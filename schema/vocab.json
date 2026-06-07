@@ -1,0 +1,64 @@
+{
+  "_comment": "字彙對照表(留鬆)。新增字彙在此加一項即可,不動 DB 表結構。extract.py 與 validate.py 都讀本檔當唯一真實來源。",
+  "schema_version": "0.1",
+  "node_type": [
+    "Company",
+    "Product",
+    "TechNode",
+    "Material",
+    "Standard",
+    "Person"
+  ],
+  "abstraction_level": [
+    "end_demand",
+    "network_systems",
+    "module_subsystem",
+    "device_chip",
+    "test_yield",
+    "foundry_packaging",
+    "equipment_epitaxy",
+    "materials_substrate"
+  ],
+  "role": [
+    "leader",
+    "bottleneck_supplier",
+    "disruptor",
+    "foundry",
+    "test",
+    "network",
+    "adjacent_silicon",
+    "material_base"
+  ],
+  "relation": [
+    "supplies_to",
+    "is_component_of",
+    "competes_with",
+    "enables",
+    "depends_on",
+    "invests_in",
+    "licenses_to"
+  ],
+  "qualification_status": [
+    "none",
+    "sampling",
+    "qualifying",
+    "qualified",
+    "designed_in"
+  ],
+  "demand_proof_level": [
+    "confirmed",
+    "guided",
+    "inferred",
+    "speculative"
+  ],
+  "source_type": [
+    "filing",
+    "transcript",
+    "ir_deck",
+    "industry_report",
+    "paper",
+    "news",
+    "social"
+  ],
+  "evidence_tier": [1, 2, 3, 4]
+}

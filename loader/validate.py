@@ -1,0 +1,108 @@
+"""
+validate.py — 驗證一份中介 JSON 是否合法且自洽。
+
+檢查三層:
+1. JSON Schema(schema/intermediate_format.schema.json)
+2. 字彙(schema/vocab.json):type/relation/level/role/... 是否都在對照表
+3. 參照完整性:edge/claim 指到的 id 是否都存在;source_ids 是否都在 sources
+
+用法:
+    pip install jsonschema
+    python loader/validate.py samples/cpo_external_laser_source.json
+"""
+from __future__ import annotations
+
+import json
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+SCHEMA = ROOT / "schema" / "intermediate_format.schema.json"
+VOCAB = ROOT / "schema" / "vocab.json"
+
+
+def _load(p: Path) -> dict:
+    with open(p, encoding="utf-8") as f:
+        return json.load(f)
+
+
+def validate(doc_path: str) -> list[str]:
+    errors: list[str] = []
+    doc = _load(Path(doc_path))
+    vocab = _load(VOCAB)
+
+    # ── 1. JSON Schema ──
+    try:
+        import jsonschema
+        jsonschema.validate(doc, _load(SCHEMA))
+    except ImportError:
+        errors.append("WARN: 未裝 jsonschema,跳過結構驗證(pip install jsonschema)")
+    except Exception as ex:  # jsonschema.ValidationError
+        errors.append(f"SCHEMA: {getattr(ex, 'message', ex)}")
+
+    node_ids = {n["id"] for n in doc.get("nodes", [])}
+    source_ids = {s["id"] for s in doc.get("sources", [])}
+
+    # ── 2. 字彙 ──
+    for n in doc.get("nodes", []):
+        if n["type"] not in vocab["node_type"]:
+            errors.append(f"VOCAB: node {n['id']} type={n['type']} 不在對照表")
+        if n["abstraction_level"] not in vocab["abstraction_level"]:
+            errors.append(f"VOCAB: node {n['id']} level={n['abstraction_level']} 不在對照表")
+        if n.get("role") and n["role"] not in vocab["role"]:
+            errors.append(f"VOCAB: node {n['id']} role={n['role']} 不在對照表")
+    for e in doc.get("edges", []):
+        if e["relation"] not in vocab["relation"]:
+            errors.append(f"VOCAB: edge {e['id']} relation={e['relation']} 不在對照表")
+        qs = e.get("attributes", {}).get("qualification_status")
+        if qs and qs not in vocab["qualification_status"]:
+            errors.append(f"VOCAB: edge {e['id']} qualification_status={qs} 不在對照表")
+    for c in doc.get("claims", []):
+        if c["demand_proof_level"] not in vocab["demand_proof_level"]:
+            errors.append(f"VOCAB: claim {c['id']} demand_proof_level={c['demand_proof_level']} 不在對照表")
+    sd = doc["source_doc"]
+    if sd["source_type"] not in vocab["source_type"]:
+        errors.append(f"VOCAB: source_doc source_type={sd['source_type']} 不在對照表")
+    if sd["evidence_tier"] not in vocab["evidence_tier"]:
+        errors.append(f"VOCAB: source_doc evidence_tier={sd['evidence_tier']} 不在對照表")
+
+    # ── 3. 參照完整性 ──
+    def _check_sources(owner: str, sids: list[str]) -> None:
+        for sid in sids:
+            if sid not in source_ids:
+                errors.append(f"REF: {owner} 的 source_id={sid} 不在 sources")
+
+    for n in doc.get("nodes", []):
+        _check_sources(f"node {n['id']}", n["source_ids"])
+    for e in doc.get("edges", []):
+        if e["src_id"] not in node_ids:
+            errors.append(f"REF: edge {e['id']} src_id={e['src_id']} 無對應 node")
+        if e["dst_id"] not in node_ids:
+            errors.append(f"REF: edge {e['id']} dst_id={e['dst_id']} 無對應 node")
+        _check_sources(f"edge {e['id']}", e["source_ids"])
+    for c in doc.get("claims", []):
+        if c["subject_id"] not in node_ids:
+            errors.append(f"REF: claim {c['id']} subject_id={c['subject_id']} 無對應 node")
+        _check_sources(f"claim {c['id']}", c["source_ids"])
+
+    return errors
+
+
+def main() -> int:
+    if len(sys.argv) != 2:
+        print("用法: python loader/validate.py <doc.json>", file=sys.stderr)
+        return 2
+    errs = validate(sys.argv[1])
+    hard = [e for e in errs if not e.startswith("WARN")]
+    for e in errs:
+        print(("  ✗ " if not e.startswith("WARN") else "  ! ") + e)
+    if hard:
+        print(f"\nFAIL: {len(hard)} 個錯誤")
+        return 1
+    print(f"\nOK: {Path(sys.argv[1]).name} 通過驗證"
+          + (" (有 warning)" if errs else ""))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

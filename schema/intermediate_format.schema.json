@@ -1,0 +1,349 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "stockbotv2/intermediate_format/0.1",
+  "title": "Engine A extraction intermediate format (DB-agnostic)",
+  "description": "extract.py for each document outputs one JSON in this format. The loader merges into Neo4j.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "source_doc",
+    "sources",
+    "nodes",
+    "edges"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string"
+    },
+    "_note": {
+      "type": "string"
+    },
+    "_comment": {
+      "type": "string"
+    },
+    "source_doc": {
+      "type": "object",
+      "required": [
+        "doc_id",
+        "title",
+        "source_type",
+        "evidence_tier"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "doc_id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "url": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "publisher": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "published_at": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "retrieved_at": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source_type": {
+          "enum": [
+            "filing",
+            "transcript",
+            "ir_deck",
+            "industry_report",
+            "paper",
+            "news",
+            "social"
+          ]
+        },
+        "evidence_tier": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4
+        }
+      }
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "locator"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "locator": {
+            "type": "string"
+          },
+          "quote": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "type",
+          "name",
+          "abstraction_level",
+          "confidence",
+          "source_ids"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z]+:[a-z0-9_\\-]+$"
+          },
+          "type": {
+            "enum": [
+              "Company",
+              "Product",
+              "TechNode",
+              "Material",
+              "Standard",
+              "Person"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "abstraction_level": {
+            "enum": [
+              "end_demand",
+              "network_systems",
+              "module_subsystem",
+              "device_chip",
+              "test_yield",
+              "foundry_packaging",
+              "equipment_epitaxy",
+              "materials_substrate"
+            ]
+          },
+          "role": {
+            "enum": [
+              "leader",
+              "bottleneck_supplier",
+              "disruptor",
+              "foundry",
+              "test",
+              "network",
+              "adjacent_silicon",
+              "material_base",
+              null
+            ]
+          },
+          "aliases": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "attributes": {
+            "type": "object",
+            "properties": {
+              "ramp_difficulty_intrinsic": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 1,
+                "maximum": 5
+              },
+              "concentration_score": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 1,
+                "maximum": 5
+              }
+            }
+          },
+          "confidence": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "source_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1
+          }
+        }
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "src_id",
+          "dst_id",
+          "relation",
+          "confidence",
+          "source_ids"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "src_id": {
+            "type": "string"
+          },
+          "dst_id": {
+            "type": "string"
+          },
+          "relation": {
+            "enum": [
+              "supplies_to",
+              "is_component_of",
+              "competes_with",
+              "enables",
+              "depends_on",
+              "invests_in",
+              "licenses_to"
+            ]
+          },
+          "attributes": {
+            "type": "object",
+            "properties": {
+              "substitutability": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 1,
+                "maximum": 5
+              },
+              "sole_source": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "lead_time_weeks": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "qualification_status": {
+                "enum": [
+                  "none",
+                  "sampling",
+                  "qualifying",
+                  "qualified",
+                  "designed_in",
+                  null
+                ]
+              },
+              "ramp_execution": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 1,
+                "maximum": 5
+              }
+            }
+          },
+          "confidence": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "source_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1
+          }
+        }
+      }
+    },
+    "claims": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "statement",
+          "subject_id",
+          "demand_proof_level",
+          "disproof_condition",
+          "confidence",
+          "source_ids"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "statement": {
+            "type": "string"
+          },
+          "subject_id": {
+            "type": "string"
+          },
+          "demand_proof_level": {
+            "enum": [
+              "confirmed",
+              "guided",
+              "inferred",
+              "speculative"
+            ]
+          },
+          "disproof_condition": {
+            "type": "string"
+          },
+          "confidence": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "source_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1
+          }
+        }
+      }
+    }
+  }
+}

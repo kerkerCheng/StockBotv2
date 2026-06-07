@@ -1,0 +1,25 @@
+# Neo4j local data — never commit DB files
+.neo4j/
+
+# Secrets
+.env
+
+# Claude Code 本機設定（不應共用）
+.claude/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+env/
+
+# Raw source documents and extraction outputs
+# Remove these lines if you want to track library/raw/ and extractions/ in git.
+# For files under ~500 KB, tracking is fine; larger files (full transcripts/PDFs) should stay gitignored.
+library/raw/*
+!library/raw/.gitkeep
+extractions/*
+!extractions/.gitkeep
