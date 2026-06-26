@@ -27,6 +27,12 @@ import os
 import sys
 from pathlib import Path
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv(Path(__file__).resolve().parent / ".env")
+except ImportError:
+    pass
+
 ROOT = Path(__file__).resolve().parent
 SYSTEM_PROMPT_FILE = ROOT / "prompts" / "extract_system.md"
 SAMPLE_FILE = ROOT / "samples" / "cpo_external_laser_source.json"
@@ -136,7 +142,7 @@ Output ONLY the JSON object."""
 
     response = client.messages.create(
         model=model,
-        max_tokens=4096,
+        max_tokens=8192,
         system=system_prompt,
         messages=[{"role": "user", "content": user_message}],
     )

@@ -22,6 +22,13 @@ import json
 import os
 import sys
 from datetime import datetime, timezone
+from pathlib import Path
+
+try:
+    from dotenv import load_dotenv
+    load_dotenv(Path(__file__).resolve().parent.parent / ".env")
+except ImportError:
+    pass
 
 
 def _now() -> str:

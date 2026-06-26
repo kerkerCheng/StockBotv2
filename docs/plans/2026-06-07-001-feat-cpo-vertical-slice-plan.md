@@ -16,7 +16,7 @@ depth: standard
 
 Build the two foundations of the CPO/矽光子 vertical slice:
 
-1. **Infra (U1):** Docker Compose brings up Neo4j 5.x with APOC. Schema is applied, the hand-authored sample loads cleanly, and the graph is visually verified in the Neo4j Browser.
+1. **Infra (U1):** Neo4j Desktop brings up Neo4j 5.x with APOC plugin. Schema is applied, the hand-authored sample loads cleanly, and the graph is visually verified in the Neo4j Browser.
 2. **Extract pipeline (U2–U3):** `extract.py` reads a raw CPO-related transcript or paper section from `library/raw/`, calls the Claude API with a chokepoint-atlas question-ladder system prompt built from `schema/graph_schema.md` + `schema/vocab.json`, and outputs intermediate JSON compliant with `schema/intermediate_format.schema.json`. The pipeline runs: extract → `loader/validate.py` → `loader/load_to_neo4j.py` → Browser review → schema gaps logged to CLAUDE.md Lessons.
 
 When both steps pass their acceptance criteria the vertical slice v0 is complete. All automation, multi-document batching, and RAG/thesis layers are deferred.
@@ -37,7 +37,7 @@ Until a real document runs through `extract → validate → load → human revi
 
 | ID | Requirement |
 |---|---|
-| R1 | Neo4j 5.x runs locally via Docker Compose with APOC plugin enabled. |
+| R1 | Neo4j 5.x runs locally via Neo4j Desktop with APOC plugin enabled. |
 | R2 | Schema setup cypher (`schema/neo4j_setup.cypher`) applies cleanly; 4+ indexes visible. |
 | R3 | Sample JSON (`samples/cpo_external_laser_source.json`) loads with correct node/edge/claim counts and MERGE idempotency. |
 | R4 | `extract.py` accepts a raw text file, calls Claude API, and writes a JSON file to `extractions/`. |
@@ -113,7 +113,7 @@ flowchart TD
 ## Scope Boundaries
 
 ### In scope
-- Docker Compose + Neo4j 5.x with APOC
+- Neo4j Desktop + Neo4j 5.x with APOC
 - `schema/neo4j_setup.cypher` application and index verification
 - Sample load verification (Step 1 acceptance criteria)
 - `library/raw/` and `extractions/` directory structure
@@ -142,24 +142,29 @@ flowchart TD
 
 ## Implementation Units
 
-### U1. Docker + Neo4j Infrastructure
+### U1. Neo4j Desktop Infrastructure
 
-**Goal:** Neo4j 5.x running locally with APOC; schema applied; sample loaded and visually verified.
+**Goal:** Neo4j 5.x running locally via Neo4j Desktop with APOC; schema applied; sample loaded and visually verified.
 
 **Requirements:** R1, R2, R3
 
 **Dependencies:** None
 
 **Files:**
-- `docker-compose.yml` (create)
-- `.env.example` (create)
-- `.gitignore` (modify — add `.neo4j/`, `.env`)
+- `.env.example` (already committed — no changes needed)
+- `.gitignore` (already committed — no changes needed)
+- `docker-compose.yml` — already committed; remains in repo as an optional Docker alternative for future use, but is not the active path.
 
 **Approach:**
-- `docker-compose.yml` uses `neo4j:5.26-community` image, exposes ports 7474 (Browser) and 7687 (Bolt), sets `NEO4J_AUTH`, enables APOC plugin via `NEO4J_PLUGINS=["apoc"]` and `NEO4J_dbms_security_procedures_unrestricted=apoc.*`, mounts `.neo4j/data` and `.neo4j/logs` as volumes.
-- `.env.example` documents all required env vars: `NEO4J_URI`, `NEO4J_USER`, `NEO4J_PASSWORD`, `ANTHROPIC_API_KEY`, `EXTRACT_MODEL` (optional, defaults to `claude-sonnet-4-6`).
-- After `docker compose up -d`, apply schema via `cypher-shell` piping `schema/neo4j_setup.cypher`, then load sample with `loader/load_to_neo4j.py samples/cpo_external_laser_source.json --apoc`.
-- Step 1 acceptance check is manual (Neo4j Browser queries as listed in `docs/next-steps.md`).
+1. Download and install **Neo4j Desktop** from [neo4j.com/download](https://neo4j.com/download/) (Windows installer, free).
+2. In Neo4j Desktop: **New Project → Add → Local DBMS**, select Neo4j version **5.x** (e.g. 5.26), set a password.
+3. Before starting: go to the **Plugins** tab → install **APOC** (one-click install).
+4. Click **Start** to launch the database. Bolt URI will be `bolt://localhost:7687`.
+5. Copy `.env.example` to `.env`; fill in `NEO4J_URI=bolt://localhost:7687`, `NEO4J_USER=neo4j`, `NEO4J_PASSWORD=<password set in step 2>`, and `ANTHROPIC_API_KEY`.
+6. Apply schema: open Neo4j Browser at `http://localhost:7474`, connect, then either:
+   - Paste the full contents of `schema/neo4j_setup.cypher` into the query editor and run, **or**
+   - Use cypher-shell (bundled with Neo4j Desktop under the **Terminal** button): `cat schema/neo4j_setup.cypher | cypher-shell -u neo4j -p <password>`
+7. Load sample: `python loader/load_to_neo4j.py samples/cpo_external_laser_source.json --apoc`
 
 **Test scenarios:**
 - `SHOW INDEXES;` returns ≥4 indexes (entity_id_unique, entity_type, entity_level, entity_role, plus fulltext and vector indexes).
@@ -322,7 +327,7 @@ MATCH (n:Entity)-[r]->(m:Entity) RETURN n, r, m LIMIT 50;
 | Entity ID mismatch creates duplicate nodes | High on first run | Graph becomes noisy | Known entity list in system prompt mitigates; human review catches it; fix slug in prompt and re-run |
 | Transcript section too long for context window | Low (trimmed to CPO section) | Truncated extraction | Manual trim per KTD3; chunk if needed as a follow-up |
 | APOC not loaded in time when Neo4j starts | Low | `--apoc` flag fails | Add `--no-apoc` fallback (already in `load_to_neo4j.py`); wait 20–30s after `docker compose up -d` |
-| Docker not installed / WSL2 issues on Windows | Medium (Windows 11 dev machine) | Infra blocked | Docker Desktop with WSL2 backend; ensure WSL2 integration is enabled in Docker settings |
+| Neo4j Desktop installation issues | Low | Infra blocked | Standard Windows installer; if version 5.x unavailable in Desktop, download standalone Neo4j 5.x Community zip from neo4j.com and run manually |
 
 **External dependency:** Anthropic API key (`ANTHROPIC_API_KEY`) must be set in `.env`. Extract will fail cleanly if missing.
 

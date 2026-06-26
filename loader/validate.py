@@ -16,6 +16,12 @@ import json
 import sys
 from pathlib import Path
 
+# Windows consoles default to cp950; force utf-8 so ✓/✗ render correctly.
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
 ROOT = Path(__file__).resolve().parent.parent
 SCHEMA = ROOT / "schema" / "intermediate_format.schema.json"
 VOCAB = ROOT / "schema" / "vocab.json"
@@ -80,9 +86,10 @@ def validate(doc_path: str) -> list[str]:
         if e["dst_id"] not in node_ids:
             errors.append(f"REF: edge {e['id']} dst_id={e['dst_id']} 無對應 node")
         _check_sources(f"edge {e['id']}", e["source_ids"])
+    edge_ids = {e["id"] for e in doc.get("edges", [])}
     for c in doc.get("claims", []):
-        if c["subject_id"] not in node_ids:
-            errors.append(f"REF: claim {c['id']} subject_id={c['subject_id']} 無對應 node")
+        if c["subject_id"] not in node_ids and c["subject_id"] not in edge_ids:
+            errors.append(f"REF: claim {c['id']} subject_id={c['subject_id']} 無對應 node 或 edge")
         _check_sources(f"claim {c['id']}", c["source_ids"])
 
     return errors

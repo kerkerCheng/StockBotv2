@@ -91,6 +91,31 @@ v0 schema 的對錯只有真實資料能驗證。凍結一個會壞的 v0 → �
 **結論:** 品類集中度/內在量產難度 = node(且集中度應衍生);可替代性/sole-source/lead-time/供應商 ramp 執行力 = edge;需求證據強度 = 證據 metadata 掛在主張上;市場擁擠度 = 時變觀測進 Postgres。
 **一句話:** 瓶頸的本質是「一條關係會不會斷」,所以瓶頸的 alpha 大半在**邊**上,不在點上。別把分數無腦掛 node。
 
+### L6 — 第一次真實抽取撞出的三個 schema/pipeline gap
+
+**事發:** 用 Coherent Q3 FY2026 法說會 CPO 段落跑完 extract → validate → load → Browser review 後發現。
+
+**Gap 1 — Claim 節點沒有 `name` 欄位**
+Neo4j Browser 找不到 `name` 就拿 `confidence`(0.55)當顯示標籤,讓人以為是一個數值節點。
+修法:loader 在寫入 Claim 時自動從 `statement` 截前 30 字填成 `name`,或 Browser query 時 `RETURN c.id + ": " + c.statement` 手動補。
+
+**Gap 2 — `source_ids` 是文件內局部 ID,跨文件後無法在圖裡直接追溯**
+樣本(s2/s4)與法說會(s2/s4)指向完全不同的 quote,但在 Neo4j 裡看節點的 `source_ids` 時無法知道是哪份文件的 s2。Sources 沒有存進 Neo4j,只存在各自 JSON 裡。
+修法方向(v1):source ID 改成全域唯一格式 `<doc_id>_s<N>`(例: `coherent_q3fy26_s2`);或把 sources 也寫成 Neo4j 節點(`Source` label),讓圖本身可追溯。v0 先接受這個限制,追溯時需對照原始 JSON。
+
+**Gap 3 — `ABOUT` 邊類型未在 `vocab.json` 登記**
+loader 自動建 Claim→subject 的 `ABOUT` 關係,但這個 relation 沒有進 `schema/vocab.json`。validate.py 的 vocab 層目前只檢查 Edge(非 Claim 邊)的 relation 欄位,所以沒有報錯,但在字彙表上是個洞。
+修法:在 `vocab.json` 的 `relation` 清單補上 `about`(或決定 Claim 邊不走 vocab 檢查);同步更新 `loader/validate.py` 說明。
+
+**Gap 4 — LLM 從類別詞推斷出具體產品節點(幻覺型態)**
+s15 quote 只說「data center interconnect 需求強」,LLM 自己推出 ZR/ZR+ DCI Transceivers 節點,但文件從未出現 ZR/ZR+ 字樣。quote 支持的是「DCI 需求」這個類別,不是具體型號。
+修法:在 `prompts/extract_system.md` 加強規則:「若 quote 只提到產品類別(如 'data center interconnect'),不要抽出具體型號節點(如 ZR/ZR+)。具體產品名稱必須在 quote 裡逐字出現。」
+
+**通用判準:**
+1. Schema gap 只有在真實資料撞上去才會現形。凍結 v0 讓資料教你,比白板多討論兩週更有價值(L2 再次驗證)。
+2. 局部 ID 在單文件內沒問題,跨文件 MERGE 後就會產生命名空間衝突。設計 ID 時要問「這個 ID 在系統全局還是文件局部?」
+3. LLM 最常見的幻覺型態之一:從類別詞推斷出具體實體。review 時重點抽查「具體型號/公司名是否逐字出現在 quote 裡」。
+
 ### L5 — chokepoint-atlas / serenity-skill 是方法論藍圖,不是相依套件
 兩者都是純 prompt 的研究方法論 skill(無狀態、模仿 Serenity/Crux 兩位 X 大佬),沒有持久化知識庫。**抄骨架(stack 分層、role 分類、證據四階、question-ladder 當抽取 prompt、output-formats 當報告模板),不裝套件、不綁相依。** 它們補的是「怎麼想」,我們專案補的是它們缺的「記得」(持久化知識庫)。注意是**單一 lens**(偏小市值瓶頸獵手、高風險),當眾多視角之一,別讓系統世界觀被綁死。
 

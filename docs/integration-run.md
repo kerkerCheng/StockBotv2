@@ -5,23 +5,25 @@
 ---
 
 ## 前置條件
-- [ ] Docker Desktop 已啟動且 WSL2 整合已啟用(Windows 設定 → Docker → Resources → WSL Integration)
-- [ ] `.env` 已建立(複製 `.env.example`,填入真實 `ANTHROPIC_API_KEY` 與 `NEO4J_PASSWORD`)
+- [ ] **Neo4j Desktop** 已安裝並啟動 (下載: https://neo4j.com/download/)
+  - Desktop 內建立 Local DBMS (Neo4j 5.x)、安裝 APOC 插件、啟動資料庫 (狀態顯示 Running)
+- [ ] `.env` 已建立(複製 `.env.example`,填入 `NEO4J_URI=bolt://localhost:7687`、`NEO4J_USER=neo4j`、`NEO4J_PASSWORD`、`ANTHROPIC_API_KEY`)
 - [ ] `pip install neo4j jsonschema anthropic` 已完成
 
 ---
 
-## Step 1 — 啟動 Neo4j + 載入樣本 (U1 驗收)
+## Step 1 — 套 Schema + 載入樣本 (U1 驗收)
 
-```powershell
-# 在 repo 根目錄執行
-docker compose up -d
-# 等約 30 秒讓 Neo4j + APOC 完整起動
-```
+確認 Neo4j Desktop 的資料庫狀態為 **Running**。
 
-套 schema:
+套 schema — 擇一執行:
+
+**方式 A — Neo4j Browser(最簡單):**
+開啟 http://localhost:7474 → 連線 → 把 `schema/neo4j_setup.cypher` 全文貼進查詢框執行。
+
+**方式 B — cypher-shell(Desktop 內建 Terminal):**
 ```powershell
-Get-Content schema\neo4j_setup.cypher | docker exec -i stockbot-neo4j cypher-shell -u neo4j -p stockbot_dev_pw
+Get-Content schema\neo4j_setup.cypher | cypher-shell -u neo4j -p <your_password>
 ```
 
 載入手工樣本:

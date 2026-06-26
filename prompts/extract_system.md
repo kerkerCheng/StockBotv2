@@ -11,13 +11,28 @@ You output ONLY a JSON object that conforms exactly to the intermediate_format s
 ```
 {
   "schema_version": "0.1",
-  "source_doc": { ... },    // filled in by caller — do NOT invent values
-  "sources": [ ... ],       // your locator + quote entries
-  "nodes": [ ... ],
-  "edges": [ ... ],
-  "claims": [ ... ]         // optional, only for explicit demand/bottleneck claims
+  "source_doc": { ... },
+  "sources": [
+    { "id": "s1", "locator": "Q3 prepared remarks, p.2", "quote": "verbatim text..." }
+  ],
+  "nodes": [
+    {
+      "id": "co:example", "type": "Company", "name": "Example Corp",
+      "abstraction_level": "module_subsystem", "role": "leader",
+      "aliases": [], "attributes": {}, "confidence": 0.9, "source_ids": ["s1"]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1", "src_id": "co:example", "dst_id": "tech:cpo",
+      "relation": "supplies_to", "attributes": {}, "confidence": 0.75, "source_ids": ["s1"]
+    }
+  ],
+  "claims": []
 }
 ```
+
+**CRITICAL field names for edges: use `src_id` and `dst_id` — NOT `from`/`to`, `source`/`target`, or any other variant.**
 
 The caller injects `source_doc` (doc_id, title, source_type, evidence_tier) into the user message. Do not fabricate those fields; use the values the caller provides.
 
@@ -188,6 +203,8 @@ Do not extract the following — they are time-varying observations or out-of-sc
 - Inventory levels, backlog dollar amounts, days-of-supply
 - Generic product descriptions with no supply-chain relationship
 - Any relationship that has no supporting quote in the document
+
+**Product/entity naming rule:** A specific product name or model number (e.g. "ZR/ZR+ transceivers", "Tomahawk 6") may only become a node if that exact name appears verbatim in the document. If the document only mentions a product *category* (e.g. "data center interconnect transceivers", "AI switches"), extract the category as a TechNode — do NOT infer or invent a specific product name.
 
 ---
 
