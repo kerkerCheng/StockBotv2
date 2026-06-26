@@ -122,3 +122,8 @@ s15 quote 只說「data center interconnect 需求強」,LLM 自己推出 ZR/ZR+
 **已評估、可撿的零件:**
 - serenity-skill 的 `market-source-playbook` → 已併入上方「一手來源」登記表(尤其台股 MOPS/月營收)。
 - serenity-skill 的 `bottleneck-scorecard.json` + 評分腳本(8 因子 + 8 扣分項 → 排序)→ **留給引擎C 參考**,不是引擎A 要用的。它把因子攤平在一張表,正好反證 L4:持久化的庫必須拆到 node/edge/時變觀測,不能攤平。
+
+<!-- ===== 自訂:Skill 輸出翻譯(2026-06 加) ===== -->
+## Skill 輸出語言
+執行 last-30-days skill 時,最終輸出翻成繁體中文...
+<!-- ===== 自訂結束 ===== -->

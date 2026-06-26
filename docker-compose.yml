@@ -6,7 +6,7 @@ services:
       - "7474:7474"   # Browser
       - "7687:7687"   # Bolt
     environment:
-      - NEO4J_AUTH=neo4j/stockbot_dev_pw
+      - NEO4J_AUTH=neo4j/c4780647
       - NEO4J_PLUGINS=["apoc"]
       - NEO4J_dbms_security_procedures_unrestricted=apoc.*
     volumes:
