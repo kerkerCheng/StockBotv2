@@ -213,6 +213,13 @@ claims 迴圈裡，在 `session.run(...)` 前計算：
 4. Coherent 最新 10-K（Products 章節）：提供更完整的產品線描述
 5. OFC 2025 論文（1-2 篇）：技術架構視角，補 Tier 2 證據
 
+*前置確認（U2 開始前跑一次）:*
+確認 Neo4j DBMS 已重啟且 APOC 生效（Desktop 安裝 APOC plugin 後需 restart）：
+```cypher
+RETURN apoc.version();
+-- 正常應印出版本號，若報錯代表 APOC 未啟用，先重啟 DBMS 再繼續
+```
+
 *每份文件處理（重複以下步驟）:*
 ```powershell
 python extract.py `
@@ -236,12 +243,15 @@ MATCH (n:Entity) WHERE n.id CONTAINS 'coherent' RETURN n.id;
 -- 不應出現 co:coherent_2 或類似重複
 ```
 
+*已知：手工 sample 的 source_ids 格式不一致（v0 接受，不修）*
+`samples/cpo_external_laser_source.json` 的 source_ids 是手工短 ID（`s1`, `s2`），不走 extract.py，不會被 U1 的前綴修補覆蓋到。Review 邊時若看到短格式 `s1`，先用 edge.id 比對各 JSON 的 edges 清單確認來源文件，再到對應 JSON 查 quote。跨文件命名空間統一（含 sample）列為 Deferred。
+
 **Test scenarios:**
 - 每份文件 validate.py 返回 OK（0 hard errors）
 - 每份文件 load 後圖節點總數有增加
 - `co:coherent`、`co:lumentum`、`co:broadcom`、`tech:cpo` 等核心節點的 `source_ids` 陣列隨文件數增長（跨文件 MERGE 成功）
 - `MATCH (n:Entity) RETURN n.abstraction_level, count(n)` 顯示至少 4 個不同 level 有節點
-- 抽查 2 份新文件各 2 條 edge：quote 支持關係方向（人工驗收）
+- 抽查 2 份新文件各 2 條 edge：quote 支持關係方向（人工驗收）。Review 方式：用 `r.id` 比對各 source JSON 的 edges 清單找出所屬文件，再到該文件的 sources 取 quote，而非混查不同文件的 sources（Gap 2 防範）
 
 **Verification:** 載入 5-8 份文件後，`MATCH (n:Entity)-[r]->(m:Entity) RETURN n, r, m LIMIT 100` 能看到跨越需求端、module/device、foundry/material 等多層的關係網絡。
 

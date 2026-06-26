@@ -1,7 +1,7 @@
 ---
 title: "feat: CPO/矽光子垂直切片 — 基礎建設 + extract 管線"
 date: 2026-06-07
-status: active
+status: completed
 type: feat
 depth: standard
 ---

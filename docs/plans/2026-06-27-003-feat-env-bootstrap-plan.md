@@ -1,7 +1,7 @@
 ---
 title: "feat: StockBotv2 環境重建 — plan002 前置 bootstrap"
 date: 2026-06-27
-status: active
+status: completed
 type: feat
 depth: standard
 ---
