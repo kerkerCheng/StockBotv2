@@ -53,15 +53,26 @@
 
 `demand_proof_level`(需求主張的證據強度,**掛在需求主張/邊上,不是 node 靜態欄**): confirmed | guided | inferred | speculative
 
+**來源獨立性鐵律:** `confidence` 只在不同 `origin_event`(原始事件)之間才累加。同一場法說會的多份摘要、同一 PR 被多家媒體轉發,算一個 `origin_event`,不是多重佐證。標注原則:每個 source 應記錄其 `origin_entity`(哪家公司發出)+ `origin_event`(哪個原始事件,如 `coherent_fy26q3_earnings`);相同 `origin_event` 的多個 source 在 confidence 計算中只算一次。
+
+**`sole_source` 標記規則:** 必須區分兩種情況,二者信心強度不同:
+- `verified_by_absence`:文件沒有提到第二供應商 → 弱主張,`confidence` 不得超過 0.5
+- `verified_by_search`:主動查過競品 / 替代路徑 / 客戶自製可能,確認暫無 → 強主張
+一個節點自己的法說會說「我們是唯一供應商」不算 `verified_by_search`;需要**客戶端或第三方**來源印證。
+
 ### 不進圖的東西(時變觀測,歸引擎B/C 的 Postgres 時間序列)
 - `consensus_coverage`(underfollowed | emerging | crowded):這是**股票/公司的市場認知**,且會隨時間變,屬 Company 的帶時戳觀測,**不是物理 component 的靜態圖屬性**。
 
 ### 報告產出三級模板(借自 chokepoint-atlas output-formats)
-1. **Directional Lane Memo**(先給方向):一句 thesis → 需求驅動 → stack 摘要 → 主瓶頸 → 最強證據 → 什麼會推翻它 → 接下來盯什麼
+1. **Directional Lane Memo**(先給方向):一句 thesis → 需求驅動 → stack 摘要 → 主瓶頸 → 最強證據 → 什麼會推翻它 → 接下來盯什麼 → **variant perception(市場現在信 X,本 thesis 認為 Y,催化劑 Z)**
+   - Lane Memo 是方向備忘,**不是可操作的投資建議**。財務核驗清單(5 項)是升格到 Watchlist 的 gate,不是 Lane Memo 的 gate。
+   - `variant perception` 是**必填欄**,不是選填。缺這一段的 Lane Memo 不能升格(無論其他分數多高)。
+   - **Variant perception 的正確操作定義:「當前股價/估值隱含的假設是 X,本 thesis 認為真實情況會是 Y,催化劑 Z 會讓市場重新定價。」** 重點是股價說什麼,不是「多數人信什麼」——市場可以一半信 X、一半信 Y,但若股價仍以 X 的假設定價,信 Y 且 Y 對就有 alpha。可從 forward P/E / EV/Sales / 分析師共識估值推斷股價的隱含假設。
 2. **Watchlist**(thesis 成立後才給名字):每檔附 role / 為何重要 / 已確認 / 待驗證 / 主風險
+   - **升格條件(全部滿足才能升格):**(a) Lane Memo 評分通過失敗閾值;(b) variant perception 已明確寫出;(c) 財務核驗清單 5 項完成(客戶集中度 / 毛利率趨勢 / backlog / 稀釋 / 估值壓力)。
 3. **Underwrite Sheet**(單一標的深挖)
 
-每份 thesis/claim 必帶 `disproof_condition`(可證偽是一等公民)。
+每份 thesis/claim 必帶 `disproof_condition`(可證偽是一等公民)。thesis 生命週期:`active` → 定期核查 disproof 條件 → 條件觸發 → 強制 review → `retired` 或 `revised`。欄位存在不等於流程存在;disproof 條件觸發時必須有明確的下一步動作(見 L7)。
 
 ## 踩過的坑 / 通用判準 (Lessons)
 
@@ -122,6 +133,35 @@ s15 quote 只說「data center interconnect 需求強」,LLM 自己推出 ZR/ZR+
 **已評估、可撿的零件:**
 - serenity-skill 的 `market-source-playbook` → 已併入上方「一手來源」登記表(尤其台股 MOPS/月營收)。
 - serenity-skill 的 `bottleneck-scorecard.json` + 評分腳本(8 因子 + 8 扣分項 → 排序)→ **留給引擎C 參考**,不是引擎A 要用的。它把因子攤平在一張表,正好反證 L4:持久化的庫必須拆到 node/edge/時變觀測,不能攤平。
+
+### L7 — Thesis 生命週期:`disproof_condition` 是欄位,不是流程
+**判準:** 光是填 `disproof_condition` 不夠。欄位有填但沒有後續流程,等於貼了一個永遠不會響的火警警報。
+
+**Thesis 生命週期定義:**
+- `active`:thesis 成立,定期核查 disproof 條件(建議每季一次)
+- `watch`:有 leading indicator 朝 disproof 方向移動,升高監控頻率
+- `review_required`:disproof 條件已觸發,強制 review(不能繼續持有不檢查)
+- `retired`:確認 thesis 失效,出場並記錄推翻原因
+- `revised`:修正後的 thesis 成立,重新進入 `active` 並更新 disproof 條件
+
+**何時會爆:** 每條 thesis 的 `disproof_condition` 應附「核查頻率」與「觸發後 48 小時內要做什麼」。沒有這兩個欄位,生命週期只是一張圖。
+
+### L8 — 自我報告確認偏誤:供應商的法說會不能作為「自己是瓶頸」的獨立佐證
+**事發:** 計畫用 Lumentum 法說會作為「Lumentum 是 CPO 外部雷射 sole_source」的主要佐證。但 Lumentum 在法說會裡天然會強調自家不可替代性;這份文件不是獨立證據,是當事人陳述。
+
+**判準:**
+1. **來源獨立性檢查(多文件入圖前):** 文件選源清單中,至少 3 個不同 `origin_entity`。「被分析的公司自己的文件」只能算佐證,不能算主要確認來源。
+2. **`sole_source` 確認來源必須是客戶端或第三方:** 供應商自稱 sole_source → `verified_by_absence`(弱)。客戶在法說會中說「目前只有一個供應商」、或第三方產業報告列供應商名單只有該公司 → 才能考慮 `verified_by_search`(強)。
+3. **圖裡的交叉驗證:** 若某條 `sole_source=true` 的邊,其所有 source_ids 的 `origin_entity` 全是同一家供應商,標記 `sole_source_evidence_quality: weak`。
+
+### L9 — 三引擎匯流的前置條件(Engine C 與投資諮詢開放前必做)
+**Engine C 設計前必先定義 A→C join key:**
+Engine A 的圖節點(如 `co:coherent`)和 Engine C 的 Postgres 財務數字(Coherent 的毛利率、營收)要能自動對齊,需要一個共同 ID(如 ticker `COHR`、MOPS 代號)。join key 若在 Engine C 設計期才決定,要回頭改 A 的 loader 和 schema;在 Engine C 啟動前先定義一頁資料流(B 線索 → A 觸發條件、A 節點 → C 的 join key、最終 decision layer 輸入輸出)成本最低。
+
+**投資諮詢開放的三個前置條件(全部滿足才開放):**
+1. 第二條垂直切片必須是**非 AI / 非 CPO** 主題,且跑通相同的 extract → thesis → 評分流程。目的:驗證方法論不是 AI 多頭的特例,而是跨主題有效的框架。
+2. thesis→部位的最小規則已定義(進場條件 / 單檔上限 / 持有期 / thesis 失效即出場),哪怕是人工執行的規則。沒有 sizing 規則的「建議」只是選股清單。
+3. 財務核驗清單 5 項(客戶集中度 / 毛利率趨勢 / backlog / 稀釋 / 估值壓力)已能一鍵從 Engine C 查出,並且必須在 Watchlist 升格前執行。
 
 <!-- ===== 自訂:Skill 輸出翻譯(2026-06 加) ===== -->
 ## Skill 輸出語言

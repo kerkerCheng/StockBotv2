@@ -205,6 +205,9 @@ claims 迴圈裡，在 `session.run(...)` 前計算：
 
 **Approach:**
 
+*來源獨立性前置規則（開始選源前確認）:*
+最終文件清單必須包含 **至少 3 個不同 `origin_entity`（原始資訊來源公司）**。Coherent 的多季法說會（Q1/Q2/Q3）+ 10-K 算同一 origin_entity，不論拆成幾份文件。原因：同一家公司的自我報告無法作為「它是瓶頸」的獨立佐證（CLAUDE.md L8）。若無法滿足 3 個 origin_entity，優先尋找客戶端（如 hyperscaler 法說會提及 CPO）或產業第三方來源，而非重複選同一家公司。
+
 *選源優先順序（per KTD5）:*
 每類至少涵蓋一篇，以下為建議清單：
 1. Coherent Corp：FY26 Q1 或 Q2 法說會 CPO 段落（比較季度趨勢）
@@ -288,14 +291,15 @@ RETURN a.name, type(r), b.name, r.attributes, r.confidence, r.source_ids
 ORDER BY r.confidence DESC LIMIT 50
 
 -- 3. 瓶頸候選（sole_source 或 低 substitutability）
+-- 用 APOC JSON 解析，避免字串 CONTAINS 因序列化格式差異靜默失效（blind-spot A4）
 MATCH (a:Entity)-[r]->(b:Entity)
-WHERE r.attributes CONTAINS '"sole_source": true'
-   OR r.attributes CONTAINS '"substitutability": 1'
-   OR r.attributes CONTAINS '"substitutability": 2'
+WHERE apoc.convert.fromJsonMap(r.attributes).sole_source = true
+   OR toInteger(apoc.convert.fromJsonMap(r.attributes).substitutability) <= 2
 RETURN a.name, b.name, r.relation, r.attributes, r.source_ids
 
--- 4. Claims（confirmed/guided 優先）
+-- 4. Claims（confirmed/guided 優先，加 confidence floor 過濾低信心雜訊）
 MATCH (c:Claim)-[:ABOUT]->(s:Entity)
+WHERE c.confidence >= 0.5
 RETURN c.statement, c.demand_proof_level, c.disproof_condition,
        c.confidence, s.name, c.source_ids
 ORDER BY
@@ -385,16 +389,24 @@ Token 控制：context 組裝後做 `len(context) // 4` 粗估，若超過 7500 
 
 **Approach:**
 
-`thesis/scoring_rubric.md` 定義 5 個維度（各 1-5 分）：
+`thesis/scoring_rubric.md` 定義 6 個維度（各 1-5 分，滿分 30）：
 1. **可信度（Credibility）：** 主張都有 Tier 1/2 一手來源支持？ (1=全部推測，5=全部 Tier 1)
 2. **瓶頸清晰度（Chokepoint Clarity）：** 供應鏈的 chokepoint 被準確識別並解釋？
 3. **可證偽性（Falsifiability）：** 每個主要論點有具體、可觀測的 disproof_condition？
 4. **洞見密度（Insight Density）：** 投資者看完能採取行動，還是全是已知事實？
 5. **完整性（Completeness）：** 7 個段落都有實質內容，且涵蓋需求/供應/技術三個視角？
+6. **市場差異度（Variant Perception）：** Thesis 是否明確說出「市場現在信 X，本 thesis 認為 Y，催化劑 Z」？(1=與賣方共識完全一致，5=有具體的非共識主張且可驗證)
+
+**失敗閾值（Engine A 推進判準）：**
+- 可信度 < 3 **或** 可證偽性 < 3 → thesis 退回 U2（補充更多 Tier 1 文件），不算 Engine A 這條切片完成
+- 市場差異度 < 2 → thesis 是賣方共識整理，標記為「研究素材」而非「可升格 thesis」，不升格到 Watchlist
+- 總分 ≥ 22/30 且前兩條均通過 → 可進入 Watchlist 升格流程（仍需財務核驗 5 項）
 
 評分後，把結果（各維分數 + 評語 + 整體評估 + 最弱的環節）記進 CLAUDE.md 新 Lesson（L7 或下一個可用編號）。
 
 *CLAUDE.md 修改項目：*
+
+0. 確認 L7、L8、L9 已在 CLAUDE.md 中存在（blind-spot audit 已加入）。若本次 run 發現更多 gap，以 L10+ 格式追加。
 
 1. 把「引擎順序 C → A → B」段落更新為：
    > **開發順序（更新版）:** A 先（垂直切片驗證端到端路線）→ 之後 A/C 交替推進（A 出 thesis → C 補基本面校準 → A 精進 → ...）→ B 最後。  
