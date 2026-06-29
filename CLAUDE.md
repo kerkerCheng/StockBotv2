@@ -16,7 +16,11 @@
 - **抽取與 DB 解耦:** `extract.py` 只輸出 DB 無關的 node/edge JSON 中介格式;「JSON → 寫進 DB」是可替換的 loader。DB 選擇不可綁死資料。
 - **graph 用 property graph,不用 tree。** 供應鏈/技術拓樸本質是 DAG。節點帶 `type` + `abstraction_level`,邊帶 `relation` 型別。每個 node/edge 必掛 `source_ids` + `confidence`(來源可追溯是鐵律)。
 - **schema 字彙(type/relation 種類)用對照表管理、留鬆;表的「形狀」鎖死。** 加新邊型別 = 加一列設定,不動表結構。
-- **開發順序:垂直切片優先。** 第一條切片 = CPO/矽光子,一個標的端到端跑通(手選 8~10 篇一手資料 → extract → 圖+向量 → 出 thesis → 人工評分),再談自動化。引擎順序 C → A → B(C 最客觀好驗證;B 最後做)。
+- **開發順序:垂直切片優先。** 第一條切片 = CPO/矽光子,一個標的端到端跑通(手選 5-8 篇一手資料 → extract → 圖 → Cypher context builder → 出 thesis → 人工評分),再談自動化。
+  **開發順序（更新版）:** A 先（垂直切片驗證端到端路線）→ 之後 A/C 交替推進（A 出 thesis → C 補基本面校準 → A 精進 → ...）→ B 最後。
+  **判準：** A 切片讓系統能輸出洞見（thesis 為 A 的驗收），C 提供量化錨點（基本面數字校準 A 的定性判斷），兩者互補。A-first 已在 CPO/矽光子切片中驗證。
+  - **Milestone A（已完成）:** 1 篇文件 extract → graph → human edge review；L6 四個 schema gap 記錄與修正（source_id 全域命名空間、Claim name 自動填入、vocab about、幻覺防護規則）。
+  - **Milestone B（本計畫目標）:** 5-8 篇文件 → Cypher context builder → thesis 生成（Directional Lane Memo）→ 人工評分；完成即可啟動 Engine C（基本面引擎）規劃。
 - **一手來源優先於通用搜尋:** 通用搜尋(Tavily 等)只配 LLM 品質評分 gate,用在第三層。一手來源依市場分路(來源登記表,借自 serenity-skill 的 market-source-playbook):
   - **美股:** SEC EDGAR(10-K/10-Q/8-K/S-1/Form 4)、法說會逐字稿、IR 簡報、客戶/供應商 filings。
   - **台股:** 公開資訊觀測站(MOPS)、**月營收揭露**、法說會 / IR、上下游上市公司交叉驗證。

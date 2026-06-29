@@ -63,6 +63,39 @@ def _known_entities_block() -> str:
     return "\n".join(lines)
 
 
+def _prefix_source_ids(doc: dict, doc_id: str) -> dict:
+    """Rewrite all source IDs from local s{N} to {doc_id}_s{N} format.
+
+    Pure function — returns a new dict, does not mutate the input.
+    Idempotent: skips IDs that already contain an underscore-s pattern (already prefixed).
+    """
+    import copy
+    doc = copy.deepcopy(doc)
+
+    mapping: dict[str, str] = {}
+    for s in doc.get("sources", []):
+        old_id = s["id"]
+        # Already prefixed if it contains '_s' followed by digits
+        if "_s" in old_id and old_id.split("_s")[-1].isdigit():
+            mapping[old_id] = old_id
+        else:
+            new_id = f"{doc_id}_{old_id}"
+            mapping[old_id] = new_id
+            s["id"] = new_id
+
+    def _rewrite(ids: list) -> list:
+        return [mapping.get(sid, sid) for sid in ids]
+
+    for n in doc.get("nodes", []):
+        n["source_ids"] = _rewrite(n.get("source_ids", []))
+    for e in doc.get("edges", []):
+        e["source_ids"] = _rewrite(e.get("source_ids", []))
+    for c in doc.get("claims", []):
+        c["source_ids"] = _rewrite(c.get("source_ids", []))
+
+    return doc
+
+
 def _strip_code_fences(text: str) -> str:
     """Remove leading ```json or ``` and trailing ``` from LLM responses."""
     text = text.strip()
@@ -165,6 +198,9 @@ Output ONLY the JSON object."""
 
     # Ensure schema_version is set
     doc.setdefault("schema_version", "0.1")
+
+    # Rewrite source IDs to global namespace ({doc_id}_s{N})
+    doc = _prefix_source_ids(doc, doc_id)
 
     # Write output
     out = Path(out_path)

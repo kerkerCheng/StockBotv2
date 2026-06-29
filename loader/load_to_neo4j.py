@@ -138,10 +138,12 @@ def load(doc: dict, session, use_apoc: bool = False) -> None:
 
     # ── claims(v0:存成節點掛在 subject 上,之後再細化) ──
     for c in doc.get("claims", []):
+        name = c.get("name") or (c["statement"][:30] + "…")
         session.run(
             """
             MERGE (cl:Claim:Entity {id: $id})
-            SET cl.statement = $statement,
+            SET cl.name = $name,
+                cl.statement = $statement,
                 cl.demand_proof_level = $dpl,
                 cl.disproof_condition = $disproof,
                 cl.confidence = $confidence,
@@ -152,6 +154,7 @@ def load(doc: dict, session, use_apoc: bool = False) -> None:
             MERGE (cl)-[:ABOUT]->(s)
             """,
             id=c["id"],
+            name=name,
             statement=c["statement"],
             dpl=c["demand_proof_level"],
             disproof=c["disproof_condition"],

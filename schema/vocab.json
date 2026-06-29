@@ -36,7 +36,8 @@
     "enables",
     "depends_on",
     "invests_in",
-    "licenses_to"
+    "licenses_to",
+    "about"
   ],
   "qualification_status": [
     "none",
