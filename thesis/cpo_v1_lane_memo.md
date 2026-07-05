@@ -1,104 +1,126 @@
-# Directional Lane Memo — CPO / 矽光子供應鏈
-**版本：Draft v1 ｜ 分類：方向備忘錄（非投資建議）**
+# Directional Lane Memo
+## CPO／矽光子供應鏈：外部雷射源與 InP 垂直整合
 
 ---
 
-## 1. 一句 Thesis
+### 1. 一句 Thesis
 
-**Coherent 因 InP 垂直整合與 NVIDIA sole-source 地位，在 CPO 放量的 H2 2026–2027 週期中成為供應鏈不可繞過的關鍵節點。**
+**Coherent 與 Lumentum 因掌握 CPO 不可繞過的 InP 外部雷射源，在 AI 算力集群大規模建設的浪潮下（H2 2026–H2 2027）將成為供應鏈定價權節點。**
 
-> **Variant Perception（初步）：**
-> 當前市場隱含的假設是「CPO 是早期利基市場，供應鏈仍有充裕競爭者」；本 thesis 認為 ELS/CW DFB 雷射的 InP 製造瓶頸遠比市場定價嚴苛，Coherent 在 NVIDIA 端的 sole-source designed-in 狀態將使其在 2026–2027 的定價能力被嚴重低估。催化劑：Coherent H2 FY26 法說會首次揭露 CPO 規模出貨數字，或 NVIDIA 次世代 AI 網路架構公告明確採用 CPO。
+> **Variant Perception：** 當前市場共識將 CPO 受益者聚焦於 Broadcom（交換晶片 sole_source 設計定案）與 NVIDIA（算力需求方），對外部雷射源環節的定價能力關注不足。本 thesis 認為，InP 雷射產能（而非光子整合晶片設計）是 H2 2026 規模出貨的真實卡點，Coherent 的多年期 NVIDIA 協議與 InP 產能擴充將成為重新定價的催化劑。
 >
-> ⚠️ *Variant perception 的估值量化面（P/E、EV/Sales 區間、客戶集中度財務影響）需 Engine C 基本面引擎補充後才能完整填寫。*
+> ⚠️ *Variant perception 中的估值隱含假設（本益比／EV-Revenue 溢價幅度）需 Engine C（基本面引擎）補充估值資料後才能完整填寫。*
 
 ---
 
-## 2. 需求驅動
+### 2. 需求驅動
 
-- **AI 訓練/推論叢集擴建直接 ENABLES CPO 需求**：超大規模資料中心為因應 AI 算力密度上升，正加速部署 Co-Packaged Optics 以解決 switch I/O 頻寬瓶頸。`(source: s5, s6)`
+- **AI training/inference cluster buildout → CPO 需求：** AI 訓練與推理集群的規模化建設直接拉動 CPO 需求，並同時推動光學電路交換（OCS）、scale-up 光互聯等元件採購。
+  `(source: coherent-corp-cohr-discusses-photonics-innovation-and-data-center-communications-at-ofc_march_17_s3, lumentum_q2fy26_cpo_s2)`
 
-- **CPO 成為資料中心 switch / scale-up 網路的核心元件**：AI 叢集建設同步驅動 Data-center switch 與 scale-up 網路需求，而 CPO 是其中的光學傳輸介面，需求具有結構性而非週期性特徵。`(source: s1, s5)`
+- **CPO → 資料中心交換機/Scale-up 網路：** CPO 作為關鍵元件嵌入資料中心交換機與 scale-up 網路，同時資料中心網路需求又反過來驅動 CPO 採購，形成相互強化的正向循環。
+  `(source: Broadcom_q2fy26_cpo_s1, coherent_q2fy26_cpo_s14)`
 
-- **OCS（光電路交換）與多軌連結同步受惠**：除 CPO 外，AI 訓練/推論叢集建設同時驅動 Optical Circuit Switching 及 Multi-rail connectivity solutions 需求，加總擴大了 Coherent 的可服務市場規模，其中 CPO+OCS 總可服務市場估計逾 $19B。`(source: s6, s13, s20)`
+- **超大型雲端與 AI 原生客戶（Anthropic、OpenAI、Meta、Google）大規模採購 Broadcom XPU：** Broadcom 同時供應 Google、Meta、OpenAI、Anthropic 的 AI XPU 與 CPO 解決方案，需求集中化使 CPO stack 的每一層壓力同步放大。
+  `(source: Broadcom_q2fy26_cpo_s10, Broadcom_q2fy26_cpo_s5)`
 
-- **放量時間軸明確**：Coherent 已公開指引，scale-out CPO 收入將於 H2 Calendar 2026 開始放量，scale-up CPO 收入則於 H2 Calendar 2027 接力，需求曲線的陡峭度在未來兩年將顯著提升。`(source: s9)`
-
----
-
-## 3. Stack 摘要
-
-供應鏈結構性變化集中在兩個 abstraction level：**元件製造層（Component）** 與 **模組整合層（Module / Sub-system）**。
-
-在元件層，InP 基板 → CW DFB 雷射 → External Laser Source (ELS) 的垂直鏈條正在從「分散多供」向「高度集中」過渡；InP 基板對 CW DFB 雷射的 substitutability 評分為 1（圖中最低），且目前無 sole_source=True 確認，顯示此層雖競爭形式上存在，實際轉換成本極高。`(source: s3)`
-
-在模組整合層，Coherent 幾乎涵蓋所有 CPO 光學子元件（CW 雷射、隔離器、TEC、ELS 模組、Fiber Attach Unit、透鏡陣列、PM 光纖），垂直整合程度形成進入壁壘，使模組層的過渡比元件層相對順暢——但也意味著若任一子元件出問題，風險無法轉移。`(source: s16, s18, s19)`
+- **Blackwell 架構 GPU 平台落地 → scale-out CPO 先行，scale-up CPO 接棒：** AI 算力建設支撐 Blackwell 架構的規模化部署，CPO 被預期於 H2 2026 開始 scale-out 收入，H2 2027 進入 scale-up ramp。
+  `(source: Nvidia_q1fy27_s5, coherent-corp-cohr-discusses-photonics-innovation-and-data-center-communications-at-ofc_march_17_s3)`
 
 ---
 
-## 4. 主瓶頸
+### 3. Stack 摘要
 
-### 首要瓶頸：High-power CW DFB 雷射對 InP 基板的依賴
+**需求層（end_demand）** 集中度高但過渡平順：NVIDIA、Google、Meta、Anthropic、OpenAI 等超大型客戶已在圖中確認為 Broadcom 下游，需求可見性強，短期不存在結構性中斷風險。
 
-| 指標 | 數值 / 狀態 | Source |
-|---|---|---|
-| substitutability（InP 基板） | **1**（圖中最低） | s3 |
-| sole_source（InP 對 CW DFB）| False（目前圖中未確認） | s3 |
-| Coherent Sherman 廠定性 | 全球最先進 InP 生產基地 | s1, s2 |
-| Coherent 6-inch InP fab substitutability | 5（幾乎不可替代） | s1, s3 |
+**平台整合層（CPO 系統設計）** 出現明顯集中：Broadcom 在 CPO 系統設計層擁有 sole_source=True、substitutability=5、qualification_status=designed_in 的地位，意味著此層替換成本極高，平台鎖定已形成。
 
-**為何是瓶頸：**
-High-power CW DFB 雷射是 ELS 的核心元件，而 ELS 是 CPO 的關鍵子系統。CW DFB 雷射製造強依賴 InP 基板（substitutability=1），且 InP 晶圓製程的良率控制、磊晶品質要求極高，產能擴增需要長達 26–30 週交期（以 ELS 供應商資料推算）。`(source: s3, s4)`
-
-Coherent 的 Sherman, Texas 6-inch InP fab 目前是此鏈條的核心放量場所。圖中 sole_source=False，**意味著目前資料尚未確認 InP 基板端為單一來源**，此為資料缺口，需進一步驗證其他 InP 磊晶供應商的量產能力。`(source: s1, s2)`
-
-### 次要瓶頸：ELS 模組層的認證週期
-
-| 供應商 | qualification_status | lead_time_weeks | substitutability |
-|---|---|---|---|
-| Coherent | sampling | 30 週 | 2 |
-| Lumentum | qualifying | 26 週 | 2 |
-
-ELS 在 CPO 系統中 substitutability=2，且兩家供應商均尚在 sampling/qualifying 階段，尚未達到量產 qualification，代表短期（H1 2026）內供給彈性極低。`(source: s4)`
-
-### NVIDIA 端的 Sole-Source 地位
-
-Coherent 在 NVIDIA 的供應關係為圖中唯一明確標注 `sole_source=True` 且 `qualification_status=designed_in` 的邊，substitutability=5。這是圖中最高確信度的壟斷供應節點。`(source: s7, s8)`
+**關鍵元件層（外部雷射源 → InP 基板）** 是供應鏈中結構性瓶頸最為集中之處：External Laser Source 的 substitutability=2（難以替代），High-power CW DFB laser 對 InP 基板的依賴度達 substitutability=1（圖中最低值），且 InP 晶圓的 6 吋產線擴充進度直接決定 H2 2026 能否如期出貨，此層正在發生最顯著的供應鏈結構性緊縮。
 
 ---
 
-## 5. 最強證據
+### 4. 主瓶頸
 
-- **[s1, s2]** *「Coherent's Sherman, Texas facility is the world's most advanced indium phosphide production site and is central to ramping CW laser supply for CPO.」*（confidence: 0.90）
+#### 一級瓶頸：InP 基板 → High-power CW DFB Laser
 
-- **[s7, s8]** *Coherent SUPPLIES_TO NVIDIA，sole_source=True，qualification_status=designed_in，substitutability=5。* 即 Coherent 是 NVIDIA CPO 光學供應鏈中目前唯一已認證設計進入的供應商。（confidence: 0.90）
+| 屬性 | 數值 |
+|---|---|
+| substitutability | **1**（圖中最低，極難替代） |
+| sole_source | False（目前資料未確認單一壟斷供應商） |
+| 依賴路徑 | InP substrate → High-power CW DFB laser → External Laser Source → Co-Packaged Optics |
 
-- **[s9]** *「Coherent expects initial scale-out CPO revenue to begin ramping in H2 calendar 2026, and scale-up CPO revenue in H2 calendar 2027.」*（confidence: 0.90）
+InP 基板的 substitutability=1 表示在目前技術路徑下，High-power CW DFB laser 幾乎無法以非 InP 材料替代。High-power CW DFB laser 本身亦依賴 6 吋 InP 晶圓產線（substitutability=4，`source: coherent_q2fy26_cpo_s2, coherent_q2fy26_cpo_s5`），而此產線的擴充速度直接決定雷射供應能否跟上 CPO ramp 節奏。
 
-- **[s16, s18, s19]** *「Coherent is vertically integrated across nearly all CPO optical ingredients (CW laser, isolators, TECs, ELS module, fiber attach unit, lens arrays, PM fiber), reducing dependency on third-party suppliers.」*（confidence: 0.90）
+> ⚠️ **資料缺口說明：** InP 基板供應商層面，圖中 sole_source=False，**目前資料尚未確認是否存在單一壟斷 InP 晶圓供應商，需進一步驗證**（例如：確認 AXT、Sumitomo 等 InP substrate 廠商是否已有供應關係節點）。
 
----
+#### 二級瓶頸：External Laser Source（Lumentum、Coherent 雙主供）
 
-## 6. 什麼會推翻這個 Thesis（Disproof Conditions）
+| 供應商 | substitutability | sole_source | lead_time_weeks | qualification_status |
+|---|---|---|---|---|
+| Lumentum → External Laser Source | 2 | False | **26 週** | qualifying |
+| Coherent → External Laser Source | 2 | False | **30 週** | sampling |
+| Lumentum → UHP laser | 5 | **True** | — | designed_in / qualifying |
+| Coherent → NVIDIA | 5 | **True** | — | designed_in |
 
-- **若 Coherent 錯過 H2 2026 scale-out CPO 放量時程**，或主要超大規模雲端業者延後 CPO 部署計畫，則放量斜率假設需重設，thesis 主時間軸需降評。`(source: s9)`
+Lumentum 在 Ultra-High-Power (UHP) laser 供應 NVIDIA 路徑上已確認 sole_source=True，qualification_status 同時出現 designed_in（`lumentum_q2fy26_cpo_s14, s15, s27`）與 qualifying（`lumentum_q3fy26_cpo_s2`），兩個狀態並存，暗示跨世代（scale-out → scale-up）的資格認證仍在推進中，ramp 不確定性尚未完全消除。
 
-- **若 CPO 採用率停滯、可插拔光模組（pluggable）持續保持主導地位**，或 ELS 出現可快速認證的第二供應來源且認證週期顯著縮短，則 ELS 瓶頸主張降級，Coherent 的定價能力假設需修正。`(source: s2, s4)`（此條同時對應圖中 [inferred] claim 的 disproof condition）
+Coherent 對 NVIDIA 的供應同樣確認 sole_source=True、designed_in（`coherent_q3fy26_cpo_s7, s8`），並持有橫跨 scale-out 與 scale-up 的多年期多十億美元協議（`coherent-corp-cohr-discusses-photonics-innovation-and-data-center-communications-at-ofc_march_17_s6`）。
 
-- **若 Coherent Sherman 廠喪失關鍵客戶資格認證**，或另一 InP 製造場所達到同等或更高產量與製程節點，則 InP 垂直整合壁壘的核心主張應降級，重新評估競爭格局。`(source: s1, s2)`
-
----
-
-## 7. 接下來盯什麼（Leading Indicators / Catalysts）
-
-- **🔵 Coherent 季度法說會 CPO 收入揭露**（每季觀測）：H2 Calendar 2026 首次出現 CPO 規模收入貢獻是最關鍵的確認點。若收入低於預期或指引被下修，直接否定 thesis 時間軸。`(source: s9)`
-
-- **🔵 NVIDIA AI 網路架構公告與 CPO 供應商指定**（每次客戶公告）：NVIDIA 在次世代 AI 訓練/推論叢集中正式公開採用 CPO、並維持 Coherent 為 sole-source 供應商，是最強的 thesis 確認信號。`(source: s7, s8)`
-
-- **🟡 Lumentum ELS 認證進度**（每季法說會）：若 Lumentum 從 `qualifying` 升級至 `qualified`，代表 ELS 層出現第二供應，瓶頸壓力緩解，Coherent 溢價空間受壓。`(source: s4)`
-
-- **🟡 InP 6-inch 產能競爭者動態**（每月產業新聞 / 競爭者法說會）：觀察是否有其他 InP 晶圓廠宣布 6-inch 量產計畫或取得超大規模客戶認證，作為 Sherman 廠壟斷地位受挑戰的預警指標。`(source: s1, s2, s3)`
+External Laser Source 對 CPO 的依賴關係標示 substitutability=2（`source: s2`），確認此層是整個 CPO stack 中替換難度最高的非壟斷環節。
 
 ---
 
-*本備忘錄為方向性研究文件，不構成任何買賣建議、目標價設定或持倉建議。財務核驗（客戶集中度、毛利率、backlog、稀釋壓力、估值區間）為 Watchlist 升格的必要條件，需由 Engine C 基本面引擎另行完成。*
+### 5. 最強證據
+
+- **coherent-corp-cohr-discusses-photonics-innovation-and-data-center-communications-at-ofc_march_17_s6**
+  「Coherent has a multibillion-dollar, multi-product CPO development and supply agreement with NVIDIA spanning through the end of this decade, covering both scale-out and scale-up CPO.」
+  （confidence: **0.75**，confirmed）
+
+- **coherent-corp-cohr-discusses-photonics-innovation-and-data-center-communications-at-ofc_march_17_s3 + s20**
+  「Coherent expects first CPO revenue in the second half of calendar year 2026 (scale-out), with scale-up CPO ramp beginning in the second half of 2027.」
+  （confidence: **0.75**，guided）
+
+- **coherent-corp-cohr-discusses-photonics-innovation-and-data-center-communications-at-ofc_march_17_s8**
+  「Coherent is doubling its indium phosphide manufacturing capacity in 2025, with further expansion planned for 2026.」
+  （confidence: **0.75**，guided）
+
+- **lumentum_q2fy26_cpo_s14, lumentum_q2fy26_cpo_s15, lumentum_q2fy26_cpo_s27**
+  「Lumentum SUPPLIES_TO Ultra-High-Power (UHP) laser：sole_source=True, qualification_status=designed_in, substitutability=5。」
+  （confidence: **0.90**）
+
+---
+
+### 6. 什麼會推翻這個 Thesis（Disproof Conditions）
+
+- **若 NVIDIA 取消或大幅縮減與 Coherent 的多年期 CPO 採購協議，或將 CPO 採購轉移至競爭供應商**，則 Coherent 在 sole_source 雷射供應鏈的定價節點地位將瓦解，thesis 需降評退場。
+  `(source: coherent-corp-cohr-discusses-photonics-innovation-and-data-center-communications-at-ofc_march_17_s6，disproof_condition)`
+
+- **若 Coherent 的 InP 產能倍增計畫（2025）延誤、取消，或實際產出未能如期翻倍**，則 H2 2026 scale-out CPO 出貨時程將直接受阻，外部雷射源成為真實出貨瓶頸的論點將需重估。
+  `(source: coherent-corp-cohr-discusses-photonics-innovation-and-data-center-communications-at-ofc_march_17_s8，disproof_condition)`
+
+- **若 CPO 量產時程滑移至 H2 2026 之後（scale-out）或 H2 2027 之後（scale-up）**，或超大型雲端客戶轉向替代光互聯架構（如持續擴大可插拔光模組比重而非擁抱 CPO），則需求拉力假設需重新定錨，thesis 核心邏輯承壓。
+  `(source: coherent-corp-cohr-discusses-photonics-innovation-and-data-center-communications-at-ofc_march_17_s3, s20，disproof_condition；推導部分標注：推導，非圖中明確主張)`
+
+---
+
+### 7. 接下來盯什麼（Leading Indicators / Catalysts）
+
+- **Coherent 季度法說會（每季）：InP 產能利用率與 CPO 收入確認**
+  觀測 Coherent 是否於 H2 CY2026 正式認列 CPO 收入（scale-out），以及 InP 產能是否按計畫完成 2025 倍增目標。若 CPO 收入時程延後，或管理層下修 InP 擴廠進度，視為 thesis 負向訊號。
+  `(source: coherent-corp-cohr-discusses-photonics-innovation-and-data-center-communications-at-ofc_march_17_s3, s8)`
+
+- **Lumentum 季度法說會（每季）：UHP laser qualification 進展與 lead time 變化**
+  Lumentum UHP laser 目前同時存在 designed_in 與 qualifying 兩種狀態，需確認 scale-up 路徑的客戶認證是否完成。lead_time=26 週的縮短或延長，是供需緊張度的直接溫度計。
+  `(source: lumentum_q2fy26_cpo_s14, lumentum_q3fy26_cpo_s2)`
+
+- **NVIDIA / Broadcom 客戶公告或 AI 基礎設施採購計畫更新（每次重大公告）**
+  AI 訓練與推理集群建設是整個 CPO demand pull 的根源。NVIDIA Blackwell 架構的部署進度、Broadcom XPU 客戶（Anthropic、OpenAI、Google、Meta）的 capex 指引，是 CPO ramp 可見度的領先指標。
+  `(source: Nvidia_q1fy27_s5, Broadcom_q2fy26_cpo_s10)`
+
+- **InP 晶圓供應商產能公告或 Coherent/Lumentum 的 InP 垂直整合動作（不定期，關注每季財報附註與行業展會）**
+  由於 InP 基板 substitutability=1 為圖中最低值，任何上游 InP 晶圓廠商的產能限制公告、或 Coherent/Lumentum 宣布進一步垂直整合 InP 製造，均將顯著影響外部雷射源供應的天花板，是本 thesis 最需持續監測的結構性變數。
+  `(source: lumentum_q2fy26_cpo_s20, coherent_q3fy26_cpo_s1)`
+
+---
+
+> **免責聲明：** 本備忘錄為方向性研究備忘錄，不構成可操作的投資建議，不含目標價、買賣建議或持倉大小建議。財務核驗（客戶集中度、毛利率、backlog、稀釋風險、估值壓力測試）為 Watchlist 升格的必要條件，需由 Engine C 基本面引擎另行完成。

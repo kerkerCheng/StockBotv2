@@ -175,7 +175,7 @@ Output ONLY the JSON object."""
 
     response = client.messages.create(
         model=model,
-        max_tokens=8192,
+        max_tokens=16000,
         system=system_prompt,
         messages=[{"role": "user", "content": user_message}],
     )

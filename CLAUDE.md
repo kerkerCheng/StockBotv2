@@ -7,8 +7,11 @@
 
 ## 三大引擎
 - **引擎A — 科研引擎:** 抓高品質報告/報導/論文/官方資訊,建知識庫(property graph)+ RAG。核心、最難、最優先確保深度。
+  - 目前（Milestone B）：人工找原文 → 複製到 `library/raw/` → extract pipeline。各類文件的 AI 抽取指引見 [`docs/extraction-instructions.md`](docs/extraction-instructions.md)（隨做隨補的操作筆記，也是 Source Fetcher 的 spec 草稿）。
+  - Milestone B 後（Source Fetcher 層）：`fetchers/edgar.py`（EDGAR API，免費無 paywall）、`fetchers/arxiv.py`、長文件 chunker（transcript > 10 頁需切塊）。人工手選 → 自動拉源的轉型點。架構：fetcher 輸出標準化 `library/raw/{doc_id}.txt` + `{doc_id}.meta.json`，接回現有 extract pipeline，不動下游。
 - **引擎B — SNS 語意爬蟲:** X 大佬推文/小道消息 → 找線索 → 餵給 A。本身不進知識庫,除非推文是高密度技術內容。
 - **引擎C — 基本面引擎:** 爬客觀數字,出投資建議。tabular / 時間序列為主。
+- **引擎B→A 閘門(線索驗證入庫 SOP):** 任何原料(推文/報導/法說/論文/小道消息)要從「線索」升格成「可入圖證據」,走 `skills/lead-intake`(拆 claim → 依源登記表跑獨立驗證 → 套 L4/L6/L7/L8 + 獨立性鐵律標記 → 分層決定入圖/park → 接 loader → Lane Memo)。這是規模化「亂抓」後不被低品質資訊淹沒的護城河。v0,等真實流量撞。
 
 ## 關鍵定案 (Decisions)
 - **開發工具:** 主力 Claude Code(或 Cursor 接 Claude),Cursor 當輔助 review。
@@ -27,6 +30,7 @@
   - **A股(備用):** 年報/季報/臨時公告、交易所問詢函、互動易、招投標/中標、環評能評、海關數據、上下游交叉驗證。
   - **技術/學術:** arXiv + Semantic Scholar API、OFC/ECOC 議程與論文、公司技術白皮書、專利、標準組織。
   - 核驗清單(出投資建議前必看):客戶集中度、毛利率/產能利用率、backlog/營收結構、稀釋(增資/可轉債/SBC/內部人賣股)、估值壓力。
+  - **各類來源的 AI 抽取 instruction（法說會/8-K/論文/媒體報導）：** [`docs/extraction-instructions.md`](docs/extraction-instructions.md)
 
 ## v0 Schema(定案,故意會壞、等真實資料來撞)
 
