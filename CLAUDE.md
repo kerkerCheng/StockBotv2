@@ -2,38 +2,92 @@
 
 > 任何 session 在此資料夾開工前先讀本檔。這裡記錄定案、判準、與踩過的坑。
 
-## 專案一句話
-高度利用 LLM 做「AI 產業鏈科研 + 股市量化」的系統,產出個股完整報告與產業 thesis,作為投資指引。本機單人自用。使用者會寫 Python、碰過 API。
+## 定位一句話
 
-## 三大引擎
-- **引擎A — 科研引擎:** 抓高品質報告/報導/論文/官方資訊,建知識庫(property graph)+ RAG。核心、最難、最優先確保深度。
-  - 目前（Milestone B）：人工找原文 → 複製到 `library/raw/` → extract pipeline。各類文件的 AI 抽取指引見 [`docs/extraction-instructions.md`](docs/extraction-instructions.md)（隨做隨補的操作筆記，也是 Source Fetcher 的 spec 草稿）。
-  - Milestone B 後（Source Fetcher 層）：`fetchers/edgar.py`（EDGAR API，免費無 paywall）、`fetchers/arxiv.py`、長文件 chunker（transcript > 10 頁需切塊）。人工手選 → 自動拉源的轉型點。架構：fetcher 輸出標準化 `library/raw/{doc_id}.txt` + `{doc_id}.meta.json`，接回現有 extract pipeline，不動下游。
-- **引擎B — SNS 語意爬蟲:** X 大佬推文/小道消息 → 找線索 → 餵給 A。本身不進知識庫,除非推文是高密度技術內容。
-- **引擎C — 基本面引擎:** 爬客觀數字,出投資建議。tabular / 時間序列為主。
-- **引擎B→A 閘門(線索驗證入庫 SOP):** 任何原料(推文/報導/法說/論文/小道消息)要從「線索」升格成「可入圖證據」,走 `skills/lead-intake`(拆 claim → 依源登記表跑獨立驗證 → 套 L4/L6/L7/L8 + 獨立性鐵律標記 → 分層決定入圖/park → 接 loader → Lane Memo)。這是規模化「亂抓」後不被低品質資訊淹沒的護城河。v0,等真實流量撞。
+**Claude + 結構化持久記憶 → 有根據的投資研究對話。**
 
-## 關鍵定案 (Decisions)
-- **開發工具:** 主力 Claude Code(或 Cursor 接 Claude),Cursor 當輔助 review。
-- **文件化學習:** 踩過的坑與設計決定沉澱在 `docs/solutions/`（按問題類型分類，帶 YAML frontmatter 可搜尋：`module`, `tags`, `problem_type`）；共用領域詞彙見 `CONCEPTS.md`。
-- **資料庫(polyglot):** 知識圖譜 → **Neo4j**;基本面數字/時間序列/文件 metadata → **SQLite（本機零安裝預設）或 Postgres（設 `POSTGRES_HOST`/`POSTGRES_DSN` 環境變數切換）**，見 [`docs/solutions/tooling-decisions/engine-c-sqlite-dual-backend.md`](docs/solutions/tooling-decisions/engine-c-sqlite-dual-backend.md)；向量 RAG 先用 Neo4j 內建向量,量大再分出去。
-- **抽取與 DB 解耦:** `extract.py` 只輸出 DB 無關的 node/edge JSON 中介格式;「JSON → 寫進 DB」是可替換的 loader。DB 選擇不可綁死資料。
-- **graph 用 property graph,不用 tree。** 供應鏈/技術拓樸本質是 DAG。節點帶 `type` + `abstraction_level`,邊帶 `relation` 型別。每個 node/edge 必掛 `source_ids` + `confidence`(來源可追溯是鐵律)。
-- **schema 字彙(type/relation 種類)用對照表管理、留鬆;表的「形狀」鎖死。** 加新邊型別 = 加一列設定,不動表結構。
-- **開發順序:垂直切片優先。** 第一條切片 = CPO/矽光子,一個標的端到端跑通(手選 5-8 篇一手資料 → extract → 圖 → Cypher context builder → 出 thesis → 人工評分),再談自動化。
-  **開發順序（更新版）:** A 先（垂直切片驗證端到端路線）→ 之後 A/C 交替推進（A 出 thesis → C 補基本面校準 → A 精進 → ...）→ B 最後。
-  **判準：** A 切片讓系統能輸出洞見（thesis 為 A 的驗收），C 提供量化錨點（基本面數字校準 A 的定性判斷），兩者互補。A-first 已在 CPO/矽光子切片中驗證。
-  - **Milestone A（已完成）:** 1 篇文件 extract → graph → human edge review；L6 四個 schema gap 記錄與修正（source_id 全域命名空間、Claim name 自動填入、vocab about、幻覺防護規則）。
-  - **Milestone B（本計畫目標）:** 5-8 篇文件 → Cypher context builder → thesis 生成（Directional Lane Memo）→ 人工評分；完成即可啟動 Engine C（基本面引擎）規劃。
-- **一手來源優先於通用搜尋:** 通用搜尋(Tavily 等)只配 LLM 品質評分 gate,用在第三層。一手來源依市場分路(來源登記表,借自 serenity-skill 的 market-source-playbook):
-  - **美股:** SEC EDGAR(10-K/10-Q/8-K/S-1/Form 4)、法說會逐字稿、IR 簡報、客戶/供應商 filings。
-  - **台股:** 公開資訊觀測站(MOPS)、**月營收揭露**、法說會 / IR、上下游上市公司交叉驗證。
-  - **A股(備用):** 年報/季報/臨時公告、交易所問詢函、互動易、招投標/中標、環評能評、海關數據、上下游交叉驗證。
-  - **技術/學術:** arXiv + Semantic Scholar API、OFC/ECOC 議程與論文、公司技術白皮書、專利、標準組織。
-  - 核驗清單(出投資建議前必看):客戶集中度、毛利率/產能利用率、backlog/營收結構、稀釋(增資/可轉債/SBC/內部人賣股)、估值壓力。
-  - **各類來源的 AI 抽取 instruction（法說會/8-K/論文/媒體報導）：** [`docs/extraction-instructions.md`](docs/extraction-instructions.md)
+使用者說公司名或 thesis → Claude 從 Neo4j 圖取 context、Engine C 取財務數據 → 合成有來源可追溯的回答。Claude 是分析引擎；圖譜是跨 session 的研究筆記本。本機單人自用，使用者會寫 Python、碰過 API。
 
-## v0 Schema(定案,故意會壞、等真實資料來撞)
+---
+
+## 系統架構（三層）
+
+### Skill 層（Claude 的操作介面）
+存在 `skills/` 目錄，每個 skill 是告訴 Claude「如何使用記憶層」的操作手冊。
+
+| Skill | 觸發場景 |
+|-------|---------|
+| `skills/investment-research` | 問投資問題、評估標的、生成 thesis |
+| `skills/lead-intake` | 丟來一條推文/報導/消息，要入庫 |
+| `skills/blind-spot-audit` | 已有 thesis，要找反駁角度 |
+
+### 記憶層（持久知識庫）
+- **Neo4j 知識圖譜（引擎A）：** 供應鏈結構、技術關係、來源可追溯的主張。Property graph，不是 tree。
+- **SQLite / Postgres 財務數據（引擎C）：** 財務快照、Watchlist Gate。零安裝預設用 SQLite；設 `POSTGRES_HOST`/`POSTGRES_DSN` 切換 Postgres。見 [`docs/solutions/tooling-decisions/engine-c-sqlite-dual-backend.md`](docs/solutions/tooling-decisions/engine-c-sqlite-dual-backend.md)。
+- **向量 RAG：** 暫用 Neo4j 內建，量大再分。
+
+### 管道層（知識入庫的機器）
+```
+文件 → library/raw/ → extract.py → loader/validate.py → loader/load_to_neo4j.py → Neo4j
+fetchers/edgar.py ──────↑                        engine_c/etl_yfinance.py → SQLite
+```
+- **抽取與 DB 解耦：** `extract.py` 只輸出 DB 無關 JSON；loader 可替換。DB 選型不綁死資料。
+- **fetchers（已有）：** `fetchers/edgar.py`（美股 SEC EDGAR，免費無 paywall）。
+- **引擎B（未建）：** X 推文/小道消息 → 線索 → 走 `skills/lead-intake` 閘門 → 入庫。
+- **各類來源的 AI 抽取 instruction：** [`docs/extraction-instructions.md`](docs/extraction-instructions.md)
+
+---
+
+## 什麼值得開發 / 什麼交給 Claude
+
+### 值得開發（邊際效益高、省 token、跨 session 有用）
+
+| 類別 | 具體項目 | 理由 |
+|------|---------|------|
+| 知識累積 | 更多公司 onboarding、更多高品質文件 | 圖的大小決定回答的深度 |
+| Skill 介面 | SKILL.md 檔（已有 3 個）| 讓 Claude 每次都能正確使用記憶 |
+| 高槓桿 fetcher | EDGAR 季報自動更新、arXiv 論文抓取 | 減少人工取文件摩擦 |
+| G5 L8 偏誤檢查 | `validate.py` 加 origin_entity 同質性警告 | 低工程量、高資料品質槓桿 |
+
+### 不值得自己開發（Claude 做得更好或沒意義）
+
+| 類別 | 理由 |
+|------|------|
+| 長文解讀、文章分析 | Claude 的 context window + 推理比自製 pipeline 好 |
+| Text2Cypher / 對話式查詢 | 直接給 Claude 原始 graph context，Claude 自己解讀 |
+| 自動選文件頁面（G2）| Claude 看 TOC 判斷比 embedding filter 更準確 |
+| 節點重要性評分（G8）| Claude 從 edge 數量、tier、公司規模能即時判斷 |
+| 公司識別（G1）| Claude training data 知道公司是誰，hallucination 風險由 TICKER_MAP 控制 |
+| 自動投資決策 | 永遠需要人工決策，不是開發方向 |
+
+---
+
+## 開發優先序（接下來三件事）
+
+1. **第二條垂直切片（非 AI / 非 CPO 主題）**
+   — L9 前置條件；驗證方法論不是 AI 多頭特例，而是跨主題有效的框架。
+
+2. **SIVE 來源品質升級**
+   — 目前 SIVE 的關鍵主張多為自我報告（L8 弱）。找 3 個不同 `origin_entity` 的獨立來源（客戶端文件優先：Coherent 法說會提到 SIVE？O-Net 財報？）。
+
+3. **EDGAR 季報自動更新**
+   — `fetchers/edgar.py` 已有，加個 CLI 一鍵拉最新 10-Q（含 `--max-chars` guard），讓圖內美股公司的財務數據不過期。
+
+---
+
+## 來源登記表（一手來源優先）
+
+通用搜尋（Tavily 等）只配 LLM 品質評分 gate，用在第三層。一手來源依市場分路：
+
+- **美股：** SEC EDGAR（10-K/10-Q/8-K/S-1/Form 4）、法說會逐字稿、IR 簡報、客戶/供應商 filings。
+- **台股：** 公開資訊觀測站（MOPS）、**月營收揭露**、法說會/IR、上下游上市公司交叉驗證。
+- **A股（備用）：** 年報/季報/臨時公告、交易所問詢函、互動易、招投標/中標、環評能評、海關數據、上下游交叉驗證。
+- **技術/學術：** arXiv + Semantic Scholar API、OFC/ECOC 議程與論文、公司技術白皮書、專利、標準組織。
+- 核驗清單（出投資建議前必看）：客戶集中度、毛利率/產能利用率、backlog/營收結構、稀釋（增資/可轉債/SBC/內部人賣股）、估值壓力。
+
+---
+
+## v0 Schema（定案，故意會壞、等真實資料來撞）
 
 > 設計原則:表的「形狀」鎖死,字彙(type/relation/層級種類)用對照表留鬆。
 > 方法論藍圖借自 chokepoint-atlas skill(見 L4),但只抄概念、不裝套件。
@@ -69,8 +123,8 @@
 - `verified_by_search`:主動查過競品 / 替代路徑 / 客戶自製可能,確認暫無 → 強主張
 一個節點自己的法說會說「我們是唯一供應商」不算 `verified_by_search`;需要**客戶端或第三方**來源印證。
 
-### 不進圖的東西(時變觀測,歸引擎B/C 的 Postgres 時間序列)
-- `consensus_coverage`(underfollowed | emerging | crowded):這是**股票/公司的市場認知**,且會隨時間變,屬 Company 的帶時戳觀測,**不是物理 component 的靜態圖屬性**。
+### 不進圖的東西（時變觀測，歸引擎C 的時間序列）
+- `consensus_coverage`（underfollowed | emerging | crowded）：這是**股票/公司的市場認知**，且會隨時間變，屬 Company 的帶時戳觀測，**不是物理 component 的靜態圖屬性**。
 
 ### 報告產出三級模板(借自 chokepoint-atlas output-formats)
 1. **Directional Lane Memo**(先給方向):一句 thesis → 需求驅動 → stack 摘要 → 主瓶頸 → 最強證據 → 什麼會推翻它 → 接下來盯什麼 → **variant perception(市場現在信 X,本 thesis 認為 Y,催化劑 Z)**
@@ -105,43 +159,35 @@ v0 schema 的對錯只有真實資料能驗證。凍結一個會壞的 v0 → �
 
 **三連問判準(決定一個屬性放哪):**
 1. **換掉關係另一端,值會變嗎?** 不變 → node;會變 → edge。
-2. **值會隨時間變嗎?** 會 → 不是靜態圖屬性,是「帶時戳的觀測」(進 Postgres,不進圖)。
+2. **值會隨時間變嗎？** 會 → 不是靜態圖屬性，是「帶時戳的觀測」（進 SQLite，不進圖）。
 3. **講的是物理現實,還是證據強度 / 市場認知?** 後兩者 → 是 metadata 或市場狀態,不是實體屬性。
 
-**結論:** 品類集中度/內在量產難度 = node(且集中度應衍生);可替代性/sole-source/lead-time/供應商 ramp 執行力 = edge;需求證據強度 = 證據 metadata 掛在主張上;市場擁擠度 = 時變觀測進 Postgres。
-**一句話:** 瓶頸的本質是「一條關係會不會斷」,所以瓶頸的 alpha 大半在**邊**上,不在點上。別把分數無腦掛 node。
+**結論：** 品類集中度/內在量產難度 = node；可替代性/sole-source/lead-time/供應商 ramp 執行力 = edge；需求證據強度 = 證據 metadata 掛在主張上；市場擁擠度 = 時變觀測進 SQLite。
+**一句話：瓶頸的 alpha 大半在邊上，不在點上。**
 
-### L6 — 第一次真實抽取撞出的三個 schema/pipeline gap
+### L5 — chokepoint-atlas / serenity-skill 是方法論藍圖，不是相依套件
+兩者都是純 prompt 的研究方法論 skill，沒有持久化知識庫。**抄骨架（stack 分層、role 分類、證據四階、output-formats 當報告模板），不裝套件、不綁相依。** 它們補的是「怎麼想」，我們專案補的是它們缺的「記得」（持久化知識庫）。注意是**單一 lens**（偏小市值瓶頸獵手），當眾多視角之一，別讓系統世界觀被綁死。
 
-**事發:** 用 Coherent Q3 FY2026 法說會 CPO 段落跑完 extract → validate → load → Browser review 後發現。
+**已評估、可撿的零件：**
+- serenity-skill 的 `market-source-playbook` → 已併入上方「一手來源」登記表（尤其台股 MOPS/月營收）。
+- serenity-skill 的 `bottleneck-scorecard.json` → **留給引擎C 參考**，不是引擎A 要用的。
 
-**Gap 1 — Claim 節點沒有 `name` 欄位**
-Neo4j Browser 找不到 `name` 就拿 `confidence`(0.55)當顯示標籤,讓人以為是一個數值節點。
-修法:loader 在寫入 Claim 時自動從 `statement` 截前 30 字填成 `name`,或 Browser query 時 `RETURN c.id + ": " + c.statement` 手動補。
+### L6 — 第一次真實抽取撞出的 schema/pipeline gap
 
-**Gap 2 — `source_ids` 是文件內局部 ID,跨文件後無法在圖裡直接追溯**
-樣本(s2/s4)與法說會(s2/s4)指向完全不同的 quote,但在 Neo4j 裡看節點的 `source_ids` 時無法知道是哪份文件的 s2。Sources 沒有存進 Neo4j,只存在各自 JSON 裡。
-修法方向(v1):source ID 改成全域唯一格式 `<doc_id>_s<N>`(例: `coherent_q3fy26_s2`);或把 sources 也寫成 Neo4j 節點(`Source` label),讓圖本身可追溯。v0 先接受這個限制,追溯時需對照原始 JSON。
+**事發：** 用 Coherent Q3 FY2026 法說會 CPO 段落跑完 extract → validate → load → Browser review 後發現。
 
-**Gap 3 — `ABOUT` 邊類型未在 `vocab.json` 登記**
-loader 自動建 Claim→subject 的 `ABOUT` 關係,但這個 relation 沒有進 `schema/vocab.json`。validate.py 的 vocab 層目前只檢查 Edge(非 Claim 邊)的 relation 欄位,所以沒有報錯,但在字彙表上是個洞。
-修法:在 `vocab.json` 的 `relation` 清單補上 `about`(或決定 Claim 邊不走 vocab 檢查);同步更新 `loader/validate.py` 說明。
+**Gap 1 — Claim 節點沒有 `name` 欄位：** loader 在寫入 Claim 時自動從 `statement` 截前 30 字填成 `name`。
 
-**Gap 4 — LLM 從類別詞推斷出具體產品節點(幻覺型態)**
-s15 quote 只說「data center interconnect 需求強」,LLM 自己推出 ZR/ZR+ DCI Transceivers 節點,但文件從未出現 ZR/ZR+ 字樣。quote 支持的是「DCI 需求」這個類別,不是具體型號。
-修法:在 `prompts/extract_system.md` 加強規則:「若 quote 只提到產品類別(如 'data center interconnect'),不要抽出具體型號節點(如 ZR/ZR+)。具體產品名稱必須在 quote 裡逐字出現。」
+**Gap 2 — `source_ids` 是文件內局部 ID，跨文件後無法追溯：** source ID 改成全域唯一格式 `<doc_id>_s<N>`（例：`coherent_q3fy26_s2`）；或把 sources 寫成 Neo4j 節點（`Source` label）。
 
-**通用判準:**
-1. Schema gap 只有在真實資料撞上去才會現形。凍結 v0 讓資料教你,比白板多討論兩週更有價值(L2 再次驗證)。
-2. 局部 ID 在單文件內沒問題,跨文件 MERGE 後就會產生命名空間衝突。設計 ID 時要問「這個 ID 在系統全局還是文件局部?」
-3. LLM 最常見的幻覺型態之一:從類別詞推斷出具體實體。review 時重點抽查「具體型號/公司名是否逐字出現在 quote 裡」。
+**Gap 3 — `ABOUT` 邊類型未在 `vocab.json` 登記：** 在 `vocab.json` 的 relation 清單補上 `about`；同步更新 `loader/validate.py`。
 
-### L5 — chokepoint-atlas / serenity-skill 是方法論藍圖,不是相依套件
-兩者都是純 prompt 的研究方法論 skill(無狀態、模仿 Serenity/Crux 兩位 X 大佬),沒有持久化知識庫。**抄骨架(stack 分層、role 分類、證據四階、question-ladder 當抽取 prompt、output-formats 當報告模板),不裝套件、不綁相依。** 它們補的是「怎麼想」,我們專案補的是它們缺的「記得」(持久化知識庫)。注意是**單一 lens**(偏小市值瓶頸獵手、高風險),當眾多視角之一,別讓系統世界觀被綁死。
+**Gap 4 — LLM 從類別詞推斷出具體產品節點（幻覺型態）：** quote 只說「data center interconnect 需求強」，LLM 自己推出 ZR/ZR+ 節點。修法：`prompts/extract_system.md` 加規則「具體型號/公司名必須在 quote 裡逐字出現」。
 
-**已評估、可撿的零件:**
-- serenity-skill 的 `market-source-playbook` → 已併入上方「一手來源」登記表(尤其台股 MOPS/月營收)。
-- serenity-skill 的 `bottleneck-scorecard.json` + 評分腳本(8 因子 + 8 扣分項 → 排序)→ **留給引擎C 參考**,不是引擎A 要用的。它把因子攤平在一張表,正好反證 L4:持久化的庫必須拆到 node/edge/時變觀測,不能攤平。
+**通用判準：**
+1. Schema gap 只有真實資料撞上去才會現形（L2 再次驗證）。
+2. 局部 ID 在單文件內沒問題，跨文件 MERGE 後會命名空間衝突。
+3. LLM 最常見幻覺型態：從類別詞推斷具體實體。review 時重點抽查「具體型號/公司名是否逐字出現在 quote 裡」。
 
 ### L7 — Thesis 生命週期:`disproof_condition` 是欄位,不是流程
 **判準:** 光是填 `disproof_condition` 不夠。欄位有填但沒有後續流程,等於貼了一個永遠不會響的火警警報。
@@ -164,15 +210,22 @@ s15 quote 只說「data center interconnect 需求強」,LLM 自己推出 ZR/ZR+
 3. **圖裡的交叉驗證:** 若某條 `sole_source=true` 的邊,其所有 source_ids 的 `origin_entity` 全是同一家供應商,標記 `sole_source_evidence_quality: weak`。
 
 ### L9 — 三引擎匯流的前置條件(Engine C 與投資諮詢開放前必做)
-**Engine C 設計前必先定義 A→C join key:**
-Engine A 的圖節點(如 `co:coherent`)和 Engine C 的 Postgres 財務數字(Coherent 的毛利率、營收)要能自動對齊,需要一個共同 ID(如 ticker `COHR`、MOPS 代號)。join key 若在 Engine C 設計期才決定,要回頭改 A 的 loader 和 schema;在 Engine C 啟動前先定義一頁資料流(B 線索 → A 觸發條件、A 節點 → C 的 join key、最終 decision layer 輸入輸出)成本最低。
+**Engine A→C join key：** Engine A 的圖節點（如 `co:coherent`）和 Engine C 的財務數字（Coherent 的毛利率）要能自動對齊，需要共同 ID（如 ticker `COHR`）。join key 由 `loader/load_to_neo4j.py` 的 `TICKER_MAP` 維護（靜態 lookup，不用 LLM 推斷）。私人公司映射到 `None`（不是空缺，是明確標記）。
 
-**投資諮詢開放的三個前置條件(全部滿足才開放):**
-1. 第二條垂直切片必須是**非 AI / 非 CPO** 主題,且跑通相同的 extract → thesis → 評分流程。目的:驗證方法論不是 AI 多頭的特例,而是跨主題有效的框架。
-2. thesis→部位的最小規則已定義(進場條件 / 單檔上限 / 持有期 / thesis 失效即出場),哪怕是人工執行的規則。沒有 sizing 規則的「建議」只是選股清單。
-3. 財務核驗清單 5 項(客戶集中度 / 毛利率趨勢 / backlog / 稀釋 / 估值壓力)已能一鍵從 Engine C 查出,並且必須在 Watchlist 升格前執行。
+**投資諮詢開放的三個前置條件（全部滿足才開放）：**
+1. 第二條垂直切片必須是**非 AI / 非 CPO** 主題，且跑通相同的 extract → thesis → 評分流程。
+2. thesis→部位的最小規則已定義（進場條件 / 單檔上限 / 持有期 / thesis 失效即出場），哪怕是人工執行的規則。
+3. 財務核驗清單 5 項（客戶集中度 / 毛利率趨勢 / backlog / 稀釋 / 估值壓力）已能一鍵從 Engine C 查出，並且必須在 Watchlist 升格前執行。
 
-<!-- ===== 自訂:Skill 輸出翻譯(2026-06 加) ===== -->
+---
+
+## 文件化學習
+
+踩過的坑與設計決定沉澱在 `docs/solutions/`（按問題類型分類，帶 YAML frontmatter 可搜尋：`module`, `tags`, `problem_type`）；共用領域詞彙見 `CONCEPTS.md`。
+
+---
+
+<!-- ===== 自訂：Skill 輸出翻譯（2026-06 加） ===== -->
 ## Skill 輸出語言
-執行 last-30-days skill 時,最終輸出翻成繁體中文...
+執行 last-30-days skill 時，最終輸出翻成繁體中文...
 <!-- ===== 自訂結束 ===== -->

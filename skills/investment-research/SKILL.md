@@ -1,0 +1,219 @@
+---
+name: investment-research
+description: >
+  對知識圖譜（Neo4j）+ 財務資料（SQLite）提問，產出有根據的投資研究回答。
+  當使用者問關於標的的瓶頸性、競爭地位、供應鏈位置、thesis 狀態、或說「評估XXX」、
+  「分析XXX的競爭位置」、「XXX 在 CPO 供應鏈的地位」、「thesis 還成立嗎」、
+  「建議買嗎」、「怎麼看XXX」、「幫我分析$TICKER」時，使用本 skill。
+  Claude 是分析引擎；圖譜是跨 session 的持久記憶；本 skill 定義如何接取這份記憶並組成回答。
+  觸發詞：評估、分析、怎麼看、建議、thesis、CPO、瓶頸、供應鏈、$TICKER。
+---
+
+# 投資研究 Skill
+
+## ⚠️ 定位先讀（別跳過）
+
+**這個系統的核心不是自動化，是記憶。**
+
+Claude 是分析引擎，知識圖譜（Neo4j）是持久的、跨 session 的研究筆記本。
+使用者問問題 → Claude 從圖取 context → 結合財務數據 → 合成有根據的回答。
+
+**圖譜能做的事：**
+- 記住哪些公司在哪個供應鏈位置
+- 記住哪些主張有哪些來源支撐（可追溯）
+- 記住 `sole_source`、`substitutability`、`ramp_difficulty` 等瓶頸屬性
+- 記住 thesis 與可證偽條件（`disproof_condition`）
+
+**圖譜不能做的事：**
+- 不能替你判斷分析好不好（這是 Claude 的工作）
+- 不能自動更新（需要你餵新文件進去）
+- 不能驗證自己的來源是否偏誤（你要問 Claude）
+
+---
+
+## 系統架構（你手上有什麼）
+
+```
+使用者問題
+    ↓
+[本 skill — Claude 分析]
+    ↓                        ↓
+Neo4j 圖                  SQLite 財務數據
+query/graph_context.py    engine_c/checklist.py
+    ↓                        ↓
+供應鏈結構 + 主張 + 來源   財務快照 + Watchlist Gate
+    ↓                        ↓
+         合成回答（Claude）
+```
+
+**指令參考：**
+```powershell
+# 取公司子圖 context（2 跳供應鏈）
+python query/graph_context.py --company-id co:<ticker_lower>
+
+# 取全圖 context（Lane Memo 用）
+python query/graph_context.py
+
+# 財務核驗清單
+python engine_c/checklist.py <TICKER>
+
+# 生成 Lane Memo（需要 context 輸入）
+python thesis/generate_lane_memo.py --company-id co:<ticker_lower>
+```
+
+---
+
+## 問題分流（三類）
+
+### 類型 1 — 快速事實查詢
+
+**觸發：** 單一具體問題，不需要完整 thesis。
+- 「SIVE 在 CPO 是 sole_source 嗎？」
+- 「Coherent 的 CPO 相關節點有哪些？」
+- 「圖裡有哪些公司的 `substitutability < 2`？」
+
+**流程：**
+1. 執行 `python query/graph_context.py --company-id co:<ticker>` 取子圖
+2. 直接從 context JSON 找相關屬性/邊
+3. 回答時標明 evidence_tier 和 source_ids（讓使用者知道根據來自哪）
+4. 明確說出圖裡沒有的資訊（不要自己推斷填補空缺）
+
+**格式：** 2-5 段直接回答 + 來源品質標注（tier 幾、哪份文件）+ 什麼是圖裡沒有的
+
+---
+
+### 類型 2 — Thesis 評估
+
+**觸發：** 使用者想知道某個方向是否成立、是否要進場/出場。
+- 「SIVE 值得繼續持有嗎？」
+- 「CPO 供應鏈的瓶頸 thesis 還成立嗎？」
+- 「我應該評估哪些公司？」
+
+**流程：**
+1. 執行 `python query/graph_context.py --company-id co:<ticker>` 取子圖
+2. 執行 `python engine_c/checklist.py <TICKER>` 取財務快照
+3. 評估以下四個維度（這是 Claude 的判斷，不是自動化）：
+
+| 維度 | 要問的問題 |
+|------|-----------|
+| **供應鏈位置** | 這家公司在哪個 abstraction_level？role 是什麼？有幾條邊？ |
+| **瓶頸性** | `sole_source` 有多少？`substitutability` 分布？替代路徑存在嗎？ |
+| **來源品質** | 最強主張是 tier 幾？origin_entity 有幾個？有無 L8 偏誤？ |
+| **財務錨點** | 毛利率趨勢？EV/Revenue？估值隱含什麼假設？ |
+
+4. 套 L8 偏誤檢查：若所有關鍵主張的 source_ids 都是同一家公司的文件 → 主動警告
+5. 回答要包含：現在知道什麼 / 還不確定什麼 / 什麼資訊能改變看法
+
+**格式：** 結構化評估（位置 → 瓶頸 → 來源品質 → 財務） + 信心度 + 知識缺口
+
+---
+
+### 類型 3 — 完整 Lane Memo
+
+**觸發：** 使用者明確說要 Lane Memo，或首次深度評估某個 thesis。
+- 「幫我出一份 SIVE 的 Lane Memo」
+- 「生成 CPO 的 thesis 文件」
+
+**流程：**
+1. 確認圖裡有足夠資料（至少 3 個不同 `origin_entity` 的文件）
+2. 執行 `python thesis/generate_lane_memo.py --company-id co:<ticker>`
+3. 產出後逐項核查：
+   - `variant_perception` 有沒有（必填）？格式是否「股價隱含 X → 本 thesis 認為 Y → 催化劑 Z」？
+   - `disproof_condition` 有沒有？附沒附核查頻率和觸發後 48h 動作？
+4. 缺 `variant_perception` → 標 TODO，等 Engine C 估值數字補齊
+5. 評分：`python thesis/scoring_rubric.py <memo_file>`
+
+**格式：** 完整 Lane Memo 文件（存 `thesis/`）+ 評分 + 升格 Watchlist 所需缺口
+
+---
+
+## 公司不在圖中時（Onboarding 觸發）
+
+若 `query/graph_context.py --company-id co:<ticker>` 回傳空圖或「公司不在圖中」：
+
+**不要自己從 training data 回答。** 訓練資料是舊的、無法追溯。
+
+正確做法：
+1. 告知使用者：「圖裡還沒有這家公司的資料，需要先 onboarding」
+2. 引導走 `docs/onboarding-sop.md` 流程（5 步：EDGAR/手動取文件 → extract → validate → load → 驗證）
+3. 如果使用者只想快速評估（不想 onboarding），可以：
+   - 用 training data 給初步看法，**但必須明確標示「非圖內資料，無法追溯」**
+   - 列出「若要入圖，最值得找的 3 種一手來源」
+
+---
+
+## 來源品質標注（每次回答都要做）
+
+回答投資相關問題時，必須附上來源品質說明：
+
+```
+根據圖內資料：
+- [主張A]：來源 coherent_q3fy26_s2（tier 1 — 法說會逐字稿，Coherent 2026Q3）
+- [主張B]：來源 sivers_ar2024_s7（tier 1 — 年報，Sivers 2024），⚠️ 自我報告（L8）
+- [主張C]：無圖內來源 — 以下為推斷，請自行驗證
+```
+
+**L8 偏誤自動觸發條件：** 若節點的主要 claims 的 source_ids 裡 `origin_entity` 全是同一家公司 → 加 ⚠️ 警告：「供應商自稱，缺獨立佐證」
+
+**來源缺口識別：** 若 sole_source=True 但所有來源都是供應商自己的文件 → 標注 `sole_source_evidence_quality: weak`，並建議找客戶端或第三方文件
+
+---
+
+## 知識缺口的正確處理
+
+當圖內資料不足以回答問題時，**明確說出缺什麼**，比猜測填補更有價值：
+
+```
+目前圖內缺口：
+- 未見客戶端確認 SIVE 的 sole_source 地位（只有 Sivers 自稱）
+- 無 POET Technologies 的詳細技術比較（尚未入圖）
+- 財務數據缺 backlog 資訊（需手動輸入）
+
+建議的下一步（按優先序）：
+1. 找 Coherent 2025 法說會——他們是 SIVE 的客戶，可確認或否認獨佔
+2. 取 O-Net 6963.HK 最近財報——競爭者，可評估替代威脅
+3. 更新 Engine C backlog 手動欄位
+```
+
+---
+
+## 投資建議的邊界
+
+本系統是**研究工具，不是投資顧問**：
+
+- **Lane Memo**：方向性備忘，說「thesis 是否成立」，不說「買多少」
+- **Watchlist**：thesis 通過 + 財務核驗後升格，說「值得深研」，不說「何時買」
+- **Underwrite Sheet**：具體標的深挖，仍需使用者自行決策部位大小
+
+升格到 Watchlist 的三個前置條件（L9）：
+1. Lane Memo 評分通過（`thesis/scoring_rubric.md`）
+2. `variant_perception` 已明確寫出（股價隱含假設 X → 本 thesis 認為 Y → 催化劑 Z）
+3. 財務核驗清單 5 項完成（`engine_c/checklist.py`）
+
+---
+
+## 與其他 skill 的分工
+
+| 情況 | 用哪個 skill |
+|------|-------------|
+| 丟進來一條推文/新聞/小道消息，要入庫 | `skills/lead-intake` |
+| 已有 thesis，要找反駁角度 | `skills/blind-spot-audit` |
+| 問關於某公司/市場的投資研究問題 | 本 skill |
+
+---
+
+## 與既有系統的接點
+
+- 取圖 context：`query/graph_context.py`
+- 財務快照：`engine_c/etl_yfinance.py`、`engine_c/checklist.py`
+- Lane Memo 生成：`thesis/generate_lane_memo.py`
+- Lane Memo 評分：`thesis/scoring_rubric.md`
+- 新公司 onboarding：`docs/onboarding-sop.md`
+- 來源分類標準：CLAUDE.md 來源登記表 + 證據四階
+
+## 已知限制（v0，等真實流量撞）
+
+- **variant_perception 需要估值數字**：Engine C 目前只有 yfinance 快照，缺 forward P/E 分析師估值細節時只能標 TODO
+- **圖只有 CPO/矽光子 + SIVE**：其他主題暫時沒有圖內資料
+- **sole_source 缺獨立確認**：目前 SIVE 的關鍵主張多為自我報告（L8），需要客戶端文件補強
+- **backlog 和客戶集中度需手動輸入**：不是 yfinance 能自動抓的欄位
