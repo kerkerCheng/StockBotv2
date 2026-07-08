@@ -5,43 +5,33 @@ get_checklist(ticker) -> dict
   回傳 5 項各自的狀態（ok / manual_required / missing）與數值，
   供 thesis/generate_lane_memo.py 的 Watchlist Gate 使用。
 
-連線方式與 etl_yfinance.py 相同（POSTGRES_DSN 或分項 env vars）。
+後端：SQLite（預設）或 Postgres（設 POSTGRES_HOST/DSN）。
 """
 from __future__ import annotations
 
-import os
 import sys
 from pathlib import Path
 
+_ROOT = Path(__file__).resolve().parent.parent
+if str(_ROOT) not in sys.path:
+    sys.path.insert(0, str(_ROOT))
+
 try:
     from dotenv import load_dotenv
-    load_dotenv(Path(__file__).resolve().parent.parent / ".env")
+    load_dotenv(_ROOT / ".env")
 except ImportError:
     pass
 
 
 def _get_conn():
     try:
-        import psycopg2
-    except ImportError:
-        return None
-    dsn = os.environ.get("POSTGRES_DSN")
-    try:
-        if dsn:
-            return psycopg2.connect(dsn)
-        return psycopg2.connect(
-            host=os.environ.get("POSTGRES_HOST", "localhost"),
-            port=int(os.environ.get("POSTGRES_PORT", 5432)),
-            dbname=os.environ.get("POSTGRES_DB", "stockbot"),
-            user=os.environ.get("POSTGRES_USER", "stockbot"),
-            password=os.environ.get("POSTGRES_PASSWORD", ""),
-        )
+        from engine_c.db import get_conn
+        return get_conn()
     except Exception:
         return None
 
 
 def _snap_status(value, label: str) -> dict:
-    """把一個數值包成清單項目格式。"""
     if value is None:
         return {"status": "missing", "value": None, "label": label}
     return {"status": "ok", "value": value, "label": label}
@@ -62,13 +52,13 @@ def get_checklist(ticker: str) -> dict:
       "ticker": "COHR",
       "engine_c_available": True/False,
       "items": {
-        "gross_margin_trend": {"status": "ok"|"missing", "value": [...], "label": "..."},
-        "customer_concentration": {"status": "manual_required", "value": None, "label": "..."},
-        "backlog": {"status": "manual_required", "value": None, "label": "..."},
-        "dilution": {"status": "ok", "value": {...}, "label": "..."},
-        "valuation_pressure": {"status": "ok", "value": {...}, "label": "..."},
+        "gross_margin_trend":     {"status": "ok"|"missing", "value": [...], "label": "..."},
+        "customer_concentration": {"status": "manual_required", ...},
+        "backlog":                {"status": "manual_required", ...},
+        "dilution":               {"status": "ok", ...},
+        "valuation_pressure":     {"status": "ok", ...},
       },
-      "gate_pass": True/False   # True = 全部 ok 或 manual_reviewed（無 missing）
+      "gate_pass": True/False
     }
     """
     conn = _get_conn()
@@ -78,31 +68,54 @@ def get_checklist(ticker: str) -> dict:
             "engine_c_available": False,
             "items": {},
             "gate_pass": False,
-            "note": "Postgres 不可用（Engine C 未啟動）",
+            "note": "Engine C 資料庫不可用（db.py 匯入失敗）",
         }
 
     try:
-        with conn.cursor() as cur:
-            # 最近 4 季毛利率
+        from engine_c.db import _use_postgres
+        is_pg = _use_postgres()
+
+        if is_pg:
+            cur = conn.cursor()
             cur.execute("""
                 SELECT snapshot_date, gross_margin, shares_outstanding,
                        pe_forward, ev_revenue, price,
                        analyst_target_mean, analyst_target_count
                 FROM financial_snapshots
-                WHERE ticker = %s
-                ORDER BY snapshot_date DESC
-                LIMIT 4
+                WHERE ticker = %s ORDER BY snapshot_date DESC LIMIT 4
             """, (ticker,))
             snaps = cur.fetchall()
-
-            # 人工填入項目
-            cur.execute("""
-                SELECT field_name, value FROM manual_fields
-                WHERE ticker = %s
-            """, (ticker,))
+            cur.execute(
+                "SELECT field_name, value FROM manual_fields WHERE ticker = %s",
+                (ticker,)
+            )
             manual = {row[0]: row[1] for row in cur.fetchall()}
-    finally:
-        conn.close()
+            conn.close()
+        else:
+            import sqlite3
+            cur = conn.execute("""
+                SELECT snapshot_date, gross_margin, shares_outstanding,
+                       pe_forward, ev_revenue, price,
+                       analyst_target_mean, analyst_target_count
+                FROM financial_snapshots
+                WHERE ticker = ? ORDER BY snapshot_date DESC LIMIT 4
+            """, (ticker,))
+            snaps = [tuple(r) for r in cur.fetchall()]
+            cur2 = conn.execute(
+                "SELECT field_name, value FROM manual_fields WHERE ticker = ?",
+                (ticker,)
+            )
+            manual = {row[0]: row[1] for row in cur2.fetchall()}
+            conn.close()
+
+    except Exception as e:
+        return {
+            "ticker": ticker,
+            "engine_c_available": False,
+            "items": {},
+            "gate_pass": False,
+            "note": f"資料庫查詢失敗：{e}",
+        }
 
     if not snaps:
         return {
@@ -119,7 +132,7 @@ def get_checklist(ticker: str) -> dict:
                 ]
             },
             "gate_pass": False,
-            "note": f"Postgres 有資料但 {ticker} 無快照，請先執行 ETL",
+            "note": f"{ticker} 無快照，請先執行 python engine_c/etl_yfinance.py {ticker}",
         }
 
     # 1. 毛利率趨勢（最近 4 季）
@@ -128,17 +141,16 @@ def get_checklist(ticker: str) -> dict:
     if gm_item["status"] == "ok":
         latest = gm_vals[0][1]
         oldest = gm_vals[-1][1]
-        trend = "上升" if latest > oldest else ("下滑" if latest < oldest else "持平")
-        gm_item["trend"] = trend
+        gm_item["trend"] = "上升" if latest > oldest else ("下滑" if latest < oldest else "持平")
         gm_item["latest"] = f"{latest:.1%}"
 
-    # 2. 客戶集中度（人工）
+    # 2. 客戶集中度（人工填入）
     cc_item = _manual_status(manual.get("customer_concentration"), "客戶集中度（前三大客戶 % 收入）")
 
-    # 3. Backlog（人工）
+    # 3. Backlog（人工填入）
     bl_item = _manual_status(manual.get("backlog"), "Backlog/訂單能見度")
 
-    # 4. 稀釋分析（shares_outstanding 趨勢）
+    # 4. 稀釋（shares_outstanding 趨勢）
     shares = [(str(r[0]), r[2]) for r in snaps if r[2] is not None]
     dil_item = _snap_status(shares or None, "稀釋分析（股數趨勢）")
     if dil_item["status"] == "ok" and len(shares) >= 2:
@@ -146,16 +158,15 @@ def get_checklist(ticker: str) -> dict:
         dil_item["shares_change"] = f"{delta:+.1%}"
 
     # 5. 估值壓力
-    latest_snap = snaps[0]
+    r0 = snaps[0]
     val_data = {
-        "price": latest_snap[5],
-        "pe_forward": latest_snap[3],
-        "ev_revenue": latest_snap[4],
-        "analyst_target_mean": latest_snap[6],
-        "analyst_target_count": latest_snap[7],
+        "price": r0[5], "pe_forward": r0[3], "ev_revenue": r0[4],
+        "analyst_target_mean": r0[6], "analyst_target_count": r0[7],
     }
-    has_val = any(v is not None for v in val_data.values())
-    val_item = _snap_status(val_data if has_val else None, "估值壓力（P/E, EV/Rev, 分析師目標價）")
+    val_item = _snap_status(
+        val_data if any(v is not None for v in val_data.values()) else None,
+        "估值壓力（P/E, EV/Rev, 分析師目標價）"
+    )
 
     items = {
         "gross_margin_trend":     gm_item,
@@ -164,11 +175,7 @@ def get_checklist(ticker: str) -> dict:
         "dilution":               dil_item,
         "valuation_pressure":     val_item,
     }
-
-    gate_pass = all(
-        v["status"] in ("ok", "manual_reviewed")
-        for v in items.values()
-    )
+    gate_pass = all(v["status"] in ("ok", "manual_reviewed") for v in items.values())
 
     return {
         "ticker": ticker,
@@ -179,40 +186,35 @@ def get_checklist(ticker: str) -> dict:
 
 
 def format_checklist(result: dict) -> str:
-    """把 get_checklist() 的結果格式化成人類可讀字串（用於 Lane Memo context）。"""
     lines = [f"## 5 項財務核驗清單：{result['ticker']}"]
 
     if not result.get("engine_c_available"):
         lines.append(f"⚠ {result.get('note', 'Engine C 未啟動')}")
         return "\n".join(lines)
 
-    note = result.get("note")
-    if note:
-        lines.append(f"⚠ {note}")
+    if result.get("note"):
+        lines.append(f"⚠ {result['note']}")
 
-    status_icon = {"ok": "✓", "manual_reviewed": "✓(人工)", "manual_required": "⚠(人工待填)", "missing": "✗"}
+    icon_map = {"ok": "✓", "manual_reviewed": "✓(人工)", "manual_required": "⚠(人工待填)", "missing": "✗"}
     for key, item in result.get("items", {}).items():
-        icon = status_icon.get(item["status"], "?")
-        val = item.get("value", "")
+        icon = icon_map.get(item["status"], "?")
         extra = ""
         if key == "gross_margin_trend" and item.get("trend"):
             extra = f"  趨勢：{item['trend']}，最新：{item.get('latest', 'N/A')}"
         elif key == "dilution" and item.get("shares_change"):
             extra = f"  股數變化：{item['shares_change']}"
-        elif key == "valuation_pressure" and isinstance(val, dict):
+        elif key == "valuation_pressure" and isinstance(item.get("value"), dict):
+            v = item["value"]
             parts = []
-            if val.get("price"):
-                parts.append(f"價格=${val['price']:.2f}")
-            if val.get("pe_forward"):
-                parts.append(f"FwdPE={val['pe_forward']:.1f}x")
-            if val.get("ev_revenue"):
-                parts.append(f"EV/Rev={val['ev_revenue']:.1f}x")
-            if val.get("analyst_target_mean"):
-                parts.append(f"分析師目標=${val['analyst_target_mean']:.2f}(N={val.get('analyst_target_count', '?')})")
+            if v.get("price"):       parts.append(f"${v['price']:.2f}")
+            if v.get("pe_forward"):  parts.append(f"FwdPE={v['pe_forward']:.1f}x")
+            if v.get("ev_revenue"):  parts.append(f"EV/Rev={v['ev_revenue']:.1f}x")
+            if v.get("analyst_target_mean"):
+                parts.append(f"分析師=${v['analyst_target_mean']:.2f}(N={v.get('analyst_target_count','?')})")
             extra = "  " + ", ".join(parts) if parts else ""
         lines.append(f"{icon} {item['label']}{extra}")
 
-    gate = "✓ Gate 通過 → 可升格 Watchlist" if result.get("gate_pass") else "✗ Gate 未通過 → 輸出 [Research Note]"
+    gate = "✓ Gate 通過 → 可升格 Watchlist" if result.get("gate_pass") else "✗ Gate 未通過 → [Research Note]"
     lines.append(f"\n**{gate}**")
     return "\n".join(lines)
 
@@ -222,8 +224,7 @@ def main() -> int:
     ticker = sys.argv[1].upper() if len(sys.argv) > 1 else "COHR"
     result = get_checklist(ticker)
     print(format_checklist(result))
-    print()
-    print("--- raw ---")
+    print("\n--- raw ---")
     print(json.dumps(result, indent=2, default=str))
     return 0 if result.get("gate_pass") else 1
 

@@ -167,13 +167,26 @@ def fetch_filing_text(cik: str, accession: str, primary_doc: str) -> str | None:
         return None
 
 
+# 預設截斷：~50k chars ≈ ~12k tokens，10-K 全文常超過 300k chars
+# extract.py 的 context window 大約 100k tokens，但整份 10-K 品質很差（法律條文噪音多）
+# 建議只抓前 50k chars（Business + MD&A 段落），需要更多時手動 --max-chars
+_DEFAULT_MAX_CHARS = 50_000
+
+
 def fetch_ticker(
     ticker: str,
     form_types: list[str],
     n: int,
     out_dir: Path,
+    max_chars: int = _DEFAULT_MAX_CHARS,
 ) -> list[dict]:
-    """主入口：抓 ticker 的最近 n 份 filing，寫入 out_dir，回傳 meta 清單。"""
+    """
+    主入口：抓 ticker 的最近 n 份 filing，寫入 out_dir，回傳 meta 清單。
+
+    max_chars: 每份文件的字符截斷上限（預設 50,000 ≈ 12k tokens）。
+               10-K 全文通常 200k-400k chars，全部送給 extract.py 很貴且品質差。
+               設 0 或負數 = 不截斷（危險：可能噴幾十萬 tokens）。
+    """
     print(f"[edgar] looking up CIK for {ticker}...")
     cik = get_cik(ticker)
     if not cik:
@@ -194,6 +207,15 @@ def fetch_ticker(
             print(f"[edgar] WARN: empty document, skipping", file=sys.stderr)
             continue
 
+        original_len = len(text)
+        if max_chars > 0 and original_len > max_chars:
+            text = text[:max_chars]
+            print(
+                f"[edgar] ⚠ truncated {original_len:,} → {max_chars:,} chars "
+                f"(~{max_chars//4:,} tokens). 若需完整文件加 --max-chars 0（不建議）",
+                file=sys.stderr,
+            )
+
         doc_id = make_doc_id(ticker, f["form_type"], f["filed_date"])
         meta = {
             "doc_id": doc_id,
@@ -205,6 +227,8 @@ def fetch_ticker(
             "filed_date": f["filed_date"],
             "cik": f["cik"],
             "accession": f["accession"],
+            "truncated": original_len > max_chars > 0,
+            "original_chars": original_len,
             "url": (
                 f"https://www.sec.gov/Archives/edgar/full-index/"
                 f"{f['cik']}/{f['accession']}/{f['primary_doc']}"
@@ -229,6 +253,10 @@ def main() -> int:
         "--out", default="library/raw",
         help="輸出目錄，預設 library/raw"
     )
+    ap.add_argument(
+        "--max-chars", type=int, default=50_000,
+        help="每份文件截斷上限（chars）。預設 50000 ≈ 12k tokens。0=不截斷（危險）",
+    )
     args = ap.parse_args()
 
     form_types = [f.strip() for f in args.forms.split(",")]
@@ -239,6 +267,7 @@ def main() -> int:
         form_types=form_types,
         n=args.n,
         out_dir=out_dir,
+        max_chars=args.max_chars,
     )
 
     if results:
