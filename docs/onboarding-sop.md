@@ -107,3 +107,9 @@ Company 和 Material 孤立節點需優先處理（無邊 = 不出現在供應�
 - 至少 3 個不同 `origin_entity`（不同公司的文件）
 - 被分析公司自己的法說會只算佐證，不算主要確認來源（CLAUDE.md L8）
 - `sole_source` 判定需要客戶端或第三方來源（非供應商自稱）
+
+---
+
+## 相關文件
+
+- [`docs/solutions/tooling-decisions/engine-c-sqlite-dual-backend.md`](solutions/tooling-decisions/engine-c-sqlite-dual-backend.md) — 非美股 yfinance suffix 規則、EDGAR 適用範圍限制、pdfplumber 頁面抽取模式、TICKER_MAP `None` 的意義

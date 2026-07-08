@@ -127,3 +127,10 @@
 
 這三層都需要 LLM 在管道裡扮演更主動的角色，不只是「處理你給的輸入」。
 G7（Text2Cypher）是其中最有槓桿的單點——解鎖後你就能直接問圖問題，不用每次都出整篇 Lane Memo。
+
+---
+
+## Related
+
+- [`docs/solutions/tooling-decisions/engine-c-sqlite-dual-backend.md`](solutions/tooling-decisions/engine-c-sqlite-dual-backend.md) — Engine C 實作細節：SQLite 雙後端抽象、非美股 onboarding 路徑（與 G1 公司識別和 G6 文件搜尋相關）
+- [`docs/solutions/architecture-patterns/knowledge-graph-data-quality-and-engine-c-join-key.md`](solutions/architecture-patterns/knowledge-graph-data-quality-and-engine-c-join-key.md) — Engine A 圖品質模式與 A→C join key 設計（與 G10 Entity Resolution 相關）
