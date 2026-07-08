@@ -50,8 +50,9 @@ TICKER_MAP: dict[str, str | None] = {
     "co:jabil":      "JBL",
     "co:anthropic":  None,   # 私人公司，明確 null
     "co:openai":     None,   # 私人公司，明確 null
-    # $SIVE — 待 onboarding 後確認 graph node id，再補入
-    # "co:sive": "SIVE",
+    # Sivers Semiconductors AB — 瑞典上市 (Nasdaq First North Stockholm)
+    # yfinance ticker: SIVE.ST；非美股，EDGAR 無資料，文件走 IR 人工下載路徑
+    "co:sivers_semiconductors": "SIVE.ST",
 }
 
 
