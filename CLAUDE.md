@@ -15,7 +15,8 @@
 
 ## 關鍵定案 (Decisions)
 - **開發工具:** 主力 Claude Code(或 Cursor 接 Claude),Cursor 當輔助 review。
-- **資料庫(polyglot):** 知識圖譜 → **Neo4j**;基本面數字/時間序列/文件 metadata → **Postgres**;向量 RAG 先用 Neo4j 內建向量,量大再分出去。
+- **文件化學習:** 踩過的坑與設計決定沉澱在 `docs/solutions/`（按問題類型分類，帶 YAML frontmatter 可搜尋：`module`, `tags`, `problem_type`）；共用領域詞彙見 `CONCEPTS.md`。
+- **資料庫(polyglot):** 知識圖譜 → **Neo4j**;基本面數字/時間序列/文件 metadata → **SQLite（本機零安裝預設）或 Postgres（設 `POSTGRES_HOST`/`POSTGRES_DSN` 環境變數切換）**，見 [`docs/solutions/tooling-decisions/engine-c-sqlite-dual-backend.md`](docs/solutions/tooling-decisions/engine-c-sqlite-dual-backend.md)；向量 RAG 先用 Neo4j 內建向量,量大再分出去。
 - **抽取與 DB 解耦:** `extract.py` 只輸出 DB 無關的 node/edge JSON 中介格式;「JSON → 寫進 DB」是可替換的 loader。DB 選擇不可綁死資料。
 - **graph 用 property graph,不用 tree。** 供應鏈/技術拓樸本質是 DAG。節點帶 `type` + `abstraction_level`,邊帶 `relation` 型別。每個 node/edge 必掛 `source_ids` + `confidence`(來源可追溯是鐵律)。
 - **schema 字彙(type/relation 種類)用對照表管理、留鬆;表的「形狀」鎖死。** 加新邊型別 = 加一列設定,不動表結構。
