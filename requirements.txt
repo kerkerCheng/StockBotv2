@@ -2,3 +2,8 @@ anthropic
 neo4j
 python-dotenv
 jsonschema
+# Engine C
+yfinance
+psycopg2-binary
+# Source Fetcher
+requests

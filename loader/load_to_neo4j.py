@@ -30,6 +30,30 @@ try:
 except ImportError:
     pass
 
+# ── Ticker Map (Plan B — source of truth for A→C join key) ────────────────────
+# 人工維護；LLM 不生成 ticker（避免幻覺）。
+# 私人公司明確設 None（區分「已知無 ticker」vs「尚未建檔」）。
+# 新公司 onboarding 後在此補上對應 ticker。
+TICKER_MAP: dict[str, str | None] = {
+    "co:coherent":   "COHR",
+    "co:lumentum":   "LITE",
+    "co:broadcom":   "AVGO",
+    "co:nvidia":     "NVDA",
+    "co:tsmc":       "TSM",
+    "co:intel":      "INTC",
+    "co:samsung":    "005930.KS",
+    "co:apple":      "AAPL",
+    "co:corning":    "GLW",
+    "co:arista":     "ANET",
+    "co:meta":       "META",
+    "co:google":     "GOOGL",
+    "co:jabil":      "JBL",
+    "co:anthropic":  None,   # 私人公司，明確 null
+    "co:openai":     None,   # 私人公司，明確 null
+    # $SIVE — 待 onboarding 後確認 graph node id，再補入
+    # "co:sive": "SIVE",
+}
+
 
 def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
@@ -96,6 +120,10 @@ def load(doc: dict, session, use_apoc: bool = False) -> None:
 
     # ── nodes ──
     for n in doc.get("nodes", []):
+        attrs = dict(n.get("attributes", {}))
+        # Inject ticker for known Company nodes (Engine A→C join key)
+        if n.get("type") == "Company" and n["id"] in TICKER_MAP:
+            attrs["ticker"] = TICKER_MAP[n["id"]]
         params = {
             "id": n["id"],
             "type": n["type"],
@@ -103,7 +131,7 @@ def load(doc: dict, session, use_apoc: bool = False) -> None:
             "abstraction_level": n["abstraction_level"],
             "role": n.get("role"),
             "aliases": n.get("aliases", []),
-            "attributes_json": json.dumps(n.get("attributes", {}), ensure_ascii=False),
+            "attributes_json": json.dumps(attrs, ensure_ascii=False),
             "confidence": n["confidence"],
             "updated_at": ts,
         }
