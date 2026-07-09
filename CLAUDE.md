@@ -87,46 +87,18 @@ fetchers/edgar.py ──────↑                        engine_c/etl_yfin
 
 ---
 
-## v0 Schema（定案，故意會壞、等真實資料來撞）
+## v0 Schema
 
-> 設計原則:表的「形狀」鎖死,字彙(type/relation/層級種類)用對照表留鬆。
-> 方法論藍圖借自 chokepoint-atlas skill(見 L4),但只抄概念、不裝套件。
+設計原則：表的「形狀」鎖死，字彙（type/relation/層級）用對照表留鬆；屬性按 L4「物理 / 關係 / 時變」三分歸位。完整欄位表、vocab、claims 格式、sole_source 驗證規則：見 [`schema/graph_schema.md`](schema/graph_schema.md)。
 
-### 節點 `nodes`
-欄位形狀(鎖死):`id, type, name, abstraction_level, role, aliases[], attributes(jsonb), confidence, source_ids[], updated_at`
+**快速記憶：**
+- node 帶內在慢變屬性（`ramp_difficulty_intrinsic`、`concentration_score` 為衍生值非手填）
+- edge 帶關係型屬性（`substitutability`、`sole_source`、`lead_time`、`ramp_execution`）
+- `confidence` 只在不同 `origin_event` 之間累加（同一法說會多份摘要 = 一個 origin_event）
+- `sole_source` 需客戶端或第三方印證；供應商自稱 → `verified_by_absence`（weak，≤0.5）
+- `consensus_coverage` / 股價 / 財務數字 → 不進圖，進引擎 C（SQLite）
 
-- `type`(字彙,留鬆): Company | Product | TechNode | Material | Standard | Person
-- `abstraction_level`(採 chokepoint-atlas 的 stack 分層,取代舊的籠統四層):
-  `end_demand` | `network_systems` | `module_subsystem` | `device_chip` | `test_yield` | `foundry_packaging` | `equipment_epitaxy` | `materials_substrate`
-- `role`(公司在 stack 的角色): leader | bottleneck_supplier | disruptor | foundry | test | network | adjacent_silicon | material_base
-- **內在(慢變)瓶頸屬性放這裡:** `ramp_difficulty_intrinsic`(1-5,該品類本質上多難量產)、`concentration_score`(1-5,且應為**衍生值** = 數進入此 component 的供應邊並加權市占,存成有來源的快取,非手填)
-
-### 邊 `edges`
-欄位形狀(鎖死):`id, src_id, dst_id, relation, attributes(jsonb), confidence, source_ids[], updated_at`
-
-- `relation`(字彙,留鬆): supplies_to | is_component_of | competes_with | enables | depends_on | invests_in | licenses_to
-- **關係型(會隨另一端而變)瓶頸屬性放這裡:** `substitutability`(1-5)、`sole_source`(bool)、`lead_time`、`qualification_status`、supplier 端的 `ramp_execution`(這家供應商實際 ramp 能力,與 node 的內在難度分開)
-
-### 證據與信心(四階,鐵律:每個 node/edge 必掛 source_ids)
-`evidence_tier`:
-1. **strongest** — filings / 法說會逐字稿 / IR 材料 / 客戶供應商直接揭露
-2. **strong** — 官方供應商名單變動 / design-win 公告 / 產能擴張通知
-3. **medium** — 可信產業報導 / 券商研究摘要
-4. **weak** — 社群貼文 / 未證實論壇說法
-
-`demand_proof_level`(需求主張的證據強度,**掛在需求主張/邊上,不是 node 靜態欄**): confirmed | guided | inferred | speculative
-
-**來源獨立性鐵律:** `confidence` 只在不同 `origin_event`(原始事件)之間才累加。同一場法說會的多份摘要、同一 PR 被多家媒體轉發,算一個 `origin_event`,不是多重佐證。標注原則:每個 source 應記錄其 `origin_entity`(哪家公司發出)+ `origin_event`(哪個原始事件,如 `coherent_fy26q3_earnings`);相同 `origin_event` 的多個 source 在 confidence 計算中只算一次。
-
-**`sole_source` 標記規則:** 必須區分兩種情況,二者信心強度不同:
-- `verified_by_absence`:文件沒有提到第二供應商 → 弱主張,`confidence` 不得超過 0.5
-- `verified_by_search`:主動查過競品 / 替代路徑 / 客戶自製可能,確認暫無 → 強主張
-一個節點自己的法說會說「我們是唯一供應商」不算 `verified_by_search`;需要**客戶端或第三方**來源印證。
-
-### 不進圖的東西（時變觀測，歸引擎C 的時間序列）
-- `consensus_coverage`（underfollowed | emerging | crowded）：這是**股票/公司的市場認知**，且會隨時間變，屬 Company 的帶時戳觀測，**不是物理 component 的靜態圖屬性**。
-
-### 報告產出三級模板(借自 chokepoint-atlas output-formats)
+### 報告產出三級模板
 1. **Directional Lane Memo**(先給方向):一句 thesis → 需求驅動 → stack 摘要 → 主瓶頸 → 最強證據 → 什麼會推翻它 → 接下來盯什麼 → **variant perception(市場現在信 X,本 thesis 認為 Y,催化劑 Z)**
    - Lane Memo 是方向備忘,**不是可操作的投資建議**。財務核驗清單(5 項)是升格到 Watchlist 的 gate,不是 Lane Memo 的 gate。
    - `variant perception` 是**必填欄**,不是選填。缺這一段的 Lane Memo 不能升格(無論其他分數多高)。
@@ -214,7 +186,7 @@ v0 schema 的對錯只有真實資料能驗證。凍結一個會壞的 v0 → �
 
 **投資諮詢開放的三個前置條件（全部滿足才開放）：**
 1. 第二條垂直切片必須是**非 AI / 非 CPO** 主題，且跑通相同的 extract → thesis → 評分流程。
-2. thesis→部位的最小規則已定義（進場條件 / 單檔上限 / 持有期 / thesis 失效即出場），哪怕是人工執行的規則。
+2. thesis→部位的最小規則已定義（進場條件 / 單檔上限 / 持有期 / thesis 失效即出場），哪怕是人工執行的規則。見 [`docs/investment-sop.md`](docs/investment-sop.md)（`thesis/preconditions.py` 的 `_check_sop()` 依賴此檔）。
 3. 財務核驗清單 5 項（客戶集中度 / 毛利率趨勢 / backlog / 稀釋 / 估值壓力）已能一鍵從 Engine C 查出，並且必須在 Watchlist 升格前執行。
 
 ---

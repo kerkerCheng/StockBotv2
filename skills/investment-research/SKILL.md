@@ -189,6 +189,7 @@ python thesis/generate_lane_memo.py --company-id co:<ticker_lower>
 1. Lane Memo 評分通過（`thesis/scoring_rubric.md`）
 2. `variant_perception` 已明確寫出（股價隱含假設 X → 本 thesis 認為 Y → 催化劑 Z）
 3. 財務核驗清單 5 項完成（`engine_c/checklist.py`）
+4. 最小投資規則已定義：見 [`docs/investment-sop.md`](../../docs/investment-sop.md)（`thesis/preconditions.py` 的 L9 gate 依賴此檔）
 
 ---
 

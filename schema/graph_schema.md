@@ -117,7 +117,34 @@
 
 ---
 
-## 6. 不進圖的東西(時變觀測,歸引擎 C 的 Postgres)
+## 6. Sources — 來源欄位與獨立性鐵律
 
-- `consensus_coverage`(underfollowed/emerging/crowded):Company 的帶時戳市場認知,進時間序列。
-- 股價、估值、月營收、產能利用率等所有數字:Postgres,不進圖。
+每個 node / edge / claim 的 `source_ids[]` 指向文件中的來源物件，每條來源應記錄：
+
+| 欄位 | 說明 |
+|------|------|
+| `id` | 全域唯一格式 `<doc_id>_s<N>`，例 `coherent_q3fy26_s2` |
+| `origin_entity` | 哪家公司發出（發出方，不是被分析方） |
+| `origin_event` | 哪個原始事件，例 `coherent_fy26q3_earnings` |
+| `evidence_tier` | 見 §5 |
+| `quote` | 逐字引文，具體型號/公司名必須在 quote 裡出現才可建節點 |
+
+**來源獨立性鐵律：** `confidence` 只在不同 `origin_event` 之間才累加。同一場法說會的多份摘要、同一 PR 被多家媒體轉發，算一個 `origin_event`，不是多重佐證。
+
+---
+
+## 7. `sole_source` 驗證規則
+
+必須區分兩種情況，信心強度不同：
+
+- `verified_by_absence`：文件沒有提到第二供應商 → 弱主張，`confidence` 不得超過 0.5，標 `sole_source_evidence_quality: weak`
+- `verified_by_search`：主動查過競品 / 替代路徑 / 客戶自製可能，確認暫無 → 強主張
+
+**鐵律：** 供應商自己的法說會說「我們是唯一供應商」不算 `verified_by_search`；需要**客戶端或第三方**來源印證。若某條 `sole_source=true` 的邊，其所有 source_ids 的 `origin_entity` 全是同一家供應商 → 自動標 `sole_source_evidence_quality: weak`（L8）。
+
+---
+
+## 8. 不進圖的東西（時變觀測，歸引擎 C 的 SQLite）
+
+- `consensus_coverage`（underfollowed/emerging/crowded）：Company 的帶時戳市場認知，進時間序列。
+- 股價、估值、月營收、產能利用率等所有數字：SQLite（Engine C），不進圖。
