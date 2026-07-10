@@ -392,9 +392,38 @@ Skill 定義以下操作流程（Claude 在對話中執行，不需要另一個 
 - 手動 `RemoteTrigger` run now → PR 內容包含結構化週報 + 主題 section
 - themes.txt 有 comment 行 → 被正確忽略，不搜尋
 - 發現高訊號事件 → PR 描述或週報開頭有 30 秒 brief 標記
-- 下次開本機 Claude Code session → 我用 `gh pr list` 或讀 `docs/reports/` 發現待審週報並主動提示
+- 下次開本機 Claude Code session → 見 U7b，我用 `gh pr list` 主動列出待審 PR
 
 **Verification:** Routine 手動觸發一次後，GitHub 出現新 PR，內容包含主題 section + actionable items。
+
+---
+
+### U7b. Session-Start PR Digest（U7 的消費端，2026-07-11 補設計，尚未實作）
+
+**Goal:** U7 的 cloud routine 只負責「生產」PR；U7b 負責「你開 session 時主動看到有哪些待審週報 PR」，讓完整迴圈接起來——你看完簡報後決定要研究哪個主題，才觸發 `company-onboard` 找文件 + 跑入庫流程。沒有這一段，U7 開的 PR 只會安靜躺在 GitHub，等你自己想到才去看。
+
+**Requirements:** R6, R7（跟 U7 共用）
+
+**Dependencies:** U7 必須先建好（有 routine 在開 PR，這個 hook 才有東西可查）；GitHub 需已連接 `kerkerCheng/StockBotv2`；本機需有 `gh` CLI 且已認證
+
+**Files:**
+- 新增：`crons/weekly_scan_digest.py`（`SessionStart` hook script，跟 `crons/thesis_freshness_check.py`同一種寫法）
+- `.claude/settings.local.json` — 在既有 `hooks.SessionStart` 陣列裡追加一筆（不覆蓋 U8 那筆）
+
+**Approach:**
+
+- Script 執行 `gh pr list --repo kerkerCheng/StockBotv2 --label weekly-scan --json number,title,url,body`（或用 U7 routine 固定的分支/標籤慣例過濾出週報 PR，避免跟其他手動 PR 混在一起——U7 建立時要記得幫 PR 打上 `weekly-scan` label）
+- 若有開著的週報 PR → 印出 `{"systemMessage": "..."}`，內容是每個 PR 的主題摘要 + PR 連結，格式跟 U7 週報本身的「30 秒 brief」一致
+- 若沒有開著的 PR → 安靜過去（同 U8 的「都新鮮就不輸出」原則）
+- 純讀 `gh pr list` 的輸出，不碰 Neo4j/Engine C；跟 U8 的 hook 各自獨立，互不呼叫
+
+**Test scenarios:**
+- 手動跑 `gh pr list --label weekly-scan` 有結果時 → script 輸出正確格式的 systemMessage
+- 沒有開著的週報 PR → 無輸出
+- `gh` 未安裝或未認證 → script 需優雅失敗（`2>/dev/null || true`），不能讓 session 開不起來
+- 使用者看到簡報後說「研究 X」→ 走 `company-onboard` skill，不是這個 hook 自己去跑
+
+**Verification:** 待 U7 routine 建好、實際產出至少一個 PR 後，開新 session 應看到該 PR 的摘要主動出現。
 
 ---
 
@@ -454,7 +483,7 @@ Skill 定義以下操作流程（Claude 在對話中執行，不需要另一個 
 2. **U3**（依賴 U1）— Onboarding skill 到位後做 M1 CPO Depth Sprint
 3. **M1 CPO Depth Sprint**（內容任務）— U3 到位後執行，讓 CPO 主題達到可信標準
 4. **U4 + U5**（U4 先，U5 依賴 U4）— 個人化建議層
-5. **U6 + U7 + U8**（可平行）— 注意力層。U7 為 cloud routine（需先連接 GitHub），U8 為 skill 內 session-start 檢查（無外部依賴）
+5. **U6 + U7 + U7b + U8**（U8 已完成；U6 已完成；U7 需先連接 GitHub 才能建，U7b 需 U7 先建好）— 注意力層
 6. **M2 Second Vertical Slice**（follow Plan 005）— M1 完成後
 7. **L9 Gate 自動通過** — M2 完成 + investment-sop.md + Engine C 可用 → `preconditions.py` 全通過
 
