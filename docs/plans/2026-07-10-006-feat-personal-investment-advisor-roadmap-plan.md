@@ -145,8 +145,14 @@ Claude 在對話中用現有工具（fetchers/edgar.py via Bash、WebSearch、Wr
 **KTD4 — Google Sheets 以 fetchers/gsheets.py 實現，每 session 快取**
 GCP Service Account credentials 存在 `.env`（`GSHEETS_CREDENTIALS_JSON` + `PORTFOLIO_SHEET_ID`）。每次 session 第一次呼叫時取資料、後續 cache dict 在 process 生命週期內，避免 API quota 問題。
 
-**KTD5 — CronCreate jobs 輸出到 memory 檔**
-Cron job 跑完的週報 / thesis 提醒寫入 `C:/Users/Cheng/.claude/projects/.../memory/` 目錄，下次開啟 Claude Code 對話時自動帶入。這是 Windows 本機最可靠的「通知」方式，不依賴 daemon 常駐或 push notification 設定。
+**KTD5 — U7/U8 拆成「cloud routine」與「session-start 檢查」兩種機制（2026-07-10 修訂）**
+執行時發現原設計（CronCreate jobs 輸出到本機 memory 檔）不成立：`CronCreate` 是 session-only、recurring 最多存活 7 天，關掉這個 CLI 視窗工作就消失，無法做到真正的「每週/每季背景執行」。改用 `schedule` skill 建的 cloud routine 雖然能持久排程，但跑在 Anthropic 雲端 sandbox，連不到本機 Neo4j（`bolt://localhost:7687`）、本機 SQLite/Postgres、或本機 `.env` 密鑰。
+
+修訂後的分工：
+- **U7（週報）→ cloud routine**：這個任務本來就只需要外部資源（`/last30days` web search + `config/themes.txt` 靜態清單），適合放雲端。Routine clone repo → 掃描 → 把週報寫成 `docs/reports/weekly_scan_<date>.md` → 開 PR（不直接 push main，維持人工確認）。下次開本機 session 時，Claude 看到新 PR/檔案即可提示「有 N 份週報待讀」。
+- **U8（thesis 核查）→ session-start 檢查，不用排程**：厚重依賴本機 Engine C 財務查詢，改成寫進 `skills/investment-research/SKILL.md`：每次 session 開始時檢查各 active thesis 的 Lane Memo 日期，若距上次核查 > 90 天則主動提醒，用戶開口才觸發本機查詢。不需要任何雲端或背景基礎設施。
+
+前提：cloud routine 需要 GitHub 連接 `kerkerCheng/StockBotv2`（建立時尚未連接，需先執行 `/web-setup` 或安裝 Claude GitHub App）。
 
 **KTD6 — 主題清單為 repo 內的純文字檔**
 `config/themes.txt`：每行一個主題名稱 + 關鍵字，cron job 讀取並逐主題呼叫 last30days。格式簡單，user 可直接編輯。
@@ -361,73 +367,62 @@ Skill 定義以下操作流程（Claude 在對話中執行，不需要另一個 
 
 ---
 
-### U7. Weekly Scan Cron
+### U7. Weekly Scan Cloud Routine（2026-07-10 修訂：改用 schedule skill 的 cloud routine，取代 CronCreate）
 
 **Goal:** 每週自動掃描活躍主題，產出週報（5 分鐘可讀）+ 高訊號事件觸發 30 秒 brief。
 
 **Requirements:** R6, R7
 
-**Dependencies:** 無（獨立 cron job，需要 last30days skill 可用）
+**Dependencies:** 無（需先連接 GitHub repo `kerkerCheng/StockBotv2`，見 KTD5）
 
 **Files:**
-- `config/themes.txt` — 新建（活躍主題清單）
-- `crons/weekly_scan_prompt.md` — 新建（CronCreate job 的 prompt 模板）
+- `config/themes.txt` — 已建（活躍主題清單）
+- `crons/weekly_scan_prompt.md` — 已建，內容需調整為 cloud routine 的自包含 prompt（無法假設能存取本機路徑）
+- 新增：`docs/reports/`（cloud routine 輸出目錄，routine 對此開 PR）
 
 **Approach:**
 
-`config/themes.txt` 格式：
-```
-# StockBotv2 Active Themes — 每行一個主題，空行或 # 開頭為 comment
-CPO silicon photonics external laser: SIVE, Coherent, Lumentum, Nvidia
-# AMAT LRCX mature node: AMAT, LRCX (inactive until M2)
-```
-
-`crons/weekly_scan_prompt.md`：定義 CronCreate job 執行的 Claude session 行為：
-- 讀取 `config/themes.txt` 中的 active 主題
-- 對每個主題呼叫 `/last30days` skill（或等效搜尋）
-- 合成週報：各主題的新訊號 + 與現有 thesis 的關聯 + 本週值得深挖的 1-2 件事
-- 週報寫入 `C:/Users/Cheng/.claude/projects/.../memory/weekly_scan_YYYY-MM-DD.md`（KTD5）
-- 若發現高訊號事件（法說會相關、disproof 觸發跡象）→ 另寫 30 秒 brief 到同一目錄
-
-CronCreate job：每週五台灣時間下午 6 點觸發（週末有空讀）；prompt 指向 `crons/weekly_scan_prompt.md`。
+改用 `schedule` skill 建立 cloud routine（`RemoteTrigger` action: create），而非 `CronCreate`：
+- routine 每週觸發一次（cron 最小間隔 1 小時，選一個非整點時間，如週五 UTC 10:07 對應台灣週五 18:07）
+- prompt 內容：讀 `config/themes.txt` → 對每個主題做 web search（cloud sandbox 連不到 `/last30days` 本機 skill，需直接用 WebSearch/等效工具重現同樣邏輯）→ 合成週報 markdown
+- 輸出：寫入 `docs/reports/weekly_scan_<date>.md`，**開 PR 而非直接 push main**（維持人工確認這一關，不讓雲端 agent 靜默改變 repo 主線）
+- 不做本機依賴的步驟（不查 Neo4j、不查 Engine C）——那些留給你下次開本機 session 時，我看到新 PR 再接手判斷是否要 onboard 新公司
 
 **Test scenarios:**
-- 手動執行 weekly scan prompt → 產出結構化週報到 memory 目錄
+- 手動 `RemoteTrigger` run now → PR 內容包含結構化週報 + 主題 section
 - themes.txt 有 comment 行 → 被正確忽略，不搜尋
-- 發現 CPO 相關高訊號新聞（Nvidia 法說會） → 週報內有 brief 標記 + 30 秒摘要
-- 週報寫入後，下次開 Claude Code 對話 → memory 系統自動帶入「本週有新週報」提示
+- 發現高訊號事件 → PR 描述或週報開頭有 30 秒 brief 標記
+- 下次開本機 Claude Code session → 我用 `gh pr list` 或讀 `docs/reports/` 發現待審週報並主動提示
 
-**Verification:** 跑一次 prompt 後 memory 目錄出現 `weekly_scan_*.md`；格式包含主題 section + actionable items。
+**Verification:** Routine 手動觸發一次後，GitHub 出現新 PR，內容包含主題 section + actionable items。
 
 ---
 
-### U8. Thesis Lifecycle Monitor
+### U8. Thesis Lifecycle Check — 已完成（2026-07-10 修訂並實作：從 CronCreate 排程改為真正的 `SessionStart` hook，不用背景基礎設施）
 
-**Goal:** 每季自動提醒 thesis 核查，格式為「thesis 已 N 個月，disproof condition 是 X，Y 有觸發跡象嗎？」
+**Goal:** thesis 距上次核查超過 90 天時，開新 session 就主動提醒，格式為「N 份 thesis 已超過 90 天未核查（公司 N天, ...）」。
 
 **Requirements:** R8
 
 **Dependencies:** 無
 
 **Files:**
-- `crons/thesis_monitor_prompt.md` — 新建（CronCreate job prompt）
+- `crons/thesis_freshness_check.py` — 新建。純 stdlib，掃描 `thesis/*_lane_memo.md`，抓 `**生成日期：**` 欄位（沒有的話退回檔案 mtime，相容舊格式檔案），同公司多版本取最新，>90 天輸出 `{"systemMessage": "..."}`，都新鮮則不輸出（安靜）
+- `.claude/settings.local.json` — 新增 `hooks.SessionStart`，每次開 session 執行此腳本
+- `crons/thesis_monitor_prompt.md` — 保留為「用戶同意核查後」的完整核查邏輯參考（讀 disproof_condition → WebSearch → `engine_c/checklist.py` → L7 狀態分級），不再假設有背景排程呼叫它
 
-**Approach:**
+**Approach（實際採用，比原設計更直接）：**
 
-CronCreate job：每 13 週觸發一次（季度）。
+不用任何雲端或需要本機常駐的排程基礎設施——原因：完整核查需要 `engine_c/checklist.py`（本機 SQLite/Postgres），cloud routine 連不到；`CronCreate` 又是 session-only、撐不了 13 週。改用 Claude Code 本身的 `SessionStart` hook 機制（跟現有 `/last30days` 啟動提示同一種），比原計畫寫的「skill 內邏輯」更可靠：hook 是 harness 保證觸發的，不依賴使用者剛好觸發到 investment-research skill 的關鍵字。
 
-Prompt 行為：
-- 讀取 `thesis/` 目錄中所有 `*_lane_memo.md`
-- 對每份 memo 提取：thesis 建立日期、disproof_condition 文字、thesis status（active/watch/retired）
-- 對 active theses：搜尋 disproof condition 相關的近期新聞（用 WebSearch）
-- 輸出提醒到 memory 目錄：「SIVE thesis 已 6 個月。Disproof condition：[X]。搜尋結果：無明顯觸發跡象。建議：維持 active，下次核查 2026-10。」
-- 若有觸發跡象 → 標記 `[⚠ REVIEW REQUIRED]`，優先呈現
+- Hook 只做「該不該問」——純讀本機 markdown 檔案比日期，不碰 Neo4j/Engine C
+- 使用者看到提醒後同意才觸發完整核查（讀 `crons/thesis_monitor_prompt.md` 的核查格式）
 
-**Test scenarios:**
-- 手動執行 prompt → 讀到 cpo_v1_lane_memo.md 和 sivers_v1_lane_memo.md，輸出各自的核查摘要
-- thesis 日期超過 3 個月 → 輸出中包含「距建立 X 個月」
-- disproof condition 相關新聞找到 → 標記 [⚠ REVIEW REQUIRED]
-- thesis 標記為 `retired` → 在核查中跳過
+**Test scenarios（已驗證）：**
+- 手動跑 `python crons/thesis_freshness_check.py`，目前全部 thesis 在 90 天內 → 無輸出（quiet）✓
+- Monkeypatch 模擬 2 份逾期 thesis → 輸出 `{"systemMessage": "📋 thesis-monitor: 2 份 thesis 已超過 90 天未核查（sivers 92天, cpo 45天）— 要現在核查嗎？"}` ✓
+- `.claude/settings.local.json` JSON 格式驗證通過 ✓
+- Hook 在 `SessionStart` 觸發（本輪對話外），需要開新 session 或 `/hooks` 重新載入才會實際發動——尚待下次開 session 驗證實際觸發
 
 **Verification:** 手動執行後 memory 目錄有 `thesis_review_YYYY-MM-DD.md`；對 active thesis 各有一段核查摘要。
 
@@ -447,9 +442,9 @@ Prompt 行為：
 
 ## Open Questions
 
-- **CronCreate 設定細節**：Windows 本機的 CronCreate daemon 設定步驟需要在第一次跑 U7/U8 時釐清，不是 planning-time 問題。
-- **Google Sheets 結構**：`fetchers/gsheets.py` 假設特定欄位名稱；實際 sheet 結構在 U4 實作時與用戶對齊。
-- **themes.txt 的初始內容**：U7 完成時由用戶填入第一批主題關鍵字。
+- ~~**CronCreate 設定細節**~~ — 已於執行時解決（見 KTD5）：`CronCreate` 是 session-only 且 recurring 最多 7 天，不適合本用途。U7 改用 `schedule` skill 的 cloud routine（輸出走 PR，不碰本機資源）；U8 改成 session-start 檢查，不用背景排程。
+- ~~**Google Sheets 結構**~~ — 已於 U4 實作時對齊：欄位為 `ticker/symbol | company | bucket | shares | avg_cost | currency | notes`，bucket 用中文標籤（見 `fetchers/gsheets.py` docstring）。
+- **themes.txt 的初始內容**：已建立 `config/themes.txt`，含 `cpo` 和 `sivers` 兩個主題；U7 cloud routine 上線後可依需要擴充。
 
 ---
 
@@ -459,7 +454,7 @@ Prompt 行為：
 2. **U3**（依賴 U1）— Onboarding skill 到位後做 M1 CPO Depth Sprint
 3. **M1 CPO Depth Sprint**（內容任務）— U3 到位後執行，讓 CPO 主題達到可信標準
 4. **U4 + U5**（U4 先，U5 依賴 U4）— 個人化建議層
-5. **U6 + U7 + U8**（可平行）— 注意力層
+5. **U6 + U7 + U8**（可平行）— 注意力層。U7 為 cloud routine（需先連接 GitHub），U8 為 skill 內 session-start 檢查（無外部依賴）
 6. **M2 Second Vertical Slice**（follow Plan 005）— M1 完成後
 7. **L9 Gate 自動通過** — M2 完成 + investment-sop.md + Engine C 可用 → `preconditions.py` 全通過
 
