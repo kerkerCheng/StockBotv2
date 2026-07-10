@@ -3,6 +3,7 @@
 
 # Secrets
 .env
+config/*.json
 
 # Claude Code 本機設定（不應共用）
 .claude/

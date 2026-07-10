@@ -114,16 +114,28 @@ python thesis/generate_lane_memo.py --company-id co:<ticker_lower>
 - 「幫我出一份 SIVE 的 Lane Memo」
 - 「生成 CPO 的 thesis 文件」
 
-**流程：**
-1. 確認圖裡有足夠資料（至少 3 個不同 `origin_entity` 的文件）
-2. 執行 `python thesis/generate_lane_memo.py --company-id co:<ticker>`
-3. 產出後逐項核查：
-   - `variant_perception` 有沒有（必填）？格式是否「股價隱含 X → 本 thesis 認為 Y → 催化劑 Z」？
+**流程（對話式，主路線）：**
+1. 執行 L8 gate 檢查：
+   ```bash
+   python -c "from thesis.generate_lane_memo import _check_source_diversity; ctx,p=_check_source_diversity('co:<slug>'); print(ctx)"
+   ```
+   若 gate 未過 → 說明缺哪類文件，**不繼續**。若用戶確認 override → 繼續並在 memo 標注。
+2. 取圖 context：`python query/graph_context.py --company-id co:<slug>`
+3. 取 Engine C 數據：`python engine_c/checklist.py <TICKER>` + `python engine_c/market_data.py <TICKER>`（若 ticker 已知）
+4. **Claude 在對話裡直接生成 Lane Memo**，依 `prompts/lane_memo_system.md` 格式
+5. 生成後逐項核查（Claude 自己做）：
+   - `variant_perception` 有沒有？格式是否「股價隱含 X → 本 thesis 認為 Y → 催化劑 Z」？
    - `disproof_condition` 有沒有？附沒附核查頻率和觸發後 48h 動作？
-4. 缺 `variant_perception` → 標 TODO，等 Engine C 估值數字補齊
-5. 評分：`python thesis/scoring_rubric.py <memo_file>`
+6. 缺 `variant_perception` 數字 → 標 `[TODO: 待 Engine C 估值數字補齊]`
+7. 請用戶確認後，寫入 `thesis/<company>_v<N>_lane_memo.md`
 
-**格式：** 完整 Lane Memo 文件（存 `thesis/`）+ 評分 + 升格 Watchlist 所需缺口
+**備用路線（自動�� / cron）：**
+```bash
+python thesis/generate_lane_memo.py --company-id co:<slug> --ticker <TICKER> --override-gate --override-reason "<理由>"
+```
+需要 `.env` 的 `ANTHROPIC_API_KEY`。日常對話不需要跑這條路線。
+
+**格式：** 完整 Lane Memo 文件（存 `thesis/`）+ 升格 Watchlist 所需缺口清單
 
 ---
 
@@ -177,6 +189,54 @@ python thesis/generate_lane_memo.py --company-id co:<ticker_lower>
 
 ---
 
+## 類型 4 — 個人倉位建議（需 Google Sheets 資料）
+
+**觸發：** 使用者問「我該投多少」、「這檔值不值得加倉」、「我的 AI bucket 還有空間嗎」。
+
+**流程：**
+1. 執行 `python fetchers/gsheets.py --ticker <TICKER>` 取持倉資料
+2. 執行 `python fetchers/gsheets.py --summary` 取 ai_theme bucket 使用率
+3. 查 Engine C 估值數據：`python engine_c/checklist.py <TICKER>`
+4. 根據以下框架給建議：
+
+**倉位建議框架：**
+
+| 條件 | 行動 |
+|------|------|
+| thesis 尚未通過 L8 gate | 不給倉位建議，先補文件 |
+| ai_theme bucket > 50% 已滿 | 警告：alpha bucket 高度集中，建議縮小規模或等出場 |
+| conviction 1-2（弱） | 可考慮「觀察倉」：ai_theme bucket ≤5% |
+| conviction 3（中） | 標準倉：ai_theme bucket 10-15%（單檔上限） |
+| conviction 4-5（強，需 L9 全通過） | 戰略倉：ai_theme bucket 15-25%（單檔上限） |
+
+conviction 由 thesis 評分（`thesis/scoring_rubric.md`）和 L8 來源品質共同決定。
+
+**輸出格式：**
+```
+## 倉位建議（個人化）
+
+持倉狀態：[已持有 / 尚未持倉]
+AI 主題 bucket 使用率：XX%（建議上限 50%）
+
+Conviction 評估：[分數 / 理由]
+建議倉位：ai_theme bucket 的 X-Y%（相當於若 bucket 為 $N，建議 $N×X%）
+
+⚠ 注意：
+- [若已持倉：說明是否建議加倉/持倉/減倉]
+- [若 L8 不足：提醒 Lane Memo 不能生成，建議先補文件]
+- [若估值過高：提醒估值風險]
+
+這是研究框架下的方向建議，不是買賣指令。最終決策由你做。
+```
+
+**GSHEETS 未設定時：**
+若 `GSHEETS_SPREADSHEET_ID` 未設定，告知使用者：
+「需要設定 Google Sheets 連接才能提供個人化倉位建議。
+ 請在 `.env` 設定 `GSHEETS_SPREADSHEET_ID` 和 `GSHEETS_SERVICE_ACCOUNT_JSON`。
+ 可先參考 `fetchers/gsheets.py` 的欄位格式建立工作表。」
+
+---
+
 ## 投資建議的邊界
 
 本系統是**研究工具，不是投資顧問**：
@@ -209,7 +269,8 @@ python thesis/generate_lane_memo.py --company-id co:<ticker_lower>
 - 財務快照：`engine_c/etl_yfinance.py`、`engine_c/checklist.py`
 - Lane Memo 生成：`thesis/generate_lane_memo.py`
 - Lane Memo 評分：`thesis/scoring_rubric.md`
-- 新公司 onboarding：`docs/onboarding-sop.md`
+- 新公司 onboarding：`skills/company-onboard/SKILL.md`
+- 個人持倉資料：`fetchers/gsheets.py`（需 `.env` 設 GSHEETS_*）
 - 來源分類標準：CLAUDE.md 來源登記表 + 證據四階
 
 ## 已知限制（v0，等真實流量撞）

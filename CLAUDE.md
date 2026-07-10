@@ -62,6 +62,22 @@ fetchers/edgar.py ──────↑                        engine_c/etl_yfin
 
 ---
 
+## 引擎B（信號入庫）設計草稿
+
+**定位：** X / SubStack 信號 → 用戶判斷 → `/lead-intake` → 圖。引擎B 是「人工閘門前的信號彙整」，不是自動入庫。
+
+**已確認的初始信號來源：**
+- `aleabitoreddit`：X 帳號，有同名 SubStack。會寫產業供應鏈深度分析（evidence tier 3）。是 SIVE Sivers 客戶地圖的原始來源。
+
+**Cron 追蹤方案（待實作，已定案方向）：**
+- **RSS 路線（免費，優先）：** SubStack 有 RSS feed（`https://aleabitoreddit.substack.com/feed`）；cron 定期抓新文章，存成 pending leads 清單，每次 session 開頭提示「有 N 條待判斷」。
+- **X API 路線（$100/mo）：** 可抓短推文，但 SubStack 已含主要深度文章，RSS 對 aleabitoreddit 夠用。
+- **入庫邊界：** aleabitoreddit 的內容最高只能是 `evidence_tier: 3`，需客戶端文件升級 L8 才能用於 Lane Memo。
+
+**待做：** 建 `crons/` 目錄下的 RSS 抓取腳本 + `pending_leads.json` 格式定義。
+
+---
+
 ## 開發優先序（接下來三件事）
 
 1. **第二條垂直切片（非 AI / 非 CPO 主題）**

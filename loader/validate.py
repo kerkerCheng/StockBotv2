@@ -72,6 +72,13 @@ def validate(doc_path: str) -> list[str]:
     if sd["evidence_tier"] not in vocab["evidence_tier"]:
         errors.append(f"VOCAB: source_doc evidence_tier={sd['evidence_tier']} 不在對照表")
 
+    # ── 4. 來源獨立性 (L8) ──
+    if not doc["source_doc"].get("origin_entity"):
+        errors.append(
+            "WARN: source_doc.origin_entity 未填 — "
+            "無法做 L8 來源獨立性檢查（Lane Memo 生成時會被計為零獨立來源）"
+        )
+
     # ── 3. 參照完整性 ──
     def _check_sources(owner: str, sids: list[str]) -> None:
         for sid in sids:

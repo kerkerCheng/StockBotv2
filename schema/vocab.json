@@ -37,7 +37,9 @@
     "depends_on",
     "invests_in",
     "licenses_to",
-    "about"
+    "about",
+    "acquired",
+    "partnership_with"
   ],
   "qualification_status": [
     "none",

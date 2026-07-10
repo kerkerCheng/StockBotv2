@@ -63,6 +63,70 @@ def _resolve_ticker(ticker: str | None, company_id: str | None) -> str | None:
     return None
 
 
+def _check_source_diversity(company_id: str | None) -> tuple[str, bool]:
+    """
+    L8 來源獨立性 gate：掃描 extractions/*.json，找出包含 company_id 節點的文件，
+    統計不重複的 origin_entity 數量。< 3 個獨立來源 → 硬性阻擋。
+
+    回傳 (context_md, passes)。
+    """
+    if not company_id:
+        return (
+            "## L8 來源獨立性 Gate\n"
+            "⚠ 未指定 --company-id，跳過來源獨立性檢查（產業全圖模式）。\n",
+            True,
+        )
+
+    import json as _json
+    extractions_dir = ROOT / "extractions"
+    if not extractions_dir.exists():
+        return (
+            "## L8 來源獨立性 Gate\n"
+            f"⚠ extractions/ 目錄不存在，跳過 L8 檢查。\n",
+            True,
+        )
+
+    found_entities: list[str] = []
+    scanned = 0
+    for p in extractions_dir.glob("*.json"):
+        try:
+            doc = _json.loads(p.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+        scanned += 1
+        # Check if company_id appears as any node/edge/claim id in this file
+        all_ids: set[str] = set()
+        for n in doc.get("nodes", []):
+            all_ids.add(n.get("id", ""))
+        for e in doc.get("edges", []):
+            all_ids.add(e.get("src_id", ""))
+            all_ids.add(e.get("dst_id", ""))
+        for c in doc.get("claims", []):
+            all_ids.add(c.get("subject_id", ""))
+        if company_id in all_ids:
+            entity = doc.get("source_doc", {}).get("origin_entity")
+            if entity:
+                found_entities.append(entity)
+
+    distinct_entities = sorted(set(found_entities))
+    count = len(distinct_entities)
+    passes = count >= 3
+
+    lines = [f"## L8 來源獨立性 Gate"]
+    lines.append(f"掃描 {scanned} 份文件，其中含 `{company_id}` 節點者：{len(found_entities)} 份")
+    lines.append(f"不重複 origin_entity 數：**{count}**/3（需 ≥ 3 才通過）")
+    for e in distinct_entities:
+        lines.append(f"- {e}")
+    if not passes:
+        lines.append(
+            "\n⛔ 來源獨立性不足（L8）：需要至少 3 個不同 origin_entity 的文件才能生成 Lane Memo。\n"
+            "請先補充獨立第三方或客戶端文件（見 CLAUDE.md L8 判準），或用 --override-gate 強制覆蓋。"
+        )
+    else:
+        lines.append("\n✓ 來源獨立性通過")
+    return "\n".join(lines) + "\n", passes
+
+
 def _build_gate_context(ticker: str | None, override_gate: bool,
                          override_reason: str | None) -> tuple[str, bool]:
     """
@@ -175,6 +239,14 @@ def generate(
         l9_pass = True
         l9_ctx = f"## L9 前置條件 Gate\n⚠ Gate 已手動覆蓋（override-gate）\n"
 
+    # ── L8 Source diversity gate ─────────────────────────────────────────────
+    source_diversity_ctx, source_diversity_pass = _check_source_diversity(company_id)
+    if not override_gate and not source_diversity_pass:
+        print(source_diversity_ctx, file=sys.stderr)
+        print("ERROR: L8 來源獨立性不足，拒絕生成 Lane Memo。"
+              " 使用 --override-gate 可強制覆蓋（需說明理由）。", file=sys.stderr)
+        return 1
+
     # output_type hierarchy: both gates must pass for Watchlist Candidate
     if gate_pass and l9_pass:
         output_type = "Watchlist Candidate"
@@ -192,6 +264,8 @@ def generate(
 以下是供應鏈知識圖譜的結構化上下文與財務/市場數據，請依照 system prompt 的格式撰寫 Directional Lane Memo。
 
 {graph_ctx}
+
+{source_diversity_ctx}
 
 {gate_ctx}
 

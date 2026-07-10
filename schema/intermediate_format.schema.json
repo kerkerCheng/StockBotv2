@@ -44,6 +44,13 @@
             "null"
           ]
         },
+        "origin_entity": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "哪家公司/機構發出此文件（發出方，不是被分析方）。L8 來源獨立性鐵律的核心欄位。"
+        },
         "publisher": {
           "type": [
             "string",
@@ -234,7 +241,10 @@
               "enables",
               "depends_on",
               "invests_in",
-              "licenses_to"
+              "licenses_to",
+              "about",
+              "acquired",
+              "partnership_with"
             ]
           },
           "attributes": {

@@ -11,6 +11,34 @@ description: >
 
 # 線索驗證入庫 SOP (Lead Intake)
 
+## ⚡ Fast Path（≤3 輪，常用入口）
+
+當使用者看到一條 SNS 貼文 / 標題 / 幾句話，想快速知道「值不值得繼續研究」：
+
+**Turn 1 — 分類（Claude 做）：**
+讀輸入後立刻給：
+```
+訊號類型：[產品/技術消息 | 供應鏈異動 | 法說/財報 | 市場情緒/猜測]
+關聯圖內公司：[列出或「無」]
+初始 tier：[1-4]
+```
+
+**Turn 2 — Go/No-Go（Claude 判斷，說明理由）：**
+| 情況 | 判斷 |
+|------|------|
+| tier 1-2 且關聯現有 thesis 的公司 | **Go** — 值得入庫，觸發文件發現 |
+| tier 3 且有新角度 | **Go with caveat** — 入庫但需補獨立來源 |
+| tier 4（純社群猜測）或與現有圖無交集 | **No-Go** — 存為 lead-only，不走 pipeline |
+| 有具體公司名 + 具體動作 + 可查 | **Go** — 走 company-onboard 補資料 |
+
+**Turn 3（若 Go）— 自動觸發文件發現：**
+切換到 `skills/company-onboard` 開始找文件，
+或直接執行 `python fetchers/edgar.py --ticker <TICKER>` 取第一份材料。
+
+用戶可在 Turn 2 說「No」直接結束，或說「只存不研究」跳過 Turn 3。
+
+---
+
 ## ⚠️ 這個 skill 為什麼存在(怕忘記版 — 先讀這段)
 
 **問題:** 當 StockBotv2 成熟後,你會開始「亂抓」大量資訊(推文、報導、法說、論文)來發想、餵知識庫。
