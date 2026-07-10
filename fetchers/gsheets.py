@@ -19,8 +19,10 @@ Env vars（任選一種認證方式）:
     COHR          | Coherent      | CORE   | 100    | 45.00    | USD      | CPO thesis
 
 ticker 欄名可為 "ticker" 或 "symbol"（自動偵測）。
-bucket 值可為中文（CORE、大盤、積桿、觀察）或英文（core、ai_theme、cash）。
+bucket 值可為中文（CORE、大盤、槓桿、觀察）或英文（core、index、leverage、ai_theme、cash）；
+summarize_buckets() 會透過 _BUCKET_ALIASES 正規化成後者 ——「觀察」= 個股高信念持倉 = ai_theme。
 其他額外欄位（broker、cash_twd、market_usd 等）會原樣保留在 dict 中。
+跨掛牌 ticker（如圖裡的 SIVE.ST vs. portfolio 的 FRA:2DG）由 _TICKER_ALIASES 處理。
 """
 from __future__ import annotations
 
@@ -41,6 +43,23 @@ SHEET_NAME = os.environ.get("GSHEETS_SHEET_NAME", "Portfolio")
 SERVICE_ACCOUNT_FILE = os.environ.get("GSHEETS_SERVICE_ACCOUNT_JSON", "")
 
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
+
+# Graph/canonical ticker (loader/load_to_neo4j.py TICKER_MAP) → actual portfolio
+# ticker, for names cross-listed on a different exchange than the graph uses.
+# Sivers: graph tracks SIVE.ST (Stockholm), portfolio holds the Frankfurt listing.
+_TICKER_ALIASES: dict[str, str] = {
+    "SIVE.ST": "FRA:2DG",
+}
+
+# Portfolio bucket labels (whatever the sheet actually uses) → canonical bucket
+# used for allocation math. "觀察" (watchlist / high-conviction individual picks)
+# is this portfolio's alpha/thesis bucket — treated as "ai_theme" for sizing advice.
+_BUCKET_ALIASES: dict[str, str] = {
+    "觀察": "ai_theme", "ai_theme": "ai_theme", "watch": "ai_theme",
+    "core": "core", "大盤": "index", "index": "index",
+    "槓桿": "leverage", "leverage": "leverage",
+    "cash": "cash",
+}
 
 # Tickers that need enrichment — company name + Neo4j node ID (if in graph)
 # Exchange-prefixed tickers (FRA:, LON:, TYO:) are not self-explanatory.
@@ -154,11 +173,16 @@ def fetch_portfolio() -> list[dict[str, Any]]:
 
 
 def get_position(ticker: str) -> dict[str, Any] | None:
-    """回傳單一 ticker 的持倉資料，找不到回傳 None。"""
+    """
+    回傳單一 ticker 的持倉資料，找不到回傳 None。
+    接受圖裡的 canonical ticker（如 SIVE.ST），會自動轉換成 portfolio 實際
+    掛牌的 ticker（如 FRA:2DG）再查詢——見 _TICKER_ALIASES。
+    """
     portfolio = fetch_portfolio()
     ticker = ticker.upper()
+    lookup_ticker = _TICKER_ALIASES.get(ticker, ticker)
     for item in portfolio:
-        if item.get("ticker") == ticker:
+        if item.get("ticker") == lookup_ticker:
             return item
     return None
 
@@ -180,7 +204,8 @@ def summarize_buckets(portfolio: list[dict] | None = None) -> dict[str, Any]:
 
     buckets: dict[str, dict] = {}
     for item in portfolio:
-        bucket = item.get("bucket", "unknown").strip()
+        raw_bucket = item.get("bucket", "unknown").strip()
+        bucket = _BUCKET_ALIASES.get(raw_bucket, _BUCKET_ALIASES.get(raw_bucket.lower(), raw_bucket))
         cost = item["shares"] * item["avg_cost"]
         if bucket not in buckets:
             buckets[bucket] = {"count": 0, "cost_basis": 0.0, "tickers": []}
@@ -208,10 +233,11 @@ def format_position_for_advice(ticker: str) -> str:
     except Exception as e:
         return f"⚠ 無法讀取 Google Sheets 持倉資料：{e}\n投資建議將不包含個人倉位資訊。"
 
-    position = None
     ticker_upper = ticker.upper()
+    lookup_ticker = _TICKER_ALIASES.get(ticker_upper, ticker_upper)
+    position = None
     for item in portfolio:
-        if item.get("ticker") == ticker_upper:
+        if item.get("ticker") == lookup_ticker:
             position = item
             break
 
