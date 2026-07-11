@@ -44,7 +44,18 @@ The `ticker` field in a Company node's `attributes` JSON that enables Engine A (
 ## Financial Data (Engine C)
 
 ### Engine C
-The financial data subsystem in StockBotv2's three-engine architecture. Fetches quantitative market data (prices, P/E, EV/Revenue, gross margins, analyst targets, share count) for companies identified in the knowledge graph via the A→C Join Key. Connected to Engine A via the TICKER_MAP. Uses SQLite by default (zero-install local dev); switches to Postgres when `POSTGRES_HOST` or `POSTGRES_DSN` environment variables are set. Distinct from Engine A (knowledge graph) which handles qualitative supply chain structure, and Engine B (SNS crawler, not yet built) which handles social signals.
+The financial data subsystem in StockBotv2's three-engine architecture. Fetches quantitative market data (prices, P/E, EV/Revenue, gross margins, analyst targets, share count) for companies identified in the knowledge graph via the A→C Join Key. Connected to Engine A via the TICKER_MAP. Uses SQLite by default (zero-install local dev); switches to Postgres when `POSTGRES_HOST` or `POSTGRES_DSN` environment variables are set. Distinct from Engine A (knowledge graph) which handles qualitative supply chain structure, and Engine B (signal intake) which handles social/curated signals.
+
+---
+
+## Signal Intake (Engine B)
+
+### Engine B
+The signal-intake subsystem in StockBotv2's three-engine architecture. Aggregates external signals — curated X/SubStack accounts (e.g. `aleabitoreddit`), trending topics — as an additional harvest source feeding the same weekly Signal Triage → extract → approve pipeline used for tracked-theme web search, not a separate automated ingestion path. A signal that relays a third party's work (e.g. a screenshotted sell-side analyst note) is traced back to its true originator for `origin_entity` purposes when possible; when the primary source can't be located, it's marked as an untraced relay rather than attributed as first-party.
+*Avoid:* SNS crawler, social ingestion pipeline
+
+### Signal Triage
+The automatic, low-cost judgment step between harvesting raw signals (tracked-theme web search, Engine B feeds) and running full LLM extraction. Decides whether a raw item is relevant to an already-tracked theme/company, novel, quotable (contains concrete, verbatim-checkable claims per the L6 anti-hallucination rule), and a plausible new `origin_entity` for the L8 gate. Deliberately lenient — a silently dropped good lead is treated as worse than a wasted extraction — and every run reports what it filtered and why.
 
 ### Financial Snapshot
 A point-in-time record of market and financial metrics for a single ticker, stored in the `financial_snapshots` table. One row per `(ticker, snapshot_date)` pair. Fields include price, forward P/E, trailing P/E, EV/Revenue, gross margin, shares outstanding, and analyst target price. The primary input to the Watchlist Gate. Private companies and non-US stocks without available data are represented by absent rows, not null rows.

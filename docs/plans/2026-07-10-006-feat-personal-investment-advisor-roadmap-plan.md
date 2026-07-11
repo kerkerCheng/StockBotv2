@@ -9,6 +9,7 @@ supersedes:
   - docs/plans/2026-07-08-004-feat-investment-query-gap-audit-plan.md
 references:
   - docs/plans/2026-07-08-005-feat-second-vertical-slice-plan.md
+  - docs/brainstorms/2026-07-11-automation-reliability-workflow-requirements.md
 ---
 
 # feat: StockBotv2 Personal Investment Advisor — Full Roadmap
@@ -53,6 +54,14 @@ references:
 - **R7** 高訊號事件觸發 30 秒 brief，用戶一句話決定是否繼續
 - **R8** 每季自動提醒 thesis 核查（disproof_condition 追蹤）
 - **R9** 所有新能力在 L9 preconditions 未通過前，投資建議標籤維持 [Research Note]
+
+補充來源（2026-07-11）：`docs/brainstorms/2026-07-11-automation-reliability-workflow-requirements.md`
+
+- **R10** 系統必須能在使用者未開啟本機 session 的情況下仍主動觸及使用者（GitHub/email/手機通知），不能只靠 `SessionStart` hook
+- **R11** 入圖前的人工核准是不可繞過的關卡，跟抽取成本高低無關
+- **R12** 訊號初篩（triage）寧可寬鬆放行也不能悄悄篩掉線索，且每次都要回報篩選結果供稽核
+- **R13** 新公司/新主題的入庫決策永遠由使用者主動觸發（「研究 X」），routine 只能建議、不能自動擴大追蹤範圍
+- **R14** 引用轉發型來源（如策展帳號轉發的第三方分析）時，`origin_entity` 需追溯到真正源頭；追不到時要誠實標註為未追溯轉發，不能當作第一手來源
 
 ---
 
@@ -145,12 +154,19 @@ Claude 在對話中用現有工具（fetchers/edgar.py via Bash、WebSearch、Wr
 **KTD4 — Google Sheets 以 fetchers/gsheets.py 實現，每 session 快取**
 GCP Service Account credentials 存在 `.env`（`GSHEETS_CREDENTIALS_JSON` + `PORTFOLIO_SHEET_ID`）。每次 session 第一次呼叫時取資料、後續 cache dict 在 process 生命週期內，避免 API quota 問題。
 
-**KTD5 — U7/U8 拆成「cloud routine」與「session-start 檢查」兩種機制（2026-07-10 修訂）**
+**KTD5 — U7/U8 拆成「cloud routine」與「session-start 檢查」兩種機制（2026-07-10 修訂，2026-07-11 深化）**
 執行時發現原設計（CronCreate jobs 輸出到本機 memory 檔）不成立：`CronCreate` 是 session-only、recurring 最多存活 7 天，關掉這個 CLI 視窗工作就消失，無法做到真正的「每週/每季背景執行」。改用 `schedule` skill 建的 cloud routine 雖然能持久排程，但跑在 Anthropic 雲端 sandbox，連不到本機 Neo4j（`bolt://localhost:7687`）、本機 SQLite/Postgres、或本機 `.env` 密鑰。
 
+2026-07-11 brainstorm（`docs/brainstorms/2026-07-11-automation-reliability-workflow-requirements.md`）進一步發現：使用者開本機 session 的頻率不穩定（可能連續數週不開），代表 `SessionStart` hook 本身也不能當作「確保訊息傳達到使用者」的機制——它只在使用者剛好開 session 時才觸發，等於用「使用者會不會回來」去補「使用者可能不會回來」這件事。真正的可靠層必須換到跟本機 session 完全無關的管道：**cloud routine + GitHub 通知（PR/Issue → email/手機）**。本機 `SessionStart` hook（U7b、U8）保留，但降級成「你剛好開了 session 時的順手摘要」，不是安全網本身。
+
+另外發現使用者本機的 Neo4j 是自架的（Docker/Desktop），不是 Neo4j Aura 這種託管服務，沒有閒置暫停/刪除風險，而且使用者的電腦幾乎全天候開著——這代表原本設想的「把 Neo4j/Engine C 搬去雲端」不是唯一解法，優先驗證的是「讓 cloud routine 連到這台本來就開著的本機」（見 U7a）。
+
 修訂後的分工：
-- **U7（週報）→ cloud routine**：這個任務本來就只需要外部資源（`/last30days` web search + `config/themes.txt` 靜態清單），適合放雲端。Routine clone repo → 掃描 → 把週報寫成 `docs/reports/weekly_scan_<date>.md` → 開 PR（不直接 push main，維持人工確認）。下次開本機 session 時，Claude 看到新 PR/檔案即可提示「有 N 份週報待讀」。
-- **U8（thesis 核查）→ session-start 檢查，不用排程**：厚重依賴本機 Engine C 財務查詢，改成寫進 `skills/investment-research/SKILL.md`：每次 session 開始時檢查各 active thesis 的 Lane Memo 日期，若距上次核查 > 90 天則主動提醒，用戶開口才觸發本機查詢。不需要任何雲端或背景基礎設施。
+- **U7a（前置驗證，新）**：先確認 cloud routine 連不連得到本機通道，此結果決定 U7 能做到多完整
+- **U7（週報 + 訊號 pipeline）→ cloud routine**：不只是週報，擴充成「harvest → triage → extract → 開 PR/Issue 待核准」完整 pipeline（見下方 U7 重寫版）
+- **U7c（triage skill，新）**：U7 pipeline 中間的判斷層，獨立成一個 skill.md
+- **U7b（session-start PR digest）→ 維持，但重新定位為 convenience，不是可靠性保證**
+- **U8（thesis 核查）→ session-start hook，已完成** —— 同樣重新定位為 convenience recap，可靠性不靠它
 
 前提：cloud routine 需要 GitHub 連接 `kerkerCheng/StockBotv2`（建立時尚未連接，需先執行 `/web-setup` 或安裝 Claude GitHub App）。
 
@@ -367,40 +383,102 @@ Skill 定義以下操作流程（Claude 在對話中執行，不需要另一個 
 
 ---
 
-### U7. Weekly Scan Cloud Routine（2026-07-10 修訂：改用 schedule skill 的 cloud routine，取代 CronCreate）
+### U7a. Network Reachability & Credential Security Validation（U7 的前置驗證，新，尚未實作）
 
-**Goal:** 每週自動掃描活躍主題，產出週報（5 分鐘可讀）+ 高訊號事件觸發 30 秒 brief。
+**Goal:** 在建 U7 完整 pipeline 之前，先驗證 cloud routine 到底連不連得到使用者這台本來就開著的本機——這個結果決定 U7 能做到「只發現+通知」還是「發現+抽取+待核准入圖」的完整版本。
 
-**Requirements:** R6, R7
+**Requirements:** R10（可靠性層的地基）
 
-**Dependencies:** 無（需先連接 GitHub repo `kerkerCheng/StockBotv2`，見 KTD5）
+**Dependencies:** 無，但是 U7 的硬性前置
 
 **Files:**
-- `config/themes.txt` — 已建（活躍主題清單）
-- `crons/weekly_scan_prompt.md` — 已建，內容需調整為 cloud routine 的自包含 prompt（無法假設能存取本機路徑）
-- 新增：`docs/reports/`（cloud routine 輸出目錄，routine 對此開 PR）
+- 無程式碼變更；本單元是一次性的手動驗證 + 安全整備
 
 **Approach:**
-
-改用 `schedule` skill 建立 cloud routine（`RemoteTrigger` action: create），而非 `CronCreate`：
-- routine 每週觸發一次（cron 最小間隔 1 小時，選一個非整點時間，如週五 UTC 10:07 對應台灣週五 18:07）
-- prompt 內容：讀 `config/themes.txt` → 對每個主題做 web search（cloud sandbox 連不到 `/last30days` 本機 skill，需直接用 WebSearch/等效工具重現同樣邏輯）→ 合成週報 markdown
-- 輸出：寫入 `docs/reports/weekly_scan_<date>.md`，**開 PR 而非直接 push main**（維持人工確認這一關，不讓雲端 agent 靜默改變 repo 主線）
-- 不做本機依賴的步驟（不查 Neo4j、不查 Engine C）——那些留給你下次開本機 session 時，我看到新 PR 再接手判斷是否要 onboard 新公司
+1. **安全整備（跟通道能不能連無關，反正都該做）：**
+   - 把本機 Neo4j 密碼從目前的簡單密碼換成強隨機密碼
+   - 開一個給 cloud routine 專用的 Neo4j 帳號，權限縮到最小（只能讀寫，不能砍資料庫/改 schema），不用使用者自己的 admin 帳密
+2. **通道搭建（實驗性質）：** 用 Cloudflare Tunnel（或等效方案）讓本機 Neo4j 有一個對外可連的穩定網域，不需要在路由器開 port forward
+3. **連線驗證：** 用 `schedule` skill 建一個「Custom」網路權限的環境（`networking.allowed_hosts` 指向這個通道網域），跑一次最簡單的連線測試（例如 routine 執行 `curl` 打這個網域的健康檢查端點），確認流量真的通——Anthropic 平台目前有多個「自訂白名單網域不生效」的公開 bug 回報，這步驗證不能省
 
 **Test scenarios:**
-- 手動 `RemoteTrigger` run now → PR 內容包含結構化週報 + 主題 section
-- themes.txt 有 comment 行 → 被正確忽略，不搜尋
-- 發現高訊號事件 → PR 描述或週報開頭有 30 秒 brief 標記
-- 下次開本機 Claude Code session → 見 U7b，我用 `gh pr list` 主動列出待審 PR
+- 通道搭好後，本機能否用外部網域連上 Neo4j（跟 cloud 無關的本機測試）
+- Cloud routine 的 Custom network access 設定該網域後，routine 執行一次連線測試 → 記錄成功或失敗
+- 若失敗 → 記錄下具體錯誤（DNS 解析不到 / 連線被拒 / 逾時），供之後判斷是平台限制還是設定錯誤
 
-**Verification:** Routine 手動觸發一次後，GitHub 出現新 PR，內容包含主題 section + actionable items。
+**Verification:** 有一次成功的紀錄——cloud routine 從 Anthropic 沙盒環境連進本機 Neo4j 並執行一個簡單查詢。若怎麼試都不通，明確記錄「此路不通」並回頭考慮託管雲端方案（見 brainstorm 文件的 Dependencies/Assumptions）。
 
 ---
 
-### U7b. Session-Start PR Digest（U7 的消費端，2026-07-11 補設計，尚未實作）
+### U7. Signal Harvest → Triage → Extract → Approve Pipeline（2026-07-11 大幅重寫，取代原本單純的「週報」設計）
 
-**Goal:** U7 的 cloud routine 只負責「生產」PR；U7b 負責「你開 session 時主動看到有哪些待審週報 PR」，讓完整迴圈接起來——你看完簡報後決定要研究哪個主題，才觸發 `company-onboard` 找文件 + 跑入庫流程。沒有這一段，U7 開的 PR 只會安靜躺在 GitHub，等你自己想到才去看。
+**Goal:** 每週自動從已追蹤主題 + Engine B 策展信號源收集線索，初篩後直接抽取成結構化草稿，開 PR/Issue 讓使用者核准是否入圖——不管使用者有沒有開本機 session 都能觸及到人。
+
+**Requirements:** R6, R7, R10, R11, R12, R13, R14
+
+**Dependencies:** U7a（通道驗證通過，且已完成安全整備）；U7c（triage skill 已定義）
+
+**Files:**
+- `config/themes.txt` — 已建（活躍主題清單）
+- `crons/weekly_scan_prompt.md` — 需整份改寫為 cloud routine 的自包含 prompt，涵蓋四階段 pipeline，不只是週報
+- 新增：`docs/reports/`（週報類輸出，routine 對此開 PR）
+
+**Approach（四階段）：**
+
+1. **Harvest（廣撒網，便宜）：** 對 `config/themes.txt` 每個主題做 web search；同時檢查 Engine B 的策展信號源（如 aleabitoreddit 的 RSS/貼文）。若某則線索是「轉發第三方研究」的形式（如截圖某券商筆記），額外搜一次嘗試追到原始文件——追不到是常態，不是阻擋條件（R14）
+2. **Triage（初篩，交給 U7c 定義的 skill）：** 對每則 harvest 到的原始材料跑輕量判斷：是否關聯已追蹤主題/公司、是否新資訊、是否有可逐字引用的具體內容、是否可能是新的 `origin_entity`。判斷刻意寬鬆，且每次都記錄篩掉了什麼、為什麼（R12）
+3. **Extract（抽取，不再卡人工核准）：** 對通過 triage 的每一則，直接跑完整結構化抽取（比照 `extract.py`/`prompts/extract_system.md` 的規則），產出實際的 node/edge/quote 草稿——使用者用的是訂閱方案，這一步不再是成本考量，是品質考量：讓使用者審的是真正的草稿，不是一段摘要
+4. **Approve（人工核准，永遠保留）：**
+   - 有實際報告產出（週報）→ 開 **PR**
+   - 純粹是提醒、沒有可合併產出（例如某訊號可能觸發某 thesis 的 disproof_condition）→ 開 **Issue**
+   - 使用者核准後，**下週例行 routine 順便處理 load**，不建立即時 webhook 觸發（保持簡單，見 brainstorm 文件的 Scope Boundaries）
+   - 發現全新公司/主題（不在 `config/themes.txt` 或 `TICKER_MAP` 裡）→ 只在報告裡建議，不自動抽取或入庫，等使用者主動說「研究 X」（R13）
+
+**Test scenarios:**
+- 手動 `RemoteTrigger` run now → PR/Issue 內容包含 harvest 到的項目、triage 篩選結果（含被篩掉的）、通過項目的抽取草稿
+- themes.txt 有 comment 行 → 被正確忽略，不搜尋
+- Engine B 來源（如 aleabitoreddit 貼文轉發某券商筆記）→ 若追到原始文件，`origin_entity` 標成原始機構；追不到 → 標成「未追溯轉發」，不當作第一手引用
+- 使用者上週核准的項目 → 這次 routine 執行 load 進 Neo4j（用 U7a 建立的最小權限帳號）
+- 發現一個全新的、未追蹤的公司 → 報告裡出現建議，沒有自動抽取
+
+**Verification:** Routine 手動觸發一次後，GitHub 出現新 PR/Issue，內容包含實際草稿（不只是摘要）+ 篩選稽核紀錄。
+
+---
+
+### U7c. Signal Triage Skill（U7 Stage 2，新，尚未實作）
+
+**Goal:** 定義一個獨立的 skill.md，把「這則原始材料值不值得往下跑抽取」的判斷邏輯講清楚，讓 cloud routine 能自動執行，同時保留給使用者事後稽核的空間。
+
+**Requirements:** R12
+
+**Dependencies:** 無，但 U7 依賴它
+
+**Files:**
+- 新增：`skills/signal-triage/SKILL.md`
+
+**Approach:**
+
+Skill 定義判斷四要素（呼應 lead-intake 既有的 Fast Path 判斷邏輯，但是自動執行版）：
+1. **關聯性**：這則材料是否關聯 `config/themes.txt` 或 `TICKER_MAP` 裡已追蹤的公司/主題
+2. **新穎性**：是否是圖裡已有的事實的第 N 次重複，還是真的有新資訊
+3. **可引用性**：有沒有具體、逐字可查核的內容（呼應 CLAUDE.md L6 反幻覺鐵律：型號/公司名必須逐字出現）
+4. **潛在獨立性**：這則材料看起來像不像一個跟現有來源不同的 `origin_entity`（直接影響 L8 gate 的進展，是最有價值的篩選條件）
+
+判斷結果只有兩種：放行進 Stage 3（Extract）、或篩掉但記錄理由。刻意不做「模糊地帶再問一次」的第三種結果——寧可寬鬆放行，也不要讓 routine 卡住等一個當下不在場的人。
+
+**Test scenarios:**
+- 一則跟已追蹤公司無關的內容 → 篩掉，記錄「不關聯任何已追蹤主題」
+- 一則已經在圖裡出現過的事實的第 5 次重述 → 篩掉，記錄「非新資訊」
+- 一則具體、可逐字引用、且來源機構跟現有來源不同的材料 → 放行
+- 一則模糊、有點像新資訊但拿不準的材料 → 依「寧可寬鬆」原則放行，不卡在 triage 這一關
+
+**Verification:** 對一批混合了「明顯該放行」「明顯該篩掉」「模糊地帶」的測試材料跑一次，篩選結果符合「寬鬆但可稽核」的設計原則。
+
+---
+
+### U7b. Session-Start PR Digest（U7 的消費端，2026-07-11 補設計，尚未實作；2026-07-11 brainstorm 後重新定位為 convenience，不是可靠性保證）
+
+**Goal:** U7 的 cloud routine 只負責「生產」PR；U7b 負責「你開 session 時主動看到有哪些待審週報 PR」，讓完整迴圈接起來——你看完簡報後決定要研究哪個主題，才觸發 `company-onboard` 找文件 + 跑入庫流程。**這是 convenience，不是可靠性保證**——真正確保你會被通知到的是 U7 的 PR/Issue + GitHub 本身的 email/手機通知（R10），U7b 只是「你剛好開 session 時多一層方便」。
 
 **Requirements:** R6, R7（跟 U7 共用）
 
@@ -446,6 +524,7 @@ Skill 定義以下操作流程（Claude 在對話中執行，不需要另一個 
 
 - Hook 只做「該不該問」——純讀本機 markdown 檔案比日期，不碰 Neo4j/Engine C
 - 使用者看到提醒後同意才觸發完整核查（讀 `crons/thesis_monitor_prompt.md` 的核查格式）
+- **2026-07-11 brainstorm 後重新定位：** 這也是 convenience，不是可靠性保證——使用者開 session 的頻率不穩定，真正的可靠性交給 U7 的 cloud+GitHub 通知層（R10）
 
 **Test scenarios（已驗證）：**
 - 手動跑 `python crons/thesis_freshness_check.py`，目前全部 thesis 在 90 天內 → 無輸出（quiet）✓
@@ -453,7 +532,7 @@ Skill 定義以下操作流程（Claude 在對話中執行，不需要另一個 
 - `.claude/settings.local.json` JSON 格式驗證通過 ✓
 - Hook 在 `SessionStart` 觸發（本輪對話外），需要開新 session 或 `/hooks` 重新載入才會實際發動——尚待下次開 session 驗證實際觸發
 
-**Verification:** 手動執行後 memory 目錄有 `thesis_review_YYYY-MM-DD.md`；對 active thesis 各有一段核查摘要。
+**Verification:** 開一個新 session 後，若有 thesis 逾期，`systemMessage` 主動出現；若都新鮮，安靜無輸出（已用 monkeypatch 驗證訊息格式，實際 hook 觸發待下次真實 session 確認）。
 
 ---
 
@@ -462,10 +541,11 @@ Skill 定義以下操作流程（Claude 在對話中執行，不需要另一個 
 | 風險 | 可能性 | 緩解 |
 |------|--------|------|
 | GCP API 認證重新設定複雜 | 中 | 用戶有先例，`.env.example` 提供明確步驟；gsheets.py 有 graceful fallback |
-| CronCreate 在 Windows 本機需要 Claude Code daemon 常駐 | 高 | KTD5：cron 輸出到 memory 檔，就算 cron 沒跑，下次對話手動觸發也能補 |
+| Cloud routine 連不到本機通道（U7a 驗證可能失敗，平台已知有自訂白名單網域的 bug）| 中高 | U7a 是硬性前置驗證；若不通，U7 退回「只發現+通知」版本，或改走託管雲端（Aura/Neon，需評估月費） |
 | last30days skill 的 3 個來源不涵蓋足夠的 CPO 訊號 | 中 | Weekly scan prompt 設計為「結果少時出 sparse week 提示」，不假裝有訊號 |
 | SIVE 是瑞典股，yfinance SIVE.ST 資料可能不完整 | 中 | checklist.py 的 `manual_required` status 已處理此情況；不 crash，標 manual |
 | 法說會逐字稿抓取：非 EDGAR，依賴 WebSearch 品質 | 中 | company-onboard skill 明確說明此限制，優先推薦用戶直接提供 IR 頁面 URL |
+| Cloud routine 沒有官方密鑰保管機制，憑證只能放在 routine 設定裡 | 中 | U7a 要求開最小權限帳號 + 換強密碼，降低外洩時的影響範圍 |
 
 ---
 
@@ -474,6 +554,7 @@ Skill 定義以下操作流程（Claude 在對話中執行，不需要另一個 
 - ~~**CronCreate 設定細節**~~ — 已於執行時解決（見 KTD5）：`CronCreate` 是 session-only 且 recurring 最多 7 天，不適合本用途。U7 改用 `schedule` skill 的 cloud routine（輸出走 PR，不碰本機資源）；U8 改成 session-start 檢查，不用背景排程。
 - ~~**Google Sheets 結構**~~ — 已於 U4 實作時對齊：欄位為 `ticker/symbol | company | bucket | shares | avg_cost | currency | notes`，bucket 用中文標籤（見 `fetchers/gsheets.py` docstring）。
 - **themes.txt 的初始內容**：已建立 `config/themes.txt`，含 `cpo` 和 `sivers` 兩個主題；U7 cloud routine 上線後可依需要擴充。
+- **Cloud routine 能不能連到本機通道**：2026-07-11 brainstorm 判定為「先當假設，繼續規劃，實際驗證留給 U7a 執行時做」——不是本計畫階段要解決的問題，見 `docs/brainstorms/2026-07-11-automation-reliability-workflow-requirements.md` 的 Outstanding Questions。
 
 ---
 
@@ -483,7 +564,7 @@ Skill 定義以下操作流程（Claude 在對話中執行，不需要另一個 
 2. **U3**（依賴 U1）— Onboarding skill 到位後做 M1 CPO Depth Sprint
 3. **M1 CPO Depth Sprint**（內容任務）— U3 到位後執行，讓 CPO 主題達到可信標準
 4. **U4 + U5**（U4 先，U5 依賴 U4）— 個人化建議層
-5. **U6 + U7 + U7b + U8**（U8 已完成；U6 已完成；U7 需先連接 GitHub 才能建，U7b 需 U7 先建好）— 注意力層
+5. **U6 + U7a + U7c + U7 + U7b + U8**（U8、U6 已完成；U7a 是硬性前置驗證，決定 U7 做多完整；U7c 定義 triage 邏輯後 U7 才能引用；U7b 需 U7 先建好）— 注意力層
 6. **M2 Second Vertical Slice**（follow Plan 005）— M1 完成後
 7. **L9 Gate 自動通過** — M2 完成 + investment-sop.md + Engine C 可用 → `preconditions.py` 全通過
 
@@ -492,6 +573,7 @@ Skill 定義以下操作流程（Claude 在對話中執行，不需要另一個 
 ## Sources & Research
 
 - `docs/brainstorms/2026-07-10-investment-advisor-repositioning-requirements.md` — 本計畫 origin
+- `docs/brainstorms/2026-07-11-automation-reliability-workflow-requirements.md` — U7/U7a/U7b/U7c/U8 可靠性架構的深化來源
 - `docs/plans/2026-07-08-005-feat-second-vertical-slice-plan.md` — M2 執行指南（仍 active）
 - `thesis/preconditions.py` — L9 gate 現有實作
 - `loader/load_to_neo4j.py` — TICKER_MAP 確認存在，gap D6 分析
