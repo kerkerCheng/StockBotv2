@@ -118,6 +118,24 @@ def run_read_query(cypher: str) -> str:
 
 
 @mcp.tool()
+def get_extraction_rules() -> str:
+    """取得撰寫抽取 JSON 前必讀的完整規則書。
+
+    在呼叫 load_extraction 之前務必先讀這份——它包含 intermediate-format 的
+    完整欄位規格、vocab 白名單（node type / abstraction_level / relation 等）、
+    節點 ID 命名慣例、L4 屬性歸位三問、以及 L6 反幻覺鐵律（具體型號/公司名
+    必須逐字出現在 quote 中）。不讀規則直接抽取，軟品質規則無法靠 schema
+    驗證補救。
+    """
+    rules = (ROOT / "prompts" / "extract_system.md").read_text(encoding="utf-8")
+    vocab = (ROOT / "schema" / "vocab.json").read_text(encoding="utf-8")
+    return (
+        "# 抽取規則書（prompts/extract_system.md）\n\n" + rules +
+        "\n\n---\n\n# Vocab 白名單（schema/vocab.json）\n\n```json\n" + vocab + "\n```\n"
+    )
+
+
+@mcp.tool()
 def load_extraction(extraction_json: str) -> str:
     """把一份 intermediate-format 抽取 JSON 載入知識圖譜。
 
