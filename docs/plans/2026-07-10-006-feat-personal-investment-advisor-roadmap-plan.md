@@ -383,30 +383,34 @@ Skill 定義以下操作流程（Claude 在對話中執行，不需要另一個 
 
 ---
 
-### U7a. Network Reachability & Credential Security Validation（U7 的前置驗證，新，尚未實作）
+### U7a. Network Reachability & Credential Security Validation — 已完成，驗證結論：直連不通，改走 MCP（2026-07-11 執行）
 
-**Goal:** 在建 U7 完整 pipeline 之前，先驗證 cloud routine 到底連不連得到使用者這台本來就開著的本機——這個結果決定 U7 能做到「只發現+通知」還是「發現+抽取+待核准入圖」的完整版本。
+**Goal:** 在建 U7 完整 pipeline 之前，先驗證 cloud routine 到底連不連得到使用者這台本來就開著的本機。
 
 **Requirements:** R10（可靠性層的地基）
 
-**Dependencies:** 無，但是 U7 的硬性前置
+**執行結果（2026-07-11）：**
 
-**Files:**
-- 無程式碼變更；本單元是一次性的手動驗證 + 安全整備
+安全整備已完成：
+- Neo4j admin 密碼已換成強隨機密碼（存 `.env`，不進 git）
+- 已建 `cloud_routine` 專用帳號 + `routine_writer` 角色（MATCH + CREATE + SET PROPERTY + SET LABEL，無 DELETE/schema/admin）；用真實 `loader/load_to_neo4j.py` 驗證過能正常載入、且確認 DELETE 和 CREATE USER 都被正確拒絕
 
-**Approach:**
-1. **安全整備（跟通道能不能連無關，反正都該做）：**
-   - 把本機 Neo4j 密碼從目前的簡單密碼換成強隨機密碼
-   - 開一個給 cloud routine 專用的 Neo4j 帳號，權限縮到最小（只能讀寫，不能砍資料庫/改 schema），不用使用者自己的 admin 帳密
-2. **通道搭建（實驗性質）：** 用 Cloudflare Tunnel（或等效方案）讓本機 Neo4j 有一個對外可連的穩定網域，不需要在路由器開 port forward
-3. **連線驗證：** 用 `schedule` skill 建一個「Custom」網路權限的環境（`networking.allowed_hosts` 指向這個通道網域），跑一次最簡單的連線測試（例如 routine 執行 `curl` 打這個網域的健康檢查端點），確認流量真的通——Anthropic 平台目前有多個「自訂白名單網域不生效」的公開 bug 回報，這步驗證不能省
+通道已建成且從公網可達：
+- Cloudflare Tunnel（`stockbotv2-neo4j`，網域 `neo4j.minatoyukina.uk`）→ 本機 Neo4j HTTP Query API（port 7474，非 Bolt——HTTP 對 tunnel 友善得多）
+- 從公網用 admin 帳密查詢成功（HTTP 202，回傳正確節點數）
 
-**Test scenarios:**
-- 通道搭好後，本機能否用外部網域連上 Neo4j（跟 cloud 無關的本機測試）
-- Cloud routine 的 Custom network access 設定該網域後，routine 執行一次連線測試 → 記錄成功或失敗
-- 若失敗 → 記錄下具體錯誤（DNS 解析不到 / 連線被拒 / 逾時），供之後判斷是平台限制還是設定錯誤
+**Cloud routine 直連驗證：四次測試全部失敗，判定「此路不通」：**
 
-**Verification:** 有一次成功的紀錄——cloud routine 從 Anthropic 沙盒環境連進本機 Neo4j 並執行一個簡單查詢。若怎麼試都不通，明確記錄「此路不通」並回頭考慮託管雲端方案（見 brainstorm 文件的 Dependencies/Assumptions）。
+| 測試 | 設定 | 結果 |
+|------|------|------|
+| v1 | 預設環境（Trusted 白名單） | `curl (56) CONNECT tunnel failed, response 403`——Anthropic 出站 proxy 直接拒絕 |
+| v2 | Capabilities 加 Additional allowed domains | 請求未到達（tunnel 計數器無變化） |
+| v3 | 同上，排除設定延遲（20+ 分鐘後重測） | 請求未到達 |
+| v4 | Capabilities 切到 All domains | 請求未到達 |
+
+**結論：** Pro 方案上，claude.ai Capabilities 的網路設定（含 All domains）完全不影響 Claude Code cloud routine 的 sandbox——那是聊天 code-execution 的沙盒設定，兩者是獨立體系。另外用 `ANTHROPIC_API_KEY` 走 Managed Agents API 建的 limited-networking 環境，routine 系統看不到（`environment_not_found`），也不通。「指定網域白名單」作為受支援功能是 Enterprise 層級的東西。
+
+**替代路線（已定案，見 U7d）：** MCP connector 的流量走 Anthropic 伺服器轉發，不受 sandbox 網域白名單限制——在本機包一個小 MCP server（暴露窄工具：查圖、載入已驗證抽取），走同一條 tunnel 暴露，掛成 custom connector。此路線不只救 routine，還讓手機 App 對話也能直接讀寫圖，功能上完全等價於（甚至優於）原直連設計。今日建成的 tunnel/帳號/密碼基礎設施全部重用。
 
 ---
 
@@ -416,12 +420,14 @@ Skill 定義以下操作流程（Claude 在對話中執行，不需要另一個 
 
 **Requirements:** R6, R7, R10, R11, R12, R13, R14
 
-**Dependencies:** U7a（通道驗證通過，且已完成安全整備）；U7c（triage skill 已定義）
+**Dependencies:** U7d（graph MCP server 已上線並掛成 connector——U7a 驗證直連不通後的替代路線）；U7c（triage skill 已完成）；GitHub 連接
 
 **Files:**
 - `config/themes.txt` — 已建（活躍主題清單）
 - `crons/weekly_scan_prompt.md` — 需整份改寫為 cloud routine 的自包含 prompt，涵蓋四階段 pipeline，不只是週報
 - 新增：`docs/reports/`（週報類輸出，routine 對此開 PR）
+
+**（2026-07-11 修訂）圖的讀寫一律走 U7d 的 MCP connector**，不是直連 tunnel HTTP：triage 的新穎性比對用「查圖」工具、核准後的 load 用「載入抽取」工具。
 
 **Approach（四階段）：**
 
@@ -445,7 +451,42 @@ Skill 定義以下操作流程（Claude 在對話中執行，不需要另一個 
 
 ---
 
-### U7c. Signal Triage Skill（U7 Stage 2，新，尚未實作）
+### U7d. Graph MCP Server（2026-07-11 新增——U7a 驗證直連不通後的正式替代路線，也是「手機對話讀寫圖」的基礎設施）
+
+**Goal:** 在本機（常開機器）跑一個小 MCP server，把 Neo4j 的讀寫包成窄工具，走已建成的 Cloudflare Tunnel 暴露，掛成 claude.ai custom connector——讓 cloud routine、手機 App 對話、網頁對話都能安全地讀寫知識圖譜。
+
+**Requirements:** R10、R11（入圖核准仍是人工，只是核准的「地點」從電腦前解放到任何 Claude 介面）
+
+**Dependencies:** U7a 已完成（tunnel、`cloud_routine` 最小權限帳號、強密碼都已就緒）
+
+**Files:**
+- 新增：`mcp_server/graph_mcp.py`（MCP server 本體，Python）
+- 修改：`C:\Users\Cheng\.cloudflared\config.yml`（加一個 hostname ingress，如 `mcp.minatoyukina.uk`）
+- 修改：`requirements.txt`（加 MCP SDK 依賴）
+- `.env` 新增 MCP 認證 token（不進 git）
+
+**Approach:**
+1. **工具設計（窄面原則）——只暴露三個工具，不暴露原始 Cypher 寫入：**
+   - `get_graph_context(company_id)`：包 `query/graph_context.py` 的邏輯，回傳公司子圖摘要
+   - `run_read_query(cypher)`：唯讀查詢（用 `cloud_routine` 帳號連 Neo4j，該帳號本身就無 DELETE 權限，雙重保險）
+   - `load_extraction(extraction_json)`：先跑 `loader/validate.py` 的驗證邏輯，通過才呼叫 `loader/load_to_neo4j.py` 的 load——**schema 驗證是內建的，不合格的 JSON 進不來**
+2. **認證：** URL 路徑內嵌強隨機 token（custom connector 表單只有 URL + 選填 OAuth，path-token 是個人自用場景的務實選擇）；tunnel 之外再疊 Neo4j 帳號權限這層
+3. **暴露：** cloudflared `config.yml` 加 `mcp.minatoyukina.uk → localhost:<mcp_port>` ingress + DNS route
+4. **掛載：** 使用者在 claude.ai Settings → Connectors → Add custom connector 填入 URL
+5. **永久化：** cloudflared 和 MCP server 都設成開機自動啟動（Windows 服務或工作排程器，需一次 admin 權限）——沒有這步，機器重開後雲端就斷線
+
+**Test scenarios:**
+- 本機直打 MCP endpoint → 工具清單正確回傳
+- 走 tunnel 打 MCP endpoint（帶 token）→ 同樣結果；不帶 token → 拒絕
+- 從手機 App 對話呼叫「查 SIVE 的圖 context」→ 回傳真實子圖資料
+- `load_extraction` 餵一份不合 schema 的 JSON → 被驗證擋下，不寫圖
+- 機器重開機 → tunnel 和 MCP server 自動恢復，App 對話仍可查圖
+
+**Verification:** 手機 App 對話成功查到圖內真實資料 + 一次成功的 `load_extraction`（用測試 JSON，事後刪除）。
+
+---
+
+### U7c. Signal Triage Skill — 已完成（2026-07-11，`skills/signal-triage/SKILL.md`）
 
 **Goal:** 定義一個獨立的 skill.md，把「這則原始材料值不值得往下跑抽取」的判斷邏輯講清楚，讓 cloud routine 能自動執行，同時保留給使用者事後稽核的空間。
 
@@ -564,7 +605,7 @@ Skill 定義判斷四要素（呼應 lead-intake 既有的 Fast Path 判斷邏�
 2. **U3**（依賴 U1）— Onboarding skill 到位後做 M1 CPO Depth Sprint
 3. **M1 CPO Depth Sprint**（內容任務）— U3 到位後執行，讓 CPO 主題達到可信標準
 4. **U4 + U5**（U4 先，U5 依賴 U4）— 個人化建議層
-5. **U6 + U7a + U7c + U7 + U7b + U8**（U8、U6 已完成；U7a 是硬性前置驗證，決定 U7 做多完整；U7c 定義 triage 邏輯後 U7 才能引用；U7b 需 U7 先建好）— 注意力層
+5. **U6 + U7a + U7c + U7d + U7 + U7b + U8**（U6、U7a、U7c、U8 已完成；U7d 是 U7a 驗證直連不通後的替代路線，也是手機對話讀寫圖的基礎；U7 依賴 U7d + GitHub 連接；U7b 需 U7 先建好）— 注意力層
 6. **M2 Second Vertical Slice**（follow Plan 005）— M1 完成後
 7. **L9 Gate 自動通過** — M2 完成 + investment-sop.md + Engine C 可用 → `preconditions.py` 全通過
 
