@@ -35,6 +35,7 @@ fetchers/edgar.py ──────↑                        engine_c/etl_yfin
 - **fetchers（已有）：** `fetchers/edgar.py`（美股 SEC EDGAR，免費無 paywall）。
 - **引擎B（未建）：** X 推文/小道消息 → 線索 → 走 `skills/lead-intake` 閘門 → 入庫。
 - **各類來源的 AI 抽取 instruction：** [`docs/extraction-instructions.md`](docs/extraction-instructions.md)
+- **遠端存取（手機 App / cloud routine 讀寫圖）：** 本機 MCP server（`mcp_server/graph_mcp.py`）+ Cloudflare Tunnel + claude.ai custom connector。完整資料流、安全邊界、四工具說明、踩坑記錄：[`docs/remote-access-architecture.md`](docs/remote-access-architecture.md)
 
 ---
 
