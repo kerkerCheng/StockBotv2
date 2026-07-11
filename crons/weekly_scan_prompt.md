@@ -1,98 +1,59 @@
-# Weekly Theme Scan — Cron Prompt
+# Weekly Signal Scan — Cloud Routine Prompt
 
-> 這份 prompt 由 CronCreate 定期觸發（每周一次）。
-> 觸發後，Claude 執行以下流程並將結果寫入 Claude memory，通知用戶。
+> 這份 prompt 由 claude.ai 的 cloud routine 每週觸發執行。執行環境是 Anthropic 雲端沙盒：
+> 有整份 repo 的 clone、有 web search、有 `stockbotv2-graph` MCP connector（讀寫知識圖譜的唯一管道）。
+> **連不到使用者本機的任何東西**（Engine C SQLite、本機檔案）——需要圖譜一律走 MCP 工具。
+> 設計出處：`docs/plans/2026-07-10-006-feat-personal-investment-advisor-roadmap-plan.md` 的 U7。
 
-## 觸發指令
+## 你的任務（四階段 pipeline）
 
-```
-/last30days <theme_keywords>
-```
+### Stage 0 — 前置
 
-按 `config/themes.txt` 的主題清單逐一掃描。
+1. 讀 `config/themes.txt` 取得活躍主題清單（`#` 開頭與空行忽略）
+2. 讀 `skills/signal-triage/SKILL.md`——Stage 2 的判斷標準全在裡面
+3. 呼叫 MCP 工具 `get_extraction_rules` 取得抽取規則書（Stage 3 用；也順便確認 MCP 連線正常）
+4. **檢查上週核准待入圖的項目**：用 `gh pr list --repo kerkerCheng/StockBotv2 --label weekly-scan --state all --limit 10` 看上次的 PR/Issue 有沒有使用者留言核准但尚未入圖的抽取草稿（PR 描述中標記 `[待入圖]` 且有使用者的核准留言）。有的話：對每一份呼叫 `load_extraction` 入圖，然後在該 PR/Issue 留言記錄結果並標記 `[已入圖]`
 
-## 執行流程
+### Stage 1 — Harvest（廣撒網）
 
-### Step 1 — 讀取主題清單
+對每個活躍主題：
+- 用 web search 搜尋過去 7 天內的新訊號：法說會提及、供應鏈/設計窗口/產能變化、競爭者動向、可能觸發 disproof_condition 的消息、下游客戶 M&A、新命名客戶
+- 檢查 Engine B 策展來源：搜 `site:aleabitoreddit.substack.com` 或 aleabitoreddit 近期貼文提及追蹤中的公司
+- **轉發追源（R14）**：若某則訊號是「轉發第三方研究」（如截圖券商筆記），額外搜尋原始文件。追不到是常態不是阻擋——但 `origin_entity` 必須誠實標記（見 Stage 3）
 
-讀 `config/themes.txt`，提取所有 active 主題的關鍵字清單。
+### Stage 2 — Triage（初篩，照 signal-triage skill 執行）
 
-### Step 2 — 執行 /last30days 掃描
+對每則 harvest 到的原始材料跑四要素判斷（關聯性、新穎性、可引用性、潛在獨立性）：
+- 新穎性判斷用 MCP 工具 `get_graph_context` 或 `run_read_query` 比對圖中現有內容；**MCP 連不上時不要卡住——跳過新穎性判斷、寬鬆放行、在稽核紀錄註明**
+- 寬鬆原則：軟指標（新穎性、獨立性）不確定時一律放行
+- **每一則被篩掉的材料都要記錄摘要 + 理由**，寫進最終報告的稽核段落
 
-對每個主題執行 `/last30days` skill，搜尋過去 30 天內：
-- 法說會提及核心公司
-- 供應鏈/設計窗口/產能變化消息
-- 競爭者/替代技術動向
-- 可能觸發 disproof_condition 的訊號
-- **下游客戶 M&A**：搜 `<known_customers> acquired OR merger` — M&A 往往揭露供應鏈重要性
-- **新命名客戶**：搜 `<company> partnership OR design win OR customer` — 找圖中尚未收錄的客戶關係
-- 比對搜尋結果與圖中現有節點：有新公司名出現 → 標記為「待 onboard 候選」
+### Stage 3 — Extract（對通過 triage 的每一則做完整抽取）
 
-### Step 3 — 分級輸出
+- 嚴格依照 `get_extraction_rules` 回傳的規則書執行（尤其 L6：具體型號/公司名必須逐字出現在 quote；L4：屬性歸位三問）
+- `origin_entity` = 誰發出這份文件。轉發型來源追到原文 → 標原始機構；追不到 → 標 `<原始機構>（經 <轉發者> 轉發，未能獨立取得原文）`
+- 產出完整的 intermediate-format JSON 草稿（不呼叫 load_extraction——入圖必須等使用者核准）
+- **全新公司（不在 `config/themes.txt` 或 `loader/load_to_neo4j.py` 的 TICKER_MAP）不做抽取**，只在報告中列為「建議 onboard 候選」（R13）
 
-**30 秒 Brief（若發現高訊號事件）：**
-格式：
-```
-⚡ 本周高訊號事件
+### Stage 4 — Report & Approve（開 PR，等人工核准）
 
-1. [公司] — [一句話描述] — 重要性: [高/中]
-2. ...
+1. 把週報寫到 `docs/reports/weekly_scan_<YYYY-MM-DD>.md`，開一個 **PR**（分支名 `weekly-scan/<YYYY-MM-DD>`，**打上 `weekly-scan` label**，不直接 push main）
+2. 週報結構：
+   ```
+   ## 本週訊號掃描 — <日期>
+   ### ⚡ 30 秒 brief（若有高訊號事件才寫；沒有就整段省略）
+   ### 各主題發現（每主題一段；無動向就一句話說明，不湊字數）
+   ### 抽取草稿（每份完整 JSON + 一句「這份能為 L8 帶來什麼」）
+   ### Triage 稽核（篩掉了哪些、各自理由）
+   ### 建議 onboard 候選（若有）
+   ### 可能觸發 disproof 的訊號（若有，標 ⚠ 並引述對應 thesis 的 disproof_condition）
+   ```
+3. PR 描述開頭放 30 秒摘要 + 待核准清單：每份草稿一個核取項「回覆『核准 #N』即入圖」
+4. 純提醒、無可合併產出的事項（如 disproof 觸發跡象）→ 另開 **Issue**（同樣打 `weekly-scan` label）
 
-一鍵動作：回覆 "研究 [公司]" 開始 onboarding，或 "忽略" 跳過
-```
-若本周無高訊號事件，跳過此格式。
+## 鐵律
 
-**週報摘要（每周必出）：**
-```
-## 本周 AI 主題掃描 — <日期>
-
-### CPO / 矽光子
-- [若有新發展]
-- [若無重大變化，一句話說明]
-
-### SIVE / InP 雷射
-- [若有新發展]
-- [若無重大變化，一句話說明]
-
-### Thesis 健康狀況
-- [列出 active thesis 的 disproof_condition 是否有觸發跡象]
-
-### 值得追蹤的新訊號
-- [0-3 條，若無則說明]
-```
-
-### Step 4 — 寫入 memory
-
-將結果寫入：
-`C:/Users/Cheng/.claude/projects/C--Users-Cheng-code-StockBotv2/memory/weekly_scan_<YYYY-MM-DD>.md`
-
-格式：
-```markdown
----
-name: weekly-scan-<YYYY-MM-DD>
-description: 每周 AI 主題掃描 — <日期>
-metadata:
-  type: project
----
-
-<週報內容>
-```
-
-同時更新 `memory/MEMORY.md` 最後一行（若已有上週條目，替換之）：
-```
-- [Weekly Scan <日期>](weekly_scan_<YYYY-MM-DD>.md) — <一句最重要的發現>
-```
-
-### Step 5 — 推送通知
-
-若發現高訊號事件，用 PushNotification 通知用戶（若可用）。
-否則，結果在用戶下次開啟 Claude Code 時會從 memory 自動載入。
-
----
-
-## 輸出 tone
-
-- 繁體中文
-- 每條有投資意涵的訊號附「為何重要」一句話
-- 不確定的訊號標 "？"，不要假裝確定
-- 若某主題本周沒有新發展，直接說「本周無重大動向」，不要湊字數
+- 繁體中文輸出
+- 不確定的訊號標「？」，不假裝確定；某主題本週無動向就直說
+- **絕不自行呼叫 `load_extraction` 入庫本週新抽取的草稿**——只有 Stage 0 處理「上週已獲使用者核准」的項目時才允許呼叫
+- 找不到任何值得說的事 → PR 照開（週報說明這是 sparse week），讓使用者知道系統有在跑
