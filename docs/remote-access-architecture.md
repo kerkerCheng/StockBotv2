@@ -17,7 +17,9 @@
 | cloudflared | Cloudflare Tunnel 客戶端 | **向外撥出**長連線到 Cloudflare；本機零入站埠、路由器零設定 |
 | `mcp_server/graph_mcp.py` | 自建 MCP server（約 200 行 Python） | 只綁 127.0.0.1:8788，唯一入口是 tunnel 轉進來的流量 |
 
-**開機自動啟動：** `shell:startup`（`%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup`）裡的 `stockbotv2-graph-services.vbs` 會在登入時以隱藏視窗啟動 cloudflared + MCP server。刪除該檔即停用。手動重啟：直接雙擊該 `.vbs`。
+**開機自動啟動：** `shell:startup`（`%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup`）裡的 `stockbotv2-graph-services.vbs` 會在登入時以隱藏視窗啟動 **Neo4j + cloudflared + MCP server** 三者。刪除該檔即停用。手動重啟：直接雙擊該 `.vbs`。
+
+Neo4j 的啟動細節：使用者的 Neo4j 是 **Desktop 2 附帶的 Enterprise 版**（最小權限帳號的 RBAC 依賴 Enterprise，**不可換成 Community zip**）。啟動不開 Desktop GUI，而是由 `C:\Users\Cheng\.Neo4jDesktop2\start-dbms-headless.cmd` 直接對 Desktop 管理的 DBMS 跑 `neo4j console`（JAVA_HOME 以萬用字元自動抓 Desktop 快取的最新 zulu JRE，Desktop 更新 runtime 不會斷）。若 DBMS 已在跑（例如 Desktop 先開了），重複啟動會因 port 佔用自然退出，無害。
 
 ---
 
