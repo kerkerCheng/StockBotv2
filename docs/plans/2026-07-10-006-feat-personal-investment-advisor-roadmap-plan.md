@@ -414,7 +414,7 @@ Skill 定義以下操作流程（Claude 在對話中執行，不需要另一個 
 
 ---
 
-### U7. Signal Harvest → Triage → Extract → Approve Pipeline（2026-07-11 大幅重寫，取代原本單純的「週報」設計）
+### U7. Signal Harvest → Triage → Extract → Approve Pipeline — 已完成（2026-07-11 建成並驗收：routine `stockbotv2-weekly-signal-scan`，每週五台灣 18:07；首跑產出 PR #1 + Issue #2，四階段全數正確執行，含 sparse-week 誠實回報與 R13 不自動 onboard。已知缺口：routine 以使用者身分開 PR/Issue，GitHub 不通知本人動作，通知依賴 claude.ai routine 通知 + U7b）
 
 **Goal:** 每週自動從已追蹤主題 + Engine B 策展信號源收集線索，初篩後直接抽取成結構化草稿，開 PR/Issue 讓使用者核准是否入圖——不管使用者有沒有開本機 session 都能觸及到人。
 
@@ -451,7 +451,7 @@ Skill 定義以下操作流程（Claude 在對話中執行，不需要另一個 
 
 ---
 
-### U7d. Graph MCP Server（2026-07-11 新增——U7a 驗證直連不通後的正式替代路線，也是「手機對話讀寫圖」的基礎設施）
+### U7d. Graph MCP Server — 已完成（2026-07-11 建成並驗收：`mcp_server/graph_mcp.py` 四工具（含後補的 `get_extraction_rules`），走 tunnel + custom connector，手機 App 實測查到真實 SIVE 子圖；開機自啟 .vbs 含 Neo4j headless 啟動；`load_extraction` 在 connector 權限設 Needs-approval = L8 閘門的 UI 實體）
 
 **Goal:** 在本機（常開機器）跑一個小 MCP server，把 Neo4j 的讀寫包成窄工具，走已建成的 Cloudflare Tunnel 暴露，掛成 claude.ai custom connector——讓 cloud routine、手機 App 對話、網頁對話都能安全地讀寫知識圖譜。
 
@@ -517,7 +517,7 @@ Skill 定義判斷四要素（呼應 lead-intake 既有的 Fast Path 判斷邏�
 
 ---
 
-### U7b. Session-Start PR Digest（U7 的消費端，2026-07-11 補設計，尚未實作；2026-07-11 brainstorm 後重新定位為 convenience，不是可靠性保證）
+### U7b. Session-Start PR Digest — 已完成（2026-07-11：`crons/weekly_scan_digest.py` + 第二個 SessionStart hook；已用真實 PR #1/Issue #2 驗證輸出格式；定位為 convenience，不是可靠性保證）
 
 **Goal:** U7 的 cloud routine 只負責「生產」PR；U7b 負責「你開 session 時主動看到有哪些待審週報 PR」，讓完整迴圈接起來——你看完簡報後決定要研究哪個主題，才觸發 `company-onboard` 找文件 + 跑入庫流程。**這是 convenience，不是可靠性保證**——真正確保你會被通知到的是 U7 的 PR/Issue + GitHub 本身的 email/手機通知（R10），U7b 只是「你剛好開 session 時多一層方便」。
 
@@ -587,6 +587,7 @@ Skill 定義判斷四要素（呼應 lead-intake 既有的 Fast Path 判斷邏�
 | SIVE 是瑞典股，yfinance SIVE.ST 資料可能不完整 | 中 | checklist.py 的 `manual_required` status 已處理此情況；不 crash，標 manual |
 | 法說會逐字稿抓取：非 EDGAR，依賴 WebSearch 品質 | 中 | company-onboard skill 明確說明此限制，優先推薦用戶直接提供 IR 頁面 URL |
 | Cloud routine 沒有官方密鑰保管機制，憑證只能放在 routine 設定裡 | 中 | U7a 要求開最小權限帳號 + 換強密碼，降低外洩時的影響範圍 |
+| Routine 以使用者本人身分開 PR/Issue，GitHub 不通知本人動作（2026-07-11 已證實）| 高 | 通知改依賴 (a) claude.ai routine 自身的通知（routine 跑完會 Sent notification，需確認手機 Claude App 有收到）+ (b) U7b session-start 摘要。若 (a) 實測不可靠 → 未來加 GitHub Action 在 PR 開啟時發 email/外部通知 |
 
 ---
 
@@ -605,7 +606,7 @@ Skill 定義判斷四要素（呼應 lead-intake 既有的 Fast Path 判斷邏�
 2. **U3**（依賴 U1）— Onboarding skill 到位後做 M1 CPO Depth Sprint
 3. **M1 CPO Depth Sprint**（內容任務）— U3 到位後執行，讓 CPO 主題達到可信標準
 4. **U4 + U5**（U4 先，U5 依賴 U4）— 個人化建議層
-5. **U6 + U7a + U7c + U7d + U7 + U7b + U8**（U6、U7a、U7c、U8 已完成；U7d 是 U7a 驗證直連不通後的替代路線，也是手機對話讀寫圖的基礎；U7 依賴 U7d + GitHub 連接；U7b 需 U7 先建好）— 注意力層
+5. **U6 + U7a + U7c + U7d + U7 + U7b + U8 — 全部完成（2026-07-11）**——注意力層整條貫通：週五自動掃描 → PR/Issue 待審 → 手機/本機皆可核准 → 下週期自動入圖
 6. **M2 Second Vertical Slice**（follow Plan 005）— M1 完成後
 7. **L9 Gate 自動通過** — M2 完成 + investment-sop.md + Engine C 可用 → `preconditions.py` 全通過
 
