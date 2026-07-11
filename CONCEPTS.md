@@ -57,6 +57,17 @@ The signal-intake subsystem in StockBotv2's three-engine architecture. Aggregate
 ### Signal Triage
 The automatic, low-cost judgment step between harvesting raw signals (tracked-theme web search, Engine B feeds) and running full LLM extraction. Decides whether a raw item is relevant to an already-tracked theme/company, novel, quotable (contains concrete, verbatim-checkable claims per the L6 anti-hallucination rule), and a plausible new `origin_entity` for the L8 gate. Deliberately lenient — a silently dropped good lead is treated as worse than a wasted extraction — and every run reports what it filtered and why.
 
+### Weekly Signal Scan
+The recurring cloud-run process that keeps the knowledge graph fed without the user initiating research: harvest (tracked themes + Engine B feeds) → Signal Triage → full extraction drafts → a review artifact (PR for reports with drafts, Issue for pure alerts) awaiting human approval. Two hard rules define it: it never loads its own fresh drafts into the graph (approval always precedes loading), and a week with no primary-source material is reported honestly as sparse rather than padded.
+*Avoid:* weekly scan cron, 週報 routine
+
+---
+
+## Remote Access
+
+### Graph MCP Gateway
+The narrow-tool gateway through which every claude.ai surface (cloud runs, phone and web conversations) reads or writes the knowledge graph remotely. Exposes a fixed, small set of capabilities — graph context summary, read-only query, extraction rulebook retrieval, and validated extraction loading — rather than raw database access; anything not expressed as one of these tools is impossible remotely. Writes are double-gated: built-in schema validation rejects malformed extractions, and the loading tool requires per-call human approval, making the approval prompt itself the L8 gate's user-facing form.
+
 ### Financial Snapshot
 A point-in-time record of market and financial metrics for a single ticker, stored in the `financial_snapshots` table. One row per `(ticker, snapshot_date)` pair. Fields include price, forward P/E, trailing P/E, EV/Revenue, gross margin, shares outstanding, and analyst target price. The primary input to the Watchlist Gate. Private companies and non-US stocks without available data are represented by absent rows, not null rows.
 
