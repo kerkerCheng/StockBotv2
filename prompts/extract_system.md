@@ -13,7 +13,7 @@ You output ONLY a JSON object that conforms exactly to the intermediate_format s
   "schema_version": "0.1",
   "source_doc": { ... },
   "sources": [
-    { "id": "s1", "locator": "Q3 prepared remarks, p.2", "quote": "verbatim text..." }
+    { "id": "<doc_id>_s1", "locator": "Q3 prepared remarks, p.2", "quote": "verbatim text..." }
   ],
   "nodes": [
     {
@@ -174,11 +174,15 @@ Every item in `nodes`, `edges`, and `claims` MUST have:
 The `sources` array must have a corresponding entry:
 ```json
 {
-  "id": "s1",
+  "id": "coherent_q3fy26_s1",
   "locator": "Q3 prepared remarks, p.3",
   "quote": "We are on track to qualify our external laser source for Tomahawk 6 by Q4."
 }
 ```
+
+**Source ID convention (mandatory):** use the globally-unique format
+`<doc_id>_s<N>` (e.g. `sivers_gf_pr_2026_06_02_s1`), NOT bare `s1`. Bare local
+ids collide across documents after graph merge and become untraceable.
 
 If you cannot find a quote that supports a relationship, DO NOT emit that edge or claim.
 Prefer omission over hallucination. The human reviewer will catch gaps.
@@ -216,6 +220,8 @@ bottleneck assertion that warrants tracking across documents:
 - "InP substrate supply is sole-sourced from one vendor" → claim
 
 Each claim requires:
+- `id`: stable claim id, `cl1`, `cl2`, ... — REQUIRED (cross-document reloads
+  MERGE by this id; a claim without `id` fails schema validation)
 - `statement`: plain-language assertion
 - `subject_id`: the node or edge the claim is about
 - `demand_proof_level`: see vocab

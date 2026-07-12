@@ -63,9 +63,12 @@ def validate(doc_path: str) -> list[str]:
         qs = e.get("attributes", {}).get("qualification_status")
         if qs and qs not in vocab["qualification_status"]:
             errors.append(f"VOCAB: edge {e['id']} qualification_status={qs} 不在對照表")
-    for c in doc.get("claims", []):
+    for i, c in enumerate(doc.get("claims", [])):
+        cid = c.get("id", f"claims[{i}]")
+        if "id" not in c:
+            errors.append(f"REF: {cid} 缺 id 欄位（慣例 cl1、cl2…；跨文件重載的 MERGE 依賴穩定 id）")
         if c["demand_proof_level"] not in vocab["demand_proof_level"]:
-            errors.append(f"VOCAB: claim {c['id']} demand_proof_level={c['demand_proof_level']} 不在對照表")
+            errors.append(f"VOCAB: claim {cid} demand_proof_level={c['demand_proof_level']} 不在對照表")
     sd = doc["source_doc"]
     if sd["source_type"] not in vocab["source_type"]:
         errors.append(f"VOCAB: source_doc source_type={sd['source_type']} 不在對照表")
@@ -94,10 +97,11 @@ def validate(doc_path: str) -> list[str]:
             errors.append(f"REF: edge {e['id']} dst_id={e['dst_id']} 無對應 node")
         _check_sources(f"edge {e['id']}", e["source_ids"])
     edge_ids = {e["id"] for e in doc.get("edges", [])}
-    for c in doc.get("claims", []):
+    for i, c in enumerate(doc.get("claims", [])):
+        cid = c.get("id", f"claims[{i}]")
         if c["subject_id"] not in node_ids and c["subject_id"] not in edge_ids:
-            errors.append(f"REF: claim {c['id']} subject_id={c['subject_id']} 無對應 node 或 edge")
-        _check_sources(f"claim {c['id']}", c["source_ids"])
+            errors.append(f"REF: claim {cid} subject_id={c['subject_id']} 無對應 node 或 edge")
+        _check_sources(f"claim {cid}", c["source_ids"])
 
     return errors
 

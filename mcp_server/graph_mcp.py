@@ -155,7 +155,13 @@ def load_extraction(extraction_json: str) -> str:
     try:
         json.dump(doc, tmp, ensure_ascii=False)
         tmp.close()
-        problems = validate_extraction(tmp.name)
+        try:
+            problems = validate_extraction(tmp.name)
+        except Exception as e:
+            # 驗證器自身異常也必須回成清楚的拒載訊息，不能炸穿成框架錯誤
+            return (f"拒載：驗證器異常（{type(e).__name__}: {e}）— "
+                    f"通常代表 JSON 缺少必填欄位（如 claim 的 id）。"
+                    f"請先呼叫 get_extraction_rules 核對格式後重試。")
     finally:
         os.unlink(tmp.name)
 
