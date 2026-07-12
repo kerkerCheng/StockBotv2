@@ -186,6 +186,14 @@ def load_extraction(extraction_json: str) -> str:
         f"{len(doc.get('edges', []))} edges, "
         f"{len(doc.get('claims', []))} claims"
     )
+    # 落地到 extractions/——L8 檢查器與本機 pipeline 以此目錄為準；
+    # 遠端入圖不落地的話，origin_entity 計數會漏掉這份文件
+    try:
+        dest = ROOT / "extractions" / f"{doc_id}.json"
+        dest.write_text(json.dumps(doc, ensure_ascii=False, indent=2), encoding="utf-8")
+        summary += f"\n已落地 extractions/{doc_id}.json（L8 計數同步）"
+    except Exception as e:
+        summary += f"\n注意：extractions/ 落地失敗（{type(e).__name__}），L8 計數會暫時漏掉本文件"
     if warnings:
         summary += "\n注意（不阻擋，但請回報給使用者）：\n" + "\n".join(warnings)
     return summary
