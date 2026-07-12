@@ -50,6 +50,7 @@
 | Sole-source 認定被推翻（出現第二供應商） | 降低 `substitutability` edge 值，重新評估 thesis |
 | 財務核驗清單任一項出現重大惡化 | 即時標記 `thesis.status = watch`，升高監控頻率 |
 | Lane Memo 重新評分低於失敗閾值（可信度 < 3 或可證偽性 < 3）| 降級為 `[Research Note]`，考慮出場 |
+| **主要證據來源可信度危機**（thesis 賴以成立的文件涉造假指控／審計持續經營疑慮／財報重編） | 即時 `review_required`（比照 disproof 觸發，48h 內決策）；圖內以該文件為**唯一來源**的主張標注 `source_under_audit` 並依風險調降 confidence；新增以「重編/審計結果出爐日」為核查點的 disproof 條件。首例：2026-07-12 Sivers（`sivers_ar_2025` 涉 Ningi 指控），見 `docs/solutions/` 與 GitHub Issue #2 |
 
 ---
 
