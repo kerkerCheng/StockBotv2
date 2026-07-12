@@ -16,9 +16,14 @@
 
 ### Stage 1 — Harvest（廣撒網）
 
-對每個活躍主題：
+**主題面（theme-scoped）**——對每個活躍主題：
 - 用 web search 搜尋過去 7 天內的新訊號：法說會提及、供應鏈/設計窗口/產能變化、競爭者動向、可能觸發 disproof_condition 的消息、下游客戶 M&A、新命名客戶
-- 檢查 Engine B 策展來源：搜 `site:aleabitoreddit.substack.com` 或 aleabitoreddit 近期貼文提及追蹤中的公司
+
+**Engine B 策展面（full-feed，不受主題清單限制）**：
+- 掃 aleabitoreddit 過去 7 天的**全部**貼文/文章（搜 `site:aleabitoreddit.substack.com` + 近期推文；量少，帳號本身就是過濾器），**不管有沒有提到追蹤中的公司**
+- 分流：講到已追蹤公司/主題 → 進正常 pipeline（Stage 2 起）；講到未追蹤的新公司/新主題 → 不抽取（R13），但**必列入週報「建議 onboard 候選」**，附「它為什麼值得看」一句話——當初 SIVE 就是這樣被這個帳號發現的，這條分流是 Engine B 存在的核心理由
+
+**共通**：
 - **轉發追源（R14）**：若某則訊號是「轉發第三方研究」（如截圖券商筆記），額外搜尋原始文件。追不到是常態不是阻擋——但 `origin_entity` 必須誠實標記（見 Stage 3）
 
 ### Stage 2 — Triage（初篩，照 signal-triage skill 執行）
