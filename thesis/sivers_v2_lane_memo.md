@@ -1,9 +1,11 @@
 <!-- output_type: [Research Note] | ticker: SIVE.ST | checklist_pass: false | l9_pass: false -->
 <!-- gate_override: L8 測試用，文件補強中 — 所有主張來源為 Sivers 自報，尚無獨立佐證 -->
+<!-- thesis_status: review_required | triggered: 2026-07-12 | reason: 主要來源 sivers_ar_2025 涉做空指控（31% 營收不當認列）+ 審計持續經營疑慮 + 財報重編中。L7 強制 review。詳見 GitHub Issue #2 與其留言。 -->
 
 # Directional Lane Memo — Sivers Semiconductors (SIVE.ST)
 **生成日期：** 2026-07-10
 **L8 狀態：** ⚠ Override — 1/3 origin_entity（Sivers 自報），尚無客戶端或第三方獨立來源
+**⛔ Thesis 狀態（2026-07-12 更新）：`review_required`** — 本 memo 的主要證據文件 `sivers_ar_2025` 正被做空機構指控營收不當認列，審計師已提出持續經營疑慮，財報重編中。在 8/27 Q2 財報與重編結果出爐前，本 memo 的所有自報主張視為未經驗證。核查詳情：GitHub Issue #2。
 
 ### 1. 一句 thesis
 
