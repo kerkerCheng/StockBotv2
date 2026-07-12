@@ -43,6 +43,23 @@ def _list(kind: str, gh: str) -> list[dict]:
         return []
 
 
+def _backlog_count(gh: str) -> int:
+    """開著但沒有 weekly-scan label 的 issue 數（工程 backlog，如 #3/#4/#5）。"""
+    try:
+        out = subprocess.run(
+            [gh, "issue", "list", "--repo", REPO, "--state", "open",
+             "--json", "number,labels"],
+            capture_output=True, text=True, timeout=15,
+        )
+        if out.returncode != 0:
+            return 0
+        items = json.loads(out.stdout or "[]")
+        return sum(1 for i in items
+                   if LABEL not in {l["name"] for l in i.get("labels", [])})
+    except Exception:
+        return 0
+
+
 def main() -> int:
     gh = _gh()
     if gh is None:
@@ -50,22 +67,22 @@ def main() -> int:
 
     prs = _list("pr", gh)
     issues = _list("issue", gh)
-    if not prs and not issues:
-        return 0  # 沒有待審項目，安靜過去
+    backlog = _backlog_count(gh)
+    if not prs and not issues and not backlog:
+        return 0  # 什麼都沒有，安靜過去
 
-    lines = []
-    for p in prs:
-        lines.append(f"PR #{p['number']} {p['title']}")
-    for i in issues:
-        lines.append(f"Issue #{i['number']} {i['title']}")
+    parts = []
+    if prs or issues:
+        lines = [f"PR #{p['number']} {p['title']}" for p in prs]
+        lines += [f"Issue #{i['number']} {i['title']}" for i in issues]
+        parts.append(
+            f"📬 weekly-scan: {len(prs) + len(issues)} 件待審（"
+            + "；".join(lines[:4]) + ("…" if len(lines) > 4 else "") + "）"
+        )
+    if backlog:
+        parts.append(f"🔧 另有 {backlog} 個 backlog issue 開著（詳見 GitHub 或 plan 現況快照）")
 
-    msg = (
-        f"📬 weekly-scan: {len(prs) + len(issues)} 件待審（"
-        + "；".join(lines[:4])
-        + ("…" if len(lines) > 4 else "")
-        + "）— 要現在看嗎？"
-    )
-    print(json.dumps({"systemMessage": msg}, ensure_ascii=False))
+    print(json.dumps({"systemMessage": " ".join(parts)}, ensure_ascii=False))
     return 0
 
 
