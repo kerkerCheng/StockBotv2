@@ -612,6 +612,20 @@ Skill 定義判斷四要素（呼應 lead-intake 既有的 Fast Path 判斷邏�
 
 ---
 
+## 現況快照與下一步（2026-07-12 session 收尾）
+
+**程式面全部完成**（U1–U8 + U7a/b/c/d），注意力層實戰驗證通過：首次週掃產出 PR #1/Issue #2 並抓到真實警訊（Sivers 財報可信度危機 → L7 review 完成，thesis `review_required`，持倉決議 hold 至 8/27，disproof 綁重編結果）。遠端入圖（手機 → MCP → Neo4j）首批四份完成，撞出的坑全數修復並沉澱（見 `docs/solutions/architecture-patterns/mcp-connector-route-past-cloud-sandbox-egress.md` 硬化清單）。
+
+**下一個 ce-work session 的候選（按價值排序）：**
+1. **M1 CPO Depth Sprint（主線）**——SIVE 的 L8 已達 4/3；剩 Coherent（1/3）等公司。第一步就是 onboard **AXT**（issue 見週報 PR #1：AXT×Coherent InP 供應協議是 Coherent 依賴鏈唯一的非自報來源候選），`TICKER_MAP` 補 `co:axt: "AXTI"`
+2. **Issue #3**：loader 重複邊合併（(src,type,dst) 身分 + migration）——影響證據密度計算的正確性
+3. **Issue #4**：L8 改以圖為準（SourceDoc 節點），治本 L6 Gap 2
+4. **Issue #5**：Engine C 透過 MCP 開放給手機（使用者痛點：App 對話常被提醒財報事項但查不到）
+
+**自動化基礎設施現況**：週五 18:07 週掃 routine、SessionStart 雙 hook（thesis 逾期 + weekly-scan 待審）、三服務開機自啟（Neo4j headless + cloudflared + graph MCP，均分離行程）。
+
+---
+
 ## Sources & Research
 
 - `docs/brainstorms/2026-07-10-investment-advisor-repositioning-requirements.md` — 本計畫 origin

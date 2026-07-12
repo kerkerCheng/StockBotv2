@@ -192,6 +192,13 @@ origin-diversity counter deduplicates by string; mixing formats double-counts
 the same organization. origin_entity = who ISSUED the document, not who it is
 about.
 
+**`source_doc.url` and `published_at` (mandatory for remote loads):** remote
+loads bypass `library/raw/`, so the extraction JSON is the ONLY record of the
+document — without `url` the original can never be re-fetched for quote
+verification or re-extraction, and sources can be edited or removed after the
+fact (especially relevant for companies under investigation). Always include
+the source URL and publication date.
+
 If you cannot find a quote that supports a relationship, DO NOT emit that edge or claim.
 Prefer omission over hallucination. The human reviewer will catch gaps.
 
