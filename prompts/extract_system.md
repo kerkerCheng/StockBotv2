@@ -184,6 +184,14 @@ The `sources` array must have a corresponding entry:
 `<doc_id>_s<N>` (e.g. `sivers_gf_pr_2026_06_02_s1`), NOT bare `s1`. Bare local
 ids collide across documents after graph merge and become untraceable.
 
+**`source_doc.origin_entity` convention (mandatory when you compose source_doc
+yourself, e.g. remote loads):** the issuing organization's display name exactly
+as used elsewhere — `"Enablence Technologies"`, `"Sivers Semiconductors"`,
+`"aleabitoreddit"` — NEVER a node id like `co:enablence_technologies`. The L8
+origin-diversity counter deduplicates by string; mixing formats double-counts
+the same organization. origin_entity = who ISSUED the document, not who it is
+about.
+
 If you cannot find a quote that supports a relationship, DO NOT emit that edge or claim.
 Prefer omission over hallucination. The human reviewer will catch gaps.
 
