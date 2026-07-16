@@ -43,14 +43,16 @@
 ```
 文件 → library/raw/ → extract.py → loader/validate.py → loader/load_to_neo4j.py → Neo4j
 fetchers/edgar.py ──────↑                        engine_c/etl_yfinance.py → SQLite
-遠端線索 → source-trace → load_extraction（filesystem-first）→ Neo4j
-         → finalize_research_action（report + exact commit + push；預設 kill switch 關閉）
+遠端線索 → source-trace → prepare_research_action（server-owned review packet）
+         → 使用者明確核准 ID + 一次 native approval
+         → apply_research_action（filesystem-first + resumable graph write + report）
+         → 本機 session 執行 scripts/commit_pending_intake.py（每 action 一 commit、整批一 push）
 ```
 - **抽取與 DB 解耦：** `extract.py` 只輸出 DB 無關 JSON；loader 可替換。DB 選型不綁死資料。
 - **fetchers（已有）：** `fetchers/edgar.py`（美股 SEC EDGAR，免費無 paywall）。
-- **引擎B（未建）：** X 推文/小道消息 → 線索 → 走 `skills/lead-intake` 閘門 → 入庫。
+- **引擎B（自動 harvest 未建；ad hoc 手機入口已建）：** X 推文/小道消息 → 線索 → 走 `skills/lead-intake` 閘門 → Research Action → 入庫。自動 X/trending harvest 仍未建。
 - **各類來源的 AI 抽取 instruction：** [`docs/extraction-instructions.md`](docs/extraction-instructions.md)
-- **遠端存取（手機 App / cloud routine 讀寫圖與查 Engine C）：** 本機 MCP server（`mcp_server/graph_mcp.py`）+ Cloudflare Tunnel + claude.ai custom connector。完整資料流、安全邊界、七工具說明、storage/finalize 協定與踩坑記錄：[`docs/remote-access-architecture.md`](docs/remote-access-architecture.md)
+- **遠端存取（手機 App / web / cloud routine 讀寫圖與查 Engine C）：** 本機 MCP server（`mcp_server/graph_mcp.py`）+ Cloudflare Tunnel + connector。九工具 surface 沒有 remote Git；完整資料流、安全邊界、Research Action／storage 協定與跨平台限制：[`docs/remote-access-architecture.md`](docs/remote-access-architecture.md)
 
 ---
 
@@ -96,14 +98,14 @@ fetchers/edgar.py ──────↑                        engine_c/etl_yfin
 
 ## 開發優先序（接下來三件事）
 
-1. **第二條垂直切片（非 AI / 非 CPO 主題）**
-   — L9 前置條件；驗證方法論不是 AI 多頭特例，而是跨主題有效的框架。
+1. **Mobile Research Action 完整 rollout**
+   — 本機實作／測試完成後，重啟 MCP、刷新 connector tool snapshot、把 `apply_research_action` 設 Needs approval，從手機跑一個 disposable prepare → 明確核准 → apply → 另一個本機 session 查狀態／補 publish 的真實 smoke。手機知識累積是目前最高優先，Lane Memo／投資建議不得阻塞。
 
-2. **SIVE 來源品質升級**
-   — 目前 SIVE 的關鍵主張多為自我報告（L8 弱）。找 3 個不同 `origin_entity` 的獨立來源（客戶端文件優先：Coherent 法說會提到 SIVE？O-Net 財報？）。
+2. **Lane Memo／投資建議接縫 + L9 前置條件**
+   — 順手修 shared contract，但正式開放 actionable advice 前仍須跑第二條非 AI／非 CPO 垂直切片、thesis→部位最小規則與 Engine C 五項一鍵核驗。
 
-3. **EDGAR 季報自動更新**
-   — `fetchers/edgar.py` 已有，加個 CLI 一鍵拉最新 10-Q（含 `--max-chars` guard），讓圖內美股公司的財務數據不過期。
+3. **知識覆蓋自動化**
+   — SIVE 找 3 個不同 `origin_entity` 的獨立來源；`fetchers/edgar.py` 補最新 10-Q CLI；再做 RSS pending leads。先讓手機 ad hoc loop 穩定，再擴自動 harvest。
 
 ---
 

@@ -13,5 +13,5 @@ google-auth
 google-auth-httplib2
 google-api-python-client
 
-# Graph MCP server (mcp_server/graph_mcp.py — remote graph access for cloud/app)
-mcp
+# Graph MCP server. Stable v1 only; v2 is a deliberate breaking migration.
+mcp>=1.28,<2

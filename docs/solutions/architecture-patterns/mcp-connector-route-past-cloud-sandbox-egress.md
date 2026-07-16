@@ -44,11 +44,11 @@ U7 自動化管線需要 cloud routine 讀寫本機 Neo4j（使用者機器常�
 
 **MCP connector 的流量走 Anthropic 伺服器轉發，不經過 sandbox 的出站 proxy**——這是繞過（實為「走正門」）的關鍵。模式：
 
-1. 本機寫一個小 MCP server（Python `mcp` SDK，streamable HTTP），只暴露窄工具——本案為四個：查圖摘要、唯讀查詢、取抽取規則書、載入已驗證抽取
+1. 本機寫一個小 MCP server（Python `mcp` SDK，streamable HTTP），只暴露窄工具——本案從最初四個演進為九個固定工具；寫入以 server-owned Research Action prepare/status/apply 包住，remote surface 不含 Git
 2. 走既有 Cloudflare Tunnel 加一個 hostname 暴露它；**tunnel ingress 必須加 `httpHostHeader: 127.0.0.1:<port>` 改寫**——MCP SDK 內建 DNS-rebinding 防護，非 localhost 的 Host 一律回 421 Misdirected Request
 3. 認證用 URL 路徑內嵌 token（custom connector 表單只有 URL + 選填 OAuth，path token 是個人場景的務實解）
 4. 掛成 claude.ai custom connector 後，**routine、手機 App、網頁對話全部同時獲得存取**——比原本只給 routine 的直連設計覆蓋面更廣
-5. 防護分層：path token（碰不到端點）→ 最小權限 DB 帳號（Enterprise RBAC；MERGE/SET 可、DELETE/schema 不可）→ 唯讀工具用 READ access mode session 強制 → 寫入工具內建 schema 驗證 → connector 權限把寫入工具設 Needs-approval（人工核准閘門的 UI 實體）
+5. 防護分層：path token（碰不到端點）→ 最小權限 DB 帳號（Enterprise RBAC；MERGE/SET 可、DELETE/schema 不可）→ 唯讀工具用 READ access mode session 強制 → prepare 凍結完整 payload + digest → apply 逐文件冪等 checkpoint → connector 權限把 apply 設 Needs-approval。Needs-approval 是 UX gate，不取代 server auth；Git 只留在本機 maintenance command
 
 ## Why This Matters
 
@@ -77,5 +77,5 @@ U7 自動化管線需要 cloud routine 讀寫本機 Neo4j（使用者機器常�
 
 現行實作與操作細節（活文件）：`docs/remote-access-architecture.md`。
 決策過程與逐步驗證紀錄：`docs/plans/2026-07-10-006-feat-personal-investment-advisor-roadmap-plan.md` U7a/U7d。
-Server 本體：`mcp_server/graph_mcp.py`（約 200 行，含四工具與驗證閘門）。
+Server 本體：`mcp_server/graph_mcp.py`（九工具）+ `mcp_server/research_actions.py`（durable approval state）+ `mcp_server/action_publisher.py`（local-only Git）。
 遺留 backlog：issue #3（重複邊）、#4（L8 改以圖為準）、#5（Engine C 遠端開放）。

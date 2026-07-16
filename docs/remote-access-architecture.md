@@ -1,6 +1,6 @@
 # 遠端存取架構 — 資料流與安全邊界
 
-> 2026-07-11 建立（U7a/U7d）。這份是活文件：任何改動 tunnel、MCP server、connector 的人都應同步更新。
+> 2026-07-11 建立（U7a/U7d），2026-07-16 更新為 server-owned Research Action。這份是活文件：任何改動 tunnel、MCP server、connector 的人都應同步更新。
 > 相關計畫：[`docs/plans/2026-07-10-006-feat-personal-investment-advisor-roadmap-plan.md`](plans/2026-07-10-006-feat-personal-investment-advisor-roadmap-plan.md) 的 U7a/U7d。
 
 ## 一句話
@@ -15,7 +15,7 @@
 |------|------|---------|
 | Neo4j | 圖資料庫本體 | 只聽 localhost 7474（HTTP）/ 7687（Bolt），無對外 |
 | cloudflared | Cloudflare Tunnel 客戶端 | **向外撥出**長連線到 Cloudflare；本機零入站埠、路由器零設定 |
-| `mcp_server/graph_mcp.py` | 自建 MCP server（約 200 行 Python） | 只綁 127.0.0.1:8788，唯一入口是 tunnel 轉進來的流量 |
+| `mcp_server/graph_mcp.py` | 自建 Graph MCP server | 只綁 127.0.0.1:8788，唯一入口是 tunnel 轉進來的流量 |
 
 **開機自動啟動：** `shell:startup`（`%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup`）裡的 `stockbotv2-graph-services.vbs` 會在登入時以隱藏視窗啟動 **Neo4j + cloudflared + MCP server** 三者。刪除該檔即停用。手動重啟：直接雙擊該 `.vbs`。
 
@@ -43,34 +43,36 @@ Hostname 映射（`C:\Users\Cheng\.cloudflared\config.yml`）：
 
 ## MCP 是什麼、LLM 跑在哪
 
-MCP（Model Context Protocol）= Anthropic 制定的開放協議，標準化「Claude 如何呼叫你自家的工具」。分工：
+MCP（Model Context Protocol）是開放協議，標準化支援它的模型介面如何呼叫自家工具。分工：
 
 ```
 你的手機/瀏覽器  = 顯示對話的窗口（無 LLM）
-Anthropic 雲端   = LLM 本體——思考、決定何時呼叫工具
+Claude／OpenAI 雲端 = LLM 本體——思考、決定何時呼叫工具
 本機 graph_mcp   = 純執行器（無 LLM、不需 ANTHROPIC_API_KEY、零 API 成本）
 本機 Neo4j       = 資料
 ```
 
 對話中的實際流程：使用者提問 → 雲端 LLM 判斷需要圖譜 → 發 JSON-RPC 工具呼叫（HTTPS）→ `mcp.minatoyukina.uk` → Cloudflare → tunnel → cloudflared → graph_mcp → Neo4j → 結果原路回 → LLM 讀進上下文後以自然語言回答。
 
-**MCP server 不能對本機下任意指令。** 它只有七個寫死的工具（見下），沒有 shell、沒有 client-controlled path、沒有任意代碼執行。檔案只可落在固定 provenance/report roots，Git 只用 argv-list 精確 pathspec。要擴充能力必須改 code 重啟。
+**MCP server 不能對本機下任意指令。** 它只有九個寫死的工具（見下），沒有 shell、沒有 client-controlled path、沒有任意代碼執行。檔案只可落在固定 action/provenance/report roots；遠端工具完全沒有 Git 能力。要擴充能力必須改 code 重啟並讓 connector 重新掃描工具。
 
 ---
 
-## 七個工具與其應用
+## 九個工具與其應用
 
 | 工具 | 讀/寫 | 應用場景 |
 |------|------|---------|
 | `get_graph_context` | 讀 | 「SIVE 研究狀態如何」——公司子圖/產業全圖的 LLM-ready 摘要（重用 `query/graph_context.py`） |
 | `run_read_query` | 讀 | 精確查詢/稽核：「列出所有 sole_source 邊」「數 origin_entity」。Session 以 READ access mode 開啟，寫入語句會被 Neo4j 拒絕（已實測） |
 | `get_financial_checklist` | 讀 | 查 Engine C 五項財務清單、最新客觀 analyst coverage 與當前 `policy_version` 的即時 view；不暴露 SQL、不持久化 crowding 分類 |
-| `get_extraction_rules` | 讀 | 回傳 `prompts/extract_system.md` + `schema/vocab.json` + `prompts/intake_protocol.md` 原文（路徑寫死）。**任何遠端抽取前必讀**——含 storage permission、conflict 與 finalize 協定 |
+| `get_extraction_rules` | 讀 | 回傳 `prompts/extract_system.md` + `schema/vocab.json` + `prompts/intake_protocol.md` 原文（路徑寫死）。**任何遠端抽取前必讀**——含 storage permission、conflict 與 Research Action 協定 |
 | `get_source_trace_manual` | 讀 | 回傳 `skills/source-trace/SKILL.md` 原文。手機／網頁收到推文、轉述、截圖或未驗證消息時先讀，依市場路由追原文；tier 3–4 未果只留 lead，不進抽取／寫圖 |
-| `load_extraction` | **寫** | 一份文件一呼叫。驗 permission/schema/canonical hash，filesystem-first no-clobber 保存 extraction/raw，再冪等寫圖與重投影受影響 conflicts；失敗可用相同 payload 重試 |
-| `finalize_research_action` | **寫 + Git push** | 以成功 load 的 doc_ids manifest 建報告、精確 stage、單一 commit、push。非 master／staged index／HEAD 不同步／local_only 全部 fail closed；預設 kill switch 關閉 |
+| `load_extraction` | **寫** | legacy weekly/local primitive：一份文件一呼叫。驗 permission/schema/canonical hash，filesystem-first no-clobber 保存 extraction/raw，再冪等寫圖與重投影 conflicts；手機 ad hoc flow 不直接使用 |
+| `prepare_research_action` | **私有 staging 寫** | 驗證完整 1–10 文件 action，server 簽發 ID + digest + expiry + review packet；不寫 ledger、不寫圖、不跑 Git |
+| `get_research_action_status` | 讀 | 空 ID 回 recent actionable 摘要；完整 ID 回 frozen review + recovery state；永不回 raw/extraction body |
+| `apply_research_action` | **寫** | 以 ID + 完整 digest 套用使用者核准的 immutable action；逐文件 checkpoint、partial retry、permission-sensitive report；永不跑 Git |
 
-**Connector 權限設定（claude.ai → Settings → Connectors → stockbotv2-graph）：** 五個讀工具設「允許」；`load_extraction` 與 `finalize_research_action` 都保持「**Needs approval**」。後者不會繼承前者的設定，新增／重建 connector 時必須逐一檢查。
+**Connector 權限設定：** 六個 read tools 與 `prepare_research_action` 可設「允許」；`apply_research_action` 與 legacy `load_extraction` 保持「**Needs approval**」。工具權限不會自動繼承，新增／重建／Refresh connector 時逐一檢查。Claude mobile/web 可用同一 remote MCP；ChatGPT web 只有在帳號方案具 full MCP write 權限時能完成 apply。OpenAI 官方目前把 custom MCP apps 限在 web，ChatGPT mobile 不是手機入口。
 
 ---
 
@@ -79,12 +81,14 @@ Anthropic 雲端   = LLM 本體——思考、決定何時呼叫工具
 1. **URL 路徑 token**（`.env` 的 `GRAPH_MCP_TOKEN`，40 字元隨機）——不知道完整 URL 連端點都碰不到（錯誤 token → 404）。**Connector URL 本身就是鑰匙：含 URL 的截圖/設定頁不要外流**
 2. **最小權限 Neo4j 帳號**——MCP server 用 `cloud_routine` 帳號（`routine_writer` 角色：MATCH + CREATE + SET PROPERTY + SET LABEL；無 DELETE、無 schema、無 admin）。最壞情況是圖被亂寫，不是被刪
 3. **READ mode 強制**——`run_read_query` 在 session 層面拒絕寫入交易
-4. **驗證與 no-clobber 閘門**——`load_extraction` 先驗 schema/permission/URL/canonical hash，內容衝突不碰圖、不覆寫檔案
-5. **Finalize fail-closed**——只在 master、index 無 staged、fetch 成功且 `HEAD == origin/master` 時，精確提交本次 manifest
-6. **人工核准 + server kill switch**——兩個寫工具設 Needs-approval；Git push 另要求 `ENABLE_REMOTE_FINALIZE=true`，預設 false
-7. **本機綁定**——MCP server 只綁 127.0.0.1，唯一入口是 tunnel
+4. **Server-owned approval artifact**——prepare 對完整 normalized payload 算 SHA-256 digest；apply 必須帶 action ID + 完整 digest，任何 stale／tampered／expired payload 在新 graph mutation 前拒絕
+5. **驗證與 no-clobber 閘門**——prepare/apply 共用 schema/permission/URL/canonical hash gate；內容衝突不碰圖、不覆寫檔案
+6. **容量、生命週期與敏感資料邊界**——單 action 5 MiB／10 文件、最多 50 個非終態 action／100 MiB staging、ready 30 天過期；status list 不回 report prose，所有 status 都不回 raw/extraction body
+7. **人工核准 + idempotent checkpoint**——`apply_research_action` 設 Needs-approval；每份圖完成後留下 exact extraction hash receipt，response loss／partial failure 用同 ID + digest 續跑
+8. **遠端無 Git**——MCP enumeration 沒有 finalize／commit／push；Git credential 不在 path bearer 的 blast radius。本機 publisher 才驗 master、空 index、ancestry、action trailer 與 exact pathset
+9. **本機綁定**——MCP server 只綁 127.0.0.1，唯一入口是 tunnel
 
-> **尚未解除的 P0：** `ENABLE_REMOTE_FINALIZE=false` 仍是部署預設，原因不只一項：Needs-approval 是 client-side UX，持有完整 MCP bearer URL 的直接呼叫者可繞過；`doc_ids` 由 client/session 累積，server 尚未簽發一次性 action receipt，因此久置 session 可能帶入過期 action state；`report_markdown` 仍是 client 組成的自由文字，server 能驗證 manifest，卻無法證明其中沒有轉述 `local_only` 內容；push 失敗後也尚無窄化的遠端 retry primitive。啟用前應改成 server-owned action ID + 一次性 capability、server-rendered structured report，以及只允許既有 commit 的 ancestry/pathspec 驗證後重推。未完成前，不把這個工具開給遠端使用。
+> **殘餘安全邊界：** digest 是 integrity，不是 authentication；Needs approval 是 client UX，不是 server auth。持有完整 MCP bearer URL 的直接呼叫者仍位於既有 graph-write 信任邊界內，可準備／載入錯誤資料，但拿不到 Git 能力。OAuth 2.1、短效且 audience-bound token 仍是後續安全升級；現階段先以最小 Neo4j 權限、路徑 token、action quota 與無 remote Git 壓低 blast radius。
 
 遠端 MCP 目前定位為「查研究資料、載入已核准證據」；部位 sizing 與 paper-portfolio append 尚未暴露成遠端工具。本機 Claude/Codex 可直接呼叫 Python 模組，手機／網頁端只能讀 `get_financial_checklist`，不能假裝已執行完整政策或模擬交易流程。
 
@@ -92,7 +96,7 @@ Token 或 Neo4j 密碼要輪換時：改 `.env` → 重啟 MCP server → 到 cl
 
 第一次部署或新增 SourceDoc 欄位後，須由 admin 重跑 `schema/neo4j_setup.cypher`。setup 會建立後立即刪除 sentinel，預註冊 `storage_permission`／`permission_basis` property-name tokens；`cloud_routine` 不需要、也不應取得 `CREATE NEW PROPERTY NAME` 權限。
 
-setup 最後也會寫入 `GraphSchemaState.version=2026-07-16-u3b`。`load_extraction` 在每次圖寫入前會用 routine 帳號讀取該版本，並確認沒有未投影 canonical edge、legacy 無 `edge_key` domain edge、或缺 `CITES` 的 Claim／EdgeAssertion；不通過時只留下可重試的 `pending_graph` provenance，不會繼續寫圖或取得 finalize receipt。
+setup 最後也會寫入 `GraphSchemaState.version=2026-07-16-u3b`。`load_extraction`／Research Action apply 在每次圖寫入前會用 routine 帳號讀取該版本，並確認沒有未投影 canonical edge、legacy 無 `edge_key` domain edge、或缺 `CITES` 的 Claim／EdgeAssertion；不通過時只留下可重試的 `pending_graph` provenance，不會把 action 標成 applied。
 
 ---
 
@@ -105,12 +109,18 @@ setup 最後也會寫入 `GraphSchemaState.version=2026-07-16-u3b`。`load_extra
 → `get_financial_checklist("SIVE.ST")` → 本機 Engine C 回五項清單與原始覆蓋數 → 查詢層套當前 policy；DB 無任何變動。
 
 **寫（例：手機上入圖）**
-→ 貼新聞給 App → `get_source_trace_manual` 追原文 → `get_extraction_rules` 讀 storage/intake 協定 → 一份文件一次 `load_extraction` → App 核准 → 本機先 no-clobber 保存 provenance，再寫圖／project conflict → 累積成功且 eligible 的 doc_ids → 行動結束一次 `finalize_research_action` → 再次 App 核准 → preflight → 報告 + 單一 commit + push。任一步失敗都回 pending／not_committed，不假裝完成。
+→ 貼新聞給 App → `get_source_trace_manual` 追原文 → `get_extraction_rules` 讀 storage/action 協定 → session 完成 research + 多文件 extraction + structured report → `prepare_research_action` 驗證並凍結 → App 顯示 exact review packet、停下來討論 → 使用者明確核准該 action ID → `apply_research_action` 觸發一次 native approval → server 鎖 digest、逐文件 filesystem-first／graph checkpoint、產 permission-safe report → 回 `applied` 或可續跑的 `partial`。全程不碰 Git。
+
+**本機補帳（例：週末開 Codex）**
+→ 說「補提交入圖」→ `python scripts/commit_pending_intake.py --dry-run` → 驗 master／空 index／origin ancestry → 每 action 一個 exact-path commit（ID + digest trailers）→ 整批一次 push。push 失敗保留 commits；下次由 ancestry + trailers 復原，不會掃入無關 working-tree files。
+
+**清理過期草稿**
+→ `python scripts/commit_pending_intake.py --cleanup-expired` → 只壓縮已過 30 天且從未套用的 private action payload；不碰圖與 Git。
 
 **不碰本機（例：「CPO 最近有什麼新聞？」）**
 → 純 web search，全程雲端，本機三個行程無感。
 
-**核心規律：讀圖 = 無副作用；載入 = 人工核准 + filesystem-first + 自動驗證；Git 收尾 = 另一個人工核准 + server kill switch + 同步 preflight。**
+**核心規律：研究／抽取 = session model；核准物 = server-owned immutable action；入圖 = 一次人工核准 + filesystem-first + 冪等 checkpoint；Git = 只在可信本機 session 延後批次發布。**
 
 ---
 
@@ -119,8 +129,11 @@ setup 最後也會寫入 `GraphSchemaState.version=2026-07-16-u3b`。`load_extra
 | 介面 | codebase 存取 | 圖譜存取 |
 |------|--------------|---------|
 | 本機 Claude Code session | 本來就在 repo 裡 | 直連 localhost |
+| 本機 Codex session | 本來就在 repo 裡 | 直連 localhost／讀 private action files |
 | Cloud routine（U7） | GitHub 連接後每次執行 **clone 整份 repo**（走 GitHub，不走 tunnel） | MCP connector |
-| 手機/網頁 App 對話 | **刻意不給**（只由 `get_source_trace_manual`／`get_extraction_rules` 回傳寫死的規則檔） | MCP connector |
+| Claude 手機／網頁 App 對話 | **刻意不給**（只由 rule/status tools 回傳必要規則與 action packet） | MCP connector |
+| ChatGPT web（full MCP 方案） | **刻意不給** | 同一 remote MCP app；tool snapshot 更新後需 Refresh |
+| ChatGPT mobile | 不適用 | OpenAI 目前不支援 custom MCP apps on mobile |
 
 ---
 
@@ -131,3 +144,5 @@ setup 最後也會寫入 `GraphSchemaState.version=2026-07-16-u3b`。`load_extra
 - cloudflared 預設日誌不記錄個別請求；驗證流量用本機 metrics 端點 `127.0.0.1:20241/metrics` 的 `cloudflared_tunnel_total_requests` 計數器
 - 無 watchdog：行程若 crash 不會自動重啟（開機自啟只在登入時跑一次）。目前接受此風險
 - Neo4j Python driver 的 write result 是 lazy：loader 必須 `consume()` 才能在 MCP 呼叫內暴露權限／commit 錯誤；`tests/test_sourcedoc.py` 固定此行為
+- [OpenAI 官方目前說明](https://help.openai.com/en/articles/12584461-developer-mode-apps-and-full-mcp-connectors-in-chatgpt-beta)：ChatGPT custom MCP apps 是 web-only；full write MCP 方案與 UI 仍在 beta。這不影響 action artifact 的 provider-neutral 設計，但手機前門現階段仍是 Claude App
+- ChatGPT workspace 會保存已核准 tool schema 的 frozen snapshot；server 新增／修改工具後必須由 admin Refresh actions（或依方案重建 app），否則 call 可能因 schema drift 失敗

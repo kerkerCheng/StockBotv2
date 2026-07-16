@@ -20,6 +20,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from mcp_server.intake import pending_intake_files
+from mcp_server.research_actions import count_action_states, iter_actions
 
 REPO = "kerkerCheng/StockBotv2"
 LABEL = "weekly-scan"
@@ -94,14 +95,30 @@ def _unpushed_intake_commits(root: Path = ROOT) -> int:
 
 def intake_pending_summary(root: Path = ROOT) -> dict:
     pending = pending_intake_files(root=root)
-    untracked = pending.get("untracked") or []
-    modified = pending.get("modified") or []
-    commits = _unpushed_intake_commits(root)
+    action_paths = {
+        path
+        for record in iter_actions(root=root)
+        if record.get("state") in {"applied", "committed_not_pushed"}
+        and record.get("git", {}).get("status")
+        in {"pending", "committed_not_pushed"}
+        for path in (record.get("git", {}).get("eligible_paths") or [])
+    }
+    untracked = sorted(set(pending.get("untracked") or []) - action_paths)
+    modified = sorted(set(pending.get("modified") or []) - action_paths)
+    action_counts = count_action_states(root=root)
+    all_commits = _unpushed_intake_commits(root)
+    legacy_commits = max(0, all_commits - action_counts["committed_not_pushed"])
     return {
         "untracked": untracked,
         "modified": modified,
-        "unpushed_commits": commits,
-        "total": len(untracked) + len(modified) + commits,
+        "unpushed_commits": legacy_commits,
+        "research_actions": action_counts,
+        "total": (
+            len(untracked)
+            + len(modified)
+            + legacy_commits
+            + action_counts["total"]
+        ),
     }
 
 
@@ -124,10 +141,30 @@ def main() -> int:
         )
     if backlog:
         parts.append(f"🔧 另有 {backlog} 個 backlog issue 開著（詳見 GitHub 或 plan 現況快照）")
-    if intake_summary["total"]:
+    actions = intake_summary["research_actions"]
+    action_parts = []
+    if actions["ready_for_approval"]:
+        action_parts.append(f"{actions['ready_for_approval']} 待核准")
+    if actions["partial_apply"]:
+        action_parts.append(f"{actions['partial_apply']} 部分入圖待續跑")
+    if actions["uncommitted"]:
+        action_parts.append(f"{actions['uncommitted']} 待本機 commit")
+    if actions["committed_not_pushed"]:
+        action_parts.append(f"{actions['committed_not_pushed']} 已 commit 待 push")
+    if action_parts:
         parts.append(
-            f"🗂 {intake_summary['total']} 筆遠端入圖待補 commit/push"
-            "（開 session 後說「補提交入圖」即可處理）"
+            "🧭 Research Actions: " + "；".join(action_parts)
+            + "（可說「查看待辦入圖」或「補提交入圖」）"
+        )
+    legacy_total = (
+        len(intake_summary["untracked"])
+        + len(intake_summary["modified"])
+        + intake_summary["unpushed_commits"]
+    )
+    if legacy_total:
+        parts.append(
+            f"🗂 {legacy_total} 筆舊版 intake ledger 待補 commit/push"
+            "（可說「補提交入圖」）"
         )
 
     print(json.dumps({"systemMessage": " ".join(parts)}, ensure_ascii=False))

@@ -19,6 +19,10 @@
    成功／冪等 matching 後才加 `loaded` label，並留言記錄 doc_ids 與結果。部分失敗不加 label，
    下次 routine 必須重試；已加 `loaded` 的 PR 永不重複處理。
 
+> 這個 merged-PR gate 暫時是明確保留的 legacy direct-load flow。不要把本週新草稿改呼叫
+> `apply_research_action`，也不要在沒有 merged PR 的情況用手機 Research Action 規則繞過 Stage 0；
+> weekly scan 會在另一個 migration slice 才切換。
+
 ### Stage 1 — Harvest（廣撒網）
 
 **主題面（theme-scoped）**——對每個活躍主題：

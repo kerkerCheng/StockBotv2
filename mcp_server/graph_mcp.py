@@ -1,10 +1,10 @@
 """
-graph_mcp.py — 把知識圖譜（Neo4j）包成 MCP server，供 claude.ai 各介面遠端讀寫。
+graph_mcp.py — 把知識圖譜（Neo4j）包成 MCP server，供支援 remote MCP 的介面讀寫。
 
 為什麼存在：Pro 方案的 cloud routine sandbox 出站網路無法直連自訂網域（U7a 四次
 實測確認），但 MCP connector 流量走 Anthropic 伺服器轉發、不受 sandbox 白名單
 限制。本 server 跑在本機常開機器上，走 Cloudflare Tunnel 暴露，掛成 claude.ai
-custom connector 後，cloud routine / 手機 App / 網頁對話都能讀寫圖。
+custom connector 後，Claude 手機／網頁與具 full-MCP 權限的 ChatGPT web 都能讀寫圖。
 見 docs/plans/2026-07-10-006-...-plan.md 的 U7d。
 
 安全設計（三層）：
@@ -17,12 +17,13 @@ custom connector 後，cloud routine / 手機 App / 網頁對話都能讀寫圖�
 - get_graph_context   — 公司子圖 / 產業全圖的 LLM-ready Markdown 摘要
 - run_read_query      — 唯讀 Cypher（探索用）
 - get_financial_checklist — Engine C 五項清單、原始覆蓋數與即時 policy view
-- get_extraction_rules — 遠端抽取與 intake/finalize 規則書
+- get_extraction_rules — 遠端抽取與 Research Action 規則書
 - get_source_trace_manual — 收到未驗證線索時端出完整追源路由與分級處置手冊
 - load_extraction     — 載入一份「先通過 schema 驗證」的抽取 JSON（L8 人工核准
-                        之後才會被呼叫；驗證不過就拒載，錯誤原样回傳）
-- finalize_research_action — 以 doc_ids manifest 精確建立報告、單一 commit 與 push；
-                             預設由 server-side kill switch 關閉
+                        之後才會被 legacy weekly/local flow 呼叫）
+- prepare_research_action — 驗證並凍結完整多文件 action，不寫圖
+- get_research_action_status — 跨 session 安全 review／恢復狀態
+- apply_research_action — 一次核准後冪等套用完整 action；永不執行 Git
 
 用法:
     python mcp_server/graph_mcp.py          # 讀 .env 的 GRAPH_MCP_TOKEN / PORT
@@ -40,6 +41,7 @@ import json
 import os
 import sys
 import tempfile
+from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -53,6 +55,7 @@ except ImportError:
 
 import neo4j
 from mcp.server.fastmcp import FastMCP
+from mcp.types import ToolAnnotations
 
 from query.graph_context import build_context
 from loader.validate import validate as validate_extraction
@@ -61,8 +64,10 @@ from loader.edge_resolution import project_edge_keys
 from mcp_server.intake import (
     MAX_EXTRACTION_CHARS,
     ROOT as INTAKE_ROOT,
+    canonical_extraction_hash,
     commit_and_push,
     git_preflight,
+    inspect_provenance,
     mark_graph_complete,
     pending_intake_files,
     publish_provenance,
@@ -70,8 +75,10 @@ from mcp_server.intake import (
     sanitize_source_url,
     validate_action_slug,
     validate_doc_id,
+    verify_graph_complete,
     write_report,
 )
+from mcp_server import research_actions
 from mcp_server.engine_c_tools import get_financial_checklist_core
 
 # ── 設定 ───────────────────────────────────────────────────────────────────────
@@ -155,8 +162,27 @@ mcp = FastMCP(
     streamable_http_path=f"/{TOKEN or 'unconfigured-token'}/mcp",  # 啟動前會驗 config
 )
 
+READ_ONLY_ANNOTATIONS = ToolAnnotations(
+    readOnlyHint=True,
+    destructiveHint=False,
+    idempotentHint=True,
+    openWorldHint=False,
+)
+ADDITIVE_ANNOTATIONS = ToolAnnotations(
+    readOnlyHint=False,
+    destructiveHint=False,
+    idempotentHint=True,
+    openWorldHint=False,
+)
+PREPARE_ANNOTATIONS = ToolAnnotations(
+    readOnlyHint=False,
+    destructiveHint=False,
+    idempotentHint=False,
+    openWorldHint=False,
+)
 
-@mcp.tool()
+
+@mcp.tool(annotations=READ_ONLY_ANNOTATIONS)
 def get_graph_context(company_id: str = "") -> str:
     """取得知識圖譜的 LLM-ready Markdown 摘要。
 
@@ -171,7 +197,7 @@ def get_graph_context(company_id: str = "") -> str:
         driver.close()
 
 
-@mcp.tool()
+@mcp.tool(annotations=READ_ONLY_ANNOTATIONS)
 def run_read_query(cypher: str) -> str:
     """對知識圖譜執行唯讀 Cypher 查詢，回傳 JSON 格式的結果（最多 50 筆）。
 
@@ -192,7 +218,7 @@ def run_read_query(cypher: str) -> str:
         driver.close()
 
 
-@mcp.tool()
+@mcp.tool(annotations=READ_ONLY_ANNOTATIONS)
 def get_financial_checklist(ticker: str) -> str:
     """查一個 ticker 的 Engine C 五項財務核驗清單（唯讀）。
 
@@ -209,7 +235,7 @@ def get_financial_checklist(ticker: str) -> str:
     )
 
 
-@mcp.tool()
+@mcp.tool(annotations=READ_ONLY_ANNOTATIONS)
 def get_extraction_rules() -> str:
     """取得撰寫抽取 JSON 前必讀的完整規則書。
 
@@ -217,7 +243,7 @@ def get_extraction_rules() -> str:
     完整欄位規格、vocab 白名單（node type / abstraction_level / relation 等）、
     節點 ID 命名慣例、L4 屬性歸位三問、以及 L6 反幻覺鐵律（具體型號/公司名
     必須逐字出現在 quote 中），以及 remote intake 的 storage permission、
-    filesystem-first、conflict 回報與 finalize 義務。不讀規則直接抽取，軟品質規則
+    filesystem-first、conflict 回報與 prepare/review/apply 義務。不讀規則直接抽取，軟品質規則
     無法靠 schema 驗證補救。
     """
     rules = (ROOT / "prompts" / "extract_system.md").read_text(encoding="utf-8")
@@ -228,7 +254,7 @@ def get_extraction_rules() -> str:
     return (
         "# 抽取規則書（prompts/extract_system.md）\n\n" + rules +
         "\n\n---\n\n# Vocab 白名單（schema/vocab.json）\n\n```json\n" + vocab + "\n```\n" +
-        "\n\n---\n\n# 遠端 Intake／Finalize 協定（prompts/intake_protocol.md）\n\n" +
+        "\n\n---\n\n# 遠端 Research Action 協定（prompts/intake_protocol.md）\n\n" +
         intake_protocol
     )
 
@@ -243,7 +269,7 @@ def _read_source_trace_manual(path: Path = SOURCE_TRACE_MANUAL) -> str:
         )
 
 
-@mcp.tool()
+@mcp.tool(annotations=READ_ONLY_ANNOTATIONS)
 def get_source_trace_manual() -> str:
     """取得未驗證線索進場前必讀的完整追源手冊。
 
@@ -255,7 +281,7 @@ def get_source_trace_manual() -> str:
     return _read_source_trace_manual()
 
 
-@mcp.tool()
+@mcp.tool(annotations=ADDITIVE_ANNOTATIONS)
 def load_extraction(
     extraction_json: str,
     storage_permission: str,
@@ -270,8 +296,8 @@ def load_extraction(
     extraction/raw no-clobber 落地，再冪等寫圖並重投影受影響的 edge conflicts。
     同 doc_id 不同內容嚴格拒絕；圖失敗時檔案保留為 pending_graph，可用完全相同
     payload 重試。回傳 open conflict 只代表某些 edge attributes 待決，不代表文件
-    載入失敗，遠端不可自行選值。研究行動結束後，僅把 finalize_eligible=true 且
-    status=loaded_or_already_complete 的 doc_id 傳給 finalize_research_action。
+    載入失敗，遠端不可自行選值。此 primitive 暫留給已有外部人工核准閘門的
+    weekly/local 流程；手機 ad hoc intake 必須使用 prepare/status/apply Research Action。
     """
     return json.dumps(
         _load_extraction_impl(
@@ -288,7 +314,7 @@ def load_extraction(
     )
 
 
-def _load_extraction_impl(
+def _prepare_extraction_impl(
     extraction_json: str,
     storage_permission: str,
     permission_basis: str,
@@ -298,6 +324,8 @@ def _load_extraction_impl(
     raw_excerpt: str | None = None,
     root: Path = INTAKE_ROOT,
 ) -> dict:
+    """Run the complete deterministic intake gate without publishing or writing graph."""
+
     if not isinstance(extraction_json, str):
         return {"status": "rejected", "error": "extraction_json 必須是 JSON 字串"}
     if len(extraction_json) > MAX_EXTRACTION_CHARS:
@@ -370,12 +398,63 @@ def _load_extraction_impl(
         if value is not None
     }
     try:
-        provenance = publish_provenance(
+        provenance = inspect_provenance(
             doc_id,
             doc,
             raw_payload,
             root=root,
         )
+    except (OSError, RuntimeError, ValueError) as exc:
+        return {
+            "status": "rejected",
+            "doc_id": doc_id,
+            "error": f"provenance validation rejected: {exc}",
+            "finalize_eligible": False,
+        }
+    if provenance["status"] == "conflict":
+        return {
+            "status": "rejected",
+            "doc_id": doc_id,
+            "error": f"provenance validation rejected: conflicts={provenance['conflicts']}",
+            "finalize_eligible": False,
+        }
+    return {
+        "status": "prepared",
+        "doc_id": doc_id,
+        "document": doc,
+        "raw_payload": provenance["normalised_raw"],
+        "provenance_status": provenance["status"],
+        "warnings": warnings,
+    }
+
+
+def _load_extraction_impl(
+    extraction_json: str,
+    storage_permission: str,
+    permission_basis: str,
+    *,
+    raw_text: str | None = None,
+    raw_url: str | None = None,
+    raw_excerpt: str | None = None,
+    root: Path = INTAKE_ROOT,
+) -> dict:
+    prepared = _prepare_extraction_impl(
+        extraction_json,
+        storage_permission,
+        permission_basis,
+        raw_text=raw_text,
+        raw_url=raw_url,
+        raw_excerpt=raw_excerpt,
+        root=root,
+    )
+    if prepared["status"] != "prepared":
+        return prepared
+    doc_id = prepared["doc_id"]
+    doc = prepared["document"]
+    raw_payload = prepared["raw_payload"]
+    warnings = prepared["warnings"]
+    try:
+        provenance = publish_provenance(doc_id, doc, raw_payload, root=root)
     except (OSError, RuntimeError, ValueError) as exc:
         return {
             "status": "rejected",
@@ -415,6 +494,7 @@ def _load_extraction_impl(
         "open_conflict_ids": projection["open_conflict_ids"],
         "stale_resolution_ids": projection["stale_resolution_ids"],
         "finalize_eligible": provenance["finalize_eligible"],
+        "extraction_sha256": canonical_extraction_hash(doc),
         "counts": {
             "nodes": len(doc.get("nodes", [])),
             "edges": len(doc.get("edges", [])),
@@ -422,6 +502,474 @@ def _load_extraction_impl(
         },
         "warnings": warnings,
     }
+
+
+def _safe_error_message(value: object) -> str:
+    message = str(value)
+    if TOKEN:
+        message = message.replace(TOKEN, "[redacted]")
+    message = message.replace("\r", " ").replace("\n", " ")
+    return message[:2_000]
+
+
+def _safe_load_result(result: dict) -> dict:
+    """Persist only bounded operational fields, never caller payloads."""
+
+    safe = {
+        key: result[key]
+        for key in (
+            "status",
+            "doc_id",
+            "resolved_paths",
+            "open_conflict_ids",
+            "stale_resolution_ids",
+            "finalize_eligible",
+            "extraction_sha256",
+            "counts",
+            "warnings",
+        )
+        if key in result
+    }
+    if result.get("error"):
+        safe["error"] = _safe_error_message(result["error"])
+    if result.get("problems"):
+        safe["problems"] = [
+            _safe_error_message(item) for item in (result.get("problems") or [])[:50]
+        ]
+    return safe
+
+
+def _prepare_research_action_impl(
+    action_json: str, *, root: Path = INTAKE_ROOT
+) -> dict:
+    try:
+        request = research_actions.parse_action_request(action_json)
+    except (ValueError, TypeError) as exc:
+        return {"status": "rejected", "error": _safe_error_message(exc)}
+
+    normalized_documents = []
+    for index, document in enumerate(request["documents"]):
+        prepared = _prepare_extraction_impl(
+            document["extraction_json"],
+            document["storage_permission"],
+            document["permission_basis"],
+            raw_text=document.get("raw_text"),
+            raw_url=document.get("raw_url"),
+            raw_excerpt=document.get("raw_excerpt"),
+            root=root,
+        )
+        if prepared["status"] != "prepared":
+            return {
+                "status": "rejected",
+                "document_index": index,
+                "doc_id": prepared.get("doc_id"),
+                "error": _safe_error_message(
+                    prepared.get("error") or "document validation failed"
+                ),
+                "problems": [
+                    _safe_error_message(item)
+                    for item in (prepared.get("problems") or [])[:50]
+                ],
+            }
+        normalized_documents.append(
+            {
+                "doc_id": prepared["doc_id"],
+                "extraction": prepared["document"],
+                "raw_payload": prepared["raw_payload"],
+                "storage_permission": document["storage_permission"],
+                "permission_basis": document["permission_basis"],
+                "validation_warnings": prepared["warnings"],
+            }
+        )
+
+    payload = {
+        "schema_version": research_actions.ACTION_PAYLOAD_SCHEMA,
+        "action_slug": request["action_slug"],
+        "report": request["report"],
+        "documents": normalized_documents,
+    }
+    try:
+        record = research_actions.create_action(payload, root=root)
+    except (OSError, RuntimeError, ValueError) as exc:
+        return {"status": "rejected", "error": _safe_error_message(exc)}
+    return {
+        "status": "ready",
+        "action_id": record["action_id"],
+        "action_digest": record["action_digest"],
+        "created_at": record["created_at"],
+        "expires_at": record["expires_at"],
+        "document_count": len(record["document_manifest"]),
+        "review_packet": research_actions.render_review_packet(record),
+        "next_action": (
+            "Show this exact server-rendered packet to the user. Do not call apply "
+            "until the user explicitly approves this action ID."
+        ),
+    }
+
+
+@mcp.tool(annotations=PREPARE_ANNOTATIONS)
+def prepare_research_action(action_json: str) -> str:
+    """驗證並凍結一個多文件 Research Action，但不寫圖、不寫 Git 帳本。
+
+    action_json 必須符合 research-action/v1。server 會重跑每份 extraction、permission、
+    raw policy、URL 與 no-clobber gate，再簽發 action_id + 完整 digest + review packet。
+    呼叫端必須把 packet 顯示給使用者並等待明確核准，不能在同一輪自動 apply。
+    """
+
+    return json.dumps(
+        _prepare_research_action_impl(action_json),
+        ensure_ascii=False,
+        default=str,
+        indent=2,
+    )
+
+
+def _get_research_action_status_impl(
+    action_id: str = "", *, root: Path = INTAKE_ROOT
+) -> dict:
+    try:
+        if not action_id:
+            return research_actions.list_action_statuses(root=root)
+        return research_actions.action_status(action_id, root=root)
+    except FileNotFoundError:
+        return {"status": "not_found", "action_id": action_id}
+    except (OSError, ValueError) as exc:
+        return {
+            "status": "rejected",
+            "action_id": action_id,
+            "error": _safe_error_message(exc),
+        }
+
+
+@mcp.tool(annotations=READ_ONLY_ANNOTATIONS)
+def get_research_action_status(action_id: str = "") -> str:
+    """跨 session 查 Research Action；空 ID 只列安全摘要，完整 ID 回 review packet。
+
+    永不回傳 raw body 或 extraction JSON。list mode 也不回 client-authored report prose；
+    status 本身不 compact、不 apply，保持真正 read-only。
+    """
+
+    return json.dumps(
+        _get_research_action_status_impl(action_id),
+        ensure_ascii=False,
+        default=str,
+        indent=2,
+    )
+
+
+def _stored_extraction_for_action(document: dict, *, root: Path) -> dict:
+    doc_id = validate_doc_id(document["doc_id"])
+    if document["storage_permission"] == "local_only":
+        path = root / "library" / "private" / "extractions" / f"{doc_id}.json"
+    else:
+        path = root / "extractions" / f"{doc_id}.json"
+    if not path.exists():
+        raise ValueError(f"stored extraction missing for completed doc_id: {doc_id}")
+    try:
+        extraction = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ValueError(f"stored extraction invalid for completed doc_id: {doc_id}") from exc
+    if extraction.get("source_doc", {}).get("doc_id") != doc_id:
+        raise ValueError(f"stored extraction doc_id mismatch: {doc_id}")
+    return extraction
+
+
+def _verify_action_document_receipt(
+    document: dict, execution: dict, *, root: Path
+) -> None:
+    if execution.get("status") != "complete":
+        raise ValueError(f"document checkpoint is incomplete: {document['doc_id']}")
+    result = execution.get("result") or {}
+    extraction = _stored_extraction_for_action(document, root=root)
+    expected_hash = result.get("extraction_sha256")
+    if expected_hash != canonical_extraction_hash(extraction):
+        raise ValueError(f"document checkpoint hash mismatch: {document['doc_id']}")
+    verify_graph_complete(document["doc_id"], extraction, root=root)
+
+
+def _verify_completed_action(record: dict, *, root: Path) -> None:
+    for document, execution in zip(
+        record["document_manifest"], record["execution"]["documents"], strict=True
+    ):
+        _verify_action_document_receipt(document, execution, root=root)
+    research_actions.verify_action_reports(record, root=root)
+
+
+def _apply_response(record: dict, *, replayed: bool = False) -> dict:
+    result = dict(record.get("final_result") or {})
+    if not result:
+        result = {
+            "status": record["state"],
+            "action_id": record["action_id"],
+            "action_digest": record["action_digest"],
+        }
+    result["state"] = record["state"]
+    result["git_status"] = record.get("git", {}).get("status")
+    if replayed:
+        result["replayed"] = True
+    return result
+
+
+def _apply_research_action_impl(
+    action_id: str,
+    action_digest: str,
+    *,
+    root: Path = INTAKE_ROOT,
+    load_document=None,
+) -> dict:
+    try:
+        research_actions.validate_action_id(action_id)
+        research_actions.validate_action_digest(action_digest)
+    except ValueError as exc:
+        return {"status": "rejected", "error": _safe_error_message(exc)}
+    loader = load_document or _load_extraction_impl
+
+    try:
+        lock = research_actions.action_lock(action_id, root=root)
+        with lock:
+            try:
+                record = research_actions.read_action(action_id, root=root)
+            except FileNotFoundError:
+                return {"status": "not_found", "action_id": action_id}
+            except (OSError, ValueError):
+                return {
+                    "status": "rejected",
+                    "action_id": action_id,
+                    "error": "Research Action record failed integrity validation",
+                }
+
+            if record["action_digest"] != action_digest:
+                return {
+                    "status": "rejected",
+                    "action_id": action_id,
+                    "error": "action_digest mismatch; no graph mutation occurred",
+                }
+
+            if record["state"] in {"applied", "committed_not_pushed", "pushed"}:
+                try:
+                    _verify_completed_action(record, root=root)
+                except (OSError, ValueError) as exc:
+                    return {
+                        "status": "rejected",
+                        "action_id": action_id,
+                        "error": _safe_error_message(exc),
+                    }
+                return _apply_response(record, replayed=True)
+
+            if record["state"] == "expired":
+                return {
+                    "status": "expired",
+                    "action_id": action_id,
+                    "error": "prepare a fresh Research Action before approval",
+                }
+            if record["state"] == "ready" and _parse_action_time(
+                record["expires_at"]
+            ) <= datetime.now(timezone.utc):
+                return {
+                    "status": "expired",
+                    "action_id": action_id,
+                    "error": "prepare a fresh Research Action before approval",
+                }
+            if record.get("payload") is None:
+                return {
+                    "status": "rejected",
+                    "action_id": action_id,
+                    "error": "Research Action payload is unavailable",
+                }
+
+            if record["state"] == "applying":
+                record["state"] = (
+                    "partial"
+                    if any(
+                        item.get("status") == "complete"
+                        for item in record["execution"]["documents"]
+                    )
+                    else "ready"
+                )
+            record["state"] = "applying"
+            record["execution"]["last_error"] = None
+            record = research_actions.save_action(record, root=root)
+
+            for index, document in enumerate(record["payload"]["documents"]):
+                execution = record["execution"]["documents"][index]
+                if execution.get("status") == "complete":
+                    try:
+                        _verify_action_document_receipt(
+                            record["document_manifest"][index], execution, root=root
+                        )
+                    except (OSError, ValueError):
+                        execution["status"] = "pending"
+                        execution["result"] = None
+                    else:
+                        continue
+                try:
+                    result = loader(
+                        json.dumps(document["extraction"], ensure_ascii=False),
+                        document["storage_permission"],
+                        document["permission_basis"],
+                        root=root,
+                        **document["raw_payload"],
+                    )
+                except Exception as exc:
+                    result = {
+                        "status": "internal_error",
+                        "doc_id": document["doc_id"],
+                        "error": type(exc).__name__,
+                    }
+                safe_result = _safe_load_result(result)
+                execution["result"] = safe_result
+                if result.get("status") == "loaded_or_already_complete":
+                    execution["status"] = "complete"
+                    execution["completed_at"] = datetime.now(timezone.utc).isoformat()
+                    record = research_actions.save_action(record, root=root)
+                    continue
+                execution["status"] = "failed"
+                record["state"] = "partial"
+                record["execution"]["last_error"] = {
+                    "code": "document_not_complete",
+                    "doc_id": document["doc_id"],
+                    "message": safe_result.get("error") or result.get("status"),
+                }
+                record = research_actions.save_action(record, root=root)
+                return {
+                    "status": "partial",
+                    "action_id": action_id,
+                    "action_digest": action_digest,
+                    "completed_document_count": sum(
+                        item.get("status") == "complete"
+                        for item in record["execution"]["documents"]
+                    ),
+                    "document_count": len(record["execution"]["documents"]),
+                    "failed_doc_id": document["doc_id"],
+                    "error": record["execution"]["last_error"],
+                    "next_action": "Retry the same action ID and digest after recovery.",
+                }
+
+            try:
+                for manifest_document, execution in zip(
+                    record["document_manifest"],
+                    record["execution"]["documents"],
+                    strict=True,
+                ):
+                    _verify_action_document_receipt(
+                        manifest_document, execution, root=root
+                    )
+            except (OSError, ValueError) as exc:
+                record["state"] = "partial"
+                record["execution"]["last_error"] = {
+                    "code": "document_receipt_invalid",
+                    "message": _safe_error_message(exc),
+                }
+                research_actions.save_action(record, root=root)
+                return {
+                    "status": "partial",
+                    "action_id": action_id,
+                    "action_digest": action_digest,
+                    "completed_document_count": sum(
+                        item.get("status") == "complete"
+                        for item in record["execution"]["documents"]
+                    ),
+                    "document_count": len(record["execution"]["documents"]),
+                    "error": record["execution"]["last_error"],
+                    "next_action": "Repair the durable document receipt, then retry exactly.",
+                }
+
+            try:
+                report = research_actions.publish_action_reports(record, root=root)
+            except (OSError, RuntimeError, ValueError) as exc:
+                record["state"] = "partial"
+                record["execution"]["report"] = {"status": "failed"}
+                record["execution"]["last_error"] = {
+                    "code": "report_publish_failed",
+                    "message": _safe_error_message(exc),
+                }
+                research_actions.save_action(record, root=root)
+                return {
+                    "status": "partial",
+                    "action_id": action_id,
+                    "action_digest": action_digest,
+                    "completed_document_count": len(record["execution"]["documents"]),
+                    "document_count": len(record["execution"]["documents"]),
+                    "error": record["execution"]["last_error"],
+                    "next_action": "Retry the same action; completed documents will not reload.",
+                }
+
+            record["execution"]["report"] = report
+            research_actions.verify_action_reports(record, root=root)
+            eligible_paths = research_actions.eligible_action_paths(record)
+            record["git"]["eligible_paths"] = eligible_paths
+            record["git"]["status"] = "pending" if eligible_paths else "not_required"
+            record["state"] = "applied"
+            record["applied_at"] = datetime.now(timezone.utc).isoformat()
+            conflict_ids = sorted(
+                {
+                    conflict_id
+                    for item in record["execution"]["documents"]
+                    for conflict_id in (
+                        (item.get("result") or {}).get("open_conflict_ids") or []
+                    )
+                }
+            )
+            record["final_result"] = {
+                "status": "applied",
+                "action_id": action_id,
+                "action_digest": action_digest,
+                "document_count": len(record["execution"]["documents"]),
+                "open_conflict_ids": conflict_ids,
+                "report": report,
+                "git_status": record["git"]["status"],
+                "next_action": (
+                    "Open a local session and publish pending intake."
+                    if eligible_paths
+                    else "No Git publication is required for this local-only action."
+                ),
+            }
+            record = research_actions.compact_applied_payload(record)
+            record = research_actions.save_action(record, root=root)
+            return _apply_response(record)
+    except research_actions.ActionBusyError:
+        return {
+            "status": "busy",
+            "action_id": action_id,
+            "error": "another apply is in progress; query status before retrying",
+        }
+    except Exception as exc:
+        message = (
+            _safe_error_message(exc)
+            if isinstance(exc, (OSError, RuntimeError, ValueError, KeyError, TypeError))
+            else type(exc).__name__
+        )
+        return {
+            "status": "partial",
+            "action_id": action_id,
+            "action_digest": action_digest,
+            "error": {"code": "action_apply_internal", "message": message},
+            "next_action": "Query status, then retry the same action ID and digest.",
+        }
+
+
+def _parse_action_time(value: str) -> datetime:
+    parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    if parsed.tzinfo is None:
+        raise ValueError("Research Action timestamp has no timezone")
+    return parsed.astimezone(timezone.utc)
+
+
+@mcp.tool(annotations=ADDITIVE_ANNOTATIONS)
+def apply_research_action(action_id: str, action_digest: str) -> str:
+    """在一次 native approval 後套用使用者核准的完整 Research Action。
+
+    必須傳 prepare/status 顯示的 server action_id 與完整 digest。server 會鎖定、重新驗
+    digest、逐文件 checkpoint、冪等續跑並依 permission 寫報告；本工具永遠不執行 Git。
+    digest 不符、過期、被竄改或 live concurrent apply 都在任何新 graph mutation 前拒絕。
+    """
+
+    return json.dumps(
+        _apply_research_action_impl(action_id, action_digest),
+        ensure_ascii=False,
+        default=str,
+        indent=2,
+    )
 
 
 def _verify_loaded_doc(driver, doc: dict) -> None:
@@ -487,14 +1035,6 @@ _REQUIRED_REPORT_SECTIONS = (
     "搜尋過程摘要",
     "L8 確認備註",
 )
-
-
-def _remote_finalize_enabled() -> bool:
-    return os.environ.get("ENABLE_REMOTE_FINALIZE", "").strip().casefold() in {
-        "1",
-        "true",
-        "yes",
-    }
 
 
 def _finalize_research_action_impl(
@@ -599,36 +1139,6 @@ def _finalize_research_action_impl(
         "committed_paths": git_result.get("paths") or [],
         "pending_warning": pending_warning,
     }
-
-
-@mcp.tool()
-def finalize_research_action(
-    report_markdown: str,
-    action_slug: str,
-    commit_headline: str,
-    doc_ids: list[str],
-) -> str:
-    """完成一次遠端研究行動：報告、精確 pathspec commit、push。
-
-    四個參數皆必填。只接受本次 load_extraction 成功回傳且
-    finalize_eligible=true 的 doc_ids；server 會重新查落地 permission，不信任 client。
-    任何 local_only、非 master、staged index、HEAD 與 origin/master 不同步或 fetch
-    失敗都在寫報告前 fail closed。push 失敗保留 local commit。此工具預設由
-    ENABLE_REMOTE_FINALIZE kill switch 關閉；啟用前必須在 connector 設 Needs approval。
-    """
-    return json.dumps(
-        _finalize_research_action_impl(
-            report_markdown,
-            action_slug,
-            commit_headline,
-            doc_ids,
-            enabled=_remote_finalize_enabled(),
-        ),
-        ensure_ascii=False,
-        default=str,
-        indent=2,
-    )
-
 
 if __name__ == "__main__":
     try:
