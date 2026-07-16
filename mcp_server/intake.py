@@ -16,6 +16,12 @@ from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 ROOT = Path(__file__).resolve().parent.parent
 MAX_RAW_CHARS = 200_000
+MAX_LOCAL_RAW_CHARS = 2_000_000
+MAX_EXCERPT_CHARS = 50_000
+MAX_EXTRACTION_CHARS = 1_000_000
+MAX_PERMISSION_BASIS_CHARS = 2_000
+MAX_REPORT_CHARS = 200_000
+GRAPH_COMPLETION_SCHEMA = "1"
 IDENTIFIER_RE = re.compile(r"^[a-z0-9_-]{1,64}$")
 STORAGE_PERMISSIONS = {"repo_full", "repo_excerpt", "local_only"}
 LEDGER_PREFIXES = ("library/raw/", "extractions/", "library/intake/")
@@ -51,6 +57,8 @@ def validate_storage_permission(permission: str, basis: str) -> str:
         raise ValueError(f"invalid storage_permission: {permission!r}")
     if not isinstance(basis, str) or not basis.strip():
         raise ValueError("permission_basis is required")
+    if len(basis) > MAX_PERMISSION_BASIS_CHARS:
+        raise ValueError("permission_basis exceeds 2,000 characters")
     if basis.strip().casefold() in FORBIDDEN_BASIS_ONLY:
         raise ValueError("permission_basis cannot be only a paid/free label")
     return permission
@@ -128,6 +136,10 @@ def _normalise_raw_payload(permission: str, raw_payload: dict | None) -> dict:
         )
     if permission == "repo_excerpt" and raw_text is not None:
         raise ValueError("repo_excerpt forbids full raw_text; use raw_url + raw_excerpt")
+    if raw_text is not None and len(raw_text) > MAX_LOCAL_RAW_CHARS:
+        raise ValueError("raw_text exceeds the 2,000,000 character intake limit")
+    if raw_excerpt is not None and len(raw_excerpt) > MAX_EXCERPT_CHARS:
+        raise ValueError("raw_excerpt exceeds 50,000 characters")
     return normalised
 
 
@@ -163,6 +175,8 @@ def _prepare(
     )
     normalised_raw = _normalise_raw_payload(permission, raw_payload)
     extraction_text = json.dumps(prepared, ensure_ascii=False, indent=2) + "\n"
+    if len(extraction_text) > MAX_EXTRACTION_CHARS:
+        raise ValueError("extraction exceeds 1,000,000 characters")
     return prepared, normalised_raw, extraction_text, _raw_artifact_text(normalised_raw)
 
 
@@ -176,6 +190,10 @@ def _target_paths(doc_id: str, permission: str, root: Path) -> tuple[Path, Path]
         root / "extractions" / f"{doc_id}.json",
         root / "library" / "raw" / f"{doc_id}.txt",
     )
+
+
+def _graph_completion_path(doc_id: str, root: Path) -> Path:
+    return root / "library" / "private" / "intake_state" / f"{doc_id}.json"
 
 
 def _inside(path: Path, parent: Path) -> bool:
@@ -204,6 +222,11 @@ def inspect_provenance(
     extraction_path, raw_path = _target_paths(doc_id, permission, root)
     conflicts: list[str] = []
     missing: list[str] = []
+
+    alternate_permission = "repo_full" if permission == "local_only" else "local_only"
+    alternate_extraction, _ = _target_paths(doc_id, alternate_permission, root)
+    if alternate_extraction.exists():
+        conflicts.append(_relative(alternate_extraction, root))
 
     if extraction_path.exists():
         try:
@@ -291,6 +314,50 @@ def publish_provenance(
     return {**final, "status": "published", "doc_id": doc_id}
 
 
+def mark_graph_complete(
+    doc_id: str,
+    extraction: dict,
+    *,
+    root: Path = ROOT,
+) -> dict:
+    """Persist a local server-owned receipt after graph verify and projection."""
+
+    validate_doc_id(doc_id)
+    if not isinstance(extraction, dict):
+        raise ValueError("extraction must be an object")
+    source_doc = extraction.get("source_doc")
+    if not isinstance(source_doc, dict) or source_doc.get("doc_id") != doc_id:
+        raise ValueError("completion receipt doc_id mismatch")
+    receipt = {
+        "schema_version": GRAPH_COMPLETION_SCHEMA,
+        "doc_id": doc_id,
+        "extraction_sha256": canonical_extraction_hash(extraction),
+    }
+    path = _graph_completion_path(doc_id, root)
+    _atomic_publish(path, json.dumps(receipt, sort_keys=True, separators=(",", ":")) + "\n")
+    return receipt
+
+
+def verify_graph_complete(doc_id: str, extraction: dict, *, root: Path = ROOT) -> dict:
+    """Require a server-owned receipt bound to the exact stored extraction."""
+
+    path = _graph_completion_path(doc_id, root)
+    if not path.exists() or not _inside(path, root / "library" / "private" / "intake_state"):
+        raise ValueError(f"graph completion receipt not found for doc_id: {doc_id}")
+    try:
+        receipt = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ValueError(f"invalid graph completion receipt for doc_id: {doc_id}") from exc
+    expected = canonical_extraction_hash(extraction)
+    if (
+        receipt.get("schema_version") != GRAPH_COMPLETION_SCHEMA
+        or receipt.get("doc_id") != doc_id
+        or receipt.get("extraction_sha256") != expected
+    ):
+        raise ValueError(f"stale graph completion receipt for doc_id: {doc_id}")
+    return receipt
+
+
 def resolve_action_paths(doc_ids: list[str], *, root: Path = ROOT) -> dict:
     if not doc_ids:
         return {"doc_ids": [], "paths": [], "documents": []}
@@ -316,6 +383,7 @@ def resolve_action_paths(doc_ids: list[str], *, root: Path = ROOT) -> dict:
         )
         if permission == "local_only":
             raise ValueError(f"manifest contains local_only doc_id: {doc_id}")
+        verify_graph_complete(doc_id, extraction, root=root)
         extraction_relative = _relative(repo_path, root)
         paths.append(extraction_relative)
         raw_path = root / "library" / "raw" / f"{doc_id}.txt"
@@ -393,6 +461,8 @@ def write_report(slug: str, report_markdown: str, *, root: Path = ROOT) -> Path:
     validate_action_slug(slug)
     if not isinstance(report_markdown, str) or not report_markdown.strip():
         raise ValueError("report_markdown is required")
+    if len(report_markdown) > MAX_REPORT_CHARS:
+        raise ValueError("report_markdown exceeds 200,000 characters")
     recorded_at = datetime.now(timezone.utc)
     report_root = root / "library" / "intake"
     report_root.mkdir(parents=True, exist_ok=True)
@@ -474,13 +544,29 @@ def commit_and_push(
     preflight = git_preflight(root=root)
     if not preflight["ok"]:
         return {"status": "not_committed", "preflight": preflight, "paths": exact_paths}
+    staged = False
     try:
         added = _run_git(["add", "--", *exact_paths], root=root)
         if added.returncode != 0:
             return {"status": "not_committed", "error": added.stderr.strip(), "paths": exact_paths}
+        staged = True
         committed = _run_git(["commit", "-m", message], root=root, timeout=30)
         if committed.returncode != 0:
-            return {"status": "not_committed", "error": committed.stderr.strip(), "paths": exact_paths}
+            current = _run_git(["rev-parse", "HEAD"], root=root)
+            if current.returncode == 0 and current.stdout.strip() != preflight["head"]:
+                return {
+                    "status": "committed_not_pushed",
+                    "commit": current.stdout.strip(),
+                    "error": committed.stderr.strip(),
+                    "paths": exact_paths,
+                }
+            unstaged = _run_git(["restore", "--staged", "--", *exact_paths], root=root)
+            return {
+                "status": "not_committed",
+                "error": committed.stderr.strip(),
+                "cleanup_error": unstaged.stderr.strip() if unstaged.returncode else None,
+                "paths": exact_paths,
+            }
         commit_hash = _run_git(["rev-parse", "HEAD"], root=root).stdout.strip()
         pushed = _run_git(["push", "origin", "master"], root=root, timeout=60)
         if pushed.returncode != 0:
@@ -496,4 +582,26 @@ def commit_and_push(
             "paths": exact_paths,
         }
     except (OSError, subprocess.SubprocessError) as exc:
-        return {"status": "not_committed", "error": str(exc), "paths": exact_paths}
+        cleanup_error = None
+        if staged:
+            try:
+                current = _run_git(["rev-parse", "HEAD"], root=root)
+                if current.returncode == 0 and current.stdout.strip() != preflight["head"]:
+                    return {
+                        "status": "committed_not_pushed",
+                        "commit": current.stdout.strip(),
+                        "error": str(exc),
+                        "paths": exact_paths,
+                    }
+                unstaged = _run_git(
+                    ["restore", "--staged", "--", *exact_paths], root=root
+                )
+                cleanup_error = unstaged.stderr.strip() if unstaged.returncode else None
+            except (OSError, subprocess.SubprocessError) as cleanup_exc:
+                cleanup_error = str(cleanup_exc)
+        return {
+            "status": "not_committed",
+            "error": str(exc),
+            "cleanup_error": cleanup_error,
+            "paths": exact_paths,
+        }

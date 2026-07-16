@@ -6,9 +6,10 @@ import csv
 import hashlib
 import json
 import math
+import os
 import re
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Iterable, Mapping
 
@@ -46,6 +47,7 @@ ALL_EVENT_TYPES = TRADE_TYPES | AMENDMENT_TYPES
 _CURRENCY = re.compile(r"^[A-Z]{3}$")
 _TICKER = re.compile(r"^[A-Z0-9.^_-]{1,20}$")
 _EPSILON = 1e-9
+_APPEND_CLOCK_TOLERANCE = timedelta(minutes=5)
 
 
 class LedgerError(ValueError):
@@ -136,16 +138,29 @@ def initialize_portfolio(
         "fx_source": "engine_c_or_explicit_snapshot",
         "default_benchmark_ticker": benchmark,
     }
-    config_path.write_text(
-        json.dumps(config, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
-    )
     if transactions_path.exists() and transactions_path.stat().st_size:
         with transactions_path.open("r", encoding="utf-8", newline="") as handle:
             if next(csv.reader(handle), []) != EVENT_FIELDS:
                 raise LedgerError("transactions.csv header does not match schema")
     else:
-        with transactions_path.open("x", encoding="utf-8", newline="") as handle:
+        mode = "w" if transactions_path.exists() else "x"
+        with transactions_path.open(mode, encoding="utf-8", newline="") as handle:
             csv.DictWriter(handle, fieldnames=EVENT_FIELDS).writeheader()
+            handle.flush()
+            os.fsync(handle.fileno())
+
+    # Publish initialized config only after the ledger is known-good. os.replace
+    # keeps readers from observing a partially written JSON document.
+    temporary = config_path.with_name(f".{config_path.name}.{uuid.uuid4().hex}.tmp")
+    try:
+        with temporary.open("x", encoding="utf-8", newline="\n") as handle:
+            handle.write(json.dumps(config, ensure_ascii=False, indent=2) + "\n")
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temporary, config_path)
+    finally:
+        if temporary.exists():
+            temporary.unlink()
     return config
 
 
@@ -273,14 +288,12 @@ def create_event(
     decision_author: str,
     benchmark_ticker: str | None = None,
     corrects_event_id: str | None = None,
-    event_id: str | None = None,
-    timestamp_utc: str | None = None,
 ) -> dict[str, str]:
     """Create a CSV-ready event with program-generated identity and UTC time."""
 
     return {
-        "event_id": event_id or f"evt_{uuid.uuid4().hex}",
-        "timestamp_utc": timestamp_utc or datetime.now(timezone.utc).isoformat(),
+        "event_id": f"evt_{uuid.uuid4().hex}",
+        "timestamp_utc": datetime.now(timezone.utc).isoformat(),
         "ticker": ticker.upper(),
         "event_type": event_type,
         "target_weight": str(target_weight),
@@ -414,18 +427,24 @@ def replay(events: Iterable[Mapping[str, Any]], *, root: str | Path = ROOT) -> d
     for event in _effective_events(events):
         ticker = event["ticker"]
         position = positions.get(ticker)
-        old_target = position["target_weight"] if position else 0.0
+        decision = event["policy_decision_object"]
+        decision_nav = _positive_number(
+            decision.get("total_nav"), "policy_decision.total_nav"
+        )
+        base_price = event["price_number"] * event["fx_rate_number"]
+        old_units = position["units"] if position else 0.0
+        prior_weight = (old_units * base_price) / decision_nav
         target = event["target_weight_number"]
         changed = event["changed_weight_number"]
         inferred = (
             "open"
-            if old_target == 0 and target > 0
+            if old_units == 0 and target > 0
             else "close"
-            if old_target > 0 and target == 0
+            if old_units > 0 and target == 0
             else "add"
-            if target > old_target
+            if target > prior_weight
             else "trim"
-            if 0 <= target < old_target
+            if 0 <= target < prior_weight
             else "invalid"
         )
         declared = event["event_type"]
@@ -435,26 +454,19 @@ def replay(events: Iterable[Mapping[str, Any]], *, root: str | Path = ROOT) -> d
             raise LedgerError(
                 f"illegal state transition for {ticker}: declared={event['event_type']}, inferred={inferred}"
             )
-        if not math.isclose(changed, target - old_target, abs_tol=_EPSILON):
+        if not math.isclose(changed, target - prior_weight, abs_tol=_EPSILON):
             raise LedgerError(f"changed_weight does not reconcile for {ticker}")
 
-        decision = event["policy_decision_object"]
-        if decision.get("eligible_to_open") is False and target > old_target:
+        if decision.get("eligible_to_open") is False and target > prior_weight:
             raise LedgerError("policy decision does not allow increasing the position")
         maximum = _positive_number(
             decision.get("maximum_position"), "policy_decision.maximum_position", allow_zero=True
         )
-        if initial_nav * target > maximum + _EPSILON:
+        if decision_nav * target > maximum + _EPSILON:
             raise LedgerError(f"target_weight exceeds frozen policy decision for {ticker}")
 
-        base_price = event["price_number"] * event["fx_rate_number"]
-        old_units = position["units"] if position else 0.0
-        delta_units = (
-            -old_units
-            if inferred == "close"
-            else (initial_nav * changed) / base_price
-        )
-        desired_units = old_units + delta_units
+        desired_units = (decision_nav * target) / base_price
+        delta_units = desired_units - old_units
         if desired_units < -_EPSILON:
             raise LedgerError("trim exceeds units held")
         desired_units = max(0.0, desired_units)
@@ -504,32 +516,46 @@ def append_event(event: Mapping[str, Any], *, root: str | Path = ROOT) -> dict[s
 
     existing = read_events(root)
     normalized = _validate_event_shape(event)
-    current_policy = load_policy()
-    if normalized["policy_version"] != current_policy["policy_version"]:
-        raise LedgerError("new events must use the current investment policy_version")
-    config = load_config(root)
+    now = datetime.now(timezone.utc)
+    if abs(now - normalized["parsed_timestamp"]) > _APPEND_CLOCK_TOLERANCE:
+        raise LedgerError("new events must use the current program-generated timestamp")
     decision = normalized["policy_decision_object"]
-    try:
-        if not math.isclose(float(decision["total_nav"]), config["initial_nav"], abs_tol=_EPSILON):
-            raise LedgerError("policy decision NAV must match paper portfolio initial_nav")
-        recomputed = calculate_position_limit(
-            total_nav=decision["total_nav"],
-            high_risk_budget=decision["high_risk_budget"],
-            conviction=decision["input_conviction"],
-            analyst_coverage_count=decision["coverage_view"]["analyst_coverage_count"],
-            policy=current_policy,
-        )
-    except (KeyError, TypeError, ValueError) as exc:
-        raise LedgerError("policy_decision lacks reproducible sizing inputs") from exc
-    for key in (
-        "policy_version",
-        "eligible_to_open",
-        "effective_conviction",
-        "conviction_coefficient",
-        "maximum_position",
-    ):
-        if recomputed[key] != decision.get(key):
-            raise LedgerError(f"policy_decision does not reproduce current policy: {key}")
+    if normalized["event_type"] in AMENDMENT_TYPES:
+        originals = {
+            original["event_id"]: _validate_event_shape(original)
+            for original in existing
+            if original["event_type"] in TRADE_TYPES
+        }
+        target = originals.get(normalized["corrects_event_id"])
+        if target is None:
+            raise LedgerError("amendment must reference an earlier original trade event")
+        if normalized["policy_version"] != target["policy_version"]:
+            raise LedgerError("amendment must retain the original policy_version")
+        if decision != target["policy_decision_object"]:
+            raise LedgerError("amendment must retain the original frozen policy decision")
+    else:
+        current_policy = load_policy()
+        if normalized["policy_version"] != current_policy["policy_version"]:
+            raise LedgerError("new trades must use the current investment policy_version")
+        try:
+            recomputed = calculate_position_limit(
+                total_nav=decision["total_nav"],
+                high_risk_budget=decision["high_risk_budget"],
+                conviction=decision["input_conviction"],
+                analyst_coverage_count=decision["coverage_view"]["analyst_coverage_count"],
+                policy=current_policy,
+            )
+        except (KeyError, TypeError, ValueError) as exc:
+            raise LedgerError("policy_decision lacks reproducible sizing inputs") from exc
+        for key in (
+            "policy_version",
+            "eligible_to_open",
+            "effective_conviction",
+            "conviction_coefficient",
+            "maximum_position",
+        ):
+            if recomputed[key] != decision.get(key):
+                raise LedgerError(f"policy_decision does not reproduce current policy: {key}")
     state = replay([*existing, event], root=root)
     _, transactions_path = _root_paths(root)
     with transactions_path.open("a", encoding="utf-8", newline="") as handle:

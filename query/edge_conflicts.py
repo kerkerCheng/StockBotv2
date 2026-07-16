@@ -44,6 +44,25 @@ RETURN assertion.id AS id,
 ORDER BY assertion.edge_key, assertion.id
 """
 
+_Q_ASSERTIONS_FOR_EDGES = """
+MATCH (assertion:EdgeAssertion)
+WHERE assertion.edge_key IN $edge_keys
+OPTIONAL MATCH (assertion)-[:CITES]->(source_doc:SourceDoc)
+RETURN assertion.id AS id,
+       assertion.edge_key AS edge_key,
+       assertion.src_id AS src_id,
+       assertion.relation AS relation,
+       assertion.dst_id AS dst_id,
+       assertion.attributes AS attributes_json,
+       assertion.confidence AS confidence,
+       assertion.source_ids AS source_ids,
+       assertion.source_doc_id AS source_doc_id,
+       source_doc.origin_entity AS origin_entity,
+       source_doc.evidence_tier AS evidence_tier,
+       source_doc.published_at AS published_at
+ORDER BY assertion.edge_key, assertion.id
+"""
+
 
 def canonical_json(value) -> str:
     return json.dumps(
@@ -70,11 +89,17 @@ def _candidate_set_hash(candidates: list[dict]) -> str:
     return hashlib.sha256(canonical_json(identity).encode("utf-8")).hexdigest()
 
 
-def fetch_assertions(session) -> list[dict]:
-    """Read every assertion with its SourceDoc evidence metadata."""
+def fetch_assertions(session, edge_keys: Iterable[str] | None = None) -> list[dict]:
+    """Read assertions with SourceDoc metadata, optionally limited to edge keys."""
 
     assertions: list[dict] = []
-    for record in session.run(_Q_ASSERTIONS):
+    requested = sorted(set(edge_keys or []))
+    records = (
+        session.run(_Q_ASSERTIONS_FOR_EDGES, edge_keys=requested)
+        if edge_keys is not None
+        else session.run(_Q_ASSERTIONS)
+    )
+    for record in records:
         raw_attributes = record["attributes_json"]
         if isinstance(raw_attributes, str):
             try:

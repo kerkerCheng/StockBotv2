@@ -12,6 +12,7 @@ etl_yfinance.py — 用 yfinance 拉財務快照，寫入 Engine C 資料庫。
 from __future__ import annotations
 
 import argparse
+import math
 import os
 import sys
 from datetime import date, datetime, timezone
@@ -59,9 +60,10 @@ def _configure_yfinance_cache() -> None:
 
 def _sf(val) -> float | None:
     try:
-        return float(val) if val is not None else None
+        result = float(val) if val is not None else None
     except (TypeError, ValueError):
         return None
+    return result if result is not None and math.isfinite(result) else None
 
 
 def _si(val) -> int | None:
@@ -84,7 +86,10 @@ def fetch_snapshot(ticker: str) -> dict | None:
         print(f"[etl] WARN: yfinance failed for {ticker}: {e}", file=sys.stderr)
         return None
 
-    if not info.get("regularMarketPrice") and not info.get("currentPrice"):
+    price = _sf(info.get("currentPrice"))
+    if price is None:
+        price = _sf(info.get("regularMarketPrice"))
+    if price is None:
         print(f"[etl] WARN: no price data for {ticker}", file=sys.stderr)
         return None
 
@@ -98,7 +103,7 @@ def fetch_snapshot(ticker: str) -> dict | None:
         "ev_revenue":           _sf(info.get("enterpriseToRevenue")),
         "pe_trailing":          _sf(info.get("trailingPE")),
         "pe_forward":           _sf(info.get("forwardPE")),
-        "price":                _sf(info.get("currentPrice") or info.get("regularMarketPrice")),
+        "price":                price,
         "analyst_target_mean":  _sf(info.get("targetMeanPrice")),
         "analyst_target_high":  _sf(info.get("targetHighPrice")),
         "analyst_target_low":   _sf(info.get("targetLowPrice")),
@@ -134,8 +139,16 @@ def run_etl(tickers: list[str], dry_run: bool = False) -> int:
         if snap is None:
             print("SKIP")
             continue
-        upsert_snapshot(conn, snap)
-        upsert_coverage_observation(conn, coverage_observation_from_snapshot(snap))
+        try:
+            upsert_snapshot(conn, snap, commit=False)
+            upsert_coverage_observation(
+                conn, coverage_observation_from_snapshot(snap), commit=False
+            )
+            conn.commit()
+        except Exception as exc:
+            conn.rollback()
+            print(f"FAILED ({type(exc).__name__}: {exc})")
+            continue
         print(f"ok  (price={snap['price']}, gm={snap['gross_margin']})")
         success += 1
     conn.close()
@@ -159,7 +172,7 @@ def main() -> int:
     n = run_etl(tickers, dry_run=args.dry_run)
     if not args.dry_run:
         print(f"\n✓ {n}/{len(tickers)} snapshots written to {DB_TYPE}")
-    return 0
+    return 0 if args.dry_run or n == len(tickers) else 1
 
 
 if __name__ == "__main__":

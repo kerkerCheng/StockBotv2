@@ -434,9 +434,9 @@ def project_edge_keys(
 ) -> dict:
     """Recompute only canonical edges touched by one intake document.
 
-    The assertion truth is still read from the complete graph, so a new
-    assertion can invalidate an older candidate-set hash. Unrelated canonical
-    edges are not rewritten.
+    Every assertion for the requested canonical edges is read, so new evidence
+    still invalidates an older candidate-set hash without scanning unrelated
+    graph assertions.
     """
 
     requested = set(edge_keys)
@@ -449,7 +449,7 @@ def project_edge_keys(
         }
     resolutions = load_resolutions(resolution_dir)
     with driver.session() as session:
-        all_states = build_edge_states(fetch_assertions(session))
+        all_states = build_edge_states(fetch_assertions(session, requested))
         missing_assertions = sorted(requested - set(all_states))
         if missing_assertions:
             raise ResolutionValidationError(

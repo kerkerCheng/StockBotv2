@@ -47,7 +47,7 @@ load_extraction(
 server 順序是 filesystem-first：驗證 → canonical hash/no-clobber publish → 冪等寫圖 →
 重投影受影響 edge attributes。依回傳處理：
 
-- `loaded_or_already_complete`：文件與圖完成。只有 `finalize_eligible=true` 才把 doc_id
+- `loaded_or_already_complete`：文件與圖完成，server 已在 private state 寫入綁定 extraction hash 的 graph-completion receipt。只有 `finalize_eligible=true` 才把 doc_id
   加進本次行動 manifest。
 - `pending_graph`：檔案已保存但圖／projector 未完成；**不可**加入 finalize manifest。
   用完全相同 payload 重試。不要改字、不要加版本後綴。

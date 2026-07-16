@@ -13,10 +13,33 @@ from loader.edge_resolution import (
     build_projection,
     load_resolutions,
 )
-from query.edge_conflicts import build_edge_states, detect_conflicts, sort_conflicts
+from query.edge_conflicts import (
+    build_edge_states,
+    detect_conflicts,
+    fetch_assertions,
+    sort_conflicts,
+)
 
 
 EDGE_KEY = "edge:test"
+
+
+def test_assertion_query_can_be_limited_to_requested_edges() -> None:
+    class Session:
+        def __init__(self):
+            self.query = None
+            self.parameters = None
+
+        def run(self, query, **parameters):
+            self.query = query
+            self.parameters = parameters
+            return []
+
+    session = Session()
+
+    assert fetch_assertions(session, {"edge:b", "edge:a"}) == []
+    assert "WHERE assertion.edge_key IN $edge_keys" in session.query
+    assert session.parameters == {"edge_keys": ["edge:a", "edge:b"]}
 
 
 def _assertion(

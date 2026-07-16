@@ -16,6 +16,8 @@ custom connector 後，cloud routine / 手機 App / 網頁對話都能讀寫圖�
 工具（窄面原則，不暴露原始寫入）：
 - get_graph_context   — 公司子圖 / 產業全圖的 LLM-ready Markdown 摘要
 - run_read_query      — 唯讀 Cypher（探索用）
+- get_financial_checklist — Engine C 五項清單、原始覆蓋數與即時 policy view
+- get_extraction_rules — 遠端抽取與 intake/finalize 規則書
 - get_source_trace_manual — 收到未驗證線索時端出完整追源路由與分級處置手冊
 - load_extraction     — 載入一份「先通過 schema 驗證」的抽取 JSON（L8 人工核准
                         之後才會被呼叫；驗證不過就拒載，錯誤原样回傳）
@@ -57,9 +59,11 @@ from loader.validate import validate as validate_extraction
 from loader.load_to_neo4j import edge_key, evidence_id, load as load_to_graph
 from loader.edge_resolution import project_edge_keys
 from mcp_server.intake import (
+    MAX_EXTRACTION_CHARS,
     ROOT as INTAKE_ROOT,
     commit_and_push,
     git_preflight,
+    mark_graph_complete,
     pending_intake_files,
     publish_provenance,
     resolve_action_paths,
@@ -68,6 +72,7 @@ from mcp_server.intake import (
     validate_doc_id,
     write_report,
 )
+from mcp_server.engine_c_tools import get_financial_checklist_core
 
 # ── 設定 ───────────────────────────────────────────────────────────────────────
 
@@ -76,6 +81,7 @@ USER = os.environ.get("NEO4J_ROUTINE_USER")
 PASSWORD = os.environ.get("NEO4J_ROUTINE_PASSWORD")
 TOKEN = os.environ.get("GRAPH_MCP_TOKEN")
 PORT = int(os.environ.get("GRAPH_MCP_PORT", "8788"))
+GRAPH_SCHEMA_VERSION = "2026-07-16-u3b"
 
 SOURCE_TRACE_MANUAL = ROOT / "skills" / "source-trace" / "SKILL.md"
 
@@ -95,6 +101,49 @@ def _check_server_config() -> None:
 
 def _driver() -> neo4j.Driver:
     return neo4j.GraphDatabase.driver(URI, auth=(USER, PASSWORD))
+
+
+def _check_graph_write_readiness(driver) -> None:
+    """Fail closed before graph writes when migration/materialization is incomplete."""
+
+    with driver.session(default_access_mode=neo4j.READ_ACCESS) as session:
+        state = session.run(
+            """
+            OPTIONAL MATCH (state:GraphSchemaState {id: 'stockbotv2'})
+            RETURN state.version AS version
+            """
+        ).single()
+        unprojected = session.run(
+            """
+            MATCH ()-[r]->()
+            WHERE r.edge_key IS NOT NULL AND r.projected_at IS NULL
+            RETURN count(r) AS count
+            """
+        ).single()["count"]
+        legacy = session.run(
+            """
+            MATCH ()-[r]->()
+            WHERE NOT type(r) IN ['CITES', 'ABOUT'] AND r.edge_key IS NULL
+            RETURN count(r) AS count
+            """
+        ).single()["count"]
+        orphaned = session.run(
+            """
+            MATCH (e)
+            WHERE (e:EdgeAssertion OR e:Claim) AND NOT (e)-[:CITES]->(:SourceDoc)
+            RETURN count(e) AS count
+            """
+        ).single()["count"]
+    version = state["version"] if state else None
+    if version != GRAPH_SCHEMA_VERSION:
+        raise RuntimeError(
+            f"graph schema is not ready: expected {GRAPH_SCHEMA_VERSION}, got {version!r}"
+        )
+    if unprojected or legacy or orphaned:
+        raise RuntimeError(
+            "graph reconciliation is incomplete: "
+            f"unprojected={unprojected}, legacy={legacy}, orphaned_evidence={orphaned}"
+        )
 
 
 # ── MCP server ─────────────────────────────────────────────────────────────────
@@ -141,6 +190,23 @@ def run_read_query(cypher: str) -> str:
         return f"查詢失敗: {type(e).__name__}: {e}"
     finally:
         driver.close()
+
+
+@mcp.tool()
+def get_financial_checklist(ticker: str) -> str:
+    """查一個 ticker 的 Engine C 五項財務核驗清單（唯讀）。
+
+    回傳 checklist 原始狀態、最新 analyst coverage 客觀觀測，以及依當前
+    policy_version 即時計算的 coverage view。工具不接受 SQL，也不把 crowding
+    或任何政策分類寫回 Engine C；資料不足時明列缺項，不推測補值。
+    """
+
+    return json.dumps(
+        get_financial_checklist_core(ticker),
+        ensure_ascii=False,
+        default=str,
+        indent=2,
+    )
 
 
 @mcp.tool()
@@ -232,10 +298,17 @@ def _load_extraction_impl(
     raw_excerpt: str | None = None,
     root: Path = INTAKE_ROOT,
 ) -> dict:
+    if not isinstance(extraction_json, str):
+        return {"status": "rejected", "error": "extraction_json 必須是 JSON 字串"}
+    if len(extraction_json) > MAX_EXTRACTION_CHARS:
+        return {"status": "rejected", "error": "extraction 超過 1,000,000 字元限制"}
     try:
         doc = json.loads(extraction_json)
     except json.JSONDecodeError as e:
         return {"status": "rejected", "error": f"不是合法 JSON：{e}"}
+
+    if not isinstance(doc, dict):
+        return {"status": "rejected", "error": "extraction JSON 必須是 object"}
 
     source_doc = doc.get("source_doc")
     if not isinstance(source_doc, dict):
@@ -313,14 +386,16 @@ def _load_extraction_impl(
 
     driver = _driver()
     try:
+        _check_graph_write_readiness(driver)
         with driver.session() as session:
-            load_to_graph(doc, session)
+            session.execute_write(lambda tx: load_to_graph(doc, tx))
         _verify_loaded_doc(driver, doc)
         affected_edge_keys = {
             edge_key(edge["src_id"], edge["relation"], edge["dst_id"])
             for edge in doc.get("edges", [])
         }
         projection = project_edge_keys(driver, affected_edge_keys)
+        mark_graph_complete(doc_id, doc, root=root)
     except Exception as e:
         return {
             "status": "pending_graph",
@@ -512,11 +587,13 @@ def _finalize_research_action_impl(
         commit_headline,
         root=root,
     )
+    secondary_preflight = git_result.get("preflight") or {}
     return {
         "git_status": git_result["status"],
         "commit": git_result.get("commit"),
         "push_error": git_result.get("push_error"),
-        "error": git_result.get("error"),
+        "error": git_result.get("error") or secondary_preflight.get("reason"),
+        "detail": git_result.get("detail") or secondary_preflight.get("detail"),
         "report_path": report_relative,
         "manifest": manifest["documents"],
         "committed_paths": git_result.get("paths") or [],

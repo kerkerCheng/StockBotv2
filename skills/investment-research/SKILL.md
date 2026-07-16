@@ -264,7 +264,7 @@ Conviction 評估：[分數 / 理由]
 - Lane Memo 評分：`thesis/scoring_rubric.md`
 - 新公司 onboarding：`skills/company-onboard/SKILL.md`
 - 個人持倉資料：`fetchers/gsheets.py`（需 `.env` 設 GSHEETS_*）
-- 來源分類標準：CLAUDE.md 來源登記表 + 證據四階
+- 來源分類標準：`AGENTS.md`「來源登記表」+ 證據四階
 
 ## 已知限制（v0，等真實流量撞）
 

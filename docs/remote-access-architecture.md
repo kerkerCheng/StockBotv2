@@ -54,22 +54,23 @@ Anthropic 雲端   = LLM 本體——思考、決定何時呼叫工具
 
 對話中的實際流程：使用者提問 → 雲端 LLM 判斷需要圖譜 → 發 JSON-RPC 工具呼叫（HTTPS）→ `mcp.minatoyukina.uk` → Cloudflare → tunnel → cloudflared → graph_mcp → Neo4j → 結果原路回 → LLM 讀進上下文後以自然語言回答。
 
-**MCP server 不能對本機下任意指令。** 它只有六個寫死的工具（見下），沒有 shell、沒有 client-controlled path、沒有任意代碼執行。檔案只可落在固定 provenance/report roots，Git 只用 argv-list 精確 pathspec。要擴充能力必須改 code 重啟。
+**MCP server 不能對本機下任意指令。** 它只有七個寫死的工具（見下），沒有 shell、沒有 client-controlled path、沒有任意代碼執行。檔案只可落在固定 provenance/report roots，Git 只用 argv-list 精確 pathspec。要擴充能力必須改 code 重啟。
 
 ---
 
-## 六個工具與其應用
+## 七個工具與其應用
 
 | 工具 | 讀/寫 | 應用場景 |
 |------|------|---------|
 | `get_graph_context` | 讀 | 「SIVE 研究狀態如何」——公司子圖/產業全圖的 LLM-ready 摘要（重用 `query/graph_context.py`） |
 | `run_read_query` | 讀 | 精確查詢/稽核：「列出所有 sole_source 邊」「數 origin_entity」。Session 以 READ access mode 開啟，寫入語句會被 Neo4j 拒絕（已實測） |
+| `get_financial_checklist` | 讀 | 查 Engine C 五項財務清單、最新客觀 analyst coverage 與當前 `policy_version` 的即時 view；不暴露 SQL、不持久化 crowding 分類 |
 | `get_extraction_rules` | 讀 | 回傳 `prompts/extract_system.md` + `schema/vocab.json` + `prompts/intake_protocol.md` 原文（路徑寫死）。**任何遠端抽取前必讀**——含 storage permission、conflict 與 finalize 協定 |
 | `get_source_trace_manual` | 讀 | 回傳 `skills/source-trace/SKILL.md` 原文。手機／網頁收到推文、轉述、截圖或未驗證消息時先讀，依市場路由追原文；tier 3–4 未果只留 lead，不進抽取／寫圖 |
 | `load_extraction` | **寫** | 一份文件一呼叫。驗 permission/schema/canonical hash，filesystem-first no-clobber 保存 extraction/raw，再冪等寫圖與重投影受影響 conflicts；失敗可用相同 payload 重試 |
 | `finalize_research_action` | **寫 + Git push** | 以成功 load 的 doc_ids manifest 建報告、精確 stage、單一 commit、push。非 master／staged index／HEAD 不同步／local_only 全部 fail closed；預設 kill switch 關閉 |
 
-**Connector 權限設定（claude.ai → Settings → Connectors → stockbotv2-graph）：** 四個讀工具設「允許」；`load_extraction` 與 `finalize_research_action` 都保持「**Needs approval**」。後者不會繼承前者的設定，新增／重建 connector 時必須逐一檢查。
+**Connector 權限設定（claude.ai → Settings → Connectors → stockbotv2-graph）：** 五個讀工具設「允許」；`load_extraction` 與 `finalize_research_action` 都保持「**Needs approval**」。後者不會繼承前者的設定，新增／重建 connector 時必須逐一檢查。
 
 ---
 
@@ -83,11 +84,15 @@ Anthropic 雲端   = LLM 本體——思考、決定何時呼叫工具
 6. **人工核准 + server kill switch**——兩個寫工具設 Needs-approval；Git push 另要求 `ENABLE_REMOTE_FINALIZE=true`，預設 false
 7. **本機綁定**——MCP server 只綁 127.0.0.1，唯一入口是 tunnel
 
-> **尚未解除的 P0：** Needs-approval 是 client-side UX；持有完整 MCP bearer URL 的直接呼叫者可繞過它。`ENABLE_REMOTE_FINALIZE=false` 因此是目前部署預設。若將它設 true，代表接受「bearer URL 外洩可觸發受 preflight/pathspec 限制的 Git push」這個剩餘風險；server-side per-action capability 尚未定案。
+> **尚未解除的 P0：** `ENABLE_REMOTE_FINALIZE=false` 仍是部署預設，原因不只一項：Needs-approval 是 client-side UX，持有完整 MCP bearer URL 的直接呼叫者可繞過；`doc_ids` 由 client/session 累積，server 尚未簽發一次性 action receipt，因此久置 session 可能帶入過期 action state；`report_markdown` 仍是 client 組成的自由文字，server 能驗證 manifest，卻無法證明其中沒有轉述 `local_only` 內容；push 失敗後也尚無窄化的遠端 retry primitive。啟用前應改成 server-owned action ID + 一次性 capability、server-rendered structured report，以及只允許既有 commit 的 ancestry/pathspec 驗證後重推。未完成前，不把這個工具開給遠端使用。
+
+遠端 MCP 目前定位為「查研究資料、載入已核准證據」；部位 sizing 與 paper-portfolio append 尚未暴露成遠端工具。本機 Claude/Codex 可直接呼叫 Python 模組，手機／網頁端只能讀 `get_financial_checklist`，不能假裝已執行完整政策或模擬交易流程。
 
 Token 或 Neo4j 密碼要輪換時：改 `.env` → 重啟 MCP server → 到 claude.ai 更新 connector URL。
 
 第一次部署或新增 SourceDoc 欄位後，須由 admin 重跑 `schema/neo4j_setup.cypher`。setup 會建立後立即刪除 sentinel，預註冊 `storage_permission`／`permission_basis` property-name tokens；`cloud_routine` 不需要、也不應取得 `CREATE NEW PROPERTY NAME` 權限。
+
+setup 最後也會寫入 `GraphSchemaState.version=2026-07-16-u3b`。`load_extraction` 在每次圖寫入前會用 routine 帳號讀取該版本，並確認沒有未投影 canonical edge、legacy 無 `edge_key` domain edge、或缺 `CITES` 的 Claim／EdgeAssertion；不通過時只留下可重試的 `pending_graph` provenance，不會繼續寫圖或取得 finalize receipt。
 
 ---
 
@@ -95,6 +100,9 @@ Token 或 Neo4j 密碼要輪換時：改 `.env` → 重啟 MCP server → 到 cl
 
 **讀（例：「SIVE 的 thesis 還缺什麼？」）**
 → 雲端 LLM 呼叫 `get_graph_context` → 本機被查詢幾個唯讀 Cypher → 圖無任何變動。
+
+**讀財務（例：「SIVE 財務清單」）**
+→ `get_financial_checklist("SIVE.ST")` → 本機 Engine C 回五項清單與原始覆蓋數 → 查詢層套當前 policy；DB 無任何變動。
 
 **寫（例：手機上入圖）**
 → 貼新聞給 App → `get_source_trace_manual` 追原文 → `get_extraction_rules` 讀 storage/intake 協定 → 一份文件一次 `load_extraction` → App 核准 → 本機先 no-clobber 保存 provenance，再寫圖／project conflict → 累積成功且 eligible 的 doc_ids → 行動結束一次 `finalize_research_action` → 再次 App 核准 → preflight → 報告 + 單一 commit + push。任一步失敗都回 pending／not_committed，不假裝完成。

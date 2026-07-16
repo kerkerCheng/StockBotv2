@@ -100,6 +100,17 @@ def test_invalid_policy_fails_closed(tmp_path, override) -> None:
         load_policy(path)
 
 
+@pytest.mark.parametrize("invalid", [float("nan"), float("inf"), float("-inf")])
+def test_non_finite_policy_numbers_fail_closed(tmp_path, invalid) -> None:
+    path = tmp_path / "policy.json"
+    path.write_text(
+        json.dumps(_policy(single_position_nav_cap=invalid)), encoding="utf-8"
+    )
+
+    with pytest.raises(PolicyError, match="finite"):
+        load_policy(path)
+
+
 def test_missing_policy_key_fails_closed(tmp_path) -> None:
     policy = _policy()
     policy.pop("minimum_holding_days")

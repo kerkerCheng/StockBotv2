@@ -69,7 +69,10 @@ def _ensure_sqlite_schema(conn: sqlite3.Connection) -> None:
                              CHECK (data_status IN ('observed', 'manual_required')),
             fetched_at       TEXT    NOT NULL DEFAULT (datetime('now')),
             UNIQUE (ticker, observation_date, source),
-            CHECK (analyst_count IS NULL OR analyst_count >= 0)
+            CHECK (
+                (data_status = 'observed' AND analyst_count IS NOT NULL AND analyst_count >= 0)
+                OR (data_status = 'manual_required' AND analyst_count IS NULL)
+            )
         );
         CREATE INDEX IF NOT EXISTS idx_coverage_ticker_date
             ON consensus_coverage_observations (ticker, observation_date DESC);
@@ -88,15 +91,22 @@ def get_conn():
             import psycopg2
         except ImportError:
             raise RuntimeError("psycopg2 未安裝。換 SQLite：不設 POSTGRES_HOST/DSN 即可。")
+        try:
+            connect_timeout = int(os.environ.get("POSTGRES_CONNECT_TIMEOUT", "5"))
+        except ValueError as exc:
+            raise RuntimeError("POSTGRES_CONNECT_TIMEOUT must be a positive integer") from exc
+        if connect_timeout <= 0:
+            raise RuntimeError("POSTGRES_CONNECT_TIMEOUT must be a positive integer")
         dsn = os.environ.get("POSTGRES_DSN")
         if dsn:
-            return psycopg2.connect(dsn)
+            return psycopg2.connect(dsn, connect_timeout=connect_timeout)
         return psycopg2.connect(
             host=os.environ.get("POSTGRES_HOST", "localhost"),
             port=int(os.environ.get("POSTGRES_PORT", 5432)),
             dbname=os.environ.get("POSTGRES_DB", "stockbot"),
             user=os.environ.get("POSTGRES_USER", "stockbot"),
             password=os.environ.get("POSTGRES_PASSWORD", ""),
+            connect_timeout=connect_timeout,
         )
 
     conn = sqlite3.connect(str(_SQLITE_PATH), check_same_thread=False)
@@ -114,7 +124,7 @@ def placeholder(n: int = 1) -> str:
     return ",".join([p] * n)
 
 
-def upsert_snapshot(conn, snap: dict) -> None:
+def upsert_snapshot(conn, snap: dict, *, commit: bool = True) -> None:
     """INSERT OR REPLACE financial_snapshots（相容 SQLite + Postgres）。"""
     if _use_postgres():
         sql = """
@@ -146,7 +156,8 @@ def upsert_snapshot(conn, snap: dict) -> None:
         """
         with conn.cursor() as cur:
             cur.execute(sql, snap)
-        conn.commit()
+        if commit:
+            conn.commit()
     else:
         # SQLite: INSERT OR REPLACE（UNIQUE 約束觸發替換）
         sql = """
@@ -167,10 +178,13 @@ def upsert_snapshot(conn, snap: dict) -> None:
             snap["analyst_target_low"], snap["analyst_target_count"],
             str(snap["fetched_at"]),
         ))
-        conn.commit()
+        if commit:
+            conn.commit()
 
 
-def upsert_coverage_observation(conn, observation: dict) -> None:
+def upsert_coverage_observation(
+    conn, observation: dict, *, commit: bool = True
+) -> None:
     """Idempotently store one objective analyst-coverage observation."""
 
     required = {
@@ -188,6 +202,11 @@ def upsert_coverage_observation(conn, observation: dict) -> None:
         raise ValueError("coverage data_status must be observed or manual_required")
     if observation["data_status"] == "observed" and observation["analyst_count"] is None:
         raise ValueError("observed coverage requires analyst_count")
+    if (
+        observation["data_status"] == "manual_required"
+        and observation["analyst_count"] is not None
+    ):
+        raise ValueError("manual_required coverage must not include analyst_count")
     if (
         observation["analyst_count"] is not None
         and (
@@ -232,7 +251,8 @@ def upsert_coverage_observation(conn, observation: dict) -> None:
                 str(observation["fetched_at"]),
             ),
         )
-    conn.commit()
+    if commit:
+        conn.commit()
 
 
 def get_latest_coverage_observation(conn, ticker: str) -> dict | None:

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import csv
+import inspect
 import json
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -51,9 +52,10 @@ def _event(
     event_id: str | None = None,
     corrects: str | None = None,
     benchmark: str | None = None,
+    decision_nav: float = 100.0,
 ) -> dict[str, str]:
-    decision = _decision()
-    return create_event(
+    decision = _decision(decision_nav)
+    event = create_event(
         ticker=ticker,
         event_type=event_type,
         target_weight=target,
@@ -73,9 +75,12 @@ def _event(
         decision_author="test-suite",
         benchmark_ticker=benchmark,
         corrects_event_id=corrects,
-        event_id=event_id,
-        timestamp_utc=(timestamp or datetime.now(timezone.utc)).isoformat(),
     )
+    if event_id is not None:
+        event["event_id"] = event_id
+    if timestamp is not None:
+        event["timestamp_utc"] = timestamp.isoformat()
+    return event
 
 
 def test_init_requires_explicit_currency_and_virtual_nav(tmp_path: Path) -> None:
@@ -97,19 +102,19 @@ def test_open_add_trim_close_replays_cash_and_realized_pnl(tmp_path: Path) -> No
     start = datetime(2026, 7, 16, tzinfo=timezone.utc)
     events = [
         _event(event_type="open", target=.03, changed=.03, price=10, timestamp=start),
-        _event(event_type="add", target=.05, changed=.02, price=20,
+        _event(event_type="add", target=.05, changed=.026, price=8,
                timestamp=start + timedelta(seconds=1)),
-        _event(event_type="trim", target=.04, changed=-.01, price=25,
+        _event(event_type="trim", target=.04, changed=-.0225, price=10,
                timestamp=start + timedelta(seconds=2)),
-        _event(event_type="close", target=0, changed=-.04, price=30,
+        _event(event_type="close", target=0, changed=-.048, price=12,
                timestamp=start + timedelta(seconds=3)),
     ]
 
     state = replay(events, root=root)
 
     assert state["positions"] == {}
-    assert state["cash"] == pytest.approx(106.8)
-    assert state["realized_pnl"] == pytest.approx(6.8)
+    assert state["cash"] == pytest.approx(101.45)
+    assert state["realized_pnl"] == pytest.approx(1.45)
 
 
 def test_append_rejects_bad_transition_duplicate_and_policy_breach(tmp_path: Path) -> None:
@@ -255,7 +260,7 @@ def test_foreign_open_review_close_is_fully_prospective(tmp_path: Path) -> None:
     closed = _event(
         event_type="close",
         target=0,
-        changed=-.05,
+        changed=-.06,
         price=120,
         currency="SEK",
         fx=.1,
@@ -283,6 +288,76 @@ def test_append_is_single_row_and_transactions_are_only_position_truth(tmp_path:
     with (root / "transactions.csv").open("r", encoding="utf-8", newline="") as handle:
         assert next(csv.reader(handle)) == EVENT_FIELDS
     assert not (root / "positions.csv").exists()
+
+
+def test_event_identity_and_timestamp_are_not_public_inputs() -> None:
+    parameters = inspect.signature(create_event).parameters
+
+    assert "event_id" not in parameters
+    assert "timestamp_utc" not in parameters
+
+
+def test_append_accepts_frozen_current_nav_instead_of_initial_nav(tmp_path: Path) -> None:
+    root = _root(tmp_path)
+    append_event(_event(event_type="open", target=.03, changed=.03), root=root)
+
+    second = _event(
+        event_type="open",
+        target=.03,
+        changed=.03,
+        ticker="NEXT",
+        decision_nav=97.0,
+    )
+    state = append_event(second, root=root)
+
+    assert state["positions"]["NEXT"]["units"] == pytest.approx(.291)
+
+
+def test_append_rejects_backdated_event(tmp_path: Path) -> None:
+    root = _root(tmp_path)
+    event = _event(event_type="open", target=.03, changed=.03)
+    event["timestamp_utc"] = "2020-01-01T00:00:00+00:00"
+
+    with pytest.raises(LedgerError, match="program-generated timestamp"):
+        append_event(event, root=root)
+
+
+def test_correction_retains_original_policy_after_policy_changes(
+    tmp_path: Path, monkeypatch
+) -> None:
+    root = _root(tmp_path)
+    original = _event(event_type="open", target=.04, changed=.04)
+    append_event(original, root=root)
+    correction = _event(
+        event_type="correction",
+        target=.03,
+        changed=.03,
+        corrects=original["event_id"],
+    )
+    correction["policy_version"] = original["policy_version"]
+    correction["policy_decision"] = original["policy_decision"]
+    monkeypatch.setattr(
+        "thesis.investment_policy.load_policy",
+        lambda: {**load_policy(), "policy_version": "future-policy"},
+    )
+
+    state = append_event(correction, root=root)
+
+    assert state["positions"]["TEST"]["units"] == pytest.approx(.3)
+
+
+def test_initialization_failure_does_not_publish_initialized_config(tmp_path: Path) -> None:
+    root = tmp_path / "paper"
+    root.mkdir()
+    (root / "config.json").write_text('{"created_at": null}\n', encoding="utf-8")
+    (root / "transactions.csv").write_text("bad,header\n", encoding="utf-8")
+
+    with pytest.raises(LedgerError, match="header"):
+        initialize_portfolio(base_currency="USD", initial_nav=100, root=root)
+
+    assert json.loads((root / "config.json").read_text(encoding="utf-8")) == {
+        "created_at": None
+    }
 
 
 def test_repository_legacy_note_is_not_a_transaction() -> None:

@@ -36,6 +36,27 @@ def _extraction(
     }
 
 
+def _publish_loaded(
+    doc_id: str,
+    *,
+    root: Path,
+    raw_text: str | None = None,
+    permission: str = "repo_full",
+    basis: str = "Official public filing retained for private research",
+) -> dict:
+    extraction = _extraction(
+        doc_id, permission=permission, basis=basis
+    )
+    result = intake.publish_provenance(
+        doc_id,
+        extraction,
+        {"raw_text": raw_text} if raw_text is not None else {},
+        root=root,
+    )
+    intake.mark_graph_complete(doc_id, extraction, root=root)
+    return result
+
+
 @pytest.mark.parametrize(
     "value",
     ["", "../evil", "..\\evil", "C:evil", "C:\\evil", "/evil", "has/slash", "has space", "中文"],
@@ -183,12 +204,8 @@ def test_partial_publish_is_completed_by_identical_retry(tmp_path: Path, monkeyp
 
 
 def test_resolve_action_paths_is_manifest_scoped_and_rejects_local_only(tmp_path: Path) -> None:
-    intake.publish_provenance(
-        "doc_a", _extraction("doc_a"), {"raw_text": "A"}, root=tmp_path
-    )
-    intake.publish_provenance(
-        "doc_b", _extraction("doc_b"), {"raw_text": "B"}, root=tmp_path
-    )
+    _publish_loaded("doc_a", root=tmp_path, raw_text="A")
+    _publish_loaded("doc_b", root=tmp_path, raw_text="B")
     resolved = intake.resolve_action_paths(["doc_b"], root=tmp_path)
     assert resolved["paths"] == ["extractions/doc_b.json", "library/raw/doc_b.txt"]
 
@@ -204,6 +221,30 @@ def test_resolve_action_paths_is_manifest_scoped_and_rejects_local_only(tmp_path
     )
     with pytest.raises(ValueError, match="local_only"):
         intake.resolve_action_paths(["doc_b", "private_doc"], root=tmp_path)
+
+
+@pytest.mark.parametrize(("first", "second"), [("repo_full", "local_only"), ("local_only", "repo_full")])
+def test_doc_id_cannot_cross_storage_roots(
+    tmp_path: Path, first: str, second: str
+) -> None:
+    bases = {
+        "repo_full": "Official filing may be retained",
+        "local_only": "No third-party cloud storage permission",
+    }
+    intake.publish_provenance(
+        "same_doc",
+        _extraction("same_doc", permission=first, basis=bases[first]),
+        {"raw_text": "same"},
+        root=tmp_path,
+    )
+
+    with pytest.raises(ValueError, match="provenance conflict"):
+        intake.publish_provenance(
+            "same_doc",
+            _extraction("same_doc", permission=second, basis=bases[second]),
+            {"raw_text": "same"},
+            root=tmp_path,
+        )
 
 
 def test_write_report_validates_slug_and_never_overwrites(tmp_path: Path) -> None:
@@ -382,12 +423,80 @@ def test_commit_and_push_uses_exact_paths_and_preserves_commit_on_push_failure(
     assert (tmp_git_repo / "extractions" / "leftover.json").exists()
 
 
+def test_commit_failure_unstages_only_finalize_paths(tmp_path: Path, monkeypatch) -> None:
+    calls = []
+
+    def fake_git(args, *, root, timeout=None):
+        calls.append(args)
+        if args[:2] == ["commit", "-m"]:
+            return subprocess.CompletedProcess(args, 1, "", "hook rejected")
+        if args == ["rev-parse", "HEAD"]:
+            return subprocess.CompletedProcess(args, 0, "same-head\n", "")
+        return subprocess.CompletedProcess(args, 0, "", "")
+
+    monkeypatch.setattr(
+        intake,
+        "git_preflight",
+        lambda **_kwargs: {"ok": True, "head": "same-head", "reason": None},
+    )
+    monkeypatch.setattr(intake, "_run_git", fake_git)
+
+    result = intake.commit_and_push(
+        ["extractions/included.json"], "rejected commit", root=tmp_path
+    )
+
+    assert result["status"] == "not_committed"
+    assert ["restore", "--staged", "--", "extractions/included.json"] in calls
+
+
+def test_intake_payloads_have_explicit_size_limits(tmp_path: Path) -> None:
+    with pytest.raises(ValueError, match="permission_basis"):
+        intake.publish_provenance(
+            "basis_too_large",
+            _extraction("basis_too_large", basis="x" * (intake.MAX_PERMISSION_BASIS_CHARS + 1)),
+            {},
+            root=tmp_path,
+        )
+    with pytest.raises(ValueError, match="2,000,000"):
+        intake.publish_provenance(
+            "raw_too_large",
+            _extraction(
+                "raw_too_large",
+                permission="local_only",
+                basis="No cloud storage permission",
+            ),
+            {"raw_text": "x" * (intake.MAX_LOCAL_RAW_CHARS + 1)},
+            root=tmp_path,
+        )
+    with pytest.raises(ValueError, match="50,000"):
+        intake.publish_provenance(
+            "excerpt_too_large",
+            _extraction(
+                "excerpt_too_large",
+                permission="repo_excerpt",
+                basis="Publisher permits limited excerpts",
+            ),
+            {
+                "raw_url": "https://example.com/report",
+                "raw_excerpt": "x" * (intake.MAX_EXCERPT_CHARS + 1),
+            },
+            root=tmp_path,
+        )
+    with pytest.raises(ValueError, match="200,000"):
+        intake.write_report(
+            "large-report", "x" * (intake.MAX_REPORT_CHARS + 1), root=tmp_path
+        )
+
+
 class _FakeSession:
     def __enter__(self):
         return self
 
     def __exit__(self, *_args):
         return False
+
+    def execute_write(self, callback):
+        return callback(self)
 
 
 class _FakeDriver:
@@ -398,8 +507,47 @@ class _FakeDriver:
         return None
 
 
+def test_graph_write_readiness_requires_version_and_reconciliation() -> None:
+    class Result:
+        def __init__(self, value):
+            self.value = value
+
+        def single(self):
+            return self.value
+
+    class Session(_FakeSession):
+        def __init__(self, version, counts):
+            self.version = version
+            self.counts = iter(counts)
+
+        def run(self, query):
+            if "GraphSchemaState" in query:
+                return Result({"version": self.version})
+            return Result({"count": next(self.counts)})
+
+    class Driver:
+        def __init__(self, version, counts):
+            self.version = version
+            self.counts = counts
+
+        def session(self, **_kwargs):
+            return Session(self.version, self.counts)
+
+    graph_mcp._check_graph_write_readiness(
+        Driver(graph_mcp.GRAPH_SCHEMA_VERSION, [0, 0, 0])
+    )
+
+    with pytest.raises(RuntimeError, match="schema is not ready"):
+        graph_mcp._check_graph_write_readiness(Driver("old", [0, 0, 0]))
+    with pytest.raises(RuntimeError, match="reconciliation is incomplete"):
+        graph_mcp._check_graph_write_readiness(
+            Driver(graph_mcp.GRAPH_SCHEMA_VERSION, [1, 0, 0])
+        )
+
+
 def _install_graph_success(monkeypatch, *, conflicts: list[str] | None = None) -> None:
     monkeypatch.setattr(graph_mcp, "_driver", lambda: _FakeDriver())
+    monkeypatch.setattr(graph_mcp, "_check_graph_write_readiness", lambda _driver: None)
     monkeypatch.setattr(graph_mcp, "load_to_graph", lambda _doc, _session: None)
     monkeypatch.setattr(graph_mcp, "_verify_loaded_doc", lambda _driver, _doc: None)
     monkeypatch.setattr(
@@ -428,6 +576,60 @@ def test_load_extraction_publishes_before_graph_and_supports_extraction_only(
     assert result["finalize_eligible"] is True
     assert (tmp_path / "extractions" / "remote_doc.json").exists()
     assert not (tmp_path / "library" / "raw" / "remote_doc.txt").exists()
+
+
+@pytest.mark.parametrize("payload", ["null", "[]", '"text"', "42", "true"])
+def test_load_extraction_rejects_non_object_json_before_driver(
+    payload: str, tmp_path: Path, monkeypatch
+) -> None:
+    monkeypatch.setattr(
+        graph_mcp, "_driver", lambda: (_ for _ in ()).throw(AssertionError())
+    )
+
+    result = graph_mcp._load_extraction_impl(
+        payload,
+        "repo_full",
+        "Official public filing retained for private research",
+        root=tmp_path,
+    )
+
+    assert result["status"] == "rejected"
+    assert "object" in result["error"]
+
+
+def test_load_extraction_uses_one_graph_write_transaction(
+    tmp_path: Path, monkeypatch
+) -> None:
+    calls = []
+
+    class TransactionSession(_FakeSession):
+        def execute_write(self, callback):
+            calls.append("execute_write")
+            return callback(self)
+
+    class TransactionDriver(_FakeDriver):
+        def session(self):
+            return TransactionSession()
+
+    monkeypatch.setattr(graph_mcp, "_driver", lambda: TransactionDriver())
+    monkeypatch.setattr(graph_mcp, "_check_graph_write_readiness", lambda _driver: None)
+    monkeypatch.setattr(graph_mcp, "load_to_graph", lambda _doc, _tx: calls.append("load"))
+    monkeypatch.setattr(graph_mcp, "_verify_loaded_doc", lambda _driver, _doc: None)
+    monkeypatch.setattr(
+        graph_mcp,
+        "project_edge_keys",
+        lambda _driver, _keys: {"open_conflict_ids": [], "stale_resolution_ids": []},
+    )
+
+    result = graph_mcp._load_extraction_impl(
+        json.dumps(_extraction("transaction_doc")),
+        "repo_full",
+        "Official public filing retained for private research",
+        root=tmp_path,
+    )
+
+    assert result["status"] == "loaded_or_already_complete"
+    assert calls == ["execute_write", "load"]
 
 
 def test_load_extraction_rejects_changed_same_doc_before_driver(
@@ -465,6 +667,7 @@ def test_load_extraction_graph_failure_is_recoverable_with_identical_payload(
     tmp_path: Path, monkeypatch
 ) -> None:
     monkeypatch.setattr(graph_mcp, "_driver", lambda: _FakeDriver())
+    monkeypatch.setattr(graph_mcp, "_check_graph_write_readiness", lambda _driver: None)
 
     def fail_graph(_doc, _session):
         raise RuntimeError("simulated graph outage")
@@ -492,6 +695,36 @@ def test_load_extraction_graph_failure_is_recoverable_with_identical_payload(
         root=tmp_path,
     )
     assert retried["status"] == "loaded_or_already_complete"
+
+
+def test_pending_graph_document_cannot_finalize(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setattr(graph_mcp, "_driver", lambda: _FakeDriver())
+    monkeypatch.setattr(graph_mcp, "_check_graph_write_readiness", lambda _driver: None)
+    monkeypatch.setattr(
+        graph_mcp,
+        "load_to_graph",
+        lambda _doc, _tx: (_ for _ in ()).throw(RuntimeError("graph down")),
+    )
+    pending = graph_mcp._load_extraction_impl(
+        json.dumps(_extraction("pending_doc")),
+        "repo_full",
+        "Official public filing retained for private research",
+        raw_text="pending",
+        root=tmp_path,
+    )
+
+    result = graph_mcp._finalize_research_action_impl(
+        _valid_report(),
+        "pending-doc",
+        "must not commit",
+        ["pending_doc"],
+        root=tmp_path,
+        enabled=True,
+    )
+
+    assert pending["status"] == "pending_graph"
+    assert result["git_status"] == "not_committed"
+    assert "completion receipt" in result["reason"]
 
 
 def test_load_extraction_returns_conflicts_without_treating_document_as_failed(
@@ -587,12 +820,7 @@ def test_finalize_two_documents_creates_one_exact_commit_and_push(
 ) -> None:
     _ready_remote_repo(tmp_git_repo, tmp_path / "remote.git")
     for doc_id in ("doc_a", "doc_b"):
-        intake.publish_provenance(
-            doc_id,
-            _extraction(doc_id),
-            {"raw_text": f"raw {doc_id}"},
-            root=tmp_git_repo,
-        )
+        _publish_loaded(doc_id, root=tmp_git_repo, raw_text=f"raw {doc_id}")
 
     result = graph_mcp._finalize_research_action_impl(
         _valid_report(),
@@ -630,12 +858,7 @@ def test_finalize_is_manifest_scoped_and_warns_about_other_pending_files(
 ) -> None:
     _ready_remote_repo(tmp_git_repo, tmp_path / "remote.git")
     for doc_id in ("leftover", "selected"):
-        intake.publish_provenance(
-            doc_id,
-            _extraction(doc_id),
-            {"raw_text": doc_id},
-            root=tmp_git_repo,
-        )
+        _publish_loaded(doc_id, root=tmp_git_repo, raw_text=doc_id)
 
     result = graph_mcp._finalize_research_action_impl(
         _valid_report(),
@@ -655,9 +878,7 @@ def test_finalize_preflight_failure_writes_no_report(
     tmp_git_repo: Path, tmp_path: Path
 ) -> None:
     _ready_remote_repo(tmp_git_repo, tmp_path / "remote.git")
-    intake.publish_provenance(
-        "doc_a", _extraction("doc_a"), {"raw_text": "A"}, root=tmp_git_repo
-    )
+    _publish_loaded("doc_a", root=tmp_git_repo, raw_text="A")
     (tmp_git_repo / "staged.txt").write_text("staged", encoding="utf-8")
     subprocess.run(["git", "add", "staged.txt"], cwd=tmp_git_repo, check=True)
 
@@ -673,6 +894,44 @@ def test_finalize_preflight_failure_writes_no_report(
     assert result["git_status"] == "not_committed"
     assert result["reason"] == "index_not_clean"
     assert not list((tmp_git_repo / "library" / "intake").glob("*.md"))
+
+
+def test_finalize_propagates_second_preflight_failure(
+    tmp_git_repo: Path, monkeypatch
+) -> None:
+    _publish_loaded("doc_a", root=tmp_git_repo, raw_text="A")
+    monkeypatch.setattr(
+        graph_mcp,
+        "git_preflight",
+        lambda **_kwargs: {"ok": True, "reason": None},
+    )
+    monkeypatch.setattr(
+        graph_mcp,
+        "pending_intake_files",
+        lambda **_kwargs: {"untracked": [], "modified": [], "error": None},
+    )
+    monkeypatch.setattr(
+        graph_mcp,
+        "commit_and_push",
+        lambda *_args, **_kwargs: {
+            "status": "not_committed",
+            "paths": [],
+            "preflight": {"ok": False, "reason": "head_not_synced", "detail": "moved"},
+        },
+    )
+
+    result = graph_mcp._finalize_research_action_impl(
+        _valid_report(),
+        "second-preflight",
+        "must remain pending",
+        ["doc_a"],
+        root=tmp_git_repo,
+        enabled=True,
+    )
+
+    assert result["git_status"] == "not_committed"
+    assert result["error"] == "head_not_synced"
+    assert result["detail"] == "moved"
 
 
 def test_finalize_rejects_malicious_slug_and_local_only_before_report(
@@ -717,9 +976,7 @@ def test_finalize_push_failure_keeps_local_commit(
     tmp_git_repo: Path, tmp_path: Path
 ) -> None:
     _ready_remote_repo(tmp_git_repo, tmp_path / "remote.git")
-    intake.publish_provenance(
-        "doc_a", _extraction("doc_a"), {"raw_text": "A"}, root=tmp_git_repo
-    )
+    _publish_loaded("doc_a", root=tmp_git_repo, raw_text="A")
     subprocess.run(
         ["git", "remote", "set-url", "--push", "origin", str(tmp_path / "missing.git")],
         cwd=tmp_git_repo,

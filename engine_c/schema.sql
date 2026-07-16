@@ -63,7 +63,10 @@ CREATE TABLE IF NOT EXISTS consensus_coverage_observations (
 
     UNIQUE (ticker, observation_date, source),
     CHECK (data_status IN ('observed', 'manual_required')),
-    CHECK (analyst_count IS NULL OR analyst_count >= 0)
+    CHECK (
+        (data_status = 'observed' AND analyst_count IS NOT NULL AND analyst_count >= 0)
+        OR (data_status = 'manual_required' AND analyst_count IS NULL)
+    )
 );
 
 CREATE INDEX IF NOT EXISTS idx_coverage_ticker_date

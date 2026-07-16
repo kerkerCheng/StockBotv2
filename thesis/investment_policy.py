@@ -6,6 +6,7 @@ coverage thresholds and position sizing are applied here at query time.
 from __future__ import annotations
 
 import json
+import math
 from pathlib import Path
 from typing import Any, Mapping
 
@@ -32,7 +33,10 @@ class PolicyError(ValueError):
 def _number(value: Any, name: str) -> float:
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         raise PolicyError(f"{name} must be numeric")
-    return float(value)
+    result = float(value)
+    if not math.isfinite(result):
+        raise PolicyError(f"{name} must be finite")
+    return result
 
 
 def _ratio(value: Any, name: str, *, allow_zero: bool = False) -> float:

@@ -23,7 +23,7 @@ python paper_portfolio/ledger.py init --base-currency USD --initial-nav 100
 
 ## 事件規則
 
-合法交易順序為 `open → add/trim → close`。`target_weight` 是事件後相對初始 NAV 的目標權重；`changed_weight` 必須等於新舊 target 的差。程式用事件價與 FX 把目標名目金額換成 units，並驗證現金與當時凍結的 U16 `maximum_position`。
+合法交易順序為 `open → add/trim → close`。`target_weight` 是事件後相對該筆 `policy_decision.total_nav`（決策當下凍結 NAV）的目標權重；`changed_weight` 必須等於新 target 與「既有 units 依本次事件價換算的當下權重」之差。程式用事件價與 FX 把目標名目金額換成 units，並驗證現金與當時凍結的 U16 `maximum_position`。
 
 `correction` 以 `corrects_event_id` 在重放時替換原事件；`reversal` 移除原事件的效果。原列與更正列都保留。若移除後使後續 state transition 不合法，整本帳拒絕重放，必須補完整的更正鏈。
 

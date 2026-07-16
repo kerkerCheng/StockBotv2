@@ -78,7 +78,7 @@ def get_conn():
         return conn
 ```
 
-SQLite schema is created inline on the first `get_conn()` call — no migration runner, no setup script needed:
+SQLite schema is created inline on the first `get_conn()` call — no migration runner, no setup script needed. Postgres changes use versioned files in `engine_c/migrations/` and are applied explicitly with `python -m engine_c.migrate`:
 
 ```sql
 CREATE TABLE IF NOT EXISTS financial_snapshots (
@@ -256,7 +256,7 @@ export POSTGRES_DSN="postgresql://stockbot:secret@localhost:5432/stockbot"
 python engine_c/etl_yfinance.py COHR SIVE.ST
 ```
 
-The same script, zero code changes. The schema must exist in Postgres already (run the DDL manually or via a migration).
+The same script, zero code changes. Bootstrap a new Postgres database with `engine_c/schema.sql`; for an existing database, run `python -m engine_c.migrate` before the ETL. Connections default to a bounded five-second timeout, configurable with `POSTGRES_CONNECT_TIMEOUT`.
 
 **Checking which backend is active:**
 
@@ -315,4 +315,4 @@ python fetchers/edgar.py --ticker COHR --forms 10-K --n 1 --max-chars 0
 - `loader/load_to_neo4j.py` — contains `TICKER_MAP`; `None` values mark private companies explicitly
 - `docs/onboarding-sop.md` — step-by-step onboarding SOP that uses this non-US path
 - `docs/solutions/architecture-patterns/knowledge-graph-data-quality-and-engine-c-join-key.md` — graph-side TICKER_MAP: how Neo4j Company nodes get ticker attributes as the A→C join key
-- `CLAUDE.md §L9` — Engine C / Engine A join key design: `TICKER_MAP` is the A→C bridge
+- `AGENTS.md`「三引擎匯流的前置條件」— Engine C / Engine A join key design: `TICKER_MAP` is the A→C bridge
