@@ -16,6 +16,7 @@ custom connector 後，cloud routine / 手機 App / 網頁對話都能讀寫圖�
 工具（窄面原則，不暴露原始寫入）：
 - get_graph_context   — 公司子圖 / 產業全圖的 LLM-ready Markdown 摘要
 - run_read_query      — 唯讀 Cypher（探索用）
+- get_source_trace_manual — 收到未驗證線索時端出完整追源路由與分級處置手冊
 - load_extraction     — 載入一份「先通過 schema 驗證」的抽取 JSON（L8 人工核准
                         之後才會被呼叫；驗證不過就拒載，錯誤原样回傳）
 
@@ -61,10 +62,20 @@ PASSWORD = os.environ.get("NEO4J_ROUTINE_PASSWORD")
 TOKEN = os.environ.get("GRAPH_MCP_TOKEN")
 PORT = int(os.environ.get("GRAPH_MCP_PORT", "8788"))
 
-if not (USER and PASSWORD):
-    sys.exit("需要 .env 設定 NEO4J_ROUTINE_USER / NEO4J_ROUTINE_PASSWORD（最小權限帳號）")
-if not TOKEN or len(TOKEN) < 16:
-    sys.exit("需要 .env 設定 GRAPH_MCP_TOKEN（≥16 字元強隨機字串，將內嵌於 URL 路徑）")
+SOURCE_TRACE_MANUAL = ROOT / "skills" / "source-trace" / "SKILL.md"
+
+
+def _check_server_config() -> None:
+    """Fail at server start, while keeping read-only helpers import-testable."""
+
+    if not (USER and PASSWORD):
+        raise RuntimeError(
+            "需要 .env 設定 NEO4J_ROUTINE_USER / NEO4J_ROUTINE_PASSWORD（最小權限帳號）"
+        )
+    if not TOKEN or len(TOKEN) < 16:
+        raise RuntimeError(
+            "需要 .env 設定 GRAPH_MCP_TOKEN（≥16 字元強隨機字串，將內嵌於 URL 路徑）"
+        )
 
 
 def _driver() -> neo4j.Driver:
@@ -77,7 +88,7 @@ mcp = FastMCP(
     name="stockbotv2-graph",
     host="127.0.0.1",           # 只綁本機；對外一律走 Cloudflare Tunnel
     port=PORT,
-    streamable_http_path=f"/{TOKEN}/mcp",   # URL 路徑內嵌 token
+    streamable_http_path=f"/{TOKEN or 'unconfigured-token'}/mcp",  # 啟動前會驗 config
 )
 
 
@@ -133,6 +144,28 @@ def get_extraction_rules() -> str:
         "# 抽取規則書（prompts/extract_system.md）\n\n" + rules +
         "\n\n---\n\n# Vocab 白名單（schema/vocab.json）\n\n```json\n" + vocab + "\n```\n"
     )
+
+
+def _read_source_trace_manual(path: Path = SOURCE_TRACE_MANUAL) -> str:
+    try:
+        return path.read_text(encoding="utf-8")
+    except OSError as exc:
+        return (
+            "追源手冊目前不可用；不要在缺少規則時繼續抽取或入圖。"
+            f"請檢查 skills/source-trace/SKILL.md（{type(exc).__name__}: {exc}）。"
+        )
+
+
+@mcp.tool()
+def get_source_trace_manual() -> str:
+    """取得未驗證線索進場前必讀的完整追源手冊。
+
+    收到推文、轉述、截圖、搜尋摘要、新聞或任何尚未取得原文的 claim 時，
+    必須先呼叫本工具，再依市場路由追回原始文件並套 tier 1–2 誠實降級／
+    tier 3–4 未果隔離規則。手冊缺失時本工具回可讀錯誤，server 不會崩潰；
+    呼叫端應停止抽取與 load_extraction。
+    """
+    return _read_source_trace_manual()
 
 
 @mcp.tool()
@@ -200,5 +233,9 @@ def load_extraction(extraction_json: str) -> str:
 
 
 if __name__ == "__main__":
+    try:
+        _check_server_config()
+    except RuntimeError as exc:
+        raise SystemExit(str(exc)) from exc
     print(f"[graph_mcp] starting on 127.0.0.1:{PORT}, path=/<token>/mcp", file=sys.stderr)
     mcp.run(transport="streamable-http")

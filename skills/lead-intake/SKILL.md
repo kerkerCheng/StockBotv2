@@ -31,9 +31,11 @@ description: >
 | tier 4（純社群猜測）或與現有圖無交集 | **No-Go** — 存為 lead-only，不走 pipeline |
 | 有具體公司名 + 具體動作 + 可查 | **Go** — 走 company-onboard 補資料 |
 
-**Turn 3（若 Go）— 自動觸發文件發現：**
-切換到 `skills/company-onboard` 開始找文件，
-或直接執行 `python fetchers/edgar.py --ticker <TICKER>` 取第一份材料。
+**Turn 3（若 Go）— 先追原文，再觸發文件發現：**
+完整讀取並執行 `skills/source-trace/SKILL.md`。追到原文才以原文進抽取；tier 1–2
+轉述未能取得上游文件時依手冊誠實降級；tier 3–4 未果只留 lead，不生成 extraction。
+若結果需要新公司完整 onboarding，再切換到 `skills/company-onboard`。本機美股文件可用
+`python fetchers/edgar.py --ticker <TICKER>`；遠端 chat 不得假設可執行本機命令。
 
 用戶可在 Turn 2 說「No」直接結束，或說「只存不研究」跳過 Turn 3。
 
@@ -101,13 +103,13 @@ description: >
 > 一坨敘事拆開後通常是 5–15 條強度天差地別的主張。不拆,就會把作者的形容詞當成事實入圖。
 
 ### Step 2 — 驗證迴圈(依 CLAUDE.md 源登記表)
-對**每條事實主張**,依市場分路找**獨立**來源(目標:≥3 個不同 `origin_entity`,L8 鐵律):
-- 美股 → SEC EDGAR(10-K/Q/8-K/S-1/Form 4)、法說逐字稿、IR 簡報、客戶/供應商 filings
-- 台股 → 公開資訊觀測站 MOPS、**月營收揭露**、法說/IR、上下游上市公司交叉驗證
-- A股(備用)→ 年報/季報/公告、問詢函、互動易、招投標、海關、上下游交叉
-- 技術/學術 → arXiv + Semantic Scholar、OFC/ECOC 議程與論文、白皮書、專利、標準組織
-- **第三層才用** Tavily 等通用搜尋,且必配 LLM 品質評分 gate
-- **排序:先做最高槓桿的獨立來源**(通常是「客戶端 / 合作方」的 tier-1 文件,能一次把整條 thesis 從 tier 4 拉到 tier 1)。
+對**每條事實主張**，完整讀取並依 `skills/source-trace/SKILL.md` 跑共同追源手冊。
+市場路由、什麼算原文、tier 1–2 誠實降級、tier 3–4 未果隔離與嘗試紀錄格式，
+一律以該手冊為單一事實來源，本 skill 不複製第二份分路規則。
+
+- 目標仍是 ≥3 個不同 `origin_entity`，但同一原始事件的多份轉述只算一次。
+- 排序先做最高槓桿的客戶端／合作方 tier-1 文件；找反證與找支持證據同等重要。
+- trace 結果為 `isolated_tier_3` 或 `lead_only_tier_4` 時，不進後續自動標記／入庫步驟。
 - **輸出:來源核對表** — `claim × source(doc_id_sN) × origin_entity × evidence_tier × 逐字 quote × 支持/反對/不確定`。
 
 ### Step 3 — 套鐵律自動標記

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Source Trace"
+  short_description: "Trace leads to auditable original sources"
+  default_prompt: "Use $source-trace to trace this lead to an original source and decide whether it can become evidence."

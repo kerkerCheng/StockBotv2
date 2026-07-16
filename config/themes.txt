@@ -2,5 +2,5 @@
 # 格式：<theme_slug>: <描述> | 核心公司: <ticker1>, <ticker2>, ...
 # 以 # 開頭的行為注解，空行忽略
 
-cpo: Co-Packaged Optics 供應鏈 | 核心公司: COHR, LITE, AVGO, NVDA | 關鍵字: CPO, co-packaged optics, external laser, InP, CW DFB laser
-sivers: Sivers Semiconductors InP 雷射 | 核心公司: SIVE.ST | 關鍵字: Sivers, SIVE, InP laser, ELS
+cpo: Co-Packaged Optics 供應鏈 | 核心公司: COHR, LITE, AVGO, NVDA | 關鍵字: CPO, co-packaged optics, external laser, InP, CW DFB laser | 替代/反證關鍵字: linear pluggable optics, LPO, copper interconnect, co-packaged copper, integrated silicon laser
+sivers: Sivers Semiconductors InP 雷射 | 核心公司: SIVE.ST | 關鍵字: Sivers, SIVE, InP laser, ELS | 替代/反證關鍵字: in-house laser, integrated laser, alternative DFB supplier, Lumentum CPO laser, AAOI laser capacity

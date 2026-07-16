@@ -54,20 +54,21 @@ Anthropic 雲端   = LLM 本體——思考、決定何時呼叫工具
 
 對話中的實際流程：使用者提問 → 雲端 LLM 判斷需要圖譜 → 發 JSON-RPC 工具呼叫（HTTPS）→ `mcp.minatoyukina.uk` → Cloudflare → tunnel → cloudflared → graph_mcp → Neo4j → 結果原路回 → LLM 讀進上下文後以自然語言回答。
 
-**MCP server 不能對本機下任意指令。** 它只有四個寫死的工具（見下），沒有 shell、沒有任意檔案存取、沒有任意代碼執行。要擴充能力必須改 code 重啟。
+**MCP server 不能對本機下任意指令。** 它只有五個寫死的工具（見下），沒有 shell、沒有任意檔案存取、沒有任意代碼執行。要擴充能力必須改 code 重啟。
 
 ---
 
-## 四個工具與其應用
+## 五個工具與其應用
 
 | 工具 | 讀/寫 | 應用場景 |
 |------|------|---------|
 | `get_graph_context` | 讀 | 「SIVE 研究狀態如何」——公司子圖/產業全圖的 LLM-ready 摘要（重用 `query/graph_context.py`） |
 | `run_read_query` | 讀 | 精確查詢/稽核：「列出所有 sole_source 邊」「數 origin_entity」。Session 以 READ access mode 開啟，寫入語句會被 Neo4j 拒絕（已實測） |
 | `get_extraction_rules` | 讀 | 回傳 `prompts/extract_system.md` + `schema/vocab.json` 原文（路徑寫死）。**任何遠端抽取前必讀**——軟品質規則（L6 逐字引用、L4 屬性歸位）無法靠事後驗證補救 |
+| `get_source_trace_manual` | 讀 | 回傳 `skills/source-trace/SKILL.md` 原文。手機／網頁收到推文、轉述、截圖或未驗證消息時先讀，依市場路由追原文；tier 3–4 未果只留 lead，不進抽取／寫圖 |
 | `load_extraction` | **寫** | 唯一寫入路徑。先跑 `loader/validate.py` 完整驗證（schema/vocab/參照完整性），通過才呼叫 `loader/load_to_neo4j.py` 寫入。爛資料進不了圖 |
 
-**Connector 權限設定（claude.ai → Settings → Connectors → stockbotv2-graph）：** 三個讀工具設「允許」；`load_extraction` 保持「**Needs approval**」——每次寫圖 App 都會跳確認，**這就是 L8 人工核准閘門的 UI 實體**，不要改成自動允許。
+**Connector 權限設定（claude.ai → Settings → Connectors → stockbotv2-graph）：** 四個讀工具設「允許」；`load_extraction` 保持「**Needs approval**」——每次寫圖 App 都會跳確認，**這就是 L8 人工核准閘門的 UI 實體**，不要改成自動允許。
 
 ---
 
@@ -90,7 +91,7 @@ Token 或 Neo4j 密碼要輪換時：改 `.env` → 重啟 MCP server → 到 cl
 → 雲端 LLM 呼叫 `get_graph_context` → 本機被查詢幾個唯讀 Cypher → 圖無任何變動。
 
 **寫（例：手機上入圖）**
-→ 貼新聞給 App → LLM 呼叫 `get_extraction_rules` 拿規則書（唯讀）→ web search 找原文（**純雲端，不碰本機**）→ 按規則抽取成 JSON 草稿 → 你口頭同意 → LLM 呼叫 `load_extraction` → **App 跳權限確認，你按允許** → 本機驗證 → 寫入 → 圖長大。
+→ 貼新聞給 App → LLM 呼叫 `get_source_trace_manual` → web search 依路由找原文（**純雲端，不碰本機**）→ 找到可逐字來源後呼叫 `get_extraction_rules` → 按規則抽取成 JSON 草稿 → 你口頭同意 → LLM 呼叫 `load_extraction` → **App 跳權限確認，你按允許** → 本機驗證 → 寫入 → 圖長大。
 
 **不碰本機（例：「CPO 最近有什麼新聞？」）**
 → 純 web search，全程雲端，本機三個行程無感。
@@ -105,7 +106,7 @@ Token 或 Neo4j 密碼要輪換時：改 `.env` → 重啟 MCP server → 到 cl
 |------|--------------|---------|
 | 本機 Claude Code session | 本來就在 repo 裡 | 直連 localhost |
 | Cloud routine（U7） | GitHub 連接後每次執行 **clone 整份 repo**（走 GitHub，不走 tunnel） | MCP connector |
-| 手機/網頁 App 對話 | **刻意不給**（僅 `get_extraction_rules` 回傳兩個固定檔案） | MCP connector |
+| 手機/網頁 App 對話 | **刻意不給**（只由 `get_source_trace_manual`／`get_extraction_rules` 回傳寫死的規則檔） | MCP connector |
 
 ---
 
