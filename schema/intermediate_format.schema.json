@@ -192,6 +192,14 @@
                 ],
                 "minimum": 1,
                 "maximum": 5
+              },
+              "intrinsic_cycle_time_weeks": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 0,
+                "description": "交易對手不變時仍成立的典型物理製程週期；當期實際交期不得放此欄。"
               }
             }
           },
@@ -264,11 +272,14 @@
                   "null"
                 ]
               },
-              "lead_time_weeks": {
+              "lead_time_weeks": false,
+              "structural_lead_time_weeks": {
                 "type": [
                   "integer",
                   "null"
-                ]
+                ],
+                "minimum": 0,
+                "description": "特定供應關係在正常條件下的慢變典型交期；缺料或物流造成的當期實際交期應存為 dated Claim/Engine C observation。"
               },
               "qualification_status": {
                 "enum": [

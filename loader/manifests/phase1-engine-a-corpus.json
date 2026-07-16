@@ -1,0 +1,91 @@
+{
+  "schema_version": "1",
+  "corpus_root": "extractions",
+  "documents": [
+    {
+      "doc_id": "Broadcom_q2fy26_cpo",
+      "path": "extractions/broadcom_q2fy26_cpo.json",
+      "sha256": "3a90ca0f8e11941ba4bc2695089ae8daba8d29192d4bc19793cc2b96b1958e83"
+    },
+    {
+      "doc_id": "coherent-corp-cohr-discusses-photonics-innovation-and-data-center-communications-at-ofc_march_17",
+      "path": "extractions/coherent_ofc_march25.json",
+      "sha256": "5364541343f66d13da00dfa7446b22dce9251f2e022aa3f0f16a0c519deedfab"
+    },
+    {
+      "doc_id": "coherent_q2fy26_cpo",
+      "path": "extractions/coherent_q2fy26_cpo.json",
+      "sha256": "e103557fd42d9ef022df4a1ef9f7b61068f307776627d4015118c5747ee2d5a7"
+    },
+    {
+      "doc_id": "coherent_q3fy26_cpo",
+      "path": "extractions/coherent_q3fy26_cpo.json",
+      "sha256": "30d78a5a6198b10251232f147f1e765fe82d38445d7fb066239daf7bd6152ba1"
+    },
+    {
+      "doc_id": "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era",
+      "path": "extractions/cpo_chip_package_paper.json",
+      "sha256": "28460246bde283e2e4a1bc691539c54166a968afbde57dc6108b5f807f62ba93"
+    },
+    {
+      "doc_id": "damnang_poet_ofc2026_review_2026_03",
+      "path": "extractions/damnang_poet_ofc2026_review_2026_03.json",
+      "sha256": "72b58f94e68cfdd3bbfaa5c3ca615a3fd595c87007c02d094f32728c887e51c3"
+    },
+    {
+      "doc_id": "enablence_sivers_onet_els_2026",
+      "path": "extractions/enablence_sivers_onet_els_2026.json",
+      "sha256": "86d2b59da90bc4c9b2fd4875befcd1df95c74660346e1f689d225befe7d081ab"
+    },
+    {
+      "doc_id": "enablence_sivers_onet_ofc_pr_2026_03_17",
+      "path": "extractions/enablence_sivers_onet_ofc_pr_2026_03_17.json",
+      "sha256": "e084aa1751bc19b83545f09137595256d1516dc1e792d21535ee4fc6b767cee7"
+    },
+    {
+      "doc_id": "lumentum_q2fy26_cpo",
+      "path": "extractions/lumentum_q2fy26_cpo.json",
+      "sha256": "c7b3024a2c79539fc65b2b8bf5126f02d2bc80e536b93f6e8bc6391231cfcbe0"
+    },
+    {
+      "doc_id": "lumentum_q3fy26_cpo",
+      "path": "extractions/lumentum_q3fy26_cpo.json",
+      "sha256": "212b74b75580ef128d7c4204d732fe3ccf8681ba83d68a9ed48f7e129ff4f1ae"
+    },
+    {
+      "doc_id": "Nvidia_q1fy27",
+      "path": "extractions/nvidia_q1fy27.json",
+      "sha256": "c964d0f5101233564a7f4e4fa5a9adeaf0dab157822d18803d2488aea38063c8"
+    },
+    {
+      "doc_id": "aleabitoreddit_sivers_cpo_customer_map",
+      "path": "extractions/silicon_matter_ayar_labs.json",
+      "sha256": "93b2a8e5e75e11c685a79eafd8ab37d2536ab79c8b78c54b9d93919ff40c29cd"
+    },
+    {
+      "doc_id": "optica_opn_marvell_celestial_2025",
+      "path": "extractions/silicon_matter_celestial_marvell.json",
+      "sha256": "02ce79ed403161ce86ea5164d5f3fb55f80216575715fc66436bd1e2214aa4fb"
+    },
+    {
+      "doc_id": "silicon_matter_sivers_ayar_2026_03_14",
+      "path": "extractions/silicon_matter_sivers_ayar_2026_03_14.json",
+      "sha256": "9ce9f20bac2bcef01adea62940c4597b04d2f459a43d6ebf94d1117326d3a057"
+    },
+    {
+      "doc_id": "sivers_ar_2025_photonics_excerpt",
+      "path": "extractions/sivers_ar_2025.json",
+      "sha256": "13752e020e361c7650e2b38051a0d81f5f9d16aa8bd51bf478fc314bff0feef4"
+    },
+    {
+      "doc_id": "sivers_ar_2025_financials",
+      "path": "extractions/sivers_ar_2025_financials.json",
+      "sha256": "deb5cdd85d926e1a0f51d3c3d179be98135f0a13ca06fa570b2fc614da0f59f6"
+    },
+    {
+      "doc_id": "sivers_gf_pr_2026_06_02",
+      "path": "extractions/sivers_gf_pr_2026_06_02.json",
+      "sha256": "7939345aed53dd661a3bb7baaf0daf7a816785e980c14cb1ee7bea9b074d132a"
+    }
+  ]
+}

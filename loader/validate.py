@@ -60,6 +60,12 @@ def validate(doc_path: str) -> list[str]:
     for e in doc.get("edges", []):
         if e["relation"] not in vocab["relation"]:
             errors.append(f"VOCAB: edge {e['id']} relation={e['relation']} 不在對照表")
+        if "lead_time_weeks" in e.get("attributes", {}):
+            errors.append(
+                f"SCHEMA: edge {e['id']} 使用已停用的 lead_time_weeks；"
+                "正常關係基準請用 structural_lead_time_weeks，內在物理週期請用 "
+                "intrinsic_cycle_time_weeks，當期實際交期請存 dated Claim/Engine C observation"
+            )
         qs = e.get("attributes", {}).get("qualification_status")
         if qs and qs not in vocab["qualification_status"]:
             errors.append(f"VOCAB: edge {e['id']} qualification_status={qs} 不在對照表")

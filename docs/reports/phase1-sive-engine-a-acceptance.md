@@ -137,6 +137,25 @@ origin even when it is not independent customer-demand evidence.
 
 Pending completion of U2, U3, U3b, U4, and U5.
 
+### U2 replay checkpoint (2026-07-16)
+
+- Neo4j dump: `C:/tmp/StockBotv2-backups/phase1-before-u2-20260716/neo4j.dump`
+- Dump SHA-256: `9F818726DD502D17C60A52F58A2BC69B7FB67BF2ABA60294411D5A5A74ACF0A2`
+- Frozen corpus manifest: `loader/manifests/phase1-engine-a-corpus.json`
+- Manifest SHA-256: `bed31eba0216f658ec414afe83298951e9e21d1cf23336c50e5d28a7549ade6e`
+- Replayed inputs: 17 documents, 208 node inputs, 249 edge inputs,
+  56 Claim inputs, and 209 distinct referenced source IDs.
+- Preflight repaired 24 manifest-only source IDs. It also found 21 graph-only
+  legacy IDs; every matching graph object was inspected and the exact set was
+  approved in `phase1-engine-a-reconciliation-exceptions.json` before replay.
+- Post-replay: 209 canonical relationships, zero duplicate canonical triples,
+  249 EdgeAssertions with zero duplicate IDs, 56 Claims, no bare `cl1`, and all
+  209 manifest source IDs represented with no graph-only or manifest-only IDs.
+- Nine Claims target edges through `subject_edge_key`; none incorrectly creates
+  an `ABOUT` relationship to a domain node.
+- Canonical relationship attributes are intentionally empty until U3b projects
+  conflict-safe materialized values from EdgeAssertions.
+
 The after section must record:
 
 - the exact frozen manifest identity and hashes;

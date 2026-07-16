@@ -1,0 +1,117 @@
+{
+  "schema_version": "1",
+  "manifest_sha256": "bed31eba0216f658ec414afe83298951e9e21d1cf23336c50e5d28a7549ade6e",
+  "reviewed_at": "2026-07-16",
+  "review_scope": "Pre-U2 graph-only source IDs inspected on every matching node, Claim, and relationship before replay.",
+  "backup_dump": {
+    "path": "C:/tmp/StockBotv2-backups/phase1-before-u2-20260716/neo4j.dump",
+    "sha256": "9F818726DD502D17C60A52F58A2BC69B7FB67BF2ABA60294411D5A5A74ACF0A2"
+  },
+  "exceptions": [
+    {
+      "source_id": "s1",
+      "disposition": "drop_legacy_residue",
+      "reason": "Pre-L6 bare local source ID. It is attached to the hand-authored illustrative sample and/or an old Coherent load; neither is valid global provenance. The frozen corpus contains the current globally-namespaced evidence."
+    },
+    {
+      "source_id": "s2",
+      "disposition": "drop_legacy_residue",
+      "reason": "Pre-L6 bare local source ID. It is attached to the hand-authored illustrative sample and/or an old Coherent load; neither is valid global provenance. The frozen corpus contains the current globally-namespaced evidence."
+    },
+    {
+      "source_id": "s3",
+      "disposition": "drop_legacy_residue",
+      "reason": "Pre-L6 bare local source ID. It is attached to the hand-authored illustrative sample and/or an old Coherent load; neither is valid global provenance. The frozen corpus contains the current globally-namespaced evidence."
+    },
+    {
+      "source_id": "s4",
+      "disposition": "drop_legacy_residue",
+      "reason": "Pre-L6 bare local source ID. It is attached to the hand-authored illustrative sample and/or an old Coherent load; neither is valid global provenance. The frozen corpus contains the current globally-namespaced evidence."
+    },
+    {
+      "source_id": "s7",
+      "disposition": "drop_legacy_residue",
+      "reason": "Pre-L6 bare local source ID retained beside coherent_q3fy26_cpo_s7 after the source-ID namespace repair."
+    },
+    {
+      "source_id": "s8",
+      "disposition": "drop_legacy_residue",
+      "reason": "Pre-L6 bare local source ID retained beside coherent_q3fy26_cpo_s8 after the source-ID namespace repair."
+    },
+    {
+      "source_id": "s10",
+      "disposition": "drop_legacy_residue",
+      "reason": "Pre-L6 bare local source ID retained beside coherent_q3fy26_cpo_s10 after the source-ID namespace repair."
+    },
+    {
+      "source_id": "s12",
+      "disposition": "drop_legacy_residue",
+      "reason": "Pre-L6 bare local source ID retained beside coherent_q3fy26_cpo_s12 after the source-ID namespace repair."
+    },
+    {
+      "source_id": "s13",
+      "disposition": "drop_legacy_residue",
+      "reason": "Pre-L6 bare local source ID retained beside coherent_q3fy26_cpo_s13 after the source-ID namespace repair."
+    },
+    {
+      "source_id": "s15",
+      "disposition": "drop_legacy_residue",
+      "reason": "Pre-L6 bare local source ID retained beside coherent_q3fy26_cpo_s15 after the source-ID namespace repair."
+    },
+    {
+      "source_id": "s16",
+      "disposition": "drop_legacy_residue",
+      "reason": "Pre-L6 bare local source ID retained beside coherent_q3fy26_cpo_s16 after the source-ID namespace repair."
+    },
+    {
+      "source_id": "s17",
+      "disposition": "drop_legacy_residue",
+      "reason": "Pre-L6 bare local source ID retained beside coherent_q3fy26_cpo_s17 after the source-ID namespace repair."
+    },
+    {
+      "source_id": "s19",
+      "disposition": "drop_legacy_residue",
+      "reason": "Pre-L6 bare local source ID retained beside coherent_q3fy26_cpo_s19 after the source-ID namespace repair."
+    },
+    {
+      "source_id": "s20",
+      "disposition": "drop_legacy_residue",
+      "reason": "Pre-L6 bare local source ID retained beside coherent_q3fy26_cpo_s20 after the source-ID namespace repair."
+    },
+    {
+      "source_id": "silicon_matter_ayar_labs_2025_s1",
+      "disposition": "drop_legacy_residue",
+      "reason": "Source ID from a superseded pre-rename Ayar extraction. Current frozen Ayar/Sivers documents use globally namespaced IDs; replay retains only assertions still present in those ground-truth files."
+    },
+    {
+      "source_id": "silicon_matter_ayar_labs_2025_s2",
+      "disposition": "drop_legacy_residue",
+      "reason": "Source ID from a superseded pre-rename Ayar extraction. Current frozen Ayar/Sivers documents use globally namespaced IDs; replay retains only assertions still present in those ground-truth files."
+    },
+    {
+      "source_id": "silicon_matter_ayar_labs_2025_s3",
+      "disposition": "drop_legacy_residue",
+      "reason": "Source ID from a superseded pre-rename Ayar extraction. Current frozen Ayar/Sivers documents use globally namespaced IDs; replay retains only assertions still present in those ground-truth files."
+    },
+    {
+      "source_id": "silicon_matter_celestial_marvell_2025_s1",
+      "disposition": "drop_legacy_residue",
+      "reason": "Source ID from the superseded Celestial/Marvell extraction; the frozen successor is optica_opn_marvell_celestial_2025 with optica_celestial_2025_s* IDs."
+    },
+    {
+      "source_id": "silicon_matter_celestial_marvell_2025_s2",
+      "disposition": "drop_legacy_residue",
+      "reason": "Source ID from the superseded Celestial/Marvell extraction; the frozen successor is optica_opn_marvell_celestial_2025 with optica_celestial_2025_s* IDs."
+    },
+    {
+      "source_id": "silicon_matter_celestial_marvell_2025_s3",
+      "disposition": "drop_legacy_residue",
+      "reason": "Source ID from the superseded Celestial/Marvell extraction; the frozen successor is optica_opn_marvell_celestial_2025 with optica_celestial_2025_s* IDs."
+    },
+    {
+      "source_id": "silicon_matter_celestial_marvell_2025_s4",
+      "disposition": "drop_legacy_residue",
+      "reason": "Source ID from the superseded Celestial/Marvell extraction; the frozen successor is optica_opn_marvell_celestial_2025 with optica_celestial_2025_s* IDs."
+    }
+  ]
+}

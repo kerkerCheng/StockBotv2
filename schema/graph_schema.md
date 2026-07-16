@@ -1,4 +1,4 @@
-# Graph Schema v0.1 — 動工規格
+# Graph Schema v0.2 — identity/provenance 規格
 
 > 本檔把 `CLAUDE.md` 的 v0 schema 落成可寫程式的規格。
 > 設計原則(見 CLAUDE.md L2/L4):**表的「形狀」鎖死,字彙留鬆**;屬性按「物理 / 關係 / 時變」三分歸位。
@@ -14,7 +14,9 @@
 ```
 
 - `extract.py`:**每份文件**輸出一份 JSON(本檔 §3 的格式),只描述「這份文件說了什麼」,不做合併、不碰 DB。
-- `loader`:把多份 JSON 依 `id` **MERGE** 進圖。跨文件的合併、衝突、信心累加都在這層,不在抽取層。
+- `loader`:node 依全域 `id` MERGE；canonical domain edge 依
+  `(src_id, relation, dst_id)` 產生的 `edge_key` MERGE。每份文件的 edge 候選值
+  另建 `EdgeAssertion`。跨文件的合併、衝突、信心累加都在這層,不在抽取層。
 - DB 可換:loader 是唯一綁 DB 的地方。
 
 ---
@@ -42,6 +44,7 @@
 
 - `ramp_difficulty_intrinsic`: int 1–5 — 該品類本質上多難量產(與「哪家供應商」無關)。
 - `concentration_score`: int 1–5 — **衍生值**,不可手填。由 loader/批次作業數「進入此 component 的 `supplies_to` 邊 × 加權市占」算出,存成有來源的快取。
+- `intrinsic_cycle_time_weeks`: int \| null — 不因交易對手改變的典型物理製程週期。
 
 > ⚠️ 不要往 node 放 `substitutability` / `consensus_coverage` / `demand_proof_level`(見 L4,它們分屬 edge / 時變觀測 / 證據 metadata)。
 
@@ -53,13 +56,14 @@
 
 | 欄位 | 型別 | 說明 |
 |---|---|---|
-| `id` | string | 唯一,建議 `src--relation-->dst` hash |
+| `edge_key` | string | 由 `(src_id, relation, dst_id)` 經單一 helper 產生的全域穩定身分 |
 | `src_id` | string | 來源節點 id |
 | `dst_id` | string | 目標節點 id |
 | `relation` | string(字彙) | 見 §4 |
-| `attributes` | object(jsonb) | 關係型瓶頸屬性放這(見下) |
-| `confidence` | float 0–1 | |
-| `source_ids` | string[] | |
+| `attributes` | object(jsonb) | EdgeAssertion 的 materialized view；有衝突未決時該屬性為 unknown |
+| `confidence` | float 0–1 | 只表示關係存在的信心，不決定屬性候選值 |
+| `source_ids` | string[] | assertions 引文 ID 的去重聯集（快速查詢） |
+| `source_doc_ids` | string[] | assertions 文件 ID 的去重聯集（快速查詢） |
 | `updated_at` | ISO8601 | |
 
 ### `attributes` 內的關係型(隨另一端而變)瓶頸屬性
@@ -68,9 +72,30 @@
 
 - `substitutability`: int 1–5(5 = 完全不可替代,對這條特定關係而言)
 - `sole_source`: bool — 此買家是否單一來源
-- `lead_time_weeks`: int \| null
+- `structural_lead_time_weeks`: int \| null — 特定供應關係在正常條件下的慢變典型交期。
 - `qualification_status`: enum `none|sampling|qualifying|qualified|designed_in` \| null
 - `ramp_execution`: int 1–5 \| null — **這家供應商實際 ramp 能力**(與 node 的內在難度分開)
+
+`lead_time_weeks` 已停用且 validator 會拒收。缺料、利用率、物流或特定日期造成的
+實際交期是時變觀測；專用 Engine C schema 建成前只能存為 dated Claim。
+
+### EdgeAssertion（每份文件的 edge 證據真相）
+
+每個 extraction edge 建一個 `(:EdgeAssertion)`：
+
+| 欄位 | 說明 |
+|---|---|
+| `id` | `<doc_id>_<local_edge_id>`，全域唯一 |
+| `local_id` | extraction 內的原始 edge id |
+| `edge_key` | 對應 canonical domain relationship |
+| `src_id` / `relation` / `dst_id` | 可獨立重建 canonical triple |
+| `attributes` | 該文件提出的候選屬性 JSON；不得被其他文件覆寫 |
+| `confidence` | 該 assertion 對關係存在／候選資訊的信心 |
+| `source_ids` | 該文件內逐字引文 ID |
+| `source_doc_id` | 文件 `doc_id`；U3 以 `CITES` 連到 SourceDoc |
+
+Canonical relationship 的屬性是 assertions 的 materialized view，不是最後載入者的
+值，也不得用 relationship confidence 對衝突屬性投票。
 
 ---
 
@@ -80,9 +105,9 @@
 
 | 欄位 | 型別 | 說明 |
 |---|---|---|
-| `id` | string | |
+| `id` | string | `<doc_id>_<local_claim_id>`；loader 會將舊 corpus 的 `cl1` 正規化為全域 ID |
 | `statement` | string | 自然語言主張,例「CPO 放量會把外置雷射源需求拉 3x」 |
-| `subject_id` | string | 主張指向的 node/edge id |
+| `subject_id` | string | extraction 內可指向 node id 或 document-local edge id；入圖後分成 `subject_kind=node + ABOUT`，或 `subject_kind=edge + subject_edge_key` |
 | `demand_proof_level` | enum | `confirmed|guided|inferred|speculative` |
 | `disproof_condition` | string | **可證偽是一等公民**:什麼出現就推翻此主張 |
 | `confidence` | float 0–1 | |
@@ -126,7 +151,8 @@ confidence 不只會上調——當某文件**事後**爆出可信度危機（�
    - `audit_note`（string）——日期 + 原因 + 降級幅度 + 預計驗證日
 4. 危機解除（如重編證實無虞）→ 移除標記、confidence 回調；證實指控 → 依 disproof 流程處理 thesis
 
-注意：以非 APOC 路徑載入的邊，`source_ids` 是最後寫入文件的覆寫值（v0 已知限制），批次篩「唯一來源」時會有誤報，逐條確認前不要自動化降級。
+Canonical relationship 的 `source_ids` / `source_doc_ids` 在 APOC 與非 APOC
+路徑都必須使用去重聯集；逐文件候選值一律查 EdgeAssertion。
 
 ---
 

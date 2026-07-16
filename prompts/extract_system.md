@@ -19,13 +19,13 @@ You output ONLY a JSON object that conforms exactly to the intermediate_format s
     {
       "id": "co:example", "type": "Company", "name": "Example Corp",
       "abstraction_level": "module_subsystem", "role": "leader",
-      "aliases": [], "attributes": {}, "confidence": 0.9, "source_ids": ["s1"]
+      "aliases": [], "attributes": {}, "confidence": 0.9, "source_ids": ["<doc_id>_s1"]
     }
   ],
   "edges": [
     {
       "id": "e1", "src_id": "co:example", "dst_id": "tech:cpo",
-      "relation": "supplies_to", "attributes": {}, "confidence": 0.75, "source_ids": ["s1"]
+      "relation": "supplies_to", "attributes": {}, "confidence": 0.75, "source_ids": ["<doc_id>_s1"]
     }
   ],
   "claims": []
@@ -120,12 +120,16 @@ Ask three questions before placing any attribute:
   regardless of which supplier is doing it. (5 = extremely hard: InP epi, ELS, etc.)
 - `concentration_score`: int 1-5 — DERIVED from number of qualifying suppliers. DO NOT
   hand-fill unless you can count suppliers from the document. Leave null if unknown.
+- `intrinsic_cycle_time_weeks`: int | null — typical physical process cycle time that
+  does not change when the counterparty changes. Do not put shortage-driven current
+  delivery times here.
 
 ### Edge `attributes` (relational, depends on the specific A→B pair)
 `supplies_to` and `depends_on` edges may carry:
 - `substitutability`: int 1-5 (5 = sole-source / irreplaceable for THIS buyer)
 - `sole_source`: bool
-- `lead_time_weeks`: int | null
+- `structural_lead_time_weeks`: int | null — the slow-changing normal lead time for
+  this specific supplier/buyer relationship
 - `qualification_status`: see vocab above
 - `ramp_execution`: int 1-5 — THIS supplier's actual execution capability (distinct
   from the intrinsic difficulty of the category)
@@ -149,8 +153,13 @@ Where does the document signal:
 - Low substitutability (no qualified alternative)
 - Long lead times or slow qualification cycles
 - Capacity constraints or yield challenges
-Elevate these signals as edge attributes (substitutability, sole_source, lead_time_weeks,
+Elevate these signals as edge attributes (substitutability, sole_source,
+structural_lead_time_weeks,
 qualification_status) and as node attributes (ramp_difficulty_intrinsic).
+
+Never emit the legacy `lead_time_weeks` field. A shortage-, utilization-, logistics-,
+or date-specific actual lead time is a time-varying observation: represent it only as
+a dated Claim until Engine C has a dedicated observation table.
 
 **Pass 4 — Evidence**
 For EVERY node, edge, and claim you create, identify the verbatim sentence or phrase
@@ -168,7 +177,7 @@ A node/edge/claim with an empty `source_ids` array is invalid — do not emit it
 
 Every item in `nodes`, `edges`, and `claims` MUST have:
 ```json
-"source_ids": ["s1"]   // at least one entry
+"source_ids": ["<doc_id>_s1"]   // at least one entry
 ```
 
 The `sources` array must have a corresponding entry:
@@ -235,8 +244,9 @@ bottleneck assertion that warrants tracking across documents:
 - "InP substrate supply is sole-sourced from one vendor" → claim
 
 Each claim requires:
-- `id`: stable claim id, `cl1`, `cl2`, ... — REQUIRED (cross-document reloads
-  MERGE by this id; a claim without `id` fails schema validation)
+- `id`: globally namespaced claim id, `<doc_id>_cl1`, `<doc_id>_cl2`, ... — REQUIRED.
+  The loader also namespaces legacy document-local IDs during migration, but all new
+  extraction output must emit the global form directly.
 - `statement`: plain-language assertion
 - `subject_id`: the node or edge the claim is about
 - `demand_proof_level`: see vocab

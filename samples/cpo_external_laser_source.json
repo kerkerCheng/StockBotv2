@@ -13,10 +13,10 @@
     "evidence_tier": 3
   },
   "sources": [
-    { "id": "s1", "locator": "p1", "quote": "CPO 把光引擎與交換 ASIC 共封裝,以降低 SerDes 功耗。" },
-    { "id": "s2", "locator": "p2", "quote": "CPO 採外置雷射源(ELS),雷射移出封裝以利散熱與可靠度。" },
-    { "id": "s3", "locator": "p3", "quote": "ELS 採高功率 CW DFB 雷射,需 InP 基板。" },
-    { "id": "s4", "locator": "p4", "quote": "高功率 CW 雷射供應集中於少數光元件廠,認證周期長。" }
+    { "id": "sample-cpo-els-001_s1", "locator": "p1", "quote": "CPO 把光引擎與交換 ASIC 共封裝,以降低 SerDes 功耗。" },
+    { "id": "sample-cpo-els-001_s2", "locator": "p2", "quote": "CPO 採外置雷射源(ELS),雷射移出封裝以利散熱與可靠度。" },
+    { "id": "sample-cpo-els-001_s3", "locator": "p3", "quote": "ELS 採高功率 CW DFB 雷射,需 InP 基板。" },
+    { "id": "sample-cpo-els-001_s4", "locator": "p4", "quote": "高功率 CW 雷射供應集中於少數光元件廠,認證周期長。" }
   ],
   "nodes": [
     {
@@ -28,7 +28,7 @@
       "aliases": ["AI capex", "算力擴張"],
       "attributes": {},
       "confidence": 0.9,
-      "source_ids": ["s1"]
+      "source_ids": ["sample-cpo-els-001_s1"]
     },
     {
       "id": "tech:ai_switch",
@@ -39,7 +39,7 @@
       "aliases": ["交換器", "scale-up fabric"],
       "attributes": {},
       "confidence": 0.85,
-      "source_ids": ["s1"]
+      "source_ids": ["sample-cpo-els-001_s1"]
     },
     {
       "id": "tech:cpo",
@@ -50,7 +50,7 @@
       "aliases": ["CPO"],
       "attributes": { "ramp_difficulty_intrinsic": 4 },
       "confidence": 0.9,
-      "source_ids": ["s1", "s2"]
+      "source_ids": ["sample-cpo-els-001_s1", "sample-cpo-els-001_s2"]
     },
     {
       "id": "tech:external_laser_source",
@@ -61,7 +61,7 @@
       "aliases": ["ELS", "外置雷射源"],
       "attributes": { "ramp_difficulty_intrinsic": 4, "concentration_score": 4 },
       "confidence": 0.85,
-      "source_ids": ["s2", "s4"]
+      "source_ids": ["sample-cpo-els-001_s2", "sample-cpo-els-001_s4"]
     },
     {
       "id": "tech:cw_dfb_laser",
@@ -72,7 +72,7 @@
       "aliases": ["CW DFB", "高功率連續波雷射"],
       "attributes": { "ramp_difficulty_intrinsic": 5, "concentration_score": 4 },
       "confidence": 0.8,
-      "source_ids": ["s3", "s4"]
+      "source_ids": ["sample-cpo-els-001_s3", "sample-cpo-els-001_s4"]
     },
     {
       "id": "mat:inp_substrate",
@@ -83,7 +83,7 @@
       "aliases": ["InP", "磷化銦"],
       "attributes": { "ramp_difficulty_intrinsic": 4, "concentration_score": 5 },
       "confidence": 0.75,
-      "source_ids": ["s3"]
+      "source_ids": ["sample-cpo-els-001_s3"]
     },
     {
       "id": "co:broadcom",
@@ -94,7 +94,7 @@
       "aliases": ["AVGO"],
       "attributes": {},
       "confidence": 0.8,
-      "source_ids": ["s1"]
+      "source_ids": ["sample-cpo-els-001_s1"]
     },
     {
       "id": "co:lumentum",
@@ -105,7 +105,7 @@
       "aliases": ["LITE"],
       "attributes": {},
       "confidence": 0.7,
-      "source_ids": ["s4"]
+      "source_ids": ["sample-cpo-els-001_s4"]
     },
     {
       "id": "co:coherent",
@@ -116,7 +116,7 @@
       "aliases": ["COHR"],
       "attributes": {},
       "confidence": 0.7,
-      "source_ids": ["s4"]
+      "source_ids": ["sample-cpo-els-001_s4"]
     }
   ],
   "edges": [
@@ -127,7 +127,7 @@
       "relation": "enables",
       "attributes": {},
       "confidence": 0.85,
-      "source_ids": ["s1"]
+      "source_ids": ["sample-cpo-els-001_s1"]
     },
     {
       "id": "e:cpo--is_component_of-->ai_switch",
@@ -136,7 +136,7 @@
       "relation": "is_component_of",
       "attributes": {},
       "confidence": 0.85,
-      "source_ids": ["s1"]
+      "source_ids": ["sample-cpo-els-001_s1"]
     },
     {
       "id": "e:els--is_component_of-->cpo",
@@ -145,7 +145,7 @@
       "relation": "is_component_of",
       "attributes": { "substitutability": 2, "sole_source": false },
       "confidence": 0.8,
-      "source_ids": ["s2"]
+      "source_ids": ["sample-cpo-els-001_s2"]
     },
     {
       "id": "e:cwdfb--is_component_of-->els",
@@ -154,7 +154,7 @@
       "relation": "is_component_of",
       "attributes": { "substitutability": 2 },
       "confidence": 0.8,
-      "source_ids": ["s3"]
+      "source_ids": ["sample-cpo-els-001_s3"]
     },
     {
       "id": "e:cwdfb--depends_on-->inp",
@@ -163,7 +163,7 @@
       "relation": "depends_on",
       "attributes": { "substitutability": 1, "sole_source": false },
       "confidence": 0.75,
-      "source_ids": ["s3"]
+      "source_ids": ["sample-cpo-els-001_s3"]
     },
     {
       "id": "e:lumentum--supplies_to-->els",
@@ -173,12 +173,12 @@
       "attributes": {
         "substitutability": 2,
         "sole_source": false,
-        "lead_time_weeks": 26,
+        "structural_lead_time_weeks": 26,
         "qualification_status": "qualifying",
         "ramp_execution": 3
       },
       "confidence": 0.65,
-      "source_ids": ["s4"]
+      "source_ids": ["sample-cpo-els-001_s4"]
     },
     {
       "id": "e:coherent--supplies_to-->els",
@@ -188,12 +188,12 @@
       "attributes": {
         "substitutability": 2,
         "sole_source": false,
-        "lead_time_weeks": 30,
+        "structural_lead_time_weeks": 30,
         "qualification_status": "sampling",
         "ramp_execution": 3
       },
       "confidence": 0.6,
-      "source_ids": ["s4"]
+      "source_ids": ["sample-cpo-els-001_s4"]
     },
     {
       "id": "e:broadcom--depends_on-->els",
@@ -202,18 +202,18 @@
       "relation": "depends_on",
       "attributes": { "substitutability": 2, "sole_source": false },
       "confidence": 0.65,
-      "source_ids": ["s2"]
+      "source_ids": ["sample-cpo-els-001_s2"]
     }
   ],
   "claims": [
     {
-      "id": "c:els_demand_3x",
+      "id": "sample-cpo-els-001_cl1",
       "statement": "CPO 量產放量會把外置雷射源(ELS)需求顯著拉升,且供給端認證周期長,短期難擴。",
       "subject_id": "tech:external_laser_source",
       "demand_proof_level": "inferred",
       "disproof_condition": "若主要交換器廠改採可插拔光模組(pluggable)而非 CPO,或 ELS 出現可快速替代的二供且認證縮短,則此瓶頸主張降級。",
       "confidence": 0.55,
-      "source_ids": ["s2", "s4"]
+      "source_ids": ["sample-cpo-els-001_s2", "sample-cpo-els-001_s4"]
     }
   ]
 }
