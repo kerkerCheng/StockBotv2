@@ -176,6 +176,8 @@ def calculate_position_limit(
     maximum = min(nav_limit, budget_limit) if eligible else 0.0
     return {
         "policy_version": current["policy_version"],
+        "total_nav": nav,
+        "high_risk_budget": budget,
         "eligible_to_open": eligible,
         "input_conviction": conviction,
         "effective_conviction": effective_conviction,

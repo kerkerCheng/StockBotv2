@@ -56,6 +56,7 @@
 
 ## 前瞻模擬投資
 
+- 實作與操作說明見 `paper_portfolio/README.md`；第一次使用必須明確選擇 base currency 與虛擬 NAV，未初始化時 fail closed。
 - 模擬帳本獨立放在 `paper_portfolio/`，不與 thesis、Neo4j 或 Engine C 的事實資料混存。
 - 每筆模擬 open/add/trim/close 必須在當下凍結 thesis 版本、價格/FX、部位、理由、預期期間與 disproof condition；事後更正用新 event，不改寫舊紀錄。
 - 每季、disproof 觸發或 close 時做 review；績效是決策稽核 context，不自動證明或推翻 thesis。
