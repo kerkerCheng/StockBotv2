@@ -97,6 +97,18 @@
 Canonical relationship 的屬性是 assertions 的 materialized view，不是最後載入者的
 值，也不得用 relationship confidence 對衝突屬性投票。
 
+### SourceDoc（每份文件一個 provenance node）
+
+每份 extraction 建一個 `(:SourceDoc {id: doc_id})`。固定 properties 為：
+`title`、`source_type`、`evidence_tier`、`origin_entity`、`url`、`publisher`、
+`published_at`、`retrieved_at`、`storage_permission`、`permission_basis`。
+Phase I 舊 corpus 缺 URL、日期或 storage metadata 時允許 null；新遠端入口在 U12
+開始要求 storage permission 兩欄必填。
+
+每個 Claim 與 EdgeAssertion 都必須各有且只有一條 `[:CITES]->(:SourceDoc)`。
+Canonical domain relationship 不直接 CITES，僅保留 `source_doc_ids` / `source_ids`
+去重聯集作快速查詢；逐文件、逐屬性證據一律經 EdgeAssertion → CITES 查詢。
+
 ---
 
 ## 3. 需求主張 `claims`(可選 array)

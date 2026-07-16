@@ -69,6 +69,22 @@
             "null"
           ]
         },
+        "storage_permission": {
+          "enum": [
+            "repo_full",
+            "repo_excerpt",
+            "local_only",
+            null
+          ],
+          "description": "依內容授權與雲端保存權決定的 Git storage class；Phase I 舊 corpus 可為 null。"
+        },
+        "permission_basis": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "storage_permission 的人工可讀依據；Phase I 舊 corpus 可為 null。"
+        },
         "source_type": {
           "enum": [
             "filing",

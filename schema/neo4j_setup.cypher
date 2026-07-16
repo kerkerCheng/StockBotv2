@@ -11,6 +11,12 @@
 CREATE CONSTRAINT entity_id_unique IF NOT EXISTS
 FOR (n:Entity) REQUIRE n.id IS UNIQUE;
 
+CREATE CONSTRAINT edge_assertion_id_unique IF NOT EXISTS
+FOR (ea:EdgeAssertion) REQUIRE ea.id IS UNIQUE;
+
+CREATE CONSTRAINT source_doc_id_unique IF NOT EXISTS
+FOR (sd:SourceDoc) REQUIRE sd.id IS UNIQUE;
+
 // ── 2. 查詢用索引 ─────────────────────────────────────────
 CREATE INDEX entity_type IF NOT EXISTS
 FOR (n:Entity) ON (n.type);

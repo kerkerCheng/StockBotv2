@@ -156,6 +156,21 @@ Pending completion of U2, U3, U3b, U4, and U5.
 - Canonical relationship attributes are intentionally empty until U3b projects
   conflict-safe materialized values from EdgeAssertions.
 
+### U3 SourceDoc/CITES checkpoint (2026-07-16)
+
+- Backfilled exactly 17 SourceDocs from the unchanged U2 manifest.
+- All 249 EdgeAssertions and 56 Claims have exactly one `CITES` relationship;
+  there are no missing or duplicate citations.
+- Three metadata spot checks matched the extraction ground truth:
+  `sivers_ar_2025_photonics_excerpt` → `Sivers Semiconductors`,
+  `enablence_sivers_onet_els_2026` → `Enablence Technologies`, and
+  `silicon_matter_sivers_ayar_2026_03_14` → `silicon_matter_substack`.
+- Graph-backed SIVE L8 reports seven evidence SourceDocs and four distinct
+  non-null origins, exactly matching the pre-migration disk-scan result.
+- A rollback-only permission smoke using the cloud-routine Neo4j account could
+  create SourceDoc, EdgeAssertion, and CITES, confirming that the new name tokens
+  are usable by the remote loader without granting admin/delete authority.
+
 The after section must record:
 
 - the exact frozen manifest identity and hashes;

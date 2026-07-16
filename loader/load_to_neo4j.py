@@ -83,7 +83,7 @@ def edge_key(src_id: str, relation: str, dst_id: str) -> str:
     return "edge:" + hashlib.sha256(identity.encode("utf-8")).hexdigest()
 
 
-def _global_evidence_id(doc_id: str, local_id: str) -> str:
+def evidence_id(doc_id: str, local_id: str) -> str:
     """Namespace document-local evidence IDs without double-prefixing reloads."""
 
     prefix = f"{doc_id}_"
@@ -145,6 +145,21 @@ SET r.id = $edge_key,
 RETURN r.edge_key
 """
 
+MERGE_SOURCE_DOC = """
+MERGE (sd:SourceDoc {id: $id})
+SET sd.title = $title,
+    sd.source_type = $source_type,
+    sd.evidence_tier = $evidence_tier,
+    sd.origin_entity = $origin_entity,
+    sd.url = $url,
+    sd.publisher = $publisher,
+    sd.published_at = $published_at,
+    sd.retrieved_at = $retrieved_at,
+    sd.storage_permission = $storage_permission,
+    sd.permission_basis = $permission_basis
+RETURN sd.id
+"""
+
 MERGE_EDGE_ASSERTION = """
 MERGE (ea:EdgeAssertion {id: $assertion_id})
 SET ea.local_id = $local_id,
@@ -157,6 +172,9 @@ SET ea.local_id = $local_id,
     ea.source_ids = $source_ids,
     ea.source_doc_id = $source_doc_id,
     ea.updated_at = $updated_at
+WITH ea
+MATCH (sd:SourceDoc {id: $source_doc_id})
+MERGE (ea)-[:CITES]->(sd)
 RETURN ea.id
 """
 
@@ -174,6 +192,9 @@ SET cl.local_id = $local_id,
     cl.subject_node_id = $subject_node_id,
     cl.subject_edge_key = null,
     cl.updated_at = $updated_at
+WITH cl
+MATCH (sd:SourceDoc {id: $source_doc_id})
+MERGE (cl)-[:CITES]->(sd)
 WITH cl
 MATCH (s:Entity {id: $subject_node_id})
 MERGE (cl)-[:ABOUT]->(s)
@@ -194,13 +215,39 @@ SET cl.local_id = $local_id,
     cl.subject_node_id = null,
     cl.subject_edge_key = $subject_edge_key,
     cl.updated_at = $updated_at
+WITH cl
+MATCH (sd:SourceDoc {id: $source_doc_id})
+MERGE (cl)-[:CITES]->(sd)
 RETURN cl.id
 """
+
+
+def load_source_doc(doc: dict, session) -> None:
+    """Materialize one extraction's immutable document-level provenance."""
+
+    source_doc = doc["source_doc"]
+    session.run(
+        MERGE_SOURCE_DOC,
+        id=source_doc["doc_id"],
+        title=source_doc["title"],
+        source_type=source_doc["source_type"],
+        evidence_tier=source_doc["evidence_tier"],
+        origin_entity=source_doc.get("origin_entity"),
+        url=source_doc.get("url"),
+        publisher=source_doc.get("publisher"),
+        published_at=source_doc.get("published_at"),
+        retrieved_at=source_doc.get("retrieved_at"),
+        storage_permission=source_doc.get("storage_permission"),
+        permission_basis=source_doc.get("permission_basis"),
+    )
 
 
 def load(doc: dict, session, use_apoc: bool = False) -> None:
     ts = _now()
     doc_id = doc["source_doc"]["doc_id"]
+
+    # SourceDoc must exist before Claim/EdgeAssertion CITES edges are created.
+    load_source_doc(doc, session)
 
     # ── nodes ──
     for n in doc.get("nodes", []):
@@ -253,7 +300,7 @@ def load(doc: dict, session, use_apoc: bool = False) -> None:
         )
         session.run(
             MERGE_EDGE_ASSERTION,
-            assertion_id=_global_evidence_id(doc_id, e["id"]),
+            assertion_id=evidence_id(doc_id, e["id"]),
             local_id=e["id"],
             edge_key=canonical_key,
             src_id=e["src_id"],
@@ -271,7 +318,7 @@ def load(doc: dict, session, use_apoc: bool = False) -> None:
         name = c.get("name") or (c["statement"][:30] + "…")
         local_id = c["id"]
         params = dict(
-            id=_global_evidence_id(doc_id, local_id),
+            id=evidence_id(doc_id, local_id),
             local_id=local_id,
             name=name,
             statement=c["statement"],

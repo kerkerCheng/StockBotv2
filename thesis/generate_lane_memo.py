@@ -63,10 +63,53 @@ def _resolve_ticker(ticker: str | None, company_id: str | None) -> str | None:
     return None
 
 
-def _check_source_diversity(company_id: str | None) -> tuple[str, bool]:
+_Q_SOURCE_DIVERSITY = """
+MATCH (company:Entity {id: $company_id})
+CALL (company) {
+  MATCH (claim:Claim)-[:CITES]->(sd:SourceDoc)
+  WHERE claim.subject_kind = 'node'
+    AND claim.subject_node_id = company.id
+  RETURN sd
+  UNION
+  MATCH (company)-[relationship]-()
+  WHERE relationship.edge_key IS NOT NULL
+  MATCH (assertion:EdgeAssertion {edge_key: relationship.edge_key})-[:CITES]->(sd:SourceDoc)
+  RETURN sd
+}
+WITH collect(DISTINCT sd) AS evidence_docs
+MATCH (all_sd:SourceDoc)
+RETURN count(all_sd) AS total_source_docs,
+       size(evidence_docs) AS evidence_documents,
+       [sd IN evidence_docs WHERE sd.origin_entity IS NOT NULL | sd.origin_entity]
+         AS origin_entities
+"""
+
+
+def _source_diversity_from_session(session, company_id: str) -> dict:
+    """Return company evidence diversity derived exclusively from graph CITES."""
+
+    record = session.run(_Q_SOURCE_DIVERSITY, company_id=company_id).single()
+    if not record:
+        return {
+            "total_source_docs": 0,
+            "evidence_documents": 0,
+            "origin_entities": [],
+        }
+    return {
+        "total_source_docs": record["total_source_docs"],
+        "evidence_documents": record["evidence_documents"],
+        "origin_entities": sorted(set(record["origin_entities"] or [])),
+    }
+
+
+def _check_source_diversity(
+    company_id: str | None,
+    *,
+    driver=None,
+) -> tuple[str, bool]:
     """
-    L8 來源獨立性 gate：掃描 extractions/*.json，找出包含 company_id 節點的文件，
-    統計不重複的 origin_entity 數量。< 3 個獨立來源 → 硬性阻擋。
+    L8 來源獨立性 gate：從 Claim／EdgeAssertion 的 CITES 路徑查 SourceDoc，
+    統計與 company_id 證據直接相連的不重複 origin_entity。
 
     回傳 (context_md, passes)。
     """
@@ -77,50 +120,43 @@ def _check_source_diversity(company_id: str | None) -> tuple[str, bool]:
             True,
         )
 
-    import json as _json
-    extractions_dir = ROOT / "extractions"
-    if not extractions_dir.exists():
-        return (
-            "## L8 來源獨立性 Gate\n"
-            f"⚠ extractions/ 目錄不存在，跳過 L8 檢查。\n",
-            True,
-        )
-
-    found_entities: list[str] = []
-    scanned = 0
-    for p in extractions_dir.glob("*.json"):
+    owns_driver = driver is None
+    if owns_driver:
         try:
-            doc = _json.loads(p.read_text(encoding="utf-8"))
-        except Exception:
-            continue
-        scanned += 1
-        # Check if company_id appears as any node/edge/claim id in this file
-        all_ids: set[str] = set()
-        for n in doc.get("nodes", []):
-            all_ids.add(n.get("id", ""))
-        for e in doc.get("edges", []):
-            all_ids.add(e.get("src_id", ""))
-            all_ids.add(e.get("dst_id", ""))
-        for c in doc.get("claims", []):
-            all_ids.add(c.get("subject_id", ""))
-        if company_id in all_ids:
-            entity = doc.get("source_doc", {}).get("origin_entity")
-            if entity:
-                found_entities.append(entity)
+            from neo4j import GraphDatabase
+        except ImportError as exc:
+            return (f"## L8 來源獨立性 Gate\n⚠ neo4j 套件不可用：{exc}\n", False)
+        password = os.environ.get("NEO4J_PASSWORD")
+        if not password:
+            return ("## L8 來源獨立性 Gate\n⚠ NEO4J_PASSWORD 未設定。\n", False)
+        driver = GraphDatabase.driver(
+            os.environ.get("NEO4J_URI", "bolt://localhost:7687"),
+            auth=(os.environ.get("NEO4J_USER", "neo4j"), password),
+        )
+    try:
+        with driver.session() as session:
+            result = _source_diversity_from_session(session, company_id)
+    finally:
+        if owns_driver:
+            driver.close()
 
-    distinct_entities = sorted(set(found_entities))
+    distinct_entities = result["origin_entities"]
     count = len(distinct_entities)
     passes = count >= 3
 
     lines = [f"## L8 來源獨立性 Gate"]
-    lines.append(f"掃描 {scanned} 份文件，其中含 `{company_id}` 節點者：{len(found_entities)} 份")
+    lines.append(
+        f"圖中 SourceDoc 共 {result['total_source_docs']} 份；"
+        f"與 `{company_id}` 的 Claim／EdgeAssertion 證據直接相連："
+        f"{result['evidence_documents']} 份"
+    )
     lines.append(f"不重複 origin_entity 數：**{count}**/3（需 ≥ 3 才通過）")
     for e in distinct_entities:
         lines.append(f"- {e}")
     if not passes:
         lines.append(
             "\n⛔ 來源獨立性不足（L8）：需要至少 3 個不同 origin_entity 的文件才能生成 Lane Memo。\n"
-            "請先補充獨立第三方或客戶端文件（見 CLAUDE.md L8 判準），或用 --override-gate 強制覆蓋。"
+            "請先補充獨立第三方或客戶端文件（見 AGENTS.md L8 判準），或用 --override-gate 強制覆蓋。"
         )
     else:
         lines.append("\n✓ 來源獨立性通過")
