@@ -1,0 +1,36 @@
+{
+  "schema_version": "1",
+  "manifest_sha256": "a5a79ee2a10938813e82b044fd1c8413ae1cce4eac36d76b64781b82b5fb780d",
+  "exceptions": [
+    {
+      "source_id": "aleabitoreddit_sivers_s1",
+      "disposition": "drop_legacy_residue",
+      "reason": "Pre-rename local-format source ID from extractions/silicon_matter_ayar_labs.json; the repo_excerpt rewrite renamed the surviving sources to aleabitoreddit_sivers_cpo_customer_map_s1..s3 and this Ayar Labs entry maps to the new _s1."
+    },
+    {
+      "source_id": "aleabitoreddit_sivers_s2",
+      "disposition": "drop_legacy_residue",
+      "reason": "Pre-rename local-format source ID; the Sivers DFB-demand management quote was removed from the repo_excerpt rewrite of extractions/silicon_matter_ayar_labs.json and is no longer cited."
+    },
+    {
+      "source_id": "aleabitoreddit_sivers_s3",
+      "disposition": "drop_legacy_residue",
+      "reason": "Pre-rename local-format source ID; the CW-laser shortage management quote was removed together with claim cl2 in the repo_excerpt rewrite of extractions/silicon_matter_ayar_labs.json."
+    },
+    {
+      "source_id": "aleabitoreddit_sivers_s4",
+      "disposition": "drop_legacy_residue",
+      "reason": "Pre-rename local-format source ID; the Marvell Celestial entry maps to aleabitoreddit_sivers_cpo_customer_map_s2 in the repo_excerpt rewrite."
+    },
+    {
+      "source_id": "aleabitoreddit_sivers_s5",
+      "disposition": "drop_legacy_residue",
+      "reason": "Pre-rename local-format source ID; the Goldman Sachs CPO TAM quote was removed together with claim cl2 in the repo_excerpt rewrite of extractions/silicon_matter_ayar_labs.json."
+    },
+    {
+      "source_id": "aleabitoreddit_sivers_s7",
+      "disposition": "drop_legacy_residue",
+      "reason": "Pre-rename local-format source ID; the Win Semiconductor partnership entry maps to aleabitoreddit_sivers_cpo_customer_map_s3 in the repo_excerpt rewrite."
+    }
+  ]
+}
