@@ -54,16 +54,13 @@
 
 ---
 
-## Benchmark
+## 前瞻模擬投資（待 U19 實作）
 
-| 項目 | 設定 |
-|---|---|
-| 對比基準 | SOXX ETF（費城半導體指數）|
-| 追蹤週期 | 進場後 **6 個月**檢視一次，之後每季一次 |
-| 成功判準 | 風險調整後 return 優於 SOXX（相同持有期） |
-| 整體專案成功判準 | 第一條切片的 thesis，追蹤 6-12 個月後，贏不過等權 AI 供應鏈籃子 → 方法論需 review |
-
-> 沒有這個 benchmark，系統永遠在優化 pipeline，卻不知道它賺不賺錢。（blind-spot B6）
+- 模擬帳本獨立放在 `paper_portfolio/`，不與 thesis、Neo4j 或 Engine C 的事實資料混存。
+- 每筆模擬 open/add/trim/close 必須在當下凍結 thesis 版本、價格/FX、部位、理由、預期期間與 disproof condition；事後更正用新 event，不改寫舊紀錄。
+- 每季、disproof 觸發或 close 時做 review；績效是決策稽核 context，不自動證明或推翻 thesis。
+- `SOXX` 僅是半導體標的可選機會成本對照，不作 gate 或系統成功判準。不維護自訂 AI 供應鏈籃子。
+- 此帳本不是歷史回測、不會自動下實盤，也不以少量樣本宣稱 alpha。
 
 ---
 

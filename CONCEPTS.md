@@ -61,6 +61,18 @@ The automatic, low-cost judgment step between harvesting raw signals (tracked-th
 The recurring cloud-run process that keeps the knowledge graph fed without the user initiating research: harvest (tracked themes + Engine B feeds) → Signal Triage → full extraction drafts → a review artifact (PR for reports with drafts, Issue for pure alerts) awaiting human approval. Two hard rules define it: it never loads its own fresh drafts into the graph (approval always precedes loading), and a week with no primary-source material is reported honestly as sparse rather than padded.
 *Avoid:* weekly scan cron, 週報 routine
 
+### Source Trace Manual（追源手冊）
+The shared repo skill that turns the source registry's routing knowledge (US → EDGAR, TW → MOPS, technical → arXiv, generic search only as third-layer fallback) into an executable tracing chain. All three graph entry points — the Weekly Signal Scan, local lead-intake, and claude.ai chat via the Graph MCP Gateway — follow this one manual, so tracing behavior is identical regardless of where a signal enters. Every trace must record the routes attempted; "couldn't trace" without an attempt list is invalid.
+*Avoid:* source routing prompt, per-entry tracing rules
+
+### Trace Quarantine（追源未果清單）
+The disposition for signals that pass triage but fail primary-source tracing, applied by tier: tier 1–2 sources (filings, earnings calls known to exist) still produce extraction drafts with honest relay marking; tier 3+ (social relays) produce no draft and instead land in the weekly report's untraced list plus a `weekly-scan` labeled Issue, surfacing via the existing session-start digest. Closing the Issue means the source was recovered (re-enters intake) or abandoned. Trades draft volume for graph trustworthiness.
+*Avoid:* failed-trace park, blocked signals
+
+### Corroboration Backlog（待印證清單）
+The set of claims whose sources all share a single `origin_entity`, derived on demand by graph query — never maintained as a file or ledger. A claim leaves the backlog automatically when a second independent `origin_entity` source is loaded. Finding corroboration is not required in the week a claim enters the graph; the backlog exists so single-origin claims stay visible until upgraded (L8).
+*Avoid:* pending-verification file, corroboration ledger
+
 ---
 
 ## Remote Access
@@ -68,9 +80,25 @@ The recurring cloud-run process that keeps the knowledge graph fed without the u
 ### Graph MCP Gateway
 The narrow-tool gateway through which every claude.ai surface (cloud runs, phone and web conversations) reads or writes the knowledge graph remotely. Exposes a fixed, small set of capabilities — graph context summary, read-only query, extraction rulebook retrieval, and validated extraction loading — rather than raw database access; anything not expressed as one of these tools is impossible remotely. Writes are double-gated: built-in schema validation rejects malformed extractions, and the loading tool requires per-call human approval, making the approval prompt itself the L8 gate's user-facing form.
 
+### Research Action（研究行動）
+The unit of remote-intake provenance. One research action = one claude.ai conversation's arc of "identify graph gap → research → extract → L8 confirm → load," which may cover multiple source documents. Each action lands exactly one intake report plus its documents' raw text and extraction JSONs in the repo, and produces exactly one git commit — records are per-action, not per-document. The intake report is written by claude.ai at load time (the rationale exists only in that conversation) and lives as a repo file, not a PR; GitHub is only a pushed browse-mirror.
+*Avoid:* per-document intake, ingestion batch
+
 ### Financial Snapshot
 A point-in-time record of market and financial metrics for a single ticker, stored in the `financial_snapshots` table. One row per `(ticker, snapshot_date)` pair. Fields include price, forward P/E, trailing P/E, EV/Revenue, gross margin, shares outstanding, and analyst target price. The primary input to the Watchlist Gate. Private companies and non-US stocks without available data are represented by absent rows, not null rows.
 
 ### Watchlist Gate
 The five-item financial checklist that a Lane Memo must pass before a thesis can be upgraded from Research Note to Watchlist Candidate. Items: gross margin trend, customer concentration, backlog/revenue visibility, dilution (share count trend), and valuation pressure. The gate is evaluated by `engine_c/checklist.py` and injected into Lane Memo generation. Items sourced automatically from Financial Snapshots where available; customer concentration and backlog require manual entry. A failing gate does not block research but blocks the Watchlist upgrade.
 *Avoid:* financial gate, checklist gate
+
+---
+
+## Investment Process
+
+### Prospective Paper Portfolio（前瞻模擬投資帳本）
+The repo-versioned, append-only simulation context under `paper_portfolio/`. It freezes each paper open/add/trim/close decision together with the point-in-time thesis version, policy version, price/FX snapshot, horizon, disproof condition, rationale, and decision author. Current positions, NAV, and P&L are derived from transaction events plus Engine C observations; they are not maintained as a second mutable positions file. Its purpose is prospective decision audit, not historical backtesting or an alpha claim. SOXX may be recorded as an optional opportunity-cost comparator, but there is no custom AI supply-chain benchmark until enough comparable closed decisions exist.
+*Avoid:* decision ledger, trade log, backtest portfolio, agent trading competition
+
+### Crowding Discount（擁擠折扣）
+A position-sizing rule that lowers the conviction tier by one level (15%→10%→8%→no position) when a thesis is already priced in — triggered by sell-side coverage count above a threshold or a forward multiple that already implies the thesis scenario. Exists because Lane Memo conviction measures evidence completeness, which correlates with consensus; without the discount, sizing systematically rewards the most-priced-in ideas. Uses third-party observable data (analyst coverage count, valuation multiples), deliberately not a self-assessed "variant perception strength" score — self-grading one's own non-consensus-ness has the same confirmation-bias shape as L8 self-reporting. Feeds and consumes the `consensus_coverage` observation slot in Engine C.
+*Avoid:* consensus penalty, anti-crowding factor

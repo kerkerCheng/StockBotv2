@@ -1,7 +1,8 @@
 ---
 title: "feat: StockBotv2 Personal Investment Advisor — Full Roadmap"
 date: 2026-07-10
-status: active
+status: superseded
+superseded_by: docs/plans/2026-07-15-008-feat-unified-workplan-plan.md
 type: feat
 depth: deep
 origin: docs/brainstorms/2026-07-10-investment-advisor-repositioning-requirements.md
@@ -13,6 +14,8 @@ references:
 ---
 
 # feat: StockBotv2 Personal Investment Advisor — Full Roadmap
+
+> **⚠ 已由 [`2026-07-15-008-feat-unified-workplan-plan.md`](2026-07-15-008-feat-unified-workplan-plan.md) 取代為唯一工作起點（2026-07-15）。** U1–U8 已完成的紀錄與 U7a 驗證結論仍以本檔為準；待辦（Issue #3/#4/#5、M1/M2）已併入 008。
 
 **Scope:** 將 StockBotv2 從「批次研究工具」升級為「個人 AI 主題投資顧問」——能自動取得可信文件、強制來源品質門檻、整合個人資產組合、主動推送訊號、並在 L9 前置條件滿足後開放個人化投資建議。
 
