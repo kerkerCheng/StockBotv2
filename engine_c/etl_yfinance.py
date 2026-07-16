@@ -12,6 +12,7 @@ etl_yfinance.py — 用 yfinance 拉財務快照，寫入 Engine C 資料庫。
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 from datetime import date, datetime, timezone
 from pathlib import Path
@@ -27,11 +28,33 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 try:
     import yfinance as yf
 except ImportError:
-    print("需要 yfinance: pip install yfinance", file=sys.stderr)
-    sys.exit(1)
+    yf = None
 
 from loader.load_to_neo4j import TICKER_MAP
-from engine_c.db import get_conn, upsert_snapshot, DB_TYPE
+from engine_c.db import (
+    DB_TYPE,
+    get_conn,
+    upsert_coverage_observation,
+    upsert_snapshot,
+)
+
+
+COVERAGE_SOURCE = "yfinance.info.numberOfAnalystOpinions"
+YFINANCE_CACHE_DIR = Path(
+    os.environ.get(
+        "YFINANCE_CACHE_DIR",
+        Path(__file__).resolve().parent / ".yfinance-cache",
+    )
+)
+
+
+def _configure_yfinance_cache() -> None:
+    """Keep yfinance's SQLite cookie/timezone cache in a writable local root."""
+
+    if yf is None or not hasattr(yf, "set_tz_cache_location"):
+        return
+    YFINANCE_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    yf.set_tz_cache_location(str(YFINANCE_CACHE_DIR))
 
 
 def _sf(val) -> float | None:
@@ -50,6 +73,10 @@ def _si(val) -> int | None:
 
 def fetch_snapshot(ticker: str) -> dict | None:
     """yfinance 抓一個 ticker 的當日快照。"""
+    if yf is None:
+        print("[etl] WARN: yfinance 未安裝（pip install yfinance）", file=sys.stderr)
+        return None
+    _configure_yfinance_cache()
     try:
         t = yf.Ticker(ticker)
         info = t.info or {}
@@ -80,6 +107,20 @@ def fetch_snapshot(ticker: str) -> dict | None:
     }
 
 
+def coverage_observation_from_snapshot(snapshot: dict) -> dict:
+    """Project the raw yfinance field into an objective observation row."""
+
+    count = snapshot.get("analyst_target_count")
+    return {
+        "ticker": snapshot["ticker"],
+        "observation_date": snapshot["snapshot_date"],
+        "analyst_count": count,
+        "source": COVERAGE_SOURCE,
+        "data_status": "observed" if count is not None else "manual_required",
+        "fetched_at": snapshot["fetched_at"],
+    }
+
+
 def run_etl(tickers: list[str], dry_run: bool = False) -> int:
     if dry_run:
         print(f"[dry-run] would fetch: {', '.join(tickers)}")
@@ -94,6 +135,7 @@ def run_etl(tickers: list[str], dry_run: bool = False) -> int:
             print("SKIP")
             continue
         upsert_snapshot(conn, snap)
+        upsert_coverage_observation(conn, coverage_observation_from_snapshot(snap))
         print(f"ok  (price={snap['price']}, gm={snap['gross_margin']})")
         success += 1
     conn.close()

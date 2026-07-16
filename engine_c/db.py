@@ -59,6 +59,20 @@ def _ensure_sqlite_schema(conn: sqlite3.Connection) -> None:
             source_note TEXT,
             UNIQUE (ticker, field_name)
         );
+        CREATE TABLE IF NOT EXISTS consensus_coverage_observations (
+            id               INTEGER PRIMARY KEY AUTOINCREMENT,
+            ticker           TEXT    NOT NULL,
+            observation_date TEXT    NOT NULL,
+            analyst_count    INTEGER,
+            source           TEXT    NOT NULL,
+            data_status      TEXT    NOT NULL
+                             CHECK (data_status IN ('observed', 'manual_required')),
+            fetched_at       TEXT    NOT NULL DEFAULT (datetime('now')),
+            UNIQUE (ticker, observation_date, source),
+            CHECK (analyst_count IS NULL OR analyst_count >= 0)
+        );
+        CREATE INDEX IF NOT EXISTS idx_coverage_ticker_date
+            ON consensus_coverage_observations (ticker, observation_date DESC);
     """)
     conn.commit()
 
@@ -154,3 +168,94 @@ def upsert_snapshot(conn, snap: dict) -> None:
             str(snap["fetched_at"]),
         ))
         conn.commit()
+
+
+def upsert_coverage_observation(conn, observation: dict) -> None:
+    """Idempotently store one objective analyst-coverage observation."""
+
+    required = {
+        "ticker",
+        "observation_date",
+        "analyst_count",
+        "source",
+        "data_status",
+        "fetched_at",
+    }
+    missing = sorted(required - set(observation))
+    if missing:
+        raise ValueError(f"coverage observation missing keys: {', '.join(missing)}")
+    if observation["data_status"] not in {"observed", "manual_required"}:
+        raise ValueError("coverage data_status must be observed or manual_required")
+    if observation["data_status"] == "observed" and observation["analyst_count"] is None:
+        raise ValueError("observed coverage requires analyst_count")
+    if (
+        observation["analyst_count"] is not None
+        and (
+            isinstance(observation["analyst_count"], bool)
+            or not isinstance(observation["analyst_count"], int)
+            or observation["analyst_count"] < 0
+        )
+    ):
+        raise ValueError("analyst_count must be a non-negative integer or null")
+
+    if _use_postgres():
+        sql = """
+        INSERT INTO consensus_coverage_observations (
+            ticker, observation_date, analyst_count, source, data_status, fetched_at
+        ) VALUES (
+            %(ticker)s, %(observation_date)s, %(analyst_count)s,
+            %(source)s, %(data_status)s, %(fetched_at)s
+        ) ON CONFLICT (ticker, observation_date, source) DO UPDATE SET
+            analyst_count=EXCLUDED.analyst_count,
+            data_status=EXCLUDED.data_status,
+            fetched_at=EXCLUDED.fetched_at
+        """
+        with conn.cursor() as cur:
+            cur.execute(sql, observation)
+    else:
+        conn.execute(
+            """
+            INSERT INTO consensus_coverage_observations (
+                ticker, observation_date, analyst_count, source, data_status, fetched_at
+            ) VALUES (?, ?, ?, ?, ?, ?)
+            ON CONFLICT (ticker, observation_date, source) DO UPDATE SET
+                analyst_count=excluded.analyst_count,
+                data_status=excluded.data_status,
+                fetched_at=excluded.fetched_at
+            """,
+            (
+                observation["ticker"],
+                str(observation["observation_date"]),
+                observation["analyst_count"],
+                observation["source"],
+                observation["data_status"],
+                str(observation["fetched_at"]),
+            ),
+        )
+    conn.commit()
+
+
+def get_latest_coverage_observation(conn, ticker: str) -> dict | None:
+    """Return the latest raw coverage row without a derived classification."""
+
+    sql = """
+        SELECT ticker, observation_date, analyst_count, source, data_status, fetched_at
+        FROM consensus_coverage_observations
+        WHERE ticker = %s
+        ORDER BY observation_date DESC, fetched_at DESC
+        LIMIT 1
+    """ if _use_postgres() else """
+        SELECT ticker, observation_date, analyst_count, source, data_status, fetched_at
+        FROM consensus_coverage_observations
+        WHERE ticker = ?
+        ORDER BY observation_date DESC, fetched_at DESC
+        LIMIT 1
+    """
+    if _use_postgres():
+        with conn.cursor() as cur:
+            cur.execute(sql, (ticker,))
+            row = cur.fetchone()
+            columns = [description[0] for description in cur.description] if row else []
+        return dict(zip(columns, row)) if row else None
+    row = conn.execute(sql, (ticker,)).fetchone()
+    return dict(row) if row is not None else None

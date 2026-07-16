@@ -197,19 +197,11 @@ python thesis/generate_lane_memo.py --company-id co:<slug> --ticker <TICKER> --o
 1. 執行 `python fetchers/gsheets.py --ticker <TICKER>` 取持倉資料
 2. 執行 `python fetchers/gsheets.py --summary` 取 ai_theme bucket 使用率
 3. 查 Engine C 估值數據：`python engine_c/checklist.py <TICKER>`
-4. 根據以下框架給建議：
+4. 執行 `thesis.preconditions.check_all(<TICKER>)`；五項清單含 `manual_required` 或 `missing` 時，不得給倉位數字，只列待補項
+5. 全部 gate 通過後，呼叫 `thesis.investment_policy.calculate_position_limit(...)`；不可在 skill 內抄寫百分比或自行算另一套
+6. 檢查 `check_factor_exposure(...)`，並在回答附 `policy_version`、原始 analyst coverage 與 query-time coverage view
 
-**倉位建議框架：**
-
-| 條件 | 行動 |
-|------|------|
-| thesis 尚未通過 L8 gate | 不給倉位建議，先補文件 |
-| ai_theme bucket > 50% 已滿 | 警告：alpha bucket 高度集中，建議縮小規模或等出場 |
-| conviction 1-2（弱） | 可考慮「觀察倉」：ai_theme bucket ≤5% |
-| conviction 3（中） | 標準倉：ai_theme bucket 10-15%（單檔上限） |
-| conviction 4-5（強，需 L9 全通過） | 戰略倉：ai_theme bucket 15-25%（單檔上限） |
-
-conviction 由 thesis 評分（`thesis/scoring_rubric.md`）和 L8 來源品質共同決定。
+conviction 由 thesis 評分（`thesis/scoring_rubric.md`）和 L8 來源品質共同決定。規則語意見 `docs/investment-sop.md`；當前數字唯一權威是 `config/investment_policy.json`。`crowding` 不寫入 Engine C。
 
 **輸出格式：**
 ```
@@ -220,6 +212,7 @@ AI 主題 bucket 使用率：XX%（建議上限 50%）
 
 Conviction 評估：[分數 / 理由]
 建議倉位：ai_theme bucket 的 X-Y%（相當於若 bucket 為 $N，建議 $N×X%）
+政策版本：<policy_version>
 
 ⚠ 注意：
 - [若已持倉：說明是否建議加倉/持倉/減倉]

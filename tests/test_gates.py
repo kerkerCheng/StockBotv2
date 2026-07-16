@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from thesis.preconditions import _check_second_slice
+from thesis.preconditions import _check_financial_checklist, _check_second_slice
 
 
 def _root(tmp_path: Path) -> Path:
@@ -77,3 +77,52 @@ def test_second_slice_requires_scoring_above_every_failure_threshold(tmp_path: P
     failed = _check_second_slice(root=root)
     assert failed["ok"] is False
     assert "可信度" in failed["detail"]
+
+
+def test_financial_gate_rejects_manual_required_for_requested_ticker(monkeypatch) -> None:
+    def fake_checklist(ticker: str) -> dict:
+        return {
+            "ticker": ticker,
+            "engine_c_available": True,
+            "gate_pass": False,
+            "items": {
+                "gross_margin_trend": {"status": "ok", "label": "毛利率趨勢"},
+                "customer_concentration": {
+                    "status": "manual_required",
+                    "label": "客戶集中度",
+                },
+                "backlog": {"status": "manual_reviewed", "label": "Backlog"},
+                "dilution": {"status": "ok", "label": "稀釋"},
+                "valuation_pressure": {"status": "ok", "label": "估值壓力"},
+            },
+        }
+
+    monkeypatch.setattr("engine_c.checklist.get_checklist", fake_checklist)
+
+    result = _check_financial_checklist("SIVE.ST")
+
+    assert result["ok"] is False
+    assert "SIVE.ST" in result["detail"]
+    assert "manual_required" in result["detail"]
+    assert "倉位數字" in result["action"]
+
+
+def test_financial_gate_passes_only_when_all_five_items_complete(monkeypatch) -> None:
+    items = {
+        key: {"status": "ok", "label": key}
+        for key in ("gross_margin", "customer", "backlog", "dilution", "valuation")
+    }
+    monkeypatch.setattr(
+        "engine_c.checklist.get_checklist",
+        lambda ticker: {
+            "ticker": ticker,
+            "engine_c_available": True,
+            "gate_pass": True,
+            "items": items,
+        },
+    )
+
+    result = _check_financial_checklist("SIVE.ST")
+
+    assert result["ok"] is True
+    assert "SIVE.ST" in result["detail"]

@@ -195,7 +195,7 @@ def _check_financial_checklist(ticker: str | None = None) -> dict:
         return {
             "ok": False,
             "label": "financial_checklist",
-            "detail": "Postgres 未連線（engine_c_available=False）",
+            "detail": "Engine C 未連線（engine_c_available=False）",
             "action": (
                 "啟動 Postgres：docker compose up postgres -d\n"
                 "    初始化 schema：engine_c/schema.sql\n"
@@ -203,10 +203,24 @@ def _check_financial_checklist(ticker: str | None = None) -> dict:
             ),
         }
 
+    if not result.get("gate_pass", False):
+        incomplete = [
+            f"{item.get('label', key)}={item.get('status', 'missing')}"
+            for key, item in result.get("items", {}).items()
+            if item.get("status") not in ("ok", "manual_reviewed")
+        ]
+        detail = "；".join(incomplete) or result.get("note", "清單狀態不完整")
+        return {
+            "ok": False,
+            "label": "financial_checklist",
+            "detail": f"{test_ticker} 財務核驗清單未完成：{detail}",
+            "action": "補齊被建議標的的 missing/manual_required 項目後再提供倉位數字",
+        }
+
     return {
         "ok": True,
         "label": "financial_checklist",
-        "detail": f"財務核驗清單可用（smoke test ticker: {test_ticker}）",
+        "detail": f"{test_ticker} 財務核驗清單五項皆完成",
         "action": None,
     }
 

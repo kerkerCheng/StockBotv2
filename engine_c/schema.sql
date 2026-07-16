@@ -50,3 +50,21 @@ CREATE TABLE IF NOT EXISTS manual_fields (
 
 CREATE INDEX IF NOT EXISTS idx_manual_ticker
     ON manual_fields (ticker);
+
+-- 客觀分析師覆蓋觀測。政策門檻與 crowding view 不落地，查詢時才套用。
+CREATE TABLE IF NOT EXISTS consensus_coverage_observations (
+    id               SERIAL PRIMARY KEY,
+    ticker           VARCHAR(20)  NOT NULL,
+    observation_date DATE         NOT NULL,
+    analyst_count    INTEGER,
+    source           VARCHAR(200) NOT NULL,
+    data_status      VARCHAR(30)  NOT NULL,
+    fetched_at       TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+
+    UNIQUE (ticker, observation_date, source),
+    CHECK (data_status IN ('observed', 'manual_required')),
+    CHECK (analyst_count IS NULL OR analyst_count >= 0)
+);
+
+CREATE INDEX IF NOT EXISTS idx_coverage_ticker_date
+    ON consensus_coverage_observations (ticker, observation_date DESC);

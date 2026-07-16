@@ -1,9 +1,11 @@
 # Neo4j local data — never commit DB files
 .neo4j/
+engine_c/.yfinance-cache/
 
 # Secrets
 .env
 config/*.json
+!config/investment_policy.json
 
 # Claude Code 本機設定（不共用）；project skills 轉接層需納入版本控制
 .claude/*

@@ -1,0 +1,16 @@
+{
+  "policy_version": "2026-07-16.1",
+  "single_position_nav_cap": 0.05,
+  "minimum_open_conviction": 3,
+  "conviction_coefficients": {
+    "3": 0.08,
+    "4": 0.1,
+    "5": 0.15
+  },
+  "analyst_coverage_threshold": 8,
+  "analyst_coverage_discount_levels": 1,
+  "factor_exposure_caps": {
+    "semiconductor": 0.25
+  },
+  "minimum_holding_days": 90
+}
