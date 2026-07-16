@@ -1,0 +1,149 @@
+# Phase I SIVE Engine A Acceptance
+
+> Status: before snapshot captured; after run pending  
+> Snapshot date: 2026-07-16  
+> Company ID: `co:sivers_semiconductors`
+
+This report fixes the SIVE baseline before the U2/U3/U3b identity, provenance,
+and edge-attribute migration. The after run must use the same frozen extraction
+manifest and the same standard research question. No AXT or other new document
+may be added to the comparison corpus.
+
+## Before snapshot
+
+### Lane Memo identity
+
+| Item | Value |
+|---|---|
+| File | `thesis/sivers_v2_lane_memo.md` |
+| Last commit touching the file | `6eecffd678c32e5d7d14d309f0d8be5593f8b05c` |
+| SHA-256 | `B2F2A866590223AE92503FF272E007B01EB85DA5E0F06B4BE2472996889ACA4B` |
+| Output type | `Research Note` |
+| Thesis status | `review_required` |
+
+The memo says L8 was manually overridden at `1/3 origin_entity`. The current
+disk-scanning implementation now reports `4/3` because additional extractions
+have since been added. This drift is itself part of the baseline: neither result
+proves that the evidence actually cited by a memo has independent support.
+
+### Comparison corpus
+
+The before scope is the seven extraction files in which
+`co:sivers_semiconductors` occurs as a node, edge endpoint, or Claim subject.
+This is the corpus that the U2 migration manifest must freeze.
+
+| Extraction file | `doc_id` | Nodes | Edges | Claims |
+|---|---|---:|---:|---:|
+| `extractions/enablence_sivers_onet_els_2026.json` | `enablence_sivers_onet_els_2026` | 4 | 3 | 0 |
+| `extractions/enablence_sivers_onet_ofc_pr_2026_03_17.json` | `enablence_sivers_onet_ofc_pr_2026_03_17` | 6 | 5 | 1 |
+| `extractions/silicon_matter_ayar_labs.json` | `aleabitoreddit_sivers_cpo_customer_map` | 4 | 3 | 3 |
+| `extractions/silicon_matter_sivers_ayar_2026_03_14.json` | `silicon_matter_sivers_ayar_2026_03_14` | 5 | 3 | 1 |
+| `extractions/sivers_ar_2025.json` | `sivers_ar_2025_photonics_excerpt` | 17 | 21 | 5 |
+| `extractions/sivers_ar_2025_financials.json` | `sivers_ar_2025_financials` | 1 | 0 | 3 |
+| `extractions/sivers_gf_pr_2026_06_02.json` | `sivers_gf_pr_2026_06_02` | 5 | 4 | 1 |
+| **Input totals** | **7 documents** | **42** | **39** | **14** |
+
+Corpus identity diagnostics:
+
+- 42 node inputs reduce to 28 distinct node IDs.
+- 39 edge inputs reduce to 37 distinct `(src_id, relation, dst_id)` triples,
+  but use only 21 distinct document-local edge IDs.
+- 14 Claim inputs use only five local IDs: `cl1` through `cl5`.
+- Corpus objects reference 45 distinct quote-level `source_ids`.
+
+### Current graph materialization
+
+To avoid guessing from names, an object is counted here when its `source_ids`
+overlap the 45 quote IDs referenced by the comparison corpus. Claims are counted
+separately from domain nodes.
+
+| Graph object | Count | Source-ID references | Distinct SIVE source IDs represented |
+|---|---:|---:|---:|
+| Domain nodes (`Entity`, excluding `Claim`) | 22 | 26 | 19 |
+| Relationships | 39 | 58 | 32 |
+| Claims | 5 | 9 | 8 |
+| **Union across all three** | — | — | **35 / 45** |
+
+The graph therefore cannot account for ten source IDs that are referenced by
+the disk corpus:
+
+- `aleabitoreddit_sivers_s2`
+- `sivers_ar_2025_financials_s1`
+- `sivers_ar_2025_financials_s4`
+- `sivers_ar_2025_financials_s5`
+- `sivers_ar_2025_financials_s6`
+- `sivers_ar_2025_financials_s7`
+- `sivers_ar_2025_financials_s8`
+- `sivers_ar_2025_financials_s9`
+- `sivers_ar_2025_photonics_excerpt_s1`
+- `sivers_ar_2025_photonics_excerpt_s16`
+
+This is a characterization result, not a migration exception list. U2/U3 must
+replay from the frozen disk corpus, and the after reconciliation must either find
+every one of the 45 IDs on a Claim or EdgeAssertion or record an explicit,
+reviewed exception.
+
+### Current `_check_source_diversity` result
+
+The pre-U3 implementation scanned 17 files in `extractions/`, found seven that
+refer to SIVE, and returned:
+
+```text
+distinct origin_entity: 4 / 3 — pass
+Enablence Technologies
+Sivers Semiconductors
+aleabitoreddit
+silicon_matter_substack
+```
+
+This is only a company-wide document count. It does not establish that the
+specific Claims or edge attributes selected for a memo have three independent
+origins. It also treats a participating partner's press release as a distinct
+origin even when it is not independent customer-demand evidence.
+
+### Standard question — current answer
+
+**Question:** 目前 SIVE 的 CPO／ELS thesis：哪些已確認、哪些是單源自報、哪些證據受 audit？
+
+**Current answer:**
+
+- **Confirmed only at the collaboration/product-demonstration level:** the
+  corpus contains Enablence-origin documents describing the Sivers/O-Net/
+  Enablence ELS module, and a `silicon_matter_substack` extraction describing
+  Sivers laser arrays in Ayar Labs' SuperNova module. These support that products
+  and integrations have been announced or demonstrated. They do not confirm a
+  hyperscaler design win, committed volume, sole-source status, or durable
+  customer demand. The Ayar Claim itself says primary-source confirmation is
+  still outstanding.
+- **Single-origin or issuer/participant self-report:** Sivers sampling to
+  multiple transceiver manufacturers, expected 2027+ production, the Sivers +
+  O-Net end-2026 readiness target, a future CW-laser shortage, and the GF SCALE
+  route-to-market are not independently confirmed customer commitments in the
+  current graph. No SIVE edge has verified `sole_source`; competitor
+  qualification and confirmed customer BOM position remain unknown.
+- **Under audit:** the strongest memo evidence from
+  `sivers_ar_2025_photonics_excerpt`—including `_s5`, `_s9`, and `_s12`—inherits
+  the active source audit caused by the revenue-recognition allegations,
+  going-concern concern, and pending restatement. The thesis therefore remains
+  `review_required`; those issuer statements must not be promoted merely because
+  their stored `confidence` or `demand_proof_level` is high.
+- **Current graph limitation:** Claim ID collapse makes the answer noisier than
+  the corpus warrants. Fourteen input Claims have materialized as five Claim
+  nodes, and the same statements appear attached to unrelated subjects. The
+  current `4/3` L8 pass is therefore not sufficient evidence that any particular
+  memo assertion is independently corroborated.
+
+## After snapshot
+
+Pending completion of U2, U3, U3b, U4, and U5.
+
+The after section must record:
+
+- the exact frozen manifest identity and hashes;
+- post-migration SourceDoc, EdgeAssertion, Claim, canonical relationship, and
+  quote-source reconciliation counts;
+- graph-backed L8 results for the evidence actually cited by the memo;
+- open/unknown edge-attribute conflicts and any approved resolutions;
+- the regenerated memo and `.evidence.json` sidecar hashes;
+- the answer to the same standard question above;
+- a pass/fail decision against every Phase I acceptance criterion.
