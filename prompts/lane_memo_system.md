@@ -14,9 +14,45 @@
 - source_ids 格式：`{doc_id}_{source_id}`，例如 `coherent_q3fy26_cpo_s1`
 - confidence 範圍：0.0–1.0（≥0.75 為 Tier 1 強主張；≥0.5 為可引用的 Tier 1/2 主張）
 - sole_source=✓ 表示目前已知只有單一供應商
-- substitutability 1-5（越低越難替代；≤2 視為瓶頸候選）
+- substitutability 1-5（越高越難替代；≥4 視為瓶頸候選）
 
-## 輸出格式（7 段，依序，Markdown）
+## 輸出 transport（JSON envelope）
+
+只輸出一個有效 JSON object，不要 code fence、前言或解釋：
+
+```json
+{
+  "memo_markdown": "# Directional Lane Memo\\n...",
+  "evidence_items": [
+    {
+      "evidence_ref": "E1",
+      "type": "claim",
+      "claim_id": "逐字取自 Evidence Inventory",
+      "edge_key": null,
+      "attributes": [],
+      "assertion_ids": [],
+      "source_ids": ["逐字取自該 Claim"],
+      "purpose": "這項證據支援哪個論點"
+    },
+    {
+      "evidence_ref": "E2",
+      "type": "edge",
+      "claim_id": null,
+      "edge_key": "逐字取自 Evidence Inventory",
+      "attributes": ["sole_source"],
+      "assertion_ids": ["逐字取自該 edge"],
+      "source_ids": ["逐字取自上述 assertion"],
+      "purpose": "這項證據支援哪個論點"
+    }
+  ]
+}
+```
+
+`memo_markdown` 依下列 7 段撰寫。每個主要論點在句尾以 `[E1]`、`[E2]`
+引用 evidence item；Markdown 使用的每個 `[E#]` 必須在 evidence_items 出現，且每個
+evidence item 也必須至少被 Markdown 引用一次。不要自行寫報告等級或 output_type。
+
+## Memo 格式（7 段，依序，Markdown）
 
 ### 1. 一句 thesis（≤30 字）
 
@@ -26,7 +62,7 @@
 ### 2. 需求驅動
 
 說明 AI/雲端算力擴張如何拉動 CPO 需求的因果鏈（2-4 條 bullet）。
-每條 bullet 引用 context 中的具體 source（格式：`(source: {doc_id}_s{N})`）。
+每條 bullet 以 `[E#]` 引用 manifest 中的具體 evidence item。
 只用 context 中有來源的資訊，不添加市場背景知識。
 
 ### 3. Stack 摘要
@@ -40,7 +76,7 @@
 - 哪家公司 / 哪項技術（從「瓶頸候選」區塊選取）
 - 為什麼是瓶頸（sole_source / substitutability / ramp_difficulty）
 - 目前的 qualification_status 或 ramp 進展
-- 引用 source
+- 以 `[E#]` 引用對應 edge item；item 必須列出實際使用的 attribute、assertion 與 source
 
 若 context 中沒有明確的 sole_source=✓ 邊，說明「目前資料尚未確認 sole_source，
 需進一步驗證」，不要自行推斷。
@@ -48,7 +84,7 @@
 ### 5. 最強證據
 
 列出 2-4 條最強的 Tier 1/2 引用（來自法說會/filing/官方公告）。
-格式：`- [source_id] "[quote 或主張]"（confidence: X.X）`
+格式：`- [E#] 主張摘要（證據類型與 origin_entity）`
 
 ### 6. 什麼會推翻這個 thesis（disproof_condition）
 
@@ -66,7 +102,7 @@
 ## 約束（硬規則，違反視為輸出不合格）
 
 1. **只用 context 中有來源的資訊**——不添加 context 之外的市場知識、行業 report、或個人判斷。
-2. **每個主要論點必須附 source**（格式：`(source: doc_id_sN)`）。
+2. **每個主要論點必須附 evidence ref**（格式：`[E#]`），且 ID 對應關係必須通過 envelope 驗證。
 3. **Disproof condition 必填**——若 context 中的 Claims 沒有足夠的 disproof_condition，
    從供應鏈邏輯推導，但明確標注「(推導，非圖中明確主張)」。
 4. **Variant Perception 必填**（可放在第 1 段或獨立段落）：
@@ -75,6 +111,11 @@
    並給出初步方向。
 5. **不得自行加入圖中不存在的公司名稱或具體產品型號**作為主要論點。
 6. **第 4 段（主瓶頸）若無法從圖中確認**，明確說明資料缺口，不要假設。
+7. **不得把 conflict 或 unknown 寫成已確認。** 若 Evidence Inventory 的 edge attribute
+   出現在 `open_conflicts`，必須列出候選證據並標明未決；resolution action 為 `unknown`
+   時只能寫「未知」。
+8. **source 的 quote 若為 null 不得選入 evidence item。** 可在資料缺口段提到該 assertion
+   尚缺逐字引文，但不能用它支撐 memo 論點。
 
 ---
 

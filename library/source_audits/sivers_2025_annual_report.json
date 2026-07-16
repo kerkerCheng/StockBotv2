@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "audit_id": "sivers_2025_annual_report_2026_07_12",
+  "status": "active",
+  "source_doc_ids": [
+    "sivers_ar_2025_photonics_excerpt",
+    "sivers_ar_2025_financials"
+  ],
+  "opened_at": "2026-07-12",
+  "reason": "Ningi Research revenue-recognition allegations, going-concern concern, and pending financial restatement",
+  "review_by": "2026-08-27",
+  "evidence_ref": "GitHub Issue #2 and thesis/sivers_v2_lane_memo.md"
+}

@@ -1,6 +1,6 @@
 # Phase I SIVE Engine A Acceptance
 
-> Status: before snapshot captured; after run pending  
+> Status: **PASS — Phase I exit acceptance complete**
 > Snapshot date: 2026-07-16  
 > Company ID: `co:sivers_semiconductors`
 
@@ -135,8 +135,6 @@ origin even when it is not independent customer-demand evidence.
 
 ## After snapshot
 
-Pending completion of U2, U3, U3b, U4, and U5.
-
 ### U2 replay checkpoint (2026-07-16)
 
 - Neo4j dump: `C:/tmp/StockBotv2-backups/phase1-before-u2-20260716/neo4j.dump`
@@ -203,13 +201,97 @@ Pending completion of U2, U3, U3b, U4, and U5.
 - Local CLI and remote MCP use the same exported Cypher constant; no additional
   mutable report or MCP write surface was introduced.
 
-The after section must record:
+### U5 evidence-manifest checkpoint (2026-07-16)
 
-- the exact frozen manifest identity and hashes;
-- post-migration SourceDoc, EdgeAssertion, Claim, canonical relationship, and
-  quote-source reconciliation counts;
-- graph-backed L8 results for the evidence actually cited by the memo;
-- open/unknown edge-attribute conflicts and any approved resolutions;
-- the regenerated memo and `.evidence.json` sidecar hashes;
-- the answer to the same standard question above;
-- a pass/fail decision against every Phase I acceptance criterion.
+- `generate_lane_memo.py` now accepts a provider-independent JSON envelope and
+  validates every Claim, edge, EdgeAssertion, source ID, quote, and `[E#]`
+  reference against the exact inventory supplied for that run. Report grade is
+  written by the application after validation; the drafting model cannot choose
+  it.
+- The networked Anthropic transport was not used for this acceptance because the
+  desktop security boundary did not authorize sending the private graph/corpus
+  to an external Anthropic tenant. The same generator was run through its local
+  `--envelope-file` transport, with this Codex session supplying the JSON draft.
+  Schema validation, graph reconciliation, evidence gates, sidecar generation,
+  and output grading are identical between transports.
+- The actual SIVE memo cites eight evidence items spanning six SourceDocs and
+  four distinct origins: Enablence Technologies, Sivers Semiconductors,
+  Lumentum, and damnang_substack. Every item resolves to a verbatim quote and a
+  graph SourceDoc. Sources with only a locator/paraphrase and no verbatim quote
+  are rejected as memo evidence.
+- A migration regression was caught during acceptance: the active
+  `sivers_ar_2025` credibility audit had existed only in the old memo/graph and
+  was lost by disk replay. It is now durable in
+  `library/source_audits/sivers_2025_annual_report.json`, independently of the
+  frozen extraction corpus, and projected onto both affected SourceDocs. Citing
+  either SourceDoc automatically blocks promotion and adds an auditable note.
+- The regenerated memo validates successfully, but its evidence promotion gate
+  fails by design because E4/E5 cite the audited Sivers photonics annual-report
+  SourceDoc and E8 cites the audited financial extraction. E4 also carries the
+  non-blocking open `qualification_status` conflict warning. Financial checklist
+  and L9 also remain incomplete, so the application correctly emits
+  `[Research Note]`.
+- Live SIVE smoke test: a temporary `sole_source` conflict edge was added to the
+  company subgraph. With the edge absent from the manifest, promotion passed;
+  adding it as E2 made promotion fail with `open_conflict`. The script removed
+  the temporary relationship, assertions, and node in `finally` and verified
+  cleanup.
+
+### Regenerated memo identity
+
+| Item | Value |
+|---|---|
+| Memo | `thesis/sivers_phase1_after_lane_memo.md` |
+| Memo SHA-256 | `3706EB302C379E23AE86FA9C1B2C7F5D029B075853CE3F74031521F0E5971A39` |
+| Sidecar | `thesis/sivers_phase1_after_lane_memo.evidence.json` |
+| Sidecar SHA-256 | `A085C9C4DD29EB15A09F22729B7D9D20C6A93CC5592E965F5B7A5E5158AA95CE` |
+| Output type | `Research Note` |
+| Manifest validation | pass; 8/8 items resolved, zero errors |
+| Evidence promotion gate | fail closed; 3 cited items use active-audit SourceDocs |
+| Open cited conflict | E4, Win Semiconductor → Sivers `qualification_status` |
+| Approved edge resolutions | none |
+
+### Standard question — after answer
+
+**Question:** 目前 SIVE 的 CPO／ELS thesis：哪些已確認、哪些是單源自報、哪些證據受 audit？
+
+**After answer:**
+
+- **Confirmed:** an Enablence-origin announcement confirms the Sivers/O-Net/
+  Enablence 8-channel ELS product and explicitly names Sivers laser arrays in
+  the module. This confirms product integration and partner roles, not a
+  hyperscaler design win, committed volume, or sole-source status. Lumentum's
+  own six-quarter estimate for new InP-fab contribution independently supports
+  the long capacity cycle, but does not prove Sivers demand.
+- **Single-origin/self-report:** Sivers' CW-laser shortage expectation, GF SCALE
+  route-to-market, WIN volume-ramp readiness, and FY2025 margin narrative remain
+  supplier-origin statements unless a customer or independent primary source
+  confirms them. No cited or canonical SIVE edge establishes `sole_source=true`.
+- **Under audit/conflict:** E4 and E5 trace to
+  `sivers_ar_2025_photonics_excerpt`; E8 traces to
+  `sivers_ar_2025_financials`. Both SourceDocs inherit the active July 12 audit
+  ledger and therefore block promotion. WIN → Sivers qualification remains an
+  explicit `qualified` versus `qualifying` conflict rather than being selected
+  by confidence or load order. No resolution has been approved.
+- **Research conclusion:** Sivers has progressed from an issuer-only CPO story
+  to externally confirmed module integration, but customer qualification,
+  foundry ramp, revenue conversion, and margin conversion are still separate
+  gates. The thesis remains useful as a monitored Research Note and has not
+  earned Watchlist/Investment promotion.
+
+### Acceptance decision
+
+| Criterion | Result | Evidence |
+|---|---|---|
+| Every before source ID accounted for | PASS | All 209 frozen-manifest source IDs reconcile; the SIVE before set is a subset, with no silent loss |
+| Single-origin, self-report, audit, and conflicts remain visible | PASS | U4 report, source-audit projection, E4/E5/E8 gate annotations, 19 derived conflicts |
+| Every memo warning traces through `[E#]` to evidence | PASS | Sidecar validation 8/8; quote and full SourceDoc metadata embedded |
+| Unreferenced conflict does not block; cited high-risk conflict does | PASS | `scripts/phase1_sive_conflict_smoke.py` live result `true` then `false` |
+| Research answer remains useful after adding quality warnings | PASS | Memo states thesis, strongest evidence, counterevidence, disproof, catalysts, and variant perception |
+| No unexpected evidence loss or wrong canonical attribute | PASS | Zero manifest reconciliation gaps; conflicts absent from canonical values until resolved |
+
+**Final result: PASS.** Phase I's repaired measurement system preserves the
+frozen corpus, exposes rather than hides evidence quality problems, and still
+produces a decision-useful SIVE research answer. M1 may now start with AXT as the
+first new onboarding target; this acceptance does not itself add AXT or change
+the frozen SIVE comparison corpus.

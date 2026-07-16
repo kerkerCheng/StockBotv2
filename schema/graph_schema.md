@@ -129,6 +129,12 @@ live candidate hash、assertion/source IDs、JSON Schema 與明確人工核准�
 Phase I 舊 corpus 缺 URL、日期或 storage metadata 時允許 null；新遠端入口在 U12
 開始要求 storage permission 兩欄必填。
 
+Extraction properties 描述文件入庫時的 provenance；事後發生的可信度事件不回寫
+凍結 extraction。這類可變狀態由 `library/source_audits/*.json` 版本化，經
+`loader/project_source_audits.py` 投影為 `source_under_audit`、`audit_status`、
+`audit_id`、`audit_note`、`audit_review_by`、`audit_ledger_path`。Lane Memo 實際引用
+active audit 的 SourceDoc 時必須降級為 Research Note。
+
 每個 Claim 與 EdgeAssertion 都必須各有且只有一條 `[:CITES]->(:SourceDoc)`。
 Canonical domain relationship 不直接 CITES，僅保留 `source_doc_ids` / `source_ids`
 去重聯集作快速查詢；逐文件、逐屬性證據一律經 EdgeAssertion → CITES 查詢。

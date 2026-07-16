@@ -22,8 +22,11 @@ Env vars:
 from __future__ import annotations
 
 import argparse
+import hashlib
+import json
 import os
 import sys
+import tempfile
 from pathlib import Path
 
 try:
@@ -39,9 +42,9 @@ SYSTEM_PROMPT_FILE = ROOT / "prompts" / "lane_memo_system.md"
 DEFAULT_OUT = ROOT / "thesis" / "cpo_v1_lane_memo.md"
 
 
-def _check_env() -> bool:
+def _check_env(*, require_anthropic: bool = True) -> bool:
     ok = True
-    if not os.environ.get("ANTHROPIC_API_KEY"):
+    if require_anthropic and not os.environ.get("ANTHROPIC_API_KEY"):
         print("ERROR: ANTHROPIC_API_KEY 未設定", file=sys.stderr)
         ok = False
     if not os.environ.get("NEO4J_PASSWORD"):
@@ -211,6 +214,61 @@ def _build_market_context(ticker: str | None) -> str:
         return f"## 市場定價數據\n⚠ 取得失敗：{e}\n"
 
 
+def _parse_envelope(raw_text: str) -> tuple[dict | None, str | None]:
+    """Parse provider-independent JSON, tolerating only an outer code fence."""
+
+    candidate = raw_text.strip()
+    if candidate.startswith("```") and candidate.endswith("```"):
+        lines = candidate.splitlines()
+        candidate = "\n".join(lines[1:-1]).strip()
+    try:
+        parsed = json.loads(candidate)
+    except json.JSONDecodeError as exc:
+        return None, f"Model response is not valid JSON: {exc}"
+    if not isinstance(parsed, dict):
+        return None, "Model response JSON must be an object"
+    return parsed, None
+
+
+def _atomic_write_pair(memo_path: Path, memo_text: str, sidecar: dict) -> Path:
+    """Publish a memo and its evidence sidecar without exposing partial files."""
+
+    memo_path.parent.mkdir(parents=True, exist_ok=True)
+    sidecar_path = memo_path.with_suffix(".evidence.json")
+    temp_paths: list[Path] = []
+    try:
+        for target, content in (
+            (memo_path, memo_text),
+            (
+                sidecar_path,
+                json.dumps(sidecar, ensure_ascii=False, indent=2, default=str) + "\n",
+            ),
+        ):
+            handle = tempfile.NamedTemporaryFile(
+                mode="w",
+                encoding="utf-8",
+                dir=target.parent,
+                prefix=f".{target.name}.",
+                suffix=".tmp",
+                delete=False,
+            )
+            temp_path = Path(handle.name)
+            temp_paths.append(temp_path)
+            with handle:
+                handle.write(content)
+                handle.flush()
+                os.fsync(handle.fileno())
+        # Sidecar first: a visible memo never points at a not-yet-published manifest.
+        os.replace(temp_paths[1], sidecar_path)
+        temp_paths.pop(1)
+        os.replace(temp_paths[0], memo_path)
+        temp_paths.clear()
+    finally:
+        for path in temp_paths:
+            path.unlink(missing_ok=True)
+    return sidecar_path
+
+
 def generate(
     out_path: str | Path | None = None,
     model: str | None = None,
@@ -218,15 +276,18 @@ def generate(
     company_id: str | None = None,
     override_gate: bool = False,
     override_reason: str | None = None,
+    envelope_path: str | Path | None = None,
 ) -> int:
-    if not _check_env():
+    if not _check_env(require_anthropic=envelope_path is None):
         return 1
 
-    try:
-        from anthropic import Anthropic
-    except ImportError:
-        print("需要 anthropic 套件: pip install anthropic", file=sys.stderr)
-        return 1
+    Anthropic = None
+    if envelope_path is None:
+        try:
+            from anthropic import Anthropic
+        except ImportError:
+            print("需要 anthropic 套件: pip install anthropic", file=sys.stderr)
+            return 1
     try:
         from neo4j import GraphDatabase
     except ImportError:
@@ -234,6 +295,13 @@ def generate(
         return 1
 
     from query.graph_context import build_context
+    from thesis.evidence_manifest import (
+        build_context_inventory,
+        evaluate_evidence_gates,
+        gate_notes_markdown,
+        inventory_to_markdown,
+        validate_envelope,
+    )
 
     # ── 1. System prompt ──────────────────────────────────────────────────────
     if not SYSTEM_PROMPT_FILE.exists():
@@ -248,6 +316,11 @@ def generate(
     driver = GraphDatabase.driver(uri, auth=(user, pw))
     try:
         graph_ctx = build_context(driver, company_id=company_id)
+        inventory = build_context_inventory(driver, company_id=company_id)
+        source_diversity_ctx, source_diversity_pass = _check_source_diversity(
+            company_id,
+            driver=driver,
+        )
     finally:
         driver.close()
 
@@ -275,24 +348,12 @@ def generate(
         l9_pass = True
         l9_ctx = f"## L9 前置條件 Gate\n⚠ Gate 已手動覆蓋（override-gate）\n"
 
-    # ── L8 Source diversity gate ─────────────────────────────────────────────
-    source_diversity_ctx, source_diversity_pass = _check_source_diversity(company_id)
-    if not override_gate and not source_diversity_pass:
-        print(source_diversity_ctx, file=sys.stderr)
-        print("ERROR: L8 來源獨立性不足，拒絕生成 Lane Memo。"
-              " 使用 --override-gate 可強制覆蓋（需說明理由）。", file=sys.stderr)
-        return 1
-
-    # output_type hierarchy: both gates must pass for Watchlist Candidate
-    if gate_pass and l9_pass:
-        output_type = "Watchlist Candidate"
-    elif override_gate:
-        output_type = "Watchlist Candidate (override)"
-    else:
-        output_type = "Research Note"
+    # Company-wide L8 is context only.  Promotion is decided after the draft by
+    # inspecting the exact Claim/edge evidence selected in the manifest.
+    evidence_inventory_ctx = inventory_to_markdown(inventory)
 
     print(f"[generate_lane_memo] ticker={resolved_ticker}, checklist_pass={gate_pass}, "
-          f"l9_pass={l9_pass}, output_type=[{output_type}]", file=sys.stderr)
+          f"l9_pass={l9_pass}, company_l8_pass={source_diversity_pass}", file=sys.stderr)
 
     # ── 4. Claude API call ────────────────────────────────────────────────────
     model = model or os.environ.get("THESIS_MODEL", "claude-sonnet-4-6")
@@ -300,6 +361,8 @@ def generate(
 以下是供應鏈知識圖譜的結構化上下文與財務/市場數據，請依照 system prompt 的格式撰寫 Directional Lane Memo。
 
 {graph_ctx}
+
+{evidence_inventory_ctx}
 
 {source_diversity_ctx}
 
@@ -309,36 +372,111 @@ def generate(
 
 {market_ctx}
 
-請輸出 Markdown 格式的 Lane Memo，直接開始寫，不要加前言或解釋。
+請只輸出 system prompt 指定的 JSON envelope，不要加 code fence、前言或解釋。
 確保 Variant Perception 段落有具體的「市場現在信 X，本 thesis 認為 Y，催化劑 Z」，
-並引用上方市場定價數據中的具體數字。"""
+並引用上方市場定價數據中的具體數字。每個重要論點必須用 `[E#]` 指向
+evidence_items；所有 ID 必須逐字取自 Evidence Inventory。"""
 
-    print(f"[generate_lane_memo] model={model}", file=sys.stderr)
-    client = Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
-    response = client.messages.create(
-        model=model,
-        max_tokens=4096,
-        system=system_prompt,
-        messages=[{"role": "user", "content": user_message}],
-    )
-    memo_text = response.content[0].text
+    if envelope_path is not None:
+        envelope_file = Path(envelope_path)
+        try:
+            raw_text = envelope_file.read_text(encoding="utf-8")
+        except OSError as exc:
+            print(f"ERROR: 無法讀取 envelope file：{exc}", file=sys.stderr)
+            return 1
+        print(f"[generate_lane_memo] envelope_file={envelope_file}", file=sys.stderr)
+    else:
+        print(f"[generate_lane_memo] model={model}", file=sys.stderr)
+        client = Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+        response = client.messages.create(
+            model=model,
+            max_tokens=4096,
+            system=system_prompt,
+            messages=[{"role": "user", "content": user_message}],
+        )
+        raw_text = response.content[0].text
+    envelope, parse_error = _parse_envelope(raw_text)
+    if envelope is None:
+        validation = {
+            "ok": False,
+            "errors": [parse_error or "Unknown envelope parse error"],
+            "resolved_evidence": [],
+        }
+        envelope = {"memo_markdown": raw_text, "evidence_items": []}
+    else:
+        validation = validate_envelope(envelope, inventory)
+    evidence_gate = evaluate_evidence_gates(validation, inventory)
 
-    # ── 5. Write output with output_type header ────────────────────────────────
+    evidence_pass = validation["ok"] and evidence_gate["promotion_pass"]
+    if evidence_pass and gate_pass and l9_pass:
+        output_type = "Watchlist Candidate"
+    elif evidence_pass and override_gate:
+        output_type = "Watchlist Candidate (override)"
+    else:
+        output_type = "Research Note"
+
+    # ── 5. Write output and auditable evidence sidecar ────────────────────────
     header = (
         f"<!-- output_type: [{output_type}] | ticker: {resolved_ticker or 'n/a'} "
-        f"| checklist_pass: {gate_pass} | l9_pass: {l9_pass} -->\n\n"
+        f"| checklist_pass: {gate_pass} | l9_pass: {l9_pass} "
+        f"| evidence_manifest_pass: {validation['ok']} "
+        f"| evidence_gate_pass: {evidence_gate['promotion_pass']} -->\n\n"
     )
     if override_gate:
         header += f"<!-- gate_override: {override_reason or '(no reason)'} -->\n\n"
 
-    full_output = header + memo_text
+    memo_text = str(envelope.get("memo_markdown") or "").strip()
+    if not validation["ok"]:
+        manifest_errors = "\n".join(f"- {error}" for error in validation["errors"])
+        memo_text += (
+            "\n\n## Evidence Manifest Errors\n"
+            "本稿無法驗證引用鏈，因此只能保存為 Research Note。\n"
+            f"{manifest_errors}"
+        )
+    notes = gate_notes_markdown(evidence_gate)
+    if notes:
+        memo_text += "\n\n" + notes.rstrip()
+
+    full_output = header + memo_text.rstrip() + "\n"
 
     out = Path(out_path) if out_path else DEFAULT_OUT
-    out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(full_output, encoding="utf-8")
-    print(f"[generate_lane_memo] wrote {out}", file=sys.stderr)
-    print(f"\n[{output_type}] — {'可升格 Watchlist' if gate_pass else '仍為 Research Note（見 gate 狀態）'}",
-          file=sys.stderr)
+    canonical_inventory = json.dumps(
+        inventory,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+        default=str,
+    )
+    sidecar = {
+        "schema_version": "1.0",
+        "memo_path": out.name,
+        "memo_sha256": hashlib.sha256(full_output.encode("utf-8")).hexdigest(),
+        "output_type": output_type,
+        "ticker": resolved_ticker,
+        "company_id": company_id,
+        "context_inventory_sha256": hashlib.sha256(
+            canonical_inventory.encode("utf-8")
+        ).hexdigest(),
+        "context_inventory": inventory,
+        "evidence_items": envelope.get("evidence_items") or [],
+        "validation": validation,
+        "evidence_gate": evidence_gate,
+        "engine_c_context": {
+            "financial_checklist_markdown": gate_ctx,
+            "market_snapshot_markdown": market_ctx,
+        },
+        "other_gates": {
+            "financial_checklist_pass": gate_pass,
+            "l9_pass": l9_pass,
+            "company_l8_context_pass": source_diversity_pass,
+            "override": override_gate,
+            "override_reason": override_reason,
+        },
+    }
+    sidecar_path = _atomic_write_pair(out, full_output, sidecar)
+    print(f"[generate_lane_memo] wrote {out} and {sidecar_path}", file=sys.stderr)
+    promotion_label = "可升格 Watchlist" if output_type.startswith("Watchlist") else "仍為 Research Note（見 gate 狀態）"
+    print(f"\n[{output_type}] — {promotion_label}", file=sys.stderr)
     return 0
 
 
@@ -358,6 +496,14 @@ def main() -> int:
                     help="強制跳過 Watchlist gate（輸出仍標記覆蓋記錄）。")
     ap.add_argument("--override-reason", default=None,
                     help="override-gate 時說明跳過理由。")
+    ap.add_argument(
+        "--envelope-file",
+        default=None,
+        help=(
+            "讀取 provider-independent JSON envelope，不呼叫 Anthropic API；"
+            "適合由其他 agent/model 先產生 draft，再走同一驗證與 gate。"
+        ),
+    )
     args = ap.parse_args()
     return generate(
         out_path=args.out,
@@ -366,6 +512,7 @@ def main() -> int:
         company_id=args.company_id,
         override_gate=args.override_gate,
         override_reason=args.override_reason,
+        envelope_path=args.envelope_file,
     )
 
 

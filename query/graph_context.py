@@ -47,7 +47,7 @@ MATCH (a:Entity)-[r]->(b:Entity)
 WHERE NOT (a:Claim) AND NOT (b:Claim)
   AND (
     apoc.convert.fromJsonMap(coalesce(r.attributes, '{}')).sole_source = true
-    OR toInteger(apoc.convert.fromJsonMap(coalesce(r.attributes, '{}')).substitutability) <= 2
+    OR toInteger(apoc.convert.fromJsonMap(coalesce(r.attributes, '{}')).substitutability) >= 4
   )
 RETURN a.name AS src, b.name AS dst, type(r) AS rel,
        r.attributes AS attrs, r.source_ids AS source_ids
@@ -167,8 +167,8 @@ def _build_supply_section(records) -> str:
 
 def _build_bottleneck_section(records) -> str:
     if not records:
-        return "### 瓶頸候選 (sole_source=true 或 substitutability ≤ 2)\n_(無資料)_\n"
-    lines = ["### 瓶頸候選 (sole_source=true 或 substitutability ≤ 2)"]
+        return "### 瓶頸候選 (sole_source=true 或 substitutability ≥ 4)\n_(無資料)_\n"
+    lines = ["### 瓶頸候選 (sole_source=true 或 substitutability ≥ 4)"]
     for r in records:
         attrs = _parse_attrs(r["attrs"])
         attr_summary = ", ".join(

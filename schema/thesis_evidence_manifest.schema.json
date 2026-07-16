@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://stockbot.local/schema/thesis_evidence_manifest.schema.json",
+  "title": "Lane Memo evidence envelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["memo_markdown", "evidence_items"],
+  "properties": {
+    "memo_markdown": {
+      "type": "string",
+      "minLength": 1
+    },
+    "evidence_items": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "evidence_ref",
+          "type",
+          "claim_id",
+          "edge_key",
+          "attributes",
+          "assertion_ids",
+          "source_ids",
+          "purpose"
+        ],
+        "properties": {
+          "evidence_ref": {
+            "type": "string",
+            "pattern": "^E[1-9][0-9]*$"
+          },
+          "type": {
+            "enum": ["claim", "edge"]
+          },
+          "claim_id": {
+            "type": ["string", "null"]
+          },
+          "edge_key": {
+            "type": ["string", "null"]
+          },
+          "attributes": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {"type": "string", "minLength": 1}
+          },
+          "assertion_ids": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {"type": "string", "minLength": 1}
+          },
+          "source_ids": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {"type": "string", "minLength": 1}
+          },
+          "purpose": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "allOf": [
+          {
+            "if": {"properties": {"type": {"const": "claim"}}},
+            "then": {
+              "properties": {
+                "claim_id": {"type": "string", "minLength": 1},
+                "edge_key": {"type": "null"},
+                "attributes": {"maxItems": 0},
+                "assertion_ids": {"maxItems": 0}
+              }
+            }
+          },
+          {
+            "if": {"properties": {"type": {"const": "edge"}}},
+            "then": {
+              "properties": {
+                "claim_id": {"type": "null"},
+                "edge_key": {"type": "string", "minLength": 1},
+                "assertion_ids": {"minItems": 1}
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}
