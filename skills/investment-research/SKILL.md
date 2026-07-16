@@ -5,7 +5,7 @@ description: >
   當使用者問關於標的的瓶頸性、競爭地位、供應鏈位置、thesis 狀態、或說「評估XXX」、
   「分析XXX的競爭位置」、「XXX 在 CPO 供應鏈的地位」、「thesis 還成立嗎」、
   「建議買嗎」、「怎麼看XXX」、「幫我分析$TICKER」時，使用本 skill。
-  Claude 是分析引擎；圖譜是跨 session 的持久記憶；本 skill 定義如何接取這份記憶並組成回答。
+  研究 agent（Claude Code / Codex）是分析引擎；圖譜是跨 session 的持久記憶；本 skill 定義如何接取這份記憶並組成回答。
   觸發詞：評估、分析、怎麼看、建議、thesis、CPO、瓶頸、供應鏈、$TICKER。
 ---
 
@@ -15,8 +15,8 @@ description: >
 
 **這個系統的核心不是自動化，是記憶。**
 
-Claude 是分析引擎，知識圖譜（Neo4j）是持久的、跨 session 的研究筆記本。
-使用者問問題 → Claude 從圖取 context → 結合財務數據 → 合成有根據的回答。
+研究 agent（Claude Code / Codex）是分析引擎，知識圖譜（Neo4j）是持久的、跨 session 的研究筆記本。
+使用者問問題 → agent 從圖取 context → 結合財務數據 → 合成有根據的回答。
 
 **圖譜能做的事：**
 - 記住哪些公司在哪個供應鏈位置
@@ -25,9 +25,9 @@ Claude 是分析引擎，知識圖譜（Neo4j）是持久的、跨 session 的�
 - 記住 thesis 與可證偽條件（`disproof_condition`）
 
 **圖譜不能做的事：**
-- 不能替你判斷分析好不好（這是 Claude 的工作）
+- 不能替你判斷分析好不好（這是研究 agent 的工作）
 - 不能自動更新（需要你餵新文件進去）
-- 不能驗證自己的來源是否偏誤（你要問 Claude）
+- 不能驗證自己的來源是否偏誤（你要問研究 agent）
 
 ---
 
@@ -36,14 +36,14 @@ Claude 是分析引擎，知識圖譜（Neo4j）是持久的、跨 session 的�
 ```
 使用者問題
     ↓
-[本 skill — Claude 分析]
+[本 skill — 研究 agent 分析]
     ↓                        ↓
 Neo4j 圖                  SQLite 財務數據
 query/graph_context.py    engine_c/checklist.py
     ↓                        ↓
 供應鏈結構 + 主張 + 來源   財務快照 + Watchlist Gate
     ↓                        ↓
-         合成回答（Claude）
+         合成回答（agent）
 ```
 
 **指令參考：**
@@ -92,7 +92,7 @@ python thesis/generate_lane_memo.py --company-id co:<ticker_lower>
 **流程：**
 1. 執行 `python query/graph_context.py --company-id co:<ticker>` 取子圖
 2. 執行 `python engine_c/checklist.py <TICKER>` 取財務快照
-3. 評估以下四個維度（這是 Claude 的判斷，不是自動化）：
+3. 評估以下四個維度（這是研究 agent 的判斷，不是自動化）：
 
 | 維度 | 要問的問題 |
 |------|-----------|
@@ -122,8 +122,8 @@ python thesis/generate_lane_memo.py --company-id co:<ticker_lower>
    若 gate 未過 → 說明缺哪類文件，**不繼續**。若用戶確認 override → 繼續並在 memo 標注。
 2. 取圖 context：`python query/graph_context.py --company-id co:<slug>`
 3. 取 Engine C 數據：`python engine_c/checklist.py <TICKER>` + `python engine_c/market_data.py <TICKER>`（若 ticker 已知）
-4. **Claude 在對話裡直接生成 Lane Memo**，依 `prompts/lane_memo_system.md` 格式
-5. 生成後逐項核查（Claude 自己做）：
+4. **研究 agent 在對話裡直接生成 Lane Memo**，依 `prompts/lane_memo_system.md` 格式
+5. 生成後逐項核查（agent 自己做）：
    - `variant_perception` 有沒有？格式是否「股價隱含 X → 本 thesis 認為 Y → 催化劑 Z」？
    - `disproof_condition` 有沒有？附沒附核查頻率和觸發後 48h 動作？
 6. 缺 `variant_perception` 數字 → 標 `[TODO: 待 Engine C 估值數字補齊]`

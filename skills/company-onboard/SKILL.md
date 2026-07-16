@@ -13,7 +13,7 @@ description: >
 
 **找文件 → 用戶確認來源獨立性 → extract → validate → load → 驗收。**
 
-Claude 是搜尋與格式化引擎；用戶是獨立性的最終判官（L8 不能自動化）。
+研究 agent（Claude Code / Codex）是搜尋與格式化引擎；用戶是獨立性的最終判官（L8 不能自動化）。
 
 ---
 
@@ -136,10 +136,10 @@ L8 獨立性狀態：
 
 ### 4b. Extract（對話式，主路線）
 
-把文件內容貼給 Claude（或請 Claude 用 Read 工具讀取），說：
+把文件內容貼給研究 agent（或請 agent 用 Read 工具讀取），說：
 > 「請依照 prompts/extract_system.md 的格式抽取這份文件，doc_id 用 `<doc_id>`，origin_entity 是 `<誰發出>`」
 
-Claude 會：
+研究 agent 會：
 1. 讀 `prompts/extract_system.md` 取得完整抽取規則
 2. 按格式生成中介 JSON
 3. 寫入 `extractions/<doc_id>.json`
@@ -206,7 +206,7 @@ EDGAR 只有 SEC 申報文件（10-K/10-Q/8-K），法說會逐字稿通常在�
 
 ### 文件是 PDF
 
-用 Claude 直接讀 PDF（Read tool），摘錄關鍵段落放 `library/raw/<doc>.txt`，再走 extract 流程。
+用研究 agent 直接讀 PDF（Read tool），摘錄關鍵段落放 `library/raw/<doc>.txt`，再走 extract 流程。
 
 ### origin_entity 不確定怎麼填
 

@@ -5,8 +5,10 @@
 .env
 config/*.json
 
-# Claude Code 本機設定（不應共用）
-.claude/
+# Claude Code 本機設定（不共用）；project skills 轉接層需納入版本控制
+.claude/*
+!.claude/skills/
+!.claude/skills/**
 
 # Python
 __pycache__/
