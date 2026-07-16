@@ -171,6 +171,25 @@ Pending completion of U2, U3, U3b, U4, and U5.
   create SourceDoc, EdgeAssertion, and CITES, confirming that the new name tokens
   are usable by the remote loader without granting admin/delete authority.
 
+### U3b conflict/projector checkpoint (2026-07-16)
+
+- Derived the complete queue from 249 EdgeAssertions: 19 open conflicts across
+  209 canonical edges (`qualification_status`: 12, `substitutability`: 4,
+  `ramp_execution`: 3). No mutable conflict registry was created.
+- Projected 178 unambiguous attributes. All 19 conflicting attributes are absent
+  from canonical values and listed in `open_conflict_attributes`; overlap between
+  open attributes and materialized values is zero.
+- No real conflict was auto-approved. The resolution ledger is currently empty;
+  unit coverage proves approved choose/unknown decisions, stale candidate hashes,
+  missing assertion/source IDs, missing human approval, and split-scope handoff.
+- The one conflict directly incident to Sivers is Win Semiconductor → Sivers
+  `qualification_status` (`qualified` from aleabitoreddit versus `qualifying`
+  from the audited Sivers annual-report corpus). It remains open rather than
+  being hidden by load order or confidence.
+- `evidence-conflict-resolution` was validated with the skill tooling and synced
+  to both Claude and Codex adapters. It may produce proposals but cannot directly
+  edit the versioned resolution ledger or Neo4j.
+
 The after section must record:
 
 - the exact frozen manifest identity and hashes;

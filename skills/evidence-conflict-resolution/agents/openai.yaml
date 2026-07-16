@@ -1,0 +1,4 @@
+interface:
+  display_name: "Evidence Conflict Resolution"
+  short_description: "Review graph evidence conflicts with human approval"
+  default_prompt: "Use $evidence-conflict-resolution to review this edge-evidence conflict and draft a verifiable proposal."

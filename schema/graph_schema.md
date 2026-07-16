@@ -97,6 +97,30 @@
 Canonical relationship 的屬性是 assertions 的 materialized view，不是最後載入者的
 值，也不得用 relationship confidence 對衝突屬性投票。
 
+### Edge attribute conflict / resolution
+
+衝突單位是 `edge_key + attribute`。Detector 只比較 EdgeAssertion 中明確出現的候選：
+
+- 全部明確值相同 → 自動投影；
+- null 加一個明確值 → 投影明確值；
+- 兩個以上不同的明確值 → open conflict，canonical 該屬性不存在。
+
+`conflict_id` 由 `edge_key + attribute` 穩定產生；`candidate_set_hash` 由排序後的
+assertion IDs 與 canonical candidate values 產生。Open queue 每次現算，不落 mutable
+registry。核准決議才存 `library/resolutions/<conflict_id>.json`，且必須符合
+`schema/edge_resolution.schema.json`。候選集合改變時決議 stale、衝突自動重開。
+
+Projector 每次完整重建 relationship `attributes`，並維護：
+
+- `open_conflict_attributes`: 未解或 stale 的屬性名稱；
+- `attribute_resolution_meta_json`: 自動一致或人工決議的 confidence、resolution ID、
+  action、理由與 as-of；
+- relationship `confidence`: 仍只代表關係存在，不參與屬性 tie-break。
+
+`unknown`、`split_scope`、`move_to_observation` 都不捏造 canonical value；後兩者另要求
+人工 schema/observation refactor。LLM 只能產 proposal，deterministic resolver 驗證
+live candidate hash、assertion/source IDs、JSON Schema 與明確人工核准後才可寫決議與投影。
+
 ### SourceDoc（每份文件一個 provenance node）
 
 每份 extraction 建一個 `(:SourceDoc {id: doc_id})`。固定 properties 為：

@@ -1,0 +1,129 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "stockbotv2/edge_resolution/1",
+  "title": "Approved edge-attribute evidence resolution",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "resolution_id",
+    "conflict_id",
+    "edge_key",
+    "attribute",
+    "candidate_set_hash",
+    "action",
+    "selected_value",
+    "supporting_assertion_ids",
+    "rejected_assertion_ids",
+    "supporting_source_ids",
+    "rationale",
+    "resolved_confidence",
+    "approved_by",
+    "approved_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1"
+    },
+    "resolution_id": {
+      "type": "string",
+      "pattern": "^resolution_[a-f0-9]{64}_[a-f0-9]{12}$"
+    },
+    "conflict_id": {
+      "type": "string",
+      "pattern": "^conflict_[a-f0-9]{64}$"
+    },
+    "edge_key": {
+      "type": "string",
+      "minLength": 1
+    },
+    "attribute": {
+      "type": "string",
+      "minLength": 1
+    },
+    "candidate_set_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "action": {
+      "enum": [
+        "choose_value",
+        "unknown",
+        "split_scope",
+        "move_to_observation"
+      ]
+    },
+    "selected_value": {},
+    "supporting_assertion_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "rejected_assertion_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "supporting_source_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "rationale": {
+      "type": "string",
+      "minLength": 1
+    },
+    "resolved_confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "approved_by": {
+      "type": "string",
+      "minLength": 1
+    },
+    "approved_at": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "action": {
+            "const": "choose_value"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "selected_value": {
+            "not": {
+              "type": "null"
+            }
+          },
+          "supporting_assertion_ids": {
+            "minItems": 1
+          },
+          "supporting_source_ids": {
+            "minItems": 1
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "selected_value": {
+            "type": "null"
+          }
+        }
+      }
+    }
+  ]
+}
