@@ -1,0 +1,545 @@
+# Source: Sivers Semiconductors 2025 Annual Report (Photonics excerpt)
+# URL: https://www.sivers-semiconductors.com/wp-content/uploads/2026/05/Sivers_annualreport_2025_2.pdf
+# Retrieved: 2026-07-08
+
+[Page 4]
+ABOUT SIVERS SEMICONDUCTORS ABOUT SIVERS SEMICONDUCTORS
+Sivers designs the backbone
+of intelligent connectivity
+From ultra-fast wireless chips to precision lasers and beamformers, our technologies
+connect cloud and edge, enabling AI data centers, advanced telecommunications, and
+satellite communications.
+With deep engineering expertise and scalable, production-ready platforms, Sivers helps
+customers accelerate time to market and deploy high-performance systems at scale.
+Wireless Photonics
+Sivers provides mmWave beamforming ICs, transceivers, and Sivers provides high-power DFB lasers and laser arrays for
+antenna modules for SATCOM, Fixed Wireless Access (FWA), optical links in AI data centers and high-performance
+and Defense. These solutions enable higher throughput, lower computing (HPC) systems. These solutions deliver higher band-
+power consumption, flexible system designs, and faster time to width, lower power consumption, scalable designs, and reliable
+market. high-volume production.
+Applications Applications
+• Satellite Communications • Data Communications, AI & Machine Learning
+• Fixed Wireless Access/5G • LIDAR for 3D Imaging (Autonomous Vehicles and Robotics)
+• Defense Systems • Bio-Sensing
+4 2025 ANNUAL REPORT SIVERS SEMICONDUCTORS
+
+[Page 5]
+ABOUT SIVERS SEMICONDUCTORS ABOUT SIVERS SEMICONDUCTORS
+Our People and Global Presence
+Sivers Semiconductors AB is the Parent Company of a Group comprising the wholly-owned subsidiaries
+Sivers Wireless AB, Sivers Photonics Ltd, Trebax AB, Sivers Semiconductors Corp and Sivers Semiconductors Inc.
+The operations are mainly conducted in the three companies Sivers Wireless AB (Kista, Sweden),
+Sivers Photonics Ltd (Glasgow, Scotland) and Sivers Semiconductors Inc. (Chatham, USA).
+SCOTLAND SWEDEN
+Photonics AI, Head office, Wireless,
+R&D and Sales/Fab R&D and Sales
+USA
+Wireless,
+R&D and Sales
+INDIA
+Wireless,
+R&D
+Our Employees Social Responsibility
+We now have newly opened offices in Banga- Total number and Business Ethics
+of employees
+lore, India and San Jose, California (USA). At Sivers Semiconductors conducts its operations
+the end of the fourth quarter 2025, Sivers 130 in accordance with applicable laws, interna-
+Semiconductors had 130 employees in the US, tional standards, and its Code of Conduct, with
+Scotland, Sweden and India. a focus on human rights, ethical business prac-
+of whom
+Sivers Semiconductors’ success is driven tices, and responsible sourcing. The company
+by a highly skilled, international workforce 30 prohibits child and forced labor, discrimination,
+with deep expertise in advanced wireless and and corruption, and expects the same stan-
+photonics technologies. dards from its suppliers, including compliance
+To attract and retain key talent, the hold a PhD with conflict-minerals regulations.
+company offers competitive compensation  Policies and procedures are in place to
+and long-term incentive programs, including support employee health and safety, promote
+employee stock option plans that align equal opportunity, and enable reporting of
+employee interests with shareholder value suspected misconduct.
+creation.
+SIVERS SEMICONDUCTORS 2025 ANNUAL REPORT 5
+
+[Page 6]
+CEO’S LETTER CEO’S LETTER
+Igniting revenue
+and pipeline growth
+Annual revenues increased by 40% YoY to a new record of SEK 307 m, while AEBITDA
+improved by SEK 1 m compared to the previous year. Our opportunity pipeline grew, and
+we expanded our Serviceable Addressable Market (SAM) with optical pluggables. We have
+increasing momentum across focus market segments and are broadening our customer
+engagements with standard products. Our lead LIDAR customer will begin production ship-
+ments in Q4 2026 contributing significant top line revenues from 2027. We are finalizing
+the second-year contract at $6.6M with US Chips Act for Electronic Warfare.
+Sivers’ opportunity pipeline, a key lead indicator architectures for co-packaged optics (CPO). We are
+of future revenue growth potential, grew strongly actively sampling several customers including POET
+during 2025. for their alpha customer ELS product.
+Our wireless revenues grew 53% YoY, showcasing We are excited that our lead LIDAR customer will
+strong progress across key market segments. The ramp production starting Q4 2026, with Sivers’ lasers
+drive for ubiquitous broadband needs strong back- and optical amplifiers deployed across their product
+bone connectivity via SATCOM links and a robust last platforms for automotive and industrial LIDAR. This
+mile solution (Fixed Wireless Access, FWA). Sivers has program is expected to be a significant contributor to
+made strategic progress in both these areas with our our top-line growth over the coming years.
+customer engagements. We deepened our veteran leadership ranks with
+In SATCOM, our lead customer, ALL.SPACE has the addition of Raymond Biagan as Chief Revenue
+reached Technology Readiness Level 6 (TRL6) with the Officer and Neeraj Chopra as Chief Operations Officer.
+US Army and an expanded production pipeline starting Strong revenue growth, With solid revenue and pipeline growth in 2025,
+sizeable gains in the
+2H 2026. For IRIS2, the largest SATCOM upgrade accelerating customer engagement and market
+opportunity pipeline,
+program in Europe, three user terminal vendors who momentum, and good prospects to ramp up produc-
+and strategic
+bid with Sivers beamformers in the RFI stage have now expansion of our tion from the second half of 2026, Sivers is well-po-
+advanced to the RFP prototyping stage. Additionally, customer and partner sitioned and ready to grow revenues in the most
+we have expanded into Korea with a strategic contract base in focus markets eventful markets of our time.
+positions us well for
+($1.5M) with Doosan Corporation for antenna panels.
+continued success.
+In FWA, our Tier-1 customer is on track to release Correction of the financial figures
+first generation product by end of 2026. We are also  Sivers has previously informed that we are investi-
+executing well on their next-generation product. We gating the possibility of a dual listing of our shares
+have inked first production orders ($3M). In defense we on Nasdaq New York. This is part of our ongoing
+are finalizing the 2nd year Electronic Warfare (EW Star) analysis of strategic choices to improve access
+contract at a 20% higher project grant ($6.6M). to the major U.S. capital markets with a focus on
+We also added to our defense pipeline a new technology, to drive long-term growth and to grow
+contract ($800K) from a leading US defense contractor, our international investor base.
+to support emerging US tactical communication As part of this evaluation, we have conducted a
+programs. review of the Group’s financial reporting for the finan-
+Our photonics business grew by 17% YoY, driven by cial years 2024 and 2025, in preparation for a listing on
+increased product shipments to our SME customers. a US exchange. In connection with this, the need for
+Sivers expanded its manufacturing and serviceable adjustments in the previously reported financial data
+available market through several strategic partner- has been identified. The adjustments concern, among
+ships. Collaborations with WIN Semiconductors, O-Net other things, the redistribution of income between
+Technologies and POET volume production of DFB laser periods as well as to 2026 and later.
+arrays, pluggable transceivers, external laser sources The update of the consolidated financial state-
+and light engines (ELS) for AI data-centers. ments is an important step in our ongoing evaluation
+Our serviceable market and opportunity pipe- of a possible dual listing on Nasdaq New York.
+line has expanded to include pluggable optical
+interconnects as well as scale-up and scale-out Vickram Vathulya, CEO
+6 2025 ANNUAL REPORT SIVERS SEMICONDUCTORS
+
+[Page 7]
+CEO’S LETTER CEO’S LETTER
+Our performance in 2025 reflects
+our relentless pursuit of the growth
+journey ahead, says Vickram Vathulya,
+President & CEO.
+SIVERS SEMICONDUCTORS 2025 ANNUAL REPORT 7
+
+[Page 10]
+PHOTONICS
+Photonics
+The drive towards improved AI system performance is fundamentally reshaping
+how datacenter networks are built, powered, and monetized. The most important
+trend is that scale-up and scale-out networking are converging. Together, they are
+redefining AI datacenter networks as optics-first architectures.
+Scale-up drives the demand for light sources. The collaboration posi- several pluggable transceiver manu-
+high-performance, energy-efficient tions both companies to address the facturers world-wide. As these trials
+optical interconnects that can replace rapidly growing AI optical connectivity progress, we expect a subset of these
+copper over short distances. This is market, with prototypes will be demon- customers to commit to production
+where Sivers advanced DWDM laser strated to customers in the first half of plans with Sivers lasers in 2027 and
+arrays coupled with Co-Packaged silicon 2026 and production readiness targeted beyond. The partnership announced
+photonics chiplets become strategically by year-end 2026. There is additional with high volume foundry Win Semi-
+critical. In April 2025, Sivers announced strong interest in our DWDM laser conductor in March 2025 now places
+a strategic partnership with O-Net arrays with parts being evaluated in us in a strong position to meet these
+Technologies to produce high-perform- multiple labs. anticipated volume demands.
+ance external laser sources, a crit- Scale-out creates enormous volume Furthermore, Sivers continues to
+ical component for next-generation demand for optical modules, lasers, and develop novel laser technology and
+Co-Packaged Optics (CPO) in switches, fiber infrastructure. Even small effi- integrated architectures. In October
+network interface cards, delivering ciency gains per link translate into large 2025 we announced a partnership with
+significantly lower power consumption cost savings at the hyperscale. Discus- LIGHTIUM AG funded by the EU project
+compared with traditional pluggable sions with hyperscalers and pluggable INGENIOUS. It will deliver an integrated
+transceivers. Furthermore, in November transceiver vendors suggest a CW laser Thin-Film Lithium Niobate (TFLN)
+2025, Sivers announced a strategic supply shortage in the next few years platform for next generation optical
+partnership with POET Technologies as the industry transitions from 800G to transceiver engines with Sivers CW
+Inc., combining Sivers’ DFB laser arrays 1.6T and eventually to 3.2T bandwidths. lasers and photodetectors integrated
+with POET’s Optical Interposer™ to We currently have strong traction and directly onto TFLN wafers.
+deliver scalable, energy-efficient external interest sampling our CW DFB lasers to
+Data Communications, LIDAR for 3D Imaging Bio Sensing
+AI & Machine Learning (Autonomous Vehicles
+and Robotics) Our lasers and detectors enable
+Providing high-power DFB laser innovative wearable healthcare
+sources for next-generation optical Drive LIDAR performance forward products for many applications,
+interconnects that support with our narrow-linewidth, including personal fitness tracking
+the scale-up and scale-out of high-power DFB lasers designed and healthcare diagnostics.
+data center architectures. for precise, reliable sensing in
+any environment.
+10 2025 ANNUAL REPORT SIVERS SEMICONDUCTORS
+
+[Page 11]
+PHOTONICS PHOTONICS
+SIVERS SEMICONDUCTORS 2025 ANNUAL REPORT 11
+
+[Page 12]
+12 2025 ANNUAL REPORT SIVERS SEMICONDUCTORS
+
+[Page 13]
+THE SHARE
+The Sivers Semiconductors Share
+The Sivers Semiconductors share has The Share
+been listed on Nasdaq Stockholm since 6 45,000
+June 10, 2021. Market capitalization as
+of December 31, 2025, amounted to SEK 5.56 40,000
+5
+1,293 M.
+35,000
+4.15
+Share capital
+4 30,000
+As of December 31, 2025, the share
+capital of Sivers Semiconductors was 25,000
+3
+SEK 155.7 M. The number of shares was
+2.92 20,000
+311,333,572. According to the Articles of
+Association, the share capital shall be a
+2 15,000
+minimum of SEK 65 M and a maximum of
+SEK 260 M, distributed over a minimum 10,000
+of 130,000,000 shares and a maximum 1
+5,000
+of 520,000,000 shares. The proportion of
+shares available for trading (free float) at
+0 0
+year-end was 100 percent. J F M A M J J A S O N D
+___ Share price ___OMX Stockholm PI Number of shares traded in thousands per week ■ ■■
+Share price performance
+during the year
+During the year, the Sivers Semiconduc- growth, which means that available management and key personnel within
+tors share increased by 31.2 percent, financial resources and reported profit the Group. Participants who retain the
+compared to the Nasdaq Stockholm are reinvested in operations to finance savings shares during the savings period
+index, which increased by 9.5 percent. the Company’s long-term strategy. The 2022–2025 and who are also employed
+The closing price on December 30, 2025, Board’s intention is therefore not to in the group during the entire savings
+was SEK 4.15 per share, corresponding propose any dividend over the coming period will, after the end of the savings
+to a market capitalization of SEK 1,293 M. years. period, be able to receive ordinary
+shares in the company free of charge
+Share turnover in the year Incentive programs (”performance shares”) provided that
+The average daily turnover of the Sivers Sivers Semiconductors had six the performance conditions are met.
+Semiconductors share was 1,454,467 employee stock option programs at the The share savings program includes a
+shares. A total of 362 million shares were end of the year. Stock option programs maximum of 412,500 savings shares,
+traded in 2025, with a total value of SEK still active at the end of the period have which can give the right to a maximum
+1,409 M. The highest closing price for the the following terms: 1) 2020–2026, of 2,062,500 performance shares. The
+share in 2025 was SEK 5.56 on March 2)2022–2027, 3) 2021–2026, 4) 2023– program was settled during 2025.
+3, and the lowest closing price was SEK 2028, 5) 2024-2027, 6)2025-2031. Upon For more information, see Note 26
+2.92 on January 7, 2025. full conversion of outstanding employee of the Group’s Annual Report.
+stock options, the total number of
+Owner and ownership structure shares will amount to 307,808,572. The Board authorization
+At the end of the year, the ten largest total number of outstanding employee The AGM on May 28, 2025 authorized
+shareholders controlled 46.4 (44.6) stock options granted as of December the Board, on one or more occasions in
+percent of the capital and 43.9 (44.5) 31, 2025, amounted to 16,475,000 of the period until the next AGM is held,
+percent of the votes. The total number of which 1,090,000 have been vested. with or without departing from share-
+shareholders of Sivers Semiconductors In 2025, a new option program holders’ preferential rights, to decide to
+was approximately 20,000 (20,000). P10 was established where the perfor- complete new issues of shares and/or
+mance condition is based on average convertibles which involves the issuance
+Dividend annual growth of the group’s net sales or conversion to a total of 47,900,000,
+Sivers Semiconductors has not paid 2025–2027. corresponding to a dilution effect of
+any dividends to date and follows the In addition to the option programs, approximately 15 percent of the share
+dividend policy adopted in 2020. The a share savings program was estab- capital and voting rights, based on the
+Company will continue to focus on lished in 2022 encompassing the Group total number of shares in the Company.
+SIVERS SEMICONDUCTORS 2025 ANNUAL REPORT 13
+
+[Page 14]
+DIRECTORS’ REPORT
+Directors’ Report
+The Board of Directors and the CEO of Sivers Semiconductors AB hereby submit the
+Parent Company and consolidated financial statements for the financial year January 1,
+2025 – December 31, 2025.
+Operations critical semiconductor ecosystem focused on domestic capabilities
+Sivers Semiconductors AB (publ), company registration number and resilience.
+556383-9348, is the parent company of a Group comprising the wholly Within photonics, Sivers expanded its manufacturing and servicea-
+owned subsidiaries Sivers Wireless AB, Sivers Photonics Ltd, Trebax ble market through several strategic partnerships. Collaborations with
+AB, Sivers Semiconductors Inc and Sivers Semiconductors India Ltd. WIN Semiconductors, O-Net Technologies and POET enable scalable,
+The Group’s operations are conducted primarily through Sivers high-volume production of DFB laser arrays, as well as external laser
+Wireless AB, Sivers Photonics Ltd, Sivers Semiconductors Inc and sources and light engines for AI data centers. The Company’s servicea-
+Sivers Semiconductors India Ltd. Sivers Wireless has its head office in ble markets have now expanded to include pluggable optical intercon-
+Kista, Stockholm, and a development office in Gothenburg. Sivers nects as well as scale-up and scale-out architectures for co-packaged
+Photonics’ head office and manufacturing facility are located in optics (CPO).
+Glasgow, Scotland. Sivers Semiconductors Inc. has its head office in Organizationally, Sivers strengthened its management team
+Chatham, US. through the appointments of Heine Thorsgaard as Chief Financial
+The Sivers Group develops, manufactures and sells energy-efficient Officer, Neeraj Chopra as VP of Global Operations and Quality, and
+chips, components, modules and subsystems based on advanced Raymond Biagan as Chief Revenue Officer. These appointments
+semiconductor technology for millimeter-wave (mmWave) systems, strengthen financial governance, optimize operational efficiency and
+as well as optical semiconductors for fiber networks, wireless optical support the Company’s commercial execution as it scales across multi-
+networks and sensors. MmWave technology and optical semicon- ple high-growth end markets.
+ductors are central to high-speed networks. The Wireless business
+area focuses on wireless mmWave technology, primarily for satellite Capital
+communications, while the Photonics business area targets AI data In May 2025, Sivers Semiconductors obtained a new loan of USD 12
+centers. million from a US credit institution, while maturing loans were repaid.
+During the first quarter, the Company carried out a directed new share
+Significant events issue of 31.7 million shares, corresponding to proceeds of approx-
+During 2025, Sivers Semiconductors made significant progress in its imately SEK 108 million before transaction costs. During the third
+long-term growth strategy within satellite communications (SATCOM), quarter, the Company carried out a directed new share issue of 25.7
+Fixed Wireless Access (FWA), and photonics, while further strengthen- million shares, corresponding to proceeds of approximately SEK 95
+ing its financial position and industrial partnerships. million before transaction costs.
+Within SATCOM, new program agreements were entered into with At the Annual General Meeting held on May 28, 2025, the Board
+Intelsat, Doosan, and the European Space Agency, complementing of Directors was authorized, on one or more occasions until the next
+existing collaborations with ALL.SPACE, the Company’s single most AGM, with or without deviation from the shareholders’ preferential
+important customer. During 2025, ALL.SPACE achieved Technology rights, to resolve on new issues of shares and/or convertible instru-
+Readiness Level 6 (TRL 6) for the US Army and has a rapidly expanding ments resulting in the issuance of, or conversion into, a maximum
+production pipeline that is expected to result in increased produc- of 47,900,000 ordinary shares, corresponding to a dilution effect of
+tion volumes during 2026. Sivers has also made significant progress approximately 15 percent of the share capital and voting rights, based
+together with several SATCOM user terminal suppliers through joint on the total number of shares in the Company.
+bids relating to IRIS2, the largest planned satellite communications
+infrastructure upgrade program in Europe. Together, these milestones Recruitment and Board of Directors
+underscore the Company’s increasingly important role in SATCOM On August 8, it was announced that Heine Thorsgaard would assume
+user terminal solutions for both commercial markets and defense the role of CFO of Sivers Semiconductors.
+applications.
+The Company secured a major chip development program with a Comments on operations,
+leading Tier 1 telecommunications infrastructure supplier. This pro- results and financial position
+gram complements two products already scheduled for launch with The Group’s net sales amounted to SEK 306.6 (219.2) million, an
+this customer. New production orders from Tachyon Networks further increase of SEK 87.4 million or 40% compared with the previous year.
+support the Company’s strategy of selectively targeting the most Wireless net sales increased by SEK 74.0 million, or 53%, while Photon-
+promising FWA deployments for commercial applications. ics net sales increased by SEK 13.4 million, or 17%.
+Sivers has also strengthened its position within the US defense indus- Operating profit amounted to SEK -177.8 (-194.3) million, an
+try through the signing of a CHIPS Act contract with the Northeast improvement of SEK 16.5 million. Profit after tax amounted to SEK
+Microelectronics Coalition Hub. This agreement facilitates access to -222.6 (-183.9) million, a decline of SEK 38.7 million. Profit included
+US funding programs and deepens the Company’s integration into a non-recurring items totaling SEK 43.1 million, of which SEK 14.7 million
+14 ANNUAL REPORT 2025 SIVERS SEMICONDUCTORS
+
+[Page 15]
+DIRECTORS’ REPORT
+related to strategic projects, SEK 8.5 million to incentive programs, liquidity position when needed, including the ability to utilize equity
+SEK 11.5 million to restructuring measures and SEK 8.5 million to a financing to support future growth initiatives. As part of the annual
+cyberattack. Net financial items were negatively affected by exchange strategic planning process, the Group actively reviews and optimizes
+rate effects, primarily attributable to fluctuations in USD and GBP its long-term capital structure. In addition, a number of measures are
+arising from the translation of internal financing. Other comprehensive being implemented to improve working capital, including efforts to
+income amounted to SEK -121.8 (70.4) million, a decline of SEK 192.2 enhance the commercial terms of customer agreements and initiatives
+million. The change was attributable to the translation of investments to better align customer and supplier payment schedules. These
+in subsidiaries from USD and GBP into SEK. measures are designed to further strengthen cash generation and
+EBITDA amounted to SEK -93.4 (-68.3) million, a decline of SEK 25.1 support the Group’s liquidity profile.
+million. EBITDA adjusted for non-recurring items (“adjusted EBITDA”)
+amounted to SEK -50.3 (-51.3) million, an improvement of SEK 1.0 Investments
+million. Reconciliations of EBITDA and adjusted EBITDA are provided in The Group’s total investments during the period January–December
+the table Reconciliation of alternative performance measures. amounted to SEK 67.1 (44.1) million and related to intangible assets
+in the form of capitalized development expenditure of SEK 56.7 (27.8)
+SEK thousand Jan–Dec 2025 Jan–Dec 2024 million, acquisitions of other intangible assets of SEK 1.7 (7.7) million
+and acquisitions of property, plant and equipment of SEK 8.7 (8.6)
+Net sales 306,558 219,207
+million. Investments in capitalized development expenditure were
+EBITDA1) -93,432 -68,315
+attributable to the development of new generations of products.
+Adjusted EBITDA1) -50,304 -51,292
+Equity
+1) EBITDA is calculated as earnings before financial items, taxes, depreciation, amortization and
+As of December 31, 2025, the Group’s equity amounted to SEK 949.8
+impairment.
+(1,091.1) million. Share capital amounted to SEK 155.7 (118.8) million.
+Depreciation, amortization and impairment Employees
+Profit for the period January–December was affected by deprecia- As of December 31, 2025, the Group had 130 (128) employees, exclud-
+tion, amortization and impairment losses of SEK 84.4 (126.0) million, ing consultants.
+a decrease of SEK 41.7 million. This included SEK 17.9 (13.7) million
+related to depreciation and impairment of equipment, tools and instal- Material risks and uncertainties
+lations; SEK 9.1 (51.0) million related to amortization and impairment The Sivers Semiconductors Group’s operations, financial position and
+of previously capitalized development expenditure; SEK 53.1 (55.1) results may be affected by a number of risks and uncertainties. These
+million related to amortization and impairment of other intangible risks may adversely affect the Group’s operations, results and financial
+assets; and SEK 4.4 (6.3) million related to depreciation of right-of-use position.
+assets under lease agreements. The risk factors described below are not ranked by importance and
+do not constitute a comprehensive description of all risks to which the
+Income tax Group may be exposed.
+Income tax for the period amounted to SEK 14.6 (19.7) million and
+primarily related to deferred tax on temporary differences Internal control over financial reporting
+The Group is currently implementing measures to strengthen internal
+Liquidity, cash flow and financing control over financial reporting and remediate identified material
+As of December 31, 2025, the Group’s cash and cash equivalents weaknesses. The measures include the introduction of new IT solu-
+amounted to SEK 29.7 (17.8) million. In addition to the Group’s cash tions and systems for the preparation of financial reports, implementa-
+and cash equivalents, short-term investments in restricted bank funds tion of additional review procedures within the finance and accounting
+amounted to SEK 13.8 (0.0) million. function, and the recruitment of additional personnel.
+During the second quarter, the Group repaid the loans from credit The Group has also engaged an external advisor to support improve-
+institutions that matured in May while simultaneously obtaining a USD ments to accounting processes and procedures, as well as to supple-
+12 million loan from a US credit institution. ment internal resources in the calculation and reporting processes.
+During the period January–December, the Group’s cash flow from Following the identification of material weaknesses, and as part
+operating activities amounted to SEK -38.5 (-48.2) million. of management’s commitment to strengthening internal control over
+During the same period, two directed new share issues were financial reporting, management is implementing remedial measures
+carried out, corresponding to proceeds of SEK 202.8 million before under the oversight of the Audit Committee and the Board of Direc-
+transaction costs. tors to address the identified material weaknesses. Remediation is
+In light of the Group’s development and scaling phase, manage- focused on the following areas:
+ment maintains strict forward-looking liquidity planning, supported by • strengthening of the Group’s overall control environment through
+detailed rolling cash flow forecasts and scenario analyses. During the improved governance, clearer roles and responsibilities, and
+year, the Group further strengthened its financial position through enhanced monitoring and oversight mechanisms;
+several pre-planned and successfully executed financing measures, • r edesign and implementation of control activities within the business
+ensuring increased flexibility heading into 2026. areas, including improved review procedures and clearer allocation
+The Group maintains several processes to further enhance its of responsibilities; and
+SIVERS SEMICONDUCTORS ANNUAL REPORT 2025 15
+
+[Page 16]
+DIRECTORS’ REPORT
+• f urther development of accounting and financial reporting systems This could in turn result in delayed or canceled market launches of
+aimed at strengthening the control environment. parts of, or entire, product categories, leading to lost revenue and/or
+increased development costs. There is also a risk that the Group may
+See also Internal control over financial reporting in the Corporate fail to identify the technical solutions required for a commercial launch,
+Governance section. or that such objectives may not be achieved within a reasonable time
+frame, which could negatively affect the Group’s operations, earnings
+Market risk and financial position.
+The Group operates globally with customers across several regions of The Group has a strong research and development focus. An
+the world. As a result, the Group is exposed to risks such as deteriorat- established process for project management and follow-up is in place
+ing trade policy conditions, changes in regulations between countries, to support future profitability.
+limited protection of intellectual property rights, differing accounting The projects involve experienced partners with contact networks
+standards, tax systems and varying payment terms. that help speed up market launches. The Group also focuses on
+The Group operates in a market expected to continue to demon- targeted recruitment to attract qualified personnel. Collaborations
+strate growth and strong earnings potential in the coming years. with universities and other institutions provide a strong recruitment
+However, there is a risk that market developments may adversely pipeline.
+affect the Group due to changes in macroeconomic factors, new regu-
+lations, limited protection of intellectual property rights or other factors Competition
+beyond the Group’s control. Sivers Semiconductors operates within a highly competitive segment
+A significant portion of the Group’s revenue is derived from cus- of the global semiconductor industry, which continuously evolves in
+tomers in the US and the UK. Geopolitical disputes between the US, response to customer needs and behavior. The Group’s competitors
+China and Europe may disrupt customers’ supply chains, which in turn include large companies with significant research, financial and techni-
+could hamper the Group’s expansion. cal resources. Different combinations of such resources may provide
+A military conflict between Russia and Ukraine is currently ongoing. competitors with advantages that enable them to influence industry
+This has resulted in sanctions, trade restrictions and political tensions. trends. Strong competition from one or more of the Group’s compet-
+Sivers Semiconductors currently has no suppliers or customers in itors may lead to increased pressure to reduce the Group’s prices,
+Russia or Ukraine. higher sales and marketing costs, and loss of market share. In addition,
+Geopolitical tensions between the US and Iran may contribute to there is a risk that competing technologies and products may prove
+increased uncertainty in the global markets in which Sivers operates, to be more effective, safer or less expensive than those developed by
+particularly through volatility in energy prices, currencies and global Sivers Semiconductors. The Group’s competitors may also have access
+supply chains. For Sivers, increased uncertainty may affect customers’ to greater manufacturing, marketing and distribution capacity. If the
+willingness to invest and the timing of larger systems and technology Group’s competitors are able to sell more attractive competing prod-
+projects. As of the reporting date, the conflict had not had any material ucts, this may result in reduced revenue or force the Group to adjust
+direct impact on the Group’s operations or financial position, although its pricing in a manner that negatively affects the Group’s margins.
+developments are continuously monitored as part of the Company’s The products sold by the Group are technically complex. The Group
+risk management. has many years of experience in the design and manufacture of these
+However, the uncertainties arising in the market and the global products and therefore benefits from a competitive advantage, as the
+economy may affect the Group’s operations through, for example, products are not easily replicated. The Group’s focus on collaborations
+reduced demand for the Group’s products, increased input costs, post- with larger partners also enables faster market launches and increased
+poned investments in 5G networks, or supply chain problems affecting market share.
+customers and/or suppliers. In the longer term, this could delay the
+Group’s product development and hamper the Group’s expansion. Dependence on suppliers, manufacturers and partners
+The Group is dependent on partners, manufacturers and subcontrac-
+Technology development risk tors to establish and maintain its market position. There is a risk that
+The market in which the Group operates is continuously evolving in one or more of these partners, suppliers or manufacturers may be
+response to customer needs and behavior. There is a risk that the unwilling to continue their contractual cooperation with the compa-
+results of technological development may not meet the expectations of nies within the Group, or that such suppliers or manufacturers may
+the Group, its customers or the market. be unable to meet the quality requirements imposed by the Group
+Five-Year Summary – Group
+SEK thousand 2025 2024 2023 2022 2021
+Net sales 306,558 219,207 236,334 132,607 90,652
+Operating profit -177,788 -194,324 -158,623 -185,096 -140,941
+Profit before tax -237,201 -203,618 -175,783 -103,628 -139,012
+Total assets 1,330,990 1,502,329 1,505,920 1,571,000 951,379
+Equity/assets ratio 71% 73% 80% 79% 84%
+Average number of employees 128 124 123 131 117
+16 ANNUAL REPORT 2025 SIVERS SEMICONDUCTORS
+
+[Page 17]
+DIRECTORS’ REPORT
+companies. Over time, this could negatively affect the Group’s devel- executives or other key personnel were to leave the Group, important
+opment and sales. The Sivers Semiconductors Group works actively knowledge and expertise could be lost, potentially resulting in the
+to maintain existing partnerships and to enter into collaboration or failure to achieve established objectives or negatively affecting the
+supply agreements in order to mitigate this risk. implementation of the Group’s business strategy. If such individuals
+The Group’s dependence on external parties also entails a risk leave the Group and cannot be effectively replaced, this could have a
+that the Group’s continued profitability may be indirectly affected by material adverse effect on the Group’s operations and development.
+the business performance of such parties. The Wireless business area
+does not have its own manufacturing operations and instead relies on Production-critical systems and facilities
+outsourced production. As a result, the business area, which repre- Sivers Semiconductors develops, manufactures and sells chips, com-
+sents a significant part of the Group’s future strategic focus, is entirely ponents, modules and subsystems based on advanced semiconductor
+dependent on partners and external manufacturers. technology for 5G mmWave networks, as well as optical semicon-
+The Group’s dependence on external parties increases the vulner- ductors for fiber networks, wireless optical networks and sensors. A
+ability of its operations. Events causing disruptions in the operations significant part of the Group’s operations depends on functioning IT
+of any of the Group’s critical collaboration partners, manufacturers or systems, including systems used for managing customer deliveries
+subcontractors may result in such parties being unable to fulfill their and conducting research. The Group’s IT systems may be exposed to
+obligations towards the Group, which in turn could also cause material technical disruptions or cyberattacks that could disrupt or damage
+disruptions to the Group’s operations. Such disruptions may delay the systems, compromise the protection of confidential information,
+product development and launches, as well as limit the Group’s sales cause data losses that are costly or impossible to remedy, and inter-
+growth and, consequently, its revenue. rupt operations. Unintentional disclosure of confidential information
+entrusted to the Group by, for example, collaboration partners may
+Dependence on customers also result in claims for damages against the Group. The Group also
+More than 50 percent of the Group’s revenue during the 2025 finan- operates a production facility in Glasgow, Scotland, which manufac-
+cial year was derived from three customers. These customers are tures customized lasers and semiconductor optical amplifiers that
+within the Wireless business area. If these customers were to reduce are critical to the operations of the Photonics business area. Damage
+or discontinue their purchases, this could negatively affect the Group’s to production facilities and related logistics chains caused by events
+revenue over a shorter or longer period, which in turn could adversely such as fire, equipment failure, weather conditions, labor disputes or
+affect the Group’s operations, earnings and financial position. The natural disasters may have adverse consequences both in the form of
+Group places significant focus on customer satisfaction and on quality direct property damage and operational disruptions that hamper the
+testing of products prior to delivery. The Group is currently in a growth Group’s production and may impair its ability to fulfill commitments to
+phase, with an established base of customers and potential custom- customers.
+ers that may contribute to increased sales in the future. The Group
+continuously works to broaden its customer base in order to reduce Intellectual property rights
+its dependence on a limited number of customers. Sivers Semiconductors Group holds intellectual property rights of
+significant value. These rights entail a risk that the Group may be
+Price risk exposed to theft of information, for example through cyberattacks.
+The Group’s operations are dependent on certain highly complex There is also a risk that the Group may fail to maintain existing patent
+input materials, and the Group has limited ability to control the pricing protection, that ongoing patent applications may not be granted, or
+of the input materials on which it depends. If pricing conditions were that additional patent protection for future technologies and applica-
+to deviate significantly from expectations, there is a risk that the tions may not be obtained.
+Group may be unable to secure the quantities of such input materials The Group’s competitiveness is largely derived from proprietary
+required to conduct its intended manufacturing operations. Increased methods, tools and specialized technical expertise. Among other
+costs for input materials may negatively affect the Group’s margins, things, the Group’s planned future investments in the 5G network mar-
+while difficulties in securing sufficient volumes of input materials may ket depend on the effective protection of the advanced 5G mmWave
+result in production constraints and reduced revenue. technology that forms the core of the wireless solutions offered by the
+Geopolitical tensions, including the ongoing conflict between the Group. If the Group is unable to effectively protect its technologies,
+US and Iran, may further contribute to volatile pricing levels, dis- know-how and brand, this could have a material adverse effect on the
+ruptions in global supply chains, and increased transportation and Group’s competitive position and market standing.
+insurance costs. To protect its intellectual property rights in their various forms, the
+Group relies on protection under laws relating to trade secrets, pat-
+Dependence on key personnel ents and copyrights. In addition, the Group enters into confidentiality
+Board of members, senior executives and other key personnel within agreements with counterparties and executes agreements containing
+the Group possess business expertise and specialized technical intellectual property protections before sensitive information is dis-
+competence of significant importance to the Group and its operations, closed. The Group has also implemented controls to prevent cyberat-
+which may be difficult to replace. Sivers Semiconductors’ ability to tacks and intellectual property theft.
+recruit and retain such individuals depends on a number of factors,
+several of which are beyond the Group’s control, including competition Cyber risks
+from other employers in the labor market. During 2025, a cyberattack was identified within the Group. The
+Furthermore, the arrangements and contractual solutions imple- incident was managed in accordance with the Company’s internal
+mented by the Group to retain senior executives and key personnel information security procedures and did not result in any material dis-
+may prove insufficient or have limited effect. If Board members, senior ruptions to ongoing operations, although it gave rise to certain non-re-
+SIVERS SEMICONDUCTORS ANNUAL REPORT 2025 17
+
+[Page 18]
+DIRECTORS’ REPORT
+curring costs related to the attack. The Group works continuously to Financial risks and risks related to going concern
+reduce its exposure to cyber risks through technical, organizational The Sivers Group is exposed to financial risks such as currency risk,
+and training-related measures. However, it cannot be ruled out that interest rate risk, credit risk and liquidity risk. The Group’s financial
+future incidents may adversely affect the business. risk management is overseen by the Board of Directors and Group
+management, which continuously monitor and evaluate risks. Group
+Acquisitions management places particular focus on liquidity risk. The Group is
+Sivers Semiconductors has historically completed a number of acqui- currently in a development and scaling phase and has not yet achieved
+sitions. For example, Sivers Semiconductors acquired Compound an earnings capacity through sales revenue sufficient to fully cover the
+Semiconductor Technologies Global Limited (now Sivers Photonics) in Group’s development plans and operating costs. This means that the
+2017 and MixComm Inc. (now Sivers Semiconductors Inc.) in 2022. In Group’s ability to implement its established business plan depends on
+addition to risks related to identifying and executing acquisitions, the its continued ability to obtain additional capital and/or carry out other
+actual acquisition process exposes the Group to risks associated with financing measures to the extent necessary. Management uses rolling
+the integration of acquired businesses. There is a risk that acquired cash flow forecasts and scenario analyses and implements measures
+businesses may not develop as expected. to secure financing and liquidity, such as share issues, borrowings,
+The implementation of an acquisition and the integration of an and cost and working capital measures, in order to ensure sufficient
+acquired business may result in unforeseen operational difficulties liquidity. If these measures are not implemented as planned, or if
+and costs, which could delay the Group’s growth objectives. The inte- market conditions deteriorate, additional financing may need to be
+gration of each acquisition completed by the Group involves a number secured. Accordingly, there is a material risk and uncertainty factor
+of operational and company-specific risks. The assessments and due that the Group and the Parent Company may not be able to continue
+diligence carried out in connection with each acquisition process may operations to the planned extent. The Group and the Parent Company
+prove insufficient or inaccurate. For example, the Group may deter- have prepared their financial statements on a going concern basis.
+mine that the acquisition price exceeds the value of the acquisition, The Group is exposed to foreign exchange risk, primarily relating to
+that there are undisclosed obligations or liabilities relating to the USD, GBP and EUR, as a significant portion of sales is denominated in
+acquired company, or that transaction costs exceed expectations. USD, while purchases are primarily made in GBP, EUR and SEK. As the
+There is also a risk that, following completion of an acquisition, the Group has the subsidiary Sivers Photonics Ltd in the UK and the sub-
+Group may fail to retain key employees within the acquired business, sidiary Sivers Semiconductors Inc. in the US, the Group is also exposed
+even though such employees may represent an important part of the to translation exposure from GBP to SEK and USD to SEK.
+ongoing operations and facilitate the integration process. Acquisitions Further information regarding financial risks and risk management
+in new geographic markets also involve risks relating to local laws is presented in Note 29 Financial instruments.
+and regulations, the local business climate, and established busi-
+ness practices and culture. If conditions change or deviate from the Research and Development
+Group’s expectations, geographical expansion may expose the Group Research and development are a central part of the Group’s opera-
+to new or increased risks. Additional potential risks include acquisi- tions and are conducted in Kista, Gothenburg, Glasgow and Chatham.
+tions requiring excessive management time and resources, thereby The development process follows the Group’s project model, which
+reducing the time and resources available for the Group’s ongoing is ISO 9001:2015 certified and has been developed over many years.
+operations, or the loss of customers or personnel within the acquired During the year, SEK 56.7 (27.8) million in development costs relating
+business. The integration of acquisitions may become more costly or to projects in the development phase were capitalized.
+time-consuming than expected, fail altogether, or otherwise have a
+material adverse effect on the Group’s operations. Related party transactions
+Remuneration of senior executives is presented in Note 30.
+Share price risk
+Sivers Semiconductors AB has employee stock options outstanding Outlook for 2026
+relating to its own shares. The provision for social security contri- The Board of Directors believes that the Group is well positioned
+butions is measured at fair value as of the reporting date, and the for continued development within its prioritized markets. Future
+payment to the Swedish Tax Agency upon allocation of shares under developments are expected to be influenced by ongoing customer
+the option programs is calculated based on the market value of the discussions, continued technological development and market
+shares allocated, which is determined by the share price. An increase demand, while the business remains subject to customary business
+in the share price of SEK 10 compared with the share price at the and execution risks. The Board of Directors has chosen not to provide
+reporting date would increase the cost of social security contributions a forecast for 2026.
+by approximately SEK 5.6 million, based on the number of outstanding
+options as of December 31, 2025. Parent Company
+Under the option programs, Sivers Semiconductors is authorized During the first half of the year, the Parent Company repaid the loans
+to issue warrants or alternatively sell treasury shares in order to hedge from credit institutions that matured in May 2025. Net financial items
+the cash flow risk associated with the social security contributions were negatively affected by impairment of shares in subsidiaries
+relating to the options. as a result of an intra-Group transaction, while interest and similar
+expenses were negatively affected by foreign exchange remeasure-
+ment of internal financing, primarily from GBP and USD into SEK.
+18 ANNUAL REPORT 2025 SIVERS SEMICONDUCTORS

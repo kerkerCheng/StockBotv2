@@ -1,0 +1,129 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "sivers_ar_2025_financials",
+    "title": "Sivers Semiconductors 2025 Annual Report (Financial Notes & Directors' Report)",
+    "url": "https://www.sivers-semiconductors.com/wp-content/uploads/2026/05/Sivers_annualreport_2025_2.pdf",
+    "source_type": "filing",
+    "evidence_tier": 1,
+    "origin_entity": "Sivers Semiconductors",
+    "storage_permission": "repo_full",
+    "permission_basis": "This is Sivers Semiconductors' official annual report, published as an original investor disclosure on the issuer's own domain. The repository retains attributed research excerpts and derived extraction with the issuer PDF URL and retrieval metadata."
+  },
+  "sources": [
+    {
+      "id": "sivers_ar_2025_financials_s1",
+      "locator": "Directors' Report, p.~19, Comments on operations",
+      "quote": "The Group's net sales amounted to SEK 306.6 (219.2) million, an increase of SEK 87.4 million or 40% compared with the previous year. Wireless net sales increased by SEK 74.0 million, or 53%, while Photonics net sales increased by SEK 13.4 million, or 17%."
+    },
+    {
+      "id": "sivers_ar_2025_financials_s2",
+      "locator": "Directors' Report, Comments on operations",
+      "quote": "EBITDA amounted to SEK -93.4 (-68.3) million, a decline of SEK 25.1 million. EBITDA adjusted for non-recurring items (\"adjusted EBITDA\") amounted to SEK -50.3 (-51.3) million, an improvement of SEK 1.0 million."
+    },
+    {
+      "id": "sivers_ar_2025_financials_s3",
+      "locator": "Directors' Report, Comments on operations",
+      "quote": "Operating profit amounted to SEK -177.8 (-194.3) million, an improvement of SEK 16.5 million. Profit after tax amounted to SEK -222.6 (-183.9) million, a decline of SEK 38.7 million."
+    },
+    {
+      "id": "sivers_ar_2025_financials_s4",
+      "locator": "Directors' Report, Dependence on customers",
+      "quote": "More than 50 percent of the Group's revenue during the 2025 financial year was derived from three customers. These customers are within the Wireless business area. If these customers were to reduce or discontinue their purchases, this could negatively affect the Group's revenue over a shorter or longer period."
+    },
+    {
+      "id": "sivers_ar_2025_financials_s5",
+      "locator": "Note 5, Information about major customers",
+      "quote": "During the financial year ended December 31, 2025, three customers each accounted for more than 10 percent of the Group's total revenue. Revenue from these customers amounted to SEK 183.4 million (2024: three customers, SEK 96.5 million). Customer A: SEK 79.4 (75.3) million. Customer B: SEK 55.2 (16.9) million. Customer C: SEK 48.7 (4.4) million. These revenues were attributable to the following operating segments: Customer A: Wireless. Customer B: Wireless. Customer C: Wireless. The Group does not disclose the identity of major customers."
+    },
+    {
+      "id": "sivers_ar_2025_financials_s6",
+      "locator": "Note 5, Segment revenue reconciliation",
+      "quote": "Wireless: [Dec 31, 2025] 213,137 [Dec 31, 2024] 139,154. Photonics: [Dec 31, 2025] 93,420 [Dec 31, 2024] 80,053. [Total] 306,558 / 219,207."
+    },
+    {
+      "id": "sivers_ar_2025_financials_s7",
+      "locator": "Consolidated Income Statement (restated to function-of-expense format from Q4 2025)",
+      "quote": "Net sales: 306,558 (2024: 219,207). Cost of sales: -308,636 (2024: -215,015). Gross profit: -2,079 (2024: 4,192)."
+    },
+    {
+      "id": "sivers_ar_2025_financials_s8",
+      "locator": "Note 8/9, Cost of sales breakdown Dec 31 2025",
+      "quote": "Raw materials and consumables used: 67,575. Employee benefits expense: 82,841. Other external expenses: 88,666. Depreciation, amortization and impairment: 69,554. Total: 308,636."
+    },
+    {
+      "id": "sivers_ar_2025_financials_s9",
+      "locator": "CEO Letter, p.6",
+      "quote": "Our major customer, ALL.SPACE, continues to gain traction with the U.S. armed forces, recently completing a milestone demonstration under the U.S. Army's Next Generation Tactical Terminal (NGTT) program and achieving Technology Readiness Level 6."
+    },
+    {
+      "id": "sivers_ar_2025_financials_s10",
+      "locator": "Directors' Report, Dependence on customers",
+      "quote": "The Group continuously works to broaden its customer base in order to reduce its dependence on a limited number of customers."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:sivers_semiconductors",
+      "type": "Company",
+      "name": "Sivers Semiconductors",
+      "abstraction_level": "device_chip",
+      "role": "bottleneck_supplier",
+      "aliases": ["Sivers", "Sivers Photonics", "Sivers Photonics Ltd"],
+      "attributes": {
+        "fy2025_revenue_sek_m": 306.6,
+        "fy2025_photonics_revenue_sek_m": 93.4,
+        "fy2025_wireless_revenue_sek_m": 213.1,
+        "fy2025_gross_margin_pct": -0.7,
+        "fy2025_adj_ebitda_sek_m": -50.3,
+        "fy2025_op_loss_sek_m": -177.8
+      },
+      "confidence": 0.95,
+      "source_ids": [
+        "sivers_ar_2025_financials_s1",
+        "sivers_ar_2025_financials_s6",
+        "sivers_ar_2025_financials_s7"
+      ]
+    }
+  ],
+  "edges": [],
+  "claims": [
+    {
+      "id": "cl1",
+      "statement": "More than 50% of Sivers' FY2025 total revenue (SEK 183.4M out of 306.6M) came from three Wireless-segment customers; the Photonics segment (SEK 93.4M, +17% YoY) has no disclosed customer exceeding 10% of group revenue, implying Photonics customer concentration is lower.",
+      "subject_id": "co:sivers_semiconductors",
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "If Photonics revenue becomes concentrated in one or two customers as CPO volumes scale, or if the top Wireless customers (ALL.SPACE + 2 others) reduce orders materially, the group revenue profile would deteriorate.",
+      "confidence": 0.95,
+      "source_ids": [
+        "sivers_ar_2025_financials_s4",
+        "sivers_ar_2025_financials_s5",
+        "sivers_ar_2025_financials_s6"
+      ]
+    },
+    {
+      "id": "cl2",
+      "statement": "Sivers FY2025 group gross margin was -0.7% (gross loss SEK 2.1M on revenue SEK 306.6M), a deterioration from +1.9% in FY2024, driven by raw material costs more than doubling (+116%) as the company scales production ahead of Photonics ramp.",
+      "subject_id": "co:sivers_semiconductors",
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "If raw material and external manufacturing costs do not decline as production volumes ramp in 2026-2027, gross margin will not recover, weakening the path to profitability.",
+      "confidence": 0.95,
+      "source_ids": [
+        "sivers_ar_2025_financials_s7",
+        "sivers_ar_2025_financials_s8"
+      ]
+    },
+    {
+      "id": "cl3",
+      "statement": "Sivers' largest identifiable customer is ALL.SPACE (Customer A, SEK 79.4M = 25.9% of group revenue), operating in SATCOM/defense Wireless, not in the Photonics/CPO segment that underpins the investment thesis.",
+      "subject_id": "co:sivers_semiconductors",
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "If ALL.SPACE loses its U.S. Army NGTT program or reduces satellite terminal orders materially, Wireless revenue falls and Photonics % of mix rises—but total revenue would decline in the near term.",
+      "confidence": 0.9,
+      "source_ids": [
+        "sivers_ar_2025_financials_s5",
+        "sivers_ar_2025_financials_s9"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,932 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era",
+    "title": "Electronic Chip Package and CPO Technology for Modern AI Era (Academic Paper)",
+    "url": "https://www.mdpi.com/2072-666X/16/4/431",
+    "source_type": "paper",
+    "evidence_tier": 2,
+    "origin_entity": "Third-party Research",
+    "storage_permission": "repo_full",
+    "permission_basis": "Micromachines publishes the article open access under Creative Commons Attribution 4.0. The repository copy retains the article title, journal attribution, source URL, and CC BY 4.0 license reference."
+  },
+  "sources": [
+    {
+      "id": "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s1",
+      "locator": "Introduction, para 1",
+      "quote": "hyperscale data centers where tens of thousands of CPU and GPU clusters are deployed, and data transfer rates are growing exponentially… key considerations today include speed, bandwidth, power efficiency, and cost… based on data from OpenAI and Broadcom's official reports."
+    },
+    {
+      "id": "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s2",
+      "locator": "Introduction, para 1",
+      "quote": "advanced packaging technologies have emerged as an effective alternative with rapid developments in 3D chiplets hetero-integration and co-packaged optics (CPO)"
+    },
+    {
+      "id": "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s3",
+      "locator": "Advanced Packaging Technology, InFO section",
+      "quote": "TSMC's Integrated Fan-Out (InFO) is a representative FO package… This technology directly uses RDLs and Through InFO Via (TIV) to connect chips to the PCB, significantly reducing parasitic parameters associated with bonding wires."
+    },
+    {
+      "id": "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s4",
+      "locator": "Advanced Packaging Technology, InFO section",
+      "quote": "TSMC's InFO technology has been used in Apple's A-series processors and DRAM co-packages."
+    },
+    {
+      "id": "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s5",
+      "locator": "Advanced Packaging Technology, 2D CPO section",
+      "quote": "Figure 6 shows Compact Optical Universal Photonic Engine (COUPE) designed by TSMC in 2021. COUPE is a groundbreaking technology designed to address the growing demand for high-performance computing, networking, and communication systems."
+    },
+    {
+      "id": "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s6",
+      "locator": "Advanced Packaging Technology, 2.5D section",
+      "quote": "TSMC's Chip-on-Wafer-on-Substrate (CoWoS)… Multiple dies with different functions are interconnected by RDLs and TSVs in the silicon interposer, enabling ultra-high-density, high-performance packaging. This is particularly suitable for AI and supercomputing applications."
+    },
+    {
+      "id": "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s7",
+      "locator": "Advanced Packaging Technology, 2.5D section",
+      "quote": "Samsung's Interposer Cube 4 (I-Cube4) is an advanced 2.5D silicon interposer packaging technology that utilizes stacking to integrate multiple components, such as memory and logic chips, into a compact and high-performance package."
+    },
+    {
+      "id": "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s8",
+      "locator": "Advanced Packaging Technology, 2.5D section",
+      "quote": "TSMC's CoWoS-S integrates multiple chips in a 2.5D configuration, utilizing a silicon interposer that connects high-bandwidth memory (HBM) to logic chips… CoWoS-S also emphasizes high-density interconnects and efficient heat dissipation for large-scale data center and AI applications."
+    },
+    {
+      "id": "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s9",
+      "locator": "Advanced Packaging Technology, 2.5D section",
+      "quote": "Samsung's I-Cube4… incorporates HBM with logic… designed to support even higher integration density and bandwidth, positioning it for cutting-edge applications requiring extreme performance, like AI accelerators and networking systems."
+    },
+    {
+      "id": "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s10",
+      "locator": "Advanced Packaging Technology, 2.5D CPO section",
+      "quote": "Figure 9 shows a silicon-based CPO designed by IME of Chinese Academy. In this package, the PIC and EIC are connected by TSVs and three RDLs. The RDL line width and space can be less than 10 um."
+    },
+    {
+      "id": "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s11",
+      "locator": "Advanced Packaging Technology, 2.5D CPO section",
+      "quote": "Another example is glass substrate CPO designed by Corning, USA… The PIC is connected to optical fibers by the glass waveguides fabricated with ion exchange (IOX) technology."
+    },
+    {
+      "id": "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s12",
+      "locator": "Advanced Packaging Technology, 3D stacking section",
+      "quote": "One typical example for 3D electrical chip stacking is Intel Foveros, in which various IP chips with different types of processes are directly stacked together with TSVs and bumps… Foveros has been applied on a MAX series GPU."
+    },
+    {
+      "id": "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s13",
+      "locator": "Advanced Packaging Technology, 3D stacking section",
+      "quote": "Samsung's X-Cube is designed to provide high-performance integration for complex semiconductor applications. It utilizes a cutting-edge 3D stacking architecture to combine multiple logic and memory chips into a single compact package."
+    },
+    {
+      "id": "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s14",
+      "locator": "Advanced Packaging Technology, 3D CPO section",
+      "quote": "An example is Broadcom 3D Silicon CPO… PIC is flip-chip above EIC which is connected to switch ASIC through the substrate. In this application, four CPO packages in total are adopted, which can support 12.8 Tb/s bandwidth. Power and cost are reduced by 40% with this configuration."
+    },
+    {
+      "id": "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s15",
+      "locator": "Advanced Packaging Technology, 3D CPO section",
+      "quote": "For 3D glass CPO integration, Intel has announced it for the next generation of high-power processors… Intel is on the path to delivering 1 trillion transistors on a package by 2030, and its ongoing innovation in advanced packaging including glass substrates will help achieve this goal."
+    },
+    {
+      "id": "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s16",
+      "locator": "Future Prospects section",
+      "quote": "glass-based CPO products are very promising for being employed in the near future hyperscale datacenter with a huge amount of CPUs and GPUs… Glass-based Co-Packaged Optics (CPO) represents a transformative shift in data center networking."
+    },
+    {
+      "id": "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s17",
+      "locator": "Future Prospects section",
+      "quote": "challenges in cost and manufacturing remain… demands for ultra-low latency and high-speed connections rise which cannot be satisfied by Moore's Law and silicon-based CPO technology."
+    },
+    {
+      "id": "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s18",
+      "locator": "Future Prospects section",
+      "quote": "Many commercial EDA software such as Cadence and Ansys Lumerical are also available for efficient simulation."
+    },
+    {
+      "id": "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s19",
+      "locator": "Advanced Packaging Technology, CoWoS comparison section",
+      "quote": "Both innovations push the envelope in 2.5D packaging, but Samsung's solution tends to emphasize greater interconnect scalability."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "tech:ai_compute_buildout",
+      "type": "TechNode",
+      "name": "AI training/inference cluster buildout",
+      "abstraction_level": "end_demand",
+      "role": null,
+      "aliases": [
+        "HPC AI cluster",
+        "hyperscale AI infrastructure"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s1"
+      ]
+    },
+    {
+      "id": "tech:cpo",
+      "type": "TechNode",
+      "name": "Co-Packaged Optics",
+      "abstraction_level": "module_subsystem",
+      "role": null,
+      "aliases": [
+        "CPO"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 5
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s2",
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s14",
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s16"
+      ]
+    },
+    {
+      "id": "tech:advanced_packaging",
+      "type": "TechNode",
+      "name": "Advanced Semiconductor Packaging",
+      "abstraction_level": "foundry_packaging",
+      "role": null,
+      "aliases": [
+        "3D chiplet integration",
+        "heterogeneous integration"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s2"
+      ]
+    },
+    {
+      "id": "co:tsmc",
+      "type": "Company",
+      "name": "TSMC",
+      "abstraction_level": "foundry_packaging",
+      "role": "foundry",
+      "aliases": [
+        "Taiwan Semiconductor Manufacturing Company"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s3",
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s5",
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s6",
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s8"
+      ]
+    },
+    {
+      "id": "co:broadcom",
+      "type": "Company",
+      "name": "Broadcom",
+      "abstraction_level": "module_subsystem",
+      "role": "leader",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s1",
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s14"
+      ]
+    },
+    {
+      "id": "co:samsung",
+      "type": "Company",
+      "name": "Samsung",
+      "abstraction_level": "foundry_packaging",
+      "role": "foundry",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s7",
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s9",
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s13"
+      ]
+    },
+    {
+      "id": "co:intel",
+      "type": "Company",
+      "name": "Intel",
+      "abstraction_level": "foundry_packaging",
+      "role": "leader",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s12",
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s15"
+      ]
+    },
+    {
+      "id": "co:corning",
+      "type": "Company",
+      "name": "Corning",
+      "abstraction_level": "materials_substrate",
+      "role": "material_base",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s11"
+      ]
+    },
+    {
+      "id": "co:apple",
+      "type": "Company",
+      "name": "Apple",
+      "abstraction_level": "end_demand",
+      "role": "adjacent_silicon",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s4"
+      ]
+    },
+    {
+      "id": "co:ime_cas",
+      "type": "Company",
+      "name": "IME of Chinese Academy of Sciences",
+      "abstraction_level": "foundry_packaging",
+      "role": "foundry",
+      "aliases": [
+        "IME CAS"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s10"
+      ]
+    },
+    {
+      "id": "co:cadence",
+      "type": "Company",
+      "name": "Cadence",
+      "abstraction_level": "equipment_epitaxy",
+      "role": "adjacent_silicon",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s18"
+      ]
+    },
+    {
+      "id": "co:ansys",
+      "type": "Company",
+      "name": "Ansys",
+      "abstraction_level": "equipment_epitaxy",
+      "role": "adjacent_silicon",
+      "aliases": [
+        "Ansys Lumerical"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s18"
+      ]
+    },
+    {
+      "id": "tech:info_packaging",
+      "type": "TechNode",
+      "name": "Integrated Fan-Out (InFO) Packaging",
+      "abstraction_level": "foundry_packaging",
+      "role": null,
+      "aliases": [
+        "InFO",
+        "InFO PoP",
+        "InFO B",
+        "InFO OS",
+        "InFO LSI",
+        "InFO MS",
+        "InFO AiP"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s3"
+      ]
+    },
+    {
+      "id": "tech:coupe",
+      "type": "TechNode",
+      "name": "Compact Optical Universal Photonic Engine (COUPE)",
+      "abstraction_level": "module_subsystem",
+      "role": null,
+      "aliases": [
+        "COUPE"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s5"
+      ]
+    },
+    {
+      "id": "tech:cowos",
+      "type": "TechNode",
+      "name": "Chip-on-Wafer-on-Substrate (CoWoS)",
+      "abstraction_level": "foundry_packaging",
+      "role": null,
+      "aliases": [
+        "CoWoS",
+        "CoWoS-S"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s6",
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s8"
+      ]
+    },
+    {
+      "id": "tech:icube4",
+      "type": "TechNode",
+      "name": "Samsung I-Cube4",
+      "abstraction_level": "foundry_packaging",
+      "role": null,
+      "aliases": [
+        "I-Cube4",
+        "Integrated-Cube 4"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s7",
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s9"
+      ]
+    },
+    {
+      "id": "tech:intel_foveros",
+      "type": "TechNode",
+      "name": "Intel Foveros 3D Stacking",
+      "abstraction_level": "foundry_packaging",
+      "role": null,
+      "aliases": [
+        "Foveros"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s12"
+      ]
+    },
+    {
+      "id": "tech:samsung_xcube",
+      "type": "TechNode",
+      "name": "Samsung X-Cube 3D Stacking",
+      "abstraction_level": "foundry_packaging",
+      "role": null,
+      "aliases": [
+        "X-Cube"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s13"
+      ]
+    },
+    {
+      "id": "tech:broadcom_3d_silicon_cpo",
+      "type": "TechNode",
+      "name": "Broadcom 3D Silicon CPO",
+      "abstraction_level": "module_subsystem",
+      "role": null,
+      "aliases": [],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 4
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s14"
+      ]
+    },
+    {
+      "id": "tech:glass_cpo",
+      "type": "TechNode",
+      "name": "Glass-based Co-Packaged Optics",
+      "abstraction_level": "module_subsystem",
+      "role": null,
+      "aliases": [
+        "glass CPO",
+        "glass substrate CPO"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 5
+      },
+      "confidence": 0.75,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s11",
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s15",
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s16",
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s17"
+      ]
+    },
+    {
+      "id": "tech:intel_glass_cpo",
+      "type": "TechNode",
+      "name": "Intel 3D Glass CPO Integration",
+      "abstraction_level": "module_subsystem",
+      "role": null,
+      "aliases": [],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 5
+      },
+      "confidence": 0.75,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s15"
+      ]
+    },
+    {
+      "id": "tech:ime_silicon_cpo",
+      "type": "TechNode",
+      "name": "IME Silicon-based CPO",
+      "abstraction_level": "module_subsystem",
+      "role": null,
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.75,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s10"
+      ]
+    },
+    {
+      "id": "tech:hbm",
+      "type": "TechNode",
+      "name": "High-Bandwidth Memory (HBM)",
+      "abstraction_level": "device_chip",
+      "role": null,
+      "aliases": [
+        "HBM"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s8",
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s9"
+      ]
+    },
+    {
+      "id": "mat:glass_substrate",
+      "type": "Material",
+      "name": "Glass Substrate",
+      "abstraction_level": "materials_substrate",
+      "role": null,
+      "aliases": [
+        "glass interposer"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s11",
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s15",
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s16"
+      ]
+    },
+    {
+      "id": "mat:silicon_interposer",
+      "type": "Material",
+      "name": "Silicon Interposer",
+      "abstraction_level": "materials_substrate",
+      "role": null,
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s6",
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s8"
+      ]
+    },
+    {
+      "id": "tech:ai_switch",
+      "type": "TechNode",
+      "name": "Data-center switch / scale-up network",
+      "abstraction_level": "network_systems",
+      "role": null,
+      "aliases": [
+        "switch ASIC"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s14"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "tech:ai_compute_buildout",
+      "dst_id": "tech:cpo",
+      "relation": "enables",
+      "attributes": {},
+      "confidence": 0.75,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s2",
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s16"
+      ]
+    },
+    {
+      "id": "e2",
+      "src_id": "tech:ai_compute_buildout",
+      "dst_id": "tech:advanced_packaging",
+      "relation": "enables",
+      "attributes": {},
+      "confidence": 0.75,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s2"
+      ]
+    },
+    {
+      "id": "e3",
+      "src_id": "co:tsmc",
+      "dst_id": "tech:info_packaging",
+      "relation": "supplies_to",
+      "attributes": {
+        "qualification_status": "qualified"
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s3"
+      ]
+    },
+    {
+      "id": "e4",
+      "src_id": "co:tsmc",
+      "dst_id": "tech:coupe",
+      "relation": "supplies_to",
+      "attributes": {
+        "qualification_status": "qualified"
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s5"
+      ]
+    },
+    {
+      "id": "e5",
+      "src_id": "co:tsmc",
+      "dst_id": "tech:cowos",
+      "relation": "supplies_to",
+      "attributes": {
+        "qualification_status": "qualified"
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s6",
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s8"
+      ]
+    },
+    {
+      "id": "e6",
+      "src_id": "tech:info_packaging",
+      "dst_id": "co:apple",
+      "relation": "supplies_to",
+      "attributes": {
+        "qualification_status": "designed_in"
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s4"
+      ]
+    },
+    {
+      "id": "e7",
+      "src_id": "co:samsung",
+      "dst_id": "tech:icube4",
+      "relation": "supplies_to",
+      "attributes": {
+        "qualification_status": "qualified"
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s7",
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s9"
+      ]
+    },
+    {
+      "id": "e8",
+      "src_id": "co:samsung",
+      "dst_id": "tech:samsung_xcube",
+      "relation": "supplies_to",
+      "attributes": {
+        "qualification_status": "qualified"
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s13"
+      ]
+    },
+    {
+      "id": "e9",
+      "src_id": "tech:cowos",
+      "dst_id": "tech:icube4",
+      "relation": "competes_with",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s8",
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s9",
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s19"
+      ]
+    },
+    {
+      "id": "e10",
+      "src_id": "tech:cowos",
+      "dst_id": "tech:hbm",
+      "relation": "depends_on",
+      "attributes": {
+        "qualification_status": "designed_in",
+        "substitutability": 4
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s8"
+      ]
+    },
+    {
+      "id": "e11",
+      "src_id": "tech:icube4",
+      "dst_id": "tech:hbm",
+      "relation": "depends_on",
+      "attributes": {
+        "qualification_status": "designed_in",
+        "substitutability": 4
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s9"
+      ]
+    },
+    {
+      "id": "e12",
+      "src_id": "co:intel",
+      "dst_id": "tech:intel_foveros",
+      "relation": "supplies_to",
+      "attributes": {
+        "qualification_status": "qualified"
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s12"
+      ]
+    },
+    {
+      "id": "e13",
+      "src_id": "co:intel",
+      "dst_id": "tech:intel_glass_cpo",
+      "relation": "supplies_to",
+      "attributes": {
+        "qualification_status": "sampling"
+      },
+      "confidence": 0.75,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s15"
+      ]
+    },
+    {
+      "id": "e14",
+      "src_id": "tech:intel_glass_cpo",
+      "dst_id": "mat:glass_substrate",
+      "relation": "depends_on",
+      "attributes": {
+        "substitutability": 3
+      },
+      "confidence": 0.75,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s15"
+      ]
+    },
+    {
+      "id": "e15",
+      "src_id": "co:corning",
+      "dst_id": "tech:glass_cpo",
+      "relation": "supplies_to",
+      "attributes": {
+        "qualification_status": "sampling"
+      },
+      "confidence": 0.75,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s11"
+      ]
+    },
+    {
+      "id": "e16",
+      "src_id": "tech:glass_cpo",
+      "dst_id": "mat:glass_substrate",
+      "relation": "depends_on",
+      "attributes": {
+        "substitutability": 4
+      },
+      "confidence": 0.75,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s11",
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s16"
+      ]
+    },
+    {
+      "id": "e17",
+      "src_id": "co:ime_cas",
+      "dst_id": "tech:ime_silicon_cpo",
+      "relation": "supplies_to",
+      "attributes": {
+        "qualification_status": "sampling"
+      },
+      "confidence": 0.75,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s10"
+      ]
+    },
+    {
+      "id": "e18",
+      "src_id": "tech:ime_silicon_cpo",
+      "dst_id": "mat:silicon_interposer",
+      "relation": "depends_on",
+      "attributes": {
+        "substitutability": 3
+      },
+      "confidence": 0.75,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s10"
+      ]
+    },
+    {
+      "id": "e19",
+      "src_id": "co:broadcom",
+      "dst_id": "tech:broadcom_3d_silicon_cpo",
+      "relation": "supplies_to",
+      "attributes": {
+        "qualification_status": "qualified"
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s14"
+      ]
+    },
+    {
+      "id": "e20",
+      "src_id": "tech:broadcom_3d_silicon_cpo",
+      "dst_id": "tech:ai_switch",
+      "relation": "is_component_of",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s14"
+      ]
+    },
+    {
+      "id": "e21",
+      "src_id": "tech:broadcom_3d_silicon_cpo",
+      "dst_id": "tech:cpo",
+      "relation": "is_component_of",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s14"
+      ]
+    },
+    {
+      "id": "e22",
+      "src_id": "tech:cowos",
+      "dst_id": "mat:silicon_interposer",
+      "relation": "depends_on",
+      "attributes": {
+        "substitutability": 3,
+        "qualification_status": "designed_in"
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s6",
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s8"
+      ]
+    },
+    {
+      "id": "e23",
+      "src_id": "tech:coupe",
+      "dst_id": "tech:cpo",
+      "relation": "is_component_of",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s5"
+      ]
+    },
+    {
+      "id": "e24",
+      "src_id": "tech:glass_cpo",
+      "dst_id": "tech:cpo",
+      "relation": "is_component_of",
+      "attributes": {},
+      "confidence": 0.75,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s16"
+      ]
+    },
+    {
+      "id": "e25",
+      "src_id": "tech:intel_glass_cpo",
+      "dst_id": "tech:cpo",
+      "relation": "is_component_of",
+      "attributes": {},
+      "confidence": 0.75,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s15"
+      ]
+    },
+    {
+      "id": "e26",
+      "src_id": "tech:intel_foveros",
+      "dst_id": "tech:samsung_xcube",
+      "relation": "competes_with",
+      "attributes": {},
+      "confidence": 0.75,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s12",
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s13"
+      ]
+    },
+    {
+      "id": "e27",
+      "src_id": "co:cadence",
+      "dst_id": "tech:cpo",
+      "relation": "enables",
+      "attributes": {},
+      "confidence": 0.75,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s18"
+      ]
+    },
+    {
+      "id": "e28",
+      "src_id": "co:ansys",
+      "dst_id": "tech:cpo",
+      "relation": "enables",
+      "attributes": {},
+      "confidence": 0.75,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s18"
+      ]
+    },
+    {
+      "id": "e29",
+      "src_id": "tech:ai_compute_buildout",
+      "dst_id": "tech:cowos",
+      "relation": "enables",
+      "attributes": {},
+      "confidence": 0.75,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s6"
+      ]
+    },
+    {
+      "id": "e30",
+      "src_id": "tech:ai_compute_buildout",
+      "dst_id": "tech:icube4",
+      "relation": "enables",
+      "attributes": {},
+      "confidence": 0.75,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s7"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "c1",
+      "statement": "Broadcom's 3D Silicon CPO can support 12.8 Tb/s bandwidth while reducing power and cost by 40% compared to conventional approaches.",
+      "subject_id": "tech:broadcom_3d_silicon_cpo",
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "If independent benchmarks or Broadcom disclosures contradict the 12.8 Tb/s figure or the 40% power/cost reduction claim, this claim should be downgraded.",
+      "confidence": 0.75,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s14"
+      ]
+    },
+    {
+      "id": "c2",
+      "statement": "Intel is targeting delivery of 1 trillion transistors on a package by 2030, enabled in part by glass substrate advanced packaging including glass-based CPO.",
+      "subject_id": "tech:intel_glass_cpo",
+      "demand_proof_level": "guided",
+      "disproof_condition": "If Intel publicly withdraws or revises this roadmap milestone, or if glass substrate packaging fails to achieve yield targets required for CPO integration, this claim should be downgraded.",
+      "confidence": 0.65,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s15"
+      ]
+    },
+    {
+      "id": "c3",
+      "statement": "Glass-based CPO is positioned as a transformative successor to silicon-based CPO for hyperscale datacenter networking, but faces unresolved cost and manufacturing challenges.",
+      "subject_id": "tech:glass_cpo",
+      "demand_proof_level": "inferred",
+      "disproof_condition": "If silicon-based CPO scaling continues to satisfy hyperscaler bandwidth/power requirements without requiring glass substrates, or if alternative materials (e.g., polymer, SiN) displace glass, this claim should be downgraded.",
+      "confidence": 0.65,
+      "source_ids": [
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s16",
+        "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s17"
+      ]
+    }
+  ]
+}

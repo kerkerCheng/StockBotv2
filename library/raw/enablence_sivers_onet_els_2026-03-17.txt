@@ -1,0 +1,24 @@
+Sivers Semiconductors, O-Net and Enablence Technologies Announce External Light Sources for AI Datacenters
+Published: 2026-03-17
+Distributed via: Sivers Semiconductors and Enablence Technologies official investor news pages; also syndicated by PR Newswire and Newsfile Corp
+Canonical issuer URL: https://www.sivers-semiconductors.com/press/sivers-semiconductors-o-net-and-enablence-technologies-announce-external-light-sources-for-ai-datacenters/
+
+--- Main content ---
+
+Sivers Semiconductors AB (STO: SIVE), O-Net Technologies, and Enablence Technologies Inc. (TSXV: ENA) announced a strategic partnership to develop an advanced external light source (ELS) module with Sivers laser arrays supporting Co-Packaged Optics (CPO) deployment in AI datacenters and HPC systems.
+
+O-Net Technologies serves as ODM partner, integrating Sivers Semiconductors' laser arrays and Enablence's NxN Star Coupler to deliver a scalable ELS module for scale-out and scale-up optical systems.
+
+CPO integrates most optical elements into GPU and Switch packages, delivering high speed optical interconnects with 80% lower energy consumption compared to copper.
+
+According to IDTechEx (December 2025 report), the CPO market is projected to exceed US$20 billion by 2036, growing at a robust CAGR of 37% from 2026 to 2036. ELS solutions represent 10% of this CPO market.
+
+All three companies showcased their optics solutions and discussed the collaboration at the OFC Show in Los Angeles, March 17-20, 2026 (Enablence at booth 4812, Sivers at booth 1250, O-Net at booth 2039).
+
+--- Direct quotes ---
+
+Alex McCann, Managing Director, Sivers Photonics: "ELS is crucial to CPO because it separates temperature-sensitive lasers from extreme heat, ensuring wavelength stability and enhancing reliability."
+
+Austin Na, CEO/Chairman, O-Net: "Together, we're enabling practical, scalable ELS aligned with HPC and AI data center needs."
+
+Todd Haugen, CEO, Enablence: "Our NxN Star Coupler enables efficient wavelength distribution at scale for CPO-based architectures."

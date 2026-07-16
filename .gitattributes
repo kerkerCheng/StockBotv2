@@ -1,0 +1,4 @@
+/extractions/*.json text eol=lf
+/library/raw/*.txt text eol=lf
+/library/raw/*.meta.json text eol=lf
+/loader/manifests/*.json text eol=lf

@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -283,10 +285,15 @@ def test_pending_intake_files_separates_untracked_and_modified(tmp_git_repo: Pat
     assert pending["untracked"] == ["library/raw/new.txt"]
 
 
-def test_production_gitignore_exposes_new_ledger_files_but_keeps_legacy_private(
+def test_production_gitignore_exposes_eligible_ledger_files_but_keeps_local_only_legacy_private(
     tmp_git_repo: Path,
 ) -> None:
     production_ignore = (intake.ROOT / ".gitignore").read_text(encoding="utf-8")
+    migration = json.loads(
+        (intake.ROOT / "loader/manifests/legacy-storage-permission-migration.json").read_text(
+            encoding="utf-8"
+        )
+    )
     (tmp_git_repo / ".gitignore").write_text(production_ignore, encoding="utf-8")
     for relative in ("library/raw", "extractions", "library/intake", "library/private"):
         (tmp_git_repo / relative).mkdir(parents=True, exist_ok=True)
@@ -294,15 +301,68 @@ def test_production_gitignore_exposes_new_ledger_files_but_keeps_legacy_private(
     _commit_all(tmp_git_repo)
     (tmp_git_repo / "extractions" / "new_doc.json").write_text("{}", encoding="utf-8")
     (tmp_git_repo / "library" / "raw" / "new_doc.txt").write_text("new", encoding="utf-8")
-    (tmp_git_repo / "extractions" / "sivers_ar_2025.json").write_text("legacy", encoding="utf-8")
+    (tmp_git_repo / "library" / "raw" / "new_doc.meta.json").write_text(
+        "{}", encoding="utf-8"
+    )
+    artifacts = migration["documents"] + migration["raw_artifacts"]
+    for artifact in artifacts:
+        path = tmp_git_repo / artifact["path"]
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("fixture", encoding="utf-8")
     (tmp_git_repo / "library" / "private" / "secret.txt").write_text("secret", encoding="utf-8")
 
     pending = intake.pending_intake_files(root=tmp_git_repo)
 
-    assert pending["untracked"] == [
-        "extractions/new_doc.json",
-        "library/raw/new_doc.txt",
-    ]
+    expected = {"extractions/new_doc.json", "library/raw/new_doc.txt"}
+    expected.update(artifact["path"] for artifact in artifacts if artifact["git_eligible"])
+    assert pending["untracked"] == sorted(expected)
+
+
+def test_legacy_storage_permission_migration_reconciles_tracked_artifacts() -> None:
+    migration = json.loads(
+        (intake.ROOT / "loader/manifests/legacy-storage-permission-migration.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    before = json.loads(
+        (intake.ROOT / migration["pre_migration_manifest"]).read_text(encoding="utf-8")
+    )
+    before_by_path = {item["path"]: item for item in before["documents"]}
+
+    for document in migration["documents"]:
+        assert document["before_sha256"] == before_by_path[document["path"]]["sha256"]
+        assert document["git_eligible"] is (document["storage_permission"] != "local_only")
+        path = intake.ROOT / document["path"]
+        if not document["git_eligible"] and not path.exists():
+            continue
+        extraction = json.loads(path.read_text(encoding="utf-8"))
+        source_doc = extraction["source_doc"]
+        assert source_doc["storage_permission"] == document["storage_permission"]
+        intake.validate_storage_permission(
+            source_doc["storage_permission"], source_doc["permission_basis"]
+        )
+        content = path.read_bytes()
+        if document["git_eligible"]:
+            content = content.replace(b"\r\n", b"\n")
+        assert hashlib.sha256(content).hexdigest() == document["after_sha256"]
+        validation = subprocess.run(
+            [sys.executable, "loader/validate.py", str(path)],
+            cwd=intake.ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        assert validation.returncode == 0, validation.stdout + validation.stderr
+
+    for artifact in migration["raw_artifacts"]:
+        assert artifact["git_eligible"] is (artifact["storage_permission"] != "local_only")
+        path = intake.ROOT / artifact["path"]
+        if not artifact["git_eligible"] and not path.exists():
+            continue
+        content = path.read_bytes()
+        if artifact["git_eligible"]:
+            content = content.replace(b"\r\n", b"\n")
+        assert hashlib.sha256(content).hexdigest() == artifact["sha256"]
 
 
 def _add_bare_remote(repo: Path, remote: Path) -> None:

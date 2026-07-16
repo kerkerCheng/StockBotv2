@@ -1,0 +1,109 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "enablence_sivers_onet_els_2026",
+    "title": "Sivers Semiconductors, O-Net and Enablence Technologies Announce External Light Sources for AI Datacenters",
+    "url": "https://www.sivers-semiconductors.com/press/sivers-semiconductors-o-net-and-enablence-technologies-announce-external-light-sources-for-ai-datacenters/",
+    "origin_entity": "Enablence Technologies",
+    "publisher": "PR Newswire (joint release: Sivers Semiconductors, O-Net Technologies, Enablence Technologies)",
+    "published_at": "2026-03-17",
+    "retrieved_at": "2026-07-10",
+    "source_type": "news",
+    "evidence_tier": 2,
+    "storage_permission": "repo_full",
+    "permission_basis": "This is the issuers' official joint press release, published as an original disclosure in full on Sivers Semiconductors' official newsroom and indexed by Enablence's official press-release page. The repository uses the issuer-hosted source rather than the PR Newswire site copy."
+  },
+  "sources": [
+    {
+      "id": "enablence_sivers_onet_els_2026_s1",
+      "locator": "para 1, joint press release",
+      "quote": "Sivers Semiconductors AB (STO: SIVE), O-Net Technologies, and Enablence Technologies Inc. (TSXV: ENA) announced a strategic partnership to develop an advanced external light source (ELS) module with Sivers laser arrays supporting Co-Packaged Optics (CPO) deployment in AI datacenters and HPC systems."
+    },
+    {
+      "id": "enablence_sivers_onet_els_2026_s2",
+      "locator": "para 2, joint press release",
+      "quote": "O-Net Technologies serves as ODM partner, integrating Sivers Semiconductors' laser arrays and Enablence's NxN Star Coupler to deliver a scalable ELS module for scale-out and scale-up optical systems."
+    },
+    {
+      "id": "enablence_sivers_onet_els_2026_s3",
+      "locator": "Todd Haugen, CEO, Enablence — direct quote",
+      "quote": "Our NxN Star Coupler enables efficient wavelength distribution at scale for CPO-based architectures."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:sivers_semiconductors",
+      "type": "Company",
+      "name": "Sivers Semiconductors",
+      "abstraction_level": "device_chip",
+      "role": "bottleneck_supplier",
+      "aliases": ["Sivers", "Sivers Photonics", "Sivers Photonics Ltd"],
+      "attributes": {},
+      "confidence": 0.75,
+      "source_ids": ["enablence_sivers_onet_els_2026_s1"]
+    },
+    {
+      "id": "co:o_net_technologies",
+      "type": "Company",
+      "name": "O-Net Technologies",
+      "abstraction_level": "module_subsystem",
+      "role": "leader",
+      "aliases": ["O-Net"],
+      "attributes": {},
+      "confidence": 0.75,
+      "source_ids": ["enablence_sivers_onet_els_2026_s2"]
+    },
+    {
+      "id": "co:enablence_technologies",
+      "type": "Company",
+      "name": "Enablence Technologies",
+      "abstraction_level": "device_chip",
+      "role": "adjacent_silicon",
+      "aliases": ["Enablence", "Enablence Technologies Inc."],
+      "attributes": {},
+      "confidence": 0.75,
+      "source_ids": ["enablence_sivers_onet_els_2026_s2", "enablence_sivers_onet_els_2026_s3"]
+    },
+    {
+      "id": "tech:external_laser_source",
+      "type": "TechNode",
+      "name": "External Laser Source",
+      "abstraction_level": "module_subsystem",
+      "role": null,
+      "aliases": ["ELS", "external light source", "ELS module"],
+      "attributes": {},
+      "confidence": 0.75,
+      "source_ids": ["enablence_sivers_onet_els_2026_s1"]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:sivers_semiconductors",
+      "dst_id": "tech:external_laser_source",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.65,
+      "source_ids": ["enablence_sivers_onet_els_2026_s1"]
+    },
+    {
+      "id": "e2",
+      "src_id": "co:enablence_technologies",
+      "dst_id": "tech:external_laser_source",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.65,
+      "source_ids": ["enablence_sivers_onet_els_2026_s2", "enablence_sivers_onet_els_2026_s3"]
+    },
+    {
+      "id": "e3",
+      "src_id": "co:o_net_technologies",
+      "dst_id": "tech:external_laser_source",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.65,
+      "source_ids": ["enablence_sivers_onet_els_2026_s2"]
+    }
+  ],
+  "claims": []
+}

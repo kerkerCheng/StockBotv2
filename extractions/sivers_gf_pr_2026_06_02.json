@@ -1,0 +1,177 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "sivers_gf_pr_2026_06_02",
+    "title": "Sivers & GlobalFoundries Advance AI Data Center Optical Solutions (Sivers press release, June 2, 2026)",
+    "url": "https://www.sivers-semiconductors.com/press/sivers-globalfoundries-advance-ai-data-center-optical-solutions/",
+    "source_type": "news",
+    "evidence_tier": 2,
+    "origin_entity": "Sivers Semiconductors",
+    "storage_permission": "repo_full",
+    "permission_basis": "This is an issuer-authored press release published as an original disclosure on Sivers Semiconductors' official newsroom. The repository retains the attributed extraction and canonical issuer URL."
+  },
+  "sources": [
+    {
+      "id": "sivers_gf_pr_2026_06_02_s1",
+      "locator": "press release, para 1",
+      "quote": "today announced a strategic collaboration with GlobalFoundries (NASDAQ: GFS) (GF), to develop advanced silicon photonics solutions for the high-growth AI infrastructure market"
+    },
+    {
+      "id": "sivers_gf_pr_2026_06_02_s2",
+      "locator": "press release, para 1",
+      "quote": "Sivers Semiconductors' laser arrays will be integrated into reference designs built on GF's silicon photonics platform"
+    },
+    {
+      "id": "sivers_gf_pr_2026_06_02_s3",
+      "locator": "press release, para 1",
+      "quote": "The collaboration supports a range of optical connectivity architectures, including co-packaged optics (CPO), linear pluggable optics (LPO), and other emerging data center interconnect solutions"
+    },
+    {
+      "id": "sivers_gf_pr_2026_06_02_s4",
+      "locator": "press release, para 1",
+      "quote": "Sivers' laser arrays will also be available in GF's Silicon Photonics Co-packaged Advanced Light Engine (SCALE™) platform for next-generation optical sub-assemblies and light engine architectures"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:globalfoundries",
+      "type": "Company",
+      "name": "GlobalFoundries",
+      "abstraction_level": "foundry_packaging",
+      "role": "foundry",
+      "aliases": [
+        "GF",
+        "GFS"
+      ],
+      "attributes": {},
+      "confidence": 0.75,
+      "source_ids": [
+        "sivers_gf_pr_2026_06_02_s1"
+      ]
+    },
+    {
+      "id": "co:sivers_semiconductors",
+      "type": "Company",
+      "name": "Sivers Semiconductors",
+      "abstraction_level": "device_chip",
+      "role": "bottleneck_supplier",
+      "aliases": [
+        "Sivers"
+      ],
+      "attributes": {},
+      "confidence": 0.75,
+      "source_ids": [
+        "sivers_gf_pr_2026_06_02_s2"
+      ]
+    },
+    {
+      "id": "prod:gf_scale",
+      "type": "Product",
+      "name": "GF Silicon Photonics Co-packaged Advanced Light Engine (SCALE™)",
+      "abstraction_level": "module_subsystem",
+      "role": null,
+      "aliases": [
+        "SCALE",
+        "SCALE CPO platform"
+      ],
+      "attributes": {},
+      "confidence": 0.75,
+      "source_ids": [
+        "sivers_gf_pr_2026_06_02_s4"
+      ]
+    },
+    {
+      "id": "tech:lpo",
+      "type": "TechNode",
+      "name": "Linear Pluggable Optics (LPO)",
+      "abstraction_level": "module_subsystem",
+      "role": null,
+      "aliases": [
+        "LPO"
+      ],
+      "attributes": {},
+      "confidence": 0.75,
+      "source_ids": [
+        "sivers_gf_pr_2026_06_02_s3"
+      ]
+    },
+    {
+      "id": "tech:cpo",
+      "type": "TechNode",
+      "name": "Co-Packaged Optics",
+      "abstraction_level": "module_subsystem",
+      "role": null,
+      "aliases": [
+        "CPO"
+      ],
+      "attributes": {},
+      "confidence": 0.75,
+      "source_ids": [
+        "sivers_gf_pr_2026_06_02_s3"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:sivers_semiconductors",
+      "dst_id": "co:globalfoundries",
+      "relation": "supplies_to",
+      "attributes": {
+        "qualification_status": "qualifying"
+      },
+      "confidence": 0.65,
+      "source_ids": [
+        "sivers_gf_pr_2026_06_02_s2"
+      ]
+    },
+    {
+      "id": "e2",
+      "src_id": "co:sivers_semiconductors",
+      "dst_id": "prod:gf_scale",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.65,
+      "source_ids": [
+        "sivers_gf_pr_2026_06_02_s4"
+      ]
+    },
+    {
+      "id": "e3",
+      "src_id": "prod:gf_scale",
+      "dst_id": "tech:cpo",
+      "relation": "enables",
+      "attributes": {},
+      "confidence": 0.65,
+      "source_ids": [
+        "sivers_gf_pr_2026_06_02_s3",
+        "sivers_gf_pr_2026_06_02_s4"
+      ]
+    },
+    {
+      "id": "e4",
+      "src_id": "co:sivers_semiconductors",
+      "dst_id": "co:globalfoundries",
+      "relation": "partnership_with",
+      "attributes": {},
+      "confidence": 0.65,
+      "source_ids": [
+        "sivers_gf_pr_2026_06_02_s1"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "cl1",
+      "statement": "Sivers laser arrays will be integrated into GlobalFoundries silicon photonics reference designs and offered in GF's SCALE CPO platform, giving Sivers a foundry-platform route-to-market for CPO/LPO optical engines (announced June 2, 2026; not yet a customer design win).",
+      "subject_id": "co:sivers_semiconductors",
+      "demand_proof_level": "guided",
+      "disproof_condition": "If GF reference designs fail to convert into customer design wins within 12-18 months, or GF qualifies alternative laser suppliers (e.g. Lumentum, Coherent, AAOI) into the SCALE platform, downgrade this claim.",
+      "confidence": 0.65,
+      "source_ids": [
+        "sivers_gf_pr_2026_06_02_s2",
+        "sivers_gf_pr_2026_06_02_s4"
+      ]
+    }
+  ]
+}

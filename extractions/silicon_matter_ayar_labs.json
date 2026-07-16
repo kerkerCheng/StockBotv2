@@ -1,0 +1,140 @@
+{
+  "schema_version": "0.1",
+  "_note": "Repository-safe excerpt of the aleabitoreddit Substack article 'Sivers: The Undiscovered CPO Laser Chokepoint + Customer Mapping', retrieved 2026-07-10. Only three short verbatim fragments that name the asserted counterparties are retained; unsupported WebFetch paraphrases and attributes were removed.",
+  "source_doc": {
+    "doc_id": "aleabitoreddit_sivers_cpo_customer_map",
+    "title": "Sivers: The Undiscovered CPO Laser Chokepoint + Customer Mapping — aleabitoreddit SubStack",
+    "url": "https://aleabitoreddit.substack.com/p/sivers-semi-sive-the-cpo-laser-supplier",
+    "source_type": "industry_report",
+    "evidence_tier": 3,
+    "origin_entity": "aleabitoreddit",
+    "retrieved_at": "2026-07-10",
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "No redistribution license was found. Git retains the canonical URL, metadata, three short attributed quotations totaling 165 characters, and narrowly derived graph assertions only; the full Substack article is excluded."
+  },
+  "sources": [
+    {
+      "id": "aleabitoreddit_sivers_cpo_customer_map_s1",
+      "locator": "aleabitoreddit article, publicly disclosed customers section, Ayar Labs entry",
+      "quote": "SIVE as the laser supplier is listed on Ayar Labs Website"
+    },
+    {
+      "id": "aleabitoreddit_sivers_cpo_customer_map_s2",
+      "locator": "aleabitoreddit article, high-confidence customers section, Marvell Celestial entry",
+      "quote": "Marvell Celestial ($MRVL) - Direct supplier"
+    },
+    {
+      "id": "aleabitoreddit_sivers_cpo_customer_map_s3",
+      "locator": "aleabitoreddit article, Sivers annual-report quotation on manufacturing scale",
+      "quote": "partnership announced with high-volume supplier Win Semiconductor"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:sivers_semiconductors",
+      "type": "Company",
+      "name": "Sivers Semiconductors",
+      "abstraction_level": "device_chip",
+      "role": "bottleneck_supplier",
+      "aliases": ["Sivers", "Sivers Photonics"],
+      "attributes": {},
+      "confidence": 0.95,
+      "source_ids": ["aleabitoreddit_sivers_cpo_customer_map_s1"]
+    },
+    {
+      "id": "co:ayar_labs",
+      "type": "Company",
+      "name": "Ayar Labs",
+      "abstraction_level": "module_subsystem",
+      "role": "disruptor",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.55,
+      "source_ids": ["aleabitoreddit_sivers_cpo_customer_map_s1"]
+    },
+    {
+      "id": "co:marvell_technology",
+      "type": "Company",
+      "name": "Marvell Technology",
+      "abstraction_level": "module_subsystem",
+      "role": "leader",
+      "aliases": ["Marvell", "MRVL", "Marvell Celestial"],
+      "attributes": {
+        "ticker": "MRVL"
+      },
+      "confidence": 0.95,
+      "source_ids": ["aleabitoreddit_sivers_cpo_customer_map_s2"]
+    },
+    {
+      "id": "co:win_semiconductor",
+      "type": "Company",
+      "name": "Win Semiconductor",
+      "abstraction_level": "foundry_packaging",
+      "role": "foundry",
+      "aliases": ["WIN Semi"],
+      "attributes": {},
+      "confidence": 0.85,
+      "source_ids": ["aleabitoreddit_sivers_cpo_customer_map_s3"]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:sivers_semiconductors",
+      "dst_id": "co:ayar_labs",
+      "relation": "supplies_to",
+      "attributes": {
+        "qualification_status": "none",
+        "sole_source": false,
+        "note": "Tier-3 article says Sivers was listed as Ayar Labs' laser supplier; no current qualification or volume status is established."
+      },
+      "confidence": 0.55,
+      "source_ids": ["aleabitoreddit_sivers_cpo_customer_map_s1"]
+    },
+    {
+      "id": "e2",
+      "src_id": "co:sivers_semiconductors",
+      "dst_id": "co:marvell_technology",
+      "relation": "supplies_to",
+      "attributes": {
+        "qualification_status": "none",
+        "sole_source": false,
+        "note": "Tier-3 article asserts a direct supplier relationship; it is not confirmed by Marvell."
+      },
+      "confidence": 0.6,
+      "source_ids": ["aleabitoreddit_sivers_cpo_customer_map_s2"]
+    },
+    {
+      "id": "e3",
+      "src_id": "co:win_semiconductor",
+      "dst_id": "co:sivers_semiconductors",
+      "relation": "supplies_to",
+      "attributes": {
+        "qualification_status": "none",
+        "note": "Tier-3 article quotes a partnership with high-volume supplier Win Semiconductor; scope and qualification status are not established."
+      },
+      "confidence": 0.8,
+      "source_ids": ["aleabitoreddit_sivers_cpo_customer_map_s3"]
+    }
+  ],
+  "claims": [
+    {
+      "id": "cl1",
+      "statement": "aleabitoreddit identifies Sivers as a laser supplier listed on the Ayar Labs website; the relationship remains unconfirmed by a primary Ayar Labs document in this extraction.",
+      "subject_id": "e1",
+      "demand_proof_level": "inferred",
+      "disproof_condition": "If Ayar Labs' current supplier materials omit Sivers or name another laser supplier, retire this relationship.",
+      "confidence": 0.55,
+      "source_ids": ["aleabitoreddit_sivers_cpo_customer_map_s1"]
+    },
+    {
+      "id": "cl3",
+      "statement": "aleabitoreddit asserts Marvell Celestial is a direct Sivers customer; the relationship remains an unconfirmed tier-3 inference.",
+      "subject_id": "e2",
+      "demand_proof_level": "inferred",
+      "disproof_condition": "If Marvell or Celestial AI supplier materials name another laser supplier or exclude Sivers, retire this relationship.",
+      "confidence": 0.55,
+      "source_ids": ["aleabitoreddit_sivers_cpo_customer_map_s2"]
+    }
+  ]
+}

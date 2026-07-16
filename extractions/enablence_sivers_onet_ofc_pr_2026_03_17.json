@@ -1,0 +1,204 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "enablence_sivers_onet_ofc_pr_2026_03_17",
+    "title": "Sivers Semiconductors, O-Net and Enablence Technologies Announce Collaboration on Co-Packaged Optics (Enablence press release, March 17, 2026, OFC)",
+    "url": "https://www.sivers-semiconductors.com/press/sivers-semiconductors-o-net-and-enablence-technologies-announce-external-light-sources-for-ai-datacenters/",
+    "source_type": "news",
+    "evidence_tier": 2,
+    "origin_entity": "Enablence Technologies",
+    "storage_permission": "repo_full",
+    "permission_basis": "This is the issuers' official joint press release, published as an original disclosure in full on Sivers Semiconductors' official newsroom and indexed by Enablence's official press-release page. The repository uses the issuer-hosted source rather than the PR Newswire site copy."
+  },
+  "sources": [
+    {
+      "id": "enablence_sivers_onet_ofc_pr_2026_03_17_s1",
+      "locator": "press release, headline + para 1",
+      "quote": "Sivers Semiconductors, O-Net and Enablence Technologies Announce Collaboration on Co-Packaged Optics"
+    },
+    {
+      "id": "enablence_sivers_onet_ofc_pr_2026_03_17_s2",
+      "locator": "press release, para 1",
+      "quote": "announced a strategic partnership with Sivers Semiconductors AB (STO: SIVE) and O-Net Technologies to develop an 8-channel external light source (ELS) module for AI datacenters and HPC systems"
+    },
+    {
+      "id": "enablence_sivers_onet_ofc_pr_2026_03_17_s3",
+      "locator": "press release, para 2",
+      "quote": "O-Net Technologies will serve as the OEM partner, integrating Sivers Semiconductors' laser arrays and Enablence's NxN Star Coupler"
+    },
+    {
+      "id": "enablence_sivers_onet_ofc_pr_2026_03_17_s4",
+      "locator": "press release, para 2",
+      "quote": "The resulting broad-market solution offers a compact, scalable external light source capable of enabling multi-wavelength optical interconnects for scale-out networking and scale-up compute implementations"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "prod:els_8ch_module",
+      "type": "Product",
+      "name": "8-channel external light source (ELS) module (Sivers/O-Net/Enablence)",
+      "abstraction_level": "module_subsystem",
+      "role": null,
+      "aliases": [
+        "8-channel ELS module"
+      ],
+      "attributes": {},
+      "confidence": 0.75,
+      "source_ids": [
+        "enablence_sivers_onet_ofc_pr_2026_03_17_s2"
+      ]
+    },
+    {
+      "id": "prod:nxn_star_coupler",
+      "type": "Product",
+      "name": "Enablence NxN Star Coupler",
+      "abstraction_level": "device_chip",
+      "role": null,
+      "aliases": [
+        "NxN Star Coupler"
+      ],
+      "attributes": {},
+      "confidence": 0.75,
+      "source_ids": [
+        "enablence_sivers_onet_ofc_pr_2026_03_17_s3"
+      ]
+    },
+    {
+      "id": "co:sivers_semiconductors",
+      "type": "Company",
+      "name": "Sivers Semiconductors",
+      "abstraction_level": "device_chip",
+      "role": "bottleneck_supplier",
+      "aliases": [
+        "Sivers",
+        "Sivers Semiconductors AB"
+      ],
+      "attributes": {},
+      "confidence": 0.75,
+      "source_ids": [
+        "enablence_sivers_onet_ofc_pr_2026_03_17_s2"
+      ]
+    },
+    {
+      "id": "co:o_net_technologies",
+      "type": "Company",
+      "name": "O-Net Technologies",
+      "abstraction_level": "module_subsystem",
+      "role": "leader",
+      "aliases": [
+        "O-Net"
+      ],
+      "attributes": {},
+      "confidence": 0.75,
+      "source_ids": [
+        "enablence_sivers_onet_ofc_pr_2026_03_17_s3"
+      ]
+    },
+    {
+      "id": "co:enablence_technologies",
+      "type": "Company",
+      "name": "Enablence Technologies",
+      "abstraction_level": "device_chip",
+      "role": "adjacent_silicon",
+      "aliases": [
+        "Enablence"
+      ],
+      "attributes": {},
+      "confidence": 0.75,
+      "source_ids": [
+        "enablence_sivers_onet_ofc_pr_2026_03_17_s2"
+      ]
+    },
+    {
+      "id": "tech:cpo",
+      "type": "TechNode",
+      "name": "Co-Packaged Optics",
+      "abstraction_level": "module_subsystem",
+      "role": null,
+      "aliases": [
+        "CPO"
+      ],
+      "attributes": {},
+      "confidence": 0.75,
+      "source_ids": [
+        "enablence_sivers_onet_ofc_pr_2026_03_17_s1"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:sivers_semiconductors",
+      "dst_id": "prod:els_8ch_module",
+      "relation": "supplies_to",
+      "attributes": {
+        "qualification_status": "designed_in"
+      },
+      "confidence": 0.65,
+      "source_ids": [
+        "enablence_sivers_onet_ofc_pr_2026_03_17_s3"
+      ]
+    },
+    {
+      "id": "e2",
+      "src_id": "co:enablence_technologies",
+      "dst_id": "prod:els_8ch_module",
+      "relation": "supplies_to",
+      "attributes": {
+        "qualification_status": "designed_in"
+      },
+      "confidence": 0.65,
+      "source_ids": [
+        "enablence_sivers_onet_ofc_pr_2026_03_17_s3"
+      ]
+    },
+    {
+      "id": "e3",
+      "src_id": "prod:nxn_star_coupler",
+      "dst_id": "prod:els_8ch_module",
+      "relation": "is_component_of",
+      "attributes": {},
+      "confidence": 0.65,
+      "source_ids": [
+        "enablence_sivers_onet_ofc_pr_2026_03_17_s3"
+      ]
+    },
+    {
+      "id": "e4",
+      "src_id": "co:o_net_technologies",
+      "dst_id": "prod:els_8ch_module",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.65,
+      "source_ids": [
+        "enablence_sivers_onet_ofc_pr_2026_03_17_s3"
+      ]
+    },
+    {
+      "id": "e5",
+      "src_id": "prod:els_8ch_module",
+      "dst_id": "tech:cpo",
+      "relation": "enables",
+      "attributes": {},
+      "confidence": 0.65,
+      "source_ids": [
+        "enablence_sivers_onet_ofc_pr_2026_03_17_s1",
+        "enablence_sivers_onet_ofc_pr_2026_03_17_s4"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "cl1",
+      "statement": "At OFC 2026 (March 17), Sivers, O-Net and Enablence announced a tri-party 8-channel ELS module for AI datacenters/HPC: O-Net as OEM integrator, Sivers laser arrays plus Enablence NxN Star Coupler. This concretizes the earlier Sivers-O-Net ELS partnership into a specific product with defined roles.",
+      "subject_id": "prod:els_8ch_module",
+      "demand_proof_level": "guided",
+      "disproof_condition": "If the module fails customer evaluation, O-Net substitutes an alternative laser array supplier, or no customer engagement is disclosed by mid-2027, downgrade this claim.",
+      "confidence": 0.65,
+      "source_ids": [
+        "enablence_sivers_onet_ofc_pr_2026_03_17_s2",
+        "enablence_sivers_onet_ofc_pr_2026_03_17_s3"
+      ]
+    }
+  ]
+}

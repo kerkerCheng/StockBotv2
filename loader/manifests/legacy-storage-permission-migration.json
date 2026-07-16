@@ -1,0 +1,223 @@
+{
+  "schema_version": "1",
+  "migration_id": "legacy-storage-permissions-20260716",
+  "migrated_at": "2026-07-16",
+  "pre_migration_manifest": "loader/manifests/phase1-engine-a-corpus.json",
+  "hash_policy": {
+    "before_sha256": "Raw file bytes recorded by the pre-migration manifest.",
+    "after_sha256": "Staged Git blob bytes when git_eligible is true; local working-file bytes otherwise.",
+    "raw_artifacts.sha256": "Staged Git blob bytes when git_eligible is true; local working-file bytes otherwise."
+  },
+  "documents": [
+    {
+      "doc_id": "Broadcom_q2fy26_cpo",
+      "path": "extractions/broadcom_q2fy26_cpo.json",
+      "before_sha256": "3a90ca0f8e11941ba4bc2695089ae8daba8d29192d4bc19793cc2b96b1958e83",
+      "after_sha256": "8ef64ac24bdee44431dfe10013bcf0d690aea6d8fed40269db6598768c630a51",
+      "storage_permission": "local_only",
+      "git_eligible": false
+    },
+    {
+      "doc_id": "coherent-corp-cohr-discusses-photonics-innovation-and-data-center-communications-at-ofc_march_17",
+      "path": "extractions/coherent_ofc_march25.json",
+      "before_sha256": "5364541343f66d13da00dfa7446b22dce9251f2e022aa3f0f16a0c519deedfab",
+      "after_sha256": "09eb239ce38774fad51f9d3d663d4a8621ddfd1dcf59353b8cb937ed9a9408d7",
+      "storage_permission": "local_only",
+      "git_eligible": false
+    },
+    {
+      "doc_id": "coherent_q2fy26_cpo",
+      "path": "extractions/coherent_q2fy26_cpo.json",
+      "before_sha256": "e103557fd42d9ef022df4a1ef9f7b61068f307776627d4015118c5747ee2d5a7",
+      "after_sha256": "2498089bff0e5ceb7a0504a6fd3d73f19b1e3bee9c0a06994019f7abd43dae98",
+      "storage_permission": "local_only",
+      "git_eligible": false
+    },
+    {
+      "doc_id": "coherent_q3fy26_cpo",
+      "path": "extractions/coherent_q3fy26_cpo.json",
+      "before_sha256": "30d78a5a6198b10251232f147f1e765fe82d38445d7fb066239daf7bd6152ba1",
+      "after_sha256": "18d9f8a9a4fa52408a8e33c89be2b4ac073d56cbea2b8df2267c64e71a8f63c3",
+      "storage_permission": "local_only",
+      "git_eligible": false
+    },
+    {
+      "doc_id": "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era",
+      "path": "extractions/cpo_chip_package_paper.json",
+      "before_sha256": "28460246bde283e2e4a1bc691539c54166a968afbde57dc6108b5f807f62ba93",
+      "after_sha256": "f42c8793f019cf8ce0de48b5fc08d6cad9339407a8514b512b8479cb778f2dab",
+      "storage_permission": "repo_full",
+      "git_eligible": true
+    },
+    {
+      "doc_id": "damnang_poet_ofc2026_review_2026_03",
+      "path": "extractions/damnang_poet_ofc2026_review_2026_03.json",
+      "before_sha256": "72b58f94e68cfdd3bbfaa5c3ca615a3fd595c87007c02d094f32728c887e51c3",
+      "after_sha256": "ec119e6953e6dd455f65b133e95bc12ba16fd32d1a89df5eb7c35d99711b8da2",
+      "storage_permission": "local_only",
+      "git_eligible": false
+    },
+    {
+      "doc_id": "enablence_sivers_onet_els_2026",
+      "path": "extractions/enablence_sivers_onet_els_2026.json",
+      "before_sha256": "86d2b59da90bc4c9b2fd4875befcd1df95c74660346e1f689d225befe7d081ab",
+      "after_sha256": "0f07b1fa3995e4e7dd3451aaa999c9573ac25a9443f9646a8b92196be2e44125",
+      "storage_permission": "repo_full",
+      "git_eligible": true
+    },
+    {
+      "doc_id": "enablence_sivers_onet_ofc_pr_2026_03_17",
+      "path": "extractions/enablence_sivers_onet_ofc_pr_2026_03_17.json",
+      "before_sha256": "e084aa1751bc19b83545f09137595256d1516dc1e792d21535ee4fc6b767cee7",
+      "after_sha256": "64ad23a0072fac88e9566e79648c37dc85979ab02a308193ac35526a873ad695",
+      "storage_permission": "repo_full",
+      "git_eligible": true
+    },
+    {
+      "doc_id": "lumentum_q2fy26_cpo",
+      "path": "extractions/lumentum_q2fy26_cpo.json",
+      "before_sha256": "c7b3024a2c79539fc65b2b8bf5126f02d2bc80e536b93f6e8bc6391231cfcbe0",
+      "after_sha256": "9afd7e28f60c0ac0ceaeff3b013e76be07e4fb35a9119e214238c791657e88b0",
+      "storage_permission": "local_only",
+      "git_eligible": false
+    },
+    {
+      "doc_id": "lumentum_q3fy26_cpo",
+      "path": "extractions/lumentum_q3fy26_cpo.json",
+      "before_sha256": "212b74b75580ef128d7c4204d732fe3ccf8681ba83d68a9ed48f7e129ff4f1ae",
+      "after_sha256": "67d0be33428372164bfc767baac655a1bd1220c9bc87e129048d403c78e14a9d",
+      "storage_permission": "local_only",
+      "git_eligible": false
+    },
+    {
+      "doc_id": "Nvidia_q1fy27",
+      "path": "extractions/nvidia_q1fy27.json",
+      "before_sha256": "c964d0f5101233564a7f4e4fa5a9adeaf0dab157822d18803d2488aea38063c8",
+      "after_sha256": "8de790f1553683875069929b953d0957e40fb6ca8f76b27df07dee47b146679b",
+      "storage_permission": "local_only",
+      "git_eligible": false
+    },
+    {
+      "doc_id": "aleabitoreddit_sivers_cpo_customer_map",
+      "path": "extractions/silicon_matter_ayar_labs.json",
+      "before_sha256": "93b2a8e5e75e11c685a79eafd8ab37d2536ab79c8b78c54b9d93919ff40c29cd",
+      "after_sha256": "f025bf41cf4b44129e259ccd87c4a5983b9c8b90b4f24202e2fde4b29bc53d4c",
+      "storage_permission": "repo_excerpt",
+      "git_eligible": true
+    },
+    {
+      "doc_id": "optica_opn_marvell_celestial_2025",
+      "path": "extractions/silicon_matter_celestial_marvell.json",
+      "before_sha256": "02ce79ed403161ce86ea5164d5f3fb55f80216575715fc66436bd1e2214aa4fb",
+      "after_sha256": "9e26729c173c9ac78f1c180f9e9fec18201fc57a50d81858558c201156b0567a",
+      "storage_permission": "local_only",
+      "git_eligible": false
+    },
+    {
+      "doc_id": "silicon_matter_sivers_ayar_2026_03_14",
+      "path": "extractions/silicon_matter_sivers_ayar_2026_03_14.json",
+      "before_sha256": "9ce9f20bac2bcef01adea62940c4597b04d2f459a43d6ebf94d1117326d3a057",
+      "after_sha256": "5e247a267ccd232dc9839f893e286b9f45dc53e3a5a9e25660ee8d98dd0f28eb",
+      "storage_permission": "local_only",
+      "git_eligible": false
+    },
+    {
+      "doc_id": "sivers_ar_2025_photonics_excerpt",
+      "path": "extractions/sivers_ar_2025.json",
+      "before_sha256": "13752e020e361c7650e2b38051a0d81f5f9d16aa8bd51bf478fc314bff0feef4",
+      "after_sha256": "cf60692c1a484808095c7018f8eaf20f2d4fbfe2d9c48e4b46906c6a6a0eb6e6",
+      "storage_permission": "repo_full",
+      "git_eligible": true
+    },
+    {
+      "doc_id": "sivers_ar_2025_financials",
+      "path": "extractions/sivers_ar_2025_financials.json",
+      "before_sha256": "deb5cdd85d926e1a0f51d3c3d179be98135f0a13ca06fa570b2fc614da0f59f6",
+      "after_sha256": "c577530a4147323b06f675410e00bf00336fb0689d07fa8ddbf5da47b9646027",
+      "storage_permission": "repo_full",
+      "git_eligible": true
+    },
+    {
+      "doc_id": "sivers_gf_pr_2026_06_02",
+      "path": "extractions/sivers_gf_pr_2026_06_02.json",
+      "before_sha256": "7939345aed53dd661a3bb7baaf0daf7a816785e980c14cb1ee7bea9b074d132a",
+      "after_sha256": "deec5bf38e49e5af73cf5061cc4cb672c1cbb36a994c15ea90fea0b811dcaf83",
+      "storage_permission": "repo_full",
+      "git_eligible": true
+    }
+  ],
+  "raw_artifacts": [
+    {
+      "path": "library/raw/Broadcom_q2fy26_cpo.txt",
+      "sha256": "86c9aa71fa7c30620c9d577c93a473916a9610ccc5ad59ba78a4bdc6e8bea44e",
+      "storage_permission": "local_only",
+      "git_eligible": false
+    },
+    {
+      "path": "library/raw/coherent-corp-cohr-discusses-photonics-innovation-and-data-center-communications-at-ofc_march_17.txt",
+      "sha256": "5c383d4366e5af531a10af95763daaf2f7a3753063a782384100453ea601642c",
+      "storage_permission": "local_only",
+      "git_eligible": false
+    },
+    {
+      "path": "library/raw/coherent_q2fy26_cpo.txt",
+      "sha256": "0cf2f11c374efe724bba2b8b4630670caa486c329acf93a62af3d4201b0b38c6",
+      "storage_permission": "local_only",
+      "git_eligible": false
+    },
+    {
+      "path": "library/raw/coherent_q3fy26_cpo.txt",
+      "sha256": "5bf537a82a769ef47b9ba23b5573579b6616d91ddd0ccfb13a446799a09ca2cc",
+      "storage_permission": "local_only",
+      "git_eligible": false
+    },
+    {
+      "path": "library/raw/Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era.txt",
+      "sha256": "46168b80b4d8291294a476c3823550646bc029ba9057ef1e895b0554160c7be6",
+      "storage_permission": "repo_full",
+      "git_eligible": true
+    },
+    {
+      "path": "library/raw/enablence_sivers_onet_els_2026-03-17.txt",
+      "sha256": "de1f9925aaaedf53fdc08fe3045c50f6d30207f97842f21885edbfb39ce68c39",
+      "storage_permission": "repo_full",
+      "git_eligible": true
+    },
+    {
+      "path": "library/raw/lumentum_q2fy26_cpo.txt",
+      "sha256": "a1b782e68175fe4040b107dff2abc1c095051f2916b9f2228e77a9e456ccf634",
+      "storage_permission": "local_only",
+      "git_eligible": false
+    },
+    {
+      "path": "library/raw/lumentum_q3fy26_cpo.txt",
+      "sha256": "b38bd1e242d827e7d1bb70f030b35cadfde209b03161d51f5de598167ee98f5d",
+      "storage_permission": "local_only",
+      "git_eligible": false
+    },
+    {
+      "path": "library/raw/Nvidia_q1fy27.txt",
+      "sha256": "616bf0f0baeade2bcd6a5ecc6319c778167999957f13e544dad445ae9e69fb78",
+      "storage_permission": "local_only",
+      "git_eligible": false
+    },
+    {
+      "path": "library/raw/sivers_ar_2025_photonics_excerpt.txt",
+      "sha256": "14b597014fb45a752b989a98b0b83e2409ce89742c0cd4e79d919cd3d7af425c",
+      "storage_permission": "repo_full",
+      "git_eligible": true
+    },
+    {
+      "path": "library/raw/sivers_ar_2025_photonics_excerpt.meta.json",
+      "sha256": "1d0b91d72989fe724b9b0abdaaccb9bc9628cd221dc234493d980194fb4e8b73",
+      "storage_permission": "repo_full",
+      "git_eligible": true
+    },
+    {
+      "path": "extractions/lumentum_q2fy26_cpo_raw.txt",
+      "sha256": "92ab74ef782a2495f851d9e99ef6eae9be7aaff3a04fbfafa953847b55926d04",
+      "storage_permission": "local_only",
+      "git_eligible": false
+    }
+  ]
+}
