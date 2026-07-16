@@ -190,6 +190,19 @@ Pending completion of U2, U3, U3b, U4, and U5.
   to both Claude and Codex adapters. It may produce proposals but cannot directly
   edit the versioned resolution ledger or Neo4j.
 
+### U4 single-origin checkpoint (2026-07-16)
+
+- The graph-derived SIVE report contains 24 unique single-origin Claims/edges
+  and zero provenance orphans.
+- Spot checks matched the graph: Sivers → GlobalFoundries is issuer self-report,
+  Sivers → Ayar Labs is aleabitoreddit-only, and Sivers → Enablence/O-Net ELS is
+  supported by an Enablence-origin document.
+- Win Semiconductor → Sivers does not appear as single-origin because its two
+  assertions cite distinct Sivers and aleabitoreddit SourceDocs. Adding a second
+  origin therefore removes an element automatically without editing a list.
+- Local CLI and remote MCP use the same exported Cypher constant; no additional
+  mutable report or MCP write surface was introduced.
+
 The after section must record:
 
 - the exact frozen manifest identity and hashes;
