@@ -20,10 +20,44 @@ __pycache__/
 venv/
 env/
 
-# Raw source documents and extraction outputs
-# Remove these lines if you want to track library/raw/ and extractions/ in git.
-# For files under ~500 KB, tracking is fine; larger files (full transcripts/PDFs) should stay gitignored.
+# Raw source documents and extraction outputs.
+# New repo-eligible intake artifacts are tracked. The pre-U11 corpus remains
+# explicitly ignored because its cloud-storage permission was never recorded;
+# missing permission fails closed rather than inheriting "free" or "paid".
 library/raw/*
 !library/raw/.gitkeep
+!library/raw/*.txt
+library/raw/Broadcom_q2fy26_cpo.txt
+library/raw/coherent-corp-cohr-discusses-photonics-innovation-and-data-center-communications-at-ofc_march_17.txt
+library/raw/coherent_q2fy26_cpo.txt
+library/raw/coherent_q3fy26_cpo.txt
+library/raw/Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era.txt
+library/raw/enablence_sivers_onet_els_2026-03-17.txt
+library/raw/lumentum_q2fy26_cpo.txt
+library/raw/lumentum_q3fy26_cpo.txt
+library/raw/Nvidia_q1fy27.txt
+library/raw/sivers_ar_2025_photonics_excerpt.txt
+
 extractions/*
 !extractions/.gitkeep
+!extractions/*.json
+extractions/broadcom_q2fy26_cpo.json
+extractions/coherent_ofc_march25.json
+extractions/coherent_q2fy26_cpo.json
+extractions/coherent_q3fy26_cpo.json
+extractions/cpo_chip_package_paper.json
+extractions/damnang_poet_ofc2026_review_2026_03.json
+extractions/enablence_sivers_onet_els_2026.json
+extractions/enablence_sivers_onet_ofc_pr_2026_03_17.json
+extractions/lumentum_q2fy26_cpo.json
+extractions/lumentum_q3fy26_cpo.json
+extractions/nvidia_q1fy27.json
+extractions/silicon_matter_ayar_labs.json
+extractions/silicon_matter_celestial_marvell.json
+extractions/silicon_matter_sivers_ayar_2026_03_14.json
+extractions/sivers_ar_2025.json
+extractions/sivers_ar_2025_financials.json
+extractions/sivers_gf_pr_2026_06_02.json
+
+# Never commit local-only source-derived content.
+library/private/

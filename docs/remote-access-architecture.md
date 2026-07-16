@@ -54,21 +54,22 @@ Anthropic 雲端   = LLM 本體——思考、決定何時呼叫工具
 
 對話中的實際流程：使用者提問 → 雲端 LLM 判斷需要圖譜 → 發 JSON-RPC 工具呼叫（HTTPS）→ `mcp.minatoyukina.uk` → Cloudflare → tunnel → cloudflared → graph_mcp → Neo4j → 結果原路回 → LLM 讀進上下文後以自然語言回答。
 
-**MCP server 不能對本機下任意指令。** 它只有五個寫死的工具（見下），沒有 shell、沒有任意檔案存取、沒有任意代碼執行。要擴充能力必須改 code 重啟。
+**MCP server 不能對本機下任意指令。** 它只有六個寫死的工具（見下），沒有 shell、沒有 client-controlled path、沒有任意代碼執行。檔案只可落在固定 provenance/report roots，Git 只用 argv-list 精確 pathspec。要擴充能力必須改 code 重啟。
 
 ---
 
-## 五個工具與其應用
+## 六個工具與其應用
 
 | 工具 | 讀/寫 | 應用場景 |
 |------|------|---------|
 | `get_graph_context` | 讀 | 「SIVE 研究狀態如何」——公司子圖/產業全圖的 LLM-ready 摘要（重用 `query/graph_context.py`） |
 | `run_read_query` | 讀 | 精確查詢/稽核：「列出所有 sole_source 邊」「數 origin_entity」。Session 以 READ access mode 開啟，寫入語句會被 Neo4j 拒絕（已實測） |
-| `get_extraction_rules` | 讀 | 回傳 `prompts/extract_system.md` + `schema/vocab.json` 原文（路徑寫死）。**任何遠端抽取前必讀**——軟品質規則（L6 逐字引用、L4 屬性歸位）無法靠事後驗證補救 |
+| `get_extraction_rules` | 讀 | 回傳 `prompts/extract_system.md` + `schema/vocab.json` + `prompts/intake_protocol.md` 原文（路徑寫死）。**任何遠端抽取前必讀**——含 storage permission、conflict 與 finalize 協定 |
 | `get_source_trace_manual` | 讀 | 回傳 `skills/source-trace/SKILL.md` 原文。手機／網頁收到推文、轉述、截圖或未驗證消息時先讀，依市場路由追原文；tier 3–4 未果只留 lead，不進抽取／寫圖 |
-| `load_extraction` | **寫** | 唯一寫入路徑。先跑 `loader/validate.py` 完整驗證（schema/vocab/參照完整性），通過才呼叫 `loader/load_to_neo4j.py` 寫入。爛資料進不了圖 |
+| `load_extraction` | **寫** | 一份文件一呼叫。驗 permission/schema/canonical hash，filesystem-first no-clobber 保存 extraction/raw，再冪等寫圖與重投影受影響 conflicts；失敗可用相同 payload 重試 |
+| `finalize_research_action` | **寫 + Git push** | 以成功 load 的 doc_ids manifest 建報告、精確 stage、單一 commit、push。非 master／staged index／HEAD 不同步／local_only 全部 fail closed；預設 kill switch 關閉 |
 
-**Connector 權限設定（claude.ai → Settings → Connectors → stockbotv2-graph）：** 四個讀工具設「允許」；`load_extraction` 保持「**Needs approval**」——每次寫圖 App 都會跳確認，**這就是 L8 人工核准閘門的 UI 實體**，不要改成自動允許。
+**Connector 權限設定（claude.ai → Settings → Connectors → stockbotv2-graph）：** 四個讀工具設「允許」；`load_extraction` 與 `finalize_research_action` 都保持「**Needs approval**」。後者不會繼承前者的設定，新增／重建 connector 時必須逐一檢查。
 
 ---
 
@@ -77,11 +78,16 @@ Anthropic 雲端   = LLM 本體——思考、決定何時呼叫工具
 1. **URL 路徑 token**（`.env` 的 `GRAPH_MCP_TOKEN`，40 字元隨機）——不知道完整 URL 連端點都碰不到（錯誤 token → 404）。**Connector URL 本身就是鑰匙：含 URL 的截圖/設定頁不要外流**
 2. **最小權限 Neo4j 帳號**——MCP server 用 `cloud_routine` 帳號（`routine_writer` 角色：MATCH + CREATE + SET PROPERTY + SET LABEL；無 DELETE、無 schema、無 admin）。最壞情況是圖被亂寫，不是被刪
 3. **READ mode 強制**——`run_read_query` 在 session 層面拒絕寫入交易
-4. **驗證閘門**——`load_extraction` 內建 schema/vocab 驗證，拒載回傳錯誤清單
-5. **人工核准**——connector 權限的 Needs-approval + 對話中的口頭確認，雙重
-6. **本機綁定**——MCP server 只綁 127.0.0.1，唯一入口是 tunnel
+4. **驗證與 no-clobber 閘門**——`load_extraction` 先驗 schema/permission/URL/canonical hash，內容衝突不碰圖、不覆寫檔案
+5. **Finalize fail-closed**——只在 master、index 無 staged、fetch 成功且 `HEAD == origin/master` 時，精確提交本次 manifest
+6. **人工核准 + server kill switch**——兩個寫工具設 Needs-approval；Git push 另要求 `ENABLE_REMOTE_FINALIZE=true`，預設 false
+7. **本機綁定**——MCP server 只綁 127.0.0.1，唯一入口是 tunnel
+
+> **尚未解除的 P0：** Needs-approval 是 client-side UX；持有完整 MCP bearer URL 的直接呼叫者可繞過它。`ENABLE_REMOTE_FINALIZE=false` 因此是目前部署預設。若將它設 true，代表接受「bearer URL 外洩可觸發受 preflight/pathspec 限制的 Git push」這個剩餘風險；server-side per-action capability 尚未定案。
 
 Token 或 Neo4j 密碼要輪換時：改 `.env` → 重啟 MCP server → 到 claude.ai 更新 connector URL。
+
+第一次部署或新增 SourceDoc 欄位後，須由 admin 重跑 `schema/neo4j_setup.cypher`。setup 會建立後立即刪除 sentinel，預註冊 `storage_permission`／`permission_basis` property-name tokens；`cloud_routine` 不需要、也不應取得 `CREATE NEW PROPERTY NAME` 權限。
 
 ---
 
@@ -91,12 +97,12 @@ Token 或 Neo4j 密碼要輪換時：改 `.env` → 重啟 MCP server → 到 cl
 → 雲端 LLM 呼叫 `get_graph_context` → 本機被查詢幾個唯讀 Cypher → 圖無任何變動。
 
 **寫（例：手機上入圖）**
-→ 貼新聞給 App → LLM 呼叫 `get_source_trace_manual` → web search 依路由找原文（**純雲端，不碰本機**）→ 找到可逐字來源後呼叫 `get_extraction_rules` → 按規則抽取成 JSON 草稿 → 你口頭同意 → LLM 呼叫 `load_extraction` → **App 跳權限確認，你按允許** → 本機驗證 → 寫入 → 圖長大。
+→ 貼新聞給 App → `get_source_trace_manual` 追原文 → `get_extraction_rules` 讀 storage/intake 協定 → 一份文件一次 `load_extraction` → App 核准 → 本機先 no-clobber 保存 provenance，再寫圖／project conflict → 累積成功且 eligible 的 doc_ids → 行動結束一次 `finalize_research_action` → 再次 App 核准 → preflight → 報告 + 單一 commit + push。任一步失敗都回 pending／not_committed，不假裝完成。
 
 **不碰本機（例：「CPO 最近有什麼新聞？」）**
 → 純 web search，全程雲端，本機三個行程無感。
 
-**核心規律：讀圖 = 無副作用；寫圖 = 兩道人工核准 + 一道自動驗證；其他 = 雲端自理。**
+**核心規律：讀圖 = 無副作用；載入 = 人工核准 + filesystem-first + 自動驗證；Git 收尾 = 另一個人工核准 + server kill switch + 同步 preflight。**
 
 ---
 
@@ -116,3 +122,4 @@ Token 或 Neo4j 密碼要輪換時：改 `.env` → 重啟 MCP server → 到 cl
 - MCP SDK 的 DNS-rebinding 防護會對非 localhost 的 Host 回 421 → tunnel ingress 用 `httpHostHeader` 改寫解決
 - cloudflared 預設日誌不記錄個別請求；驗證流量用本機 metrics 端點 `127.0.0.1:20241/metrics` 的 `cloudflared_tunnel_total_requests` 計數器
 - 無 watchdog：行程若 crash 不會自動重啟（開機自啟只在登入時跑一次）。目前接受此風險
+- Neo4j Python driver 的 write result 是 lazy：loader 必須 `consume()` 才能在 MCP 呼叫內暴露權限／commit 錯誤；`tests/test_sourcedoc.py` 固定此行為

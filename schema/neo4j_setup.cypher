@@ -17,6 +17,16 @@ FOR (ea:EdgeAssertion) REQUIRE ea.id IS UNIQUE;
 CREATE CONSTRAINT source_doc_id_unique IF NOT EXISTS
 FOR (sd:SourceDoc) REQUIRE sd.id IS UNIQUE;
 
+// ── 1b. 預註冊最小權限 writer 會用到的 property-name tokens ────────────
+// Neo4j Enterprise 的 SET PROPERTY 權限不等於 CREATE NEW PROPERTY NAME。
+// 由 admin 跑 setup 時先建立 token，再刪掉 sentinel；不要把建立任意
+// property name 的權限授給 cloud_routine。
+MERGE (prewarm:SourceDoc {id: '__schema_token_prewarm__'})
+SET prewarm.storage_permission = 'local_only',
+    prewarm.permission_basis = 'schema token pre-registration'
+WITH prewarm
+DETACH DELETE prewarm;
+
 // ── 2. 查詢用索引 ─────────────────────────────────────────
 CREATE INDEX entity_type IF NOT EXISTS
 FOR (n:Entity) ON (n.type);

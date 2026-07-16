@@ -90,6 +90,16 @@ def evidence_id(doc_id: str, local_id: str) -> str:
     return local_id if local_id.startswith(prefix) else prefix + local_id
 
 
+def _execute(session, query: str, **params):
+    """Execute a write eagerly so commit/permission failures surface in-call."""
+
+    result = session.run(query, **params)
+    consume = getattr(result, "consume", None)
+    if callable(consume):
+        consume()
+    return result
+
+
 # node.type → 額外 label(:Entity 之外)
 def _node_labels(node_type: str) -> list[str]:
     return ["Entity", node_type]
@@ -226,7 +236,8 @@ def load_source_doc(doc: dict, session) -> None:
     """Materialize one extraction's immutable document-level provenance."""
 
     source_doc = doc["source_doc"]
-    session.run(
+    _execute(
+        session,
         MERGE_SOURCE_DOC,
         id=source_doc["doc_id"],
         title=source_doc["title"],
@@ -269,12 +280,13 @@ def load(doc: dict, session, use_apoc: bool = False) -> None:
         if use_apoc:
             params["source_ids"] = n["source_ids"]
             params["extra_labels"] = [n["type"]]
-            session.run(MERGE_NODE, **params)
+            _execute(session, MERGE_NODE, **params)
         else:
             params["source_ids"] = n["source_ids"]
-            session.run(MERGE_NODE_NOAPOC, **params)
+            _execute(session, MERGE_NODE_NOAPOC, **params)
             # type label 後補(純 Cypher 動態 label 需字串拼接)
-            session.run(
+            _execute(
+                session,
                 f"MATCH (n:Entity {{id:$id}}) SET n:`{n['type']}`", id=n["id"]
             )
 
@@ -284,7 +296,8 @@ def load(doc: dict, session, use_apoc: bool = False) -> None:
         canonical_key = edge_key(e["src_id"], e["relation"], e["dst_id"])
         edge_keys_by_local_id[e["id"]] = canonical_key
         cypher = MERGE_EDGE % _rel_type(e["relation"])
-        session.run(
+        _execute(
+            session,
             cypher,
             edge_key=canonical_key,
             src_id=e["src_id"],
@@ -298,7 +311,8 @@ def load(doc: dict, session, use_apoc: bool = False) -> None:
             source_doc_ids=[doc_id],
             updated_at=ts,
         )
-        session.run(
+        _execute(
+            session,
             MERGE_EDGE_ASSERTION,
             assertion_id=evidence_id(doc_id, e["id"]),
             local_id=e["id"],
@@ -334,13 +348,13 @@ def load(doc: dict, session, use_apoc: bool = False) -> None:
                 subject_kind="edge",
                 subject_edge_key=edge_keys_by_local_id[c["subject_id"]],
             )
-            session.run(MERGE_EDGE_CLAIM, **params)
+            _execute(session, MERGE_EDGE_CLAIM, **params)
         else:
             params.update(
                 subject_kind="node",
                 subject_node_id=c["subject_id"],
             )
-            session.run(MERGE_NODE_CLAIM, **params)
+            _execute(session, MERGE_NODE_CLAIM, **params)
 
 
 def dry_run(doc: dict) -> None:

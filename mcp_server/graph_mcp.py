@@ -19,6 +19,8 @@ custom connector 後，cloud routine / 手機 App / 網頁對話都能讀寫圖�
 - get_source_trace_manual — 收到未驗證線索時端出完整追源路由與分級處置手冊
 - load_extraction     — 載入一份「先通過 schema 驗證」的抽取 JSON（L8 人工核准
                         之後才會被呼叫；驗證不過就拒載，錯誤原样回傳）
+- finalize_research_action — 以 doc_ids manifest 精確建立報告、單一 commit 與 push；
+                             預設由 server-side kill switch 關閉
 
 用法:
     python mcp_server/graph_mcp.py          # 讀 .env 的 GRAPH_MCP_TOKEN / PORT
@@ -52,7 +54,20 @@ from mcp.server.fastmcp import FastMCP
 
 from query.graph_context import build_context
 from loader.validate import validate as validate_extraction
-from loader.load_to_neo4j import load as load_to_graph
+from loader.load_to_neo4j import edge_key, evidence_id, load as load_to_graph
+from loader.edge_resolution import project_edge_keys
+from mcp_server.intake import (
+    ROOT as INTAKE_ROOT,
+    commit_and_push,
+    git_preflight,
+    pending_intake_files,
+    publish_provenance,
+    resolve_action_paths,
+    sanitize_source_url,
+    validate_action_slug,
+    validate_doc_id,
+    write_report,
+)
 
 # ── 設定 ───────────────────────────────────────────────────────────────────────
 
@@ -135,14 +150,20 @@ def get_extraction_rules() -> str:
     在呼叫 load_extraction 之前務必先讀這份——它包含 intermediate-format 的
     完整欄位規格、vocab 白名單（node type / abstraction_level / relation 等）、
     節點 ID 命名慣例、L4 屬性歸位三問、以及 L6 反幻覺鐵律（具體型號/公司名
-    必須逐字出現在 quote 中）。不讀規則直接抽取，軟品質規則無法靠 schema
-    驗證補救。
+    必須逐字出現在 quote 中），以及 remote intake 的 storage permission、
+    filesystem-first、conflict 回報與 finalize 義務。不讀規則直接抽取，軟品質規則
+    無法靠 schema 驗證補救。
     """
     rules = (ROOT / "prompts" / "extract_system.md").read_text(encoding="utf-8")
     vocab = (ROOT / "schema" / "vocab.json").read_text(encoding="utf-8")
+    intake_protocol = (ROOT / "prompts" / "intake_protocol.md").read_text(
+        encoding="utf-8"
+    )
     return (
         "# 抽取規則書（prompts/extract_system.md）\n\n" + rules +
-        "\n\n---\n\n# Vocab 白名單（schema/vocab.json）\n\n```json\n" + vocab + "\n```\n"
+        "\n\n---\n\n# Vocab 白名單（schema/vocab.json）\n\n```json\n" + vocab + "\n```\n" +
+        "\n\n---\n\n# 遠端 Intake／Finalize 協定（prompts/intake_protocol.md）\n\n" +
+        intake_protocol
     )
 
 
@@ -169,17 +190,70 @@ def get_source_trace_manual() -> str:
 
 
 @mcp.tool()
-def load_extraction(extraction_json: str) -> str:
+def load_extraction(
+    extraction_json: str,
+    storage_permission: str,
+    permission_basis: str,
+    raw_text: str | None = None,
+    raw_url: str | None = None,
+    raw_excerpt: str | None = None,
+) -> str:
     """把一份 intermediate-format 抽取 JSON 載入知識圖譜。
 
-    只在使用者已人工核准（L8 來源獨立性確認）後呼叫。內建 schema/vocab 驗證：
-    不合格的 JSON 會被拒載並回傳具體錯誤清單，不會寫進圖。
-    輸入為完整的抽取 JSON 字串（schema_version / source_doc / sources / nodes / edges）。
+    一份文件呼叫一次；storage_permission 與 permission_basis 必填。先依授權把
+    extraction/raw no-clobber 落地，再冪等寫圖並重投影受影響的 edge conflicts。
+    同 doc_id 不同內容嚴格拒絕；圖失敗時檔案保留為 pending_graph，可用完全相同
+    payload 重試。回傳 open conflict 只代表某些 edge attributes 待決，不代表文件
+    載入失敗，遠端不可自行選值。研究行動結束後，僅把 finalize_eligible=true 且
+    status=loaded_or_already_complete 的 doc_id 傳給 finalize_research_action。
     """
+    return json.dumps(
+        _load_extraction_impl(
+            extraction_json,
+            storage_permission,
+            permission_basis,
+            raw_text=raw_text,
+            raw_url=raw_url,
+            raw_excerpt=raw_excerpt,
+        ),
+        ensure_ascii=False,
+        default=str,
+        indent=2,
+    )
+
+
+def _load_extraction_impl(
+    extraction_json: str,
+    storage_permission: str,
+    permission_basis: str,
+    *,
+    raw_text: str | None = None,
+    raw_url: str | None = None,
+    raw_excerpt: str | None = None,
+    root: Path = INTAKE_ROOT,
+) -> dict:
     try:
         doc = json.loads(extraction_json)
     except json.JSONDecodeError as e:
-        return f"拒載：不是合法 JSON — {e}"
+        return {"status": "rejected", "error": f"不是合法 JSON：{e}"}
+
+    source_doc = doc.get("source_doc")
+    if not isinstance(source_doc, dict):
+        return {"status": "rejected", "error": "source_doc 是必填 object"}
+    doc_id = source_doc.get("doc_id")
+    try:
+        validate_doc_id(doc_id)
+    except ValueError as exc:
+        return {"status": "rejected", "error": str(exc)}
+    source_doc["storage_permission"] = storage_permission
+    source_doc["permission_basis"] = permission_basis
+    try:
+        if raw_url:
+            source_doc["url"] = sanitize_source_url(raw_url)
+        elif source_doc.get("url"):
+            source_doc["url"] = sanitize_source_url(source_doc["url"])
+    except ValueError as exc:
+        return {"status": "rejected", "doc_id": doc_id, "error": str(exc)}
 
     # 驗證（validate() 吃檔案路徑，寫入 temp 檔重用其完整邏輯）
     tmp = tempfile.NamedTemporaryFile(
@@ -192,44 +266,291 @@ def load_extraction(extraction_json: str) -> str:
             problems = validate_extraction(tmp.name)
         except Exception as e:
             # 驗證器自身異常也必須回成清楚的拒載訊息，不能炸穿成框架錯誤
-            return (f"拒載：驗證器異常（{type(e).__name__}: {e}）— "
-                    f"通常代表 JSON 缺少必填欄位（如 claim 的 id）。"
-                    f"請先呼叫 get_extraction_rules 核對格式後重試。")
+            return {
+                "status": "rejected",
+                "doc_id": doc_id,
+                "error": (
+                    f"驗證器異常（{type(e).__name__}: {e}）；"
+                    "請先呼叫 get_extraction_rules 核對格式後重試"
+                ),
+            }
     finally:
         os.unlink(tmp.name)
 
     hard_errors = [p for p in problems if not p.startswith("WARN")]
     warnings = [p for p in problems if p.startswith("WARN")]
     if hard_errors:
-        return "拒載：驗證未通過\n" + "\n".join(hard_errors)
+        return {
+            "status": "rejected",
+            "doc_id": doc_id,
+            "error": "驗證未通過",
+            "problems": hard_errors,
+        }
+
+    raw_payload = {
+        key: value
+        for key, value in {
+            "raw_text": raw_text,
+            "raw_url": raw_url,
+            "raw_excerpt": raw_excerpt,
+        }.items()
+        if value is not None
+    }
+    try:
+        provenance = publish_provenance(
+            doc_id,
+            doc,
+            raw_payload,
+            root=root,
+        )
+    except (OSError, RuntimeError, ValueError) as exc:
+        return {
+            "status": "rejected",
+            "doc_id": doc_id,
+            "error": f"provenance publish rejected: {exc}",
+            "finalize_eligible": False,
+        }
 
     driver = _driver()
     try:
         with driver.session() as session:
             load_to_graph(doc, session)
+        _verify_loaded_doc(driver, doc)
+        affected_edge_keys = {
+            edge_key(edge["src_id"], edge["relation"], edge["dst_id"])
+            for edge in doc.get("edges", [])
+        }
+        projection = project_edge_keys(driver, affected_edge_keys)
     except Exception as e:
-        return f"載入失敗: {type(e).__name__}: {e}"
+        return {
+            "status": "pending_graph",
+            "doc_id": doc_id,
+            "error": f"{type(e).__name__}: {e}",
+            "resolved_paths": provenance["paths"],
+            "finalize_eligible": False,
+            "warnings": warnings,
+        }
     finally:
         driver.close()
 
-    doc_id = doc.get("source_doc", {}).get("doc_id", "?")
-    summary = (
-        f"已載入 doc_id={doc_id}: "
-        f"{len(doc.get('nodes', []))} nodes, "
-        f"{len(doc.get('edges', []))} edges, "
-        f"{len(doc.get('claims', []))} claims"
-    )
-    # 落地到 extractions/——L8 檢查器與本機 pipeline 以此目錄為準；
-    # 遠端入圖不落地的話，origin_entity 計數會漏掉這份文件
+    return {
+        "status": "loaded_or_already_complete",
+        "doc_id": doc_id,
+        "resolved_paths": provenance["paths"],
+        "open_conflict_ids": projection["open_conflict_ids"],
+        "stale_resolution_ids": projection["stale_resolution_ids"],
+        "finalize_eligible": provenance["finalize_eligible"],
+        "counts": {
+            "nodes": len(doc.get("nodes", [])),
+            "edges": len(doc.get("edges", [])),
+            "claims": len(doc.get("claims", [])),
+        },
+        "warnings": warnings,
+    }
+
+
+def _verify_loaded_doc(driver, doc: dict) -> None:
+    """Fail closed unless this document's graph identity is observable."""
+
+    doc_id = doc["source_doc"]["doc_id"]
+    expected_assertions = {
+        evidence_id(doc_id, edge["id"]) for edge in doc.get("edges", [])
+    }
+    expected_claims = {
+        evidence_id(doc_id, claim["id"]) for claim in doc.get("claims", [])
+    }
+    expected_edges = {
+        edge_key(edge["src_id"], edge["relation"], edge["dst_id"])
+        for edge in doc.get("edges", [])
+    }
+    with driver.session() as session:
+        source_doc_count = session.run(
+            "MATCH (sd:SourceDoc {id: $id}) RETURN count(sd) AS count",
+            id=doc_id,
+        ).single()["count"]
+        assertions = {
+            row["id"]
+            for row in session.run(
+                "MATCH (a:EdgeAssertion) WHERE a.id IN $ids RETURN a.id AS id",
+                ids=sorted(expected_assertions),
+            )
+        }
+        claims = {
+            row["id"]
+            for row in session.run(
+                "MATCH (c:Claim) WHERE c.id IN $ids RETURN c.id AS id",
+                ids=sorted(expected_claims),
+            )
+        }
+        edges = {
+            row["edge_key"]
+            for row in session.run(
+                """
+                MATCH ()-[r]->()
+                WHERE r.edge_key IN $edge_keys
+                RETURN r.edge_key AS edge_key
+                """,
+                edge_keys=sorted(expected_edges),
+            )
+        }
+    problems = []
+    if source_doc_count != 1:
+        problems.append(f"SourceDoc count={source_doc_count}")
+    if assertions != expected_assertions:
+        problems.append(f"missing EdgeAssertions={sorted(expected_assertions - assertions)}")
+    if claims != expected_claims:
+        problems.append(f"missing Claims={sorted(expected_claims - claims)}")
+    if edges != expected_edges:
+        problems.append(f"missing canonical edges={sorted(expected_edges - edges)}")
+    if problems:
+        raise RuntimeError("graph reconciliation failed: " + "; ".join(problems))
+
+
+_REQUIRED_REPORT_SECTIONS = (
+    "為何此時入圖",
+    "文件清單",
+    "搜尋過程摘要",
+    "L8 確認備註",
+)
+
+
+def _remote_finalize_enabled() -> bool:
+    return os.environ.get("ENABLE_REMOTE_FINALIZE", "").strip().casefold() in {
+        "1",
+        "true",
+        "yes",
+    }
+
+
+def _finalize_research_action_impl(
+    report_markdown: str,
+    action_slug: str,
+    commit_headline: str,
+    doc_ids: list[str],
+    *,
+    root: Path = INTAKE_ROOT,
+    enabled: bool,
+) -> dict:
+    if not enabled:
+        return {
+            "git_status": "not_committed",
+            "reason": "remote_finalize_disabled",
+            "action": (
+                "Set ENABLE_REMOTE_FINALIZE=true only after accepting the remote-push "
+                "security boundary and configuring this MCP tool as Needs approval."
+            ),
+        }
     try:
-        dest = ROOT / "extractions" / f"{doc_id}.json"
-        dest.write_text(json.dumps(doc, ensure_ascii=False, indent=2), encoding="utf-8")
-        summary += f"\n已落地 extractions/{doc_id}.json（L8 計數同步）"
-    except Exception as e:
-        summary += f"\n注意：extractions/ 落地失敗（{type(e).__name__}），L8 計數會暫時漏掉本文件"
-    if warnings:
-        summary += "\n注意（不阻擋，但請回報給使用者）：\n" + "\n".join(warnings)
-    return summary
+        validate_action_slug(action_slug)
+    except ValueError as exc:
+        return {"git_status": "not_committed", "reason": str(exc)}
+    if not isinstance(commit_headline, str) or not commit_headline.strip():
+        return {"git_status": "not_committed", "reason": "commit_headline is required"}
+    if "\n" in commit_headline or "\r" in commit_headline:
+        return {
+            "git_status": "not_committed",
+            "reason": "commit_headline must be one line",
+        }
+    if not isinstance(doc_ids, list):
+        return {"git_status": "not_committed", "reason": "doc_ids must be a list"}
+    try:
+        manifest = resolve_action_paths(doc_ids, root=root)
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        return {"git_status": "not_committed", "reason": str(exc)}
+    if not manifest["paths"]:
+        return {
+            "git_status": "not_committed",
+            "reason": "no_pending_files",
+            "manifest": [],
+        }
+    missing_sections = [
+        section for section in _REQUIRED_REPORT_SECTIONS if section not in report_markdown
+    ]
+    if missing_sections:
+        return {
+            "git_status": "not_committed",
+            "reason": f"report missing required sections: {missing_sections}",
+        }
+
+    preflight = git_preflight(root=root)
+    if not preflight["ok"]:
+        return {
+            "git_status": "not_committed",
+            "reason": preflight["reason"],
+            "detail": preflight.get("detail"),
+        }
+    pending = pending_intake_files(root=root)
+    manifest_paths = set(manifest["paths"])
+    modified_manifest = sorted(manifest_paths & set(pending.get("modified") or []))
+    if modified_manifest:
+        return {
+            "git_status": "not_committed",
+            "reason": f"manifest contains modified tracked files: {modified_manifest}",
+        }
+    pending_warning = {
+        "untracked": sorted(set(pending.get("untracked") or []) - manifest_paths),
+        "modified": sorted(set(pending.get("modified") or []) - manifest_paths),
+        "error": pending.get("error"),
+    }
+
+    verified_lines = ["## Server-verified provenance manifest", ""]
+    for document in manifest["documents"]:
+        verified_lines.append(
+            f"- `{document['doc_id']}` — storage_permission=`{document['storage_permission']}`; "
+            f"URL={document.get('url') or 'n/a'}; permission_basis: "
+            f"{document['permission_basis']}"
+        )
+    final_report = report_markdown.rstrip() + "\n\n" + "\n".join(verified_lines) + "\n"
+    try:
+        report_path = write_report(action_slug, final_report, root=root)
+        report_relative = report_path.resolve().relative_to(root.resolve()).as_posix()
+    except (OSError, RuntimeError, ValueError) as exc:
+        return {"git_status": "not_committed", "reason": f"report write failed: {exc}"}
+
+    git_result = commit_and_push(
+        [*manifest["paths"], report_relative],
+        commit_headline,
+        root=root,
+    )
+    return {
+        "git_status": git_result["status"],
+        "commit": git_result.get("commit"),
+        "push_error": git_result.get("push_error"),
+        "error": git_result.get("error"),
+        "report_path": report_relative,
+        "manifest": manifest["documents"],
+        "committed_paths": git_result.get("paths") or [],
+        "pending_warning": pending_warning,
+    }
+
+
+@mcp.tool()
+def finalize_research_action(
+    report_markdown: str,
+    action_slug: str,
+    commit_headline: str,
+    doc_ids: list[str],
+) -> str:
+    """完成一次遠端研究行動：報告、精確 pathspec commit、push。
+
+    四個參數皆必填。只接受本次 load_extraction 成功回傳且
+    finalize_eligible=true 的 doc_ids；server 會重新查落地 permission，不信任 client。
+    任何 local_only、非 master、staged index、HEAD 與 origin/master 不同步或 fetch
+    失敗都在寫報告前 fail closed。push 失敗保留 local commit。此工具預設由
+    ENABLE_REMOTE_FINALIZE kill switch 關閉；啟用前必須在 connector 設 Needs approval。
+    """
+    return json.dumps(
+        _finalize_research_action_impl(
+            report_markdown,
+            action_slug,
+            commit_headline,
+            doc_ids,
+            enabled=_remote_finalize_enabled(),
+        ),
+        ensure_ascii=False,
+        default=str,
+        indent=2,
+    )
 
 
 if __name__ == "__main__":

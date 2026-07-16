@@ -31,6 +31,8 @@
 | `skills/blind-spot-audit` | 已有 thesis，要找反駁角度 |
 | `skills/company-onboard` | 新公司尚未入圖，要找文件並 onboarding |
 | `skills/signal-triage` | 週掃 harvest 後判斷是否值得進入完整抽取 |
+| `skills/source-trace` | 推文／轉述／截圖／二手報導先追回原文；tier 3–4 未果隔離 |
+| `skills/evidence-conflict-resolution` | EdgeAssertion 屬性衝突產 proposal；只在人工核准後寫 resolution |
 
 ### 記憶層（持久知識庫）
 - **Neo4j 知識圖譜（引擎A）：** 供應鏈結構、技術關係、來源可追溯的主張。Property graph，不是 tree。
@@ -41,12 +43,14 @@
 ```
 文件 → library/raw/ → extract.py → loader/validate.py → loader/load_to_neo4j.py → Neo4j
 fetchers/edgar.py ──────↑                        engine_c/etl_yfinance.py → SQLite
+遠端線索 → source-trace → load_extraction（filesystem-first）→ Neo4j
+         → finalize_research_action（report + exact commit + push；預設 kill switch 關閉）
 ```
 - **抽取與 DB 解耦：** `extract.py` 只輸出 DB 無關 JSON；loader 可替換。DB 選型不綁死資料。
 - **fetchers（已有）：** `fetchers/edgar.py`（美股 SEC EDGAR，免費無 paywall）。
 - **引擎B（未建）：** X 推文/小道消息 → 線索 → 走 `skills/lead-intake` 閘門 → 入庫。
 - **各類來源的 AI 抽取 instruction：** [`docs/extraction-instructions.md`](docs/extraction-instructions.md)
-- **遠端存取（手機 App / cloud routine 讀寫圖）：** 本機 MCP server（`mcp_server/graph_mcp.py`）+ Cloudflare Tunnel + claude.ai custom connector。完整資料流、安全邊界、四工具說明、踩坑記錄：[`docs/remote-access-architecture.md`](docs/remote-access-architecture.md)
+- **遠端存取（手機 App / cloud routine 讀寫圖）：** 本機 MCP server（`mcp_server/graph_mcp.py`）+ Cloudflare Tunnel + claude.ai custom connector。完整資料流、安全邊界、六工具說明、storage/finalize 協定與踩坑記錄：[`docs/remote-access-architecture.md`](docs/remote-access-architecture.md)
 
 ---
 
@@ -57,7 +61,7 @@ fetchers/edgar.py ──────↑                        engine_c/etl_yfin
 | 類別 | 具體項目 | 理由 |
 |------|---------|------|
 | 知識累積 | 更多公司 onboarding、更多高品質文件 | 圖的大小決定回答的深度 |
-| Skill 介面 | SKILL.md 檔（已有 5 個）| 讓 Claude Code / Codex 每次都能正確使用記憶 |
+| Skill 介面 | SKILL.md 檔（已有 7 個）| 讓 Claude Code / Codex 每次都能正確使用記憶 |
 | 高槓桿 fetcher | EDGAR 季報自動更新、arXiv 論文抓取 | 減少人工取文件摩擦 |
 | G5 L8 偏誤檢查 | `validate.py` 加 origin_entity 同質性警告 | 低工程量、高資料品質槓桿 |
 
@@ -105,7 +109,8 @@ fetchers/edgar.py ──────↑                        engine_c/etl_yfin
 
 ## 來源登記表（一手來源優先）
 
-通用搜尋（Tavily 等）只配 LLM 品質評分 gate，用在第三層。一手來源依市場分路：
+通用搜尋（Tavily 等）只配 LLM 品質評分 gate，用在第三層。一手來源依市場分路；
+**LLM／routine 可執行的機器版路由與未果處置唯一權威是 [`skills/source-trace/SKILL.md`](skills/source-trace/SKILL.md)**，此處只留快速記憶：
 
 - **美股：** SEC EDGAR（10-K/10-Q/8-K/S-1/Form 4）、法說會逐字稿、IR 簡報、客戶/供應商 filings。
 - **台股：** 公開資訊觀測站（MOPS）、**月營收揭露**、法說會/IR、上下游上市公司交叉驗證。
@@ -121,7 +126,7 @@ fetchers/edgar.py ──────↑                        engine_c/etl_yfin
 
 **快速記憶：**
 - node 帶內在慢變屬性（`ramp_difficulty_intrinsic`、`concentration_score` 為衍生值非手填）
-- edge 帶關係型屬性（`substitutability`、`sole_source`、`lead_time`、`ramp_execution`）
+- edge 帶關係型屬性（`substitutability`、`sole_source`、`structural_lead_time_weeks`、`ramp_execution`）
 - `confidence` 只在不同 `origin_event` 之間累加（同一法說會多份摘要 = 一個 origin_event）
 - `sole_source` 需客戶端或第三方印證；供應商自稱 → `verified_by_absence`（weak，≤0.5）
 - `consensus_coverage` / 股價 / 財務數字 → 不進圖，進引擎 C（SQLite）

@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from loader.load_to_neo4j import load
+from loader.load_to_neo4j import _execute, load
 from loader.migrate_replay_identity import build_manifest, write_manifest
 from loader.migrate_sourcedoc import migrate_sourcedocs
 from loader.validate import validate
@@ -19,6 +19,31 @@ class RecordingSession:
     def run(self, query: str, **params):
         self.calls.append((query, params))
         return []
+
+
+class _ConsumableResult:
+    def __init__(self) -> None:
+        self.consumed = False
+
+    def consume(self) -> None:
+        self.consumed = True
+
+
+class _LazyWriteSession:
+    def __init__(self) -> None:
+        self.result = _ConsumableResult()
+
+    def run(self, query: str, **params):
+        return self.result
+
+
+def test_execute_consumes_lazy_neo4j_writes() -> None:
+    session = _LazyWriteSession()
+
+    returned = _execute(session, "CREATE (:SourceDoc {id: $id})", id="doc_a")
+
+    assert returned is session.result
+    assert session.result.consumed is True
 
 
 def _document(

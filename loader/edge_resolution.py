@@ -427,6 +427,105 @@ def project_graph(
     return result
 
 
+def project_edge_keys(
+    driver,
+    edge_keys: set[str] | list[str],
+    resolution_dir: str | Path = DEFAULT_RESOLUTION_DIR,
+) -> dict:
+    """Recompute only canonical edges touched by one intake document.
+
+    The assertion truth is still read from the complete graph, so a new
+    assertion can invalidate an older candidate-set hash. Unrelated canonical
+    edges are not rewritten.
+    """
+
+    requested = set(edge_keys)
+    if not requested:
+        return {
+            "status": "projected",
+            "edges": 0,
+            "open_conflict_ids": [],
+            "stale_resolution_ids": [],
+        }
+    resolutions = load_resolutions(resolution_dir)
+    with driver.session() as session:
+        all_states = build_edge_states(fetch_assertions(session))
+        missing_assertions = sorted(requested - set(all_states))
+        if missing_assertions:
+            raise ResolutionValidationError(
+                f"affected edges have no assertions: {missing_assertions}"
+            )
+        states = {edge_key: all_states[edge_key] for edge_key in requested}
+        projection = build_projection(states, resolutions)
+        actual = {
+            record["edge_key"]
+            for record in session.run(
+                """
+                MATCH ()-[r]->()
+                WHERE r.edge_key IN $edge_keys
+                RETURN r.edge_key AS edge_key
+                """,
+                edge_keys=sorted(requested),
+            )
+        }
+        if actual != requested:
+            raise ResolutionValidationError(
+                "affected canonical relationship reconciliation failed; "
+                f"missing={sorted(requested - actual)}, unexpected={sorted(actual - requested)}"
+            )
+        conflicts = detect_conflicts(states)
+        conflict_by_pair = {
+            (conflict["edge_key"], conflict["attribute"]): conflict
+            for conflict in conflicts
+        }
+        open_conflict_ids = sorted(
+            conflict_by_pair[(edge_key, attribute)]["conflict_id"]
+            for edge_key, edge_projection in projection.items()
+            for attribute in edge_projection["open_conflict_attributes"]
+            if (edge_key, attribute) in conflict_by_pair
+        )
+        stale_resolution_ids = sorted(
+            metadata["resolution_id"]
+            for edge_projection in projection.values()
+            for metadata in edge_projection["attribute_resolution_meta"].values()
+            if metadata.get("status") == "stale" and metadata.get("resolution_id")
+        )
+        projected_at = datetime.now(timezone.utc).isoformat()
+
+        def apply_projection(transaction) -> None:
+            for edge_key, edge_projection in projection.items():
+                transaction.run(
+                    """
+                    MATCH ()-[r]->()
+                    WHERE r.edge_key = $edge_key
+                    SET r.attributes = $attributes_json,
+                        r.open_conflict_attributes = $open_conflict_attributes,
+                        r.attribute_resolution_meta_json = $meta_json,
+                        r.projected_at = $projected_at
+                    """,
+                    edge_key=edge_key,
+                    attributes_json=json.dumps(
+                        edge_projection["attributes"], ensure_ascii=False
+                    ),
+                    open_conflict_attributes=edge_projection[
+                        "open_conflict_attributes"
+                    ],
+                    meta_json=json.dumps(
+                        edge_projection["attribute_resolution_meta"],
+                        ensure_ascii=False,
+                    ),
+                    projected_at=projected_at,
+                )
+
+        session.execute_write(apply_projection)
+    return {
+        "status": "projected",
+        "edges": len(requested),
+        "open_conflict_ids": open_conflict_ids,
+        "stale_resolution_ids": stale_resolution_ids,
+    }
+
+
 def _current_conflicts(driver) -> dict[str, dict]:
     with driver.session() as session:
         states = build_edge_states(fetch_assertions(session))

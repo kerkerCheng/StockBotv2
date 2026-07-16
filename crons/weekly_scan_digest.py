@@ -14,9 +14,16 @@ import json
 import shutil
 import subprocess
 import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))
+
+from mcp_server.intake import pending_intake_files
 
 REPO = "kerkerCheng/StockBotv2"
 LABEL = "weekly-scan"
+LEDGER_PATHS = ["library/raw", "extractions", "library/intake"]
 
 
 def _gh() -> str | None:
@@ -60,15 +67,51 @@ def _backlog_count(gh: str) -> int:
         return 0
 
 
-def main() -> int:
-    gh = _gh()
-    if gh is None:
-        return 0  # gh 不在，安靜跳過
+def _unpushed_intake_commits(root: Path = ROOT) -> int:
+    """Count local-only commits that touch an intake ledger path."""
 
-    prs = _list("pr", gh)
-    issues = _list("issue", gh)
-    backlog = _backlog_count(gh)
-    if not prs and not issues and not backlog:
+    try:
+        result = subprocess.run(
+            [
+                "git",
+                "rev-list",
+                "origin/master..HEAD",
+                "--",
+                *LEDGER_PATHS,
+            ],
+            cwd=root,
+            capture_output=True,
+            text=True,
+            timeout=15,
+            shell=False,
+        )
+        if result.returncode != 0:
+            return 0
+        return len([line for line in result.stdout.splitlines() if line.strip()])
+    except Exception:
+        return 0
+
+
+def intake_pending_summary(root: Path = ROOT) -> dict:
+    pending = pending_intake_files(root=root)
+    untracked = pending.get("untracked") or []
+    modified = pending.get("modified") or []
+    commits = _unpushed_intake_commits(root)
+    return {
+        "untracked": untracked,
+        "modified": modified,
+        "unpushed_commits": commits,
+        "total": len(untracked) + len(modified) + commits,
+    }
+
+
+def main() -> int:
+    intake_summary = intake_pending_summary()
+    gh = _gh()
+    prs = _list("pr", gh) if gh else []
+    issues = _list("issue", gh) if gh else []
+    backlog = _backlog_count(gh) if gh else 0
+    if not prs and not issues and not backlog and not intake_summary["total"]:
         return 0  # 什麼都沒有，安靜過去
 
     parts = []
@@ -81,6 +124,11 @@ def main() -> int:
         )
     if backlog:
         parts.append(f"🔧 另有 {backlog} 個 backlog issue 開著（詳見 GitHub 或 plan 現況快照）")
+    if intake_summary["total"]:
+        parts.append(
+            f"🗂 {intake_summary['total']} 筆遠端入圖待補 commit/push"
+            "（開 session 後說「補提交入圖」即可處理）"
+        )
 
     print(json.dumps({"systemMessage": " ".join(parts)}, ensure_ascii=False))
     return 0
