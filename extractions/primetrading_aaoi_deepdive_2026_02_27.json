@@ -1,0 +1,132 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "primetrading_aaoi_deepdive_2026_02_27",
+    "title": "primetrading Substack: Equity Research Deep Dive — Applied Optoelectronics (AAOI), 800G inflection and AI infrastructure cycle",
+    "url": "https://primetrading.substack.com/p/equity-research-deep-dive-applied",
+    "origin_entity": "primetrading_substack",
+    "publisher": "primetrading (Substack)",
+    "published_at": "2026-02-27",
+    "retrieved_at": "2026-07-17",
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "Independent analyst newsletter (free post); only brief quotations for research are stored in library/raw and this extraction.",
+    "source_type": "industry_report",
+    "evidence_tier": 3
+  },
+  "sources": [
+    {
+      "id": "primetrading_aaoi_deepdive_2026_02_27_s1",
+      "locator": "Orders section",
+      "quote": "the company achieved its fourth major 800G volume order from a hyperscale customer during the quarter"
+    },
+    {
+      "id": "primetrading_aaoi_deepdive_2026_02_27_s2",
+      "locator": "Customers section",
+      "quote": "The data center customers are widely understood to be Microsoft and Amazon"
+    },
+    {
+      "id": "primetrading_aaoi_deepdive_2026_02_27_s3",
+      "locator": "Texas expansion section",
+      "quote": "broke ground on a new 210,000-square-foot manufacturing facility in Sugar Land, Texas"
+    },
+    {
+      "id": "primetrading_aaoi_deepdive_2026_02_27_s4",
+      "locator": "Manufacturing moat section",
+      "quote": "Molecular Beam Epitaxy (MBE) for semiconductor laser manufacturing"
+    },
+    {
+      "id": "primetrading_aaoi_deepdive_2026_02_27_s5",
+      "locator": "Onshoring section",
+      "quote": "less than 10% of the value in its 800G/1.6T modules currently originates from China"
+    },
+    {
+      "id": "primetrading_aaoi_deepdive_2026_02_27_s6",
+      "locator": "Supply/demand section",
+      "quote": "currently exceeds production capabilities"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:applied_optoelectronics",
+      "type": "Company",
+      "name": "Applied Optoelectronics",
+      "abstraction_level": "module_subsystem",
+      "role": "leader",
+      "aliases": [
+        "AAOI"
+      ],
+      "attributes": {},
+      "confidence": 0.55,
+      "source_ids": [
+        "primetrading_aaoi_deepdive_2026_02_27_s1",
+        "primetrading_aaoi_deepdive_2026_02_27_s4"
+      ]
+    },
+    {
+      "id": "tech:pluggable_transceiver",
+      "type": "TechNode",
+      "name": "Pluggable optical transceiver",
+      "abstraction_level": "module_subsystem",
+      "role": null,
+      "aliases": [
+        "pluggable optics"
+      ],
+      "attributes": {},
+      "confidence": 0.55,
+      "source_ids": [
+        "primetrading_aaoi_deepdive_2026_02_27_s1"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:applied_optoelectronics",
+      "dst_id": "tech:pluggable_transceiver",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.5,
+      "source_ids": [
+        "primetrading_aaoi_deepdive_2026_02_27_s1",
+        "primetrading_aaoi_deepdive_2026_02_27_s6"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "primetrading_aaoi_deepdive_2026_02_27_cl1",
+      "statement": "AAOI secured its fourth major 800G volume order from a hyperscale customer in the quarter, and demand for its 800G/1.6T products currently exceeds production capabilities through mid-2027 (analyst assessment).",
+      "subject_id": "e1",
+      "demand_proof_level": "guided",
+      "disproof_condition": "Order cancellations or quarterly results showing utilization below capacity / inventory build.",
+      "confidence": 0.55,
+      "source_ids": [
+        "primetrading_aaoi_deepdive_2026_02_27_s1",
+        "primetrading_aaoi_deepdive_2026_02_27_s6"
+      ]
+    },
+    {
+      "id": "primetrading_aaoi_deepdive_2026_02_27_cl2",
+      "statement": "AAOI's hyperscale data-center customers are widely understood to be Microsoft and Amazon (analyst inference, NOT company disclosure — do not create named-customer edges without customer-side or filing confirmation).",
+      "subject_id": "co:applied_optoelectronics",
+      "demand_proof_level": "speculative",
+      "disproof_condition": "Company filings or customer-side documents identify a different customer set.",
+      "confidence": 0.4,
+      "source_ids": [
+        "primetrading_aaoi_deepdive_2026_02_27_s2"
+      ]
+    },
+    {
+      "id": "primetrading_aaoi_deepdive_2026_02_27_cl3",
+      "statement": "AAOI's manufacturing moat rests on vertically integrated MBE-based laser production (vs competitors' MOCVD) and US onshoring: less than 10% of the value in its 800G/1.6T modules currently originates from China — low direct exposure to China InP export-control risk relative to peers.",
+      "subject_id": "co:applied_optoelectronics",
+      "demand_proof_level": "inferred",
+      "disproof_condition": "Supply-chain disclosures show materially higher China-origin value content, or MBE yields/economics prove uncompetitive vs MOCVD at volume.",
+      "confidence": 0.5,
+      "source_ids": [
+        "primetrading_aaoi_deepdive_2026_02_27_s4",
+        "primetrading_aaoi_deepdive_2026_02_27_s5"
+      ]
+    }
+  ]
+}

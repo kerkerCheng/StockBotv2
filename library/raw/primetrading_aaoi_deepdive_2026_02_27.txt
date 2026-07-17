@@ -1,0 +1,26 @@
+primetrading (Substack) — "Equity Research Deep Dive: Applied Optoelectronics, Inc. (AAOI) — Navigating the 800G Inflection Point and the Multi-Year AI Infrastructure Cycle"
+Author: Alex
+Published: 2026-02-27
+URL: https://primetrading.substack.com/p/equity-research-deep-dive-applied
+Retrieved: 2026-07-17
+Storage: repo_excerpt — brief quotations only. Not paywalled.
+
+== Key verbatim excerpts ==
+
+[Orders]
+"the company achieved its fourth major 800G volume order from a hyperscale customer during the quarter"
+
+[Customer identification (analyst inference, not company disclosure)]
+"The data center customers are widely understood to be Microsoft and Amazon"
+
+[Texas expansion / capacity]
+"broke ground on a new 210,000-square-foot manufacturing facility in Sugar Land, Texas" with plans to reach "more than 500,000 combined 800G and 1.6T units per month by the end of 2026"
+
+[Manufacturing moat]
+The company uses "Molecular Beam Epitaxy (MBE) for semiconductor laser manufacturing" as its primary technical differentiator, distinct from competitors using MOCVD processes.
+
+[Onshoring]
+"less than 10% of the value in its 800G/1.6T modules currently originates from China"
+
+[Supply/demand]
+Demand "currently exceeds production capabilities" through mid-2027.

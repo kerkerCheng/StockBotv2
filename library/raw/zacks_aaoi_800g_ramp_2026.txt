@@ -1,0 +1,15 @@
+Zacks Investment Research (via TradingView News) — "AAOI Bets on 800G Ramp, 1.6T Optics & Texas Scale to Power AI Growth"
+Published: 2026 (exact date not shown on syndication page; retrieved 2026-07-17)
+URL: https://www.tradingview.com/news/zacks:76899f7bb094b:0-aaoi-bets-on-800g-ramp-1-6t-optics-texas-scale-to-power-ai-growth/
+Storage: repo_excerpt — brief quotations only.
+
+== Key verbatim excerpts ==
+
+[800G/1.6T revenue mix]
+"800 gigabits per second transceivers to become the largest individual data center revenue line beginning in the second quarter of 2026, with 1.6 terabits per second contributing later in 2026"
+
+[Capacity target]
+"By year-end 2026, AAOI is targeting capability of more than 500,000 pieces per month across 800 gigabits per second and 1.6 terabits per second combined"
+
+[Texas expansion]
+A "new 210,000-square-foot manufacturing facility in Sugar Land" with plans to "more than triple Texas laser capacity by mid-2027"

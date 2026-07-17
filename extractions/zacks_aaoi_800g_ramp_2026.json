@@ -1,0 +1,105 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "zacks_aaoi_800g_ramp_2026",
+    "title": "Zacks: AAOI Bets on 800G Ramp, 1.6T Optics & Texas Scale to Power AI Growth",
+    "url": "https://www.tradingview.com/news/zacks:76899f7bb094b:0-aaoi-bets-on-800g-ramp-1-6t-optics-texas-scale-to-power-ai-growth/",
+    "origin_entity": "Zacks Investment Research",
+    "publisher": "Zacks via TradingView News",
+    "published_at": null,
+    "retrieved_at": "2026-07-17",
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "Copyrighted analyst commentary; only brief quotations for research are stored in library/raw and this extraction.",
+    "source_type": "industry_report",
+    "evidence_tier": 3
+  },
+  "sources": [
+    {
+      "id": "zacks_aaoi_800g_ramp_2026_s1",
+      "locator": "Revenue mix para",
+      "quote": "800 gigabits per second transceivers to become the largest individual data center revenue line beginning in the second quarter of 2026, with 1.6 terabits per second contributing later in 2026"
+    },
+    {
+      "id": "zacks_aaoi_800g_ramp_2026_s2",
+      "locator": "Capacity target para",
+      "quote": "By year-end 2026, AAOI is targeting capability of more than 500,000 pieces per month across 800 gigabits per second and 1.6 terabits per second combined"
+    },
+    {
+      "id": "zacks_aaoi_800g_ramp_2026_s3",
+      "locator": "Texas expansion para",
+      "quote": "new 210,000-square-foot manufacturing facility in Sugar Land ... more than triple Texas laser capacity by mid-2027"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:applied_optoelectronics",
+      "type": "Company",
+      "name": "Applied Optoelectronics",
+      "abstraction_level": "module_subsystem",
+      "role": "leader",
+      "aliases": [
+        "AAOI"
+      ],
+      "attributes": {},
+      "confidence": 0.55,
+      "source_ids": [
+        "zacks_aaoi_800g_ramp_2026_s1",
+        "zacks_aaoi_800g_ramp_2026_s3"
+      ]
+    },
+    {
+      "id": "tech:pluggable_transceiver",
+      "type": "TechNode",
+      "name": "Pluggable optical transceiver",
+      "abstraction_level": "module_subsystem",
+      "role": null,
+      "aliases": [
+        "pluggable optics"
+      ],
+      "attributes": {},
+      "confidence": 0.55,
+      "source_ids": [
+        "zacks_aaoi_800g_ramp_2026_s1"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:applied_optoelectronics",
+      "dst_id": "tech:pluggable_transceiver",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.5,
+      "source_ids": [
+        "zacks_aaoi_800g_ramp_2026_s1",
+        "zacks_aaoi_800g_ramp_2026_s2"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "zacks_aaoi_800g_ramp_2026_cl1",
+      "statement": "AAOI expects 800G transceivers to become its largest individual data-center revenue line from Q2 2026 (1.6T contributing later in 2026), targeting more than 500,000 combined 800G/1.6T pieces per month capability by year-end 2026.",
+      "subject_id": "co:applied_optoelectronics",
+      "demand_proof_level": "guided",
+      "disproof_condition": "Quarterly results show 800G failing to become the largest DC revenue line in 2026, or the 500k/month capability target is pushed out.",
+      "confidence": 0.55,
+      "source_ids": [
+        "zacks_aaoi_800g_ramp_2026_s1",
+        "zacks_aaoi_800g_ramp_2026_s2"
+      ]
+    },
+    {
+      "id": "zacks_aaoi_800g_ramp_2026_cl2",
+      "statement": "AAOI is building a new 210,000 sq ft manufacturing facility in Sugar Land and plans to more than triple Texas laser capacity by mid-2027 — US-based laser capacity expansion.",
+      "subject_id": "co:applied_optoelectronics",
+      "demand_proof_level": "guided",
+      "disproof_condition": "The Sugar Land facility or laser capacity expansion is delayed, scaled back, or cancelled.",
+      "confidence": 0.55,
+      "source_ids": [
+        "zacks_aaoi_800g_ramp_2026_s3"
+      ]
+    }
+  ]
+}
