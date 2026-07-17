@@ -145,15 +145,16 @@ def get_filings(cik: str, form_types: list[str], n: int) -> list[dict]:
 
 def fetch_filing_text(cik: str, accession: str, primary_doc: str) -> str | None:
     """下載 filing 主文件，strip HTML，回傳純文字。"""
-    base_url = f"{EDGAR_BASE}/Archives/edgar/full-index/{cik}/{accession}"
-    # Try primary doc first
+    # Archives 路徑在 www.sec.gov，CIK 不補零：/Archives/edgar/data/{cik}/{accession}/
+    cik_int = str(int(cik))
+    base_url = f"https://www.sec.gov/Archives/edgar/data/{cik_int}/{accession}"
     if primary_doc:
-        url = f"{EDGAR_BASE}/Archives/edgar/full-index/{cik}/{accession}/{primary_doc}"
+        url = f"{base_url}/{primary_doc}"
     else:
         url = f"{base_url}/{accession}.txt"
 
     headers = _build_headers()
-    headers["Host"] = "data.sec.gov"
+    headers["Host"] = "www.sec.gov"
     rate_sleep()
     try:
         resp = requests.get(url, headers=headers, timeout=30)
@@ -230,8 +231,8 @@ def fetch_ticker(
             "truncated": original_len > max_chars > 0,
             "original_chars": original_len,
             "url": (
-                f"https://www.sec.gov/Archives/edgar/full-index/"
-                f"{f['cik']}/{f['accession']}/{f['primary_doc']}"
+                f"https://www.sec.gov/Archives/edgar/data/"
+                f"{int(f['cik'])}/{f['accession']}/{f['primary_doc']}"
             ),
         }
         txt_path, meta_path = write_raw(doc_id, text, meta, out_dir)
