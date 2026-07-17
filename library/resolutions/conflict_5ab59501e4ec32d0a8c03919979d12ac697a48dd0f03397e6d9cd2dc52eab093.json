@@ -1,0 +1,17 @@
+{
+  "schema_version": "1",
+  "resolution_id": "resolution_5ab59501e4ec32d0a8c03919979d12ac697a48dd0f03397e6d9cd2dc52eab093_704e4ebda8d8",
+  "conflict_id": "conflict_5ab59501e4ec32d0a8c03919979d12ac697a48dd0f03397e6d9cd2dc52eab093",
+  "edge_key": "edge:9a77a192f8ddb9bc39c3a2b0a516630dd61d5eedfb266846dc43d38e9ba346bf",
+  "attribute": "qualification_status",
+  "candidate_set_hash": "704e4ebda8d8907325c0ced90cf36da0a12d5c8deb1c63ac2f72018de32c918e",
+  "action": "unknown",
+  "selected_value": null,
+  "supporting_assertion_ids": [],
+  "rejected_assertion_ids": [],
+  "supporting_source_ids": [],
+  "rationale": "這是 tech:cpo→tech:external_laser_source 的品類層依賴邊；兩個候選各描述不同供應商（Lumentum、Sivers）自家 ELS 計畫的狀態，不是對同一事實的衝突。qualification_status 在品類邊上沒有單一正確值——各家狀態已保存在各自公司邊。結論 unknown，不投影 canonical 值。",
+  "resolved_confidence": 0.0,
+  "approved_by": "Cheng",
+  "approved_at": "2026-07-18T07:14:08+08:00"
+}

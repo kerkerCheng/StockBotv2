@@ -1,0 +1,24 @@
+{
+  "schema_version": "1",
+  "resolution_id": "resolution_ea5b22273141dd51d295ef4587f9f0fefd17d9e19f27150d08a3f26927397048_4fa624386202",
+  "conflict_id": "conflict_ea5b22273141dd51d295ef4587f9f0fefd17d9e19f27150d08a3f26927397048",
+  "edge_key": "edge:dadc511c45ec86ecc0d6ae2cd470565652ab4e346fb01365ccf2e01b3a684c09",
+  "attribute": "ramp_execution",
+  "candidate_set_hash": "4fa624386202b1312dd3113832b0bbd1b831f8672c7377e25e00ea5ed58111a9",
+  "action": "choose_value",
+  "selected_value": 3,
+  "supporting_assertion_ids": [
+    "lumentum_q3fy26_cpo_e6"
+  ],
+  "rejected_assertion_ids": [
+    "lumentum_q2fy26_cpo_e11"
+  ],
+  "supporting_source_ids": [
+    "lumentum_q3fy26_cpo_s3",
+    "lumentum_q3fy26_cpo_s10"
+  ],
+  "rationale": "與同邊 qualification 的 scope 澄清一致：Q2 的 4 建立在把晶片 design-in 算進模組業務的混同上；模組實際仍在早期開發，取 Q3 的 3。",
+  "resolved_confidence": 0.6,
+  "approved_by": "Cheng",
+  "approved_at": "2026-07-18T07:14:08+08:00"
+}

@@ -1,0 +1,24 @@
+{
+  "schema_version": "1",
+  "resolution_id": "resolution_76dd421e889a8dd284dde2e45346fc4f1dd70393f95defabee2119a5caf1a098_994db8521ee9",
+  "conflict_id": "conflict_76dd421e889a8dd284dde2e45346fc4f1dd70393f95defabee2119a5caf1a098",
+  "edge_key": "edge:0e25fcc6381a52f5a51a303e8cc856dcc17ed07058d66d5e5251c44d8a8f224c",
+  "attribute": "qualification_status",
+  "candidate_set_hash": "994db8521ee9df906ddb7393a2b010b432b6464373147ad84f0e6eaa184e09de",
+  "action": "choose_value",
+  "selected_value": "qualified",
+  "supporting_assertion_ids": [
+    "coherent_q3fy26_cpo_e17"
+  ],
+  "rejected_assertion_ids": [
+    "coherent_q2fy26_cpo_e19"
+  ],
+  "supporting_source_ids": [
+    "coherent_q3fy26_cpo_s15",
+    "coherent_q3fy26_cpo_s20"
+  ],
+  "rationale": "同一 scope（OCS 平台）。Q2「strong progress」→ Q3 已在 ramp production capacity 且本季認列營收、市場機會上修至 $4B+；狀態隨時間前進，Q3 supersede Q2。",
+  "resolved_confidence": 0.8,
+  "approved_by": "Cheng",
+  "approved_at": "2026-07-18T07:14:08+08:00"
+}

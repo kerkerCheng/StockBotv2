@@ -1,0 +1,25 @@
+{
+  "schema_version": "1",
+  "resolution_id": "resolution_e61cbe08451d98282d0f66518261c1248571b5139ba98a30082cf9a67cad6bf7_db22fd08a2ee",
+  "conflict_id": "conflict_e61cbe08451d98282d0f66518261c1248571b5139ba98a30082cf9a67cad6bf7",
+  "edge_key": "edge:c0c8fe0e186b29ddbf744b9298e26524d6b76aa27445b637afc3b6592e81edcb",
+  "attribute": "qualification_status",
+  "candidate_set_hash": "db22fd08a2eeeaf1ef7c2d3d404518f7ee56aacbb236e852bd09b9b83ec2e0e0",
+  "action": "choose_value",
+  "selected_value": "qualifying",
+  "supporting_assertion_ids": [
+    "coherent_q2fy26_cpo_e20",
+    "coherent_q3fy26_cpo_e14"
+  ],
+  "rejected_assertion_ids": [
+    "coherent-corp-cohr-discusses-photonics-innovation-and-data-center-communications-at-ofc_march_17_e7"
+  ],
+  "supporting_source_ids": [
+    "coherent_q2fy26_cpo_s19",
+    "coherent_q3fy26_cpo_s17"
+  ],
+  "rationale": "同一 scope（VCSEL-based CPO/NPO）。OFC demo → Q2「engagements across multiple customers」、Q3 延續；兩份較新文件一致 qualifying。",
+  "resolved_confidence": 0.75,
+  "approved_by": "Cheng",
+  "approved_at": "2026-07-18T07:14:08+08:00"
+}

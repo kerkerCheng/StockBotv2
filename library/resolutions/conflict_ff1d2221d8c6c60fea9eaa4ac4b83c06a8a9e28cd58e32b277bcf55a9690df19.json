@@ -1,0 +1,23 @@
+{
+  "schema_version": "1",
+  "resolution_id": "resolution_ff1d2221d8c6c60fea9eaa4ac4b83c06a8a9e28cd58e32b277bcf55a9690df19_9d699cbad441",
+  "conflict_id": "conflict_ff1d2221d8c6c60fea9eaa4ac4b83c06a8a9e28cd58e32b277bcf55a9690df19",
+  "edge_key": "edge:5385a32986fad276d328c932330335c183fef0dd0fed052bbc9892ba6b0f426b",
+  "attribute": "qualification_status",
+  "candidate_set_hash": "9d699cbad441d71b696ff80bf71e8a4923ee44750292a6f712a2f0cf40a86816",
+  "action": "choose_value",
+  "selected_value": "designed_in",
+  "supporting_assertion_ids": [
+    "Broadcom_q2fy26_cpo_e17"
+  ],
+  "rejected_assertion_ids": [
+    "nextplatform_broadcom_cpo_2025_10_17_e1"
+  ],
+  "supporting_source_ids": [
+    "Broadcom_q2fy26_cpo_s10"
+  ],
+  "rationale": "時間推進：第三方 Next Platform（2025-10）記錄 Meta 部署 Broadcom CPO 現場驗證通過（qualified）；Broadcom Q2 FY26（2026-06）稱 Meta 的 AI compute 部署已受大型合約約束（designed_in）。兩 quote 產品面不完全相同（CPO switch vs AI compute 整體），但同屬此公司對公司邊，且第三方較舊文件與較新合約狀態是一致的階段推進而非矛盾；取 designed_in。若日後要分產品線追蹤，應開 split_scope refactor 而非在本邊二選一。",
+  "resolved_confidence": 0.7,
+  "approved_by": "Cheng",
+  "approved_at": "2026-07-18T07:14:08+08:00"
+}

@@ -1,0 +1,27 @@
+{
+  "schema_version": "1",
+  "resolution_id": "resolution_7b7c26bb2ed626eb22222fd3eb23be07d2ea7653354d53ea2a9ac10387b986a3_221af6fc7e54",
+  "conflict_id": "conflict_7b7c26bb2ed626eb22222fd3eb23be07d2ea7653354d53ea2a9ac10387b986a3",
+  "edge_key": "edge:e9616068cf0c8f3a092e25cb16c7c94c5f154ec9de7d8d3ccf397d0629866e4d",
+  "attribute": "qualification_status",
+  "candidate_set_hash": "221af6fc7e54b89b576d5fc9d55b934607b11641fbcd23ac8d95fd046a6c3ef6",
+  "action": "choose_value",
+  "selected_value": "designed_in",
+  "supporting_assertion_ids": [
+    "coherent_q3fy26_cpo_e10",
+    "nvda_coherent_partnership_pr_2026_03_02_e2"
+  ],
+  "rejected_assertion_ids": [
+    "coherent-corp-cohr-discusses-photonics-innovation-and-data-center-communications-at-ofc_march_17_e20"
+  ],
+  "supporting_source_ids": [
+    "coherent_q3fy26_cpo_s7",
+    "coherent_q3fy26_cpo_s8",
+    "nvda_coherent_partnership_pr_2026_03_02_s2",
+    "nvda_coherent_partnership_pr_2026_03_02_s4"
+  ],
+  "rationale": "同一 scope（Coherent→NVIDIA）。OFC（宣布兩週後）qualifying → 2026-03 客戶端 PR＋Q3 FY26 均為 designed_in：$2B 股權投資、多年供應協議至 2030、multibillion 採購承諾。有客戶端文件印證，是本批唯一非自報決勝的 qualification conflict。",
+  "resolved_confidence": 0.9,
+  "approved_by": "Cheng",
+  "approved_at": "2026-07-18T07:14:08+08:00"
+}

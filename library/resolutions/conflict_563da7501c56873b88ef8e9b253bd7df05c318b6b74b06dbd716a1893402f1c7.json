@@ -1,0 +1,26 @@
+{
+  "schema_version": "1",
+  "resolution_id": "resolution_563da7501c56873b88ef8e9b253bd7df05c318b6b74b06dbd716a1893402f1c7_cc7c2f4a9868",
+  "conflict_id": "conflict_563da7501c56873b88ef8e9b253bd7df05c318b6b74b06dbd716a1893402f1c7",
+  "edge_key": "edge:941281f4c983769cd91de8f081ea4a7cc23a3d74b41197b1ec836885b30a34e6",
+  "attribute": "ramp_execution",
+  "candidate_set_hash": "cc7c2f4a9868de498f63095db7393fe4ca5a5811ff4f59998b6ed8a51e95c464",
+  "action": "choose_value",
+  "selected_value": 4,
+  "supporting_assertion_ids": [
+    "coherent-corp-cohr-discusses-photonics-innovation-and-data-center-communications-at-ofc_march_17_e4",
+    "coherent_q3fy26_cpo_e4"
+  ],
+  "rejected_assertion_ids": [
+    "coherent_q2fy26_cpo_e8"
+  ],
+  "supporting_source_ids": [
+    "coherent-corp-cohr-discusses-photonics-innovation-and-data-center-communications-at-ofc_march_17_s10",
+    "coherent_q3fy26_cpo_s16",
+    "coherent_q3fy26_cpo_s18"
+  ],
+  "rationale": "同一 scope（ELS 模組 ramp）。OFC 4 → Q2 降 3（當時模組僅 planning）→ Q3 回 4（垂直整合零組件齊備、列入供應協議）。取最新且多數的 4。",
+  "resolved_confidence": 0.6,
+  "approved_by": "Cheng",
+  "approved_at": "2026-07-18T07:14:08+08:00"
+}

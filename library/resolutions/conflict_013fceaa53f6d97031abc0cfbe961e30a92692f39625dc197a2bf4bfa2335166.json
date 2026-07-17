@@ -1,0 +1,23 @@
+{
+  "schema_version": "1",
+  "resolution_id": "resolution_013fceaa53f6d97031abc0cfbe961e30a92692f39625dc197a2bf4bfa2335166_4dfac3baaa5d",
+  "conflict_id": "conflict_013fceaa53f6d97031abc0cfbe961e30a92692f39625dc197a2bf4bfa2335166",
+  "edge_key": "edge:9ef3c3cbb8580ce2e5758d9686938023856d2fd88d368784e6b5ff845698516c",
+  "attribute": "qualification_status",
+  "candidate_set_hash": "4dfac3baaa5d9064c3cee01aece663fc2f8daa12eb1084bf059606a02818f452",
+  "action": "choose_value",
+  "selected_value": "qualified",
+  "supporting_assertion_ids": [
+    "lumentum_q2fy26_cpo_e10"
+  ],
+  "rejected_assertion_ids": [
+    "lumentum_q3fy26_cpo_e17"
+  ],
+  "supporting_source_ids": [
+    "lumentum_q2fy26_cpo_s17"
+  ],
+  "rationale": "scope 需注意：Q2 quote 是外售 CW laser 首次出貨（qualified，已有實際 shipment）；Q3 quote 講的是自用 insourcing ramp（內部通路），並非外售資格退回。兩者不互斥，外售已出貨的事實成立，維持 qualified。",
+  "resolved_confidence": 0.7,
+  "approved_by": "Cheng",
+  "approved_at": "2026-07-18T07:14:08+08:00"
+}

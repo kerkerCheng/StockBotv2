@@ -1,0 +1,24 @@
+{
+  "schema_version": "1",
+  "resolution_id": "resolution_6c1f96fe3637acda75d993bcfabea2e4341b0d289b9f3c4d5e9b5ec3bb2e88f0_0f01fe744303",
+  "conflict_id": "conflict_6c1f96fe3637acda75d993bcfabea2e4341b0d289b9f3c4d5e9b5ec3bb2e88f0",
+  "edge_key": "edge:35435d7eb2d25dbd0aca26438976c547c37ad9bc401fbc3faf87265b5edac10f",
+  "attribute": "substitutability",
+  "candidate_set_hash": "0f01fe744303850335446b8d35a061616d46996df448440f18be56e687784d9b",
+  "action": "choose_value",
+  "selected_value": 4,
+  "supporting_assertion_ids": [
+    "lumentum_q3fy26_cpo_e7"
+  ],
+  "rejected_assertion_ids": [
+    "lumentum_q2fy26_cpo_e24"
+  ],
+  "supporting_source_ids": [
+    "lumentum_q3fy26_cpo_s14",
+    "lumentum_q3fy26_cpo_s16"
+  ],
+  "rationale": "同一 scope（Lumentum 供應 pump laser）。Q3 FY26 引述具體新事實：供需缺口 >30%、尤其集中在 EML 與 pump laser——短缺集中度是替代困難的市場面證據，非單純語氣升級；supersede Q2 的 3。仍為供應商自報，confidence 0.65。",
+  "resolved_confidence": 0.65,
+  "approved_by": "Cheng",
+  "approved_at": "2026-07-18T07:14:08+08:00"
+}

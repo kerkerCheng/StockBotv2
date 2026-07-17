@@ -1,0 +1,24 @@
+{
+  "schema_version": "1",
+  "resolution_id": "resolution_bda49a7e5446df28cf81d99a9631004ce91f312346e689625cedd4bbeefd44c2_77e8d21a2584",
+  "conflict_id": "conflict_bda49a7e5446df28cf81d99a9631004ce91f312346e689625cedd4bbeefd44c2",
+  "edge_key": "edge:15d7af33e42502ce404ed699c4f17c1e284456f025964460a1d7f71a960681e8",
+  "attribute": "qualification_status",
+  "candidate_set_hash": "77e8d21a25844c19c239d6e980ec6480f05f0abf9b773d3317499b6e28bafff7",
+  "action": "choose_value",
+  "selected_value": "qualifying",
+  "supporting_assertion_ids": [
+    "sivers_ar_2025_photonics_excerpt_e14"
+  ],
+  "rejected_assertion_ids": [
+    "aleabitoreddit_sivers_cpo_customer_map_e3"
+  ],
+  "supporting_source_ids": [
+    "sivers_ar_2025_photonics_excerpt_s7",
+    "sivers_ar_2025_photonics_excerpt_s15"
+  ],
+  "rationale": "此邊（WIN→Sivers）上 Sivers 年報是「客戶端」文件（tier 1）：明言與 WIN 的合作已為量產需求佈局（qualifying）。aleabitoreddit 是 tier 3 轉述，其自身 note 即承認 qualification 狀態未確立，其 none 不是反證而是資訊不足。依證據階序取 qualifying。",
+  "resolved_confidence": 0.7,
+  "approved_by": "Cheng",
+  "approved_at": "2026-07-18T07:14:08+08:00"
+}

@@ -1,0 +1,26 @@
+{
+  "schema_version": "1",
+  "resolution_id": "resolution_842b504cab693aecead41f2e0deb1395720790e7022f12eabd7a946be7a0d8ea_e2c5c8052f44",
+  "conflict_id": "conflict_842b504cab693aecead41f2e0deb1395720790e7022f12eabd7a946be7a0d8ea",
+  "edge_key": "edge:941281f4c983769cd91de8f081ea4a7cc23a3d74b41197b1ec836885b30a34e6",
+  "attribute": "qualification_status",
+  "candidate_set_hash": "e2c5c8052f44bf58643866ce9c14f7b274e1b1773c23b50a1334359de99b93b1",
+  "action": "choose_value",
+  "selected_value": "qualifying",
+  "supporting_assertion_ids": [
+    "coherent_q2fy26_cpo_e8",
+    "coherent_q3fy26_cpo_e4"
+  ],
+  "rejected_assertion_ids": [
+    "coherent-corp-cohr-discusses-photonics-innovation-and-data-center-communications-at-ofc_march_17_e4"
+  ],
+  "supporting_source_ids": [
+    "coherent_q2fy26_cpo_s12",
+    "coherent_q3fy26_cpo_s16",
+    "coherent_q3fy26_cpo_s18"
+  ],
+  "rationale": "同一 scope（ELS 模組）。OFC demo（sampling）→ Q2/Q3 兩季一致描述正在向客戶供應模組層級方案；兩份較新文件一致 qualifying。",
+  "resolved_confidence": 0.8,
+  "approved_by": "Cheng",
+  "approved_at": "2026-07-18T07:14:08+08:00"
+}

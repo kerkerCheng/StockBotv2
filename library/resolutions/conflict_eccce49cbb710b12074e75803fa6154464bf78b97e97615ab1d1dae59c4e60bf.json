@@ -1,0 +1,26 @@
+{
+  "schema_version": "1",
+  "resolution_id": "resolution_eccce49cbb710b12074e75803fa6154464bf78b97e97615ab1d1dae59c4e60bf_66cef5c04111",
+  "conflict_id": "conflict_eccce49cbb710b12074e75803fa6154464bf78b97e97615ab1d1dae59c4e60bf",
+  "edge_key": "edge:2822777d40793a7998084482f37bb2c336577a114f7fd9afb02e33b20493bb89",
+  "attribute": "qualification_status",
+  "candidate_set_hash": "66cef5c04111c8bb1320daafe9c34c31cd03f70fd601e0ca87963b1997f998ab",
+  "action": "choose_value",
+  "selected_value": "designed_in",
+  "supporting_assertion_ids": [
+    "coherent_q2fy26_cpo_e5",
+    "coherent_q3fy26_cpo_e3"
+  ],
+  "rejected_assertion_ids": [
+    "coherent-corp-cohr-discusses-photonics-innovation-and-data-center-communications-at-ofc_march_17_e5"
+  ],
+  "supporting_source_ids": [
+    "coherent_q2fy26_cpo_s1",
+    "coherent_q2fy26_cpo_s2",
+    "coherent_q3fy26_cpo_s8"
+  ],
+  "rationale": "同一 scope（高功率 CW laser）。OFC（2025-03）sampling → Q2/Q3 FY26 大額 PO＋NVIDIA 供應協議涵蓋該產品；兩份較新文件一致 designed_in，清楚 supersede。",
+  "resolved_confidence": 0.85,
+  "approved_by": "Cheng",
+  "approved_at": "2026-07-18T07:14:08+08:00"
+}

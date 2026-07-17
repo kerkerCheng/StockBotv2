@@ -1,0 +1,23 @@
+{
+  "schema_version": "1",
+  "resolution_id": "resolution_7398a995b6f01c1768ae878643f79457b0f7e38bebae438b08667cde20ed318d_e0376fdc4896",
+  "conflict_id": "conflict_7398a995b6f01c1768ae878643f79457b0f7e38bebae438b08667cde20ed318d",
+  "edge_key": "edge:f4330d3756583479cb35e218a09f31c7529e641410c02b3cdd5200bf33c9bb02",
+  "attribute": "substitutability",
+  "candidate_set_hash": "e0376fdc4896f7ec442507dbb004c9926f6efc73b6b72800f5e62d7d651ed840",
+  "action": "choose_value",
+  "selected_value": 3,
+  "supporting_assertion_ids": [
+    "lumentum_q2fy26_cpo_e25"
+  ],
+  "rejected_assertion_ids": [
+    "lumentum_q3fy26_cpo_e8"
+  ],
+  "supporting_source_ids": [
+    "lumentum_q2fy26_cpo_s19"
+  ],
+  "rationale": "同一 scope（narrow linewidth laser）。Q3 的 4 其 quote 只有出貨 +120% YoY——成長證明需求，不證明替代性升級；逐字證據不支撐較高等級，維持 Q2 的 3。日後有 shortage／qualification 佐證再重開。",
+  "resolved_confidence": 0.5,
+  "approved_by": "Cheng",
+  "approved_at": "2026-07-18T07:14:08+08:00"
+}

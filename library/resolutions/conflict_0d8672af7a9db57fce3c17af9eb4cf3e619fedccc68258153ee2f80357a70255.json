@@ -1,0 +1,25 @@
+{
+  "schema_version": "1",
+  "resolution_id": "resolution_0d8672af7a9db57fce3c17af9eb4cf3e619fedccc68258153ee2f80357a70255_a3d7b845e644",
+  "conflict_id": "conflict_0d8672af7a9db57fce3c17af9eb4cf3e619fedccc68258153ee2f80357a70255",
+  "edge_key": "edge:bc3b0f94fd9858f50c3a6be89622062bd26a7500fc5ed5d309d379df976b97d6",
+  "attribute": "qualification_status",
+  "candidate_set_hash": "a3d7b845e644514e7c2efb776af16a1fe9f4257bf842718c435de98271282c29",
+  "action": "choose_value",
+  "selected_value": "designed_in",
+  "supporting_assertion_ids": [
+    "lumentum_q2fy26_cpo_e9"
+  ],
+  "rejected_assertion_ids": [
+    "lumentum_q3fy26_cpo_e5"
+  ],
+  "supporting_source_ids": [
+    "lumentum_q2fy26_cpo_s14",
+    "lumentum_q2fy26_cpo_s15",
+    "lumentum_q2fy26_cpo_s27"
+  ],
+  "rationale": "同一 scope（UHP laser for CPO）。Q2 已取得 multi-$100M PO（designed_in）；Q3 自己的 quote 明講正按計畫履行該 PO——較新文件的 qualifying 分級與其逐字內容矛盾，design win 未被撤銷，維持 designed_in。",
+  "resolved_confidence": 0.8,
+  "approved_by": "Cheng",
+  "approved_at": "2026-07-18T07:14:08+08:00"
+}

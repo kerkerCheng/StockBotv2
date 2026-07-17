@@ -1,0 +1,24 @@
+{
+  "schema_version": "1",
+  "resolution_id": "resolution_eba48e711b0a98d4fd4514543b41e9cc75b1562e65b1fcda6e7683b741375c05_f83b9809f73f",
+  "conflict_id": "conflict_eba48e711b0a98d4fd4514543b41e9cc75b1562e65b1fcda6e7683b741375c05",
+  "edge_key": "edge:dadc511c45ec86ecc0d6ae2cd470565652ab4e346fb01365ccf2e01b3a684c09",
+  "attribute": "qualification_status",
+  "candidate_set_hash": "f83b9809f73f11c9fea0f67da5a8a48f40c314bfb01d4f878ca16f42b3faf101",
+  "action": "choose_value",
+  "selected_value": "sampling",
+  "supporting_assertion_ids": [
+    "lumentum_q3fy26_cpo_e6"
+  ],
+  "rejected_assertion_ids": [
+    "lumentum_q2fy26_cpo_e11"
+  ],
+  "supporting_source_ids": [
+    "lumentum_q3fy26_cpo_s3",
+    "lumentum_q3fy26_cpo_s10"
+  ],
+  "rationale": "scope 澄清型：Q2 的 designed_in quote 把 UHP 雷射晶片的 design-in 與 ELS 模組混在一句（design win 屬晶片，非模組）；Q3 更具體：ELS 模組仍是 development work／接觸新客戶的敲門磚。ELS 模組本身取 sampling；UHP 晶片的 designed_in 已在另一條邊保存，無資訊遺失。",
+  "resolved_confidence": 0.6,
+  "approved_by": "Cheng",
+  "approved_at": "2026-07-18T07:14:08+08:00"
+}

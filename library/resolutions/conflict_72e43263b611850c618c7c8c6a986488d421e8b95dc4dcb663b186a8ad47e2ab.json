@@ -1,0 +1,24 @@
+{
+  "schema_version": "1",
+  "resolution_id": "resolution_72e43263b611850c618c7c8c6a986488d421e8b95dc4dcb663b186a8ad47e2ab_9dde539c5d47",
+  "conflict_id": "conflict_72e43263b611850c618c7c8c6a986488d421e8b95dc4dcb663b186a8ad47e2ab",
+  "edge_key": "edge:7d1d821abdaf80b442660936f8d01ff04daa99eab8f8c00101224856dfe032ea",
+  "attribute": "qualification_status",
+  "candidate_set_hash": "9dde539c5d47b374b7683026b7f74d026643d5dbe757e19603ecdee9059d58d7",
+  "action": "choose_value",
+  "selected_value": "qualifying",
+  "supporting_assertion_ids": [
+    "coherent_q3fy26_cpo_e8"
+  ],
+  "rejected_assertion_ids": [
+    "coherent-corp-cohr-discusses-photonics-innovation-and-data-center-communications-at-ofc_march_17_e11"
+  ],
+  "supporting_source_ids": [
+    "coherent_q3fy26_cpo_s16",
+    "coherent_q3fy26_cpo_s19"
+  ],
+  "rationale": "同一 scope（fiber attach unit）。OFC（2025-03）demo 階段 sampling → Q3 FY26 描述可整組供應且列入 NVIDIA 協議產品範圍，狀態前進為 qualifying。",
+  "resolved_confidence": 0.7,
+  "approved_by": "Cheng",
+  "approved_at": "2026-07-18T07:14:08+08:00"
+}

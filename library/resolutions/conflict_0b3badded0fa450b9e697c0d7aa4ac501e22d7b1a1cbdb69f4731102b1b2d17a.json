@@ -1,0 +1,27 @@
+{
+  "schema_version": "1",
+  "resolution_id": "resolution_0b3badded0fa450b9e697c0d7aa4ac501e22d7b1a1cbdb69f4731102b1b2d17a_4d1cea61ab14",
+  "conflict_id": "conflict_0b3badded0fa450b9e697c0d7aa4ac501e22d7b1a1cbdb69f4731102b1b2d17a",
+  "edge_key": "edge:2822777d40793a7998084482f37bb2c336577a114f7fd9afb02e33b20493bb89",
+  "attribute": "substitutability",
+  "candidate_set_hash": "4d1cea61ab142b84f1b0263a6637f47797a1e5dc33d13aa3fc3548fd2817fc51",
+  "action": "choose_value",
+  "selected_value": 4,
+  "supporting_assertion_ids": [
+    "coherent-corp-cohr-discusses-photonics-innovation-and-data-center-communications-at-ofc_march_17_e5",
+    "coherent_q3fy26_cpo_e3"
+  ],
+  "rejected_assertion_ids": [
+    "coherent_q2fy26_cpo_e5"
+  ],
+  "supporting_source_ids": [
+    "coherent-corp-cohr-discusses-photonics-innovation-and-data-center-communications-at-ofc_march_17_s10",
+    "coherent-corp-cohr-discusses-photonics-innovation-and-data-center-communications-at-ofc_march_17_s13",
+    "coherent_q3fy26_cpo_s8",
+    "coherent_q3fy26_cpo_s16"
+  ],
+  "rationale": "同一 scope（Coherent 供應 CW DFB laser）。三份自報文件評 4/5/4；最新 Q3 FY26 回到 4，與 OFC 一致。Q2 的 5 出現在大額 PO 公布當季，quote 內容（六吋 InP 產線、量產中）並未支撐「無可替代」等級。取最新且多數的 4。",
+  "resolved_confidence": 0.6,
+  "approved_by": "Cheng",
+  "approved_at": "2026-07-18T07:14:08+08:00"
+}

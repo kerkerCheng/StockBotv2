@@ -1,0 +1,24 @@
+{
+  "schema_version": "1",
+  "resolution_id": "resolution_38e34951eac75ef8b14c023af7ec6303ef69c8e5c2d864955cc33a853043b275_7fc6fff627fc",
+  "conflict_id": "conflict_38e34951eac75ef8b14c023af7ec6303ef69c8e5c2d864955cc33a853043b275",
+  "edge_key": "edge:e9616068cf0c8f3a092e25cb16c7c94c5f154ec9de7d8d3ccf397d0629866e4d",
+  "attribute": "substitutability",
+  "candidate_set_hash": "7fc6fff627fc8ec5acd05b59bbac96124752615c639e0aba81c9da0d09599d67",
+  "action": "choose_value",
+  "selected_value": 5,
+  "supporting_assertion_ids": [
+    "coherent_q3fy26_cpo_e10"
+  ],
+  "rejected_assertion_ids": [
+    "coherent-corp-cohr-discusses-photonics-innovation-and-data-center-communications-at-ofc_march_17_e20"
+  ],
+  "supporting_source_ids": [
+    "coherent_q3fy26_cpo_s7",
+    "coherent_q3fy26_cpo_s8"
+  ],
+  "rationale": "同一 scope（Coherent 對 NVIDIA 的 CPO 供應關係）。OFC 評 4 出自 2025-03 合作宣布兩週後；Q3 FY26（2026-05）在 NVIDIA $2B 股權投資＋供應協議延伸至 2030 之後評 5。NVIDIA 客戶端 PR（nvda_coherent_partnership_pr_2026_03_02，同邊另一 assertion）證實 multibillion 採購承諾與 capacity rights——客戶以股權鎖產能是「難以替代」的行為證據，但該 assertion 未帶 substitutability 值，故本值仍全為供應商自報，resolved_confidence 壓在 0.6，Lane Memo 層的單源自報 weak 標記照常適用。",
+  "resolved_confidence": 0.6,
+  "approved_by": "Cheng",
+  "approved_at": "2026-07-18T07:14:08+08:00"
+}

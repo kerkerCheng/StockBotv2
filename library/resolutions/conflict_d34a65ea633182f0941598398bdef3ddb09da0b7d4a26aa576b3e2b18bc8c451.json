@@ -1,0 +1,25 @@
+{
+  "schema_version": "1",
+  "resolution_id": "resolution_d34a65ea633182f0941598398bdef3ddb09da0b7d4a26aa576b3e2b18bc8c451_8762d595b8ff",
+  "conflict_id": "conflict_d34a65ea633182f0941598398bdef3ddb09da0b7d4a26aa576b3e2b18bc8c451",
+  "edge_key": "edge:25e880d8745d4f5383e3a0724d6b93144f9df9079bdd04af79b4f8093bfa45a7",
+  "attribute": "qualification_status",
+  "candidate_set_hash": "8762d595b8ff750c6080ca62bb0a32324f074906fe27df52a399d3c1482eb34d",
+  "action": "choose_value",
+  "selected_value": "designed_in",
+  "supporting_assertion_ids": [
+    "coherent_q2fy26_cpo_e4"
+  ],
+  "rejected_assertion_ids": [
+    "coherent_q3fy26_cpo_e22"
+  ],
+  "supporting_source_ids": [
+    "coherent_q2fy26_cpo_s1",
+    "coherent_q2fy26_cpo_s2",
+    "coherent_q2fy26_cpo_s11"
+  ],
+  "rationale": "同一 scope（Coherent 的 CPO 方案）。Q2 已取得「exceptionally large purchase order」＝design win；Q3 的 qualifying 是泛稱進度語言且同一文件明講 H2 CY2026 開始 ramp、與 NVIDIA 簽多年協議——design win 未被撤銷，較新文件的較低分級不構成退回。狀態不可逆時取已確立的最高階段。",
+  "resolved_confidence": 0.75,
+  "approved_by": "Cheng",
+  "approved_at": "2026-07-18T07:14:08+08:00"
+}
