@@ -65,7 +65,7 @@ fetchers/edgar.py ──────↑                        engine_c/etl_yfin
 | 知識累積 | 更多公司 onboarding、更多高品質文件 | 圖的大小決定回答的深度 |
 | Skill 介面 | SKILL.md 檔（已有 7 個）| 讓 Claude Code / Codex 每次都能正確使用記憶 |
 | 高槓桿 fetcher | EDGAR 季報自動更新、arXiv 論文抓取 | 減少人工取文件摩擦 |
-| G5 L8 偏誤檢查 | `validate.py` 加 origin_entity 同質性警告 | 低工程量、高資料品質槓桿 |
+| G5 L8 偏誤檢查 | `validate.py` 加 origin_entity 同質性警告（2026-07-17 已實作：供應商自報 sole_source 在文件層 WARN） | 低工程量、高資料品質槓桿 |
 
 ### 不值得自己開發（Claude 做得更好或沒意義）
 
@@ -98,8 +98,8 @@ fetchers/edgar.py ──────↑                        engine_c/etl_yfin
 
 ## 開發優先序（接下來三件事）
 
-1. **Mobile Research Action 完整 rollout**
-   — 本機實作／測試完成後，重啟 MCP、刷新 connector tool snapshot、把 `apply_research_action` 設 Needs approval，從手機跑一個 disposable prepare → 明確核准 → apply → 另一個本機 session 查狀態／補 publish 的真實 smoke。手機知識累積是目前最高優先，Lane Memo／投資建議不得阻塞。
+1. **M1: CPO Depth Sprint**（mobile rollout smoke 已於 2026-07-17 走完 prepare→核准→apply→跨 session status→本機 publish 全鏈，遞補此項）
+   — onboard **AXT**（`TICKER_MAP` 補 `co:axt: "AXTI"`；AXT×Coherent InP 供應協議是 Coherent 依賴鏈唯一非自報來源候選）；Coherent／Lumentum／客戶端公司各達 ≥3 個 distinct `origin_entity`；active thesis 引用的邊不得留未處置的 `sole_source`／`substitutability` conflict。TSEM intake（ra_2bf1494b）遺留 backlog：2027–29 光通訊集體擴產 oversupply watch、MACOM/Semtech 作為 Tower TIA 客戶（tier 3，待客戶端揭露印證）、GF 對 Tower 專利訴訟未追源。
 
 2. **Lane Memo／投資建議接縫 + L9 前置條件**
    — 順手修 shared contract，但正式開放 actionable advice 前仍須跑第二條非 AI／非 CPO 垂直切片、thesis→部位最小規則與 Engine C 五項一鍵核驗。
