@@ -1,0 +1,21 @@
+Calcalist / Ctech — "Tower Semiconductor surges to $15 billion valuation, tripling Intel's abandoned bid"
+Published: 2026-01-29 (11:46, 29.01.26)
+URL: https://www.calcalistech.com/ctechnews/article/hkphis00l11g
+Retrieved: 2026-07-17
+Storage: repo_excerpt — brief quotations only. Original reporting incl. CEO interview (Russell Ellwanger).
+
+== Key verbatim excerpts ==
+
+[Photonics capacity investment]
+"$300 million expansion of its silicon photonics production lines, on top of a $350 million investment disclosed earlier this year."
+
+[Manufacturing hub]
+"Migdal HaEmek, Tower's main manufacturing site in northern Israel, which is set to become the company's largest photonics hub."
+
+[Revenue projection]
+Once expansion completes in H1 2026, the company "expects to triple revenue from photonics-related activity, approaching $1 billion annually from AI-linked products alone."
+
+[Data-center revenue share]
+By year-end 2026, CEO Ellwanger estimates "40% to 45% of Tower's revenue will come from data-center applications."
+
+(Article does not name specific customers.)

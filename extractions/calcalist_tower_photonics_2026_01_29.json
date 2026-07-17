@@ -1,0 +1,137 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "calcalist_tower_photonics_2026_01_29",
+    "title": "Calcalist: Tower Semiconductor surges to $15 billion valuation — silicon photonics expansion and AI revenue mix",
+    "url": "https://www.calcalistech.com/ctechnews/article/hkphis00l11g",
+    "origin_entity": "Calcalist",
+    "publisher": "Calcalist / Ctech",
+    "published_at": "2026-01-29",
+    "retrieved_at": "2026-07-17",
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "Copyrighted news article; only brief quotations for research are stored in library/raw and this extraction.",
+    "source_type": "news",
+    "evidence_tier": 3
+  },
+  "sources": [
+    {
+      "id": "calcalist_tower_photonics_2026_01_29_s1",
+      "locator": "Photonics investment para",
+      "quote": "$300 million expansion of its silicon photonics production lines, on top of a $350 million investment disclosed earlier this year."
+    },
+    {
+      "id": "calcalist_tower_photonics_2026_01_29_s2",
+      "locator": "Manufacturing hub para",
+      "quote": "Migdal HaEmek, Tower's main manufacturing site in northern Israel, which is set to become the company's largest photonics hub."
+    },
+    {
+      "id": "calcalist_tower_photonics_2026_01_29_s3",
+      "locator": "Revenue projection para",
+      "quote": "expects to triple revenue from photonics-related activity, approaching $1 billion annually from AI-linked products alone."
+    },
+    {
+      "id": "calcalist_tower_photonics_2026_01_29_s4",
+      "locator": "Data-center revenue share para",
+      "quote": "40% to 45% of Tower's revenue will come from data-center applications."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:tower_semiconductor",
+      "type": "Company",
+      "name": "Tower Semiconductor",
+      "abstraction_level": "foundry_packaging",
+      "role": "foundry",
+      "aliases": [
+        "TSEM",
+        "Tower"
+      ],
+      "attributes": {},
+      "confidence": 0.55,
+      "source_ids": [
+        "calcalist_tower_photonics_2026_01_29_s1",
+        "calcalist_tower_photonics_2026_01_29_s2"
+      ]
+    },
+    {
+      "id": "tech:silicon_photonics_pic",
+      "type": "TechNode",
+      "name": "Silicon photonics PIC platform",
+      "abstraction_level": "device_chip",
+      "role": null,
+      "aliases": [
+        "SiPho PIC"
+      ],
+      "attributes": {},
+      "confidence": 0.55,
+      "source_ids": [
+        "calcalist_tower_photonics_2026_01_29_s1"
+      ]
+    },
+    {
+      "id": "tech:ai_compute_buildout",
+      "type": "TechNode",
+      "name": "AI compute buildout",
+      "abstraction_level": "end_demand",
+      "role": null,
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.55,
+      "source_ids": [
+        "calcalist_tower_photonics_2026_01_29_s3"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:tower_semiconductor",
+      "dst_id": "tech:silicon_photonics_pic",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.5,
+      "source_ids": [
+        "calcalist_tower_photonics_2026_01_29_s1",
+        "calcalist_tower_photonics_2026_01_29_s3"
+      ]
+    },
+    {
+      "id": "e2",
+      "src_id": "tech:ai_compute_buildout",
+      "dst_id": "tech:silicon_photonics_pic",
+      "relation": "enables",
+      "attributes": {},
+      "confidence": 0.5,
+      "source_ids": [
+        "calcalist_tower_photonics_2026_01_29_s3",
+        "calcalist_tower_photonics_2026_01_29_s4"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "calcalist_tower_photonics_2026_01_29_cl1",
+      "statement": "Tower is investing $300M on top of an earlier $350M to expand silicon photonics production lines, with Migdal HaEmek becoming its largest photonics hub; after the H1 2026 expansion it expects to triple photonics-related revenue, approaching $1B annually from AI-linked products alone (independent Calcalist reporting with CEO interview).",
+      "subject_id": "co:tower_semiconductor",
+      "demand_proof_level": "guided",
+      "disproof_condition": "The expansion is delayed or scaled back, or photonics revenue fails to approach the ~$1B annual run-rate after the expansion completes.",
+      "confidence": 0.55,
+      "source_ids": [
+        "calcalist_tower_photonics_2026_01_29_s1",
+        "calcalist_tower_photonics_2026_01_29_s2",
+        "calcalist_tower_photonics_2026_01_29_s3"
+      ]
+    },
+    {
+      "id": "calcalist_tower_photonics_2026_01_29_cl2",
+      "statement": "Tower CEO estimates 40-45% of company revenue will come from data-center applications by end of 2026 — the foundry's revenue mix is pivoting to AI/data-center optics.",
+      "subject_id": "co:tower_semiconductor",
+      "demand_proof_level": "guided",
+      "disproof_condition": "Reported segment mix at end-2026 shows data-center applications materially below 40% of revenue.",
+      "confidence": 0.55,
+      "source_ids": [
+        "calcalist_tower_photonics_2026_01_29_s4"
+      ]
+    }
+  ]
+}
