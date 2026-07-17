@@ -1,0 +1,126 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "nvda_coherent_partnership_pr_2026_03_02",
+    "title": "NVIDIA PR: NVIDIA and Coherent Announce Strategic Partnership to Develop Optics Technology to Scale Next-Generation Data Center Architecture",
+    "url": "https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-and-Coherent-Announce-Strategic-Partnership-to-Develop-Optics-Technology-to-Scale-Next-Generation-Data-Center-Architecture/default.aspx",
+    "origin_entity": "NVIDIA",
+    "publisher": "NVIDIA Investor Relations",
+    "published_at": "2026-03-02",
+    "retrieved_at": "2026-07-17",
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "Corporate press release intended for public distribution; brief quotations stored in library/raw and this extraction.",
+    "source_type": "news",
+    "evidence_tier": 2
+  },
+  "sources": [
+    {
+      "id": "nvda_coherent_partnership_pr_2026_03_02_s1",
+      "locator": "PR body, investment para",
+      "quote": "NVIDIA is investing $2 billion in Coherent to support research and development, future capacity and operations as Coherent builds out its U.S.-based manufacturing capabilities."
+    },
+    {
+      "id": "nvda_coherent_partnership_pr_2026_03_02_s2",
+      "locator": "PR body, agreement para",
+      "quote": "includes an NVIDIA multibillion-dollar purchase commitment and future access and capacity rights for advanced laser and optical networking products."
+    },
+    {
+      "id": "nvda_coherent_partnership_pr_2026_03_02_s3",
+      "locator": "Jensen Huang quote",
+      "quote": "With Coherent, NVIDIA is pioneering next-generation silicon photonics to enable AI infrastructure at unprecedented scale, speed and energy efficiency."
+    },
+    {
+      "id": "nvda_coherent_partnership_pr_2026_03_02_s4",
+      "locator": "Jim Anderson quote",
+      "quote": "This strategic relationship underscores Coherent's role as a key enabler of next-generation AI data center infrastructure. We are proud to expand our 20-year relationship with NVIDIA by increasing their access to include multiple product families"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:nvidia",
+      "type": "Company",
+      "name": "NVIDIA",
+      "abstraction_level": "module_subsystem",
+      "role": "leader",
+      "aliases": [
+        "NVDA"
+      ],
+      "attributes": {},
+      "confidence": 0.75,
+      "source_ids": [
+        "nvda_coherent_partnership_pr_2026_03_02_s1",
+        "nvda_coherent_partnership_pr_2026_03_02_s3"
+      ]
+    },
+    {
+      "id": "co:coherent",
+      "type": "Company",
+      "name": "Coherent",
+      "abstraction_level": "device_chip",
+      "role": "bottleneck_supplier",
+      "aliases": [
+        "Coherent Corp",
+        "COHR"
+      ],
+      "attributes": {},
+      "confidence": 0.75,
+      "source_ids": [
+        "nvda_coherent_partnership_pr_2026_03_02_s1",
+        "nvda_coherent_partnership_pr_2026_03_02_s4"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:nvidia",
+      "dst_id": "co:coherent",
+      "relation": "invests_in",
+      "attributes": {},
+      "confidence": 0.65,
+      "source_ids": [
+        "nvda_coherent_partnership_pr_2026_03_02_s1"
+      ]
+    },
+    {
+      "id": "e2",
+      "src_id": "co:coherent",
+      "dst_id": "co:nvidia",
+      "relation": "supplies_to",
+      "attributes": {
+        "qualification_status": "designed_in"
+      },
+      "confidence": 0.65,
+      "source_ids": [
+        "nvda_coherent_partnership_pr_2026_03_02_s2",
+        "nvda_coherent_partnership_pr_2026_03_02_s4"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "nvda_coherent_partnership_pr_2026_03_02_cl1",
+      "statement": "Customer-side confirmation: NVIDIA is investing $2B in Coherent and signed a multibillion-dollar purchase commitment with future access and capacity rights for advanced laser and optical networking products, tied to Coherent's U.S.-based manufacturing buildout.",
+      "subject_id": "e2",
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "The agreement is terminated or materially reduced, or NVIDIA discloses shifting the committed volumes to another optics supplier.",
+      "confidence": 0.75,
+      "source_ids": [
+        "nvda_coherent_partnership_pr_2026_03_02_s1",
+        "nvda_coherent_partnership_pr_2026_03_02_s2"
+      ]
+    },
+    {
+      "id": "nvda_coherent_partnership_pr_2026_03_02_cl2",
+      "statement": "Coherent CEO frames the deal as expanding a 20-year NVIDIA relationship to multiple product families, positioning Coherent as a key enabler of next-generation AI data center infrastructure (silicon photonics / optics).",
+      "subject_id": "co:coherent",
+      "demand_proof_level": "guided",
+      "disproof_condition": "Product-family scope is narrowed in later disclosures, or NVIDIA qualifies competing suppliers for the same families at comparable volume.",
+      "confidence": 0.65,
+      "source_ids": [
+        "nvda_coherent_partnership_pr_2026_03_02_s3",
+        "nvda_coherent_partnership_pr_2026_03_02_s4"
+      ]
+    }
+  ]
+}

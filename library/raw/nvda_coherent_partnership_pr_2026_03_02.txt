@@ -1,0 +1,20 @@
+NVIDIA Investor Relations press release
+"NVIDIA and Coherent Announce Strategic Partnership to Develop Optics Technology to Scale Next-Generation Data Center Architecture"
+Published: 2026-03-02
+URL: https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-and-Coherent-Announce-Strategic-Partnership-to-Develop-Optics-Technology-to-Scale-Next-Generation-Data-Center-Architecture/default.aspx
+Retrieved: 2026-07-17
+Storage: repo_excerpt — key quotations only.
+
+== Key verbatim excerpts ==
+
+[Investment]
+"NVIDIA is investing $2 billion in Coherent to support research and development, future capacity and operations as Coherent builds out its U.S.-based manufacturing capabilities."
+
+[Purchase commitment and capacity rights]
+The agreement "includes an NVIDIA multibillion-dollar purchase commitment and future access and capacity rights for advanced laser and optical networking products."
+
+[Jensen Huang, NVIDIA CEO]
+"With Coherent, NVIDIA is pioneering next-generation silicon photonics to enable AI infrastructure at unprecedented scale, speed and energy efficiency."
+
+[Jim Anderson, Coherent CEO]
+"This strategic relationship underscores Coherent's role as a key enabler of next-generation AI data center infrastructure. We are proud to expand our 20-year relationship with NVIDIA by increasing their access to include multiple product families to help them build the AI data centers of the future."
