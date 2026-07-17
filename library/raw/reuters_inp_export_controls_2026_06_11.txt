@@ -1,0 +1,26 @@
+Reuters — "China's control over indium phosphide exports threatens AI data centre rollout"
+Byline: Laurie Chen, Liam Mo, Michael Martina, Wen-Yee Lee, Amy Lv, Xiuyuan Ning and Kentaro Okasaka
+Dateline: 2026-06-11
+Retrieved via syndication: https://www.mining.com/web/chinas-control-over-indium-phosphide-exports-threatens-ai-data-centre-rollout/
+(reuters.com blocks crawler; text verified against Mining.com syndicated copy on 2026-07-17)
+Storage: repo_excerpt — brief quotations only; full article remains with Reuters.
+
+== Key verbatim paragraphs ==
+
+[AXT and Coherent]
+"AXT, the world's second-largest InP substrate producer and a major supplier to Coherent, said in May that 'InP export permits represent the most significant challenge we currently face.' The company, which manufactures most of its InP substrates in China, said its Chinese subsidiary only received its first export permits last June and has a significant backlog of orders."
+
+[Market share and competition]
+"Market leaders AXT and Sumitomo together account for almost 80% of global InP substrate manufacturing, while JX Advanced Metals makes up around 10%."
+
+[Wafer pricing]
+"Since China introduced export restrictions on InP, the average price for a 6-inch InP wafer has surged 250% to $5,000."
+
+[Supply chain ripple effects]
+"SemiAnalysis' Wang said 'the restrictions ripple through the entire optical supply chain,' beyond AXT and Coherent. Lumentum is sold out through 2028 despite quadrupling output, while Taiwanese optical products makers VPEC and LandMark Optoelectronics faced InP substrate disruptions from AXT permit delays, he said."
+
+[Supplier switching barriers]
+"Companies such as Coherent, mainly supplied by AXT, and Lumentum, mainly supplied by Sumitomo and JX Advanced Metals, are unlikely to switch suppliers easily, as moving to a new supplier requires lengthy qualification cycles, the person said."
+
+[Coherent mitigation]
+Coherent CEO Jim Anderson accompanied President Trump to China in early May to raise export license delays; Coherent is "doubling its own InP wafer capacity at its Texas plant this year" with plans to "more than double the capacity again by end of 2027".

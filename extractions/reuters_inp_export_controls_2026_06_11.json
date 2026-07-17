@@ -1,0 +1,343 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "reuters_inp_export_controls_2026_06_11",
+    "title": "Reuters: China's control over indium phosphide exports threatens AI data centre rollout",
+    "url": "https://www.mining.com/web/chinas-control-over-indium-phosphide-exports-threatens-ai-data-centre-rollout/",
+    "origin_entity": "Reuters",
+    "publisher": "Reuters (verified via Mining.com syndication; reuters.com blocks crawler)",
+    "published_at": "2026-06-11",
+    "retrieved_at": "2026-07-17",
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "Reuters wire copy is copyrighted; only brief quotations for research are stored in library/raw and this extraction.",
+    "source_type": "news",
+    "evidence_tier": 3
+  },
+  "sources": [
+    {
+      "id": "reuters_inp_export_controls_2026_06_11_s1",
+      "locator": "AXT and Coherent para",
+      "quote": "AXT, the world's second-largest InP substrate producer and a major supplier to Coherent, said in May that 'InP export permits represent the most significant challenge we currently face.'"
+    },
+    {
+      "id": "reuters_inp_export_controls_2026_06_11_s2",
+      "locator": "Supplier switching barriers para",
+      "quote": "Companies such as Coherent, mainly supplied by AXT, and Lumentum, mainly supplied by Sumitomo and JX Advanced Metals, are unlikely to switch suppliers easily, as moving to a new supplier requires lengthy qualification cycles, the person said."
+    },
+    {
+      "id": "reuters_inp_export_controls_2026_06_11_s3",
+      "locator": "Market share para",
+      "quote": "Market leaders AXT and Sumitomo together account for almost 80% of global InP substrate manufacturing, while JX Advanced Metals makes up around 10%."
+    },
+    {
+      "id": "reuters_inp_export_controls_2026_06_11_s4",
+      "locator": "Wafer pricing para",
+      "quote": "Since China introduced export restrictions on InP, the average price for a 6-inch InP wafer has surged 250% to $5,000."
+    },
+    {
+      "id": "reuters_inp_export_controls_2026_06_11_s5",
+      "locator": "Supply chain ripple effects para",
+      "quote": "SemiAnalysis' Wang said 'the restrictions ripple through the entire optical supply chain,' beyond AXT and Coherent. Lumentum is sold out through 2028 despite quadrupling output, while Taiwanese optical products makers VPEC and LandMark Optoelectronics faced InP substrate disruptions from AXT permit delays, he said."
+    },
+    {
+      "id": "reuters_inp_export_controls_2026_06_11_s6",
+      "locator": "Coherent mitigation para",
+      "quote": "Coherent CEO Jim Anderson accompanied President Trump to China in early May to raise export license delays; Coherent is 'doubling its own InP wafer capacity at its Texas plant this year' with plans to 'more than double the capacity again by end of 2027'."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:axt",
+      "type": "Company",
+      "name": "AXT",
+      "abstraction_level": "materials_substrate",
+      "role": "material_base",
+      "aliases": [
+        "AXT Inc",
+        "AXTI",
+        "Tongmei"
+      ],
+      "attributes": {},
+      "confidence": 0.55,
+      "source_ids": [
+        "reuters_inp_export_controls_2026_06_11_s1",
+        "reuters_inp_export_controls_2026_06_11_s3"
+      ]
+    },
+    {
+      "id": "co:coherent",
+      "type": "Company",
+      "name": "Coherent",
+      "abstraction_level": "device_chip",
+      "role": "bottleneck_supplier",
+      "aliases": [
+        "Coherent Corp",
+        "COHR"
+      ],
+      "attributes": {},
+      "confidence": 0.55,
+      "source_ids": [
+        "reuters_inp_export_controls_2026_06_11_s1",
+        "reuters_inp_export_controls_2026_06_11_s6"
+      ]
+    },
+    {
+      "id": "co:lumentum",
+      "type": "Company",
+      "name": "Lumentum",
+      "abstraction_level": "device_chip",
+      "role": "bottleneck_supplier",
+      "aliases": [
+        "LITE"
+      ],
+      "attributes": {},
+      "confidence": 0.55,
+      "source_ids": [
+        "reuters_inp_export_controls_2026_06_11_s2",
+        "reuters_inp_export_controls_2026_06_11_s5"
+      ]
+    },
+    {
+      "id": "co:sumitomo_electric",
+      "type": "Company",
+      "name": "Sumitomo Electric Industries",
+      "abstraction_level": "materials_substrate",
+      "role": "material_base",
+      "aliases": [
+        "Sumitomo",
+        "SEI"
+      ],
+      "attributes": {},
+      "confidence": 0.55,
+      "source_ids": [
+        "reuters_inp_export_controls_2026_06_11_s2",
+        "reuters_inp_export_controls_2026_06_11_s3"
+      ]
+    },
+    {
+      "id": "co:jx_advanced_metals",
+      "type": "Company",
+      "name": "JX Advanced Metals",
+      "abstraction_level": "materials_substrate",
+      "role": "material_base",
+      "aliases": [
+        "JX Nippon Mining & Metals",
+        "JX Metals"
+      ],
+      "attributes": {},
+      "confidence": 0.55,
+      "source_ids": [
+        "reuters_inp_export_controls_2026_06_11_s2",
+        "reuters_inp_export_controls_2026_06_11_s3"
+      ]
+    },
+    {
+      "id": "co:vpec",
+      "type": "Company",
+      "name": "VPEC",
+      "abstraction_level": "materials_substrate",
+      "role": "foundry",
+      "aliases": [
+        "Visual Photonics Epitaxy"
+      ],
+      "attributes": {},
+      "confidence": 0.55,
+      "source_ids": [
+        "reuters_inp_export_controls_2026_06_11_s5"
+      ]
+    },
+    {
+      "id": "co:landmark_optoelectronics",
+      "type": "Company",
+      "name": "LandMark Optoelectronics",
+      "abstraction_level": "materials_substrate",
+      "role": "foundry",
+      "aliases": [
+        "LandMark"
+      ],
+      "attributes": {},
+      "confidence": 0.55,
+      "source_ids": [
+        "reuters_inp_export_controls_2026_06_11_s5"
+      ]
+    },
+    {
+      "id": "mat:inp_substrate",
+      "type": "Material",
+      "name": "Indium Phosphide (InP) substrate",
+      "abstraction_level": "materials_substrate",
+      "role": null,
+      "aliases": [
+        "InP",
+        "indium phosphide"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 5,
+        "concentration_score": 4
+      },
+      "confidence": 0.55,
+      "source_ids": [
+        "reuters_inp_export_controls_2026_06_11_s3"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:axt",
+      "dst_id": "co:coherent",
+      "relation": "supplies_to",
+      "attributes": {
+        "substitutability": 4,
+        "sole_source": false,
+        "qualification_status": "qualified"
+      },
+      "confidence": 0.5,
+      "source_ids": [
+        "reuters_inp_export_controls_2026_06_11_s1",
+        "reuters_inp_export_controls_2026_06_11_s2"
+      ]
+    },
+    {
+      "id": "e2",
+      "src_id": "co:sumitomo_electric",
+      "dst_id": "co:lumentum",
+      "relation": "supplies_to",
+      "attributes": {
+        "substitutability": 4,
+        "sole_source": false,
+        "qualification_status": "qualified"
+      },
+      "confidence": 0.5,
+      "source_ids": [
+        "reuters_inp_export_controls_2026_06_11_s2"
+      ]
+    },
+    {
+      "id": "e3",
+      "src_id": "co:jx_advanced_metals",
+      "dst_id": "co:lumentum",
+      "relation": "supplies_to",
+      "attributes": {
+        "qualification_status": "qualified"
+      },
+      "confidence": 0.5,
+      "source_ids": [
+        "reuters_inp_export_controls_2026_06_11_s2"
+      ]
+    },
+    {
+      "id": "e4",
+      "src_id": "co:axt",
+      "dst_id": "co:vpec",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.5,
+      "source_ids": [
+        "reuters_inp_export_controls_2026_06_11_s5"
+      ]
+    },
+    {
+      "id": "e5",
+      "src_id": "co:axt",
+      "dst_id": "co:landmark_optoelectronics",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.5,
+      "source_ids": [
+        "reuters_inp_export_controls_2026_06_11_s5"
+      ]
+    },
+    {
+      "id": "e6",
+      "src_id": "co:sumitomo_electric",
+      "dst_id": "mat:inp_substrate",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.5,
+      "source_ids": [
+        "reuters_inp_export_controls_2026_06_11_s3"
+      ]
+    },
+    {
+      "id": "e7",
+      "src_id": "co:jx_advanced_metals",
+      "dst_id": "mat:inp_substrate",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.5,
+      "source_ids": [
+        "reuters_inp_export_controls_2026_06_11_s3"
+      ]
+    },
+    {
+      "id": "e8",
+      "src_id": "co:sumitomo_electric",
+      "dst_id": "co:axt",
+      "relation": "competes_with",
+      "attributes": {},
+      "confidence": 0.5,
+      "source_ids": [
+        "reuters_inp_export_controls_2026_06_11_s3"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "reuters_inp_export_controls_2026_06_11_cl1",
+      "statement": "Coherent's InP substrates are mainly supplied by AXT (Reuters, anonymous industry source), and switching InP substrate suppliers requires lengthy qualification cycles — Coherent has direct exposure to AXT's China export permit bottleneck. This is the first non-AXT source for the AXT-to-Coherent supply edge.",
+      "subject_id": "e1",
+      "demand_proof_level": "inferred",
+      "disproof_condition": "Coherent discloses that its InP substrate supply is primarily internal or from a non-AXT vendor, or AXT/Coherent filings show the relationship ended.",
+      "confidence": 0.5,
+      "source_ids": [
+        "reuters_inp_export_controls_2026_06_11_s1",
+        "reuters_inp_export_controls_2026_06_11_s2"
+      ]
+    },
+    {
+      "id": "reuters_inp_export_controls_2026_06_11_cl2",
+      "statement": "Global InP substrate manufacturing is highly concentrated: AXT and Sumitomo together account for almost 80%, JX Advanced Metals around 10% (three players ~90%).",
+      "subject_id": "mat:inp_substrate",
+      "demand_proof_level": "inferred",
+      "disproof_condition": "A new InP substrate entrant reaches meaningful volume share, or third-party data shows materially lower concentration.",
+      "confidence": 0.5,
+      "source_ids": [
+        "reuters_inp_export_controls_2026_06_11_s3"
+      ]
+    },
+    {
+      "id": "reuters_inp_export_controls_2026_06_11_cl3",
+      "statement": "Dated observation (as of 2026-06-11): since China's InP export restrictions, average 6-inch InP wafer price surged 250% to about $5,000 — price evidence of an acute substrate shortage.",
+      "subject_id": "mat:inp_substrate",
+      "demand_proof_level": "inferred",
+      "disproof_condition": "InP wafer prices retreat toward pre-restriction levels as permits normalize or new capacity comes online.",
+      "confidence": 0.5,
+      "source_ids": [
+        "reuters_inp_export_controls_2026_06_11_s4"
+      ]
+    },
+    {
+      "id": "reuters_inp_export_controls_2026_06_11_cl4",
+      "statement": "Coherent is mitigating substrate dependence by doubling its own InP wafer capacity at its Texas plant in 2026 and plans to more than double it again by end of 2027; its CEO raised China export license delays during a May 2026 U.S. presidential trip to China.",
+      "subject_id": "co:coherent",
+      "demand_proof_level": "guided",
+      "disproof_condition": "Coherent's internal InP wafer capacity expansion is delayed or cancelled, or Coherent states continued reliance on external substrate vendors.",
+      "confidence": 0.55,
+      "source_ids": [
+        "reuters_inp_export_controls_2026_06_11_s6"
+      ]
+    },
+    {
+      "id": "reuters_inp_export_controls_2026_06_11_cl5",
+      "statement": "China's InP export restrictions ripple through the entire optical supply chain (SemiAnalysis): Lumentum sold out through 2028 despite quadrupling output; Taiwanese epi houses VPEC and LandMark Optoelectronics faced InP substrate disruptions from AXT permit delays.",
+      "subject_id": "mat:inp_substrate",
+      "demand_proof_level": "speculative",
+      "disproof_condition": "VPEC/LandMark report normalized substrate supply, or Lumentum capacity catches up with demand before 2028.",
+      "confidence": 0.5,
+      "source_ids": [
+        "reuters_inp_export_controls_2026_06_11_s5"
+      ]
+    }
+  ]
+}
