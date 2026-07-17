@@ -173,3 +173,42 @@ def test_pushed_action_does_not_hide_a_later_ledger_modification(
 
     assert summary["modified"] == ["extractions/historical.json"]
     assert summary["total"] == 1
+
+
+def test_pending_onboard_reports_undecided_companies_only(
+    tmp_path: Path, monkeypatch
+) -> None:
+    import json
+
+    import loader.load_to_neo4j as loader_module
+    from crons.weekly_scan_digest import pending_onboard_companies
+
+    extraction_dir = tmp_path / "extractions"
+    extraction_dir.mkdir()
+    (extraction_dir / "doc.json").write_text(
+        json.dumps(
+            {
+                "nodes": [
+                    {"id": "co:decided_ticker", "type": "Company"},
+                    {"id": "co:decided_private", "type": "Company"},
+                    {"id": "co:undecided", "type": "Company"},
+                    {"id": "prod:not_company", "type": "Product"},
+                ]
+            }
+        ),
+        encoding="utf-8",
+    )
+    (extraction_dir / "broken.json").write_text("{not json", encoding="utf-8")
+    monkeypatch.setattr(
+        loader_module,
+        "TICKER_MAP",
+        {"co:decided_ticker": "TICK", "co:decided_private": None},
+    )
+
+    assert pending_onboard_companies(tmp_path) == ["co:undecided"]
+
+
+def test_pending_onboard_is_quiet_without_extraction_dir(tmp_path: Path) -> None:
+    from crons.weekly_scan_digest import pending_onboard_companies
+
+    assert pending_onboard_companies(tmp_path) == []

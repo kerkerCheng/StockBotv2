@@ -93,6 +93,30 @@ def _unpushed_intake_commits(root: Path = ROOT) -> int:
         return 0
 
 
+def pending_onboard_companies(root: Path = ROOT) -> list[str]:
+    """抽取語料裡的 Company id，凡 TICKER_MAP 沒有登記（含明確 None）就算待 onboard 決定。"""
+    try:
+        from loader.load_to_neo4j import TICKER_MAP
+    except Exception:
+        return []
+    company_ids: set[str] = set()
+    for path in (root / "extractions").glob("*.json"):
+        try:
+            doc = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+        if not isinstance(doc, dict):
+            continue
+        for node in doc.get("nodes", []):
+            if (
+                isinstance(node, dict)
+                and node.get("type") == "Company"
+                and isinstance(node.get("id"), str)
+            ):
+                company_ids.add(node["id"])
+    return sorted(company_ids - set(TICKER_MAP))
+
+
 def intake_pending_summary(root: Path = ROOT) -> dict:
     pending = pending_intake_files(root=root)
     action_paths = {
@@ -124,11 +148,18 @@ def intake_pending_summary(root: Path = ROOT) -> dict:
 
 def main() -> int:
     intake_summary = intake_pending_summary()
+    onboard_pending = pending_onboard_companies()
     gh = _gh()
     prs = _list("pr", gh) if gh else []
     issues = _list("issue", gh) if gh else []
     backlog = _backlog_count(gh) if gh else 0
-    if not prs and not issues and not backlog and not intake_summary["total"]:
+    if (
+        not prs
+        and not issues
+        and not backlog
+        and not intake_summary["total"]
+        and not onboard_pending
+    ):
         return 0  # 什麼都沒有，安靜過去
 
     parts = []
@@ -155,6 +186,13 @@ def main() -> int:
         parts.append(
             "🧭 Research Actions: " + "；".join(action_parts)
             + "（可說「查看待辦入圖」或「補提交入圖」）"
+        )
+    if onboard_pending:
+        parts.append(
+            f"🏷 {len(onboard_pending)} 家公司待 onboard 決定（TICKER_MAP 未登記）："
+            + "、".join(onboard_pending[:5])
+            + ("…" if len(onboard_pending) > 5 else "")
+            + "（說「onboard <公司>」收尾；決定不追的在 TICKER_MAP 填 None）"
         )
     legacy_total = (
         len(intake_summary["untracked"])
