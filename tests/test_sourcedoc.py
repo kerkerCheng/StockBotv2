@@ -276,3 +276,56 @@ def test_sourcedoc_migration_dry_run_uses_frozen_manifest_only(tmp_path: Path) -
         "claims": 1,
         "cites": 2,
     }
+
+
+def test_self_reported_sole_source_warns(tmp_path: Path) -> None:
+    doc = _document("doc_a", origin_entity="Supplier")
+    doc["edges"][0]["attributes"]["sole_source"] = True
+    path = _write_extraction(tmp_path, doc)
+
+    errors = validate(str(path))
+
+    warnings = [
+        error
+        for error in errors
+        if error.startswith("WARN") and "sole_source" in error
+    ]
+    assert len(warnings) == 1
+    assert "e1" in warnings[0]
+    assert "verified_by_absence" in warnings[0]
+
+
+def test_supplier_alias_match_also_warns(tmp_path: Path) -> None:
+    doc = _document("doc_a", origin_entity="Supplier Photonics AB")
+    doc["nodes"][0]["aliases"] = ["Supplier Photonics"]
+    doc["edges"][0]["attributes"]["sole_source"] = True
+    path = _write_extraction(tmp_path, doc)
+
+    errors = validate(str(path))
+
+    assert any(
+        error.startswith("WARN") and "sole_source" in error for error in errors
+    )
+
+
+def test_customer_confirmed_sole_source_does_not_warn(tmp_path: Path) -> None:
+    doc = _document("doc_a", origin_entity="Customer")
+    doc["edges"][0]["attributes"]["sole_source"] = True
+    path = _write_extraction(tmp_path, doc)
+
+    errors = validate(str(path))
+
+    assert not any(
+        error.startswith("WARN") and "sole_source" in error for error in errors
+    )
+
+
+def test_self_report_without_sole_source_does_not_warn(tmp_path: Path) -> None:
+    doc = _document("doc_a", origin_entity="Supplier")
+    path = _write_extraction(tmp_path, doc)
+
+    errors = validate(str(path))
+
+    assert not any(
+        error.startswith("WARN") and "sole_source" in error for error in errors
+    )

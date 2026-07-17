@@ -82,11 +82,39 @@ def validate(doc_path: str) -> list[str]:
         errors.append(f"VOCAB: source_doc evidence_tier={sd['evidence_tier']} 不在對照表")
 
     # ── 4. 來源獨立性 (L8) ──
-    if not doc["source_doc"].get("origin_entity"):
+    origin = doc["source_doc"].get("origin_entity")
+    if not origin:
         errors.append(
             "WARN: source_doc.origin_entity 未填 — "
             "無法做 L8 來源獨立性檢查（Lane Memo 生成時會被計為零獨立來源）"
         )
+    else:
+        # G5 同質性：sole_source 只有客戶端或第三方能確認；供應商自報最高只算
+        # verified_by_absence（weak），入圖前先在文件層警告。
+        origin_norm = origin.casefold().strip()
+
+        def _is_origin_company(node: dict) -> bool:
+            names = [node.get("name") or "", *node.get("aliases", [])]
+            for name in names:
+                name_norm = name.casefold().strip()
+                if name_norm and (name_norm in origin_norm or origin_norm in name_norm):
+                    return True
+            return False
+
+        origin_company_ids = {
+            n["id"]
+            for n in doc.get("nodes", [])
+            if n.get("type") == "Company" and _is_origin_company(n)
+        }
+        for e in doc.get("edges", []):
+            if not e.get("attributes", {}).get("sole_source"):
+                continue
+            if e["src_id"] in origin_company_ids:
+                errors.append(
+                    f"WARN: edge {e['id']} 的 sole_source=true 出自供應商自報"
+                    f"（origin_entity={origin} 即 src {e['src_id']}）— "
+                    "L8 只能算 verified_by_absence（weak），需客戶端或第三方來源印證"
+                )
 
     # ── 3. 參照完整性 ──
     def _check_sources(owner: str, sids: list[str]) -> None:
