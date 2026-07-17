@@ -57,6 +57,8 @@ TICKER_MAP: dict[str, str | None] = {
     # Sivers Semiconductors AB — 瑞典上市 (Nasdaq First North Stockholm)
     # yfinance ticker: SIVE.ST；非美股，EDGAR 無資料，文件走 IR 人工下載路徑
     "co:sivers_semiconductors": "SIVE.ST",
+    # AXT Inc — InP/GaAs 化合物半導體基板供應商（Coherent 依賴鏈上游）
+    "co:axt": "AXTI",
 }
 
 

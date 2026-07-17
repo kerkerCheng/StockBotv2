@@ -1,0 +1,273 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "axti_10_k_20260317",
+    "title": "AXT Inc FY2025 Form 10-K — InP/GaAs/Ge substrate business, customers, China export controls",
+    "url": "https://www.sec.gov/Archives/edgar/data/1051627/000143774926008612/axti20251231_10k.htm",
+    "origin_entity": "AXT",
+    "publisher": "SEC EDGAR",
+    "published_at": "2026-03-17",
+    "retrieved_at": "2026-07-17",
+    "storage_permission": "repo_full",
+    "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+    "source_type": "filing",
+    "evidence_tier": 1
+  },
+  "sources": [
+    {
+      "id": "axti_10_k_20260317_s1",
+      "locator": "Item 1 Business, overview para 2",
+      "quote": "Our compound substrates combine indium with phosphorous (indium phosphide: InP) or gallium with arsenic (gallium arsenide: GaAs). Our single element substrates are made from germanium (Ge)."
+    },
+    {
+      "id": "axti_10_k_20260317_s2",
+      "locator": "Item 1 Business, overview para 3",
+      "quote": "InP is a high-performance semiconductor wafer substrate used in broadband and fiber optic applications, 5G infrastructure and data center connectivity. Data centers use InP devices for high-speed optical data transmission."
+    },
+    {
+      "id": "axti_10_k_20260317_s3",
+      "locator": "Item 1 Business, overview para 3",
+      "quote": "We believe the growth of AI applications is increasing the need for high-speed data transfer, which may enable a growing increase in InP substrate demand for such data centers."
+    },
+    {
+      "id": "axti_10_k_20260317_s4",
+      "locator": "Item 1 Business, Customers",
+      "quote": "We sell our substrates to companies that apply the epitaxial layer, who then in turn sell the modified wafers to the wafer fabs, chip design companies, LED manufacturers and others. Some customers do both the epitaxial layer and wafer fabrication."
+    },
+    {
+      "id": "axti_10_k_20260317_s5",
+      "locator": "Item 1 Business, Customers",
+      "quote": "No customer represented more than 10% of our revenue for the years ended December 31, 2025, 2024 and 2023. Our top five customers, although not the same five customers for each period, represented 29% of our revenue for the year 2025"
+    },
+    {
+      "id": "axti_10_k_20260317_s6",
+      "locator": "Item 1 Business, Manufacturing",
+      "quote": "All of our products are manufactured in China."
+    },
+    {
+      "id": "axti_10_k_20260317_s7",
+      "locator": "Item 1 Business, Competition",
+      "quote": "Other products, such as InP and low EPD GaAs wafers, have fewer competitors and quality is a key competitive factor in addition to price."
+    },
+    {
+      "id": "axti_10_k_20260317_s8",
+      "locator": "Item 1 Business, Technology",
+      "quote": "Tongmei has a substantial body of proprietary process technology and we believe this gives us a competitive advantage, especially in InP. This also creates a barrier to entry."
+    },
+    {
+      "id": "axti_10_k_20260317_s9",
+      "locator": "Item 1A Risk Factors, trade restrictions",
+      "quote": "On February 4, 2025, China added indium phosphide substrates to its export control list. As a result, the three wafer substrate product families manufactured by Tongmei all require permits from China's Ministry of Commerce before they can be exported from China."
+    },
+    {
+      "id": "axti_10_k_20260317_s10",
+      "locator": "Item 1A Risk Factors, trade restrictions",
+      "quote": "InP export permits represent the most significant challenge we currently face."
+    },
+    {
+      "id": "axti_10_k_20260317_s11",
+      "locator": "Item 1A Risk Factors, trade restrictions",
+      "quote": "On June 11, 2025, Tongmei was informed that it had satisfied the applicable requirements for a permit to export indium phosphide and received its initial export permits from the Ministry of Commerce of the People's Republic of China to resume shipping indium phosphide substrates to certain customers in Europe and Japan."
+    },
+    {
+      "id": "axti_10_k_20260317_s12",
+      "locator": "Item 1A Risk Factors, trade restrictions",
+      "quote": "Indium phosphide substrates are the primary revenue generator derived from imports into the U.S. This revenue has been impacted by additional tariffs imposed by the United States and by export controls implemented by China."
+    },
+    {
+      "id": "axti_10_k_20260317_s13",
+      "locator": "Item 1A Risk Factors, trade restrictions",
+      "quote": "To our knowledge, indium phosphide is rarely used in military applications and we can reasonably expect that export permits to ship our indium phosphide substrates to the U.S. will be granted. However, the timing for receiving permits remains uncertain, unclear and beyond our control."
+    },
+    {
+      "id": "axti_10_k_20260317_s14",
+      "locator": "Item 1 Business, PRC operations",
+      "quote": "Our supply chain includes partial ownership of raw material companies in China (subsidiaries/joint ventures). We believe this supply chain arrangement provides us with pricing advantages, reliable supply, market trend visibility and better sourcing lead-times for key raw materials"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:axt",
+      "type": "Company",
+      "name": "AXT",
+      "abstraction_level": "materials_substrate",
+      "role": "material_base",
+      "aliases": [
+        "AXT Inc",
+        "AXTI",
+        "Tongmei",
+        "Beijing Tongmei Xtal Technology"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "axti_10_k_20260317_s1",
+        "axti_10_k_20260317_s6",
+        "axti_10_k_20260317_s8"
+      ]
+    },
+    {
+      "id": "mat:inp_substrate",
+      "type": "Material",
+      "name": "Indium Phosphide (InP) substrate",
+      "abstraction_level": "materials_substrate",
+      "role": null,
+      "aliases": [
+        "InP",
+        "indium phosphide"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 5
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "axti_10_k_20260317_s2",
+        "axti_10_k_20260317_s7"
+      ]
+    },
+    {
+      "id": "mat:gaas_substrate",
+      "type": "Material",
+      "name": "Gallium Arsenide (GaAs) substrate",
+      "abstraction_level": "materials_substrate",
+      "role": null,
+      "aliases": [
+        "GaAs",
+        "gallium arsenide"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "axti_10_k_20260317_s1"
+      ]
+    },
+    {
+      "id": "mat:germanium_substrate",
+      "type": "Material",
+      "name": "Germanium (Ge) substrate",
+      "abstraction_level": "materials_substrate",
+      "role": null,
+      "aliases": [
+        "Ge substrate",
+        "germanium"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "axti_10_k_20260317_s1"
+      ]
+    },
+    {
+      "id": "tech:ai_compute_buildout",
+      "type": "TechNode",
+      "name": "AI compute buildout",
+      "abstraction_level": "end_demand",
+      "role": null,
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "axti_10_k_20260317_s3"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:axt",
+      "dst_id": "mat:inp_substrate",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.75,
+      "source_ids": [
+        "axti_10_k_20260317_s1",
+        "axti_10_k_20260317_s2",
+        "axti_10_k_20260317_s7"
+      ]
+    },
+    {
+      "id": "e2",
+      "src_id": "co:axt",
+      "dst_id": "mat:gaas_substrate",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.75,
+      "source_ids": [
+        "axti_10_k_20260317_s1"
+      ]
+    },
+    {
+      "id": "e3",
+      "src_id": "co:axt",
+      "dst_id": "mat:germanium_substrate",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.75,
+      "source_ids": [
+        "axti_10_k_20260317_s1"
+      ]
+    },
+    {
+      "id": "e4",
+      "src_id": "tech:ai_compute_buildout",
+      "dst_id": "mat:inp_substrate",
+      "relation": "enables",
+      "attributes": {},
+      "confidence": 0.75,
+      "source_ids": [
+        "axti_10_k_20260317_s3"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "axti_10_k_20260317_cl1",
+      "statement": "China added InP substrates to its export control list on 2025-02-04; all three Tongmei (AXT) wafer substrate product families require permits from China's Ministry of Commerce before export. AXT calls InP export permits the most significant challenge it currently faces.",
+      "subject_id": "e1",
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "China removes InP substrates from its export control list, or MOFCOM permits become routine and timely for all destinations including the U.S.",
+      "confidence": 0.9,
+      "source_ids": [
+        "axti_10_k_20260317_s9",
+        "axti_10_k_20260317_s10"
+      ]
+    },
+    {
+      "id": "axti_10_k_20260317_cl2",
+      "statement": "As of the FY2025 10-K (2026-03-17), Tongmei's initial InP export permits (granted 2025-06-11) cover only certain customers in Europe and Japan; permits for U.S. shipments of InP substrates remain pending with timing uncertain and beyond AXT's control.",
+      "subject_id": "e1",
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Tongmei receives MOFCOM export permits covering U.S. customers and resumes InP substrate shipments to the U.S.",
+      "confidence": 0.9,
+      "source_ids": [
+        "axti_10_k_20260317_s11",
+        "axti_10_k_20260317_s12",
+        "axti_10_k_20260317_s13"
+      ]
+    },
+    {
+      "id": "axti_10_k_20260317_cl3",
+      "statement": "AXT sells substrates primarily to epitaxial-layer companies (some customers also do wafer fabrication); no customer represented more than 10% of revenue in 2023-2025 and the 10-K names no specific customers, so any AXT-to-specific-device-maker supply edge requires a customer-side or third-party source.",
+      "subject_id": "co:axt",
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "A future AXT filing discloses a >10% customer or names specific device-maker customers.",
+      "confidence": 0.9,
+      "source_ids": [
+        "axti_10_k_20260317_s4",
+        "axti_10_k_20260317_s5"
+      ]
+    },
+    {
+      "id": "axti_10_k_20260317_cl4",
+      "statement": "AXT states that InP and low-EPD GaAs wafers have fewer competitors than commodity substrates and that Tongmei's proprietary process technology creates a barrier to entry, especially in InP (self-reported competitive positioning).",
+      "subject_id": "mat:inp_substrate",
+      "demand_proof_level": "guided",
+      "disproof_condition": "Third-party or customer-side evidence shows multiple qualified InP substrate suppliers with comparable quality, eroding the claimed barrier to entry.",
+      "confidence": 0.6,
+      "source_ids": [
+        "axti_10_k_20260317_s7",
+        "axti_10_k_20260317_s8"
+      ]
+    }
+  ]
+}

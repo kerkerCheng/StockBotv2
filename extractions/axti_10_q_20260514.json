@@ -1,0 +1,119 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "axti_10_q_20260514",
+    "title": "AXT Inc Q1 2026 Form 10-Q — InP export permit status update (U.S. shipments still blocked)",
+    "url": "https://www.sec.gov/Archives/edgar/data/1051627/000143774926016697/axti20260331_10q.htm",
+    "origin_entity": "AXT",
+    "publisher": "SEC EDGAR",
+    "published_at": "2026-05-14",
+    "retrieved_at": "2026-07-17",
+    "storage_permission": "repo_full",
+    "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+    "source_type": "filing",
+    "evidence_tier": 1
+  },
+  "sources": [
+    {
+      "id": "axti_10_q_20260514_s1",
+      "locator": "MD&A, Economic Challenges, Risks and Uncertainties",
+      "quote": "InP export permits represent the most significant challenge we currently face."
+    },
+    {
+      "id": "axti_10_q_20260514_s2",
+      "locator": "MD&A, Economic Challenges, Risks and Uncertainties",
+      "quote": "While we continue to receive permits, we have a backlog of orders for which we have not yet received permits and as of the date of this report we still cannot predict when a permit application will be reviewed and approved."
+    },
+    {
+      "id": "axti_10_q_20260514_s3",
+      "locator": "MD&A, Economic Challenges, Risks and Uncertainties",
+      "quote": "We are unable to estimate when we will receive the necessary export permits to resume shipping our indium phosphide substrates to the U.S."
+    },
+    {
+      "id": "axti_10_q_20260514_s4",
+      "locator": "MD&A, Economic Challenges, Risks and Uncertainties",
+      "quote": "On December 27, 2025 China's National People's Congress enacted substantial revisions to the Foreign Trade Law of the People's Republic of China, effective March 1, 2026"
+    },
+    {
+      "id": "axti_10_q_20260514_s5",
+      "locator": "MD&A, PRC operations overview",
+      "quote": "All of our substrate products and raw material products are manufactured in the People's Republic of China (PRC or China) by our PRC subsidiaries and PRC joint ventures."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:axt",
+      "type": "Company",
+      "name": "AXT",
+      "abstraction_level": "materials_substrate",
+      "role": "material_base",
+      "aliases": [
+        "AXT Inc",
+        "AXTI",
+        "Tongmei"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "axti_10_q_20260514_s5"
+      ]
+    },
+    {
+      "id": "mat:inp_substrate",
+      "type": "Material",
+      "name": "Indium Phosphide (InP) substrate",
+      "abstraction_level": "materials_substrate",
+      "role": null,
+      "aliases": [
+        "InP",
+        "indium phosphide"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 5
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "axti_10_q_20260514_s1"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:axt",
+      "dst_id": "mat:inp_substrate",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.75,
+      "source_ids": [
+        "axti_10_q_20260514_s3",
+        "axti_10_q_20260514_s5"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "axti_10_q_20260514_cl1",
+      "statement": "As of the Q1 2026 10-Q (2026-05-14), AXT/Tongmei still has not received China MOFCOM export permits to resume shipping InP substrates to the U.S., and carries a backlog of orders awaiting permits with unpredictable approval timing. U.S.-based InP device makers therefore cannot currently source InP substrates from AXT.",
+      "subject_id": "e1",
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "AXT discloses receipt of MOFCOM export permits covering U.S. customers and resumption of InP substrate shipments to the U.S.",
+      "confidence": 0.9,
+      "source_ids": [
+        "axti_10_q_20260514_s2",
+        "axti_10_q_20260514_s3"
+      ]
+    },
+    {
+      "id": "axti_10_q_20260514_cl2",
+      "statement": "China's revised Foreign Trade Law (effective 2026-03-01) expands government authority to prohibit or restrict exports, adding regulatory tail-risk on top of the existing InP export permit regime.",
+      "subject_id": "mat:inp_substrate",
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Implementing rules exempt compound semiconductor substrates, or InP is removed from the export control list.",
+      "confidence": 0.85,
+      "source_ids": [
+        "axti_10_q_20260514_s4"
+      ]
+    }
+  ]
+}

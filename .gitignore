@@ -29,6 +29,8 @@ library/raw/*
 !library/raw/.gitkeep
 !library/raw/*.txt
 !library/raw/sivers_ar_2025_photonics_excerpt.meta.json
+!library/raw/axti_10_k_20260317.meta.json
+!library/raw/axti_10_q_20260514.meta.json
 library/raw/Broadcom_q2fy26_cpo.txt
 library/raw/coherent-corp-cohr-discusses-photonics-innovation-and-data-center-communications-at-ofc_march_17.txt
 library/raw/coherent_q2fy26_cpo.txt
