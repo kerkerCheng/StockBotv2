@@ -59,6 +59,33 @@ TICKER_MAP: dict[str, str | None] = {
     "co:sivers_semiconductors": "SIVE.ST",
     # AXT Inc — InP/GaAs 化合物半導體基板供應商（Coherent 依賴鏈上游）
     "co:axt": "AXTI",
+    # ── 2026-07-17 補登：圖中已有邊但先前未登記的上市公司 ──
+    "co:tower_semiconductor": "TSEM",
+    "co:marvell_technology": "MRVL",
+    "co:poet_technologies": "POET",
+    "co:applied_optoelectronics": "AAOI",
+    "co:globalfoundries": "GFS",
+    "co:cadence": "CDNS",
+    "co:apollo": "APO",
+    "co:blackstone": "BX",
+    "co:o_net_technologies": "0877.HK",   # 港股
+    "co:sumitomo_electric": "5802.T",     # 東證
+    "co:jx_advanced_metals": "5016.T",    # 東證，2025-03 IPO
+    "co:enablence_technologies": "ENA.V", # TSX Venture
+    # 台股後綴依掛牌板：證交所上市 = .TW、櫃買上櫃 = .TWO（yfinance 格式，
+    # 兩者是不同交易所，不能統一成同一後綴）
+    "co:vpec": "2455.TW",                       # 全新光電（上市）
+    "co:win_semiconductor": "3105.TWO",         # 穩懋（上櫃）
+    "co:landmark_optoelectronics": "3081.TWO",  # 聯亞光電（上櫃）
+    # ── 私人公司 / 機構 / 已下市 — 明確 None ──
+    "co:ayar_labs": None,
+    "co:celestial_ai": None,
+    "co:newphotonics": None,
+    "co:openlight_photonics": None,
+    "co:lightium_ag": None,
+    "co:nava_thailand": None,
+    "co:ime_cas": None,   # 中科院微電子所（研究機構）
+    "co:ansys": None,     # 2025 年併入 Synopsys 下市；不對映 SNPS 以免 join 錯財務
 }
 
 
