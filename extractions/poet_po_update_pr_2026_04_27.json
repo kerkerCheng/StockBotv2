@@ -1,0 +1,119 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "poet_po_update_pr_2026_04_27",
+    "title": "POET Technologies Provides Purchase Order Update — Marvell (Celestial AI) cancels all POET purchase orders",
+    "url": "https://www.sec.gov/Archives/edgar/data/1437424/000117184326002726/exh_991.htm",
+    "origin_entity": "POET Technologies",
+    "publisher": "GlobeNewswire / SEC EDGAR (6-K Exhibit 99.1)",
+    "published_at": "2026-04-27",
+    "retrieved_at": "2026-07-17",
+    "storage_permission": "repo_full",
+    "permission_basis": "Corporate press release distributed for publication and filed as an SEC 6-K exhibit; full text may be committed.",
+    "source_type": "filing",
+    "evidence_tier": 1
+  },
+  "sources": [
+    {
+      "id": "poet_po_update_pr_2026_04_27_s1",
+      "locator": "PR body, para 1",
+      "quote": "today announced the cancellation of all purchase orders received by the Company from Celestial AI, including the ones for initial production units first disclosed (the \"Purchase Orders\") by the Company in a press release on April 25, 2023."
+    },
+    {
+      "id": "poet_po_update_pr_2026_04_27_s2",
+      "locator": "PR body, para 2",
+      "quote": "Marvell Semiconductor Inc., which acquired Celestial AI, provided written notice of the cancellation to the Company on April 23, 2026. As the basis for the cancellation, Marvell indicated that the Company had made disclosures of information related to the Purchase Order and shipping information in contravention of its confidentiality obligations."
+    },
+    {
+      "id": "poet_po_update_pr_2026_04_27_s3",
+      "locator": "PR body, para 3",
+      "quote": "This effort also involves fulfilling product deliveries for other customers, including a recently disclosed purchase order with another technology company with a value of approximately $5 million."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:poet_technologies",
+      "type": "Company",
+      "name": "POET Technologies",
+      "abstraction_level": "device_chip",
+      "role": "disruptor",
+      "aliases": [
+        "POET"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "poet_po_update_pr_2026_04_27_s1",
+        "poet_po_update_pr_2026_04_27_s3"
+      ]
+    },
+    {
+      "id": "co:marvell_technology",
+      "type": "Company",
+      "name": "Marvell Technology",
+      "abstraction_level": "device_chip",
+      "role": null,
+      "aliases": [
+        "Marvell",
+        "Marvell Semiconductor"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "poet_po_update_pr_2026_04_27_s2"
+      ]
+    },
+    {
+      "id": "co:celestial_ai",
+      "type": "Company",
+      "name": "Celestial AI",
+      "abstraction_level": "device_chip",
+      "role": "disruptor",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "poet_po_update_pr_2026_04_27_s1",
+        "poet_po_update_pr_2026_04_27_s2"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:marvell_technology",
+      "dst_id": "co:celestial_ai",
+      "relation": "acquired",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "poet_po_update_pr_2026_04_27_s2"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "poet_po_update_pr_2026_04_27_cl1",
+      "statement": "Dated event (2026-04-23 notice, disclosed 2026-04-27): Marvell, after acquiring Celestial AI, cancelled ALL purchase orders from Celestial AI to POET (including the initial production units disclosed 2023-04-25), citing POET's breach of confidentiality obligations. The Celestial AI/Marvell demand channel for POET optical engines is terminated — any graph claim relying on Celestial AI as a POET customer must be treated as disproven as of this date.",
+      "subject_id": "co:poet_technologies",
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Marvell reinstates the orders or a new Marvell-POET commercial agreement is disclosed.",
+      "confidence": 0.9,
+      "source_ids": [
+        "poet_po_update_pr_2026_04_27_s1",
+        "poet_po_update_pr_2026_04_27_s2"
+      ]
+    },
+    {
+      "id": "poet_po_update_pr_2026_04_27_cl2",
+      "statement": "POET states it continues fulfilling deliveries for other customers, including a recently disclosed purchase order of approximately $5 million from another (unnamed) technology company.",
+      "subject_id": "co:poet_technologies",
+      "demand_proof_level": "guided",
+      "disproof_condition": "The ~$5M order is cancelled or POET fails to disclose corresponding revenue recognition in subsequent quarters.",
+      "confidence": 0.75,
+      "source_ids": [
+        "poet_po_update_pr_2026_04_27_s3"
+      ]
+    }
+  ]
+}

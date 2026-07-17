@@ -1,0 +1,14 @@
+POET Technologies press release (SEC 6-K Exhibit 99.1)
+"POET Technologies Provides Purchase Order Update"
+SAN JOSE, Calif., April 27, 2026 (GLOBE NEWSWIRE)
+URL: https://www.sec.gov/Archives/edgar/data/1437424/000117184326002726/exh_991.htm
+Retrieved: 2026-07-17
+Storage: repo_full — corporate press release distributed for publication; SEC-filed exhibit.
+
+== Body (key paragraphs) ==
+
+POET Technologies Inc. ("POET" or the "Company") (NASDAQ: POET), a leader in the design and implementation of highly-integrated optical engines and light sources for artificial intelligence networks, today announced the cancellation of all purchase orders received by the Company from Celestial AI, including the ones for initial production units first disclosed (the "Purchase Orders") by the Company in a press release on April 25, 2023.
+
+Marvell Semiconductor Inc., which acquired Celestial AI, provided written notice of the cancellation to the Company on April 23, 2026. As the basis for the cancellation, Marvell indicated that the Company had made disclosures of information related to the Purchase Order and shipping information in contravention of its confidentiality obligations.
+
+The Company remains focused on executing its strategic priorities and advancing product development within the AI and optical networking markets to meet increasing demand. This effort also involves fulfilling product deliveries for other customers, including a recently disclosed purchase order with another technology company with a value of approximately $5 million.
