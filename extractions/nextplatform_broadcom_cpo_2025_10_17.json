@@ -1,0 +1,166 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "nextplatform_broadcom_cpo_2025_10_17",
+    "title": "The Next Platform: The Third Time Will Be The Charm For Broadcom Switch Co-Packaged Optics",
+    "url": "https://www.nextplatform.com/2025/10/17/the-third-time-will-be-the-charm-for-broadcom-switch-co-packaged-optics/",
+    "origin_entity": "The Next Platform",
+    "publisher": "The Next Platform",
+    "published_at": "2025-10-17",
+    "retrieved_at": "2026-07-17",
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "Copyrighted trade-press article; only brief quotations for research are stored in library/raw and this extraction.",
+    "source_type": "news",
+    "evidence_tier": 3
+  },
+  "sources": [
+    {
+      "id": "nextplatform_broadcom_cpo_2025_10_17_s1",
+      "locator": "Meta Bailly testing section",
+      "quote": "over the first 1 million device hours...there were zero link flaps observed."
+    },
+    {
+      "id": "nextplatform_broadcom_cpo_2025_10_17_s2",
+      "locator": "Meta Bailly testing section",
+      "quote": "no failures or uncorrectable codewords (UCWs) in the links."
+    },
+    {
+      "id": "nextplatform_broadcom_cpo_2025_10_17_s3",
+      "locator": "Power efficiency section",
+      "quote": "65 percent lower power per 100 Gb/sec lane compared to retimed pluggable optical models."
+    },
+    {
+      "id": "nextplatform_broadcom_cpo_2025_10_17_s4",
+      "locator": "Davisson section",
+      "quote": "Third-generation device: 102.4 Tb/sec capacity with field-replaceable laser modules. An 800 Gb/sec port consumes approximately 3.5 watts - 36.4% lower than Tomahawk 5 CPO and over 70% less than pluggable optics."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:broadcom",
+      "type": "Company",
+      "name": "Broadcom",
+      "abstraction_level": "device_chip",
+      "role": "leader",
+      "aliases": [
+        "AVGO"
+      ],
+      "attributes": {},
+      "confidence": 0.55,
+      "source_ids": [
+        "nextplatform_broadcom_cpo_2025_10_17_s1",
+        "nextplatform_broadcom_cpo_2025_10_17_s4"
+      ]
+    },
+    {
+      "id": "co:meta",
+      "type": "Company",
+      "name": "Meta",
+      "abstraction_level": "end_demand",
+      "role": "adjacent_silicon",
+      "aliases": [
+        "Meta Platforms"
+      ],
+      "attributes": {},
+      "confidence": 0.55,
+      "source_ids": [
+        "nextplatform_broadcom_cpo_2025_10_17_s1",
+        "nextplatform_broadcom_cpo_2025_10_17_s3"
+      ]
+    },
+    {
+      "id": "tech:cpo",
+      "type": "TechNode",
+      "name": "Co-packaged optics (CPO)",
+      "abstraction_level": "module_subsystem",
+      "role": null,
+      "aliases": [
+        "co-packaged optics"
+      ],
+      "attributes": {},
+      "confidence": 0.55,
+      "source_ids": [
+        "nextplatform_broadcom_cpo_2025_10_17_s3"
+      ]
+    },
+    {
+      "id": "tech:pluggable_transceiver",
+      "type": "TechNode",
+      "name": "Pluggable optical transceiver",
+      "abstraction_level": "module_subsystem",
+      "role": null,
+      "aliases": [
+        "pluggable optics"
+      ],
+      "attributes": {},
+      "confidence": 0.55,
+      "source_ids": [
+        "nextplatform_broadcom_cpo_2025_10_17_s3"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:broadcom",
+      "dst_id": "co:meta",
+      "relation": "supplies_to",
+      "attributes": {
+        "qualification_status": "qualified"
+      },
+      "confidence": 0.5,
+      "source_ids": [
+        "nextplatform_broadcom_cpo_2025_10_17_s1",
+        "nextplatform_broadcom_cpo_2025_10_17_s2"
+      ]
+    },
+    {
+      "id": "e2",
+      "src_id": "co:broadcom",
+      "dst_id": "tech:cpo",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.5,
+      "source_ids": [
+        "nextplatform_broadcom_cpo_2025_10_17_s4"
+      ]
+    },
+    {
+      "id": "e3",
+      "src_id": "tech:cpo",
+      "dst_id": "tech:pluggable_transceiver",
+      "relation": "competes_with",
+      "attributes": {},
+      "confidence": 0.5,
+      "source_ids": [
+        "nextplatform_broadcom_cpo_2025_10_17_s3"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "nextplatform_broadcom_cpo_2025_10_17_cl1",
+      "statement": "Meta's system-level testing of Broadcom Bailly (Tomahawk 5) CPO switches logged over 1 million device hours with zero link flaps and no failures or uncorrectable codewords — hyperscaler-side reliability validation of Broadcom's CPO platform.",
+      "subject_id": "e1",
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Later field data shows material CPO link-failure rates at Meta, or Meta halts CPO deployment.",
+      "confidence": 0.55,
+      "source_ids": [
+        "nextplatform_broadcom_cpo_2025_10_17_s1",
+        "nextplatform_broadcom_cpo_2025_10_17_s2"
+      ]
+    },
+    {
+      "id": "nextplatform_broadcom_cpo_2025_10_17_cl2",
+      "statement": "CPO's structural power advantage over retimed pluggable optics is ~65% lower power per 100G lane (Bailly 800G port 5.5W vs 16-18W pluggable); Broadcom's third-gen Davisson (Tomahawk 6 CPO, 102.4T) cuts this further to ~3.5W per 800G port with field-replaceable laser modules.",
+      "subject_id": "tech:cpo",
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Next-gen pluggable optics (e.g. LPO/LRO) close the per-lane power gap to CPO, removing the structural efficiency argument.",
+      "confidence": 0.55,
+      "source_ids": [
+        "nextplatform_broadcom_cpo_2025_10_17_s3",
+        "nextplatform_broadcom_cpo_2025_10_17_s4"
+      ]
+    }
+  ]
+}

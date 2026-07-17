@@ -1,0 +1,21 @@
+The Next Platform — "The Third Time Will Be The Charm For Broadcom Switch Co-Packaged Optics"
+Author: Timothy Prickett Morgan
+Published: 2025-10-17
+URL: https://www.nextplatform.com/2025/10/17/the-third-time-will-be-the-charm-for-broadcom-switch-co-packaged-optics/
+Retrieved: 2026-07-17
+Storage: repo_excerpt — brief quotations only. Independent trade-press analysis incl. Meta test data.
+
+== Key verbatim excerpts ==
+
+[Meta Bailly CPO reliability testing]
+"over the first 1 million device hours...there were zero link flaps observed."
+"the highest device hours reported for CPO technology operation at the system level" with "no failures or uncorrectable codewords (UCWs) in the links."
+
+[Power efficiency]
+An 800 Gb/sec Bailly port consumed 5.5 watts compared to 16-18 watts for standard pluggable optics. Meta's paper noted CPO delivered "65 percent lower power per 100 Gb/sec lane compared to retimed pluggable optical models."
+
+[Davisson / Tomahawk 6 CPO]
+Third-generation device: 102.4 Tb/sec capacity with field-replaceable laser modules. An 800 Gb/sec port consumes approximately 3.5 watts — 36.4% lower than Tomahawk 5 CPO and over 70% less than pluggable optics.
+
+[Hyperscaler adoption]
+Meta Platforms deployed/tested Bailly-based CPO switches (Tencent presumed by the author, not confirmed).
