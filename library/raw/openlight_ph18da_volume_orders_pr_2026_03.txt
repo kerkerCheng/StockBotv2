@@ -1,0 +1,4 @@
+Source URL: https://openlightphotonics.com/newsroom/openlight-receives-first-volume-production-orders
+
+Excerpt:
+announced the first-ever volume production orders by a customer on its PH18DA indium phosphide (InP) on silicon photonic platform, developed in collaboration with Tower Semiconductor … This milestone based on NewPhotonics 800G and 1.6T laser-integrated PIC solution marks a major step forward bringing highly integrated, laser-enabled photonic ICs into high-volume production

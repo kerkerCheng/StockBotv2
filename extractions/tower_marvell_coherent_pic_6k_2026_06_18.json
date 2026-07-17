@@ -1,0 +1,143 @@
+{
+  "claims": [
+    {
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "If Marvell moves coherent PIC production to another foundry or in-house, or cumulative shipment disclosures stop growing in subsequent filings, downgrade.",
+      "id": "tower_marvell_coherent_pic_6k_2026_06_18_cl1",
+      "source_ids": [
+        "tower_marvell_coherent_pic_6k_2026_06_18_s1",
+        "tower_marvell_coherent_pic_6k_2026_06_18_s3"
+      ],
+      "statement": "Tower, in partnership with Marvell Technology, has shipped over five million coherent photonic ICs to Marvell global customers, evidencing volume production on Tower's SiPho foundry platform for AI-driven DCI applications.",
+      "subject_id": "co:tower_semiconductor"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {
+        "qualification_status": "designed_in"
+      },
+      "confidence": 0.75,
+      "dst_id": "co:marvell_technology",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "tower_marvell_coherent_pic_6k_2026_06_18_s1"
+      ],
+      "src_id": "co:tower_semiconductor"
+    },
+    {
+      "attributes": {
+        "qualification_status": "designed_in"
+      },
+      "confidence": 0.75,
+      "dst_id": "tech:coherent_pic",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "tower_marvell_coherent_pic_6k_2026_06_18_s1"
+      ],
+      "src_id": "co:tower_semiconductor"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:dci_transceiver",
+      "id": "e3",
+      "relation": "enables",
+      "source_ids": [
+        "tower_marvell_coherent_pic_6k_2026_06_18_s3"
+      ],
+      "src_id": "tech:coherent_pic"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:tower_semiconductor",
+      "name": "Tower Semiconductor",
+      "role": "foundry",
+      "source_ids": [
+        "tower_marvell_coherent_pic_6k_2026_06_18_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:marvell_technology",
+      "name": "Marvell Technology",
+      "role": null,
+      "source_ids": [
+        "tower_marvell_coherent_pic_6k_2026_06_18_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "coherent PIC"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 4
+      },
+      "confidence": 0.9,
+      "id": "tech:coherent_pic",
+      "name": "Coherent photonic integrated circuit (PIC)",
+      "role": null,
+      "source_ids": [
+        "tower_marvell_coherent_pic_6k_2026_06_18_s1",
+        "tower_marvell_coherent_pic_6k_2026_06_18_s2"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:dci_transceiver",
+      "name": "Data center interconnect (DCI) transceiver",
+      "role": null,
+      "source_ids": [
+        "tower_marvell_coherent_pic_6k_2026_06_18_s3"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "tower_marvell_coherent_pic_6k_2026_06_18",
+    "evidence_tier": 1,
+    "origin_entity": "Tower Semiconductor",
+    "permission_basis": "SEC EDGAR 公開 6-K 文件,保存有限逐字節錄與 canonical URL",
+    "published_at": "2026-06-18",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Tower Semiconductor and Marvell Ship Over Five Million Coherent Photonic ICs (Form 6-K)",
+    "url": "https://www.sec.gov/Archives/edgar/data/0000928876/000117891326003242/zk2635572.htm"
+  },
+  "sources": [
+    {
+      "id": "tower_marvell_coherent_pic_6k_2026_06_18_s1",
+      "locator": "6-K exhibit PR para 1",
+      "quote": "The company, in partnership with Marvell Technology, has shipped over five million coherent photonic integrated circuits (PICs) to Marvell global customers"
+    },
+    {
+      "id": "tower_marvell_coherent_pic_6k_2026_06_18_s2",
+      "locator": "6-K exhibit PR para 2",
+      "quote": "Coherent PICs are complex because they must control the phase and polarization of light, not just the amplitude. The design and process requirements for these PICs are far more stringent"
+    },
+    {
+      "id": "tower_marvell_coherent_pic_6k_2026_06_18_s3",
+      "locator": "6-K exhibit PR para 1",
+      "quote": "delivering advanced, high-performance photonics solutions to address the growing bandwidth and efficiency demands of AI-driven data center interconnect (DCI) networks"
+    }
+  ]
+}

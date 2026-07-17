@@ -1,0 +1,125 @@
+{
+  "claims": [
+    {
+      "confidence": 0.9,
+      "demand_proof_level": "guided",
+      "disproof_condition": "If transceiver/CPO architectures integrate TIA and driver functions into DSP or the SiPho PIC itself, reducing discrete SiGe TIA/driver content per port, the 1:1 coupling breaks and this claim should be downgraded.",
+      "id": "tower_q1_2026_earnings_call_2026_05_13_cl1",
+      "source_ids": [
+        "tower_q1_2026_earnings_call_2026_05_13_s1"
+      ],
+      "statement": "Per Tower CEO, TIA/driver unit demand scales at roughly the same ratio as SiPho port growth, coupling Tower's SiGe TIA/driver business to the same AI optical connectivity demand as SiPho.",
+      "subject_id": "tech:tia_driver"
+    },
+    {
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "If Fab 7 or new SiPho/SiGe capacity utilization falls materially below the utilization model, or the $920M investment plan is cut or deferred, downgrade.",
+      "id": "tower_q1_2026_earnings_call_2026_05_13_cl2",
+      "source_ids": [
+        "tower_q1_2026_earnings_call_2026_05_13_s2",
+        "tower_q1_2026_earnings_call_2026_05_13_s3"
+      ],
+      "statement": "Tower is executing a $920M SiGe+SiPho capacity investment across Israel, Newport Beach, Texas, and the 12-inch Uozu fab, while Fab 7 runs fully utilized above the 85% utilization model — capacity tightness preceding the July 2026 METI-backed expansion.",
+      "subject_id": "co:tower_semiconductor"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:tia_driver",
+      "id": "e1",
+      "relation": "enables",
+      "source_ids": [
+        "tower_q1_2026_earnings_call_2026_05_13_s1"
+      ],
+      "src_id": "tech:silicon_photonics_pic"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:tower_semiconductor",
+      "name": "Tower Semiconductor",
+      "role": "foundry",
+      "source_ids": [
+        "tower_q1_2026_earnings_call_2026_05_13_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "TIAs and drivers"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:tia_driver",
+      "name": "TIA and driver (optical transceiver)",
+      "role": null,
+      "source_ids": [
+        "tower_q1_2026_earnings_call_2026_05_13_s1"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:sige_platform",
+      "name": "Silicon Germanium (SiGe) platform",
+      "role": null,
+      "source_ids": [
+        "tower_q1_2026_earnings_call_2026_05_13_s2"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:silicon_photonics_pic",
+      "name": "Silicon Photonics PIC",
+      "role": null,
+      "source_ids": [
+        "tower_q1_2026_earnings_call_2026_05_13_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "tower_q1_2026_earnings_call_2026_05_13",
+    "evidence_tier": 1,
+    "origin_entity": "Tower Semiconductor",
+    "permission_basis": "公司法說會公開發言之有限逐字節錄(每則<200字元),來源為第三方轉錄頁,僅存節錄與 URL,不存全文",
+    "published_at": "2026-05-13",
+    "source_type": "transcript",
+    "storage_permission": "repo_excerpt",
+    "title": "Tower Semiconductor Q1 2026 Earnings Call Transcript",
+    "url": "https://www.investing.com/news/transcripts/earnings-call-transcript-tower-semiconductors-q1-2026-earnings-beat-expectations-93CH-4685444"
+  },
+  "sources": [
+    {
+      "id": "tower_q1_2026_earnings_call_2026_05_13_s1",
+      "locator": "Q&A, CEO Ellwanger reply to Mehdi Hosseini",
+      "quote": "As the ports increase and the movement to SiPho increases, that obviously the SiPho grows. As the ports increase as well, the need for TIAs and drivers increases pretty much at the same ratio."
+    },
+    {
+      "id": "tower_q1_2026_earnings_call_2026_05_13_s2",
+      "locator": "CFO Shirazi prepared remarks, CapEx section",
+      "quote": "we are executing a $920 million investment plan in capacity and capability of SiGe and SiPho in our 8-inch fabs in Israel, Newport Beach, Texas and also in our 12-inch Uozu fab in Japan"
+    },
+    {
+      "id": "tower_q1_2026_earnings_call_2026_05_13_s3",
+      "locator": "CEO prepared remarks, utilization section",
+      "quote": "Fab 7 continues to be fully utilized, well above our 85% utilization model."
+    }
+  ]
+}

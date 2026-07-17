@@ -1,0 +1,122 @@
+{
+  "claims": [
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "guided",
+      "disproof_condition": "If a competing foundry or in-house CMOS/BiCMOS alternatives take TIA/driver share, or later disclosures show materially lower share, downgrade. Figures are CEO self-report from mid-2024 and require re-verification against current-period statements.",
+      "id": "tower_q2_2024_earnings_call_2024_07_cl1",
+      "source_ids": [
+        "tower_q2_2024_earnings_call_2024_07_s1",
+        "tower_q2_2024_earnings_call_2024_07_s2"
+      ],
+      "statement": "Tower CEO states the company holds the number one market position in TIA and drivers for optical transceivers on its SiGe platform, at roughly 60-65% market share (as of mid-2024), making Tower a concentrated foundry node beneath datacom transceiver suppliers.",
+      "subject_id": "co:tower_semiconductor"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {
+        "qualification_status": "designed_in"
+      },
+      "confidence": 0.75,
+      "dst_id": "tech:tia_driver",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "tower_q2_2024_earnings_call_2024_07_s1",
+        "tower_q2_2024_earnings_call_2024_07_s2"
+      ],
+      "src_id": "co:tower_semiconductor"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:tia_driver",
+      "id": "e2",
+      "relation": "depends_on",
+      "source_ids": [
+        "tower_q2_2024_earnings_call_2024_07_s1",
+        "tower_q2_2024_earnings_call_2024_07_s2"
+      ],
+      "src_id": "tech:pluggable_transceiver"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:tower_semiconductor",
+      "name": "Tower Semiconductor",
+      "role": "foundry",
+      "source_ids": [
+        "tower_q2_2024_earnings_call_2024_07_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:tia_driver",
+      "name": "TIA and driver (optical transceiver)",
+      "role": null,
+      "source_ids": [
+        "tower_q2_2024_earnings_call_2024_07_s1"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:sige_platform",
+      "name": "Silicon Germanium (SiGe) platform",
+      "role": null,
+      "source_ids": [
+        "tower_q2_2024_earnings_call_2024_07_s1"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:pluggable_transceiver",
+      "name": "Pluggable optical transceiver",
+      "role": null,
+      "source_ids": [
+        "tower_q2_2024_earnings_call_2024_07_s2"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "tower_q2_2024_earnings_call_2024_07",
+    "evidence_tier": 1,
+    "origin_entity": "Tower Semiconductor",
+    "permission_basis": "公司法說會公開發言之有限逐字節錄(每則<200字元),來源為第三方轉錄頁,僅存節錄與 URL,不存全文",
+    "published_at": "2024-07-25",
+    "source_type": "transcript",
+    "storage_permission": "repo_excerpt",
+    "title": "Tower Semiconductor FY24 Q2 Earnings Call Transcript",
+    "url": "https://www.stockinsights.ai/us/TSEM/earnings-transcript/fy24-q2-d46d"
+  },
+  "sources": [
+    {
+      "id": "tower_q2_2024_earnings_call_2024_07_s1",
+      "locator": "CEO Ellwanger prepared remarks, growth drivers",
+      "quote": "SiGe demand and growth is predominantly from TIA and drivers for optical transceivers, where I believe we hold the number one market position."
+    },
+    {
+      "id": "tower_q2_2024_earnings_call_2024_07_s2",
+      "locator": "Q&A, CEO on TIA/driver share within pluggables",
+      "quote": "If you're sitting at 60%, 65% market share and that market grows as long as you sustain that market share you have very good growth."
+    }
+  ]
+}

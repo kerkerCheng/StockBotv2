@@ -1,0 +1,75 @@
+{
+  "claims": [
+    {
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "If contracts are cancelled or renegotiated down, prepayments are refunded, or the 2028-linked prepayments due by January 2027 fail to arrive, downgrade.",
+      "id": "tower_sipho_contracts_6k_2026_05_13_cl1",
+      "source_ids": [
+        "tower_sipho_contracts_6k_2026_05_13_s1",
+        "tower_sipho_contracts_6k_2026_05_13_s2",
+        "tower_sipho_contracts_6k_2026_05_13_s3"
+      ],
+      "statement": "Tower has signed SiPho contracts worth $1.3B for 2027 revenue with its largest customers, backed by $290M received prepayments for capacity reservation; 2028 contractual wafer commitments are even larger, with associated prepayments due by January 2027. Prepaid reservations are minimum commitments, with full customer demand forecast higher.",
+      "subject_id": "co:tower_semiconductor"
+    }
+  ],
+  "edges": [],
+  "nodes": [
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:tower_semiconductor",
+      "name": "Tower Semiconductor",
+      "role": "foundry",
+      "source_ids": [
+        "tower_sipho_contracts_6k_2026_05_13_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:silicon_photonics_pic",
+      "name": "Silicon Photonics PIC",
+      "role": null,
+      "source_ids": [
+        "tower_sipho_contracts_6k_2026_05_13_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "tower_sipho_contracts_6k_2026_05_13",
+    "evidence_tier": 1,
+    "origin_entity": "Tower Semiconductor",
+    "permission_basis": "SEC EDGAR 公開 6-K 文件,保存有限逐字節錄與 canonical URL",
+    "published_at": "2026-05-13",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Tower Semiconductor Signs Customer Contracts for $1.3 Billion Silicon Photonics Revenue for 2027 (Form 6-K)",
+    "url": "https://www.sec.gov/Archives/edgar/data/0000928876/000117891326002609/zk2635309.htm"
+  },
+  "sources": [
+    {
+      "id": "tower_sipho_contracts_6k_2026_05_13_s1",
+      "locator": "6-K exhibit PR para 1",
+      "quote": "announced it has signed Silicon Photonics (SiPho) contracts for $1.3 billion for 2027 revenue with its largest customers, and the receipt of $290 million in customers' prepayments for capacity reservation"
+    },
+    {
+      "id": "tower_sipho_contracts_6k_2026_05_13_s2",
+      "locator": "6-K exhibit PR para 1",
+      "quote": "This initial commitment is further reinforced by an even larger contractual wafer commitment for 2028 for which additional associated prepayments are due by January 2027."
+    },
+    {
+      "id": "tower_sipho_contracts_6k_2026_05_13_s3",
+      "locator": "6-K exhibit PR para 2",
+      "quote": "The pre-paid capacity reservation is the customer contractual commitment, with their full demand and Tower shipment forecast being higher."
+    }
+  ]
+}

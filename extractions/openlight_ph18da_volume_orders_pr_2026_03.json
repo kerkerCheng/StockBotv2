@@ -1,0 +1,136 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "If PH18DA volume remains confined to a single customer, on-wafer InP laser yield/reliability underperforms discrete lasers, or hyperscaler CPO designs remain on external laser sources through 2027, the integrated-laser substitution threat stays contained and this watch can be closed.",
+      "id": "openlight_ph18da_volume_orders_pr_2026_03_cl1",
+      "source_ids": [
+        "openlight_ph18da_volume_orders_pr_2026_03_s1",
+        "openlight_ph18da_volume_orders_pr_2026_03_s2"
+      ],
+      "statement": "First volume production orders on the Tower/OpenLight PH18DA InP-on-silicon platform (NewPhotonics 800G/1.6T laser-integrated PICs) mark on-chip integrated lasers entering high-volume production — a live trigger-watch for the existing graph disproof condition that architectures shifting to on-chip integrated lasers would erode external-laser-source (ELS) and discrete CW/EML laser demand.",
+      "subject_id": "prod:ph18da"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.65,
+      "dst_id": "co:tower_semiconductor",
+      "id": "e1",
+      "relation": "partnership_with",
+      "source_ids": [
+        "openlight_ph18da_volume_orders_pr_2026_03_s1"
+      ],
+      "src_id": "co:openlight_photonics"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.65,
+      "dst_id": "prod:ph18da",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "openlight_ph18da_volume_orders_pr_2026_03_s1"
+      ],
+      "src_id": "co:tower_semiconductor"
+    },
+    {
+      "attributes": {
+        "qualification_status": "designed_in"
+      },
+      "confidence": 0.65,
+      "dst_id": "co:newphotonics",
+      "id": "e3",
+      "relation": "supplies_to",
+      "source_ids": [
+        "openlight_ph18da_volume_orders_pr_2026_03_s1",
+        "openlight_ph18da_volume_orders_pr_2026_03_s2"
+      ],
+      "src_id": "co:openlight_photonics"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "OpenLight Photonics"
+      ],
+      "attributes": {},
+      "confidence": 0.75,
+      "id": "co:openlight_photonics",
+      "name": "OpenLight",
+      "role": "disruptor",
+      "source_ids": [
+        "openlight_ph18da_volume_orders_pr_2026_03_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.75,
+      "id": "co:newphotonics",
+      "name": "NewPhotonics",
+      "role": "disruptor",
+      "source_ids": [
+        "openlight_ph18da_volume_orders_pr_2026_03_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.75,
+      "id": "co:tower_semiconductor",
+      "name": "Tower Semiconductor",
+      "role": "foundry",
+      "source_ids": [
+        "openlight_ph18da_volume_orders_pr_2026_03_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [
+        "PH18DA"
+      ],
+      "attributes": {},
+      "confidence": 0.75,
+      "id": "prod:ph18da",
+      "name": "PH18DA InP-on-silicon photonic platform",
+      "role": null,
+      "source_ids": [
+        "openlight_ph18da_volume_orders_pr_2026_03_s1"
+      ],
+      "type": "Product"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "openlight_ph18da_volume_orders_pr_2026_03",
+    "evidence_tier": 2,
+    "origin_entity": "OpenLight",
+    "permission_basis": "公司官方新聞稿公開頁面(openlightphotonics.com newsroom),僅保存有限逐字節錄與 canonical URL",
+    "published_at": "2026-03-06",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "OpenLight Receives First Volume Production Orders for NewPhotonics 800G and 1.6T Laser-Integrated PICs with Tower Semiconductor PH18DA InP-on-Silicon Platform",
+    "url": "https://openlightphotonics.com/newsroom/openlight-receives-first-volume-production-orders"
+  },
+  "sources": [
+    {
+      "id": "openlight_ph18da_volume_orders_pr_2026_03_s1",
+      "locator": "PR para 1",
+      "quote": "announced the first-ever volume production orders by a customer on its PH18DA indium phosphide (InP) on silicon photonic platform, developed in collaboration with Tower Semiconductor"
+    },
+    {
+      "id": "openlight_ph18da_volume_orders_pr_2026_03_s2",
+      "locator": "PR para 1",
+      "quote": "This milestone based on NewPhotonics 800G and 1.6T laser-integrated PIC solution marks a major step forward bringing highly integrated, laser-enabled photonic ICs into high-volume production"
+    }
+  ]
+}

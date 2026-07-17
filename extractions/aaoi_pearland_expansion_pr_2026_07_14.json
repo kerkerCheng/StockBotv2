@@ -1,0 +1,108 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "guided",
+      "disproof_condition": "If construction stalls, or if upstream laser (EML/CW) supply constraints prevent output scaling despite floor-space addition, capacity does not translate to shipments. Verify whether AAOI's 800G/1.6T lasers are in-house or externally sourced; if external, this expansion is gated by the documented >30% EML undersupply.",
+      "id": "aaoi_pearland_expansion_pr_2026_07_14_cl1",
+      "source_ids": [
+        "aaoi_pearland_expansion_pr_2026_07_14_s1",
+        "aaoi_pearland_expansion_pr_2026_07_14_s2"
+      ],
+      "statement": "AAOI has begun construction adding nearly 400,000 sq ft of manufacturing capacity in Pearland, Texas to increase production of 800G and 1.6T optical transceivers for AI infrastructure — an onshoring capacity signal announced the same day as Tower's METI expansion.",
+      "subject_id": "co:applied_optoelectronics"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.65,
+      "dst_id": "tech:pluggable_transceiver",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "aaoi_pearland_expansion_pr_2026_07_14_s2"
+      ],
+      "src_id": "co:applied_optoelectronics"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.65,
+      "dst_id": "tech:transceiver_1_6t",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "aaoi_pearland_expansion_pr_2026_07_14_s2"
+      ],
+      "src_id": "co:applied_optoelectronics"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "AOI",
+        "AAOI"
+      ],
+      "attributes": {},
+      "confidence": 0.75,
+      "id": "co:applied_optoelectronics",
+      "name": "Applied Optoelectronics",
+      "role": "leader",
+      "source_ids": [
+        "aaoi_pearland_expansion_pr_2026_07_14_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.75,
+      "id": "tech:pluggable_transceiver",
+      "name": "Pluggable optical transceiver",
+      "role": null,
+      "source_ids": [
+        "aaoi_pearland_expansion_pr_2026_07_14_s2"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.75,
+      "id": "tech:transceiver_1_6t",
+      "name": "1.6T-speed transceiver",
+      "role": null,
+      "source_ids": [
+        "aaoi_pearland_expansion_pr_2026_07_14_s2"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "aaoi_pearland_expansion_pr_2026_07_14",
+    "evidence_tier": 2,
+    "origin_entity": "Applied Optoelectronics",
+    "permission_basis": "公司官方新聞稿(GlobeNewswire 公開發布),僅保存有限逐字節錄與 canonical URL",
+    "published_at": "2026-07-14",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "AOI Begins Expansion of Pearland Manufacturing Campus to Scale 800G and 1.6T Optical Transceiver Production",
+    "url": "https://www.globenewswire.com/news-release/2026/07/14/3326701/9986/en/AOI-Begins-Expansion-of-Pearland-Manufacturing-Campus-to-Scale-800G-and-1-6T-Optical-Transceiver-Production.html"
+  },
+  "sources": [
+    {
+      "id": "aaoi_pearland_expansion_pr_2026_07_14_s1",
+      "locator": "PR para 1",
+      "quote": "announced it has begun construction on its two adjacent properties in Pearland, Texas, adding nearly 400,000 square feet of manufacturing capacity"
+    },
+    {
+      "id": "aaoi_pearland_expansion_pr_2026_07_14_s2",
+      "locator": "PR para 1",
+      "quote": "supports AOI's plans to increase production of its 800G and 1.6T optical transceivers, which are a critical component of modern AI infrastructures"
+    }
+  ]
+}

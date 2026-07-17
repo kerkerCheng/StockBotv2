@@ -1,0 +1,179 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "guided",
+      "disproof_condition": "If track two agreements fail to sign/close, METI grant covenants are breached causing loss of funds, or production readiness slips materially past Q4 2027, downgrade. If aggregate 2028-29 industry SiPho/transceiver capacity additions (Tower, AAOI, Coherent, Lumentum announced same quarter) outpace demand and fab utilization falls below full, the capacity-scarcity premise flips to oversupply.",
+      "id": "tower_meti_expansion_pr_2026_07_14_cl1",
+      "source_ids": [
+        "tower_meti_expansion_pr_2026_07_14_s1",
+        "tower_meti_expansion_pr_2026_07_14_s2",
+        "tower_meti_expansion_pr_2026_07_14_s3",
+        "tower_meti_expansion_pr_2026_07_14_s4",
+        "tower_meti_expansion_pr_2026_07_14_s5"
+      ],
+      "statement": "Tower is executing a METI-backed dual-track Japan expansion targeting a multi-fold increase in SiPho and SiGe capacity (~$3B investment net of $1B Japan government grants); track one production-ready Q4 2027, track two subject to signing and closing of agreements.",
+      "subject_id": "co:tower_semiconductor"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.65,
+      "dst_id": "tech:silicon_photonics_pic",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "tower_meti_expansion_pr_2026_07_14_s1",
+        "tower_meti_expansion_pr_2026_07_14_s3"
+      ],
+      "src_id": "co:tower_semiconductor"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.65,
+      "dst_id": "tech:sige_platform",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "tower_meti_expansion_pr_2026_07_14_s1"
+      ],
+      "src_id": "co:tower_semiconductor"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.65,
+      "dst_id": "tech:advanced_packaging",
+      "id": "e3",
+      "relation": "supplies_to",
+      "source_ids": [
+        "tower_meti_expansion_pr_2026_07_14_s1"
+      ],
+      "src_id": "co:tower_semiconductor"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.65,
+      "dst_id": "tech:silicon_photonics_pic",
+      "id": "e4",
+      "relation": "enables",
+      "source_ids": [
+        "tower_meti_expansion_pr_2026_07_14_s3"
+      ],
+      "src_id": "tech:ai_compute_buildout"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [
+        "TSEM",
+        "TowerJazz"
+      ],
+      "attributes": {},
+      "confidence": 0.75,
+      "id": "co:tower_semiconductor",
+      "name": "Tower Semiconductor",
+      "role": "foundry",
+      "source_ids": [
+        "tower_meti_expansion_pr_2026_07_14_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [
+        "SiGe"
+      ],
+      "attributes": {},
+      "confidence": 0.75,
+      "id": "tech:sige_platform",
+      "name": "Silicon Germanium (SiGe) platform",
+      "role": null,
+      "source_ids": [
+        "tower_meti_expansion_pr_2026_07_14_s1"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "SiPho"
+      ],
+      "attributes": {},
+      "confidence": 0.75,
+      "id": "tech:silicon_photonics_pic",
+      "name": "Silicon Photonics PIC",
+      "role": null,
+      "source_ids": [
+        "tower_meti_expansion_pr_2026_07_14_s1"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.75,
+      "id": "tech:advanced_packaging",
+      "name": "Advanced Semiconductor Packaging",
+      "role": null,
+      "source_ids": [
+        "tower_meti_expansion_pr_2026_07_14_s1"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "end_demand",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.75,
+      "id": "tech:ai_compute_buildout",
+      "name": "AI training/inference cluster buildout",
+      "role": null,
+      "source_ids": [
+        "tower_meti_expansion_pr_2026_07_14_s3"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "tower_meti_expansion_pr_2026_07_14",
+    "evidence_tier": 2,
+    "origin_entity": "Tower Semiconductor",
+    "permission_basis": "公司官方新聞稿公開頁面(towersemi.com),僅保存研究所需有限逐字節錄與 canonical URL,不保存全文",
+    "published_at": "2026-07-14",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Tower Semiconductor with METI Support Announces Strategic Capacity Expansion in Japan",
+    "url": "https://towersemi.com/2026/07/14/07142026/"
+  },
+  "sources": [
+    {
+      "id": "tower_meti_expansion_pr_2026_07_14_s1",
+      "locator": "PR para 1",
+      "quote": "announced a parallel dual-track strategic expansion of its 300mm Silicon Photonics (SiPho), Silicon Germanium (SiGe), and advanced packaging capabilities in Japan, with support from the Government of Japan"
+    },
+    {
+      "id": "tower_meti_expansion_pr_2026_07_14_s2",
+      "locator": "PR track one para",
+      "quote": "Track one adds significant new 300mm Silicon Photonics capacity, with full production readiness expected during the fourth quarter of 2027"
+    },
+    {
+      "id": "tower_meti_expansion_pr_2026_07_14_s3",
+      "locator": "PR track two para",
+      "quote": "expected to provide a multi-fold increase in Silicon Photonics and Silicon Germanium capacity, positioning Tower to support continued accelerating customer demand for emerging AI and data center applications"
+    },
+    {
+      "id": "tower_meti_expansion_pr_2026_07_14_s4",
+      "locator": "PR investment scope para",
+      "quote": "The scope of the dual-track expansion is forecasted to be an approximate $3 billion Tower's investment, net of grants of $1 billion, to be provided by the Government of Japan."
+    },
+    {
+      "id": "tower_meti_expansion_pr_2026_07_14_s5",
+      "locator": "PR track two para",
+      "quote": "Track two will commence in parallel with the first track and consists of constructing an additional 300mm manufacturing facility, adjacent to Fab 7, following signing and closing of related agreements."
+    }
+  ]
+}
