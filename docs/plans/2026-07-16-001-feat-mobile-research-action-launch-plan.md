@@ -2,6 +2,8 @@
 title: "Mobile Research Action Launch - Plan"
 type: feat
 date: 2026-07-16
+status: completed
+status_note: "2026-07-17 rollout smoke 走完 prepare→核准→apply→跨 session status→本機 publish 全鏈（見 AGENTS.md 開發優先序 M1 遞補註記）。取代 008 U13 遠端 finalize。"
 deepened: 2026-07-16
 depth: deep
 artifact_contract: ce-unified-plan/v1

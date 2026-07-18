@@ -1,7 +1,8 @@
 ---
 title: "feat: 投資查詢能力規劃 — $SIVE 問題透鏡下的系統缺口審查 + 下一階段里程碑"
 date: 2026-07-08
-status: active
+status: superseded
+superseded_by: docs/plans/2026-07-10-006-feat-personal-investment-advisor-roadmap-plan.md
 type: feat
 depth: deep
 ---

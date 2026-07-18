@@ -1,7 +1,7 @@
 ---
 title: "feat: CPO/矽光子垂直切片 v1 — 多文件擴張 + Thesis 生成"
 date: 2026-06-26
-status: active
+status: completed
 type: feat
 depth: standard
 origin: docs/plans/2026-06-07-001-feat-cpo-vertical-slice-plan.md

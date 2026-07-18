@@ -2,6 +2,8 @@
 title: "feat: 統一工作計畫 — Engine A 品質優先（Phase I–III）"
 type: feat
 date: 2026-07-15
+status: completed
+status_note: "Phase I–III 全數落地（見 docs/reports/、config/investment_policy.json、paper_portfolio/）。U13 遠端 finalize_research_action 已由 2026-07-16 mobile plan 的 prepare/apply 兩段式協定取代，不再實作。"
 depth: deep
 origins:
   - docs/brainstorms/2026-07-13-source-trace-upgrade-requirements.md
