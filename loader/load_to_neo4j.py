@@ -68,7 +68,6 @@ TICKER_MAP: dict[str, str | None] = {
     "co:cadence": "CDNS",
     "co:apollo": "APO",
     "co:blackstone": "BX",
-    "co:o_net_technologies": "0877.HK",   # 港股
     "co:sumitomo_electric": "5802.T",     # 東證
     "co:jx_advanced_metals": "5016.T",    # 東證，2025-03 IPO
     "co:enablence_technologies": "ENA.V", # TSX Venture
@@ -86,6 +85,7 @@ TICKER_MAP: dict[str, str | None] = {
     "co:nava_thailand": None,
     "co:ime_cas": None,   # 中科院微電子所（研究機構）
     "co:ansys": None,     # 2025 年併入 Synopsys 下市；不對映 SNPS 以免 join 錯財務
+    "co:o_net_technologies": None,  # 原港股 0877.HK，2021 私有化下市，yfinance 無資料
 }
 
 

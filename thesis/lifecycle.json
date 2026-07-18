@@ -1,0 +1,20 @@
+{
+  "coherent_cpo": {
+    "status": "active",
+    "memo": "thesis/coherent_cpo_v2_lane_memo.md",
+    "ticker": "COHR",
+    "last_checked": "2026-07-17",
+    "next_check": "2026-10-15",
+    "check_interval_days": 90,
+    "note": "memo 於 2026-07-17 conflict-resolved 重生成（commit 6ec70c7）；12 月另有六吋 InP 產能倍增檢核點"
+  },
+  "sivers": {
+    "status": "review_required",
+    "memo": "thesis/sivers_v2_lane_memo.md",
+    "ticker": "SIVE.ST",
+    "last_checked": "2026-07-12",
+    "next_check": "2026-08-27",
+    "check_interval_days": 30,
+    "note": "L7 review 已於 2026-07-12 人工決議：持有至 2026-08-27 Q2+財報重編分辨點；觸發任一核查點須 48h 內人工決策（詳見 memo header 與 GitHub Issue #2）"
+  }
+}

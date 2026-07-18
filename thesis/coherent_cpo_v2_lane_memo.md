@@ -1,6 +1,8 @@
 <!-- output_type: [Research Note] | ticker: COHR | checklist_pass: False | l9_pass: False | evidence_manifest_pass: True | evidence_gate_pass: False -->
 
 # Directional Lane Memo — Coherent（CPO 外部雷射 / InP 垂直整合）
+**生成日期：** 2026-07-17
+**核查頻率與觸發動作：** 每週掃描（weekly 審查）自動監控 disproof 訊號；完整核查每季一次（下次依 `thesis/lifecycle.json`，2026-10-15）。關鍵檢核點：每季 Coherent 法說會（scale-out CPO 營收認列進度）、2026-12 六吋 InP 產能倍增達成與否、NVIDIA 端第二供應商訊號。任一 disproof 條件觸發 → 48 小時內人工 review，決定降評／維持／退場。
 
 ## 1. 一句 thesis
 

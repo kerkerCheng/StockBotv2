@@ -30,7 +30,7 @@
 | `skills/lead-intake` | 丟來一條推文/報導/消息，要入庫 |
 | `skills/blind-spot-audit` | 已有 thesis，要找反駁角度 |
 | `skills/company-onboard` | 新公司尚未入圖，要找文件並 onboarding |
-| `skills/signal-triage` | 週掃 harvest 後判斷是否值得進入完整抽取 |
+| `skills/signal-triage` | 週掃 harvest 後判斷是否值得列入 Topic Digest（深挖由本機 session 點名） |
 | `skills/source-trace` | 推文／轉述／截圖／二手報導先追回原文；tier 3–4 未果隔離 |
 | `skills/evidence-conflict-resolution` | EdgeAssertion 屬性衝突產 proposal；只在人工核准後寫 resolution |
 
@@ -51,6 +51,7 @@ fetchers/edgar.py ──────↑                        engine_c/etl_yfin
 - **抽取與 DB 解耦：** `extract.py` 只輸出 DB 無關 JSON；loader 可替換。DB 選型不綁死資料。
 - **fetchers（已有）：** `fetchers/edgar.py`（美股 SEC EDGAR，免費無 paywall）。
 - **引擎B（自動 harvest 未建；ad hoc 手機入口已建）：** X 推文/小道消息 → 線索 → 走 `skills/lead-intake` 閘門 → Research Action → 入庫。自動 X/trending harvest 仍未建。
+- **每週審查（cloud routine，台北 06:00，`crons/weekly_scan_prompt.md`）：** 只做 topic discovery（不追源、不抽取，深挖由使用者本機 session 點名「research topic N」）+ thesis 生命週期**到期制**核查（L7 的流程實作；狀態存 `thesis/lifecycle.json`，active 90 天／watch 30 天）+ 系統健康審查（審查查詢唯一權威 `query/health_audit.py`；Engine C 等本機項目由使用者跑 `python query/health_audit.py --local` 補齊）。原 `crons/thesis_monitor_prompt.md` 季度 cron 已併入此處刪除（CronCreate 7 天過期，跑不起來）。
 - **各類來源的 AI 抽取 instruction：** [`docs/extraction-instructions.md`](docs/extraction-instructions.md)
 - **遠端存取（手機 App / web / cloud routine 讀寫圖與查 Engine C）：** 本機 MCP server（`mcp_server/graph_mcp.py`）+ Cloudflare Tunnel + connector。九工具 surface 沒有 remote Git；完整資料流、安全邊界、Research Action／storage 協定與跨平台限制：[`docs/remote-access-architecture.md`](docs/remote-access-architecture.md)
 
