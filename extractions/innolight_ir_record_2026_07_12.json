@@ -1,0 +1,96 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "innolight_ir_record_2026_07_12",
+    "evidence_tier": 1,
+    "origin_entity": "Zhongji Innolight",
+    "permission_basis": "深交所上市公司正式披露之投資者關係活動記錄表(巨潮資訊/東方財富公開 PDF),僅保存有限逐字節錄與 canonical URL",
+    "published_at": "2026-07-12",
+    "source_type": "transcript",
+    "storage_permission": "repo_excerpt",
+    "title": "中際旭創股份有限公司 投資者關係活動記錄表 編號:2026-006(電話會議)",
+    "url": "https://pdf.dfcfw.com/pdf/H2_AN202607121826913971_1.pdf"
+  },
+  "nodes": [
+    {
+      "id": "tech:transceiver_800g",
+      "type": "TechNode",
+      "name": "800G-speed transceiver",
+      "abstraction_level": "module_subsystem",
+      "role": null,
+      "aliases": ["800G optical module", "800G"],
+      "attributes": {},
+      "confidence": 0.85,
+      "source_ids": ["innolight_ir_record_2026_07_12_s1"]
+    },
+    {
+      "id": "tech:transceiver_1_6t",
+      "type": "TechNode",
+      "name": "1.6T-speed transceiver",
+      "abstraction_level": "module_subsystem",
+      "role": null,
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.85,
+      "source_ids": ["innolight_ir_record_2026_07_12_s2"]
+    },
+    {
+      "id": "tech:silicon_photonics",
+      "type": "TechNode",
+      "name": "Silicon Photonics transceiver",
+      "abstraction_level": "module_subsystem",
+      "role": null,
+      "aliases": ["SiPh", "硅光"],
+      "attributes": {},
+      "confidence": 0.85,
+      "source_ids": ["innolight_ir_record_2026_07_12_s3"]
+    }
+  ],
+  "edges": [],
+  "claims": [
+    {
+      "id": "innolight_ir_record_2026_07_12_cl1",
+      "statement": "Zhongji Innolight (largest optical module maker; demand-side customer of CW/EML lasers) stated on 2026-07-12 that 2027 industry-wide 800G demand growth is more significant than previously expected — a module-maker-origin demand signal upstream of laser suppliers (Lumentum, AAOI read-through per Engine B curation).",
+      "subject_id": "tech:transceiver_800g",
+      "demand_proof_level": "guided",
+      "confidence": 0.8,
+      "disproof_condition": "If Innolight's subsequent quarterly disclosures cut 800G shipment guidance, or industry 800G orders show inventory-correction signs in H2 2026 – 2027, this stronger-than-expected demand reading is invalidated.",
+      "source_ids": ["innolight_ir_record_2026_07_12_s1"]
+    },
+    {
+      "id": "innolight_ir_record_2026_07_12_cl2",
+      "statement": "Innolight stated 2027 industry 1.6T demand remains strong and unchanged versus the previously expected volume range, with customer count increasing — corroborating the 1.6T ramp demand assumption used across CPO/optics theses from a demand-side origin.",
+      "subject_id": "tech:transceiver_1_6t",
+      "demand_proof_level": "guided",
+      "confidence": 0.8,
+      "disproof_condition": "If the 2027 1.6T expected volume range is revised down or customer count shrinks in later Innolight disclosures, this corroboration is invalidated.",
+      "source_ids": ["innolight_ir_record_2026_07_12_s2"]
+    },
+    {
+      "id": "innolight_ir_record_2026_07_12_cl3",
+      "statement": "Innolight stated silicon photonics (SiPh) share continues to trend up: 800G customers are further increasing SiPh ratio, 1.6T added new customers, and new customers show strong interest in SiPh solutions — supporting the rising-SiPh-penetration assumption that expands TAM for external CW laser suppliers (e.g., Sivers ELS thesis) and SOI wafer demand.",
+      "subject_id": "tech:silicon_photonics",
+      "demand_proof_level": "guided",
+      "confidence": 0.8,
+      "disproof_condition": "If SiPh ratio plateaus or reverses in Innolight's product mix (e.g., EML-based modules regain share in 1.6T), the SiPh-penetration TAM expansion assumption is invalidated.",
+      "source_ids": ["innolight_ir_record_2026_07_12_s3"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "innolight_ir_record_2026_07_12_s1",
+      "locator": "A1",
+      "quote": "2027年800G行業需求增長較此前預期更為顯著。"
+    },
+    {
+      "id": "innolight_ir_record_2026_07_12_s2",
+      "locator": "A1",
+      "quote": "2027年整體行業的1.6T需求依然保持強勁，與此前預期的數量區間相比沒有變化，客戶數量也有所增加。"
+    },
+    {
+      "id": "innolight_ir_record_2026_07_12_s3",
+      "locator": "A18",
+      "quote": "硅光比例整體還是保持上行趨勢，去年主要是800G，今年800G一些客戶還在進一步增加硅光比例，此外1.6T還增加了一些新的客戶，27年1.6T客戶結構也會有更多變化，新客戶對硅光方案都充滿了濃厚的興趣。"
+    }
+  ]
+}
