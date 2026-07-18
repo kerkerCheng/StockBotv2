@@ -24,7 +24,9 @@ confidence 只描述證據強度，永遠不是勝負票數。
 
 ## Workflow
 
-1. 執行 `python query/edge_conflicts.py`，選最高風險 conflict。需要機讀資料時加 `--json`。
+1. 先跑 `python loader/edge_resolution.py project --dry-run`：`open_conflicts` 才是「真正未處置」數，
+   `0` 代表全部已解、無事可做（`edge_conflicts.py` 的 raw 數字不會因已解而下降，別被它誤導）。
+   確有未處置項時再執行 `python query/edge_conflicts.py` 選最高風險 conflict；需要機讀資料時加 `--json`。
 2. 核對 `conflict_id`、`candidate_set_hash`、edge triple、attribute 與每個 assertion。
 3. 依 `source_ids` 回到 frozen manifest 指向的 extraction，讀逐字 quote 與 SourceDoc metadata。
    找不到原文或 assertion/source ID 對不上時，停止並提 `unknown`；不可補猜。

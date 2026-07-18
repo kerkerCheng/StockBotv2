@@ -3,6 +3,14 @@
 The conflict queue is intentionally computed on demand. EdgeAssertions and
 SourceDocs are the evidence truth; approved JSON files are the only persisted
 decisions. No mutable conflict registry exists.
+
+NOTE: this module is the RAW detector — it reads only assertions and does NOT
+subtract approved resolutions. Its count stays constant even after every
+conflict is resolved (raw evidence still has 2+ distinct values by nature). For
+the count of conflicts that are actually still unresolved, run
+`python loader/edge_resolution.py project --dry-run` and read `open_conflicts`
+(0 == all handled), or use `query/health_audit.py`, which already subtracts
+approved/stale resolutions.
 """
 
 from __future__ import annotations
@@ -261,10 +269,16 @@ def format_conflict_report(edge_states: dict[str, dict]) -> str:
     conflicts = detect_conflicts(edge_states)
     lines = ["# Edge Evidence Conflict Report", ""]
     lines.append(
-        f"Edges: {len(edge_states)} | Open conflicts: {len(conflicts)}"
+        f"Edges: {len(edge_states)} | Derived conflicts "
+        f"(RAW — ignores approved resolutions): {len(conflicts)}"
+    )
+    lines.append(
+        "> This count does NOT drop when conflicts are resolved. For the number "
+        "actually still unresolved, run `python loader/edge_resolution.py "
+        "project --dry-run` and read `open_conflicts`."
     )
     if not conflicts:
-        lines.extend(["", "No open edge-attribute conflicts."])
+        lines.extend(["", "No derived edge-attribute conflicts."])
         return "\n".join(lines) + "\n"
     for conflict in conflicts:
         lines.extend(
