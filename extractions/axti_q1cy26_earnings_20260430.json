@@ -1,0 +1,110 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "axti_q1cy26_earnings",
+    "evidence_tier": 1,
+    "origin_entity": "AXT",
+    "permission_basis": "公開法說會逐字稿(Motley Fool 轉載),僅保存有限逐字節錄與 canonical URL",
+    "published_at": "2026-04-30",
+    "source_type": "transcript",
+    "storage_permission": "repo_excerpt",
+    "title": "AXT (AXTI) Q1 2026 Earnings Call Transcript",
+    "url": "https://www.fool.com/earnings/call-transcripts/2026/04/30/axt-axti-q1-2026-earnings-call-transcript/"
+  },
+  "nodes": [
+    {
+      "id": "co:axt",
+      "type": "Company",
+      "name": "AXT",
+      "abstraction_level": "materials_substrate",
+      "role": "material_base",
+      "aliases": ["AXT Inc", "AXTI", "Tongmei", "Beijing Tongmei Xtal Technology"],
+      "attributes": {},
+      "confidence": 0.85,
+      "source_ids": ["axti_q1cy26_earnings_s1"]
+    },
+    {
+      "id": "mat:inp_substrate",
+      "type": "Material",
+      "name": "Indium Phosphide (InP) substrate",
+      "abstraction_level": "materials_substrate",
+      "role": null,
+      "aliases": ["InP", "indium phosphide"],
+      "attributes": {},
+      "confidence": 0.85,
+      "source_ids": ["axti_q1cy26_earnings_s1"]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:axt",
+      "relation": "supplies_to",
+      "dst_id": "mat:inp_substrate",
+      "attributes": {},
+      "confidence": 0.85,
+      "source_ids": ["axti_q1cy26_earnings_s1", "axti_q1cy26_earnings_s3"]
+    }
+  ],
+  "claims": [
+    {
+      "id": "axti_q1cy26_earnings_cl1",
+      "statement": "AXT's InP substrate backlog reached a record high of over $100 million as of Q1 2026 (2026-04-30), with InP quarterly revenue of $13.6M driven primarily by data center / AI infrastructure demand — hard-order evidence that upstream InP substrate demand from AI optics is real, not forecast.",
+      "subject_id": "co:axt",
+      "demand_proof_level": "confirmed",
+      "confidence": 0.85,
+      "disproof_condition": "If InP backlog declines materially in subsequent quarters, or if China export permits fail to convert backlog into shipped revenue (backlog stays high but revenue stalls), the demand-signal reading of this backlog is invalidated.",
+      "source_ids": ["axti_q1cy26_earnings_s1", "axti_q1cy26_earnings_s3", "axti_q1cy26_earnings_s4"]
+    },
+    {
+      "id": "axti_q1cy26_earnings_cl2",
+      "statement": "AXT's top five customers generated approximately 32% of total revenue in Q1 2026 with no single customer above 10% — the transcript names no specific customer, so the AXT-Coherent supply link remains supported only by third-party reporting (Reuters), not by AXT's own disclosure.",
+      "subject_id": "co:axt",
+      "demand_proof_level": "confirmed",
+      "confidence": 0.85,
+      "disproof_condition": "If a future AXT filing or call discloses a customer above 10% of revenue, the customer-diversification reading changes and that customer's supply dependence on AXT should be re-scored.",
+      "source_ids": ["axti_q1cy26_earnings_s2"]
+    },
+    {
+      "id": "axti_q1cy26_earnings_cl3",
+      "statement": "AXT management identifies China export permit timing as the single most significant factor for growth in Q2 2026 and beyond, and reports it is still being encouraged to apply for export permits for U.S. customers — the choke on converting record InP backlog into revenue is regulatory, not demand or capacity.",
+      "subject_id": "co:axt",
+      "demand_proof_level": "confirmed",
+      "confidence": 0.85,
+      "disproof_condition": "If export permits are broadly granted and revenue conversion normalizes (or the permit regime is lifted), this regulatory-bottleneck claim retires; if permits are formally denied, the claim escalates to a supply-disruption risk for downstream InP users including Coherent.",
+      "source_ids": ["axti_q1cy26_earnings_s5", "axti_q1cy26_earnings_s6"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "axti_q1cy26_earnings_s1",
+      "locator": "Prepared remarks, CFO Gary L. Fischer",
+      "quote": "Indium phosphide backlog reached over $100 million, a new high."
+    },
+    {
+      "id": "axti_q1cy26_earnings_s2",
+      "locator": "Prepared remarks, CFO Gary L. Fischer",
+      "quote": "The top five customers generated approximately 32% of total revenue, and no customers were over the 10% level."
+    },
+    {
+      "id": "axti_q1cy26_earnings_s3",
+      "locator": "Prepared remarks, CFO Gary L. Fischer",
+      "quote": "Indium phosphide was $13.6 million, primarily from data center applications."
+    },
+    {
+      "id": "axti_q1cy26_earnings_s4",
+      "locator": "Q&A, CEO Morris S. Young",
+      "quote": "The massive AI infrastructure build-out and planned CapEx spending by cloud services and AI platform providers in the U.S. is the primary driver."
+    },
+    {
+      "id": "axti_q1cy26_earnings_s5",
+      "locator": "Prepared remarks, CFO Gary L. Fischer",
+      "quote": "The most significant single factor to our growth in Q2 and beyond is the success and timing of getting export permits."
+    },
+    {
+      "id": "axti_q1cy26_earnings_s6",
+      "locator": "Q&A, COO Tim Bettles",
+      "quote": "We are still being encouraged to apply for export permits for U.S. customers both in the U.S. and in other global regions."
+    }
+  ]
+}

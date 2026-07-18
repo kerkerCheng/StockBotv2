@@ -1,0 +1,101 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "nvidia_photonics_pr_2025_03_18",
+    "evidence_tier": 2,
+    "origin_entity": "NVIDIA",
+    "permission_basis": "公司官方新聞稿(NVIDIA Newsroom 公開發布),僅保存有限逐字節錄與 canonical URL",
+    "published_at": "2025-03-18",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "NVIDIA Announces Spectrum-X Photonics, Co-Packaged Optics Networking Switches to Scale AI Factories to Millions of GPUs",
+    "url": "https://nvidianews.nvidia.com/news/nvidia-spectrum-x-co-packaged-optics-networking-switches-ai-factories"
+  },
+  "nodes": [
+    {
+      "id": "co:nvidia",
+      "type": "Company",
+      "name": "NVIDIA",
+      "abstraction_level": "end_demand",
+      "role": "leader",
+      "aliases": ["NVDA"],
+      "attributes": {},
+      "confidence": 0.85,
+      "source_ids": ["nvidia_photonics_pr_2025_03_18_s1"]
+    },
+    {
+      "id": "co:lumentum",
+      "type": "Company",
+      "name": "Lumentum",
+      "abstraction_level": "device_chip",
+      "role": "bottleneck_supplier",
+      "aliases": ["LITE"],
+      "attributes": {},
+      "confidence": 0.85,
+      "source_ids": ["nvidia_photonics_pr_2025_03_18_s1"]
+    },
+    {
+      "id": "co:coherent",
+      "type": "Company",
+      "name": "Coherent",
+      "abstraction_level": "device_chip",
+      "role": "bottleneck_supplier",
+      "aliases": ["Coherent Corp", "COHR"],
+      "attributes": {},
+      "confidence": 0.85,
+      "source_ids": ["nvidia_photonics_pr_2025_03_18_s1"]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:lumentum",
+      "relation": "partnership_with",
+      "dst_id": "co:nvidia",
+      "attributes": {},
+      "confidence": 0.75,
+      "source_ids": ["nvidia_photonics_pr_2025_03_18_s1"]
+    },
+    {
+      "id": "e2",
+      "src_id": "co:coherent",
+      "relation": "partnership_with",
+      "dst_id": "co:nvidia",
+      "attributes": {},
+      "confidence": 0.75,
+      "source_ids": ["nvidia_photonics_pr_2025_03_18_s1", "nvidia_photonics_pr_2025_03_18_s2"]
+    }
+  ],
+  "claims": [
+    {
+      "id": "nvidia_photonics_pr_2025_03_18_cl1",
+      "statement": "NVIDIA (customer side) publicly named Lumentum as a member of its silicon photonics ecosystem for Quantum-X/Spectrum-X co-packaged optics switches at GTC 2025 — the first customer-origin document in this graph tying Lumentum to NVIDIA's CPO program. The release lists 11 ecosystem members including both Lumentum and Coherent and does NOT single out any company as laser supplier, so it supports qualified-ecosystem-member status only, not sole_source.",
+      "subject_id": "co:lumentum",
+      "demand_proof_level": "confirmed",
+      "confidence": 0.8,
+      "disproof_condition": "If subsequent NVIDIA supplier disclosures or product documentation omit Lumentum from the CPO/photonics ecosystem, or name a different exclusive laser supplier, Lumentum's customer-confirmed ecosystem position is invalidated.",
+      "source_ids": ["nvidia_photonics_pr_2025_03_18_s1"]
+    },
+    {
+      "id": "nvidia_photonics_pr_2025_03_18_cl2",
+      "statement": "The same NVIDIA release separately lists Coherent among industry leaders supporting pluggable optical transceiver technologies alongside the CPO ecosystem — customer-side confirmation that NVIDIA's photonics roadmap runs CPO and pluggables in parallel with overlapping suppliers, consistent with a multi-supplier (non-sole-source) structure at the ecosystem level.",
+      "subject_id": "co:coherent",
+      "demand_proof_level": "confirmed",
+      "confidence": 0.8,
+      "disproof_condition": "If NVIDIA's roadmap retires the pluggable track or consolidates photonics supply to a single named vendor, the parallel multi-supplier reading is invalidated.",
+      "source_ids": ["nvidia_photonics_pr_2025_03_18_s2"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "nvidia_photonics_pr_2025_03_18_s1",
+      "locator": "PR ecosystem paragraph",
+      "quote": "NVIDIA's silicon photonics ecosystem includes TSMC, Browave, Coherent, Corning Incorporated, Fabrinet, Foxconn, Lumentum, SENKO, SPIL, Sumitomo Electric Industries and TFC Communication."
+    },
+    {
+      "id": "nvidia_photonics_pr_2025_03_18_s2",
+      "locator": "PR body",
+      "quote": "NVIDIA photonics will drive massive growth for a new wave of state-of-the-art AI factories, alongside pluggable optical transceiver technologies supported by industry leaders including Coherent, Eoptolink, Fabrinet and Innolight."
+    }
+  ]
+}
