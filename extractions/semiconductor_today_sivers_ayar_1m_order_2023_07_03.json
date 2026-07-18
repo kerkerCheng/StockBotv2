@@ -1,0 +1,71 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "semiconductor_today_sivers_ayar_1m_order_2023_07_03",
+    "title": "Sivers Photonics receives $1m order from Ayar Labs (Semiconductor Today, July 3, 2023)",
+    "url": "https://www.semiconductor-today.com/news_items/2023/jul/sivers-photonics-030723.shtml",
+    "source_type": "industry_report",
+    "evidence_tier": 3,
+    "origin_entity": "Semiconductor Today",
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "Third-party trade publication (Semiconductor Today, Juno Publishing and Media Solutions Ltd); copyrighted editorial. Repository retains only the canonical URL, limited verbatim excerpts needed for evidence, and derived research — not the full article text."
+  },
+  "sources": [
+    {
+      "id": "semiconductor_today_sivers_ayar_1m_order_2023_07_03_s1",
+      "locator": "article body",
+      "quote": "Sivers Photonics of Glasgow, Scotland, UK has received a new order worth $1m"
+    },
+    {
+      "id": "semiconductor_today_sivers_ayar_1m_order_2023_07_03_s2",
+      "locator": "article body",
+      "quote": "DFB laser arrays provide the high-quality light source for Ayar Labs' SuperNova remote optical source product"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:sivers_semiconductors",
+      "type": "Company",
+      "name": "Sivers Semiconductors",
+      "abstraction_level": "device_chip",
+      "role": "bottleneck_supplier",
+      "aliases": ["Sivers", "Sivers Photonics"],
+      "attributes": {},
+      "confidence": 0.6,
+      "source_ids": ["semiconductor_today_sivers_ayar_1m_order_2023_07_03_s1"]
+    },
+    {
+      "id": "co:ayar_labs",
+      "type": "Company",
+      "name": "Ayar Labs",
+      "abstraction_level": "module_subsystem",
+      "role": null,
+      "aliases": ["Ayar"],
+      "attributes": {},
+      "confidence": 0.6,
+      "source_ids": ["semiconductor_today_sivers_ayar_1m_order_2023_07_03_s2"]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:sivers_semiconductors",
+      "dst_id": "co:ayar_labs",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.6,
+      "source_ids": ["semiconductor_today_sivers_ayar_1m_order_2023_07_03_s2"]
+    }
+  ],
+  "claims": [
+    {
+      "id": "cl1",
+      "statement": "Independent trade-press (Semiconductor Today, 2023-07-03) reports Sivers Photonics received a $1m order and that its DFB laser arrays provide the light source for Ayar Labs' SuperNova — a non-Sivers, non-aleabitoreddit origin corroborating the Sivers→Ayar Labs supply relationship as a concrete commercial order rather than a customer-map inference.",
+      "subject_id": "co:sivers_semiconductors",
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "If Ayar Labs publicly qualifies an alternative DFB laser-array supplier for SuperNova, or Sivers discloses loss of the Ayar program, downgrade.",
+      "confidence": 0.6,
+      "source_ids": ["semiconductor_today_sivers_ayar_1m_order_2023_07_03_s1", "semiconductor_today_sivers_ayar_1m_order_2023_07_03_s2"]
+    }
+  ]
+}

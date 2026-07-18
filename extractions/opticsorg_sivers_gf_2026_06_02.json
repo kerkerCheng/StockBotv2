@@ -1,0 +1,91 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "opticsorg_sivers_gf_2026_06_02",
+    "title": "Sivers to provide lasers for GlobalFoundries; Nvidia ramps optical AI 'engine' (optics.org, June 2, 2026)",
+    "url": "https://optics.org/news/sivers-to-provide-lasers-for-globalfoundries-nvidia-ramps-optical-ai-engine",
+    "source_type": "industry_report",
+    "evidence_tier": 3,
+    "origin_entity": "optics.org",
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "Third-party trade publication (optics.org, published by SPIE); copyrighted editorial. Repository retains only the canonical URL, limited verbatim excerpts needed for evidence, and derived research — not the full article text."
+  },
+  "sources": [
+    {
+      "id": "opticsorg_sivers_gf_2026_06_02_s1",
+      "locator": "article body",
+      "quote": "Sivers says that its laser arrays will be integrated into reference designs built on GF's silicon photonics platform, for technologies including co-packaged optics (CPO) and linear pluggable optics (LPO)."
+    },
+    {
+      "id": "opticsorg_sivers_gf_2026_06_02_s2",
+      "locator": "article body",
+      "quote": "The laser emitters will also feature in GF's recently announced silicon photonics co-packaged advanced light engine (SCALE) optical module for CPO, which is expected to accelerate the adoption of optical scale-up interconnects."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:sivers_semiconductors",
+      "type": "Company",
+      "name": "Sivers Semiconductors",
+      "abstraction_level": "device_chip",
+      "role": "bottleneck_supplier",
+      "aliases": ["Sivers"],
+      "attributes": {},
+      "confidence": 0.6,
+      "source_ids": ["opticsorg_sivers_gf_2026_06_02_s1"]
+    },
+    {
+      "id": "co:globalfoundries",
+      "type": "Company",
+      "name": "GlobalFoundries",
+      "abstraction_level": "foundry_packaging",
+      "role": "foundry",
+      "aliases": ["GF", "GFS"],
+      "attributes": {},
+      "confidence": 0.6,
+      "source_ids": ["opticsorg_sivers_gf_2026_06_02_s1"]
+    },
+    {
+      "id": "prod:gf_scale",
+      "type": "Product",
+      "name": "GF Silicon Photonics Co-packaged Advanced Light Engine (SCALE™)",
+      "abstraction_level": "module_subsystem",
+      "role": null,
+      "aliases": ["SCALE", "SCALE CPO platform"],
+      "attributes": {},
+      "confidence": 0.6,
+      "source_ids": ["opticsorg_sivers_gf_2026_06_02_s2"]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:sivers_semiconductors",
+      "dst_id": "co:globalfoundries",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.6,
+      "source_ids": ["opticsorg_sivers_gf_2026_06_02_s1"]
+    },
+    {
+      "id": "e2",
+      "src_id": "co:sivers_semiconductors",
+      "dst_id": "prod:gf_scale",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.6,
+      "source_ids": ["opticsorg_sivers_gf_2026_06_02_s2"]
+    }
+  ],
+  "claims": [
+    {
+      "id": "cl1",
+      "statement": "Independent trade-press (optics.org) confirmation, dated 2026-06-02, that Sivers laser arrays will be integrated into GlobalFoundries silicon photonics reference designs and the SCALE co-packaged light engine module — a non-Sivers origin corroborating the Sivers-GF supply relationship.",
+      "subject_id": "co:sivers_semiconductors",
+      "demand_proof_level": "guided",
+      "disproof_condition": "If GF publicly names an alternative primary laser-array supplier for its silicon photonics reference designs / SCALE module, or the collaboration lapses without design wins within 12-18 months, downgrade.",
+      "confidence": 0.6,
+      "source_ids": ["opticsorg_sivers_gf_2026_06_02_s1", "opticsorg_sivers_gf_2026_06_02_s2"]
+    }
+  ]
+}

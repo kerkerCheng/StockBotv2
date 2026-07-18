@@ -1,0 +1,91 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "semiconductor_today_sivers_gf_2026_06_02",
+    "title": "Sivers & GlobalFoundries advance AI data center optical solutions (Semiconductor Today, June 2, 2026)",
+    "url": "https://www.semiconductor-today.com/news_items/2026/jun/SIVERS-GF-020626.shtml",
+    "source_type": "industry_report",
+    "evidence_tier": 3,
+    "origin_entity": "Semiconductor Today",
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "Third-party trade publication (Semiconductor Today, Juno Publishing and Media Solutions Ltd); copyrighted editorial. Repository retains only the canonical URL, limited verbatim excerpts needed for evidence, and derived research — not the full article text."
+  },
+  "sources": [
+    {
+      "id": "semiconductor_today_sivers_gf_2026_06_02_s1",
+      "locator": "article body",
+      "quote": "Sivers' laser arrays will be integrated into reference designs built on GF's silicon photonics platform"
+    },
+    {
+      "id": "semiconductor_today_sivers_gf_2026_06_02_s2",
+      "locator": "article body",
+      "quote": "The laser arrays will also be available in GF's Silicon Photonics Co-packaged Advanced Light Engine (SCALE) platform"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:sivers_semiconductors",
+      "type": "Company",
+      "name": "Sivers Semiconductors",
+      "abstraction_level": "device_chip",
+      "role": "bottleneck_supplier",
+      "aliases": ["Sivers"],
+      "attributes": {},
+      "confidence": 0.6,
+      "source_ids": ["semiconductor_today_sivers_gf_2026_06_02_s1"]
+    },
+    {
+      "id": "co:globalfoundries",
+      "type": "Company",
+      "name": "GlobalFoundries",
+      "abstraction_level": "foundry_packaging",
+      "role": "foundry",
+      "aliases": ["GF", "GFS"],
+      "attributes": {},
+      "confidence": 0.6,
+      "source_ids": ["semiconductor_today_sivers_gf_2026_06_02_s1"]
+    },
+    {
+      "id": "prod:gf_scale",
+      "type": "Product",
+      "name": "GF Silicon Photonics Co-packaged Advanced Light Engine (SCALE™)",
+      "abstraction_level": "module_subsystem",
+      "role": null,
+      "aliases": ["SCALE", "SCALE CPO platform"],
+      "attributes": {},
+      "confidence": 0.6,
+      "source_ids": ["semiconductor_today_sivers_gf_2026_06_02_s2"]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:sivers_semiconductors",
+      "dst_id": "co:globalfoundries",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.6,
+      "source_ids": ["semiconductor_today_sivers_gf_2026_06_02_s1"]
+    },
+    {
+      "id": "e2",
+      "src_id": "co:sivers_semiconductors",
+      "dst_id": "prod:gf_scale",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.6,
+      "source_ids": ["semiconductor_today_sivers_gf_2026_06_02_s2"]
+    }
+  ],
+  "claims": [
+    {
+      "id": "cl1",
+      "statement": "Independent trade-press (Semiconductor Today) confirmation, dated 2026-06-02, that Sivers laser arrays will be integrated into GlobalFoundries silicon photonics reference designs and available in the SCALE co-packaged light engine platform — a non-Sivers origin corroborating the Sivers-GF supply relationship.",
+      "subject_id": "co:sivers_semiconductors",
+      "demand_proof_level": "guided",
+      "disproof_condition": "If GF publicly names an alternative primary laser-array supplier for its silicon photonics reference designs / SCALE platform, or the collaboration lapses without design wins within 12-18 months, downgrade.",
+      "confidence": 0.6,
+      "source_ids": ["semiconductor_today_sivers_gf_2026_06_02_s1", "semiconductor_today_sivers_gf_2026_06_02_s2"]
+    }
+  ]
+}
