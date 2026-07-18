@@ -8,10 +8,9 @@ from thesis.preconditions import _check_financial_checklist, _check_second_slice
 
 
 def _root(tmp_path: Path) -> Path:
+    # Deliberately no plan file: the gate must decide purely on runtime
+    # deliverables (memo + scoring), not on any docs/plans/*.md existence.
     (tmp_path / "thesis").mkdir()
-    plan = tmp_path / "docs" / "plans" / "2026-07-08-005-feat-second-vertical-slice-plan.md"
-    plan.parent.mkdir(parents=True)
-    plan.write_text("# Second slice plan\n", encoding="utf-8")
     return tmp_path
 
 

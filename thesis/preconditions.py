@@ -25,7 +25,15 @@ sys.path.insert(0, str(ROOT))
 
 # ── 1. 第二條垂直切片 ─────────────────────────────────────────────────────────
 
-_SECOND_SLICE_PLAN = ROOT / "docs" / "plans" / "2026-07-08-005-feat-second-vertical-slice-plan.md"
+# 第二切片的「規格」住文件（AGENTS.md 開發優先序第 1 項；詳細歷史規格見 005 plan）。
+# 此 gate 只認 runtime 交付物（memo + scoring），刻意不綁任何 plan 檔存在性——
+# plan 是意圖不是完成訊號，且 docs/plans 已定為純歷史，gate 不該硬依賴其檔名。
+_SECOND_SLICE_SPEC_REF = (
+    "AGENTS.md 開發優先序第 1 項"
+    "（詳細規格：docs/plans/2026-07-08-005-feat-second-vertical-slice-plan.md）"
+)
+_SECOND_SLICE_MEMO_TOKENS = ("amat", "lrcx", "semi_equip", "mature_node")
+
 
 def _extract_score(content: str, label: str) -> int | None:
     match = re.search(
@@ -38,95 +46,87 @@ def _extract_score(content: str, label: str) -> int | None:
 
 def _check_second_slice(*, root: Path = ROOT) -> dict:
     """
-    第二條切片的前置條件：計畫存在且包含 done/complete 標記，
-    或 thesis/ 目錄有對應的 lane memo 產出。
-    目前 v1：計畫存在 = 條件成立（計畫執行由人工啟動）。
-    """
-    plan_path = root / "docs" / "plans" / _SECOND_SLICE_PLAN.name
-    if not plan_path.exists():
-        return {
-            "ok": False,
-            "label": "second_slice",
-            "detail": f"計畫文件不存在：{plan_path.relative_to(root)}",
-            "action": "確認 docs/plans/2026-07-08-005-feat-second-vertical-slice-plan.md 已建立",
-        }
+    L9 前置條件 #1：第二條非 AI／非 CPO 垂直切片是否「做完且通過」。
 
-    # 進一步確認計畫是否已「執行完成」：thesis/ 有 non-CPO slice memo
+    判定完全依 runtime 交付物——thesis/ 下檔名含 amat/lrcx/semi_equip/mature_node
+    的 Lane Memo，且有非空 Variant Perception 段落 + 同 stem scoring 過失敗閾值。
+    刻意不檢查任何 plan 檔存在性：plan 是意圖不是完成訊號，規格住文件（見
+    `_SECOND_SLICE_SPEC_REF`），gate 只認交付物。
+    """
     thesis_dir = root / "thesis"
     non_cpo_memos = [
         f for f in thesis_dir.glob("*.md")
-        if "amat" in f.name or "lrcx" in f.name or "semi_equip" in f.name
-           or "mature_node" in f.name
+        if any(token in f.name for token in _SECOND_SLICE_MEMO_TOKENS)
     ]
-    if non_cpo_memos:
-        memo = non_cpo_memos[0]
-        content = memo.read_text(encoding="utf-8", errors="ignore")
-        variant_match = re.search(
-            r"(?ims)^#{1,6}\s*Variant Perception\s*$\s*(.+?)(?=^#{1,6}\s|\Z)",
-            content,
-        )
-        if not variant_match or not variant_match.group(1).strip():
-            return {
-                "ok": False,
-                "label": "second_slice",
-                "detail": f"{memo.name} 缺少非空 Variant Perception 段落",
-                "action": "補上市場隱含假設 X、thesis Y 與催化劑 Z",
-            }
-
-        stem = memo.stem
-        scoring_candidates = [
-            memo.with_name(stem.replace("_lane_memo", "_scoring") + ".md"),
-            memo.with_name(stem + ".scoring.md"),
-        ]
-        scoring = next((path for path in scoring_candidates if path.exists()), None)
-        if scoring is None:
-            return {
-                "ok": False,
-                "label": "second_slice",
-                "detail": f"{memo.name} 有 Variant Perception，但缺對應 scoring 檔",
-                "action": "建立同 stem 的 _scoring.md 並完成失敗閾值評分",
-            }
-
-        scoring_text = scoring.read_text(encoding="utf-8", errors="ignore")
-        scores = {
-            "可信度": _extract_score(scoring_text, "可信度"),
-            "可證偽性": _extract_score(scoring_text, "可證偽性"),
-            "市場差異度": _extract_score(scoring_text, "市場差異度"),
-            "總分": _extract_score(scoring_text, "總分"),
-        }
-        missing_scores = [label for label, score in scores.items() if score is None]
-        if missing_scores:
-            return {
-                "ok": False,
-                "label": "second_slice",
-                "detail": f"{scoring.name} 缺少 scoring 欄位：{missing_scores}",
-                "action": "補齊可信度、可證偽性、市場差異度與總分",
-            }
-        thresholds = {"可信度": 3, "可證偽性": 3, "市場差異度": 2, "總分": 20}
-        failed = [
-            f"{label} {scores[label]} < {minimum}"
-            for label, minimum in thresholds.items()
-            if scores[label] < minimum
-        ]
-        if failed:
-            return {
-                "ok": False,
-                "label": "second_slice",
-                "detail": "second-slice scoring 未通過：" + "；".join(failed),
-                "action": "補強研究後重新評分；不可只靠檔名解鎖 L9",
-            }
+    if not non_cpo_memos:
         return {
-            "ok": True,
+            "ok": False,
             "label": "second_slice",
-            "detail": f"第二條切片內容與 scoring 皆通過 ({memo.name})",
-            "action": None,
+            "detail": "尚未找到第二切片 Lane Memo（thesis/ 無 amat/lrcx/semi_equip/mature_node memo）",
+            "action": f"依 {_SECOND_SLICE_SPEC_REF} 執行工業半導體設備切片（手選 5-8 篇文件 → extract → thesis → scoring）",
         }
 
+    memo = non_cpo_memos[0]
+    content = memo.read_text(encoding="utf-8", errors="ignore")
+    variant_match = re.search(
+        r"(?ims)^#{1,6}\s*Variant Perception\s*$\s*(.+?)(?=^#{1,6}\s|\Z)",
+        content,
+    )
+    if not variant_match or not variant_match.group(1).strip():
+        return {
+            "ok": False,
+            "label": "second_slice",
+            "detail": f"{memo.name} 缺少非空 Variant Perception 段落",
+            "action": "補上市場隱含假設 X、thesis Y 與催化劑 Z",
+        }
+
+    stem = memo.stem
+    scoring_candidates = [
+        memo.with_name(stem.replace("_lane_memo", "_scoring") + ".md"),
+        memo.with_name(stem + ".scoring.md"),
+    ]
+    scoring = next((path for path in scoring_candidates if path.exists()), None)
+    if scoring is None:
+        return {
+            "ok": False,
+            "label": "second_slice",
+            "detail": f"{memo.name} 有 Variant Perception，但缺對應 scoring 檔",
+            "action": "建立同 stem 的 _scoring.md 並完成失敗閾值評分",
+        }
+
+    scoring_text = scoring.read_text(encoding="utf-8", errors="ignore")
+    scores = {
+        "可信度": _extract_score(scoring_text, "可信度"),
+        "可證偽性": _extract_score(scoring_text, "可證偽性"),
+        "市場差異度": _extract_score(scoring_text, "市場差異度"),
+        "總分": _extract_score(scoring_text, "總分"),
+    }
+    missing_scores = [label for label, score in scores.items() if score is None]
+    if missing_scores:
+        return {
+            "ok": False,
+            "label": "second_slice",
+            "detail": f"{scoring.name} 缺少 scoring 欄位：{missing_scores}",
+            "action": "補齊可信度、可證偽性、市場差異度與總分",
+        }
+    thresholds = {"可信度": 3, "可證偽性": 3, "市場差異度": 2, "總分": 20}
+    failed = [
+        f"{label} {scores[label]} < {minimum}"
+        for label, minimum in thresholds.items()
+        if scores[label] < minimum
+    ]
+    if failed:
+        return {
+            "ok": False,
+            "label": "second_slice",
+            "detail": "second-slice scoring 未通過：" + "；".join(failed),
+            "action": "補強研究後重新評分；不可只靠檔名解鎖 L9",
+        }
     return {
-        "ok": False,
+        "ok": True,
         "label": "second_slice",
-        "detail": "計畫已建立，但尚未執行（thesis/ 中未找到非 CPO 的 Lane Memo）",
-        "action": "依 2026-07-08-005 計畫執行工業半導體設備切片（手選 5-8 篇文件 → extract → thesis）",
+        "detail": f"第二條切片內容與 scoring 皆通過 ({memo.name})",
+        "action": None,
     }
 
 

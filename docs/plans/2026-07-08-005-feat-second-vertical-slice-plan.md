@@ -9,7 +9,7 @@ origin: docs/plans/2026-07-08-004-feat-investment-query-gap-audit-plan.md
 
 # feat: 第二條垂直切片 — 工業半導體設備（AMAT/LRCX Mature Node Segment）
 
-> **⚠ 現況校正（2026-07-18）：** 本檔保留為 active（`thesis/preconditions.py` `_check_second_slice()` 硬性依賴其存在，勿刪），但下列細節已過時，**以當前 gate 為準**：
+> **⚠ 現況校正（2026-07-18）：** 本檔留作第二切片的詳細規格參考（`_check_second_slice()` gate 已與本檔脫鉤，只認 runtime 交付物）。下列細節已過時，**以當前 gate 為準**：
 > - **輸出檔名** 不可用 KTD3／U3 的 `slice2_industrial_equip_*`——gate 只認檔名含 `amat`／`lrcx`／`semi_equip`／`mature_node` 的 `*_lane_memo.md`。建議 `thesis/amat_lrcx_mature_node_v1_lane_memo.md`。
 > - **達標需三件**：非空 `## Variant Perception` 段落 + 同 stem 的 `*_scoring.md`（可信度／可證偽性／市場差異度／總分 ≥3／≥3／≥2／≥20）。
 > - EDGAR fetcher 10-Q 已驗證可用（`--forms 10-Q --n 1`）。當前 gate 與 roadmap 定位見 `AGENTS.md` 開發優先序第 1 項。
