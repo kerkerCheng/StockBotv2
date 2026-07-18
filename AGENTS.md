@@ -97,16 +97,18 @@ fetchers/edgar.py ──────↑                        engine_c/etl_yfin
 
 ---
 
-## 開發優先序（接下來三件事）
+## 開發優先序
 
-1. **M1: CPO Depth Sprint**（mobile rollout smoke 已於 2026-07-17 走完 prepare→核准→apply→跨 session status→本機 publish 全鏈，遞補此項）
-   — onboard **AXT**（`TICKER_MAP` 補 `co:axt: "AXTI"`；AXT×Coherent InP 供應協議是 Coherent 依賴鏈唯一非自報來源候選）；Coherent／Lumentum／客戶端公司各達 ≥3 個 distinct `origin_entity`；active thesis 引用的邊不得留未處置的 `sole_source`／`substitutability` conflict。TSEM intake（ra_2bf1494b）遺留 backlog：2027–29 光通訊集體擴產 oversupply watch、MACOM/Semtech 作為 Tower TIA 客戶（tier 3，待客戶端揭露印證）、GF 對 Tower 專利訴訟未追源。
+> `docs/plans/` 已轉純歷史（見 [`docs/plans/README.md`](docs/plans/README.md)）；當前工作起點只看本節。
+> 小工作直接照本節做、不再開 plan 檔；只有大型開發才新建 plan。
 
-2. **Lane Memo／投資建議接縫 + L9 前置條件**
-   — 順手修 shared contract，但正式開放 actionable advice 前仍須跑第二條非 AI／非 CPO 垂直切片、thesis→部位最小規則與 Engine C 五項一鍵核驗。
+**（已完成）M1 CPO Depth Sprint** — 2026-07-18 達標：AXT 已 onboard（`TICKER_MAP` 有 `co:axt: "AXTI"`）；Coherent／Lumentum／NVIDIA／Broadcom 各 ≥3 個 distinct `origin_entity`；20 條 edge conflict 全數 resolve 並 project 進圖（`python loader/edge_resolution.py project --dry-run` 的 `open_conflicts=0`）。**遺留 backlog（仍開）：** TSEM intake（ra_2bf1494b）的 2027–29 光通訊集體擴產 oversupply watch、MACOM/Semtech 作為 Tower TIA 客戶（tier 3，待客戶端揭露印證）、GF 對 Tower 專利訴訟未追源。
 
-3. **知識覆蓋自動化**
-   — SIVE 找 3 個不同 `origin_entity` 的獨立來源；`fetchers/edgar.py` 補最新 10-Q CLI；再做 RSS pending leads。先讓手機 ad hoc loop 穩定，再擴自動 harvest。
+1. **第二條垂直切片 + L9 前置條件（解鎖 actionable advice 的閘門）**
+   — 規格保存在 [`docs/plans/2026-07-08-005-feat-second-vertical-slice-plan.md`](docs/plans/2026-07-08-005-feat-second-vertical-slice-plan.md)（**該檔不可刪**：`thesis/preconditions.py` 的 `_check_second_slice()` 硬性檢查它存在）。主題：AMAT/LRCX 成熟製程設備（非 AI／非 CPO），走相同 extract→graph→thesis 流程。**達標判準以當前 gate 為準（非 005 舊描述）：** (a) `thesis/` 有檔名含 `amat`／`lrcx`／`mature_node` 的 `*_lane_memo.md`（005 建議的 `slice2_*` 舊命名匹配不到 gate）；(b) 該 memo 有非空 `## Variant Perception` 段落；(c) 同 stem 的 `*_scoring.md`（或 `*.scoring.md`），欄位 可信度／可證偽性／市場差異度／總分 齊全且 ≥3／≥3／≥2／≥20。另兩項前置：thesis→部位最小規則（[`docs/investment-sop.md`](docs/investment-sop.md)）與 Engine C 五項一鍵核驗。順手修 Lane Memo／投資建議 shared contract。
+
+2. **知識覆蓋自動化**
+   — `fetchers/edgar.py` 的 10-Q CLI 已可用（2026-07-18 驗證 AMAT/LRCX 最新 10-Q 抓取正常：`python fetchers/edgar.py --ticker AMAT --forms 10-Q --n 1`）。剩：SIVE 找 3 個不同 `origin_entity` 的獨立來源；RSS pending leads（見上方引擎B 待做）。先讓手機 ad hoc loop 穩定，再擴自動 harvest。
 
 ---
 
