@@ -71,6 +71,7 @@ TICKER_MAP: dict[str, str | None] = {
     "co:sumitomo_electric": "5802.T",     # 東證
     "co:jx_advanced_metals": "5016.T",    # 東證，2025-03 IPO
     "co:enablence_technologies": "ENA.V", # TSX Venture
+    "co:zhongji_innolight": "300308.SZ",  # 中際旭創（深交所創業板）；需求側 read-through 指標
     # 台股後綴依掛牌板：證交所上市 = .TW、櫃買上櫃 = .TWO（yfinance 格式，
     # 兩者是不同交易所，不能統一成同一後綴）
     "co:vpec": "2455.TW",                       # 全新光電（上市）

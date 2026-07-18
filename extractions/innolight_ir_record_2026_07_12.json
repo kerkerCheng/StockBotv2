@@ -13,6 +13,17 @@
   },
   "nodes": [
     {
+      "id": "co:zhongji_innolight",
+      "type": "Company",
+      "name": "Zhongji Innolight",
+      "abstraction_level": "module_subsystem",
+      "role": "leader",
+      "aliases": ["Innolight", "中際旭創", "中际旭创", "300308.SZ"],
+      "attributes": {},
+      "confidence": 0.85,
+      "source_ids": ["innolight_ir_record_2026_07_12_s3"]
+    },
+    {
       "id": "tech:transceiver_800g",
       "type": "TechNode",
       "name": "800G-speed transceiver",
@@ -46,7 +57,35 @@
       "source_ids": ["innolight_ir_record_2026_07_12_s3"]
     }
   ],
-  "edges": [],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:zhongji_innolight",
+      "relation": "supplies_to",
+      "dst_id": "tech:silicon_photonics",
+      "attributes": {},
+      "confidence": 0.8,
+      "source_ids": ["innolight_ir_record_2026_07_12_s3"]
+    },
+    {
+      "id": "e2",
+      "src_id": "co:zhongji_innolight",
+      "relation": "supplies_to",
+      "dst_id": "tech:transceiver_800g",
+      "attributes": {},
+      "confidence": 0.8,
+      "source_ids": ["innolight_ir_record_2026_07_12_s3"]
+    },
+    {
+      "id": "e3",
+      "src_id": "co:zhongji_innolight",
+      "relation": "supplies_to",
+      "dst_id": "tech:transceiver_1_6t",
+      "attributes": {},
+      "confidence": 0.8,
+      "source_ids": ["innolight_ir_record_2026_07_12_s3"]
+    }
+  ],
   "claims": [
     {
       "id": "innolight_ir_record_2026_07_12_cl1",

@@ -21,7 +21,7 @@
       "doc_id": "coherent-corp-cohr-discusses-photonics-innovation-and-data-center-communications-at-ofc_march_17",
       "path": "extractions/coherent_ofc_march25.json",
       "before_sha256": "5364541343f66d13da00dfa7446b22dce9251f2e022aa3f0f16a0c519deedfab",
-      "after_sha256": "09eb239ce38774fad51f9d3d663d4a8621ddfd1dcf59353b8cb937ed9a9408d7",
+      "after_sha256": "3b58b80bb56900badb93db9e10e707c7051e0a24a6926bd1f6c3f7a6c8a711e3",
       "storage_permission": "local_only",
       "git_eligible": false
     },
@@ -37,7 +37,7 @@
       "doc_id": "coherent_q3fy26_cpo",
       "path": "extractions/coherent_q3fy26_cpo.json",
       "before_sha256": "30d78a5a6198b10251232f147f1e765fe82d38445d7fb066239daf7bd6152ba1",
-      "after_sha256": "18d9f8a9a4fa52408a8e33c89be2b4ac073d56cbea2b8df2267c64e71a8f63c3",
+      "after_sha256": "69a7e461b2949c600cce1ade302e60012db4252715fb096cb6639dd5af1835c3",
       "storage_permission": "local_only",
       "git_eligible": false
     },
