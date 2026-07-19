@@ -21,6 +21,10 @@ import re
 import sys
 from pathlib import Path
 
+# Allow `python fetchers/edgar.py ...` (not just `-m fetchers.edgar`): put repo root
+# on sys.path before the `from fetchers.utils import ...` below.
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
 try:
     from dotenv import load_dotenv
     load_dotenv(Path(__file__).resolve().parent.parent / ".env")
