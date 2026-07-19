@@ -1,0 +1,17 @@
+{
+  "doc_id": "gfs_20_f_20260227",
+  "source_type": "filing",
+  "evidence_tier": 1,
+  "company": "GLOBALFOUNDRIES Inc.",
+  "ticker": "GFS",
+  "form_type": "20-F",
+  "filed_date": "2026-02-27",
+  "cik": "0001709048",
+  "accession": "000170904826000022",
+  "truncated": false,
+  "original_chars": 666860,
+  "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000022/gfs-20251231.htm",
+  "curated_excerpt": true,
+  "curated_note": "Hand-curated verbatim excerpts of mature-node-relevant sections (segment/market breakdown, non-leading-edge/ICAPS, China export exposure, capex & equipment-supplier dependence). Char offsets per section in file header. Full filing at url; original_chars = full-doc length.",
+  "curated_chars": 48857
+}
