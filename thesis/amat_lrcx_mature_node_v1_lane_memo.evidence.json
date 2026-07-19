@@ -1,0 +1,2318 @@
+{
+  "schema_version": "1.0",
+  "memo_path": "amat_lrcx_mature_node_v1_lane_memo.md",
+  "memo_sha256": "78690f83a2c9952e764903856bcfd7f6634cb63e322675d260f004e188c37091",
+  "output_type": "Research Note",
+  "ticker": "AMAT",
+  "company_id": "co:applied_materials",
+  "context_inventory_sha256": "8e2f5f1d95dbf45b6e97f287c55de84b2e22239f42cfc72cb9276925a6203453",
+  "context_inventory": {
+    "focus_company": {
+      "id": "co:applied_materials",
+      "name": "Applied Materials"
+    },
+    "company_origin_entities": [
+      "AXT",
+      "Applied Materials",
+      "Applied Optoelectronics",
+      "Broadcom",
+      "Calcalist",
+      "Coherent",
+      "Enablence Technologies",
+      "Global Semi Research",
+      "GlobalFoundries",
+      "Lam Research Corporation",
+      "Lumentum",
+      "NVIDIA",
+      "OpenLight",
+      "Optica Publishing Group",
+      "POET Technologies",
+      "Reuters",
+      "Semiconductor Today",
+      "Sivers Semiconductors",
+      "The Next Platform",
+      "Third-party Research",
+      "Tower Semiconductor",
+      "Zacks Investment Research",
+      "Zhongji Innolight",
+      "aleabitoreddit",
+      "damnang_substack",
+      "optics.org",
+      "primetrading_substack",
+      "silicon_matter_substack"
+    ],
+    "claims": {
+      "amat_10_k_20251212_cl1": {
+        "id": "amat_10_k_20251212_cl1",
+        "statement": "Applied Materials faces a structural risk that US export controls on semiconductor equipment to China will reduce its addressable market in China and advantage international competitors, as China revenue declined from 37% to 30% of net revenue year-over-year.",
+        "demand_proof_level": "confirmed",
+        "disproof_condition": "If US export controls on semiconductor equipment to China are relaxed, or if Applied Materials grows China revenue materially, this claim should be downgraded.",
+        "confidence": 0.9,
+        "source_ids": [
+          "amat_10_k_20251212_s10",
+          "amat_10_k_20251212_s16",
+          "amat_10_k_20251212_s19"
+        ],
+        "source_doc_id": "amat_10_k_20251212",
+        "subject_kind": "edge",
+        "subject_node_id": null,
+        "subject_edge_key": "edge:df74dbde4d6c0cf9e817842bfe03c0ec0a145592031e397bec9caf005f60c24f",
+        "origin_entity": "Applied Materials",
+        "source_doc": {
+          "storage_permission": "repo_full",
+          "origin_entity": "Applied Materials",
+          "publisher": "SEC EDGAR",
+          "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+          "source_type": "filing",
+          "id": "amat_10_k_20251212",
+          "retrieved_at": "2026-07-19",
+          "title": "Applied Materials FY2025 Form 10-K — Semiconductor Systems segments: foundry/logic leading vs non-leading edge (ICAPS: IoT/comms/auto/power/sensors), DRAM, NAND; backlog; China export exposure",
+          "published_at": "2025-12-12",
+          "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828025056742/amat-20251026.htm",
+          "evidence_tier": 1
+        }
+      },
+      "amat_10_k_20251212_cl3": {
+        "id": "amat_10_k_20251212_cl3",
+        "statement": "Some key parts for Applied Materials systems are sourced from a single qualified supplier or limited group of qualified suppliers, representing a supply concentration risk.",
+        "demand_proof_level": "confirmed",
+        "disproof_condition": "If Applied Materials qualifies alternate suppliers for all key sole-sourced parts, this claim should be retired.",
+        "confidence": 0.9,
+        "source_ids": [
+          "amat_10_k_20251212_s9"
+        ],
+        "source_doc_id": "amat_10_k_20251212",
+        "subject_kind": "node",
+        "subject_node_id": "co:applied_materials",
+        "subject_edge_key": null,
+        "origin_entity": "Applied Materials",
+        "source_doc": {
+          "storage_permission": "repo_full",
+          "origin_entity": "Applied Materials",
+          "publisher": "SEC EDGAR",
+          "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+          "source_type": "filing",
+          "id": "amat_10_k_20251212",
+          "retrieved_at": "2026-07-19",
+          "title": "Applied Materials FY2025 Form 10-K — Semiconductor Systems segments: foundry/logic leading vs non-leading edge (ICAPS: IoT/comms/auto/power/sensors), DRAM, NAND; backlog; China export exposure",
+          "published_at": "2025-12-12",
+          "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828025056742/amat-20251026.htm",
+          "evidence_tier": 1
+        }
+      },
+      "amat_10_q_20260219_cl1": {
+        "id": "amat_10_q_20260219_cl1",
+        "statement": "Applied Materials agreed to pay $253 million to BIS to settle export controls compliance inquiry related to China customer shipments, with a suspended denial order waivable after three years.",
+        "demand_proof_level": "confirmed",
+        "disproof_condition": "If BIS rescinds the settlement, reinstates the denial order, or announces additional enforcement action against AMAT for the same conduct, this claim should be revised.",
+        "confidence": 0.9,
+        "source_ids": [
+          "amat_10_q_20260219_s1",
+          "amat_10_q_20260219_s2"
+        ],
+        "source_doc_id": "amat_10_q_20260219",
+        "subject_kind": "node",
+        "subject_node_id": "co:applied_materials",
+        "subject_edge_key": null,
+        "origin_entity": "Applied Materials",
+        "source_doc": {
+          "storage_permission": "repo_full",
+          "origin_entity": "Applied Materials",
+          "publisher": "SEC EDGAR",
+          "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+          "source_type": "filing",
+          "id": "amat_10_q_20260219",
+          "retrieved_at": "2026-07-19",
+          "title": "Applied Materials Q1 FY2026 Form 10-Q — net revenue by market, gross margin, capex, China export controls",
+          "published_at": "2026-02-19",
+          "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026009694/amat-20260125.htm",
+          "evidence_tier": 1
+        }
+      },
+      "amat_10_q_20260219_cl2": {
+        "id": "amat_10_q_20260219_cl2",
+        "statement": "U.S. export controls have materially limited Applied Materials' ability to supply semiconductor equipment to customers in China, and China retaliated with new tariffs on U.S. goods, creating ongoing supply-chain disruption risk.",
+        "demand_proof_level": "confirmed",
+        "disproof_condition": "If the U.S. government materially relaxes semiconductor export restrictions to China or China removes retaliatory tariffs on U.S. goods, this claim should be downgraded.",
+        "confidence": 0.9,
+        "source_ids": [
+          "amat_10_q_20260219_s5",
+          "amat_10_q_20260219_s6",
+          "amat_10_q_20260219_s7"
+        ],
+        "source_doc_id": "amat_10_q_20260219",
+        "subject_kind": "node",
+        "subject_node_id": "tech:us_export_controls",
+        "subject_edge_key": null,
+        "origin_entity": "Applied Materials",
+        "source_doc": {
+          "storage_permission": "repo_full",
+          "origin_entity": "Applied Materials",
+          "publisher": "SEC EDGAR",
+          "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+          "source_type": "filing",
+          "id": "amat_10_q_20260219",
+          "retrieved_at": "2026-07-19",
+          "title": "Applied Materials Q1 FY2026 Form 10-Q — net revenue by market, gross margin, capex, China export controls",
+          "published_at": "2026-02-19",
+          "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026009694/amat-20260125.htm",
+          "evidence_tier": 1
+        }
+      },
+      "amat_10_q_20260521_cl1": {
+        "id": "amat_10_q_20260521_cl1",
+        "statement": "Applied Materials paid $253 million to BIS to settle an export controls inquiry related to China customer shipments; a suspended denial order will be waived after three years if audit requirements are met.",
+        "demand_proof_level": "confirmed",
+        "disproof_condition": "If Applied Materials fails to complete required audits or BIS activates the denial order, this claim should be revised to reflect an active denial order.",
+        "confidence": 0.9,
+        "source_ids": [
+          "amat_10_q_20260521_s1",
+          "amat_10_q_20260521_s2"
+        ],
+        "source_doc_id": "amat_10_q_20260521",
+        "subject_kind": "node",
+        "subject_node_id": "co:applied_materials",
+        "subject_edge_key": null,
+        "origin_entity": "Applied Materials",
+        "source_doc": {
+          "storage_permission": "repo_full",
+          "origin_entity": "Applied Materials",
+          "publisher": "SEC EDGAR",
+          "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+          "source_type": "filing",
+          "id": "amat_10_q_20260521",
+          "retrieved_at": "2026-07-19",
+          "title": "Applied Materials Q2 FY2026 Form 10-Q — net revenue by market (foundry-logic/DRAM/NAND), gross margin, China export controls",
+          "published_at": "2026-05-21",
+          "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026037227/amat-20260426.htm",
+          "evidence_tier": 1
+        }
+      },
+      "amat_10_q_20260521_cl2": {
+        "id": "amat_10_q_20260521_cl2",
+        "statement": "US export controls and tariffs have materially limited Applied Materials' ability to supply certain semiconductor equipment products and services to customers in China, and China has retaliated with tariffs on US goods.",
+        "demand_proof_level": "confirmed",
+        "disproof_condition": "If the US government revokes or substantially relaxes export restrictions on semiconductor equipment to China, or if China removes retaliatory tariffs, this claim should be downgraded.",
+        "confidence": 0.9,
+        "source_ids": [
+          "amat_10_q_20260521_s6",
+          "amat_10_q_20260521_s11"
+        ],
+        "source_doc_id": "amat_10_q_20260521",
+        "subject_kind": "node",
+        "subject_node_id": "tech:export_controls_us_china",
+        "subject_edge_key": null,
+        "origin_entity": "Applied Materials",
+        "source_doc": {
+          "storage_permission": "repo_full",
+          "origin_entity": "Applied Materials",
+          "publisher": "SEC EDGAR",
+          "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+          "source_type": "filing",
+          "id": "amat_10_q_20260521",
+          "retrieved_at": "2026-07-19",
+          "title": "Applied Materials Q2 FY2026 Form 10-Q — net revenue by market (foundry-logic/DRAM/NAND), gross margin, China export controls",
+          "published_at": "2026-05-21",
+          "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026037227/amat-20260426.htm",
+          "evidence_tier": 1
+        }
+      },
+      "amat_10_q_20260521_cl4": {
+        "id": "amat_10_q_20260521_cl4",
+        "statement": "Memory customer spending growth in FY2026 H1 was primarily driven by increased investments in DRAM technology transitions, not NAND; NAND share of Semiconductor Systems revenue fell from 7% to 4% YoY in Q2.",
+        "demand_proof_level": "confirmed",
+        "disproof_condition": "If NAND investment recovers and surpasses DRAM share in future quarters, this directional claim should be revised.",
+        "confidence": 0.9,
+        "source_ids": [
+          "amat_10_q_20260521_s8",
+          "amat_10_q_20260521_s3"
+        ],
+        "source_doc_id": "amat_10_q_20260521",
+        "subject_kind": "node",
+        "subject_node_id": "tech:dram",
+        "subject_edge_key": null,
+        "origin_entity": "Applied Materials",
+        "source_doc": {
+          "storage_permission": "repo_full",
+          "origin_entity": "Applied Materials",
+          "publisher": "SEC EDGAR",
+          "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+          "source_type": "filing",
+          "id": "amat_10_q_20260521",
+          "retrieved_at": "2026-07-19",
+          "title": "Applied Materials Q2 FY2026 Form 10-Q — net revenue by market (foundry-logic/DRAM/NAND), gross margin, China export controls",
+          "published_at": "2026-05-21",
+          "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026037227/amat-20260426.htm",
+          "evidence_tier": 1
+        }
+      }
+    },
+    "edges": {
+      "edge:0771e5fe8e8efefdaac7b846de019fa92bff0a0b75ea475a0f9ddff2da611647": {
+        "edge_key": "edge:0771e5fe8e8efefdaac7b846de019fa92bff0a0b75ea475a0f9ddff2da611647",
+        "src_id": "co:applied_materials",
+        "src_name": "Applied Materials",
+        "relation": "SUPPLIES_TO",
+        "dst_id": "tech:icaps",
+        "dst_name": "ICAPS non-leading-edge markets (IoT, Communications, Automotive, Power, Sensors)",
+        "attributes": {},
+        "open_conflict_attributes": [],
+        "attribute_resolution_meta": {},
+        "assertions": {
+          "amat_10_k_20251212_e4": {
+            "id": "amat_10_k_20251212_e4",
+            "attributes": {
+              "qualification_status": "qualified",
+              "substitutability": null
+            },
+            "source_ids": [
+              "amat_10_k_20251212_s3",
+              "amat_10_k_20251212_s4"
+            ],
+            "source_doc_id": "amat_10_k_20251212",
+            "origin_entity": "Applied Materials",
+            "source_doc": {
+              "storage_permission": "repo_full",
+              "origin_entity": "Applied Materials",
+              "publisher": "SEC EDGAR",
+              "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+              "source_type": "filing",
+              "id": "amat_10_k_20251212",
+              "retrieved_at": "2026-07-19",
+              "title": "Applied Materials FY2025 Form 10-K — Semiconductor Systems segments: foundry/logic leading vs non-leading edge (ICAPS: IoT/comms/auto/power/sensors), DRAM, NAND; backlog; China export exposure",
+              "published_at": "2025-12-12",
+              "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828025056742/amat-20251026.htm",
+              "evidence_tier": 1
+            }
+          }
+        }
+      },
+      "edge:0fbad55fb3ce6936c05fa565edf0d022adc5585a89509f6adf34f8040bd43d69": {
+        "edge_key": "edge:0fbad55fb3ce6936c05fa565edf0d022adc5585a89509f6adf34f8040bd43d69",
+        "src_id": "co:applied_materials",
+        "src_name": "Applied Materials",
+        "relation": "SUPPLIES_TO",
+        "dst_id": "tech:semiconductor_equipment",
+        "dst_name": "Semiconductor Manufacturing Equipment",
+        "attributes": {},
+        "open_conflict_attributes": [],
+        "attribute_resolution_meta": {},
+        "assertions": {
+          "amat_10_q_20260219_e1": {
+            "id": "amat_10_q_20260219_e1",
+            "attributes": {
+              "qualification_status": "qualified",
+              "substitutability": null,
+              "sole_source": false,
+              "structural_lead_time_weeks": null,
+              "ramp_execution": null
+            },
+            "source_ids": [
+              "amat_10_q_20260219_s3"
+            ],
+            "source_doc_id": "amat_10_q_20260219",
+            "origin_entity": "Applied Materials",
+            "source_doc": {
+              "storage_permission": "repo_full",
+              "origin_entity": "Applied Materials",
+              "publisher": "SEC EDGAR",
+              "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+              "source_type": "filing",
+              "id": "amat_10_q_20260219",
+              "retrieved_at": "2026-07-19",
+              "title": "Applied Materials Q1 FY2026 Form 10-Q — net revenue by market, gross margin, capex, China export controls",
+              "published_at": "2026-02-19",
+              "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026009694/amat-20260125.htm",
+              "evidence_tier": 1
+            }
+          }
+        }
+      },
+      "edge:3407138fd145fedc1873eb976fbbfe8389b58f08604c4c023fbdc248838f6159": {
+        "edge_key": "edge:3407138fd145fedc1873eb976fbbfe8389b58f08604c4c023fbdc248838f6159",
+        "src_id": "co:applied_materials",
+        "src_name": "Applied Materials",
+        "relation": "SUPPLIES_TO",
+        "dst_id": "tech:advanced_packaging",
+        "dst_name": "Advanced packaging chip integration",
+        "attributes": {},
+        "open_conflict_attributes": [],
+        "attribute_resolution_meta": {},
+        "assertions": {
+          "amat_10_k_20251212_e5": {
+            "id": "amat_10_k_20251212_e5",
+            "attributes": {
+              "qualification_status": "qualified",
+              "substitutability": null
+            },
+            "source_ids": [
+              "amat_10_k_20251212_s5"
+            ],
+            "source_doc_id": "amat_10_k_20251212",
+            "origin_entity": "Applied Materials",
+            "source_doc": {
+              "storage_permission": "repo_full",
+              "origin_entity": "Applied Materials",
+              "publisher": "SEC EDGAR",
+              "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+              "source_type": "filing",
+              "id": "amat_10_k_20251212",
+              "retrieved_at": "2026-07-19",
+              "title": "Applied Materials FY2025 Form 10-K — Semiconductor Systems segments: foundry/logic leading vs non-leading edge (ICAPS: IoT/comms/auto/power/sensors), DRAM, NAND; backlog; China export exposure",
+              "published_at": "2025-12-12",
+              "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828025056742/amat-20251026.htm",
+              "evidence_tier": 1
+            }
+          }
+        }
+      },
+      "edge:540c150a591bf275a4c64ae62ee2ed51810b66bf2f4743b55ddcc44099dae12f": {
+        "edge_key": "edge:540c150a591bf275a4c64ae62ee2ed51810b66bf2f4743b55ddcc44099dae12f",
+        "src_id": "co:applied_materials",
+        "src_name": "Applied Materials",
+        "relation": "SUPPLIES_TO",
+        "dst_id": "prod:amat_ags",
+        "dst_name": "Applied Global Services (AGS)",
+        "attributes": {},
+        "open_conflict_attributes": [],
+        "attribute_resolution_meta": {},
+        "assertions": {
+          "amat_10_q_20260521_e2": {
+            "id": "amat_10_q_20260521_e2",
+            "attributes": {
+              "qualification_status": "qualified"
+            },
+            "source_ids": [
+              "amat_10_q_20260521_s10"
+            ],
+            "source_doc_id": "amat_10_q_20260521",
+            "origin_entity": "Applied Materials",
+            "source_doc": {
+              "storage_permission": "repo_full",
+              "origin_entity": "Applied Materials",
+              "publisher": "SEC EDGAR",
+              "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+              "source_type": "filing",
+              "id": "amat_10_q_20260521",
+              "retrieved_at": "2026-07-19",
+              "title": "Applied Materials Q2 FY2026 Form 10-Q — net revenue by market (foundry-logic/DRAM/NAND), gross margin, China export controls",
+              "published_at": "2026-05-21",
+              "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026037227/amat-20260426.htm",
+              "evidence_tier": 1
+            }
+          }
+        }
+      },
+      "edge:7005d1f7b6014e6f636f58ac4ab224845379a5e145c09fe151d7a0bba5d81fe2": {
+        "edge_key": "edge:7005d1f7b6014e6f636f58ac4ab224845379a5e145c09fe151d7a0bba5d81fe2",
+        "src_id": "tech:us_export_controls",
+        "src_name": "U.S. Export Controls on Semiconductor Equipment",
+        "relation": "DEPENDS_ON",
+        "dst_id": "co:applied_materials",
+        "dst_name": "Applied Materials",
+        "attributes": {},
+        "open_conflict_attributes": [],
+        "attribute_resolution_meta": {},
+        "assertions": {
+          "amat_10_q_20260219_e6": {
+            "id": "amat_10_q_20260219_e6",
+            "attributes": {
+              "qualification_status": "none",
+              "substitutability": null,
+              "sole_source": false,
+              "structural_lead_time_weeks": null
+            },
+            "source_ids": [
+              "amat_10_q_20260219_s5",
+              "amat_10_q_20260219_s6"
+            ],
+            "source_doc_id": "amat_10_q_20260219",
+            "origin_entity": "Applied Materials",
+            "source_doc": {
+              "storage_permission": "repo_full",
+              "origin_entity": "Applied Materials",
+              "publisher": "SEC EDGAR",
+              "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+              "source_type": "filing",
+              "id": "amat_10_q_20260219",
+              "retrieved_at": "2026-07-19",
+              "title": "Applied Materials Q1 FY2026 Form 10-Q — net revenue by market, gross margin, capex, China export controls",
+              "published_at": "2026-02-19",
+              "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026009694/amat-20260125.htm",
+              "evidence_tier": 1
+            }
+          }
+        }
+      },
+      "edge:76b6fd176f5843f43478aa4f602db3a8a8f628c88aca65ac003ba4448565f4f6": {
+        "edge_key": "edge:76b6fd176f5843f43478aa4f602db3a8a8f628c88aca65ac003ba4448565f4f6",
+        "src_id": "co:applied_materials",
+        "src_name": "Applied Materials",
+        "relation": "SUPPLIES_TO",
+        "dst_id": "tech:nand",
+        "dst_name": "NAND Flash Memory fabrication",
+        "attributes": {},
+        "open_conflict_attributes": [],
+        "attribute_resolution_meta": {},
+        "assertions": {
+          "amat_10_k_20251212_e3": {
+            "id": "amat_10_k_20251212_e3",
+            "attributes": {
+              "qualification_status": "qualified",
+              "substitutability": null
+            },
+            "source_ids": [
+              "amat_10_k_20251212_s1",
+              "amat_10_k_20251212_s14"
+            ],
+            "source_doc_id": "amat_10_k_20251212",
+            "origin_entity": "Applied Materials",
+            "source_doc": {
+              "storage_permission": "repo_full",
+              "origin_entity": "Applied Materials",
+              "publisher": "SEC EDGAR",
+              "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+              "source_type": "filing",
+              "id": "amat_10_k_20251212",
+              "retrieved_at": "2026-07-19",
+              "title": "Applied Materials FY2025 Form 10-K — Semiconductor Systems segments: foundry/logic leading vs non-leading edge (ICAPS: IoT/comms/auto/power/sensors), DRAM, NAND; backlog; China export exposure",
+              "published_at": "2025-12-12",
+              "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828025056742/amat-20251026.htm",
+              "evidence_tier": 1
+            }
+          }
+        }
+      },
+      "edge:9c91adf5dfd14e140f1dd003d3ab20b8ebadf9130ca5bd329b777a73c3ca7355": {
+        "edge_key": "edge:9c91adf5dfd14e140f1dd003d3ab20b8ebadf9130ca5bd329b777a73c3ca7355",
+        "src_id": "co:applied_materials",
+        "src_name": "Applied Materials",
+        "relation": "SUPPLIES_TO",
+        "dst_id": "tech:dram",
+        "dst_name": "Dynamic Random-Access Memory (DRAM)",
+        "attributes": {},
+        "open_conflict_attributes": [],
+        "attribute_resolution_meta": {},
+        "assertions": {
+          "amat_10_k_20251212_e2": {
+            "id": "amat_10_k_20251212_e2",
+            "attributes": {
+              "qualification_status": "qualified",
+              "substitutability": null
+            },
+            "source_ids": [
+              "amat_10_k_20251212_s1",
+              "amat_10_k_20251212_s12"
+            ],
+            "source_doc_id": "amat_10_k_20251212",
+            "origin_entity": "Applied Materials",
+            "source_doc": {
+              "storage_permission": "repo_full",
+              "origin_entity": "Applied Materials",
+              "publisher": "SEC EDGAR",
+              "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+              "source_type": "filing",
+              "id": "amat_10_k_20251212",
+              "retrieved_at": "2026-07-19",
+              "title": "Applied Materials FY2025 Form 10-K — Semiconductor Systems segments: foundry/logic leading vs non-leading edge (ICAPS: IoT/comms/auto/power/sensors), DRAM, NAND; backlog; China export exposure",
+              "published_at": "2025-12-12",
+              "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828025056742/amat-20251026.htm",
+              "evidence_tier": 1
+            }
+          }
+        }
+      },
+      "edge:a1cb457a7f2f39761aae3123a4920fc9d29a4dc3b5482260435d11029f37ac3d": {
+        "edge_key": "edge:a1cb457a7f2f39761aae3123a4920fc9d29a4dc3b5482260435d11029f37ac3d",
+        "src_id": "co:applied_materials",
+        "src_name": "Applied Materials",
+        "relation": "SUPPLIES_TO",
+        "dst_id": "tech:200mm_equipment",
+        "dst_name": "200mm semiconductor equipment",
+        "attributes": {},
+        "open_conflict_attributes": [],
+        "attribute_resolution_meta": {},
+        "assertions": {
+          "amat_10_k_20251212_e6": {
+            "id": "amat_10_k_20251212_e6",
+            "attributes": {
+              "qualification_status": "qualified",
+              "substitutability": null
+            },
+            "source_ids": [
+              "amat_10_k_20251212_s4"
+            ],
+            "source_doc_id": "amat_10_k_20251212",
+            "origin_entity": "Applied Materials",
+            "source_doc": {
+              "storage_permission": "repo_full",
+              "origin_entity": "Applied Materials",
+              "publisher": "SEC EDGAR",
+              "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+              "source_type": "filing",
+              "id": "amat_10_k_20251212",
+              "retrieved_at": "2026-07-19",
+              "title": "Applied Materials FY2025 Form 10-K — Semiconductor Systems segments: foundry/logic leading vs non-leading edge (ICAPS: IoT/comms/auto/power/sensors), DRAM, NAND; backlog; China export exposure",
+              "published_at": "2025-12-12",
+              "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828025056742/amat-20251026.htm",
+              "evidence_tier": 1
+            }
+          }
+        }
+      },
+      "edge:b4623f0b6a6f4cd3b4e3e560f57a2923942aa038366f49a365e410481035a3c5": {
+        "edge_key": "edge:b4623f0b6a6f4cd3b4e3e560f57a2923942aa038366f49a365e410481035a3c5",
+        "src_id": "co:applied_materials",
+        "src_name": "Applied Materials",
+        "relation": "SUPPLIES_TO",
+        "dst_id": "tech:leading_edge_logic_foundry",
+        "dst_name": "Leading-edge foundry/logic nodes (7nm and below)",
+        "attributes": {},
+        "open_conflict_attributes": [],
+        "attribute_resolution_meta": {},
+        "assertions": {
+          "amat_10_k_20251212_e1": {
+            "id": "amat_10_k_20251212_e1",
+            "attributes": {
+              "qualification_status": "qualified",
+              "substitutability": null
+            },
+            "source_ids": [
+              "amat_10_k_20251212_s1",
+              "amat_10_k_20251212_s13"
+            ],
+            "source_doc_id": "amat_10_k_20251212",
+            "origin_entity": "Applied Materials",
+            "source_doc": {
+              "storage_permission": "repo_full",
+              "origin_entity": "Applied Materials",
+              "publisher": "SEC EDGAR",
+              "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+              "source_type": "filing",
+              "id": "amat_10_k_20251212",
+              "retrieved_at": "2026-07-19",
+              "title": "Applied Materials FY2025 Form 10-K — Semiconductor Systems segments: foundry/logic leading vs non-leading edge (ICAPS: IoT/comms/auto/power/sensors), DRAM, NAND; backlog; China export exposure",
+              "published_at": "2025-12-12",
+              "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828025056742/amat-20251026.htm",
+              "evidence_tier": 1
+            }
+          }
+        }
+      },
+      "edge:c0345feb1112fb98ba8de88f842184739d6edf021a53625b38b48904ad9ab092": {
+        "edge_key": "edge:c0345feb1112fb98ba8de88f842184739d6edf021a53625b38b48904ad9ab092",
+        "src_id": "co:applied_materials",
+        "src_name": "Applied Materials",
+        "relation": "SUPPLIES_TO",
+        "dst_id": "prod:amat_semiconductor_systems",
+        "dst_name": "Applied Materials Semiconductor Systems",
+        "attributes": {},
+        "open_conflict_attributes": [],
+        "attribute_resolution_meta": {},
+        "assertions": {
+          "amat_10_q_20260521_e1": {
+            "id": "amat_10_q_20260521_e1",
+            "attributes": {
+              "qualification_status": "qualified"
+            },
+            "source_ids": [
+              "amat_10_q_20260521_s10"
+            ],
+            "source_doc_id": "amat_10_q_20260521",
+            "origin_entity": "Applied Materials",
+            "source_doc": {
+              "storage_permission": "repo_full",
+              "origin_entity": "Applied Materials",
+              "publisher": "SEC EDGAR",
+              "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+              "source_type": "filing",
+              "id": "amat_10_q_20260521",
+              "retrieved_at": "2026-07-19",
+              "title": "Applied Materials Q2 FY2026 Form 10-Q — net revenue by market (foundry-logic/DRAM/NAND), gross margin, China export controls",
+              "published_at": "2026-05-21",
+              "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026037227/amat-20260426.htm",
+              "evidence_tier": 1
+            }
+          }
+        }
+      },
+      "edge:df74dbde4d6c0cf9e817842bfe03c0ec0a145592031e397bec9caf005f60c24f": {
+        "edge_key": "edge:df74dbde4d6c0cf9e817842bfe03c0ec0a145592031e397bec9caf005f60c24f",
+        "src_id": "tech:export_controls_us_china",
+        "src_name": "US Export Controls on Semiconductor Technology to China",
+        "relation": "DEPENDS_ON",
+        "dst_id": "co:applied_materials",
+        "dst_name": "Applied Materials",
+        "attributes": {},
+        "open_conflict_attributes": [],
+        "attribute_resolution_meta": {},
+        "assertions": {
+          "amat_10_k_20251212_e11": {
+            "id": "amat_10_k_20251212_e11",
+            "attributes": {
+              "substitutability": null
+            },
+            "source_ids": [
+              "amat_10_k_20251212_s10",
+              "amat_10_k_20251212_s19"
+            ],
+            "source_doc_id": "amat_10_k_20251212",
+            "origin_entity": "Applied Materials",
+            "source_doc": {
+              "storage_permission": "repo_full",
+              "origin_entity": "Applied Materials",
+              "publisher": "SEC EDGAR",
+              "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+              "source_type": "filing",
+              "id": "amat_10_k_20251212",
+              "retrieved_at": "2026-07-19",
+              "title": "Applied Materials FY2025 Form 10-K — Semiconductor Systems segments: foundry/logic leading vs non-leading edge (ICAPS: IoT/comms/auto/power/sensors), DRAM, NAND; backlog; China export exposure",
+              "published_at": "2025-12-12",
+              "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828025056742/amat-20251026.htm",
+              "evidence_tier": 1
+            }
+          },
+          "amat_10_q_20260521_e7": {
+            "id": "amat_10_q_20260521_e7",
+            "attributes": {
+              "qualification_status": "none",
+              "substitutability": 1
+            },
+            "source_ids": [
+              "amat_10_q_20260521_s6",
+              "amat_10_q_20260521_s1"
+            ],
+            "source_doc_id": "amat_10_q_20260521",
+            "origin_entity": "Applied Materials",
+            "source_doc": {
+              "storage_permission": "repo_full",
+              "origin_entity": "Applied Materials",
+              "publisher": "SEC EDGAR",
+              "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+              "source_type": "filing",
+              "id": "amat_10_q_20260521",
+              "retrieved_at": "2026-07-19",
+              "title": "Applied Materials Q2 FY2026 Form 10-Q — net revenue by market (foundry-logic/DRAM/NAND), gross margin, China export controls",
+              "published_at": "2026-05-21",
+              "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026037227/amat-20260426.htm",
+              "evidence_tier": 1
+            }
+          }
+        }
+      }
+    },
+    "sources": {
+      "amat_10_k_20251212_s1": {
+        "id": "amat_10_k_20251212_s1",
+        "locator": "chars 46700-50100, Business: segments & markets",
+        "quote": "Our Semiconductor Systems sales are to customers that serve the following markets: foundry, logic and other; dynamic random access memory (DRAM); and flash memory (NAND).",
+        "source_doc_id": "amat_10_k_20251212",
+        "origin_entity": "Applied Materials",
+        "extraction_path": "extractions/amat_10_k_20251212.json",
+        "source_doc": {
+          "storage_permission": "repo_full",
+          "origin_entity": "Applied Materials",
+          "publisher": "SEC EDGAR",
+          "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+          "source_type": "filing",
+          "id": "amat_10_k_20251212",
+          "retrieved_at": "2026-07-19",
+          "title": "Applied Materials FY2025 Form 10-K — Semiconductor Systems segments: foundry/logic leading vs non-leading edge (ICAPS: IoT/comms/auto/power/sensors), DRAM, NAND; backlog; China export exposure",
+          "published_at": "2025-12-12",
+          "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828025056742/amat-20251026.htm",
+          "evidence_tier": 1
+        }
+      },
+      "amat_10_k_20251212_s10": {
+        "id": "amat_10_k_20251212_s10",
+        "locator": "chars 50100-56800, Risk Factors: China competition",
+        "quote": "We could see increased competition from domestic equipment manufacturers in China resulting from local government incentives and funding as well as export controls established by the United States government to restrict the sale of certain technologies to customers in China.",
+        "source_doc_id": "amat_10_k_20251212",
+        "origin_entity": "Applied Materials",
+        "extraction_path": "extractions/amat_10_k_20251212.json",
+        "source_doc": {
+          "storage_permission": "repo_full",
+          "origin_entity": "Applied Materials",
+          "publisher": "SEC EDGAR",
+          "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+          "source_type": "filing",
+          "id": "amat_10_k_20251212",
+          "retrieved_at": "2026-07-19",
+          "title": "Applied Materials FY2025 Form 10-K — Semiconductor Systems segments: foundry/logic leading vs non-leading edge (ICAPS: IoT/comms/auto/power/sensors), DRAM, NAND; backlog; China export exposure",
+          "published_at": "2025-12-12",
+          "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828025056742/amat-20251026.htm",
+          "evidence_tier": 1
+        }
+      },
+      "amat_10_k_20251212_s12": {
+        "id": "amat_10_k_20251212_s12",
+        "locator": "chars 163600-166600, MD&A: Semiconductor Systems revenue by market",
+        "quote": "Net revenue for Semiconductor Systems by market for the periods presented were as follows: Foundry, logic and other 67%; Dynamic random-access memory (DRAM) 26%; Flash memory (NAND) 7%.",
+        "source_doc_id": "amat_10_k_20251212",
+        "origin_entity": "Applied Materials",
+        "extraction_path": "extractions/amat_10_k_20251212.json",
+        "source_doc": {
+          "storage_permission": "repo_full",
+          "origin_entity": "Applied Materials",
+          "publisher": "SEC EDGAR",
+          "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+          "source_type": "filing",
+          "id": "amat_10_k_20251212",
+          "retrieved_at": "2026-07-19",
+          "title": "Applied Materials FY2025 Form 10-K — Semiconductor Systems segments: foundry/logic leading vs non-leading edge (ICAPS: IoT/comms/auto/power/sensors), DRAM, NAND; backlog; China export exposure",
+          "published_at": "2025-12-12",
+          "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828025056742/amat-20251026.htm",
+          "evidence_tier": 1
+        }
+      },
+      "amat_10_k_20251212_s13": {
+        "id": "amat_10_k_20251212_s13",
+        "locator": "chars 163600-166600, MD&A: foundry/logic leading-edge driver",
+        "quote": "Foundry and logic customers' spending in fiscal 2025 increased driven primarily by higher customer investments in leading-edge manufacturing technologies.",
+        "source_doc_id": "amat_10_k_20251212",
+        "origin_entity": "Applied Materials",
+        "extraction_path": "extractions/amat_10_k_20251212.json",
+        "source_doc": {
+          "storage_permission": "repo_full",
+          "origin_entity": "Applied Materials",
+          "publisher": "SEC EDGAR",
+          "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+          "source_type": "filing",
+          "id": "amat_10_k_20251212",
+          "retrieved_at": "2026-07-19",
+          "title": "Applied Materials FY2025 Form 10-K — Semiconductor Systems segments: foundry/logic leading vs non-leading edge (ICAPS: IoT/comms/auto/power/sensors), DRAM, NAND; backlog; China export exposure",
+          "published_at": "2025-12-12",
+          "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828025056742/amat-20251026.htm",
+          "evidence_tier": 1
+        }
+      },
+      "amat_10_k_20251212_s14": {
+        "id": "amat_10_k_20251212_s14",
+        "locator": "chars 163600-166600, MD&A: NAND spend driver",
+        "quote": "Memory customers' spending in fiscal 2025 was higher due to increased customer investments in NAND fabrication equipment upgrades.",
+        "source_doc_id": "amat_10_k_20251212",
+        "origin_entity": "Applied Materials",
+        "extraction_path": "extractions/amat_10_k_20251212.json",
+        "source_doc": {
+          "storage_permission": "repo_full",
+          "origin_entity": "Applied Materials",
+          "publisher": "SEC EDGAR",
+          "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+          "source_type": "filing",
+          "id": "amat_10_k_20251212",
+          "retrieved_at": "2026-07-19",
+          "title": "Applied Materials FY2025 Form 10-K — Semiconductor Systems segments: foundry/logic leading vs non-leading edge (ICAPS: IoT/comms/auto/power/sensors), DRAM, NAND; backlog; China export exposure",
+          "published_at": "2025-12-12",
+          "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828025056742/amat-20251026.htm",
+          "evidence_tier": 1
+        }
+      },
+      "amat_10_k_20251212_s16": {
+        "id": "amat_10_k_20251212_s16",
+        "locator": "chars 163600-166600, MD&A: geographic revenue China",
+        "quote": "China $8,529 30% [of net revenue in fiscal 2025]; [prior year] $10,117 37% … (16)% [change]",
+        "source_doc_id": "amat_10_k_20251212",
+        "origin_entity": "Applied Materials",
+        "extraction_path": "extractions/amat_10_k_20251212.json",
+        "source_doc": {
+          "storage_permission": "repo_full",
+          "origin_entity": "Applied Materials",
+          "publisher": "SEC EDGAR",
+          "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+          "source_type": "filing",
+          "id": "amat_10_k_20251212",
+          "retrieved_at": "2026-07-19",
+          "title": "Applied Materials FY2025 Form 10-K — Semiconductor Systems segments: foundry/logic leading vs non-leading edge (ICAPS: IoT/comms/auto/power/sensors), DRAM, NAND; backlog; China export exposure",
+          "published_at": "2025-12-12",
+          "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828025056742/amat-20251026.htm",
+          "evidence_tier": 1
+        }
+      },
+      "amat_10_k_20251212_s19": {
+        "id": "amat_10_k_20251212_s19",
+        "locator": "chars 50100-56800, Risk Factors: export controls international competitors",
+        "quote": "Export controls enacted by the United States government that restrict the sale of certain technologies to customers in China may also provide an advantage to our international competitors.",
+        "source_doc_id": "amat_10_k_20251212",
+        "origin_entity": "Applied Materials",
+        "extraction_path": "extractions/amat_10_k_20251212.json",
+        "source_doc": {
+          "storage_permission": "repo_full",
+          "origin_entity": "Applied Materials",
+          "publisher": "SEC EDGAR",
+          "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+          "source_type": "filing",
+          "id": "amat_10_k_20251212",
+          "retrieved_at": "2026-07-19",
+          "title": "Applied Materials FY2025 Form 10-K — Semiconductor Systems segments: foundry/logic leading vs non-leading edge (ICAPS: IoT/comms/auto/power/sensors), DRAM, NAND; backlog; China export exposure",
+          "published_at": "2025-12-12",
+          "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828025056742/amat-20251026.htm",
+          "evidence_tier": 1
+        }
+      },
+      "amat_10_k_20251212_s3": {
+        "id": "amat_10_k_20251212_s3",
+        "locator": "chars 46700-50100, Business: non-leading edge / ICAPS",
+        "quote": "Non-leading edge technology nodes serve markets such as internet of things, communications, automotive, power and sensors.",
+        "source_doc_id": "amat_10_k_20251212",
+        "origin_entity": "Applied Materials",
+        "extraction_path": "extractions/amat_10_k_20251212.json",
+        "source_doc": {
+          "storage_permission": "repo_full",
+          "origin_entity": "Applied Materials",
+          "publisher": "SEC EDGAR",
+          "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+          "source_type": "filing",
+          "id": "amat_10_k_20251212",
+          "retrieved_at": "2026-07-19",
+          "title": "Applied Materials FY2025 Form 10-K — Semiconductor Systems segments: foundry/logic leading vs non-leading edge (ICAPS: IoT/comms/auto/power/sensors), DRAM, NAND; backlog; China export exposure",
+          "published_at": "2025-12-12",
+          "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828025056742/amat-20251026.htm",
+          "evidence_tier": 1
+        }
+      },
+      "amat_10_k_20251212_s4": {
+        "id": "amat_10_k_20251212_s4",
+        "locator": "chars 46700-50100, Business: AGS segment",
+        "quote": "Our AGS segment provides services, spares and factory automation software to customer fabrication plants globally. Through October 26, 2025, our AGS segment also manufactured and sold 200 millimeter (200mm) and other equipment to customers globally that serve non-leading-edge markets.",
+        "source_doc_id": "amat_10_k_20251212",
+        "origin_entity": "Applied Materials",
+        "extraction_path": "extractions/amat_10_k_20251212.json",
+        "source_doc": {
+          "storage_permission": "repo_full",
+          "origin_entity": "Applied Materials",
+          "publisher": "SEC EDGAR",
+          "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+          "source_type": "filing",
+          "id": "amat_10_k_20251212",
+          "retrieved_at": "2026-07-19",
+          "title": "Applied Materials FY2025 Form 10-K — Semiconductor Systems segments: foundry/logic leading vs non-leading edge (ICAPS: IoT/comms/auto/power/sensors), DRAM, NAND; backlog; China export exposure",
+          "published_at": "2025-12-12",
+          "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828025056742/amat-20251026.htm",
+          "evidence_tier": 1
+        }
+      },
+      "amat_10_k_20251212_s5": {
+        "id": "amat_10_k_20251212_s5",
+        "locator": "chars 46700-50100, Business: advanced packaging",
+        "quote": "Our advanced packaging systems use our materials engineering expertise to allow customers to connect multiple chips together through heterogeneous integration, enabling them to advance the technology roadmap beyond a single chip.",
+        "source_doc_id": "amat_10_k_20251212",
+        "origin_entity": "Applied Materials",
+        "extraction_path": "extractions/amat_10_k_20251212.json",
+        "source_doc": {
+          "storage_permission": "repo_full",
+          "origin_entity": "Applied Materials",
+          "publisher": "SEC EDGAR",
+          "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+          "source_type": "filing",
+          "id": "amat_10_k_20251212",
+          "retrieved_at": "2026-07-19",
+          "title": "Applied Materials FY2025 Form 10-K — Semiconductor Systems segments: foundry/logic leading vs non-leading edge (ICAPS: IoT/comms/auto/power/sensors), DRAM, NAND; backlog; China export exposure",
+          "published_at": "2025-12-12",
+          "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828025056742/amat-20251026.htm",
+          "evidence_tier": 1
+        }
+      },
+      "amat_10_k_20251212_s9": {
+        "id": "amat_10_k_20251212_s9",
+        "locator": "chars 50100-56800, Risk Factors: sole-source supply",
+        "quote": "some key parts may be obtained from only a qualified single supplier or a limited group of qualified suppliers.",
+        "source_doc_id": "amat_10_k_20251212",
+        "origin_entity": "Applied Materials",
+        "extraction_path": "extractions/amat_10_k_20251212.json",
+        "source_doc": {
+          "storage_permission": "repo_full",
+          "origin_entity": "Applied Materials",
+          "publisher": "SEC EDGAR",
+          "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+          "source_type": "filing",
+          "id": "amat_10_k_20251212",
+          "retrieved_at": "2026-07-19",
+          "title": "Applied Materials FY2025 Form 10-K — Semiconductor Systems segments: foundry/logic leading vs non-leading edge (ICAPS: IoT/comms/auto/power/sensors), DRAM, NAND; backlog; China export exposure",
+          "published_at": "2025-12-12",
+          "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828025056742/amat-20251026.htm",
+          "evidence_tier": 1
+        }
+      },
+      "amat_10_q_20260219_s1": {
+        "id": "amat_10_q_20260219_s1",
+        "locator": "MD&A: export controls, chars 90900-92000",
+        "quote": "On February 11, 2026, subsequent to the end of our fiscal quarter, we entered into a settlement agreement with BIS to resolve its inquiry relating to certain China customer shipments and export controls compliance and agreed to pay BIS an amount of $253 million.",
+        "source_doc_id": "amat_10_q_20260219",
+        "origin_entity": "Applied Materials",
+        "extraction_path": "extractions/amat_10_q_20260219.json",
+        "source_doc": {
+          "storage_permission": "repo_full",
+          "origin_entity": "Applied Materials",
+          "publisher": "SEC EDGAR",
+          "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+          "source_type": "filing",
+          "id": "amat_10_q_20260219",
+          "retrieved_at": "2026-07-19",
+          "title": "Applied Materials Q1 FY2026 Form 10-Q — net revenue by market, gross margin, capex, China export controls",
+          "published_at": "2026-02-19",
+          "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026009694/amat-20260125.htm",
+          "evidence_tier": 1
+        }
+      },
+      "amat_10_q_20260219_s2": {
+        "id": "amat_10_q_20260219_s2",
+        "locator": "MD&A: export controls, chars 90900-92000",
+        "quote": "The settlement agreement also includes a denial order that is suspended and will be waived three years after the date of the order issued under the settlement agreement, provided that we have made full and timely payments under the settlement agreement and timely completed the audit requirements.",
+        "source_doc_id": "amat_10_q_20260219",
+        "origin_entity": "Applied Materials",
+        "extraction_path": "extractions/amat_10_q_20260219.json",
+        "source_doc": {
+          "storage_permission": "repo_full",
+          "origin_entity": "Applied Materials",
+          "publisher": "SEC EDGAR",
+          "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+          "source_type": "filing",
+          "id": "amat_10_q_20260219",
+          "retrieved_at": "2026-07-19",
+          "title": "Applied Materials Q1 FY2026 Form 10-Q — net revenue by market, gross margin, capex, China export controls",
+          "published_at": "2026-02-19",
+          "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026009694/amat-20260125.htm",
+          "evidence_tier": 1
+        }
+      },
+      "amat_10_q_20260219_s3": {
+        "id": "amat_10_q_20260219_s3",
+        "locator": "MD&A: gross margin, capex, foundry-logic/DRAM/NAND by market, chars 95400-100100",
+        "quote": "Revenue for Semiconductor Systems by market: Foundry, logic and other 62% / 69%; Dynamic random-access memory (DRAM) 34% / 27%; Flash memory (NAND) 4% / 4%",
+        "source_doc_id": "amat_10_q_20260219",
+        "origin_entity": "Applied Materials",
+        "extraction_path": "extractions/amat_10_q_20260219.json",
+        "source_doc": {
+          "storage_permission": "repo_full",
+          "origin_entity": "Applied Materials",
+          "publisher": "SEC EDGAR",
+          "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+          "source_type": "filing",
+          "id": "amat_10_q_20260219",
+          "retrieved_at": "2026-07-19",
+          "title": "Applied Materials Q1 FY2026 Form 10-Q — net revenue by market, gross margin, capex, China export controls",
+          "published_at": "2026-02-19",
+          "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026009694/amat-20260125.htm",
+          "evidence_tier": 1
+        }
+      },
+      "amat_10_q_20260219_s5": {
+        "id": "amat_10_q_20260219_s5",
+        "locator": "MD&A: China, net revenue by market, chars 108900-113700",
+        "quote": "The United States government has implemented export regulations for U.S. semiconductor technology sold or provided to customers in China, which have limited our ability to provide certain products and services to customers in China, over the past several years.",
+        "source_doc_id": "amat_10_q_20260219",
+        "origin_entity": "Applied Materials",
+        "extraction_path": "extractions/amat_10_q_20260219.json",
+        "source_doc": {
+          "storage_permission": "repo_full",
+          "origin_entity": "Applied Materials",
+          "publisher": "SEC EDGAR",
+          "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+          "source_type": "filing",
+          "id": "amat_10_q_20260219",
+          "retrieved_at": "2026-07-19",
+          "title": "Applied Materials Q1 FY2026 Form 10-Q — net revenue by market, gross margin, capex, China export controls",
+          "published_at": "2026-02-19",
+          "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026009694/amat-20260125.htm",
+          "evidence_tier": 1
+        }
+      },
+      "amat_10_q_20260219_s6": {
+        "id": "amat_10_q_20260219_s6",
+        "locator": "MD&A: China, net revenue by market, chars 108900-113700",
+        "quote": "The U.S. government continues to issue new export licensing requirements, and additional updates and other requirements that have had the effect of further limiting our ability to provide certain products and services to customers outside the U.S., including in China.",
+        "source_doc_id": "amat_10_q_20260219",
+        "origin_entity": "Applied Materials",
+        "extraction_path": "extractions/amat_10_q_20260219.json",
+        "source_doc": {
+          "storage_permission": "repo_full",
+          "origin_entity": "Applied Materials",
+          "publisher": "SEC EDGAR",
+          "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+          "source_type": "filing",
+          "id": "amat_10_q_20260219",
+          "retrieved_at": "2026-07-19",
+          "title": "Applied Materials Q1 FY2026 Form 10-Q — net revenue by market, gross margin, capex, China export controls",
+          "published_at": "2026-02-19",
+          "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026009694/amat-20260125.htm",
+          "evidence_tier": 1
+        }
+      },
+      "amat_10_q_20260219_s7": {
+        "id": "amat_10_q_20260219_s7",
+        "locator": "MD&A: China, net revenue by market, chars 108900-113700",
+        "quote": "Also, the United States has announced changes to its trade policy, including increased tariffs on imports. These actions have caused substantial uncertainty and have resulted in retaliatory measures, including new tariffs on U.S. goods imposed by China and other countries.",
+        "source_doc_id": "amat_10_q_20260219",
+        "origin_entity": "Applied Materials",
+        "extraction_path": "extractions/amat_10_q_20260219.json",
+        "source_doc": {
+          "storage_permission": "repo_full",
+          "origin_entity": "Applied Materials",
+          "publisher": "SEC EDGAR",
+          "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+          "source_type": "filing",
+          "id": "amat_10_q_20260219",
+          "retrieved_at": "2026-07-19",
+          "title": "Applied Materials Q1 FY2026 Form 10-Q — net revenue by market, gross margin, capex, China export controls",
+          "published_at": "2026-02-19",
+          "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026009694/amat-20260125.htm",
+          "evidence_tier": 1
+        }
+      },
+      "amat_10_q_20260521_s1": {
+        "id": "amat_10_q_20260521_s1",
+        "locator": "MD&A: export controls, chars 102500-104200",
+        "quote": "on February 11, 2026, we entered into a settlement agreement with the U.S. Commerce Department Bureau of Industry and Security (BIS) to resolve its inquiry relating to certain China customer shipments and export controls compliance and agreed to pay BIS an amount of $253 million",
+        "source_doc_id": "amat_10_q_20260521",
+        "origin_entity": "Applied Materials",
+        "extraction_path": "extractions/amat_10_q_20260521.json",
+        "source_doc": {
+          "storage_permission": "repo_full",
+          "origin_entity": "Applied Materials",
+          "publisher": "SEC EDGAR",
+          "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+          "source_type": "filing",
+          "id": "amat_10_q_20260521",
+          "retrieved_at": "2026-07-19",
+          "title": "Applied Materials Q2 FY2026 Form 10-Q — net revenue by market (foundry-logic/DRAM/NAND), gross margin, China export controls",
+          "published_at": "2026-05-21",
+          "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026037227/amat-20260426.htm",
+          "evidence_tier": 1
+        }
+      },
+      "amat_10_q_20260521_s10": {
+        "id": "amat_10_q_20260521_s10",
+        "locator": "MD&A: export controls, chars 102500-104200",
+        "quote": "Our two reportable segments are: Semiconductor Systems and Applied Global Services (AGS). The Semiconductor Systems segment includes semiconductor capital equipment to enable materials engineering steps including etch, rapid thermal processing, deposition, chemical mechanical planarization, metrology and inspection, wafer packaging, and ion implantation.",
+        "source_doc_id": "amat_10_q_20260521",
+        "origin_entity": "Applied Materials",
+        "extraction_path": "extractions/amat_10_q_20260521.json",
+        "source_doc": {
+          "storage_permission": "repo_full",
+          "origin_entity": "Applied Materials",
+          "publisher": "SEC EDGAR",
+          "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+          "source_type": "filing",
+          "id": "amat_10_q_20260521",
+          "retrieved_at": "2026-07-19",
+          "title": "Applied Materials Q2 FY2026 Form 10-Q — net revenue by market (foundry-logic/DRAM/NAND), gross margin, China export controls",
+          "published_at": "2026-05-21",
+          "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026037227/amat-20260426.htm",
+          "evidence_tier": 1
+        }
+      },
+      "amat_10_q_20260521_s11": {
+        "id": "amat_10_q_20260521_s11",
+        "locator": "MD&A: China, net revenue by market, chars 122900-129200",
+        "quote": "These actions have caused substantial uncertainty and have resulted in retaliatory measures, including new tariffs on U.S. goods imposed by China and other countries.",
+        "source_doc_id": "amat_10_q_20260521",
+        "origin_entity": "Applied Materials",
+        "extraction_path": "extractions/amat_10_q_20260521.json",
+        "source_doc": {
+          "storage_permission": "repo_full",
+          "origin_entity": "Applied Materials",
+          "publisher": "SEC EDGAR",
+          "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+          "source_type": "filing",
+          "id": "amat_10_q_20260521",
+          "retrieved_at": "2026-07-19",
+          "title": "Applied Materials Q2 FY2026 Form 10-Q — net revenue by market (foundry-logic/DRAM/NAND), gross margin, China export controls",
+          "published_at": "2026-05-21",
+          "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026037227/amat-20260426.htm",
+          "evidence_tier": 1
+        }
+      },
+      "amat_10_q_20260521_s2": {
+        "id": "amat_10_q_20260521_s2",
+        "locator": "MD&A: export controls, chars 102500-104200",
+        "quote": "The settlement agreement also includes a denial order that is suspended and will be waived three years after the date of the order issued under the settlement agreement, provided that we have timely completed the audit requirements.",
+        "source_doc_id": "amat_10_q_20260521",
+        "origin_entity": "Applied Materials",
+        "extraction_path": "extractions/amat_10_q_20260521.json",
+        "source_doc": {
+          "storage_permission": "repo_full",
+          "origin_entity": "Applied Materials",
+          "publisher": "SEC EDGAR",
+          "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+          "source_type": "filing",
+          "id": "amat_10_q_20260521",
+          "retrieved_at": "2026-07-19",
+          "title": "Applied Materials Q2 FY2026 Form 10-Q — net revenue by market (foundry-logic/DRAM/NAND), gross margin, China export controls",
+          "published_at": "2026-05-21",
+          "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026037227/amat-20260426.htm",
+          "evidence_tier": 1
+        }
+      },
+      "amat_10_q_20260521_s3": {
+        "id": "amat_10_q_20260521_s3",
+        "locator": "MD&A: gross margin, results by market, chars 106800-112900",
+        "quote": "Revenue for Semiconductor Systems by market for the periods presented were as follows: Foundry, logic and other 67% ... Dynamic random-access memory (DRAM) 29% ... Flash memory (NAND) 4% [Q2 FY2026]",
+        "source_doc_id": "amat_10_q_20260521",
+        "origin_entity": "Applied Materials",
+        "extraction_path": "extractions/amat_10_q_20260521.json",
+        "source_doc": {
+          "storage_permission": "repo_full",
+          "origin_entity": "Applied Materials",
+          "publisher": "SEC EDGAR",
+          "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+          "source_type": "filing",
+          "id": "amat_10_q_20260521",
+          "retrieved_at": "2026-07-19",
+          "title": "Applied Materials Q2 FY2026 Form 10-Q — net revenue by market (foundry-logic/DRAM/NAND), gross margin, China export controls",
+          "published_at": "2026-05-21",
+          "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026037227/amat-20260426.htm",
+          "evidence_tier": 1
+        }
+      },
+      "amat_10_q_20260521_s6": {
+        "id": "amat_10_q_20260521_s6",
+        "locator": "MD&A: China, net revenue by market, chars 122900-129200",
+        "quote": "The United States government has implemented export regulations for U.S. semiconductor technology sold or provided to customers in China, which have limited our ability to provide certain products and services to customers in China, over the past several years.",
+        "source_doc_id": "amat_10_q_20260521",
+        "origin_entity": "Applied Materials",
+        "extraction_path": "extractions/amat_10_q_20260521.json",
+        "source_doc": {
+          "storage_permission": "repo_full",
+          "origin_entity": "Applied Materials",
+          "publisher": "SEC EDGAR",
+          "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+          "source_type": "filing",
+          "id": "amat_10_q_20260521",
+          "retrieved_at": "2026-07-19",
+          "title": "Applied Materials Q2 FY2026 Form 10-Q — net revenue by market (foundry-logic/DRAM/NAND), gross margin, China export controls",
+          "published_at": "2026-05-21",
+          "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026037227/amat-20260426.htm",
+          "evidence_tier": 1
+        }
+      },
+      "amat_10_q_20260521_s8": {
+        "id": "amat_10_q_20260521_s8",
+        "locator": "MD&A: China, net revenue by market, chars 122900-129200",
+        "quote": "Memory customers' spending in the three and six months ended April 26, 2026 was higher compared to the same periods in the prior year primarily due to increased customer investments in DRAM technology transitions.",
+        "source_doc_id": "amat_10_q_20260521",
+        "origin_entity": "Applied Materials",
+        "extraction_path": "extractions/amat_10_q_20260521.json",
+        "source_doc": {
+          "storage_permission": "repo_full",
+          "origin_entity": "Applied Materials",
+          "publisher": "SEC EDGAR",
+          "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+          "source_type": "filing",
+          "id": "amat_10_q_20260521",
+          "retrieved_at": "2026-07-19",
+          "title": "Applied Materials Q2 FY2026 Form 10-Q — net revenue by market (foundry-logic/DRAM/NAND), gross margin, China export controls",
+          "published_at": "2026-05-21",
+          "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026037227/amat-20260426.htm",
+          "evidence_tier": 1
+        }
+      }
+    }
+  },
+  "evidence_items": [
+    {
+      "evidence_ref": "E1",
+      "type": "claim",
+      "claim_id": "amat_10_k_20251212_cl1",
+      "edge_key": null,
+      "attributes": [],
+      "assertion_ids": [],
+      "source_ids": [
+        "amat_10_k_20251212_s10",
+        "amat_10_k_20251212_s16",
+        "amat_10_k_20251212_s19"
+      ],
+      "purpose": "支援「AI 算力擴張推動設備需求、管理層預期延續」的需求驅動論點，並提供中國收入從 37% 跌至 30% 的量化佐證"
+    },
+    {
+      "evidence_ref": "E2",
+      "type": "claim",
+      "claim_id": "amat_10_q_20260521_cl4",
+      "edge_key": null,
+      "attributes": [],
+      "assertion_ids": [],
+      "source_ids": [
+        "amat_10_q_20260521_s8",
+        "amat_10_q_20260521_s3"
+      ],
+      "purpose": "支援「DRAM 技術轉型為記憶體設備支出主引擎、NAND 佔比下滑」的需求驅動論點及 disproof condition"
+    },
+    {
+      "evidence_ref": "E3",
+      "type": "edge",
+      "claim_id": null,
+      "edge_key": "edge:3407138fd145fedc1873eb976fbbfe8389b58f08604c4c023fbdc248838f6159",
+      "attributes": [
+        "qualification_status"
+      ],
+      "assertion_ids": [
+        "amat_10_k_20251212_e5"
+      ],
+      "source_ids": [
+        "amat_10_k_20251212_s5"
+      ],
+      "purpose": "支援「先進封裝異質整合需求上升、AMAT 材料工程設備直接受益」的需求驅動與 Stack 摘要論點"
+    },
+    {
+      "evidence_ref": "E4",
+      "type": "edge",
+      "claim_id": null,
+      "edge_key": "edge:0fbad55fb3ce6936c05fa565edf0d022adc5585a89509f6adf34f8040bd43d69",
+      "attributes": [
+        "qualification_status"
+      ],
+      "assertion_ids": [
+        "amat_10_q_20260219_e1"
+      ],
+      "source_ids": [
+        "amat_10_q_20260219_s3"
+      ],
+      "purpose": "支援「晶圓代工/邏輯端佔 Semiconductor Systems 收入最大份額、前端製程設備需求結構穩健」的需求驅動與 Stack 摘要論點"
+    },
+    {
+      "evidence_ref": "E5",
+      "type": "edge",
+      "claim_id": null,
+      "edge_key": "edge:0771e5fe8e8efefdaac7b846de019fa92bff0a0b75ea475a0f9ddff2da611647",
+      "attributes": [
+        "qualification_status"
+      ],
+      "assertion_ids": [
+        "amat_10_k_20251212_e4"
+      ],
+      "source_ids": [
+        "amat_10_k_20251212_s3",
+        "amat_10_k_20251212_s4"
+      ],
+      "purpose": "支援「ICAPS/200mm 非前沿層業務結構調整已告一段落」的 Stack 摘要論點"
+    },
+    {
+      "evidence_ref": "E6",
+      "type": "claim",
+      "claim_id": "amat_10_q_20260521_cl2",
+      "edge_key": null,
+      "attributes": [],
+      "assertion_ids": [],
+      "source_ids": [
+        "amat_10_q_20260521_s6",
+        "amat_10_q_20260521_s11"
+      ],
+      "purpose": "支援「出口管制與關稅為主要地理/法規瓶頸」的主瓶頸論點及 disproof condition"
+    },
+    {
+      "evidence_ref": "E7",
+      "type": "edge",
+      "claim_id": null,
+      "edge_key": "edge:df74dbde4d6c0cf9e817842bfe03c0ec0a145592031e397bec9caf005f60c24f",
+      "attributes": [
+        "substitutability"
+      ],
+      "assertion_ids": [
+        "amat_10_q_20260521_e7"
+      ],
+      "source_ids": [
+        "amat_10_q_20260521_s6",
+        "amat_10_q_20260521_s1"
+      ],
+      "purpose": "支援「出口管制對 AMAT 的依賴邊 substitutability=1，法規瓶頸不可迴避」的主瓶頸論點"
+    },
+    {
+      "evidence_ref": "E8",
+      "type": "claim",
+      "claim_id": "amat_10_q_20260521_cl1",
+      "edge_key": null,
+      "attributes": [],
+      "assertion_ids": [],
+      "source_ids": [
+        "amat_10_q_20260521_s1",
+        "amat_10_q_20260521_s2"
+      ],
+      "purpose": "支援「BIS $253M 和解與懸置否認令構成三年稽核窗口尾部風險」的主瓶頸論點及 disproof condition"
+    },
+    {
+      "evidence_ref": "E9",
+      "type": "claim",
+      "claim_id": "amat_10_k_20251212_cl3",
+      "edge_key": null,
+      "attributes": [],
+      "assertion_ids": [],
+      "source_ids": [
+        "amat_10_k_20251212_s9"
+      ],
+      "purpose": "支援「關鍵零件依賴單一或少數合格供應商的供應集中風險」的主瓶頸資料缺口說明"
+    }
+  ],
+  "validation": {
+    "ok": true,
+    "errors": [],
+    "resolved_evidence": [
+      {
+        "evidence_ref": "E1",
+        "item": {
+          "evidence_ref": "E1",
+          "type": "claim",
+          "claim_id": "amat_10_k_20251212_cl1",
+          "edge_key": null,
+          "attributes": [],
+          "assertion_ids": [],
+          "source_ids": [
+            "amat_10_k_20251212_s10",
+            "amat_10_k_20251212_s16",
+            "amat_10_k_20251212_s19"
+          ],
+          "purpose": "支援「AI 算力擴張推動設備需求、管理層預期延續」的需求驅動論點，並提供中國收入從 37% 跌至 30% 的量化佐證"
+        },
+        "claim": {
+          "id": "amat_10_k_20251212_cl1",
+          "statement": "Applied Materials faces a structural risk that US export controls on semiconductor equipment to China will reduce its addressable market in China and advantage international competitors, as China revenue declined from 37% to 30% of net revenue year-over-year.",
+          "demand_proof_level": "confirmed",
+          "disproof_condition": "If US export controls on semiconductor equipment to China are relaxed, or if Applied Materials grows China revenue materially, this claim should be downgraded.",
+          "confidence": 0.9,
+          "source_ids": [
+            "amat_10_k_20251212_s10",
+            "amat_10_k_20251212_s16",
+            "amat_10_k_20251212_s19"
+          ],
+          "source_doc_id": "amat_10_k_20251212",
+          "subject_kind": "edge",
+          "subject_node_id": null,
+          "subject_edge_key": "edge:df74dbde4d6c0cf9e817842bfe03c0ec0a145592031e397bec9caf005f60c24f",
+          "origin_entity": "Applied Materials",
+          "source_doc": {
+            "storage_permission": "repo_full",
+            "origin_entity": "Applied Materials",
+            "publisher": "SEC EDGAR",
+            "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+            "source_type": "filing",
+            "id": "amat_10_k_20251212",
+            "retrieved_at": "2026-07-19",
+            "title": "Applied Materials FY2025 Form 10-K — Semiconductor Systems segments: foundry/logic leading vs non-leading edge (ICAPS: IoT/comms/auto/power/sensors), DRAM, NAND; backlog; China export exposure",
+            "published_at": "2025-12-12",
+            "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828025056742/amat-20251026.htm",
+            "evidence_tier": 1
+          }
+        },
+        "sources": [
+          {
+            "id": "amat_10_k_20251212_s10",
+            "locator": "chars 50100-56800, Risk Factors: China competition",
+            "quote": "We could see increased competition from domestic equipment manufacturers in China resulting from local government incentives and funding as well as export controls established by the United States government to restrict the sale of certain technologies to customers in China.",
+            "source_doc_id": "amat_10_k_20251212",
+            "origin_entity": "Applied Materials",
+            "extraction_path": "extractions/amat_10_k_20251212.json",
+            "source_doc": {
+              "storage_permission": "repo_full",
+              "origin_entity": "Applied Materials",
+              "publisher": "SEC EDGAR",
+              "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+              "source_type": "filing",
+              "id": "amat_10_k_20251212",
+              "retrieved_at": "2026-07-19",
+              "title": "Applied Materials FY2025 Form 10-K — Semiconductor Systems segments: foundry/logic leading vs non-leading edge (ICAPS: IoT/comms/auto/power/sensors), DRAM, NAND; backlog; China export exposure",
+              "published_at": "2025-12-12",
+              "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828025056742/amat-20251026.htm",
+              "evidence_tier": 1
+            }
+          },
+          {
+            "id": "amat_10_k_20251212_s16",
+            "locator": "chars 163600-166600, MD&A: geographic revenue China",
+            "quote": "China $8,529 30% [of net revenue in fiscal 2025]; [prior year] $10,117 37% … (16)% [change]",
+            "source_doc_id": "amat_10_k_20251212",
+            "origin_entity": "Applied Materials",
+            "extraction_path": "extractions/amat_10_k_20251212.json",
+            "source_doc": {
+              "storage_permission": "repo_full",
+              "origin_entity": "Applied Materials",
+              "publisher": "SEC EDGAR",
+              "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+              "source_type": "filing",
+              "id": "amat_10_k_20251212",
+              "retrieved_at": "2026-07-19",
+              "title": "Applied Materials FY2025 Form 10-K — Semiconductor Systems segments: foundry/logic leading vs non-leading edge (ICAPS: IoT/comms/auto/power/sensors), DRAM, NAND; backlog; China export exposure",
+              "published_at": "2025-12-12",
+              "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828025056742/amat-20251026.htm",
+              "evidence_tier": 1
+            }
+          },
+          {
+            "id": "amat_10_k_20251212_s19",
+            "locator": "chars 50100-56800, Risk Factors: export controls international competitors",
+            "quote": "Export controls enacted by the United States government that restrict the sale of certain technologies to customers in China may also provide an advantage to our international competitors.",
+            "source_doc_id": "amat_10_k_20251212",
+            "origin_entity": "Applied Materials",
+            "extraction_path": "extractions/amat_10_k_20251212.json",
+            "source_doc": {
+              "storage_permission": "repo_full",
+              "origin_entity": "Applied Materials",
+              "publisher": "SEC EDGAR",
+              "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+              "source_type": "filing",
+              "id": "amat_10_k_20251212",
+              "retrieved_at": "2026-07-19",
+              "title": "Applied Materials FY2025 Form 10-K — Semiconductor Systems segments: foundry/logic leading vs non-leading edge (ICAPS: IoT/comms/auto/power/sensors), DRAM, NAND; backlog; China export exposure",
+              "published_at": "2025-12-12",
+              "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828025056742/amat-20251026.htm",
+              "evidence_tier": 1
+            }
+          }
+        ]
+      },
+      {
+        "evidence_ref": "E2",
+        "item": {
+          "evidence_ref": "E2",
+          "type": "claim",
+          "claim_id": "amat_10_q_20260521_cl4",
+          "edge_key": null,
+          "attributes": [],
+          "assertion_ids": [],
+          "source_ids": [
+            "amat_10_q_20260521_s8",
+            "amat_10_q_20260521_s3"
+          ],
+          "purpose": "支援「DRAM 技術轉型為記憶體設備支出主引擎、NAND 佔比下滑」的需求驅動論點及 disproof condition"
+        },
+        "claim": {
+          "id": "amat_10_q_20260521_cl4",
+          "statement": "Memory customer spending growth in FY2026 H1 was primarily driven by increased investments in DRAM technology transitions, not NAND; NAND share of Semiconductor Systems revenue fell from 7% to 4% YoY in Q2.",
+          "demand_proof_level": "confirmed",
+          "disproof_condition": "If NAND investment recovers and surpasses DRAM share in future quarters, this directional claim should be revised.",
+          "confidence": 0.9,
+          "source_ids": [
+            "amat_10_q_20260521_s8",
+            "amat_10_q_20260521_s3"
+          ],
+          "source_doc_id": "amat_10_q_20260521",
+          "subject_kind": "node",
+          "subject_node_id": "tech:dram",
+          "subject_edge_key": null,
+          "origin_entity": "Applied Materials",
+          "source_doc": {
+            "storage_permission": "repo_full",
+            "origin_entity": "Applied Materials",
+            "publisher": "SEC EDGAR",
+            "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+            "source_type": "filing",
+            "id": "amat_10_q_20260521",
+            "retrieved_at": "2026-07-19",
+            "title": "Applied Materials Q2 FY2026 Form 10-Q — net revenue by market (foundry-logic/DRAM/NAND), gross margin, China export controls",
+            "published_at": "2026-05-21",
+            "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026037227/amat-20260426.htm",
+            "evidence_tier": 1
+          }
+        },
+        "sources": [
+          {
+            "id": "amat_10_q_20260521_s8",
+            "locator": "MD&A: China, net revenue by market, chars 122900-129200",
+            "quote": "Memory customers' spending in the three and six months ended April 26, 2026 was higher compared to the same periods in the prior year primarily due to increased customer investments in DRAM technology transitions.",
+            "source_doc_id": "amat_10_q_20260521",
+            "origin_entity": "Applied Materials",
+            "extraction_path": "extractions/amat_10_q_20260521.json",
+            "source_doc": {
+              "storage_permission": "repo_full",
+              "origin_entity": "Applied Materials",
+              "publisher": "SEC EDGAR",
+              "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+              "source_type": "filing",
+              "id": "amat_10_q_20260521",
+              "retrieved_at": "2026-07-19",
+              "title": "Applied Materials Q2 FY2026 Form 10-Q — net revenue by market (foundry-logic/DRAM/NAND), gross margin, China export controls",
+              "published_at": "2026-05-21",
+              "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026037227/amat-20260426.htm",
+              "evidence_tier": 1
+            }
+          },
+          {
+            "id": "amat_10_q_20260521_s3",
+            "locator": "MD&A: gross margin, results by market, chars 106800-112900",
+            "quote": "Revenue for Semiconductor Systems by market for the periods presented were as follows: Foundry, logic and other 67% ... Dynamic random-access memory (DRAM) 29% ... Flash memory (NAND) 4% [Q2 FY2026]",
+            "source_doc_id": "amat_10_q_20260521",
+            "origin_entity": "Applied Materials",
+            "extraction_path": "extractions/amat_10_q_20260521.json",
+            "source_doc": {
+              "storage_permission": "repo_full",
+              "origin_entity": "Applied Materials",
+              "publisher": "SEC EDGAR",
+              "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+              "source_type": "filing",
+              "id": "amat_10_q_20260521",
+              "retrieved_at": "2026-07-19",
+              "title": "Applied Materials Q2 FY2026 Form 10-Q — net revenue by market (foundry-logic/DRAM/NAND), gross margin, China export controls",
+              "published_at": "2026-05-21",
+              "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026037227/amat-20260426.htm",
+              "evidence_tier": 1
+            }
+          }
+        ]
+      },
+      {
+        "evidence_ref": "E3",
+        "item": {
+          "evidence_ref": "E3",
+          "type": "edge",
+          "claim_id": null,
+          "edge_key": "edge:3407138fd145fedc1873eb976fbbfe8389b58f08604c4c023fbdc248838f6159",
+          "attributes": [
+            "qualification_status"
+          ],
+          "assertion_ids": [
+            "amat_10_k_20251212_e5"
+          ],
+          "source_ids": [
+            "amat_10_k_20251212_s5"
+          ],
+          "purpose": "支援「先進封裝異質整合需求上升、AMAT 材料工程設備直接受益」的需求驅動與 Stack 摘要論點"
+        },
+        "edge": {
+          "edge_key": "edge:3407138fd145fedc1873eb976fbbfe8389b58f08604c4c023fbdc248838f6159",
+          "src_id": "co:applied_materials",
+          "src_name": "Applied Materials",
+          "relation": "SUPPLIES_TO",
+          "dst_id": "tech:advanced_packaging",
+          "dst_name": "Advanced packaging chip integration",
+          "attributes": {},
+          "open_conflict_attributes": [],
+          "attribute_resolution_meta": {},
+          "assertions": {
+            "amat_10_k_20251212_e5": {
+              "id": "amat_10_k_20251212_e5",
+              "attributes": {
+                "qualification_status": "qualified",
+                "substitutability": null
+              },
+              "source_ids": [
+                "amat_10_k_20251212_s5"
+              ],
+              "source_doc_id": "amat_10_k_20251212",
+              "origin_entity": "Applied Materials",
+              "source_doc": {
+                "storage_permission": "repo_full",
+                "origin_entity": "Applied Materials",
+                "publisher": "SEC EDGAR",
+                "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+                "source_type": "filing",
+                "id": "amat_10_k_20251212",
+                "retrieved_at": "2026-07-19",
+                "title": "Applied Materials FY2025 Form 10-K — Semiconductor Systems segments: foundry/logic leading vs non-leading edge (ICAPS: IoT/comms/auto/power/sensors), DRAM, NAND; backlog; China export exposure",
+                "published_at": "2025-12-12",
+                "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828025056742/amat-20251026.htm",
+                "evidence_tier": 1
+              }
+            }
+          }
+        },
+        "assertions": [
+          {
+            "id": "amat_10_k_20251212_e5",
+            "attributes": {
+              "qualification_status": "qualified",
+              "substitutability": null
+            },
+            "source_ids": [
+              "amat_10_k_20251212_s5"
+            ],
+            "source_doc_id": "amat_10_k_20251212",
+            "origin_entity": "Applied Materials",
+            "source_doc": {
+              "storage_permission": "repo_full",
+              "origin_entity": "Applied Materials",
+              "publisher": "SEC EDGAR",
+              "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+              "source_type": "filing",
+              "id": "amat_10_k_20251212",
+              "retrieved_at": "2026-07-19",
+              "title": "Applied Materials FY2025 Form 10-K — Semiconductor Systems segments: foundry/logic leading vs non-leading edge (ICAPS: IoT/comms/auto/power/sensors), DRAM, NAND; backlog; China export exposure",
+              "published_at": "2025-12-12",
+              "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828025056742/amat-20251026.htm",
+              "evidence_tier": 1
+            }
+          }
+        ],
+        "sources": [
+          {
+            "id": "amat_10_k_20251212_s5",
+            "locator": "chars 46700-50100, Business: advanced packaging",
+            "quote": "Our advanced packaging systems use our materials engineering expertise to allow customers to connect multiple chips together through heterogeneous integration, enabling them to advance the technology roadmap beyond a single chip.",
+            "source_doc_id": "amat_10_k_20251212",
+            "origin_entity": "Applied Materials",
+            "extraction_path": "extractions/amat_10_k_20251212.json",
+            "source_doc": {
+              "storage_permission": "repo_full",
+              "origin_entity": "Applied Materials",
+              "publisher": "SEC EDGAR",
+              "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+              "source_type": "filing",
+              "id": "amat_10_k_20251212",
+              "retrieved_at": "2026-07-19",
+              "title": "Applied Materials FY2025 Form 10-K — Semiconductor Systems segments: foundry/logic leading vs non-leading edge (ICAPS: IoT/comms/auto/power/sensors), DRAM, NAND; backlog; China export exposure",
+              "published_at": "2025-12-12",
+              "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828025056742/amat-20251026.htm",
+              "evidence_tier": 1
+            }
+          }
+        ]
+      },
+      {
+        "evidence_ref": "E4",
+        "item": {
+          "evidence_ref": "E4",
+          "type": "edge",
+          "claim_id": null,
+          "edge_key": "edge:0fbad55fb3ce6936c05fa565edf0d022adc5585a89509f6adf34f8040bd43d69",
+          "attributes": [
+            "qualification_status"
+          ],
+          "assertion_ids": [
+            "amat_10_q_20260219_e1"
+          ],
+          "source_ids": [
+            "amat_10_q_20260219_s3"
+          ],
+          "purpose": "支援「晶圓代工/邏輯端佔 Semiconductor Systems 收入最大份額、前端製程設備需求結構穩健」的需求驅動與 Stack 摘要論點"
+        },
+        "edge": {
+          "edge_key": "edge:0fbad55fb3ce6936c05fa565edf0d022adc5585a89509f6adf34f8040bd43d69",
+          "src_id": "co:applied_materials",
+          "src_name": "Applied Materials",
+          "relation": "SUPPLIES_TO",
+          "dst_id": "tech:semiconductor_equipment",
+          "dst_name": "Semiconductor Manufacturing Equipment",
+          "attributes": {},
+          "open_conflict_attributes": [],
+          "attribute_resolution_meta": {},
+          "assertions": {
+            "amat_10_q_20260219_e1": {
+              "id": "amat_10_q_20260219_e1",
+              "attributes": {
+                "qualification_status": "qualified",
+                "substitutability": null,
+                "sole_source": false,
+                "structural_lead_time_weeks": null,
+                "ramp_execution": null
+              },
+              "source_ids": [
+                "amat_10_q_20260219_s3"
+              ],
+              "source_doc_id": "amat_10_q_20260219",
+              "origin_entity": "Applied Materials",
+              "source_doc": {
+                "storage_permission": "repo_full",
+                "origin_entity": "Applied Materials",
+                "publisher": "SEC EDGAR",
+                "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+                "source_type": "filing",
+                "id": "amat_10_q_20260219",
+                "retrieved_at": "2026-07-19",
+                "title": "Applied Materials Q1 FY2026 Form 10-Q — net revenue by market, gross margin, capex, China export controls",
+                "published_at": "2026-02-19",
+                "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026009694/amat-20260125.htm",
+                "evidence_tier": 1
+              }
+            }
+          }
+        },
+        "assertions": [
+          {
+            "id": "amat_10_q_20260219_e1",
+            "attributes": {
+              "qualification_status": "qualified",
+              "substitutability": null,
+              "sole_source": false,
+              "structural_lead_time_weeks": null,
+              "ramp_execution": null
+            },
+            "source_ids": [
+              "amat_10_q_20260219_s3"
+            ],
+            "source_doc_id": "amat_10_q_20260219",
+            "origin_entity": "Applied Materials",
+            "source_doc": {
+              "storage_permission": "repo_full",
+              "origin_entity": "Applied Materials",
+              "publisher": "SEC EDGAR",
+              "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+              "source_type": "filing",
+              "id": "amat_10_q_20260219",
+              "retrieved_at": "2026-07-19",
+              "title": "Applied Materials Q1 FY2026 Form 10-Q — net revenue by market, gross margin, capex, China export controls",
+              "published_at": "2026-02-19",
+              "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026009694/amat-20260125.htm",
+              "evidence_tier": 1
+            }
+          }
+        ],
+        "sources": [
+          {
+            "id": "amat_10_q_20260219_s3",
+            "locator": "MD&A: gross margin, capex, foundry-logic/DRAM/NAND by market, chars 95400-100100",
+            "quote": "Revenue for Semiconductor Systems by market: Foundry, logic and other 62% / 69%; Dynamic random-access memory (DRAM) 34% / 27%; Flash memory (NAND) 4% / 4%",
+            "source_doc_id": "amat_10_q_20260219",
+            "origin_entity": "Applied Materials",
+            "extraction_path": "extractions/amat_10_q_20260219.json",
+            "source_doc": {
+              "storage_permission": "repo_full",
+              "origin_entity": "Applied Materials",
+              "publisher": "SEC EDGAR",
+              "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+              "source_type": "filing",
+              "id": "amat_10_q_20260219",
+              "retrieved_at": "2026-07-19",
+              "title": "Applied Materials Q1 FY2026 Form 10-Q — net revenue by market, gross margin, capex, China export controls",
+              "published_at": "2026-02-19",
+              "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026009694/amat-20260125.htm",
+              "evidence_tier": 1
+            }
+          }
+        ]
+      },
+      {
+        "evidence_ref": "E5",
+        "item": {
+          "evidence_ref": "E5",
+          "type": "edge",
+          "claim_id": null,
+          "edge_key": "edge:0771e5fe8e8efefdaac7b846de019fa92bff0a0b75ea475a0f9ddff2da611647",
+          "attributes": [
+            "qualification_status"
+          ],
+          "assertion_ids": [
+            "amat_10_k_20251212_e4"
+          ],
+          "source_ids": [
+            "amat_10_k_20251212_s3",
+            "amat_10_k_20251212_s4"
+          ],
+          "purpose": "支援「ICAPS/200mm 非前沿層業務結構調整已告一段落」的 Stack 摘要論點"
+        },
+        "edge": {
+          "edge_key": "edge:0771e5fe8e8efefdaac7b846de019fa92bff0a0b75ea475a0f9ddff2da611647",
+          "src_id": "co:applied_materials",
+          "src_name": "Applied Materials",
+          "relation": "SUPPLIES_TO",
+          "dst_id": "tech:icaps",
+          "dst_name": "ICAPS non-leading-edge markets (IoT, Communications, Automotive, Power, Sensors)",
+          "attributes": {},
+          "open_conflict_attributes": [],
+          "attribute_resolution_meta": {},
+          "assertions": {
+            "amat_10_k_20251212_e4": {
+              "id": "amat_10_k_20251212_e4",
+              "attributes": {
+                "qualification_status": "qualified",
+                "substitutability": null
+              },
+              "source_ids": [
+                "amat_10_k_20251212_s3",
+                "amat_10_k_20251212_s4"
+              ],
+              "source_doc_id": "amat_10_k_20251212",
+              "origin_entity": "Applied Materials",
+              "source_doc": {
+                "storage_permission": "repo_full",
+                "origin_entity": "Applied Materials",
+                "publisher": "SEC EDGAR",
+                "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+                "source_type": "filing",
+                "id": "amat_10_k_20251212",
+                "retrieved_at": "2026-07-19",
+                "title": "Applied Materials FY2025 Form 10-K — Semiconductor Systems segments: foundry/logic leading vs non-leading edge (ICAPS: IoT/comms/auto/power/sensors), DRAM, NAND; backlog; China export exposure",
+                "published_at": "2025-12-12",
+                "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828025056742/amat-20251026.htm",
+                "evidence_tier": 1
+              }
+            }
+          }
+        },
+        "assertions": [
+          {
+            "id": "amat_10_k_20251212_e4",
+            "attributes": {
+              "qualification_status": "qualified",
+              "substitutability": null
+            },
+            "source_ids": [
+              "amat_10_k_20251212_s3",
+              "amat_10_k_20251212_s4"
+            ],
+            "source_doc_id": "amat_10_k_20251212",
+            "origin_entity": "Applied Materials",
+            "source_doc": {
+              "storage_permission": "repo_full",
+              "origin_entity": "Applied Materials",
+              "publisher": "SEC EDGAR",
+              "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+              "source_type": "filing",
+              "id": "amat_10_k_20251212",
+              "retrieved_at": "2026-07-19",
+              "title": "Applied Materials FY2025 Form 10-K — Semiconductor Systems segments: foundry/logic leading vs non-leading edge (ICAPS: IoT/comms/auto/power/sensors), DRAM, NAND; backlog; China export exposure",
+              "published_at": "2025-12-12",
+              "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828025056742/amat-20251026.htm",
+              "evidence_tier": 1
+            }
+          }
+        ],
+        "sources": [
+          {
+            "id": "amat_10_k_20251212_s3",
+            "locator": "chars 46700-50100, Business: non-leading edge / ICAPS",
+            "quote": "Non-leading edge technology nodes serve markets such as internet of things, communications, automotive, power and sensors.",
+            "source_doc_id": "amat_10_k_20251212",
+            "origin_entity": "Applied Materials",
+            "extraction_path": "extractions/amat_10_k_20251212.json",
+            "source_doc": {
+              "storage_permission": "repo_full",
+              "origin_entity": "Applied Materials",
+              "publisher": "SEC EDGAR",
+              "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+              "source_type": "filing",
+              "id": "amat_10_k_20251212",
+              "retrieved_at": "2026-07-19",
+              "title": "Applied Materials FY2025 Form 10-K — Semiconductor Systems segments: foundry/logic leading vs non-leading edge (ICAPS: IoT/comms/auto/power/sensors), DRAM, NAND; backlog; China export exposure",
+              "published_at": "2025-12-12",
+              "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828025056742/amat-20251026.htm",
+              "evidence_tier": 1
+            }
+          },
+          {
+            "id": "amat_10_k_20251212_s4",
+            "locator": "chars 46700-50100, Business: AGS segment",
+            "quote": "Our AGS segment provides services, spares and factory automation software to customer fabrication plants globally. Through October 26, 2025, our AGS segment also manufactured and sold 200 millimeter (200mm) and other equipment to customers globally that serve non-leading-edge markets.",
+            "source_doc_id": "amat_10_k_20251212",
+            "origin_entity": "Applied Materials",
+            "extraction_path": "extractions/amat_10_k_20251212.json",
+            "source_doc": {
+              "storage_permission": "repo_full",
+              "origin_entity": "Applied Materials",
+              "publisher": "SEC EDGAR",
+              "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+              "source_type": "filing",
+              "id": "amat_10_k_20251212",
+              "retrieved_at": "2026-07-19",
+              "title": "Applied Materials FY2025 Form 10-K — Semiconductor Systems segments: foundry/logic leading vs non-leading edge (ICAPS: IoT/comms/auto/power/sensors), DRAM, NAND; backlog; China export exposure",
+              "published_at": "2025-12-12",
+              "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828025056742/amat-20251026.htm",
+              "evidence_tier": 1
+            }
+          }
+        ]
+      },
+      {
+        "evidence_ref": "E6",
+        "item": {
+          "evidence_ref": "E6",
+          "type": "claim",
+          "claim_id": "amat_10_q_20260521_cl2",
+          "edge_key": null,
+          "attributes": [],
+          "assertion_ids": [],
+          "source_ids": [
+            "amat_10_q_20260521_s6",
+            "amat_10_q_20260521_s11"
+          ],
+          "purpose": "支援「出口管制與關稅為主要地理/法規瓶頸」的主瓶頸論點及 disproof condition"
+        },
+        "claim": {
+          "id": "amat_10_q_20260521_cl2",
+          "statement": "US export controls and tariffs have materially limited Applied Materials' ability to supply certain semiconductor equipment products and services to customers in China, and China has retaliated with tariffs on US goods.",
+          "demand_proof_level": "confirmed",
+          "disproof_condition": "If the US government revokes or substantially relaxes export restrictions on semiconductor equipment to China, or if China removes retaliatory tariffs, this claim should be downgraded.",
+          "confidence": 0.9,
+          "source_ids": [
+            "amat_10_q_20260521_s6",
+            "amat_10_q_20260521_s11"
+          ],
+          "source_doc_id": "amat_10_q_20260521",
+          "subject_kind": "node",
+          "subject_node_id": "tech:export_controls_us_china",
+          "subject_edge_key": null,
+          "origin_entity": "Applied Materials",
+          "source_doc": {
+            "storage_permission": "repo_full",
+            "origin_entity": "Applied Materials",
+            "publisher": "SEC EDGAR",
+            "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+            "source_type": "filing",
+            "id": "amat_10_q_20260521",
+            "retrieved_at": "2026-07-19",
+            "title": "Applied Materials Q2 FY2026 Form 10-Q — net revenue by market (foundry-logic/DRAM/NAND), gross margin, China export controls",
+            "published_at": "2026-05-21",
+            "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026037227/amat-20260426.htm",
+            "evidence_tier": 1
+          }
+        },
+        "sources": [
+          {
+            "id": "amat_10_q_20260521_s6",
+            "locator": "MD&A: China, net revenue by market, chars 122900-129200",
+            "quote": "The United States government has implemented export regulations for U.S. semiconductor technology sold or provided to customers in China, which have limited our ability to provide certain products and services to customers in China, over the past several years.",
+            "source_doc_id": "amat_10_q_20260521",
+            "origin_entity": "Applied Materials",
+            "extraction_path": "extractions/amat_10_q_20260521.json",
+            "source_doc": {
+              "storage_permission": "repo_full",
+              "origin_entity": "Applied Materials",
+              "publisher": "SEC EDGAR",
+              "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+              "source_type": "filing",
+              "id": "amat_10_q_20260521",
+              "retrieved_at": "2026-07-19",
+              "title": "Applied Materials Q2 FY2026 Form 10-Q — net revenue by market (foundry-logic/DRAM/NAND), gross margin, China export controls",
+              "published_at": "2026-05-21",
+              "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026037227/amat-20260426.htm",
+              "evidence_tier": 1
+            }
+          },
+          {
+            "id": "amat_10_q_20260521_s11",
+            "locator": "MD&A: China, net revenue by market, chars 122900-129200",
+            "quote": "These actions have caused substantial uncertainty and have resulted in retaliatory measures, including new tariffs on U.S. goods imposed by China and other countries.",
+            "source_doc_id": "amat_10_q_20260521",
+            "origin_entity": "Applied Materials",
+            "extraction_path": "extractions/amat_10_q_20260521.json",
+            "source_doc": {
+              "storage_permission": "repo_full",
+              "origin_entity": "Applied Materials",
+              "publisher": "SEC EDGAR",
+              "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+              "source_type": "filing",
+              "id": "amat_10_q_20260521",
+              "retrieved_at": "2026-07-19",
+              "title": "Applied Materials Q2 FY2026 Form 10-Q — net revenue by market (foundry-logic/DRAM/NAND), gross margin, China export controls",
+              "published_at": "2026-05-21",
+              "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026037227/amat-20260426.htm",
+              "evidence_tier": 1
+            }
+          }
+        ]
+      },
+      {
+        "evidence_ref": "E7",
+        "item": {
+          "evidence_ref": "E7",
+          "type": "edge",
+          "claim_id": null,
+          "edge_key": "edge:df74dbde4d6c0cf9e817842bfe03c0ec0a145592031e397bec9caf005f60c24f",
+          "attributes": [
+            "substitutability"
+          ],
+          "assertion_ids": [
+            "amat_10_q_20260521_e7"
+          ],
+          "source_ids": [
+            "amat_10_q_20260521_s6",
+            "amat_10_q_20260521_s1"
+          ],
+          "purpose": "支援「出口管制對 AMAT 的依賴邊 substitutability=1，法規瓶頸不可迴避」的主瓶頸論點"
+        },
+        "edge": {
+          "edge_key": "edge:df74dbde4d6c0cf9e817842bfe03c0ec0a145592031e397bec9caf005f60c24f",
+          "src_id": "tech:export_controls_us_china",
+          "src_name": "US Export Controls on Semiconductor Technology to China",
+          "relation": "DEPENDS_ON",
+          "dst_id": "co:applied_materials",
+          "dst_name": "Applied Materials",
+          "attributes": {},
+          "open_conflict_attributes": [],
+          "attribute_resolution_meta": {},
+          "assertions": {
+            "amat_10_k_20251212_e11": {
+              "id": "amat_10_k_20251212_e11",
+              "attributes": {
+                "substitutability": null
+              },
+              "source_ids": [
+                "amat_10_k_20251212_s10",
+                "amat_10_k_20251212_s19"
+              ],
+              "source_doc_id": "amat_10_k_20251212",
+              "origin_entity": "Applied Materials",
+              "source_doc": {
+                "storage_permission": "repo_full",
+                "origin_entity": "Applied Materials",
+                "publisher": "SEC EDGAR",
+                "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+                "source_type": "filing",
+                "id": "amat_10_k_20251212",
+                "retrieved_at": "2026-07-19",
+                "title": "Applied Materials FY2025 Form 10-K — Semiconductor Systems segments: foundry/logic leading vs non-leading edge (ICAPS: IoT/comms/auto/power/sensors), DRAM, NAND; backlog; China export exposure",
+                "published_at": "2025-12-12",
+                "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828025056742/amat-20251026.htm",
+                "evidence_tier": 1
+              }
+            },
+            "amat_10_q_20260521_e7": {
+              "id": "amat_10_q_20260521_e7",
+              "attributes": {
+                "qualification_status": "none",
+                "substitutability": 1
+              },
+              "source_ids": [
+                "amat_10_q_20260521_s6",
+                "amat_10_q_20260521_s1"
+              ],
+              "source_doc_id": "amat_10_q_20260521",
+              "origin_entity": "Applied Materials",
+              "source_doc": {
+                "storage_permission": "repo_full",
+                "origin_entity": "Applied Materials",
+                "publisher": "SEC EDGAR",
+                "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+                "source_type": "filing",
+                "id": "amat_10_q_20260521",
+                "retrieved_at": "2026-07-19",
+                "title": "Applied Materials Q2 FY2026 Form 10-Q — net revenue by market (foundry-logic/DRAM/NAND), gross margin, China export controls",
+                "published_at": "2026-05-21",
+                "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026037227/amat-20260426.htm",
+                "evidence_tier": 1
+              }
+            }
+          }
+        },
+        "assertions": [
+          {
+            "id": "amat_10_q_20260521_e7",
+            "attributes": {
+              "qualification_status": "none",
+              "substitutability": 1
+            },
+            "source_ids": [
+              "amat_10_q_20260521_s6",
+              "amat_10_q_20260521_s1"
+            ],
+            "source_doc_id": "amat_10_q_20260521",
+            "origin_entity": "Applied Materials",
+            "source_doc": {
+              "storage_permission": "repo_full",
+              "origin_entity": "Applied Materials",
+              "publisher": "SEC EDGAR",
+              "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+              "source_type": "filing",
+              "id": "amat_10_q_20260521",
+              "retrieved_at": "2026-07-19",
+              "title": "Applied Materials Q2 FY2026 Form 10-Q — net revenue by market (foundry-logic/DRAM/NAND), gross margin, China export controls",
+              "published_at": "2026-05-21",
+              "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026037227/amat-20260426.htm",
+              "evidence_tier": 1
+            }
+          }
+        ],
+        "sources": [
+          {
+            "id": "amat_10_q_20260521_s6",
+            "locator": "MD&A: China, net revenue by market, chars 122900-129200",
+            "quote": "The United States government has implemented export regulations for U.S. semiconductor technology sold or provided to customers in China, which have limited our ability to provide certain products and services to customers in China, over the past several years.",
+            "source_doc_id": "amat_10_q_20260521",
+            "origin_entity": "Applied Materials",
+            "extraction_path": "extractions/amat_10_q_20260521.json",
+            "source_doc": {
+              "storage_permission": "repo_full",
+              "origin_entity": "Applied Materials",
+              "publisher": "SEC EDGAR",
+              "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+              "source_type": "filing",
+              "id": "amat_10_q_20260521",
+              "retrieved_at": "2026-07-19",
+              "title": "Applied Materials Q2 FY2026 Form 10-Q — net revenue by market (foundry-logic/DRAM/NAND), gross margin, China export controls",
+              "published_at": "2026-05-21",
+              "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026037227/amat-20260426.htm",
+              "evidence_tier": 1
+            }
+          },
+          {
+            "id": "amat_10_q_20260521_s1",
+            "locator": "MD&A: export controls, chars 102500-104200",
+            "quote": "on February 11, 2026, we entered into a settlement agreement with the U.S. Commerce Department Bureau of Industry and Security (BIS) to resolve its inquiry relating to certain China customer shipments and export controls compliance and agreed to pay BIS an amount of $253 million",
+            "source_doc_id": "amat_10_q_20260521",
+            "origin_entity": "Applied Materials",
+            "extraction_path": "extractions/amat_10_q_20260521.json",
+            "source_doc": {
+              "storage_permission": "repo_full",
+              "origin_entity": "Applied Materials",
+              "publisher": "SEC EDGAR",
+              "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+              "source_type": "filing",
+              "id": "amat_10_q_20260521",
+              "retrieved_at": "2026-07-19",
+              "title": "Applied Materials Q2 FY2026 Form 10-Q — net revenue by market (foundry-logic/DRAM/NAND), gross margin, China export controls",
+              "published_at": "2026-05-21",
+              "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026037227/amat-20260426.htm",
+              "evidence_tier": 1
+            }
+          }
+        ]
+      },
+      {
+        "evidence_ref": "E8",
+        "item": {
+          "evidence_ref": "E8",
+          "type": "claim",
+          "claim_id": "amat_10_q_20260521_cl1",
+          "edge_key": null,
+          "attributes": [],
+          "assertion_ids": [],
+          "source_ids": [
+            "amat_10_q_20260521_s1",
+            "amat_10_q_20260521_s2"
+          ],
+          "purpose": "支援「BIS $253M 和解與懸置否認令構成三年稽核窗口尾部風險」的主瓶頸論點及 disproof condition"
+        },
+        "claim": {
+          "id": "amat_10_q_20260521_cl1",
+          "statement": "Applied Materials paid $253 million to BIS to settle an export controls inquiry related to China customer shipments; a suspended denial order will be waived after three years if audit requirements are met.",
+          "demand_proof_level": "confirmed",
+          "disproof_condition": "If Applied Materials fails to complete required audits or BIS activates the denial order, this claim should be revised to reflect an active denial order.",
+          "confidence": 0.9,
+          "source_ids": [
+            "amat_10_q_20260521_s1",
+            "amat_10_q_20260521_s2"
+          ],
+          "source_doc_id": "amat_10_q_20260521",
+          "subject_kind": "node",
+          "subject_node_id": "co:applied_materials",
+          "subject_edge_key": null,
+          "origin_entity": "Applied Materials",
+          "source_doc": {
+            "storage_permission": "repo_full",
+            "origin_entity": "Applied Materials",
+            "publisher": "SEC EDGAR",
+            "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+            "source_type": "filing",
+            "id": "amat_10_q_20260521",
+            "retrieved_at": "2026-07-19",
+            "title": "Applied Materials Q2 FY2026 Form 10-Q — net revenue by market (foundry-logic/DRAM/NAND), gross margin, China export controls",
+            "published_at": "2026-05-21",
+            "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026037227/amat-20260426.htm",
+            "evidence_tier": 1
+          }
+        },
+        "sources": [
+          {
+            "id": "amat_10_q_20260521_s1",
+            "locator": "MD&A: export controls, chars 102500-104200",
+            "quote": "on February 11, 2026, we entered into a settlement agreement with the U.S. Commerce Department Bureau of Industry and Security (BIS) to resolve its inquiry relating to certain China customer shipments and export controls compliance and agreed to pay BIS an amount of $253 million",
+            "source_doc_id": "amat_10_q_20260521",
+            "origin_entity": "Applied Materials",
+            "extraction_path": "extractions/amat_10_q_20260521.json",
+            "source_doc": {
+              "storage_permission": "repo_full",
+              "origin_entity": "Applied Materials",
+              "publisher": "SEC EDGAR",
+              "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+              "source_type": "filing",
+              "id": "amat_10_q_20260521",
+              "retrieved_at": "2026-07-19",
+              "title": "Applied Materials Q2 FY2026 Form 10-Q — net revenue by market (foundry-logic/DRAM/NAND), gross margin, China export controls",
+              "published_at": "2026-05-21",
+              "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026037227/amat-20260426.htm",
+              "evidence_tier": 1
+            }
+          },
+          {
+            "id": "amat_10_q_20260521_s2",
+            "locator": "MD&A: export controls, chars 102500-104200",
+            "quote": "The settlement agreement also includes a denial order that is suspended and will be waived three years after the date of the order issued under the settlement agreement, provided that we have timely completed the audit requirements.",
+            "source_doc_id": "amat_10_q_20260521",
+            "origin_entity": "Applied Materials",
+            "extraction_path": "extractions/amat_10_q_20260521.json",
+            "source_doc": {
+              "storage_permission": "repo_full",
+              "origin_entity": "Applied Materials",
+              "publisher": "SEC EDGAR",
+              "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+              "source_type": "filing",
+              "id": "amat_10_q_20260521",
+              "retrieved_at": "2026-07-19",
+              "title": "Applied Materials Q2 FY2026 Form 10-Q — net revenue by market (foundry-logic/DRAM/NAND), gross margin, China export controls",
+              "published_at": "2026-05-21",
+              "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026037227/amat-20260426.htm",
+              "evidence_tier": 1
+            }
+          }
+        ]
+      },
+      {
+        "evidence_ref": "E9",
+        "item": {
+          "evidence_ref": "E9",
+          "type": "claim",
+          "claim_id": "amat_10_k_20251212_cl3",
+          "edge_key": null,
+          "attributes": [],
+          "assertion_ids": [],
+          "source_ids": [
+            "amat_10_k_20251212_s9"
+          ],
+          "purpose": "支援「關鍵零件依賴單一或少數合格供應商的供應集中風險」的主瓶頸資料缺口說明"
+        },
+        "claim": {
+          "id": "amat_10_k_20251212_cl3",
+          "statement": "Some key parts for Applied Materials systems are sourced from a single qualified supplier or limited group of qualified suppliers, representing a supply concentration risk.",
+          "demand_proof_level": "confirmed",
+          "disproof_condition": "If Applied Materials qualifies alternate suppliers for all key sole-sourced parts, this claim should be retired.",
+          "confidence": 0.9,
+          "source_ids": [
+            "amat_10_k_20251212_s9"
+          ],
+          "source_doc_id": "amat_10_k_20251212",
+          "subject_kind": "node",
+          "subject_node_id": "co:applied_materials",
+          "subject_edge_key": null,
+          "origin_entity": "Applied Materials",
+          "source_doc": {
+            "storage_permission": "repo_full",
+            "origin_entity": "Applied Materials",
+            "publisher": "SEC EDGAR",
+            "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+            "source_type": "filing",
+            "id": "amat_10_k_20251212",
+            "retrieved_at": "2026-07-19",
+            "title": "Applied Materials FY2025 Form 10-K — Semiconductor Systems segments: foundry/logic leading vs non-leading edge (ICAPS: IoT/comms/auto/power/sensors), DRAM, NAND; backlog; China export exposure",
+            "published_at": "2025-12-12",
+            "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828025056742/amat-20251026.htm",
+            "evidence_tier": 1
+          }
+        },
+        "sources": [
+          {
+            "id": "amat_10_k_20251212_s9",
+            "locator": "chars 50100-56800, Risk Factors: sole-source supply",
+            "quote": "some key parts may be obtained from only a qualified single supplier or a limited group of qualified suppliers.",
+            "source_doc_id": "amat_10_k_20251212",
+            "origin_entity": "Applied Materials",
+            "extraction_path": "extractions/amat_10_k_20251212.json",
+            "source_doc": {
+              "storage_permission": "repo_full",
+              "origin_entity": "Applied Materials",
+              "publisher": "SEC EDGAR",
+              "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+              "source_type": "filing",
+              "id": "amat_10_k_20251212",
+              "retrieved_at": "2026-07-19",
+              "title": "Applied Materials FY2025 Form 10-K — Semiconductor Systems segments: foundry/logic leading vs non-leading edge (ICAPS: IoT/comms/auto/power/sensors), DRAM, NAND; backlog; China export exposure",
+              "published_at": "2025-12-12",
+              "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828025056742/amat-20251026.htm",
+              "evidence_tier": 1
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "evidence_gate": {
+    "promotion_pass": true,
+    "promotion_blockers": [],
+    "annotations": {}
+  },
+  "engine_c_context": {
+    "financial_checklist_markdown": "## 5 項財務核驗清單：AMAT\n⚠ AMAT 無快照，請先執行 python engine_c/etl_yfinance.py AMAT\n✗ 毛利率趨勢\n✗ 客戶集中度\n✗ Backlog/訂單能見度\n✗ 稀釋分析\n✗ 估值壓力\n\n**✗ Gate 未通過 → [Research Note]**\n",
+    "market_snapshot_markdown": "## 市場定價數據：AMAT（Variant Perception 錨點）\n- 當前股價：$529.66\n- Trailing P/E：49.7x\n- Forward P/E：31.6x\n- EV/Revenue：14.46x\n- 分析師目標價均值：$623.06  (N=35)\n- 毛利率（最新）：49.0%\n\n**隱含假設提示：** EV/Rev=14.5x + 毛利率=49% → 市場可能定價的收入增長率約為 708%-852%/年（粗估）。\n[請在 Variant Perception 填寫：市場假設 X，本 thesis 認為 Y，催化劑 Z]\n"
+  },
+  "other_gates": {
+    "financial_checklist_pass": false,
+    "l9_pass": false,
+    "company_l8_context_pass": false,
+    "override": false,
+    "override_reason": null
+  }
+}
