@@ -1,0 +1,55 @@
+{
+  "backed_up_at": "2026-07-19T00:04:56.525181+00:00",
+  "reason": "Remove wrong-shaped direct Sivers->Marvell supplies_to edge (indirect via POET; see poet_celestial_* extractions).",
+  "objects": {
+    "edge_assertion": {
+      "source_ids": [
+        "aleabitoreddit_sivers_cpo_customer_map_s2"
+      ],
+      "updated_at": "2026-07-16T14:35:10.184412+00:00",
+      "local_id": "e2",
+      "src_id": "co:sivers_semiconductors",
+      "confidence": 0.6,
+      "edge_key": "edge:d17f0f63926396805b254115fe0b9eea4c699b6dbdd45c92eef56ec9587bab22",
+      "attributes": "{\"qualification_status\": \"none\", \"sole_source\": false, \"note\": \"Tier-3 article asserts a direct supplier relationship; it is not confirmed by Marvell.\"}",
+      "dst_id": "co:marvell_technology",
+      "id": "aleabitoreddit_sivers_cpo_customer_map_e2",
+      "relation": "supplies_to",
+      "source_doc_id": "aleabitoreddit_sivers_cpo_customer_map"
+    },
+    "canonical_relationship": {
+      "source_ids": [
+        "aleabitoreddit_sivers_cpo_customer_map_s2"
+      ],
+      "updated_at": "2026-07-16T14:35:10.184412+00:00",
+      "source_doc_ids": [
+        "aleabitoreddit_sivers_cpo_customer_map"
+      ],
+      "open_conflict_attributes": [],
+      "confidence": 0.6,
+      "projected_at": "2026-07-17T23:16:05.634371+00:00",
+      "edge_key": "edge:d17f0f63926396805b254115fe0b9eea4c699b6dbdd45c92eef56ec9587bab22",
+      "attribute_resolution_meta_json": "{\"note\": {\"status\": \"auto\", \"candidate_set_hash\": \"a9acea5b650ef7037e7412d5a6427f74cf758d0c050b57119f83f750f9875a50\", \"assertion_ids\": [\"aleabitoreddit_sivers_cpo_customer_map_e2\"], \"value_confidence\": 0.6, \"as_of\": null}, \"qualification_status\": {\"status\": \"auto\", \"candidate_set_hash\": \"fbe796f30ea3fb3a3aafe8092d68272fd1a94d9546cc5c744cb495dea56e6b8d\", \"assertion_ids\": [\"aleabitoreddit_sivers_cpo_customer_map_e2\"], \"value_confidence\": 0.6, \"as_of\": null}, \"sole_source\": {\"status\": \"auto\", \"candidate_set_hash\": \"670a694eb3999f06fba7f22f1f39561ed60679bd379cac04ad723f5850c7d0c1\", \"assertion_ids\": [\"aleabitoreddit_sivers_cpo_customer_map_e2\"], \"value_confidence\": 0.6, \"as_of\": null}}",
+      "attributes": "{\"note\": \"Tier-3 article asserts a direct supplier relationship; it is not confirmed by Marvell.\", \"qualification_status\": \"none\", \"sole_source\": false}",
+      "id": "edge:d17f0f63926396805b254115fe0b9eea4c699b6dbdd45c92eef56ec9587bab22",
+      "relation": "supplies_to"
+    },
+    "claim": {
+      "source_ids": [
+        "aleabitoreddit_sivers_cpo_customer_map_s2"
+      ],
+      "disproof_condition": "If Marvell or Celestial AI supplier materials name another laser supplier or exclude Sivers, retire this relationship.",
+      "subject_kind": "edge",
+      "updated_at": "2026-07-16T14:35:10.184412+00:00",
+      "demand_proof_level": "inferred",
+      "local_id": "cl3",
+      "confidence": 0.55,
+      "name": "aleabitoreddit asserts Marvell…",
+      "statement": "aleabitoreddit asserts Marvell Celestial is a direct Sivers customer; the relationship remains an unconfirmed tier-3 inference.",
+      "id": "aleabitoreddit_sivers_cpo_customer_map_cl3",
+      "source_doc_id": "aleabitoreddit_sivers_cpo_customer_map",
+      "subject_edge_key": "edge:d17f0f63926396805b254115fe0b9eea4c699b6dbdd45c92eef56ec9587bab22"
+    }
+  },
+  "supporting_assertions_on_edge": 1
+}

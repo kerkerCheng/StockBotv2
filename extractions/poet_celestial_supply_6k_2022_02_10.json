@@ -1,0 +1,74 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "poet_celestial_supply_6k_2022_02_10",
+    "title": "POET Technologies to Supply Celestial AI with its Optical Interposer-based Integrated Light Engine Modules (POET SEC Form 6-K Exhibit 99.1, Feb 10, 2022)",
+    "url": "https://www.sec.gov/Archives/edgar/data/1437424/000117184322000925/exh_991.htm",
+    "source_type": "filing",
+    "evidence_tier": 1,
+    "origin_entity": "POET Technologies",
+    "storage_permission": "repo_full",
+    "permission_basis": "Official SEC EDGAR primary filing (POET Technologies Form 6-K, Exhibit 99.1), public domain government-hosted disclosure. Repository retains attributed extraction and canonical SEC URL."
+  },
+  "sources": [
+    {
+      "id": "poet_celestial_supply_6k_2022_02_10_s1",
+      "locator": "exhibit 99.1, para 1",
+      "quote": "it has entered into an agreement with Celestial AI to provide multi-laser integrated external light source (ELS) modules using its advanced packaging platform based on the POET Optical Interposer"
+    },
+    {
+      "id": "poet_celestial_supply_6k_2022_02_10_s2",
+      "locator": "exhibit 99.1, para 1",
+      "quote": "The agreement includes a contract for continued platform development, along with a purchase order for initial quantities of the advanced modules"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:poet_technologies",
+      "type": "Company",
+      "name": "POET Technologies",
+      "abstraction_level": "module_subsystem",
+      "role": "bottleneck_supplier",
+      "aliases": ["POET", "PTK", "POETF"],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": ["poet_celestial_supply_6k_2022_02_10_s1"]
+    },
+    {
+      "id": "co:celestial_ai",
+      "type": "Company",
+      "name": "Celestial AI",
+      "abstraction_level": "module_subsystem",
+      "role": "leader",
+      "aliases": ["Celestial"],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": ["poet_celestial_supply_6k_2022_02_10_s1"]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:poet_technologies",
+      "dst_id": "co:celestial_ai",
+      "relation": "supplies_to",
+      "attributes": {
+        "qualification_status": "designed_in",
+        "note": "Feb 2022 agreement: POET to supply Celestial AI ELS/light-engine modules built on the POET Optical Interposer, with a development contract and a purchase order for initial quantities. See cancellation claim (April 2026) for termination."
+      },
+      "confidence": 0.9,
+      "source_ids": ["poet_celestial_supply_6k_2022_02_10_s1", "poet_celestial_supply_6k_2022_02_10_s2"]
+    }
+  ],
+  "claims": [
+    {
+      "id": "cl1",
+      "statement": "On 2022-02-10 POET Technologies entered an agreement to supply Celestial AI with Optical Interposer-based multi-laser integrated external light source (ELS) modules, including a platform-development contract and a purchase order for initial quantities — establishing the POET→Celestial optical-engine supply channel (the indirect route by which Sivers, a POET laser supplier, reaches Celestial/Marvell demand).",
+      "subject_id": "e1",
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Superseded if the POET→Celestial supply agreement is terminated or the parties disclose a replacement supplier (see the April 2026 Marvell cancellation).",
+      "confidence": 0.9,
+      "source_ids": ["poet_celestial_supply_6k_2022_02_10_s1", "poet_celestial_supply_6k_2022_02_10_s2"]
+    }
+  ]
+}

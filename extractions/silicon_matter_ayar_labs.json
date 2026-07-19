@@ -92,19 +92,6 @@
       "source_ids": ["aleabitoreddit_sivers_cpo_customer_map_s1"]
     },
     {
-      "id": "e2",
-      "src_id": "co:sivers_semiconductors",
-      "dst_id": "co:marvell_technology",
-      "relation": "supplies_to",
-      "attributes": {
-        "qualification_status": "none",
-        "sole_source": false,
-        "note": "Tier-3 article asserts a direct supplier relationship; it is not confirmed by Marvell."
-      },
-      "confidence": 0.6,
-      "source_ids": ["aleabitoreddit_sivers_cpo_customer_map_s2"]
-    },
-    {
       "id": "e3",
       "src_id": "co:win_semiconductor",
       "dst_id": "co:sivers_semiconductors",
@@ -129,11 +116,11 @@
     },
     {
       "id": "cl3",
-      "statement": "aleabitoreddit asserts Marvell Celestial is a direct Sivers customer; the relationship remains an unconfirmed tier-3 inference.",
-      "subject_id": "e2",
+      "statement": "aleabitoreddit's tier-3 customer map asserted 'Marvell Celestial - Direct supplier' for Sivers, but independent primary sources show the link is INDIRECT, not direct: Sivers supplies lasers to POET; POET supplied Celestial AI's optical-engine modules (POET SEC 6-K, Feb 2022); Marvell acquired Celestial AI. No primary document supports a direct Sivers->Marvell supply relationship, so the direct edge was removed. Furthermore Marvell cancelled POET's Celestial purchase orders in April 2026, cutting this indirect channel.",
+      "subject_id": "co:sivers_semiconductors",
       "demand_proof_level": "inferred",
-      "disproof_condition": "If Marvell or Celestial AI supplier materials name another laser supplier or exclude Sivers, retire this relationship.",
-      "confidence": 0.55,
+      "disproof_condition": "Reinstate a direct Sivers->Marvell edge only if a primary Marvell or Celestial AI document names Sivers as a direct laser supplier.",
+      "confidence": 0.4,
       "source_ids": ["aleabitoreddit_sivers_cpo_customer_map_s2"]
     }
   ]
