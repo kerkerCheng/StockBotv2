@@ -390,7 +390,7 @@ evidence_items；所有 ID 必須逐字取自 Evidence Inventory。"""
         client = Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
         response = client.messages.create(
             model=model,
-            max_tokens=4096,
+            max_tokens=16000,
             system=system_prompt,
             messages=[{"role": "user", "content": user_message}],
         )
