@@ -94,6 +94,10 @@ description: >
 ## 流程(端到端)
 
 ### Step 0 — 輸入分類與登記
+- **先查再 onboard(去重防呆):** 取好原文 URL 後,**先問圖「這份文件是不是已經在了」**——用該 URL 或
+  origin_event 查有無既有 `SourceDoc`(`MATCH (sd:SourceDoc) WHERE sd.url ...`),避免同一份文件被以不同
+  `doc_id` 重複 onboard。`doc_id` 是自取的名字、不是文件身分;换個名字系統不會自動擋。loader 已有 URL 去重
+  guard(同 URL 不同 doc_id 會 fail closed);`query/health_audit.py` 有「重複 SourceDoc」事後巡檢。
 - 判定原料的 `source_type`(social/news/transcript/filing/ir_deck/industry_report/paper)與初始 `evidence_tier`。
 - 原始文字存進 `library/raw/`,給一個全域 `doc_id`(例:`tweet_<handle>_20260629`)。
 - **輸出:** 一筆 intake 紀錄(doc_id / source_type / tier / origin_entity / origin_event / 原文連結)。

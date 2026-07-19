@@ -101,7 +101,7 @@
       "doc_id": "aleabitoreddit_sivers_cpo_customer_map",
       "path": "extractions/silicon_matter_ayar_labs.json",
       "before_sha256": "93b2a8e5e75e11c685a79eafd8ab37d2536ab79c8b78c54b9d93919ff40c29cd",
-      "after_sha256": "f025bf41cf4b44129e259ccd87c4a5983b9c8b90b4f24202e2fde4b29bc53d4c",
+      "after_sha256": "a9d250b863d5d6131d447f942f11aee2876a9814cdbfc09568220d3ac5673091",
       "storage_permission": "repo_excerpt",
       "git_eligible": true
     },

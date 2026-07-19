@@ -106,6 +106,12 @@ RETURN kind, element_id, summary
 ORDER BY kind, element_id
 """
 
+SOURCE_DOC_URLS_CYPHER = """
+MATCH (sd:SourceDoc) WHERE sd.url IS NOT NULL AND sd.url <> ''
+RETURN sd.id AS id, sd.url AS url
+ORDER BY sd.id
+"""
+
 SCHEMA_STATE_CYPHER = """
 OPTIONAL MATCH (state:GraphSchemaState {id: 'stockbotv2'})
 RETURN state.version AS version
@@ -274,6 +280,19 @@ def run_local_audit(*, today: date | None = None) -> str:  # pragma: no cover - 
                 f"- [{row['kind']}] `{row['element_id']}` {row['summary']}"
                 for row in missing_cites
             ]
+            # 重複 SourceDoc：同一份文件被以不同 doc_id 重複 onboard（URL 正規化後比對）
+            from loader.load_to_neo4j import normalize_url
+
+            by_norm_url: dict[str, list[str]] = {}
+            for row in session.run(SOURCE_DOC_URLS_CYPHER):
+                norm = normalize_url(row["url"])
+                if norm:
+                    by_norm_url.setdefault(norm, []).append(row["id"])
+            graph_lines["dup_url"] = [
+                f"- `{norm}` ← {sorted(ids)}"
+                for norm, ids in sorted(by_norm_url.items())
+                if len(ids) > 1
+            ]
             schema_version = session.run(SCHEMA_STATE_CYPHER).single()["version"]
             company_ids = [row["company_id"] for row in session.run(COMPANY_IDS_CYPHER)]
 
@@ -314,6 +333,13 @@ def run_local_audit(*, today: date | None = None) -> str:  # pragma: no cover - 
                 "Claim/EdgeAssertion 缺 CITES",
                 "red" if graph_lines["missing_cites"] else "green",
                 graph_lines["missing_cites"],
+            )
+        )
+        report.extend(
+            _section(
+                "重複 SourceDoc（同 URL 不同 doc_id）",
+                "red" if graph_lines.get("dup_url") else "green",
+                graph_lines.get("dup_url", []),
             )
         )
         from mcp_server.graph_mcp import GRAPH_SCHEMA_VERSION

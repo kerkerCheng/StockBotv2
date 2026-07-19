@@ -27,6 +27,7 @@ import re
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
+from urllib.parse import urlsplit, urlunsplit
 
 try:
     from dotenv import load_dotenv
@@ -262,6 +263,53 @@ RETURN cl.id
 """
 
 
+class DuplicateUrlError(RuntimeError):
+    """Raised when a different doc_id already owns the same canonical source URL."""
+
+
+def normalize_url(url) -> str | None:
+    """Canonicalize a source URL for cross-doc_id dedup (host-lower, no fragment/trailing slash)."""
+    if not isinstance(url, str) or not url.strip():
+        return None
+    parts = urlsplit(url.strip())
+    host = (parts.hostname or "").lower()
+    if parts.port:
+        host = f"{host}:{parts.port}"
+    path = parts.path.rstrip("/") or "/"
+    return urlunsplit((parts.scheme.lower(), host, path, parts.query, ""))
+
+
+def check_duplicate_url(source_doc: dict, session, allow_dup_url: bool = False) -> list[str]:
+    """Fail closed if another SourceDoc already owns this URL under a different doc_id.
+
+    Root-cause guard for silent duplicates: SourceDoc identity is the agent-assigned
+    doc_id, so the same document under a new doc_id would otherwise create a second
+    node with zero collision. Returns the clashing doc_ids (empty if none).
+    """
+    norm = normalize_url(source_doc.get("url"))
+    if norm is None:
+        return []
+    doc_id = source_doc["doc_id"]
+    rows = session.run(
+        "MATCH (sd:SourceDoc) WHERE sd.url IS NOT NULL AND sd.id <> $doc_id "
+        "RETURN sd.id AS id, sd.url AS url",
+        doc_id=doc_id,
+    )
+    clashes = sorted({r["id"] for r in rows if normalize_url(r["url"]) == norm})
+    if clashes and not allow_dup_url:
+        raise DuplicateUrlError(
+            f"SourceDoc URL 已存在於 doc_id {clashes}（正規化 URL: {norm}）。"
+            f"這很可能是同一份文件被以不同 doc_id 重複 onboard。"
+            f"若確為不同文件，重跑並加 --allow-dup-url。"
+        )
+    if clashes:
+        print(
+            f"[load] WARN: URL 與既有 {clashes} 相同，--allow-dup-url 已放行",
+            file=sys.stderr,
+        )
+    return clashes
+
+
 def load_source_doc(doc: dict, session) -> None:
     """Materialize one extraction's immutable document-level provenance."""
 
@@ -283,9 +331,12 @@ def load_source_doc(doc: dict, session) -> None:
     )
 
 
-def load(doc: dict, session, use_apoc: bool = False) -> None:
+def load(doc: dict, session, use_apoc: bool = False, allow_dup_url: bool = False) -> None:
     ts = _now()
     doc_id = doc["source_doc"]["doc_id"]
+
+    # Fail closed on the same source URL under a different doc_id (silent-duplicate guard).
+    check_duplicate_url(doc["source_doc"], session, allow_dup_url)
 
     # SourceDoc must exist before Claim/EdgeAssertion CITES edges are created.
     load_source_doc(doc, session)
@@ -404,6 +455,8 @@ def main() -> int:
     ap.add_argument("json_path")
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--apoc", action="store_true", help="用 APOC 做 label/source_ids 聯集")
+    ap.add_argument("--allow-dup-url", action="store_true",
+                    help="放行 URL 與既有 SourceDoc 相同的載入（預設 fail closed）")
     args = ap.parse_args()
 
     with open(args.json_path, encoding="utf-8") as f:
@@ -427,9 +480,14 @@ def main() -> int:
         return 1
 
     driver = GraphDatabase.driver(uri, auth=(user, pw))
-    with driver.session() as session:
-        load(doc, session, use_apoc=args.apoc)
-    driver.close()
+    try:
+        with driver.session() as session:
+            load(doc, session, use_apoc=args.apoc, allow_dup_url=args.allow_dup_url)
+    except DuplicateUrlError as exc:
+        print(f"FAIL CLOSED: {exc}", file=sys.stderr)
+        return 1
+    finally:
+        driver.close()
     print(f"loaded {args.json_path} into {uri}")
     return 0
 
