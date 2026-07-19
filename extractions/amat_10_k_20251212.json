@@ -1,0 +1,484 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "amat_10_k_20251212",
+    "title": "Applied Materials FY2025 Form 10-K — Semiconductor Systems segments: foundry/logic leading vs non-leading edge (ICAPS: IoT/comms/auto/power/sensors), DRAM, NAND; backlog; China export exposure",
+    "source_type": "filing",
+    "evidence_tier": 1,
+    "origin_entity": "Applied Materials",
+    "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828025056742/amat-20251026.htm",
+    "published_at": "2025-12-12",
+    "storage_permission": "repo_full",
+    "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+    "publisher": "SEC EDGAR",
+    "retrieved_at": "2026-07-19"
+  },
+  "sources": [
+    {
+      "id": "amat_10_k_20251212_s1",
+      "locator": "chars 46700-50100, Business: segments & markets",
+      "quote": "Our Semiconductor Systems sales are to customers that serve the following markets: foundry, logic and other; dynamic random access memory (DRAM); and flash memory (NAND)."
+    },
+    {
+      "id": "amat_10_k_20251212_s2",
+      "locator": "chars 46700-50100, Business: leading-edge definition",
+      "quote": "Leading-edge represents customers that are producing on the most advanced technology nodes, defined as 7 nanometers and smaller."
+    },
+    {
+      "id": "amat_10_k_20251212_s3",
+      "locator": "chars 46700-50100, Business: non-leading edge / ICAPS",
+      "quote": "Non-leading edge technology nodes serve markets such as internet of things, communications, automotive, power and sensors."
+    },
+    {
+      "id": "amat_10_k_20251212_s4",
+      "locator": "chars 46700-50100, Business: AGS segment",
+      "quote": "Our AGS segment provides services, spares and factory automation software to customer fabrication plants globally. Through October 26, 2025, our AGS segment also manufactured and sold 200 millimeter (200mm) and other equipment to customers globally that serve non-leading-edge markets."
+    },
+    {
+      "id": "amat_10_k_20251212_s5",
+      "locator": "chars 46700-50100, Business: advanced packaging",
+      "quote": "Our advanced packaging systems use our materials engineering expertise to allow customers to connect multiple chips together through heterogeneous integration, enabling them to advance the technology roadmap beyond a single chip."
+    },
+    {
+      "id": "amat_10_k_20251212_s6",
+      "locator": "chars 46700-50100, Business: backlog",
+      "quote": "Backlog by reportable segment as of October 26, 2025 was as follows: Semiconductor Systems $7,105 47%; Applied Global Services $7,141 48%; Corporate and Other $756 5%; Total $15,002 100%."
+    },
+    {
+      "id": "amat_10_k_20251212_s7",
+      "locator": "chars 46700-50100, Business: backlog fill horizon",
+      "quote": "Of the total backlog as of October 26, 2025, approximately 31% is not reasonably expected to be filled within the next 12 months."
+    },
+    {
+      "id": "amat_10_k_20251212_s8",
+      "locator": "chars 50100-56800, Risk Factors: manufacturing model",
+      "quote": "We utilize a distributed manufacturing model under which manufacturing and supply chain activities are conducted in various countries, including United States, Singapore, Japan, China, Korea, Taiwan, Israel and other countries in Asia and Europe."
+    },
+    {
+      "id": "amat_10_k_20251212_s9",
+      "locator": "chars 50100-56800, Risk Factors: sole-source supply",
+      "quote": "some key parts may be obtained from only a qualified single supplier or a limited group of qualified suppliers."
+    },
+    {
+      "id": "amat_10_k_20251212_s10",
+      "locator": "chars 50100-56800, Risk Factors: China competition",
+      "quote": "We could see increased competition from domestic equipment manufacturers in China resulting from local government incentives and funding as well as export controls established by the United States government to restrict the sale of certain technologies to customers in China."
+    },
+    {
+      "id": "amat_10_k_20251212_s11",
+      "locator": "chars 50100-56800, Risk Factors: AI/IoT demand drivers",
+      "quote": "The growth of data and emerging end-market drivers such as artificial intelligence, the internet of things, robotics and smart vehicles are also creating the next wave of growth for the industry."
+    },
+    {
+      "id": "amat_10_k_20251212_s12",
+      "locator": "chars 163600-166600, MD&A: Semiconductor Systems revenue by market",
+      "quote": "Net revenue for Semiconductor Systems by market for the periods presented were as follows: Foundry, logic and other 67%; Dynamic random-access memory (DRAM) 26%; Flash memory (NAND) 7%."
+    },
+    {
+      "id": "amat_10_k_20251212_s13",
+      "locator": "chars 163600-166600, MD&A: foundry/logic leading-edge driver",
+      "quote": "Foundry and logic customers' spending in fiscal 2025 increased driven primarily by higher customer investments in leading-edge manufacturing technologies."
+    },
+    {
+      "id": "amat_10_k_20251212_s14",
+      "locator": "chars 163600-166600, MD&A: NAND spend driver",
+      "quote": "Memory customers' spending in fiscal 2025 was higher due to increased customer investments in NAND fabrication equipment upgrades."
+    },
+    {
+      "id": "amat_10_k_20251212_s15",
+      "locator": "chars 163600-166600, MD&A: HBM/advanced packaging demand",
+      "quote": "Investments by semiconductor equipment customers are expected to remain strong with growth in the adoption of high-bandwidth memory and other forms of advanced packaging, continued demand for AI and data center computing, and for non-leading edge nodes."
+    },
+    {
+      "id": "amat_10_k_20251212_s16",
+      "locator": "chars 163600-166600, MD&A: geographic revenue China",
+      "quote": "China $8,529 30% [of net revenue in fiscal 2025]; [prior year] $10,117 37% … (16)% [change]"
+    },
+    {
+      "id": "amat_10_k_20251212_s17",
+      "locator": "chars 163600-166600, MD&A: geographic revenue Taiwan",
+      "quote": "Taiwan $6,857 24% [of net revenue in fiscal 2025]; [prior year] $4,010 15% … 71% [change]"
+    },
+    {
+      "id": "amat_10_k_20251212_s18",
+      "locator": "chars 163600-166600, MD&A: secular growth drivers",
+      "quote": "Over the longer term, we believe secular drivers such as data center AI, edge AI and the internet of things, robotics and electric and autonomous vehicles will continue to create the next wave of growth for semiconductors."
+    },
+    {
+      "id": "amat_10_k_20251212_s19",
+      "locator": "chars 50100-56800, Risk Factors: export controls international competitors",
+      "quote": "Export controls enacted by the United States government that restrict the sale of certain technologies to customers in China may also provide an advantage to our international competitors."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:applied_materials",
+      "type": "Company",
+      "name": "Applied Materials",
+      "abstraction_level": "equipment_epitaxy",
+      "role": "leader",
+      "aliases": [
+        "AMAT"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": null,
+        "concentration_score": null,
+        "intrinsic_cycle_time_weeks": null
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "amat_10_k_20251212_s1"
+      ]
+    },
+    {
+      "id": "tech:ai_compute_buildout",
+      "type": "TechNode",
+      "name": "AI training/inference cluster buildout",
+      "abstraction_level": "end_demand",
+      "role": null,
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "amat_10_k_20251212_s11"
+      ]
+    },
+    {
+      "id": "tech:icaps",
+      "type": "TechNode",
+      "name": "ICAPS non-leading-edge markets (IoT, Communications, Automotive, Power, Sensors)",
+      "abstraction_level": "end_demand",
+      "role": null,
+      "aliases": [
+        "ICAPS",
+        "non-leading edge"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "amat_10_k_20251212_s3"
+      ]
+    },
+    {
+      "id": "tech:leading_edge_logic_foundry",
+      "type": "TechNode",
+      "name": "Leading-edge foundry/logic nodes (7nm and below)",
+      "abstraction_level": "foundry_packaging",
+      "role": null,
+      "aliases": [
+        "leading-edge",
+        "7nm and smaller"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 5
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "amat_10_k_20251212_s2"
+      ]
+    },
+    {
+      "id": "tech:dram",
+      "type": "TechNode",
+      "name": "DRAM (Dynamic Random-Access Memory) fabrication",
+      "abstraction_level": "foundry_packaging",
+      "role": null,
+      "aliases": [
+        "DRAM"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 4
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "amat_10_k_20251212_s1"
+      ]
+    },
+    {
+      "id": "tech:nand",
+      "type": "TechNode",
+      "name": "NAND Flash Memory fabrication",
+      "abstraction_level": "foundry_packaging",
+      "role": null,
+      "aliases": [
+        "NAND",
+        "flash memory"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 4
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "amat_10_k_20251212_s1"
+      ]
+    },
+    {
+      "id": "tech:hbm",
+      "type": "TechNode",
+      "name": "High-Bandwidth Memory (HBM)",
+      "abstraction_level": "module_subsystem",
+      "role": null,
+      "aliases": [
+        "high-bandwidth memory",
+        "HBM"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "amat_10_k_20251212_s15"
+      ]
+    },
+    {
+      "id": "tech:advanced_packaging",
+      "type": "TechNode",
+      "name": "Advanced Packaging / Heterogeneous Integration",
+      "abstraction_level": "foundry_packaging",
+      "role": null,
+      "aliases": [
+        "advanced packaging",
+        "heterogeneous integration"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 4
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "amat_10_k_20251212_s5"
+      ]
+    },
+    {
+      "id": "tech:semiconductor_manufacturing_equipment",
+      "type": "TechNode",
+      "name": "Semiconductor Manufacturing Equipment",
+      "abstraction_level": "equipment_epitaxy",
+      "role": null,
+      "aliases": [
+        "wafer fab equipment",
+        "WFE"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "amat_10_k_20251212_s1"
+      ]
+    },
+    {
+      "id": "tech:200mm_equipment",
+      "type": "TechNode",
+      "name": "200mm semiconductor equipment",
+      "abstraction_level": "equipment_epitaxy",
+      "role": null,
+      "aliases": [
+        "200mm equipment"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "amat_10_k_20251212_s4"
+      ]
+    },
+    {
+      "id": "tech:export_controls_us_china",
+      "type": "TechNode",
+      "name": "US export controls on semiconductor technology to China",
+      "abstraction_level": "end_demand",
+      "role": null,
+      "aliases": [
+        "export controls",
+        "US-China export restrictions"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "amat_10_k_20251212_s10"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "amat_10_k_20251212_e1",
+      "src_id": "co:applied_materials",
+      "dst_id": "tech:leading_edge_logic_foundry",
+      "relation": "supplies_to",
+      "attributes": {
+        "qualification_status": "qualified",
+        "substitutability": null
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "amat_10_k_20251212_s1",
+        "amat_10_k_20251212_s13"
+      ]
+    },
+    {
+      "id": "amat_10_k_20251212_e2",
+      "src_id": "co:applied_materials",
+      "dst_id": "tech:dram",
+      "relation": "supplies_to",
+      "attributes": {
+        "qualification_status": "qualified",
+        "substitutability": null
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "amat_10_k_20251212_s1",
+        "amat_10_k_20251212_s12"
+      ]
+    },
+    {
+      "id": "amat_10_k_20251212_e3",
+      "src_id": "co:applied_materials",
+      "dst_id": "tech:nand",
+      "relation": "supplies_to",
+      "attributes": {
+        "qualification_status": "qualified",
+        "substitutability": null
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "amat_10_k_20251212_s1",
+        "amat_10_k_20251212_s14"
+      ]
+    },
+    {
+      "id": "amat_10_k_20251212_e4",
+      "src_id": "co:applied_materials",
+      "dst_id": "tech:icaps",
+      "relation": "supplies_to",
+      "attributes": {
+        "qualification_status": "qualified",
+        "substitutability": null
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "amat_10_k_20251212_s3",
+        "amat_10_k_20251212_s4"
+      ]
+    },
+    {
+      "id": "amat_10_k_20251212_e5",
+      "src_id": "co:applied_materials",
+      "dst_id": "tech:advanced_packaging",
+      "relation": "supplies_to",
+      "attributes": {
+        "qualification_status": "qualified",
+        "substitutability": null
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "amat_10_k_20251212_s5"
+      ]
+    },
+    {
+      "id": "amat_10_k_20251212_e6",
+      "src_id": "co:applied_materials",
+      "dst_id": "tech:200mm_equipment",
+      "relation": "supplies_to",
+      "attributes": {
+        "qualification_status": "qualified",
+        "substitutability": null
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "amat_10_k_20251212_s4"
+      ]
+    },
+    {
+      "id": "amat_10_k_20251212_e7",
+      "src_id": "tech:ai_compute_buildout",
+      "dst_id": "tech:leading_edge_logic_foundry",
+      "relation": "enables",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "amat_10_k_20251212_s11",
+        "amat_10_k_20251212_s13"
+      ]
+    },
+    {
+      "id": "amat_10_k_20251212_e8",
+      "src_id": "tech:ai_compute_buildout",
+      "dst_id": "tech:hbm",
+      "relation": "enables",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "amat_10_k_20251212_s15"
+      ]
+    },
+    {
+      "id": "amat_10_k_20251212_e9",
+      "src_id": "tech:ai_compute_buildout",
+      "dst_id": "tech:advanced_packaging",
+      "relation": "enables",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "amat_10_k_20251212_s15"
+      ]
+    },
+    {
+      "id": "amat_10_k_20251212_e10",
+      "src_id": "tech:hbm",
+      "dst_id": "tech:dram",
+      "relation": "is_component_of",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "amat_10_k_20251212_s15"
+      ]
+    },
+    {
+      "id": "amat_10_k_20251212_e11",
+      "src_id": "tech:export_controls_us_china",
+      "dst_id": "co:applied_materials",
+      "relation": "depends_on",
+      "attributes": {
+        "substitutability": null
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "amat_10_k_20251212_s10",
+        "amat_10_k_20251212_s19"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "amat_10_k_20251212_cl1",
+      "statement": "Applied Materials faces a structural risk that US export controls on semiconductor equipment to China will reduce its addressable market in China and advantage international competitors, as China revenue declined from 37% to 30% of net revenue year-over-year.",
+      "subject_id": "amat_10_k_20251212_e11",
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "If US export controls on semiconductor equipment to China are relaxed, or if Applied Materials grows China revenue materially, this claim should be downgraded.",
+      "confidence": 0.9,
+      "source_ids": [
+        "amat_10_k_20251212_s10",
+        "amat_10_k_20251212_s16",
+        "amat_10_k_20251212_s19"
+      ]
+    },
+    {
+      "id": "amat_10_k_20251212_cl2",
+      "statement": "AI compute buildout and advanced packaging (including HBM) are expected to sustain strong semiconductor equipment investment beyond fiscal 2025, per Applied Materials management guidance.",
+      "subject_id": "tech:ai_compute_buildout",
+      "demand_proof_level": "guided",
+      "disproof_condition": "If hyperscaler AI capex decelerates sharply or HBM adoption stalls, this forward guidance would be invalidated.",
+      "confidence": 0.9,
+      "source_ids": [
+        "amat_10_k_20251212_s15",
+        "amat_10_k_20251212_s18"
+      ]
+    },
+    {
+      "id": "amat_10_k_20251212_cl3",
+      "statement": "Some key parts for Applied Materials systems are sourced from a single qualified supplier or limited group of qualified suppliers, representing a supply concentration risk.",
+      "subject_id": "co:applied_materials",
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "If Applied Materials qualifies alternate suppliers for all key sole-sourced parts, this claim should be retired.",
+      "confidence": 0.9,
+      "source_ids": [
+        "amat_10_k_20251212_s9"
+      ]
+    }
+  ]
+}
