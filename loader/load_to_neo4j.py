@@ -78,6 +78,12 @@ TICKER_MAP: dict[str, str | None] = {
     "co:vpec": "2455.TW",                       # 全新光電（上市）
     "co:win_semiconductor": "3105.TWO",         # 穩懋（上櫃）
     "co:landmark_optoelectronics": "3081.TWO",  # 聯亞光電（上櫃）
+    # ── 2026-07-19 補登：第二垂直切片（成熟製程設備 AMAT/LRCX + 客戶端 GF 對照公司）──
+    "co:applied_materials": "AMAT",             # 半導體設備龍頭（本切片主標的）
+    "co:lam_research": "LRCX",                  # 沉積/蝕刻/清洗設備（本切片主標的）
+    "co:texas_instruments": "TXN",             # 成熟製程 IDM（GF 對照競爭者）
+    "co:umc": "UMC",                            # 聯電（成熟製程晶圓代工競爭者）
+    "co:soitec": "SOI.PA",                     # Euronext Paris；GF 的 SOI 晶圓供應商
     # ── 私人公司 / 機構 / 已下市 — 明確 None ──
     "co:ayar_labs": None,
     "co:celestial_ai": None,
@@ -88,6 +94,7 @@ TICKER_MAP: dict[str, str | None] = {
     "co:ime_cas": None,   # 中科院微電子所（研究機構）
     "co:ansys": None,     # 2025 年併入 Synopsys 下市；不對映 SNPS 以免 join 錯財務
     "co:o_net_technologies": None,  # 原港股 0877.HK，2021 私有化下市，yfinance 無資料
+    "co:mips_holding": None,        # MIPS Holding（GF 少數股權投資標的），私人公司
 }
 
 
