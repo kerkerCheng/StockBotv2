@@ -1,0 +1,401 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "lrcx_10_q_20260423",
+    "title": "Lam Research Q3 FY2026 Form 10-Q — results by segment, non-leading edge, DRAM, China export controls, capex",
+    "source_type": "filing",
+    "evidence_tier": 1,
+    "origin_entity": "Lam Research Corporation",
+    "url": "https://www.sec.gov/Archives/edgar/data/707549/000070754926000022/lrcx-20260329.htm",
+    "published_at": "2026-04-23",
+    "storage_permission": "repo_full",
+    "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+    "publisher": "SEC EDGAR",
+    "retrieved_at": "2026-07-19"
+  },
+  "sources": [
+    {
+      "id": "lrcx_10_q_20260423_s1",
+      "locator": "MD&A intro, chars 31900-34300",
+      "quote": "Systems revenue includes sales of new leading-edge equipment in deposition, etch, clean and other wafer fabrication markets. Customer support-related revenue includes sales of customer service, spares, upgrades, and non-leading-edge equipment from the Company's Reliant® product line."
+    },
+    {
+      "id": "lrcx_10_q_20260423_s2",
+      "locator": "MD&A intro, chars 31900-34300",
+      "quote": "China $ 1,996,926   $ 1,467,299   $ 6,138,046   $ 4,368,501"
+    },
+    {
+      "id": "lrcx_10_q_20260423_s3",
+      "locator": "MD&A intro, chars 31900-34300",
+      "quote": "Foundry 54   % 48   % 58   % 42   % Memory 39   % 43   % 36   % 43   % Logic/integrated device manufacturing 7   % 9   % 6   % 15   %"
+    },
+    {
+      "id": "lrcx_10_q_20260423_s4",
+      "locator": "MD&A executive summary, chars 63900-72400",
+      "quote": "Lam Research Corporation is a global supplier of innovative wafer fabrication equipment and services to the semiconductor industry."
+    },
+    {
+      "id": "lrcx_10_q_20260423_s5",
+      "locator": "MD&A executive summary, chars 63900-72400",
+      "quote": "Demand from cloud computing, artificial intelligence (\"AI\"), 5G, the Internet of Things, and other markets is driving the need for increasingly powerful and cost-efficient semiconductors."
+    },
+    {
+      "id": "lrcx_10_q_20260423_s6",
+      "locator": "MD&A executive summary, chars 63900-72400",
+      "quote": "we believe there will be continued growth in 2026 with the AI market driving higher semiconductor industry spending across both the memory and non-memory market segments."
+    },
+    {
+      "id": "lrcx_10_q_20260423_s7",
+      "locator": "MD&A executive summary, chars 63900-72400",
+      "quote": "revenue increased 9% compared to the three months ended December 28, 2025, driven by an increase in systems revenue primarily resulting from increased customer investments in the DRAM market segment as well as an increase in customer support-related revenue mainly tied to our expanding installed base and higher spares, upgrades and services revenue, partially offset by decreased customer spend on non-leading-edge equipment."
+    },
+    {
+      "id": "lrcx_10_q_20260423_s8",
+      "locator": "MD&A executive summary, chars 63900-72400",
+      "quote": "volatility in the semiconductor industry environment from trade restrictions, tariffs, as well as other direct and indirect risks and uncertainties discussed in Part II, Item 1A, \"Risk Factors,\" have had, and in the future may have, a negative impact on our revenue and operating margin."
+    },
+    {
+      "id": "lrcx_10_q_20260423_s9",
+      "locator": "MD&A executive summary, chars 63900-72400",
+      "quote": "technology inflections in our industry, including 3D device scaling, multiple patterning, process flow, and advanced packaging chip integration, will drive sustainable growth and lead to an increase in the served available market for our products and services in the deposition, etch, and clean businesses."
+    },
+    {
+      "id": "lrcx_10_q_20260423_s10",
+      "locator": "MD&A executive summary, chars 63900-72400",
+      "quote": "$331.6 million of capital expenditures"
+    },
+    {
+      "id": "lrcx_10_q_20260423_s11",
+      "locator": "Risk Factors, chars 112300-113200",
+      "quote": "changes in import/export regulations and tariffs, such as regulations imposed by the U.S. government restricting exports to China or regulations imposed by other countries restricting the export of certain materials or the re-export of products containing such materials"
+    },
+    {
+      "id": "lrcx_10_q_20260423_s12",
+      "locator": "MD&A executive summary, chars 63900-72400",
+      "quote": "Our Customer Support Business Group provides products and services to maximize installed equipment performance, predictability, and operational efficiency."
+    },
+    {
+      "id": "lrcx_10_q_20260423_s13",
+      "locator": "MD&A executive summary, chars 63900-72400",
+      "quote": "Our core technical competency is integrating hardware, process, materials, software, and process control, enabling results on the wafer."
+    },
+    {
+      "id": "lrcx_10_q_20260423_s14",
+      "locator": "MD&A executive summary, chars 63900-72400",
+      "quote": "Wafer fabrication equipment investments were strong in the 2025 calendar year, and we believe there will be continued growth in 2026 with the AI market driving higher semiconductor industry spending across both the memory and non-memory market segments."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:lam_research",
+      "type": "Company",
+      "name": "Lam Research Corporation",
+      "abstraction_level": "equipment_epitaxy",
+      "role": "leader",
+      "aliases": [
+        "LRCX"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": null,
+        "concentration_score": null,
+        "intrinsic_cycle_time_weeks": null
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "lrcx_10_q_20260423_s4"
+      ]
+    },
+    {
+      "id": "tech:ai_compute_buildout",
+      "type": "TechNode",
+      "name": "AI training/inference cluster buildout",
+      "abstraction_level": "end_demand",
+      "role": null,
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "lrcx_10_q_20260423_s5",
+        "lrcx_10_q_20260423_s6"
+      ]
+    },
+    {
+      "id": "tech:dram_manufacturing",
+      "type": "TechNode",
+      "name": "DRAM wafer fabrication",
+      "abstraction_level": "foundry_packaging",
+      "role": null,
+      "aliases": [],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 4,
+        "concentration_score": null,
+        "intrinsic_cycle_time_weeks": null
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "lrcx_10_q_20260423_s7"
+      ]
+    },
+    {
+      "id": "tech:3d_nand_manufacturing",
+      "type": "TechNode",
+      "name": "Non-volatile memory (3D NAND) wafer fabrication",
+      "abstraction_level": "foundry_packaging",
+      "role": null,
+      "aliases": [
+        "NVM",
+        "non-volatile memory"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 4,
+        "concentration_score": null,
+        "intrinsic_cycle_time_weeks": null
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "lrcx_10_q_20260423_s4"
+      ]
+    },
+    {
+      "id": "tech:deposition_etch_clean",
+      "type": "TechNode",
+      "name": "Deposition, etch, and clean wafer fabrication equipment",
+      "abstraction_level": "equipment_epitaxy",
+      "role": null,
+      "aliases": [
+        "dep/etch/clean"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 3,
+        "concentration_score": null,
+        "intrinsic_cycle_time_weeks": null
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "lrcx_10_q_20260423_s1",
+        "lrcx_10_q_20260423_s9"
+      ]
+    },
+    {
+      "id": "prod:reliant",
+      "type": "Product",
+      "name": "Reliant non-leading-edge equipment product line",
+      "abstraction_level": "equipment_epitaxy",
+      "role": null,
+      "aliases": [
+        "Reliant"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "lrcx_10_q_20260423_s1"
+      ]
+    },
+    {
+      "id": "tech:advanced_packaging",
+      "type": "TechNode",
+      "name": "Advanced packaging chip integration",
+      "abstraction_level": "foundry_packaging",
+      "role": null,
+      "aliases": [],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 4,
+        "concentration_score": null,
+        "intrinsic_cycle_time_weeks": null
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "lrcx_10_q_20260423_s9"
+      ]
+    },
+    {
+      "id": "tech:3d_scaling",
+      "type": "TechNode",
+      "name": "3D device scaling / vertical scaling",
+      "abstraction_level": "foundry_packaging",
+      "role": null,
+      "aliases": [
+        "three-dimensional architecture",
+        "3D device scaling",
+        "multiple patterning"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "lrcx_10_q_20260423_s9"
+      ]
+    },
+    {
+      "id": "tech:export_controls_china",
+      "type": "TechNode",
+      "name": "US export controls restricting semiconductor equipment exports to China",
+      "abstraction_level": "end_demand",
+      "role": null,
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "lrcx_10_q_20260423_s11"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "lrcx_10_q_20260423_e1",
+      "src_id": "tech:ai_compute_buildout",
+      "dst_id": "tech:dram_manufacturing",
+      "relation": "enables",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "lrcx_10_q_20260423_s6",
+        "lrcx_10_q_20260423_s7"
+      ]
+    },
+    {
+      "id": "lrcx_10_q_20260423_e2",
+      "src_id": "tech:ai_compute_buildout",
+      "dst_id": "tech:3d_nand_manufacturing",
+      "relation": "enables",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "lrcx_10_q_20260423_s6"
+      ]
+    },
+    {
+      "id": "lrcx_10_q_20260423_e3",
+      "src_id": "co:lam_research",
+      "dst_id": "tech:deposition_etch_clean",
+      "relation": "supplies_to",
+      "attributes": {
+        "qualification_status": "qualified",
+        "substitutability": null,
+        "sole_source": false,
+        "ramp_execution": null
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "lrcx_10_q_20260423_s1",
+        "lrcx_10_q_20260423_s4"
+      ]
+    },
+    {
+      "id": "lrcx_10_q_20260423_e4",
+      "src_id": "co:lam_research",
+      "dst_id": "tech:dram_manufacturing",
+      "relation": "supplies_to",
+      "attributes": {
+        "qualification_status": "qualified",
+        "substitutability": null,
+        "sole_source": false,
+        "ramp_execution": null
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "lrcx_10_q_20260423_s7"
+      ]
+    },
+    {
+      "id": "lrcx_10_q_20260423_e5",
+      "src_id": "co:lam_research",
+      "dst_id": "tech:3d_nand_manufacturing",
+      "relation": "supplies_to",
+      "attributes": {
+        "qualification_status": "qualified",
+        "substitutability": null,
+        "sole_source": false,
+        "ramp_execution": null
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "lrcx_10_q_20260423_s4"
+      ]
+    },
+    {
+      "id": "lrcx_10_q_20260423_e6",
+      "src_id": "prod:reliant",
+      "dst_id": "co:lam_research",
+      "relation": "is_component_of",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "lrcx_10_q_20260423_s1"
+      ]
+    },
+    {
+      "id": "lrcx_10_q_20260423_e7",
+      "src_id": "tech:export_controls_china",
+      "dst_id": "co:lam_research",
+      "relation": "depends_on",
+      "attributes": {
+        "qualification_status": "none",
+        "substitutability": null,
+        "sole_source": false
+      },
+      "confidence": 0.75,
+      "source_ids": [
+        "lrcx_10_q_20260423_s8",
+        "lrcx_10_q_20260423_s11"
+      ]
+    },
+    {
+      "id": "lrcx_10_q_20260423_e8",
+      "src_id": "tech:3d_scaling",
+      "dst_id": "tech:deposition_etch_clean",
+      "relation": "enables",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "lrcx_10_q_20260423_s9"
+      ]
+    },
+    {
+      "id": "lrcx_10_q_20260423_e9",
+      "src_id": "tech:advanced_packaging",
+      "dst_id": "tech:deposition_etch_clean",
+      "relation": "enables",
+      "attributes": {},
+      "confidence": 0.75,
+      "source_ids": [
+        "lrcx_10_q_20260423_s9"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "lrcx_10_q_20260423_cl1",
+      "statement": "AI market demand is driving higher semiconductor industry spending across both memory and non-memory market segments, with continued growth expected in calendar year 2026.",
+      "subject_id": "tech:ai_compute_buildout",
+      "demand_proof_level": "guided",
+      "disproof_condition": "If hyperscaler AI capex guidance is cut materially or semiconductor WFE spending declines year-over-year in 2026, this claim should be downgraded.",
+      "confidence": 0.85,
+      "source_ids": [
+        "lrcx_10_q_20260423_s14"
+      ]
+    },
+    {
+      "id": "lrcx_10_q_20260423_cl2",
+      "statement": "US government export controls restricting semiconductor equipment exports to China represent a material revenue and operating margin risk for Lam Research.",
+      "subject_id": "tech:export_controls_china",
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "If US export restrictions on China are lifted or materially relaxed, or if Lam's China revenue share declines to a negligible portion, this claim should be downgraded.",
+      "confidence": 0.9,
+      "source_ids": [
+        "lrcx_10_q_20260423_s8",
+        "lrcx_10_q_20260423_s11"
+      ]
+    },
+    {
+      "id": "lrcx_10_q_20260423_cl3",
+      "statement": "DRAM market investment growth was the primary driver of Lam Research's sequential revenue increase in Q3 FY2026, while non-leading-edge equipment spend declined.",
+      "subject_id": "tech:dram_manufacturing",
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "If Lam discloses that another segment (NAND, foundry, logic) was actually the primary driver, or if DRAM customer spending reverses, this claim should be downgraded.",
+      "confidence": 0.9,
+      "source_ids": [
+        "lrcx_10_q_20260423_s7"
+      ]
+    }
+  ]
+}
