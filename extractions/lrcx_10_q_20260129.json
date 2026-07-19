@@ -1,0 +1,361 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "lrcx_10_q_20260129",
+    "title": "Lam Research Q2 FY2026 Form 10-Q — gross margin, DRAM/NAND, China export controls",
+    "source_type": "filing",
+    "evidence_tier": 1,
+    "origin_entity": "Lam Research Corporation",
+    "url": "https://www.sec.gov/Archives/edgar/data/707549/000070754926000009/lrcx-20251228.htm",
+    "published_at": "2026-01-29",
+    "storage_permission": "repo_full",
+    "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+    "publisher": "SEC EDGAR",
+    "retrieved_at": "2026-07-19"
+  },
+  "sources": [
+    {
+      "id": "lrcx_10_q_20260129_s1",
+      "locator": "MD&A: China exposure, chars 31000-33000",
+      "quote": "The Company operates in seven geographic regions: United States, China, Europe, Japan, Korea, Southeast Asia, and Taiwan. The Company serves three primary markets: memory, foundry, and logic/integrated device manufacturing."
+    },
+    {
+      "id": "lrcx_10_q_20260129_s2",
+      "locator": "MD&A: China exposure, chars 31000-33000",
+      "quote": "China $ 1,858,547   $ 1,342,798   $ 4,141,120   $ 2,901,202"
+    },
+    {
+      "id": "lrcx_10_q_20260129_s3",
+      "locator": "MD&A: results, DRAM/NAND, China, chars 66200-71200",
+      "quote": "China 35  % 43  % 39  % 34  %"
+    },
+    {
+      "id": "lrcx_10_q_20260129_s4",
+      "locator": "MD&A: results, DRAM/NAND, China, chars 66200-71200",
+      "quote": "The increase in revenue in the six months ended December 28, 2025 compared to the same period in the prior year was predominantly driven by increases in Foundry equipment spending by our customers, as well as higher customer support-related revenue."
+    },
+    {
+      "id": "lrcx_10_q_20260129_s5",
+      "locator": "MD&A: results, DRAM/NAND, China, chars 66200-71200",
+      "quote": "the memory market segment saw strengthened DRAM investments offset by lower non-volatile memory spending."
+    },
+    {
+      "id": "lrcx_10_q_20260129_s6",
+      "locator": "MD&A: gross margin, results of operations, chars 54300-58200",
+      "quote": "Systems revenue includes sales of new leading-edge equipment in deposition, etch, clean and other wafer fabrication markets. Customer support-related revenue includes sales of customer service, spares, upgrades, and non-leading-edge equipment from the Company's Reliant® product line."
+    },
+    {
+      "id": "lrcx_10_q_20260129_s7",
+      "locator": "MD&A: results, DRAM/NAND, China, chars 66200-71200",
+      "quote": "Gross margin as a percentage of revenue decreased in the December 2025 quarter… primarily a result of unfavorable changes in customer mix."
+    },
+    {
+      "id": "lrcx_10_q_20260129_s8",
+      "locator": "Risk Factors: export controls, chars 107500-108300",
+      "quote": "legal, tax, accounting, or regulatory changes (including, but not limited to, changes in import/export regulations and tariffs, such as regulations imposed by the U.S. government restricting exports to China…)"
+    },
+    {
+      "id": "lrcx_10_q_20260129_s9",
+      "locator": "MD&A: results, DRAM/NAND, China, chars 66200-71200",
+      "quote": "Foundry 59  % 60  % 60  % 38  % Memory 34  % 34  % 34  % 43  % Logic/integrated device manufacturing 7  % 6  % 6  % 19  %"
+    },
+    {
+      "id": "lrcx_10_q_20260129_s10",
+      "locator": "MD&A: gross margin, results of operations, chars 54300-58200",
+      "quote": "our supply chain and the role of suppliers in our business, including the impacts of supply chain constraints and material costs"
+    },
+    {
+      "id": "lrcx_10_q_20260129_s11",
+      "locator": "MD&A: results, DRAM/NAND, China, chars 66200-71200",
+      "quote": "The decrease in the foundry market segment for the December 2025 quarter compared to the September 2025 quarter was primarily driven by mature node investments"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:lam_research",
+      "type": "Company",
+      "name": "Lam Research Corporation",
+      "abstraction_level": "equipment_epitaxy",
+      "role": "leader",
+      "aliases": [
+        "LRCX",
+        "Lam"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": null,
+        "concentration_score": null,
+        "intrinsic_cycle_time_weeks": null
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "lrcx_10_q_20260129_s1"
+      ]
+    },
+    {
+      "id": "tech:wafer_fab_equipment",
+      "type": "TechNode",
+      "name": "Wafer Fabrication Equipment (deposition, etch, clean)",
+      "abstraction_level": "equipment_epitaxy",
+      "role": null,
+      "aliases": [
+        "WFE",
+        "etch equipment",
+        "deposition equipment",
+        "clean equipment"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 4,
+        "concentration_score": null,
+        "intrinsic_cycle_time_weeks": null
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "lrcx_10_q_20260129_s6"
+      ]
+    },
+    {
+      "id": "tech:ai_compute_buildout",
+      "type": "TechNode",
+      "name": "AI training/inference cluster buildout",
+      "abstraction_level": "end_demand",
+      "role": null,
+      "aliases": [],
+      "attributes": {
+        "ramp_difficulty_intrinsic": null,
+        "concentration_score": null,
+        "intrinsic_cycle_time_weeks": null
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "lrcx_10_q_20260129_s4"
+      ]
+    },
+    {
+      "id": "tech:dram_manufacturing",
+      "type": "TechNode",
+      "name": "DRAM Manufacturing",
+      "abstraction_level": "foundry_packaging",
+      "role": null,
+      "aliases": [
+        "DRAM"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 4,
+        "concentration_score": null,
+        "intrinsic_cycle_time_weeks": null
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "lrcx_10_q_20260129_s5"
+      ]
+    },
+    {
+      "id": "tech:nand_manufacturing",
+      "type": "TechNode",
+      "name": "NAND / Non-Volatile Memory Manufacturing",
+      "abstraction_level": "foundry_packaging",
+      "role": null,
+      "aliases": [
+        "NAND",
+        "non-volatile memory",
+        "NVM"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 4,
+        "concentration_score": null,
+        "intrinsic_cycle_time_weeks": null
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "lrcx_10_q_20260129_s5"
+      ]
+    },
+    {
+      "id": "tech:foundry_logic",
+      "type": "TechNode",
+      "name": "Foundry / Logic Semiconductor Manufacturing",
+      "abstraction_level": "foundry_packaging",
+      "role": null,
+      "aliases": [
+        "foundry",
+        "logic/IDM"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 4,
+        "concentration_score": null,
+        "intrinsic_cycle_time_weeks": null
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "lrcx_10_q_20260129_s4"
+      ]
+    },
+    {
+      "id": "prod:reliant_product_line",
+      "type": "Product",
+      "name": "Reliant Product Line",
+      "abstraction_level": "equipment_epitaxy",
+      "role": null,
+      "aliases": [
+        "Reliant"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "lrcx_10_q_20260129_s6"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "lrcx_10_q_20260129_e1",
+      "src_id": "co:lam_research",
+      "dst_id": "tech:wafer_fab_equipment",
+      "relation": "supplies_to",
+      "attributes": {
+        "qualification_status": "qualified",
+        "substitutability": null,
+        "sole_source": false,
+        "structural_lead_time_weeks": null,
+        "ramp_execution": null
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "lrcx_10_q_20260129_s6"
+      ]
+    },
+    {
+      "id": "lrcx_10_q_20260129_e2",
+      "src_id": "co:lam_research",
+      "dst_id": "tech:dram_manufacturing",
+      "relation": "supplies_to",
+      "attributes": {
+        "qualification_status": "qualified",
+        "substitutability": null,
+        "sole_source": false,
+        "structural_lead_time_weeks": null,
+        "ramp_execution": null
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "lrcx_10_q_20260129_s5"
+      ]
+    },
+    {
+      "id": "lrcx_10_q_20260129_e3",
+      "src_id": "co:lam_research",
+      "dst_id": "tech:nand_manufacturing",
+      "relation": "supplies_to",
+      "attributes": {
+        "qualification_status": "qualified",
+        "substitutability": null,
+        "sole_source": false,
+        "structural_lead_time_weeks": null,
+        "ramp_execution": null
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "lrcx_10_q_20260129_s5"
+      ]
+    },
+    {
+      "id": "lrcx_10_q_20260129_e4",
+      "src_id": "co:lam_research",
+      "dst_id": "tech:foundry_logic",
+      "relation": "supplies_to",
+      "attributes": {
+        "qualification_status": "qualified",
+        "substitutability": null,
+        "sole_source": false,
+        "structural_lead_time_weeks": null,
+        "ramp_execution": null
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "lrcx_10_q_20260129_s4"
+      ]
+    },
+    {
+      "id": "lrcx_10_q_20260129_e5",
+      "src_id": "tech:ai_compute_buildout",
+      "dst_id": "tech:dram_manufacturing",
+      "relation": "enables",
+      "attributes": {},
+      "confidence": 0.75,
+      "source_ids": [
+        "lrcx_10_q_20260129_s5"
+      ]
+    },
+    {
+      "id": "lrcx_10_q_20260129_e6",
+      "src_id": "tech:ai_compute_buildout",
+      "dst_id": "tech:foundry_logic",
+      "relation": "enables",
+      "attributes": {},
+      "confidence": 0.75,
+      "source_ids": [
+        "lrcx_10_q_20260129_s4"
+      ]
+    },
+    {
+      "id": "lrcx_10_q_20260129_e7",
+      "src_id": "prod:reliant_product_line",
+      "dst_id": "tech:wafer_fab_equipment",
+      "relation": "is_component_of",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "lrcx_10_q_20260129_s6"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "lrcx_10_q_20260129_cl1",
+      "statement": "China represented 35% of Lam Research revenue in the December 2025 quarter, up from 34% in the prior-year six-month period, indicating sustained and growing dependence on Chinese customers for equipment spending.",
+      "subject_id": "co:lam_research",
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "If U.S. export controls materially restrict Lam's ability to ship equipment to China and China's share of revenue falls below 20% for two consecutive quarters, this claim should be downgraded.",
+      "confidence": 0.9,
+      "source_ids": [
+        "lrcx_10_q_20260129_s2",
+        "lrcx_10_q_20260129_s3"
+      ]
+    },
+    {
+      "id": "lrcx_10_q_20260129_cl2",
+      "statement": "DRAM investment by memory customers strengthened in the December 2025 quarter while NAND (non-volatile memory) spending declined, reflecting a bifurcation in memory equipment demand driven by AI workloads.",
+      "subject_id": "tech:dram_manufacturing",
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "If NAND spending recovers to parity with DRAM in subsequent quarters, the bifurcation thesis should be revised.",
+      "confidence": 0.9,
+      "source_ids": [
+        "lrcx_10_q_20260129_s5"
+      ]
+    },
+    {
+      "id": "lrcx_10_q_20260129_cl3",
+      "statement": "U.S. government export controls restricting exports to China represent a material risk to Lam Research's revenue, given China's ~35-43% share of quarterly revenue.",
+      "subject_id": "co:lam_research",
+      "demand_proof_level": "guided",
+      "disproof_condition": "If export controls are relaxed or Lam successfully diversifies revenue so China represents less than 15% of revenue, this claim should be downgraded.",
+      "confidence": 0.85,
+      "source_ids": [
+        "lrcx_10_q_20260129_s8",
+        "lrcx_10_q_20260129_s3"
+      ]
+    },
+    {
+      "id": "lrcx_10_q_20260129_cl4",
+      "statement": "Foundry equipment spending was the predominant growth driver for Lam Research in H1 FY2026 (six months ended December 2025), with foundry representing 60% of leading- and non-leading-edge equipment revenue versus 38% in the prior-year period.",
+      "subject_id": "tech:foundry_logic",
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "If foundry share drops back below 45% for two consecutive quarters, this claim should be revised.",
+      "confidence": 0.9,
+      "source_ids": [
+        "lrcx_10_q_20260129_s4",
+        "lrcx_10_q_20260129_s9"
+      ]
+    }
+  ]
+}

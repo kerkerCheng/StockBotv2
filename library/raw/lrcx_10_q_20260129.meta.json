@@ -1,0 +1,17 @@
+{
+  "doc_id": "lrcx_10_q_20260129",
+  "source_type": "filing",
+  "evidence_tier": 1,
+  "company": "LAM RESEARCH CORP",
+  "ticker": "LRCX",
+  "form_type": "10-Q",
+  "filed_date": "2026-01-29",
+  "cik": "0000707549",
+  "accession": "000070754926000009",
+  "truncated": false,
+  "original_chars": 181537,
+  "url": "https://www.sec.gov/Archives/edgar/data/707549/000070754926000009/lrcx-20251228.htm",
+  "curated_excerpt": true,
+  "curated_note": "Hand-curated verbatim excerpts of mature-node-relevant sections (segment/market breakdown, non-leading-edge/ICAPS, China export exposure, capex & equipment-supplier dependence). Char offsets per section in file header. Full filing at url; original_chars = full-doc length.",
+  "curated_chars": 11201
+}
