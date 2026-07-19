@@ -255,6 +255,58 @@ def upsert_coverage_observation(
         conn.commit()
 
 
+def upsert_manual_field(
+    conn,
+    ticker: str,
+    field_name: str,
+    value: str,
+    *,
+    source_note: str | None = None,
+    commit: bool = True,
+) -> None:
+    """Idempotently store one human-reviewed checklist field (customer_concentration, backlog…).
+
+    These are the checklist items yfinance cannot supply; they must be hand-entered
+    from the primary filing. UNIQUE(ticker, field_name) makes re-entry an update.
+    `source_note` records the filing the value came from (traceability is a hard rule).
+    """
+    ticker = ticker.upper().strip()
+    field_name = field_name.strip()
+    if not ticker or not field_name:
+        raise ValueError("ticker and field_name are required")
+    if value is None or not str(value).strip():
+        raise ValueError("value must be a non-empty string (use a note, never blank)")
+
+    if _use_postgres():
+        sql = """
+        INSERT INTO manual_fields (ticker, field_name, value, source_note, updated_at)
+        VALUES (%(ticker)s, %(field_name)s, %(value)s, %(source_note)s, NOW())
+        ON CONFLICT (ticker, field_name) DO UPDATE SET
+            value=EXCLUDED.value,
+            source_note=EXCLUDED.source_note,
+            updated_at=EXCLUDED.updated_at
+        """
+        with conn.cursor() as cur:
+            cur.execute(sql, {
+                "ticker": ticker, "field_name": field_name,
+                "value": str(value), "source_note": source_note,
+            })
+    else:
+        conn.execute(
+            """
+            INSERT INTO manual_fields (ticker, field_name, value, source_note, updated_at)
+            VALUES (?, ?, ?, ?, datetime('now'))
+            ON CONFLICT (ticker, field_name) DO UPDATE SET
+                value=excluded.value,
+                source_note=excluded.source_note,
+                updated_at=excluded.updated_at
+            """,
+            (ticker, field_name, str(value), source_note),
+        )
+    if commit:
+        conn.commit()
+
+
 def get_latest_coverage_observation(conn, ticker: str) -> dict | None:
     """Return the latest raw coverage row without a derived classification."""
 
