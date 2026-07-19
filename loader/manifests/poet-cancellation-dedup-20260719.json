@@ -1,0 +1,32 @@
+{
+  "backed_up_at": "2026-07-19T05:24:34.130407+00:00",
+  "reason": "Remove duplicate of pre-existing poet_po_update_pr_2026_04_27 (same SEC URL/event).",
+  "source_doc": {
+    "storage_permission": "repo_full",
+    "origin_entity": "POET Technologies",
+    "permission_basis": "Official SEC EDGAR primary filing (POET Technologies Form 6-K, Exhibit 99.1), public domain government-hosted disclosure. Repository retains attributed extraction and canonical SEC URL.",
+    "source_type": "filing",
+    "id": "poet_celestial_cancellation_6k_2026_04_27",
+    "title": "POET Technologies Provides Purchase Order Update — Marvell cancels all Celestial AI purchase orders (POET SEC Form 6-K Exhibit 99.1, April 27, 2026)",
+    "url": "https://www.sec.gov/Archives/edgar/data/1437424/000117184326002726/exh_991.htm",
+    "evidence_tier": 1
+  },
+  "claim": {
+    "source_ids": [
+      "poet_celestial_cancellation_6k_2026_04_27_s1",
+      "poet_celestial_cancellation_6k_2026_04_27_s2",
+      "poet_celestial_cancellation_6k_2026_04_27_s3"
+    ],
+    "disproof_condition": "Revise if POET and Marvell/Celestial reinstate the purchase orders or announce a replacement supply agreement.",
+    "subject_kind": "node",
+    "updated_at": "2026-07-19T00:02:37.501632+00:00",
+    "demand_proof_level": "confirmed",
+    "local_id": "cl1",
+    "confidence": 0.9,
+    "name": "Marvell Semiconductor (which a…",
+    "statement": "Marvell Semiconductor (which acquired Celestial AI) cancelled all of POET Technologies' Celestial AI purchase orders — written notice given 2026-04-23, POET announced 2026-04-27 — citing alleged POET breach of confidentiality obligations. This terminates the POET→Celestial optical-engine supply channel and, by extension, cuts Sivers' indirect route to Celestial/Marvell AI demand via POET (Sivers→POET→Celestial).",
+    "subject_node_id": "co:poet_technologies",
+    "id": "poet_celestial_cancellation_6k_2026_04_27_cl1",
+    "source_doc_id": "poet_celestial_cancellation_6k_2026_04_27"
+  }
+}

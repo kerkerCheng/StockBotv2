@@ -1,11 +1,11 @@
 {
   "schema_version": "1.0",
   "memo_path": "sivers_v3_lane_memo.md",
-  "memo_sha256": "5f8f87ba31dec555e0fd41006aa841c739e1441f6cae1b551d8441ef0a4ca986",
+  "memo_sha256": "a3407b4f7e0a763f0845d229db22bcb7343a07ae9c31574963f41018a8765ecc",
   "output_type": "Research Note",
   "ticker": "SIVE.ST",
   "company_id": "co:sivers_semiconductors",
-  "context_inventory_sha256": "629205aa8eca745aa3cc37965b407da860e4eb72d50ae5d47f3235fb406aff6d",
+  "context_inventory_sha256": "d0d4b8de6c215a9deb7602b8258ebc2723f767e45cb5c36c42e08865b3f8b43f",
   "context_inventory": {
     "focus_company": {
       "id": "co:sivers_semiconductors",
@@ -129,33 +129,6 @@
           "id": "lumentum_q3fy26_cpo",
           "title": "Lumentum Q3 FY2026 Earnings Call — ELS/CPO/UHP Laser Segment",
           "url": "https://www.fool.com/earnings/call-transcripts/2026/05/06/lumentum-lite-q3-2026-earnings-transcript/",
-          "evidence_tier": 1
-        }
-      },
-      "poet_celestial_cancellation_6k_2026_04_27_cl1": {
-        "id": "poet_celestial_cancellation_6k_2026_04_27_cl1",
-        "statement": "Marvell Semiconductor (which acquired Celestial AI) cancelled all of POET Technologies' Celestial AI purchase orders — written notice given 2026-04-23, POET announced 2026-04-27 — citing alleged POET breach of confidentiality obligations. This terminates the POET→Celestial optical-engine supply channel and, by extension, cuts Sivers' indirect route to Celestial/Marvell AI demand via POET (Sivers→POET→Celestial).",
-        "demand_proof_level": "confirmed",
-        "disproof_condition": "Revise if POET and Marvell/Celestial reinstate the purchase orders or announce a replacement supply agreement.",
-        "confidence": 0.9,
-        "source_ids": [
-          "poet_celestial_cancellation_6k_2026_04_27_s1",
-          "poet_celestial_cancellation_6k_2026_04_27_s2",
-          "poet_celestial_cancellation_6k_2026_04_27_s3"
-        ],
-        "source_doc_id": "poet_celestial_cancellation_6k_2026_04_27",
-        "subject_kind": "node",
-        "subject_node_id": "co:poet_technologies",
-        "subject_edge_key": null,
-        "origin_entity": "POET Technologies",
-        "source_doc": {
-          "storage_permission": "repo_full",
-          "origin_entity": "POET Technologies",
-          "permission_basis": "Official SEC EDGAR primary filing (POET Technologies Form 6-K, Exhibit 99.1), public domain government-hosted disclosure. Repository retains attributed extraction and canonical SEC URL.",
-          "source_type": "filing",
-          "id": "poet_celestial_cancellation_6k_2026_04_27",
-          "title": "POET Technologies Provides Purchase Order Update — Marvell cancels all Celestial AI purchase orders (POET SEC Form 6-K Exhibit 99.1, April 27, 2026)",
-          "url": "https://www.sec.gov/Archives/edgar/data/1437424/000117184326002726/exh_991.htm",
           "evidence_tier": 1
         }
       },
@@ -617,6 +590,31 @@
           "retrieved_at": "2026-07-10",
           "title": "Sivers: The Undiscovered CPO Laser Chokepoint + Customer Mapping — aleabitoreddit SubStack",
           "url": "https://aleabitoreddit.substack.com/p/sivers-semi-sive-the-cpo-laser-supplier",
+          "evidence_tier": 3
+        }
+      },
+      "damnang_poet_ofc2026_review_2026_03_cl1": {
+        "id": "damnang_poet_ofc2026_review_2026_03_cl1",
+        "statement": "POET publicly live-demoed its Blazar and Starlight ELS products at OFC 2026 (Mar 16-19). No primary source confirms these demos used Sivers DFB laser arrays, and no explicit announcement confirms the POET-Sivers ELS 'customer prototype demonstrations in H1 2026' milestone was completed. Demos happened, but Sivers content inside is UNVERIFIED. Note: POET positions Blazar as an order-of-magnitude cheaper substitute for DFB lasers, making partner POET a potential future substitutor of Sivers DFB arrays.",
+        "demand_proof_level": "inferred",
+        "disproof_condition": "If POET or Sivers confirm the demoed ELS units contain Sivers laser arrays or announce completed customer prototype demos, upgrade. If the Sivers Q2 2026 report (due Aug 27, 2026) reveals the milestone slipped, downgrade the end-2026 ELS production-readiness claim. If Blazar hybrid lasers displace DFB arrays in POET ELS BOM, downgrade Sivers-POET supply edge.",
+        "confidence": 0.55,
+        "source_ids": [
+          "damnang_poet_ofc2026_review_2026_03_s2",
+          "damnang_poet_ofc2026_review_2026_03_s3"
+        ],
+        "source_doc_id": "damnang_poet_ofc2026_review_2026_03",
+        "subject_kind": "node",
+        "subject_node_id": "co:poet_technologies",
+        "subject_edge_key": null,
+        "origin_entity": "damnang_substack",
+        "source_doc": {
+          "storage_permission": "local_only",
+          "origin_entity": "damnang_substack",
+          "permission_basis": "No creator reuse license or independently verified canonical source URL was recorded for this analyst article. Copyright and network-storage permission are therefore unresolved, so the extraction remains local-only.",
+          "source_type": "industry_report",
+          "id": "damnang_poet_ofc2026_review_2026_03",
+          "title": "OFC 2026 review: POET Technologies ELS live demonstrations (damnang.com analyst article, late March 2026)",
           "evidence_tier": 3
         }
       }
@@ -1536,6 +1534,40 @@
           "evidence_tier": 3
         }
       },
+      "damnang_poet_ofc2026_review_2026_03_s2": {
+        "id": "damnang_poet_ofc2026_review_2026_03_s2",
+        "locator": "article, demo section",
+        "quote": "The main event for live demos at OFC 2026 was ELS. The Blazar and Starlight ELS products were front and center in the booth",
+        "source_doc_id": "damnang_poet_ofc2026_review_2026_03",
+        "origin_entity": "damnang_substack",
+        "extraction_path": "extractions/damnang_poet_ofc2026_review_2026_03.json",
+        "source_doc": {
+          "storage_permission": "local_only",
+          "origin_entity": "damnang_substack",
+          "permission_basis": "No creator reuse license or independently verified canonical source URL was recorded for this analyst article. Copyright and network-storage permission are therefore unresolved, so the extraction remains local-only.",
+          "source_type": "industry_report",
+          "id": "damnang_poet_ofc2026_review_2026_03",
+          "title": "OFC 2026 review: POET Technologies ELS live demonstrations (damnang.com analyst article, late March 2026)",
+          "evidence_tier": 3
+        }
+      },
+      "damnang_poet_ofc2026_review_2026_03_s3": {
+        "id": "damnang_poet_ofc2026_review_2026_03_s3",
+        "locator": "article, Blazar cost section",
+        "quote": "POET claims costs come down by an order of magnitude compared to DFB",
+        "source_doc_id": "damnang_poet_ofc2026_review_2026_03",
+        "origin_entity": "damnang_substack",
+        "extraction_path": "extractions/damnang_poet_ofc2026_review_2026_03.json",
+        "source_doc": {
+          "storage_permission": "local_only",
+          "origin_entity": "damnang_substack",
+          "permission_basis": "No creator reuse license or independently verified canonical source URL was recorded for this analyst article. Copyright and network-storage permission are therefore unresolved, so the extraction remains local-only.",
+          "source_type": "industry_report",
+          "id": "damnang_poet_ofc2026_review_2026_03",
+          "title": "OFC 2026 review: POET Technologies ELS live demonstrations (damnang.com analyst article, late March 2026)",
+          "evidence_tier": 3
+        }
+      },
       "enablence_sivers_onet_els_2026_s1": {
         "id": "enablence_sivers_onet_els_2026_s1",
         "locator": "para 1, joint press release",
@@ -1718,60 +1750,6 @@
           "title": "Sivers to provide lasers for GlobalFoundries; Nvidia ramps optical AI 'engine' (optics.org, June 2, 2026)",
           "url": "https://optics.org/news/sivers-to-provide-lasers-for-globalfoundries-nvidia-ramps-optical-ai-engine",
           "evidence_tier": 3
-        }
-      },
-      "poet_celestial_cancellation_6k_2026_04_27_s1": {
-        "id": "poet_celestial_cancellation_6k_2026_04_27_s1",
-        "locator": "exhibit 99.1, para 1",
-        "quote": "today announced the cancellation of all purchase orders received by the Company from Celestial AI, including the ones for initial production units first disclosed (the \"Purchase Orders\") by the Company in a press release on April 25, 2023",
-        "source_doc_id": "poet_celestial_cancellation_6k_2026_04_27",
-        "origin_entity": "POET Technologies",
-        "extraction_path": "extractions/poet_celestial_cancellation_6k_2026_04_27.json",
-        "source_doc": {
-          "storage_permission": "repo_full",
-          "origin_entity": "POET Technologies",
-          "permission_basis": "Official SEC EDGAR primary filing (POET Technologies Form 6-K, Exhibit 99.1), public domain government-hosted disclosure. Repository retains attributed extraction and canonical SEC URL.",
-          "source_type": "filing",
-          "id": "poet_celestial_cancellation_6k_2026_04_27",
-          "title": "POET Technologies Provides Purchase Order Update — Marvell cancels all Celestial AI purchase orders (POET SEC Form 6-K Exhibit 99.1, April 27, 2026)",
-          "url": "https://www.sec.gov/Archives/edgar/data/1437424/000117184326002726/exh_991.htm",
-          "evidence_tier": 1
-        }
-      },
-      "poet_celestial_cancellation_6k_2026_04_27_s2": {
-        "id": "poet_celestial_cancellation_6k_2026_04_27_s2",
-        "locator": "exhibit 99.1, para 1",
-        "quote": "Marvell Semiconductor Inc., which acquired Celestial AI, provided written notice of the cancellation to the Company on April 23, 2026",
-        "source_doc_id": "poet_celestial_cancellation_6k_2026_04_27",
-        "origin_entity": "POET Technologies",
-        "extraction_path": "extractions/poet_celestial_cancellation_6k_2026_04_27.json",
-        "source_doc": {
-          "storage_permission": "repo_full",
-          "origin_entity": "POET Technologies",
-          "permission_basis": "Official SEC EDGAR primary filing (POET Technologies Form 6-K, Exhibit 99.1), public domain government-hosted disclosure. Repository retains attributed extraction and canonical SEC URL.",
-          "source_type": "filing",
-          "id": "poet_celestial_cancellation_6k_2026_04_27",
-          "title": "POET Technologies Provides Purchase Order Update — Marvell cancels all Celestial AI purchase orders (POET SEC Form 6-K Exhibit 99.1, April 27, 2026)",
-          "url": "https://www.sec.gov/Archives/edgar/data/1437424/000117184326002726/exh_991.htm",
-          "evidence_tier": 1
-        }
-      },
-      "poet_celestial_cancellation_6k_2026_04_27_s3": {
-        "id": "poet_celestial_cancellation_6k_2026_04_27_s3",
-        "locator": "exhibit 99.1, para 1",
-        "quote": "Marvell indicated that the Company had made disclosures of information related to the Purchase Order and shipping information in contravention of its confidentiality obligations",
-        "source_doc_id": "poet_celestial_cancellation_6k_2026_04_27",
-        "origin_entity": "POET Technologies",
-        "extraction_path": "extractions/poet_celestial_cancellation_6k_2026_04_27.json",
-        "source_doc": {
-          "storage_permission": "repo_full",
-          "origin_entity": "POET Technologies",
-          "permission_basis": "Official SEC EDGAR primary filing (POET Technologies Form 6-K, Exhibit 99.1), public domain government-hosted disclosure. Repository retains attributed extraction and canonical SEC URL.",
-          "source_type": "filing",
-          "id": "poet_celestial_cancellation_6k_2026_04_27",
-          "title": "POET Technologies Provides Purchase Order Update — Marvell cancels all Celestial AI purchase orders (POET SEC Form 6-K Exhibit 99.1, April 27, 2026)",
-          "url": "https://www.sec.gov/Archives/edgar/data/1437424/000117184326002726/exh_991.htm",
-          "evidence_tier": 1
         }
       },
       "poet_po_update_pr_2026_04_27_s1": {
@@ -2545,6 +2523,33 @@
     {
       "evidence_ref": "E1",
       "type": "claim",
+      "claim_id": "sivers_ar_2025_financials_cl1",
+      "edge_key": null,
+      "attributes": [],
+      "assertion_ids": [],
+      "source_ids": [
+        "sivers_ar_2025_financials_s4",
+        "sivers_ar_2025_financials_s5",
+        "sivers_ar_2025_financials_s6"
+      ],
+      "purpose": "確立 Sivers 營收結構：Photonics 僅佔約 30%，Wireless 三大客戶佔集團收入過半，Photonics 客戶集中度相對低但絕對規模小——支撐 thesis 的收入結構風險分析與 Variant Perception"
+    },
+    {
+      "evidence_ref": "E2",
+      "type": "claim",
+      "claim_id": "sivers_ar_2025_financials_cl2",
+      "edge_key": null,
+      "attributes": [],
+      "assertion_ids": [],
+      "source_ids": [
+        "sivers_ar_2025_financials_s7",
+        "sivers_ar_2025_financials_s8"
+      ],
+      "purpose": "確立 Sivers FY2025 毛利率 -0.7%、原材料成本 YoY +116%，支撐量產前期成本曲線分析與 disproof condition"
+    },
+    {
+      "evidence_ref": "E3",
+      "type": "claim",
       "claim_id": "sivers_ar_2025_photonics_excerpt_cl4",
       "edge_key": null,
       "attributes": [],
@@ -2553,10 +2558,10 @@
         "sivers_ar_2025_photonics_excerpt_s5",
         "sivers_ar_2025_photonics_excerpt_s20"
       ],
-      "purpose": "支援需求驅動段：外部雷射源是下一代 CPO 的關鍵元件，CPO 相較傳統可插拔模組具結構性功耗優勢"
+      "purpose": "確立外部雷射源是 CPO 的關鍵組件且具功耗優勢，支撐需求驅動段的 CPO 功耗論點"
     },
     {
-      "evidence_ref": "E2",
+      "evidence_ref": "E4",
       "type": "claim",
       "claim_id": "sivers_ar_2025_photonics_excerpt_cl1",
       "edge_key": null,
@@ -2565,10 +2570,10 @@
       "source_ids": [
         "sivers_ar_2025_photonics_excerpt_s8"
       ],
-      "purpose": "支援需求驅動段：超大規模業者預期 CW 雷射在 800G→1.6T→3.2T 演進過程中出現短缺"
+      "purpose": "確立 800G→1.6T→3.2T 過渡將導致 CW 雷射供應短缺，支撐需求驅動段的供需缺口論點"
     },
     {
-      "evidence_ref": "E3",
+      "evidence_ref": "E5",
       "type": "claim",
       "claim_id": "sivers_ar_2025_photonics_excerpt_cl2",
       "edge_key": null,
@@ -2577,67 +2582,33 @@
       "source_ids": [
         "sivers_ar_2025_photonics_excerpt_s10"
       ],
-      "purpose": "支援需求驅動段：Sivers DWDM 雷射陣列與矽光子小晶片結合為 AI 規模擴展互連的策略性輸入"
-    },
-    {
-      "evidence_ref": "E4",
-      "type": "claim",
-      "claim_id": "lumentum_q3fy26_cpo_cl4",
-      "edge_key": null,
-      "attributes": [],
-      "assertion_ids": [],
-      "source_ids": [
-        "lumentum_q3fy26_cpo_s10",
-        "lumentum_q3fy26_cpo_s24"
-      ],
-      "purpose": "支援需求驅動段：ELS 模組是光學技術陌生型 CPO 客戶的主要切入產品形式，驗證 Sivers ELS 策略的市場邏輯"
-    },
-    {
-      "evidence_ref": "E5",
-      "type": "edge",
-      "claim_id": null,
-      "edge_key": "edge:f06c79e5b1e989550acbc7f7abfa565d248f565ff2a91177d1f0ff41bb17c6e3",
-      "attributes": [
-        "qualification_status",
-        "ramp_execution"
-      ],
-      "assertion_ids": [
-        "sivers_ar_2025_photonics_excerpt_e8"
-      ],
-      "source_ids": [
-        "sivers_ar_2025_photonics_excerpt_s5",
-        "sivers_ar_2025_photonics_excerpt_s12"
-      ],
-      "purpose": "支援主瓶頸段及最強證據段：Sivers→O-Net ELS 模組為 qualifying 狀態，生產就緒目標 2026 年底，ramp_execution=3"
+      "purpose": "確立 Sivers DWDM 雷射陣列與矽光子 chiplet 結合的策略定位，支撐 scale-up 算力需求驅動論點"
     },
     {
       "evidence_ref": "E6",
       "type": "claim",
-      "claim_id": "semiconductor_today_sivers_ayar_1m_order_2023_07_03_cl1",
+      "claim_id": "sivers_gf_pr_2026_06_02_cl1",
       "edge_key": null,
       "attributes": [],
       "assertion_ids": [],
       "source_ids": [
-        "semiconductor_today_sivers_ayar_1m_order_2023_07_03_s1",
-        "semiconductor_today_sivers_ayar_1m_order_2023_07_03_s2"
+        "sivers_gf_pr_2026_06_02_s2",
+        "sivers_gf_pr_2026_06_02_s4"
       ],
-      "purpose": "支援最強證據段：第三方獨立媒體確認 Sivers DFB 雷射陣列為 Ayar Labs SuperNova 光源，具體商業訂單（$1M）記錄"
+      "purpose": "確立 Sivers 雷射陣列進入 GF 矽光子參考設計與 SCALE 平台（qualifying 階段），支撐平台化路線論點與 Stack 摘要"
     },
     {
       "evidence_ref": "E7",
-      "type": "edge",
-      "claim_id": null,
-      "edge_key": "edge:a5ee8f38530b9406a5440fd998de21284ecdf9516a31fe316d7c91cf2716abb8",
-      "attributes": [
-        "qualification_status"
-      ],
-      "assertion_ids": [
-        "sivers_gf_pr_2026_06_02_e1"
-      ],
+      "type": "claim",
+      "claim_id": "opticsorg_sivers_gf_2026_06_02_cl1",
+      "edge_key": null,
+      "attributes": [],
+      "assertion_ids": [],
       "source_ids": [
-        "sivers_gf_pr_2026_06_02_s2"
+        "opticsorg_sivers_gf_2026_06_02_s1",
+        "opticsorg_sivers_gf_2026_06_02_s2"
       ],
-      "purpose": "支援 Variant Perception 及主瓶頸段：Sivers→GF 矽光子平台合作為 qualifying 狀態，提供平台型路徑至市場但尚無 design win 確認"
+      "purpose": "獨立貿易媒體（optics.org）佐證 Sivers-GF SCALE 合作，提升 E6 的來源多樣性，支撐平台路線 GF 節點"
     },
     {
       "evidence_ref": "E8",
@@ -2650,10 +2621,39 @@
         "enablence_sivers_onet_ofc_pr_2026_03_17_s2",
         "enablence_sivers_onet_ofc_pr_2026_03_17_s3"
       ],
-      "purpose": "支援 Variant Perception 及需求驅動段：三方 8 通道 ELS 模組宣布，具體化 Sivers-O-Net 合作為針對 AI 資料中心的定義產品"
+      "purpose": "確立 Sivers-O-Net-Enablence 三方 8 通道 ELS 模組合作具體產品與角色分工，支撐需求驅動段平台化論點與最強證據"
     },
     {
       "evidence_ref": "E9",
+      "type": "claim",
+      "claim_id": "lumentum_q3fy26_cpo_cl3",
+      "edge_key": null,
+      "attributes": [],
+      "assertion_ids": [],
+      "source_ids": [
+        "lumentum_q3fy26_cpo_s25",
+        "lumentum_q3fy26_cpo_s4"
+      ],
+      "purpose": "確立 Lumentum 新 Greensboro InP 廠需約 6 個季度以上才能貢獻收入，支撐 InP 供應短缺窗口論點"
+    },
+    {
+      "evidence_ref": "E10",
+      "type": "edge",
+      "claim_id": null,
+      "edge_key": "edge:37d1b83d0edf43f8a7f223845f9dc04c011a51b00b47d61324ac725cd1dcc5fc",
+      "attributes": [
+        "qualification_status"
+      ],
+      "assertion_ids": [
+        "sivers_ar_2025_photonics_excerpt_e6"
+      ],
+      "source_ids": [
+        "sivers_ar_2025_photonics_excerpt_s9"
+      ],
+      "purpose": "確立 Sivers CW DFB 雷射目前為 sampling 狀態，支撐主瓶頸段的執行階段評估"
+    },
+    {
+      "evidence_ref": "E11",
       "type": "edge",
       "claim_id": null,
       "edge_key": "edge:15d7af33e42502ce404ed699c4f17c1e284456f025964460a1d7f71a960681e8",
@@ -2668,91 +2668,108 @@
         "sivers_ar_2025_photonics_excerpt_s7",
         "sivers_ar_2025_photonics_excerpt_s15"
       ],
-      "purpose": "支援 Variant Perception 及主瓶頸段：Win Semiconductor→Sivers 為量產布局的 qualifying 狀態，ramp_execution=4 顯示執行難度偏高"
-    },
-    {
-      "evidence_ref": "E10",
-      "type": "edge",
-      "claim_id": null,
-      "edge_key": "edge:60c5c41ce38247c69feb0050b787e6a68b7db943e5179c1ec2c199373d1abd9d",
-      "attributes": [
-        "qualification_status",
-        "sole_source"
-      ],
-      "assertion_ids": [
-        "aleabitoreddit_sivers_cpo_customer_map_e1"
-      ],
-      "source_ids": [
-        "aleabitoreddit_sivers_cpo_customer_map_s1"
-      ],
-      "purpose": "支援主瓶頸段：確認 Sivers→Ayar Labs 邊 sole_source=False，qualification_status=none，不可用作 sole_source 主張"
-    },
-    {
-      "evidence_ref": "E11",
-      "type": "claim",
-      "claim_id": "poet_celestial_cancellation_6k_2026_04_27_cl1",
-      "edge_key": null,
-      "attributes": [],
-      "assertion_ids": [],
-      "source_ids": [
-        "poet_celestial_cancellation_6k_2026_04_27_s1",
-        "poet_celestial_cancellation_6k_2026_04_27_s2",
-        "poet_celestial_cancellation_6k_2026_04_27_s3"
-      ],
-      "purpose": "支援主瓶頸段：Marvell/Celestial AI 取消 POET 所有訂單，Sivers→POET→Celestial 間接需求路徑已終止"
+      "purpose": "確立 Win Semiconductor 為 Sivers 高產能製造合作夥伴（qualifying），支撐 Stack 摘要的晶片製造層分析"
     },
     {
       "evidence_ref": "E12",
-      "type": "claim",
-      "claim_id": "sivers_ar_2025_financials_cl1",
-      "edge_key": null,
-      "attributes": [],
-      "assertion_ids": [],
-      "source_ids": [
-        "sivers_ar_2025_financials_s4",
-        "sivers_ar_2025_financials_s5",
-        "sivers_ar_2025_financials_s6"
+      "type": "edge",
+      "claim_id": null,
+      "edge_key": "edge:4cb1aff422df37fd3107efb6e9b906d11874d2831134fbd2a0cbeea6b7198f80",
+      "attributes": [
+        "qualification_status",
+        "ramp_execution"
       ],
-      "purpose": "支援最強證據段及 Variant Perception：Sivers FY2025 光子段 SEK 93.4M（+17% YoY），前三大客戶均屬 Wireless，來自經審計年報"
+      "assertion_ids": [
+        "sivers_ar_2025_photonics_excerpt_e10"
+      ],
+      "source_ids": [
+        "sivers_ar_2025_photonics_excerpt_s4",
+        "sivers_ar_2025_photonics_excerpt_s6"
+      ],
+      "purpose": "確立 Sivers→POET 供應關係為 sampling 階段（ramp_execution=3），支撐模組整合層分析與替代風險討論"
     },
     {
       "evidence_ref": "E13",
-      "type": "claim",
-      "claim_id": "sivers_ar_2025_financials_cl2",
-      "edge_key": null,
-      "attributes": [],
-      "assertion_ids": [],
-      "source_ids": [
-        "sivers_ar_2025_financials_s7",
-        "sivers_ar_2025_financials_s8"
+      "type": "edge",
+      "claim_id": null,
+      "edge_key": "edge:484b95bbc2d41970d2256c384424b2c1d2416b0b508d31a1afdbbd6709ca758c",
+      "attributes": [
+        "qualification_status"
       ],
-      "purpose": "支援最強證據段、disproof conditions 及 leading indicators：FY2025 毛利率 -0.7%，原材料成本 +116%，量產前期成本壓力明確，來自經審計年報"
+      "assertion_ids": [
+        "sivers_ar_2025_photonics_excerpt_e15"
+      ],
+      "source_ids": [
+        "sivers_ar_2025_photonics_excerpt_s11"
+      ],
+      "purpose": "確立 Sivers→LIGHTIUM AG 為 qualifying 階段，TFLN 平台整合，支撐 Stack 摘要的模組整合層分析"
     },
     {
       "evidence_ref": "E14",
       "type": "claim",
-      "claim_id": "sivers_ar_2025_financials_cl3",
+      "claim_id": "semiconductor_today_sivers_ayar_1m_order_2023_07_03_cl1",
       "edge_key": null,
       "attributes": [],
       "assertion_ids": [],
       "source_ids": [
-        "sivers_ar_2025_financials_s5",
-        "sivers_ar_2025_financials_s9"
+        "semiconductor_today_sivers_ayar_1m_order_2023_07_03_s1",
+        "semiconductor_today_sivers_ayar_1m_order_2023_07_03_s2"
       ],
-      "purpose": "支援 disproof conditions：ALL.SPACE 為最大可識別客戶（SEK 79.4M，25.9% 集團收入），屬 Wireless/SATCOM/defense，非 CPO 光子段"
+      "purpose": "獨立貿易媒體確認 Sivers 獲 Ayar Labs 100 萬美元訂單，DFB 陣列為 SuperNova 光源，支撐最強證據段與 disproof condition"
     },
     {
       "evidence_ref": "E15",
       "type": "claim",
-      "claim_id": "sivers_ar_2025_photonics_excerpt_cl3",
+      "claim_id": "sivers_ar_2025_photonics_excerpt_cl5",
       "edge_key": null,
       "attributes": [],
       "assertion_ids": [],
       "source_ids": [
-        "sivers_ar_2025_photonics_excerpt_s9",
-        "sivers_ar_2025_photonics_excerpt_s16"
+        "sivers_ar_2025_photonics_excerpt_s5",
+        "sivers_ar_2025_photonics_excerpt_s12"
       ],
-      "purpose": "支援 leading indicators 段：Sivers 自述預計 2027 年及以後部分 CW DFB 採樣客戶將轉為量產承諾，是觀測時程錨點"
+      "purpose": "確立 ELS production readiness 目標為 2026 年底，支撐主瓶頸段與 leading indicator 分析"
+    },
+    {
+      "evidence_ref": "E16",
+      "type": "claim",
+      "claim_id": "damnang_poet_ofc2026_review_2026_03_cl1",
+      "edge_key": null,
+      "attributes": [],
+      "assertion_ids": [],
+      "source_ids": [
+        "damnang_poet_ofc2026_review_2026_03_s2",
+        "damnang_poet_ofc2026_review_2026_03_s3"
+      ],
+      "purpose": "確立 POET Blazar 聲稱成本比 DFB 低一個數量級，支撐主瓶頸段的替代風險分析與 leading indicator"
+    },
+    {
+      "evidence_ref": "E17",
+      "type": "claim",
+      "claim_id": "poet_po_update_pr_2026_04_27_cl1",
+      "edge_key": null,
+      "attributes": [],
+      "assertion_ids": [],
+      "source_ids": [
+        "poet_po_update_pr_2026_04_27_s1",
+        "poet_po_update_pr_2026_04_27_s2"
+      ],
+      "purpose": "確認 Marvell/Celestial AI 已取消 POET 所有訂單，限定 POET 作為 Sivers 客戶的當前風險程度"
+    },
+    {
+      "evidence_ref": "E18",
+      "type": "edge",
+      "claim_id": null,
+      "edge_key": "edge:3bb6fb27d008730ed6689db280d467df76f74bcc085388599d75f9237bc3560a",
+      "attributes": [],
+      "assertion_ids": [
+        "silicon_matter_sivers_ayar_2026_03_14_e3"
+      ],
+      "source_ids": [
+        "silicon_matter_sivers_ayar_2026_03_14_s2",
+        "silicon_matter_sivers_ayar_2026_03_14_s3"
+      ],
+      "purpose": "確立 Lumentum 主動競爭 CPO 市場（挖角 Ayar Labs 前 VP），支撐主瓶頸段競爭動態分析與 disproof condition"
     }
   ],
   "validation": {
@@ -2764,6 +2781,235 @@
         "item": {
           "evidence_ref": "E1",
           "type": "claim",
+          "claim_id": "sivers_ar_2025_financials_cl1",
+          "edge_key": null,
+          "attributes": [],
+          "assertion_ids": [],
+          "source_ids": [
+            "sivers_ar_2025_financials_s4",
+            "sivers_ar_2025_financials_s5",
+            "sivers_ar_2025_financials_s6"
+          ],
+          "purpose": "確立 Sivers 營收結構：Photonics 僅佔約 30%，Wireless 三大客戶佔集團收入過半，Photonics 客戶集中度相對低但絕對規模小——支撐 thesis 的收入結構風險分析與 Variant Perception"
+        },
+        "claim": {
+          "id": "sivers_ar_2025_financials_cl1",
+          "statement": "More than 50% of Sivers' FY2025 total revenue (SEK 183.4M out of 306.6M) came from three Wireless-segment customers; the Photonics segment (SEK 93.4M, +17% YoY) has no disclosed customer exceeding 10% of group revenue, implying Photonics customer concentration is lower.",
+          "demand_proof_level": "confirmed",
+          "disproof_condition": "If Photonics revenue becomes concentrated in one or two customers as CPO volumes scale, or if the top Wireless customers (ALL.SPACE + 2 others) reduce orders materially, the group revenue profile would deteriorate.",
+          "confidence": 0.95,
+          "source_ids": [
+            "sivers_ar_2025_financials_s4",
+            "sivers_ar_2025_financials_s5",
+            "sivers_ar_2025_financials_s6"
+          ],
+          "source_doc_id": "sivers_ar_2025_financials",
+          "subject_kind": "node",
+          "subject_node_id": "co:sivers_semiconductors",
+          "subject_edge_key": null,
+          "origin_entity": "Sivers Semiconductors",
+          "source_doc": {
+            "audit_ledger_path": "library/source_audits/sivers_2025_annual_report.json",
+            "storage_permission": "repo_full",
+            "source_audit_managed": true,
+            "audit_note": "2026-07-12: Ningi Research revenue-recognition allegations, going-concern concern, and pending financial restatement; review_by=2026-08-27; evidence=GitHub Issue #2 and thesis/sivers_v2_lane_memo.md",
+            "source_type": "filing",
+            "audit_review_by": "2026-08-27",
+            "audit_status": "active",
+            "title": "Sivers Semiconductors 2025 Annual Report (Financial Notes & Directors' Report)",
+            "url": "https://www.sivers-semiconductors.com/wp-content/uploads/2026/05/Sivers_annualreport_2025_2.pdf",
+            "evidence_tier": 1,
+            "audit_id": "sivers_2025_annual_report_2026_07_12",
+            "source_under_audit": true,
+            "origin_entity": "Sivers Semiconductors",
+            "permission_basis": "This is Sivers Semiconductors' official annual report, published as an original investor disclosure on the issuer's own domain. The repository retains attributed research excerpts and derived extraction with the issuer PDF URL and retrieval metadata.",
+            "id": "sivers_ar_2025_financials"
+          }
+        },
+        "sources": [
+          {
+            "id": "sivers_ar_2025_financials_s4",
+            "locator": "Directors' Report, Dependence on customers",
+            "quote": "More than 50 percent of the Group's revenue during the 2025 financial year was derived from three customers. These customers are within the Wireless business area. If these customers were to reduce or discontinue their purchases, this could negatively affect the Group's revenue over a shorter or longer period.",
+            "source_doc_id": "sivers_ar_2025_financials",
+            "origin_entity": "Sivers Semiconductors",
+            "extraction_path": "extractions/sivers_ar_2025_financials.json",
+            "source_doc": {
+              "audit_ledger_path": "library/source_audits/sivers_2025_annual_report.json",
+              "storage_permission": "repo_full",
+              "source_audit_managed": true,
+              "audit_note": "2026-07-12: Ningi Research revenue-recognition allegations, going-concern concern, and pending financial restatement; review_by=2026-08-27; evidence=GitHub Issue #2 and thesis/sivers_v2_lane_memo.md",
+              "source_type": "filing",
+              "audit_review_by": "2026-08-27",
+              "audit_status": "active",
+              "title": "Sivers Semiconductors 2025 Annual Report (Financial Notes & Directors' Report)",
+              "url": "https://www.sivers-semiconductors.com/wp-content/uploads/2026/05/Sivers_annualreport_2025_2.pdf",
+              "evidence_tier": 1,
+              "audit_id": "sivers_2025_annual_report_2026_07_12",
+              "source_under_audit": true,
+              "origin_entity": "Sivers Semiconductors",
+              "permission_basis": "This is Sivers Semiconductors' official annual report, published as an original investor disclosure on the issuer's own domain. The repository retains attributed research excerpts and derived extraction with the issuer PDF URL and retrieval metadata.",
+              "id": "sivers_ar_2025_financials"
+            }
+          },
+          {
+            "id": "sivers_ar_2025_financials_s5",
+            "locator": "Note 5, Information about major customers",
+            "quote": "During the financial year ended December 31, 2025, three customers each accounted for more than 10 percent of the Group's total revenue. Revenue from these customers amounted to SEK 183.4 million (2024: three customers, SEK 96.5 million). Customer A: SEK 79.4 (75.3) million. Customer B: SEK 55.2 (16.9) million. Customer C: SEK 48.7 (4.4) million. These revenues were attributable to the following operating segments: Customer A: Wireless. Customer B: Wireless. Customer C: Wireless. The Group does not disclose the identity of major customers.",
+            "source_doc_id": "sivers_ar_2025_financials",
+            "origin_entity": "Sivers Semiconductors",
+            "extraction_path": "extractions/sivers_ar_2025_financials.json",
+            "source_doc": {
+              "audit_ledger_path": "library/source_audits/sivers_2025_annual_report.json",
+              "storage_permission": "repo_full",
+              "source_audit_managed": true,
+              "audit_note": "2026-07-12: Ningi Research revenue-recognition allegations, going-concern concern, and pending financial restatement; review_by=2026-08-27; evidence=GitHub Issue #2 and thesis/sivers_v2_lane_memo.md",
+              "source_type": "filing",
+              "audit_review_by": "2026-08-27",
+              "audit_status": "active",
+              "title": "Sivers Semiconductors 2025 Annual Report (Financial Notes & Directors' Report)",
+              "url": "https://www.sivers-semiconductors.com/wp-content/uploads/2026/05/Sivers_annualreport_2025_2.pdf",
+              "evidence_tier": 1,
+              "audit_id": "sivers_2025_annual_report_2026_07_12",
+              "source_under_audit": true,
+              "origin_entity": "Sivers Semiconductors",
+              "permission_basis": "This is Sivers Semiconductors' official annual report, published as an original investor disclosure on the issuer's own domain. The repository retains attributed research excerpts and derived extraction with the issuer PDF URL and retrieval metadata.",
+              "id": "sivers_ar_2025_financials"
+            }
+          },
+          {
+            "id": "sivers_ar_2025_financials_s6",
+            "locator": "Note 5, Segment revenue reconciliation",
+            "quote": "Wireless: [Dec 31, 2025] 213,137 [Dec 31, 2024] 139,154. Photonics: [Dec 31, 2025] 93,420 [Dec 31, 2024] 80,053. [Total] 306,558 / 219,207.",
+            "source_doc_id": "sivers_ar_2025_financials",
+            "origin_entity": "Sivers Semiconductors",
+            "extraction_path": "extractions/sivers_ar_2025_financials.json",
+            "source_doc": {
+              "audit_ledger_path": "library/source_audits/sivers_2025_annual_report.json",
+              "storage_permission": "repo_full",
+              "source_audit_managed": true,
+              "audit_note": "2026-07-12: Ningi Research revenue-recognition allegations, going-concern concern, and pending financial restatement; review_by=2026-08-27; evidence=GitHub Issue #2 and thesis/sivers_v2_lane_memo.md",
+              "source_type": "filing",
+              "audit_review_by": "2026-08-27",
+              "audit_status": "active",
+              "title": "Sivers Semiconductors 2025 Annual Report (Financial Notes & Directors' Report)",
+              "url": "https://www.sivers-semiconductors.com/wp-content/uploads/2026/05/Sivers_annualreport_2025_2.pdf",
+              "evidence_tier": 1,
+              "audit_id": "sivers_2025_annual_report_2026_07_12",
+              "source_under_audit": true,
+              "origin_entity": "Sivers Semiconductors",
+              "permission_basis": "This is Sivers Semiconductors' official annual report, published as an original investor disclosure on the issuer's own domain. The repository retains attributed research excerpts and derived extraction with the issuer PDF URL and retrieval metadata.",
+              "id": "sivers_ar_2025_financials"
+            }
+          }
+        ]
+      },
+      {
+        "evidence_ref": "E2",
+        "item": {
+          "evidence_ref": "E2",
+          "type": "claim",
+          "claim_id": "sivers_ar_2025_financials_cl2",
+          "edge_key": null,
+          "attributes": [],
+          "assertion_ids": [],
+          "source_ids": [
+            "sivers_ar_2025_financials_s7",
+            "sivers_ar_2025_financials_s8"
+          ],
+          "purpose": "確立 Sivers FY2025 毛利率 -0.7%、原材料成本 YoY +116%，支撐量產前期成本曲線分析與 disproof condition"
+        },
+        "claim": {
+          "id": "sivers_ar_2025_financials_cl2",
+          "statement": "Sivers FY2025 group gross margin was -0.7% (gross loss SEK 2.1M on revenue SEK 306.6M), a deterioration from +1.9% in FY2024, driven by raw material costs more than doubling (+116%) as the company scales production ahead of Photonics ramp.",
+          "demand_proof_level": "confirmed",
+          "disproof_condition": "If raw material and external manufacturing costs do not decline as production volumes ramp in 2026-2027, gross margin will not recover, weakening the path to profitability.",
+          "confidence": 0.95,
+          "source_ids": [
+            "sivers_ar_2025_financials_s7",
+            "sivers_ar_2025_financials_s8"
+          ],
+          "source_doc_id": "sivers_ar_2025_financials",
+          "subject_kind": "node",
+          "subject_node_id": "co:sivers_semiconductors",
+          "subject_edge_key": null,
+          "origin_entity": "Sivers Semiconductors",
+          "source_doc": {
+            "audit_ledger_path": "library/source_audits/sivers_2025_annual_report.json",
+            "storage_permission": "repo_full",
+            "source_audit_managed": true,
+            "audit_note": "2026-07-12: Ningi Research revenue-recognition allegations, going-concern concern, and pending financial restatement; review_by=2026-08-27; evidence=GitHub Issue #2 and thesis/sivers_v2_lane_memo.md",
+            "source_type": "filing",
+            "audit_review_by": "2026-08-27",
+            "audit_status": "active",
+            "title": "Sivers Semiconductors 2025 Annual Report (Financial Notes & Directors' Report)",
+            "url": "https://www.sivers-semiconductors.com/wp-content/uploads/2026/05/Sivers_annualreport_2025_2.pdf",
+            "evidence_tier": 1,
+            "audit_id": "sivers_2025_annual_report_2026_07_12",
+            "source_under_audit": true,
+            "origin_entity": "Sivers Semiconductors",
+            "permission_basis": "This is Sivers Semiconductors' official annual report, published as an original investor disclosure on the issuer's own domain. The repository retains attributed research excerpts and derived extraction with the issuer PDF URL and retrieval metadata.",
+            "id": "sivers_ar_2025_financials"
+          }
+        },
+        "sources": [
+          {
+            "id": "sivers_ar_2025_financials_s7",
+            "locator": "Consolidated Income Statement (restated to function-of-expense format from Q4 2025)",
+            "quote": "Net sales: 306,558 (2024: 219,207). Cost of sales: -308,636 (2024: -215,015). Gross profit: -2,079 (2024: 4,192).",
+            "source_doc_id": "sivers_ar_2025_financials",
+            "origin_entity": "Sivers Semiconductors",
+            "extraction_path": "extractions/sivers_ar_2025_financials.json",
+            "source_doc": {
+              "audit_ledger_path": "library/source_audits/sivers_2025_annual_report.json",
+              "storage_permission": "repo_full",
+              "source_audit_managed": true,
+              "audit_note": "2026-07-12: Ningi Research revenue-recognition allegations, going-concern concern, and pending financial restatement; review_by=2026-08-27; evidence=GitHub Issue #2 and thesis/sivers_v2_lane_memo.md",
+              "source_type": "filing",
+              "audit_review_by": "2026-08-27",
+              "audit_status": "active",
+              "title": "Sivers Semiconductors 2025 Annual Report (Financial Notes & Directors' Report)",
+              "url": "https://www.sivers-semiconductors.com/wp-content/uploads/2026/05/Sivers_annualreport_2025_2.pdf",
+              "evidence_tier": 1,
+              "audit_id": "sivers_2025_annual_report_2026_07_12",
+              "source_under_audit": true,
+              "origin_entity": "Sivers Semiconductors",
+              "permission_basis": "This is Sivers Semiconductors' official annual report, published as an original investor disclosure on the issuer's own domain. The repository retains attributed research excerpts and derived extraction with the issuer PDF URL and retrieval metadata.",
+              "id": "sivers_ar_2025_financials"
+            }
+          },
+          {
+            "id": "sivers_ar_2025_financials_s8",
+            "locator": "Note 8/9, Cost of sales breakdown Dec 31 2025",
+            "quote": "Raw materials and consumables used: 67,575. Employee benefits expense: 82,841. Other external expenses: 88,666. Depreciation, amortization and impairment: 69,554. Total: 308,636.",
+            "source_doc_id": "sivers_ar_2025_financials",
+            "origin_entity": "Sivers Semiconductors",
+            "extraction_path": "extractions/sivers_ar_2025_financials.json",
+            "source_doc": {
+              "audit_ledger_path": "library/source_audits/sivers_2025_annual_report.json",
+              "storage_permission": "repo_full",
+              "source_audit_managed": true,
+              "audit_note": "2026-07-12: Ningi Research revenue-recognition allegations, going-concern concern, and pending financial restatement; review_by=2026-08-27; evidence=GitHub Issue #2 and thesis/sivers_v2_lane_memo.md",
+              "source_type": "filing",
+              "audit_review_by": "2026-08-27",
+              "audit_status": "active",
+              "title": "Sivers Semiconductors 2025 Annual Report (Financial Notes & Directors' Report)",
+              "url": "https://www.sivers-semiconductors.com/wp-content/uploads/2026/05/Sivers_annualreport_2025_2.pdf",
+              "evidence_tier": 1,
+              "audit_id": "sivers_2025_annual_report_2026_07_12",
+              "source_under_audit": true,
+              "origin_entity": "Sivers Semiconductors",
+              "permission_basis": "This is Sivers Semiconductors' official annual report, published as an original investor disclosure on the issuer's own domain. The repository retains attributed research excerpts and derived extraction with the issuer PDF URL and retrieval metadata.",
+              "id": "sivers_ar_2025_financials"
+            }
+          }
+        ]
+      },
+      {
+        "evidence_ref": "E3",
+        "item": {
+          "evidence_ref": "E3",
+          "type": "claim",
           "claim_id": "sivers_ar_2025_photonics_excerpt_cl4",
           "edge_key": null,
           "attributes": [],
@@ -2772,7 +3018,7 @@
             "sivers_ar_2025_photonics_excerpt_s5",
             "sivers_ar_2025_photonics_excerpt_s20"
           ],
-          "purpose": "支援需求驅動段：外部雷射源是下一代 CPO 的關鍵元件，CPO 相較傳統可插拔模組具結構性功耗優勢"
+          "purpose": "確立外部雷射源是 CPO 的關鍵組件且具功耗優勢，支撐需求驅動段的 CPO 功耗論點"
         },
         "claim": {
           "id": "sivers_ar_2025_photonics_excerpt_cl4",
@@ -2861,9 +3107,9 @@
         ]
       },
       {
-        "evidence_ref": "E2",
+        "evidence_ref": "E4",
         "item": {
-          "evidence_ref": "E2",
+          "evidence_ref": "E4",
           "type": "claim",
           "claim_id": "sivers_ar_2025_photonics_excerpt_cl1",
           "edge_key": null,
@@ -2872,7 +3118,7 @@
           "source_ids": [
             "sivers_ar_2025_photonics_excerpt_s8"
           ],
-          "purpose": "支援需求驅動段：超大規模業者預期 CW 雷射在 800G→1.6T→3.2T 演進過程中出現短缺"
+          "purpose": "確立 800G→1.6T→3.2T 過渡將導致 CW 雷射供應短缺，支撐需求驅動段的供需缺口論點"
         },
         "claim": {
           "id": "sivers_ar_2025_photonics_excerpt_cl1",
@@ -2935,9 +3181,9 @@
         ]
       },
       {
-        "evidence_ref": "E3",
+        "evidence_ref": "E5",
         "item": {
-          "evidence_ref": "E3",
+          "evidence_ref": "E5",
           "type": "claim",
           "claim_id": "sivers_ar_2025_photonics_excerpt_cl2",
           "edge_key": null,
@@ -2946,7 +3192,7 @@
           "source_ids": [
             "sivers_ar_2025_photonics_excerpt_s10"
           ],
-          "purpose": "支援需求驅動段：Sivers DWDM 雷射陣列與矽光子小晶片結合為 AI 規模擴展互連的策略性輸入"
+          "purpose": "確立 Sivers DWDM 雷射陣列與矽光子 chiplet 結合的策略定位，支撐 scale-up 算力需求驅動論點"
         },
         "claim": {
           "id": "sivers_ar_2025_photonics_excerpt_cl2",
@@ -3009,460 +3255,46 @@
         ]
       },
       {
-        "evidence_ref": "E4",
-        "item": {
-          "evidence_ref": "E4",
-          "type": "claim",
-          "claim_id": "lumentum_q3fy26_cpo_cl4",
-          "edge_key": null,
-          "attributes": [],
-          "assertion_ids": [],
-          "source_ids": [
-            "lumentum_q3fy26_cpo_s10",
-            "lumentum_q3fy26_cpo_s24"
-          ],
-          "purpose": "支援需求驅動段：ELS 模組是光學技術陌生型 CPO 客戶的主要切入產品形式，驗證 Sivers ELS 策略的市場邏輯"
-        },
-        "claim": {
-          "id": "lumentum_q3fy26_cpo_cl4",
-          "statement": "Non-primary CPO customers (those less familiar with optics) will be engaged primarily through ELS module offerings, making ELS Lumentum's key enabler for CPO market expansion beyond the primary customer.",
-          "demand_proof_level": "guided",
-          "disproof_condition": "If non-primary CPO customers bypass ELS and adopt direct laser integration or source ELS from an alternative supplier, this claim should be downgraded.",
-          "confidence": 0.85,
-          "source_ids": [
-            "lumentum_q3fy26_cpo_s10",
-            "lumentum_q3fy26_cpo_s24"
-          ],
-          "source_doc_id": "lumentum_q3fy26_cpo",
-          "subject_kind": "node",
-          "subject_node_id": "tech:external_laser_source",
-          "subject_edge_key": null,
-          "origin_entity": "Lumentum",
-          "source_doc": {
-            "storage_permission": "local_only",
-            "origin_entity": "Lumentum",
-            "permission_basis": "The source is a Motley Fool earnings transcript. Motley Fool's terms permit one intact personal, non-commercial copy but prohibit other storing, posting, and abstracts without prior written permission; source-derived raw and extraction artifacts therefore stay out of Git.",
-            "source_type": "transcript",
-            "id": "lumentum_q3fy26_cpo",
-            "title": "Lumentum Q3 FY2026 Earnings Call — ELS/CPO/UHP Laser Segment",
-            "url": "https://www.fool.com/earnings/call-transcripts/2026/05/06/lumentum-lite-q3-2026-earnings-transcript/",
-            "evidence_tier": 1
-          }
-        },
-        "sources": [
-          {
-            "id": "lumentum_q3fy26_cpo_s10",
-            "locator": "Q&A — Papa Sylla / Michael Hurlston exchange",
-            "quote": "the non-primary customer engagements are largely driven by ELS. Simply, the engineering teams there are less familiar with optics… our currency to engage those customers, at least initially, will be the ELS.",
-            "source_doc_id": "lumentum_q3fy26_cpo",
-            "origin_entity": "Lumentum",
-            "extraction_path": "extractions/lumentum_q3fy26_cpo.json",
-            "source_doc": {
-              "storage_permission": "local_only",
-              "origin_entity": "Lumentum",
-              "permission_basis": "The source is a Motley Fool earnings transcript. Motley Fool's terms permit one intact personal, non-commercial copy but prohibit other storing, posting, and abstracts without prior written permission; source-derived raw and extraction artifacts therefore stay out of Git.",
-              "source_type": "transcript",
-              "id": "lumentum_q3fy26_cpo",
-              "title": "Lumentum Q3 FY2026 Earnings Call — ELS/CPO/UHP Laser Segment",
-              "url": "https://www.fool.com/earnings/call-transcripts/2026/05/06/lumentum-lite-q3-2026-earnings-transcript/",
-              "evidence_tier": 1
-            }
-          },
-          {
-            "id": "lumentum_q3fy26_cpo_s24",
-            "locator": "SUMMARY section",
-            "quote": "Non-primary CPO customer wins are likely to be 'ELS'-driven, with vertical integration seen as a near-term catalyst for future high-margin business.",
-            "source_doc_id": "lumentum_q3fy26_cpo",
-            "origin_entity": "Lumentum",
-            "extraction_path": "extractions/lumentum_q3fy26_cpo.json",
-            "source_doc": {
-              "storage_permission": "local_only",
-              "origin_entity": "Lumentum",
-              "permission_basis": "The source is a Motley Fool earnings transcript. Motley Fool's terms permit one intact personal, non-commercial copy but prohibit other storing, posting, and abstracts without prior written permission; source-derived raw and extraction artifacts therefore stay out of Git.",
-              "source_type": "transcript",
-              "id": "lumentum_q3fy26_cpo",
-              "title": "Lumentum Q3 FY2026 Earnings Call — ELS/CPO/UHP Laser Segment",
-              "url": "https://www.fool.com/earnings/call-transcripts/2026/05/06/lumentum-lite-q3-2026-earnings-transcript/",
-              "evidence_tier": 1
-            }
-          }
-        ]
-      },
-      {
-        "evidence_ref": "E5",
-        "item": {
-          "evidence_ref": "E5",
-          "type": "edge",
-          "claim_id": null,
-          "edge_key": "edge:f06c79e5b1e989550acbc7f7abfa565d248f565ff2a91177d1f0ff41bb17c6e3",
-          "attributes": [
-            "qualification_status",
-            "ramp_execution"
-          ],
-          "assertion_ids": [
-            "sivers_ar_2025_photonics_excerpt_e8"
-          ],
-          "source_ids": [
-            "sivers_ar_2025_photonics_excerpt_s5",
-            "sivers_ar_2025_photonics_excerpt_s12"
-          ],
-          "purpose": "支援主瓶頸段及最強證據段：Sivers→O-Net ELS 模組為 qualifying 狀態，生產就緒目標 2026 年底，ramp_execution=3"
-        },
-        "edge": {
-          "edge_key": "edge:f06c79e5b1e989550acbc7f7abfa565d248f565ff2a91177d1f0ff41bb17c6e3",
-          "src_id": "co:sivers_semiconductors",
-          "src_name": "Sivers Semiconductors",
-          "relation": "SUPPLIES_TO",
-          "dst_id": "co:o_net_technologies",
-          "dst_name": "O-Net Technologies",
-          "attributes": {
-            "qualification_status": "qualifying",
-            "ramp_execution": 3
-          },
-          "open_conflict_attributes": [],
-          "attribute_resolution_meta": {
-            "qualification_status": {
-              "status": "auto",
-              "candidate_set_hash": "b43a69581c4336e1ced893b665ced78ea12061b71bb25a1c305e390b234721b6",
-              "assertion_ids": [
-                "sivers_ar_2025_photonics_excerpt_e8"
-              ],
-              "value_confidence": 0.9,
-              "as_of": null
-            },
-            "ramp_execution": {
-              "status": "auto",
-              "candidate_set_hash": "98378b228eea8882a75df66c55375a072cfdbf47c20413a2a95a02060d3a98eb",
-              "assertion_ids": [
-                "sivers_ar_2025_photonics_excerpt_e8"
-              ],
-              "value_confidence": 0.9,
-              "as_of": null
-            }
-          },
-          "assertions": {
-            "sivers_ar_2025_photonics_excerpt_e8": {
-              "id": "sivers_ar_2025_photonics_excerpt_e8",
-              "attributes": {
-                "qualification_status": "qualifying",
-                "ramp_execution": 3
-              },
-              "source_ids": [
-                "sivers_ar_2025_photonics_excerpt_s5",
-                "sivers_ar_2025_photonics_excerpt_s12"
-              ],
-              "source_doc_id": "sivers_ar_2025_photonics_excerpt",
-              "origin_entity": "Sivers Semiconductors",
-              "source_doc": {
-                "audit_ledger_path": "library/source_audits/sivers_2025_annual_report.json",
-                "storage_permission": "repo_full",
-                "source_audit_managed": true,
-                "audit_note": "2026-07-12: Ningi Research revenue-recognition allegations, going-concern concern, and pending financial restatement; review_by=2026-08-27; evidence=GitHub Issue #2 and thesis/sivers_v2_lane_memo.md",
-                "source_type": "filing",
-                "audit_review_by": "2026-08-27",
-                "audit_status": "active",
-                "title": "Sivers Semiconductors 2025 Annual Report (Photonics excerpt)",
-                "url": "https://www.sivers-semiconductors.com/wp-content/uploads/2026/05/Sivers_annualreport_2025_2.pdf",
-                "evidence_tier": 1,
-                "audit_id": "sivers_2025_annual_report_2026_07_12",
-                "source_under_audit": true,
-                "origin_entity": "Sivers Semiconductors",
-                "permission_basis": "This is Sivers Semiconductors' official annual report, published as an original investor disclosure on the issuer's own domain. The repository retains attributed research excerpts and derived extraction with the issuer PDF URL and retrieval metadata.",
-                "id": "sivers_ar_2025_photonics_excerpt"
-              }
-            }
-          }
-        },
-        "assertions": [
-          {
-            "id": "sivers_ar_2025_photonics_excerpt_e8",
-            "attributes": {
-              "qualification_status": "qualifying",
-              "ramp_execution": 3
-            },
-            "source_ids": [
-              "sivers_ar_2025_photonics_excerpt_s5",
-              "sivers_ar_2025_photonics_excerpt_s12"
-            ],
-            "source_doc_id": "sivers_ar_2025_photonics_excerpt",
-            "origin_entity": "Sivers Semiconductors",
-            "source_doc": {
-              "audit_ledger_path": "library/source_audits/sivers_2025_annual_report.json",
-              "storage_permission": "repo_full",
-              "source_audit_managed": true,
-              "audit_note": "2026-07-12: Ningi Research revenue-recognition allegations, going-concern concern, and pending financial restatement; review_by=2026-08-27; evidence=GitHub Issue #2 and thesis/sivers_v2_lane_memo.md",
-              "source_type": "filing",
-              "audit_review_by": "2026-08-27",
-              "audit_status": "active",
-              "title": "Sivers Semiconductors 2025 Annual Report (Photonics excerpt)",
-              "url": "https://www.sivers-semiconductors.com/wp-content/uploads/2026/05/Sivers_annualreport_2025_2.pdf",
-              "evidence_tier": 1,
-              "audit_id": "sivers_2025_annual_report_2026_07_12",
-              "source_under_audit": true,
-              "origin_entity": "Sivers Semiconductors",
-              "permission_basis": "This is Sivers Semiconductors' official annual report, published as an original investor disclosure on the issuer's own domain. The repository retains attributed research excerpts and derived extraction with the issuer PDF URL and retrieval metadata.",
-              "id": "sivers_ar_2025_photonics_excerpt"
-            }
-          }
-        ],
-        "sources": [
-          {
-            "id": "sivers_ar_2025_photonics_excerpt_s5",
-            "locator": "p.10, Photonics section",
-            "quote": "In April 2025, Sivers announced a strategic partnership with O-Net Technologies to produce high-performance external laser sources, a critical component for next-generation Co-Packaged Optics (CPO) in switches, network interface cards…",
-            "source_doc_id": "sivers_ar_2025_photonics_excerpt",
-            "origin_entity": "Sivers Semiconductors",
-            "extraction_path": "extractions/sivers_ar_2025.json",
-            "source_doc": {
-              "audit_ledger_path": "library/source_audits/sivers_2025_annual_report.json",
-              "storage_permission": "repo_full",
-              "source_audit_managed": true,
-              "audit_note": "2026-07-12: Ningi Research revenue-recognition allegations, going-concern concern, and pending financial restatement; review_by=2026-08-27; evidence=GitHub Issue #2 and thesis/sivers_v2_lane_memo.md",
-              "source_type": "filing",
-              "audit_review_by": "2026-08-27",
-              "audit_status": "active",
-              "title": "Sivers Semiconductors 2025 Annual Report (Photonics excerpt)",
-              "url": "https://www.sivers-semiconductors.com/wp-content/uploads/2026/05/Sivers_annualreport_2025_2.pdf",
-              "evidence_tier": 1,
-              "audit_id": "sivers_2025_annual_report_2026_07_12",
-              "source_under_audit": true,
-              "origin_entity": "Sivers Semiconductors",
-              "permission_basis": "This is Sivers Semiconductors' official annual report, published as an original investor disclosure on the issuer's own domain. The repository retains attributed research excerpts and derived extraction with the issuer PDF URL and retrieval metadata.",
-              "id": "sivers_ar_2025_photonics_excerpt"
-            }
-          },
-          {
-            "id": "sivers_ar_2025_photonics_excerpt_s12",
-            "locator": "p.10, Photonics section",
-            "quote": "prototypes will be demonstrated to customers in the first half of 2026 and production readiness targeted by year-end 2026.",
-            "source_doc_id": "sivers_ar_2025_photonics_excerpt",
-            "origin_entity": "Sivers Semiconductors",
-            "extraction_path": "extractions/sivers_ar_2025.json",
-            "source_doc": {
-              "audit_ledger_path": "library/source_audits/sivers_2025_annual_report.json",
-              "storage_permission": "repo_full",
-              "source_audit_managed": true,
-              "audit_note": "2026-07-12: Ningi Research revenue-recognition allegations, going-concern concern, and pending financial restatement; review_by=2026-08-27; evidence=GitHub Issue #2 and thesis/sivers_v2_lane_memo.md",
-              "source_type": "filing",
-              "audit_review_by": "2026-08-27",
-              "audit_status": "active",
-              "title": "Sivers Semiconductors 2025 Annual Report (Photonics excerpt)",
-              "url": "https://www.sivers-semiconductors.com/wp-content/uploads/2026/05/Sivers_annualreport_2025_2.pdf",
-              "evidence_tier": 1,
-              "audit_id": "sivers_2025_annual_report_2026_07_12",
-              "source_under_audit": true,
-              "origin_entity": "Sivers Semiconductors",
-              "permission_basis": "This is Sivers Semiconductors' official annual report, published as an original investor disclosure on the issuer's own domain. The repository retains attributed research excerpts and derived extraction with the issuer PDF URL and retrieval metadata.",
-              "id": "sivers_ar_2025_photonics_excerpt"
-            }
-          }
-        ]
-      },
-      {
         "evidence_ref": "E6",
         "item": {
           "evidence_ref": "E6",
           "type": "claim",
-          "claim_id": "semiconductor_today_sivers_ayar_1m_order_2023_07_03_cl1",
+          "claim_id": "sivers_gf_pr_2026_06_02_cl1",
           "edge_key": null,
           "attributes": [],
           "assertion_ids": [],
           "source_ids": [
-            "semiconductor_today_sivers_ayar_1m_order_2023_07_03_s1",
-            "semiconductor_today_sivers_ayar_1m_order_2023_07_03_s2"
+            "sivers_gf_pr_2026_06_02_s2",
+            "sivers_gf_pr_2026_06_02_s4"
           ],
-          "purpose": "支援最強證據段：第三方獨立媒體確認 Sivers DFB 雷射陣列為 Ayar Labs SuperNova 光源，具體商業訂單（$1M）記錄"
+          "purpose": "確立 Sivers 雷射陣列進入 GF 矽光子參考設計與 SCALE 平台（qualifying 階段），支撐平台化路線論點與 Stack 摘要"
         },
         "claim": {
-          "id": "semiconductor_today_sivers_ayar_1m_order_2023_07_03_cl1",
-          "statement": "Independent trade-press (Semiconductor Today, 2023-07-03) reports Sivers Photonics received a $1m order and that its DFB laser arrays provide the light source for Ayar Labs' SuperNova — a non-Sivers, non-aleabitoreddit origin corroborating the Sivers→Ayar Labs supply relationship as a concrete commercial order rather than a customer-map inference.",
-          "demand_proof_level": "confirmed",
-          "disproof_condition": "If Ayar Labs publicly qualifies an alternative DFB laser-array supplier for SuperNova, or Sivers discloses loss of the Ayar program, downgrade.",
-          "confidence": 0.6,
+          "id": "sivers_gf_pr_2026_06_02_cl1",
+          "statement": "Sivers laser arrays will be integrated into GlobalFoundries silicon photonics reference designs and offered in GF's SCALE CPO platform, giving Sivers a foundry-platform route-to-market for CPO/LPO optical engines (announced June 2, 2026; not yet a customer design win).",
+          "demand_proof_level": "guided",
+          "disproof_condition": "If GF reference designs fail to convert into customer design wins within 12-18 months, or GF qualifies alternative laser suppliers (e.g. Lumentum, Coherent, AAOI) into the SCALE platform, downgrade this claim.",
+          "confidence": 0.65,
           "source_ids": [
-            "semiconductor_today_sivers_ayar_1m_order_2023_07_03_s1",
-            "semiconductor_today_sivers_ayar_1m_order_2023_07_03_s2"
+            "sivers_gf_pr_2026_06_02_s2",
+            "sivers_gf_pr_2026_06_02_s4"
           ],
-          "source_doc_id": "semiconductor_today_sivers_ayar_1m_order_2023_07_03",
+          "source_doc_id": "sivers_gf_pr_2026_06_02",
           "subject_kind": "node",
           "subject_node_id": "co:sivers_semiconductors",
           "subject_edge_key": null,
-          "origin_entity": "Semiconductor Today",
+          "origin_entity": "Sivers Semiconductors",
           "source_doc": {
-            "storage_permission": "repo_excerpt",
-            "origin_entity": "Semiconductor Today",
-            "permission_basis": "Third-party trade publication (Semiconductor Today, Juno Publishing and Media Solutions Ltd); copyrighted editorial. Repository retains only the canonical URL, limited verbatim excerpts needed for evidence, and derived research — not the full article text.",
-            "source_type": "industry_report",
-            "id": "semiconductor_today_sivers_ayar_1m_order_2023_07_03",
-            "title": "Sivers Photonics receives $1m order from Ayar Labs (Semiconductor Today, July 3, 2023)",
-            "url": "https://www.semiconductor-today.com/news_items/2023/jul/sivers-photonics-030723.shtml",
-            "evidence_tier": 3
-          }
-        },
-        "sources": [
-          {
-            "id": "semiconductor_today_sivers_ayar_1m_order_2023_07_03_s1",
-            "locator": "article body",
-            "quote": "Sivers Photonics of Glasgow, Scotland, UK has received a new order worth $1m",
-            "source_doc_id": "semiconductor_today_sivers_ayar_1m_order_2023_07_03",
-            "origin_entity": "Semiconductor Today",
-            "extraction_path": "extractions/semiconductor_today_sivers_ayar_1m_order_2023_07_03.json",
-            "source_doc": {
-              "storage_permission": "repo_excerpt",
-              "origin_entity": "Semiconductor Today",
-              "permission_basis": "Third-party trade publication (Semiconductor Today, Juno Publishing and Media Solutions Ltd); copyrighted editorial. Repository retains only the canonical URL, limited verbatim excerpts needed for evidence, and derived research — not the full article text.",
-              "source_type": "industry_report",
-              "id": "semiconductor_today_sivers_ayar_1m_order_2023_07_03",
-              "title": "Sivers Photonics receives $1m order from Ayar Labs (Semiconductor Today, July 3, 2023)",
-              "url": "https://www.semiconductor-today.com/news_items/2023/jul/sivers-photonics-030723.shtml",
-              "evidence_tier": 3
-            }
-          },
-          {
-            "id": "semiconductor_today_sivers_ayar_1m_order_2023_07_03_s2",
-            "locator": "article body",
-            "quote": "DFB laser arrays provide the high-quality light source for Ayar Labs' SuperNova remote optical source product",
-            "source_doc_id": "semiconductor_today_sivers_ayar_1m_order_2023_07_03",
-            "origin_entity": "Semiconductor Today",
-            "extraction_path": "extractions/semiconductor_today_sivers_ayar_1m_order_2023_07_03.json",
-            "source_doc": {
-              "storage_permission": "repo_excerpt",
-              "origin_entity": "Semiconductor Today",
-              "permission_basis": "Third-party trade publication (Semiconductor Today, Juno Publishing and Media Solutions Ltd); copyrighted editorial. Repository retains only the canonical URL, limited verbatim excerpts needed for evidence, and derived research — not the full article text.",
-              "source_type": "industry_report",
-              "id": "semiconductor_today_sivers_ayar_1m_order_2023_07_03",
-              "title": "Sivers Photonics receives $1m order from Ayar Labs (Semiconductor Today, July 3, 2023)",
-              "url": "https://www.semiconductor-today.com/news_items/2023/jul/sivers-photonics-030723.shtml",
-              "evidence_tier": 3
-            }
-          }
-        ]
-      },
-      {
-        "evidence_ref": "E7",
-        "item": {
-          "evidence_ref": "E7",
-          "type": "edge",
-          "claim_id": null,
-          "edge_key": "edge:a5ee8f38530b9406a5440fd998de21284ecdf9516a31fe316d7c91cf2716abb8",
-          "attributes": [
-            "qualification_status"
-          ],
-          "assertion_ids": [
-            "sivers_gf_pr_2026_06_02_e1"
-          ],
-          "source_ids": [
-            "sivers_gf_pr_2026_06_02_s2"
-          ],
-          "purpose": "支援 Variant Perception 及主瓶頸段：Sivers→GF 矽光子平台合作為 qualifying 狀態，提供平台型路徑至市場但尚無 design win 確認"
-        },
-        "edge": {
-          "edge_key": "edge:a5ee8f38530b9406a5440fd998de21284ecdf9516a31fe316d7c91cf2716abb8",
-          "src_id": "co:sivers_semiconductors",
-          "src_name": "Sivers Semiconductors",
-          "relation": "SUPPLIES_TO",
-          "dst_id": "co:globalfoundries",
-          "dst_name": "GlobalFoundries",
-          "attributes": {
-            "qualification_status": "qualifying"
-          },
-          "open_conflict_attributes": [],
-          "attribute_resolution_meta": {
-            "qualification_status": {
-              "status": "auto",
-              "candidate_set_hash": "68eae7e08f25b5ae2cf8465edc2c77511a15646fcce01606ce8eae45353d50a4",
-              "assertion_ids": [
-                "sivers_gf_pr_2026_06_02_e1"
-              ],
-              "value_confidence": 0.65,
-              "as_of": null
-            }
-          },
-          "assertions": {
-            "opticsorg_sivers_gf_2026_06_02_e1": {
-              "id": "opticsorg_sivers_gf_2026_06_02_e1",
-              "attributes": {},
-              "source_ids": [
-                "opticsorg_sivers_gf_2026_06_02_s1"
-              ],
-              "source_doc_id": "opticsorg_sivers_gf_2026_06_02",
-              "origin_entity": "optics.org",
-              "source_doc": {
-                "storage_permission": "repo_excerpt",
-                "origin_entity": "optics.org",
-                "permission_basis": "Third-party trade publication (optics.org, published by SPIE); copyrighted editorial. Repository retains only the canonical URL, limited verbatim excerpts needed for evidence, and derived research — not the full article text.",
-                "source_type": "industry_report",
-                "id": "opticsorg_sivers_gf_2026_06_02",
-                "title": "Sivers to provide lasers for GlobalFoundries; Nvidia ramps optical AI 'engine' (optics.org, June 2, 2026)",
-                "url": "https://optics.org/news/sivers-to-provide-lasers-for-globalfoundries-nvidia-ramps-optical-ai-engine",
-                "evidence_tier": 3
-              }
-            },
-            "semiconductor_today_sivers_gf_2026_06_02_e1": {
-              "id": "semiconductor_today_sivers_gf_2026_06_02_e1",
-              "attributes": {},
-              "source_ids": [
-                "semiconductor_today_sivers_gf_2026_06_02_s1"
-              ],
-              "source_doc_id": "semiconductor_today_sivers_gf_2026_06_02",
-              "origin_entity": "Semiconductor Today",
-              "source_doc": {
-                "storage_permission": "repo_excerpt",
-                "origin_entity": "Semiconductor Today",
-                "permission_basis": "Third-party trade publication (Semiconductor Today, Juno Publishing and Media Solutions Ltd); copyrighted editorial. Repository retains only the canonical URL, limited verbatim excerpts needed for evidence, and derived research — not the full article text.",
-                "source_type": "industry_report",
-                "id": "semiconductor_today_sivers_gf_2026_06_02",
-                "title": "Sivers & GlobalFoundries advance AI data center optical solutions (Semiconductor Today, June 2, 2026)",
-                "url": "https://www.semiconductor-today.com/news_items/2026/jun/SIVERS-GF-020626.shtml",
-                "evidence_tier": 3
-              }
-            },
-            "sivers_gf_pr_2026_06_02_e1": {
-              "id": "sivers_gf_pr_2026_06_02_e1",
-              "attributes": {
-                "qualification_status": "qualifying"
-              },
-              "source_ids": [
-                "sivers_gf_pr_2026_06_02_s2"
-              ],
-              "source_doc_id": "sivers_gf_pr_2026_06_02",
-              "origin_entity": "Sivers Semiconductors",
-              "source_doc": {
-                "storage_permission": "repo_full",
-                "origin_entity": "Sivers Semiconductors",
-                "permission_basis": "This is an issuer-authored press release published as an original disclosure on Sivers Semiconductors' official newsroom. The repository retains the attributed extraction and canonical issuer URL.",
-                "source_type": "news",
-                "id": "sivers_gf_pr_2026_06_02",
-                "title": "Sivers & GlobalFoundries Advance AI Data Center Optical Solutions (Sivers press release, June 2, 2026)",
-                "url": "https://www.sivers-semiconductors.com/press/sivers-globalfoundries-advance-ai-data-center-optical-solutions/",
-                "evidence_tier": 2
-              }
-            }
-          }
-        },
-        "assertions": [
-          {
-            "id": "sivers_gf_pr_2026_06_02_e1",
-            "attributes": {
-              "qualification_status": "qualifying"
-            },
-            "source_ids": [
-              "sivers_gf_pr_2026_06_02_s2"
-            ],
-            "source_doc_id": "sivers_gf_pr_2026_06_02",
+            "storage_permission": "repo_full",
             "origin_entity": "Sivers Semiconductors",
-            "source_doc": {
-              "storage_permission": "repo_full",
-              "origin_entity": "Sivers Semiconductors",
-              "permission_basis": "This is an issuer-authored press release published as an original disclosure on Sivers Semiconductors' official newsroom. The repository retains the attributed extraction and canonical issuer URL.",
-              "source_type": "news",
-              "id": "sivers_gf_pr_2026_06_02",
-              "title": "Sivers & GlobalFoundries Advance AI Data Center Optical Solutions (Sivers press release, June 2, 2026)",
-              "url": "https://www.sivers-semiconductors.com/press/sivers-globalfoundries-advance-ai-data-center-optical-solutions/",
-              "evidence_tier": 2
-            }
+            "permission_basis": "This is an issuer-authored press release published as an original disclosure on Sivers Semiconductors' official newsroom. The repository retains the attributed extraction and canonical issuer URL.",
+            "source_type": "news",
+            "id": "sivers_gf_pr_2026_06_02",
+            "title": "Sivers & GlobalFoundries Advance AI Data Center Optical Solutions (Sivers press release, June 2, 2026)",
+            "url": "https://www.sivers-semiconductors.com/press/sivers-globalfoundries-advance-ai-data-center-optical-solutions/",
+            "evidence_tier": 2
           }
-        ],
+        },
         "sources": [
           {
             "id": "sivers_gf_pr_2026_06_02_s2",
@@ -3481,6 +3313,104 @@
               "url": "https://www.sivers-semiconductors.com/press/sivers-globalfoundries-advance-ai-data-center-optical-solutions/",
               "evidence_tier": 2
             }
+          },
+          {
+            "id": "sivers_gf_pr_2026_06_02_s4",
+            "locator": "press release, para 1",
+            "quote": "Sivers' laser arrays will also be available in GF's Silicon Photonics Co-packaged Advanced Light Engine (SCALE™) platform for next-generation optical sub-assemblies and light engine architectures",
+            "source_doc_id": "sivers_gf_pr_2026_06_02",
+            "origin_entity": "Sivers Semiconductors",
+            "extraction_path": "extractions/sivers_gf_pr_2026_06_02.json",
+            "source_doc": {
+              "storage_permission": "repo_full",
+              "origin_entity": "Sivers Semiconductors",
+              "permission_basis": "This is an issuer-authored press release published as an original disclosure on Sivers Semiconductors' official newsroom. The repository retains the attributed extraction and canonical issuer URL.",
+              "source_type": "news",
+              "id": "sivers_gf_pr_2026_06_02",
+              "title": "Sivers & GlobalFoundries Advance AI Data Center Optical Solutions (Sivers press release, June 2, 2026)",
+              "url": "https://www.sivers-semiconductors.com/press/sivers-globalfoundries-advance-ai-data-center-optical-solutions/",
+              "evidence_tier": 2
+            }
+          }
+        ]
+      },
+      {
+        "evidence_ref": "E7",
+        "item": {
+          "evidence_ref": "E7",
+          "type": "claim",
+          "claim_id": "opticsorg_sivers_gf_2026_06_02_cl1",
+          "edge_key": null,
+          "attributes": [],
+          "assertion_ids": [],
+          "source_ids": [
+            "opticsorg_sivers_gf_2026_06_02_s1",
+            "opticsorg_sivers_gf_2026_06_02_s2"
+          ],
+          "purpose": "獨立貿易媒體（optics.org）佐證 Sivers-GF SCALE 合作，提升 E6 的來源多樣性，支撐平台路線 GF 節點"
+        },
+        "claim": {
+          "id": "opticsorg_sivers_gf_2026_06_02_cl1",
+          "statement": "Independent trade-press (optics.org) confirmation, dated 2026-06-02, that Sivers laser arrays will be integrated into GlobalFoundries silicon photonics reference designs and the SCALE co-packaged light engine module — a non-Sivers origin corroborating the Sivers-GF supply relationship.",
+          "demand_proof_level": "guided",
+          "disproof_condition": "If GF publicly names an alternative primary laser-array supplier for its silicon photonics reference designs / SCALE module, or the collaboration lapses without design wins within 12-18 months, downgrade.",
+          "confidence": 0.6,
+          "source_ids": [
+            "opticsorg_sivers_gf_2026_06_02_s1",
+            "opticsorg_sivers_gf_2026_06_02_s2"
+          ],
+          "source_doc_id": "opticsorg_sivers_gf_2026_06_02",
+          "subject_kind": "node",
+          "subject_node_id": "co:sivers_semiconductors",
+          "subject_edge_key": null,
+          "origin_entity": "optics.org",
+          "source_doc": {
+            "storage_permission": "repo_excerpt",
+            "origin_entity": "optics.org",
+            "permission_basis": "Third-party trade publication (optics.org, published by SPIE); copyrighted editorial. Repository retains only the canonical URL, limited verbatim excerpts needed for evidence, and derived research — not the full article text.",
+            "source_type": "industry_report",
+            "id": "opticsorg_sivers_gf_2026_06_02",
+            "title": "Sivers to provide lasers for GlobalFoundries; Nvidia ramps optical AI 'engine' (optics.org, June 2, 2026)",
+            "url": "https://optics.org/news/sivers-to-provide-lasers-for-globalfoundries-nvidia-ramps-optical-ai-engine",
+            "evidence_tier": 3
+          }
+        },
+        "sources": [
+          {
+            "id": "opticsorg_sivers_gf_2026_06_02_s1",
+            "locator": "article body",
+            "quote": "Sivers says that its laser arrays will be integrated into reference designs built on GF's silicon photonics platform, for technologies including co-packaged optics (CPO) and linear pluggable optics (LPO).",
+            "source_doc_id": "opticsorg_sivers_gf_2026_06_02",
+            "origin_entity": "optics.org",
+            "extraction_path": "extractions/opticsorg_sivers_gf_2026_06_02.json",
+            "source_doc": {
+              "storage_permission": "repo_excerpt",
+              "origin_entity": "optics.org",
+              "permission_basis": "Third-party trade publication (optics.org, published by SPIE); copyrighted editorial. Repository retains only the canonical URL, limited verbatim excerpts needed for evidence, and derived research — not the full article text.",
+              "source_type": "industry_report",
+              "id": "opticsorg_sivers_gf_2026_06_02",
+              "title": "Sivers to provide lasers for GlobalFoundries; Nvidia ramps optical AI 'engine' (optics.org, June 2, 2026)",
+              "url": "https://optics.org/news/sivers-to-provide-lasers-for-globalfoundries-nvidia-ramps-optical-ai-engine",
+              "evidence_tier": 3
+            }
+          },
+          {
+            "id": "opticsorg_sivers_gf_2026_06_02_s2",
+            "locator": "article body",
+            "quote": "The laser emitters will also feature in GF's recently announced silicon photonics co-packaged advanced light engine (SCALE) optical module for CPO, which is expected to accelerate the adoption of optical scale-up interconnects.",
+            "source_doc_id": "opticsorg_sivers_gf_2026_06_02",
+            "origin_entity": "optics.org",
+            "extraction_path": "extractions/opticsorg_sivers_gf_2026_06_02.json",
+            "source_doc": {
+              "storage_permission": "repo_excerpt",
+              "origin_entity": "optics.org",
+              "permission_basis": "Third-party trade publication (optics.org, published by SPIE); copyrighted editorial. Repository retains only the canonical URL, limited verbatim excerpts needed for evidence, and derived research — not the full article text.",
+              "source_type": "industry_report",
+              "id": "opticsorg_sivers_gf_2026_06_02",
+              "title": "Sivers to provide lasers for GlobalFoundries; Nvidia ramps optical AI 'engine' (optics.org, June 2, 2026)",
+              "url": "https://optics.org/news/sivers-to-provide-lasers-for-globalfoundries-nvidia-ramps-optical-ai-engine",
+              "evidence_tier": 3
+            }
           }
         ]
       },
@@ -3497,7 +3427,7 @@
             "enablence_sivers_onet_ofc_pr_2026_03_17_s2",
             "enablence_sivers_onet_ofc_pr_2026_03_17_s3"
           ],
-          "purpose": "支援 Variant Perception 及需求驅動段：三方 8 通道 ELS 模組宣布，具體化 Sivers-O-Net 合作為針對 AI 資料中心的定義產品"
+          "purpose": "確立 Sivers-O-Net-Enablence 三方 8 通道 ELS 模組合作具體產品與角色分工，支撐需求驅動段平台化論點與最強證據"
         },
         "claim": {
           "id": "enablence_sivers_onet_ofc_pr_2026_03_17_cl1",
@@ -3568,6 +3498,215 @@
         "evidence_ref": "E9",
         "item": {
           "evidence_ref": "E9",
+          "type": "claim",
+          "claim_id": "lumentum_q3fy26_cpo_cl3",
+          "edge_key": null,
+          "attributes": [],
+          "assertion_ids": [],
+          "source_ids": [
+            "lumentum_q3fy26_cpo_s25",
+            "lumentum_q3fy26_cpo_s4"
+          ],
+          "purpose": "確立 Lumentum 新 Greensboro InP 廠需約 6 個季度以上才能貢獻收入，支撐 InP 供應短缺窗口論點"
+        },
+        "claim": {
+          "id": "lumentum_q3fy26_cpo_cl3",
+          "statement": "Lumentum's new Greensboro InP fab will not contribute to revenue for approximately six or more quarters (roughly 18 months from mid-2026).",
+          "demand_proof_level": "guided",
+          "disproof_condition": "If the fab conversion and qualification proceed faster than expected and revenue contributions appear before Q1 2028, this claim should be downgraded.",
+          "confidence": 0.9,
+          "source_ids": [
+            "lumentum_q3fy26_cpo_s25",
+            "lumentum_q3fy26_cpo_s4"
+          ],
+          "source_doc_id": "lumentum_q3fy26_cpo",
+          "subject_kind": "node",
+          "subject_node_id": "co:lumentum",
+          "subject_edge_key": null,
+          "origin_entity": "Lumentum",
+          "source_doc": {
+            "storage_permission": "local_only",
+            "origin_entity": "Lumentum",
+            "permission_basis": "The source is a Motley Fool earnings transcript. Motley Fool's terms permit one intact personal, non-commercial copy but prohibit other storing, posting, and abstracts without prior written permission; source-derived raw and extraction artifacts therefore stay out of Git.",
+            "source_type": "transcript",
+            "id": "lumentum_q3fy26_cpo",
+            "title": "Lumentum Q3 FY2026 Earnings Call — ELS/CPO/UHP Laser Segment",
+            "url": "https://www.fool.com/earnings/call-transcripts/2026/05/06/lumentum-lite-q3-2026-earnings-transcript/",
+            "evidence_tier": 1
+          }
+        },
+        "sources": [
+          {
+            "id": "lumentum_q3fy26_cpo_s25",
+            "locator": "SUMMARY section",
+            "quote": "new Greensboro indium phosphide fab capacity is not yet included in revenue projections, with line contributions starting 'six or so quarters away.'",
+            "source_doc_id": "lumentum_q3fy26_cpo",
+            "origin_entity": "Lumentum",
+            "extraction_path": "extractions/lumentum_q3fy26_cpo.json",
+            "source_doc": {
+              "storage_permission": "local_only",
+              "origin_entity": "Lumentum",
+              "permission_basis": "The source is a Motley Fool earnings transcript. Motley Fool's terms permit one intact personal, non-commercial copy but prohibit other storing, posting, and abstracts without prior written permission; source-derived raw and extraction artifacts therefore stay out of Git.",
+              "source_type": "transcript",
+              "id": "lumentum_q3fy26_cpo",
+              "title": "Lumentum Q3 FY2026 Earnings Call — ELS/CPO/UHP Laser Segment",
+              "url": "https://www.fool.com/earnings/call-transcripts/2026/05/06/lumentum-lite-q3-2026-earnings-transcript/",
+              "evidence_tier": 1
+            }
+          },
+          {
+            "id": "lumentum_q3fy26_cpo_s4",
+            "locator": "CEO prepared remarks, para 2",
+            "quote": "we announced our acquisition of a fifth indium phosphide fab in Greensboro, North Carolina, which provides the capacity needed for years of future growth… plans to convert the facility from gallium arsenide to indium phosphide are well underway.",
+            "source_doc_id": "lumentum_q3fy26_cpo",
+            "origin_entity": "Lumentum",
+            "extraction_path": "extractions/lumentum_q3fy26_cpo.json",
+            "source_doc": {
+              "storage_permission": "local_only",
+              "origin_entity": "Lumentum",
+              "permission_basis": "The source is a Motley Fool earnings transcript. Motley Fool's terms permit one intact personal, non-commercial copy but prohibit other storing, posting, and abstracts without prior written permission; source-derived raw and extraction artifacts therefore stay out of Git.",
+              "source_type": "transcript",
+              "id": "lumentum_q3fy26_cpo",
+              "title": "Lumentum Q3 FY2026 Earnings Call — ELS/CPO/UHP Laser Segment",
+              "url": "https://www.fool.com/earnings/call-transcripts/2026/05/06/lumentum-lite-q3-2026-earnings-transcript/",
+              "evidence_tier": 1
+            }
+          }
+        ]
+      },
+      {
+        "evidence_ref": "E10",
+        "item": {
+          "evidence_ref": "E10",
+          "type": "edge",
+          "claim_id": null,
+          "edge_key": "edge:37d1b83d0edf43f8a7f223845f9dc04c011a51b00b47d61324ac725cd1dcc5fc",
+          "attributes": [
+            "qualification_status"
+          ],
+          "assertion_ids": [
+            "sivers_ar_2025_photonics_excerpt_e6"
+          ],
+          "source_ids": [
+            "sivers_ar_2025_photonics_excerpt_s9"
+          ],
+          "purpose": "確立 Sivers CW DFB 雷射目前為 sampling 狀態，支撐主瓶頸段的執行階段評估"
+        },
+        "edge": {
+          "edge_key": "edge:37d1b83d0edf43f8a7f223845f9dc04c011a51b00b47d61324ac725cd1dcc5fc",
+          "src_id": "co:sivers_semiconductors",
+          "src_name": "Sivers Semiconductors",
+          "relation": "SUPPLIES_TO",
+          "dst_id": "tech:cw_dfb_laser",
+          "dst_name": "High-power CW DFB laser",
+          "attributes": {
+            "qualification_status": "sampling"
+          },
+          "open_conflict_attributes": [],
+          "attribute_resolution_meta": {
+            "qualification_status": {
+              "status": "auto",
+              "candidate_set_hash": "a91cfdb28b7bf3709bbd76851f330cb744d1f04b34270491412aafb760b6a436",
+              "assertion_ids": [
+                "sivers_ar_2025_photonics_excerpt_e6"
+              ],
+              "value_confidence": 0.9,
+              "as_of": null
+            }
+          },
+          "assertions": {
+            "sivers_ar_2025_photonics_excerpt_e6": {
+              "id": "sivers_ar_2025_photonics_excerpt_e6",
+              "attributes": {
+                "qualification_status": "sampling"
+              },
+              "source_ids": [
+                "sivers_ar_2025_photonics_excerpt_s9"
+              ],
+              "source_doc_id": "sivers_ar_2025_photonics_excerpt",
+              "origin_entity": "Sivers Semiconductors",
+              "source_doc": {
+                "audit_ledger_path": "library/source_audits/sivers_2025_annual_report.json",
+                "storage_permission": "repo_full",
+                "source_audit_managed": true,
+                "audit_note": "2026-07-12: Ningi Research revenue-recognition allegations, going-concern concern, and pending financial restatement; review_by=2026-08-27; evidence=GitHub Issue #2 and thesis/sivers_v2_lane_memo.md",
+                "source_type": "filing",
+                "audit_review_by": "2026-08-27",
+                "audit_status": "active",
+                "title": "Sivers Semiconductors 2025 Annual Report (Photonics excerpt)",
+                "url": "https://www.sivers-semiconductors.com/wp-content/uploads/2026/05/Sivers_annualreport_2025_2.pdf",
+                "evidence_tier": 1,
+                "audit_id": "sivers_2025_annual_report_2026_07_12",
+                "source_under_audit": true,
+                "origin_entity": "Sivers Semiconductors",
+                "permission_basis": "This is Sivers Semiconductors' official annual report, published as an original investor disclosure on the issuer's own domain. The repository retains attributed research excerpts and derived extraction with the issuer PDF URL and retrieval metadata.",
+                "id": "sivers_ar_2025_photonics_excerpt"
+              }
+            }
+          }
+        },
+        "assertions": [
+          {
+            "id": "sivers_ar_2025_photonics_excerpt_e6",
+            "attributes": {
+              "qualification_status": "sampling"
+            },
+            "source_ids": [
+              "sivers_ar_2025_photonics_excerpt_s9"
+            ],
+            "source_doc_id": "sivers_ar_2025_photonics_excerpt",
+            "origin_entity": "Sivers Semiconductors",
+            "source_doc": {
+              "audit_ledger_path": "library/source_audits/sivers_2025_annual_report.json",
+              "storage_permission": "repo_full",
+              "source_audit_managed": true,
+              "audit_note": "2026-07-12: Ningi Research revenue-recognition allegations, going-concern concern, and pending financial restatement; review_by=2026-08-27; evidence=GitHub Issue #2 and thesis/sivers_v2_lane_memo.md",
+              "source_type": "filing",
+              "audit_review_by": "2026-08-27",
+              "audit_status": "active",
+              "title": "Sivers Semiconductors 2025 Annual Report (Photonics excerpt)",
+              "url": "https://www.sivers-semiconductors.com/wp-content/uploads/2026/05/Sivers_annualreport_2025_2.pdf",
+              "evidence_tier": 1,
+              "audit_id": "sivers_2025_annual_report_2026_07_12",
+              "source_under_audit": true,
+              "origin_entity": "Sivers Semiconductors",
+              "permission_basis": "This is Sivers Semiconductors' official annual report, published as an original investor disclosure on the issuer's own domain. The repository retains attributed research excerpts and derived extraction with the issuer PDF URL and retrieval metadata.",
+              "id": "sivers_ar_2025_photonics_excerpt"
+            }
+          }
+        ],
+        "sources": [
+          {
+            "id": "sivers_ar_2025_photonics_excerpt_s9",
+            "locator": "p.10, Photonics section",
+            "quote": "We currently have strong traction and interest sampling our CW DFB lasers to several pluggable transceiver manufacturers world-wide.",
+            "source_doc_id": "sivers_ar_2025_photonics_excerpt",
+            "origin_entity": "Sivers Semiconductors",
+            "extraction_path": "extractions/sivers_ar_2025.json",
+            "source_doc": {
+              "audit_ledger_path": "library/source_audits/sivers_2025_annual_report.json",
+              "storage_permission": "repo_full",
+              "source_audit_managed": true,
+              "audit_note": "2026-07-12: Ningi Research revenue-recognition allegations, going-concern concern, and pending financial restatement; review_by=2026-08-27; evidence=GitHub Issue #2 and thesis/sivers_v2_lane_memo.md",
+              "source_type": "filing",
+              "audit_review_by": "2026-08-27",
+              "audit_status": "active",
+              "title": "Sivers Semiconductors 2025 Annual Report (Photonics excerpt)",
+              "url": "https://www.sivers-semiconductors.com/wp-content/uploads/2026/05/Sivers_annualreport_2025_2.pdf",
+              "evidence_tier": 1,
+              "audit_id": "sivers_2025_annual_report_2026_07_12",
+              "source_under_audit": true,
+              "origin_entity": "Sivers Semiconductors",
+              "permission_basis": "This is Sivers Semiconductors' official annual report, published as an original investor disclosure on the issuer's own domain. The repository retains attributed research excerpts and derived extraction with the issuer PDF URL and retrieval metadata.",
+              "id": "sivers_ar_2025_photonics_excerpt"
+            }
+          }
+        ]
+      },
+      {
+        "evidence_ref": "E11",
+        "item": {
+          "evidence_ref": "E11",
           "type": "edge",
           "claim_id": null,
           "edge_key": "edge:15d7af33e42502ce404ed699c4f17c1e284456f025964460a1d7f71a960681e8",
@@ -3582,7 +3721,7 @@
             "sivers_ar_2025_photonics_excerpt_s7",
             "sivers_ar_2025_photonics_excerpt_s15"
           ],
-          "purpose": "支援 Variant Perception 及主瓶頸段：Win Semiconductor→Sivers 為量產布局的 qualifying 狀態，ramp_execution=4 顯示執行難度偏高"
+          "purpose": "確立 Win Semiconductor 為 Sivers 高產能製造合作夥伴（qualifying），支撐 Stack 摘要的晶片製造層分析"
         },
         "edge": {
           "edge_key": "edge:15d7af33e42502ce404ed699c4f17c1e284456f025964460a1d7f71a960681e8",
@@ -3768,318 +3907,130 @@
         ]
       },
       {
-        "evidence_ref": "E10",
+        "evidence_ref": "E12",
         "item": {
-          "evidence_ref": "E10",
+          "evidence_ref": "E12",
           "type": "edge",
           "claim_id": null,
-          "edge_key": "edge:60c5c41ce38247c69feb0050b787e6a68b7db943e5179c1ec2c199373d1abd9d",
+          "edge_key": "edge:4cb1aff422df37fd3107efb6e9b906d11874d2831134fbd2a0cbeea6b7198f80",
           "attributes": [
             "qualification_status",
-            "sole_source"
+            "ramp_execution"
           ],
           "assertion_ids": [
-            "aleabitoreddit_sivers_cpo_customer_map_e1"
+            "sivers_ar_2025_photonics_excerpt_e10"
           ],
           "source_ids": [
-            "aleabitoreddit_sivers_cpo_customer_map_s1"
+            "sivers_ar_2025_photonics_excerpt_s4",
+            "sivers_ar_2025_photonics_excerpt_s6"
           ],
-          "purpose": "支援主瓶頸段：確認 Sivers→Ayar Labs 邊 sole_source=False，qualification_status=none，不可用作 sole_source 主張"
+          "purpose": "確立 Sivers→POET 供應關係為 sampling 階段（ramp_execution=3），支撐模組整合層分析與替代風險討論"
         },
         "edge": {
-          "edge_key": "edge:60c5c41ce38247c69feb0050b787e6a68b7db943e5179c1ec2c199373d1abd9d",
+          "edge_key": "edge:4cb1aff422df37fd3107efb6e9b906d11874d2831134fbd2a0cbeea6b7198f80",
           "src_id": "co:sivers_semiconductors",
           "src_name": "Sivers Semiconductors",
           "relation": "SUPPLIES_TO",
-          "dst_id": "co:ayar_labs",
-          "dst_name": "Ayar Labs",
+          "dst_id": "co:poet_technologies",
+          "dst_name": "POET Technologies",
           "attributes": {
-            "note": "Tier-3 article says Sivers was listed as Ayar Labs' laser supplier; no current qualification or volume status is established.",
-            "qualification_status": "none",
-            "sole_source": false
+            "qualification_status": "sampling",
+            "ramp_execution": 3
           },
           "open_conflict_attributes": [],
           "attribute_resolution_meta": {
-            "note": {
-              "status": "auto",
-              "candidate_set_hash": "80dca3c3b6580430cd09c79205801cbc8f647076b5a0fe1cae00dd45a474ede1",
-              "assertion_ids": [
-                "aleabitoreddit_sivers_cpo_customer_map_e1"
-              ],
-              "value_confidence": 0.55,
-              "as_of": null
-            },
             "qualification_status": {
               "status": "auto",
-              "candidate_set_hash": "ce88fd39d7fe197a8b9fbd639cb9db0208350466a5c0ecc0570172885ab06b5c",
+              "candidate_set_hash": "0bc7d7702c24b3863390046e4e29de538718fdc016d60886d557e0d5814ec16b",
               "assertion_ids": [
-                "aleabitoreddit_sivers_cpo_customer_map_e1"
+                "sivers_ar_2025_photonics_excerpt_e10"
               ],
-              "value_confidence": 0.55,
+              "value_confidence": 0.9,
               "as_of": null
             },
-            "sole_source": {
+            "ramp_execution": {
               "status": "auto",
-              "candidate_set_hash": "7b1ba73419fe0e78e6d96e241250e28599b824f9d2c680705e76d2f6a713ed42",
+              "candidate_set_hash": "df4db6fbe84f2cfc5ff9cae49a3916bc719510a55275109f1d8911237b2e9056",
               "assertion_ids": [
-                "aleabitoreddit_sivers_cpo_customer_map_e1"
+                "sivers_ar_2025_photonics_excerpt_e10"
               ],
-              "value_confidence": 0.55,
+              "value_confidence": 0.9,
               "as_of": null
             }
           },
           "assertions": {
-            "aleabitoreddit_sivers_cpo_customer_map_e1": {
-              "id": "aleabitoreddit_sivers_cpo_customer_map_e1",
+            "sivers_ar_2025_photonics_excerpt_e10": {
+              "id": "sivers_ar_2025_photonics_excerpt_e10",
               "attributes": {
-                "qualification_status": "none",
-                "sole_source": false,
-                "note": "Tier-3 article says Sivers was listed as Ayar Labs' laser supplier; no current qualification or volume status is established."
+                "qualification_status": "sampling",
+                "ramp_execution": 3
               },
               "source_ids": [
-                "aleabitoreddit_sivers_cpo_customer_map_s1"
+                "sivers_ar_2025_photonics_excerpt_s4",
+                "sivers_ar_2025_photonics_excerpt_s6"
               ],
-              "source_doc_id": "aleabitoreddit_sivers_cpo_customer_map",
-              "origin_entity": "aleabitoreddit",
+              "source_doc_id": "sivers_ar_2025_photonics_excerpt",
+              "origin_entity": "Sivers Semiconductors",
               "source_doc": {
-                "storage_permission": "repo_excerpt",
-                "origin_entity": "aleabitoreddit",
-                "permission_basis": "No redistribution license was found. Git retains the canonical URL, metadata, three short attributed quotations totaling 165 characters, and narrowly derived graph assertions only; the full Substack article is excluded.",
-                "source_type": "industry_report",
-                "id": "aleabitoreddit_sivers_cpo_customer_map",
-                "retrieved_at": "2026-07-10",
-                "title": "Sivers: The Undiscovered CPO Laser Chokepoint + Customer Mapping — aleabitoreddit SubStack",
-                "url": "https://aleabitoreddit.substack.com/p/sivers-semi-sive-the-cpo-laser-supplier",
-                "evidence_tier": 3
-              }
-            },
-            "semiconductor_today_sivers_ayar_1m_order_2023_07_03_e1": {
-              "id": "semiconductor_today_sivers_ayar_1m_order_2023_07_03_e1",
-              "attributes": {},
-              "source_ids": [
-                "semiconductor_today_sivers_ayar_1m_order_2023_07_03_s2"
-              ],
-              "source_doc_id": "semiconductor_today_sivers_ayar_1m_order_2023_07_03",
-              "origin_entity": "Semiconductor Today",
-              "source_doc": {
-                "storage_permission": "repo_excerpt",
-                "origin_entity": "Semiconductor Today",
-                "permission_basis": "Third-party trade publication (Semiconductor Today, Juno Publishing and Media Solutions Ltd); copyrighted editorial. Repository retains only the canonical URL, limited verbatim excerpts needed for evidence, and derived research — not the full article text.",
-                "source_type": "industry_report",
-                "id": "semiconductor_today_sivers_ayar_1m_order_2023_07_03",
-                "title": "Sivers Photonics receives $1m order from Ayar Labs (Semiconductor Today, July 3, 2023)",
-                "url": "https://www.semiconductor-today.com/news_items/2023/jul/sivers-photonics-030723.shtml",
-                "evidence_tier": 3
+                "audit_ledger_path": "library/source_audits/sivers_2025_annual_report.json",
+                "storage_permission": "repo_full",
+                "source_audit_managed": true,
+                "audit_note": "2026-07-12: Ningi Research revenue-recognition allegations, going-concern concern, and pending financial restatement; review_by=2026-08-27; evidence=GitHub Issue #2 and thesis/sivers_v2_lane_memo.md",
+                "source_type": "filing",
+                "audit_review_by": "2026-08-27",
+                "audit_status": "active",
+                "title": "Sivers Semiconductors 2025 Annual Report (Photonics excerpt)",
+                "url": "https://www.sivers-semiconductors.com/wp-content/uploads/2026/05/Sivers_annualreport_2025_2.pdf",
+                "evidence_tier": 1,
+                "audit_id": "sivers_2025_annual_report_2026_07_12",
+                "source_under_audit": true,
+                "origin_entity": "Sivers Semiconductors",
+                "permission_basis": "This is Sivers Semiconductors' official annual report, published as an original investor disclosure on the issuer's own domain. The repository retains attributed research excerpts and derived extraction with the issuer PDF URL and retrieval metadata.",
+                "id": "sivers_ar_2025_photonics_excerpt"
               }
             }
           }
         },
         "assertions": [
           {
-            "id": "aleabitoreddit_sivers_cpo_customer_map_e1",
+            "id": "sivers_ar_2025_photonics_excerpt_e10",
             "attributes": {
-              "qualification_status": "none",
-              "sole_source": false,
-              "note": "Tier-3 article says Sivers was listed as Ayar Labs' laser supplier; no current qualification or volume status is established."
+              "qualification_status": "sampling",
+              "ramp_execution": 3
             },
             "source_ids": [
-              "aleabitoreddit_sivers_cpo_customer_map_s1"
+              "sivers_ar_2025_photonics_excerpt_s4",
+              "sivers_ar_2025_photonics_excerpt_s6"
             ],
-            "source_doc_id": "aleabitoreddit_sivers_cpo_customer_map",
-            "origin_entity": "aleabitoreddit",
+            "source_doc_id": "sivers_ar_2025_photonics_excerpt",
+            "origin_entity": "Sivers Semiconductors",
             "source_doc": {
-              "storage_permission": "repo_excerpt",
-              "origin_entity": "aleabitoreddit",
-              "permission_basis": "No redistribution license was found. Git retains the canonical URL, metadata, three short attributed quotations totaling 165 characters, and narrowly derived graph assertions only; the full Substack article is excluded.",
-              "source_type": "industry_report",
-              "id": "aleabitoreddit_sivers_cpo_customer_map",
-              "retrieved_at": "2026-07-10",
-              "title": "Sivers: The Undiscovered CPO Laser Chokepoint + Customer Mapping — aleabitoreddit SubStack",
-              "url": "https://aleabitoreddit.substack.com/p/sivers-semi-sive-the-cpo-laser-supplier",
-              "evidence_tier": 3
+              "audit_ledger_path": "library/source_audits/sivers_2025_annual_report.json",
+              "storage_permission": "repo_full",
+              "source_audit_managed": true,
+              "audit_note": "2026-07-12: Ningi Research revenue-recognition allegations, going-concern concern, and pending financial restatement; review_by=2026-08-27; evidence=GitHub Issue #2 and thesis/sivers_v2_lane_memo.md",
+              "source_type": "filing",
+              "audit_review_by": "2026-08-27",
+              "audit_status": "active",
+              "title": "Sivers Semiconductors 2025 Annual Report (Photonics excerpt)",
+              "url": "https://www.sivers-semiconductors.com/wp-content/uploads/2026/05/Sivers_annualreport_2025_2.pdf",
+              "evidence_tier": 1,
+              "audit_id": "sivers_2025_annual_report_2026_07_12",
+              "source_under_audit": true,
+              "origin_entity": "Sivers Semiconductors",
+              "permission_basis": "This is Sivers Semiconductors' official annual report, published as an original investor disclosure on the issuer's own domain. The repository retains attributed research excerpts and derived extraction with the issuer PDF URL and retrieval metadata.",
+              "id": "sivers_ar_2025_photonics_excerpt"
             }
           }
         ],
         "sources": [
           {
-            "id": "aleabitoreddit_sivers_cpo_customer_map_s1",
-            "locator": "aleabitoreddit article, publicly disclosed customers section, Ayar Labs entry",
-            "quote": "SIVE as the laser supplier is listed on Ayar Labs Website",
-            "source_doc_id": "aleabitoreddit_sivers_cpo_customer_map",
-            "origin_entity": "aleabitoreddit",
-            "extraction_path": "extractions/silicon_matter_ayar_labs.json",
-            "source_doc": {
-              "storage_permission": "repo_excerpt",
-              "origin_entity": "aleabitoreddit",
-              "permission_basis": "No redistribution license was found. Git retains the canonical URL, metadata, three short attributed quotations totaling 165 characters, and narrowly derived graph assertions only; the full Substack article is excluded.",
-              "source_type": "industry_report",
-              "id": "aleabitoreddit_sivers_cpo_customer_map",
-              "retrieved_at": "2026-07-10",
-              "title": "Sivers: The Undiscovered CPO Laser Chokepoint + Customer Mapping — aleabitoreddit SubStack",
-              "url": "https://aleabitoreddit.substack.com/p/sivers-semi-sive-the-cpo-laser-supplier",
-              "evidence_tier": 3
-            }
-          }
-        ]
-      },
-      {
-        "evidence_ref": "E11",
-        "item": {
-          "evidence_ref": "E11",
-          "type": "claim",
-          "claim_id": "poet_celestial_cancellation_6k_2026_04_27_cl1",
-          "edge_key": null,
-          "attributes": [],
-          "assertion_ids": [],
-          "source_ids": [
-            "poet_celestial_cancellation_6k_2026_04_27_s1",
-            "poet_celestial_cancellation_6k_2026_04_27_s2",
-            "poet_celestial_cancellation_6k_2026_04_27_s3"
-          ],
-          "purpose": "支援主瓶頸段：Marvell/Celestial AI 取消 POET 所有訂單，Sivers→POET→Celestial 間接需求路徑已終止"
-        },
-        "claim": {
-          "id": "poet_celestial_cancellation_6k_2026_04_27_cl1",
-          "statement": "Marvell Semiconductor (which acquired Celestial AI) cancelled all of POET Technologies' Celestial AI purchase orders — written notice given 2026-04-23, POET announced 2026-04-27 — citing alleged POET breach of confidentiality obligations. This terminates the POET→Celestial optical-engine supply channel and, by extension, cuts Sivers' indirect route to Celestial/Marvell AI demand via POET (Sivers→POET→Celestial).",
-          "demand_proof_level": "confirmed",
-          "disproof_condition": "Revise if POET and Marvell/Celestial reinstate the purchase orders or announce a replacement supply agreement.",
-          "confidence": 0.9,
-          "source_ids": [
-            "poet_celestial_cancellation_6k_2026_04_27_s1",
-            "poet_celestial_cancellation_6k_2026_04_27_s2",
-            "poet_celestial_cancellation_6k_2026_04_27_s3"
-          ],
-          "source_doc_id": "poet_celestial_cancellation_6k_2026_04_27",
-          "subject_kind": "node",
-          "subject_node_id": "co:poet_technologies",
-          "subject_edge_key": null,
-          "origin_entity": "POET Technologies",
-          "source_doc": {
-            "storage_permission": "repo_full",
-            "origin_entity": "POET Technologies",
-            "permission_basis": "Official SEC EDGAR primary filing (POET Technologies Form 6-K, Exhibit 99.1), public domain government-hosted disclosure. Repository retains attributed extraction and canonical SEC URL.",
-            "source_type": "filing",
-            "id": "poet_celestial_cancellation_6k_2026_04_27",
-            "title": "POET Technologies Provides Purchase Order Update — Marvell cancels all Celestial AI purchase orders (POET SEC Form 6-K Exhibit 99.1, April 27, 2026)",
-            "url": "https://www.sec.gov/Archives/edgar/data/1437424/000117184326002726/exh_991.htm",
-            "evidence_tier": 1
-          }
-        },
-        "sources": [
-          {
-            "id": "poet_celestial_cancellation_6k_2026_04_27_s1",
-            "locator": "exhibit 99.1, para 1",
-            "quote": "today announced the cancellation of all purchase orders received by the Company from Celestial AI, including the ones for initial production units first disclosed (the \"Purchase Orders\") by the Company in a press release on April 25, 2023",
-            "source_doc_id": "poet_celestial_cancellation_6k_2026_04_27",
-            "origin_entity": "POET Technologies",
-            "extraction_path": "extractions/poet_celestial_cancellation_6k_2026_04_27.json",
-            "source_doc": {
-              "storage_permission": "repo_full",
-              "origin_entity": "POET Technologies",
-              "permission_basis": "Official SEC EDGAR primary filing (POET Technologies Form 6-K, Exhibit 99.1), public domain government-hosted disclosure. Repository retains attributed extraction and canonical SEC URL.",
-              "source_type": "filing",
-              "id": "poet_celestial_cancellation_6k_2026_04_27",
-              "title": "POET Technologies Provides Purchase Order Update — Marvell cancels all Celestial AI purchase orders (POET SEC Form 6-K Exhibit 99.1, April 27, 2026)",
-              "url": "https://www.sec.gov/Archives/edgar/data/1437424/000117184326002726/exh_991.htm",
-              "evidence_tier": 1
-            }
-          },
-          {
-            "id": "poet_celestial_cancellation_6k_2026_04_27_s2",
-            "locator": "exhibit 99.1, para 1",
-            "quote": "Marvell Semiconductor Inc., which acquired Celestial AI, provided written notice of the cancellation to the Company on April 23, 2026",
-            "source_doc_id": "poet_celestial_cancellation_6k_2026_04_27",
-            "origin_entity": "POET Technologies",
-            "extraction_path": "extractions/poet_celestial_cancellation_6k_2026_04_27.json",
-            "source_doc": {
-              "storage_permission": "repo_full",
-              "origin_entity": "POET Technologies",
-              "permission_basis": "Official SEC EDGAR primary filing (POET Technologies Form 6-K, Exhibit 99.1), public domain government-hosted disclosure. Repository retains attributed extraction and canonical SEC URL.",
-              "source_type": "filing",
-              "id": "poet_celestial_cancellation_6k_2026_04_27",
-              "title": "POET Technologies Provides Purchase Order Update — Marvell cancels all Celestial AI purchase orders (POET SEC Form 6-K Exhibit 99.1, April 27, 2026)",
-              "url": "https://www.sec.gov/Archives/edgar/data/1437424/000117184326002726/exh_991.htm",
-              "evidence_tier": 1
-            }
-          },
-          {
-            "id": "poet_celestial_cancellation_6k_2026_04_27_s3",
-            "locator": "exhibit 99.1, para 1",
-            "quote": "Marvell indicated that the Company had made disclosures of information related to the Purchase Order and shipping information in contravention of its confidentiality obligations",
-            "source_doc_id": "poet_celestial_cancellation_6k_2026_04_27",
-            "origin_entity": "POET Technologies",
-            "extraction_path": "extractions/poet_celestial_cancellation_6k_2026_04_27.json",
-            "source_doc": {
-              "storage_permission": "repo_full",
-              "origin_entity": "POET Technologies",
-              "permission_basis": "Official SEC EDGAR primary filing (POET Technologies Form 6-K, Exhibit 99.1), public domain government-hosted disclosure. Repository retains attributed extraction and canonical SEC URL.",
-              "source_type": "filing",
-              "id": "poet_celestial_cancellation_6k_2026_04_27",
-              "title": "POET Technologies Provides Purchase Order Update — Marvell cancels all Celestial AI purchase orders (POET SEC Form 6-K Exhibit 99.1, April 27, 2026)",
-              "url": "https://www.sec.gov/Archives/edgar/data/1437424/000117184326002726/exh_991.htm",
-              "evidence_tier": 1
-            }
-          }
-        ]
-      },
-      {
-        "evidence_ref": "E12",
-        "item": {
-          "evidence_ref": "E12",
-          "type": "claim",
-          "claim_id": "sivers_ar_2025_financials_cl1",
-          "edge_key": null,
-          "attributes": [],
-          "assertion_ids": [],
-          "source_ids": [
-            "sivers_ar_2025_financials_s4",
-            "sivers_ar_2025_financials_s5",
-            "sivers_ar_2025_financials_s6"
-          ],
-          "purpose": "支援最強證據段及 Variant Perception：Sivers FY2025 光子段 SEK 93.4M（+17% YoY），前三大客戶均屬 Wireless，來自經審計年報"
-        },
-        "claim": {
-          "id": "sivers_ar_2025_financials_cl1",
-          "statement": "More than 50% of Sivers' FY2025 total revenue (SEK 183.4M out of 306.6M) came from three Wireless-segment customers; the Photonics segment (SEK 93.4M, +17% YoY) has no disclosed customer exceeding 10% of group revenue, implying Photonics customer concentration is lower.",
-          "demand_proof_level": "confirmed",
-          "disproof_condition": "If Photonics revenue becomes concentrated in one or two customers as CPO volumes scale, or if the top Wireless customers (ALL.SPACE + 2 others) reduce orders materially, the group revenue profile would deteriorate.",
-          "confidence": 0.95,
-          "source_ids": [
-            "sivers_ar_2025_financials_s4",
-            "sivers_ar_2025_financials_s5",
-            "sivers_ar_2025_financials_s6"
-          ],
-          "source_doc_id": "sivers_ar_2025_financials",
-          "subject_kind": "node",
-          "subject_node_id": "co:sivers_semiconductors",
-          "subject_edge_key": null,
-          "origin_entity": "Sivers Semiconductors",
-          "source_doc": {
-            "audit_ledger_path": "library/source_audits/sivers_2025_annual_report.json",
-            "storage_permission": "repo_full",
-            "source_audit_managed": true,
-            "audit_note": "2026-07-12: Ningi Research revenue-recognition allegations, going-concern concern, and pending financial restatement; review_by=2026-08-27; evidence=GitHub Issue #2 and thesis/sivers_v2_lane_memo.md",
-            "source_type": "filing",
-            "audit_review_by": "2026-08-27",
-            "audit_status": "active",
-            "title": "Sivers Semiconductors 2025 Annual Report (Financial Notes & Directors' Report)",
-            "url": "https://www.sivers-semiconductors.com/wp-content/uploads/2026/05/Sivers_annualreport_2025_2.pdf",
-            "evidence_tier": 1,
-            "audit_id": "sivers_2025_annual_report_2026_07_12",
-            "source_under_audit": true,
+            "id": "sivers_ar_2025_photonics_excerpt_s4",
+            "locator": "p.6, CEO's Letter",
+            "quote": "we are actively sampling several customers including POET for their alpha customer ELS product.",
+            "source_doc_id": "sivers_ar_2025_photonics_excerpt",
             "origin_entity": "Sivers Semiconductors",
-            "permission_basis": "This is Sivers Semiconductors' official annual report, published as an original investor disclosure on the issuer's own domain. The repository retains attributed research excerpts and derived extraction with the issuer PDF URL and retrieval metadata.",
-            "id": "sivers_ar_2025_financials"
-          }
-        },
-        "sources": [
-          {
-            "id": "sivers_ar_2025_financials_s4",
-            "locator": "Directors' Report, Dependence on customers",
-            "quote": "More than 50 percent of the Group's revenue during the 2025 financial year was derived from three customers. These customers are within the Wireless business area. If these customers were to reduce or discontinue their purchases, this could negatively affect the Group's revenue over a shorter or longer period.",
-            "source_doc_id": "sivers_ar_2025_financials",
-            "origin_entity": "Sivers Semiconductors",
-            "extraction_path": "extractions/sivers_ar_2025_financials.json",
+            "extraction_path": "extractions/sivers_ar_2025.json",
             "source_doc": {
               "audit_ledger_path": "library/source_audits/sivers_2025_annual_report.json",
               "storage_permission": "repo_full",
@@ -4088,23 +4039,23 @@
               "source_type": "filing",
               "audit_review_by": "2026-08-27",
               "audit_status": "active",
-              "title": "Sivers Semiconductors 2025 Annual Report (Financial Notes & Directors' Report)",
+              "title": "Sivers Semiconductors 2025 Annual Report (Photonics excerpt)",
               "url": "https://www.sivers-semiconductors.com/wp-content/uploads/2026/05/Sivers_annualreport_2025_2.pdf",
               "evidence_tier": 1,
               "audit_id": "sivers_2025_annual_report_2026_07_12",
               "source_under_audit": true,
               "origin_entity": "Sivers Semiconductors",
               "permission_basis": "This is Sivers Semiconductors' official annual report, published as an original investor disclosure on the issuer's own domain. The repository retains attributed research excerpts and derived extraction with the issuer PDF URL and retrieval metadata.",
-              "id": "sivers_ar_2025_financials"
+              "id": "sivers_ar_2025_photonics_excerpt"
             }
           },
           {
-            "id": "sivers_ar_2025_financials_s5",
-            "locator": "Note 5, Information about major customers",
-            "quote": "During the financial year ended December 31, 2025, three customers each accounted for more than 10 percent of the Group's total revenue. Revenue from these customers amounted to SEK 183.4 million (2024: three customers, SEK 96.5 million). Customer A: SEK 79.4 (75.3) million. Customer B: SEK 55.2 (16.9) million. Customer C: SEK 48.7 (4.4) million. These revenues were attributable to the following operating segments: Customer A: Wireless. Customer B: Wireless. Customer C: Wireless. The Group does not disclose the identity of major customers.",
-            "source_doc_id": "sivers_ar_2025_financials",
+            "id": "sivers_ar_2025_photonics_excerpt_s6",
+            "locator": "p.10, Photonics section",
+            "quote": "in November 2025, Sivers announced a strategic partnership with POET Technologies Inc., combining Sivers' DFB laser arrays with POET's Optical Interposer™ to deliver scalable, energy-efficient external laser sources…",
+            "source_doc_id": "sivers_ar_2025_photonics_excerpt",
             "origin_entity": "Sivers Semiconductors",
-            "extraction_path": "extractions/sivers_ar_2025_financials.json",
+            "extraction_path": "extractions/sivers_ar_2025.json",
             "source_doc": {
               "audit_ledger_path": "library/source_audits/sivers_2025_annual_report.json",
               "storage_permission": "repo_full",
@@ -4113,39 +4064,14 @@
               "source_type": "filing",
               "audit_review_by": "2026-08-27",
               "audit_status": "active",
-              "title": "Sivers Semiconductors 2025 Annual Report (Financial Notes & Directors' Report)",
+              "title": "Sivers Semiconductors 2025 Annual Report (Photonics excerpt)",
               "url": "https://www.sivers-semiconductors.com/wp-content/uploads/2026/05/Sivers_annualreport_2025_2.pdf",
               "evidence_tier": 1,
               "audit_id": "sivers_2025_annual_report_2026_07_12",
               "source_under_audit": true,
               "origin_entity": "Sivers Semiconductors",
               "permission_basis": "This is Sivers Semiconductors' official annual report, published as an original investor disclosure on the issuer's own domain. The repository retains attributed research excerpts and derived extraction with the issuer PDF URL and retrieval metadata.",
-              "id": "sivers_ar_2025_financials"
-            }
-          },
-          {
-            "id": "sivers_ar_2025_financials_s6",
-            "locator": "Note 5, Segment revenue reconciliation",
-            "quote": "Wireless: [Dec 31, 2025] 213,137 [Dec 31, 2024] 139,154. Photonics: [Dec 31, 2025] 93,420 [Dec 31, 2024] 80,053. [Total] 306,558 / 219,207.",
-            "source_doc_id": "sivers_ar_2025_financials",
-            "origin_entity": "Sivers Semiconductors",
-            "extraction_path": "extractions/sivers_ar_2025_financials.json",
-            "source_doc": {
-              "audit_ledger_path": "library/source_audits/sivers_2025_annual_report.json",
-              "storage_permission": "repo_full",
-              "source_audit_managed": true,
-              "audit_note": "2026-07-12: Ningi Research revenue-recognition allegations, going-concern concern, and pending financial restatement; review_by=2026-08-27; evidence=GitHub Issue #2 and thesis/sivers_v2_lane_memo.md",
-              "source_type": "filing",
-              "audit_review_by": "2026-08-27",
-              "audit_status": "active",
-              "title": "Sivers Semiconductors 2025 Annual Report (Financial Notes & Directors' Report)",
-              "url": "https://www.sivers-semiconductors.com/wp-content/uploads/2026/05/Sivers_annualreport_2025_2.pdf",
-              "evidence_tier": 1,
-              "audit_id": "sivers_2025_annual_report_2026_07_12",
-              "source_under_audit": true,
-              "origin_entity": "Sivers Semiconductors",
-              "permission_basis": "This is Sivers Semiconductors' official annual report, published as an original investor disclosure on the issuer's own domain. The repository retains attributed research excerpts and derived extraction with the issuer PDF URL and retrieval metadata.",
-              "id": "sivers_ar_2025_financials"
+              "id": "sivers_ar_2025_photonics_excerpt"
             }
           }
         ]
@@ -4154,83 +4080,84 @@
         "evidence_ref": "E13",
         "item": {
           "evidence_ref": "E13",
-          "type": "claim",
-          "claim_id": "sivers_ar_2025_financials_cl2",
-          "edge_key": null,
-          "attributes": [],
-          "assertion_ids": [],
-          "source_ids": [
-            "sivers_ar_2025_financials_s7",
-            "sivers_ar_2025_financials_s8"
+          "type": "edge",
+          "claim_id": null,
+          "edge_key": "edge:484b95bbc2d41970d2256c384424b2c1d2416b0b508d31a1afdbbd6709ca758c",
+          "attributes": [
+            "qualification_status"
           ],
-          "purpose": "支援最強證據段、disproof conditions 及 leading indicators：FY2025 毛利率 -0.7%，原材料成本 +116%，量產前期成本壓力明確，來自經審計年報"
-        },
-        "claim": {
-          "id": "sivers_ar_2025_financials_cl2",
-          "statement": "Sivers FY2025 group gross margin was -0.7% (gross loss SEK 2.1M on revenue SEK 306.6M), a deterioration from +1.9% in FY2024, driven by raw material costs more than doubling (+116%) as the company scales production ahead of Photonics ramp.",
-          "demand_proof_level": "confirmed",
-          "disproof_condition": "If raw material and external manufacturing costs do not decline as production volumes ramp in 2026-2027, gross margin will not recover, weakening the path to profitability.",
-          "confidence": 0.95,
-          "source_ids": [
-            "sivers_ar_2025_financials_s7",
-            "sivers_ar_2025_financials_s8"
+          "assertion_ids": [
+            "sivers_ar_2025_photonics_excerpt_e15"
           ],
-          "source_doc_id": "sivers_ar_2025_financials",
-          "subject_kind": "node",
-          "subject_node_id": "co:sivers_semiconductors",
-          "subject_edge_key": null,
-          "origin_entity": "Sivers Semiconductors",
-          "source_doc": {
-            "audit_ledger_path": "library/source_audits/sivers_2025_annual_report.json",
-            "storage_permission": "repo_full",
-            "source_audit_managed": true,
-            "audit_note": "2026-07-12: Ningi Research revenue-recognition allegations, going-concern concern, and pending financial restatement; review_by=2026-08-27; evidence=GitHub Issue #2 and thesis/sivers_v2_lane_memo.md",
-            "source_type": "filing",
-            "audit_review_by": "2026-08-27",
-            "audit_status": "active",
-            "title": "Sivers Semiconductors 2025 Annual Report (Financial Notes & Directors' Report)",
-            "url": "https://www.sivers-semiconductors.com/wp-content/uploads/2026/05/Sivers_annualreport_2025_2.pdf",
-            "evidence_tier": 1,
-            "audit_id": "sivers_2025_annual_report_2026_07_12",
-            "source_under_audit": true,
-            "origin_entity": "Sivers Semiconductors",
-            "permission_basis": "This is Sivers Semiconductors' official annual report, published as an original investor disclosure on the issuer's own domain. The repository retains attributed research excerpts and derived extraction with the issuer PDF URL and retrieval metadata.",
-            "id": "sivers_ar_2025_financials"
-          }
+          "source_ids": [
+            "sivers_ar_2025_photonics_excerpt_s11"
+          ],
+          "purpose": "確立 Sivers→LIGHTIUM AG 為 qualifying 階段，TFLN 平台整合，支撐 Stack 摘要的模組整合層分析"
         },
-        "sources": [
-          {
-            "id": "sivers_ar_2025_financials_s7",
-            "locator": "Consolidated Income Statement (restated to function-of-expense format from Q4 2025)",
-            "quote": "Net sales: 306,558 (2024: 219,207). Cost of sales: -308,636 (2024: -215,015). Gross profit: -2,079 (2024: 4,192).",
-            "source_doc_id": "sivers_ar_2025_financials",
-            "origin_entity": "Sivers Semiconductors",
-            "extraction_path": "extractions/sivers_ar_2025_financials.json",
-            "source_doc": {
-              "audit_ledger_path": "library/source_audits/sivers_2025_annual_report.json",
-              "storage_permission": "repo_full",
-              "source_audit_managed": true,
-              "audit_note": "2026-07-12: Ningi Research revenue-recognition allegations, going-concern concern, and pending financial restatement; review_by=2026-08-27; evidence=GitHub Issue #2 and thesis/sivers_v2_lane_memo.md",
-              "source_type": "filing",
-              "audit_review_by": "2026-08-27",
-              "audit_status": "active",
-              "title": "Sivers Semiconductors 2025 Annual Report (Financial Notes & Directors' Report)",
-              "url": "https://www.sivers-semiconductors.com/wp-content/uploads/2026/05/Sivers_annualreport_2025_2.pdf",
-              "evidence_tier": 1,
-              "audit_id": "sivers_2025_annual_report_2026_07_12",
-              "source_under_audit": true,
-              "origin_entity": "Sivers Semiconductors",
-              "permission_basis": "This is Sivers Semiconductors' official annual report, published as an original investor disclosure on the issuer's own domain. The repository retains attributed research excerpts and derived extraction with the issuer PDF URL and retrieval metadata.",
-              "id": "sivers_ar_2025_financials"
+        "edge": {
+          "edge_key": "edge:484b95bbc2d41970d2256c384424b2c1d2416b0b508d31a1afdbbd6709ca758c",
+          "src_id": "co:sivers_semiconductors",
+          "src_name": "Sivers Semiconductors",
+          "relation": "SUPPLIES_TO",
+          "dst_id": "co:lightium_ag",
+          "dst_name": "LIGHTIUM AG",
+          "attributes": {
+            "qualification_status": "qualifying"
+          },
+          "open_conflict_attributes": [],
+          "attribute_resolution_meta": {
+            "qualification_status": {
+              "status": "auto",
+              "candidate_set_hash": "34a4fa2d786f4ddfed962241f837234c68e36b87c04082b94bad92a413e80215",
+              "assertion_ids": [
+                "sivers_ar_2025_photonics_excerpt_e15"
+              ],
+              "value_confidence": 0.9,
+              "as_of": null
             }
           },
+          "assertions": {
+            "sivers_ar_2025_photonics_excerpt_e15": {
+              "id": "sivers_ar_2025_photonics_excerpt_e15",
+              "attributes": {
+                "qualification_status": "qualifying"
+              },
+              "source_ids": [
+                "sivers_ar_2025_photonics_excerpt_s11"
+              ],
+              "source_doc_id": "sivers_ar_2025_photonics_excerpt",
+              "origin_entity": "Sivers Semiconductors",
+              "source_doc": {
+                "audit_ledger_path": "library/source_audits/sivers_2025_annual_report.json",
+                "storage_permission": "repo_full",
+                "source_audit_managed": true,
+                "audit_note": "2026-07-12: Ningi Research revenue-recognition allegations, going-concern concern, and pending financial restatement; review_by=2026-08-27; evidence=GitHub Issue #2 and thesis/sivers_v2_lane_memo.md",
+                "source_type": "filing",
+                "audit_review_by": "2026-08-27",
+                "audit_status": "active",
+                "title": "Sivers Semiconductors 2025 Annual Report (Photonics excerpt)",
+                "url": "https://www.sivers-semiconductors.com/wp-content/uploads/2026/05/Sivers_annualreport_2025_2.pdf",
+                "evidence_tier": 1,
+                "audit_id": "sivers_2025_annual_report_2026_07_12",
+                "source_under_audit": true,
+                "origin_entity": "Sivers Semiconductors",
+                "permission_basis": "This is Sivers Semiconductors' official annual report, published as an original investor disclosure on the issuer's own domain. The repository retains attributed research excerpts and derived extraction with the issuer PDF URL and retrieval metadata.",
+                "id": "sivers_ar_2025_photonics_excerpt"
+              }
+            }
+          }
+        },
+        "assertions": [
           {
-            "id": "sivers_ar_2025_financials_s8",
-            "locator": "Note 8/9, Cost of sales breakdown Dec 31 2025",
-            "quote": "Raw materials and consumables used: 67,575. Employee benefits expense: 82,841. Other external expenses: 88,666. Depreciation, amortization and impairment: 69,554. Total: 308,636.",
-            "source_doc_id": "sivers_ar_2025_financials",
+            "id": "sivers_ar_2025_photonics_excerpt_e15",
+            "attributes": {
+              "qualification_status": "qualifying"
+            },
+            "source_ids": [
+              "sivers_ar_2025_photonics_excerpt_s11"
+            ],
+            "source_doc_id": "sivers_ar_2025_photonics_excerpt",
             "origin_entity": "Sivers Semiconductors",
-            "extraction_path": "extractions/sivers_ar_2025_financials.json",
             "source_doc": {
               "audit_ledger_path": "library/source_audits/sivers_2025_annual_report.json",
               "storage_permission": "repo_full",
@@ -4239,14 +4166,41 @@
               "source_type": "filing",
               "audit_review_by": "2026-08-27",
               "audit_status": "active",
-              "title": "Sivers Semiconductors 2025 Annual Report (Financial Notes & Directors' Report)",
+              "title": "Sivers Semiconductors 2025 Annual Report (Photonics excerpt)",
               "url": "https://www.sivers-semiconductors.com/wp-content/uploads/2026/05/Sivers_annualreport_2025_2.pdf",
               "evidence_tier": 1,
               "audit_id": "sivers_2025_annual_report_2026_07_12",
               "source_under_audit": true,
               "origin_entity": "Sivers Semiconductors",
               "permission_basis": "This is Sivers Semiconductors' official annual report, published as an original investor disclosure on the issuer's own domain. The repository retains attributed research excerpts and derived extraction with the issuer PDF URL and retrieval metadata.",
-              "id": "sivers_ar_2025_financials"
+              "id": "sivers_ar_2025_photonics_excerpt"
+            }
+          }
+        ],
+        "sources": [
+          {
+            "id": "sivers_ar_2025_photonics_excerpt_s11",
+            "locator": "p.10, Photonics section",
+            "quote": "in October 2025 we announced a partnership with LIGHTIUM AG funded by the EU project INGENIOUS. It will deliver an integrated Thin-Film Lithium Niobate (TFLN) platform for next generation optical transceiver engines with Sivers CW lasers and photodetectors integrated directly onto TFLN wafers.",
+            "source_doc_id": "sivers_ar_2025_photonics_excerpt",
+            "origin_entity": "Sivers Semiconductors",
+            "extraction_path": "extractions/sivers_ar_2025.json",
+            "source_doc": {
+              "audit_ledger_path": "library/source_audits/sivers_2025_annual_report.json",
+              "storage_permission": "repo_full",
+              "source_audit_managed": true,
+              "audit_note": "2026-07-12: Ningi Research revenue-recognition allegations, going-concern concern, and pending financial restatement; review_by=2026-08-27; evidence=GitHub Issue #2 and thesis/sivers_v2_lane_memo.md",
+              "source_type": "filing",
+              "audit_review_by": "2026-08-27",
+              "audit_status": "active",
+              "title": "Sivers Semiconductors 2025 Annual Report (Photonics excerpt)",
+              "url": "https://www.sivers-semiconductors.com/wp-content/uploads/2026/05/Sivers_annualreport_2025_2.pdf",
+              "evidence_tier": 1,
+              "audit_id": "sivers_2025_annual_report_2026_07_12",
+              "source_under_audit": true,
+              "origin_entity": "Sivers Semiconductors",
+              "permission_basis": "This is Sivers Semiconductors' official annual report, published as an original investor disclosure on the issuer's own domain. The repository retains attributed research excerpts and derived extraction with the issuer PDF URL and retrieval metadata.",
+              "id": "sivers_ar_2025_photonics_excerpt"
             }
           }
         ]
@@ -4256,98 +4210,77 @@
         "item": {
           "evidence_ref": "E14",
           "type": "claim",
-          "claim_id": "sivers_ar_2025_financials_cl3",
+          "claim_id": "semiconductor_today_sivers_ayar_1m_order_2023_07_03_cl1",
           "edge_key": null,
           "attributes": [],
           "assertion_ids": [],
           "source_ids": [
-            "sivers_ar_2025_financials_s5",
-            "sivers_ar_2025_financials_s9"
+            "semiconductor_today_sivers_ayar_1m_order_2023_07_03_s1",
+            "semiconductor_today_sivers_ayar_1m_order_2023_07_03_s2"
           ],
-          "purpose": "支援 disproof conditions：ALL.SPACE 為最大可識別客戶（SEK 79.4M，25.9% 集團收入），屬 Wireless/SATCOM/defense，非 CPO 光子段"
+          "purpose": "獨立貿易媒體確認 Sivers 獲 Ayar Labs 100 萬美元訂單，DFB 陣列為 SuperNova 光源，支撐最強證據段與 disproof condition"
         },
         "claim": {
-          "id": "sivers_ar_2025_financials_cl3",
-          "statement": "Sivers' largest identifiable customer is ALL.SPACE (Customer A, SEK 79.4M = 25.9% of group revenue), operating in SATCOM/defense Wireless, not in the Photonics/CPO segment that underpins the investment thesis.",
+          "id": "semiconductor_today_sivers_ayar_1m_order_2023_07_03_cl1",
+          "statement": "Independent trade-press (Semiconductor Today, 2023-07-03) reports Sivers Photonics received a $1m order and that its DFB laser arrays provide the light source for Ayar Labs' SuperNova — a non-Sivers, non-aleabitoreddit origin corroborating the Sivers→Ayar Labs supply relationship as a concrete commercial order rather than a customer-map inference.",
           "demand_proof_level": "confirmed",
-          "disproof_condition": "If ALL.SPACE loses its U.S. Army NGTT program or reduces satellite terminal orders materially, Wireless revenue falls and Photonics % of mix rises—but total revenue would decline in the near term.",
-          "confidence": 0.9,
+          "disproof_condition": "If Ayar Labs publicly qualifies an alternative DFB laser-array supplier for SuperNova, or Sivers discloses loss of the Ayar program, downgrade.",
+          "confidence": 0.6,
           "source_ids": [
-            "sivers_ar_2025_financials_s5",
-            "sivers_ar_2025_financials_s9"
+            "semiconductor_today_sivers_ayar_1m_order_2023_07_03_s1",
+            "semiconductor_today_sivers_ayar_1m_order_2023_07_03_s2"
           ],
-          "source_doc_id": "sivers_ar_2025_financials",
+          "source_doc_id": "semiconductor_today_sivers_ayar_1m_order_2023_07_03",
           "subject_kind": "node",
           "subject_node_id": "co:sivers_semiconductors",
           "subject_edge_key": null,
-          "origin_entity": "Sivers Semiconductors",
+          "origin_entity": "Semiconductor Today",
           "source_doc": {
-            "audit_ledger_path": "library/source_audits/sivers_2025_annual_report.json",
-            "storage_permission": "repo_full",
-            "source_audit_managed": true,
-            "audit_note": "2026-07-12: Ningi Research revenue-recognition allegations, going-concern concern, and pending financial restatement; review_by=2026-08-27; evidence=GitHub Issue #2 and thesis/sivers_v2_lane_memo.md",
-            "source_type": "filing",
-            "audit_review_by": "2026-08-27",
-            "audit_status": "active",
-            "title": "Sivers Semiconductors 2025 Annual Report (Financial Notes & Directors' Report)",
-            "url": "https://www.sivers-semiconductors.com/wp-content/uploads/2026/05/Sivers_annualreport_2025_2.pdf",
-            "evidence_tier": 1,
-            "audit_id": "sivers_2025_annual_report_2026_07_12",
-            "source_under_audit": true,
-            "origin_entity": "Sivers Semiconductors",
-            "permission_basis": "This is Sivers Semiconductors' official annual report, published as an original investor disclosure on the issuer's own domain. The repository retains attributed research excerpts and derived extraction with the issuer PDF URL and retrieval metadata.",
-            "id": "sivers_ar_2025_financials"
+            "storage_permission": "repo_excerpt",
+            "origin_entity": "Semiconductor Today",
+            "permission_basis": "Third-party trade publication (Semiconductor Today, Juno Publishing and Media Solutions Ltd); copyrighted editorial. Repository retains only the canonical URL, limited verbatim excerpts needed for evidence, and derived research — not the full article text.",
+            "source_type": "industry_report",
+            "id": "semiconductor_today_sivers_ayar_1m_order_2023_07_03",
+            "title": "Sivers Photonics receives $1m order from Ayar Labs (Semiconductor Today, July 3, 2023)",
+            "url": "https://www.semiconductor-today.com/news_items/2023/jul/sivers-photonics-030723.shtml",
+            "evidence_tier": 3
           }
         },
         "sources": [
           {
-            "id": "sivers_ar_2025_financials_s5",
-            "locator": "Note 5, Information about major customers",
-            "quote": "During the financial year ended December 31, 2025, three customers each accounted for more than 10 percent of the Group's total revenue. Revenue from these customers amounted to SEK 183.4 million (2024: three customers, SEK 96.5 million). Customer A: SEK 79.4 (75.3) million. Customer B: SEK 55.2 (16.9) million. Customer C: SEK 48.7 (4.4) million. These revenues were attributable to the following operating segments: Customer A: Wireless. Customer B: Wireless. Customer C: Wireless. The Group does not disclose the identity of major customers.",
-            "source_doc_id": "sivers_ar_2025_financials",
-            "origin_entity": "Sivers Semiconductors",
-            "extraction_path": "extractions/sivers_ar_2025_financials.json",
+            "id": "semiconductor_today_sivers_ayar_1m_order_2023_07_03_s1",
+            "locator": "article body",
+            "quote": "Sivers Photonics of Glasgow, Scotland, UK has received a new order worth $1m",
+            "source_doc_id": "semiconductor_today_sivers_ayar_1m_order_2023_07_03",
+            "origin_entity": "Semiconductor Today",
+            "extraction_path": "extractions/semiconductor_today_sivers_ayar_1m_order_2023_07_03.json",
             "source_doc": {
-              "audit_ledger_path": "library/source_audits/sivers_2025_annual_report.json",
-              "storage_permission": "repo_full",
-              "source_audit_managed": true,
-              "audit_note": "2026-07-12: Ningi Research revenue-recognition allegations, going-concern concern, and pending financial restatement; review_by=2026-08-27; evidence=GitHub Issue #2 and thesis/sivers_v2_lane_memo.md",
-              "source_type": "filing",
-              "audit_review_by": "2026-08-27",
-              "audit_status": "active",
-              "title": "Sivers Semiconductors 2025 Annual Report (Financial Notes & Directors' Report)",
-              "url": "https://www.sivers-semiconductors.com/wp-content/uploads/2026/05/Sivers_annualreport_2025_2.pdf",
-              "evidence_tier": 1,
-              "audit_id": "sivers_2025_annual_report_2026_07_12",
-              "source_under_audit": true,
-              "origin_entity": "Sivers Semiconductors",
-              "permission_basis": "This is Sivers Semiconductors' official annual report, published as an original investor disclosure on the issuer's own domain. The repository retains attributed research excerpts and derived extraction with the issuer PDF URL and retrieval metadata.",
-              "id": "sivers_ar_2025_financials"
+              "storage_permission": "repo_excerpt",
+              "origin_entity": "Semiconductor Today",
+              "permission_basis": "Third-party trade publication (Semiconductor Today, Juno Publishing and Media Solutions Ltd); copyrighted editorial. Repository retains only the canonical URL, limited verbatim excerpts needed for evidence, and derived research — not the full article text.",
+              "source_type": "industry_report",
+              "id": "semiconductor_today_sivers_ayar_1m_order_2023_07_03",
+              "title": "Sivers Photonics receives $1m order from Ayar Labs (Semiconductor Today, July 3, 2023)",
+              "url": "https://www.semiconductor-today.com/news_items/2023/jul/sivers-photonics-030723.shtml",
+              "evidence_tier": 3
             }
           },
           {
-            "id": "sivers_ar_2025_financials_s9",
-            "locator": "CEO Letter, p.6",
-            "quote": "Our major customer, ALL.SPACE, continues to gain traction with the U.S. armed forces, recently completing a milestone demonstration under the U.S. Army's Next Generation Tactical Terminal (NGTT) program and achieving Technology Readiness Level 6.",
-            "source_doc_id": "sivers_ar_2025_financials",
-            "origin_entity": "Sivers Semiconductors",
-            "extraction_path": "extractions/sivers_ar_2025_financials.json",
+            "id": "semiconductor_today_sivers_ayar_1m_order_2023_07_03_s2",
+            "locator": "article body",
+            "quote": "DFB laser arrays provide the high-quality light source for Ayar Labs' SuperNova remote optical source product",
+            "source_doc_id": "semiconductor_today_sivers_ayar_1m_order_2023_07_03",
+            "origin_entity": "Semiconductor Today",
+            "extraction_path": "extractions/semiconductor_today_sivers_ayar_1m_order_2023_07_03.json",
             "source_doc": {
-              "audit_ledger_path": "library/source_audits/sivers_2025_annual_report.json",
-              "storage_permission": "repo_full",
-              "source_audit_managed": true,
-              "audit_note": "2026-07-12: Ningi Research revenue-recognition allegations, going-concern concern, and pending financial restatement; review_by=2026-08-27; evidence=GitHub Issue #2 and thesis/sivers_v2_lane_memo.md",
-              "source_type": "filing",
-              "audit_review_by": "2026-08-27",
-              "audit_status": "active",
-              "title": "Sivers Semiconductors 2025 Annual Report (Financial Notes & Directors' Report)",
-              "url": "https://www.sivers-semiconductors.com/wp-content/uploads/2026/05/Sivers_annualreport_2025_2.pdf",
-              "evidence_tier": 1,
-              "audit_id": "sivers_2025_annual_report_2026_07_12",
-              "source_under_audit": true,
-              "origin_entity": "Sivers Semiconductors",
-              "permission_basis": "This is Sivers Semiconductors' official annual report, published as an original investor disclosure on the issuer's own domain. The repository retains attributed research excerpts and derived extraction with the issuer PDF URL and retrieval metadata.",
-              "id": "sivers_ar_2025_financials"
+              "storage_permission": "repo_excerpt",
+              "origin_entity": "Semiconductor Today",
+              "permission_basis": "Third-party trade publication (Semiconductor Today, Juno Publishing and Media Solutions Ltd); copyrighted editorial. Repository retains only the canonical URL, limited verbatim excerpts needed for evidence, and derived research — not the full article text.",
+              "source_type": "industry_report",
+              "id": "semiconductor_today_sivers_ayar_1m_order_2023_07_03",
+              "title": "Sivers Photonics receives $1m order from Ayar Labs (Semiconductor Today, July 3, 2023)",
+              "url": "https://www.semiconductor-today.com/news_items/2023/jul/sivers-photonics-030723.shtml",
+              "evidence_tier": 3
             }
           }
         ]
@@ -4357,30 +4290,30 @@
         "item": {
           "evidence_ref": "E15",
           "type": "claim",
-          "claim_id": "sivers_ar_2025_photonics_excerpt_cl3",
+          "claim_id": "sivers_ar_2025_photonics_excerpt_cl5",
           "edge_key": null,
           "attributes": [],
           "assertion_ids": [],
           "source_ids": [
-            "sivers_ar_2025_photonics_excerpt_s9",
-            "sivers_ar_2025_photonics_excerpt_s16"
+            "sivers_ar_2025_photonics_excerpt_s5",
+            "sivers_ar_2025_photonics_excerpt_s12"
           ],
-          "purpose": "支援 leading indicators 段：Sivers 自述預計 2027 年及以後部分 CW DFB 採樣客戶將轉為量產承諾，是觀測時程錨點"
+          "purpose": "確立 ELS production readiness 目標為 2026 年底，支撐主瓶頸段與 leading indicator 分析"
         },
         "claim": {
-          "id": "sivers_ar_2025_photonics_excerpt_cl3",
-          "statement": "Sivers is sampling CW DFB lasers to multiple pluggable transceiver manufacturers worldwide, with a subset expected to commit to production plans in 2027 and beyond.",
+          "id": "sivers_ar_2025_photonics_excerpt_cl5",
+          "statement": "Sivers and O-Net Technologies are targeting production readiness of high-performance ELS for CPO by year-end 2026, with customer prototype demonstrations in H1 2026.",
           "demand_proof_level": "guided",
-          "disproof_condition": "If pluggable transceiver manufacturers select alternative laser suppliers or if bandwidth transitions stall, Sivers' design-in pipeline would not convert to production orders.",
+          "disproof_condition": "If prototypes fail customer evaluations or production readiness milestones slip beyond 2026, this claim should be downgraded.",
           "confidence": 0.85,
           "source_ids": [
-            "sivers_ar_2025_photonics_excerpt_s9",
-            "sivers_ar_2025_photonics_excerpt_s16"
+            "sivers_ar_2025_photonics_excerpt_s5",
+            "sivers_ar_2025_photonics_excerpt_s12"
           ],
           "source_doc_id": "sivers_ar_2025_photonics_excerpt",
           "subject_kind": "edge",
           "subject_node_id": null,
-          "subject_edge_key": "edge:37d1b83d0edf43f8a7f223845f9dc04c011a51b00b47d61324ac725cd1dcc5fc",
+          "subject_edge_key": "edge:f06c79e5b1e989550acbc7f7abfa565d248f565ff2a91177d1f0ff41bb17c6e3",
           "origin_entity": "Sivers Semiconductors",
           "source_doc": {
             "audit_ledger_path": "library/source_audits/sivers_2025_annual_report.json",
@@ -4402,9 +4335,9 @@
         },
         "sources": [
           {
-            "id": "sivers_ar_2025_photonics_excerpt_s9",
+            "id": "sivers_ar_2025_photonics_excerpt_s5",
             "locator": "p.10, Photonics section",
-            "quote": "We currently have strong traction and interest sampling our CW DFB lasers to several pluggable transceiver manufacturers world-wide.",
+            "quote": "In April 2025, Sivers announced a strategic partnership with O-Net Technologies to produce high-performance external laser sources, a critical component for next-generation Co-Packaged Optics (CPO) in switches, network interface cards…",
             "source_doc_id": "sivers_ar_2025_photonics_excerpt",
             "origin_entity": "Sivers Semiconductors",
             "extraction_path": "extractions/sivers_ar_2025.json",
@@ -4427,9 +4360,9 @@
             }
           },
           {
-            "id": "sivers_ar_2025_photonics_excerpt_s16",
+            "id": "sivers_ar_2025_photonics_excerpt_s12",
             "locator": "p.10, Photonics section",
-            "quote": "As these trials progress, we expect a subset of these customers to commit to production plans with Sivers lasers in 2027 and beyond.",
+            "quote": "prototypes will be demonstrated to customers in the first half of 2026 and production readiness targeted by year-end 2026.",
             "source_doc_id": "sivers_ar_2025_photonics_excerpt",
             "origin_entity": "Sivers Semiconductors",
             "extraction_path": "extractions/sivers_ar_2025.json",
@@ -4452,20 +4385,294 @@
             }
           }
         ]
+      },
+      {
+        "evidence_ref": "E16",
+        "item": {
+          "evidence_ref": "E16",
+          "type": "claim",
+          "claim_id": "damnang_poet_ofc2026_review_2026_03_cl1",
+          "edge_key": null,
+          "attributes": [],
+          "assertion_ids": [],
+          "source_ids": [
+            "damnang_poet_ofc2026_review_2026_03_s2",
+            "damnang_poet_ofc2026_review_2026_03_s3"
+          ],
+          "purpose": "確立 POET Blazar 聲稱成本比 DFB 低一個數量級，支撐主瓶頸段的替代風險分析與 leading indicator"
+        },
+        "claim": {
+          "id": "damnang_poet_ofc2026_review_2026_03_cl1",
+          "statement": "POET publicly live-demoed its Blazar and Starlight ELS products at OFC 2026 (Mar 16-19). No primary source confirms these demos used Sivers DFB laser arrays, and no explicit announcement confirms the POET-Sivers ELS 'customer prototype demonstrations in H1 2026' milestone was completed. Demos happened, but Sivers content inside is UNVERIFIED. Note: POET positions Blazar as an order-of-magnitude cheaper substitute for DFB lasers, making partner POET a potential future substitutor of Sivers DFB arrays.",
+          "demand_proof_level": "inferred",
+          "disproof_condition": "If POET or Sivers confirm the demoed ELS units contain Sivers laser arrays or announce completed customer prototype demos, upgrade. If the Sivers Q2 2026 report (due Aug 27, 2026) reveals the milestone slipped, downgrade the end-2026 ELS production-readiness claim. If Blazar hybrid lasers displace DFB arrays in POET ELS BOM, downgrade Sivers-POET supply edge.",
+          "confidence": 0.55,
+          "source_ids": [
+            "damnang_poet_ofc2026_review_2026_03_s2",
+            "damnang_poet_ofc2026_review_2026_03_s3"
+          ],
+          "source_doc_id": "damnang_poet_ofc2026_review_2026_03",
+          "subject_kind": "node",
+          "subject_node_id": "co:poet_technologies",
+          "subject_edge_key": null,
+          "origin_entity": "damnang_substack",
+          "source_doc": {
+            "storage_permission": "local_only",
+            "origin_entity": "damnang_substack",
+            "permission_basis": "No creator reuse license or independently verified canonical source URL was recorded for this analyst article. Copyright and network-storage permission are therefore unresolved, so the extraction remains local-only.",
+            "source_type": "industry_report",
+            "id": "damnang_poet_ofc2026_review_2026_03",
+            "title": "OFC 2026 review: POET Technologies ELS live demonstrations (damnang.com analyst article, late March 2026)",
+            "evidence_tier": 3
+          }
+        },
+        "sources": [
+          {
+            "id": "damnang_poet_ofc2026_review_2026_03_s2",
+            "locator": "article, demo section",
+            "quote": "The main event for live demos at OFC 2026 was ELS. The Blazar and Starlight ELS products were front and center in the booth",
+            "source_doc_id": "damnang_poet_ofc2026_review_2026_03",
+            "origin_entity": "damnang_substack",
+            "extraction_path": "extractions/damnang_poet_ofc2026_review_2026_03.json",
+            "source_doc": {
+              "storage_permission": "local_only",
+              "origin_entity": "damnang_substack",
+              "permission_basis": "No creator reuse license or independently verified canonical source URL was recorded for this analyst article. Copyright and network-storage permission are therefore unresolved, so the extraction remains local-only.",
+              "source_type": "industry_report",
+              "id": "damnang_poet_ofc2026_review_2026_03",
+              "title": "OFC 2026 review: POET Technologies ELS live demonstrations (damnang.com analyst article, late March 2026)",
+              "evidence_tier": 3
+            }
+          },
+          {
+            "id": "damnang_poet_ofc2026_review_2026_03_s3",
+            "locator": "article, Blazar cost section",
+            "quote": "POET claims costs come down by an order of magnitude compared to DFB",
+            "source_doc_id": "damnang_poet_ofc2026_review_2026_03",
+            "origin_entity": "damnang_substack",
+            "extraction_path": "extractions/damnang_poet_ofc2026_review_2026_03.json",
+            "source_doc": {
+              "storage_permission": "local_only",
+              "origin_entity": "damnang_substack",
+              "permission_basis": "No creator reuse license or independently verified canonical source URL was recorded for this analyst article. Copyright and network-storage permission are therefore unresolved, so the extraction remains local-only.",
+              "source_type": "industry_report",
+              "id": "damnang_poet_ofc2026_review_2026_03",
+              "title": "OFC 2026 review: POET Technologies ELS live demonstrations (damnang.com analyst article, late March 2026)",
+              "evidence_tier": 3
+            }
+          }
+        ]
+      },
+      {
+        "evidence_ref": "E17",
+        "item": {
+          "evidence_ref": "E17",
+          "type": "claim",
+          "claim_id": "poet_po_update_pr_2026_04_27_cl1",
+          "edge_key": null,
+          "attributes": [],
+          "assertion_ids": [],
+          "source_ids": [
+            "poet_po_update_pr_2026_04_27_s1",
+            "poet_po_update_pr_2026_04_27_s2"
+          ],
+          "purpose": "確認 Marvell/Celestial AI 已取消 POET 所有訂單，限定 POET 作為 Sivers 客戶的當前風險程度"
+        },
+        "claim": {
+          "id": "poet_po_update_pr_2026_04_27_cl1",
+          "statement": "Dated event (2026-04-23 notice, disclosed 2026-04-27): Marvell, after acquiring Celestial AI, cancelled ALL purchase orders from Celestial AI to POET (including the initial production units disclosed 2023-04-25), citing POET's breach of confidentiality obligations. The Celestial AI/Marvell demand channel for POET optical engines is terminated — any graph claim relying on Celestial AI as a POET customer must be treated as disproven as of this date.",
+          "demand_proof_level": "confirmed",
+          "disproof_condition": "Marvell reinstates the orders or a new Marvell-POET commercial agreement is disclosed.",
+          "confidence": 0.9,
+          "source_ids": [
+            "poet_po_update_pr_2026_04_27_s1",
+            "poet_po_update_pr_2026_04_27_s2"
+          ],
+          "source_doc_id": "poet_po_update_pr_2026_04_27",
+          "subject_kind": "node",
+          "subject_node_id": "co:poet_technologies",
+          "subject_edge_key": null,
+          "origin_entity": "POET Technologies",
+          "source_doc": {
+            "storage_permission": "repo_full",
+            "origin_entity": "POET Technologies",
+            "publisher": "GlobeNewswire / SEC EDGAR (6-K Exhibit 99.1)",
+            "permission_basis": "Corporate press release distributed for publication and filed as an SEC 6-K exhibit; full text may be committed.",
+            "source_type": "filing",
+            "id": "poet_po_update_pr_2026_04_27",
+            "retrieved_at": "2026-07-17",
+            "title": "POET Technologies Provides Purchase Order Update — Marvell (Celestial AI) cancels all POET purchase orders",
+            "published_at": "2026-04-27",
+            "url": "https://www.sec.gov/Archives/edgar/data/1437424/000117184326002726/exh_991.htm",
+            "evidence_tier": 1
+          }
+        },
+        "sources": [
+          {
+            "id": "poet_po_update_pr_2026_04_27_s1",
+            "locator": "PR body, para 1",
+            "quote": "today announced the cancellation of all purchase orders received by the Company from Celestial AI, including the ones for initial production units first disclosed (the \"Purchase Orders\") by the Company in a press release on April 25, 2023.",
+            "source_doc_id": "poet_po_update_pr_2026_04_27",
+            "origin_entity": "POET Technologies",
+            "extraction_path": "extractions/poet_po_update_pr_2026_04_27.json",
+            "source_doc": {
+              "storage_permission": "repo_full",
+              "origin_entity": "POET Technologies",
+              "publisher": "GlobeNewswire / SEC EDGAR (6-K Exhibit 99.1)",
+              "permission_basis": "Corporate press release distributed for publication and filed as an SEC 6-K exhibit; full text may be committed.",
+              "source_type": "filing",
+              "id": "poet_po_update_pr_2026_04_27",
+              "retrieved_at": "2026-07-17",
+              "title": "POET Technologies Provides Purchase Order Update — Marvell (Celestial AI) cancels all POET purchase orders",
+              "published_at": "2026-04-27",
+              "url": "https://www.sec.gov/Archives/edgar/data/1437424/000117184326002726/exh_991.htm",
+              "evidence_tier": 1
+            }
+          },
+          {
+            "id": "poet_po_update_pr_2026_04_27_s2",
+            "locator": "PR body, para 2",
+            "quote": "Marvell Semiconductor Inc., which acquired Celestial AI, provided written notice of the cancellation to the Company on April 23, 2026. As the basis for the cancellation, Marvell indicated that the Company had made disclosures of information related to the Purchase Order and shipping information in contravention of its confidentiality obligations.",
+            "source_doc_id": "poet_po_update_pr_2026_04_27",
+            "origin_entity": "POET Technologies",
+            "extraction_path": "extractions/poet_po_update_pr_2026_04_27.json",
+            "source_doc": {
+              "storage_permission": "repo_full",
+              "origin_entity": "POET Technologies",
+              "publisher": "GlobeNewswire / SEC EDGAR (6-K Exhibit 99.1)",
+              "permission_basis": "Corporate press release distributed for publication and filed as an SEC 6-K exhibit; full text may be committed.",
+              "source_type": "filing",
+              "id": "poet_po_update_pr_2026_04_27",
+              "retrieved_at": "2026-07-17",
+              "title": "POET Technologies Provides Purchase Order Update — Marvell (Celestial AI) cancels all POET purchase orders",
+              "published_at": "2026-04-27",
+              "url": "https://www.sec.gov/Archives/edgar/data/1437424/000117184326002726/exh_991.htm",
+              "evidence_tier": 1
+            }
+          }
+        ]
+      },
+      {
+        "evidence_ref": "E18",
+        "item": {
+          "evidence_ref": "E18",
+          "type": "edge",
+          "claim_id": null,
+          "edge_key": "edge:3bb6fb27d008730ed6689db280d467df76f74bcc085388599d75f9237bc3560a",
+          "attributes": [],
+          "assertion_ids": [
+            "silicon_matter_sivers_ayar_2026_03_14_e3"
+          ],
+          "source_ids": [
+            "silicon_matter_sivers_ayar_2026_03_14_s2",
+            "silicon_matter_sivers_ayar_2026_03_14_s3"
+          ],
+          "purpose": "確立 Lumentum 主動競爭 CPO 市場（挖角 Ayar Labs 前 VP），支撐主瓶頸段競爭動態分析與 disproof condition"
+        },
+        "edge": {
+          "edge_key": "edge:3bb6fb27d008730ed6689db280d467df76f74bcc085388599d75f9237bc3560a",
+          "src_id": "co:lumentum",
+          "src_name": "Lumentum",
+          "relation": "COMPETES_WITH",
+          "dst_id": "co:sivers_semiconductors",
+          "dst_name": "Sivers Semiconductors",
+          "attributes": {},
+          "open_conflict_attributes": [],
+          "attribute_resolution_meta": {},
+          "assertions": {
+            "silicon_matter_sivers_ayar_2026_03_14_e3": {
+              "id": "silicon_matter_sivers_ayar_2026_03_14_e3",
+              "attributes": {},
+              "source_ids": [
+                "silicon_matter_sivers_ayar_2026_03_14_s2",
+                "silicon_matter_sivers_ayar_2026_03_14_s3"
+              ],
+              "source_doc_id": "silicon_matter_sivers_ayar_2026_03_14",
+              "origin_entity": "silicon_matter_substack",
+              "source_doc": {
+                "storage_permission": "local_only",
+                "origin_entity": "silicon_matter_substack",
+                "permission_basis": "No creator reuse license or independently verified canonical source URL was recorded for this analyst article. Copyright and network-storage permission are therefore unresolved, so the extraction remains local-only.",
+                "source_type": "industry_report",
+                "id": "silicon_matter_sivers_ayar_2026_03_14",
+                "title": "Silicon Matter: Sivers Semiconductors laser arrays in Ayar Labs SuperNova (analyst article, March 14, 2026)",
+                "evidence_tier": 3
+              }
+            }
+          }
+        },
+        "assertions": [
+          {
+            "id": "silicon_matter_sivers_ayar_2026_03_14_e3",
+            "attributes": {},
+            "source_ids": [
+              "silicon_matter_sivers_ayar_2026_03_14_s2",
+              "silicon_matter_sivers_ayar_2026_03_14_s3"
+            ],
+            "source_doc_id": "silicon_matter_sivers_ayar_2026_03_14",
+            "origin_entity": "silicon_matter_substack",
+            "source_doc": {
+              "storage_permission": "local_only",
+              "origin_entity": "silicon_matter_substack",
+              "permission_basis": "No creator reuse license or independently verified canonical source URL was recorded for this analyst article. Copyright and network-storage permission are therefore unresolved, so the extraction remains local-only.",
+              "source_type": "industry_report",
+              "id": "silicon_matter_sivers_ayar_2026_03_14",
+              "title": "Silicon Matter: Sivers Semiconductors laser arrays in Ayar Labs SuperNova (analyst article, March 14, 2026)",
+              "evidence_tier": 3
+            }
+          }
+        ],
+        "sources": [
+          {
+            "id": "silicon_matter_sivers_ayar_2026_03_14_s2",
+            "locator": "article, Lumentum section",
+            "quote": "The partnership between Sivers Semiconductors and Ayar Labs has been so successful that Lumentum in 2024 poached Ayar Labs' former VP of Laser and Platform Engineering, appointing him as CTO",
+            "source_doc_id": "silicon_matter_sivers_ayar_2026_03_14",
+            "origin_entity": "silicon_matter_substack",
+            "extraction_path": "extractions/silicon_matter_sivers_ayar_2026_03_14.json",
+            "source_doc": {
+              "storage_permission": "local_only",
+              "origin_entity": "silicon_matter_substack",
+              "permission_basis": "No creator reuse license or independently verified canonical source URL was recorded for this analyst article. Copyright and network-storage permission are therefore unresolved, so the extraction remains local-only.",
+              "source_type": "industry_report",
+              "id": "silicon_matter_sivers_ayar_2026_03_14",
+              "title": "Silicon Matter: Sivers Semiconductors laser arrays in Ayar Labs SuperNova (analyst article, March 14, 2026)",
+              "evidence_tier": 3
+            }
+          },
+          {
+            "id": "silicon_matter_sivers_ayar_2026_03_14_s3",
+            "locator": "article, Lumentum section",
+            "quote": "to strengthen their own foothold in the emerging CPO market",
+            "source_doc_id": "silicon_matter_sivers_ayar_2026_03_14",
+            "origin_entity": "silicon_matter_substack",
+            "extraction_path": "extractions/silicon_matter_sivers_ayar_2026_03_14.json",
+            "source_doc": {
+              "storage_permission": "local_only",
+              "origin_entity": "silicon_matter_substack",
+              "permission_basis": "No creator reuse license or independently verified canonical source URL was recorded for this analyst article. Copyright and network-storage permission are therefore unresolved, so the extraction remains local-only.",
+              "source_type": "industry_report",
+              "id": "silicon_matter_sivers_ayar_2026_03_14",
+              "title": "Silicon Matter: Sivers Semiconductors laser arrays in Ayar Labs SuperNova (analyst article, March 14, 2026)",
+              "evidence_tier": 3
+            }
+          }
+        ]
       }
     ]
   },
   "evidence_gate": {
     "promotion_pass": false,
     "promotion_blockers": [
-      "E1: SourceDoc sivers_ar_2025_photonics_excerpt is under audit",
-      "E2: SourceDoc sivers_ar_2025_photonics_excerpt is under audit",
+      "E1: SourceDoc sivers_ar_2025_financials is under audit",
+      "E2: SourceDoc sivers_ar_2025_financials is under audit",
       "E3: SourceDoc sivers_ar_2025_photonics_excerpt is under audit",
+      "E4: SourceDoc sivers_ar_2025_photonics_excerpt is under audit",
       "E5: SourceDoc sivers_ar_2025_photonics_excerpt is under audit",
-      "E9: SourceDoc sivers_ar_2025_photonics_excerpt is under audit",
-      "E12: SourceDoc sivers_ar_2025_financials is under audit",
-      "E13: SourceDoc sivers_ar_2025_financials is under audit",
-      "E14: SourceDoc sivers_ar_2025_financials is under audit",
+      "E10: SourceDoc sivers_ar_2025_photonics_excerpt is under audit",
+      "E11: SourceDoc sivers_ar_2025_photonics_excerpt is under audit",
+      "E12: SourceDoc sivers_ar_2025_photonics_excerpt is under audit",
+      "E13: SourceDoc sivers_ar_2025_photonics_excerpt is under audit",
       "E15: SourceDoc sivers_ar_2025_photonics_excerpt is under audit"
     ],
     "annotations": {
@@ -4473,11 +4680,19 @@
         {
           "code": "source_under_audit",
           "severity": "blocker",
-          "source_doc_id": "sivers_ar_2025_photonics_excerpt",
-          "message": "SourceDoc sivers_ar_2025_photonics_excerpt 正在可信度審查：2026-07-12: Ningi Research revenue-recognition allegations, going-concern concern, and pending financial restatement; review_by=2026-08-27; evidence=GitHub Issue #2 and thesis/sivers_v2_lane_memo.md"
+          "source_doc_id": "sivers_ar_2025_financials",
+          "message": "SourceDoc sivers_ar_2025_financials 正在可信度審查：2026-07-12: Ningi Research revenue-recognition allegations, going-concern concern, and pending financial restatement; review_by=2026-08-27; evidence=GitHub Issue #2 and thesis/sivers_v2_lane_memo.md"
         }
       ],
       "E2": [
+        {
+          "code": "source_under_audit",
+          "severity": "blocker",
+          "source_doc_id": "sivers_ar_2025_financials",
+          "message": "SourceDoc sivers_ar_2025_financials 正在可信度審查：2026-07-12: Ningi Research revenue-recognition allegations, going-concern concern, and pending financial restatement; review_by=2026-08-27; evidence=GitHub Issue #2 and thesis/sivers_v2_lane_memo.md"
+        }
+      ],
+      "E3": [
         {
           "code": "source_under_audit",
           "severity": "blocker",
@@ -4485,7 +4700,7 @@
           "message": "SourceDoc sivers_ar_2025_photonics_excerpt 正在可信度審查：2026-07-12: Ningi Research revenue-recognition allegations, going-concern concern, and pending financial restatement; review_by=2026-08-27; evidence=GitHub Issue #2 and thesis/sivers_v2_lane_memo.md"
         }
       ],
-      "E3": [
+      "E4": [
         {
           "code": "source_under_audit",
           "severity": "blocker",
@@ -4501,7 +4716,15 @@
           "message": "SourceDoc sivers_ar_2025_photonics_excerpt 正在可信度審查：2026-07-12: Ningi Research revenue-recognition allegations, going-concern concern, and pending financial restatement; review_by=2026-08-27; evidence=GitHub Issue #2 and thesis/sivers_v2_lane_memo.md"
         }
       ],
-      "E9": [
+      "E10": [
+        {
+          "code": "source_under_audit",
+          "severity": "blocker",
+          "source_doc_id": "sivers_ar_2025_photonics_excerpt",
+          "message": "SourceDoc sivers_ar_2025_photonics_excerpt 正在可信度審查：2026-07-12: Ningi Research revenue-recognition allegations, going-concern concern, and pending financial restatement; review_by=2026-08-27; evidence=GitHub Issue #2 and thesis/sivers_v2_lane_memo.md"
+        }
+      ],
+      "E11": [
         {
           "code": "source_under_audit",
           "severity": "blocker",
@@ -4513,24 +4736,16 @@
         {
           "code": "source_under_audit",
           "severity": "blocker",
-          "source_doc_id": "sivers_ar_2025_financials",
-          "message": "SourceDoc sivers_ar_2025_financials 正在可信度審查：2026-07-12: Ningi Research revenue-recognition allegations, going-concern concern, and pending financial restatement; review_by=2026-08-27; evidence=GitHub Issue #2 and thesis/sivers_v2_lane_memo.md"
+          "source_doc_id": "sivers_ar_2025_photonics_excerpt",
+          "message": "SourceDoc sivers_ar_2025_photonics_excerpt 正在可信度審查：2026-07-12: Ningi Research revenue-recognition allegations, going-concern concern, and pending financial restatement; review_by=2026-08-27; evidence=GitHub Issue #2 and thesis/sivers_v2_lane_memo.md"
         }
       ],
       "E13": [
         {
           "code": "source_under_audit",
           "severity": "blocker",
-          "source_doc_id": "sivers_ar_2025_financials",
-          "message": "SourceDoc sivers_ar_2025_financials 正在可信度審查：2026-07-12: Ningi Research revenue-recognition allegations, going-concern concern, and pending financial restatement; review_by=2026-08-27; evidence=GitHub Issue #2 and thesis/sivers_v2_lane_memo.md"
-        }
-      ],
-      "E14": [
-        {
-          "code": "source_under_audit",
-          "severity": "blocker",
-          "source_doc_id": "sivers_ar_2025_financials",
-          "message": "SourceDoc sivers_ar_2025_financials 正在可信度審查：2026-07-12: Ningi Research revenue-recognition allegations, going-concern concern, and pending financial restatement; review_by=2026-08-27; evidence=GitHub Issue #2 and thesis/sivers_v2_lane_memo.md"
+          "source_doc_id": "sivers_ar_2025_photonics_excerpt",
+          "message": "SourceDoc sivers_ar_2025_photonics_excerpt 正在可信度審查：2026-07-12: Ningi Research revenue-recognition allegations, going-concern concern, and pending financial restatement; review_by=2026-08-27; evidence=GitHub Issue #2 and thesis/sivers_v2_lane_memo.md"
         }
       ],
       "E15": [

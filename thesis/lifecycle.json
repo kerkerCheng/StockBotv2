@@ -10,11 +10,11 @@
   },
   "sivers": {
     "status": "review_required",
-    "memo": "thesis/sivers_v2_lane_memo.md",
+    "memo": "thesis/sivers_v3_lane_memo.md",
     "ticker": "SIVE.ST",
     "last_checked": "2026-07-12",
     "next_check": "2026-08-27",
     "check_interval_days": 30,
-    "note": "L7 review 已於 2026-07-12 人工決議：持有至 2026-08-27 Q2+財報重編分辨點；觸發任一核查點須 48h 內人工決策（詳見 memo header 與 GitHub Issue #2）"
+    "note": "L7 review 已於 2026-07-12 人工決議：持有至 2026-08-27 Q2+財報重編分辨點；觸發任一核查點須 48h 內人工決策（詳見 memo header 與 GitHub Issue #2）。2026-07-19 memo 更新為 v3：客戶邊補獨立來源、Marvell 直接邊更正為間接鏈並反映 POET/Celestial 通道 2026-04 切斷。仍 review_required — 核心財務/光子 claim 全押在 source_under_audit 的 FY2025 年報（Ningi 指控），evidence_gate 未過。"
   }
 }
