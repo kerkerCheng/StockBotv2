@@ -1,0 +1,437 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "lrcx_10_k_20250811",
+    "title": "Lam Research FY2025 Form 10-K — deposition/etch/clean for leading & non-leading edge, DRAM/NAND demand, CSBG non-leading refurbished products, China exposure",
+    "source_type": "filing",
+    "evidence_tier": 1,
+    "origin_entity": "Lam Research Corporation",
+    "url": "https://www.sec.gov/Archives/edgar/data/707549/000070754925000075/lrcx-20250629.htm",
+    "published_at": "2025-08-11",
+    "storage_permission": "repo_full",
+    "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+    "publisher": "SEC EDGAR",
+    "retrieved_at": "2026-07-19"
+  },
+  "sources": [
+    {
+      "id": "lrcx_10_k_20250811_s1",
+      "locator": "10-K Business section, chars 38300-40300",
+      "quote": "Our Customer Support Business Group (\"CSBG\") provides products and services to maximize installed equipment performance, predictability, and operational efficiency. We offer a broad range of services to deliver value throughout the lifecycle of our equipment, including customer service, spares, upgrades, and new and refurbished non-leading edge products in our deposition, etch, and clean markets."
+    },
+    {
+      "id": "lrcx_10_k_20250811_s2",
+      "locator": "10-K Business section, chars 38300-40300",
+      "quote": "within CSBG, our Reliant® product line offers new and refurbished non-leading edge products in deposition, etch and clean markets for those applications that do not require the most advanced wafer processing capability."
+    },
+    {
+      "id": "lrcx_10_k_20250811_s3",
+      "locator": "10-K Business section, chars 38300-40300",
+      "quote": "Products Market   Process/Application   Technology   Products Deposition Metal Films Electrochemical Deposition (\"ECD\") (Copper & Other) SABRE® family  Chemical Vapor Deposition (\"CVD\") Atomic Layer Deposition (\"ALD\") (Tungsten & Molybdenum) ALTUS® family  Dielectric Films Plasma-enhanced CVD (\"PECVD\") ALD  Gapfill High-Density Plasma CVD (\"HDP-CVD\") VECTOR® family Striker® family SPEED® family Etch Conductor Etch Reactive Ion Etc"
+    },
+    {
+      "id": "lrcx_10_k_20250811_s4",
+      "locator": "10-K Risk Factors, chars 60000-62900",
+      "quote": "Our Sales to Customers in China, a Significant Region for Us, Have Been Impacted, and are Likely to be Materially and Adversely Affected by Export License Requirements and Other Regulatory Changes, or Other Governmental Actions in the Course of the Trade Relationship Between the U.S. and China"
+    },
+    {
+      "id": "lrcx_10_k_20250811_s5",
+      "locator": "10-K MD&A, chars 185200-192200",
+      "quote": "Fiscal year 2025 revenue increased 23.7% compared to fiscal year 2024, driven by strong customer demand for semiconductor equipment systems as well as customer support-related revenues from customer investments across memory and non-memory markets."
+    },
+    {
+      "id": "lrcx_10_k_20250811_s6",
+      "locator": "10-K MD&A, chars 185200-192200",
+      "quote": "Revenue decreased in fiscal year 2024 compared to fiscal year 2023 mainly due to decreases in non-volatile memory spending, partially offset by increases in DRAM spending by our customers."
+    },
+    {
+      "id": "lrcx_10_k_20250811_s7",
+      "locator": "10-K MD&A, chars 185200-192200",
+      "quote": "China 34% [of revenue FY2025] ... Korea 22% ... Taiwan 19% ... Japan 10% ... United States 7%"
+    },
+    {
+      "id": "lrcx_10_k_20250811_s8",
+      "locator": "10-K MD&A, chars 185200-192200",
+      "quote": "Revenue increased in fiscal year 2025 compared to fiscal year 2024 due to increased equipment spending by our customers across Memory and Foundry market segments as well as increased customer support-related revenue for upgrades, spares, and services."
+    },
+    {
+      "id": "lrcx_10_k_20250811_s9",
+      "locator": "10-K MD&A, chars 185200-192200",
+      "quote": "The percentage of leading- and non-leading-edge equipment and upgrade revenue from each of the markets we serve was as follows: Foundry 45% [FY25] ... Memory 42% [FY25] ... Logic/integrated device manufacturing 13% [FY25]"
+    },
+    {
+      "id": "lrcx_10_k_20250811_s10",
+      "locator": "10-K MD&A, chars 185200-192200",
+      "quote": "Fiscal year 2024 revenue decreased 14.5% compared to fiscal year 2023. Systems and customer-support related revenues declined in fiscal year 2024 primarily from weakness in the non-volatile memory market, partially offset by strength in DRAM as well as increased revenue generation from our China regional customers."
+    },
+    {
+      "id": "lrcx_10_k_20250811_s11",
+      "locator": "10-K MD&A, chars 185200-192200",
+      "quote": "ning, process flow, and advanced packaging chip integration, will drive sustainable growth and lead to an increase in the served available market for our products and services in the deposition, etch, and clean businesses."
+    },
+    {
+      "id": "lrcx_10_k_20250811_s12",
+      "locator": "10-K Risk Factors, chars 60000-62900",
+      "quote": "Regulations that impact trade, including tariffs, export controls, taxes, trade barriers, sanctions, the termination or modification of trade agreements, trade zones, and other duty mitigation initiatives, have the potential to increase our manufacturing costs, decrease margins, reduce the competitiveness of our products, or inhibit our ability to sell products or purchase necessary equipment and supplies"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:lam_research",
+      "type": "Company",
+      "name": "Lam Research",
+      "abstraction_level": "equipment_epitaxy",
+      "role": "leader",
+      "aliases": [
+        "LRCX",
+        "Lam Research Corporation"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": null,
+        "concentration_score": null,
+        "intrinsic_cycle_time_weeks": null
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "lrcx_10_k_20250811_s1"
+      ]
+    },
+    {
+      "id": "tech:deposition_etch_clean",
+      "type": "TechNode",
+      "name": "Deposition, Etch, and Clean Equipment",
+      "abstraction_level": "equipment_epitaxy",
+      "role": null,
+      "aliases": [
+        "wafer fabrication deposition/etch/clean"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 4,
+        "concentration_score": null,
+        "intrinsic_cycle_time_weeks": null
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "lrcx_10_k_20250811_s1",
+        "lrcx_10_k_20250811_s3"
+      ]
+    },
+    {
+      "id": "tech:non_leading_edge_fab",
+      "type": "TechNode",
+      "name": "Non-leading-edge wafer fabrication",
+      "abstraction_level": "equipment_epitaxy",
+      "role": null,
+      "aliases": [
+        "mature node",
+        "non-leading edge"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 2,
+        "concentration_score": null,
+        "intrinsic_cycle_time_weeks": null
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "lrcx_10_k_20250811_s2"
+      ]
+    },
+    {
+      "id": "prod:reliant_product_line",
+      "type": "Product",
+      "name": "Reliant product line (CSBG non-leading edge)",
+      "abstraction_level": "equipment_epitaxy",
+      "role": null,
+      "aliases": [
+        "Reliant"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "lrcx_10_k_20250811_s2"
+      ]
+    },
+    {
+      "id": "prod:sabre_family",
+      "type": "Product",
+      "name": "SABRE family (ECD deposition)",
+      "abstraction_level": "equipment_epitaxy",
+      "role": null,
+      "aliases": [
+        "SABRE"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "lrcx_10_k_20250811_s3"
+      ]
+    },
+    {
+      "id": "prod:altus_family",
+      "type": "Product",
+      "name": "ALTUS family (CVD/ALD tungsten & molybdenum)",
+      "abstraction_level": "equipment_epitaxy",
+      "role": null,
+      "aliases": [
+        "ALTUS"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "lrcx_10_k_20250811_s3"
+      ]
+    },
+    {
+      "id": "prod:vector_family",
+      "type": "Product",
+      "name": "VECTOR family (PECVD/ALD dielectric)",
+      "abstraction_level": "equipment_epitaxy",
+      "role": null,
+      "aliases": [
+        "VECTOR",
+        "Striker",
+        "SPEED"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "lrcx_10_k_20250811_s3"
+      ]
+    },
+    {
+      "id": "tech:dram_production",
+      "type": "TechNode",
+      "name": "DRAM wafer fabrication",
+      "abstraction_level": "foundry_packaging",
+      "role": null,
+      "aliases": [
+        "DRAM"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 4,
+        "concentration_score": null,
+        "intrinsic_cycle_time_weeks": null
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "lrcx_10_k_20250811_s6",
+        "lrcx_10_k_20250811_s10"
+      ]
+    },
+    {
+      "id": "tech:nand_production",
+      "type": "TechNode",
+      "name": "NAND / non-volatile memory wafer fabrication",
+      "abstraction_level": "foundry_packaging",
+      "role": null,
+      "aliases": [
+        "NAND",
+        "non-volatile memory",
+        "NVM"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 4,
+        "concentration_score": null,
+        "intrinsic_cycle_time_weeks": null
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "lrcx_10_k_20250811_s6",
+        "lrcx_10_k_20250811_s10"
+      ]
+    },
+    {
+      "id": "tech:advanced_packaging_integration",
+      "type": "TechNode",
+      "name": "Advanced packaging chip integration",
+      "abstraction_level": "foundry_packaging",
+      "role": null,
+      "aliases": [
+        "advanced packaging"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 4,
+        "concentration_score": null,
+        "intrinsic_cycle_time_weeks": null
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "lrcx_10_k_20250811_s11"
+      ]
+    },
+    {
+      "id": "tech:ai_compute_buildout",
+      "type": "TechNode",
+      "name": "AI training/inference cluster buildout",
+      "abstraction_level": "end_demand",
+      "role": null,
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "lrcx_10_k_20250811_s5",
+        "lrcx_10_k_20250811_s11"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "lrcx_10_k_20250811_e1",
+      "src_id": "co:lam_research",
+      "dst_id": "tech:deposition_etch_clean",
+      "relation": "supplies_to",
+      "attributes": {
+        "qualification_status": "qualified",
+        "substitutability": null,
+        "sole_source": false,
+        "structural_lead_time_weeks": null,
+        "ramp_execution": null
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "lrcx_10_k_20250811_s1"
+      ]
+    },
+    {
+      "id": "lrcx_10_k_20250811_e2",
+      "src_id": "prod:reliant_product_line",
+      "dst_id": "tech:non_leading_edge_fab",
+      "relation": "enables",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "lrcx_10_k_20250811_s2"
+      ]
+    },
+    {
+      "id": "lrcx_10_k_20250811_e3",
+      "src_id": "co:lam_research",
+      "dst_id": "prod:reliant_product_line",
+      "relation": "supplies_to",
+      "attributes": {
+        "qualification_status": "qualified"
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "lrcx_10_k_20250811_s2"
+      ]
+    },
+    {
+      "id": "lrcx_10_k_20250811_e4",
+      "src_id": "prod:sabre_family",
+      "dst_id": "tech:deposition_etch_clean",
+      "relation": "is_component_of",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "lrcx_10_k_20250811_s3"
+      ]
+    },
+    {
+      "id": "lrcx_10_k_20250811_e5",
+      "src_id": "prod:altus_family",
+      "dst_id": "tech:deposition_etch_clean",
+      "relation": "is_component_of",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "lrcx_10_k_20250811_s3"
+      ]
+    },
+    {
+      "id": "lrcx_10_k_20250811_e6",
+      "src_id": "prod:vector_family",
+      "dst_id": "tech:deposition_etch_clean",
+      "relation": "is_component_of",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "lrcx_10_k_20250811_s3"
+      ]
+    },
+    {
+      "id": "lrcx_10_k_20250811_e7",
+      "src_id": "tech:deposition_etch_clean",
+      "dst_id": "tech:dram_production",
+      "relation": "enables",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "lrcx_10_k_20250811_s8",
+        "lrcx_10_k_20250811_s6"
+      ]
+    },
+    {
+      "id": "lrcx_10_k_20250811_e8",
+      "src_id": "tech:deposition_etch_clean",
+      "dst_id": "tech:nand_production",
+      "relation": "enables",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "lrcx_10_k_20250811_s6",
+        "lrcx_10_k_20250811_s10"
+      ]
+    },
+    {
+      "id": "lrcx_10_k_20250811_e9",
+      "src_id": "tech:ai_compute_buildout",
+      "dst_id": "tech:deposition_etch_clean",
+      "relation": "enables",
+      "attributes": {},
+      "confidence": 0.75,
+      "source_ids": [
+        "lrcx_10_k_20250811_s5",
+        "lrcx_10_k_20250811_s11"
+      ]
+    },
+    {
+      "id": "lrcx_10_k_20250811_e10",
+      "src_id": "tech:advanced_packaging_integration",
+      "dst_id": "tech:deposition_etch_clean",
+      "relation": "enables",
+      "attributes": {},
+      "confidence": 0.75,
+      "source_ids": [
+        "lrcx_10_k_20250811_s11"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "lrcx_10_k_20250811_cl1",
+      "statement": "Lam Research's China revenue declined from 42% of total revenue in FY2024 to 34% in FY2025, reflecting material adverse impact of US export controls on China sales.",
+      "subject_id": "co:lam_research",
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "If China revenue share recovers to prior levels or export controls are substantially relaxed, this claim should be downgraded.",
+      "confidence": 0.9,
+      "source_ids": [
+        "lrcx_10_k_20250811_s4",
+        "lrcx_10_k_20250811_s7"
+      ]
+    },
+    {
+      "id": "lrcx_10_k_20250811_cl2",
+      "statement": "NAND/non-volatile memory spending weakness was a primary driver of Lam Research revenue decline in FY2024, while DRAM spending provided a partial offset; both memory sub-segments are key demand drivers for Lam's deposition, etch, and clean equipment.",
+      "subject_id": "tech:nand_production",
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "If Lam's management revises the attribution of FY2024 revenue decline away from NVM weakness, or if DRAM is no longer cited as an offset, this claim should be downgraded.",
+      "confidence": 0.9,
+      "source_ids": [
+        "lrcx_10_k_20250811_s6",
+        "lrcx_10_k_20250811_s10"
+      ]
+    },
+    {
+      "id": "lrcx_10_k_20250811_cl3",
+      "statement": "Advanced packaging chip integration is expected to drive sustainable growth and expand Lam Research's served available market in deposition, etch, and clean.",
+      "subject_id": "tech:advanced_packaging_integration",
+      "demand_proof_level": "guided",
+      "disproof_condition": "If hyperscalers or memory makers shift away from advanced packaging approaches, or if Lam explicitly revises this growth thesis, this claim should be downgraded.",
+      "confidence": 0.75,
+      "source_ids": [
+        "lrcx_10_k_20250811_s11"
+      ]
+    }
+  ]
+}
