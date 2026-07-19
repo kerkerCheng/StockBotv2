@@ -1,0 +1,359 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "amat_10_q_20260521",
+    "title": "Applied Materials Q2 FY2026 Form 10-Q — net revenue by market (foundry-logic/DRAM/NAND), gross margin, China export controls",
+    "source_type": "filing",
+    "evidence_tier": 1,
+    "origin_entity": "Applied Materials",
+    "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026037227/amat-20260426.htm",
+    "published_at": "2026-05-21",
+    "storage_permission": "repo_full",
+    "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+    "publisher": "SEC EDGAR",
+    "retrieved_at": "2026-07-19"
+  },
+  "sources": [
+    {
+      "id": "amat_10_q_20260521_s1",
+      "locator": "MD&A: export controls, chars 102500-104200",
+      "quote": "on February 11, 2026, we entered into a settlement agreement with the U.S. Commerce Department Bureau of Industry and Security (BIS) to resolve its inquiry relating to certain China customer shipments and export controls compliance and agreed to pay BIS an amount of $253 million"
+    },
+    {
+      "id": "amat_10_q_20260521_s2",
+      "locator": "MD&A: export controls, chars 102500-104200",
+      "quote": "The settlement agreement also includes a denial order that is suspended and will be waived three years after the date of the order issued under the settlement agreement, provided that we have timely completed the audit requirements."
+    },
+    {
+      "id": "amat_10_q_20260521_s3",
+      "locator": "MD&A: gross margin, results by market, chars 106800-112900",
+      "quote": "Revenue for Semiconductor Systems by market for the periods presented were as follows: Foundry, logic and other 67% ... Dynamic random-access memory (DRAM) 29% ... Flash memory (NAND) 4% [Q2 FY2026]"
+    },
+    {
+      "id": "amat_10_q_20260521_s4",
+      "locator": "MD&A: gross margin, results by market, chars 106800-112900",
+      "quote": "Semiconductor Systems ... Revenue $5,965 ... Gross profit $3,264 ... Gross margin 54.7% [Three Months Ended April 26, 2026]"
+    },
+    {
+      "id": "amat_10_q_20260521_s5",
+      "locator": "MD&A: China, net revenue by market, chars 122900-129200",
+      "quote": "China $2,087 27% ... Korea 1,572 20% ... Taiwan 2,155 27% [Three Months Ended April 26, 2026]"
+    },
+    {
+      "id": "amat_10_q_20260521_s6",
+      "locator": "MD&A: China, net revenue by market, chars 122900-129200",
+      "quote": "The United States government has implemented export regulations for U.S. semiconductor technology sold or provided to customers in China, which have limited our ability to provide certain products and services to customers in China, over the past several years."
+    },
+    {
+      "id": "amat_10_q_20260521_s7",
+      "locator": "MD&A: China, net revenue by market, chars 122900-129200",
+      "quote": "Foundry and logic customers' spending increased for the three months ended April 26, 2026 compared to the same period in the prior year primarily driven by increased demand for leading-edge manufacturing technologies."
+    },
+    {
+      "id": "amat_10_q_20260521_s8",
+      "locator": "MD&A: China, net revenue by market, chars 122900-129200",
+      "quote": "Memory customers' spending in the three and six months ended April 26, 2026 was higher compared to the same periods in the prior year primarily due to increased customer investments in DRAM technology transitions."
+    },
+    {
+      "id": "amat_10_q_20260521_s9",
+      "locator": "MD&A: gross margin, results by market, chars 106800-112900",
+      "quote": "Two customers accounted for approximately 21% and 15%, respectively, of our revenue for the six months ended April 26, 2026."
+    },
+    {
+      "id": "amat_10_q_20260521_s10",
+      "locator": "MD&A: export controls, chars 102500-104200",
+      "quote": "Our two reportable segments are: Semiconductor Systems and Applied Global Services (AGS). The Semiconductor Systems segment includes semiconductor capital equipment to enable materials engineering steps including etch, rapid thermal processing, deposition, chemical mechanical planarization, metrology and inspection, wafer packaging, and ion implantation."
+    },
+    {
+      "id": "amat_10_q_20260521_s11",
+      "locator": "MD&A: China, net revenue by market, chars 122900-129200",
+      "quote": "These actions have caused substantial uncertainty and have resulted in retaliatory measures, including new tariffs on U.S. goods imposed by China and other countries."
+    },
+    {
+      "id": "amat_10_q_20260521_s12",
+      "locator": "MD&A: China, net revenue by market, chars 122900-129200",
+      "quote": "Gross margin in the three and six months ended April 26, 2026 increased compared to the same periods in the prior year primarily driven by higher revenue and increases in average selling prices."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:applied_materials",
+      "type": "Company",
+      "name": "Applied Materials",
+      "abstraction_level": "equipment_epitaxy",
+      "role": "leader",
+      "aliases": [
+        "AMAT"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": null,
+        "concentration_score": null,
+        "intrinsic_cycle_time_weeks": null
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "amat_10_q_20260521_s10"
+      ]
+    },
+    {
+      "id": "prod:amat_semiconductor_systems",
+      "type": "Product",
+      "name": "Applied Materials Semiconductor Systems",
+      "abstraction_level": "equipment_epitaxy",
+      "role": null,
+      "aliases": [],
+      "attributes": {
+        "ramp_difficulty_intrinsic": null,
+        "concentration_score": null,
+        "intrinsic_cycle_time_weeks": null
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "amat_10_q_20260521_s10"
+      ]
+    },
+    {
+      "id": "prod:amat_ags",
+      "type": "Product",
+      "name": "Applied Global Services (AGS)",
+      "abstraction_level": "equipment_epitaxy",
+      "role": null,
+      "aliases": [
+        "AGS"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": null,
+        "concentration_score": null,
+        "intrinsic_cycle_time_weeks": null
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "amat_10_q_20260521_s10"
+      ]
+    },
+    {
+      "id": "tech:foundry_logic_advanced",
+      "type": "TechNode",
+      "name": "Foundry and Logic Leading-Edge Manufacturing",
+      "abstraction_level": "foundry_packaging",
+      "role": null,
+      "aliases": [
+        "foundry, logic and other"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 5,
+        "concentration_score": null,
+        "intrinsic_cycle_time_weeks": null
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "amat_10_q_20260521_s3",
+        "amat_10_q_20260521_s7"
+      ]
+    },
+    {
+      "id": "tech:dram",
+      "type": "TechNode",
+      "name": "Dynamic Random-Access Memory (DRAM)",
+      "abstraction_level": "device_chip",
+      "role": null,
+      "aliases": [
+        "DRAM"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 4,
+        "concentration_score": null,
+        "intrinsic_cycle_time_weeks": null
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "amat_10_q_20260521_s3",
+        "amat_10_q_20260521_s8"
+      ]
+    },
+    {
+      "id": "tech:nand_flash",
+      "type": "TechNode",
+      "name": "Flash Memory (NAND)",
+      "abstraction_level": "device_chip",
+      "role": null,
+      "aliases": [
+        "NAND",
+        "Flash memory"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 3,
+        "concentration_score": null,
+        "intrinsic_cycle_time_weeks": null
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "amat_10_q_20260521_s3"
+      ]
+    },
+    {
+      "id": "tech:ai_compute_buildout",
+      "type": "TechNode",
+      "name": "AI training/inference cluster buildout",
+      "abstraction_level": "end_demand",
+      "role": null,
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "amat_10_q_20260521_s7"
+      ]
+    },
+    {
+      "id": "tech:export_controls_us_china",
+      "type": "TechNode",
+      "name": "US Export Controls on Semiconductor Technology to China",
+      "abstraction_level": "end_demand",
+      "role": null,
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "amat_10_q_20260521_s6"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "amat_10_q_20260521_e1",
+      "src_id": "co:applied_materials",
+      "dst_id": "prod:amat_semiconductor_systems",
+      "relation": "supplies_to",
+      "attributes": {
+        "qualification_status": "qualified"
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "amat_10_q_20260521_s10"
+      ]
+    },
+    {
+      "id": "amat_10_q_20260521_e2",
+      "src_id": "co:applied_materials",
+      "dst_id": "prod:amat_ags",
+      "relation": "supplies_to",
+      "attributes": {
+        "qualification_status": "qualified"
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "amat_10_q_20260521_s10"
+      ]
+    },
+    {
+      "id": "amat_10_q_20260521_e3",
+      "src_id": "prod:amat_semiconductor_systems",
+      "dst_id": "tech:foundry_logic_advanced",
+      "relation": "enables",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "amat_10_q_20260521_s3",
+        "amat_10_q_20260521_s7"
+      ]
+    },
+    {
+      "id": "amat_10_q_20260521_e4",
+      "src_id": "prod:amat_semiconductor_systems",
+      "dst_id": "tech:dram",
+      "relation": "enables",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "amat_10_q_20260521_s3",
+        "amat_10_q_20260521_s8"
+      ]
+    },
+    {
+      "id": "amat_10_q_20260521_e5",
+      "src_id": "prod:amat_semiconductor_systems",
+      "dst_id": "tech:nand_flash",
+      "relation": "enables",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "amat_10_q_20260521_s3"
+      ]
+    },
+    {
+      "id": "amat_10_q_20260521_e6",
+      "src_id": "tech:ai_compute_buildout",
+      "dst_id": "tech:foundry_logic_advanced",
+      "relation": "enables",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "amat_10_q_20260521_s7"
+      ]
+    },
+    {
+      "id": "amat_10_q_20260521_e7",
+      "src_id": "tech:export_controls_us_china",
+      "dst_id": "co:applied_materials",
+      "relation": "depends_on",
+      "attributes": {
+        "qualification_status": "none",
+        "substitutability": 1
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "amat_10_q_20260521_s6",
+        "amat_10_q_20260521_s1"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "amat_10_q_20260521_cl1",
+      "statement": "Applied Materials paid $253 million to BIS to settle an export controls inquiry related to China customer shipments; a suspended denial order will be waived after three years if audit requirements are met.",
+      "subject_id": "co:applied_materials",
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "If Applied Materials fails to complete required audits or BIS activates the denial order, this claim should be revised to reflect an active denial order.",
+      "confidence": 0.9,
+      "source_ids": [
+        "amat_10_q_20260521_s1",
+        "amat_10_q_20260521_s2"
+      ]
+    },
+    {
+      "id": "amat_10_q_20260521_cl2",
+      "statement": "US export controls and tariffs have materially limited Applied Materials' ability to supply certain semiconductor equipment products and services to customers in China, and China has retaliated with tariffs on US goods.",
+      "subject_id": "tech:export_controls_us_china",
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "If the US government revokes or substantially relaxes export restrictions on semiconductor equipment to China, or if China removes retaliatory tariffs, this claim should be downgraded.",
+      "confidence": 0.9,
+      "source_ids": [
+        "amat_10_q_20260521_s6",
+        "amat_10_q_20260521_s11"
+      ]
+    },
+    {
+      "id": "amat_10_q_20260521_cl3",
+      "statement": "Foundry and logic demand for AMAT Semiconductor Systems equipment in Q2 FY2026 was driven by increased demand for leading-edge manufacturing technologies, reflecting AI-related capex pull.",
+      "subject_id": "amat_10_q_20260521_e3",
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "If hyperscalers cut AI infrastructure capex or shift to non-leading-edge nodes, this claim should be downgraded.",
+      "confidence": 0.9,
+      "source_ids": [
+        "amat_10_q_20260521_s7"
+      ]
+    },
+    {
+      "id": "amat_10_q_20260521_cl4",
+      "statement": "Memory customer spending growth in FY2026 H1 was primarily driven by increased investments in DRAM technology transitions, not NAND; NAND share of Semiconductor Systems revenue fell from 7% to 4% YoY in Q2.",
+      "subject_id": "tech:dram",
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "If NAND investment recovers and surpasses DRAM share in future quarters, this directional claim should be revised.",
+      "confidence": 0.9,
+      "source_ids": [
+        "amat_10_q_20260521_s8",
+        "amat_10_q_20260521_s3"
+      ]
+    }
+  ]
+}

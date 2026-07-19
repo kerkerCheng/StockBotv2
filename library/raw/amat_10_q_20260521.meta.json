@@ -1,0 +1,17 @@
+{
+  "doc_id": "amat_10_q_20260521",
+  "source_type": "filing",
+  "evidence_tier": 1,
+  "company": "APPLIED MATERIALS INC /DE",
+  "ticker": "AMAT",
+  "form_type": "10-Q",
+  "filed_date": "2026-05-21",
+  "cik": "0000006951",
+  "accession": "000162828026037227",
+  "truncated": false,
+  "original_chars": 227710,
+  "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026037227/amat-20260426.htm",
+  "curated_excerpt": true,
+  "curated_note": "Hand-curated verbatim excerpts of mature-node-relevant sections (segment/market breakdown, non-leading-edge/ICAPS, China export exposure, capex & equipment-supplier dependence). Char offsets per section in file header. Full filing at url; original_chars = full-doc length.",
+  "curated_chars": 12525
+}
