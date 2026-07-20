@@ -12,9 +12,9 @@
     "status": "review_required",
     "memo": "thesis/sivers_v3_lane_memo.md",
     "ticker": "SIVE.ST",
-    "last_checked": "2026-07-12",
+    "last_checked": "2026-07-20",
     "next_check": "2026-08-27",
     "check_interval_days": 30,
-    "note": "L7 review 已於 2026-07-12 人工決議：持有至 2026-08-27 Q2+財報重編分辨點；觸發任一核查點須 48h 內人工決策（詳見 memo header 與 GitHub Issue #2）。2026-07-19 memo 更新為 v3：客戶邊補獨立來源、Marvell 直接邊更正為間接鏈並反映 POET/Celestial 通道 2026-04 切斷。仍 review_required — 核心財務/光子 claim 全押在 source_under_audit 的 FY2025 年報（Ningi 指控），evidence_gate 未過。"
+    "note": "L7 review 已於 2026-07-12 人工決議：持有至 2026-08-27 Q2+財報重編分辨點；觸發任一核查點須 48h 內人工決策（詳見 memo header 與 GitHub Issue #2）。2026-07-19 memo 更新為 v3：客戶邊補獨立來源、Marvell 直接邊更正為間接鏈並反映 POET/Celestial 通道 2026-04 切斷。仍 review_required — 核心財務/光子 claim 全押在 source_under_audit 的 FY2025 年報（Ningi 指控），evidence_gate 未過。2026-07-20 source-trace 追源（docs/reports/sive-ningi-audit-trace-2026-07-20.md）：定位 Ningi 一手報告（2026-06-01）；逐字核 AR PDF 確認為公司自揭 material going-concern uncertainty（非審計保留意見，L11）、2023–25 PCAOB 重編已發生（淨損 186.5M→222.6M SEK）；另證實董事會出走、雙重監管/洩密調查、SEK 600M 增資（以成長為名未提 going-concern）、公司迄今無反駁。維持 review_required 至 8/27，未 retire（尊重持倉觀望決議；8/27 為 retire/revise 分辨點）。"
   }
 }

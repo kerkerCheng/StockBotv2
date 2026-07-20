@@ -2,6 +2,10 @@
 
 # Directional Lane Memo — Sivers Semiconductors (SIVE.ST)
 > **[Research Note]** 財務核驗清單未全通過（客戶集中度與 Backlog 待補），本備忘錄為方向性參考，不構成可操作投資建議。倉位數字需待 Gate 全通過後由獨立財務引擎填寫。
+>
+> **⛔ Thesis 狀態：`review_required`**（2026-07-12 觸發；2026-07-20 追源更新）— 主要證據 `sivers_ar_2025`（財務＋光子）為 `source_under_audit`：Ningi Research（2026-06-01）指控營收不當認列（~97M SEK／31%）、公司於年報自揭 material going-concern uncertainty（非審計保留意見，見 AGENTS.md L11）、2023–25 已重編至 US PCAOB，evidence_gate 未過。詳見 [`docs/reports/sive-ningi-audit-trace-2026-07-20.md`](../docs/reports/sive-ningi-audit-trace-2026-07-20.md)。
+> **核查頻率：** weekly signal scan 自動監控 ＋ 每月 Sivers IR；關鍵核查點 **2026-08-27**（Q2＋重編，真相分辨點）、2026-11-26（Q3）。
+> **觸發後 48h 動作：** 任一核查點觸發 → 48 小時內人工決策：若 8/27 重編證實營收認列達 Ningi 指控量級（~31%／97M SEK）或 going-concern 惡化 → thesis 轉 `retired`；否則重估 EV/Revenue 與量產時間表後決定 revised 或維持觀望。
 
 ---
 
