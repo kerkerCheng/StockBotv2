@@ -40,6 +40,10 @@ attempts:
     query_or_url: "Sivers official response rebuttal Ningi board resignation lock-up"
     result: found
     note: "迄 2026-07 中,公司未提出詳細公開反駁。另證實董事會出走與監管調查"
+  - route: "公司一手 AR PDF 逐字核 going concern（回應使用者質疑來源）"
+    query_or_url: "https://www.sivers-semiconductors.com/wp-content/uploads/2026/05/Sivers_annualreport_2025_2.pdf（WebFetch 無法解析,存本地後以 pypdf 抽 86 頁）"
+    result: partial
+    note: "找到公司/Board 自揭 material going-concern uncertainty 逐字;但審計(Deloitte)正式意見段未乾淨抽出,無法證實『審計保留意見』。更正先前過度陳述"
 trace_status: tier_1_2_honest_passthrough
 obtained_origin_entity: "Ningi Research（指控,tier-3）+ Sivers/審計（佐證事實,tier-1,已入庫 AR）"
 obtained_source_type: "industry_report(做空) / filing(公司 AR) / official_pr(增資)"
@@ -60,10 +64,13 @@ next_action: park_trace_backlog   # hold 維持;8/27 為量級分辨點
 - **客戶合約空洞**、**2018 起「即將量產」承諾一再跳票**。
 - **2026-07-01 追打**：Ningi 發第二則 thread 批評 SEK 700M 定向增資。
 
-## 4. 已是既成事實的 tier-1 佐證（公司自己的審計，非做空方說法）
+## 4. 已是既成事實的 tier-1 佐證（公司自己的年報，非做空方說法）
+
+已核 Sivers 2025 Annual Report 全文（86 頁，Deloitte AB / Alexandros Kouvatsos 簽證；2026-07-20 以 pypdf 抽 PDF 驗證）：
 
 - **2023–25 帳目已重編至 US PCAOB 標準**；2025 淨損由原報 186.5M **重編為 222.6M SEK**（= 已入庫 `sivers_ar_2025_financials` 的數字）。
-- **年報已出具 going-concern 材料不確定性**（審計公開質疑能否持續經營）。
+- **公司/Board 於年報「going concern 風險」段自揭 material going-concern uncertainty**，逐字：「there is a material risk and uncertainty factor that the Group and the Parent Company may not be able to continue operations to the planned extent」，財報仍以 going concern basis 編製。
+  - ⚠ **精確界定**：這是**公司自揭的 material uncertainty**，非已證實的「審計保留意見」。PDF 可抽文字中 `material uncertainty related to going concern` / `substantial doubt` / `qualified opinion` / `emphasis of matter` / `in our opinion` **皆為 0**；Deloitte 正式意見段（revisionsberättelse）未乾淨抽出，故不能斷言審計已修正意見。先前把它寫成「審計出具 going-concern 保留意見」是**過度陳述**，已更正。
 - 佐旁：Q1 2026 淨銷售 61.9M SEK（-22% YoY）、adj EBITDA -13.8M、營運現金流 -49.2M。
 
 ## 5. 伴隨的治理/融資危機（tier-3 discovery，方向一致）
