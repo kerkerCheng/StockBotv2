@@ -339,7 +339,7 @@ def generate(
     if not override_gate:
         try:
             from thesis.preconditions import check_all, format_gate
-            l9_result = check_all(resolved_ticker)
+            l9_result = check_all(resolved_ticker, company_id=company_id)
             l9_ctx = format_gate(l9_result) + "\n"
             l9_pass = l9_result.get("gate_pass", False)
         except Exception as e:

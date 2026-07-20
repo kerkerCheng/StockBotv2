@@ -8,6 +8,11 @@ CLAUDE.md L9 規定，投資諮詢開放前必須滿足三個前置條件：
 
 若任一條件未滿足，輸出標記為 [Research Note] 而非 [Investment Candidate]。
 
+除了三大 L9 前置條件，本 gate 另加一個**每公司**的升格 hold：來源可信度
+（`source_credibility`）。事實 `source_under_audit` 住 Engine A 的 SourceDoc；此處與
+memo 的 evidence gate 共用 `query.audit_hold` 讀同一真相，避免兩個閘門面漂移。
+若被建議公司的證據基底有審查中來源，credibility hold 觸發、gate 不亮綠。
+
 用法:
     from thesis.preconditions import check_all, format_gate
     result = check_all()
@@ -225,11 +230,86 @@ def _check_financial_checklist(ticker: str | None = None) -> dict:
     }
 
 
+# ── 4. 來源可信度 hold（audit）— 跨引擎閘門，事實住 Engine A ─────────────────────
+
+def _resolve_company_id(ticker: str | None, company_id: str | None) -> str | None:
+    """company_id 優先；否則用 TICKER_MAP 反查（靜態 lookup，不猜）。"""
+    if company_id:
+        return company_id
+    if not ticker:
+        return None
+    try:
+        from loader.load_to_neo4j import TICKER_MAP
+    except ImportError:
+        return None
+    reverse = {tk: cid for cid, tk in TICKER_MAP.items() if tk}
+    return reverse.get(ticker.upper())
+
+
+def _check_source_credibility(
+    ticker: str | None = None, company_id: str | None = None
+) -> dict:
+    """升格 hold：公司證據基底若有 `source_under_audit` 來源，不得升格。
+
+    與 memo 的 evidence gate 共用 `query.audit_hold`（事實住 Engine A 的 SourceDoc）。
+    無法查證（Neo4j 未連線／ticker 未對映）→ 出 warning 但不擋——memo 的 evidence
+    gate 是真正的 promotion backstop，這裡的軟降級只避免圖暫時不可用時 brick 整個 gate。
+    """
+    cid = _resolve_company_id(ticker, company_id)
+    if not cid:
+        return {
+            "ok": True,
+            "label": "source_credibility",
+            "detail": f"未能由 ticker={ticker} 對映 company_id，跳過來源審查檢查",
+            "action": None,
+        }
+    try:
+        from neo4j import GraphDatabase
+        from query.audit_hold import audit_hold_for_company
+    except ImportError as e:
+        return {"ok": True, "label": "source_credibility",
+                "detail": f"⚠ 無法檢查來源審查狀態（套件不可用：{e}）", "action": None}
+    pw = os.environ.get("NEO4J_PASSWORD")
+    if not pw:
+        return {"ok": True, "label": "source_credibility",
+                "detail": "⚠ 無法檢查來源審查狀態（NEO4J_PASSWORD 未設）", "action": None}
+    driver = GraphDatabase.driver(
+        os.environ.get("NEO4J_URI", "bolt://localhost:7687"),
+        auth=(os.environ.get("NEO4J_USER", "neo4j"), pw),
+    )
+    try:
+        hold = audit_hold_for_company(driver, cid)
+    except Exception as e:
+        return {"ok": True, "label": "source_credibility",
+                "detail": f"⚠ 無法檢查來源審查狀態（Neo4j 查詢失敗：{e}）", "action": None}
+    finally:
+        driver.close()
+
+    if not hold["held"]:
+        return {"ok": True, "label": "source_credibility",
+                "detail": f"{cid} 證據基底無審查中來源", "action": None}
+    docs = hold["docs"]
+    review_bys = sorted({str(d.get("review_by")) for d in docs if d.get("review_by")})
+    doc_ids = "、".join(d["doc_id"] for d in docs)
+    return {
+        "ok": False,
+        "label": "source_credibility",
+        "detail": (
+            f"{cid} 有審查中來源（credibility hold）：{doc_ids}"
+            + (f"；review_by={', '.join(review_bys)}" if review_bys else "")
+        ),
+        "action": "審查解除前不得升格 [Investment Note]；走 source-trace 追指控原文、盯 review_by 結果",
+    }
+
+
 # ── public API ─────────────────────────────────────────────────────────────────
 
-def check_all(ticker: str | None = None) -> dict:
+def check_all(ticker: str | None = None, company_id: str | None = None) -> dict:
     """
     執行三大前置條件檢查，回傳結果 dict。
+
+    三大 L9 前置條件 + 每公司的來源可信度 hold（audit）。company_id 選填：
+    generate_lane_memo 直接傳入；命令列只給 ticker 時由 TICKER_MAP 反查。
 
     結構:
     {
@@ -239,6 +319,7 @@ def check_all(ticker: str | None = None) -> dict:
         {"label": "second_slice", "ok": bool, "detail": str, "action": str | None},
         {"label": "investment_rules", ...},
         {"label": "financial_checklist", ...},
+        {"label": "source_credibility", ...},  # audit hold，事實住 Engine A
       ]
     }
     """
@@ -246,6 +327,7 @@ def check_all(ticker: str | None = None) -> dict:
         _check_second_slice(),
         _check_investment_rules(),
         _check_financial_checklist(ticker),
+        _check_source_credibility(ticker, company_id),
     ]
     gate_pass = all(c["ok"] for c in checks)
     return {
