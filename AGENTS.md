@@ -11,6 +11,19 @@
 - **切換原則：** 同一 working tree 只讓一個 agent 寫入；序列切換沿用同一 feature branch。若兩邊同時工作，必須使用不同 worktree / branch。交接訊息至少附目前 plan 路徑、進行中的 U-ID、`git status --short`、最後一次驗證命令與結果。
 - 本機開發 agent 可以是 Claude Code 或 Codex；架構中明指 `claude.ai` custom connector 的遠端流程仍維持 Claude，不因本機開發工具切換而改名。
 
+## 工作語言（繁體中文）
+
+**與使用者的所有溝通、以及實作過程本身的敘述，一律用繁體中文——不只是最終答案，過程也是。**
+
+- **溝通與敘述：** 對話回覆、工具呼叫之間的狀態更新、步驟說明、分析、計畫、思考敘述。
+- **產出物文字：** Task 的 subject/description、commit message、PR 說明、plan 檔、docs/ 報告。
+- **程式碼：** 新寫的註解／docstring 跟隨該檔既有語言慣例（既有英文檔可維持英文）；面向本專案的新說明文字優先中文。
+- **Skill 最終輸出**（含 last-30-days 等）翻成繁體中文。
+
+**維持原文、不強行翻譯：** 程式識別符（變數／函式／類別名）、既定英文技術術語（going concern、sole_source、evidence tier、backlog…）、第三方 API 欄位與字串、檔名／路徑、以及引用一手文件的逐字 quote。
+
+判準：語言規範針對「溝通與敘述」，不是把程式碼或逐字證據中文化。若發現實作過程飄成英文，視為違反本規範，切回中文。
+
 ## 定位一句話
 
 **Claude + 結構化持久記憶 → 有根據的投資研究對話。**
@@ -246,7 +259,7 @@ v0 schema 的對錯只有真實資料能驗證。凍結一個會壞的 v0 → �
 
 <!-- ===== 自訂：Skill 輸出翻譯（2026-06 加） ===== -->
 ## Skill 輸出語言
-執行 last-30-days skill 時，最終輸出翻成繁體中文...
+併入上方「## 工作語言（繁體中文）」——Skill 最終輸出（含 last-30-days）一律翻成繁體中文；整個實作過程亦同。
 <!-- ===== 自訂結束 ===== -->
 
 ## Imported Claude Cowork project instructions
