@@ -46,6 +46,9 @@
 **Engine B 策展面（full-feed，不受主題清單限制）**：
 - 掃 aleabitoreddit 過去 7 天的**全部**貼文/文章（搜 `site:aleabitoreddit.substack.com` +
   近期推文；量少，帳號本身就是過濾器），**不管有沒有提到追蹤中的公司**
+- 可優先試 RSS feed `https://aleabitoreddit.substack.com/feed`（channel 標題是
+  "Serenity"、不是帳號名）。**解析失敗 ≠ 無新文**：失敗時必須退回上面的 `site:`
+  搜尋，並在稽核紀錄註明用了 fallback；Substack 首頁需 JavaScript，不能直接爬
 - 分流：講到已追蹤公司/主題 → 進 Stage 2；講到未追蹤的新公司/新主題 → **必列入
   「建議 onboard 候選」**，附「它為什麼值得看」一句話——當初 SIVE 就是這樣被這個
   帳號發現的，這條分流是 Engine B 存在的核心理由
@@ -56,6 +59,10 @@
 矛盾／反證價值）：
 - 新穎性判斷用 MCP 工具 `get_graph_context` 或 `run_read_query` 比對圖中現有內容；
   MCP 連不上時跳過新穎性判斷、寬鬆放行、在稽核紀錄註明
+- **公司 ID（`co:*`）不要憑公司名猜**：先查 repo clone 的 `loader/load_to_neo4j.py`
+  `TICKER_MAP`，或用 `query/health_audit.py` 的 `COMPANY_IDS_CYPHER` 經 `run_read_query`
+  列出圖中 Company 再比對（例：Sivers 是 `co:sivers_semiconductors`）。ID 未命中時
+  在稽核紀錄區分「ID 沒解析對」與「圖中真無此公司」，不能默默跳過該公司的比對
 - 寬鬆原則：軟指標（新穎性、獨立性）不確定時一律放行
 - **每一則被篩掉的材料都要記錄摘要 + 理由**，寫進報告的稽核段落
 - 原文反駁現有 thesis → 標 `contradicts`，在 Topic Digest 置頂並連到對應 thesis 的

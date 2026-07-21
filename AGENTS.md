@@ -103,6 +103,7 @@ fetchers/edgar.py ──────↑                        engine_c/etl_yfin
 
 **Cron 追蹤方案（待實作，已定案方向）：**
 - **RSS 路線（免費，優先）：** SubStack 有 RSS feed（`https://aleabitoreddit.substack.com/feed`）；cron 定期抓新文章，存成 pending leads 清單，每次 session 開頭提示「有 N 條待判斷」。
+  - 讀取注意（2026-07-21 實測）：feed 本身正常（HTTP 200、合法 RSS XML），但 **channel 標題是 "Serenity"、不是帳號名**——看到 "Serenity" 就是這個 feed，別當成別的來源。Substack 首頁需 JavaScript、不能直接爬。**讀取器解析失敗 ≠ 無新文**：失敗時必須 fallback 到 `site:aleabitoreddit.substack.com` web search，並在報告註明用了 fallback。
 - **X API 路線（$100/mo）：** 可抓短推文，但 SubStack 已含主要深度文章，RSS 對 aleabitoreddit 夠用。
 - **入庫邊界：** aleabitoreddit 的內容最高只能是 `evidence_tier: 3`，需客戶端文件升級 L8 才能用於 Lane Memo。
 
@@ -143,6 +144,7 @@ fetchers/edgar.py ──────↑                        engine_c/etl_yfin
 設計原則：表的「形狀」鎖死，字彙（type/relation/層級）用對照表留鬆；屬性按 L4「物理 / 關係 / 時變」三分歸位。完整欄位表、vocab、claims 格式、sole_source 驗證規則：見 [`schema/graph_schema.md`](schema/graph_schema.md)。
 
 **快速記憶：**
+- **圖公司 ID（`co:*`）不要憑公司名猜。** 唯一權威是 `loader/load_to_neo4j.py` 的 `TICKER_MAP`；查圖前先查表，或用 `query/health_audit.py` 的 `COMPANY_IDS_CYPHER` 列出圖中 Company 再比對。例：Sivers 是 `co:sivers_semiconductors`，不是 `co:sivers`（2026-07-21 週掃即因猜 ID 未命中而漏掉 Sivers 的圖內比對）。ID 未命中時要區分「ID 沒解析對」與「圖中真無此公司」，不能默默跳過。
 - node 帶內在慢變屬性（`ramp_difficulty_intrinsic`、`concentration_score` 為衍生值非手填）
 - edge 帶關係型屬性（`substitutability`、`sole_source`、`structural_lead_time_weeks`、`ramp_execution`）
 - `confidence` 只在不同 `origin_event` 之間累加（同一法說會多份摘要 = 一個 origin_event）
