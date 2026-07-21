@@ -1,0 +1,750 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "sivers_ar_2025_photonics_excerpt",
+    "title": "Sivers Semiconductors 2025 Annual Report (Photonics excerpt)",
+    "url": "https://www.sivers-semiconductors.com/wp-content/uploads/2026/05/Sivers_annualreport_2025_2.pdf",
+    "origin_entity": "Sivers Semiconductors",
+    "publisher": null,
+    "published_at": null,
+    "retrieved_at": null,
+    "storage_permission": "repo_full",
+    "permission_basis": "This is Sivers Semiconductors' official annual report, published as an original investor disclosure on the issuer's own domain. The repository retains attributed research excerpts and derived extraction with the issuer PDF URL and retrieval metadata.",
+    "source_type": "filing",
+    "evidence_tier": 1,
+    "section": "photonics"
+  },
+  "sources": [
+    {
+      "id": "sivers_ar_2025_photonics_excerpt_s10",
+      "locator": "原始 extraction 未保存於 repo（2026-07-16 入圖，未 commit）；結構由圖反向重建，quote 遺失無法復原，raw 全文見 library/raw/sivers_ar_2025_photonics_excerpt.txt",
+      "quote": null
+    },
+    {
+      "id": "sivers_ar_2025_photonics_excerpt_s11",
+      "locator": "原始 extraction 未保存於 repo（2026-07-16 入圖，未 commit）；結構由圖反向重建，quote 遺失無法復原，raw 全文見 library/raw/sivers_ar_2025_photonics_excerpt.txt",
+      "quote": null
+    },
+    {
+      "id": "sivers_ar_2025_photonics_excerpt_s12",
+      "locator": "原始 extraction 未保存於 repo（2026-07-16 入圖，未 commit）；結構由圖反向重建，quote 遺失無法復原，raw 全文見 library/raw/sivers_ar_2025_photonics_excerpt.txt",
+      "quote": null
+    },
+    {
+      "id": "sivers_ar_2025_photonics_excerpt_s13",
+      "locator": "原始 extraction 未保存於 repo（2026-07-16 入圖，未 commit）；結構由圖反向重建，quote 遺失無法復原，raw 全文見 library/raw/sivers_ar_2025_photonics_excerpt.txt",
+      "quote": null
+    },
+    {
+      "id": "sivers_ar_2025_photonics_excerpt_s14",
+      "locator": "原始 extraction 未保存於 repo（2026-07-16 入圖，未 commit）；結構由圖反向重建，quote 遺失無法復原，raw 全文見 library/raw/sivers_ar_2025_photonics_excerpt.txt",
+      "quote": null
+    },
+    {
+      "id": "sivers_ar_2025_photonics_excerpt_s15",
+      "locator": "原始 extraction 未保存於 repo（2026-07-16 入圖，未 commit）；結構由圖反向重建，quote 遺失無法復原，raw 全文見 library/raw/sivers_ar_2025_photonics_excerpt.txt",
+      "quote": null
+    },
+    {
+      "id": "sivers_ar_2025_photonics_excerpt_s16",
+      "locator": "原始 extraction 未保存於 repo（2026-07-16 入圖，未 commit）；結構由圖反向重建，quote 遺失無法復原，raw 全文見 library/raw/sivers_ar_2025_photonics_excerpt.txt",
+      "quote": null
+    },
+    {
+      "id": "sivers_ar_2025_photonics_excerpt_s19",
+      "locator": "原始 extraction 未保存於 repo（2026-07-16 入圖，未 commit）；結構由圖反向重建，quote 遺失無法復原，raw 全文見 library/raw/sivers_ar_2025_photonics_excerpt.txt",
+      "quote": null
+    },
+    {
+      "id": "sivers_ar_2025_photonics_excerpt_s2",
+      "locator": "原始 extraction 未保存於 repo（2026-07-16 入圖，未 commit）；結構由圖反向重建，quote 遺失無法復原，raw 全文見 library/raw/sivers_ar_2025_photonics_excerpt.txt",
+      "quote": null
+    },
+    {
+      "id": "sivers_ar_2025_photonics_excerpt_s20",
+      "locator": "原始 extraction 未保存於 repo（2026-07-16 入圖，未 commit）；結構由圖反向重建，quote 遺失無法復原，raw 全文見 library/raw/sivers_ar_2025_photonics_excerpt.txt",
+      "quote": null
+    },
+    {
+      "id": "sivers_ar_2025_photonics_excerpt_s3",
+      "locator": "原始 extraction 未保存於 repo（2026-07-16 入圖，未 commit）；結構由圖反向重建，quote 遺失無法復原，raw 全文見 library/raw/sivers_ar_2025_photonics_excerpt.txt",
+      "quote": null
+    },
+    {
+      "id": "sivers_ar_2025_photonics_excerpt_s4",
+      "locator": "原始 extraction 未保存於 repo（2026-07-16 入圖，未 commit）；結構由圖反向重建，quote 遺失無法復原，raw 全文見 library/raw/sivers_ar_2025_photonics_excerpt.txt",
+      "quote": null
+    },
+    {
+      "id": "sivers_ar_2025_photonics_excerpt_s5",
+      "locator": "原始 extraction 未保存於 repo（2026-07-16 入圖，未 commit）；結構由圖反向重建，quote 遺失無法復原，raw 全文見 library/raw/sivers_ar_2025_photonics_excerpt.txt",
+      "quote": null
+    },
+    {
+      "id": "sivers_ar_2025_photonics_excerpt_s6",
+      "locator": "原始 extraction 未保存於 repo（2026-07-16 入圖，未 commit）；結構由圖反向重建，quote 遺失無法復原，raw 全文見 library/raw/sivers_ar_2025_photonics_excerpt.txt",
+      "quote": null
+    },
+    {
+      "id": "sivers_ar_2025_photonics_excerpt_s7",
+      "locator": "原始 extraction 未保存於 repo（2026-07-16 入圖，未 commit）；結構由圖反向重建，quote 遺失無法復原，raw 全文見 library/raw/sivers_ar_2025_photonics_excerpt.txt",
+      "quote": null
+    },
+    {
+      "id": "sivers_ar_2025_photonics_excerpt_s8",
+      "locator": "原始 extraction 未保存於 repo（2026-07-16 入圖，未 commit）；結構由圖反向重建，quote 遺失無法復原，raw 全文見 library/raw/sivers_ar_2025_photonics_excerpt.txt",
+      "quote": null
+    },
+    {
+      "id": "sivers_ar_2025_photonics_excerpt_s9",
+      "locator": "原始 extraction 未保存於 repo（2026-07-16 入圖，未 commit）；結構由圖反向重建，quote 遺失無法復原，raw 全文見 library/raw/sivers_ar_2025_photonics_excerpt.txt",
+      "quote": null
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:lightium_ag",
+      "type": "Company",
+      "name": "LIGHTIUM AG",
+      "abstraction_level": "device_chip",
+      "role": "disruptor",
+      "aliases": [
+        "LIGHTIUM"
+      ],
+      "attributes": {
+        "ticker": null
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "sivers_ar_2025_photonics_excerpt_s11"
+      ]
+    },
+    {
+      "id": "co:o_net_technologies",
+      "type": "Company",
+      "name": "O-Net Technologies",
+      "abstraction_level": "module_subsystem",
+      "role": "leader",
+      "aliases": [
+        "O-Net"
+      ],
+      "attributes": {
+        "ticker": "0877.HK"
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "sivers_ar_2025_photonics_excerpt_s12",
+        "sivers_ar_2025_photonics_excerpt_s15",
+        "sivers_ar_2025_photonics_excerpt_s5"
+      ]
+    },
+    {
+      "id": "co:poet_technologies",
+      "type": "Company",
+      "name": "POET Technologies",
+      "abstraction_level": "device_chip",
+      "role": "disruptor",
+      "aliases": [
+        "POET"
+      ],
+      "attributes": {
+        "ticker": "POET"
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "sivers_ar_2025_photonics_excerpt_s4",
+        "sivers_ar_2025_photonics_excerpt_s6"
+      ]
+    },
+    {
+      "id": "co:sivers_semiconductors",
+      "type": "Company",
+      "name": "Sivers Semiconductors",
+      "abstraction_level": "device_chip",
+      "role": "bottleneck_supplier",
+      "aliases": [
+        "Sivers",
+        "Sivers Photonics",
+        "Sivers Photonics Ltd"
+      ],
+      "attributes": {
+        "fy2025_revenue_sek_m": 306.6,
+        "fy2025_photonics_revenue_sek_m": 93.4,
+        "fy2025_wireless_revenue_sek_m": 213.1,
+        "fy2025_gross_margin_pct": -0.7,
+        "fy2025_adj_ebitda_sek_m": -50.3,
+        "fy2025_op_loss_sek_m": -177.8,
+        "ticker": "SIVE.ST"
+      },
+      "confidence": 0.95,
+      "source_ids": [
+        "sivers_ar_2025_photonics_excerpt_s10",
+        "sivers_ar_2025_photonics_excerpt_s11",
+        "sivers_ar_2025_photonics_excerpt_s12",
+        "sivers_ar_2025_photonics_excerpt_s14",
+        "sivers_ar_2025_photonics_excerpt_s15",
+        "sivers_ar_2025_photonics_excerpt_s19",
+        "sivers_ar_2025_photonics_excerpt_s2",
+        "sivers_ar_2025_photonics_excerpt_s4",
+        "sivers_ar_2025_photonics_excerpt_s5",
+        "sivers_ar_2025_photonics_excerpt_s6",
+        "sivers_ar_2025_photonics_excerpt_s7",
+        "sivers_ar_2025_photonics_excerpt_s9"
+      ]
+    },
+    {
+      "id": "co:win_semiconductor",
+      "type": "Company",
+      "name": "Win Semiconductor",
+      "abstraction_level": "foundry_packaging",
+      "role": "foundry",
+      "aliases": [
+        "WIN Semi"
+      ],
+      "attributes": {
+        "ticker": "3105.TWO"
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "sivers_ar_2025_photonics_excerpt_s15",
+        "sivers_ar_2025_photonics_excerpt_s7"
+      ]
+    },
+    {
+      "id": "prod:optical_interposer",
+      "type": "Product",
+      "name": "POET Optical Interposer™",
+      "abstraction_level": "device_chip",
+      "role": null,
+      "aliases": [
+        "Optical Interposer"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "sivers_ar_2025_photonics_excerpt_s6"
+      ]
+    },
+    {
+      "id": "tech:ai_compute_buildout",
+      "type": "TechNode",
+      "name": "AI training/inference cluster buildout",
+      "abstraction_level": "end_demand",
+      "role": null,
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "sivers_ar_2025_photonics_excerpt_s10",
+        "sivers_ar_2025_photonics_excerpt_s13",
+        "sivers_ar_2025_photonics_excerpt_s3"
+      ]
+    },
+    {
+      "id": "tech:ai_switch",
+      "type": "TechNode",
+      "name": "Data-center switch / scale-up network",
+      "abstraction_level": "network_systems",
+      "role": null,
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "sivers_ar_2025_photonics_excerpt_s10",
+        "sivers_ar_2025_photonics_excerpt_s13",
+        "sivers_ar_2025_photonics_excerpt_s20",
+        "sivers_ar_2025_photonics_excerpt_s5"
+      ]
+    },
+    {
+      "id": "tech:cpo",
+      "type": "TechNode",
+      "name": "Co-Packaged Optics",
+      "abstraction_level": "module_subsystem",
+      "role": null,
+      "aliases": [
+        "CPO"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 5
+      },
+      "confidence": 0.95,
+      "source_ids": [
+        "sivers_ar_2025_photonics_excerpt_s10",
+        "sivers_ar_2025_photonics_excerpt_s20",
+        "sivers_ar_2025_photonics_excerpt_s5"
+      ]
+    },
+    {
+      "id": "tech:cw_dfb_laser",
+      "type": "TechNode",
+      "name": "High-power CW DFB laser",
+      "abstraction_level": "device_chip",
+      "role": null,
+      "aliases": [
+        "CW laser",
+        "high-power CW laser"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 4
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "sivers_ar_2025_photonics_excerpt_s11",
+        "sivers_ar_2025_photonics_excerpt_s8",
+        "sivers_ar_2025_photonics_excerpt_s9"
+      ]
+    },
+    {
+      "id": "tech:dwdm_laser_array",
+      "type": "TechNode",
+      "name": "DWDM DFB laser array",
+      "abstraction_level": "device_chip",
+      "role": null,
+      "aliases": [
+        "DWDM laser arrays",
+        "DFB laser arrays"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 4
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "sivers_ar_2025_photonics_excerpt_s10",
+        "sivers_ar_2025_photonics_excerpt_s19",
+        "sivers_ar_2025_photonics_excerpt_s2",
+        "sivers_ar_2025_photonics_excerpt_s6"
+      ]
+    },
+    {
+      "id": "tech:external_laser_source",
+      "type": "TechNode",
+      "name": "External Laser Source",
+      "abstraction_level": "device_chip",
+      "role": null,
+      "aliases": [
+        "ELS"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 5
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "sivers_ar_2025_photonics_excerpt_s10",
+        "sivers_ar_2025_photonics_excerpt_s15",
+        "sivers_ar_2025_photonics_excerpt_s20",
+        "sivers_ar_2025_photonics_excerpt_s4",
+        "sivers_ar_2025_photonics_excerpt_s5",
+        "sivers_ar_2025_photonics_excerpt_s6"
+      ]
+    },
+    {
+      "id": "tech:lidar",
+      "type": "TechNode",
+      "name": "LIDAR sensing system",
+      "abstraction_level": "end_demand",
+      "role": null,
+      "aliases": [
+        "LIDAR for 3D Imaging",
+        "automotive and industrial LIDAR"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "sivers_ar_2025_photonics_excerpt_s14"
+      ]
+    },
+    {
+      "id": "tech:pluggable_transceiver",
+      "type": "TechNode",
+      "name": "Pluggable optical transceiver",
+      "abstraction_level": "module_subsystem",
+      "role": null,
+      "aliases": [
+        "1.6T transceivers",
+        "OSFP",
+        "Pluggable Transceivers",
+        "pluggables"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 3
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "sivers_ar_2025_photonics_excerpt_s11",
+        "sivers_ar_2025_photonics_excerpt_s13",
+        "sivers_ar_2025_photonics_excerpt_s20",
+        "sivers_ar_2025_photonics_excerpt_s3",
+        "sivers_ar_2025_photonics_excerpt_s8",
+        "sivers_ar_2025_photonics_excerpt_s9"
+      ]
+    },
+    {
+      "id": "tech:silicon_photonics_chiplet",
+      "type": "TechNode",
+      "name": "Silicon photonics chiplet",
+      "abstraction_level": "device_chip",
+      "role": null,
+      "aliases": [
+        "Co-Packaged silicon photonics chiplets"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "source_ids": [
+        "sivers_ar_2025_photonics_excerpt_s10"
+      ]
+    },
+    {
+      "id": "tech:tfln_platform",
+      "type": "TechNode",
+      "name": "Thin-Film Lithium Niobate (TFLN) photonic platform",
+      "abstraction_level": "device_chip",
+      "role": null,
+      "aliases": [
+        "TFLN",
+        "Thin-Film Lithium Niobate platform"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "sivers_ar_2025_photonics_excerpt_s11"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "tech:ai_compute_buildout",
+      "dst_id": "tech:ai_switch",
+      "relation": "enables",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "sivers_ar_2025_photonics_excerpt_s10",
+        "sivers_ar_2025_photonics_excerpt_s13"
+      ]
+    },
+    {
+      "id": "e2",
+      "src_id": "co:sivers_semiconductors",
+      "dst_id": "co:poet_technologies",
+      "relation": "supplies_to",
+      "attributes": {
+        "qualification_status": "sampling",
+        "ramp_execution": 3
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "sivers_ar_2025_photonics_excerpt_s4",
+        "sivers_ar_2025_photonics_excerpt_s6"
+      ]
+    },
+    {
+      "id": "e3",
+      "src_id": "co:poet_technologies",
+      "dst_id": "tech:external_laser_source",
+      "relation": "supplies_to",
+      "attributes": {
+        "qualification_status": "sampling"
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "sivers_ar_2025_photonics_excerpt_s4",
+        "sivers_ar_2025_photonics_excerpt_s6"
+      ]
+    },
+    {
+      "id": "e4",
+      "src_id": "tech:dwdm_laser_array",
+      "dst_id": "tech:external_laser_source",
+      "relation": "is_component_of",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "sivers_ar_2025_photonics_excerpt_s6",
+        "sivers_ar_2025_photonics_excerpt_s10"
+      ]
+    },
+    {
+      "id": "e5",
+      "src_id": "tech:external_laser_source",
+      "dst_id": "tech:cpo",
+      "relation": "is_component_of",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "sivers_ar_2025_photonics_excerpt_s5",
+        "sivers_ar_2025_photonics_excerpt_s20"
+      ]
+    },
+    {
+      "id": "e6",
+      "src_id": "co:win_semiconductor",
+      "dst_id": "co:sivers_semiconductors",
+      "relation": "supplies_to",
+      "attributes": {
+        "qualification_status": "qualifying",
+        "ramp_execution": 4
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "sivers_ar_2025_photonics_excerpt_s7",
+        "sivers_ar_2025_photonics_excerpt_s15"
+      ]
+    },
+    {
+      "id": "e7",
+      "src_id": "co:sivers_semiconductors",
+      "dst_id": "co:lightium_ag",
+      "relation": "supplies_to",
+      "attributes": {
+        "qualification_status": "qualifying"
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "sivers_ar_2025_photonics_excerpt_s11"
+      ]
+    },
+    {
+      "id": "e8",
+      "src_id": "tech:cw_dfb_laser",
+      "dst_id": "tech:tfln_platform",
+      "relation": "is_component_of",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "sivers_ar_2025_photonics_excerpt_s11"
+      ]
+    },
+    {
+      "id": "e9",
+      "src_id": "tech:tfln_platform",
+      "dst_id": "tech:pluggable_transceiver",
+      "relation": "enables",
+      "attributes": {},
+      "confidence": 0.85,
+      "source_ids": [
+        "sivers_ar_2025_photonics_excerpt_s11"
+      ]
+    },
+    {
+      "id": "e10",
+      "src_id": "tech:silicon_photonics_chiplet",
+      "dst_id": "tech:cpo",
+      "relation": "is_component_of",
+      "attributes": {},
+      "confidence": 0.85,
+      "source_ids": [
+        "sivers_ar_2025_photonics_excerpt_s10"
+      ]
+    },
+    {
+      "id": "e11",
+      "src_id": "prod:optical_interposer",
+      "dst_id": "tech:external_laser_source",
+      "relation": "is_component_of",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "sivers_ar_2025_photonics_excerpt_s6"
+      ]
+    },
+    {
+      "id": "e12",
+      "src_id": "tech:ai_switch",
+      "dst_id": "tech:cpo",
+      "relation": "enables",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "sivers_ar_2025_photonics_excerpt_s5",
+        "sivers_ar_2025_photonics_excerpt_s10",
+        "sivers_ar_2025_photonics_excerpt_s20"
+      ]
+    },
+    {
+      "id": "e13",
+      "src_id": "co:sivers_semiconductors",
+      "dst_id": "tech:lidar",
+      "relation": "supplies_to",
+      "attributes": {
+        "qualification_status": "designed_in"
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "sivers_ar_2025_photonics_excerpt_s14"
+      ]
+    },
+    {
+      "id": "e14",
+      "src_id": "tech:cpo",
+      "dst_id": "tech:pluggable_transceiver",
+      "relation": "competes_with",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "sivers_ar_2025_photonics_excerpt_s20"
+      ]
+    },
+    {
+      "id": "e15",
+      "src_id": "tech:cpo",
+      "dst_id": "tech:external_laser_source",
+      "relation": "depends_on",
+      "attributes": {
+        "substitutability": 5,
+        "sole_source": false,
+        "qualification_status": "sampling"
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "sivers_ar_2025_photonics_excerpt_s5",
+        "sivers_ar_2025_photonics_excerpt_s20"
+      ]
+    },
+    {
+      "id": "e16",
+      "src_id": "tech:ai_compute_buildout",
+      "dst_id": "tech:pluggable_transceiver",
+      "relation": "enables",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "sivers_ar_2025_photonics_excerpt_s3",
+        "sivers_ar_2025_photonics_excerpt_s13"
+      ]
+    },
+    {
+      "id": "e17",
+      "src_id": "tech:pluggable_transceiver",
+      "dst_id": "tech:cw_dfb_laser",
+      "relation": "depends_on",
+      "attributes": {
+        "substitutability": 4,
+        "qualification_status": "sampling"
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "sivers_ar_2025_photonics_excerpt_s8",
+        "sivers_ar_2025_photonics_excerpt_s9"
+      ]
+    },
+    {
+      "id": "e18",
+      "src_id": "co:sivers_semiconductors",
+      "dst_id": "tech:cw_dfb_laser",
+      "relation": "supplies_to",
+      "attributes": {
+        "qualification_status": "sampling"
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "sivers_ar_2025_photonics_excerpt_s9"
+      ]
+    },
+    {
+      "id": "e19",
+      "src_id": "co:sivers_semiconductors",
+      "dst_id": "tech:dwdm_laser_array",
+      "relation": "supplies_to",
+      "attributes": {
+        "qualification_status": "sampling"
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "sivers_ar_2025_photonics_excerpt_s2",
+        "sivers_ar_2025_photonics_excerpt_s10",
+        "sivers_ar_2025_photonics_excerpt_s19"
+      ]
+    },
+    {
+      "id": "e20",
+      "src_id": "co:sivers_semiconductors",
+      "dst_id": "co:o_net_technologies",
+      "relation": "supplies_to",
+      "attributes": {
+        "qualification_status": "qualifying",
+        "ramp_execution": 3
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "sivers_ar_2025_photonics_excerpt_s5",
+        "sivers_ar_2025_photonics_excerpt_s12"
+      ]
+    },
+    {
+      "id": "e21",
+      "src_id": "co:o_net_technologies",
+      "dst_id": "tech:external_laser_source",
+      "relation": "supplies_to",
+      "attributes": {
+        "qualification_status": "qualifying"
+      },
+      "confidence": 0.85,
+      "source_ids": [
+        "sivers_ar_2025_photonics_excerpt_s5",
+        "sivers_ar_2025_photonics_excerpt_s15"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "cl1",
+      "statement": "CW laser supply will be in shortage within the next few years as the optical interconnect industry transitions from 800G to 1.6T and 3.2T bandwidths.",
+      "subject_id": "tech:cw_dfb_laser",
+      "demand_proof_level": "guided",
+      "disproof_condition": "If multiple new qualified CW laser suppliers enter the market at scale, or if bandwidth transition timelines are significantly delayed, this claim should be downgraded.",
+      "confidence": 0.75,
+      "source_ids": [
+        "sivers_ar_2025_photonics_excerpt_s8"
+      ]
+    },
+    {
+      "id": "cl2",
+      "statement": "Sivers' DWDM laser arrays are a strategically critical input for Co-Packaged Optics combined with silicon photonics chiplets for scale-up AI datacenter networking.",
+      "subject_id": "tech:dwdm_laser_array",
+      "demand_proof_level": "inferred",
+      "disproof_condition": "If alternative laser technologies (e.g., integrated silicon lasers, other III-V approaches) qualify for CPO applications at comparable performance, this claim should be downgraded.",
+      "confidence": 0.75,
+      "source_ids": [
+        "sivers_ar_2025_photonics_excerpt_s10"
+      ]
+    },
+    {
+      "id": "cl3",
+      "statement": "Sivers is sampling CW DFB lasers to multiple pluggable transceiver manufacturers worldwide, with a subset expected to commit to production plans in 2027 and beyond.",
+      "subject_id": "e18",
+      "demand_proof_level": "guided",
+      "disproof_condition": "If pluggable transceiver manufacturers select alternative laser suppliers or if bandwidth transitions stall, Sivers' design-in pipeline would not convert to production orders.",
+      "confidence": 0.85,
+      "source_ids": [
+        "sivers_ar_2025_photonics_excerpt_s9",
+        "sivers_ar_2025_photonics_excerpt_s16"
+      ]
+    },
+    {
+      "id": "cl4",
+      "statement": "External laser sources are a critical component for next-generation CPO, enabling significantly lower power consumption compared with traditional pluggable transceivers.",
+      "subject_id": "tech:external_laser_source",
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "If pluggable transceiver power efficiency improves to match CPO, or if CPO architectures shift to on-chip integrated lasers, this claim should be downgraded.",
+      "confidence": 0.9,
+      "source_ids": [
+        "sivers_ar_2025_photonics_excerpt_s5",
+        "sivers_ar_2025_photonics_excerpt_s20"
+      ]
+    },
+    {
+      "id": "cl5",
+      "statement": "Sivers and O-Net Technologies are targeting production readiness of high-performance ELS for CPO by year-end 2026, with customer prototype demonstrations in H1 2026.",
+      "subject_id": "e20",
+      "demand_proof_level": "guided",
+      "disproof_condition": "If prototypes fail customer evaluations or production readiness milestones slip beyond 2026, this claim should be downgraded.",
+      "confidence": 0.85,
+      "source_ids": [
+        "sivers_ar_2025_photonics_excerpt_s5",
+        "sivers_ar_2025_photonics_excerpt_s12"
+      ]
+    }
+  ]
+}
