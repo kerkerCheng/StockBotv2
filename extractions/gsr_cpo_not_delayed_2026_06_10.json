@@ -1,0 +1,148 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "gsr_cpo_not_delayed_2026_06_10",
+    "title": "Global Semi Research: Co-Packaged Optics Is Not Delayed. SemiAnalysis Is Just Wrong — CPO 延遲論戰(含 SemiAnalysis「Powered Down, Lights Off」主張之轉述)",
+    "url": "https://globalsemiresearch.substack.com/p/co-packaged-optics-is-not-delayed",
+    "origin_entity": "Global Semi Research",
+    "publisher": "Global Semi Research (Substack)",
+    "published_at": "2026-06-10",
+    "retrieved_at": "2026-07-21",
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "公開 Substack 文章;僅保存研究所需之有限逐字引文於 library/raw 與本 extraction。SemiAnalysis 原報告(2026-06-09)為付費內容且未獨立取得,其主張以本文轉述為準(honest passthrough,不得計為第二 origin)。",
+    "source_type": "industry_report",
+    "evidence_tier": 3
+  },
+  "sources": [
+    {
+      "id": "gsr_cpo_not_delayed_2026_06_10_s1",
+      "locator": "開頭,SemiAnalysis 報告背景",
+      "quote": "On June 9, SemiAnalysis published 'Powered Down, Lights Off'"
+    },
+    {
+      "id": "gsr_cpo_not_delayed_2026_06_10_s2",
+      "locator": "SemiAnalysis 主張轉述(原報告未獨立取得)",
+      "quote": "scale-out CPO shipments revised down through 2027, scale-up pushed to 2029"
+    },
+    {
+      "id": "gsr_cpo_not_delayed_2026_06_10_s3",
+      "locator": "SemiAnalysis 主張轉述,Spectrum-6 技術問題",
+      "quote": "Spectrum 6 reportedly showed more than 3.5 dB of insertion loss in system-level testing"
+    },
+    {
+      "id": "gsr_cpo_not_delayed_2026_06_10_s4",
+      "locator": "GSR 供應鏈查核,CW 雷射 guidance",
+      "quote": "Nvidia's guidance to Coherent and Lumentum for high-power CW lasers climbed from roughly 40 million units in January to about 100 million units by April and May"
+    },
+    {
+      "id": "gsr_cpo_not_delayed_2026_06_10_s5",
+      "locator": "GSR 反駁,Lumentum 產線",
+      "quote": "Lumentum does not book out an entire FA production line, for a technology that is supposedly delivering 'meaningfully below prior expectations.'"
+    },
+    {
+      "id": "gsr_cpo_not_delayed_2026_06_10_s6",
+      "locator": "GSR 反駁,良率算法批判",
+      "quote": "freezes yield at one pessimistic snapshot and raises it to the 32nd power as though yield never improves."
+    },
+    {
+      "id": "gsr_cpo_not_delayed_2026_06_10_s7",
+      "locator": "GSR 結論",
+      "quote": "CPO is not being delayed."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "tech:cpo",
+      "type": "TechNode",
+      "name": "Co-Packaged Optics (CPO)",
+      "abstraction_level": "module_subsystem",
+      "role": null,
+      "aliases": ["CPO", "co-packaged optics"],
+      "attributes": {},
+      "confidence": 0.55,
+      "source_ids": ["gsr_cpo_not_delayed_2026_06_10_s2", "gsr_cpo_not_delayed_2026_06_10_s7"]
+    },
+    {
+      "id": "co:nvidia",
+      "type": "Company",
+      "name": "NVIDIA",
+      "abstraction_level": "network_systems",
+      "role": "leader",
+      "aliases": ["NVIDIA Corporation", "NVDA", "Nvidia"],
+      "attributes": {},
+      "confidence": 0.55,
+      "source_ids": ["gsr_cpo_not_delayed_2026_06_10_s4"]
+    },
+    {
+      "id": "co:coherent",
+      "type": "Company",
+      "name": "Coherent",
+      "abstraction_level": "device_chip",
+      "role": "bottleneck_supplier",
+      "aliases": ["Coherent Corp", "COHR"],
+      "attributes": {},
+      "confidence": 0.55,
+      "source_ids": ["gsr_cpo_not_delayed_2026_06_10_s4"]
+    },
+    {
+      "id": "co:lumentum",
+      "type": "Company",
+      "name": "Lumentum",
+      "abstraction_level": "device_chip",
+      "role": "bottleneck_supplier",
+      "aliases": ["Lumentum Holdings", "LITE"],
+      "attributes": {},
+      "confidence": 0.55,
+      "source_ids": ["gsr_cpo_not_delayed_2026_06_10_s4", "gsr_cpo_not_delayed_2026_06_10_s5"]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:coherent",
+      "dst_id": "co:nvidia",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.5,
+      "source_ids": ["gsr_cpo_not_delayed_2026_06_10_s4"]
+    },
+    {
+      "id": "e2",
+      "src_id": "co:lumentum",
+      "dst_id": "co:nvidia",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.5,
+      "source_ids": ["gsr_cpo_not_delayed_2026_06_10_s4"]
+    }
+  ],
+  "claims": [
+    {
+      "id": "gsr_cpo_not_delayed_2026_06_10_cl1",
+      "statement": "反向 thesis 存證(honest passthrough,SemiAnalysis 原報告付費未獨立取得,主張依 GSR 轉述):SemiAnalysis「Powered Down, Lights Off」(2026-06-09)主張 CPO 時程延遲——scale-out 出貨下修至 2027、scale-up 推遲到 2029,Spectrum-6 系統級測試 insertion loss >3.5dB。此為對本圖 CPO 需求 thesis 的最強公開反駁,發布當日 LITE/COHR/AAOI 等光通股大跌。",
+      "subject_id": "tech:cpo",
+      "demand_proof_level": "speculative",
+      "disproof_condition": "NVIDIA/Broadcom 官方確認 CPO 出貨時程未變(如 Spectrum-6 如期量產出貨),或 SemiAnalysis 撤回/修正報告,或取得原報告全文顯示主張與轉述不符。",
+      "confidence": 0.5,
+      "source_ids": ["gsr_cpo_not_delayed_2026_06_10_s1", "gsr_cpo_not_delayed_2026_06_10_s2", "gsr_cpo_not_delayed_2026_06_10_s3"]
+    },
+    {
+      "id": "gsr_cpo_not_delayed_2026_06_10_cl2",
+      "statement": "GSR 反駁 SemiAnalysis 延遲論:CPO is not being delayed——供應端產能承諾與延遲敘事矛盾(Lumentum 不會為一個「明顯低於預期」的技術 book out 整條 FA 產線),且 SemiAnalysis 的 0.95^32≈19% 系統良率算法把良率凍結在悲觀單點、忽略良率學習曲線。",
+      "subject_id": "tech:cpo",
+      "demand_proof_level": "inferred",
+      "disproof_condition": "Spectrum-6 CPO 官方出貨時程正式下修 2 季以上,或 Coherent/Lumentum 撤回 2027 scale-up 出貨承諾/砍產能。",
+      "confidence": 0.5,
+      "source_ids": ["gsr_cpo_not_delayed_2026_06_10_s5", "gsr_cpo_not_delayed_2026_06_10_s6", "gsr_cpo_not_delayed_2026_06_10_s7"]
+    },
+    {
+      "id": "gsr_cpo_not_delayed_2026_06_10_cl3",
+      "statement": "Dated observation(GSR 供應鏈查核,截至 2026-06-10):NVIDIA 對 Coherent 與 Lumentum 的 high-power CW 雷射 guidance 由 1 月約 40M 顆攀升至 4-5 月約 100M 顆——需求前置訊號,亦為 Coherent/Lumentum→NVIDIA 雷射供應關係的第一個非當事方(GSR)佐證。",
+      "subject_id": "co:nvidia",
+      "demand_proof_level": "inferred",
+      "disproof_condition": "後續供應鏈查核或公司揭露顯示 guidance 被下修/正常化,或證實 40M→100M 數字失實。",
+      "confidence": 0.5,
+      "source_ids": ["gsr_cpo_not_delayed_2026_06_10_s4"]
+    }
+  ]
+}

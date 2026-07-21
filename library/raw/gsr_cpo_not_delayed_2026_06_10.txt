@@ -1,0 +1,22 @@
+[EXCERPT — 公開 Substack 之有限逐字引文] Global Semi Research: "Co-Packaged Optics Is Not Delayed. SemiAnalysis Is Just Wrong"
+Source: https://globalsemiresearch.substack.com/p/co-packaged-optics-is-not-delayed
+Published: 2026-06-10 | Origin: Global Semi Research | Retrieved: 2026-07-21(WebFetch)
+
+背景:本文是對 SemiAnalysis 付費報告「Powered Down, Lights Off」(2026-06-09)的公開反駁。
+SemiAnalysis 原報告付費牆內、未獨立取得;其主張內容以本文描述為準(honest passthrough)。
+
+Verbatim quotes:
+
+"On June 9, SemiAnalysis published 'Powered Down, Lights Off'"
+
+(描述 SemiAnalysis 主張)"scale-out CPO shipments revised down through 2027, scale-up pushed to 2029"
+
+(描述 SemiAnalysis 主張)"Spectrum 6 reportedly showed more than 3.5 dB of insertion loss in system-level testing"
+
+"Nvidia's guidance to Coherent and Lumentum for high-power CW lasers climbed from roughly 40 million units in January to about 100 million units by April and May"
+
+"Lumentum does not book out an entire FA production line, for a technology that is supposedly delivering 'meaningfully below prior expectations.'"
+
+(批判 SemiAnalysis 良率算法)"freezes yield at one pessimistic snapshot and raises it to the 32nd power as though yield never improves." / "0.95^32 lands at roughly 19% system yield"
+
+"CPO is not being delayed."
