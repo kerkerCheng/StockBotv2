@@ -11,6 +11,7 @@ from decision_lab.execution import (
     prepare_managed_action,
     record_live_fill,
 )
+from decision_lab.outcomes import trigger_review_required
 from tests.test_decision_execution import _bundle, _store
 from tests.test_probe_sizing import _assessment
 
@@ -171,5 +172,30 @@ def test_card_respects_explicit_live_fill_instead_of_recommending_duplicate_trad
         assert card["action"] == "NO_ACTION"
         assert card["live"]["fill_reported"] is True
         assert card["scope"]["single_name"] == "monitor_confirmed_live_execution"
+    finally:
+        store.close()
+
+
+def test_review_required_lifecycle_forces_48h_review_without_optional_context(
+    tmp_path: Path,
+) -> None:
+    store = _store(tmp_path)
+    try:
+        decision = _decision(store, key="lifecycle-review")
+        cohort_id = store.get_decision(decision.decision_id)["cohort_id"]
+        trigger_review_required(
+            store,
+            cohort_id,
+            reason="Customer qualification failed",
+            evidence_refs=["fixture://customer"],
+            effective_at="2026-07-21T12:10:00+00:00",
+        )
+
+        card = build_action_card(store, decision.decision_id)
+
+        assert card["action"] == "REVIEW"
+        assert card["urgency"] == "within_48h"
+        assert card["lifecycle"]["status"] == "review_required"
+        assert card["lifecycle"]["review_due_at"] == "2026-07-23T12:10:00+00:00"
     finally:
         store.close()

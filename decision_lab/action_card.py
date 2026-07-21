@@ -106,8 +106,15 @@ def build_action_card(
     paper_event = store.paper_event_for_decision(decision_id)
     live_choice = store.latest_live_choice(decision_id)
     live_fill = store.latest_live_fill(decision_id)
+    lifecycle = store.current_lifecycle(decision["cohort_id"])
     alpha_beta = _alpha_beta(change_context)
-    disproof_triggered = bool((change_context or {}).get("disproof_triggered"))
+    disproof_triggered = bool(
+        (change_context or {}).get("disproof_triggered")
+        or lifecycle.status == "review_required"
+    )
+    if lifecycle.status == "review_required":
+        alpha_beta["classification"] = "alpha"
+        alpha_beta["thesis_changed"] = True
     portfolio_status = str((portfolio_context or {}).get("status") or "ok")
     live_status = str(sizing["live_status"])
     paper_status = str(sizing["paper_status"])
@@ -207,6 +214,11 @@ def build_action_card(
         },
         "reason": reason,
         "alpha_beta": alpha_beta,
+        "lifecycle": {
+            "epoch": lifecycle.epoch,
+            "status": lifecycle.status,
+            "review_due_at": lifecycle.review_due_at,
+        },
         "weakest_link": {
             "axis": axis,
             "level": axis_result["level"],

@@ -20,6 +20,8 @@ from .models import (
     ContextBundle,
     CoverageResult,
     DecisionExecutionResult,
+    LifecycleResult,
+    OutcomeResult,
     PreparedAction,
     ProbeRecord,
     ProbeSizingResult,
@@ -912,6 +914,30 @@ class DecisionStore:
         result["payload"] = json.loads(result.pop("payload_json"))
         return result
 
+    def latest_decision_for_cohort(self, cohort_id: str) -> dict[str, Any] | None:
+        row = self._conn.execute(
+            """
+            SELECT decision_id FROM system_decisions
+            WHERE cohort_id = ? ORDER BY effective_at DESC, decision_id DESC LIMIT 1
+            """,
+            (cohort_id,),
+        ).fetchone()
+        return self.get_decision(str(row["decision_id"])) if row is not None else None
+
+    def signal_sources_for_cohort(self, cohort_id: str) -> tuple[str, ...]:
+        sources = set()
+        for row in self._conn.execute(
+            """
+            SELECT payload_json FROM decision_events
+            WHERE cohort_id = ? AND event_type = 'qualified_signal'
+            """,
+            (cohort_id,),
+        ):
+            source_id = json.loads(row["payload_json"]).get("source_id")
+            if isinstance(source_id, str) and source_id:
+                sources.add(source_id)
+        return tuple(sorted(sources))
+
     def list_paper_events(self, cohort_id: str) -> list[dict[str, Any]]:
         rows = self._conn.execute(
             """
@@ -1259,3 +1285,328 @@ class DecisionStore:
                 (effective_at, action_id),
             )
             return event_id
+
+    def current_lifecycle(self, cohort_id: str) -> LifecycleResult:
+        row = self._conn.execute(
+            """
+            SELECT cohort_id, epoch, status, review_due_at, terminal_event_id
+            FROM probe_lifecycle_epochs WHERE cohort_id = ?
+            ORDER BY epoch DESC LIMIT 1
+            """,
+            (cohort_id,),
+        ).fetchone()
+        if row is None:
+            cohort = self._conn.execute(
+                "SELECT 1 FROM decision_cohorts WHERE cohort_id = ?", (cohort_id,)
+            ).fetchone()
+            if cohort is None:
+                raise KeyError(f"cohort not found: {cohort_id}")
+            return LifecycleResult(cohort_id, 1, "active", None, None)
+        return LifecycleResult(
+            cohort_id=str(row["cohort_id"]),
+            epoch=int(row["epoch"]),
+            status=str(row["status"]),
+            review_due_at=row["review_due_at"],
+            lifecycle_event_id=row["terminal_event_id"],
+        )
+
+    def _ensure_lifecycle_epoch(self, cohort_id: str, started_at: str) -> sqlite3.Row:
+        row = self._conn.execute(
+            """
+            SELECT cohort_id, epoch, status, review_due_at, terminal_event_id
+            FROM probe_lifecycle_epochs WHERE cohort_id = ?
+            ORDER BY epoch DESC LIMIT 1
+            """,
+            (cohort_id,),
+        ).fetchone()
+        if row is not None:
+            return row
+        self._conn.execute(
+            """
+            INSERT INTO probe_lifecycle_epochs (
+                cohort_id, epoch, status, started_at
+            ) VALUES (?, 1, 'active', ?)
+            """,
+            (cohort_id, started_at),
+        )
+        row = self._conn.execute(
+            """
+            SELECT cohort_id, epoch, status, review_due_at, terminal_event_id
+            FROM probe_lifecycle_epochs WHERE cohort_id = ? AND epoch = 1
+            """,
+            (cohort_id,),
+        ).fetchone()
+        assert row is not None
+        return row
+
+    def trigger_review_required(
+        self,
+        *,
+        cohort_id: str,
+        reason: str,
+        evidence_refs: tuple[str, ...],
+        effective_at: str,
+        review_due_at: str,
+    ) -> LifecycleResult:
+        with immediate_transaction(self._conn):
+            current = self._ensure_lifecycle_epoch(cohort_id, effective_at)
+            if current["status"] == "review_required":
+                return LifecycleResult(
+                    cohort_id, int(current["epoch"]), "review_required",
+                    current["review_due_at"], None,
+                )
+            if current["status"] != "active":
+                raise ValueError("terminal lifecycle cannot enter review_required")
+            event_payload = {
+                "cohort_id": cohort_id,
+                "epoch": int(current["epoch"]),
+                "from_status": "active",
+                "to_status": "review_required",
+                "reason": reason,
+                "evidence_refs": evidence_refs,
+                "effective_at": effective_at,
+                "review_due_at": review_due_at,
+            }
+            digest = _digest(_canonical_json(event_payload))
+            event_id = "le_" + digest[:32]
+            self._conn.execute(
+                """
+                INSERT OR IGNORE INTO probe_lifecycle_events (
+                    lifecycle_event_id, cohort_id, epoch, from_status,
+                    to_status, reason, evidence_refs_json,
+                    event_digest, effective_at
+                ) VALUES (?, ?, ?, 'active', 'review_required', ?, ?, ?, ?)
+                """,
+                (
+                    event_id,
+                    cohort_id,
+                    int(current["epoch"]),
+                    reason,
+                    _canonical_json({"items": evidence_refs}),
+                    digest,
+                    effective_at,
+                ),
+            )
+            self._conn.execute(
+                """
+                UPDATE probe_lifecycle_epochs
+                SET status = 'review_required', review_due_at = ?, updated_at = datetime('now')
+                WHERE cohort_id = ? AND epoch = ?
+                """,
+                (review_due_at, cohort_id, int(current["epoch"])),
+            )
+            return LifecycleResult(
+                cohort_id, int(current["epoch"]), "review_required", review_due_at, event_id
+            )
+
+    @staticmethod
+    def _outcome_result(payload: Mapping[str, Any]) -> OutcomeResult:
+        return OutcomeResult(
+            outcome_id=str(payload["outcome_id"]),
+            cohort_id=str(payload["cohort_id"]),
+            epoch=int(payload["epoch"]),
+            terminal_status=str(payload["terminal_status"]),
+            claim_correctness=str(payload["claim_correctness"]),
+            market_return_status=str(payload["market_return_status"]),
+            absolute_return=(
+                float(payload["absolute_return"])
+                if payload.get("absolute_return") is not None
+                else None
+            ),
+            benchmark_adjusted_return=(
+                float(payload["benchmark_adjusted_return"])
+                if payload.get("benchmark_adjusted_return") is not None
+                else None
+            ),
+        )
+
+    def close_lifecycle_with_outcome(
+        self,
+        *,
+        cohort_id: str,
+        terminal_status: str,
+        outcome_payload: Mapping[str, Any],
+        effective_at: str,
+        failure_at: str | None = None,
+    ) -> OutcomeResult:
+        if terminal_status not in {"promoted", "rejected", "expired", "revised"}:
+            raise ValueError("invalid terminal lifecycle status")
+        with immediate_transaction(self._conn):
+            current = self._ensure_lifecycle_epoch(cohort_id, effective_at)
+            epoch = int(current["epoch"])
+            if epoch > 1:
+                previous = self._conn.execute(
+                    """
+                    SELECT payload_json FROM outcome_envelopes
+                    WHERE cohort_id = ? AND epoch = ?
+                    """,
+                    (cohort_id, epoch - 1),
+                ).fetchone()
+                if previous is not None:
+                    prior_payload = json.loads(previous["payload_json"])
+                    if (
+                        prior_payload.get("terminal_status") == "revised"
+                        and prior_payload.get("effective_at") == effective_at
+                    ):
+                        prior_base = {
+                            key: value
+                            for key, value in prior_payload.items()
+                            if key
+                            not in {
+                                "outcome_id",
+                                "cohort_id",
+                                "epoch",
+                                "terminal_status",
+                                "effective_at",
+                            }
+                        }
+                        if (
+                            terminal_status == "revised"
+                            and _canonical_json(prior_base)
+                            == _canonical_json(outcome_payload)
+                        ):
+                            return self._outcome_result(prior_payload)
+                        raise ValueError("terminal revised epoch already closed at this timestamp")
+            finalized_payload = dict(outcome_payload) | {
+                "cohort_id": cohort_id,
+                "epoch": epoch,
+                "terminal_status": terminal_status,
+                "effective_at": effective_at,
+            }
+            outcome_json_without_id = _canonical_json(finalized_payload)
+            outcome_digest = _digest(outcome_json_without_id)
+            outcome_id = "oe_" + outcome_digest[:32]
+            finalized_payload["outcome_id"] = outcome_id
+            outcome_json = _canonical_json(finalized_payload)
+            existing = self._conn.execute(
+                """
+                SELECT outcome_id, outcome_digest, payload_json
+                FROM outcome_envelopes WHERE cohort_id = ? AND epoch = ?
+                """,
+                (cohort_id, epoch),
+            ).fetchone()
+            if existing is not None:
+                if existing["outcome_digest"] != outcome_digest:
+                    raise ValueError("terminal epoch already has a different outcome")
+                return self._outcome_result(json.loads(existing["payload_json"]))
+            if current["status"] not in {"active", "review_required"}:
+                raise ValueError("terminal lifecycle state is missing its outcome")
+            event_payload = {
+                "cohort_id": cohort_id,
+                "epoch": epoch,
+                "from_status": str(current["status"]),
+                "to_status": terminal_status,
+                "reason": finalized_payload["reason"],
+                "evidence_refs": finalized_payload["evidence_refs"],
+                "effective_at": effective_at,
+            }
+            event_digest = _digest(_canonical_json(event_payload))
+            event_id = "le_" + event_digest[:32]
+            self._conn.execute(
+                """
+                INSERT INTO probe_lifecycle_events (
+                    lifecycle_event_id, cohort_id, epoch, from_status,
+                    to_status, reason, evidence_refs_json,
+                    event_digest, effective_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    event_id,
+                    cohort_id,
+                    epoch,
+                    current["status"],
+                    terminal_status,
+                    finalized_payload["reason"],
+                    _canonical_json({"items": finalized_payload["evidence_refs"]}),
+                    event_digest,
+                    effective_at,
+                ),
+            )
+            if failure_at == "after_terminal":
+                raise RuntimeError("injected failure after terminal event")
+            self._conn.execute(
+                """
+                INSERT INTO outcome_envelopes (
+                    outcome_id, cohort_id, epoch, terminal_event_id,
+                    outcome_digest, terminal_status, claim_correctness,
+                    market_return_status, absolute_return,
+                    benchmark_adjusted_return, calculator_version,
+                    payload_json, effective_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    outcome_id,
+                    cohort_id,
+                    epoch,
+                    event_id,
+                    outcome_digest,
+                    terminal_status,
+                    finalized_payload["claim_correctness"],
+                    finalized_payload["market_return_status"],
+                    finalized_payload.get("absolute_return"),
+                    finalized_payload.get("benchmark_adjusted_return"),
+                    finalized_payload.get("calculator_version"),
+                    outcome_json,
+                    effective_at,
+                ),
+            )
+            if failure_at == "after_outcome":
+                raise RuntimeError("injected failure after outcome")
+            self._conn.execute(
+                """
+                UPDATE probe_lifecycle_epochs
+                SET status = ?, terminal_event_id = ?, review_due_at = NULL,
+                    updated_at = datetime('now')
+                WHERE cohort_id = ? AND epoch = ?
+                """,
+                (terminal_status, event_id, cohort_id, epoch),
+            )
+            if terminal_status == "revised":
+                self._conn.execute(
+                    """
+                    INSERT INTO probe_lifecycle_epochs (
+                        cohort_id, epoch, status, started_at
+                    ) VALUES (?, ?, 'active', ?)
+                    """,
+                    (cohort_id, epoch + 1, effective_at),
+                )
+            elif terminal_status in {"promoted", "rejected", "expired"}:
+                self._conn.execute(
+                    """
+                    UPDATE probe_projection SET status = ?, updated_at = datetime('now')
+                    WHERE cohort_id = ?
+                    """,
+                    (terminal_status, cohort_id),
+                )
+            return self._outcome_result(finalized_payload)
+
+    def get_outcome(self, outcome_id: str) -> dict[str, Any]:
+        row = self._conn.execute(
+            "SELECT payload_json FROM outcome_envelopes WHERE outcome_id = ?",
+            (outcome_id,),
+        ).fetchone()
+        if row is None:
+            raise KeyError(f"outcome not found: {outcome_id}")
+        return json.loads(row["payload_json"])
+
+    def lifecycle_invariant_violations(self) -> list[str]:
+        violations: list[str] = []
+        rows = self._conn.execute(
+            """
+            SELECT e.cohort_id, e.epoch, e.status, o.outcome_id
+            FROM probe_lifecycle_epochs e
+            LEFT JOIN outcome_envelopes o
+              ON o.cohort_id = e.cohort_id AND o.epoch = e.epoch
+            """
+        )
+        terminal = {"promoted", "rejected", "expired", "revised"}
+        for row in rows:
+            if row["status"] in terminal and row["outcome_id"] is None:
+                violations.append(
+                    f"terminal_without_outcome:{row['cohort_id']}:{row['epoch']}"
+                )
+            if row["status"] not in terminal and row["outcome_id"] is not None:
+                violations.append(
+                    f"outcome_on_nonterminal:{row['cohort_id']}:{row['epoch']}"
+                )
+        return violations

@@ -140,3 +140,24 @@ class PreparedAction:
     target_id: str
     digest: str
     expires_at: str
+
+
+@dataclass(frozen=True)
+class LifecycleResult:
+    cohort_id: str
+    epoch: int
+    status: str
+    review_due_at: str | None
+    lifecycle_event_id: str | None
+
+
+@dataclass(frozen=True)
+class OutcomeResult:
+    outcome_id: str
+    cohort_id: str
+    epoch: int
+    terminal_status: str
+    claim_correctness: str
+    market_return_status: str
+    absolute_return: float | None
+    benchmark_adjusted_return: float | None

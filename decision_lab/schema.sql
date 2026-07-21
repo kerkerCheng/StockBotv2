@@ -93,6 +93,51 @@ CREATE TABLE IF NOT EXISTS prepared_actions (
     UNIQUE (action_type, target_id, action_digest)
 );
 
+CREATE TABLE IF NOT EXISTS probe_lifecycle_epochs (
+    cohort_id        TEXT NOT NULL REFERENCES decision_cohorts(cohort_id),
+    epoch            INTEGER NOT NULL CHECK (epoch > 0),
+    status           TEXT NOT NULL CHECK (status IN ('active', 'review_required', 'promoted', 'rejected', 'expired', 'revised')),
+    started_at       TEXT NOT NULL,
+    review_due_at    TEXT,
+    terminal_event_id TEXT,
+    updated_at       TEXT NOT NULL DEFAULT (datetime('now')),
+    PRIMARY KEY (cohort_id, epoch)
+);
+
+CREATE TABLE IF NOT EXISTS probe_lifecycle_events (
+    lifecycle_event_id TEXT PRIMARY KEY,
+    cohort_id        TEXT NOT NULL,
+    epoch            INTEGER NOT NULL,
+    from_status      TEXT NOT NULL,
+    to_status        TEXT NOT NULL,
+    reason           TEXT NOT NULL,
+    evidence_refs_json TEXT NOT NULL,
+    event_digest     TEXT NOT NULL,
+    effective_at     TEXT NOT NULL,
+    created_at       TEXT NOT NULL DEFAULT (datetime('now')),
+    FOREIGN KEY (cohort_id, epoch) REFERENCES probe_lifecycle_epochs(cohort_id, epoch),
+    UNIQUE (cohort_id, epoch, event_digest)
+);
+
+CREATE TABLE IF NOT EXISTS outcome_envelopes (
+    outcome_id       TEXT PRIMARY KEY,
+    cohort_id        TEXT NOT NULL,
+    epoch            INTEGER NOT NULL,
+    terminal_event_id TEXT NOT NULL UNIQUE REFERENCES probe_lifecycle_events(lifecycle_event_id),
+    outcome_digest   TEXT NOT NULL,
+    terminal_status  TEXT NOT NULL,
+    claim_correctness TEXT NOT NULL CHECK (claim_correctness IN ('true', 'false', 'mixed', 'unknown')),
+    market_return_status TEXT NOT NULL,
+    absolute_return  REAL,
+    benchmark_adjusted_return REAL,
+    calculator_version TEXT,
+    payload_json     TEXT NOT NULL,
+    effective_at     TEXT NOT NULL,
+    created_at       TEXT NOT NULL DEFAULT (datetime('now')),
+    FOREIGN KEY (cohort_id, epoch) REFERENCES probe_lifecycle_epochs(cohort_id, epoch),
+    UNIQUE (cohort_id, epoch)
+);
+
 CREATE TABLE IF NOT EXISTS paper_position_projection (
     company_id       TEXT PRIMARY KEY,
     weight           REAL NOT NULL DEFAULT 0,
@@ -178,5 +223,5 @@ CREATE INDEX IF NOT EXISTS idx_decision_events_cohort_time
 CREATE INDEX IF NOT EXISTS idx_paper_events_cohort_time
     ON paper_events (cohort_id, effective_at, paper_event_id);
 INSERT INTO decision_store_meta (key, value)
-VALUES ('schema_version', '4')
+VALUES ('schema_version', '5')
 ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = datetime('now');
