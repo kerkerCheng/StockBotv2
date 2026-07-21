@@ -1,6 +1,9 @@
 # Neo4j local data — never commit DB files
 .neo4j/
 engine_c/.yfinance-cache/
+engine_c/stockbot.db
+paper_portfolio/config.json
+paper_portfolio/transactions.csv
 
 # Secrets
 .env

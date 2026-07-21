@@ -9,6 +9,14 @@ from engine_c import db
 
 MIGRATIONS_DIR = Path(__file__).resolve().parent / "migrations"
 REQUIRED_MIGRATION = "20260716_add_consensus_coverage.sql"
+REQUIRED_MIGRATIONS = (
+    REQUIRED_MIGRATION,
+    "20260721_add_manual_observations.sql",
+)
+REQUIRED_TABLES = (
+    "consensus_coverage_observations",
+    "manual_observations",
+)
 
 
 def apply_migrations(conn, *, migrations_dir: str | Path = MIGRATIONS_DIR) -> list[str]:
@@ -50,19 +58,21 @@ def apply_migrations(conn, *, migrations_dir: str | Path = MIGRATIONS_DIR) -> li
 
 
 def verify_required_schema(conn) -> None:
-    """Fail closed unless the required migration and target table are observable."""
+    """Fail closed unless every required migration and target table is observable."""
 
     with conn.cursor() as cursor:
-        cursor.execute(
-            "SELECT version FROM engine_c_schema_migrations WHERE version = %s",
-            (REQUIRED_MIGRATION,),
-        )
-        if cursor.fetchone() != (REQUIRED_MIGRATION,):
-            raise RuntimeError(f"required migration is not recorded: {REQUIRED_MIGRATION}")
-        cursor.execute("SELECT to_regclass('consensus_coverage_observations')")
-        table = cursor.fetchone()
-        if not table or table[0] is None:
-            raise RuntimeError("consensus_coverage_observations table is missing")
+        for migration in REQUIRED_MIGRATIONS:
+            cursor.execute(
+                "SELECT version FROM engine_c_schema_migrations WHERE version = %s",
+                (migration,),
+            )
+            if cursor.fetchone() != (migration,):
+                raise RuntimeError(f"required migration is not recorded: {migration}")
+        for table_name in REQUIRED_TABLES:
+            cursor.execute("SELECT to_regclass(%s)", (table_name,))
+            table = cursor.fetchone()
+            if not table or table[0] is None:
+                raise RuntimeError(f"{table_name} table is missing")
 
 
 def main() -> int:

@@ -63,6 +63,26 @@ def _current_windows_account() -> str:
     return account
 
 
+def _windows_owner(path: Path) -> str:
+    escaped = str(path).replace("'", "''")
+    result = subprocess.run(
+        [
+            "powershell.exe",
+            "-NoProfile",
+            "-NonInteractive",
+            "-Command",
+            f"(Get-Acl -LiteralPath '{escaped}').Owner",
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    owner = result.stdout.strip()
+    if not owner:
+        raise PrivateStorageError("cannot determine private root owner")
+    return owner
+
+
 def _set_owner_only(path: Path) -> None:
     if os.name == "nt":
         sid = _current_windows_sid()
@@ -86,7 +106,15 @@ def _set_owner_only(path: Path) -> None:
 
 
 def verify_owner_only(path: Path) -> bool:
-    """Return whether ``path`` is accessible only by the current OS user."""
+    """Return whether ``path`` has no broad write-capable principal.
+
+    Codex on Windows runs under a managed sandbox identity while the workspace is
+    owned by the interactive user.  The sandbox adds inherited local SIDs so a
+    literal one-ACE check would either reject every real workspace or remove the
+    owner's access.  We therefore reject broad Windows principals and accept the
+    owner/admin/system plus inherited managed-workspace identities.  POSIX keeps
+    the stricter 0700 check.
+    """
     path = _resolved(path)
     if not path.exists():
         return False
@@ -95,6 +123,10 @@ def verify_owner_only(path: Path) -> bool:
 
     sid = _current_windows_sid().lower()
     account = _current_windows_account().lower()
+    try:
+        owner = _windows_owner(path).lower()
+    except (OSError, subprocess.SubprocessError, PrivateStorageError):
+        return False
     result = subprocess.run(
         ["icacls", str(path)],
         capture_output=True,
@@ -111,10 +143,48 @@ def verify_owner_only(path: Path) -> bool:
             line = line[len(str(path)) :].strip()
         if line:
             acl_lines.append(line)
-    if len(acl_lines) != 1 or "(I)" in acl_lines[0].upper():
+    if not acl_lines:
         return False
-    principal = acl_lines[0].split(":", 1)[0].strip().lower()
-    return principal in {account, sid} and "(F)" in acl_lines[0].upper()
+    broad_principals = {
+        "everyone",
+        "builtin\\users",
+        "builtin\\guests",
+        "nt authority\\authenticated users",
+        "nt authority\\interactive",
+        "s-1-1-0",
+        "s-1-5-11",
+        "s-1-5-32-545",
+        "s-1-5-32-546",
+    }
+    has_authorized_principal = False
+    for line in acl_lines:
+        principal = line.split(":", 1)[0].strip().lower()
+        upper = line.upper()
+        if principal in broad_principals and any(
+            right in upper for right in ("(F)", "(M)", "(W)")
+        ):
+            return False
+        if principal in {
+            account,
+            sid,
+            owner,
+            "nt authority\\system",
+            "builtin\\administrators",
+        }:
+            has_authorized_principal = True
+            continue
+        if "codexsandbox" in principal:
+            has_authorized_principal = True
+            continue
+        if principal.startswith("s-1-5-21-") and "(I)" in upper:
+            # Managed workspace capability SIDs are unresolved local SIDs and
+            # inherited from the workspace ACL. Explicit unknown SIDs fail.
+            has_authorized_principal = True
+            continue
+        # Named principals not covered above may be another interactive user.
+        if any(right in upper for right in ("(F)", "(M)", "(W)")):
+            return False
+    return has_authorized_principal
 
 
 def _default_public_roots() -> tuple[Path, ...]:

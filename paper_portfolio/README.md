@@ -7,6 +7,11 @@
 `paper_portfolio.ledger.replay_decision_store_events()` 提供不寫檔的 domain replay facade。
 System paper、Google Sheet live holdings 與使用者 live choice 是三種不同真相，彼此不得回寫。
 
+本目錄的 `config.json`／`transactions.csv` 已退出 Git/runtime authority；若本機仍看得到，僅是
+cutover 前留下的 ignored legacy 檔。Fresh clone 不需要也不應建立它們。新 runtime 位於
+owner-only 的 `library/private/decision_lab/decision_lab.db`，完整 recovery export 也只能留在
+`library/private/`。下方 CSV 操作說明只適用於 legacy characterization tests。
+
 這是一個獨立的前瞻模擬投資帳本，用來稽核「當時知道什麼、怎麼決策、是否遵守 disproof 與部位規則」。它不會下實盤、不做歷史回填或回測，也不因少量績效宣稱 alpha。
 
 ## 邊界

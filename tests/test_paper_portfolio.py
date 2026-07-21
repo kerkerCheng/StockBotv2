@@ -363,10 +363,10 @@ def test_initialization_failure_does_not_publish_initialized_config(tmp_path: Pa
 def test_repository_legacy_note_is_not_a_transaction() -> None:
     repo_root = Path(__file__).resolve().parents[1]
     note = repo_root / "paper_portfolio" / "reviews" / "2026-07-12-sive-legacy-decision.md"
-    transactions = (repo_root / "paper_portfolio" / "transactions.csv").read_text(
-        encoding="utf-8"
-    )
 
     assert "legacy_observation" in note.read_text(encoding="utf-8")
-    assert transactions.count("\n") == 1
-    assert "SIVE" not in transactions
+    legacy_transactions = repo_root / "paper_portfolio" / "transactions.csv"
+    if legacy_transactions.exists():
+        transactions = legacy_transactions.read_text(encoding="utf-8")
+        assert transactions.count("\n") == 1
+        assert "SIVE" not in transactions

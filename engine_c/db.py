@@ -12,12 +12,18 @@ db.py — Engine C 資料庫連線抽象層（SQLite 預設，可換 Postgres）
 """
 from __future__ import annotations
 
+import json
 import os
 import sqlite3
 from pathlib import Path
 
+from storage.relational import (
+    connect_sqlite,
+    initialize_private_root,
+    validate_private_destination,
+)
+
 _ROOT = Path(__file__).resolve().parent.parent
-_SQLITE_PATH = _ROOT / "engine_c" / "stockbot.db"
 
 _PG_ENVS = ("POSTGRES_DSN", "POSTGRES_HOST")
 
@@ -27,6 +33,36 @@ def _use_postgres() -> bool:
 
 
 DB_TYPE: str = "postgres" if _use_postgres() else "sqlite"
+
+
+def sqlite_path(
+    *,
+    repo_root: Path | None = None,
+    private_root: Path | None = None,
+) -> Path:
+    """Resolve the active ignored Engine C authority without trusting broad paths。"""
+
+    repo = (repo_root or _ROOT).resolve()
+    private = initialize_private_root(
+        (private_root or repo / "library" / "private").resolve(),
+        repo_root=repo,
+    )
+    pointer = private / "runtime_pointer.json"
+    destination = private / "engine_c" / "stockbot.db"
+    if pointer.is_file():
+        try:
+            payload = json.loads(pointer.read_text(encoding="utf-8"))
+            relative = payload["engine_c"]
+        except (KeyError, OSError, json.JSONDecodeError, TypeError) as exc:
+            raise RuntimeError("Engine C runtime pointer is invalid") from exc
+        if not isinstance(relative, str) or Path(relative).is_absolute():
+            raise RuntimeError("Engine C runtime pointer must be a relative path")
+        destination = private / relative
+    return validate_private_destination(
+        destination,
+        private_root=private,
+        repo_root=repo,
+    )
 
 
 def _ensure_sqlite_schema(conn: sqlite3.Connection) -> None:
@@ -90,6 +126,9 @@ def _ensure_sqlite_schema(conn: sqlite3.Connection) -> None:
     ):
         if name not in columns:
             conn.execute(f"ALTER TABLE financial_snapshots ADD COLUMN {name} REAL")
+    from engine_c.manual_observations import ensure_manual_observation_schema
+
+    ensure_manual_observation_schema(conn)
     conn.commit()
 
 
@@ -122,8 +161,7 @@ def get_conn():
             connect_timeout=connect_timeout,
         )
 
-    conn = sqlite3.connect(str(_SQLITE_PATH), check_same_thread=False)
-    conn.row_factory = sqlite3.Row
+    conn = connect_sqlite(sqlite_path())
     _ensure_sqlite_schema(conn)
     return conn
 

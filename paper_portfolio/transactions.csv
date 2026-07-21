@@ -1,1 +1,0 @@
-event_id,timestamp_utc,ticker,event_type,target_weight,changed_weight,price,price_currency,fx_rate_to_base,fx_ref,thesis_version,thesis_hash,policy_version,policy_decision,expected_horizon,disproof_condition,disproof_ref,reason,decision_author,benchmark_ticker,corrects_event_id

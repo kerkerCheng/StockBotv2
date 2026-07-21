@@ -1,0 +1,24 @@
+{
+  "destination_relative": "engine_c/stockbot-engine-c-private-v1-458db5270ee2.db",
+  "destination_sha256": "e1fec6fa780585a3501410274e50cbc3addb9c84112823510939ddfc038fe7b4",
+  "pointer_switched": true,
+  "reconciliation": {
+    "consensus_coverage_observations": true,
+    "destination_counts": {
+      "consensus_coverage_observations": 37,
+      "financial_snapshots": 40,
+      "manual_fields": 7,
+      "manual_observations": 7
+    },
+    "financial_snapshots": true,
+    "manual_fields": true,
+    "manual_observations": true
+  },
+  "source_counts": {
+    "consensus_coverage_observations": 37,
+    "financial_snapshots": 40,
+    "manual_fields": 7
+  },
+  "source_sha256": "458db5270ee2d4ca1e42e38f73fd32c683077d365612fa2b2e29314561f1ca86",
+  "version": "engine-c-private-v1"
+}

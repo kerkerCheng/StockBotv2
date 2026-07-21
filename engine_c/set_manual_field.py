@@ -22,7 +22,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from engine_c.db import get_conn, upsert_manual_field  # noqa: E402
+from engine_c.db import get_conn  # noqa: E402
+from engine_c.manual_observations import append_manual_observation  # noqa: E402
 
 _MANUAL_FIELDS = ("customer_concentration", "backlog")
 
@@ -52,7 +53,9 @@ def main() -> int:
     ap.add_argument("ticker", help="股票代號，如 AMAT")
     ap.add_argument("field_name", nargs="?", help="欄位名（customer_concentration / backlog）")
     ap.add_argument("value", nargs="?", help="值（非空字串；backlog 停揭露時填替代指標並註明）")
-    ap.add_argument("--source", default=None, help="依據的 filing（強烈建議填，如 'AMAT FY2025 10-K'）")
+    ap.add_argument("--source", required=False, help="依據的 filing（必填）")
+    ap.add_argument("--as-of", dest="as_of", help="觀測日期／時間（必填，ISO-8601）")
+    ap.add_argument("--author", default="user", help="輸入者識別（預設 user）")
     ap.add_argument("--list", dest="do_list", action="store_true", help="列出該 ticker 已填欄位")
     args = ap.parse_args()
 
@@ -64,17 +67,23 @@ def main() -> int:
     if args.field_name not in _MANUAL_FIELDS:
         print(f"⚠ 提醒：'{args.field_name}' 不在標準人工欄位 {_MANUAL_FIELDS}；"
               "仍會寫入，但 checklist 只讀這兩個。", file=sys.stderr)
-    if not args.source:
-        print("⚠ 未帶 --source：traceability 是硬規則，建議補上依據 filing。", file=sys.stderr)
+    if not args.source or not args.as_of:
+        ap.error("manual observation 必須同時提供 --source 與 --as-of")
 
     conn = get_conn()
     try:
-        upsert_manual_field(
-            conn, args.ticker, args.field_name, args.value, source_note=args.source
+        observation_id = append_manual_observation(
+            conn,
+            ticker=args.ticker,
+            field_name=args.field_name,
+            value=args.value,
+            source_ref=args.source,
+            as_of=args.as_of,
+            author=args.author,
         )
     finally:
         conn.close()
-    print(f"✓ 已寫入 {args.ticker.upper()} / {args.field_name}")
+    print(f"✓ 已追加 {observation_id}：{args.ticker.upper()} / {args.field_name}")
     return 0
 
 

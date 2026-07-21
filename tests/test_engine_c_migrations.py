@@ -7,6 +7,7 @@ import pytest
 
 from engine_c.migrate import (
     REQUIRED_MIGRATION,
+    REQUIRED_MIGRATIONS,
     apply_migrations,
     verify_required_schema,
 )
@@ -77,6 +78,17 @@ def test_repository_coverage_migration_has_idempotent_postgres_ddl() -> None:
     assert "manual_required' AND analyst_count IS NULL" in sql
 
 
+def test_repository_manual_observation_migration_has_idempotent_postgres_ddl() -> None:
+    path = Path(__file__).resolve().parents[1] / "engine_c" / "migrations" / (
+        "20260721_add_manual_observations.sql"
+    )
+    sql = path.read_text(encoding="utf-8")
+
+    assert "CREATE TABLE IF NOT EXISTS manual_observations" in sql
+    assert "payload_digest VARCHAR(64) NOT NULL UNIQUE" in sql
+    assert "CREATE INDEX IF NOT EXISTS idx_manual_observation_field_time" in sql
+
+
 def test_missing_or_empty_migration_directory_fails_closed(tmp_path: Path) -> None:
     with pytest.raises(RuntimeError, match="does not exist"):
         apply_migrations(FakeConnection(), migrations_dir=tmp_path / "missing")
@@ -87,8 +99,9 @@ def test_missing_or_empty_migration_directory_fails_closed(tmp_path: Path) -> No
 def test_required_migration_and_table_are_verified() -> None:
     healthy = FakeConnection(
         fetchone_values=[
-            (REQUIRED_MIGRATION,),
+            *((migration,) for migration in REQUIRED_MIGRATIONS),
             ("consensus_coverage_observations",),
+            ("manual_observations",),
         ]
     )
     verify_required_schema(healthy)
@@ -96,3 +109,15 @@ def test_required_migration_and_table_are_verified() -> None:
     missing = FakeConnection(fetchone_values=[None])
     with pytest.raises(RuntimeError, match="required migration"):
         verify_required_schema(missing)
+
+    missing_table = FakeConnection(
+        fetchone_values=[
+            *((migration,) for migration in REQUIRED_MIGRATIONS),
+            ("consensus_coverage_observations",),
+            None,
+        ]
+    )
+    with pytest.raises(RuntimeError, match="manual_observations table"):
+        verify_required_schema(missing_table)
+
+    assert REQUIRED_MIGRATION == REQUIRED_MIGRATIONS[0]
