@@ -44,12 +44,18 @@ SERVICE_ACCOUNT_FILE = os.environ.get("GSHEETS_SERVICE_ACCOUNT_JSON", "")
 
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
 
-# Graph/canonical ticker (loader/load_to_neo4j.py TICKER_MAP) → actual portfolio
+# Neutral registry research ticker → actual portfolio
 # ticker, for names cross-listed on a different exchange than the graph uses.
 # Sivers: graph tracks SIVE.ST (Stockholm), portfolio holds the Frankfurt listing.
 _TICKER_ALIASES: dict[str, str] = {
     "SIVE.ST": "FRA:2DG",
 }
+
+
+def get_execution_aliases() -> dict[str, str]:
+    """回傳 copy，避免 consumer 改寫 Google Sheet 的 execution alias authority。"""
+
+    return dict(_TICKER_ALIASES)
 
 # Portfolio bucket labels (whatever the sheet actually uses) → canonical bucket
 # used for allocation math. "觀察" (watchlist / high-conviction individual picks)

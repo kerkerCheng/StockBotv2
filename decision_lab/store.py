@@ -14,6 +14,8 @@ from storage.relational import (
     validate_private_destination,
 )
 
+from .models import ProbeRecord, ShadowBaseline
+
 
 _SCHEMA_PATH = Path(__file__).with_name("schema.sql")
 
@@ -161,3 +163,211 @@ class DecisionStore:
             ).fetchone()
         assert row is not None
         return EventRecord(**dict(row))
+
+    def capture_signal_inception(
+        self,
+        *,
+        dedupe_key: str,
+        company_id: str,
+        research_ticker: str,
+        signal_payload: Mapping[str, Any],
+        observed_at: str,
+        shadow: Mapping[str, Any],
+        evidence_admission_status: str,
+        source_registry_status: str,
+        research_priority: int,
+    ) -> dict[str, Any]:
+        """Atomically append Signal and create the cohort's one immutable Shadow。"""
+
+        if not dedupe_key.strip():
+            raise ValueError("dedupe_key is required")
+        cohort_id = "dc_" + _digest(dedupe_key)[:32]
+        shadow_id = "sh_" + _digest(cohort_id)[:32]
+        signal_json = _canonical_json(signal_payload)
+        signal_digest = _digest(signal_json)
+        signal_identity = _canonical_json(
+            {
+                "cohort_id": cohort_id,
+                "event_type": "qualified_signal",
+                "payload_digest": signal_digest,
+                "observed_at": observed_at,
+            }
+        )
+        signal_event_id = "de_" + _digest(signal_identity)[:32]
+        shadow_payload = {
+            "shadow_id": shadow_id,
+            "status": shadow.get("status"),
+            "price": shadow.get("price"),
+            "currency": shadow.get("currency"),
+            "source": shadow.get("source"),
+            "as_of": shadow.get("as_of"),
+            "fetched_at": shadow.get("fetched_at"),
+        }
+        shadow_json = _canonical_json(shadow_payload)
+        shadow_digest = _digest(shadow_json)
+        shadow_event_id = "de_" + _digest(
+            _canonical_json(
+                {
+                    "cohort_id": cohort_id,
+                    "event_type": "shadow_inception",
+                    "payload_digest": shadow_digest,
+                    "observed_at": observed_at,
+                }
+            )
+        )[:32]
+
+        with immediate_transaction(self._conn):
+            self._conn.execute(
+                """
+                INSERT OR IGNORE INTO decision_cohorts (
+                    cohort_id, dedupe_key, company_id, research_ticker
+                ) VALUES (?, ?, ?, ?)
+                """,
+                (cohort_id, dedupe_key, company_id, research_ticker),
+            )
+            cohort = self._conn.execute(
+                """
+                SELECT company_id, research_ticker
+                FROM decision_cohorts WHERE dedupe_key = ?
+                """,
+                (dedupe_key,),
+            ).fetchone()
+            assert cohort is not None
+            if (
+                cohort["company_id"] != company_id
+                or cohort["research_ticker"] != research_ticker
+            ):
+                raise ValueError("dedupe_key already belongs to a different identity")
+
+            self._conn.execute(
+                """
+                INSERT OR IGNORE INTO decision_events (
+                    event_id, cohort_id, event_type, payload_json,
+                    payload_digest, observed_at
+                ) VALUES (?, ?, 'qualified_signal', ?, ?, ?)
+                """,
+                (
+                    signal_event_id,
+                    cohort_id,
+                    signal_json,
+                    signal_digest,
+                    observed_at,
+                ),
+            )
+            shadow_cursor = self._conn.execute(
+                """
+                INSERT OR IGNORE INTO shadow_observations (
+                    shadow_id, cohort_id, status, price, currency,
+                    source, as_of, fetched_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    shadow_id,
+                    cohort_id,
+                    shadow_payload["status"],
+                    shadow_payload["price"],
+                    shadow_payload["currency"],
+                    shadow_payload["source"],
+                    shadow_payload["as_of"],
+                    shadow_payload["fetched_at"],
+                ),
+            )
+            shadow_created = shadow_cursor.rowcount == 1
+            if shadow_created:
+                self._conn.execute(
+                    """
+                    INSERT INTO decision_events (
+                        event_id, cohort_id, event_type, payload_json,
+                        payload_digest, observed_at
+                    ) VALUES (?, ?, 'shadow_inception', ?, ?, ?)
+                    """,
+                    (
+                        shadow_event_id,
+                        cohort_id,
+                        shadow_json,
+                        shadow_digest,
+                        observed_at,
+                    ),
+                )
+            self._conn.execute(
+                """
+                INSERT INTO probe_projection (
+                    cohort_id, status, evidence_admission_status,
+                    source_registry_status, research_priority
+                ) VALUES (?, 'active', ?, ?, ?)
+                ON CONFLICT(cohort_id) DO UPDATE SET
+                    evidence_admission_status = CASE
+                        WHEN probe_projection.evidence_admission_status = 'eligible_for_review'
+                            THEN probe_projection.evidence_admission_status
+                        ELSE excluded.evidence_admission_status
+                    END,
+                    source_registry_status = excluded.source_registry_status,
+                    research_priority = excluded.research_priority,
+                    updated_at = datetime('now')
+                """,
+                (
+                    cohort_id,
+                    evidence_admission_status,
+                    source_registry_status,
+                    research_priority,
+                ),
+            )
+        return {
+            "cohort_id": cohort_id,
+            "signal_event_id": signal_event_id,
+            "shadow_id": shadow_id,
+            "shadow_created": shadow_created,
+        }
+
+    def list_events(
+        self, cohort_id: str, *, event_type: str | None = None
+    ) -> list[EventRecord]:
+        sql = """
+            SELECT event_id, cohort_id, event_type, payload_digest, observed_at
+            FROM decision_events WHERE cohort_id = ?
+        """
+        params: list[Any] = [cohort_id]
+        if event_type is not None:
+            sql += " AND event_type = ?"
+            params.append(event_type)
+        sql += " ORDER BY observed_at, event_id"
+        return [EventRecord(**dict(row)) for row in self._conn.execute(sql, params)]
+
+    def get_shadow(self, cohort_id: str) -> ShadowBaseline:
+        row = self._conn.execute(
+            """
+            SELECT shadow_id, cohort_id, status, price, currency,
+                   source, as_of, fetched_at
+            FROM shadow_observations WHERE cohort_id = ?
+            """,
+            (cohort_id,),
+        ).fetchone()
+        if row is None:
+            raise KeyError(f"shadow not found for {cohort_id}")
+        return ShadowBaseline(**dict(row))
+
+    def count_shadows(self, cohort_id: str) -> int:
+        row = self._conn.execute(
+            "SELECT COUNT(*) AS count FROM shadow_observations WHERE cohort_id = ?",
+            (cohort_id,),
+        ).fetchone()
+        return int(row["count"])
+
+    def get_probe(self, cohort_id: str) -> ProbeRecord:
+        row = self._conn.execute(
+            """
+            SELECT cohort_id, status, evidence_admission_status,
+                   source_registry_status, research_priority
+            FROM probe_projection WHERE cohort_id = ?
+            """,
+            (cohort_id,),
+        ).fetchone()
+        if row is None:
+            raise KeyError(f"probe not found for {cohort_id}")
+        return ProbeRecord(**dict(row))
+
+    def table_count(self, table: str) -> int:
+        if table not in self.table_names():
+            raise ValueError(f"unknown table: {table}")
+        row = self._conn.execute(f'SELECT COUNT(*) AS count FROM "{table}"').fetchone()
+        return int(row["count"])

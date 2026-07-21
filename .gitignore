@@ -7,6 +7,7 @@ engine_c/.yfinance-cache/
 config/*.json
 !config/investment_policy.json
 !config/company_identity.json
+!config/signal_sources.json
 
 # Claude Code 本機設定（不共用）；project skills 轉接層需納入版本控制
 .claude/*

@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "sources": [
+    {
+      "source_id": "aleabitoreddit",
+      "status": "active",
+      "research_priority": 100,
+      "auto_capture": true
+    }
+  ]
+}
