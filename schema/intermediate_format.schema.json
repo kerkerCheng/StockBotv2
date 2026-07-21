@@ -100,6 +100,10 @@
           "type": "integer",
           "minimum": 1,
           "maximum": 4
+        },
+        "section": {
+          "type": ["string", "null"],
+          "description": "同一 canonical URL 文件被刻意拆成多段抽取時，標記此段（如 financials / photonics）。同 URL 的多個 doc 需各自 section 非空且互不相同才算合法多段，否則視為靜默重複。"
         }
       }
     },

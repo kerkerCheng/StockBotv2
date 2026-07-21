@@ -204,7 +204,8 @@ SET sd.title = $title,
     sd.published_at = $published_at,
     sd.retrieved_at = $retrieved_at,
     sd.storage_permission = $storage_permission,
-    sd.permission_basis = $permission_basis
+    sd.permission_basis = $permission_basis,
+    sd.section = $section
 RETURN sd.id
 """
 
@@ -292,28 +293,50 @@ def check_duplicate_url(source_doc: dict, session, allow_dup_url: bool = False) 
     Root-cause guard for silent duplicates: SourceDoc identity is the agent-assigned
     doc_id, so the same document under a new doc_id would otherwise create a second
     node with zero collision. Returns the clashing doc_ids (empty if none).
+
+    正當例外——同文件多段抽取：同一 canonical URL 的多個 doc，只要**新 doc 與每個
+    既有同 URL doc 都聲明了非空 `section` 且彼此不同**，就是刻意拆段（如年報財務段／
+    光子段），放行且不算 clash。任一方缺 section 或 section 相同 → 仍當靜默重複擋下。
     """
     norm = normalize_url(source_doc.get("url"))
     if norm is None:
         return []
     doc_id = source_doc["doc_id"]
+    new_section = (source_doc.get("section") or "").strip()
     rows = session.run(
         "MATCH (sd:SourceDoc) WHERE sd.url IS NOT NULL AND sd.id <> $doc_id "
-        "RETURN sd.id AS id, sd.url AS url",
+        "RETURN sd.id AS id, sd.url AS url, sd.section AS section",
         doc_id=doc_id,
     )
-    clashes = sorted({r["id"] for r in rows if normalize_url(r["url"]) == norm})
-    if clashes and not allow_dup_url:
+    same_url = [
+        (r["id"], (r["section"] or "").strip())
+        for r in rows
+        if normalize_url(r["url"]) == norm
+    ]
+    if not same_url:
+        return []
+    clashes = sorted({sid for sid, _ in same_url})
+    legit_multi_section = bool(new_section) and all(
+        sec and sec != new_section for _, sec in same_url
+    )
+    if legit_multi_section:
+        print(
+            f"[load] INFO: 同文件多段（section={new_section!r}），與 {clashes} 同 URL "
+            f"但 section 互異，視為合法拆段放行",
+            file=sys.stderr,
+        )
+        return []
+    if not allow_dup_url:
         raise DuplicateUrlError(
             f"SourceDoc URL 已存在於 doc_id {clashes}（正規化 URL: {norm}）。"
             f"這很可能是同一份文件被以不同 doc_id 重複 onboard。"
+            f"若為同一文件的不同段落，請為各段填不同的 source_doc.section 再載入；"
             f"若確為不同文件，重跑並加 --allow-dup-url。"
         )
-    if clashes:
-        print(
-            f"[load] WARN: URL 與既有 {clashes} 相同，--allow-dup-url 已放行",
-            file=sys.stderr,
-        )
+    print(
+        f"[load] WARN: URL 與既有 {clashes} 相同，--allow-dup-url 已放行",
+        file=sys.stderr,
+    )
     return clashes
 
 
@@ -335,6 +358,7 @@ def load_source_doc(doc: dict, session) -> None:
         retrieved_at=source_doc.get("retrieved_at"),
         storage_permission=source_doc.get("storage_permission"),
         permission_basis=source_doc.get("permission_basis"),
+        section=source_doc.get("section"),
     )
 
 

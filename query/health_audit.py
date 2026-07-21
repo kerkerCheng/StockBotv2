@@ -108,7 +108,7 @@ ORDER BY kind, element_id
 
 SOURCE_DOC_URLS_CYPHER = """
 MATCH (sd:SourceDoc) WHERE sd.url IS NOT NULL AND sd.url <> ''
-RETURN sd.id AS id, sd.url AS url
+RETURN sd.id AS id, sd.url AS url, sd.section AS section
 ORDER BY sd.id
 """
 
@@ -280,18 +280,27 @@ def run_local_audit(*, today: date | None = None) -> str:  # pragma: no cover - 
                 f"- [{row['kind']}] `{row['element_id']}` {row['summary']}"
                 for row in missing_cites
             ]
-            # 重複 SourceDoc：同一份文件被以不同 doc_id 重複 onboard（URL 正規化後比對）
+            # 重複 SourceDoc：同一份文件被以不同 doc_id 重複 onboard（URL 正規化後比對）。
+            # 正當例外——同文件多段：同 URL 的 group 每個都有非空且互異的 section（見
+            # loader.check_duplicate_url），視為刻意拆段，不報。
             from loader.load_to_neo4j import normalize_url
 
-            by_norm_url: dict[str, list[str]] = {}
+            by_norm_url: dict[str, list[tuple[str, str]]] = {}
             for row in session.run(SOURCE_DOC_URLS_CYPHER):
                 norm = normalize_url(row["url"])
                 if norm:
-                    by_norm_url.setdefault(norm, []).append(row["id"])
+                    by_norm_url.setdefault(norm, []).append(
+                        (row["id"], (row.get("section") or "").strip())
+                    )
+
+            def _is_legit_multi_section(members: list[tuple[str, str]]) -> bool:
+                sections = [sec for _, sec in members]
+                return all(sections) and len(set(sections)) == len(sections)
+
             graph_lines["dup_url"] = [
-                f"- `{norm}` ← {sorted(ids)}"
-                for norm, ids in sorted(by_norm_url.items())
-                if len(ids) > 1
+                f"- `{norm}` ← {sorted(sid for sid, _ in members)}"
+                for norm, members in sorted(by_norm_url.items())
+                if len(members) > 1 and not _is_legit_multi_section(members)
             ]
             schema_version = session.run(SCHEMA_STATE_CYPHER).single()["version"]
             company_ids = [row["company_id"] for row in session.run(COMPANY_IDS_CYPHER)]

@@ -8,7 +8,8 @@
     "evidence_tier": 1,
     "origin_entity": "Sivers Semiconductors",
     "storage_permission": "repo_full",
-    "permission_basis": "This is Sivers Semiconductors' official annual report, published as an original investor disclosure on the issuer's own domain. The repository retains attributed research excerpts and derived extraction with the issuer PDF URL and retrieval metadata."
+    "permission_basis": "This is Sivers Semiconductors' official annual report, published as an original investor disclosure on the issuer's own domain. The repository retains attributed research excerpts and derived extraction with the issuer PDF URL and retrieval metadata.",
+    "section": "financials"
   },
   "sources": [
     {
@@ -69,7 +70,11 @@
       "name": "Sivers Semiconductors",
       "abstraction_level": "device_chip",
       "role": "bottleneck_supplier",
-      "aliases": ["Sivers", "Sivers Photonics", "Sivers Photonics Ltd"],
+      "aliases": [
+        "Sivers",
+        "Sivers Photonics",
+        "Sivers Photonics Ltd"
+      ],
       "attributes": {
         "fy2025_revenue_sek_m": 306.6,
         "fy2025_photonics_revenue_sek_m": 93.4,
