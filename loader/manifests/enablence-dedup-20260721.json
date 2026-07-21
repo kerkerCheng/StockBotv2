@@ -1,0 +1,120 @@
+{
+  "migration": "enablence-dedup",
+  "created": "2026-07-21",
+  "reason": "同一 PR 被以兩 doc_id 重複 onboard(URL 去重防護 8021acc 加入前的 7/16 遺留);保留內容較全、更忠於 PR 的 ofc_pr(三方→prod:els_8ch_module),移除 els(三方→泛化 tech:external_laser_source)。兩份 edge 完全不重疊。",
+  "keep_doc": "enablence_sivers_onet_ofc_pr_2026_03_17",
+  "drop_doc": "enablence_sivers_onet_els_2026",
+  "source_doc": {
+    "storage_permission": "repo_full",
+    "origin_entity": "Enablence Technologies",
+    "publisher": "PR Newswire (joint release: Sivers Semiconductors, O-Net Technologies, Enablence Technologies)",
+    "permission_basis": "This is the issuers' official joint press release, published as an original disclosure in full on Sivers Semiconductors' official newsroom and indexed by Enablence's official press-release page. The repository uses the issuer-hosted source rather than the PR Newswire site copy.",
+    "source_type": "news",
+    "id": "enablence_sivers_onet_els_2026",
+    "retrieved_at": "2026-07-10",
+    "title": "Sivers Semiconductors, O-Net and Enablence Technologies Announce External Light Sources for AI Datacenters",
+    "published_at": "2026-03-17",
+    "url": "https://www.sivers-semiconductors.com/press/sivers-semiconductors-o-net-and-enablence-technologies-announce-external-light-sources-for-ai-datacenters/",
+    "evidence_tier": 2
+  },
+  "edge_assertions": [
+    {
+      "source_ids": [
+        "enablence_sivers_onet_els_2026_s1"
+      ],
+      "updated_at": "2026-07-16T14:35:09.679633+00:00",
+      "local_id": "e1",
+      "src_id": "co:sivers_semiconductors",
+      "confidence": 0.65,
+      "edge_key": "edge:2fe4c16032497460809b6475fe06ddf637ea26bc459f1e5c276e9ff79f6e926a",
+      "attributes": "{}",
+      "dst_id": "tech:external_laser_source",
+      "id": "enablence_sivers_onet_els_2026_e1",
+      "relation": "supplies_to",
+      "source_doc_id": "enablence_sivers_onet_els_2026"
+    },
+    {
+      "source_ids": [
+        "enablence_sivers_onet_els_2026_s2",
+        "enablence_sivers_onet_els_2026_s3"
+      ],
+      "updated_at": "2026-07-16T14:35:09.679633+00:00",
+      "local_id": "e2",
+      "src_id": "co:enablence_technologies",
+      "confidence": 0.65,
+      "edge_key": "edge:1daf5705f94d524ef70f690b0c51fe55e6340012ca2095acffa821c75e7924f4",
+      "attributes": "{}",
+      "dst_id": "tech:external_laser_source",
+      "id": "enablence_sivers_onet_els_2026_e2",
+      "relation": "supplies_to",
+      "source_doc_id": "enablence_sivers_onet_els_2026"
+    },
+    {
+      "source_ids": [
+        "enablence_sivers_onet_els_2026_s2"
+      ],
+      "updated_at": "2026-07-16T14:35:09.679633+00:00",
+      "local_id": "e3",
+      "src_id": "co:o_net_technologies",
+      "confidence": 0.65,
+      "edge_key": "edge:2bff7cd0b0fb50033598abe6a694f9e8366e52ef32a9d0b4d04274d6cc51f79f",
+      "attributes": "{}",
+      "dst_id": "tech:external_laser_source",
+      "id": "enablence_sivers_onet_els_2026_e3",
+      "relation": "supplies_to",
+      "source_doc_id": "enablence_sivers_onet_els_2026"
+    }
+  ],
+  "orphan_canonical_edges": [
+    {
+      "edge_key": "edge:2fe4c16032497460809b6475fe06ddf637ea26bc459f1e5c276e9ff79f6e926a",
+      "src": "co:sivers_semiconductors",
+      "dst": "tech:external_laser_source",
+      "rel": "SUPPLIES_TO",
+      "props": {
+        "source_ids": [
+          "enablence_sivers_onet_els_2026_s1"
+        ],
+        "updated_at": "2026-07-16T14:35:09.679633+00:00",
+        "source_doc_ids": [
+          "enablence_sivers_onet_els_2026"
+        ],
+        "open_conflict_attributes": [],
+        "confidence": 0.65,
+        "projected_at": "2026-07-19T00:06:02.450125+00:00",
+        "edge_key": "edge:2fe4c16032497460809b6475fe06ddf637ea26bc459f1e5c276e9ff79f6e926a",
+        "attribute_resolution_meta_json": "{}",
+        "attributes": "{}",
+        "id": "edge:2fe4c16032497460809b6475fe06ddf637ea26bc459f1e5c276e9ff79f6e926a",
+        "relation": "supplies_to"
+      }
+    },
+    {
+      "edge_key": "edge:1daf5705f94d524ef70f690b0c51fe55e6340012ca2095acffa821c75e7924f4",
+      "src": "co:enablence_technologies",
+      "dst": "tech:external_laser_source",
+      "rel": "SUPPLIES_TO",
+      "props": {
+        "source_ids": [
+          "enablence_sivers_onet_els_2026_s2",
+          "enablence_sivers_onet_els_2026_s3"
+        ],
+        "updated_at": "2026-07-16T14:35:09.679633+00:00",
+        "source_doc_ids": [
+          "enablence_sivers_onet_els_2026"
+        ],
+        "open_conflict_attributes": [],
+        "confidence": 0.65,
+        "projected_at": "2026-07-19T00:06:02.450125+00:00",
+        "edge_key": "edge:1daf5705f94d524ef70f690b0c51fe55e6340012ca2095acffa821c75e7924f4",
+        "attribute_resolution_meta_json": "{}",
+        "attributes": "{}",
+        "id": "edge:1daf5705f94d524ef70f690b0c51fe55e6340012ca2095acffa821c75e7924f4",
+        "relation": "supplies_to"
+      }
+    }
+  ],
+  "shared_edges_kept": [
+    "edge:2bff7cd0b0fb50033598abe6a694f9e8366e52ef32a9d0b4d04274d6cc51f79f"
+  ]
+}
