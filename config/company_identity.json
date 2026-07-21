@@ -17,7 +17,7 @@
     {"company_id": "co:anthropic", "research_ticker": null},
     {"company_id": "co:openai", "research_ticker": null},
     {"company_id": "co:sivers_semiconductors", "research_ticker": "SIVE.ST", "market_currency": "SEK", "execution_currency": "EUR", "execution_venue": "FRA", "factor_tags": ["photonics", "small_cap"]},
-    {"company_id": "co:axt", "research_ticker": "AXTI"},
+    {"company_id": "co:axt", "research_ticker": "AXTI", "market_currency": "USD", "execution_currency": "USD", "execution_venue": "NASDAQ", "factor_tags": ["semiconductor", "small_cap"]},
     {"company_id": "co:tower_semiconductor", "research_ticker": "TSEM"},
     {"company_id": "co:marvell_technology", "research_ticker": "MRVL"},
     {"company_id": "co:poet_technologies", "research_ticker": "POET"},

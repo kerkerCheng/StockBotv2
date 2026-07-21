@@ -228,6 +228,7 @@ def calculate_probe_limits(
     *,
     policy: Mapping[str, Any] | None = None,
     registry: IdentityRegistry | None = None,
+    paper_exposure_override: Mapping[str, Any] | None = None,
 ) -> ProbeSizingResult:
     """Pure calculation；不保存 decision，也不建立 paper event。"""
 
@@ -273,7 +274,7 @@ def calculate_probe_limits(
             ]
         )
 
-    paper = payload["paper_exposure"]
+    paper = paper_exposure_override or payload["paper_exposure"]
     paper_blockers = list(coverage.paper_blockers)
     if not coverage.paper_context_ready or paper.get("status") != "available":
         paper_blockers.extend(paper.get("blockers") or ["paper_context_not_ready"])

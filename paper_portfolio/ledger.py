@@ -509,6 +509,51 @@ def replay(events: Iterable[Mapping[str, Any]], *, root: str | Path = ROOT) -> d
     }
 
 
+def replay_decision_store_events(
+    events: Iterable[Mapping[str, Any]],
+) -> dict[str, Any]:
+    """Replay private Decision Store paper facts without reading legacy CSV runtime。"""
+
+    positions: dict[str, float] = {}
+    seen: set[str] = set()
+    ordered = sorted(
+        (dict(event) for event in events),
+        key=lambda event: (str(event.get("effective_at") or ""), str(event.get("paper_event_id") or "")),
+    )
+    for event in ordered:
+        event_id = str(event.get("paper_event_id") or "")
+        event_type = str(event.get("event_type") or "")
+        payload = event.get("payload")
+        if not event_id or event_id in seen or not isinstance(payload, Mapping):
+            raise LedgerError("invalid or duplicate Decision Store paper event")
+        correction_target = event.get("corrects_paper_event_id")
+        if event_type in {"paper_correction", "paper_reversal"}:
+            if not correction_target or correction_target not in seen:
+                raise LedgerError("paper amendment must reference an earlier event")
+        elif event_type != "target_update":
+            raise LedgerError(f"unsupported Decision Store paper event: {event_type}")
+        company_id = payload.get("company_id")
+        target = payload.get("target_weight")
+        if (
+            not isinstance(company_id, str)
+            or not company_id.startswith("co:")
+            or isinstance(target, bool)
+            or not isinstance(target, (int, float))
+            or not math.isfinite(float(target))
+            or float(target) < 0
+        ):
+            raise LedgerError("invalid Decision Store paper event payload")
+        positions[company_id] = float(target)
+        seen.add(event_id)
+    return {
+        "company_weights": {
+            company_id: weight for company_id, weight in positions.items() if weight > 0
+        },
+        "total_weight": sum(weight for weight in positions.values() if weight > 0),
+        "event_count": len(seen),
+    }
+
+
 def append_event(event: Mapping[str, Any], *, root: str | Path = ROOT) -> dict[str, Any]:
     """Validate the complete ledger, then append exactly one immutable row."""
 

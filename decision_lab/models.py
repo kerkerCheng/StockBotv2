@@ -120,3 +120,23 @@ class ProbeSizingResult:
     live_blockers: tuple[str, ...]
     constraint_trace: tuple[Mapping[str, Any], ...]
     action: str
+
+
+@dataclass(frozen=True)
+class DecisionExecutionResult:
+    decision_id: str
+    decision_digest: str
+    paper_event_id: str | None
+    paper_funded: bool
+    paper_target: float
+    paper_max_supported_position: float
+    action: str
+
+
+@dataclass(frozen=True)
+class PreparedAction:
+    action_id: str
+    action_type: str
+    target_id: str
+    digest: str
+    expires_at: str
