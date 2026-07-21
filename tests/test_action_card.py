@@ -1,0 +1,175 @@
+from __future__ import annotations
+
+from pathlib import Path
+
+import pytest
+
+from decision_lab.action_card import RedactionError, build_action_card, render_markdown
+from decision_lab.execution import assess_probe
+from decision_lab.execution import (
+    apply_live_override,
+    prepare_managed_action,
+    record_live_fill,
+)
+from tests.test_decision_execution import _bundle, _store
+from tests.test_probe_sizing import _assessment
+
+
+def _decision(store, *, key="card"):
+    bundle, coverage = _bundle(store, key)
+    return assess_probe(
+        store,
+        bundle,
+        coverage,
+        _assessment(),
+        idempotency_key=f"assess:{key}",
+        effective_at="2026-07-21T12:00:00+00:00",
+    )
+
+
+def test_action_card_leads_with_action_and_keeps_paper_live_separate(
+    tmp_path: Path,
+) -> None:
+    store = _store(tmp_path)
+    try:
+        decision = _decision(store)
+        card = build_action_card(store, decision.decision_id)
+
+        assert card["action"] == "REVIEW"
+        assert card["urgency"] == "next_review"
+        assert card["paper"]["funded"] is True
+        assert card["paper"]["target"] == pytest.approx(0.0035)
+        assert card["live"]["status"] == "DATA_NEEDED"
+        assert card["live"]["supported_shares"] is None
+        assert card["weakest_link"]["axis"]
+        assert card["next_action"]
+    finally:
+        store.close()
+
+
+def test_beta_move_without_evidence_delta_is_not_called_thesis_disproof(
+    tmp_path: Path,
+) -> None:
+    store = _store(tmp_path)
+    try:
+        decision = _decision(store, key="beta")
+        card = build_action_card(
+            store,
+            decision.decision_id,
+            change_context={
+                "security_return": -0.08,
+                "benchmark_return": -0.07,
+                "evidence_delta": "none",
+                "disproof_triggered": False,
+            },
+        )
+
+        assert card["alpha_beta"]["classification"] == "beta"
+        assert card["alpha_beta"]["thesis_changed"] is False
+        assert "disproof" not in card["reason"].lower()
+    finally:
+        store.close()
+
+
+def test_portfolio_factor_breach_can_request_hedge_without_fake_units(
+    tmp_path: Path,
+) -> None:
+    store = _store(tmp_path)
+    try:
+        decision = _decision(store, key="hedge")
+        card = build_action_card(
+            store,
+            decision.decision_id,
+            portfolio_context={
+                "status": "over_cap",
+                "factor": "photonics",
+                "reason": "portfolio factor exposure exceeded",
+            },
+        )
+
+        assert card["action"] == "HEDGE"
+        assert card["scope"]["portfolio"] == "reduce_or_hedge:photonics"
+        assert "shares" not in card["scope"]
+    finally:
+        store.close()
+
+
+def test_card_is_pure_read_and_markdown_preserves_first_screen_contract(
+    tmp_path: Path,
+) -> None:
+    store = _store(tmp_path)
+    try:
+        decision = _decision(store, key="pure")
+        before = {
+            table: store.table_count(table)
+            for table in ("system_decisions", "paper_events", "live_choices")
+        }
+        card = build_action_card(store, decision.decision_id)
+        markdown = render_markdown(card)
+        after = {
+            table: store.table_count(table)
+            for table in ("system_decisions", "paper_events", "live_choices")
+        }
+
+        assert before == after
+        assert markdown.splitlines()[0].startswith("# REVIEW")
+        assert "Weakest link" in markdown
+        assert "Live" in markdown
+        assert "下一步" in markdown
+    finally:
+        store.close()
+
+
+def test_secret_bearing_optional_context_is_rejected_before_render(tmp_path: Path) -> None:
+    store = _store(tmp_path)
+    try:
+        decision = _decision(store, key="secret")
+        with pytest.raises(RedactionError, match="secret"):
+            build_action_card(
+                store,
+                decision.decision_id,
+                change_context={"api_token": "CANARY-DO-NOT-LEAK"},
+            )
+    finally:
+        store.close()
+
+
+def test_card_respects_explicit_live_fill_instead_of_recommending_duplicate_trade(
+    tmp_path: Path,
+) -> None:
+    store = _store(tmp_path)
+    try:
+        decision = _decision(store, key="filled")
+        prepared = prepare_managed_action(
+            store,
+            action_type="live_override",
+            target_id=decision.decision_id,
+            payload={"selected_weight": 0.01, "reason": "我接受額外探索風險"},
+            prepared_at="2026-07-21T12:00:00+00:00",
+            expires_at="2026-07-21T13:00:00+00:00",
+        )
+        apply_live_override(
+            store,
+            prepared.action_id,
+            prepared.digest,
+            native_approved=True,
+            decided_at="2026-07-21T12:05:00+00:00",
+        )
+        record_live_fill(
+            store,
+            decision.decision_id,
+            execution_ref="manual:card-fill",
+            shares=10,
+            price=2.0,
+            currency="EUR",
+            executed_at="2026-07-21T12:10:00+00:00",
+            explicit=True,
+        )
+
+        card = build_action_card(store, decision.decision_id)
+
+        assert card["action"] == "NO_ACTION"
+        assert card["live"]["fill_reported"] is True
+        assert card["scope"]["single_name"] == "monitor_confirmed_live_execution"
+    finally:
+        store.close()

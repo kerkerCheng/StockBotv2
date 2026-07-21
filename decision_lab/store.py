@@ -18,6 +18,7 @@ from storage.relational import (
 
 from .models import (
     ContextBundle,
+    CoverageResult,
     DecisionExecutionResult,
     PreparedAction,
     ProbeRecord,
@@ -513,6 +514,56 @@ class DecisionStore:
             payload=json.loads(row["payload_json"]),
         )
 
+    def get_context_bundle(self, context_digest: str) -> ContextBundle:
+        row = self._conn.execute(
+            """
+            SELECT context_id, cohort_id, context_digest,
+                   evaluation_at, payload_json
+            FROM context_bundles WHERE context_digest = ?
+            """,
+            (context_digest,),
+        ).fetchone()
+        if row is None:
+            raise KeyError(f"context not found: {context_digest}")
+        return ContextBundle(
+            context_id=str(row["context_id"]),
+            cohort_id=str(row["cohort_id"]),
+            digest=str(row["context_digest"]),
+            evaluation_at=str(row["evaluation_at"]),
+            payload=json.loads(row["payload_json"]),
+        )
+
+    def get_coverage_result(self, assessment_id: str) -> CoverageResult:
+        row = self._conn.execute(
+            """
+            SELECT assessment_id, cohort_id, context_digest, status,
+                   blockers_json, paper_blockers_json, live_blockers_json
+            FROM coverage_assessments WHERE assessment_id = ?
+            """,
+            (assessment_id,),
+        ).fetchone()
+        if row is None:
+            raise KeyError(f"coverage assessment not found: {assessment_id}")
+        blockers = tuple(json.loads(row["blockers_json"])["items"])
+        paper_blockers = tuple(json.loads(row["paper_blockers_json"])["items"])
+        live_blockers = tuple(json.loads(row["live_blockers_json"])["items"])
+        status = str(row["status"])
+        paper_ready = status == "analyzable" and not paper_blockers
+        return CoverageResult(
+            assessment_id=str(row["assessment_id"]),
+            cohort_id=str(row["cohort_id"]),
+            context_digest=str(row["context_digest"]),
+            status=status,
+            blockers=blockers,
+            paper_blockers=paper_blockers,
+            live_blockers=live_blockers,
+            paper_context_ready=paper_ready,
+            live_context_ready=paper_ready and not live_blockers,
+            paper_supported_position=0.0,
+            live_supported_range=(0.0, 0.0),
+            work_order_id=None,
+        )
+
     def record_coverage_assessment(
         self,
         *,
@@ -846,6 +897,21 @@ class DecisionStore:
         result["payload"] = json.loads(result.pop("payload_json"))
         return result
 
+    def paper_event_for_decision(self, decision_id: str) -> dict[str, Any] | None:
+        row = self._conn.execute(
+            """
+            SELECT paper_event_id, event_type, payload_json, effective_at
+            FROM paper_events WHERE decision_id = ?
+            ORDER BY effective_at, paper_event_id LIMIT 1
+            """,
+            (decision_id,),
+        ).fetchone()
+        if row is None:
+            return None
+        result = dict(row)
+        result["payload"] = json.loads(result.pop("payload_json"))
+        return result
+
     def list_paper_events(self, cohort_id: str) -> list[dict[str, Any]]:
         rows = self._conn.execute(
             """
@@ -966,6 +1032,29 @@ class DecisionStore:
                 (fill_id, decision_id, execution_ref, shares, price, currency, executed_at),
             )
         return fill_id
+
+    def latest_live_choice(self, decision_id: str) -> dict[str, Any] | None:
+        row = self._conn.execute(
+            """
+            SELECT choice_id, selected_weight, choice_type, reason,
+                   approved_action_id, decided_at
+            FROM live_choices WHERE decision_id = ?
+            ORDER BY decided_at DESC, choice_id DESC LIMIT 1
+            """,
+            (decision_id,),
+        ).fetchone()
+        return dict(row) if row is not None else None
+
+    def latest_live_fill(self, decision_id: str) -> dict[str, Any] | None:
+        row = self._conn.execute(
+            """
+            SELECT fill_id, execution_ref, shares, price, currency, executed_at
+            FROM live_execution_reports WHERE decision_id = ?
+            ORDER BY executed_at DESC, fill_id DESC LIMIT 1
+            """,
+            (decision_id,),
+        ).fetchone()
+        return dict(row) if row is not None else None
 
     def prepare_action(
         self,

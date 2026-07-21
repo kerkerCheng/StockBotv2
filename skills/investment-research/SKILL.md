@@ -90,6 +90,10 @@ python thesis/generate_lane_memo.py --company-id co:<ticker_lower>
 - 「我應該評估哪些公司？」
 
 **流程：**
+0. 若問題是「我現在是否該動作」，且已有 Decision Lab decision，先呼叫
+   `python -m decision_lab ... card <decision_id>` 讀 Action Card。以 structured result 的
+   `action / urgency / weakest_link / paper / live / blockers / next_action` 為決策主幹；本 skill
+   只補研究解釋，不重算部位、不同 lane 的 Gate 或 freshness。
 1. 執行 `python query/graph_context.py --company-id co:<ticker>` 取子圖
 2. 執行 `python engine_c/checklist.py <TICKER>` 取財務快照
 3. 評估以下四個維度（這是研究 agent 的判斷，不是自動化）：
@@ -194,6 +198,9 @@ python thesis/generate_lane_memo.py --company-id co:<slug> --ticker <TICKER> --o
 **觸發：** 使用者問「我該投多少」、「這檔值不值得加倉」、「我的 AI bucket 還有空間嗎」。
 
 **流程：**
+0. Probe／既有持股的「現在是否動作」優先讀 Decision Lab Action Card；`card` 是純讀。
+   新 assess 由 `decision_lab` application primitive 原子保存 system decision 與 eligible paper，
+   live 仍須使用者明確接受並手動下單。只有已正式升格的部位才走下列 formal policy 流程。
 1. 執行 `python fetchers/gsheets.py --ticker <TICKER>` 取持倉資料
 2. 執行 `python fetchers/gsheets.py --summary` 取 ai_theme bucket 使用率
 3. 查 Engine C 估值數據：`python engine_c/checklist.py <TICKER>`

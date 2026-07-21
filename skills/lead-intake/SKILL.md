@@ -18,6 +18,11 @@ description: >
 **Turn 1 — 分類（研究 agent 做）：**
 讀輸入後立刻給：
 ```
+
+同時，凡是具名公司、可歸因、可證偽且有 expiry 的 qualified lead，先呼叫
+`decision_lab.intake.capture_signal` 保存 Signal 與 observed-time Shadow Observation；這一步不代表
+evidence admission、不寫 Engine A，也不自動建立 funded paper。後續 Coverage／Action Card 只呼叫
+Decision Lab primitive，不在本 skill 複製 Gate、部位百分比或 sizing 公式。
 訊號類型：[產品/技術消息 | 供應鏈異動 | 法說/財報 | 市場情緒/猜測]
 關聯圖內公司：[列出或「無」]
 初始 tier：[1-4]
@@ -157,6 +162,8 @@ description: >
 ---
 
 ## 與既有系統的接點(檔案對照)
+- Signal／Shadow capture：`decision_lab.intake.capture_signal`（qualified lead 先保留，再跑研究）
+- Decision Lab Action Card：`python -m decision_lab ... card <decision_id>`（純讀，不產生交易）
 - 原文落地:`library/raw/`
 - 中介格式:`schema/intermediate_format.schema.json`、字彙:`schema/vocab.json`
 - 抽取參考:`prompts/extract_system.md`(L6 Gap4 幻覺規則在此)、`extract.py`
