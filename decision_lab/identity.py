@@ -13,6 +13,9 @@ class ResolvedIdentity:
     research_ticker: str | None
     execution_symbol: str | None
     blockers: tuple[str, ...]
+    market_currency: str | None = None
+    execution_currency: str | None = None
+    execution_venue: str | None = None
 
 
 def resolve_identity(
@@ -49,9 +52,13 @@ def resolve_identity(
 
     execution_symbol = aliases.get(resolved_ticker, resolved_ticker) if resolved_ticker else None
     blockers = () if resolved_ticker else ("research_ticker_unavailable",)
+    company = registry.company(resolved_company)
     return ResolvedIdentity(
         company_id=resolved_company,
         research_ticker=resolved_ticker,
         execution_symbol=execution_symbol,
         blockers=blockers,
+        market_currency=company.market_currency if company else None,
+        execution_currency=company.execution_currency if company else None,
+        execution_venue=company.execution_venue if company else None,
     )

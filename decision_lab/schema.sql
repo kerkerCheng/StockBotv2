@@ -68,7 +68,53 @@ CREATE TABLE IF NOT EXISTS probe_projection (
     evidence_admission_status   TEXT NOT NULL,
     source_registry_status      TEXT NOT NULL,
     research_priority           INTEGER NOT NULL DEFAULT 0,
+    coverage_status             TEXT NOT NULL DEFAULT 'not_assessed',
     updated_at                  TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS holdings_confirmations (
+    confirmation_id  TEXT PRIMARY KEY,
+    sheet_digest     TEXT NOT NULL,
+    confirmed_at     TEXT NOT NULL,
+    created_at       TEXT NOT NULL DEFAULT (datetime('now')),
+    UNIQUE (sheet_digest, confirmed_at)
+);
+
+CREATE TABLE IF NOT EXISTS context_bundles (
+    context_id      TEXT PRIMARY KEY,
+    cohort_id       TEXT NOT NULL REFERENCES decision_cohorts(cohort_id),
+    context_digest  TEXT NOT NULL UNIQUE,
+    evaluation_at   TEXT NOT NULL,
+    payload_json    TEXT NOT NULL,
+    created_at      TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS coverage_assessments (
+    assessment_id       TEXT PRIMARY KEY,
+    cohort_id           TEXT NOT NULL REFERENCES decision_cohorts(cohort_id),
+    context_digest      TEXT NOT NULL REFERENCES context_bundles(context_digest),
+    status              TEXT NOT NULL CHECK (status IN ('coverage_pending', 'analyzable')),
+    blockers_json       TEXT NOT NULL,
+    paper_blockers_json TEXT NOT NULL,
+    live_blockers_json  TEXT NOT NULL,
+    catalyst            TEXT NOT NULL,
+    disproof            TEXT NOT NULL,
+    expiry              TEXT NOT NULL,
+    created_at          TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS research_work_orders (
+    work_order_id       TEXT PRIMARY KEY,
+    assessment_id       TEXT NOT NULL UNIQUE REFERENCES coverage_assessments(assessment_id),
+    cohort_id           TEXT NOT NULL REFERENCES decision_cohorts(cohort_id),
+    context_digest      TEXT NOT NULL REFERENCES context_bundles(context_digest),
+    blockers_json       TEXT NOT NULL,
+    expiry              TEXT NOT NULL,
+    decision_relevance  INTEGER NOT NULL,
+    falsifiability      INTEGER NOT NULL,
+    information_value   INTEGER NOT NULL,
+    status              TEXT NOT NULL DEFAULT 'queued',
+    created_at          TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
 CREATE INDEX IF NOT EXISTS idx_decision_events_cohort_time
@@ -77,5 +123,5 @@ CREATE INDEX IF NOT EXISTS idx_paper_events_cohort_time
     ON paper_events (cohort_id, effective_at, paper_event_id);
 
 INSERT INTO decision_store_meta (key, value)
-VALUES ('schema_version', '2')
+VALUES ('schema_version', '3')
 ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = datetime('now');

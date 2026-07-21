@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Any, Mapping
 
 
 @dataclass(frozen=True)
@@ -68,3 +69,28 @@ class CaptureResult:
     company_id: str
     research_ticker: str
     execution_symbol: str
+
+
+@dataclass(frozen=True)
+class ContextBundle:
+    context_id: str
+    cohort_id: str
+    digest: str
+    evaluation_at: str
+    payload: Mapping[str, Any]
+
+
+@dataclass(frozen=True)
+class CoverageResult:
+    assessment_id: str
+    cohort_id: str
+    context_digest: str
+    status: str
+    blockers: tuple[str, ...]
+    paper_blockers: tuple[str, ...]
+    live_blockers: tuple[str, ...]
+    paper_context_ready: bool
+    live_context_ready: bool
+    paper_supported_position: float
+    live_supported_range: tuple[float, float]
+    work_order_id: str | None

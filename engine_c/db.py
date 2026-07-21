@@ -39,6 +39,9 @@ def _ensure_sqlite_schema(conn: sqlite3.Connection) -> None:
             operating_margin     REAL,
             revenue_ttm          INTEGER,
             shares_outstanding   INTEGER,
+            cash_and_equivalents REAL,
+            total_debt           REAL,
+            free_cash_flow_ttm   REAL,
             ev_revenue           REAL,
             pe_trailing          REAL,
             pe_forward           REAL,
@@ -77,6 +80,16 @@ def _ensure_sqlite_schema(conn: sqlite3.Connection) -> None:
         CREATE INDEX IF NOT EXISTS idx_coverage_ticker_date
             ON consensus_coverage_observations (ticker, observation_date DESC);
     """)
+    columns = {
+        row[1] for row in conn.execute("PRAGMA table_info(financial_snapshots)")
+    }
+    for name in (
+        "cash_and_equivalents",
+        "total_debt",
+        "free_cash_flow_ttm",
+    ):
+        if name not in columns:
+            conn.execute(f"ALTER TABLE financial_snapshots ADD COLUMN {name} REAL")
     conn.commit()
 
 
@@ -126,18 +139,28 @@ def placeholder(n: int = 1) -> str:
 
 def upsert_snapshot(conn, snap: dict, *, commit: bool = True) -> None:
     """INSERT OR REPLACE financial_snapshots（相容 SQLite + Postgres）。"""
+    snapshot = dict(snap)
+    for key in (
+        "cash_and_equivalents",
+        "total_debt",
+        "free_cash_flow_ttm",
+    ):
+        snapshot.setdefault(key, None)
     if _use_postgres():
         sql = """
         INSERT INTO financial_snapshots (
             ticker, snapshot_date,
             gross_margin, operating_margin, revenue_ttm, shares_outstanding,
+            cash_and_equivalents, total_debt, free_cash_flow_ttm,
             ev_revenue, pe_trailing, pe_forward, price,
             analyst_target_mean, analyst_target_high, analyst_target_low,
             analyst_target_count, fetched_at
         ) VALUES (
             %(ticker)s, %(snapshot_date)s,
             %(gross_margin)s, %(operating_margin)s, %(revenue_ttm)s,
-            %(shares_outstanding)s, %(ev_revenue)s, %(pe_trailing)s,
+            %(shares_outstanding)s, %(cash_and_equivalents)s,
+            %(total_debt)s, %(free_cash_flow_ttm)s,
+            %(ev_revenue)s, %(pe_trailing)s,
             %(pe_forward)s, %(price)s,
             %(analyst_target_mean)s, %(analyst_target_high)s,
             %(analyst_target_low)s, %(analyst_target_count)s, %(fetched_at)s
@@ -146,6 +169,9 @@ def upsert_snapshot(conn, snap: dict, *, commit: bool = True) -> None:
             operating_margin=EXCLUDED.operating_margin,
             revenue_ttm=EXCLUDED.revenue_ttm,
             shares_outstanding=EXCLUDED.shares_outstanding,
+            cash_and_equivalents=EXCLUDED.cash_and_equivalents,
+            total_debt=EXCLUDED.total_debt,
+            free_cash_flow_ttm=EXCLUDED.free_cash_flow_ttm,
             ev_revenue=EXCLUDED.ev_revenue, pe_trailing=EXCLUDED.pe_trailing,
             pe_forward=EXCLUDED.pe_forward, price=EXCLUDED.price,
             analyst_target_mean=EXCLUDED.analyst_target_mean,
@@ -155,7 +181,7 @@ def upsert_snapshot(conn, snap: dict, *, commit: bool = True) -> None:
             fetched_at=EXCLUDED.fetched_at
         """
         with conn.cursor() as cur:
-            cur.execute(sql, snap)
+            cur.execute(sql, snapshot)
         if commit:
             conn.commit()
     else:
@@ -164,19 +190,22 @@ def upsert_snapshot(conn, snap: dict, *, commit: bool = True) -> None:
         INSERT OR REPLACE INTO financial_snapshots (
             ticker, snapshot_date,
             gross_margin, operating_margin, revenue_ttm, shares_outstanding,
+            cash_and_equivalents, total_debt, free_cash_flow_ttm,
             ev_revenue, pe_trailing, pe_forward, price,
             analyst_target_mean, analyst_target_high, analyst_target_low,
             analyst_target_count, fetched_at
-        ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+        ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
         """
         conn.execute(sql, (
-            snap["ticker"], str(snap["snapshot_date"]),
-            snap["gross_margin"], snap["operating_margin"], snap["revenue_ttm"],
-            snap["shares_outstanding"], snap["ev_revenue"], snap["pe_trailing"],
-            snap["pe_forward"], snap["price"],
-            snap["analyst_target_mean"], snap["analyst_target_high"],
-            snap["analyst_target_low"], snap["analyst_target_count"],
-            str(snap["fetched_at"]),
+            snapshot["ticker"], str(snapshot["snapshot_date"]),
+            snapshot["gross_margin"], snapshot["operating_margin"], snapshot["revenue_ttm"],
+            snapshot["shares_outstanding"], snapshot["cash_and_equivalents"],
+            snapshot["total_debt"], snapshot["free_cash_flow_ttm"],
+            snapshot["ev_revenue"], snapshot["pe_trailing"],
+            snapshot["pe_forward"], snapshot["price"],
+            snapshot["analyst_target_mean"], snapshot["analyst_target_high"],
+            snapshot["analyst_target_low"], snapshot["analyst_target_count"],
+            str(snapshot["fetched_at"]),
         ))
         if commit:
             conn.commit()

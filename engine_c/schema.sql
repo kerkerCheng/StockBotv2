@@ -15,6 +15,11 @@ CREATE TABLE IF NOT EXISTS financial_snapshots (
     -- 稀釋分析
     shares_outstanding  BIGINT,         -- 流通股數
 
+    -- Probe 財務韌性 / runway（原始 scalar，公式在 Decision Lab）
+    cash_and_equivalents NUMERIC(20,2),
+    total_debt           NUMERIC(20,2),
+    free_cash_flow_ttm   NUMERIC(20,2),
+
     -- 估值
     ev_revenue          NUMERIC(10,4),  -- EV/Revenue 倍數
     pe_trailing         NUMERIC(10,4),

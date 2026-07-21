@@ -37,9 +37,14 @@ def _snap_status(value, label: str) -> dict:
     return {"status": "ok", "value": value, "label": label}
 
 
-def _manual_status(value: str | None, label: str) -> dict:
-    if value:
-        return {"status": "manual_reviewed", "value": value, "label": label}
+def _manual_status(value: str | None, label: str, source_note: str | None = None) -> dict:
+    if value and source_note:
+        return {
+            "status": "manual_reviewed",
+            "value": value,
+            "source": source_note,
+            "label": label,
+        }
     return {"status": "manual_required", "value": None, "label": label}
 
 
@@ -86,10 +91,10 @@ def get_checklist(ticker: str) -> dict:
             """, (ticker,))
             snaps = cur.fetchall()
             cur.execute(
-                "SELECT field_name, value FROM manual_fields WHERE ticker = %s",
+                "SELECT field_name, value, source_note FROM manual_fields WHERE ticker = %s",
                 (ticker,)
             )
-            manual = {row[0]: row[1] for row in cur.fetchall()}
+            manual = {row[0]: (row[1], row[2]) for row in cur.fetchall()}
             conn.close()
         else:
             import sqlite3
@@ -102,10 +107,10 @@ def get_checklist(ticker: str) -> dict:
             """, (ticker,))
             snaps = [tuple(r) for r in cur.fetchall()]
             cur2 = conn.execute(
-                "SELECT field_name, value FROM manual_fields WHERE ticker = ?",
+                "SELECT field_name, value, source_note FROM manual_fields WHERE ticker = ?",
                 (ticker,)
             )
-            manual = {row[0]: row[1] for row in cur2.fetchall()}
+            manual = {row[0]: (row[1], row[2]) for row in cur2.fetchall()}
             conn.close()
 
     except Exception as e:
@@ -145,10 +150,16 @@ def get_checklist(ticker: str) -> dict:
         gm_item["latest"] = f"{latest:.1%}"
 
     # 2. 客戶集中度（人工填入）
-    cc_item = _manual_status(manual.get("customer_concentration"), "客戶集中度（前三大客戶 % 收入）")
+    cc_value, cc_source = manual.get("customer_concentration", (None, None))
+    cc_item = _manual_status(
+        cc_value,
+        "客戶集中度（前三大客戶 % 收入）",
+        cc_source,
+    )
 
     # 3. Backlog（人工填入）
-    bl_item = _manual_status(manual.get("backlog"), "Backlog/訂單能見度")
+    bl_value, bl_source = manual.get("backlog", (None, None))
+    bl_item = _manual_status(bl_value, "Backlog/訂單能見度", bl_source)
 
     # 4. 稀釋（shares_outstanding 趨勢）
     shares = [(str(r[0]), r[2]) for r in snaps if r[2] is not None]
@@ -183,6 +194,71 @@ def get_checklist(ticker: str) -> dict:
         "items": items,
         "gate_pass": gate_pass,
     }
+
+
+def get_probe_financial_baseline(ticker: str, *, conn=None) -> dict:
+    """回傳 runway 所需的 point-in-time raw scalars，不在 Engine C 算部位。"""
+
+    owned_connection = conn is None
+    connection = conn or _get_conn()
+    if connection is None:
+        return {"ticker": ticker, "status": "unavailable"}
+    try:
+        from engine_c.db import _use_postgres
+
+        if _use_postgres():
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """
+                    SELECT snapshot_date, cash_and_equivalents, total_debt,
+                           free_cash_flow_ttm, fetched_at
+                    FROM financial_snapshots
+                    WHERE ticker = %s
+                    ORDER BY snapshot_date DESC, fetched_at DESC
+                    LIMIT 1
+                    """,
+                    (ticker,),
+                )
+                row = cursor.fetchone()
+        else:
+            row = connection.execute(
+                """
+                SELECT snapshot_date, cash_and_equivalents, total_debt,
+                       free_cash_flow_ttm, fetched_at
+                FROM financial_snapshots
+                WHERE ticker = ?
+                ORDER BY snapshot_date DESC, fetched_at DESC
+                LIMIT 1
+                """,
+                (ticker,),
+            ).fetchone()
+        if row is None:
+            return {"ticker": ticker, "status": "missing"}
+        values = tuple(row)
+        result = {
+            "ticker": ticker,
+            "as_of": str(values[0]),
+            "cash_and_equivalents": values[1],
+            "total_debt": values[2],
+            "free_cash_flow_ttm": values[3],
+            "fetched_at": str(values[4]),
+            "source": "yfinance.info",
+        }
+        result["status"] = (
+            "observed"
+            if all(result[key] is not None for key in (
+                "cash_and_equivalents",
+                "total_debt",
+                "free_cash_flow_ttm",
+            ))
+            else "manual_required"
+        )
+        return result
+    except Exception:
+        return {"ticker": ticker, "status": "unavailable"}
+    finally:
+        if owned_connection and connection is not None:
+            connection.close()
 
 
 def format_checklist(result: dict) -> str:

@@ -19,6 +19,9 @@ class CompanyIdentity:
 
     company_id: str
     research_ticker: str | None
+    market_currency: str | None = None
+    execution_currency: str | None = None
+    execution_venue: str | None = None
     factor_tags: tuple[str, ...] = ()
 
 
@@ -59,6 +62,9 @@ class IdentityRegistry:
                     if item.get("research_ticker") is not None
                     else None
                 ),
+                market_currency=item.get("market_currency"),
+                execution_currency=item.get("execution_currency"),
+                execution_venue=item.get("execution_venue"),
                 factor_tags=tuple(str(tag) for tag in item.get("factor_tags", [])),
             )
             for item in raw_companies
@@ -81,6 +87,9 @@ class IdentityRegistry:
     def factor_tags(self, company_id: str) -> tuple[str, ...]:
         company = self._by_id.get(company_id)
         return company.factor_tags if company else ()
+
+    def company(self, company_id: str) -> CompanyIdentity | None:
+        return self._by_id.get(company_id)
 
     def has_company(self, company_id: str) -> bool:
         return company_id in self._by_id

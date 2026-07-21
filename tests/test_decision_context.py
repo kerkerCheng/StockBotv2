@@ -1,0 +1,223 @@
+from __future__ import annotations
+
+from pathlib import Path
+
+import pytest
+
+from decision_lab.context import build_context_bundle, holdings_digest
+from decision_lab.store import DecisionStore
+from storage.relational import initialize_private_root
+
+
+NOW = "2026-07-21T12:00:00+00:00"
+
+
+def _store(tmp_path: Path) -> DecisionStore:
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    private_root = repo / "library" / "private"
+    initialize_private_root(private_root, repo_root=repo)
+    return DecisionStore.open(
+        private_root / "decision_lab" / "decision_lab.db",
+        private_root=private_root,
+        repo_root=repo,
+    )
+
+
+def _cohort(store: DecisionStore, key: str) -> str:
+    return store.ensure_cohort(
+        dedupe_key=key,
+        company_id="co:sivers_semiconductors",
+        research_ticker="SIVE.ST",
+    ).cohort_id
+
+
+def complete_inputs(rows=None):
+    rows = rows if rows is not None else [
+        {"ticker": "FRA:2DG", "shares": 10.0, "currency": "EUR"}
+    ]
+    return {
+        "identity": {
+            "company_id": "co:sivers_semiconductors",
+            "research_ticker": "SIVE.ST",
+            "execution_symbol": "FRA:2DG",
+            "market_currency": "SEK",
+            "execution_currency": "EUR",
+            "execution_venue": "FRA",
+        },
+        "evidence": {
+            "focus_company": {"id": "co:sivers_semiconductors"},
+            "subject_origin_entity": "Sivers",
+            "sources": [
+                {"id": "src:gf", "origin_entity": "GlobalFoundries", "evidence_tier": 2}
+            ],
+            "causal_paths": ["edge:cw-laser"],
+            "counter_paths": ["edge:alternative"],
+        },
+        "financial": {
+            "status": "observed",
+            "ticker": "SIVE.ST",
+            "as_of": "2026-07-15T00:00:00+00:00",
+            "fetched_at": "2026-07-15T01:00:00+00:00",
+            "source": "fixture://filing",
+            "cash_and_equivalents": 120.0,
+            "total_debt": 20.0,
+            "free_cash_flow_ttm": -60.0,
+            "checklist": {
+                "gross_margin_trend": {"status": "ok"},
+                "customer_concentration": {
+                    "status": "manual_reviewed",
+                    "value": "top customers disclosed",
+                    "source": "fixture://filing",
+                },
+                "backlog": {
+                    "status": "manual_reviewed",
+                    "value": "backlog disclosed",
+                    "source": "fixture://filing",
+                },
+                "dilution": {"status": "ok"},
+                "valuation_pressure": {"status": "ok"},
+            },
+        },
+        "market": {
+            "status": "observed",
+            "ticker": "SIVE.ST",
+            "price": 2.5,
+            "currency": "SEK",
+            "adv20": 1_000_000.0,
+            "as_of": "2026-07-21T10:00:00+00:00",
+            "fetched_at": "2026-07-21T10:01:00+00:00",
+            "unit_status": "ok",
+            "source": "fixture://market",
+        },
+        "fx": {
+            "status": "observed",
+            "pair": "SEK/USD",
+            "rate": 0.1,
+            "as_of": "2026-07-21T10:00:00+00:00",
+            "fetched_at": "2026-07-21T10:01:00+00:00",
+            "source": "fixture://fx",
+        },
+        "holdings": {
+            "status": "available",
+            "rows": rows,
+            "fetched_at": "2026-07-21T11:00:00+00:00",
+        },
+        "paper_exposure": {"nav": 100.0, "total_weight": 0.0, "factor_weights": {}},
+    }
+
+
+def test_holdings_confirmation_is_digest_bound_and_retrieval_is_not_confirmation(
+    tmp_path: Path,
+) -> None:
+    store = _store(tmp_path)
+    inputs = complete_inputs()
+    try:
+        cohort_id = _cohort(store, "fixture")
+        unconfirmed = build_context_bundle(
+            store,
+            cohort_id=cohort_id,
+            evaluation_at=NOW,
+            policy_version="probe-v1",
+            **inputs,
+        )
+        digest = holdings_digest(inputs["holdings"]["rows"])
+        store.record_holdings_confirmation(digest, confirmed_at="2026-07-21T09:00:00+00:00")
+        confirmed = build_context_bundle(
+            store,
+            cohort_id=cohort_id,
+            evaluation_at=NOW,
+            policy_version="probe-v1",
+            **inputs,
+        )
+        changed = complete_inputs(rows=[
+            {"ticker": "FRA:2DG", "shares": 11.0, "currency": "EUR"}
+        ])
+        changed_bundle = build_context_bundle(
+            store,
+            cohort_id=cohort_id,
+            evaluation_at=NOW,
+            policy_version="probe-v1",
+            **changed,
+        )
+
+        assert unconfirmed.payload["holdings"]["status"] == "unconfirmed"
+        assert confirmed.payload["holdings"]["status"] == "confirmed"
+        assert changed_bundle.payload["holdings"]["status"] == "unconfirmed"
+        assert confirmed.digest != changed_bundle.digest
+    finally:
+        store.close()
+
+
+def test_confirmed_empty_malformed_missing_and_unavailable_are_distinct(
+    tmp_path: Path,
+) -> None:
+    store = _store(tmp_path)
+    try:
+        empty_inputs = complete_inputs(rows=[])
+        store.record_holdings_confirmation(
+            holdings_digest([]), confirmed_at="2026-07-21T09:00:00+00:00"
+        )
+        empty = build_context_bundle(
+            store, cohort_id=_cohort(store, "empty"), evaluation_at=NOW,
+            policy_version="probe-v1", **empty_inputs
+        )
+
+        statuses = [empty.payload["holdings"]["status"]]
+        for upstream_status in ("malformed", "missing", "unavailable"):
+            inputs = complete_inputs()
+            inputs["holdings"] = {"status": upstream_status, "rows": []}
+            bundle = build_context_bundle(
+                store, cohort_id=_cohort(store, upstream_status), evaluation_at=NOW,
+                policy_version="probe-v1", **inputs
+            )
+            statuses.append(bundle.payload["holdings"]["status"])
+
+        assert statuses == ["confirmed_empty", "malformed", "missing", "unavailable"]
+    finally:
+        store.close()
+
+
+def test_context_bundle_is_content_addressed_and_frozen(tmp_path: Path) -> None:
+    store = _store(tmp_path)
+    inputs = complete_inputs()
+    try:
+        store.record_holdings_confirmation(
+            holdings_digest(inputs["holdings"]["rows"]),
+            confirmed_at="2026-07-21T09:00:00+00:00",
+        )
+        cohort_id = _cohort(store, "fixture")
+        first = build_context_bundle(
+            store, cohort_id=cohort_id, evaluation_at=NOW,
+            policy_version="probe-v1", **inputs
+        )
+        retry = build_context_bundle(
+            store, cohort_id=cohort_id, evaluation_at=NOW,
+            policy_version="probe-v1", **inputs
+        )
+
+        assert first == retry
+        assert len(first.digest) == 64
+        assert store.table_count("context_bundles") == 1
+    finally:
+        store.close()
+
+
+def test_secret_bearing_external_payload_is_rejected_before_persistence(
+    tmp_path: Path,
+) -> None:
+    store = _store(tmp_path)
+    inputs = complete_inputs()
+    inputs["market"]["api_token"] = "canary-secret"
+    try:
+        with pytest.raises(ValueError, match="secret-bearing"):
+            build_context_bundle(
+                store,
+                cohort_id=_cohort(store, "secret"),
+                evaluation_at=NOW,
+                policy_version="probe-v1",
+                **inputs,
+            )
+        assert store.table_count("context_bundles") == 0
+    finally:
+        store.close()
