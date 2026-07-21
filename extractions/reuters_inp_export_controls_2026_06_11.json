@@ -280,6 +280,37 @@
       "source_ids": [
         "reuters_inp_export_controls_2026_06_11_s3"
       ]
+    },
+    {
+      "id": "e9",
+      "src_id": "co:coherent",
+      "dst_id": "mat:inp_substrate",
+      "relation": "depends_on",
+      "attributes": {
+        "substitutability": 5,
+        "sole_source": false,
+        "qualification_status": "qualified"
+      },
+      "confidence": 0.5,
+      "source_ids": [
+        "reuters_inp_export_controls_2026_06_11_s1",
+        "reuters_inp_export_controls_2026_06_11_s2"
+      ]
+    },
+    {
+      "id": "e10",
+      "src_id": "co:lumentum",
+      "dst_id": "mat:inp_substrate",
+      "relation": "depends_on",
+      "attributes": {
+        "substitutability": 5,
+        "sole_source": false
+      },
+      "confidence": 0.5,
+      "source_ids": [
+        "reuters_inp_export_controls_2026_06_11_s2",
+        "reuters_inp_export_controls_2026_06_11_s5"
+      ]
     }
   ],
   "claims": [
