@@ -1,0 +1,15 @@
+[EXCERPT — 公開 PR 之有限逐字引文] NVIDIA Announces Strategic Partnership With Lumentum to Develop State-of-the-Art Optics Technology
+Source: https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-Announces-Strategic-Partnership-With-Lumentum-to-Develop-State-of-the-Art-Optics-Technology/default.aspx
+Published: 2026-03-02 | Origin: NVIDIA Investor Relations | Retrieved: 2026-07-21(WebFetch)
+
+Verbatim quotes:
+
+"NVIDIA is investing $2 billion in Lumentum to support R&D, future capacity and operations as the company builds out its U.S.-based manufacturing capabilities in a new fab."
+
+"The nonexclusive agreement includes an NVIDIA multibillion purchase commitment and future capacity access rights for advanced laser components."
+
+Lumentum will provide "high-performance lasers, modules, and optical subsystems that enable scalable, energy-efficient data center connectivity" (for next-generation AI infrastructure).
+
+Jensen Huang (NVIDIA CEO): "AI has reinvented computing and is driving the largest computing infrastructure buildout in history. Together with Lumentum, NVIDIA is advancing the world's most sophisticated silicon photonics to build the next generation of gigawatt-scale AI factories."
+
+Michael Hurlston (Lumentum CEO): "This multiyear strategic agreement reflects our shared commitment to advancing the optics technologies that will power the next generation of AI infrastructure."

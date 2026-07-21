@@ -1,0 +1,95 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "nvda_lumentum_partnership_pr_2026_03_02",
+    "title": "NVIDIA PR: NVIDIA Announces Strategic Partnership With Lumentum to Develop State-of-the-Art Optics Technology",
+    "url": "https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-Announces-Strategic-Partnership-With-Lumentum-to-Develop-State-of-the-Art-Optics-Technology/default.aspx",
+    "origin_entity": "NVIDIA",
+    "publisher": "NVIDIA Investor Relations",
+    "published_at": "2026-03-02",
+    "retrieved_at": "2026-07-21",
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "Corporate press release intended for public distribution; brief quotations stored in library/raw and this extraction.",
+    "source_type": "news",
+    "evidence_tier": 2
+  },
+  "sources": [
+    {
+      "id": "nvda_lumentum_partnership_pr_2026_03_02_s1",
+      "locator": "PR body, investment paragraph",
+      "quote": "NVIDIA is investing $2 billion in Lumentum to support R&D, future capacity and operations as the company builds out its U.S.-based manufacturing capabilities in a new fab."
+    },
+    {
+      "id": "nvda_lumentum_partnership_pr_2026_03_02_s2",
+      "locator": "PR body, agreement terms paragraph",
+      "quote": "The nonexclusive agreement includes an NVIDIA multibillion purchase commitment and future capacity access rights for advanced laser components."
+    },
+    {
+      "id": "nvda_lumentum_partnership_pr_2026_03_02_s3",
+      "locator": "PR body, Lumentum role",
+      "quote": "high-performance lasers, modules, and optical subsystems that enable scalable, energy-efficient data center connectivity"
+    },
+    {
+      "id": "nvda_lumentum_partnership_pr_2026_03_02_s4",
+      "locator": "Jensen Huang quote",
+      "quote": "Together with Lumentum, NVIDIA is advancing the world's most sophisticated silicon photonics to build the next generation of gigawatt-scale AI factories."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:nvidia",
+      "type": "Company",
+      "name": "NVIDIA",
+      "abstraction_level": "network_systems",
+      "role": "leader",
+      "aliases": ["NVIDIA Corporation", "NVDA"],
+      "attributes": {},
+      "confidence": 0.75,
+      "source_ids": ["nvda_lumentum_partnership_pr_2026_03_02_s1"]
+    },
+    {
+      "id": "co:lumentum",
+      "type": "Company",
+      "name": "Lumentum",
+      "abstraction_level": "device_chip",
+      "role": "bottleneck_supplier",
+      "aliases": ["Lumentum Holdings", "LITE"],
+      "attributes": {},
+      "confidence": 0.75,
+      "source_ids": ["nvda_lumentum_partnership_pr_2026_03_02_s1", "nvda_lumentum_partnership_pr_2026_03_02_s3"]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:nvidia",
+      "dst_id": "co:lumentum",
+      "relation": "invests_in",
+      "attributes": {},
+      "confidence": 0.65,
+      "source_ids": ["nvda_lumentum_partnership_pr_2026_03_02_s1"]
+    },
+    {
+      "id": "e2",
+      "src_id": "co:lumentum",
+      "dst_id": "co:nvidia",
+      "relation": "supplies_to",
+      "attributes": {
+        "qualification_status": "designed_in"
+      },
+      "confidence": 0.65,
+      "source_ids": ["nvda_lumentum_partnership_pr_2026_03_02_s2", "nvda_lumentum_partnership_pr_2026_03_02_s3"]
+    }
+  ],
+  "claims": [
+    {
+      "id": "nvda_lumentum_partnership_pr_2026_03_02_cl1",
+      "statement": "Customer-side confirmation: NVIDIA is investing $2B in Lumentum and the nonexclusive agreement includes an NVIDIA multibillion purchase commitment plus future capacity access rights for advanced laser components — client-side (origin NVIDIA) evidence of the Lumentum-to-NVIDIA laser/optics supply relationship, symmetric to the Coherent deal of the same day.",
+      "subject_id": "e2",
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "NVIDIA or Lumentum discloses termination/expiry of the purchase commitment, or NVIDIA discloses sourcing its advanced laser components primarily from other vendors.",
+      "confidence": 0.7,
+      "source_ids": ["nvda_lumentum_partnership_pr_2026_03_02_s1", "nvda_lumentum_partnership_pr_2026_03_02_s2"]
+    }
+  ]
+}
