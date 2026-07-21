@@ -99,6 +99,54 @@ def test_cutover_failure_never_publishes_partial_pointer(
 
     assert not (private / "runtime_pointer.json").exists()
     assert source.exists()
+    assert sqlite_path(repo_root=repo, private_root=private) == source
+
+
+def test_pointer_missing_target_fails_closed_without_creating_empty_database(
+    tmp_path: Path,
+) -> None:
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    private = repo / "library" / "private"
+    initialize_private_root(private, repo_root=repo)
+    pointer = private / "runtime_pointer.json"
+    pointer.write_text(
+        json.dumps({"engine_c": "engine_c/missing.db"}),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(RuntimeError, match="target is missing"):
+        sqlite_path(repo_root=repo, private_root=private)
+    assert not (private / "engine_c" / "missing.db").exists()
+
+
+def test_reapplying_same_cutover_is_idempotent_and_preserves_active_writes(
+    tmp_path: Path,
+) -> None:
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    source = repo / "engine_c" / "stockbot.db"
+    private = repo / "library" / "private"
+    _legacy_db(source)
+    first = apply_cutover(source, private_root=private, repo_root=repo)
+    active = private / first.destination_relative
+    conn = sqlite3.connect(active)
+    conn.execute(
+        "INSERT INTO financial_snapshots (ticker, snapshot_date) VALUES ('NEW', '2026-07-02')"
+    )
+    conn.commit()
+    conn.close()
+
+    retry = apply_cutover(source, private_root=private, repo_root=repo)
+
+    assert retry.reconciliation == {"status": "already_active"}
+    conn = sqlite3.connect(active)
+    try:
+        assert conn.execute(
+            "SELECT COUNT(*) FROM financial_snapshots WHERE ticker = 'NEW'"
+        ).fetchone()[0] == 1
+    finally:
+        conn.close()
 
 
 def test_runtime_authority_files_are_not_in_git_index() -> None:

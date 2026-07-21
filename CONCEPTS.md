@@ -111,6 +111,14 @@ Whether a decision receives funded `paper` capital or actual `live` capital. `pa
 A multidimensional constraint on capital permission, not a single additive confidence score. It keeps source credibility, technical/causal linkage, commercial maturity, financial resilience, and valuation/payoff separate, then reports a paper target, live supported range, lane-specific maximum supported position, weakest link, and action. A strong item on one axis cannot cancel a missing necessary link on another; the user may underweight or override the supported cap, but an override remains distinct from the system recommendation.
 *Avoid:* conviction score, weighted evidence sum, binary gate
 
+### Action Card（行動卡）
+The on-demand, pure-read decision view that leads with `NO ACTION / REVIEW / TRADE / HEDGE`, urgency, single-name versus portfolio scope, alpha/beta context, weakest link, paper/live state, freshness, blockers, approval boundary, and the next user action. It never creates a trade merely by being rendered. A scheduled Daily Decision Brief may later reuse this contract, but scheduling and alerts are not part of v1.
+*Avoid:* auto-trading instruction, daily turnover prompt, thesis memo
+
+### Legacy / Unclassified Live Holding（既有未分類實盤持股）
+A real position that predates a frozen Decision Lab system decision. It remains visible through the Google Sheet and may trigger monitoring or a new research Probe, but its existence is not evidence for the thesis and does not authorize an automatic add. Once the user explicitly accepts a new live choice and reports a manual fill, those facts are linked prospectively without rewriting the legacy history.
+*Avoid:* implied system recommendation, backfilled paper trade
+
 ### Decision Cohort（決策樣本集）
 The prospective population of every signal that passed the Probe Gate, including signals the user skipped, rejected, paper-traded, live-traded, or overrode. Each record preserves the raw qualified lead, system decision, user decision, execution references, claim outcome, and market outcome so source alpha, system alpha, and user discretion can be evaluated separately. It is upstream of the paper transaction ledger and does not duplicate paper or live position truth.
 *Avoid:* trade log, winners list, three decision ledgers

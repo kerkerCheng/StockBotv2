@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import asdict
+from datetime import datetime, timezone
 from typing import Any, Mapping
 
 from identity.registry import IdentityRegistry, get_registry
@@ -22,6 +23,16 @@ class ExecutionError(ValueError):
     """Mutation request did not satisfy an explicit authority boundary。"""
 
 
+def _utc_timestamp(value: str) -> str:
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except (AttributeError, ValueError) as exc:
+        raise ExecutionError("effective_at must be an ISO-8601 timestamp") from exc
+    if parsed.tzinfo is None:
+        raise ExecutionError("effective_at must include timezone")
+    return parsed.astimezone(timezone.utc).isoformat()
+
+
 def assess_probe(
     store: DecisionStore,
     bundle: ContextBundle,
@@ -35,6 +46,21 @@ def assess_probe(
     _failure_at: str | None = None,
 ) -> DecisionExecutionResult:
     """Atomically persist a system decision and any eligible paper target。"""
+
+    effective_at = _utc_timestamp(effective_at)
+    try:
+        authoritative_bundle = store.get_context_bundle(bundle.digest)
+        authoritative_coverage = store.get_coverage_result(coverage.assessment_id)
+    except KeyError as exc:
+        raise ExecutionError(str(exc)) from exc
+    if (
+        authoritative_bundle.cohort_id != bundle.cohort_id
+        or authoritative_coverage.cohort_id != authoritative_bundle.cohort_id
+        or authoritative_coverage.context_digest != authoritative_bundle.digest
+    ):
+        raise ExecutionError("context and coverage do not belong to the same stored cohort")
+    bundle = authoritative_bundle
+    coverage = authoritative_coverage
 
     current_policy = validate_policy(policy) if policy is not None else load_policy()
     probe = current_policy.get("probe_lane")

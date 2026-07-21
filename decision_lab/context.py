@@ -10,14 +10,11 @@ from datetime import datetime, timedelta
 from typing import Any, Mapping, Sequence
 
 from .adapters.market import normalize_fx_snapshot, normalize_market_snapshot
+from .adapters.holdings import execution_aliases
+from .identity import resolve_identity
 from .models import ContextBundle
+from .redaction import sensitive_payload_path
 from .store import DecisionStore
-
-
-_SECRET_KEY = re.compile(
-    r"password|passwd|token|secret|credential|service.?account|dsn|private.?key",
-    re.IGNORECASE,
-)
 
 
 def _canonical(value: Any) -> str:
@@ -43,14 +40,9 @@ def _parse_time(value: Any, field: str) -> datetime:
 
 
 def _reject_secrets(value: Any, path: str = "root") -> None:
-    if isinstance(value, Mapping):
-        for key, child in value.items():
-            if _SECRET_KEY.search(str(key)):
-                raise ValueError(f"secret-bearing field rejected at {path}.{key}")
-            _reject_secrets(child, f"{path}.{key}")
-    elif isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
-        for index, child in enumerate(value):
-            _reject_secrets(child, f"{path}[{index}]")
+    sensitive = sensitive_payload_path(value, path)
+    if sensitive is not None:
+        raise ValueError(f"secret-bearing value rejected at {sensitive}")
 
 
 def _finite(value: Any, *, non_negative: bool = False) -> float | None:
@@ -151,6 +143,23 @@ def _normalize_financial(
         else "available"
     )
     checklist = deepcopy(payload.get("checklist") or {})
+    runway = derive_runway(
+        payload,
+        manual_observation=payload.get("manual_runway"),
+    )
+    runway_blockers: list[str] = []
+    manual_runway_used = any(
+        payload.get(key) is None
+        for key in ("cash_and_equivalents", "total_debt", "free_cash_flow_ttm")
+    ) and payload.get("manual_runway") is not None
+    if manual_runway_used and runway.get("status") in {"calculated", "self_funding"}:
+        runway_as_of = _parse_time(runway.get("as_of"), "runway.as_of")
+        if runway_as_of > evaluation:
+            runway = {"status": "manual_required", "runway_months": None}
+            runway_blockers.append("financial_runway_timestamp_future")
+        elif evaluation - runway_as_of > timedelta(days=freshness_days):
+            runway = {"status": "manual_required", "runway_months": None}
+            runway_blockers.append("financial_runway_stale")
     return {
         "status": status,
         "ticker": expected_ticker,
@@ -158,11 +167,11 @@ def _normalize_financial(
         "fetched_at": payload["fetched_at"],
         "source": payload["source"],
         "checklist": checklist,
-        "runway": derive_runway(
-            payload,
-            manual_observation=payload.get("manual_runway"),
+        "runway": runway,
+        "blockers": (
+            ([] if status == "available" else ["financial_stale"])
+            + runway_blockers
         ),
-        "blockers": [] if status == "available" else ["financial_stale"],
     }
 
 
@@ -336,19 +345,35 @@ def build_context_bundle(
     company_id = identity.get("company_id")
     research_ticker = identity.get("research_ticker")
     execution_symbol = identity.get("execution_symbol")
-    if not all(isinstance(value, str) and value for value in (
-        company_id, research_ticker, execution_symbol
-    )):
+    resolved = resolve_identity(
+        company_id=company_id if isinstance(company_id, str) else None,
+        research_ticker=(
+            research_ticker if isinstance(research_ticker, str) else None
+        ),
+        execution_aliases=execution_aliases(),
+    )
+    canonical_fields = {
+        "company_id": resolved.company_id,
+        "research_ticker": resolved.research_ticker,
+        "execution_symbol": resolved.execution_symbol,
+        "market_currency": resolved.market_currency,
+        "execution_currency": resolved.execution_currency,
+        "execution_venue": resolved.execution_venue,
+    }
+    identity_mismatch = (
+        bool(resolved.blockers)
+        or any(canonical is None for canonical in canonical_fields.values())
+        or any(
+            identity.get(field) != canonical
+            for field, canonical in canonical_fields.items()
+        )
+    )
+    if identity_mismatch:
         normalized_identity = {"status": "unresolved", "blockers": ["identity_unresolved"]}
     else:
         normalized_identity = {
             "status": "resolved",
-            "company_id": company_id,
-            "research_ticker": research_ticker,
-            "execution_symbol": execution_symbol,
-            "market_currency": identity.get("market_currency"),
-            "execution_currency": identity.get("execution_currency"),
-            "execution_venue": identity.get("execution_venue"),
+            **canonical_fields,
             "blockers": [],
         }
     normalized_evidence = deepcopy(dict(evidence))
@@ -403,18 +428,23 @@ def build_context_bundle(
             blocker.replace("market_", "execution_market_", 1)
             for blocker in normalized_execution_market.get("blockers", [])
         ]
-    execution_pair = f"{execution_currency}/USD"
-    if execution_currency == "USD" and execution_fx is None:
+    live_base_currency = str(normalized_holdings.get("base_currency") or "")
+    execution_pair = f"{execution_currency}/{live_base_currency}"
+    if execution_currency and execution_currency == live_base_currency and execution_fx is None:
         normalized_execution_fx = {
             "status": "available",
-            "pair": "USD/USD",
+            "pair": execution_pair,
             "rate": 1.0,
             "as_of": evaluation_at,
             "fetched_at": evaluation_at,
             "source": "identity://base-currency",
             "blockers": [],
         }
-    elif execution_fx is None and execution_pair == expected_pair:
+    elif (
+        execution_fx is None
+        and live_base_currency == "USD"
+        and execution_pair == expected_pair
+    ):
         normalized_execution_fx = deepcopy(normalized_fx)
     elif execution_fx is None:
         normalized_execution_fx = {

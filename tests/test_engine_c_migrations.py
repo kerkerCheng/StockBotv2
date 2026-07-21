@@ -102,6 +102,9 @@ def test_required_migration_and_table_are_verified() -> None:
             *((migration,) for migration in REQUIRED_MIGRATIONS),
             ("consensus_coverage_observations",),
             ("manual_observations",),
+            ("cash_and_equivalents",),
+            ("total_debt",),
+            ("free_cash_flow_ttm",),
         ]
     )
     verify_required_schema(healthy)
@@ -119,5 +122,16 @@ def test_required_migration_and_table_are_verified() -> None:
     )
     with pytest.raises(RuntimeError, match="manual_observations table"):
         verify_required_schema(missing_table)
+
+    missing_column = FakeConnection(
+        fetchone_values=[
+            *((migration,) for migration in REQUIRED_MIGRATIONS),
+            ("consensus_coverage_observations",),
+            ("manual_observations",),
+            None,
+        ]
+    )
+    with pytest.raises(RuntimeError, match="cash_and_equivalents"):
+        verify_required_schema(missing_column)
 
     assert REQUIRED_MIGRATION == REQUIRED_MIGRATIONS[0]

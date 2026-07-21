@@ -3,6 +3,8 @@ from __future__ import annotations
 import sqlite3
 from pathlib import Path
 
+import pytest
+
 from decision_lab.store import DecisionStore
 from storage.relational import initialize_private_root
 
@@ -119,3 +121,20 @@ def test_private_store_write_does_not_touch_tracked_runtime_paths(tmp_path: Path
 
     assert not (repo / "engine_c" / "stockbot.db").exists()
     assert not (repo / "paper_portfolio" / "transactions.csv").exists()
+
+
+def test_missing_initialized_authority_fails_closed_instead_of_creating_empty_db(
+    tmp_path: Path,
+) -> None:
+    store, repo, db_path = _store(tmp_path)
+    private_root = repo / "library" / "private"
+    store.close()
+    db_path.unlink()
+
+    with pytest.raises(RuntimeError, match="authority is missing"):
+        DecisionStore.open(
+            db_path,
+            private_root=private_root,
+            repo_root=repo,
+        )
+    assert not db_path.exists()

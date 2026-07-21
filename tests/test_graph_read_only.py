@@ -64,6 +64,8 @@ def test_query_port_only_exposes_read_and_uses_read_access_mode() -> None:
         "MATCH (n) DETACH DELETE n",
         "MERGE (n:Entity {id: 'co:x'}) RETURN n",
         "CALL apoc.create.node(['Entity'], {}) YIELD node RETURN node",
+        "CALL db.labels() YIELD label RETURN label",
+        "WITH 1 AS x CALL db.createLabel('Injected') RETURN x",
     ],
 )
 def test_write_queries_fail_closed_before_reaching_driver(cypher: str) -> None:

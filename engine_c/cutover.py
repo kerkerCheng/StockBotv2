@@ -30,11 +30,8 @@ class CutoverReport:
 
 
 def _sha256(path: Path) -> str:
-    digest = hashlib.sha256()
     with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
+        return hashlib.file_digest(handle, "sha256").hexdigest()
 
 
 def _count(conn: sqlite3.Connection, table: str) -> int:
@@ -92,6 +89,34 @@ def apply_cutover(
     repo = repo_root.resolve()
     private = initialize_private_root(private_root.resolve(), repo_root=repo)
     planned = plan_cutover(source, private_root=private, repo_root=repo)
+    pointer = private / "runtime_pointer.json"
+    if pointer.is_file():
+        try:
+            current = json.loads(pointer.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            raise RuntimeError("existing Engine C runtime pointer is invalid") from exc
+        if (
+            current.get("version") == CUTOVER_VERSION
+            and current.get("source_sha256") == planned.source_sha256
+            and current.get("engine_c") == planned.destination_relative
+        ):
+            active = validate_private_destination(
+                private / planned.destination_relative,
+                private_root=private,
+                repo_root=repo,
+            )
+            if not active.is_file():
+                raise RuntimeError("existing Engine C runtime pointer target is missing")
+            return CutoverReport(
+                version=planned.version,
+                source_sha256=planned.source_sha256,
+                source_counts=planned.source_counts,
+                destination_relative=planned.destination_relative,
+                destination_sha256=_sha256(active),
+                reconciliation={"status": "already_active"},
+                pointer_switched=True,
+            )
+        raise RuntimeError("Engine C is already cut over; recutover requires explicit migration")
     destination = validate_private_destination(
         private / planned.destination_relative,
         private_root=private,

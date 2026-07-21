@@ -4,9 +4,10 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+import os
 import sqlite3
 from dataclasses import asdict, dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Mapping
 
@@ -27,12 +28,17 @@ from .models import (
     ProbeSizingResult,
     ShadowBaseline,
 )
+from .redaction import sensitive_payload_path
 
 
 _SCHEMA_PATH = Path(__file__).with_name("schema.sql")
+_SCHEMA_VERSION = "7"
 
 
 def _canonical_json(payload: Mapping[str, Any]) -> str:
+    sensitive = sensitive_payload_path(payload)
+    if sensitive is not None:
+        raise ValueError(f"secret-bearing payload rejected at {sensitive}")
     return json.dumps(
         payload,
         ensure_ascii=False,
@@ -53,43 +59,11 @@ def _time(value: str, field: str) -> datetime:
         raise ValueError(f"{field} must be an ISO-8601 timestamp") from exc
     if parsed.tzinfo is None:
         raise ValueError(f"{field} must include timezone")
-    return parsed
+    return parsed.astimezone(timezone.utc)
 
 
-def _ensure_execution_schema(conn: sqlite3.Connection) -> None:
-    columns = {
-        str(row["name"])
-        for row in conn.execute("PRAGMA table_info(paper_events)")
-    }
-    additions = {
-        "decision_id": "TEXT REFERENCES system_decisions(decision_id)",
-        "corrects_paper_event_id": "TEXT REFERENCES paper_events(paper_event_id)",
-        "approved_action_id": "TEXT",
-    }
-    for column, declaration in additions.items():
-        if column not in columns:
-            conn.execute(f"ALTER TABLE paper_events ADD COLUMN {column} {declaration}")
-    conn.execute(
-        """
-        CREATE UNIQUE INDEX IF NOT EXISTS idx_paper_events_decision_digest
-        ON paper_events (decision_id, payload_digest)
-        WHERE decision_id IS NOT NULL
-        """
-    )
-    conn.execute(
-        """
-        CREATE UNIQUE INDEX IF NOT EXISTS idx_live_choices_approved_action
-        ON live_choices (approved_action_id)
-        WHERE approved_action_id IS NOT NULL
-        """
-    )
-    conn.execute(
-        """
-        CREATE UNIQUE INDEX IF NOT EXISTS idx_paper_events_approved_action
-        ON paper_events (approved_action_id)
-        WHERE approved_action_id IS NOT NULL
-        """
-    )
+def _timestamp(value: str, field: str) -> str:
+    return _time(value, field).isoformat()
 
 
 @dataclass(frozen=True)
@@ -129,11 +103,48 @@ class DecisionStore:
             private_root=private_root,
             repo_root=repo_root,
         )
-        conn = connect_sqlite(resolved)
+        private = private_root.resolve()
+        marker = validate_private_destination(
+            private / "decision_lab_authority.json",
+            private_root=private,
+            repo_root=repo_root,
+        )
+        marker_exists = marker.is_file()
+        if marker_exists and not resolved.is_file():
+            raise RuntimeError(
+                "Decision Store authority is missing; restore the database before opening"
+            )
+        is_new = not resolved.exists()
+        conn = connect_sqlite(resolved, create=is_new)
         try:
-            conn.executescript(_SCHEMA_PATH.read_text(encoding="utf-8"))
-            _ensure_execution_schema(conn)
-            conn.commit()
+            if is_new:
+                conn.executescript(_SCHEMA_PATH.read_text(encoding="utf-8"))
+                conn.commit()
+            integrity = conn.execute("PRAGMA integrity_check").fetchone()
+            version_row = conn.execute(
+                "SELECT value FROM decision_store_meta WHERE key = 'schema_version'"
+            ).fetchone()
+            if integrity is None or str(integrity[0]) != "ok" or version_row is None:
+                raise RuntimeError("Decision Store authority is invalid")
+            if str(version_row["value"]) != _SCHEMA_VERSION:
+                raise RuntimeError(
+                    "Decision Store schema version mismatch; use an explicit migration or empty bootstrap"
+                )
+            if not marker_exists:
+                marker.parent.mkdir(parents=True, exist_ok=True)
+                marker_temp = marker.with_suffix(".tmp")
+                marker_temp.write_text(
+                    _canonical_json(
+                        {
+                            "schema": "decision-store-authority-v1",
+                            "database": resolved.relative_to(private).as_posix(),
+                            "schema_version": _SCHEMA_VERSION,
+                        }
+                    )
+                    + "\n",
+                    encoding="utf-8",
+                )
+                os.replace(marker_temp, marker)
         except BaseException:
             conn.close()
             raise
@@ -197,6 +208,7 @@ class DecisionStore:
     ) -> EventRecord:
         if not event_type.strip() or not observed_at.strip():
             raise ValueError("event_type and observed_at are required")
+        observed_at = _timestamp(observed_at, "observed_at")
         payload_json = _canonical_json(payload)
         payload_digest = _digest(payload_json)
         identity = _canonical_json(
@@ -254,6 +266,7 @@ class DecisionStore:
 
         if not dedupe_key.strip():
             raise ValueError("dedupe_key is required")
+        observed_at = _timestamp(observed_at, "observed_at")
         cohort_id = "dc_" + _digest(dedupe_key)[:32]
         shadow_id = "sh_" + _digest(cohort_id)[:32]
         signal_json = _canonical_json(signal_payload)
@@ -270,12 +283,20 @@ class DecisionStore:
         shadow_payload = {
             "shadow_id": shadow_id,
             "status": shadow.get("status"),
+            "ticker": shadow.get("ticker"),
             "price": shadow.get("price"),
             "currency": shadow.get("currency"),
             "source": shadow.get("source"),
             "as_of": shadow.get("as_of"),
             "fetched_at": shadow.get("fetched_at"),
         }
+        if shadow_payload["status"] == "observed":
+            shadow_payload["as_of"] = _timestamp(
+                str(shadow_payload["as_of"]), "shadow.as_of"
+            )
+            shadow_payload["fetched_at"] = _timestamp(
+                str(shadow_payload["fetched_at"]), "shadow.fetched_at"
+            )
         shadow_json = _canonical_json(shadow_payload)
         shadow_digest = _digest(shadow_json)
         shadow_event_id = "de_" + _digest(
@@ -330,14 +351,15 @@ class DecisionStore:
             shadow_cursor = self._conn.execute(
                 """
                 INSERT OR IGNORE INTO shadow_observations (
-                    shadow_id, cohort_id, status, price, currency,
+                    shadow_id, cohort_id, status, ticker, price, currency,
                     source, as_of, fetched_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     shadow_id,
                     cohort_id,
                     shadow_payload["status"],
+                    shadow_payload["ticker"],
                     shadow_payload["price"],
                     shadow_payload["currency"],
                     shadow_payload["source"],
@@ -410,7 +432,7 @@ class DecisionStore:
         row = self._conn.execute(
             """
             SELECT shadow_id, cohort_id, status, price, currency,
-                   source, as_of, fetched_at
+                   ticker, source, as_of, fetched_at
             FROM shadow_observations WHERE cohort_id = ?
             """,
             (cohort_id,),
@@ -439,6 +461,21 @@ class DecisionStore:
             raise KeyError(f"probe not found for {cohort_id}")
         return ProbeRecord(**dict(row))
 
+    def cohort_identity(self, cohort_id: str) -> dict[str, str | None]:
+        row = self._conn.execute(
+            """
+            SELECT company_id, research_ticker
+            FROM decision_cohorts WHERE cohort_id = ?
+            """,
+            (cohort_id,),
+        ).fetchone()
+        if row is None:
+            raise KeyError(f"cohort not found: {cohort_id}")
+        return {
+            "company_id": row["company_id"],
+            "research_ticker": row["research_ticker"],
+        }
+
     def table_count(self, table: str) -> int:
         if table not in self.table_names():
             raise ValueError(f"unknown table: {table}")
@@ -450,6 +487,7 @@ class DecisionStore:
     ) -> str:
         if len(sheet_digest) != 64 or not confirmed_at.strip():
             raise ValueError("holdings confirmation requires digest and confirmed_at")
+        confirmed_at = _timestamp(confirmed_at, "confirmed_at")
         confirmation_id = "hc_" + _digest(f"{sheet_digest}:{confirmed_at}")[:32]
         with immediate_transaction(self._conn):
             self._conn.execute(
@@ -483,11 +521,28 @@ class DecisionStore:
         evaluation_at: str,
         payload: Mapping[str, Any],
     ) -> ContextBundle:
+        evaluation_at = _timestamp(evaluation_at, "evaluation_at")
         payload_json = _canonical_json(payload)
         if _digest(payload_json) != digest:
             raise ValueError("context digest mismatch")
         context_id = "ctx_" + digest[:32]
         with immediate_transaction(self._conn):
+            cohort = self._conn.execute(
+                """
+                SELECT company_id, research_ticker
+                FROM decision_cohorts WHERE cohort_id = ?
+                """,
+                (cohort_id,),
+            ).fetchone()
+            identity = payload.get("identity")
+            if (
+                cohort is None
+                or payload.get("cohort_id") != cohort_id
+                or not isinstance(identity, Mapping)
+                or identity.get("company_id") != cohort["company_id"]
+                or identity.get("research_ticker") != cohort["research_ticker"]
+            ):
+                raise ValueError("context identity does not match cohort authority")
             self._conn.execute(
                 """
                 INSERT OR IGNORE INTO context_bundles (
@@ -538,9 +593,12 @@ class DecisionStore:
     def get_coverage_result(self, assessment_id: str) -> CoverageResult:
         row = self._conn.execute(
             """
-            SELECT assessment_id, cohort_id, context_digest, status,
-                   blockers_json, paper_blockers_json, live_blockers_json
-            FROM coverage_assessments WHERE assessment_id = ?
+            SELECT ca.assessment_id, ca.cohort_id, ca.context_digest, ca.status,
+                   ca.blockers_json, ca.paper_blockers_json, ca.live_blockers_json,
+                   wo.work_order_id
+            FROM coverage_assessments ca
+            LEFT JOIN research_work_orders wo ON wo.assessment_id = ca.assessment_id
+            WHERE ca.assessment_id = ?
             """,
             (assessment_id,),
         ).fetchone()
@@ -551,6 +609,7 @@ class DecisionStore:
         live_blockers = tuple(json.loads(row["live_blockers_json"])["items"])
         status = str(row["status"])
         paper_ready = status == "analyzable" and not paper_blockers
+        live_ready = status == "analyzable" and not live_blockers
         return CoverageResult(
             assessment_id=str(row["assessment_id"]),
             cohort_id=str(row["cohort_id"]),
@@ -560,10 +619,10 @@ class DecisionStore:
             paper_blockers=paper_blockers,
             live_blockers=live_blockers,
             paper_context_ready=paper_ready,
-            live_context_ready=paper_ready and not live_blockers,
+            live_context_ready=live_ready,
             paper_supported_position=0.0,
             live_supported_range=(0.0, 0.0),
-            work_order_id=None,
+            work_order_id=row["work_order_id"],
         )
 
     def record_coverage_assessment(
@@ -584,6 +643,26 @@ class DecisionStore:
     ) -> dict[str, str | None]:
         if status not in {"coverage_pending", "analyzable"}:
             raise ValueError("invalid coverage status")
+        expiry = _timestamp(expiry, "expiry")
+        context = self._conn.execute(
+            """
+            SELECT cohort_id, evaluation_at
+            FROM context_bundles WHERE context_digest = ?
+            """,
+            (context_digest,),
+        ).fetchone()
+        if context is None or context["cohort_id"] != cohort_id:
+            raise ValueError("coverage context does not match cohort authority")
+        if _time(expiry, "expiry") <= _time(
+            str(context["evaluation_at"]), "context.evaluation_at"
+        ):
+            raise ValueError("coverage expiry must follow context evaluation")
+        if not catalyst.strip() or not disproof.strip():
+            raise ValueError("coverage requires catalyst and disproof")
+        if status == "analyzable" and blockers:
+            raise ValueError("analyzable coverage cannot contain core blockers")
+        if status == "coverage_pending" and not blockers:
+            raise ValueError("coverage_pending requires core blockers")
         for score in (decision_relevance, falsifiability, information_value):
             if isinstance(score, bool) or not isinstance(score, int) or not 0 <= score <= 10:
                 raise ValueError("work-order scores must be integers from 0 to 10")
@@ -712,6 +791,33 @@ class DecisionStore:
             "blockers": [],
         }
 
+    def _latest_cohort_time(self, cohort_id: str) -> str | None:
+        row = self._conn.execute(
+            """
+            SELECT MAX(event_time) AS latest FROM (
+                SELECT observed_at AS event_time FROM decision_events WHERE cohort_id = ?
+                UNION ALL
+                SELECT evaluation_at FROM context_bundles WHERE cohort_id = ?
+                UNION ALL
+                SELECT effective_at FROM system_decisions WHERE cohort_id = ?
+                UNION ALL
+                SELECT effective_at FROM paper_events WHERE cohort_id = ?
+                UNION ALL
+                SELECT effective_at FROM probe_lifecycle_events WHERE cohort_id = ?
+                UNION ALL
+                SELECT lc.decided_at FROM live_choices lc
+                JOIN system_decisions sd ON sd.decision_id = lc.decision_id
+                WHERE sd.cohort_id = ?
+                UNION ALL
+                SELECT lf.executed_at FROM live_execution_reports lf
+                JOIN system_decisions sd ON sd.decision_id = lf.decision_id
+                WHERE sd.cohort_id = ?
+            )
+            """,
+            (cohort_id,) * 7,
+        ).fetchone()
+        return str(row["latest"]) if row is not None and row["latest"] else None
+
     @staticmethod
     def _execution_result_from_payload(
         decision_id: str,
@@ -751,11 +857,39 @@ class DecisionStore:
 
         if not idempotency_key.strip():
             raise ValueError("idempotency_key is required")
-        _time(effective_at, "effective_at")
+        effective_at = _timestamp(effective_at, "effective_at")
         request_json = _canonical_json(request_payload)
         request_digest = _digest(request_json)
         decision_id = "pd_" + _digest(idempotency_key)[:32]
         with immediate_transaction(self._conn):
+            authority = self._conn.execute(
+                """
+                SELECT cb.cohort_id AS context_cohort,
+                       cb.evaluation_at AS context_evaluation_at,
+                       ca.cohort_id AS coverage_cohort,
+                       ca.context_digest AS coverage_context
+                FROM context_bundles cb
+                JOIN coverage_assessments ca ON ca.assessment_id = ?
+                WHERE cb.context_digest = ?
+                """,
+                (coverage_assessment_id, context_digest),
+            ).fetchone()
+            if (
+                authority is None
+                or authority["context_cohort"] != cohort_id
+                or authority["coverage_cohort"] != cohort_id
+                or authority["coverage_context"] != context_digest
+            ):
+                raise ValueError("decision authority context/coverage mismatch")
+            if _time(effective_at, "effective_at") < _time(
+                str(authority["context_evaluation_at"]), "context.evaluation_at"
+            ):
+                raise ValueError("decision cannot predate its frozen context")
+            latest_causal = self._latest_cohort_time(cohort_id)
+            if latest_causal is not None and _time(
+                effective_at, "effective_at"
+            ) < _time(latest_causal, "latest_causal"):
+                raise ValueError("decision cannot predate the cohort causal timeline")
             existing = self._conn.execute(
                 """
                 SELECT decision_id, request_digest, decision_digest, payload_json
@@ -822,6 +956,19 @@ class DecisionStore:
             if sizing.paper_status == "ELIGIBLE" and not math.isclose(
                 current, target, abs_tol=1e-12
             ):
+                prior_event = self._conn.execute(
+                    """
+                    SELECT e.effective_at
+                    FROM paper_position_projection p
+                    JOIN paper_events e ON e.paper_event_id = p.source_event_id
+                    WHERE p.company_id = ?
+                    """,
+                    (company_id,),
+                ).fetchone()
+                if prior_event is not None and _time(
+                    effective_at, "effective_at"
+                ) <= _time(str(prior_event["effective_at"]), "prior.effective_at"):
+                    raise ValueError("paper update must follow its current source event")
                 event_payload = {
                     "company_id": company_id,
                     "decision_id": decision_id,
@@ -877,11 +1024,56 @@ class DecisionStore:
             )
 
     def paper_position(self, company_id: str) -> float:
+        return float(self.paper_position_state(company_id)["weight"])
+
+    def paper_position_state(
+        self, company_id: str, *, as_of: str | None = None
+    ) -> dict[str, Any]:
+        if as_of is not None:
+            cutoff = _timestamp(as_of, "as_of")
+            rows = self._conn.execute(
+                """
+                SELECT paper_event_id, decision_id, payload_json
+                FROM paper_events
+                WHERE effective_at <= ?
+                ORDER BY effective_at, paper_event_id
+                """,
+                (cutoff,),
+            )
+            latest: dict[str, Any] | None = None
+            for row in rows:
+                payload = json.loads(row["payload_json"])
+                if payload.get("company_id") == company_id:
+                    latest = {
+                        "weight": float(payload["target_weight"]),
+                        "source_event_id": row["paper_event_id"],
+                        "decision_id": row["decision_id"],
+                    }
+            return latest or {
+                "weight": 0.0,
+                "source_event_id": None,
+                "decision_id": None,
+            }
         row = self._conn.execute(
-            "SELECT weight FROM paper_position_projection WHERE company_id = ?",
+            """
+            SELECT p.weight, p.source_event_id, e.decision_id
+            FROM paper_position_projection p
+            LEFT JOIN paper_events e ON e.paper_event_id = p.source_event_id
+            WHERE p.company_id = ?
+            """,
             (company_id,),
         ).fetchone()
-        return float(row["weight"]) if row is not None else 0.0
+        if row is None:
+            return {
+                "weight": 0.0,
+                "source_event_id": None,
+                "decision_id": None,
+            }
+        return {
+            "weight": float(row["weight"]),
+            "source_event_id": row["source_event_id"],
+            "decision_id": row["decision_id"],
+        }
 
     def get_decision(self, decision_id: str) -> dict[str, Any]:
         row = self._conn.execute(
@@ -914,14 +1106,27 @@ class DecisionStore:
         result["payload"] = json.loads(result.pop("payload_json"))
         return result
 
-    def latest_decision_for_cohort(self, cohort_id: str) -> dict[str, Any] | None:
-        row = self._conn.execute(
-            """
-            SELECT decision_id FROM system_decisions
-            WHERE cohort_id = ? ORDER BY effective_at DESC, decision_id DESC LIMIT 1
-            """,
-            (cohort_id,),
-        ).fetchone()
+    def latest_decision_for_cohort(
+        self, cohort_id: str, *, as_of: str | None = None
+    ) -> dict[str, Any] | None:
+        if as_of is None:
+            row = self._conn.execute(
+                """
+                SELECT decision_id FROM system_decisions
+                WHERE cohort_id = ?
+                ORDER BY effective_at DESC, decision_id DESC LIMIT 1
+                """,
+                (cohort_id,),
+            ).fetchone()
+        else:
+            row = self._conn.execute(
+                """
+                SELECT decision_id FROM system_decisions
+                WHERE cohort_id = ? AND effective_at <= ?
+                ORDER BY effective_at DESC, decision_id DESC LIMIT 1
+                """,
+                (cohort_id, _timestamp(as_of, "as_of")),
+            ).fetchone()
         return self.get_decision(str(row["decision_id"])) if row is not None else None
 
     def signal_sources_for_cohort(self, cohort_id: str) -> tuple[str, ...]:
@@ -966,16 +1171,23 @@ class DecisionStore:
         approved_action_id: str | None = None,
         force_override: bool = False,
     ) -> str:
-        _time(decided_at, "decided_at")
+        decided_at = _timestamp(decided_at, "decided_at")
         if not math.isfinite(selected_weight) or selected_weight < 0:
             raise ValueError("selected_weight must be finite and non-negative")
         with immediate_transaction(self._conn):
             decision = self._conn.execute(
-                "SELECT payload_json FROM system_decisions WHERE decision_id = ?",
+                """
+                SELECT payload_json, effective_at
+                FROM system_decisions WHERE decision_id = ?
+                """,
                 (decision_id,),
             ).fetchone()
             if decision is None:
                 raise KeyError(f"decision not found: {decision_id}")
+            if _time(decided_at, "decided_at") < _time(
+                str(decision["effective_at"]), "decision.effective_at"
+            ):
+                raise ValueError("live choice cannot predate its decision")
             payload = json.loads(decision["payload_json"])
             lower, upper = payload["sizing"]["live_supported_range"]
             if selected_weight > float(upper) + 1e-12 and not force_override:
@@ -1030,7 +1242,7 @@ class DecisionStore:
         currency: str,
         executed_at: str,
     ) -> str:
-        _time(executed_at, "executed_at")
+        executed_at = _timestamp(executed_at, "executed_at")
         if (
             not execution_ref.strip()
             or not math.isfinite(shares)
@@ -1043,19 +1255,79 @@ class DecisionStore:
         fill_id = "lf_" + _digest(execution_ref)[:32]
         with immediate_transaction(self._conn):
             choice = self._conn.execute(
-                "SELECT 1 FROM live_choices WHERE decision_id = ? LIMIT 1",
+                """
+                SELECT lc.choice_id, lc.selected_weight, lc.decided_at,
+                       sd.context_digest, sd.effective_at AS decision_effective_at
+                FROM live_choices lc
+                JOIN system_decisions sd ON sd.decision_id = lc.decision_id
+                WHERE lc.decision_id = ?
+                ORDER BY lc.decided_at DESC, lc.choice_id DESC LIMIT 1
+                """,
                 (decision_id,),
             ).fetchone()
             if choice is None:
                 raise ValueError("live fill requires an explicit live choice")
+            if float(choice["selected_weight"]) <= 0:
+                raise ValueError("live fill requires a positive live choice")
+            if _time(executed_at, "executed_at") < max(
+                _time(str(choice["decided_at"]), "choice.decided_at"),
+                _time(
+                    str(choice["decision_effective_at"]),
+                    "decision.effective_at",
+                ),
+            ):
+                raise ValueError("live fill cannot predate its choice or decision")
+            context = self.get_context_bundle(str(choice["context_digest"])).payload
+            expected_currency = context.get("identity", {}).get("execution_currency")
+            if currency != expected_currency:
+                raise ValueError("live fill currency does not match execution identity")
+            existing = self._conn.execute(
+                """
+                SELECT fill_id, decision_id, choice_id, execution_ref, shares,
+                       price, currency, executed_at
+                FROM live_execution_reports WHERE execution_ref = ?
+                """,
+                (execution_ref,),
+            ).fetchone()
+            expected = (
+                decision_id,
+                str(choice["choice_id"]),
+                execution_ref,
+                float(shares),
+                float(price),
+                currency,
+                executed_at,
+            )
+            if existing is not None:
+                actual = (
+                    existing["decision_id"],
+                    existing["choice_id"],
+                    existing["execution_ref"],
+                    float(existing["shares"]),
+                    float(existing["price"]),
+                    existing["currency"],
+                    existing["executed_at"],
+                )
+                if actual != expected:
+                    raise ValueError("execution_ref already belongs to a different fill")
+                return str(existing["fill_id"])
             self._conn.execute(
                 """
                 INSERT OR IGNORE INTO live_execution_reports (
-                    fill_id, decision_id, execution_ref, shares,
+                    fill_id, decision_id, choice_id, execution_ref, shares,
                     price, currency, executed_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """,
-                (fill_id, decision_id, execution_ref, shares, price, currency, executed_at),
+                (
+                    fill_id,
+                    decision_id,
+                    choice["choice_id"],
+                    execution_ref,
+                    shares,
+                    price,
+                    currency,
+                    executed_at,
+                ),
             )
         return fill_id
 
@@ -1074,13 +1346,44 @@ class DecisionStore:
     def latest_live_fill(self, decision_id: str) -> dict[str, Any] | None:
         row = self._conn.execute(
             """
-            SELECT fill_id, execution_ref, shares, price, currency, executed_at
+            SELECT fill_id, choice_id, execution_ref, shares, price, currency, executed_at
             FROM live_execution_reports WHERE decision_id = ?
             ORDER BY executed_at DESC, fill_id DESC LIMIT 1
             """,
             (decision_id,),
         ).fetchone()
         return dict(row) if row is not None else None
+
+    def latest_live_facts_for_cohort(
+        self, cohort_id: str, *, as_of: str
+    ) -> tuple[dict[str, Any] | None, dict[str, Any] | None]:
+        cutoff = _timestamp(as_of, "as_of")
+        choice = self._conn.execute(
+            """
+            SELECT lc.choice_id, lc.decision_id, lc.selected_weight,
+                   lc.choice_type, lc.reason, lc.approved_action_id, lc.decided_at
+            FROM live_choices lc
+            JOIN system_decisions sd ON sd.decision_id = lc.decision_id
+            WHERE sd.cohort_id = ? AND lc.decided_at <= ?
+            ORDER BY lc.decided_at DESC, lc.choice_id DESC LIMIT 1
+            """,
+            (cohort_id, cutoff),
+        ).fetchone()
+        fill = self._conn.execute(
+            """
+            SELECT lf.fill_id, lf.decision_id, lf.choice_id, lf.execution_ref,
+                   lf.shares, lf.price, lf.currency, lf.executed_at
+            FROM live_execution_reports lf
+            JOIN system_decisions sd ON sd.decision_id = lf.decision_id
+            WHERE sd.cohort_id = ? AND lf.executed_at <= ?
+            ORDER BY lf.executed_at DESC, lf.fill_id DESC LIMIT 1
+            """,
+            (cohort_id, cutoff),
+        ).fetchone()
+        return (
+            dict(choice) if choice is not None else None,
+            dict(fill) if fill is not None else None,
+        )
 
     def prepare_action(
         self,
@@ -1093,6 +1396,8 @@ class DecisionStore:
     ) -> PreparedAction:
         if action_type not in {"live_override", "paper_correction", "paper_reversal"}:
             raise ValueError("unsupported managed action")
+        prepared_at = _timestamp(prepared_at, "prepared_at")
+        expires_at = _timestamp(expires_at, "expires_at")
         if not target_id.strip() or _time(expires_at, "expires_at") <= _time(
             prepared_at, "prepared_at"
         ):
@@ -1144,6 +1449,7 @@ class DecisionStore:
     def apply_live_override(
         self, *, action_id: str, digest: str, decided_at: str
     ) -> str:
+        decided_at = _timestamp(decided_at, "decided_at")
         with immediate_transaction(self._conn):
             action = self._prepared(action_id, digest)
             if action["action_type"] != "live_override":
@@ -1167,11 +1473,17 @@ class DecisionStore:
                 raise ValueError("live override reason is required")
             # Inline the insert so action state and choice commit together.
             decision = self._conn.execute(
-                "SELECT 1 FROM system_decisions WHERE decision_id = ?",
+                """
+                SELECT effective_at FROM system_decisions WHERE decision_id = ?
+                """,
                 (action["target_id"],),
             ).fetchone()
             if decision is None:
                 raise KeyError("override target decision not found")
+            if _time(decided_at, "decided_at") < _time(
+                str(decision["effective_at"]), "decision.effective_at"
+            ):
+                raise ValueError("live override cannot predate its decision")
             choice_id = "lc_" + _digest(f"{action_id}:{decided_at}")[:32]
             self._conn.execute(
                 """
@@ -1191,6 +1503,7 @@ class DecisionStore:
     def apply_paper_amendment(
         self, *, action_id: str, digest: str, effective_at: str
     ) -> str:
+        effective_at = _timestamp(effective_at, "effective_at")
         with immediate_transaction(self._conn):
             action = self._prepared(action_id, digest)
             if action["action_type"] not in {"paper_correction", "paper_reversal"}:
@@ -1207,7 +1520,8 @@ class DecisionStore:
                 return str(existing["paper_event_id"])
             original = self._conn.execute(
                 """
-                SELECT paper_event_id, cohort_id, decision_id, payload_json
+                SELECT paper_event_id, cohort_id, decision_id,
+                       payload_json, effective_at
                 FROM paper_events WHERE paper_event_id = ?
                 """,
                 (action["target_id"],),
@@ -1236,6 +1550,19 @@ class DecisionStore:
                 if target > maximum + 1e-12:
                     raise ValueError("paper amendment exceeds original supported cap")
             company_id = str(original_payload["company_id"])
+            current_source = self._conn.execute(
+                """
+                SELECT e.effective_at
+                FROM paper_position_projection p
+                JOIN paper_events e ON e.paper_event_id = p.source_event_id
+                WHERE p.company_id = ?
+                """,
+                (company_id,),
+            ).fetchone()
+            if current_source is not None and _time(
+                effective_at, "effective_at"
+            ) <= _time(str(current_source["effective_at"]), "current.effective_at"):
+                raise ValueError("paper amendment must follow the current source event")
             current = self.paper_position(company_id)
             event_payload = {
                 "company_id": company_id,
@@ -1310,6 +1637,16 @@ class DecisionStore:
             lifecycle_event_id=row["terminal_event_id"],
         )
 
+    def lifecycle_epoch_started_at(self, cohort_id: str, epoch: int) -> str | None:
+        row = self._conn.execute(
+            """
+            SELECT started_at FROM probe_lifecycle_epochs
+            WHERE cohort_id = ? AND epoch = ?
+            """,
+            (cohort_id, epoch),
+        ).fetchone()
+        return str(row["started_at"]) if row is not None else None
+
     def _ensure_lifecycle_epoch(self, cohort_id: str, started_at: str) -> sqlite3.Row:
         row = self._conn.execute(
             """
@@ -1348,7 +1685,14 @@ class DecisionStore:
         effective_at: str,
         review_due_at: str,
     ) -> LifecycleResult:
+        effective_at = _timestamp(effective_at, "effective_at")
+        review_due_at = _timestamp(review_due_at, "review_due_at")
         with immediate_transaction(self._conn):
+            latest_causal = self._latest_cohort_time(cohort_id)
+            if latest_causal is not None and _time(
+                effective_at, "effective_at"
+            ) < _time(latest_causal, "latest_causal"):
+                raise ValueError("review cannot predate the cohort causal timeline")
             current = self._ensure_lifecycle_epoch(cohort_id, effective_at)
             if current["status"] == "review_required":
                 return LifecycleResult(
@@ -1431,7 +1775,13 @@ class DecisionStore:
     ) -> OutcomeResult:
         if terminal_status not in {"promoted", "rejected", "expired", "revised"}:
             raise ValueError("invalid terminal lifecycle status")
+        effective_at = _timestamp(effective_at, "effective_at")
         with immediate_transaction(self._conn):
+            latest_causal = self._latest_cohort_time(cohort_id)
+            if latest_causal is not None and _time(
+                effective_at, "effective_at"
+            ) < _time(latest_causal, "latest_causal"):
+                raise ValueError("outcome cannot predate the cohort causal timeline")
             current = self._ensure_lifecycle_epoch(cohort_id, effective_at)
             epoch = int(current["epoch"])
             if epoch > 1:

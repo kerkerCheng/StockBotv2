@@ -35,7 +35,7 @@
     {"company_id": "co:landmark_optoelectronics", "research_ticker": "3081.TWO"},
     {"company_id": "co:applied_materials", "research_ticker": "AMAT"},
     {"company_id": "co:lam_research", "research_ticker": "LRCX"},
-    {"company_id": "co:texas_instruments", "research_ticker": "TXN"},
+    {"company_id": "co:texas_instruments", "research_ticker": "TXN", "market_currency": "USD", "execution_currency": "USD", "execution_venue": "NASDAQ"},
     {"company_id": "co:umc", "research_ticker": "UMC"},
     {"company_id": "co:soitec", "research_ticker": "SOI.PA"},
     {"company_id": "co:ayar_labs", "research_ticker": null},

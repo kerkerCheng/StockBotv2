@@ -12,10 +12,16 @@ REQUIRED_MIGRATION = "20260716_add_consensus_coverage.sql"
 REQUIRED_MIGRATIONS = (
     REQUIRED_MIGRATION,
     "20260721_add_manual_observations.sql",
+    "20260721_add_probe_financial_baseline.sql",
 )
 REQUIRED_TABLES = (
     "consensus_coverage_observations",
     "manual_observations",
+)
+REQUIRED_FINANCIAL_COLUMNS = (
+    "cash_and_equivalents",
+    "total_debt",
+    "free_cash_flow_ttm",
 )
 
 
@@ -73,6 +79,18 @@ def verify_required_schema(conn) -> None:
             table = cursor.fetchone()
             if not table or table[0] is None:
                 raise RuntimeError(f"{table_name} table is missing")
+        for column_name in REQUIRED_FINANCIAL_COLUMNS:
+            cursor.execute(
+                """
+                SELECT column_name FROM information_schema.columns
+                WHERE table_name = 'financial_snapshots' AND column_name = %s
+                """,
+                (column_name,),
+            )
+            if cursor.fetchone() != (column_name,):
+                raise RuntimeError(
+                    f"financial_snapshots.{column_name} column is missing"
+                )
 
 
 def main() -> int:

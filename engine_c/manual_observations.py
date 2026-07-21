@@ -4,7 +4,10 @@ from __future__ import annotations
 import hashlib
 import json
 import sqlite3
+from datetime import datetime, timezone
 from typing import Any, Mapping
+
+from decision_lab.redaction import sensitive_payload_path
 
 
 def _canonical(value: Mapping[str, Any]) -> str:
@@ -19,6 +22,16 @@ def _canonical(value: Mapping[str, Any]) -> str:
 
 def _is_sqlite(conn: Any) -> bool:
     return isinstance(conn, sqlite3.Connection)
+
+
+def _utc_timestamp(value: str) -> str:
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except (AttributeError, ValueError) as exc:
+        raise ValueError("manual observation as_of must be an ISO-8601 timestamp") from exc
+    if parsed.tzinfo is None:
+        raise ValueError("manual observation as_of must include timezone")
+    return parsed.astimezone(timezone.utc).isoformat()
 
 
 def ensure_manual_observation_schema(conn: Any) -> None:
@@ -71,6 +84,10 @@ def append_manual_observation(
         "ticker", "field_name", "value", "source_ref", "as_of", "author"
     )):
         raise ValueError("manual observation requires value, provenance, as_of, and author")
+    fields["as_of"] = _utc_timestamp(str(fields["as_of"]))
+    sensitive = sensitive_payload_path(fields, "manual_observation")
+    if sensitive is not None:
+        raise ValueError(f"secret-bearing manual observation rejected at {sensitive}")
     ensure_manual_observation_schema(conn)
     payload = _canonical(fields)
     digest = hashlib.sha256(payload.encode("utf-8")).hexdigest()
@@ -87,13 +104,6 @@ def append_manual_observation(
             supersedes_id,
             digest,
         )
-        projection = (
-            fields["ticker"],
-            fields["field_name"],
-            fields["value"],
-            fields["source_ref"],
-            fields["as_of"],
-        )
         if _is_sqlite(conn):
             conn.execute(
                 """
@@ -104,6 +114,17 @@ def append_manual_observation(
                 """,
                 values,
             )
+            winner = conn.execute(
+                """
+                SELECT ticker, field_name, value, source_ref, as_of
+                FROM manual_observations
+                WHERE ticker = ? AND field_name = ?
+                ORDER BY as_of DESC, recorded_at DESC, observation_id DESC
+                LIMIT 1
+                """,
+                (fields["ticker"], fields["field_name"]),
+            ).fetchone()
+            assert winner is not None
             conn.execute(
                 """
                 INSERT INTO manual_fields (
@@ -114,7 +135,7 @@ def append_manual_observation(
                     source_note=excluded.source_note,
                     updated_at=excluded.updated_at
                 """,
-                projection,
+                tuple(winner),
             )
         else:
             with conn.cursor() as cursor:
@@ -130,6 +151,19 @@ def append_manual_observation(
                 )
                 cursor.execute(
                     """
+                    SELECT ticker, field_name, value, source_ref, as_of
+                    FROM manual_observations
+                    WHERE ticker = %s AND field_name = %s
+                    ORDER BY as_of DESC, recorded_at DESC, observation_id DESC
+                    LIMIT 1
+                    """,
+                    (fields["ticker"], fields["field_name"]),
+                )
+                winner = cursor.fetchone()
+                if winner is None:
+                    raise RuntimeError("manual observation insert has no projection winner")
+                cursor.execute(
+                    """
                     INSERT INTO manual_fields (
                         ticker, field_name, value, source_note, updated_at
                     ) VALUES (%s, %s, %s, %s, %s)
@@ -138,7 +172,7 @@ def append_manual_observation(
                         source_note=EXCLUDED.source_note,
                         updated_at=EXCLUDED.updated_at
                     """,
-                    projection,
+                    tuple(winner),
                 )
         if commit:
             conn.commit()

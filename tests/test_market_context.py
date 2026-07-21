@@ -50,3 +50,26 @@ def test_tradeability_snapshot_quarantines_invalid_history(rows) -> None:
 
     assert result["status"] == "quarantined"
     assert result["blockers"]
+
+
+def test_tradeability_snapshot_requires_twenty_unique_sessions() -> None:
+    rows = [
+        {
+            "as_of": f"2026-07-{day:02d}T16:00:00+00:00",
+            "close": 10.0,
+            "volume": 100.0,
+        }
+        for day in range(1, 20)
+    ]
+    rows.append(dict(rows[-1]))
+
+    result = build_tradeability_snapshot(
+        ticker="FRA:2DG",
+        currency="EUR",
+        rows=rows,
+        fetched_at="2026-07-21T17:00:00+00:00",
+        source="fixture://history",
+    )
+
+    assert result["status"] == "quarantined"
+    assert "market_history_insufficient_sessions" in result["blockers"]

@@ -17,6 +17,7 @@ class LaterMarket:
     def observe(self, *_args, **_kwargs) -> MarketObservation:
         return MarketObservation(
             status="observed",
+            ticker="SIVE.ST",
             price=99.0,
             currency="SEK",
             source="fixture://later",

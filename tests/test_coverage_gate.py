@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from decision_lab.context import build_context_bundle, holdings_digest
+from decision_lab.context import build_context_bundle, holdings_snapshot_digest
 from decision_lab.coverage import assess_coverage
 from decision_lab.store import DecisionStore
 from storage.relational import initialize_private_root
@@ -27,14 +27,28 @@ def _store(tmp_path: Path) -> DecisionStore:
     return store
 
 
-def _bundle(store: DecisionStore, *, evidence=None, financial=None):
+def _bundle(
+    store: DecisionStore,
+    *,
+    evidence=None,
+    financial=None,
+    holdings=None,
+    execution_market=None,
+    execution_fx=None,
+):
     inputs = complete_inputs()
     if evidence is not None:
         inputs["evidence"] = evidence
     if financial is not None:
         inputs["financial"] = financial
+    if holdings is not None:
+        inputs["holdings"] = holdings
     store.record_holdings_confirmation(
-        holdings_digest(inputs["holdings"]["rows"]),
+        holdings_snapshot_digest(
+            inputs["holdings"]["rows"],
+            nav_base=inputs["holdings"].get("nav_base"),
+            base_currency=inputs["holdings"].get("base_currency"),
+        ),
         confirmed_at="2026-07-21T09:00:00+00:00",
     )
     cohort_id = store.ensure_cohort(
@@ -44,7 +58,10 @@ def _bundle(store: DecisionStore, *, evidence=None, financial=None):
     ).cohort_id
     return build_context_bundle(
         store, cohort_id=cohort_id, evaluation_at=NOW,
-        policy_version="probe-v1", **inputs
+        policy_version="probe-v1",
+        execution_market=execution_market,
+        execution_fx=execution_fx,
+        **inputs,
     )
 
 
@@ -171,14 +188,39 @@ def test_stale_financial_snapshot_blocks_paper_lane_but_keeps_research_state(
     store = _store(tmp_path)
     inputs = complete_inputs()
     inputs["financial"]["as_of"] = "2026-06-01T00:00:00+00:00"
+    inputs["holdings"].update({"nav_base": 10_000.0, "base_currency": "USD"})
     try:
         result = _assess(
             store,
-            _bundle(store, financial=inputs["financial"]),
+            _bundle(
+                store,
+                financial=inputs["financial"],
+                holdings=inputs["holdings"],
+                execution_market={
+                    "status": "observed",
+                    "ticker": "FRA:2DG",
+                    "price": 10.0,
+                    "currency": "EUR",
+                    "adv20": 100.0,
+                    "as_of": "2026-07-21T10:00:00+00:00",
+                    "fetched_at": "2026-07-21T10:01:00+00:00",
+                    "unit_status": "ok",
+                    "source": "fixture://fra-market",
+                },
+                execution_fx={
+                    "status": "observed",
+                    "pair": "EUR/USD",
+                    "rate": 1.2,
+                    "as_of": "2026-07-21T10:00:00+00:00",
+                    "fetched_at": "2026-07-21T10:01:00+00:00",
+                    "source": "fixture://eur-usd",
+                },
+            ),
         )
 
         assert result.status == "analyzable"
         assert result.paper_context_ready is False
+        assert result.live_context_ready is True
         assert "financial_stale" in result.paper_blockers
     finally:
         store.close()

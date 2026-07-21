@@ -95,7 +95,17 @@ def assess_coverage(
         for blocker in (section.get("blockers") or [f"{section.get('status')}_data"])
     )
     holdings = payload["holdings"]
-    live_blockers = tuple(holdings.get("blockers") or ())
+    live_blockers = tuple(
+        blocker
+        for section in (
+            holdings,
+            payload.get("execution_market") or {},
+            payload.get("execution_fx") or {},
+        )
+        if section.get("status")
+        not in {"confirmed", "confirmed_empty", "available", "observed"}
+        for blocker in (section.get("blockers") or [f"{section.get('status')}_data"])
+    )
     status = "coverage_pending" if blockers else "analyzable"
     stored = store.record_coverage_assessment(
         cohort_id=bundle.cohort_id,
@@ -122,8 +132,8 @@ def assess_coverage(
         paper_context_ready=status == "analyzable" and not paper_blockers,
         live_context_ready=(
             status == "analyzable"
-            and not paper_blockers
             and holdings.get("status") in {"confirmed", "confirmed_empty"}
+            and not live_blockers
         ),
         paper_supported_position=0.0,
         live_supported_range=(0.0, 0.0),

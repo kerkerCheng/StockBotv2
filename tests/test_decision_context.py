@@ -149,6 +149,89 @@ def test_holdings_confirmation_is_digest_bound_and_retrieval_is_not_confirmation
         store.close()
 
 
+def test_secret_in_benign_external_value_is_rejected_before_persistence(
+    tmp_path: Path,
+) -> None:
+    store = _store(tmp_path)
+    inputs = complete_inputs()
+    inputs["market"]["source"] = "postgresql://user:canary-password@example/db"
+    try:
+        with pytest.raises(ValueError, match="secret-bearing"):
+            build_context_bundle(
+                store,
+                cohort_id=_cohort(store, "secret-value"),
+                evaluation_at=NOW,
+                policy_version="probe-v1",
+                **inputs,
+            )
+        assert store.table_count("context_bundles") == 0
+    finally:
+        store.close()
+
+
+def test_future_manual_runway_cannot_complete_current_financial_context(
+    tmp_path: Path,
+) -> None:
+    store = _store(tmp_path)
+    inputs = complete_inputs()
+    inputs["financial"].update(
+        {
+            "cash_and_equivalents": None,
+            "total_debt": None,
+            "free_cash_flow_ttm": None,
+            "manual_runway": {
+                "cash_and_equivalents": 100.0,
+                "total_debt": 0.0,
+                "free_cash_flow_ttm": -50.0,
+                "source": "fixture://future-filing",
+                "as_of": "2027-01-01T00:00:00+00:00",
+            },
+        }
+    )
+    try:
+        bundle = build_context_bundle(
+            store,
+            cohort_id=_cohort(store, "future-runway"),
+            evaluation_at=NOW,
+            policy_version="probe-v1",
+            **inputs,
+        )
+
+        assert bundle.payload["financial"]["runway"]["status"] == "manual_required"
+        assert "financial_runway_timestamp_future" in bundle.payload["financial"][
+            "blockers"
+        ]
+    finally:
+        store.close()
+
+
+def test_context_identity_cannot_cross_fund_a_different_cohort(tmp_path: Path) -> None:
+    store = _store(tmp_path)
+    inputs = complete_inputs()
+    inputs["identity"].update(
+        {
+            "company_id": "co:axt",
+            "research_ticker": "AXTI",
+            "execution_symbol": "AXTI",
+            "market_currency": "USD",
+            "execution_currency": "USD",
+            "execution_venue": "NASDAQ",
+        }
+    )
+    try:
+        with pytest.raises(ValueError, match="cohort authority"):
+            build_context_bundle(
+                store,
+                cohort_id=_cohort(store, "cross-company"),
+                evaluation_at=NOW,
+                policy_version="probe-v1",
+                **inputs,
+            )
+        assert store.table_count("context_bundles") == 0
+    finally:
+        store.close()
+
+
 def test_confirmed_empty_malformed_missing_and_unavailable_are_distinct(
     tmp_path: Path,
 ) -> None:

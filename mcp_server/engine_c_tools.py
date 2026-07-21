@@ -18,7 +18,7 @@ def get_financial_checklist_core(
     *,
     checklist_getter: Callable[[str], dict[str, Any]] | None = None,
     connection_factory: Callable[[], Any] | None = None,
-    sqlite_path: str | Path | None = engine_db._SQLITE_PATH,
+    sqlite_path: str | Path | None = None,
     policy: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Return five checklist items, raw coverage, and a query-time policy view."""
@@ -37,6 +37,19 @@ def get_financial_checklist_core(
 
     current_policy = validate_policy(policy) if policy is not None else load_policy()
     unknown_view = coverage_policy_view(None, policy=current_policy)
+    if not engine_db._use_postgres() and sqlite_path is None:
+        try:
+            sqlite_path = engine_db.sqlite_path()
+        except RuntimeError as exc:
+            return {
+                "ticker": normalized,
+                "engine_c_available": False,
+                "items": {},
+                "gate_pass": False,
+                "raw_coverage_observation": None,
+                "policy_view": unknown_view,
+                "note": f"Engine C SQLite authority 無法解析：{exc}",
+            }
     if not engine_db._use_postgres() and sqlite_path is not None and not Path(sqlite_path).exists():
         return {
             "ticker": normalized,

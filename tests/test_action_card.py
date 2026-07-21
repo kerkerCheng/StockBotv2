@@ -11,7 +11,7 @@ from decision_lab.execution import (
     prepare_managed_action,
     record_live_fill,
 )
-from decision_lab.outcomes import trigger_review_required
+from decision_lab.outcomes import close_probe, trigger_review_required
 from tests.test_decision_execution import _bundle, _store
 from tests.test_probe_sizing import _assessment
 
@@ -131,6 +131,12 @@ def test_secret_bearing_optional_context_is_rejected_before_render(tmp_path: Pat
                 decision.decision_id,
                 change_context={"api_token": "CANARY-DO-NOT-LEAK"},
             )
+        with pytest.raises(RedactionError, match="secret"):
+            build_action_card(
+                store,
+                decision.decision_id,
+                change_context={"notes": "Authorization: Bearer CANARY-DO-NOT-LEAK"},
+            )
     finally:
         store.close()
 
@@ -197,5 +203,132 @@ def test_review_required_lifecycle_forces_48h_review_without_optional_context(
         assert card["urgency"] == "within_48h"
         assert card["lifecycle"]["status"] == "review_required"
         assert card["lifecycle"]["review_due_at"] == "2026-07-23T12:10:00+00:00"
+    finally:
+        store.close()
+
+
+def test_action_card_rechecks_frozen_freshness_at_render_time(tmp_path: Path) -> None:
+    store = _store(tmp_path)
+    try:
+        decision = _decision(store, key="stale-card")
+        card = build_action_card(
+            store,
+            decision.decision_id,
+            as_of="2026-08-10T12:00:00+00:00",
+        )
+
+        assert card["action"] == "REVIEW"
+        assert card["urgency"] == "data_refresh"
+        assert card["paper"]["status"] == "DATA_NEEDED"
+        assert card["live"]["supported_shares"] is None
+        assert any("stale_since_decision" in item for item in card["blockers"])
+    finally:
+        store.close()
+
+
+def test_terminal_probe_never_reuses_old_decision_to_open_position(tmp_path: Path) -> None:
+    store = _store(tmp_path)
+    try:
+        decision = _decision(store, key="terminal-card")
+        cohort_id = store.get_decision(decision.decision_id)["cohort_id"]
+        close_probe(
+            store,
+            cohort_id,
+            terminal_status="rejected",
+            claim_correctness="false",
+            current_market={"status": "missing"},
+            benchmark={"status": "missing"},
+            reason="Claim disproved",
+            evidence_refs=["fixture://counter"],
+            effective_at="2026-07-21T13:00:00+00:00",
+        )
+
+        card = build_action_card(
+            store, decision.decision_id, as_of="2026-07-21T13:05:00+00:00"
+        )
+        assert card["action"] == "REVIEW"
+        assert card["scope"]["single_name"] == "terminal_unwind_review"
+    finally:
+        store.close()
+
+
+def test_disproof_review_remains_primary_when_portfolio_is_over_cap(
+    tmp_path: Path,
+) -> None:
+    store = _store(tmp_path)
+    try:
+        decision = _decision(store, key="review-and-hedge")
+        cohort_id = store.get_decision(decision.decision_id)["cohort_id"]
+        trigger_review_required(
+            store,
+            cohort_id,
+            reason="Customer qualification failed",
+            evidence_refs=["fixture://customer"],
+            effective_at="2026-07-21T12:10:00+00:00",
+        )
+        card = build_action_card(
+            store,
+            decision.decision_id,
+            as_of="2026-07-21T12:20:00+00:00",
+            portfolio_context={"status": "over_cap", "factor": "photonics"},
+        )
+
+        assert card["action"] == "REVIEW"
+        assert card["urgency"] == "within_48h"
+        assert card["scope"]["portfolio"] == "reduce_or_hedge:photonics"
+    finally:
+        store.close()
+
+
+def test_new_live_choice_requires_its_own_fill(tmp_path: Path) -> None:
+    store = _store(tmp_path)
+    try:
+        decision = _decision(store, key="choice-link")
+        first = prepare_managed_action(
+            store,
+            action_type="live_override",
+            target_id=decision.decision_id,
+            payload={"selected_weight": 0.01, "reason": "first"},
+            prepared_at="2026-07-21T12:00:00+00:00",
+            expires_at="2026-07-21T13:00:00+00:00",
+        )
+        apply_live_override(
+            store,
+            first.action_id,
+            first.digest,
+            native_approved=True,
+            decided_at="2026-07-21T12:05:00+00:00",
+        )
+        record_live_fill(
+            store,
+            decision.decision_id,
+            execution_ref="manual:first-fill",
+            shares=10,
+            price=2.0,
+            currency="EUR",
+            executed_at="2026-07-21T12:10:00+00:00",
+            explicit=True,
+        )
+        second = prepare_managed_action(
+            store,
+            action_type="live_override",
+            target_id=decision.decision_id,
+            payload={"selected_weight": 0.02, "reason": "second"},
+            prepared_at="2026-07-21T12:15:00+00:00",
+            expires_at="2026-07-21T13:00:00+00:00",
+        )
+        apply_live_override(
+            store,
+            second.action_id,
+            second.digest,
+            native_approved=True,
+            decided_at="2026-07-21T12:20:00+00:00",
+        )
+
+        card = build_action_card(
+            store, decision.decision_id, as_of="2026-07-21T12:25:00+00:00"
+        )
+        assert card["live"]["fill_reported"] is False
+        assert card["scope"]["single_name"] == "execute_confirmed_live_choice"
     finally:
         store.close()

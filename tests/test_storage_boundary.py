@@ -87,3 +87,25 @@ def test_non_owner_only_existing_root_fails_closed(
             private_root=private_root,
             repo_root=repo,
         )
+
+
+def test_nonexistent_child_does_not_skip_existing_reparse_ancestor(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    private_root = tmp_path / "private"
+    initialize_private_root(private_root, repo_root=repo)
+    junction = private_root / "junction"
+    junction.mkdir()
+    monkeypatch.setattr(
+        "storage.relational._is_reparse_point",
+        lambda path: path == junction,
+    )
+
+    with pytest.raises(PrivateStorageError, match="reparse"):
+        validate_private_destination(
+            junction / "not-created" / "decision.db",
+            private_root=private_root,
+            repo_root=repo,
+        )

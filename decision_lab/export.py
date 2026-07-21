@@ -4,6 +4,7 @@ from __future__ import annotations
 import json
 import os
 import sqlite3
+from collections import Counter
 from pathlib import Path
 
 from storage.relational import validate_private_destination
@@ -23,12 +24,17 @@ def export_redacted_summary(
 ) -> Path:
     repo = repo_root.resolve()
     target = destination.resolve()
+    export_root = (repo / "diagnostics" / "decision_lab").resolve()
     try:
-        target.relative_to(repo)
+        target.relative_to(export_root)
     except ValueError as exc:
-        raise ExportError("redacted tracked export must stay inside the repository") from exc
+        raise ExportError(
+            "redacted tracked export must stay under diagnostics/decision_lab"
+        ) from exc
     if target.suffix.lower() != ".json":
         raise ExportError("redacted export must be JSON")
+    if target.exists():
+        raise ExportError("redacted export refuses to overwrite an existing file")
     allowed_tables = (
         "decision_cohorts",
         "system_decisions",
@@ -37,10 +43,14 @@ def export_redacted_summary(
         "outcome_envelopes",
         "research_work_orders",
     )
+    violation_counts = Counter(
+        violation.split(":", 1)[0]
+        for violation in store.lifecycle_invariant_violations()
+    )
     payload = {
         "schema": "decision-lab-redacted-summary-v1",
         "counts": {table: store.table_count(table) for table in allowed_tables},
-        "lifecycle_invariant_violations": store.lifecycle_invariant_violations(),
+        "lifecycle_invariant_violations": dict(sorted(violation_counts.items())),
     }
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text(

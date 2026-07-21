@@ -2,17 +2,11 @@
 from __future__ import annotations
 
 import math
-import re
-from copy import deepcopy
+from datetime import datetime, timedelta, timezone
 from typing import Any, Mapping, Sequence
 
+from .redaction import sensitive_payload_path
 from .store import DecisionStore
-
-
-_SENSITIVE_KEY = re.compile(
-    r"password|passwd|token|secret|credential|service.?account|dsn|private.?key",
-    re.IGNORECASE,
-)
 
 
 class RedactionError(ValueError):
@@ -20,14 +14,9 @@ class RedactionError(ValueError):
 
 
 def assert_safe_payload(value: Any, path: str = "root") -> None:
-    if isinstance(value, Mapping):
-        for key, child in value.items():
-            if _SENSITIVE_KEY.search(str(key)):
-                raise RedactionError(f"secret-bearing field rejected at {path}.{key}")
-            assert_safe_payload(child, f"{path}.{key}")
-    elif isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
-        for index, child in enumerate(value):
-            assert_safe_payload(child, f"{path}[{index}]")
+    sensitive = sensitive_payload_path(value, path)
+    if sensitive is not None:
+        raise RedactionError(f"secret-bearing value rejected at {sensitive}")
 
 
 def _finite(value: Any) -> float | None:
@@ -88,10 +77,65 @@ def _freshness(context: Mapping[str, Any]) -> dict[str, Any]:
     return result
 
 
+def _time(value: Any, field: str) -> datetime:
+    if not isinstance(value, str):
+        raise ValueError(f"{field} must be an ISO-8601 timestamp")
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError as exc:
+        raise ValueError(f"{field} must be an ISO-8601 timestamp") from exc
+    if parsed.tzinfo is None:
+        raise ValueError(f"{field} must include timezone")
+    return parsed
+
+
+def _runtime_freshness(
+    context: Mapping[str, Any], as_of: str
+) -> tuple[dict[str, Any], tuple[str, ...], tuple[str, ...]]:
+    now = _time(as_of, "as_of")
+    policy = context.get("freshness_policy") or {}
+    specs = {
+        "market": ("market_freshness_hours", "hours", "paper"),
+        "fx": ("fx_freshness_hours", "hours", "paper"),
+        "financial": ("financial_freshness_days", "days", "paper"),
+        "execution_market": ("market_freshness_hours", "hours", "live"),
+        "execution_fx": ("fx_freshness_hours", "hours", "live"),
+        "holdings": ("holdings_freshness_days", "days", "live"),
+    }
+    result = _freshness(context)
+    paper: list[str] = []
+    live: list[str] = []
+    for section, (policy_key, unit, lane) in specs.items():
+        payload = context.get(section) or {}
+        status = str(payload.get("status") or "missing")
+        accepted = {"available"} if section != "holdings" else {
+            "confirmed",
+            "confirmed_empty",
+        }
+        if status not in accepted:
+            continue
+        source_time = _time(
+            payload.get("as_of") or payload.get("confirmed_at"),
+            f"{section}.as_of",
+        )
+        amount = _finite(policy.get(policy_key))
+        if amount is None or amount <= 0 or source_time > now:
+            stale = True
+        else:
+            limit = timedelta(**{unit: amount})
+            stale = now - source_time > limit
+        if stale:
+            blocker = f"{section}_stale_since_decision"
+            (paper if lane == "paper" else live).append(blocker)
+            result[section]["status"] = "stale_since_decision"
+    return result, tuple(sorted(paper)), tuple(sorted(live))
+
+
 def build_action_card(
     store: DecisionStore,
     decision_id: str,
     *,
+    as_of: str | None = None,
     change_context: Mapping[str, Any] | None = None,
     portfolio_context: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
@@ -100,13 +144,32 @@ def build_action_card(
     assert_safe_payload(change_context or {})
     assert_safe_payload(portfolio_context or {})
     decision = store.get_decision(decision_id)
+    card_as_of = as_of or datetime.now(timezone.utc).isoformat()
+    if _time(card_as_of, "as_of") < _time(decision["effective_at"], "decision.effective_at"):
+        raise ValueError("Action Card as_of cannot predate the decision")
     payload = decision["payload"]
     sizing = payload["sizing"]
     context = store.get_context_bundle(decision["context_digest"]).payload
-    paper_event = store.paper_event_for_decision(decision_id)
+    company_id = str(context["identity"].get("company_id") or "")
+    paper_position = store.paper_position_state(company_id)
     live_choice = store.latest_live_choice(decision_id)
     live_fill = store.latest_live_fill(decision_id)
+    if (
+        live_fill is not None
+        and live_choice is not None
+        and live_fill.get("choice_id") != live_choice.get("choice_id")
+    ):
+        live_fill = None
     lifecycle = store.current_lifecycle(decision["cohort_id"])
+    lifecycle_started_at = store.lifecycle_epoch_started_at(
+        decision["cohort_id"], lifecycle.epoch
+    )
+    revised_decision_stale = bool(
+        lifecycle.epoch > 1
+        and lifecycle_started_at
+        and _time(decision["effective_at"], "decision.effective_at")
+        < _time(lifecycle_started_at, "lifecycle.started_at")
+    )
     alpha_beta = _alpha_beta(change_context)
     disproof_triggered = bool(
         (change_context or {}).get("disproof_triggered")
@@ -118,8 +181,54 @@ def build_action_card(
     portfolio_status = str((portfolio_context or {}).get("status") or "ok")
     live_status = str(sizing["live_status"])
     paper_status = str(sizing["paper_status"])
+    freshness, current_paper_blockers, current_live_blockers = _runtime_freshness(
+        context, card_as_of
+    )
+    if current_paper_blockers:
+        paper_status = "DATA_NEEDED"
+    if current_live_blockers:
+        live_status = "DATA_NEEDED"
 
-    if portfolio_status == "over_cap":
+    if disproof_triggered:
+        action = "REVIEW"
+        urgency = "within_48h"
+        if portfolio_status == "over_cap":
+            factor = str((portfolio_context or {}).get("factor") or "unknown_factor")
+            portfolio_action = f"reduce_or_hedge:{factor}"
+        else:
+            portfolio_action = "none"
+        single_name_action = "mandatory_thesis_review"
+        reason = "可證偽條件已被標記觸發，需要在 48 小時內重新審查。"
+        next_action = "核對觸發證據；同時執行必要的投組降險，再決定 rejected 或 revised。"
+    elif lifecycle.status in {"rejected", "expired"}:
+        action = "REVIEW"
+        urgency = "prompt"
+        portfolio_action = "none"
+        single_name_action = "terminal_unwind_review"
+        reason = f"Probe 已進入 terminal 狀態 {lifecycle.status}，不得沿用舊建議新增部位。"
+        next_action = "檢查 paper/live 殘餘部位並決定減碼、出場或僅保留歷史紀錄。"
+    elif lifecycle.status == "promoted":
+        action = "REVIEW"
+        urgency = "next_review"
+        portfolio_action = "none"
+        single_name_action = "handoff_to_formal_lane"
+        reason = "Probe 已升格；舊 Probe sizing 不再授權新交易。"
+        next_action = "使用 formal Watchlist／Underwrite 規則重新產生部位建議。"
+    elif revised_decision_stale:
+        action = "REVIEW"
+        urgency = "prompt"
+        portfolio_action = "none"
+        single_name_action = "reassess_revised_epoch"
+        reason = "Thesis 已 revised；舊 epoch 的 decision 不再授權新交易。"
+        next_action = "在新 epoch 重新 freeze context、coverage 與 sizing。"
+    elif current_paper_blockers or current_live_blockers:
+        action = "REVIEW"
+        urgency = "data_refresh"
+        portfolio_action = "none"
+        single_name_action = "refresh_and_reassess"
+        reason = "凍結決策的必要市場、財務或持倉資料已過期。"
+        next_action = "重新 freeze context 並 assess；舊 card 只保留歷史用途。"
+    elif portfolio_status == "over_cap":
         factor = str((portfolio_context or {}).get("factor") or "unknown_factor")
         action = "HEDGE"
         urgency = "prompt"
@@ -130,13 +239,6 @@ def build_action_card(
             or "投組 factor exposure 超過上限。"
         )
         next_action = f"決定要降低或對沖 {factor} 曝險；資料不足時不輸出單位數。"
-    elif disproof_triggered:
-        action = "REVIEW"
-        urgency = "within_48h"
-        portfolio_action = "none"
-        single_name_action = "mandatory_thesis_review"
-        reason = "可證偽條件已被標記觸發，需要在 48 小時內重新審查。"
-        next_action = "核對觸發證據並決定 rejected、revised 或 promoted。"
     elif live_fill is not None:
         action = "NO_ACTION"
         urgency = "routine"
@@ -158,6 +260,29 @@ def build_action_card(
         single_name_action = "execute_confirmed_live_choice"
         reason = "使用者已明確接受 live 配置，但尚未回報手動成交。"
         next_action = "手動下單後回報 execution reference；系統不會連接 broker。"
+    elif (
+        live_status == "ELIGIBLE"
+        and float(sizing["live_current_position"])
+        > float(sizing["live_supported_range"][1]) + 1e-12
+    ):
+        action = "REVIEW"
+        urgency = "prompt"
+        portfolio_action = "none"
+        single_name_action = "reduce_to_supported_range"
+        reason = "目前 live 部位高於研究所支持的上限。"
+        next_action = "檢視減碼或保留 override 的理由；系統不會自動下單。"
+    elif (
+        live_status == "ELIGIBLE"
+        and float(sizing["live_supported_range"][0]) - 1e-12
+        <= float(sizing["live_current_position"])
+        <= float(sizing["live_supported_range"][1]) + 1e-12
+    ):
+        action = "NO_ACTION"
+        urgency = "routine"
+        portfolio_action = "none"
+        single_name_action = "hold_within_supported_range"
+        reason = "目前 live 部位已在研究支持區間內。"
+        next_action = "維持部位並依 catalyst／expiry 日曆追蹤。"
     elif live_status == "ELIGIBLE":
         action = "TRADE"
         urgency = "user_decision"
@@ -200,12 +325,15 @@ def build_action_card(
         set(sizing.get("assessment_blockers", []))
         | set(sizing.get("paper_blockers", []))
         | set(sizing.get("live_blockers", []))
+        | set(current_paper_blockers)
+        | set(current_live_blockers)
     )
     card = {
         "schema_version": "action-card-v1",
         "decision_id": decision_id,
         "decision_digest": decision["decision_digest"],
-        "company_id": context["identity"].get("company_id"),
+        "as_of": card_as_of,
+        "company_id": company_id,
         "action": action,
         "urgency": urgency,
         "scope": {
@@ -218,6 +346,7 @@ def build_action_card(
             "epoch": lifecycle.epoch,
             "status": lifecycle.status,
             "review_due_at": lifecycle.review_due_at,
+            "started_at": lifecycle_started_at,
         },
         "weakest_link": {
             "axis": axis,
@@ -227,8 +356,9 @@ def build_action_card(
         },
         "paper": {
             "status": paper_status,
-            "funded": paper_event is not None,
-            "event_id": paper_event["paper_event_id"] if paper_event else None,
+            "funded": float(paper_position["weight"]) > 0,
+            "event_id": paper_position["source_event_id"],
+            "current_position": paper_position["weight"],
             "target": sizing["paper_target"],
             "max_supported_position": sizing["paper_max_supported_position"],
         },
@@ -240,7 +370,7 @@ def build_action_card(
             "user_choice": live_choice,
             "fill_reported": live_fill is not None,
         },
-        "freshness": _freshness(context),
+        "freshness": freshness,
         "blockers": blockers,
         "sources": sources,
         "policy_version": sizing["policy_version"],
@@ -248,7 +378,7 @@ def build_action_card(
         "next_action": next_action,
     }
     assert_safe_payload(card)
-    return deepcopy(card)
+    return card
 
 
 def render_markdown(card: Mapping[str, Any]) -> str:

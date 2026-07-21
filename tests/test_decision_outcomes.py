@@ -29,6 +29,7 @@ def _captured(store, *, status="observed"):
     observation = (
         MarketObservation(
             status="observed",
+            ticker="SIVE.ST",
             price=10.0,
             currency="SEK",
             source="fixture://market",
@@ -72,6 +73,7 @@ def test_claim_correctness_is_separate_from_market_and_benchmark_return(
             claim_correctness="unknown",
             current_market={
                 "status": "observed",
+                "ticker": "SIVE.ST",
                 "price": 12.0,
                 "currency": "SEK",
                 "as_of": "2026-12-31T10:00:00+00:00",
@@ -83,6 +85,7 @@ def test_claim_correctness_is_separate_from_market_and_benchmark_return(
                 "start_price": 100.0,
                 "end_price": 110.0,
                 "source": "fixture://benchmark",
+                "start_as_of": "2026-07-01T10:00:00+00:00",
                 "as_of": "2026-12-31T10:00:00+00:00",
             },
             reason="Claim expiry reached without decisive proof",
@@ -94,6 +97,79 @@ def test_claim_correctness_is_separate_from_market_and_benchmark_return(
         assert result.absolute_return == pytest.approx(0.20)
         assert result.benchmark_adjusted_return == pytest.approx(0.10)
         assert result.claim_correctness != "true"
+    finally:
+        store.close()
+
+
+@pytest.mark.parametrize(
+    "market, message",
+    [
+        (
+            {
+                "status": "observed",
+                "ticker": "ERIC-B.ST",
+                "price": 12.0,
+                "currency": "SEK",
+                "as_of": "2026-08-01T10:00:00+00:00",
+                "source": "fixture://wrong-security",
+            },
+            "ticker",
+        ),
+        (
+            {
+                "status": "observed",
+                "ticker": "SIVE.ST",
+                "price": 12.0,
+                "currency": "SEK",
+                "as_of": "2026-06-30T10:00:00+00:00",
+                "source": "fixture://pre-inception",
+            },
+            "predates",
+        ),
+    ],
+)
+def test_outcome_market_is_bound_to_cohort_identity_and_shadow_window(
+    tmp_path: Path,
+    market: dict,
+    message: str,
+) -> None:
+    store = _store(tmp_path)
+    try:
+        captured = _captured(store)
+        with pytest.raises(OutcomeError, match=message):
+            close_probe(
+                store,
+                captured.cohort_id,
+                terminal_status="expired",
+                claim_correctness="unknown",
+                current_market=market,
+                benchmark={"status": "missing"},
+                reason="Window validation",
+                evidence_refs=["fixture://review"],
+                effective_at="2026-08-01T12:00:00+00:00",
+            )
+        assert store.table_count("outcome_envelopes") == 0
+    finally:
+        store.close()
+
+
+def test_outcome_secret_in_reason_never_enters_store(tmp_path: Path) -> None:
+    store = _store(tmp_path)
+    try:
+        captured = _captured(store)
+        with pytest.raises(OutcomeError, match="secret-bearing"):
+            close_probe(
+                store,
+                captured.cohort_id,
+                terminal_status="expired",
+                claim_correctness="unknown",
+                current_market={"status": "missing"},
+                benchmark={"status": "missing"},
+                reason="Authorization: Bearer CANARY-DO-NOT-LEAK",
+                evidence_refs=["fixture://review"],
+                effective_at="2026-08-01T12:00:00+00:00",
+            )
+        assert store.table_count("outcome_envelopes") == 0
     finally:
         store.close()
 
@@ -112,6 +188,7 @@ def test_missing_inception_never_hindsight_backfills_market_return(
             claim_correctness="false",
             current_market={
                 "status": "observed",
+                "ticker": "SIVE.ST",
                 "price": 12.0,
                 "currency": "SEK",
                 "as_of": "2026-08-01T10:00:00+00:00",
@@ -248,6 +325,53 @@ def test_outcome_freezes_system_vs_user_choice_and_calculator_trace(
         assert frozen["decision_attribution"]["user_choice_type"] == "skipped"
         assert frozen["calculator_version"] == "probe-limit-v1"
         assert frozen["constraint_trace"]
+    finally:
+        store.close()
+
+
+def test_outcome_attributes_actual_paper_book_not_latest_blocked_recommendation(
+    tmp_path: Path,
+) -> None:
+    store = _store(tmp_path)
+    try:
+        bundle, coverage = _bundle(store, "outcome-book")
+        funded = assess_probe(
+            store,
+            bundle,
+            coverage,
+            _assessment(),
+            idempotency_key="outcome:funded",
+            effective_at="2026-07-21T12:00:00+00:00",
+        )
+        blocked = assess_probe(
+            store,
+            bundle,
+            coverage,
+            _assessment(commercial="unknown"),
+            idempotency_key="outcome:blocked",
+            effective_at="2026-07-22T12:00:00+00:00",
+        )
+        assert funded.paper_funded is True
+        assert blocked.paper_funded is False
+        assert store.paper_position("co:sivers_semiconductors") == pytest.approx(0.0035)
+
+        result = close_probe(
+            store,
+            bundle.cohort_id,
+            terminal_status="expired",
+            claim_correctness="mixed",
+            current_market={"status": "missing"},
+            benchmark={"status": "missing"},
+            reason="Review horizon ended",
+            evidence_refs=["fixture://review"],
+            effective_at="2026-10-21T12:00:00+00:00",
+        )
+        attribution = store.get_outcome(result.outcome_id)["decision_attribution"]
+
+        assert attribution["decision_id"] == blocked.decision_id
+        assert attribution["paper_source_decision_id"] == funded.decision_id
+        assert attribution["system_paper_target"] == pytest.approx(0.0035)
+        assert attribution["latest_recommendation_target"] == 0.0
     finally:
         store.close()
 

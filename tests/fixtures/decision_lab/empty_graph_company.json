@@ -1,0 +1,121 @@
+{
+  "signal": {
+    "raw_text": "A new source claims an unmodeled analog supplier has an emerging bottleneck.",
+    "source_id": "unmodeled-source",
+    "source_uri": "fixture://signals/unmodeled-txn-claim",
+    "origin_event": "fixture:unmodeled-txn-post",
+    "observed_at": "2026-07-21T08:00:00+00:00",
+    "atomic_claim": "Texas Instruments has an unmodeled process bottleneck with near-term upside.",
+    "direction": "long",
+    "expiry": "2026-10-21T00:00:00+00:00",
+    "disproof": "The alleged bottleneck has no customer or process evidence before expiry.",
+    "evidence_tier": 4,
+    "company_id": "co:texas_instruments",
+    "research_ticker": "TXN",
+    "capture_mode": "manual",
+    "source_traced": false
+  },
+  "shadow_market": {
+    "status": "observed",
+    "ticker": "TXN",
+    "price": 200.0,
+    "currency": "USD",
+    "source": "fixture://market/txn",
+    "as_of": "2026-07-21T08:00:00+00:00",
+    "fetched_at": "2026-07-21T08:01:00+00:00"
+  },
+  "evaluation_at": "2026-07-21T12:00:00+00:00",
+  "holdings_confirmed_at": "2026-07-21T09:00:00+00:00",
+  "context": {
+    "identity": {
+      "company_id": "co:texas_instruments",
+      "research_ticker": "TXN",
+      "execution_symbol": "TXN",
+      "market_currency": "USD",
+      "execution_currency": "USD",
+      "execution_venue": "NASDAQ"
+    },
+    "evidence": {
+      "focus_company": null,
+      "subject_origin_entity": "Texas Instruments",
+      "sources": [],
+      "causal_paths": [],
+      "counter_paths": []
+    },
+    "financial": {
+      "status": "missing"
+    },
+    "market": {
+      "status": "observed",
+      "ticker": "TXN",
+      "price": 200.0,
+      "currency": "USD",
+      "adv20": 5000000.0,
+      "as_of": "2026-07-21T10:00:00+00:00",
+      "fetched_at": "2026-07-21T10:01:00+00:00",
+      "unit_status": "ok",
+      "source": "fixture://market/txn"
+    },
+    "fx": {
+      "status": "observed",
+      "pair": "USD/USD",
+      "rate": 1.0,
+      "as_of": "2026-07-21T10:00:00+00:00",
+      "fetched_at": "2026-07-21T10:01:00+00:00",
+      "source": "fixture://fx/usd-usd"
+    },
+    "holdings": {
+      "status": "available",
+      "nav_base": 10000.0,
+      "base_currency": "USD",
+      "fetched_at": "2026-07-21T11:00:00+00:00",
+      "rows": []
+    },
+    "paper_exposure": {
+      "nav": 100.0,
+      "total_weight": 0.0,
+      "company_weights": {},
+      "factor_weights": {}
+    }
+  },
+  "coverage": {
+    "catalyst": "A customer or filing identifies the process and economic conversion path.",
+    "disproof": "No attributable process or customer evidence appears before expiry.",
+    "expiry": "2026-10-21T00:00:00+00:00",
+    "decision_relevance": 5,
+    "falsifiability": 8,
+    "information_value": 7
+  },
+  "assessment": {
+    "source_reliability": {
+      "level": "corroborated",
+      "evidence_refs": ["fixture://placeholder/source"],
+      "reason": "Deliberately optimistic input must not override Coverage.",
+      "missing_data": []
+    },
+    "technical_causal_link": {
+      "level": "corroborated",
+      "evidence_refs": ["fixture://placeholder/technical"],
+      "reason": "Deliberately optimistic input must not override Coverage.",
+      "missing_data": []
+    },
+    "commercial_maturity": {
+      "level": "corroborated",
+      "evidence_refs": ["fixture://placeholder/commercial"],
+      "reason": "Deliberately optimistic input must not override Coverage.",
+      "missing_data": []
+    },
+    "financial_resilience": {
+      "level": "corroborated",
+      "evidence_refs": ["fixture://placeholder/financial"],
+      "reason": "Deliberately optimistic input must not override Coverage.",
+      "missing_data": []
+    },
+    "valuation_payoff": {
+      "level": "corroborated",
+      "evidence_refs": ["fixture://placeholder/valuation"],
+      "reason": "Deliberately optimistic input must not override Coverage.",
+      "missing_data": []
+    }
+  }
+}

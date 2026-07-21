@@ -7,6 +7,7 @@ import os
 import re
 import shutil
 import sqlite3
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Mapping
 
@@ -18,11 +19,8 @@ class BackupError(RuntimeError):
 
 
 def _sha256(path: Path) -> str:
-    digest = hashlib.sha256()
     with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
+        return hashlib.file_digest(handle, "sha256").hexdigest()
 
 
 def _sqlite_backup(source: Path, destination: Path) -> None:
@@ -36,6 +34,36 @@ def _sqlite_backup(source: Path, destination: Path) -> None:
     finally:
         target_conn.close()
         source_conn.close()
+
+
+def _verified_manifest(backup: Path) -> dict:
+    try:
+        manifest = json.loads((backup / "manifest.json").read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise BackupError("backup manifest is missing or invalid") from exc
+    if not isinstance(manifest, dict) or manifest.get("backup_id") != backup.name:
+        raise BackupError("backup manifest identity is invalid")
+    try:
+        datetime.fromisoformat(str(manifest["created_at"]).replace("Z", "+00:00"))
+    except (KeyError, ValueError) as exc:
+        raise BackupError("backup manifest created_at is invalid") from exc
+    files = manifest.get("files")
+    if not isinstance(files, dict):
+        raise BackupError("backup manifest files are invalid")
+    for name, entry in files.items():
+        filename = entry.get("filename") if isinstance(entry, dict) else None
+        if (
+            not isinstance(name, str)
+            or not isinstance(filename, str)
+            or not re.fullmatch(r"[A-Za-z0-9._-]+", filename)
+        ):
+            raise BackupError("backup manifest filename is invalid")
+        source = (backup / filename).resolve()
+        if source.parent != backup or not source.is_file():
+            raise BackupError(f"backup file is missing or escapes its directory: {name}")
+        if _sha256(source) != entry.get("sha256"):
+            raise BackupError(f"backup checksum mismatch: {name}")
+    return manifest
 
 
 def create_private_backup(
@@ -61,7 +89,11 @@ def create_private_backup(
     if destination.exists():
         raise BackupError("backup already exists")
     destination.mkdir()
-    manifest = {"backup_id": backup_id, "files": {}}
+    manifest = {
+        "backup_id": backup_id,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "files": {},
+    }
     try:
         for name, raw_source in sorted(sources.items()):
             if not re.fullmatch(r"[A-Za-z0-9._-]+", name):
@@ -86,16 +118,19 @@ def create_private_backup(
         shutil.rmtree(destination)
         raise
 
-    backups = sorted(path for path in root.iterdir() if path.is_dir())
-    for stale in backups[:-retention]:
+    verified_backups: list[tuple[str, Path]] = []
+    for candidate in root.iterdir():
+        if not candidate.is_dir():
+            continue
         resolved = validate_private_destination(
-            stale.resolve(), private_root=private, repo_root=repo_root.resolve()
+            candidate.resolve(), private_root=private, repo_root=repo_root.resolve()
         )
+        verified = _verified_manifest(resolved)
+        verified_backups.append((str(verified["created_at"]), resolved))
+    verified_backups.sort(key=lambda item: (item[0], item[1].name))
+    for _, resolved in verified_backups[:-retention]:
         if resolved == destination:
             continue
-        manifest_path = resolved / "manifest.json"
-        if not manifest_path.is_file():
-            raise BackupError(f"refusing to rotate unverified directory: {resolved.name}")
         shutil.rmtree(resolved)
     return destination
 
@@ -111,23 +146,20 @@ def restore_private_backup(
     backup = validate_private_destination(
         backup_dir.resolve(), private_root=private, repo_root=repo_root.resolve()
     )
-    try:
-        manifest = json.loads((backup / "manifest.json").read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as exc:
-        raise BackupError("backup manifest is missing or invalid") from exc
-    prepared: list[tuple[Path, Path]] = []
+    manifest = _verified_manifest(backup)
+    prepared: list[tuple[Path, Path, Path | None]] = []
+    replaced: list[tuple[Path, Path | None]] = []
     try:
         for name, raw_target in targets.items():
             entry = manifest.get("files", {}).get(name)
             if not isinstance(entry, dict):
                 raise BackupError(f"backup does not contain source: {name}")
+            filename = entry["filename"]
             source = validate_private_destination(
-                backup / entry["filename"],
+                backup / filename,
                 private_root=private,
                 repo_root=repo_root.resolve(),
             )
-            if _sha256(source) != entry.get("sha256"):
-                raise BackupError(f"backup checksum mismatch: {name}")
             target = validate_private_destination(
                 raw_target.resolve(), private_root=private, repo_root=repo_root.resolve()
             )
@@ -140,10 +172,39 @@ def restore_private_backup(
             if temp.exists():
                 temp.unlink()
             _sqlite_backup(source, temp)
-            prepared.append((temp, target))
-        for temp, target in prepared:
-            os.replace(temp, target)
+            rollback: Path | None = None
+            if target.exists():
+                if not target.is_file():
+                    raise BackupError(f"restore target is not a file: {name}")
+                rollback = validate_private_destination(
+                    target.with_suffix(target.suffix + ".restore.rollback"),
+                    private_root=private,
+                    repo_root=repo_root.resolve(),
+                )
+                if rollback.exists():
+                    rollback.unlink()
+                shutil.copy2(target, rollback)
+            prepared.append((temp, target, rollback))
+        try:
+            for temp, target, rollback in prepared:
+                os.replace(temp, target)
+                replaced.append((target, rollback))
+        except BaseException as replace_error:
+            rollback_error: BaseException | None = None
+            for target, rollback in reversed(replaced):
+                try:
+                    if rollback is None:
+                        if target.exists():
+                            target.unlink()
+                    else:
+                        os.replace(rollback, target)
+                except BaseException as exc:  # pragma: no cover - catastrophic filesystem failure
+                    rollback_error = rollback_error or exc
+            if rollback_error is not None:
+                raise BackupError("restore failed and rollback was incomplete") from rollback_error
+            raise replace_error
     finally:
-        for temp, _ in prepared:
-            if temp.exists():
-                temp.unlink()
+        for temp, _, rollback in prepared:
+            for artifact in (temp, rollback):
+                if artifact is not None and artifact.exists():
+                    artifact.unlink()

@@ -7,6 +7,7 @@ import sqlite3
 import stat
 import subprocess
 from contextlib import contextmanager
+from functools import lru_cache
 from pathlib import Path
 from typing import Callable, Iterator, Sequence
 
@@ -37,6 +38,7 @@ def _is_reparse_point(path: Path) -> bool:
     return bool(attributes & stat.FILE_ATTRIBUTE_REPARSE_POINT)
 
 
+@lru_cache(maxsize=1)
 def _current_windows_sid() -> str:
     result = subprocess.run(
         ["whoami", "/user", "/fo", "csv", "/nh"],
@@ -50,6 +52,7 @@ def _current_windows_sid() -> str:
     return row[1]
 
 
+@lru_cache(maxsize=1)
 def _current_windows_account() -> str:
     result = subprocess.run(
         ["whoami"],
@@ -221,9 +224,9 @@ def _validate_location(
     ):
         raise PrivateStorageError("private root is an unapproved repository path")
 
-    cursor = destination if destination.exists() else destination.parent
-    while cursor.exists() and _within(cursor, private_root):
-        if _is_reparse_point(cursor):
+    cursor = destination
+    while _within(cursor, private_root):
+        if cursor.exists() and _is_reparse_point(cursor):
             raise PrivateStorageError("private runtime destination contains a symlink/reparse point")
         if cursor == private_root:
             break
@@ -279,10 +282,18 @@ def validate_private_destination(
     return _resolved(destination)
 
 
-def connect_sqlite(path: Path) -> sqlite3.Connection:
+def connect_sqlite(path: Path, *, create: bool = True) -> sqlite3.Connection:
     """Open SQLite with the connection semantics shared by private stores."""
-    path.parent.mkdir(parents=True, exist_ok=True)
-    conn = sqlite3.connect(str(path), check_same_thread=False)
+    if create:
+        path.parent.mkdir(parents=True, exist_ok=True)
+    elif not path.is_file():
+        raise PrivateStorageError(f"SQLite authority is missing: {path}")
+    mode = "rwc" if create else "rw"
+    conn = sqlite3.connect(
+        f"file:{path.as_posix()}?mode={mode}",
+        uri=True,
+        check_same_thread=False,
+    )
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON")
     conn.execute("PRAGMA journal_mode = WAL")

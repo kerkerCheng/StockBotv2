@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from dataclasses import replace
 from pathlib import Path
-import sqlite3
 
 import pytest
 
@@ -16,7 +16,6 @@ from decision_lab.execution import (
     record_live_choice,
     record_live_fill,
 )
-from decision_lab.models import CoverageResult
 from decision_lab.store import DecisionStore
 from paper_portfolio.ledger import replay_decision_store_events
 from storage.relational import initialize_private_root
@@ -35,40 +34,6 @@ def _store(tmp_path: Path) -> DecisionStore:
         private_root=private_root,
         repo_root=repo,
     )
-
-
-def test_existing_pre_execution_store_adds_nullable_link_columns(tmp_path: Path) -> None:
-    repo = tmp_path / "repo"
-    repo.mkdir()
-    private_root = repo / "library" / "private"
-    initialize_private_root(private_root, repo_root=repo)
-    path = private_root / "decision_lab" / "decision_lab.db"
-    path.parent.mkdir(parents=True)
-    conn = sqlite3.connect(path)
-    conn.execute(
-        """
-        CREATE TABLE paper_events (
-            paper_event_id TEXT PRIMARY KEY,
-            cohort_id TEXT NOT NULL,
-            decision_event_id TEXT,
-            event_type TEXT NOT NULL,
-            payload_json TEXT NOT NULL,
-            payload_digest TEXT NOT NULL,
-            effective_at TEXT NOT NULL,
-            created_at TEXT NOT NULL DEFAULT (datetime('now')),
-            UNIQUE (decision_event_id, payload_digest)
-        )
-        """
-    )
-    conn.commit()
-    conn.close()
-
-    store = DecisionStore.open(path, private_root=private_root, repo_root=repo)
-    try:
-        columns = store.table_columns("paper_events")
-        assert {"decision_id", "corrects_paper_event_id", "approved_action_id"} <= columns
-    finally:
-        store.close()
 
 
 def _bundle(store: DecisionStore, key: str = "execution", *, inputs=None):
@@ -90,20 +55,21 @@ def _bundle(store: DecisionStore, key: str = "execution", *, inputs=None):
         policy_version=load_policy()["policy_version"],
         **payload,
     )
-    coverage = CoverageResult(
-        assessment_id=f"assessment:{key}",
+    stored = store.record_coverage_assessment(
         cohort_id=cohort_id,
         context_digest=bundle.digest,
         status="analyzable",
         blockers=(),
         paper_blockers=(),
         live_blockers=("holdings_unconfirmed",),
-        paper_context_ready=True,
-        live_context_ready=False,
-        paper_supported_position=0.0,
-        live_supported_range=(0.0, 0.0),
-        work_order_id=None,
+        catalyst="next filing",
+        disproof="commercial evidence fails",
+        expiry="2026-08-21T00:00:00+00:00",
+        decision_relevance=8,
+        falsifiability=8,
+        information_value=7,
     )
+    coverage = store.get_coverage_result(str(stored["assessment_id"]))
     return bundle, coverage
 
 
@@ -158,6 +124,35 @@ def test_same_idempotency_key_with_different_request_fails_closed(tmp_path: Path
         store.close()
 
 
+def test_equivalent_effective_time_offsets_are_one_idempotent_decision(
+    tmp_path: Path,
+) -> None:
+    store = _store(tmp_path)
+    try:
+        bundle, coverage = _bundle(store, "offset-retry")
+        first = assess_probe(
+            store,
+            bundle,
+            coverage,
+            _assessment(),
+            idempotency_key="assess:offset-retry",
+            effective_at="2026-07-21T13:00:00+00:00",
+        )
+        retry = assess_probe(
+            store,
+            bundle,
+            coverage,
+            _assessment(),
+            idempotency_key="assess:offset-retry",
+            effective_at="2026-07-21T09:00:00-04:00",
+        )
+
+        assert retry == first
+        assert store.table_count("system_decisions") == 1
+    finally:
+        store.close()
+
+
 @pytest.mark.parametrize(
     "failure_at",
     ["after_capacity", "after_decision", "after_paper_event", "after_projection"],
@@ -186,13 +181,34 @@ def test_failure_injection_rolls_back_decision_and_paper(
         store.close()
 
 
-def test_gate_or_stale_paper_context_records_decision_but_never_funds(tmp_path: Path) -> None:
+def test_forged_coverage_cannot_bypass_stored_pending_gate(tmp_path: Path) -> None:
     store = _store(tmp_path)
     try:
         bundle, coverage = _bundle(store)
-        pending = CoverageResult(**{**coverage.__dict__, "status": "coverage_pending"})
+        stored = store.record_coverage_assessment(
+            cohort_id=bundle.cohort_id,
+            context_digest=bundle.digest,
+            status="coverage_pending",
+            blockers=("catalyst_missing",),
+            paper_blockers=("catalyst_missing",),
+            live_blockers=("catalyst_missing",),
+            catalyst="unknown",
+            disproof="commercial evidence fails",
+            expiry="2026-08-21T00:00:00+00:00",
+            decision_relevance=8,
+            falsifiability=8,
+            information_value=7,
+        )
+        pending = store.get_coverage_result(str(stored["assessment_id"]))
+        forged = replace(
+            pending,
+            status="analyzable",
+            blockers=(),
+            paper_blockers=(),
+            paper_context_ready=True,
+        )
         result = assess_probe(
-            store, bundle, pending, _assessment(),
+            store, bundle, forged, _assessment(),
             idempotency_key="assess:pending", effective_at=NOW,
         )
 
@@ -247,6 +263,40 @@ def test_transaction_recomputes_current_paper_capacity_instead_of_stale_context(
         assert store.paper_position("co:sivers_semiconductors") == pytest.approx(0.0035)
         assert store.paper_position("co:axt") == pytest.approx(0.0015)
         assert second.paper_target != pytest.approx(0.0035)
+    finally:
+        store.close()
+
+
+def test_backdated_assess_cannot_diverge_projection_from_event_replay(
+    tmp_path: Path,
+) -> None:
+    store = _store(tmp_path)
+    try:
+        bundle, coverage = _bundle(store, "paper-order")
+        assess_probe(
+            store,
+            bundle,
+            coverage,
+            _assessment(),
+            idempotency_key="assess:paper-order:first",
+            effective_at="2026-07-21T13:00:00+00:00",
+        )
+        with pytest.raises(ValueError, match="causal timeline|follow"):
+            assess_probe(
+                store,
+                bundle,
+                coverage,
+                _assessment(commercial="bounded_hypothesis"),
+                idempotency_key="assess:paper-order:backdated",
+                effective_at="2026-07-21T12:30:00+00:00",
+            )
+
+        events = store.list_paper_events(bundle.cohort_id)
+        assert len(events) == 1
+        assert store.paper_position("co:sivers_semiconductors") == pytest.approx(0.0035)
+        assert replay_decision_store_events(events)["company_weights"][
+            "co:sivers_semiconductors"
+        ] == pytest.approx(0.0035)
     finally:
         store.close()
 
@@ -342,10 +392,44 @@ def test_above_cap_live_override_requires_prepared_exact_native_approval(
             explicit=True,
         )
 
+        with pytest.raises(ExecutionError, match="currency"):
+            record_live_fill(
+                store,
+                decision.decision_id,
+                execution_ref="manual:wrong-currency",
+                shares=10,
+                price=2.0,
+                currency="JPY",
+                executed_at="2026-07-21T12:11:00+00:00",
+                explicit=True,
+            )
+
         assert choice_id
         assert fill_id
         assert store.table_count("live_choices") == 1
         assert store.table_count("live_execution_reports") == 1
+
+        assert record_live_fill(
+            store,
+            decision.decision_id,
+            execution_ref="manual:broker-override",
+            shares=10,
+            price=2.0,
+            currency="EUR",
+            executed_at="2026-07-21T12:10:00+00:00",
+            explicit=True,
+        ) == fill_id
+        with pytest.raises(ExecutionError, match="different fill"):
+            record_live_fill(
+                store,
+                decision.decision_id,
+                execution_ref="manual:broker-override",
+                shares=11,
+                price=2.0,
+                currency="EUR",
+                executed_at="2026-07-21T12:10:00+00:00",
+                explicit=True,
+            )
     finally:
         store.close()
 
@@ -370,6 +454,15 @@ def test_paper_amendment_preserves_original_and_requires_approval(
             prepared_at=NOW,
             expires_at="2026-07-21T13:00:00+00:00",
         )
+
+        with pytest.raises(ExecutionError, match="follow"):
+            apply_paper_amendment(
+                store,
+                prepared.action_id,
+                prepared.digest,
+                native_approved=True,
+                effective_at="2026-07-21T11:59:00+00:00",
+            )
 
         amendment_id = apply_paper_amendment(
             store,

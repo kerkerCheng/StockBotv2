@@ -14,10 +14,13 @@ class GraphQueryRejected(ValueError):
 
 _WRITE_PATTERN = re.compile(
     r"\b(CREATE|MERGE|SET|DELETE|DETACH|REMOVE|DROP|FOREACH|LOAD\s+CSV)\b"
-    r"|\bCALL\s+APOC\.(CREATE|MERGE|PERIODIC|REFAC|TRIGGER)\b",
+    r"|\bCALL\b",
     re.IGNORECASE,
 )
-_READ_PREFIX = re.compile(r"^\s*(MATCH|OPTIONAL\s+MATCH|RETURN|WITH|UNWIND|SHOW|CALL\s+DB\.)\b", re.IGNORECASE)
+_READ_PREFIX = re.compile(
+    r"^\s*(MATCH|OPTIONAL\s+MATCH|RETURN|WITH|UNWIND|SHOW)\b",
+    re.IGNORECASE,
+)
 
 
 @dataclass(frozen=True)
@@ -29,7 +32,7 @@ class ReadOnlyCredential:
 
 
 class Neo4jReadOnlyQueryPort:
-    """只暴露 read query；driver 層另以 read access mode 防禦。"""
+    """只暴露無 procedure 的 read query；RBAC credential 仍是最終防線。"""
 
     def __init__(self, driver: Any, *, database: str | None = None):
         self._driver = driver
@@ -79,3 +82,75 @@ def fixture_fingerprint(snapshot: Mapping[str, Any]) -> str:
         separators=(",", ":"),
     )
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
+def live_graph_delta_diagnostic(
+    before: Mapping[str, Any],
+    after: Mapping[str, Any],
+    *,
+    attribution_by_stable_id: Mapping[str, str] | None = None,
+) -> dict[str, Any]:
+    """Compare live snapshots by stable ID without asserting equality or repairing。
+
+    Live Neo4j may legitimately change while another research agent ingests data.
+    This helper therefore emits an attributed diagnostic only; exact equality is
+    intentionally reserved for :func:`fixture_fingerprint`.
+    """
+
+    def indexed(snapshot: Mapping[str, Any], field: str, key: str) -> dict[str, Any]:
+        if field not in snapshot:
+            raise ValueError(f"live graph snapshot missing: {field}")
+        raw = snapshot[field]
+        if not isinstance(raw, list):
+            raise ValueError(f"live graph snapshot {field} must be a list")
+        result: dict[str, Any] = {}
+        for item in raw:
+            if not isinstance(item, Mapping) or not isinstance(item.get(key), str):
+                raise ValueError(f"live graph snapshot {field} lacks stable {key}")
+            stable_id = str(item[key])
+            if stable_id in result:
+                raise ValueError(f"duplicate live graph stable ID: {stable_id}")
+            result[stable_id] = _canonical(dict(item))
+        return result
+
+    attributed = dict(attribution_by_stable_id or {})
+    if any(
+        not isinstance(key, str)
+        or not key
+        or not isinstance(value, str)
+        or not value
+        for key, value in attributed.items()
+    ):
+        raise ValueError("graph delta attribution requires non-empty stable IDs and actors")
+    changes: list[dict[str, str]] = []
+    for field, key in (("nodes", "id"), ("edges", "edge_key")):
+        left = indexed(before, field, key)
+        right = indexed(after, field, key)
+        for stable_id in sorted(set(left) | set(right)):
+            if stable_id not in left:
+                change = "added"
+            elif stable_id not in right:
+                change = "removed"
+            elif left[stable_id] != right[stable_id]:
+                change = "changed"
+            else:
+                continue
+            changes.append(
+                {
+                    "kind": field[:-1],
+                    "stable_id": stable_id,
+                    "change": change,
+                    "attribution": attributed.get(stable_id, "external_or_unattributed"),
+                }
+            )
+    return {
+        "mode": "diagnostic_only",
+        "automatic_repair": False,
+        "changes": changes,
+        "attributed_changes": sum(
+            item["attribution"] != "external_or_unattributed" for item in changes
+        ),
+        "external_or_unattributed_changes": sum(
+            item["attribution"] == "external_or_unattributed" for item in changes
+        ),
+    }

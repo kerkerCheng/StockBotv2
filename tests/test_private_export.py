@@ -35,13 +35,36 @@ def test_redacted_export_contains_only_allowlisted_aggregate_contract(tmp_path: 
             observed_at="2026-07-21T00:00:00+00:00",
         )
         target = export_redacted_summary(
-            store, repo / "diagnostics" / "summary.json", repo_root=repo
+            store,
+            repo / "diagnostics" / "decision_lab" / "summary.json",
+            repo_root=repo,
         )
         text = target.read_text(encoding="utf-8")
 
         assert "CANARY-DO-NOT-LEAK" not in text
         assert "raw_text" not in text
         assert "counts" in text
+    finally:
+        store.close()
+
+
+def test_redacted_export_cannot_overwrite_arbitrary_or_existing_json(
+    tmp_path: Path,
+) -> None:
+    store, repo, _private = _store(tmp_path)
+    try:
+        with pytest.raises(ExportError, match="diagnostics/decision_lab"):
+            export_redacted_summary(
+                store,
+                repo / "config" / "company_identity.json",
+                repo_root=repo,
+            )
+        target = repo / "diagnostics" / "decision_lab" / "summary.json"
+        target.parent.mkdir(parents=True)
+        target.write_text("authority", encoding="utf-8")
+        with pytest.raises(ExportError, match="overwrite"):
+            export_redacted_summary(store, target, repo_root=repo)
+        assert target.read_text(encoding="utf-8") == "authority"
     finally:
         store.close()
 

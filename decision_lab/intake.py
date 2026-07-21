@@ -7,14 +7,17 @@ import math
 import re
 import unicodedata
 from dataclasses import asdict, dataclass
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Protocol
 from urllib.parse import urlparse
 
+from identity.registry import get_registry
+
 from .adapters.holdings import execution_aliases
 from .identity import resolve_identity
 from .models import CaptureResult, MarketObservation, SignalInput
+from .redaction import sensitive_payload_path
 from .store import DecisionStore
 
 
@@ -96,8 +99,14 @@ def _validate_signal(signal: SignalInput) -> None:
         raise ValueError("raw_text and atomic_claim are required")
     if not signal.source_id.strip() or not signal.origin_event.strip():
         raise ValueError("source attribution and origin_event are required")
-    if urlparse(signal.source_uri).scheme not in {"http", "https", "fixture"}:
+    parsed_uri = urlparse(signal.source_uri)
+    if parsed_uri.scheme not in {"http", "https", "fixture"}:
         raise ValueError("source_uri must be an attributable URI")
+    if parsed_uri.username is not None or parsed_uri.password is not None:
+        raise ValueError("source_uri must not contain credentials")
+    sensitive = sensitive_payload_path(asdict(signal), "signal")
+    if sensitive is not None:
+        raise ValueError(f"secret-bearing signal rejected at {sensitive}")
     if signal.direction not in _DIRECTIONS:
         raise ValueError("direction must be long, short, or neutral")
     if not signal.disproof.strip():
@@ -111,7 +120,12 @@ def _validate_signal(signal: SignalInput) -> None:
         raise ValueError("capture_mode must be manual or automatic")
 
 
-def _validate_market(observation: MarketObservation) -> MarketObservation:
+def _validate_market(
+    observation: MarketObservation,
+    *,
+    expected_ticker: str,
+    expected_currency: str,
+) -> MarketObservation:
     if observation.status not in _MARKET_STATUSES:
         return MarketObservation(status="unavailable")
     if observation.status != "observed":
@@ -121,16 +135,21 @@ def _validate_market(observation: MarketObservation) -> MarketObservation:
         or not isinstance(observation.price, (int, float))
         or not math.isfinite(float(observation.price))
         or float(observation.price) <= 0
+        or observation.ticker != expected_ticker
+        or observation.currency != expected_currency
         or not observation.currency
         or not observation.source
         or not observation.as_of
         or not observation.fetched_at
     ):
         return MarketObservation(status="unavailable")
-    _parse_time(observation.as_of, "market.as_of")
-    _parse_time(observation.fetched_at, "market.fetched_at")
+    as_of = _parse_time(observation.as_of, "market.as_of")
+    fetched_at = _parse_time(observation.fetched_at, "market.fetched_at")
+    if fetched_at < as_of:
+        return MarketObservation(status="unavailable")
     return MarketObservation(
         status="observed",
+        ticker=expected_ticker,
         price=float(observation.price),
         currency=observation.currency.upper(),
         source=observation.source,
@@ -145,7 +164,9 @@ def _claim_key(signal: SignalInput, company_id: str) -> str:
             "company_id": company_id,
             "claim": _normalize_claim(signal.atomic_claim),
             "direction": signal.direction,
-            "expiry": signal.expiry,
+            "expiry": _parse_time(signal.expiry, "expiry")
+            .astimezone(timezone.utc)
+            .isoformat(),
         },
         sort_keys=True,
         separators=(",", ":"),
@@ -178,6 +199,15 @@ def capture_signal(
     if identity.blockers:
         raise ValueError(identity.blockers[0])
     assert identity.company_id and identity.research_ticker and identity.execution_symbol
+    canonical_company = get_registry().company(identity.company_id)
+    if canonical_company is None or not all(
+        (
+            canonical_company.market_currency,
+            canonical_company.execution_currency,
+            canonical_company.execution_venue,
+        )
+    ):
+        raise ValueError("identity market/execution metadata is incomplete")
 
     try:
         market_observation = market.observe(
@@ -187,7 +217,22 @@ def capture_signal(
         )
     except Exception:
         market_observation = MarketObservation(status="unavailable")
-    market_observation = _validate_market(market_observation)
+    market_observation = _validate_market(
+        market_observation,
+        expected_ticker=identity.research_ticker,
+        expected_currency=str(canonical_company.market_currency),
+    )
+    if (
+        market_observation.status == "observed"
+        and (
+            _parse_time(str(market_observation.as_of), "market.as_of")
+            > _parse_time(signal.observed_at, "observed_at")
+            or _parse_time(signal.observed_at, "observed_at")
+            - _parse_time(str(market_observation.as_of), "market.as_of")
+            > timedelta(days=4)
+        )
+    ):
+        market_observation = MarketObservation(status="unavailable")
 
     evidence_admission = (
         "eligible_for_review"

@@ -115,11 +115,17 @@ def _market_outcome(
             "market_inputs": inputs,
         }
     current_price = _positive(current_market.get("price"), "current_market.price")
+    identity = store.cohort_identity(cohort_id)
+    if current_market.get("ticker") != identity["research_ticker"]:
+        raise OutcomeError("current market ticker does not match the cohort")
     if current_market.get("currency") != shadow.currency:
         raise OutcomeError("current market currency does not match Shadow inception")
     if not current_market.get("source"):
         raise OutcomeError("current market source is required")
     current_as_of = _time(current_market.get("as_of"), "current_market.as_of")
+    shadow_as_of = _time(shadow.as_of, "shadow.as_of")
+    if current_as_of < shadow_as_of:
+        raise OutcomeError("current market observation predates Shadow inception")
     if current_as_of > _time(effective_at, "effective_at"):
         raise OutcomeError("current market observation cannot be from the future")
     absolute = current_price / shadow.price - 1.0
@@ -130,7 +136,14 @@ def _market_outcome(
         end = _positive(benchmark.get("end_price"), "benchmark.end_price")
         if not benchmark.get("source") or not benchmark.get("ticker"):
             raise OutcomeError("observed benchmark requires ticker and source")
+        benchmark_start_as_of = _time(
+            benchmark.get("start_as_of"), "benchmark.start_as_of"
+        )
         benchmark_as_of = _time(benchmark.get("as_of"), "benchmark.as_of")
+        if benchmark_start_as_of != shadow_as_of:
+            raise OutcomeError("benchmark start must align with Shadow inception")
+        if benchmark_as_of < benchmark_start_as_of:
+            raise OutcomeError("benchmark end predates its inception")
         if benchmark_as_of > _time(effective_at, "effective_at"):
             raise OutcomeError("benchmark observation cannot be from the future")
         adjusted = absolute - (end / start - 1.0)
@@ -145,25 +158,43 @@ def _market_outcome(
 
 def _decision_attribution(
     store: DecisionStore,
-    cohort_id: str,
+    decision: Mapping[str, Any] | None,
     current_market: Mapping[str, Any],
+    effective_at: str,
 ) -> dict[str, Any]:
-    decision = store.latest_decision_for_cohort(cohort_id)
     if decision is None:
         return {
             "decision_id": None,
             "system_paper_target": None,
+            "paper_source_decision_id": None,
+            "latest_recommendation_target": None,
             "user_live_weight": None,
+            "user_choice_decision_id": None,
             "user_choice_type": None,
             "live_fill_ref": None,
+            "live_fill_decision_id": None,
             "system_paper_return": None,
         }
     sizing = decision["payload"]["sizing"]
-    choice = store.latest_live_choice(decision["decision_id"])
-    fill = store.latest_live_fill(decision["decision_id"])
-    system_return: float | None = None
     context = store.get_context_bundle(decision["context_digest"]).payload
-    decision_market = context.get("market") or {}
+    company_id = str(context.get("identity", {}).get("company_id") or "")
+    paper_state = store.paper_position_state(company_id, as_of=effective_at)
+    source_decision_id = paper_state.get("decision_id")
+    source_decision = (
+        store.get_decision(str(source_decision_id))
+        if source_decision_id is not None
+        else None
+    )
+    choice, fill = store.latest_live_facts_for_cohort(
+        str(decision["cohort_id"]), as_of=effective_at
+    )
+    system_return: float | None = None
+    paper_context = (
+        store.get_context_bundle(source_decision["context_digest"]).payload
+        if source_decision is not None
+        else context
+    )
+    decision_market = paper_context.get("market") or {}
     if (
         current_market.get("status") == "observed"
         and decision_market.get("status") == "available"
@@ -174,11 +205,15 @@ def _decision_attribution(
         system_return = current_price / decision_price - 1.0
     return {
         "decision_id": decision["decision_id"],
-        "system_paper_target": sizing["paper_target"],
+        "paper_source_decision_id": source_decision_id,
+        "system_paper_target": paper_state["weight"],
+        "latest_recommendation_target": sizing["paper_target"],
         "system_paper_max": sizing["paper_max_supported_position"],
         "user_live_weight": choice["selected_weight"] if choice else None,
+        "user_choice_decision_id": choice["decision_id"] if choice else None,
         "user_choice_type": choice["choice_type"] if choice else None,
         "live_fill_ref": fill["execution_ref"] if fill else None,
+        "live_fill_decision_id": fill["decision_id"] if fill else None,
         "system_paper_return": system_return,
     }
 
@@ -207,7 +242,7 @@ def close_probe(
     market = _market_outcome(
         store, cohort_id, current_market, benchmark, effective_at
     )
-    decision = store.latest_decision_for_cohort(cohort_id)
+    decision = store.latest_decision_for_cohort(cohort_id, as_of=effective_at)
     sizing = decision["payload"]["sizing"] if decision is not None else {}
     payload = {
         "claim_correctness": claim_correctness,
@@ -215,7 +250,7 @@ def close_probe(
         "evidence_refs": refs,
         **market,
         "decision_attribution": _decision_attribution(
-            store, cohort_id, current_market
+            store, decision, current_market, effective_at
         ),
         "source_calibration_inputs": {
             "source_ids": store.signal_sources_for_cohort(cohort_id),

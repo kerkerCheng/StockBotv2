@@ -1,0 +1,187 @@
+{
+  "signal": {
+    "raw_text": "aleabitoreddit argues that Sivers controls a key CW laser bottleneck; later EU Chips Act, Nasdaq and GlobalFoundries references expand the upside narrative.",
+    "source_id": "aleabitoreddit",
+    "source_uri": "fixture://signals/aleabitoreddit-sive-cw",
+    "origin_event": "fixture:sive-cw-post",
+    "observed_at": "2026-07-21T08:00:00+00:00",
+    "atomic_claim": "Sivers CW laser capability can become a commercially important bottleneck in silicon photonics.",
+    "direction": "long",
+    "expiry": "2026-10-21T00:00:00+00:00",
+    "disproof": "A qualified alternative wins the same production socket or the reference design never converts to a named production order.",
+    "evidence_tier": 3,
+    "company_id": "co:sivers_semiconductors",
+    "research_ticker": "SIVE.ST",
+    "capture_mode": "manual",
+    "source_traced": false
+  },
+  "shadow_market": {
+    "status": "observed",
+    "ticker": "SIVE.ST",
+    "price": 2.5,
+    "currency": "SEK",
+    "source": "fixture://market/sive-stockholm",
+    "as_of": "2026-07-21T08:00:00+00:00",
+    "fetched_at": "2026-07-21T08:01:00+00:00"
+  },
+  "evaluation_at": "2026-07-21T12:00:00+00:00",
+  "holdings_confirmed_at": "2026-07-21T09:00:00+00:00",
+  "context": {
+    "identity": {
+      "company_id": "co:sivers_semiconductors",
+      "research_ticker": "SIVE.ST",
+      "execution_symbol": "FRA:2DG",
+      "market_currency": "SEK",
+      "execution_currency": "EUR",
+      "execution_venue": "FRA"
+    },
+    "evidence": {
+      "focus_company": {"id": "co:sivers_semiconductors"},
+      "subject_origin_entity": "Sivers",
+      "sources": [
+        {
+          "id": "fixture:globalfoundries-reference-design",
+          "origin_entity": "GlobalFoundries",
+          "evidence_tier": 2
+        }
+      ],
+      "causal_paths": [
+        "GlobalFoundries reference design -> Sivers CW laser -> customer qualification -> production revenue"
+      ],
+      "counter_paths": [
+        "alternative laser supplier qualifies before the reference design converts"
+      ]
+    },
+    "financial": {
+      "status": "observed",
+      "ticker": "SIVE.ST",
+      "as_of": "2026-07-15T00:00:00+00:00",
+      "fetched_at": "2026-07-15T01:00:00+00:00",
+      "source": "fixture://sivers/filing",
+      "cash_and_equivalents": 120.0,
+      "total_debt": 20.0,
+      "free_cash_flow_ttm": -60.0,
+      "checklist": {
+        "gross_margin_trend": {"status": "ok"},
+        "customer_concentration": {
+          "status": "manual_reviewed",
+          "value": "customer concentration reviewed",
+          "source": "fixture://sivers/filing"
+        },
+        "backlog": {
+          "status": "manual_reviewed",
+          "value": "commercial disclosure reviewed; no named production order",
+          "source": "fixture://sivers/filing"
+        },
+        "dilution": {"status": "ok"},
+        "valuation_pressure": {"status": "ok"}
+      }
+    },
+    "market": {
+      "status": "observed",
+      "ticker": "SIVE.ST",
+      "price": 2.5,
+      "currency": "SEK",
+      "adv20": 1000000.0,
+      "as_of": "2026-07-21T10:00:00+00:00",
+      "fetched_at": "2026-07-21T10:01:00+00:00",
+      "unit_status": "ok",
+      "source": "fixture://market/sive-stockholm"
+    },
+    "fx": {
+      "status": "observed",
+      "pair": "SEK/USD",
+      "rate": 0.1,
+      "as_of": "2026-07-21T10:00:00+00:00",
+      "fetched_at": "2026-07-21T10:01:00+00:00",
+      "source": "fixture://fx/sek-usd"
+    },
+    "holdings": {
+      "status": "available",
+      "nav_base": 10000.0,
+      "base_currency": "USD",
+      "fetched_at": "2026-07-21T11:00:00+00:00",
+      "rows": [
+        {
+          "ticker": "FRA:2DG",
+          "shares": 10.0,
+          "currency": "EUR",
+          "company_id": "co:sivers_semiconductors",
+          "market_value_base": 10.0
+        },
+        {
+          "ticker": "SIVE.ST",
+          "shares": 20.0,
+          "currency": "SEK",
+          "company_id": "co:sivers_semiconductors",
+          "market_value_base": 20.0
+        }
+      ]
+    },
+    "paper_exposure": {
+      "nav": 100.0,
+      "total_weight": 0.0,
+      "company_weights": {},
+      "factor_weights": {}
+    }
+  },
+  "execution_market": {
+    "status": "observed",
+    "ticker": "FRA:2DG",
+    "price": 10.0,
+    "currency": "EUR",
+    "adv20": 100.0,
+    "as_of": "2026-07-21T10:00:00+00:00",
+    "fetched_at": "2026-07-21T10:01:00+00:00",
+    "unit_status": "ok",
+    "source": "fixture://market/sive-frankfurt"
+  },
+  "execution_fx": {
+    "status": "observed",
+    "pair": "EUR/USD",
+    "rate": 1.2,
+    "as_of": "2026-07-21T10:00:00+00:00",
+    "fetched_at": "2026-07-21T10:01:00+00:00",
+    "source": "fixture://fx/eur-usd"
+  },
+  "coverage": {
+    "catalyst": "A named customer production order validates conversion from reference design to revenue.",
+    "disproof": "A qualified alternative wins the socket or no production order appears before expiry.",
+    "expiry": "2026-10-21T00:00:00+00:00",
+    "decision_relevance": 9,
+    "falsifiability": 8,
+    "information_value": 9
+  },
+  "assessment": {
+    "source_reliability": {
+      "level": "corroborated",
+      "evidence_refs": ["fixture://globalfoundries-reference-design"],
+      "reason": "Independent company material confirms the bounded reference-design relationship.",
+      "missing_data": []
+    },
+    "technical_causal_link": {
+      "level": "corroborated",
+      "evidence_refs": ["fixture://globalfoundries-reference-design", "fixture://eu-chips-act", "fixture://nasdaq"],
+      "reason": "Multiple events support technical relevance, but they are not added into a synthetic conviction score.",
+      "missing_data": []
+    },
+    "commercial_maturity": {
+      "level": "bounded_hypothesis",
+      "evidence_refs": ["fixture://globalfoundries-reference-design"],
+      "reason": "A reference design is commercially meaningful but is not a named production order.",
+      "missing_data": ["named production order", "customer revenue conversion"]
+    },
+    "financial_resilience": {
+      "level": "corroborated",
+      "evidence_refs": ["fixture://sivers/filing"],
+      "reason": "Runway inputs and dilution review are point-in-time sourced.",
+      "missing_data": []
+    },
+    "valuation_payoff": {
+      "level": "corroborated",
+      "evidence_refs": ["fixture://market/sive-stockholm"],
+      "reason": "Market and FX snapshots support a bounded paper payoff assessment.",
+      "missing_data": []
+    }
+  }
+}

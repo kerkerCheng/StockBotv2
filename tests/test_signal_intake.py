@@ -19,6 +19,7 @@ class FixedMarket:
     def observe(self, *_args, **_kwargs) -> MarketObservation:
         return MarketObservation(
             status="observed",
+            ticker="SIVE.ST",
             price=2.5,
             currency="SEK",
             source="fixture://market/sive",
@@ -109,6 +110,26 @@ def test_claim_or_expiry_changes_create_distinct_probe(tmp_path: Path) -> None:
         store.close()
 
 
+def test_equivalent_expiry_offsets_share_one_probe_and_shadow(tmp_path: Path) -> None:
+    store = _store(tmp_path)
+    try:
+        first = capture_signal(store, _signal(), market=FixedMarket())
+        retry = capture_signal(
+            store,
+            _signal(
+                expiry="2026-10-20T20:00:00-04:00",
+                origin_event="post-offset",
+            ),
+            market=FixedMarket(),
+        )
+
+        assert retry.cohort_id == first.cohort_id
+        assert retry.shadow_created is False
+        assert store.count_shadows(first.cohort_id) == 1
+    finally:
+        store.close()
+
+
 def test_registry_status_never_upgrades_raw_evidence_or_graph_admission(
     tmp_path: Path,
 ) -> None:
@@ -179,5 +200,78 @@ def test_probe_gate_and_automatic_capture_permission_fail_before_write(
 
         assert store.table_count("decision_cohorts") == 0
         assert store.table_count("shadow_observations") == 0
+    finally:
+        store.close()
+
+
+def test_future_market_price_never_becomes_shadow_inception(tmp_path: Path) -> None:
+    store = _store(tmp_path)
+
+    class FutureMarket(FixedMarket):
+        def observe(self, *_args, **_kwargs) -> MarketObservation:
+            return replace(
+                super().observe(),
+                as_of="2026-07-22T08:00:00+00:00",
+                fetched_at="2026-07-22T08:01:00+00:00",
+            )
+
+    try:
+        result = capture_signal(store, _signal(), market=FutureMarket())
+        shadow = store.get_shadow(result.cohort_id)
+
+        assert shadow.status == "unavailable"
+        assert shadow.price is None
+    finally:
+        store.close()
+
+
+@pytest.mark.parametrize(
+    "changes",
+    [
+        {"ticker": "ERIC-B.ST"},
+        {
+            "as_of": "2020-07-21T08:00:00+00:00",
+            "fetched_at": "2026-07-21T08:01:00+00:00",
+        },
+        {
+            "as_of": "2026-07-21T08:00:00+00:00",
+            "fetched_at": "2026-07-21T07:59:00+00:00",
+        },
+    ],
+)
+def test_wrong_security_stale_or_causally_invalid_shadow_price_is_unavailable(
+    tmp_path: Path,
+    changes: dict,
+) -> None:
+    store = _store(tmp_path)
+
+    class InvalidMarket(FixedMarket):
+        def observe(self, *_args, **_kwargs) -> MarketObservation:
+            return replace(super().observe(), **changes)
+
+    try:
+        result = capture_signal(store, _signal(), market=InvalidMarket())
+        assert store.get_shadow(result.cohort_id).status == "unavailable"
+    finally:
+        store.close()
+
+
+@pytest.mark.parametrize(
+    "overrides",
+    [
+        {"source_uri": "https://user:password@example.test/post/1"},
+        {"source_uri": "https://example.test/post/1?api_key=CANARY123456789"},
+        {"raw_text": "Authorization: Bearer CANARY-DO-NOT-LEAK"},
+    ],
+)
+def test_signal_credentials_never_enter_store(
+    tmp_path: Path,
+    overrides: dict,
+) -> None:
+    store = _store(tmp_path)
+    try:
+        with pytest.raises(ValueError, match="credential|secret-bearing"):
+            capture_signal(store, _signal(**overrides), market=FixedMarket())
+        assert store.table_count("decision_events") == 0
     finally:
         store.close()

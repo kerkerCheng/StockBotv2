@@ -26,6 +26,7 @@ class SignalInput:
 @dataclass(frozen=True)
 class MarketObservation:
     status: str
+    ticker: str | None = None
     price: float | None = None
     currency: str | None = None
     source: str | None = None
@@ -38,6 +39,7 @@ class ShadowBaseline:
     shadow_id: str
     cohort_id: str
     status: str
+    ticker: str | None
     price: float | None
     currency: str | None
     source: str | None

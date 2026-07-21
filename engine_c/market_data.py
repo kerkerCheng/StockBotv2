@@ -44,7 +44,7 @@ def build_tradeability_snapshot(
     """由具實際 session timestamp 的 history rows 建立 execution 快照。"""
 
     blockers: list[str] = []
-    parsed_rows: list[tuple[datetime, float, float]] = []
+    sessions: dict[str, tuple[datetime, float, float]] = {}
     if not isinstance(ticker, str) or not ticker.strip():
         blockers.append("market_ticker_invalid")
     if not isinstance(currency, str) or len(currency) != 3 or not currency.isupper():
@@ -60,9 +60,12 @@ def build_tradeability_snapshot(
         if as_of is None or close is None or close <= 0 or volume is None or volume < 0:
             blockers.append("market_history_row_invalid")
             continue
-        parsed_rows.append((as_of, close, volume))
+        sessions[as_of.date().isoformat()] = (as_of, close, volume)
+    parsed_rows = list(sessions.values())
     if not parsed_rows:
         blockers.append("market_history_missing")
+    elif len(parsed_rows) < 20:
+        blockers.append("market_history_insufficient_sessions")
     if blockers:
         return {"status": "quarantined", "blockers": sorted(set(blockers))}
 

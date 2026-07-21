@@ -58,6 +58,28 @@ def sqlite_path(
         if not isinstance(relative, str) or Path(relative).is_absolute():
             raise RuntimeError("Engine C runtime pointer must be a relative path")
         destination = private / relative
+        destination = validate_private_destination(
+            destination,
+            private_root=private,
+            repo_root=repo,
+        )
+        if not destination.is_file():
+            raise RuntimeError("Engine C runtime pointer target is missing")
+        check_conn = sqlite3.connect(
+            f"file:{destination.as_posix()}?mode=ro", uri=True
+        )
+        try:
+            if check_conn.execute("PRAGMA quick_check").fetchone() != ("ok",):
+                raise RuntimeError("Engine C runtime pointer target is corrupt")
+        finally:
+            check_conn.close()
+        return destination
+    legacy = repo / "engine_c" / "stockbot.db"
+    if legacy.is_file():
+        return legacy.resolve()
+    versioned = list((private / "engine_c").glob("stockbot-engine-c-private-v*.db"))
+    if versioned:
+        raise RuntimeError("Engine C versioned runtime exists without an authority pointer")
     return validate_private_destination(
         destination,
         private_root=private,
@@ -161,7 +183,14 @@ def get_conn():
             connect_timeout=connect_timeout,
         )
 
-    conn = connect_sqlite(sqlite_path())
+    path = sqlite_path()
+    legacy = (_ROOT / "engine_c" / "stockbot.db").resolve()
+    if path.resolve() == legacy:
+        conn = sqlite3.connect(f"file:{path.as_posix()}?mode=ro", uri=True)
+        conn.row_factory = sqlite3.Row
+        conn.execute("PRAGMA foreign_keys = ON")
+        return conn
+    conn = connect_sqlite(path, create=not path.exists())
     _ensure_sqlite_schema(conn)
     return conn
 

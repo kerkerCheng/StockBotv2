@@ -271,6 +271,47 @@ def test_research_listing_market_data_cannot_substitute_for_execution_listing_ad
         store.close()
 
 
+def test_live_fx_must_translate_execution_currency_into_holdings_base(
+    tmp_path: Path,
+) -> None:
+    store = _store(tmp_path)
+    inputs = complete_inputs(rows=[])
+    inputs["holdings"].update({"nav_base": 10_000.0, "base_currency": "TWD"})
+    execution_market = {
+        "status": "observed",
+        "ticker": "FRA:2DG",
+        "price": 10.0,
+        "currency": "EUR",
+        "adv20": 100.0,
+        "as_of": "2026-07-21T10:00:00+00:00",
+        "fetched_at": "2026-07-21T10:01:00+00:00",
+        "unit_status": "ok",
+        "source": "fixture://fra-market",
+    }
+    wrong_fx = {
+        "status": "observed",
+        "pair": "EUR/USD",
+        "rate": 1.2,
+        "as_of": "2026-07-21T10:00:00+00:00",
+        "fetched_at": "2026-07-21T10:01:00+00:00",
+        "source": "fixture://eur-usd",
+    }
+    try:
+        bundle = _bundle(
+            store,
+            inputs=inputs,
+            execution_market=execution_market,
+            execution_fx=wrong_fx,
+        )
+        result = calculate_probe_limits(bundle, _coverage(bundle), _assessment())
+
+        assert result.live_status == "DATA_NEEDED"
+        assert result.live_supported_shares is None
+        assert "execution_fx_pair_mismatch" in result.live_blockers
+    finally:
+        store.close()
+
+
 def test_sizing_is_content_deterministic_and_rejects_context_mismatch(
     tmp_path: Path,
 ) -> None:

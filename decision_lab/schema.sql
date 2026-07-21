@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS system_decisions (
     request_digest    TEXT NOT NULL,
     decision_digest   TEXT NOT NULL,
     context_digest    TEXT NOT NULL REFERENCES context_bundles(context_digest),
-    coverage_assessment_id TEXT NOT NULL,
+    coverage_assessment_id TEXT NOT NULL REFERENCES coverage_assessments(assessment_id),
     policy_version    TEXT NOT NULL,
     calculator_version TEXT NOT NULL,
     payload_json      TEXT NOT NULL,
@@ -71,6 +71,7 @@ CREATE TABLE IF NOT EXISTS live_choices (
 CREATE TABLE IF NOT EXISTS live_execution_reports (
     fill_id          TEXT PRIMARY KEY,
     decision_id      TEXT NOT NULL REFERENCES system_decisions(decision_id),
+    choice_id        TEXT NOT NULL REFERENCES live_choices(choice_id),
     execution_ref    TEXT NOT NULL UNIQUE,
     shares           REAL NOT NULL,
     price            REAL NOT NULL CHECK (price > 0),
@@ -149,6 +150,7 @@ CREATE TABLE IF NOT EXISTS shadow_observations (
     shadow_id   TEXT PRIMARY KEY,
     cohort_id   TEXT NOT NULL UNIQUE REFERENCES decision_cohorts(cohort_id),
     status      TEXT NOT NULL CHECK (status IN ('observed', 'missing', 'unavailable')),
+    ticker      TEXT,
     price       REAL,
     currency    TEXT,
     source      TEXT,
@@ -156,7 +158,8 @@ CREATE TABLE IF NOT EXISTS shadow_observations (
     fetched_at  TEXT,
     created_at  TEXT NOT NULL DEFAULT (datetime('now')),
     CHECK (
-        (status = 'observed' AND price IS NOT NULL AND price > 0
+        (status = 'observed' AND ticker IS NOT NULL
+         AND price IS NOT NULL AND price > 0
          AND currency IS NOT NULL AND source IS NOT NULL
          AND as_of IS NOT NULL AND fetched_at IS NOT NULL)
         OR (status IN ('missing', 'unavailable') AND price IS NULL)
@@ -222,6 +225,17 @@ CREATE INDEX IF NOT EXISTS idx_decision_events_cohort_time
     ON decision_events (cohort_id, observed_at, event_id);
 CREATE INDEX IF NOT EXISTS idx_paper_events_cohort_time
     ON paper_events (cohort_id, effective_at, paper_event_id);
+CREATE INDEX IF NOT EXISTS idx_system_decisions_cohort_time
+    ON system_decisions (cohort_id, effective_at DESC, decision_id DESC);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_paper_events_decision_digest
+    ON paper_events (decision_id, payload_digest)
+    WHERE decision_id IS NOT NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS idx_live_choices_approved_action
+    ON live_choices (approved_action_id)
+    WHERE approved_action_id IS NOT NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS idx_paper_events_approved_action
+    ON paper_events (approved_action_id)
+    WHERE approved_action_id IS NOT NULL;
 INSERT INTO decision_store_meta (key, value)
-VALUES ('schema_version', '5')
-ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = datetime('now');
+VALUES ('schema_version', '7')
+ON CONFLICT(key) DO NOTHING;
