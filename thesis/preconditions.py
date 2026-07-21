@@ -239,7 +239,7 @@ def _resolve_company_id(ticker: str | None, company_id: str | None) -> str | Non
     if not ticker:
         return None
     try:
-        from loader.load_to_neo4j import TICKER_MAP
+        from identity.registry import TICKER_MAP
     except ImportError:
         return None
     reverse = {tk: cid for cid, tk in TICKER_MAP.items() if tk}

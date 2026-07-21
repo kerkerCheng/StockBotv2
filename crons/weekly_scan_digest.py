@@ -96,7 +96,7 @@ def _unpushed_intake_commits(root: Path = ROOT) -> int:
 def pending_onboard_companies(root: Path = ROOT) -> list[str]:
     """抽取語料裡的 Company id，凡 TICKER_MAP 沒有登記（含明確 None）就算待 onboard 決定。"""
     try:
-        from loader.load_to_neo4j import TICKER_MAP
+        from identity.registry import TICKER_MAP
     except Exception:
         return []
     company_ids: set[str] = set()

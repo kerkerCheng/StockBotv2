@@ -24,7 +24,7 @@ except ImportError:
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from loader.load_to_neo4j import TICKER_MAP
+from identity.registry import TICKER_MAP
 
 
 def migrate(dry_run: bool = False) -> int:

@@ -180,7 +180,7 @@ def test_pending_onboard_reports_undecided_companies_only(
 ) -> None:
     import json
 
-    import loader.load_to_neo4j as loader_module
+    import identity.registry as registry_module
     from crons.weekly_scan_digest import pending_onboard_companies
 
     extraction_dir = tmp_path / "extractions"
@@ -200,7 +200,7 @@ def test_pending_onboard_reports_undecided_companies_only(
     )
     (extraction_dir / "broken.json").write_text("{not json", encoding="utf-8")
     monkeypatch.setattr(
-        loader_module,
+        registry_module,
         "TICKER_MAP",
         {"co:decided_ticker": "TICK", "co:decided_private": None},
     )

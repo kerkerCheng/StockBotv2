@@ -59,7 +59,7 @@ def _resolve_ticker(ticker: str | None, company_id: str | None) -> str | None:
         return ticker.upper()
     if company_id:
         try:
-            from loader.load_to_neo4j import TICKER_MAP
+            from identity.registry import TICKER_MAP
             return TICKER_MAP.get(company_id)
         except ImportError:
             pass

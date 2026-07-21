@@ -31,7 +31,7 @@ try:
 except ImportError:
     yf = None
 
-from loader.load_to_neo4j import TICKER_MAP
+from identity.registry import TICKER_MAP
 from engine_c.db import (
     DB_TYPE,
     get_conn,

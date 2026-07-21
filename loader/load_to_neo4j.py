@@ -29,74 +29,13 @@ from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urlsplit, urlunsplit
 
+from identity.registry import TICKER_MAP
+
 try:
     from dotenv import load_dotenv
     load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 except ImportError:
     pass
-
-# ── Ticker Map (Plan B — source of truth for A→C join key) ────────────────────
-# 人工維護；LLM 不生成 ticker（避免幻覺）。
-# 私人公司明確設 None（區分「已知無 ticker」vs「尚未建檔」）。
-# 新公司 onboarding 後在此補上對應 ticker。
-TICKER_MAP: dict[str, str | None] = {
-    "co:coherent":   "COHR",
-    "co:lumentum":   "LITE",
-    "co:broadcom":   "AVGO",
-    "co:nvidia":     "NVDA",
-    "co:tsmc":       "TSM",
-    "co:intel":      "INTC",
-    "co:samsung":    "005930.KS",
-    "co:apple":      "AAPL",
-    "co:corning":    "GLW",
-    "co:arista":     "ANET",
-    "co:meta":       "META",
-    "co:google":     "GOOGL",
-    "co:jabil":      "JBL",
-    "co:anthropic":  None,   # 私人公司，明確 null
-    "co:openai":     None,   # 私人公司，明確 null
-    # Sivers Semiconductors AB — 瑞典上市 (Nasdaq First North Stockholm)
-    # yfinance ticker: SIVE.ST；非美股，EDGAR 無資料，文件走 IR 人工下載路徑
-    "co:sivers_semiconductors": "SIVE.ST",
-    # AXT Inc — InP/GaAs 化合物半導體基板供應商（Coherent 依賴鏈上游）
-    "co:axt": "AXTI",
-    # ── 2026-07-17 補登：圖中已有邊但先前未登記的上市公司 ──
-    "co:tower_semiconductor": "TSEM",
-    "co:marvell_technology": "MRVL",
-    "co:poet_technologies": "POET",
-    "co:applied_optoelectronics": "AAOI",
-    "co:globalfoundries": "GFS",
-    "co:cadence": "CDNS",
-    "co:apollo": "APO",
-    "co:blackstone": "BX",
-    "co:sumitomo_electric": "5802.T",     # 東證
-    "co:jx_advanced_metals": "5016.T",    # 東證，2025-03 IPO
-    "co:enablence_technologies": "ENA.V", # TSX Venture
-    "co:zhongji_innolight": "300308.SZ",  # 中際旭創（深交所創業板）；需求側 read-through 指標
-    # 台股後綴依掛牌板：證交所上市 = .TW、櫃買上櫃 = .TWO（yfinance 格式，
-    # 兩者是不同交易所，不能統一成同一後綴）
-    "co:vpec": "2455.TW",                       # 全新光電（上市）
-    "co:win_semiconductor": "3105.TWO",         # 穩懋（上櫃）
-    "co:landmark_optoelectronics": "3081.TWO",  # 聯亞光電（上櫃）
-    # ── 2026-07-19 補登：第二垂直切片（成熟製程設備 AMAT/LRCX + 客戶端 GF 對照公司）──
-    "co:applied_materials": "AMAT",             # 半導體設備龍頭（本切片主標的）
-    "co:lam_research": "LRCX",                  # 沉積/蝕刻/清洗設備（本切片主標的）
-    "co:texas_instruments": "TXN",             # 成熟製程 IDM（GF 對照競爭者）
-    "co:umc": "UMC",                            # 聯電（成熟製程晶圓代工競爭者）
-    "co:soitec": "SOI.PA",                     # Euronext Paris；GF 的 SOI 晶圓供應商
-    # ── 私人公司 / 機構 / 已下市 — 明確 None ──
-    "co:ayar_labs": None,
-    "co:celestial_ai": None,
-    "co:newphotonics": None,
-    "co:openlight_photonics": None,
-    "co:lightium_ag": None,
-    "co:nava_thailand": None,
-    "co:ime_cas": None,   # 中科院微電子所（研究機構）
-    "co:ansys": None,     # 2025 年併入 Synopsys 下市；不對映 SNPS 以免 join 錯財務
-    "co:o_net_technologies": None,  # 原港股 0877.HK，2021 私有化下市，yfinance 無資料
-    "co:mips_holding": None,        # MIPS Holding（GF 少數股權投資標的），私人公司
-}
-
 
 def _now() -> str:
     return datetime.now(timezone.utc).isoformat()

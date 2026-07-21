@@ -27,7 +27,7 @@ except ImportError:
 
 # loader 是 source of truth；這裡 import 確保兩邊同步
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from loader.load_to_neo4j import TICKER_MAP
+from identity.registry import TICKER_MAP
 
 PATCH_QUERY = """
 MATCH (c:Entity {id: $node_id})

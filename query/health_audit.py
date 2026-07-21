@@ -383,7 +383,7 @@ def run_local_audit(*, today: date | None = None) -> str:  # pragma: no cover - 
         )
 
     # 3. TICKER_MAP 覆蓋率
-    from loader.load_to_neo4j import TICKER_MAP
+    from identity.registry import TICKER_MAP
 
     gaps = ticker_map_gaps(company_ids, TICKER_MAP)
     report.extend(
