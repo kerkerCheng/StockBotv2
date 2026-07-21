@@ -118,10 +118,13 @@ fetchers/edgar.py ──────↑                        engine_c/etl_yfin
 
 **（已完成）M1 CPO Depth Sprint** — 2026-07-18 達標：AXT 已 onboard（`TICKER_MAP` 有 `co:axt: "AXTI"`）；Coherent／Lumentum／NVIDIA／Broadcom 各 ≥3 個 distinct `origin_entity`；20 條 edge conflict 全數 resolve 並 project 進圖（`python loader/edge_resolution.py project --dry-run` 的 `open_conflicts=0`）。**遺留 backlog（仍開）：** TSEM intake（ra_2bf1494b）的 2027–29 光通訊集體擴產 oversupply watch、MACOM/Semtech 作為 Tower TIA 客戶（tier 3，待客戶端揭露印證）、GF 對 Tower 專利訴訟未追源。
 
-1. **第二條垂直切片 + L9 前置條件（解鎖 actionable advice 的閘門）**
+1. **Action-Oriented Alpha Decision Lab（當前大型開發）**
+   — 唯一 implementation plan：[`docs/plans/2026-07-21-001-feat-action-oriented-alpha-decision-lab-plan.md`](docs/plans/2026-07-21-001-feat-action-oriented-alpha-decision-lab-plan.md)。先做本機手動 Signal → Shadow Observation → Coverage／Confidence → lane-specific sizing → funded paper／Action Card 閉環。硬邊界：Neo4j 只讀且不可清空／重建；Engine C 可由 ETL + source-backed manual observations 重建；個人 Decision／paper runtime 不進 Git；live inventory 仍只認 Google Sheet，交易仍由使用者手動執行。排程 Daily Brief、自動 harvest 與 remote decision MCP 不在第一版。
+
+2. **第二條垂直切片 + L9 前置條件（解鎖 formal actionable advice 的閘門）**
    — 詳細規格保存在 [`docs/plans/2026-07-08-005-feat-second-vertical-slice-plan.md`](docs/plans/2026-07-08-005-feat-second-vertical-slice-plan.md)（純文件參考；`_check_second_slice()` gate 已與 plan 檔脫鉤，只認 runtime 交付物，故該檔可自由歸檔）。主題：AMAT/LRCX 成熟製程設備（非 AI／非 CPO），走相同 extract→graph→thesis 流程。**達標判準（= gate 實檢項）：** (a) `thesis/` 有檔名含 `amat`／`lrcx`／`semi_equip`／`mature_node` 的 `*_lane_memo.md`（005 建議的 `slice2_*` 舊命名匹配不到 gate）；(b) 該 memo 有非空 `## Variant Perception` 段落；(c) 同 stem 的 `*_scoring.md`（或 `*.scoring.md`），欄位 可信度／可證偽性／市場差異度／總分 齊全且 ≥3／≥3／≥2／≥20。另兩項前置：thesis→部位最小規則（[`docs/investment-sop.md`](docs/investment-sop.md)）與 Engine C 五項一鍵核驗。順手修 Lane Memo／投資建議 shared contract。
 
-2. **知識覆蓋自動化**
+3. **知識覆蓋自動化**
    — `fetchers/edgar.py` 的 10-Q CLI 已可用（2026-07-18 驗證 AMAT/LRCX 最新 10-Q 抓取正常：`python fetchers/edgar.py --ticker AMAT --forms 10-Q --n 1`）。剩：SIVE 找 3 個不同 `origin_entity` 的獨立來源；RSS pending leads（見上方引擎B 待做）。先讓手機 ad hoc loop 穩定，再擴自動 harvest。
 
 ---

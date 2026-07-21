@@ -95,8 +95,40 @@ The five-item financial checklist that a Lane Memo must pass before a thesis can
 
 ## Investment Process
 
+### Probe（研究探針）
+A time-bounded research state for testing an investable claim before it qualifies as a Formal Position. Every signal that passes the lightweight Probe Gate receives a Shadow Observation; a funded Paper execution requires the Coverage Gate, paper-lane market/FX freshness, and a positive paper supported position. A Live execution is optional and always manually approved and placed by the user. Probe is not a synonym for simulated trading: research status, research readiness, Observation Mode, and Execution Mode are orthogonal. A `coverage_pending` Probe remains valid for shadow observation but has a system-supported funded range of zero until its Minimum Viable Research Packet passes the Coverage Gate. A Probe ends as `promoted`, `rejected`, or `expired`; `revised` opens a new lifecycle epoch. Unresolved but still testable claims may remain active until their claim-specific expiry, but may not be repeatedly added to on the same unchanged narrative.
+*Avoid:* paper position, tiny formal position, watchlist candidate
+
+### Shadow Observation（影子觀測）
+The mandatory, zero-capital counterfactual attached to every qualified signal. It freezes the signal timestamp, catalyst, disproof condition, horizon, and either the then-current observable price or an explicit `missing/unavailable` status, without creating a funded Paper position. A missing inception price is never backfilled from hindsight; its market return stays unknown. Shadow Observation preserves rejected, zero-size, and coverage-pending decisions so source quality and decision quality can be evaluated without selection bias.
+*Avoid:* paper trade, virtual position, watchlist note
+
+### Execution Mode（執行模式）
+Whether a decision receives funded `paper` capital or actual `live` capital. `paper` is a conditional simulated allocation maintained by the Prospective Paper Portfolio; `live` means the user manually placed a real trade whose current inventory remains in Google Sheets. A qualified Probe may remain shadow-only, so Execution Mode does not express research maturity and is distinct from Shadow Observation.
+*Avoid:* probe type, order automation mode
+
+### Confidence Envelope（信心包絡）
+A multidimensional constraint on capital permission, not a single additive confidence score. It keeps source credibility, technical/causal linkage, commercial maturity, financial resilience, and valuation/payoff separate, then reports a paper target, live supported range, lane-specific maximum supported position, weakest link, and action. A strong item on one axis cannot cancel a missing necessary link on another; the user may underweight or override the supported cap, but an override remains distinct from the system recommendation.
+*Avoid:* conviction score, weighted evidence sum, binary gate
+
+### Decision Cohort（決策樣本集）
+The prospective population of every signal that passed the Probe Gate, including signals the user skipped, rejected, paper-traded, live-traded, or overrode. Each record preserves the raw qualified lead, system decision, user decision, execution references, claim outcome, and market outcome so source alpha, system alpha, and user discretion can be evaluated separately. It is upstream of the paper transaction ledger and does not duplicate paper or live position truth.
+*Avoid:* trade log, winners list, three decision ledgers
+
+### Signal Source Registry（訊號來源登記表／Whitelist）
+The user-governed registry that decides which accounts may trigger automatic Signal and Shadow capture and receive scarce research attention. A source moves among `candidate`, `probation`, `active`, and `suspended` based on prospective claim accuracy, trace success, lead time, independence, correction behavior, and beta-adjusted outcomes. Registry status is an attention and automation permission, never evidence or funded-Paper eligibility: it cannot raise `evidence_tier`, replace source tracing, or directly loosen a position cap.
+*Avoid:* trusted-evidence list, influencer score, automatic credibility override
+
+### Coverage Gate（研究覆蓋閘門）
+The readiness check run after a qualified signal has already been captured as a Probe with Shadow Observation. It asks whether enough company identity, source trace, causal context, counter-path, financial baseline, and falsifiable milestones exist to produce a defensible Confidence Envelope. Failure yields `coverage_pending / SHADOW ONLY / RESEARCH REQUIRED` and a system-supported funded range of zero; a user may still make a separately recorded manual override.
+*Avoid:* graph completeness gate, evidence admission gate, formal promotion gate
+
+### Minimum Viable Research Packet（最低可用研究包）
+The smallest bounded research package that can move a Probe from `coverage_pending` to analyzable without requiring full company onboarding. It contains the correct company/ticker, best available source, one claim-to-economics causal path, one substitution or counter-thesis path, a basic price/dilution/financial-runway baseline, and explicit catalyst, disproof, and expiry. It permits the system to assess paper and live lanes; it does not qualify a thesis as a Formal Position.
+*Avoid:* complete company graph, Lane Memo, underwrite sheet
+
 ### Prospective Paper Portfolio（前瞻模擬投資帳本）
-The repo-versioned, append-only simulation context under `paper_portfolio/`. It freezes each paper open/add/trim/close decision together with the point-in-time thesis version, policy version, price/FX snapshot, horizon, disproof condition, rationale, and decision author. Current positions, NAV, and P&L are derived from transaction events plus Engine C observations; they are not maintained as a second mutable positions file. Its purpose is prospective decision audit, not historical backtesting or an alpha claim. SOXX may be recorded as an optional opportunity-cost comparator, but there is no custom AI supply-chain benchmark until enough comparable closed decisions exist.
+The append-only funded simulation context for Paper executions. `paper_portfolio/` retains the domain/replay interface, while its transaction events share the ignored private Decision Store transaction boundary with their decision records; paper events remain the logical counterfactual transaction SSOT. It freezes each paper open/add/trim/close decision together with the point-in-time decision record, policy/calculator versions, price/FX snapshot, horizon, disproof condition, rationale, and decision author. Current positions, NAV, and P&L are derived from transaction events plus Engine C observations; they are not maintained as a second mutable positions file. Its purpose is prospective decision audit, not historical backtesting or an alpha claim. SOXX may be recorded as an optional opportunity-cost comparator, but there is no custom AI supply-chain benchmark until enough comparable closed decisions exist.
 *Avoid:* decision ledger, trade log, backtest portfolio, agent trading competition
 
 ### Crowding Discount（擁擠折扣）
