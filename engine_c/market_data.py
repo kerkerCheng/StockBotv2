@@ -10,7 +10,111 @@ market_data.py — 取當日市場快照（股價、估值倍數、分析師共�
 """
 from __future__ import annotations
 
+import math
 import sys
+from datetime import datetime, timezone
+from typing import Any, Iterable, Mapping
+
+
+def _finite_number(value: Any) -> float | None:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return None
+    parsed = float(value)
+    return parsed if math.isfinite(parsed) else None
+
+
+def _timestamp(value: Any) -> datetime | None:
+    if not isinstance(value, str):
+        return None
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    return parsed if parsed.tzinfo is not None else None
+
+
+def build_tradeability_snapshot(
+    *,
+    ticker: str,
+    currency: str,
+    rows: Iterable[Mapping[str, Any]],
+    fetched_at: str,
+    source: str,
+) -> dict[str, Any]:
+    """由具實際 session timestamp 的 history rows 建立 execution 快照。"""
+
+    blockers: list[str] = []
+    parsed_rows: list[tuple[datetime, float, float]] = []
+    if not isinstance(ticker, str) or not ticker.strip():
+        blockers.append("market_ticker_invalid")
+    if not isinstance(currency, str) or len(currency) != 3 or not currency.isupper():
+        blockers.append("market_currency_invalid")
+    if _timestamp(fetched_at) is None:
+        blockers.append("market_fetched_at_invalid")
+    if not isinstance(source, str) or not source.strip():
+        blockers.append("market_source_missing")
+    for row in rows:
+        as_of = _timestamp(row.get("as_of"))
+        close = _finite_number(row.get("close"))
+        volume = _finite_number(row.get("volume"))
+        if as_of is None or close is None or close <= 0 or volume is None or volume < 0:
+            blockers.append("market_history_row_invalid")
+            continue
+        parsed_rows.append((as_of, close, volume))
+    if not parsed_rows:
+        blockers.append("market_history_missing")
+    if blockers:
+        return {"status": "quarantined", "blockers": sorted(set(blockers))}
+
+    parsed_rows.sort(key=lambda row: row[0])
+    latest_time, latest_close, _ = parsed_rows[-1]
+    trailing = parsed_rows[-20:]
+    adv20 = sum(row[2] for row in trailing) / len(trailing)
+    return {
+        "status": "observed",
+        "ticker": ticker.strip().upper(),
+        "price": latest_close,
+        "currency": currency,
+        "adv20": adv20,
+        "as_of": latest_time.isoformat(),
+        "fetched_at": fetched_at,
+        "unit_status": "ok",
+        "source": source,
+        "blockers": [],
+    }
+
+
+def get_tradeability_snapshot(ticker: str, currency: str) -> dict[str, Any]:
+    """用 yfinance history 取可追溯的 20-session price/ADV 快照。"""
+
+    try:
+        import yfinance as yf
+    except ImportError:
+        return {"status": "unavailable", "blockers": ["yfinance_unavailable"]}
+    fetched_at = datetime.now(timezone.utc).isoformat()
+    try:
+        history = yf.Ticker(ticker).history(period="2mo", auto_adjust=False)
+        rows = [
+            {
+                "as_of": index.to_pydatetime().isoformat(),
+                "close": row.get("Close"),
+                "volume": row.get("Volume"),
+            }
+            for index, row in history.iterrows()
+        ]
+    except Exception as exc:
+        return {
+            "status": "unavailable",
+            "blockers": ["market_history_unavailable"],
+            "note": str(exc),
+        }
+    return build_tradeability_snapshot(
+        ticker=ticker,
+        currency=currency,
+        rows=rows,
+        fetched_at=fetched_at,
+        source="yfinance://history",
+    )
 
 
 def get_snapshot(ticker: str) -> dict:

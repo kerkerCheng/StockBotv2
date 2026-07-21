@@ -25,6 +25,22 @@ _REQUIRED_KEYS = {
     "minimum_holding_days",
 }
 
+_PROBE_REQUIRED_KEYS = {
+    "rubric_version",
+    "calculator_version",
+    "paper_nav",
+    "single_probe_nav_cap",
+    "probe_book_nav_cap",
+    "review_hours",
+    "axis_ceilings",
+    "live_adv_fraction_cap",
+    "market_freshness_hours",
+    "fx_freshness_hours",
+    "holdings_freshness_days",
+    "financial_freshness_days",
+}
+_PROBE_LEVELS = ("unknown", "bounded_hypothesis", "corroborated")
+
 
 class PolicyError(ValueError):
     """Raised when policy configuration is missing or unsafe."""
@@ -47,6 +63,82 @@ def _ratio(value: Any, name: str, *, allow_zero: bool = False) -> float:
     return result
 
 
+def _positive_number(value: Any, name: str) -> float:
+    result = _number(value, name)
+    if result <= 0:
+        raise PolicyError(f"{name} must be positive")
+    return result
+
+
+def _version(value: Any, name: str) -> str:
+    if not isinstance(value, str) or not value.strip():
+        raise PolicyError(f"{name} must be a non-empty string")
+    return value.strip()
+
+
+def _validate_probe_lane(value: Any) -> dict[str, Any]:
+    if not isinstance(value, Mapping):
+        raise PolicyError("probe_lane must be an object")
+    missing = sorted(_PROBE_REQUIRED_KEYS - set(value))
+    if missing:
+        raise PolicyError(f"probe_lane missing required keys: {', '.join(missing)}")
+
+    single_cap = _ratio(value["single_probe_nav_cap"], "probe_lane.single_probe_nav_cap")
+    book_cap = _ratio(value["probe_book_nav_cap"], "probe_lane.probe_book_nav_cap")
+    if single_cap > book_cap:
+        raise PolicyError("probe single-position cap cannot exceed probe book cap")
+
+    review_hours = value["review_hours"]
+    if (
+        isinstance(review_hours, bool)
+        or not isinstance(review_hours, int)
+        or not 48 <= review_hours <= 72
+    ):
+        raise PolicyError("probe_lane.review_hours must be an integer from 48 to 72")
+
+    raw_ceilings = value["axis_ceilings"]
+    if not isinstance(raw_ceilings, Mapping) or set(raw_ceilings) != set(_PROBE_LEVELS):
+        raise PolicyError("probe_lane.axis_ceilings must define exactly the three rubric levels")
+    ceilings = {
+        level: _ratio(
+            raw_ceilings[level],
+            f"probe_lane.axis_ceilings.{level}",
+            allow_zero=True,
+        )
+        for level in _PROBE_LEVELS
+    }
+    if ceilings["unknown"] != 0.0:
+        raise PolicyError("probe unknown ceiling must be zero")
+    ordered = [ceilings[level] for level in _PROBE_LEVELS]
+    if ordered != sorted(ordered) or len(set(ordered)) != len(ordered):
+        raise PolicyError("probe axis ceilings must increase strictly by rubric level")
+    if ceilings["corroborated"] > single_cap:
+        raise PolicyError("probe corroborated ceiling cannot exceed single-position cap")
+
+    normalized = {
+        "rubric_version": _version(value["rubric_version"], "probe_lane.rubric_version"),
+        "calculator_version": _version(
+            value["calculator_version"], "probe_lane.calculator_version"
+        ),
+        "paper_nav": _positive_number(value["paper_nav"], "probe_lane.paper_nav"),
+        "single_probe_nav_cap": single_cap,
+        "probe_book_nav_cap": book_cap,
+        "review_hours": review_hours,
+        "axis_ceilings": ceilings,
+        "live_adv_fraction_cap": _ratio(
+            value["live_adv_fraction_cap"], "probe_lane.live_adv_fraction_cap"
+        ),
+    }
+    for field in (
+        "market_freshness_hours",
+        "fx_freshness_hours",
+        "holdings_freshness_days",
+        "financial_freshness_days",
+    ):
+        normalized[field] = _positive_number(value[field], f"probe_lane.{field}")
+    return normalized
+
+
 def validate_policy(policy: Mapping[str, Any]) -> dict[str, Any]:
     """Validate and normalize a policy mapping, failing closed on drift."""
 
@@ -56,9 +148,7 @@ def validate_policy(policy: Mapping[str, Any]) -> dict[str, Any]:
     if missing:
         raise PolicyError(f"policy missing required keys: {', '.join(missing)}")
 
-    version = policy["policy_version"]
-    if not isinstance(version, str) or not version.strip():
-        raise PolicyError("policy_version must be a non-empty string")
+    version = _version(policy["policy_version"], "policy_version")
 
     minimum = policy["minimum_open_conviction"]
     if isinstance(minimum, bool) or not isinstance(minimum, int) or not 1 <= minimum <= 5:
@@ -103,8 +193,8 @@ def validate_policy(policy: Mapping[str, Any]) -> dict[str, Any]:
             raise PolicyError("factor exposure names must be non-empty strings")
         normalized_caps[factor] = _ratio(cap, f"factor_exposure_caps.{factor}")
 
-    return {
-        "policy_version": version.strip(),
+    normalized = {
+        "policy_version": version,
         "single_position_nav_cap": _ratio(
             policy["single_position_nav_cap"], "single_position_nav_cap"
         ),
@@ -115,6 +205,11 @@ def validate_policy(policy: Mapping[str, Any]) -> dict[str, Any]:
         "factor_exposure_caps": normalized_caps,
         "minimum_holding_days": minimum_days,
     }
+    # Formal-only historical callers remain compatible; repository policy opts in
+    # to the independently validated Probe lane.
+    if "probe_lane" in policy:
+        normalized["probe_lane"] = _validate_probe_lane(policy["probe_lane"])
+    return normalized
 
 
 def load_policy(path: str | Path = POLICY_PATH) -> dict[str, Any]:

@@ -70,6 +70,22 @@ def holdings_digest(rows: Sequence[Mapping[str, Any]]) -> str:
     return hashlib.sha256(_canonical(normalized).encode("utf-8")).hexdigest()
 
 
+def holdings_snapshot_digest(
+    rows: Sequence[Mapping[str, Any]],
+    *,
+    nav_base: float | None = None,
+    base_currency: str | None = None,
+) -> str:
+    """Bind optional mark-to-market NAV to the same explicit confirmation."""
+
+    payload: list[Mapping[str, Any]] = list(rows)
+    if nav_base is not None:
+        payload.append(
+            {"portfolio_nav_base": nav_base, "base_currency": base_currency}
+        )
+    return holdings_digest(payload)
+
+
 def derive_runway(
     financial: Mapping[str, Any],
     *,
@@ -108,7 +124,11 @@ def derive_runway(
 
 
 def _normalize_financial(
-    payload: Mapping[str, Any], *, expected_ticker: str, evaluation_at: str
+    payload: Mapping[str, Any],
+    *,
+    expected_ticker: str,
+    evaluation_at: str,
+    freshness_days: float = 14,
 ) -> dict[str, Any]:
     if payload.get("status") in {"missing", "unavailable"}:
         status = str(payload["status"])
@@ -125,7 +145,11 @@ def _normalize_financial(
         return {"status": "quarantined", "blockers": ["financial_timestamp_future"]}
     if not payload.get("source"):
         return {"status": "quarantined", "blockers": ["financial_source_missing"]}
-    status = "stale" if evaluation - as_of > timedelta(days=14) else "available"
+    status = (
+        "stale"
+        if evaluation - as_of > timedelta(days=freshness_days)
+        else "available"
+    )
     checklist = deepcopy(payload.get("checklist") or {})
     return {
         "status": status,
@@ -149,6 +173,7 @@ def _normalize_holdings(
     evaluation_at: str,
     expected_symbol: str | None,
     expected_currency: str | None,
+    freshness_days: float = 7,
 ) -> dict[str, Any]:
     upstream = payload.get("status")
     if upstream in {"malformed", "missing", "unavailable"}:
@@ -171,9 +196,25 @@ def _normalize_holdings(
             or shares is None
         ):
             return {"status": "malformed", "blockers": ["holdings_malformed"]}
-        normalized.append(
-            {"ticker": ticker.strip().upper(), "shares": shares, "currency": currency}
-        )
+        normalized_row = {
+            "ticker": ticker.strip().upper(),
+            "shares": shares,
+            "currency": currency,
+        }
+        company_id = row.get("company_id")
+        if company_id is not None:
+            if not isinstance(company_id, str) or not company_id.startswith("co:"):
+                return {"status": "malformed", "blockers": ["holdings_company_id_invalid"]}
+            normalized_row["company_id"] = company_id
+        if "market_value_base" in row:
+            market_value = _finite(row.get("market_value_base"), non_negative=True)
+            if market_value is None:
+                return {
+                    "status": "malformed",
+                    "blockers": ["holdings_market_value_invalid"],
+                }
+            normalized_row["market_value_base"] = market_value
+        normalized.append(normalized_row)
         if (
             expected_symbol
             and ticker.strip().upper() == expected_symbol.upper()
@@ -184,39 +225,67 @@ def _normalize_holdings(
                 "status": "malformed",
                 "blockers": ["holdings_currency_mismatch"],
             }
-    digest = holdings_digest(normalized)
+    nav_base = payload.get("nav_base")
+    base_currency = payload.get("base_currency")
+    normalized_nav: float | None = None
+    if nav_base is not None or base_currency is not None:
+        normalized_nav = _finite(nav_base, non_negative=True)
+        if (
+            normalized_nav is None
+            or normalized_nav <= 0
+            or not isinstance(base_currency, str)
+            or not re.fullmatch(r"[A-Z]{3}", base_currency)
+        ):
+            return {"status": "malformed", "blockers": ["holdings_nav_invalid"]}
+    digest = holdings_snapshot_digest(
+        normalized,
+        nav_base=normalized_nav,
+        base_currency=base_currency if isinstance(base_currency, str) else None,
+    )
+    common = {
+        "digest": digest,
+        "rows": normalized,
+        "nav_base": normalized_nav,
+        "base_currency": base_currency,
+    }
     confirmation = store.latest_holdings_confirmation(digest)
     if confirmation is None:
-        return {
+        return common | {
             "status": "unconfirmed",
-            "digest": digest,
-            "rows": normalized,
             "blockers": ["holdings_unconfirmed"],
         }
     evaluation = _parse_time(evaluation_at, "evaluation_at")
     confirmed_at = _parse_time(confirmation["confirmed_at"], "holdings.confirmed_at")
     if confirmed_at > evaluation:
-        return {
+        return common | {
             "status": "unconfirmed",
-            "digest": digest,
-            "rows": normalized,
             "blockers": ["holdings_confirmation_future"],
         }
-    if evaluation - confirmed_at > timedelta(days=7):
-        return {
+    if evaluation - confirmed_at > timedelta(days=freshness_days):
+        return common | {
             "status": "stale",
-            "digest": digest,
-            "rows": normalized,
             "confirmed_at": confirmation["confirmed_at"],
             "blockers": ["holdings_stale"],
         }
-    return {
+    return common | {
         "status": "confirmed_empty" if not normalized else "confirmed",
-        "digest": digest,
-        "rows": normalized,
         "confirmed_at": confirmation["confirmed_at"],
         "blockers": [],
     }
+
+
+def _normalize_weights(value: Any, field: str) -> dict[str, float] | None:
+    if value is None:
+        return {}
+    if not isinstance(value, Mapping):
+        return None
+    normalized: dict[str, float] = {}
+    for key, raw_weight in value.items():
+        weight = _finite(raw_weight, non_negative=True)
+        if not isinstance(key, str) or not key.strip() or weight is None or weight > 10:
+            return None
+        normalized[key.strip()] = weight
+    return normalized
 
 
 def build_context_bundle(
@@ -232,12 +301,38 @@ def build_context_bundle(
     fx: Mapping[str, Any],
     holdings: Mapping[str, Any],
     paper_exposure: Mapping[str, Any],
+    execution_market: Mapping[str, Any] | None = None,
+    execution_fx: Mapping[str, Any] | None = None,
+    freshness_policy: Mapping[str, Any] | None = None,
 ) -> ContextBundle:
     """Validate every external scalar, then persist one content-addressed bundle。"""
 
     _parse_time(evaluation_at, "evaluation_at")
-    for value in (identity, evidence, financial, market, fx, holdings, paper_exposure):
+    for value in (
+        identity,
+        evidence,
+        financial,
+        market,
+        fx,
+        holdings,
+        paper_exposure,
+        execution_market or {},
+        execution_fx or {},
+        freshness_policy or {},
+    ):
         _reject_secrets(value)
+    freshness = {
+        "market_freshness_hours": 36.0,
+        "fx_freshness_hours": 36.0,
+        "holdings_freshness_days": 7.0,
+        "financial_freshness_days": 14.0,
+    }
+    if freshness_policy is not None:
+        for field in freshness:
+            parsed = _finite(freshness_policy.get(field), non_negative=True)
+            if parsed is None or parsed <= 0:
+                raise ValueError(f"{field} must be positive and finite")
+            freshness[field] = parsed
     company_id = identity.get("company_id")
     research_ticker = identity.get("research_ticker")
     execution_symbol = identity.get("execution_symbol")
@@ -251,6 +346,9 @@ def build_context_bundle(
             "company_id": company_id,
             "research_ticker": research_ticker,
             "execution_symbol": execution_symbol,
+            "market_currency": identity.get("market_currency"),
+            "execution_currency": identity.get("execution_currency"),
+            "execution_venue": identity.get("execution_venue"),
             "blockers": [],
         }
     normalized_evidence = deepcopy(dict(evidence))
@@ -262,17 +360,20 @@ def build_context_bundle(
         expected_ticker=str(research_ticker or ""),
         expected_currency=expected_currency,
         evaluation_at=evaluation_at,
+        max_age_hours=freshness["market_freshness_hours"],
     )
     expected_pair = f"{expected_currency}/USD"
     normalized_fx = normalize_fx_snapshot(
         fx,
         expected_pair=expected_pair,
         evaluation_at=evaluation_at,
+        max_age_hours=freshness["fx_freshness_hours"],
     )
     normalized_financial = _normalize_financial(
         financial,
         expected_ticker=str(research_ticker or ""),
         evaluation_at=evaluation_at,
+        freshness_days=freshness["financial_freshness_days"],
     )
     normalized_holdings = _normalize_holdings(
         store,
@@ -280,10 +381,70 @@ def build_context_bundle(
         evaluation_at=evaluation_at,
         expected_symbol=str(execution_symbol or "") or None,
         expected_currency=str(identity.get("execution_currency") or "") or None,
+        freshness_days=freshness["holdings_freshness_days"],
     )
+    execution_currency = str(identity.get("execution_currency") or "")
+    if execution_market is None and execution_symbol == research_ticker:
+        normalized_execution_market = deepcopy(normalized_market)
+    elif execution_market is None:
+        normalized_execution_market = {
+            "status": "missing",
+            "blockers": ["execution_market_missing"],
+        }
+    else:
+        normalized_execution_market = normalize_market_snapshot(
+            execution_market,
+            expected_ticker=str(execution_symbol or ""),
+            expected_currency=execution_currency,
+            evaluation_at=evaluation_at,
+            max_age_hours=freshness["market_freshness_hours"],
+        )
+        normalized_execution_market["blockers"] = [
+            blocker.replace("market_", "execution_market_", 1)
+            for blocker in normalized_execution_market.get("blockers", [])
+        ]
+    execution_pair = f"{execution_currency}/USD"
+    if execution_currency == "USD" and execution_fx is None:
+        normalized_execution_fx = {
+            "status": "available",
+            "pair": "USD/USD",
+            "rate": 1.0,
+            "as_of": evaluation_at,
+            "fetched_at": evaluation_at,
+            "source": "identity://base-currency",
+            "blockers": [],
+        }
+    elif execution_fx is None and execution_pair == expected_pair:
+        normalized_execution_fx = deepcopy(normalized_fx)
+    elif execution_fx is None:
+        normalized_execution_fx = {
+            "status": "missing",
+            "blockers": ["execution_fx_missing"],
+        }
+    else:
+        normalized_execution_fx = normalize_fx_snapshot(
+            execution_fx,
+            expected_pair=execution_pair,
+            evaluation_at=evaluation_at,
+            max_age_hours=freshness["fx_freshness_hours"],
+        )
+        normalized_execution_fx["blockers"] = [
+            blocker.replace("fx_", "execution_fx_", 1)
+            for blocker in normalized_execution_fx.get("blockers", [])
+        ]
     nav = _finite(paper_exposure.get("nav"), non_negative=True)
     total_weight = _finite(paper_exposure.get("total_weight"), non_negative=True)
-    if nav is None or nav <= 0 or total_weight is None:
+    factor_weights = _normalize_weights(paper_exposure.get("factor_weights"), "factor_weights")
+    company_weights = _normalize_weights(
+        paper_exposure.get("company_weights"), "company_weights"
+    )
+    if (
+        nav is None
+        or nav <= 0
+        or total_weight is None
+        or factor_weights is None
+        or company_weights is None
+    ):
         normalized_paper = {
             "status": "quarantined",
             "blockers": ["paper_exposure_invalid"],
@@ -293,6 +454,8 @@ def build_context_bundle(
             "status": "available",
             "nav": nav,
             "total_weight": total_weight,
+            "factor_weights": factor_weights,
+            "company_weights": company_weights,
             "blockers": [],
         }
     payload = {
@@ -304,8 +467,11 @@ def build_context_bundle(
         "financial": normalized_financial,
         "market": normalized_market,
         "fx": normalized_fx,
+        "execution_market": normalized_execution_market,
+        "execution_fx": normalized_execution_fx,
         "holdings": normalized_holdings,
         "paper_exposure": normalized_paper,
+        "freshness_policy": freshness,
     }
     digest = hashlib.sha256(_canonical(payload).encode("utf-8")).hexdigest()
     return store.freeze_context_bundle(

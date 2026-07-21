@@ -34,7 +34,7 @@ def normalize_market_snapshot(
     expected_ticker: str,
     expected_currency: str,
     evaluation_at: str,
-    max_age_hours: int = 36,
+    max_age_hours: float = 36,
 ) -> dict[str, Any]:
     upstream = payload.get("status")
     if upstream in {"missing", "unavailable"}:
@@ -85,7 +85,7 @@ def normalize_fx_snapshot(
     *,
     expected_pair: str,
     evaluation_at: str,
-    max_age_hours: int = 36,
+    max_age_hours: float = 36,
 ) -> dict[str, Any]:
     upstream = payload.get("status")
     if upstream in {"missing", "unavailable"}:

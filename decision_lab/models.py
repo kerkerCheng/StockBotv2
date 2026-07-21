@@ -94,3 +94,29 @@ class CoverageResult:
     paper_supported_position: float
     live_supported_range: tuple[float, float]
     work_order_id: str | None
+
+
+@dataclass(frozen=True)
+class ProbeSizingResult:
+    cohort_id: str
+    context_digest: str
+    policy_version: str
+    rubric_version: str
+    calculator_version: str
+    identity_registry_version: int
+    weakest_axis: str
+    axis_ceiling: float
+    axis_results: Mapping[str, Mapping[str, Any]]
+    assessment_blockers: tuple[str, ...]
+    paper_status: str
+    paper_target: float
+    paper_max_supported_position: float
+    paper_current_position: float
+    paper_blockers: tuple[str, ...]
+    live_status: str
+    live_supported_range: tuple[float, float]
+    live_supported_shares: tuple[float, float] | None
+    live_current_position: float
+    live_blockers: tuple[str, ...]
+    constraint_trace: tuple[Mapping[str, Any], ...]
+    action: str

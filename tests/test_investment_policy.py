@@ -11,6 +11,7 @@ from thesis.investment_policy import (
     check_factor_exposure,
     holding_action,
     load_policy,
+    validate_policy,
 )
 
 
@@ -132,3 +133,48 @@ def test_factor_cap_and_exit_override_are_machine_checked() -> None:
 
     assert exposure["within_cap"] is False
     assert exit_action["action"] == "review_exit_now"
+
+
+def test_repository_policy_has_versioned_probe_lane_defaults() -> None:
+    probe = load_policy()["probe_lane"]
+
+    assert probe["paper_nav"] == 100.0
+    assert probe["single_probe_nav_cap"] == 0.005
+    assert probe["probe_book_nav_cap"] == 0.02
+    assert probe["review_hours"] == 72
+    assert probe["axis_ceilings"] == {
+        "unknown": 0.0,
+        "bounded_hypothesis": 0.002,
+        "corroborated": 0.005,
+    }
+    assert probe["rubric_version"]
+    assert probe["calculator_version"]
+
+
+@pytest.mark.parametrize(
+    "probe_override",
+    [
+        {"review_hours": 96},
+        {"single_probe_nav_cap": 0.03},
+        {
+            "axis_ceilings": {
+                "unknown": 0.0,
+                "bounded_hypothesis": 0.006,
+                "corroborated": 0.005,
+            }
+        },
+        {"live_adv_fraction_cap": 0.0},
+    ],
+)
+def test_invalid_probe_lane_fails_closed_without_changing_formal_policy(
+    probe_override,
+) -> None:
+    repository_probe = load_policy()["probe_lane"]
+    invalid_probe = dict(repository_probe)
+    invalid_probe.update(probe_override)
+
+    with pytest.raises(PolicyError):
+        validate_policy(_policy(probe_lane=invalid_probe))
+
+    # 沒有 probe_lane 的舊 formal policy 仍維持相容。
+    assert validate_policy(_policy())["single_position_nav_cap"] == 0.05
