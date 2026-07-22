@@ -44,12 +44,12 @@ revised: 2026-07-22 (push 前提定案後修訂：git push 為狀態同步機制
 
 - R1. pending leads 狀態存 `library/leads/pending_leads.json`（git tracked；**本機是 authority，push 是同步機制**——cloud routine 讀 pushed baseline，不寫回）。每條 lead：`lead_id`（URL content hash）、source、url、title、published_at、first_seen、status、triage 結果、refs（research_action_id 等）。URL hash 去重，重複 harvest 冪等。
 - R2. Status 是封閉狀態機：`pending → triaged_go | triaged_no_go`；`triaged_go → researching → action_prepared → applied`；任何狀態可 `parked`。不變式：**任何 status 都不影響 evidence tier**。
-- R3. Harvest 來源由 `crons/harvest_config.json` 設定（可編輯，不 hardcode）：v0 = aleabitoreddit RSS（channel 標題是 "Serenity"，見 AGENTS 既知坑）＋ EDGAR watch tickers 的新 filing 檢查（沿用 `fetchers/edgar.py` 的 submissions 查詢，只記 metadata 不下載全文）。
+- R3. Harvest 來源由 `crons/harvest_config.json` 設定（可編輯，不 hardcode）：v0 = aleabitoreddit RSS（channel 標題是 "Serenity"，見 AGENTS 既知坑）＋ EDGAR watch tickers 的新 filing 檢查（沿用 `fetchers/edgar.py` 的 submissions 查詢，比對已見 accession，只記 metadata——form 類型／日期／URL——不下載全文；8-K／10-K／10-Q／Form 4 高優先，S-8 等註冊雜訊交 triage 判）。Watch 清單 v0 手動維護是刻意的；future note：自動衍生規則（active thesis ∪ Engine D active cohorts ∪ 手動追加）等「研究新公司忘了加 watch」的摩擦真實出現再做。
 - R4. Harvest 失敗必須誠實：每次 run 寫 harvest_log（run_at／source／ok|fetch_failed|parse_failed／new 數量）；**解析失敗 ≠ 無新文**，brief 必須把 failed source 標出來並提示 fallback（`site:aleabitoreddit.substack.com` web search）。
 
 **Brief 組成與動詞**
 
-- R5. Brief 是三佇列聚合、exception-first：(a) 決策佇列＝`decision_lab today` 的 redacted DTO；(b) 入庫佇列＝pending Research Actions（`get_research_action_status`）；(c) 注意力佇列＝triaged leads。無事輸出一行 `NO ACTION` ＋日期。
+- R5. Brief 是四佇列聚合、exception-first：(a) 決策佇列＝`decision_lab today` 的 redacted DTO；(b) 入庫佇列＝pending Research Actions（`get_research_action_status`）；(c) 注意力佇列＝triaged leads；(d) **thesis 生命週期到期佇列**＝讀 `thesis/lifecycle.json` 比對到期（active 90 天／watch 30 天／review_required 每日必列），due 項目就是「需要你動作」的一種（2026-07-22 定案：從 weekly scan 移交 daily，因為到期 review 本質是核准佇列項目，不該等週一）。無事輸出一行 `NO ACTION` ＋日期。
 - R6. 動詞是封閉集合並在 brief 尾附說明：`research <n|topic>`（觸發 source-trace＋lead-intake）、`apply <ra_id>`（既有核准協定）、`park <n>`、`skip`；決策類（`accept`／`reduce`／`record fill`）僅本機，維持 explicit flags。動詞不新增任何權限語意。
 - R7. Triage 由 `skills/signal-triage/SKILL.md` 判準執行（LLM 便宜判斷）。本機 triage 寫回 lead 的 triage 欄位；cloud routine 的 triage 只呈現在 Issue（不回寫狀態），本機隔天 inline harvest 冪等落地同批 leads 後重 triage（便宜，且避免遠端寫入面）。Triage 刻意寬鬆，丟棄也要記 reason。
 
@@ -64,9 +64,9 @@ revised: 2026-07-22 (push 前提定案後修訂：git push 為狀態同步機制
 
 **Cloud routine 與排程**
 
-- R11. 新增 `crons/daily_brief_prompt.md`：每日（台北 06:30，錯開週掃 06:00）執行——讀 pushed clone 的 `pending_leads.json` baseline 與 harvest config → web harvest RSS／EDGAR → 與 baseline 去重後把**新發現直接列在 Issue**（含 triage 摘要，不回寫狀態）→ 經 MCP 讀 `get_decision_brief`＋`get_research_action_status` → 產出當日 GitHub Issue（title 含日期、label `daily-brief`，附動詞說明）→ 前一日 Issue 若無人動作自動 close 並在新 Issue 註記 carry-over。**Issue 以日期命名＝心跳：日期空洞即漏跑證據**，weekly scan 作 backstop。MCP 連不上時決策佇列標明降級，leads／RA 佇列照常（比純 MCP 方案更耐斷線）。
-- R12. Routine 與 weekly scan 分工明確：daily 只做「佇列＋今日行動」；topic discovery 深度聚類、thesis 生命週期、系統健康仍歸 weekly。兩份 prompt 互相引用此分工，避免漂移。
-- R13. 本機 session 開頭 digest 增加一行「pending leads N 條（M 條 triaged_go）」——沿用既有 session-start digest 機制擴充，不另建通知系統。
+- R11. 新增 `crons/daily_brief_prompt.md`：每日（台北 06:30，錯開週掃 06:00）執行——讀 pushed clone 的 `pending_leads.json` baseline 與 harvest config → web harvest RSS／EDGAR → 與 baseline 去重後把**新發現直接列在 Issue**（含 triage 摘要，不回寫狀態）→ 經 MCP 讀 `get_decision_brief`＋`get_research_action_status` → 產出當日 GitHub Issue（title 含日期、label `daily-brief`，附動詞說明）→ 前一日 Issue 若無人動作自動 close 並在新 Issue 註記 carry-over。**Issue 版面分兩區：「今日新增」置頂、「carry-over（第 N 天）」在後**——baseline 久未 push 時重複項全部落在 carry-over 區，真新料不被淹沒。**Issue 以日期命名＝心跳：日期空洞即漏跑證據**，weekly scan 作 backstop。MCP 連不上時決策佇列標明降級，leads／RA 佇列照常（比純 MCP 方案更耐斷線）。
+- R12. Routine 與 weekly scan 分工明確（2026-07-22 重新定案）：**daily＝一切需要使用者動作的東西（含 thesis lifecycle 到期，見 R5d）＋心跳；weekly 瘦身為 topic discovery＋系統健康審查＋Stage 0 legacy gate**。兩份 prompt 互相引用此分工，避免漂移。Weekly 存廢的後續判準：跑數週後若 topic discovery 從未產出使用者想深挖的主題，屆時砍 weekly 收斂成單一 routine（用真實數據決定，不預先合併）。
+- R13. Session 開頭 digest 增加一行「pending leads N 條（M 條 triaged_go）」。**前置已完成（2026-07-22，commit 553755b）：** hooks 已從 `settings.local.json` 搬到 tracked `.claude/settings.json`（clone 即生效，含 cloud session），digest 腳本已改雙通道輸出（`systemMessage` 給終端 UI＋`additionalContext` 進 agent context 並指示第一則回覆轉述——手機 App 遙控與雲端介面都靠後者，因為它們不渲染 systemMessage）。U4 只需把 leads 計數依同一模式加進 digest；Codex 端 hook 設定放 `.codex/`，呼叫同一支 Python 腳本（AGENTS 雙代理原則）。
 
 ### 前置修復（進 scope）
 
@@ -112,12 +112,12 @@ revised: 2026-07-22 (push 前提定案後修訂：git push 為狀態同步機制
 ### U4 — `/daily-brief` skill 與 session digest（R5–R7、R10、R13）
 
 - **Files:** add `skills/daily-brief/SKILL.md`（canonical）；regenerate `.agents/skills/`、`.claude/skills/`（`python scripts/sync_agent_skills.py`）；session-start digest 擴充（實作時查現行 hook 設定，最小改動）；modify `tests/test_skill_decision_contract.py` 或新增 parity 測試；modify `AGENTS.md`（push 慣例）。
-- **Approach:** skill 定義：inline 跑 `python crons/harvest_leads.py` → 對 pending 新 leads 依 signal-triage 判準 triage 並寫回 → 跑 `python -m decision_lab today --format markdown` → 組三佇列 brief（繁中、action-first、動詞說明在尾）→ 動詞 dispatch 表（`research <n>` → source-trace＋lead-intake；`apply <ra_id>` → 既有 apply＋`scripts/commit_pending_intake.py`；`park` → leads.py 狀態轉移）→ 收尾 commit＋push（含 `git ls-files library/private` sanity check）。skill 不含政策數值、不算 sizing。
+- **Approach:** skill 定義：inline 跑 `python crons/harvest_leads.py` → 對 pending 新 leads 依 signal-triage 判準 triage 並寫回 → 跑 `python -m decision_lab today --format markdown` → 讀 `thesis/lifecycle.json` 列到期項（R5d）→ 組四佇列 brief（繁中、action-first、動詞說明在尾）→ 動詞 dispatch 表（`research <n>` → source-trace＋lead-intake；`apply <ra_id>` → 既有 apply＋`scripts/commit_pending_intake.py`；`park` → leads.py 狀態轉移）→ 收尾 commit＋push（含 `git ls-files library/private` sanity check）。skill 不含政策數值、不算 sizing。**明文注意事項：decision_lab 命令只在本機執行**——雲端 session 的 clone 沒有 private Decision Store，跑了會開出一個用完即棄的空 store（不污染真 store，但產出無效且造成困惑）。digest 擴充沿用 553755b 的雙通道模式（見 R13）。
 - **Dependencies:** U1、U2（research 動詞會打 evaluate-signal）。
 
 ### U5 — Daily cloud routine 與上線（R11–R12）
 
-- **Files:** add `crons/daily_brief_prompt.md`；modify `crons/weekly_scan_prompt.md`（加一段分工註記）；modify `AGENTS.md`（開發優先序＋operational commands）。
+- **Files:** add `crons/daily_brief_prompt.md`；modify `crons/weekly_scan_prompt.md`（**移除 thesis 生命週期核查段——已移交 daily（R5d／R12），瘦身為 topic discovery＋系統健康＋Stage 0 legacy gate**，並加分工註記）；modify `AGENTS.md`（開發優先序＋operational commands＋weekly scan 描述同步）。
 - **Approach:** prompt 結構仿 weekly scan（前提宣告、clone baseline 讀取、MCP 降級規則、Stage 化流程、日期心跳 Issue 模板含動詞說明與 carry-over 規則）。
 - **上線 checklist（人工步驟，寫進 prompt 檔頭）：**
   1. push 現有 master backlog（首次 rollout 前提）；
@@ -135,7 +135,7 @@ revised: 2026-07-22 (push 前提定案後修訂：git push 為狀態同步機制
 - **RISK1 — 初期流量太稀，brief 天天 NO ACTION。** 接受；這是來源清單問題不是管線問題，擴源另議。
 - **RISK2 — triage 判準太鬆／太緊。** signal-triage 本來就標為拍腦袋 v0；用真實流量調。
 - **RISK3 — Issue view 與 json state 漂移**（使用者在 Issue 上打勾但沒回動詞）。v0 以 state 為準＋carry-over 註記；常發生再考慮讓 routine 讀 Issue 回寫。
-- **RISK4 — clone staleness：** 使用者若幾天沒 push，routine 會重複列已處理的 leads（冪等、僅噪音）。撞到頻繁再加 `get_pending_leads` live 視窗（R9 future note）。
+- **RISK4 — clone staleness 與 RSS 視窗遺漏：** 使用者若幾天沒 push，routine 會重複列已處理的 leads（冪等、僅噪音，且都落在 carry-over 區）。**真的會漏的只有一種**：長期（2 週＋）不開本機 session，RSS 文章掉出 feed 視窗後本機 harvest 永遠抓不到，唯一紀錄剩舊 Issue（保底：回來後翻 Issue 用 `research <url>` 手動撈）；EDGAR 無此問題（submissions JSON 是完整歷史，回來補跑全抓得到）。撞到頻繁再加 `get_pending_leads` live 視窗或 Issue 機器可讀區塊（R9 future note）。
 - **RISK5 — 忘記 push 使迴路劣化是新的人為依賴。** 緩解：/daily-brief 收尾步驟內建 push；Issue 重複噪音本身就是「該 push 了」的可見信號。
 - **RISK6 — MCP tunnel 斷線。** 只降級決策佇列；leads／RA 佇列照常（KTD1 的耐斷線紅利）。
 
@@ -147,10 +147,23 @@ revised: 2026-07-22 (push 前提定案後修訂：git push 為狀態同步機制
 
 ## Definition of Done
 
-- [ ] 本機 `/daily-brief` 一個指令產出三佇列 brief，無事輸出 `NO ACTION`。
+- [ ] 本機 `/daily-brief` 一個指令產出四佇列 brief（決策／入庫／注意力／lifecycle 到期），無事輸出 `NO ACTION`。
 - [ ] partial-identity ticker 走完 evaluate-signal 不 crash，缺欄以 blocker 呈現。
 - [ ] MCP 10 工具：`get_decision_brief` 過測試（含 redaction 斷言），remote-access 文件同步。
 - [ ] Push 慣例寫入 AGENTS，/daily-brief 收尾含 commit＋push＋sanity check。
-- [ ] Daily routine 連續 3 天產出日期心跳 Issue，carry-over 與降級規則被觀察到正確運作。
+- [ ] Weekly scan prompt 已移除 thesis lifecycle 段並加分工註記；AGENTS 的 weekly 描述同步。
+- [ ] Daily routine 連續 3 天產出日期心跳 Issue（今日新增／carry-over 兩區），carry-over 與降級規則被觀察到正確運作。
 - [ ] 動詞 dispatch 三條路徑（research／apply／park）真實跑通各一次。
 - [ ] AGENTS 更新、skill sync clean、full suite 與 baseline 比對歸因、邏輯 commits，**master 已 push**。
+
+## 討論定案紀錄（2026-07-22，Q&A 收斂）
+
+規劃過程中與使用者逐題釐清、已併入上方 requirements 的決定，留此供實作者回溯「為什麼」：
+
+- **升格 vs Engine D：** 升格是 investment SOP／L9 的 per-thesis gate（→ Formal Position）；Engine D 是 per-signal 決策介面（Probe lane：shadow／paper／有界 live range）。兩者並存。使用者不需自記升格狀態：Probe lifecycle 在 private Decision Store（`today`／`card` 可查）、thesis 標籤在 Lane Memo、gate 即時算（`checklist.py`／`preconditions.py`）。**已知落差：** Formal Position 的完整 conviction sizing 尚未進 Engine D workflow（deferred，獨立 plan）。
+- **自動化不放寬入圖閘門：** 抓進來的是 Signal→Shadow（零資本），不是自動 paper。三道閘門（graph admission 核准、深挖點名、live 人工）永不自動。token 大戶（深挖 research）永遠 gate 在使用者手上；自動段（harvest 零 token、triage 便宜）不會因來源變多而爆量。
+- **Push 前提（本 plan 的地基）：** 先前 session 的「不 push」是保守預設非需求。push 解禁後 git 成為狀態同步機制，MCP 增量從 3 工具縮為 1（見 KTD1）。
+- **Weekly 是否保留：** 保留但瘦身（R12）。cloud routine 相對「使用者主動開 session」的價值是**節奏保證／不漏**（心跳，KTD6），不是能力。存廢後續用真實數據決定。
+- **Cloud triage 為何看得到卻寫不進：** 單一寫入者（只有本機 session 寫 state）避免併發與遠端寫入面；Issue 是給人看的 view 不是機器介面；重複成本花在最便宜的 triage 層。本機隔天 inline harvest 以 URL-hash 冪等落地同批 leads 後重 triage（見 R7）。
+- **Remote 兩義：** 手機 App 遙控本機 session＝碰本機 working tree 本體（有 private runtime）；claude.ai/code 雲端 session＝clone 自 GitHub、碰不到本機（無 private runtime）。故 decision_lab 命令只在本機跑（U4 明文注意事項）。
+- **PR #6／Issue #2 現況（查證於 2026-07-22）：** Issue #2＝SIVE 做空指控 credibility hold（review_by 2026-08-27）。PR #6＝2026-07-17 週報（`docs/reports/weekly_scan_2026-07-17.md`），**無抽取草稿待核准**——本週唯一夠格線索（AXT-Coherent 三年期 6 吋 InP 供應協議）因當次 cloud session egress 被 403 擋、無法逐字追源，依規則不產草稿、不入圖，僅列追源未果清單。此 PR 是純報告、merge 即結案，不觸發 Stage 0 load。
