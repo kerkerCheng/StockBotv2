@@ -1,0 +1,112 @@
+{
+  "schema_version": "0.1",
+  "_note": "Curated excerpt extraction：只抽 NVIDIA 投資與產能協議段落（Note 12 / MD&A / Liquidity），非全文件抽取。財務數字照例進 Engine C，不進圖。",
+  "source_doc": {
+    "doc_id": "cohr_10_q_20260506",
+    "title": "Coherent Corp. Form 10-Q Q3 FY2026 — NVIDIA $2B common stock investment and multi-year capacity agreement (filed 2026-05-06)",
+    "url": "https://www.sec.gov/Archives/edgar/data/820318/000082031826000013/iivi-20260331.htm",
+    "origin_entity": "Coherent",
+    "publisher": "SEC EDGAR",
+    "published_at": "2026-05-06",
+    "retrieved_at": "2026-07-22",
+    "storage_permission": "repo_full",
+    "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+    "source_type": "filing",
+    "evidence_tier": 1
+  },
+  "sources": [
+    {
+      "id": "cohr_10_q_20260506_s1",
+      "locator": "Note 12. Equity and Redeemable Preferred Stock — Common shares issued",
+      "quote": "On March 2, 2026, the Company entered into a Securities Purchase Agreement (the \"Purchase Agreement\") with NVIDIA Corporation (\"NVIDIA\"), pursuant to which the Company issued and sold 7,788,161 shares of Common Stock at a price of $256.80 per share, for aggregate gross proceeds of $2 billion. The transaction was completed as a private placement in reliance on the exemption from registration provided by Section 4(a)(2) of the Securities Act of 1933, as amended."
+    },
+    {
+      "id": "cohr_10_q_20260506_s2",
+      "locator": "Note 12. Equity and Redeemable Preferred Stock — lock-up",
+      "quote": "The shares issued to NVIDIA are subject to a contractual lock-up for a period of six months following the closing date, during which NVIDIA may not, without the Company's prior written consent, directly or indirectly transfer or otherwise dispose of the shares or enter into transactions that transfer the economic risks or benefits of ownership."
+    },
+    {
+      "id": "cohr_10_q_20260506_s3",
+      "locator": "MD&A — Agreements with NVIDIA",
+      "quote": "On March 2, 2026, the Company entered into a multi-year strategic agreement with NVIDIA to advance the development of advanced optics technologies, including manufacturing capacity and research and development, to enable next-generation AI infrastructure. The non-exclusive agreement includes a multi-billion-dollar purchase commitment with NVIDIA, as well as future access and capacity rights for advanced laser and optical networking products."
+    },
+    {
+      "id": "cohr_10_q_20260506_s4",
+      "locator": "MD&A — Liquidity, Other Liquidity",
+      "quote": "We also entered into a multi-year capacity agreement that may require incremental investments in equipment, labor, and working capital to support future production volumes through 2030. While no material liability was recorded at quarter-end solely as a result of entering into the agreement, the arrangement may result in material future cash requirements and could affect revenue concentration, gross margin, and capital expenditures as volumes ramp."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:nvidia",
+      "type": "Company",
+      "name": "NVIDIA",
+      "abstraction_level": "network_systems",
+      "role": "leader",
+      "aliases": ["NVIDIA Corporation", "NVDA"],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": ["cohr_10_q_20260506_s1", "cohr_10_q_20260506_s3"]
+    },
+    {
+      "id": "co:coherent",
+      "type": "Company",
+      "name": "Coherent",
+      "abstraction_level": "device_chip",
+      "role": "bottleneck_supplier",
+      "aliases": ["Coherent Corp", "COHR"],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": ["cohr_10_q_20260506_s1", "cohr_10_q_20260506_s3", "cohr_10_q_20260506_s4"]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:nvidia",
+      "dst_id": "co:coherent",
+      "relation": "invests_in",
+      "attributes": {},
+      "confidence": 0.85,
+      "source_ids": ["cohr_10_q_20260506_s1", "cohr_10_q_20260506_s2"]
+    },
+    {
+      "id": "e2",
+      "src_id": "co:coherent",
+      "dst_id": "co:nvidia",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.8,
+      "source_ids": ["cohr_10_q_20260506_s3", "cohr_10_q_20260506_s4"]
+    }
+  ],
+  "claims": [
+    {
+      "id": "cohr_10_q_20260506_cl1",
+      "statement": "NVIDIA purchased 7,788,161 shares of Coherent Common Stock at $256.80 per share ($2 billion gross proceeds) under a Securities Purchase Agreement dated 2026-03-02, completed as a private placement under Section 4(a)(2), with a six-month contractual lock-up — the Coherent half of NVIDIA's 2026-03-02 photonics supply-chain investment (Lumentum half in graph via lite_8_k_20260302).",
+      "subject_id": "e1",
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "A subsequent Coherent or NVIDIA filing discloses termination, unwinding, or material amendment of the Purchase Agreement or disposal of the position after lock-up expiry (2026-09-02).",
+      "confidence": 0.85,
+      "source_ids": ["cohr_10_q_20260506_s1", "cohr_10_q_20260506_s2"]
+    },
+    {
+      "id": "cohr_10_q_20260506_cl2",
+      "statement": "Coherent and NVIDIA entered a multi-year strategic agreement (2026-03-02) that includes a multi-billion-dollar purchase commitment with NVIDIA and future access and capacity rights for advanced laser and optical networking products, to enable next-generation AI infrastructure. The agreement is explicitly non-exclusive — it is customer-side volume commitment evidence for the supplies_to edge, not sole_source evidence.",
+      "subject_id": "e2",
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "A subsequent filing or joint announcement discloses termination or material reduction of the purchase commitment, or NVIDIA discloses shifting the committed optics volumes to other suppliers.",
+      "confidence": 0.85,
+      "source_ids": ["cohr_10_q_20260506_s3"]
+    },
+    {
+      "id": "cohr_10_q_20260506_cl3",
+      "statement": "The multi-year capacity agreement supports future production volumes through 2030 and may require incremental Coherent investments in equipment, labor, and working capital; Coherent states it could affect revenue concentration, gross margin, and capital expenditures as volumes ramp (no material liability recorded at 2026-03-31 solely from entering the agreement).",
+      "subject_id": "co:coherent",
+      "demand_proof_level": "guided",
+      "disproof_condition": "Coherent FY2027–FY2028 filings show no NVIDIA-related capacity ramp, capex step-up, or >10% NVIDIA customer concentration emerging, or the capacity agreement is disclosed as wound down.",
+      "confidence": 0.6,
+      "source_ids": ["cohr_10_q_20260506_s4"]
+    }
+  ]
+}

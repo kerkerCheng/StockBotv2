@@ -1,7 +1,7 @@
 {
   "version": 1,
   "companies": [
-    {"company_id": "co:coherent", "research_ticker": "COHR"},
+    {"company_id": "co:coherent", "research_ticker": "COHR", "market_currency": "USD", "execution_currency": "USD", "execution_venue": "NYSE", "factor_tags": ["semiconductor", "photonics"]},
     {"company_id": "co:lumentum", "research_ticker": "LITE"},
     {"company_id": "co:broadcom", "research_ticker": "AVGO"},
     {"company_id": "co:nvidia", "research_ticker": "NVDA"},
