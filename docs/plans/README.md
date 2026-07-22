@@ -22,5 +22,6 @@
 | [008 (2026-07-15)](2026-07-15-008-feat-unified-workplan-plan.md) | 統一工作計畫 — Engine A 品質優先（Phase I–III） | completed（U13 遠端 finalize 由 mobile plan 取代） |
 | [mobile (2026-07-16)](2026-07-16-001-feat-mobile-research-action-launch-plan.md) | Mobile Research Action 兩段式協定 | completed |
 | [Decision Lab (2026-07-21)](2026-07-21-001-feat-action-oriented-alpha-decision-lab-plan.md) | Engine D／Action-Oriented Alpha Decision Lab v1 | completed |
+| [Engine D workflow (2026-07-22)](2026-07-22-001-feat-engine-d-operational-workflow-plan.md) | Raw Signal → Action Card／today brief operational workflow | active |
 
-**目前沒有 active plan。** 005 已由 commit `a7abdf5` 完成交付並通過 runtime gate；L9 目前剩下的是 Engine C 財務核驗清單的人工缺口，不屬於 005 scope。下一項大型開發開始時再建立一份新的 active plan。
+**目前 active plan 是 Engine D operational workflow。** 005 已由 commit `a7abdf5` 完成交付並通過 runtime gate；L9 目前剩下的是 Engine C 財務核驗清單的人工缺口，不屬於 005 或本次 workflow implementation scope。
