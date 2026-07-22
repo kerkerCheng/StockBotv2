@@ -134,6 +134,16 @@ fetchers/edgar.py ──────↑                        engine_c/etl_yfin
 
 **（已完成）Action-Oriented Alpha Decision Lab v1** — 2026-07-21 完成：本機手動 Signal → Shadow Observation → Coverage／Confidence → lane-specific sizing → funded paper／Action Card → outcome 閉環。SIVE／空圖 fixtures、Engine C rebuild、Decision Store backup/restore、paper replay與 Neo4j 唯讀 preservation proof 均有測試。Engine C 與 Decision／paper runtime 已私有化且不再由 Git 追蹤；live inventory 只認 Google Sheet，交易仍由使用者手動執行。唯一歷史 plan：[`docs/plans/2026-07-21-001-feat-action-oriented-alpha-decision-lab-plan.md`](docs/plans/2026-07-21-001-feat-action-oriented-alpha-decision-lab-plan.md)。**未包含：** 排程 Daily Brief、自動 harvest、remote decision MCP、broker routing。
 
+**（已完成）Engine D operational workflow** — 2026-07-22 完成：`python -m decision_lab evaluate-signal "<Signal>"` 可由 raw Signal 自動完成 wide capture、exact identity、Engine A/C／market／FX／Sheet authority read、content-addressed freeze、Coverage／Confidence／sizing、atomic decision／eligible paper 與 Action Card；`reassess` 建立新 context 與 attributed delta、不改舊 decision；`today` 純讀輸出 `NO ACTION / REVIEW / TRADE / HEDGE`。正常入口不要求 internal digest／Coverage ID／idempotency key。Unresolved identity、空圖、missing／stale／manual_required 會保存 cohort／Shadow、歸零 funded range並產 bounded work order。Live 仍只由明確 `record-choice`、使用者手動下單及 `record-fill` 建立 facts，Google Sheet 不被 Engine D 寫回。歷史 plan：[`docs/plans/2026-07-22-001-feat-engine-d-operational-workflow-plan.md`](docs/plans/2026-07-22-001-feat-engine-d-operational-workflow-plan.md)。**仍未包含：** 排程、notification、remote Decision MCP、broker routing、自動 harvest。
+
+**Operational commands／外部設定：**
+- 研究預設：`python -m decision_lab evaluate-signal "<Signal>" --ticker <TICKER> --intent research --format markdown`；只有使用者明確要求才用 `paper`／`live`。
+- 新資料重評：`python -m decision_lab reassess <decision_id> --assessment <assessment.json> --intent <research|paper|live> --format markdown`；live 另加 `--confirm-holdings`。
+- 今日摘要：`python -m decision_lab today --format markdown`；既有卡片：`python -m decision_lab card <decision_id>`。
+- Engine A exact-name／bounded context 需專用唯讀帳號：`NEO4J_URI`、`NEO4J_DECISION_READER_USER`、`NEO4J_DECISION_READER_PASSWORD`，可選 `NEO4J_DATABASE`；不得 fallback 到可寫帳號。
+- Live holdings 需 `GSHEETS_SERVICE_ACCOUNT_JSON`、`GSHEETS_SPREADSHEET_ID`，可選 `GSHEETS_SHEET_NAME`。Sheet operational rows 必須有 `ticker`、`shares`、`currency`、`market_value_base`、`nav_base`、`base_currency`；成本基礎不能代替 mark-to-market NAV。
+- Price／FX 預設沿用 yfinance（無 API key）；Engine C authority 仍由 ignored private runtime pointer／既有 Postgres env 決定。非同幣 FX 缺失或方向不符一律 fail closed。
+
 **（已完成）第二條垂直切片／L9 前置條件 #1** — 2026-07-19 由 commit `a7abdf5` 交付 AMAT/LRCX mature-node Lane Memo、evidence manifest 與 scoring；主題為非 AI／非 CPO，評分 23/30（可信度 4、可證偽性 4、市場差異度 4），`thesis/preconditions.py` 的 `_check_second_slice()` 已通過。歷史規格：[`docs/plans/2026-07-08-005-feat-second-vertical-slice-plan.md`](docs/plans/2026-07-08-005-feat-second-vertical-slice-plan.md)。
 
 1. **完成 L9 剩餘財務核驗缺口**
@@ -162,7 +172,7 @@ fetchers/edgar.py ──────↑                        engine_c/etl_yfin
 設計原則：表的「形狀」鎖死，字彙（type/relation/層級）用對照表留鬆；屬性按 L4「物理 / 關係 / 時變」三分歸位。完整欄位表、vocab、claims 格式、sole_source 驗證規則：見 [`schema/graph_schema.md`](schema/graph_schema.md)。
 
 **快速記憶：**
-- **圖公司 ID（`co:*`）不要憑公司名猜。** 唯一權威是 `loader/load_to_neo4j.py` 的 `TICKER_MAP`；查圖前先查表，或用 `query/health_audit.py` 的 `COMPANY_IDS_CYPHER` 列出圖中 Company 再比對。例：Sivers 是 `co:sivers_semiconductors`，不是 `co:sivers`（2026-07-21 週掃即因猜 ID 未命中而漏掉 Sivers 的圖內比對）。ID 未命中時要區分「ID 沒解析對」與「圖中真無此公司」，不能默默跳過。
+- **圖公司 ID（`co:*`）不要憑公司名猜。** 唯一權威是 `config/company_identity.json`，由 `identity/registry.py` 載入；loader 的 `TICKER_MAP` 只是由同一 registry 生成的相容介面。查圖前先查 registry，或用 `query/health_audit.py` 的 `COMPANY_IDS_CYPHER` 列出圖中 Company 再比對。例：Sivers 是 `co:sivers_semiconductors`，不是 `co:sivers`（2026-07-21 週掃即因猜 ID 未命中而漏掉 Sivers 的圖內比對）。ID 未命中時要區分「ID 沒解析對」與「圖中真無此公司」，不能默默跳過。
 - node 帶內在慢變屬性（`ramp_difficulty_intrinsic`、`concentration_score` 為衍生值非手填）
 - edge 帶關係型屬性（`substitutability`、`sole_source`、`structural_lead_time_weeks`、`ramp_execution`）
 - `confidence` 只在不同 `origin_event` 之間累加（同一法說會多份摘要 = 一個 origin_event）
@@ -258,7 +268,7 @@ v0 schema 的對錯只有真實資料能驗證。凍結一個會壞的 v0 → �
 3. **圖裡的交叉驗證:** 若某條 `sole_source=true` 的邊,其所有 source_ids 的 `origin_entity` 全是同一家供應商,標記 `sole_source_evidence_quality: weak`。
 
 ### L9 — 上游三引擎匯流至 Engine D 的前置條件（Engine C 與 formal 投資建議開放前必做）
-**Engine A→C join key：** Engine A 的圖節點（如 `co:coherent`）和 Engine C 的財務數字（Coherent 的毛利率）要能自動對齊，需要共同 ID（如 ticker `COHR`）。join key 由 `loader/load_to_neo4j.py` 的 `TICKER_MAP` 維護（靜態 lookup，不用 LLM 推斷）。私人公司映射到 `None`（不是空缺，是明確標記）。
+**Engine A→C join key：** Engine A 的圖節點（如 `co:coherent`）和 Engine C 的財務數字（Coherent 的毛利率）要能自動對齊，需要共同 ID（如 ticker `COHR`）。join key 由 `config/company_identity.json`／`identity.registry` 維護（靜態 lookup，不用 LLM 推斷）；loader 的 `TICKER_MAP` 由此生成。私人公司映射到 `None`（不是空缺，是明確標記）。
 
 **投資諮詢開放的三個前置條件（全部滿足才開放）：**
 1. 第二條垂直切片必須是**非 AI / 非 CPO** 主題，且跑通相同的 extract → thesis → 評分流程。

@@ -19,10 +19,16 @@ description: >
 讀輸入後立刻給：
 ```
 
-同時，凡是具名公司、可歸因、可證偽且有 expiry 的 qualified lead，先呼叫
-`decision_lab.intake.capture_signal` 保存 Signal 與 observed-time Shadow Observation；這一步不代表
-evidence admission、不寫 Engine A，也不自動建立 funded paper。後續 Coverage／Action Card 只呼叫
-Decision Lab primitive，不在本 skill 複製 Gate、部位百分比或 sizing 公式。
+同時，先用同一條 Engine D operational workflow 保存 Signal、Shadow 與 prospective cohort：
+
+```powershell
+python -m decision_lab evaluate-signal "<原始 Signal>" --source-url "<URL>" --ticker <TICKER> --intent research --format json
+```
+
+URL／ticker 不確定時可省略；workflow 會保留 unresolved／missing 狀態並產 work order，不可猜值。
+這一步不代表 evidence admission、不寫 Engine A，也不建立 funded paper。記下回傳的 public
+`decision_id`／`cohort_id`；不要自行準備 `context_digest`、Coverage ID、holdings digest 或 idempotency key。
+後續 Coverage／Confidence／sizing／Action Card 仍只走這條 application workflow，不在本 skill 複製公式。
 訊號類型：[產品/技術消息 | 供應鏈異動 | 法說/財報 | 市場情緒/猜測]
 關聯圖內公司：[列出或「無」]
 初始 tier：[1-4]
@@ -99,6 +105,9 @@ Decision Lab primitive，不在本 skill 複製 Gate、部位百分比或 sizing
 ## 流程(端到端)
 
 ### Step 0 — 輸入分類與登記
+- **先做 wide capture：** 對原始材料呼叫 `evaluate-signal ... --intent research`；即使 identity unresolved、
+  公司尚未入圖或外部 authority unavailable，也必須保留 Signal／Shadow 並以 zero-size blocker 結束，
+  不能因研究尚未完成而遺失 prospective cohort。
 - **先查再 onboard(去重防呆):** 取好原文 URL 後,**先問圖「這份文件是不是已經在了」**——用該 URL 或
   origin_event 查有無既有 `SourceDoc`(`MATCH (sd:SourceDoc) WHERE sd.url ...`),避免同一份文件被以不同
   `doc_id` 重複 onboard。`doc_id` 是自取的名字、不是文件身分;换個名字系統不會自動擋。loader 已有 URL 去重
@@ -159,11 +168,26 @@ Decision Lab primitive，不在本 skill 複製 Gate、部位百分比或 sizing
 - **`disproof_condition` + 核查頻率 + 觸發後 48h 動作**(L7,缺這兩個欄位等於沒裝火警)。
 > Lane Memo 是方向備忘,**不是可操作投資建議**。升格 Watchlist 需另過財務核驗 5 項(L9),那是 gate 不是本流程。
 
+### Step 7 — 回到同一條 Engine D workflow
+
+研究完成後，把五軸的語意判斷與「本次 bounded context 內實際存在」的 stable evidence refs 寫成
+assessment JSON；skill 只判斷 level／reason／missing data，不計算 Confidence ceiling 或部位。接著執行：
+
+```powershell
+python -m decision_lab reassess <decision_id> --assessment <assessment.json> --intent research --format markdown
+```
+
+只有使用者明確要求 paper 或評估 live 時，才把 `--intent` 改為 `paper`／`live`；live 另需當次
+`--confirm-holdings`。Workflow 會重讀 authorities、freeze 新 context、驗 refs、跑既有 Coverage／sizing，
+舊 decision 不會被修改。缺圖、COHR `manual_required`、price／FX／Sheet 缺口都照 Card blocker 處理，
+不得在 skill 內補零值、替代 ref 或自行提高 evidence tier。
+
 ---
 
 ## 與既有系統的接點(檔案對照)
-- Signal／Shadow capture：`decision_lab.intake.capture_signal`（qualified lead 先保留，再跑研究）
-- Decision Lab Action Card：`python -m decision_lab ... card <decision_id>`（純讀，不產生交易）
+- Signal → Shadow → Action Card：`python -m decision_lab evaluate-signal ...`／`reassess ...`
+- Decision Lab Action Card：`python -m decision_lab card <decision_id>`（純讀，不產生交易）
+- 今日 action brief：`python -m decision_lab today --format markdown`（純讀、on-demand）
 - 原文落地:`library/raw/`
 - 中介格式:`schema/intermediate_format.schema.json`、字彙:`schema/vocab.json`
 - 抽取參考:`prompts/extract_system.md`(L6 Gap4 幻覺規則在此)、`extract.py`

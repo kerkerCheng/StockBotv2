@@ -1,18 +1,47 @@
+from __future__ import annotations
+
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parent.parent
+SKILLS = (
+    ROOT / "skills" / "lead-intake" / "SKILL.md",
+    ROOT / "skills" / "investment-research" / "SKILL.md",
+)
 
 
-def test_skills_call_decision_lab_without_copying_policy_numbers_or_formulas() -> None:
-    lead = (ROOT / "skills/lead-intake/SKILL.md").read_text(encoding="utf-8")
-    research = (ROOT / "skills/investment-research/SKILL.md").read_text(encoding="utf-8")
-    decision_sections = "\n".join(
-        line for line in (lead + research).splitlines() if "Decision Lab" in line or "decision_lab" in line
-    )
+def test_research_skills_share_the_same_operational_commands() -> None:
+    texts = [path.read_text(encoding="utf-8") for path in SKILLS]
+    for text in texts:
+        for command in (
+            "evaluate-signal",
+            "reassess",
+            "today",
+            "card",
+        ):
+            assert command in text
+        assert "context_digest" not in "\n".join(
+            line for line in text.splitlines() if line.lstrip().startswith("python -m")
+        )
 
-    assert "decision_lab" in decision_sections
-    assert "Action Card" in decision_sections
-    assert "0.5%" not in decision_sections
-    assert "axis_ceilings" not in decision_sections
-    assert "probe_book_nav_cap" not in decision_sections
+
+def test_skills_do_not_duplicate_probe_policy_or_imply_automatic_live_execution() -> None:
+    combined = "\n".join(path.read_text(encoding="utf-8") for path in SKILLS)
+
+    for forbidden in (
+        "0.5%",
+        "axis_ceilings",
+        "probe_book_nav_cap",
+        "single_probe_nav_cap =",
+        "live_adv_fraction_cap =",
+        "paper_nav =",
+    ):
+        assert forbidden not in combined
+    assert "不連 broker" in combined
+    assert "不得由 recommendation 推定" in combined
+
+
+def test_only_canonical_skill_files_were_hand_edited_before_sync() -> None:
+    for path in SKILLS:
+        assert path.parts[-3] == "skills"
+        assert path.name == "SKILL.md"

@@ -48,6 +48,15 @@ query/graph_context.py    engine_c/checklist.py
 
 **指令參考：**
 ```powershell
+# 一條 Signal 到 zero-size／funded（依 intent）Action Card
+python -m decision_lab evaluate-signal "<Signal>" --ticker <TICKER> --intent research --format markdown
+
+# 重新讀取 authorities 並建立新 decision（不改寫舊 decision）
+python -m decision_lab reassess <decision_id> --assessment <assessment.json> --intent paper --format markdown
+
+# 今天是否需要動作（純讀、on-demand）
+python -m decision_lab today --format markdown
+
 # 取公司子圖 context（2 跳供應鏈）
 python query/graph_context.py --company-id co:<ticker_lower>
 
@@ -90,8 +99,9 @@ python thesis/generate_lane_memo.py --company-id co:<ticker_lower>
 - 「我應該評估哪些公司？」
 
 **流程：**
-0. 若問題是「我現在是否該動作」，且已有 Decision Lab decision，先呼叫
-   `python -m decision_lab ... card <decision_id>` 讀 Action Card。以 structured result 的
+0. 若使用者提供新 Signal，先呼叫 `evaluate-signal ... --intent research` 做 wide capture；若問題是
+   「我現在是否該動作」，先呼叫 `python -m decision_lab today --format json`，再對相關 decision 呼叫
+   `python -m decision_lab card <decision_id>`。以 structured result 的
    `action / urgency / weakest_link / paper / live / blockers / next_action` 為決策主幹；本 skill
    只補研究解釋，不重算部位、不同 lane 的 Gate 或 freshness。
 1. 執行 `python query/graph_context.py --company-id co:<ticker>` 取子圖
@@ -107,6 +117,9 @@ python thesis/generate_lane_memo.py --company-id co:<ticker_lower>
 
 4. 套 L8 偏誤檢查：若所有關鍵主張的 source_ids 都是同一家公司的文件 → 主動警告
 5. 回答要包含：現在知道什麼 / 還不確定什麼 / 什麼資訊能改變看法
+6. 若研究結果要進入 Decision Lab，產生五軸 assessment JSON；每個非 `unknown` 軸只能引用這次
+   bounded graph／Engine C／market context 的 stable refs。呼叫 `reassess` 讓 Python 驗 refs、freeze、
+   Coverage、Confidence／sizing 與 audit trail；skill 不自行算 ceiling、supported range 或 paper target。
 
 **格式：** 結構化評估（位置 → 瓶頸 → 來源品質 → 財務） + 信心度 + 知識缺口
 
@@ -198,9 +211,11 @@ python thesis/generate_lane_memo.py --company-id co:<slug> --ticker <TICKER> --o
 **觸發：** 使用者問「我該投多少」、「這檔值不值得加倉」、「我的 AI bucket 還有空間嗎」。
 
 **流程：**
-0. Probe／既有持股的「現在是否動作」優先讀 Decision Lab Action Card；`card` 是純讀。
-   新 assess 由 `decision_lab` application primitive 原子保存 system decision 與 eligible paper，
-   live 仍須使用者明確接受並手動下單。只有已正式升格的部位才走下列 formal policy 流程。
+0. Probe／既有持股的「現在是否動作」先跑 `python -m decision_lab today --format json`，再讀相關
+   Action Card；兩者都是純讀。新 Signal 用 `evaluate-signal`，新 evidence／price／FX／holdings／policy
+   用 `reassess`。只有使用者明確指定 `paper`／`live` intent 才評估相應 lane；live 仍須使用者明確
+   `record-choice`、自行下單，再用 `record-fill` 回報，任何一步都不得由 recommendation 推定。
+   只有已正式升格的部位才走下列 formal policy 流程。
 1. 執行 `python fetchers/gsheets.py --ticker <TICKER>` 取持倉資料
 2. 執行 `python fetchers/gsheets.py --summary` 取 ai_theme bucket 使用率
 3. 查 Engine C 估值數據：`python engine_c/checklist.py <TICKER>`
@@ -265,6 +280,8 @@ Conviction 評估：[分數 / 理由]
 
 ## 與既有系統的接點
 
+- Engine D operational workflow：`python -m decision_lab evaluate-signal`／`reassess`／`today`／`card`
+- Explicit live facts：`python -m decision_lab record-choice`／`record-fill`（不連 broker、不寫 Sheet）
 - 取圖 context：`query/graph_context.py`
 - 財務快照：`engine_c/etl_yfinance.py`、`engine_c/checklist.py`
 - Lane Memo 生成：`thesis/generate_lane_memo.py`

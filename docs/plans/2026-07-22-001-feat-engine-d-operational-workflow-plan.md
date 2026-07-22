@@ -3,12 +3,13 @@ title: Engine D Operational Workflow - Plan
 type: feat
 date: 2026-07-22
 topic: engine-d-operational-workflow
-status: active
+status: completed
 artifact_contract: ce-unified-plan/v1
 artifact_readiness: implementation-ready
 product_contract_source: user-directed
 execution: code
 deepened: 2026-07-22
+completed: 2026-07-22
 ---
 
 # Engine D Operational Workflow - Plan
@@ -337,15 +338,23 @@ The diagram is a boundary map, not method-level design. Concrete adapters return
 
 ## Definition of Done
 
-- [ ] User-level evaluate request可從 raw Signal到 Action Card，不要求 internal digest／assessment IDs。
-- [ ] Unresolved／empty graph／missing/stale/unconfirmed/manual_required皆保存 wide capture、產 work order、funded range=0。
-- [ ] Assessment evidence refs受 frozen context allowlist約束。
-- [ ] Same-context retry不重複 paper；re-assess建立新 facts且舊 decision不變。
-- [ ] Live choice／fill只由 explicit input建立，Sheet未被 Engine D修改。
-- [ ] Today brief可執行且覆蓋 `NO ACTION / REVIEW / TRADE / HEDGE`與九個欄位。
-- [ ] JSON／Markdown public output通過 redaction，不含 private path／holdings detail／credentials。
-- [ ] Engine A無 write path且 preservation proof通過。
-- [ ] Lead-intake與investment-research共用 workflow，generated skill adapters sync clean。
-- [ ] Targeted tests、preconditions、sync check、diff check與完整 suite完成，baseline差異已歸因。
-- [ ] Code review findings已修正，plan標 completed，README／AGENTS已更新。
-- [ ] 變更依邏輯邊界 committed，working tree clean，未 push。
+- [x] User-level evaluate request可從 raw Signal到 Action Card，不要求 internal digest／assessment IDs。
+- [x] Unresolved／empty graph／missing/stale/unconfirmed/manual_required皆保存 wide capture、產 work order、funded range=0。
+- [x] Assessment evidence refs受 frozen context allowlist約束。
+- [x] Same-context retry不重複 paper；re-assess建立新 facts且舊 decision不變。
+- [x] Live choice／fill只由 explicit input建立，Sheet未被 Engine D修改。
+- [x] Today brief可執行且覆蓋 `NO ACTION / REVIEW / TRADE / HEDGE`與九個欄位。
+- [x] JSON／Markdown public output通過 redaction，不含 private path／holdings detail／credentials。
+- [x] Engine A無 write path且 preservation proof通過。
+- [x] Lead-intake與investment-research共用 workflow，generated skill adapters sync clean。
+- [x] Targeted tests、preconditions、sync check、diff check與完整 suite完成，baseline差異已歸因。
+- [x] Review findings已修正，plan標 completed，README／AGENTS已更新。
+- [x] 變更依邏輯邊界 committed，working tree clean，未 push。
+
+## Completion Evidence
+
+- Engine D／authority／preservation targeted suite：`122 passed`；後續 action-intent、strict Sheet 與 Markdown hardening 另由 scoped tests及完整 suite覆蓋。
+- 新增 operational workflow／brief／CLI／skill／FX tests：全數通過。
+- `python thesis/preconditions.py`：second slice與investment rules通過；只剩既知 COHR customer concentration／backlog `manual_required`。
+- `python scripts/sync_agent_skills.py --check`、`python -m compileall ...`、`git diff --check`：通過。
+- 完整 suite：`423 passed, 2 failed`；兩個 failure與開工前基線相同，分別是缺少 `extractions/enablence_sivers_onet_els_2026.json`，以及舊 SourceDoc test未接受既有 `section=None`。
