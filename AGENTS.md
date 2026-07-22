@@ -149,8 +149,8 @@ fetchers/edgar.py ──────↑                        engine_c/etl_yfin
 1. **（已完成 2026-07-22）L9 剩餘財務核驗缺口**
    — COHR「客戶集中度」與「Backlog／訂單能見度」已以一手 filing 補入 Engine C manual observation ledger（append-only，含逐字 provenance）：客戶集中度出自 FY2025 10-K segment note「Major Customers」（兩大客戶各佔 12%／10%，主要來自 Networking segment；另註 NVIDIA 2026-03-02 投資 $2B＋多年期產能協議至 2030 的前瞻集中度旗標，出自 Q3 FY2026 10-Q）；COHR 不揭露美元 backlog／RPO，依規則填替代指標＝Q4 FY2026 guided revenue $1.91B–$2.05B（8-K EX-99.1，filed 2026-05-06）＋ NVIDIA 產能協議。`python thesis/preconditions.py` 全綠、`python engine_c/checklist.py COHR` 五項 gate_pass=true；**L9 三前置條件全部達標，投資諮詢 gate 開放**。一手文件存 `library/raw/cohr_10_k_20250815.txt`、`cohr_10_q_20260506.txt`、`cohr_ex991_20260506.txt`。
 
-2. **知識覆蓋自動化**
-   — `fetchers/edgar.py` 的 10-Q CLI 已可用（2026-07-18 驗證 AMAT/LRCX 最新 10-Q 抓取正常：`python fetchers/edgar.py --ticker AMAT --forms 10-Q --n 1`）。剩：SIVE 找 3 個不同 `origin_entity` 的獨立來源；RSS pending leads（見上方引擎B 待做）。先讓手機 ad hoc loop 穩定，再擴自動 harvest。
+2. **Daily Approval Loop（進行中，大型開發）**
+   — 每日 harvest／triage／brief／封閉動詞核准迴路，含 partial-identity crash 修復、MCP gateway 9→12 工具、`/daily-brief` skill 與 daily cloud routine。可實作 plan：[`docs/plans/2026-07-22-002-feat-daily-approval-loop-plan.md`](docs/plans/2026-07-22-002-feat-daily-approval-loop-plan.md)。原「知識覆蓋自動化」的 RSS pending leads 併入此 plan（U1）；SIVE 找 3 個獨立 `origin_entity` 來源仍為獨立待辦。
 
 ---
 
