@@ -14,6 +14,7 @@ config/*.json
 
 # Claude Code 本機設定（不共用）；project skills 轉接層需納入版本控制
 .claude/*
+!.claude/settings.json
 !.claude/skills/
 !.claude/skills/**
 

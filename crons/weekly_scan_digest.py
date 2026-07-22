@@ -205,7 +205,18 @@ def main() -> int:
             "（可說「補提交入圖」）"
         )
 
-    print(json.dumps({"systemMessage": " ".join(parts)}, ensure_ascii=False))
+    msg = " ".join(parts)
+    # 雙通道：systemMessage 只給終端 UI；additionalContext 進 agent context，
+    # 讓 agent 在任何介面（含手機 App 遙控、cloud session）都能主動轉述。
+    print(json.dumps({
+        "systemMessage": msg,
+        "hookSpecificOutput": {
+            "hookEventName": "SessionStart",
+            "additionalContext": (
+                "【session 待辦摘要——請在你給使用者的第一則回覆開頭轉述】" + msg
+            ),
+        },
+    }, ensure_ascii=False))
     return 0
 
 

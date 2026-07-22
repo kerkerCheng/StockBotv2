@@ -63,7 +63,17 @@ def main() -> int:
 
     parts = ", ".join(f"{company} {days}天" for company, days in stale)
     msg = f"📋 thesis-monitor: {len(stale)} 份 thesis 已超過 {STALE_DAYS} 天未核查（{parts}）— 要現在核查嗎？"
-    print(json.dumps({"systemMessage": msg}, ensure_ascii=False))
+    # 雙通道：systemMessage 只給終端 UI；additionalContext 進 agent context，
+    # 讓 agent 在任何介面（含手機 App 遙控、cloud session）都能主動轉述。
+    print(json.dumps({
+        "systemMessage": msg,
+        "hookSpecificOutput": {
+            "hookEventName": "SessionStart",
+            "additionalContext": (
+                "【session 待辦摘要——請在你給使用者的第一則回覆開頭轉述】" + msg
+            ),
+        },
+    }, ensure_ascii=False))
     return 0
 
 
