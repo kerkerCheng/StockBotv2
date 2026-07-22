@@ -12,6 +12,7 @@ from decision_lab.execution import (
     record_live_fill,
 )
 from decision_lab.outcomes import close_probe, trigger_review_required
+from tests.test_decision_context import NOW
 from tests.test_decision_execution import _bundle, _store
 from tests.test_probe_sizing import _assessment
 
@@ -34,7 +35,9 @@ def test_action_card_leads_with_action_and_keeps_paper_live_separate(
     store = _store(tmp_path)
     try:
         decision = _decision(store)
-        card = build_action_card(store, decision.decision_id)
+        # 錨定 as_of 到 fixture 參考時間；不傳則走 wall-clock，fixture 市場時戳
+        # （2026-07-21）過 36h freshness 窗後會誤判 data_refresh。
+        card = build_action_card(store, decision.decision_id, as_of=NOW)
 
         assert card["action"] == "REVIEW"
         assert card["urgency"] == "next_review"
@@ -81,6 +84,7 @@ def test_portfolio_factor_breach_can_request_hedge_without_fake_units(
         card = build_action_card(
             store,
             decision.decision_id,
+            as_of=NOW,  # 錨定，避免 wall-clock 使 fixture 資料過期而搶先 data_refresh
             portfolio_context={
                 "status": "over_cap",
                 "factor": "photonics",
@@ -198,7 +202,7 @@ def test_card_respects_explicit_live_fill_instead_of_recommending_duplicate_trad
             explicit=True,
         )
 
-        card = build_action_card(store, decision.decision_id)
+        card = build_action_card(store, decision.decision_id, as_of=NOW)
 
         assert card["action"] == "NO_ACTION"
         assert card["live"]["fill_reported"] is True
