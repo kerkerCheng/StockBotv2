@@ -15,7 +15,7 @@
 | [002 (2026-06-26)](2026-06-26-002-feat-cpo-vertical-slice-thesis-plan.md) | CPO 垂直切片 v1 — 多文件擴張 + thesis 生成 | completed |
 | [003 (2026-06-27)](2026-06-27-003-feat-env-bootstrap-plan.md) | 環境重建 bootstrap | completed |
 | [004 (2026-07-08)](2026-07-08-004-feat-investment-query-gap-audit-plan.md) | 投資查詢能力缺口審查 | superseded → 006 |
-| [005 (2026-07-08)](2026-07-08-005-feat-second-vertical-slice-plan.md) | 第二條垂直切片 — 工業半導體設備（AMAT/LRCX） | **active** |
+| [005 (2026-07-08)](2026-07-08-005-feat-second-vertical-slice-plan.md) | 第二條垂直切片 — 工業半導體設備（AMAT/LRCX） | completed |
 | [006 (2026-07-10)](2026-07-10-006-feat-personal-investment-advisor-roadmap-plan.md) | Personal Investment Advisor 全 roadmap | superseded → 008 |
 | [007a (2026-07-14)](2026-07-14-007-feat-source-trace-upgrade-plan.md) | Source Trace Manual 三入口追源 | superseded → 008 |
 | [007b (2026-07-14)](2026-07-14-007-feat-remote-intake-provenance-plan.md) | 遠端入圖 provenance 帳本 | superseded → 008 |
@@ -23,4 +23,4 @@
 | [mobile (2026-07-16)](2026-07-16-001-feat-mobile-research-action-launch-plan.md) | Mobile Research Action 兩段式協定 | completed |
 | [Decision Lab (2026-07-21)](2026-07-21-001-feat-action-oriented-alpha-decision-lab-plan.md) | Engine D／Action-Oriented Alpha Decision Lab v1 | completed |
 
-**唯一還 active 的 plan 是 005**（第二條非 AI／非 CPO 垂直切片），它同時是 L9（上游三引擎匯流至 Engine D 的前置條件）解鎖 formal 投資建議的硬性前置之一。
+**目前沒有 active plan。** 005 已由 commit `a7abdf5` 完成交付並通過 runtime gate；L9 目前剩下的是 Engine C 財務核驗清單的人工缺口，不屬於 005 scope。下一項大型開發開始時再建立一份新的 active plan。

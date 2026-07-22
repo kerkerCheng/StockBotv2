@@ -134,8 +134,10 @@ fetchers/edgar.py ──────↑                        engine_c/etl_yfin
 
 **（已完成）Action-Oriented Alpha Decision Lab v1** — 2026-07-21 完成：本機手動 Signal → Shadow Observation → Coverage／Confidence → lane-specific sizing → funded paper／Action Card → outcome 閉環。SIVE／空圖 fixtures、Engine C rebuild、Decision Store backup/restore、paper replay與 Neo4j 唯讀 preservation proof 均有測試。Engine C 與 Decision／paper runtime 已私有化且不再由 Git 追蹤；live inventory 只認 Google Sheet，交易仍由使用者手動執行。唯一歷史 plan：[`docs/plans/2026-07-21-001-feat-action-oriented-alpha-decision-lab-plan.md`](docs/plans/2026-07-21-001-feat-action-oriented-alpha-decision-lab-plan.md)。**未包含：** 排程 Daily Brief、自動 harvest、remote decision MCP、broker routing。
 
-1. **第二條垂直切片 + L9 前置條件（解鎖 formal actionable advice 的閘門）**
-   — 詳細規格保存在 [`docs/plans/2026-07-08-005-feat-second-vertical-slice-plan.md`](docs/plans/2026-07-08-005-feat-second-vertical-slice-plan.md)（純文件參考；`_check_second_slice()` gate 已與 plan 檔脫鉤，只認 runtime 交付物，故該檔可自由歸檔）。主題：AMAT/LRCX 成熟製程設備（非 AI／非 CPO），走相同 extract→graph→thesis 流程。**達標判準（= gate 實檢項）：** (a) `thesis/` 有檔名含 `amat`／`lrcx`／`semi_equip`／`mature_node` 的 `*_lane_memo.md`（005 建議的 `slice2_*` 舊命名匹配不到 gate）；(b) 該 memo 有非空 `## Variant Perception` 段落；(c) 同 stem 的 `*_scoring.md`（或 `*.scoring.md`），欄位 可信度／可證偽性／市場差異度／總分 齊全且 ≥3／≥3／≥2／≥20。另兩項前置：thesis→部位最小規則（[`docs/investment-sop.md`](docs/investment-sop.md)）與 Engine C 五項一鍵核驗。順手修 Lane Memo／投資建議 shared contract。
+**（已完成）第二條垂直切片／L9 前置條件 #1** — 2026-07-19 由 commit `a7abdf5` 交付 AMAT/LRCX mature-node Lane Memo、evidence manifest 與 scoring；主題為非 AI／非 CPO，評分 23/30（可信度 4、可證偽性 4、市場差異度 4），`thesis/preconditions.py` 的 `_check_second_slice()` 已通過。歷史規格：[`docs/plans/2026-07-08-005-feat-second-vertical-slice-plan.md`](docs/plans/2026-07-08-005-feat-second-vertical-slice-plan.md)。
+
+1. **完成 L9 剩餘財務核驗缺口**
+   — thesis→部位最小規則已由 [`docs/investment-sop.md`](docs/investment-sop.md) 滿足；目前 `python thesis/preconditions.py` 只剩 Engine C 的 COHR「客戶集中度」與「Backlog／訂單能見度」為 `manual_required`。補齊可追溯人工 observation 並確認五項一鍵核驗通過；這是 L9 前置條件 #3，不屬於已完成的 005 scope。
 
 2. **知識覆蓋自動化**
    — `fetchers/edgar.py` 的 10-Q CLI 已可用（2026-07-18 驗證 AMAT/LRCX 最新 10-Q 抓取正常：`python fetchers/edgar.py --ticker AMAT --forms 10-Q --n 1`）。剩：SIVE 找 3 個不同 `origin_entity` 的獨立來源；RSS pending leads（見上方引擎B 待做）。先讓手機 ad hoc loop 穩定，再擴自動 harvest。
@@ -260,7 +262,7 @@ v0 schema 的對錯只有真實資料能驗證。凍結一個會壞的 v0 → �
 
 **投資諮詢開放的三個前置條件（全部滿足才開放）：**
 1. 第二條垂直切片必須是**非 AI / 非 CPO** 主題，且跑通相同的 extract → thesis → 評分流程。
-2. thesis→部位的最小規則已定義（進場條件 / 單檔上限 / 持有期 / thesis 失效即出場），哪怕是人工執行的規則。見 [`docs/investment-sop.md`](docs/investment-sop.md)（`thesis/preconditions.py` 的 `_check_sop()` 依賴此檔）。
+2. thesis→部位的最小規則已定義（進場條件 / 單檔上限 / 持有期 / thesis 失效即出場），哪怕是人工執行的規則。見 [`docs/investment-sop.md`](docs/investment-sop.md)（`thesis/preconditions.py` 的 `_check_investment_rules()` 依賴此檔）。
 3. 財務核驗清單 5 項（客戶集中度 / 毛利率趨勢 / backlog / 稀釋 / 估值壓力）已能一鍵從 Engine C 查出，並且必須在 Watchlist 升格前執行。
 
 ### L10 — 早期資料庫以 correctness 優先，不背錯誤相容包袱
