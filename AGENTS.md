@@ -26,13 +26,20 @@
 
 ## 定位一句話
 
-**Claude + 結構化持久記憶 → 有根據的投資研究對話。**
+**Engine A/B/C 研究輸入 + Engine D 決策責任 → 有根據且可控的投資決策。**
 
-使用者說公司名或 thesis → Claude 從 Neo4j 圖取 context、Engine C 取財務數據 → 合成有來源可追溯的回答。Claude 是分析引擎；圖譜是跨 session 的研究筆記本。本機單人自用，使用者會寫 Python、碰過 API。
+使用者提出公司、thesis 或外部 Signal → 研究 agent 結合 Engine A 的因果／證據 context、Engine B 的線索與 Engine C 的財務／市場狀態 → Engine D（Decision Lab）凍結決策當下實際使用的 context，產生可稽核的 `NO ACTION / REVIEW / TRADE / HEDGE` 與受支持部位區間。使用者保留最終接受、縮小、覆寫與手動下單權力。本機單人自用，使用者會寫 Python、碰過 API。
 
 ---
 
-## 系統架構（三層）
+## 系統架構（四引擎／四層）
+
+| 引擎 | 角色 | Current-state authority | 不負責 |
+|------|------|-------------------------|--------|
+| **Engine A** | 供應鏈、物理／關係瓶頸、claim 與 provenance | Neo4j | Signal queue、部位、價格時序、交易決策 |
+| **Engine B** | 外部 Signal discovery／intake 與研究注意力排序 | 來源登記與 pending lead／Research Action | 提高 evidence tier、自動投資、graph admission bypass |
+| **Engine C** | 財務、估值、市場與其他帶時戳 observation | SQLite／Postgres private runtime | thesis、持股真相、最終部位決策 |
+| **Engine D** | Decision & Accountability Engine（Decision Lab）：Shadow、Coverage、Confidence、paper/live permission、Action Card、outcome | Private Decision Store；paper events 是模擬帳本真相 | 寫 Engine A、複製 Engine C current truth、取代 Google Sheet、broker routing |
 
 ### Skill 層（Claude Code / Codex 共用操作介面）
 權威內容存在 `skills/` 目錄，每個 skill 是告訴研究 agent「如何使用記憶層」的操作手冊；兩端的自動發現路徑由上方轉接層提供。
@@ -47,12 +54,19 @@
 | `skills/source-trace` | 推文／轉述／截圖／二手報導先追回原文；tier 3–4 未果隔離 |
 | `skills/evidence-conflict-resolution` | EdgeAssertion 屬性衝突產 proposal；只在人工核准後寫 resolution |
 
+### 決策層（Engine D — Decision & Accountability Engine／Decision Lab）
+
+- **責任：** 將 Engine A/B/C、versioned policy 與 Google Sheet holdings 轉成可稽核的資本許可與下一步行動；保存 Signal cohort、Shadow、Coverage、Confidence Envelope、system decision、paper event、明確的 live choice/fill、lifecycle 與 outcome attribution。
+- **Point-in-time contract：** 「凍結 Engine A」一律指**凍結該次決策實際使用的 Engine A context slice**，不是 snapshot／dump 整張 Neo4j。Engine D 將該 slice 與財務、價格、FX、持股、policy 的 as-of values／refs／versions 組成 content-addressed context bundle；舊 decision 永遠引用原 digest，不因 A/B/C 後續更新而改寫。
+- **資本邊界：** eligible paper 可與 system decision 原子寫入；live 只輸出 supported range，必須由使用者明確接受、手動下單並回報，Google Sheet 仍是 live inventory 唯一權威。
+- **Runtime：** Decision／paper facts 存於 ignored `library/private/decision_lab/`；第一筆真實事件後只允許 backup／restore與 append-only correction，不做破壞性 reset。
+
 ### 記憶層（持久知識庫）
 - **Neo4j 知識圖譜（引擎A）：** 供應鏈結構、技術關係、來源可追溯的主張。Property graph，不是 tree。
 - **SQLite / Postgres 財務數據（引擎C）：** 財務快照、Watchlist Gate。零安裝預設用 SQLite；設 `POSTGRES_HOST`/`POSTGRES_DSN` 切換 Postgres。SQLite authority 已移至 ignored `library/private/engine_c/`，由 `library/private/runtime_pointer.json` 指向；ETL projection 可由 tracked schema 重建，但同庫的 append-only manual observation ledger 是 private authority，刪除／重建前必須先做 recovery backup，不能假設 Git 能救回。見 [`docs/solutions/tooling-decisions/engine-c-sqlite-dual-backend.md`](docs/solutions/tooling-decisions/engine-c-sqlite-dual-backend.md)。
 - **向量 RAG：** 暫用 Neo4j 內建，量大再分。
 
-### 管道層（知識入庫的機器）
+### 管道層（Engine B discovery／知識入庫的機器）
 ```
 文件 → library/raw/ → extract.py → loader/validate.py → loader/load_to_neo4j.py → Neo4j
 fetchers/edgar.py ──────↑                        engine_c/etl_yfinance.py → SQLite
@@ -90,7 +104,7 @@ fetchers/edgar.py ──────↑                        engine_c/etl_yfin
 | 自動選文件頁面（G2）| Claude 看 TOC 判斷比 embedding filter 更準確 |
 | 節點重要性評分（G8）| Claude 從 edge 數量、tier、公司規模能即時判斷 |
 | 公司識別（G1）| Claude training data 知道公司是誰，hallucination 風險由 TICKER_MAP 控制 |
-| 自動投資決策 | 永遠需要人工決策，不是開發方向 |
+| 自動代替使用者做最終投資決定或送單 | Engine D 可以提出有邊界的建議與 paper counterfactual，但 live 接受、覆寫與 broker 下單永遠需要人工 |
 
 ---
 
@@ -241,7 +255,7 @@ v0 schema 的對錯只有真實資料能驗證。凍結一個會壞的 v0 → �
 2. **`sole_source` 確認來源必須是客戶端或第三方:** 供應商自稱 sole_source → `verified_by_absence`(弱)。客戶在法說會中說「目前只有一個供應商」、或第三方產業報告列供應商名單只有該公司 → 才能考慮 `verified_by_search`(強)。
 3. **圖裡的交叉驗證:** 若某條 `sole_source=true` 的邊,其所有 source_ids 的 `origin_entity` 全是同一家供應商,標記 `sole_source_evidence_quality: weak`。
 
-### L9 — 三引擎匯流的前置條件(Engine C 與投資諮詢開放前必做)
+### L9 — 上游三引擎匯流至 Engine D 的前置條件（Engine C 與 formal 投資建議開放前必做）
 **Engine A→C join key：** Engine A 的圖節點（如 `co:coherent`）和 Engine C 的財務數字（Coherent 的毛利率）要能自動對齊，需要共同 ID（如 ticker `COHR`）。join key 由 `loader/load_to_neo4j.py` 的 `TICKER_MAP` 維護（靜態 lookup，不用 LLM 推斷）。私人公司映射到 `None`（不是空缺，是明確標記）。
 
 **投資諮詢開放的三個前置條件（全部滿足才開放）：**

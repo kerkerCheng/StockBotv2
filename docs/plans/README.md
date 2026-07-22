@@ -21,5 +21,6 @@
 | [007b (2026-07-14)](2026-07-14-007-feat-remote-intake-provenance-plan.md) | 遠端入圖 provenance 帳本 | superseded → 008 |
 | [008 (2026-07-15)](2026-07-15-008-feat-unified-workplan-plan.md) | 統一工作計畫 — Engine A 品質優先（Phase I–III） | completed（U13 遠端 finalize 由 mobile plan 取代） |
 | [mobile (2026-07-16)](2026-07-16-001-feat-mobile-research-action-launch-plan.md) | Mobile Research Action 兩段式協定 | completed |
+| [Decision Lab (2026-07-21)](2026-07-21-001-feat-action-oriented-alpha-decision-lab-plan.md) | Engine D／Action-Oriented Alpha Decision Lab v1 | completed |
 
-**唯一還 active 的 plan 是 005**（第二條非 AI／非 CPO 垂直切片），它同時是 L9（三引擎匯流前置條件）解鎖投資諮詢的硬性前置之一。
+**唯一還 active 的 plan 是 005**（第二條非 AI／非 CPO 垂直切片），它同時是 L9（上游三引擎匯流至 Engine D 的前置條件）解鎖 formal 投資建議的硬性前置之一。

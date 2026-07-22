@@ -3,6 +3,7 @@ title: Action-Oriented Alpha Decision Lab - Plan
 type: feat
 date: 2026-07-21
 topic: action-oriented-alpha-decision-lab
+status: completed
 artifact_contract: ce-unified-plan/v1
 artifact_readiness: implementation-ready
 product_contract_source: ce-brainstorm

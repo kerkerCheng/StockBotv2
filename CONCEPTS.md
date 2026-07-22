@@ -44,14 +44,14 @@ The `ticker` field in a Company node's `attributes` JSON that enables Engine A (
 ## Financial Data (Engine C)
 
 ### Engine C
-The financial data subsystem in StockBotv2's three-engine architecture. Fetches quantitative market data (prices, P/E, EV/Revenue, gross margins, analyst targets, share count) for companies identified in the knowledge graph via the A→C Join Key. Connected to Engine A via the TICKER_MAP. Uses SQLite by default (zero-install local dev); switches to Postgres when `POSTGRES_HOST` or `POSTGRES_DSN` environment variables are set. Distinct from Engine A (knowledge graph) which handles qualitative supply chain structure, and Engine B (signal intake) which handles social/curated signals.
+The financial and market-observation subsystem in StockBotv2's four-engine architecture. It owns timestamped quantitative state for companies resolved through the A→C Join Key. Engine D may freeze values from Engine C into a decision context, but does not become a second current-state authority.
 
 ---
 
 ## Signal Intake (Engine B)
 
 ### Engine B
-The signal-intake subsystem in StockBotv2's three-engine architecture. Aggregates external signals — curated X/SubStack accounts (e.g. `aleabitoreddit`), trending topics — as an additional harvest source feeding the same weekly Signal Triage → extract → approve pipeline used for tracked-theme web search, not a separate automated ingestion path. A signal that relays a third party's work (e.g. a screenshotted sell-side analyst note) is traced back to its true originator for `origin_entity` purposes when possible; when the primary source can't be located, it's marked as an untraced relay rather than attributed as first-party.
+The signal-discovery and intake subsystem in StockBotv2's four-engine architecture. It turns external material from curated accounts, reports, filings, or other leads into traceable Signal candidates and research attention, without treating registry status as evidence or funded-capital permission. A relay is attributed to its true originator when traceable and remains an untraced lead otherwise.
 *Avoid:* SNS crawler, social ingestion pipeline
 
 ### Signal Triage
@@ -90,6 +90,22 @@ A point-in-time record of market and financial metrics for a single ticker, stor
 ### Watchlist Gate
 The five-item financial checklist that a Lane Memo must pass before a thesis can be upgraded from Research Note to Watchlist Candidate. Items: gross margin trend, customer concentration, backlog/revenue visibility, dilution (share count trend), and valuation pressure. The gate is evaluated by `engine_c/checklist.py` and injected into Lane Memo generation. Items sourced automatically from Financial Snapshots where available; customer concentration and backlog require manual entry. A failing gate does not block research but blocks the Watchlist upgrade.
 *Avoid:* financial gate, checklist gate
+
+---
+
+## Decision & Accountability (Engine D)
+
+### Engine D — Decision & Accountability Engine（Decision Lab）
+The decision layer that consumes Engine B Signals, Engine A evidence/causal context, Engine C observations, versioned policy, and confirmed live holdings to produce bounded capital permission, Action Cards, prospective paper decisions, explicit user-choice facts, and outcome attribution.
+*Avoid:* fourth data source, auto-trading engine, second portfolio authority
+
+Engine D owns immutable decision history and paper-event truth, not the upstream current state it observed. It cannot write Engine A, cannot replace Engine C observations or Google Sheet live inventory, and cannot infer broker execution from a recommendation.
+
+### Point-in-Time Decision Context（決策時點內容）
+The content-addressed, immutable bundle of normalized values, source references, versions, and freshness states that a single Engine D assessment actually used. Its Engine A portion is a bounded evidence/causal slice, not a Neo4j snapshot or disaster-recovery artifact.
+*Avoid:* frozen graph, full graph snapshot, copied current state
+
+Later changes in Engine A/B/C do not rewrite an existing decision context; a new assessment freezes a new bundle. This preserves what the system knew at decision time without creating parallel current-state authorities.
 
 ---
 

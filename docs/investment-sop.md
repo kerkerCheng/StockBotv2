@@ -1,10 +1,12 @@
 # 最小投資規則 SOP（人工執行版）
 
-> **版本：** v3 — Formal Position 規則 + Probe／paper／live 決策邊界。
+> **版本：** v4 — Formal Position 規則 + Engine D／Probe／paper／live 決策邊界。
 > **用途：** L9 前置條件 #2。這份文件存在且非空，代表「最小投資規則已定義」。
 > **性質：** 方向備忘，不是法律或財務建議。本機單人自用。
 
 本文件是**規則語意與人工流程權威**；目前百分比、門檻、天數與 `policy_version` 的唯一數值權威是 `config/investment_policy.json`。調整數字只改 JSON，不修改 Engine C 的歷史觀測。
+
+本文件中的 Decision Lab 正式定位為 **Engine D — Decision & Accountability Engine**：它消費 Engine A/B/C 與持股／policy context，保存決策時點與責任紀錄；它不是第四個資料來源，也不是自動下單引擎。「凍結圖譜」只表示凍結該次決策使用的 Engine A context slice，不是複製整張 Neo4j。
 
 ## 先判斷現在處在哪一層
 
@@ -99,3 +101,4 @@ active → (每季核查 disproof_condition)
 | v1 | 2026-07-08 | 初版，人工執行，對應 L9 前置條件 #2 |
 | v2 | 2026-07-16 | 數值移至 versioned JSON；新增覆蓋折扣、因子曝險與退出優先規則 |
 | v3 | 2026-07-21 | 加入 Signal → Shadow → Coverage → Confidence → paper/live 的 Decision Lab 邊界與 private runtime authority |
+| v4 | 2026-07-22 | 正式將 Decision Lab 定位為 Engine D；釐清 point-in-time Engine A context slice 並非全圖 snapshot |

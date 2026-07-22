@@ -1,6 +1,7 @@
 ---
 title: "Engine C Dual-Backend DB Abstraction: SQLite for Local Dev, Postgres for Production"
 date: 2026-07-08
+last_updated: 2026-07-22
 category: docs/solutions/tooling-decisions/
 module: engine-c-financial-db
 problem_type: tooling_decision
@@ -29,7 +30,7 @@ tags:
 
 Engine C (financial data engine) was designed for Postgres. When implementation began, the development environment had no Docker installed. Installing Docker just to run a local Postgres instance adds significant friction to a single-user, local-only tool — and it blocks development entirely while the environment is being set up.
 
-Rather than halt progress or require infrastructure changes as a prerequisite, a dual-backend abstraction layer was introduced. SQLite becomes the default zero-install path; Postgres is activated by environment variable for production-grade deployments. The same application code works on both without branching at the call site.
+Rather than halt progress or require infrastructure changes as a prerequisite, a dual-backend abstraction layer was introduced. SQLite becomes the default zero-install path; Postgres is activated by environment variable for production-grade deployments. The same application code works on both without branching at the call site. SQLite 後來再移入 ignored private runtime，避免把個人財務 observation 與 manual ledger 當成可由 Git 回復的 source code。
 
 This pattern also emerged from a second discovery: non-US stocks (e.g., Sivers Semiconductors, traded on Nasdaq Stockholm) have a separate onboarding path that EDGAR cannot service. That path — manual PDF extraction via pdfplumber, yfinance with exchange suffixes — was established alongside the DB abstraction work.
 
@@ -57,28 +58,51 @@ No config file, no flag. If `POSTGRES_DSN` or `POSTGRES_HOST` is set in the envi
 **Connection factory — returns native connections, not an ORM:**
 
 ```python
-_SQLITE_PATH = _ROOT / "engine_c" / "stockbot.db"
+def sqlite_path(*, repo_root: Path | None = None,
+                private_root: Path | None = None) -> Path:
+    """Resolve the active ignored Engine C authority."""
+    repo = (repo_root or _ROOT).resolve()
+    private = initialize_private_root(
+        (private_root or repo / "library" / "private").resolve(),
+        repo_root=repo,
+    )
+    pointer = private / "runtime_pointer.json"
+    if pointer.is_file():
+        # Parse a relative target, validate containment and run SQLite quick_check.
+        ...
+        if not destination.is_file():
+            raise RuntimeError("Engine C runtime pointer target is missing")
+        return destination
+
+    legacy = repo / "engine_c" / "stockbot.db"
+    if legacy.is_file():
+        return legacy.resolve()
+    if list((private / "engine_c").glob("stockbot-engine-c-private-v*.db")):
+        raise RuntimeError("Engine C versioned runtime exists without an authority pointer")
+    return validate_private_destination(
+        private / "engine_c" / "stockbot.db",
+        private_root=private,
+        repo_root=repo,
+    )
 
 def get_conn():
-    """Returns sqlite3.Connection or psycopg2 connection.
-    Auto-creates SQLite schema on first connect."""
+    """Return a native SQLite or psycopg2 connection."""
     if _use_postgres():
-        import psycopg2
-        dsn = os.environ.get("POSTGRES_DSN") or (
-            f"host={os.environ['POSTGRES_HOST']} "
-            f"dbname={os.environ.get('POSTGRES_DB', 'stockbot')} "
-            f"user={os.environ.get('POSTGRES_USER', 'stockbot')} "
-            f"password={os.environ.get('POSTGRES_PASSWORD', '')}"
-        )
-        return psycopg2.connect(dsn)
-    else:
-        import sqlite3
-        conn = sqlite3.connect(_SQLITE_PATH)
-        _ensure_schema(conn)
-        return conn
+        # Build a psycopg2 connection with a bounded connect timeout.
+        ...
+
+    path = sqlite_path()
+    legacy = (_ROOT / "engine_c" / "stockbot.db").resolve()
+    if path.resolve() == legacy:
+        return sqlite3.connect(f"file:{path.as_posix()}?mode=ro", uri=True)
+    conn = connect_sqlite(path, create=not path.exists())
+    _ensure_sqlite_schema(conn)
+    return conn
 ```
 
-SQLite schema is created inline on the first `get_conn()` call — no migration runner, no setup script needed. Postgres changes use versioned files in `engine_c/migrations/` and are applied explicitly with `python -m engine_c.migrate`:
+以上是 contract-level 摘要；完整驗證與連線細節以 `engine_c/db.py` 為準。Fresh clone 尚無 authority 時可在 `library/private/engine_c/` bootstrap SQLite schema；但已有 runtime pointer、versioned runtime 或 legacy authority 時會驗證並 fail closed，不會把遺失／損毀的 authority 靜默替換成空 DB。Postgres 變更仍使用 `engine_c/migrations/` 的 versioned migrations，並由 `python -m engine_c.migrate` 顯式套用與驗證 required schema。
+
+`manual_observations` 是 append-only private input authority，`manual_fields` 才是可重建 projection。兩者目前同庫，因此「ETL projection 可重建」不代表整個 Engine C DB 可以無備份刪除；任何整庫 relocation／restore 前都必須把 manual ledger 納入 recovery backup。
 
 ```sql
 CREATE TABLE IF NOT EXISTS financial_snapshots (
@@ -223,7 +247,7 @@ Apply the dual-backend pattern when:
 - The tool is primarily single-user and local-first, but you want a clear upgrade path to a production database without rewriting.
 - You want to develop without running a database server (no Docker, no Postgres install, no network).
 - The SQL used is simple enough that the only meaningful dialect differences are parameter placeholders (`?` vs `%s`) and upsert syntax. If you need window functions, CTEs, or Postgres-specific types (JSONB, arrays), the abstraction becomes much more complex — evaluate whether SQLite is actually sufficient at that point.
-- You are in early-stage development and schema changes are frequent; SQLite's `_ensure_schema()` approach (`CREATE TABLE IF NOT EXISTS` inline) is faster to iterate than maintaining migration files.
+- You are in early-stage development and schema changes are frequent；fresh private SQLite 可由 tracked schema bootstrap，但已有 authority 必須經 explicit migration／cutover／backup contract，不可把 `CREATE TABLE IF NOT EXISTS` 當成遺失資料的 recovery。
 
 Apply the non-US onboarding path when:
 
@@ -247,7 +271,7 @@ Apply the EDGAR token guard when:
 python engine_c/etl_yfinance.py COHR SIVE.ST
 ```
 
-`engine_c/stockbot.db` is created automatically on first run. No environment variables required.
+Fresh clone 尚未有 Engine C authority 時，SQLite 會建立在 ignored `library/private/engine_c/`；cutover 後由 `library/private/runtime_pointer.json` 指向 active DB。舊 `engine_c/stockbot.db` 只保留 read-only compatibility fallback，不再是新 runtime 的寫入位置。No environment variables required.
 
 **Switching to Postgres:**
 
@@ -315,4 +339,5 @@ python fetchers/edgar.py --ticker COHR --forms 10-K --n 1 --max-chars 0
 - `loader/load_to_neo4j.py` — contains `TICKER_MAP`; `None` values mark private companies explicitly
 - `docs/onboarding-sop.md` — step-by-step onboarding SOP that uses this non-US path
 - `docs/solutions/architecture-patterns/knowledge-graph-data-quality-and-engine-c-join-key.md` — graph-side TICKER_MAP: how Neo4j Company nodes get ticker attributes as the A→C join key
-- `AGENTS.md`「三引擎匯流的前置條件」— Engine C / Engine A join key design: `TICKER_MAP` is the A→C bridge
+- `docs/solutions/architecture-patterns/engine-d-content-addressed-decision-context.md` — Engine D 只凍結本次使用的 Engine C values，不取代 current observation authority
+- `AGENTS.md`「上游三引擎匯流至 Engine D 的前置條件」— Engine C / Engine A join key design: `TICKER_MAP` is the A→C bridge
