@@ -101,11 +101,14 @@ revised: 2026-07-22 (push 前提定案後修訂：git push 為狀態同步機制
   2. **EDGAR 冷啟動偏 Form 4**：首跑 64 筆 EDGAR 裡 54 筆是 Form 4（內部人交易）。日常增量下是涓流且對稀釋核驗有用，但**冷啟動 seed 明顯偏重**——**U4 brief 呈現層必須摺疊／降權舊 filing 與 Form 4**，否則第一份 brief 會被歷史 Form 4 淹沒。已 seed populated baseline（65 筆），使 routine 日後只浮現真正新 filing。
 - **決策定案：** commit populated baseline（非空骨架）——baseline 檔的職責是「已見去重記憶」，空檔＝謊稱沒見過、保證首跑洪水；populated 讓系統從第一天就只報新料。
 
-### U2 — 修 partial-identity crash ＋ registry 補齊（R14–R15）
+### U2 — 修 partial-identity crash ＋ registry 補齊（R14–R15）（✅ 已完成 2026-07-23）
 
-- **Files:** modify `decision_lab/context.py` 或 `decision_lab/workflow.py`（依實作判斷，以最小 diff 滿足 R9 語意）, `config/company_identity.json`；modify `tests/test_operational_workflow.py`（新增 partial-metadata fixture 案例）。
-- **Approach:** 固定契約——「registry 能解析 company_id＋ticker 即可完成 capture＋freeze；execution metadata 缺失是 lane blocker 不是 identity 失敗」。負向測試：partial ticker 走完 evaluate-signal 得 REVIEW card＋blockers，無 exception；既有完整 metadata 案例不回歸。
-- **Dependencies:** 無（可與 U1 並行）。
+- **Files:** modified `decision_lab/context.py`（`build_context_bundle` identity 判斷）, `config/company_identity.json`（6 檔 US watch 補 metadata）, `tests/test_operational_workflow.py`（partial-metadata 負向測試）。
+- **根因與修法：** `build_context_bundle` 原以 `any(canonical is None ...)` 把「缺 execution metadata（market_currency／execution_currency／execution_venue）」誤判為 identity 失敗 → frozen identity 丟掉 company_id → 與已綁定 cohort 衝突 → freeze 拋 `ValueError`。改為拆 **core identity（company_id／research_ticker／execution_symbol，決定 resolved）** 與 **execution profile（缺失只記 `<field>_missing` blocker、封鎖 live lane，不讓 freeze 失敗）**。
+- **語意精修：** `execution_conflict` 只在 caller 與 registry 「都非 None 且相異」時觸發——caller 傳 None＝未指定以 registry 為準、registry None＝未知（lane blocker），兩者都不該讓已解析 identity 變 unresolved。
+- **R15：** LITE／AMAT／LRCX／AAOI／TSEM／GFS 六檔美股補 `market_currency`/`execution_currency`/`execution_venue`=USD/USD/NASDAQ（各檔真實上市所；COHR=NYSE、AXTI=NASDAQ 已有）。**待使用者確認：** execution venue 是「你實際下單場所」（如 SIVE 研究用 Stockholm、執行在 Frankfurt）；若某檔你在別處交易，改該欄即可。
+- **驗證：** 新負向測試（AVGO，真實 registry 內仍無 metadata）＋CLI 對 LITE 端到端皆 `completed_with_blockers`／REVIEW／不 crash。U2 前 CLI 回 INVALID_REQUEST。73 相關測試通過。
+- **Dependencies:** 無。
 
 ### U3 — MCP gateway `get_decision_brief`（R8–R9）
 

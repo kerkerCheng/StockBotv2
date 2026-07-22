@@ -98,6 +98,58 @@ def _request(**overrides) -> EvaluationRequest:
     return EvaluationRequest(**payload)
 
 
+def _partial_metadata_inputs() -> dict:
+    """真實 registry 內有 ticker 但缺 execution metadata 的公司（co:broadcom/AVGO）。
+
+    大多數 registry 條目都是這種狀態；U2 前這會在 context freeze 階段拋
+    ValueError（context identity does not match cohort authority）。
+    """
+    inputs = deepcopy(complete_inputs(rows=[]))
+    inputs["identity"] = {
+        "company_id": "co:broadcom",
+        "research_ticker": "AVGO",
+        "execution_symbol": "AVGO",
+        "market_currency": None,
+        "execution_currency": None,
+        "execution_venue": None,
+    }
+    inputs["financial"]["ticker"] = "AVGO"
+    inputs["market"]["ticker"] = "AVGO"
+    return inputs
+
+
+def test_partial_execution_metadata_captures_without_crash(tmp_path: Path) -> None:
+    store = _store(tmp_path)
+    provider = FixtureProvider(inputs=_partial_metadata_inputs())
+    try:
+        # 缺 execution metadata 不得讓 evaluate-signal 崩潰——是 lane blocker，
+        # 不是 identity 失敗（plan R14／KTD3）。
+        result = evaluate_signal(
+            store,
+            provider,
+            _request(
+                ticker_hint="AVGO",
+                company_id_hint="co:broadcom",
+                execution_intent="research",
+            ),
+        )
+
+        assert result["status"] == "completed_with_blockers"
+        assert result["action_card"]["action"] == "REVIEW"
+        # 核心 identity 存活（company_id 有綁定，coverage 不報 identity_unresolved）。
+        bundle = store.get_context_bundle(result["context_digest"])
+        frozen_identity = bundle.payload["identity"]
+        assert frozen_identity["status"] == "resolved"
+        assert frozen_identity["company_id"] == "co:broadcom"
+        assert "identity_unresolved" not in result["blockers"]
+        # execution metadata 缺失以 identity blocker 呈現、且封鎖資本 lane。
+        assert "market_currency_missing" in frozen_identity["blockers"]
+        assert result["action_card"]["paper"]["max_supported_position"] == 0
+        assert result["action_card"]["live"]["supported_range"] == [0.0, 0.0]
+    finally:
+        store.close()
+
+
 def test_sive_signal_runs_to_auditable_card_and_retry_is_idempotent(
     tmp_path: Path,
 ) -> None:

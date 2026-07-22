@@ -466,29 +466,48 @@ def build_context_bundle(
         ),
         execution_aliases=execution_aliases(),
     )
-    canonical_fields = {
+    # 核心 identity（company_id／research_ticker／execution_symbol）決定 freeze／
+    # cohort 是否 resolved；execution metadata（currency／venue）缺失只是 live／
+    # execution lane 的 blocker，不讓整個 capture／freeze 失敗（plan R14／KTD3）。
+    # 大多數 registry 條目沒填 execution metadata，若當成 identity 失敗會使 frozen
+    # identity 丟掉 company_id、與已綁定的 cohort 衝突並在 freeze 拋 ValueError。
+    core_fields = {
         "company_id": resolved.company_id,
         "research_ticker": resolved.research_ticker,
         "execution_symbol": resolved.execution_symbol,
+    }
+    execution_profile = {
         "market_currency": resolved.market_currency,
         "execution_currency": resolved.execution_currency,
         "execution_venue": resolved.execution_venue,
     }
-    identity_mismatch = (
+    core_unresolved = (
         bool(resolved.blockers)
-        or any(canonical is None for canonical in canonical_fields.values())
-        or any(
-            identity.get(field) != canonical
-            for field, canonical in canonical_fields.items()
-        )
+        or any(value is None for value in core_fields.values())
+        or any(identity.get(field) != value for field, value in core_fields.items())
     )
-    if identity_mismatch:
+    # 防偽：caller 與 registry 都非 None 且相異才算 conflict。caller 傳 None＝
+    # 「未指定，以 registry 為準」；registry 未列（None）＝未知，之後以 lane
+    # blocker 呈現。兩者都不該讓已解析的 identity 變 unresolved。
+    execution_conflict = any(
+        identity.get(field) is not None
+        and value is not None
+        and identity.get(field) != value
+        for field, value in execution_profile.items()
+    )
+    if core_unresolved or execution_conflict:
         normalized_identity = {"status": "unresolved", "blockers": ["identity_unresolved"]}
     else:
+        missing_execution = sorted(
+            f"{field}_missing"
+            for field, value in execution_profile.items()
+            if value is None
+        )
         normalized_identity = {
             "status": "resolved",
-            **canonical_fields,
-            "blockers": [],
+            **core_fields,
+            **execution_profile,
+            "blockers": missing_execution,
         }
     normalized_evidence = deepcopy(dict(evidence))
     expected_currency = str(
