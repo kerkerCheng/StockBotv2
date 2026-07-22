@@ -10,6 +10,7 @@
 - **平台設定分開：** Codex 設定放 `.codex/`，Claude Code 本機設定放 `.claude/settings.local.json`；共用行為應呼叫同一支 repo Python 程式，不在兩份 hook 裡複製業務邏輯。
 - **切換原則：** 同一 working tree 只讓一個 agent 寫入；序列切換沿用同一 feature branch。若兩邊同時工作，必須使用不同 worktree / branch。交接訊息至少附目前 plan 路徑、進行中的 U-ID、`git status --short`、最後一次驗證命令與結果。
 - 本機開發 agent 可以是 Claude Code 或 Codex；架構中明指 `claude.ai` custom connector 的遠端流程仍維持 Claude，不因本機開發工具切換而改名。
+- **Push 政策（2026-07-22 使用者定案）：** push 是常規動作——session 收尾（邏輯 commits 完成後）把 master push 到 origin，不需逐次人工確認。私有隔離依 `.gitignore`（`library/private/`、`.env`）；push 前 sanity check：`git ls-files library/private` 應為空。Cloud routine 依賴 pushed clone 的新鮮度，幾天不 push 會使 daily brief 出現重複噪音（那本身就是該 push 的信號）。
 
 ## 工作語言（繁體中文）
 
