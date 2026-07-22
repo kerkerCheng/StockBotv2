@@ -127,10 +127,17 @@ def test_cli_redacts_errors_and_never_echoes_canary_secret(tmp_path: Path) -> No
         store.close()
 
 
-def test_public_help_only_promotes_assess_and_card() -> None:
+def test_public_help_promotes_operational_workflow() -> None:
     help_text = build_parser().format_help()
 
-    assert "assess" in help_text
-    assert "card" in help_text
+    for command in (
+        "evaluate-signal",
+        "reassess",
+        "today",
+        "card",
+        "record-choice",
+        "record-fill",
+    ):
+        assert command in help_text
     assert "correction" not in help_text
     assert "record-decision" not in help_text

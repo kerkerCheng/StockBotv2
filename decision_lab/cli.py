@@ -1,45 +1,123 @@
-"""Decision Lab 本機 CLI；公開 surface 只突出 assess 與 card。"""
+"""Engine D operational CLI；正常路徑從 Signal、today 與 explicit live facts 出發。"""
 from __future__ import annotations
 
 import argparse
 import json
 import sys
 from dataclasses import asdict
+from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, TextIO
+from typing import Any, Mapping, TextIO
 
-from .action_card import (
-    RedactionError,
-    assert_safe_payload,
-    build_action_card,
-    render_markdown,
+from .action_card import RedactionError, assert_safe_payload, build_action_card, render_markdown
+from .bootstrap import open_default_store
+from .brief import build_today_brief, render_today_markdown
+from .execution import (
+    ExecutionError,
+    assess_probe,
+    record_live_choice,
+    record_live_fill,
 )
-from .execution import ExecutionError, assess_probe
 from .store import DecisionStore
+from .workflow import (
+    EvaluationRequest,
+    WorkflowError,
+    evaluate_signal,
+    reassess,
+    render_workflow_markdown,
+)
+from .workflow_ports import WorkflowDataProvider
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="python -m decision_lab",
-        description="評估已凍結的 Signal context，或讀取 action-first Decision Card。",
+        description="從一條 Signal 產生 Action Card，或回答今天是否需要動作。",
     )
-    parser.add_argument("--store", required=True, type=Path, help=argparse.SUPPRESS)
-    parser.add_argument("--private-root", required=True, type=Path, help=argparse.SUPPRESS)
-    parser.add_argument("--repo-root", required=True, type=Path, help=argparse.SUPPRESS)
+    parser.add_argument("--store", type=Path, help=argparse.SUPPRESS)
+    parser.add_argument("--private-root", type=Path, help=argparse.SUPPRESS)
+    parser.add_argument("--repo-root", type=Path, help=argparse.SUPPRESS)
     subcommands = parser.add_subparsers(dest="command", required=True)
 
-    assess = subcommands.add_parser(
-        "assess",
-        help="依凍結 context 與 Coverage 產生決策，eligible 時原子建立 system paper。",
+    evaluate = subcommands.add_parser(
+        "evaluate-signal",
+        help="從原始 Signal 自動建立 context、Coverage、decision 與 Action Card。",
     )
-    assess.add_argument("--input", default="-", help="JSON 檔；- 代表 stdin。")
+    evaluate.add_argument("signal", help="推文、網址說明、公司／ticker 或一句 thesis。")
+    evaluate.add_argument("--source-url")
+    evaluate.add_argument("--ticker")
+    evaluate.add_argument("--company")
+    evaluate.add_argument("--company-id", help=argparse.SUPPRESS)
+    evaluate.add_argument("--thesis")
+    evaluate.add_argument("--catalyst")
+    evaluate.add_argument("--disproof")
+    evaluate.add_argument("--expiry")
+    evaluate.add_argument("--as-of")
+    evaluate.add_argument(
+        "--intent", choices=("research", "paper", "live"), default="research"
+    )
+    evaluate.add_argument("--direction", choices=("long", "short", "neutral"), default="neutral")
+    evaluate.add_argument("--source-id", default="unattributed")
+    evaluate.add_argument("--source-traced", action="store_true")
+    evaluate.add_argument("--evidence-tier", type=int, default=4)
+    evaluate.add_argument("--confirm-holdings", action="store_true")
+    evaluate.add_argument("--assessment", help="研究 agent 產生的五軸 JSON 檔。")
+    evaluate.add_argument("--format", choices=("json", "markdown"), default="markdown")
 
-    card = subcommands.add_parser(
-        "card",
-        help="純讀既有 decision 的 NO ACTION / REVIEW / TRADE / HEDGE 卡片。",
+    reassess_parser = subcommands.add_parser(
+        "reassess",
+        help="以既有 decision／cohort 重新讀 authorities，保留舊 decision。",
     )
+    reassess_parser.add_argument("target_id")
+    reassess_parser.add_argument("--as-of")
+    reassess_parser.add_argument("--ticker")
+    reassess_parser.add_argument("--company")
+    reassess_parser.add_argument("--company-id", help=argparse.SUPPRESS)
+    reassess_parser.add_argument("--intent", choices=("research", "paper", "live"))
+    reassess_parser.add_argument("--confirm-holdings", action="store_true")
+    reassess_parser.add_argument("--assessment")
+    reassess_parser.add_argument("--format", choices=("json", "markdown"), default="markdown")
+
+    today = subcommands.add_parser(
+        "today",
+        help="純讀回答今天是否需要 NO ACTION／REVIEW／TRADE／HEDGE。",
+    )
+    today.add_argument("--as-of")
+    today.add_argument("--format", choices=("json", "markdown"), default="markdown")
+
+    card = subcommands.add_parser("card", help="純讀既有 decision 的 Action Card。")
     card.add_argument("decision_id")
+    card.add_argument("--as-of")
     card.add_argument("--format", choices=("json", "markdown"), default="json")
+
+    choice = subcommands.add_parser(
+        "record-choice", help="明確記錄接受、縮小、skip 或 override 的 live 選擇。"
+    )
+    choice.add_argument("decision_id")
+    choice.add_argument("--selected-weight", required=True, type=float)
+    choice.add_argument("--decided-at")
+    choice.add_argument("--reason")
+    choice.add_argument("--confirmation-ref", required=True)
+    choice.add_argument("--explicit", action="store_true")
+    choice.add_argument("--format", choices=("json", "markdown"), default="json")
+
+    fill = subcommands.add_parser(
+        "record-fill", help="在使用者手動下單後，明確回報 live fill。"
+    )
+    fill.add_argument("decision_id")
+    fill.add_argument("--execution-ref", required=True)
+    fill.add_argument("--shares", required=True, type=float)
+    fill.add_argument("--price", required=True, type=float)
+    fill.add_argument("--currency", required=True)
+    fill.add_argument("--executed-at")
+    fill.add_argument("--explicit", action="store_true")
+    fill.add_argument("--format", choices=("json", "markdown"), default="json")
+
+    # 保留 v1 low-level surface 供 deterministic fixtures／維護用途。
+    assess = subcommands.add_parser(
+        "assess", help="維護用低階相容入口；正常操作請使用 evaluate-signal。"
+    )
+    assess.add_argument("--input", default="-", help=argparse.SUPPRESS)
     return parser
 
 
@@ -52,7 +130,18 @@ def _read_json(source: str, stdin: TextIO) -> dict[str, Any]:
     return value
 
 
+def _read_optional_json(source: str | None) -> Mapping[str, Any] | None:
+    if source is None:
+        return None
+    value = json.loads(Path(source).read_text(encoding="utf-8"))
+    if not isinstance(value, dict):
+        raise ValueError("assessment must be a JSON object")
+    assert_safe_payload(value)
+    return value
+
+
 def _write_json(value: Any, stdout: TextIO) -> None:
+    assert_safe_payload(value)
     json.dump(
         value,
         stdout,
@@ -64,23 +153,186 @@ def _write_json(value: Any, stdout: TextIO) -> None:
     stdout.write("\n")
 
 
+def _timestamp(value: str | None) -> str:
+    return value or datetime.now(timezone.utc).isoformat()
+
+
+def _open_store(args: argparse.Namespace) -> DecisionStore:
+    configured = (args.store, args.private_root, args.repo_root)
+    if any(configured):
+        if not all(configured):
+            raise ValueError("private store configuration is incomplete")
+        return DecisionStore.open(
+            args.store,
+            private_root=args.private_root,
+            repo_root=args.repo_root,
+        )
+    return open_default_store()
+
+
+def _provider(current: WorkflowDataProvider | None) -> WorkflowDataProvider:
+    if current is not None:
+        return current
+    from engine_d_runtime.bootstrap import build_default_runtime_provider
+
+    return build_default_runtime_provider()
+
+
+def _render(
+    payload: Mapping[str, Any],
+    *,
+    format_name: str,
+    stdout: TextIO,
+    markdown_renderer,
+) -> None:
+    if format_name == "json":
+        _write_json(payload, stdout)
+    else:
+        stdout.write(markdown_renderer(payload) + "\n")
+
+
 def run(
     argv: list[str] | None = None,
     *,
     stdin: TextIO | None = None,
     stdout: TextIO | None = None,
+    provider: WorkflowDataProvider | None = None,
 ) -> int:
     stdin = stdin or sys.stdin
     stdout = stdout or sys.stdout
     args = build_parser().parse_args(argv)
     store: DecisionStore | None = None
     try:
-        store = DecisionStore.open(
-            args.store,
-            private_root=args.private_root,
-            repo_root=args.repo_root,
-        )
-        if args.command == "assess":
+        store = _open_store(args)
+        if args.command == "evaluate-signal":
+            result = evaluate_signal(
+                store,
+                _provider(provider),
+                EvaluationRequest(
+                    raw_signal=args.signal,
+                    source_url=args.source_url,
+                    ticker_hint=args.ticker,
+                    company_hint=args.company,
+                    company_id_hint=args.company_id,
+                    thesis=args.thesis,
+                    catalyst=args.catalyst,
+                    disproof=args.disproof,
+                    expiry=args.expiry,
+                    as_of=args.as_of,
+                    execution_intent=args.intent,
+                    direction=args.direction,
+                    source_id=args.source_id,
+                    source_traced=args.source_traced,
+                    evidence_tier=args.evidence_tier,
+                    confirm_holdings=args.confirm_holdings,
+                    assessment=_read_optional_json(args.assessment),
+                ),
+            )
+            _render(
+                result,
+                format_name=args.format,
+                stdout=stdout,
+                markdown_renderer=render_workflow_markdown,
+            )
+        elif args.command == "reassess":
+            result = reassess(
+                store,
+                _provider(provider),
+                args.target_id,
+                as_of=args.as_of,
+                execution_intent=args.intent,
+                ticker_hint=args.ticker,
+                company_hint=args.company,
+                company_id_hint=args.company_id,
+                confirm_holdings=args.confirm_holdings,
+                assessment=_read_optional_json(args.assessment),
+            )
+            _render(
+                result,
+                format_name=args.format,
+                stdout=stdout,
+                markdown_renderer=render_workflow_markdown,
+            )
+        elif args.command == "today":
+            evaluation_at = _timestamp(args.as_of)
+            runtime = _provider(provider)
+            try:
+                holdings = runtime.current_holdings(
+                    evaluation_at=evaluation_at
+                )
+            except Exception:
+                holdings = {"status": "unavailable"}
+            brief = build_today_brief(
+                store,
+                as_of=evaluation_at,
+                current_holdings=holdings,
+                provider=runtime,
+            )
+            _render(
+                brief,
+                format_name=args.format,
+                stdout=stdout,
+                markdown_renderer=render_today_markdown,
+            )
+        elif args.command == "card":
+            card = build_action_card(store, args.decision_id, as_of=args.as_of)
+            _render(
+                card,
+                format_name=args.format,
+                stdout=stdout,
+                markdown_renderer=render_markdown,
+            )
+        elif args.command == "record-choice":
+            decided_at = _timestamp(args.decided_at)
+            choice_id = record_live_choice(
+                store,
+                args.decision_id,
+                selected_weight=args.selected_weight,
+                decided_at=decided_at,
+                explicit=args.explicit,
+                reason=args.reason,
+                confirmation_ref=args.confirmation_ref,
+            )
+            payload = {
+                "status": "recorded",
+                "choice_id": choice_id,
+                "decision_id": args.decision_id,
+            }
+            _render(
+                payload,
+                format_name=args.format,
+                stdout=stdout,
+                markdown_renderer=lambda item: (
+                    f"# Live choice 已記錄\n\n- Decision：{item['decision_id']}\n"
+                    f"- Choice：{item['choice_id']}"
+                ),
+            )
+        elif args.command == "record-fill":
+            fill_id = record_live_fill(
+                store,
+                args.decision_id,
+                execution_ref=args.execution_ref,
+                shares=args.shares,
+                price=args.price,
+                currency=args.currency.upper(),
+                executed_at=_timestamp(args.executed_at),
+                explicit=args.explicit,
+            )
+            payload = {
+                "status": "recorded",
+                "fill_id": fill_id,
+                "decision_id": args.decision_id,
+            }
+            _render(
+                payload,
+                format_name=args.format,
+                stdout=stdout,
+                markdown_renderer=lambda item: (
+                    f"# Live fill 已記錄\n\n- Decision：{item['decision_id']}\n"
+                    f"- Fill：{item['fill_id']}"
+                ),
+            )
+        else:
             request = _read_json(args.input, stdin)
             required = {
                 "context_digest",
@@ -104,15 +356,10 @@ def run(
                 effective_at=str(request["effective_at"]),
             )
             _write_json(asdict(result), stdout)
-        else:
-            card = build_action_card(store, args.decision_id)
-            if args.format == "markdown":
-                stdout.write(render_markdown(card) + "\n")
-            else:
-                _write_json(card, stdout)
         return 0
     except (
         ExecutionError,
+        WorkflowError,
         RedactionError,
         KeyError,
         OSError,
@@ -125,6 +372,8 @@ def run(
             if isinstance(exc, RedactionError)
             else "NOT_FOUND"
             if isinstance(exc, KeyError)
+            else "IDEMPOTENCY_CONFLICT"
+            if "idempotency" in str(exc).casefold()
             else "INVALID_REQUEST"
         )
         _write_json({"status": "error", "code": code}, stdout)
