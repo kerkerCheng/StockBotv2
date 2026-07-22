@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import math
+import re
 from datetime import datetime, timedelta, timezone
 from typing import Any, Mapping, Sequence
 
@@ -11,6 +12,18 @@ from .store import DecisionStore
 
 class RedactionError(ValueError):
     """Payload contains a field that must never enter output or diagnostics。"""
+
+
+_ANSI_ESCAPE = re.compile(r"\x1b\[[0-?]*[ -/]*[@-~]")
+_MARKDOWN_SPECIAL = re.compile(r"([\\`*_{}\[\]()<>#+.!|-])")
+
+
+def markdown_text(value: Any) -> str:
+    """將外部文字限制成單行並 escape Markdown／terminal control。"""
+
+    text = _ANSI_ESCAPE.sub("", str(value)).replace("\r", " ").replace("\n", " ")
+    text = "".join(character if character >= " " else " " for character in text)
+    return _MARKDOWN_SPECIAL.sub(r"\\\1", text)
 
 
 def assert_safe_payload(value: Any, path: str = "root") -> None:
@@ -149,9 +162,13 @@ def build_action_card(
         raise ValueError("Action Card as_of cannot predate the decision")
     payload = decision["payload"]
     sizing = payload["sizing"]
+    execution_intent = str(payload.get("request", {}).get("execution_intent") or "live")
+    paper_requested = execution_intent in {"paper", "live"}
+    live_requested = execution_intent == "live"
     context = store.get_context_bundle(decision["context_digest"]).payload
-    company_id = str(context["identity"].get("company_id") or "")
-    paper_position = store.paper_position_state(company_id)
+    authority_company_id = str(context["identity"].get("company_id") or "")
+    company_id = authority_company_id or "unresolved"
+    paper_position = store.paper_position_state(authority_company_id)
     live_choice = store.latest_live_choice(decision_id)
     live_fill = store.latest_live_fill(decision_id)
     if (
@@ -184,10 +201,18 @@ def build_action_card(
     freshness, current_paper_blockers, current_live_blockers = _runtime_freshness(
         context, card_as_of
     )
-    if current_paper_blockers:
+    if current_paper_blockers and paper_requested:
         paper_status = "DATA_NEEDED"
-    if current_live_blockers:
+    if current_live_blockers and live_requested:
         live_status = "DATA_NEEDED"
+    if not paper_requested:
+        paper_status = "NOT_REQUESTED"
+    if not live_requested:
+        live_status = "NOT_REQUESTED"
+    core_blockers = sorted(
+        set(sizing.get("assessment_blockers", []))
+        | set((payload.get("request", {}).get("coverage") or {}).get("blockers", []))
+    )
 
     if disproof_triggered:
         action = "REVIEW"
@@ -221,7 +246,16 @@ def build_action_card(
         single_name_action = "reassess_revised_epoch"
         reason = "Thesis 已 revised；舊 epoch 的 decision 不再授權新交易。"
         next_action = "在新 epoch 重新 freeze context、coverage 與 sizing。"
-    elif current_paper_blockers or current_live_blockers:
+    elif core_blockers:
+        action = "REVIEW"
+        urgency = "next_review"
+        portfolio_action = "none"
+        single_name_action = "complete_research_work_order"
+        reason = "研究 coverage 或 Confidence assessment 尚未完整。"
+        next_action = "補齊 blockers 指向的 evidence／研究欄位後執行 reassess。"
+    elif (current_paper_blockers and paper_requested) or (
+        current_live_blockers and live_requested
+    ):
         action = "REVIEW"
         urgency = "data_refresh"
         portfolio_action = "none"
@@ -334,6 +368,7 @@ def build_action_card(
         "decision_digest": decision["decision_digest"],
         "as_of": card_as_of,
         "company_id": company_id,
+        "execution_intent": execution_intent,
         "action": action,
         "urgency": urgency,
         "scope": {
@@ -386,18 +421,19 @@ def render_markdown(card: Mapping[str, Any]) -> str:
     weakest = card["weakest_link"]
     paper = card["paper"]
     live = card["live"]
-    blockers = ", ".join(card["blockers"]) if card["blockers"] else "無"
+    blockers = ", ".join(markdown_text(item) for item in card["blockers"]) if card["blockers"] else "無"
     return "\n".join(
         [
-            f"# {card['action']} — {card['company_id']} ({card['urgency']})",
+            f"# {markdown_text(card['action'])} — {markdown_text(card['company_id'])} ({markdown_text(card['urgency'])})",
             "",
-            f"- 理由：{card['reason']}",
-            f"- Alpha / Beta：{card['alpha_beta']['classification']}",
-            f"- Weakest link：{weakest['axis']} / {weakest['level']} — {weakest['reason']}",
-            f"- Paper：{paper['status']}；target={paper['target']:.4%}；funded={paper['funded']}",
-            f"- Live：{live['status']}；range={tuple(live['supported_range'])}",
+            f"- 理由：{markdown_text(card['reason'])}",
+            f"- Alpha / Beta：{markdown_text(card['alpha_beta']['classification'])}",
+            f"- Weakest link：{markdown_text(weakest['axis'])} / {markdown_text(weakest['level'])} — {markdown_text(weakest['reason'])}",
+            f"- Intent：{markdown_text(card.get('execution_intent', 'live'))}",
+            f"- Paper：{markdown_text(paper['status'])}；target={paper['target']:.4%}；funded={paper['funded']}",
+            f"- Live：{markdown_text(live['status'])}；range={tuple(live['supported_range'])}",
             f"- Blockers：{blockers}",
             "",
-            f"## 下一步\n{card['next_action']}",
+            f"## 下一步\n{markdown_text(card['next_action'])}",
         ]
     )

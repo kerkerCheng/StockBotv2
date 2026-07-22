@@ -11,6 +11,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Mapping
 
+from identity.registry import get_registry
 from storage.relational import (
     connect_sqlite,
     immediate_transaction,
@@ -198,6 +199,82 @@ class DecisionStore:
             raise ValueError("dedupe_key already belongs to a different identity")
         return CohortRecord(**dict(row))
 
+    def bind_cohort_identity(
+        self,
+        cohort_id: str,
+        *,
+        company_id: str,
+        research_ticker: str,
+        resolved_at: str,
+    ) -> CohortRecord:
+        """Monotonically bind one unresolved cohort to a registry identity pair。"""
+
+        resolved_at = _timestamp(resolved_at, "resolved_at")
+        registry = get_registry()
+        company = registry.company(company_id)
+        canonical_ticker = research_ticker.strip().upper()
+        if company is None or company.research_ticker != canonical_ticker:
+            raise ValueError("cohort identity pair is not canonical in the registry")
+        payload = {
+            "company_id": company_id,
+            "research_ticker": canonical_ticker,
+            "identity_registry_version": registry.version,
+        }
+        payload_json = _canonical_json(payload)
+        payload_digest = _digest(payload_json)
+        event_id = "de_" + _digest(
+            _canonical_json(
+                {
+                    "cohort_id": cohort_id,
+                    "event_type": "identity_resolved",
+                    "payload_digest": payload_digest,
+                    "observed_at": resolved_at,
+                }
+            )
+        )[:32]
+        with immediate_transaction(self._conn):
+            row = self._conn.execute(
+                """
+                SELECT cohort_id, dedupe_key, company_id, research_ticker
+                FROM decision_cohorts WHERE cohort_id = ?
+                """,
+                (cohort_id,),
+            ).fetchone()
+            if row is None:
+                raise KeyError(f"cohort not found: {cohort_id}")
+            current_pair = (row["company_id"], row["research_ticker"])
+            requested_pair = (company_id, canonical_ticker)
+            if current_pair == requested_pair:
+                return CohortRecord(**dict(row))
+            if current_pair != (None, None):
+                raise ValueError("cohort identity remap is forbidden")
+            self._conn.execute(
+                """
+                UPDATE decision_cohorts
+                SET company_id = ?, research_ticker = ?
+                WHERE cohort_id = ? AND company_id IS NULL AND research_ticker IS NULL
+                """,
+                (company_id, canonical_ticker, cohort_id),
+            )
+            self._conn.execute(
+                """
+                INSERT INTO decision_events (
+                    event_id, cohort_id, event_type, payload_json,
+                    payload_digest, observed_at
+                ) VALUES (?, ?, 'identity_resolved', ?, ?, ?)
+                """,
+                (event_id, cohort_id, payload_json, payload_digest, resolved_at),
+            )
+            updated = self._conn.execute(
+                """
+                SELECT cohort_id, dedupe_key, company_id, research_ticker
+                FROM decision_cohorts WHERE cohort_id = ?
+                """,
+                (cohort_id,),
+            ).fetchone()
+        assert updated is not None
+        return CohortRecord(**dict(updated))
+
     def append_event(
         self,
         *,
@@ -253,8 +330,8 @@ class DecisionStore:
         self,
         *,
         dedupe_key: str,
-        company_id: str,
-        research_ticker: str,
+        company_id: str | None,
+        research_ticker: str | None,
         signal_payload: Mapping[str, Any],
         observed_at: str,
         shadow: Mapping[str, Any],
@@ -657,8 +734,10 @@ class DecisionStore:
             str(context["evaluation_at"]), "context.evaluation_at"
         ):
             raise ValueError("coverage expiry must follow context evaluation")
-        if not catalyst.strip() or not disproof.strip():
-            raise ValueError("coverage requires catalyst and disproof")
+        if status == "analyzable" and (
+            not catalyst.strip() or not disproof.strip()
+        ):
+            raise ValueError("analyzable coverage requires catalyst and disproof")
         if status == "analyzable" and blockers:
             raise ValueError("analyzable coverage cannot contain core blockers")
         if status == "coverage_pending" and not blockers:
@@ -790,6 +869,21 @@ class DecisionStore:
             "factor_weights": factor_weights,
             "blockers": [],
         }
+
+    def paper_exposure_snapshot(
+        self,
+        *,
+        paper_nav: float,
+        factor_resolver: Callable[[str], tuple[str, ...]],
+    ) -> dict[str, Any]:
+        """公開唯讀 wrapper；paper projection 仍是唯一模擬帳本 authority。"""
+
+        if not math.isfinite(paper_nav) or paper_nav <= 0:
+            raise ValueError("paper_nav must be positive and finite")
+        return self._paper_exposure(
+            paper_nav=paper_nav,
+            factor_resolver=factor_resolver,
+        )
 
     def _latest_cohort_time(self, cohort_id: str) -> str | None:
         row = self._conn.execute(
@@ -1143,6 +1237,92 @@ class DecisionStore:
                 sources.add(source_id)
         return tuple(sorted(sources))
 
+    def latest_signal_payload(self, cohort_id: str) -> dict[str, Any]:
+        """讀取 cohort 最近一筆原始 Signal，供 explicit reassessment 使用。"""
+
+        row = self._conn.execute(
+            """
+            SELECT payload_json FROM decision_events
+            WHERE cohort_id = ? AND event_type = 'qualified_signal'
+            ORDER BY observed_at DESC, event_id DESC LIMIT 1
+            """,
+            (cohort_id,),
+        ).fetchone()
+        if row is None:
+            raise KeyError(f"signal not found for cohort: {cohort_id}")
+        return dict(json.loads(row["payload_json"]))
+
+    def find_workflow_operation(
+        self, operation_id: str, *, completed: bool
+    ) -> dict[str, Any] | None:
+        """依 server-owned operation ID 取得 immutable start/completion event。"""
+
+        event_type = (
+            "workflow_evaluation_completed"
+            if completed
+            else "workflow_evaluation_started"
+        )
+        for row in self._conn.execute(
+            """
+            SELECT event_id, cohort_id, payload_json, observed_at
+            FROM decision_events WHERE event_type = ?
+            ORDER BY observed_at, event_id
+            """,
+            (event_type,),
+        ):
+            payload = json.loads(row["payload_json"])
+            if payload.get("operation_id") == operation_id:
+                return {
+                    "event_id": row["event_id"],
+                    "cohort_id": row["cohort_id"],
+                    "payload": payload,
+                    "observed_at": row["observed_at"],
+                }
+        return None
+
+    def list_operational_cohorts(self, *, as_of: str) -> list[dict[str, Any]]:
+        """Today brief 專用唯讀列舉；不暴露 event/context private payload。"""
+
+        cutoff = _timestamp(as_of, "as_of")
+        rows = self._conn.execute(
+            """
+            SELECT cohort_id, company_id, research_ticker, created_at
+            FROM decision_cohorts
+            ORDER BY created_at, cohort_id
+            """
+        ).fetchall()
+        result: list[dict[str, Any]] = []
+        for row in rows:
+            latest = self.latest_decision_for_cohort(
+                str(row["cohort_id"]), as_of=cutoff
+            )
+            lifecycle = self.current_lifecycle(str(row["cohort_id"]))
+            result.append(
+                {
+                    "cohort_id": row["cohort_id"],
+                    "company_id": row["company_id"],
+                    "research_ticker": row["research_ticker"],
+                    "latest_decision_id": (
+                        latest["decision_id"] if latest is not None else None
+                    ),
+                    "lifecycle_status": lifecycle.status,
+                    "review_due_at": lifecycle.review_due_at,
+                }
+            )
+        return result
+
+    def get_coverage_metadata(self, assessment_id: str) -> dict[str, Any]:
+        row = self._conn.execute(
+            """
+            SELECT assessment_id, catalyst, disproof, expiry
+            FROM coverage_assessments WHERE assessment_id = ?
+            """,
+            (assessment_id,),
+        ).fetchone()
+        if row is None:
+            raise KeyError(f"coverage assessment not found: {assessment_id}")
+        return dict(row)
+
     def list_paper_events(self, cohort_id: str) -> list[dict[str, Any]]:
         rows = self._conn.execute(
             """
@@ -1168,16 +1348,19 @@ class DecisionStore:
         selected_weight: float,
         decided_at: str,
         reason: str | None = None,
+        confirmation_ref: str | None = None,
         approved_action_id: str | None = None,
         force_override: bool = False,
     ) -> str:
         decided_at = _timestamp(decided_at, "decided_at")
         if not math.isfinite(selected_weight) or selected_weight < 0:
             raise ValueError("selected_weight must be finite and non-negative")
+        if confirmation_ref is not None and not confirmation_ref.strip():
+            raise ValueError("confirmation_ref must be non-empty when provided")
         with immediate_transaction(self._conn):
             decision = self._conn.execute(
                 """
-                SELECT payload_json, effective_at
+                SELECT cohort_id, payload_json, effective_at
                 FROM system_decisions WHERE decision_id = ?
                 """,
                 (decision_id,),
@@ -1230,6 +1413,39 @@ class DecisionStore:
                     decided_at,
                 ),
             )
+            if confirmation_ref is not None:
+                confirmation_payload = {
+                    "choice_id": choice_id,
+                    "decision_id": decision_id,
+                    "confirmation_ref": confirmation_ref.strip(),
+                }
+                confirmation_json = _canonical_json(confirmation_payload)
+                confirmation_digest = _digest(confirmation_json)
+                confirmation_id = "de_" + _digest(
+                    _canonical_json(
+                        {
+                            "cohort_id": decision["cohort_id"],
+                            "event_type": "live_choice_confirmation",
+                            "payload_digest": confirmation_digest,
+                            "observed_at": decided_at,
+                        }
+                    )
+                )[:32]
+                self._conn.execute(
+                    """
+                    INSERT OR IGNORE INTO decision_events (
+                        event_id, cohort_id, event_type, payload_json,
+                        payload_digest, observed_at
+                    ) VALUES (?, ?, 'live_choice_confirmation', ?, ?, ?)
+                    """,
+                    (
+                        confirmation_id,
+                        decision["cohort_id"],
+                        confirmation_json,
+                        confirmation_digest,
+                        decided_at,
+                    ),
+                )
             return choice_id
 
     def record_live_fill(

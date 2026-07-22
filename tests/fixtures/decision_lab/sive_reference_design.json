@@ -155,19 +155,19 @@
   "assessment": {
     "source_reliability": {
       "level": "corroborated",
-      "evidence_refs": ["fixture://globalfoundries-reference-design"],
+      "evidence_refs": ["fixture:globalfoundries-reference-design"],
       "reason": "Independent company material confirms the bounded reference-design relationship.",
       "missing_data": []
     },
     "technical_causal_link": {
       "level": "corroborated",
-      "evidence_refs": ["fixture://globalfoundries-reference-design", "fixture://eu-chips-act", "fixture://nasdaq"],
+      "evidence_refs": ["co:sivers_semiconductors", "GlobalFoundries reference design -> Sivers CW laser -> customer qualification -> production revenue"],
       "reason": "Multiple events support technical relevance, but they are not added into a synthetic conviction score.",
       "missing_data": []
     },
     "commercial_maturity": {
       "level": "bounded_hypothesis",
-      "evidence_refs": ["fixture://globalfoundries-reference-design"],
+      "evidence_refs": ["fixture://sivers/filing"],
       "reason": "A reference design is commercially meaningful but is not a named production order.",
       "missing_data": ["named production order", "customer revenue conversion"]
     },

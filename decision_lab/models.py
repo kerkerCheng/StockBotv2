@@ -68,9 +68,9 @@ class CaptureResult:
     shadow_created: bool
     source_status: str
     evidence_tier: int
-    company_id: str
-    research_ticker: str
-    execution_symbol: str
+    company_id: str | None
+    research_ticker: str | None
+    execution_symbol: str | None
 
 
 @dataclass(frozen=True)

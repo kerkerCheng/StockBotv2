@@ -297,6 +297,120 @@ def _normalize_weights(value: Any, field: str) -> dict[str, float] | None:
     return normalized
 
 
+def _reference_id(value: Any) -> str | None:
+    if isinstance(value, str):
+        return value.strip() or None
+    if isinstance(value, Mapping):
+        for field in ("reference_id", "ref", "id", "source"):
+            candidate = value.get(field)
+            if isinstance(candidate, str) and candidate.strip():
+                return candidate.strip()
+    return None
+
+
+def _add_reference(
+    index: dict[str, set[str]], value: Any, *authorities: str
+) -> None:
+    reference = _reference_id(value)
+    if reference is None:
+        return
+    index.setdefault(reference, set()).update(authorities)
+
+
+def _explicit_authorities(value: Any, default: str) -> tuple[str, ...]:
+    if not isinstance(value, Mapping):
+        return (default,)
+    raw = value.get("authorities")
+    if raw is None:
+        raw = [value.get("authority")] if value.get("authority") else []
+    if not isinstance(raw, Sequence) or isinstance(raw, (str, bytes)):
+        return (default,)
+    allowed = {
+        "graph_source_assertion",
+        "source_trace",
+        "graph_entity",
+        "graph_causal",
+        "graph_commercial",
+    }
+    parsed = tuple(
+        str(authority)
+        for authority in raw
+        if isinstance(authority, str) and authority in allowed
+    )
+    return parsed or (default,)
+
+
+def _build_reference_index(
+    *,
+    policy_version: str,
+    evidence: Mapping[str, Any],
+    financial: Mapping[str, Any],
+    market: Mapping[str, Any],
+    fx: Mapping[str, Any],
+    execution_market: Mapping[str, Any],
+    execution_fx: Mapping[str, Any],
+    holdings: Mapping[str, Any],
+    paper_exposure: Mapping[str, Any],
+) -> dict[str, dict[str, list[str]]]:
+    """Build the context-owned capability index used by confidence axes。"""
+
+    index: dict[str, set[str]] = {}
+    focus = evidence.get("focus_company")
+    _add_reference(index, focus, "graph_entity")
+    for item in evidence.get("entities") or []:
+        _add_reference(index, item, *_explicit_authorities(item, "graph_entity"))
+    for item in evidence.get("sources") or []:
+        _add_reference(
+            index,
+            item,
+            *_explicit_authorities(item, "graph_source_assertion"),
+        )
+        if isinstance(item, Mapping):
+            _add_reference(
+                index,
+                item.get("source_uri"),
+                *_explicit_authorities(item, "graph_source_assertion"),
+            )
+    for item in evidence.get("source_trace_refs") or []:
+        _add_reference(index, item, "source_trace")
+    for field in ("causal_paths", "counter_paths"):
+        for item in evidence.get(field) or []:
+            _add_reference(index, item, *_explicit_authorities(item, "graph_causal"))
+    for item in evidence.get("commercial_assertions") or []:
+        _add_reference(index, item, *_explicit_authorities(item, "graph_commercial"))
+
+    _add_reference(index, financial.get("source"), "engine_c_financial")
+    runway = financial.get("runway") or {}
+    _add_reference(index, runway.get("source"), "engine_c_financial")
+    checklist_authorities = {
+        "customer_concentration": "engine_c_customer",
+        "backlog": "engine_c_backlog",
+        "valuation_pressure": "engine_c_valuation",
+    }
+    for item_name, item in (financial.get("checklist") or {}).items():
+        if not isinstance(item, Mapping):
+            continue
+        authorities = [checklist_authorities.get(item_name, "engine_c_financial")]
+        if item.get("status") == "manual_reviewed":
+            authorities.append("engine_c_manual")
+        _add_reference(index, item.get("source"), *authorities)
+
+    _add_reference(index, market.get("source"), "market")
+    _add_reference(index, fx.get("source"), "fx")
+    _add_reference(index, execution_market.get("source"), "market")
+    _add_reference(index, execution_fx.get("source"), "fx")
+    holdings_ref = holdings.get("digest")
+    if isinstance(holdings_ref, str) and holdings_ref:
+        _add_reference(index, f"holdings:{holdings_ref}", "holdings")
+    _add_reference(index, f"policy:{policy_version}", "policy")
+    paper_ref = hashlib.sha256(_canonical(paper_exposure).encode("utf-8")).hexdigest()
+    _add_reference(index, f"paper-exposure:{paper_ref}", "paper_ledger")
+    return {
+        reference: {"authorities": sorted(authorities)}
+        for reference, authorities in sorted(index.items())
+    }
+
+
 def build_context_bundle(
     store: DecisionStore,
     *,
@@ -503,6 +617,17 @@ def build_context_bundle(
         "paper_exposure": normalized_paper,
         "freshness_policy": freshness,
     }
+    payload["reference_index"] = _build_reference_index(
+        policy_version=policy_version,
+        evidence=normalized_evidence,
+        financial=normalized_financial,
+        market=normalized_market,
+        fx=normalized_fx,
+        execution_market=normalized_execution_market,
+        execution_fx=normalized_execution_fx,
+        holdings=normalized_holdings,
+        paper_exposure=normalized_paper,
+    )
     digest = hashlib.sha256(_canonical(payload).encode("utf-8")).hexdigest()
     return store.freeze_context_bundle(
         cohort_id=cohort_id,

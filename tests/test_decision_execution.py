@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 
 from decision_lab.context import build_context_bundle, holdings_digest
+from decision_lab.coverage import assess_coverage
 from decision_lab.execution import (
     ExecutionError,
     apply_live_override,
@@ -120,6 +121,156 @@ def test_same_idempotency_key_with_different_request_fails_closed(tmp_path: Path
                 store, bundle, coverage, changed,
                 idempotency_key="assess:conflict", effective_at=NOW,
             )
+    finally:
+        store.close()
+
+
+@pytest.mark.parametrize(
+    "intent,paper_blocker,live_blocker",
+    [
+        ("research", "execution_intent_research_only", "execution_intent_research_only"),
+        ("paper", None, "execution_intent_paper_only"),
+        ("live", None, None),
+    ],
+)
+def test_execution_intent_is_an_existing_coverage_lane_permission(
+    tmp_path: Path,
+    intent: str,
+    paper_blocker: str | None,
+    live_blocker: str | None,
+) -> None:
+    store = _store(tmp_path)
+    try:
+        bundle, _ = _bundle(store, f"intent:{intent}")
+        coverage = assess_coverage(
+            store,
+            bundle,
+            catalyst="next filing",
+            disproof="commercial evidence fails",
+            expiry="2026-08-21T00:00:00+00:00",
+            decision_relevance=8,
+            falsifiability=8,
+            information_value=7,
+            execution_intent=intent,
+        )
+
+        assert (paper_blocker in coverage.paper_blockers) is (paper_blocker is not None)
+        assert (live_blocker in coverage.live_blockers) is (live_blocker is not None)
+    finally:
+        store.close()
+
+
+def test_pending_coverage_persists_missing_catalyst_and_disproof_as_blockers(
+    tmp_path: Path,
+) -> None:
+    store = _store(tmp_path)
+    try:
+        bundle, _ = _bundle(store, "missing-semantic-fields")
+
+        coverage = assess_coverage(
+            store,
+            bundle,
+            catalyst="",
+            disproof="",
+            expiry="2026-08-21T00:00:00+00:00",
+            decision_relevance=0,
+            falsifiability=0,
+            information_value=0,
+        )
+
+        assert coverage.status == "coverage_pending"
+        assert {"catalyst_missing", "disproof_missing"} <= set(coverage.blockers)
+        assert store.get_coverage_result(coverage.assessment_id) == coverage
+    finally:
+        store.close()
+
+
+def test_research_intent_is_in_assessment_request_and_cannot_fund_paper(
+    tmp_path: Path,
+) -> None:
+    store = _store(tmp_path)
+    try:
+        bundle, coverage = _bundle(store, "research-intent")
+        result = assess_probe(
+            store,
+            bundle,
+            coverage,
+            _assessment(),
+            idempotency_key="assess:research-intent",
+            effective_at=NOW,
+            execution_intent="research",
+        )
+
+        decision = store.get_decision(result.decision_id)
+        assert result.paper_funded is False
+        assert decision["payload"]["request"]["execution_intent"] == "research"
+        assert "execution_intent_research_only" in decision["payload"]["sizing"][
+            "paper_blockers"
+        ]
+    finally:
+        store.close()
+
+
+def test_unresolved_context_can_record_only_a_zero_size_decision(
+    tmp_path: Path,
+) -> None:
+    store = _store(tmp_path)
+    try:
+        cohort_id = store.ensure_cohort(
+            dedupe_key="unresolved-decision",
+            company_id=None,
+            research_ticker=None,
+        ).cohort_id
+        inputs = complete_inputs(rows=[])
+        inputs.update(
+            {
+                "identity": {},
+                "evidence": {
+                    "focus_company": None,
+                    "sources": [],
+                    "causal_paths": [],
+                    "counter_paths": [],
+                },
+                "financial": {"status": "missing"},
+                "market": {"status": "missing"},
+                "fx": {"status": "missing"},
+                "holdings": {"status": "missing"},
+            }
+        )
+        bundle = build_context_bundle(
+            store,
+            cohort_id=cohort_id,
+            evaluation_at=NOW,
+            policy_version=load_policy()["policy_version"],
+            **inputs,
+        )
+        coverage = assess_coverage(
+            store,
+            bundle,
+            catalyst="resolve identity",
+            disproof="claim cannot be attributed",
+            expiry="2026-08-21T00:00:00+00:00",
+            decision_relevance=8,
+            falsifiability=8,
+            information_value=7,
+        )
+        unknown = _assessment()
+        for value in unknown.values():
+            value.update(level="unknown", evidence_refs=[], missing_data=["identity"])
+
+        result = assess_probe(
+            store,
+            bundle,
+            coverage,
+            unknown,
+            idempotency_key="assess:unresolved",
+            effective_at=NOW,
+        )
+
+        assert result.paper_funded is False
+        assert result.paper_max_supported_position == 0.0
+        assert store.table_count("system_decisions") == 1
+        assert store.table_count("paper_events") == 0
     finally:
         store.close()
 

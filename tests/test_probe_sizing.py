@@ -29,10 +29,17 @@ def _store(tmp_path: Path) -> DecisionStore:
 def _assessment(*, commercial: str = "corroborated") -> dict:
     levels = {axis: "corroborated" for axis in AXES}
     levels["commercial_maturity"] = commercial
+    refs = {
+        "source_reliability": ["src:gf"],
+        "technical_causal_link": ["edge:cw-laser"],
+        "commercial_maturity": ["fixture://filing"],
+        "financial_resilience": ["fixture://filing"],
+        "valuation_payoff": ["fixture://market"],
+    }
     return {
         axis: {
             "level": level,
-            "evidence_refs": [f"fixture://{axis}/1"],
+            "evidence_refs": refs[axis],
             "reason": f"{axis} fixture assessment",
             "missing_data": [] if level == "corroborated" else ["named production order"],
         }
@@ -97,9 +104,9 @@ def test_multiple_positive_events_do_not_add_and_weakest_axis_caps_position(
         bundle = _bundle(store)
         assessment = _assessment(commercial="bounded_hypothesis")
         assessment["technical_causal_link"]["evidence_refs"] = [
-            "fixture://eu-chips-act",
-            "fixture://nasdaq",
-            "fixture://globalfoundries",
+            "co:sivers_semiconductors",
+            "edge:cw-laser",
+            "edge:alternative",
         ]
 
         result = calculate_probe_limits(bundle, _coverage(bundle), assessment)
@@ -134,6 +141,32 @@ def test_unknown_or_unreferenced_required_axis_fails_closed(
         assert result.live_supported_range == (0.0, 0.0)
         assert result.action == "SHADOW_ONLY"
         assert result.assessment_blockers
+    finally:
+        store.close()
+
+
+@pytest.mark.parametrize(
+    "axis,invalid_ref",
+    [
+        ("source_reliability", "fixture://not-in-this-context"),
+        ("valuation_payoff", "edge:cw-laser"),
+    ],
+)
+def test_cross_context_or_wrong_authority_ref_fails_closed(
+    tmp_path: Path, axis: str, invalid_ref: str
+) -> None:
+    store = _store(tmp_path)
+    try:
+        bundle = _bundle(store)
+        assessment = _assessment()
+        assessment[axis]["evidence_refs"] = [invalid_ref]
+
+        result = calculate_probe_limits(bundle, _coverage(bundle), assessment)
+
+        assert result.axis_results[axis]["level"] == "unknown"
+        assert f"assessment_context_mismatch:{axis}" in result.assessment_blockers
+        assert result.paper_max_supported_position == 0.0
+        assert result.live_supported_range == (0.0, 0.0)
     finally:
         store.close()
 

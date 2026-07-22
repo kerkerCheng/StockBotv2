@@ -19,6 +19,23 @@ AXES = (
     "valuation_payoff",
 )
 LEVELS = ("unknown", "bounded_hypothesis", "corroborated")
+AXIS_REFERENCE_AUTHORITIES = {
+    "source_reliability": frozenset(
+        {"graph_source_assertion", "source_trace"}
+    ),
+    "technical_causal_link": frozenset(
+        {"graph_entity", "graph_causal", "graph_source_assertion"}
+    ),
+    "commercial_maturity": frozenset(
+        {"graph_commercial", "engine_c_backlog", "engine_c_customer"}
+    ),
+    "financial_resilience": frozenset(
+        {"engine_c_financial", "engine_c_manual"}
+    ),
+    "valuation_payoff": frozenset(
+        {"engine_c_valuation", "market", "fx"}
+    ),
+}
 
 
 class AssessmentError(ValueError):
@@ -44,7 +61,9 @@ def _string_list(value: Any, field: str) -> tuple[str, ...]:
 
 
 def _validate_assessment(
-    assessment: Mapping[str, Any], ceilings: Mapping[str, float]
+    assessment: Mapping[str, Any],
+    ceilings: Mapping[str, float],
+    reference_index: Mapping[str, Any],
 ) -> tuple[dict[str, dict[str, Any]], tuple[str, ...]]:
     if not isinstance(assessment, Mapping) or set(assessment) != set(AXES):
         raise AssessmentError("assessment must contain exactly the five confidence axes")
@@ -69,13 +88,24 @@ def _validate_assessment(
             blockers.append(f"{axis}_unknown")
         elif not refs:
             blockers.append(f"{axis}_evidence_missing")
+        elif any(
+            not isinstance(reference_index.get(reference), Mapping)
+            or not (
+                set(reference_index[reference].get("authorities") or ())
+                & AXIS_REFERENCE_AUTHORITIES[axis]
+            )
+            for reference in refs
+        ):
+            blockers.append(f"assessment_context_mismatch:{axis}")
         if level == "corroborated" and missing_data:
             blockers.append(f"{axis}_corroboration_incomplete")
-        effective_ceiling = 0.0 if any(
-            blocker.startswith(f"{axis}_") for blocker in blockers
+        context_mismatch = f"assessment_context_mismatch:{axis}" in blockers
+        effective_ceiling = 0.0 if (
+            context_mismatch
+            or any(blocker.startswith(f"{axis}_") for blocker in blockers)
         ) else ceilings[level]
         normalized[axis] = {
-            "level": level,
+            "level": "unknown" if context_mismatch else level,
             "evidence_refs": refs,
             "reason": reason.strip() if isinstance(reason, str) else "",
             "missing_data": missing_data,
@@ -242,7 +272,14 @@ def calculate_probe_limits(
     if payload.get("policy_version") != current_policy["policy_version"]:
         raise AssessmentError("context policy version does not match calculator policy")
     registry = registry or get_registry()
-    axes, assessment_blockers = _validate_assessment(assessment, probe["axis_ceilings"])
+    reference_index = payload.get("reference_index")
+    if not isinstance(reference_index, Mapping):
+        reference_index = {}
+    axes, assessment_blockers = _validate_assessment(
+        assessment,
+        probe["axis_ceilings"],
+        reference_index,
+    )
     weakest_axis = min(AXES, key=lambda axis: (axes[axis]["ceiling"], AXES.index(axis)))
     weakest_level = str(axes[weakest_axis]["level"])
     axis_ceiling = float(axes[weakest_axis]["ceiling"])
@@ -276,6 +313,8 @@ def calculate_probe_limits(
 
     paper = paper_exposure_override or payload["paper_exposure"]
     paper_blockers = list(coverage.paper_blockers)
+    if identity.get("status") != "resolved" or not company_id:
+        paper_blockers.append("identity_unresolved")
     if not coverage.paper_context_ready or paper.get("status") != "available":
         paper_blockers.extend(paper.get("blockers") or ["paper_context_not_ready"])
         trace.append(_constraint("paper", "paper_context", 0.0, bundle.digest, status="blocked"))
@@ -321,6 +360,8 @@ def calculate_probe_limits(
     paper_target = paper_max if paper_current > paper_max else (paper_floor + paper_max) / 2.0
 
     live_blockers = list(coverage.live_blockers)
+    if identity.get("status") != "resolved" or not company_id:
+        live_blockers.append("identity_unresolved")
     if not coverage.live_context_ready:
         live_blockers.append("live_context_not_ready")
     holdings = payload["holdings"]

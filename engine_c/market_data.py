@@ -120,6 +120,78 @@ def get_tradeability_snapshot(ticker: str, currency: str) -> dict[str, Any]:
     )
 
 
+def build_fx_snapshot(
+    *,
+    pair: str,
+    rows: Iterable[Mapping[str, Any]],
+    fetched_at: str,
+    source: str,
+) -> dict[str, Any]:
+    """由 exact base/quote history 建立可追溯 FX observation。"""
+
+    parts = pair.split("/")
+    if (
+        len(parts) != 2
+        or any(len(part) != 3 or not part.isupper() for part in parts)
+        or _timestamp(fetched_at) is None
+        or not isinstance(source, str)
+        or not source.strip()
+    ):
+        return {"status": "malformed", "blockers": ["fx_metadata_invalid"]}
+    observations: list[tuple[datetime, float]] = []
+    for row in rows:
+        as_of = _timestamp(row.get("as_of"))
+        rate = _finite_number(row.get("rate"))
+        if as_of is not None and rate is not None and rate > 0:
+            observations.append((as_of, rate))
+    if not observations:
+        return {"status": "missing", "pair": pair, "blockers": ["fx_history_missing"]}
+    observations.sort(key=lambda item: item[0])
+    as_of, rate = observations[-1]
+    return {
+        "status": "observed",
+        "pair": pair,
+        "rate": rate,
+        "as_of": as_of.isoformat(),
+        "fetched_at": fetched_at,
+        "source": source,
+        "blockers": [],
+    }
+
+
+def get_fx_snapshot(pair: str, evaluation_at: str) -> dict[str, Any]:
+    """用 yfinance exact pair ticker 取得 FX；不倒數或猜測方向。"""
+
+    del evaluation_at
+    parts = pair.split("/")
+    if len(parts) != 2 or any(len(part) != 3 or not part.isupper() for part in parts):
+        return {"status": "malformed", "blockers": ["fx_pair_invalid"]}
+    try:
+        import yfinance as yf
+    except ImportError:
+        return {"status": "unavailable", "pair": pair, "blockers": ["yfinance_unavailable"]}
+    symbol = f"{parts[0]}{parts[1]}=X"
+    fetched_at = datetime.now(timezone.utc).isoformat()
+    try:
+        history = yf.Ticker(symbol).history(period="5d", auto_adjust=False)
+        rows = [
+            {"as_of": index.to_pydatetime().isoformat(), "rate": row.get("Close")}
+            for index, row in history.iterrows()
+        ]
+    except Exception:
+        return {
+            "status": "unavailable",
+            "pair": pair,
+            "blockers": ["fx_history_unavailable"],
+        }
+    return build_fx_snapshot(
+        pair=pair,
+        rows=rows,
+        fetched_at=fetched_at,
+        source=f"yfinance://fx/{symbol}",
+    )
+
+
 def get_snapshot(ticker: str) -> dict:
     """
     回傳市場快照 dict。若 yfinance 不可用或資料缺失，各欄位為 None。

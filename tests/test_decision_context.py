@@ -286,6 +286,35 @@ def test_context_bundle_is_content_addressed_and_frozen(tmp_path: Path) -> None:
         store.close()
 
 
+def test_context_builds_canonical_reference_index_from_frozen_authorities(
+    tmp_path: Path,
+) -> None:
+    store = _store(tmp_path)
+    inputs = complete_inputs()
+    try:
+        bundle = build_context_bundle(
+            store,
+            cohort_id=_cohort(store, "reference-index"),
+            evaluation_at=NOW,
+            policy_version="probe-v1",
+            **inputs,
+        )
+
+        index = bundle.payload["reference_index"]
+        assert index["src:gf"]["authorities"] == ["graph_source_assertion"]
+        assert index["edge:cw-laser"]["authorities"] == ["graph_causal"]
+        assert "engine_c_financial" in index["fixture://filing"]["authorities"]
+        assert "engine_c_customer" in index["fixture://filing"]["authorities"]
+        assert index["fixture://market"]["authorities"] == ["market"]
+        assert index["policy:probe-v1"]["authorities"] == ["policy"]
+        assert any(
+            item["authorities"] == ["holdings"]
+            for item in index.values()
+        )
+    finally:
+        store.close()
+
+
 def test_secret_bearing_external_payload_is_rejected_before_persistence(
     tmp_path: Path,
 ) -> None:

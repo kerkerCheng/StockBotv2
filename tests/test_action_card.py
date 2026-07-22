@@ -141,6 +141,31 @@ def test_secret_bearing_optional_context_is_rejected_before_render(tmp_path: Pat
         store.close()
 
 
+def test_markdown_renderer_escapes_research_text_and_terminal_controls(
+    tmp_path: Path,
+) -> None:
+    store = _store(tmp_path)
+    try:
+        bundle, coverage = _bundle(store, "markdown-escape")
+        assessment = _assessment()
+        assessment["source_reliability"]["reason"] = "*injected*\n# heading\x1b[31m"
+        decision = assess_probe(
+            store,
+            bundle,
+            coverage,
+            assessment,
+            idempotency_key="card:markdown-escape",
+            effective_at="2026-07-21T12:00:00+00:00",
+        )
+        markdown = render_markdown(build_action_card(store, decision.decision_id))
+
+        assert "\x1b" not in markdown
+        assert "\n# heading" not in markdown
+        assert r"\*injected\*" in markdown
+    finally:
+        store.close()
+
+
 def test_card_respects_explicit_live_fill_instead_of_recommending_duplicate_trade(
     tmp_path: Path,
 ) -> None:

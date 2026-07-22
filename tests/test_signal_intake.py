@@ -28,6 +28,11 @@ class FixedMarket:
         )
 
 
+class UnexpectedMarket:
+    def observe(self, *_args, **_kwargs) -> MarketObservation:
+        raise AssertionError("unresolved identity must not query market data")
+
+
 def _store(tmp_path: Path) -> DecisionStore:
     repo = tmp_path / "repo"
     repo.mkdir()
@@ -200,6 +205,84 @@ def test_probe_gate_and_automatic_capture_permission_fail_before_write(
 
         assert store.table_count("decision_cohorts") == 0
         assert store.table_count("shadow_observations") == 0
+    finally:
+        store.close()
+
+
+def test_opt_in_incomplete_unresolved_signal_still_captures_cohort_and_shadow(
+    tmp_path: Path,
+) -> None:
+    store = _store(tmp_path)
+    signal = _signal(
+        atomic_claim="",
+        disproof="",
+        company_id=None,
+        research_ticker=None,
+        source_uri="signal:7a86d75b5c0f",
+    )
+    try:
+        first = capture_signal(
+            store,
+            signal,
+            market=UnexpectedMarket(),
+            allow_incomplete=True,
+            allow_unresolved=True,
+        )
+        retry = capture_signal(
+            store,
+            signal,
+            market=UnexpectedMarket(),
+            allow_incomplete=True,
+            allow_unresolved=True,
+        )
+
+        assert first.company_id is None
+        assert first.research_ticker is None
+        assert first.execution_symbol is None
+        assert retry.cohort_id == first.cohort_id
+        assert [first.shadow_created, retry.shadow_created] == [True, False]
+        assert store.get_shadow(first.cohort_id).status == "unavailable"
+        assert len(store.list_events(first.cohort_id, event_type="qualified_signal")) == 1
+    finally:
+        store.close()
+
+
+def test_unresolved_cohort_identity_binding_is_monotonic_and_audited(
+    tmp_path: Path,
+) -> None:
+    store = _store(tmp_path)
+    try:
+        captured = capture_signal(
+            store,
+            _signal(company_id=None, research_ticker=None),
+            market=UnexpectedMarket(),
+            allow_unresolved=True,
+        )
+
+        bound = store.bind_cohort_identity(
+            captured.cohort_id,
+            company_id="co:sivers_semiconductors",
+            research_ticker="SIVE.ST",
+            resolved_at="2026-07-21T08:05:00+00:00",
+        )
+        retry = store.bind_cohort_identity(
+            captured.cohort_id,
+            company_id="co:sivers_semiconductors",
+            research_ticker="SIVE.ST",
+            resolved_at="2026-07-21T08:06:00+00:00",
+        )
+
+        assert bound == retry
+        assert bound.company_id == "co:sivers_semiconductors"
+        assert bound.research_ticker == "SIVE.ST"
+        assert len(store.list_events(captured.cohort_id, event_type="identity_resolved")) == 1
+        with pytest.raises(ValueError, match="remap"):
+            store.bind_cohort_identity(
+                captured.cohort_id,
+                company_id="co:axt",
+                research_ticker="AXTI",
+                resolved_at="2026-07-21T08:07:00+00:00",
+            )
     finally:
         store.close()
 

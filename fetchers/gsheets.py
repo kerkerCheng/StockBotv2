@@ -32,6 +32,8 @@ import sys
 from pathlib import Path
 from typing import Any
 
+from identity.execution import get_execution_aliases as _neutral_execution_aliases
+
 try:
     from dotenv import load_dotenv
     load_dotenv(Path(__file__).resolve().parent.parent / ".env")
@@ -47,15 +49,13 @@ SCOPES = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
 # Neutral registry research ticker → actual portfolio
 # ticker, for names cross-listed on a different exchange than the graph uses.
 # Sivers: graph tracks SIVE.ST (Stockholm), portfolio holds the Frankfurt listing.
-_TICKER_ALIASES: dict[str, str] = {
-    "SIVE.ST": "FRA:2DG",
-}
+_TICKER_ALIASES: dict[str, str] = _neutral_execution_aliases()
 
 
 def get_execution_aliases() -> dict[str, str]:
     """回傳 copy，避免 consumer 改寫 Google Sheet 的 execution alias authority。"""
 
-    return dict(_TICKER_ALIASES)
+    return _neutral_execution_aliases()
 
 # Portfolio bucket labels (whatever the sheet actually uses) → canonical bucket
 # used for allocation math. "觀察" (watchlist / high-conviction individual picks)
@@ -116,10 +116,13 @@ def _get_service():
     return build("sheets", "v4", credentials=creds)
 
 
-def fetch_portfolio() -> list[dict[str, Any]]:
+def fetch_portfolio(*, strict_operational: bool = False) -> list[dict[str, Any]]:
     """
     讀取 Google Sheets 工作表，回傳 list of dicts。
     每個 dict 包含：ticker, company, bucket, shares, avg_cost, currency, notes
+
+    strict_operational=True 時另要求 market_value_base、nav_base、base_currency，
+    且任何格式錯誤直接失敗，供 Engine D live authority 使用。
     """
     if not SPREADSHEET_ID:
         raise ValueError(
@@ -166,12 +169,34 @@ def fetch_portfolio() -> list[dict[str, Any]]:
         # Type conversions
         try:
             item["shares"] = float(item.get("shares", 0) or 0)
-        except ValueError:
+        except (TypeError, ValueError):
+            if strict_operational:
+                raise ValueError("Google Sheet shares 欄位格式錯誤") from None
             item["shares"] = 0.0
         try:
             item["avg_cost"] = float(item.get("avg_cost", 0) or 0)
-        except ValueError:
+        except (TypeError, ValueError):
+            if strict_operational:
+                raise ValueError("Google Sheet avg_cost 欄位格式錯誤") from None
             item["avg_cost"] = 0.0
+
+        if strict_operational:
+            for field in ("market_value_base", "nav_base"):
+                try:
+                    item[field] = float(item.get(field, ""))
+                except (TypeError, ValueError):
+                    raise ValueError(f"Google Sheet {field} 欄位格式錯誤") from None
+            item["currency"] = str(item.get("currency") or "").strip().upper()
+            item["base_currency"] = str(
+                item.get("base_currency") or ""
+            ).strip().upper()
+            if (
+                len(item["currency"]) != 3
+                or len(item["base_currency"]) != 3
+                or item["market_value_base"] < 0
+                or item["nav_base"] <= 0
+            ):
+                raise ValueError("Google Sheet operational holdings 欄位格式錯誤")
 
         portfolio.append(item)
 

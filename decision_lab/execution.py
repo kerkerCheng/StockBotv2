@@ -15,6 +15,7 @@ from .models import (
     DecisionExecutionResult,
     PreparedAction,
 )
+from .coverage import apply_execution_intent
 from .sizing import calculate_probe_limits
 from .store import DecisionStore
 
@@ -43,6 +44,7 @@ def assess_probe(
     effective_at: str,
     policy: Mapping[str, Any] | None = None,
     registry: IdentityRegistry | None = None,
+    execution_intent: str = "live",
     _failure_at: str | None = None,
 ) -> DecisionExecutionResult:
     """Atomically persist a system decision and any eligible paper target。"""
@@ -60,7 +62,13 @@ def assess_probe(
     ):
         raise ExecutionError("context and coverage do not belong to the same stored cohort")
     bundle = authoritative_bundle
-    coverage = authoritative_coverage
+    try:
+        coverage = apply_execution_intent(
+            authoritative_coverage,
+            execution_intent,
+        )
+    except ValueError as exc:
+        raise ExecutionError(str(exc)) from exc
 
     current_policy = validate_policy(policy) if policy is not None else load_policy()
     probe = current_policy.get("probe_lane")
@@ -68,8 +76,6 @@ def assess_probe(
         raise ExecutionError("investment policy has no Probe lane")
     registry = registry or get_registry()
     company_id = str(bundle.payload.get("identity", {}).get("company_id") or "")
-    if not company_id:
-        raise ExecutionError("resolved company identity is required")
     request_payload = {
         "cohort_id": bundle.cohort_id,
         "context_digest": bundle.digest,
@@ -78,6 +84,7 @@ def assess_probe(
         "policy_version": current_policy["policy_version"],
         "calculator_version": probe["calculator_version"],
         "effective_at": effective_at,
+        "execution_intent": execution_intent,
     }
 
     def calculator(paper_exposure: Mapping[str, Any]):
@@ -118,6 +125,7 @@ def record_live_choice(
     decided_at: str,
     explicit: bool,
     reason: str | None = None,
+    confirmation_ref: str | None = None,
 ) -> str:
     if not explicit:
         raise ExecutionError("live choice requires explicit user confirmation")
@@ -127,6 +135,7 @@ def record_live_choice(
             selected_weight=selected_weight,
             decided_at=decided_at,
             reason=reason,
+            confirmation_ref=confirmation_ref,
         )
     except (KeyError, ValueError) as exc:
         raise ExecutionError(str(exc)) from exc

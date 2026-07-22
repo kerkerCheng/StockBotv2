@@ -1,6 +1,7 @@
 """Coverage Gate 與 bounded Minimum Viable Research Packet。"""
 from __future__ import annotations
 
+from dataclasses import replace
 from datetime import datetime
 
 from .models import ContextBundle, CoverageResult
@@ -14,6 +15,36 @@ _CHECKLIST_ITEMS = (
     "dilution",
     "valuation_pressure",
 )
+_EXECUTION_INTENTS = {"research", "paper", "live"}
+
+
+def apply_execution_intent(
+    coverage: CoverageResult, execution_intent: str
+) -> CoverageResult:
+    """Apply lane permission as blockers on the existing Coverage result。"""
+
+    if execution_intent not in _EXECUTION_INTENTS:
+        raise ValueError("execution_intent must be research, paper, or live")
+    paper_blockers = list(coverage.paper_blockers)
+    live_blockers = list(coverage.live_blockers)
+    if execution_intent == "research":
+        paper_blockers.append("execution_intent_research_only")
+        live_blockers.append("execution_intent_research_only")
+    elif execution_intent == "paper":
+        live_blockers.append("execution_intent_paper_only")
+    normalized_paper = tuple(sorted(set(paper_blockers)))
+    normalized_live = tuple(sorted(set(live_blockers)))
+    return replace(
+        coverage,
+        paper_blockers=normalized_paper,
+        live_blockers=normalized_live,
+        paper_context_ready=(
+            coverage.status == "analyzable" and not normalized_paper
+        ),
+        live_context_ready=(
+            coverage.status == "analyzable" and not normalized_live
+        ),
+    )
 
 
 def _valid_future_time(expiry: str, evaluation_at: str) -> bool:
@@ -35,6 +66,7 @@ def assess_coverage(
     decision_relevance: int,
     falsifiability: int,
     information_value: int,
+    execution_intent: str = "live",
 ) -> CoverageResult:
     payload = bundle.payload
     blockers: list[str] = []
@@ -107,6 +139,25 @@ def assess_coverage(
         for blocker in (section.get("blockers") or [f"{section.get('status')}_data"])
     )
     status = "coverage_pending" if blockers else "analyzable"
+    permissioned = apply_execution_intent(
+        CoverageResult(
+            assessment_id="pending",
+            cohort_id=bundle.cohort_id,
+            context_digest=bundle.digest,
+            status=status,
+            blockers=tuple(sorted(set(blockers))),
+            paper_blockers=paper_blockers,
+            live_blockers=live_blockers,
+            paper_context_ready=False,
+            live_context_ready=False,
+            paper_supported_position=0.0,
+            live_supported_range=(0.0, 0.0),
+            work_order_id=None,
+        ),
+        execution_intent,
+    )
+    paper_blockers = permissioned.paper_blockers
+    live_blockers = permissioned.live_blockers
     stored = store.record_coverage_assessment(
         cohort_id=bundle.cohort_id,
         context_digest=bundle.digest,

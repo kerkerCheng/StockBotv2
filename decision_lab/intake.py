@@ -94,13 +94,18 @@ def _normalize_claim(value: str) -> str:
     return re.sub(r"\s+", " ", normalized).strip().casefold()
 
 
-def _validate_signal(signal: SignalInput) -> None:
-    if not signal.raw_text.strip() or not signal.atomic_claim.strip():
-        raise ValueError("raw_text and atomic_claim are required")
+def _validate_signal(signal: SignalInput, *, allow_incomplete: bool = False) -> None:
+    if not signal.raw_text.strip():
+        raise ValueError("raw_text is required")
+    if not allow_incomplete and not signal.atomic_claim.strip():
+        raise ValueError("atomic_claim is required")
     if not signal.source_id.strip() or not signal.origin_event.strip():
         raise ValueError("source attribution and origin_event are required")
     parsed_uri = urlparse(signal.source_uri)
-    if parsed_uri.scheme not in {"http", "https", "fixture"}:
+    allowed_schemes = {"http", "https", "fixture"}
+    if allow_incomplete:
+        allowed_schemes.add("signal")
+    if parsed_uri.scheme not in allowed_schemes:
         raise ValueError("source_uri must be an attributable URI")
     if parsed_uri.username is not None or parsed_uri.password is not None:
         raise ValueError("source_uri must not contain credentials")
@@ -109,7 +114,7 @@ def _validate_signal(signal: SignalInput) -> None:
         raise ValueError(f"secret-bearing signal rejected at {sensitive}")
     if signal.direction not in _DIRECTIONS:
         raise ValueError("direction must be long, short, or neutral")
-    if not signal.disproof.strip():
+    if not allow_incomplete and not signal.disproof.strip():
         raise ValueError("disproof is required")
     if isinstance(signal.evidence_tier, bool) or signal.evidence_tier not in {1, 2, 3, 4}:
         raise ValueError("evidence_tier must be 1..4")
@@ -118,6 +123,12 @@ def _validate_signal(signal: SignalInput) -> None:
         raise ValueError("expiry must be after observed_at")
     if signal.capture_mode not in {"manual", "automatic"}:
         raise ValueError("capture_mode must be manual or automatic")
+    if (
+        signal.capture_mode == "automatic"
+        and allow_incomplete
+        and (not signal.atomic_claim.strip() or not signal.disproof.strip())
+    ):
+        raise ValueError("automatic capture requires a complete claim and disproof")
 
 
 def _validate_market(
@@ -158,11 +169,13 @@ def _validate_market(
     )
 
 
-def _claim_key(signal: SignalInput, company_id: str) -> str:
+def _claim_key(signal: SignalInput, company_id: str | None) -> str:
+    identity_token = company_id or signal.company_id or signal.research_ticker or ""
+    claim = signal.atomic_claim if signal.atomic_claim.strip() else signal.raw_text
     payload = json.dumps(
         {
-            "company_id": company_id,
-            "claim": _normalize_claim(signal.atomic_claim),
+            "identity_token": _normalize_claim(identity_token),
+            "claim": _normalize_claim(claim),
             "direction": signal.direction,
             "expiry": _parse_time(signal.expiry, "expiry")
             .astimezone(timezone.utc)
@@ -180,10 +193,12 @@ def capture_signal(
     *,
     market: MarketObserver,
     source_registry: SignalSourceRegistry | None = None,
+    allow_incomplete: bool = False,
+    allow_unresolved: bool = False,
 ) -> CaptureResult:
     """Validate and atomically capture one signal plus immutable Shadow inception。"""
 
-    _validate_signal(signal)
+    _validate_signal(signal, allow_incomplete=allow_incomplete)
     registry = source_registry or SignalSourceRegistry.from_path()
     source_policy = registry.snapshot(signal.source_id)
     if signal.capture_mode == "automatic" and not (
@@ -196,32 +211,45 @@ def capture_signal(
         research_ticker=signal.research_ticker,
         execution_aliases=execution_aliases(),
     )
-    if identity.blockers:
+    if identity.blockers and not allow_unresolved:
         raise ValueError(identity.blockers[0])
-    assert identity.company_id and identity.research_ticker and identity.execution_symbol
-    canonical_company = get_registry().company(identity.company_id)
-    if canonical_company is None or not all(
-        (
-            canonical_company.market_currency,
-            canonical_company.execution_currency,
-            canonical_company.execution_venue,
+    resolved = not identity.blockers and all(
+        (identity.company_id, identity.research_ticker, identity.execution_symbol)
+    )
+    canonical_company = (
+        get_registry().company(str(identity.company_id)) if resolved else None
+    )
+    if resolved and (
+        canonical_company is None
+        or not all(
+            (
+                canonical_company.market_currency,
+                canonical_company.execution_currency,
+                canonical_company.execution_venue,
+            )
         )
     ):
-        raise ValueError("identity market/execution metadata is incomplete")
+        if not allow_unresolved:
+            raise ValueError("identity market/execution metadata is incomplete")
+        resolved = False
 
-    try:
-        market_observation = market.observe(
-            identity.company_id,
-            identity.research_ticker,
-            signal.observed_at,
+    if resolved:
+        assert identity.company_id and identity.research_ticker and canonical_company
+        try:
+            market_observation = market.observe(
+                identity.company_id,
+                identity.research_ticker,
+                signal.observed_at,
+            )
+        except Exception:
+            market_observation = MarketObservation(status="unavailable")
+        market_observation = _validate_market(
+            market_observation,
+            expected_ticker=identity.research_ticker,
+            expected_currency=str(canonical_company.market_currency),
         )
-    except Exception:
+    else:
         market_observation = MarketObservation(status="unavailable")
-    market_observation = _validate_market(
-        market_observation,
-        expected_ticker=identity.research_ticker,
-        expected_currency=str(canonical_company.market_currency),
-    )
     if (
         market_observation.status == "observed"
         and (
@@ -236,9 +264,17 @@ def capture_signal(
 
     evidence_admission = (
         "eligible_for_review"
-        if signal.source_traced and signal.evidence_tier <= 3
+        if (
+            signal.source_traced
+            and signal.evidence_tier <= 3
+            and signal.atomic_claim.strip()
+            and signal.disproof.strip()
+        )
         else "lead_only"
     )
+    canonical_company_id = identity.company_id if resolved else None
+    canonical_ticker = identity.research_ticker if resolved else None
+    canonical_symbol = identity.execution_symbol if resolved else None
     payload = {
         "raw_text": signal.raw_text,
         "source_id": signal.source_id,
@@ -252,12 +288,32 @@ def capture_signal(
         "evidence_tier": signal.evidence_tier,
         "source_traced": signal.source_traced,
         "source_registry": asdict(source_policy) | {"version": registry.version},
-        "identity": asdict(identity),
+        "identity": asdict(identity) if resolved else {
+            "company_id": None,
+            "research_ticker": None,
+            "execution_symbol": None,
+            "blockers": list(identity.blockers or ("identity_unresolved",)),
+            "market_currency": None,
+            "execution_currency": None,
+            "execution_venue": None,
+        },
+        "identity_hints": {
+            "company_id": signal.company_id,
+            "research_ticker": signal.research_ticker,
+        },
+        "completeness_blockers": [
+            field
+            for field, present in (
+                ("atomic_claim_missing", bool(signal.atomic_claim.strip())),
+                ("disproof_missing", bool(signal.disproof.strip())),
+            )
+            if not present
+        ],
     }
     captured = store.capture_signal_inception(
-        dedupe_key=_claim_key(signal, identity.company_id),
-        company_id=identity.company_id,
-        research_ticker=identity.research_ticker,
+        dedupe_key=_claim_key(signal, canonical_company_id),
+        company_id=canonical_company_id,
+        research_ticker=canonical_ticker,
         signal_payload=payload,
         observed_at=signal.observed_at,
         shadow=asdict(market_observation),
@@ -272,7 +328,7 @@ def capture_signal(
         shadow_created=captured["shadow_created"],
         source_status=source_policy.status,
         evidence_tier=signal.evidence_tier,
-        company_id=identity.company_id,
-        research_ticker=identity.research_ticker,
-        execution_symbol=identity.execution_symbol,
+        company_id=canonical_company_id,
+        research_ticker=canonical_ticker,
+        execution_symbol=canonical_symbol,
     )
