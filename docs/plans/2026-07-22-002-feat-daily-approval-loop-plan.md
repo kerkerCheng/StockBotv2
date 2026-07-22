@@ -91,11 +91,15 @@ revised: 2026-07-22 (push 前提定案後修訂：git push 為狀態同步機制
 
 ## Implementation Units
 
-### U1 — Leads 狀態模組與 harvest script
+### U1 — Leads 狀態模組與 harvest script（✅ 已完成 2026-07-22）
 
-- **Files:** add `engine_b/__init__.py`, `engine_b/leads.py`（狀態機、URL-hash 去重、harvest_log、atomic 寫檔）, `crons/harvest_leads.py`（RSS＋EDGAR watch）, `crons/harvest_config.json`；add `tests/test_engine_b_leads.py`。
+- **Files:** add `engine_b/__init__.py`, `engine_b/leads.py`（狀態機、URL-hash 去重、harvest_log、atomic 寫檔）, `crons/harvest_leads.py`（RSS＋EDGAR watch）, `crons/harvest_config.json`, `library/leads/pending_leads.json`（seeded baseline）；add `tests/test_engine_b_leads.py`。
 - **Approach:** leads.py 只依賴標準庫；RSS 解析失敗記 `parse_failed` 不拋例外；EDGAR 用 submissions JSON 比對已見 accession，只記 metadata。config 含 feed 清單（附 Serenity 註記）與 watch tickers（v0：COHR、LITE、AMAT、LRCX、AXTI、AAOI、TSEM、GFS）。
-- **Tests:** 去重冪等、狀態機非法轉移拒絕、parse 失敗誠實記錄、config 缺欄 fail closed。
+- **Tests:** 21 passed——去重冪等、狀態機非法轉移拒絕、triage 只從 pending、parse 失敗誠實記錄、config 缺欄 fail closed、atomic round-trip、RSS/Atom 解析、EDGAR 純轉換、run 端到端 fetch_failed。
+- **上線觀察（真實 harvest 驗證，L2 精神）：**
+  1. **RSS feed 只曝露 1 篇最新**（Substack 免費 feed 限制，符合 AGENTS 既知坑）——首跑抓到的正是高相關線索「Sivers: The Undiscovered CPO Laser Chokepoint」。這強化 RISK4 的 feed 視窗遺漏：長期不在時舊文會掉出。
+  2. **EDGAR 冷啟動偏 Form 4**：首跑 64 筆 EDGAR 裡 54 筆是 Form 4（內部人交易）。日常增量下是涓流且對稀釋核驗有用，但**冷啟動 seed 明顯偏重**——**U4 brief 呈現層必須摺疊／降權舊 filing 與 Form 4**，否則第一份 brief 會被歷史 Form 4 淹沒。已 seed populated baseline（65 筆），使 routine 日後只浮現真正新 filing。
+- **決策定案：** commit populated baseline（非空骨架）——baseline 檔的職責是「已見去重記憶」，空檔＝謊稱沒見過、保證首跑洪水；populated 讓系統從第一天就只報新料。
 
 ### U2 — 修 partial-identity crash ＋ registry 補齊（R14–R15）
 

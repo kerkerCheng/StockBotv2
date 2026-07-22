@@ -1,0 +1,776 @@
+{
+  "harvest_log": [
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-07-22T15:37:16.686284+00:00",
+      "source": "aleabitoreddit_rss"
+    },
+    {
+      "new": 8,
+      "result": "ok",
+      "run_at": "2026-07-22T15:37:18.082230+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 8,
+      "result": "ok",
+      "run_at": "2026-07-22T15:37:19.172754+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 8,
+      "result": "ok",
+      "run_at": "2026-07-22T15:37:20.250751+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 8,
+      "result": "ok",
+      "run_at": "2026-07-22T15:37:21.356673+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 8,
+      "result": "ok",
+      "run_at": "2026-07-22T15:37:22.502800+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 8,
+      "result": "ok",
+      "run_at": "2026-07-22T15:37:23.595740+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 8,
+      "result": "ok",
+      "run_at": "2026-07-22T15:37:25.644530+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "new": 8,
+      "result": "ok",
+      "run_at": "2026-07-22T15:37:26.728985+00:00",
+      "source": "edgar:GFS"
+    }
+  ],
+  "leads": {
+    "lead_00026a9efd69a5321479dc1ab4eac906": {
+      "first_seen": "2026-07-22T15:37:19.172635+00:00",
+      "lead_id": "lead_00026a9efd69a5321479dc1ab4eac906",
+      "published_at": "2026-07-16",
+      "refs": {},
+      "source": "edgar:LITE",
+      "status": "pending",
+      "title": "LITE 4 filed 2026-07-16",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1633978/000171491026000003/xslF345X06/form4-07172026_120713.xml"
+    },
+    "lead_072ee0491ea59637933371a069bd0321": {
+      "first_seen": "2026-07-22T15:37:23.595703+00:00",
+      "lead_id": "lead_072ee0491ea59637933371a069bd0321",
+      "published_at": "2026-06-16",
+      "refs": {},
+      "source": "edgar:AAOI",
+      "status": "pending",
+      "title": "AAOI 4 filed 2026-06-16",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826004882/xslF345X06/ownership.xml"
+    },
+    "lead_08a496cc0d099d7509a44dc50a225701": {
+      "first_seen": "2026-07-22T15:37:20.250746+00:00",
+      "lead_id": "lead_08a496cc0d099d7509a44dc50a225701",
+      "published_at": "2026-06-05",
+      "refs": {},
+      "source": "edgar:AMAT",
+      "status": "pending",
+      "title": "AMAT 4 filed 2026-06-05",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026041314/xslF345X06/wk-form4_1780693451.xml"
+    },
+    "lead_0ff868c1f91c2b054d93ad0fde8d30f6": {
+      "first_seen": "2026-07-22T15:37:18.082221+00:00",
+      "lead_id": "lead_0ff868c1f91c2b054d93ad0fde8d30f6",
+      "published_at": "2026-04-24",
+      "refs": {},
+      "source": "edgar:COHR",
+      "status": "pending",
+      "title": "COHR 4 filed 2026-04-24",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/820318/000089914026000393/xslF345X06/form4.xml"
+    },
+    "lead_10ce3c3e5213479b8624d7b3e59899f2": {
+      "first_seen": "2026-07-22T15:37:26.728948+00:00",
+      "lead_id": "lead_10ce3c3e5213479b8624d7b3e59899f2",
+      "published_at": "2026-06-29",
+      "refs": {},
+      "source": "edgar:GFS",
+      "status": "pending",
+      "title": "GFS 4 filed 2026-06-29",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1709048/000162828026046017/xslF345X06/wk-form4_1782765252.xml"
+    },
+    "lead_11e73e5ccb7f3889467a869e7b854224": {
+      "first_seen": "2026-07-22T15:37:20.250734+00:00",
+      "lead_id": "lead_11e73e5ccb7f3889467a869e7b854224",
+      "published_at": "2026-06-17",
+      "refs": {},
+      "source": "edgar:AMAT",
+      "status": "pending",
+      "title": "AMAT 4 filed 2026-06-17",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026044039/xslF345X06/wk-form4_1781733475.xml"
+    },
+    "lead_12f5545a0584132a028176abe9bcdbbb": {
+      "first_seen": "2026-07-22T15:37:22.502785+00:00",
+      "lead_id": "lead_12f5545a0584132a028176abe9bcdbbb",
+      "published_at": "2026-06-16",
+      "refs": {},
+      "source": "edgar:AXTI",
+      "status": "pending",
+      "title": "AXTI 4 filed 2026-06-16",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1051627/000143774926020833/xslF345X06/rdgdoc.xml"
+    },
+    "lead_190b059db6c27b9bb7025eda28a9c61c": {
+      "first_seen": "2026-07-22T15:37:20.250643+00:00",
+      "lead_id": "lead_190b059db6c27b9bb7025eda28a9c61c",
+      "published_at": "2026-07-06",
+      "refs": {},
+      "source": "edgar:AMAT",
+      "status": "pending",
+      "title": "AMAT 4 filed 2026-07-06",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026047328/xslF345X06/wk-form4_1783371864.xml"
+    },
+    "lead_1cc53b8f399fa19d8de9097b212b2d50": {
+      "first_seen": "2026-07-22T15:37:19.172726+00:00",
+      "lead_id": "lead_1cc53b8f399fa19d8de9097b212b2d50",
+      "published_at": "2026-07-07",
+      "refs": {},
+      "source": "edgar:LITE",
+      "status": "pending",
+      "title": "LITE 4 filed 2026-07-07",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1633978/000186650326000006/xslF345X06/form4-07072026_110711.xml"
+    },
+    "lead_1fa5e4b88de07ce8b801e2468729c087": {
+      "first_seen": "2026-07-22T15:37:21.356645+00:00",
+      "lead_id": "lead_1fa5e4b88de07ce8b801e2468729c087",
+      "published_at": "2026-05-04",
+      "refs": {},
+      "source": "edgar:LRCX",
+      "status": "pending",
+      "title": "LRCX 4 filed 2026-05-04",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/707549/000070754926000024/xslF345X06/wk-form4_1777915449.xml"
+    },
+    "lead_22950673806c7136d6516716900c4a79": {
+      "first_seen": "2026-07-22T15:37:26.728959+00:00",
+      "lead_id": "lead_22950673806c7136d6516716900c4a79",
+      "published_at": "2026-06-26",
+      "refs": {},
+      "source": "edgar:GFS",
+      "status": "pending",
+      "title": "GFS 4 filed 2026-06-26",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000147/xslF345X06/wk-form4_1782496850.xml"
+    },
+    "lead_24275206bfbcff3a5904bde1187763f8": {
+      "first_seen": "2026-07-22T15:37:25.644456+00:00",
+      "lead_id": "lead_24275206bfbcff3a5904bde1187763f8",
+      "published_at": "2026-07-06",
+      "refs": {},
+      "source": "edgar:TSEM",
+      "status": "pending",
+      "title": "TSEM 4 filed 2026-07-06",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/928876/000197640826000637/xslF345X06/primary_doc.xml"
+    },
+    "lead_24700653e97ff33c21c1dc97cfb66341": {
+      "first_seen": "2026-07-22T15:37:25.644514+00:00",
+      "lead_id": "lead_24700653e97ff33c21c1dc97cfb66341",
+      "published_at": "2026-07-06",
+      "refs": {},
+      "source": "edgar:TSEM",
+      "status": "pending",
+      "title": "TSEM 4 filed 2026-07-06",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/928876/000197640826000632/xslF345X06/primary_doc.xml"
+    },
+    "lead_24ad40de03ac5f87c78d9e043845b309": {
+      "first_seen": "2026-07-22T15:37:22.502796+00:00",
+      "lead_id": "lead_24ad40de03ac5f87c78d9e043845b309",
+      "published_at": "2026-06-15",
+      "refs": {},
+      "source": "edgar:AXTI",
+      "status": "pending",
+      "title": "AXTI 4 filed 2026-06-15",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1051627/000143774926020633/xslF345X06/rdgdoc.xml"
+    },
+    "lead_2ea3e59722e5e136cf2f82e823cbe7e6": {
+      "first_seen": "2026-07-22T15:37:23.595633+00:00",
+      "lead_id": "lead_2ea3e59722e5e136cf2f82e823cbe7e6",
+      "published_at": "2026-07-01",
+      "refs": {},
+      "source": "edgar:AAOI",
+      "status": "pending",
+      "title": "AAOI 8-K filed 2026-07-01",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826005221/aaoi_8k.htm"
+    },
+    "lead_330dd99ad380ce1a207e4fb53c046f03": {
+      "first_seen": "2026-07-22T15:37:25.644432+00:00",
+      "lead_id": "lead_330dd99ad380ce1a207e4fb53c046f03",
+      "published_at": "2026-07-15",
+      "refs": {},
+      "source": "edgar:TSEM",
+      "status": "pending",
+      "title": "TSEM 4 filed 2026-07-15",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/928876/000197640826000651/xslF345X06/primary_doc.xml"
+    },
+    "lead_46944fdf1d1e34e38f5a9e32bc1c3fc8": {
+      "first_seen": "2026-07-22T15:37:21.356596+00:00",
+      "lead_id": "lead_46944fdf1d1e34e38f5a9e32bc1c3fc8",
+      "published_at": "2026-07-06",
+      "refs": {},
+      "source": "edgar:LRCX",
+      "status": "pending",
+      "title": "LRCX 4 filed 2026-07-06",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/707549/000134360026000009/xslF345X06/wk-form4_1783355605.xml"
+    },
+    "lead_57cf81e3979adf60169cbebabc245435": {
+      "first_seen": "2026-07-22T15:37:23.595734+00:00",
+      "lead_id": "lead_57cf81e3979adf60169cbebabc245435",
+      "published_at": "2026-06-16",
+      "refs": {},
+      "source": "edgar:AAOI",
+      "status": "pending",
+      "title": "AAOI 4 filed 2026-06-16",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826004880/xslF345X06/ownership.xml"
+    },
+    "lead_5a2bd2c90d6f38fdb3db6673c309109a": {
+      "first_seen": "2026-07-22T15:37:25.644469+00:00",
+      "lead_id": "lead_5a2bd2c90d6f38fdb3db6673c309109a",
+      "published_at": "2026-07-06",
+      "refs": {},
+      "source": "edgar:TSEM",
+      "status": "pending",
+      "title": "TSEM 4 filed 2026-07-06",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/928876/000197640826000636/xslF345X06/primary_doc.xml"
+    },
+    "lead_5d739525279dfae394f8c8e213084633": {
+      "first_seen": "2026-07-22T15:37:26.728926+00:00",
+      "lead_id": "lead_5d739525279dfae394f8c8e213084633",
+      "published_at": "2026-07-10",
+      "refs": {},
+      "source": "edgar:GFS",
+      "status": "pending",
+      "title": "GFS 4 filed 2026-07-10",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000151/xslF345X06/wk-form4_1783706629.xml"
+    },
+    "lead_6076a9d2224995bfb0874bc42fefa9b0": {
+      "first_seen": "2026-07-22T15:37:20.250709+00:00",
+      "lead_id": "lead_6076a9d2224995bfb0874bc42fefa9b0",
+      "published_at": "2026-06-17",
+      "refs": {},
+      "source": "edgar:AMAT",
+      "status": "pending",
+      "title": "AMAT 4 filed 2026-06-17",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026044048/xslF345X06/wk-form4_1781734174.xml"
+    },
+    "lead_61053b6d935c61b2c3def03c953b1994": {
+      "first_seen": "2026-07-22T15:37:21.356668+00:00",
+      "lead_id": "lead_61053b6d935c61b2c3def03c953b1994",
+      "published_at": "2026-04-23",
+      "refs": {},
+      "source": "edgar:LRCX",
+      "status": "pending",
+      "title": "LRCX 10-Q filed 2026-04-23",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/707549/000070754926000022/lrcx-20260329.htm"
+    },
+    "lead_649c104b63846fa7ff3cecbc703cb560": {
+      "first_seen": "2026-07-22T15:37:26.728902+00:00",
+      "lead_id": "lead_649c104b63846fa7ff3cecbc703cb560",
+      "published_at": "2026-07-20",
+      "refs": {},
+      "source": "edgar:GFS",
+      "status": "pending",
+      "title": "GFS 4 filed 2026-07-20",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1709048/000162828026048834/xslF345X06/wk-form4_1784581401.xml"
+    },
+    "lead_65ee4298b4ed323ef3394c30c29fe4bd": {
+      "first_seen": "2026-07-22T15:37:18.082205+00:00",
+      "lead_id": "lead_65ee4298b4ed323ef3394c30c29fe4bd",
+      "published_at": "2026-04-28",
+      "refs": {},
+      "source": "edgar:COHR",
+      "status": "pending",
+      "title": "COHR 8-K filed 2026-04-28",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/820318/000119312526187297/d107137d8k.htm"
+    },
+    "lead_6fe8187893d0e728c504af8f4d20d66d": {
+      "first_seen": "2026-07-22T15:37:22.502775+00:00",
+      "lead_id": "lead_6fe8187893d0e728c504af8f4d20d66d",
+      "published_at": "2026-06-17",
+      "refs": {},
+      "source": "edgar:AXTI",
+      "status": "pending",
+      "title": "AXTI 4 filed 2026-06-17",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1051627/000143774926020894/xslF345X06/rdgdoc.xml"
+    },
+    "lead_7542d1fbe0f10b6a3b60b28c3851444e": {
+      "first_seen": "2026-07-22T15:37:26.728879+00:00",
+      "lead_id": "lead_7542d1fbe0f10b6a3b60b28c3851444e",
+      "published_at": "2026-07-20",
+      "refs": {},
+      "source": "edgar:GFS",
+      "status": "pending",
+      "title": "GFS 4 filed 2026-07-20",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1709048/000162828026048836/xslF345X06/wk-form4_1784581782.xml"
+    },
+    "lead_760eb6913a23e02842e06ac15b77d48d": {
+      "first_seen": "2026-07-22T15:37:25.644504+00:00",
+      "lead_id": "lead_760eb6913a23e02842e06ac15b77d48d",
+      "published_at": "2026-07-06",
+      "refs": {},
+      "source": "edgar:TSEM",
+      "status": "pending",
+      "title": "TSEM 4 filed 2026-07-06",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/928876/000197640826000633/xslF345X06/primary_doc.xml"
+    },
+    "lead_795d937852b829058416270a4f3b8c6c": {
+      "first_seen": "2026-07-22T15:37:23.595719+00:00",
+      "lead_id": "lead_795d937852b829058416270a4f3b8c6c",
+      "published_at": "2026-06-16",
+      "refs": {},
+      "source": "edgar:AAOI",
+      "status": "pending",
+      "title": "AAOI 4 filed 2026-06-16",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826004881/xslF345X06/ownership.xml"
+    },
+    "lead_7a35cedfdcf7226f4b045d3f83b84c9b": {
+      "first_seen": "2026-07-22T15:37:25.644481+00:00",
+      "lead_id": "lead_7a35cedfdcf7226f4b045d3f83b84c9b",
+      "published_at": "2026-07-06",
+      "refs": {},
+      "source": "edgar:TSEM",
+      "status": "pending",
+      "title": "TSEM 4 filed 2026-07-06",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/928876/000197640826000635/xslF345X06/primary_doc.xml"
+    },
+    "lead_7b9c116e84b64ff60100e1157c2e398e": {
+      "first_seen": "2026-07-22T15:37:22.502741+00:00",
+      "lead_id": "lead_7b9c116e84b64ff60100e1157c2e398e",
+      "published_at": "2026-06-22",
+      "refs": {},
+      "source": "edgar:AXTI",
+      "status": "pending",
+      "title": "AXTI 8-K filed 2026-06-22",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1051627/000143774926021307/axti20260622_8k.htm"
+    },
+    "lead_7bbf1d134806b235e07a8de3130ac5db": {
+      "first_seen": "2026-07-22T15:37:16.686268+00:00",
+      "lead_id": "lead_7bbf1d134806b235e07a8de3130ac5db",
+      "published_at": "Tue, 19 May 2026 10:42:15 GMT",
+      "refs": {},
+      "source": "aleabitoreddit_rss",
+      "status": "pending",
+      "title": "Sivers: The Undiscovered CPO Laser Chokepoint + Customer Mapping",
+      "triage": null,
+      "url": "https://aleabitoreddit.substack.com/p/sivers-semi-sive-the-cpo-laser-supplier"
+    },
+    "lead_7f7729ed1b82edffd1cd8a0750ffa6f0": {
+      "first_seen": "2026-07-22T15:37:22.502764+00:00",
+      "lead_id": "lead_7f7729ed1b82edffd1cd8a0750ffa6f0",
+      "published_at": "2026-06-17",
+      "refs": {},
+      "source": "edgar:AXTI",
+      "status": "pending",
+      "title": "AXTI 4 filed 2026-06-17",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1051627/000143774926020895/xslF345X06/rdgdoc.xml"
+    },
+    "lead_81ba31cd1de380267a03be48750212c2": {
+      "first_seen": "2026-07-22T15:37:18.082120+00:00",
+      "lead_id": "lead_81ba31cd1de380267a03be48750212c2",
+      "published_at": "2026-06-05",
+      "refs": {},
+      "source": "edgar:COHR",
+      "status": "pending",
+      "title": "COHR 4 filed 2026-06-05",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/820318/000089914026000627/xslF345X06/form4.xml"
+    },
+    "lead_873e98e4ef4115a235ec9ab644c8ed63": {
+      "first_seen": "2026-07-22T15:37:21.356657+00:00",
+      "lead_id": "lead_873e98e4ef4115a235ec9ab644c8ed63",
+      "published_at": "2026-04-28",
+      "refs": {},
+      "source": "edgar:LRCX",
+      "status": "pending",
+      "title": "LRCX 4 filed 2026-04-28",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/707549/000164241526000008/xslF345X06/wk-form4_1777399454.xml"
+    },
+    "lead_878039c1c6b351d4cbf7c4477fefa6a5": {
+      "first_seen": "2026-07-22T15:37:23.595654+00:00",
+      "lead_id": "lead_878039c1c6b351d4cbf7c4477fefa6a5",
+      "published_at": "2026-06-18",
+      "refs": {},
+      "source": "edgar:AAOI",
+      "status": "pending",
+      "title": "AAOI 4 filed 2026-06-18",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826004979/xslF345X06/ownership.xml"
+    },
+    "lead_8c3fba30392e99a9ac7922057f6994d9": {
+      "first_seen": "2026-07-22T15:37:21.356622+00:00",
+      "lead_id": "lead_8c3fba30392e99a9ac7922057f6994d9",
+      "published_at": "2026-06-15",
+      "refs": {},
+      "source": "edgar:LRCX",
+      "status": "pending",
+      "title": "LRCX 4 filed 2026-06-15",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/707549/000119063926000004/xslF345X06/wk-form4_1781540828.xml"
+    },
+    "lead_91566124ed7104cd67577f995d19c83f": {
+      "first_seen": "2026-07-22T15:37:21.356633+00:00",
+      "lead_id": "lead_91566124ed7104cd67577f995d19c83f",
+      "published_at": "2026-06-02",
+      "refs": {},
+      "source": "edgar:LRCX",
+      "status": "pending",
+      "title": "LRCX 4 filed 2026-06-02",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/707549/000196659826000004/xslF345X06/wk-form4_1780416309.xml"
+    },
+    "lead_9c9f51de58d334452a3838d5db8636e1": {
+      "first_seen": "2026-07-22T15:37:20.250697+00:00",
+      "lead_id": "lead_9c9f51de58d334452a3838d5db8636e1",
+      "published_at": "2026-06-17",
+      "refs": {},
+      "source": "edgar:AMAT",
+      "status": "pending",
+      "title": "AMAT 4 filed 2026-06-17",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026044050/xslF345X06/wk-form4_1781734484.xml"
+    },
+    "lead_9ff86c00d2d3b0d1bcfedc009510393f": {
+      "first_seen": "2026-07-22T15:37:22.502752+00:00",
+      "lead_id": "lead_9ff86c00d2d3b0d1bcfedc009510393f",
+      "published_at": "2026-06-17",
+      "refs": {},
+      "source": "edgar:AXTI",
+      "status": "pending",
+      "title": "AXTI 8-K filed 2026-06-17",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1051627/000143774926020978/axti20260615_8k.htm"
+    },
+    "lead_a2c7358ac3d8e81ef853864b7d00073b": {
+      "first_seen": "2026-07-22T15:37:21.356609+00:00",
+      "lead_id": "lead_a2c7358ac3d8e81ef853864b7d00073b",
+      "published_at": "2026-06-15",
+      "refs": {},
+      "source": "edgar:LRCX",
+      "status": "pending",
+      "title": "LRCX 4 filed 2026-06-15",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/707549/000119063926000006/xslF345X06/wk-form4_1781566408.xml"
+    },
+    "lead_a3548c3bb8a56282baecde6c9e90734e": {
+      "first_seen": "2026-07-22T15:37:19.172597+00:00",
+      "lead_id": "lead_a3548c3bb8a56282baecde6c9e90734e",
+      "published_at": "2026-07-16",
+      "refs": {},
+      "source": "edgar:LITE",
+      "status": "pending",
+      "title": "LITE 4 filed 2026-07-16",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1633978/000160799026000001/xslF345X06/form4-07172026_120732.xml"
+    },
+    "lead_a86ef356511602e278888eabb9b34082": {
+      "first_seen": "2026-07-22T15:37:21.356568+00:00",
+      "lead_id": "lead_a86ef356511602e278888eabb9b34082",
+      "published_at": "2026-07-14",
+      "refs": {},
+      "source": "edgar:LRCX",
+      "status": "pending",
+      "title": "LRCX 4 filed 2026-07-14",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/707549/000131606526000012/xslF345X06/wk-form4_1784048170.xml"
+    },
+    "lead_a9b6bd59cd2a456b0f7bc1ffa27245f6": {
+      "first_seen": "2026-07-22T15:37:19.172746+00:00",
+      "lead_id": "lead_a9b6bd59cd2a456b0f7bc1ffa27245f6",
+      "published_at": "2026-06-04",
+      "refs": {},
+      "source": "edgar:LITE",
+      "status": "pending",
+      "title": "LITE 4 filed 2026-06-04",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1633978/000186650326000005/xslF345X06/form4-06042026_090638.xml"
+    },
+    "lead_a9eecd775218a780048490e677cf5364": {
+      "first_seen": "2026-07-22T15:37:19.172710+00:00",
+      "lead_id": "lead_a9eecd775218a780048490e677cf5364",
+      "published_at": "2026-07-16",
+      "refs": {},
+      "source": "edgar:LITE",
+      "status": "pending",
+      "title": "LITE 4 filed 2026-07-16",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1633978/000171103526000002/xslF345X06/form4-07172026_120709.xml"
+    },
+    "lead_aa00cda139834f060a0d24b0245844ac": {
+      "first_seen": "2026-07-22T15:37:20.250671+00:00",
+      "lead_id": "lead_aa00cda139834f060a0d24b0245844ac",
+      "published_at": "2026-07-01",
+      "refs": {},
+      "source": "edgar:AMAT",
+      "status": "pending",
+      "title": "AMAT 4 filed 2026-07-01",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026046609/xslF345X06/wk-form4_1782940748.xml"
+    },
+    "lead_ac2d4f7e3c0a017783e2221a8e1bddb7": {
+      "first_seen": "2026-07-22T15:37:25.644525+00:00",
+      "lead_id": "lead_ac2d4f7e3c0a017783e2221a8e1bddb7",
+      "published_at": "2026-07-06",
+      "refs": {},
+      "source": "edgar:TSEM",
+      "status": "pending",
+      "title": "TSEM 4 filed 2026-07-06",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/928876/000197640826000631/xslF345X06/primary_doc.xml"
+    },
+    "lead_ad57b7f621a69d781b3bd9da17b8f776": {
+      "first_seen": "2026-07-22T15:37:18.082188+00:00",
+      "lead_id": "lead_ad57b7f621a69d781b3bd9da17b8f776",
+      "published_at": "2026-05-06",
+      "refs": {},
+      "source": "edgar:COHR",
+      "status": "pending",
+      "title": "COHR 10-Q filed 2026-05-06",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/820318/000082031826000013/iivi-20260331.htm"
+    },
+    "lead_b3503ff4c9d89e278f35dcadc4f19a4a": {
+      "first_seen": "2026-07-22T15:37:26.728937+00:00",
+      "lead_id": "lead_b3503ff4c9d89e278f35dcadc4f19a4a",
+      "published_at": "2026-07-07",
+      "refs": {},
+      "source": "edgar:GFS",
+      "status": "pending",
+      "title": "GFS 4 filed 2026-07-07",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000149/xslF345X06/wk-form4_1783445628.xml"
+    },
+    "lead_bdd03e8e9f98242b0023cb2a3a7eff0c": {
+      "first_seen": "2026-07-22T15:37:18.082085+00:00",
+      "lead_id": "lead_bdd03e8e9f98242b0023cb2a3a7eff0c",
+      "published_at": "2026-07-06",
+      "refs": {},
+      "source": "edgar:COHR",
+      "status": "pending",
+      "title": "COHR 4 filed 2026-07-06",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/820318/000089914026000699/xslF345X06/form4.xml"
+    },
+    "lead_c47b75e7f3907d271c4707876b56a30a": {
+      "first_seen": "2026-07-22T15:37:20.250684+00:00",
+      "lead_id": "lead_c47b75e7f3907d271c4707876b56a30a",
+      "published_at": "2026-06-22",
+      "refs": {},
+      "source": "edgar:AMAT",
+      "status": "pending",
+      "title": "AMAT 4 filed 2026-06-22",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026044741/xslF345X06/wk-form4_1782164283.xml"
+    },
+    "lead_c52bbb5dfebba938fa1694d1c4596f4e": {
+      "first_seen": "2026-07-22T15:37:18.082138+00:00",
+      "lead_id": "lead_c52bbb5dfebba938fa1694d1c4596f4e",
+      "published_at": "2026-05-13",
+      "refs": {},
+      "source": "edgar:COHR",
+      "status": "pending",
+      "title": "COHR 4 filed 2026-05-13",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/820318/000089914026000476/xslF345X06/form4.xml"
+    },
+    "lead_c79853952e8130f1c0d6680388d3b020": {
+      "first_seen": "2026-07-22T15:37:19.172678+00:00",
+      "lead_id": "lead_c79853952e8130f1c0d6680388d3b020",
+      "published_at": "2026-07-16",
+      "refs": {},
+      "source": "edgar:LITE",
+      "status": "pending",
+      "title": "LITE 4 filed 2026-07-16",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1633978/000172228926000001/xslF345X06/form4-07172026_120708.xml"
+    },
+    "lead_c9225fcf3ddafb198bd230cda3ae8f5e": {
+      "first_seen": "2026-07-22T15:37:20.250721+00:00",
+      "lead_id": "lead_c9225fcf3ddafb198bd230cda3ae8f5e",
+      "published_at": "2026-06-17",
+      "refs": {},
+      "source": "edgar:AMAT",
+      "status": "pending",
+      "title": "AMAT 4 filed 2026-06-17",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026044046/xslF345X06/wk-form4_1781733868.xml"
+    },
+    "lead_cc4797205853458be513a748c01e2735": {
+      "first_seen": "2026-07-22T15:37:26.728914+00:00",
+      "lead_id": "lead_cc4797205853458be513a748c01e2735",
+      "published_at": "2026-07-13",
+      "refs": {},
+      "source": "edgar:GFS",
+      "status": "pending",
+      "title": "GFS 4 filed 2026-07-13",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1709048/000162828026047972/xslF345X06/wk-form4_1783962211.xml"
+    },
+    "lead_d038e162169964320fa1bc8354c2349c": {
+      "first_seen": "2026-07-22T15:37:23.595596+00:00",
+      "lead_id": "lead_d038e162169964320fa1bc8354c2349c",
+      "published_at": "2026-07-14",
+      "refs": {},
+      "source": "edgar:AAOI",
+      "status": "pending",
+      "title": "AAOI 4 filed 2026-07-14",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826005532/xslF345X06/ownership.xml"
+    },
+    "lead_db65b9b3833c1035e39aaa450f5a079a": {
+      "first_seen": "2026-07-22T15:37:19.172694+00:00",
+      "lead_id": "lead_db65b9b3833c1035e39aaa450f5a079a",
+      "published_at": "2026-07-16",
+      "refs": {},
+      "source": "edgar:LITE",
+      "status": "pending",
+      "title": "LITE 4 filed 2026-07-16",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1633978/000123201926000005/xslF345X06/form4-07172026_120757.xml"
+    },
+    "lead_db77cee320ee409a222adb1b88f865bc": {
+      "first_seen": "2026-07-22T15:37:22.502728+00:00",
+      "lead_id": "lead_db77cee320ee409a222adb1b88f865bc",
+      "published_at": "2026-07-02",
+      "refs": {},
+      "source": "edgar:AXTI",
+      "status": "pending",
+      "title": "AXTI 8-K filed 2026-07-02",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1051627/000143774926022557/axti20260630_8k.htm"
+    },
+    "lead_dff5a2a6ef33a72e4cf07fda277f6bd2": {
+      "first_seen": "2026-07-22T15:37:25.644492+00:00",
+      "lead_id": "lead_dff5a2a6ef33a72e4cf07fda277f6bd2",
+      "published_at": "2026-07-06",
+      "refs": {},
+      "source": "edgar:TSEM",
+      "status": "pending",
+      "title": "TSEM 4 filed 2026-07-06",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/928876/000197640826000634/xslF345X06/primary_doc.xml"
+    },
+    "lead_e48d58c39e20202b653eecf6cff75adc": {
+      "first_seen": "2026-07-22T15:37:19.172660+00:00",
+      "lead_id": "lead_e48d58c39e20202b653eecf6cff75adc",
+      "published_at": "2026-07-16",
+      "refs": {},
+      "source": "edgar:LITE",
+      "status": "pending",
+      "title": "LITE 4 filed 2026-07-16",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1633978/000164823126000004/xslF345X06/form4-07172026_120753.xml"
+    },
+    "lead_e590eca752d976cef58be766a5b17d62": {
+      "first_seen": "2026-07-22T15:37:23.595687+00:00",
+      "lead_id": "lead_e590eca752d976cef58be766a5b17d62",
+      "published_at": "2026-06-16",
+      "refs": {},
+      "source": "edgar:AAOI",
+      "status": "pending",
+      "title": "AAOI 8-K filed 2026-06-16",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826004885/aaoi_8k.htm"
+    },
+    "lead_ebb4a71c7f16ef7faf37e8d17bb2d337": {
+      "first_seen": "2026-07-22T15:37:18.082171+00:00",
+      "lead_id": "lead_ebb4a71c7f16ef7faf37e8d17bb2d337",
+      "published_at": "2026-05-06",
+      "refs": {},
+      "source": "edgar:COHR",
+      "status": "pending",
+      "title": "COHR 8-K filed 2026-05-06",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/820318/000119312526208972/d57080d8k.htm"
+    },
+    "lead_f05f3fd8a753c084704afc3b06330a47": {
+      "first_seen": "2026-07-22T15:37:22.502705+00:00",
+      "lead_id": "lead_f05f3fd8a753c084704afc3b06330a47",
+      "published_at": "2026-07-08",
+      "refs": {},
+      "source": "edgar:AXTI",
+      "status": "pending",
+      "title": "AXTI 8-K filed 2026-07-08",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1051627/000143774926022984/axti20260629_8k.htm"
+    },
+    "lead_f1d18173b1d1d173650f0dae1545c692": {
+      "first_seen": "2026-07-22T15:37:26.728975+00:00",
+      "lead_id": "lead_f1d18173b1d1d173650f0dae1545c692",
+      "published_at": "2026-06-23",
+      "refs": {},
+      "source": "edgar:GFS",
+      "status": "pending",
+      "title": "GFS 4 filed 2026-06-23",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000145/xslF345X06/wk-form4_1782235966.xml"
+    },
+    "lead_fd354516dc2093159fc7d48737016b84": {
+      "first_seen": "2026-07-22T15:37:18.082155+00:00",
+      "lead_id": "lead_fd354516dc2093159fc7d48737016b84",
+      "published_at": "2026-05-13",
+      "refs": {},
+      "source": "edgar:COHR",
+      "status": "pending",
+      "title": "COHR 4 filed 2026-05-13",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/820318/000089914026000475/xslF345X06/form4.xml"
+    },
+    "lead_fd75b848c93c7fc3fd0a1cb241fd22d6": {
+      "first_seen": "2026-07-22T15:37:23.595670+00:00",
+      "lead_id": "lead_fd75b848c93c7fc3fd0a1cb241fd22d6",
+      "published_at": "2026-06-18",
+      "refs": {},
+      "source": "edgar:AAOI",
+      "status": "pending",
+      "title": "AAOI 4 filed 2026-06-18",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826004977/xslF345X06/ownership.xml"
+    }
+  },
+  "schema_version": "1"
+}

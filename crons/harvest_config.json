@@ -1,0 +1,16 @@
+{
+  "_note": "Daily Approval Loop harvest 來源設定（plan U1/R3）。可手動編輯。feeds=RSS 類；edgar_watch=SEC filing 監看。watch 清單 v0 手動維護是刻意的（plan R3 future note）。",
+  "feeds": [
+    {
+      "source": "aleabitoreddit_rss",
+      "url": "https://aleabitoreddit.substack.com/feed",
+      "note": "channel 標題是 'Serenity'、不是帳號名（AGENTS 既知坑）；最高只能 evidence_tier 3。讀取器解析失敗時 fallback 到 site:aleabitoreddit.substack.com web search。"
+    }
+  ],
+  "edgar_watch": {
+    "note": "只記 filing metadata（form/日期/URL），不下載全文。8-K/10-K/10-Q/Form 4 高優先；S-8 等註冊雜訊交 triage 判。下載＋抽取仍由使用者點名 research 動詞觸發。",
+    "tickers": ["COHR", "LITE", "AMAT", "LRCX", "AXTI", "AAOI", "TSEM", "GFS"],
+    "forms": ["8-K", "10-K", "10-Q", "4"],
+    "lookback_count": 8
+  }
+}

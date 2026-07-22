@@ -151,7 +151,8 @@ fetchers/edgar.py ──────↑                        engine_c/etl_yfin
    — COHR「客戶集中度」與「Backlog／訂單能見度」已以一手 filing 補入 Engine C manual observation ledger（append-only，含逐字 provenance）：客戶集中度出自 FY2025 10-K segment note「Major Customers」（兩大客戶各佔 12%／10%，主要來自 Networking segment；另註 NVIDIA 2026-03-02 投資 $2B＋多年期產能協議至 2030 的前瞻集中度旗標，出自 Q3 FY2026 10-Q）；COHR 不揭露美元 backlog／RPO，依規則填替代指標＝Q4 FY2026 guided revenue $1.91B–$2.05B（8-K EX-99.1，filed 2026-05-06）＋ NVIDIA 產能協議。`python thesis/preconditions.py` 全綠、`python engine_c/checklist.py COHR` 五項 gate_pass=true；**L9 三前置條件全部達標，投資諮詢 gate 開放**。一手文件存 `library/raw/cohr_10_k_20250815.txt`、`cohr_10_q_20260506.txt`、`cohr_ex991_20260506.txt`。
 
 2. **Daily Approval Loop（進行中，大型開發）**
-   — 每日 harvest／triage／brief／封閉動詞核准迴路，含 partial-identity crash 修復、MCP gateway 9→12 工具、`/daily-brief` skill 與 daily cloud routine。可實作 plan：[`docs/plans/2026-07-22-002-feat-daily-approval-loop-plan.md`](docs/plans/2026-07-22-002-feat-daily-approval-loop-plan.md)。原「知識覆蓋自動化」的 RSS pending leads 併入此 plan（U1）；SIVE 找 3 個獨立 `origin_entity` 來源仍為獨立待辦。
+   — 每日 harvest／triage／brief／封閉動詞核准迴路。可實作 plan：[`docs/plans/2026-07-22-002-feat-daily-approval-loop-plan.md`](docs/plans/2026-07-22-002-feat-daily-approval-loop-plan.md)。進度：**U1 已完成**（`engine_b/leads.py` 狀態機＋去重、`crons/harvest_leads.py` RSS＋EDGAR harvest、`crons/harvest_config.json`、seeded `library/leads/pending_leads.json`；21 tests；真實 harvest 驗證通過）。剩 U2（partial-identity crash 修復）、U3（MCP `get_decision_brief`，9→10 工具）、U4（`/daily-brief` skill）、U5（daily cloud routine）。SIVE 找 3 個獨立 `origin_entity` 來源仍為獨立待辦。
+   - **Harvest／leads 操作：** `python crons/harvest_leads.py`（零 token；`--dry-run` 只印不寫）。Leads 狀態存 `library/leads/pending_leads.json`（tracked，本機 authority）；狀態機與 API 見 `engine_b/leads.py`。lead 狀態只是注意力 metadata，**永不影響 evidence tier**。
 
 ---
 
