@@ -3,7 +3,8 @@ title: Daily Approval Loop - Plan
 type: feat
 date: 2026-07-22
 topic: daily-approval-loop
-status: ready
+status: completed
+completed: 2026-07-23
 artifact_readiness: implementation-ready
 product_contract_source: user-directed
 planning_mode: direct
@@ -65,7 +66,7 @@ revised: 2026-07-22 (push 前提定案後修訂：git push 為狀態同步機制
 **Cloud routine 與排程**
 
 - R11. 新增 `crons/daily_brief_prompt.md`：每日（台北 06:30，錯開週掃 06:00）執行——讀 pushed clone 的 `pending_leads.json` baseline 與 harvest config → web harvest RSS／EDGAR → 與 baseline 去重後把**新發現直接列在 Issue**（含 triage 摘要，不回寫狀態）→ 經 MCP 讀 `get_decision_brief`＋`get_research_action_status` → 產出當日 GitHub Issue（title 含日期、label `daily-brief`，附動詞說明）→ 前一日 Issue 若無人動作自動 close 並在新 Issue 註記 carry-over。**Issue 版面分兩區：「今日新增」置頂、「carry-over（第 N 天）」在後**——baseline 久未 push 時重複項全部落在 carry-over 區，真新料不被淹沒。**Issue 以日期命名＝心跳：日期空洞即漏跑證據**，weekly scan 作 backstop。MCP 連不上時決策佇列標明降級，leads／RA 佇列照常（比純 MCP 方案更耐斷線）。
-- R12. Routine 與 weekly scan 分工明確（2026-07-22 重新定案）：**daily＝一切需要使用者動作的東西（含 thesis lifecycle 到期，見 R5d）＋心跳；weekly 瘦身為 topic discovery＋系統健康審查＋Stage 0 legacy gate**。兩份 prompt 互相引用此分工，避免漂移。Weekly 存廢的後續判準：跑數週後若 topic discovery 從未產出使用者想深挖的主題，屆時砍 weekly 收斂成單一 routine（用真實數據決定，不預先合併）。
+- R12. Routine 與 weekly scan 分工明確（2026-07-22 定案，2026-07-23 實作精修）：**daily＝harvest／triage／今日決策佇列／等 apply 的 RA／到期 thesis 即時 surface＋心跳；weekly＝topic discovery 深度聚類＋系統健康審查＋Stage 0 legacy gate＋thesis lifecycle 正式狀態更新**。**thesis lifecycle 拆偵測 vs 變更**：daily 唯讀 surface 到期 thesis（R5d 的即時可見性，不必等週一），但**不寫 lifecycle.json**（KTD4：cloud 只讀不寫）；正式的 `last_checked`／`next_check`／`status` 更新仍由 weekly PR 或使用者本機寫入。兩份 prompt 互相引用此分工。Weekly 存廢後續判準：跑數週後若 topic discovery 從未產出想深挖的主題，屆時砍 weekly（用真實數據決定）。
 - R13. Session 開頭 digest 增加一行「pending leads N 條（M 條 triaged_go）」。**前置已完成（2026-07-22，commit 553755b）：** hooks 已從 `settings.local.json` 搬到 tracked `.claude/settings.json`（clone 即生效，含 cloud session），digest 腳本已改雙通道輸出（`systemMessage` 給終端 UI＋`additionalContext` 進 agent context 並指示第一則回覆轉述——手機 App 遙控與雲端介面都靠後者，因為它們不渲染 systemMessage）。U4 只需把 leads 計數依同一模式加進 digest；Codex 端 hook 設定放 `.codex/`，呼叫同一支 Python 腳本（AGENTS 雙代理原則）。
 
 ### 前置修復（進 scope）
@@ -128,9 +129,11 @@ revised: 2026-07-22 (push 前提定案後修訂：git push 為狀態同步機制
 - **Approach:** skill 定義：inline 跑 `python crons/harvest_leads.py` → 對 pending 新 leads 依 signal-triage 判準 triage 並寫回 → 跑 `python -m decision_lab today --format markdown` → 讀 `thesis/lifecycle.json` 列到期項（R5d）→ 組四佇列 brief（繁中、action-first、動詞說明在尾）→ 動詞 dispatch 表（`research <n>` → source-trace＋lead-intake；`apply <ra_id>` → 既有 apply＋`scripts/commit_pending_intake.py`；`park` → leads.py 狀態轉移）→ 收尾 commit＋push（含 `git ls-files library/private` sanity check）。skill 不含政策數值、不算 sizing。**明文注意事項：decision_lab 命令只在本機執行**——雲端 session 的 clone 沒有 private Decision Store，跑了會開出一個用完即棄的空 store（不污染真 store，但產出無效且造成困惑）。digest 擴充沿用 553755b 的雙通道模式（見 R13）。
 - **Dependencies:** U1、U2（research 動詞會打 evaluate-signal）。
 
-### U5 — Daily cloud routine 與上線（R11–R12）
+### U5 — Daily cloud routine 與上線（R11–R12）（✅ 已完成 2026-07-23，程式碼交付；rollout 待使用者建 routine）
 
-- **Files:** add `crons/daily_brief_prompt.md`；modify `crons/weekly_scan_prompt.md`（**移除 thesis 生命週期核查段——已移交 daily（R5d／R12），瘦身為 topic discovery＋系統健康＋Stage 0 legacy gate**，並加分工註記）；modify `AGENTS.md`（開發優先序＋operational commands＋weekly scan 描述同步）。
+- **交付：** `crons/daily_brief_prompt.md`（Stage 0 降級判定→Stage 1 harvest→Stage 2 triage 只呈現不寫回→Stage 3 MCP 決策佇列→Stage 4 到期 thesis 唯讀 surface→Stage 5 日期心跳 Issue，今日新增／carry-over／低優先摺疊／無事三段＋動詞 legend，含上線 checklist）；`crons/weekly_scan_prompt.md` 加分工註記＋Stage 4 標為「正式狀態更新端」。
+- **實作精修（見 R12）：** 原規劃「移除 weekly thesis lifecycle 段」改為**拆偵測 vs 變更**——daily 唯讀 surface 到期 thesis、weekly 保留 lifecycle.json 的正式 PR 寫入。理由：cloud 只讀不寫（KTD4），狀態寫入需 PR 機制、留在 weekly 較安全，daily 已達成 R5d 的即時可見性。
+- **rollout 待人工：** push backlog（本輪完成）→ 使用者在 claude.ai 建 daily routine（06:30 台北）→ 連續 3 天 bake → 摩擦點回寫。程式面已完成，routine 建立是 claude.ai 端操作，我無法代建。
 - **Approach:** prompt 結構仿 weekly scan（前提宣告、clone baseline 讀取、MCP 降級規則、Stage 化流程、日期心跳 Issue 模板含動詞說明與 carry-over 規則）。
 - **上線 checklist（人工步驟，寫進 prompt 檔頭）：**
   1. push 現有 master backlog（首次 rollout 前提）；
@@ -160,14 +163,16 @@ revised: 2026-07-22 (push 前提定案後修訂：git push 為狀態同步機制
 
 ## Definition of Done
 
-- [ ] 本機 `/daily-brief` 一個指令產出四佇列 brief（決策／入庫／注意力／lifecycle 到期），無事輸出 `NO ACTION`。
-- [ ] partial-identity ticker 走完 evaluate-signal 不 crash，缺欄以 blocker 呈現。
-- [ ] MCP 10 工具：`get_decision_brief` 過測試（含 redaction 斷言），remote-access 文件同步。
-- [ ] Push 慣例寫入 AGENTS，/daily-brief 收尾含 commit＋push＋sanity check。
-- [ ] Weekly scan prompt 已移除 thesis lifecycle 段並加分工註記；AGENTS 的 weekly 描述同步。
-- [ ] Daily routine 連續 3 天產出日期心跳 Issue（今日新增／carry-over 兩區），carry-over 與降級規則被觀察到正確運作。
-- [ ] 動詞 dispatch 三條路徑（research／apply／park）真實跑通各一次。
-- [ ] AGENTS 更新、skill sync clean、full suite 與 baseline 比對歸因、邏輯 commits，**master 已 push**。
+- [x] 本機 `/daily-brief` skill 定義四佇列 brief（決策／入庫／注意力／lifecycle 到期），無事輸出 `NO ACTION`。
+- [x] partial-identity ticker 走完 evaluate-signal 不 crash，缺欄以 blocker 呈現（U2，CLI＋負向測試驗證）。
+- [x] MCP 10 工具：`get_decision_brief` 過測試（含 redaction／不洩路徑斷言），remote-access 文件同步。
+- [x] Push 慣例寫入 AGENTS，/daily-brief 收尾含 commit＋push＋sanity check。
+- [x] Weekly scan prompt 加分工註記＋Stage 4 標為正式狀態更新端（改採偵測 vs 變更拆分，見 R12）；AGENTS 的 weekly／daily 描述同步。
+- [ ] （rollout，待人工）Daily routine 連續 3 天產出日期心跳 Issue、carry-over 與降級規則觀察正確——需使用者在 claude.ai 建 routine，我無法代建。
+- [ ] （rollout，待人工）動詞 dispatch 三條路徑（research／apply／park）真實跑通各一次——需真實流量與使用者回動詞。
+- [x] AGENTS 更新、skill sync clean、full suite 與 baseline 比對歸因、邏輯 commits，**master 已 push**。
+
+> **完成狀態：** U1–U5 程式碼、skill、prompt、測試與文件全部交付並 push。剩兩項是 rollout 驗收（建 cloud routine ＋真實使用），本質是使用者在 claude.ai 端的操作與數天觀察，非程式工作。
 
 ## 討論定案紀錄（2026-07-22，Q&A 收斂）
 

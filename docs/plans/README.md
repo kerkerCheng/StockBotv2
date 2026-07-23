@@ -23,5 +23,6 @@
 | [mobile (2026-07-16)](2026-07-16-001-feat-mobile-research-action-launch-plan.md) | Mobile Research Action 兩段式協定 | completed |
 | [Decision Lab (2026-07-21)](2026-07-21-001-feat-action-oriented-alpha-decision-lab-plan.md) | Engine D／Action-Oriented Alpha Decision Lab v1 | completed |
 | [Engine D workflow (2026-07-22)](2026-07-22-001-feat-engine-d-operational-workflow-plan.md) | Raw Signal → Action Card／today brief operational workflow | completed |
+| [Daily Approval Loop (2026-07-22)](2026-07-22-002-feat-daily-approval-loop-plan.md) | 每日 harvest／triage／brief／封閉動詞核准迴路（U1–U5） | completed（rollout 待人工建 routine） |
 
-**目前沒有 active plan。** 005 與 Engine D operational workflow 均已完成；L9 目前剩下的是 Engine C 財務核驗清單的人工缺口，不屬於這兩份 completed plan 的 implementation scope。
+**目前沒有 active plan。** L9 財務核驗缺口已補齊（COHR customer concentration／backlog）。Daily Approval Loop 程式面完成，剩 rollout 是使用者在 claude.ai 建 daily routine 並觀察數天，非程式工作。

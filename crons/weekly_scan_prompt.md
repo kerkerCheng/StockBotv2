@@ -13,10 +13,19 @@
 1. **Topic discovery**——掃訊號、聚類成 topic、排序給使用者選；**絕不自行追源或抽取**。
    被選中的 topic 由使用者在本機 session 說「research topic N」才啟動完整
    lead-intake / source-trace 流程。
-2. **Thesis 生命週期核查（L7）**——讀 `thesis/lifecycle.json`，只對到期的 thesis 跑
-   disproof 檢查（到期制：active 每 90 天、watch 每 30 天、review_required 每週必列）。
+2. **Thesis 生命週期的正式狀態更新（L7）**——讀 `thesis/lifecycle.json`，只對到期的 thesis 跑
+   disproof 檢查（到期制：active 每 90 天、watch 每 30 天、review_required 每週必列），
+   並在 PR 內更新 `lifecycle.json`。
 3. **系統健康審查**——跑 `query/health_audit.py` 的 Cypher 常數 + repo 檔案檢查，
    回報圖譜／memo／管道的紅黃綠狀態。
+
+> **與 daily routine 的分工（2026-07-23）：** 每日 harvest／triage、今日決策佇列
+> （MCP `get_decision_brief`）、等 apply 的 Research Actions 與**到期 thesis 的即時
+> 唯讀 surface** 已移交 `crons/daily_brief_prompt.md`（每日 06:30，Issue-based、不寫
+> state）。Weekly 保留的是 **topic discovery 深度聚類、系統健康審查、Stage 0 legacy PR
+> gate，以及 thesis lifecycle 的正式狀態更新（PR 寫 `lifecycle.json`）**——daily 只讓
+> 到期 thesis 提早被看見，正式的 `last_checked`／`next_check`／`status` 仍由本 weekly PR
+> 或使用者本機寫入。
 
 ## 執行流程
 
@@ -82,7 +91,10 @@
 由使用者在本機 session 點名（「research topic N」）才跑完整流程。Routine 一律不呼叫
 `get_extraction_rules`、不產 intermediate JSON 草稿。
 
-### Stage 4 — Thesis 到期核查（併入原季度 monitor，到期制）
+### Stage 4 — Thesis 到期核查（正式狀態更新；到期制）
+
+> daily routine 已每日**唯讀 surface** 到期 thesis 供即時可見；本 stage 是**正式狀態更新**
+> 的權威寫入端（PR 改 `lifecycle.json`）。兩者不衝突：daily 讓你早點看到，weekly 落狀態。
 
 1. 讀 `thesis/lifecycle.json`。**只對到期的 thesis**（`next_check` <= 今天，或
    `status = review_required`）執行核查；未到期的在報告列一行下次核查日即可
