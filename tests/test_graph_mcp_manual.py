@@ -39,13 +39,14 @@ def test_extraction_rules_include_remote_intake_and_conflict_protocol() -> None:
     assert "scripts/commit_pending_intake.py" in content
 
 
-def test_remote_tool_surface_has_nine_tools_and_no_git_finalize() -> None:
+def test_remote_tool_surface_has_ten_tools_and_no_git_finalize() -> None:
     tools = mcp._tool_manager._tools
 
     assert set(tools) == {
         "get_graph_context",
         "run_read_query",
         "get_financial_checklist",
+        "get_decision_brief",
         "get_extraction_rules",
         "get_source_trace_manual",
         "load_extraction",
@@ -53,6 +54,8 @@ def test_remote_tool_surface_has_nine_tools_and_no_git_finalize() -> None:
         "get_research_action_status",
         "apply_research_action",
     }
+    # 新增的決策 brief 工具必須是唯讀（不 freeze／不建 decision／不下單）。
+    assert tools["get_decision_brief"].annotations.readOnlyHint is True
     assert tools["get_research_action_status"].annotations.readOnlyHint is True
     assert tools["prepare_research_action"].annotations.idempotentHint is False
     assert tools["apply_research_action"].annotations.idempotentHint is True

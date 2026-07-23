@@ -17,6 +17,8 @@ custom connector 後，Claude 手機／網頁與具 full-MCP 權限的 ChatGPT w
 - get_graph_context   — 公司子圖 / 產業全圖的 LLM-ready Markdown 摘要
 - run_read_query      — 唯讀 Cypher（探索用）
 - get_financial_checklist — Engine C 五項清單、原始覆蓋數與即時 policy view
+- get_decision_brief  — 今日 Engine D 決策摘要（redacted DTO；Decision Store
+                        永不進 git，這是遠端看決策佇列的唯一唯讀視窗）
 - get_extraction_rules — 遠端抽取與 Research Action 規則書
 - get_source_trace_manual — 收到未驗證線索時端出完整追源路由與分級處置手冊
 - load_extraction     — 載入一份「先通過 schema 驗證」的抽取 JSON（L8 人工核准
@@ -80,6 +82,7 @@ from mcp_server.intake import (
 )
 from mcp_server import research_actions
 from mcp_server.engine_c_tools import get_financial_checklist_core
+from mcp_server.decision_tools import get_decision_brief_core
 
 # ── 設定 ───────────────────────────────────────────────────────────────────────
 
@@ -229,6 +232,29 @@ def get_financial_checklist(ticker: str) -> str:
 
     return json.dumps(
         get_financial_checklist_core(ticker),
+        ensure_ascii=False,
+        default=str,
+        indent=2,
+    )
+
+
+@mcp.tool(annotations=READ_ONLY_ANNOTATIONS)
+def get_decision_brief() -> str:
+    """今日 Engine D 決策摘要（純讀，遠端唯一的決策佇列視窗）。
+
+    回傳 `decision_lab today` 的 redacted public DTO：每筆需要動作的
+    cohort／decision 附 `NO ACTION / REVIEW / TRADE / HEDGE`、reason、
+    supported range、blockers 與 next review。純讀——不 freeze context、
+    不建 decision、不寫任何 authority、不下單。
+
+    Decision Store 是本機 private runtime，永不進 git；本工具是手機／雲端
+    看今日決策的唯一管道。runtime 未就緒時回明確 `unavailable`，不洩私有
+    路徑、也不假裝有資料。record-choice／record-fill 等寫入永遠只在本機
+    以明確輸入執行，不經此遠端面。
+    """
+
+    return json.dumps(
+        get_decision_brief_core(),
         ensure_ascii=False,
         default=str,
         indent=2,

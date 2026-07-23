@@ -110,10 +110,11 @@ revised: 2026-07-22 (push 前提定案後修訂：git push 為狀態同步機制
 - **驗證：** 新負向測試（AVGO，真實 registry 內仍無 metadata）＋CLI 對 LITE 端到端皆 `completed_with_blockers`／REVIEW／不 crash。U2 前 CLI 回 INVALID_REQUEST。73 相關測試通過。
 - **Dependencies:** 無。
 
-### U3 — MCP gateway `get_decision_brief`（R8–R9）
+### U3 — MCP gateway `get_decision_brief`（R8–R9）（✅ 已完成 2026-07-23）
 
-- **Files:** modify `mcp_server/graph_mcp.py`；modify `docs/remote-access-architecture.md`；add/extend gateway 測試。
-- **Approach:** 呼叫 Engine D 既有 brief/today 純讀入口取 DTO，READ_ONLY annotation，pass-through 不重組。負向測試：輸出不含 private path／holdings rows／credentials（沿用既有 redaction 斷言）。
+- **Files:** add `mcp_server/decision_tools.py`（core，可注入 store/provider factory）；modify `mcp_server/graph_mcp.py`（+`get_decision_brief` READ_ONLY tool、docstring 9→10）；modify `docs/remote-access-architecture.md`（工具數、表列、read tools 6→7、遠端可讀範圍）；add `tests/test_decision_brief_mcp.py`（5 tests）。
+- **Approach:** `get_decision_brief_core` 呼叫既有 `build_today_brief` 取 redacted public DTO、pass-through 不重組（KTD3）。**安全強化：** Decision Store 路徑私有，開 store／產 brief 的 exception 可能夾帶該路徑，故錯誤只回穩定 code＋exception 型別名、**絕不回 str(exc)**（比 engine_c_tools 更嚴）；最終 DTO 再過一次 `assert_safe_payload`。
+- **驗證：** 5 tests（pass-through 九欄、store unavailable 不洩路徑、build 失敗仍關 store 且安全、provider 壞掉不 crash、wrapper 序列化）＋真實本機 store smoke-test（回 REVIEW／2 items／九欄／無路徑洩漏）。
 - **Dependencies:** 無新依賴（既有 Engine D）。
 
 ### U4 — `/daily-brief` skill 與 session digest（R5–R7、R10、R13）
