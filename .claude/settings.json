@@ -12,6 +12,11 @@
             "type": "command",
             "command": "python crons/weekly_scan_digest.py 2>/dev/null || true",
             "statusMessage": "Checking pending weekly-scan PRs..."
+          },
+          {
+            "type": "command",
+            "command": "python crons/pending_leads_digest.py 2>/dev/null || true",
+            "statusMessage": "Checking pending leads..."
           }
         ]
       }

@@ -117,7 +117,12 @@ revised: 2026-07-22 (push 前提定案後修訂：git push 為狀態同步機制
 - **驗證：** 5 tests（pass-through 九欄、store unavailable 不洩路徑、build 失敗仍關 store 且安全、provider 壞掉不 crash、wrapper 序列化）＋真實本機 store smoke-test（回 REVIEW／2 items／九欄／無路徑洩漏）。
 - **Dependencies:** 無新依賴（既有 Engine D）。
 
-### U4 — `/daily-brief` skill 與 session digest（R5–R7、R10、R13）
+### U4 — `/daily-brief` skill 與 session digest（R5–R7、R10、R13）（✅ 已完成 2026-07-23）
+
+- **交付：** canonical `skills/daily-brief/SKILL.md`（四佇列 action-first brief、封閉動詞 dispatch、Form 4／舊 filing 摺疊、只在本機執行、雲端用唯讀 `get_decision_brief`、收尾 commit＋push）＋生成 `.agents`／`.claude` adapters；`engine_b/cli.py`（list／triage／advance／counts，給 skill deterministic 持久化路徑，不讓 agent 手寫 JSON）；`crons/pending_leads_digest.py`（SessionStart hook，雙通道、0 則靜默）掛進 `.claude/settings.json`。
+- **測試：** 11 tests（CLI round-trip／非法轉移不持久化／list filter／ref；digest 靜默與雙通道；skill 契約：封閉動詞、operational commands、不硬編政策、閘門與人工邊界明文）。sync check clean。
+- **Dependencies:** U1（leads）、U2（research 動詞打 evaluate-signal）。原文以下為原始規格：
+
 
 - **Files:** add `skills/daily-brief/SKILL.md`（canonical）；regenerate `.agents/skills/`、`.claude/skills/`（`python scripts/sync_agent_skills.py`）；session-start digest 擴充（實作時查現行 hook 設定，最小改動）；modify `tests/test_skill_decision_contract.py` 或新增 parity 測試；modify `AGENTS.md`（push 慣例）。
 - **Approach:** skill 定義：inline 跑 `python crons/harvest_leads.py` → 對 pending 新 leads 依 signal-triage 判準 triage 並寫回 → 跑 `python -m decision_lab today --format markdown` → 讀 `thesis/lifecycle.json` 列到期項（R5d）→ 組四佇列 brief（繁中、action-first、動詞說明在尾）→ 動詞 dispatch 表（`research <n>` → source-trace＋lead-intake；`apply <ra_id>` → 既有 apply＋`scripts/commit_pending_intake.py`；`park` → leads.py 狀態轉移）→ 收尾 commit＋push（含 `git ls-files library/private` sanity check）。skill 不含政策數值、不算 sizing。**明文注意事項：decision_lab 命令只在本機執行**——雲端 session 的 clone 沒有 private Decision Store，跑了會開出一個用完即棄的空 store（不污染真 store，但產出無效且造成困惑）。digest 擴充沿用 553755b 的雙通道模式（見 R13）。
