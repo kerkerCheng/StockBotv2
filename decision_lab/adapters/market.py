@@ -59,7 +59,11 @@ def normalize_market_snapshot(
     evaluation = _time(evaluation_at)
     if as_of is None or fetched_at is None or evaluation is None:
         blockers.append("market_timestamp_invalid")
-    elif as_of > evaluation or fetched_at > evaluation:
+    elif as_of > max(evaluation, fetched_at):
+        # 只有「觀測時間」比 max(operation as-of, 抓取時刻) 還晚才算 future data。
+        # fetched_at 幾乎必略晚於 evaluation（先設 as-of 再 fetch 的延遲），不該
+        # 因此判 future；as_of 既已被我們抓到，晚於 evaluation、不晚於 fetched_at
+        # 也是正常（當日資料）。genuinely future（隔日 as_of）仍會被擋。
         blockers.append("market_timestamp_future")
     if not payload.get("source"):
         blockers.append("market_source_missing")
@@ -101,7 +105,9 @@ def normalize_fx_snapshot(
     evaluation = _time(evaluation_at)
     if as_of is None or fetched_at is None or evaluation is None:
         blockers.append("fx_timestamp_invalid")
-    elif as_of > evaluation or fetched_at > evaluation:
+    elif as_of > max(evaluation, fetched_at):
+        # 同 market：fetch 延遲不算 future，只有 observation 晚於 max(eval, fetched)
+        # 才是真正的未來資料（見 normalize_market_snapshot 說明）。
         blockers.append("fx_timestamp_future")
     if not payload.get("source"):
         blockers.append("fx_source_missing")

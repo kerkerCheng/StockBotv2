@@ -73,6 +73,12 @@ def build_tradeability_snapshot(
     latest_time, latest_close, _ = parsed_rows[-1]
     trailing = parsed_rows[-20:]
     adv20 = sum(row[2] for row in trailing) / len(trailing)
+    # yfinance 日線把當日 forming bar 標成交易所午夜；換算 UTC 在清晨時段可能略
+    # 超前抓取時刻。觀測不可能晚於我們抓到它的時間——夾到 fetched_at，避免下游
+    # 誤判 market_timestamp_future。
+    fetched_time = _timestamp(fetched_at)
+    if fetched_time is not None and latest_time > fetched_time:
+        latest_time = fetched_time
     return {
         "status": "observed",
         "ticker": ticker.strip().upper(),
@@ -148,6 +154,11 @@ def build_fx_snapshot(
         return {"status": "missing", "pair": pair, "blockers": ["fx_history_missing"]}
     observations.sort(key=lambda item: item[0])
     as_of, rate = observations[-1]
+    # 同 tradeability：夾 as_of 到不超過 fetched_at，避免 forming-bar 午夜時戳
+    # 在清晨時段被誤判 future。
+    fetched_time = _timestamp(fetched_at)
+    if fetched_time is not None and as_of > fetched_time:
+        as_of = fetched_time
     return {
         "status": "observed",
         "pair": pair,
