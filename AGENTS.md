@@ -122,7 +122,9 @@ fetchers/edgar.py ──────↑                        engine_c/etl_yfin
 **Cron 追蹤方案（待實作，已定案方向）：**
 - **RSS 路線（免費，優先）：** SubStack 有 RSS feed（`https://aleabitoreddit.substack.com/feed`）；cron 定期抓新文章，存成 pending leads 清單，每次 session 開頭提示「有 N 條待判斷」。
   - 讀取注意（2026-07-21 實測）：feed 本身正常（HTTP 200、合法 RSS XML），但 **channel 標題是 "Serenity"、不是帳號名**——看到 "Serenity" 就是這個 feed，別當成別的來源。Substack 首頁需 JavaScript、不能直接爬。**讀取器解析失敗 ≠ 無新文**：失敗時必須 fallback 到 `site:aleabitoreddit.substack.com` web search，並在報告註明用了 fallback。
-- **X API 路線（$100/mo）：** 可抓短推文，但 SubStack 已含主要深度文章，RSS 對 aleabitoreddit 夠用。
+- **⚠ 上述 RSS 路線的前提已被推翻（2026-07-25 查證）：** Substack feed 至今**只有 1 篇公開文**（2026-05-19 的 Sivers CPO Laser），`site:` 搜尋也只找到首頁＋同一篇。但本人**在 X 上極度活躍**（[@aleabitoreddit](https://x.com/aleabitoreddit)，顯示名 Serenity，10 萬+ 追蹤、2026-06 一度為全 X 訂閱數第一）。**結論：RSS 掃的是錯的表面——他的產出在 X，不在 Substack。** 目前 harvest 覆蓋實質上等於「只有 EDGAR」。
+- **X 抓取的現況（2026-07-25 查證）：** **Nitter 已死**（X 關閉 guest account，專案終止），公開實例不可靠。現存自架方案是 **RSSHub**（可自架、有 X 路由），但 X 路由需登入 cookie、易被限流，維護成本高。可行選項依成本排序：(a) 使用者看到就手動貼給 chat（零成本，Fast Path，現在就能用）；(b) 自架 RSSHub（免費但脆弱，需 cookie 與維護）；(c) X API Basic 約 $100/mo（可靠，抓特定 handle 而非整條 timeline）。
+- **來源品質警語：** 該帳號公開宣稱 2026 報酬率 4,502%、推薦標的漲 100–1,000%。這類極端績效宣稱與 L5（單一 lens：偏多頭小市值瓶頸獵手）一致——當**線索來源**用，不當證據；tier 上限見下。
 - **入庫邊界：** aleabitoreddit 的內容最高只能是 `evidence_tier: 3`，需客戶端文件升級 L8 才能用於 Lane Memo。
 
 **待做：** 建 `crons/` 目錄下的 RSS 抓取腳本 + `pending_leads.json` 格式定義。
