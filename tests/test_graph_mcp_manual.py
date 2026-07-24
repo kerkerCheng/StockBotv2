@@ -39,7 +39,7 @@ def test_extraction_rules_include_remote_intake_and_conflict_protocol() -> None:
     assert "scripts/commit_pending_intake.py" in content
 
 
-def test_remote_tool_surface_has_ten_tools_and_no_git_finalize() -> None:
+def test_remote_tool_surface_has_twelve_tools_and_no_git_finalize() -> None:
     tools = mcp._tool_manager._tools
 
     assert set(tools) == {
@@ -47,6 +47,8 @@ def test_remote_tool_surface_has_ten_tools_and_no_git_finalize() -> None:
         "run_read_query",
         "get_financial_checklist",
         "get_decision_brief",
+        "get_pending_leads",
+        "record_lead_decision",
         "get_extraction_rules",
         "get_source_trace_manual",
         "load_extraction",
@@ -54,8 +56,12 @@ def test_remote_tool_surface_has_ten_tools_and_no_git_finalize() -> None:
         "get_research_action_status",
         "apply_research_action",
     }
-    # 新增的決策 brief 工具必須是唯讀（不 freeze／不建 decision／不下單）。
+    # 決策 brief 與 leads 佇列是唯讀；record_lead_decision 是 additive（寫 leads
+    # metadata + 窄 pathset commit，但不入圖、不 destructive）。
     assert tools["get_decision_brief"].annotations.readOnlyHint is True
+    assert tools["get_pending_leads"].annotations.readOnlyHint is True
+    assert tools["record_lead_decision"].annotations.readOnlyHint is False
+    assert tools["record_lead_decision"].annotations.destructiveHint is False
     assert tools["get_research_action_status"].annotations.readOnlyHint is True
     assert tools["prepare_research_action"].annotations.idempotentHint is False
     assert tools["apply_research_action"].annotations.idempotentHint is True

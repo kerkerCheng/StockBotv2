@@ -19,6 +19,9 @@ custom connector 後，Claude 手機／網頁與具 full-MCP 權限的 ChatGPT w
 - get_financial_checklist — Engine C 五項清單、原始覆蓋數與即時 policy view
 - get_decision_brief  — 今日 Engine D 決策摘要（redacted DTO；Decision Store
                         永不進 git，這是遠端看決策佇列的唯一唯讀視窗）
+- get_pending_leads   — 今日 pending leads 佇列（priority 排序，唯讀）
+- record_lead_decision — triage/advance 一則 lead；寫後窄 pathset commit+push
+                        leads.json（只動注意力 metadata，永不入圖）
 - get_extraction_rules — 遠端抽取與 Research Action 規則書
 - get_source_trace_manual — 收到未驗證線索時端出完整追源路由與分級處置手冊
 - load_extraction     — 載入一份「先通過 schema 驗證」的抽取 JSON（L8 人工核准
@@ -83,6 +86,7 @@ from mcp_server.intake import (
 from mcp_server import research_actions
 from mcp_server.engine_c_tools import get_financial_checklist_core
 from mcp_server.decision_tools import get_decision_brief_core
+from mcp_server.leads_tools import get_pending_leads_core, record_lead_decision_core
 
 # ── 設定 ───────────────────────────────────────────────────────────────────────
 
@@ -258,6 +262,58 @@ def get_decision_brief() -> str:
         ensure_ascii=False,
         default=str,
         indent=2,
+    )
+
+
+@mcp.tool(annotations=READ_ONLY_ANNOTATIONS)
+def get_pending_leads(tracked_tickers: str = "", limit: int = 50) -> str:
+    """今日 pending leads 佇列（priority 排序，唯讀）。
+
+    回 priority 分數排序的 leads 摘要、狀態計數與最近 harvest_log。tracked_tickers
+    （逗號分隔）用來算 thesis 影響度（是否關聯已追蹤/已入 probe 的公司）。
+    leads 狀態只是注意力 metadata，永不影響 evidence tier、decision 或圖。
+    """
+
+    return json.dumps(
+        get_pending_leads_core(tracked_tickers=tracked_tickers, limit=limit),
+        ensure_ascii=False, default=str, indent=2,
+    )
+
+
+@mcp.tool(annotations=ADDITIVE_ANNOTATIONS)
+def record_lead_decision(
+    lead_id: str,
+    op: str,
+    go: bool = True,
+    tier: int = 4,
+    reason: str = "",
+    contradiction: bool = False,
+    novelty: bool = False,
+    independent_source: bool = False,
+    to_status: str = "",
+    ref: str = "",
+) -> str:
+    """記錄一則 lead 的 triage／advance 決定，寫後由本機窄 pathset commit+push。
+
+    op="triage"（用 go／tier／reason／三個 priority flag）｜op="advance"（用
+    to_status／ref，如 park、researching、applied）。寫入後本機 MCP server 把
+    **只有** `library/leads/pending_leads.json` commit+push，cloud 每天讀到最新。
+
+    **邊界：** 只動注意力 metadata——不入圖、不改 evidence tier、不建 decision。
+    圖 admission 走 apply_research_action；此工具永不 commit 圖／碼／extraction。
+    """
+
+    flags = {
+        "contradiction": contradiction,
+        "novelty": novelty,
+        "independent_source": independent_source,
+    }
+    return json.dumps(
+        record_lead_decision_core(
+            lead_id=lead_id, op=op, go=go, tier=tier, reason=reason,
+            priority_flags=flags, to_status=to_status, ref=ref,
+        ),
+        ensure_ascii=False, default=str, indent=2,
     )
 
 
