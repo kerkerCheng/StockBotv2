@@ -10,22 +10,22 @@
 ## 定位（先讀這段）
 
 本 routine 是**審查與發現**，不是研究。它做三件事：
-1. **Topic discovery**——掃訊號、聚類成 topic、排序給使用者選；**絕不自行追源或抽取**。
-   被選中的 topic 由使用者在本機 session 說「research topic N」才啟動完整
-   lead-intake / source-trace 流程。
-2. **Thesis 生命週期的正式狀態更新（L7）**——讀 `thesis/lifecycle.json`，只對到期的 thesis 跑
-   disproof 檢查（到期制：active 每 90 天、watch 每 30 天、review_required 每週必列），
-   並在 PR 內更新 `lifecycle.json`。
-3. **系統健康審查**——跑 `query/health_audit.py` 的 Cypher 常數 + repo 檔案檢查，
+1. **Topic discovery（發現未知）**——掃訊號、聚類成 topic、排序給使用者選；**絕不自行追源或抽取**。
+   這是 daily 做不到的：daily 只處理**設定好的來源**（RSS/EDGAR watch），weekly 掃你**還沒在 watch
+   清單裡**的新公司/新題材。被選中的 topic 由使用者本機說「research topic N」才啟動完整流程。
+2. **系統健康審查**——跑 `query/health_audit.py` 的 Cypher 常數 + repo 檔案檢查，
    回報圖譜／memo／管道的紅黃綠狀態。
+3. **唯讀 lifecycle 到期提醒（backstop）**——讀 `thesis/lifecycle.json` 比對到期（next_check<=今天 或
+   review_required），在報告列出提醒。**只讀不寫**：正式的 disproof 評估與 `last_checked`／`next_check`／
+   `status` 更新需人工判斷（retired/revised 只能使用者明示），由使用者**本機手動**複查更新——weekly 與
+   daily 都**不寫** lifecycle.json（plan v1.1 R17/R18）。
 
-> **與 daily routine 的分工（2026-07-23）：** 每日 harvest／triage、今日決策佇列
-> （MCP `get_decision_brief`）、等 apply 的 Research Actions 與**到期 thesis 的即時
-> 唯讀 surface** 已移交 `crons/daily_brief_prompt.md`（每日 06:30，Issue-based、不寫
-> state）。Weekly 保留的是 **topic discovery 深度聚類、系統健康審查、Stage 0 legacy PR
-> gate，以及 thesis lifecycle 的正式狀態更新（PR 寫 `lifecycle.json`）**——daily 只讓
-> 到期 thesis 提早被看見，正式的 `last_checked`／`next_check`／`status` 仍由本 weekly PR
-> 或使用者本機寫入。
+> **與 daily routine 的分工（v1.1，2026-07-24）：** 每日 harvest／triage／pq1 drain／今日決策佇列
+> （MCP `get_decision_brief`）／等 apply 的 RA／到期 thesis 唯讀 surface 已移交
+> `crons/daily_brief_prompt.md`（每日 06:30，**輸出到 Claude app、無 GitHub UI、批次語法核准**）。
+> Weekly＝**發現未知（topic discovery）＋系統健康審查＋Stage 0 legacy PR gate＋唯讀 lifecycle 到期
+> 提醒**。lifecycle 正式狀態更新**不再由 weekly PR 寫入**——改由 SessionStart hook＋本 weekly 雙重
+> 提醒到期，使用者本機手動複查更新（判斷留人）。
 
 ## 執行流程
 
@@ -91,28 +91,18 @@
 由使用者在本機 session 點名（「research topic N」）才跑完整流程。Routine 一律不呼叫
 `get_extraction_rules`、不產 intermediate JSON 草稿。
 
-### Stage 4 — Thesis 到期核查（正式狀態更新；到期制）
+### Stage 4 — Thesis 到期提醒（唯讀 backstop；不寫 lifecycle.json）
 
-> daily routine 已每日**唯讀 surface** 到期 thesis 供即時可見；本 stage 是**正式狀態更新**
-> 的權威寫入端（PR 改 `lifecycle.json`）。兩者不衝突：daily 讓你早點看到，weekly 落狀態。
+> v1.1（2026-07-24）：本 stage **只讀不寫**。SessionStart hook（`crons/thesis_freshness_check.py`）
+> 已在使用者開任何 session 時提示 lifecycle 到期；本 weekly stage 是**backstop**——萬一某週沒開
+> session，週報也提醒一次。**lifecycle 的正式狀態更新（disproof 評估、`last_checked`／`next_check`／
+> `status`、retired/revised）需人工判斷，由使用者本機手動做——weekly 不再寫 lifecycle.json。**
 
-1. 讀 `thesis/lifecycle.json`。**只對到期的 thesis**（`next_check` <= 今天，或
-   `status = review_required`）執行核查；未到期的在報告列一行下次核查日即可
-2. 對每條到期 thesis：
-   - 讀 memo 裡的 `disproof_condition`，用 web search 查過去一個核查週期內有無觸發跡象
-   - 依下表分級（財務面本機才能查，在報告註明「財務指標待本機
-     `python engine_c/checklist.py <TICKER>` 補查」）：
-
-| 情況 | 狀態 | 行動 |
-|------|------|------|
-| disproof_condition 無觸發跡象 | `active` | 記錄「已核查 <日期>，正常」，next_check += 90 天 |
-| 有 leading indicator 朝 disproof 方向移動 | `watch` | check_interval_days 降為 30，next_check += 30 天 |
-| disproof_condition 已明確觸發 | `review_required` | **PR 開頭標 ⛔**，48h 內必須人工決策 |
-| 使用者已確認 thesis 失效 | `retired` | 記錄推翻原因，建議出場 |
-
-3. 核查後**在週報 PR 分支裡更新 `thesis/lifecycle.json`**（`last_checked` /
-   `next_check` / `status` / `note`）；merge 週報 = 接受狀態更新。`retired` / `revised`
-   的轉換必須由使用者明示，routine 只能建議
+1. 讀 `thesis/lifecycle.json`。列出到期的 thesis（`next_check` <= 今天，或 `status = review_required`）；
+   未到期的列一行下次核查日即可
+2. 對每條到期 thesis 可做一次**輕量** disproof web search，把發現寫進報告（供使用者本機複查時參考）；
+   `review_required` 在報告開頭標 ⛔
+3. **不修改 `thesis/lifecycle.json`**——只在報告提醒「以下 thesis 到期，請本機手動複查更新」。
 
 **L7 鐵律：** 一條 thesis 有 `disproof_condition` 但沒有「核查頻率」和「觸發後 48h
 動作」= 沒裝的火警。發現 memo 缺這兩個欄位時在健康審查段標黃。

@@ -56,13 +56,51 @@ def check() -> list[tuple[str, int]]:
     return sorted(stale, key=lambda x: -x[1])
 
 
+LIFECYCLE = ROOT / "thesis" / "lifecycle.json"
+
+
+def lifecycle_due() -> list[tuple[str, str]]:
+    """讀 lifecycle.json，回 [(thesis_id, 原因)]——到期（next_check<=今天）或
+    review_required。這是 lifecycle 的權威到期訊號（memo 檔日期只是次要 fallback）。
+
+    lifecycle 的正式狀態更新（disproof 評估、retired/revised）需人工判斷，本 hook
+    只 surface 到期供你本機手動複查（plan R17）；不寫入。
+    """
+    try:
+        data = json.loads(LIFECYCLE.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return []
+    today = date.today()
+    due: list[tuple[str, str]] = []
+    for tid, entry in (data.items() if isinstance(data, dict) else []):
+        if not isinstance(entry, dict):
+            continue
+        if entry.get("status") == "review_required":
+            due.append((tid, "review_required"))
+            continue
+        nc = entry.get("next_check")
+        try:
+            if nc and date.fromisoformat(str(nc)) <= today:
+                due.append((tid, f"到期 {nc}"))
+        except ValueError:
+            continue
+    return due
+
+
 def main() -> int:
     stale = check()
-    if not stale:
+    due = lifecycle_due()
+    if not stale and not due:
         return 0  # 都新鮮，安靜過去，不輸出任何東西
 
-    parts = ", ".join(f"{company} {days}天" for company, days in stale)
-    msg = f"📋 thesis-monitor: {len(stale)} 份 thesis 已超過 {STALE_DAYS} 天未核查（{parts}）— 要現在核查嗎？"
+    segments = []
+    if due:
+        parts = ", ".join(f"{tid}（{why}）" for tid, why in due)
+        segments.append(f"⛔ lifecycle 到期複查：{parts}")
+    if stale:
+        parts = ", ".join(f"{company} {days}天" for company, days in stale)
+        segments.append(f"📋 memo 已超過 {STALE_DAYS} 天未核查：{parts}")
+    msg = "thesis-monitor: " + "；".join(segments) + " — 要現在複查嗎？"
     # 雙通道：systemMessage 只給終端 UI；additionalContext 進 agent context，
     # 讓 agent 在任何介面（含手機 App 遙控、cloud session）都能主動轉述。
     print(json.dumps({

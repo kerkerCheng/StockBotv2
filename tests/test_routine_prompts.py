@@ -1,4 +1,4 @@
-"""Daily／weekly cloud routine prompt 的契約與分工不漂移。"""
+"""Daily／weekly cloud routine prompt 的 v1.1 契約與分工不漂移。"""
 from __future__ import annotations
 
 from pathlib import Path
@@ -13,6 +13,8 @@ def test_daily_prompt_references_mcp_and_clone_sources() -> None:
     text = DAILY.read_text(encoding="utf-8")
     for token in (
         "get_decision_brief",
+        "get_pending_leads",
+        "record_lead_decision",
         "get_research_action_status",
         "harvest_config.json",
         "pending_leads.json",
@@ -21,30 +23,29 @@ def test_daily_prompt_references_mcp_and_clone_sources() -> None:
         assert token in text
 
 
-def test_daily_prompt_is_cloud_read_only_with_heartbeat_and_verbs() -> None:
+def test_daily_prompt_is_cloud_read_only_with_heartbeat_and_batch() -> None:
     text = DAILY.read_text(encoding="utf-8")
-    # cloud 只讀不寫（不回寫 leads／lifecycle、不 commit／push）。
     assert "只讀不寫" in text
-    assert "不 commit" in text and "push" in text
-    # 日期心跳＋carry-over。
-    assert "Daily Brief <YYYY-MM-DD>" in text
-    assert "Carry-over" in text
+    assert "不使用 GitHub" in text  # v1.1：無 GitHub UI
+    assert "Claude app" in text
     assert "心跳" in text
-    # 封閉動詞 legend。
-    for verb in ("research", "apply", "park", "skip"):
-        assert verb in text
+    # 批次語法核准
+    assert "go" in text and "drop" in text and "pending" in text
+    assert "pq1 drain" in text  # 心跳後 best-effort drain
 
 
-def test_daily_prompt_defers_state_writes_to_local() -> None:
+def test_daily_prompt_defers_writes_to_local_and_leads_via_mcp() -> None:
     text = DAILY.read_text(encoding="utf-8")
-    # 決策寫入永遠只在本機；lifecycle 正式更新不在 daily。
+    # 入圖/live 只在本機；leads 狀態只經 MCP record_lead_decision
     assert "record-choice" in text or "record-fill" in text
     assert "不改" in text and "lifecycle.json" in text
+    assert "record_lead_decision" in text
 
 
-def test_weekly_prompt_points_to_daily_and_keeps_formal_lifecycle_update() -> None:
+def test_weekly_points_to_daily_and_no_longer_writes_lifecycle() -> None:
     text = WEEKLY.read_text(encoding="utf-8")
-    # weekly 引用 daily 分工，且保留 lifecycle 的正式狀態更新端。
     assert "crons/daily_brief_prompt.md" in text
-    assert "正式狀態更新" in text
-    assert "lifecycle.json" in text
+    # v1.1：weekly 不再寫 lifecycle（唯讀提醒）
+    assert "不寫" in text and "lifecycle.json" in text
+    assert "發現未知" in text  # weekly 保留 horizon discovery
+    assert "唯讀" in text

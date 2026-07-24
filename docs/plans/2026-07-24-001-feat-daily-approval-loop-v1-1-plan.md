@@ -3,7 +3,8 @@ title: Daily Approval Loop v1.1 — 優先研究佇列、閉環回饋與對話�
 type: feat
 date: 2026-07-24
 topic: daily-approval-loop-v1-1
-status: active
+status: completed
+completed: 2026-07-24
 artifact_readiness: implementation-ready
 product_contract_source: user-directed
 planning_mode: direct
@@ -173,13 +174,15 @@ supersedes_interface: 2026-07-22-002（沿用其 U1–U5 產物，改寫介面�
 
 ## Definition of Done
 
-- [ ] priority 排序 + 可續跑 drain（中斷重跑不重複 prepared）。
-- [ ] MCP `get_pending_leads`/`record_lead_decision`（12 工具）+ leads.json 窄 pathset commit/push；拒絕任何非 leads 路徑。
-- [ ] 入圖 → 連結 probe → evidence-delta（causal-path 精度）回 brief；入圖後自動建 Shadow；brief 顯示「自追蹤 +X%」。
-- [ ] 對話式批次語法 `go/drop/pending` type-aware dispatch；brief 穩定編號、去顏色、Form4 摺疊。
-- [ ] daily 先心跳後 drain；weekly 瘦身（健康 + 發現未知 + 唯讀 lifecycle 提醒、不寫 lifecycle）；hook 讀 lifecycle 到期。
-- [ ] 無 GitHub UI；cloud → Claude app → chat 批次核准；push 照常（MCP/本機）。
-- [ ] AGENTS/README/remote-access 文件同步；sync clean；full suite 與 baseline 比對歸因；邏輯 commits，master 已 push。
+- [x] priority 排序 + 可續跑 drain（中斷重跑不重複 prepared）。
+- [x] MCP `get_pending_leads`/`record_lead_decision`（12 工具）+ leads.json 窄 pathset commit/push；拒絕任何非 leads 路徑（真實 temp git repo 測試）。
+- [x] 入圖 → 連結 probe（既有 refs）→ evidence-delta（causal-path 精度）回 brief；`ensure_shadow_for_company` 自動建 Shadow；brief 顯示「自追蹤 +X%」。
+- [x] 對話式批次語法 `go/drop/pending` type-aware dispatch（`engine_b/batch.py`）；brief 穩定編號、去顏色、Form4 摺疊（skill）。
+- [x] daily 先心跳後 drain；weekly 瘦身（健康 + 發現未知 + 唯讀 lifecycle 提醒、不寫 lifecycle）；hook 讀 lifecycle 到期。
+- [x] 無 GitHub UI；cloud → Claude app → chat 批次核准；push 照常（MCP/本機）。
+- [x] AGENTS/README/remote-access 文件同步；sync clean；full suite 與 baseline 比對歸因；邏輯 commits，master 已 push。
+
+> **完成狀態：** U1–U5 程式碼、skill、prompt、測試、文件全部交付並 push。剩 rollout（使用者在 claude.ai 建 daily routine 並 bake 數天）是 claude.ai 端操作，非程式工作。
 
 ## 上線 checklist（人工）
 
