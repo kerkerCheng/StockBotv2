@@ -73,9 +73,13 @@ The disposition for signals that pass triage but fail primary-source tracing, ap
 The set of claims whose sources all share a single `origin_entity`, derived on demand by graph query — never maintained as a file or ledger. A claim leaves the backlog automatically when a second independent `origin_entity` source is loaded. Finding corroboration is not required in the week a claim enters the graph; the backlog exists so single-origin claims stay visible until upgraded (L8).
 *Avoid:* pending-verification file, corroboration ledger
 
----
+### PQ1（研究佇列 / pq1）
+Daily Approval Loop 研究管線的**昂貴階段**：從 priority 排序的 `triaged_go` leads 取最高分者，跑 source-trace + extraction，產出等核准的 Research Action（prepared）。token 幾乎全花在這裡（web search + 讀文件 + LLM 抽結構化 claim），所以 priority 的作用就是**分配 pq1 的預算**——決定貴的 token 先花在哪幾則。pq1 由 routine/本機/手動貼三種 runner 自動 drain，靠每則 lead 的 status 當 checkpoint 做到可中斷續跑（不必單 session 撐完）。pq1 之後、pq2 之前**不入圖**。權威設計見 `docs/plans/2026-07-24-001-feat-daily-approval-loop-v1-1-plan.md`。
+*Avoid:* research stage（過泛）、auto-ingest
 
-## Remote Access
+### PQ2（入圖核准佇列 / pq2）
+Daily Approval Loop 研究管線的**人工閘門**：pq1 產出的 prepared Research Action 等使用者核准入圖。這是整條管線唯一保留的人工 gate（pq1 全自動 drain 到此為止）。核准是**對話式批次語法**（`1 3 go 4 drop 5 6 pending`，type-aware），不使用 GitHub UI；核准後 `apply_research_action` 寫圖、入圖後自動建 Shadow 追蹤。一次入圖只確認一次。
+*Avoid:* PR checkbox approval、auto-admission
 
 ### Graph MCP Gateway
 The narrow-tool gateway through which supported Claude surfaces and full-MCP web clients read or write the knowledge graph remotely. It exposes nine fixed capabilities—graph/financial reads, rulebooks, legacy single-document load, and Research Action prepare/status/apply—rather than raw database or shell access. Mobile ad hoc writes are two-phase: prepare validates and freezes the whole action without graph mutation; apply requires its exact server ID + digest behind one native approval. No remotely exposed tool can run Git.
