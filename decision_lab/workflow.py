@@ -508,6 +508,43 @@ def evaluate_signal(
     )
 
 
+def ensure_shadow_for_company(
+    store: DecisionStore,
+    provider: WorkflowDataProvider,
+    *,
+    company_id: str,
+    ticker: str | None = None,
+    as_of: str | None = None,
+) -> dict[str, Any]:
+    """入圖後自動追蹤（plan R13）：若該公司尚無 active cohort，用 research intent
+    建立零資本 Shadow Observation；已有 probe 則回既有、改走 evidence-delta。
+
+    這是 composition（workflow 編排），不是 Engine A 呼叫 Engine D——由 dispatch
+    層在 admission 成功後呼叫。research intent 不建 funded paper、不給 live
+    permission，只保存 Signal／Shadow／cohort。
+    """
+    now = as_of or _now()
+    for summary in store.list_operational_cohorts(as_of=now):
+        if summary.get("company_id") == company_id:
+            return {"created": False, "cohort_id": str(summary["cohort_id"])}
+    result = evaluate_signal(
+        store,
+        provider,
+        EvaluationRequest(
+            raw_signal=f"入圖後自動追蹤 {company_id}",
+            ticker_hint=ticker,
+            company_id_hint=company_id,
+            execution_intent="research",
+            as_of=now,
+        ),
+    )
+    return {
+        "created": True,
+        "cohort_id": result["cohort_id"],
+        "decision_id": result["decision_id"],
+    }
+
+
 def _context_delta(
     old_context: Mapping[str, Any],
     new_context: Mapping[str, Any],

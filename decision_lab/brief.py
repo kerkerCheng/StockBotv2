@@ -56,6 +56,11 @@ def _decision_item(
     )
     if current_authority.get("blockers"):
         action = "REVIEW"
+    # 閉環：因果結構有新證據（material）而 probe 目前無其他動作 → 提醒 reassess。
+    evidence_delta = str(current_authority.get("evidence_delta") or "none")
+    material_evidence = evidence_delta == "material"
+    if material_evidence and action == "NO ACTION":
+        action = "REVIEW"
     item = {
         "cohort_id": card.get("cohort_id"),
         "decision_id": card["decision_id"],
@@ -74,16 +79,23 @@ def _decision_item(
         "supported_sizing_range": (card.get("live") or {}).get(
             "supported_range", [0.0, 0.0]
         ),
+        # Shadow-first：自追蹤（凍結決策時＝Shadow inception）到現在的價格變化。
+        "performance_since_tracked": current_authority.get("security_return"),
+        "evidence_delta": evidence_delta,
         "blockers": blockers,
         "next_review_at": lifecycle.get("review_due_at"),
         "user_response_needed": (
             "請修復 current authority blocker 並執行 reassess。"
             if current_authority.get("blockers")
+            else "有觸及 thesis 因果結構的新證據，建議 reassess。"
+            if material_evidence
             else _user_request(card)
         ),
     }
     if current_authority.get("blockers"):
         item["reason"] = "目前 authority snapshot 不完整或失效，需先 REVIEW，不能沿用舊 sizing。"
+    elif material_evidence:
+        item["reason"] = "自上次決策後出現觸及 thesis 因果結構的新證據；建議 reassess 看 sizing/thesis 是否改變。"
     return item
 
 
@@ -96,6 +108,24 @@ def _evidence_refs(evidence: Mapping[str, Any]) -> set[str]:
             value = item
         if isinstance(value, str) and value:
             refs.add(value)
+    for field in ("causal_paths", "counter_paths"):
+        for item in evidence.get(field) or []:
+            if isinstance(item, Mapping):
+                value = item.get("id") or item.get("edge_key")
+            else:
+                value = item
+            if isinstance(value, str) and value:
+                refs.add(value)
+    return refs
+
+
+def _causal_refs(evidence: Mapping[str, Any]) -> set[str]:
+    """只取 thesis 結構 refs（causal/counter path），不含週邊 source。
+
+    閉環精度（plan R12）：新證據標 material 的條件是它觸及 probe 的因果結構，
+    而非只是這家公司多了一條 source。
+    """
+    refs: set[str] = set()
     for field in ("causal_paths", "counter_paths"):
         for item in evidence.get(field) or []:
             if isinstance(item, Mapping):
@@ -153,9 +183,15 @@ def _current_authority_context(
     fx_return = _ratio(
         current_fx.get("rate"), (frozen.get("fx") or {}).get("rate")
     )
-    old_refs = _evidence_refs(frozen.get("evidence") or {})
-    new_refs = _evidence_refs(snapshot.evidence)
-    evidence_delta = "material" if old_refs != new_refs else "none"
+    # 閉環精度（R12）：因果結構變＝material（建議 reassess）；只有週邊 source
+    # 變＝peripheral（記錄但不強制）；都沒變＝none。純價格波動不進 evidence_delta。
+    frozen_evidence = frozen.get("evidence") or {}
+    if _causal_refs(frozen_evidence) != _causal_refs(snapshot.evidence):
+        evidence_delta = "material"
+    elif _evidence_refs(frozen_evidence) != _evidence_refs(snapshot.evidence):
+        evidence_delta = "peripheral"
+    else:
+        evidence_delta = "none"
     change = {
         "security_return": security_return,
         "benchmark_return": None,
@@ -168,6 +204,7 @@ def _current_authority_context(
             "blockers": sorted(set(blockers)),
             "security_return": security_return,
             "fx_return": fx_return,
+            "evidence_delta": evidence_delta,
         },
         change,
     )
