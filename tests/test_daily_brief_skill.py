@@ -12,16 +12,28 @@ def _text() -> str:
     return SKILL.read_text(encoding="utf-8")
 
 
-def test_references_closed_verbs_and_operational_commands() -> None:
+def test_references_batch_verbs_and_operational_commands() -> None:
     text = _text()
-    for verb in ("research", "apply", "park", "skip"):
+    # v1.1 批次語法動詞
+    for verb in ("go", "drop", "pending"):
         assert verb in text
+    assert "parse_batch_reply" in text  # deterministic parser，不自由心證
+    assert "1 3 7 go 4 drop 5 6 pending" in text  # 範例
     for command in (
         "python crons/harvest_leads.py",
         "python -m engine_b.cli",
         "python -m decision_lab today",
+        "drain",  # pq1 priority drain
     ):
         assert command in text
+
+
+def test_references_closed_loop_and_no_github() -> None:
+    text = _text()
+    assert "evidence-delta" in text or "evidence_delta" in text
+    assert "自動建 Shadow" in text
+    assert "GitHub" in text  # 明文說不用 GitHub UI
+    assert "record_lead_decision" in text  # 雲端改 leads 走 MCP
 
 
 def test_does_not_hardcode_probe_policy_numbers() -> None:

@@ -405,6 +405,8 @@ def build_today_brief(
             str(item.get("cohort_id") or ""),
         ),
     )
+    for position, item in enumerate(ranked, 1):
+        item["index"] = position  # 穩定編號，供對話式批次核准引用（plan R5）
     recommended = ranked[0]["recommended_action"] if ranked else "NO ACTION"
     if ranked:
         reason = ranked[0]["reason"]
@@ -451,24 +453,47 @@ def build_today_brief(
     return brief
 
 
+def _pct(value: Any) -> str:
+    if not isinstance(value, (int, float)) or isinstance(value, bool):
+        return "未知"
+    return f"{value * 100:+.1f}%"
+
+
 def render_today_markdown(brief: Mapping[str, Any]) -> str:
-    """由同一 public DTO 產生 Markdown；不接觸 private payload。"""
+    """由同一 public DTO 產生 Markdown；不接觸 private payload。
+
+    每個 item 帶穩定編號 [N] 供對話式批次核准引用（plan R5）；顯示自追蹤變化%
+    與 evidence_delta，不使用顏色維度（plan R15）。
+    """
 
     assert_safe_payload(brief)
     blockers = "、".join(markdown_text(item) for item in brief.get("blockers") or []) or "無"
-    response = "\n".join(
-        f"- {markdown_text(item)}" for item in brief.get("user_response_needed") or []
-    ) or "- 無"
-    return "\n".join(
-        [
-            f"# 今天需要動作嗎？{'是' if brief['action_needed'] else '否'}",
-            "",
-            f"- 建議動作：{markdown_text(brief['recommended_action'])}",
-            f"- 原因：{markdown_text(brief['reason'])}",
-            f"- Blockers：{blockers}",
-            f"- 下一個 review：{markdown_text(brief.get('next_review_at') or '尚未排定')}",
-            "",
-            "## 需要你回答或回報",
-            response,
-        ]
-    )
+    lines = [
+        f"# 今天需要動作嗎？{'是' if brief['action_needed'] else '否'}",
+        "",
+        f"- 建議動作：{markdown_text(brief['recommended_action'])}",
+        f"- 原因：{markdown_text(brief['reason'])}",
+        f"- Blockers：{blockers}",
+        f"- 下一個 review：{markdown_text(brief.get('next_review_at') or '尚未排定')}",
+    ]
+    items = brief.get("items") or []
+    if items:
+        lines += ["", "## 項目（回覆用編號）"]
+        for item in items:
+            idx = item.get("index")
+            company = markdown_text(item.get("company_id") or "")
+            action = markdown_text(item.get("recommended_action") or "")
+            perf = _pct(item.get("performance_since_tracked"))
+            delta = markdown_text(item.get("evidence_delta") or "none")
+            lines.append(f"- [{idx}] {action} — {company}｜自追蹤 {perf}｜證據 {delta}")
+            resp = markdown_text(item.get("user_response_needed") or "")
+            if resp:
+                lines.append(f"      → {resp}")
+    lines += [
+        "",
+        "## 需要你回答或回報",
+        "\n".join(
+            f"- {markdown_text(item)}" for item in brief.get("user_response_needed") or []
+        ) or "- 無",
+    ]
+    return "\n".join(lines)
