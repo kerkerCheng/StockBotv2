@@ -26,10 +26,16 @@
 3. 呼叫 MCP `get_decision_brief` 確認連線；**連不上不卡住**——決策佇列段標「MCP 不可用、今日降級」，
    leads／harvest／lifecycle 照常
 
-### Stage 1 — Harvest（web，零 token）
+### Stage 1 — Harvest（web；雲端受 egress 限制，預設走 WebSearch）
 
-抓 config 內 RSS（解析失敗退回 `site:` web search 並註明）＋ EDGAR watch 新 filing（只記 metadata）；
-與 baseline 去重，只留今日新增。
+> **已知環境限制（2026-07-24 實測）：** Anthropic 雲端沙盒直連 `aleabitoreddit.substack.com` 與
+> `www.sec.gov` 會被 **proxy 403（policy denial）**，`crons/harvest_leads.py` 與 `WebFetch` 在雲端都
+>跑不動。**不要重試直連**（policy denial 重試無用、只燒時間）——直接用 `WebSearch` fallback，並在
+> brief 標明「harvest 走 fallback、覆蓋不完整」。完整覆蓋由使用者本機執行 harvest 補上。
+
+用 `WebSearch` 掃 config 內來源的近期新項（如 `site:aleabitoreddit.substack.com`、watch 清單各
+ticker 的新 filing 公告）；與 baseline 去重，只留今日新增。**不得因覆蓋不完整就假裝窮盡**——
+brief 要明說哪些來源沒查到、本機補跑什麼命令。
 
 ### Stage 2 — Triage（照 signal-triage，寫回經 MCP）
 

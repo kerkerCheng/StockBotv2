@@ -82,7 +82,9 @@ fetchers/edgar.py ──────↑                        engine_c/etl_yfin
 - **引擎B（自動 harvest 未建；ad hoc 手機入口已建）：** X 推文/小道消息 → 線索 → 走 `skills/lead-intake` 閘門 → Research Action → 入庫。自動 X/trending harvest 仍未建。
 - **每週審查（cloud routine，台北 06:00，`crons/weekly_scan_prompt.md`）：** 只做 topic discovery（不追源、不抽取，深挖由使用者本機 session 點名「research topic N」）+ thesis 生命週期**到期制**核查（L7 的流程實作；狀態存 `thesis/lifecycle.json`，active 90 天／watch 30 天）+ 系統健康審查（審查查詢唯一權威 `query/health_audit.py`；Engine C 等本機項目由使用者跑 `python query/health_audit.py --local` 補齊）。原 `crons/thesis_monitor_prompt.md` 季度 cron 已併入此處刪除（CronCreate 7 天過期，跑不起來）。
 - **各類來源的 AI 抽取 instruction：** [`docs/extraction-instructions.md`](docs/extraction-instructions.md)
-- **遠端存取（手機 App / web / cloud routine 讀寫圖與查 Engine C）：** 本機 MCP server（`mcp_server/graph_mcp.py`）+ Cloudflare Tunnel + connector。九工具 surface 沒有 remote Git；完整資料流、安全邊界、Research Action／storage 協定與跨平台限制：[`docs/remote-access-architecture.md`](docs/remote-access-architecture.md)
+- **遠端存取（手機 App / web / cloud routine 讀寫圖與查 Engine C）：** 本機 MCP server（`mcp_server/graph_mcp.py`）+ Cloudflare Tunnel + connector。十二工具 surface，Git 能力僅 leads.json 一個窄例外；完整資料流、安全邊界、Research Action／storage 協定與跨平台限制：[`docs/remote-access-architecture.md`](docs/remote-access-architecture.md)
+  - **⚠ 改完 `mcp_server/` 一定要重啟 MCP server process，否則遠端看到的是舊 tool surface。** 沒有 auto-reload：process 是開機由 `shell:startup` 的 `stockbotv2-graph-services.vbs` 啟動、之後就一直跑舊程式碼。2026-07-24 首次 daily routine 即因此回報「三支新工具不在 tool surface」（程式碼有、跑著的 process 沒有）。重啟：停掉 `graph_mcp` python process 再跑 `.venv\Scripts\python.exe mcp_server\graph_mcp.py`（或雙擊該 `.vbs`）。驗證跑著的版本：對 `http://127.0.0.1:$GRAPH_MCP_PORT/$GRAPH_MCP_TOKEN/mcp` 送 MCP `tools/list` 數工具數，**不要只看原始碼或測試**（那只證明 repo 對）。
+  - **Anthropic 雲端沙盒的 egress 限制（2026-07-24 實測）：** cloud routine 直連 `aleabitoreddit.substack.com` 與 `www.sec.gov` 一律 **proxy 403（policy denial）**，`WebFetch` 同樣被擋——所以 **cloud 端跑不了 `crons/harvest_leads.py`**，只能退回 `WebSearch` fallback（覆蓋不完整、無法保證窮盡 watch 清單）。本機直連正常。harvest 的完整覆蓋只能靠本機執行。
 
 ---
 
