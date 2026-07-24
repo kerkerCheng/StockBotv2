@@ -24,5 +24,6 @@
 | [Decision Lab (2026-07-21)](2026-07-21-001-feat-action-oriented-alpha-decision-lab-plan.md) | Engine D／Action-Oriented Alpha Decision Lab v1 | completed |
 | [Engine D workflow (2026-07-22)](2026-07-22-001-feat-engine-d-operational-workflow-plan.md) | Raw Signal → Action Card／today brief operational workflow | completed |
 | [Daily Approval Loop (2026-07-22)](2026-07-22-002-feat-daily-approval-loop-plan.md) | 每日 harvest／triage／brief／封閉動詞核准迴路（U1–U5） | completed（rollout 待人工建 routine） |
+| [Daily Approval Loop v1.1 (2026-07-24)](2026-07-24-001-feat-daily-approval-loop-v1-1-plan.md) | 優先研究佇列、可續跑 drain、閉環 evidence-delta、對話式批次核准、MCP leads 同步 | **active** |
 
-**目前沒有 active plan。** L9 財務核驗缺口已補齊（COHR customer concentration／backlog）。Daily Approval Loop 程式面完成，剩 rollout 是使用者在 claude.ai 建 daily routine 並觀察數天，非程式工作。
+**當前 active plan：Daily Approval Loop v1.1**（`2026-07-24-001`）——把 v1.0 骨架升級成可持續 drain 的優先研究管線 + 閉環回饋 + 對話式核准（無 GitHub UI）。v1.0 程式面已完成、market timestamp bug 已修。
