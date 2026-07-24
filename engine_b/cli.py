@@ -20,17 +20,25 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from engine_b import leads  # noqa: E402
+from engine_b import priority  # noqa: E402
+
+
+def _tracked(arg: str | None) -> frozenset[str]:
+    return frozenset(t.strip().upper() for t in (arg or "").split(",") if t.strip())
 
 
 def _cmd_list(args: argparse.Namespace) -> int:
     store = leads.load(args.leads)
-    rows = sorted(
-        store["leads"].values(),
-        key=lambda l: (l.get("published_at") or "", l["lead_id"]),
-        reverse=True,
-    )
+    rows = list(store["leads"].values())
     if args.status:
         rows = [l for l in rows if l["status"] == args.status]
+    if args.by_priority:
+        ranked = priority.rank_leads(rows, tracked_tickers=_tracked(args.tracked))
+        rows = [lead for _score, lead in ranked]
+        scores = {lead["lead_id"]: score for score, lead in ranked}
+    else:
+        rows.sort(key=lambda l: (l.get("published_at") or "", l["lead_id"]), reverse=True)
+        scores = {}
     if args.json:
         print(json.dumps(rows, ensure_ascii=False, indent=2))
         return 0
@@ -40,17 +48,53 @@ def _cmd_list(args: argparse.Namespace) -> int:
     for l in rows:
         tri = l.get("triage") or {}
         tag = f" [{tri.get('decision')}·tier{tri.get('tier')}]" if tri else ""
-        print(f"{l['lead_id']}  {l['status']:15}{tag}  {l['source']}")
+        prefix = f"[{scores[l['lead_id']]:5.1f}] " if l["lead_id"] in scores else ""
+        print(f"{prefix}{l['lead_id']}  {l['status']:15}{tag}  {l['source']}")
         print(f"    {l.get('title') or '(無標題)'}  {l.get('url')}")
+    return 0
+
+
+def _cmd_drain(args: argparse.Namespace) -> int:
+    """列出 pq1 接下來該處理的 leads（依 priority），供 agent 逐個 trace+extract。
+
+    pop 的是 triaged_go（新）與 researching（中斷待續）；靠 lead status 當
+    checkpoint，重跑從剩下的接（plan R3/KTD2）。命令本身不做 trace+extract。
+    """
+    store = leads.load(args.leads)
+    candidates = [
+        l for l in store["leads"].values()
+        if l["status"] in ("triaged_go", "researching")
+    ]
+    ranked = priority.rank_leads(candidates, tracked_tickers=_tracked(args.tracked))
+    batch = ranked[: args.limit]
+    if args.json:
+        print(json.dumps(
+            [{"score": s, "lead": l} for s, l in batch],
+            ensure_ascii=False, indent=2,
+        ))
+        return 0
+    if not batch:
+        print("（pq1 佇列已空——無 triaged_go／researching lead）")
+        return 0
+    print(f"pq1 drain：接下來 {len(batch)} 則（依 priority）：")
+    for score, l in batch:
+        print(f"  [{score:5.1f}] {l['lead_id']}  {l['status']:12}  {l['source']}")
+        print(f"           {l.get('title') or '(無標題)'}  {l.get('url')}")
     return 0
 
 
 def _cmd_triage(args: argparse.Namespace) -> int:
     store = leads.load(args.leads)
+    flags = {
+        "contradiction": args.contradiction,
+        "novelty": args.novelty,
+        "independent_source": args.independent,
+    }
     try:
         leads.triage(
             store, args.lead_id,
             go=args.go, tier=args.tier, reason=args.reason,
+            priority_flags=flags,
         )
     except (leads.LeadStateError, ValueError) as exc:
         print(f"triage 失敗：{exc}", file=sys.stderr)
@@ -93,8 +137,17 @@ def build_parser() -> argparse.ArgumentParser:
 
     p_list = sub.add_parser("list", help="列出 leads")
     p_list.add_argument("--status", help="只列某狀態（pending／triaged_go…）")
+    p_list.add_argument("--by-priority", dest="by_priority", action="store_true",
+                        help="依 priority 排序並顯示分數")
+    p_list.add_argument("--tracked", help="逗號分隔的已追蹤 ticker（thesis 影響度）")
     p_list.add_argument("--json", action="store_true")
     p_list.set_defaults(func=_cmd_list)
+
+    p_drain = sub.add_parser("drain", help="列出 pq1 接下來該處理的 leads（依 priority）")
+    p_drain.add_argument("--limit", type=int, default=5)
+    p_drain.add_argument("--tracked", help="逗號分隔的已追蹤 ticker（thesis 影響度）")
+    p_drain.add_argument("--json", action="store_true")
+    p_drain.set_defaults(func=_cmd_drain)
 
     p_tri = sub.add_parser("triage", help="對 pending lead 下 go／no-go")
     p_tri.add_argument("lead_id")
@@ -103,6 +156,9 @@ def build_parser() -> argparse.ArgumentParser:
     grp.add_argument("--no-go", dest="go", action="store_false")
     p_tri.add_argument("--tier", type=int, required=True, help="1–4（來源分級，非 evidence tier）")
     p_tri.add_argument("--reason", required=True)
+    p_tri.add_argument("--contradiction", action="store_true", help="矛盾/反證價值（priority）")
+    p_tri.add_argument("--novelty", action="store_true", help="新穎性（priority）")
+    p_tri.add_argument("--independent", action="store_true", help="新 origin_entity/獨立來源（priority）")
     p_tri.set_defaults(func=_cmd_triage)
 
     p_adv = sub.add_parser("advance", help="一般狀態轉移")

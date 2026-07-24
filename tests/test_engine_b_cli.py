@@ -61,3 +61,47 @@ def test_advance_records_ref(tmp_path) -> None:
 
     store = leads.load(path)
     assert store["leads"][lead_id]["refs"]["research_action_id"] == "ra_abc"
+
+
+def test_triage_stores_priority_flags(tmp_path) -> None:
+    path = tmp_path / "pending_leads.json"
+    lead_id = _seed(path)
+    cli.main(["--leads", str(path), "triage", lead_id, "--go", "--tier", "3",
+              "--reason", "反證", "--contradiction", "--novelty"])
+    tri = leads.load(path)["leads"][lead_id]["triage"]
+    assert tri["priority_flags"]["contradiction"] is True
+    assert tri["priority_flags"]["novelty"] is True
+    assert tri["priority_flags"].get("independent_source", False) is False
+
+
+def test_drain_lists_triaged_go_and_researching_by_priority(tmp_path, capsys) -> None:
+    path = tmp_path / "pending_leads.json"
+    store = leads.empty_store()
+    a, _ = leads.register(store, source="edgar:AAOI", url="https://x.io/a")
+    b, _ = leads.register(store, source="edgar:COHR", url="https://x.io/b")
+    c, _ = leads.register(store, source="edgar:LITE", url="https://x.io/c")
+    leads.triage(store, a, go=True, tier=4, reason="弱")
+    leads.triage(store, b, go=True, tier=1, reason="強", priority_flags={"contradiction": True})
+    leads.triage(store, c, go=False, tier=4, reason="no")  # no-go 不該進 drain
+    leads.save(store, path)
+
+    assert cli.main(["--leads", str(path), "drain", "--json"]) == 0
+    out = json.loads(capsys.readouterr().out.strip())
+    sources = [item["lead"]["source"] for item in out]
+    assert "edgar:LITE" not in sources  # no-go 排除
+    assert sources[0] == "edgar:COHR"  # 最高 priority 在前
+    assert set(sources) == {"edgar:COHR", "edgar:AAOI"}
+
+
+def test_drain_resumes_researching_leads(tmp_path, capsys) -> None:
+    path = tmp_path / "pending_leads.json"
+    store = leads.empty_store()
+    lead_id, _ = leads.register(store, source="edgar:COHR", url="https://x.io/b")
+    leads.triage(store, lead_id, go=True, tier=1, reason="x")
+    leads.advance(store, lead_id, "researching")  # 中斷在 pq1 中途
+    leads.save(store, path)
+
+    cli.main(["--leads", str(path), "drain", "--json"])
+    out = json.loads(capsys.readouterr().out.strip())
+    # researching（中斷待續）仍要被 drain 撿回
+    assert out[0]["lead"]["status"] == "researching"

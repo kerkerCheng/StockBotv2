@@ -182,6 +182,9 @@ def advance(
     return lead
 
 
+_PRIORITY_FLAG_KEYS = ("contradiction", "novelty", "independent_source")
+
+
 def triage(
     store: dict[str, Any],
     lead_id: str,
@@ -189,12 +192,17 @@ def triage(
     go: bool,
     tier: int,
     reason: str,
+    priority_flags: Mapping[str, Any] | None = None,
     decided_at: str | None = None,
 ) -> dict[str, Any]:
     """對 pending lead 下 triage 判斷，轉入 triaged_go／triaged_no_go。
 
     tier 只是 triage 的初步來源分級記錄，**不是** evidence tier，不影響入圖
     強度（plan R2 不變式）；真正 evidence tier 由 source-trace／lead-intake 決定。
+
+    priority_flags（可選）記 signal-triage 五要素中的 boolean 訊號
+    （contradiction／novelty／independent_source），供 priority 計分用；不影響
+    狀態機、不影響 evidence tier。
     """
     if not (1 <= int(tier) <= 4):
         raise ValueError("triage tier 必須是 1–4")
@@ -204,12 +212,18 @@ def triage(
     target = "triaged_go" if go else "triaged_no_go"
     if target not in ALLOWED_TRANSITIONS[lead["status"]]:
         raise LeadStateError(f"只能對 pending lead triage；現況 {lead['status']}")
+    flags = {
+        key: bool((priority_flags or {}).get(key))
+        for key in _PRIORITY_FLAG_KEYS
+        if (priority_flags or {}).get(key)
+    }
     lead["status"] = target
     lead["triage"] = {
         "decision": "go" if go else "no_go",
         "tier": int(tier),
         "reason": reason.strip(),
         "decided_at": decided_at or _now(),
+        "priority_flags": flags,
     }
     return lead
 
