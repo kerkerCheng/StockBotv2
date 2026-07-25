@@ -107,6 +107,126 @@
       "result": "ok",
       "run_at": "2026-07-23T11:56:56.460080+00:00",
       "source": "edgar:GFS"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-25T09:06:50.300717+00:00",
+      "source": "aleabitoreddit_rss"
+    },
+    {
+      "new": 23,
+      "result": "ok",
+      "run_at": "2026-07-25T09:06:50.927022+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-07-25T09:06:52.028461+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-25T09:06:53.002807+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-25T09:06:53.914140+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-25T09:06:54.822251+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-25T09:06:55.788614+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 5,
+      "result": "ok",
+      "run_at": "2026-07-25T09:06:56.758418+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-25T09:06:57.742206+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-07-25T09:06:58.734930+00:00",
+      "source": "edgar:GFS"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-25T09:07:24.848496+00:00",
+      "source": "aleabitoreddit_rss"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-25T09:07:25.057822+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-25T09:07:26.204756+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-25T09:07:26.915558+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-25T09:07:27.789640+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-25T09:07:28.707096+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-25T09:07:29.404648+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-25T09:07:30.132854+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-25T09:07:30.941602+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-25T09:07:31.650706+00:00",
+      "source": "edgar:GFS"
     }
   ],
   "leads": {
@@ -126,6 +246,17 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1633978/000171491026000003/xslF345X06/form4-07172026_120713.xml"
+    },
+    "lead_0105a33e36381612a823b981ec5e7bc6": {
+      "first_seen": "2026-07-25T09:06:50.926910+00:00",
+      "lead_id": "lead_0105a33e36381612a823b981ec5e7bc6",
+      "published_at": "2026-07-20T17:18:38.000Z",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "pending",
+      "title": "$IREN +19.69% after revising ARR target to $4B+ from new AI cloud contracts. Its customer base now includes Microsoft, Nvidia, Perplexity, a",
+      "triage": null,
+      "url": "https://x.com/aleabitoreddit/status/2079254669793316962"
     },
     "lead_072ee0491ea59637933371a069bd0321": {
       "first_seen": "2026-07-22T15:37:23.595703+00:00",
@@ -160,6 +291,17 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026041314/xslF345X06/wk-form4_1780693451.xml"
+    },
+    "lead_09abba7335ec575ec76ca63a92e5663f": {
+      "first_seen": "2026-07-25T09:06:50.926723+00:00",
+      "lead_id": "lead_09abba7335ec575ec76ca63a92e5663f",
+      "published_at": "2026-07-24T00:11:40.000Z",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "pending",
+      "title": "Not exactly for $AAOI (they're working on CPO too, just a little further behind in commercialization). There's a podcast that featured the $",
+      "triage": null,
+      "url": "https://x.com/aleabitoreddit/status/2080445777395298454"
     },
     "lead_0f16352fcbf4bafcfc927a9642d68715": {
       "first_seen": "2026-07-23T11:56:56.460012+00:00",
@@ -280,6 +422,17 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1633978/000186650326000006/xslF345X06/form4-07072026_110711.xml"
     },
+    "lead_1d14c346bf03346253d908e26f2d7406": {
+      "first_seen": "2026-07-25T09:06:50.926944+00:00",
+      "lead_id": "lead_1d14c346bf03346253d908e26f2d7406",
+      "published_at": "2026-07-18T04:39:54.000Z",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "pending",
+      "title": "For anyone watching the 25%+ premium in $SKHY versus SK Hynix's Korean shares: The ADRs and local shares become convertible on July 29. Shou",
+      "triage": null,
+      "url": "https://x.com/aleabitoreddit/status/2078338950150959558"
+    },
     "lead_1fa5e4b88de07ce8b801e2468729c087": {
       "first_seen": "2026-07-22T15:37:21.356645+00:00",
       "lead_id": "lead_1fa5e4b88de07ce8b801e2468729c087",
@@ -384,6 +537,17 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826005221/aaoi_8k.htm"
     },
+    "lead_2ffb199ff20ab64369580b427464efcf": {
+      "first_seen": "2026-07-25T09:06:50.926829+00:00",
+      "lead_id": "lead_2ffb199ff20ab64369580b427464efcf",
+      "published_at": "2026-07-22T15:10:40.000Z",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "pending",
+      "title": "$AMD to invest $5B in Anthropic. Anthropic in turn will sign a 2 GW deal to buy AMD’s latest chips, worth tens of billions of dollars. Looks",
+      "triage": null,
+      "url": "https://x.com/aleabitoreddit/status/2079947242455335379"
+    },
     "lead_330dd99ad380ce1a207e4fb53c046f03": {
       "first_seen": "2026-07-22T15:37:25.644432+00:00",
       "lead_id": "lead_330dd99ad380ce1a207e4fb53c046f03",
@@ -400,6 +564,17 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/928876/000197640826000651/xslF345X06/primary_doc.xml"
+    },
+    "lead_435289261da3b093b9ed384b989c839c": {
+      "first_seen": "2026-07-25T09:06:50.926886+00:00",
+      "lead_id": "lead_435289261da3b093b9ed384b989c839c",
+      "published_at": "2026-07-20T21:38:14.000Z",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "pending",
+      "title": "If you’re curious why $NBIS is up after hours. $NVDA disclosed it owns 9.3% beneficial ownership of Nebius via SEC filings. Not exactly too",
+      "triage": null,
+      "url": "https://x.com/aleabitoreddit/status/2079319999915925938"
     },
     "lead_46944fdf1d1e34e38f5a9e32bc1c3fc8": {
       "first_seen": "2026-07-22T15:37:21.356596+00:00",
@@ -434,6 +609,17 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826004880/xslF345X06/ownership.xml"
+    },
+    "lead_58cf007b302a50a1e3d05e7dfe6acef7": {
+      "first_seen": "2026-07-25T09:06:50.926738+00:00",
+      "lead_id": "lead_58cf007b302a50a1e3d05e7dfe6acef7",
+      "published_at": "2026-07-23T20:46:57.000Z",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "pending",
+      "title": "From $AMD Advancing AI, channel checks: Helios networking partners told me they expect AMD to pursue CPO for future generations of Helios sc",
+      "triage": null,
+      "url": "https://x.com/aleabitoreddit/status/2080394259535221222"
     },
     "lead_5a2bd2c90d6f38fdb3db6673c309109a": {
       "first_seen": "2026-07-22T15:37:25.644469+00:00",
@@ -503,6 +689,39 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/707549/000070754926000022/lrcx-20260329.htm"
     },
+    "lead_6218747d4f0360a48659c5c6f95cc735": {
+      "first_seen": "2026-07-25T09:06:50.926898+00:00",
+      "lead_id": "lead_6218747d4f0360a48659c5c6f95cc735",
+      "published_at": "2026-07-20T19:36:23.000Z",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "pending",
+      "title": "TBH, casually posting novel information discovery to X is how research should be done. Apparently this was #16 on the Smale's list of Mathem",
+      "triage": null,
+      "url": "https://x.com/aleabitoreddit/status/2079289335351062693"
+    },
+    "lead_62fb4326975492b9f826c63bb266571d": {
+      "first_seen": "2026-07-25T09:06:56.758379+00:00",
+      "lead_id": "lead_62fb4326975492b9f826c63bb266571d",
+      "published_at": "2026-07-23",
+      "refs": {},
+      "source": "edgar:AAOI",
+      "status": "pending",
+      "title": "AAOI 4 filed 2026-07-23",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826005737/xslF345X06/ownership.xml"
+    },
+    "lead_645d1fd05b13b7b735654ef26b9b3c60": {
+      "first_seen": "2026-07-25T09:06:58.734861+00:00",
+      "lead_id": "lead_645d1fd05b13b7b735654ef26b9b3c60",
+      "published_at": "2026-07-24",
+      "refs": {},
+      "source": "edgar:GFS",
+      "status": "pending",
+      "title": "GFS 4 filed 2026-07-24",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1709048/000162828026049554/xslF345X06/wk-form4_1784918046.xml"
+    },
     "lead_649c104b63846fa7ff3cecbc703cb560": {
       "first_seen": "2026-07-22T15:37:26.728902+00:00",
       "lead_id": "lead_649c104b63846fa7ff3cecbc703cb560",
@@ -537,6 +756,17 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/820318/000119312526187297/d107137d8k.htm"
     },
+    "lead_6b03a1645ffd5ff134e1bac977b1154c": {
+      "first_seen": "2026-07-25T09:06:50.926863+00:00",
+      "lead_id": "lead_6b03a1645ffd5ff134e1bac977b1154c",
+      "published_at": "2026-07-21T09:14:20.000Z",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "pending",
+      "title": "It's slightly more nuanced. Basically, $AMD SF event is tomorrow, Wed/Thurs (July 22, 23). From Jefferies client note, AMD is expected to pr",
+      "triage": null,
+      "url": "https://x.com/aleabitoreddit/status/2079495178793201678"
+    },
     "lead_6fe8187893d0e728c504af8f4d20d66d": {
       "first_seen": "2026-07-22T15:37:22.502775+00:00",
       "lead_id": "lead_6fe8187893d0e728c504af8f4d20d66d",
@@ -553,6 +783,17 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1051627/000143774926020894/xslF345X06/rdgdoc.xml"
+    },
+    "lead_7492a9c7d071032785306522c73abe39": {
+      "first_seen": "2026-07-25T09:06:50.926934+00:00",
+      "lead_id": "lead_7492a9c7d071032785306522c73abe39",
+      "published_at": "2026-07-19T18:46:43.000Z",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "pending",
+      "title": "There’s nothing quite like the scent of more AI capex on a Sunday. Probably some ways to go if leading frontier models are out of capacity f",
+      "triage": null,
+      "url": "https://x.com/aleabitoreddit/status/2078914447180263438"
     },
     "lead_7542d1fbe0f10b6a3b60b28c3851444e": {
       "first_seen": "2026-07-22T15:37:26.728879+00:00",
@@ -622,6 +863,17 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/928876/000197640826000635/xslF345X06/primary_doc.xml"
     },
+    "lead_7a5e9e5d146fe9cfec4419ea453876c3": {
+      "first_seen": "2026-07-25T09:06:56.758390+00:00",
+      "lead_id": "lead_7a5e9e5d146fe9cfec4419ea453876c3",
+      "published_at": "2026-07-23",
+      "refs": {},
+      "source": "edgar:AAOI",
+      "status": "pending",
+      "title": "AAOI 4 filed 2026-07-23",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826005736/xslF345X06/ownership.xml"
+    },
     "lead_7b9c116e84b64ff60100e1157c2e398e": {
       "first_seen": "2026-07-22T15:37:22.502741+00:00",
       "lead_id": "lead_7b9c116e84b64ff60100e1157c2e398e",
@@ -660,6 +912,17 @@
       },
       "url": "https://aleabitoreddit.substack.com/p/sivers-semi-sive-the-cpo-laser-supplier"
     },
+    "lead_7d78fe6824f7f8f545c4eb8b23bb234f": {
+      "first_seen": "2026-07-25T09:06:50.926761+00:00",
+      "lead_id": "lead_7d78fe6824f7f8f545c4eb8b23bb234f",
+      "published_at": "2026-07-23T16:49:57.000Z",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "pending",
+      "title": "I have this feeling that Lisa from $AMD likes AI. It’s cool getting to meet some of you at the event! https://t.co/AWdGS349xF",
+      "triage": null,
+      "url": "https://x.com/aleabitoreddit/status/2080334612807758136"
+    },
     "lead_7f7729ed1b82edffd1cd8a0750ffa6f0": {
       "first_seen": "2026-07-22T15:37:22.502764+00:00",
       "lead_id": "lead_7f7729ed1b82edffd1cd8a0750ffa6f0",
@@ -693,6 +956,17 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/820318/000089914026000627/xslF345X06/form4.xml"
+    },
+    "lead_857582308bdff8e00dd648d213f7d679": {
+      "first_seen": "2026-07-25T09:06:50.926772+00:00",
+      "lead_id": "lead_857582308bdff8e00dd648d213f7d679",
+      "published_at": "2026-07-23T04:49:37.000Z",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "pending",
+      "title": "$INTC and $AMD to sign CPU LTAs with Chinese customers for AI DCs (Reuters). - Prices of some CPU products have risen more than 40% in China",
+      "triage": null,
+      "url": "https://x.com/aleabitoreddit/status/2080153334888182065"
     },
     "lead_873e98e4ef4115a235ec9ab644c8ed63": {
       "first_seen": "2026-07-22T15:37:21.356657+00:00",
@@ -779,6 +1053,17 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026044050/xslF345X06/wk-form4_1781734484.xml"
     },
+    "lead_9cfeeb81b915d59d455bcb7b619ddc55": {
+      "first_seen": "2026-07-25T09:06:50.926955+00:00",
+      "lead_id": "lead_9cfeeb81b915d59d455bcb7b619ddc55",
+      "published_at": "2026-07-18T01:00:56.000Z",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "pending",
+      "title": "Thanks! I’ve always shared personal research and core thoughts for free. Not trying to sell anything or tell others what to do. And above al",
+      "triage": null,
+      "url": "https://x.com/aleabitoreddit/status/2078283847612186739"
+    },
     "lead_9ff86c00d2d3b0d1bcfedc009510393f": {
       "first_seen": "2026-07-22T15:37:22.502752+00:00",
       "lead_id": "lead_9ff86c00d2d3b0d1bcfedc009510393f",
@@ -832,6 +1117,39 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1633978/000160799026000001/xslF345X06/form4-07172026_120732.xml"
     },
+    "lead_a440efe914fc9272a997fa97c3694a0d": {
+      "first_seen": "2026-07-25T09:06:56.758367+00:00",
+      "lead_id": "lead_a440efe914fc9272a997fa97c3694a0d",
+      "published_at": "2026-07-23",
+      "refs": {},
+      "source": "edgar:AAOI",
+      "status": "pending",
+      "title": "AAOI 4 filed 2026-07-23",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826005738/xslF345X06/ownership.xml"
+    },
+    "lead_a4eca2bd1a52d9a049fe6a5f6a642aab": {
+      "first_seen": "2026-07-25T09:06:50.926873+00:00",
+      "lead_id": "lead_a4eca2bd1a52d9a049fe6a5f6a642aab",
+      "published_at": "2026-07-21T08:13:03.000Z",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "pending",
+      "title": "Memory names from Kioxia finished up a whopping +17.18%. Samsung up +6.15%. Optical networking from $SIVE, $LITE, and $AAOI are showing sign",
+      "triage": null,
+      "url": "https://x.com/aleabitoreddit/status/2079479755481776221"
+    },
+    "lead_a8256faf3304ce743ea2bc0a9724edff": {
+      "first_seen": "2026-07-25T09:06:52.028389+00:00",
+      "lead_id": "lead_a8256faf3304ce743ea2bc0a9724edff",
+      "published_at": "2026-07-24",
+      "refs": {},
+      "source": "edgar:COHR",
+      "status": "pending",
+      "title": "COHR 4 filed 2026-07-24",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/820318/000089914026000726/xslF345X06/form4.xml"
+    },
     "lead_a86ef356511602e278888eabb9b34082": {
       "first_seen": "2026-07-22T15:37:21.356568+00:00",
       "lead_id": "lead_a86ef356511602e278888eabb9b34082",
@@ -865,6 +1183,17 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1633978/000186650326000005/xslF345X06/form4-06042026_090638.xml"
+    },
+    "lead_a9cbebd4ff6590c97c5a7f1919e72261": {
+      "first_seen": "2026-07-25T09:06:50.926852+00:00",
+      "lead_id": "lead_a9cbebd4ff6590c97c5a7f1919e72261",
+      "published_at": "2026-07-21T17:41:05.000Z",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "pending",
+      "title": "Wow, a historic single day recovery. $SIVEF +30.89% $IQEF +28.6% $AEHR +26.53% $CIFR +17.82% $NBIS +17.3% $AAOI +15.6% $LPK +14.48% $AXTI +1",
+      "triage": null,
+      "url": "https://x.com/aleabitoreddit/status/2079622706572804368"
     },
     "lead_a9eecd775218a780048490e677cf5364": {
       "first_seen": "2026-07-22T15:37:19.172710+00:00",
@@ -934,6 +1263,17 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/820318/000082031826000013/iivi-20260331.htm"
     },
+    "lead_af57fda547a71e40dc0b6a4eb5b3ddf2": {
+      "first_seen": "2026-07-25T09:06:56.758332+00:00",
+      "lead_id": "lead_af57fda547a71e40dc0b6a4eb5b3ddf2",
+      "published_at": "2026-07-23",
+      "refs": {},
+      "source": "edgar:AAOI",
+      "status": "pending",
+      "title": "AAOI 4 filed 2026-07-23",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826005740/xslF345X06/ownership.xml"
+    },
     "lead_b3503ff4c9d89e278f35dcadc4f19a4a": {
       "first_seen": "2026-07-22T15:37:26.728937+00:00",
       "lead_id": "lead_b3503ff4c9d89e278f35dcadc4f19a4a",
@@ -950,6 +1290,39 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000149/xslF345X06/wk-form4_1783445628.xml"
+    },
+    "lead_b48a6c9a349398a5d0d3ab8732a05d54": {
+      "first_seen": "2026-07-25T09:06:50.926750+00:00",
+      "lead_id": "lead_b48a6c9a349398a5d0d3ab8732a05d54",
+      "published_at": "2026-07-23T19:48:45.000Z",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "pending",
+      "title": "$AMD reached out directly to hand me some special swag! Apparently they only made 30 of these bandanas? I love AMD and Lisa Su now. https://",
+      "triage": null,
+      "url": "https://x.com/aleabitoreddit/status/2080379612736221325"
+    },
+    "lead_b94949da2feeb98fb8d6c03bf6504c48": {
+      "first_seen": "2026-07-25T09:06:56.758354+00:00",
+      "lead_id": "lead_b94949da2feeb98fb8d6c03bf6504c48",
+      "published_at": "2026-07-23",
+      "refs": {},
+      "source": "edgar:AAOI",
+      "status": "pending",
+      "title": "AAOI 4 filed 2026-07-23",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826005739/xslF345X06/ownership.xml"
+    },
+    "lead_bab7554c6ae3edbc39c38e11cf3fa953": {
+      "first_seen": "2026-07-25T09:06:50.926806+00:00",
+      "lead_id": "lead_bab7554c6ae3edbc39c38e11cf3fa953",
+      "published_at": "2026-07-22T20:45:31.000Z",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "pending",
+      "title": "$GOOGL now has 950M monthly Gemini users and processes 22B API tokens/min. Compared to 750M back in February. Absurd growth adding 200 milli",
+      "triage": null,
+      "url": "https://x.com/aleabitoreddit/status/2080031508656746874"
     },
     "lead_bdd03e8e9f98242b0023cb2a3a7eff0c": {
       "first_seen": "2026-07-22T15:37:18.082085+00:00",
@@ -984,6 +1357,17 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026044741/xslF345X06/wk-form4_1782164283.xml"
+    },
+    "lead_c51e7f15f13fcaaa3f781e8cdf9ea9f4": {
+      "first_seen": "2026-07-25T09:06:50.926784+00:00",
+      "lead_id": "lead_c51e7f15f13fcaaa3f781e8cdf9ea9f4",
+      "published_at": "2026-07-23T04:35:37.000Z",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "pending",
+      "title": "Just some notes from $TSLA transcripts: Elon Musk: \"I think Optimus will be the biggest product ever\" from Q2 earnings transcripts. Even fro",
+      "triage": null,
+      "url": "https://x.com/aleabitoreddit/status/2080149813065396454"
     },
     "lead_c52bbb5dfebba938fa1694d1c4596f4e": {
       "first_seen": "2026-07-22T15:37:18.082138+00:00",
@@ -1053,6 +1437,17 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1709048/000162828026047972/xslF345X06/wk-form4_1783962211.xml"
     },
+    "lead_d024baf2ef9f980060fbac0805025087": {
+      "first_seen": "2026-07-25T09:06:50.926818+00:00",
+      "lead_id": "lead_d024baf2ef9f980060fbac0805025087",
+      "published_at": "2026-07-22T20:27:50.000Z",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "pending",
+      "title": "$GOOGL reported earnings today: EPS: $9.11 actual vs $2.91 expected - retail reactions to EPS blowout is kinda just accounting noise, since",
+      "triage": null,
+      "url": "https://x.com/aleabitoreddit/status/2080027058063958323"
+    },
     "lead_d038e162169964320fa1bc8354c2349c": {
       "first_seen": "2026-07-22T15:37:23.595596+00:00",
       "lead_id": "lead_d038e162169964320fa1bc8354c2349c",
@@ -1069,6 +1464,17 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826005532/xslF345X06/ownership.xml"
+    },
+    "lead_d27d7ed2236215408d3ea9b5edacccfe": {
+      "first_seen": "2026-07-25T09:06:50.926839+00:00",
+      "lead_id": "lead_d27d7ed2236215408d3ea9b5edacccfe",
+      "published_at": "2026-07-21T21:02:48.000Z",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "pending",
+      "title": "OpenAI models reportedly escaped from its controlled environment, with no internet access. Exploited zero day vulnerabilities and hacked int",
+      "triage": null,
+      "url": "https://x.com/aleabitoreddit/status/2079673469567226149"
     },
     "lead_db65b9b3833c1035e39aaa450f5a079a": {
       "first_seen": "2026-07-22T15:37:19.172694+00:00",
@@ -1105,6 +1511,17 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1051627/000143774926022557/axti20260630_8k.htm"
+    },
+    "lead_dbc94158a40139d8ae06d646603deb10": {
+      "first_seen": "2026-07-25T09:06:50.926707+00:00",
+      "lead_id": "lead_dbc94158a40139d8ae06d646603deb10",
+      "published_at": "2026-07-24T16:21:59.000Z",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "pending",
+      "title": "Jensen from $NVDA has joined X for the first time to share his letter on open models. https://t.co/WMdqDyyp5F",
+      "triage": null,
+      "url": "https://x.com/aleabitoreddit/status/2080689966045348047"
     },
     "lead_dff5a2a6ef33a72e4cf07fda277f6bd2": {
       "first_seen": "2026-07-22T15:37:25.644492+00:00",
@@ -1195,6 +1612,17 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1051627/000143774926022984/axti20260629_8k.htm"
     },
+    "lead_f10510a87362e2f2d5a785c9d573e7ef": {
+      "first_seen": "2026-07-25T09:06:50.926679+00:00",
+      "lead_id": "lead_f10510a87362e2f2d5a785c9d573e7ef",
+      "published_at": "2026-07-24T20:22:41.000Z",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "pending",
+      "title": "There you have it, $GOOGL Waymo to explore split with $UBER per FT. My view last year was that Uber partnering with Waymo was a bad choice…",
+      "triage": null,
+      "url": "https://x.com/aleabitoreddit/status/2080750537121874206"
+    },
     "lead_f1d18173b1d1d173650f0dae1545c692": {
       "first_seen": "2026-07-22T15:37:26.728975+00:00",
       "lead_id": "lead_f1d18173b1d1d173650f0dae1545c692",
@@ -1231,6 +1659,17 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1051627/000143774926024184/axti20260720_8k.htm"
     },
+    "lead_fcbf2bd4a87932e4d67c12f0c188c3ac": {
+      "first_seen": "2026-07-25T09:06:50.926795+00:00",
+      "lead_id": "lead_fcbf2bd4a87932e4d67c12f0c188c3ac",
+      "published_at": "2026-07-22T21:02:27.000Z",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "pending",
+      "title": "$GOOGL updates FY 2026 capex guidance: To $195B-$205B. Up from $180B-$190B. Google is also expected to significantly increase capex in 2027.",
+      "triage": null,
+      "url": "https://x.com/aleabitoreddit/status/2080035769062916479"
+    },
     "lead_fd354516dc2093159fc7d48737016b84": {
       "first_seen": "2026-07-22T15:37:18.082155+00:00",
       "lead_id": "lead_fd354516dc2093159fc7d48737016b84",
@@ -1264,7 +1703,25 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826004977/xslF345X06/ownership.xml"
+    },
+    "lead_ffdc392c947397e9a649b634ed41f0c8": {
+      "first_seen": "2026-07-25T09:06:50.926923+00:00",
+      "lead_id": "lead_ffdc392c947397e9a649b634ed41f0c8",
+      "published_at": "2026-07-20T06:22:41.000Z",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "pending",
+      "title": "Some updates on bottleneck timelines: - ABF substrates: 1 year / eg. Ajinomoto (2802) for ABF film, Ibiden, Unimicron, Nan Ya PCB, etc make",
+      "triage": null,
+      "url": "https://x.com/aleabitoreddit/status/2079089592385610023"
     }
   },
-  "schema_version": "1"
+  "schema_version": "1",
+  "source_state": {
+    "x:aleabitoreddit": {
+      "since_id": "2080750537121874206",
+      "updated_at": "2026-07-25T09:07:25.057809+00:00",
+      "user_id": "1940360837547565056"
+    }
+  }
 }
