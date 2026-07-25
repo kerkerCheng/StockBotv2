@@ -84,7 +84,11 @@ fetchers/edgar.py ──────↑                        engine_c/etl_yfin
 - **各類來源的 AI 抽取 instruction：** [`docs/extraction-instructions.md`](docs/extraction-instructions.md)
 - **遠端存取（手機 App / web / cloud routine 讀寫圖與查 Engine C）：** 本機 MCP server（`mcp_server/graph_mcp.py`）+ Cloudflare Tunnel + connector。十二工具 surface，Git 能力僅 leads.json 一個窄例外；完整資料流、安全邊界、Research Action／storage 協定與跨平台限制：[`docs/remote-access-architecture.md`](docs/remote-access-architecture.md)
   - **⚠ 改完 `mcp_server/` 一定要重啟 MCP server process，否則遠端看到的是舊 tool surface。** 沒有 auto-reload：process 是開機由 `shell:startup` 的 `stockbotv2-graph-services.vbs` 啟動、之後就一直跑舊程式碼。2026-07-24 首次 daily routine 即因此回報「三支新工具不在 tool surface」（程式碼有、跑著的 process 沒有）。重啟：停掉 `graph_mcp` python process 再跑 `.venv\Scripts\python.exe mcp_server\graph_mcp.py`（或雙擊該 `.vbs`）。驗證跑著的版本：對 `http://127.0.0.1:$GRAPH_MCP_PORT/$GRAPH_MCP_TOKEN/mcp` 送 MCP `tools/list` 數工具數，**不要只看原始碼或測試**（那只證明 repo 對）。
-  - **Anthropic 雲端沙盒的 egress 限制（2026-07-24 實測）：** cloud routine 直連 `aleabitoreddit.substack.com` 與 `www.sec.gov` 一律 **proxy 403（policy denial）**，`WebFetch` 同樣被擋——所以 **cloud 端跑不了 `crons/harvest_leads.py`**，只能退回 `WebSearch` fallback（覆蓋不完整、無法保證窮盡 watch 清單）。本機直連正常。harvest 的完整覆蓋只能靠本機執行。
+  - **雲端 routine 的 egress 是「可設定的環境白名單」，不是平台硬限制（2026-07-25 更正）：** 2026-07-24 首跑時 cloud 直連 `substack.com` 與 `www.sec.gov` 收到 proxy 403，當時誤判為平台政策；實際是 claude.ai 該 **cloud environment 的 Network access = Custom + allowed domains** 白名單擋掉。設定位置：claude.ai → 該 routine → 環境設定 → Network access。**兩個 routine（daily／weekly）共用同一環境 `env_017R6G5V1df7zxVvtGA4MJut`（Default），改一次兩邊都生效。**
+    - 白名單需含（harvest 用）：`sec.gov`、`*.sec.gov`（EDGAR 的 www/data/efts）、`substack.com`、`*.substack.com`；並保留勾選 default package-manager 清單。
+    - **MCP connector 流量不受此白名單影響**（走 Anthropic 伺服器轉發）——證據：403 那次 MCP 工具仍可呼叫。
+    - **`WebSearch` 不受影響**（是工具不是 egress）；受影響的只有直接抓取（`WebFetch`／`curl`／`urllib`，即 `crons/harvest_leads.py`）。
+    - 設計取捨：維持 Custom 白名單（而非 All domains）較安全——本 routine 天職就是讀不受信任的網路內容，且握有 MCP 圖寫入能力，收斂 egress 可壓低 prompt-injection 外流面。代價是非 EDGAR/Substack 的一手來源在雲端抓不到；但那類深挖本來就設計成在本機做。
 
 ---
 

@@ -35,15 +35,10 @@
 2. 讀 `skills/signal-triage/SKILL.md`——Stage 2 的判斷標準全在裡面
 3. 呼叫 MCP 工具 `get_graph_context` 或 `run_read_query` 任一，確認 MCP 連線正常；
    連不上時不要卡住——跳過所有需要圖的步驟、在報告開頭標明 MCP 不可用
-4. **處理所有已核准但未入圖的週掃 PR，不限上週：**列出所有 `weekly-scan` label、
-   `state=merged` 且沒有 `loaded` label 的 PR。PR merge 就是人工核准協定。逐份讀 PR 內
-   extraction 草稿並呼叫 `load_extraction`；只有該 PR 所有草稿都成功／冪等 matching 後
-   才加 `loaded` label，並留言記錄 doc_ids 與結果。部分失敗不加 label，下次 routine
-   必須重試；已加 `loaded` 的 PR 永不重複處理。
-
-> 這個 merged-PR gate 是明確保留的 legacy direct-load flow，服務舊 PR 裡的抽取草稿
-> （2026-07-18 起本 routine 不再產新草稿，此步驟會自然清空）。不要在沒有 merged PR
-> 的情況用手機 Research Action 規則繞過 Stage 0。
+4. **（已退場，2026-07-25）** 原本的「merged-PR 即核准入圖」gate 已隨 GitHub UI 一起退場：
+   本 routine 自 2026-07-18 起就不產抽取草稿，且入圖核准已改為對話式（daily brief 的
+   `go <編號>` → `apply_research_action`）。**不要再掃 PR、不要再呼叫 `load_extraction`。**
+   殘留的舊 `weekly-scan` PR（如 #6）是純報告、無草稿，由使用者自行關閉即可。
 
 ### Stage 1 — Harvest（廣撒網，輕量）
 
@@ -133,11 +128,16 @@
 5. Engine C 類（snapshot 新鮮度、財務清單可跑性）雲端碰不到 → 統一列入
    「本機待跑清單」段落，指示使用者跑 `python query/health_audit.py --local`
 
-### Stage 6 — Report & PR
+### Stage 6 — Report（輸出到對話，不開 PR）
 
-1. 把週報寫到 `docs/reports/weekly_scan_<YYYY-MM-DD>.md`，開一個 **PR**（分支名
-   `weekly-scan/<YYYY-MM-DD>`，**打上 `weekly-scan` label**，不直接 push main）；
-   `thesis/lifecycle.json` 的更新放同一個 PR
+> **v1.1（2026-07-25）：不再開 PR。** 使用者已決定不透過 GitHub PR/Issue 介面看東西——
+> 週報的**主要輸出就是本次 session 的回覆內容**（呈現在 Claude app，與 daily brief 一致）。
+> 同時把週報**直接 commit 到 master** 的 `docs/reports/weekly_scan_<YYYY-MM-DD>.md` 留存
+> （push 照常，只是不走 PR review）。**不再開分支、不再打 label、不再有 merge 即核准的語義。**
+> 本 routine 不寫 `thesis/lifecycle.json`（見 Stage 4）。
+
+1. 週報內容作為本次 session 的回覆完整輸出；同時寫入
+   `docs/reports/weekly_scan_<YYYY-MM-DD>.md` 並直接 commit/push 到 master（僅此報告檔）
 2. 週報結構：
    ```
    ## 週審查 — <日期>
@@ -150,21 +150,18 @@
    ### 🖥 本機待跑清單（`python query/health_audit.py --local`、追源 backlog aging、
        到期 thesis 的財務補查命令）
    ```
-3. PR 描述開頭放 30 秒摘要；若 lifecycle.json 有變更，明寫「merge 本 PR 即接受
-   thesis 狀態更新」。舊 PR 若仍含抽取草稿，維持「merge 即核准入圖」語義（Stage 0 處理）
-4. 純提醒、無可合併產出的事項（如 disproof 觸發跡象）→ 另開 **Issue**（同樣打
-   `weekly-scan` label）
-5. 追源未果 backlog Issue（rolling，`weekly-scan` label）：本 routine 不再新增項目
-   （不做追源了），但要檢查既有項目的 aging——超過 30 天未動的項目在「本機待跑清單」
-   提醒一句
+3. 回覆開頭放 30 秒摘要（⛔ 與紅燈優先）。**不開 Issue、不打 label**——需要使用者動作的
+   提醒（如 disproof 觸發跡象、追源 backlog aging 超過 30 天）直接列在週報的
+   「本機待跑清單」段，使用者在對話中處理
+4. 追源未果 backlog：本 routine 不新增項目（不做追源），但檢查既有項目 aging 並在
+   「本機待跑清單」提醒
 
 ## 鐵律
 
 - 繁體中文輸出
 - 不確定的訊號標「？」，不假裝確定；某主題本週無動向就直說
 - **絕不對本週新訊號做追源或抽取**——topic discovery 是本 routine 研究面的邊界
-- **絕不自行呼叫 `load_extraction` 入庫新內容**——只有 Stage 0 處理「已獲使用者
-  merge 核准」的舊草稿時才允許呼叫
-- lifecycle.json 只能改 `last_checked` / `next_check` / `status` / `note` 四個欄位；
-  `retired` / `revised` 轉換只能建議、不能自行寫入
-- 找不到任何值得說的事 → PR 照開（週報說明這是 sparse week），讓使用者知道系統有在跑
+- **絕不自行呼叫 `load_extraction` 入庫新內容**——入圖一律由使用者明確核准
+- **不寫 `thesis/lifecycle.json`**（見 Stage 4）：到期只做唯讀提醒，狀態更新由使用者本機手動
+- 只 commit 週報檔本身（`docs/reports/weekly_scan_<日期>.md`），不碰其他檔
+- 找不到任何值得說的事 → 週報照出（說明這是 sparse week），讓使用者知道系統有在跑

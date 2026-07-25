@@ -28,14 +28,16 @@
 
 ### Stage 1 — Harvest（web；雲端受 egress 限制，預設走 WebSearch）
 
-> **已知環境限制（2026-07-24 實測）：** Anthropic 雲端沙盒直連 `aleabitoreddit.substack.com` 與
-> `www.sec.gov` 會被 **proxy 403（policy denial）**，`crons/harvest_leads.py` 與 `WebFetch` 在雲端都
->跑不動。**不要重試直連**（policy denial 重試無用、只燒時間）——直接用 `WebSearch` fallback，並在
-> brief 標明「harvest 走 fallback、覆蓋不完整」。完整覆蓋由使用者本機執行 harvest 補上。
+> **egress 取決於環境白名單（2026-07-25 更正）：** 直連能否成功由 claude.ai 該 cloud environment 的
+> Network access 白名單決定，**不是平台硬限制**。若白名單已含 `sec.gov`／`*.sec.gov`／`substack.com`／
+> `*.substack.com`，就**照常跑 `python crons/harvest_leads.py`**（零 token、覆蓋完整）。
+> 若收到 proxy 403（policy denial）代表白名單未含該網域：**不要重試**（重試無用），改用 `WebSearch`
+> fallback，並在 brief 明確標「harvest 走 fallback、覆蓋不完整」＋列出被擋的網域，讓使用者去補白名單。
+> `WebSearch` 與 MCP 皆不受此白名單影響。
 
-用 `WebSearch` 掃 config 內來源的近期新項（如 `site:aleabitoreddit.substack.com`、watch 清單各
-ticker 的新 filing 公告）；與 baseline 去重，只留今日新增。**不得因覆蓋不完整就假裝窮盡**——
-brief 要明說哪些來源沒查到、本機補跑什麼命令。
+先試直連 harvest；被擋才退 `WebSearch`（如 `site:aleabitoreddit.substack.com`、watch 清單各 ticker 的
+新 filing）。與 baseline 去重，只留今日新增。**不得因覆蓋不完整就假裝窮盡**——brief 要明說哪些來源
+沒查到、本機補跑什麼命令。
 
 ### Stage 2 — Triage（照 signal-triage，寫回經 MCP）
 
