@@ -1,0 +1,127 @@
+{
+  "items": [
+    {
+      "added_at": "2026-07-25T04:49:13.254029+00:00",
+      "hint": "進 pq1 深挖（source-trace + extraction）",
+      "n": 1,
+      "reason": null,
+      "ref_id": "lead_2ea3e59722e5e136cf2f82e823cbe7e6",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "edgar:AAOI",
+      "title": "AAOI 8-K filed 2026-07-01",
+      "type": "lead_research"
+    },
+    {
+      "added_at": "2026-07-25T04:49:13.254043+00:00",
+      "hint": "進 pq1 深挖（source-trace + extraction）",
+      "n": 2,
+      "reason": null,
+      "ref_id": "lead_61053b6d935c61b2c3def03c953b1994",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "edgar:LRCX",
+      "title": "LRCX 10-Q filed 2026-04-23",
+      "type": "lead_research"
+    },
+    {
+      "added_at": "2026-07-25T04:49:13.254051+00:00",
+      "hint": "進 pq1 深挖（source-trace + extraction）",
+      "n": 3,
+      "reason": null,
+      "ref_id": "lead_7b9c116e84b64ff60100e1157c2e398e",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "edgar:AXTI",
+      "title": "AXTI 8-K filed 2026-06-22",
+      "type": "lead_research"
+    },
+    {
+      "added_at": "2026-07-25T04:49:13.254056+00:00",
+      "hint": "進 pq1 深挖（source-trace + extraction）",
+      "n": 4,
+      "reason": null,
+      "ref_id": "lead_7bbf1d134806b235e07a8de3130ac5db",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "aleabitoreddit_rss",
+      "title": "Sivers: The Undiscovered CPO Laser Chokepoint + Customer Mapping",
+      "type": "lead_research"
+    },
+    {
+      "added_at": "2026-07-25T04:49:13.254061+00:00",
+      "hint": "進 pq1 深挖（source-trace + extraction）",
+      "n": 5,
+      "reason": null,
+      "ref_id": "lead_9ff86c00d2d3b0d1bcfedc009510393f",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "edgar:AXTI",
+      "title": "AXTI 8-K filed 2026-06-17",
+      "type": "lead_research"
+    },
+    {
+      "added_at": "2026-07-25T04:49:13.254066+00:00",
+      "hint": "進 pq1 深挖（source-trace + extraction）",
+      "n": 6,
+      "reason": null,
+      "ref_id": "lead_db77cee320ee409a222adb1b88f865bc",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "edgar:AXTI",
+      "title": "AXTI 8-K filed 2026-07-02",
+      "type": "lead_research"
+    },
+    {
+      "added_at": "2026-07-25T04:49:13.254071+00:00",
+      "hint": "進 pq1 深挖（source-trace + extraction）",
+      "n": 7,
+      "reason": null,
+      "ref_id": "lead_e590eca752d976cef58be766a5b17d62",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "edgar:AAOI",
+      "title": "AAOI 8-K filed 2026-06-16",
+      "type": "lead_research"
+    },
+    {
+      "added_at": "2026-07-25T04:49:13.254076+00:00",
+      "hint": "進 pq1 深挖（source-trace + extraction）",
+      "n": 8,
+      "reason": null,
+      "ref_id": "lead_f05f3fd8a753c084704afc3b06330a47",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "edgar:AXTI",
+      "title": "AXTI 8-K filed 2026-07-08",
+      "type": "lead_research"
+    },
+    {
+      "added_at": "2026-07-25T04:49:13.254081+00:00",
+      "hint": "進 pq1 深挖（source-trace + extraction）",
+      "n": 9,
+      "reason": null,
+      "ref_id": "lead_f6d7fdd6bff7d38b4edf021c49835f5f",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "edgar:AXTI",
+      "title": "AXTI 8-K filed 2026-07-22",
+      "type": "lead_research"
+    },
+    {
+      "added_at": "2026-07-25T04:49:13.254087+00:00",
+      "hint": "本機複查 thesis 並手動更新 lifecycle.json",
+      "n": 10,
+      "reason": null,
+      "ref_id": "sivers",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "lifecycle",
+      "title": "thesis sivers：review_required",
+      "type": "thesis_lifecycle"
+    }
+  ],
+  "log": [],
+  "next_n": 11,
+  "schema_version": "1"
+}

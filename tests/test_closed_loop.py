@@ -73,6 +73,35 @@ def test_source_only_change_is_peripheral_not_material(tmp_path: Path) -> None:
         store.close()
 
 
+def test_terminal_probe_leaves_the_daily_queue(tmp_path: Path) -> None:
+    """已結案（expired/rejected/promoted）的 probe 不該永遠留在每日待辦。"""
+    from decision_lab.outcomes import close_probe
+
+    store = _store(tmp_path)
+    provider = FixtureProvider()
+    try:
+        result = evaluate_signal(store, provider, _request(execution_intent="research"))
+        before = build_today_brief(store, as_of=NOW, current_holdings=_HOLDINGS,
+                                   provider=provider)
+        assert _item(before) is not None
+
+        close_probe(
+            store, result["cohort_id"],
+            terminal_status="expired",
+            claim_correctness="unknown",
+            current_market={"status": "unavailable"},
+            benchmark={"status": "unavailable"},
+            reason="測試：probe 結案後不應再出現在每日待辦",
+            evidence_refs=["admin:test"],
+            effective_at=NOW,
+        )
+        after = build_today_brief(store, as_of=NOW, current_holdings=_HOLDINGS,
+                                  provider=provider)
+        assert _item(after) is None
+    finally:
+        store.close()
+
+
 def test_price_move_alone_is_not_material(tmp_path: Path) -> None:
     store = _store(tmp_path)
     provider = FixtureProvider()

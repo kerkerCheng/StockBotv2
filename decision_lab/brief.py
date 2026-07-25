@@ -13,6 +13,8 @@ from .workflow_ports import WorkflowDataProvider
 
 
 _ACTION_PRIORITY = {"NO ACTION": 0, "TRADE": 1, "HEDGE": 2, "REVIEW": 3}
+# 已結案的 probe 不再進今日待辦；`revised` 刻意不在內（新 epoch 需 reassess）。
+_TERMINAL_LIFECYCLE = frozenset({"promoted", "rejected", "expired"})
 
 
 def _time(value: str, field: str) -> datetime:
@@ -368,7 +370,13 @@ def build_today_brief(
     for summary in summaries:
         cohort_id = str(summary["cohort_id"])
         if summary.get("company_id"):
+            # 終結的 cohort 仍要登記 company，避免它的 Sheet 持股被誤判成
+            # sheet-only legacy holding。
             cohort_company_ids.add(str(summary["company_id"]))
+        # 已終結的 probe 不再是今日待辦（promoted／rejected／expired）。`revised`
+        # 不算終結——它開新 epoch 且需要 reassess，仍要出現。
+        if str(summary.get("lifecycle_status") or "") in _TERMINAL_LIFECYCLE:
+            continue
         decision_id = summary.get("latest_decision_id")
         if decision_id is None:
             items.append(_pending_item(summary))
