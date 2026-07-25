@@ -50,6 +50,9 @@ def load_config(path: Path | str = DEFAULT_CONFIG_PATH) -> dict:
             watch.get("forms"), list
         ):
             raise ValueError("edgar_watch 必須有 tickers 與 forms list")
+    x_section = data.get("x_accounts") or {}
+    if x_section and not isinstance(x_section.get("handles"), list):
+        raise ValueError("x_accounts 必須有 handles list")
     return data
 
 
@@ -159,6 +162,72 @@ def harvest_feeds(config: dict, store: dict, *, seen_at: str | None = None) -> N
         print(f"[harvest] {source} ok: {new} new / {len(items)} items")
 
 
+def harvest_x(config: dict, store: dict, *, seen_at: str | None = None) -> None:
+    """抓追蹤 X 帳號的原創貼文（pay-per-use：只抓 since_id 之後的新貼文）。
+
+    每個帳號一筆 harvest_log；缺 token／API 失敗都記 fetch_failed 不拋例外
+    （與其他來源一致：解析／抓取失敗 ≠ 無新文）。
+    """
+    section = config.get("x_accounts") or {}
+    handles = section.get("handles") or []
+    if not handles:
+        return
+    try:
+        from fetchers import x_api
+    except ImportError as exc:
+        for handle in handles:
+            leads.record_run(store, source=f"x:{handle}", result="fetch_failed",
+                             new=0, run_at=seen_at)
+        print(f"[harvest] x api unavailable: {exc}", file=sys.stderr)
+        return
+
+    try:
+        token = x_api.bearer_token()
+    except x_api.XApiError as exc:
+        for handle in handles:
+            leads.record_run(store, source=f"x:{handle}", result="fetch_failed",
+                             new=0, run_at=seen_at)
+        print(f"[harvest] x api: {exc}（請在 .env 設 X_BEARER_TOKEN）", file=sys.stderr)
+        return
+
+    for handle in handles:
+        source = f"x:{handle}"
+        state = leads.get_source_state(store, source)
+        try:
+            user_id = state.get("user_id") or x_api.get_user_id(handle, token)
+            posts = x_api.get_user_posts(
+                user_id,
+                since_id=state.get("since_id"),
+                max_results=int(section.get("max_results", x_api.DEFAULT_MAX_RESULTS)),
+                exclude_replies=bool(section.get("exclude_replies", True)),
+                exclude_retweets=bool(section.get("exclude_retweets", True)),
+                token=token,
+            )
+        except x_api.XApiError as exc:
+            leads.record_run(store, source=source, result="fetch_failed", new=0,
+                             run_at=seen_at)
+            print(f"[harvest] {source} fetch_failed: {exc}", file=sys.stderr)
+            continue
+
+        items = [
+            {
+                "url": x_api.post_url(handle, p["id"]),
+                "title": " ".join((p.get("text") or "").split())[:140],
+                "published_at": p.get("created_at"),
+            }
+            for p in posts
+        ]
+        new = _register_all(store, source, items, seen_at)
+        leads.set_source_state(
+            store, source,
+            user_id=user_id,
+            since_id=x_api.newest_id(posts) or state.get("since_id"),
+        )
+        leads.record_run(store, source=source, result="ok", new=new, run_at=seen_at)
+        cost = len(posts) * 0.005
+        print(f"[harvest] {source} ok: {new} new / {len(posts)} posts (~${cost:.3f})")
+
+
 def harvest_edgar(config: dict, store: dict, *, seen_at: str | None = None) -> None:
     watch = config.get("edgar_watch") or {}
     tickers = watch.get("tickers") or []
@@ -194,6 +263,7 @@ def harvest_edgar(config: dict, store: dict, *, seen_at: str | None = None) -> N
 
 def run(config: dict, store: dict, *, seen_at: str | None = None) -> dict:
     harvest_feeds(config, store, seen_at=seen_at)
+    harvest_x(config, store, seen_at=seen_at)
     harvest_edgar(config, store, seen_at=seen_at)
     return store
 

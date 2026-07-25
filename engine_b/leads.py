@@ -76,7 +76,12 @@ def lead_id_for(url: str) -> str:
 
 
 def empty_store() -> dict[str, Any]:
-    return {"schema_version": SCHEMA_VERSION, "leads": {}, "harvest_log": []}
+    return {
+        "schema_version": SCHEMA_VERSION,
+        "leads": {},
+        "harvest_log": [],
+        "source_state": {},
+    }
 
 
 def load(path: Path | str = DEFAULT_LEADS_PATH) -> dict[str, Any]:
@@ -90,7 +95,21 @@ def load(path: Path | str = DEFAULT_LEADS_PATH) -> dict[str, Any]:
     data.setdefault("schema_version", SCHEMA_VERSION)
     data.setdefault("leads", {})
     data.setdefault("harvest_log", [])
+    # 各來源的增量抓取狀態（如 X 的 since_id／user_id 快取）。X API 是
+    # pay-per-use（按回傳貼文數計費），since_id 讓每次只抓新貼文＝成本下限。
+    data.setdefault("source_state", {})
     return data
+
+
+def get_source_state(store: dict[str, Any], key: str) -> dict[str, Any]:
+    return dict(store.setdefault("source_state", {}).get(key) or {})
+
+
+def set_source_state(store: dict[str, Any], key: str, **fields: Any) -> dict[str, Any]:
+    state = store.setdefault("source_state", {}).setdefault(key, {})
+    state.update({k: v for k, v in fields.items() if v is not None})
+    state["updated_at"] = _now()
+    return state
 
 
 def save(store: dict[str, Any], path: Path | str = DEFAULT_LEADS_PATH) -> None:
