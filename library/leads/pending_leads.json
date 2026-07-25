@@ -253,9 +253,15 @@
       "published_at": "2026-07-20T17:18:38.000Z",
       "refs": {},
       "source": "x:aleabitoreddit",
-      "status": "pending",
+      "status": "triaged_no_go",
       "title": "$IREN +19.69% after revising ARR target to $4B+ from new AI cloud contracts. Its customer base now includes Microsoft, Nvidia, Perplexity, a",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-07-25T09:09:23.756209+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "IREN 不在追蹤範圍",
+        "tier": 4
+      },
       "url": "https://x.com/aleabitoreddit/status/2079254669793316962"
     },
     "lead_072ee0491ea59637933371a069bd0321": {
@@ -298,9 +304,17 @@
       "published_at": "2026-07-24T00:11:40.000Z",
       "refs": {},
       "source": "x:aleabitoreddit",
-      "status": "pending",
+      "status": "triaged_go",
       "title": "Not exactly for $AAOI (they're working on CPO too, just a little further behind in commercialization). There's a podcast that featured the $",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-07-25T09:09:23.755917+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "直接評論 AAOI 的 CPO 商業化進度；AAOI 在圖中且 CPO 是核心主題",
+        "tier": 3
+      },
       "url": "https://x.com/aleabitoreddit/status/2080445777395298454"
     },
     "lead_0f16352fcbf4bafcfc927a9642d68715": {
@@ -428,9 +442,15 @@
       "published_at": "2026-07-18T04:39:54.000Z",
       "refs": {},
       "source": "x:aleabitoreddit",
-      "status": "pending",
+      "status": "triaged_no_go",
       "title": "For anyone watching the 25%+ premium in $SKHY versus SK Hynix's Korean shares: The ADRs and local shares become convertible on July 29. Shou",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-07-25T09:09:23.756232+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "ADR 溢價套利觀察，非供應鏈瓶頸",
+        "tier": 4
+      },
       "url": "https://x.com/aleabitoreddit/status/2078338950150959558"
     },
     "lead_1fa5e4b88de07ce8b801e2468729c087": {
@@ -543,9 +563,17 @@
       "published_at": "2026-07-22T15:10:40.000Z",
       "refs": {},
       "source": "x:aleabitoreddit",
-      "status": "pending",
+      "status": "triaged_go",
       "title": "$AMD to invest $5B in Anthropic. Anthropic in turn will sign a 2 GW deal to buy AMD’s latest chips, worth tens of billions of dollars. Looks",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-07-25T09:09:23.755984+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "AMD-Anthropic 2GW 資料中心合約；2GW 級電力需求直接驅動光互連容量",
+        "tier": 3
+      },
       "url": "https://x.com/aleabitoreddit/status/2079947242455335379"
     },
     "lead_330dd99ad380ce1a207e4fb53c046f03": {
@@ -571,9 +599,15 @@
       "published_at": "2026-07-20T21:38:14.000Z",
       "refs": {},
       "source": "x:aleabitoreddit",
-      "status": "pending",
+      "status": "triaged_no_go",
       "title": "If you’re curious why $NBIS is up after hours. $NVDA disclosed it owns 9.3% beneficial ownership of Nebius via SEC filings. Not exactly too",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-07-25T09:09:23.756185+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "NBIS 不在追蹤範圍",
+        "tier": 4
+      },
       "url": "https://x.com/aleabitoreddit/status/2079319999915925938"
     },
     "lead_46944fdf1d1e34e38f5a9e32bc1c3fc8": {
@@ -616,9 +650,18 @@
       "published_at": "2026-07-23T20:46:57.000Z",
       "refs": {},
       "source": "x:aleabitoreddit",
-      "status": "pending",
+      "status": "triaged_go",
       "title": "From $AMD Advancing AI, channel checks: Helios networking partners told me they expect AMD to pursue CPO for future generations of Helios sc",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-07-25T09:09:23.755948+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true,
+          "novelty": true
+        },
+        "reason": "AMD Helios networking 通路查訪（作者一手 channel check），光互連需求端情報",
+        "tier": 3
+      },
       "url": "https://x.com/aleabitoreddit/status/2080394259535221222"
     },
     "lead_5a2bd2c90d6f38fdb3db6673c309109a": {
@@ -695,9 +738,15 @@
       "published_at": "2026-07-20T19:36:23.000Z",
       "refs": {},
       "source": "x:aleabitoreddit",
-      "status": "pending",
+      "status": "triaged_no_go",
       "title": "TBH, casually posting novel information discovery to X is how research should be done. Apparently this was #16 on the Smale's list of Mathem",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-07-25T09:09:23.756197+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "關於發文方式的元評論",
+        "tier": 4
+      },
       "url": "https://x.com/aleabitoreddit/status/2079289335351062693"
     },
     "lead_62fb4326975492b9f826c63bb266571d": {
@@ -706,9 +755,15 @@
       "published_at": "2026-07-23",
       "refs": {},
       "source": "edgar:AAOI",
-      "status": "pending",
+      "status": "triaged_no_go",
       "title": "AAOI 4 filed 2026-07-23",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-07-25T09:09:23.756256+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "個別 Form 4 資訊量低；內部人交易應以彙總方式讀（Engine C 稀釋項）",
+        "tier": 1
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826005737/xslF345X06/ownership.xml"
     },
     "lead_645d1fd05b13b7b735654ef26b9b3c60": {
@@ -717,9 +772,15 @@
       "published_at": "2026-07-24",
       "refs": {},
       "source": "edgar:GFS",
-      "status": "pending",
+      "status": "triaged_no_go",
       "title": "GFS 4 filed 2026-07-24",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-07-25T09:09:23.756259+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "個別 Form 4 資訊量低；內部人交易應以彙總方式讀（Engine C 稀釋項）",
+        "tier": 1
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/1709048/000162828026049554/xslF345X06/wk-form4_1784918046.xml"
     },
     "lead_649c104b63846fa7ff3cecbc703cb560": {
@@ -762,9 +823,15 @@
       "published_at": "2026-07-21T09:14:20.000Z",
       "refs": {},
       "source": "x:aleabitoreddit",
-      "status": "pending",
+      "status": "triaged_no_go",
       "title": "It's slightly more nuanced. Basically, $AMD SF event is tomorrow, Wed/Thurs (July 22, 23). From Jefferies client note, AMD is expected to pr",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-07-25T09:09:23.756161+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "活動預告，無實質內容",
+        "tier": 4
+      },
       "url": "https://x.com/aleabitoreddit/status/2079495178793201678"
     },
     "lead_6fe8187893d0e728c504af8f4d20d66d": {
@@ -790,9 +857,15 @@
       "published_at": "2026-07-19T18:46:43.000Z",
       "refs": {},
       "source": "x:aleabitoreddit",
-      "status": "pending",
+      "status": "triaged_no_go",
       "title": "There’s nothing quite like the scent of more AI capex on a Sunday. Probably some ways to go if leading frontier models are out of capacity f",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-07-25T09:09:23.756221+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "泛泛感想，無可查核內容",
+        "tier": 4
+      },
       "url": "https://x.com/aleabitoreddit/status/2078914447180263438"
     },
     "lead_7542d1fbe0f10b6a3b60b28c3851444e": {
@@ -869,9 +942,15 @@
       "published_at": "2026-07-23",
       "refs": {},
       "source": "edgar:AAOI",
-      "status": "pending",
+      "status": "triaged_no_go",
       "title": "AAOI 4 filed 2026-07-23",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-07-25T09:09:23.756263+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "個別 Form 4 資訊量低；內部人交易應以彙總方式讀（Engine C 稀釋項）",
+        "tier": 1
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826005736/xslF345X06/ownership.xml"
     },
     "lead_7b9c116e84b64ff60100e1157c2e398e": {
@@ -918,9 +997,15 @@
       "published_at": "2026-07-23T16:49:57.000Z",
       "refs": {},
       "source": "x:aleabitoreddit",
-      "status": "pending",
+      "status": "triaged_no_go",
       "title": "I have this feeling that Lisa from $AMD likes AI. It’s cool getting to meet some of you at the event! https://t.co/AWdGS349xF",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-07-25T09:09:23.756064+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "純社交內容",
+        "tier": 4
+      },
       "url": "https://x.com/aleabitoreddit/status/2080334612807758136"
     },
     "lead_7f7729ed1b82edffd1cd8a0750ffa6f0": {
@@ -963,9 +1048,15 @@
       "published_at": "2026-07-23T04:49:37.000Z",
       "refs": {},
       "source": "x:aleabitoreddit",
-      "status": "pending",
+      "status": "triaged_no_go",
       "title": "$INTC and $AMD to sign CPU LTAs with Chinese customers for AI DCs (Reuters). - Prices of some CPU products have risen more than 40% in China",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-07-25T09:09:23.756080+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "CPU 長約；轉述 Reuters，且未觸及光學/CPO 瓶頸",
+        "tier": 4
+      },
       "url": "https://x.com/aleabitoreddit/status/2080153334888182065"
     },
     "lead_873e98e4ef4115a235ec9ab644c8ed63": {
@@ -1059,9 +1150,15 @@
       "published_at": "2026-07-18T01:00:56.000Z",
       "refs": {},
       "source": "x:aleabitoreddit",
-      "status": "pending",
+      "status": "triaged_no_go",
       "title": "Thanks! I’ve always shared personal research and core thoughts for free. Not trying to sell anything or tell others what to do. And above al",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-07-25T09:09:23.756243+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "純社交內容",
+        "tier": 4
+      },
       "url": "https://x.com/aleabitoreddit/status/2078283847612186739"
     },
     "lead_9ff86c00d2d3b0d1bcfedc009510393f": {
@@ -1123,9 +1220,15 @@
       "published_at": "2026-07-23",
       "refs": {},
       "source": "edgar:AAOI",
-      "status": "pending",
+      "status": "triaged_no_go",
       "title": "AAOI 4 filed 2026-07-23",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-07-25T09:09:23.756267+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "個別 Form 4 資訊量低；內部人交易應以彙總方式讀（Engine C 稀釋項）",
+        "tier": 1
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826005738/xslF345X06/ownership.xml"
     },
     "lead_a4eca2bd1a52d9a049fe6a5f6a642aab": {
@@ -1134,9 +1237,15 @@
       "published_at": "2026-07-21T08:13:03.000Z",
       "refs": {},
       "source": "x:aleabitoreddit",
-      "status": "pending",
+      "status": "triaged_no_go",
       "title": "Memory names from Kioxia finished up a whopping +17.18%. Samsung up +6.15%. Optical networking from $SIVE, $LITE, and $AAOI are showing sign",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-07-25T09:09:23.756173+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "純股價漲幅列舉",
+        "tier": 4
+      },
       "url": "https://x.com/aleabitoreddit/status/2079479755481776221"
     },
     "lead_a8256faf3304ce743ea2bc0a9724edff": {
@@ -1145,9 +1254,15 @@
       "published_at": "2026-07-24",
       "refs": {},
       "source": "edgar:COHR",
-      "status": "pending",
+      "status": "triaged_no_go",
       "title": "COHR 4 filed 2026-07-24",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-07-25T09:09:23.756271+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "個別 Form 4 資訊量低；內部人交易應以彙總方式讀（Engine C 稀釋項）",
+        "tier": 1
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/820318/000089914026000726/xslF345X06/form4.xml"
     },
     "lead_a86ef356511602e278888eabb9b34082": {
@@ -1190,9 +1305,15 @@
       "published_at": "2026-07-21T17:41:05.000Z",
       "refs": {},
       "source": "x:aleabitoreddit",
-      "status": "pending",
+      "status": "triaged_no_go",
       "title": "Wow, a historic single day recovery. $SIVEF +30.89% $IQEF +28.6% $AEHR +26.53% $CIFR +17.82% $NBIS +17.3% $AAOI +15.6% $LPK +14.48% $AXTI +1",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-07-25T09:09:23.756148+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "純股價變動（含 SIVEF）；價格動 ≠ thesis 變",
+        "tier": 4
+      },
       "url": "https://x.com/aleabitoreddit/status/2079622706572804368"
     },
     "lead_a9eecd775218a780048490e677cf5364": {
@@ -1269,9 +1390,15 @@
       "published_at": "2026-07-23",
       "refs": {},
       "source": "edgar:AAOI",
-      "status": "pending",
+      "status": "triaged_no_go",
       "title": "AAOI 4 filed 2026-07-23",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-07-25T09:09:23.756275+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "個別 Form 4 資訊量低；內部人交易應以彙總方式讀（Engine C 稀釋項）",
+        "tier": 1
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826005740/xslF345X06/ownership.xml"
     },
     "lead_b3503ff4c9d89e278f35dcadc4f19a4a": {
@@ -1297,9 +1424,15 @@
       "published_at": "2026-07-23T19:48:45.000Z",
       "refs": {},
       "source": "x:aleabitoreddit",
-      "status": "pending",
+      "status": "triaged_no_go",
       "title": "$AMD reached out directly to hand me some special swag! Apparently they only made 30 of these bandanas? I love AMD and Lisa Su now. https://",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-07-25T09:09:23.756049+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "純社交內容",
+        "tier": 4
+      },
       "url": "https://x.com/aleabitoreddit/status/2080379612736221325"
     },
     "lead_b94949da2feeb98fb8d6c03bf6504c48": {
@@ -1308,9 +1441,15 @@
       "published_at": "2026-07-23",
       "refs": {},
       "source": "edgar:AAOI",
-      "status": "pending",
+      "status": "triaged_no_go",
       "title": "AAOI 4 filed 2026-07-23",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-07-25T09:09:23.756279+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "個別 Form 4 資訊量低；內部人交易應以彙總方式讀（Engine C 稀釋項）",
+        "tier": 1
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826005739/xslF345X06/ownership.xml"
     },
     "lead_bab7554c6ae3edbc39c38e11cf3fa953": {
@@ -1319,9 +1458,15 @@
       "published_at": "2026-07-22T20:45:31.000Z",
       "refs": {},
       "source": "x:aleabitoreddit",
-      "status": "pending",
+      "status": "triaged_no_go",
       "title": "$GOOGL now has 950M monthly Gemini users and processes 22B API tokens/min. Compared to 750M back in February. Absurd growth adding 200 milli",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-07-25T09:09:23.756108+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "需求端間接訊號，對瓶頸影響弱",
+        "tier": 4
+      },
       "url": "https://x.com/aleabitoreddit/status/2080031508656746874"
     },
     "lead_bdd03e8e9f98242b0023cb2a3a7eff0c": {
@@ -1364,9 +1509,15 @@
       "published_at": "2026-07-23T04:35:37.000Z",
       "refs": {},
       "source": "x:aleabitoreddit",
-      "status": "pending",
+      "status": "triaged_no_go",
       "title": "Just some notes from $TSLA transcripts: Elon Musk: \"I think Optimus will be the biggest product ever\" from Q2 earnings transcripts. Even fro",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-07-25T09:09:23.756094+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "Optimus 機器人，不在追蹤主題",
+        "tier": 4
+      },
       "url": "https://x.com/aleabitoreddit/status/2080149813065396454"
     },
     "lead_c52bbb5dfebba938fa1694d1c4596f4e": {
@@ -1443,9 +1594,15 @@
       "published_at": "2026-07-22T20:27:50.000Z",
       "refs": {},
       "source": "x:aleabitoreddit",
-      "status": "pending",
+      "status": "triaged_no_go",
       "title": "$GOOGL reported earnings today: EPS: $9.11 actual vs $2.91 expected - retail reactions to EPS blowout is kinda just accounting noise, since",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-07-25T09:09:23.756122+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "財報數字可直接從一手取得，不需經此二手",
+        "tier": 4
+      },
       "url": "https://x.com/aleabitoreddit/status/2080027058063958323"
     },
     "lead_d038e162169964320fa1bc8354c2349c": {
@@ -1471,9 +1628,15 @@
       "published_at": "2026-07-21T21:02:48.000Z",
       "refs": {},
       "source": "x:aleabitoreddit",
-      "status": "pending",
+      "status": "triaged_no_go",
       "title": "OpenAI models reportedly escaped from its controlled environment, with no internet access. Exploited zero day vulnerabilities and hacked int",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-07-25T09:09:23.756135+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "AI safety 新聞，與投資主題無關",
+        "tier": 4
+      },
       "url": "https://x.com/aleabitoreddit/status/2079673469567226149"
     },
     "lead_db65b9b3833c1035e39aaa450f5a079a": {
@@ -1518,9 +1681,15 @@
       "published_at": "2026-07-24T16:21:59.000Z",
       "refs": {},
       "source": "x:aleabitoreddit",
-      "status": "pending",
+      "status": "triaged_no_go",
       "title": "Jensen from $NVDA has joined X for the first time to share his letter on open models. https://t.co/WMdqDyyp5F",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-07-25T09:09:23.756034+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "泛泛評論，無可逐字查核的供應鏈內容",
+        "tier": 4
+      },
       "url": "https://x.com/aleabitoreddit/status/2080689966045348047"
     },
     "lead_dff5a2a6ef33a72e4cf07fda277f6bd2": {
@@ -1618,9 +1787,15 @@
       "published_at": "2026-07-24T20:22:41.000Z",
       "refs": {},
       "source": "x:aleabitoreddit",
-      "status": "pending",
+      "status": "triaged_no_go",
       "title": "There you have it, $GOOGL Waymo to explore split with $UBER per FT. My view last year was that Uber partnering with Waymo was a bad choice…",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-07-25T09:09:23.756018+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "自駕車題材，與供應鏈瓶頸主題無交集",
+        "tier": 4
+      },
       "url": "https://x.com/aleabitoreddit/status/2080750537121874206"
     },
     "lead_f1d18173b1d1d173650f0dae1545c692": {
@@ -1665,9 +1840,17 @@
       "published_at": "2026-07-22T21:02:27.000Z",
       "refs": {},
       "source": "x:aleabitoreddit",
-      "status": "pending",
+      "status": "triaged_go",
       "title": "$GOOGL updates FY 2026 capex guidance: To $195B-$205B. Up from $180B-$190B. Google is also expected to significantly increase capex in 2027.",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-07-25T09:09:23.755967+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "GOOGL FY26 capex 上修至 $195-205B——CPO/光互連 thesis 的需求端直接驅動；可回財報追源",
+        "tier": 3
+      },
       "url": "https://x.com/aleabitoreddit/status/2080035769062916479"
     },
     "lead_fd354516dc2093159fc7d48737016b84": {
@@ -1710,9 +1893,18 @@
       "published_at": "2026-07-20T06:22:41.000Z",
       "refs": {},
       "source": "x:aleabitoreddit",
-      "status": "pending",
+      "status": "triaged_go",
       "title": "Some updates on bottleneck timelines: - ABF substrates: 1 year / eg. Ajinomoto (2802) for ABF film, Ibiden, Unimicron, Nan Ya PCB, etc make",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-07-25T09:09:23.756000+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true,
+          "novelty": true
+        },
+        "reason": "瓶頸時程分析（ABF substrates/Ajinomoto 等具體公司與時程）——正是本系統核心主題",
+        "tier": 3
+      },
       "url": "https://x.com/aleabitoreddit/status/2079089592385610023"
     }
   },

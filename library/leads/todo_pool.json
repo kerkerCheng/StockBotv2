@@ -119,9 +119,69 @@
       "source": "lifecycle",
       "title": "thesis sivers：review_required",
       "type": "thesis_lifecycle"
+    },
+    {
+      "added_at": "2026-07-25T09:09:40.441273+00:00",
+      "hint": "進 pq1 深挖（source-trace + extraction）",
+      "n": 11,
+      "reason": null,
+      "ref_id": "lead_09abba7335ec575ec76ca63a92e5663f",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "x:aleabitoreddit",
+      "title": "Not exactly for $AAOI (they're working on CPO too, just a little further behind in commercialization). There's a podcast that featured the $",
+      "type": "lead_research"
+    },
+    {
+      "added_at": "2026-07-25T09:09:40.441291+00:00",
+      "hint": "進 pq1 深挖（source-trace + extraction）",
+      "n": 12,
+      "reason": null,
+      "ref_id": "lead_2ffb199ff20ab64369580b427464efcf",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "x:aleabitoreddit",
+      "title": "$AMD to invest $5B in Anthropic. Anthropic in turn will sign a 2 GW deal to buy AMD’s latest chips, worth tens of billions of dollars. Looks",
+      "type": "lead_research"
+    },
+    {
+      "added_at": "2026-07-25T09:09:40.441300+00:00",
+      "hint": "進 pq1 深挖（source-trace + extraction）",
+      "n": 13,
+      "reason": null,
+      "ref_id": "lead_58cf007b302a50a1e3d05e7dfe6acef7",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "x:aleabitoreddit",
+      "title": "From $AMD Advancing AI, channel checks: Helios networking partners told me they expect AMD to pursue CPO for future generations of Helios sc",
+      "type": "lead_research"
+    },
+    {
+      "added_at": "2026-07-25T09:09:40.441324+00:00",
+      "hint": "進 pq1 深挖（source-trace + extraction）",
+      "n": 14,
+      "reason": null,
+      "ref_id": "lead_fcbf2bd4a87932e4d67c12f0c188c3ac",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "x:aleabitoreddit",
+      "title": "$GOOGL updates FY 2026 capex guidance: To $195B-$205B. Up from $180B-$190B. Google is also expected to significantly increase capex in 2027.",
+      "type": "lead_research"
+    },
+    {
+      "added_at": "2026-07-25T09:09:40.441331+00:00",
+      "hint": "進 pq1 深挖（source-trace + extraction）",
+      "n": 15,
+      "reason": null,
+      "ref_id": "lead_ffdc392c947397e9a649b634ed41f0c8",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "x:aleabitoreddit",
+      "title": "Some updates on bottleneck timelines: - ABF substrates: 1 year / eg. Ajinomoto (2802) for ABF film, Ibiden, Unimicron, Nan Ya PCB, etc make",
+      "type": "lead_research"
     }
   ],
   "log": [],
-  "next_n": 11,
+  "next_n": 16,
   "schema_version": "1"
 }
