@@ -7,13 +7,8 @@
     "exclude_retweets": true,
     "max_results": 25
   },
-  "feeds": [
-    {
-      "source": "aleabitoreddit_rss",
-      "url": "https://aleabitoreddit.substack.com/feed",
-      "note": "channel 標題是 'Serenity'、不是帳號名（AGENTS 既知坑）；最高只能 evidence_tier 3。讀取器解析失敗時 fallback 到 site:aleabitoreddit.substack.com web search。"
-    }
-  ],
+  "_feeds_note": "2026-07-25：移除 aleabitoreddit substack feed——查證確認他的產出在 X 不在 Substack（該 feed 至今只有 1 篇 2026-05-19 舊文），已由上方 x_accounts 覆蓋；他若發長文也會在 X 貼連結。留空陣列供未來其他 RSS 來源使用。",
+  "feeds": [],
   "edgar_watch": {
     "note": "只記 filing metadata（form/日期/URL），不下載全文。8-K/10-K/10-Q/Form 4 高優先；S-8 等註冊雜訊交 triage 判。下載＋抽取仍由使用者點名 research 動詞觸發。",
     "tickers": ["COHR", "LITE", "AMAT", "LRCX", "AXTI", "AAOI", "TSEM", "GFS"],

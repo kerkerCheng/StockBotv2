@@ -123,15 +123,13 @@ fetchers/edgar.py ──────↑                        engine_c/etl_yfin
 **已確認的初始信號來源：**
 - `aleabitoreddit`：X 帳號，有同名 SubStack。會寫產業供應鏈深度分析（evidence tier 3）。是 SIVE Sivers 客戶地圖的原始來源。
 
-**Cron 追蹤方案（待實作，已定案方向）：**
-- **RSS 路線（免費，優先）：** SubStack 有 RSS feed（`https://aleabitoreddit.substack.com/feed`）；cron 定期抓新文章，存成 pending leads 清單，每次 session 開頭提示「有 N 條待判斷」。
-  - 讀取注意（2026-07-21 實測）：feed 本身正常（HTTP 200、合法 RSS XML），但 **channel 標題是 "Serenity"、不是帳號名**——看到 "Serenity" 就是這個 feed，別當成別的來源。Substack 首頁需 JavaScript、不能直接爬。**讀取器解析失敗 ≠ 無新文**：失敗時必須 fallback 到 `site:aleabitoreddit.substack.com` web search，並在報告註明用了 fallback。
-- **⚠ 上述 RSS 路線的前提已被推翻（2026-07-25 查證）：** Substack feed 至今**只有 1 篇公開文**（2026-05-19 的 Sivers CPO Laser），`site:` 搜尋也只找到首頁＋同一篇。但本人**在 X 上極度活躍**（[@aleabitoreddit](https://x.com/aleabitoreddit)，顯示名 Serenity，10 萬+ 追蹤、2026-06 一度為全 X 訂閱數第一）。**結論：RSS 掃的是錯的表面——他的產出在 X，不在 Substack。** 目前 harvest 覆蓋實質上等於「只有 EDGAR」。
-- **X 抓取的現況（2026-07-25 查證）：** **Nitter 已死**（X 關閉 guest account，專案終止），公開實例不可靠。現存自架方案是 **RSSHub**（可自架、有 X 路由），但 X 路由需登入 cookie、易被限流，維護成本高。可行選項依成本排序：(a) 使用者看到就手動貼給 chat（零成本，Fast Path，現在就能用）；(b) 自架 RSSHub（免費但脆弱，需 cookie 與維護）；(c) X API Basic 約 $100/mo（可靠，抓特定 handle 而非整條 timeline）。
-- **來源品質警語：** 該帳號公開宣稱 2026 報酬率 4,502%、推薦標的漲 100–1,000%。這類極端績效宣稱與 L5（單一 lens：偏多頭小市值瓶頸獵手）一致——當**線索來源**用，不當證據；tier 上限見下。
+**追蹤方案（2026-07-25 已實作並驗證）：**
+- **X API 是主來源（`crons/harvest_leads.py` 的 `harvest_x`）。** 曾經的「SubStack RSS 就夠」前提**已被推翻**：該 feed 至今只有 1 篇 2026-05-19 舊文，但本人在 X 極度活躍（[@aleabitoreddit](https://x.com/aleabitoreddit)，顯示名 Serenity，10 萬+ 追蹤）。**RSS 掃的是錯的表面。** substack feed 已於 2026-07-25 從 `harvest_config.json` 移除（他發長文也會在 X 貼連結）。
+- **X API 成本模型（2026-02 起 pay-per-use）：** 約 **$0.005/則、按回傳貼文數計費、無月費下限**（舊的 $200 Basic 已對新用戶關閉）。成本控制四件套實測有效：`since_id` 增量、`exclude=replies,retweets`、`max_results` 上限、`user_id` 快取。**實測：首抓 23 則 $0.115；立即重跑 0 則 $0.000。** 日常估 $1–2/月。
+- **⚠ X harvest 只在本機跑。** `X_BEARER_TOKEN` 刻意只放本機 `.env`、**不放雲端環境變數**：(a) 那是計費憑證，不該進「天職是讀不受信任網路內容」的雲端 session 的 blast radius；(b) **雲端無法持久化 `since_id`**（MCP 的 `record_lead_decision` 不碰 `source_state`），會每天重抓、重複計費，成本控制直接失效。雲端 routine 看到 `x:<handle> fetch_failed` 是**預期行為**，不是故障。
+- **已知限制（未修）：** `harvest_x` 不分頁。若新貼文數超過 `max_results`（預設 25），單次只取得部分而 `since_id` 仍前進 → **可能永久漏掉中間那批**。日常每天跑不會觸發；長時間沒跑（估 >2–3 天）再開機時要留意。要修就是加分頁並設總量上限。
+- **來源品質警語：** 該帳號公開宣稱 2026 報酬率 4,502%、推薦標的漲 100–1,000%。這類極端績效宣稱與 L5（單一 lens：偏多頭小市值瓶頸獵手）一致——當**線索來源**用，不當證據。
 - **入庫邊界：** aleabitoreddit 的內容最高只能是 `evidence_tier: 3`，需客戶端文件升級 L8 才能用於 Lane Memo。
-
-**待做：** 建 `crons/` 目錄下的 RSS 抓取腳本 + `pending_leads.json` 格式定義。
 
 ---
 

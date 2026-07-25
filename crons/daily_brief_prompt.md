@@ -28,16 +28,20 @@
 
 ### Stage 1 — Harvest（web；雲端受 egress 限制，預設走 WebSearch）
 
-> **egress 取決於環境白名單（2026-07-25 更正）：** 直連能否成功由 claude.ai 該 cloud environment 的
-> Network access 白名單決定，**不是平台硬限制**。若白名單已含 `sec.gov`／`*.sec.gov`／`substack.com`／
-> `*.substack.com`，就**照常跑 `python crons/harvest_leads.py`**（零 token、覆蓋完整）。
-> 若收到 proxy 403（policy denial）代表白名單未含該網域：**不要重試**（重試無用），改用 `WebSearch`
-> fallback，並在 brief 明確標「harvest 走 fallback、覆蓋不完整」＋列出被擋的網域，讓使用者去補白名單。
-> `WebSearch` 與 MCP 皆不受此白名單影響。
+> **egress 取決於環境白名單：** 直連能否成功由 claude.ai 該 cloud environment 的 Network access
+> 白名單決定，**不是平台硬限制**。白名單含 `sec.gov`／`*.sec.gov` 時就**照常跑
+> `python crons/harvest_leads.py`**（EDGAR 覆蓋完整）。收到 proxy 403 代表白名單未含該網域：
+> **不要重試**（重試無用），改用 `WebSearch` fallback 並在 brief 標明被擋的網域。
+> `WebSearch` 與 MCP 皆不受白名單影響。
+>
+> **X harvest 是本機專屬，雲端失敗屬預期（2026-07-25）：** `x:<handle>` 會記 `fetch_failed`，因為
+> **X_BEARER_TOKEN 刻意只留在使用者本機 `.env`、不放雲端環境變數**（那是計費憑證，不進雲端 session
+> 的 blast radius；且雲端無法持久化 `since_id`，會每天重抓重複計費）。**這不是故障、不要當問題回報、
+> 不要試圖修**——只在 brief 的「無事項目」一行帶過「X 由本機 harvest 覆蓋」即可。
 
-先試直連 harvest；被擋才退 `WebSearch`（如 `site:aleabitoreddit.substack.com`、watch 清單各 ticker 的
-新 filing）。與 baseline 去重，只留今日新增。**不得因覆蓋不完整就假裝窮盡**——brief 要明說哪些來源
-沒查到、本機補跑什麼命令。
+跑 `python crons/harvest_leads.py`（EDGAR 直連；X 預期 fetch_failed 見上）；被擋的來源才退 `WebSearch`。
+與 baseline 去重，只留今日新增。**不得因覆蓋不完整就假裝窮盡**——brief 要明說哪些來源沒查到、
+本機補跑什麼命令。
 
 ### Stage 2 — Triage（照 signal-triage，寫回經 MCP）
 

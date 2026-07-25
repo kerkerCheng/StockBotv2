@@ -190,7 +190,8 @@ def test_load_config_fail_closed_on_missing_fields(tmp_path: Path) -> None:
 
 def test_load_config_accepts_repo_default() -> None:
     cfg = harvest_leads.load_config()  # repo 內 crons/harvest_config.json
-    assert any(f["source"] == "aleabitoreddit_rss" for f in cfg["feeds"])
+    assert isinstance(cfg["feeds"], list)  # 2026-07-25 起為空（substack 已由 X 取代）
+    assert "aleabitoreddit" in cfg["x_accounts"]["handles"]
     assert "COHR" in cfg["edgar_watch"]["tickers"]
 
 
