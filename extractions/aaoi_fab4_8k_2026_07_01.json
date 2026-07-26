@@ -1,0 +1,71 @@
+{
+  "claims": [
+    {
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Downgrade if a later AAOI filing cancels the agreement, materially reduces the cleanroom scope, or pushes substantial completion beyond January 10, 2027. The filing does not prove product allocation, qualified output, utilization, or shipment volume.",
+      "id": "aaoi_fab4_8k_2026_07_01_cl1",
+      "source_ids": [
+        "aaoi_fab4_8k_2026_07_01_s1",
+        "aaoi_fab4_8k_2026_07_01_s2",
+        "aaoi_fab4_8k_2026_07_01_s3",
+        "aaoi_fab4_8k_2026_07_01_s4"
+      ],
+      "statement": "AAOI entered a $94.1 million design-build agreement for its OMD 3 (FAB4) project, including approximately 195,591 square feet of ISO Class 6 cleanroom space, with targeted substantial completion on January 10, 2027.",
+      "subject_id": "co:applied_optoelectronics"
+    }
+  ],
+  "edges": [],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "AOI",
+        "AAOI"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:applied_optoelectronics",
+      "name": "Applied Optoelectronics",
+      "role": "leader",
+      "source_ids": [
+        "aaoi_fab4_8k_2026_07_01_s1"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "aaoi_fab4_8k_2026_07_01",
+    "evidence_tier": 1,
+    "origin_entity": "Applied Optoelectronics",
+    "permission_basis": "SEC EDGAR 公開 8-K；僅保存研究所需有限逐字節錄與 canonical URL",
+    "published_at": "2026-07-01",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Applied Optoelectronics Form 8-K — OMD 3 (FAB4) cleanroom design-build agreement",
+    "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826005221/aaoi_8k.htm"
+  },
+  "sources": [
+    {
+      "id": "aaoi_fab4_8k_2026_07_01_s1",
+      "locator": "Item 1.01, paragraphs 1-3",
+      "quote": "OMD 3 (FAB4) cleanroom construction project located at 11555 North Spectrum Blvd., Houston, Texas 77047"
+    },
+    {
+      "id": "aaoi_fab4_8k_2026_07_01_s2",
+      "locator": "Item 1.01, paragraphs 3-4",
+      "quote": "approximately 195,591 square feet of ISO Class 6-certified cleanroom space"
+    },
+    {
+      "id": "aaoi_fab4_8k_2026_07_01_s3",
+      "locator": "Item 1.01, paragraphs 4-6",
+      "quote": "The total contract amount for the Project is approximately $94.1 million"
+    },
+    {
+      "id": "aaoi_fab4_8k_2026_07_01_s4",
+      "locator": "Item 1.01, final paragraph",
+      "quote": "The Project has a targeted Substantial Completion date of January 10, 2027."
+    }
+  ]
+}
