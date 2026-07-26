@@ -179,9 +179,33 @@
       "source": "x:aleabitoreddit",
       "title": "Some updates on bottleneck timelines: - ABF substrates: 1 year / eg. Ajinomoto (2802) for ABF film, Ibiden, Unimicron, Nan Ya PCB, etc make",
       "type": "lead_research"
+    },
+    {
+      "added_at": "2026-07-26T07:30:43.068107+00:00",
+      "hint": "修復全域 authority blocker 後重跑 decision_lab today",
+      "n": 16,
+      "reason": null,
+      "ref_id": "global:holdings_unavailable",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — Google Sheet current holdings 無法讀取；無法完成今日投組覆蓋檢查。",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-07-26T07:32:23.550338+00:00",
+      "hint": "research：比對 Ningi/governance thesis 與 8/27 review；先追公司原始公告與監管申報",
+      "n": 17,
+      "reason": null,
+      "ref_id": "weekly:2026-07-26:sivers-insider-transactions",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "Weekly topic：Sivers 2026-07-21 lock-up 到期與 insider transactions（CEO +70k；董事長 -275k；Headwaters -950k）",
+      "type": "manual"
     }
   ],
   "log": [],
-  "next_n": 16,
+  "next_n": 18,
   "schema_version": "1"
 }

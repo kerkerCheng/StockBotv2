@@ -289,7 +289,8 @@ def collect_from_decisions() -> list[dict[str, Any]]:
     except Exception:
         return []
     rows: list[dict[str, Any]] = []
-    for item in brief.get("items") or []:
+    items = brief.get("items") or []
+    for item in items:
         action = str(item.get("recommended_action") or "")
         if action in {"NO ACTION", ""}:
             continue
@@ -301,6 +302,21 @@ def collect_from_decisions() -> list[dict[str, Any]]:
             "type": "sheet_only_holding" if item.get("sheet_only") else "decision_review",
             "ref_id": ref,
             "title": f"{action} — {company}",
+            "source": "decision_lab",
+        })
+    # Engine D 也可能因 portfolio authority 全域失效而要求 REVIEW，這時沒有
+    # cohort item（例如 Google Sheet holdings 完全讀不到）。這仍是需要使用者
+    # 處理的 pq2，不能因 items=[] 就從統一待辦池消失。
+    if brief.get("action_needed") and not items:
+        action = str(brief.get("recommended_action") or "REVIEW")
+        blockers = sorted(str(b) for b in (brief.get("blockers") or []) if b)
+        reason = str(brief.get("reason") or "Engine D 全域狀態需要複查")
+        ref = "global:" + ("|".join(blockers) or action.lower())
+        rows.append({
+            "type": "decision_review",
+            "ref_id": ref,
+            "title": f"{action} — {reason}",
+            "hint": "修復全域 authority blocker 後重跑 decision_lab today",
             "source": "decision_lab",
         })
     return rows

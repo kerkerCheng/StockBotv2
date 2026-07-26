@@ -19,10 +19,10 @@ description: >
 判斷（要不要深挖、要不要入圖）。無事時 brief 是一行 `NO ACTION`。三道閘門永不自動：graph
 admission 必經核准 exact 對象、深挖由 priority 排序但入圖仍核准、live 資本永遠人工。
 
-> **介面是對話，不用 GitHub UI。** cloud routine 產 brief → Claude app 推播 → 你在 thread 回批次語法。
-> `decision_lab` 決策命令只在本機（雲端 clone 無 private Decision Store）；雲端看決策用 MCP 唯讀
-> `get_decision_brief`、改 leads 狀態用 MCP `record_lead_decision`（本機 server 幫你窄 pathset commit+push）。
-> pq1／pq2 定義見 CONCEPTS.md。
+> **介面是對話，不用 GitHub UI。** 本機 Codex／Claude 排程直接讀 repo、private runtime 與
+> `todo_pool.json`；遠端 cloud session 才需要 MCP `get_decision_brief`／`record_lead_decision` 降級路徑。
+> 決策與 private authority 寫入只在本機；所有需要使用者決策的項目一律先進統一待辦池，brief
+> 不自行重編號。pq1／pq2 定義見 CONCEPTS.md。
 
 ---
 
@@ -81,10 +81,18 @@ python -m decision_lab today --format markdown
 （material=有觸及 thesis 因果結構的新證據 → 建議 reassess；peripheral=只多週邊 source；none=無變或
 純價格波動）。再讀 `thesis/lifecycle.json` 列到期需複查的 thesis。純讀，不建 decision。
 
-### Step 5 — 組 brief（繁中、exception-first、**穩定編號、無顏色**）
+### Step 5 — 同步統一待辦池並組 brief（繁中、exception-first、**穩定編號、無顏色**）
 
-把 leads／決策佇列／等 apply 的 RA／到期 thesis／有 material evidence-delta 的 probe 聚成一份，
-**跨 section 連續編號**（回覆用），每項附明確指令。無事就一行 `NO ACTION ＋日期`。
+先同步所有 pq2 來源：
+
+```powershell
+python -m engine_b.todo sync
+```
+
+`library/leads/todo_pool.json` 是回覆編號的唯一 authority：項目首次進池時取得編號，直到 resolve 才釋放；
+**不得依當日排序、section 或模型輸出重新編號**。用池內原編號把 leads／決策佇列／等 apply 的 RA／
+到期 thesis／有 material evidence-delta 的 probe 組成 brief，每項附明確指令。無事就一行
+`NO ACTION ＋日期`。
 
 ```
 # Daily Brief <YYYY-MM-DD>
@@ -114,13 +122,17 @@ paper 無異動｜live 無 pending fill｜...
 
 ### Step 6 — 批次 dispatch（type-aware）
 
-使用者回 `1 3 7 go 4 drop 5 6 pending`。用 deterministic parser 解析，不自由心證：
+使用者回 `1 3 7 go 4 drop 5 6 pending`。先讀池中 exact item，再用 deterministic parser 解析，
+不自由心證：
 
 ```powershell
+python -m engine_b.todo list --json
 python -c "from engine_b.batch import parse_batch_reply; import json,sys; print(json.dumps(parse_batch_reply(sys.argv[1])))" "1 3 7 go 4 drop 5 6 pending"
 ```
 
-依編號對應的**項目類型** dispatch（type-aware；動詞不新增任何權限語意）：
+依編號對應的**項目類型** dispatch（type-aware；動詞不新增任何權限語意）。`todo batch` 只會更新池與
+稽核 log，**不會代做** pq1／apply／reassess；必須先完成或 checkpoint 對應動作，再以
+`python -m engine_b.todo resolve <編號> --verb <動詞>` 記錄結果，不能先 resolve 再假裝已執行：
 
 | 動詞 | lead | 已 prepared 的 RA | 到期 thesis |
 |------|------|-------------------|-------------|

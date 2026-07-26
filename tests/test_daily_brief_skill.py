@@ -22,6 +22,7 @@ def test_references_batch_verbs_and_operational_commands() -> None:
     for command in (
         "python crons/harvest_leads.py",
         "python -m engine_b.cli",
+        "python -m engine_b.todo sync",
         "python -m decision_lab today",
         "drain",  # pq1 priority drain
     ):
@@ -57,3 +58,10 @@ def test_states_gates_and_human_boundaries() -> None:
 def test_lead_status_never_claims_evidence_tier() -> None:
     text = _text()
     assert "不是" in text and "evidence tier" in text
+
+
+def test_uses_persistent_todo_numbers_and_does_not_blindly_dispatch_batch() -> None:
+    text = _text()
+    assert "todo_pool.json" in text
+    assert "不得依當日排序" in text
+    assert "todo batch" in text and "不會代做" in text

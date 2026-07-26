@@ -112,6 +112,26 @@ def test_load_missing_returns_empty_pool(tmp_path) -> None:
     assert todo.load(tmp_path / "nope.json") == todo.empty_pool()
 
 
+def test_collect_from_decisions_keeps_global_blocker_without_items(monkeypatch) -> None:
+    from mcp_server import decision_tools
+
+    monkeypatch.setattr(decision_tools, "get_decision_brief_core", lambda: {
+        "action_needed": True,
+        "recommended_action": "REVIEW",
+        "reason": "Google Sheet current holdings 無法讀取。",
+        "blockers": ["holdings_unavailable"],
+        "items": [],
+    })
+
+    assert todo.collect_from_decisions() == [{
+        "type": "decision_review",
+        "ref_id": "global:holdings_unavailable",
+        "title": "REVIEW — Google Sheet current holdings 無法讀取。",
+        "hint": "修復全域 authority blocker 後重跑 decision_lab today",
+        "source": "decision_lab",
+    }]
+
+
 def test_cli_add_and_batch(tmp_path, capsys) -> None:
     path = str(tmp_path / "todo_pool.json")
     assert todo.main(["--pool", path, "add", "查 COHR 客戶集中度", "--hint", "本機查"]) == 0
