@@ -19,8 +19,10 @@ description: >
 無事時 brief 是一行 `NO ACTION`。三道閘門永不自動：graph
 admission 必經核准 exact 對象、深挖由 priority 排序但入圖仍核准、live 資本永遠人工。
 
-> **介面是對話，不用 GitHub UI。** 本機 Codex／Claude 排程直接讀 repo、private runtime 與
-> `todo_pool.json`；遠端 cloud session 才需要 MCP `get_decision_brief`／`record_lead_decision` 降級路徑。
+> **介面是對話，不用 GitHub UI。** 現行排程是 Codex desktop local scheduled task；本機 Claude Code
+> session 也可手動執行同一流程，直接讀 repo、private runtime 與 `todo_pool.json`。本階段提到 Claude
+> 預設就是 Claude Code 本機；cloud session＋MCP 是備援，只保留
+> `get_decision_brief`／`record_lead_decision` 等既有受限路徑，不要求與本機完全等權。
 > 決策與 private authority 寫入只在本機；所有需要使用者決策的項目一律先進統一待辦池，brief
 > 不自行重編號。pq1／pq2 定義見 CONCEPTS.md。
 
@@ -132,6 +134,10 @@ paper 無異動｜live 無 pending fill｜...
 使用者回 `1 3 7 go 4 drop 5 6 pending`。先讀池中 exact item，再用 deterministic parser 解析，
 不自由心證：
 
+Codex／Claude Code 本機交互執行時，收到核准的 agent 必須以當下 `todo_pool.json` 與 underlying authority
+重新核對；上一個 task 的 `memory.md`／transcript 不能證明 item 已執行。兩個本機 agent 不得同時 dispatch
+或同時寫同一 working tree。
+
 ```powershell
 & '.venv\Scripts\python.exe' -m engine_b.todo list --json
 & '.venv\Scripts\python.exe' -c "from engine_b.batch import parse_batch_reply; import json,sys; print(json.dumps(parse_batch_reply(sys.argv[1])))" "1 3 7 go 4 drop 5 6 pending"
@@ -171,8 +177,9 @@ fill。系統不連 broker。
 ## 現行本機排程與遠端 fallback
 
 `crons/daily_brief_prompt.md` 是 Codex desktop 每日 06:30 的本機 scheduled task prompt，可直接讀 repo 與
-private authorities；`crons/weekly_scan_prompt.md` 是台北週日 04:00 的本機 weekly prompt。Claude cloud routine 已退出現行
-排程，只保留遠端 chat／手機 intake 的 MCP fallback；遠端永遠不得取代本機 decision／lifecycle authority。
+private authorities；本機 Claude Code session 亦可沿用同一 prompt 手動執行；`crons/weekly_scan_prompt.md`
+是台北週日 04:00 的本機 weekly prompt。Cloud session＋MCP 不承擔現行排程，只保留遠端 chat／手機
+intake 的 fallback；遠端永遠不得取代本機 decision／lifecycle authority。
 
 ## 已知會壞的地方（v0，撞到回頭修）
 

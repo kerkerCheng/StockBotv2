@@ -3,6 +3,8 @@
 > 現行執行端是 Codex 本機 scheduled task（台北週日 04:00），直接在 `master` working tree 執行。
 > 不建立 branch／worktree、不走 Claude cloud clone、不靠 MCP 才能讀本機 authority。Windows 命令一律
 > 使用 `.venv\Scripts\python.exe`。
+> 本檔亦可由本機 Claude Code session 手動執行，或日後在停用 Codex Weekly 後成為其本機排程 runbook；
+> 同一個 Weekly 只能有一個本機 scheduler，兩端 session／排程不得同時寫 `master`。
 
 ## 定位
 

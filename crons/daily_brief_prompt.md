@@ -3,6 +3,8 @@
 > 現行執行端是 Codex desktop 的 standalone local scheduled task，每日台北 06:30 直接在
 > `C:\Users\Cheng\code\StockBotv2` 的 `master` working tree 執行。電腦需保持開機、Codex App
 > 保持運行。不要建立 branch／worktree，也不要使用 Claude cloud clone 或遠端 MCP 降級路徑。
+> 本檔同時是本機 Claude Code session 的手動共用 runbook；若由 Claude Code 執行，「Claude」指本機
+> session，仍直接讀同一 repo／private authorities，不需也不得依賴 Codex automation memory。
 
 ## 任務
 

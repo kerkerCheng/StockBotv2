@@ -1,7 +1,7 @@
 # 盲點審查報告：下一階段 Operating Model（三個工作流＋跨代理狀態）
 
 > 狀態：下一階段 brainstorm；尚未授權實作 portfolio bands、付費來源自動化、Daily runner
-> 重構或新的 remote approval tool。
+> 重構或本機 single-writer guard。
 >
 > 本文件把三個待討論工作流收在同一個 umbrella 下：
 > 1. Alpha／Beta Portfolio Sleeve Monitor
@@ -11,6 +11,10 @@
 > Alpha／Beta 的既有深度審查仍以
 > [`2026-07-26-alpha-beta-sleeve-workflow-requirements.md`](2026-07-26-alpha-beta-sleeve-workflow-requirements.md)
 > 為準；本文件只定義三者如何共用 authority、Daily 介面與跨 Codex／Claude 狀態。
+>
+> **範圍校正（2026-07-26 使用者定案）：** primary path 是本機 Codex session＋本機 Claude Code
+> session；兩者直接讀同一 repo、Neo4j、Engine C／Decision Store 與 Google Sheet，採序列切換。
+> Cloud session＋MCP 只是備援，不是本階段 parity／記憶共享目標，也不在本文件新增 remote surface。
 
 ## 最危險的三個盲點（先看這個）
 
@@ -69,12 +73,12 @@
 | 狀態 | Current-state authority | 跨工具方式 | session memory 的角色 |
 |---|---|---|---|
 | 政策／runbook／skill | `AGENTS.md`、`skills/`、`crons/*_prompt.md` | Git；兩端 skill adapters 由 sync script 生成 | 可摘要，不可覆寫政策 |
-| pq1 注意力 | `library/leads/pending_leads.json` | Git＋窄 MCP lead tool | 只記「上次看到哪裡」的提示 |
-| pq2 編號／決定稽核 | `library/leads/todo_pool.json` | 本機 Git；remote surface 尚未完整 | 不可宣稱某編號已 resolve |
-| Research Action | server-owned action、exact ID＋digest、apply receipt | 本機／MCP | 可提示 action ID，不是 apply receipt |
-| Engine A | Neo4j | 本機或 MCP | 不保存圖的 current truth |
-| Engine C | private runtime／manual observation ledger | 本機；remote read surface 有限 | 不保存 freshness 真相 |
-| Engine D | private Decision Store | 本機；`get_decision_brief` 僅 redacted read | 不保存 choice／fill／decision truth |
+| pq1 注意力 | `library/leads/pending_leads.json` | 兩個本機 session 讀同一檔；Git 負責持久同步 | 只記「上次看到哪裡」的提示 |
+| pq2 編號／決定稽核 | `library/leads/todo_pool.json` | 兩個本機 session 讀寫同一檔與 log | 不可宣稱某編號已 resolve |
+| Research Action | server-owned action、exact ID＋digest、apply receipt | 兩個本機 session 讀同一 action store | 可提示 action ID，不是 apply receipt |
+| Engine A | Neo4j | 兩個本機 session 直連同一 DB | 不保存圖的 current truth |
+| Engine C | private runtime／manual observation ledger | 兩個本機 session 讀同一 private authority | 不保存 freshness 真相 |
+| Engine D | private Decision Store | 兩個本機 session 讀寫同一 private authority | 不保存 choice／fill／decision truth |
 | live inventory | Google Sheet | Google authority | 不複製持股數字 |
 | thesis lifecycle | `thesis/lifecycle.json` | Git＋人工修改 | 不得自行 revise／retire |
 | Weekly 歷史發現 | `docs/reports/weekly_scan_<date>.md` | Git | 可指向上次報告，不取代現況 |
@@ -94,20 +98,19 @@ Codex 官方公開契約是：standalone scheduled task 每次 run 開一個新 
 3. underlying authority 留下 receipt：RA apply state、Decision reassess、lifecycle edit、或其他 type-specific fact。
 4. 最後才寫 `todo_pool.log`／resolution，供下一個 Codex／Claude session 重建。
 
-目前 Claude Code **本機 session** 可直接讀同一 repo／private runtime，因此能完成上述四步；但必須避免與 Codex
-同時寫同一 working tree。Claude **cloud chat／routine** 目前只有 `get_decision_brief`、pending leads 與
-Research Action 等窄 MCP surface，沒有完整 unified todo read／type-aware resolve。它可以討論，某些 RA 也可經
-native approval apply，但若沒有本機 reconciliation，`todo_pool` 仍可能保留舊項目而被下一次 Daily 重問。
+本機 Claude Code 與本機 Codex 可直接完成上述四步，不需要同步各自的 session memory。正確的序列切換協定是：
 
-因此下一階段若真的需要「任一 chat 都能批准」，應討論的是 provider-neutral approval receipt／reconciliation，
-不是同步兩份自然語言 memory。候選設計可以是：
+1. 目前 agent 先完成、checkpoint 或明確停止寫入；不得只留下半句 transcript 當交接。
+2. 下一個 agent 重新確認 branch／`git status --short`，再讀 `todo_pool.json`、exact action state 與相關
+   private receipt；authority 與 memory 衝突時永遠以 authority 為準。
+3. 收到 `go` 的 agent 負責完成 type-aware action；成功後才 resolve todo。若動作 partial／失敗，保留 active，
+   讓另一個本機 session 可從 checkpoint 續跑。
+4. 同一時間只能有一個 writer。Codex scheduled task 與 Claude Code interactive session 也算兩個 writer；
+   若未來把 Weekly scheduler 搬給 Claude，必須先停用 Codex Weekly，不能雙排程並存。
 
-- read-only `get_todo_pool`：輸出 redacted exact item 與 fingerprint；
-- additive `record_todo_authorization`：只記使用者對 exact fingerprint 的 intent，不宣稱執行成功；
-- local reconciler：依 type 執行並驗證 receipt，成功後才 resolve；
-- 是否允許 remote immediate RA apply，另以現有 ID＋digest＋native approval 邊界處理。
-
-以上只是 brainstorm；新增 remote write tool 前需另做安全與 duplicate-execution review。
+Cloud session＋MCP 保留作備援：可在本機不便使用時讀 redacted brief、處理既有窄工具允許的工作，但不把
+「cloud 能否完整 resolve unified todo」當成本階段需求。若未來備援使用頻率真的上升，再另立 remote parity
+需求；本文件不先新增 remote tool。
 
 ## 逐視角發現
 
@@ -167,9 +170,11 @@ native approval apply，但若沒有本機 reconciliation，`todo_pool` 仍可�
 
 ### C10 系統整合縫隙
 
-- [🔴] **觀察**：Cloud Claude 目前能讀 Decision brief、操作部分 Research Action，卻不能完整讀／resolve unified todo。
-  **修正**：在允許 cloud approval 前先補 read surface 與 local reconciliation；否則明確限制 cloud 為討論／prepare。
-  **驗證／何時會爆**：Claude 完成一次 action 後，下一次 Codex Daily 若仍提出同一 active item，整合失敗。
+- [🔴] **觀察**：Codex 排程直接寫 `master`；Claude Code interactive session 也可能同時寫同一 working tree／
+  private store。即使兩邊都會讀最新 authority，並發 writer 仍可能造成 stale digest、重複 apply 或 Git 衝突。
+  **修正**：維持人工序列切換；若實測常撞到排程時間，再設計 lightweight 本機 single-writer lease／abort guard。
+  **驗證／何時會爆**：讓 Claude Code 在 06:30／週日 04:00 跨越排程時間執行 state mutation；Codex routine 必須
+  能偵測已有 writer 並停止，而不是兩邊繼續。
 
 ### C11 單一視角風險
 
@@ -179,10 +184,10 @@ native approval apply，但若沒有本機 reconciliation，`todo_pool` 仍可�
 
 ### C12 可操作性／scope
 
-- [🔴] **觀察**：同時做 sleeve engine、付費內容 ingest、runner 重構與 remote approval protocol，單人 scope 過大。
-  **修正**：建議順序為 telemetry／authority contract → token runner → sleeve v0 → paywall manual route；remote approval
-  只有在真實跨工具核准需求反覆出現後再做。
-  **驗證／何時會爆**：若第一階段還沒量到基準就新增四種 schema／MCP tools，代表過度設計。
+- [🔴] **觀察**：同時做 sleeve engine、付費內容 ingest、runner 重構與跨 agent orchestration，單人 scope 過大。
+  **修正**：建議順序為 local handoff contract／telemetry → token runner → sleeve v0 → paywall manual route；
+  single-writer guard 只有在真實排程碰撞反覆出現後再做。
+  **驗證／何時會爆**：若第一階段還沒量到基準就新增多套 schema／lock／hook，代表過度設計。
 
 ## 整體可證偽條件
 
@@ -193,9 +198,8 @@ approval 在換工具後重做，則現有 authority contract 不足，必須新
 
 ## 接下來盯什麼
 
-1. 先定案跨工具原則：Claude Code 本機可完整執行；Claude cloud 暫限討論／prepare／既有 MCP 邊界，直到 todo
-   read＋reconciliation 補齊。
+1. 依 local-first 契約執行：本機 Codex／Claude Code 序列互換；cloud session＋MCP 只作備援。
 2. 收集 3–7 次 Daily telemetry，依 run class 記 model calls、uncached input、quota delta 與 pq1 outcome。
 3. 讓 paywall outcome 開始累積 30 天 ROI ledger，再決定是否買 DIGITIMES News。
 4. 回到 Alpha／Beta 文件，核准現有資產的 core／tactical／alpha 分類與最小 bands。
-5. 再決定是否立項 deterministic Daily runner；remote approval protocol 不與第一版 runner 綁在一起。
+5. 再決定是否立項 deterministic Daily runner；只有真實發生排程／互動 session writer 碰撞，才加本機 lock。

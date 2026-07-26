@@ -8,7 +8,9 @@
 - **研究 skill 唯一權威：** `skills/<name>/SKILL.md`。`.agents/skills/`（Codex）與 `.claude/skills/`（Claude Code）是生成的薄轉接層，不直接手改。
 - 新增 skill 或修改 skill 的 `name` / `description` 後，執行 `python scripts/sync_agent_skills.py`；交接前用 `python scripts/sync_agent_skills.py --check` 驗證兩端無漂移。
 - **平台設定分開：** Codex 設定放 `.codex/`，Claude Code 本機設定放 `.claude/settings.local.json`；共用行為應呼叫同一支 repo Python 程式，不在兩份 hook 裡複製業務邏輯。
-- **切換原則：** 同一 working tree 只讓一個 agent 寫入；序列切換沿用同一 feature branch。若兩邊同時工作，必須使用不同 worktree / branch。交接訊息至少附目前 plan 路徑、進行中的 U-ID、`git status --short`、最後一次驗證命令與結果。
+- **Local-first 方針（2026-07-26 使用者定案）：** 未特別寫 `claude.ai`／cloud 時，文件中的「Claude」一律指**本機 Claude Code session**。Daily／Weekly／todo 核准的 primary path 是本機 Codex 與本機 Claude Code 可序列互換、直接讀同一套 repo／private authorities；**cloud session＋MCP 是備援**，只使用既有受限 surface，不要求與本機 session 完全等權。
+- **切換原則：** 同一 working tree 只讓一個 agent 寫入；本機 Codex／Claude Code 序列切換可沿用 `master` 與同一組 private authorities，但下一個 agent 必須重新讀 `git status --short`、`todo_pool.json`、對應 action／decision receipt，不得依賴上一個 session 的自然語言摘要。若兩邊同時工作，必須使用不同 worktree / branch；排程與互動 session 也算兩個 writer，不能重疊。交接訊息至少附目前 plan 路徑、進行中的 U-ID、`git status --short`、最後一次驗證命令與結果。
+- **Session memory 不是 authority：** Codex automation `memory.md`、Codex task context 與 Claude Code transcript 都只可當 disposable advisory cache，不需同步。使用者在任一個本機 session 核准 todo 後，必須先完成 type-aware 動作並留下 underlying receipt，最後才寫 `todo_pool.log`／resolution；未寫 authority 的「已 go」不得被另一個 agent 視為完成。
 - 本機開發 agent 可以是 Claude Code 或 Codex；架構中明指 `claude.ai` custom connector 的遠端流程仍維持 Claude，不因本機開發工具切換而改名。
 - **Push 政策（2026-07-22 使用者定案）：** push 是常規動作——session 收尾（邏輯 commits 完成後）把 master push 到 origin，不需逐次人工確認。私有隔離依 `.gitignore`（`library/private/`、`.env`）；push 前 sanity check：`git ls-files library/private` 應為空。本機 daily scheduled task 只可經 `scripts/publish_daily_state.py` 發布 `pending_leads.json`＋`todo_pool.json`；不得用 unattended 廣泛 Git 命令碰其他檔。
 
