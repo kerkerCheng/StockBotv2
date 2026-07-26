@@ -335,6 +335,60 @@
       "result": "ok",
       "run_at": "2026-07-26T07:24:55.890691+00:00",
       "source": "edgar:GFS"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-26T08:17:39.114415+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-26T08:17:40.268815+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-26T08:17:41.174392+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-26T08:17:42.097801+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-26T08:17:43.058333+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-26T08:17:43.970874+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-26T08:17:44.977491+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-26T08:17:45.965726+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-26T08:17:46.846015+00:00",
+      "source": "edgar:GFS"
     }
   ],
   "leads": {
@@ -756,9 +810,13 @@
       "first_seen": "2026-07-25T09:06:50.926738+00:00",
       "lead_id": "lead_58cf007b302a50a1e3d05e7dfe6acef7",
       "published_at": "2026-07-23T20:46:57.000Z",
-      "refs": {},
+      "refs": {
+        "gap": "future_CPO_and_MI500_not_supported_by_primary_sources",
+        "outcome": "lead_only_tier_4",
+        "primary_url": "https://www.amd.com/en/blogs/2026/ai-networking-built-for-scale.html"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "title": "From $AMD Advancing AI, channel checks: Helios networking partners told me they expect AMD to pursue CPO for future generations of Helios sc",
       "triage": {
         "decided_at": "2026-07-25T09:09:23.755948+00:00",
@@ -1961,6 +2019,30 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2080035769062916479"
     },
+    "lead_fcc4ddc4ac5a29b00466bd580c5d4e6a": {
+      "first_seen": "2026-07-26T08:23:40.494911+00:00",
+      "lead_id": "lead_fcc4ddc4ac5a29b00466bd580c5d4e6a",
+      "published_at": "2026-07-21",
+      "refs": {
+        "outcome": "verified_engine_c_only",
+        "pq2_ref": "thesis:sivers",
+        "primary_url": "https://www.sivers-semiconductors.com/press/update-on-expiry-of-lock-up-undertaking-and-insider-transactions-in-sivers-semiconductors/"
+      },
+      "source": "weekly:sivers",
+      "status": "parked",
+      "title": "Sivers 2026-07-21 lock-up 到期與 insider transactions",
+      "triage": {
+        "decided_at": "2026-07-26T08:23:48.004674+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "contradiction": true,
+          "novelty": true
+        },
+        "reason": "公司具名公告含日期、角色與精確股數，可逐字核對；直接影響 Sivers governance／資本結構風險，具新穎與反證價值，先進 pq1 追監管原始申報。",
+        "tier": 2
+      },
+      "url": "https://www.prnewswire.com/news-releases/update-on-expiry-of-lock-up-undertaking-and-insider-transactions-in-sivers-semiconductors-302831179.html"
+    },
     "lead_fd354516dc2093159fc7d48737016b84": {
       "first_seen": "2026-07-22T15:37:18.082155+00:00",
       "lead_id": "lead_fd354516dc2093159fc7d48737016b84",
@@ -2020,7 +2102,7 @@
   "source_state": {
     "x:aleabitoreddit": {
       "since_id": "2080750537121874206",
-      "updated_at": "2026-07-26T07:24:48.037463+00:00",
+      "updated_at": "2026-07-26T08:17:39.114401+00:00",
       "user_id": "1940360837547565056"
     }
   }

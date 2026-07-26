@@ -1,115 +1,61 @@
-# Daily Approval Brief — Cloud Routine Prompt（v1.1）
+# Daily Approval Brief — Codex 本機排程 Prompt（v1.2）
 
-> 這份 prompt 由 claude.ai 的 cloud routine 每日觸發執行（台北時間 06:30，錯開週掃 06:00）。
-> 執行環境是 Anthropic 雲端沙盒：有整份 repo 的 **pushed clone**、有 web search、有
-> `stockbotv2-graph` MCP connector。**連不到使用者本機檔案／Engine C／Decision Store**——
-> 決策佇列走 MCP `get_decision_brief`；leads 讀 `get_pending_leads`、改狀態用
-> `record_lead_decision`（本機 MCP server 幫忙窄 pathset commit+push）。
-> **不使用 GitHub Issue/PR。** 本 routine 的輸出（brief）直接呈現在 Claude app，推播給使用者；
-> 使用者在同一 thread 用批次語法回覆。設計出處：`docs/plans/2026-07-24-001-...-v1-1-plan.md`。
+> 現行執行端是 Codex desktop 的 standalone local scheduled task，每日台北 06:30 直接在
+> `C:\Users\Cheng\code\StockBotv2` 的 `master` working tree 執行。電腦需保持開機、Codex App
+> 保持運行。不要建立 branch／worktree，也不要使用 Claude cloud clone 或遠端 MCP 降級路徑。
 
-## 定位（先讀這段）
+## 任務
 
-每日**心跳＋聚合＋best-effort 研究 drain**。先產一份 action-first brief（心跳，必完成），
-再用剩餘預算 best-effort drain pq1（研究）到「等你核准」為止。
+明確使用 `$daily-brief` skill，產出一份繁體中文、action-first、穩定 pq2 編號的 Daily Brief。
+這個本機 task 可直接讀 repo、`.env`、Neo4j、Engine C private runtime、Decision Store 與 Google Sheet；
+X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
 
-**鐵律（KTD1/KTD3/KTD4）：cloud 只讀不寫圖/lifecycle。** 不建 decision、不下單、不入圖、不改
-`thesis/lifecycle.json`。leads 狀態變更**只**經 MCP `record_lead_decision`（窄 pathset）。入圖
-（apply）與 live 決策永遠是使用者的人工 gate。
+## 執行契約
 
-## 執行流程
+1. 先讀 `AGENTS.md` 與 `skills/daily-brief/SKILL.md`。確認目前 branch 是 `master`；若不是就停止並回報，
+   不自行切 branch。若 working tree 有與本 routine 無關的使用者變更，保留不碰。
+2. Windows 一律使用專案 interpreter：`.venv\Scripts\python.exe`，不得用 bare `python`。
+3. 依序執行：
+   - `.venv\Scripts\python.exe crons\harvest_leads.py`（X＋EDGAR；以 `since_id`／URL hash 去重）
+   - `.venv\Scripts\python.exe engine_c\etl_yfinance.py`（35 檔 Engine C daily snapshot）
+   - 對今日新增 pending leads 套 `skills/signal-triage/SKILL.md`，用本機 CLI 寫回 triage
+   - `.venv\Scripts\python.exe -m decision_lab today --format markdown`
+   - `.venv\Scripts\python.exe -m engine_b.todo sync`
+   - `.venv\Scripts\python.exe -m engine_b.todo list`
+4. 任何來源失敗都要誠實列出 `fetch_failed`／`parse_failed`；單一來源失敗不阻斷其他段落。X token
+   只從本機 `.env` 讀取，不得輸出或搬移 token。
+5. 先組出不會因研究失敗而消失的心跳 snapshot，再 best-effort 執行
+   `.venv\Scripts\python.exe -m engine_b.cli drain --limit 2` 的最高 priority leads：逐則
+   source-trace＋extract，checkpoint `researching` → `action_prepared`。有可核准 graph delta 才 prepare；
+   追源未果、原主張被否定或僅屬 Engine C 時變 observation 時 park 並記 outcome，不製造空 RA。
+   只有 prepared RA 才進 pq2；triage PASS 與 pq1 自動研究都不代表入圖核准。
+6. Graph admission、thesis retire／revise、Google Sheet 真實持倉值、`record-choice`／`record-fill` 永遠
+   保留人工 gate；不得因 routine recommendation 推定使用者核准。
+7. 收尾執行 `.venv\Scripts\python.exe scripts\publish_daily_state.py`。這支固定 publisher 只准提交
+   `library/leads/pending_leads.json` 與 `library/leads/todo_pool.json`；若 guard 拒絕，保留檔案並在 brief
+   回報，不要改用廣泛 `git add/commit/push` 繞過。
 
-### Stage 0 — 前置與降級
+## 輸出
 
-1. 讀 clone 的 `crons/harvest_config.json` 與 `library/leads/pending_leads.json` baseline（去重用）
-2. 讀 `skills/signal-triage/SKILL.md`（triage 判準）
-3. 呼叫 MCP `get_decision_brief` 確認連線；**連不上不卡住**——決策佇列段標「MCP 不可用、今日降級」，
-   leads／harvest／lifecycle 照常
+只用 `library/leads/todo_pool.json` 的既有穩定編號；不得依 section 或當日排序重新編號。
 
-### Stage 1 — Harvest（web；雲端受 egress 限制，預設走 WebSearch）
-
-> **egress 取決於環境白名單：** 直連能否成功由 claude.ai 該 cloud environment 的 Network access
-> 白名單決定，**不是平台硬限制**。白名單含 `sec.gov`／`*.sec.gov` 時就**照常跑
-> `python crons/harvest_leads.py`**（EDGAR 覆蓋完整）。收到 proxy 403 代表白名單未含該網域：
-> **不要重試**（重試無用），改用 `WebSearch` fallback 並在 brief 標明被擋的網域。
-> `WebSearch` 與 MCP 皆不受白名單影響。
->
-> **X harvest 是本機專屬，雲端失敗屬預期（2026-07-25）：** `x:<handle>` 會記 `fetch_failed`，因為
-> **X_BEARER_TOKEN 刻意只留在使用者本機 `.env`、不放雲端環境變數**（那是計費憑證，不進雲端 session
-> 的 blast radius；且雲端無法持久化 `since_id`，會每天重抓重複計費）。**這不是故障、不要當問題回報、
-> 不要試圖修**——只在 brief 的「無事項目」一行帶過「X 由本機 harvest 覆蓋」即可。
-
-跑 `python crons/harvest_leads.py`（EDGAR 直連；X 預期 fetch_failed 見上）；被擋的來源才退 `WebSearch`。
-與 baseline 去重，只留今日新增。**不得因覆蓋不完整就假裝窮盡**——brief 要明說哪些來源沒查到、
-本機補跑什麼命令。
-
-### Stage 2 — Triage（照 signal-triage，寫回經 MCP）
-
-對今日新增材料跑五要素判斷。go/no-go 用 MCP `record_lead_decision`（op=triage，帶 tier、reason 與
-priority flags：contradiction/novelty/independent_source）寫回——本機 MCP server 會窄 pathset
-commit+push leads.json，使用者本機隔天讀到最新。**公司 ID 不憑名猜**（查 clone registry / 圖）。
-
-### Stage 3 — 決策佇列（MCP，唯讀）
-
-- `get_decision_brief` → 今日 `NO ACTION / REVIEW / TRADE / HEDGE`，每個 probe 附**自追蹤變化%**與
-  **evidence_delta**（material=觸及 thesis 因果結構的新證據 → 建議 reassess；peripheral／none）
-- `get_research_action_status`（空 ID）→ 等 apply 的 Research Actions（pq2）
-- 一般價格波動不得當 thesis disproof；`NO ACTION` 是正式結果
-
-### Stage 4 — pq1 drain（best-effort，心跳之後）
-
-**brief 產出後**，用剩餘預算 drain pq1：讀 `get_pending_leads`（priority 排序）取最高分的 triaged_go，
-逐則跑 source-trace＋extraction，經 MCP `prepare_research_action` 產出 prepared RA，並用
-`record_lead_decision`（op=advance）逐則 checkpoint（researching→action_prepared）。**被限制打斷就停，
-下次從剩下的接**（靠 lead status）。drain **到 prepared 為止，不入圖**。別讓 drain 挾持心跳——brief 一定先完成。
-
-### Stage 5 — 到期 thesis（唯讀 surface）
-
-讀 clone 的 `thesis/lifecycle.json`，列到期（next_check<=今天 或 review_required）的 thesis，附輕量
-disproof web 掃描發現。**不改 lifecycle.json**——正式狀態更新由使用者本機手動（見分工）。
-
-### Stage 6 — 產出 brief（Claude app，穩定編號、批次語法）
-
-把上述聚成一份 action-first brief 作為**本 routine 的輸出**（呈現在 Claude app、推播）。**跨 section
-連續編號**、每項附明確指令、**不用顏色**、Form 4／舊 filing 摺疊只列數量。結尾附批次語法說明：
-
-```
+```text
 # Daily Brief <YYYY-MM-DD>
 
 ## 需要你動作
-[1] REVIEW — co:x｜自追蹤 +X%｜證據 material  → 有新證據，reassess
-[2] TRADE  — 等 apply ra_xxx  → 核准入圖：go 2
-## 新 leads（依 priority）
-[3] go  <lead 摘要>  → 深挖：go 3
-## 低優先（摺疊）
-EDGAR Form 4 ×N、舊 filing
-## 無事項目
-...
+[N] <type> — <摘要> → <為什麼需要決定>
 
-回覆：`<編號…> go｜drop｜pending`（例：`1 2 go 3 drop`）——go 對 lead=深挖、對 prepared=入圖；
-決策/live 動作請本機執行。
+## 新 leads（依 priority）
+<僅列 pq1 進度／失敗；raw lead 不占 pq2 編號>
+
+## 健康／資料降級
+<本次 harvest、Engine C、Neo4j、Sheet 的失敗或缺口；無則寫正常>
+
+## 無事項目
+<NO ACTION 類別>
+
+回覆：`<編號…> go｜drop｜pending`（例：`13 17 go 10 16 pending`）
 ```
 
-**心跳＝每日輸出。** 使用者在此 thread 接續回批次語法即可操作（thread 帶 MCP+web）。找不到值得說的
-事 → 照樣輸出一行 `NO ACTION ＋日期`（心跳不能斷）。
-
-## 與本機 /daily-brief 及 weekly 的分工
-
-- **本機 `/daily-brief` skill**：使用者本機以 URL-hash 冪等重跑、批次 dispatch、入圖 apply＋
-  `commit_pending_intake`、live 決策；是圖與 Git provenance 帳本的寫入端。
-- **Weekly**（`crons/weekly_scan_prompt.md`）：健康檢查＋發現未知（horizon 掃描）＋**唯讀** lifecycle
-  到期提醒。lifecycle 正式狀態更新由使用者本機手動（cloud/weekly 都不寫）。
-
-## 鐵律
-
-- 繁體中文輸出
-- cloud 只讀不寫圖/lifecycle；leads 狀態只經 MCP `record_lead_decision`（窄 pathset）
-- 入圖（apply）與 live 決策（record-choice/fill）永遠人工、只在本機以明確輸入
-- MCP 連不上只降級決策佇列；leads／harvest／lifecycle 照常並標明降級
-- brief 先於 pq1 drain 完成（心跳可靠），drain best-effort、可續跑
-
-## 上線 checklist（人工）
-
-1. push 現有 master backlog（routine 讀 pushed clone）
-2. 在 claude.ai 建 daily routine，貼本 prompt，排台北 06:30，確認輸出推播到 app
-3. 連續數天 bake：撞 priority 權重、drain 節奏、evidence-delta 精度、批次語法手感；摩擦點回寫 plan
+即使無新事項，也輸出 `NO ACTION + 日期` 心跳。Daily brief 不另存 report；稽核由 todo log、leads
+狀態機、Decision Store 與窄 state commit 承擔。

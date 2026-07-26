@@ -20,10 +20,12 @@ def test_references_batch_verbs_and_operational_commands() -> None:
     assert "parse_batch_reply" in text  # deterministic parser，不自由心證
     assert "1 3 7 go 4 drop 5 6 pending" in text  # 範例
     for command in (
-        "python crons/harvest_leads.py",
-        "python -m engine_b.cli",
-        "python -m engine_b.todo sync",
-        "python -m decision_lab today",
+        ".venv\\Scripts\\python.exe",
+        "crons\\harvest_leads.py",
+        "engine_c\\etl_yfinance.py",
+        "-m engine_b.cli",
+        "-m engine_b.todo sync",
+        "-m decision_lab today",
         "drain",  # pq1 priority drain
     ):
         assert command in text
@@ -34,7 +36,8 @@ def test_references_closed_loop_and_no_github() -> None:
     assert "evidence-delta" in text or "evidence_delta" in text
     assert "自動建 Shadow" in text
     assert "GitHub" in text  # 明文說不用 GitHub UI
-    assert "record_lead_decision" in text  # 雲端改 leads 走 MCP
+    assert "record_lead_decision" in text  # 遠端 fallback 仍走 MCP
+    assert "scripts\\publish_daily_state.py" in text
 
 
 def test_does_not_hardcode_probe_policy_numbers() -> None:
@@ -50,9 +53,18 @@ def test_states_gates_and_human_boundaries() -> None:
     assert "graph admission" in text
     assert "不連 broker" in text
     assert "recommendation 推定 choice" in text
-    # 決策寫入只在本機、雲端用唯讀 get_decision_brief。
+    # 決策寫入只在本機、遠端 fallback 用唯讀 get_decision_brief。
     assert "get_decision_brief" in text
     assert "只在本機" in text
+
+
+def test_scheduled_run_auto_drains_pq1_but_keeps_admission_gate() -> None:
+    text = _text()
+    assert "依每輪 limit 自動跑" in text
+    assert "Triage PASS 只授權研究、不授權入圖" in text
+    assert "prepared RA 進 pq2 後才等待使用者 `go`" in text
+    assert "不為了讓每個 PASS 都進 pq2而製造空 Research Action".replace("pq2而", "pq2 而") in text
+    assert "## pq1 研究進度（無 pq2 編號）" in text
 
 
 def test_lead_status_never_claims_evidence_tier() -> None:

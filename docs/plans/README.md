@@ -23,7 +23,7 @@
 | [mobile (2026-07-16)](2026-07-16-001-feat-mobile-research-action-launch-plan.md) | Mobile Research Action 兩段式協定 | completed |
 | [Decision Lab (2026-07-21)](2026-07-21-001-feat-action-oriented-alpha-decision-lab-plan.md) | Engine D／Action-Oriented Alpha Decision Lab v1 | completed |
 | [Engine D workflow (2026-07-22)](2026-07-22-001-feat-engine-d-operational-workflow-plan.md) | Raw Signal → Action Card／today brief operational workflow | completed |
-| [Daily Approval Loop (2026-07-22)](2026-07-22-002-feat-daily-approval-loop-plan.md) | 每日 harvest／triage／brief／封閉動詞核准迴路（U1–U5） | completed（rollout 待人工建 routine） |
-| [Daily Approval Loop v1.1 (2026-07-24)](2026-07-24-001-feat-daily-approval-loop-v1-1-plan.md) | 優先研究佇列、可續跑 drain、閉環 evidence-delta、對話式批次核准、MCP leads 同步 | completed（rollout 待人工建 routine） |
+| [Daily Approval Loop (2026-07-22)](2026-07-22-002-feat-daily-approval-loop-plan.md) | 每日 harvest／triage／brief／封閉動詞核准迴路（U1–U5） | completed（2026-07-26 由本機 v1.2 rollout 接手） |
+| [Daily Approval Loop v1.1 (2026-07-24)](2026-07-24-001-feat-daily-approval-loop-v1-1-plan.md) | 優先研究佇列、可續跑 drain、閉環 evidence-delta、對話式批次核准、MCP leads 同步 | completed（2026-07-26 已建 Codex local daily scheduled task） |
 
-**目前沒有 active plan。** Daily Approval Loop v1.0/v1.1 程式面均完成；剩 rollout 是使用者在 claude.ai 建 daily routine 並 bake 數天，非程式工作。L9 財務核驗缺口已補齊。
+**目前沒有 active plan。** Daily Approval Loop v1.0/v1.1 程式面均完成；現行 v1.2 runner 是 Codex desktop 本機排程，先 bake daily，weekly 暫按需本機執行。L9 財務核驗缺口已補齊。

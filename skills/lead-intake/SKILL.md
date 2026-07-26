@@ -4,7 +4,8 @@ description: >
   把一條「原料」(X 推文 / 產業報導 / 法說會 / 論文 / 小道消息)從進場到入庫的完整驗證 SOP。
   當使用者丟來一條推文、一則新聞、一份文件、或任何「我看到這個消息,該怎麼查證、該不該加進知識庫」
   的線索時,務必使用本 skill。它定義:拆原子 claim → 依源登記表跑獨立驗證 → 套用證據/獨立性/幻覺
-  鐵律自動標記 → 分層決定入圖或 park → 接既有 extract/loader pipeline 入庫 → 產出 Directional
+  鐵律自動標記 → 分層決定 prepare 或 park → 接既有 extract/loader pipeline 驗證 → 產出待核准的
+  Research Action 與 Directional
   Lane Memo。本 skill 是引擎B(線索)與引擎A(知識庫)之間的閘門,也是系統規模化「亂抓」後不被
   低品質資訊淹沒的護城河。觸發詞:驗證推文、查證消息、這條要不要入庫、餵給引擎A、跑 intake、線索處理。
 ---
@@ -146,18 +147,25 @@ URL／ticker 不確定時可省略；workflow 會保留 unresolved／missing 狀
 
 | 情況 | 處置 |
 |------|------|
-| tier ≤ 2 且 ≥2 獨立 origin_entity 印證 | 自動寫入圖(node/edge,`active`),記 source_ids |
-| tier 3,或獨立來源不足但無矛盾 | 寫入圖但低 confidence + 標 `needs_review`;進人工 review 佇列 |
+| tier ≤ 2 且 ≥2 獨立 origin_entity 印證 | 產生高信心 extraction 並凍結為 Research Action，進 pq2 等使用者核准 |
+| tier 3,或獨立來源不足但無矛盾 | 產生低 confidence／`needs_review` extraction；若仍有增量價值則凍結為 Research Action，否則 park |
 | tier 4(純社群),或僅作者推斷/形容 | **不入圖**,存成 `lead-only`(留在 `library/raw/` + intake 紀錄),當未來搜尋線索 |
-| 有來源直接矛盾 | park 成 `conflict`,人工裁決,不自動入圖 |
+| 有來源直接矛盾 | park 成 `conflict` 或產 conflict-resolution proposal，人工裁決，不自動入圖 |
 > 原則:**寧可 park,不可污染圖。** 圖的價值在每條都可追溯;一條沒來源的 claim 進去,整個庫的可信度打折。
 
-### Step 5 — 入庫(接既有 pipeline,不重造輪子)
-通過 Step 4 要入圖的 claim:
+**核准邊界：** Step 4 的自動化終點是 `prepare_research_action` 回傳的 server-rendered review packet，
+不是 graph write。只有 Research Action 進入廣義 pq2；raw lead、triage PASS 與仍在追源／抽取的工作都留在
+pq1。使用者對 action ID 明確回覆 `go` 後，另一個執行步驟才可呼叫 `apply_research_action`；`pending`／
+`drop` 不得寫圖。同一輪不得 prepare 後自行 apply。
+
+### Step 5 — 驗證並準備 Research Action（接既有 pipeline，不重造輪子）
+通過 Step 4、值得提出 graph admission 的 claim：
 - 整理成 DB 無關中介格式(`schema/intermediate_format.schema.json`),如同 `extract.py` 的輸出
 - 跑 `loader/validate.py`(vocab + schema 形狀檢查;新 relation/type 先補 `schema/vocab.json`)
-- 跑 `loader/load_to_neo4j.py` 寫入(Claim 自動補 `name`,L6 Gap1)
 - node/edge 帶齊 `source_ids`(全域格式)、`confidence`、L4 歸位好的屬性
+- 呼叫 `prepare_research_action` 讓 server 重跑驗證並凍結 immutable payload；把原樣 review packet 放進 pq2
+- **不要**在 pq1 或同一輪呼叫 loader／`apply_research_action`。只有使用者明確核准 action ID 後，才由
+  apply 流程寫入、驗圖並接續窄 pathset commit/push
 
 ### Step 6 — 產出 Directional Lane Memo
 若這批線索構成一個方向,用 `query/graph_context.py` 取 context → `thesis/generate_lane_memo.py`
@@ -200,13 +208,13 @@ python -m decision_lab reassess <decision_id> --assessment <assessment.json> --i
 1. intake 紀錄(doc_id / tier / origin / 連結)
 2. 原子 claim 表
 3. 來源核對表(claim × source × origin_entity × tier × quote × 立場)
-4. 分層處置決定(哪些入圖 / 哪些 lead-only / 哪些 conflict)
-5. (若入圖)中介格式 JSON + 通過 validate
+4. 分層處置決定(哪些 prepare / 哪些 lead-only / 哪些 conflict)
+5. (若建議入圖)中介格式 JSON + 通過 validate + 待核准 Research Action review packet
 6. (若構成方向)Lane Memo 草稿
 
 ## 已知會壞的地方 / 等著撞(v0,撞到回頭修這份)
 - **variant perception 需要估值數字**,引擎C 未上線前只能手填或標 TODO — 這是目前最大缺口。
 - **「≥3 獨立 origin_entity」門檻可能太嚴或太鬆**,真實流量會告訴你。
-- **Step 4 自動入圖的 tier/數量門檻是拍腦袋的**,要用 precision/recall 撞(入了多少垃圾 vs 漏了多少真貨)。
+- **Step 4 自動 prepare 的 tier/數量門檻是拍腦袋的**,要用 precision/recall 撞(提出多少垃圾 vs 漏了多少真貨)。
 - **拆 claim 的顆粒度**沒有客觀標準,不同原料可能要不同粒度。
 - **L5 單一 lens 風險:** 很多原料來自偏多頭的小市值瓶頸獵手(X 大佬),別讓系統世界觀被綁死;一律當「眾多視角之一的 weak source」。

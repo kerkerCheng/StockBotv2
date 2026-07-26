@@ -1,4 +1,4 @@
-"""engine_b.cli：leads 狀態機的命令列入口（list／triage／advance／counts）。"""
+"""engine_b.cli：leads 狀態機的命令列入口。"""
 from __future__ import annotations
 
 import json
@@ -13,6 +13,25 @@ def _seed(path: Path) -> str:
                                 url="https://x.io/1", title="COHR 8-K")
     leads.save(store, path)
     return lead_id
+
+
+def test_register_is_url_idempotent(tmp_path, capsys) -> None:
+    path = tmp_path / "pending_leads.json"
+    args = [
+        "--leads", str(path), "register",
+        "--source", "weekly:sivers",
+        "--url", "https://example.com/sivers",
+        "--title", "Sivers insider transactions",
+        "--published-at", "2026-07-21",
+    ]
+
+    assert cli.main(args) == 0
+    first = capsys.readouterr().out.strip()
+    assert first.endswith("new")
+    assert cli.main(args) == 0
+    second = capsys.readouterr().out.strip()
+    assert second.endswith("existing")
+    assert len(leads.load(path)["leads"]) == 1
 
 
 def test_triage_then_advance_round_trip(tmp_path, capsys) -> None:

@@ -1,0 +1,12 @@
+from pathlib import Path
+
+
+SKILL = Path(__file__).resolve().parent.parent / "skills" / "signal-triage" / "SKILL.md"
+
+
+def test_pass_runs_pq1_and_only_prepared_action_enters_pq2() -> None:
+    text = SKILL.read_text(encoding="utf-8")
+    assert "PASS 後可自動研究" in text
+    assert "prepared Research Action 後，才以完整核准包進 pq2" in text
+    assert "使用者 `go` 的語意是核准" in text
+    assert "不必在研究前先回答一次" in text

@@ -1,11 +1,11 @@
 ---
 name: daily-brief
 description: >
-  每日核准迴路：把 harvest → triage → pq1 研究 drain → 今日決策 → 到期 thesis 聚合成一份
+  每日核准迴路：把 harvest → triage → pq1 自動研究 → 今日決策 → 到期 thesis 聚合成一份
   action-first 的 Daily Approval Brief，使用者用一行批次語法（`1 3 7 go 4 drop 5 6 pending`）
   核准。當使用者說「daily brief」「今天有什麼要處理」「跑每日摘要」「有哪些待判斷」「今天需要
   動作嗎」時使用。三道閘門不放寬：graph admission 必經核准、深挖由 priority/使用者驅動但入圖仍
-  核准、live 資本永遠人工。純讀聚合，不自動建 decision、不下單、不自動入圖。觸發詞：daily brief、
+  核准、live 資本永遠人工。Scheduled run 可自動 pq1 到 prepared，但不建 decision、不下單、不自動入圖。觸發詞：daily brief、
   每日摘要、今天有什麼、待判斷、今天需要動作嗎。
 ---
 
@@ -13,10 +13,10 @@ description: >
 
 ## 定位一句話
 
-**每天一份 action-first brief，使用者回一行批次語法就完成當日核准；貴的研究（pq1）在背景替他消化。**
+**每天一份 action-first brief；routine 先把 PASS 線索研究成 prepared RA，使用者只核准完整 pq2。**
 
-系統做便宜的事（harvest／triage／聚合）與可自動化的 pq1 drain（到「等你核准」為止）；人工只做
-判斷（要不要深挖、要不要入圖）。無事時 brief 是一行 `NO ACTION`。三道閘門永不自動：graph
+系統做便宜的 harvest／triage，再依 priority 自動 drain pq1 到 prepared；人工判斷要不要入圖。
+無事時 brief 是一行 `NO ACTION`。三道閘門永不自動：graph
 admission 必經核准 exact 對象、深挖由 priority 排序但入圖仍核准、live 資本永遠人工。
 
 > **介面是對話，不用 GitHub UI。** 本機 Codex／Claude 排程直接讀 repo、private runtime 與
@@ -28,27 +28,29 @@ admission 必經核准 exact 對象、深挖由 priority 排序但入圖仍核�
 
 ## 執行流程
 
-### Step 1 — Harvest（零 token）
+### Step 1 — 本機資料更新（零 token）
 
 ```powershell
-python crons/harvest_leads.py
+& '.venv\Scripts\python.exe' crons\harvest_leads.py
+& '.venv\Scripts\python.exe' engine_c\etl_yfinance.py
 ```
 
-抓 RSS＋EDGAR watch 新項，URL-hash 去重。fetch／parse 失敗各記 harvest_log；**解析失敗 ≠ 無新文**，
-brief 要標明 failed source 並提示 fallback（如 `site:aleabitoreddit.substack.com` web search）。
+第一支抓 X＋RSS＋EDGAR watch 新項，以 `since_id`／URL-hash 去重；第二支刷新 Engine C financial snapshots。
+fetch／parse 失敗各記 harvest_log；**解析失敗 ≠ 無新文**，brief 要標明 failed source。Windows 本機與
+scheduled task 一律使用 repo `.venv`，不要依賴父 shell 是否剛好 activate。
 
 ### Step 2 — Triage 新 pending leads（依 signal-triage 判準）
 
 ```powershell
-python -m engine_b.cli list --status pending --by-priority --tracked <已追蹤ticker>
+& '.venv\Scripts\python.exe' -m engine_b.cli list --status pending --by-priority --tracked <已追蹤ticker>
 ```
 
 對每條**新** pending lead 套 `skills/signal-triage/SKILL.md` 五要素判準。判斷完寫回（本機用 CLI、
 雲端用 MCP `record_lead_decision`），並帶上 priority flags（供 pq1 排序）：
 
 ```powershell
-python -m engine_b.cli triage <lead_id> --go   --tier 3 --reason "<要素>" [--contradiction] [--novelty] [--independent]
-python -m engine_b.cli triage <lead_id> --no-go --tier 4 --reason "<為何篩掉>"
+& '.venv\Scripts\python.exe' -m engine_b.cli triage <lead_id> --go   --tier 3 --reason "<要素>" [--contradiction] [--novelty] [--independent]
+& '.venv\Scripts\python.exe' -m engine_b.cli triage <lead_id> --no-go --tier 4 --reason "<為何篩掉>"
 ```
 
 triage 寬鬆（關聯性與可引用性是硬指標，其餘軟指標命中即 go）；no-go 也記 reason。`tier` 是來源初步
@@ -57,24 +59,27 @@ triage 寬鬆（關聯性與可引用性是硬指標，其餘軟指標命中即 
 ### Step 3 — pq1 drain（priority，可續跑）
 
 ```powershell
-python -m engine_b.cli drain --limit <N> --tracked <已追蹤ticker>
+& '.venv\Scripts\python.exe' -m engine_b.cli drain --limit <N> --tracked <已追蹤ticker>
 ```
 
-列出接下來該研究的 leads（依 priority；pop triaged_go＋researching）。對每則跑 **pq1＝source-trace＋
-extraction**（`skills/source-trace`＋`skills/lead-intake` 的研究部分），逐則 checkpoint 狀態：
+列出接下來可研究的 leads（依 priority；pop triaged_go＋researching），依每輪 limit 自動跑
+**pq1＝source-trace＋extraction**（`skills/source-trace`＋`skills/lead-intake` 的研究部分），逐則
+checkpoint 狀態。Triage PASS 只授權研究、不授權入圖；prepared RA 進 pq2 後才等待使用者 `go`：
 
 ```powershell
-python -m engine_b.cli advance <lead_id> researching        # 開始
-python -m engine_b.cli advance <lead_id> action_prepared --ref research_action_id=<ra_id>   # prepare 完
+& '.venv\Scripts\python.exe' -m engine_b.cli advance <lead_id> researching        # 開始
+& '.venv\Scripts\python.exe' -m engine_b.cli advance <lead_id> action_prepared --ref research_action_id=<ra_id>   # prepare 完
 ```
 
 pq1 是唯一昂貴階段（web search + 讀文件 + 抽 claim）——priority 決定貴的 token 先花在哪。被 5 小時
-限制/中斷後**重跑 drain 從剩下的接**（靠 lead status checkpoint）。drain 到 prepared 為止，**不入圖**。
+限制/中斷後**重跑 drain 從剩下的接**（靠 lead status checkpoint）。有可核准的 graph delta 才 prepare；
+若追源未果、原主張被一手資料否定，或結果依 L4 只屬 Engine C 時變 observation，就 park 並記 outcome，
+不為了讓每個 PASS 都進 pq2 而製造空 Research Action。drain 最遠到 prepared，**不入圖**。
 
 ### Step 4 — 今日決策佇列與到期 thesis
 
 ```powershell
-python -m decision_lab today --format markdown
+& '.venv\Scripts\python.exe' -m decision_lab today --format markdown
 ```
 
 回今日 `NO ACTION / REVIEW / TRADE / HEDGE`，每個 probe 附**自追蹤變化%**與**evidence_delta**
@@ -86,11 +91,11 @@ python -m decision_lab today --format markdown
 先同步所有 pq2 來源：
 
 ```powershell
-python -m engine_b.todo sync
+& '.venv\Scripts\python.exe' -m engine_b.todo sync
 ```
 
 `library/leads/todo_pool.json` 是回覆編號的唯一 authority：項目首次進池時取得編號，直到 resolve 才釋放；
-**不得依當日排序、section 或模型輸出重新編號**。用池內原編號把 leads／決策佇列／等 apply 的 RA／
+**不得依當日排序、section 或模型輸出重新編號**。用池內原編號把決策佇列／等 apply 的 RA／
 到期 thesis／有 material evidence-delta 的 probe 組成 brief，每項附明確指令。無事就一行
 `NO ACTION ＋日期`。
 
@@ -102,10 +107,10 @@ python -m engine_b.todo sync
 [2] TRADE  — 等 apply ra_xxx（Tower TIA 客戶揭露 draft）  → 核准入圖：go 2
 ...
 
-## 新 leads（依 priority，已 triage）
-[3] go  AXTI 8-K ×3（一個月內密集）  → 深挖：go 3
-[4] go  aleabitoreddit：Sivers CPO laser  → 深挖：go 4
-...
+## pq1 研究進度（無 pq2 編號）
+完成：AXTI 8-K ×3 → prepared `ra_xxx`，已以上方穩定編號 [2] 等核准
+park：社群 CPO 推論 → 一手來源未支持，不產空 RA
+續跑：尚有 triaged_go ×N
 
 ## 低優先（摺疊）
 EDGAR Form 4 ×55、較舊 filing——預設摺疊只列數量（要看再展開）
@@ -126,25 +131,25 @@ paper 無異動｜live 無 pending fill｜...
 不自由心證：
 
 ```powershell
-python -m engine_b.todo list --json
-python -c "from engine_b.batch import parse_batch_reply; import json,sys; print(json.dumps(parse_batch_reply(sys.argv[1])))" "1 3 7 go 4 drop 5 6 pending"
+& '.venv\Scripts\python.exe' -m engine_b.todo list --json
+& '.venv\Scripts\python.exe' -c "from engine_b.batch import parse_batch_reply; import json,sys; print(json.dumps(parse_batch_reply(sys.argv[1])))" "1 3 7 go 4 drop 5 6 pending"
 ```
 
 依編號對應的**項目類型** dispatch（type-aware；動詞不新增任何權限語意）。`todo batch` 只會更新池與
 稽核 log，**不會代做** pq1／apply／reassess；必須先完成或 checkpoint 對應動作，再以
 `python -m engine_b.todo resolve <編號> --verb <動詞>` 記錄結果，不能先 resolve 再假裝已執行：
 
-| 動詞 | lead | 已 prepared 的 RA | 到期 thesis |
-|------|------|-------------------|-------------|
-| `go` | 進 pq1 深挖（drain/Fast Path） | **apply 入圖**（見下）＋入圖後自動建 Shadow | 引導 reassess/複查 |
-| `drop` | park（`advance <lead> parked`／MCP） | 略過該 RA | 標記已看、不複查 |
+| 動詞 | legacy lead | 已 prepared 的 RA | 到期 thesis |
+|------|-------------|-------------------|-------------|
+| `go` | raw lead 不再進 pq2 | **apply 入圖**（見下）＋入圖後自動建 Shadow | 引導 reassess/複查 |
+| `drop` | raw lead 不再進 pq2 | 略過該 RA | 標記已看、不複查 |
 | `pending` | 維持不動、留到之後 brief | 同左 | 同左 |
 
 **go 一個 prepared RA ＝入圖**：走既有 `apply_research_action`（本機或 MCP native approval，一次確認）
 → `advance <lead> applied --ref focus_company_id=co:x` → **入圖後自動建 Shadow 追蹤**：
 
 ```powershell
-python -m decision_lab evaluate-signal "入圖後自動追蹤 co:x" --company-id co:x --ticker <T> --intent research
+& '.venv\Scripts\python.exe' -m decision_lab evaluate-signal "入圖後自動追蹤 co:x" --company-id co:x --ticker <T> --intent research
 ```
 
 （或程式內 `decision_lab.ensure_shadow_for_company`；已有 probe 則不重複建、改走 evidence-delta。）
@@ -154,17 +159,18 @@ fill。系統不連 broker。
 
 ### Step 7 — 收尾同步
 
-- **本機**：leads 狀態變更後 push（`git ls-files library/private` 應空；leads.json 可 push）；入圖帳本
-  `scripts/commit_pending_intake.py`。
-- **雲端 chat**：`record_lead_decision` 已由本機 MCP server 窄 pathset commit+push leads.json，cloud 隔天讀到。
+- **本機 scheduled task**：執行 `& '.venv\Scripts\python.exe' scripts\publish_daily_state.py`；它只准提交
+  `pending_leads.json` 與 `todo_pool.json`，guard 失敗不得改用廣泛 Git 命令繞過。
+- **入圖帳本**：有實際 apply 才另外跑 `scripts/commit_pending_intake.py`。
+- **遠端 chat fallback**：`record_lead_decision` 仍由本機 MCP server 窄 pathset commit+push leads.json。
 
 ---
 
-## 與 cloud routine 的分工
+## 現行本機排程與遠端 fallback
 
-`crons/daily_brief_prompt.md`（每日）先產 brief（心跳、必完成）→ best-effort drain pq1 到 prepared。
-cloud **只讀不寫圖/lifecycle**；leads 狀態經 MCP `record_lead_decision`（窄 pathset commit+push）。
-weekly（`crons/weekly_scan_prompt.md`）＝健康檢查＋發現未知（horizon 掃描）＋唯讀 lifecycle 到期提醒。
+`crons/daily_brief_prompt.md` 是 Codex desktop 每日 06:30 的本機 scheduled task prompt，可直接讀 repo 與
+private authorities；`crons/weekly_scan_prompt.md` 是本機 weekly prompt。Claude cloud routine 已退出現行
+排程，只保留遠端 chat／手機 intake 的 MCP fallback；遠端永遠不得取代本機 decision／lifecycle authority。
 
 ## 已知會壞的地方（v0，撞到回頭修）
 

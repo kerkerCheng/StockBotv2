@@ -10,7 +10,7 @@
 - **平台設定分開：** Codex 設定放 `.codex/`，Claude Code 本機設定放 `.claude/settings.local.json`；共用行為應呼叫同一支 repo Python 程式，不在兩份 hook 裡複製業務邏輯。
 - **切換原則：** 同一 working tree 只讓一個 agent 寫入；序列切換沿用同一 feature branch。若兩邊同時工作，必須使用不同 worktree / branch。交接訊息至少附目前 plan 路徑、進行中的 U-ID、`git status --short`、最後一次驗證命令與結果。
 - 本機開發 agent 可以是 Claude Code 或 Codex；架構中明指 `claude.ai` custom connector 的遠端流程仍維持 Claude，不因本機開發工具切換而改名。
-- **Push 政策（2026-07-22 使用者定案）：** push 是常規動作——session 收尾（邏輯 commits 完成後）把 master push 到 origin，不需逐次人工確認。私有隔離依 `.gitignore`（`library/private/`、`.env`）；push 前 sanity check：`git ls-files library/private` 應為空。Cloud routine 依賴 pushed clone 的新鮮度，幾天不 push 會使 daily brief 出現重複噪音（那本身就是該 push 的信號）。
+- **Push 政策（2026-07-22 使用者定案）：** push 是常規動作——session 收尾（邏輯 commits 完成後）把 master push 到 origin，不需逐次人工確認。私有隔離依 `.gitignore`（`library/private/`、`.env`）；push 前 sanity check：`git ls-files library/private` 應為空。本機 daily scheduled task 只可經 `scripts/publish_daily_state.py` 發布 `pending_leads.json`＋`todo_pool.json`；不得用 unattended 廣泛 Git 命令碰其他檔。
 
 ## 工作語言（繁體中文）
 
@@ -52,9 +52,10 @@
 | `skills/lead-intake` | 丟來一條推文/報導/消息，要入庫 |
 | `skills/blind-spot-audit` | 已有 thesis，要找反駁角度 |
 | `skills/company-onboard` | 新公司尚未入圖，要找文件並 onboarding |
-| `skills/signal-triage` | 週掃 harvest 後判斷是否值得列入 Topic Digest（深挖由本機 session 點名） |
+| `skills/signal-triage` | harvest 後判斷是否值得進自動 pq1；PASS 只授權追源／抽取，不授權入圖 |
 | `skills/source-trace` | 推文／轉述／截圖／二手報導先追回原文；tier 3–4 未果隔離 |
 | `skills/evidence-conflict-resolution` | EdgeAssertion 屬性衝突產 proposal；只在人工核准後寫 resolution |
+| `skills/daily-brief` | 本機每日 harvest／Engine C refresh／triage／today／穩定 pq2 核准 brief |
 
 ### 決策層（Engine D — Decision & Accountability Engine／Decision Lab）
 
@@ -79,12 +80,12 @@ fetchers/edgar.py ──────↑                        engine_c/etl_yfin
 ```
 - **抽取與 DB 解耦：** `extract.py` 只輸出 DB 無關 JSON；loader 可替換。DB 選型不綁死資料。
 - **fetchers（已有）：** `fetchers/edgar.py`（美股 SEC EDGAR，免費無 paywall）。
-- **引擎B（自動 harvest 未建；ad hoc 手機入口已建）：** X 推文/小道消息 → 線索 → 走 `skills/lead-intake` 閘門 → Research Action → 入庫。自動 X/trending harvest 仍未建。
-- **每週審查（cloud routine，台北 06:00，`crons/weekly_scan_prompt.md`）：** 只做 topic discovery（不追源、不抽取，深挖由使用者本機 session 點名「research topic N」）+ thesis 生命週期**到期制**核查（L7 的流程實作；狀態存 `thesis/lifecycle.json`，active 90 天／watch 30 天）+ 系統健康審查（審查查詢唯一權威 `query/health_audit.py`；Engine C 等本機項目由使用者跑 `python query/health_audit.py --local` 補齊）。原 `crons/thesis_monitor_prompt.md` 季度 cron 已併入此處刪除（CronCreate 7 天過期，跑不起來）。
+- **引擎B（X／EDGAR daily harvest 已建；trending horizon 由 weekly 負責）：** `crons/harvest_leads.py` 在本機以 X API `since_id`＋EDGAR watch 抓 metadata → triage PASS → routine 依 priority 自動 pq1（source-trace＋extract）→ prepared Research Action 才進 pq2 等使用者核准入圖。ad hoc 手機入口仍走 `skills/lead-intake`。
+- **每週審查（Codex 本機 session，`crons/weekly_scan_prompt.md`）：** 只做 topic discovery（不追源、不抽取）＋thesis lifecycle 唯讀提醒＋完整本機健康審查。可確定性維護先修；需要證據／thesis／持倉 authority 的大事才進統一 pq2。本機 weekly 排程尚未建立，目前按需執行並留 `docs/reports/`。
 - **各類來源的 AI 抽取 instruction：** [`docs/extraction-instructions.md`](docs/extraction-instructions.md)
-- **遠端存取（手機 App / web / cloud routine 讀寫圖與查 Engine C）：** 本機 MCP server（`mcp_server/graph_mcp.py`）+ Cloudflare Tunnel + connector。十二工具 surface，Git 能力僅 leads.json 一個窄例外；完整資料流、安全邊界、Research Action／storage 協定與跨平台限制：[`docs/remote-access-architecture.md`](docs/remote-access-architecture.md)
+- **遠端存取（手機 App／web／Claude chat fallback）：** 本機 MCP server（`mcp_server/graph_mcp.py`）+ Cloudflare Tunnel + connector。十二工具 surface，Git 能力僅 leads.json 一個窄例外；daily／weekly 現行排程不需要 MCP，因為直接在本機 repo 執行。完整資料流、安全邊界、Research Action／storage 協定與跨平台限制：[`docs/remote-access-architecture.md`](docs/remote-access-architecture.md)
   - **⚠ 改完 `mcp_server/` 一定要重啟 MCP server process，否則遠端看到的是舊 tool surface。** 沒有 auto-reload：process 是開機由 `shell:startup` 的 `stockbotv2-graph-services.vbs` 啟動、之後就一直跑舊程式碼。2026-07-24 首次 daily routine 即因此回報「三支新工具不在 tool surface」（程式碼有、跑著的 process 沒有）。重啟：停掉 `graph_mcp` python process 再跑 `.venv\Scripts\python.exe mcp_server\graph_mcp.py`（或雙擊該 `.vbs`）。驗證跑著的版本：對 `http://127.0.0.1:$GRAPH_MCP_PORT/$GRAPH_MCP_TOKEN/mcp` 送 MCP `tools/list` 數工具數，**不要只看原始碼或測試**（那只證明 repo 對）。
-  - **雲端 routine 的 egress 是「可設定的環境白名單」，不是平台硬限制（2026-07-25 更正）：** 2026-07-24 首跑時 cloud 直連 `substack.com` 與 `www.sec.gov` 收到 proxy 403，當時誤判為平台政策；實際是 claude.ai 該 **cloud environment 的 Network access = Custom + allowed domains** 白名單擋掉。設定位置：claude.ai → 該 routine → 環境設定 → Network access。**兩個 routine（daily／weekly）共用同一環境 `env_017R6G5V1df7zxVvtGA4MJut`（Default），改一次兩邊都生效。**
+  - **（歷史／fallback）雲端 routine 的 egress 是可設定的環境白名單，不是平台硬限制（2026-07-25 更正）：** 2026-07-24 首跑時 cloud 直連 `substack.com` 與 `www.sec.gov` 收到 proxy 403，實際是 claude.ai cloud environment 的 Network access allowlist。現行 daily／weekly 已移回本機，以下白名單只在日後重啟 Claude cloud fallback 時適用。
     - 白名單需含（harvest 用）：`sec.gov`、`*.sec.gov`（EDGAR 的 www/data/efts）、`substack.com`、`*.substack.com`；並保留勾選 default package-manager 清單。
     - **MCP connector 流量不受此白名單影響**（走 Anthropic 伺服器轉發）——證據：403 那次 MCP 工具仍可呼叫。
     - **`WebSearch` 不受影響**（是工具不是 egress）；受影響的只有直接抓取（`WebFetch`／`curl`／`urllib`，即 `crons/harvest_leads.py`）。
@@ -99,7 +100,7 @@ fetchers/edgar.py ──────↑                        engine_c/etl_yfin
 | 類別 | 具體項目 | 理由 |
 |------|---------|------|
 | 知識累積 | 更多公司 onboarding、更多高品質文件 | 圖的大小決定回答的深度 |
-| Skill 介面 | SKILL.md 檔（已有 7 個）| 讓 Claude Code / Codex 每次都能正確使用記憶 |
+| Skill 介面 | SKILL.md 檔（已有 8 個）| 讓 Claude Code / Codex 每次都能正確使用記憶 |
 | 高槓桿 fetcher | EDGAR 季報自動更新、arXiv 論文抓取 | 減少人工取文件摩擦 |
 | G5 L8 偏誤檢查 | `validate.py` 加 origin_entity 同質性警告（2026-07-17 已實作：供應商自報 sole_source 在文件層 WARN） | 低工程量、高資料品質槓桿 |
 
@@ -118,7 +119,7 @@ fetchers/edgar.py ──────↑                        engine_c/etl_yfin
 
 ## 引擎B（信號入庫）設計草稿
 
-**定位：** X / SubStack 信號 → 用戶判斷 → `/lead-intake` → 圖。引擎B 是「人工閘門前的信號彙整」，不是自動入庫。
+**定位：** X / EDGAR 信號 → triage → 自動 pq1 追源／抽取 → prepared Research Action → 使用者 pq2 核准 → 圖。引擎B 是「人工 graph admission 閘門前的信號彙整與研究佇列」，不是自動入庫。
 
 **已確認的初始信號來源：**
 - `aleabitoreddit`：X 帳號，有同名 SubStack。會寫產業供應鏈深度分析（evidence tier 3）。是 SIVE Sivers 客戶地圖的原始來源。
@@ -126,7 +127,7 @@ fetchers/edgar.py ──────↑                        engine_c/etl_yfin
 **追蹤方案（2026-07-25 已實作並驗證）：**
 - **X API 是主來源（`crons/harvest_leads.py` 的 `harvest_x`）。** 曾經的「SubStack RSS 就夠」前提**已被推翻**：該 feed 至今只有 1 篇 2026-05-19 舊文，但本人在 X 極度活躍（[@aleabitoreddit](https://x.com/aleabitoreddit)，顯示名 Serenity，10 萬+ 追蹤）。**RSS 掃的是錯的表面。** substack feed 已於 2026-07-25 從 `harvest_config.json` 移除（他發長文也會在 X 貼連結）。
 - **X API 成本模型（2026-02 起 pay-per-use）：** 約 **$0.005/則、按回傳貼文數計費、無月費下限**（舊的 $200 Basic 已對新用戶關閉）。成本控制四件套實測有效：`since_id` 增量、`exclude=replies,retweets`、`max_results` 上限、`user_id` 快取。**實測：首抓 23 則 $0.115；立即重跑 0 則 $0.000。** 日常估 $1–2/月。
-- **⚠ X harvest 只在本機跑。** `X_BEARER_TOKEN` 刻意只放本機 `.env`、**不放雲端環境變數**：(a) 那是計費憑證，不該進「天職是讀不受信任網路內容」的雲端 session 的 blast radius；(b) **雲端無法持久化 `since_id`**（MCP 的 `record_lead_decision` 不碰 `source_state`），會每天重抓、重複計費，成本控制直接失效。雲端 routine 看到 `x:<handle> fetch_failed` 是**預期行為**，不是故障。
+- **⚠ X harvest 只在本機跑。** `X_BEARER_TOKEN` 刻意只放本機 `.env`；Codex local daily scheduled task 可直接持久化 `since_id`。任何 cloud fallback 都不得抓 X，避免重複計費與擴大計費憑證 blast radius。
 - **已知限制（未修）：** `harvest_x` 不分頁。若新貼文數超過 `max_results`（預設 25），單次只取得部分而 `since_id` 仍前進 → **可能永久漏掉中間那批**。日常每天跑不會觸發；長時間沒跑（估 >2–3 天）再開機時要留意。要修就是加分頁並設總量上限。
 - **來源品質警語：** 該帳號公開宣稱 2026 報酬率 4,502%、推薦標的漲 100–1,000%。這類極端績效宣稱與 L5（單一 lens：偏多頭小市值瓶頸獵手）一致——當**線索來源**用，不當證據。
 - **入庫邊界：** aleabitoreddit 的內容最高只能是 `evidence_tier: 3`，需客戶端文件升級 L8 才能用於 Lane Memo。
@@ -157,14 +158,14 @@ fetchers/edgar.py ──────↑                        engine_c/etl_yfin
 1. **（已完成 2026-07-22）L9 剩餘財務核驗缺口**
    — COHR「客戶集中度」與「Backlog／訂單能見度」已以一手 filing 補入 Engine C manual observation ledger（append-only，含逐字 provenance）：客戶集中度出自 FY2025 10-K segment note「Major Customers」（兩大客戶各佔 12%／10%，主要來自 Networking segment；另註 NVIDIA 2026-03-02 投資 $2B＋多年期產能協議至 2030 的前瞻集中度旗標，出自 Q3 FY2026 10-Q）；COHR 不揭露美元 backlog／RPO，依規則填替代指標＝Q4 FY2026 guided revenue $1.91B–$2.05B（8-K EX-99.1，filed 2026-05-06）＋ NVIDIA 產能協議。`python thesis/preconditions.py` 全綠、`python engine_c/checklist.py COHR` 五項 gate_pass=true；**L9 三前置條件全部達標，投資諮詢 gate 開放**。一手文件存 `library/raw/cohr_10_k_20250815.txt`、`cohr_10_q_20260506.txt`、`cohr_ex991_20260506.txt`。
 
-2. **（已完成 2026-07-24）Daily Approval Loop v1.1** — plan：[`docs/plans/2026-07-24-001-feat-daily-approval-loop-v1-1-plan.md`](docs/plans/2026-07-24-001-feat-daily-approval-loop-v1-1-plan.md)。U1 priority 計分＋可續跑 pq1 drain（`engine_b/priority.py`、`engine_b/cli.py drain`）；U2 MCP leads 讀寫＋窄 pathset commit/push（`mcp_server/leads_tools.py`、`leads_git.py`，12 工具）；U3 閉環 evidence-delta 精度＋自動 Shadow＋變化%（`decision_lab/brief.py`、`workflow.ensure_shadow_for_company`）；U4 對話式批次核准 `1 3 go 4 drop 5 6 pending`（`engine_b/batch.py`、daily-brief skill）；U5 daily/weekly prompt 重組＋lifecycle hook。**剩 rollout（人工）：** 建 daily routine 並 bake。
-   - **統一待辦池（廣義 pq2，2026-07-25）：** **所有需要使用者決策的事只有一個編號空間**——入圖核准、pq1 深挖、決策複查、thesis 到期、Sheet-only 持股、手動加入。使用者說「待辦事項統整」＝跑 `python -m engine_b.todo sync`。編號在項目首次進池時指派、**直到 resolve 才釋放**（不因排序或當日狀態重算——否則隔天回「3 go」會指到別的東西，是正確性風險）。批次：`python -m engine_b.todo batch "1 3 go 4 drop 5 6 pending"`；手動加入：`python -m engine_b.todo add "<事情>"`。狀態存 tracked `library/leads/todo_pool.json`，帶 append-only `log`（何時提出／怎麼決定／理由）當稽核。
+2. **（已完成 2026-07-26）Daily Approval Loop v1.2 本機 rollout** — v1.1 plan：[`docs/plans/2026-07-24-001-feat-daily-approval-loop-v1-1-plan.md`](docs/plans/2026-07-24-001-feat-daily-approval-loop-v1-1-plan.md)。原 U1–U5 均保留；現行 runner 改成 Codex desktop local scheduled task（台北 06:30），直接讀 `.env`、Neo4j、Engine C／Decision Store，不再依賴 Claude cloud clone／MCP 才能完成 brief。新增 Engine C daily ETL、repo `.venv` 明確入口與窄 state publisher。先 bake daily；weekly 暫按需本機執行。
+   - **統一待辦池（廣義 pq2，2026-07-26 校正）：** **所有真正需要使用者決策的事只有一個編號空間**——prepared RA 入圖核准、決策複查、thesis 到期、Sheet-only 持股、手動 authority。Raw／triaged leads 留在 pq1，由 routine 自動研究，不占 pq2 編號；否則同一題會在研究前與入圖前問兩次。使用者說「待辦事項統整」＝跑 `& '.venv\Scripts\python.exe' -m engine_b.todo sync`。編號首次進池後直到 resolve 才釋放；狀態存 tracked `library/leads/todo_pool.json`，append-only `log` 保留核准與 migration 稽核。
    - **報告留檔策略（2026-07-25 定案）：** **daily brief 不留檔**（只出在 session；稽核價值由待辦池 log＋leads 狀態機＋Decision Store 承擔）；**weekly report 留檔**（`docs/reports/`，含無法從池重建的 topic discovery 與健康審查趨勢）。不回到 PR/Issue 形式——那會產生與池競爭的第二個狀態源。
-   - **v1.1 每日操作：** 本機 `/daily-brief` skill → harvest → triage（帶 priority flags）→ `python -m engine_b.cli drain` 取 pq1 順序 → 深挖 → today（含變化%／evidence_delta）→ 回批次語法 `1 3 go 4 drop 5 6 pending`。lead 狀態：本機 CLI 或雲端 MCP `record_lead_decision`（窄 pathset commit/push）。入圖後 `decision_lab.ensure_shadow_for_company` 自動追蹤。介面全在對話，**無 GitHub UI**。lifecycle 到期由 hook＋weekly 唯讀提醒 → 本機手動複查。
+   - **v1.2 每日操作：** Codex local scheduled task → X／EDGAR harvest → Engine C ETL → triage → priority pq1 best-effort drain（預設每輪 2 則）→ prepared RA／today／lifecycle `todo sync` → brief。Triage PASS 只授權研究；使用者回 `go` 的對象是完整 prepared RA 或 authority 決策。介面全在對話，**無 GitHub UI**。
    - **（已完成 2026-07-23）v1.0 骨架** — 歷史 plan：[`docs/plans/2026-07-22-002-feat-daily-approval-loop-plan.md`](docs/plans/2026-07-22-002-feat-daily-approval-loop-plan.md)。U1 leads 狀態機＋harvest、U2 partial-identity 修復、U3 MCP `get_decision_brief`、U4 `/daily-brief` skill＋leads CLI＋digest、U5 daily cloud routine。market_timestamp_future 系統性 bug 已修（commit `7f60f0b`）。
-   - **每日操作：** 本機說「daily brief」或跑 `/daily-brief` skill → harvest → triage → 今日決策 → thesis 到期 → 一句動詞（research／apply／park／skip）核准。Harvest：`python crons/harvest_leads.py`（零 token）。Leads CLI：`python -m engine_b.cli list|triage|advance|counts`。決策命令（`decision_lab` today／evaluate-signal／record-choice／record-fill）**只在本機**（雲端 clone 無 private Decision Store）；雲端看決策用 MCP 唯讀 `get_decision_brief`。
-   - **Routine 分工：** daily（`crons/daily_brief_prompt.md`）＝harvest／triage／今日決策佇列／到期 thesis 唯讀 surface＋心跳，cloud 只讀不寫；weekly（`crons/weekly_scan_prompt.md`）＝topic discovery＋系統健康＋Stage 0 legacy gate＋thesis lifecycle 正式 PR 更新。lead 狀態只是注意力 metadata，永不影響 evidence tier。SIVE 找 3 個獨立 `origin_entity` 來源仍為獨立待辦。
-   - **Harvest／leads 操作：** `python crons/harvest_leads.py`（零 token；`--dry-run` 只印不寫）。Leads 狀態存 `library/leads/pending_leads.json`（tracked，本機 authority）；狀態機與 API 見 `engine_b/leads.py`。lead 狀態只是注意力 metadata，**永不影響 evidence tier**。
+   - **每日操作：** 本機說「daily brief」或由 06:30 排程觸發 `$daily-brief`。所有 Python 命令使用 `& '.venv\Scripts\python.exe' ...`；排程收尾只跑 `scripts/publish_daily_state.py`。決策命令（today／evaluate-signal／record-choice／record-fill）只在本機；遠端 chat 看決策才用 MCP 唯讀 `get_decision_brief`。
+   - **Routine 分工：** daily（`crons/daily_brief_prompt.md`）＝X／EDGAR harvest＋Engine C ETL＋triage＋today＋統一 pq2 brief；weekly（`crons/weekly_scan_prompt.md`）＝topic discovery＋完整本機健康審查＋唯讀 lifecycle。兩者都不替使用者寫 thesis 結論、入圖或 live facts。
+   - **Harvest／leads 操作：** `& '.venv\Scripts\python.exe' crons\harvest_leads.py`（零 token；`--dry-run` 只印不寫）。Leads authority 是 tracked `library/leads/pending_leads.json`；狀態機與 API 見 `engine_b/leads.py`。lead 狀態只是注意力 metadata，永不影響 evidence tier。
 
 ---
 

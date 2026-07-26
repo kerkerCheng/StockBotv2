@@ -5,6 +5,7 @@ triage 判斷，這支 CLI 負責寫入狀態機（不讓 agent 手寫 JSON 冒�
 狀態語意與不變式（lead 狀態不影響 evidence tier）全在 engine_b/leads.py。
 
 用法:
+    python -m engine_b.cli register --source weekly --url <url> --title "..."
     python -m engine_b.cli list [--status pending]
     python -m engine_b.cli triage <lead_id> --go|--no-go --tier 3 --reason "有新角度"
     python -m engine_b.cli advance <lead_id> researching
@@ -51,6 +52,25 @@ def _cmd_list(args: argparse.Namespace) -> int:
         prefix = f"[{scores[l['lead_id']]:5.1f}] " if l["lead_id"] in scores else ""
         print(f"{prefix}{l['lead_id']}  {l['status']:15}{tag}  {l['source']}")
         print(f"    {l.get('title') or '(無標題)'}  {l.get('url')}")
+    return 0
+
+
+def _cmd_register(args: argparse.Namespace) -> int:
+    """把 weekly／手動發現註冊成 pending lead，仍走 URL-hash 冪等入口。"""
+    store = leads.load(args.leads)
+    try:
+        lead_id, is_new = leads.register(
+            store,
+            source=args.source,
+            url=args.url,
+            title=args.title,
+            published_at=args.published_at,
+        )
+    except ValueError as exc:
+        print(f"register 失敗：{exc}", file=sys.stderr)
+        return 1
+    leads.save(store, args.leads)
+    print(f"{lead_id}  {'new' if is_new else 'existing'}")
     return 0
 
 
@@ -134,6 +154,13 @@ def build_parser() -> argparse.ArgumentParser:
     ap.add_argument("--leads", default=str(leads.DEFAULT_LEADS_PATH),
                     help="pending_leads.json 路徑（預設本機 authority）")
     sub = ap.add_subparsers(dest="command", required=True)
+
+    p_reg = sub.add_parser("register", help="把 weekly／手動發現註冊成 pending lead")
+    p_reg.add_argument("--source", required=True)
+    p_reg.add_argument("--url", required=True)
+    p_reg.add_argument("--title", default="")
+    p_reg.add_argument("--published-at")
+    p_reg.set_defaults(func=_cmd_register)
 
     p_list = sub.add_parser("list", help="列出 leads")
     p_list.add_argument("--status", help="只列某狀態（pending／triaged_go…）")

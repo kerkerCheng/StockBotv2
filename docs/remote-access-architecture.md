@@ -133,7 +133,8 @@ setup 最後也會寫入 `GraphSchemaState.version=2026-07-16-u3b`。`load_extra
 |------|--------------|---------|
 | 本機 Claude Code session | 本來就在 repo 裡 | 直連 localhost |
 | 本機 Codex session | 本來就在 repo 裡 | 直連 localhost／讀 private action files |
-| Cloud routine（U7） | GitHub 連接後每次執行 **clone 整份 repo**（走 GitHub，不走 tunnel） | MCP connector |
+| Claude cloud routine（歷史／fallback） | GitHub 連接後每次執行 **clone 整份 repo**（走 GitHub，不走 tunnel） | MCP connector |
+| Codex local scheduled task（現行 daily） | 直接使用本機 `master` working tree | 直連 localhost／private runtime，不需 connector |
 | Claude 手機／網頁 App 對話 | **刻意不給**（只由 rule/status tools 回傳必要規則與 action packet） | MCP connector |
 | ChatGPT web（full MCP 方案） | **刻意不給** | 同一 remote MCP app；tool snapshot 更新後需 Refresh |
 | ChatGPT mobile | 不適用 | OpenAI 目前不支援 custom MCP apps on mobile |
@@ -142,7 +143,7 @@ setup 最後也會寫入 `GraphSchemaState.version=2026-07-16-u3b`。`load_extra
 
 ## 已知限制與踩坑記錄
 
-- **Pro 方案的 cloud routine sandbox 出站網路不可自訂**（U7a 四次實測：Trusted 403、Additional allowed domains 無效、All domains 無效）。claude.ai Capabilities 的網路設定只管聊天 code-execution 沙盒，管不到 routine。這是走 MCP 路線的原因
+- **2026-07-25 更正：Claude cloud environment 的出站網路可用 Network access allowlist 設定。**早期 Trusted／Additional allowed domains 測試得到 403，是當時 environment 白名單未涵蓋目標網域，不是平台硬限制。MCP connector 流量仍走伺服器轉發、不受該白名單影響。現行 daily／weekly 已移回 Codex 本機；此限制只影響日後 cloud fallback。
 - MCP SDK 的 DNS-rebinding 防護會對非 localhost 的 Host 回 421 → tunnel ingress 用 `httpHostHeader` 改寫解決
 - cloudflared 預設日誌不記錄個別請求；驗證流量用本機 metrics 端點 `127.0.0.1:20241/metrics` 的 `cloudflared_tunnel_total_requests` 計數器
 - 無 watchdog：行程若 crash 不會自動重啟（開機自啟只在登入時跑一次）。目前接受此風險

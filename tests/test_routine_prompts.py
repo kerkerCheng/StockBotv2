@@ -1,4 +1,4 @@
-"""Daily／weekly cloud routine prompt 的 v1.1 契約與分工不漂移。"""
+"""Daily／weekly Codex 本機 routine prompt 的 v1.2 契約。"""
 from __future__ import annotations
 
 from pathlib import Path
@@ -9,43 +9,51 @@ DAILY = ROOT / "crons" / "daily_brief_prompt.md"
 WEEKLY = ROOT / "crons" / "weekly_scan_prompt.md"
 
 
-def test_daily_prompt_references_mcp_and_clone_sources() -> None:
+def test_daily_prompt_uses_local_authorities_and_repo_venv() -> None:
     text = DAILY.read_text(encoding="utf-8")
     for token in (
-        "get_decision_brief",
-        "get_pending_leads",
-        "record_lead_decision",
-        "get_research_action_status",
-        "harvest_config.json",
-        "pending_leads.json",
-        "thesis/lifecycle.json",
+        "$daily-brief",
+        ".venv\\Scripts\\python.exe",
+        "crons\\harvest_leads.py",
+        "engine_c\\etl_yfinance.py",
+        "decision_lab today",
+        "engine_b.todo sync",
+        "scripts\\publish_daily_state.py",
     ):
         assert token in text
+    assert "master" in text
+    assert "不要建立 branch" in text
 
 
-def test_daily_prompt_is_cloud_read_only_with_heartbeat_and_batch() -> None:
+def test_daily_prompt_keeps_human_gates_and_batch_contract() -> None:
     text = DAILY.read_text(encoding="utf-8")
-    assert "只讀不寫" in text
-    assert "不使用 GitHub" in text  # v1.1：無 GitHub UI
-    assert "Claude app" in text
-    assert "心跳" in text
-    # 批次語法核准
+    assert "drain --limit 2" in text
+    assert "只有 prepared RA 才進 pq2" in text
+    assert "Graph admission" in text
+    assert "record-choice" in text and "record-fill" in text
     assert "go" in text and "drop" in text and "pending" in text
-    assert "pq1 drain" in text  # 心跳後 best-effort drain
+    assert "todo_pool.json" in text and "不得依 section" in text
 
 
-def test_daily_prompt_defers_writes_to_local_and_leads_via_mcp() -> None:
+def test_daily_prompt_is_not_the_retired_cloud_runner() -> None:
     text = DAILY.read_text(encoding="utf-8")
-    # 入圖/live 只在本機；leads 狀態只經 MCP record_lead_decision
-    assert "record-choice" in text or "record-fill" in text
-    assert "不改" in text and "lifecycle.json" in text
-    assert "record_lead_decision" in text
+    assert "Codex 本機排程" in text
+    assert "不要使用 Claude cloud clone" in text
+    assert "MCP 降級路徑" in text
 
 
-def test_weekly_points_to_daily_and_no_longer_writes_lifecycle() -> None:
+def test_weekly_is_local_health_discovery_and_read_only_lifecycle() -> None:
     text = WEEKLY.read_text(encoding="utf-8")
-    assert "crons/daily_brief_prompt.md" in text
-    # v1.1：weekly 不再寫 lifecycle（唯讀提醒）
-    assert "不寫" in text and "lifecycle.json" in text
-    assert "發現未知" in text  # weekly 保留 horizon discovery
-    assert "唯讀" in text
+    for token in (
+        "query\\health_audit.py --local",
+        "發現未知",
+        "Topic discovery",
+        "不追源",
+        "不抽取",
+        "不改 lifecycle",
+        "engine_b.todo sync",
+        "穩定編號",
+    ):
+        assert token in text
+    assert "健康 finding 與 pq2 是正交" in text
+    assert "Codex 本機" in text

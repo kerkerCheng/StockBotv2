@@ -1,0 +1,18 @@
+# 本機 scheduled task 只放行三支固定入口；不放行任意 Python、shell 或 Git。
+prefix_rule(
+    pattern=[".venv\\Scripts\\python.exe", "crons\\harvest_leads.py"],
+    decision="allow",
+    justification="Daily harvest 需要連 X API 與 SEC EDGAR，憑證與 source_state 都留在本機。",
+)
+
+prefix_rule(
+    pattern=[".venv\\Scripts\\python.exe", "engine_c\\etl_yfinance.py"],
+    decision="allow",
+    justification="Daily Engine C ETL 需要連 Yahoo Finance 並只寫 ignored private runtime。",
+)
+
+prefix_rule(
+    pattern=[".venv\\Scripts\\python.exe", "scripts\\publish_daily_state.py"],
+    decision="allow",
+    justification="固定 publisher 只提交兩個 daily state files 並推送 master。",
+)

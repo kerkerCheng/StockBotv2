@@ -1,8 +1,9 @@
 """統一待辦池（廣義 pq2）——所有需要使用者決策的事，一個編號空間。
 
-設計原則（2026-07-25 定案）：
-- **單一收件匣：** 入圖核准、pq1 深挖、決策複查、thesis 到期、Sheet-only 持股、
-  手動加入——全部收斂到這一個池，共用一個編號空間。散在多處是先前的問題。
+設計原則（2026-07-26 校正）：
+- **單一核准收件匣：** prepared Research Action 入圖、決策複查、thesis 到期、
+  Sheet-only 持股與手動 authority 問題收斂到這一個池。Raw／triaged leads 屬 pq1 工作佇列，
+  routine 先自動 trace＋extract；只有 prepared 結果才進 pq2，避免同一題問使用者兩次。
 - **編號持久：** `n` 在項目首次進池時指派，直到 resolve 才釋放。**不因排序或當日
   狀態重算**——否則你隔天回「3 go」會指到別的東西（正確性風險，不只是體驗問題）。
 - **池是狀態，report 是敘事：** daily brief 不留檔；稽核價值由本池的 append-only
@@ -28,7 +29,7 @@ DEFAULT_POOL_PATH = _ROOT / "library" / "leads" / "todo_pool.json"
 
 # 項目類型 → 該類型的 `go` 代表什麼動作（type-aware dispatch 的權威對照）。
 ITEM_TYPES: dict[str, str] = {
-    "lead_research": "進 pq1 深挖（source-trace + extraction）",
+    "lead_research": "（legacy）已移回自動 pq1，不再建立新項目",
     "ra_admission": "核准入圖（apply_research_action）",
     "decision_review": "重新評估該 probe（reassess）",
     "thesis_lifecycle": "本機複查 thesis 並手動更新 lifecycle.json",
@@ -193,6 +194,39 @@ def apply_batch(
     return {"applied": sorted(applied), "failed": sorted(failed)}
 
 
+def retire_legacy_pq1_items(
+    pool: dict[str, Any], *, at: str | None = None
+) -> int:
+    """把舊版 raw lead／Weekly research topic 移回 pq1；保留稽核。"""
+    stamp = at or _now()
+    retired = 0
+    for item in active_items(pool):
+        legacy_lead = item["type"] == "lead_research"
+        legacy_weekly = (
+            item["type"] == "manual"
+            and str(item.get("title") or "").startswith("Weekly topic：")
+        )
+        if not (legacy_lead or legacy_weekly):
+            continue
+        item["resolved_at"] = stamp
+        item["resolution"] = "migrated_to_pq1"
+        item["reason"] = "triage PASS 後由 routine 自動 trace/extract；prepared RA 才進 pq2"
+        pool["log"].append({
+            "at": stamp,
+            "n": item["n"],
+            "type": item["type"],
+            "ref_id": item["ref_id"],
+            "verb": "migrated_to_pq1",
+            "reason": item["reason"],
+        })
+        retired += 1
+    return retired
+
+
+# 舊 import 相容；新程式使用語意較完整的名稱。
+retire_legacy_lead_research = retire_legacy_pq1_items
+
+
 def sync(
     pool: dict[str, Any],
     incoming: Iterable[Mapping[str, Any]],
@@ -225,20 +259,8 @@ def sync(
 # ── 來源蒐集（lazy import，避免 engine_b 反向依賴 Engine A/C/D）─────────────
 
 def collect_from_leads() -> list[dict[str, Any]]:
-    """triaged_go 的 leads → pq1 深挖待辦。"""
-    from engine_b import leads as _leads
-
-    store = _leads.load()
-    return [
-        {
-            "type": "lead_research",
-            "ref_id": l["lead_id"],
-            "title": l.get("title") or l.get("url") or l["lead_id"],
-            "source": l.get("source", ""),
-        }
-        for l in store["leads"].values()
-        if l["status"] == "triaged_go"
-    ]
+    """Raw／triaged leads 不屬 pq2；保留函式作相容面，永遠回空。"""
+    return []
 
 
 def collect_from_research_actions() -> list[dict[str, Any]]:
@@ -323,7 +345,7 @@ def collect_from_decisions() -> list[dict[str, Any]]:
 
 
 def collect_all(*, include_decisions: bool = True) -> list[dict[str, Any]]:
-    rows = collect_from_leads() + collect_from_research_actions() + collect_from_lifecycle()
+    rows = collect_from_research_actions() + collect_from_lifecycle()
     if include_decisions:
         rows += collect_from_decisions()
     return rows
@@ -386,13 +408,15 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.command == "sync":
+        retired = retire_legacy_pq1_items(pool)
         result = sync(pool, collect_all(include_decisions=not args.no_decisions))
         save(pool, args.pool)
         if args.json:
             print(json.dumps({**result, "items": active_items(pool)},
                              ensure_ascii=False, indent=2))
         else:
-            print(f"（新增 {result['added']}，目前 {result['active']} 項待辦）\n")
+            migration = f"；移回 pq1 {retired}" if retired else ""
+            print(f"（新增 {result['added']}，目前 {result['active']} 項待辦{migration}）\n")
             print(_render(pool))
         return 0
 

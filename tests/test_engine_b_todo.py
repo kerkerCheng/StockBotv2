@@ -132,6 +132,19 @@ def test_collect_from_decisions_keeps_global_blocker_without_items(monkeypatch) 
     }]
 
 
+def test_raw_leads_are_not_pq2_and_legacy_items_migrate_with_audit() -> None:
+    pool = _pool_with(
+        {"type": "lead_research", "ref_id": "lead_a", "title": "raw lead"},
+        {"type": "manual", "ref_id": "weekly:1", "title": "Weekly topic：Sivers"},
+    )
+
+    assert todo.collect_from_leads() == []
+    assert todo.retire_legacy_pq1_items(pool, at="2026-07-26T00:00:00+00:00") == 2
+    assert todo.active_items(pool) == []
+    assert pool["items"][0]["resolution"] == "migrated_to_pq1"
+    assert pool["log"][-1]["verb"] == "migrated_to_pq1"
+
+
 def test_cli_add_and_batch(tmp_path, capsys) -> None:
     path = str(tmp_path / "todo_pool.json")
     assert todo.main(["--pool", path, "add", "查 COHR 客戶集中度", "--hint", "本機查"]) == 0

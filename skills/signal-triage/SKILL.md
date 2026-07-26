@@ -2,8 +2,8 @@
 name: signal-triage
 description: >
   Stage 2 判斷層：決定一則從 web search 或 Engine B（如 aleabitoreddit）harvest 到的
-  原始材料，值不值得往下跑完整 LLM 抽取。由 U7 cloud routine 在 harvest 之後、extract
-  之前自動呼叫；設計上刻意寬鬆，不需要使用者在場確認。
+  原始材料，值不值得進 pq1（source-trace＋抽取）。由 daily／weekly routine 在 harvest
+  之後自動呼叫；設計上刻意寬鬆，PASS 後可自動研究，但不等於入圖核准。
   觸發詞：本 skill 由 routine 自動呼叫，不是使用者直接觸發的入口。
 ---
 
@@ -11,9 +11,12 @@ description: >
 
 ## 定位一句話
 
-**便宜的自動判斷：這則原始材料該不該進下一步（花錢的）LLM 抽取。**
+**便宜的自動判斷：這則原始材料值不值得花 pq1 成本，先整理成可供使用者判斷的核准包。**
 
-這不是 L8 來源獨立性的最終判定——那個判定永遠留給人工核准這一關（見 `docs/brainstorms/2026-07-11-automation-reliability-workflow-requirements.md` R11）。這裡只決定「值不值得先抽取出來讓人審」，判斷錯了的代價很小（多花一點抽取力氣，或者少抽了一個之後還能再撿回來的線索），所以整體原則是**寧可放行，不要卡關**。
+這不是 L8 來源獨立性的最終判定——那個判定永遠留給人工核准。PASS 只會把 lead 放進自動 pq1；
+routine 追源、抽取並取得 prepared Research Action 後，才以完整核准包進 pq2。使用者 `go` 的語意是核准
+prepared RA 入圖，不必在研究前先回答一次。判斷錯了的主要代價是多花一點研究 token，所以由 priority
+與每輪 limit 控制，整體原則仍是**寧可放行，不要卡關**。
 
 ---
 
@@ -70,8 +73,8 @@ description: >
 
 只有兩種結果，沒有「先問一下」的第三種：
 
-- **PASS** → 進 Stage 3（Extract），這則材料連同判斷理由一起往下傳
-- **FILTER** → 不抽取，但記錄下來：材料摘要 + 篩掉的理由（哪一項要素沒過）
+- **PASS** → 寫回 `triaged_go`，由 routine 依 priority 自動 source-trace＋extract；prepared RA 才進 pq2
+- **FILTER** → 寫回 `triaged_no_go`／park，並記錄材料摘要 + 篩掉理由
 
 **寬鬆原則的具體操作：** 五要素中，關聯性和可引用性是硬指標（沒關聯、沒有可查核內容 → 直接 FILTER，抽取了也沒用）。新穎性、潛在獨立性與矛盾／反證價值是軟指標；後三者任一項不確定、可能有價值或明確命中時，一律 PASS。不要因為材料反駁現有 thesis、或與既有主題重疊就篩掉——這是「寧可多花一點抽取力氣、也不要悄悄漏掉好線索」的核心（R12）。
 
@@ -79,14 +82,14 @@ description: >
 
 ## 輸出格式
 
-每次 routine 執行後，Stage 2 的結果彙整成一段稽核紀錄，附在最終 PR/Issue 裡：
+每次 routine 執行後，Stage 2 的結果彙整進 Daily Brief／Weekly Report 的稽核段；不開 PR／Issue：
 
 ```
 ## Triage 結果
 
 本次 harvest N 則原始材料。
 
-**通過（M 則）：** 進入 Stage 3 抽取
+**通過（M 則）：** 進 priority pq1；完成後以 prepared RA 進 pq2
 - [材料摘要] — 判斷理由：[哪一項要素觸發放行]
 
 **篩掉（P 則）：**
@@ -101,6 +104,6 @@ description: >
 
 | 情況 | 用哪個 skill |
 |------|-------------|
-| Cloud routine 自動判斷一則 harvest 材料值不值得抽取 | 本 skill |
+| 本機 daily／weekly routine 判斷一則 harvest 材料值不值得進 pq1 | 本 skill |
 | 使用者自己貼一條推文/新聞，要不要入庫 | `skills/lead-intake`（人在場的 Fast Path，判斷邏輯類似但由人主導） |
 | 新公司決定要不要入圖 | `skills/company-onboard`（本 skill 只建議候選，不觸發） |
