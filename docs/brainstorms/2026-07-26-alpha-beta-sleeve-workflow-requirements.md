@@ -1,6 +1,10 @@
 # 盲點審查報告：Beta 地基＋Alpha 衛星的 Daily Decision Workflow
 
 > 狀態：下一階段 brainstorm；尚未授權實作 target bands、regime 規則或自動調倉。
+>
+> 本主題已與 Paywall ROI／合法手動入口、Token-efficient Daily Runner 一併收斂到
+> [`2026-07-26-next-phase-operating-model-requirements.md`](2026-07-26-next-phase-operating-model-requirements.md)；
+> 本檔保留 Portfolio Sleeve 的深度需求。
 
 ## 最危險的三個盲點（先看這個）
 
