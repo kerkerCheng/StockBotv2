@@ -22,6 +22,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from engine_b import leads  # noqa: E402
 from engine_b import priority  # noqa: E402
+from engine_b import routine_config  # noqa: E402
 
 
 def _tracked(arg: str | None) -> frozenset[str]:
@@ -81,12 +82,23 @@ def _cmd_drain(args: argparse.Namespace) -> int:
     checkpoint，重跑從剩下的接（plan R3/KTD2）。命令本身不做 trace+extract。
     """
     store = leads.load(args.leads)
+    config = routine_config.load_config(Path(args.routine_config))
+    limit = (
+        args.limit
+        if args.limit is not None
+        else int(config["pq1"]["drain_limit_per_run"])
+    )
+    tracked = (
+        _tracked(args.tracked)
+        if args.tracked is not None
+        else routine_config.discover_tracked_tickers(config)
+    )
     candidates = [
         l for l in store["leads"].values()
         if l["status"] in ("triaged_go", "researching")
     ]
-    ranked = priority.rank_leads(candidates, tracked_tickers=_tracked(args.tracked))
-    batch = ranked[: args.limit]
+    ranked = priority.rank_leads(candidates, tracked_tickers=tracked)
+    batch = ranked[:limit]
     if args.json:
         print(json.dumps(
             [{"score": s, "lead": l} for s, l in batch],
@@ -171,8 +183,11 @@ def build_parser() -> argparse.ArgumentParser:
     p_list.set_defaults(func=_cmd_list)
 
     p_drain = sub.add_parser("drain", help="列出 pq1 接下來該處理的 leads（依 priority）")
-    p_drain.add_argument("--limit", type=int, default=5)
-    p_drain.add_argument("--tracked", help="逗號分隔的已追蹤 ticker（thesis 影響度）")
+    p_drain.add_argument("--limit", type=int, default=None,
+                         help="本輪上限；省略時讀 config/daily_routine.json")
+    p_drain.add_argument("--tracked", default=None,
+                         help="逗號分隔的已追蹤 ticker；省略時由 lifecycle/cohort 自動導出")
+    p_drain.add_argument("--routine-config", default=str(routine_config.DEFAULT_CONFIG))
     p_drain.add_argument("--json", action="store_true")
     p_drain.set_defaults(func=_cmd_drain)
 

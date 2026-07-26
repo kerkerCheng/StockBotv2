@@ -6,6 +6,10 @@
 
 ## 定位
 
+Authority contract：`AGENTS.md` 是政策 SSOT；本檔是 weekly executable runbook。Routine 必須讀取、遵守，
+但**不得在執行中自我修改本檔**。`docs/reports/weekly_scan_<date>.md` 只保存當週 point-in-time 發現，
+不是 leads／todo／lifecycle／Engine A-C-D 的 current-state authority。
+
 Weekly 只做三件事：
 
 1. **Topic discovery（發現未知）**：掃 watch 清單外的新公司／新題材，只到 topic digest，不追源、不抽取。
@@ -64,7 +68,8 @@ Daily 負責已知來源的 X／EDGAR harvest、triage、Engine C refresh、toda
 ## pq2（只列真正需使用者決定的穩定編號）
 ```
 
-只提交本週 report 與本次確實更新的統一 state files，直接在 master push；不要開 PR／Issue。若 working
+只提交本週 report 與本次確實更新的統一 state files，直接在 master push；不得修改本 prompt，
+不要開 PR／Issue。若 working
 tree 或 Git guard 使安全提交不成立，就保留檔案、回報原因，不擴大 pathset。
 
 ## 鐵律

@@ -59,10 +59,12 @@ triage 寬鬆（關聯性與可引用性是硬指標，其餘軟指標命中即 
 ### Step 3 — pq1 drain（priority，可續跑）
 
 ```powershell
-& '.venv\Scripts\python.exe' -m engine_b.cli drain --limit <N> --tracked <已追蹤ticker>
+& '.venv\Scripts\python.exe' -m engine_b.cli drain
 ```
 
-列出接下來可研究的 leads（依 priority；pop triaged_go＋researching），依每輪 limit 自動跑
+列出接下來可研究的 leads（依 priority；pop triaged_go＋researching）。每輪 limit 由
+`config/daily_routine.json` 控制；tracked tickers 預設由 lifecycle＋Decision cohorts 自動導出，
+需要臨時覆寫時才傳 `--limit`／`--tracked`。依每輪 limit 自動跑
 **pq1＝source-trace＋extraction**（`skills/source-trace`＋`skills/lead-intake` 的研究部分），逐則
 checkpoint 狀態。Triage PASS 只授權研究、不授權入圖；prepared RA 進 pq2 後才等待使用者 `go`：
 

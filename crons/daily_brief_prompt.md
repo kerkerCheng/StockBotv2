@@ -25,7 +25,8 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
 4. 任何來源失敗都要誠實列出 `fetch_failed`／`parse_failed`；單一來源失敗不阻斷其他段落。X token
    只從本機 `.env` 讀取，不得輸出或搬移 token。
 5. 先組出不會因研究失敗而消失的心跳 snapshot，再 best-effort 執行
-   `.venv\Scripts\python.exe -m engine_b.cli drain --limit 2` 的最高 priority leads：逐則
+   `.venv\Scripts\python.exe -m engine_b.cli drain`。每輪上限由 `config/daily_routine.json` 控制；
+   tracked tickers 由非 retired lifecycle 與 non-terminal Decision cohorts 自動導出。對最高 priority leads 逐則
    source-trace＋extract，checkpoint `researching` → `action_prepared`。有可核准 graph delta 才 prepare；
    追源未果、原主張被否定或僅屬 Engine C 時變 observation 時 park 並記 outcome，不製造空 RA。
    只有 prepared RA 才進 pq2；triage PASS 與 pq1 自動研究都不代表入圖核准。

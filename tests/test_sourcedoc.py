@@ -151,6 +151,7 @@ def test_load_creates_sourcedoc_and_cites_from_claim_and_assertion() -> None:
         "retrieved_at": "2026-07-02",
         "storage_permission": "repo_excerpt",
         "permission_basis": "Public filing; excerpt retained for verification.",
+        "section": None,
     }
     assert "sd.storage_permission" in source_query
 

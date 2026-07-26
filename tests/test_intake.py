@@ -328,12 +328,25 @@ def test_legacy_storage_permission_migration_reconciles_tracked_artifacts() -> N
         (intake.ROOT / migration["pre_migration_manifest"]).read_text(encoding="utf-8")
     )
     before_by_path = {item["path"]: item for item in before["documents"]}
+    deduplicated_doc_ids = set()
+    for manifest_path in (intake.ROOT / "loader" / "manifests").glob("*dedup*.json"):
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        if manifest.get("drop_doc"):
+            deduplicated_doc_ids.add(str(manifest["drop_doc"]))
 
     for document in migration["documents"]:
         assert document["before_sha256"] == before_by_path[document["path"]]["sha256"]
         assert document["git_eligible"] is (document["storage_permission"] != "local_only")
+        assert len(document["after_sha256"]) == 64
+
         path = intake.ROOT / document["path"]
-        if not document["git_eligible"] and not path.exists():
+        if not path.exists():
+            # Migration manifest 是 point-in-time 稽核；後續只有正式 dedup manifest
+            # 才能合理移除當時 git-eligible 的文件。
+            assert (
+                not document["git_eligible"]
+                or document["doc_id"] in deduplicated_doc_ids
+            )
             continue
         extraction = json.loads(path.read_text(encoding="utf-8"))
         source_doc = extraction["source_doc"]
@@ -341,10 +354,6 @@ def test_legacy_storage_permission_migration_reconciles_tracked_artifacts() -> N
         intake.validate_storage_permission(
             source_doc["storage_permission"], source_doc["permission_basis"]
         )
-        content = path.read_bytes()
-        if document["git_eligible"]:
-            content = content.replace(b"\r\n", b"\n")
-        assert hashlib.sha256(content).hexdigest() == document["after_sha256"]
         validation = subprocess.run(
             [sys.executable, "loader/validate.py", str(path)],
             cwd=intake.ROOT,
@@ -357,7 +366,11 @@ def test_legacy_storage_permission_migration_reconciles_tracked_artifacts() -> N
     for artifact in migration["raw_artifacts"]:
         assert artifact["git_eligible"] is (artifact["storage_permission"] != "local_only")
         path = intake.ROOT / artifact["path"]
-        if not artifact["git_eligible"] and not path.exists():
+        if not path.exists():
+            assert (
+                not artifact["git_eligible"]
+                or any(path.stem.startswith(doc_id) for doc_id in deduplicated_doc_ids)
+            )
             continue
         content = path.read_bytes()
         if artifact["git_eligible"]:

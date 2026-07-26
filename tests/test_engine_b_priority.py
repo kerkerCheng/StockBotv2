@@ -11,9 +11,10 @@ def _triaged(source: str, *, tier: int, flags=None):
     return store["leads"][lead_id]
 
 
-def test_lead_ticker_parses_edgar_source_only() -> None:
+def test_lead_ticker_parses_edgar_source_and_title_cashtag() -> None:
     assert priority.lead_ticker({"source": "edgar:COHR"}) == "COHR"
     assert priority.lead_ticker({"source": "aleabitoreddit_rss"}) is None
+    assert priority.lead_ticker({"source": "x:serenity", "title": "$GOOGL capex"}) == "GOOGL"
 
 
 def test_tier_base_score() -> None:

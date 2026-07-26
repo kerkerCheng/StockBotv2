@@ -140,7 +140,7 @@ A real position that predates a frozen Decision Lab system decision. It remains 
 *Avoid:* implied system recommendation, backfilled paper trade
 
 ### Decision Cohort（決策樣本集）
-The prospective population of every signal that passed the Probe Gate, including signals the user skipped, rejected, paper-traded, live-traded, or overrode. Each record preserves the raw qualified lead, system decision, user decision, execution references, claim outcome, and market outcome so source alpha, system alpha, and user discretion can be evaluated separately. It is upstream of the paper transaction ledger and does not duplicate paper or live position truth.
+The prospective population of every signal that passed the Probe Gate, including signals the user skipped, rejected, paper-traded, live-traded, or overrode. **One cohort is one stable, falsifiable decision case** keyed by normalized company/claim/direction/expiry—not one brokerage lot, not one company master, and not automatically one current holding. A company may have multiple cohorts across distinct claims or lifecycle epochs; a legacy holding needs a meaningful claim/MVRP before it becomes an alpha cohort. Each record preserves the raw qualified lead, system decision, user decision, execution references, claim outcome, and market outcome so source alpha, system alpha, and user discretion can be evaluated separately. It is upstream of the paper transaction ledger and does not duplicate paper or live position truth.
 *Avoid:* trade log, winners list, three decision ledgers
 
 ### Signal Source Registry（訊號來源登記表／Whitelist）

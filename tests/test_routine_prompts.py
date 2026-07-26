@@ -27,7 +27,9 @@ def test_daily_prompt_uses_local_authorities_and_repo_venv() -> None:
 
 def test_daily_prompt_keeps_human_gates_and_batch_contract() -> None:
     text = DAILY.read_text(encoding="utf-8")
-    assert "drain --limit 2" in text
+    assert "engine_b.cli drain" in text
+    assert "config/daily_routine.json" in text
+    assert "drain --limit 2" not in text
     assert "只有 prepared RA 才進 pq2" in text
     assert "Graph admission" in text
     assert "record-choice" in text and "record-fill" in text

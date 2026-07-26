@@ -21,12 +21,16 @@ PRIORITY_WEIGHTS: dict[str, float] = {
 }
 
 _EDGAR_SOURCE = re.compile(r"^edgar:([A-Z0-9.^_-]+)$")
+_CASHTAG = re.compile(r"(?<![A-Z0-9_])\$([A-Z][A-Z0-9.]{0,9})\b", re.IGNORECASE)
 
 
 def lead_ticker(lead: Mapping[str, Any]) -> str | None:
-    """從 edgar: source 取 ticker；RSS 等無法解析回 None。"""
+    """從 edgar: source 或標題 cashtag 取第一個 ticker。"""
     m = _EDGAR_SOURCE.match(str(lead.get("source") or ""))
-    return m.group(1) if m else None
+    if m:
+        return m.group(1)
+    title_match = _CASHTAG.search(str(lead.get("title") or ""))
+    return title_match.group(1).upper() if title_match else None
 
 
 def score_lead(lead: Mapping[str, Any], *, thesis_impact: bool = False) -> float:
