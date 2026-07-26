@@ -29,6 +29,18 @@ DEFAULT_CONFIG_PATH = ROOT / "crons" / "harvest_config.json"
 _UA = "StockBotv2 daily-harvest (research; contact c3035281@gmail.com)"
 
 
+def load_local_env(path: Path | str = ROOT / ".env") -> None:
+    """載入 repo-local secrets，讓無人值守 process 不依賴父 shell 注入。"""
+    try:
+        from dotenv import load_dotenv
+    except ImportError:
+        return
+    load_dotenv(Path(path), override=False)
+
+
+load_local_env()
+
+
 class HarvestParseError(Exception):
     """來源抓到了但內容無法解析（→ parse_failed，不是無新文）。"""
 

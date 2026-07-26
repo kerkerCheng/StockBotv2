@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import os
 
 import pytest
 
@@ -70,6 +71,18 @@ def test_bearer_token_requires_env(monkeypatch) -> None:
         x_api.bearer_token()
     monkeypatch.setenv("X_BEARER_TOKEN", " tok ")
     assert x_api.bearer_token() == "tok"
+
+
+def test_harvest_loads_repo_local_env_for_unattended_process(tmp_path, monkeypatch) -> None:
+    monkeypatch.delenv("X_BEARER_TOKEN", raising=False)
+    env_file = tmp_path / ".env"
+    env_file.write_text("X_BEARER_TOKEN=from-local-env\n", encoding="utf-8")
+
+    try:
+        harvest_leads.load_local_env(env_file)
+        assert x_api.bearer_token() == "from-local-env"
+    finally:
+        os.environ.pop("X_BEARER_TOKEN", None)
 
 
 # --- harvest 整合 ---------------------------------------------------------

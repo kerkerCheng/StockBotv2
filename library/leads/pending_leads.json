@@ -227,6 +227,114 @@
       "result": "ok",
       "run_at": "2026-07-25T09:07:31.650706+00:00",
       "source": "edgar:GFS"
+    },
+    {
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-26T07:23:05.435604+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-26T07:23:07.112224+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-26T07:23:08.042951+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-26T07:23:08.950773+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-26T07:23:09.686548+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-26T07:23:10.567326+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-26T07:23:11.494890+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-26T07:23:12.442290+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-26T07:23:13.333066+00:00",
+      "source": "edgar:GFS"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-26T07:24:48.037478+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-26T07:24:49.153074+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-26T07:24:50.124613+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-26T07:24:51.066634+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-26T07:24:52.007691+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-26T07:24:52.944066+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-26T07:24:53.985012+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-26T07:24:54.918650+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-26T07:24:55.890691+00:00",
+      "source": "edgar:GFS"
     }
   ],
   "leads": {
@@ -1912,7 +2020,7 @@
   "source_state": {
     "x:aleabitoreddit": {
       "since_id": "2080750537121874206",
-      "updated_at": "2026-07-25T09:07:25.057809+00:00",
+      "updated_at": "2026-07-26T07:24:48.037463+00:00",
       "user_id": "1940360837547565056"
     }
   }
