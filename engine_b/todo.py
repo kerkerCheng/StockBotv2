@@ -317,13 +317,22 @@ def collect_from_decisions() -> list[dict[str, Any]]:
         if action in {"NO ACTION", ""}:
             continue
         ref = str(item.get("cohort_id") or item.get("decision_id") or "")
+        company = str(item.get("company_id") or "unknown")
+        ticker = str(item.get("ticker") or "").strip().upper()
+        if not ref and item.get("sheet_only"):
+            identity = company if company not in {"", "unknown", "unresolved"} else (
+                f"ticker:{ticker}" if ticker else ""
+            )
+            ref = f"sheet:{identity}" if identity else ""
         if not ref:
             continue
-        company = item.get("company_id") or "unknown"
+        label = company if company not in {"", "unknown", "unresolved"} else (
+            ticker or "unknown"
+        )
         rows.append({
             "type": "sheet_only_holding" if item.get("sheet_only") else "decision_review",
             "ref_id": ref,
-            "title": f"{action} — {company}",
+            "title": f"{action} — {label}",
             "source": "decision_lab",
         })
     # Engine D 也可能因 portfolio authority 全域失效而要求 REVIEW，這時沒有

@@ -32,6 +32,11 @@ import sys
 from pathlib import Path
 from typing import Any
 
+# 允許文件所列的 ``python fetchers/gsheets.py`` 直接入口；模組入口仍可照常使用。
+_REPO_ROOT = Path(__file__).resolve().parent.parent
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
+
 from identity.execution import get_execution_aliases as _neutral_execution_aliases
 
 try:
@@ -121,8 +126,9 @@ def fetch_portfolio(*, strict_operational: bool = False) -> list[dict[str, Any]]
     讀取 Google Sheets 工作表，回傳 list of dicts。
     每個 dict 包含：ticker, company, bucket, shares, avg_cost, currency, notes
 
-    strict_operational=True 時另要求 market_value_base、nav_base、base_currency，
-    且任何格式錯誤直接失敗，供 Engine D live authority 使用。
+    strict_operational=True 時優先要求 market_value_base、nav_base、base_currency；
+    舊表可完整退回 market_usd（逐列 mark-to-market），由 adapter 統一成 USD NAV。
+    兩種契約都會嚴格驗證，欄位半套或格式錯誤直接失敗。
     """
     if not SPREADSHEET_ID:
         raise ValueError(
@@ -145,6 +151,20 @@ def fetch_portfolio(*, strict_operational: bool = False) -> list[dict[str, Any]]
 
     # First row = headers; normalise to lowercase
     headers = [h.strip().lower() for h in rows[0]]
+
+    operational_mode: str | None = None
+    if strict_operational:
+        canonical_fields = {"market_value_base", "nav_base", "base_currency"}
+        present_canonical = canonical_fields.intersection(headers)
+        if present_canonical == canonical_fields:
+            operational_mode = "canonical"
+        elif not present_canonical and "market_usd" in headers:
+            operational_mode = "legacy_market_usd"
+        else:
+            raise ValueError(
+                "Google Sheet operational holdings 欄位不完整：需完整提供 "
+                "market_value_base/nav_base/base_currency，或提供 market_usd"
+            )
 
     # Accept "symbol" as an alias for "ticker"
     ticker_col = "ticker" if "ticker" in headers else "symbol"
@@ -181,24 +201,44 @@ def fetch_portfolio(*, strict_operational: bool = False) -> list[dict[str, Any]]
             item["avg_cost"] = 0.0
 
         if strict_operational:
-            for field in ("market_value_base", "nav_base"):
+            assert operational_mode is not None
+            numeric_fields = (
+                ("market_value_base", "nav_base")
+                if operational_mode == "canonical"
+                else ("market_usd",)
+            )
+            for field in numeric_fields:
                 try:
                     item[field] = float(item.get(field, ""))
                 except (TypeError, ValueError):
                     raise ValueError(f"Google Sheet {field} 欄位格式錯誤") from None
             item["currency"] = str(item.get("currency") or "").strip().upper()
-            item["base_currency"] = str(
-                item.get("base_currency") or ""
-            ).strip().upper()
+            if operational_mode == "legacy_market_usd":
+                item["market_value_base"] = item["market_usd"]
+                item["base_currency"] = "USD"
+            else:
+                item["base_currency"] = str(
+                    item.get("base_currency") or ""
+                ).strip().upper()
             if (
                 len(item["currency"]) != 3
                 or len(item["base_currency"]) != 3
                 or item["market_value_base"] < 0
-                or item["nav_base"] <= 0
+                or (
+                    operational_mode == "canonical"
+                    and item["nav_base"] <= 0
+                )
             ):
                 raise ValueError("Google Sheet operational holdings 欄位格式錯誤")
 
         portfolio.append(item)
+
+    if strict_operational and operational_mode == "legacy_market_usd":
+        nav_base = sum(item["market_value_base"] for item in portfolio)
+        if nav_base <= 0:
+            raise ValueError("Google Sheet market_usd 合計必須大於 0")
+        for item in portfolio:
+            item["nav_base"] = nav_base
 
     return portfolio
 

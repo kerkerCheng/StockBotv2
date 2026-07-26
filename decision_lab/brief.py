@@ -307,6 +307,8 @@ def _sheet_only_items(
                 "cohort_id": None,
                 "decision_id": None,
                 "company_id": _public_company(company_id),
+                "ticker": ticker,
+                "sheet_only": True,
                 "recommended_action": "REVIEW",
                 "reason": "Google Sheet 有 live 持股，但 Engine D 尚無對應 cohort／decision。",
                 "alpha_thesis_change": {

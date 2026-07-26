@@ -1,6 +1,6 @@
 # Weekly 審查 — Codex 本機 Prompt（v1.2）
 
-> 現行執行端改為 Codex 本機 session／未來的 local scheduled task，直接在 `master` working tree 執行。
+> 現行執行端是 Codex 本機 scheduled task（台北週日 04:00），直接在 `master` working tree 執行。
 > 不建立 branch／worktree、不走 Claude cloud clone、不靠 MCP 才能讀本機 authority。Windows 命令一律
 > 使用 `.venv\Scripts\python.exe`。
 

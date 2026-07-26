@@ -122,6 +122,8 @@ def test_today_finds_sheet_only_holding_without_creating_a_cohort(tmp_path: Path
 
         assert brief["recommended_action"] == "REVIEW"
         assert "sheet_only_holding" in brief["blockers"]
+        assert brief["items"][0]["ticker"] == "LEGACY"
+        assert brief["items"][0]["sheet_only"] is True
         assert brief["items"][0]["supported_sizing_range"] == [0.0, 0.0]
         assert store.table_count("decision_cohorts") == before
     finally:

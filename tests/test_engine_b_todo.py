@@ -132,6 +132,49 @@ def test_collect_from_decisions_keeps_global_blocker_without_items(monkeypatch) 
     }]
 
 
+def test_collect_from_decisions_keeps_sheet_only_items_without_cohort(
+    monkeypatch,
+) -> None:
+    from mcp_server import decision_tools
+
+    monkeypatch.setattr(decision_tools, "get_decision_brief_core", lambda: {
+        "action_needed": True,
+        "items": [
+            {
+                "cohort_id": None,
+                "decision_id": None,
+                "company_id": "co:nvidia",
+                "ticker": "NVDA",
+                "recommended_action": "REVIEW",
+                "sheet_only": True,
+            },
+            {
+                "cohort_id": None,
+                "decision_id": None,
+                "company_id": "unresolved",
+                "ticker": "QQQ",
+                "recommended_action": "REVIEW",
+                "sheet_only": True,
+            },
+        ],
+    })
+
+    assert todo.collect_from_decisions() == [
+        {
+            "type": "sheet_only_holding",
+            "ref_id": "sheet:co:nvidia",
+            "title": "REVIEW — co:nvidia",
+            "source": "decision_lab",
+        },
+        {
+            "type": "sheet_only_holding",
+            "ref_id": "sheet:ticker:QQQ",
+            "title": "REVIEW — QQQ",
+            "source": "decision_lab",
+        },
+    ]
+
+
 def test_raw_leads_are_not_pq2_and_legacy_items_migrate_with_audit() -> None:
     pool = _pool_with(
         {"type": "lead_research", "ref_id": "lead_a", "title": "raw lead"},

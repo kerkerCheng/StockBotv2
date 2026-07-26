@@ -114,3 +114,52 @@ def test_operational_sheet_read_rejects_malformed_numeric_cells(monkeypatch) -> 
 
     with pytest.raises(ValueError, match="shares"):
         fetch_portfolio(strict_operational=True)
+
+
+def test_operational_sheet_read_normalizes_legacy_market_usd(monkeypatch) -> None:
+    headers = [
+        "ticker",
+        "shares",
+        "avg_cost",
+        "currency",
+        "market_usd",
+    ]
+    monkeypatch.setattr(gsheets, "SPREADSHEET_ID", "fixture")
+    monkeypatch.setattr(
+        gsheets,
+        "_get_service",
+        lambda: _SheetService(
+            [
+                headers,
+                ["FRA:2DG", "10", "2", "eur", "25"],
+                ["NVDA", "3", "10", "usd", "75"],
+            ]
+        ),
+    )
+
+    rows = fetch_portfolio(strict_operational=True)
+
+    assert [row["market_value_base"] for row in rows] == [25.0, 75.0]
+    assert {row["nav_base"] for row in rows} == {100.0}
+    assert {row["base_currency"] for row in rows} == {"USD"}
+
+
+def test_operational_sheet_read_rejects_partial_canonical_contract(
+    monkeypatch,
+) -> None:
+    headers = [
+        "ticker",
+        "shares",
+        "currency",
+        "market_value_base",
+        "market_usd",
+    ]
+    monkeypatch.setattr(gsheets, "SPREADSHEET_ID", "fixture")
+    monkeypatch.setattr(
+        gsheets,
+        "_get_service",
+        lambda: _SheetService([headers, ["NVDA", "3", "USD", "75", "75"]]),
+    )
+
+    with pytest.raises(ValueError, match="欄位不完整"):
+        fetch_portfolio(strict_operational=True)

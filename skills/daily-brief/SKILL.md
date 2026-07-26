@@ -169,7 +169,7 @@ fill。系統不連 broker。
 ## 現行本機排程與遠端 fallback
 
 `crons/daily_brief_prompt.md` 是 Codex desktop 每日 06:30 的本機 scheduled task prompt，可直接讀 repo 與
-private authorities；`crons/weekly_scan_prompt.md` 是本機 weekly prompt。Claude cloud routine 已退出現行
+private authorities；`crons/weekly_scan_prompt.md` 是台北週日 04:00 的本機 weekly prompt。Claude cloud routine 已退出現行
 排程，只保留遠端 chat／手機 intake 的 MCP fallback；遠端永遠不得取代本機 decision／lifecycle authority。
 
 ## 已知會壞的地方（v0，撞到回頭修）
