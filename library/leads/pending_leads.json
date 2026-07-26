@@ -389,6 +389,114 @@
       "result": "ok",
       "run_at": "2026-07-26T08:17:46.846015+00:00",
       "source": "edgar:GFS"
+    },
+    {
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-26T10:20:05.649155+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-26T10:20:06.249117+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-26T10:20:06.677840+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-26T10:20:07.094706+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-26T10:20:07.511391+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-26T10:20:07.926116+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-26T10:20:08.341081+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-26T10:20:08.746431+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-26T10:20:09.176234+00:00",
+      "source": "edgar:GFS"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-26T10:20:32.191064+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-26T10:20:33.310522+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-26T10:20:34.244149+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-26T10:20:35.198867+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-26T10:20:36.126627+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-26T10:20:37.061855+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-26T10:20:37.988521+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-26T10:20:38.898208+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-26T10:20:39.847789+00:00",
+      "source": "edgar:GFS"
     }
   ],
   "leads": {
@@ -704,9 +812,12 @@
       "first_seen": "2026-07-22T15:37:23.595633+00:00",
       "lead_id": "lead_2ea3e59722e5e136cf2f82e823cbe7e6",
       "published_at": "2026-07-01",
-      "refs": {},
+      "refs": {
+        "action_digest": "cb309761a92e6f4a9ad0d168d69ef20dacf29c4022c496de833b7a0b4806be94",
+        "research_action_id": "ra_0db7d5cf689c05753ed71d1e967a7f4f"
+      },
       "source": "edgar:AAOI",
-      "status": "triaged_go",
+      "status": "action_prepared",
       "title": "AAOI 8-K filed 2026-07-01",
       "triage": {
         "decided_at": "2026-07-25T03:52:34.713763+00:00",
@@ -2081,9 +2192,13 @@
       "first_seen": "2026-07-25T09:06:50.926923+00:00",
       "lead_id": "lead_ffdc392c947397e9a649b634ed41f0c8",
       "published_at": "2026-07-20T06:22:41.000Z",
-      "refs": {},
+      "refs": {
+        "claimed_origin": "digitimes_2026_07_20",
+        "outcome": "paywalled_timeline_not_independently_quotable",
+        "trace_status": "isolated_tier_3"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "title": "Some updates on bottleneck timelines: - ABF substrates: 1 year / eg. Ajinomoto (2802) for ABF film, Ibiden, Unimicron, Nan Ya PCB, etc make",
       "triage": {
         "decided_at": "2026-07-25T09:09:23.756000+00:00",
@@ -2102,7 +2217,7 @@
   "source_state": {
     "x:aleabitoreddit": {
       "since_id": "2080750537121874206",
-      "updated_at": "2026-07-26T08:17:39.114401+00:00",
+      "updated_at": "2026-07-26T10:20:32.191038+00:00",
       "user_id": "1940360837547565056"
     }
   }
