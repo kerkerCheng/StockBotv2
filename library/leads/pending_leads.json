@@ -814,10 +814,11 @@
       "published_at": "2026-07-01",
       "refs": {
         "action_digest": "cb309761a92e6f4a9ad0d168d69ef20dacf29c4022c496de833b7a0b4806be94",
+        "focus_company_id": "co:applied_optoelectronics",
         "research_action_id": "ra_0db7d5cf689c05753ed71d1e967a7f4f"
       },
       "source": "edgar:AAOI",
-      "status": "action_prepared",
+      "status": "applied",
       "title": "AAOI 8-K filed 2026-07-01",
       "triage": {
         "decided_at": "2026-07-25T03:52:34.713763+00:00",

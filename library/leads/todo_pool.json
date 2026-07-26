@@ -110,6 +110,7 @@
     },
     {
       "added_at": "2026-07-25T04:49:13.254087+00:00",
+      "deferred_at": "2026-07-26T13:07:18.781347+00:00",
       "hint": "本機複查 thesis 並手動更新 lifecycle.json",
       "n": 10,
       "reason": null,
@@ -232,10 +233,10 @@
       "added_at": "2026-07-26T09:03:27.776126+00:00",
       "hint": "評估這筆 Sheet 持股（evaluate-signal 或 onboard）",
       "n": 20,
-      "reason": null,
+      "reason": "已建立 Sivers research-intent cohort dc_7dc03795699f2169e9c8adc6d3d10179 與 decision pd_e297eca103fbffe0eeeaf4c6bedb6061；無 live choice/fill",
       "ref_id": "sheet:co:sivers_semiconductors",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-07-26T13:07:23.881195+00:00",
       "source": "decision_lab",
       "title": "REVIEW — co:sivers_semiconductors",
       "type": "sheet_only_holding"
@@ -400,13 +401,37 @@
       "added_at": "2026-07-26T10:30:33.474730+00:00",
       "hint": "核准入圖（apply_research_action）",
       "n": 34,
-      "reason": null,
+      "reason": "Research Action ra_0db7d5cf689c05753ed71d1e967a7f4f applied；無 open conflict；commit 73b22f799b62caa83da9c35d725049203dafe795 已推送",
       "ref_id": "ra_0db7d5cf689c05753ed71d1e967a7f4f",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-07-26T13:07:29.731161+00:00",
       "source": "research_action",
       "title": "AAOI FAB4 cleanroom 合約與完工時程補強",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-07-26T13:07:56.663666+00:00",
+      "hint": "重新評估該 probe（reassess）",
+      "n": 35,
+      "reason": null,
+      "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:applied_optoelectronics",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-07-26T13:07:56.663708+00:00",
+      "hint": "重新評估該 probe（reassess）",
+      "n": 36,
+      "reason": null,
+      "ref_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:sivers_semiconductors",
+      "type": "decision_review"
     }
   ],
   "log": [
@@ -537,8 +562,32 @@
       "ref_id": "global:holdings_unavailable",
       "type": "decision_review",
       "verb": "go"
+    },
+    {
+      "at": "2026-07-26T13:07:18.781347+00:00",
+      "n": 10,
+      "reason": "使用者延後 Sivers lifecycle 複查",
+      "ref_id": "sivers",
+      "type": "thesis_lifecycle",
+      "verb": "pending"
+    },
+    {
+      "at": "2026-07-26T13:07:23.881195+00:00",
+      "n": 20,
+      "reason": "已建立 Sivers research-intent cohort dc_7dc03795699f2169e9c8adc6d3d10179 與 decision pd_e297eca103fbffe0eeeaf4c6bedb6061；無 live choice/fill",
+      "ref_id": "sheet:co:sivers_semiconductors",
+      "type": "sheet_only_holding",
+      "verb": "go"
+    },
+    {
+      "at": "2026-07-26T13:07:29.731161+00:00",
+      "n": 34,
+      "reason": "Research Action ra_0db7d5cf689c05753ed71d1e967a7f4f applied；無 open conflict；commit 73b22f799b62caa83da9c35d725049203dafe795 已推送",
+      "ref_id": "ra_0db7d5cf689c05753ed71d1e967a7f4f",
+      "type": "ra_admission",
+      "verb": "go"
     }
   ],
-  "next_n": 35,
+  "next_n": 37,
   "schema_version": "1"
 }
