@@ -91,6 +91,32 @@ def test_advance_unknown_lead_or_status() -> None:
         leads.advance(store, lead_id, "nonsense")
 
 
+def test_annotate_refs_preserves_parked_status_and_triage() -> None:
+    store = leads.empty_store()
+    lead_id, _ = leads.register(store, source="s", url="https://x.io/audio")
+    leads.triage(store, lead_id, go=True, tier=3, reason="待追音訊")
+    leads.advance(store, lead_id, "parked")
+
+    lead = leads.annotate_refs(
+        store,
+        lead_id,
+        refs={"outcome": "official_audio_obtained", "asr_timestamp": "00:08:38-00:09:10"},
+    )
+
+    assert lead["status"] == "parked"
+    assert lead["triage"]["decision"] == "go"
+    assert lead["refs"]["asr_timestamp"] == "00:08:38-00:09:10"
+
+
+def test_annotate_refs_rejects_empty_refs_and_unknown_lead() -> None:
+    store = leads.empty_store()
+    lead_id, _ = leads.register(store, source="s", url="https://x.io/audio-2")
+    with pytest.raises(ValueError):
+        leads.annotate_refs(store, lead_id, refs={})
+    with pytest.raises(leads.LeadStateError):
+        leads.annotate_refs(store, "lead_missing", refs={"outcome": "x"})
+
+
 # --- triage 約束 ----------------------------------------------------------
 
 def test_triage_requires_reason_and_valid_tier() -> None:

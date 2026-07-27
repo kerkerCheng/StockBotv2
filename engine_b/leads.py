@@ -201,6 +201,28 @@ def advance(
     return lead
 
 
+def annotate_refs(
+    store: dict[str, Any],
+    lead_id: str,
+    *,
+    refs: dict[str, Any],
+) -> dict[str, Any]:
+    """補充 lead provenance metadata，但不改變狀態或 evidence tier。"""
+    if not refs:
+        raise ValueError("refs 不可為空")
+    cleaned: dict[str, Any] = {}
+    for raw_key, value in refs.items():
+        key = str(raw_key).strip()
+        if not key:
+            raise ValueError("ref key 不可為空")
+        if value is None:
+            raise ValueError(f"ref {key} 不可為 null")
+        cleaned[key] = value
+    lead = _require(store, lead_id)
+    lead.setdefault("refs", {}).update(cleaned)
+    return lead
+
+
 _PRIORITY_FLAG_KEYS = ("contradiction", "novelty", "independent_source")
 
 

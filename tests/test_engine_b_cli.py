@@ -82,6 +82,37 @@ def test_advance_records_ref(tmp_path) -> None:
     assert store["leads"][lead_id]["refs"]["research_action_id"] == "ra_abc"
 
 
+def test_annotate_records_refs_without_changing_parked_status(tmp_path, capsys) -> None:
+    path = tmp_path / "pending_leads.json"
+    lead_id = _seed(path)
+    cli.main(["--leads", str(path), "advance", lead_id, "parked"])
+    capsys.readouterr()
+
+    assert cli.main([
+        "--leads", str(path), "annotate", lead_id,
+        "--ref", "outcome=official_audio_obtained",
+        "--ref", "asr_timestamp=00:08:38-00:09:10",
+    ]) == 0
+
+    lead = leads.load(path)["leads"][lead_id]
+    assert lead["status"] == "parked"
+    assert lead["refs"] == {
+        "outcome": "official_audio_obtained",
+        "asr_timestamp": "00:08:38-00:09:10",
+    }
+    assert "status=parked" in capsys.readouterr().out
+
+
+def test_annotate_rejects_malformed_ref_without_persisting(tmp_path) -> None:
+    path = tmp_path / "pending_leads.json"
+    lead_id = _seed(path)
+
+    assert cli.main([
+        "--leads", str(path), "annotate", lead_id, "--ref", "missing-separator",
+    ]) == 1
+    assert leads.load(path)["leads"][lead_id]["refs"] == {}
+
+
 def test_triage_stores_priority_flags(tmp_path) -> None:
     path = tmp_path / "pending_leads.json"
     lead_id = _seed(path)

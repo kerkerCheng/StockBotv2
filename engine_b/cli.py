@@ -1,4 +1,4 @@
-"""engine_b.cli — pending leads 的 list／triage／advance 命令列入口。
+"""engine_b.cli — pending leads 的 list／triage／advance／annotate 命令列入口。
 
 給 `/daily-brief` skill 一條 deterministic 持久化路徑：research agent 做語意
 triage 判斷，這支 CLI 負責寫入狀態機（不讓 agent 手寫 JSON 冒險汙染 store）。
@@ -9,6 +9,7 @@ triage 判斷，這支 CLI 負責寫入狀態機（不讓 agent 手寫 JSON 冒�
     python -m engine_b.cli list [--status pending]
     python -m engine_b.cli triage <lead_id> --go|--no-go --tier 3 --reason "有新角度"
     python -m engine_b.cli advance <lead_id> researching
+    python -m engine_b.cli annotate <lead_id> --ref outcome=audio_obtained
     python -m engine_b.cli counts
 """
 from __future__ import annotations
@@ -181,6 +182,26 @@ def _cmd_advance(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_annotate(args: argparse.Namespace) -> int:
+    """只補 refs，不藉 metadata 更新繞過封閉狀態機。"""
+    store = leads.load(args.leads)
+    refs = {}
+    for pair in args.ref:
+        key, separator, value = pair.partition("=")
+        if not separator or not key.strip():
+            print(f"annotate 失敗：ref 必須是非空 key=value：{pair}", file=sys.stderr)
+            return 1
+        refs[key.strip()] = value
+    try:
+        lead = leads.annotate_refs(store, args.lead_id, refs=refs)
+    except (leads.LeadStateError, ValueError) as exc:
+        print(f"annotate 失敗：{exc}", file=sys.stderr)
+        return 1
+    leads.save(store, args.leads)
+    print(f"✓ {args.lead_id} metadata updated（status={lead['status']}）")
+    return 0
+
+
 def _cmd_counts(args: argparse.Namespace) -> int:
     store = leads.load(args.leads)
     counts = leads.status_counts(store)
@@ -239,6 +260,12 @@ def build_parser() -> argparse.ArgumentParser:
     p_adv.add_argument("to_status")
     p_adv.add_argument("--ref", action="append", help="key=value，記錄關聯（如 research_action_id=ra_x）")
     p_adv.set_defaults(func=_cmd_advance)
+
+    p_ann = sub.add_parser("annotate", help="補充 metadata，不變更 lead status")
+    p_ann.add_argument("lead_id")
+    p_ann.add_argument("--ref", action="append", required=True,
+                       help="key=value，可重複指定")
+    p_ann.set_defaults(func=_cmd_annotate)
 
     p_cnt = sub.add_parser("counts", help="各狀態計數（JSON）")
     p_cnt.set_defaults(func=_cmd_counts)
