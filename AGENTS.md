@@ -83,6 +83,7 @@ fetchers/edgar.py ──────↑                        engine_c/etl_yfin
 - **抽取與 DB 解耦：** `extract.py` 只輸出 DB 無關 JSON；loader 可替換。DB 選型不綁死資料。
 - **fetchers（已有）：** `fetchers/edgar.py`（美股 SEC EDGAR，免費無 paywall）。
 - **引擎B（X／EDGAR daily harvest 已建；trending horizon 由 weekly 負責）：** `crons/harvest_leads.py` 在本機以 X API `since_id`＋EDGAR watch 抓 metadata → triage PASS → routine 依 priority 自動 pq1（source-trace＋extract）→ prepared Research Action 才進 pq2 等使用者核准入圖。ad hoc 手機入口仍走 `skills/lead-intake`。
+- **本機音訊追源：** 官方 podcast／錄音沒有 transcript 時，用 `scripts/transcribe_audio.py` 跑 `faster-whisper`；預設 CPU `small.en`，模型與完整逐字稿只存 ignored `library/private/`。ASR 只提供 timestamp locator，不自行提高 evidence tier；精確技術詞與 quote 仍須回聽核對。cloud fallback 不假設有此工具。
 - **每週審查（Codex 本機排程，台北週日 04:00，`crons/weekly_scan_prompt.md`）：** 只做 topic discovery（不追源、不抽取）＋thesis lifecycle 唯讀提醒＋完整本機健康審查。可確定性維護先修；需要證據／thesis／持倉 authority 的大事才進統一 pq2。刻意與 daily 06:30 錯開，報告留 `docs/reports/`。
   - **Weekly authority hierarchy：** `AGENTS.md` 是政策 SSOT；`crons/weekly_scan_prompt.md` 是 executable runbook，只有開發／人工修 policy 時才改，weekly routine 本身不得自我改寫。`docs/reports/weekly_scan_<date>.md` 是當週 point-in-time 歷史報告，不是 current-state truth；現況仍以 leads／todo pool／lifecycle／Engine A-C-D 各自 authority 為準。
 - **各類來源的 AI 抽取 instruction：** [`docs/extraction-instructions.md`](docs/extraction-instructions.md)
@@ -165,6 +166,7 @@ fetchers/edgar.py ──────↑                        engine_c/etl_yfin
    - **Daily pq1 budget：** 每輪上限唯一 authority 是 `config/daily_routine.json`（目前 2，屬 v0 成本／時間 cap，不是假裝最佳值）；排序權重唯一 authority 是 `engine_b/priority.py`。tracked thesis impact 由非 retired lifecycle＋non-terminal Decision cohorts 自動導出，不再靠 prompt 手填。
    - **統一待辦池（廣義 pq2，2026-07-26 校正）：** **所有真正需要使用者決策的事只有一個編號空間**——prepared RA 入圖核准、決策複查、thesis 到期、Sheet-only 持股、手動 authority。Raw／triaged leads 留在 pq1，由 routine 自動研究，不占 pq2 編號；否則同一題會在研究前與入圖前問兩次。使用者說「待辦事項統整」＝跑 `& '.venv\Scripts\python.exe' -m engine_b.todo sync`。編號首次進池後直到 resolve 才釋放；狀態存 tracked `library/leads/todo_pool.json`，append-only `log` 保留核准與 migration 稽核。
    - **報告留檔策略（2026-07-25 定案）：** **daily brief 不留檔**（只出在 session；稽核價值由待辦池 log＋leads 狀態機＋Decision Store 承擔）；**weekly report 留檔**（`docs/reports/`，含無法從池重建的 topic discovery 與健康審查趨勢）。不回到 PR/Issue 形式——那會產生與池競爭的第二個狀態源。
+   - **提醒去重：** lifecycle SessionStart hook 只提醒尚未進統一待辦池的新到期項目；已存在的 `thesis_lifecycle`（含 `pending`／deferred）由 Daily Brief 顯示，hook 必須靜默，避免同一 session 問兩次。
    - **v1.2 每日操作：** Codex local scheduled task → X／EDGAR harvest → Engine C ETL → triage → priority pq1 best-effort drain（預設每輪 2 則）→ prepared RA／today／lifecycle `todo sync` → brief。Triage PASS 只授權研究；使用者回 `go` 的對象是完整 prepared RA 或 authority 決策。介面全在對話，**無 GitHub UI**。
    - **（已完成 2026-07-23）v1.0 骨架** — 歷史 plan：[`docs/plans/2026-07-22-002-feat-daily-approval-loop-plan.md`](docs/plans/2026-07-22-002-feat-daily-approval-loop-plan.md)。U1 leads 狀態機＋harvest、U2 partial-identity 修復、U3 MCP `get_decision_brief`、U4 `/daily-brief` skill＋leads CLI＋digest、U5 daily cloud routine。market_timestamp_future 系統性 bug 已修（commit `7f60f0b`）。
    - **每日操作：** 本機說「daily brief」或由 06:30 排程觸發 `$daily-brief`。所有 Python 命令使用 `& '.venv\Scripts\python.exe' ...`；排程收尾只跑 `scripts/publish_daily_state.py`。決策命令（today／evaluate-signal／record-choice／record-fill）只在本機；遠端 chat 看決策才用 MCP 唯讀 `get_decision_brief`。
@@ -192,6 +194,7 @@ fetchers/edgar.py ──────↑                        engine_c/etl_yfin
 
 **快速記憶：**
 - **圖公司 ID（`co:*`）不要憑公司名猜。** 唯一權威是 `config/company_identity.json`，由 `identity/registry.py` 載入；loader 的 `TICKER_MAP` 只是由同一 registry 生成的相容介面。查圖前先查 registry，或用 `query/health_audit.py` 的 `COMPANY_IDS_CYPHER` 列出圖中 Company 再比對。例：Sivers 是 `co:sivers_semiconductors`，不是 `co:sivers`（2026-07-21 週掃即因猜 ID 未命中而漏掉 Sivers 的圖內比對）。ID 未命中時要區分「ID 沒解析對」與「圖中真無此公司」，不能默默跳過。
+- **Sivers 三層 symbol 不可混用：** Engine C／研究行情是瑞典主掛牌 `SIVE.ST`（SEK）；Google Sheet／execution authority 保留 `FRA:2DG`（EUR）；Yahoo provider syntax 由 `identity/execution.py` 正規化成 `2DG.F`。快照對外仍回 canonical `FRA:2DG`，不得把瑞典 ADV／currency 冒充 Frankfurt live liquidity。
 - node 帶內在慢變屬性（`ramp_difficulty_intrinsic`、`concentration_score` 為衍生值非手填）
 - edge 帶關係型屬性（`substitutability`、`sole_source`、`structural_lead_time_weeks`、`ramp_execution`）
 - `confidence` 只在不同 `origin_event` 之間累加（同一法說會多份摘要 = 一個 origin_event）

@@ -17,6 +17,20 @@ description: >
 本手冊必須能在遠端 chat 單獨使用。標有「本機入口」的命令只適用於本機 session；
 cloud routine／手機不能假設可碰本機檔案或 localhost。
 
+### 本機音訊／podcast 入口
+
+官方音訊沒有逐字稿時，本機 session 可執行：
+
+```powershell
+& '.venv\Scripts\python.exe' scripts\transcribe_audio.py '<本機檔案或直接音訊 URL>'
+```
+
+預設用 `small.en`＋CPU int8 在本機推論；首次使用會下載模型，之後從
+`library/private/models/faster-whisper/` 讀 cache。完整逐字稿只寫入 ignored 的
+`library/private/transcripts/`，固定標為 `local_only`。ASR 只用來找 timestamp；技術名詞、
+數字與要引用的句子仍須回到該 timestamp 音訊核對。不得因「有機器逐字稿」就提高
+`evidence_tier`，辨識含糊時仍依下方規則降級。
+
 ## 什麼算「追到原文」
 
 至少滿足以下一種：

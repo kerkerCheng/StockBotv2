@@ -57,6 +57,7 @@ def check() -> list[tuple[str, int]]:
 
 
 LIFECYCLE = ROOT / "thesis" / "lifecycle.json"
+TODO_POOL = ROOT / "library" / "leads" / "todo_pool.json"
 
 
 def lifecycle_due() -> list[tuple[str, str]]:
@@ -87,9 +88,34 @@ def lifecycle_due() -> list[tuple[str, str]]:
     return due
 
 
+def active_lifecycle_todo_refs() -> set[str]:
+    """Return lifecycle refs already surfaced by the unified approval inbox.
+
+    SessionStart is only a fallback for newly due items. Once an item is in the
+    todo pool, Daily Brief owns the user-facing reminder and the hook stays quiet.
+    """
+
+    try:
+        data = json.loads(TODO_POOL.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return set()
+    items = data.get("items") if isinstance(data, dict) else None
+    if not isinstance(items, list):
+        return set()
+    return {
+        str(item.get("ref_id"))
+        for item in items
+        if isinstance(item, dict)
+        and item.get("type") == "thesis_lifecycle"
+        and not item.get("resolved_at")
+        and item.get("ref_id")
+    }
+
+
 def main() -> int:
     stale = check()
-    due = lifecycle_due()
+    surfaced = active_lifecycle_todo_refs()
+    due = [(tid, why) for tid, why in lifecycle_due() if tid not in surfaced]
     if not stale and not due:
         return 0  # 都新鮮，安靜過去，不輸出任何東西
 

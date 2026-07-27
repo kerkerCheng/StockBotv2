@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+import sys
+from types import SimpleNamespace
 
+import pandas as pd
 import pytest
 
-from engine_c.market_data import build_tradeability_snapshot
+from engine_c.market_data import build_tradeability_snapshot, get_tradeability_snapshot
 
 
 def test_tradeability_snapshot_uses_actual_latest_history_timestamp_and_adv20() -> None:
@@ -73,3 +76,30 @@ def test_tradeability_snapshot_requires_twenty_unique_sessions() -> None:
 
     assert result["status"] == "quarantined"
     assert "market_history_insufficient_sessions" in result["blockers"]
+
+
+def test_execution_symbol_uses_yahoo_alias_but_preserves_canonical_ticker(
+    monkeypatch,
+) -> None:
+    requested = []
+    index = pd.date_range("2026-06-01", periods=25, freq="B", tz="Europe/Berlin")
+    history = pd.DataFrame({
+        "Close": [2.0 + i / 100 for i in range(25)],
+        "Volume": [1000 + i for i in range(25)],
+    }, index=index)
+
+    class FakeTicker:
+        def __init__(self, symbol):
+            requested.append(symbol)
+
+        def history(self, **_kwargs):
+            return history
+
+    monkeypatch.setitem(sys.modules, "yfinance", SimpleNamespace(Ticker=FakeTicker))
+
+    result = get_tradeability_snapshot("FRA:2DG", "EUR")
+
+    assert requested == ["2DG.F"]
+    assert result["status"] == "observed"
+    assert result["ticker"] == "FRA:2DG"
+    assert result["source"] == "yfinance://history/2DG.F"

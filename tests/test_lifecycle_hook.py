@@ -32,3 +32,42 @@ def test_missing_or_malformed_lifecycle_is_silent(tmp_path, monkeypatch) -> None
     bad.write_text("not json", encoding="utf-8")
     monkeypatch.setattr(hook, "LIFECYCLE", bad)
     assert hook.lifecycle_due() == []
+
+
+def test_session_hook_is_quiet_when_lifecycle_is_already_in_todo_pool(
+    tmp_path, monkeypatch, capsys
+) -> None:
+    monkeypatch.setattr(hook, "LIFECYCLE", _write(tmp_path, {
+        "sivers": {"status": "review_required", "next_check": "2099-01-01"},
+    }))
+    todo = tmp_path / "todo_pool.json"
+    todo.write_text(json.dumps({
+        "items": [{
+            "n": 10,
+            "type": "thesis_lifecycle",
+            "ref_id": "sivers",
+            "resolved_at": None,
+            "deferred_at": "2026-07-26T00:00:00+00:00",
+        }]
+    }), encoding="utf-8")
+    monkeypatch.setattr(hook, "TODO_POOL", todo)
+    monkeypatch.setattr(hook, "check", lambda: [])
+
+    assert hook.main() == 0
+    assert capsys.readouterr().out == ""
+
+
+def test_resolved_lifecycle_todo_does_not_suppress_new_due_item(
+    tmp_path, monkeypatch
+) -> None:
+    todo = tmp_path / "todo_pool.json"
+    todo.write_text(json.dumps({
+        "items": [{
+            "type": "thesis_lifecycle",
+            "ref_id": "sivers",
+            "resolved_at": "2026-07-26T00:00:00+00:00",
+        }]
+    }), encoding="utf-8")
+    monkeypatch.setattr(hook, "TODO_POOL", todo)
+
+    assert hook.active_lifecycle_todo_refs() == set()

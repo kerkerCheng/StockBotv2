@@ -8,6 +8,10 @@ psycopg2-binary
 # Source Fetcher
 requests
 
+# Local-first audio transcription for source tracing. Model weights are cached
+# under ignored library/private/ on first use.
+faster-whisper==1.2.1
+
 # Google Sheets (personal portfolio — fetchers/gsheets.py, build_dashboard.py)
 google-auth
 google-auth-httplib2

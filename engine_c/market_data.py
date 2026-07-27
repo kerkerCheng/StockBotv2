@@ -15,6 +15,8 @@ import sys
 from datetime import datetime, timezone
 from typing import Any, Iterable, Mapping
 
+from identity.execution import yfinance_symbol
+
 
 def _finite_number(value: Any) -> float | None:
     if isinstance(value, bool) or not isinstance(value, (int, float)):
@@ -101,8 +103,9 @@ def get_tradeability_snapshot(ticker: str, currency: str) -> dict[str, Any]:
     except ImportError:
         return {"status": "unavailable", "blockers": ["yfinance_unavailable"]}
     fetched_at = datetime.now(timezone.utc).isoformat()
+    provider_symbol = yfinance_symbol(ticker)
     try:
-        history = yf.Ticker(ticker).history(period="2mo", auto_adjust=False)
+        history = yf.Ticker(provider_symbol).history(period="2mo", auto_adjust=False)
         rows = [
             {
                 "as_of": index.to_pydatetime().isoformat(),
@@ -122,7 +125,7 @@ def get_tradeability_snapshot(ticker: str, currency: str) -> dict[str, Any]:
         currency=currency,
         rows=rows,
         fetched_at=fetched_at,
-        source="yfinance://history",
+        source=f"yfinance://history/{provider_symbol}",
     )
 
 

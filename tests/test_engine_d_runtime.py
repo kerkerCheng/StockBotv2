@@ -6,9 +6,14 @@ from pathlib import Path
 from decision_lab.adapters.graph import Neo4jReadOnlyQueryPort
 from decision_lab.workflow_ports import WorkflowDataProvider
 from engine_d_runtime.adapters import DefaultRuntimeProvider
+from engine_d_runtime.adapters import _BOUNDED_EVIDENCE_QUERY
 
 
 NOW = "2026-07-22T02:00:00+00:00"
+
+
+def test_bounded_graph_query_does_not_read_undefined_claim_type() -> None:
+    assert "claim.claim_type" not in _BOUNDED_EVIDENCE_QUERY
 
 
 class _GraphPort:

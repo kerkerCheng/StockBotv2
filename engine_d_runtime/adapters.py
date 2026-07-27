@@ -67,7 +67,6 @@ RETURN graph_node_count,
        collect(DISTINCT CASE WHEN claim IS NULL THEN NULL ELSE {
            id: claim.id,
            statement: claim.statement,
-           claim_type: claim.claim_type,
            source_ids: coalesce(claim.source_ids, [])
        } END)[0..$claim_limit] AS claims,
        collect(DISTINCT CASE WHEN assertion IS NULL THEN NULL ELSE {
