@@ -605,6 +605,114 @@
       "result": "ok",
       "run_at": "2026-07-27T14:17:28.801191+00:00",
       "source": "edgar:GFS"
+    },
+    {
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-27T22:31:34.752366+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-27T22:31:35.310908+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-27T22:31:35.730504+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-27T22:31:36.169373+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-27T22:31:36.603374+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-27T22:31:37.021262+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-27T22:31:37.453680+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-27T22:31:37.875829+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-27T22:31:38.312539+00:00",
+      "source": "edgar:GFS"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-27T22:31:49.732023+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-27T22:31:50.824836+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-27T22:31:51.708353+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-27T22:31:52.694559+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-27T22:31:53.633868+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-27T22:31:54.548064+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-27T22:31:55.510215+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-27T22:31:56.715480+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-07-27T22:31:57.627741+00:00",
+      "source": "edgar:GFS"
     }
   ],
   "leads": {
@@ -2258,6 +2366,25 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2080750537121874206"
     },
+    "lead_f14b0508299201ea095bacf1ed3a083d": {
+      "first_seen": "2026-07-27T22:31:57.627669+00:00",
+      "lead_id": "lead_f14b0508299201ea095bacf1ed3a083d",
+      "published_at": "2026-07-27",
+      "refs": {},
+      "source": "edgar:GFS",
+      "status": "triaged_go",
+      "title": "GFS 4 filed 2026-07-27",
+      "triage": {
+        "decided_at": "2026-07-27T22:32:43.482003+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "關聯性：GFS 為既有追蹤公司；可引用性：SEC EDGAR 官方 Form 4，具體 issuer／表單／申報日期與原文 URL；新穎性：2026-07-27 新 insider filing，可能影響稀釋／內部人交易監控。先進低優先 pq1 核對交易內容；若僅屬時變觀測則依 L4 park，不入圖。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1709048/000162828026049740/xslF345X06/wk-form4_1785173635.xml"
+    },
     "lead_f1d18173b1d1d173650f0dae1545c692": {
       "first_seen": "2026-07-22T15:37:26.728975+00:00",
       "lead_id": "lead_f1d18173b1d1d173650f0dae1545c692",
@@ -2400,7 +2527,7 @@
   "source_state": {
     "x:aleabitoreddit": {
       "since_id": "2081579593815978273",
-      "updated_at": "2026-07-27T14:17:21.432306+00:00",
+      "updated_at": "2026-07-27T22:31:49.732009+00:00",
       "user_id": "1940360837547565056"
     }
   }

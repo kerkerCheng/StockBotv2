@@ -436,8 +436,10 @@
     {
       "added_at": "2026-07-27T14:46:57.350563+00:00",
       "dispatch_baseline_decision_id": "pd_f48b4cb31d2a2b883f4abed022972716",
+      "dispatch_receipt": "packet:C:\\Users\\Cheng\\code\\StockBotv2\\library\\private\\decision_lab\\daily_gap_research_2026-07-28.json#wo_23faa9def046e05bc23bdb5735bb774f",
       "dispatch_ref": "wo_23faa9def046e05bc23bdb5735bb774f",
-      "dispatch_status": "queued",
+      "dispatch_status": "awaiting_approval",
+      "dispatch_updated_at": "2026-07-27T22:39:39.297895+00:00",
       "dispatched_at": "2026-07-27T15:23:22.085910+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 37,
@@ -452,8 +454,10 @@
     {
       "added_at": "2026-07-27T14:46:57.350607+00:00",
       "dispatch_baseline_decision_id": "pd_11ec8776b62cc368c5549c3d7ce7833c",
+      "dispatch_receipt": "packet:C:\\Users\\Cheng\\code\\StockBotv2\\library\\private\\decision_lab\\daily_gap_research_2026-07-28.json#wo_a3e54af91361c3babb82b9d66e2d0ace",
       "dispatch_ref": "wo_a3e54af91361c3babb82b9d66e2d0ace",
-      "dispatch_status": "queued",
+      "dispatch_status": "awaiting_approval",
+      "dispatch_updated_at": "2026-07-27T22:39:40.444485+00:00",
       "dispatched_at": "2026-07-27T15:23:22.097954+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 38,
@@ -464,6 +468,30 @@
       "source": "decision_lab",
       "title": "REVIEW — co:sivers_semiconductors",
       "type": "decision_review"
+    },
+    {
+      "added_at": "2026-07-27T22:39:41.049773+00:00",
+      "hint": "核准 packet 中 AAOI 兩筆 append-only manual observations；核准後 research-intent reassess，無 graph／paper／live 動作",
+      "n": 39,
+      "reason": null,
+      "ref_id": "engine_c_manual:wo_23faa9def046e05bc23bdb5735bb774f",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "ENGINE C APPROVAL — AAOI customer concentration／backlog",
+      "type": "manual"
+    },
+    {
+      "added_at": "2026-07-27T22:39:41.592821+00:00",
+      "hint": "核准 packet 中 SIVE.ST 兩筆 append-only manual observations；保留 source_under_audit 警語，核准後 research-intent reassess，無 thesis／graph／paper／live 動作",
+      "n": 40,
+      "reason": null,
+      "ref_id": "engine_c_manual:wo_a3e54af91361c3babb82b9d66e2d0ace",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "ENGINE C APPROVAL — SIVE.ST customer concentration／backlog",
+      "type": "manual"
     }
   ],
   "log": [
@@ -652,8 +680,44 @@
       "ref_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
       "type": "decision_review",
       "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-07-27T22:34:32.767671+00:00",
+      "n": 37,
+      "reason": "Daily v1.2 budget slot 1：開始 AAOI bounded gap research",
+      "receipt": "research-start:2026-07-28:wo_23faa9def046e05bc23bdb5735bb774f",
+      "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-07-27T22:34:33.942975+00:00",
+      "n": 38,
+      "reason": "Daily v1.2 budget slot 2：開始 Sivers bounded gap research",
+      "receipt": "research-start:2026-07-28:wo_a3e54af91361c3babb82b9d66e2d0ace",
+      "ref_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-07-27T22:39:39.297895+00:00",
+      "n": 37,
+      "reason": "AAOI 一手 filing 已追回；需人工核准兩筆 Engine C manual observations 後才可 reassess",
+      "receipt": "packet:C:\\Users\\Cheng\\code\\StockBotv2\\library\\private\\decision_lab\\daily_gap_research_2026-07-28.json#wo_23faa9def046e05bc23bdb5735bb774f",
+      "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
+      "type": "decision_review",
+      "verb": "pq1_awaiting_approval"
+    },
+    {
+      "at": "2026-07-27T22:39:40.444485+00:00",
+      "n": 38,
+      "reason": "Sivers 一手年報與 Q1 report 已追回；需人工核准兩筆 Engine C manual observations 後才可 reassess",
+      "receipt": "packet:C:\\Users\\Cheng\\code\\StockBotv2\\library\\private\\decision_lab\\daily_gap_research_2026-07-28.json#wo_a3e54af91361c3babb82b9d66e2d0ace",
+      "ref_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
+      "type": "decision_review",
+      "verb": "pq1_awaiting_approval"
     }
   ],
-  "next_n": 39,
+  "next_n": 41,
   "schema_version": "1"
 }
