@@ -127,10 +127,10 @@ def main() -> int:
         parts = ", ".join(f"{company} {days}天" for company, days in stale)
         segments.append(f"📋 memo 已超過 {STALE_DAYS} 天未核查：{parts}")
     msg = "thesis-monitor: " + "；".join(segments) + " — 要現在複查嗎？"
-    # 雙通道：systemMessage 只給終端 UI；additionalContext 進 agent context，
-    # 讓 agent 在任何介面（含手機 App 遙控、cloud session）都能主動轉述。
+    # 單一 agent-visible channel：systemMessage 與 additionalContext 同時輸出會
+    # 讓 Codex desktop 顯示一次、agent 又轉述一次。只保留 additionalContext，
+    # 由 agent 在第一則回覆呈現，跨介面仍一致且不重複。
     print(json.dumps({
-        "systemMessage": msg,
         "hookSpecificOutput": {
             "hookEventName": "SessionStart",
             "additionalContext": (

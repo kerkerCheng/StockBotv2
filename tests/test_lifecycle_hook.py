@@ -71,3 +71,21 @@ def test_resolved_lifecycle_todo_does_not_suppress_new_due_item(
     monkeypatch.setattr(hook, "TODO_POOL", todo)
 
     assert hook.active_lifecycle_todo_refs() == set()
+
+
+def test_new_due_item_uses_one_agent_visible_channel(
+    tmp_path, monkeypatch, capsys
+) -> None:
+    monkeypatch.setattr(hook, "LIFECYCLE", _write(tmp_path, {
+        "new_thesis": {"status": "review_required", "next_check": "2099-01-01"},
+    }))
+    todo = tmp_path / "todo_pool.json"
+    todo.write_text(json.dumps({"items": []}), encoding="utf-8")
+    monkeypatch.setattr(hook, "TODO_POOL", todo)
+    monkeypatch.setattr(hook, "check", lambda: [])
+
+    assert hook.main() == 0
+    payload = json.loads(capsys.readouterr().out)
+    assert "systemMessage" not in payload
+    assert payload["hookSpecificOutput"]["hookEventName"] == "SessionStart"
+    assert "new_thesis" in payload["hookSpecificOutput"]["additionalContext"]
