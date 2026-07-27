@@ -413,6 +413,30 @@
       "added_at": "2026-07-26T13:07:56.663666+00:00",
       "hint": "重新評估該 probe（reassess）",
       "n": 35,
+      "reason": "AAOI reassess 完成；baseline pd_fc9369418bbc3fd261a771c5eaa08eb1 → new pd_f48b4cb31d2a2b883f4abed022972716；結果 REVIEW、research intent、無 paper/live 動作。",
+      "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
+      "resolution": "go",
+      "resolved_at": "2026-07-27T14:46:31.299546+00:00",
+      "source": "decision_lab",
+      "title": "REVIEW — co:applied_optoelectronics",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-07-26T13:07:56.663708+00:00",
+      "hint": "重新評估該 probe（reassess）",
+      "n": 36,
+      "reason": "Sivers reassess 完成；baseline pd_e297eca103fbffe0eeeaf4c6bedb6061 → new pd_11ec8776b62cc368c5549c3d7ce7833c；結果 REVIEW、research intent、無 paper/live 動作。",
+      "ref_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
+      "resolution": "go",
+      "resolved_at": "2026-07-27T14:46:31.972167+00:00",
+      "source": "decision_lab",
+      "title": "REVIEW — co:sivers_semiconductors",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-07-27T14:46:57.350563+00:00",
+      "hint": "重新評估該 probe（reassess）",
+      "n": 37,
       "reason": null,
       "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
       "resolution": null,
@@ -422,9 +446,9 @@
       "type": "decision_review"
     },
     {
-      "added_at": "2026-07-26T13:07:56.663708+00:00",
+      "added_at": "2026-07-27T14:46:57.350607+00:00",
       "hint": "重新評估該 probe（reassess）",
-      "n": 36,
+      "n": 38,
       "reason": null,
       "ref_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
       "resolution": null,
@@ -586,8 +610,24 @@
       "ref_id": "ra_0db7d5cf689c05753ed71d1e967a7f4f",
       "type": "ra_admission",
       "verb": "go"
+    },
+    {
+      "at": "2026-07-27T14:46:31.299546+00:00",
+      "n": 35,
+      "reason": "AAOI reassess 完成；baseline pd_fc9369418bbc3fd261a771c5eaa08eb1 → new pd_f48b4cb31d2a2b883f4abed022972716；結果 REVIEW、research intent、無 paper/live 動作。",
+      "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
+      "type": "decision_review",
+      "verb": "go"
+    },
+    {
+      "at": "2026-07-27T14:46:31.972167+00:00",
+      "n": 36,
+      "reason": "Sivers reassess 完成；baseline pd_e297eca103fbffe0eeeaf4c6bedb6061 → new pd_11ec8776b62cc368c5549c3d7ce7833c；結果 REVIEW、research intent、無 paper/live 動作。",
+      "ref_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
+      "type": "decision_review",
+      "verb": "go"
     }
   ],
-  "next_n": 37,
+  "next_n": 39,
   "schema_version": "1"
 }
