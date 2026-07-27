@@ -435,7 +435,11 @@
     },
     {
       "added_at": "2026-07-27T14:46:57.350563+00:00",
-      "hint": "重新評估該 probe（reassess）",
+      "dispatch_baseline_decision_id": "pd_f48b4cb31d2a2b883f4abed022972716",
+      "dispatch_ref": "wo_23faa9def046e05bc23bdb5735bb774f",
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-07-27T15:23:22.085910+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 37,
       "reason": null,
       "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
@@ -447,7 +451,11 @@
     },
     {
       "added_at": "2026-07-27T14:46:57.350607+00:00",
-      "hint": "重新評估該 probe（reassess）",
+      "dispatch_baseline_decision_id": "pd_11ec8776b62cc368c5549c3d7ce7833c",
+      "dispatch_ref": "wo_a3e54af91361c3babb82b9d66e2d0ace",
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-07-27T15:23:22.097954+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 38,
       "reason": null,
       "ref_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
@@ -626,6 +634,24 @@
       "ref_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
       "type": "decision_review",
       "verb": "go"
+    },
+    {
+      "at": "2026-07-27T15:23:22.085910+00:00",
+      "n": 37,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_23faa9def046e05bc23bdb5735bb774f",
+      "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-07-27T15:23:22.097954+00:00",
+      "n": 38,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_a3e54af91361c3babb82b9d66e2d0ace",
+      "ref_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
+      "type": "decision_review",
+      "verb": "pq1_queued"
     }
   ],
   "next_n": 39,
