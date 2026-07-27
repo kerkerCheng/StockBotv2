@@ -76,6 +76,9 @@ def build_parser() -> argparse.ArgumentParser:
     reassess_parser.add_argument("--intent", choices=("research", "paper", "live"))
     reassess_parser.add_argument("--confirm-holdings", action="store_true")
     reassess_parser.add_argument("--assessment")
+    reassess_parser.add_argument("--catalyst")
+    reassess_parser.add_argument("--disproof")
+    reassess_parser.add_argument("--expiry")
     reassess_parser.add_argument("--format", choices=("json", "markdown"), default="markdown")
 
     today = subcommands.add_parser(
@@ -246,6 +249,9 @@ def run(
                 company_id_hint=args.company_id,
                 confirm_holdings=args.confirm_holdings,
                 assessment=_read_optional_json(args.assessment),
+                catalyst=args.catalyst,
+                disproof=args.disproof,
+                expiry=args.expiry,
             )
             _render(
                 result,

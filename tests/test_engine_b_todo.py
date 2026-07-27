@@ -90,11 +90,81 @@ def test_unknown_type_rejected() -> None:
 def test_resolved_item_can_reenter_pool_with_new_number() -> None:
     pool = _pool_with({"type": "decision_review", "ref_id": "dc_1", "title": "REVIEW"})
     n1 = todo.active_items(pool)[0]["n"]
-    todo.resolve(pool, n1, "go")
+    todo.resolve(pool, n1, "go", receipt="decision:pd_new")
     # 同一 cohort 之後又有新 evidence-delta → 應重新進池（resolve 不是永久黑名單）
     todo.sync(pool, [{"type": "decision_review", "ref_id": "dc_1", "title": "REVIEW 再現"}])
     items = todo.active_items(pool)
     assert len(items) == 1 and items[0]["n"] != n1
+
+
+class _WorkOrderStore:
+    def __init__(self) -> None:
+        self.status = "proposed"
+        self.transitions = []
+
+    def latest_research_work_order(self, cohort_id):
+        assert cohort_id == "dc_1"
+        return {
+            "work_order_id": "wo_1",
+            "decision_id": "pd_old",
+            "status": self.status,
+        }
+
+    def transition_research_work_order(self, **kwargs):
+        self.status = kwargs["to_status"]
+        self.transitions.append(kwargs)
+        return {"work_order_id": kwargs["work_order_id"], "status": self.status}
+
+    def get_decision(self, decision_id):
+        if decision_id != "pd_new":
+            raise KeyError(decision_id)
+        return {"decision_id": decision_id, "cohort_id": "dc_1"}
+
+
+def test_decision_review_go_dispatches_pq1_without_resolving() -> None:
+    pool = _pool_with({"type": "decision_review", "ref_id": "dc_1", "title": "REVIEW"})
+    store = _WorkOrderStore()
+
+    result = todo.dispatch_decision_review(
+        pool, 1, store=store, at="2026-07-27T00:00:00+00:00"
+    )
+
+    assert result["item"]["dispatch_status"] == "queued"
+    assert result["item"]["dispatch_ref"] == "wo_1"
+    assert todo.active_items(pool)[0]["n"] == 1
+    assert todo.actionable_items(pool) == []
+    assert pool["log"][-1]["verb"] == "pq1_queued"
+
+
+def test_batch_cannot_bare_go_a_decision_review() -> None:
+    pool = _pool_with({"type": "decision_review", "ref_id": "dc_1", "title": "REVIEW"})
+
+    outcome = todo.apply_batch(pool, parse_batch_reply("1 go"))
+
+    assert outcome == {"applied": [], "failed": [1]}
+    assert todo.active_items(pool)[0]["n"] == 1
+
+
+def test_decision_review_cannot_complete_with_baseline_decision() -> None:
+    pool = _pool_with({"type": "decision_review", "ref_id": "dc_1", "title": "REVIEW"})
+    store = _WorkOrderStore()
+    todo.dispatch_decision_review(
+        pool, 1, store=store, at="2026-07-27T00:00:00+00:00"
+    )
+
+    with pytest.raises(todo.TodoError, match="有效 decision"):
+        todo.checkpoint_decision_review(
+            pool, 1, store=store, to_status="completed",
+            receipt="decision:pd_old", at="2026-07-27T01:00:00+00:00",
+        )
+
+    result = todo.checkpoint_decision_review(
+        pool, 1, store=store, to_status="completed",
+        receipt="decision:pd_new", reason="gap 補齊後 reassess",
+        at="2026-07-27T01:00:00+00:00",
+    )
+    assert result["item"]["resolved_at"]
+    assert result["item"]["receipt"] == "decision:pd_new"
 
 
 def test_save_load_round_trip(tmp_path) -> None:

@@ -581,8 +581,11 @@ def reassess(
     company_id_hint: str | None = None,
     confirm_holdings: bool = False,
     assessment: Mapping[str, Any] | None = None,
+    catalyst: str | None = None,
+    disproof: str | None = None,
+    expiry: str | None = None,
 ) -> dict[str, Any]:
-    """以既有 decision 的原 Signal 建立新 context／decision，不改寫舊 facts。"""
+    """以既有 Signal 建立新 decision；明確 research overrides 不改寫舊 facts。"""
 
     baseline = (
         store.get_decision(target_id)
@@ -615,9 +618,9 @@ def reassess(
         or identity.get("company_id")
         or signal_hints.get("company_id"),
         thesis=str(signal.get("atomic_claim") or "") or None,
-        catalyst=str(old_coverage_metadata.get("catalyst") or "") or None,
-        disproof=str(signal.get("disproof") or "") or None,
-        expiry=None,
+        catalyst=catalyst or str(old_coverage_metadata.get("catalyst") or "") or None,
+        disproof=disproof or str(signal.get("disproof") or "") or None,
+        expiry=expiry,
         as_of=evaluation_at,
         execution_intent=execution_intent
         or str(old_request.get("execution_intent") or "research"),

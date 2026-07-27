@@ -261,6 +261,41 @@ def test_reassessment_creates_new_context_without_mutating_old_decision(
         store.close()
 
 
+def test_reassessment_accepts_explicit_gap_research_overrides_without_mutating_signal(
+    tmp_path: Path,
+) -> None:
+    store = _store(tmp_path)
+    provider = FixtureProvider()
+    try:
+        first = evaluate_signal(
+            store,
+            provider,
+            _request(catalyst=None, disproof=None),
+        )
+        original_signal = deepcopy(store.latest_signal_payload(first["cohort_id"]))
+
+        second = reassess(
+            store,
+            provider,
+            first["decision_id"],
+            as_of="2026-07-22T12:00:00+00:00",
+            catalyst="customer qualification reaches volume production",
+            disproof="qualification slips beyond the stated window",
+            expiry="2026-08-22T12:00:00+00:00",
+        )
+
+        decision = store.get_decision(second["decision_id"])
+        metadata = store.get_coverage_metadata(
+            decision["payload"]["request"]["coverage"]["assessment_id"]
+        )
+        assert metadata["catalyst"] == "customer qualification reaches volume production"
+        assert metadata["disproof"] == "qualification slips beyond the stated window"
+        assert metadata["expiry"] == "2026-08-22T12:00:00+00:00"
+        assert store.latest_signal_payload(first["cohort_id"]) == original_signal
+    finally:
+        store.close()
+
+
 def test_fake_assessment_ref_cannot_fund_paper(tmp_path: Path) -> None:
     store = _store(tmp_path)
     assessment = _assessment()

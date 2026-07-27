@@ -141,3 +141,15 @@ def test_public_help_promotes_operational_workflow() -> None:
         assert command in help_text
     assert "correction" not in help_text
     assert "record-decision" not in help_text
+
+
+def test_reassess_parser_exposes_gap_research_overrides() -> None:
+    args = build_parser().parse_args([
+        "reassess", "pd_old",
+        "--catalyst", "volume production",
+        "--disproof", "qualification slips",
+        "--expiry", "2026-08-22T12:00:00+00:00",
+    ])
+    assert args.catalyst == "volume production"
+    assert args.disproof == "qualification slips"
+    assert args.expiry == "2026-08-22T12:00:00+00:00"

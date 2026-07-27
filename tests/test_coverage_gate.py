@@ -252,6 +252,17 @@ def test_queue_capacity_preserves_backlog_and_stable_ranking(tmp_path: Path) -> 
                 _assess(store, bundle, decision_relevance=7 - index)
             )
 
+        # Coverage 只會提出 work order；明確 pq2 go 後才進可 drain 的 pq1。
+        assert store.rank_work_orders(capacity=5)["selected"] == []
+        for index, result in enumerate(results):
+            store.transition_research_work_order(
+                work_order_id=result.work_order_id,
+                to_status="queued",
+                operation_key=f"test-dispatch-{index}",
+                receipt={"todo_n": index + 1},
+                observed_at=NOW,
+            )
+
         ranked_once = store.rank_work_orders(capacity=5)
         ranked_twice = store.rank_work_orders(capacity=5)
         assert ranked_once == ranked_twice

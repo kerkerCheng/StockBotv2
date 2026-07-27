@@ -28,13 +28,22 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
    只從本機 `.env` 讀取，不得輸出或搬移 token。
 5. 先組出不會因研究失敗而消失的心跳 snapshot，再 best-effort 執行
    `.venv\Scripts\python.exe -m engine_b.cli drain`。每輪上限由 `config/daily_routine.json` 控制；
+   使用者已 `go` 且有 dispatch receipt 的 Decision gap work order 優先，再以剩餘 budget 處理 leads；
    tracked tickers 由非 retired lifecycle 與 non-terminal Decision cohorts 自動導出。對最高 priority leads 逐則
    source-trace＋extract，checkpoint `researching` → `action_prepared`。有可核准 graph delta 才 prepare；
    追源未果、原主張被否定或僅屬 Engine C 時變 observation 時 park 並記 outcome，不製造空 RA。
    只有 prepared RA 才進 pq2；triage PASS 與 pq1 自動研究都不代表入圖核准。
+   Decision work order 必須 checkpoint researching；若純唯讀研究即可補齊，產 assessment 後才跑
+   research-intent reassess，並以新 decision receipt 結案。若需入圖、Engine C manual observation、thesis
+   revise／retire 或其他 authority mutation，先 checkpoint awaiting_approval，完整 packet 回 pq2；不得拿舊
+   assessment bare reassess。
 6. Graph admission、thesis retire／revise、Google Sheet 真實持倉值、`record-choice`／`record-fill` 永遠
    保留人工 gate；不得因 routine recommendation 推定使用者核准。
-7. 收尾執行 `.venv\Scripts\python.exe scripts\publish_daily_state.py`。這支固定 publisher 只准提交
+7. 批次回覆中的 `decision_review go` 執行
+   `.venv\Scripts\python.exe -m engine_b.todo dispatch <編號>`：只排入 gap pq1、不先 resolve。原項目在
+   queued／researching／awaiting_approval 時不重複詢問；只有 parked outcome receipt 或補缺口後的新
+   decision receipt 才能結案。
+8. 收尾執行 `.venv\Scripts\python.exe scripts\publish_daily_state.py`。這支固定 publisher 只准提交
    `library/leads/pending_leads.json` 與 `library/leads/todo_pool.json`；若 guard 拒絕，保留檔案並在 brief
    回報，不要改用廣泛 `git add/commit/push` 繞過。
 

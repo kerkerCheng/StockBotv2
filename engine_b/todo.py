@@ -31,7 +31,7 @@ DEFAULT_POOL_PATH = _ROOT / "library" / "leads" / "todo_pool.json"
 ITEM_TYPES: dict[str, str] = {
     "lead_research": "（legacy）已移回自動 pq1，不再建立新項目",
     "ra_admission": "核准入圖（apply_research_action）",
-    "decision_review": "重新評估該 probe（reassess）",
+    "decision_review": "核准補缺口研究；取得新 receipt 後 reassess",
     "thesis_lifecycle": "本機複查 thesis 並手動更新 lifecycle.json",
     "sheet_only_holding": "評估這筆 Sheet 持股（evaluate-signal 或 onboard）",
     "manual": "依 hint 執行",
@@ -94,6 +94,17 @@ def active_items(pool: Mapping[str, Any]) -> list[dict[str, Any]]:
     )
 
 
+def actionable_items(pool: Mapping[str, Any]) -> list[dict[str, Any]]:
+    """尚需使用者決定的項目；已 dispatch 的 pq1 job 仍 active 但不重複詢問。"""
+
+    return [
+        item for item in active_items(pool)
+        if item.get("dispatch_status") not in {
+            "queued", "researching", "awaiting_approval"
+        }
+    ]
+
+
 def _key(item_type: str, ref_id: str) -> tuple[str, str]:
     return (item_type, ref_id)
 
@@ -150,12 +161,15 @@ def resolve(
     verb: str,
     *,
     reason: str = "",
+    receipt: str = "",
     at: str | None = None,
 ) -> dict[str, Any]:
     """以動詞處理一個編號。`pending` 不 resolve（明確 defer，留在池中）。"""
     if verb not in VERBS:
         raise TodoError(f"未知動詞：{verb}（可用：{', '.join(VERBS)}）")
     item = get(pool, n)
+    if verb == "go" and item["type"] == "decision_review" and not receipt.strip():
+        raise TodoError("decision_review 不得 bare go；請先 dispatch pq1，完成後附 receipt resolve")
     stamp = at or _now()
     if verb == "pending":
         item["deferred_at"] = stamp
@@ -163,11 +177,129 @@ def resolve(
         item["resolved_at"] = stamp
         item["resolution"] = verb
         item["reason"] = reason or None
+        item["receipt"] = receipt or None
     pool["log"].append({
         "at": stamp, "n": item["n"], "type": item["type"],
         "ref_id": item["ref_id"], "verb": verb, "reason": reason or None,
+        "receipt": receipt or None,
     })
     return item
+
+
+def dispatch_decision_review(
+    pool: dict[str, Any],
+    n: int,
+    *,
+    store: Any,
+    at: str | None = None,
+) -> dict[str, Any]:
+    """把使用者核准的 decision review 轉為持久 pq1 job，不先 resolve pq2。"""
+
+    item = get(pool, n)
+    if item["type"] != "decision_review":
+        raise TodoError(f"[{n}] 不是 decision_review，不能 dispatch 到 gap pq1")
+    cohort_id = str(item["ref_id"])
+    if not cohort_id.startswith("dc_"):
+        raise TodoError("全域 authority blocker 沒有 bounded cohort work order，需依 hint 修復")
+    work_order = store.latest_research_work_order(cohort_id)
+    if work_order is None:
+        raise TodoError(f"cohort {cohort_id} 的最新 decision 沒有 research work order")
+    stamp = at or _now()
+    operation_key = f"todo:{n}:go"
+    transitioned = store.transition_research_work_order(
+        work_order_id=str(work_order["work_order_id"]),
+        to_status="queued",
+        operation_key=operation_key,
+        receipt={
+            "todo_n": int(n),
+            "todo_ref_id": cohort_id,
+            "baseline_decision_id": str(work_order["decision_id"]),
+        },
+        observed_at=stamp,
+    )
+    item["dispatch_status"] = "queued"
+    item["dispatch_ref"] = str(work_order["work_order_id"])
+    item["dispatch_baseline_decision_id"] = str(work_order["decision_id"])
+    item["dispatched_at"] = stamp
+    item.pop("deferred_at", None)
+    if not any(
+        entry.get("n") == int(n)
+        and entry.get("verb") == "pq1_queued"
+        and entry.get("receipt") == item["dispatch_ref"]
+        for entry in pool["log"]
+    ):
+        pool["log"].append({
+            "at": stamp,
+            "n": int(n),
+            "type": item["type"],
+            "ref_id": cohort_id,
+            "verb": "pq1_queued",
+            "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+            "receipt": item["dispatch_ref"],
+        })
+    return {"item": item, "work_order": transitioned}
+
+
+def checkpoint_decision_review(
+    pool: dict[str, Any],
+    n: int,
+    *,
+    store: Any,
+    to_status: str,
+    receipt: str,
+    reason: str = "",
+    at: str | None = None,
+) -> dict[str, Any]:
+    """Checkpoint dispatched research；terminal 狀態必須留下 underlying receipt。"""
+
+    if to_status not in {"researching", "awaiting_approval", "completed", "parked"}:
+        raise TodoError(f"不支援的 pq1 checkpoint：{to_status}")
+    if not receipt.strip():
+        raise TodoError("pq1 checkpoint 必須附 receipt")
+    item = get(pool, n)
+    if item["type"] != "decision_review" or not item.get("dispatch_ref"):
+        raise TodoError(f"[{n}] 尚未 dispatch decision-review pq1")
+    if to_status == "completed":
+        decision_id = receipt.removeprefix("decision:")
+        try:
+            decision = store.get_decision(decision_id)
+        except KeyError as exc:
+            raise TodoError(f"completed receipt 不是有效 decision：{decision_id}") from exc
+        if decision["cohort_id"] != item["ref_id"]:
+            raise TodoError("completed decision 不屬於原 cohort")
+        if decision_id == item.get("dispatch_baseline_decision_id"):
+            raise TodoError("completed receipt 不可沿用 dispatch 前的 baseline decision")
+    stamp = at or _now()
+    operation_key = f"todo:{n}:{to_status}:{receipt}"
+    work_order = store.transition_research_work_order(
+        work_order_id=str(item["dispatch_ref"]),
+        to_status=to_status,
+        operation_key=operation_key,
+        receipt={"todo_n": int(n), "reference": receipt, "reason": reason},
+        observed_at=stamp,
+    )
+    item["dispatch_status"] = to_status
+    item["dispatch_receipt"] = receipt
+    item["dispatch_updated_at"] = stamp
+    pool["log"].append({
+        "at": stamp,
+        "n": int(n),
+        "type": item["type"],
+        "ref_id": item["ref_id"],
+        "verb": f"pq1_{to_status}",
+        "reason": reason or None,
+        "receipt": receipt,
+    })
+    if to_status in {"completed", "parked"}:
+        resolve(
+            pool,
+            n,
+            "go",
+            reason=reason or f"pq1 {to_status}",
+            receipt=receipt,
+            at=stamp,
+        )
+    return {"item": item, "work_order": work_order}
 
 
 def apply_batch(
@@ -333,6 +465,8 @@ def collect_from_decisions() -> list[dict[str, Any]]:
             "type": "sheet_only_holding" if item.get("sheet_only") else "decision_review",
             "ref_id": ref,
             "title": f"{action} — {label}",
+            **({"hint": "核准 bounded gap research；完成後才 reassess"}
+               if not item.get("sheet_only") else {}),
             "source": "decision_lab",
         })
     # Engine D 也可能因 portfolio authority 全域失效而要求 REVIEW，這時沒有
@@ -373,7 +507,13 @@ def _render(pool: Mapping[str, Any]) -> str:
     for item_type, group in by_type.items():
         lines.append(f"## {item_type} — {ITEM_TYPES[item_type]}")
         for item in group:
-            flag = "（已 defer）" if item.get("deferred_at") else ""
+            if item.get("dispatch_status"):
+                flag = (
+                    f"（pq1 {item['dispatch_status']}：{item.get('dispatch_ref')}；"
+                    "無需再次 go）"
+                )
+            else:
+                flag = "（已 defer）" if item.get("deferred_at") else ""
             lines.append(f"  [{item['n']}] {item['title']}{flag}")
         lines.append("")
     return "\n".join(lines).rstrip()
@@ -399,6 +539,21 @@ def main(argv: list[str] | None = None) -> int:
     p_res.add_argument("numbers", nargs="+")
     p_res.add_argument("--verb", required=True, choices=VERBS)
     p_res.add_argument("--reason", default="")
+    p_res.add_argument("--receipt", default="")
+
+    p_dispatch = sub.add_parser(
+        "dispatch", help="把 decision_review 的 go checkpoint 成 pq1 job"
+    )
+    p_dispatch.add_argument("numbers", nargs="+")
+
+    p_work = sub.add_parser("work", help="更新已 dispatch 的 decision-review pq1 job")
+    p_work.add_argument("number", type=int)
+    p_work.add_argument(
+        "--to", required=True,
+        choices=("researching", "awaiting_approval", "completed", "parked"),
+    )
+    p_work.add_argument("--receipt", required=True)
+    p_work.add_argument("--reason", default="")
 
     p_batch = sub.add_parser("batch", help="套用批次語法，如 '1 3 go 4 drop'")
     p_batch.add_argument("reply")
@@ -430,14 +585,49 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.command == "resolve":
+        failures = 0
         for raw in args.numbers:
             try:
-                resolve(pool, int(raw), args.verb, reason=args.reason)
+                resolve(
+                    pool, int(raw), args.verb,
+                    reason=args.reason, receipt=args.receipt,
+                )
                 print(f"✓ [{raw}] → {args.verb}")
             except (TodoError, ValueError) as exc:
+                failures += 1
                 print(f"✗ [{raw}]：{exc}", file=sys.stderr)
         save(pool, args.pool)
-        return 0
+        return 1 if failures else 0
+
+    if args.command in {"dispatch", "work"}:
+        from decision_lab.bootstrap import open_default_store
+
+        store = open_default_store()
+        failures = 0
+        try:
+            if args.command == "dispatch":
+                for raw in args.numbers:
+                    try:
+                        result = dispatch_decision_review(pool, int(raw), store=store)
+                        save(pool, args.pool)
+                        print(f"✓ [{raw}] → pq1 queued {result['item']['dispatch_ref']}")
+                    except (TodoError, KeyError, ValueError) as exc:
+                        failures += 1
+                        print(f"✗ [{raw}]：{exc}", file=sys.stderr)
+            else:
+                try:
+                    result = checkpoint_decision_review(
+                        pool, args.number, store=store, to_status=args.to,
+                        receipt=args.receipt, reason=args.reason,
+                    )
+                    save(pool, args.pool)
+                    print(f"✓ [{args.number}] pq1 → {args.to} ({args.receipt})")
+                except (TodoError, KeyError, ValueError) as exc:
+                    failures += 1
+                    print(f"✗ [{args.number}]：{exc}", file=sys.stderr)
+        finally:
+            store.close()
+        return 1 if failures else 0
 
     if args.command == "batch":
         from engine_b.batch import parse_batch_reply

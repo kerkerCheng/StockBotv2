@@ -804,8 +804,8 @@ class DecisionStore:
                     INSERT OR IGNORE INTO research_work_orders (
                         work_order_id, assessment_id, cohort_id, context_digest,
                         blockers_json, expiry, decision_relevance,
-                        falsifiability, information_value
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        falsifiability, information_value, status
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'proposed')
                     """,
                     (
                         work_order_id,
@@ -821,27 +821,168 @@ class DecisionStore:
                 )
         return {"assessment_id": assessment_id, "work_order_id": work_order_id}
 
+    def get_research_work_order(self, work_order_id: str) -> dict[str, Any]:
+        row = self._conn.execute(
+            """
+            SELECT work_order_id, assessment_id, cohort_id, context_digest,
+                   blockers_json, expiry, decision_relevance, falsifiability,
+                   information_value, status, created_at
+            FROM research_work_orders WHERE work_order_id = ?
+            """,
+            (work_order_id,),
+        ).fetchone()
+        if row is None:
+            raise KeyError(f"research work order not found: {work_order_id}")
+        result = dict(row)
+        result["blockers"] = list(json.loads(result.pop("blockers_json"))["items"])
+        return result
+
+    def latest_research_work_order(self, cohort_id: str) -> dict[str, Any] | None:
+        """Return the work order bound to the cohort's latest immutable decision."""
+
+        row = self._conn.execute(
+            """
+            SELECT wo.work_order_id, sd.decision_id
+            FROM system_decisions sd
+            JOIN research_work_orders wo
+              ON wo.assessment_id = sd.coverage_assessment_id
+            WHERE sd.cohort_id = ?
+            ORDER BY sd.effective_at DESC, sd.decision_id DESC
+            LIMIT 1
+            """,
+            (cohort_id,),
+        ).fetchone()
+        if row is None:
+            return None
+        result = self.get_research_work_order(str(row["work_order_id"]))
+        result["decision_id"] = str(row["decision_id"])
+        return result
+
+    def transition_research_work_order(
+        self,
+        *,
+        work_order_id: str,
+        to_status: str,
+        operation_key: str,
+        receipt: Mapping[str, Any],
+        observed_at: str,
+    ) -> dict[str, Any]:
+        """Checkpoint one bounded research job and append its audit receipt atomically."""
+
+        transitions = {
+            "proposed": {"queued", "parked"},
+            "queued": {"researching", "parked"},
+            "researching": {"queued", "awaiting_approval", "completed", "parked"},
+            "awaiting_approval": {"researching", "completed", "parked"},
+            "completed": set(),
+            "parked": set(),
+        }
+        if to_status not in transitions:
+            raise ValueError(f"invalid research work order status: {to_status}")
+        if not operation_key.strip():
+            raise ValueError("operation_key is required")
+        observed_at = _timestamp(observed_at, "observed_at")
+        event_type = f"research_work_order_{to_status}"
+        payload = {
+            "work_order_id": work_order_id,
+            "to_status": to_status,
+            "operation_key": operation_key,
+            "receipt": dict(receipt),
+        }
+        payload_json = _canonical_json(payload)
+        payload_digest = _digest(payload_json)
+        with immediate_transaction(self._conn):
+            row = self._conn.execute(
+                "SELECT cohort_id, status FROM research_work_orders WHERE work_order_id = ?",
+                (work_order_id,),
+            ).fetchone()
+            if row is None:
+                raise KeyError(f"research work order not found: {work_order_id}")
+            cohort_id = str(row["cohort_id"])
+            current = str(row["status"])
+
+            for event in self._conn.execute(
+                """
+                SELECT payload_json FROM decision_events
+                WHERE cohort_id = ? AND event_type = ?
+                """,
+                (cohort_id, event_type),
+            ):
+                stored = json.loads(event["payload_json"])
+                if stored.get("operation_key") == operation_key:
+                    if stored != payload or current != to_status:
+                        raise ValueError("research work order operation key was reused")
+                    return self.get_research_work_order(work_order_id)
+
+            # Legacy v1.2 rows were born as queued.  A first explicit pq2 dispatch may
+            # therefore audit queued -> queued; all other same-state transitions fail.
+            legacy_dispatch = current == to_status == "queued"
+            if not legacy_dispatch and to_status not in transitions.get(current, set()):
+                raise ValueError(
+                    f"illegal research work order transition: {current} -> {to_status}"
+                )
+            self._conn.execute(
+                "UPDATE research_work_orders SET status = ? WHERE work_order_id = ?",
+                (to_status, work_order_id),
+            )
+            event_id = "de_" + _digest(_canonical_json({
+                "cohort_id": cohort_id,
+                "event_type": event_type,
+                "payload_digest": payload_digest,
+                "observed_at": observed_at,
+            }))[:32]
+            self._conn.execute(
+                """
+                INSERT INTO decision_events (
+                    event_id, cohort_id, event_type, payload_json,
+                    payload_digest, observed_at
+                ) VALUES (?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    event_id, cohort_id, event_type, payload_json,
+                    payload_digest, observed_at,
+                ),
+            )
+        return self.get_research_work_order(work_order_id)
+
     def rank_work_orders(self, *, capacity: int = 5) -> dict[str, list[dict[str, Any]]]:
         if capacity < 0:
             raise ValueError("capacity must be non-negative")
-        rows = [
-            dict(row)
-            for row in self._conn.execute(
+        authorized: set[str] = set()
+        for event in self._conn.execute(
+            """
+            SELECT payload_json FROM decision_events
+            WHERE event_type = 'research_work_order_queued'
+            """
+        ):
+            payload = json.loads(event["payload_json"])
+            work_order_id = payload.get("work_order_id")
+            if isinstance(work_order_id, str) and work_order_id:
+                authorized.add(work_order_id)
+        rows = []
+        for row in self._conn.execute(
                 """
-                SELECT work_order_id, cohort_id, context_digest, expiry,
+                SELECT work_order_id, cohort_id, context_digest, blockers_json, expiry,
                        decision_relevance, falsifiability, information_value,
                        status, created_at
                 FROM research_work_orders
-                WHERE status = 'queued'
-                ORDER BY decision_relevance DESC,
+                WHERE status IN ('queued', 'researching')
+                ORDER BY CASE status WHEN 'researching' THEN 0 ELSE 1 END,
+                         decision_relevance DESC,
                          falsifiability DESC,
                          expiry ASC,
                          information_value DESC,
                          created_at ASC,
                          work_order_id ASC
                 """
-            )
-        ]
+            ):
+            item = dict(row)
+            # v1.2 legacy rows were born as queued.  Only an explicit user-go
+            # dispatch event grants pq1 research authority.
+            if str(item["work_order_id"]) not in authorized:
+                continue
+            item["blockers"] = list(json.loads(item.pop("blockers_json"))["items"])
+            rows.append(item)
         return {"selected": rows[:capacity], "backlog": rows[capacity:]}
 
     def _paper_exposure(

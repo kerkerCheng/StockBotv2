@@ -35,6 +35,9 @@ def test_daily_prompt_keeps_human_gates_and_batch_contract() -> None:
     assert "record-choice" in text and "record-fill" in text
     assert "go" in text and "drop" in text and "pending" in text
     assert "todo_pool.json" in text and "不得依 section" in text
+    assert "engine_b.todo dispatch" in text
+    assert "bare reassess" in text
+    assert "新 decision receipt" in text
 
 
 def test_daily_prompt_is_not_the_retired_cloud_runner() -> None:

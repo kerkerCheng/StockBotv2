@@ -9,7 +9,7 @@ description: >
   每日摘要、今天有什麼、待判斷、今天需要動作嗎。
 ---
 
-# Daily Approval Brief Skill（v1.1）
+# Daily Approval Brief Skill（v1.2）
 
 ## 定位一句話
 
@@ -64,7 +64,8 @@ triage 寬鬆（關聯性與可引用性是硬指標，其餘軟指標命中即 
 & '.venv\Scripts\python.exe' -m engine_b.cli drain
 ```
 
-列出接下來可研究的 leads（依 priority；pop triaged_go＋researching）。每輪 limit 由
+列出接下來可研究的 bounded jobs。**使用者已明確 go 的 Decision gap work order 優先**，再以剩餘
+budget 取 leads（依 priority；pop triaged_go＋researching）。每輪 limit 由
 `config/daily_routine.json` 控制；tracked tickers 預設由 lifecycle＋Decision cohorts 自動導出，
 需要臨時覆寫時才傳 `--limit`／`--tracked`。依每輪 limit 自動跑
 **pq1＝source-trace＋extraction**（`skills/source-trace`＋`skills/lead-intake` 的研究部分），逐則
@@ -74,6 +75,25 @@ checkpoint 狀態。Triage PASS 只授權研究、不授權入圖；prepared RA 
 & '.venv\Scripts\python.exe' -m engine_b.cli advance <lead_id> researching        # 開始
 & '.venv\Scripts\python.exe' -m engine_b.cli advance <lead_id> action_prepared --ref research_action_id=<ra_id>   # prepare 完
 ```
+
+Decision review 的 `go` 只授權 bounded gap research，先留下跨 session receipt，**不得立刻拿舊
+assessment bare reassess**：
+
+```powershell
+& '.venv\Scripts\python.exe' -m engine_b.todo dispatch <todo_n>
+& '.venv\Scripts\python.exe' -m engine_b.todo work <todo_n> --to researching --receipt <研究起始ref>
+```
+
+若只需讀既有 authorities／生成五軸 assessment，可完成研究後執行 research-intent `reassess`，再用新
+decision receipt 結案：
+
+```powershell
+& '.venv\Scripts\python.exe' -m decision_lab reassess <baseline_decision_id> --assessment <assessment.json> --catalyst "<可驗證催化劑>" --disproof "<可證偽條件>" --expiry <ISO-8601> --intent research
+& '.venv\Scripts\python.exe' -m engine_b.todo work <todo_n> --to completed --receipt decision:<new_decision_id>
+```
+
+若結果需要 Engine A 入圖、Engine C manual observation、thesis revise／retire 或其他 authority mutation，
+先 checkpoint `awaiting_approval` 並把完整 packet 放回 pq2；人工 gate 完成且取得 receipt 後才 reassess。
 
 pq1 是唯一昂貴階段（web search + 讀文件 + 抽 claim）——priority 決定貴的 token 先花在哪。被 5 小時
 限制/中斷後**重跑 drain 從剩下的接**（靠 lead status checkpoint）。有可核准的 graph delta 才 prepare；
@@ -147,11 +167,15 @@ Codex／Claude Code 本機交互執行時，收到核准的 agent 必須以當�
 稽核 log，**不會代做** pq1／apply／reassess；必須先完成或 checkpoint 對應動作，再以
 `python -m engine_b.todo resolve <編號> --verb <動詞>` 記錄結果，不能先 resolve 再假裝已執行：
 
-| 動詞 | legacy lead | 已 prepared 的 RA | 到期 thesis |
-|------|-------------|-------------------|-------------|
-| `go` | raw lead 不再進 pq2 | **apply 入圖**（見下）＋入圖後自動建 Shadow | 引導 reassess/複查 |
-| `drop` | raw lead 不再進 pq2 | 略過該 RA | 標記已看、不複查 |
-| `pending` | 維持不動、留到之後 brief | 同左 | 同左 |
+| 動詞 | legacy lead | 已 prepared 的 RA | Decision review | 到期 thesis |
+|------|-------------|-------------------|-----------------|-------------|
+| `go` | raw lead 不再進 pq2 | **apply 入圖**（見下）＋入圖後自動建 Shadow | `todo dispatch` 排入 gap pq1；不先 resolve、不 bare reassess | 引導複查；authority mutation 仍另核准 |
+| `drop` | raw lead 不再進 pq2 | 略過該 RA | 略過本次補缺口 | 標記已看、不複查 |
+| `pending` | 維持不動、留到之後 brief | 同左 | 同左 | 同左 |
+
+`decision_review go` 的原 pq2 項目在研究期間維持 active，但標成 queued／researching／awaiting_approval，
+brief 不得再次請使用者 go。只有 `parked` outcome receipt，或補缺口後產生的**新 decision receipt**，才能
+結案；舊 baseline decision 不算完成 receipt。
 
 **go 一個 prepared RA ＝入圖**：走既有 `apply_research_action`（本機或 MCP native approval，一次確認）
 → `advance <lead> applied --ref focus_company_id=co:x` → **入圖後自動建 Shadow 追蹤**：

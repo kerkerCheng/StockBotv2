@@ -76,10 +76,10 @@ def _cmd_register(args: argparse.Namespace) -> int:
 
 
 def _cmd_drain(args: argparse.Namespace) -> int:
-    """列出 pq1 接下來該處理的 leads（依 priority），供 agent 逐個 trace+extract。
+    """列出 pq1 接下來的 bounded jobs，供 agent 逐個研究與 checkpoint。
 
-    pop 的是 triaged_go（新）與 researching（中斷待續）；靠 lead status 當
-    checkpoint，重跑從剩下的接（plan R3/KTD2）。命令本身不做 trace+extract。
+    使用者明確 dispatch 的 Decision work order 優先，再用剩餘 budget 取
+    triaged_go／researching leads。命令本身不執行語意研究。
     """
     store = leads.load(args.leads)
     config = routine_config.load_config(Path(args.routine_config))
@@ -93,23 +93,50 @@ def _cmd_drain(args: argparse.Namespace) -> int:
         if args.tracked is not None
         else routine_config.discover_tracked_tickers(config)
     )
+    decision_jobs: list[dict] = []
+    include_decisions = args.decision_work_orders == "include" or (
+        args.decision_work_orders == "auto"
+        and Path(args.leads).resolve() == leads.DEFAULT_LEADS_PATH.resolve()
+    )
+    if include_decisions and limit:
+        try:
+            from decision_lab.bootstrap import open_default_store
+
+            decision_store = open_default_store()
+            try:
+                decision_jobs = decision_store.rank_work_orders(capacity=limit)["selected"]
+            finally:
+                decision_store.close()
+        except Exception as exc:
+            print(f"警告：Decision pq1 無法讀取：{exc}", file=sys.stderr)
+
     candidates = [
         l for l in store["leads"].values()
         if l["status"] in ("triaged_go", "researching")
     ]
     ranked = priority.rank_leads(candidates, tracked_tickers=tracked)
-    batch = ranked[:limit]
+    lead_batch = ranked[:max(0, limit - len(decision_jobs))]
     if args.json:
-        print(json.dumps(
-            [{"score": s, "lead": l} for s, l in batch],
-            ensure_ascii=False, indent=2,
-        ))
+        rows = [
+            {"kind": "decision_work_order", "work_order": job}
+            for job in decision_jobs
+        ] + [
+            {"kind": "lead", "score": score, "lead": lead}
+            for score, lead in lead_batch
+        ]
+        print(json.dumps(rows, ensure_ascii=False, indent=2))
         return 0
-    if not batch:
-        print("（pq1 佇列已空——無 triaged_go／researching lead）")
+    if not decision_jobs and not lead_batch:
+        print("（pq1 佇列已空——無 dispatched work order 或可研究 lead）")
         return 0
-    print(f"pq1 drain：接下來 {len(batch)} 則（依 priority）：")
-    for score, l in batch:
+    print(f"pq1 drain：接下來 {len(decision_jobs) + len(lead_batch)} 件：")
+    for job in decision_jobs:
+        print(
+            f"  [USER-GO] {job['work_order_id']}  {job['status']:12}  "
+            f"cohort={job['cohort_id']}"
+        )
+        print(f"            blockers={','.join(job.get('blockers') or [])}")
+    for score, l in lead_batch:
         print(f"  [{score:5.1f}] {l['lead_id']}  {l['status']:12}  {l['source']}")
         print(f"           {l.get('title') or '(無標題)'}  {l.get('url')}")
     return 0
@@ -188,6 +215,10 @@ def build_parser() -> argparse.ArgumentParser:
     p_drain.add_argument("--tracked", default=None,
                          help="逗號分隔的已追蹤 ticker；省略時由 lifecycle/cohort 自動導出")
     p_drain.add_argument("--routine-config", default=str(routine_config.DEFAULT_CONFIG))
+    p_drain.add_argument(
+        "--decision-work-orders", choices=("auto", "include", "skip"), default="auto",
+        help="是否合併使用者已核准的 Decision gap jobs；custom leads 預設不混入 production store",
+    )
     p_drain.add_argument("--json", action="store_true")
     p_drain.set_defaults(func=_cmd_drain)
 

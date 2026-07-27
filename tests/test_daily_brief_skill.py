@@ -77,3 +77,11 @@ def test_uses_persistent_todo_numbers_and_does_not_blindly_dispatch_batch() -> N
     assert "todo_pool.json" in text
     assert "不得依當日排序" in text
     assert "todo batch" in text and "不會代做" in text
+
+
+def test_decision_review_go_dispatches_gap_pq1_before_reassess() -> None:
+    text = _text()
+    assert "engine_b.todo dispatch" in text
+    assert "不得立刻拿舊" in text and "bare reassess" in text
+    assert "--to awaiting_approval" in text or "awaiting_approval" in text
+    assert "decision:<new_decision_id>" in text
