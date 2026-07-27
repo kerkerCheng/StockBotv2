@@ -497,6 +497,114 @@
       "result": "ok",
       "run_at": "2026-07-26T10:20:39.847789+00:00",
       "source": "edgar:GFS"
+    },
+    {
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-27T14:17:05.718708+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-27T14:17:06.390867+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-27T14:17:06.814800+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-27T14:17:07.232829+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-27T14:17:07.653463+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-27T14:17:08.073720+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-27T14:17:08.495846+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-27T14:17:08.916202+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-27T14:17:09.351208+00:00",
+      "source": "edgar:GFS"
+    },
+    {
+      "new": 3,
+      "result": "ok",
+      "run_at": "2026-07-27T14:17:21.432312+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-27T14:17:22.527887+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-27T14:17:23.234888+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-27T14:17:24.117781+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-27T14:17:25.036475+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-27T14:17:26.025595+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-27T14:17:26.987564+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-27T14:17:27.919138+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-27T14:17:28.801191+00:00",
+      "source": "edgar:GFS"
     }
   ],
   "leads": {
@@ -572,9 +680,13 @@
       "first_seen": "2026-07-25T09:06:50.926723+00:00",
       "lead_id": "lead_09abba7335ec575ec76ca63a92e5663f",
       "published_at": "2026-07-24T00:11:40.000Z",
-      "refs": {},
+      "refs": {
+        "canonical_url": "https://followingthephotons.podbean.com/e/market-insights-photonics-ai/",
+        "outcome": "podcast_transcript_unavailable",
+        "trace_status": "lead_only_tier_4"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "title": "Not exactly for $AAOI (they're working on CPO too, just a little further behind in commercialization). There's a podcast that featured the $",
       "triage": {
         "decided_at": "2026-07-25T09:09:23.755917+00:00",
@@ -831,6 +943,25 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826005221/aaoi_8k.htm"
     },
+    "lead_2f5aebfb7785c12a8fb2fe665f8a26ff": {
+      "first_seen": "2026-07-27T14:17:21.432272+00:00",
+      "lead_id": "lead_2f5aebfb7785c12a8fb2fe665f8a26ff",
+      "published_at": "2026-07-27T01:12:57.000Z",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_go",
+      "title": "Nvidia in talks to backstop $250B worth of OpenAI DC financing. - Softbank’s SB energy develops 10 GW Ohio campus - OpenAI signs long term l",
+      "triage": {
+        "decided_at": "2026-07-27T14:19:01.895098+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "命中已追蹤 NVDA／OpenAI，含 250B 融資 backstop、10 GW Ohio campus 等可追源的具體公司與數字；原始連結尚待 pq1 核對，按新穎性寬鬆放行。",
+        "tier": 3
+      },
+      "url": "https://x.com/aleabitoreddit/status/2081548360818004299"
+    },
     "lead_2ffb199ff20ab64369580b427464efcf": {
       "first_seen": "2026-07-25T09:06:50.926829+00:00",
       "lead_id": "lead_2ffb199ff20ab64369580b427464efcf",
@@ -866,6 +997,25 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/928876/000197640826000651/xslF345X06/primary_doc.xml"
+    },
+    "lead_3e383a34e368086c3f09085532274856": {
+      "first_seen": "2026-07-27T14:17:21.432289+00:00",
+      "lead_id": "lead_3e383a34e368086c3f09085532274856",
+      "published_at": "2026-07-26T20:12:11.000Z",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_go",
+      "title": "Just some TLDR news: - $CXMT IPO tomorrow if you like Chinese memory. - Samsung Electronics reportedly struggling to secure large FC-BGA sub",
+      "triage": {
+        "decided_at": "2026-07-27T14:19:02.481210+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "命中已追蹤 Samsung，FC-BGA substrate 供應困難是具體且可核對的供應鏈主張；可能補充現有 semiconductor bottleneck 視角，按新穎性放行追源。",
+        "tier": 3
+      },
+      "url": "https://x.com/aleabitoreddit/status/2081472671129501729"
     },
     "lead_435289261da3b093b9ed384b989c839c": {
       "first_seen": "2026-07-25T09:06:50.926886+00:00",
@@ -1764,6 +1914,23 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/820318/000089914026000699/xslF345X06/form4.xml"
     },
+    "lead_be022ca8c6ef56ae177d7f60e36f5273": {
+      "first_seen": "2026-07-27T14:17:21.432239+00:00",
+      "lead_id": "lead_be022ca8c6ef56ae177d7f60e36f5273",
+      "published_at": "2026-07-27T03:17:03.000Z",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "title": "Wow, $CMXT is up a very normal +469.98% after going public today. Now valuing it at ~$487.31 billion, up from $85.5 billion. Did any of my C",
+      "triage": {
+        "decided_at": "2026-07-27T14:19:03.064013+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "核心只是在未追蹤 CXMT／CMXT IPO 後股價與市值跳升，屬時變市場觀測，未連到目前 CPO／Sivers 主題或已追蹤公司的可入圖因果主張。",
+        "tier": 3
+      },
+      "url": "https://x.com/aleabitoreddit/status/2081579593815978273"
+    },
     "lead_c47b75e7f3907d271c4707876b56a30a": {
       "first_seen": "2026-07-22T15:37:20.250684+00:00",
       "lead_id": "lead_c47b75e7f3907d271c4707876b56a30a",
@@ -2008,9 +2175,13 @@
       "first_seen": "2026-07-22T15:37:23.595687+00:00",
       "lead_id": "lead_e590eca752d976cef58be766a5b17d62",
       "published_at": "2026-06-16",
-      "refs": {},
+      "refs": {
+        "canonical_url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826004885/aaoi_8k.htm",
+        "outcome": "engine_c_time_varying_observation",
+        "trace_status": "original_obtained"
+      },
       "source": "edgar:AAOI",
-      "status": "triaged_go",
+      "status": "parked",
       "title": "AAOI 8-K filed 2026-06-16",
       "triage": {
         "decided_at": "2026-07-25T03:52:34.713767+00:00",
@@ -2217,8 +2388,8 @@
   "schema_version": "1",
   "source_state": {
     "x:aleabitoreddit": {
-      "since_id": "2080750537121874206",
-      "updated_at": "2026-07-26T10:20:32.191038+00:00",
+      "since_id": "2081579593815978273",
+      "updated_at": "2026-07-27T14:17:21.432306+00:00",
       "user_id": "1940360837547565056"
     }
   }
