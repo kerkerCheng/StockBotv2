@@ -66,6 +66,8 @@ def validate_beta_policy(source: Mapping[str, Any]) -> dict[str, Any]:
         "cash_bucket_aliases",
         "operating_reserve_nav_fraction",
         "alpha_reserve_nav_fraction",
+        "household_authority_max_age_days",
+        "household_fx_max_age_hours",
     }:
         raise BetaPolicyError("capital policy fields do not match schema")
     aliases = capital.get("cash_bucket_aliases")
@@ -82,6 +84,16 @@ def validate_beta_policy(source: Mapping[str, Any]) -> dict[str, Any]:
     )
     if operating + alpha >= 1:
         raise BetaPolicyError("combined reserves must remain below NAV")
+    authority_age = capital.get("household_authority_max_age_days")
+    fx_age = capital.get("household_fx_max_age_hours")
+    if (
+        isinstance(authority_age, bool)
+        or not isinstance(authority_age, int)
+        or not 1 <= authority_age <= 365
+    ):
+        raise BetaPolicyError("household_authority_max_age_days must be 1..365")
+    if isinstance(fx_age, bool) or not isinstance(fx_age, int) or not 24 <= fx_age <= 168:
+        raise BetaPolicyError("household_fx_max_age_hours must be 24..168")
 
     signal = source.get("signal")
     if not isinstance(signal, Mapping) or set(signal) != {
@@ -273,6 +285,8 @@ def validate_beta_policy(source: Mapping[str, Any]) -> dict[str, Any]:
             "cash_bucket_aliases": normalized_cash_aliases,
             "operating_reserve_nav_fraction": operating,
             "alpha_reserve_nav_fraction": alpha,
+            "household_authority_max_age_days": authority_age,
+            "household_fx_max_age_hours": fx_age,
         },
         "signal": {
             "allowed_paces": [0.0, 0.25, 0.5, 1.0],

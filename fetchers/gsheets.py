@@ -13,6 +13,7 @@ Env vars（任選一種認證方式）:
     GSHEETS_SERVICE_ACCOUNT_JSON  — Service Account 金鑰 JSON 的檔案路徑
     GSHEETS_SPREADSHEET_ID        — Google Sheets 的 spreadsheet ID（URL 中段）
     GSHEETS_SHEET_NAME            — 工作表名稱，預設 "Portfolio"
+    GSHEETS_CAPITAL_SHEET_NAME    — household authority 工作表，預設 "Capital Authority"
 
 工作表欄位格式（第一列為標題）:
     ticker/symbol | company(可選) | bucket | shares | avg_cost | currency | notes
@@ -47,9 +48,43 @@ except ImportError:
 
 SPREADSHEET_ID = os.environ.get("GSHEETS_SPREADSHEET_ID", "")
 SHEET_NAME = os.environ.get("GSHEETS_SHEET_NAME", "Portfolio")
+CAPITAL_AUTHORITY_SHEET_NAME = os.environ.get(
+    "GSHEETS_CAPITAL_SHEET_NAME", "Capital Authority"
+)
 SERVICE_ACCOUNT_FILE = os.environ.get("GSHEETS_SERVICE_ACCOUNT_JSON", "")
 
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
+
+CAPITAL_AUTHORITY_HEADERS = (
+    "record_id",
+    "as_of",
+    "confirmation_status",
+    "capital_type",
+    "description",
+    "currency",
+    "limit_amount",
+    "drawn_amount",
+    "annual_rate_pct",
+    "rate_status",
+    "interest_accrual",
+    "availability",
+    "collateral",
+    "maturity",
+    "include_in_net_investable_capital",
+    "include_in_deployable_cash",
+    "source",
+    "notes",
+    "facility_term_years",
+    "repayment_structure",
+    "minimum_payment_status",
+    "minimum_payment_terms",
+    "amount",
+    "amount_source",
+    "allowed_asset_scope",
+    "deployment_mode",
+    "tranche_policy",
+    "automatic_deployment",
+)
 
 # Neutral registry research ticker → actual portfolio
 # ticker, for names cross-listed on a different exchange than the graph uses.
@@ -241,6 +276,44 @@ def fetch_portfolio(*, strict_operational: bool = False) -> list[dict[str, Any]]
             item["nav_base"] = nav_base
 
     return portfolio
+
+
+def fetch_capital_authority() -> list[dict[str, Any]]:
+    """唯讀取得 household capital authority；schema 不完整時拒絕猜測。"""
+
+    if not SPREADSHEET_ID:
+        raise ValueError(
+            "請設定 GSHEETS_SPREADSHEET_ID 環境變數（Google Sheets URL 中段的 ID）。"
+        )
+    service = _get_service()
+    range_name = f"{CAPITAL_AUTHORITY_SHEET_NAME}!A:AB"
+    result = (
+        service.spreadsheets()
+        .values()
+        .get(spreadsheetId=SPREADSHEET_ID, range=range_name)
+        .execute()
+    )
+    rows = result.get("values", [])
+    if not rows:
+        raise ValueError("Capital Authority 工作表為空或不存在")
+    headers = tuple(str(value).strip().lower() for value in rows[0])
+    if headers != CAPITAL_AUTHORITY_HEADERS:
+        raise ValueError("Capital Authority 欄位不符合 Phase II-A exact schema")
+
+    records: list[dict[str, Any]] = []
+    for row in rows[1:]:
+        if len(row) > len(headers):
+            raise ValueError("Capital Authority 資料列超出 schema")
+        padded = list(row) + [""] * (len(headers) - len(row))
+        if not any(str(value).strip() for value in padded):
+            continue
+        record = dict(zip(headers, padded))
+        if not str(record.get("record_id") or "").strip():
+            raise ValueError("Capital Authority 非空資料列缺少 record_id")
+        records.append(record)
+    if not records:
+        raise ValueError("Capital Authority 沒有 authority records")
+    return records
 
 
 def get_position(ticker: str) -> dict[str, Any] | None:

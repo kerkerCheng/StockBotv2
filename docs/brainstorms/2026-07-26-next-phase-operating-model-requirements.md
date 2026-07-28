@@ -1,7 +1,7 @@
 # 盲點審查報告：下一階段 Operating Model（三個工作流＋跨代理狀態）
 
-> 狀態：Workstream A 的 Phase I Daily Beta Technical Monitor 已於 2026-07-28 完成；Phase II-A household
-> capital authority brainstorm 亦已收斂但尚未實作。Workstream B、通用 Daily runner 重構、ETF 完整 look-through、
+> 狀態：Workstream A 的 Phase I Daily Beta Technical Monitor 與 Phase II-A household capital authority
+> 已於 2026-07-28 完成。Workstream B、通用 Daily runner 重構、ETF 完整 look-through、
 > Sheet writer 與本機 single-writer guard 仍是後續 Phase II brainstorm。
 >
 > 本文件把三個待討論工作流收在同一個 umbrella 下：
@@ -70,10 +70,11 @@
   reconciliation receipt。它不下 broker order，也不開放通用 Sheet range write。
 - Phase I 已定：14 商品／11 series、五類監控分類、technical state／pace、Sheet reserve、stacked-leverage／tech
   proxy／known issuer cap 與 sequential contribution routing；全部維持 `paper_observation`。
-- Phase II-A 已收斂：私人 `Capital Authority` 保存 actual values；Portfolio cash 是自有 cash authority，reserve／
+- Phase II-A 已完成：私人 `Capital Authority` 保存 actual values；Portfolio cash 是自有 cash authority，reserve／
   planned outflows 與未動用 facility 分欄。Loan proceeds 不預先禁止任何標的，但只走 exact draw／instrument／tranche
   的人工 review；Daily 必須並列既有 `sheet_conservative` 與新的 household cash-supported candidate，再分開
-  contingent-credit 與 manual loan-funded range，不能把額度算 NAV，也不能用較低私人 floor 靜默放寬 Phase I。
+  contingent-credit 與 manual loan-funded range，不能把額度算 NAV，也不能用較低私人 floor 靜默放寬 Phase I；
+  runtime 維持 `spreadsheets.readonly`，authority／FX 失敗只降級 household path。
 - Phase II 後續未定：完整 point-in-time ETF look-through、live policy promotion、explicit-fill-only Sheet
   narrow-write contract與 server promotion。另保留 zero-code-first 的問答型 LLM advisory：
   只在使用者明確提問時讀 beta monitor／Sheet aggregate 並按需補抓最新客觀資料，直接回答 rough scenario／替代策略；

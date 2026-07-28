@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 from typing import Any, Mapping, Sequence
 
 from .beta_policy import load_beta_policy
+from .capital_authority import build_household_capital_view
 
 
 _ACTIONS = {"HOLD", "PAUSE CONTRIBUTION", "CONTRIBUTE REVIEW"}
@@ -310,22 +311,20 @@ def _warning_flags(portfolio: Mapping[str, Any], policy: Mapping[str, Any]) -> l
     return sorted(flags)
 
 
-def build_beta_monitor(
+def _allocate_ranges(
     *,
-    observations_by_benchmark: Mapping[str, Mapping[str, Any] | None],
-    history_by_benchmark: Mapping[str, Sequence[Mapping[str, Any]]],
-    holdings_rows: Sequence[Mapping[str, Any]] | None,
-    as_of: str,
-    policy: Mapping[str, Any] | None = None,
-) -> dict[str, Any]:
-    """Build one public, non-executing beta contribution report。"""
+    prepared: Sequence[Mapping[str, Any]],
+    portfolio: Mapping[str, Any],
+    policy: Mapping[str, Any],
+    deployable_cash: float,
+    capital_available: bool,
+    capital_blockers: Sequence[str],
+) -> tuple[list[dict[str, Any]], float]:
+    """Run one independent sequential allocation view against shared hard caps。"""
 
-    evaluation_at = _timestamp(as_of)
-    resolved_policy = dict(policy or load_beta_policy())
-    portfolio = _portfolio_snapshot(holdings_rows, resolved_policy)
     nav = float(portfolio["nav_base"])
-    remaining_cash = float(portfolio["deployable_cash_base"])
-    risk = resolved_policy["risk"]
+    remaining_cash = max(float(deployable_cash), 0.0) if capital_available else 0.0
+    risk = policy["risk"]
     projected_leverage_nominal = float(portfolio["leveraged_nominal_base"])
     projected_leverage_effective = float(portfolio["leveraged_effective_base"])
     projected_technology_effective = float(portfolio["technology_effective_base"])
@@ -334,20 +333,11 @@ def build_beta_monitor(
         for key, value in portfolio["issuer_effective_base"].items()
     }
     claimed_groups: set[str] = set()
-    items: list[dict[str, Any]] = []
-    for instrument in resolved_policy["instruments"]:
-        benchmark_key = str(instrument["benchmark_key"])
-        observation = _fresh_observation(
-            observations_by_benchmark.get(benchmark_key),
-            evaluation_at=evaluation_at,
-            max_age_hours=int(resolved_policy["signal"]["max_refresh_age_hours"]),
-        )
-        state = signal_state(observation, resolved_policy)
-        cadence = _review_cadence(
-            state,
-            history_by_benchmark.get(benchmark_key, ()),
-            resolved_policy,
-        )
+    allocations: list[dict[str, Any]] = []
+    for candidate in prepared:
+        instrument = candidate["instrument"]
+        state = candidate["state"]
+        cadence = candidate["cadence"]
         blockers = list(state["blockers"])
         warnings: list[str] = []
         action = "HOLD"
@@ -355,8 +345,8 @@ def build_beta_monitor(
         safe_max = 0.0
         binding: list[str] = []
         group = str(instrument["allocation_group"])
-        if portfolio["status"] != "available":
-            blockers.extend(portfolio["blockers"])
+        if not capital_available:
+            blockers.extend(str(item) for item in capital_blockers)
             action = "PAUSE CONTRIBUTION"
         elif state["data_status"] != "observed":
             action = "PAUSE CONTRIBUTION"
@@ -373,7 +363,7 @@ def build_beta_monitor(
             leverage = float(instrument["leverage_multiple"])
             constraints["campaign_budget"] = (
                 nav
-                * float(resolved_policy["campaign_budget_fraction_by_sleeve"][instrument["sleeve"]])
+                * float(policy["campaign_budget_fraction_by_sleeve"][instrument["sleeve"]])
                 * float(state["pace"])
             )
             constraints["deployable_cash"] = remaining_cash
@@ -425,6 +415,102 @@ def build_beta_monitor(
                 blockers.extend(binding or ["safe_capacity_exhausted"])
         if action not in _ACTIONS:
             raise AssertionError("unexpected beta action")
+        allocations.append(
+            {
+                "action": action,
+                "supported_order_range_base": [0.0, safe_max],
+                "binding_constraints": binding,
+                "blockers": sorted(set(blockers)),
+                "warnings": sorted(set(warnings)),
+            }
+        )
+    return allocations, remaining_cash
+
+
+def build_beta_monitor(
+    *,
+    observations_by_benchmark: Mapping[str, Mapping[str, Any] | None],
+    history_by_benchmark: Mapping[str, Sequence[Mapping[str, Any]]],
+    holdings_rows: Sequence[Mapping[str, Any]] | None,
+    capital_authority_rows: Sequence[Mapping[str, Any]] | None = None,
+    fx_fetcher=None,
+    as_of: str,
+    policy: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Build one public, non-executing beta contribution report。"""
+
+    evaluation_at = _timestamp(as_of)
+    resolved_policy = dict(policy or load_beta_policy())
+    portfolio = _portfolio_snapshot(holdings_rows, resolved_policy)
+    nav = float(portfolio["nav_base"])
+    prepared: list[dict[str, Any]] = []
+    for instrument in resolved_policy["instruments"]:
+        benchmark_key = str(instrument["benchmark_key"])
+        observation = _fresh_observation(
+            observations_by_benchmark.get(benchmark_key),
+            evaluation_at=evaluation_at,
+            max_age_hours=int(resolved_policy["signal"]["max_refresh_age_hours"]),
+        )
+        state = signal_state(observation, resolved_policy)
+        cadence = _review_cadence(
+            state,
+            history_by_benchmark.get(benchmark_key, ()),
+            resolved_policy,
+        )
+        prepared.append(
+            {
+                "instrument": instrument,
+                "observation": observation,
+                "state": state,
+                "cadence": cadence,
+            }
+        )
+
+    sheet_allocations, remaining_cash = _allocate_ranges(
+        prepared=prepared,
+        portfolio=portfolio,
+        policy=resolved_policy,
+        deployable_cash=float(portfolio["deployable_cash_base"]),
+        capital_available=portfolio["status"] == "available",
+        capital_blockers=portfolio["blockers"],
+    )
+    capital_view = build_household_capital_view(
+        authority_rows=capital_authority_rows,
+        portfolio_cash_base=portfolio["cash_base"],
+        portfolio_nav_base=portfolio["nav_base"],
+        base_currency=portfolio["base_currency"],
+        evaluation_at=evaluation_at,
+        alpha_reserve_nav_fraction=float(
+            resolved_policy["capital"]["alpha_reserve_nav_fraction"]
+        ),
+        max_authority_age_days=int(
+            resolved_policy["capital"]["household_authority_max_age_days"]
+        ),
+        max_fx_age_hours=int(resolved_policy["capital"]["household_fx_max_age_hours"]),
+        fx_fetcher=fx_fetcher,
+    )
+    household_cash = capital_view["household_cash"]
+    household_available = (
+        portfolio["status"] == "available"
+        and household_cash["status"] == "available"
+    )
+    household_allocations, household_remaining_cash = _allocate_ranges(
+        prepared=prepared,
+        portfolio=portfolio,
+        policy=resolved_policy,
+        deployable_cash=float(household_cash["deployable_cash_base"]),
+        capital_available=household_available,
+        capital_blockers=household_cash["blockers"],
+    )
+
+    items: list[dict[str, Any]] = []
+    for candidate, sheet_allocation, household_allocation in zip(
+        prepared, sheet_allocations, household_allocations, strict=True
+    ):
+        instrument = candidate["instrument"]
+        observation = candidate["observation"]
+        state = candidate["state"]
+        cadence = candidate["cadence"]
         current_value = float(portfolio["instrument_values"].get(instrument["ticker"], 0.0))
         indicator = {
             key: observation.get(key) if observation else None
@@ -459,16 +545,23 @@ def build_beta_monitor(
                     if nav > 0
                     else None
                 ),
-                "supported_order_range_base": [0.0, safe_max],
-                "binding_constraints": binding,
-                "blockers": sorted(set(blockers)),
-                "warnings": sorted(set(warnings)),
-                "action": action,
+                "supported_order_range_base": sheet_allocation["supported_order_range_base"],
+                "sheet_conservative_order_range_base": sheet_allocation["supported_order_range_base"],
+                "binding_constraints": sheet_allocation["binding_constraints"],
+                "blockers": sheet_allocation["blockers"],
+                "warnings": sheet_allocation["warnings"],
+                "action": sheet_allocation["action"],
+                "household_cash_supported_order_range_base": household_allocation[
+                    "supported_order_range_base"
+                ],
+                "household_binding_constraints": household_allocation["binding_constraints"],
+                "household_blockers": household_allocation["blockers"],
+                "household_action": household_allocation["action"],
             }
         )
     warning_flags = _warning_flags(portfolio, resolved_policy)
     technical_statuses = {str(item["technical_status"]) for item in items}
-    report_status = (
+    base_status = (
         "degraded"
         if portfolio["status"] != "available"
         or not technical_statuses <= {"observed", "insufficient_history"}
@@ -476,8 +569,19 @@ def build_beta_monitor(
         if "insufficient_history" in technical_statuses
         else "ok"
     )
+    report_status = (
+        base_status
+        if base_status == "degraded"
+        else "partial"
+        if base_status == "partial" or capital_view["status"] != "available"
+        else "ok"
+    )
+    sheet_allocated = float(portfolio["deployable_cash_base"]) - remaining_cash
+    household_allocated = (
+        float(household_cash["deployable_cash_base"]) - household_remaining_cash
+    )
     report = {
-        "schema_version": "engine-d-beta-monitor-v1",
+        "schema_version": "engine-d-beta-monitor-v2",
         "as_of": evaluation_at,
         "policy_version": resolved_policy["policy_version"],
         "policy_mode": resolved_policy["mode"],
@@ -490,7 +594,7 @@ def build_beta_monitor(
             "cash_base": portfolio["cash_base"],
             "reserve_base": portfolio.get("reserve_base", 0.0),
             "deployable_cash_base": portfolio["deployable_cash_base"],
-            "allocated_review_base": portfolio["deployable_cash_base"] - remaining_cash,
+            "allocated_review_base": sheet_allocated,
             "remaining_cash_base": remaining_cash,
             "leveraged_nominal_weight": portfolio["leveraged_nominal_base"] / nav if nav > 0 else None,
             "leveraged_effective_weight": portfolio["leveraged_effective_base"] / nav if nav > 0 else None,
@@ -501,8 +605,29 @@ def build_beta_monitor(
             if nav > 0
             else {},
         },
-        "blockers": list(portfolio["blockers"]),
-        "warnings": sorted(set(portfolio["warnings"] + warning_flags)),
+        "capital_view": {
+            key: capital_view[key]
+            for key in (
+                "schema_version",
+                "status",
+                "as_of",
+                "authority_as_of",
+                "digest",
+                "base_currency",
+                "household_cash",
+                "fx",
+                "blockers",
+                "warnings",
+            )
+        },
+        "sheet_conservative_range": [0.0, sheet_allocated],
+        "household_cash_supported_range": [0.0, household_allocated],
+        "contingent_credit_available": capital_view["contingent_credit_available"],
+        "loan_funded_supported_range": capital_view["loan_funded_supported_range"],
+        "blockers": sorted(set(portfolio["blockers"] + capital_view["blockers"])),
+        "warnings": sorted(
+            set(portfolio["warnings"] + warning_flags + capital_view["warnings"])
+        ),
         "items": items,
     }
     return report
@@ -519,20 +644,32 @@ def _money(value: Any, currency: str | None) -> str:
 
 
 def render_beta_monitor_markdown(report: Mapping[str, Any]) -> str:
-    """Render only aggregate holdings and public signal scalars。"""
+    """Render safe aggregates, dual cash ranges and the manual loan boundary。"""
 
     portfolio = report["portfolio"]
     currency = portfolio.get("base_currency")
+    capital_view = report["capital_view"]
+    household_cash = capital_view["household_cash"]
+    contingent = report["contingent_credit_available"]
+    loan_range = report["loan_funded_supported_range"]
     lines = [
         "# Beta Technical Monitor",
         "",
         f"- 狀態：{report['status']}",
         f"- Policy：{report['policy_version']}（{report['policy_mode']}）",
-        f"- 資本範圍：{report['capital_scope']}（不是 household-level safe maximum）",
+        f"- 資本範圍：Sheet-only conservative（{report['capital_scope']}）＋"
+        "household_cash paper observation（並列、不互相覆寫）",
         f"- NAV／現金／保留：{_money(portfolio.get('nav_base'), currency)}／"
         f"{_money(portfolio.get('cash_base'), currency)}／{_money(portfolio.get('reserve_base'), currency)}",
-        f"- 本輪可部署／已分配：{_money(portfolio.get('deployable_cash_base'), currency)}／"
-        f"{_money(portfolio.get('allocated_review_base'), currency)}",
+        f"- Sheet conservative 可部署／本輪 range：{_money(portfolio.get('deployable_cash_base'), currency)}／"
+        f"{_money(report['sheet_conservative_range'][1], currency)}",
+        f"- Household cash 可部署／本輪 range："
+        f"{_money(household_cash.get('deployable_cash_base'), currency)}／"
+        f"{_money(report['household_cash_supported_range'][1], currency)}"
+        f"（{household_cash.get('status', 'unknown')}）",
+        f"- Contingent credit：{_money(contingent.get('undrawn_amount_base'), currency)}"
+        f"（{contingent.get('status', 'unknown')}；terms={contingent.get('terms_status', 'unknown')}；不算資本）",
+        f"- Loan-funded range：{loan_range.get('status', 'manual_review_required')}（不自動給金額）",
         f"- 槓桿名目／effective：{_pct(portfolio.get('leveraged_nominal_weight'))}／"
         f"{_pct(portfolio.get('leveraged_effective_weight'))}",
         f"- 科技 effective proxy：{_pct(portfolio.get('technology_effective_proxy_weight'))}",
@@ -544,9 +681,29 @@ def render_beta_monitor_markdown(report: Mapping[str, Any]) -> str:
     if warnings:
         lines.append(f"- Warnings：{'、'.join(str(item) for item in warnings)}")
 
-    reviews = [item for item in report["items"] if item["action"] == "CONTRIBUTE REVIEW"]
-    paused = [item for item in report["items"] if item["action"] == "PAUSE CONTRIBUTION"]
-    holds = [item for item in report["items"] if item["action"] == "HOLD"]
+    household_path_available = household_cash.get("status") == "available"
+    reviews = [
+        item
+        for item in report["items"]
+        if item["action"] == "CONTRIBUTE REVIEW"
+        or (
+            household_path_available
+            and item["household_action"] == "CONTRIBUTE REVIEW"
+        )
+    ]
+    paused = [
+        item
+        for item in report["items"]
+        if item not in reviews
+        and (
+            item["action"] == "PAUSE CONTRIBUTION"
+            or (
+                household_path_available
+                and item["household_action"] == "PAUSE CONTRIBUTION"
+            )
+        )
+    ]
+    holds = [item for item in report["items"] if item not in reviews and item not in paused]
     lines += ["", "## 需要人工判斷"]
     if not reviews:
         lines.append("- NO ACTION")
@@ -555,15 +712,18 @@ def render_beta_monitor_markdown(report: Mapping[str, Any]) -> str:
         lines.append(
             f"- {item['ticker']} — {item['signal_tier']} / pace {item['signal_pace']:.2f}｜"
             f"RSI {_finite(indicator.get('rsi_14')) or 0:.1f}｜drawdown {_pct(indicator.get('drawdown_252'))}｜"
-            f"候選上限 {_money(item['supported_order_range_base'][1], currency)}｜"
-            f"約束 {','.join(item['binding_constraints']) or 'none'}"
+            f"Sheet／household 上限 {_money(item['supported_order_range_base'][1], currency)}／"
+            f"{_money(item['household_cash_supported_order_range_base'][1], currency)}｜"
+            f"Sheet 約束 {','.join(item['binding_constraints']) or 'none'}｜"
+            f"household 約束 {','.join(item['household_binding_constraints']) or 'none'}"
         )
     if paused:
         lines += ["", "## 暫停新增"]
         for item in paused:
             lines.append(
                 f"- {item['ticker']} — {item['technical_status']}｜"
-                f"{','.join(item['blockers']) or 'safe capacity exhausted'}"
+                f"Sheet={','.join(item['blockers']) or item['action']}｜"
+                f"household={','.join(item['household_blockers']) or item['household_action']}"
             )
     lines += ["", "## 正常監控"]
     if holds:
@@ -579,7 +739,7 @@ def render_beta_monitor_markdown(report: Mapping[str, Any]) -> str:
         lines.append("- 無")
     lines += [
         "",
-        "> 所有金額均為 Sheet-only conservative review range；不代表已核准、已下單或已寫回 Google Sheet。",
+        "> 所有金額均為 paper observation review range；未動用額度不進 NAV／cash，且不代表已核准、已下單或已寫回 Google Sheet；貸款另不代表已提款。",
     ]
     return "\n".join(lines)
 

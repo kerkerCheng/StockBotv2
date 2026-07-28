@@ -9,7 +9,7 @@ description: >
   每日摘要、今天有什麼、待判斷、今天需要動作嗎。
 ---
 
-# Daily Approval Brief Skill（v1.2）
+# Daily Approval Brief Skill（v1.3）
 
 ## 定位一句話
 
@@ -40,10 +40,14 @@ admission 必經核准 exact 對象、深挖由 priority 排序但入圖仍核�
 
 第一支抓 X＋RSS＋EDGAR watch 新項，以 `since_id`／URL-hash 去重；第二支刷新 Engine C financial snapshots。
 第三支對固定 ETF／權值股 universe 刷新 Engine C TechnicalObservation，再由 Engine D 產
-`HOLD / PAUSE CONTRIBUTION / CONTRIBUTE REVIEW` 與 Sheet-only conservative range；technical telemetry
-不進 pq1，recommendation 不推定 choice／fill，且不寫 Google Sheet。fetch／parse 失敗各記 harvest_log；
-**解析失敗 ≠ 無新文**，`insufficient_history`／`unavailable`／`stale` 也必須在健康段落明示並讓該商品
-range 歸零。Windows 本機與
+`HOLD / PAUSE CONTRIBUTION / CONTRIBUTE REVIEW`。它以同一組 risk caps 並列
+`sheet_conservative_range`（Sheet-only conservative）與 `household_cash_supported_range`，另把
+`contingent_credit_available` 與 `loan_funded_supported_range=manual_review_required` 分開顯示。Portfolio cash
+仍是自有 cash 唯一 authority；`Capital Authority` 只以 `spreadsheets.readonly` 讀取 private floor／outflows／
+facility，undrawn credit 不進 NAV／cash／allocation。technical／capital telemetry 不進 pq1，recommendation
+不推定 choice／fill，也不推定 draw，且不寫 Google Sheet。fetch／parse 失敗各記 harvest_log；
+**解析失敗 ≠ 無新文**，`insufficient_history`／`unavailable`／`stale` 也必須在健康段落明示並讓受影響的
+technical 或 household range 獨立歸零；Capital Authority 失敗不得連帶抹掉 Phase I Sheet range。Windows 本機與
 scheduled task 一律使用 repo `.venv`，不要依賴父 shell 是否剛好 activate。
 
 ### Step 2 — Triage 新 pending leads（依 signal-triage 判準）
@@ -143,6 +147,12 @@ pq1 是唯一昂貴階段（web search + 讀文件 + 抽 claim）——priority 
 park：社群 CPO 推論 → 一手來源未支持，不產空 RA
 續跑：尚有 triaged_go ×N
 
+## Beta capital observation（無 pq2 編號）
+sheet_conservative_range：<range>
+household_cash_supported_range：<range 或 unavailable＋blocker>
+contingent_credit_available：<amount／terms status；明標不算資本>
+loan_funded_supported_range：manual_review_required
+
 ## 低優先（摺疊）
 EDGAR Form 4 ×55、較舊 filing——預設摺疊只列數量（要看再展開）
 
@@ -195,6 +205,9 @@ brief 不得再次請使用者 go。只有 `parked` outcome receipt，或補缺�
 本機入圖後跑 `scripts/commit_pending_intake.py` 補 provenance 帳本。**live 決策（record-choice／
 record-fill）不在批次動詞集合**——永遠本機明確 flags，不得由 recommendation 推定 choice、choice 推定
 fill。系統不連 broker。
+
+Beta 的 `CONTRIBUTE REVIEW` 只是一個當日人工 capital discussion prompt，不因出現在 brief 就取得 pq2
+approval、loan draw、choice 或 fill 語意。貸款路徑在沒有 exact draw／instrument／tranche 核准前不得輸出自動金額。
 
 ### Step 7 — 收尾同步
 

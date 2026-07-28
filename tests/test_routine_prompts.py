@@ -41,6 +41,11 @@ def test_daily_prompt_keeps_human_gates_and_batch_contract() -> None:
     assert "新 decision receipt" in text
     assert "beta technical" in text
     assert "supported range 歸零" in text
+    assert "sheet_conservative_range" in text
+    assert "household_cash_supported_range" in text
+    assert "contingent_credit_available" in text
+    assert "loan_funded_supported_range" in text
+    assert "spreadsheets.readonly" in text
 
 
 def test_daily_brief_title_carries_taipei_date() -> None:

@@ -4,7 +4,13 @@ import pytest
 
 from decision_lab.identity import resolve_identity
 from fetchers import gsheets
-from fetchers.gsheets import fetch_portfolio, get_execution_aliases
+from fetchers.gsheets import (
+    CAPITAL_AUTHORITY_HEADERS,
+    SCOPES,
+    fetch_capital_authority,
+    fetch_portfolio,
+    get_execution_aliases,
+)
 
 
 def test_sheet_execution_alias_is_a_separate_reference_not_company_identity() -> None:
@@ -163,3 +169,29 @@ def test_operational_sheet_read_rejects_partial_canonical_contract(
 
     with pytest.raises(ValueError, match="欄位不完整"):
         fetch_portfolio(strict_operational=True)
+
+
+def test_capital_authority_reader_uses_exact_schema_and_readonly_scope(monkeypatch) -> None:
+    monkeypatch.setattr(gsheets, "SPREADSHEET_ID", "fixture")
+    row = [""] * len(CAPITAL_AUTHORITY_HEADERS)
+    row[0] = "operating_floor_twd_01"
+    monkeypatch.setattr(
+        gsheets,
+        "_get_service",
+        lambda: _SheetService([list(CAPITAL_AUTHORITY_HEADERS), row]),
+    )
+
+    records = fetch_capital_authority()
+
+    assert records[0]["record_id"] == "operating_floor_twd_01"
+    assert SCOPES == ["https://www.googleapis.com/auth/spreadsheets.readonly"]
+
+
+def test_capital_authority_reader_rejects_header_drift(monkeypatch) -> None:
+    headers = list(CAPITAL_AUTHORITY_HEADERS)
+    headers[-1] = "auto_invest"
+    monkeypatch.setattr(gsheets, "SPREADSHEET_ID", "fixture")
+    monkeypatch.setattr(gsheets, "_get_service", lambda: _SheetService([headers]))
+
+    with pytest.raises(ValueError, match="exact schema"):
+        fetch_capital_authority()

@@ -1,4 +1,4 @@
-# Daily Approval Brief — Codex 本機排程 Prompt（v1.2）
+# Daily Approval Brief — Codex 本機排程 Prompt（v1.3）
 
 > 現行執行端是 Codex desktop 的 standalone local scheduled task，每日台北 06:30 直接在
 > `C:\Users\Cheng\code\StockBotv2` 的 `master` working tree 執行。電腦需保持開機、Codex App
@@ -21,13 +21,16 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
    - `.venv\Scripts\python.exe crons\harvest_leads.py`（X＋EDGAR；以 `since_id`／URL hash 去重）
    - `.venv\Scripts\python.exe engine_c\etl_yfinance.py`（35 檔 Engine C daily snapshot）
    - `.venv\Scripts\python.exe scripts\daily_beta_snapshot.py --format markdown`（固定 ETF／權值股 technical refresh
-     ＋ Engine D Sheet-conservative beta monitor；`CONTRIBUTE REVIEW` 只呈現、不推定 choice／fill）
+     ＋ Engine D 雙 cash range beta monitor；並列 `sheet_conservative_range`／`household_cash_supported_range`，
+     contingent credit 不算資本，loan-funded range 固定人工 review；只呈現、不推定 draw／choice／fill）
    - 對今日新增 pending leads 套 `skills/signal-triage/SKILL.md`，用本機 CLI 寫回 triage
    - `.venv\Scripts\python.exe -m decision_lab today --format markdown`
    - `.venv\Scripts\python.exe -m engine_b.todo sync`
    - `.venv\Scripts\python.exe -m engine_b.todo list`
 4. 任何來源失敗都要誠實列出 `fetch_failed`／`parse_failed`；beta technical 的 `insufficient_history`／
-   `unavailable`／`stale` 也必須列在健康段落，該商品 supported range 歸零但不阻斷其他商品。單一來源失敗不
+   `unavailable`／`stale` 也必須列在健康段落，該商品 supported range 歸零但不阻斷其他商品。Capital Authority
+   缺失／stale／FX 錯誤只歸零 household range，不得抹掉 Phase I Sheet range；四欄 capital output 都要保留。
+   routine 的 Google Sheet credential scope 維持 `spreadsheets.readonly`，不得建立或修改 tab／cell。單一來源失敗不
    阻斷其他段落。X token
    只從本機 `.env` 讀取，不得輸出或搬移 token。
 5. 先組出不會因研究失敗而消失的心跳 snapshot，再 best-effort 執行
@@ -66,6 +69,9 @@ Asia/Taipei 當日；沒有日期的 brief 視為未完成輸出（多份 brief 
 
 ## 新 leads（依 priority）
 <僅列 pq1 進度／失敗；raw lead 不占 pq2 編號>
+
+## Beta capital observation（無 pq2 編號）
+<sheet_conservative_range／household_cash_supported_range／contingent_credit_available／loan_funded_supported_range>
 
 ## 健康／資料降級
 <本次 harvest、Engine C、beta technical、Neo4j、Sheet 的失敗或缺口；無則寫正常>

@@ -3,8 +3,9 @@
 > 狀態：Phase I Daily Beta Technical Monitor 已於 2026-07-28 實作為 `paper_observation`；不含自動調倉、
 > household capital authority 或 Google Sheet 寫回。正式規格與驗收見
 > [`../plans/2026-07-28-001-feat-daily-beta-technical-monitor-plan.md`](../plans/2026-07-28-001-feat-daily-beta-technical-monitor-plan.md)。
-> Phase II-A household capital authority brainstorm 已於同日收斂；私人數值只存在 Google Sheet
-> `Capital Authority`，tracked 文件只保存 authority routing、fail-closed 與人工資本邊界。尚未開始 Phase II code。
+> Phase II-A household capital authority 已於同日完成；私人數值只存在 Google Sheet
+> `Capital Authority`，tracked 文件只保存 authority routing、fail-closed 與人工資本邊界。實作與驗收見
+> [`../plans/2026-07-28-002-feat-household-capital-authority-plan.md`](../plans/2026-07-28-002-feat-household-capital-authority-plan.md)。
 >
 > 本主題已與 Paywall ROI／合法手動入口、Token-efficient Daily Runner 一併收斂到
 > [`2026-07-26-next-phase-operating-model-requirements.md`](2026-07-26-next-phase-operating-model-requirements.md)；
@@ -252,9 +253,8 @@ contingent_credit_available       # 只顯示可討論額度與條款完整度�
 loan_funded_supported_range       # 預設 manual_review_required；無 exact choice 時不給自動數字
 ```
 
-brainstorm 至此可視為 settled；下一個 implementation plan 只應處理唯讀 `Capital Authority` adapter、point-in-time
-capital view、上述四欄輸出與 Daily 整合。ETF 完整 look-through、live promotion、成交後 Sheet writer 與 server
-仍是後續獨立切片。
+brainstorm 至此可視為 settled；Phase II-A 已完成唯讀 `Capital Authority` adapter、point-in-time capital view、
+上述四欄輸出與 Daily 整合。ETF 完整 look-through、live promotion、成交後 Sheet writer 與 server 仍是後續獨立切片。
 
 ### 3x 定位定案方向：可投資的 `beta_leverage` 衛星，不是主力
 
@@ -717,11 +717,8 @@ horizon 自動取得新增資金。若 changing RSI／MACD／MA thresholds 會�
 
 ## 接下來盯什麼
 
-1. 為 Phase II-A 建立 implementation plan：唯讀 `Capital Authority` adapter、strict schema／freshness、FX 與
-   content-addressed capital view。
-2. Daily 並列 Phase I `sheet_conservative_range` 與 Phase II-A `household_cash_supported_range`，再分開顯示
-   `contingent_credit_available`、`loan_funded_supported_range`；後者沒有 exact user choice 時固定
-   `manual_review_required`，不得用「高信心」自動算金額。
-3. 繼續累積 30–90 天 Phase I paper observation；再核准 live beta bands、stacked-leverage stress 與 drawdown ladder。
-4. 真正考慮提款前補齊最低還款、利率調整、callable／freeze 等 lender terms；提款後 cash／debt 原子更新。
-5. ETF 完整 look-through、explicit-fill-only Sheet writer 與 server promotion 各自另立後續切片，不併入 Phase II-A。
+1. Phase II-A plan／唯讀 adapter／strict schema／freshness／FX／content digest／Daily 四欄均已完成；先觀察
+   `sheet_conservative_range` 與 `household_cash_supported_range` 的差異是否真的改善決策。
+2. 繼續累積 30–90 天 paper observation；再核准 live beta bands、stacked-leverage stress 與 drawdown ladder。
+3. 真正考慮提款前補齊最低還款、利率調整、callable／freeze 等 lender terms；提款後 cash／debt 原子更新。
+4. ETF 完整 look-through、explicit-fill-only Sheet writer 與 server promotion 各自另立後續切片，不併入 Phase II-A。

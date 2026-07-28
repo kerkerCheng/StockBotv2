@@ -98,6 +98,54 @@ def _holdings():
     ]
 
 
+def _capital():
+    common = {
+        "as_of": "2026-07-28",
+        "confirmation_status": "user_confirmed",
+        "currency": "USD",
+    }
+    return [
+        {
+            **common,
+            "record_id": "portfolio_cash_authority_01",
+            "capital_type": "portfolio_cash_authority",
+            "amount": "",
+            "amount_source": "Portfolio.cash_twd+Portfolio.cash_usd",
+        },
+        {
+            **common,
+            "record_id": "operating_floor_01",
+            "capital_type": "operating_floor",
+            "amount": "1",
+        },
+        {
+            **common,
+            "record_id": "planned_outflows_24m_01",
+            "capital_type": "planned_outflows_reserve_24m",
+            "amount": "0",
+        },
+        {
+            **common,
+            "record_id": "credit_facility_01",
+            "capital_type": "contingent_liquidity_credit_facility",
+            "confirmation_status": "user_confirmed_partial",
+            "limit_amount": "1000",
+            "drawn_amount": "0",
+            "annual_rate_pct": "3.1",
+            "interest_accrual": "daily",
+            "availability": "on_demand",
+            "facility_term_years": "30",
+            "repayment_structure": "revolving_draw_repay",
+            "minimum_payment_status": "exists_unverified",
+            "minimum_payment_terms": "",
+            "deployment_mode": "manual_review_only",
+            "automatic_deployment": "FALSE",
+            "include_in_net_investable_capital": "FALSE",
+            "include_in_deployable_cash": "FALSE",
+        },
+    ]
+
+
 def test_fixed_entry_runs_refresh_and_outputs_public_json() -> None:
     holder = NonClosingConnection()
     output = io.StringIO()
@@ -108,6 +156,7 @@ def test_fixed_entry_runs_refresh_and_outputs_public_json() -> None:
         policy=load_beta_policy(),
         conn_factory=lambda: holder,
         holdings_fetcher=_holdings,
+        capital_fetcher=_capital,
         refresh_fn=_refresh,
     )
     payload = json.loads(output.getvalue())
@@ -115,6 +164,10 @@ def test_fixed_entry_runs_refresh_and_outputs_public_json() -> None:
     assert code == 0
     assert payload["refresh"]["status"] == "ok"
     assert payload["capital_scope"] == "sheet_conservative"
+    assert "sheet_conservative_range" in payload
+    assert "household_cash_supported_range" in payload
+    assert "contingent_credit_available" in payload
+    assert payload["loan_funded_supported_range"]["status"] == "manual_review_required"
     assert len(payload["items"]) == 14
     assert "shares" not in output.getvalue()
     assert "private" not in output.getvalue()
@@ -134,6 +187,7 @@ def test_sheet_failure_keeps_technical_health_but_zeroes_ranges() -> None:
         policy=load_beta_policy(),
         conn_factory=lambda: holder,
         holdings_fetcher=broken_sheet,
+        capital_fetcher=_capital,
         refresh_fn=_refresh,
     )
     payload = json.loads(output.getvalue())

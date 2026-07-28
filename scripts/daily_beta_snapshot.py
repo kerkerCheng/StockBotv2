@@ -24,12 +24,17 @@ from decision_lab.beta_monitor import build_beta_monitor, render_beta_monitor_ma
 from decision_lab.beta_policy import load_beta_policy, unique_benchmarks
 from engine_c.db import get_conn
 from engine_c.etl_technical import refresh_technical_observations
+from engine_c.market_data import get_fx_snapshot
 from engine_c.technical import latest_technical_status, recent_technical_observations
-from fetchers.gsheets import fetch_portfolio
+from fetchers.gsheets import fetch_capital_authority, fetch_portfolio
 
 
 def _portfolio() -> Sequence[Mapping[str, Any]]:
     return fetch_portfolio(strict_operational=True)
+
+
+def _capital_authority() -> Sequence[Mapping[str, Any]]:
+    return fetch_capital_authority()
 
 
 def run(
@@ -39,6 +44,8 @@ def run(
     policy: Mapping[str, Any] | None = None,
     conn_factory: Callable[[], Any] = get_conn,
     holdings_fetcher: Callable[[], Sequence[Mapping[str, Any]]] = _portfolio,
+    capital_fetcher: Callable[[], Sequence[Mapping[str, Any]]] = _capital_authority,
+    fx_fetcher=get_fx_snapshot,
     refresh_fn=refresh_technical_observations,
 ) -> int:
     parser = argparse.ArgumentParser(description="Daily beta technical refresh and monitor")
@@ -97,10 +104,16 @@ def run(
             holdings = list(holdings_fetcher())
         except Exception:
             holdings = None
+        try:
+            capital_authority = list(capital_fetcher())
+        except Exception:
+            capital_authority = None
         report = build_beta_monitor(
             observations_by_benchmark=observations,
             history_by_benchmark=histories,
             holdings_rows=holdings,
+            capital_authority_rows=capital_authority,
+            fx_fetcher=fx_fetcher,
             as_of=as_of,
             policy=resolved_policy,
         )

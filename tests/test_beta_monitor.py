@@ -80,6 +80,54 @@ def _holdings(*, cash: float = 10.0, tqqq: float = 0.0, other: list[dict] | None
     return rows
 
 
+def _capital_rows(*, credit_limit: str = "1000") -> list[dict]:
+    common = {
+        "as_of": "2026-07-28",
+        "confirmation_status": "user_confirmed",
+        "currency": "USD",
+    }
+    return [
+        {
+            **common,
+            "record_id": "portfolio_cash_authority_01",
+            "capital_type": "portfolio_cash_authority",
+            "amount": "",
+            "amount_source": "Portfolio.cash_twd+Portfolio.cash_usd",
+        },
+        {
+            **common,
+            "record_id": "operating_floor_01",
+            "capital_type": "operating_floor",
+            "amount": "1",
+        },
+        {
+            **common,
+            "record_id": "planned_outflows_24m_01",
+            "capital_type": "planned_outflows_reserve_24m",
+            "amount": "0",
+        },
+        {
+            **common,
+            "record_id": "credit_facility_01",
+            "capital_type": "contingent_liquidity_credit_facility",
+            "confirmation_status": "user_confirmed_partial",
+            "limit_amount": credit_limit,
+            "drawn_amount": "0",
+            "annual_rate_pct": "3.1",
+            "interest_accrual": "daily",
+            "availability": "on_demand",
+            "facility_term_years": "30",
+            "repayment_structure": "revolving_draw_repay",
+            "minimum_payment_status": "exists_unverified",
+            "minimum_payment_terms": "",
+            "deployment_mode": "manual_review_only",
+            "automatic_deployment": "FALSE",
+            "include_in_net_investable_capital": "FALSE",
+            "include_in_deployable_cash": "FALSE",
+        },
+    ]
+
+
 def test_signal_state_uses_macd_and_ma_as_pace_guard_not_extra_votes() -> None:
     policy = load_beta_policy()
 
@@ -116,6 +164,62 @@ def test_ranges_share_one_frozen_deployable_cash_budget() -> None:
     )
     assert report["capital_scope"] == "sheet_conservative"
     assert report["policy_mode"] == "paper_observation"
+
+
+def test_household_cash_runs_a_separate_range_without_using_credit() -> None:
+    policy = load_beta_policy()
+    observations = _observations(policy)
+    histories = {key: [value] for key, value in observations.items()}
+
+    report = build_beta_monitor(
+        observations_by_benchmark=observations,
+        history_by_benchmark=histories,
+        holdings_rows=_holdings(cash=10.0),
+        capital_authority_rows=_capital_rows(),
+        as_of=NOW,
+        policy=policy,
+    )
+    larger_credit = build_beta_monitor(
+        observations_by_benchmark=observations,
+        history_by_benchmark=histories,
+        holdings_rows=_holdings(cash=10.0),
+        capital_authority_rows=_capital_rows(credit_limit="999999"),
+        as_of=NOW,
+        policy=policy,
+    )
+
+    assert report["sheet_conservative_range"][1] <= 2.0
+    assert report["household_cash_supported_range"][1] <= 6.0
+    assert report["household_cash_supported_range"][1] >= report["sheet_conservative_range"][1]
+    assert report["household_cash_supported_range"] == larger_credit["household_cash_supported_range"]
+    assert report["contingent_credit_available"]["undrawn_amount_base"] == 1000.0
+    assert report["loan_funded_supported_range"]["status"] == "manual_review_required"
+    assert all(
+        item["supported_order_range_base"] == item["sheet_conservative_order_range_base"]
+        for item in report["items"]
+    )
+
+
+def test_missing_household_authority_does_not_zero_phase_one_range() -> None:
+    policy = load_beta_policy()
+    observations = _observations(policy)
+    histories = {key: [value] for key, value in observations.items()}
+
+    report = build_beta_monitor(
+        observations_by_benchmark=observations,
+        history_by_benchmark=histories,
+        holdings_rows=_holdings(cash=10.0),
+        capital_authority_rows=None,
+        as_of=NOW,
+        policy=policy,
+    )
+
+    assert report["sheet_conservative_range"][1] > 0
+    assert report["household_cash_supported_range"] == [0.0, 0.0]
+    assert "capital_authority_unavailable" in report["blockers"]
+    rendered = render_beta_monitor_markdown(report)
+    assert "Household cash 可部署" in rendered
+    assert "LON:VWRA — observed｜" not in rendered
 
 
 def test_leverage_effective_cap_binds_even_when_signal_is_extreme() -> None:
