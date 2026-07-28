@@ -33,6 +33,43 @@ def test_reregister_does_not_clobber_status_or_triage() -> None:
     assert store["leads"][lead_id]["triage"]["decision"] == "go"
 
 
+def test_reregister_enriches_full_text_and_media_without_clobbering_state() -> None:
+    store = leads.empty_store()
+    full = ("第一段 " + ("完整 roundup 內容 " * 20)).strip()
+    short = full[:140]
+    lead_id, _ = leads.register(
+        store, source="x:author", url="https://x.com/author/status/1", title=short
+    )
+    leads.triage(store, lead_id, go=True, tier=3, reason="值得追源")
+
+    again_id, is_new = leads.register(
+        store,
+        source="x:author",
+        url="https://x.com/author/status/1",
+        title=full,
+        raw_text=full.replace(" ", "\n", 1),
+        media=[{
+            "media_key": "3_1",
+            "type": "photo",
+            "url": "https://pbs.twimg.com/media/one.jpg",
+            "cache": {
+                "local_path": "library/private/lead_media/lead_1/3_1.jpg",
+                "sha256": "a" * 64,
+                "bytes": 12,
+                "content_type": "image/jpeg",
+            },
+        }],
+    )
+
+    lead = store["leads"][lead_id]
+    assert again_id == lead_id and is_new is False
+    assert lead["status"] == "triaged_go"
+    assert lead["triage"]["reason"] == "值得追源"
+    assert lead["title"] == full
+    assert "\n" in lead["raw_text"]
+    assert lead["media"][0]["cache"]["bytes"] == 12
+
+
 def test_register_rejects_empty_source_and_url() -> None:
     store = leads.empty_store()
     with pytest.raises(ValueError):
@@ -239,6 +276,15 @@ def test_save_load_round_trip(tmp_path: Path) -> None:
 def test_load_missing_returns_empty_skeleton(tmp_path: Path) -> None:
     store = leads.load(tmp_path / "nope.json")
     assert store == leads.empty_store()
+
+
+def test_load_lazily_migrates_v1_store_to_v2(tmp_path: Path) -> None:
+    path = tmp_path / "pending_leads.json"
+    path.write_text(
+        json.dumps({"schema_version": "1", "leads": {}, "harvest_log": []}),
+        encoding="utf-8",
+    )
+    assert leads.load(path)["schema_version"] == "2"
 
 
 def test_status_counts(tmp_path: Path) -> None:

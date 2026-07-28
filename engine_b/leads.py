@@ -18,7 +18,8 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import urlsplit, urlunsplit
 
-SCHEMA_VERSION = "1"
+SCHEMA_VERSION = "2"
+_SUPPORTED_SCHEMA_VERSIONS = frozenset({"1", SCHEMA_VERSION})
 
 _ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_LEADS_PATH = _ROOT / "library" / "leads" / "pending_leads.json"
@@ -92,7 +93,11 @@ def load(path: Path | str = DEFAULT_LEADS_PATH) -> dict[str, Any]:
     data = json.loads(p.read_text(encoding="utf-8"))
     if not isinstance(data, dict) or "leads" not in data:
         raise ValueError(f"leads store 格式非法：{p}")
-    data.setdefault("schema_version", SCHEMA_VERSION)
+    version = str(data.get("schema_version") or "1")
+    if version not in _SUPPORTED_SCHEMA_VERSIONS:
+        raise ValueError(f"leads store schema_version 不支援：{version}")
+    # v2 只有 additive fields（raw_text／media），舊資料可 lazy migration。
+    data["schema_version"] = SCHEMA_VERSION
     data.setdefault("leads", {})
     data.setdefault("harvest_log", [])
     # 各來源的增量抓取狀態（如 X 的 since_id／user_id 快取）。X API 是
@@ -142,33 +147,116 @@ def register(
     source: str,
     url: str,
     title: str = "",
+    raw_text: str | None = None,
+    media: list[dict[str, Any]] | None = None,
     published_at: str | None = None,
     seen_at: str | None = None,
 ) -> tuple[str, bool]:
-    """以 URL-hash upsert 一筆 lead。冪等：已存在則不覆寫既有狀態／triage。
+    """以 URL-hash upsert 一筆 lead；重抓只補內容，不覆寫狀態／triage。
 
     回傳 (lead_id, is_new)。這是 harvest 去重的唯一入口——同一 URL 重複
-    harvest 只註冊一次，狀態不倒退。
+    harvest 只註冊一次，狀態不倒退。X 等可取得全文的來源以 raw_text 保存
+    原始換行，title 只做空白正規化；media 保存來源 metadata 與 private cache ref。
     """
     source = (source or "").strip()
     if not source:
         raise ValueError("lead 必須註明 source")
     lead_id = lead_id_for(url)
     leads = store["leads"]
+    clean_title = (title or "").strip()
+    clean_media = _clean_media(media)
     if lead_id in leads:
+        lead = leads[lead_id]
+        enriched = False
+        old_title = str(lead.get("title") or "")
+        if (
+            clean_title
+            and len(clean_title) > len(old_title)
+            and clean_title.startswith(old_title)
+        ):
+            lead["title"] = clean_title
+            enriched = True
+        if raw_text is not None:
+            incoming_raw = str(raw_text)
+            old_raw = lead.get("raw_text")
+            if old_raw is None or (
+                len(incoming_raw) > len(str(old_raw))
+                and incoming_raw.startswith(str(old_raw))
+            ):
+                lead["raw_text"] = incoming_raw
+                enriched = True
+        if media is not None:
+            merged = _merge_media(lead.get("media") or [], clean_media)
+            if "media" not in lead or merged != lead.get("media"):
+                lead["media"] = merged
+                enriched = True
+        if not lead.get("published_at") and published_at:
+            lead["published_at"] = published_at
+            enriched = True
+        if enriched:
+            lead["content_updated_at"] = _now()
         return lead_id, False
-    leads[lead_id] = {
+    lead = {
         "lead_id": lead_id,
         "source": source,
         "url": url.strip(),
-        "title": (title or "").strip(),
+        "title": clean_title,
         "published_at": published_at,
         "first_seen": seen_at or _now(),
         "status": "pending",
         "triage": None,
         "refs": {},
     }
+    if raw_text is not None:
+        lead["raw_text"] = str(raw_text)
+    if media is not None:
+        lead["media"] = clean_media
+    leads[lead_id] = lead
     return lead_id, True
+
+
+def _clean_media(media: list[dict[str, Any]] | None) -> list[dict[str, Any]]:
+    if media is None:
+        return []
+    if not isinstance(media, list):
+        raise ValueError("lead media 必須是 list")
+    allowed = {
+        "media_key", "type", "url", "preview_image_url", "alt_text",
+        "width", "height", "duration_ms",
+    }
+    cache_allowed = {"local_path", "sha256", "bytes", "content_type"}
+    cleaned: list[dict[str, Any]] = []
+    for raw in media:
+        if not isinstance(raw, dict) or not raw.get("media_key"):
+            raise ValueError("每筆 media 必須有 media_key")
+        item = {key: raw[key] for key in allowed if raw.get(key) is not None}
+        item["media_key"] = str(raw["media_key"])
+        cache = raw.get("cache")
+        if cache is not None:
+            if not isinstance(cache, dict):
+                raise ValueError("media cache 必須是 object")
+            item["cache"] = {
+                key: cache[key] for key in cache_allowed if cache.get(key) is not None
+            }
+        cleaned.append(item)
+    return cleaned
+
+
+def _merge_media(
+    existing: list[dict[str, Any]], incoming: list[dict[str, Any]]
+) -> list[dict[str, Any]]:
+    """依 media_key enrich，保留既有 cache，順序以最新 API attachments 為準。"""
+    old_by_key = {str(item.get("media_key")): item for item in existing}
+    merged: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for item in incoming:
+        key = str(item["media_key"])
+        combined = dict(old_by_key.get(key) or {})
+        combined.update(item)
+        merged.append(combined)
+        seen.add(key)
+    merged.extend(item for key, item in old_by_key.items() if key not in seen)
+    return merged
 
 
 def _require(store: dict[str, Any], lead_id: str) -> dict[str, Any]:

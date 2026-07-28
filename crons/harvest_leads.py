@@ -1,7 +1,8 @@
 """harvest_leads.py — 每日 harvest：RSS feeds ＋ EDGAR watch filings → pending leads。
 
-零 LLM token（純 HTTP＋解析）。只註冊 metadata，不下載 filing 全文、不 triage、
-不入圖（那些分別由 signal-triage、使用者點名 research、Research Action 核准負責）。
+零 LLM token（純 HTTP＋解析）。X 保存全文、media metadata 與 private 圖片快取；
+EDGAR 不下載 filing 全文。此步不 triage、不入圖（那些分別由 signal-triage、
+使用者點名 research、Research Action 核准負責）。
 
 誠實降級（plan R4）：每個 source 各記一筆 harvest_log（ok／fetch_failed／
 parse_failed）；解析失敗 ≠ 無新文，brief 會據此提示 fallback。
@@ -14,6 +15,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 from urllib.error import URLError
@@ -26,7 +28,9 @@ sys.path.insert(0, str(ROOT))
 from engine_b import leads  # noqa: E402
 
 DEFAULT_CONFIG_PATH = ROOT / "crons" / "harvest_config.json"
+DEFAULT_MEDIA_ROOT = ROOT / "library" / "private" / "lead_media"
 _UA = "StockBotv2 daily-harvest (research; contact c3035281@gmail.com)"
+_X_STATUS_URL = re.compile(r"^https://x\.com/([^/]+)/status/(\d+)$")
 
 
 def load_local_env(path: Path | str = ROOT / ".env") -> None:
@@ -142,6 +146,8 @@ def _register_all(store: dict, source: str, items: list[dict], seen_at: str | No
                 source=source,
                 url=item["url"],
                 title=item.get("title", ""),
+                raw_text=item.get("raw_text"),
+                media=item.get("media"),
                 published_at=item.get("published_at"),
                 seen_at=seen_at,
             )
@@ -172,6 +178,66 @@ def harvest_feeds(config: dict, store: dict, *, seen_at: str | None = None) -> N
         new = _register_all(store, source, items, seen_at)
         leads.record_run(store, source=source, result="ok", new=new, run_at=seen_at)
         print(f"[harvest] {source} ok: {new} new / {len(items)} items")
+
+
+def _cache_x_media(
+    post_media: list[dict],
+    *,
+    lead_id: str,
+    section: dict,
+    x_api,
+) -> list[dict]:
+    """保存 media metadata；啟用時把圖片／影片預覽 fail-soft 快取到 private。"""
+    output: list[dict] = []
+    cache_enabled = bool(section.get("cache_media", False))
+    default_max = getattr(x_api, "DEFAULT_MEDIA_MAX_BYTES", 20 * 1024 * 1024)
+    max_bytes = int(section.get("media_max_bytes", default_max))
+    for raw in post_media:
+        item = dict(raw)
+        source_url = (
+            item.get("url")
+            if item.get("type") == "photo"
+            else item.get("preview_image_url") or item.get("url")
+        )
+        if cache_enabled and source_url and item.get("media_key"):
+            try:
+                cache = x_api.download_media_image(
+                    source_url,
+                    DEFAULT_MEDIA_ROOT / lead_id,
+                    str(item["media_key"]),
+                    max_bytes=max_bytes,
+                )
+                cache_path = Path(cache.pop("path")).resolve()
+                cache["local_path"] = cache_path.relative_to(ROOT.resolve()).as_posix()
+                item["cache"] = cache
+            except (x_api.XApiError, OSError, ValueError) as exc:
+                print(
+                    f"[harvest] x media cache_failed: {lead_id} "
+                    f"{item.get('media_key')} {exc}",
+                    file=sys.stderr,
+                )
+        output.append(item)
+    return output
+
+
+def _x_post_item(handle: str, post: dict, section: dict, x_api) -> dict:
+    url = x_api.post_url(handle, post["id"])
+    raw_text = str(post.get("text") or "")
+    lead_id = leads.lead_id_for(url)
+    return {
+        "url": url,
+        # title 是可搜尋／可排序的單行全文，不再做 140 字截斷。
+        "title": " ".join(raw_text.split()),
+        # raw_text 保存 X 回傳的逐字內容與換行，供後續 atomic claim 拆解。
+        "raw_text": raw_text,
+        "media": _cache_x_media(
+            list(post.get("media") or []),
+            lead_id=lead_id,
+            section=section,
+            x_api=x_api,
+        ),
+        "published_at": post.get("created_at"),
+    }
 
 
 def harvest_x(config: dict, store: dict, *, seen_at: str | None = None) -> None:
@@ -221,14 +287,7 @@ def harvest_x(config: dict, store: dict, *, seen_at: str | None = None) -> None:
             print(f"[harvest] {source} fetch_failed: {exc}", file=sys.stderr)
             continue
 
-        items = [
-            {
-                "url": x_api.post_url(handle, p["id"]),
-                "title": " ".join((p.get("text") or "").split())[:140],
-                "published_at": p.get("created_at"),
-            }
-            for p in posts
-        ]
+        items = [_x_post_item(handle, post, section, x_api) for post in posts]
         new = _register_all(store, source, items, seen_at)
         leads.set_source_state(
             store, source,
@@ -238,6 +297,37 @@ def harvest_x(config: dict, store: dict, *, seen_at: str | None = None) -> None:
         leads.record_run(store, source=source, result="ok", new=new, run_at=seen_at)
         cost = len(posts) * 0.005
         print(f"[harvest] {source} ok: {new} new / {len(posts)} posts (~${cost:.3f})")
+
+
+def refresh_x_lead(config: dict, store: dict, lead_id: str) -> dict:
+    """精準重抓一筆既有 X lead，補全文／media，不推進 since_id 或改狀態。"""
+    lead = store.get("leads", {}).get(lead_id)
+    if lead is None:
+        raise ValueError(f"未知 lead：{lead_id}")
+    match = _X_STATUS_URL.fullmatch(str(lead.get("url") or ""))
+    if not match or not str(lead.get("source") or "").startswith("x:"):
+        raise ValueError(f"不是可 refresh 的 X lead：{lead_id}")
+    handle, post_id = match.groups()
+    section = config.get("x_accounts") or {}
+
+    from fetchers import x_api
+
+    posts = x_api.get_posts_by_ids([post_id])
+    if not posts:
+        raise x_api.XApiError("post_not_found")
+    item = _x_post_item(handle, posts[0], section, x_api)
+    refreshed_id, _is_new = leads.register(
+        store,
+        source=lead["source"],
+        url=item["url"],
+        title=item["title"],
+        raw_text=item["raw_text"],
+        media=item["media"],
+        published_at=item["published_at"],
+    )
+    if refreshed_id != lead_id:
+        raise ValueError("refresh 後 lead identity 不一致")
+    return store["leads"][lead_id]
 
 
 def harvest_edgar(config: dict, store: dict, *, seen_at: str | None = None) -> None:
@@ -285,10 +375,32 @@ def main() -> int:
     ap.add_argument("--config", default=str(DEFAULT_CONFIG_PATH))
     ap.add_argument("--leads", default=str(leads.DEFAULT_LEADS_PATH))
     ap.add_argument("--dry-run", action="store_true", help="只印，不寫檔")
+    ap.add_argument(
+        "--refresh-x-lead",
+        metavar="LEAD_ID",
+        help="只重抓指定既有 X lead，補全文與圖片，不跑一般 harvest",
+    )
     args = ap.parse_args()
 
     config = load_config(args.config)
     store = leads.load(args.leads)
+    if args.refresh_x_lead:
+        if args.dry_run:
+            config.setdefault("x_accounts", {})["cache_media"] = False
+        try:
+            refreshed = refresh_x_lead(config, store, args.refresh_x_lead)
+        except (ValueError, OSError, RuntimeError) as exc:
+            print(f"[harvest] X lead refresh_failed: {exc}", file=sys.stderr)
+            return 1
+        if not args.dry_run:
+            leads.save(store, args.leads)
+        print(
+            f"[harvest] X lead refreshed: {args.refresh_x_lead} "
+            f"text={len(refreshed.get('raw_text') or '')} chars "
+            f"media={len(refreshed.get('media') or [])}"
+        )
+        return 0
+
     before = len(store["leads"])
     run(config, store)
     added = len(store["leads"]) - before

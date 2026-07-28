@@ -131,6 +131,7 @@ fetchers/edgar.py ──────↑                        engine_c/etl_yfin
 **追蹤方案（2026-07-25 已實作並驗證）：**
 - **X API 是主來源（`crons/harvest_leads.py` 的 `harvest_x`）。** 曾經的「SubStack RSS 就夠」前提**已被推翻**：該 feed 至今只有 1 篇 2026-05-19 舊文，但本人在 X 極度活躍（[@aleabitoreddit](https://x.com/aleabitoreddit)，顯示名 Serenity，10 萬+ 追蹤）。**RSS 掃的是錯的表面。** substack feed 已於 2026-07-25 從 `harvest_config.json` 移除（他發長文也會在 X 貼連結）。
 - **X API 成本模型（2026-02 起 pay-per-use）：** 約 **$0.005/則、按回傳貼文數計費、無月費下限**（舊的 $200 Basic 已對新用戶關閉）。成本控制四件套實測有效：`since_id` 增量、`exclude=replies,retweets`、`max_results` 上限、`user_id` 快取。**實測：首抓 23 則 $0.115；立即重跑 0 則 $0.000。** 日常估 $1–2/月。
+- **X 內容保存（2026-07-28 校正）：** 不再把貼文硬截成 140 字。tracked lead 保存單行可搜尋全文 `title` 與保留換行的 `raw_text`；API 同回應請求 `note_tweet` 與 `attachments.media_keys` expansion，media URL／alt text 等 metadata 隨 lead 保存，照片及影片／GIF 預覽另快取至 ignored `library/private/lead_media/`。harvest 不做 OCR，截圖內容仍須在 pq1 依 `source-trace` 追源；同一貼文的文字與圖片維持同一 `origin_event`，不構成獨立佐證。舊 lead 可用 `crons/harvest_leads.py --refresh-x-lead <lead_id>` 精準回填，不做全量昂貴 backfill。
 - **⚠ X harvest 只在本機跑。** `X_BEARER_TOKEN` 刻意只放本機 `.env`；Codex local daily scheduled task 可直接持久化 `since_id`。任何 cloud fallback 都不得抓 X，避免重複計費與擴大計費憑證 blast radius。
 - **已知限制（未修）：** `harvest_x` 不分頁。若新貼文數超過 `max_results`（預設 25），單次只取得部分而 `since_id` 仍前進 → **可能永久漏掉中間那批**。日常每天跑不會觸發；長時間沒跑（估 >2–3 天）再開機時要留意。要修就是加分頁並設總量上限。
 - **來源品質警語：** 該帳號公開宣稱 2026 報酬率 4,502%、推薦標的漲 100–1,000%。這類極端績效宣稱與 L5（單一 lens：偏多頭小市值瓶頸獵手）一致——當**線索來源**用，不當證據。

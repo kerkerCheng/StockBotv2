@@ -13,11 +13,15 @@ Token 只從環境變數讀，絕不寫進 repo、log 或錯誤訊息。
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import os
+import re
+import tempfile
 import urllib.error
 import urllib.parse
 import urllib.request
+from pathlib import Path
 from typing import Any
 
 API_BASE = "https://api.x.com/2"
@@ -25,6 +29,16 @@ _TIMEOUT = 20
 
 # max_results 允許 5–100；預設 25 是成本天花板（正常增量遠低於此）
 DEFAULT_MAX_RESULTS = 25
+DEFAULT_MEDIA_MAX_BYTES = 20 * 1024 * 1024
+
+_MEDIA_HOSTS = frozenset({"pbs.twimg.com"})
+_MEDIA_SUFFIXES = {
+    "image/gif": ".gif",
+    "image/jpeg": ".jpg",
+    "image/png": ".png",
+    "image/webp": ".webp",
+}
+_SAFE_MEDIA_STEM = re.compile(r"^[A-Za-z0-9_-]+$")
 
 
 class XApiError(RuntimeError):
@@ -81,7 +95,7 @@ def get_user_posts(
     exclude_retweets: bool = True,
     token: str | None = None,
 ) -> list[dict[str, Any]]:
-    """取某帳號的貼文（預設只要原創）。回 [{id, text, created_at}]，新到舊。
+    """取某帳號的貼文（預設只要原創），含 long-post 全文與 media metadata。
 
     since_id 存在時只回更新的貼文——這是主要成本控制。
     """
@@ -91,24 +105,137 @@ def get_user_posts(
     ]
     params: dict[str, Any] = {
         "max_results": max(5, min(100, int(max_results))),
-        "tweet.fields": "created_at,public_metrics",
+        "tweet.fields": "created_at,public_metrics,note_tweet,attachments",
+        "expansions": "attachments.media_keys",
+        "media.fields": (
+            "media_key,type,url,preview_image_url,alt_text,width,height,duration_ms"
+        ),
     }
     if exclude:
         params["exclude"] = ",".join(exclude)
     if since_id:
         params["since_id"] = str(since_id)
     payload = _get(f"/users/{user_id}/tweets", params, token)
-    data = payload.get("data") or []
-    return [
+    return _hydrate_posts(payload)
+
+
+def get_posts_by_ids(
+    post_ids: list[str],
+    *,
+    token: str | None = None,
+) -> list[dict[str, Any]]:
+    """精準重取既有貼文，供舊 lead 回填全文／圖片；最多 100 則。"""
+    cleaned = [str(post_id).strip() for post_id in post_ids if str(post_id).strip()]
+    if not cleaned:
+        return []
+    if len(cleaned) > 100 or any(not post_id.isdigit() for post_id in cleaned):
+        raise XApiError("invalid_post_ids")
+    token = token or bearer_token()
+    payload = _get(
+        "/tweets",
         {
-            "id": str(row.get("id")),
-            "text": str(row.get("text") or ""),
-            "created_at": row.get("created_at"),
-            "metrics": row.get("public_metrics") or {},
-        }
-        for row in data
-        if row.get("id")
-    ]
+            "ids": ",".join(cleaned),
+            "tweet.fields": "created_at,public_metrics,note_tweet,attachments",
+            "expansions": "attachments.media_keys",
+            "media.fields": (
+                "media_key,type,url,preview_image_url,alt_text,width,height,duration_ms"
+            ),
+        },
+        token,
+    )
+    return _hydrate_posts(payload)
+
+
+def _hydrate_posts(payload: dict[str, Any]) -> list[dict[str, Any]]:
+    """把 X includes.media 接回各貼文，並以 note_tweet.text 優先。"""
+    media_by_key = {
+        str(item.get("media_key")): item
+        for item in ((payload.get("includes") or {}).get("media") or [])
+        if item.get("media_key")
+    }
+    posts: list[dict[str, Any]] = []
+    for row in payload.get("data") or []:
+        if not row.get("id"):
+            continue
+        note_text = ((row.get("note_tweet") or {}).get("text"))
+        media_keys = ((row.get("attachments") or {}).get("media_keys") or [])
+        posts.append(
+            {
+                "id": str(row["id"]),
+                "text": str(note_text if note_text is not None else row.get("text") or ""),
+                "created_at": row.get("created_at"),
+                "metrics": row.get("public_metrics") or {},
+                "media": [
+                    dict(media_by_key[str(media_key)])
+                    for media_key in media_keys
+                    if str(media_key) in media_by_key
+                ],
+            }
+        )
+    return posts
+
+
+def _validate_media_url(url: str) -> None:
+    parts = urllib.parse.urlsplit(url)
+    if parts.scheme != "https" or (parts.hostname or "").lower() not in _MEDIA_HOSTS:
+        raise XApiError("untrusted_media_url")
+
+
+def download_media_image(
+    url: str,
+    destination_dir: Path | str,
+    stem: str,
+    *,
+    max_bytes: int = DEFAULT_MEDIA_MAX_BYTES,
+) -> dict[str, Any]:
+    """把 X 圖片／影片預覽存進指定 private 目錄，回可稽核 cache metadata。
+
+    只接受 X 官方圖片 CDN、image Content-Type 與固定大小上限；失敗由 harvest
+    fail-soft 處理，不會讓貼文本身消失。
+    """
+    if not _SAFE_MEDIA_STEM.fullmatch(stem):
+        raise XApiError("invalid_media_key")
+    _validate_media_url(url)
+    req = urllib.request.Request(url, headers={"User-Agent": "StockBotv2-harvest/1.0"})
+    try:
+        with urllib.request.urlopen(req, timeout=_TIMEOUT) as resp:  # noqa: S310
+            _validate_media_url(resp.geturl())
+            content_type = (resp.headers.get_content_type() or "").lower()
+            if not content_type.startswith("image/"):
+                raise XApiError("media_not_image")
+            declared = resp.headers.get("Content-Length")
+            if declared and int(declared) > int(max_bytes):
+                raise XApiError("media_too_large")
+            content = resp.read(int(max_bytes) + 1)
+    except XApiError:
+        raise
+    except urllib.error.HTTPError as exc:
+        raise XApiError(f"media_http_{exc.code}") from None
+    except (urllib.error.URLError, OSError, ValueError) as exc:
+        raise XApiError(f"media_transport_error:{type(exc).__name__}") from None
+    if len(content) > int(max_bytes):
+        raise XApiError("media_too_large")
+
+    suffix = _MEDIA_SUFFIXES.get(content_type, ".img")
+    directory = Path(destination_dir)
+    directory.mkdir(parents=True, exist_ok=True)
+    destination = directory / f"{stem}{suffix}"
+    handle = tempfile.NamedTemporaryFile(dir=directory, prefix=f".{stem}.", delete=False)
+    temp_path = Path(handle.name)
+    try:
+        with handle:
+            handle.write(content)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temp_path, destination)
+    finally:
+        temp_path.unlink(missing_ok=True)
+    return {
+        "path": str(destination),
+        "sha256": hashlib.sha256(content).hexdigest(),
+        "bytes": len(content),
+        "content_type": content_type,
+    }
 
 
 def post_url(username: str, post_id: str) -> str:

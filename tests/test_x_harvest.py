@@ -13,7 +13,8 @@ from fetchers import x_api
 
 def _config(**overrides):
     section = {"handles": ["aleabitoreddit"], "exclude_replies": True,
-               "exclude_retweets": True, "max_results": 25}
+               "exclude_retweets": True, "max_results": 25,
+               "cache_media": False}
     section.update(overrides)
     return {"feeds": [], "edgar_watch": {}, "x_accounts": section}
 
@@ -23,6 +24,7 @@ class _FakeApi:
 
     XApiError = x_api.XApiError
     DEFAULT_MAX_RESULTS = 25
+    DEFAULT_MEDIA_MAX_BYTES = 20 * 1024 * 1024
 
     def __init__(self, posts, *, fail=None):
         self.posts = posts
@@ -45,6 +47,21 @@ class _FakeApi:
         if self.fail == "posts":
             raise x_api.XApiError("http_429")
         return self.posts
+
+    def get_posts_by_ids(self, post_ids, **kw):
+        self.calls.append(("posts_by_ids", post_ids, kw))
+        if self.fail == "posts":
+            raise x_api.XApiError("http_429")
+        return self.posts
+
+    def download_media_image(self, url, destination_dir, stem, **kw):
+        self.calls.append(("media", url, destination_dir, stem, kw))
+        return {
+            "path": str(destination_dir / f"{stem}.jpg"),
+            "sha256": "a" * 64,
+            "bytes": 123,
+            "content_type": "image/jpeg",
+        }
 
     post_url = staticmethod(x_api.post_url)
     newest_id = staticmethod(x_api.newest_id)
@@ -102,11 +119,83 @@ def test_harvest_registers_posts_and_persists_since_id(monkeypatch) -> None:
     lead = next(iter(store["leads"].values()))
     assert lead["source"] == "x:aleabitoreddit"
     assert lead["url"].startswith("https://x.com/aleabitoreddit/status/")
-    assert len(lead["title"]) <= 140  # 標題截斷
+    assert len(lead["title"]) > 140
+    assert lead["title"] == " ".join(lead["raw_text"].split())
     # since_id 與 user_id 持久化＝下次只抓新貼文（成本控制）
     state = leads.get_source_state(store, "x:aleabitoreddit")
     assert state["since_id"] == "200" and state["user_id"] == "12345"
     assert store["harvest_log"][-1]["result"] == "ok"
+
+
+def test_harvest_preserves_media_metadata_and_private_cache_ref(monkeypatch) -> None:
+    posts = [{
+        "id": "201",
+        "text": "看截圖\n第二行",
+        "created_at": "2026-07-25T00:00:00Z",
+        "media": [{
+            "media_key": "3_201",
+            "type": "photo",
+            "url": "https://pbs.twimg.com/media/example.jpg",
+            "alt_text": "server memory pricing table",
+        }],
+    }]
+    fake = _FakeApi(posts)
+    _install(monkeypatch, fake)
+    store = leads.empty_store()
+
+    harvest_leads.harvest_x(_config(cache_media=True), store)
+
+    lead = next(iter(store["leads"].values()))
+    assert lead["raw_text"] == "看截圖\n第二行"
+    assert lead["title"] == "看截圖 第二行"
+    assert lead["media"][0]["alt_text"] == "server memory pricing table"
+    assert lead["media"][0]["cache"] == {
+        "local_path": (
+            "library/private/lead_media/"
+            f"{lead['lead_id']}/3_201.jpg"
+        ),
+        "sha256": "a" * 64,
+        "bytes": 123,
+        "content_type": "image/jpeg",
+    }
+    assert any(call[0] == "media" for call in fake.calls)
+
+
+def test_x_client_hydrates_note_tweet_and_media(monkeypatch) -> None:
+    def fake_get(path, params, token):
+        assert path == "/users/123/tweets"
+        assert "note_tweet" in params["tweet.fields"]
+        assert params["expansions"] == "attachments.media_keys"
+        assert "alt_text" in params["media.fields"]
+        assert token == "token"
+        return {
+            "data": [{
+                "id": "900",
+                "text": "truncated…",
+                "note_tweet": {"text": "完整長文\n第二行"},
+                "attachments": {"media_keys": ["3_900"]},
+            }],
+            "includes": {"media": [{
+                "media_key": "3_900",
+                "type": "photo",
+                "url": "https://pbs.twimg.com/media/full.jpg",
+            }]},
+        }
+
+    monkeypatch.setattr(x_api, "_get", fake_get)
+    posts = x_api.get_user_posts("123", token="token")
+    assert posts[0]["text"] == "完整長文\n第二行"
+    assert posts[0]["media"][0]["media_key"] == "3_900"
+
+
+def test_x_client_can_refresh_exact_post_id(monkeypatch) -> None:
+    def fake_get(path, params, token):
+        assert path == "/tweets"
+        assert params["ids"] == "900"
+        return {"data": [{"id": "900", "text": "full"}]}
+
+    monkeypatch.setattr(x_api, "_get", fake_get)
+    assert x_api.get_posts_by_ids(["900"], token="token")[0]["text"] == "full"
 
 
 def test_second_run_sends_since_id_and_skips_user_lookup(monkeypatch) -> None:
@@ -161,6 +250,40 @@ def test_repeat_harvest_is_idempotent(monkeypatch) -> None:
     harvest_leads.harvest_x(_config(), store)
     harvest_leads.harvest_x(_config(), store)  # 同一則再回傳一次
     assert len(store["leads"]) == 1  # URL-hash 去重
+
+
+def test_refresh_exact_x_lead_enriches_content_without_changing_status(monkeypatch) -> None:
+    fake = _FakeApi([{
+        "id": "200",
+        "text": "完整 roundup\n- claim A\n- claim B",
+        "created_at": "2026-07-25T00:00:00Z",
+        "media": [],
+    }])
+    _install(monkeypatch, fake)
+    store = leads.empty_store()
+    lead_id, _ = leads.register(
+        store,
+        source="x:aleabitoreddit",
+        url="https://x.com/aleabitoreddit/status/200",
+        title="完整 roundup",
+    )
+    leads.triage(store, lead_id, go=True, tier=3, reason="roundup")
+
+    refreshed = harvest_leads.refresh_x_lead(_config(), store, lead_id)
+
+    assert refreshed["raw_text"].endswith("claim B")
+    assert refreshed["title"].endswith("claim B")
+    assert refreshed["media"] == []
+    assert refreshed["status"] == "triaged_go"
+    assert refreshed["triage"]["reason"] == "roundup"
+    assert ("posts_by_ids", ["200"], {}) in fake.calls
+
+
+def test_media_downloader_rejects_non_x_cdn_without_network(tmp_path) -> None:
+    with pytest.raises(x_api.XApiError, match="untrusted_media_url"):
+        x_api.download_media_image(
+            "https://example.com/screenshot.jpg", tmp_path, "3_1"
+        )
 
 
 # --- config ---------------------------------------------------------------
