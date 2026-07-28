@@ -520,6 +520,18 @@
       "source": "decision_lab",
       "title": "REVIEW — co:sivers_semiconductors",
       "type": "decision_review"
+    },
+    {
+      "added_at": "2026-07-28T22:45:53.987413+00:00",
+      "hint": "核准 exact Research Action 與 digest 後 apply；不自動入圖",
+      "n": 43,
+      "reason": null,
+      "ref_id": "ra_a09b6e59fa7334b37e9a8412821da29f",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "AXT／Casela 2027 InP 長約待核准入圖",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -800,6 +812,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 43,
+  "next_n": 44,
   "schema_version": "1"
 }

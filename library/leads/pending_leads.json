@@ -713,6 +713,114 @@
       "result": "ok",
       "run_at": "2026-07-27T22:31:57.627741+00:00",
       "source": "edgar:GFS"
+    },
+    {
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-28T22:33:23.885086+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-28T22:33:24.459500+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-28T22:33:24.879385+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-28T22:33:25.313534+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-28T22:33:25.718743+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-28T22:33:26.141891+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-28T22:33:26.565143+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-28T22:33:26.999782+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-28T22:33:27.435758+00:00",
+      "source": "edgar:GFS"
+    },
+    {
+      "new": 2,
+      "result": "ok",
+      "run_at": "2026-07-28T22:33:39.749970+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-28T22:33:40.773421+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-28T22:33:41.672965+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-28T22:33:42.566962+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-28T22:33:43.454750+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-28T22:33:44.377224+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-28T22:33:45.324704+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-28T22:33:46.191491+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-28T22:33:47.049170+00:00",
+      "source": "edgar:GFS"
     }
   ],
   "leads": {
@@ -1507,9 +1615,14 @@
       "first_seen": "2026-07-22T15:37:22.502741+00:00",
       "lead_id": "lead_7b9c116e84b64ff60100e1157c2e398e",
       "published_at": "2026-06-22",
-      "refs": {},
+      "refs": {
+        "outcome": "governance_only_no_graph_delta",
+        "research_run": "daily_2026-07-29",
+        "source_doc": "axti_8_k_20260622_board_appointment",
+        "trace_status": "original_obtained"
+      },
       "source": "edgar:AXTI",
-      "status": "triaged_go",
+      "status": "parked",
       "title": "AXTI 8-K filed 2026-06-22",
       "triage": {
         "decided_at": "2026-07-25T03:52:34.713737+00:00",
@@ -1660,6 +1773,27 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/707549/000119063926000004/xslF345X06/wk-form4_1781540828.xml"
     },
+    "lead_8e16834b3c423735ad20eb6f6be7d63b": {
+      "first_seen": "2026-07-28T22:33:39.749915+00:00",
+      "lead_id": "lead_8e16834b3c423735ad20eb6f6be7d63b",
+      "media": [],
+      "published_at": "2026-07-28T22:25:27.000Z",
+      "raw_text": "I personally see it as extreme short term deleveraging that overshot many individual names. \n\n- $BE to $TER reported blowout results, with Bloom reporting 166% Y/Y rev growth + expanding margins + raised 2026 guidance... Teradyne reported 104% Y/Y revenue growth with 300%+ EPS growth. \n\nYour leading optical players over in China reported amazing preliminary earnings + extremely strong read through for the Western photonics sector. \n\nThink earnings season tend to remind markets about continued AI acceleration. I'm expecting $LITE, $SNDK / SK Hynix, and sector leader ERs to continue that trend.   \n\nBut it does feel like markets are rewarding existing acceleration more rather than future growth a year out over near-term revisions as seen with $AMKR. \n\nBut as a TLDR, looks very positive for the themes I'm tracking.  \n\n- Then you have $GOOGL capex raised to $195-$205B, which is typically the biggest AI demand signal from hyperscalers. \n\n- 77% 0bps change est. next FOMC decision from prediction markets. Trump administration on Monday called for the Fed to lower interest rates. \n\nSo your 3x rate hikes fears this year seem kinda overblown. \n\n- Chinese fears from DUV to $CXMT overflooding are extremely overblown as well. We see this with every sector from time to time until people remember that lasers or HBM bottlenecks for a reason. \n\nAs for personal thoughts, it was unhealthy seeing everything rise up or down together, especially with these themes. But I'm personally not worried since I have full conviction in my names, especially optical interconnects like $SIVE or $AAOI. \n\n$META compute and $GOOGL GCP margins/growth shows increasing demand for $NBIS and similar neocloud business models. \n\n$META + other hyperscaler notes around LTAs with $SNDK and Samsung/SK Hynix, $MU point to structural memory demand. \n\nCan go on and on... \n\nBut when you have Jim Cramer telling every margined DC trader to \"sell everything\" at market open and news saying there's an AI bubble. \n\nI do hate it when others say \"it's dropping so sell\". My belief is that the important thing to look is accelerating revenue/EPS growth. And if that thesis stays in-tact with revenue acceleration in line with hyperscaler capex. \n\nTLDR: I see signs of AI demand / revenue acceleration, hyperscaler capex is one of the most important things to track. \n\nAnd my guess is that we'll see the theme recover broadly. But I can't predict what hour, day, or week that happens.",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_go",
+      "title": "I personally see it as extreme short term deleveraging that overshot many individual names. - $BE to $TER reported blowout results, with Bloom reporting 166% Y/Y rev growth + expanding margins + raised 2026 guidance... Teradyne reported 104% Y/Y revenue growth with 300%+ EPS growth. Your leading optical players over in China reported amazing preliminary earnings + extremely strong read through for the Western photonics sector. Think earnings season tend to remind markets about continued AI acceleration. I'm expecting $LITE, $SNDK / SK Hynix, and sector leader ERs to continue that trend. But it does feel like markets are rewarding existing acceleration more rather than future growth a year out over near-term revisions as seen with $AMKR. But as a TLDR, looks very positive for the themes I'm tracking. - Then you have $GOOGL capex raised to $195-$205B, which is typically the biggest AI demand signal from hyperscalers. - 77% 0bps change est. next FOMC decision from prediction markets. Trump administration on Monday called for the Fed to lower interest rates. So your 3x rate hikes fears this year seem kinda overblown. - Chinese fears from DUV to $CXMT overflooding are extremely overblown as well. We see this with every sector from time to time until people remember that lasers or HBM bottlenecks for a reason. As for personal thoughts, it was unhealthy seeing everything rise up or down together, especially with these themes. But I'm personally not worried since I have full conviction in my names, especially optical interconnects like $SIVE or $AAOI. $META compute and $GOOGL GCP margins/growth shows increasing demand for $NBIS and similar neocloud business models. $META + other hyperscaler notes around LTAs with $SNDK and Samsung/SK Hynix, $MU point to structural memory demand. Can go on and on... But when you have Jim Cramer telling every margined DC trader to \"sell everything\" at market open and news saying there's an AI bubble. I do hate it when others say \"it's dropping so sell\". My belief is that the important thing to look is accelerating revenue/EPS growth. And if that thesis stays in-tact with revenue acceleration in line with hyperscaler capex. TLDR: I see signs of AI demand / revenue acceleration, hyperscaler capex is one of the most important things to track. And my guess is that we'll see the theme recover broadly. But I can't predict what hour, day, or week that happens.",
+      "triage": {
+        "decided_at": "2026-07-28T22:34:59.195565+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "直接命中 LITE、SIVE、AAOI 與 optical interconnect／hyperscaler capex；含營收成長與 GOOGL capex 等可逐字追查數字。作者推論不作證據，送 pq1 追回公司 filing／IR。",
+        "tier": 3
+      },
+      "url": "https://x.com/aleabitoreddit/status/2082230983487803755"
+    },
     "lead_91566124ed7104cd67577f995d19c83f": {
       "first_seen": "2026-07-22T15:37:21.356633+00:00",
       "lead_id": "lead_91566124ed7104cd67577f995d19c83f",
@@ -1676,6 +1810,52 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/707549/000196659826000004/xslF345X06/wk-form4_1780416309.xml"
+    },
+    "lead_98f8189824f53a0f3b6a58e79133dc6b": {
+      "first_seen": "2026-07-28T22:33:39.749946+00:00",
+      "lead_id": "lead_98f8189824f53a0f3b6a58e79133dc6b",
+      "media": [
+        {
+          "cache": {
+            "bytes": 112800,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_98f8189824f53a0f3b6a58e79133dc6b/3_2082175250431938560.jpg",
+            "sha256": "1c8514980074fc38fabb9ea10d2faa32ae65fba9c695816df466e7917605b252"
+          },
+          "height": 632,
+          "media_key": "3_2082175250431938560",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HOVfW8IbEAAinqE.jpg",
+          "width": 1236
+        },
+        {
+          "cache": {
+            "bytes": 81646,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_98f8189824f53a0f3b6a58e79133dc6b/3_2082175458846887936.jpg",
+            "sha256": "87c1c74385b39e8a5d3a2f008017cc290e67c8a185d616b9f5cbbcd8d155ba15"
+          },
+          "height": 1062,
+          "media_key": "3_2082175458846887936",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HOVfjEia0AA6_qr.jpg",
+          "width": 1034
+        }
+      ],
+      "published_at": "2026-07-28T18:45:19.000Z",
+      "raw_text": "FCC set to ban Chinese imports of humanoid and quadruped robots per Reuters.  \n\nTo protect American Humanoid/Robotics programs.\n\nAgility Robotics ( $CCXI ) and other US humanoid players should be happy to hear this. https://t.co/s2dFWTA4EX",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "title": "FCC set to ban Chinese imports of humanoid and quadruped robots per Reuters. To protect American Humanoid/Robotics programs. Agility Robotics ( $CCXI ) and other US humanoid players should be happy to hear this. https://t.co/s2dFWTA4EX",
+      "triage": {
+        "decided_at": "2026-07-28T22:34:59.333868+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "humanoid／quadruped robot 進口禁令與 CCXI 不在目前 CPO／Sivers 追蹤範圍；雖可追 Reuters，但與現行主題關聯性硬指標不足。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2082175588555702410"
     },
     "lead_9c9f51de58d334452a3838d5db8636e1": {
       "first_seen": "2026-07-22T15:37:20.250697+00:00",
@@ -1715,9 +1895,14 @@
       "first_seen": "2026-07-22T15:37:22.502752+00:00",
       "lead_id": "lead_9ff86c00d2d3b0d1bcfedc009510393f",
       "published_at": "2026-06-17",
-      "refs": {},
+      "refs": {
+        "action_digest": "b407220e00aa386b96527b9a971a51756646fbb68214ee6e9d87fc9ac1348137",
+        "research_action_id": "ra_a09b6e59fa7334b37e9a8412821da29f",
+        "research_run": "daily_2026-07-29",
+        "trace_status": "original_obtained"
+      },
       "source": "edgar:AXTI",
-      "status": "triaged_go",
+      "status": "action_prepared",
       "title": "AXTI 8-K filed 2026-06-17",
       "triage": {
         "decided_at": "2026-07-25T03:52:34.713741+00:00",
@@ -2529,8 +2714,8 @@
   "schema_version": "2",
   "source_state": {
     "x:aleabitoreddit": {
-      "since_id": "2081579593815978273",
-      "updated_at": "2026-07-27T22:31:49.732009+00:00",
+      "since_id": "2082230983487803755",
+      "updated_at": "2026-07-28T22:33:39.749965+00:00",
       "user_id": "1940360837547565056"
     }
   }
