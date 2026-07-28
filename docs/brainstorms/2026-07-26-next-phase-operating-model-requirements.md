@@ -70,7 +70,10 @@
 - Phase I 已定：14 商品／11 series、五類監控分類、technical state／pace、Sheet reserve、stacked-leverage／tech
   proxy／known issuer cap 與 sequential contribution routing；全部維持 `paper_observation`。
 - Phase II 未定：household capital authority、完整 point-in-time ETF look-through、live policy promotion、
-  explicit-fill-only Sheet narrow-write contract與 server promotion。
+  explicit-fill-only Sheet narrow-write contract與 server promotion。另保留 zero-code-first 的問答型 LLM advisory：
+  只在使用者明確提問時讀 beta monitor／Sheet aggregate 並按需補抓最新客觀資料，直接回答 rough scenario／替代策略；
+  不跑每日 LLM 研究、不建 graph／新 authority、不自動進 pq，也不得放寬 deterministic hard caps。只有重複取數摩擦
+  證明值得開發時，才考慮唯讀 compact context composer。
 - 不可偷渡：持有一檔股票不自動等於建立 alpha cohort；ETF 不走 company onboarding；beta 急跌不自動等於買進。
 
 ### Workstream B — Paywall ROI／合法手動入口

@@ -62,6 +62,10 @@ completed: 2026-07-28
   Decision Store reconciliation receipt。
 - 只有本機常離線且不能接受補跑、需要 intraday／各市場收盤即時通知、每日必達 SLA 或雙 provider redundancy，
   才升級最小 always-on market-data worker。
+- 問答型 LLM advisory 採 zero-code-first：只有使用者明確詢問黑天鵝／regime／替代策略時，才讀取 monitor／Sheet
+  aggregate 並按需補抓最新客觀資料後直接回答。它不跑每日 LLM 研究、不建 Engine A 式 graph／claim pipeline、
+  不新增 current-state authority 或自動 pq，也不得改動 deterministic hard caps。只有重複取數摩擦被實測證明後，
+  才為它另立唯讀 compact context composer implementation unit。
 
 **與本切片無關但保留在 roadmap：** Paywall ROI／合法手動入口、通用 token-efficient Daily runner、其他
 Engine A／B research backlog 繼續以既有 brainstorm／AGENTS 優先序管理；本 plan 只連結，不建立 Phase II
@@ -242,3 +246,5 @@ technical telemetry，直到state machine／look-through／household authority�
   市值合計若對不上NAV即fail closed。
 - 驗證：targeted suites passed；full suite 587 tests passed；skill adapters sync；`git diff --check`通過。
 - Phase II維持本plan「Scope Decision」列出的啟動條件，未建立第二個active implementation scope。
+- 2026-07-28 post-completion clarification：問答型 LLM advisory 已加入 Phase II 邊界，但現階段只是可立即使用的
+  對話行為契約，不回頭改寫 Phase I completion，也不宣稱已有新的自動化模組。

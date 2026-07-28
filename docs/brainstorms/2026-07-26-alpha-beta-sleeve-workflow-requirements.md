@@ -190,9 +190,34 @@ HOLD / PAUSE CONTRIBUTION / CONTRIBUTE REVIEW / STRUCTURAL REVIEW
   待辦編號空間，但不先繞 pq1。使用者 `go` 只記 choice／permission，仍由使用者手動下單並回報 fill。
 - **罕見 pq1 → pq2：** 只有基金更換標的指數、objective、issuer／closure 等事件本身尚未查清時，才建立 bounded
   product-structure research；研究完成後需要採取動作才回 pq2。
+- **使用者問答不進 pq：** 使用者直接問「這次像不像黑天鵝／regime shift」「目前有沒有更好的配置方法」時，
+  LLM 可按需抓取最新客觀資料後直接回答；除非使用者進一步要求修改 policy 或投入 live 資本，否則不建立
+  pq1／pq2、Decision receipt 或持久化研究工作。
 
 所以「標的固定」確實消除了日常研究 pq；但不能消除 live 資本的人工核准。這是 exception-only pq2，
 不是 lead／thesis queue。
+
+### 2026-07-28 問答型 LLM 顧問：列入 Phase II 邊界，但採 zero-code-first
+
+使用者希望保留一個輕量、rough、可持續對話的判讀層：當使用者主動詢問目前下跌是否可能是系統性壓力、
+是否有更合適的投資策略、或某個 deterministic 訊號應如何解讀時，LLM 可讀取當下 beta monitor／Sheet aggregate，
+並按問題需要補抓市場、信用、波動、政策或事件等最新客觀資料後直接回答。
+
+這個能力不建立第五個 engine，也不複製 Engine A 的 graph／claim／Research Action 複雜度。候選 contract 為：
+
+1. **只由明確提問觸發**：不加入每日固定 LLM 研究，不因一般 `HOLD`／technical telemetry 自動產生評論。
+2. **資料可多抓、狀態不必多存**：回答 current／latest 問題時必須使用帶時間戳的最新來源；預設只在對話中
+   組合證據，不建立圖節點、thesis lifecycle 或新的 current-state authority。
+3. **回答而非拍板**：輸出可包含 rough scenario、支持／反方解釋、組合影響與 policy-compatible alternatives；
+   「黑天鵝」不作二元事實分類，改用 `normal pullback / regime shift suspected / systemic stress suspected /
+   event shock / high ambiguity` 等帶不確定性的語言。
+4. **不得改 hard cap**：LLM 建議不能提高 Sheet／household deployable cash、campaign budget、leverage、factor、
+   single-company ceiling，也不能推定 choice／fill；若使用者要採取 live 動作，仍回既有 Engine D 人工邊界。
+5. **只有重複摩擦才寫 helper**：若後續反覆需要同一組 portfolio／technical／macro context，Phase II 才考慮
+   一支唯讀 compact context composer；在此之前直接問答即可，不為了形式完整先建 schema、queue 或新 pipeline。
+
+因此這項目在 roadmap 上與 household authority／look-through 一起列為 Phase II clarification，但使用者現在已可
+直接提問，不需等 Phase II 工程完成。只有當它變成穩定、重複、可驗收的資料組裝需求，才另立 implementation unit。
 
 ### 3x 定位定案方向：可投資的 `beta_leverage` 衛星，不是主力
 
