@@ -436,13 +436,71 @@
     {
       "added_at": "2026-07-27T14:46:57.350563+00:00",
       "dispatch_baseline_decision_id": "pd_f48b4cb31d2a2b883f4abed022972716",
-      "dispatch_receipt": "packet:C:\\Users\\Cheng\\code\\StockBotv2\\library\\private\\decision_lab\\daily_gap_research_2026-07-28.json#wo_23faa9def046e05bc23bdb5735bb774f",
+      "dispatch_receipt": "decision:pd_ce5c1b9396dadafb9b238be8b6f44dcb",
       "dispatch_ref": "wo_23faa9def046e05bc23bdb5735bb774f",
-      "dispatch_status": "awaiting_approval",
-      "dispatch_updated_at": "2026-07-27T22:39:39.297895+00:00",
+      "dispatch_status": "completed",
+      "dispatch_updated_at": "2026-07-28T01:09:48.908255+00:00",
       "dispatched_at": "2026-07-27T15:23:22.085910+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 37,
+      "reason": "Engine C observations 已核准寫入；以新 context／assessment 完成 research-intent reassess，系統仍為 REVIEW",
+      "receipt": "decision:pd_ce5c1b9396dadafb9b238be8b6f44dcb",
+      "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
+      "resolution": "go",
+      "resolved_at": "2026-07-28T01:09:48.908255+00:00",
+      "source": "decision_lab",
+      "title": "REVIEW — co:applied_optoelectronics",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-07-27T14:46:57.350607+00:00",
+      "dispatch_baseline_decision_id": "pd_11ec8776b62cc368c5549c3d7ce7833c",
+      "dispatch_receipt": "decision:pd_343e33c5c1cf6637d77a9b2eb41b58ea",
+      "dispatch_ref": "wo_a3e54af91361c3babb82b9d66e2d0ace",
+      "dispatch_status": "completed",
+      "dispatch_updated_at": "2026-07-28T01:10:02.280261+00:00",
+      "dispatched_at": "2026-07-27T15:23:22.097954+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 38,
+      "reason": "Engine C observations 已核准寫入；保留 source_under_audit／pipeline caveat，以新 context／assessment 完成 research-intent reassess，系統仍為 REVIEW",
+      "receipt": "decision:pd_343e33c5c1cf6637d77a9b2eb41b58ea",
+      "ref_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
+      "resolution": "go",
+      "resolved_at": "2026-07-28T01:10:02.280261+00:00",
+      "source": "decision_lab",
+      "title": "REVIEW — co:sivers_semiconductors",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-07-27T22:39:41.049773+00:00",
+      "hint": "核准 packet 中 AAOI 兩筆 append-only manual observations；核准後 research-intent reassess，無 graph／paper／live 動作",
+      "n": 39,
+      "reason": "使用者核准 AAOI 兩筆 Engine C append-only observations；已完成 research-intent reassess",
+      "receipt": "engine_c_manual:mo_2097874593f8efcdf64f6be17ae37887+mo_7935887a5894f80a52fe8a501451f06b;decision:pd_ce5c1b9396dadafb9b238be8b6f44dcb",
+      "ref_id": "engine_c_manual:wo_23faa9def046e05bc23bdb5735bb774f",
+      "resolution": "go",
+      "resolved_at": "2026-07-28T01:09:24.663496+00:00",
+      "source": "manual",
+      "title": "ENGINE C APPROVAL — AAOI customer concentration／backlog",
+      "type": "manual"
+    },
+    {
+      "added_at": "2026-07-27T22:39:41.592821+00:00",
+      "hint": "核准 packet 中 SIVE.ST 兩筆 append-only manual observations；保留 source_under_audit 警語，核准後 research-intent reassess，無 thesis／graph／paper／live 動作",
+      "n": 40,
+      "reason": "使用者核准 SIVE.ST 兩筆 Engine C append-only observations；保留 source_under_audit／pipeline caveat，已完成 research-intent reassess",
+      "receipt": "engine_c_manual:mo_2860c1f15d6e8ecd918f1dd65b01a637+mo_570bbd26d2478185eb88fdc0962c0a35;decision:pd_343e33c5c1cf6637d77a9b2eb41b58ea",
+      "ref_id": "engine_c_manual:wo_a3e54af91361c3babb82b9d66e2d0ace",
+      "resolution": "go",
+      "resolved_at": "2026-07-28T01:09:36.891513+00:00",
+      "source": "manual",
+      "title": "ENGINE C APPROVAL — SIVE.ST customer concentration／backlog",
+      "type": "manual"
+    },
+    {
+      "added_at": "2026-07-28T01:10:21.849151+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 41,
       "reason": null,
       "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
       "resolution": null,
@@ -452,15 +510,9 @@
       "type": "decision_review"
     },
     {
-      "added_at": "2026-07-27T14:46:57.350607+00:00",
-      "dispatch_baseline_decision_id": "pd_11ec8776b62cc368c5549c3d7ce7833c",
-      "dispatch_receipt": "packet:C:\\Users\\Cheng\\code\\StockBotv2\\library\\private\\decision_lab\\daily_gap_research_2026-07-28.json#wo_a3e54af91361c3babb82b9d66e2d0ace",
-      "dispatch_ref": "wo_a3e54af91361c3babb82b9d66e2d0ace",
-      "dispatch_status": "awaiting_approval",
-      "dispatch_updated_at": "2026-07-27T22:39:40.444485+00:00",
-      "dispatched_at": "2026-07-27T15:23:22.097954+00:00",
+      "added_at": "2026-07-28T01:10:21.849173+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
-      "n": 38,
+      "n": 42,
       "reason": null,
       "ref_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
       "resolution": null,
@@ -468,30 +520,6 @@
       "source": "decision_lab",
       "title": "REVIEW — co:sivers_semiconductors",
       "type": "decision_review"
-    },
-    {
-      "added_at": "2026-07-27T22:39:41.049773+00:00",
-      "hint": "核准 packet 中 AAOI 兩筆 append-only manual observations；核准後 research-intent reassess，無 graph／paper／live 動作",
-      "n": 39,
-      "reason": null,
-      "ref_id": "engine_c_manual:wo_23faa9def046e05bc23bdb5735bb774f",
-      "resolution": null,
-      "resolved_at": null,
-      "source": "manual",
-      "title": "ENGINE C APPROVAL — AAOI customer concentration／backlog",
-      "type": "manual"
-    },
-    {
-      "added_at": "2026-07-27T22:39:41.592821+00:00",
-      "hint": "核准 packet 中 SIVE.ST 兩筆 append-only manual observations；保留 source_under_audit 警語，核准後 research-intent reassess，無 thesis／graph／paper／live 動作",
-      "n": 40,
-      "reason": null,
-      "ref_id": "engine_c_manual:wo_a3e54af91361c3babb82b9d66e2d0ace",
-      "resolution": null,
-      "resolved_at": null,
-      "source": "manual",
-      "title": "ENGINE C APPROVAL — SIVE.ST customer concentration／backlog",
-      "type": "manual"
     }
   ],
   "log": [
@@ -716,8 +744,62 @@
       "ref_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
       "type": "decision_review",
       "verb": "pq1_awaiting_approval"
+    },
+    {
+      "at": "2026-07-28T01:09:24.663496+00:00",
+      "n": 39,
+      "reason": "使用者核准 AAOI 兩筆 Engine C append-only observations；已完成 research-intent reassess",
+      "receipt": "engine_c_manual:mo_2097874593f8efcdf64f6be17ae37887+mo_7935887a5894f80a52fe8a501451f06b;decision:pd_ce5c1b9396dadafb9b238be8b6f44dcb",
+      "ref_id": "engine_c_manual:wo_23faa9def046e05bc23bdb5735bb774f",
+      "type": "manual",
+      "verb": "go"
+    },
+    {
+      "at": "2026-07-28T01:09:36.891513+00:00",
+      "n": 40,
+      "reason": "使用者核准 SIVE.ST 兩筆 Engine C append-only observations；保留 source_under_audit／pipeline caveat，已完成 research-intent reassess",
+      "receipt": "engine_c_manual:mo_2860c1f15d6e8ecd918f1dd65b01a637+mo_570bbd26d2478185eb88fdc0962c0a35;decision:pd_343e33c5c1cf6637d77a9b2eb41b58ea",
+      "ref_id": "engine_c_manual:wo_a3e54af91361c3babb82b9d66e2d0ace",
+      "type": "manual",
+      "verb": "go"
+    },
+    {
+      "at": "2026-07-28T01:09:48.908255+00:00",
+      "n": 37,
+      "reason": "Engine C observations 已核准寫入；以新 context／assessment 完成 research-intent reassess，系統仍為 REVIEW",
+      "receipt": "decision:pd_ce5c1b9396dadafb9b238be8b6f44dcb",
+      "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
+      "type": "decision_review",
+      "verb": "pq1_completed"
+    },
+    {
+      "at": "2026-07-28T01:09:48.908255+00:00",
+      "n": 37,
+      "reason": "Engine C observations 已核准寫入；以新 context／assessment 完成 research-intent reassess，系統仍為 REVIEW",
+      "receipt": "decision:pd_ce5c1b9396dadafb9b238be8b6f44dcb",
+      "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
+      "type": "decision_review",
+      "verb": "go"
+    },
+    {
+      "at": "2026-07-28T01:10:02.280261+00:00",
+      "n": 38,
+      "reason": "Engine C observations 已核准寫入；保留 source_under_audit／pipeline caveat，以新 context／assessment 完成 research-intent reassess，系統仍為 REVIEW",
+      "receipt": "decision:pd_343e33c5c1cf6637d77a9b2eb41b58ea",
+      "ref_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
+      "type": "decision_review",
+      "verb": "pq1_completed"
+    },
+    {
+      "at": "2026-07-28T01:10:02.280261+00:00",
+      "n": 38,
+      "reason": "Engine C observations 已核准寫入；保留 source_under_audit／pipeline caveat，以新 context／assessment 完成 research-intent reassess，系統仍為 REVIEW",
+      "receipt": "decision:pd_343e33c5c1cf6637d77a9b2eb41b58ea",
+      "ref_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
+      "type": "decision_review",
+      "verb": "go"
     }
   ],
-  "next_n": 41,
+  "next_n": 43,
   "schema_version": "1"
 }
