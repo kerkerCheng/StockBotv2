@@ -15,8 +15,8 @@
 
 1. 🔴 **把「指數長期向上」直接推成「daily 3x 長抱必然向上」** — daily reset 的終值依賴報酬路徑；
    underlying 長期正報酬與 3x ETF 長期正報酬可以同時一正一負。若此假設不拆開，永久持有信念會掩蓋產品風險。
-2. 🔴 **把未動用貸款額度當成多餘資金** — 額度不是資產；提款後 cash 與 debt 同時增加，還疊加利息、
-   debt service、再融資／擔保品風險。若只擴大可買金額、不縮小 net capital，會系統性高估風險承受能力。
+2. 🔴 **只看貸款買進後的名目資產終值，沒看退休時的淨終值** — 未動用額度不是資產；提款後 cash 與 debt
+   同時增加。真正比較基準是退休時資產終值扣除本金、累計利息與其機會成本，而不是「30 年後大盤大概更高」。
 3. 🔴 **no-sell policy 讓所有風控不可逆地前移到進場** — 不賣可以是紀律，但 target upper band 將不能靠出售修復；
    新增部位若沒有 entry cap、contribution routing 與產品結構例外，錯誤 concentration 只會永久累積。
 
@@ -37,6 +37,27 @@
    household cash-supported candidate，loan facility 另列 contingent capacity，不混成同一個 surplus。
 4. 自有可投資現金直接認 Google Sheet `Portfolio` cash 欄位，不另建立重複的表外 cash；家庭 reserve、
    planned outflows 與未動用貸款額度則由私人 `Capital Authority` tab 保存。
+
+### 2026-07-28 最終方向校正：退休淨終值導向，不另建貸款引擎
+
+這一輪把貸款政策收斂到足以執行、但不過度工程化的版本：
+
+1. **目標函數**：使用者目前約 30 歲、退休目標約 60 歲；策略以約 30 年後的
+   `retirement_net_terminal_wealth` 最大化為方向，不以壓低短期波動或回撤作為第一目標。
+2. **可投入範圍**：只有使用者明確指定、確信可一路持有到到期的貸款額度才進人工討論；系統不把整個
+   undrawn facility 自動視為可買金額。
+3. **已確認契約現金流**：利息按月支付、期間內不用攤還本金、到期一次還本；契約允許投資用途，資金用途
+   不再是系統 blocker。
+4. **不另開 Phase II-B engine**：不建立 household cash-flow optimizer、debt-service stress engine 或新的 pq 流程。
+   每次實際提款仍由使用者明確指定 draw／instrument／tranche，LLM 按當時資料做一次性比較即可。
+5. **資產選擇邊界**：貸款資金可討論 broad beta、tilt、daily leverage 或 alpha，不做類別禁令；但 broad
+   unlevered beta 是主要候選，daily 3x 因 daily reset 與 path dependency 維持衛星定位，不因期限長而升為主力。
+6. **最小會計邊界**：未提款仍只列 contingent credit；提款後 cash 與 drawn debt 必須同時入帳。唯一持續要守的
+   operational condition 是每月利息能由既定現金流支付、不必被迫賣出；本金則在到期終值比較中完整扣除。
+
+因此，早期 brainstorm 中的一般化 lender-purpose、12–24 個月 debt-service reserve、callable／freeze 與多情境
+壓力引擎，均不再是這位使用者目前的 implementation prerequisite。若未來契約或支付能力改變，再重新開題；
+現在不為尚未發生的例外建系統。
 
 這個方向將 v0 從傳統「雙向 rebalance」改成 **contribution-routing policy**：低於 band 的 sleeve 優先取得
 新資金，超過上緣的 sleeve 停止新增，但不因越界自動賣出。也就是說，beta position 是近似 absorbing state；
@@ -76,7 +97,7 @@ underlying index 上漲時承受重大虧損；ProShares 也只承諾 TQQQ 的 d
 | `other_liquid_investments` | 是，扣除重複計算 | 其他券商／基金／短債等 |
 | `operating_floor` | 否，從可部署額扣除 | 緊急預備金與日常流動性 |
 | `planned_outflows_reserve` | 否，從可部署額扣除 | 稅、房屋、教育或已知大額支出 |
-| `drawn_investment_debt` | 負債；不得只把 proceeds 算資產 | 計 household net capital、利息與 debt service |
+| `drawn_investment_debt` | 負債；不得只把 proceeds 算資產 | 計 household net capital、每月利息與到期本金 |
 | `undrawn_credit_limit` | **否** | 只記 `contingent_liquidity`，不是現金、NAV 或 alpha reserve |
 
 概念公式先定為：
@@ -89,31 +110,28 @@ household_net_investable_capital
   - drawn_investment_debt
 
 verified_deployable_cash
-  = confirmed_cash
-  + near-term_free_cash_flow
+  = portfolio_cash
   - operating_floor
   - planned_outflows_reserve
-  - debt_service_reserve
   - committed_beta_budget
   - alpha_reserve
+
+retirement_net_terminal_wealth
+  = retirement_portfolio_value
+  - outstanding_principal_at_maturity
+  - accumulated_interest_and_opportunity_cost
 ```
 
 `undrawn_credit_limit` 不出現在上述兩個公式。若日後真的提款，必須同時增加 cash 與 debt，並重算：
 
 - `gross_effective_exposure / household_net_investable_capital`
-- 固定／浮動利率與 all-in borrowing cost
-- 至少 12–24 個月 debt service reserve
-- collateral／margin call、到期續借與 lender reduction risk
-- `市場 -50% + 利率上升 + 收入中斷` 的聯合壓力測試
+- 當期 borrowing cost 與每月利息現金流
+- 到期本金與退休時 `retirement_net_terminal_wealth`
+- 若 instrument 是 daily leveraged ETF，另看產品自身的 path-dependent terminal distribution
 
-若貸款由證券或房屋擔保，還會引入「市場下跌時被要求補擔保／還款」或資產被迫處分的風險，與 no-sell
-policy 直接衝突。FINRA 對 securities-backed line of credit 提醒 collateral 下跌可在兩三天內觸發 maintenance
-call；以房屋淨值借款投資則可能危及住宅。因此授信種類必須進 authority，不能只記總額度。
-
-來源：
-
-- [FINRA：Securities-Backed Lines of Credit Explained](https://www.finra.org/investors/insights/securities-backed-lines-credit)
-- [FINRA：Know the Risks of Using Home Equity Loans for Investing](https://www.finra.org/investors/insights/risks-home-equity-for-investing)
+使用者已確認此 facility 利息按月支付、期間不攤還本金、到期一次還本，且契約允許投資用途。故目前不另建
+一般化 debt-service reserve／lender-purpose／callable stress engine；只有每月利息無法在不賣資產下支付，或契約
+本身日後變更時，才把貸款路徑降級並重新討論。
 
 ### 目前 Sheet 持倉的第一個診斷：帳戶內不是缺 beta，而是 beta 不夠乾淨
 
@@ -237,8 +255,8 @@ HOLD / PAUSE CONTRIBUTION / CONTRIBUTE REVIEW / STRUCTURAL REVIEW
    系統不預先禁止某一類商品。
 4. **但永遠是人工資本路徑**：Daily 不產自動 loan-funded supported range。每次提款、標的、總額與 tranche 必須
    由使用者明確討論／核准；「足夠信心」只是對話判斷，不能被 parser 當成 machine permission。
-5. **提款後雙邊入帳**：一旦實際提款，同時增加 cash 與 drawn debt，重算利息、debt service、household net capital、
-   stacked leverage 與 stress loss；未知最低還款／可變條款在核對前 fail closed。
+5. **提款後雙邊入帳**：一旦實際提款，同時增加 cash 與 drawn debt，重算 household net capital、stacked leverage、
+   每月利息與退休淨終值。已確認期間只付月息、不攤還本金、到期一次還本；契約允許投資用途，不再為此另建 blocker。
 6. **不靜默放寬 Phase I**：私人 operating floor 只用於新的 household candidate；Phase I 既有 5% NAV operating
    reserve＋3% NAV alpha reserve 所產 `sheet_conservative` range 同時保留。Phase II-A 先並列 paper observation；
    household candidate 仍沿用既有 alpha reserve，直到 live promotion 另行核准，不能因私人 floor 較低就直接
@@ -254,7 +272,8 @@ loan_funded_supported_range       # 預設 manual_review_required；無 exact ch
 ```
 
 brainstorm 至此可視為 settled；Phase II-A 已完成唯讀 `Capital Authority` adapter、point-in-time capital view、
-上述四欄輸出與 Daily 整合。ETF 完整 look-through、live promotion、成交後 Sheet writer 與 server 仍是後續獨立切片。
+上述四欄輸出與 Daily 整合。貸款方向不另開 Phase II-B engine；ETF 完整 look-through、live promotion、成交後
+Sheet writer 與 server 若日後真的有重複摩擦，再各自另立切片。
 
 ### 3x 定位定案方向：可投資的 `beta_leverage` 衛星，不是主力
 
@@ -265,8 +284,8 @@ brainstorm 至此可視為 settled；Phase II-A 已完成唯讀 `Capital Authori
    5–8% 作偏積極型討論起點。
 2. **combined effective cap**：依 2x／3x 換算後合計 15–20% 作偏積極型討論起點；風控看此欄，不只看市值。
 3. **funding rule**：Daily deterministic range 只使用 `verified_deployable_cash`。使用者允許 loan proceeds 投入
-   daily leveraged ETF，但每次都必須另走 exact draw／instrument／tranche 的人工 review 與 stacked-leverage stress，
-   不能視為一般 beta contribution 或自動 permission。
+   daily leveraged ETF，但每次都必須另走 exact draw／instrument／tranche 的人工 review；比較退休淨終值、
+   借款成本與既有 leverage cap，不能視為一般 beta contribution 或自動 permission。
 4. **accumulation-only 行為**：低於 cap 可依 ladder 小額貢獻；高於 cap 只 `PAUSE CONTRIBUTION`，不自動賣出。
 5. **satellite budget**：3x 與 alpha 各有獨立 reserve，不能因大盤急跌吃掉 alpha budget，也不能由 alpha conviction
    反向放寬 leverage cap。
@@ -511,7 +530,8 @@ contribution 導向 underweight sleeve；不為了機械回到中點賣出既有
 目前較合理的 action 不是立刻增加總 beta，而是：
 
 1. **既有 beta 不因下跌觸發賣出**，符合使用者 accumulation-only 偏好；但新增 TQQQ／00631L 仍要等
-   stacked-leverage cap 與 stress loss budget 定義完成，不能由「退休時大盤較高」單一信念自動放行。
+   既有 leverage cap 與 exact tranche 人工 review，不能由「退休時大盤較高」單一信念自動放行；不再等待一套
+   新的 debt stress engine。
 2. **把 beta core 與 tilt 重新分類後再判斷是否有 core gap**。若只有 VWRA 算嚴格 core，問題是 core 品質不足；
    若把 QQQ／台灣 50 全算 core，問題則是隱含科技／台積電集中度過高。兩種定義會導出完全不同的加碼結論，
    因此不能先交易、後補定義。
@@ -527,7 +547,8 @@ core 低於 band、verified cash 可用、stacked leverage 未超標、重疊未
 
 自有 cash authority、私人 operating floor、planned outflows 與 credit-facility current state 已存在 Google Sheet
 `Capital Authority`；exact 個人數值不進 tracked repo。貸款可討論所有標的，但只走人工 exact-choice／分批路徑。
-最低還款與其他尚未核對的 lender terms 保持 `unknown`，不阻擋唯讀 adapter plan，但阻擋自動 loan-funded range。
+使用者已確認利息每月支付、期間不還本、到期一次還本，且契約允許投資用途。這些條件不再是 roadmap blocker；
+但 Daily 仍不自動產生 loan-funded range，私人 Sheet authority 尚未同步前可繼續誠實顯示舊的條款完整度警告。
 
 下列數字留待 30–90 天 paper observation 後的 live promotion，而非 Phase II-A reader 的 blocker：
 
@@ -586,9 +607,10 @@ core 低於 band、verified cash 可用、stacked leverage 未超標、重疊未
   **修正**：Sheet 下一版分開 `asset_type`、`strategy_sleeve`、`research_scope`；不得再由單一 bucket 推全部語意。
   **驗證**：每個持股都能無歧義回答「是 beta_core、beta_tilt、beta_leverage、alpha_single_name 或 cash」。
 
-- [🔴] **觀察**：「還有很多貸款額度」目前沒有利率、攤還、擔保、到期或是否可撤回等數字。
-  **修正**：未補齊 loan terms 前一律只算 contingent liquidity，不得進 investable capital 或 alpha budget。
-  **驗證**：同額度但一筆是固定低利長債、另一筆是浮動利率／證券擔保時，系統必須產生不同容量結論。
+- [🟢] **已收斂**：使用者已確認本策略可用額度的利息按月支付、期間不攤還本金、到期一次還本，且契約允許
+  投資用途；策略目標是約 30 年後退休淨終值最大化。
+  **保留邊界**：未提款仍只算 contingent liquidity；每筆 draw 仍需 exact-choice review，提款後 cash／debt 同時入帳。
+  **驗證**：增加 undrawn limit 不得改變 Daily cash-supported range；只有使用者明確提款後，資產與負債才同時改變。
 
 ### B6 回測誠實官
 
@@ -650,10 +672,10 @@ core 低於 band、verified cash 可用、stacked leverage 未超標、重疊未
 
 - [🔴] **觀察**：`daily leveraged ETF × balance-sheet borrowing` 是 stacked leverage；兩者相乘放大 asset drawdown，
   但貸款本金／利息不隨 ETF 跌幅下降。
-  **修正**：同時報 gross effective exposure、household net capital、debt service coverage 與 stress loss，不允許各自
-  看似低於 cap 卻合計失控。
-  **驗證**：在 `市場 -50% + 借款利率上升 + 收入中斷` 情境下，若需賣出 beta 才能還債，no-sell policy 與
-  financing policy 不相容，該筆借款不得列入 deployable capital。
+  **修正**：不另建通用 debt stress engine，但 exact-choice review 必須比較 gross effective exposure、每月利息與
+  退休淨終值；daily 3x 維持衛星上限，不能只因借款期限長就升為主力。
+  **驗證**：若加入借款成本與到期本金後，候選配置的退休淨終值分布不優於無借款方案，或每月利息需靠賣出
+  beta 支付，該 tranche 不成立。
 
 ### C10 系統整合縫隙
 
@@ -709,16 +731,18 @@ core 低於 band、verified cash 可用、stacked leverage 未超標、重疊未
 
 ## 整體可證偽條件
 
-核心假設改為「accumulation-only beta 可用 contribution routing 管理；只有 household authority 驗證後的
-surplus 才分配給 beta ladder 與 alpha」。若任何合理壓力情境要求出售 beta 才能維持 debt service，則貸款與
-no-sell policy 不相容；若 underlying 長期上漲但 daily 3x 仍產生不可承受虧損，則 `beta_leverage` 不得因退休
-horizon 自動取得新增資金。若 changing RSI／MACD／MA thresholds 會改變 hard safe ceiling，代表 timing 與 sizing
-責任沒有隔離；若 sleeve aggregate 仍無法解釋 ETF 內部 factor，需提升 look-through 粒度。
+核心假設改為「accumulation-only beta 可用 contribution routing 管理；自有現金走 deterministic range，使用者明確
+指定且能持有到期的貸款只走 manual tranche，目標是退休淨終值最大化」。若每月利息必須靠出售 beta 支付，貸款
+與 no-sell policy 不相容；若扣除累計利息、機會成本與到期本金後，貸款方案不優於無貸款方案，借款提高終值的
+假設即被推翻。若 underlying 長期上漲但 daily 3x 仍產生不可承受虧損，`beta_leverage` 不得因退休 horizon 自動
+取得新增資金。若 changing RSI／MACD／MA thresholds 會改變 hard safe ceiling，代表 timing 與 sizing 責任沒有隔離；
+若 sleeve aggregate 仍無法解釋 ETF 內部 factor，需提升 look-through 粒度。
 
 ## 接下來盯什麼
 
 1. Phase II-A plan／唯讀 adapter／strict schema／freshness／FX／content digest／Daily 四欄均已完成；先觀察
    `sheet_conservative_range` 與 `household_cash_supported_range` 的差異是否真的改善決策。
-2. 繼續累積 30–90 天 paper observation；再核准 live beta bands、stacked-leverage stress 與 drawdown ladder。
-3. 真正考慮提款前補齊最低還款、利率調整、callable／freeze 等 lender terms；提款後 cash／debt 原子更新。
-4. ETF 完整 look-through、explicit-fill-only Sheet writer 與 server promotion 各自另立後續切片，不併入 Phase II-A。
+2. 繼續累積 30–90 天 paper observation；再核准 live beta bands 與 drawdown ladder。貸款政策不另開 Phase II-B engine。
+3. 使用者提出實際提款時，再以當時利率、exact instrument／tranche 比較退休淨終值；核准後 cash／debt 原子更新。
+4. 私人 `Capital Authority` 的還款條款日後另以明確 Sheet write 同步；本次只更新 tracked policy，不擴張 readonly runtime。
+5. ETF 完整 look-through、explicit-fill-only Sheet writer 與 server promotion只有在重複摩擦出現時才另立切片。

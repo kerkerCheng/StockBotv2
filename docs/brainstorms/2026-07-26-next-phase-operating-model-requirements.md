@@ -1,8 +1,9 @@
 # 盲點審查報告：下一階段 Operating Model（三個工作流＋跨代理狀態）
 
 > 狀態：Workstream A 的 Phase I Daily Beta Technical Monitor 與 Phase II-A household capital authority
-> 已於 2026-07-28 完成。Workstream B、通用 Daily runner 重構、ETF 完整 look-through、
-> Sheet writer 與本機 single-writer guard 仍是後續 Phase II brainstorm。
+> 已於 2026-07-28 完成；退休貸款政策亦已收斂為 zero-code manual contract，**不另開 Phase II-B engine**。
+> Workstream B、通用 Daily runner 重構、ETF 完整 look-through、Sheet writer 與本機 single-writer guard 仍是
+> 相鄰 brainstorm，只有重複摩擦出現時才另立 plan。
 >
 > 本文件把三個待討論工作流收在同一個 umbrella 下：
 > 1. Alpha／Beta Portfolio Sleeve Monitor
@@ -45,8 +46,10 @@
 - 2026-07-28 使用者方向：beta 採 `accumulation_only`，一般回檔／熊市不賣；超過 band 時停止新增並把後續
   contribution 導向 underweight sleeve。這個偏好也涵蓋 daily leveraged ETF，但「指數長期向上」不被系統
   當成「daily 3x 終值必然向上」的事實；leverage 仍需 entry cap、stress loss budget 與產品結構例外。
-- capital denominator 不再只看 Sheet：另需人工確認 external investable cash／assets、drawn debt 與 loan terms；
-  undrawn credit limit 只算 `contingent_liquidity`，不算 NAV、deployable cash 或 alpha reserve。
+- 2026-07-28 最終貸款方向：使用者目前約 30 歲、退休目標約 60 歲，目標函數是約 30 年後的
+  `retirement_net_terminal_wealth` 最大化。指定額度利息按月支付、期間不攤還本金、到期一次還本；契約允許投資
+  用途，故不再建立 lender-purpose／debt-service stress blocker。未動用額度仍只算 `contingent_liquidity`，不算
+  NAV、deployable cash 或 alpha reserve；提款後 cash 與 debt 同時入帳。
 - Engine ownership 定為 Engine D：固定 beta instrument registry／policy／permission／choice／fill 歸 D；Engine C 只供應
   price／FX／drawdown／volatility／look-through observations。固定標的不進 pq1；`HOLD`／`PAUSE CONTRIBUTION` 不進
   任何 pq，只有初次 policy、`CONTRIBUTE REVIEW` 與 `STRUCTURAL REVIEW` 進統一 pq2。3x 是可投資但非主力的
@@ -75,6 +78,10 @@
   的人工 review；Daily 必須並列既有 `sheet_conservative` 與新的 household cash-supported candidate，再分開
   contingent-credit 與 manual loan-funded range，不能把額度算 NAV，也不能用較低私人 floor 靜默放寬 Phase I；
   runtime 維持 `spreadsheets.readonly`，authority／FX 失敗只降級 household path。
+- 貸款政策到此收斂：不另開 Phase II-B engine、debt optimizer 或新 pq。使用者提出 exact draw 時，由 LLM 按當時
+  borrowing cost、instrument／tranche、既有 leverage cap 與退休淨終值做一次性比較；每月利息若需靠賣出 beta
+  支付，或扣除累計利息與到期本金後不優於無借款方案，即推翻該 tranche。broad unlevered beta 是主要候選，
+  daily 3x 仍為衛星而非主力。
 - Phase II 後續未定：完整 point-in-time ETF look-through、live policy promotion、explicit-fill-only Sheet
   narrow-write contract與 server promotion。另保留 zero-code-first 的問答型 LLM advisory：
   只在使用者明確提問時讀 beta monitor／Sheet aggregate 並按需補抓最新客觀資料，直接回答 rough scenario／替代策略；

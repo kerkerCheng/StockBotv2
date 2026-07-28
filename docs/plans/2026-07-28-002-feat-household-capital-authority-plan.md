@@ -126,3 +126,21 @@ completed: 2026-07-28
 - 盲點修補：drawn debt 判斷不依賴 facility FX；只要 drawn amount 非零就封鎖 household cash path。household
   全域故障只在資本健康列呈現，不再把所有標的重複洗版成暫停。
 - 驗證：targeted suites passed；full suite **598 passed**；skill adapters sync；`git diff --check` 通過。
+
+---
+
+## Post-completion Policy Clarification（2026-07-28）
+
+本節是完成後的使用者政策校正，不改寫 Phase II-A 當時的 code scope 或驗收事實：
+
+- **長期目標：** 使用者目前約 30 歲、退休目標約 60 歲；貸款資本的目標函數是約 30 年後的
+  `retirement_net_terminal_wealth` 最大化，而不是最小化中途回撤。
+- **已確認現金流：** 指定 facility 利息按月支付、期間不攤還本金、到期一次還本；契約允許投資用途，
+  lender-purpose 不再是 blocker。
+- **設計收斂：** 不另開 Phase II-B loan engine、debt optimizer、通用 stress engine 或新 pq。實際提款仍走
+  exact draw／instrument／tranche 的人工 review；broad unlevered beta 是主要候選，daily 3x 維持衛星定位。
+- **最小判準：** exact review 比較當時 borrowing cost、每月利息、既有 leverage cap，以及扣除累計利息與到期
+  本金後的退休淨終值。若月息需靠賣出 beta 支付，或淨終值不優於無借款方案，該 tranche 不成立。
+- **authority 邊界：** 未動用額度仍不算 NAV／cash／allocation；提款後 cash 與 debt 必須同時入帳。這次只更新
+  tracked policy，沒有取得 Google Sheet write 授權；私人 `Capital Authority` 未另行同步前，現行 readonly runtime
+  仍可能顯示歷史的 `credit_terms_incomplete` telemetry，但它不再是新增 engine 的 roadmap blocker。
