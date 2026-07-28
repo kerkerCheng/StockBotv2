@@ -243,7 +243,7 @@ HOLD / PAUSE CONTRIBUTION / CONTRIBUTE REVIEW / STRUCTURAL REVIEW
    household candidate 仍沿用既有 alpha reserve，直到 live promotion 另行核准，不能因私人 floor 較低就直接
    覆蓋舊 hard maximum。
 
-Phase II-A 預期輸出必須分三欄，禁止合成一個誤導性的「可買金額」：
+Phase II-A 預期輸出必須分四欄，禁止合成一個誤導性的「可買金額」：
 
 ```text
 sheet_conservative_range          # Phase I 既有 5% operating＋3% alpha reserve
