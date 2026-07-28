@@ -1,0 +1,241 @@
+{
+  "schema_version": "beta-policy-v1",
+  "policy_version": "2026-07-28.1",
+  "mode": "paper_observation",
+  "capital_scope": "sheet_conservative",
+  "capital": {
+    "cash_bucket_aliases": ["cash"],
+    "operating_reserve_nav_fraction": 0.05,
+    "alpha_reserve_nav_fraction": 0.03
+  },
+  "signal": {
+    "allowed_paces": [0.0, 0.25, 0.5, 1.0],
+    "max_refresh_age_hours": 96,
+    "repeat_after_sessions": 5,
+    "tiers": [
+      {
+        "name": "pullback",
+        "drawdown_at_most": -0.1,
+        "rsi_at_most": 45.0,
+        "base_pace": 0.25,
+        "turning_pace": 0.25
+      },
+      {
+        "name": "deep",
+        "drawdown_at_most": -0.2,
+        "rsi_at_most": 40.0,
+        "base_pace": 0.25,
+        "turning_pace": 0.5
+      },
+      {
+        "name": "capitulation",
+        "drawdown_at_most": -0.3,
+        "rsi_at_most": 35.0,
+        "base_pace": 0.5,
+        "turning_pace": 1.0
+      }
+    ]
+  },
+  "risk": {
+    "leveraged_nominal_warning": 0.05,
+    "leveraged_nominal_cap": 0.08,
+    "leveraged_effective_warning": 0.15,
+    "leveraged_effective_cap": 0.2,
+    "technology_effective_warning": 0.6,
+    "technology_effective_cap": 0.7,
+    "unmapped_technology_proxy_load": 1.0,
+    "single_company_warning": 0.3,
+    "single_company_cap": 0.35
+  },
+  "campaign_budget_fraction_by_sleeve": {
+    "beta_core": 0.05,
+    "beta_tilt": 0.03,
+    "beta_tilt_active": 0.02,
+    "beta_leverage": 0.015,
+    "large_cap_tilt": 0.01
+  },
+  "instruments": [
+    {
+      "ticker": "LON:VWRA",
+      "sheet_aliases": ["LON:VWRA", "VWRA"],
+      "provider_symbol": "VWRA.L",
+      "benchmark_key": "vwra",
+      "benchmark_symbol": "VWRA.L",
+      "sleeve": "beta_core",
+      "allocation_group": "global_core",
+      "leverage_multiple": 1.0,
+      "technology_proxy_load": 0.25,
+      "issuer_loads": {},
+      "priority": 10
+    },
+    {
+      "ticker": "QQQ",
+      "sheet_aliases": ["QQQ"],
+      "provider_symbol": "QQQ",
+      "benchmark_key": "qqq",
+      "benchmark_symbol": "QQQ",
+      "sleeve": "beta_tilt",
+      "allocation_group": "qqq_unlevered",
+      "leverage_multiple": 1.0,
+      "technology_proxy_load": 0.65,
+      "issuer_loads": {},
+      "priority": 20
+    },
+    {
+      "ticker": "0050.TW",
+      "sheet_aliases": ["0050.TW", "0050"],
+      "provider_symbol": "0050.TW",
+      "benchmark_key": "tw50",
+      "benchmark_symbol": "0050.TW",
+      "sleeve": "beta_tilt",
+      "allocation_group": "tw50_unlevered",
+      "leverage_multiple": 1.0,
+      "technology_proxy_load": 0.7,
+      "issuer_loads": {"TSMC": 0.5869},
+      "priority": 21
+    },
+    {
+      "ticker": "006208.TW",
+      "sheet_aliases": ["006208.TW", "006208"],
+      "provider_symbol": "006208.TW",
+      "benchmark_key": "tw50",
+      "benchmark_symbol": "0050.TW",
+      "sleeve": "beta_tilt",
+      "allocation_group": "tw50_unlevered",
+      "leverage_multiple": 1.0,
+      "technology_proxy_load": 0.7,
+      "issuer_loads": {"TSMC": 0.5739},
+      "priority": 22
+    },
+    {
+      "ticker": "SOXX",
+      "sheet_aliases": ["SOXX"],
+      "provider_symbol": "SOXX",
+      "benchmark_key": "soxx",
+      "benchmark_symbol": "SOXX",
+      "sleeve": "beta_tilt",
+      "allocation_group": "semiconductor_tilt",
+      "leverage_multiple": 1.0,
+      "technology_proxy_load": 1.0,
+      "issuer_loads": {},
+      "priority": 30
+    },
+    {
+      "ticker": "DRAM",
+      "sheet_aliases": ["DRAM"],
+      "provider_symbol": "DRAM",
+      "benchmark_key": "dram",
+      "benchmark_symbol": "DRAM",
+      "sleeve": "beta_tilt_active",
+      "allocation_group": "memory_active_tilt",
+      "leverage_multiple": 1.0,
+      "technology_proxy_load": 1.0,
+      "issuer_loads": {},
+      "priority": 31
+    },
+    {
+      "ticker": "00981A.TW",
+      "sheet_aliases": ["00981A.TW", "00981A"],
+      "provider_symbol": "00981A.TW",
+      "benchmark_key": "active_tw_growth",
+      "benchmark_symbol": "00981A.TW",
+      "sleeve": "beta_tilt_active",
+      "allocation_group": "active_tw_growth",
+      "leverage_multiple": 1.0,
+      "technology_proxy_load": 0.7,
+      "issuer_loads": {},
+      "priority": 32
+    },
+    {
+      "ticker": "TQQQ",
+      "sheet_aliases": ["TQQQ"],
+      "provider_symbol": "TQQQ",
+      "benchmark_key": "qqq",
+      "benchmark_symbol": "QQQ",
+      "sleeve": "beta_leverage",
+      "allocation_group": "qqq_leverage",
+      "leverage_multiple": 3.0,
+      "technology_proxy_load": 0.65,
+      "issuer_loads": {},
+      "priority": 40
+    },
+    {
+      "ticker": "00631L.TW",
+      "sheet_aliases": ["00631L.TW", "00631L"],
+      "provider_symbol": "00631L.TW",
+      "benchmark_key": "tw50",
+      "benchmark_symbol": "0050.TW",
+      "sleeve": "beta_leverage",
+      "allocation_group": "tw50_leverage",
+      "leverage_multiple": 2.0,
+      "technology_proxy_load": 0.7,
+      "issuer_loads": {"TSMC": 0.5869},
+      "priority": 41
+    },
+    {
+      "ticker": "2330.TW",
+      "sheet_aliases": ["2330.TW", "2330"],
+      "provider_symbol": "2330.TW",
+      "benchmark_key": "tsmc",
+      "benchmark_symbol": "2330.TW",
+      "sleeve": "large_cap_tilt",
+      "allocation_group": "tsmc_single",
+      "leverage_multiple": 1.0,
+      "technology_proxy_load": 1.0,
+      "issuer_loads": {"TSMC": 1.0},
+      "priority": 50
+    },
+    {
+      "ticker": "GOOGL",
+      "sheet_aliases": ["GOOGL"],
+      "provider_symbol": "GOOGL",
+      "benchmark_key": "googl",
+      "benchmark_symbol": "GOOGL",
+      "sleeve": "large_cap_tilt",
+      "allocation_group": "alphabet_single",
+      "leverage_multiple": 1.0,
+      "technology_proxy_load": 1.0,
+      "issuer_loads": {"ALPHABET": 1.0},
+      "priority": 51
+    },
+    {
+      "ticker": "MU",
+      "sheet_aliases": ["MU"],
+      "provider_symbol": "MU",
+      "benchmark_key": "mu",
+      "benchmark_symbol": "MU",
+      "sleeve": "large_cap_tilt",
+      "allocation_group": "micron_single",
+      "leverage_multiple": 1.0,
+      "technology_proxy_load": 1.0,
+      "issuer_loads": {"MICRON": 1.0},
+      "priority": 52
+    },
+    {
+      "ticker": "NVDA",
+      "sheet_aliases": ["NVDA"],
+      "provider_symbol": "NVDA",
+      "benchmark_key": "nvda",
+      "benchmark_symbol": "NVDA",
+      "sleeve": "large_cap_tilt",
+      "allocation_group": "nvidia_single",
+      "leverage_multiple": 1.0,
+      "technology_proxy_load": 1.0,
+      "issuer_loads": {"NVIDIA": 1.0},
+      "priority": 53
+    },
+    {
+      "ticker": "TSLA",
+      "sheet_aliases": ["TSLA"],
+      "provider_symbol": "TSLA",
+      "benchmark_key": "tsla",
+      "benchmark_symbol": "TSLA",
+      "sleeve": "large_cap_tilt",
+      "allocation_group": "tesla_single",
+      "leverage_multiple": 1.0,
+      "technology_proxy_load": 1.0,
+      "issuer_loads": {"TESLA": 1.0},
+      "priority": 54
+    }
+  ]
+}

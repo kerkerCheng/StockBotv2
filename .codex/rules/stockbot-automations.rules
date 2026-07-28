@@ -12,6 +12,12 @@ prefix_rule(
 )
 
 prefix_rule(
+    pattern=[".venv\\Scripts\\python.exe", "scripts\\daily_beta_snapshot.py"],
+    decision="allow",
+    justification="Daily beta fixed entry 只刷新 Engine C technical observations、唯讀 Sheet 並產人工 review，不下單或寫 Sheet。",
+)
+
+prefix_rule(
     pattern=[".venv\\Scripts\\python.exe", "scripts\\publish_daily_state.py"],
     decision="allow",
     justification="固定 publisher 只提交兩個 daily state files 並推送 master。",

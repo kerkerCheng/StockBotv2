@@ -25,5 +25,6 @@
 | [Engine D workflow (2026-07-22)](2026-07-22-001-feat-engine-d-operational-workflow-plan.md) | Raw Signal → Action Card／today brief operational workflow | completed |
 | [Daily Approval Loop (2026-07-22)](2026-07-22-002-feat-daily-approval-loop-plan.md) | 每日 harvest／triage／brief／封閉動詞核准迴路（U1–U5） | completed（2026-07-26 由本機 v1.2 rollout 接手） |
 | [Daily Approval Loop v1.1 (2026-07-24)](2026-07-24-001-feat-daily-approval-loop-v1-1-plan.md) | 優先研究佇列、可續跑 drain、閉環 evidence-delta、對話式批次核准、MCP leads 同步 | completed（2026-07-26 已建 Codex local daily scheduled task） |
+| [Daily Beta Technical Monitor (2026-07-28)](2026-07-28-001-feat-daily-beta-technical-monitor-plan.md) | 固定持倉 universe 的日線 technical observation、beta safe contribution monitor 與 Daily 整合 | completed |
 
-**目前沒有 active plan。** Daily Approval Loop v1.0/v1.1 程式面均完成；現行 v1.2 runner 是 Codex desktop 本機排程（daily 台北 06:30；weekly 週日 04:00，兩者錯開）。L9 財務核驗缺口已補齊。
+**目前沒有 active plan。** Daily Beta Technical Monitor v1 與 Daily Approval Loop v1.0/v1.1 程式面均完成；現行 v1.2 runner 是 Codex desktop 本機排程（daily 台北 06:30；weekly 週日 04:00，兩者錯開）。L9 財務核驗缺口已補齊。

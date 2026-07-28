@@ -1,7 +1,7 @@
 # 盲點審查報告：下一階段 Operating Model（三個工作流＋跨代理狀態）
 
-> 狀態：下一階段 brainstorm；尚未授權實作 portfolio bands、付費來源自動化、Daily runner
-> 重構或本機 single-writer guard。
+> 狀態：Workstream A 的 Phase I Daily Beta Technical Monitor 已於 2026-07-28 完成；Workstream B、通用 Daily
+> runner 重構、household authority、Sheet writer 與本機 single-writer guard 仍是 Phase II brainstorm。
 >
 > 本文件把三個待討論工作流收在同一個 umbrella 下：
 > 1. Alpha／Beta Portfolio Sleeve Monitor
@@ -37,7 +37,40 @@
   beta aggregate。
 - authority：Google Sheet 保存使用者核准的 `asset_type`／`strategy_sleeve`；versioned policy 保存 target bands、
   rebalance threshold、drawdown ladder、effective leverage cap 與 cooldown；Engine D 唯讀組合並產 review。
-- 未定事項：現有標的的 core／tactical 分類、target bands、regime 最小觀測集、再平衡與去槓桿門檻。
+- 2026-07-28 深化：候選 sleeve 改為 `beta_core / beta_tilt / beta_leverage / alpha_single_name / cash`；
+  `cash` 另分 operating floor 與 alpha reserve。Beta 進場先過 authority、core gap、leverage、liquidity、
+  look-through overlap 與 cooldown gate，再由 drawdown／regime 決定部署速度；完整規則與現有持倉下限估算見
+  Alpha／Beta 深度文件。
+- 2026-07-28 使用者方向：beta 採 `accumulation_only`，一般回檔／熊市不賣；超過 band 時停止新增並把後續
+  contribution 導向 underweight sleeve。這個偏好也涵蓋 daily leveraged ETF，但「指數長期向上」不被系統
+  當成「daily 3x 終值必然向上」的事實；leverage 仍需 entry cap、stress loss budget 與產品結構例外。
+- capital denominator 不再只看 Sheet：另需人工確認 external investable cash／assets、drawn debt 與 loan terms；
+  undrawn credit limit 只算 `contingent_liquidity`，不算 NAV、deployable cash 或 alpha reserve。
+- Engine ownership 定為 Engine D：固定 beta instrument registry／policy／permission／choice／fill 歸 D；Engine C 只供應
+  price／FX／drawdown／volatility／look-through observations。固定標的不進 pq1；`HOLD`／`PAUSE CONTRIBUTION` 不進
+  任何 pq，只有初次 policy、`CONTRIBUTE REVIEW` 與 `STRUCTURAL REVIEW` 進統一 pq2。3x 是可投資但非主力的
+  `beta_leverage` satellite；依使用者偏積極科技型風險承受度，候選 combined cap 上修為 nominal 5–8%／
+  effective 15–20%，尚未核准。
+- 2026-07-28 signal／execution 校正：Engine C 對固定 universe 產 point-in-time RSI14、MACD 12-26-9、
+  SMA20／50／200、252-day drawdown 與 realized volatility；槓桿商品使用 underlying `signal_benchmark`，不直接以
+  TQQQ／00631L 自身複利路徑判斷水位。Engine D 先算 household／sleeve／effective-leverage hard ceiling，再讓
+  signal state 只決定 discrete tranche pace。RSI／MACD／MA 不當三份獨立證據。
+- 首波 universe 直接沿用目前 frozen Sheet 的 ETF／權值股：14 個商品去重為約 11 條 technical series；
+  QQQ／TQQQ 共用 QQQ，0050／006208／00631L 共用 Taiwan 50。FRA:2DG、TYO:7803 暫留 alpha／single-name
+  流程。偏積極型候選 guardrails 另設 tech look-through 60% warning／70% pause、single-company 30%／35%；
+  全部必須改用已確認 household denominator 才能核准。
+- 日線 technical refresh 不先架 server；包進現有台北 06:30 Daily 的 deterministic snapshot，按各交易所保存
+  `last_complete_session`、missing-bar backfill、bounded retry 與 stale fail-closed。Phase I 已新增受控
+  `scripts/daily_beta_snapshot.py` fixed entry、append-only Engine C observations 與 Sheet-conservative Engine D monitor。
+  只有本機常離線且不接受隔日補跑、需要 intraday／market-close
+  即時通知、每日必達 SLA 或 provider redundancy 時，才升級最小 always-on market-data worker。
+- 使用者手動成交後希望由本機 session 同步 Google Sheet。現行 adapter 仍是 readonly；候選新增 explicit-fill-only
+  narrow writer，要求穩定 `position_id`、pending checkpoint、exact row write、read-back digest 與 Decision Store
+  reconciliation receipt。它不下 broker order，也不開放通用 Sheet range write。
+- Phase I 已定：14 商品／11 series、五類監控分類、technical state／pace、Sheet reserve、stacked-leverage／tech
+  proxy／known issuer cap 與 sequential contribution routing；全部維持 `paper_observation`。
+- Phase II 未定：household capital authority、完整 point-in-time ETF look-through、live policy promotion、
+  explicit-fill-only Sheet narrow-write contract與 server promotion。
 - 不可偷渡：持有一檔股票不自動等於建立 alpha cohort；ETF 不走 company onboarding；beta 急跌不自動等於買進。
 
 ### Workstream B — Paywall ROI／合法手動入口
@@ -201,5 +234,5 @@ approval 在換工具後重做，則現有 authority contract 不足，必須新
 1. 依 local-first 契約執行：本機 Codex／Claude Code 序列互換；cloud session＋MCP 只作備援。
 2. 收集 3–7 次 Daily telemetry，依 run class 記 model calls、uncached input、quota delta 與 pq1 outcome。
 3. 讓 paywall outcome 開始累積 30 天 ROI ledger，再決定是否買 DIGITIMES News。
-4. 回到 Alpha／Beta 文件，核准現有資產的 core／tactical／alpha 分類與最小 bands。
+4. 回到 Alpha／Beta 文件，核准現有資產的 core／tilt／leverage／alpha／cash 分類與最小 bands。
 5. 再決定是否立項 deterministic Daily runner；只有真實發生排程／互動 session writer 碰撞，才加本機 lock。

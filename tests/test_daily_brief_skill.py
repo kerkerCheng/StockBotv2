@@ -23,6 +23,7 @@ def test_references_batch_verbs_and_operational_commands() -> None:
         ".venv\\Scripts\\python.exe",
         "crons\\harvest_leads.py",
         "engine_c\\etl_yfinance.py",
+        "scripts\\daily_beta_snapshot.py",
         "-m engine_b.cli",
         "-m engine_b.todo sync",
         "-m decision_lab today",
@@ -56,6 +57,8 @@ def test_states_gates_and_human_boundaries() -> None:
     # 決策寫入只在本機、遠端 fallback 用唯讀 get_decision_brief。
     assert "get_decision_brief" in text
     assert "只在本機" in text
+    assert "Sheet-only conservative" in text
+    assert "不推定 choice／fill" in text
 
 
 def test_scheduled_run_auto_drains_pq1_but_keeps_admission_gate() -> None:

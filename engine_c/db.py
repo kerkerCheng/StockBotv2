@@ -149,8 +149,10 @@ def _ensure_sqlite_schema(conn: sqlite3.Connection) -> None:
         if name not in columns:
             conn.execute(f"ALTER TABLE financial_snapshots ADD COLUMN {name} REAL")
     from engine_c.manual_observations import ensure_manual_observation_schema
+    from engine_c.technical import ensure_technical_schema
 
     ensure_manual_observation_schema(conn)
+    ensure_technical_schema(conn)
     conn.commit()
 
 

@@ -89,6 +89,17 @@ def test_repository_manual_observation_migration_has_idempotent_postgres_ddl() -
     assert "CREATE INDEX IF NOT EXISTS idx_manual_observation_field_time" in sql
 
 
+def test_repository_technical_migration_has_append_only_postgres_ddl() -> None:
+    path = Path(__file__).resolve().parents[1] / "engine_c" / "migrations" / (
+        "20260728_add_technical_observations.sql"
+    )
+    sql = path.read_text(encoding="utf-8")
+
+    assert "CREATE TABLE IF NOT EXISTS technical_observations" in sql
+    assert "payload_digest VARCHAR(64) NOT NULL UNIQUE" in sql
+    assert "idx_technical_benchmark_session" in sql
+
+
 def test_missing_or_empty_migration_directory_fails_closed(tmp_path: Path) -> None:
     with pytest.raises(RuntimeError, match="does not exist"):
         apply_migrations(FakeConnection(), migrations_dir=tmp_path / "missing")
@@ -102,6 +113,7 @@ def test_required_migration_and_table_are_verified() -> None:
             *((migration,) for migration in REQUIRED_MIGRATIONS),
             ("consensus_coverage_observations",),
             ("manual_observations",),
+            ("technical_observations",),
             ("cash_and_equivalents",),
             ("total_debt",),
             ("free_cash_flow_ttm",),
@@ -128,6 +140,7 @@ def test_required_migration_and_table_are_verified() -> None:
             *((migration,) for migration in REQUIRED_MIGRATIONS),
             ("consensus_coverage_observations",),
             ("manual_observations",),
+            ("technical_observations",),
             None,
         ]
     )

@@ -13,10 +13,12 @@ REQUIRED_MIGRATIONS = (
     REQUIRED_MIGRATION,
     "20260721_add_manual_observations.sql",
     "20260721_add_probe_financial_baseline.sql",
+    "20260728_add_technical_observations.sql",
 )
 REQUIRED_TABLES = (
     "consensus_coverage_observations",
     "manual_observations",
+    "technical_observations",
 )
 REQUIRED_FINANCIAL_COLUMNS = (
     "cash_and_equivalents",

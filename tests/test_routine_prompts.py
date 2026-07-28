@@ -16,6 +16,7 @@ def test_daily_prompt_uses_local_authorities_and_repo_venv() -> None:
         ".venv\\Scripts\\python.exe",
         "crons\\harvest_leads.py",
         "engine_c\\etl_yfinance.py",
+        "scripts\\daily_beta_snapshot.py",
         "decision_lab today",
         "engine_b.todo sync",
         "scripts\\publish_daily_state.py",
@@ -38,6 +39,14 @@ def test_daily_prompt_keeps_human_gates_and_batch_contract() -> None:
     assert "engine_b.todo dispatch" in text
     assert "bare reassess" in text
     assert "新 decision receipt" in text
+    assert "beta technical" in text
+    assert "supported range 歸零" in text
+
+
+def test_daily_brief_title_carries_taipei_date() -> None:
+    for path in (DAILY, ROOT / "skills" / "daily-brief" / "SKILL.md"):
+        text = path.read_text(encoding="utf-8")
+        assert "# Daily Brief <YYYY-MM-DD> (Asia/Taipei)" in text
 
 
 def test_daily_prompt_is_not_the_retired_cloud_runner() -> None:

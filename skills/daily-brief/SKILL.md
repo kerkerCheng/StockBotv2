@@ -35,10 +35,15 @@ admission 必經核准 exact 對象、深挖由 priority 排序但入圖仍核�
 ```powershell
 & '.venv\Scripts\python.exe' crons\harvest_leads.py
 & '.venv\Scripts\python.exe' engine_c\etl_yfinance.py
+& '.venv\Scripts\python.exe' scripts\daily_beta_snapshot.py --format markdown
 ```
 
 第一支抓 X＋RSS＋EDGAR watch 新項，以 `since_id`／URL-hash 去重；第二支刷新 Engine C financial snapshots。
-fetch／parse 失敗各記 harvest_log；**解析失敗 ≠ 無新文**，brief 要標明 failed source。Windows 本機與
+第三支對固定 ETF／權值股 universe 刷新 Engine C TechnicalObservation，再由 Engine D 產
+`HOLD / PAUSE CONTRIBUTION / CONTRIBUTE REVIEW` 與 Sheet-only conservative range；technical telemetry
+不進 pq1，recommendation 不推定 choice／fill，且不寫 Google Sheet。fetch／parse 失敗各記 harvest_log；
+**解析失敗 ≠ 無新文**，`insufficient_history`／`unavailable`／`stale` 也必須在健康段落明示並讓該商品
+range 歸零。Windows 本機與
 scheduled task 一律使用 repo `.venv`，不要依賴父 shell 是否剛好 activate。
 
 ### Step 2 — Triage 新 pending leads（依 signal-triage 判準）
@@ -123,8 +128,10 @@ pq1 是唯一昂貴階段（web search + 讀文件 + 抽 claim）——priority 
 到期 thesis／有 material evidence-delta 的 probe 組成 brief，每項附明確指令。無事就一行
 `NO ACTION ＋日期`。
 
+第一行固定是 `# Daily Brief YYYY-MM-DD (Asia/Taipei)`（Asia/Taipei 當日），讓不同天的 brief 可分辨。
+
 ```
-# Daily Brief <YYYY-MM-DD>
+# Daily Brief <YYYY-MM-DD> (Asia/Taipei)
 
 ## 需要你動作
 [1] REVIEW — co:coherent｜自追蹤 +3.2%｜證據 material  → 有新證據，reassess

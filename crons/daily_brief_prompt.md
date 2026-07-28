@@ -20,11 +20,15 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
 3. 依序執行：
    - `.venv\Scripts\python.exe crons\harvest_leads.py`（X＋EDGAR；以 `since_id`／URL hash 去重）
    - `.venv\Scripts\python.exe engine_c\etl_yfinance.py`（35 檔 Engine C daily snapshot）
+   - `.venv\Scripts\python.exe scripts\daily_beta_snapshot.py --format markdown`（固定 ETF／權值股 technical refresh
+     ＋ Engine D Sheet-conservative beta monitor；`CONTRIBUTE REVIEW` 只呈現、不推定 choice／fill）
    - 對今日新增 pending leads 套 `skills/signal-triage/SKILL.md`，用本機 CLI 寫回 triage
    - `.venv\Scripts\python.exe -m decision_lab today --format markdown`
    - `.venv\Scripts\python.exe -m engine_b.todo sync`
    - `.venv\Scripts\python.exe -m engine_b.todo list`
-4. 任何來源失敗都要誠實列出 `fetch_failed`／`parse_failed`；單一來源失敗不阻斷其他段落。X token
+4. 任何來源失敗都要誠實列出 `fetch_failed`／`parse_failed`；beta technical 的 `insufficient_history`／
+   `unavailable`／`stale` 也必須列在健康段落，該商品 supported range 歸零但不阻斷其他商品。單一來源失敗不
+   阻斷其他段落。X token
    只從本機 `.env` 讀取，不得輸出或搬移 token。
 5. 先組出不會因研究失敗而消失的心跳 snapshot，再 best-effort 執行
    `.venv\Scripts\python.exe -m engine_b.cli drain`。每輪上限由 `config/daily_routine.json` 控制；
@@ -51,8 +55,11 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
 
 只用 `library/leads/todo_pool.json` 的既有穩定編號；不得依 section 或當日排序重新編號。
 
+輸出第一行**必須**是帶執行日期的標題 `# Daily Brief YYYY-MM-DD (Asia/Taipei)`，日期取本機
+Asia/Taipei 當日；沒有日期的 brief 視為未完成輸出（多份 brief 並排時要能一眼分辨是哪一天）。
+
 ```text
-# Daily Brief <YYYY-MM-DD>
+# Daily Brief <YYYY-MM-DD> (Asia/Taipei)
 
 ## 需要你動作
 [N] <type> — <摘要> → <為什麼需要決定>
@@ -61,7 +68,7 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
 <僅列 pq1 進度／失敗；raw lead 不占 pq2 編號>
 
 ## 健康／資料降級
-<本次 harvest、Engine C、Neo4j、Sheet 的失敗或缺口；無則寫正常>
+<本次 harvest、Engine C、beta technical、Neo4j、Sheet 的失敗或缺口；無則寫正常>
 
 ## 無事項目
 <NO ACTION 類別>
