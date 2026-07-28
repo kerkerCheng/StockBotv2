@@ -248,3 +248,7 @@ technical telemetry，直到state machine／look-through／household authority�
 - Phase II維持本plan「Scope Decision」列出的啟動條件，未建立第二個active implementation scope。
 - 2026-07-28 post-completion clarification：問答型 LLM advisory 已加入 Phase II 邊界，但現階段只是可立即使用的
   對話行為契約，不回頭改寫 Phase I completion，也不宣稱已有新的自動化模組。
+- 2026-07-28 Phase II-A brainstorm closure：私人 `Capital Authority` 已成為 household input 候選 authority；
+  自有 cash 只認 Portfolio cash、不重複計算。Loan proceeds 可依使用者偏好討論所有標的，但永遠需要 exact
+  draw／instrument／tranche 人工 review，不得由 Daily 或「高信心」文字自動轉為 deployable range。本 plan 仍是
+  Phase I 歷史，不在此追加 Phase II implementation units。

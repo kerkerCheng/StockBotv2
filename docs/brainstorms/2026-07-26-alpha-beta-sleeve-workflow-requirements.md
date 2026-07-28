@@ -3,6 +3,8 @@
 > 狀態：Phase I Daily Beta Technical Monitor 已於 2026-07-28 實作為 `paper_observation`；不含自動調倉、
 > household capital authority 或 Google Sheet 寫回。正式規格與驗收見
 > [`../plans/2026-07-28-001-feat-daily-beta-technical-monitor-plan.md`](../plans/2026-07-28-001-feat-daily-beta-technical-monitor-plan.md)。
+> Phase II-A household capital authority brainstorm 已於同日收斂；私人數值只存在 Google Sheet
+> `Capital Authority`，tracked 文件只保存 authority routing、fail-closed 與人工資本邊界。尚未開始 Phase II code。
 >
 > 本主題已與 Paywall ROI／合法手動入口、Token-efficient Daily Runner 一併收斂到
 > [`2026-07-26-next-phase-operating-model-requirements.md`](2026-07-26-next-phase-operating-model-requirements.md)；
@@ -30,8 +32,10 @@
 
 1. 買進大盤 beta 後原則上持有至退休，不因回檔、熊市或一般 regime 變化賣出。
 2. 這個 no-sell 信念目前也涵蓋 TQQQ／00631L 等 daily leveraged ETF；但不代表一次 all-in 或無上限加碼。
-3. Beta 地基之外的 surplus capital 才用於 StockBot 的 alpha；`surplus` 的精確定義尚待完成。
-4. Google Sheet 不是完整 household balance sheet；另有表外現金／資產與多筆未動用貸款額度。
+3. Beta 地基之外的 surplus capital 才用於 StockBot 的 alpha；Phase II-A 以私人 capital authority 產
+   household cash-supported candidate，loan facility 另列 contingent capacity，不混成同一個 surplus。
+4. 自有可投資現金直接認 Google Sheet `Portfolio` cash 欄位，不另建立重複的表外 cash；家庭 reserve、
+   planned outflows 與未動用貸款額度則由私人 `Capital Authority` tab 保存。
 
 這個方向將 v0 從傳統「雙向 rebalance」改成 **contribution-routing policy**：低於 band 的 sleeve 優先取得
 新資金，超過上緣的 sleeve 停止新增，但不因越界自動賣出。也就是說，beta position 是近似 absorbing state；
@@ -219,6 +223,39 @@ HOLD / PAUSE CONTRIBUTION / CONTRIBUTE REVIEW / STRUCTURAL REVIEW
 因此這項目在 roadmap 上與 household authority／look-through 一起列為 Phase II clarification，但使用者現在已可
 直接提問，不需等 Phase II 工程完成。只有當它變成穩定、重複、可驗收的資料組裝需求，才另立 implementation unit。
 
+### 2026-07-28 Phase II-A 收斂：Capital Authority 與 loan-funded discussion contract
+
+本輪已將 household capital 的實際 current-state 數值寫入 Google Sheet 私人 `Capital Authority` tab；tracked repo
+不保存個人金額。使用者確認的產品 contract 為：
+
+1. **自有現金不重複計算**：可投資 cash 只讀 `Portfolio.cash_twd／cash_usd`；`Capital Authority` 只保存
+   routing reference、家庭 operating floor 與 planned-outflow reserve。
+2. **未動用額度不是資產**：房屋擔保 credit facility 維持 `contingent_liquidity`；未提款時不增加 NAV、
+   household net investable capital 或 Daily deployable cash。
+3. **不做標的類別禁令**：依使用者偏好，loan proceeds 可討論配置到 broad beta、tilt、daily leverage 或 alpha；
+   系統不預先禁止某一類商品。
+4. **但永遠是人工資本路徑**：Daily 不產自動 loan-funded supported range。每次提款、標的、總額與 tranche 必須
+   由使用者明確討論／核准；「足夠信心」只是對話判斷，不能被 parser 當成 machine permission。
+5. **提款後雙邊入帳**：一旦實際提款，同時增加 cash 與 drawn debt，重算利息、debt service、household net capital、
+   stacked leverage 與 stress loss；未知最低還款／可變條款在核對前 fail closed。
+6. **不靜默放寬 Phase I**：私人 operating floor 只用於新的 household candidate；Phase I 既有 5% NAV operating
+   reserve＋3% NAV alpha reserve 所產 `sheet_conservative` range 同時保留。Phase II-A 先並列 paper observation；
+   household candidate 仍沿用既有 alpha reserve，直到 live promotion 另行核准，不能因私人 floor 較低就直接
+   覆蓋舊 hard maximum。
+
+Phase II-A 預期輸出必須分三欄，禁止合成一個誤導性的「可買金額」：
+
+```text
+sheet_conservative_range          # Phase I 既有 5% operating＋3% alpha reserve
+household_cash_supported_range    # Portfolio cash 扣 private floor、planned outflows與既有alpha reserve
+contingent_credit_available       # 只顯示可討論額度與條款完整度，不算資本
+loan_funded_supported_range       # 預設 manual_review_required；無 exact choice 時不給自動數字
+```
+
+brainstorm 至此可視為 settled；下一個 implementation plan 只應處理唯讀 `Capital Authority` adapter、point-in-time
+capital view、上述四欄輸出與 Daily 整合。ETF 完整 look-through、live promotion、成交後 Sheet writer 與 server
+仍是後續獨立切片。
+
 ### 3x 定位定案方向：可投資的 `beta_leverage` 衛星，不是主力
 
 這輪同意使用者的方向：TQQQ／00631L 不列為禁止資產，也不要求因一般回檔出售；但它們不計入
@@ -227,8 +264,9 @@ HOLD / PAUSE CONTRIBUTION / CONTRIBUTE REVIEW / STRUCTURAL REVIEW
 1. **combined nominal cap**：所有 daily leveraged beta 市值合計，先以 household net investable capital 的
    5–8% 作偏積極型討論起點。
 2. **combined effective cap**：依 2x／3x 換算後合計 15–20% 作偏積極型討論起點；風控看此欄，不只看市值。
-3. **funding rule**：預設只用 `verified_deployable_cash`，不使用 loan proceeds 購買 daily leveraged ETF；
-   若日後要 override，必須另過 stacked-leverage stress，而不能視為一般 beta contribution。
+3. **funding rule**：Daily deterministic range 只使用 `verified_deployable_cash`。使用者允許 loan proceeds 投入
+   daily leveraged ETF，但每次都必須另走 exact draw／instrument／tranche 的人工 review 與 stacked-leverage stress，
+   不能視為一般 beta contribution 或自動 permission。
 4. **accumulation-only 行為**：低於 cap 可依 ladder 小額貢獻；高於 cap 只 `PAUSE CONTRIBUTION`，不自動賣出。
 5. **satellite budget**：3x 與 alpha 各有獨立 reserve，不能因大盤急跌吃掉 alpha budget，也不能由 alpha conviction
    反向放寬 leverage cap。
@@ -404,8 +442,8 @@ net investable capital：
 - daily leveraged beta：combined nominal 5–8%、effective 15–20%；兩道上限都要通過。
 - technology／semiconductor look-through：60% 顯示 warning、70% 暫停新增相關曝險。
 - single-company look-through：30% 顯示 warning、35% 暫停新增；直接股與 ETF 內含持股合併計算。
-- 高風險承受度可提高 equity／tech budget，不能降低 operating reserve、債務服務預備金或放寬 loan-funded 3x
-  的預設禁止。
+- 高風險承受度可提高 equity／tech budget，不能降低 operating reserve、債務服務預備金，也不能把 loan-funded
+  3x 從人工 review 變成 Daily 自動 deployable cash。
 
 目前 Sheet 的 TQQQ＋00631L 約 7.04% nominal／16.39% effective，位於候選 leverage band；TSMC 直接加已知
 台灣 50 look-through 下限約 30.24%，已進 single-company warning 區但未達 hard pause。兩者都只是 Sheet-level
@@ -485,13 +523,17 @@ contribution 導向 underweight sleeve；不為了機械回到中點賣出既有
 這個 provisional response 不是「永遠不買」，而是把買進條件從「跌了／有額度」改成「household capital 已確認、
 core 低於 band、verified cash 可用、stacked leverage 未超標、重疊未惡化，而且 drawdown tier 尚未使用」。
 
-### 仍待使用者核准的 policy 數字
+### Phase II-A 已收斂；仍待 live promotion 核准的 policy 數字
+
+自有 cash authority、私人 operating floor、planned outflows 與 credit-facility current state 已存在 Google Sheet
+`Capital Authority`；exact 個人數值不進 tracked repo。貸款可討論所有標的，但只走人工 exact-choice／分批路徑。
+最低還款與其他尚未核對的 lender terms 保持 `unknown`，不阻擋唯讀 adapter plan，但阻擋自動 loan-funded range。
+
+下列數字留待 30–90 天 paper observation 後的 live promotion，而非 Phase II-A reader 的 blocker：
 
 - `beta_core` target／lower／upper band。
 - `beta_tilt` 總上限，以及 QQQ／台灣大型股是否有任何一檔可列 core。
 - `beta_leverage` nominal cap、effective cap 與最長持有／expiry。
-- `operating_floor` 與 `alpha_reserve`；兩者必須是不同欄位。
-- household capital authority 的涵蓋範圍，以及每筆貸款的 drawn／undrawn、利率、到期、攤還、擔保與 callable 狀態。
 - look-through 的單一公司（尤其台積電）、半導體、Nasdaq growth 與台灣區域 cap。
 - drawdown ladder 是採上表 4 tranche，或只用月度／季度 band rebalance 的更簡版本。
 
@@ -675,15 +717,11 @@ horizon 自動取得新增資金。若 changing RSI／MACD／MA thresholds 會�
 
 ## 接下來盯什麼
 
-1. 建立 household capital snapshot：表外可投資現金／資產、固定支出、預備金與 drawn debt；undrawn limits 分開。
-2. 對每筆貸款記 type、drawn／limit、固定／浮動利率、到期／攤還、擔保品、callable 與可否投資證券。
-3. 核准五類 sleeve 與 `exit_policy=accumulation_only`；依偏積極科技型 profile，3x 先以 combined nominal
-   5–8%／effective 15–20% 作候選衛星 band，另核准 tech 60／70% 與 single-company 30／35% warning／pause。
-4. 定義新資金 routing：beta core、beta tilt／leverage、alpha reserve 各自取得多少 confirmed surplus；候選預設禁止 loan-funded 3x。
-5. 核准本輪 14 商品／11 unique series 的 instrument → signal benchmark mapping，並選定 RSI／MACD／MA／drawdown
-   的 candidate state machine 與 signal pace。
-6. 實作時由 Engine C 產 TechnicalObservation、Engine D 產 supported contribution range；固定 beta 不進 pq1，只有初次 policy／live contribution／structural exception 進 pq2。
-7. Google Sheet 先加入穩定 `position_id`，再設計 explicit-fill-only 窄寫回與 reconciliation receipt；現行 readonly adapter 不直接放寬。
-8. 核准 stacked-leverage cap、stress loss budget 與 drawdown ladder，再做 30–90 天 forward paper observation。
-9. v0 把 technical refresh 包進 06:30 Daily fixed entry，加入 missed-run／stale heartbeat；只有需要 always-on SLA、
-   intraday 或各市場收盤即時通知時才升級最小 server worker。
+1. 為 Phase II-A 建立 implementation plan：唯讀 `Capital Authority` adapter、strict schema／freshness、FX 與
+   content-addressed capital view。
+2. Daily 並列 Phase I `sheet_conservative_range` 與 Phase II-A `household_cash_supported_range`，再分開顯示
+   `contingent_credit_available`、`loan_funded_supported_range`；後者沒有 exact user choice 時固定
+   `manual_review_required`，不得用「高信心」自動算金額。
+3. 繼續累積 30–90 天 Phase I paper observation；再核准 live beta bands、stacked-leverage stress 與 drawdown ladder。
+4. 真正考慮提款前補齊最低還款、利率調整、callable／freeze 等 lender terms；提款後 cash／debt 原子更新。
+5. ETF 完整 look-through、explicit-fill-only Sheet writer 與 server promotion 各自另立後續切片，不併入 Phase II-A。
