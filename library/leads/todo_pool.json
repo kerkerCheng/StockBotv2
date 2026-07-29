@@ -500,8 +500,10 @@
     {
       "added_at": "2026-07-28T01:10:21.849151+00:00",
       "dispatch_baseline_decision_id": "pd_ce5c1b9396dadafb9b238be8b6f44dcb",
+      "dispatch_receipt": "prepared:ra_1fdcb6bcdfb8348fd6a6c05999e7c34a",
       "dispatch_ref": "wo_b82c8b5cbb4a0b3480036f93a72bdade",
-      "dispatch_status": "queued",
+      "dispatch_status": "awaiting_approval",
+      "dispatch_updated_at": "2026-07-29T04:17:19.595442+00:00",
       "dispatched_at": "2026-07-29T00:59:49.245672+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 41,
@@ -550,6 +552,18 @@
       "source": "decision_lab",
       "title": "REVIEW — co:axt",
       "type": "decision_review"
+    },
+    {
+      "added_at": "2026-07-29T04:17:34.539549+00:00",
+      "hint": "核准入圖（apply_research_action）",
+      "n": 45,
+      "reason": null,
+      "ref_id": "ra_1fdcb6bcdfb8348fd6a6c05999e7c34a",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "AAOI counter-path：FY2025 10-K Competition 段 named competitors 入圖",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -855,8 +869,26 @@
       "ref_id": "ra_a09b6e59fa7334b37e9a8412821da29f",
       "type": "ra_admission",
       "verb": "go"
+    },
+    {
+      "at": "2026-07-29T04:11:56.696184+00:00",
+      "n": 41,
+      "reason": "接手 queued gap research：AAOI counter_path_missing 需 graph admission 證據",
+      "receipt": "research-start:2026-07-29:wo_b82c8b5cbb4a0b3480036f93a72bdade",
+      "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-07-29T04:17:19.595442+00:00",
+      "n": 41,
+      "reason": "AAOI 10-K Competition 段一手已追回並 prepared RA；counter_path 需 graph admission，等使用者核准",
+      "receipt": "prepared:ra_1fdcb6bcdfb8348fd6a6c05999e7c34a",
+      "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
+      "type": "decision_review",
+      "verb": "pq1_awaiting_approval"
     }
   ],
-  "next_n": 45,
+  "next_n": 46,
   "schema_version": "1"
 }
