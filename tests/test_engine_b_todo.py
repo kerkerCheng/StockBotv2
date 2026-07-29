@@ -43,9 +43,11 @@ def test_upsert_is_idempotent_and_updates_title_only() -> None:
 
 
 def test_resolve_go_removes_from_active_and_logs() -> None:
-    pool = _pool_with({"type": "lead_research", "ref_id": "x", "title": "A"})
+    pool = _pool_with({"type": "manual", "ref_id": "x", "title": "A"})
     n = todo.active_items(pool)[0]["n"]
-    todo.resolve(pool, n, "go", reason="值得深挖")
+    todo.resolve(
+        pool, n, "go", reason="值得深挖", receipt="authority:engine_c;ref:mo_1"
+    )
     assert todo.active_items(pool) == []
     entry = pool["log"][-1]
     assert entry["verb"] == "go" and entry["reason"] == "值得深挖" and entry["n"] == n
@@ -68,9 +70,9 @@ def test_batch_applies_and_reports_failures() -> None:
     )
     parsed = parse_batch_reply("1 3 go 2 drop 99 pending")
     outcome = todo.apply_batch(pool, parsed)
-    assert outcome["applied"] == [1, 2, 3]
-    assert outcome["failed"] == [99]  # 不存在的編號不中斷其餘
-    assert todo.active_items(pool) == []
+    assert outcome["applied"] == [2]
+    assert outcome["failed"] == [1, 3, 99]  # bare go 與未知編號不中斷其餘
+    assert [item["n"] for item in todo.active_items(pool)] == [1, 3]
 
 
 def test_unknown_number_and_verb_rejected() -> None:
@@ -90,6 +92,9 @@ def test_unknown_type_rejected() -> None:
 def test_resolved_item_can_reenter_pool_with_new_number() -> None:
     pool = _pool_with({"type": "decision_review", "ref_id": "dc_1", "title": "REVIEW"})
     n1 = todo.active_items(pool)[0]["n"]
+    item = todo.active_items(pool)[0]
+    item["dispatch_status"] = "completed"
+    item["dispatch_receipt"] = "decision:pd_new"
     todo.resolve(pool, n1, "go", receipt="decision:pd_new")
     # 同一 cohort 之後又有新 evidence-delta → 應重新進池（resolve 不是永久黑名單）
     todo.sync(pool, [{"type": "decision_review", "ref_id": "dc_1", "title": "REVIEW 再現"}])
@@ -143,6 +148,96 @@ def test_batch_cannot_bare_go_a_decision_review() -> None:
 
     assert outcome == {"applied": [], "failed": [1]}
     assert todo.active_items(pool)[0]["n"] == 1
+
+
+def test_ra_admission_cannot_resolve_without_verified_completion() -> None:
+    digest = "a" * 64
+    commit = "b" * 40
+    pool = _pool_with({"type": "ra_admission", "ref_id": "ra_abc", "title": "RA"})
+
+    with pytest.raises(todo.TodoError, match="complete-ra"):
+        todo.resolve(
+            pool,
+            1,
+            "go",
+            receipt=f"action:ra_abc;digest:{digest};commit:{commit};cohort:dc_1",
+        )
+
+
+def test_complete_ra_validates_authorities_hands_off_and_resolves(monkeypatch) -> None:
+    digest = "a" * 64
+    commit = "b" * 40
+    pool = _pool_with({"type": "ra_admission", "ref_id": "ra_abc", "title": "RA"})
+    monkeypatch.setattr(todo, "_read_action_for_completion", lambda action_id: {
+        "action_id": action_id,
+        "action_digest": digest,
+        "state": "pushed",
+        "git": {"status": "pushed", "commit": commit},
+        "execution": {
+            "documents": [{"doc_id": "doc_1", "status": "complete"}],
+            "report": {"status": "complete"},
+        },
+    })
+    monkeypatch.setattr(
+        todo,
+        "_lead_context_for_action",
+        lambda action_id, action_digest, leads_path: {"company_id": "co:axt"},
+    )
+    shadow_calls = []
+
+    def _handoff(**kwargs):
+        shadow_calls.append(kwargs)
+        return {"created": True, "cohort_id": "dc_new", "decision_id": "pd_new"}
+
+    monkeypatch.setattr(todo, "_ensure_shadow_for_completion", _handoff)
+
+    result = todo.complete_ra_admission(
+        pool,
+        1,
+        action_digest=digest,
+        company_id="co:axt",
+        ticker="AXTI",
+        leads_path="ignored.json",
+        at="2026-07-29T00:00:00+00:00",
+    )
+
+    assert todo.active_items(pool) == []
+    assert result["receipt"] == (
+        f"action:ra_abc;digest:{digest};commit:{commit};cohort:dc_new"
+    )
+    assert shadow_calls == [{
+        "company_id": "co:axt",
+        "ticker": "AXTI",
+        "as_of": "2026-07-29T00:00:00+00:00",
+    }]
+    assert pool["log"][-1]["receipt"] == result["receipt"]
+
+
+def test_ra_lead_context_requires_matching_digest(tmp_path) -> None:
+    path = tmp_path / "leads.json"
+    path.write_text(json.dumps({
+        "schema_version": "2",
+        "leads": {
+            "lead_1": {
+                "status": "applied",
+                "refs": {
+                    "research_action_id": "ra_abc",
+                    "action_digest": "a" * 64,
+                    "focus_company_id": "co:axt",
+                },
+            },
+        },
+        "harvest_log": [],
+        "source_state": {},
+    }), encoding="utf-8")
+
+    assert todo._lead_context_for_action(
+        "ra_abc", action_digest="a" * 64, leads_path=path
+    ) == {"company_id": "co:axt"}
+    with pytest.raises(todo.TodoError, match="action_digest"):
+        todo._lead_context_for_action(
+            "ra_abc", action_digest="b" * 64, leads_path=path
+        )
 
 
 def test_decision_review_cannot_complete_with_baseline_decision() -> None:
@@ -200,6 +295,35 @@ def test_collect_from_decisions_keeps_global_blocker_without_items(monkeypatch) 
         "hint": "修復全域 authority blocker 後重跑 decision_lab today",
         "source": "decision_lab",
     }]
+
+
+def test_collect_from_research_actions_recognizes_actual_ready_state(monkeypatch) -> None:
+    from mcp_server import research_actions
+
+    monkeypatch.setattr(research_actions, "iter_actions", lambda: iter([
+        {
+            "action_id": "ra_ready",
+            "state": "ready",
+            "payload": {"report": {"title": "可核准"}},
+        },
+        {"action_id": "ra_partial", "state": "partial", "title": "可續跑"},
+        {"action_id": "ra_done", "state": "pushed", "title": "已完成"},
+    ]))
+
+    assert todo.collect_from_research_actions() == [
+        {
+            "type": "ra_admission",
+            "ref_id": "ra_ready",
+            "title": "可核准",
+            "source": "research_action",
+        },
+        {
+            "type": "ra_admission",
+            "ref_id": "ra_partial",
+            "title": "可續跑",
+            "source": "research_action",
+        },
+    ]
 
 
 def test_collect_from_decisions_keeps_sheet_only_items_without_cohort(
@@ -262,7 +386,7 @@ def test_cli_add_and_batch(tmp_path, capsys) -> None:
     path = str(tmp_path / "todo_pool.json")
     assert todo.main(["--pool", path, "add", "查 COHR 客戶集中度", "--hint", "本機查"]) == 0
     capsys.readouterr()
-    assert todo.main(["--pool", path, "batch", "1 go"]) == 0
+    assert todo.main(["--pool", path, "batch", "1 drop"]) == 0
     out = json.loads(capsys.readouterr().out.strip())
     assert out["applied"] == [1] and out["failed"] == []
     assert todo.active_items(todo.load(path)) == []

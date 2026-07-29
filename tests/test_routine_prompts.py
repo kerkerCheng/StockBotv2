@@ -51,6 +51,9 @@ def test_daily_prompt_keeps_human_gates_and_batch_contract() -> None:
     assert "failure_class" in text
     assert "access_blocked" in text
     assert "同一來源後續成功才算 recovered" in text
+    assert "可互換" in text and "不認 agent 身分" in text
+    assert "engine_b.todo complete-ra" in text
+    assert "一般 `todo batch` 不得用 bare go" in text
 
 
 def test_daily_brief_title_carries_taipei_date() -> None:

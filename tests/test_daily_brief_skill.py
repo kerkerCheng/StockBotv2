@@ -96,6 +96,9 @@ def test_uses_persistent_todo_numbers_and_does_not_blindly_dispatch_batch() -> N
     assert "todo_pool.json" in text
     assert "不得依當日排序" in text
     assert "todo batch" in text and "不會代做" in text
+    assert "engine_b.todo complete-ra" in text
+    assert "action:<id>;digest:<sha256>;commit:<sha|not_required>;cohort:<dc_id>" in text
+    assert "權限與完成狀態綁 action type＋receipt，不綁 provider" in text
 
 
 def test_decision_review_go_dispatches_gap_pq1_before_reassess() -> None:

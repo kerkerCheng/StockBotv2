@@ -182,18 +182,20 @@ technical 區可用配有文字的燈號表達 deterministic state，但不得�
 使用者回 `1 3 7 go 4 drop 5 6 pending`。先讀池中 exact item，再用 deterministic parser 解析，
 不自由心證：
 
-Codex／Claude Code 本機交互執行時，收到核准的 agent 必須以當下 `todo_pool.json` 與 underlying authority
-重新核對；上一個 task 的 `memory.md`／transcript 不能證明 item 已執行。兩個本機 agent 不得同時 dispatch
-或同時寫同一 working tree。
+Codex／Claude Code 都是可互換的本機 executor，不把 routine、研究或完整 pq2 流程寫死給任一方。收到
+使用者對 **exact pq2 item** 的明確核准後，當下 agent 可走完整 type-aware 動作，但必須重新讀
+`todo_pool.json` 與 underlying authority；權限與完成狀態綁 action type＋receipt，不綁 provider。上一個 task 的
+`memory.md`／transcript 或模型 recommendation 不能授權，也不能證明 item 已執行。兩個本機 agent 不得同時
+dispatch 或同時寫同一 working tree。
 
 ```powershell
 & '.venv\Scripts\python.exe' -m engine_b.todo list --json
 & '.venv\Scripts\python.exe' -c "from engine_b.batch import parse_batch_reply; import json,sys; print(json.dumps(parse_batch_reply(sys.argv[1])))" "1 3 7 go 4 drop 5 6 pending"
 ```
 
-依編號對應的**項目類型** dispatch（type-aware；動詞不新增任何權限語意）。`todo batch` 只會更新池與
-稽核 log，**不會代做** pq1／apply／reassess；必須先完成或 checkpoint 對應動作，再以
-`python -m engine_b.todo resolve <編號> --verb <動詞>` 記錄結果，不能先 resolve 再假裝已執行：
+依編號對應的**項目類型** dispatch（type-aware；動詞不新增任何權限語意）。`todo batch` 不會代做
+pq1／apply／reassess；沒有完成 receipt 的 `go` 會失敗並留在池中。必須先完成或 checkpoint 對應動作，
+再由 type-specific completion command（或附該類型要求的 receipt）結案，不能先 resolve 再假裝已執行：
 
 | 動詞 | legacy lead | 已 prepared 的 RA | Decision review | 到期 thesis |
 |------|-------------|-------------------|-----------------|-------------|
@@ -206,14 +208,19 @@ brief 不得再次請使用者 go。只有 `parked` outcome receipt，或補缺�
 結案；舊 baseline decision 不算完成 receipt。
 
 **go 一個 prepared RA ＝入圖**：走既有 `apply_research_action`（本機或 MCP native approval，一次確認）
-→ `advance <lead> applied --ref focus_company_id=co:x` → **入圖後自動建 Shadow 追蹤**：
+→ `advance <lead> applied --ref research_action_id=<ra_id> --ref action_digest=<digest> --ref focus_company_id=co:x`
+→ `scripts/commit_pending_intake.py` 完成 durable publication → 用同一個 deterministic completion point 驗證
+apply／publish 並自動建立（或沿用）Decision Shadow：
 
 ```powershell
-& '.venv\Scripts\python.exe' -m decision_lab evaluate-signal "入圖後自動追蹤 co:x" --company-id co:x --ticker <T> --intent research
+& '.venv\Scripts\python.exe' scripts\commit_pending_intake.py
+& '.venv\Scripts\python.exe' -m engine_b.todo complete-ra <todo_n> --digest <完整 action_digest> [--company-id co:x] [--ticker <T>]
 ```
 
-（或程式內 `decision_lab.ensure_shadow_for_company`；已有 probe 則不重複建、改走 evidence-delta。）
-本機入圖後跑 `scripts/commit_pending_intake.py` 補 provenance 帳本。**live 決策（record-choice／
+`complete-ra` 只有在 RA 為 `pushed`（local-only 則 `applied/not_required`）、所有文件／report receipt 完整、
+來源 lead 已 `applied` 且有唯一 `focus_company_id`、Decision handoff 回傳 cohort 後，才以
+`action:<id>;digest:<sha256>;commit:<sha|not_required>;cohort:<dc_id>` resolve pq2；中途失敗可安全重跑。
+已有 active cohort 時不重複建，後續由 evidence-delta 顯示新 action。**live 決策（record-choice／
 record-fill）不在批次動詞集合**——永遠本機明確 flags，不得由 recommendation 推定 choice、choice 推定
 fill。系統不連 broker。
 

@@ -53,11 +53,17 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
    revise／retire 或其他 authority mutation，先 checkpoint awaiting_approval，完整 packet 回 pq2；不得拿舊
    assessment bare reassess。
 6. Graph admission、thesis retire／revise、Google Sheet 真實持倉值、`record-choice`／`record-fill` 永遠
-   保留人工 gate；不得因 routine recommendation 推定使用者核准。
+   保留人工 gate；不得因 routine recommendation 推定使用者核准。本機 Codex／Claude Code 是可互換
+   executor；任一方收到使用者對 exact pq2 item 的明確核准後都可完成全套 type-aware 動作，但權限與
+   完成狀態只認 underlying authority／receipt，不認 agent 身分、memory 或 transcript。
 7. 批次回覆中的 `decision_review go` 執行
    `.venv\Scripts\python.exe -m engine_b.todo dispatch <編號>`：只排入 gap pq1、不先 resolve。原項目在
    queued／researching／awaiting_approval 時不重複詢問；只有 parked outcome receipt 或補缺口後的新
-   decision receipt 才能結案。
+   decision receipt 才能結案。`ra_admission go` 必須先完成 apply、把來源 lead 標為 `applied` 並留下
+   `research_action_id`／`action_digest`／`focus_company_id`、跑 `scripts\commit_pending_intake.py`，最後執行
+   `.venv\Scripts\python.exe -m engine_b.todo complete-ra <todo_n> --digest <完整 action_digest>`；此命令驗證
+   durable publication、建立或沿用 Decision cohort 並留下組合 receipt。一般 `todo batch` 不得用 bare go
+   先清項目。
 8. 收尾執行 `.venv\Scripts\python.exe scripts\publish_daily_state.py`。這支固定 publisher 只准提交
    `library/leads/pending_leads.json` 與 `library/leads/todo_pool.json`；若 guard 拒絕，保留檔案並在 brief
    回報，不要改用廣泛 `git add/commit/push` 繞過。

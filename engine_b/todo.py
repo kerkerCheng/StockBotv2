@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
@@ -38,6 +39,9 @@ ITEM_TYPES: dict[str, str] = {
 }
 
 VERBS = ("go", "drop", "pending")
+
+_SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
+_GIT_COMMIT_RE = re.compile(r"^[0-9a-f]{40}$")
 
 
 class TodoError(ValueError):
@@ -155,6 +159,81 @@ def get(pool: Mapping[str, Any], n: int) -> dict[str, Any]:
     raise TodoError(f"編號 {n} 不存在或已處理")
 
 
+def _receipt_fields(receipt: str) -> dict[str, str]:
+    """解析 `key:value;key:value` receipt；拒絕空值與重複欄位。"""
+
+    fields: dict[str, str] = {}
+    for part in receipt.split(";"):
+        key, separator, value = part.partition(":")
+        key = key.strip()
+        value = value.strip()
+        if not separator or not key or not value:
+            raise TodoError("receipt 必須是非空的 key:value（多欄以分號分隔）")
+        if key in fields:
+            raise TodoError(f"receipt 欄位重複：{key}")
+        fields[key] = value
+    return fields
+
+
+def _validate_go_receipt(item: Mapping[str, Any], receipt: str) -> None:
+    """依 pq2 類型驗證完成 receipt；推薦或 transcript 都不是 authority。"""
+
+    item_type = str(item["type"])
+    if item_type == "lead_research":
+        raise TodoError("legacy lead 不得在 pq2 go；請先執行 todo sync 移回 pq1")
+    if item_type == "decision_review":
+        if item.get("dispatch_status") not in {"completed", "parked"}:
+            raise TodoError("decision_review 不得 bare go；請先 dispatch 並完成 pq1 checkpoint")
+        if not receipt.strip() or receipt != item.get("dispatch_receipt"):
+            raise TodoError("decision_review receipt 必須等於 terminal pq1 checkpoint receipt")
+        if item.get("dispatch_status") == "completed" and not receipt.startswith("decision:pd_"):
+            raise TodoError("completed decision_review 必須附新 decision receipt")
+        return
+
+    if not receipt.strip():
+        raise TodoError(f"{item_type} go 必須附 underlying authority receipt")
+    fields = _receipt_fields(receipt)
+
+    if item_type == "ra_admission":
+        if set(fields) != {"action", "digest", "commit", "cohort"}:
+            raise TodoError("ra_admission receipt 必須含 action、digest、commit、cohort")
+        if fields["action"] != item["ref_id"]:
+            raise TodoError("ra_admission receipt 的 action 不符 exact pq2 item")
+        if not _SHA256_RE.fullmatch(fields["digest"]):
+            raise TodoError("ra_admission receipt digest 必須是 64 位 sha256")
+        if fields["commit"] != "not_required" and not _GIT_COMMIT_RE.fullmatch(fields["commit"]):
+            raise TodoError("ra_admission receipt commit 必須是 40 位 Git SHA 或 not_required")
+        if not fields["cohort"].startswith("dc_"):
+            raise TodoError("ra_admission receipt 必須含 Decision cohort")
+        completion = item.get("completion_authority") or {}
+        if (
+            completion.get("action_digest") != fields["digest"]
+            or completion.get("commit") != fields["commit"]
+            or completion.get("cohort_id") != fields["cohort"]
+        ):
+            raise TodoError("請用 todo complete-ra 驗證 apply／publish／Decision handoff 後再結案")
+        return
+
+    if item_type == "thesis_lifecycle":
+        if set(fields) != {"lifecycle", "commit"}:
+            raise TodoError("thesis_lifecycle receipt 必須含 lifecycle 與 commit")
+        if fields["lifecycle"] != item["ref_id"] or not _GIT_COMMIT_RE.fullmatch(fields["commit"]):
+            raise TodoError("thesis_lifecycle receipt 必須對應 exact thesis 與 40 位 Git SHA")
+        return
+
+    if item_type == "sheet_only_holding":
+        if set(fields) != {"decision"} or not fields["decision"].startswith("pd_"):
+            raise TodoError("sheet_only_holding receipt 必須是 decision:<decision_id>")
+        return
+
+    if item_type == "manual":
+        if set(fields) != {"authority", "ref"}:
+            raise TodoError("manual receipt 必須含 authority:<kind>;ref:<underlying_id>")
+        return
+
+    raise TodoError(f"尚未定義 {item_type} 的 go receipt contract")
+
+
 def resolve(
     pool: dict[str, Any],
     n: int,
@@ -168,8 +247,8 @@ def resolve(
     if verb not in VERBS:
         raise TodoError(f"未知動詞：{verb}（可用：{', '.join(VERBS)}）")
     item = get(pool, n)
-    if verb == "go" and item["type"] == "decision_review" and not receipt.strip():
-        raise TodoError("decision_review 不得 bare go；請先 dispatch pq1，完成後附 receipt resolve")
+    if verb == "go":
+        _validate_go_receipt(item, receipt)
     stamp = at or _now()
     if verb == "pending":
         item["deferred_at"] = stamp
@@ -326,6 +405,152 @@ def apply_batch(
     return {"applied": sorted(applied), "failed": sorted(failed)}
 
 
+def _read_action_for_completion(action_id: str) -> dict[str, Any]:
+    from mcp_server.research_actions import read_action
+
+    return read_action(action_id)
+
+
+def _lead_context_for_action(
+    action_id: str, *, action_digest: str, leads_path: Path | str
+) -> dict[str, str]:
+    from engine_b.leads import load as load_leads
+
+    store = load_leads(leads_path)
+    matches = [
+        lead for lead in store["leads"].values()
+        if (lead.get("refs") or {}).get("research_action_id") == action_id
+    ]
+    if not matches:
+        raise TodoError(f"找不到綁定 {action_id} 的 lead receipt")
+    if any(lead.get("status") != "applied" for lead in matches):
+        raise TodoError("Research Action 的來源 lead 尚未全部標記 applied")
+    if any(
+        (lead.get("refs") or {}).get("action_digest") != action_digest
+        for lead in matches
+    ):
+        raise TodoError("applied lead 的 action_digest 缺失或與核准內容不符")
+    companies = {
+        str((lead.get("refs") or {}).get("focus_company_id") or "").strip()
+        for lead in matches
+    } - {""}
+    if len(companies) != 1:
+        raise TodoError("applied lead 必須留下唯一 focus_company_id")
+    return {"company_id": companies.pop()}
+
+
+def _ensure_shadow_for_completion(
+    *, company_id: str, ticker: str | None, as_of: str
+) -> dict[str, Any]:
+    from decision_lab.bootstrap import open_default_store
+    from decision_lab.workflow import ensure_shadow_for_company
+    from engine_d_runtime.bootstrap import build_default_runtime_provider
+
+    store = open_default_store()
+    provider = None
+    try:
+        provider = build_default_runtime_provider()
+        return ensure_shadow_for_company(
+            store,
+            provider,
+            company_id=company_id,
+            ticker=ticker,
+            as_of=as_of,
+        )
+    finally:
+        try:
+            if provider is not None:
+                provider.close()
+        finally:
+            store.close()
+
+
+def complete_ra_admission(
+    pool: dict[str, Any],
+    n: int,
+    *,
+    action_digest: str,
+    company_id: str | None = None,
+    ticker: str | None = None,
+    leads_path: Path | str | None = None,
+    at: str | None = None,
+) -> dict[str, Any]:
+    """驗證 RA 已完整 apply/publish，建立（或沿用）Shadow 後才 resolve pq2。
+
+    此 completion point 不綁 Codex 或 Claude Code；任何本機 agent 在收到使用者
+    對 exact item 的明確核准後，都走同一組 authority 與 receipt 檢查。
+    """
+
+    item = get(pool, n)
+    if item["type"] != "ra_admission":
+        raise TodoError(f"[{n}] 不是 ra_admission")
+    action_id = str(item["ref_id"])
+    digest = action_digest.strip().lower()
+    if not _SHA256_RE.fullmatch(digest):
+        raise TodoError("--digest 必須是完整 64 位 sha256")
+    action = _read_action_for_completion(action_id)
+    if action.get("action_digest") != digest:
+        raise TodoError("Research Action digest 不符 exact 核准內容")
+
+    git = action.get("git") or {}
+    if action.get("state") == "pushed" and git.get("status") == "pushed":
+        commit = str(git.get("commit") or "").lower()
+        if not _GIT_COMMIT_RE.fullmatch(commit):
+            raise TodoError("pushed Research Action 缺少有效 commit receipt")
+    elif action.get("state") == "applied" and git.get("status") == "not_required":
+        commit = "not_required"
+    else:
+        raise TodoError("Research Action 尚未完成 apply 與 publish（或 local-only durable apply）")
+    execution = action.get("execution") or {}
+    if any(row.get("status") != "complete" for row in execution.get("documents") or []):
+        raise TodoError("Research Action document receipts 尚未 complete")
+    if (execution.get("report") or {}).get("status") != "complete":
+        raise TodoError("Research Action report receipt 尚未 complete")
+
+    from engine_b.leads import DEFAULT_LEADS_PATH
+    lead_context = _lead_context_for_action(
+        action_id,
+        action_digest=digest,
+        leads_path=leads_path or DEFAULT_LEADS_PATH,
+    )
+    recorded_company = lead_context["company_id"]
+    if company_id and company_id.strip() != recorded_company:
+        raise TodoError("--company-id 與 applied lead 的 focus_company_id 不符")
+    target_company = recorded_company
+    if not ticker:
+        from identity.registry import get_registry
+
+        ticker = get_registry().research_ticker(target_company)
+    stamp = at or _now()
+    handoff = _ensure_shadow_for_completion(
+        company_id=target_company,
+        ticker=ticker,
+        as_of=stamp,
+    )
+    cohort_id = str(handoff.get("cohort_id") or "")
+    if not cohort_id.startswith("dc_"):
+        raise TodoError("Decision handoff 未回傳有效 cohort receipt")
+    receipt = (
+        f"action:{action_id};digest:{digest};commit:{commit};cohort:{cohort_id}"
+    )
+    item["completion_authority"] = {
+        "action_digest": digest,
+        "commit": commit,
+        "company_id": target_company,
+        "cohort_id": cohort_id,
+        "verified_at": stamp,
+    }
+    resolved = resolve(
+        pool,
+        n,
+        "go",
+        reason="Research Action durable apply＋Decision Shadow handoff 完成",
+        receipt=receipt,
+        at=stamp,
+    )
+    return {"item": resolved, "action": action_id, "handoff": handoff, "receipt": receipt}
+
+
 def retire_legacy_pq1_items(
     pool: dict[str, Any], *, at: str | None = None
 ) -> int:
@@ -403,11 +628,20 @@ def collect_from_research_actions() -> list[dict[str, Any]]:
         return []
     rows: list[dict[str, Any]] = []
     for action in iter_actions():
-        if action.get("state") in {"ready_for_approval", "partial_apply"}:
+        if action.get("state") in {
+            "ready", "applying", "partial", "ready_for_approval", "partial_apply"
+        }:
+            title = (
+                action.get("slug")
+                or action.get("title")
+                or ((action.get("payload") or {}).get("report") or {}).get("title")
+                or (action.get("review") or {}).get("title")
+                or "Research Action"
+            )
             rows.append({
                 "type": "ra_admission",
                 "ref_id": str(action.get("action_id") or action.get("id") or ""),
-                "title": str(action.get("slug") or action.get("title") or "Research Action"),
+                "title": str(title),
                 "source": "research_action",
             })
     return [r for r in rows if r["ref_id"]]
@@ -555,6 +789,16 @@ def main(argv: list[str] | None = None) -> int:
     p_work.add_argument("--receipt", required=True)
     p_work.add_argument("--reason", default="")
 
+    p_complete_ra = sub.add_parser(
+        "complete-ra",
+        help="驗證 RA durable apply＋Decision handoff 後結案 exact pq2 item",
+    )
+    p_complete_ra.add_argument("number", type=int)
+    p_complete_ra.add_argument("--digest", required=True)
+    p_complete_ra.add_argument("--company-id", default="")
+    p_complete_ra.add_argument("--ticker", default="")
+    p_complete_ra.add_argument("--leads", default="")
+
     p_batch = sub.add_parser("batch", help="套用批次語法，如 '1 3 go 4 drop'")
     p_batch.add_argument("reply")
 
@@ -628,6 +872,23 @@ def main(argv: list[str] | None = None) -> int:
         finally:
             store.close()
         return 1 if failures else 0
+
+    if args.command == "complete-ra":
+        try:
+            result = complete_ra_admission(
+                pool,
+                args.number,
+                action_digest=args.digest,
+                company_id=args.company_id or None,
+                ticker=args.ticker or None,
+                leads_path=args.leads or None,
+            )
+            save(pool, args.pool)
+            print(json.dumps(result, ensure_ascii=False, indent=2))
+            return 0
+        except (TodoError, KeyError, OSError, ValueError) as exc:
+            print(f"✗ [{args.number}]：{exc}", file=sys.stderr)
+            return 1
 
     if args.command == "batch":
         from engine_b.batch import parse_batch_reply
