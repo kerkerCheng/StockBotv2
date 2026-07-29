@@ -14,8 +14,10 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
 
 ## 執行契約
 
-1. 先讀 `AGENTS.md` 與 `skills/daily-brief/SKILL.md`。確認目前 branch 是 `master`；若不是就停止並回報，
-   不自行切 branch。若 working tree 有與本 routine 無關的使用者變更，保留不碰。
+1. 先讀 `AGENTS.md` 與 `skills/daily-brief/SKILL.md`。Codex desktop 執行時，立即把目前 task 標題改成
+   `StockBotv2 Daily Brief — YYYY-MM-DD`（日期取 Asia/Taipei 當日）；只在 brief 內輸出帶日期標題不算完成。
+   確認目前 branch 是 `master`；若不是就停止並回報，不自行切 branch。若 working tree 有與本 routine
+   無關的使用者變更，保留不碰。
 2. Windows 一律使用專案 interpreter：`.venv\Scripts\python.exe`，不得用 bare `python`。
 3. 依序執行：
    - `.venv\Scripts\python.exe crons\harvest_leads.py`（X＋EDGAR；以 `since_id`／URL hash 去重）
