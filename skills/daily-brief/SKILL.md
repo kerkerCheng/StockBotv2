@@ -49,6 +49,9 @@ facility，undrawn credit 不進 NAV／cash／allocation。technical／capital t
 **解析失敗 ≠ 無新文**，`insufficient_history`／`unavailable`／`stale` 也必須在健康段落明示並讓受影響的
 technical 或 household range 獨立歸零；Capital Authority 失敗不得連帶抹掉 Phase I Sheet range。Windows 本機與
 scheduled task 一律使用 repo `.venv`，不要依賴父 shell 是否剛好 activate。
+Engine C 同一筆 observation 保存 adjusted-close 的 1／5／20-session return；Engine D 才負責把
+return、RSI、252-session drawdown、signal tier、cooldown 與 capital constraints 組成 Mobile-friendly
+燈號。燈號必須配 `可評估／冷卻／觀察／資料不足` 文字，且不構成 live permission。
 
 ### Step 2 — Triage 新 pending leads（依 signal-triage 判準）
 
@@ -119,7 +122,7 @@ pq1 是唯一昂貴階段（web search + 讀文件 + 抽 claim）——priority 
 （material=有觸及 thesis 因果結構的新證據 → 建議 reassess；peripheral=只多週邊 source；none=無變或
 純價格波動）。再讀 `thesis/lifecycle.json` 列到期需複查的 thesis。純讀，不建 decision。
 
-### Step 5 — 同步統一待辦池並組 brief（繁中、exception-first、**穩定編號、無顏色**）
+### Step 5 — 同步統一待辦池並組 brief（繁中、exception-first、**穩定編號**）
 
 先同步所有 pq2 來源：
 
@@ -163,7 +166,10 @@ paper 無異動｜live 無 pending fill｜...
 回覆：`<編號…> go｜drop｜pending`（例：`3 4 go 5 drop`）
 ```
 
-**不使用顏色維度**（顏色曾混淆 triage 與優先度）；改用明確指令字串。Form 4 與較舊 filing 一律進
+pq2／lead priority **不使用顏色維度**（顏色曾混淆 triage 與優先度），一律使用明確指令字串。Beta
+technical 區可用配有文字的燈號表達 deterministic state，但不得只靠顏色，也不得把 `可評估` 寫成 `買進`。
+主力首屏依序顯示 `QQQ`、`TQQQ`、`LON:VWRA`、`SOXX`、`00631L.TW`、`2330.TW`、`00981A.TW`；
+個股與其他標的縮成 exception-first 摘要。Form 4 與較舊 filing 一律進
 「低優先（摺疊）」只列數量——冷啟動 EDGAR seed 偏 Form 4，別淹沒新訊號。
 
 ### Step 6 — 批次 dispatch（type-aware）

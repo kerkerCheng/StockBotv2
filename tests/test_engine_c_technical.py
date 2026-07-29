@@ -60,6 +60,7 @@ def test_indicator_builder_emits_complete_finite_observation() -> None:
     assert result["session_count"] == 300
     assert result["rsi_14"] == pytest.approx(100.0)
     assert result["drawdown_252"] == pytest.approx(0.0)
+    assert 0 < result["return_1d"] < result["return_5d"] < result["return_20d"]
     assert result["sma_20"] < result["close_adjusted"]
     assert result["distance_sma_200"] > 0
     assert result["sma_50_slope_5"] > 0
@@ -89,6 +90,9 @@ def test_short_history_and_forming_row_fail_closed_without_hiding_partial_metric
     assert result["data_status"] == "insufficient_history"
     assert result["session_count"] == 251
     assert result["rsi_14"] is not None
+    assert result["return_1d"] is not None
+    assert result["return_5d"] is not None
+    assert result["return_20d"] is not None
     assert result["drawdown_252"] is None
     assert result["blockers"] == ["technical_history_insufficient_252_sessions"]
     assert "forming_session_excluded" in result["warnings"]
@@ -126,6 +130,21 @@ def test_append_is_idempotent_and_recent_query_deduplicates_session() -> None:
     assert conn.execute("SELECT COUNT(*) FROM technical_observations").fetchone()[0] == 2
     assert len(recent_technical_observations(conn, "qqq")) == 1
     assert latest_technical_status(conn, "qqq")["fetched_at"] == newer["fetched_at"]
+    conn.close()
+
+
+def test_sqlite_schema_upgrade_adds_return_columns_non_destructively() -> None:
+    conn = sqlite3.connect(":memory:")
+    conn.execute(
+        "CREATE TABLE technical_observations (benchmark_key TEXT, session_date TEXT, fetched_at TEXT)"
+    )
+
+    ensure_technical_schema(conn)
+
+    columns = {
+        row[1] for row in conn.execute("PRAGMA table_info(technical_observations)").fetchall()
+    }
+    assert {"return_1d", "return_5d", "return_20d"} <= columns
     conn.close()
 
 
@@ -178,6 +197,9 @@ def test_postgres_decimal_and_date_rows_normalize_to_public_scalars() -> None:
         **{key: Decimal("1.25") for key in (
             "close_raw",
             "close_adjusted",
+            "return_1d",
+            "return_5d",
+            "return_20d",
             "drawdown_252",
             "rsi_14",
             "macd_line",
@@ -207,3 +229,4 @@ def test_postgres_decimal_and_date_rows_normalize_to_public_scalars() -> None:
     assert normalized["session_date"] == "2026-07-27"
     assert normalized["fetched_at"] == "2026-07-28T00:00:00+00:00"
     assert normalized["rsi_14"] == 1.25
+    assert normalized["return_20d"] == 1.25

@@ -14,6 +14,7 @@ REQUIRED_MIGRATIONS = (
     "20260721_add_manual_observations.sql",
     "20260721_add_probe_financial_baseline.sql",
     "20260728_add_technical_observations.sql",
+    "20260729_add_technical_returns.sql",
 )
 REQUIRED_TABLES = (
     "consensus_coverage_observations",

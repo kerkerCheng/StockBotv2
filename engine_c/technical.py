@@ -15,6 +15,9 @@ _STATUS = {"observed", "insufficient_history", "unavailable", "quarantined"}
 _METRIC_COLUMNS = (
     "close_raw",
     "close_adjusted",
+    "return_1d",
+    "return_5d",
+    "return_20d",
     "drawdown_252",
     "rsi_14",
     "macd_line",
@@ -141,6 +144,13 @@ def _realized_vol(values: Sequence[float], sessions: int) -> float | None:
     return statistics.stdev(returns) * math.sqrt(252.0)
 
 
+def _period_return(values: Sequence[float], sessions: int) -> float | None:
+    if sessions < 1 or len(values) <= sessions:
+        return None
+    prior = values[-(sessions + 1)]
+    return values[-1] / prior - 1.0 if prior > 0 else None
+
+
 def unavailable_observation(
     *,
     benchmark_key: str,
@@ -237,6 +247,9 @@ def build_technical_observation(
     base["series_digest"] = _digest(json.dumps(series_payload, separators=(",", ":")))
     base["close_raw"] = raw_values[-1]
     base["close_adjusted"] = adjusted_values[-1]
+    base["return_1d"] = _period_return(adjusted_values, 1)
+    base["return_5d"] = _period_return(adjusted_values, 5)
+    base["return_20d"] = _period_return(adjusted_values, 20)
     base["rsi_14"] = _rsi_wilder(adjusted_values)
     (
         base["macd_line"],
@@ -370,6 +383,9 @@ def ensure_technical_schema(conn) -> None:
             ),
             close_raw REAL,
             close_adjusted REAL,
+            return_1d REAL,
+            return_5d REAL,
+            return_20d REAL,
             drawdown_252 REAL,
             rsi_14 REAL,
             macd_line REAL,
@@ -399,6 +415,12 @@ def ensure_technical_schema(conn) -> None:
             ON technical_observations (benchmark_key, fetched_at DESC);
         """
     )
+    existing_columns = {
+        str(row[1]) for row in conn.execute("PRAGMA table_info(technical_observations)")
+    }
+    for column in ("return_1d", "return_5d", "return_20d"):
+        if column not in existing_columns:
+            conn.execute(f"ALTER TABLE technical_observations ADD COLUMN {column} REAL")
 
 
 def _validated_storage_payload(observation: Mapping[str, Any]) -> dict[str, Any]:

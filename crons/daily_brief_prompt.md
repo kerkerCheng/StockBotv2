@@ -24,7 +24,8 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
    - `.venv\Scripts\python.exe engine_c\etl_yfinance.py`（35 檔 Engine C daily snapshot）
    - `.venv\Scripts\python.exe scripts\daily_beta_snapshot.py --format markdown`（固定 ETF／權值股 technical refresh
      ＋ Engine D 雙 cash range beta monitor；並列 `sheet_conservative_range`／`household_cash_supported_range`，
-     contingent credit 不算資本，loan-funded range 固定人工 review；只呈現、不推定 draw／choice／fill）
+     Engine C 保存 adjusted-close 1／5／20-session return；contingent credit 不算資本，loan-funded range 固定
+     人工 review；只呈現、不推定 draw／choice／fill）
    - 對今日新增 pending leads 套 `skills/signal-triage/SKILL.md`，用本機 CLI 寫回 triage
    - `.venv\Scripts\python.exe -m decision_lab today --format markdown`
    - `.venv\Scripts\python.exe -m engine_b.todo sync`
@@ -74,6 +75,7 @@ Asia/Taipei 當日；沒有日期的 brief 視為未完成輸出（多份 brief 
 
 ## Beta capital observation（無 pq2 編號）
 <sheet_conservative_range／household_cash_supported_range／contingent_credit_available／loan_funded_supported_range>
+<先列需要人工判斷，再列主力 QQQ／TQQQ／LON:VWRA／SOXX／00631L.TW／2330.TW／00981A.TW；每檔用文字燈號＋1／5／20 日漲跌＋必要指標，個股與其他縮成摘要>
 
 ## 健康／資料降級
 <本次 harvest、Engine C、beta technical、Neo4j、Sheet 的失敗或缺口；無則寫正常>

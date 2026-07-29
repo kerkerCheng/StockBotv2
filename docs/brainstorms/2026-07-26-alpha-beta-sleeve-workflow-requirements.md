@@ -761,7 +761,8 @@ Daily Brief，採以下 presentation hierarchy；這是 UI／通知 brainstorm�
 3. `GOOGL`、`TSLA`、`NVDA`、`MU` 等個股繼續追蹤，但放在次區塊，以一兩句 exception-first 摘要或
    可摺疊內容呈現；只有狀態改變或形成非零 review range 才提升到首屏。
 4. 1／5／20 日漲跌可作為 App-like context，但必須由正式 TechnicalObservation／可重現行情計算提供；
-   欄位未實作前顯示 unavailable，不從模型補數字。
+   2026-07-29 已實作為 Engine C adjusted-close `return_1d`／`return_5d`／`return_20d`，由 06:30 fixed entry
+   隨 technical refresh append；舊 observation 保持 NULL，不回寫假造歷史 decision。
 5. 通知先觀察 Codex Inbox，不立即增加外部服務。若一段時間後仍無法可靠提醒手機，第一個 fallback
    候選是 Discord webhook；token／URL 只放本機 `.env` 或 private authority，實作與 unattended send
    必須另行核准。

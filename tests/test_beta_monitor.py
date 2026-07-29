@@ -26,6 +26,9 @@ def _observation(
         "data_status": "observed",
         "fetched_at": NOW,
         "session_date": "2026-07-27",
+        "return_1d": -0.01,
+        "return_5d": -0.03,
+        "return_20d": -0.08,
         "rsi_14": rsi,
         "drawdown_252": drawdown,
         "macd_histogram": -0.2,
@@ -378,5 +381,8 @@ def test_markdown_is_aggregate_and_preserves_human_boundary() -> None:
     rendered = render_beta_monitor_markdown(report)
 
     assert "Sheet-only conservative" in rendered
+    assert "1日 -1.0%｜5日 -3.0%｜20日 -8.0%" in rendered
+    assert "## 主力 ETF／權值" in rendered
+    assert rendered.index("QQQ") < rendered.index("TQQQ")
     assert "不代表已核准、已下單或已寫回" in rendered
     assert "shares" not in rendered

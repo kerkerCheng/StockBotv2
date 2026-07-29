@@ -100,6 +100,17 @@ def test_repository_technical_migration_has_append_only_postgres_ddl() -> None:
     assert "idx_technical_benchmark_session" in sql
 
 
+def test_repository_technical_returns_migration_is_idempotent() -> None:
+    path = Path(__file__).resolve().parents[1] / "engine_c" / "migrations" / (
+        "20260729_add_technical_returns.sql"
+    )
+    sql = path.read_text(encoding="utf-8")
+
+    assert "ADD COLUMN IF NOT EXISTS return_1d" in sql
+    assert "ADD COLUMN IF NOT EXISTS return_5d" in sql
+    assert "ADD COLUMN IF NOT EXISTS return_20d" in sql
+
+
 def test_missing_or_empty_migration_directory_fails_closed(tmp_path: Path) -> None:
     with pytest.raises(RuntimeError, match="does not exist"):
         apply_migrations(FakeConnection(), migrations_dir=tmp_path / "missing")

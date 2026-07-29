@@ -10,6 +10,15 @@ from .capital_authority import build_household_capital_view
 
 
 _ACTIONS = {"HOLD", "PAUSE CONTRIBUTION", "CONTRIBUTE REVIEW"}
+_PRIMARY_DISPLAY_ORDER = (
+    "QQQ",
+    "TQQQ",
+    "LON:VWRA",
+    "SOXX",
+    "00631L.TW",
+    "2330.TW",
+    "00981A.TW",
+)
 
 
 def _finite(value: Any, *, non_negative: bool = False) -> float | None:
@@ -516,6 +525,9 @@ def build_beta_monitor(
             key: observation.get(key) if observation else None
             for key in (
                 "session_date",
+                "return_1d",
+                "return_5d",
+                "return_20d",
                 "rsi_14",
                 "drawdown_252",
                 "macd_histogram",
@@ -638,6 +650,55 @@ def _pct(value: Any) -> str:
     return "未知" if parsed is None else f"{parsed * 100:.1f}%"
 
 
+def _signed_pct(value: Any) -> str:
+    parsed = _finite(value)
+    if parsed is None:
+        return "未知"
+    percentage = parsed * 100
+    if abs(percentage) < 0.05:
+        percentage = 0.0
+    return f"{percentage:+.1f}%"
+
+
+def _moves(indicator: Mapping[str, Any]) -> str:
+    return (
+        f"1日 {_signed_pct(indicator.get('return_1d'))}｜"
+        f"5日 {_signed_pct(indicator.get('return_5d'))}｜"
+        f"20日 {_signed_pct(indicator.get('return_20d'))}"
+    )
+
+
+def _display_label(item: Mapping[str, Any], *, household_path_available: bool) -> str:
+    if item["action"] == "CONTRIBUTE REVIEW" or (
+        household_path_available and item["household_action"] == "CONTRIBUTE REVIEW"
+    ):
+        return "🟢 可評估"
+    if item["technical_status"] != "observed":
+        return "🔴 資料不足"
+    blockers = set(item.get("blockers") or [])
+    if household_path_available:
+        blockers |= set(item.get("household_blockers") or [])
+    if "signal_review_cooldown" in blockers or "overlapping_instrument_deferred" in blockers:
+        return "🟡 冷卻／排序中"
+    if item["action"] == "PAUSE CONTRIBUTION" or (
+        household_path_available and item["household_action"] == "PAUSE CONTRIBUTION"
+    ):
+        return "🔴 暫停新增"
+    return "⚪ 觀察"
+
+
+def _compact_monitor_item(
+    item: Mapping[str, Any], *, household_path_available: bool
+) -> str:
+    return (
+        f"{item['ticker']} {_display_label(item, household_path_available=household_path_available)}"
+        f"（{_moves(item['indicator'])}，"
+        f"{item['signal_tier']}/pace {item['signal_pace']:.2f}"
+        + (f"，{','.join(item['blockers'])}" if item["blockers"] else "")
+        + "）"
+    )
+
+
 def _money(value: Any, currency: str | None) -> str:
     parsed = _finite(value, non_negative=True)
     return "未知" if parsed is None else f"{currency or ''} {parsed:,.0f}".strip()
@@ -710,8 +771,10 @@ def render_beta_monitor_markdown(report: Mapping[str, Any]) -> str:
     for item in reviews:
         indicator = item["indicator"]
         lines.append(
-            f"- {item['ticker']} — {item['signal_tier']} / pace {item['signal_pace']:.2f}｜"
-            f"RSI {_finite(indicator.get('rsi_14')) or 0:.1f}｜drawdown {_pct(indicator.get('drawdown_252'))}｜"
+            f"- {_display_label(item, household_path_available=household_path_available)}｜"
+            f"{item['ticker']}｜{_moves(indicator)}｜"
+            f"RSI {_finite(indicator.get('rsi_14')) or 0:.1f}｜距高點 {_pct(indicator.get('drawdown_252'))}｜"
+            f"{item['signal_tier']} / pace {item['signal_pace']:.2f}｜"
             f"Sheet／household 上限 {_money(item['supported_order_range_base'][1], currency)}／"
             f"{_money(item['household_cash_supported_order_range_base'][1], currency)}｜"
             f"Sheet 約束 {','.join(item['binding_constraints']) or 'none'}｜"
@@ -720,21 +783,57 @@ def render_beta_monitor_markdown(report: Mapping[str, Any]) -> str:
     if paused:
         lines += ["", "## 暫停新增"]
         for item in paused:
+            indicator = item["indicator"]
             lines.append(
-                f"- {item['ticker']} — {item['technical_status']}｜"
+                f"- {_display_label(item, household_path_available=household_path_available)}｜"
+                f"{item['ticker']}｜{_moves(indicator)}｜"
+                f"{item['technical_status']}｜"
                 f"Sheet={','.join(item['blockers']) or item['action']}｜"
                 f"household={','.join(item['household_blockers']) or item['household_action']}"
             )
-    lines += ["", "## 正常監控"]
-    if holds:
-        lines.append(
-            "- "
-            + "；".join(
-                f"{item['ticker']}={item['signal_tier']}/pace {item['signal_pace']:.2f}"
-                + (f" ({','.join(item['blockers'])})" if item["blockers"] else "")
-                for item in holds
+    primary_rank = {ticker: index for index, ticker in enumerate(_PRIMARY_DISPLAY_ORDER)}
+    primary_holds = sorted(
+        (item for item in holds if item["ticker"] in primary_rank),
+        key=lambda item: primary_rank[item["ticker"]],
+    )
+    secondary_holds = [item for item in holds if item["ticker"] not in primary_rank]
+    lines += ["", "## 主力 ETF／權值"]
+    if primary_holds:
+        for item in primary_holds:
+            indicator = item["indicator"]
+            lines.append(
+                f"- {_display_label(item, household_path_available=household_path_available)}｜"
+                f"{item['ticker']}｜{_moves(indicator)}｜"
+                f"RSI {_finite(indicator.get('rsi_14')) or 0:.1f}｜"
+                f"距高點 {_pct(indicator.get('drawdown_252'))}｜"
+                f"{item['signal_tier']} / pace {item['signal_pace']:.2f}"
             )
-        )
+    else:
+        lines.append("- 無")
+    lines += ["", "## 個股與其他（摘要）"]
+    if secondary_holds:
+        other_etfs = [item for item in secondary_holds if item["ticker"] in {"0050.TW", "006208.TW"}]
+        individual_names = [item for item in secondary_holds if item not in other_etfs]
+        if other_etfs:
+            lines.append(
+                "- 其他 ETF："
+                + "；".join(
+                    _compact_monitor_item(
+                        item, household_path_available=household_path_available
+                    )
+                    for item in other_etfs
+                )
+            )
+        if individual_names:
+            lines.append(
+                "- 個股："
+                + "；".join(
+                    _compact_monitor_item(
+                        item, household_path_available=household_path_available
+                    )
+                    for item in individual_names
+                )
+            )
     else:
         lines.append("- 無")
     lines += [
