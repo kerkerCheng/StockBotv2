@@ -1,7 +1,7 @@
 {
   "schema_version": "1",
   "pq1": {
-    "drain_limit_per_run": 2,
+    "drain_limit_per_run": 5,
     "tracked_ticker_sources": {
       "thesis_lifecycle": true,
       "decision_cohorts": true
