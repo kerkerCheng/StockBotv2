@@ -173,6 +173,49 @@ def test_triage_only_from_pending() -> None:
         leads.triage(store, lead_id, go=True, tier=2, reason="再一次")
 
 
+def test_campaign_requeue_preserves_prior_triage_receipt() -> None:
+    store = leads.empty_store()
+    lead_id, _ = leads.register(
+        store, source="x:test", url="https://x.com/test/status/1"
+    )
+    leads.triage(store, lead_id, go=False, tier=4, reason="未追蹤標的")
+
+    lead = leads.requeue_for_triage(
+        store,
+        lead_id,
+        reason="使用者指定 robotics campaign",
+        campaign_id="robotics_30d",
+        requeued_at="2026-07-29T00:00:00+00:00",
+    )
+
+    assert lead["status"] == "pending" and lead["triage"] is None
+    assert lead["refs"]["campaign_ids"] == ["robotics_30d"]
+    assert lead["triage_history"] == [{
+        "status": "triaged_no_go",
+        "triage": {
+            "decision": "no_go",
+            "tier": 4,
+            "reason": "未追蹤標的",
+            "decided_at": lead["triage_history"][0]["triage"]["decided_at"],
+            "priority_flags": {},
+        },
+        "superseded_at": "2026-07-29T00:00:00+00:00",
+        "superseded_reason": "使用者指定 robotics campaign",
+        "campaign_id": "robotics_30d",
+    }]
+
+
+def test_campaign_requeue_rejects_non_no_go() -> None:
+    store = leads.empty_store()
+    lead_id, _ = leads.register(
+        store, source="x:test", url="https://x.com/test/status/2"
+    )
+    with pytest.raises(leads.LeadStateError, match="只允許 triaged_no_go"):
+        leads.requeue_for_triage(
+            store, lead_id, reason="x", campaign_id="campaign"
+        )
+
+
 # --- harvest_log 誠實降級 -------------------------------------------------
 
 def test_record_run_rejects_unknown_result() -> None:

@@ -314,7 +314,69 @@ def annotate_refs(
     return lead
 
 
-_PRIORITY_FLAG_KEYS = ("contradiction", "novelty", "independent_source")
+def tag_campaign(
+    store: dict[str, Any],
+    lead_id: str,
+    *,
+    campaign_id: str,
+) -> dict[str, Any]:
+    """將 lead 納入具名研究 campaign；保留所有歷次 campaign。"""
+    cleaned = str(campaign_id or "").strip()
+    if not cleaned:
+        raise ValueError("campaign_id 不可為空")
+    lead = _require(store, lead_id)
+    refs = lead.setdefault("refs", {})
+    history = refs.get("campaign_ids") or []
+    if not isinstance(history, list):
+        raise ValueError("campaign_ids 必須是 list")
+    refs["campaign_ids"] = list(dict.fromkeys([*history, cleaned]))
+    return lead
+
+
+def requeue_for_triage(
+    store: dict[str, Any],
+    lead_id: str,
+    *,
+    reason: str,
+    campaign_id: str,
+    requeued_at: str | None = None,
+) -> dict[str, Any]:
+    """明確 campaign 可重審舊 no-go，且不得抹掉先前 triage receipt。"""
+    cleaned_reason = str(reason or "").strip()
+    cleaned_campaign = str(campaign_id or "").strip()
+    if not cleaned_reason or not cleaned_campaign:
+        raise ValueError("requeue 必須附 reason 與 campaign_id")
+    lead = _require(store, lead_id)
+    if lead["status"] != "triaged_no_go":
+        raise LeadStateError(
+            f"campaign requeue 只允許 triaged_no_go；現況 {lead['status']}"
+        )
+    previous = lead.get("triage")
+    if previous:
+        history = lead.setdefault("triage_history", [])
+        if not isinstance(history, list):
+            raise ValueError("triage_history 必須是 list")
+        history.append(
+            {
+                "status": lead["status"],
+                "triage": dict(previous),
+                "superseded_at": requeued_at or _now(),
+                "superseded_reason": cleaned_reason,
+                "campaign_id": cleaned_campaign,
+            }
+        )
+    lead["status"] = "pending"
+    lead["triage"] = None
+    tag_campaign(store, lead_id, campaign_id=cleaned_campaign)
+    return lead
+
+
+_PRIORITY_FLAG_KEYS = (
+    "contradiction",
+    "novelty",
+    "independent_source",
+    "user_requested",
+)
 
 
 def triage(
@@ -333,7 +395,7 @@ def triage(
     強度（plan R2 不變式）；真正 evidence tier 由 source-trace／lead-intake 決定。
 
     priority_flags（可選）記 signal-triage 五要素中的 boolean 訊號
-    （contradiction／novelty／independent_source），供 priority 計分用；不影響
+    （contradiction／novelty／independent_source／user_requested），供 priority 計分用；不影響
     狀態機、不影響 evidence tier。
     """
     if not (1 <= int(tier) <= 4):

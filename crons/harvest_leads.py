@@ -17,6 +17,7 @@ import argparse
 import json
 import re
 import sys
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from urllib.error import URLError
 from urllib.request import Request, urlopen
@@ -187,20 +188,34 @@ def _cache_x_media(
     lead_id: str,
     section: dict,
     x_api,
+    existing_media: list[dict] | None = None,
 ) -> list[dict]:
     """保存 media metadata；啟用時把圖片／影片預覽 fail-soft 快取到 private。"""
     output: list[dict] = []
     cache_enabled = bool(section.get("cache_media", False))
     default_max = getattr(x_api, "DEFAULT_MEDIA_MAX_BYTES", 20 * 1024 * 1024)
     max_bytes = int(section.get("media_max_bytes", default_max))
+    old_by_key = {
+        str(item.get("media_key")): dict(item)
+        for item in (existing_media or [])
+        if item.get("media_key")
+    }
     for raw in post_media:
-        item = dict(raw)
+        item = dict(old_by_key.get(str(raw.get("media_key"))) or {})
+        item.update(raw)
         source_url = (
             item.get("url")
             if item.get("type") == "photo"
             else item.get("preview_image_url") or item.get("url")
         )
-        if cache_enabled and source_url and item.get("media_key"):
+        cached_path = str((item.get("cache") or {}).get("local_path") or "")
+        cache_exists = bool(cached_path and Path(cached_path).is_file())
+        if (
+            cache_enabled
+            and source_url
+            and item.get("media_key")
+            and not cache_exists
+        ):
             try:
                 cache = x_api.download_media_image(
                     source_url,
@@ -221,7 +236,14 @@ def _cache_x_media(
     return output
 
 
-def _x_post_item(handle: str, post: dict, section: dict, x_api) -> dict:
+def _x_post_item(
+    handle: str,
+    post: dict,
+    section: dict,
+    x_api,
+    *,
+    existing_media: list[dict] | None = None,
+) -> dict:
     url = x_api.post_url(handle, post["id"])
     raw_text = str(post.get("text") or "")
     lead_id = leads.lead_id_for(url)
@@ -236,6 +258,7 @@ def _x_post_item(handle: str, post: dict, section: dict, x_api) -> dict:
             lead_id=lead_id,
             section=section,
             x_api=x_api,
+            existing_media=existing_media,
         ),
         "published_at": post.get("created_at"),
     }
@@ -301,6 +324,134 @@ def harvest_x(config: dict, store: dict, *, seen_at: str | None = None) -> None:
         leads.record_run(store, source=source, result="ok", new=new, run_at=seen_at)
         cost = len(posts) * 0.005
         print(f"[harvest] {source} ok: {new} new / {len(posts)} posts (~${cost:.3f})")
+
+
+def backfill_x_handle(
+    config: dict,
+    store: dict,
+    handle: str,
+    *,
+    days: int = 30,
+    max_posts: int = 200,
+    campaign_id: str | None = None,
+    requeue_no_go: bool = False,
+    include_replies: bool = False,
+    start_at: datetime | None = None,
+    end_at: datetime | None = None,
+) -> dict:
+    """回補具名 X account 的 bounded 時間窗，不推進 daily since_id。"""
+    section = config.get("x_accounts") or {}
+    configured = {
+        str(item).lstrip("@").lower() for item in (section.get("handles") or [])
+    }
+    cleaned_handle = str(handle or "").lstrip("@").strip()
+    if cleaned_handle.lower() not in configured:
+        raise ValueError(f"X handle 未列於 harvest config：{cleaned_handle}")
+    if not 1 <= int(days) <= 90:
+        raise ValueError("X backfill days 必須介於 1–90")
+    if not 5 <= int(max_posts) <= 1000:
+        raise ValueError("X backfill max_posts 必須介於 5–1000")
+
+    from fetchers import x_api
+
+    token = x_api.bearer_token()
+    source = f"x:{cleaned_handle}"
+    state = leads.get_source_state(store, source)
+    user_id = state.get("user_id") or x_api.get_user_id(cleaned_handle, token)
+    end = end_at or (datetime.now(timezone.utc) - timedelta(seconds=15))
+    if end.tzinfo is None:
+        raise ValueError("X backfill end_at 必須含 timezone")
+    end = end.astimezone(timezone.utc)
+    if start_at is not None and start_at.tzinfo is None:
+        raise ValueError("X backfill start_at 必須含 timezone")
+    start = (
+        start_at.astimezone(timezone.utc)
+        if start_at is not None
+        else end - timedelta(days=int(days))
+    )
+    if start >= end:
+        raise ValueError("X backfill start_at 必須早於 end_at")
+    # X timeline 只接受 YYYY-MM-DDTHH:mm:ssZ；不得帶 microseconds。
+    start_time = start.replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    end_time = end.replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    resolved_campaign = (
+        str(campaign_id or "").strip()
+        or f"x_{cleaned_handle}_{start:%Y%m%d}_{end:%Y%m%d}"
+    )
+    window = x_api.get_user_posts_window(
+        user_id,
+        start_time=start_time,
+        end_time=end_time,
+        max_posts=int(max_posts),
+        page_size=int(section.get("backfill_page_size", 100)),
+        exclude_replies=(
+            False if include_replies else bool(section.get("exclude_replies", True))
+        ),
+        exclude_retweets=bool(section.get("exclude_retweets", True)),
+        token=token,
+        with_meta=True,
+    )
+    posts = list(window["posts"])
+
+    new = 0
+    requeued = 0
+    for post in posts:
+        url = x_api.post_url(cleaned_handle, post["id"])
+        lead_id = leads.lead_id_for(url)
+        existing = store.get("leads", {}).get(lead_id) or {}
+        item = _x_post_item(
+            cleaned_handle,
+            post,
+            section,
+            x_api,
+            existing_media=list(existing.get("media") or []),
+        )
+        registered_id, is_new = leads.register(
+            store,
+            source=source,
+            url=item["url"],
+            title=item["title"],
+            raw_text=item["raw_text"],
+            media=item["media"],
+            published_at=item["published_at"],
+        )
+        new += int(is_new)
+        leads.tag_campaign(store, registered_id, campaign_id=resolved_campaign)
+        leads.annotate_refs(
+            store,
+            registered_id,
+            refs={
+                "campaign_window_start": start_time,
+                "campaign_window_end": end_time,
+            },
+        )
+        lead = store["leads"][registered_id]
+        if requeue_no_go and lead["status"] == "triaged_no_go":
+            leads.requeue_for_triage(
+                store,
+                registered_id,
+                reason="使用者明確要求以新領域探索 campaign 重新 triage",
+                campaign_id=resolved_campaign,
+            )
+            requeued += 1
+
+    # 只補 user_id；歷史回補不得推進 daily since_id。
+    leads.set_source_state(store, source, user_id=user_id)
+    leads.record_run(store, source=source, result="ok", new=new)
+    return {
+        "campaign_id": resolved_campaign,
+        "handle": cleaned_handle,
+        "start_time": start_time,
+        "end_time": end_time,
+        "posts": len(posts),
+        "new": new,
+        "existing": len(posts) - new,
+        "requeued_no_go": requeued,
+        "include_replies": bool(include_replies),
+        "estimated_post_read_cost_usd": round(len(posts) * 0.005, 3),
+        "max_posts": int(max_posts),
+        "truncated": bool(window.get("truncated")),
+    }
 
 
 def refresh_x_lead(config: dict, store: dict, lead_id: str) -> dict:
@@ -385,6 +536,31 @@ def main() -> int:
         metavar="LEAD_ID",
         help="只重抓指定既有 X lead，補全文與圖片，不跑一般 harvest",
     )
+    ap.add_argument(
+        "--backfill-x-handle",
+        metavar="HANDLE",
+        help="分頁回補具名 X 帳號的 bounded 時間窗，不推進 daily since_id",
+    )
+    ap.add_argument("--days", type=int, default=30, help="X backfill 天數（1–90）")
+    ap.add_argument(
+        "--max-posts",
+        type=int,
+        default=200,
+        help="X backfill 最多讀取貼文數＝成本硬上限（5–1000）",
+    )
+    ap.add_argument("--campaign-id", help="X backfill 研究 campaign ID")
+    ap.add_argument("--start-at", help="覆寫 backfill 起點（RFC3339 UTC）")
+    ap.add_argument("--end-at", help="覆寫 backfill 終點（RFC3339 UTC）")
+    ap.add_argument(
+        "--requeue-no-go",
+        action="store_true",
+        help="保留舊 triage receipt 後，把時間窗內 triaged_no_go 重新排入 triage",
+    )
+    ap.add_argument(
+        "--include-replies",
+        action="store_true",
+        help="X backfill 納入 replies／thread continuations；仍排除 retweets",
+    )
     args = ap.parse_args()
 
     config = load_config(args.config)
@@ -404,6 +580,45 @@ def main() -> int:
             f"text={len(refreshed.get('raw_text') or '')} chars "
             f"media={len(refreshed.get('media') or [])}"
         )
+        return 0
+
+    if args.backfill_x_handle:
+        if args.dry_run:
+            config.setdefault("x_accounts", {})["cache_media"] = False
+            print(
+                "[harvest] 注意：X backfill --dry-run 仍會消耗 Post reads；"
+                "僅不寫 leads／media。",
+                file=sys.stderr,
+            )
+        try:
+            start_at = (
+                datetime.fromisoformat(args.start_at.replace("Z", "+00:00"))
+                if args.start_at
+                else None
+            )
+            end_at = (
+                datetime.fromisoformat(args.end_at.replace("Z", "+00:00"))
+                if args.end_at
+                else None
+            )
+            receipt = backfill_x_handle(
+                config,
+                store,
+                args.backfill_x_handle,
+                days=args.days,
+                max_posts=args.max_posts,
+                campaign_id=args.campaign_id,
+                requeue_no_go=args.requeue_no_go,
+                include_replies=args.include_replies,
+                start_at=start_at,
+                end_at=end_at,
+            )
+        except (ValueError, OSError, RuntimeError) as exc:
+            print(f"[harvest] X backfill_failed: {exc}", file=sys.stderr)
+            return 1
+        if not args.dry_run:
+            leads.save(store, args.leads)
+        print(json.dumps(receipt, ensure_ascii=False, sort_keys=True))
         return 0
 
     before = len(store["leads"])

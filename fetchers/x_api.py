@@ -99,6 +99,30 @@ def get_user_posts(
 
     since_id 存在時只回更新的貼文——這是主要成本控制。
     """
+    page = get_user_posts_page(
+        user_id,
+        since_id=since_id,
+        max_results=max_results,
+        exclude_replies=exclude_replies,
+        exclude_retweets=exclude_retweets,
+        token=token,
+    )
+    return page["posts"]
+
+
+def get_user_posts_page(
+    user_id: str,
+    *,
+    since_id: str | None = None,
+    start_time: str | None = None,
+    end_time: str | None = None,
+    pagination_token: str | None = None,
+    max_results: int = DEFAULT_MAX_RESULTS,
+    exclude_replies: bool = True,
+    exclude_retweets: bool = True,
+    token: str | None = None,
+) -> dict[str, Any]:
+    """取一頁 user timeline，保留 next_token 供 bounded backfill 使用。"""
     token = token or bearer_token()
     exclude = [
         name for name, on in (("replies", exclude_replies), ("retweets", exclude_retweets)) if on
@@ -115,8 +139,67 @@ def get_user_posts(
         params["exclude"] = ",".join(exclude)
     if since_id:
         params["since_id"] = str(since_id)
+    elif start_time:
+        params["start_time"] = str(start_time)
+    if end_time:
+        params["end_time"] = str(end_time)
+    if pagination_token:
+        params["pagination_token"] = str(pagination_token)
     payload = _get(f"/users/{user_id}/tweets", params, token)
-    return _hydrate_posts(payload)
+    next_token = ((payload.get("meta") or {}).get("next_token"))
+    return {
+        "posts": _hydrate_posts(payload),
+        "next_token": str(next_token) if next_token else None,
+    }
+
+
+def get_user_posts_window(
+    user_id: str,
+    *,
+    start_time: str,
+    end_time: str | None = None,
+    max_posts: int = 200,
+    page_size: int = 100,
+    exclude_replies: bool = True,
+    exclude_retweets: bool = True,
+    token: str | None = None,
+    with_meta: bool = False,
+) -> list[dict[str, Any]] | dict[str, Any]:
+    """分頁取得 bounded 時間窗；max_posts 是 API 成本的硬上限。"""
+    if not str(start_time or "").strip():
+        raise XApiError("missing_start_time")
+    cap = int(max_posts)
+    if cap < 5:
+        raise XApiError("max_posts_below_api_minimum")
+    size = max(5, min(100, int(page_size)))
+    token = token or bearer_token()
+    output: list[dict[str, Any]] = []
+    next_token: str | None = None
+    while len(output) < cap:
+        remaining = cap - len(output)
+        if remaining < 5:
+            break
+        page = get_user_posts_page(
+            user_id,
+            start_time=start_time,
+            end_time=end_time,
+            pagination_token=next_token,
+            max_results=min(size, remaining),
+            exclude_replies=exclude_replies,
+            exclude_retweets=exclude_retweets,
+            token=token,
+        )
+        posts = list(page["posts"])
+        output.extend(posts[:remaining])
+        next_token = page.get("next_token")
+        if not next_token or not posts:
+            break
+    result = {
+        "posts": output,
+        "truncated": bool(next_token),
+        "next_token": next_token,
+    }
+    return result if with_meta else output
 
 
 def get_posts_by_ids(

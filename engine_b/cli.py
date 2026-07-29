@@ -164,6 +164,76 @@ def _cmd_triage(args: argparse.Namespace) -> int:
     return 0
 
 
+def _campaign_ids(lead: dict) -> frozenset[str]:
+    raw = (lead.get("refs") or {}).get("campaign_ids") or []
+    return frozenset(str(item) for item in raw if str(item).strip())
+
+
+def _cmd_triage_campaign(args: argparse.Namespace) -> int:
+    """單次 atomic save 套用具名 campaign 決策；不改 evidence tier。"""
+    store = leads.load(args.leads)
+    campaign_rows = {
+        lead_id: lead
+        for lead_id, lead in store["leads"].items()
+        if args.campaign_id in _campaign_ids(lead)
+    }
+    requested = list(dict.fromkeys(args.go_id or []))
+    invalid = [
+        lead_id
+        for lead_id in requested
+        if lead_id not in campaign_rows
+        or campaign_rows[lead_id]["status"] != "pending"
+    ]
+    if invalid:
+        print(
+            "campaign triage 失敗：go IDs 不屬於 pending campaign："
+            + ",".join(invalid),
+            file=sys.stderr,
+        )
+        return 1
+    flags = {
+        "contradiction": args.contradiction,
+        "novelty": args.novelty,
+        "independent_source": args.independent,
+        "user_requested": True,
+    }
+    for lead_id in requested:
+        leads.triage(
+            store,
+            lead_id,
+            go=True,
+            tier=args.tier,
+            reason=args.reason,
+            priority_flags=flags,
+        )
+    filtered = 0
+    if args.filter_rest:
+        for lead_id, lead in campaign_rows.items():
+            if lead["status"] != "pending":
+                continue
+            leads.triage(
+                store,
+                lead_id,
+                go=False,
+                tier=4,
+                reason=args.filter_reason,
+            )
+            filtered += 1
+    leads.save(store, args.leads)
+    print(
+        json.dumps(
+            {
+                "campaign_id": args.campaign_id,
+                "passed": len(requested),
+                "filtered": filtered,
+            },
+            ensure_ascii=False,
+            sort_keys=True,
+        )
+    )
+    return 0
+
+
 def _cmd_advance(args: argparse.Namespace) -> int:
     store = leads.load(args.leads)
     ref = {}
@@ -263,6 +333,27 @@ def build_parser() -> argparse.ArgumentParser:
     p_tri.add_argument("--novelty", action="store_true", help="新穎性（priority）")
     p_tri.add_argument("--independent", action="store_true", help="新 origin_entity/獨立來源（priority）")
     p_tri.set_defaults(func=_cmd_triage)
+
+    p_campaign = sub.add_parser(
+        "triage-campaign",
+        help="原子套用具名探索 campaign 的 PASS／FILTER 決策",
+    )
+    p_campaign.add_argument("--campaign-id", required=True)
+    p_campaign.add_argument("--go-id", action="append", default=[])
+    p_campaign.add_argument("--tier", type=int, default=4)
+    p_campaign.add_argument("--reason", default="具體可追查 claim，進 scoped pq1")
+    p_campaign.add_argument("--contradiction", action="store_true")
+    p_campaign.add_argument("--novelty", action="store_true")
+    p_campaign.add_argument("--independent", action="store_true")
+    p_campaign.add_argument("--filter-rest", action="store_true")
+    p_campaign.add_argument(
+        "--filter-reason",
+        default=(
+            "campaign 全量盤點後屬重複敘事、短回覆、績效／市場情緒，"
+            "或缺乏可追查的增量 claim"
+        ),
+    )
+    p_campaign.set_defaults(func=_cmd_triage_campaign)
 
     p_adv = sub.add_parser("advance", help="一般狀態轉移")
     p_adv.add_argument("lead_id")

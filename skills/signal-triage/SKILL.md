@@ -27,6 +27,7 @@ prepared RA 入圖，不必在研究前先回答一次。判斷錯了的主要�
 - `source_url`：來源連結
 - `matched_theme`：這則材料是因為匹配 `config/themes.txt` 的哪個主題/公司才被撈到的
 - `harvest_channel`：`web_search` 或 `engine_b`（哪個管道找到的）
+- `campaign_id`（可選）：使用者明確指定、具時間窗與來源邊界的探索 campaign
 
 ---
 
@@ -77,6 +78,22 @@ prepared RA 入圖，不必在研究前先回答一次。判斷錯了的主要�
 - **FILTER** → 寫回 `triaged_no_go`／park，並記錄材料摘要 + 篩掉理由
 
 **寬鬆原則的具體操作：** 五要素中，關聯性和可引用性是硬指標（沒關聯、沒有可查核內容 → 直接 FILTER，抽取了也沒用）。新穎性、潛在獨立性與矛盾／反證價值是軟指標；後三者任一項不確定、可能有價值或明確命中時，一律 PASS。不要因為材料反駁現有 thesis、或與既有主題重疊就篩掉——這是「寧可多花一點抽取力氣、也不要悄悄漏掉好線索」的核心（R12）。
+
+### 使用者指定的新領域探索 campaign
+
+只有使用者明確指定 **來源＋時間窗＋研究目的** 時，才可對該批材料套 scoped exploration；
+不得把例外變成 daily 全域規則。此時只放寬關聯性的「必須已存在於 `themes.txt`／`TICKER_MAP`」部分：
+
+- 有具名公司／產品／技術機制，且至少有一個可追查的動作、數字、連結或圖片 → PASS；即使公司尚未入圖，仍進 pq1。
+- 新領域是否有投資價值尚不確定不是 FILTER 理由；標 `novelty`，由 source-trace 決定能否取得原始 tier 1–2 文件。
+- 純績效宣稱、價格喊單、泛市場情緒、只有形容詞、或無法拆出 atomic claim → FILTER。
+- 可引用性不放寬；source-trace、evidence tier、prepared RA 與 pq2 graph admission 閘門完全不變。
+
+先把同一事件的 thread、短回覆與重複轉述折成代表性 event，再看 PASS 率。對**已去重且具體的
+candidate events**，預期新領域 campaign 的 PASS 率約 50–70%，只作事後稽核是否過嚴／過鬆，
+**不是配額**；raw posts 的比例沒有判讀價值。不得為達比例硬放行。若 candidate-event PASS 低於
+30%，先檢查是否仍錯用「未追蹤＝無關」；若高於 80%，抽查是否把作者推斷、績效宣稱或無法追源
+的敘事誤當可研究 claim。
 
 ---
 

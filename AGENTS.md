@@ -193,6 +193,11 @@ fetchers/edgar.py ──────↑                        engine_c/etl_yfin
    - **跨 sleeve 風險快照：** `decision_lab/portfolio_risk.py` 合併全部 Sheet 持股，分列 ETF nominal／effective、drawn debt、combined leverage、alpha total 與 known issuer direct／indirect weight。aggregate snapshot append 至 ignored `library/private/decision_lab/portfolio_risk_snapshots.jsonl`，只供 Daily 狀態變化與 Weekly 趨勢，不是 holdings authority；Daily 2 percentage-point threshold 內且 state 不變即靜默，Weekly 用 full view。
    - **事件監控：** issuer 曝險≥20%且對應 series 單日報酬首次跌破 -4% 才產 ephemeral `event_search_requests`；daily agent 只做一次 WebSearch，輸出可能原因＋曝險並標未經查證，不建 lead／decision、不進 pq1/pq2、不寫 Engine A。需要深挖才另走 lead-intake。
 
+5. **（已完成 2026-07-29）Serenity 30-Day Research Campaign** — plan：[`docs/plans/2026-07-29-002-feat-serenity-30d-research-campaign-plan.md`](docs/plans/2026-07-29-002-feat-serenity-30d-research-campaign-plan.md)，研究報告：[`docs/reports/serenity_30d_research_2026-07-29.md`](docs/reports/serenity_30d_research_2026-07-29.md)。
+   - `crons/harvest_leads.py --backfill-x-handle ...` 以 RFC3339 time window＋pagination token＋`max_posts` 成本硬上限做歷史回補；可納入 replies、補全文／media，且不得推進 daily `since_id`。Serenity 30 天實跑取得 279 則、187 個 media cache，估算 Post read 成本 US$1.395。
+   - Scoped exploration 只放寬「未在既有 theme／ticker」的相關性；具名實體＋可追查 claim 才 PASS，quotability、source-trace、evidence tier、prepared RA 與 pq2 graph admission 不變。PASS audit 只看事件去重後 candidate events，不看 raw posts 比例。
+   - Robotics source trace 證實 Agility 少量商用部署與 actuator 工業化方向，但 `$300M orders` 有 v5 contractual milestones、warrants 且非 current revenue，10k 是設計產能；FCC 禁中國 humanoid import 尚無官方文本。現行半導體／光通訊 extraction vocab 不得硬套 robotics；pq2 [61] 核准最小 ontology＋四 origin source bundle，真正入圖仍要後續 `ra_admission`。
+
 ---
 
 ## 來源登記表（一手來源優先）

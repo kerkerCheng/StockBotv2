@@ -18,6 +18,9 @@ PRIORITY_WEIGHTS: dict[str, float] = {
     "thesis_impact": 4.0,
     "independent_source": 3.0,
     "novelty": 2.0,
+    # 使用者明確指定的 bounded campaign 是 pq1 排程 authority，但仍不授權 pq2。
+    "user_requested": 5.0,
+    "campaign_focus": 5.0,
 }
 
 _EDGAR_SOURCE = re.compile(r"^edgar:([A-Z0-9.^_-]+)$")
@@ -52,6 +55,10 @@ def score_lead(lead: Mapping[str, Any], *, thesis_impact: bool = False) -> float
         score += PRIORITY_WEIGHTS["independent_source"]
     if flags.get("novelty"):
         score += PRIORITY_WEIGHTS["novelty"]
+    if flags.get("user_requested"):
+        score += PRIORITY_WEIGHTS["user_requested"]
+    if (lead.get("refs") or {}).get("campaign_focus") == "primary":
+        score += PRIORITY_WEIGHTS["campaign_focus"]
     return score
 
 

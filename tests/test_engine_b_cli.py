@@ -149,6 +149,42 @@ def test_triage_stores_priority_flags(tmp_path) -> None:
     assert tri["priority_flags"].get("independent_source", False) is False
 
 
+def test_campaign_triage_passes_selected_and_filters_rest_atomically(
+    tmp_path, capsys
+) -> None:
+    path = tmp_path / "leads.json"
+    store = leads.empty_store()
+    selected, _ = leads.register(
+        store, source="x:test", url="https://x.com/test/status/11"
+    )
+    filtered, _ = leads.register(
+        store, source="x:test", url="https://x.com/test/status/12"
+    )
+    outsider, _ = leads.register(
+        store, source="x:test", url="https://x.com/test/status/13"
+    )
+    leads.tag_campaign(store, selected, campaign_id="robotics")
+    leads.tag_campaign(store, filtered, campaign_id="robotics")
+    leads.save(store, path)
+
+    assert cli.main([
+        "--leads", str(path), "triage-campaign",
+        "--campaign-id", "robotics", "--go-id", selected,
+        "--novelty", "--filter-rest",
+    ]) == 0
+
+    reloaded = leads.load(path)["leads"]
+    assert reloaded[selected]["status"] == "triaged_go"
+    assert reloaded[selected]["triage"]["priority_flags"] == {
+        "novelty": True,
+        "user_requested": True,
+    }
+    assert reloaded[filtered]["status"] == "triaged_no_go"
+    assert reloaded[outsider]["status"] == "pending"
+    receipt = json.loads(capsys.readouterr().out)
+    assert receipt == {"campaign_id": "robotics", "filtered": 1, "passed": 1}
+
+
 def test_drain_lists_triaged_go_and_researching_by_priority(tmp_path, capsys) -> None:
     path = tmp_path / "pending_leads.json"
     store = leads.empty_store()

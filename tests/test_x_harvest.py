@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import os
+from datetime import datetime, timezone
 
 import pytest
 
@@ -47,6 +48,15 @@ class _FakeApi:
         if self.fail == "posts":
             raise x_api.XApiError("http_429")
         return self.posts
+
+    def get_user_posts_window(self, user_id, **kw):
+        self.calls.append(("posts_window", user_id, kw))
+        if self.fail == "posts":
+            raise x_api.XApiError("http_429")
+        posts = self.posts[: int(kw["max_posts"])]
+        if kw.get("with_meta"):
+            return {"posts": posts, "truncated": False, "next_token": None}
+        return posts
 
     def get_posts_by_ids(self, post_ids, **kw):
         self.calls.append(("posts_by_ids", post_ids, kw))
@@ -198,6 +208,51 @@ def test_x_client_can_refresh_exact_post_id(monkeypatch) -> None:
     assert x_api.get_posts_by_ids(["900"], token="token")[0]["text"] == "full"
 
 
+def test_x_client_paginates_bounded_time_window(monkeypatch) -> None:
+    calls = []
+
+    def fake_get(path, params, token):
+        calls.append(dict(params))
+        if "pagination_token" not in params:
+            return {
+                "data": [{"id": "3", "text": "new"}],
+                "meta": {"next_token": "next"},
+            }
+        return {"data": [{"id": "2", "text": "old"}], "meta": {}}
+
+    monkeypatch.setattr(x_api, "_get", fake_get)
+    posts = x_api.get_user_posts_window(
+        "123",
+        start_time="2026-06-29T00:00:00Z",
+        end_time="2026-07-29T00:00:00Z",
+        max_posts=200,
+        token="token",
+    )
+
+    assert [post["id"] for post in posts] == ["3", "2"]
+    assert calls[0]["start_time"] == "2026-06-29T00:00:00Z"
+    assert calls[0]["end_time"] == "2026-07-29T00:00:00Z"
+    assert calls[1]["pagination_token"] == "next"
+
+
+def test_x_client_marks_window_truncated_at_cost_cap(monkeypatch) -> None:
+    def fake_get(path, params, token):
+        return {
+            "data": [{"id": str(params["max_results"]), "text": "x"}],
+            "meta": {"next_token": "more"},
+        }
+
+    monkeypatch.setattr(x_api, "_get", fake_get)
+    result = x_api.get_user_posts_window(
+        "123",
+        start_time="2026-06-29T00:00:00Z",
+        max_posts=5,
+        token="token",
+        with_meta=True,
+    )
+    assert result["truncated"] is True
+
+
 def test_second_run_sends_since_id_and_skips_user_lookup(monkeypatch) -> None:
     fake = _FakeApi([{"id": "300", "text": "new", "created_at": "2026-07-25T01:00:00Z"}])
     _install(monkeypatch, fake)
@@ -279,6 +334,67 @@ def test_refresh_exact_x_lead_enriches_content_without_changing_status(monkeypat
     assert refreshed["status"] == "triaged_go"
     assert refreshed["triage"]["reason"] == "roundup"
     assert ("posts_by_ids", ["200"], {}) in fake.calls
+
+
+def test_backfill_enriches_requeues_no_go_and_preserves_since_id(monkeypatch) -> None:
+    fake = _FakeApi([{
+        "id": "200",
+        "text": "Figure robotics supplier map",
+        "created_at": "2026-07-20T00:00:00Z",
+        "media": [],
+    }])
+    _install(monkeypatch, fake)
+    store = leads.empty_store()
+    lead_id, _ = leads.register(
+        store,
+        source="x:aleabitoreddit",
+        url="https://x.com/aleabitoreddit/status/200",
+        title="Figure robotics",
+    )
+    leads.triage(store, lead_id, go=False, tier=4, reason="未命中既有 theme")
+    leads.set_source_state(
+        store, "x:aleabitoreddit", user_id="12345", since_id="999"
+    )
+
+    receipt = harvest_leads.backfill_x_handle(
+        _config(),
+        store,
+        "aleabitoreddit",
+        days=30,
+        max_posts=200,
+        campaign_id="serenity_30d",
+        requeue_no_go=True,
+        end_at=datetime(2026, 7, 29, tzinfo=timezone.utc),
+    )
+
+    lead = store["leads"][lead_id]
+    assert receipt["posts"] == 1 and receipt["requeued_no_go"] == 1
+    assert lead["raw_text"] == "Figure robotics supplier map"
+    assert lead["status"] == "pending" and lead["triage"] is None
+    assert lead["triage_history"][0]["triage"]["reason"] == "未命中既有 theme"
+    assert lead["refs"]["campaign_ids"] == ["serenity_30d"]
+    assert leads.get_source_state(store, "x:aleabitoreddit")["since_id"] == "999"
+
+
+def test_media_backfill_redownloads_when_recorded_cache_file_is_missing(
+    monkeypatch, tmp_path
+) -> None:
+    fake = _FakeApi([])
+    missing = tmp_path / "missing.jpg"
+    media = harvest_leads._cache_x_media(
+        [{"media_key": "3_200", "type": "photo", "url": "https://pbs.twimg.com/media/x.jpg"}],
+        lead_id="lead_test",
+        section={"cache_media": True},
+        x_api=fake,
+        existing_media=[{
+            "media_key": "3_200",
+            "type": "photo",
+            "cache": {"local_path": str(missing)},
+        }],
+    )
+
+    assert media[0]["cache"]["local_path"].endswith("3_200.jpg")
+    assert any(call[0] == "media" for call in fake.calls)
 
 
 def test_media_downloader_rejects_non_x_cdn_without_network(tmp_path) -> None:

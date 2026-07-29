@@ -40,7 +40,8 @@ URL／ticker 不確定時可省略；workflow 會保留 unresolved／missing 狀
 |------|------|
 | tier 1-2 且關聯現有 thesis 的公司 | **Go** — 值得入庫，觸發文件發現 |
 | tier 3 且有新角度 | **Go with caveat** — 入庫但需補獨立來源 |
-| tier 4（純社群猜測）或與現有圖無交集 | **No-Go** — 存為 lead-only，不走 pipeline |
+| tier 4（純社群猜測）且沒有可追查的具名實體／動作 | **No-Go** — 存為 lead-only，不走 pipeline |
+| 使用者指定探索 campaign、與現有圖無交集，但有具名公司／產品／技術機制與可追查 claim | **Go with caveat** — 進 pq1 追源；未追蹤不等於無關，入圖仍等 pq2 |
 | 有具體公司名 + 具體動作 + 可查 | **Go** — 走 company-onboard 補資料 |
 
 **Turn 3（若 Go）— 先追原文，再觸發文件發現：**

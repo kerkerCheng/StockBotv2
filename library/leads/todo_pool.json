@@ -805,6 +805,18 @@
       "source": "decision_lab",
       "title": "REVIEW — 00631L.TW",
       "type": "sheet_only_holding"
+    },
+    {
+      "added_at": "2026-07-29T14:11:02.173003+00:00",
+      "hint": "go＝核准新增最小 robotics vocabulary（robot OEM／actuator／deployment／RaaS）並以 Agility SEC、GXO、Schaeffler、Hyundai Mobis/Boston Dynamics 四個 origin 執行 extract＋validate；只準備 Research Action，入圖仍須下一道 ra_admission pq2",
+      "n": 61,
+      "reason": null,
+      "ref_id": "campaign:serenity_30d_20260729:robotics_ontology",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "Serenity 30d robotics：核准 ontology mini-slice＋四份一手來源進 pq1 extraction",
+      "type": "manual"
     }
   ],
   "log": [
@@ -1598,6 +1610,6 @@
       "verb": "drop"
     }
   ],
-  "next_n": 61,
+  "next_n": 62,
   "schema_version": "1"
 }

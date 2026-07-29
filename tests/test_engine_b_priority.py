@@ -35,6 +35,21 @@ def test_flags_and_thesis_impact_boost() -> None:
     assert impact == base + priority.PRIORITY_WEIGHTS["thesis_impact"]
 
 
+def test_user_requested_campaign_gets_pq1_scheduling_priority() -> None:
+    base = priority.score_lead(_triaged("x:test", tier=4))
+    campaign = priority.score_lead(
+        _triaged("x:test", tier=4, flags={"user_requested": True})
+    )
+    assert campaign - base == priority.PRIORITY_WEIGHTS["user_requested"]
+
+
+def test_primary_campaign_focus_boosts_new_domain() -> None:
+    lead = _triaged("x:test", tier=4, flags={"user_requested": True})
+    base = priority.score_lead(lead)
+    lead["refs"]["campaign_focus"] = "primary"
+    assert priority.score_lead(lead) - base == priority.PRIORITY_WEIGHTS["campaign_focus"]
+
+
 def test_rank_orders_by_score_and_derives_thesis_impact() -> None:
     low = _triaged("edgar:AAOI", tier=4)  # 弱、非追蹤
     high = _triaged("edgar:COHR", tier=1, flags={"contradiction": True})

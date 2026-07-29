@@ -1,11 +1,12 @@
 {
   "_note": "Daily Approval Loop harvest 來源設定（plan U1/R3）。可手動編輯。feeds=RSS 類；x_accounts=X API；edgar_watch=SEC filing 監看。watch 清單 v0 手動維護是刻意的（plan R3 future note）。",
   "x_accounts": {
-    "note": "X API v2 pay-per-use（約 $0.005/則、按回傳貼文數計費）。since_id 增量＋exclude replies/retweets＋max_results 上限＝成本控制三件套。note_tweet 全文與 media expansion 使用同一份貼文 response；圖片／影片預覽另存 ignored private cache，不做 OCR。需 .env 的 X_BEARER_TOKEN。加帳號只要往 handles 加，不必改程式。",
+    "note": "X API v2 pay-per-use（約 $0.005/則、按回傳貼文數計費）。Daily 由 since_id＋exclude replies/retweets＋max_results 控成本；具名探索 campaign 可用 bounded 30-day 分頁 backfill，另受 max_posts 硬上限。note_tweet 全文與 media expansion 使用同一份貼文 response；圖片／影片預覽另存 ignored private cache，不做 OCR。需 .env 的 X_BEARER_TOKEN。加帳號只要往 handles 加，不必改程式。",
     "handles": ["aleabitoreddit"],
     "exclude_replies": true,
     "exclude_retweets": true,
     "max_results": 25,
+    "backfill_page_size": 100,
     "cache_media": true,
     "media_max_bytes": 20971520
   },
