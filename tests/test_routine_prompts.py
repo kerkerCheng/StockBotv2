@@ -15,6 +15,7 @@ def test_daily_prompt_uses_local_authorities_and_repo_venv() -> None:
         "$daily-brief",
         ".venv\\Scripts\\python.exe",
         "crons\\harvest_leads.py",
+        "engine_b.cli harvest-health",
         "engine_c\\etl_yfinance.py",
         "scripts\\daily_beta_snapshot.py",
         "decision_lab today",
@@ -46,6 +47,10 @@ def test_daily_prompt_keeps_human_gates_and_batch_contract() -> None:
     assert "contingent_credit_available" in text
     assert "loan_funded_supported_range" in text
     assert "spreadsheets.readonly" in text
+    assert "retirement_net_terminal_wealth" in text
+    assert "failure_class" in text
+    assert "access_blocked" in text
+    assert "同一來源後續成功才算 recovered" in text
 
 
 def test_daily_brief_title_carries_taipei_date() -> None:

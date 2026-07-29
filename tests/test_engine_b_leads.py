@@ -181,6 +181,56 @@ def test_record_run_rejects_unknown_result() -> None:
         leads.record_run(store, source="s", result="maybe", new=0)
 
 
+def test_record_run_rejects_unknown_failure_class_and_class_on_success() -> None:
+    store = leads.empty_store()
+    with pytest.raises(ValueError, match="failure_class"):
+        leads.record_run(
+            store,
+            source="s",
+            result="fetch_failed",
+            new=0,
+            failure_class="shrug",
+        )
+    with pytest.raises(ValueError, match="successful"):
+        leads.record_run(
+            store,
+            source="s",
+            result="ok",
+            new=0,
+            failure_class="access_blocked",
+        )
+
+
+def test_unresolved_harvest_failures_clear_only_after_same_source_recovers() -> None:
+    store = leads.empty_store()
+    leads.record_run(
+        store,
+        source="edgar:AXTI",
+        result="fetch_failed",
+        new=0,
+        failure_class="access_blocked",
+    )
+    leads.record_run(
+        store,
+        source="customer_ir:casela",
+        result="fetch_failed",
+        new=0,
+        failure_class="tls_failure",
+    )
+    assert {
+        item["source"]: item["failure_class"]
+        for item in leads.unresolved_harvest_failures(store)
+    } == {
+        "customer_ir:casela": "tls_failure",
+        "edgar:AXTI": "access_blocked",
+    }
+
+    leads.record_run(store, source="edgar:AXTI", result="ok", new=1)
+
+    unresolved = leads.unresolved_harvest_failures(store)
+    assert [item["source"] for item in unresolved] == ["customer_ir:casela"]
+
+
 def test_parse_failed_is_logged_not_silently_empty() -> None:
     store = leads.empty_store()
     with pytest.raises(harvest_leads.HarvestParseError):
@@ -315,5 +365,6 @@ def test_run_records_fetch_failed_for_unreachable_feed(monkeypatch) -> None:
         "source": "dead_feed",
         "result": "fetch_failed",
         "new": 0,
+        "failure_class": "transport_failure",
     }
     assert len(store["leads"]) == 0

@@ -25,6 +25,7 @@ from xml.etree import ElementTree as ET
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
+from access_failures import classify_access_failure  # noqa: E402
 from engine_b import leads  # noqa: E402
 
 DEFAULT_CONFIG_PATH = ROOT / "crons" / "harvest_config.json"
@@ -165,14 +166,14 @@ def harvest_feeds(config: dict, store: dict, *, seen_at: str | None = None) -> N
             content = fetch_url(feed["url"])
         except (URLError, OSError) as exc:
             leads.record_run(store, source=source, result="fetch_failed", new=0,
-                             run_at=seen_at)
+                             run_at=seen_at, failure_class=classify_access_failure(exc))
             print(f"[harvest] {source} fetch_failed: {exc}", file=sys.stderr)
             continue
         try:
             items = parse_rss(content, source)
         except HarvestParseError as exc:
             leads.record_run(store, source=source, result="parse_failed", new=0,
-                             run_at=seen_at)
+                             run_at=seen_at, failure_class="parse_error")
             print(f"[harvest] {source} parse_failed: {exc}", file=sys.stderr)
             continue
         new = _register_all(store, source, items, seen_at)
@@ -255,7 +256,7 @@ def harvest_x(config: dict, store: dict, *, seen_at: str | None = None) -> None:
     except ImportError as exc:
         for handle in handles:
             leads.record_run(store, source=f"x:{handle}", result="fetch_failed",
-                             new=0, run_at=seen_at)
+                             new=0, run_at=seen_at, failure_class="dependency_missing")
         print(f"[harvest] x api unavailable: {exc}", file=sys.stderr)
         return
 
@@ -264,7 +265,7 @@ def harvest_x(config: dict, store: dict, *, seen_at: str | None = None) -> None:
     except x_api.XApiError as exc:
         for handle in handles:
             leads.record_run(store, source=f"x:{handle}", result="fetch_failed",
-                             new=0, run_at=seen_at)
+                             new=0, run_at=seen_at, failure_class="credentials_missing")
         print(f"[harvest] x api: {exc}（請在 .env 設 X_BEARER_TOKEN）", file=sys.stderr)
         return
 
@@ -283,7 +284,10 @@ def harvest_x(config: dict, store: dict, *, seen_at: str | None = None) -> None:
             )
         except x_api.XApiError as exc:
             leads.record_run(store, source=source, result="fetch_failed", new=0,
-                             run_at=seen_at)
+                             run_at=seen_at,
+                             failure_class=classify_access_failure(
+                                 exc, default="provider_api_error"
+                             ))
             print(f"[harvest] {source} fetch_failed: {exc}", file=sys.stderr)
             continue
 
@@ -342,7 +346,8 @@ def harvest_edgar(config: dict, store: dict, *, seen_at: str | None = None) -> N
     except ImportError as exc:
         for ticker in tickers:
             leads.record_run(store, source=f"edgar:{ticker.upper()}",
-                             result="fetch_failed", new=0, run_at=seen_at)
+                             result="fetch_failed", new=0, run_at=seen_at,
+                             failure_class="dependency_missing")
         print(f"[harvest] edgar unavailable: {exc}", file=sys.stderr)
         return
     for ticker in tickers:
@@ -354,7 +359,7 @@ def harvest_edgar(config: dict, store: dict, *, seen_at: str | None = None) -> N
             filings = get_filings(cik, forms, count)
         except Exception as exc:  # noqa: BLE001 網路／解析都算 fetch_failed
             leads.record_run(store, source=source, result="fetch_failed", new=0,
-                             run_at=seen_at)
+                             run_at=seen_at, failure_class=classify_access_failure(exc))
             print(f"[harvest] {source} fetch_failed: {exc}", file=sys.stderr)
             continue
         items = filings_to_leads(ticker, cik, filings)

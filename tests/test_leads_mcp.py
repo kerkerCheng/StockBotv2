@@ -31,6 +31,7 @@ def test_get_pending_leads_core_ranks_and_counts(tmp_path) -> None:
 
     result = leads_tools.get_pending_leads_core(leads_path=path, tracked_tickers="COHR")
     assert result["counts"]["triaged_go"] == 2
+    assert result["unresolved_harvest_failures"] == []
     assert result["leads"][0]["source"] == "edgar:COHR"  # 最高 priority 在前
     assert result["leads"][0]["priority"] > result["leads"][1]["priority"]
 

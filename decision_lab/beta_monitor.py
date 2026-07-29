@@ -699,6 +699,23 @@ def _compact_monitor_item(
     )
 
 
+def _risk_hint_summary(report: Mapping[str, Any]) -> str:
+    labels = {
+        "leveraged_nominal_warning": "槓桿名目進提醒區",
+        "leveraged_effective_warning": "effective 槓桿進提醒區",
+        "technology_effective_warning": "科技曝險進提醒區",
+        "unmapped_holdings_counted_as_full_technology_proxy": "未映射持股按 100% 科技保守計",
+    }
+    hints: list[str] = []
+    for warning in report.get("warnings") or []:
+        code = str(warning)
+        if code.startswith("single_company_warning:"):
+            hints.append(f"{code.partition(':')[2]} 集中度進提醒區")
+        elif code in labels:
+            hints.append(labels[code])
+    return "、".join(hints) or "未觸及已設定的組合提醒線"
+
+
 def _money(value: Any, currency: str | None) -> str:
     parsed = _finite(value, non_negative=True)
     return "未知" if parsed is None else f"{currency or ''} {parsed:,.0f}".strip()
@@ -713,8 +730,30 @@ def render_beta_monitor_markdown(report: Mapping[str, Any]) -> str:
     household_cash = capital_view["household_cash"]
     contingent = report["contingent_credit_available"]
     loan_range = report["loan_funded_supported_range"]
+    household_path_available = household_cash.get("status") == "available"
+    reviews = [
+        item
+        for item in report["items"]
+        if item["action"] == "CONTRIBUTE REVIEW"
+        or (
+            household_path_available
+            and item["household_action"] == "CONTRIBUTE REVIEW"
+        )
+    ]
+    review_names = "、".join(str(item["ticker"]) for item in reviews) or "無"
     lines = [
         "# Beta Technical Monitor",
+        "",
+        "## TL;DR",
+        "",
+        "- 目標：最大化約 30 年後的退休淨終值；Beta 維持 accumulation-only，technical signal 只決定新增的 timing／pace，不因一般回檔自動賣出。",
+        f"- 今日：{review_names} 可進人工評估；Sheet／household 本輪合計上限 "
+        f"{_money(report['sheet_conservative_range'][1], currency)}／"
+        f"{_money(report['household_cash_supported_range'][1], currency)}，不是下單金額。",
+        f"- 風控：{_risk_hint_summary(report)}；未動用額度 {_money(contingent.get('undrawn_amount_base'), currency)} "
+        "不算資本，貸款必須另做 exact draw／instrument／tranche 人工 review，扣除利息與到期本金，且月息不得依賴被迫賣出 beta。",
+        "",
+        "## 資本與風控明細",
         "",
         f"- 狀態：{report['status']}",
         f"- Policy：{report['policy_version']}（{report['policy_mode']}）",
@@ -742,16 +781,6 @@ def render_beta_monitor_markdown(report: Mapping[str, Any]) -> str:
     if warnings:
         lines.append(f"- Warnings：{'、'.join(str(item) for item in warnings)}")
 
-    household_path_available = household_cash.get("status") == "available"
-    reviews = [
-        item
-        for item in report["items"]
-        if item["action"] == "CONTRIBUTE REVIEW"
-        or (
-            household_path_available
-            and item["household_action"] == "CONTRIBUTE REVIEW"
-        )
-    ]
     paused = [
         item
         for item in report["items"]

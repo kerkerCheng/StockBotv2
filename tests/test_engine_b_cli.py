@@ -71,6 +71,31 @@ def test_list_status_filter_and_counts(tmp_path, capsys) -> None:
     assert json.loads(capsys.readouterr().out.strip()) == []
 
 
+def test_harvest_health_only_lists_latest_unresolved_failures(tmp_path, capsys) -> None:
+    path = tmp_path / "pending_leads.json"
+    store = leads.empty_store()
+    leads.record_run(
+        store,
+        source="edgar:AXTI",
+        result="fetch_failed",
+        new=0,
+        failure_class="access_blocked",
+    )
+    leads.record_run(store, source="edgar:AXTI", result="ok", new=1)
+    leads.record_run(
+        store,
+        source="customer_ir:casela",
+        result="fetch_failed",
+        new=0,
+        failure_class="tls_failure",
+    )
+    leads.save(store, path)
+
+    assert cli.main(["--leads", str(path), "harvest-health"]) == 0
+    rows = json.loads(capsys.readouterr().out)
+    assert [row["source"] for row in rows] == ["customer_ir:casela"]
+
+
 def test_advance_records_ref(tmp_path) -> None:
     path = tmp_path / "pending_leads.json"
     lead_id = _seed(path)

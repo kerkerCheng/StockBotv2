@@ -64,6 +64,17 @@ def test_states_gates_and_human_boundaries() -> None:
     assert "contingent_credit_available" in text
     assert "loan_funded_supported_range=manual_review_required" in text
     assert "spreadsheets.readonly" in text
+    assert "retirement_net_terminal_wealth" in text
+    assert "technical 只決定新增 timing／pace" in text
+
+
+def test_access_blocked_is_retried_and_never_presented_as_no_result() -> None:
+    text = _text()
+    assert "harvest-health" in text
+    assert "failure_class" in text
+    assert "access_blocked" in text
+    assert "同一來源後續成功才標 recovered" in text
+    assert "不得改寫成「零筆」或 `no_result`" in text
 
 
 def test_scheduled_run_auto_drains_pq1_but_keeps_admission_gate() -> None:

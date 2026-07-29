@@ -381,6 +381,10 @@ def test_markdown_is_aggregate_and_preserves_human_boundary() -> None:
     rendered = render_beta_monitor_markdown(report)
 
     assert "Sheet-only conservative" in rendered
+    assert "## TL;DR" in rendered
+    assert "退休淨終值" in rendered
+    assert "technical signal 只決定新增的 timing／pace" in rendered
+    assert "月息不得依賴被迫賣出 beta" in rendered
     assert "1日 -1.0%｜5日 -3.0%｜20日 -8.0%" in rendered
     assert "## 主力 ETF／權值" in rendered
     assert rendered.index("QQQ") < rendered.index("TQQQ")

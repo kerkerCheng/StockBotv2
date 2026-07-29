@@ -15,6 +15,7 @@ import sys
 from datetime import datetime, timezone
 from typing import Any, Iterable, Mapping
 
+from access_failures import classify_access_failure
 from identity.execution import yfinance_symbol
 
 
@@ -118,7 +119,7 @@ def get_tradeability_snapshot(ticker: str, currency: str) -> dict[str, Any]:
         return {
             "status": "unavailable",
             "blockers": ["market_history_unavailable"],
-            "note": str(exc),
+            "failure_class": classify_access_failure(exc),
         }
     return build_tradeability_snapshot(
         ticker=ticker,
@@ -192,11 +193,12 @@ def get_fx_snapshot(pair: str, evaluation_at: str) -> dict[str, Any]:
             {"as_of": index.to_pydatetime().isoformat(), "rate": row.get("Close")}
             for index, row in history.iterrows()
         ]
-    except Exception:
+    except Exception as exc:
         return {
             "status": "unavailable",
             "pair": pair,
             "blockers": ["fx_history_unavailable"],
+            "failure_class": classify_access_failure(exc),
         }
     return build_fx_snapshot(
         pair=pair,

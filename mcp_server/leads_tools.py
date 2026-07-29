@@ -52,6 +52,7 @@ def get_pending_leads_core(
         "counts": leads.status_counts(store),
         "leads": items,
         "harvest_log": store.get("harvest_log", [])[-10:],
+        "unresolved_harvest_failures": leads.unresolved_harvest_failures(store),
     }
 
 

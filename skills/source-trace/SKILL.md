@@ -70,7 +70,9 @@ cloud routine／手機不能假設可碰本機檔案或 localhost。
 5. **登記 origin：** `origin_entity` 是真正發出目前取得文件的人；`origin_event` 是原始事件。
    找不到聲稱的原文件時，不得把轉述者標成原事件的發出者，也不得反過來把被轉述機構
    寫成目前文件的 `origin_entity`。
-6. **依下表處置，留下完整嘗試紀錄。**
+6. **依下表處置，留下完整嘗試紀錄。** 若失敗看起來來自 sandbox／proxy／本機網路權限，先將
+   `failure_class` 記為 `access_blocked`，再以完全相同路徑在允許本機網路的權限下重跑一次；仍失敗時，
+   至少再試一條官方替代路徑。`blocked` 不是 `no_result`、不支持也不反駁 claim，必須留在追源 backlog。
 
 ## 分級處置（追不到不是同一種結果）
 
@@ -98,6 +100,7 @@ attempts:
   - route: "SEC EDGAR | MOPS | customer IR | arXiv | exact-phrase search | ..."
     query_or_url: "實際查過的 query 或 canonical URL"
     result: "found | no_result | blocked | paywalled | mismatch | contradicts"
+    failure_class: "access_blocked | timeout | tls_failure | transport_failure | provider_api_error | null"
     note: "找到/沒找到什麼"
 trace_status: "original_obtained | tier_1_2_honest_passthrough | isolated_tier_3 | lead_only_tier_4"
 obtained_origin_entity: "真正取得文件的發出者；沒有則 null"
@@ -110,7 +113,8 @@ next_action: "extract | park_trace_backlog | lead_only | investigate_contradicti
 ```
 
 禁止只寫「Google 沒找到」。至少記錄試過的專用登記表、交叉方與 exact-phrase query；
-若環境無法連某路徑，寫 `blocked`，不要假裝已查完。
+若環境無法連某路徑，寫 `blocked`，不要假裝已查完；完成權限重跑與官方替代路徑前，不得改寫成
+`no_result`。後續成功時保留原 attempt 並加 recovered attempt，不能刪掉第一次失敗造成的觀測偏誤。
 
 ## 遠端 chat／routine intake SOP
 

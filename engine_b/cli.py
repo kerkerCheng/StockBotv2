@@ -209,6 +209,15 @@ def _cmd_counts(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_harvest_health(args: argparse.Namespace) -> int:
+    """列出最新一次仍未恢復的來源失敗，避免 blocked 被當成零新資料。"""
+
+    store = leads.load(args.leads)
+    unresolved = leads.unresolved_harvest_failures(store)
+    print(json.dumps(unresolved, ensure_ascii=False, indent=2))
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     ap = argparse.ArgumentParser(description="pending leads 狀態機命令列入口")
     ap.add_argument("--leads", default=str(leads.DEFAULT_LEADS_PATH),
@@ -269,6 +278,12 @@ def build_parser() -> argparse.ArgumentParser:
 
     p_cnt = sub.add_parser("counts", help="各狀態計數（JSON）")
     p_cnt.set_defaults(func=_cmd_counts)
+
+    p_health = sub.add_parser(
+        "harvest-health",
+        help="列出最新仍未恢復的 harvest 失敗（JSON）",
+    )
+    p_health.set_defaults(func=_cmd_harvest_health)
     return ap
 
 

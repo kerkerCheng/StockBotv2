@@ -80,6 +80,23 @@ def test_market_and_fx_staleness_use_observation_time_not_fetch_time() -> None:
     assert fx["status"] == "stale"
 
 
+def test_market_access_block_survives_normalization_as_retry_required() -> None:
+    normalized = normalize_market_snapshot(
+        {
+            "status": "unavailable",
+            "blockers": ["market_history_unavailable"],
+            "failure_class": "access_blocked",
+        },
+        expected_ticker="AXTI",
+        expected_currency="USD",
+        evaluation_at=NOW,
+    )
+
+    assert normalized["status"] == "unavailable"
+    assert normalized["failure_class"] == "access_blocked"
+    assert "market_access_blocked_retry_required" in normalized["blockers"]
+
+
 def test_runway_self_funding_negative_fcf_and_manual_required_paths() -> None:
     self_funding = derive_runway(
         {

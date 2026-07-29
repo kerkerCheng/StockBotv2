@@ -18,6 +18,8 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import urlsplit, urlunsplit
 
+from access_failures import FAILURE_CLASSES
+
 SCHEMA_VERSION = "2"
 _SUPPORTED_SCHEMA_VERSIONS = frozenset({"1", SCHEMA_VERSION})
 
@@ -44,6 +46,7 @@ ALLOWED_TRANSITIONS: dict[str, frozenset[str]] = {
 ALL_STATUSES: frozenset[str] = frozenset(ALLOWED_TRANSITIONS)
 
 HARVEST_RESULTS: frozenset[str] = frozenset({"ok", "fetch_failed", "parse_failed"})
+HARVEST_FAILURE_CLASSES: frozenset[str] = FAILURE_CLASSES
 
 
 class LeadStateError(ValueError):
@@ -364,19 +367,40 @@ def record_run(
     result: str,
     new: int,
     run_at: str | None = None,
+    failure_class: str | None = None,
 ) -> None:
     """記一次 harvest run 結果。parse_failed／fetch_failed 都必須誠實入帳
     （plan R4：解析失敗 ≠ 無新文）。"""
     if result not in HARVEST_RESULTS:
         raise ValueError(f"未知 harvest result：{result}")
-    store["harvest_log"].append(
-        {
-            "run_at": run_at or _now(),
-            "source": source,
-            "result": result,
-            "new": int(new),
-        }
-    )
+    if failure_class is not None and failure_class not in HARVEST_FAILURE_CLASSES:
+        raise ValueError(f"未知 harvest failure_class：{failure_class}")
+    if result == "ok" and failure_class is not None:
+        raise ValueError("successful harvest run cannot have failure_class")
+    entry = {
+        "run_at": run_at or _now(),
+        "source": source,
+        "result": result,
+        "new": int(new),
+    }
+    if failure_class is not None:
+        entry["failure_class"] = failure_class
+    store["harvest_log"].append(entry)
+
+
+def unresolved_harvest_failures(store: dict[str, Any]) -> list[dict[str, Any]]:
+    """Return only sources whose latest recorded attempt still failed。"""
+
+    latest: dict[str, dict[str, Any]] = {}
+    for raw in store.get("harvest_log") or []:
+        if not isinstance(raw, dict) or not str(raw.get("source") or "").strip():
+            continue
+        latest[str(raw["source"])] = dict(raw)
+    return [
+        latest[source]
+        for source in sorted(latest)
+        if latest[source].get("result") != "ok"
+    ]
 
 
 def status_counts(store: dict[str, Any]) -> dict[str, int]:

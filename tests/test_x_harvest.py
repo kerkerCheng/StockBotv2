@@ -223,6 +223,7 @@ def test_missing_token_logs_fetch_failed_not_crash(monkeypatch) -> None:
     assert store["harvest_log"][-1] == {
         **store["harvest_log"][-1], "source": "x:aleabitoreddit",
         "result": "fetch_failed", "new": 0,
+        "failure_class": "credentials_missing",
     }
 
 
@@ -232,6 +233,7 @@ def test_api_error_logs_fetch_failed_and_keeps_since_id(monkeypatch) -> None:
     leads.set_source_state(store, "x:aleabitoreddit", user_id="1", since_id="500")
     harvest_leads.harvest_x(_config(), store)
     assert store["harvest_log"][-1]["result"] == "fetch_failed"
+    assert store["harvest_log"][-1]["failure_class"] == "provider_api_error"
     # 失敗不得推進 since_id（否則會永久漏掉那批貼文）
     assert leads.get_source_state(store, "x:aleabitoreddit")["since_id"] == "500"
 

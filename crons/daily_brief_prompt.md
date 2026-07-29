@@ -21,6 +21,7 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
 2. Windows 一律使用專案 interpreter：`.venv\Scripts\python.exe`，不得用 bare `python`。
 3. 依序執行：
    - `.venv\Scripts\python.exe crons\harvest_leads.py`（X＋EDGAR；以 `since_id`／URL hash 去重）
+   - `.venv\Scripts\python.exe -m engine_b.cli harvest-health`（列出最新仍未恢復的來源失敗）
    - `.venv\Scripts\python.exe engine_c\etl_yfinance.py`（35 檔 Engine C daily snapshot）
    - `.venv\Scripts\python.exe scripts\daily_beta_snapshot.py --format markdown`（固定 ETF／權值股 technical refresh
      ＋ Engine D 雙 cash range beta monitor；並列 `sheet_conservative_range`／`household_cash_supported_range`，
@@ -30,7 +31,11 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
    - `.venv\Scripts\python.exe -m decision_lab today --format markdown`
    - `.venv\Scripts\python.exe -m engine_b.todo sync`
    - `.venv\Scripts\python.exe -m engine_b.todo list`
-4. 任何來源失敗都要誠實列出 `fetch_failed`／`parse_failed`；beta technical 的 `insufficient_history`／
+4. 任何來源失敗都要誠實列出 `fetch_failed`／`parse_failed` 與結構化 `failure_class`；若 fixed entry
+   疑似被 sandbox／proxy／本機網路權限擋住，必須以**完全相同的命令**在允許本機網路的權限下重跑一次，
+   不得把第一次 `access_blocked` 寫成「零筆新資料」或 `no_result`。同一來源後續成功才算 recovered；
+   重跑仍失敗則保留在 `harvest-health` 與健康段落，研究追源另依 `$source-trace` 嘗試一條官方替代路徑。
+   beta technical 的 `insufficient_history`／
    `unavailable`／`stale` 也必須列在健康段落，該商品 supported range 歸零但不阻斷其他商品。Capital Authority
    缺失／stale／FX 錯誤只歸零 household range，不得抹掉 Phase I Sheet range；四欄 capital output 都要保留。
    routine 的 Google Sheet credential scope 維持 `spreadsheets.readonly`，不得建立或修改 tab／cell。單一來源失敗不
@@ -74,6 +79,7 @@ Asia/Taipei 當日；沒有日期的 brief 視為未完成輸出（多份 brief 
 <僅列 pq1 進度／失敗；raw lead 不占 pq2 編號>
 
 ## Beta capital observation（無 pq2 編號）
+TL;DR：<約 30 年後 retirement_net_terminal_wealth 目標；今日哪些標的可人工評估；最重要的動態風控 warning>
 <sheet_conservative_range／household_cash_supported_range／contingent_credit_available／loan_funded_supported_range>
 <先列需要人工判斷，再列主力 QQQ／TQQQ／LON:VWRA／SOXX／00631L.TW／2330.TW／00981A.TW；每檔用文字燈號＋1／5／20 日漲跌＋必要指標，個股與其他縮成摘要>
 

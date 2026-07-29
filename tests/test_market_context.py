@@ -103,3 +103,19 @@ def test_execution_symbol_uses_yahoo_alias_but_preserves_canonical_ticker(
     assert result["status"] == "observed"
     assert result["ticker"] == "FRA:2DG"
     assert result["source"] == "yfinance://history/2DG.F"
+
+
+def test_tradeability_failure_classifies_sandbox_block_as_retryable(monkeypatch) -> None:
+    class BlockedTicker:
+        def __init__(self, _symbol):
+            pass
+
+        def history(self, **_kwargs):
+            raise PermissionError("sandbox network permission denied")
+
+    monkeypatch.setitem(sys.modules, "yfinance", SimpleNamespace(Ticker=BlockedTicker))
+
+    result = get_tradeability_snapshot("AXTI", "USD")
+
+    assert result["status"] == "unavailable"
+    assert result["failure_class"] == "access_blocked"

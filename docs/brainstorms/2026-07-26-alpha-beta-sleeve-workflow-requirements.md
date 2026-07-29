@@ -55,6 +55,10 @@
 6. **最小會計邊界**：未提款仍只列 contingent credit；提款後 cash 與 drawn debt 必須同時入帳。唯一持續要守的
    operational condition 是每月利息能由既定現金流支付、不必被迫賣出；本金則在到期終值比較中完整扣除。
 
+Daily Brief 的 Beta 首屏因此採三行 TL;DR：先說約 30 年後 `retirement_net_terminal_wealth` 目標，
+再列今日可人工評估標的，最後列已觸發的動態風控。technical signal 只調整新增 timing／pace，不能把
+短期燈號誤寫成退休目標本身、自動賣出指令或 live permission。
+
 因此，早期 brainstorm 中的一般化 lender-purpose、12–24 個月 debt-service reserve、callable／freeze 與多情境
 壓力引擎，均不再是這位使用者目前的 implementation prerequisite。若未來契約或支付能力改變，再重新開題；
 現在不為尚未發生的例外建系統。

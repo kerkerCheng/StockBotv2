@@ -34,6 +34,7 @@ admission 必經核准 exact 對象、深挖由 priority 排序但入圖仍核�
 
 ```powershell
 & '.venv\Scripts\python.exe' crons\harvest_leads.py
+& '.venv\Scripts\python.exe' -m engine_b.cli harvest-health
 & '.venv\Scripts\python.exe' engine_c\etl_yfinance.py
 & '.venv\Scripts\python.exe' scripts\daily_beta_snapshot.py --format markdown
 ```
@@ -46,7 +47,10 @@ admission 必經核准 exact 對象、深挖由 priority 排序但入圖仍核�
 仍是自有 cash 唯一 authority；`Capital Authority` 只以 `spreadsheets.readonly` 讀取 private floor／outflows／
 facility，undrawn credit 不進 NAV／cash／allocation。technical／capital telemetry 不進 pq1，recommendation
 不推定 choice／fill，也不推定 draw，且不寫 Google Sheet。fetch／parse 失敗各記 harvest_log；
-**解析失敗 ≠ 無新文**，`insufficient_history`／`unavailable`／`stale` 也必須在健康段落明示並讓受影響的
+**解析失敗 ≠ 無新文**。每筆失敗必須保存 `failure_class`；最新一次仍失敗的來源由
+`harvest-health` 持續顯示。fixed entry 若疑似 sandbox／proxy／本機網路權限受阻，原命令必須在允許
+本機網路的權限下重跑一次；第一次記 `access_blocked`，只有同一來源後續成功才標 recovered，重跑仍失敗
+不得改寫成「零筆」或 `no_result`。`insufficient_history`／`unavailable`／`stale` 也必須在健康段落明示並讓受影響的
 technical 或 household range 獨立歸零；Capital Authority 失敗不得連帶抹掉 Phase I Sheet range。Windows 本機與
 scheduled task 一律使用 repo `.venv`，不要依賴父 shell 是否剛好 activate。
 Engine C 同一筆 observation 保存 adjusted-close 的 1／5／20-session return；Engine D 才負責把
@@ -151,6 +155,7 @@ park：社群 CPO 推論 → 一手來源未支持，不產空 RA
 續跑：尚有 triaged_go ×N
 
 ## Beta capital observation（無 pq2 編號）
+TL;DR：最大化約 30 年後 `retirement_net_terminal_wealth`；technical 只決定新增 timing／pace；列今日可人工評估標的與最重要的動態風控 warning
 sheet_conservative_range：<range>
 household_cash_supported_range：<range 或 unavailable＋blocker>
 contingent_credit_available：<amount／terms status；明標不算資本>

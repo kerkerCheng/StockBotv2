@@ -38,7 +38,14 @@ def normalize_market_snapshot(
 ) -> dict[str, Any]:
     upstream = payload.get("status")
     if upstream in {"missing", "unavailable"}:
-        return {"status": upstream, "blockers": [f"market_{upstream}"]}
+        blockers = list(payload.get("blockers") or [f"market_{upstream}"])
+        failure_class = payload.get("failure_class")
+        if failure_class == "access_blocked":
+            blockers.append("market_access_blocked_retry_required")
+        result = {"status": upstream, "blockers": sorted(set(blockers))}
+        if isinstance(failure_class, str) and failure_class:
+            result["failure_class"] = failure_class
+        return result
     blockers: list[str] = []
     if payload.get("ticker") != expected_ticker:
         blockers.append("market_ticker_mismatch")
@@ -93,7 +100,14 @@ def normalize_fx_snapshot(
 ) -> dict[str, Any]:
     upstream = payload.get("status")
     if upstream in {"missing", "unavailable"}:
-        return {"status": upstream, "blockers": [f"fx_{upstream}"]}
+        blockers = list(payload.get("blockers") or [f"fx_{upstream}"])
+        failure_class = payload.get("failure_class")
+        if failure_class == "access_blocked":
+            blockers.append("fx_access_blocked_retry_required")
+        result = {"status": upstream, "blockers": sorted(set(blockers))}
+        if isinstance(failure_class, str) and failure_class:
+            result["failure_class"] = failure_class
+        return result
     blockers: list[str] = []
     if payload.get("pair") != expected_pair:
         blockers.append("fx_pair_mismatch")
