@@ -1,0 +1,137 @@
+{
+  "claims": [
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "A later AAOI filing materially revises the competitor list or discloses exclusive design-wins that remove named competitors from the product areas AAOI serves.",
+      "id": "aaoi_10_k_20260227_competition_cl1",
+      "source_ids": [
+        "aaoi_10_k_20260227_competition_s1",
+        "aaoi_10_k_20260227_competition_s2"
+      ],
+      "statement": "AAOI's own FY2025 10-K states the optical networking market is intensely competitive, anticipates competition will increase, and names Coherent Corporation, Eoptolink Technology, Foxconn Interconnect Technology, InnoLight Technology (Suzhou), Intel, Lumentum Holdings, Mitsubishi, Molex, Source Photonics and Sumitomo Electric Industries as major competitors, many larger with significantly greater resources; this is issuer against-interest disclosure that AAOI's transceiver products face named substitute suppliers.",
+      "subject_id": "co:applied_optoelectronics"
+    },
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Later primary disclosure shows AAOI's major customers contractually committing multi-year transceiver volume to AAOI, or in-house optics programs at those customers being cancelled.",
+      "id": "aaoi_10_k_20260227_competition_cl2",
+      "source_ids": [
+        "aaoi_10_k_20260227_competition_s3"
+      ],
+      "statement": "AAOI discloses that its customers (network equipment providers) and their downstream network service providers may manufacture optical subsystems in-house, and that some potential customers are committed to competitors' products because of existing relationships; in-house build and relationship lock-in are additional counter-paths to AAOI capturing the demand it invests capacity for.",
+      "subject_id": "co:applied_optoelectronics"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "co:coherent",
+      "id": "e1",
+      "relation": "competes_with",
+      "source_ids": [
+        "aaoi_10_k_20260227_competition_s1"
+      ],
+      "src_id": "co:applied_optoelectronics"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "co:lumentum",
+      "id": "e2",
+      "relation": "competes_with",
+      "source_ids": [
+        "aaoi_10_k_20260227_competition_s1"
+      ],
+      "src_id": "co:applied_optoelectronics"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "AAOI",
+        "Applied Optoelectronics, Inc."
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:applied_optoelectronics",
+      "name": "Applied Optoelectronics",
+      "role": null,
+      "source_ids": [
+        "aaoi_10_k_20260227_competition_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Coherent Corporation",
+        "COHR"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:coherent",
+      "name": "Coherent",
+      "role": null,
+      "source_ids": [
+        "aaoi_10_k_20260227_competition_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Lumentum Holdings, Inc.",
+        "LITE"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:lumentum",
+      "name": "Lumentum",
+      "role": null,
+      "source_ids": [
+        "aaoi_10_k_20260227_competition_s1"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "aaoi_10_k_20260227_competition",
+    "evidence_tier": 1,
+    "origin_entity": "Applied Optoelectronics",
+    "permission_basis": "SEC EDGAR public filing; store the canonical URL and only the research-relevant Competition excerpt from Item 1 Business.",
+    "published_at": "2026-02-27",
+    "publisher": "SEC EDGAR",
+    "retrieved_at": "2026-07-29",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "AAOI Form 10-K FY2025 — Item 1 Business, Competition",
+    "url": "https://www.sec.gov/Archives/edgar/data/1158114/000143774926005875/aaoi20251231_10k.htm"
+  },
+  "sources": [
+    {
+      "id": "aaoi_10_k_20260227_competition_s1",
+      "locator": "Item 1 Business, Competition, first paragraph",
+      "quote": "The optical networking market is intensely competitive. Because of the broad nature of our product offerings, we do not believe that we face a single major competitor across all of our markets. We do, however, experience intense competition in each product area from a number of manufacturers and we anticipate that competition will increase. Our major competitors in one or more of our markets include Coherent Corporation, Eoptolink Technology Inc., Ltd., Foxconn Interconnect Technology Ltd., InnoLight Technology (Suzhou) Ltd., Intel Corporation, Lumentum Holdings, Inc., Mitsubishi, Molex, LLC, Source Photonics, Inc. and Sumitomo Electric Industries, Ltd."
+    },
+    {
+      "id": "aaoi_10_k_20260227_competition_s2",
+      "locator": "Item 1 Business, Competition, second paragraph",
+      "quote": "Many of our competitors are larger than we are and have significantly greater financial, marketing and other resources."
+    },
+    {
+      "id": "aaoi_10_k_20260227_competition_s3",
+      "locator": "Item 1 Business, Competition, third paragraph",
+      "quote": "Network equipment providers, who are our customers, and network service providers, who are supplied by our customers, may decide to manufacture the optical subsystems incorporated into their network systems in-house. We also encounter potential customers that, because of existing relationships, are committed to the products offered by these competitors."
+    },
+    {
+      "id": "aaoi_10_k_20260227_competition_s4",
+      "locator": "Item 1 Business, Competition, closing paragraph",
+      "quote": "We believe that we compete favorably with respect to the above factors based on our MBE and MOCVD processes, our vertically integrated model, the performance and reliability of our product offerings, and our technical expertise in light engine design and manufacture."
+    }
+  ]
+}
