@@ -2137,6 +2137,28 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826005740/xslF345X06/ownership.xml"
     },
+    "lead_b27ffbab577a82de6e3f7c9ed96e0445": {
+      "first_seen": "2026-07-29T04:32:41.209438+00:00",
+      "lead_id": "lead_b27ffbab577a82de6e3f7c9ed96e0445",
+      "published_at": "2026-02-27",
+      "refs": {
+        "action_digest": "d482e15e562717704277c22c9ae631d991b6434d5ccc6a092186676b8e14de36",
+        "focus_company_id": "co:applied_optoelectronics",
+        "intake_commit": "22f9d4f",
+        "research_action_id": "ra_1fdcb6bcdfb8348fd6a6c05999e7c34a"
+      },
+      "source": "decision_gap:wo_b82c8b5cbb4a0b3480036f93a72bdade",
+      "status": "applied",
+      "title": "AAOI Form 10-K FY2025 — Item 1 Business, Competition（counter-path gap research 來源）",
+      "triage": {
+        "decided_at": "2026-07-29T04:32:41.209459+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "使用者 go [41]（wo_b82c8b5cbb4a0b3480036f93a72bdade）授權 AAOI counter_path bounded gap research；SEC EDGAR 一手 filing",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1158114/000143774926005875/aaoi20251231_10k.htm"
+    },
     "lead_b3503ff4c9d89e278f35dcadc4f19a4a": {
       "first_seen": "2026-07-22T15:37:26.728937+00:00",
       "lead_id": "lead_b3503ff4c9d89e278f35dcadc4f19a4a",
