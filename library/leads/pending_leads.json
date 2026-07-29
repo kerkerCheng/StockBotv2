@@ -1007,33 +1007,61 @@
         "campaign_window_start": "2026-06-29T13:46:25Z",
         "ontology_authority": "todo:61",
         "ontology_status": "approved",
-        "parked_reason": "trace_backlog_or_lead_only_after_robotics_bundle",
+        "parked_reason": "original_report_obtained_no_new_ra_tier3_supplier_map",
         "pq2_item": "61",
         "research_bundle_id": "serenity_robotics_20260729",
         "research_report": "docs/reports/serenity_30d_research_2026-07-29.md",
-        "trace_attempts_ref": "docs/reports/serenity_30d_research_2026-07-29.md#截圖paywall判讀",
+        "trace_access_method": "official_public_download",
+        "trace_attempts_ref": "docs/reports/serenity_30d_research_2026-07-29.md#pq2-66-後續追源ibk-原報告已取得",
         "trace_cost_authorized": "false",
-        "trace_next_trigger": "canonical_ibk_report_metadata_or_user_provided_legal_excerpt",
-        "trace_request_kind": "user_provided_licensed_excerpt",
-        "trace_requires_user": "true",
-        "trace_review_hint": "若你可合法提供報告或相關頁面，回覆此編號 go 並附檔／本機路徑；go 只授權 bounded pq1 追源，不含購買、不接受 supplier mapping、不入圖。",
+        "trace_next_trigger": "customer_side_named_supplier_disclosure",
+        "trace_origin_entity": "IBK_Investment_Securities",
+        "trace_origin_linkage": "independent",
+        "trace_original_date": "2026-06-08",
+        "trace_original_url": "https://m.ibks.com/iko/IKO01/download.do?attatchCd=ATTATCH1&menuCode=IKO010301&seq=11727",
+        "trace_request_kind": "public_official_report",
+        "trace_request_resolved": "true",
+        "trace_requeue_trigger": "user_go",
+        "trace_requeued_at": "2026-07-29T15:47:47.713462+00:00",
+        "trace_requires_user": "false",
+        "trace_review_hint": "已取得 IBK 官網公開原報告；只有新的客戶端或供應商正式揭露才重跑 named supplier mapping。",
         "trace_review_title": "追原報告 — IBK Boston Dynamics value-chain supplier map",
-        "trace_status": "isolated_tier_3",
-        "trace_storage_default": "local_only"
+        "trace_status": "original_obtained",
+        "trace_storage_default": "repo_excerpt",
+        "trace_storage_permission": "repo_excerpt",
+        "trace_transformation_service": "none"
       },
       "source": "x:aleabitoreddit",
       "status": "parked",
       "title": "So there's a IBK Research report on Boston Dynamics value chains from last month. Just a summary: IBK maps these companies to Atlas as suppliers: - Hwashin (010690) / body, arms, legs - LG Energy (373220) / battery - Hyundai Autoever (307950) / integration - Hyundai Mobis (012330) / actuators As for humanoid volume ramps: They're modeling for, 11.29K in 2028, 20k 2029, 30k in 2030... 40k in 2031, and 50k in 2032. Not quite sure why IBK and other institutions are a fan of linearly modeling S-curve volume ramps... Like adding +10K per year, don't quite think it's volume ramp is going to work like that... if I had to guess it would look more like: - 15-20k 2028 - 40k-70k 2029 - 90k-140k for 2030 Since Boston Dynamics is projecting 30k capacity by 2028 (I'm sure they'd aim to get more online by 2029-2030), as China collectively is already doing 100k EOY in 2026. In terms of competitive landscape they name: - $TSLA, Figure, Apptronik, $CCXI (Agility), as US players. Then Boston Dynamics (Korea parent owned now) - Unitree, Fourier, AGibot, UBtech, $XPEV as the Chinese leaders. - Neura, Pal Robotics, Wandercraft, Oversonic, as the EU leaders. They also did quite a lot of valuation modeling around Hyundai Mobis/Hyundai Autoever/Glovis. Regarding the BD economic ownership from 27.9% from Hyundai Motor, 11.3% from Mobis, and 11.3% from Glovis. So at least institution are valuing humanoid segments inside companies lot more now. Then from report assumptions: - 31 actuators per Atlas - $1K per actuator in 2028 - $134K Atlas ASP, Which implies actuator cost of final selling price is roughly 23–28%. Probably the more interesting statement was IBK stated that actuator capacity is biggest signal for volume ramp. eg. every 310,000 units of actuator capacity supports 10,000 more robots. So tracking actuator outputs, yields, ASP is a cleaner read on 2028-2030 ramp. I didn't have much personal takeaways, but hopefully others find it interesting, maybe around Hwashin as a core supplier or around actuator capacity as an indicator.",
       "triage": {
-        "decided_at": "2026-07-29T14:00:33.049910+00:00",
+        "decided_at": "2026-07-29T15:47:47.713462+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true,
           "user_requested": true
         },
-        "reason": "Robotics 探索：具名公司／零件／政策與可追查數字或原始事件；進 pq1 追官方與客戶端來源，不把 Serenity 或圖片視為證據",
+        "reason": "使用者核准 exact source_trace_review；排入 bounded pq1，尚未接受 claim 或核准入圖",
         "tier": 4
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-07-29T15:47:47.713462+00:00",
+          "superseded_reason": "使用者核准 exact source_trace_review；排入 bounded pq1，尚未接受 claim 或核准入圖",
+          "trace_trigger": "user_go",
+          "triage": {
+            "decided_at": "2026-07-29T14:00:33.049910+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true,
+              "user_requested": true
+            },
+            "reason": "Robotics 探索：具名公司／零件／政策與可追查數字或原始事件；進 pq1 追官方與客戶端來源，不把 Serenity 或圖片視為證據",
+            "tier": 4
+          }
+        }
+      ],
       "url": "https://x.com/aleabitoreddit/status/2076248337863639506"
     },
     "lead_043e94a0e70f703a76115cf09f96b438": {

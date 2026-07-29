@@ -165,6 +165,9 @@ pq1。使用者對 action ID 明確回覆 `go` 後，另一個執行步驟才可
 - 跑 `loader/validate.py`(vocab + schema 形狀檢查;新 relation/type 先補 `schema/vocab.json`)
 - node/edge 帶齊 `source_ids`(全域格式)、`confidence`、L4 歸位好的屬性
 - 呼叫 `prepare_research_action` 讓 server 重跑驗證並凍結 immutable payload；把原樣 review packet 放進 pq2
+- 在凍結前，分開列出 graph delta 內所有公司與唯一 `focus_company_id`；把 focus 寫入綁定 lead，並在
+  `ra_admission` pq2 明列 `Decision handoff: co:x`。其他公司只作 evidence／relationship context，不因入圖
+  自動建立 cohort；若沒有唯一 focus，先留 pq1，若要追多個投資標的則分開提出 handoff。
 - **不要**在 pq1 或同一輪呼叫 loader／`apply_research_action`。只有使用者明確核准 action ID 後，才由
   apply 流程寫入、驗圖並接續窄 pathset commit/push
 

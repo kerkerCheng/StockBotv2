@@ -773,6 +773,33 @@ def collect_from_research_actions() -> list[dict[str, Any]]:
         if action.get("state") in {
             "ready", "applying", "partial", "ready_for_approval", "partial_apply"
         }:
+            action_id = str(action.get("action_id") or action.get("id") or "")
+            try:
+                from engine_b.leads import load as load_leads
+
+                lead_store = load_leads()
+                focuses = sorted({
+                    str((lead.get("refs") or {}).get("focus_company_id") or "").strip()
+                    for lead in lead_store["leads"].values()
+                    if (lead.get("refs") or {}).get("research_action_id") == action_id
+                } - {""})
+            except Exception:
+                focuses = []
+            if len(focuses) == 1:
+                handoff_hint = (
+                    f"核准 exact graph delta；Decision handoff：{focuses[0]}。"
+                    "RA 內其他公司只作 evidence／relationship context，不自動建 cohort。"
+                )
+            elif focuses:
+                handoff_hint = (
+                    "BLOCKER：Research Action 有多個 focus_company_id："
+                    f"{', '.join(focuses)}；先回 pq1 拆成明確 Decision handoff。"
+                )
+            else:
+                handoff_hint = (
+                    "BLOCKER：Research Action 尚未聲明唯一 focus_company_id；"
+                    "先回 pq1 補 Decision handoff，不得先 apply。"
+                )
             title = (
                 action.get("slug")
                 or action.get("title")
@@ -782,8 +809,9 @@ def collect_from_research_actions() -> list[dict[str, Any]]:
             )
             rows.append({
                 "type": "ra_admission",
-                "ref_id": str(action.get("action_id") or action.get("id") or ""),
+                "ref_id": action_id,
                 "title": str(title),
+                "hint": handoff_hint,
                 "source": "research_action",
             })
     return [r for r in rows if r["ref_id"]]

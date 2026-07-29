@@ -409,6 +409,7 @@ def test_collect_from_decisions_keeps_global_blocker_without_items(monkeypatch) 
 
 def test_collect_from_research_actions_recognizes_actual_ready_state(monkeypatch) -> None:
     from mcp_server import research_actions
+    from engine_b import leads
 
     monkeypatch.setattr(research_actions, "iter_actions", lambda: iter([
         {
@@ -419,21 +420,62 @@ def test_collect_from_research_actions_recognizes_actual_ready_state(monkeypatch
         {"action_id": "ra_partial", "state": "partial", "title": "可續跑"},
         {"action_id": "ra_done", "state": "pushed", "title": "已完成"},
     ]))
+    monkeypatch.setattr(leads, "load", lambda: {"leads": {
+        "lead_ready": {
+            "refs": {
+                "research_action_id": "ra_ready",
+                "focus_company_id": "co:agility_robotics",
+            }
+        }
+    }})
 
     assert todo.collect_from_research_actions() == [
         {
             "type": "ra_admission",
             "ref_id": "ra_ready",
             "title": "可核准",
+            "hint": (
+                "核准 exact graph delta；Decision handoff：co:agility_robotics。"
+                "RA 內其他公司只作 evidence／relationship context，不自動建 cohort。"
+            ),
             "source": "research_action",
         },
         {
             "type": "ra_admission",
             "ref_id": "ra_partial",
             "title": "可續跑",
+            "hint": (
+                "BLOCKER：Research Action 尚未聲明唯一 focus_company_id；"
+                "先回 pq1 補 Decision handoff，不得先 apply。"
+            ),
             "source": "research_action",
         },
     ]
+
+
+def test_collect_from_research_actions_exposes_multiple_focus_blocker(monkeypatch) -> None:
+    from mcp_server import research_actions
+    from engine_b import leads
+
+    monkeypatch.setattr(research_actions, "iter_actions", lambda: iter([{
+        "action_id": "ra_multi",
+        "state": "ready",
+        "title": "多公司 action",
+    }]))
+    monkeypatch.setattr(leads, "load", lambda: {"leads": {
+        "lead_a": {"refs": {
+            "research_action_id": "ra_multi",
+            "focus_company_id": "co:a",
+        }},
+        "lead_b": {"refs": {
+            "research_action_id": "ra_multi",
+            "focus_company_id": "co:b",
+        }},
+    }})
+
+    row = todo.collect_from_research_actions()[0]
+    assert row["hint"].startswith("BLOCKER：Research Action 有多個 focus_company_id")
+    assert "co:a, co:b" in row["hint"]
 
 
 def test_collect_from_decisions_keeps_sheet_only_items_without_cohort(

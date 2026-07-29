@@ -122,6 +122,12 @@ pq1 是唯一昂貴階段（web search + 讀文件 + 抽 claim）——priority 
 若追源未果、原主張被一手資料否定，或結果依 L4 只屬 Engine C 時變 observation，就 park 並記 outcome，
 不為了讓每個 PASS 都進 pq2 而製造空 Research Action。drain 最遠到 prepared，**不入圖**。
 
+prepare 前先把「graph delta 涵蓋哪些公司」與「完成後唯一要建立／沿用哪個 Decision cohort」分開。
+把唯一 `focus_company_id` 寫入綁定 lead，並讓 `ra_admission` pq2 的 hint 明列
+`Decision handoff：co:x`；RA 內其他公司預設只作 evidence／relationship context，不自動建 cohort。
+若沒有唯一 focus，先留 pq1 修正；若確實要追多個投資標的，分開提出明確 handoff，不由「入圖多家公司」
+推定「全部開始投資追蹤」。
+
 每輪 drain 後另列不會被一般 queue 自動撿回的 trace backlog：
 
 ```powershell
@@ -225,6 +231,10 @@ brief 不得再次請使用者 go。只有 `parked` outcome receipt，或補缺�
 `source_trace_review go` 也使用 `todo dispatch <n>`：原 pq2 在 queued／researching 期間保持 active 但不重複
 詢問。只有 prepared action receipt，或誠實的 `trace:<trace_status>` parked receipt 才能結案；前者若需入圖，
 仍另建立 `ra_admission` pq2。新報告訂閱／購買需 exact 價格的獨立人工核准。
+
+`ra_admission` 顯示時必須讓 hint 明列唯一 `Decision handoff`。`focus_company_id` 是 pq1 在 RA 凍結前，
+依主要投資問題篩出的 cohort 目標，不等於 action 內唯一公司；使用者的 `go` 同時核准 exact graph delta
+與已揭露的 handoff。若 hint 顯示未聲明／多個 focus blocker，不得先 apply 再事後補選。
 
 **go 一個 prepared RA ＝入圖**：走既有 `apply_research_action`（本機或 MCP native approval，一次確認）
 → `advance <lead> applied --ref research_action_id=<ra_id> --ref action_digest=<digest> --ref focus_company_id=co:x`

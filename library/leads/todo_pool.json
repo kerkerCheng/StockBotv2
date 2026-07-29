@@ -877,12 +877,18 @@
     },
     {
       "added_at": "2026-07-29T15:35:20.211696+00:00",
+      "dispatch_receipt": "trace:original_obtained",
+      "dispatch_ref": "lead:lead_038fe471d126685d77dadb0045d9daa6",
+      "dispatch_status": "parked",
+      "dispatch_updated_at": "2026-07-29T15:58:27.285144+00:00",
+      "dispatched_at": "2026-07-29T15:47:47.713462+00:00",
       "hint": "若你可合法提供報告或相關頁面，回覆此編號 go 並附檔／本機路徑；go 只授權 bounded pq1 追源，不含購買、不接受 supplier mapping、不入圖。",
       "n": 66,
-      "reason": null,
+      "reason": "已取得 IBK 官網 2026-06-08 公開原報告並定位 p79/p84/p85/p104/p108；確認 Serenity 主要轉述，但 Hwashin/LGES/AutoEver mapping 仍是 tier 3 彙整，無新 RA",
+      "receipt": "trace:original_obtained",
       "ref_id": "lead_038fe471d126685d77dadb0045d9daa6",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-07-29T15:58:27.285144+00:00",
       "source": "source_trace",
       "title": "追原報告 — IBK Boston Dynamics value-chain supplier map",
       "type": "source_trace_review"
@@ -1694,6 +1700,42 @@
       "receipt": "action:ra_155541bb6c18e49d0d58140b242c8331;digest:856df9b6939a8664c1f515c77bd0e255d6f86fd1af08c8cfded6bbaa02d9d243;commit:11d14fd1d09126d0e363efa66a8feb2655b82f21;cohort:dc_6ae5b014dbbcd0774b45487542c9a102",
       "ref_id": "ra_155541bb6c18e49d0d58140b242c8331",
       "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-07-29T15:47:47.713462+00:00",
+      "n": 66,
+      "reason": "使用者 go 只授權 bounded source trace",
+      "receipt": "lead:lead_038fe471d126685d77dadb0045d9daa6",
+      "ref_id": "lead_038fe471d126685d77dadb0045d9daa6",
+      "type": "source_trace_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-07-29T15:47:56.447778+00:00",
+      "n": 66,
+      "reason": "使用者核准公開合法 bounded source trace；不含付費、繞過登入或 graph admission",
+      "receipt": "lead:lead_038fe471d126685d77dadb0045d9daa6",
+      "ref_id": "lead_038fe471d126685d77dadb0045d9daa6",
+      "type": "source_trace_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-07-29T15:58:27.285144+00:00",
+      "n": 66,
+      "reason": "已取得 IBK 官網 2026-06-08 公開原報告並定位 p79/p84/p85/p104/p108；確認 Serenity 主要轉述，但 Hwashin/LGES/AutoEver mapping 仍是 tier 3 彙整，無新 RA",
+      "receipt": "trace:original_obtained",
+      "ref_id": "lead_038fe471d126685d77dadb0045d9daa6",
+      "type": "source_trace_review",
+      "verb": "pq1_parked"
+    },
+    {
+      "at": "2026-07-29T15:58:27.285144+00:00",
+      "n": 66,
+      "reason": "已取得 IBK 官網 2026-06-08 公開原報告並定位 p79/p84/p85/p104/p108；確認 Serenity 主要轉述，但 Hwashin/LGES/AutoEver mapping 仍是 tier 3 彙整，無新 RA",
+      "receipt": "trace:original_obtained",
+      "ref_id": "lead_038fe471d126685d77dadb0045d9daa6",
+      "type": "source_trace_review",
       "verb": "go"
     }
   ],

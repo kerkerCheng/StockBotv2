@@ -125,6 +125,24 @@ Robotics 15 個代表 leads 共快取 33 個 media items，X metadata 的 `alt_t
 
 資本邊界：截圖可以提高 pq1 priority，不能單獨擴大 Engine D funded range。若 broad thesis 已有獨立一手證據，截圖可成為 research timing／paper hypothesis；若 named supplier mapping 只剩截圖支持，維持 research-only。使用者合法持有付費報告時，只在本機保存 canonical URL、報告 metadata、頁碼與必要 excerpt；不保存或上傳 cookie、帶 token URL或整份未授權報告。
 
+### pq2 [66] 後續追源：IBK 原報告已取得
+
+使用者核准 [66] 後，以英文 exact phrase 先找到 Gate／PANews 等同標題轉述；它們緊接 Serenity 貼文發布，且保留 Serenity 自己的 S-curve 批評與數字，故標為 `same_origin`／`metadata_only`，不算獨立來源。改用韓文公司名、零件名與報告日期搜尋後，找到 IBK 投資證券官網公開下載 endpoint：[*독일 하노버에서 본 Physical AI*](https://m.ibks.com/iko/IKO01/download.do?attatchCd=ATTATCH1&menuCode=IKO010301&seq=11727)，汽車／二次電池產業分析，李賢旭（이현욱），2026-06-08，共 118 頁。
+
+一般 sandbox 抓取第一次記為 `access_blocked`；以完全相同的 IBK 公開 URL 在允許本機網路的權限下重跑後成功，證實不是 paywall／login。官方 PDF 可直接下載，因此未使用 `txtify.it`、搜尋摘要或媒體鏡像作原文。
+
+| Serenity atomic claim | IBK locator | 判讀 |
+|---|---|---|
+| Atlas：Hwashin＝body／arms／legs、LG Energy Solution＝battery、Hyundai AutoEver＝SI、Hyundai Mobis＝actuator | p.79，表 61 | 確認「IBK 報告確實這樣列」；但表下注明來源是「各公司、媒體彙整、IBK」，仍是 tier 3 supplier map。只有 Mobis→Atlas 另有 Boston Dynamics／Mobis 官方確認。 |
+| Atlas 2028–2032 銷量 11,290／20k／30k／40k／50k | p.84，表 62 | 逐字一致；這是 IBK model／forecast，不是已下單量或 Boston Dynamics guidance。 |
+| 2028 Atlas ASP US$134k | p.84，表 62 | 逐字一致；屬模型假設。 |
+| 每台 31 顆 actuator、2028 ASP US$1,000 | p.104 敘述、p.108 表 84 | 逐字一致；表 84 以 350k 顆推算 11,290 台，仍是 IBK／Mobis model assumption，不是已實現產能 receipt。 |
+| Hyundai 27.9%、Mobis 11.3%、Glovis 11.3% 的 Boston Dynamics 經濟曝險 | p.85，表 63 | 表格一致；正文把 Hyundai 四捨五入寫 27.8%。這是 IBK 依 HMG Global／直接持股推算的 economic exposure。 |
+| actuator 約占售價 23–28% | 未找到相同報告句子 | 由 31×US$1,000÷US$134,000 可得到約 23.1%；這是 Serenity 的算術推論，不是 IBK quote，28% 上緣無法由該組輸入直接重現。 |
+| actuator capacity 是「biggest signal」；每 310k 顆支撐 10k 台 | p.84、p.108 可支持 31 顆／台的換算 | 310k÷31＝10k 是算術；未找到 `biggest signal` 的對應報告逐字句，保留為 Serenity 的研究解讀。 |
+
+公司端再查結果不變：Hyundai Mobis 官方支持 Atlas actuator 供應；Hwashin、LG Energy Solution、Hyundai AutoEver 官網／IR 搜尋仍未找到 Atlas named nomination。因此本次 trace outcome 是 `original_obtained`，解除了「截圖是否真的來自 IBK」的不確定性，但沒有把其餘 named supplier edges 升級；不產生新的 Research Action，等待客戶端／供應商正式揭露再重跑。
+
 ## Disproof conditions
 
 - Agility 的 v5 orders 未通過 milestones、SPAC 延遲／終止、redemptions 顯著稀釋可用現金。

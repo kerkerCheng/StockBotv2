@@ -3,7 +3,7 @@ name: source-trace
 description: >
   把轉述、截圖、搜尋摘要、推文或二手報導追回可逐字核對的原始文件，並依來源品質決定
   可抽取、誠實降級或只留 lead。當研究流程需要「追原文」、「找一手來源」、「這個轉述能不能
-  當證據」、weekly scan trace、或遠端 chat 收到未驗證線索時使用。這是 lead-intake、
+  當證據」、處理公開頁面的存取障礙、weekly scan trace、或遠端 chat 收到未驗證線索時使用。這是 lead-intake、
   weekly scan 與手機 intake 共用的追源規則書。
 ---
 
@@ -60,6 +60,29 @@ cloud routine／手機不能假設可碰本機檔案或 localhost。
 打開 SEC/IR 原頁。通用搜尋永遠是第三層 discovery，不因搜尋結果彼此重複就算多個
 `origin_entity` 或 `origin_event`。
 
+## 公開內容的 access recovery 梯子
+
+遇到 JS rendering、壞連結、地區 routing、搜尋只見摘要或一般抓取器讀不到時，依序嘗試並記錄；
+目的只是**恢復對公開內容的正常讀取**，不是繞過付費、登入、授權或技術性 access control：
+
+1. 先找 canonical URL、官方 research／IR index、作者頁、文件編號、日期與公開下載 endpoint。
+2. 用 exact title、作者、日期、報告編號、獨特句子與當地語言查找；搜尋摘要只供 discovery，
+   不能充當 quote 或原文。
+3. 找相同標題的媒體報導以恢復 metadata／claimed origin；若它只是重述同一報告或同一貼文，標
+   `same_origin`，不得當獨立佐證。發布時間緊接原線索、保留原線索特有評論或數字時，預設同源。
+4. 回到被點名公司、客戶、供應商、監管機構或作者的官方頁，逐條獨立核對 atomic claims；
+   可以確認廣義方向，但不得把 broad corroboration 外推成 exact named supplier mapping。
+5. 公開 reader／文字轉換服務（例如 `txtify.it`）只可用於 canonical URL **原本即公開、無需登入／
+   訂閱／cookie，且障礙只是 rendering compatibility** 的情況。必須同時保存 canonical URL、轉換服務、
+   取得時間，並抽查標題／作者／日期／關鍵段落與原站一致；代理輸出本身不是新的 origin。
+6. 使用者合法持有的本機副本預設 `local_only`；只保存研究必要 excerpt／locator，不上傳 cookie、
+   token URL 或未授權全文。
+7. 遇到 paywall、login、CAPTCHA、robots／anti-bot 或其他 access control 就停止；不得使用外洩鏡像、
+   偽造憑證、規避限制的代理或其他 circumvention。需要購買時另走 exact vendor／金額核准。
+
+`txtify.it` 不是預設路徑，也不是「看到 403 就試」的繞過器。若原站 403 的原因不明，先記
+`access_blocked` 並做同路徑權限重跑；確認是公開頁的 rendering 問題後，才可走第 5 層。
+
 ## 每條 claim 的 Trace 迴圈
 
 1. **拆 atomic claim：** 主體、動作／屬性、對象、時間、原線索說它來自哪裡。
@@ -102,9 +125,13 @@ lead_url: "起始線索 URL"
 claimed_origin: "線索聲稱來自誰／哪個事件"
 attempts:
   - route: "SEC EDGAR | MOPS | customer IR | arXiv | exact-phrase search | ..."
+    access_method: "canonical | official_index | exact_title | same_title_media | public_transformer | local_copy"
     query_or_url: "實際查過的 query 或 canonical URL"
+    canonical_url: "聲稱原文的穩定 URL；沒有則 null"
+    transformation_service: "例如 txtify.it；未使用則 null"
+    origin_linkage: "independent | same_origin | metadata_only | unknown"
     result: "found | no_result | blocked | paywalled | mismatch | contradicts"
-    failure_class: "access_blocked | timeout | tls_failure | transport_failure | provider_api_error | null"
+    failure_class: "access_blocked | paywall_or_login | anti_bot | timeout | tls_failure | transport_failure | provider_api_error | null"
     note: "找到/沒找到什麼"
 trace_status: "original_obtained | tier_1_2_honest_passthrough | isolated_tier_3 | lead_only_tier_4"
 obtained_origin_entity: "真正取得文件的發出者；沒有則 null"
@@ -129,6 +156,8 @@ next_action: "extract | park_trace_backlog | lead_only | investigate_contradicti
 禁止只寫「Google 沒找到」。至少記錄試過的專用登記表、交叉方與 exact-phrase query；
 若環境無法連某路徑，寫 `blocked`，不要假裝已查完；完成權限重跑與官方替代路徑前，不得改寫成
 `no_result`。後續成功時保留原 attempt 並加 recovered attempt，不能刪掉第一次失敗造成的觀測偏誤。
+同標題報導、搜尋摘要與公開轉換服務還必須記 `origin_linkage`；它們可以幫忙找路，不能製造新的
+evidence origin。
 
 ## 遠端 chat／routine intake SOP
 
