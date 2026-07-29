@@ -1,0 +1,144 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "若客戶端文件、後續 SEC 文件或部署台帳顯示這些設施只是未上線承諾，或 operating hours 無法歸屬 live production，則降級。",
+      "id": "agility_robotics_sec_investor_presentation_2026_06_cl1",
+      "source_ids": [
+        "agility_robotics_sec_investor_presentation_2026_06_s2"
+      ],
+      "statement": "Agility 自報 Digit 已有 9 個 committed customer facility deployments，累計 65,000 operating hours。",
+      "subject_id": "prod:digit_v5"
+    },
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "guided",
+      "disproof_condition": "若最終合約或後續 SEC revenue disclosure 顯示數量、期限、milestone、warrant 或 revenue treatment 不同，則以新文件 supersede。",
+      "id": "agility_robotics_sec_investor_presentation_2026_06_cl2",
+      "source_ids": [
+        "agility_robotics_sec_investor_presentation_2026_06_s2",
+        "agility_robotics_sec_investor_presentation_2026_06_s3",
+        "agility_robotics_sec_investor_presentation_2026_06_s4"
+      ],
+      "statement": "Agility 的 $300M+ committed orders 對應 1,000 台 Digit v5、三年 RaaS，受 contractual milestones 約束、包含 purchaser warrants，且不是 current-period revenue。",
+      "subject_id": "prod:digit_v5"
+    },
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "guided",
+      "disproof_condition": "若 audited production／shipment data 證明 10,000 台已實際生產，才可把它升格為 realized output。",
+      "id": "agility_robotics_sec_investor_presentation_2026_06_cl3",
+      "source_ids": [
+        "agility_robotics_sec_investor_presentation_2026_06_s2"
+      ],
+      "statement": "RoboFab 的 10,000 是 annual production capacity 披露，不是已實現年產量。",
+      "subject_id": "co:agility_robotics"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "prod:digit_v5",
+      "id": "agility_robotics_sec_investor_presentation_2026_06_e1",
+      "relation": "develops",
+      "source_ids": [
+        "agility_robotics_sec_investor_presentation_2026_06_s1",
+        "agility_robotics_sec_investor_presentation_2026_06_s3"
+      ],
+      "src_id": "co:agility_robotics"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:robotics_as_a_service",
+      "id": "agility_robotics_sec_investor_presentation_2026_06_e2",
+      "relation": "offered_under",
+      "source_ids": [
+        "agility_robotics_sec_investor_presentation_2026_06_s4"
+      ],
+      "src_id": "prod:digit_v5"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "robot_system",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:agility_robotics",
+      "name": "Agility Robotics",
+      "role": "robot_oem",
+      "source_ids": [
+        "agility_robotics_sec_investor_presentation_2026_06_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "robot_system",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "prod:digit_v5",
+      "name": "Digit v5",
+      "role": null,
+      "source_ids": [
+        "agility_robotics_sec_investor_presentation_2026_06_s2",
+        "agility_robotics_sec_investor_presentation_2026_06_s3"
+      ],
+      "type": "Product"
+    },
+    {
+      "abstraction_level": "deployment_workflow",
+      "aliases": [
+        "RaaS"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:robotics_as_a_service",
+      "name": "Robotics-as-a-Service",
+      "role": null,
+      "source_ids": [
+        "agility_robotics_sec_investor_presentation_2026_06_s4"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "agility_robotics_sec_investor_presentation_2026_06",
+    "evidence_tier": 1,
+    "origin_entity": "Agility Robotics",
+    "permission_basis": "官方公開文件；只保存 canonical URL 與研究所需的有限逐字節錄，不重製完整頁面或 PDF。",
+    "published_at": "2026-06-24",
+    "publisher": "Agility Robotics",
+    "retrieved_at": "2026-07-29",
+    "source_type": "ir_deck",
+    "storage_permission": "repo_excerpt",
+    "title": "Agility Robotics Investor Presentation — June 2026",
+    "url": "https://www.sec.gov/Archives/edgar/data/2074973/000121390026071287/ea029548401ex99-2.htm"
+  },
+  "sources": [
+    {
+      "id": "agility_robotics_sec_investor_presentation_2026_06_s1",
+      "locator": "Exhibit 99.2 cover, p.1",
+      "quote": "Agility to go public in partnership with Churchill Capital Corp XI … the only U.S. publicly listed pure-play humanoid company with proven commercial deployments."
+    },
+    {
+      "id": "agility_robotics_sec_investor_presentation_2026_06_s2",
+      "locator": "Exhibit 99.2, slide 11",
+      "quote": "9 Committed customer facility deployments 65,000 hours of operations $300M+ committed orders for Digit v5 (and growing!) 10,000 RoboFab annual production capacity"
+    },
+    {
+      "id": "agility_robotics_sec_investor_presentation_2026_06_s3",
+      "locator": "Exhibit 99.2, slide 6, note 1",
+      "quote": "Reflects customer orders for Digit v5, as of May 2026, representing potential multi-year value expected to be realized over time, subject to the realization of certain contractual milestones"
+    },
+    {
+      "id": "agility_robotics_sec_investor_presentation_2026_06_s4",
+      "locator": "Exhibit 99.2, slide 6, note 1",
+      "quote": "relates to 1,000 Digit v5 robots with three-year term RaaS contract, which includes warrants issued to purchaser vesting proportionately to robots deployed; figures are not a measure of current period revenue."
+    }
+  ]
+}

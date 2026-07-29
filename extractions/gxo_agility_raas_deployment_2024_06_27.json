@@ -1,0 +1,149 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "若 GXO 後續揭露部署已停止、只剩展示環境，或無法達到 live operations 的安全與 uptime 要求，則此商用部署主張失效。",
+      "id": "gxo_agility_raas_deployment_2024_06_27_cl1",
+      "source_ids": [
+        "gxo_agility_raas_deployment_2024_06_27_s3"
+      ],
+      "statement": "GXO 客戶端確認 Digit 已在物流設施執行 tote transfer，並與既有 cobot／conveyor 工作流整合。",
+      "subject_id": "tech:logistics_tote_transfer"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "prod:digit",
+      "id": "gxo_agility_raas_deployment_2024_06_27_e1",
+      "relation": "deploys",
+      "source_ids": [
+        "gxo_agility_raas_deployment_2024_06_27_s1",
+        "gxo_agility_raas_deployment_2024_06_27_s2"
+      ],
+      "src_id": "co:gxo_logistics"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.65,
+      "dst_id": "tech:robotics_as_a_service",
+      "id": "gxo_agility_raas_deployment_2024_06_27_e2",
+      "relation": "offered_under",
+      "source_ids": [
+        "gxo_agility_raas_deployment_2024_06_27_s2",
+        "gxo_agility_raas_deployment_2024_06_27_s4"
+      ],
+      "src_id": "prod:digit"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.65,
+      "dst_id": "tech:logistics_tote_transfer",
+      "id": "gxo_agility_raas_deployment_2024_06_27_e3",
+      "relation": "enables",
+      "source_ids": [
+        "gxo_agility_raas_deployment_2024_06_27_s3"
+      ],
+      "src_id": "prod:digit"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "deployment_workflow",
+      "aliases": [
+        "GXO"
+      ],
+      "attributes": {},
+      "confidence": 0.75,
+      "id": "co:gxo_logistics",
+      "name": "GXO Logistics",
+      "role": "robot_operator",
+      "source_ids": [
+        "gxo_agility_raas_deployment_2024_06_27_s1",
+        "gxo_agility_raas_deployment_2024_06_27_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "robot_system",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.75,
+      "id": "prod:digit",
+      "name": "Digit",
+      "role": null,
+      "source_ids": [
+        "gxo_agility_raas_deployment_2024_06_27_s1",
+        "gxo_agility_raas_deployment_2024_06_27_s3"
+      ],
+      "type": "Product"
+    },
+    {
+      "abstraction_level": "deployment_workflow",
+      "aliases": [
+        "RaaS"
+      ],
+      "attributes": {},
+      "confidence": 0.75,
+      "id": "tech:robotics_as_a_service",
+      "name": "Robotics-as-a-Service",
+      "role": null,
+      "source_ids": [
+        "gxo_agility_raas_deployment_2024_06_27_s2",
+        "gxo_agility_raas_deployment_2024_06_27_s4"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "deployment_workflow",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.75,
+      "id": "tech:logistics_tote_transfer",
+      "name": "Logistics tote transfer",
+      "role": null,
+      "source_ids": [
+        "gxo_agility_raas_deployment_2024_06_27_s3"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "gxo_agility_raas_deployment_2024_06_27",
+    "evidence_tier": 2,
+    "origin_entity": "GXO Logistics",
+    "permission_basis": "官方公開文件；只保存 canonical URL 與研究所需的有限逐字節錄，不重製完整頁面或 PDF。",
+    "published_at": "2024-06-27",
+    "publisher": "GXO Logistics",
+    "retrieved_at": "2026-07-29",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Industry-first multi-year agreement with Agility Robotics",
+    "url": "https://gxo.com/news_article/gxo-signs-industry-first-multi-year-agreement-with-agility-robotics/"
+  },
+  "sources": [
+    {
+      "id": "gxo_agility_raas_deployment_2024_06_27_s1",
+      "locator": "announcement, opening paragraph",
+      "quote": "GXO … and Agility Robotics … announced today that they have signed a multi-year agreement to begin deploying Digit in GXO’s logistics operations."
+    },
+    {
+      "id": "gxo_agility_raas_deployment_2024_06_27_s2",
+      "locator": "announcement, deployment description",
+      "quote": "As part of the RaaS agreement, GXO is deploying Digit robots and Agility Arc™, Agility’s cloud automation platform for deploying and managing Digit fleets."
+    },
+    {
+      "id": "gxo_agility_raas_deployment_2024_06_27_s3",
+      "locator": "announcement, SPANX facility use case",
+      "quote": "Digit robots are assisting with repetitive tasks such as moving totes from cobots and placing them onto conveyors, all orchestrated through Agility Arc."
+    },
+    {
+      "id": "gxo_agility_raas_deployment_2024_06_27_s4",
+      "locator": "announcement, RaaS paragraph",
+      "quote": "Under the RaaS agreement, the companies will continue to explore additional use cases and scale Digit usage to meet demand throughout the deployment."
+    }
+  ]
+}

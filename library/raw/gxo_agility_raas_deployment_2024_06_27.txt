@@ -1,0 +1,10 @@
+Source URL: https://gxo.com/news_article/gxo-signs-industry-first-multi-year-agreement-with-agility-robotics/
+
+Excerpt:
+[announcement, opening paragraph] GXO … and Agility Robotics … announced today that they have signed a multi-year agreement to begin deploying Digit in GXO’s logistics operations.
+
+[announcement, deployment description] As part of the RaaS agreement, GXO is deploying Digit robots and Agility Arc™, Agility’s cloud automation platform for deploying and managing Digit fleets.
+
+[announcement, SPANX facility use case] Digit robots are assisting with repetitive tasks such as moving totes from cobots and placing them onto conveyors, all orchestrated through Agility Arc.
+
+[announcement, RaaS paragraph] Under the RaaS agreement, the companies will continue to explore additional use cases and scale Digit usage to meet demand throughout the deployment.

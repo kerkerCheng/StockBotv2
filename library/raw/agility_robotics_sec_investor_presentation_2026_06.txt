@@ -1,0 +1,10 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/2074973/000121390026071287/ea029548401ex99-2.htm
+
+Excerpt:
+[Exhibit 99.2 cover, p.1] Agility to go public in partnership with Churchill Capital Corp XI … the only U.S. publicly listed pure-play humanoid company with proven commercial deployments.
+
+[Exhibit 99.2, slide 11] 9 Committed customer facility deployments 65,000 hours of operations $300M+ committed orders for Digit v5 (and growing!) 10,000 RoboFab annual production capacity
+
+[Exhibit 99.2, slide 6, note 1] Reflects customer orders for Digit v5, as of May 2026, representing potential multi-year value expected to be realized over time, subject to the realization of certain contractual milestones
+
+[Exhibit 99.2, slide 6, note 1] relates to 1,000 Digit v5 robots with three-year term RaaS contract, which includes warrants issued to purchaser vesting proportionately to robots deployed; figures are not a measure of current period revenue.

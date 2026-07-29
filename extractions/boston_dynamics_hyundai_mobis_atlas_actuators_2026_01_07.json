@@ -1,0 +1,153 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "若 Boston Dynamics／Hyundai Mobis 後續宣布合作終止、Atlas actuator 改由其他來源且不再由 Hyundai Mobis 供應，則 supersede 此關係。",
+      "id": "boston_dynamics_hyundai_mobis_atlas_actuators_2026_01_07_cl1",
+      "source_ids": [
+        "boston_dynamics_hyundai_mobis_atlas_actuators_2026_01_07_s1",
+        "boston_dynamics_hyundai_mobis_atlas_actuators_2026_01_07_s2"
+      ],
+      "statement": "Boston Dynamics 客戶端官方頁面確認 Hyundai Mobis 將為 Atlas 供應 actuators。",
+      "subject_id": "boston_dynamics_hyundai_mobis_atlas_actuators_2026_01_07_e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {
+        "qualification_status": "designed_in"
+      },
+      "confidence": 0.7,
+      "dst_id": "co:boston_dynamics",
+      "id": "boston_dynamics_hyundai_mobis_atlas_actuators_2026_01_07_e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "boston_dynamics_hyundai_mobis_atlas_actuators_2026_01_07_s2"
+      ],
+      "src_id": "co:hyundai_mobis"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "prod:atlas_humanoid_robot",
+      "id": "boston_dynamics_hyundai_mobis_atlas_actuators_2026_01_07_e2",
+      "relation": "is_component_of",
+      "source_ids": [
+        "boston_dynamics_hyundai_mobis_atlas_actuators_2026_01_07_s2"
+      ],
+      "src_id": "tech:robotic_actuator"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.65,
+      "dst_id": "prod:atlas_humanoid_robot",
+      "id": "boston_dynamics_hyundai_mobis_atlas_actuators_2026_01_07_e3",
+      "relation": "develops",
+      "source_ids": [
+        "boston_dynamics_hyundai_mobis_atlas_actuators_2026_01_07_s2"
+      ],
+      "src_id": "co:boston_dynamics"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.65,
+      "dst_id": "co:boston_dynamics",
+      "id": "boston_dynamics_hyundai_mobis_atlas_actuators_2026_01_07_e4",
+      "relation": "partnership_with",
+      "source_ids": [
+        "boston_dynamics_hyundai_mobis_atlas_actuators_2026_01_07_s1"
+      ],
+      "src_id": "co:hyundai_mobis"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "robot_subsystem",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.75,
+      "id": "co:hyundai_mobis",
+      "name": "Hyundai Mobis",
+      "role": "robot_component_supplier",
+      "source_ids": [
+        "boston_dynamics_hyundai_mobis_atlas_actuators_2026_01_07_s1",
+        "boston_dynamics_hyundai_mobis_atlas_actuators_2026_01_07_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "robot_system",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.75,
+      "id": "co:boston_dynamics",
+      "name": "Boston Dynamics",
+      "role": "robot_oem",
+      "source_ids": [
+        "boston_dynamics_hyundai_mobis_atlas_actuators_2026_01_07_s1",
+        "boston_dynamics_hyundai_mobis_atlas_actuators_2026_01_07_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "robot_system",
+      "aliases": [
+        "Atlas humanoid robot"
+      ],
+      "attributes": {},
+      "confidence": 0.75,
+      "id": "prod:atlas_humanoid_robot",
+      "name": "Atlas",
+      "role": null,
+      "source_ids": [
+        "boston_dynamics_hyundai_mobis_atlas_actuators_2026_01_07_s2"
+      ],
+      "type": "Product"
+    },
+    {
+      "abstraction_level": "robot_subsystem",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.75,
+      "id": "tech:robotic_actuator",
+      "name": "Robotic actuator",
+      "role": null,
+      "source_ids": [
+        "boston_dynamics_hyundai_mobis_atlas_actuators_2026_01_07_s2"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "boston_dynamics_hyundai_mobis_atlas_actuators_2026_01_07",
+    "evidence_tier": 2,
+    "origin_entity": "Boston Dynamics",
+    "permission_basis": "官方公開文件；只保存 canonical URL 與研究所需的有限逐字節錄，不重製完整頁面或 PDF。",
+    "published_at": "2026-01-07",
+    "publisher": "Boston Dynamics",
+    "retrieved_at": "2026-07-29",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Hyundai Mobis Forms Strategic Collaboration Framework with Boston Dynamics",
+    "url": "https://bostondynamics.com/news/hyundai-mobis-forms-strategic-collaboration-framework-with-boston-dynamics/"
+  },
+  "sources": [
+    {
+      "id": "boston_dynamics_hyundai_mobis_atlas_actuators_2026_01_07_s1",
+      "locator": "press release, opening paragraph",
+      "quote": "Hyundai Mobis announced that it has formed a strategic collaboration with Boston Dynamics, a global leader in robotics, at CES 2026 in Las Vegas."
+    },
+    {
+      "id": "boston_dynamics_hyundai_mobis_atlas_actuators_2026_01_07_s2",
+      "locator": "press release, opening paragraph",
+      "quote": "The company stated on the 7th that it will supply actuators for Atlas, Boston Dynamics’s next-generation humanoid robot."
+    },
+    {
+      "id": "boston_dynamics_hyundai_mobis_atlas_actuators_2026_01_07_s3",
+      "locator": "press release, opening paragraph",
+      "quote": "the collaboration with Hyundai Mobis will help accelerate Boston Dynamics and HMG’s mass production plans for Atlas."
+    }
+  ]
+}

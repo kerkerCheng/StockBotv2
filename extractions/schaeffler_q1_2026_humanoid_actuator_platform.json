@@ -1,0 +1,129 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "若後續 filing 顯示 prototype order 取消、contract 不含具約束力採購義務，或無法轉成 series revenue，則降低需求證明強度。",
+      "id": "schaeffler_q1_2026_humanoid_actuator_platform_cl1",
+      "source_ids": [
+        "schaeffler_q1_2026_humanoid_actuator_platform_s1"
+      ],
+      "statement": "Schaeffler 自報 humanoid actuator platform 已取得約 30 個 prototype orders 與 5 份 contracts。",
+      "subject_id": "prod:schaeffler_rotary_actuator_platform"
+    },
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "guided",
+      "disproof_condition": "若 2026 年後續季度未披露 SOP／ramp 進展，或明確延後，則此時程主張失效。",
+      "id": "schaeffler_q1_2026_humanoid_actuator_platform_cl2",
+      "source_ids": [
+        "schaeffler_q1_2026_humanoid_actuator_platform_s2"
+      ],
+      "statement": "Schaeffler 規劃第一個 humanoid actuator series SOP 於 2026 Q2，並在 Q3、Q4 進一步 ramp。",
+      "subject_id": "prod:schaeffler_rotary_actuator_platform"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "prod:schaeffler_rotary_actuator_platform",
+      "id": "schaeffler_q1_2026_humanoid_actuator_platform_e1",
+      "relation": "develops",
+      "source_ids": [
+        "schaeffler_q1_2026_humanoid_actuator_platform_s3"
+      ],
+      "src_id": "co:schaeffler"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.6,
+      "dst_id": "tech:humanoid_robot_systems",
+      "id": "schaeffler_q1_2026_humanoid_actuator_platform_e2",
+      "relation": "is_component_of",
+      "source_ids": [
+        "schaeffler_q1_2026_humanoid_actuator_platform_s1",
+        "schaeffler_q1_2026_humanoid_actuator_platform_s3"
+      ],
+      "src_id": "prod:schaeffler_rotary_actuator_platform"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "robot_subsystem",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:schaeffler",
+      "name": "Schaeffler",
+      "role": "robot_component_supplier",
+      "source_ids": [
+        "schaeffler_q1_2026_humanoid_actuator_platform_s1",
+        "schaeffler_q1_2026_humanoid_actuator_platform_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "robot_subsystem",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "prod:schaeffler_rotary_actuator_platform",
+      "name": "Schaeffler rotary actuator platform",
+      "role": null,
+      "source_ids": [
+        "schaeffler_q1_2026_humanoid_actuator_platform_s3"
+      ],
+      "type": "Product"
+    },
+    {
+      "abstraction_level": "robot_system",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.8,
+      "id": "tech:humanoid_robot_systems",
+      "name": "Humanoid robot systems",
+      "role": null,
+      "source_ids": [
+        "schaeffler_q1_2026_humanoid_actuator_platform_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "schaeffler_q1_2026_humanoid_actuator_platform",
+    "evidence_tier": 1,
+    "origin_entity": "Schaeffler",
+    "permission_basis": "官方公開文件；只保存 canonical URL 與研究所需的有限逐字節錄，不重製完整頁面或 PDF。",
+    "published_at": "2026-05-05",
+    "publisher": "Schaeffler",
+    "retrieved_at": "2026-07-29",
+    "source_type": "ir_deck",
+    "storage_permission": "repo_excerpt",
+    "title": "Q1 2026 Schaeffler AG earnings — Humanoid actuator platform",
+    "url": "https://www.schaeffler.com/remotemedien/media/_shared_media_rwd/08_investor_relations/presentations/2026_q1_schaeffler_conference_call_presentation_zdi81v.pdf"
+  },
+  "sources": [
+    {
+      "id": "schaeffler_q1_2026_humanoid_actuator_platform_s1",
+      "locator": "Q1 2026 earnings presentation, p.10, Customer",
+      "quote": "Engaged with all strategically relevant humanoid players, already ~30 prototype orders and 5 contracts secured, ongoing contract negotiations to further build the orderbook"
+    },
+    {
+      "id": "schaeffler_q1_2026_humanoid_actuator_platform_s2",
+      "locator": "Q1 2026 earnings presentation, p.10, Customer",
+      "quote": "First series SOP planned for Q2 2026, with further ramp-ups scheduled for Q3 and Q4 2026 covering all relevant regions"
+    },
+    {
+      "id": "schaeffler_q1_2026_humanoid_actuator_platform_s3",
+      "locator": "Q1 2026 earnings presentation, p.10, Product",
+      "quote": "Cost-competitive rotary actuator platform in multiple sizes developed covering ~80% of market demand, recognized by prestigious Hermes award"
+    },
+    {
+      "id": "schaeffler_q1_2026_humanoid_actuator_platform_s4",
+      "locator": "Q1 2026 earnings presentation, p.10, Manufacturing",
+      "quote": "Existing core manufacturing technologies enable production with the highest precision and quality on an industrial scale"
+    }
+  ]
+}
