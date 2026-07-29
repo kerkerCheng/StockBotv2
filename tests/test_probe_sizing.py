@@ -285,6 +285,69 @@ def test_paper_and_live_use_separate_nav_factor_and_execution_liquidity(
         store.close()
 
 
+def test_cash_rows_do_not_block_live_sizing_as_unmapped_holdings(
+    tmp_path: Path,
+) -> None:
+    """Sheet 現金列計入 NAV，但沒有 company／factor 可解析，不得 fail closed。"""
+    store = _store(tmp_path)
+    inputs = complete_inputs(
+        rows=[
+            {
+                "ticker": "—",
+                "shares": 0.0,
+                "currency": "USD",
+                "market_value_base": 31_700.0,
+                "is_cash": True,
+            },
+            {
+                "ticker": "FRA:2DG",
+                "shares": 10.0,
+                "currency": "EUR",
+                "company_id": "co:sivers_semiconductors",
+                "market_value_base": 10.0,
+            },
+        ]
+    )
+    inputs["holdings"].update({"nav_base": 10_000.0, "base_currency": "USD"})
+    try:
+        bundle = _bundle(store, inputs=inputs)
+
+        result = calculate_probe_limits(bundle, _coverage(bundle), _assessment())
+
+        assert not any(
+            blocker.startswith("holdings_company_mapping_unresolved")
+            for blocker in result.live_blockers
+        )
+        # 現金不得計入任何 factor 曝險。
+        assert result.live_current_position == pytest.approx(0.001)
+    finally:
+        store.close()
+
+
+def test_unmapped_non_cash_holding_still_blocks_live_sizing(tmp_path: Path) -> None:
+    """回歸護欄：真正對應不到公司的持股仍要擋住 live sizing。"""
+    store = _store(tmp_path)
+    inputs = complete_inputs(
+        rows=[
+            {
+                "ticker": "MYSTERY",
+                "shares": 5.0,
+                "currency": "USD",
+                "market_value_base": 500.0,
+            },
+        ]
+    )
+    inputs["holdings"].update({"nav_base": 10_000.0, "base_currency": "USD"})
+    try:
+        bundle = _bundle(store, inputs=inputs)
+
+        result = calculate_probe_limits(bundle, _coverage(bundle), _assessment())
+
+        assert "holdings_company_mapping_unresolved:MYSTERY" in result.live_blockers
+    finally:
+        store.close()
+
+
 def test_research_listing_market_data_cannot_substitute_for_execution_listing_adv(
     tmp_path: Path,
 ) -> None:

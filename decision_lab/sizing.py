@@ -225,6 +225,10 @@ def _live_portfolio(
     company_values: dict[str, float] = {}
     blockers: list[str] = []
     for row in holdings.get("rows") or []:
+        # 現金已計入 NAV，且沒有 company／factor 曝險；不跳過的話會被誤報成
+        # 對應不到公司的持股而擋住 live sizing。
+        if row.get("is_cash"):
+            continue
         ticker = str(row.get("ticker") or "").upper()
         company_id = row.get("company_id")
         if company_id is None and ticker in {execution_symbol.upper(), research_ticker.upper()}:

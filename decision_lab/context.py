@@ -210,6 +210,10 @@ def _normalize_holdings(
             "shares": shares,
             "currency": currency,
         }
+        if row.get("is_cash"):
+            # 現金身分要進 frozen context：sizing 依它排除 company／factor mapping，
+            # 舊 bundle 沒有此欄位時行為不變。
+            normalized_row["is_cash"] = True
         company_id = row.get("company_id")
         if company_id is not None:
             if not isinstance(company_id, str) or not company_id.startswith("co:"):

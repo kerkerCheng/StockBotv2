@@ -30,6 +30,11 @@ def _fetch_operational_portfolio() -> Sequence[Mapping[str, Any]]:
     return fetch_portfolio(strict_operational=True)
 
 
+# Sheet 的現金列標籤（大小寫與中英文皆可）。現金是 NAV 的一部分，但不是
+# 可對應到 company／factor 的持股。
+_CASH_BUCKET_LABELS = frozenset({"cash", "現金"})
+
+
 _EXACT_COMPANY_QUERY = """
 MATCH (company:Company)
 WHERE toLower(trim(company.name)) = toLower(trim($company_name))
@@ -701,6 +706,11 @@ class DefaultRuntimeProvider:
                 "currency": currency.strip().upper(),
                 "market_value_base": market_value,
             }
+            # 現金列計入 NAV，但沒有 company／factor 曝險可解析；不標記的話
+            # 下游 live sizing 會把它當成對應不到公司的持股而 fail closed。
+            bucket = raw.get("bucket")
+            if isinstance(bucket, str) and bucket.strip().lower() in _CASH_BUCKET_LABELS:
+                row["is_cash"] = True
             company_id = raw.get("company_id") or raw.get("neo4j_id")
             if company_id is not None:
                 if not isinstance(company_id, str) or not self._registry.has_company(company_id):
