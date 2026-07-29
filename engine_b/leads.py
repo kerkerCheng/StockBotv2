@@ -405,6 +405,8 @@ def trace_backlog(store: dict[str, Any]) -> list[dict[str, Any]]:
             "attempts_ref": refs.get("trace_attempts_ref"),
             "requires_user": requires_user,
             "lane": "pq2_manual_authority" if requires_user else "event_or_scheduled_pq1",
+            "review_title": refs.get("trace_review_title"),
+            "review_hint": refs.get("trace_review_hint"),
         })
     return sorted(rows, key=lambda row: (not row["requires_user"], row["lead_id"]))
 

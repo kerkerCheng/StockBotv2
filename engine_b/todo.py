@@ -747,8 +747,14 @@ def collect_from_source_trace_reviews() -> list[dict[str, Any]]:
         {
             "type": "source_trace_review",
             "ref_id": row["lead_id"],
-            "title": f"追原報告／來源 access — {row['title'] or row['lead_id']}",
-            "hint": "go 只排入 bounded pq1；不接受 claim、不入圖。若需付費，另核准 exact 金額／方案。",
+            "title": str(
+                row.get("review_title")
+                or f"追原報告／來源 access — {row['title'] or row['lead_id']}"
+            ),
+            "hint": str(
+                row.get("review_hint")
+                or "go 只排入 bounded pq1；不接受 claim、不入圖。若需付費，另核准 exact 金額／方案。"
+            ),
             "source": "source_trace",
         }
         for row in rows

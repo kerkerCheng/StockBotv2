@@ -1012,9 +1012,14 @@
         "research_bundle_id": "serenity_robotics_20260729",
         "research_report": "docs/reports/serenity_30d_research_2026-07-29.md",
         "trace_attempts_ref": "docs/reports/serenity_30d_research_2026-07-29.md#截圖paywall判讀",
+        "trace_cost_authorized": "false",
         "trace_next_trigger": "canonical_ibk_report_metadata_or_user_provided_legal_excerpt",
-        "trace_requires_user": "false",
-        "trace_status": "isolated_tier_3"
+        "trace_request_kind": "user_provided_licensed_excerpt",
+        "trace_requires_user": "true",
+        "trace_review_hint": "若你可合法提供報告或相關頁面，回覆此編號 go 並附檔／本機路徑；go 只授權 bounded pq1 追源，不含購買、不接受 supplier mapping、不入圖。",
+        "trace_review_title": "追原報告 — IBK Boston Dynamics value-chain supplier map",
+        "trace_status": "isolated_tier_3",
+        "trace_storage_default": "local_only"
       },
       "source": "x:aleabitoreddit",
       "status": "parked",

@@ -234,6 +234,8 @@ def test_collect_source_trace_review_only_when_human_authority_required(
                 "refs": {
                     "trace_status": "isolated_tier_3",
                     "trace_requires_user": "true",
+                    "trace_review_title": "追原報告 — IBK supplier map",
+                    "trace_review_hint": "有合法 excerpt 才 go；不含購買核准。",
                 },
             },
             "lead_event": {
@@ -252,8 +254,8 @@ def test_collect_source_trace_review_only_when_human_authority_required(
     assert todo.collect_from_source_trace_reviews() == [{
         "type": "source_trace_review",
         "ref_id": "lead_manual",
-        "title": "追原報告／來源 access — IBK report",
-        "hint": "go 只排入 bounded pq1；不接受 claim、不入圖。若需付費，另核准 exact 金額／方案。",
+        "title": "追原報告 — IBK supplier map",
+        "hint": "有合法 excerpt 才 go；不含購買核准。",
         "source": "source_trace",
     }]
 

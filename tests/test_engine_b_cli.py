@@ -121,6 +121,8 @@ def test_trace_backlog_keeps_legacy_parked_trace_visible(tmp_path, capsys) -> No
         "attempts_ref": None,
         "requires_user": False,
         "lane": "event_or_scheduled_pq1",
+        "review_title": None,
+        "review_hint": None,
     }]
 
 

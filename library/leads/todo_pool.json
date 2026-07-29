@@ -874,6 +874,18 @@
       "source": "decision_lab",
       "title": "REVIEW — co:agility_robotics",
       "type": "decision_review"
+    },
+    {
+      "added_at": "2026-07-29T15:35:20.211696+00:00",
+      "hint": "若你可合法提供報告或相關頁面，回覆此編號 go 並附檔／本機路徑；go 只授權 bounded pq1 追源，不含購買、不接受 supplier mapping、不入圖。",
+      "n": 66,
+      "reason": null,
+      "ref_id": "lead_038fe471d126685d77dadb0045d9daa6",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "source_trace",
+      "title": "追原報告 — IBK Boston Dynamics value-chain supplier map",
+      "type": "source_trace_review"
     }
   ],
   "log": [
@@ -1685,6 +1697,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 66,
+  "next_n": 67,
   "schema_version": "1"
 }
