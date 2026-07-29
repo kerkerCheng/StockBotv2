@@ -833,6 +833,123 @@
       "result": "ok",
       "run_at": "2026-07-29T13:53:44.435595+00:00",
       "source": "x:aleabitoreddit"
+    },
+    {
+      "failure_class": "provider_api_error",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-29T22:34:49.270451+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-29T22:34:49.830145+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-29T22:34:50.251380+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-29T22:34:50.654729+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-29T22:34:51.058701+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-29T22:34:51.478445+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-29T22:34:51.898680+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-29T22:34:52.337426+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-29T22:34:52.742611+00:00",
+      "source": "edgar:GFS"
+    },
+    {
+      "new": 4,
+      "result": "ok",
+      "run_at": "2026-07-29T22:35:06.358088+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-29T22:35:07.435897+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-29T22:35:08.363272+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-29T22:35:09.310648+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-07-29T22:35:10.288934+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 2,
+      "result": "ok",
+      "run_at": "2026-07-29T22:35:11.212803+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-29T22:35:12.149906+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-29T22:35:13.204453+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-29T22:35:14.193837+00:00",
+      "source": "edgar:GFS"
     }
   ],
   "leads": {
@@ -2578,6 +2695,23 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2074240512593481955"
     },
+    "lead_2a55aeb6fff1b9590b520af4daafed47": {
+      "first_seen": "2026-07-29T22:35:10.288856+00:00",
+      "lead_id": "lead_2a55aeb6fff1b9590b520af4daafed47",
+      "published_at": "2026-07-29",
+      "refs": {},
+      "source": "edgar:LRCX",
+      "status": "triaged_go",
+      "title": "LRCX 8-K filed 2026-07-29",
+      "triage": {
+        "decided_at": "2026-07-29T22:36:51.876397+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "LRCX 官方 8-K，已追蹤公司且 form/date/issuer 可逐字核對；新穎性待 pq1 追文件確認。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/707549/000070754926000033/lrcx-20260729.htm"
+    },
     "lead_2b43cb181b7cac79e1ef6a05bad6b150": {
       "first_seen": "2026-07-29T13:47:01.129884+00:00",
       "lead_id": "lead_2b43cb181b7cac79e1ef6a05bad6b150",
@@ -3840,6 +3974,23 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2078272513755263319"
     },
+    "lead_44ce140c224422130eecf4bb9766219e": {
+      "first_seen": "2026-07-29T22:35:11.212742+00:00",
+      "lead_id": "lead_44ce140c224422130eecf4bb9766219e",
+      "published_at": "2026-07-29",
+      "refs": {},
+      "source": "edgar:AXTI",
+      "status": "triaged_go",
+      "title": "AXTI 8-K filed 2026-07-29",
+      "triage": {
+        "decided_at": "2026-07-29T22:36:52.056895+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "AXTI 官方 8-K，已追蹤公司且 form/date/issuer 可逐字核對；內容與圖譜增量待 pq1 判斷。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1051627/000143774926024882/axti20260729_8k.htm"
+    },
     "lead_44d33f5c904cb1fb75c452098d739e55": {
       "first_seen": "2026-07-29T13:47:15.389575+00:00",
       "lead_id": "lead_44d33f5c904cb1fb75c452098d739e55",
@@ -4955,16 +5106,19 @@
       "published_at": "2026-07-13T20:18:58.000Z",
       "raw_text": "$AAOI mainly gets revenue from pluggable, they’re developing/sampling related lasers but have no CPO design wins.\n\nOthers like $MTSI look like they fell off the map for some reason with cpo lasers.\n\nCEO says “TBD” with commercial timing and it’s in reliability work right now. And fits the OSINT research done with Ayar removing Macom from their website.\n\nSo would agree with MS that $SIVE, $LITE, $COHR imo are the three leaders to focus on for lasers.",
       "refs": {
+        "action_digest": "476df4322d0d9c50b8eca6fa4e0f1a64a6becb1b915ec749842ea469ffd614b9",
         "campaign_ids": [
           "serenity_30d_20260729"
         ],
         "campaign_topic": "photonics",
         "campaign_window_end": "2026-07-29T13:46:25Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
+        "focus_company_id": "co:applied_optoelectronics",
+        "research_action_id": "ra_ab4814197e21600d22aa2ef7c1c9783b",
         "research_mode": "delta_only"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "action_prepared",
       "title": "$AAOI mainly gets revenue from pluggable, they’re developing/sampling related lasers but have no CPO design wins. Others like $MTSI look like they fell off the map for some reason with cpo lasers. CEO says “TBD” with commercial timing and it’s in reliability work right now. And fits the OSINT research done with Ayar removing Macom from their website. So would agree with MS that $SIVE, $LITE, $COHR imo are the three leaders to focus on for lasers.",
       "triage": {
         "decided_at": "2026-07-29T14:00:45.994070+00:00",
@@ -5834,6 +5988,68 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2072745577310564861"
     },
+    "lead_78a655cf74ea5516f2d24b2ac3eeb8bf": {
+      "first_seen": "2026-07-29T22:35:06.358066+00:00",
+      "lead_id": "lead_78a655cf74ea5516f2d24b2ac3eeb8bf",
+      "media": [
+        {
+          "cache": {
+            "bytes": 108948,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_78a655cf74ea5516f2d24b2ac3eeb8bf/3_2082507728128483328.jpg",
+            "sha256": "230d841892eba3881572f65aa4f4d63cf5cd4326df687a16b7e9364d7b7f1ee2"
+          },
+          "height": 787,
+          "media_key": "3_2082507728128483328",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HOaNvsEaoAADH4n.jpg",
+          "width": 1739
+        },
+        {
+          "cache": {
+            "bytes": 120878,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_78a655cf74ea5516f2d24b2ac3eeb8bf/3_2082511914949922816.jpg",
+            "sha256": "8c5974cb926ac2c6b3e50896cd2ceb7398ab54de5f2521815baae5a9f879a934"
+          },
+          "height": 1380,
+          "media_key": "3_2082511914949922816",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HOaRjZMb0AAmHlS.jpg",
+          "width": 1755
+        },
+        {
+          "cache": {
+            "bytes": 161572,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_78a655cf74ea5516f2d24b2ac3eeb8bf/3_2082512584893497344.jpg",
+            "sha256": "4f3fe447275c07cab613399f8d539b4ccb33a7993545228317cf39be5630e3ae"
+          },
+          "height": 973,
+          "media_key": "3_2082512584893497344",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HOaSKY7bgAAOvCx.jpg",
+          "width": 1848
+        }
+      ],
+      "published_at": "2026-07-29T17:07:41.000Z",
+      "raw_text": "US Gov to take 1% stake in $GFS, and award them $300m for the US CHIPS ACT.\n\nThis is actually a strong read through on $SIVE / $LITE, given this CHIPS ACT is specifically aimed at advancing CPO + Silicon Photonics. \n\n(For reference, Sivers and Lumentum were the only two public laser suppliers named in GFS presentation slides. Sivers laser arrays was named recently as a reference design in Globalfoundries SCALE for CPO).  \n\nPer US Gov announcement: \"GlobalFoundries will receive up to $300 million to accelerate domestic CPO R&D by two to three years\" (NIST)\n\nNever thought we'd see the US Gov / $INTC foundry playbook for CPO in specific...",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_go",
+      "title": "US Gov to take 1% stake in $GFS, and award them $300m for the US CHIPS ACT. This is actually a strong read through on $SIVE / $LITE, given this CHIPS ACT is specifically aimed at advancing CPO + Silicon Photonics. (For reference, Sivers and Lumentum were the only two public laser suppliers named in GFS presentation slides. Sivers laser arrays was named recently as a reference design in Globalfoundries SCALE for CPO). Per US Gov announcement: \"GlobalFoundries will receive up to $300 million to accelerate domestic CPO R&D by two to three years\" (NIST) Never thought we'd see the US Gov / $INTC foundry playbook for CPO in specific...",
+      "triage": {
+        "decided_at": "2026-07-29T22:36:52.228841+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true,
+          "novelty": true
+        },
+        "reason": "關聯 GFS／SIVE／LITE 與 CPO，含政府持股、CHIPS Act 300M 美元及 2–3 年研發時程等可追查主張；NIST／GFS 官方文件可望提供獨立來源。",
+        "tier": 3
+      },
+      "url": "https://x.com/aleabitoreddit/status/2082513405219631384"
+    },
     "lead_795d937852b829058416270a4f3b8c6c": {
       "first_seen": "2026-07-22T15:37:23.595719+00:00",
       "lead_id": "lead_795d937852b829058416270a4f3b8c6c",
@@ -6435,10 +6651,15 @@
         "campaign_topic": "photonics",
         "campaign_window_end": "2026-07-29T13:46:25Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
-        "research_mode": "delta_only"
+        "research_mode": "delta_only",
+        "research_outcome": "report_not_obtained_no_extraction",
+        "trace_attempts_ref": "nomura_2026-07-06_exact-phrase_and_AXT_IQE_official_search",
+        "trace_next_trigger": "canonical_nomura_report_or_issuer_price_disclosure",
+        "trace_requires_user": "false",
+        "trace_status": "isolated_tier_3"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "title": "Nomura’s report cites $AXTI and $IQE as the leading players. Then regarding ASP updates: - 2in InP substrate price hike 42-76% - 3in InP substrates price hike 78% - 2in EML Epiwafer price hike 50-75% - 3in CW Epiwafer price hike ~40%+ - Prices lower domestically in China as expected. Hyperscalers bottlenecking upstream photonics confirmation validation… on all fronts from pricing, demand, to supply shortages. My personal expectation was that price hikes would keep going up like $SNDK given ramping optical demand. We’ll see if this turns out right given another 2 years of the demand curve.",
       "triage": {
         "decided_at": "2026-07-29T14:00:45.994057+00:00",
@@ -6543,6 +6764,39 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2077414086959112629"
+    },
+    "lead_8482d009db1c60e12c73a8a726d8a0df": {
+      "first_seen": "2026-07-29T22:35:06.358051+00:00",
+      "lead_id": "lead_8482d009db1c60e12c73a8a726d8a0df",
+      "media": [
+        {
+          "cache": {
+            "bytes": 108015,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_8482d009db1c60e12c73a8a726d8a0df/3_2082529044416065536.jpg",
+            "sha256": "ae334fb5b2b90385b708a5c3e7d3e4a651ccb3f5973d5cf16bfb5a8ba19fcd58"
+          },
+          "height": 693,
+          "media_key": "3_2082529044416065536",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HOahIdbacAAAJMr.jpg",
+          "width": 1839
+        }
+      ],
+      "published_at": "2026-07-29T18:10:55.000Z",
+      "raw_text": "Federal Reserve leaves rates unchanged at unchanged at 3.50% - 3.75%.  \n\nSo far so good, since markets would have sold off on an immediate rate hike (seem to have largely frontran hike expectations off already).   \n\nThink everyone is waiting for the Fed Chair commentary now. https://t.co/2bZtg5UKEb",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "title": "Federal Reserve leaves rates unchanged at unchanged at 3.50% - 3.75%. So far so good, since markets would have sold off on an immediate rate hike (seem to have largely frontran hike expectations off already). Think everyone is waiting for the Fed Chair commentary now. https://t.co/2bZtg5UKEb",
+      "triage": {
+        "decided_at": "2026-07-29T22:36:52.400037+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "聯準會利率與作者市場反應評論屬泛用宏觀／市場情緒，未連到現行追蹤公司或可入圖供應鏈 claim。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2082529316655763703"
     },
     "lead_85718e111d4463facc284308619b8be1": {
       "first_seen": "2026-07-29T13:47:09.991474+00:00",
@@ -6754,10 +7008,16 @@
         "campaign_topic": "photonics",
         "campaign_window_end": "2026-07-05T09:45:21Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
-        "research_mode": "delta_only"
+        "research_action_id": "ra_51c9c1a8d82d349d18bb166220bdcea9",
+        "research_mode": "delta_only",
+        "research_outcome": "same_origin_duplicate_of_lead_db77cee320ee409a222adb1b88f865bc",
+        "trace_attempts_ref": "sec_000143774926022557",
+        "trace_next_trigger": "coherent_side_confirmation_or_Q2_2026_10Q_exhibit",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "title": "$AXTI signs 3-year wafer deal with $COHR. \"Coherent will make a prepayment of $22,288,500 to AXT-Tongmei in exchange for a committed supply capacity.\" https://t.co/nTkyJSMo96",
       "triage": {
         "decided_at": "2026-07-29T14:00:45.994052+00:00",
@@ -7150,6 +7410,23 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/707549/000196659826000004/xslF345X06/wk-form4_1780416309.xml"
+    },
+    "lead_928514b80dea6644f199f48c0803092d": {
+      "first_seen": "2026-07-29T22:35:11.212717+00:00",
+      "lead_id": "lead_928514b80dea6644f199f48c0803092d",
+      "published_at": "2026-07-29",
+      "refs": {},
+      "source": "edgar:AXTI",
+      "status": "triaged_go",
+      "title": "AXTI 8-K filed 2026-07-29",
+      "triage": {
+        "decided_at": "2026-07-29T22:36:52.598454+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "AXTI 官方 8-K，已追蹤公司且 form/date/issuer 可逐字核對；需 pq1 追文件辨識事件與是否重複。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1051627/000143774926024883/axti20260715_8k.htm"
     },
     "lead_9560cb7de6f030c75af6b74251114924": {
       "first_seen": "2026-07-29T13:46:54.703941+00:00",
@@ -9297,10 +9574,15 @@
         "campaign_topic": "photonics",
         "campaign_window_end": "2026-07-29T13:46:25Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
-        "research_mode": "delta_only"
+        "research_mode": "delta_only",
+        "research_outcome": "broad_direction_supported_exact_event_unobtained_no_unique_focus",
+        "trace_attempts_ref": "cninfo_2026-001_and_2026-004",
+        "trace_next_trigger": "canonical_innolight_IR_event_matching_2026-07-13_claims",
+        "trace_requires_user": "false",
+        "trace_status": "tier_1_2_honest_passthrough"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "title": "TLDR of Innolight investor relations takeaways: 1. \"Overall, 1.6T market demand has not contracted; instead, 800G demand has increased significantly compared with previous expectations\" Prob most important takeaway as a whole was 800G demand revision (also longer tail demand). Which is a bullish read through on US transceiver makers like $AAOI, $COHR, $LITE. Lot of new customers like neoclouds, AI model companies, contributing to overall demand rather than just hyperscalers, diversification always a bonus. 2. Innolight said the shortage covers the module supply chain broadly including: - Optical chips. - Electrical chips. - PCBs. - Other module materials From last ER, I think they singled out EMLs and CW optical chips as the most constrained. So Innolight's bottleneck list mention broadened since then. They expect some of the component availability to improve gradually from the second half of 2026 through the first half of 2027. Think a lot of this is already known from earlier though. But just some confirmation + easing timelines (EML is extremely bottlenecked, same with CW, this is probably talking about other components). 3. Innolight said module-production equipment is not the constraint. Equipment lead times remain relatively short. So this isn't really a bottleneck compared to others. 4. The overall proportion of silicon photonics continues to trend upward. Last year it was mainly 800G. This year, some 800G customers are further increasing their silicon-photonics proportion. 1.6T also added some new customers Positive for SiPH penetration eg. $SIVE / $JBL, since this shifts away from EML toward CW. Basically: main surprising takeaway is just 800g demand go brrr. Apart from that just reaffirming bottlenecks/timelines/market speculation.",
       "triage": {
         "decided_at": "2026-07-29T14:00:45.994074+00:00",
@@ -10728,9 +11010,13 @@
       "first_seen": "2026-07-22T15:37:22.502728+00:00",
       "lead_id": "lead_db77cee320ee409a222adb1b88f865bc",
       "published_at": "2026-07-02",
-      "refs": {},
+      "refs": {
+        "action_digest": "25ff93f5c606223883a9e1cf9b60b43f2a5e7af712a7d6daa025d601d794c89c",
+        "focus_company_id": "co:axt",
+        "research_action_id": "ra_51c9c1a8d82d349d18bb166220bdcea9"
+      },
       "source": "edgar:AXTI",
-      "status": "triaged_go",
+      "status": "action_prepared",
       "title": "AXTI 8-K filed 2026-07-02",
       "triage": {
         "decided_at": "2026-07-25T03:52:34.713745+00:00",
@@ -11572,6 +11858,54 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2081581943142167034"
     },
+    "lead_ea9347e48fbc93a2e8839be63e24f862": {
+      "first_seen": "2026-07-29T22:35:06.358014+00:00",
+      "lead_id": "lead_ea9347e48fbc93a2e8839be63e24f862",
+      "media": [
+        {
+          "cache": {
+            "bytes": 146748,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_ea9347e48fbc93a2e8839be63e24f862/3_2082578798189699072.jpg",
+            "sha256": "b82d5cc7a38b1e6c6dd2d7ab30de0d1aaccb254211da4b230c8cdcb806e86176"
+          },
+          "height": 1253,
+          "media_key": "3_2082578798189699072",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HObOYgrbYAA_vLK.jpg",
+          "width": 1260
+        },
+        {
+          "cache": {
+            "bytes": 154095,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_ea9347e48fbc93a2e8839be63e24f862/3_2082578798189637632.jpg",
+            "sha256": "bed2911a606539eff20d5a695b21df82d40468f068055e50f7aec3f2b601219a"
+          },
+          "height": 814,
+          "media_key": "3_2082578798189637632",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HObOYgracAAEi1T.jpg",
+          "width": 1228
+        }
+      ],
+      "published_at": "2026-07-29T21:27:33.000Z",
+      "raw_text": "$AXTI enters long term agreement with $LITE for InP substrates. \n\nLumentum has agreed to pay a deposit of $43.5M as a reservation for capacity. https://t.co/5Dl3L9EYRa",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_go",
+      "title": "$AXTI enters long term agreement with $LITE for InP substrates. Lumentum has agreed to pay a deposit of $43.5M as a reservation for capacity. https://t.co/5Dl3L9EYRa",
+      "triage": {
+        "decided_at": "2026-07-29T22:36:52.774479+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "AXTI／LITE InP 長約與 43.5M 美元 capacity reservation deposit 具體可查，與 CPO／InP 供應鏈直接相關；pq1 應追回同期官方 8-K 並做同源去重。",
+        "tier": 3
+      },
+      "url": "https://x.com/aleabitoreddit/status/2082578803189268855"
+    },
     "lead_ebb4a71c7f16ef7faf37e8d17bb2d337": {
       "first_seen": "2026-07-22T15:37:18.082171+00:00",
       "lead_id": "lead_ebb4a71c7f16ef7faf37e8d17bb2d337",
@@ -12187,6 +12521,25 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2072760446617280650"
     },
+    "lead_f7c1a2e7c62b2eae1d81de417fb754f7": {
+      "first_seen": "2026-07-29T22:35:06.358037+00:00",
+      "lead_id": "lead_f7c1a2e7c62b2eae1d81de417fb754f7",
+      "media": [],
+      "published_at": "2026-07-29T20:03:30.000Z",
+      "raw_text": "To show solidarity with the $IREN holders:\n\nI now own 1 share of IREN.",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "title": "To show solidarity with the $IREN holders: I now own 1 share of IREN.",
+      "triage": {
+        "decided_at": "2026-07-29T22:36:52.952406+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "僅為作者持有一股 IREN 的個人敘述，沒有可驗證的公司事件、供應鏈 claim 或反證價值。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2082557648298516918"
+    },
     "lead_f8b105284a2de000d25fbd902912ae77": {
       "first_seen": "2026-07-29T13:46:55.433500+00:00",
       "lead_id": "lead_f8b105284a2de000d25fbd902912ae77",
@@ -12492,8 +12845,8 @@
   "schema_version": "2",
   "source_state": {
     "x:aleabitoreddit": {
-      "since_id": "2082230983487803755",
-      "updated_at": "2026-07-29T13:53:44.435589+00:00",
+      "since_id": "2082578803189268855",
+      "updated_at": "2026-07-29T22:35:06.358083+00:00",
       "user_id": "1940360837547565056"
     }
   }

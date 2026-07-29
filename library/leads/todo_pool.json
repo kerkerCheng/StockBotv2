@@ -892,6 +892,30 @@
       "source": "source_trace",
       "title": "追原報告 — IBK Boston Dynamics value-chain supplier map",
       "type": "source_trace_review"
+    },
+    {
+      "added_at": "2026-07-29T22:45:41.838835+00:00",
+      "hint": "核准 exact graph delta；Decision handoff：co:axt。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 67,
+      "reason": null,
+      "ref_id": "ra_51c9c1a8d82d349d18bb166220bdcea9",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "AXT–Coherent 6 吋 InP 三年期 capacity commitment",
+      "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-07-29T22:45:41.838863+00:00",
+      "hint": "核准 exact graph delta；Decision handoff：co:applied_optoelectronics。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 68,
+      "reason": null,
+      "ref_id": "ra_ab4814197e21600d22aa2ef7c1c9783b",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "AAOI 400mW pump laser：sampling 狀態與 CPO 用途",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -1739,6 +1763,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 67,
+  "next_n": 69,
   "schema_version": "1"
 }
