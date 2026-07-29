@@ -820,6 +820,7 @@ def collect_from_decisions() -> list[dict[str, Any]]:
             continue
         ref = str(item.get("cohort_id") or item.get("decision_id") or "")
         company = str(item.get("company_id") or "unknown")
+        company_hint = str(item.get("company_id_hint") or "").strip()
         ticker = str(item.get("ticker") or "").strip().upper()
         if not ref and item.get("sheet_only"):
             identity = company if company not in {"", "unknown", "unresolved"} else (
@@ -829,7 +830,7 @@ def collect_from_decisions() -> list[dict[str, Any]]:
         if not ref:
             continue
         label = company if company not in {"", "unknown", "unresolved"} else (
-            ticker or "unknown"
+            company_hint or ticker or "unknown"
         )
         rows.append({
             "type": "sheet_only_holding" if item.get("sheet_only") else "decision_review",

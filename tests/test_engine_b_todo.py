@@ -477,6 +477,32 @@ def test_collect_from_decisions_keeps_sheet_only_items_without_cohort(
     ]
 
 
+def test_collect_from_decisions_uses_company_hint_only_as_display_label(
+    monkeypatch,
+) -> None:
+    from mcp_server import decision_tools
+
+    monkeypatch.setattr(decision_tools, "get_decision_brief_core", lambda: {
+        "action_needed": True,
+        "items": [{
+            "cohort_id": "dc_private",
+            "decision_id": "pd_private",
+            "company_id": "unresolved",
+            "company_id_hint": "co:agility_robotics",
+            "ticker": None,
+            "recommended_action": "REVIEW",
+        }],
+    })
+
+    assert todo.collect_from_decisions() == [{
+        "type": "decision_review",
+        "ref_id": "dc_private",
+        "title": "REVIEW — co:agility_robotics",
+        "hint": "核准 bounded gap research；完成後才 reassess",
+        "source": "decision_lab",
+    }]
+
+
 def test_raw_leads_are_not_pq2_and_legacy_items_migrate_with_audit() -> None:
     pool = _pool_with(
         {"type": "lead_research", "ref_id": "lead_a", "title": "raw lead"},

@@ -409,7 +409,10 @@ def build_today_brief(
             continue
         decision_id = summary.get("latest_decision_id")
         if decision_id is None:
-            items.append(_pending_item(summary))
+            pending = _pending_item(summary)
+            if pending["company_id"] == "unresolved" and summary.get("company_id_hint"):
+                pending["company_id_hint"] = str(summary["company_id_hint"])
+            items.append(pending)
             continue
         card = build_action_card(
             store,
@@ -419,7 +422,13 @@ def build_today_brief(
             portfolio_context=portfolios.get(cohort_id),
         )
         card["cohort_id"] = cohort_id
-        items.append(_decision_item(card, current_authorities.get(cohort_id)))
+        decision_item = _decision_item(card, current_authorities.get(cohort_id))
+        if (
+            decision_item["company_id"] == "unresolved"
+            and summary.get("company_id_hint")
+        ):
+            decision_item["company_id_hint"] = str(summary["company_id_hint"])
+        items.append(decision_item)
 
     items.extend(
         _sheet_only_items(

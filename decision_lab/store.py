@@ -1420,6 +1420,13 @@ class DecisionStore:
         ).fetchall()
         result: list[dict[str, Any]] = []
         for row in rows:
+            try:
+                signal = self.latest_signal_payload(str(row["cohort_id"]))
+            except KeyError:
+                # 舊版／單元測試可由 decision 直接建立 cohort，沒有 qualified_signal。
+                # 顯示 hint 是 additive；缺席時維持原 summary contract。
+                signal = {}
+            identity_hints = signal.get("identity_hints") or {}
             latest = self.latest_decision_for_cohort(
                 str(row["cohort_id"]), as_of=cutoff
             )
@@ -1429,6 +1436,10 @@ class DecisionStore:
                     "cohort_id": row["cohort_id"],
                     "company_id": row["company_id"],
                     "research_ticker": row["research_ticker"],
+                    # 未上市／無 ticker 的 company 仍可能依設計保持 unresolved。
+                    # hint 只供 brief 顯示 exact 研究對象，不提升 identity authority。
+                    "company_id_hint": identity_hints.get("company_id"),
+                    "research_ticker_hint": identity_hints.get("research_ticker"),
                     "latest_decision_id": (
                         latest["decision_id"] if latest is not None else None
                     ),
