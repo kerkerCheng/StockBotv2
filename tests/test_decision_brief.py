@@ -130,6 +130,98 @@ def test_today_finds_sheet_only_holding_without_creating_a_cohort(tmp_path: Path
         store.close()
 
 
+def test_beta_covered_holding_is_visible_but_not_an_alpha_todo(tmp_path: Path) -> None:
+    """QQQ 由 beta policy 涵蓋：仍要在 brief 現形，但不得每天配一個新 pq2 編號。"""
+    store = _store(tmp_path)
+    try:
+        brief = build_today_brief(
+            store,
+            as_of=NOW,
+            current_holdings={
+                "status": "available",
+                "rows": [
+                    {
+                        "ticker": "QQQ",
+                        "shares": 87.0,
+                        "currency": "USD",
+                        "market_value_base": 58767.63,
+                    }
+                ],
+            },
+        )
+
+        item = brief["items"][0]
+        assert item["ticker"] == "QQQ"
+        assert item["sheet_only"] is True
+        assert item["coverage"] == "beta_policy"
+        # NO ACTION 是 collect_from_decisions 用來跳過 pq2 的唯一判準。
+        assert item["recommended_action"] == "NO ACTION"
+        assert item["blockers"] == []
+        assert item["supported_sizing_range"] == [0.0, 0.0]
+        # 覆蓋事實不得冒泡成全域 blocker 噪音。
+        assert "alpha_cohort_absent" not in brief["blockers"]
+        assert "sheet_only_holding" not in brief["blockers"]
+    finally:
+        store.close()
+
+
+def test_user_ignored_holding_is_not_an_alpha_todo(tmp_path: Path) -> None:
+    store = _store(tmp_path)
+    try:
+        brief = build_today_brief(
+            store,
+            as_of=NOW,
+            current_holdings={
+                "status": "available",
+                "rows": [
+                    {
+                        "ticker": "TYO:7803",
+                        "shares": 400.0,
+                        "currency": "USD",
+                        "market_value_base": 849.59,
+                    }
+                ],
+            },
+        )
+
+        item = brief["items"][0]
+        assert item["coverage"] == "user_ignored"
+        assert item["recommended_action"] == "NO ACTION"
+        assert item["blockers"] == []
+        # registry 無對應時，markdown 仍要顯示 ticker 而非 unresolved。
+        assert "TYO:7803" in render_today_markdown(brief)
+    finally:
+        store.close()
+
+
+def test_uncovered_holding_still_demands_review(tmp_path: Path) -> None:
+    """回歸護欄：不在 beta policy／ignore 清單的持股必須維持 REVIEW。"""
+    store = _store(tmp_path)
+    try:
+        brief = build_today_brief(
+            store,
+            as_of=NOW,
+            current_holdings={
+                "status": "available",
+                "rows": [
+                    {
+                        "ticker": "SOMETHING_NEW",
+                        "shares": 10.0,
+                        "currency": "USD",
+                        "market_value_base": 500.0,
+                    }
+                ],
+            },
+        )
+
+        item = brief["items"][0]
+        assert item["coverage"] == "uncovered"
+        assert item["recommended_action"] == "REVIEW"
+        assert "sheet_only_holding" in item["blockers"]
+    finally:
+        store.close()
+
+
 def test_today_does_not_treat_beta_only_move_as_disproof(tmp_path: Path) -> None:
     store = _store(tmp_path)
     try:

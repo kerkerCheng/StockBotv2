@@ -1,7 +1,9 @@
 """純讀、action-first 的 Engine D 今日摘要。"""
 from __future__ import annotations
 
+import json
 from datetime import datetime
+from pathlib import Path
 from typing import Any, Mapping, Sequence
 
 from identity.registry import IdentityRegistry, get_registry
@@ -274,6 +276,47 @@ def _pending_item(summary: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
+def _beta_covered_aliases() -> dict[str, str]:
+    """Sheet alias → sleeve，取自 beta policy（唯一 numeric SSOT）。
+
+    讀不到就回空 dict：覆蓋資訊不可得時必須退回 REVIEW，寧可重複提醒，
+    也不能因設定檔壞掉而讓未覆蓋持股從 pq2 靜默消失。
+    """
+    try:
+        from .beta_policy import load_beta_policy
+
+        policy = load_beta_policy()
+    except Exception:
+        return {}
+    aliases: dict[str, str] = {}
+    for instrument in policy.get("instruments") or []:
+        sleeve = str(instrument.get("sleeve") or "")
+        for alias in instrument.get("sheet_aliases") or ():
+            aliases[str(alias).upper()] = sleeve
+    return aliases
+
+
+_COVERAGE_PATH = Path(__file__).resolve().parents[1] / "config" / "holdings_coverage.json"
+
+
+def _ignored_holdings() -> dict[str, str]:
+    """Sheet ticker → 使用者不做 alpha 研究的理由。讀不到同樣退回 REVIEW。"""
+    try:
+        value = json.loads(_COVERAGE_PATH.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+    if not isinstance(value, dict):
+        return {}
+    ignored: dict[str, str] = {}
+    for entry in value.get("ignored") or ():
+        if not isinstance(entry, Mapping):
+            continue
+        ticker = str(entry.get("sheet_ticker") or "").strip().upper()
+        if ticker:
+            ignored[ticker] = str(entry.get("reason") or "使用者明確指示不做 alpha 研究。")
+    return ignored
+
+
 def _sheet_only_items(
     holdings: Mapping[str, Any] | None,
     *,
@@ -286,6 +329,8 @@ def _sheet_only_items(
         "confirmed_empty",
     }:
         return []
+    beta_aliases = _beta_covered_aliases()
+    ignored = _ignored_holdings()
     result: list[dict[str, Any]] = []
     seen: set[str] = set()
     for row in holdings.get("rows") or []:
@@ -302,6 +347,38 @@ def _sheet_only_items(
         if identity in cohort_company_ids or identity in seen:
             continue
         seen.add(identity)
+
+        # 已由別的機制負責的持股仍要在 brief 現形，但不是 alpha 待辦：改用
+        # NO ACTION，統一待辦池才不會每天替它們配一個新 pq2 編號。
+        sleeve = beta_aliases.get(ticker)
+        ignore_reason = ignored.get(ticker)
+        if sleeve:
+            action = "NO ACTION"
+            coverage = "beta_policy"
+            reason = (
+                f"由 beta policy 涵蓋（sleeve={sleeve}），"
+                "配置與 timing 走 daily beta monitor，不需 alpha cohort。"
+            )
+            portfolio_action = "covered_by_beta_policy"
+            # 沒有 alpha cohort 對這些持股是預期狀態，不是 blocker；覆蓋事實由
+            # coverage 欄位承載，不讓它冒泡進全域 blockers 製造噪音。
+            blockers = []
+            request = "無；如需 single-name thesis 再另行 evaluate-signal 建 cohort。"
+        elif ignore_reason:
+            action = "NO ACTION"
+            coverage = "user_ignored"
+            reason = f"使用者指定不做 alpha 研究：{ignore_reason}"
+            portfolio_action = "user_ignored_holding"
+            blockers = []
+            request = "無；要恢復追蹤請移除 config/holdings_coverage.json 的該筆登記。"
+        else:
+            action = "REVIEW"
+            coverage = "uncovered"
+            reason = "Google Sheet 有 live 持股，但 Engine D 尚無對應 cohort／decision。"
+            portfolio_action = "review_uncovered_holding"
+            blockers = ["sheet_only_holding", "decision_missing"]
+            request = "請先 evaluate-signal／onboard；未完成前不提供 live sizing。"
+
         result.append(
             {
                 "cohort_id": None,
@@ -309,20 +386,21 @@ def _sheet_only_items(
                 "company_id": _public_company(company_id),
                 "ticker": ticker,
                 "sheet_only": True,
-                "recommended_action": "REVIEW",
-                "reason": "Google Sheet 有 live 持股，但 Engine D 尚無對應 cohort／decision。",
+                "coverage": coverage,
+                "recommended_action": action,
+                "reason": reason,
                 "alpha_thesis_change": {
                     "classification": "unknown",
                     "thesis_changed": False,
                 },
                 "beta_portfolio_risk": {
-                    "portfolio_action": "review_uncovered_holding",
+                    "portfolio_action": portfolio_action,
                     "classification": "unknown",
                 },
                 "supported_sizing_range": [0.0, 0.0],
-                "blockers": ["sheet_only_holding", "decision_missing"],
+                "blockers": blockers,
                 "next_review_at": None,
-                "user_response_needed": "請先 evaluate-signal／onboard；未完成前不提供 live sizing。",
+                "user_response_needed": request,
             }
         )
     return result
@@ -491,7 +569,12 @@ def render_today_markdown(brief: Mapping[str, Any]) -> str:
         lines += ["", "## 項目（回覆用編號）"]
         for item in items:
             idx = item.get("index")
-            company = markdown_text(item.get("company_id") or "")
+            # Sheet-only 持股常無 registry 對應，company_id 會是 unresolved；
+            # 顯示 ticker 才看得出是哪一檔。
+            label = item.get("company_id") or ""
+            if str(label) in {"", "unresolved"} and item.get("ticker"):
+                label = item["ticker"]
+            company = markdown_text(label)
             action = markdown_text(item.get("recommended_action") or "")
             perf = _pct(item.get("performance_since_tracked"))
             delta = markdown_text(item.get("evidence_delta") or "none")

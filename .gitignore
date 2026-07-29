@@ -13,6 +13,7 @@ config/*.json
 !config/signal_sources.json
 !config/daily_routine.json
 !config/beta_policy.json
+!config/holdings_coverage.json
 
 # Claude Code 本機設定（不共用）；project skills 轉接層需納入版本控制
 .claude/*

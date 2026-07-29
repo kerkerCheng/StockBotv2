@@ -1,0 +1,12 @@
+{
+  "_comment": "Sheet 持股在 Engine D alpha 覆蓋檢查中的處置。beta universe 由 config/beta_policy.json 自動涵蓋，不在此重複列舉；本檔只登記使用者明確決定不做 alpha 研究的持股。列在此處只影響 pq2 提醒，不影響持股本身、NAV、beta 監控或任何 evidence tier。",
+  "schema_version": "holdings-coverage-v1",
+  "policy_version": "2026-07-29.1",
+  "ignored": [
+    {
+      "sheet_ticker": "TYO:7803",
+      "reason": "使用者 2026-07-29 明確指示不做 alpha 研究（自述為隨意買進的小額部位）。identity registry 亦無對應 co: ID。",
+      "decided_at": "2026-07-29"
+    }
+  ]
+}
