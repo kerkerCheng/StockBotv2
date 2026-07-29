@@ -124,7 +124,7 @@ def test_duplicate_or_stale_authority_fails_household_cash_closed() -> None:
     assert "capital_authority_stale" in stale_view["blockers"]
 
 
-def test_wrong_direction_fx_and_drawn_debt_fail_closed() -> None:
+def test_wrong_direction_fx_fails_but_valid_drawn_debt_is_telemetry() -> None:
     rows = _rows(currency="TWD")
 
     def wrong_fx(_pair: str, evaluation_at: str) -> dict:
@@ -152,11 +152,12 @@ def test_wrong_direction_fx_and_drawn_debt_fail_closed() -> None:
 
     assert fx_view["household_cash"]["deployable_cash_base"] == 0.0
     assert "operating_floor_fx_unavailable" in fx_view["blockers"]
-    assert drawn_view["household_cash"]["deployable_cash_base"] == 0.0
-    assert "drawn_debt_requires_full_authority" in drawn_view["blockers"]
+    assert drawn_view["household_cash"]["deployable_cash_base"] == pytest.approx(55.0)
+    assert drawn_view["drawn_debt_base"] == pytest.approx(1.0)
+    assert "drawn_debt_present" in drawn_view["warnings"]
 
 
-def test_unverified_drawn_balance_blocks_cash_even_if_facility_fx_is_missing() -> None:
+def test_drawn_balance_with_missing_fx_does_not_invent_loan_leverage() -> None:
     rows = _rows()
     rows[-1]["currency"] = "EUR"
     rows[-1]["drawn_amount"] = "1"
@@ -173,8 +174,9 @@ def test_unverified_drawn_balance_blocks_cash_even_if_facility_fx_is_missing() -
         fx_fetcher=None,
     )
 
-    assert view["household_cash"]["deployable_cash_base"] == 0.0
-    assert "drawn_debt_requires_full_authority" in view["blockers"]
+    assert view["household_cash"]["deployable_cash_base"] == pytest.approx(55.0)
+    assert view["drawn_debt_base"] is None
+    assert "credit_fx_unavailable" in view["contingent_credit_available"]["blockers"]
 
 
 def test_credit_limit_never_changes_household_cash() -> None:

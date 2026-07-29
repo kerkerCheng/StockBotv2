@@ -166,23 +166,56 @@ def validate_beta_policy(source: Mapping[str, Any]) -> dict[str, Any]:
         raise BetaPolicyError("signal tiers must become stricter with depth")
 
     risk = source.get("risk")
-    risk_keys = {
+    risk_scalar_keys = {
         "leveraged_nominal_warning",
         "leveraged_nominal_cap",
         "leveraged_effective_warning",
         "leveraged_effective_cap",
-        "technology_effective_warning",
-        "technology_effective_cap",
-        "unmapped_technology_proxy_load",
-        "single_company_warning",
-        "single_company_cap",
+        "issuer_concentration_warning",
+        "alpha_total_warning",
     }
-    if not isinstance(risk, Mapping) or set(risk) != risk_keys:
+    if not isinstance(risk, Mapping) or set(risk) != risk_scalar_keys | {
+        "daily_display_change",
+        "event_monitor",
+    }:
         raise BetaPolicyError("risk policy fields do not match schema")
-    normalized_risk = {key: _finite_fraction(risk.get(key), key, positive=True) for key in risk_keys}
-    for prefix in ("leveraged_nominal", "leveraged_effective", "technology_effective", "single_company"):
+    normalized_risk = {
+        key: _finite_fraction(risk.get(key), key, positive=True)
+        for key in risk_scalar_keys
+    }
+    for prefix in ("leveraged_nominal", "leveraged_effective"):
         if normalized_risk[f"{prefix}_warning"] >= normalized_risk[f"{prefix}_cap"]:
             raise BetaPolicyError(f"{prefix} warning must be below cap")
+    display = risk.get("daily_display_change")
+    display_keys = {"issuer_weight", "combined_leverage_weight", "alpha_total_weight"}
+    if not isinstance(display, Mapping) or set(display) != display_keys:
+        raise BetaPolicyError("daily display change fields do not match schema")
+    normalized_risk["daily_display_change"] = {
+        key: _finite_fraction(display.get(key), f"daily_display_change:{key}", positive=True)
+        for key in display_keys
+    }
+    event_monitor = risk.get("event_monitor")
+    if not isinstance(event_monitor, Mapping) or set(event_monitor) != {
+        "concentrated_issuer_threshold",
+        "return_1d_at_most",
+    }:
+        raise BetaPolicyError("event monitor fields do not match schema")
+    return_floor = event_monitor.get("return_1d_at_most")
+    if (
+        isinstance(return_floor, bool)
+        or not isinstance(return_floor, (int, float))
+        or not math.isfinite(float(return_floor))
+        or not -1 < float(return_floor) < 0
+    ):
+        raise BetaPolicyError("event return threshold must be in (-1, 0)")
+    normalized_risk["event_monitor"] = {
+        "concentrated_issuer_threshold": _finite_fraction(
+            event_monitor.get("concentrated_issuer_threshold"),
+            "concentrated_issuer_threshold",
+            positive=True,
+        ),
+        "return_1d_at_most": float(return_floor),
+    }
 
     campaign = source.get("campaign_budget_fraction_by_sleeve")
     if not isinstance(campaign, Mapping) or set(campaign) != _SLEEVES:
@@ -209,7 +242,6 @@ def validate_beta_policy(source: Mapping[str, Any]) -> dict[str, Any]:
         "sleeve",
         "allocation_group",
         "leverage_multiple",
-        "technology_proxy_load",
         "issuer_loads",
         "priority",
     }
@@ -268,9 +300,6 @@ def validate_beta_policy(source: Mapping[str, Any]) -> dict[str, Any]:
                 "sleeve": sleeve,
                 "allocation_group": _text(raw.get("allocation_group"), "allocation_group").casefold(),
                 "leverage_multiple": float(leverage),
-                "technology_proxy_load": _finite_fraction(
-                    raw.get("technology_proxy_load"), "technology_proxy_load"
-                ),
                 "issuer_loads": normalized_loads,
                 "priority": priority,
             }

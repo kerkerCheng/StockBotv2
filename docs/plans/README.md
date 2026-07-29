@@ -27,5 +27,6 @@
 | [Daily Approval Loop v1.1 (2026-07-24)](2026-07-24-001-feat-daily-approval-loop-v1-1-plan.md) | 優先研究佇列、可續跑 drain、閉環 evidence-delta、對話式批次核准、MCP leads 同步 | completed（2026-07-26 已建 Codex local daily scheduled task） |
 | [Daily Beta Technical Monitor (2026-07-28)](2026-07-28-001-feat-daily-beta-technical-monitor-plan.md) | 固定持倉 universe 的日線 technical observation、beta safe contribution monitor 與 Daily 整合 | completed |
 | [Household Capital Authority Phase II-A (2026-07-28)](2026-07-28-002-feat-household-capital-authority-plan.md) | 私人 Capital Authority 唯讀 adapter、point-in-time capital view 與 Daily 四欄輸出 | completed |
+| [Portfolio Risk Policy Redesign (2026-07-29)](2026-07-29-001-refactor-portfolio-risk-policy-plan.md) | 只保留 ETF 槓桿／單筆 hard block、known issuer 穿透、drawn debt 與低雜訊事件監控 | completed |
 
-**目前沒有 active plan。** Daily Beta Technical Monitor v1、Household Capital Authority Phase II-A 與 Daily Approval Loop v1.0/v1.1 程式面均完成；退休貸款政策已在 Phase II-A 完成後校正為約 30 年退休淨終值導向的 zero-code manual contract，不另開 Phase II-B engine。現行 v1.3 runbook 由 Codex desktop 本機排程執行（daily 台北 06:30；weekly 週日 04:00，兩者錯開）。L9 財務核驗缺口已補齊。
+**目前沒有 active plan。** Portfolio Risk Policy Redesign、Daily Beta Technical Monitor v1、Household Capital Authority Phase II-A 與 Daily Approval Loop v1.0/v1.1 程式面均完成；退休貸款政策維持約 30 年退休淨終值導向的 manual contract，不另開 Phase II-B engine。現行 v1.3 runbook 由 Codex desktop 本機排程執行（daily 台北 06:30；weekly 週日 04:00，兩者錯開）。L9 財務核驗缺口已補齊。

@@ -54,6 +54,9 @@ def test_daily_prompt_keeps_human_gates_and_batch_contract() -> None:
     assert "可互換" in text and "不認 agent 身分" in text
     assert "engine_b.todo complete-ra" in text
     assert "一般 `todo batch` 不得用 bare go" in text
+    assert "--risk-view changes" in text
+    assert "event_search_requests" in text
+    assert "不註冊 lead" in text
 
 
 def test_daily_brief_title_carries_taipei_date() -> None:
@@ -84,3 +87,5 @@ def test_weekly_is_local_health_discovery_and_read_only_lifecycle() -> None:
         assert token in text
     assert "健康 finding 與 pq2 是正交" in text
     assert "Codex 本機" in text
+    assert "--risk-view full --no-record-risk" in text
+    assert "投組風險完整快照" in text

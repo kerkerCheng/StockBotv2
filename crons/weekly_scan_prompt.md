@@ -29,6 +29,8 @@ Daily 負責已知來源的 X／EDGAR harvest、triage、Engine C refresh、toda
    `library/leads/todo_pool.json` 與前一份 `docs/reports/weekly_scan_*.md`。
 2. 確認 branch 是 `master`；不是就停止並回報。保留所有無關的使用者變更。
 3. 跑 `.venv\Scripts\python.exe query\health_audit.py --local`，把它當健康查詢唯一權威。
+4. 跑 `.venv\Scripts\python.exe scripts\daily_beta_snapshot.py --format markdown --no-refresh --risk-view full --no-record-risk`，
+   取得 ETF／貸款／合計槓桿、alpha 總量、known issuer direct／indirect exposure 與 partial coverage；只讀、不新增 risk history。
 
 ### Stage 1 — Topic discovery
 
@@ -65,6 +67,7 @@ Daily 負責已知來源的 X／EDGAR harvest、triage、Engine C refresh、toda
 ## Topic Digest
 ## Thesis 核查
 ## 系統健康審查（修前／修後）
+## 投組風險完整快照與較前次趨勢
 ## Triage 稽核
 ## 建議 onboard 候選
 ## pq2（只列真正需使用者決定的穩定編號）

@@ -162,6 +162,13 @@ def build_action_card(
         raise ValueError("Action Card as_of cannot predate the decision")
     payload = decision["payload"]
     sizing = payload["sizing"]
+    coverage_id = str(
+        (payload.get("request", {}).get("coverage") or {}).get("assessment_id") or ""
+    )
+    try:
+        disproof_condition = store.get_coverage_metadata(coverage_id)["disproof"]
+    except (KeyError, TypeError):
+        disproof_condition = ""
     execution_intent = str(payload.get("request", {}).get("execution_intent") or "live")
     paper_requested = execution_intent in {"paper", "live"}
     live_requested = execution_intent == "live"
@@ -270,7 +277,7 @@ def build_action_card(
         single_name_action = "hold_pending_portfolio_action"
         reason = str(
             (portfolio_context or {}).get("reason")
-            or "投組 factor exposure 超過上限。"
+            or "投組曝險超過明確傳入的風險上限。"
         )
         next_action = f"決定要降低或對沖 {factor} 曝險；資料不足時不輸出單位數。"
     elif live_fill is not None:
@@ -383,6 +390,7 @@ def build_action_card(
             "review_due_at": lifecycle.review_due_at,
             "started_at": lifecycle_started_at,
         },
+        "disproof_condition": disproof_condition,
         "weakest_link": {
             "axis": axis,
             "level": axis_result["level"],
@@ -428,6 +436,7 @@ def render_markdown(card: Mapping[str, Any]) -> str:
             "",
             f"- 理由：{markdown_text(card['reason'])}",
             f"- Alpha / Beta：{markdown_text(card['alpha_beta']['classification'])}",
+            f"- Disproof condition：{markdown_text(card.get('disproof_condition') or '未提供')}",
             f"- Weakest link：{markdown_text(weakest['axis'])} / {markdown_text(weakest['level'])} — {markdown_text(weakest['reason'])}",
             f"- Intent：{markdown_text(card.get('execution_intent', 'live'))}",
             f"- Paper：{markdown_text(paper['status'])}；target={paper['target']:.4%}；funded={paper['funded']}",

@@ -28,6 +28,9 @@ def test_repository_beta_policy_has_fourteen_instruments_and_eleven_series() -> 
         for ticker in ("0050.TW", "006208.TW", "00631L.TW")
     } == {"tw50"}
     assert by_ticker["00631L.TW"]["leverage_multiple"] == 2.0
+    assert "technology_proxy_load" not in by_ticker["QQQ"]
+    assert "issuer_concentration_warning" in policy["risk"]
+    assert "technology_effective_cap" not in policy["risk"]
 
 
 @pytest.mark.parametrize(

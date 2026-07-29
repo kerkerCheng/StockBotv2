@@ -221,7 +221,7 @@ python thesis/generate_lane_memo.py --company-id co:<slug> --ticker <TICKER> --o
 3. 查 Engine C 估值數據：`python engine_c/checklist.py <TICKER>`
 4. 執行 `thesis.preconditions.check_all(<TICKER>)`；五項清單含 `manual_required` 或 `missing` 時，不得給倉位數字，只列待補項
 5. 全部 gate 通過後，呼叫 `thesis.investment_policy.calculate_position_limit(...)`；不可在 skill 內抄寫百分比或自行算另一套
-6. 檢查 `check_factor_exposure(...)`，並在回答附 `policy_version`、原始 analyst coverage 與 query-time coverage view
+6. 讀最新 Portfolio Risk Snapshot（本機可跑 `& '.venv\Scripts\python.exe' scripts\daily_beta_snapshot.py --format json --no-refresh --risk-view full --no-record-risk`）：ETF 槓桿與 `single_position_nav_cap` 是 hard block；issuer concentration／alpha 總量只列 warning。回答必附 investment／beta `policy_version`、原始 analyst coverage、query-time coverage view，並明說 issuer look-through 若為 `partial` 不能冒充完整 ETF 成分覆蓋。
 
 conviction 由 thesis 評分（`thesis/scoring_rubric.md`）和 L8 來源品質共同決定。規則語意見 `docs/investment-sop.md`；當前數字唯一權威是 `config/investment_policy.json`。`crowding` 不寫入 Engine C。
 

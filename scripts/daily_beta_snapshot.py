@@ -22,11 +22,17 @@ except ImportError:
 
 from decision_lab.beta_monitor import build_beta_monitor, render_beta_monitor_markdown
 from decision_lab.beta_policy import load_beta_policy, unique_benchmarks
+from decision_lab.portfolio_risk import append_risk_snapshot, read_latest_risk_snapshot
 from engine_c.db import get_conn
 from engine_c.etl_technical import refresh_technical_observations
 from engine_c.market_data import get_fx_snapshot
 from engine_c.technical import latest_technical_status, recent_technical_observations
 from fetchers.gsheets import fetch_capital_authority, fetch_portfolio
+
+
+DEFAULT_RISK_HISTORY_PATH = (
+    REPO_ROOT / "library" / "private" / "decision_lab" / "portfolio_risk_snapshots.jsonl"
+)
 
 
 def _portfolio() -> Sequence[Mapping[str, Any]]:
@@ -47,11 +53,14 @@ def run(
     capital_fetcher: Callable[[], Sequence[Mapping[str, Any]]] = _capital_authority,
     fx_fetcher=get_fx_snapshot,
     refresh_fn=refresh_technical_observations,
+    risk_history_path: Path | None = None,
 ) -> int:
     parser = argparse.ArgumentParser(description="Daily beta technical refresh and monitor")
     parser.add_argument("--format", choices=("json", "markdown"), default="markdown")
     parser.add_argument("--as-of")
     parser.add_argument("--no-refresh", action="store_true")
+    parser.add_argument("--risk-view", choices=("changes", "full"), default="changes")
+    parser.add_argument("--no-record-risk", action="store_true")
     args = parser.parse_args(argv)
     output = stdout or sys.stdout
     as_of = args.as_of or datetime.now(timezone.utc).isoformat()
@@ -108,6 +117,8 @@ def run(
             capital_authority = list(capital_fetcher())
         except Exception:
             capital_authority = None
+        history_path = risk_history_path or DEFAULT_RISK_HISTORY_PATH
+        previous_risk = read_latest_risk_snapshot(history_path)
         report = build_beta_monitor(
             observations_by_benchmark=observations,
             history_by_benchmark=histories,
@@ -116,7 +127,17 @@ def run(
             fx_fetcher=fx_fetcher,
             as_of=as_of,
             policy=resolved_policy,
+            previous_risk_snapshot=previous_risk,
         )
+        recorded = False
+        if not args.no_record_risk:
+            try:
+                recorded = append_risk_snapshot(history_path, report["risk_snapshot"])
+            except OSError:
+                report["warnings"] = sorted(
+                    set(report.get("warnings") or []) | {"risk_history_write_failed"}
+                )
+        report["risk_history_recorded"] = recorded
         report["refresh"] = {
             key: refresh.get(key)
             for key in ("status", "observed_count", "total_count", "blockers")
@@ -133,7 +154,9 @@ def run(
             )
             output.write("\n")
         else:
-            output.write(render_beta_monitor_markdown(report) + "\n")
+            output.write(
+                render_beta_monitor_markdown(report, risk_view=args.risk_view) + "\n"
+            )
         return 0
     except (OSError, RuntimeError, TypeError, ValueError, json.JSONDecodeError):
         json.dump(

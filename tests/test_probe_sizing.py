@@ -190,7 +190,7 @@ def test_coverage_gate_cannot_be_overridden_by_high_axis_levels(tmp_path: Path) 
         store.close()
 
 
-def test_paper_book_and_factor_remaining_can_bind_below_axis_ceiling(
+def test_paper_book_remaining_can_bind_below_axis_ceiling(
     tmp_path: Path,
 ) -> None:
     store = _store(tmp_path)
@@ -199,7 +199,6 @@ def test_paper_book_and_factor_remaining_can_bind_below_axis_ceiling(
         "nav": 100.0,
         "total_weight": 0.019,
         "company_weights": {},
-        "factor_weights": {"photonics": 0.099, "small_cap": 0.01},
     }
     try:
         bundle = _bundle(store, inputs=inputs)
@@ -214,7 +213,6 @@ def test_paper_book_and_factor_remaining_can_bind_below_axis_ceiling(
             if item["lane"] == "paper" and item["binding"]
         }
         assert "probe_book_remaining" in binding
-        assert "factor:photonics" in binding
     finally:
         store.close()
 
@@ -324,8 +322,8 @@ def test_cash_rows_do_not_block_live_sizing_as_unmapped_holdings(
         store.close()
 
 
-def test_unmapped_non_cash_holding_still_blocks_live_sizing(tmp_path: Path) -> None:
-    """回歸護欄：真正對應不到公司的持股仍要擋住 live sizing。"""
+def test_unmapped_non_cash_holding_no_longer_creates_mapping_blocker(tmp_path: Path) -> None:
+    """未知持股改成警告層，不得讓已刪除的 factor mapping 重新擋住 live sizing。"""
     store = _store(tmp_path)
     inputs = complete_inputs(
         rows=[
@@ -343,7 +341,62 @@ def test_unmapped_non_cash_holding_still_blocks_live_sizing(tmp_path: Path) -> N
 
         result = calculate_probe_limits(bundle, _coverage(bundle), _assessment())
 
-        assert "holdings_company_mapping_unresolved:MYSTERY" in result.live_blockers
+        assert not any("mapping_unresolved" in blocker for blocker in result.live_blockers)
+    finally:
+        store.close()
+
+
+def test_single_position_cap_hard_blocks_live_range(tmp_path: Path) -> None:
+    store = _store(tmp_path)
+    inputs = complete_inputs(
+        rows=[
+            {
+                "ticker": "FRA:2DG",
+                "company_id": "co:sivers_semiconductors",
+                "shares": 100.0,
+                "currency": "EUR",
+                "market_value_base": 600.0,
+            }
+        ]
+    )
+    inputs["holdings"].update({"nav_base": 10_000.0, "base_currency": "USD"})
+    try:
+        bundle = _bundle(store, inputs=inputs)
+        result = calculate_probe_limits(bundle, _coverage(bundle), _assessment())
+
+        assert result.live_supported_range == (0.0, 0.0)
+        assert "single_position_nav_cap_reached" in result.live_blockers
+    finally:
+        store.close()
+
+
+def test_portfolio_etf_leverage_cap_hard_blocks_alpha_live_range(tmp_path: Path) -> None:
+    store = _store(tmp_path)
+    inputs = complete_inputs(
+        rows=[
+            {
+                "ticker": "TQQQ",
+                "shares": 10.0,
+                "currency": "USD",
+                "market_value_base": 800.0,
+            },
+            {
+                "ticker": "FRA:2DG",
+                "company_id": "co:sivers_semiconductors",
+                "shares": 10.0,
+                "currency": "EUR",
+                "market_value_base": 10.0,
+            },
+        ]
+    )
+    inputs["holdings"].update({"nav_base": 10_000.0, "base_currency": "USD"})
+    try:
+        bundle = _bundle(store, inputs=inputs)
+        result = calculate_probe_limits(bundle, _coverage(bundle), _assessment())
+
+        assert result.live_supported_range == (0.0, 0.0)
+        assert "etf_leverage_nominal_cap_reached" in result.live_blockers
+        assert "etf_leverage_effective_cap_reached" in result.live_blockers
     finally:
         store.close()
 

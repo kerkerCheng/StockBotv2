@@ -4,7 +4,8 @@ type: refactor
 date: 2026-07-29
 topic: portfolio-risk-policy
 artifact_contract: ce-unified-plan/v1
-artifact_readiness: requirements-only
+artifact_readiness: implemented
+status: completed
 product_contract_source: ce-brainstorm
 execution: code
 ---
@@ -13,10 +14,10 @@ execution: code
 
 ## Goal Capsule
 
-- 目標：把投資組合風控從多維度 factor cap 收斂成單一原則——只有槓桿硬擋，其餘一律紀錄加警告。
+- 目標：把投資組合風控從多維度 factor cap 收斂成單一原則——ETF 槓桿與5%單筆上限硬擋，其餘一律紀錄加警告。
 - Product authority：`config/investment_policy.json` 與 `config/beta_policy.json` 是數值 SSOT；`AGENTS.md` 是政策 SSOT，本次變更會推翻其中數條既有定案。
 - 資本邊界不變：live 永遠由使用者手動下單，Google Sheet 仍是 live inventory 唯一權威。
-- Open blockers：單筆部位上限在新原則下屬硬擋或警告尚未決定（見 Outstanding Questions），會影響 alpha 層的 requirement 形狀。
+- Open blockers：無；單筆部位上限已定案維持5% hard block，v0 顯示／事件門檻已在實作時鎖定並 versioned。
 
 ---
 
@@ -24,7 +25,7 @@ execution: code
 
 ### Summary
 
-風控收斂成單一原則：只有槓桿硬擋，其餘一律紀錄加警告。刪除 alpha 從未生效的產業 factor 體系與其衍生的 mapping blocker，改以跨 alpha/beta 的發行人穿透、thesis 叢集顯示，以及價格異動觸發的集中曝險事件監控取代。
+風控收斂成單一原則：ETF 槓桿與5%單筆上限硬擋，其餘一律紀錄加警告。刪除 alpha 從未生效的產業 factor 體系與其衍生的 mapping blocker，改以跨 alpha/beta 的發行人穿透、thesis 叢集顯示，以及價格異動觸發的集中曝險事件監控取代。
 
 ### Problem Frame
 
@@ -76,7 +77,7 @@ flowchart TB
 
 **集中度與叢集（警告層）**
 
-- R5. 單一發行人曝險穿透 ETF 成分計算，涵蓋 alpha 與 beta 全部持股，並標示直接持有與間接持有的佔比。
+- R5. 單一發行人曝險以 policy 已登記的 ETF `issuer_loads` 加全部 direct alpha／beta 持股計算，標示直接與間接佔比並明示 partial coverage；不得冒充完整 ETF 成分。
 - R6. alpha 部位列出時一併顯示各自的 disproof condition，共享同一假設的部位自然浮現，不建立正式的叢集實體。
 - R7. alpha 總量超過設定比例時發出警告，不阻擋。
 
@@ -139,15 +140,16 @@ flowchart TB
 - beta monitor 的 technical observations 已在計算 1/5/20-session 報酬，可直接當價格異動觸發器。
 - 已凍結的 decision 不回溯改寫（content-addressed 原則），因此變更後一段時間內 brief 會同時存在新舊語彙。
 
-### Outstanding Questions
+### Implementation Resolutions
 
-**Deferred to Planning**
+**2026-07-29 實作時鎖定**
 
-- 顯示門檻的具體數值：TSMC 穿透、合計槓桿、alpha 總量各自要變化多少才在 daily 報告。屬 v0 參數，先設值再依實際雜訊調整。
-- 價格異動的觸發門檻（單日跌幅，或相對波動度的倍數）。同屬 v0 參數。
-- alpha 總量警告線落在 10% 或 20%。
-- 事件監控的搜尋詞構造與結果篩選方式。
-- 發行人穿透是否涵蓋 alpha 標的的上游依賴（例如 AAOI 對台積電產能的間接依賴）。此問題也決定「發行人穿透」能否成為 `CONCEPTS.md` 的正式詞彙。
+- Daily 數值顯示門檻：issuer、combined leverage、alpha total 均為 2 percentage points；warning／hard-block band 翻轉不受此數值門檻限制，必定顯示。
+- 價格異動觸發：issuer 曝險至少20%，對應 series 的 `return_1d` 首次 `<= -4%`。
+- alpha 總量 warning：20%；不阻擋 sizing。
+- 事件搜尋：deterministic query＝issuer＋benchmark symbol＋session date＋`stock price drop reason official filing company announcement`；daily agent 最多列三個可能原因並標未經查證。
+- 「發行人穿透」正式定義為 ownership exposure，只含 direct holding 與 policy 已知 `issuer_loads`；Engine A 上游依賴明確排除，完整 ETF 成分更新仍 out of scope。
+- Daily／Weekly 變化狀態：ignored private append-only `portfolio_risk_snapshots.jsonl`；它是 derived telemetry，不是 holdings／capital authority。
 
 ### Sources / Research
 
@@ -158,3 +160,13 @@ flowchart TB
 - `config/company_identity.json` — 47 家公司，僅 3 家有 `factor_tags`。
 - `fetchers/gsheets.py` 的 `CAPITAL_AUTHORITY_HEADERS` — `drawn_amount`、`currency`、`annual_rate_pct`、`maturity`、`repayment_structure`。
 - 2026-07-29 實測：科技曝險 63.2%、TSMC 穿透 29.4%、槓桿有效 15.7%（warning 15%）、槓桿名目 6.7%（warning 5%）、alpha 部位 1.7%、現金 11.0%、可部署現金 3.0%。
+
+---
+
+## Implementation Receipt
+
+- Runtime：`decision_lab/portfolio_risk.py`、`decision_lab/beta_monitor.py`、`decision_lab/sizing.py`、`decision_lab/capital_authority.py`、`scripts/daily_beta_snapshot.py`。
+- Policy：`investment_policy` v2026-07-29.2／`probe-limit-v2`；`beta_policy` v2026-07-29.3。
+- 已移除：`factor_exposure_caps`、`factor_tags`、technology proxy cap、issuer hard cap、兩種 `holdings_*_mapping_unresolved`。
+- Human boundary：既有 `live_override` 保留 exact prepared action／reason receipt；event packet 不建立 lead、decision 或任何 graph mutation。
+- Verification：`python -m pytest -q`＝628 passed；`python scripts/sync_agent_skills.py --check`＝兩端 adapters 同步；真實唯讀 smoke 讀到 NAV USD 399,462.46、ETF 槓桿名目 6.71%、有效 15.71%、TSMC direct＋indirect 29.48%，0 hard block，並正確標為 partial issuer look-through。

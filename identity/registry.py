@@ -1,4 +1,4 @@
-"""公司 ID、研究 ticker 與 factor tags 的中立 registry。"""
+"""公司 ID 與研究／執行市場識別的中立 registry。"""
 from __future__ import annotations
 
 import json
@@ -22,7 +22,6 @@ class CompanyIdentity:
     market_currency: str | None = None
     execution_currency: str | None = None
     execution_venue: str | None = None
-    factor_tags: tuple[str, ...] = ()
 
 
 class IdentityRegistry:
@@ -65,7 +64,6 @@ class IdentityRegistry:
                 market_currency=item.get("market_currency"),
                 execution_currency=item.get("execution_currency"),
                 execution_venue=item.get("execution_venue"),
-                factor_tags=tuple(str(tag) for tag in item.get("factor_tags", [])),
             )
             for item in raw_companies
         )
@@ -83,10 +81,6 @@ class IdentityRegistry:
 
     def company_id_for_ticker(self, ticker: str) -> str | None:
         return self._by_ticker.get(ticker.strip().upper())
-
-    def factor_tags(self, company_id: str) -> tuple[str, ...]:
-        company = self._by_id.get(company_id)
-        return company.factor_tags if company else ()
 
     def company(self, company_id: str) -> CompanyIdentity | None:
         return self._by_id.get(company_id)

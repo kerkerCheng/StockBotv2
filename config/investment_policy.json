@@ -1,5 +1,5 @@
 {
-  "policy_version": "2026-07-21.1",
+  "policy_version": "2026-07-29.2",
   "single_position_nav_cap": 0.05,
   "minimum_open_conviction": 3,
   "conviction_coefficients": {
@@ -9,15 +9,10 @@
   },
   "analyst_coverage_threshold": 8,
   "analyst_coverage_discount_levels": 1,
-  "factor_exposure_caps": {
-    "semiconductor": 0.25,
-    "photonics": 0.1,
-    "small_cap": 0.05
-  },
   "minimum_holding_days": 90,
   "probe_lane": {
     "rubric_version": "confidence-envelope-v1",
-    "calculator_version": "probe-limit-v1",
+    "calculator_version": "probe-limit-v2",
     "paper_nav": 100.0,
     "single_probe_nav_cap": 0.005,
     "probe_book_nav_cap": 0.02,

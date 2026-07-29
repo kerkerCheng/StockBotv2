@@ -62,7 +62,6 @@ def _policy(threshold: int) -> dict:
         "conviction_coefficients": {"3": .08, "4": .10, "5": .15},
         "analyst_coverage_threshold": threshold,
         "analyst_coverage_discount_levels": 1,
-        "factor_exposure_caps": {"semiconductor": .25},
         "minimum_holding_days": 90,
     }
 

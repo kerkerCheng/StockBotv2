@@ -601,7 +601,6 @@ def build_context_bundle(
         ]
     nav = _finite(paper_exposure.get("nav"), non_negative=True)
     total_weight = _finite(paper_exposure.get("total_weight"), non_negative=True)
-    factor_weights = _normalize_weights(paper_exposure.get("factor_weights"), "factor_weights")
     company_weights = _normalize_weights(
         paper_exposure.get("company_weights"), "company_weights"
     )
@@ -609,7 +608,6 @@ def build_context_bundle(
         nav is None
         or nav <= 0
         or total_weight is None
-        or factor_weights is None
         or company_weights is None
     ):
         normalized_paper = {
@@ -621,7 +619,6 @@ def build_context_bundle(
             "status": "available",
             "nav": nav,
             "total_weight": total_weight,
-            "factor_weights": factor_weights,
             "company_weights": company_weights,
             "blockers": [],
         }

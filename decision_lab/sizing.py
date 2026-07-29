@@ -8,7 +8,9 @@ from typing import Any, Mapping, Sequence
 from identity.registry import IdentityRegistry, get_registry
 from thesis.investment_policy import PolicyError, load_policy, validate_policy
 
+from .beta_policy import load_beta_policy
 from .models import ContextBundle, CoverageResult, ProbeSizingResult
+from .portfolio_risk import build_portfolio_components
 
 
 AXES = (
@@ -157,57 +159,6 @@ def _level_floor(level: str, ceilings: Mapping[str, float]) -> float:
     return 0.0 if index == 0 else ceilings[LEVELS[index - 1]]
 
 
-def _factor_caps(
-    *,
-    lane: str,
-    current_company_weight: float,
-    factor_weights: Mapping[str, Any],
-    factor_tags: tuple[str, ...],
-    policy_caps: Mapping[str, float],
-    trace: list[dict[str, Any]],
-    blockers: list[str],
-) -> None:
-    if not factor_tags:
-        blockers.append("factor_mapping_unresolved")
-        trace.append(_constraint(lane, "factor_mapping", 0.0, "identity_registry", status="missing"))
-        return
-    for factor in factor_tags:
-        if factor not in policy_caps:
-            blockers.append(f"factor_policy_missing:{factor}")
-            trace.append(
-                _constraint(
-                    lane,
-                    f"factor:{factor}",
-                    0.0,
-                    "investment_policy",
-                    status="missing",
-                )
-            )
-            continue
-        existing = _finite(factor_weights.get(factor, 0.0), non_negative=True)
-        if existing is None:
-            blockers.append(f"factor_exposure_invalid:{factor}")
-            trace.append(
-                _constraint(
-                    lane,
-                    f"factor:{factor}",
-                    0.0,
-                    "portfolio_snapshot",
-                    status="quarantined",
-                )
-            )
-            continue
-        total_position_cap = current_company_weight + max(0.0, policy_caps[factor] - existing)
-        trace.append(
-            _constraint(
-                lane,
-                f"factor:{factor}",
-                total_position_cap,
-                "portfolio_snapshot+investment_policy",
-            )
-        )
-
-
 def _live_portfolio(
     payload: Mapping[str, Any],
     *,
@@ -215,14 +166,12 @@ def _live_portfolio(
     focus_company_id: str,
     execution_symbol: str,
     research_ticker: str,
-    policy_caps: Mapping[str, float],
-) -> tuple[float, dict[str, float], list[str], float]:
+) -> tuple[float, list[str], float]:
     holdings = payload["holdings"]
     nav = _finite(holdings.get("nav_base"), non_negative=True)
     if nav is None or nav <= 0:
-        return 0.0, {}, ["live_nav_missing"], 0.0
-    factor_values: dict[str, float] = {}
-    company_values: dict[str, float] = {}
+        return 0.0, ["live_nav_missing"], 0.0
+    current_value = 0.0
     blockers: list[str] = []
     for row in holdings.get("rows") or []:
         # 現金已計入 NAV，且沒有 company／factor 曝險；不跳過的話會被誤報成
@@ -236,23 +185,12 @@ def _live_portfolio(
         if company_id is None:
             company_id = registry.company_id_for_ticker(ticker)
         value = _finite(row.get("market_value_base"), non_negative=True)
-        if company_id is None:
-            blockers.append(f"holdings_company_mapping_unresolved:{ticker}")
-            continue
         if value is None:
             blockers.append(f"holdings_market_value_missing:{ticker}")
             continue
-        company_values[company_id] = company_values.get(company_id, 0.0) + value
-        tags = registry.factor_tags(company_id)
-        if not tags and value:
-            blockers.append(f"holdings_factor_mapping_unresolved:{company_id}")
-        for tag in tags:
-            if tag not in policy_caps:
-                blockers.append(f"factor_policy_missing:{tag}")
-            factor_values[tag] = factor_values.get(tag, 0.0) + value
-    factor_weights = {factor: value / nav for factor, value in factor_values.items()}
-    current = company_values.get(focus_company_id, 0.0) / nav
-    return nav, factor_weights, blockers, current
+        if company_id == focus_company_id:
+            current_value += value
+    return nav, blockers, current_value / nav
 
 
 def calculate_probe_limits(
@@ -291,7 +229,6 @@ def calculate_probe_limits(
     company_id = str(identity.get("company_id") or "")
     execution_symbol = str(identity.get("execution_symbol") or "")
     research_ticker = str(identity.get("research_ticker") or "")
-    factor_tags = registry.factor_tags(company_id)
     trace: list[dict[str, Any]] = []
 
     coverage_cap = probe["single_probe_nav_cap"] if coverage.status == "analyzable" else 0.0
@@ -347,15 +284,6 @@ def calculate_probe_limits(
                 "paper_ledger+investment_policy",
             )
         )
-    _factor_caps(
-        lane="paper",
-        current_company_weight=paper_current,
-        factor_weights=paper.get("factor_weights") or {},
-        factor_tags=factor_tags,
-        policy_caps=current_policy["factor_exposure_caps"],
-        trace=trace,
-        blockers=paper_blockers,
-    )
     paper_max = _lane_max(trace, "paper")
     if paper_blockers:
         trace.append(_constraint("paper", "paper_lane_blockers", 0.0, bundle.digest, status="blocked"))
@@ -371,24 +299,44 @@ def calculate_probe_limits(
     holdings = payload["holdings"]
     if holdings.get("status") not in {"confirmed", "confirmed_empty"}:
         live_blockers.extend(holdings.get("blockers") or ["holdings_not_confirmed"])
-    live_nav, live_factor_weights, portfolio_blockers, live_current = _live_portfolio(
+    live_nav, portfolio_blockers, live_current = _live_portfolio(
         payload,
         registry=registry,
         focus_company_id=company_id,
         execution_symbol=execution_symbol,
         research_ticker=research_ticker,
-        policy_caps=current_policy["factor_exposure_caps"],
     )
     live_blockers.extend(portfolio_blockers)
-    _factor_caps(
-        lane="live",
-        current_company_weight=live_current,
-        factor_weights=live_factor_weights,
-        factor_tags=factor_tags,
-        policy_caps=current_policy["factor_exposure_caps"],
-        trace=trace,
-        blockers=live_blockers,
+    trace.append(
+        _constraint(
+            "live",
+            "single_position_cap",
+            current_policy["single_position_nav_cap"],
+            current_policy["policy_version"],
+        )
     )
+    if live_current >= float(current_policy["single_position_nav_cap"]):
+        live_blockers.append("single_position_nav_cap_reached")
+    try:
+        if live_nav <= 0:
+            raise ValueError("live nav unavailable")
+        beta_policy = load_beta_policy()
+        leverage = build_portfolio_components(
+            holdings.get("rows") or [],
+            beta_policy,
+            nav_base=holdings.get("nav_base"),
+            base_currency=holdings.get("base_currency"),
+            strict_reconciliation=False,
+            registry=registry,
+        )
+        nominal_weight = float(leverage["leveraged_nominal_base"]) / live_nav
+        effective_weight = float(leverage["leveraged_effective_base"]) / live_nav
+        if nominal_weight >= float(beta_policy["risk"]["leveraged_nominal_cap"]):
+            live_blockers.append("etf_leverage_nominal_cap_reached")
+        if effective_weight >= float(beta_policy["risk"]["leveraged_effective_cap"]):
+            live_blockers.append("etf_leverage_effective_cap_reached")
+    except (KeyError, OSError, TypeError, ValueError):
+        live_blockers.append("portfolio_leverage_unavailable")
     execution_market = payload.get("execution_market") or {}
     execution_fx = payload.get("execution_fx") or {}
     if execution_market.get("status") != "available":

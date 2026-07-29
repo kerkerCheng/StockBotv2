@@ -107,7 +107,6 @@ def assess_probe(
             request_payload=request_payload,
             paper_nav=float(probe["paper_nav"]),
             company_id=company_id,
-            factor_resolver=registry.factor_tags,
             calculator=calculator,
             failure_at=_failure_at,
         )

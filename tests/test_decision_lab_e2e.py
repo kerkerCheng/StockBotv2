@@ -127,10 +127,6 @@ def test_sive_signal_funds_bounded_paper_but_never_auto_adds_live(
                 "company_weights": {
                     "co:sivers_semiconductors": decision.paper_target
                 },
-                "factor_weights": {
-                    "photonics": decision.paper_target,
-                    "small_cap": decision.paper_target,
-                },
             }
         )
         live_bundle = _freeze_fixture_context(

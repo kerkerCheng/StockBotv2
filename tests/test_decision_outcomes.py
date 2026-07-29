@@ -323,7 +323,7 @@ def test_outcome_freezes_system_vs_user_choice_and_calculator_trace(
         assert frozen["decision_attribution"]["system_paper_target"] == pytest.approx(0.0035)
         assert frozen["decision_attribution"]["user_live_weight"] == 0.0
         assert frozen["decision_attribution"]["user_choice_type"] == "skipped"
-        assert frozen["calculator_version"] == "probe-limit-v1"
+        assert frozen["calculator_version"] == "probe-limit-v2"
         assert frozen["constraint_trace"]
     finally:
         store.close()

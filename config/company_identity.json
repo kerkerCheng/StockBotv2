@@ -1,7 +1,7 @@
 {
   "version": 1,
   "companies": [
-    {"company_id": "co:coherent", "research_ticker": "COHR", "market_currency": "USD", "execution_currency": "USD", "execution_venue": "NYSE", "factor_tags": ["semiconductor", "photonics"]},
+    {"company_id": "co:coherent", "research_ticker": "COHR", "market_currency": "USD", "execution_currency": "USD", "execution_venue": "NYSE"},
     {"company_id": "co:lumentum", "research_ticker": "LITE", "market_currency": "USD", "execution_currency": "USD", "execution_venue": "NASDAQ"},
     {"company_id": "co:broadcom", "research_ticker": "AVGO"},
     {"company_id": "co:nvidia", "research_ticker": "NVDA"},
@@ -16,8 +16,8 @@
     {"company_id": "co:jabil", "research_ticker": "JBL"},
     {"company_id": "co:anthropic", "research_ticker": null},
     {"company_id": "co:openai", "research_ticker": null},
-    {"company_id": "co:sivers_semiconductors", "research_ticker": "SIVE.ST", "market_currency": "SEK", "execution_currency": "EUR", "execution_venue": "FRA", "factor_tags": ["photonics", "small_cap"]},
-    {"company_id": "co:axt", "research_ticker": "AXTI", "market_currency": "USD", "execution_currency": "USD", "execution_venue": "NASDAQ", "factor_tags": ["semiconductor", "small_cap"]},
+    {"company_id": "co:sivers_semiconductors", "research_ticker": "SIVE.ST", "market_currency": "SEK", "execution_currency": "EUR", "execution_venue": "FRA"},
+    {"company_id": "co:axt", "research_ticker": "AXTI", "market_currency": "USD", "execution_currency": "USD", "execution_venue": "NASDAQ"},
     {"company_id": "co:tower_semiconductor", "research_ticker": "TSEM", "market_currency": "USD", "execution_currency": "USD", "execution_venue": "NASDAQ"},
     {"company_id": "co:marvell_technology", "research_ticker": "MRVL"},
     {"company_id": "co:poet_technologies", "research_ticker": "POET"},

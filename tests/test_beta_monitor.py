@@ -83,7 +83,7 @@ def _holdings(*, cash: float = 10.0, tqqq: float = 0.0, other: list[dict] | None
     return rows
 
 
-def _capital_rows(*, credit_limit: str = "1000") -> list[dict]:
+def _capital_rows(*, credit_limit: str = "1000", drawn_amount: str = "0") -> list[dict]:
     common = {
         "as_of": "2026-07-28",
         "confirmation_status": "user_confirmed",
@@ -115,7 +115,7 @@ def _capital_rows(*, credit_limit: str = "1000") -> list[dict]:
             "capital_type": "contingent_liquidity_credit_facility",
             "confirmation_status": "user_confirmed_partial",
             "limit_amount": credit_limit,
-            "drawn_amount": "0",
+            "drawn_amount": drawn_amount,
             "annual_rate_pct": "3.1",
             "interest_accrual": "daily",
             "availability": "on_demand",
@@ -242,10 +242,11 @@ def test_leverage_effective_cap_binds_even_when_signal_is_extreme() -> None:
     assert tqqq["signal_pace"] == 1.0
     assert tqqq["action"] == "PAUSE CONTRIBUTION"
     assert tqqq["supported_order_range_base"] == [0.0, 0.0]
-    assert "leveraged_effective_capacity" in tqqq["binding_constraints"]
+    assert "etf_leverage_effective_cap_reached" in tqqq["blockers"]
+    assert "etf_leverage_effective_cap_reached" in report["risk_snapshot"]["hard_blocks"]
 
 
-def test_sequential_allocations_also_share_the_technology_capacity() -> None:
+def test_alpha_total_is_warning_only_and_does_not_consume_beta_capacity() -> None:
     policy = load_beta_policy()
     observations = _observations(policy)
     histories = {key: [value] for key, value in observations.items()}
@@ -269,15 +270,9 @@ def test_sequential_allocations_also_share_the_technology_capacity() -> None:
         as_of=NOW,
         policy=policy,
     )
-    by_ticker = {item["ticker"]: item for item in policy["instruments"]}
-    technology_addition = sum(
-        item["supported_order_range_base"][1]
-        * by_ticker[item["ticker"]]["leverage_multiple"]
-        * by_ticker[item["ticker"]]["technology_proxy_load"]
-        for item in report["items"]
-    )
-
-    assert technology_addition <= 5.000001
+    assert report["risk_snapshot"]["alpha_total_weight"] == pytest.approx(0.65)
+    assert "alpha_total_warning" in report["warnings"]
+    assert any(item["supported_order_range_base"][1] > 0 for item in report["items"])
 
 
 def test_missing_sheet_or_partial_technical_data_returns_zero_ranges() -> None:
@@ -333,7 +328,7 @@ def test_same_signal_respects_repeat_cadence() -> None:
     assert tqqq["action"] == "HOLD"
 
 
-def test_known_tsmc_lower_bound_pauses_taiwan_related_additions() -> None:
+def test_known_tsmc_concentration_warns_without_pausing_additions() -> None:
     policy = load_beta_policy()
     observations = _observations(policy)
     histories = {key: [value] for key, value in observations.items()}
@@ -363,8 +358,30 @@ def test_known_tsmc_lower_bound_pauses_taiwan_related_additions() -> None:
         for item in report["items"]
         if item["ticker"] in {"0050.TW", "006208.TW", "00631L.TW", "2330.TW"}
     ]
-    assert all(item["supported_order_range_base"][1] == 0 for item in taiwan)
-    assert any("single_company_capacity:TSMC" in item["binding_constraints"] for item in taiwan)
+    assert any(item["supported_order_range_base"][1] > 0 for item in taiwan)
+    exposure = report["risk_snapshot"]["issuer_exposures"]["TSMC"]
+    assert exposure["total_weight"] == pytest.approx(0.36)
+    assert exposure["direct_weight"] == pytest.approx(0.36)
+    assert "issuer_concentration_warning:TSMC" in report["warnings"]
+
+
+def test_drawn_debt_is_separate_from_etf_leverage_and_combined() -> None:
+    policy = load_beta_policy()
+    observations = _observations(policy)
+    report = build_beta_monitor(
+        observations_by_benchmark=observations,
+        history_by_benchmark={key: [value] for key, value in observations.items()},
+        holdings_rows=_holdings(),
+        capital_authority_rows=_capital_rows(drawn_amount="20"),
+        as_of=NOW,
+        policy=policy,
+    )
+
+    risk = report["risk_snapshot"]
+    assert risk["etf_leverage"]["effective_weight"] == 0.0
+    assert risk["loan_leverage_weight"] == pytest.approx(0.20)
+    assert risk["combined_leverage_weight"] == pytest.approx(0.20)
+    assert risk["hard_blocks"] == []
 
 
 def test_markdown_is_aggregate_and_preserves_human_boundary() -> None:
@@ -390,3 +407,32 @@ def test_markdown_is_aggregate_and_preserves_human_boundary() -> None:
     assert rendered.index("QQQ") < rendered.index("TQQQ")
     assert "不代表已核准、已下單或已寫回" in rendered
     assert "shares" not in rendered
+
+
+def test_daily_risk_view_is_silent_without_change_but_weekly_full_is_explicit() -> None:
+    policy = load_beta_policy()
+    observations = _observations(policy)
+    history = {key: [value] for key, value in observations.items()}
+    first = build_beta_monitor(
+        observations_by_benchmark=observations,
+        history_by_benchmark=history,
+        holdings_rows=_holdings(),
+        as_of=NOW,
+        policy=policy,
+    )
+    second = build_beta_monitor(
+        observations_by_benchmark=observations,
+        history_by_benchmark=history,
+        holdings_rows=_holdings(),
+        as_of=NOW,
+        policy=policy,
+        previous_risk_snapshot=first["risk_snapshot"],
+    )
+
+    daily = render_beta_monitor_markdown(second)
+    weekly = render_beta_monitor_markdown(second, risk_view="full")
+
+    assert "## 投組風險變化" not in daily
+    assert "## 投組風險完整快照" in weekly
+    assert "Issuer look-through coverage：partial" in weekly
+    assert "科技 effective proxy" not in weekly

@@ -154,7 +154,7 @@ def test_fixed_entry_runs_refresh_and_outputs_public_json() -> None:
     output = io.StringIO()
 
     code = run(
-        ["--format", "json", "--as-of", NOW],
+        ["--format", "json", "--as-of", NOW, "--no-record-risk"],
         stdout=output,
         policy=load_beta_policy(),
         conn_factory=lambda: holder,
@@ -185,7 +185,7 @@ def test_sheet_failure_keeps_technical_health_but_zeroes_ranges() -> None:
         raise RuntimeError("secret path should not escape")
 
     code = run(
-        ["--format", "json", "--as-of", NOW],
+        ["--format", "json", "--as-of", NOW, "--no-record-risk"],
         stdout=output,
         policy=load_beta_policy(),
         conn_factory=lambda: holder,

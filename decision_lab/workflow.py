@@ -241,7 +241,6 @@ def _confirm_holdings_if_requested(
 def _paper_exposure(store: DecisionStore, policy: Mapping[str, Any]) -> Mapping[str, Any]:
     return store.paper_exposure_snapshot(
         paper_nav=float(policy["probe_lane"]["paper_nav"]),
-        factor_resolver=get_registry().factor_tags,
     )
 
 

@@ -7,6 +7,12 @@ from typing import Any, Mapping, Sequence
 
 from .beta_policy import load_beta_policy
 from .capital_authority import build_household_capital_view
+from .portfolio_risk import (
+    build_portfolio_components,
+    compose_risk_snapshot,
+    event_search_requests,
+    risk_changes,
+)
 
 
 _ACTIONS = {"HOLD", "PAUSE CONTRIBUTION", "CONTRIBUTE REVIEW"}
@@ -198,126 +204,23 @@ def _portfolio_snapshot(
     holdings_rows: Sequence[Mapping[str, Any]] | None,
     policy: Mapping[str, Any],
 ) -> dict[str, Any]:
-    blockers: list[str] = []
-    if holdings_rows is None:
-        return {
-            "status": "unavailable",
-            "blockers": ["holdings_unavailable"],
-            "nav_base": 0.0,
-            "base_currency": None,
-            "cash_base": 0.0,
-            "deployable_cash_base": 0.0,
-            "instrument_values": {},
-            "leveraged_nominal_base": 0.0,
-            "leveraged_effective_base": 0.0,
-            "technology_effective_base": 0.0,
-            "issuer_effective_base": {},
-            "warnings": [],
-        }
-    aliases = {
-        alias: instrument
-        for instrument in policy["instruments"]
-        for alias in instrument["sheet_aliases"]
-    }
-    cash_aliases = set(policy["capital"]["cash_bucket_aliases"])
-    nav_values: list[float] = []
-    currencies: set[str] = set()
-    cash = 0.0
-    instrument_values = {instrument["ticker"]: 0.0 for instrument in policy["instruments"]}
-    leverage_nominal = 0.0
-    leverage_effective = 0.0
-    technology_effective = 0.0
-    issuer_effective: dict[str, float] = {}
-    unmapped_non_cash = 0.0
-    market_total = 0.0
-    for row in holdings_rows:
-        if not isinstance(row, Mapping):
-            blockers.append("holdings_malformed")
-            continue
-        nav = _finite(row.get("nav_base"), non_negative=True)
-        value = _finite(row.get("market_value_base"), non_negative=True)
-        ticker = str(row.get("ticker") or "").strip().upper()
-        currency = str(row.get("base_currency") or "").strip().upper()
-        bucket = str(row.get("bucket") or "").strip().casefold()
-        if nav is None or nav <= 0 or value is None or not ticker or len(currency) != 3:
-            blockers.append("holdings_malformed")
-            continue
-        nav_values.append(nav)
-        currencies.add(currency)
-        market_total += value
-        is_cash = bucket in cash_aliases or ticker.casefold() in cash_aliases
-        if is_cash:
-            cash += value
-            continue
-        instrument = aliases.get(ticker)
-        if instrument is None:
-            unmapped_non_cash += value
-            continue
-        canonical = str(instrument["ticker"])
-        instrument_values[canonical] += value
-        leverage = float(instrument["leverage_multiple"])
-        if leverage > 1:
-            leverage_nominal += value
-            leverage_effective += value * leverage
-        technology_effective += value * leverage * float(instrument["technology_proxy_load"])
-        for issuer, load in instrument["issuer_loads"].items():
-            issuer_effective[issuer] = issuer_effective.get(issuer, 0.0) + value * leverage * float(load)
-    if not nav_values:
-        blockers.append("holdings_empty")
-        nav_base = 0.0
-    else:
-        nav_base = nav_values[0]
-        if any(not math.isclose(value, nav_base, rel_tol=1e-9, abs_tol=1e-6) for value in nav_values[1:]):
-            blockers.append("holdings_nav_inconsistent")
-    if len(currencies) != 1:
-        blockers.append("holdings_base_currency_inconsistent")
-    if nav_base > 0 and not math.isclose(market_total, nav_base, rel_tol=1e-6, abs_tol=0.01):
-        blockers.append("holdings_market_value_nav_mismatch")
-    if cash <= 0:
+    components = build_portfolio_components(holdings_rows, policy)
+    blockers = list(components["blockers"])
+    nav_base = float(components["nav_base"])
+    cash = float(components["cash_base"])
+    if holdings_rows is not None and cash <= 0:
         blockers.append("cash_bucket_missing")
-    technology_effective += unmapped_non_cash * float(policy["risk"]["unmapped_technology_proxy_load"])
     reserve = nav_base * (
         float(policy["capital"]["operating_reserve_nav_fraction"])
         + float(policy["capital"]["alpha_reserve_nav_fraction"])
     )
     deployable = max(cash - reserve, 0.0) if not blockers else 0.0
-    warnings = ["unmapped_holdings_counted_as_full_technology_proxy"] if unmapped_non_cash else []
-    return {
+    return dict(components) | {
         "status": "available" if not blockers else "malformed",
         "blockers": sorted(set(blockers)),
-        "nav_base": nav_base,
-        "base_currency": next(iter(currencies)) if len(currencies) == 1 else None,
-        "cash_base": cash,
         "reserve_base": reserve,
         "deployable_cash_base": deployable,
-        "instrument_values": instrument_values,
-        "leveraged_nominal_base": leverage_nominal,
-        "leveraged_effective_base": leverage_effective,
-        "technology_effective_base": technology_effective,
-        "issuer_effective_base": issuer_effective,
-        "unmapped_non_cash_base": unmapped_non_cash,
-        "warnings": warnings,
     }
-
-
-def _warning_flags(portfolio: Mapping[str, Any], policy: Mapping[str, Any]) -> list[str]:
-    nav = float(portfolio.get("nav_base") or 0.0)
-    if nav <= 0:
-        return []
-    risk = policy["risk"]
-    flags: list[str] = []
-    ratios = {
-        "leveraged_nominal_warning": float(portfolio["leveraged_nominal_base"]) / nav,
-        "leveraged_effective_warning": float(portfolio["leveraged_effective_base"]) / nav,
-        "technology_effective_warning": float(portfolio["technology_effective_base"]) / nav,
-    }
-    for key, value in ratios.items():
-        if value >= float(risk[key]):
-            flags.append(key)
-    for issuer, value in portfolio["issuer_effective_base"].items():
-        if float(value) / nav >= float(risk["single_company_warning"]):
-            flags.append(f"single_company_warning:{issuer}")
-    return sorted(flags)
 
 
 def _allocate_ranges(
@@ -328,6 +231,7 @@ def _allocate_ranges(
     deployable_cash: float,
     capital_available: bool,
     capital_blockers: Sequence[str],
+    global_risk_blocks: Sequence[str],
 ) -> tuple[list[dict[str, Any]], float]:
     """Run one independent sequential allocation view against shared hard caps。"""
 
@@ -336,11 +240,6 @@ def _allocate_ranges(
     risk = policy["risk"]
     projected_leverage_nominal = float(portfolio["leveraged_nominal_base"])
     projected_leverage_effective = float(portfolio["leveraged_effective_base"])
-    projected_technology_effective = float(portfolio["technology_effective_base"])
-    projected_issuer_effective = {
-        str(key): float(value)
-        for key, value in portfolio["issuer_effective_base"].items()
-    }
     claimed_groups: set[str] = set()
     allocations: list[dict[str, Any]] = []
     for candidate in prepared:
@@ -354,7 +253,10 @@ def _allocate_ranges(
         safe_max = 0.0
         binding: list[str] = []
         group = str(instrument["allocation_group"])
-        if not capital_available:
+        if global_risk_blocks:
+            blockers.extend(str(item) for item in global_risk_blocks)
+            action = "PAUSE CONTRIBUTION"
+        elif not capital_available:
             blockers.extend(str(item) for item in capital_blockers)
             action = "PAUSE CONTRIBUTION"
         elif state["data_status"] != "observed":
@@ -376,13 +278,6 @@ def _allocate_ranges(
                 * float(state["pace"])
             )
             constraints["deployable_cash"] = remaining_cash
-            tech_load = leverage * float(instrument["technology_proxy_load"])
-            if tech_load > 0:
-                constraints["technology_effective_capacity"] = max(
-                    nav * float(risk["technology_effective_cap"])
-                    - projected_technology_effective,
-                    0.0,
-                ) / tech_load
             if leverage > 1:
                 constraints["leveraged_nominal_capacity"] = max(
                     nav * float(risk["leveraged_nominal_cap"])
@@ -394,12 +289,6 @@ def _allocate_ranges(
                     - projected_leverage_effective,
                     0.0,
                 ) / leverage
-            for issuer, load in instrument["issuer_loads"].items():
-                exposure = float(projected_issuer_effective.get(issuer, 0.0))
-                constraints[f"single_company_capacity:{issuer}"] = max(
-                    nav * float(risk["single_company_cap"]) - exposure,
-                    0.0,
-                ) / (leverage * float(load))
             safe_max = max(min(constraints.values()), 0.0)
             minimum = min(constraints.values())
             binding = sorted(
@@ -410,15 +299,9 @@ def _allocate_ranges(
             if safe_max > 0:
                 action = "CONTRIBUTE REVIEW"
                 remaining_cash = max(remaining_cash - safe_max, 0.0)
-                projected_technology_effective += safe_max * tech_load
                 if leverage > 1:
                     projected_leverage_nominal += safe_max
                     projected_leverage_effective += safe_max * leverage
-                for issuer, load in instrument["issuer_loads"].items():
-                    projected_issuer_effective[issuer] = (
-                        projected_issuer_effective.get(issuer, 0.0)
-                        + safe_max * leverage * float(load)
-                    )
             else:
                 action = "PAUSE CONTRIBUTION"
                 blockers.extend(binding or ["safe_capacity_exhausted"])
@@ -445,6 +328,7 @@ def build_beta_monitor(
     fx_fetcher=None,
     as_of: str,
     policy: Mapping[str, Any] | None = None,
+    previous_risk_snapshot: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Build one public, non-executing beta contribution report。"""
 
@@ -475,14 +359,6 @@ def build_beta_monitor(
             }
         )
 
-    sheet_allocations, remaining_cash = _allocate_ranges(
-        prepared=prepared,
-        portfolio=portfolio,
-        policy=resolved_policy,
-        deployable_cash=float(portfolio["deployable_cash_base"]),
-        capital_available=portfolio["status"] == "available",
-        capital_blockers=portfolio["blockers"],
-    )
     capital_view = build_household_capital_view(
         authority_rows=capital_authority_rows,
         portfolio_cash_base=portfolio["cash_base"],
@@ -498,6 +374,21 @@ def build_beta_monitor(
         max_fx_age_hours=int(resolved_policy["capital"]["household_fx_max_age_hours"]),
         fx_fetcher=fx_fetcher,
     )
+    risk_snapshot = compose_risk_snapshot(
+        portfolio,
+        capital_view,
+        resolved_policy,
+        as_of=evaluation_at,
+    )
+    sheet_allocations, remaining_cash = _allocate_ranges(
+        prepared=prepared,
+        portfolio=portfolio,
+        policy=resolved_policy,
+        deployable_cash=float(portfolio["deployable_cash_base"]),
+        capital_available=portfolio["status"] == "available",
+        capital_blockers=portfolio["blockers"],
+        global_risk_blocks=risk_snapshot["hard_blocks"],
+    )
     household_cash = capital_view["household_cash"]
     household_available = (
         portfolio["status"] == "available"
@@ -510,6 +401,7 @@ def build_beta_monitor(
         deployable_cash=float(household_cash["deployable_cash_base"]),
         capital_available=household_available,
         capital_blockers=household_cash["blockers"],
+        global_risk_blocks=risk_snapshot["hard_blocks"],
     )
 
     items: list[dict[str, Any]] = []
@@ -571,7 +463,6 @@ def build_beta_monitor(
                 "household_action": household_allocation["action"],
             }
         )
-    warning_flags = _warning_flags(portfolio, resolved_policy)
     technical_statuses = {str(item["technical_status"]) for item in items}
     base_status = (
         "degraded"
@@ -593,7 +484,7 @@ def build_beta_monitor(
         float(household_cash["deployable_cash_base"]) - household_remaining_cash
     )
     report = {
-        "schema_version": "engine-d-beta-monitor-v2",
+        "schema_version": "engine-d-beta-monitor-v3",
         "as_of": evaluation_at,
         "policy_version": resolved_policy["policy_version"],
         "policy_mode": resolved_policy["mode"],
@@ -610,12 +501,8 @@ def build_beta_monitor(
             "remaining_cash_base": remaining_cash,
             "leveraged_nominal_weight": portfolio["leveraged_nominal_base"] / nav if nav > 0 else None,
             "leveraged_effective_weight": portfolio["leveraged_effective_base"] / nav if nav > 0 else None,
-            "technology_effective_proxy_weight": portfolio["technology_effective_base"] / nav if nav > 0 else None,
-            "known_issuer_effective_weights": {
-                issuer: value / nav for issuer, value in sorted(portfolio["issuer_effective_base"].items())
-            }
-            if nav > 0
-            else {},
+            "alpha_total_weight": risk_snapshot["alpha_total_weight"],
+            "known_issuer_exposures": risk_snapshot["issuer_exposures"],
         },
         "capital_view": {
             key: capital_view[key]
@@ -630,15 +517,26 @@ def build_beta_monitor(
                 "fx",
                 "blockers",
                 "warnings",
+                "drawn_debt_base",
             )
         },
         "sheet_conservative_range": [0.0, sheet_allocated],
         "household_cash_supported_range": [0.0, household_allocated],
         "contingent_credit_available": capital_view["contingent_credit_available"],
         "loan_funded_supported_range": capital_view["loan_funded_supported_range"],
-        "blockers": sorted(set(portfolio["blockers"] + capital_view["blockers"])),
+        "risk_snapshot": risk_snapshot,
+        "risk_changes": risk_changes(risk_snapshot, previous_risk_snapshot, resolved_policy),
+        "event_search_requests": event_search_requests(
+            risk_snapshot,
+            observations_by_benchmark=observations_by_benchmark,
+            history_by_benchmark=history_by_benchmark,
+            policy=resolved_policy,
+        ),
+        "blockers": sorted(
+            set(portfolio["blockers"] + capital_view["blockers"] + risk_snapshot["hard_blocks"])
+        ),
         "warnings": sorted(
-            set(portfolio["warnings"] + warning_flags + capital_view["warnings"])
+            set(portfolio["warnings"] + risk_snapshot["warnings"] + capital_view["warnings"])
         ),
         "items": items,
     }
@@ -700,20 +598,23 @@ def _compact_monitor_item(
 
 
 def _risk_hint_summary(report: Mapping[str, Any]) -> str:
-    labels = {
-        "leveraged_nominal_warning": "槓桿名目進提醒區",
-        "leveraged_effective_warning": "effective 槓桿進提醒區",
-        "technology_effective_warning": "科技曝險進提醒區",
-        "unmapped_holdings_counted_as_full_technology_proxy": "未映射持股按 100% 科技保守計",
-    }
-    hints: list[str] = []
-    for warning in report.get("warnings") or []:
-        code = str(warning)
-        if code.startswith("single_company_warning:"):
-            hints.append(f"{code.partition(':')[2]} 集中度進提醒區")
-        elif code in labels:
-            hints.append(labels[code])
-    return "、".join(hints) or "未觸及已設定的組合提醒線"
+    changes = report.get("risk_changes") or []
+    if not changes:
+        return "今日沒有顯示門檻跨越或狀態翻轉"
+    if any(item.get("kind") == "baseline_initialized" for item in changes):
+        return "已建立第一筆風險 baseline；後續只回報門檻跨越或狀態翻轉"
+    labels: list[str] = []
+    for item in changes:
+        metric = str(item.get("metric") or "")
+        if metric.startswith("issuer_exposure:"):
+            labels.append(f"{metric.partition(':')[2]} 集中曝險變動")
+        elif metric == "alpha_total_weight":
+            labels.append("alpha 總量變動")
+        elif "leverage" in metric:
+            labels.append("槓桿狀態變動")
+        elif metric == "policy_version":
+            labels.append("風控 policy 已換版")
+    return "、".join(dict.fromkeys(labels)) or "風險狀態有變"
 
 
 def _money(value: Any, currency: str | None) -> str:
@@ -721,7 +622,54 @@ def _money(value: Any, currency: str | None) -> str:
     return "未知" if parsed is None else f"{currency or ''} {parsed:,.0f}".strip()
 
 
-def render_beta_monitor_markdown(report: Mapping[str, Any]) -> str:
+def _risk_snapshot_lines(report: Mapping[str, Any], *, full: bool) -> list[str]:
+    snapshot = report["risk_snapshot"]
+    changes = report.get("risk_changes") or []
+    if not full and not changes:
+        return []
+    etf = snapshot["etf_leverage"]
+    lines = ["", "## 投組風險變化" if not full else "## 投組風險完整快照"]
+    if full or any("leverage" in str(item.get("metric")) for item in changes):
+        lines.append(
+            f"- ETF 槓桿名目／effective：{_pct(etf.get('nominal_weight'))}／"
+            f"{_pct(etf.get('effective_weight'))}；貸款 {_pct(snapshot.get('loan_leverage_weight'))}；"
+            f"合計 {_pct(snapshot.get('combined_leverage_weight'))}"
+        )
+    if full or any(item.get("metric") == "alpha_total_weight" for item in changes):
+        lines.append(f"- Alpha 總量：{_pct(snapshot.get('alpha_total_weight'))}（警告、不阻擋）")
+    changed_issuers = {
+        str(item.get("metric")).partition(":")[2]
+        for item in changes
+        if str(item.get("metric") or "").startswith("issuer_exposure:")
+    }
+    for issuer, exposure in snapshot.get("issuer_exposures", {}).items():
+        if full or issuer in changed_issuers:
+            lines.append(
+                f"- {issuer}：總曝險 {_pct(exposure.get('total_weight'))}"
+                f"（直接 {_pct(exposure.get('direct_weight'))}／間接 {_pct(exposure.get('indirect_weight'))}）"
+            )
+    coverage = snapshot["issuer_coverage"]
+    if full:
+        lines.append(
+            f"- Issuer look-through coverage：{coverage['status']}；method={coverage['method']}；"
+            f"未建模={','.join(coverage['unmodeled_lookthrough_instruments']) or 'none'}"
+        )
+    if changes:
+        lines.append(
+            "- 較前次："
+            + "；".join(
+                f"{item.get('metric')} {item.get('previous_state', '')}→{item.get('current_state', '')}"
+                for item in changes
+            )
+        )
+    return lines
+
+
+def render_beta_monitor_markdown(
+    report: Mapping[str, Any],
+    *,
+    risk_view: str = "changes",
+) -> str:
     """Render safe aggregates, dual cash ranges and the manual loan boundary。"""
 
     portfolio = report["portfolio"]
@@ -770,16 +718,30 @@ def render_beta_monitor_markdown(report: Mapping[str, Any]) -> str:
         f"- Contingent credit：{_money(contingent.get('undrawn_amount_base'), currency)}"
         f"（{contingent.get('status', 'unknown')}；terms={contingent.get('terms_status', 'unknown')}；不算資本）",
         f"- Loan-funded range：{loan_range.get('status', 'manual_review_required')}（不自動給金額）",
-        f"- 槓桿名目／effective：{_pct(portfolio.get('leveraged_nominal_weight'))}／"
-        f"{_pct(portfolio.get('leveraged_effective_weight'))}",
-        f"- 科技 effective proxy：{_pct(portfolio.get('technology_effective_proxy_weight'))}",
     ]
     blockers = report.get("blockers") or []
-    warnings = report.get("warnings") or []
+    warnings = list(report.get("warnings") or [])
+    if risk_view != "full":
+        warnings = [
+            item
+            for item in warnings
+            if item not in set(report["risk_snapshot"].get("warnings") or [])
+        ]
     if blockers:
         lines.append(f"- Portfolio blockers：{'、'.join(str(item) for item in blockers)}")
     if warnings:
         lines.append(f"- Warnings：{'、'.join(str(item) for item in warnings)}")
+
+    lines += _risk_snapshot_lines(report, full=risk_view == "full")
+    requests = report.get("event_search_requests") or []
+    if requests:
+        lines += ["", "## 集中曝險事件搜尋請求（未經查證、不寫入 authority）"]
+        for request in requests:
+            lines.append(
+                f"- {request['issuer']}｜1日 {_signed_pct(request['return_1d'])}｜"
+                f"曝險 {_pct(request['exposure_weight'])}（直接 {_pct(request['direct_weight'])}／"
+                f"間接 {_pct(request['indirect_weight'])}）｜WebSearch：{request['search_query']}"
+            )
 
     paused = [
         item

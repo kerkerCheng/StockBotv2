@@ -23,7 +23,7 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
    - `.venv\Scripts\python.exe crons\harvest_leads.py`（X＋EDGAR；以 `since_id`／URL hash 去重）
    - `.venv\Scripts\python.exe -m engine_b.cli harvest-health`（列出最新仍未恢復的來源失敗）
    - `.venv\Scripts\python.exe engine_c\etl_yfinance.py`（35 檔 Engine C daily snapshot）
-   - `.venv\Scripts\python.exe scripts\daily_beta_snapshot.py --format markdown`（固定 ETF／權值股 technical refresh
+   - `.venv\Scripts\python.exe scripts\daily_beta_snapshot.py --format markdown --risk-view changes`（固定 ETF／權值股 technical refresh
      ＋ Engine D 雙 cash range beta monitor；並列 `sheet_conservative_range`／`household_cash_supported_range`，
      Engine C 保存 adjusted-close 1／5／20-session return；contingent credit 不算資本，loan-funded range 固定
      人工 review；只呈現、不推定 draw／choice／fill）
@@ -40,7 +40,13 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
    缺失／stale／FX 錯誤只歸零 household range，不得抹掉 Phase I Sheet range；四欄 capital output 都要保留。
    routine 的 Google Sheet credential scope 維持 `spreadsheets.readonly`，不得建立或修改 tab／cell。單一來源失敗不
    阻斷其他段落。X token
-   只從本機 `.env` 讀取，不得輸出或搬移 token。
+   只從本機 `.env` 讀取，不得輸出或搬移 token。Beta monitor 的 aggregate risk snapshot 會 append 到
+   ignored private JSONL；Daily 只顯示門檻跨越或狀態翻轉，沒有變化就保持靜默。ETF 槓桿 cap／5% 單筆
+   上限是 hard block；issuer concentration、alpha 總量與 drawn loan leverage 只 warning。`issuer_loads`
+   coverage 必須標 partial，不能宣稱完整 ETF look-through。若命令輸出 `event_search_requests`，以 packet
+   的 exact query 執行一次 WebSearch，最多列三個可能原因、對應 direct／indirect 曝險與「未經查證」
+   標籤；不註冊 lead、不進 pq1／pq2、不寫任何 Engine authority。使用者要深挖時才另走
+   `$lead-intake`／`$source-trace`。
 5. 先組出不會因研究失敗而消失的心跳 snapshot，再 best-effort 執行
    `.venv\Scripts\python.exe -m engine_b.cli drain`。每輪上限由 `config/daily_routine.json` 控制；
    使用者已 `go` 且有 dispatch receipt 的 Decision gap work order 優先，再以剩餘 budget 處理 leads；

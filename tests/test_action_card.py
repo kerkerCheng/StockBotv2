@@ -46,6 +46,8 @@ def test_action_card_leads_with_action_and_keeps_paper_live_separate(
         assert card["live"]["status"] == "DATA_NEEDED"
         assert card["live"]["supported_shares"] is None
         assert card["weakest_link"]["axis"]
+        assert card["disproof_condition"]
+        assert "Disproof condition" in render_markdown(card)
         assert card["next_action"]
     finally:
         store.close()

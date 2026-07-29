@@ -103,7 +103,7 @@ def complete_inputs(rows=None):
             "rows": rows,
             "fetched_at": "2026-07-21T11:00:00+00:00",
         },
-        "paper_exposure": {"nav": 100.0, "total_weight": 0.0, "factor_weights": {}},
+        "paper_exposure": {"nav": 100.0, "total_weight": 0.0},
     }
 
 

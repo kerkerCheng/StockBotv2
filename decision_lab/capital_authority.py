@@ -119,6 +119,7 @@ def _unavailable_view(
             "range_base": None,
             "blockers": ["exact_draw_instrument_tranche_choice_required"],
         },
+        "drawn_debt_base": None,
         "fx": {},
         "blockers": unique,
         "warnings": [],
@@ -293,6 +294,8 @@ def build_household_capital_view(
     facility_summaries: list[dict[str, Any]] = []
     credit_blockers: list[str] = []
     total_undrawn_base = 0.0
+    total_drawn_base = 0.0
+    drawn_debt_complete = True
     any_drawn = False
     for facility in by_type.get(_CREDIT_TYPE, []):
         facility_blockers: list[str] = []
@@ -310,6 +313,7 @@ def build_household_capital_view(
             facility_blockers.append("credit_balance_invalid")
         if drawn_amount is None:
             blockers.append("drawn_debt_status_unverified")
+            drawn_debt_complete = False
         elif drawn_amount > 0:
             any_drawn = True
         if automatic is not False:
@@ -343,13 +347,19 @@ def build_household_capital_view(
         if facility_fx is None:
             facility_blockers.append("credit_fx_unavailable")
         undrawn_base = None
+        drawn_base = None
         if limit_amount is not None and drawn_amount is not None and facility_fx is not None:
             undrawn_base = max(limit_amount - drawn_amount, 0.0) * facility_fx
             total_undrawn_base += undrawn_base
+            drawn_base = drawn_amount * facility_fx
+            total_drawn_base += drawn_base
+        elif drawn_amount is not None:
+            drawn_debt_complete = False
         facility_summaries.append(
             {
                 "currency": facility_currency or None,
                 "undrawn_amount_base": undrawn_base,
+                "drawn_amount_base": drawn_base,
                 "annual_rate_pct": rate,
                 "terms_status": "incomplete" if incomplete_fields else "complete",
                 "incomplete_fields": sorted(set(incomplete_fields)),
@@ -358,7 +368,7 @@ def build_household_capital_view(
         )
         credit_blockers.extend(facility_blockers)
     if any_drawn:
-        blockers.append("drawn_debt_requires_full_authority")
+        warnings.append("drawn_debt_present")
 
     household_blockers = sorted(set(blockers))
     floor_base = floor_amount * floor_rate if floor_amount is not None and floor_rate is not None else None
@@ -427,6 +437,7 @@ def build_household_capital_view(
             "range_base": None,
             "blockers": ["exact_draw_instrument_tranche_choice_required"],
         },
+        "drawn_debt_base": total_drawn_base if drawn_debt_complete else None,
         "fx": {key: fx_cache[key] for key in sorted(fx_cache)},
         "blockers": household_blockers,
         "warnings": sorted(set(warnings)),

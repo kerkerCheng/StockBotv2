@@ -255,7 +255,7 @@ def test_today_does_not_treat_beta_only_move_as_disproof(tmp_path: Path) -> None
         store.close()
 
 
-def test_today_reads_current_market_fx_and_derives_factor_hedge_from_sheet(
+def test_today_reads_current_market_fx_without_deriving_legacy_factor_hedge(
     tmp_path: Path,
 ) -> None:
     store = _store(tmp_path)
@@ -283,9 +283,9 @@ def test_today_reads_current_market_fx_and_derives_factor_hedge_from_sheet(
             provider=provider,
         )
 
-        assert brief["recommended_action"] == "HEDGE"
+        assert brief["recommended_action"] == "REVIEW"
         risk = brief["beta_portfolio_risk"][0]
-        assert risk["portfolio_action"] == "reduce_or_hedge:photonics"
+        assert risk["portfolio_action"] == "none"
         assert risk["security_return"] == pytest.approx(0.1)
         assert risk["fx_return"] == pytest.approx(0.1)
     finally:

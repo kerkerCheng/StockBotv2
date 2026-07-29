@@ -111,6 +111,14 @@ The content-addressed, immutable bundle of normalized values, source references,
 
 Later changes in Engine A/B/C do not rewrite an existing decision context; a new assessment freezes a new bundle. This preserves what the system knew at decision time without creating parallel current-state authorities.
 
+### Portfolio Risk Snapshot（投組風險快照）
+Engine D 由當下 Google Sheet holdings、Capital Authority、versioned beta／investment policy 衍生的 point-in-time telemetry。它分開保存 daily-reset ETF 的 nominal／effective 槓桿、已提款貸款槓桿、兩者合計、alpha 總量與已知 issuer 曝險；`library/private/decision_lab/portfolio_risk_snapshots.jsonl` 只作 append-only 變化偵測與 weekly 趨勢，不取代 Sheet、Capital Authority 或 frozen decision context。Daily 只顯示門檻跨越／狀態翻轉；Weekly 可顯示完整快照。
+*Avoid:* portfolio authority, holdings ledger, daily report archive
+
+### Issuer Look-through（發行人穿透）
+把直接持有的單一公司與 policy 已登記的 ETF `issuer_loads` 合併，分列 direct／indirect weight 的 ownership exposure。v0 coverage 刻意是 partial：只對 policy 有明確 load 的 issuer 做穿透，未取得完整成分的 ETF 必須列在 `unmodeled_lookthrough_instruments`；供應鏈依賴（例如 AAOI 使用台積電產能）屬 Engine A causal dependency，不得冒充 ownership look-through。
+*Avoid:* complete ETF holdings, supply-chain dependency exposure, factor tag
+
 ---
 
 ## Investment Process

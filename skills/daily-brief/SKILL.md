@@ -36,11 +36,11 @@ admission 必經核准 exact 對象、深挖由 priority 排序但入圖仍核�
 & '.venv\Scripts\python.exe' crons\harvest_leads.py
 & '.venv\Scripts\python.exe' -m engine_b.cli harvest-health
 & '.venv\Scripts\python.exe' engine_c\etl_yfinance.py
-& '.venv\Scripts\python.exe' scripts\daily_beta_snapshot.py --format markdown
+& '.venv\Scripts\python.exe' scripts\daily_beta_snapshot.py --format markdown --risk-view changes
 ```
 
 第一支抓 X＋RSS＋EDGAR watch 新項，以 `since_id`／URL-hash 去重；第二支刷新 Engine C financial snapshots。
-第三支對固定 ETF／權值股 universe 刷新 Engine C TechnicalObservation，再由 Engine D 產
+第四支對固定 ETF／權值股 universe 刷新 Engine C TechnicalObservation，再由 Engine D 產
 `HOLD / PAUSE CONTRIBUTION / CONTRIBUTE REVIEW`。它以同一組 risk caps 並列
 `sheet_conservative_range`（Sheet-only conservative）與 `household_cash_supported_range`，另把
 `contingent_credit_available` 與 `loan_funded_supported_range=manual_review_required` 分開顯示。Portfolio cash
@@ -56,6 +56,12 @@ scheduled task 一律使用 repo `.venv`，不要依賴父 shell 是否剛好 ac
 Engine C 同一筆 observation 保存 adjusted-close 的 1／5／20-session return；Engine D 才負責把
 return、RSI、252-session drawdown、signal tier、cooldown 與 capital constraints 組成 Mobile-friendly
 燈號。燈號必須配 `可評估／冷卻／觀察／資料不足` 文字，且不構成 live permission。
+Portfolio risk 另以 ignored append-only JSONL 保存 aggregate snapshot：Daily 只顯示門檻跨越／狀態翻轉，
+Weekly 才用 `--risk-view full --no-record-risk` 顯示完整快照。硬擋只含 ETF nominal／effective 槓桿 cap
+與 investment policy 的 5% 單筆上限；issuer concentration、alpha 總量與 drawn loan leverage 只警告。
+`issuer_loads` 是已知、partial ownership look-through，不是完整 ETF 成分，也不含 Engine A 上游依賴。
+若輸出 `event_search_requests`，只對該 packet 做一次 WebSearch，列可能原因、曝險與「未經查證」；不得
+建立 lead／pq1／pq2、不得寫 Engine A／C／D authority，深入研究必須另走 lead-intake。
 
 ### Step 2 — Triage 新 pending leads（依 signal-triage 判準）
 

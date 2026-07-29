@@ -21,7 +21,6 @@ _REQUIRED_KEYS = {
     "conviction_coefficients",
     "analyst_coverage_threshold",
     "analyst_coverage_discount_levels",
-    "factor_exposure_caps",
     "minimum_holding_days",
 }
 
@@ -184,15 +183,6 @@ def validate_policy(policy: Mapping[str, Any]) -> dict[str, Any]:
     if discount > 4:
         raise PolicyError("analyst_coverage_discount_levels must be <= 4")
 
-    caps = policy["factor_exposure_caps"]
-    if not isinstance(caps, Mapping) or not caps:
-        raise PolicyError("factor_exposure_caps must be a non-empty object")
-    normalized_caps: dict[str, float] = {}
-    for factor, cap in caps.items():
-        if not isinstance(factor, str) or not factor.strip():
-            raise PolicyError("factor exposure names must be non-empty strings")
-        normalized_caps[factor] = _ratio(cap, f"factor_exposure_caps.{factor}")
-
     normalized = {
         "policy_version": version,
         "single_position_nav_cap": _ratio(
@@ -202,7 +192,6 @@ def validate_policy(policy: Mapping[str, Any]) -> dict[str, Any]:
         "conviction_coefficients": normalized_coefficients,
         "analyst_coverage_threshold": threshold,
         "analyst_coverage_discount_levels": discount,
-        "factor_exposure_caps": normalized_caps,
         "minimum_holding_days": minimum_days,
     }
     # Formal-only historical callers remain compatible; repository policy opts in
@@ -285,29 +274,6 @@ def calculate_position_limit(
         "high_risk_budget_limit": budget_limit,
         "maximum_position": maximum,
         "coverage_view": coverage,
-    }
-
-
-def check_factor_exposure(
-    factor: str,
-    *,
-    current_exposure: float,
-    proposed_addition: float,
-    policy: Mapping[str, Any] | None = None,
-) -> dict[str, Any]:
-    current = validate_policy(policy) if policy is not None else load_policy()
-    if factor not in current["factor_exposure_caps"]:
-        raise PolicyError(f"unknown factor exposure: {factor}")
-    existing = _ratio(current_exposure, "current_exposure", allow_zero=True)
-    addition = _ratio(proposed_addition, "proposed_addition", allow_zero=True)
-    projected = existing + addition
-    cap = current["factor_exposure_caps"][factor]
-    return {
-        "policy_version": current["policy_version"],
-        "factor": factor,
-        "cap": cap,
-        "projected_exposure": projected,
-        "within_cap": projected <= cap,
     }
 
 

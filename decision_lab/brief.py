@@ -7,8 +7,6 @@ from pathlib import Path
 from typing import Any, Mapping, Sequence
 
 from identity.registry import IdentityRegistry, get_registry
-from thesis.investment_policy import load_policy
-
 from .action_card import assert_safe_payload, build_action_card, markdown_text
 from .store import DecisionStore
 from .workflow_ports import WorkflowDataProvider
@@ -88,6 +86,7 @@ def _decision_item(
         "evidence_delta": evidence_delta,
         "blockers": blockers,
         "next_review_at": lifecycle.get("review_due_at"),
+        "disproof_condition": card.get("disproof_condition") or "",
         "user_response_needed": (
             "請修復 current authority blocker 並執行 reassess。"
             if current_authority.get("blockers")
@@ -214,52 +213,6 @@ def _current_authority_context(
     )
 
 
-def _portfolio_contexts(
-    holdings: Mapping[str, Any] | None,
-    summaries: Sequence[Mapping[str, Any]],
-    *,
-    registry: IdentityRegistry,
-) -> dict[str, dict[str, Any]]:
-    if not holdings or holdings.get("status") not in {
-        "available",
-        "confirmed",
-        "confirmed_empty",
-    }:
-        return {}
-    nav = holdings.get("nav_base")
-    if isinstance(nav, bool) or not isinstance(nav, (int, float)) or nav <= 0:
-        return {}
-    factor_values: dict[str, float] = {}
-    for row in holdings.get("rows") or []:
-        if not isinstance(row, Mapping):
-            continue
-        value = row.get("market_value_base")
-        if isinstance(value, bool) or not isinstance(value, (int, float)) or value < 0:
-            continue
-        company_id = row.get("company_id")
-        if not company_id and isinstance(row.get("ticker"), str):
-            company_id = registry.company_id_for_ticker(str(row["ticker"]))
-        for factor in registry.factor_tags(str(company_id or "")):
-            factor_values[factor] = factor_values.get(factor, 0.0) + float(value)
-    caps = load_policy()["factor_exposure_caps"]
-    over = {
-        factor: value / float(nav)
-        for factor, value in factor_values.items()
-        if factor in caps and value / float(nav) > float(caps[factor])
-    }
-    result: dict[str, dict[str, Any]] = {}
-    for summary in summaries:
-        company_id = str(summary.get("company_id") or "")
-        breached = sorted(set(registry.factor_tags(company_id)) & set(over))
-        if breached:
-            result[str(summary["cohort_id"])] = {
-                "status": "over_cap",
-                "factor": breached[0],
-                "reason": f"目前 {breached[0]} factor exposure 超過 versioned policy 上限。",
-            }
-    return result
-
-
 def _pending_item(summary: Mapping[str, Any]) -> dict[str, Any]:
     return {
         "cohort_id": summary["cohort_id"],
@@ -272,6 +225,7 @@ def _pending_item(summary: Mapping[str, Any]) -> dict[str, Any]:
         "supported_sizing_range": [0.0, 0.0],
         "blockers": ["decision_missing"],
         "next_review_at": summary.get("review_due_at"),
+        "disproof_condition": "",
         "user_response_needed": "請執行 reassess 或補齊 research work order。",
     }
 
@@ -400,6 +354,7 @@ def _sheet_only_items(
                 "supported_sizing_range": [0.0, 0.0],
                 "blockers": blockers,
                 "next_review_at": None,
+                "disproof_condition": "",
                 "user_response_needed": request,
             }
         )
@@ -440,11 +395,6 @@ def build_today_brief(
             )
             current_authorities.setdefault(str(summary["cohort_id"]), authority)
             changes.setdefault(str(summary["cohort_id"]), derived_change)
-    derived_portfolios = _portfolio_contexts(
-        current_holdings, summaries, registry=registry
-    )
-    for cohort_id, context in derived_portfolios.items():
-        portfolios.setdefault(cohort_id, context)
     items: list[dict[str, Any]] = []
     cohort_company_ids: set[str] = set()
     for summary in summaries:
@@ -582,6 +532,9 @@ def render_today_markdown(brief: Mapping[str, Any]) -> str:
             resp = markdown_text(item.get("user_response_needed") or "")
             if resp:
                 lines.append(f"      → {resp}")
+            disproof = markdown_text(item.get("disproof_condition") or "")
+            if disproof:
+                lines.append(f"      → Disproof：{disproof}")
     lines += [
         "",
         "## 需要你回答或回報",

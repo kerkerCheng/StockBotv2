@@ -989,7 +989,6 @@ class DecisionStore:
         self,
         *,
         paper_nav: float,
-        factor_resolver: Callable[[str], tuple[str, ...]],
     ) -> dict[str, Any]:
         rows = [
             dict(row)
@@ -998,16 +997,11 @@ class DecisionStore:
             )
         ]
         company_weights = {str(row["company_id"]): float(row["weight"]) for row in rows}
-        factor_weights: dict[str, float] = {}
-        for company_id, weight in company_weights.items():
-            for factor in factor_resolver(company_id):
-                factor_weights[factor] = factor_weights.get(factor, 0.0) + weight
         return {
             "status": "available",
             "nav": paper_nav,
             "total_weight": sum(company_weights.values()),
             "company_weights": company_weights,
-            "factor_weights": factor_weights,
             "blockers": [],
         }
 
@@ -1015,16 +1009,12 @@ class DecisionStore:
         self,
         *,
         paper_nav: float,
-        factor_resolver: Callable[[str], tuple[str, ...]],
     ) -> dict[str, Any]:
         """公開唯讀 wrapper；paper projection 仍是唯一模擬帳本 authority。"""
 
         if not math.isfinite(paper_nav) or paper_nav <= 0:
             raise ValueError("paper_nav must be positive and finite")
-        return self._paper_exposure(
-            paper_nav=paper_nav,
-            factor_resolver=factor_resolver,
-        )
+        return self._paper_exposure(paper_nav=paper_nav)
 
     def _latest_cohort_time(self, cohort_id: str) -> str | None:
         row = self._conn.execute(
@@ -1084,7 +1074,6 @@ class DecisionStore:
         request_payload: Mapping[str, Any],
         paper_nav: float,
         company_id: str,
-        factor_resolver: Callable[[str], tuple[str, ...]],
         calculator: Callable[[Mapping[str, Any]], ProbeSizingResult],
         failure_at: str | None = None,
     ) -> DecisionExecutionResult:
@@ -1146,10 +1135,7 @@ class DecisionStore:
                     str(event["paper_event_id"]) if event is not None else None,
                 )
 
-            exposure = self._paper_exposure(
-                paper_nav=paper_nav,
-                factor_resolver=factor_resolver,
-            )
+            exposure = self._paper_exposure(paper_nav=paper_nav)
             if failure_at == "after_capacity":
                 raise RuntimeError("injected failure after capacity")
             sizing = calculator(exposure)

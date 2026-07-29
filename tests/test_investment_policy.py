@@ -8,7 +8,6 @@ import pytest
 from thesis.investment_policy import (
     PolicyError,
     calculate_position_limit,
-    check_factor_exposure,
     holding_action,
     load_policy,
     validate_policy,
@@ -23,7 +22,6 @@ def _policy(**overrides):
         "conviction_coefficients": {"3": 0.08, "4": 0.10, "5": 0.15},
         "analyst_coverage_threshold": 8,
         "analyst_coverage_discount_levels": 1,
-        "factor_exposure_caps": {"semiconductor": 0.25},
         "minimum_holding_days": 90,
     }
     policy.update(overrides)
@@ -90,7 +88,6 @@ def test_missing_coverage_is_unknown_and_not_persisted() -> None:
         {"single_position_nav_cap": 1.1},
         {"analyst_coverage_threshold": "8"},
         {"conviction_coefficients": {"3": 0.08, "4": 0.10}},
-        {"factor_exposure_caps": {"semiconductor": -0.1}},
     ],
 )
 def test_invalid_policy_fails_closed(tmp_path, override) -> None:
@@ -122,17 +119,11 @@ def test_missing_policy_key_fails_closed(tmp_path) -> None:
         load_policy(path)
 
 
-def test_factor_cap_and_exit_override_are_machine_checked() -> None:
-    exposure = check_factor_exposure(
-        "semiconductor",
-        current_exposure=0.20,
-        proposed_addition=0.06,
-        policy=_policy(),
-    )
+def test_exit_override_is_machine_checked_without_legacy_factor_caps() -> None:
     exit_action = holding_action(days_held=10, exit_triggered=True, policy=_policy())
 
-    assert exposure["within_cap"] is False
     assert exit_action["action"] == "review_exit_now"
+    assert "factor_exposure_caps" not in validate_policy(_policy())
 
 
 def test_repository_policy_has_versioned_probe_lane_defaults() -> None:
