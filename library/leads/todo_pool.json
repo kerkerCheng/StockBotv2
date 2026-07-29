@@ -499,6 +499,10 @@
     },
     {
       "added_at": "2026-07-28T01:10:21.849151+00:00",
+      "dispatch_baseline_decision_id": "pd_ce5c1b9396dadafb9b238be8b6f44dcb",
+      "dispatch_ref": "wo_b82c8b5cbb4a0b3480036f93a72bdade",
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-07-29T00:59:49.245672+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 41,
       "reason": null,
@@ -511,6 +515,7 @@
     },
     {
       "added_at": "2026-07-28T01:10:21.849173+00:00",
+      "deferred_at": "2026-07-29T00:59:49.378748+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 42,
       "reason": null,
@@ -525,13 +530,26 @@
       "added_at": "2026-07-28T22:45:53.987413+00:00",
       "hint": "核准 exact Research Action 與 digest 後 apply；不自動入圖",
       "n": 43,
-      "reason": null,
+      "reason": "使用者明確核准 AXT／Casela 2027 InP Research Action",
+      "receipt": "action:ra_a09b6e59fa7334b37e9a8412821da29f;commit:acafff1250b4348ce223a541c5aa5df4616f0d37",
       "ref_id": "ra_a09b6e59fa7334b37e9a8412821da29f",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-07-29T01:01:15.558958+00:00",
       "source": "research_action",
       "title": "AXT／Casela 2027 InP 長約待核准入圖",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-07-29T01:01:43.676817+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 44,
+      "reason": null,
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:axt",
+      "type": "decision_review"
     }
   ],
   "log": [
@@ -810,8 +828,35 @@
       "ref_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
       "type": "decision_review",
       "verb": "go"
+    },
+    {
+      "at": "2026-07-29T00:59:49.245672+00:00",
+      "n": 41,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_b82c8b5cbb4a0b3480036f93a72bdade",
+      "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-07-29T00:59:49.378748+00:00",
+      "n": 42,
+      "reason": "使用者明確 pending；保留 Sivers review_required 與現有 market/work-order blocker",
+      "receipt": null,
+      "ref_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
+      "type": "decision_review",
+      "verb": "pending"
+    },
+    {
+      "at": "2026-07-29T01:01:15.558958+00:00",
+      "n": 43,
+      "reason": "使用者明確核准 AXT／Casela 2027 InP Research Action",
+      "receipt": "action:ra_a09b6e59fa7334b37e9a8412821da29f;commit:acafff1250b4348ce223a541c5aa5df4616f0d37",
+      "ref_id": "ra_a09b6e59fa7334b37e9a8412821da29f",
+      "type": "ra_admission",
+      "verb": "go"
     }
   ],
-  "next_n": 44,
+  "next_n": 45,
   "schema_version": "1"
 }

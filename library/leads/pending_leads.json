@@ -1897,12 +1897,13 @@
       "published_at": "2026-06-17",
       "refs": {
         "action_digest": "b407220e00aa386b96527b9a971a51756646fbb68214ee6e9d87fc9ac1348137",
+        "focus_company_id": "co:axt",
         "research_action_id": "ra_a09b6e59fa7334b37e9a8412821da29f",
         "research_run": "daily_2026-07-29",
         "trace_status": "original_obtained"
       },
       "source": "edgar:AXTI",
-      "status": "action_prepared",
+      "status": "applied",
       "title": "AXTI 8-K filed 2026-06-17",
       "triage": {
         "decided_at": "2026-07-25T03:52:34.713741+00:00",
