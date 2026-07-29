@@ -746,3 +746,22 @@ core 低於 band、verified cash 可用、stacked leverage 未超標、重疊未
 3. 使用者提出實際提款時，再以當時利率、exact instrument／tranche 比較退休淨終值；核准後 cash／debt 原子更新。
 4. 私人 `Capital Authority` 的還款條款日後另以明確 Sheet write 同步；本次只更新 tracked policy，不擴張 readonly runtime。
 5. ETF 完整 look-through、explicit-fill-only Sheet writer 與 server promotion只有在重複摩擦出現時才另立切片。
+
+## 2026-07-29 延伸：Daily Mobile 首屏與完成通知
+
+使用者以 Codex Mobile 實機檢視後，確認寬表格會讓燈號、ticker 與多欄指標擁擠換行。後續若正式修改
+Daily Brief，採以下 presentation hierarchy；這是 UI／通知 brainstorm，不改 technical policy、capital range
+或人工 live gate：
+
+1. 首屏先列主力大盤 ETF／權值：`QQQ`、`TQQQ`、`LON:VWRA`、`SOXX`、`00631L.TW`、
+   `2330.TW`、`00981A.TW`；`0050.TW`／`006208.TW` 可置於同類次順位。本輪語音輸入出現 `VERA`，
+   暫按現有 universe 的 `LON:VWRA` 理解，正式改 universe 前需再核對。
+2. Mobile 不用多欄 table；每檔只顯示 ticker＋文字燈號、一行必要指標與一句原因。燈號必須配文字，
+   `可評估` 不得縮寫成 `買進`，也不推定 choice／order／fill。
+3. `GOOGL`、`TSLA`、`NVDA`、`MU` 等個股繼續追蹤，但放在次區塊，以一兩句 exception-first 摘要或
+   可摺疊內容呈現；只有狀態改變或形成非零 review range 才提升到首屏。
+4. 1／5／20 日漲跌可作為 App-like context，但必須由正式 TechnicalObservation／可重現行情計算提供；
+   欄位未實作前顯示 unavailable，不從模型補數字。
+5. 通知先觀察 Codex Inbox，不立即增加外部服務。若一段時間後仍無法可靠提醒手機，第一個 fallback
+   候選是 Discord webhook；token／URL 只放本機 `.env` 或 private authority，實作與 unattended send
+   必須另行核准。
