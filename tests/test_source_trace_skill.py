@@ -21,3 +21,10 @@ def test_access_helpers_do_not_create_independent_evidence() -> None:
     assert "代理輸出本身不是新的 origin" in text
     assert "搜尋摘要只供 discovery" in text
     assert "origin_linkage" in text
+
+
+def test_obtaining_original_tier_three_report_does_not_upgrade_evidence() -> None:
+    text = (ROOT / "skills" / "source-trace" / "SKILL.md").read_text(encoding="utf-8")
+
+    assert "tier 3 仍維持 tier 3" in text
+    assert "不因「找到原報告」升級" in text

@@ -105,7 +105,7 @@ cloud routine／手機不能假設可碰本機檔案或 localhost。
 
 | 最終可取得材料 | 處置 |
 |---|---|
-| 找到原始 tier 1–2 文件與逐字 quote | `original_obtained`：可進 extract；保存原文件 origin、URL、locator、quote |
+| 找到線索所聲稱的原始文件與逐字 quote | `original_obtained`：保存原文件 origin、URL、locator、quote；tier 1–2 可進 extract，tier 3 仍維持 tier 3，依 lead-intake 產低 confidence／needs_review RA 或 park，不因「找到原報告」升級 |
 | 目前真正取得的文件本身是 tier 1–2，但它提到另一個拿不到的事件 | `tier_1_2_honest_passthrough`：可產草稿，但只引用目前文件的逐字文字；明標「原事件未獨立取得」，不可算第二 origin |
 | tier 3 報導／研究，且聲稱的原文追不到 | `isolated_tier_3`：不產 extraction 草稿、不入圖；進「追源未果」backlog，保留 lead 與嘗試紀錄 |
 | tier 4 社群／論壇／截圖，且原文追不到 | `lead_only_tier_4`：只留線索，不產草稿、不呼叫 `load_extraction` |
