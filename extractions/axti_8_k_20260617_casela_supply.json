@@ -1,0 +1,169 @@
+{
+  "claims": [
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "AXT or Casela later discloses that the agreement was rescinded, terminated, or materially amended so that the 2027 committed InP supply relationship no longer applies.",
+      "id": "axti_8_k_20260617_casela_supply_cl1",
+      "source_ids": [
+        "axti_8_k_20260617_casela_supply_s1",
+        "axti_8_k_20260617_casela_supply_s2"
+      ],
+      "statement": "AXT subsidiary Tongmei and Nanjing Casela Technologies entered a binding long-term supply agreement for Tongmei to reserve capacity and raw-material allocation and supply a fixed aggregate quantity of InP wafer substrates to Casela throughout calendar 2027; this AXT filing is direct issuer disclosure naming Casela as a specific InP customer.",
+      "subject_id": "co:axt"
+    },
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "The full agreement or a later filing shows that the disclosed purchase amount, prepayment schedule, minimum-purchase threshold, or cancellation protection was materially reduced, waived, or terminated.",
+      "id": "axti_8_k_20260617_casela_supply_cl2",
+      "source_ids": [
+        "axti_8_k_20260617_casela_supply_s3",
+        "axti_8_k_20260617_casela_supply_s4"
+      ],
+      "statement": "Casela committed to RMB 173 million (approximately US$25.4 million) of InP substrate purchases for monthly delivery in 2027, with 50% due within 15 business days, the remainder due by 2026-12-31, and an 80% minimum-purchase threshold backed by a cancellation fee; the terms are dated demand evidence, not proof of sole-source status.",
+      "subject_id": "co:casela_technologies"
+    },
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "The full agreement omits or materially narrows the excess-demand priority language, or later disclosure says Tongmei cannot honor the priority because capacity is unavailable.",
+      "id": "axti_8_k_20260617_casela_supply_cl3",
+      "source_ids": [
+        "axti_8_k_20260617_casela_supply_s5",
+        "axti_8_k_20260617_casela_supply_s6"
+      ],
+      "statement": "Tongmei also agreed, subject to available capacity and comparable-customer terms, to prioritize Casela demand above the fixed 2027 commitment; this supports a contractual supply-priority claim but does not establish exclusivity, qualification status, or Casela's downstream customer map.",
+      "subject_id": "co:casela_technologies"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "co:casela_technologies",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "axti_8_k_20260617_casela_supply_s1",
+        "axti_8_k_20260617_casela_supply_s2",
+        "axti_8_k_20260617_casela_supply_s3"
+      ],
+      "src_id": "co:axt"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "mat:inp_substrate",
+      "id": "e2",
+      "relation": "depends_on",
+      "source_ids": [
+        "axti_8_k_20260617_casela_supply_s2",
+        "axti_8_k_20260617_casela_supply_s3",
+        "axti_8_k_20260617_casela_supply_s4"
+      ],
+      "src_id": "co:casela_technologies"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "AXT Inc",
+        "AXTI",
+        "Tongmei",
+        "Beijing Tongmei Xtal Technology"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:axt",
+      "name": "AXT",
+      "role": "material_base",
+      "source_ids": [
+        "axti_8_k_20260617_casela_supply_s1",
+        "axti_8_k_20260617_casela_supply_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "Nanjing Casela Technologies Corporation, Ltd.",
+        "Nanjing Casela Technologies Corporation Limited"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:casela_technologies",
+      "name": "Casela Technologies",
+      "role": null,
+      "source_ids": [
+        "axti_8_k_20260617_casela_supply_s1",
+        "axti_8_k_20260617_casela_supply_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "InP substrate",
+        "indium phosphide wafer substrate"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "mat:inp_substrate",
+      "name": "Indium Phosphide (InP) substrate",
+      "role": null,
+      "source_ids": [
+        "axti_8_k_20260617_casela_supply_s2",
+        "axti_8_k_20260617_casela_supply_s3"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "axti_8_k_20260617_casela_supply",
+    "evidence_tier": 1,
+    "origin_entity": "AXT",
+    "permission_basis": "SEC EDGAR public filing; store the canonical URL and only the research-relevant Item 1.01 excerpt.",
+    "published_at": "2026-06-17",
+    "publisher": "SEC EDGAR",
+    "retrieved_at": "2026-07-29",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "AXT Form 8-K — Tongmei and Casela 2027 InP substrate long-term supply agreement",
+    "url": "https://www.sec.gov/Archives/edgar/data/1051627/000143774926020978/axti20260615_8k.htm"
+  },
+  "sources": [
+    {
+      "id": "axti_8_k_20260617_casela_supply_s1",
+      "locator": "Item 1.01, first paragraph",
+      "quote": "On June 11, 2026, Beijing Tongmei Xtal Technology Co., Ltd. (“Tongmei”), the subsidiary of AXT, Inc., a Delaware corporation, entered into a Long-term Supply Agreement (the “Agreement”) with Nanjing Casela Technologies Corporation, Ltd. (“Casela”)."
+    },
+    {
+      "id": "axti_8_k_20260617_casela_supply_s2",
+      "locator": "Item 1.01, first paragraph",
+      "quote": "The Agreement establishes an arrangement under which Tongmei reserves production capacity and raw-material allocation for, and grants supply priority to, Casela in exchange for Casela’s binding commitment to purchase a fixed aggregate quantity of indium phosphide (“InP”) wafer substrates from Tongmei during the period from January 1, 2027 through December 31, 2027."
+    },
+    {
+      "id": "axti_8_k_20260617_casela_supply_s3",
+      "locator": "Item 1.01, second paragraph",
+      "quote": "During the year 2027, Casela is committed to purchase an agreed upon quantity of InP substrate wafers for a total price of RMB 173,000,000 (approximately US $25.4 million), to be delivered on a monthly schedule."
+    },
+    {
+      "id": "axti_8_k_20260617_casela_supply_s4",
+      "locator": "Item 1.01, second and third paragraphs",
+      "quote": "Casela is required to pay 50% of the total purchase price as a prepayment within 15 business days after entry into the Agreement, with the remaining 50% due on or before December 31, 2026. Casela is required to purchase at least 80% of the fixed aggregate quantity of InP wafer substrates and if purchases fall below 80%, Casela must pay a cancellation fee for the unpurchased quantity."
+    },
+    {
+      "id": "axti_8_k_20260617_casela_supply_s5",
+      "locator": "Item 1.01, fourth paragraph",
+      "quote": "To the extent Casela’s demand during the term exceeds the committed quantity, Tongmei has agreed, subject to available capacity and on terms no less favorable than those offered to similarly situated customers, to prioritize Casela’s excess demand."
+    },
+    {
+      "id": "axti_8_k_20260617_casela_supply_s6",
+      "locator": "Item 1.01, final paragraph",
+      "quote": "The foregoing description does not purport to be complete and is qualified in its entirety by reference to the full text of the Long-term Supply Agreement, an English translation of which will be filed as an exhibit to our quarterly report on Form 10-Q for the period ended June 30, 2026."
+    }
+  ]
+}
