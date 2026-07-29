@@ -371,6 +371,98 @@ def requeue_for_triage(
     return lead
 
 
+def trace_backlog(store: dict[str, Any]) -> list[dict[str, Any]]:
+    """列出 parked 的追源未果項目，避免規則書中的 backlog 變成黑洞。
+
+    舊資料若只有 ``parked_reason`` 含 trace，也會列為 ``unstructured``；這讓
+    routine 能顯示資料品質缺口，而不是因缺少新欄位就把歷史項目靜默漏掉。
+    ``trace_requires_user`` 只表示需要 access／付費／優先權等人工 authority，
+    不表示 claim 可信或可入圖。
+    """
+
+    rows: list[dict[str, Any]] = []
+    for lead in store["leads"].values():
+        if lead.get("status") != "parked":
+            continue
+        refs = lead.get("refs") or {}
+        trace_status = str(refs.get("trace_status") or "").strip()
+        parked_reason = str(refs.get("parked_reason") or "").strip()
+        if not trace_status and "trace" not in parked_reason.lower():
+            continue
+        if trace_status in {"original_obtained", "tier_1_2_honest_passthrough"}:
+            continue
+        requires_user = str(refs.get("trace_requires_user") or "").lower() in {
+            "1", "true", "yes",
+        }
+        full_title = " ".join(str(lead.get("title") or "").split())
+        short_title = full_title[:197] + "..." if len(full_title) > 200 else full_title
+        rows.append({
+            "lead_id": lead["lead_id"],
+            "title": short_title,
+            "url": lead.get("url") or "",
+            "trace_status": trace_status or "unstructured",
+            "next_trigger": refs.get("trace_next_trigger") or "unspecified",
+            "attempts_ref": refs.get("trace_attempts_ref"),
+            "requires_user": requires_user,
+            "lane": "pq2_manual_authority" if requires_user else "event_or_scheduled_pq1",
+        })
+    return sorted(rows, key=lambda row: (not row["requires_user"], row["lead_id"]))
+
+
+def requeue_trace(
+    store: dict[str, Any],
+    lead_id: str,
+    *,
+    trigger: str,
+    reason: str,
+    requeued_at: str | None = None,
+) -> dict[str, Any]:
+    """把 exact trace review 從 parked 重新排入 pq1，並保留舊 triage receipt。"""
+
+    cleaned_trigger = str(trigger or "").strip()
+    cleaned_reason = str(reason or "").strip()
+    if not cleaned_trigger or not cleaned_reason:
+        raise ValueError("trace requeue 必須附 trigger 與 reason")
+    lead = _require(store, lead_id)
+    if lead["status"] != "parked":
+        raise LeadStateError(f"trace requeue 只允許 parked；現況 {lead['status']}")
+    refs = lead.get("refs") or {}
+    if not refs.get("trace_status") and "trace" not in str(
+        refs.get("parked_reason") or ""
+    ).lower():
+        raise LeadStateError("lead 沒有 trace backlog receipt")
+
+    stamp = requeued_at or _now()
+    previous = lead.get("triage")
+    if previous:
+        history = lead.setdefault("triage_history", [])
+        if not isinstance(history, list):
+            raise ValueError("triage_history 必須是 list")
+        history.append({
+            "status": "parked",
+            "triage": dict(previous),
+            "superseded_at": stamp,
+            "superseded_reason": cleaned_reason,
+            "trace_trigger": cleaned_trigger,
+        })
+    previous_flags = dict((previous or {}).get("priority_flags") or {})
+    if cleaned_trigger in {"user_go", "user_requested", "access_granted"}:
+        previous_flags["user_requested"] = True
+    lead["status"] = "triaged_go"
+    lead["triage"] = {
+        "decision": "go",
+        "tier": int((previous or {}).get("tier") or 4),
+        "reason": cleaned_reason,
+        "decided_at": stamp,
+        "priority_flags": previous_flags,
+    }
+    lead.setdefault("refs", {}).update({
+        "trace_requeued_at": stamp,
+        "trace_requeue_trigger": cleaned_trigger,
+    })
+    return lead
+
+
 _PRIORITY_FLAG_KEYS = (
     "contradiction",
     "novelty",

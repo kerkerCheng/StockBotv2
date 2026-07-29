@@ -73,6 +73,10 @@ cloud routine／手機不能假設可碰本機檔案或 localhost。
 6. **依下表處置，留下完整嘗試紀錄。** 若失敗看起來來自 sandbox／proxy／本機網路權限，先將
    `failure_class` 記為 `access_blocked`，再以完全相同路徑在允許本機網路的權限下重跑一次；仍失敗時，
    至少再試一條官方替代路徑。`blocked` 不是 `no_result`、不支持也不反駁 claim，必須留在追源 backlog。
+7. **park 必須帶下一個 trigger：** 寫入 lead refs 的 `trace_status`、`trace_attempts_ref`、
+   `trace_next_trigger`、`trace_requires_user`，並由 Daily 的 `engine_b.cli trace-backlog` 持續可見。
+   `trace_requires_user=true` 只用於需要合法 access／付費／人工優先權的 exact 問題；一般新 metadata、
+   官方事件或 scheduled retry 仍留 pq1，不占 pq2。
 
 ## 分級處置（追不到不是同一種結果）
 
@@ -111,6 +115,16 @@ locator: "頁碼／段落／timestamp；追不到則 null"
 storage_permission: "repo_full | repo_excerpt | local_only | unknown"
 next_action: "extract | park_trace_backlog | lead_only | investigate_contradiction"
 ```
+
+### Backlog → pq1／pq2 路由
+
+- `trace_requires_user=false`：保留在 trace backlog；`trace_next_trigger` 命中後重新排入 pq1。
+- `trace_requires_user=true`：`todo sync` 建立 `source_trace_review`。使用者 `go` 只授權 bounded
+  source trace 並 dispatch 回 pq1；不代表接受 claim，也不授權付費或入圖。
+- pq1 取得可引用原文並產生 graph delta：prepare Research Action，另進 `ra_admission` pq2。
+- pq1 仍未取得原文：以 `trace:<trace_status>` terminal receipt 結束本次 review，保留下一個 trigger。
+- 需要購買新報告／訂閱：必須另提出 vendor、方案、exact 金額與 storage permission；不得由一般
+  `source_trace_review go` 推定消費核准。
 
 禁止只寫「Google 沒找到」。至少記錄試過的專用登記表、交叉方與 exact-phrase query；
 若環境無法連某路徑，寫 `blocked`，不要假裝已查完；完成權限重跑與官方替代路徑前，不得改寫成

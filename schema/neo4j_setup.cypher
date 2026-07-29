@@ -27,6 +27,28 @@ SET prewarm.storage_permission = 'local_only',
 WITH prewarm
 DETACH DELETE prewarm;
 
+// ── 1c. 預註冊最小權限 writer 會用到的 relationship-type tokens ────────
+// routine_writer 可建立白名單內的關係，但不能建立全新的 relationship
+// type token。此清單必須與 schema/vocab.json 的 relation 完全同步；sentinel
+// 關係刪除後 token 仍會留在資料庫，無須擴張 routine_writer 權限。
+MERGE (rel_source:SchemaTokenSentinel {id: '__relation_token_source__'})
+MERGE (rel_target:SchemaTokenSentinel {id: '__relation_token_target__'})
+MERGE (rel_source)-[:SUPPLIES_TO]->(rel_target)
+MERGE (rel_source)-[:IS_COMPONENT_OF]->(rel_target)
+MERGE (rel_source)-[:DEVELOPS]->(rel_target)
+MERGE (rel_source)-[:DEPLOYS]->(rel_target)
+MERGE (rel_source)-[:OFFERED_UNDER]->(rel_target)
+MERGE (rel_source)-[:COMPETES_WITH]->(rel_target)
+MERGE (rel_source)-[:ENABLES]->(rel_target)
+MERGE (rel_source)-[:DEPENDS_ON]->(rel_target)
+MERGE (rel_source)-[:INVESTS_IN]->(rel_target)
+MERGE (rel_source)-[:LICENSES_TO]->(rel_target)
+MERGE (rel_source)-[:ABOUT]->(rel_target)
+MERGE (rel_source)-[:ACQUIRED]->(rel_target)
+MERGE (rel_source)-[:PARTNERSHIP_WITH]->(rel_target)
+WITH rel_source, rel_target
+DETACH DELETE rel_source, rel_target;
+
 // ── 2. 查詢用索引 ─────────────────────────────────────────
 CREATE INDEX entity_type IF NOT EXISTS
 FOR (n:Entity) ON (n.type);

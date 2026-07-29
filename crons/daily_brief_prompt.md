@@ -28,6 +28,7 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
      Engine C 保存 adjusted-close 1／5／20-session return；contingent credit 不算資本，loan-funded range 固定
      人工 review；只呈現、不推定 draw／choice／fill）
    - 對今日新增 pending leads 套 `skills/signal-triage/SKILL.md`，用本機 CLI 寫回 triage
+   - `.venv\Scripts\python.exe -m engine_b.cli trace-backlog`（顯示 parked 追源未果及下一 trigger；不把一般 backlog 全塞 pq2）
    - `.venv\Scripts\python.exe -m decision_lab today --format markdown`
    - `.venv\Scripts\python.exe -m engine_b.todo sync`
    - `.venv\Scripts\python.exe -m engine_b.todo list`
@@ -53,6 +54,8 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
    tracked tickers 由非 retired lifecycle 與 non-terminal Decision cohorts 自動導出。對最高 priority leads 逐則
    source-trace＋extract，checkpoint `researching` → `action_prepared`。有可核准 graph delta 才 prepare；
    追源未果、原主張被否定或僅屬 Engine C 時變 observation 時 park 並記 outcome，不製造空 RA。
+   追源未果的 park 必須帶 `trace_status`／`trace_attempts_ref`／`trace_next_trigger`／`trace_requires_user`；
+   一般 event／scheduled retry 留 pq1，只有需要合法 access／付費／人工優先權時才進 `source_trace_review` pq2。
    只有 prepared RA 才進 pq2；triage PASS 與 pq1 自動研究都不代表入圖核准。
    Decision work order 必須 checkpoint researching；若純唯讀研究即可補齊，產 assessment 後才跑
    research-intent reassess，並以新 decision receipt 結案。若需入圖、Engine C manual observation、thesis
@@ -70,6 +73,9 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
    `.venv\Scripts\python.exe -m engine_b.todo complete-ra <todo_n> --digest <完整 action_digest>`；此命令驗證
    durable publication、建立或沿用 Decision cohort 並留下組合 receipt。一般 `todo batch` 不得用 bare go
    先清項目。
+   `source_trace_review go` 同樣執行 `.venv\Scripts\python.exe -m engine_b.todo dispatch <編號>`；只將
+   exact lead 排回 pq1，不接受 claim、不提高 evidence tier，也不授權購買報告。pq1 prepare 出 RA 後，
+   graph admission 仍是另一個 `ra_admission` pq2。
 8. 收尾執行 `.venv\Scripts\python.exe scripts\publish_daily_state.py`。這支固定 publisher 只准提交
    `library/leads/pending_leads.json` 與 `library/leads/todo_pool.json`；若 guard 拒絕，保留檔案並在 brief
    回報，不要改用廣泛 `git add/commit/push` 繞過。

@@ -6,6 +6,7 @@ import json
 import pytest
 
 from engine_b import todo
+from engine_b import leads
 from engine_b.batch import parse_batch_reply
 
 
@@ -148,6 +149,113 @@ def test_batch_cannot_bare_go_a_decision_review() -> None:
 
     assert outcome == {"applied": [], "failed": [1]}
     assert todo.active_items(pool)[0]["n"] == 1
+
+
+def test_source_trace_review_go_dispatches_back_to_pq1(tmp_path) -> None:
+    leads_path = tmp_path / "leads.json"
+    store = leads.empty_store()
+    lead_id, _ = leads.register(
+        store, source="x:test", url="https://x.com/test/status/paywall"
+    )
+    leads.triage(store, lead_id, go=True, tier=4, reason="追原報告")
+    leads.advance(store, lead_id, "parked", ref={
+        "trace_status": "isolated_tier_3",
+        "trace_requires_user": "true",
+    })
+    leads.save(store, leads_path)
+    pool = _pool_with({
+        "type": "source_trace_review",
+        "ref_id": lead_id,
+        "title": "追原報告",
+    })
+
+    with pytest.raises(todo.TodoError, match="不得 bare go"):
+        todo.resolve(pool, 1, "go", receipt="action:ra_fake")
+
+    result = todo.dispatch_source_trace_review(
+        pool,
+        1,
+        leads_path=leads_path,
+        at="2026-07-29T00:00:00+00:00",
+    )
+
+    assert result["item"]["dispatch_status"] == "queued"
+    assert todo.actionable_items(pool) == []
+    assert leads.load(leads_path)["leads"][lead_id]["status"] == "triaged_go"
+
+
+def test_source_trace_review_resolves_only_after_terminal_trace_receipt(tmp_path) -> None:
+    leads_path = tmp_path / "leads.json"
+    store = leads.empty_store()
+    lead_id, _ = leads.register(
+        store, source="x:test", url="https://x.com/test/status/paywall"
+    )
+    leads.triage(store, lead_id, go=True, tier=4, reason="追原報告")
+    leads.advance(store, lead_id, "parked", ref={
+        "trace_status": "isolated_tier_3",
+        "trace_requires_user": "true",
+    })
+    leads.save(store, leads_path)
+    pool = _pool_with({
+        "type": "source_trace_review",
+        "ref_id": lead_id,
+        "title": "追原報告",
+    })
+    todo.dispatch_source_trace_review(pool, 1, leads_path=leads_path)
+
+    resumed = leads.load(leads_path)
+    leads.advance(resumed, lead_id, "parked", ref={
+        "trace_status": "isolated_tier_3",
+    })
+    leads.save(resumed, leads_path)
+    result = todo.checkpoint_source_trace_review(
+        pool,
+        1,
+        leads_path=leads_path,
+        to_status="parked",
+        receipt="trace:isolated_tier_3",
+        at="2026-07-29T01:00:00+00:00",
+    )
+
+    assert result["item"]["resolved_at"]
+    assert result["item"]["receipt"] == "trace:isolated_tier_3"
+
+
+def test_collect_source_trace_review_only_when_human_authority_required(
+    monkeypatch,
+) -> None:
+    monkeypatch.setattr(leads, "load", lambda: {
+        "leads": {
+            "lead_manual": {
+                "lead_id": "lead_manual",
+                "status": "parked",
+                "title": "IBK report",
+                "url": "https://example.com/ibk",
+                "refs": {
+                    "trace_status": "isolated_tier_3",
+                    "trace_requires_user": "true",
+                },
+            },
+            "lead_event": {
+                "lead_id": "lead_event",
+                "status": "parked",
+                "title": "FCC rule",
+                "url": "https://example.com/fcc",
+                "refs": {
+                    "trace_status": "isolated_tier_3",
+                    "trace_next_trigger": "official_rule_published",
+                },
+            },
+        }
+    })
+
+    assert todo.collect_from_source_trace_reviews() == [{
+        "type": "source_trace_review",
+        "ref_id": "lead_manual",
+        "title": "追原報告／來源 access — IBK report",
+        "hint": "go 只排入 bounded pq1；不接受 claim、不入圖。若需付費，另核准 exact 金額／方案。",
+        "source": "source_trace",
+    }]
 
 
 def test_ra_admission_cannot_resolve_without_verified_completion() -> None:

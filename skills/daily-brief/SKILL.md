@@ -122,6 +122,15 @@ pq1 是唯一昂貴階段（web search + 讀文件 + 抽 claim）——priority 
 若追源未果、原主張被一手資料否定，或結果依 L4 只屬 Engine C 時變 observation，就 park 並記 outcome，
 不為了讓每個 PASS 都進 pq2 而製造空 Research Action。drain 最遠到 prepared，**不入圖**。
 
+每輪 drain 後另列不會被一般 queue 自動撿回的 trace backlog：
+
+```powershell
+& '.venv\Scripts\python.exe' -m engine_b.cli trace-backlog
+```
+
+一般 event／scheduled trigger 仍回 pq1；只有 `trace_requires_user=true` 才由 `todo sync` 建立
+`source_trace_review`。其 `go` 只 dispatch exact lead 回 pq1，不接受 claim、不提高 tier，也不授權付費。
+
 ### Step 4 — 今日決策佇列與到期 thesis
 
 ```powershell
@@ -203,15 +212,19 @@ dispatch 或同時寫同一 working tree。
 pq1／apply／reassess；沒有完成 receipt 的 `go` 會失敗並留在池中。必須先完成或 checkpoint 對應動作，
 再由 type-specific completion command（或附該類型要求的 receipt）結案，不能先 resolve 再假裝已執行：
 
-| 動詞 | legacy lead | 已 prepared 的 RA | Decision review | 到期 thesis |
-|------|-------------|-------------------|-----------------|-------------|
-| `go` | raw lead 不再進 pq2 | **apply 入圖**（見下）＋入圖後自動建 Shadow | `todo dispatch` 排入 gap pq1；不先 resolve、不 bare reassess | 引導複查；authority mutation 仍另核准 |
-| `drop` | raw lead 不再進 pq2 | 略過該 RA | 略過本次補缺口 | 標記已看、不複查 |
-| `pending` | 維持不動、留到之後 brief | 同左 | 同左 | 同左 |
+| 動詞 | legacy lead | Source trace review | 已 prepared 的 RA | Decision review | 到期 thesis |
+|------|-------------|---------------------|-------------------|-----------------|-------------|
+| `go` | raw lead 不再進 pq2 | `todo dispatch` 回 pq1；不接受 claim、不授權付費 | **apply 入圖**（見下）＋入圖後自動建 Shadow | `todo dispatch` 排入 gap pq1；不先 resolve、不 bare reassess | 引導複查；authority mutation 仍另核准 |
+| `drop` | raw lead 不再進 pq2 | 略過本次人工追源 | 略過該 RA | 略過本次補缺口 | 標記已看、不複查 |
+| `pending` | 維持不動、留到之後 brief | 同左 | 同左 | 同左 | 同左 |
 
 `decision_review go` 的原 pq2 項目在研究期間維持 active，但標成 queued／researching／awaiting_approval，
 brief 不得再次請使用者 go。只有 `parked` outcome receipt，或補缺口後產生的**新 decision receipt**，才能
 結案；舊 baseline decision 不算完成 receipt。
+
+`source_trace_review go` 也使用 `todo dispatch <n>`：原 pq2 在 queued／researching 期間保持 active 但不重複
+詢問。只有 prepared action receipt，或誠實的 `trace:<trace_status>` parked receipt 才能結案；前者若需入圖，
+仍另建立 `ra_admission` pq2。新報告訂閱／購買需 exact 價格的獨立人工核准。
 
 **go 一個 prepared RA ＝入圖**：走既有 `apply_research_action`（本機或 MCP native approval，一次確認）
 → `advance <lead> applied --ref research_action_id=<ra_id> --ref action_digest=<digest> --ref focus_company_id=co:x`

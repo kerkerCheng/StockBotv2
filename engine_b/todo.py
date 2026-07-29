@@ -33,6 +33,7 @@ ITEM_TYPES: dict[str, str] = {
     "lead_research": "（legacy）已移回自動 pq1，不再建立新項目",
     "ra_admission": "核准入圖（apply_research_action）",
     "decision_review": "核准補缺口研究；取得新 receipt 後 reassess",
+    "source_trace_review": "核准人工 authority 後做 bounded 追源；go 只 dispatch 回 pq1",
     "thesis_lifecycle": "本機複查 thesis 並手動更新 lifecycle.json",
     "sheet_only_holding": "評估這筆 Sheet 持股（evaluate-signal 或 onboard）",
     "manual": "依 hint 執行",
@@ -188,6 +189,17 @@ def _validate_go_receipt(item: Mapping[str, Any], receipt: str) -> None:
             raise TodoError("decision_review receipt 必須等於 terminal pq1 checkpoint receipt")
         if item.get("dispatch_status") == "completed" and not receipt.startswith("decision:pd_"):
             raise TodoError("completed decision_review 必須附新 decision receipt")
+        return
+
+    if item_type == "source_trace_review":
+        if item.get("dispatch_status") not in {"completed", "parked"}:
+            raise TodoError("source_trace_review 不得 bare go；請先 dispatch 並完成 pq1 checkpoint")
+        if not receipt.strip() or receipt != item.get("dispatch_receipt"):
+            raise TodoError("source_trace_review receipt 必須等於 terminal pq1 checkpoint receipt")
+        if item.get("dispatch_status") == "completed" and not receipt.startswith("action:ra_"):
+            raise TodoError("completed source_trace_review 必須附 prepared action receipt")
+        if item.get("dispatch_status") == "parked" and not receipt.startswith("trace:"):
+            raise TodoError("parked source_trace_review 必須附 trace outcome receipt")
         return
 
     if not receipt.strip():
@@ -379,6 +391,109 @@ def checkpoint_decision_review(
             at=stamp,
         )
     return {"item": item, "work_order": work_order}
+
+
+def dispatch_source_trace_review(
+    pool: dict[str, Any],
+    n: int,
+    *,
+    leads_path: Path | str,
+    at: str | None = None,
+) -> dict[str, Any]:
+    """將需要人工 authority 的 exact trace item 重新排入 pq1，不先 resolve。"""
+
+    from engine_b import leads
+
+    item = get(pool, n)
+    if item["type"] != "source_trace_review":
+        raise TodoError(f"[{n}] 不是 source_trace_review")
+    store = leads.load(leads_path)
+    stamp = at or _now()
+    lead = leads.requeue_trace(
+        store,
+        str(item["ref_id"]),
+        trigger="user_go",
+        reason="使用者核准 exact source_trace_review；排入 bounded pq1，尚未接受 claim 或核准入圖",
+        requeued_at=stamp,
+    )
+    leads.save(store, leads_path)
+    item["dispatch_status"] = "queued"
+    item["dispatch_ref"] = f"lead:{lead['lead_id']}"
+    item["dispatched_at"] = stamp
+    item.pop("deferred_at", None)
+    pool["log"].append({
+        "at": stamp,
+        "n": int(n),
+        "type": item["type"],
+        "ref_id": item["ref_id"],
+        "verb": "pq1_queued",
+        "reason": "使用者 go 只授權 bounded source trace",
+        "receipt": item["dispatch_ref"],
+    })
+    return {"item": item, "lead": lead}
+
+
+def checkpoint_source_trace_review(
+    pool: dict[str, Any],
+    n: int,
+    *,
+    leads_path: Path | str,
+    to_status: str,
+    receipt: str,
+    reason: str = "",
+    at: str | None = None,
+) -> dict[str, Any]:
+    """Checkpoint trace pq1；prepared action 或誠實 parked receipt 才可結案。"""
+
+    from engine_b import leads
+
+    if to_status not in {"researching", "completed", "parked"}:
+        raise TodoError(f"source_trace_review 不支援 checkpoint：{to_status}")
+    if not receipt.strip():
+        raise TodoError("pq1 checkpoint 必須附 receipt")
+    item = get(pool, n)
+    if item["type"] != "source_trace_review" or not item.get("dispatch_ref"):
+        raise TodoError(f"[{n}] 尚未 dispatch source-trace pq1")
+    store = leads.load(leads_path)
+    lead = store["leads"].get(str(item["ref_id"]))
+    if lead is None:
+        raise TodoError("source_trace_review 對應 lead 不存在")
+    if to_status == "completed":
+        action_id = str((lead.get("refs") or {}).get("research_action_id") or "")
+        if lead.get("status") not in {"action_prepared", "applied"}:
+            raise TodoError("completed trace lead 尚未 action_prepared／applied")
+        if receipt != f"action:{action_id}" or not action_id.startswith("ra_"):
+            raise TodoError("completed trace receipt 必須對應 lead 的 prepared action")
+    elif to_status == "parked":
+        trace_status = str((lead.get("refs") or {}).get("trace_status") or "")
+        if lead.get("status") != "parked" or receipt != f"trace:{trace_status}":
+            raise TodoError("parked trace receipt 必須對應 lead 的 trace_status")
+    elif lead.get("status") != "researching":
+        raise TodoError("researching checkpoint 需要 lead 已進 researching")
+
+    stamp = at or _now()
+    item["dispatch_status"] = to_status
+    item["dispatch_receipt"] = receipt
+    item["dispatch_updated_at"] = stamp
+    pool["log"].append({
+        "at": stamp,
+        "n": int(n),
+        "type": item["type"],
+        "ref_id": item["ref_id"],
+        "verb": f"pq1_{to_status}",
+        "reason": reason or None,
+        "receipt": receipt,
+    })
+    if to_status in {"completed", "parked"}:
+        resolve(
+            pool,
+            n,
+            "go",
+            reason=reason or f"source trace pq1 {to_status}",
+            receipt=receipt,
+            at=stamp,
+        )
+    return {"item": item, "lead": lead}
 
 
 def apply_batch(
@@ -620,6 +735,27 @@ def collect_from_leads() -> list[dict[str, Any]]:
     return []
 
 
+def collect_from_source_trace_reviews() -> list[dict[str, Any]]:
+    """只有需要人類 authority 的 parked trace 才進 pq2；其餘仍屬 pq1/backlog。"""
+
+    try:
+        from engine_b.leads import load, trace_backlog
+        rows = trace_backlog(load())
+    except Exception:
+        return []
+    return [
+        {
+            "type": "source_trace_review",
+            "ref_id": row["lead_id"],
+            "title": f"追原報告／來源 access — {row['title'] or row['lead_id']}",
+            "hint": "go 只排入 bounded pq1；不接受 claim、不入圖。若需付費，另核准 exact 金額／方案。",
+            "source": "source_trace",
+        }
+        for row in rows
+        if row["requires_user"]
+    ]
+
+
 def collect_from_research_actions() -> list[dict[str, Any]]:
     """等核准入圖的 Research Action → 經典 pq2。"""
     try:
@@ -722,7 +858,11 @@ def collect_from_decisions() -> list[dict[str, Any]]:
 
 
 def collect_all(*, include_decisions: bool = True) -> list[dict[str, Any]]:
-    rows = collect_from_research_actions() + collect_from_lifecycle()
+    rows = (
+        collect_from_research_actions()
+        + collect_from_source_trace_reviews()
+        + collect_from_lifecycle()
+    )
     if include_decisions:
         rows += collect_from_decisions()
     return rows
@@ -776,9 +916,10 @@ def main(argv: list[str] | None = None) -> int:
     p_res.add_argument("--receipt", default="")
 
     p_dispatch = sub.add_parser(
-        "dispatch", help="把 decision_review 的 go checkpoint 成 pq1 job"
+        "dispatch", help="把 decision／source-trace review 的 go checkpoint 成 pq1 job"
     )
     p_dispatch.add_argument("numbers", nargs="+")
+    p_dispatch.add_argument("--leads", default="")
 
     p_work = sub.add_parser("work", help="更新已 dispatch 的 decision-review pq1 job")
     p_work.add_argument("number", type=int)
@@ -788,6 +929,7 @@ def main(argv: list[str] | None = None) -> int:
     )
     p_work.add_argument("--receipt", required=True)
     p_work.add_argument("--reason", default="")
+    p_work.add_argument("--leads", default="")
 
     p_complete_ra = sub.add_parser(
         "complete-ra",
@@ -844,15 +986,32 @@ def main(argv: list[str] | None = None) -> int:
         return 1 if failures else 0
 
     if args.command in {"dispatch", "work"}:
-        from decision_lab.bootstrap import open_default_store
+        from engine_b.leads import DEFAULT_LEADS_PATH
 
-        store = open_default_store()
+        decision_store = None
         failures = 0
         try:
             if args.command == "dispatch":
                 for raw in args.numbers:
                     try:
-                        result = dispatch_decision_review(pool, int(raw), store=store)
+                        item = get(pool, int(raw))
+                        if item["type"] == "decision_review":
+                            if decision_store is None:
+                                from decision_lab.bootstrap import open_default_store
+                                decision_store = open_default_store()
+                            result = dispatch_decision_review(
+                                pool, int(raw), store=decision_store
+                            )
+                        elif item["type"] == "source_trace_review":
+                            result = dispatch_source_trace_review(
+                                pool,
+                                int(raw),
+                                leads_path=args.leads or DEFAULT_LEADS_PATH,
+                            )
+                        else:
+                            raise TodoError(
+                                f"[{raw}] 類型 {item['type']} 不支援 pq1 dispatch"
+                            )
                         save(pool, args.pool)
                         print(f"✓ [{raw}] → pq1 queued {result['item']['dispatch_ref']}")
                     except (TodoError, KeyError, ValueError) as exc:
@@ -860,17 +1019,37 @@ def main(argv: list[str] | None = None) -> int:
                         print(f"✗ [{raw}]：{exc}", file=sys.stderr)
             else:
                 try:
-                    result = checkpoint_decision_review(
-                        pool, args.number, store=store, to_status=args.to,
-                        receipt=args.receipt, reason=args.reason,
-                    )
+                    item = get(pool, args.number)
+                    if item["type"] == "decision_review":
+                        if decision_store is None:
+                            from decision_lab.bootstrap import open_default_store
+                            decision_store = open_default_store()
+                        result = checkpoint_decision_review(
+                            pool, args.number, store=decision_store,
+                            to_status=args.to, receipt=args.receipt,
+                            reason=args.reason,
+                        )
+                    elif item["type"] == "source_trace_review":
+                        result = checkpoint_source_trace_review(
+                            pool,
+                            args.number,
+                            leads_path=args.leads or DEFAULT_LEADS_PATH,
+                            to_status=args.to,
+                            receipt=args.receipt,
+                            reason=args.reason,
+                        )
+                    else:
+                        raise TodoError(
+                            f"[{args.number}] 類型 {item['type']} 不支援 pq1 checkpoint"
+                        )
                     save(pool, args.pool)
                     print(f"✓ [{args.number}] pq1 → {args.to} ({args.receipt})")
                 except (TodoError, KeyError, ValueError) as exc:
                     failures += 1
                     print(f"✗ [{args.number}]：{exc}", file=sys.stderr)
         finally:
-            store.close()
+            if decision_store is not None:
+                decision_store.close()
         return 1 if failures else 0
 
     if args.command == "complete-ra":

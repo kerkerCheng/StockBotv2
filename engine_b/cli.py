@@ -288,6 +288,17 @@ def _cmd_harvest_health(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_trace_backlog(args: argparse.Namespace) -> int:
+    """列出不會被一般 drain 撿回的 parked source-trace backlog。"""
+
+    store = leads.load(args.leads)
+    rows = leads.trace_backlog(store)
+    if args.manual_only:
+        rows = [row for row in rows if row["requires_user"]]
+    print(json.dumps(rows, ensure_ascii=False, indent=2))
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     ap = argparse.ArgumentParser(description="pending leads 狀態機命令列入口")
     ap.add_argument("--leads", default=str(leads.DEFAULT_LEADS_PATH),
@@ -375,6 +386,16 @@ def build_parser() -> argparse.ArgumentParser:
         help="列出最新仍未恢復的 harvest 失敗（JSON）",
     )
     p_health.set_defaults(func=_cmd_harvest_health)
+
+    p_trace = sub.add_parser(
+        "trace-backlog",
+        help="列出 parked 的追源未果 backlog 與下一個 trigger（JSON）",
+    )
+    p_trace.add_argument(
+        "--manual-only", action="store_true",
+        help="只列需要使用者 access／付費／優先權決策的項目",
+    )
+    p_trace.set_defaults(func=_cmd_trace_backlog)
     return ap
 
 

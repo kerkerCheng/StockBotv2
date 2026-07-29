@@ -1010,7 +1010,11 @@
         "parked_reason": "trace_backlog_or_lead_only_after_robotics_bundle",
         "pq2_item": "61",
         "research_bundle_id": "serenity_robotics_20260729",
-        "research_report": "docs/reports/serenity_30d_research_2026-07-29.md"
+        "research_report": "docs/reports/serenity_30d_research_2026-07-29.md",
+        "trace_attempts_ref": "docs/reports/serenity_30d_research_2026-07-29.md#截圖paywall判讀",
+        "trace_next_trigger": "canonical_ibk_report_metadata_or_user_provided_legal_excerpt",
+        "trace_requires_user": "false",
+        "trace_status": "isolated_tier_3"
       },
       "source": "x:aleabitoreddit",
       "status": "parked",
@@ -1073,7 +1077,11 @@
         "parked_reason": "trace_backlog_or_lead_only_after_robotics_bundle",
         "pq2_item": "61",
         "research_bundle_id": "serenity_robotics_20260729",
-        "research_report": "docs/reports/serenity_30d_research_2026-07-29.md"
+        "research_report": "docs/reports/serenity_30d_research_2026-07-29.md",
+        "trace_attempts_ref": "docs/reports/serenity_30d_research_2026-07-29.md#截圖paywall判讀",
+        "trace_next_trigger": "canonical_ft_or_nikkei_text_or_new_official_event",
+        "trace_requires_user": "false",
+        "trace_status": "isolated_tier_3"
       },
       "source": "x:aleabitoreddit",
       "status": "parked",
@@ -1297,7 +1305,10 @@
         "original_claim_status": "unverified_no_aaoi_mention",
         "outcome": "official_audio_obtained_asr_locator_only",
         "storage_permission": "local_only",
-        "trace_status": "lead_only_tier_4"
+        "trace_attempts_ref": "library/private/transcripts/9236bd2317056112_small.en.json",
+        "trace_next_trigger": "terminal_original_does_not_support_aaoi",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
       },
       "source": "x:aleabitoreddit",
       "status": "parked",
@@ -2077,7 +2088,11 @@
         "parked_reason": "trace_backlog_or_lead_only_after_robotics_bundle",
         "pq2_item": "61",
         "research_bundle_id": "serenity_robotics_20260729",
-        "research_report": "docs/reports/serenity_30d_research_2026-07-29.md"
+        "research_report": "docs/reports/serenity_30d_research_2026-07-29.md",
+        "trace_attempts_ref": "docs/reports/serenity_30d_research_2026-07-29.md#截圖paywall判讀",
+        "trace_next_trigger": "new_agility_primary_disclosure",
+        "trace_requires_user": "false",
+        "trace_status": "lead_only_tier_4"
       },
       "source": "x:aleabitoreddit",
       "status": "parked",
@@ -2614,7 +2629,11 @@
         "parked_reason": "trace_backlog_or_lead_only_after_robotics_bundle",
         "pq2_item": "61",
         "research_bundle_id": "serenity_robotics_20260729",
-        "research_report": "docs/reports/serenity_30d_research_2026-07-29.md"
+        "research_report": "docs/reports/serenity_30d_research_2026-07-29.md",
+        "trace_attempts_ref": "docs/reports/serenity_30d_research_2026-07-29.md#截圖paywall判讀",
+        "trace_next_trigger": "canonical_ceo_source_or_new_deployment_data",
+        "trace_requires_user": "false",
+        "trace_status": "lead_only_tier_4"
       },
       "source": "x:aleabitoreddit",
       "status": "parked",
@@ -3443,23 +3462,22 @@
         "focus_company_id": "co:agility_robotics",
         "ontology_authority": "todo:61",
         "ontology_status": "approved",
-        "parked_reason": "research_action_prepared_awaiting_ra_admission",
+        "parked_reason": "resolved_by_action_apply",
         "pq2_item": "61",
         "research_action_id": "ra_155541bb6c18e49d0d58140b242c8331",
         "research_bundle_id": "serenity_robotics_20260729",
         "research_report": "docs/reports/serenity_30d_research_2026-07-29.md"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "applied",
       "title": "Just dropping these 3 slides from Agility Robotics ( $CCXI ) presentations. For the US robotic program doomposters: 1. “75% of parts” - sourced from the USA 2. Just eyeballing the graph, looks like <$30k BOM mass production. People were just looking at the ~$145K cost. 3. 10,000 RoboFab capacity, and they build in Salem/Pittsburgh/Fremont (USA). So looks like majority US supply chains with targets of <$30K mass production It does help they’re backed by $AMZN / SoftBank / Foxconn / $NVDA as investors to get this done. Just personal thoughts as a shareholder in $CCXI (NFA): My personal biggest fear were US humanoid leaders like $TSLA were just building out their entire supply chains in China. So US robotics could just be export controlled/halted down the road. eg. South China Morning Post: ‘Optimus chain’: Chinese suppliers form the backbone of Tesla’s humanoid robot initiative and engaged with hundreds of Chinese component suppliers. And that Western companies are not able to lower costs to a competitive level + are forced to use Chinese components. I'm still not sure how they're going to do it but if Agility can achieve those mass production targets with that BOM cost in the USA/West. It would be a great validation for Made in America US robotics programs. IMO the top 5 US humanoid programs right now in terms of commercialization potential are: 1. Tesla Optimus 2. Figure 3. Agility Robotics 4. Boston Dynamics (yeah KR parent) 5. Apptronik Tesla is a $1T+ company. Figure is private and valued around ~$39B. Owning Boston Dynamics through Hyundai is a bit messy. And I’d prefer not to invest in adversarial programs just as a personal preference. So I’ve been personally excited for Agility to be listed as early as September.",
       "triage": {
-        "decided_at": "2026-07-29T14:00:33.049890+00:00",
+        "decided_at": "2026-07-29T15:06:18.708037+00:00",
         "decision": "go",
         "priority_flags": {
-          "novelty": true,
-          "user_requested": true
+          "novelty": true
         },
-        "reason": "Robotics 探索：具名公司／零件／政策與可追查數字或原始事件；進 pq1 追官方與客戶端來源，不把 Serenity 或圖片視為證據",
+        "reason": "Serenity robotics campaign 已完成 bounded pq1 追源與 extraction；推文仍是 tier 4 discovery，入圖只採四份獨立官方文件",
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2072367082248040621"
@@ -3822,7 +3840,11 @@
         "parked_reason": "trace_backlog_or_lead_only_after_robotics_bundle",
         "pq2_item": "61",
         "research_bundle_id": "serenity_robotics_20260729",
-        "research_report": "docs/reports/serenity_30d_research_2026-07-29.md"
+        "research_report": "docs/reports/serenity_30d_research_2026-07-29.md",
+        "trace_attempts_ref": "docs/reports/serenity_30d_research_2026-07-29.md#截圖paywall判讀",
+        "trace_next_trigger": "official_us_restriction_or_company_filing",
+        "trace_requires_user": "false",
+        "trace_status": "isolated_tier_3"
       },
       "source": "x:aleabitoreddit",
       "status": "parked",
@@ -3939,7 +3961,11 @@
         "parked_reason": "trace_backlog_or_lead_only_after_robotics_bundle",
         "pq2_item": "61",
         "research_bundle_id": "serenity_robotics_20260729",
-        "research_report": "docs/reports/serenity_30d_research_2026-07-29.md"
+        "research_report": "docs/reports/serenity_30d_research_2026-07-29.md",
+        "trace_attempts_ref": "docs/reports/serenity_30d_research_2026-07-29.md#截圖paywall判讀",
+        "trace_next_trigger": "official_mitsubishi_or_highlanders_deployment",
+        "trace_requires_user": "false",
+        "trace_status": "isolated_tier_3"
       },
       "source": "x:aleabitoreddit",
       "status": "parked",
@@ -7238,7 +7264,11 @@
         "parked_reason": "trace_backlog_or_lead_only_after_robotics_bundle",
         "pq2_item": "61",
         "research_bundle_id": "serenity_robotics_20260729",
-        "research_report": "docs/reports/serenity_30d_research_2026-07-29.md"
+        "research_report": "docs/reports/serenity_30d_research_2026-07-29.md",
+        "trace_attempts_ref": "docs/reports/serenity_30d_research_2026-07-29.md#截圖paywall判讀",
+        "trace_next_trigger": "fcc_or_federal_register_rule_published",
+        "trace_requires_user": "false",
+        "trace_status": "isolated_tier_3"
       },
       "source": "x:aleabitoreddit",
       "status": "parked",
@@ -7900,7 +7930,11 @@
         "parked_reason": "trace_backlog_or_lead_only_after_robotics_bundle",
         "pq2_item": "61",
         "research_bundle_id": "serenity_robotics_20260729",
-        "research_report": "docs/reports/serenity_30d_research_2026-07-29.md"
+        "research_report": "docs/reports/serenity_30d_research_2026-07-29.md",
+        "trace_attempts_ref": "docs/reports/serenity_30d_research_2026-07-29.md#截圖paywall判讀",
+        "trace_next_trigger": "canonical_report_and_methodology",
+        "trace_requires_user": "false",
+        "trace_status": "lead_only_tier_4"
       },
       "source": "x:aleabitoreddit",
       "status": "parked",
@@ -8090,7 +8124,11 @@
         "parked_reason": "trace_backlog_or_lead_only_after_robotics_bundle",
         "pq2_item": "61",
         "research_bundle_id": "serenity_robotics_20260729",
-        "research_report": "docs/reports/serenity_30d_research_2026-07-29.md"
+        "research_report": "docs/reports/serenity_30d_research_2026-07-29.md",
+        "trace_attempts_ref": "docs/reports/serenity_30d_research_2026-07-29.md#截圖paywall判讀",
+        "trace_next_trigger": "canonical_dhs_committee_report",
+        "trace_requires_user": "false",
+        "trace_status": "lead_only_tier_4"
       },
       "source": "x:aleabitoreddit",
       "status": "parked",
@@ -8364,7 +8402,11 @@
         "parked_reason": "trace_backlog_or_lead_only_after_robotics_bundle",
         "pq2_item": "61",
         "research_bundle_id": "serenity_robotics_20260729",
-        "research_report": "docs/reports/serenity_30d_research_2026-07-29.md"
+        "research_report": "docs/reports/serenity_30d_research_2026-07-29.md",
+        "trace_attempts_ref": "docs/reports/serenity_30d_research_2026-07-29.md#截圖paywall判讀",
+        "trace_next_trigger": "new_official_deployment_statistics",
+        "trace_requires_user": "false",
+        "trace_status": "lead_only_tier_4"
       },
       "source": "x:aleabitoreddit",
       "status": "parked",
@@ -8543,7 +8585,11 @@
         "parked_reason": "trace_backlog_or_lead_only_after_robotics_bundle",
         "pq2_item": "61",
         "research_bundle_id": "serenity_robotics_20260729",
-        "research_report": "docs/reports/serenity_30d_research_2026-07-29.md"
+        "research_report": "docs/reports/serenity_30d_research_2026-07-29.md",
+        "trace_attempts_ref": "docs/reports/serenity_30d_research_2026-07-29.md#截圖paywall判讀",
+        "trace_next_trigger": "xinhua_original_and_methodology",
+        "trace_requires_user": "false",
+        "trace_status": "isolated_tier_3"
       },
       "source": "x:aleabitoreddit",
       "status": "parked",
@@ -8793,7 +8839,11 @@
         "parked_reason": "trace_backlog_or_lead_only_after_robotics_bundle",
         "pq2_item": "61",
         "research_bundle_id": "serenity_robotics_20260729",
-        "research_report": "docs/reports/serenity_30d_research_2026-07-29.md"
+        "research_report": "docs/reports/serenity_30d_research_2026-07-29.md",
+        "trace_attempts_ref": "docs/reports/serenity_30d_research_2026-07-29.md#截圖paywall判讀",
+        "trace_next_trigger": "named_supplier_primary_disclosure",
+        "trace_requires_user": "false",
+        "trace_status": "lead_only_tier_4"
       },
       "source": "x:aleabitoreddit",
       "status": "parked",
@@ -9360,7 +9410,11 @@
         "parked_reason": "trace_backlog_or_lead_only_after_robotics_bundle",
         "pq2_item": "61",
         "research_bundle_id": "serenity_robotics_20260729",
-        "research_report": "docs/reports/serenity_30d_research_2026-07-29.md"
+        "research_report": "docs/reports/serenity_30d_research_2026-07-29.md",
+        "trace_attempts_ref": "docs/reports/serenity_30d_research_2026-07-29.md#截圖paywall判讀",
+        "trace_next_trigger": "new_named_supplier_or_production_disclosure",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
       },
       "source": "x:aleabitoreddit",
       "status": "parked",
@@ -11242,7 +11296,11 @@
         "parked_reason": "trace_backlog_or_lead_only_after_robotics_bundle",
         "pq2_item": "61",
         "research_bundle_id": "serenity_robotics_20260729",
-        "research_report": "docs/reports/serenity_30d_research_2026-07-29.md"
+        "research_report": "docs/reports/serenity_30d_research_2026-07-29.md",
+        "trace_attempts_ref": "docs/reports/serenity_30d_research_2026-07-29.md#截圖paywall判讀",
+        "trace_next_trigger": "canonical_svrc_report_index_or_legal_excerpt",
+        "trace_requires_user": "false",
+        "trace_status": "isolated_tier_3"
       },
       "source": "x:aleabitoreddit",
       "status": "parked",
@@ -12377,6 +12435,9 @@
         "campaign_window_start": "2026-06-29T13:46:25Z",
         "claimed_origin": "digitimes_2026_07_20",
         "outcome": "paywalled_timeline_not_independently_quotable",
+        "trace_attempts_ref": "claimed_origin:digitimes_2026_07_20",
+        "trace_next_trigger": "canonical_digitimes_article_or_supplier_lead_time_disclosure",
+        "trace_requires_user": "false",
         "trace_status": "isolated_tier_3"
       },
       "source": "x:aleabitoreddit",

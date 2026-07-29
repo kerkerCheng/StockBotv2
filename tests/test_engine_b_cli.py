@@ -96,6 +96,59 @@ def test_harvest_health_only_lists_latest_unresolved_failures(tmp_path, capsys) 
     assert [row["source"] for row in rows] == ["customer_ir:casela"]
 
 
+def test_trace_backlog_keeps_legacy_parked_trace_visible(tmp_path, capsys) -> None:
+    path = tmp_path / "pending_leads.json"
+    store = leads.empty_store()
+    lead_id, _ = leads.register(
+        store, source="x:test", url="https://x.com/test/status/trace", title="券商截圖"
+    )
+    leads.advance(
+        store,
+        lead_id,
+        "parked",
+        ref={"parked_reason": "trace_backlog_after_bounded_search"},
+    )
+    leads.save(store, path)
+
+    assert cli.main(["--leads", str(path), "trace-backlog"]) == 0
+    rows = json.loads(capsys.readouterr().out)
+    assert rows == [{
+        "lead_id": lead_id,
+        "title": "券商截圖",
+        "url": "https://x.com/test/status/trace",
+        "trace_status": "unstructured",
+        "next_trigger": "unspecified",
+        "attempts_ref": None,
+        "requires_user": False,
+        "lane": "event_or_scheduled_pq1",
+    }]
+
+
+def test_trace_requeue_preserves_triage_receipt_and_returns_to_pq1(tmp_path) -> None:
+    path = tmp_path / "pending_leads.json"
+    store = leads.empty_store()
+    lead_id, _ = leads.register(
+        store, source="x:test", url="https://x.com/test/status/paywall"
+    )
+    leads.triage(store, lead_id, go=True, tier=4, reason="先追原報告")
+    leads.advance(store, lead_id, "parked", ref={
+        "trace_status": "isolated_tier_3",
+        "trace_requires_user": "true",
+    })
+
+    lead = leads.requeue_trace(
+        store,
+        lead_id,
+        trigger="user_go",
+        reason="使用者提供合法 access，重排 pq1",
+        requeued_at="2026-07-29T00:00:00+00:00",
+    )
+
+    assert lead["status"] == "triaged_go"
+    assert lead["triage_history"][0]["triage"]["reason"] == "先追原報告"
+    assert lead["triage"]["priority_flags"]["user_requested"] is True
+
+
 def test_advance_records_ref(tmp_path) -> None:
     path = tmp_path / "pending_leads.json"
     lead_id = _seed(path)

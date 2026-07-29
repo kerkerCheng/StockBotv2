@@ -821,15 +821,59 @@
     },
     {
       "added_at": "2026-07-29T14:46:50.675977+00:00",
+      "completion_authority": {
+        "action_digest": "856df9b6939a8664c1f515c77bd0e255d6f86fd1af08c8cfded6bbaa02d9d243",
+        "cohort_id": "dc_6ae5b014dbbcd0774b45487542c9a102",
+        "commit": "11d14fd1d09126d0e363efa66a8feb2655b82f21",
+        "company_id": "co:agility_robotics",
+        "verified_at": "2026-07-29T15:07:28.392892+00:00"
+      },
       "hint": "核准入圖（apply_research_action）",
       "n": 62,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_155541bb6c18e49d0d58140b242c8331;digest:856df9b6939a8664c1f515c77bd0e255d6f86fd1af08c8cfded6bbaa02d9d243;commit:11d14fd1d09126d0e363efa66a8feb2655b82f21;cohort:dc_6ae5b014dbbcd0774b45487542c9a102",
       "ref_id": "ra_155541bb6c18e49d0d58140b242c8331",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-07-29T15:07:28.392892+00:00",
       "source": "research_action",
       "title": "Serenity 30d robotics：官方四來源 ontology mini-slice",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-07-29T15:16:58.028013+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 63,
+      "reason": null,
+      "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:applied_optoelectronics",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-07-29T15:16:58.028043+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 64,
+      "reason": null,
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:axt",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-07-29T15:16:58.028071+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 65,
+      "reason": null,
+      "ref_id": "dc_6ae5b014dbbcd0774b45487542c9a102",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — unknown",
+      "type": "decision_review"
     }
   ],
   "log": [
@@ -1630,8 +1674,17 @@
       "ref_id": "campaign:serenity_30d_20260729:robotics_ontology",
       "type": "manual",
       "verb": "go"
+    },
+    {
+      "at": "2026-07-29T15:07:28.392892+00:00",
+      "n": 62,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_155541bb6c18e49d0d58140b242c8331;digest:856df9b6939a8664c1f515c77bd0e255d6f86fd1af08c8cfded6bbaa02d9d243;commit:11d14fd1d09126d0e363efa66a8feb2655b82f21;cohort:dc_6ae5b014dbbcd0774b45487542c9a102",
+      "ref_id": "ra_155541bb6c18e49d0d58140b242c8331",
+      "type": "ra_admission",
+      "verb": "go"
     }
   ],
-  "next_n": 63,
+  "next_n": 66,
   "schema_version": "1"
 }

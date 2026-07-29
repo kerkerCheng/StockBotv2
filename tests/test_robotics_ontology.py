@@ -1,12 +1,21 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 from loader.validate import validate
 
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def test_neo4j_setup_prewarms_every_relation_in_vocab() -> None:
+    vocab = json.loads((ROOT / "schema" / "vocab.json").read_text(encoding="utf-8"))
+    setup = (ROOT / "schema" / "neo4j_setup.cypher").read_text(encoding="utf-8")
+    prewarmed = set(re.findall(r"\[:([A-Z][A-Z_]*)\]", setup))
+
+    assert {relation.upper() for relation in vocab["relation"]} <= prewarmed
 
 
 def test_robotics_mini_slice_is_in_all_vocab_surfaces(tmp_path: Path) -> None:
