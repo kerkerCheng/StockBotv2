@@ -47,6 +47,11 @@
     {"company_id": "co:ime_cas", "research_ticker": null},
     {"company_id": "co:ansys", "research_ticker": null},
     {"company_id": "co:o_net_technologies", "research_ticker": null},
-    {"company_id": "co:mips_holding", "research_ticker": null}
+    {"company_id": "co:mips_holding", "research_ticker": null},
+    {"company_id": "co:agility_robotics", "research_ticker": null},
+    {"company_id": "co:gxo_logistics", "research_ticker": "GXO", "market_currency": "USD", "execution_currency": "USD", "execution_venue": "NYSE"},
+    {"company_id": "co:schaeffler", "research_ticker": "SHA.DE", "market_currency": "EUR"},
+    {"company_id": "co:hyundai_mobis", "research_ticker": "012330.KS", "market_currency": "KRW"},
+    {"company_id": "co:boston_dynamics", "research_ticker": null}
   ]
 }

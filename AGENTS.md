@@ -196,7 +196,7 @@ fetchers/edgar.py ──────↑                        engine_c/etl_yfin
 5. **（已完成 2026-07-29）Serenity 30-Day Research Campaign** — plan：[`docs/plans/2026-07-29-002-feat-serenity-30d-research-campaign-plan.md`](docs/plans/2026-07-29-002-feat-serenity-30d-research-campaign-plan.md)，研究報告：[`docs/reports/serenity_30d_research_2026-07-29.md`](docs/reports/serenity_30d_research_2026-07-29.md)。
    - `crons/harvest_leads.py --backfill-x-handle ...` 以 RFC3339 time window＋pagination token＋`max_posts` 成本硬上限做歷史回補；可納入 replies、補全文／media，且不得推進 daily `since_id`。Serenity 30 天實跑取得 279 則、187 個 media cache，估算 Post read 成本 US$1.395。
    - Scoped exploration 只放寬「未在既有 theme／ticker」的相關性；具名實體＋可追查 claim 才 PASS，quotability、source-trace、evidence tier、prepared RA 與 pq2 graph admission 不變。PASS audit 只看事件去重後 candidate events，不看 raw posts 比例。
-   - Robotics source trace 證實 Agility 少量商用部署與 actuator 工業化方向，但 `$300M orders` 有 v5 contractual milestones、warrants 且非 current revenue，10k 是設計產能；FCC 禁中國 humanoid import 尚無官方文本。現行半導體／光通訊 extraction vocab 不得硬套 robotics；pq2 [61] 核准最小 ontology＋四 origin source bundle，真正入圖仍要後續 `ra_admission`。
+   - Robotics source trace 證實 Agility 少量商用部署與 actuator 工業化方向，但 `$300M orders` 有 v5 contractual milestones、warrants 且非 current revenue，10k 是設計產能；FCC 禁中國 humanoid import 尚無官方文本。2026-07-29 使用者以 pq2 [61] 核准 `deployment_workflow → robot_system → robot_subsystem` 最小 ontology 與四 origin extraction；prepared action 是 `ra_155541bb6c18e49d0d58140b242c8331`／digest `856df9b6939a8664c1f515c77bd0e255d6f86fd1af08c8cfded6bbaa02d9d243`，真正入圖仍等 ra_admission pq2 [62]。15 個 parked leads 不逐條進 pq2；screenshot-only supplier maps 維持 trace backlog／lead-only。
 
 ---
 

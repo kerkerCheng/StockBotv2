@@ -166,6 +166,9 @@
           "abstraction_level": {
             "enum": [
               "end_demand",
+              "deployment_workflow",
+              "robot_system",
+              "robot_subsystem",
               "network_systems",
               "module_subsystem",
               "device_chip",
@@ -178,6 +181,9 @@
           "role": {
             "enum": [
               "leader",
+              "robot_oem",
+              "robot_operator",
+              "robot_component_supplier",
               "bottleneck_supplier",
               "disruptor",
               "foundry",
@@ -265,6 +271,9 @@
             "enum": [
               "supplies_to",
               "is_component_of",
+              "develops",
+              "deploys",
+              "offered_under",
               "competes_with",
               "enables",
               "depends_on",

@@ -162,12 +162,13 @@ Canonical domain relationship 不直接 CITES，僅保留 `source_doc_ids` / `so
 權威來源 = `schema/vocab.json`。新增字彙 = 改該檔 + extract prompt,**不動 DB schema**。
 
 - `type`: `Company | Product | TechNode | Material | Standard | Person`
-- `abstraction_level`(8 層 stack,由需求端到底層):
-  `end_demand | network_systems | module_subsystem | device_chip | test_yield | foundry_packaging | equipment_epitaxy | materials_substrate`
+- `abstraction_level`（共用需求層＋領域 stack）：
+  `end_demand | deployment_workflow | robot_system | robot_subsystem | network_systems | module_subsystem | device_chip | test_yield | foundry_packaging | equipment_epitaxy | materials_substrate`。
+  Robotics 目前只核准 `deployment_workflow → robot_system → robot_subsystem` 最小切片；不得自行外推完整 BOM。
 - `role`(Company 在 stack 的角色):
-  `leader | bottleneck_supplier | disruptor | foundry | test | network | adjacent_silicon | material_base`
+  `leader | robot_oem | robot_operator | robot_component_supplier | bottleneck_supplier | disruptor | foundry | test | network | adjacent_silicon | material_base`
 - `relation`:
-  `supplies_to | is_component_of | competes_with | enables | depends_on | invests_in | licenses_to`
+  `supplies_to | is_component_of | develops | deploys | offered_under | competes_with | enables | depends_on | invests_in | licenses_to | about | acquired | partnership_with`
 
 ---
 

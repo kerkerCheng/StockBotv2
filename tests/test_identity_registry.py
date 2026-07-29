@@ -27,8 +27,13 @@ def test_neutral_registry_preserves_known_company_mappings() -> None:
     assert registry.research_ticker("co:coherent") == "COHR"
     assert registry.research_ticker("co:sivers_semiconductors") == "SIVE.ST"
     assert registry.research_ticker("co:anthropic") is None
+    assert registry.research_ticker("co:agility_robotics") is None
+    assert registry.research_ticker("co:gxo_logistics") == "GXO"
+    assert registry.research_ticker("co:schaeffler") == "SHA.DE"
+    assert registry.research_ticker("co:hyundai_mobis") == "012330.KS"
+    assert registry.research_ticker("co:boston_dynamics") is None
     assert registry.company_id_for_ticker("sive.st") == "co:sivers_semiconductors"
-    assert len(TICKER_MAP) == 47
+    assert len(TICKER_MAP) == 52
 
 
 def test_all_known_consumers_import_ticker_map_from_neutral_registry() -> None:

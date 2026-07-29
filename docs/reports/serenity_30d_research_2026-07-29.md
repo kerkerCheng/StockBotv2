@@ -99,10 +99,31 @@ Serenity 的結構性 shortage 方向有一手支撐：Micron Q3 10-Q 說 DRAM�
 
 ## PQ1／PQ2 routing
 
-- Robotics 的 15 個代表 leads 已完成 campaign-level pq1 source trace，研究 receipt 是本報告。
-- 現行 graph schema 的 abstraction levels 與 relations 寫死半導體／光通訊；直接 extract robotics 會製造錯層節點。因此不建立假的 Research Action。
-- 統一待辦池已建立 **pq2 [61]**：核准最小 robotics ontology（robot OEM／actuator／deployment／RaaS）與四個 origin 的 source bundle。`go` 只授權 ontology mini-slice＋extract／validate／prepare；完成後真正入圖仍要新的 `ra_admission` pq2。
+- Robotics 的 15 個代表 leads 已完成 campaign-level pq1 source trace，研究 receipt 是本報告；raw／parked lead 不會逐條占用 pq2。
+- 使用者已核准 **pq2 [61]**。Schema 只新增 `deployment_workflow → robot_system → robot_subsystem`、`robot_oem／robot_operator／robot_component_supplier`，以及 `develops／deploys／offered_under`；沒有藉機把 IBK／Goldman 截圖的整張 supplier map 加進 ontology。
+- Agility SEC、GXO、Schaeffler、Boston Dynamics 四個 origin 已完成 extraction 與 server-side validation，凍結成 Research Action `ra_155541bb6c18e49d0d58140b242c8331`（digest `856df9b6939a8664c1f515c77bd0e255d6f86fd1af08c8cfded6bbaa02d9d243`）。真正入圖是新的 **ra_admission pq2 [62]**，仍需使用者對 exact action 明確核准。
+- 15 個代表 leads 仍保留 `parked` 作 provenance：1 個主要 Agility lead 綁定 prepared action，其他維持 `trace_backlog_or_lead_only_after_robotics_bundle`。這些 parked 不會再各自重生為 15 個 pq2；只有新的完整 Research Action／authority packet 才能進池。
 - Photonics 12、memory／packaging 8、AI infrastructure 7 保留 delta-only pq1；不因本 campaign 自動入圖或寫 Engine C manual observation。
+
+## 截圖／paywall 判讀
+
+Robotics 15 個代表 leads 共快取 33 個 media items，X metadata 的 `alt_text` 全部為空。這些圖片的資訊強度差很多，不能一概當假，也不能一概當報告原文：
+
+- Agility 簡報截圖可逐頁對回 SEC Exhibit 99.2，因此以 SEC 文件抽取，不以推文圖片抽取。
+- IBK 那組圖片實際是英文 `Translated value chain`／`The report's …` 的二次整理頁，沒有 IBK 報告封面、作者、日期或原頁版式；它只能證明「Serenity 展示了一份自稱轉譯自 IBK 的摘要」，不能證明 Hwashin／LG Energy／Hyundai AutoEver 等 mapping 真在原報告。
+- Goldman 圖有 `Goldman Sachs Global Investment Research` footer，來源指向比無標記截圖強，但未取得合法可核對的完整報告、日期與上下文前，仍只是 tier 3 discovery；不得用來確認 named design win。
+- FT／Nikkei 截圖有標題、日期與 paywall 標記，可用 canonical article metadata＋有限可見 excerpt 登記；付費牆外看不到的其餘敘事不能推定。
+- Reuters 截圖片段可由 dateline／exact phrase 追報導，但報導聲稱的 FCC rule 尚無 FCC／Federal Register 原文；所以只能記 Reuters 報導存在，不能把禁令當已生效政策。
+- SVRC／IT桔子等 branded 圖仍需找到 canonical report/index 與 methodology；品牌字樣或 watermark 不是來源真實性與數字方法的充分條件。
+
+可承受風險的 routing 是把圖片用作 **attention prior**，而不是 evidence multiplier：
+
+1. `original_obtained`：取得官方／原作者文件與 quote，才可 extract。
+2. `paywall_excerpt_verified`：只核到 canonical metadata＋合法有限 excerpt，留 Engine B／local-only；不建立 named supplier edge。
+3. `direction_independently_corroborated`：截圖的廣義方向被其他一手來源支持，可研究 sector／mechanism，但 exact beneficiary 仍標 speculative。
+4. `screenshot_only`：無 canonical URL、作者、日期、頁碼或可反搜 quote，lead-only；只在新增 metadata／官方事件時重跑，避免無限搜尋。
+
+資本邊界：截圖可以提高 pq1 priority，不能單獨擴大 Engine D funded range。若 broad thesis 已有獨立一手證據，截圖可成為 research timing／paper hypothesis；若 named supplier mapping 只剩截圖支持，維持 research-only。使用者合法持有付費報告時，只在本機保存 canonical URL、報告 metadata、頁碼與必要 excerpt；不保存或上傳 cookie、帶 token URL或整份未授權報告。
 
 ## Disproof conditions
 
