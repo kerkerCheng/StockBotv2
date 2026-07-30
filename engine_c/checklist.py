@@ -48,6 +48,34 @@ def _manual_status(value: str | None, label: str, source_note: str | None = None
     return {"status": "manual_required", "value": None, "label": label}
 
 
+def _extended_observations(manual: dict) -> dict:
+    """把非 gate 的已登記人工觀測整理成開放讀取表面。
+
+    每筆自帶 `authorities`，讓 Engine D 的 reference index 不必反查 Engine C registry
+    （decision_lab 不得反向依賴 current-state authority）。未登記或無 provenance 的
+    欄位一律略過——寧可不出現，也不要讓沒有來源的值被 Confidence 軸引用。
+    """
+    from engine_c.observation_fields import get_observation_field_registry
+
+    registry = get_observation_field_registry()
+    result: dict[str, dict] = {}
+    for field_name, (value, source_note) in sorted(manual.items()):
+        spec = registry.get(field_name)
+        if spec is None or spec.gate_member:
+            continue
+        if not value or not source_note:
+            continue
+        result[field_name] = {
+            "status": "manual_reviewed",
+            "value": value,
+            "source": source_note,
+            "label": spec.label,
+            "category": spec.category,
+            "authorities": list(spec.authorities),
+        }
+    return result
+
+
 def get_checklist(ticker: str) -> dict:
     """
     5 項財務核驗清單。
@@ -72,6 +100,7 @@ def get_checklist(ticker: str) -> dict:
             "ticker": ticker,
             "engine_c_available": False,
             "items": {},
+            "observations": {},
             "gate_pass": False,
             "note": "Engine C 資料庫不可用（db.py 匯入失敗）",
         }
@@ -118,6 +147,7 @@ def get_checklist(ticker: str) -> dict:
             "ticker": ticker,
             "engine_c_available": False,
             "items": {},
+            "observations": {},
             "gate_pass": False,
             "note": f"資料庫查詢失敗：{e}",
         }
@@ -136,6 +166,7 @@ def get_checklist(ticker: str) -> dict:
                     ("valuation_pressure", "估值壓力"),
                 ]
             },
+            "observations": _extended_observations(manual),
             "gate_pass": False,
             "note": f"{ticker} 無快照，請先執行 python engine_c/etl_yfinance.py {ticker}",
         }
@@ -186,12 +217,15 @@ def get_checklist(ticker: str) -> dict:
         "dilution":               dil_item,
         "valuation_pressure":     val_item,
     }
+    # gate_pass 只掃 items（凍結的五項 L9 gate）。擴充欄位刻意不參與，否則新增一個
+    # 欄位就會讓所有既有標的的 Watchlist 升格 gate 退化。
     gate_pass = all(v["status"] in ("ok", "manual_reviewed") for v in items.values())
 
     return {
         "ticker": ticker,
         "engine_c_available": True,
         "items": items,
+        "observations": _extended_observations(manual),
         "gate_pass": gate_pass,
     }
 

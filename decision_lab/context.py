@@ -321,7 +321,34 @@ def _add_reference(
     index.setdefault(reference, set()).update(authorities)
 
 
-def _explicit_authorities(value: Any, default: str) -> tuple[str, ...]:
+# payload 可自報的 authority 白名單，按來源引擎分開。分開的目的是防止 over-claim：
+# Engine A 的 evidence payload 不得自稱帶有 Engine C 的財務 authority，反之亦然。
+_GRAPH_AUTHORITIES = frozenset(
+    {
+        "graph_source_assertion",
+        "source_trace",
+        "graph_entity",
+        "graph_causal",
+        "graph_commercial",
+    }
+)
+_ENGINE_C_AUTHORITIES = frozenset(
+    {
+        "engine_c_financial",
+        "engine_c_manual",
+        "engine_c_customer",
+        "engine_c_backlog",
+        "engine_c_valuation",
+    }
+)
+
+
+def _explicit_authorities(
+    value: Any,
+    default: str,
+    *,
+    allowed: frozenset[str] = _GRAPH_AUTHORITIES,
+) -> tuple[str, ...]:
     if not isinstance(value, Mapping):
         return (default,)
     raw = value.get("authorities")
@@ -329,13 +356,6 @@ def _explicit_authorities(value: Any, default: str) -> tuple[str, ...]:
         raw = [value.get("authority")] if value.get("authority") else []
     if not isinstance(raw, Sequence) or isinstance(raw, (str, bytes)):
         return (default,)
-    allowed = {
-        "graph_source_assertion",
-        "source_trace",
-        "graph_entity",
-        "graph_causal",
-        "graph_commercial",
-    }
     parsed = tuple(
         str(authority)
         for authority in raw
@@ -398,6 +418,19 @@ def _build_reference_index(
         if item.get("status") == "manual_reviewed":
             authorities.append("engine_c_manual")
         _add_reference(index, item.get("source"), *authorities)
+
+    # 非 gate 的擴充人工觀測（或有請求權、covenant、通路結構、監管依賴…）。
+    # authorities 由 Engine C 的欄位 registry 隨 payload 帶入，此處不反查 Engine C。
+    for item in (financial.get("observations") or {}).values():
+        if not isinstance(item, Mapping) or item.get("status") != "manual_reviewed":
+            continue
+        _add_reference(
+            index,
+            item.get("source"),
+            *_explicit_authorities(
+                item, "engine_c_manual", allowed=_ENGINE_C_AUTHORITIES
+            ),
+        )
 
     _add_reference(index, market.get("source"), "market")
     _add_reference(index, fx.get("source"), "fx")

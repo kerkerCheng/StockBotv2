@@ -1,0 +1,128 @@
+{
+  "_comment": "Engine C 人工觀測欄位對照表（階層式：category → field_name）。照 schema/vocab.json 的先例——表的形狀鎖死、字彙留鬆：新增一類財務事實只要在此加一項，不改 Python。engine_c/observation_fields.py 是唯一 loader，set_manual_field 會拒絕未登記的 field_name 以防同義詞漂移。",
+  "version": 1,
+  "_gate_contract": "gate_member=true 的五項就是 L9 前置條件 #3 的財務核驗清單，thesis/preconditions.py 依賴它；這五項是凍結契約，新增欄位一律 gate_member=false，否則會讓所有既有標的的 gate_pass 退化。",
+  "_authority_contract": "authorities 是 Engine D 的 reference index token，決定哪個 Confidence 軸可以引用此欄位（對照 decision_lab/sizing.py 的 AXIS_REFERENCE_AUTHORITIES）：engine_c_financial→financial_resilience；engine_c_manual→financial_resilience；engine_c_customer→commercial_maturity；engine_c_backlog→commercial_maturity；engine_c_valuation→valuation_payoff。",
+  "categories": {
+    "demand_and_orders": {
+      "label": "需求與訂單",
+      "note": "誰在買、買多少、能見度多長、通路結構如何。"
+    },
+    "profitability": {
+      "label": "獲利能力",
+      "note": "毛利、營益與其趨勢。"
+    },
+    "liquidity_and_capital": {
+      "label": "流動性與資本結構",
+      "note": "現金、負債、或有請求權、已承諾資本支出、covenant。"
+    },
+    "ownership_and_dilution": {
+      "label": "股權與稀釋",
+      "note": "股數、可轉換工具、warrants、內部人交易。"
+    },
+    "valuation": {
+      "label": "估值",
+      "note": "倍數、隱含假設、分析師覆蓋。"
+    },
+    "regulatory_and_legal": {
+      "label": "監管與法律",
+      "note": "許可依賴、出口管制、訴訟、審計意見。"
+    }
+  },
+  "fields": [
+    {
+      "field_name": "gross_margin_trend",
+      "category": "profitability",
+      "label": "毛利率趨勢（近 4 季）",
+      "gate_member": true,
+      "auto_source": "financial_snapshots",
+      "authorities": ["engine_c_financial"]
+    },
+    {
+      "field_name": "customer_concentration",
+      "category": "demand_and_orders",
+      "label": "客戶集中度（前三大客戶 % 收入）",
+      "gate_member": true,
+      "auto_source": null,
+      "authorities": ["engine_c_customer"]
+    },
+    {
+      "field_name": "backlog",
+      "category": "demand_and_orders",
+      "label": "Backlog/訂單能見度",
+      "gate_member": true,
+      "auto_source": null,
+      "authorities": ["engine_c_backlog"]
+    },
+    {
+      "field_name": "dilution",
+      "category": "ownership_and_dilution",
+      "label": "稀釋分析（股數趨勢）",
+      "gate_member": true,
+      "auto_source": "financial_snapshots",
+      "authorities": ["engine_c_financial"]
+    },
+    {
+      "field_name": "valuation_pressure",
+      "category": "valuation",
+      "label": "估值壓力（P/E, EV/Rev, 分析師目標價）",
+      "gate_member": true,
+      "auto_source": "financial_snapshots",
+      "authorities": ["engine_c_valuation"]
+    },
+    {
+      "field_name": "channel_structure",
+      "category": "demand_and_orders",
+      "label": "通路結構（代理商／通路商 vs 終端客戶）",
+      "gate_member": false,
+      "auto_source": null,
+      "authorities": ["engine_c_customer", "engine_c_manual"],
+      "why": "客戶集中度數字無法區分終端需求與通路集中。AAOI 的 Digicomm 佔 FY2025 營收 53.1% 但是獨家代理商，兩者投資意義完全不同。"
+    },
+    {
+      "field_name": "contingent_liquidity_claims",
+      "category": "liquidity_and_capital",
+      "label": "或有流動性請求權（可退預付款、贖回權、保證）",
+      "gate_member": false,
+      "auto_source": null,
+      "authorities": ["engine_c_financial", "engine_c_manual"],
+      "why": "現金與負債快照看不到或有請求權。AXT 的 PE 基金贖回權加 Coherent 可退預付款上限約 US$71.3M，足以把淨現金翻負。"
+    },
+    {
+      "field_name": "debt_maturity_and_covenants",
+      "category": "liquidity_and_capital",
+      "label": "債務到期時程與 covenant 條件",
+      "gate_member": false,
+      "auto_source": null,
+      "authorities": ["engine_c_financial", "engine_c_manual"],
+      "why": "total_debt 是單一數字，看不出到期集中度或最低流動性條款；此項在 AXT 與 AAOI 的 missing_data 都重複出現。"
+    },
+    {
+      "field_name": "committed_capex",
+      "category": "liquidity_and_capital",
+      "label": "已承諾資本支出與可延後彈性",
+      "gate_member": false,
+      "auto_source": null,
+      "authorities": ["engine_c_financial", "engine_c_manual"],
+      "why": "以 capex 為主的負自由現金流，runway 取決於擴產能否煞停；已簽約承諾與可自由延後的部分必須分開。"
+    },
+    {
+      "field_name": "regulatory_dependency",
+      "category": "regulatory_and_legal",
+      "label": "監管／許可依賴（出口管制、執照、准入）",
+      "gate_member": false,
+      "auto_source": null,
+      "authorities": ["engine_c_valuation", "engine_c_manual"],
+      "why": "單一監管路徑可否決整條營收假設。AXT 管理層自己點名 InP 出口許可時程是最大變數。"
+    },
+    {
+      "field_name": "litigation_and_audit_flags",
+      "category": "regulatory_and_legal",
+      "label": "重大訴訟與審計意見旗標",
+      "gate_member": false,
+      "auto_source": null,
+      "authorities": ["engine_c_manual"],
+      "why": "going concern、保留意見、restatement 這類措辭精度本身就是 claim（見 L11），需獨立欄位承載逐字一手用語。"
+    }
+  ]
+}

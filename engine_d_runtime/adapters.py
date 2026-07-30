@@ -482,6 +482,18 @@ class DefaultRuntimeProvider:
             for key, item in items.items()
             if isinstance(key, str) and isinstance(item, Mapping)
         }
+        # 非 gate 的已登記人工觀測：開放讀取表面，每筆自帶 authorities，
+        # 不參與 gate_pass，也不產生 work order（缺這些不算 coverage 缺口）。
+        raw_observations = (
+            checklist.get("observations")
+            if isinstance(checklist.get("observations"), Mapping)
+            else {}
+        )
+        normalized_observations = {
+            str(key): dict(item)
+            for key, item in raw_observations.items()
+            if isinstance(key, str) and isinstance(item, Mapping)
+        }
         result = {
             "status": status,
             "ticker": ticker,
@@ -492,6 +504,7 @@ class DefaultRuntimeProvider:
             "total_debt": baseline.get("total_debt"),
             "free_cash_flow_ttm": baseline.get("free_cash_flow_ttm"),
             "checklist": normalized_checklist,
+            "observations": normalized_observations,
         }
         orders: list[AuthorityWorkOrder] = []
         if not checklist.get("engine_c_available"):
