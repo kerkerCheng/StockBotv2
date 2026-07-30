@@ -30,6 +30,14 @@ admission 必經核准 exact 對象、深挖由 priority 排序但入圖仍核�
 
 ## 執行流程
 
+### Step 0 — Codex task 識別
+
+Codex desktop scheduled run 的第一個 App 動作必須實際呼叫 `codex_app__set_thread_title`，把目前 task
+改為 `StockBotv2 Daily Brief — YYYY-MM-DD`（日期取 Asia/Taipei 當日），並確認工具回傳成功後才繼續。
+只在 brief 內輸出日期標題、或只用自然語言說「已更名」，都不算完成。若工具在該 executor 不可用或
+呼叫失敗，routine 仍繼續，但健康段落必須列 `title_update_failed`；非 Codex desktop executor 跳過此
+App-specific 動作。
+
 ### Step 1 — 本機資料更新（零 token）
 
 ```powershell

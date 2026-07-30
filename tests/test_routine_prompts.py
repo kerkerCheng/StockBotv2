@@ -86,6 +86,9 @@ def test_daily_brief_title_carries_taipei_date() -> None:
     for path in (DAILY, ROOT / "skills" / "daily-brief" / "SKILL.md"):
         text = path.read_text(encoding="utf-8")
         assert "# Daily Brief <YYYY-MM-DD> (Asia/Taipei)" in text
+        assert "codex_app__set_thread_title" in text
+        assert "StockBotv2 Daily Brief — YYYY-MM-DD" in text
+        assert "title_update_failed" in text
 
 
 def test_daily_prompt_is_not_the_retired_cloud_runner() -> None:

@@ -14,8 +14,10 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
 
 ## 執行契約
 
-1. 先讀 `AGENTS.md` 與 `skills/daily-brief/SKILL.md`。Codex desktop 執行時，立即把目前 task 標題改成
-   `StockBotv2 Daily Brief — YYYY-MM-DD`（日期取 Asia/Taipei 當日）；只在 brief 內輸出帶日期標題不算完成。
+1. 先讀 `AGENTS.md` 與 `skills/daily-brief/SKILL.md`。Codex desktop 執行時，第一個 App 動作必須實際呼叫
+   `codex_app__set_thread_title`，把目前 task 改成 `StockBotv2 Daily Brief — YYYY-MM-DD`（日期取
+   Asia/Taipei 當日），並確認工具回傳成功；只在 brief 內輸出帶日期標題或只說「已更名」不算完成。
+   若工具不可用或呼叫失敗，routine 仍繼續，但健康段落必須列 `title_update_failed`。
    確認目前 branch 是 `master`；若不是就停止並回報，不自行切 branch。若 working tree 有與本 routine
    無關的使用者變更，保留不碰。
 2. Windows 一律使用專案 interpreter：`.venv\Scripts\python.exe`，不得用 bare `python`。

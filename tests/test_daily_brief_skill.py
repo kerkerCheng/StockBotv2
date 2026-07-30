@@ -91,6 +91,14 @@ def test_requires_subject_complete_pq2_explanations() -> None:
         assert token in text
 
 
+def test_codex_scheduled_run_must_actually_rename_the_task() -> None:
+    text = _text()
+    assert "codex_app__set_thread_title" in text
+    assert "StockBotv2 Daily Brief — YYYY-MM-DD" in text
+    assert "確認工具回傳成功" in text
+    assert "title_update_failed" in text
+
+
 def test_access_blocked_is_retried_and_never_presented_as_no_result() -> None:
     text = _text()
     assert "harvest-health" in text
