@@ -1,0 +1,95 @@
+{
+  "claims": [
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Downgrade if Agility discloses that Digit assembly moved offshore, that the US sourcing share materially fell, or if the commercial-deployment claim is contradicted by customer-side disclosure.",
+      "id": "agility_robotics_official_digit_page_2026_07_30_cl1",
+      "source_ids": [
+        "agility_robotics_official_digit_page_2026_07_30_s1",
+        "agility_robotics_official_digit_page_2026_07_30_s2",
+        "agility_robotics_official_digit_page_2026_07_30_s3"
+      ],
+      "statement": "Agility Robotics assembles Digit, a commercially deployed humanoid robot, at its Salem, Oregon site, with roughly 75% of Digit's nearly 6,000 parts sourced from the US.",
+      "subject_id": "co:agility_robotics"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "prod:digit",
+      "id": "e1",
+      "relation": "develops",
+      "source_ids": [
+        "agility_robotics_official_digit_page_2026_07_30_s1",
+        "agility_robotics_official_digit_page_2026_07_30_s2"
+      ],
+      "src_id": "co:agility_robotics"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "robot_system",
+      "aliases": [
+        "Agility Robotics, Inc.",
+        "Agility"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:agility_robotics",
+      "name": "Agility Robotics",
+      "role": "robot_oem",
+      "source_ids": [
+        "agility_robotics_official_digit_page_2026_07_30_s1",
+        "agility_robotics_official_digit_page_2026_07_30_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "robot_system",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "prod:digit",
+      "name": "Digit",
+      "role": null,
+      "source_ids": [
+        "agility_robotics_official_digit_page_2026_07_30_s1",
+        "agility_robotics_official_digit_page_2026_07_30_s2"
+      ],
+      "type": "Product"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "agility_robotics_official_digit_page_2026_07_30",
+    "evidence_tier": 2,
+    "origin_entity": "Agility Robotics",
+    "permission_basis": "Official public company page; store the canonical URL and only the research-relevant excerpt.",
+    "published_at": "2026-07-30",
+    "publisher": "Agility Robotics",
+    "retrieved_at": "2026-07-30",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Agility Robotics official site — Digit assembly, commercial deployment and US parts sourcing",
+    "url": "https://www.agilityrobotics.com/"
+  },
+  "sources": [
+    {
+      "id": "agility_robotics_official_digit_page_2026_07_30_s1",
+      "locator": "Homepage, Digit section",
+      "quote": "Digit is a commercially deployed humanoid robot."
+    },
+    {
+      "id": "agility_robotics_official_digit_page_2026_07_30_s2",
+      "locator": "Homepage, Digit section",
+      "quote": "Digit is assembled by the Agility team in Salem, OR."
+    },
+    {
+      "id": "agility_robotics_official_digit_page_2026_07_30_s3",
+      "locator": "Homepage, Digit section",
+      "quote": "With roughly 75% of its nearly 6,000 parts sourced from the US"
+    }
+  ]
+}

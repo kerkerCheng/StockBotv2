@@ -1,0 +1,22 @@
+Source URL: https://www.agilityrobotics.com/
+
+Excerpt:
+Source URL: https://www.agilityrobotics.com/
+Title: Agility Robotics official site — Digit assembly, commercial deployment and US parts sourcing
+Retrieved: 2026-07-30
+
+Research excerpt (verbatim):
+- "Digit is a commercially deployed humanoid robot."
+- "Digit is assembled by the Agility team in Salem, OR."
+- "With roughly 75% of its nearly 6,000 parts sourced from the US"
+
+Purpose: establish the co:agility_robotics -[develops]-> prod:digit relation that was missing from the
+graph. prod:digit was created by the GXO customer-side extraction (gxo_agility_raas_deployment_2024_06_27)
+without any link back to its maker, leaving the Agility subgraph disconnected from customer-side evidence.
+
+Boundary: this is issuer self-description on the company's own website (tier 2, origin_entity=Agility
+Robotics). It establishes only that Agility makes Digit and where it is assembled. It is NOT independent
+confirmation of deployment scale, order value, or unit economics, and asserts no sole_source, exclusivity
+or qualification status. prod:digit (deployed at GXO since 2024) and prod:digit_v5 (the 2026 generation
+carrying the $300M+ committed orders) remain deliberately separate nodes; no generation-lineage relation
+is asserted because schema/vocab.json has no relation for product succession.
