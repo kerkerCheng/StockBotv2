@@ -5118,7 +5118,7 @@
         "research_mode": "delta_only"
       },
       "source": "x:aleabitoreddit",
-      "status": "action_prepared",
+      "status": "applied",
       "title": "$AAOI mainly gets revenue from pluggable, they’re developing/sampling related lasers but have no CPO design wins. Others like $MTSI look like they fell off the map for some reason with cpo lasers. CEO says “TBD” with commercial timing and it’s in reliability work right now. And fits the OSINT research done with Ayar removing Macom from their website. So would agree with MS that $SIVE, $LITE, $COHR imo are the three leaders to focus on for lasers.",
       "triage": {
         "decided_at": "2026-07-29T14:00:45.994070+00:00",
@@ -7008,7 +7008,7 @@
         "campaign_topic": "photonics",
         "campaign_window_end": "2026-07-05T09:45:21Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
-        "research_action_id": "ra_51c9c1a8d82d349d18bb166220bdcea9",
+        "related_research_action_id": "ra_51c9c1a8d82d349d18bb166220bdcea9",
         "research_mode": "delta_only",
         "research_outcome": "same_origin_duplicate_of_lead_db77cee320ee409a222adb1b88f865bc",
         "trace_attempts_ref": "sec_000143774926022557",
@@ -11016,7 +11016,7 @@
         "research_action_id": "ra_51c9c1a8d82d349d18bb166220bdcea9"
       },
       "source": "edgar:AXTI",
-      "status": "action_prepared",
+      "status": "applied",
       "title": "AXTI 8-K filed 2026-07-02",
       "triage": {
         "decided_at": "2026-07-25T03:52:34.713745+00:00",

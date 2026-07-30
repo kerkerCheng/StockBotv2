@@ -841,6 +841,7 @@
     },
     {
       "added_at": "2026-07-29T15:16:58.028013+00:00",
+      "deferred_at": "2026-07-30T00:52:44.097059+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 63,
       "reason": null,
@@ -853,6 +854,7 @@
     },
     {
       "added_at": "2026-07-29T15:16:58.028043+00:00",
+      "deferred_at": "2026-07-30T00:52:44.097088+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 64,
       "reason": null,
@@ -865,6 +867,10 @@
     },
     {
       "added_at": "2026-07-29T15:16:58.028071+00:00",
+      "dispatch_baseline_decision_id": "pd_ac6fffd10ff1e5d1a4cedd5ee0756fbc",
+      "dispatch_ref": "wo_def0cdb42b483cd3dc87ddd98ae8cdaa",
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-07-30T00:52:44.836380+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 65,
       "reason": null,
@@ -895,24 +901,40 @@
     },
     {
       "added_at": "2026-07-29T22:45:41.838835+00:00",
+      "completion_authority": {
+        "action_digest": "25ff93f5c606223883a9e1cf9b60b43f2a5e7af712a7d6daa025d601d794c89c",
+        "cohort_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+        "commit": "63ee1d8a9dfd78b50b25c84b5411c5542a55cbc5",
+        "company_id": "co:axt",
+        "verified_at": "2026-07-30T00:55:48.743222+00:00"
+      },
       "hint": "核准 exact graph delta；Decision handoff：co:axt。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 67,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_51c9c1a8d82d349d18bb166220bdcea9;digest:25ff93f5c606223883a9e1cf9b60b43f2a5e7af712a7d6daa025d601d794c89c;commit:63ee1d8a9dfd78b50b25c84b5411c5542a55cbc5;cohort:dc_ab4aa345d1c85b0f3c365a0ec71dad13",
       "ref_id": "ra_51c9c1a8d82d349d18bb166220bdcea9",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-07-30T00:55:48.743222+00:00",
       "source": "research_action",
       "title": "AXT–Coherent 6 吋 InP 三年期 capacity commitment",
       "type": "ra_admission"
     },
     {
       "added_at": "2026-07-29T22:45:41.838863+00:00",
+      "completion_authority": {
+        "action_digest": "476df4322d0d9c50b8eca6fa4e0f1a64a6becb1b915ec749842ea469ffd614b9",
+        "cohort_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
+        "commit": "b952076f5dd8f6ef9ff467c5d33f3dae846caa65",
+        "company_id": "co:applied_optoelectronics",
+        "verified_at": "2026-07-30T00:55:50.283869+00:00"
+      },
       "hint": "核准 exact graph delta；Decision handoff：co:applied_optoelectronics。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 68,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_ab4814197e21600d22aa2ef7c1c9783b;digest:476df4322d0d9c50b8eca6fa4e0f1a64a6becb1b915ec749842ea469ffd614b9;commit:b952076f5dd8f6ef9ff467c5d33f3dae846caa65;cohort:dc_a94362af0d6a7398f02bdeb4f0fb893c",
       "ref_id": "ra_ab4814197e21600d22aa2ef7c1c9783b",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-07-30T00:55:50.283869+00:00",
       "source": "research_action",
       "title": "AAOI 400mW pump laser：sampling 狀態與 CPO 用途",
       "type": "ra_admission"
@@ -1760,6 +1782,51 @@
       "receipt": "trace:original_obtained",
       "ref_id": "lead_038fe471d126685d77dadb0045d9daa6",
       "type": "source_trace_review",
+      "verb": "go"
+    },
+    {
+      "at": "2026-07-30T00:52:44.097059+00:00",
+      "n": 63,
+      "reason": "使用者 2026-07-30 明確 pending",
+      "receipt": null,
+      "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
+      "type": "decision_review",
+      "verb": "pending"
+    },
+    {
+      "at": "2026-07-30T00:52:44.097088+00:00",
+      "n": 64,
+      "reason": "使用者 2026-07-30 明確 pending",
+      "receipt": null,
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "type": "decision_review",
+      "verb": "pending"
+    },
+    {
+      "at": "2026-07-30T00:52:44.836380+00:00",
+      "n": 65,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_def0cdb42b483cd3dc87ddd98ae8cdaa",
+      "ref_id": "dc_6ae5b014dbbcd0774b45487542c9a102",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-07-30T00:55:48.743222+00:00",
+      "n": 67,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_51c9c1a8d82d349d18bb166220bdcea9;digest:25ff93f5c606223883a9e1cf9b60b43f2a5e7af712a7d6daa025d601d794c89c;commit:63ee1d8a9dfd78b50b25c84b5411c5542a55cbc5;cohort:dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "ref_id": "ra_51c9c1a8d82d349d18bb166220bdcea9",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-07-30T00:55:50.283869+00:00",
+      "n": 68,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_ab4814197e21600d22aa2ef7c1c9783b;digest:476df4322d0d9c50b8eca6fa4e0f1a64a6becb1b915ec749842ea469ffd614b9;commit:b952076f5dd8f6ef9ff467c5d33f3dae846caa65;cohort:dc_a94362af0d6a7398f02bdeb4f0fb893c",
+      "ref_id": "ra_ab4814197e21600d22aa2ef7c1c9783b",
+      "type": "ra_admission",
       "verb": "go"
     }
   ],
