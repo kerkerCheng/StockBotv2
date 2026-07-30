@@ -84,49 +84,24 @@ def _holdings(*, cash: float = 10.0, tqqq: float = 0.0, other: list[dict] | None
 
 
 def _capital_rows(*, credit_limit: str = "1000", drawn_amount: str = "0") -> list[dict]:
-    common = {
-        "as_of": "2026-07-28",
-        "confirmation_status": "user_confirmed",
-        "currency": "USD",
-    }
+    common = {"as_of": "2026-07-28", "currency": "USD"}
     return [
         {
             **common,
-            "record_id": "portfolio_cash_authority_01",
-            "capital_type": "portfolio_cash_authority",
-            "amount": "",
-            "amount_source": "Portfolio.cash_twd+Portfolio.cash_usd",
-        },
-        {
-            **common,
-            "record_id": "operating_floor_01",
-            "capital_type": "operating_floor",
+            "record_id": "cash_floor_01",
+            "capital_type": "cash_floor",
             "amount": "1",
         },
         {
             **common,
-            "record_id": "planned_outflows_24m_01",
-            "capital_type": "planned_outflows_reserve_24m",
-            "amount": "0",
-        },
-        {
-            **common,
             "record_id": "credit_facility_01",
-            "capital_type": "contingent_liquidity_credit_facility",
-            "confirmation_status": "user_confirmed_partial",
+            "capital_type": "credit_facility",
             "limit_amount": credit_limit,
             "drawn_amount": drawn_amount,
             "annual_rate_pct": "3.1",
             "interest_accrual": "daily",
-            "availability": "on_demand",
             "facility_term_years": "30",
-            "repayment_structure": "revolving_draw_repay",
-            "minimum_payment_status": "exists_unverified",
-            "minimum_payment_terms": "",
-            "deployment_mode": "manual_review_only",
-            "automatic_deployment": "FALSE",
-            "include_in_net_investable_capital": "FALSE",
-            "include_in_deployable_cash": "FALSE",
+            "repayment_structure": "interest_only_bullet_principal_at_maturity",
         },
     ]
 
@@ -155,21 +130,22 @@ def test_ranges_share_one_frozen_deployable_cash_budget() -> None:
         observations_by_benchmark=observations,
         history_by_benchmark=histories,
         holdings_rows=_holdings(cash=10.0),
+        capital_authority_rows=_capital_rows(),
         as_of=NOW,
         policy=policy,
     )
 
     reviews = [item for item in report["items"] if item["action"] == "CONTRIBUTE REVIEW"]
-    assert report["portfolio"]["deployable_cash_base"] == pytest.approx(2.0)
-    assert sum(item["supported_order_range_base"][1] for item in reviews) <= 2.0
+    assert report["portfolio"]["deployable_cash_base"] == pytest.approx(9.0)
+    assert sum(item["supported_order_range_base"][1] for item in reviews) <= 9.0
     assert report["portfolio"]["allocated_review_base"] == pytest.approx(
         sum(item["supported_order_range_base"][1] for item in reviews)
     )
-    assert report["capital_scope"] == "sheet_conservative"
+    assert report["capital_scope"] == "shared_cash_pool"
     assert report["policy_mode"] == "paper_observation"
 
 
-def test_household_cash_runs_a_separate_range_without_using_credit() -> None:
+def test_shared_cash_pool_subtracts_only_floor_and_never_uses_credit() -> None:
     policy = load_beta_policy()
     observations = _observations(policy)
     histories = {key: [value] for key, value in observations.items()}
@@ -191,24 +167,18 @@ def test_household_cash_runs_a_separate_range_without_using_credit() -> None:
         policy=policy,
     )
 
-    assert report["sheet_conservative_range"][1] <= 2.0
-    assert report["household_cash_supported_range"][1] <= 6.0
-    assert report["household_cash_supported_range"][1] >= report["sheet_conservative_range"][1]
-    assert report["household_cash_supported_range"] == larger_credit["household_cash_supported_range"]
+    assert report["portfolio"]["deployable_cash_base"] == pytest.approx(9.0)
+    assert report["self_funded_supported_range"] == larger_credit["self_funded_supported_range"]
     assert report["contingent_credit_available"]["undrawn_amount_base"] == 1000.0
     assert report["loan_funded_supported_range"]["status"] == "manual_review_required"
-    assert all(
-        item["supported_order_range_base"] == item["sheet_conservative_order_range_base"]
-        for item in report["items"]
-    )
     rendered = render_beta_monitor_markdown(report)
-    assert "已讀取私人資本資料" in rendered
-    assert "Sheet 保守備援" not in rendered
+    assert "共同現金池計算" in rendered
+    assert "cash floor" in rendered
     assert "未動用貸款額度：USD 1,000" in rendered
     assert "不算自有現金" in rendered
 
 
-def test_missing_household_authority_does_not_zero_phase_one_range() -> None:
+def test_missing_cash_floor_authority_fails_shared_cash_closed() -> None:
     policy = load_beta_policy()
     observations = _observations(policy)
     histories = {key: [value] for key, value in observations.items()}
@@ -222,13 +192,11 @@ def test_missing_household_authority_does_not_zero_phase_one_range() -> None:
         policy=policy,
     )
 
-    assert report["sheet_conservative_range"][1] > 0
-    assert report["household_cash_supported_range"] == [0.0, 0.0]
+    assert report["self_funded_supported_range"] == [0.0, 0.0]
     assert "capital_authority_unavailable" in report["blockers"]
     rendered = render_beta_monitor_markdown(report)
     assert "自有現金可部署" in rendered
-    assert "Sheet 保守備援" in rendered
-    assert "Household cash 可部署" not in rendered
+    assert "cash floor 未知" in rendered
     assert "LON:VWRA — observed｜" not in rendered
 
 
@@ -274,6 +242,7 @@ def test_alpha_total_is_warning_only_and_does_not_consume_beta_capacity() -> Non
         observations_by_benchmark=observations,
         history_by_benchmark=histories,
         holdings_rows=rows,
+        capital_authority_rows=_capital_rows(),
         as_of=NOW,
         policy=policy,
     )
@@ -324,6 +293,7 @@ def test_same_signal_respects_repeat_cadence() -> None:
         observations_by_benchmark=observations,
         history_by_benchmark=histories,
         holdings_rows=_holdings(cash=20.0),
+        capital_authority_rows=_capital_rows(),
         as_of=NOW,
         policy=policy,
     )
@@ -356,6 +326,7 @@ def test_known_tsmc_concentration_warns_without_pausing_additions() -> None:
         observations_by_benchmark=observations,
         history_by_benchmark=histories,
         holdings_rows=rows,
+        capital_authority_rows=_capital_rows(),
         as_of=NOW,
         policy=policy,
     )
@@ -398,6 +369,7 @@ def test_markdown_is_aggregate_and_preserves_human_boundary() -> None:
         observations_by_benchmark=observations,
         history_by_benchmark={key: [value] for key, value in observations.items()},
         holdings_rows=_holdings(),
+        capital_authority_rows=_capital_rows(),
         as_of=NOW,
         policy=policy,
     )
@@ -407,7 +379,8 @@ def test_markdown_is_aggregate_and_preserves_human_boundary() -> None:
     assert "自有現金可部署" in rendered
     assert "本輪可評估上限" in rendered
     assert "未動用貸款額度" in rendered
-    assert "Sheet 保守備援" in rendered
+    assert "共同現金池計算" in rendered
+    assert "不預扣 alpha reserve" in rendered
     assert "Sheet／household" not in rendered
     assert "## TL;DR" in rendered
     assert "退休淨終值" in rendered

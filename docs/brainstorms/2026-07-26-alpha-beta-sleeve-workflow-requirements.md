@@ -11,6 +11,12 @@
 > [`2026-07-26-next-phase-operating-model-requirements.md`](2026-07-26-next-phase-operating-model-requirements.md)；
 > 本檔保留 Portfolio Sleeve 的深度需求。
 
+> **2026-07-30 current-state override：** 下文的 household／planned outflows／5% operating reserve／3% alpha
+> reserve／雙 cash range 只保留為歷史推導，不再是 current contract。現行唯一共同可投資現金池為
+> `Portfolio CASH − cash floor`，供 Alpha 與 Beta 共用；兩者分配由各自 sizing／campaign policy 另行決定。
+> `Capital Authority` 只保留 cash floor 與貸款必要條款，貸款不併入自有現金並另計利息。Current authority
+> 以 `AGENTS.md`、`skills/daily-brief/SKILL.md` 與程式為準。
+
 ## 最危險的三個盲點（先看這個）
 
 1. 🔴 **把「指數長期向上」直接推成「daily 3x 長抱必然向上」** — daily reset 的終值依賴報酬路徑；

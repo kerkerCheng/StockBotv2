@@ -1,4 +1,4 @@
-# Daily Approval Brief — Codex 本機排程 Prompt（v1.4）
+# Daily Approval Brief — Codex 本機排程 Prompt（v1.5）
 
 > 現行執行端是 Codex desktop 的 standalone local scheduled task，每日台北 06:30 直接在
 > `C:\Users\Cheng\code\StockBotv2` 的 `master` working tree 執行。電腦需保持開機、Codex App
@@ -24,10 +24,12 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
    - `.venv\Scripts\python.exe -m engine_b.cli harvest-health`（列出最新仍未恢復的來源失敗）
    - `.venv\Scripts\python.exe engine_c\etl_yfinance.py`（35 檔 Engine C daily snapshot）
    - `.venv\Scripts\python.exe scripts\daily_beta_snapshot.py --format markdown --risk-view changes`（固定 ETF／權值股 technical refresh
-     ＋ Engine D 內部雙 cash range beta monitor；JSON 保留 `sheet_conservative_range`／
-     `household_cash_supported_range` fail-safe，但人類首屏只顯示一條自有現金主路徑。Engine C 保存
-     adjusted-close 1／5／20-session return；`contingent_credit_available` 只顯示為未動用貸款額度、不算
-     自有現金，`loan_funded_supported_range` 固定人工 review；只呈現、不推定 draw／choice／fill）
+     ＋ Engine D 單一 shared cash pool beta monitor；JSON 只保留 `self_funded_supported_range`，計算固定為
+     `Portfolio CASH − cash floor`。cash floor 以上由 Alpha／Beta 共用，sleeve 分配另由 campaign budget、
+     Decision sizing、單筆上限與風控決定；不得推導 operating／alpha reserve、planned outflows 或雙 cash view。
+     Engine C 保存 adjusted-close 1／5／20-session return；`contingent_credit_available` 顯示未動用額度、
+     已借款與估計利息但不算自有現金，`loan_funded_supported_range` 固定人工 review；只呈現、不推定
+     draw／choice／fill）
    - 對今日新增 pending leads 套 `skills/signal-triage/SKILL.md`，用本機 CLI 寫回 triage
    - `.venv\Scripts\python.exe -m engine_b.cli trace-backlog`（顯示 parked 追源未果及下一 trigger；不把一般 backlog 全塞 pq2）
    - `.venv\Scripts\python.exe -m decision_lab today --format markdown`
@@ -39,8 +41,8 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
    重跑仍失敗則保留在 `harvest-health` 與健康段落，研究追源另依 `$source-trace` 嘗試一條官方替代路徑。
    beta technical 的 `insufficient_history`／
    `unavailable`／`stale` 也必須列在健康段落，該商品 supported range 歸零但不阻斷其他商品。Capital Authority
-   缺失／stale／FX 錯誤只歸零 household range，不得抹掉 Phase I Sheet range；四欄 internal capital output
-   都要保留，但人類首屏只顯示一條自有現金主路徑，另一條只在降級時作備援說明。
+   的 cash floor 缺失／stale／FX 錯誤時，單一 self-funded range fail closed 歸零；不得回退到百分比 reserve
+   或另一條 cash path。
    routine 的 Google Sheet credential scope 維持 `spreadsheets.readonly`，不得建立或修改 tab／cell。單一來源失敗不
    阻斷其他段落。X token
    只從本機 `.env` 讀取，不得輸出或搬移 token。Beta monitor 的 aggregate risk snapshot 會 append 到
@@ -108,9 +110,9 @@ go 授權：<bounded research／exact graph admission／manual observation／the
 
 ## Beta capital observation（無 pq2 編號）
 TL;DR：<約 30 年後 retirement_net_terminal_wealth 目標；今日哪些標的可人工評估；最重要的動態風控 warning>
-自有現金可部署：<Capital Authority 可用就採 household；否則 Sheet 保守備援>
+自有現金可部署：<Portfolio CASH − cash floor；Alpha／Beta 共用>
 本輪可評估上限：<同一主路徑經 technical 節奏與 risk caps 後的 ceiling；不是下單金額>
-未動用貸款額度：<明標不算自有現金、未納入本輪上限；貸款投入仍 manual_review_required>
+未動用貸款額度：<另列已借款與估計利息；明標不算自有現金、未納入本輪上限；貸款投入仍 manual_review_required>
 <先列需要人工判斷，再列主力 QQQ／TQQQ／LON:VWRA／SOXX／00631L.TW／2330.TW／00981A.TW；每檔必須保留 🟢可評估／🟡冷卻／⚪觀察／🔴資料不足文字燈號＋1／5／20 日漲跌＋必要指標，pace 顯示為節奏百分比，個股與其他縮成摘要>
 
 ## 健康／資料降級

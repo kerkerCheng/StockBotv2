@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 from typing import Any, Mapping, Sequence
 
 from .beta_policy import load_beta_policy
-from .capital_authority import build_household_capital_view
+from .capital_authority import build_capital_view
 from .portfolio_risk import (
     build_portfolio_components,
     compose_risk_snapshot,
@@ -206,20 +206,12 @@ def _portfolio_snapshot(
 ) -> dict[str, Any]:
     components = build_portfolio_components(holdings_rows, policy)
     blockers = list(components["blockers"])
-    nav_base = float(components["nav_base"])
     cash = float(components["cash_base"])
     if holdings_rows is not None and cash <= 0:
         blockers.append("cash_bucket_missing")
-    reserve = nav_base * (
-        float(policy["capital"]["operating_reserve_nav_fraction"])
-        + float(policy["capital"]["alpha_reserve_nav_fraction"])
-    )
-    deployable = max(cash - reserve, 0.0) if not blockers else 0.0
     return dict(components) | {
         "status": "available" if not blockers else "malformed",
         "blockers": sorted(set(blockers)),
-        "reserve_base": reserve,
-        "deployable_cash_base": deployable,
     }
 
 
@@ -359,19 +351,13 @@ def build_beta_monitor(
             }
         )
 
-    capital_view = build_household_capital_view(
+    capital_view = build_capital_view(
         authority_rows=capital_authority_rows,
         portfolio_cash_base=portfolio["cash_base"],
-        portfolio_nav_base=portfolio["nav_base"],
         base_currency=portfolio["base_currency"],
         evaluation_at=evaluation_at,
-        alpha_reserve_nav_fraction=float(
-            resolved_policy["capital"]["alpha_reserve_nav_fraction"]
-        ),
-        max_authority_age_days=int(
-            resolved_policy["capital"]["household_authority_max_age_days"]
-        ),
-        max_fx_age_hours=int(resolved_policy["capital"]["household_fx_max_age_hours"]),
+        max_authority_age_days=int(resolved_policy["capital"]["authority_max_age_days"]),
+        max_fx_age_hours=int(resolved_policy["capital"]["fx_max_age_hours"]),
         fx_fetcher=fx_fetcher,
     )
     risk_snapshot = compose_risk_snapshot(
@@ -380,34 +366,25 @@ def build_beta_monitor(
         resolved_policy,
         as_of=evaluation_at,
     )
-    sheet_allocations, remaining_cash = _allocate_ranges(
-        prepared=prepared,
-        portfolio=portfolio,
-        policy=resolved_policy,
-        deployable_cash=float(portfolio["deployable_cash_base"]),
-        capital_available=portfolio["status"] == "available",
-        capital_blockers=portfolio["blockers"],
-        global_risk_blocks=risk_snapshot["hard_blocks"],
-    )
-    household_cash = capital_view["household_cash"]
-    household_available = (
+    self_funded_cash = capital_view["self_funded_cash"]
+    capital_available = (
         portfolio["status"] == "available"
-        and household_cash["status"] == "available"
+        and self_funded_cash["status"] == "available"
     )
-    household_allocations, household_remaining_cash = _allocate_ranges(
+    allocations, remaining_cash = _allocate_ranges(
         prepared=prepared,
         portfolio=portfolio,
         policy=resolved_policy,
-        deployable_cash=float(household_cash["deployable_cash_base"]),
-        capital_available=household_available,
-        capital_blockers=household_cash["blockers"],
+        deployable_cash=float(self_funded_cash["deployable_cash_base"]),
+        capital_available=capital_available,
+        capital_blockers=sorted(
+            set(portfolio["blockers"] + self_funded_cash["blockers"])
+        ),
         global_risk_blocks=risk_snapshot["hard_blocks"],
     )
 
     items: list[dict[str, Any]] = []
-    for candidate, sheet_allocation, household_allocation in zip(
-        prepared, sheet_allocations, household_allocations, strict=True
-    ):
+    for candidate, allocation in zip(prepared, allocations, strict=True):
         instrument = candidate["instrument"]
         observation = candidate["observation"]
         state = candidate["state"]
@@ -449,18 +426,11 @@ def build_beta_monitor(
                     if nav > 0
                     else None
                 ),
-                "supported_order_range_base": sheet_allocation["supported_order_range_base"],
-                "sheet_conservative_order_range_base": sheet_allocation["supported_order_range_base"],
-                "binding_constraints": sheet_allocation["binding_constraints"],
-                "blockers": sheet_allocation["blockers"],
-                "warnings": sheet_allocation["warnings"],
-                "action": sheet_allocation["action"],
-                "household_cash_supported_order_range_base": household_allocation[
-                    "supported_order_range_base"
-                ],
-                "household_binding_constraints": household_allocation["binding_constraints"],
-                "household_blockers": household_allocation["blockers"],
-                "household_action": household_allocation["action"],
+                "supported_order_range_base": allocation["supported_order_range_base"],
+                "binding_constraints": allocation["binding_constraints"],
+                "blockers": allocation["blockers"],
+                "warnings": allocation["warnings"],
+                "action": allocation["action"],
             }
         )
     technical_statuses = {str(item["technical_status"]) for item in items}
@@ -479,12 +449,11 @@ def build_beta_monitor(
         if base_status == "partial" or capital_view["status"] != "available"
         else "ok"
     )
-    sheet_allocated = float(portfolio["deployable_cash_base"]) - remaining_cash
-    household_allocated = (
-        float(household_cash["deployable_cash_base"]) - household_remaining_cash
+    self_funded_allocated = (
+        float(self_funded_cash["deployable_cash_base"]) - remaining_cash
     )
     report = {
-        "schema_version": "engine-d-beta-monitor-v3",
+        "schema_version": "engine-d-beta-monitor-v4",
         "as_of": evaluation_at,
         "policy_version": resolved_policy["policy_version"],
         "policy_mode": resolved_policy["mode"],
@@ -495,9 +464,9 @@ def build_beta_monitor(
             "nav_base": nav if nav > 0 else None,
             "base_currency": portfolio["base_currency"],
             "cash_base": portfolio["cash_base"],
-            "reserve_base": portfolio.get("reserve_base", 0.0),
-            "deployable_cash_base": portfolio["deployable_cash_base"],
-            "allocated_review_base": sheet_allocated,
+            "cash_floor_base": self_funded_cash["cash_floor_base"],
+            "deployable_cash_base": self_funded_cash["deployable_cash_base"],
+            "allocated_review_base": self_funded_allocated,
             "remaining_cash_base": remaining_cash,
             "leveraged_nominal_weight": portfolio["leveraged_nominal_base"] / nav if nav > 0 else None,
             "leveraged_effective_weight": portfolio["leveraged_effective_base"] / nav if nav > 0 else None,
@@ -513,15 +482,14 @@ def build_beta_monitor(
                 "authority_as_of",
                 "digest",
                 "base_currency",
-                "household_cash",
+                "self_funded_cash",
                 "fx",
                 "blockers",
                 "warnings",
                 "drawn_debt_base",
             )
         },
-        "sheet_conservative_range": [0.0, sheet_allocated],
-        "household_cash_supported_range": [0.0, household_allocated],
+        "self_funded_supported_range": [0.0, self_funded_allocated],
         "contingent_credit_available": capital_view["contingent_credit_available"],
         "loan_funded_supported_range": capital_view["loan_funded_supported_range"],
         "risk_snapshot": risk_snapshot,
@@ -625,45 +593,30 @@ def _status_label(value: Any) -> str:
     }.get(str(value), str(value).replace("_", " "))
 
 
-def _primary_action(item: Mapping[str, Any], *, household_path_available: bool) -> str:
-    return str(item["household_action"] if household_path_available else item["action"])
+def _primary_action(item: Mapping[str, Any]) -> str:
+    return str(item["action"])
 
 
-def _primary_blockers(
-    item: Mapping[str, Any], *, household_path_available: bool
-) -> list[str]:
-    key = "household_blockers" if household_path_available else "blockers"
-    return [str(value) for value in item.get(key) or []]
+def _primary_blockers(item: Mapping[str, Any]) -> list[str]:
+    return [str(value) for value in item.get("blockers") or []]
 
 
-def _primary_binding_constraints(
-    item: Mapping[str, Any], *, household_path_available: bool
-) -> list[str]:
-    key = "household_binding_constraints" if household_path_available else "binding_constraints"
-    return [str(value) for value in item.get(key) or []]
+def _primary_binding_constraints(item: Mapping[str, Any]) -> list[str]:
+    return [str(value) for value in item.get("binding_constraints") or []]
 
 
-def _primary_supported_ceiling(
-    item: Mapping[str, Any], *, household_path_available: bool
-) -> Any:
-    key = (
-        "household_cash_supported_order_range_base"
-        if household_path_available
-        else "supported_order_range_base"
-    )
-    value = item.get(key) or [0.0, 0.0]
+def _primary_supported_ceiling(item: Mapping[str, Any]) -> Any:
+    value = item.get("supported_order_range_base") or [0.0, 0.0]
     return value[1]
 
 
-def _display_label(item: Mapping[str, Any], *, household_path_available: bool) -> str:
-    action = _primary_action(item, household_path_available=household_path_available)
+def _display_label(item: Mapping[str, Any]) -> str:
+    action = _primary_action(item)
     if action == "CONTRIBUTE REVIEW":
         return "🟢 可評估"
     if item["technical_status"] != "observed":
         return "🔴 資料不足"
-    blockers = set(
-        _primary_blockers(item, household_path_available=household_path_available)
-    )
+    blockers = set(_primary_blockers(item))
     if "signal_review_cooldown" in blockers or "overlapping_instrument_deferred" in blockers:
         return "🟡 冷卻／排序中"
     if action == "PAUSE CONTRIBUTION":
@@ -671,22 +624,18 @@ def _display_label(item: Mapping[str, Any], *, household_path_available: bool) -
     return "⚪ 觀察"
 
 
-def _compact_monitor_item(
-    item: Mapping[str, Any], *, household_path_available: bool
-) -> str:
+def _compact_monitor_item(item: Mapping[str, Any]) -> str:
     return (
-        f"{item['ticker']} {_display_label(item, household_path_available=household_path_available)}"
+        f"{item['ticker']} {_display_label(item)}"
         f"（{_moves(item['indicator'])}，"
         f"{_signal_tier_label(item['signal_tier'])}/{_pace_label(item['signal_pace'])}"
         + (
             "，"
             + "、".join(
                 _constraint_label(value)
-                for value in _primary_blockers(
-                    item, household_path_available=household_path_available
-                )
+                for value in _primary_blockers(item)
             )
-            if _primary_blockers(item, household_path_available=household_path_available)
+            if _primary_blockers(item)
             else ""
         )
         + "）"
@@ -767,33 +716,19 @@ def render_beta_monitor_markdown(
     *,
     risk_view: str = "changes",
 ) -> str:
-    """Render one human-facing self-funded view while preserving dual internal ranges。"""
+    """Render one shared Alpha/Beta self-funded cash pool and separate loan view。"""
 
     portfolio = report["portfolio"]
     currency = portfolio.get("base_currency")
     capital_view = report["capital_view"]
-    household_cash = capital_view["household_cash"]
+    self_funded_cash = capital_view["self_funded_cash"]
     contingent = report["contingent_credit_available"]
-    household_path_available = household_cash.get("status") == "available"
-    if household_path_available:
-        capital_source = (
-            "已讀取私人資本資料；投組現金扣除生活／營運備用金、已知支出，"
-            "以及總資產 3% 的個股研究部位預留額"
-        )
-        deployable_cash = household_cash.get("deployable_cash_base")
-        supported_ceiling = report["household_cash_supported_range"][1]
-    else:
-        capital_source = (
-            "Sheet 保守備援；投組現金扣除總資產 5% 的生活／營運備用金，"
-            "以及總資產 3% 的個股研究部位預留額"
-        )
-        deployable_cash = portfolio.get("deployable_cash_base")
-        supported_ceiling = report["sheet_conservative_range"][1]
+    deployable_cash = self_funded_cash.get("deployable_cash_base")
+    supported_ceiling = report["self_funded_supported_range"][1]
     reviews = [
         item
         for item in report["items"]
-        if _primary_action(item, household_path_available=household_path_available)
-        == "CONTRIBUTE REVIEW"
+        if _primary_action(item) == "CONTRIBUTE REVIEW"
     ]
     review_names = "、".join(str(item["ticker"]) for item in reviews) or "無"
     lines = [
@@ -815,8 +750,13 @@ def render_beta_monitor_markdown(
         f"（狀態：{_status_label(contingent.get('status', 'unknown'))}；"
         f"條件資料：{_status_label(contingent.get('terms_status', 'unknown'))}；"
         "不算自有現金）",
+        f"- 已借款：{_money(contingent.get('drawn_amount_base'), currency)}；"
+        f"估計月息：{_money(contingent.get('estimated_monthly_interest_base'), currency)}",
         "- 貸款投入：尚未核准；提款金額、標的與批次必須另案人工核准，且月息不得依賴被迫賣出 beta",
-        f"- 自有現金計算：{capital_source}",
+        f"- 共同現金池計算：Portfolio CASH {_money(portfolio.get('cash_base'), currency)} − "
+        f"cash floor {_money(self_funded_cash.get('cash_floor_base'), currency)}；"
+        "cash floor 以上全部可供 Alpha 與 Beta 共用",
+        "- Alpha／Beta 分配：由各自的 campaign budget、Decision sizing、單筆上限與風控另外決定；不預扣 alpha reserve。",
         "- 節奏說明：25% 代表使用該類資產完整單輪預算的四分之一，不是投入總資產的 25%。",
     ]
     blockers = report.get("blockers") or []
@@ -847,8 +787,7 @@ def render_beta_monitor_markdown(
         item
         for item in report["items"]
         if item not in reviews
-        and _primary_action(item, household_path_available=household_path_available)
-        == "PAUSE CONTRIBUTION"
+        and _primary_action(item) == "PAUSE CONTRIBUTION"
     ]
     holds = [item for item in report["items"] if item not in reviews and item not in paused]
     lines += ["", "## 需要人工判斷"]
@@ -857,19 +796,17 @@ def render_beta_monitor_markdown(
     for item in reviews:
         indicator = item["indicator"]
         lines.append(
-            f"- {_display_label(item, household_path_available=household_path_available)}｜"
+            f"- {_display_label(item)}｜"
             f"{item['ticker']}｜{_moves(indicator)}｜"
             f"RSI {_finite(indicator.get('rsi_14')) or 0:.1f}｜距高點 {_pct(indicator.get('drawdown_252'))}｜"
             f"{_signal_tier_label(item['signal_tier'])} / {_pace_label(item['signal_pace'])}｜"
             f"自有現金評估上限 "
-            f"{_money(_primary_supported_ceiling(item, household_path_available=household_path_available), currency)}｜"
+            f"{_money(_primary_supported_ceiling(item), currency)}｜"
             "限制 "
             + (
                 "、".join(
                     _constraint_label(value)
-                    for value in _primary_binding_constraints(
-                        item, household_path_available=household_path_available
-                    )
+                    for value in _primary_binding_constraints(item)
                 )
                 or "無"
             )
@@ -879,19 +816,15 @@ def render_beta_monitor_markdown(
         for item in paused:
             indicator = item["indicator"]
             lines.append(
-                f"- {_display_label(item, household_path_available=household_path_available)}｜"
+                f"- {_display_label(item)}｜"
                 f"{item['ticker']}｜{_moves(indicator)}｜"
                 "原因="
                 + (
                     "、".join(
                         _constraint_label(value)
-                        for value in _primary_blockers(
-                            item, household_path_available=household_path_available
-                        )
+                    for value in _primary_blockers(item)
                     )
-                    or _primary_action(
-                        item, household_path_available=household_path_available
-                    )
+                    or _primary_action(item)
                 )
             )
     primary_rank = {ticker: index for index, ticker in enumerate(_PRIMARY_DISPLAY_ORDER)}
@@ -905,7 +838,7 @@ def render_beta_monitor_markdown(
         for item in primary_holds:
             indicator = item["indicator"]
             lines.append(
-                f"- {_display_label(item, household_path_available=household_path_available)}｜"
+                f"- {_display_label(item)}｜"
                 f"{item['ticker']}｜{_moves(indicator)}｜"
                 f"RSI {_finite(indicator.get('rsi_14')) or 0:.1f}｜"
                 f"距高點 {_pct(indicator.get('drawdown_252'))}｜"
@@ -921,9 +854,7 @@ def render_beta_monitor_markdown(
             lines.append(
                 "- 其他 ETF："
                 + "；".join(
-                    _compact_monitor_item(
-                        item, household_path_available=household_path_available
-                    )
+                    _compact_monitor_item(item)
                     for item in other_etfs
                 )
             )
@@ -931,9 +862,7 @@ def render_beta_monitor_markdown(
             lines.append(
                 "- 個股："
                 + "；".join(
-                    _compact_monitor_item(
-                        item, household_path_available=household_path_available
-                    )
+                    _compact_monitor_item(item)
                     for item in individual_names
                 )
             )

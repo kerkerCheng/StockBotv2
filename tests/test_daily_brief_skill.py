@@ -57,10 +57,12 @@ def test_states_gates_and_human_boundaries() -> None:
     # 決策寫入只在本機、遠端 fallback 用唯讀 get_decision_brief。
     assert "get_decision_brief" in text
     assert "只在本機" in text
-    assert "Sheet-only conservative" in text
     assert "不推定 choice／fill" in text
-    assert "sheet_conservative_range" in text
-    assert "household_cash_supported_range" in text
+    assert "self_funded_supported_range" in text
+    assert "Portfolio CASH − cash floor" in text
+    assert "Alpha 與 Beta" in text
+    assert "sheet_conservative_range" not in text
+    assert "household_cash_supported_range" not in text
     assert "contingent_credit_available" in text
     assert "loan_funded_supported_range=manual_review_required" in text
     assert "spreadsheets.readonly" in text

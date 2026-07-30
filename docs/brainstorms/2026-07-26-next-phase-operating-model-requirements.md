@@ -18,6 +18,10 @@
 > session；兩者直接讀同一 repo、Neo4j、Engine C／Decision Store 與 Google Sheet，採序列切換。
 > Cloud session＋MCP 只是備援，不是本階段 parity／記憶共享目標，也不在本文件新增 remote surface。
 
+> **2026-07-30 current-state override：** household／planned-outflow／百分比 reserve 與雙 cash range 已退役。
+> 現行唯一自有現金公式是 `Portfolio CASH − cash floor`，供 Alpha／Beta 共用；貸款另列額度、已借款與利息，
+> 不併入現金。下文相反描述只保留歷史脈絡，current authority 以 `AGENTS.md`、canonical daily skill 與程式為準。
+
 ## 最危險的三個盲點（先看這個）
 
 1. 🔴 **把 Codex／Claude session memory 當成共享狀態** — Codex automation 的

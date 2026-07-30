@@ -9,7 +9,7 @@ description: >
   每日摘要、今天有什麼、待判斷、今天需要動作嗎。
 ---
 
-# Daily Approval Brief Skill（v1.4）
+# Daily Approval Brief Skill（v1.5）
 
 ## 定位一句話
 
@@ -41,21 +41,22 @@ admission 必經核准 exact 對象、深挖由 priority 排序但入圖仍核�
 
 第一支抓 X＋RSS＋EDGAR watch 新項，以 `since_id`／URL-hash 去重；第二支刷新 Engine C financial snapshots。
 第四支對固定 ETF／權值股 universe 刷新 Engine C TechnicalObservation，再由 Engine D 產
-`HOLD / PAUSE CONTRIBUTION / CONTRIBUTE REVIEW`。Runtime／JSON 以同一組 risk caps 並列
-`sheet_conservative_range`（Sheet-only conservative）與 `household_cash_supported_range` 兩條 fail-safe
-calculation，另保存 `contingent_credit_available` 與
-`loan_funded_supported_range=manual_review_required`。人類首屏不得把前兩條寫成兩種「可部署現金」：
-Capital Authority 可用時，以 household path 作唯一的「自有現金可部署」與「本輪可評估上限」；不可用時
-才顯示 `Sheet 保守備援` 並在健康段落解釋降級。`contingent_credit_available` 只顯示為「未動用貸款額度」，
-明標不算自有現金、未納入本輪上限。Portfolio cash
-仍是自有 cash 唯一 authority；`Capital Authority` 只以 `spreadsheets.readonly` 讀取 private floor／outflows／
-facility，undrawn credit 不進 NAV／cash／allocation。technical／capital telemetry 不進 pq1，recommendation
+`HOLD / PAUSE CONTRIBUTION / CONTRIBUTE REVIEW`。Runtime／JSON 只保留一條
+`self_funded_supported_range`：共同可投資現金池固定等於 `Portfolio CASH − cash floor`，cash floor 以上
+全部可供 Alpha 與 Beta 使用。不得再推導 5% operating reserve、3% alpha reserve、planned outflows，
+也不得恢復 Sheet／household 雙 cash view。Alpha／Beta 如何分配由各自 campaign budget、Decision sizing、
+單筆上限與風控另外決定，不能用 cash reserve 偷渡固定 sleeve 比例。
+`Capital Authority` 以 `spreadsheets.readonly` 只讀 `cash_floor` 與 `credit_facility`；cash floor 缺失、stale 或 FX
+錯誤時，單一 self-funded range fail closed 歸零。`contingent_credit_available` 只顯示為「未動用貸款額度」，
+另列已借款與估計利息，明標不算自有現金、未納入本輪上限；
+`loan_funded_supported_range=manual_review_required`。Portfolio cash 仍是自有 cash 唯一 authority，undrawn
+credit 不進 NAV／cash／allocation。technical／capital telemetry 不進 pq1，recommendation
 不推定 choice／fill，也不推定 draw，且不寫 Google Sheet。fetch／parse 失敗各記 harvest_log；
 **解析失敗 ≠ 無新文**。每筆失敗必須保存 `failure_class`；最新一次仍失敗的來源由
 `harvest-health` 持續顯示。fixed entry 若疑似 sandbox／proxy／本機網路權限受阻，原命令必須在允許
 本機網路的權限下重跑一次；第一次記 `access_blocked`，只有同一來源後續成功才標 recovered，重跑仍失敗
 不得改寫成「零筆」或 `no_result`。`insufficient_history`／`unavailable`／`stale` 也必須在健康段落明示並讓受影響的
-technical 或 household range 獨立歸零；Capital Authority 失敗不得連帶抹掉 Phase I Sheet range。Windows 本機與
+technical 或 self-funded range 歸零。Windows 本機與
 scheduled task 一律使用 repo `.venv`，不要依賴父 shell 是否剛好 activate。
 Engine C 同一筆 observation 保存 adjusted-close 的 1／5／20-session return；Engine D 才負責把
 return、RSI、252-session drawdown、signal tier、cooldown 與 capital constraints 組成 Mobile-friendly
@@ -208,9 +209,9 @@ park：社群 CPO 推論 → 一手來源未支持，不產空 RA
 
 ## Beta capital observation（無 pq2 編號）
 TL;DR：最大化約 30 年後 `retirement_net_terminal_wealth`；technical 只決定新增 timing／pace；列今日可人工評估標的與最重要的動態風控 warning
-自有現金可部署：<Capital Authority 可用就採 household；否則 Sheet 保守備援>
+自有現金可部署：<Portfolio CASH − cash floor；Alpha／Beta 共用>
 本輪可評估上限：<同一主路徑經 technical 節奏與 risk caps 後的 ceiling；不是下單金額>
-未動用貸款額度：<amount／terms status；明標不算自有現金、未納入本輪上限>
+未動用貸款額度：<amount／已借款／估計利息／terms status；明標不算自有現金、未納入本輪上限>
 貸款投入：manual_review_required
 🟢／🟡／⚪／🔴 <逐檔文字燈號＋1／5／20 日漲跌＋必要指標；pace 顯示為節奏百分比>
 

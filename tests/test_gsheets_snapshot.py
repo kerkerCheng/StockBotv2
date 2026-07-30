@@ -171,10 +171,10 @@ def test_operational_sheet_read_rejects_partial_canonical_contract(
         fetch_portfolio(strict_operational=True)
 
 
-def test_capital_authority_reader_uses_exact_schema_and_readonly_scope(monkeypatch) -> None:
+def test_capital_authority_reader_uses_shared_cash_schema_and_readonly_scope(monkeypatch) -> None:
     monkeypatch.setattr(gsheets, "SPREADSHEET_ID", "fixture")
     row = [""] * len(CAPITAL_AUTHORITY_HEADERS)
-    row[0] = "operating_floor_twd_01"
+    row[0] = "cash_floor_twd_01"
     monkeypatch.setattr(
         gsheets,
         "_get_service",
@@ -183,7 +183,7 @@ def test_capital_authority_reader_uses_exact_schema_and_readonly_scope(monkeypat
 
     records = fetch_capital_authority()
 
-    assert records[0]["record_id"] == "operating_floor_twd_01"
+    assert records[0]["record_id"] == "cash_floor_twd_01"
     assert SCOPES == ["https://www.googleapis.com/auth/spreadsheets.readonly"]
 
 

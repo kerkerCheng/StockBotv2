@@ -17,7 +17,13 @@ def test_repository_beta_policy_has_fourteen_instruments_and_eleven_series() -> 
     policy = load_beta_policy()
 
     assert policy["mode"] == "paper_observation"
-    assert policy["capital_scope"] == "sheet_conservative"
+    assert policy["schema_version"] == "beta-policy-v2"
+    assert policy["capital_scope"] == "shared_cash_pool"
+    assert set(policy["capital"]) == {
+        "cash_bucket_aliases",
+        "authority_max_age_days",
+        "fx_max_age_hours",
+    }
     assert len(policy["instruments"]) == 14
     assert len(unique_benchmarks(policy)) == 11
     by_ticker = {item["ticker"]: item for item in policy["instruments"]}
