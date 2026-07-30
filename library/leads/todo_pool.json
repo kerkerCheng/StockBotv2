@@ -841,20 +841,26 @@
     },
     {
       "added_at": "2026-07-29T15:16:58.028013+00:00",
-      "deferred_at": "2026-07-30T00:52:44.097059+00:00",
+      "dispatch_baseline_decision_id": "pd_8e6917ab2c5d2438eed27876132f3cd9",
+      "dispatch_receipt": "decision:pd_0a0b28a84859817afabaafa9f1411298",
+      "dispatch_ref": "wo_dc79ed71de333dade7e3d3dff89de9d4",
+      "dispatch_status": "completed",
+      "dispatch_updated_at": "2026-07-30T10:09:28.943692+00:00",
+      "dispatched_at": "2026-07-30T10:02:14.885413+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 63,
-      "reason": null,
+      "reason": "400mW CPO pump laser 入圖後 reassess：新增第二條技術路徑（sampling 階段，未升格）；釐清 Digicomm 53.1% 為獨家代理商而非終端客戶，且 hyperscaler 結構性不具名供應商，故客戶端獨立佐證多屬本質不可得；runway 約 11.8 個月，burn 主要來自可調節 capex",
+      "receipt": "decision:pd_0a0b28a84859817afabaafa9f1411298",
       "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-07-30T10:09:28.943692+00:00",
       "source": "decision_lab",
       "title": "REVIEW — co:applied_optoelectronics",
       "type": "decision_review"
     },
     {
       "added_at": "2026-07-29T15:16:58.028043+00:00",
-      "deferred_at": "2026-07-30T00:52:44.097088+00:00",
+      "deferred_at": "2026-07-30T10:11:31.331706+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 64,
       "reason": null,
@@ -990,13 +996,19 @@
     },
     {
       "added_at": "2026-07-30T05:03:34.826862+00:00",
-      "deferred_at": "2026-07-30T07:54:09.259068+00:00",
+      "dispatch_baseline_decision_id": "pd_d8be4eca9ed0e7e5b1224098725e8f36",
+      "dispatch_receipt": "decision:pd_efd4b7965b9d73547aeb9d1d9d77d9e8",
+      "dispatch_ref": "wo_b975aa3d2e687a94ae442b3514e777d7",
+      "dispatch_status": "completed",
+      "dispatch_updated_at": "2026-07-30T10:11:16.579815+00:00",
+      "dispatched_at": "2026-07-30T10:02:14.893906+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 72,
-      "reason": null,
+      "reason": "第二輪 bounded gap research 完成：圖已補 develops→prod:digit 並實測 2-hop 通路；確認 independent_source_missing 需直接連到公司節點的 GXO 端邊，而 GXO FY2025 10-K 對 Agility 0 命中、既有抽取不可改，故目前無材料。財務三軸維持 unknown（S-4 未公開），identity 依使用者定案不登記 ticker",
+      "receipt": "decision:pd_efd4b7965b9d73547aeb9d1d9d77d9e8",
       "ref_id": "dc_6ae5b014dbbcd0774b45487542c9a102",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-07-30T10:11:16.579815+00:00",
       "source": "decision_lab",
       "title": "REVIEW — co:agility_robotics",
       "type": "decision_review"
@@ -1020,6 +1032,32 @@
       "source": "research_action",
       "title": "Agility Robotics 官方頁面：補上 co:agility_robotics→prod:digit 缺失關係與 aliases",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-07-30T10:11:44.913485+00:00",
+      "deferred_at": "2026-07-30T10:12:56.042217+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 74,
+      "reason": null,
+      "ref_id": "dc_6ae5b014dbbcd0774b45487542c9a102",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:agility_robotics",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-07-30T10:11:44.913513+00:00",
+      "deferred_at": "2026-07-30T10:12:56.169035+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 75,
+      "reason": null,
+      "ref_id": "dc_b1225ef0ebbf6dab001ec8cabb11f4e1",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:agility_robotics",
+      "type": "decision_review"
     }
   ],
   "log": [
@@ -1982,8 +2020,107 @@
       "ref_id": "ra_f97210987536a34ddb83ff2d2e51c9ad",
       "type": "ra_admission",
       "verb": "go"
+    },
+    {
+      "at": "2026-07-30T10:02:14.885413+00:00",
+      "n": 63,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_dc79ed71de333dade7e3d3dff89de9d4",
+      "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-07-30T10:02:14.893906+00:00",
+      "n": 72,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_b975aa3d2e687a94ae442b3514e777d7",
+      "ref_id": "dc_6ae5b014dbbcd0774b45487542c9a102",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-07-30T10:07:06.342626+00:00",
+      "n": 63,
+      "reason": "本機 session 開始 AAOI bounded gap research",
+      "receipt": "wo_dc79ed71de333dade7e3d3dff89de9d4",
+      "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-07-30T10:07:07.045685+00:00",
+      "n": 72,
+      "reason": "本機 session 開始 Agility 第二輪 bounded gap research",
+      "receipt": "wo_b975aa3d2e687a94ae442b3514e777d7",
+      "ref_id": "dc_6ae5b014dbbcd0774b45487542c9a102",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-07-30T10:09:28.943692+00:00",
+      "n": 63,
+      "reason": "400mW CPO pump laser 入圖後 reassess：新增第二條技術路徑（sampling 階段，未升格）；釐清 Digicomm 53.1% 為獨家代理商而非終端客戶，且 hyperscaler 結構性不具名供應商，故客戶端獨立佐證多屬本質不可得；runway 約 11.8 個月，burn 主要來自可調節 capex",
+      "receipt": "decision:pd_0a0b28a84859817afabaafa9f1411298",
+      "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
+      "type": "decision_review",
+      "verb": "pq1_completed"
+    },
+    {
+      "at": "2026-07-30T10:09:28.943692+00:00",
+      "n": 63,
+      "reason": "400mW CPO pump laser 入圖後 reassess：新增第二條技術路徑（sampling 階段，未升格）；釐清 Digicomm 53.1% 為獨家代理商而非終端客戶，且 hyperscaler 結構性不具名供應商，故客戶端獨立佐證多屬本質不可得；runway 約 11.8 個月，burn 主要來自可調節 capex",
+      "receipt": "decision:pd_0a0b28a84859817afabaafa9f1411298",
+      "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
+      "type": "decision_review",
+      "verb": "go"
+    },
+    {
+      "at": "2026-07-30T10:11:16.579815+00:00",
+      "n": 72,
+      "reason": "第二輪 bounded gap research 完成：圖已補 develops→prod:digit 並實測 2-hop 通路；確認 independent_source_missing 需直接連到公司節點的 GXO 端邊，而 GXO FY2025 10-K 對 Agility 0 命中、既有抽取不可改，故目前無材料。財務三軸維持 unknown（S-4 未公開），identity 依使用者定案不登記 ticker",
+      "receipt": "decision:pd_efd4b7965b9d73547aeb9d1d9d77d9e8",
+      "ref_id": "dc_6ae5b014dbbcd0774b45487542c9a102",
+      "type": "decision_review",
+      "verb": "pq1_completed"
+    },
+    {
+      "at": "2026-07-30T10:11:16.579815+00:00",
+      "n": 72,
+      "reason": "第二輪 bounded gap research 完成：圖已補 develops→prod:digit 並實測 2-hop 通路；確認 independent_source_missing 需直接連到公司節點的 GXO 端邊，而 GXO FY2025 10-K 對 Agility 0 命中、既有抽取不可改，故目前無材料。財務三軸維持 unknown（S-4 未公開），identity 依使用者定案不登記 ticker",
+      "receipt": "decision:pd_efd4b7965b9d73547aeb9d1d9d77d9e8",
+      "ref_id": "dc_6ae5b014dbbcd0774b45487542c9a102",
+      "type": "decision_review",
+      "verb": "go"
+    },
+    {
+      "at": "2026-07-30T10:11:31.331706+00:00",
+      "n": 64,
+      "reason": "研究已完成但狀態機無法 go：新 decision pd_e5d82e5323b49d7946373509dcde3536 已產生且 coverage 無 assessment blocker，然而 [64] 從未 dispatch、其 cohort 的 work order wo_ad3bcb03 早已 completed、新 decision 因無研究缺口也未產生新 work order，因此 decision_review 的 go 路徑（需 dispatch→checkpoint）無適用對象。receipt 記於此 reason。",
+      "receipt": null,
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "type": "decision_review",
+      "verb": "pending"
+    },
+    {
+      "at": "2026-07-30T10:12:56.042217+00:00",
+      "n": 74,
+      "reason": "本 session 已完成兩輪 bounded gap research（最新 pd_efd4b7965b9d73547aeb9d1d9d77d9e8）。剩餘 blocker 皆非研究可解：identity 依使用者 2026-07-30 定案不登記 ticker（等 4Q 2026 closing 後登記 AGLT）；財務五項須等 S-4 公開；independent_source 需 GXO 端新文件（FY2025 10-K 已查證 0 命中）；counter_path 需另一輪 graph admission。預期在上市前會持續重生，維持 defer。",
+      "receipt": null,
+      "ref_id": "dc_6ae5b014dbbcd0774b45487542c9a102",
+      "type": "decision_review",
+      "verb": "pending"
+    },
+    {
+      "at": "2026-07-30T10:12:56.169035+00:00",
+      "n": 75,
+      "reason": "重複 cohort：dc_b1225ef0 由 pq2 [73] 的 complete-ra handoff 自動建立（ensure_shadow_for_company 以 company 合成 claim dedupe key），與既有 dc_6ae5b014（[74]，來自 robotics claim，含 3 筆 decision 與完整 assessment）指向同一家公司。dc_b1225ef0 僅有一筆無 assessment 的自動 decision pd_428a1937。Decision Store append-only 不刪除；研究一律走 [74]。",
+      "receipt": null,
+      "ref_id": "dc_b1225ef0ebbf6dab001ec8cabb11f4e1",
+      "type": "decision_review",
+      "verb": "pending"
     }
   ],
-  "next_n": 74,
+  "next_n": 76,
   "schema_version": "1"
 }
