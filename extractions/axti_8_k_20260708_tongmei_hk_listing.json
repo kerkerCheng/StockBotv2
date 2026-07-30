@@ -1,0 +1,86 @@
+{
+  "claims": [
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Downgrade if a later filing shows the Hong Kong listing plan was abandoned, rejected, or refiled with a materially different business emphasis.",
+      "id": "axti_8_k_20260708_tongmei_hk_listing_cl1",
+      "source_ids": [
+        "axti_8_k_20260708_tongmei_hk_listing_s1",
+        "axti_8_k_20260708_tongmei_hk_listing_s2"
+      ],
+      "statement": "Tongmei, AXT's majority-controlled subsidiary, withdrew its Shanghai STAR Market IPO application (withdrawal accepted 2026-07-08) and will pursue a Hong Kong Stock Exchange listing whose application will emphasize the InP substrate business for high-speed optical data transmission and AI data center applications.",
+      "subject_id": "co:axt"
+    },
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Supersede when subsequent filings disclose the concluded redemption amounts; downgrade if actual terms materially differ from the fixed-price no-interest redemption described here.",
+      "id": "axti_8_k_20260708_tongmei_hk_listing_cl2",
+      "source_ids": [
+        "axti_8_k_20260708_tongmei_hk_listing_s3",
+        "axti_8_k_20260708_tongmei_hk_listing_s4"
+      ],
+      "statement": "Tongmei's STAR IPO withdrawal triggered a redemption right over RMB 324,404,508 (approximately US$49 million) raised from eleven Chinese private equity funds: each fund may, but need not, require AXT or Tongmei to redeem at the original invested amount without interest, and AXT states it has sufficient funds to redeem in full should full redemption be required.",
+      "subject_id": "co:axt"
+    }
+  ],
+  "edges": [],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "AXT Inc.",
+        "AXTI",
+        "AXT-Tongmei",
+        "Beijing Tongmei Xtal Technology"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:axt",
+      "name": "AXT",
+      "role": "material_base",
+      "source_ids": [
+        "axti_8_k_20260708_tongmei_hk_listing_s1",
+        "axti_8_k_20260708_tongmei_hk_listing_s2"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "axti_8_k_20260708_tongmei_hk_listing",
+    "evidence_tier": 1,
+    "origin_entity": "AXT",
+    "permission_basis": "Official public source; store the canonical URL and only the research-relevant excerpt.",
+    "published_at": "2026-07-08",
+    "publisher": "SEC EDGAR",
+    "retrieved_at": "2026-07-30",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "AXT Form 8-K — Tongmei STAR Market IPO withdrawal, Hong Kong listing pivot and PE fund redemption right",
+    "url": "https://www.sec.gov/Archives/edgar/data/1051627/000143774926022984/axti20260629_8k.htm"
+  },
+  "sources": [
+    {
+      "id": "axti_8_k_20260708_tongmei_hk_listing_s1",
+      "locator": "Item 2.04, first paragraph",
+      "quote": "On June 26, 2026, Beijing Tongmei Xtal Technology Co., Ltd. (“Tongmei”), a majority controlled subsidiary of AXT, Inc. (the “Company”), notified the Shanghai Stock Exchange that it was withdrawing its application for an initial public offering (“IPO”) on the exchange’s STAR Market (the “STAR Market”), and on July 8, 2026 the Shanghai Stock Exchange published the acceptance of the withdrawal."
+    },
+    {
+      "id": "axti_8_k_20260708_tongmei_hk_listing_s2",
+      "locator": "Item 2.04, first paragraph",
+      "quote": "AXT and Tongmei will transfer their dedicated resources and efforts towards a listing on the Hong Kong Stock Exchange where its listing application will emphasize its updated business plan focusing on the development of the Company's indium phosphide (\"InP\") business to address the growing demand for InP substrates used in high-speed optical data transmission and artificial intelligence data center applications."
+    },
+    {
+      "id": "axti_8_k_20260708_tongmei_hk_listing_s3",
+      "locator": "Item 2.04, second paragraph",
+      "quote": "Tongmei raised an aggregate of RMB 324,404,508 (approximately US$49 million) from eleven (11) private equity funds in China. Pursuant to the agreements with these private equity funds, Tongmei’s withdrawal of the listing application gives rise to a redemption right: each fund has the right, but not the obligation, to require the Company or Tongmei to redeem its investment, and the Company or Tongmei has the right, but not the obligation, to redeem each fund’s investment, in each case for a price equal to the original amount invested, without interest or any other return."
+    },
+    {
+      "id": "axti_8_k_20260708_tongmei_hk_listing_s4",
+      "locator": "Item 2.04, second paragraph",
+      "quote": "The Company has sufficient funds to redeem the fund's investments in full should full redemption be required."
+    }
+  ]
+}

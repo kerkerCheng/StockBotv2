@@ -1,0 +1,14 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1051627/000143774926022984/axti20260629_8k.htm
+
+Excerpt:
+Source URL: https://www.sec.gov/Archives/edgar/data/1051627/000143774926022984/axti20260629_8k.htm
+Title: AXT Form 8-K — Tongmei STAR Market IPO withdrawal, Hong Kong listing pivot and PE fund redemption right
+Filed: 2026-07-08; earliest event: 2026-06-26 (withdrawal accepted 2026-07-08)
+
+Research excerpt:
+- Tongmei (AXT majority-controlled subsidiary) withdrew its Shanghai STAR Market IPO application; acceptance published 2026-07-08.
+- AXT/Tongmei will pursue a Hong Kong Stock Exchange listing emphasizing the InP substrate business for high-speed optical data transmission and AI data center applications.
+- The withdrawal triggers an optional redemption right over RMB 324,404,508 (~US$49M) raised from 11 Chinese PE funds, at original invested amount without interest; USD amount floats with RMB/USD.
+- AXT states it has sufficient funds to redeem in full if required.
+
+Boundary: issuer self-disclosure. The InP demand framing is management narrative, not independent demand evidence; the "sufficient funds" statement is unaudited management assertion.
