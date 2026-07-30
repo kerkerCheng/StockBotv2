@@ -1101,6 +1101,18 @@
       "source": "manual",
       "title": "Engine C manual observation：AXT Tongmei RMB 324,404,508 贖回權與 Coherent 可退預付款",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-07-30T22:42:06.988142+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 77,
+      "reason": null,
+      "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:applied_optoelectronics",
+      "type": "decision_review"
     }
   ],
   "log": [
@@ -2218,6 +2230,6 @@
       "verb": "pending"
     }
   ],
-  "next_n": 77,
+  "next_n": 78,
   "schema_version": "1"
 }
