@@ -1058,6 +1058,19 @@
       "source": "decision_lab",
       "title": "REVIEW — co:agility_robotics",
       "type": "decision_review"
+    },
+    {
+      "added_at": "2026-07-30T10:30:17.276498+00:00",
+      "hint": "TL;DR：把 2026-07-08 8-K 揭露的或有流動性請求權寫進 AXTI 的 Engine C append-only manual observation ledger，讓這筆事實不只存在於 Engine A 圖中。內容：11 家中國 PE 基金合計 RMB 324,404,508（約 US）贖回權（各基金可自行決定、按原始投資額無利息、RMB 計價故美元金額隨匯率浮動）＋Coherent US,288,500 預付款在協議到期／終止時未用完部分可由 Coherent 單方要求退還；合計或有流出上限約 US.3M，對照現金 .1M／淨現金 .6M。go 授權的動作：append 一筆 manual observation（附 8-K source 與 as-of）；不改 Engine A、不建 decision、不下單。",
+      "n": 76,
+      "reason": "已 append AXTI/contingent_liquidity_claims manual observation（更正筆 mo_7a984dbf supersede 損毀筆 mo_fd58c7fc，後者因 PowerShell 展開 dollar 符號而遺失金額，兩筆均保留於 append-only ledger）。註記：checklist 只讀 customer_concentration／backlog 兩欄，故此欄位不進 reference index，financial_resilience 仍無法引用——需改 checklist.py 才能機器串接",
+      "receipt": "authority:engine_c_manual;ref:mo_7a984dbfdff22b8df7857148b9502edc",
+      "ref_id": "engine_c_manual:AXTI:contingent_liquidity_claims",
+      "resolution": "go",
+      "resolved_at": "2026-07-30T10:31:53.961552+00:00",
+      "source": "manual",
+      "title": "Engine C manual observation：AXT Tongmei RMB 324,404,508 贖回權與 Coherent 可退預付款",
+      "type": "manual"
     }
   ],
   "log": [
@@ -2119,8 +2132,17 @@
       "ref_id": "dc_b1225ef0ebbf6dab001ec8cabb11f4e1",
       "type": "decision_review",
       "verb": "pending"
+    },
+    {
+      "at": "2026-07-30T10:31:53.961552+00:00",
+      "n": 76,
+      "reason": "已 append AXTI/contingent_liquidity_claims manual observation（更正筆 mo_7a984dbf supersede 損毀筆 mo_fd58c7fc，後者因 PowerShell 展開 dollar 符號而遺失金額，兩筆均保留於 append-only ledger）。註記：checklist 只讀 customer_concentration／backlog 兩欄，故此欄位不進 reference index，financial_resilience 仍無法引用——需改 checklist.py 才能機器串接",
+      "receipt": "authority:engine_c_manual;ref:mo_7a984dbfdff22b8df7857148b9502edc",
+      "ref_id": "engine_c_manual:AXTI:contingent_liquidity_claims",
+      "type": "manual",
+      "verb": "go"
     }
   ],
-  "next_n": 76,
+  "next_n": 77,
   "schema_version": "1"
 }
