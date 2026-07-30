@@ -345,6 +345,8 @@ v0 schema 的對錯只有真實資料能驗證。凍結一個會壞的 v0 → �
 
 踩過的坑與設計決定沉澱在 `docs/solutions/`（按問題類型分類，帶 YAML frontmatter 可搜尋：`module`, `tags`, `problem_type`）；共用領域詞彙見 `CONCEPTS.md`。
 
+**遇到「某個事實塞不進既有欄位／狀態／關係」時先讀 [`docs/solutions/architecture-patterns/closed-vocabulary-registry.md`](docs/solutions/architecture-patterns/closed-vocabulary-registry.md)。** 它列出每個封閉字彙住在哪、能不能擴充、以及擴充要改 config 還是改 code，省去逐一讀 Python 才知道邊界的成本。判準是 taxonomy（世界會長出新品類→字彙留鬆，放 `config/`／`schema/`）vs contract（刻意有限→打開它是 bug）。⚠ 新增 `config/*.json` 必須同時在 `.gitignore` 補 `!config/<name>.json`，否則 fresh clone 與另一個 agent 會缺檔而靜默失效；`tests/test_config_tracking.py` 是這道剎車。
+
 ---
 
 <!-- ===== 自訂：Skill 輸出翻譯（2026-06 加） ===== -->
