@@ -958,10 +958,11 @@
       "added_at": "2026-07-30T05:03:01.437116+00:00",
       "hint": "TL;DR：Agility 是未上市公司，identity registry 的 research_ticker 為 null，導致 Engine D 每次評估必然回報 identity_unresolved 與 graph_company_missing（與圖品質無關，見 decision_lab/context.py:463-503：research_ticker 屬核心 identity 欄位，缺少即整組 fallback 成 unresolved 並丟棄 company_id）。選項：(A) 不登記，維持現狀等 4Q 2026 closing 後以 AGLT 登記；(B) 登記 pre-close SPAC CCXI。判斷依據：CCXI 目前價格主要由信託現金（約 US/股）加交易完成選擇權構成，其 SEC 財報是 SPAC 空殼財報，若登記為 research_ticker，Engine C 會抓到與 Agility 基本面無關的數字，估值軸會被汙染。建議 (A)。go 授權的動作：依所選方案修改 config/company_identity.json 並記錄 receipt；不含入圖、不含建立 paper／live facts。",
       "n": 70,
-      "reason": null,
+      "reason": "使用者定案不做 Engine D 未上市支援 refactor；此項目問錯問題（不是選哪個 ticker，是 Engine D 無法表示未上市公司）。維持 research_ticker=null，等 4Q 2026 closing 後直接登記 AGLT；cohort dc_6ae5b014 未綁定（identity_resolved 事件 0 筆），屆時可乾淨綁定。",
+      "receipt": null,
       "ref_id": "identity:co:agility_robotics",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "drop",
+      "resolved_at": "2026-07-30T07:54:04.164374+00:00",
       "source": "manual",
       "title": "Agility Robotics：是否為 co:agility_robotics 登記 research ticker（CCXI 或等 AGLT）",
       "type": "manual"
@@ -970,16 +971,18 @@
       "added_at": "2026-07-30T05:03:15.206188+00:00",
       "hint": "TL;DR：2026-07-29 入圖的 robotics ontology mini-slice（ra_155541bb）留下一個結構缺口——co:gxo_logistics -[DEPLOYS]-> prod:digit，但 co:agility_robotics -[DEVELOPS]-> prod:digit_v5，而 prod:digit 與 prod:digit_v5 之間沒有任何邊，Agility 也沒連到 prod:digit。後果：GXO 官方新聞稿是唯一的客戶端獨立佐證（origin_entity=GXO Logistics，非 Agility 自報），但 Engine A 對 co:agility_robotics 的 bounded read 走不到它，因此 coverage 持續回報 independent_source_missing，Confidence 的 source_reliability 軸也只能看到單一 origin。同時 counter_paths 為空（Figure AI、Apptronik、Tesla Optimus、Unitree 皆未入圖），無法呈現 humanoid OEM 可替代性。go 授權的動作：由本機 session 準備一個 Research Action，補 Agility 與 Digit 產品世代的關係邊（並視情況補 counter-path 競品節點），入圖仍須另一個 ra_admission pq2 核准；不含提高任何 evidence tier、不含採信截圖來源。",
       "n": 71,
-      "reason": null,
+      "reason": "已 prepare Agility 官方頁面 RA 補 co:agility_robotics→prod:digit 與 aliases；入圖仍待新 ra_admission pq2 核准",
+      "receipt": "authority:research_action;ref:ra_f97210987536a34ddb83ff2d2e51c9ad",
       "ref_id": "graph_gap:agility_digit_lineage",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-07-30T07:57:50.185767+00:00",
       "source": "manual",
       "title": "Engine A robotics 子圖：Digit 世代未連通，GXO 客戶端獨立佐證不可達",
       "type": "manual"
     },
     {
       "added_at": "2026-07-30T05:03:34.826862+00:00",
+      "deferred_at": "2026-07-30T07:54:09.259068+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 72,
       "reason": null,
@@ -989,6 +992,18 @@
       "source": "decision_lab",
       "title": "REVIEW — co:agility_robotics",
       "type": "decision_review"
+    },
+    {
+      "added_at": "2026-07-30T07:58:13.469711+00:00",
+      "hint": "BLOCKER：Research Action 尚未聲明唯一 focus_company_id；先回 pq1 補 Decision handoff，不得先 apply。",
+      "n": 73,
+      "reason": null,
+      "ref_id": "ra_f97210987536a34ddb83ff2d2e51c9ad",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "Agility Robotics 官方頁面：補上 co:agility_robotics→prod:digit 缺失關係與 aliases",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -1906,8 +1921,35 @@
       "ref_id": "dc_6ae5b014dbbcd0774b45487542c9a102",
       "type": "decision_review",
       "verb": "go"
+    },
+    {
+      "at": "2026-07-30T07:54:04.164374+00:00",
+      "n": 70,
+      "reason": "使用者定案不做 Engine D 未上市支援 refactor；此項目問錯問題（不是選哪個 ticker，是 Engine D 無法表示未上市公司）。維持 research_ticker=null，等 4Q 2026 closing 後直接登記 AGLT；cohort dc_6ae5b014 未綁定（identity_resolved 事件 0 筆），屆時可乾淨綁定。",
+      "receipt": null,
+      "ref_id": "identity:co:agility_robotics",
+      "type": "manual",
+      "verb": "drop"
+    },
+    {
+      "at": "2026-07-30T07:54:09.259068+00:00",
+      "n": 72,
+      "reason": "同 cohort 剛完成 gap research（pd_d8be4eca）；剩餘 blocker 需 [71] 圖結構修補，財務軸須等 S-4 公開。defer 至 [71] 落地後再 reassess。",
+      "receipt": null,
+      "ref_id": "dc_6ae5b014dbbcd0774b45487542c9a102",
+      "type": "decision_review",
+      "verb": "pending"
+    },
+    {
+      "at": "2026-07-30T07:57:50.185767+00:00",
+      "n": 71,
+      "reason": "已 prepare Agility 官方頁面 RA 補 co:agility_robotics→prod:digit 與 aliases；入圖仍待新 ra_admission pq2 核准",
+      "receipt": "authority:research_action;ref:ra_f97210987536a34ddb83ff2d2e51c9ad",
+      "ref_id": "graph_gap:agility_digit_lineage",
+      "type": "manual",
+      "verb": "go"
     }
   ],
-  "next_n": 73,
+  "next_n": 74,
   "schema_version": "1"
 }
