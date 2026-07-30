@@ -4385,6 +4385,29 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2076030743655109063"
     },
+    "lead_4f7fae31a0641d93886720165aa31a2f": {
+      "first_seen": "2026-07-30T08:05:28.741030+00:00",
+      "lead_id": "lead_4f7fae31a0641d93886720165aa31a2f",
+      "published_at": "2026-07-30",
+      "refs": {
+        "action_digest": "231ac7feb200c952aa3387ac72eb5c05f9a39b83603b284e0260f50f2c923a6b",
+        "focus_company_id": "co:agility_robotics",
+        "research_action_id": "ra_f97210987536a34ddb83ff2d2e51c9ad"
+      },
+      "source": "internal:graph_audit",
+      "status": "applied",
+      "title": "Agility 官方頁面：Digit is assembled by the Agility team in Salem, OR（補 co:agility_robotics→prod:digit 缺失關係，源自 pq2 [65] gap research 的圖結構稽核）",
+      "triage": {
+        "decided_at": "2026-07-30T08:05:48.989299+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "官方公司頁面，逐字佐證 Agility 製造 Digit；用於補正圖中 prod:digit 未連回製造者的結構缺口",
+        "tier": 2
+      },
+      "url": "https://www.agilityrobotics.com/"
+    },
     "lead_4f9a17ae6baa44defb87cd1b81ec2fbd": {
       "first_seen": "2026-07-29T13:47:19.113185+00:00",
       "lead_id": "lead_4f9a17ae6baa44defb87cd1b81ec2fbd",
@@ -12042,10 +12065,12 @@
       "lead_id": "lead_f05f3fd8a753c084704afc3b06330a47",
       "published_at": "2026-07-08",
       "refs": {
+        "action_digest": "75963f76631581f75246564550cd62df4c58deedd120f5bf4169399d1d6dbe20",
+        "focus_company_id": "co:axt",
         "research_action_id": "ra_602a8f429b3af3fbd24021fc535f59c9"
       },
       "source": "edgar:AXTI",
-      "status": "action_prepared",
+      "status": "applied",
       "title": "AXTI 8-K filed 2026-07-08",
       "triage": {
         "decided_at": "2026-07-25T03:52:34.713749+00:00",

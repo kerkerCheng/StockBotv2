@@ -944,12 +944,20 @@
     },
     {
       "added_at": "2026-07-30T04:45:29.329477+00:00",
+      "completion_authority": {
+        "action_digest": "75963f76631581f75246564550cd62df4c58deedd120f5bf4169399d1d6dbe20",
+        "cohort_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+        "commit": "b6f692d5a1130111a799c0d13bdf6734060b235b",
+        "company_id": "co:axt",
+        "verified_at": "2026-07-30T08:04:57.485022+00:00"
+      },
       "hint": "BLOCKER：Research Action 尚未聲明唯一 focus_company_id；先回 pq1 補 Decision handoff，不得先 apply。",
       "n": 69,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_602a8f429b3af3fbd24021fc535f59c9;digest:75963f76631581f75246564550cd62df4c58deedd120f5bf4169399d1d6dbe20;commit:b6f692d5a1130111a799c0d13bdf6734060b235b;cohort:dc_ab4aa345d1c85b0f3c365a0ec71dad13",
       "ref_id": "ra_602a8f429b3af3fbd24021fc535f59c9",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-07-30T08:04:57.485022+00:00",
       "source": "research_action",
       "title": "AXT：Tongmei 撤回 STAR IPO 轉戰香港上市＋RMB 3.24 億贖回權",
       "type": "ra_admission"
@@ -995,12 +1003,20 @@
     },
     {
       "added_at": "2026-07-30T07:58:13.469711+00:00",
+      "completion_authority": {
+        "action_digest": "231ac7feb200c952aa3387ac72eb5c05f9a39b83603b284e0260f50f2c923a6b",
+        "cohort_id": "dc_b1225ef0ebbf6dab001ec8cabb11f4e1",
+        "commit": "10ebf190113c46e6d8f84a850f289cb978b24346",
+        "company_id": "co:agility_robotics",
+        "verified_at": "2026-07-30T08:05:55.573734+00:00"
+      },
       "hint": "BLOCKER：Research Action 尚未聲明唯一 focus_company_id；先回 pq1 補 Decision handoff，不得先 apply。",
       "n": 73,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_f97210987536a34ddb83ff2d2e51c9ad;digest:231ac7feb200c952aa3387ac72eb5c05f9a39b83603b284e0260f50f2c923a6b;commit:10ebf190113c46e6d8f84a850f289cb978b24346;cohort:dc_b1225ef0ebbf6dab001ec8cabb11f4e1",
       "ref_id": "ra_f97210987536a34ddb83ff2d2e51c9ad",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-07-30T08:05:55.573734+00:00",
       "source": "research_action",
       "title": "Agility Robotics 官方頁面：補上 co:agility_robotics→prod:digit 缺失關係與 aliases",
       "type": "ra_admission"
@@ -1947,6 +1963,24 @@
       "receipt": "authority:research_action;ref:ra_f97210987536a34ddb83ff2d2e51c9ad",
       "ref_id": "graph_gap:agility_digit_lineage",
       "type": "manual",
+      "verb": "go"
+    },
+    {
+      "at": "2026-07-30T08:04:57.485022+00:00",
+      "n": 69,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_602a8f429b3af3fbd24021fc535f59c9;digest:75963f76631581f75246564550cd62df4c58deedd120f5bf4169399d1d6dbe20;commit:b6f692d5a1130111a799c0d13bdf6734060b235b;cohort:dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "ref_id": "ra_602a8f429b3af3fbd24021fc535f59c9",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-07-30T08:05:55.573734+00:00",
+      "n": 73,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_f97210987536a34ddb83ff2d2e51c9ad;digest:231ac7feb200c952aa3387ac72eb5c05f9a39b83603b284e0260f50f2c923a6b;commit:10ebf190113c46e6d8f84a850f289cb978b24346;cohort:dc_b1225ef0ebbf6dab001ec8cabb11f4e1",
+      "ref_id": "ra_f97210987536a34ddb83ff2d2e51c9ad",
+      "type": "ra_admission",
       "verb": "go"
     }
   ],
