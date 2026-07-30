@@ -868,15 +868,18 @@
     {
       "added_at": "2026-07-29T15:16:58.028071+00:00",
       "dispatch_baseline_decision_id": "pd_ac6fffd10ff1e5d1a4cedd5ee0756fbc",
+      "dispatch_receipt": "decision:pd_d8be4eca9ed0e7e5b1224098725e8f36",
       "dispatch_ref": "wo_def0cdb42b483cd3dc87ddd98ae8cdaa",
-      "dispatch_status": "queued",
+      "dispatch_status": "completed",
+      "dispatch_updated_at": "2026-07-30T05:01:36.868635+00:00",
       "dispatched_at": "2026-07-30T00:52:44.836380+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 65,
-      "reason": null,
+      "reason": "bounded gap research 完成：新增四份一手 SEC 文件核對，source_reliability／technical_causal_link 由 unknown 升為 bounded_hypothesis；三個財務／估值軸誠實留 unknown（Agility 未上市、Engine C 無 authority）",
+      "receipt": "decision:pd_d8be4eca9ed0e7e5b1224098725e8f36",
       "ref_id": "dc_6ae5b014dbbcd0774b45487542c9a102",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-07-30T05:01:36.868635+00:00",
       "source": "decision_lab",
       "title": "REVIEW — co:agility_robotics",
       "type": "decision_review"
@@ -938,6 +941,54 @@
       "source": "research_action",
       "title": "AAOI 400mW pump laser：sampling 狀態與 CPO 用途",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-07-30T04:45:29.329477+00:00",
+      "hint": "BLOCKER：Research Action 尚未聲明唯一 focus_company_id；先回 pq1 補 Decision handoff，不得先 apply。",
+      "n": 69,
+      "reason": null,
+      "ref_id": "ra_602a8f429b3af3fbd24021fc535f59c9",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "AXT：Tongmei 撤回 STAR IPO 轉戰香港上市＋RMB 3.24 億贖回權",
+      "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-07-30T05:03:01.437116+00:00",
+      "hint": "TL;DR：Agility 是未上市公司，identity registry 的 research_ticker 為 null，導致 Engine D 每次評估必然回報 identity_unresolved 與 graph_company_missing（與圖品質無關，見 decision_lab/context.py:463-503：research_ticker 屬核心 identity 欄位，缺少即整組 fallback 成 unresolved 並丟棄 company_id）。選項：(A) 不登記，維持現狀等 4Q 2026 closing 後以 AGLT 登記；(B) 登記 pre-close SPAC CCXI。判斷依據：CCXI 目前價格主要由信託現金（約 US/股）加交易完成選擇權構成，其 SEC 財報是 SPAC 空殼財報，若登記為 research_ticker，Engine C 會抓到與 Agility 基本面無關的數字，估值軸會被汙染。建議 (A)。go 授權的動作：依所選方案修改 config/company_identity.json 並記錄 receipt；不含入圖、不含建立 paper／live facts。",
+      "n": 70,
+      "reason": null,
+      "ref_id": "identity:co:agility_robotics",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "Agility Robotics：是否為 co:agility_robotics 登記 research ticker（CCXI 或等 AGLT）",
+      "type": "manual"
+    },
+    {
+      "added_at": "2026-07-30T05:03:15.206188+00:00",
+      "hint": "TL;DR：2026-07-29 入圖的 robotics ontology mini-slice（ra_155541bb）留下一個結構缺口——co:gxo_logistics -[DEPLOYS]-> prod:digit，但 co:agility_robotics -[DEVELOPS]-> prod:digit_v5，而 prod:digit 與 prod:digit_v5 之間沒有任何邊，Agility 也沒連到 prod:digit。後果：GXO 官方新聞稿是唯一的客戶端獨立佐證（origin_entity=GXO Logistics，非 Agility 自報），但 Engine A 對 co:agility_robotics 的 bounded read 走不到它，因此 coverage 持續回報 independent_source_missing，Confidence 的 source_reliability 軸也只能看到單一 origin。同時 counter_paths 為空（Figure AI、Apptronik、Tesla Optimus、Unitree 皆未入圖），無法呈現 humanoid OEM 可替代性。go 授權的動作：由本機 session 準備一個 Research Action，補 Agility 與 Digit 產品世代的關係邊（並視情況補 counter-path 競品節點），入圖仍須另一個 ra_admission pq2 核准；不含提高任何 evidence tier、不含採信截圖來源。",
+      "n": 71,
+      "reason": null,
+      "ref_id": "graph_gap:agility_digit_lineage",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "Engine A robotics 子圖：Digit 世代未連通，GXO 客戶端獨立佐證不可達",
+      "type": "manual"
+    },
+    {
+      "added_at": "2026-07-30T05:03:34.826862+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 72,
+      "reason": null,
+      "ref_id": "dc_6ae5b014dbbcd0774b45487542c9a102",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:agility_robotics",
+      "type": "decision_review"
     }
   ],
   "log": [
@@ -1828,8 +1879,35 @@
       "ref_id": "ra_ab4814197e21600d22aa2ef7c1c9783b",
       "type": "ra_admission",
       "verb": "go"
+    },
+    {
+      "at": "2026-07-30T04:53:59.067922+00:00",
+      "n": 65,
+      "reason": "本機 Claude Code session 開始執行 bounded gap research（SEC CCXI/Agility filings）",
+      "receipt": "wo_def0cdb42b483cd3dc87ddd98ae8cdaa",
+      "ref_id": "dc_6ae5b014dbbcd0774b45487542c9a102",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-07-30T05:01:36.868635+00:00",
+      "n": 65,
+      "reason": "bounded gap research 完成：新增四份一手 SEC 文件核對，source_reliability／technical_causal_link 由 unknown 升為 bounded_hypothesis；三個財務／估值軸誠實留 unknown（Agility 未上市、Engine C 無 authority）",
+      "receipt": "decision:pd_d8be4eca9ed0e7e5b1224098725e8f36",
+      "ref_id": "dc_6ae5b014dbbcd0774b45487542c9a102",
+      "type": "decision_review",
+      "verb": "pq1_completed"
+    },
+    {
+      "at": "2026-07-30T05:01:36.868635+00:00",
+      "n": 65,
+      "reason": "bounded gap research 完成：新增四份一手 SEC 文件核對，source_reliability／technical_causal_link 由 unknown 升為 bounded_hypothesis；三個財務／估值軸誠實留 unknown（Agility 未上市、Engine C 無 authority）",
+      "receipt": "decision:pd_d8be4eca9ed0e7e5b1224098725e8f36",
+      "ref_id": "dc_6ae5b014dbbcd0774b45487542c9a102",
+      "type": "decision_review",
+      "verb": "go"
     }
   ],
-  "next_n": 69,
+  "next_n": 73,
   "schema_version": "1"
 }

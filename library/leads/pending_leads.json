@@ -12041,9 +12041,11 @@
       "first_seen": "2026-07-22T15:37:22.502705+00:00",
       "lead_id": "lead_f05f3fd8a753c084704afc3b06330a47",
       "published_at": "2026-07-08",
-      "refs": {},
+      "refs": {
+        "research_action_id": "ra_602a8f429b3af3fbd24021fc535f59c9"
+      },
       "source": "edgar:AXTI",
-      "status": "triaged_go",
+      "status": "action_prepared",
       "title": "AXTI 8-K filed 2026-07-08",
       "triage": {
         "decided_at": "2026-07-25T03:52:34.713749+00:00",
@@ -12417,9 +12419,11 @@
       "first_seen": "2026-07-23T11:56:53.279849+00:00",
       "lead_id": "lead_f6d7fdd6bff7d38b4edf021c49835f5f",
       "published_at": "2026-07-22",
-      "refs": {},
+      "refs": {
+        "park_reason": "governance_only_new_independent_director_jia_bin_duh_no_supply_chain_or_thesis_content"
+      },
       "source": "edgar:AXTI",
-      "status": "triaged_go",
+      "status": "parked",
       "title": "AXTI 8-K filed 2026-07-22",
       "triage": {
         "decided_at": "2026-07-25T03:52:34.713753+00:00",
