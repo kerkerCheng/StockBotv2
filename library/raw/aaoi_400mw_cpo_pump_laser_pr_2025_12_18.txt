@@ -1,0 +1,13 @@
+Source URL: https://newsroom.ao-inc.com/news-releases/aoi-introduces-new-ultra-high-power-semiconductor-laser-to-support-silicon-photonics-and-cpo/
+
+Excerpt:
+Source URL: https://newsroom.ao-inc.com/news-releases/aoi-introduces-new-ultra-high-power-semiconductor-laser-to-support-silicon-photonics-and-cpo/
+Title: AOI Introduces New Ultra High-Power Semiconductor Laser to Support Silicon Photonics and CPO
+Published: 2025-12-18
+
+Research excerpt:
+- AAOI announced a 400-milliwatt narrow-linewidth pump laser for silicon photonics and CPO in AI data centers.
+- The product is described as a high-performance light source for CPO and silicon photonics, with optical power over 400mW at 50°C.
+- Samples were available to select customers; volume production later in 2026 was guidance.
+
+Boundary: the official release does not name a customer, disclose a design win, or confirm commercial revenue. The Serenity lead's exact CEO 'TBD' wording was not independently obtained.

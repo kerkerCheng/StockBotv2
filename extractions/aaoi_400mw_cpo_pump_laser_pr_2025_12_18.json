@@ -1,0 +1,134 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "guided",
+      "disproof_condition": "Downgrade if AAOI does not confirm volume production after 2026, withdraws the product, or customer-side evidence shows the sampled laser did not complete qualification; sampling is not a design win.",
+      "id": "aaoi_400mw_cpo_pump_laser_pr_2025_12_18_cl1",
+      "source_ids": [
+        "aaoi_400mw_cpo_pump_laser_pr_2025_12_18_s1",
+        "aaoi_400mw_cpo_pump_laser_pr_2025_12_18_s2",
+        "aaoi_400mw_cpo_pump_laser_pr_2025_12_18_s3"
+      ],
+      "statement": "AAOI announced a 400mW narrow-linewidth pump laser for silicon photonics and CPO; as of 2025-12-18 it was available as samples to select customers, while volume production later in 2026 remained guidance.",
+      "subject_id": "prod:aaoi_400mw_narrow_linewidth_pump_laser"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {
+        "qualification_status": "sampling"
+      },
+      "confidence": 0.7,
+      "dst_id": "prod:aaoi_400mw_narrow_linewidth_pump_laser",
+      "id": "e1",
+      "relation": "develops",
+      "source_ids": [
+        "aaoi_400mw_cpo_pump_laser_pr_2025_12_18_s1",
+        "aaoi_400mw_cpo_pump_laser_pr_2025_12_18_s3"
+      ],
+      "src_id": "co:applied_optoelectronics"
+    },
+    {
+      "attributes": {
+        "qualification_status": "sampling"
+      },
+      "confidence": 0.7,
+      "dst_id": "tech:cpo",
+      "id": "e2",
+      "relation": "enables",
+      "source_ids": [
+        "aaoi_400mw_cpo_pump_laser_pr_2025_12_18_s1",
+        "aaoi_400mw_cpo_pump_laser_pr_2025_12_18_s2",
+        "aaoi_400mw_cpo_pump_laser_pr_2025_12_18_s3"
+      ],
+      "src_id": "prod:aaoi_400mw_narrow_linewidth_pump_laser"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "AOI",
+        "AAOI",
+        "Applied Optoelectronics Inc."
+      ],
+      "attributes": {},
+      "confidence": 0.7,
+      "id": "co:applied_optoelectronics",
+      "name": "Applied Optoelectronics",
+      "role": "bottleneck_supplier",
+      "source_ids": [
+        "aaoi_400mw_cpo_pump_laser_pr_2025_12_18_s1",
+        "aaoi_400mw_cpo_pump_laser_pr_2025_12_18_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "400mW laser",
+        "ultra high-power semiconductor laser"
+      ],
+      "attributes": {},
+      "confidence": 0.7,
+      "id": "prod:aaoi_400mw_narrow_linewidth_pump_laser",
+      "name": "AAOI 400mW narrow-linewidth pump laser",
+      "role": null,
+      "source_ids": [
+        "aaoi_400mw_cpo_pump_laser_pr_2025_12_18_s1",
+        "aaoi_400mw_cpo_pump_laser_pr_2025_12_18_s2",
+        "aaoi_400mw_cpo_pump_laser_pr_2025_12_18_s3"
+      ],
+      "type": "Product"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "CPO",
+        "co-packaged optics"
+      ],
+      "attributes": {},
+      "confidence": 0.7,
+      "id": "tech:cpo",
+      "name": "Co-Packaged Optics (CPO)",
+      "role": null,
+      "source_ids": [
+        "aaoi_400mw_cpo_pump_laser_pr_2025_12_18_s1",
+        "aaoi_400mw_cpo_pump_laser_pr_2025_12_18_s2"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "aaoi_400mw_cpo_pump_laser_pr_2025_12_18",
+    "evidence_tier": 2,
+    "origin_entity": "Applied Optoelectronics",
+    "permission_basis": "Official public source; store the canonical URL and only the research-relevant excerpt.",
+    "published_at": "2025-12-18",
+    "publisher": "Applied Optoelectronics newsroom",
+    "retrieved_at": "2026-07-30",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "AOI Introduces New Ultra High-Power Semiconductor Laser to Support Silicon Photonics and CPO",
+    "url": "https://newsroom.ao-inc.com/news-releases/aoi-introduces-new-ultra-high-power-semiconductor-laser-to-support-silicon-photonics-and-cpo/"
+  },
+  "sources": [
+    {
+      "id": "aaoi_400mw_cpo_pump_laser_pr_2025_12_18_s1",
+      "locator": "opening paragraph",
+      "quote": "Applied Optoelectronics Inc. (NASDAQ: AAOI) ... announced a new 400-milliwatt narrow-linewidth pump laser designed to meet growing demand for silicon photonics and co-packaged optics (CPO) in AI data centers."
+    },
+    {
+      "id": "aaoi_400mw_cpo_pump_laser_pr_2025_12_18_s2",
+      "locator": "product description and key performance specifications",
+      "quote": "It can source directly into semiconductor chip-scale systems to provide hyperscalers with a robust, high-performance light source for CPO, silicon photonics and other applications ... Optical power over 400mW at 50°C."
+    },
+    {
+      "id": "aaoi_400mw_cpo_pump_laser_pr_2025_12_18_s3",
+      "locator": "commercial-status paragraph",
+      "quote": "Samples are now available to select customers, with volume production expected later in 2026."
+    }
+  ]
+}
