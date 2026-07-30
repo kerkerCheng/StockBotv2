@@ -66,6 +66,27 @@ def test_states_gates_and_human_boundaries() -> None:
     assert "spreadsheets.readonly" in text
     assert "retirement_net_terminal_wealth" in text
     assert "technical 只決定新增 timing／pace" in text
+    assert "自有現金可部署" in text
+    assert "本輪可評估上限" in text
+    assert "未動用貸款額度" in text
+    assert "槓桿 ETF 資金占比" in text
+    assert "換算槓桿曝險" in text
+    assert "節奏 25%" in text
+    for light in ("🟢", "🟡", "⚪", "🔴"):
+        assert light in text
+
+
+def test_requires_subject_complete_pq2_explanations() -> None:
+    text = _text()
+    for token in (
+        "待核准項目的內容密度",
+        "誰、對誰、做了什麼",
+        "完整公司名與 ticker",
+        "事件成熟度",
+        "證據來源、反證",
+        "`go` 實際授權的 action type",
+    ):
+        assert token in text
 
 
 def test_access_blocked_is_retried_and_never_presented_as_no_result() -> None:

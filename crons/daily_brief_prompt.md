@@ -1,4 +1,4 @@
-# Daily Approval Brief — Codex 本機排程 Prompt（v1.3）
+# Daily Approval Brief — Codex 本機排程 Prompt（v1.4）
 
 > 現行執行端是 Codex desktop 的 standalone local scheduled task，每日台北 06:30 直接在
 > `C:\Users\Cheng\code\StockBotv2` 的 `master` working tree 執行。電腦需保持開機、Codex App
@@ -24,9 +24,10 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
    - `.venv\Scripts\python.exe -m engine_b.cli harvest-health`（列出最新仍未恢復的來源失敗）
    - `.venv\Scripts\python.exe engine_c\etl_yfinance.py`（35 檔 Engine C daily snapshot）
    - `.venv\Scripts\python.exe scripts\daily_beta_snapshot.py --format markdown --risk-view changes`（固定 ETF／權值股 technical refresh
-     ＋ Engine D 雙 cash range beta monitor；並列 `sheet_conservative_range`／`household_cash_supported_range`，
-     Engine C 保存 adjusted-close 1／5／20-session return；contingent credit 不算資本，loan-funded range 固定
-     人工 review；只呈現、不推定 draw／choice／fill）
+     ＋ Engine D 內部雙 cash range beta monitor；JSON 保留 `sheet_conservative_range`／
+     `household_cash_supported_range` fail-safe，但人類首屏只顯示一條自有現金主路徑。Engine C 保存
+     adjusted-close 1／5／20-session return；`contingent_credit_available` 只顯示為未動用貸款額度、不算
+     自有現金，`loan_funded_supported_range` 固定人工 review；只呈現、不推定 draw／choice／fill）
    - 對今日新增 pending leads 套 `skills/signal-triage/SKILL.md`，用本機 CLI 寫回 triage
    - `.venv\Scripts\python.exe -m engine_b.cli trace-backlog`（顯示 parked 追源未果及下一 trigger；不把一般 backlog 全塞 pq2）
    - `.venv\Scripts\python.exe -m decision_lab today --format markdown`
@@ -38,7 +39,8 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
    重跑仍失敗則保留在 `harvest-health` 與健康段落，研究追源另依 `$source-trace` 嘗試一條官方替代路徑。
    beta technical 的 `insufficient_history`／
    `unavailable`／`stale` 也必須列在健康段落，該商品 supported range 歸零但不阻斷其他商品。Capital Authority
-   缺失／stale／FX 錯誤只歸零 household range，不得抹掉 Phase I Sheet range；四欄 capital output 都要保留。
+   缺失／stale／FX 錯誤只歸零 household range，不得抹掉 Phase I Sheet range；四欄 internal capital output
+   都要保留，但人類首屏只顯示一條自有現金主路徑，另一條只在降級時作備援說明。
    routine 的 Google Sheet credential scope 維持 `spreadsheets.readonly`，不得建立或修改 tab／cell。單一來源失敗不
    阻斷其他段落。X token
    只從本機 `.env` 讀取，不得輸出或搬移 token。Beta monitor 的 aggregate risk snapshot 會 append 到
@@ -84,6 +86,10 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
 
 只用 `library/leads/todo_pool.json` 的既有穩定編號；不得依 section 或當日排序重新編號。
 
+每個 active pq2 item 不得只列短標題或 `co:*` ID。先給一句 TL;DR，再寫完整公司／ticker、誰供應誰、
+產品／材料／技術、事件成熟度、投資意義、證據與反證邊界，以及 `go` 實際授權的 action type。
+queued／researching／awaiting_approval 改列狀態更新，不重複要求 `go`。
+
 輸出第一行**必須**是帶執行日期的標題 `# Daily Brief YYYY-MM-DD (Asia/Taipei)`，日期取本機
 Asia/Taipei 當日；沒有日期的 brief 視為未完成輸出（多份 brief 並排時要能一眼分辨是哪一天）。
 
@@ -91,15 +97,21 @@ Asia/Taipei 當日；沒有日期的 brief 視為未完成輸出（多份 brief 
 # Daily Brief <YYYY-MM-DD> (Asia/Taipei)
 
 ## 需要你動作
-[N] <type> — <摘要> → <為什麼需要決定>
+[N] <type> — <完整公司／ticker 與主題>
+TL;DR：<誰、對誰、做了什麼>
+成熟度／投資意義：<announcement／sampling／qualification／capacity／volume／revenue>
+證據邊界：<一手來源、反證、不能推論什麼>
+go 授權：<bounded research／exact graph admission／manual observation／thesis review>
 
 ## 新 leads（依 priority）
 <僅列 pq1 進度／失敗；raw lead 不占 pq2 編號>
 
 ## Beta capital observation（無 pq2 編號）
 TL;DR：<約 30 年後 retirement_net_terminal_wealth 目標；今日哪些標的可人工評估；最重要的動態風控 warning>
-<sheet_conservative_range／household_cash_supported_range／contingent_credit_available／loan_funded_supported_range>
-<先列需要人工判斷，再列主力 QQQ／TQQQ／LON:VWRA／SOXX／00631L.TW／2330.TW／00981A.TW；每檔用文字燈號＋1／5／20 日漲跌＋必要指標，個股與其他縮成摘要>
+自有現金可部署：<Capital Authority 可用就採 household；否則 Sheet 保守備援>
+本輪可評估上限：<同一主路徑經 technical 節奏與 risk caps 後的 ceiling；不是下單金額>
+未動用貸款額度：<明標不算自有現金、未納入本輪上限；貸款投入仍 manual_review_required>
+<先列需要人工判斷，再列主力 QQQ／TQQQ／LON:VWRA／SOXX／00631L.TW／2330.TW／00981A.TW；每檔必須保留 🟢可評估／🟡冷卻／⚪觀察／🔴資料不足文字燈號＋1／5／20 日漲跌＋必要指標，pace 顯示為節奏百分比，個股與其他縮成摘要>
 
 ## 健康／資料降級
 <本次 harvest、Engine C、beta technical、Neo4j、Sheet 的失敗或缺口；無則寫正常>
@@ -109,6 +121,11 @@ TL;DR：<約 30 年後 retirement_net_terminal_wealth 目標；今日哪些標�
 
 回覆：`<編號…> go｜drop｜pending`（例：`13 17 go 10 16 pending`）
 ```
+
+Codex desktop 若支援 inline mobile visualization，Beta 區依「自有現金可部署／本輪可評估上限／未動用
+貸款額度 → 風險燈號 → 標的燈號」層級呈現；不支援時輸出等價 Markdown。不得輸出模糊的「名目槓桿」：
+內部 `nominal_weight` 顯示為「槓桿 ETF 資金占比」，乘上 2x／3x 的 `effective_weight` 顯示為
+「換算槓桿曝險」。不得用未解釋的斜線並列兩個 cash view。
 
 即使無新事項，也輸出 `NO ACTION + 日期` 心跳。Daily brief 不另存 report；稽核由 todo log、leads
 狀態機、Decision Store 與窄 state commit 承擔。

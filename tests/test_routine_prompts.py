@@ -57,6 +57,26 @@ def test_daily_prompt_keeps_human_gates_and_batch_contract() -> None:
     assert "--risk-view changes" in text
     assert "event_search_requests" in text
     assert "不註冊 lead" in text
+    assert "自有現金可部署" in text
+    assert "本輪可評估上限" in text
+    assert "未動用貸款額度" in text
+    assert "槓桿 ETF 資金占比" in text
+    assert "換算槓桿曝險" in text
+    assert "不得用未解釋的斜線" in text
+    for light in ("🟢", "🟡", "⚪", "🔴"):
+        assert light in text
+
+
+def test_daily_prompt_requires_subject_complete_pq2_items() -> None:
+    text = DAILY.read_text(encoding="utf-8")
+    for token in (
+        "每個 active pq2 item 不得只列短標題",
+        "誰供應誰",
+        "事件成熟度",
+        "證據與反證邊界",
+        "`go` 實際授權的 action type",
+    ):
+        assert token in text
 
 
 def test_daily_brief_title_carries_taipei_date() -> None:

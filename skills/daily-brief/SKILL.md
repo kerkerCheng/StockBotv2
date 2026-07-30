@@ -9,7 +9,7 @@ description: >
   每日摘要、今天有什麼、待判斷、今天需要動作嗎。
 ---
 
-# Daily Approval Brief Skill（v1.3）
+# Daily Approval Brief Skill（v1.4）
 
 ## 定位一句話
 
@@ -41,9 +41,13 @@ admission 必經核准 exact 對象、深挖由 priority 排序但入圖仍核�
 
 第一支抓 X＋RSS＋EDGAR watch 新項，以 `since_id`／URL-hash 去重；第二支刷新 Engine C financial snapshots。
 第四支對固定 ETF／權值股 universe 刷新 Engine C TechnicalObservation，再由 Engine D 產
-`HOLD / PAUSE CONTRIBUTION / CONTRIBUTE REVIEW`。它以同一組 risk caps 並列
-`sheet_conservative_range`（Sheet-only conservative）與 `household_cash_supported_range`，另把
-`contingent_credit_available` 與 `loan_funded_supported_range=manual_review_required` 分開顯示。Portfolio cash
+`HOLD / PAUSE CONTRIBUTION / CONTRIBUTE REVIEW`。Runtime／JSON 以同一組 risk caps 並列
+`sheet_conservative_range`（Sheet-only conservative）與 `household_cash_supported_range` 兩條 fail-safe
+calculation，另保存 `contingent_credit_available` 與
+`loan_funded_supported_range=manual_review_required`。人類首屏不得把前兩條寫成兩種「可部署現金」：
+Capital Authority 可用時，以 household path 作唯一的「自有現金可部署」與「本輪可評估上限」；不可用時
+才顯示 `Sheet 保守備援` 並在健康段落解釋降級。`contingent_credit_available` 只顯示為「未動用貸款額度」，
+明標不算自有現金、未納入本輪上限。Portfolio cash
 仍是自有 cash 唯一 authority；`Capital Authority` 只以 `spreadsheets.readonly` 讀取 private floor／outflows／
 facility，undrawn credit 不進 NAV／cash／allocation。technical／capital telemetry 不進 pq1，recommendation
 不推定 choice／fill，也不推定 draw，且不寫 Google Sheet。fetch／parse 失敗各記 harvest_log；
@@ -56,6 +60,10 @@ scheduled task 一律使用 repo `.venv`，不要依賴父 shell 是否剛好 ac
 Engine C 同一筆 observation 保存 adjusted-close 的 1／5／20-session return；Engine D 才負責把
 return、RSI、252-session drawdown、signal tier、cooldown 與 capital constraints 組成 Mobile-friendly
 燈號。燈號必須配 `可評估／冷卻／觀察／資料不足` 文字，且不構成 live permission。
+燈號與文字不得在 agent 摘要時省略：🟢 `可評估`、🟡 `冷卻／排序中`、⚪ `觀察`、🔴 `資料不足／暫停新增`。
+內部 `etf_leverage.nominal_weight` 的人類標籤固定為「槓桿 ETF 資金占比」；乘上 2x／3x 後的
+`effective_weight` 才稱「換算槓桿曝險」，不得再輸出模糊的「名目槓桿」。`pace=0.25` 顯示為
+「節奏 25%」，並解釋它是該 sleeve 完整 campaign budget 的四分之一，不是 NAV／現金／持倉的 25%。
 Portfolio risk 另以 ignored append-only JSONL 保存 aggregate snapshot：Daily 只顯示門檻跨越／狀態翻轉，
 Weekly 才用 `--risk-view full --no-record-risk` 顯示完整快照。硬擋只含 ETF nominal／effective 槓桿 cap
 與 investment policy 的 5% 單筆上限；issuer concentration、alpha 總量與 drawn loan leverage 只警告。
@@ -160,14 +168,37 @@ prepare 前先把「graph delta 涵蓋哪些公司」與「完成後唯一要建
 到期 thesis／有 material evidence-delta 的 probe 組成 brief，每項附明確指令。無事就一行
 `NO ACTION ＋日期`。
 
+### 待核准項目的內容密度
+
+stable pq2 編號後不得只貼短標題或 `co:*` ID。每一個需要使用者決定的 item 至少包含：
+
+1. 一段一句話 TL;DR，直接寫清楚「誰、對誰、做了什麼」。
+2. 完整公司名與 ticker（若有），以及供應商／客戶／產品／材料／技術的角色與方向。
+3. 事件成熟度（例如 announcement、sampling、qualification、capacity commitment、volume production、revenue）。
+4. 為什麼影響投資判斷；證據來源、反證與不能推論的邊界。
+5. `go` 實際授權的 action type：排入 bounded research、exact graph admission、manual observation、thesis review，
+   或其他明確 authority mutation；不得只寫「核准」。
+
+內容可以 mobile-friendly，但不能把理解成本轉嫁給使用者。queued／researching／awaiting_approval 的 item
+改寫為狀態更新，不再要求使用者重複 `go`。
+
 第一行固定是 `# Daily Brief YYYY-MM-DD (Asia/Taipei)`（Asia/Taipei 當日），讓不同天的 brief 可分辨。
 
 ```
 # Daily Brief <YYYY-MM-DD> (Asia/Taipei)
 
 ## 需要你動作
-[1] REVIEW — co:coherent｜自追蹤 +3.2%｜證據 material  → 有新證據，reassess
-[2] TRADE  — 等 apply ra_xxx（Tower TIA 客戶揭露 draft）  → 核准入圖：go 2
+[1] REVIEW — Coherent（COHR）供應鏈缺口
+TL;DR：<完整主詞＋關係＋事件>
+成熟度／投資意義：<為何現在需要判斷>
+證據邊界：<來源＋不能推論什麼>
+go 授權：<bounded research／exact authority mutation>
+
+[2] RA admission — AXT（AXTI）→ Coherent（COHR）6 吋 InP substrate
+TL;DR：<誰供應誰、產品與技術用途>
+成熟度／投資意義：<agreement／qualification／volume／revenue 邊界>
+證據邊界：<一手來源與反證>
+go 授權：exact graph delta＋已揭露的 Decision handoff
 ...
 
 ## pq1 研究進度（無 pq2 編號）
@@ -177,10 +208,11 @@ park：社群 CPO 推論 → 一手來源未支持，不產空 RA
 
 ## Beta capital observation（無 pq2 編號）
 TL;DR：最大化約 30 年後 `retirement_net_terminal_wealth`；technical 只決定新增 timing／pace；列今日可人工評估標的與最重要的動態風控 warning
-sheet_conservative_range：<range>
-household_cash_supported_range：<range 或 unavailable＋blocker>
-contingent_credit_available：<amount／terms status；明標不算資本>
-loan_funded_supported_range：manual_review_required
+自有現金可部署：<Capital Authority 可用就採 household；否則 Sheet 保守備援>
+本輪可評估上限：<同一主路徑經 technical 節奏與 risk caps 後的 ceiling；不是下單金額>
+未動用貸款額度：<amount／terms status；明標不算自有現金、未納入本輪上限>
+貸款投入：manual_review_required
+🟢／🟡／⚪／🔴 <逐檔文字燈號＋1／5／20 日漲跌＋必要指標；pace 顯示為節奏百分比>
 
 ## 低優先（摺疊）
 EDGAR Form 4 ×55、較舊 filing——預設摺疊只列數量（要看再展開）
@@ -194,6 +226,9 @@ paper 無異動｜live 無 pending fill｜...
 
 pq2／lead priority **不使用顏色維度**（顏色曾混淆 triage 與優先度），一律使用明確指令字串。Beta
 technical 區可用配有文字的燈號表達 deterministic state，但不得只靠顏色，也不得把 `可評估` 寫成 `買進`。
+Codex desktop 若支援 inline mobile visualization，Beta 區依「自有現金可部署／本輪可評估上限／未動用貸款
+額度 → 風險燈號 → 標的燈號」層級呈現；不支援的 executor 必須輸出相同層級的 Markdown，不能因此退化成
+raw field names 或省略燈號。
 主力首屏依序顯示 `QQQ`、`TQQQ`、`LON:VWRA`、`SOXX`、`00631L.TW`、`2330.TW`、`00981A.TW`；
 個股與其他標的縮成 exception-first 摘要。Form 4 與較舊 filing 一律進
 「低優先（摺疊）」只列數量——冷啟動 EDGAR seed 偏 Form 4，別淹沒新訊號。

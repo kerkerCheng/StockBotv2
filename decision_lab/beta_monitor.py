@@ -566,21 +566,107 @@ def _moves(indicator: Mapping[str, Any]) -> str:
     )
 
 
+def _pace_label(value: Any) -> str:
+    parsed = _finite(value, non_negative=True)
+    return "節奏未知" if parsed is None else f"節奏 {parsed * 100:.0f}%"
+
+
+def _signal_tier_label(value: Any) -> str:
+    return {
+        "none": "未觸發",
+        "pullback": "一般回檔",
+        "deep": "深度回檔",
+        "capitulation": "急跌",
+        "unavailable": "資料不足",
+    }.get(str(value), str(value))
+
+
+def _constraint_label(value: Any) -> str:
+    raw = str(value)
+    labels = {
+        "campaign_budget": "單輪預算",
+        "deployable_cash": "可部署現金",
+        "leveraged_nominal_capacity": "槓桿 ETF 資金上限",
+        "leveraged_effective_capacity": "換算槓桿曝險上限",
+        "signal_review_cooldown": "尚在冷卻期",
+        "overlapping_instrument_deferred": "同基準標的已優先評估",
+        "technical_history_insufficient_252_sessions": "歷史不足 252 個交易日",
+        "technical_observation_missing": "缺少技術資料",
+        "technical_observation_stale": "技術資料過期",
+        "technical_signal_metric_missing": "技術指標不完整",
+        "safe_capacity_exhausted": "本輪可用上限已用完",
+    }
+    return labels.get(raw, raw.replace("_", " "))
+
+
+def _warning_label(value: Any) -> str:
+    raw = str(value)
+    if raw.startswith("issuer_concentration_warning:"):
+        return f"{raw.partition(':')[2]} 集中曝險已進警戒"
+    return {
+        "issuer_lookthrough_partial": "ETF 成分穿透僅涵蓋已登記部分",
+        "leveraged_effective_warning": "換算槓桿曝險已進警戒",
+        "leveraged_nominal_warning": "槓桿 ETF 資金占比已進警戒",
+        "unclassified_holdings_assumed_unlevered_direct_issuer": (
+            "未分類持股暫按非槓桿直接曝險計算"
+        ),
+        "drawn_debt_present": "已有提款貸款",
+        "credit_terms_incomplete": "貸款條件資料不完整",
+    }.get(raw, raw.replace("_", " "))
+
+
+def _status_label(value: Any) -> str:
+    return {
+        "available": "可用",
+        "incomplete": "資料不完整",
+        "unavailable": "不可用",
+        "complete": "完整",
+        "unknown": "未知",
+    }.get(str(value), str(value).replace("_", " "))
+
+
+def _primary_action(item: Mapping[str, Any], *, household_path_available: bool) -> str:
+    return str(item["household_action"] if household_path_available else item["action"])
+
+
+def _primary_blockers(
+    item: Mapping[str, Any], *, household_path_available: bool
+) -> list[str]:
+    key = "household_blockers" if household_path_available else "blockers"
+    return [str(value) for value in item.get(key) or []]
+
+
+def _primary_binding_constraints(
+    item: Mapping[str, Any], *, household_path_available: bool
+) -> list[str]:
+    key = "household_binding_constraints" if household_path_available else "binding_constraints"
+    return [str(value) for value in item.get(key) or []]
+
+
+def _primary_supported_ceiling(
+    item: Mapping[str, Any], *, household_path_available: bool
+) -> Any:
+    key = (
+        "household_cash_supported_order_range_base"
+        if household_path_available
+        else "supported_order_range_base"
+    )
+    value = item.get(key) or [0.0, 0.0]
+    return value[1]
+
+
 def _display_label(item: Mapping[str, Any], *, household_path_available: bool) -> str:
-    if item["action"] == "CONTRIBUTE REVIEW" or (
-        household_path_available and item["household_action"] == "CONTRIBUTE REVIEW"
-    ):
+    action = _primary_action(item, household_path_available=household_path_available)
+    if action == "CONTRIBUTE REVIEW":
         return "🟢 可評估"
     if item["technical_status"] != "observed":
         return "🔴 資料不足"
-    blockers = set(item.get("blockers") or [])
-    if household_path_available:
-        blockers |= set(item.get("household_blockers") or [])
+    blockers = set(
+        _primary_blockers(item, household_path_available=household_path_available)
+    )
     if "signal_review_cooldown" in blockers or "overlapping_instrument_deferred" in blockers:
         return "🟡 冷卻／排序中"
-    if item["action"] == "PAUSE CONTRIBUTION" or (
-        household_path_available and item["household_action"] == "PAUSE CONTRIBUTION"
-    ):
+    if action == "PAUSE CONTRIBUTION":
         return "🔴 暫停新增"
     return "⚪ 觀察"
 
@@ -591,8 +677,18 @@ def _compact_monitor_item(
     return (
         f"{item['ticker']} {_display_label(item, household_path_available=household_path_available)}"
         f"（{_moves(item['indicator'])}，"
-        f"{item['signal_tier']}/pace {item['signal_pace']:.2f}"
-        + (f"，{','.join(item['blockers'])}" if item["blockers"] else "")
+        f"{_signal_tier_label(item['signal_tier'])}/{_pace_label(item['signal_pace'])}"
+        + (
+            "，"
+            + "、".join(
+                _constraint_label(value)
+                for value in _primary_blockers(
+                    item, household_path_available=household_path_available
+                )
+            )
+            if _primary_blockers(item, household_path_available=household_path_available)
+            else ""
+        )
         + "）"
     )
 
@@ -631,9 +727,10 @@ def _risk_snapshot_lines(report: Mapping[str, Any], *, full: bool) -> list[str]:
     lines = ["", "## 投組風險變化" if not full else "## 投組風險完整快照"]
     if full or any("leverage" in str(item.get("metric")) for item in changes):
         lines.append(
-            f"- ETF 槓桿名目／effective：{_pct(etf.get('nominal_weight'))}／"
-            f"{_pct(etf.get('effective_weight'))}；貸款 {_pct(snapshot.get('loan_leverage_weight'))}；"
-            f"合計 {_pct(snapshot.get('combined_leverage_weight'))}"
+            f"- 槓桿 ETF 資金占比：{_pct(etf.get('nominal_weight'))}；"
+            f"換算槓桿曝險：{_pct(etf.get('effective_weight'))}；"
+            f"已提款貸款占 NAV：{_pct(snapshot.get('loan_leverage_weight'))}；"
+            f"合計換算曝險：{_pct(snapshot.get('combined_leverage_weight'))}"
         )
     if full or any(item.get("metric") == "alpha_total_weight" for item in changes):
         lines.append(f"- Alpha 總量：{_pct(snapshot.get('alpha_total_weight'))}（警告、不阻擋）")
@@ -670,23 +767,33 @@ def render_beta_monitor_markdown(
     *,
     risk_view: str = "changes",
 ) -> str:
-    """Render safe aggregates, dual cash ranges and the manual loan boundary。"""
+    """Render one human-facing self-funded view while preserving dual internal ranges。"""
 
     portfolio = report["portfolio"]
     currency = portfolio.get("base_currency")
     capital_view = report["capital_view"]
     household_cash = capital_view["household_cash"]
     contingent = report["contingent_credit_available"]
-    loan_range = report["loan_funded_supported_range"]
     household_path_available = household_cash.get("status") == "available"
+    if household_path_available:
+        capital_source = (
+            "已讀取私人資本資料；投組現金扣除生活／營運備用金、已知支出，"
+            "以及總資產 3% 的個股研究部位預留額"
+        )
+        deployable_cash = household_cash.get("deployable_cash_base")
+        supported_ceiling = report["household_cash_supported_range"][1]
+    else:
+        capital_source = (
+            "Sheet 保守備援；投組現金扣除總資產 5% 的生活／營運備用金，"
+            "以及總資產 3% 的個股研究部位預留額"
+        )
+        deployable_cash = portfolio.get("deployable_cash_base")
+        supported_ceiling = report["sheet_conservative_range"][1]
     reviews = [
         item
         for item in report["items"]
-        if item["action"] == "CONTRIBUTE REVIEW"
-        or (
-            household_path_available
-            and item["household_action"] == "CONTRIBUTE REVIEW"
-        )
+        if _primary_action(item, household_path_available=household_path_available)
+        == "CONTRIBUTE REVIEW"
     ]
     review_names = "、".join(str(item["ticker"]) for item in reviews) or "無"
     lines = [
@@ -694,30 +801,23 @@ def render_beta_monitor_markdown(
         "",
         "## TL;DR",
         "",
-        "- 目標：最大化約 30 年後的退休淨終值；Beta 維持 accumulation-only，technical signal 只決定新增的 timing／pace，不因一般回檔自動賣出。",
-        f"- 今日：{review_names} 可進人工評估；Sheet／household 本輪合計上限 "
-        f"{_money(report['sheet_conservative_range'][1], currency)}／"
-        f"{_money(report['household_cash_supported_range'][1], currency)}，不是下單金額。",
-        f"- 風控：{_risk_hint_summary(report)}；未動用額度 {_money(contingent.get('undrawn_amount_base'), currency)} "
-        "不算資本，貸款必須另做 exact draw／instrument／tranche 人工 review，扣除利息與到期本金，且月息不得依賴被迫賣出 beta。",
+        "- 目標：最大化約 30 年後的退休淨終值；Beta 維持只累積、不因一般回檔自動賣出，技術訊號只決定新增的時點與節奏。",
+        f"- 今日：{review_names} 可進人工評估；自有現金的本輪可評估上限 "
+        f"{_money(supported_ceiling, currency)}，不是下單金額。",
+        f"- 風控：{_risk_hint_summary(report)}；未動用貸款額度 "
+        f"{_money(contingent.get('undrawn_amount_base'), currency)} 不算自有現金，也未納入本輪上限。",
         "",
         "## 資本與風控明細",
         "",
-        f"- 狀態：{report['status']}",
-        f"- Policy：{report['policy_version']}（{report['policy_mode']}）",
-        f"- 資本範圍：Sheet-only conservative（{report['capital_scope']}）＋"
-        "household_cash paper observation（並列、不互相覆寫）",
-        f"- NAV／現金／保留：{_money(portfolio.get('nav_base'), currency)}／"
-        f"{_money(portfolio.get('cash_base'), currency)}／{_money(portfolio.get('reserve_base'), currency)}",
-        f"- Sheet conservative 可部署／本輪 range：{_money(portfolio.get('deployable_cash_base'), currency)}／"
-        f"{_money(report['sheet_conservative_range'][1], currency)}",
-        f"- Household cash 可部署／本輪 range："
-        f"{_money(household_cash.get('deployable_cash_base'), currency)}／"
-        f"{_money(report['household_cash_supported_range'][1], currency)}"
-        f"（{household_cash.get('status', 'unknown')}）",
-        f"- Contingent credit：{_money(contingent.get('undrawn_amount_base'), currency)}"
-        f"（{contingent.get('status', 'unknown')}；terms={contingent.get('terms_status', 'unknown')}；不算資本）",
-        f"- Loan-funded range：{loan_range.get('status', 'manual_review_required')}（不自動給金額）",
+        f"- 自有現金可部署：{_money(deployable_cash, currency)}",
+        f"- 本輪可評估上限：{_money(supported_ceiling, currency)}（今日燈號、單輪預算與風控上限後）",
+        f"- 未動用貸款額度：{_money(contingent.get('undrawn_amount_base'), currency)}"
+        f"（狀態：{_status_label(contingent.get('status', 'unknown'))}；"
+        f"條件資料：{_status_label(contingent.get('terms_status', 'unknown'))}；"
+        "不算自有現金）",
+        "- 貸款投入：尚未核准；提款金額、標的與批次必須另案人工核准，且月息不得依賴被迫賣出 beta",
+        f"- 自有現金計算：{capital_source}",
+        "- 節奏說明：25% 代表使用該類資產完整單輪預算的四分之一，不是投入總資產的 25%。",
     ]
     blockers = report.get("blockers") or []
     warnings = list(report.get("warnings") or [])
@@ -730,7 +830,7 @@ def render_beta_monitor_markdown(
     if blockers:
         lines.append(f"- Portfolio blockers：{'、'.join(str(item) for item in blockers)}")
     if warnings:
-        lines.append(f"- Warnings：{'、'.join(str(item) for item in warnings)}")
+        lines.append(f"- 風險提醒：{'、'.join(_warning_label(item) for item in warnings)}")
 
     lines += _risk_snapshot_lines(report, full=risk_view == "full")
     requests = report.get("event_search_requests") or []
@@ -747,13 +847,8 @@ def render_beta_monitor_markdown(
         item
         for item in report["items"]
         if item not in reviews
-        and (
-            item["action"] == "PAUSE CONTRIBUTION"
-            or (
-                household_path_available
-                and item["household_action"] == "PAUSE CONTRIBUTION"
-            )
-        )
+        and _primary_action(item, household_path_available=household_path_available)
+        == "PAUSE CONTRIBUTION"
     ]
     holds = [item for item in report["items"] if item not in reviews and item not in paused]
     lines += ["", "## 需要人工判斷"]
@@ -765,11 +860,19 @@ def render_beta_monitor_markdown(
             f"- {_display_label(item, household_path_available=household_path_available)}｜"
             f"{item['ticker']}｜{_moves(indicator)}｜"
             f"RSI {_finite(indicator.get('rsi_14')) or 0:.1f}｜距高點 {_pct(indicator.get('drawdown_252'))}｜"
-            f"{item['signal_tier']} / pace {item['signal_pace']:.2f}｜"
-            f"Sheet／household 上限 {_money(item['supported_order_range_base'][1], currency)}／"
-            f"{_money(item['household_cash_supported_order_range_base'][1], currency)}｜"
-            f"Sheet 約束 {','.join(item['binding_constraints']) or 'none'}｜"
-            f"household 約束 {','.join(item['household_binding_constraints']) or 'none'}"
+            f"{_signal_tier_label(item['signal_tier'])} / {_pace_label(item['signal_pace'])}｜"
+            f"自有現金評估上限 "
+            f"{_money(_primary_supported_ceiling(item, household_path_available=household_path_available), currency)}｜"
+            "限制 "
+            + (
+                "、".join(
+                    _constraint_label(value)
+                    for value in _primary_binding_constraints(
+                        item, household_path_available=household_path_available
+                    )
+                )
+                or "無"
+            )
         )
     if paused:
         lines += ["", "## 暫停新增"]
@@ -778,9 +881,18 @@ def render_beta_monitor_markdown(
             lines.append(
                 f"- {_display_label(item, household_path_available=household_path_available)}｜"
                 f"{item['ticker']}｜{_moves(indicator)}｜"
-                f"{item['technical_status']}｜"
-                f"Sheet={','.join(item['blockers']) or item['action']}｜"
-                f"household={','.join(item['household_blockers']) or item['household_action']}"
+                "原因="
+                + (
+                    "、".join(
+                        _constraint_label(value)
+                        for value in _primary_blockers(
+                            item, household_path_available=household_path_available
+                        )
+                    )
+                    or _primary_action(
+                        item, household_path_available=household_path_available
+                    )
+                )
             )
     primary_rank = {ticker: index for index, ticker in enumerate(_PRIMARY_DISPLAY_ORDER)}
     primary_holds = sorted(
@@ -797,7 +909,7 @@ def render_beta_monitor_markdown(
                 f"{item['ticker']}｜{_moves(indicator)}｜"
                 f"RSI {_finite(indicator.get('rsi_14')) or 0:.1f}｜"
                 f"距高點 {_pct(indicator.get('drawdown_252'))}｜"
-                f"{item['signal_tier']} / pace {item['signal_pace']:.2f}"
+                f"{_signal_tier_label(item['signal_tier'])} / {_pace_label(item['signal_pace'])}"
             )
     else:
         lines.append("- 無")
@@ -829,7 +941,7 @@ def render_beta_monitor_markdown(
         lines.append("- 無")
     lines += [
         "",
-        "> 所有金額均為 paper observation review range；未動用額度不進 NAV／cash，且不代表已核准、已下單或已寫回 Google Sheet；貸款另不代表已提款。",
+        "> 所有金額都只是人工評估上限；未動用貸款額度不計入投資資產或自有現金，也不代表已核准、已提款、已下單或已寫回 Google Sheet。",
     ]
     return "\n".join(lines)
 

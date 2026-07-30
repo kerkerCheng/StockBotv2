@@ -201,6 +201,11 @@ def test_household_cash_runs_a_separate_range_without_using_credit() -> None:
         item["supported_order_range_base"] == item["sheet_conservative_order_range_base"]
         for item in report["items"]
     )
+    rendered = render_beta_monitor_markdown(report)
+    assert "已讀取私人資本資料" in rendered
+    assert "Sheet 保守備援" not in rendered
+    assert "未動用貸款額度：USD 1,000" in rendered
+    assert "不算自有現金" in rendered
 
 
 def test_missing_household_authority_does_not_zero_phase_one_range() -> None:
@@ -221,7 +226,9 @@ def test_missing_household_authority_does_not_zero_phase_one_range() -> None:
     assert report["household_cash_supported_range"] == [0.0, 0.0]
     assert "capital_authority_unavailable" in report["blockers"]
     rendered = render_beta_monitor_markdown(report)
-    assert "Household cash 可部署" in rendered
+    assert "自有現金可部署" in rendered
+    assert "Sheet 保守備援" in rendered
+    assert "Household cash 可部署" not in rendered
     assert "LON:VWRA — observed｜" not in rendered
 
 
@@ -397,15 +404,26 @@ def test_markdown_is_aggregate_and_preserves_human_boundary() -> None:
 
     rendered = render_beta_monitor_markdown(report)
 
-    assert "Sheet-only conservative" in rendered
+    assert "自有現金可部署" in rendered
+    assert "本輪可評估上限" in rendered
+    assert "未動用貸款額度" in rendered
+    assert "Sheet 保守備援" in rendered
+    assert "Sheet／household" not in rendered
     assert "## TL;DR" in rendered
     assert "退休淨終值" in rendered
-    assert "technical signal 只決定新增的 timing／pace" in rendered
+    assert "技術訊號只決定新增的時點與節奏" in rendered
     assert "月息不得依賴被迫賣出 beta" in rendered
+    assert "節奏 " in rendered
     assert "1日 -1.0%｜5日 -3.0%｜20日 -8.0%" in rendered
     assert "## 主力 ETF／權值" in rendered
     assert rendered.index("QQQ") < rendered.index("TQQQ")
-    assert "不代表已核准、已下單或已寫回" in rendered
+    assert "不代表已核准、已提款、已下單或已寫回" in rendered
+    for raw in (
+        "manual_review_required",
+        "campaign_budget",
+        "technical_history_insufficient_252_sessions",
+    ):
+        assert raw not in rendered
     assert "shares" not in rendered
 
 
@@ -435,4 +453,7 @@ def test_daily_risk_view_is_silent_without_change_but_weekly_full_is_explicit() 
     assert "## 投組風險變化" not in daily
     assert "## 投組風險完整快照" in weekly
     assert "Issuer look-through coverage：partial" in weekly
+    assert "槓桿 ETF 資金占比" in weekly
+    assert "換算槓桿曝險" in weekly
+    assert "名目槓桿" not in weekly
     assert "科技 effective proxy" not in weekly
