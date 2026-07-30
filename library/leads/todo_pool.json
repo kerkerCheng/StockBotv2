@@ -110,7 +110,7 @@
     },
     {
       "added_at": "2026-07-25T04:49:13.254087+00:00",
-      "deferred_at": "2026-07-26T13:07:18.781347+00:00",
+      "deferred_at": "2026-07-30T15:33:49.723540+00:00",
       "hint": "本機複查 thesis 並手動更新 lifecycle.json",
       "n": 10,
       "reason": null,
@@ -119,7 +119,13 @@
       "resolved_at": null,
       "source": "lifecycle",
       "title": "thesis sivers：review_required",
-      "type": "thesis_lifecycle"
+      "type": "thesis_lifecycle",
+      "waiting_on": {
+        "reason": "L7 review 已決議持有至分辨點",
+        "set_at": "2026-07-30T15:33:49.723540+00:00",
+        "trigger": "SIVE Q2+ 財報重編分辨點",
+        "until": "2026-08-27"
+      }
     },
     {
       "added_at": "2026-07-25T09:09:40.441273+00:00",
@@ -533,7 +539,7 @@
     },
     {
       "added_at": "2026-07-28T01:10:21.849173+00:00",
-      "deferred_at": "2026-07-29T00:59:49.378748+00:00",
+      "deferred_at": "2026-07-30T15:33:49.863872+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 42,
       "reason": null,
@@ -542,7 +548,13 @@
       "resolved_at": null,
       "source": "decision_lab",
       "title": "REVIEW — co:sivers_semiconductors",
-      "type": "decision_review"
+      "type": "decision_review",
+      "waiting_on": {
+        "reason": null,
+        "set_at": "2026-07-30T15:33:49.863872+00:00",
+        "trigger": "SIVE Q2 財報（Ningi 指控之分辨點）",
+        "until": "2026-08-27"
+      }
     },
     {
       "added_at": "2026-07-28T22:45:53.987413+00:00",
@@ -860,7 +872,7 @@
     },
     {
       "added_at": "2026-07-29T15:16:58.028043+00:00",
-      "deferred_at": "2026-07-30T10:11:31.331706+00:00",
+      "deferred_at": "2026-07-30T15:33:50.003109+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 64,
       "reason": null,
@@ -869,7 +881,13 @@
       "resolved_at": null,
       "source": "decision_lab",
       "title": "REVIEW — co:axt",
-      "type": "decision_review"
+      "type": "decision_review",
+      "waiting_on": {
+        "reason": null,
+        "set_at": "2026-07-30T15:33:50.003109+00:00",
+        "trigger": "下一個 review 點或新 AXT filing（研究已完成，pd_e5d82e53）",
+        "until": null
+      }
     },
     {
       "added_at": "2026-07-29T15:16:58.028071+00:00",
@@ -1035,7 +1053,7 @@
     },
     {
       "added_at": "2026-07-30T10:11:44.913485+00:00",
-      "deferred_at": "2026-07-30T10:12:56.042217+00:00",
+      "deferred_at": "2026-07-30T15:33:50.141162+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 74,
       "reason": null,
@@ -1044,11 +1062,17 @@
       "resolved_at": null,
       "source": "decision_lab",
       "title": "REVIEW — co:agility_robotics",
-      "type": "decision_review"
+      "type": "decision_review",
+      "waiting_on": {
+        "reason": null,
+        "set_at": "2026-07-30T15:33:50.141162+00:00",
+        "trigger": "S-4 公開 / 4Q 2026 closing 後登記 AGLT",
+        "until": null
+      }
     },
     {
       "added_at": "2026-07-30T10:11:44.913513+00:00",
-      "deferred_at": "2026-07-30T10:12:56.169035+00:00",
+      "deferred_at": "2026-07-30T15:33:50.287092+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 75,
       "reason": null,
@@ -1057,7 +1081,13 @@
       "resolved_at": null,
       "source": "decision_lab",
       "title": "REVIEW — co:agility_robotics",
-      "type": "decision_review"
+      "type": "decision_review",
+      "waiting_on": {
+        "reason": null,
+        "set_at": "2026-07-30T15:33:50.287092+00:00",
+        "trigger": "重複 cohort，研究一律走 [74]",
+        "until": null
+      }
     },
     {
       "added_at": "2026-07-30T10:30:17.276498+00:00",
@@ -2141,6 +2171,51 @@
       "ref_id": "engine_c_manual:AXTI:contingent_liquidity_claims",
       "type": "manual",
       "verb": "go"
+    },
+    {
+      "at": "2026-07-30T15:33:49.723540+00:00",
+      "n": 10,
+      "reason": "L7 review 已決議持有至分辨點",
+      "receipt": null,
+      "ref_id": "sivers",
+      "type": "thesis_lifecycle",
+      "verb": "pending"
+    },
+    {
+      "at": "2026-07-30T15:33:49.863872+00:00",
+      "n": 42,
+      "reason": null,
+      "receipt": null,
+      "ref_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
+      "type": "decision_review",
+      "verb": "pending"
+    },
+    {
+      "at": "2026-07-30T15:33:50.003109+00:00",
+      "n": 64,
+      "reason": null,
+      "receipt": null,
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "type": "decision_review",
+      "verb": "pending"
+    },
+    {
+      "at": "2026-07-30T15:33:50.141162+00:00",
+      "n": 74,
+      "reason": null,
+      "receipt": null,
+      "ref_id": "dc_6ae5b014dbbcd0774b45487542c9a102",
+      "type": "decision_review",
+      "verb": "pending"
+    },
+    {
+      "at": "2026-07-30T15:33:50.287092+00:00",
+      "n": 75,
+      "reason": null,
+      "receipt": null,
+      "ref_id": "dc_b1225ef0ebbf6dab001ec8cabb11f4e1",
+      "type": "decision_review",
+      "verb": "pending"
     }
   ],
   "next_n": 77,

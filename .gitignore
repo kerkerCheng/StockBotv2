@@ -15,6 +15,7 @@ config/*.json
 !config/beta_policy.json
 !config/holdings_coverage.json
 !config/engine_c_observation_fields.json
+!config/decision_blockers.json
 
 # Claude Code 本機設定（不共用）；project skills 轉接層需納入版本控制
 .claude/*
@@ -73,3 +74,4 @@ extractions/silicon_matter_sivers_ayar_2026_03_14.json
 
 # Never commit local-only source-derived content.
 library/private/
+.pytest_tmp/

@@ -254,17 +254,34 @@ def resolve(
     reason: str = "",
     receipt: str = "",
     at: str | None = None,
+    until: str | None = None,
+    trigger: str | None = None,
 ) -> dict[str, Any]:
-    """以動詞處理一個編號。`pending` 不 resolve（明確 defer，留在池中）。"""
+    """以動詞處理一個編號。`pending` 不 resolve（明確 defer，留在池中）。
+
+    `pending` 可帶 `until`（日期）或 `trigger`（事件描述）。帶了觸發條件的項目會被
+    歸入「等事件」而非「等你決定」——它仍在池中可稽核，但在觸發之前不佔用決策注意力。
+    這是使用者明確表達的等待，優先於由 blocker 自動推導的分類。
+    """
     if verb not in VERBS:
         raise TodoError(f"未知動詞：{verb}（可用：{', '.join(VERBS)}）")
     item = get(pool, n)
     if verb == "go":
         _validate_go_receipt(item, receipt)
+    if (until or trigger) and verb != "pending":
+        raise TodoError("until／trigger 只適用於 pending")
     stamp = at or _now()
     if verb == "pending":
         item["deferred_at"] = stamp
+        if until or trigger:
+            item["waiting_on"] = {
+                "until": until or None,
+                "trigger": trigger or None,
+                "reason": reason or None,
+                "set_at": stamp,
+            }
     else:
+        item.pop("waiting_on", None)
         item["resolved_at"] = stamp
         item["resolution"] = verb
         item["reason"] = reason or None
@@ -834,6 +851,36 @@ def collect_from_lifecycle() -> list[dict[str, Any]]:
     ]
 
 
+def _derive_waiting_on(blockers: Any) -> dict[str, Any] | None:
+    """依 blocker registry 判斷此項是否純粹在等外部資料。
+
+    回傳 None 代表仍需使用者決定（保守預設：registry 未登記的 code 一律當成需要人看）。
+    """
+    codes = [str(b) for b in blockers if isinstance(b, str)]
+    if not codes:
+        return None
+    try:
+        from decision_lab.blockers import get_blocker_registry
+
+        registry = get_blocker_registry()
+    except Exception:
+        return None
+    if registry.needs_user_decision(codes):
+        return None
+    reasons = registry.waiting_reasons(codes)
+    return {
+        "until": None,
+        "trigger": (
+            "／".join(reasons[:3])
+            if reasons
+            else "僅剩系統內部狀態，重新 reassess 即可（無使用者決定）"
+        ),
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": _now(),
+        "derived_from_blockers": True,
+    }
+
+
 def collect_from_decisions() -> list[dict[str, Any]]:
     """需要動作的 Engine D 決策項（REVIEW／TRADE／HEDGE）→ 複查待辦。
 
@@ -866,14 +913,21 @@ def collect_from_decisions() -> list[dict[str, Any]]:
         label = company if company not in {"", "unknown", "unresolved"} else (
             company_hint or ticker or "unknown"
         )
-        rows.append({
+        row = {
             "type": "sheet_only_holding" if item.get("sheet_only") else "decision_review",
             "ref_id": ref,
             "title": f"{action} — {label}",
             **({"hint": "核准 bounded gap research；完成後才 reassess"}
                if not item.get("sheet_only") else {}),
             "source": "decision_lab",
-        })
+        }
+        # 若這個決策的所有 blocker 都不需要使用者決定（純粹在等世界產生新資料），
+        # 就直接帶著推導出的等待理由入池，不佔決策注意力。保守規則：只要有一個
+        # blocker 需要人決定就照舊進決策佇列。
+        waiting = _derive_waiting_on(item.get("blockers") or [])
+        if waiting:
+            row["waiting_on"] = waiting
+        rows.append(row)
     # Engine D 也可能因 portfolio authority 全域失效而要求 REVIEW，這時沒有
     # cohort item（例如 Google Sheet holdings 完全讀不到）。這仍是需要使用者
     # 處理的 pq2，不能因 items=[] 就從統一待辦池消失。
@@ -905,25 +959,50 @@ def collect_all(*, include_decisions: bool = True) -> list[dict[str, Any]]:
 
 # ── CLI ────────────────────────────────────────────────────────────────────
 
+def _waiting_label(item: Mapping[str, Any]) -> str:
+    waiting = item.get("waiting_on") or {}
+    parts = [p for p in (waiting.get("until"), waiting.get("trigger")) if p]
+    return "；".join(str(p) for p in parts) or "未指定觸發條件"
+
+
+def _item_line(item: Mapping[str, Any]) -> str:
+    if item.get("dispatch_status"):
+        flag = (
+            f"（pq1 {item['dispatch_status']}：{item.get('dispatch_ref')}；"
+            "無需再次 go）"
+        )
+    else:
+        flag = "（已 defer）" if item.get("deferred_at") else ""
+    return f"  [{item['n']}] {item['title']}{flag}"
+
+
 def _render(pool: Mapping[str, Any]) -> str:
     items = active_items(pool)
     if not items:
         return "（待辦池已清空）"
-    lines = ["待辦事項統整（回覆用編號；`<編號…> go｜drop｜pending`）", ""]
-    by_type: dict[str, list[dict[str, Any]]] = {}
-    for item in items:
-        by_type.setdefault(item["type"], []).append(item)
-    for item_type, group in by_type.items():
-        lines.append(f"## {item_type} — {ITEM_TYPES[item_type]}")
-        for item in group:
-            if item.get("dispatch_status"):
-                flag = (
-                    f"（pq1 {item['dispatch_status']}：{item.get('dispatch_ref')}；"
-                    "無需再次 go）"
-                )
-            else:
-                flag = "（已 defer）" if item.get("deferred_at") else ""
-            lines.append(f"  [{item['n']}] {item['title']}{flag}")
+    # 「等你決定」與「等世界發生某件事」分開呈現。後者仍在池中可稽核，
+    # 但不佔用決策注意力——這是待辦池訊噪比的主要來源。
+    deciding = [i for i in items if not i.get("waiting_on")]
+    waiting = [i for i in items if i.get("waiting_on")]
+
+    lines: list[str] = []
+    if deciding:
+        lines += ["待辦事項統整（回覆用編號；`<編號…> go｜drop｜pending`）", ""]
+        by_type: dict[str, list[dict[str, Any]]] = {}
+        for item in deciding:
+            by_type.setdefault(item["type"], []).append(item)
+        for item_type, group in by_type.items():
+            lines.append(f"## {item_type} — {ITEM_TYPES[item_type]}")
+            lines += [_item_line(item) for item in group]
+            lines.append("")
+    else:
+        lines += ["待辦事項統整：目前沒有需要你決定的項目。", ""]
+
+    if waiting:
+        lines.append(f"## 等事件（{len(waiting)} 項，觸發前不需動作）")
+        for item in waiting:
+            lines.append(f"  [{item['n']}] {item['title']}")
+            lines.append(f"        ↳ 等：{_waiting_label(item)}")
         lines.append("")
     return "\n".join(lines).rstrip()
 
@@ -949,6 +1028,14 @@ def main(argv: list[str] | None = None) -> int:
     p_res.add_argument("--verb", required=True, choices=VERBS)
     p_res.add_argument("--reason", default="")
     p_res.add_argument("--receipt", default="")
+    p_res.add_argument(
+        "--until", default=None,
+        help="pending 專用：等到哪個日期（如 2026-08-27）。設了就歸入「等事件」，不再佔決策注意力。",
+    )
+    p_res.add_argument(
+        "--trigger", default=None,
+        help="pending 專用：等哪個事件（如「S-4 公開」）。",
+    )
 
     p_dispatch = sub.add_parser(
         "dispatch", help="把 decision／source-trace review 的 go checkpoint 成 pq1 job"
@@ -1012,8 +1099,12 @@ def main(argv: list[str] | None = None) -> int:
                 resolve(
                     pool, int(raw), args.verb,
                     reason=args.reason, receipt=args.receipt,
+                    until=args.until, trigger=args.trigger,
                 )
-                print(f"✓ [{raw}] → {args.verb}")
+                suffix = ""
+                if args.verb == "pending" and (args.until or args.trigger):
+                    suffix = f"（等：{args.until or args.trigger}）"
+                print(f"✓ [{raw}] → {args.verb}{suffix}")
             except (TodoError, ValueError) as exc:
                 failures += 1
                 print(f"✗ [{raw}]：{exc}", file=sys.stderr)
