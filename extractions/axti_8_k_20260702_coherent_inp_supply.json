@@ -1,0 +1,148 @@
+{
+  "claims": [
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Downgrade if the full agreement or a later filing shows the supply relationship was rescinded, materially reduced, or terminated.",
+      "id": "axti_8_k_20260702_coherent_inp_supply_cl1",
+      "source_ids": [
+        "axti_8_k_20260702_coherent_inp_supply_s1",
+        "axti_8_k_20260702_coherent_inp_supply_s2"
+      ],
+      "statement": "AXT-Tongmei and Coherent entered a three-year agreement for mass development and supply of 6-inch InP wafer substrates from AXT to Coherent.",
+      "subject_id": "co:axt"
+    },
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Downgrade if Coherent exercises refund or termination rights, AXT misses the capacity commitment for more than six successive months, or the Q2 2026 10-Q exhibit materially changes the disclosed economics.",
+      "id": "axti_8_k_20260702_coherent_inp_supply_cl2",
+      "source_ids": [
+        "axti_8_k_20260702_coherent_inp_supply_s3",
+        "axti_8_k_20260702_coherent_inp_supply_s4"
+      ],
+      "statement": "AXT committed to expand Beijing 6-inch InP capacity during 2026-2028 for Coherent's capacity commitment in exchange for a US$22.2885 million prepayment; refund and termination rights mean the prepayment is not equivalent to realized revenue or proof of successful delivery.",
+      "subject_id": "co:coherent"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "co:coherent",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "axti_8_k_20260702_coherent_inp_supply_s1",
+        "axti_8_k_20260702_coherent_inp_supply_s2",
+        "axti_8_k_20260702_coherent_inp_supply_s3"
+      ],
+      "src_id": "co:axt"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "mat:inp_substrate",
+      "id": "e2",
+      "relation": "depends_on",
+      "source_ids": [
+        "axti_8_k_20260702_coherent_inp_supply_s2",
+        "axti_8_k_20260702_coherent_inp_supply_s3",
+        "axti_8_k_20260702_coherent_inp_supply_s4"
+      ],
+      "src_id": "co:coherent"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "AXT Inc.",
+        "AXTI",
+        "AXT-Tongmei"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:axt",
+      "name": "AXT",
+      "role": "material_base",
+      "source_ids": [
+        "axti_8_k_20260702_coherent_inp_supply_s1",
+        "axti_8_k_20260702_coherent_inp_supply_s2",
+        "axti_8_k_20260702_coherent_inp_supply_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "Coherent Corp",
+        "COHR"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:coherent",
+      "name": "Coherent",
+      "role": "bottleneck_supplier",
+      "source_ids": [
+        "axti_8_k_20260702_coherent_inp_supply_s1",
+        "axti_8_k_20260702_coherent_inp_supply_s2",
+        "axti_8_k_20260702_coherent_inp_supply_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "InP substrate",
+        "6-inch indium phosphide wafer substrate"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "mat:inp_substrate",
+      "name": "Indium Phosphide (InP) substrate",
+      "role": null,
+      "source_ids": [
+        "axti_8_k_20260702_coherent_inp_supply_s2",
+        "axti_8_k_20260702_coherent_inp_supply_s3"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "axti_8_k_20260702_coherent_inp_supply",
+    "evidence_tier": 1,
+    "origin_entity": "AXT",
+    "permission_basis": "Official public source; store the canonical URL and only the research-relevant excerpt.",
+    "published_at": "2026-07-02",
+    "publisher": "SEC EDGAR",
+    "retrieved_at": "2026-07-30",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "AXT Form 8-K — Coherent 6-inch InP development and supply agreement",
+    "url": "https://www.sec.gov/Archives/edgar/data/1051627/000143774926022557/axti20260630_8k.htm"
+  },
+  "sources": [
+    {
+      "id": "axti_8_k_20260702_coherent_inp_supply_s1",
+      "locator": "Item 1.01, first paragraph",
+      "quote": "On June 26, 2026, AXT-Tongmei, Inc. ... entered into a Master Development and Supply Agreement ... with Coherent Corp ... effective as of June 25, 2026."
+    },
+    {
+      "id": "axti_8_k_20260702_coherent_inp_supply_s2",
+      "locator": "Item 1.01, second paragraph",
+      "quote": "The Agreement establishes the terms for the mass development and supply of certain agreed-upon specifications for 6-inch indium phosphide (InP) wafer substrates from AXT to Coherent for an initial term of three (3) years."
+    },
+    {
+      "id": "axti_8_k_20260702_coherent_inp_supply_s3",
+      "locator": "Item 1.01, third paragraph",
+      "quote": "AXT has agreed to increase its manufacturing capacity ... at its Beijing, China facility in 2026 through 2028 ... for a prepayment of US$22,288,500 from Coherent to AXT."
+    },
+    {
+      "id": "axti_8_k_20260702_coherent_inp_supply_s4",
+      "locator": "Item 1.01, third and fourth paragraphs",
+      "quote": "The Prepayment is refundable to Coherent at its sole option if the Prepayment has not been fully applied upon the expiration or termination of the Agreement ... Coherent has the right to terminate the Agreement if AXT fails to meet the Capacity Commitment for more than six (6) successive calendar months."
+    }
+  ]
+}

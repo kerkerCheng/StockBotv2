@@ -1,0 +1,13 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1051627/000143774926022557/axti20260630_8k.htm
+
+Excerpt:
+Source URL: https://www.sec.gov/Archives/edgar/data/1051627/000143774926022557/axti20260630_8k.htm
+Title: AXT Form 8-K — Coherent 6-inch InP development and supply agreement
+Filed: 2026-07-02; earliest event: 2026-06-26
+
+Research excerpt:
+- AXT-Tongmei and Coherent entered a three-year mass-development and supply agreement for 6-inch InP wafer substrates.
+- AXT committed to expand the relevant Beijing capacity in 2026-2028 for a US$22,288,500 Coherent prepayment.
+- Unused prepayment can be refundable; Coherent can terminate if AXT misses the capacity commitment for more than six successive months.
+
+Boundary: this is AXT issuer disclosure, not Coherent-side independent confirmation; it does not establish sole source, qualification, realized volume, or revenue recognition.
