@@ -89,132 +89,108 @@ fetchers/edgar.py ──────↑                        engine_c/etl_yfin
   - **Weekly authority hierarchy：** `AGENTS.md` 是政策 SSOT；`crons/weekly_scan_prompt.md` 是 executable runbook，只有開發／人工修 policy 時才改，weekly routine 本身不得自我改寫。`docs/reports/weekly_scan_<date>.md` 是當週 point-in-time 歷史報告，不是 current-state truth；現況仍以 leads／todo pool／lifecycle／Engine A-C-D 各自 authority 為準。
 - **各類來源的 AI 抽取 instruction：** [`docs/extraction-instructions.md`](docs/extraction-instructions.md)
 - **遠端存取（手機 App／web／Claude chat fallback）：** 本機 MCP server（`mcp_server/graph_mcp.py`）+ Cloudflare Tunnel + connector。十二工具 surface，Git 能力僅 leads.json 一個窄例外；daily／weekly 現行排程不需要 MCP，因為直接在本機 repo 執行。完整資料流、安全邊界、Research Action／storage 協定與跨平台限制：[`docs/remote-access-architecture.md`](docs/remote-access-architecture.md)
-  - **⚠ 改完 `mcp_server/` 一定要重啟 MCP server process，否則遠端看到的是舊 tool surface。** 沒有 auto-reload：process 是開機由 `shell:startup` 的 `stockbotv2-graph-services.vbs` 啟動、之後就一直跑舊程式碼。2026-07-24 首次 daily routine 即因此回報「三支新工具不在 tool surface」（程式碼有、跑著的 process 沒有）。重啟：停掉 `graph_mcp` python process 再跑 `.venv\Scripts\python.exe mcp_server\graph_mcp.py`（或雙擊該 `.vbs`）。驗證跑著的版本：對 `http://127.0.0.1:$GRAPH_MCP_PORT/$GRAPH_MCP_TOKEN/mcp` 送 MCP `tools/list` 數工具數，**不要只看原始碼或測試**（那只證明 repo 對）。
-  - **（歷史／fallback）雲端 routine 的 egress 是可設定的環境白名單，不是平台硬限制（2026-07-25 更正）：** 2026-07-24 首跑時 cloud 直連 `substack.com` 與 `www.sec.gov` 收到 proxy 403，實際是 claude.ai cloud environment 的 Network access allowlist。現行 daily／weekly 已移回本機，以下白名單只在日後重啟 Claude cloud fallback 時適用。
-    - 白名單需含（harvest 用）：`sec.gov`、`*.sec.gov`（EDGAR 的 www/data/efts）、`substack.com`、`*.substack.com`；並保留勾選 default package-manager 清單。
-    - **MCP connector 流量不受此白名單影響**（走 Anthropic 伺服器轉發）——證據：403 那次 MCP 工具仍可呼叫。
-    - **`WebSearch` 不受影響**（是工具不是 egress）；受影響的只有直接抓取（`WebFetch`／`curl`／`urllib`，即 `crons/harvest_leads.py`）。
-    - 設計取捨：維持 Custom 白名單（而非 All domains）較安全——本 routine 天職就是讀不受信任的網路內容，且握有 MCP 圖寫入能力，收斂 egress 可壓低 prompt-injection 外流面。代價是非 EDGAR/Substack 的一手來源在雲端抓不到；但那類深挖本來就設計成在本機做。
+
+> MCP server 重啟程序、雲端 egress 白名單等操作細節見 [`docs/OPERATIONS.md`](docs/OPERATIONS.md)。
+
 
 ---
 
-## 什麼值得開發 / 什麼交給 Claude
+## 本檔的角色與另外兩份
 
-### 值得開發（邊際效益高、省 token、跨 session 有用）
+`AGENTS.md` 是**政策 SSOT**：判準、契約、邊界、踩過的坑。每個 session 開工前讀本檔。
 
-| 類別 | 具體項目 | 理由 |
-|------|---------|------|
-| 知識累積 | 更多公司 onboarding、更多高品質文件 | 圖的大小決定回答的深度 |
-| Skill 介面 | SKILL.md 檔（已有 8 個）| 讓 Claude Code / Codex 每次都能正確使用記憶 |
-| 高槓桿 fetcher | EDGAR 季報自動更新、arXiv 論文抓取 | 減少人工取文件摩擦 |
-| G5 L8 偏誤檢查 | `validate.py` 加 origin_entity 同質性警告（2026-07-17 已實作：供應商自報 sole_source 在文件層 WARN） | 低工程量、高資料品質槓桿 |
+另外兩份按需載入，不必每次讀：
 
-### 不值得自己開發（Claude 做得更好或沒意義）
+| 檔案 | 內容 | 什麼時候讀 |
+|------|------|-----------|
+| [`docs/OPERATIONS.md`](docs/OPERATIONS.md) | 指令、環境變數、排程流程、harvest／MCP 操作陷阱 | 要實際執行操作時 |
+| [`docs/ROADMAP.md`](docs/ROADMAP.md) | 交付歷史、開放 backlog、未來想法 | 規劃或決定下一步時 |
 
-| 類別 | 理由 |
-|------|------|
-| 長文解讀、文章分析 | Claude 的 context window + 推理比自製 pipeline 好 |
-| Text2Cypher / 對話式查詢 | 直接給 Claude 原始 graph context，Claude 自己解讀 |
-| 自動選文件頁面（G2）| Claude 看 TOC 判斷比 embedding filter 更準確 |
-| 節點重要性評分（G8）| Claude 從 edge 數量、tier、公司規模能即時判斷 |
-| 公司識別（G1）| Claude training data 知道公司是誰，hallucination 風險由 TICKER_MAP 控制 |
-| 自動代替使用者做最終投資決定或送單 | Engine D 可以提出有邊界的建議與 paper counterfactual，但 live 接受、覆寫與 broker 下單永遠需要人工 |
+拆分理由：本檔每個 session 完整載入，所以每加一段都在花掉未來每一次執行的 context。
+判準與契約值得這個成本，指令表與交付紀錄不值得。
+
+**新增內容放哪：** 是判準或會約束行為的規則 → 本檔；是怎麼跑的程序 → OPERATIONS；
+是做完什麼或想做什麼 → ROADMAP。
 
 ---
 
-## 引擎B（信號入庫）設計草稿
+## 現行運作契約
 
-**定位：** X / EDGAR 信號 → triage → 自動 pq1 追源／抽取 → prepared Research Action → 使用者 pq2 核准 → 圖。引擎B 是「人工 graph admission 閘門前的信號彙整與研究佇列」，不是自動入庫。
+> 這些是**當下生效的規則**，不是歷史紀錄。交付時間與 plan 連結見 [`ROADMAP.md`](docs/ROADMAP.md)。
 
-**已確認的初始信號來源：**
-- `aleabitoreddit`：X 帳號，有同名 SubStack。會寫產業供應鏈深度分析（evidence tier 3）。是 SIVE Sivers 客戶地圖的原始來源。
+### 統一待辦池（廣義 pq2）
 
-**追蹤方案（2026-07-25 已實作並驗證）：**
-- **X API 是主來源（`crons/harvest_leads.py` 的 `harvest_x`）。** 曾經的「SubStack RSS 就夠」前提**已被推翻**：該 feed 至今只有 1 篇 2026-05-19 舊文，但本人在 X 極度活躍（[@aleabitoreddit](https://x.com/aleabitoreddit)，顯示名 Serenity，10 萬+ 追蹤）。**RSS 掃的是錯的表面。** substack feed 已於 2026-07-25 從 `harvest_config.json` 移除（他發長文也會在 X 貼連結）。
-- **X API 成本模型（2026-02 起 pay-per-use）：** 約 **$0.005/則、按回傳貼文數計費、無月費下限**（舊的 $200 Basic 已對新用戶關閉）。成本控制四件套實測有效：`since_id` 增量、`exclude=replies,retweets`、`max_results` 上限、`user_id` 快取。**實測：首抓 23 則 $0.115；立即重跑 0 則 $0.000。** 日常估 $1–2/月。
-- **X 內容保存（2026-07-28 校正）：** 不再把貼文硬截成 140 字。tracked lead 保存單行可搜尋全文 `title` 與保留換行的 `raw_text`；API 同回應請求 `note_tweet` 與 `attachments.media_keys` expansion，media URL／alt text 等 metadata 隨 lead 保存，照片及影片／GIF 預覽另快取至 ignored `library/private/lead_media/`。harvest 不做 OCR，截圖內容仍須在 pq1 依 `source-trace` 追源；同一貼文的文字與圖片維持同一 `origin_event`，不構成獨立佐證。舊 lead 可用 `crons/harvest_leads.py --refresh-x-lead <lead_id>` 精準回填，不做全量昂貴 backfill。
-- **⚠ X harvest 只在本機跑。** `X_BEARER_TOKEN` 刻意只放本機 `.env`；Codex local daily scheduled task 可直接持久化 `since_id`。任何 cloud fallback 都不得抓 X，避免重複計費與擴大計費憑證 blast radius。
-- **已知限制（未修）：** `harvest_x` 不分頁。若新貼文數超過 `max_results`（預設 25），單次只取得部分而 `since_id` 仍前進 → **可能永久漏掉中間那批**。日常每天跑不會觸發；長時間沒跑（估 >2–3 天）再開機時要留意。要修就是加分頁並設總量上限。
-- **來源品質警語：** 該帳號公開宣稱 2026 報酬率 4,502%、推薦標的漲 100–1,000%。這類極端績效宣稱與 L5（單一 lens：偏多頭小市值瓶頸獵手）一致——當**線索來源**用，不當證據。
-- **入庫邊界：** aleabitoreddit 的內容最高只能是 `evidence_tier: 3`，需客戶端文件升級 L8 才能用於 Lane Memo。
+**所有真正需要使用者決策的事只有一個編號空間**——prepared RA 入圖核准、決策複查、thesis 到期、Sheet-only 持股、手動 authority。Raw／triaged leads 留在 pq1 由 routine 自動研究，不占 pq2 編號；否則同一題會在研究前與入圖前問兩次。
+
+編號首次進池後直到 resolve 才釋放；狀態存 tracked `library/leads/todo_pool.json`，append-only `log` 保留核准與 migration 稽核。
+
+**「等你決定」與「等事件」分離（2026-07-30）：** 池子同時裝著兩種性質不同的東西，混在一起會讓訊噪比降到約 1:1（歷來 76 個編號有 31 個被 drop）。`config/decision_blockers.json` 的 `resolution_mode` 是分類判準：`user_decision`／`awaiting_external`／`system_internal`。保守規則——**只要有一個 blocker 需要人決定，整個項目就留在決策佇列**，寧可多問也不要安靜藏起來。使用者亦可用 `pending --until/--trigger` 明確指定等待條件，優先於自動推導。
+
+**Daily pq1 budget：** 每輪上限唯一 authority 是 `config/daily_routine.json`（目前 5，是吞吐量 cap 不是每日 quota）；排序權重唯一 authority 是 `engine_b/priority.py`。tracked thesis impact 由非 retired lifecycle ＋ non-terminal Decision cohorts 自動導出。
+
+**待核准內容密度（2026-07-30 使用者定案）：** stable pq2 編號不只列短標題。每項先給一段 TL;DR，再明列完整公司／ticker、誰供應誰、產品／材料／技術、事件成熟度、投資意義、證據與反證限制，以及 `go` 實際授權的 action type；**不得假設使用者能從 `co:*` ID 或內部術語自行還原主詞。** 這是 `skills/daily-brief/SKILL.md` 的共用 presentation contract。
+
+**提醒去重：** lifecycle SessionStart hook 只提醒尚未進池的新到期項目；已存在的 `thesis_lifecycle`（含 deferred）由 Daily Brief 顯示，hook 必須靜默。新提醒只走 `additionalContext` 呈現一次。
+
+### Decision gap dispatch
+
+`decision_review go` 的語意是把最新 decision 綁定的 proposed work order checkpoint 成 pq1 `queued`，**不是**立刻沿用舊 assessment 做 bare `reassess`。原 pq2 項目在 queued／researching／awaiting_approval 期間保持 active 但不重複詢問；只有研究未果的 parked receipt，或補缺口後產生的**新 decision receipt**才能 resolve。
+
+Decision gap jobs 優先占用同一個 daily pq1 budget。若研究結果需要 graph admission、Engine C manual observation、thesis revise／retire 或其他 authority mutation，完整 packet 必須回 pq2，**原人工 gate 不放寬**。Live choice／fill 永遠不由此路徑推定。
+
+### Sheet 持股覆蓋分類
+
+`sheet_only_holding` 只針對**真正沒有任何機制負責**的持股。`decision_lab/brief.py` 的 `_sheet_only_items` 依 Sheet ticker 分三類：beta policy 涵蓋（`coverage=beta_policy`）、使用者明確不研究（`coverage=user_ignored`，登記於 `config/holdings_coverage.json`）、其餘 `coverage=uncovered`。前兩類判 `NO ACTION` ＋空 blockers，仍在 daily brief 現形但不占 pq2 編號。
+
+**`todo drop` 對這類項目無效**——它只清當次編號，sync 會依 Sheet 持股＋無 cohort 重新推導並配新編號（2026-07-29 實測 [18]-[33] → [46]-[60]）；要真正解除必須改覆蓋分類或建 cohort。覆蓋設定檔讀取失敗一律 fail safe 退回 `REVIEW`。beta universe 的 SSOT 只有 `config/beta_policy.json`。
+
+### Source-trace backlog 防漏
+
+`parked` 不等同「註記後遺忘」。pq1 每次因 `isolated_tier_3`／截圖／paywall 未果而 park 時，必須留下 `trace_status`、`trace_attempts_ref`、`trace_next_trigger` 與 `trace_requires_user`。
+
+一般 scheduled／event-triggered 重查仍屬 pq1，不占 pq2；只有需要使用者提供合法 access、核准付費或明確改變研究優先權時，`todo sync` 才建立 `source_trace_review`。該類型的 `go` 只把 exact lead dispatch 回 pq1，**不代表相信截圖、提高 evidence tier 或 graph admission**；取得原文並 prepare 後，入圖仍是另一個 `ra_admission` pq2。任何新訂閱／購買必須另列 exact 金額與方案。
+
+**Lead 之間的關聯鍵（2026-07-30）：** URL hash 只認同一篇文章。跨文章的關聯靠 `engine_b/entities.py` 的具名標的做**確定性**比對（cashtag、`edgar:<TICKER>`、registry 反查的 `co:*`）。主題相關但無共同 ticker 的仍靠語意，`trace_next_trigger` 仍是自由文字且**沒有任何程式在評估它**——改善方向見 [`ROADMAP.md`](docs/ROADMAP.md)。
+
+### 資本與風控
+
+**Numeric SSOT：** `config/investment_policy.json` 與 `config/beta_policy.json`。只有 **ETF 槓桿 cap 與 5% 單筆上限**會把 live supported range 歸零，其餘曝險只記錄／警告。使用者仍可走 prepared `live_override` 留下 exact action ＋ reason receipt；系統不自動下單。
+
+**共同可投資現金池只有一條：** `Portfolio CASH − cash floor`，供 Alpha／Beta 共用。不扣 operating reserve、alpha reserve 或 planned outflows，沒有 Sheet／household 雙 range。Alpha／Beta 如何分配由各自 campaign budget、Decision sizing、單筆上限與風控決定，**cash floor 不承擔 sleeve allocation**。cash floor authority 失效時 fail closed，不回退到百分比 reserve。
+
+**兩個槓桿指標不得混用：** `nominal_weight` 是「投入槓桿 ETF 的資金占 NAV」（5/8% warning/cap）；`effective_weight` 是乘上 2x／3x 後的「換算槓桿曝險」（15/20% warning/cap）。面向使用者不得把前者寫成模糊的「名目槓桿」。
+
+**Capital Authority：** 私人 Google Sheet 只保留 `cash_floor` 與 `credit_facility` 兩種 record；日常 credential scope 只有 `spreadsheets.readonly`。貸款額度、已借款、利率、計息方式、期限與還本方式獨立保存；**未動用額度不算 NAV／cash／allocation**。每次提款、標的與 tranche 都是 explicit manual review，「高信心」不構成 machine permission。
+
+**曝險邊界：** Sheet `bucket=CASH` 列計入 NAV 但不計曝險。未知非現金持股按 unlevered direct issuer ＋ alpha exposure 誠實降級，不因缺 mapping 阻擋。`issuer_loads` 只代表 policy 已登記的 ownership look-through，輸出必標 `partial`；Engine A 上游依賴不可混成 issuer ownership。**既有 frozen decision 不回寫**，重新 reassess 才使用新 policy／calculator。
+
+**退休貸款資本目標（2026-07-28 使用者定案）：** 使用者約 30 歲、退休目標約 60 歲；可長抱至到期的貸款資本以約 30 年後 `retirement_net_terminal_wealth` 最大化為方向，不以降低中途回撤為第一目標。契約為利息按月支付、期間不攤還本金、到期一次還本、允許投資用途。broad unlevered beta 是主要候選；daily 3x 可投資但維持衛星定位，exact review 必須扣除借款成本與到期本金比較退休淨終值，**月息若需靠賣出 beta 支付則該 tranche 不成立**。
+
+### Beta 呈現契約（2026-07-30 使用者定案）
+
+底層與首屏都只保存一條 `self_funded_supported_range`。自有現金可部署固定顯示 `Portfolio CASH − cash floor`，並明說 cash floor 以上為 Alpha／Beta 共用。另獨立顯示「未動用貸款額度／已借款／估計利息」，明標貸款不算自有現金。**不得用未解釋的斜線或 raw field name。**
+
+燈號固定配文字：🟢可評估、🟡冷卻／排序中、⚪觀察、🔴資料不足／暫停新增。Beta 區先用三行 TL;DR 說明目標、今日可人工評估標的與已觸發風控；technical signal 只決定新增 timing／pace，**不因一般回檔自動賣出**。
+
+### 事件監控
+
+issuer 曝險 ≥20% 且對應 series 單日報酬首次跌破 -4% 才產 ephemeral `event_search_requests`；daily agent 只做一次 WebSearch，輸出可能原因＋曝險並標未經查證，**不建 lead／decision、不進 pq1/pq2、不寫 Engine A**。需要深挖才另走 lead-intake。
+
+### 報告留檔策略
+
+**daily brief 不留檔**（只出在 session；稽核價值由待辦池 log ＋ leads 狀態機 ＋ Decision Store 承擔）；**weekly report 留檔**（`docs/reports/`，含無法從池重建的 topic discovery 與健康審查趨勢）。不回到 PR/Issue 形式——那會產生與池競爭的第二個狀態源。
+
+**Weekly authority hierarchy：** `AGENTS.md` 是政策 SSOT；`crons/weekly_scan_prompt.md` 是 executable runbook，只有開發／人工修 policy 時才改，**weekly routine 本身不得自我改寫**。`docs/reports/weekly_scan_<date>.md` 是當週 point-in-time 歷史報告，不是 current-state truth。
 
 ---
-
-## 開發優先序
-
-> `docs/plans/` 已轉純歷史（見 [`docs/plans/README.md`](docs/plans/README.md)）；當前工作起點只看本節。
-> 小工作直接照本節做、不再開 plan 檔；只有大型開發才新建 plan。
-
-**（已完成）M1 CPO Depth Sprint** — 2026-07-18 達標：AXT 已 onboard（`TICKER_MAP` 有 `co:axt: "AXTI"`）；Coherent／Lumentum／NVIDIA／Broadcom 各 ≥3 個 distinct `origin_entity`；20 條 edge conflict 全數 resolve 並 project 進圖（`python loader/edge_resolution.py project --dry-run` 的 `open_conflicts=0`）。**遺留 backlog（仍開）：** TSEM intake（ra_2bf1494b）的 2027–29 光通訊集體擴產 oversupply watch、MACOM/Semtech 作為 Tower TIA 客戶（tier 3，待客戶端揭露印證）、GF 對 Tower 專利訴訟未追源。
-
-**（已完成）Action-Oriented Alpha Decision Lab v1** — 2026-07-21 完成：本機手動 Signal → Shadow Observation → Coverage／Confidence → lane-specific sizing → funded paper／Action Card → outcome 閉環。SIVE／空圖 fixtures、Engine C rebuild、Decision Store backup/restore、paper replay與 Neo4j 唯讀 preservation proof 均有測試。Engine C 與 Decision／paper runtime 已私有化且不再由 Git 追蹤；live inventory 只認 Google Sheet，交易仍由使用者手動執行。唯一歷史 plan：[`docs/plans/2026-07-21-001-feat-action-oriented-alpha-decision-lab-plan.md`](docs/plans/2026-07-21-001-feat-action-oriented-alpha-decision-lab-plan.md)。**未包含：** 排程 Daily Brief、自動 harvest、remote decision MCP、broker routing。
-
-**（已完成）Engine D operational workflow** — 2026-07-22 完成：`python -m decision_lab evaluate-signal "<Signal>"` 可由 raw Signal 自動完成 wide capture、exact identity、Engine A/C／market／FX／Sheet authority read、content-addressed freeze、Coverage／Confidence／sizing、atomic decision／eligible paper 與 Action Card；`reassess` 建立新 context 與 attributed delta、不改舊 decision；`today` 純讀輸出 `NO ACTION / REVIEW / TRADE / HEDGE`。正常入口不要求 internal digest／Coverage ID／idempotency key。Unresolved identity、空圖、missing／stale／manual_required 會保存 cohort／Shadow、歸零 funded range並產 bounded work order。Live 仍只由明確 `record-choice`、使用者手動下單及 `record-fill` 建立 facts，Google Sheet 不被 Engine D 寫回。歷史 plan：[`docs/plans/2026-07-22-001-feat-engine-d-operational-workflow-plan.md`](docs/plans/2026-07-22-001-feat-engine-d-operational-workflow-plan.md)。**仍未包含：** 排程、notification、remote Decision MCP、broker routing、自動 harvest。
-
-**Operational commands／外部設定：**
-- 研究預設：`python -m decision_lab evaluate-signal "<Signal>" --ticker <TICKER> --intent research --format markdown`；只有使用者明確要求才用 `paper`／`live`。
-- 新資料重評：`python -m decision_lab reassess <decision_id> --assessment <assessment.json> --intent <research|paper|live> --format markdown`；live 另加 `--confirm-holdings`。
-- 今日摘要：`python -m decision_lab today --format markdown`；既有卡片：`python -m decision_lab card <decision_id>`。
-- Engine A exact-name／bounded context 需專用唯讀帳號：`NEO4J_URI`、`NEO4J_DECISION_READER_USER`、`NEO4J_DECISION_READER_PASSWORD`，可選 `NEO4J_DATABASE`；不得 fallback 到可寫帳號。
-- Live holdings 需 `GSHEETS_SERVICE_ACCOUNT_JSON`、`GSHEETS_SPREADSHEET_ID`，可選 `GSHEETS_SHEET_NAME`。Adapter 的標準輸出仍是 `ticker`、`shares`、`currency`、`market_value_base`、`nav_base`、`base_currency`；Sheet 可直接提供完整標準欄位，或以既有逐列 mark-to-market `market_usd` 安全正規化成 USD NAV。禁止退回 `avg_cost` 或 `market_twd` 猜值。
-- Price／FX 預設沿用 yfinance（無 API key）；Engine C authority 仍由 ignored private runtime pointer／既有 Postgres env 決定。非同幣 FX 缺失或方向不符一律 fail closed。
-
-**（已完成）第二條垂直切片／L9 前置條件 #1** — 2026-07-19 由 commit `a7abdf5` 交付 AMAT/LRCX mature-node Lane Memo、evidence manifest 與 scoring；主題為非 AI／非 CPO，評分 23/30（可信度 4、可證偽性 4、市場差異度 4），`thesis/preconditions.py` 的 `_check_second_slice()` 已通過。歷史規格：[`docs/plans/2026-07-08-005-feat-second-vertical-slice-plan.md`](docs/plans/2026-07-08-005-feat-second-vertical-slice-plan.md)。
-
-1. **（已完成 2026-07-22）L9 剩餘財務核驗缺口**
-   — COHR「客戶集中度」與「Backlog／訂單能見度」已以一手 filing 補入 Engine C manual observation ledger（append-only，含逐字 provenance）：客戶集中度出自 FY2025 10-K segment note「Major Customers」（兩大客戶各佔 12%／10%，主要來自 Networking segment；另註 NVIDIA 2026-03-02 投資 $2B＋多年期產能協議至 2030 的前瞻集中度旗標，出自 Q3 FY2026 10-Q）；COHR 不揭露美元 backlog／RPO，依規則填替代指標＝Q4 FY2026 guided revenue $1.91B–$2.05B（8-K EX-99.1，filed 2026-05-06）＋ NVIDIA 產能協議。`python thesis/preconditions.py` 全綠、`python engine_c/checklist.py COHR` 五項 gate_pass=true；**L9 三前置條件全部達標，投資諮詢 gate 開放**。一手文件存 `library/raw/cohr_10_k_20250815.txt`、`cohr_10_q_20260506.txt`、`cohr_ex991_20260506.txt`。
-
-2. **（已完成 2026-07-26）Daily Approval Loop v1.2 本機 rollout** — v1.1 plan：[`docs/plans/2026-07-24-001-feat-daily-approval-loop-v1-1-plan.md`](docs/plans/2026-07-24-001-feat-daily-approval-loop-v1-1-plan.md)。原 U1–U5 均保留；現行 runner 改成 Codex desktop local scheduled task（daily 台北 06:30；weekly 週日 04:00），直接讀 `.env`、Neo4j、Engine C／Decision Store，不再依賴 Claude cloud clone／MCP 才能完成 brief。新增 Engine C daily ETL、repo `.venv` 明確入口與窄 state publisher；兩個排程都在 master 執行且刻意錯開。
-   - **Daily pq1 budget：** 每輪上限唯一 authority 是 `config/daily_routine.json`（目前 5，是吞吐量 cap、不是每日 quota；仍依 priority 與實際候選數執行）；排序權重唯一 authority 是 `engine_b/priority.py`。tracked thesis impact 由非 retired lifecycle＋non-terminal Decision cohorts 自動導出，不再靠 prompt 手填。
-   - **統一待辦池（廣義 pq2，2026-07-26 校正）：** **所有真正需要使用者決策的事只有一個編號空間**——prepared RA 入圖核准、決策複查、thesis 到期、Sheet-only 持股、手動 authority。Raw／triaged leads 留在 pq1，由 routine 自動研究，不占 pq2 編號；否則同一題會在研究前與入圖前問兩次。使用者說「待辦事項統整」＝跑 `& '.venv\Scripts\python.exe' -m engine_b.todo sync`。編號首次進池後直到 resolve 才釋放；狀態存 tracked `library/leads/todo_pool.json`，append-only `log` 保留核准與 migration 稽核。
-   - **Sheet 持股覆蓋分類（2026-07-29 使用者定案）：** `sheet_only_holding` 只針對**真正沒有任何機制負責**的持股。`decision_lab/brief.py` 的 `_sheet_only_items` 依 Sheet ticker 分三類：beta policy 涵蓋（`coverage=beta_policy`，14 檔 ETF＋權值股）、使用者明確不研究（`coverage=user_ignored`，登記於 `config/holdings_coverage.json`）、其餘 `coverage=uncovered`。前兩類判 `NO ACTION`＋空 blockers，因此仍在 daily brief 現形（可見性不犧牲），但 `collect_from_decisions` 會跳過而不占 pq2 編號。**`todo drop` 對這類項目無效**——它只清當次編號，sync 會依 Sheet 持股＋無 cohort 重新推導並配新編號（2026-07-29 實測 [18]-[33] → [46]-[60]）；要真正解除必須改覆蓋分類或建 cohort。覆蓋設定檔讀取失敗一律 fail safe 退回 `REVIEW`，寧可重複提醒也不讓未覆蓋持股靜默消失。beta universe 的 SSOT 仍只有 `config/beta_policy.json`，不在 coverage 檔重複列舉。
-   - **Decision gap dispatch（2026-07-27 校正）：** `decision_review go` 的語意是把最新 decision 綁定的 proposed work order checkpoint 成 pq1 `queued`，不是立刻沿用舊 assessment 做 bare `reassess`。原 pq2 項目在 queued／researching／awaiting_approval 期間保持 active 但不重複詢問；只有研究未果的 parked receipt，或補缺口後產生的**新 decision receipt**才能 resolve。Decision gap jobs 優先占用同一個 daily pq1 budget；若研究結果需要 graph admission、Engine C manual observation、thesis revise／retire 或其他 authority mutation，完整 packet 必須回 pq2，原人工 gate 不放寬。Live choice／fill 永遠不由此路徑推定。
-   - **Source-trace backlog 防漏（2026-07-29 校正）：** `parked` 不再等同「註記後遺忘」。pq1 每次因 `isolated_tier_3`／截圖／paywall 未果而 park 時，必須留下 `trace_status`、`trace_attempts_ref`、`trace_next_trigger` 與 `trace_requires_user`；Daily 用 `python -m engine_b.cli trace-backlog` 顯示未結案項目。一般 scheduled／event-triggered 重查仍屬 pq1，不占 pq2；只有需要使用者提供合法 access、核准付費或明確改變研究優先權時，`todo sync` 才建立 `source_trace_review`。該類型的 `go` 只把 exact lead dispatch 回 pq1，不代表相信截圖、提高 evidence tier 或 graph admission；取得原文並 prepare 後，入圖仍是另一個 `ra_admission` pq2。任何新訂閱／購買必須另列 exact 金額與方案，不由 `source_trace_review go` 推定。
-   - **報告留檔策略（2026-07-25 定案）：** **daily brief 不留檔**（只出在 session；稽核價值由待辦池 log＋leads 狀態機＋Decision Store 承擔）；**weekly report 留檔**（`docs/reports/`，含無法從池重建的 topic discovery 與健康審查趨勢）。不回到 PR/Issue 形式——那會產生與池競爭的第二個狀態源。
-   - **待核准內容密度（2026-07-30 使用者定案）：** stable pq2 編號不只列短標題。每項先給一段 TL;DR，再明列完整公司／ticker、誰供應誰、產品／材料／技術、事件成熟度、投資意義、證據與反證限制，以及 `go` 實際授權的 action type；不得假設使用者能從 `co:*` ID 或內部術語自行還原主詞。這是 `skills/daily-brief/SKILL.md` 的共用 presentation contract，不只存在 automation memory。
-   - **提醒去重：** lifecycle SessionStart hook 只提醒尚未進統一待辦池的新到期項目；已存在的 `thesis_lifecycle`（含 `pending`／deferred）由 Daily Brief 顯示，hook 必須靜默。新提醒只走 `additionalContext` 由 agent 呈現一次，不同時送 `systemMessage`，避免同一 session 問兩次。
-   - **v1.2 每日操作：** Codex local scheduled task → X／EDGAR harvest → Engine C ETL → triage → priority pq1 best-effort drain（預設每輪 2 則）→ prepared RA／today／lifecycle `todo sync` → brief。Triage PASS 只授權研究；使用者回 `go` 的對象是完整 prepared RA 或 authority 決策。介面全在對話，**無 GitHub UI**。
-   - **（已完成 2026-07-23）v1.0 骨架** — 歷史 plan：[`docs/plans/2026-07-22-002-feat-daily-approval-loop-plan.md`](docs/plans/2026-07-22-002-feat-daily-approval-loop-plan.md)。U1 leads 狀態機＋harvest、U2 partial-identity 修復、U3 MCP `get_decision_brief`、U4 `/daily-brief` skill＋leads CLI＋digest、U5 daily cloud routine。market_timestamp_future 系統性 bug 已修（commit `7f60f0b`）。
-   - **每日操作：** 本機說「daily brief」或由 06:30 排程觸發 `$daily-brief`。所有 Python 命令使用 `& '.venv\Scripts\python.exe' ...`；排程收尾只跑 `scripts/publish_daily_state.py`。決策命令（today／evaluate-signal／record-choice／record-fill）只在本機；遠端 chat 看決策才用 MCP 唯讀 `get_decision_brief`。
-   - **Routine 分工：** daily（`crons/daily_brief_prompt.md`）＝X／EDGAR harvest＋Engine C financial／beta technical ETL＋單一 shared-cash-pool beta monitor＋triage＋today＋統一 pq2 brief；weekly（`crons/weekly_scan_prompt.md`）＝topic discovery＋完整本機健康審查＋唯讀 lifecycle。兩者都不替使用者寫 thesis 結論、入圖或 live facts。
-   - **Harvest／leads 操作：** `& '.venv\Scripts\python.exe' crons\harvest_leads.py`（零 token；`--dry-run` 只印不寫）。Leads authority 是 tracked `library/leads/pending_leads.json`；狀態機與 API 見 `engine_b/leads.py`。lead 狀態只是注意力 metadata，永不影響 evidence tier。
-
-3. **（已完成 2026-07-28）Daily Beta Technical Monitor v1** — plan：[`docs/plans/2026-07-28-001-feat-daily-beta-technical-monitor-plan.md`](docs/plans/2026-07-28-001-feat-daily-beta-technical-monitor-plan.md)。
-   - **固定 universe：** 目前持有的 14 個 ETF／權值股去重成 11 條 technical series；QQQ／TQQQ 共用 QQQ，0050／006208／00631L 共用 `0050.TW`。FRA:2DG／TYO:7803 留在 alpha single-name 流程。
-   - **Engine C：** `technical_observations` 是 append-only point-in-time ledger；signal 使用 adjusted close、raw close 分欄，保存 1／5／20-session adjusted return，並計 RSI14、MACD 12-26-9、SMA20／50／200、SMA50 5-session slope、252-session drawdown與20／60日 realized vol。少於252 sessions、forming bar、missing／stale／provider failure誠實降級並歸零 range；DRAM 目前預期為 `insufficient_history`。
-   - **Engine D：** `config/beta_policy.json` 是 numeric SSOT；signal只選 `0／0.25／0.5／1.0` pace。共同可投資現金池只有一條：`Portfolio CASH − cash floor`，供 Alpha／Beta 共用；不再扣5% operating reserve、3% alpha reserve 或 planned outflows，也沒有 Sheet／household 雙 range。Alpha／Beta 如何分配由各自 campaign budget、Decision sizing、單筆上限與風控另行決定，cash floor 不承擔 sleeve allocation。多標的共用同一份 frozen deployable cash sequential allocation；campaign budget 控制單輪節奏。投組硬擋只剩 daily-reset ETF：內部 `nominal_weight` 是「投入槓桿 ETF 的資金占 NAV」5/8% warning/cap，`effective_weight` 才是乘上 2x／3x 後的「換算槓桿曝險」15/20% warning/cap；面向使用者不得再把前者寫成模糊的「名目槓桿」。investment policy 的單筆5%上限亦為硬擋；issuer concentration、alpha 總量與 drawn loan leverage 只 warning，不消耗 contribution capacity。
-   - **操作與邊界：** `& '.venv\Scripts\python.exe' scripts\daily_beta_snapshot.py --format markdown --risk-view changes` 已加入06:30 Daily fixed entry與窄 automation allowlist。輸出明標 `policy_mode=paper_observation`、`capital_scope=shared_cash_pool`；不建立choice／fill、不下單，日常 runtime 不寫Sheet，也不把undrawn loan算資本。真實驗收讀到約11條series，DRAM短歷史降級，其餘可產signal；現況數值每日變動，以最新run為準。
-   - **Brief 首屏目標（2026-07-29）：** Beta 區先用三行 TL;DR 說明約 30 年後 `retirement_net_terminal_wealth` 最大化、今日可人工評估標的與已觸發風控；technical signal 只決定新增 timing／pace，不因一般回檔自動賣出。未動用額度仍不算資本，貸款仍須 exact draw／instrument／tranche 人工 review。
-   - **Beta mobile presentation contract（2026-07-30 使用者定案）：** 底層與首屏都只保存一條 `self_funded_supported_range`。自有現金可部署固定顯示 `Portfolio CASH − cash floor`，並明說 cash floor 以上為 Alpha／Beta 共用；cash floor authority 失效時 fail closed，不回退到百分比 reserve 或第二 cash path。另獨立顯示「未動用貸款額度／已借款／估計利息」，明標貸款不算自有現金、未納入本輪上限。不得用未解釋的斜線或 raw field name。燈號固定配文字：🟢可評估、🟡冷卻／排序中、⚪觀察、🔴資料不足／暫停新增；Codex desktop 若支援 inline mobile visual，依「自有現金／本輪上限／貸款餘額 → 風險燈號 → 標的燈號」層級呈現，其他 executor 輸出等價 Markdown。
-   - **來源存取防漏（2026-07-29）：** harvest 失敗保存 bounded `failure_class`，`engine_b.cli harvest-health` 只列各來源最新仍未恢復的失敗。疑似 sandbox／proxy／網路權限造成的 `access_blocked` 必須原命令權限重跑一次；仍失敗再走 `$source-trace` 官方替代路徑。`blocked` 永遠不等於「零筆新資料」或 `no_result`，後續同來源成功才算 recovered。
-   - **Live portfolio 曝險的現金與 issuer 邊界（2026-07-29）：** Sheet `bucket=CASH` 列計入 NAV 但不計曝險。舊 alpha `factor_tags`／`factor_exposure_caps` 與 `holdings_*_mapping_unresolved` 已整套移除；未知非現金持股改按 unlevered direct issuer＋alpha exposure 誠實降級，不因缺 mapping 阻擋。`issuer_loads` 只代表 policy 已登記的 ownership look-through，輸出必標 `partial` 並列未建模 ETF；Engine A 上游依賴不可混成 issuer ownership。既有 frozen decision 不回寫，重新 reassess 才使用新 policy／calculator。
-   - **（2026-07-30 收斂）Shared Cash／Capital Authority：** 2026-07-28 Phase II-A plan 保留為歷史，但 current contract 已簡化。私人 Google Sheet `Capital Authority` 只保留 `cash_floor` 與 `credit_facility` 兩種 record、12 個必要欄位；日常 credential scope 仍只有 `spreadsheets.readonly`。自有現金只認 `Portfolio CASH`，可部署額只扣 cash floor；planned outflows、portfolio routing row、operating／alpha percentage reserve 與雙 cash range 全數移除。貸款額度、已借款、利率、計息方式、期限與還本方式獨立保存；已借款另算估計日／月／年利息，未動用額度不算 NAV／cash／allocation。每次提款、標的與 tranche 仍是 explicit manual review，「高信心」不構成 machine permission。
-   - **退休貸款資本目標（2026-07-28 使用者定案）：** 使用者目前約 30 歲、退休目標約 60 歲；指定可長抱至到期的貸款資本以約 30 年後 `retirement_net_terminal_wealth` 最大化為方向，不以降低中途回撤為第一目標。契約條件已確認為利息按月支付、期間不攤還本金、到期一次還本，且允許投資用途；不另開 Phase II-B loan engine、debt optimizer、通用 stress engine或新 pq。實際提款仍由使用者明確指定 exact draw／instrument／tranche；未提款不算資產，提款後 cash／debt 同時入帳。broad unlevered beta 是主要候選；daily 3x 可投資但維持衛星定位，exact review 必須扣除借款成本與到期本金比較退休淨終值，月息若需靠賣出 beta 支付則該 tranche 不成立。
-
-4. **（已完成 2026-07-29）Portfolio Risk Policy Redesign** — plan：[`docs/plans/2026-07-29-001-refactor-portfolio-risk-policy-plan.md`](docs/plans/2026-07-29-001-refactor-portfolio-risk-policy-plan.md)。
-   - **統一政策：** `config/investment_policy.json` v2026-07-29.2 與 `config/beta_policy.json` v2026-07-30.1 是 numeric SSOT；只有 ETF 槓桿 cap 與5%單筆上限會把 live supported range 歸零，其餘曝險只記錄／警告。使用者仍可走既有 prepared `live_override` 留下 exact action＋reason receipt；系統不自動下單。
-   - **跨 sleeve 風險快照：** `decision_lab/portfolio_risk.py` 合併全部 Sheet 持股；internal schema 保留 ETF `nominal_weight`／`effective_weight`、drawn debt、combined leverage、alpha total 與 known issuer direct／indirect weight。人類輸出分別稱「槓桿 ETF 資金占比」與「換算槓桿曝險」。aggregate snapshot append 至 ignored `library/private/decision_lab/portfolio_risk_snapshots.jsonl`，只供 Daily 狀態變化與 Weekly 趨勢，不是 holdings authority；Daily 2 percentage-point threshold 內且 state 不變即靜默，Weekly 用 full view。
-   - **事件監控：** issuer 曝險≥20%且對應 series 單日報酬首次跌破 -4% 才產 ephemeral `event_search_requests`；daily agent 只做一次 WebSearch，輸出可能原因＋曝險並標未經查證，不建 lead／decision、不進 pq1/pq2、不寫 Engine A。需要深挖才另走 lead-intake。
-
-5. **（已完成 2026-07-29）Serenity 30-Day Research Campaign** — plan：[`docs/plans/2026-07-29-002-feat-serenity-30d-research-campaign-plan.md`](docs/plans/2026-07-29-002-feat-serenity-30d-research-campaign-plan.md)，研究報告：[`docs/reports/serenity_30d_research_2026-07-29.md`](docs/reports/serenity_30d_research_2026-07-29.md)。
-   - `crons/harvest_leads.py --backfill-x-handle ...` 以 RFC3339 time window＋pagination token＋`max_posts` 成本硬上限做歷史回補；可納入 replies、補全文／media，且不得推進 daily `since_id`。Serenity 30 天實跑取得 279 則、187 個 media cache，估算 Post read 成本 US$1.395。
-   - Scoped exploration 只放寬「未在既有 theme／ticker」的相關性；具名實體＋可追查 claim 才 PASS，quotability、source-trace、evidence tier、prepared RA 與 pq2 graph admission 不變。PASS audit 只看事件去重後 candidate events，不看 raw posts 比例。
-   - Robotics source trace 證實 Agility 少量商用部署與 actuator 工業化方向，但 `$300M orders` 有 v5 contractual milestones、warrants 且非 current revenue，10k 是設計產能；FCC 禁中國 humanoid import 尚無官方文本。2026-07-29 使用者以 pq2 [61] 核准 `deployment_workflow → robot_system → robot_subsystem` 最小 ontology 與四 origin extraction；prepared action 是 `ra_155541bb6c18e49d0d58140b242c8331`／digest `856df9b6939a8664c1f515c77bd0e255d6f86fd1af08c8cfded6bbaa02d9d243`，真正入圖仍等 ra_admission pq2 [62]。15 個 parked leads 不逐條進 pq2；screenshot-only supplier maps 維持 trace backlog／lead-only。
 
 ---
 
 ## 來源登記表（一手來源優先）
 
-通用搜尋（Tavily 等）只配 LLM 品質評分 gate，用在第三層。一手來源依市場分路；
-**LLM／routine 可執行的機器版路由與未果處置唯一權威是 [`skills/source-trace/SKILL.md`](skills/source-trace/SKILL.md)**，此處只留快速記憶：
+通用搜尋（Tavily 等）只配 LLM 品質評分 gate，用在第三層。**機器可執行的路由與未果處置唯一權威是 [`skills/source-trace/SKILL.md`](skills/source-trace/SKILL.md)**；快速記憶：美股走 SEC EDGAR，台股走公開資訊觀測站（含月營收揭露），A股走年報／問詢函／海關數據，技術走 arXiv／OFC/ECOC／專利。各市場都優先做上下游上市公司交叉驗證。
 
-- **美股：** SEC EDGAR（10-K/10-Q/8-K/S-1/Form 4）、法說會逐字稿、IR 簡報、客戶/供應商 filings。
-- **台股：** 公開資訊觀測站（MOPS）、**月營收揭露**、法說會/IR、上下游上市公司交叉驗證。
-- **A股（備用）：** 年報/季報/臨時公告、交易所問詢函、互動易、招投標/中標、環評能評、海關數據、上下游交叉驗證。
-- **技術/學術：** arXiv + Semantic Scholar API、OFC/ECOC 議程與論文、公司技術白皮書、專利、標準組織。
-- 核驗清單（出投資建議前必看）：客戶集中度、毛利率/產能利用率、backlog/營收結構、稀釋（增資/可轉債/SBC/內部人賣股）、估值壓力。
-
----
+出投資建議前必看的核驗清單五項：客戶集中度、毛利率／產能利用率、backlog／營收結構、稀釋、估值壓力。
 
 ## v0 Schema
 
