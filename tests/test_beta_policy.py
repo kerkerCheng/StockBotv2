@@ -43,7 +43,10 @@ def test_repository_beta_policy_has_fourteen_instruments_and_eleven_series() -> 
     "mutate",
     [
         lambda p: p.update(mode="live"),
-        lambda p: p["risk"].update(leveraged_nominal_warning=0.09),
+        # warning 必須 <= cap；取 cap 之上的值以避免寫死數字
+        lambda p: p["risk"].update(
+            leveraged_nominal_warning=p["risk"]["leveraged_nominal_cap"] + 0.01
+        ),
         lambda p: p["signal"].update(allowed_paces=[0, 0.5, 1]),
         lambda p: p["instruments"].append(copy.deepcopy(p["instruments"][0])),
         lambda p: p["instruments"][0].update(leverage_multiple=3.0),

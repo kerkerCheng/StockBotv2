@@ -1,6 +1,6 @@
 {
   "schema_version": "beta-policy-v2",
-  "policy_version": "2026-07-30.1",
+  "policy_version": "2026-07-31.1",
   "mode": "paper_observation",
   "capital_scope": "shared_cash_pool",
   "capital": {
@@ -37,10 +37,10 @@
     ]
   },
   "risk": {
-    "leveraged_nominal_warning": 0.05,
-    "leveraged_nominal_cap": 0.08,
-    "leveraged_effective_warning": 0.15,
-    "leveraged_effective_cap": 0.2,
+    "leveraged_nominal_warning": 0.125,
+    "leveraged_nominal_cap": 0.2,
+    "leveraged_effective_warning": 0.26,
+    "leveraged_effective_cap": 0.35,
     "issuer_concentration_warning": 0.25,
     "alpha_total_warning": 0.2,
     "daily_display_change": {

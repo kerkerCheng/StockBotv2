@@ -371,6 +371,16 @@ def test_single_position_cap_hard_blocks_live_range(tmp_path: Path) -> None:
 
 
 def test_portfolio_etf_leverage_cap_hard_blocks_alpha_live_range(tmp_path: Path) -> None:
+    from decision_lab.beta_policy import load_beta_policy
+
+    # TQQQ 是 3x：持有金額取兩個 cap 各自所需的較大者再加一，確保兩者都越界。
+    # 依 policy 推導而非寫死數字，改 cap 時測試不會腐爛。
+    risk = load_beta_policy()["risk"]
+    nav = 10_000.0
+    tqqq_value = max(
+        nav * risk["leveraged_nominal_cap"],
+        nav * risk["leveraged_effective_cap"] / 3.0,
+    ) + 1.0
     store = _store(tmp_path)
     inputs = complete_inputs(
         rows=[
@@ -378,7 +388,7 @@ def test_portfolio_etf_leverage_cap_hard_blocks_alpha_live_range(tmp_path: Path)
                 "ticker": "TQQQ",
                 "shares": 10.0,
                 "currency": "USD",
-                "market_value_base": 800.0,
+                "market_value_base": tqqq_value,
             },
             {
                 "ticker": "FRA:2DG",
@@ -389,7 +399,7 @@ def test_portfolio_etf_leverage_cap_hard_blocks_alpha_live_range(tmp_path: Path)
             },
         ]
     )
-    inputs["holdings"].update({"nav_base": 10_000.0, "base_currency": "USD"})
+    inputs["holdings"].update({"nav_base": nav, "base_currency": "USD"})
     try:
         bundle = _bundle(store, inputs=inputs)
         result = calculate_probe_limits(bundle, _coverage(bundle), _assessment())

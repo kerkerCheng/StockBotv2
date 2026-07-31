@@ -204,11 +204,15 @@ def test_leverage_effective_cap_binds_even_when_signal_is_extreme() -> None:
     policy = load_beta_policy()
     observations = _observations(policy, drawdown=-0.5, rsi=15.0)
     histories = {key: [value] for key, value in observations.items()}
-    # 8 nominal TQQQ already equals 24 effective, beyond the 20 effective cap.
+    # TQQQ 是 3x：持有量取自 policy 的 effective cap，確保必然越界。
+    # 依 policy 推導而非寫死數字，改 cap 時測試不會腐爛。
+    cap = policy["risk"]["leveraged_effective_cap"]
+    nav = 100.0
+    tqqq_nominal = round(nav * cap / 3.0 + 1.0, 4)  # 超過 cap 的最小整量
     report = build_beta_monitor(
         observations_by_benchmark=observations,
         history_by_benchmark=histories,
-        holdings_rows=_holdings(cash=50.0, tqqq=8.0),
+        holdings_rows=_holdings(cash=nav - tqqq_nominal, tqqq=tqqq_nominal),
         as_of=NOW,
         policy=policy,
     )
