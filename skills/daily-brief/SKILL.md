@@ -235,7 +235,11 @@ TL;DR：最大化約 30 年後 `retirement_net_terminal_wealth`；technical 只�
 本輪可評估上限：<同一主路徑經 technical 節奏與 risk caps 後的 ceiling；不是下單金額>
 未動用貸款額度：<amount／已借款／估計利息／terms status；明標不算自有現金、未納入本輪上限>
 貸款投入：manual_review_required
-🟢／🟡／⚪／🔴 <每檔一行 TL;DR：文字燈號＋RSI 所在區間（<30 超賣區、30–50 弱／中性、50–70 偏強、>70 過熱；不是買賣訊號）＋1／5／20 日漲跌＋距高點／趨勢或回檔判讀＋pace／資本限制>
+| 標的 | 一句 TL;DR（燈號＋RSI 水位＋1／5／20 日變化＋距高點／趨勢或回檔） | 今日節奏／資本限制 |
+|---|---|---|
+| QQQ | ⚪ RSI 43.2（弱／中性）；… | 0%；… |
+| SOXX | 🟢 RSI 42.5（弱／中性）；… | 25%；上限 … |
+| DRAM | 🔴 資料不足；… | 暫停新增 |
 
 ## 低優先（摺疊）
 EDGAR Form 4 ×55、較舊 filing——預設摺疊只列數量（要看再展開）
@@ -249,7 +253,7 @@ paper 無異動｜live 無 pending fill｜...
 
 pq2／lead priority **不使用顏色維度**（顏色曾混淆 triage 與優先度），一律使用明確指令字串。Beta
 technical 區可用配有文字的燈號表達 deterministic state，但不得只靠顏色，也不得把 `可評估` 寫成 `買進`。
-每一個有資料的 ticker 都必須有一行可直接讀懂的 TL;DR；不能只堆 raw 數字。TL;DR 至少回答「現在在什麼水位、這是趨勢還是回檔、今天能不能新增、限制是什麼」。RSI 區間只是一致的解讀標籤，不改變 `config/beta_policy.json` 的 numeric gate，也不構成 live permission。
+Beta 必須使用上述表格，每個 ticker 一列；不能再用一長串 bullet 堆 raw 數字。TL;DR 至少回答「現在在什麼水位、這是趨勢還是回檔、今天能不能新增、限制是什麼」。RSI 區間只是一致的解讀標籤，不改變 `config/beta_policy.json` 的 numeric gate，也不構成 live permission。
 Codex desktop 若支援 inline mobile visualization，Beta 區依「自有現金可部署／本輪可評估上限／未動用貸款
 額度 → 風險燈號 → 標的燈號」層級呈現；不支援的 executor 必須輸出相同層級的 Markdown，不能因此退化成
 raw field names 或省略燈號。
