@@ -56,6 +56,7 @@ tags:
 | 公司 ID ↔ research／execution 識別 | `config/company_identity.json` | 加一列；`identity/registry.py` 是唯一 loader |
 | Engine C 人工觀測欄位 | `config/engine_c_observation_fields.json` | 加一項且 `gate_member` 必須為 false；`engine_c/observation_fields.py` 是唯一 loader |
 | Blocker 說明與分類 | `config/decision_blockers.json` | 加 exact code 或 prefix；`decision_lab/blockers.py` 是唯一 loader |
+| Authority token（證據來自哪個引擎、哪個軸能引用） | `config/authority_tokens.json` | 加一項並指定 `owner`；`identity/authority_tokens.py` 是唯一 loader，Engine C 與 Decision Lab 共用 |
 | 投資／beta 政策數值、持股覆蓋分類、daily routine 參數、信號來源 | `config/investment_policy.json`、`config/beta_policy.json`、`config/holdings_coverage.json`、`config/daily_routine.json`、`config/signal_sources.json` | 各自為該領域的 numeric／設定 SSOT |
 
 > ⚠ `config/*.json` 在 `.gitignore` 中**預設被忽略**（該目錄放 Google service account 憑證），靠白名單開例外。新增 config 檔一定要補 `!config/<name>.json`，否則 fresh clone 與另一個 agent 會缺檔而整個功能靜默失效——本機因為檔案在，測試還會全綠。2026-07-30 一天內踩到兩次。`tests/test_config_tracking.py` 是這道剎車。
@@ -79,7 +80,7 @@ tags:
 | 技術指標欄位 | `engine_c/technical.py` 的 `_METRIC_COLUMNS` | 想看相對強弱（vs QQQ）、ATR、Bollinger。同時是 DB 欄位，需配 migration |
 | 高風險屬性 | `thesis/evidence_manifest.py` 的 `HIGH_RISK_ATTRIBUTES` | 學到新的危險屬性型態時（L11 那類體悟） |
 | edge 衝突處理動作 | `loader/edge_resolution.py` 的 `ALLOWED_ACTIONS` | 需要「scope 切分」「移到 dated observation」時 |
-| authority token | 三份副本：`engine_c/observation_fields.py` 的 `KNOWN_AUTHORITIES`、`decision_lab/context.py` 的 `_ENGINE_C_AUTHORITIES`、`decision_lab/sizing.py` 的 `AXIS_REFERENCE_AUTHORITIES` | 刻意不合併（`decision_lab` 不得反向依賴 Engine C），代價是可能漂移。`tests/test_engine_c_observation_fields.py` 有一致性測試 |
+> authority token 曾在此區。2026-07-31 已收斂為單一權威 `config/authority_tokens.json`——先前判斷「`decision_lab` 不得反向依賴 Engine C 所以無法合併」是過度套用分層規則：該規則擋的是依賴 Engine C 的 runtime authority，而 `decision_lab` 本來就直接讀 `config/`（beta_policy、decision_blockers、holdings_coverage、signal_sources）。改讀中立 loader 後三份副本剩一份，漂移不再可能發生。
 
 ## 兩個實用訊號
 

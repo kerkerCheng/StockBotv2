@@ -164,13 +164,11 @@ def test_registry_round_trips_the_shipped_config() -> None:
     )
 
 
-# ── authority 字彙的跨模組一致性 ────────────────────────────────────────────────
-# Engine C 的 authority token 目前存在三份：本模組的 KNOWN_AUTHORITIES、
-# decision_lab/context.py 的 _ENGINE_C_AUTHORITIES、以及 decision_lab/sizing.py 的
-# AXIS_REFERENCE_AUTHORITIES。刻意不合併成一份是為了避免 decision_lab 反向依賴
-# Engine C（AGENTS.md 的 workflow_ports 分層契約），代價是三者可能漂移。
-# 漂移的後果是靜默的：欄位的 authority 被過濾掉 → 軸悄悄 fallback → Confidence 歸零
-# 而沒有任何錯誤訊息。以下兩個測試就是這個代價的剎車。
+# ── authority 字彙的單一權威 ────────────────────────────────────────────────────
+# 2026-07-31 之前這份字彙有三份寫死副本，靠測試防漂移。現已收斂成
+# config/authority_tokens.json 一份，Engine C 與 decision_lab 都由
+# identity/authority_tokens.py 讀取。以下測試確認收斂沒有回退，
+# 並確認凍結的軸對照表只用已登記的 token。
 
 
 def _engine_c_tokens_from_axes() -> set[str]:
@@ -184,11 +182,32 @@ def _engine_c_tokens_from_axes() -> set[str]:
     }
 
 
-def test_engine_c_authority_vocabulary_agrees_across_all_three_copies() -> None:
+def test_engine_c_vocabulary_comes_from_the_single_neutral_registry() -> None:
     from decision_lab.context import _ENGINE_C_AUTHORITIES
+    from identity.authority_tokens import tokens_for_owner
 
-    assert set(KNOWN_AUTHORITIES) == _engine_c_tokens_from_axes()
-    assert set(KNOWN_AUTHORITIES) == set(_ENGINE_C_AUTHORITIES)
+    canonical = tokens_for_owner("engine_c")
+    assert set(KNOWN_AUTHORITIES) == set(canonical)
+    assert set(_ENGINE_C_AUTHORITIES) == set(canonical)
+    assert _engine_c_tokens_from_axes() <= set(canonical)
+
+
+def test_frozen_axis_mapping_only_uses_registered_tokens() -> None:
+    """AXIS_REFERENCE_AUTHORITIES 刻意維持寫死（評分骨架已凍進舊 decision），
+    但它用到的每個 token 都必須在中立 registry 裡登記。"""
+    from decision_lab.sizing import AXIS_REFERENCE_AUTHORITIES
+    from identity.authority_tokens import all_authority_tokens
+
+    used = {t for tokens in AXIS_REFERENCE_AUTHORITIES.values() for t in tokens}
+    unknown = sorted(used - all_authority_tokens())
+    assert not unknown, f"軸對照表用了未登記的 token：{unknown}"
+
+
+def test_graph_and_engine_c_whitelists_do_not_overlap() -> None:
+    """owner 分群的意義就是防 over-claim；兩群不得相交。"""
+    from identity.authority_tokens import tokens_for_owner
+
+    assert not (tokens_for_owner("engine_a") & tokens_for_owner("engine_c"))
 
 
 def test_every_registered_field_is_citable_by_at_least_one_axis() -> None:

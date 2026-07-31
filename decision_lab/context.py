@@ -9,6 +9,8 @@ from copy import deepcopy
 from datetime import datetime, timedelta
 from typing import Any, Mapping, Sequence
 
+from identity.authority_tokens import tokens_for_owner
+
 from .adapters.market import normalize_fx_snapshot, normalize_market_snapshot
 from .adapters.holdings import execution_aliases
 from .identity import resolve_identity
@@ -321,26 +323,11 @@ def _add_reference(
     index.setdefault(reference, set()).update(authorities)
 
 
-# payload 可自報的 authority 白名單，按來源引擎分開。分開的目的是防止 over-claim：
+# payload 可自報的 authority 白名單，按 owner 群組分開。分開的目的是防止 over-claim：
 # Engine A 的 evidence payload 不得自稱帶有 Engine C 的財務 authority，反之亦然。
-_GRAPH_AUTHORITIES = frozenset(
-    {
-        "graph_source_assertion",
-        "source_trace",
-        "graph_entity",
-        "graph_causal",
-        "graph_commercial",
-    }
-)
-_ENGINE_C_AUTHORITIES = frozenset(
-    {
-        "engine_c_financial",
-        "engine_c_manual",
-        "engine_c_customer",
-        "engine_c_backlog",
-        "engine_c_valuation",
-    }
-)
+# 字彙本身來自中立的 config/authority_tokens.json，不在此寫死。
+_GRAPH_AUTHORITIES = tokens_for_owner("engine_a")
+_ENGINE_C_AUTHORITIES = tokens_for_owner("engine_c")
 
 
 def _explicit_authorities(

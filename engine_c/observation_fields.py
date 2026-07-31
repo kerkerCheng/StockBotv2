@@ -22,21 +22,15 @@ from pathlib import Path
 from types import MappingProxyType
 from typing import Mapping
 
+from identity.authority_tokens import tokens_for_owner
+
 
 _ROOT = Path(__file__).resolve().parent.parent
 _DEFAULT_REGISTRY_PATH = _ROOT / "config" / "engine_c_observation_fields.json"
 
-# Engine D 的 reference index 認得的 authority token；與 decision_lab/sizing.py 的
-# AXIS_REFERENCE_AUTHORITIES 對齊。此處只驗證拼寫，不反向依賴 decision_lab。
-KNOWN_AUTHORITIES = frozenset(
-    {
-        "engine_c_financial",
-        "engine_c_manual",
-        "engine_c_customer",
-        "engine_c_backlog",
-        "engine_c_valuation",
-    }
-)
+# Engine C 欄位可宣告的 authority token。字彙來自中立的
+# config/authority_tokens.json（見 identity/authority_tokens.py），不再各自寫死。
+KNOWN_AUTHORITIES = tokens_for_owner("engine_c")
 
 
 class ObservationFieldError(ValueError):

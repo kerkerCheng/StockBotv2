@@ -1,0 +1,99 @@
+{
+  "_comment": "Authority token 字彙的唯一權威。Token 標記一份證據來自哪個引擎、屬於哪一類 authority，決定哪個 Confidence 軸可以引用它——用途是防止拿錯類型的證據去撐錯的結論（例如拿發行人在 8-K 裡的敘述冒充可稽核的財務數字）。",
+  "version": 1,
+  "_history": "2026-07-31 之前這份字彙有三份寫死的副本（engine_c/observation_fields.py 的 KNOWN_AUTHORITIES、decision_lab/context.py 的 _GRAPH_AUTHORITIES/_ENGINE_C_AUTHORITIES、decision_lab/sizing.py 的 AXIS_REFERENCE_AUTHORITIES）。當時以為 decision_lab 不得反向依賴 Engine C 所以無法合併，但 decision_lab 本來就直接讀 config/（beta_policy、decision_blockers、holdings_coverage、signal_sources），分層限制擋的是 runtime authority 依賴而非共用 config。三份副本漂移的後果是靜默的：token 被白名單過濾掉→軸悄悄 fallback→Confidence 歸零而無任何錯誤訊息。",
+  "_payload_whitelist": "payload 只能自報所屬 owner 群組內的 token。Engine A 的 evidence payload 不得自稱帶有 Engine C 的財務 authority，反之亦然；這道白名單防的是 over-claim。",
+  "_frozen_mapping_note": "軸→token 的對照 (decision_lab/sizing.py 的 AXIS_REFERENCE_AUTHORITIES) 刻意維持寫死，因為它是評分骨架且已凍進所有既有 decision payload，熱改會削弱『舊 decision 永遠引用原 digest』的稽核契約。測試只斷言它用到的 token 都是本檔的子集。",
+  "tokens": [
+    {
+      "token": "graph_entity",
+      "owner": "engine_a",
+      "label": "Engine A 圖中的實體節點",
+      "description": "公司／產品／技術節點本身的存在與屬性。"
+    },
+    {
+      "token": "graph_causal",
+      "owner": "engine_a",
+      "label": "Engine A 圖中的因果邊",
+      "description": "供應、依賴、致能等關係邊，含 counter-path。"
+    },
+    {
+      "token": "graph_source_assertion",
+      "owner": "engine_a",
+      "label": "Engine A 的來源文件主張",
+      "description": "SourceDoc 與其 EdgeAssertion／Claim。注意這是『文件說了什麼』，不是可稽核的數字。"
+    },
+    {
+      "token": "graph_commercial",
+      "owner": "engine_a",
+      "label": "Engine A 的商業成熟度主張",
+      "description": "訂單、部署、qualification 狀態等具名商業事實。"
+    },
+    {
+      "token": "source_trace",
+      "owner": "engine_a",
+      "label": "追源紀錄",
+      "description": "把轉述追回一手文件的過程紀錄。"
+    },
+    {
+      "token": "engine_c_financial",
+      "owner": "engine_c",
+      "label": "Engine C 自動財務觀測",
+      "description": "現金、負債、自由現金流、毛利率、股數等由 ETL 取得的帶時戳數字。"
+    },
+    {
+      "token": "engine_c_manual",
+      "owner": "engine_c",
+      "label": "Engine C 人工觀測",
+      "description": "由一手 filing 人工填入、帶 provenance 的 append-only observation。"
+    },
+    {
+      "token": "engine_c_customer",
+      "owner": "engine_c",
+      "label": "Engine C 客戶集中度",
+      "description": "客戶／通路集中度欄位。"
+    },
+    {
+      "token": "engine_c_backlog",
+      "owner": "engine_c",
+      "label": "Engine C 訂單能見度",
+      "description": "backlog 或其替代指標。"
+    },
+    {
+      "token": "engine_c_valuation",
+      "owner": "engine_c",
+      "label": "Engine C 估值壓力",
+      "description": "倍數與分析師覆蓋。"
+    },
+    {
+      "token": "market",
+      "owner": "market",
+      "label": "市場行情",
+      "description": "價格、流動性、可交易性快照。"
+    },
+    {
+      "token": "fx",
+      "owner": "market",
+      "label": "匯率",
+      "description": "換算基準幣別所需的 FX 觀測。"
+    },
+    {
+      "token": "holdings",
+      "owner": "portfolio",
+      "label": "持股快照",
+      "description": "Google Sheet 的 live inventory digest。"
+    },
+    {
+      "token": "policy",
+      "owner": "portfolio",
+      "label": "政策版本",
+      "description": "凍結當下使用的 investment／beta policy 版本。"
+    },
+    {
+      "token": "paper_ledger",
+      "owner": "portfolio",
+      "label": "Paper 帳本曝險",
+      "description": "模擬帳本的當下曝險。"
+    }
+  ]
+}
