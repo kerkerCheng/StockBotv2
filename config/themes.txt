@@ -4,3 +4,4 @@
 
 cpo: Co-Packaged Optics 供應鏈 | 核心公司: COHR, LITE, AVGO, NVDA | 關鍵字: CPO, co-packaged optics, external laser, InP, CW DFB laser | 替代/反證關鍵字: linear pluggable optics, LPO, copper interconnect, co-packaged copper, integrated silicon laser
 sivers: Sivers Semiconductors InP 雷射 | 核心公司: SIVE.ST | 關鍵字: Sivers, SIVE, InP laser, ELS | 替代/反證關鍵字: in-house laser, integrated laser, alternative DFB supplier, Lumentum CPO laser, AAOI laser capacity
+robotics: 人形機器人商用化與供應鏈 | 核心公司: CCXI, TSLA, JBL | 關鍵字: humanoid, Digit, Agility Robotics, RoboFab, actuator, Optimus, quadruped, tote transfer, physical AI, Boston Dynamics, Schaeffler, harmonic drive, robot deployment | 替代/反證關鍵字: robot deployment delay, humanoid pilot ended, teleoperation required, AMR sufficient, fixed automation cheaper, labor cost decline

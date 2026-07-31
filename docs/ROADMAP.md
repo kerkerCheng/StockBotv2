@@ -5,6 +5,19 @@
 >
 > `docs/plans/` 已轉純歷史（見 [`plans/README.md`](plans/README.md)）。小工作直接做、不開 plan 檔；只有大型開發才新建 plan。
 
+## 想法怎麼變成程式
+
+```
+ROADMAP「未來想法」  →  docs/brainstorms/  →  docs/plans/  →  實作
+   （還沒決定要做）      （需求與盲點審查）     （規格與驗收）
+```
+
+四階不是每次都要走完。判準是**改錯的成本**：小工作直接做；需要先想清楚需求與反面的走
+brainstorm；範圍大到需要驗收條件才開 plan。brainstorm 用 frontmatter 的 `planned_in:`
+指向自己的 plan，plan 完成後回填到上方「已交付」表。
+
+**目前沒有進行中的 plan。** 七份 brainstorm 中仍有未實作項目，見下方「已 brainstorm 但未實作」。
+
 ---
 
 ## 已交付
@@ -65,6 +78,22 @@
 
 ---
 
+## 已 brainstorm 但未實作
+
+需求已想過、盲點已審過，但沒開 plan。要動工先回去讀該 brainstorm，不要重新發明。
+
+出自 [`2026-07-26-next-phase-operating-model-requirements.md`](brainstorms/2026-07-26-next-phase-operating-model-requirements.md)，該檔明載「只有重複摩擦出現時才另立 plan」：
+
+- **Workstream B：Paywall ROI／合法手動入口** — 付費來源何時值得買、以及合法的人工取得路徑
+- **Token-efficient Daily Runner（通用 daily runner 重構）**
+- **ETF 完整 look-through** — 目前 `issuer_loads` 只涵蓋 policy 已登記的 ownership，輸出必標 `partial`
+- **Sheet writer** — 現行所有 runtime 都不寫 Google Sheet
+- **本機 single-writer guard** — 目前靠人工紀律確保同一 working tree 只有一個 agent 寫入
+
+其餘五份 brainstorm 的主體都已交付（見上方表格），保留作需求推導的歷史。
+
+---
+
 ## 未來想法（尚未承諾）
 
 記在這裡的東西**不是待辦**，是「想清楚了但還沒決定要不要做」。要動工才升格成上方表格或開 plan。
@@ -75,7 +104,7 @@
 
 三個層級，成本由低到高：
 
-1. **主題關鍵字比對（下一步的首選）** — `config/themes.txt` 已有註冊過的主題字彙，含關鍵字與**反證關鍵字**；lead refs 也已有 `campaign_topic`。用既有字彙做確定性關鍵字比對即可，不需新模型、不需新依賴，且與封閉字彙表的原則一致（taxonomy 放 config）。
+1. ~~**主題關鍵字比對**~~ — **2026-07-31 已實作**（`engine_b/themes.py`）。`config/themes.txt` 補上 robotics 主題後，FCC 那則 parked lead 從只能接上 8 筆（共用 ticker）變成 14 筆（共用主題）。反證關鍵字同樣標記該主題並另旗標，因為反面證據要找得到而不是被過濾掉（L7）。
 2. **Embedding 相似度** — 理論上召回最好，但引入模糊比對、模型依賴與門檻調校。**代價要誠實計算**：false positive 消耗的是使用者注意力，而降低注意力噪音正是 2026-07-30 那輪重構的目的。若要做，應該只當「排序提示」而非「自動 retrigger」，並且先量測目前漏掉多少關聯，再判斷值不值得。
 3. **事件觸發自動化** — `trace_next_trigger` 目前是自由文字，從來沒有被程式評估過。要讓「FCC 規則公布」真的自動 un-park，得先把它變成登記過的 code（像 `config/decision_blockers.json` 那樣），才能程式比對。
 

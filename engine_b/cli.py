@@ -307,24 +307,33 @@ def _cmd_trace_backlog(args: argparse.Namespace) -> int:
 
 
 def _cmd_related(args: argparse.Namespace) -> int:
-    """列出與指定 lead 共用具名標的的 parked／其他狀態 lead。"""
+    """列出與指定 lead 相關的 lead：第一層具名標的、第二層註冊主題。"""
 
     from engine_b.entities import lead_entities, related_leads
+    from engine_b.themes import lead_themes, related_by_theme
 
     store = leads.load(args.leads)
     statuses = tuple(args.status)
     try:
-        matches = related_leads(store, args.lead_id, statuses=statuses)
+        by_entity = related_leads(store, args.lead_id, statuses=statuses)
+        by_theme = related_by_theme(store, args.lead_id, statuses=statuses)
     except KeyError as exc:
         print(f"✗ {exc}", file=sys.stderr)
         return 1
     target = store["leads"][args.lead_id]
+    entity_ids = {m["lead_id"] for m in by_entity}
     print(json.dumps(
         {
             "lead_id": args.lead_id,
             "entities": sorted(lead_entities(target)),
+            "themes": sorted(lead_themes(target)),
             "statuses_searched": list(statuses),
-            "matches": matches,
+            # 第一層：共用具名標的（精準，召回有限）
+            "by_entity": by_entity,
+            # 第二層：只共用主題、沒有共用標的——這些是第一層抓不到的
+            "by_theme_only": [
+                m for m in by_theme if m["lead_id"] not in entity_ids
+            ],
         },
         ensure_ascii=False,
         indent=2,
@@ -333,16 +342,18 @@ def _cmd_related(args: argparse.Namespace) -> int:
 
 
 def _cmd_backfill_entities(args: argparse.Namespace) -> int:
-    """替既有 lead 補上具名標的標記（一次性；register 之後會自動帶）。"""
+    """替既有 lead 補上具名標的與主題標記（一次性；register 之後會自動帶）。"""
 
     from engine_b.entities import backfill_entities
+    from engine_b.themes import backfill_themes
 
     store = leads.load(args.leads)
-    updated = backfill_entities(store)
-    if not args.dry_run and updated:
+    entities = backfill_entities(store)
+    themes = backfill_themes(store)
+    if not args.dry_run and (entities or themes):
         leads.save(store, args.leads)
     verb = "將更新" if args.dry_run else "已更新"
-    print(f"{verb} {updated} 筆 lead 的 entities")
+    print(f"{verb} entities {entities} 筆、themes {themes} 筆")
     return 0
 
 

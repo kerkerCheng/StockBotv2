@@ -199,6 +199,7 @@ def register(
         if enriched:
             lead["content_updated_at"] = _now()
             lead["entities"] = _entities_for(lead)
+            lead["themes"] = _themes_for(lead)
         return lead_id, False
     lead = {
         "lead_id": lead_id,
@@ -217,6 +218,7 @@ def register(
         lead["media"] = clean_media
     # 具名標的是 lead 之間唯一的確定性關聯鍵（URL hash 只認同一篇文章）。
     lead["entities"] = _entities_for(lead)
+    lead["themes"] = _themes_for(lead)
     leads[lead_id] = lead
     return lead_id, True
 
@@ -229,6 +231,13 @@ def _entities_for(lead: dict[str, Any]) -> dict[str, list[str]]:
         raw_text=lead.get("raw_text"),
         source=lead.get("source"),
     )
+
+
+def _themes_for(lead: dict[str, Any]) -> dict[str, Any]:
+    """第二層關聯鍵：已註冊主題的關鍵字比對（含反證詞）。"""
+    from engine_b.themes import match_themes
+
+    return match_themes(lead.get("title"), lead.get("raw_text"))
 
 
 def _clean_media(media: list[dict[str, Any]] | None) -> list[dict[str, Any]]:
