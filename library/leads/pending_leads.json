@@ -5721,9 +5721,11 @@
       "first_seen": "2026-07-29T22:35:11.212742+00:00",
       "lead_id": "lead_44ce140c224422130eecf4bb9766219e",
       "published_at": "2026-07-29",
-      "refs": {},
+      "refs": {
+        "park_reason": "governance_only_bylaw_quorum_reduction_majority_to_33.3pct_no_supply_chain_or_thesis_content"
+      },
       "source": "edgar:AXTI",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "AXTI 8-K filed 2026-07-29",
       "triage": {
