@@ -69,8 +69,10 @@ technical 或 self-funded range 歸零。Windows 本機與
 scheduled task 一律使用 repo `.venv`，不要依賴父 shell 是否剛好 activate。
 Engine C 同一筆 observation 保存 adjusted-close 的 1／5／20-session return；Engine D 才負責把
 return、RSI、252-session drawdown、signal tier、cooldown 與 capital constraints 組成 Mobile-friendly
-燈號。燈號必須配 `可評估／冷卻／觀察／資料不足` 文字，且不構成 live permission。
+燈號。燈號必須配 `可評估／冷卻／觀察／資料不足` 文字與明確系統動作，且不構成 live permission。
 燈號與文字不得在 agent 摘要時省略：🟢 `可評估`、🟡 `冷卻／排序中`、⚪ `觀察`、🔴 `資料不足／暫停新增`。
+動作對照固定為：`CONTRIBUTE REVIEW`＝可新增評估（不是買進）；`HOLD`＝維持／等待；
+`PAUSE CONTRIBUTION`＝暫停新增。若使用者只看到顏色而看不到動作文字，視為 brief 缺欄。
 內部 `etf_leverage.nominal_weight` 的人類標籤固定為「槓桿 ETF 資金占比」；乘上 2x／3x 後的
 `effective_weight` 才稱「換算槓桿曝險」，不得再輸出模糊的「名目槓桿」。`pace=0.25` 顯示為
 「節奏 25%」，並解釋它是該 sleeve 完整 campaign budget 的四分之一，不是 NAV／現金／持倉的 25%。
@@ -235,11 +237,11 @@ TL;DR：最大化約 30 年後 `retirement_net_terminal_wealth`；technical 只�
 本輪可評估上限：<同一主路徑經 technical 節奏與 risk caps 後的 ceiling；不是下單金額>
 未動用貸款額度：<amount／已借款／估計利息／terms status；明標不算自有現金、未納入本輪上限>
 貸款投入：manual_review_required
-| 標的 | 一句 TL;DR（燈號＋RSI 水位＋1／5／20 日變化＋距高點／趨勢或回檔） | 今日節奏／資本限制 |
-|---|---|---|
-| QQQ | ⚪ RSI 43.2（弱／中性）；… | 0%；… |
-| SOXX | 🟢 RSI 42.5（弱／中性）；… | 25%；上限 … |
-| DRAM | 🔴 資料不足；… | 暫停新增 |
+| 標的 | 系統動作 | 一句 TL;DR（燈號＋RSI 水位＋1／5／20 日變化＋距高點／趨勢或回檔） | 今日節奏／資本限制 |
+|---|---|---|---|
+| QQQ | HOLD | ⚪ RSI 43.2（弱／中性）；… | 0%；… |
+| SOXX | CONTRIBUTE REVIEW | 🟢 RSI 42.5（弱／中性）；… | 25%；上限 … |
+| DRAM | PAUSE CONTRIBUTION | 🔴 資料不足；… | 暫停新增 |
 
 ## 低優先（摺疊）
 EDGAR Form 4 ×55、較舊 filing——預設摺疊只列數量（要看再展開）
