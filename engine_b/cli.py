@@ -291,11 +291,58 @@ def _cmd_harvest_health(args: argparse.Namespace) -> int:
 def _cmd_trace_backlog(args: argparse.Namespace) -> int:
     """列出不會被一般 drain 撿回的 parked source-trace backlog。"""
 
+    from engine_b.entities import lead_entities
+
     store = leads.load(args.leads)
     rows = leads.trace_backlog(store)
     if args.manual_only:
         rows = [row for row in rows if row["requires_user"]]
+    # 帶上具名標的，讓「新 lead 是否與某個 parked 有關」可以確定性比對，
+    # 而不是每次都靠讀 next_trigger 自由文字用語意判斷。
+    for row in rows:
+        lead = (store.get("leads") or {}).get(row["lead_id"]) or {}
+        row["entities"] = sorted(lead_entities(lead))
     print(json.dumps(rows, ensure_ascii=False, indent=2))
+    return 0
+
+
+def _cmd_related(args: argparse.Namespace) -> int:
+    """列出與指定 lead 共用具名標的的 parked／其他狀態 lead。"""
+
+    from engine_b.entities import lead_entities, related_leads
+
+    store = leads.load(args.leads)
+    statuses = tuple(args.status)
+    try:
+        matches = related_leads(store, args.lead_id, statuses=statuses)
+    except KeyError as exc:
+        print(f"✗ {exc}", file=sys.stderr)
+        return 1
+    target = store["leads"][args.lead_id]
+    print(json.dumps(
+        {
+            "lead_id": args.lead_id,
+            "entities": sorted(lead_entities(target)),
+            "statuses_searched": list(statuses),
+            "matches": matches,
+        },
+        ensure_ascii=False,
+        indent=2,
+    ))
+    return 0
+
+
+def _cmd_backfill_entities(args: argparse.Namespace) -> int:
+    """替既有 lead 補上具名標的標記（一次性；register 之後會自動帶）。"""
+
+    from engine_b.entities import backfill_entities
+
+    store = leads.load(args.leads)
+    updated = backfill_entities(store)
+    if not args.dry_run and updated:
+        leads.save(store, args.leads)
+    verb = "將更新" if args.dry_run else "已更新"
+    print(f"{verb} {updated} 筆 lead 的 entities")
     return 0
 
 
@@ -396,6 +443,24 @@ def build_parser() -> argparse.ArgumentParser:
         help="只列需要使用者 access／付費／優先權決策的項目",
     )
     p_trace.set_defaults(func=_cmd_trace_backlog)
+
+    p_related = sub.add_parser(
+        "related",
+        help="找出與指定 lead 共用具名標的的其他 lead（確定性比對，非語意推論）",
+    )
+    p_related.add_argument("lead_id")
+    p_related.add_argument(
+        "--status", nargs="+", default=["parked"],
+        help="要搜尋的狀態，預設只找 parked",
+    )
+    p_related.set_defaults(func=_cmd_related)
+
+    p_backfill = sub.add_parser(
+        "backfill-entities",
+        help="替既有 lead 補上具名標的標記（一次性）",
+    )
+    p_backfill.add_argument("--dry-run", action="store_true")
+    p_backfill.set_defaults(func=_cmd_backfill_entities)
     return ap
 
 

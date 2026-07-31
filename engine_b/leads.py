@@ -198,6 +198,7 @@ def register(
             enriched = True
         if enriched:
             lead["content_updated_at"] = _now()
+            lead["entities"] = _entities_for(lead)
         return lead_id, False
     lead = {
         "lead_id": lead_id,
@@ -214,8 +215,20 @@ def register(
         lead["raw_text"] = str(raw_text)
     if media is not None:
         lead["media"] = clean_media
+    # 具名標的是 lead 之間唯一的確定性關聯鍵（URL hash 只認同一篇文章）。
+    lead["entities"] = _entities_for(lead)
     leads[lead_id] = lead
     return lead_id, True
+
+
+def _entities_for(lead: dict[str, Any]) -> dict[str, list[str]]:
+    from engine_b.entities import extract_entities
+
+    return extract_entities(
+        title=lead.get("title"),
+        raw_text=lead.get("raw_text"),
+        source=lead.get("source"),
+    )
 
 
 def _clean_media(media: list[dict[str, Any]] | None) -> list[dict[str, Any]]:

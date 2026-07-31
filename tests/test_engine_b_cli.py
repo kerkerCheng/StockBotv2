@@ -123,6 +123,9 @@ def test_trace_backlog_keeps_legacy_parked_trace_visible(tmp_path, capsys) -> No
         "lane": "event_or_scheduled_pq1",
         "review_title": None,
         "review_hint": None,
+        # 具名標的：讓「新 lead 是否與此 parked 有關」可確定性比對，
+        # 不必每次重讀 next_trigger 自由文字。此例文字無 cashtag 故為空。
+        "entities": [],
     }]
 
 

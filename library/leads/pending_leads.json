@@ -1071,6 +1071,14 @@
   ],
   "leads": {
     "lead_00026a9efd69a5321479dc1ab4eac906": {
+      "entities": {
+        "company_ids": [
+          "co:lumentum"
+        ],
+        "tickers": [
+          "LITE"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:19.172635+00:00",
       "lead_id": "lead_00026a9efd69a5321479dc1ab4eac906",
       "published_at": "2026-07-16",
@@ -1088,6 +1096,24 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1633978/000171491026000003/xslF345X06/form4-07172026_120713.xml"
     },
     "lead_0075b8c7d0fdb5d3e6aed5e07b9b107b": {
+      "entities": {
+        "company_ids": [
+          "co:poet_technologies",
+          "co:lumentum",
+          "co:coherent",
+          "co:applied_optoelectronics",
+          "co:meta"
+        ],
+        "tickers": [
+          "POET",
+          "LITE",
+          "COHR",
+          "AAOI",
+          "MU",
+          "META",
+          "AEHR"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:01.129927+00:00",
       "lead_id": "lead_0075b8c7d0fdb5d3e6aed5e07b9b107b",
       "media": [],
@@ -1114,6 +1140,18 @@
     },
     "lead_0105a33e36381612a823b981ec5e7bc6": {
       "content_updated_at": "2026-07-29T13:46:53.634187+00:00",
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "IREN",
+          "HUT",
+          "CIFR",
+          "CLSK",
+          "WYFI",
+          "NBIS",
+          "CRWV"
+        ]
+      },
       "first_seen": "2026-07-25T09:06:50.926910+00:00",
       "lead_id": "lead_0105a33e36381612a823b981ec5e7bc6",
       "media": [
@@ -1191,6 +1229,14 @@
       "url": "https://x.com/aleabitoreddit/status/2079254669793316962"
     },
     "lead_038fe471d126685d77dadb0045d9daa6": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "TSLA",
+          "CCXI",
+          "XPEV"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:07.025127+00:00",
       "lead_id": "lead_038fe471d126685d77dadb0045d9daa6",
       "media": [
@@ -1304,6 +1350,16 @@
       "url": "https://x.com/aleabitoreddit/status/2076248337863639506"
     },
     "lead_043e94a0e70f703a76115cf09f96b438": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "JD",
+          "AMZN",
+          "DASH",
+          "UBER",
+          "MELI"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:23.661763+00:00",
       "lead_id": "lead_043e94a0e70f703a76115cf09f96b438",
       "media": [
@@ -1371,6 +1427,12 @@
       "url": "https://x.com/aleabitoreddit/status/2073523410643366242"
     },
     "lead_061fe889e9090fd14b4711fafda3fafe": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "SIVE"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:07.792024+00:00",
       "lead_id": "lead_061fe889e9090fd14b4711fafda3fafe",
       "media": [],
@@ -1396,6 +1458,10 @@
       "url": "https://x.com/aleabitoreddit/status/2075670213169918070"
     },
     "lead_063dffb7d73ace4f7a642322002304b7": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:53:42.611289+00:00",
       "lead_id": "lead_063dffb7d73ace4f7a642322002304b7",
       "media": [
@@ -1435,6 +1501,14 @@
       "url": "https://x.com/aleabitoreddit/status/2071986411461546148"
     },
     "lead_0726807b61154ece1783f363349f1ec1": {
+      "entities": {
+        "company_ids": [
+          "co:globalfoundries"
+        ],
+        "tickers": [
+          "GFS"
+        ]
+      },
       "first_seen": "2026-07-30T22:38:48.776635+00:00",
       "lead_id": "lead_0726807b61154ece1783f363349f1ec1",
       "published_at": "2026-07-30",
@@ -1452,6 +1526,14 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000183/xslF345X06/wk-form4_1785439240.xml"
     },
     "lead_072ee0491ea59637933371a069bd0321": {
+      "entities": {
+        "company_ids": [
+          "co:applied_optoelectronics"
+        ],
+        "tickers": [
+          "AAOI"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:23.595703+00:00",
       "lead_id": "lead_072ee0491ea59637933371a069bd0321",
       "published_at": "2026-06-16",
@@ -1469,6 +1551,16 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826004882/xslF345X06/ownership.xml"
     },
     "lead_075cb52a7fffdf3550210fc2a5f6fb8b": {
+      "entities": {
+        "company_ids": [
+          "co:applied_optoelectronics"
+        ],
+        "tickers": [
+          "AMZN",
+          "AAOI",
+          "SIVE"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:08.235629+00:00",
       "lead_id": "lead_075cb52a7fffdf3550210fc2a5f6fb8b",
       "media": [
@@ -1518,6 +1610,17 @@
       "url": "https://x.com/aleabitoreddit/status/2075645547978084371"
     },
     "lead_083f344e7f03004a3a2f55d8e9c3f7bd": {
+      "entities": {
+        "company_ids": [
+          "co:globalfoundries",
+          "co:applied_optoelectronics"
+        ],
+        "tickers": [
+          "SIVE",
+          "GFS",
+          "AAOI"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:31.667136+00:00",
       "lead_id": "lead_083f344e7f03004a3a2f55d8e9c3f7bd",
       "media": [],
@@ -1543,6 +1646,14 @@
       "url": "https://x.com/aleabitoreddit/status/2072728939324428655"
     },
     "lead_08a496cc0d099d7509a44dc50a225701": {
+      "entities": {
+        "company_ids": [
+          "co:applied_materials"
+        ],
+        "tickers": [
+          "AMAT"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:20.250746+00:00",
       "lead_id": "lead_08a496cc0d099d7509a44dc50a225701",
       "published_at": "2026-06-05",
@@ -1561,6 +1672,19 @@
     },
     "lead_09abba7335ec575ec76ca63a92e5663f": {
       "content_updated_at": "2026-07-29T13:46:43.559962+00:00",
+      "entities": {
+        "company_ids": [
+          "co:applied_optoelectronics",
+          "co:jabil",
+          "co:lumentum"
+        ],
+        "tickers": [
+          "AAOI",
+          "SIVE",
+          "JBL",
+          "LITE"
+        ]
+      },
       "first_seen": "2026-07-25T09:06:50.926723+00:00",
       "lead_id": "lead_09abba7335ec575ec76ca63a92e5663f",
       "media": [
@@ -1619,6 +1743,16 @@
       "url": "https://x.com/aleabitoreddit/status/2080445777395298454"
     },
     "lead_0a46048d5ac04fc3f4ee3d89698432a2": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia",
+          "co:meta"
+        ],
+        "tickers": [
+          "NVDA",
+          "META"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:27.982662+00:00",
       "lead_id": "lead_0a46048d5ac04fc3f4ee3d89698432a2",
       "media": [],
@@ -1644,6 +1778,12 @@
       "url": "https://x.com/aleabitoreddit/status/2072928111495376922"
     },
     "lead_0a5eb03bed3a8a6302b39e8df8d5f1a0": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "RKLB"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:31.667215+00:00",
       "lead_id": "lead_0a5eb03bed3a8a6302b39e8df8d5f1a0",
       "media": [],
@@ -1669,6 +1809,15 @@
       "url": "https://x.com/aleabitoreddit/status/2072638343486259415"
     },
     "lead_0a628d672d616c055708228e6f0ea15d": {
+      "entities": {
+        "company_ids": [
+          "co:lumentum"
+        ],
+        "tickers": [
+          "HIMX",
+          "LITE"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:26.416230+00:00",
       "lead_id": "lead_0a628d672d616c055708228e6f0ea15d",
       "media": [],
@@ -1694,6 +1843,10 @@
       "url": "https://x.com/aleabitoreddit/status/2073079326862672205"
     },
     "lead_0b7003b19b8d7254df26ac43d844dc95": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:53:39.981392+00:00",
       "lead_id": "lead_0b7003b19b8d7254df26ac43d844dc95",
       "media": [],
@@ -1719,6 +1872,14 @@
       "url": "https://x.com/aleabitoreddit/status/2072148404621476038"
     },
     "lead_0b9e021ae81e0515bcf3ac09e3f473a1": {
+      "entities": {
+        "company_ids": [
+          "co:globalfoundries"
+        ],
+        "tickers": [
+          "GFS"
+        ]
+      },
       "first_seen": "2026-07-30T22:38:48.776553+00:00",
       "lead_id": "lead_0b9e021ae81e0515bcf3ac09e3f473a1",
       "published_at": "2026-07-30",
@@ -1736,6 +1897,30 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000189/xslF345X06/wk-form4_1785439277.xml"
     },
     "lead_0c4d787d641296115df7d94fdddb0c3e": {
+      "entities": {
+        "company_ids": [
+          "co:corning",
+          "co:nvidia",
+          "co:apple",
+          "co:intel",
+          "co:tsmc",
+          "co:meta",
+          "co:broadcom"
+        ],
+        "tickers": [
+          "GLW",
+          "SPCX",
+          "NVDA",
+          "AAPL",
+          "INTC",
+          "TSM",
+          "AMKR",
+          "MU",
+          "META",
+          "AVGO",
+          "TSLA"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:05.852320+00:00",
       "lead_id": "lead_0c4d787d641296115df7d94fdddb0c3e",
       "media": [],
@@ -1761,6 +1946,15 @@
       "url": "https://x.com/aleabitoreddit/status/2076467953995071881"
     },
     "lead_0ca20286115cf0c010b7e77e0dcb4a9d": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia"
+        ],
+        "tickers": [
+          "MU",
+          "NVDA"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:21.434097+00:00",
       "lead_id": "lead_0ca20286115cf0c010b7e77e0dcb4a9d",
       "media": [],
@@ -1786,6 +1980,12 @@
       "url": "https://x.com/aleabitoreddit/status/2074019505932845352"
     },
     "lead_0e28d2642bc702744d2960107565448e": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "NBIS"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:36.372666+00:00",
       "lead_id": "lead_0e28d2642bc702744d2960107565448e",
       "media": [],
@@ -1811,6 +2011,10 @@
       "url": "https://x.com/aleabitoreddit/status/2072307910223532245"
     },
     "lead_0e4fc66f1e37e6d686e569f6b2f37929": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:46:54.378178+00:00",
       "lead_id": "lead_0e4fc66f1e37e6d686e569f6b2f37929",
       "media": [],
@@ -1836,6 +2040,14 @@
       "url": "https://x.com/aleabitoreddit/status/2078342936035823828"
     },
     "lead_0f16352fcbf4bafcfc927a9642d68715": {
+      "entities": {
+        "company_ids": [
+          "co:globalfoundries"
+        ],
+        "tickers": [
+          "GFS"
+        ]
+      },
       "first_seen": "2026-07-23T11:56:56.460012+00:00",
       "lead_id": "lead_0f16352fcbf4bafcfc927a9642d68715",
       "published_at": "2026-07-22",
@@ -1853,6 +2065,14 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1709048/000162828026049171/xslF345X06/wk-form4_1784749057.xml"
     },
     "lead_0ff868c1f91c2b054d93ad0fde8d30f6": {
+      "entities": {
+        "company_ids": [
+          "co:coherent"
+        ],
+        "tickers": [
+          "COHR"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:18.082221+00:00",
       "lead_id": "lead_0ff868c1f91c2b054d93ad0fde8d30f6",
       "published_at": "2026-04-24",
@@ -1870,6 +2090,14 @@
       "url": "https://www.sec.gov/Archives/edgar/data/820318/000089914026000393/xslF345X06/form4.xml"
     },
     "lead_10ce3c3e5213479b8624d7b3e59899f2": {
+      "entities": {
+        "company_ids": [
+          "co:globalfoundries"
+        ],
+        "tickers": [
+          "GFS"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:26.728948+00:00",
       "lead_id": "lead_10ce3c3e5213479b8624d7b3e59899f2",
       "published_at": "2026-06-29",
@@ -1887,6 +2115,15 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1709048/000162828026046017/xslF345X06/wk-form4_1782765252.xml"
     },
     "lead_11157f86578b06fe4ab6fb159213e386": {
+      "entities": {
+        "company_ids": [
+          "co:applied_optoelectronics"
+        ],
+        "tickers": [
+          "AAOI",
+          "SIVE"
+        ]
+      },
       "first_seen": "2026-07-29T13:46:59.272680+00:00",
       "lead_id": "lead_11157f86578b06fe4ab6fb159213e386",
       "media": [],
@@ -1912,6 +2149,10 @@
       "url": "https://x.com/aleabitoreddit/status/2077756721293037626"
     },
     "lead_11bc57007e1491541121bf0745ec4548": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:53:32.691514+00:00",
       "lead_id": "lead_11bc57007e1491541121bf0745ec4548",
       "media": [],
@@ -1937,6 +2178,14 @@
       "url": "https://x.com/aleabitoreddit/status/2072614132730511444"
     },
     "lead_11e73e5ccb7f3889467a869e7b854224": {
+      "entities": {
+        "company_ids": [
+          "co:applied_materials"
+        ],
+        "tickers": [
+          "AMAT"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:20.250734+00:00",
       "lead_id": "lead_11e73e5ccb7f3889467a869e7b854224",
       "published_at": "2026-06-17",
@@ -1954,6 +2203,14 @@
       "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026044039/xslF345X06/wk-form4_1781733475.xml"
     },
     "lead_12f5545a0584132a028176abe9bcdbbb": {
+      "entities": {
+        "company_ids": [
+          "co:axt"
+        ],
+        "tickers": [
+          "AXTI"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:22.502785+00:00",
       "lead_id": "lead_12f5545a0584132a028176abe9bcdbbb",
       "published_at": "2026-06-16",
@@ -1971,6 +2228,12 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1051627/000143774926020833/xslF345X06/rdgdoc.xml"
     },
     "lead_1448cac72d89476ff3c76b88f2e11381": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "SIVEF"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:17.014036+00:00",
       "lead_id": "lead_1448cac72d89476ff3c76b88f2e11381",
       "media": [
@@ -2010,6 +2273,16 @@
       "url": "https://x.com/aleabitoreddit/status/2074536982311743623"
     },
     "lead_16795901900503525cb8a921bca69711": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia"
+        ],
+        "tickers": [
+          "XFAB",
+          "SILEX",
+          "NVDA"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:21.433906+00:00",
       "lead_id": "lead_16795901900503525cb8a921bca69711",
       "media": [
@@ -2049,6 +2322,17 @@
       "url": "https://x.com/aleabitoreddit/status/2074063175293809150"
     },
     "lead_16bea92fbfb5a038e7dbe2edafba4f3f": {
+      "entities": {
+        "company_ids": [
+          "co:axt"
+        ],
+        "tickers": [
+          "NBIS",
+          "AXTI",
+          "SIVE",
+          "CCXI"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:12.738760+00:00",
       "lead_id": "lead_16bea92fbfb5a038e7dbe2edafba4f3f",
       "media": [],
@@ -2074,6 +2358,15 @@
       "url": "https://x.com/aleabitoreddit/status/2074951295027568736"
     },
     "lead_18364e727aae3737941be1d12d8f086e": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia"
+        ],
+        "tickers": [
+          "NVDA",
+          "AMZN"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:31.314995+00:00",
       "lead_id": "lead_18364e727aae3737941be1d12d8f086e",
       "media": [],
@@ -2099,6 +2392,15 @@
       "url": "https://x.com/aleabitoreddit/status/2072743412244287527"
     },
     "lead_18da0ec221ed6ebc51ea83b93ee8e7d8": {
+      "entities": {
+        "company_ids": [
+          "co:lumentum"
+        ],
+        "tickers": [
+          "SIVE",
+          "LITE"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:10.874444+00:00",
       "lead_id": "lead_18da0ec221ed6ebc51ea83b93ee8e7d8",
       "media": [],
@@ -2124,6 +2426,14 @@
       "url": "https://x.com/aleabitoreddit/status/2075294412377358828"
     },
     "lead_190b059db6c27b9bb7025eda28a9c61c": {
+      "entities": {
+        "company_ids": [
+          "co:applied_materials"
+        ],
+        "tickers": [
+          "AMAT"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:20.250643+00:00",
       "lead_id": "lead_190b059db6c27b9bb7025eda28a9c61c",
       "published_at": "2026-07-06",
@@ -2141,6 +2451,13 @@
       "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026047328/xslF345X06/wk-form4_1783371864.xml"
     },
     "lead_1ab4c55b114561825c6223094828f183": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "CCXI",
+          "AGLT"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:35.435926+00:00",
       "lead_id": "lead_1ab4c55b114561825c6223094828f183",
       "media": [],
@@ -2166,6 +2483,10 @@
       "url": "https://x.com/aleabitoreddit/status/2072373689157578795"
     },
     "lead_1ac541ecd5359adc8eb7a8b5978be865": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:47:00.225338+00:00",
       "lead_id": "lead_1ac541ecd5359adc8eb7a8b5978be865",
       "media": [
@@ -2205,6 +2526,12 @@
       "url": "https://x.com/aleabitoreddit/status/2077741631135191234"
     },
     "lead_1b561ff0f07f8e5497f68cb0a15c6885": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "ASTS"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:13.060998+00:00",
       "lead_id": "lead_1b561ff0f07f8e5497f68cb0a15c6885",
       "media": [
@@ -2244,6 +2571,22 @@
       "url": "https://x.com/aleabitoreddit/status/2074843710806978606"
     },
     "lead_1b7d39ebcb3b8ede4b381cb38eedc6c2": {
+      "entities": {
+        "company_ids": [
+          "co:meta",
+          "co:nvidia",
+          "co:google"
+        ],
+        "tickers": [
+          "META",
+          "MSFT",
+          "AMD",
+          "NVDA",
+          "IREN",
+          "NBIS",
+          "GOOGL"
+        ]
+      },
       "first_seen": "2026-07-30T22:38:41.241340+00:00",
       "lead_id": "lead_1b7d39ebcb3b8ede4b381cb38eedc6c2",
       "media": [],
@@ -2265,6 +2608,13 @@
       "url": "https://x.com/aleabitoreddit/status/2082605568699871284"
     },
     "lead_1c49fc75353d0de4a5c08c02ad6e83bc": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "AMD",
+          "SIVE"
+        ]
+      },
       "first_seen": "2026-07-29T13:46:49.149581+00:00",
       "lead_id": "lead_1c49fc75353d0de4a5c08c02ad6e83bc",
       "media": [],
@@ -2290,6 +2640,14 @@
       "url": "https://x.com/aleabitoreddit/status/2079953508904964575"
     },
     "lead_1cc53b8f399fa19d8de9097b212b2d50": {
+      "entities": {
+        "company_ids": [
+          "co:lumentum"
+        ],
+        "tickers": [
+          "LITE"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:19.172726+00:00",
       "lead_id": "lead_1cc53b8f399fa19d8de9097b212b2d50",
       "published_at": "2026-07-07",
@@ -2308,6 +2666,12 @@
     },
     "lead_1d14c346bf03346253d908e26f2d7406": {
       "content_updated_at": "2026-07-29T13:46:54.703757+00:00",
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "SKHY"
+        ]
+      },
       "first_seen": "2026-07-25T09:06:50.926944+00:00",
       "lead_id": "lead_1d14c346bf03346253d908e26f2d7406",
       "media": [
@@ -2362,6 +2726,16 @@
       "url": "https://x.com/aleabitoreddit/status/2078338950150959558"
     },
     "lead_1d29da0283f3c7f84f5ee2cfdb7ee8d0": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia"
+        ],
+        "tickers": [
+          "CCXI",
+          "NVDA",
+          "AMZN"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:42.204309+00:00",
       "lead_id": "lead_1d29da0283f3c7f84f5ee2cfdb7ee8d0",
       "media": [
@@ -2442,6 +2816,13 @@
       "url": "https://x.com/aleabitoreddit/status/2071995924172394695"
     },
     "lead_1f55ec9eae7d1e4a1b68fa245ed1ee7f": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "IREN",
+          "SHAZ"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:24.671657+00:00",
       "lead_id": "lead_1f55ec9eae7d1e4a1b68fa245ed1ee7f",
       "media": [
@@ -2504,6 +2885,14 @@
       "url": "https://x.com/aleabitoreddit/status/2073704784398528599"
     },
     "lead_1fa5e4b88de07ce8b801e2468729c087": {
+      "entities": {
+        "company_ids": [
+          "co:lam_research"
+        ],
+        "tickers": [
+          "LRCX"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:21.356645+00:00",
       "lead_id": "lead_1fa5e4b88de07ce8b801e2468729c087",
       "published_at": "2026-05-04",
@@ -2521,6 +2910,13 @@
       "url": "https://www.sec.gov/Archives/edgar/data/707549/000070754926000024/xslF345X06/wk-form4_1777915449.xml"
     },
     "lead_1fdc116555056cf45f6c71ad58da24d7": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "RKLB",
+          "CCXI"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:31.314926+00:00",
       "lead_id": "lead_1fdc116555056cf45f6c71ad58da24d7",
       "media": [],
@@ -2546,6 +2942,14 @@
       "url": "https://x.com/aleabitoreddit/status/2072752326147031494"
     },
     "lead_204633b1f40ec42976958ec147bc5554": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "UBER",
+          "LYFT",
+          "TSLA"
+        ]
+      },
       "first_seen": "2026-07-29T13:46:42.606982+00:00",
       "lead_id": "lead_204633b1f40ec42976958ec147bc5554",
       "media": [],
@@ -2571,6 +2975,10 @@
       "url": "https://x.com/aleabitoreddit/status/2080754547757391897"
     },
     "lead_2093c12993bd8ad33512c4db06525336": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:46:56.086800+00:00",
       "lead_id": "lead_2093c12993bd8ad33512c4db06525336",
       "media": [
@@ -2610,6 +3018,14 @@
       "url": "https://x.com/aleabitoreddit/status/2078161322769068533"
     },
     "lead_22950673806c7136d6516716900c4a79": {
+      "entities": {
+        "company_ids": [
+          "co:globalfoundries"
+        ],
+        "tickers": [
+          "GFS"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:26.728959+00:00",
       "lead_id": "lead_22950673806c7136d6516716900c4a79",
       "published_at": "2026-06-26",
@@ -2627,6 +3043,10 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000147/xslF345X06/wk-form4_1782496850.xml"
     },
     "lead_238e9bc2281f34aae6ce26a6de502605": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:47:12.738706+00:00",
       "lead_id": "lead_238e9bc2281f34aae6ce26a6de502605",
       "media": [],
@@ -2652,6 +3072,14 @@
       "url": "https://x.com/aleabitoreddit/status/2074953917084127537"
     },
     "lead_24275206bfbcff3a5904bde1187763f8": {
+      "entities": {
+        "company_ids": [
+          "co:tower_semiconductor"
+        ],
+        "tickers": [
+          "TSEM"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:25.644456+00:00",
       "lead_id": "lead_24275206bfbcff3a5904bde1187763f8",
       "published_at": "2026-07-06",
@@ -2669,6 +3097,14 @@
       "url": "https://www.sec.gov/Archives/edgar/data/928876/000197640826000637/xslF345X06/primary_doc.xml"
     },
     "lead_24700653e97ff33c21c1dc97cfb66341": {
+      "entities": {
+        "company_ids": [
+          "co:tower_semiconductor"
+        ],
+        "tickers": [
+          "TSEM"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:25.644514+00:00",
       "lead_id": "lead_24700653e97ff33c21c1dc97cfb66341",
       "published_at": "2026-07-06",
@@ -2686,6 +3122,14 @@
       "url": "https://www.sec.gov/Archives/edgar/data/928876/000197640826000632/xslF345X06/primary_doc.xml"
     },
     "lead_24ad40de03ac5f87c78d9e043845b309": {
+      "entities": {
+        "company_ids": [
+          "co:axt"
+        ],
+        "tickers": [
+          "AXTI"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:22.502796+00:00",
       "lead_id": "lead_24ad40de03ac5f87c78d9e043845b309",
       "published_at": "2026-06-15",
@@ -2703,6 +3147,16 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1051627/000143774926020633/xslF345X06/rdgdoc.xml"
     },
     "lead_250f6558cea6c4beab2a95e262024800": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "SPCX",
+          "TSLA",
+          "CCXI",
+          "MELI",
+          "AMZN"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:15.764308+00:00",
       "lead_id": "lead_250f6558cea6c4beab2a95e262024800",
       "media": [],
@@ -2728,6 +3182,10 @@
       "url": "https://x.com/aleabitoreddit/status/2074552062382338069"
     },
     "lead_25a733b28f9f95b8b26ee14e4be63128": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:53:25.112650+00:00",
       "lead_id": "lead_25a733b28f9f95b8b26ee14e4be63128",
       "media": [
@@ -2767,6 +3225,14 @@
       "url": "https://x.com/aleabitoreddit/status/2073374325420503417"
     },
     "lead_28c13e03ca83db717f75de93f5053bf7": {
+      "entities": {
+        "company_ids": [
+          "co:corning"
+        ],
+        "tickers": [
+          "GLW"
+        ]
+      },
       "first_seen": "2026-07-29T13:46:57.013157+00:00",
       "lead_id": "lead_28c13e03ca83db717f75de93f5053bf7",
       "media": [
@@ -2819,6 +3285,14 @@
       "url": "https://x.com/aleabitoreddit/status/2078139584123482249"
     },
     "lead_28e5b89ba6cc324e31c323ca0f364e49": {
+      "entities": {
+        "company_ids": [
+          "co:intel"
+        ],
+        "tickers": [
+          "INTC"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:05.295760+00:00",
       "lead_id": "lead_28e5b89ba6cc324e31c323ca0f364e49",
       "media": [],
@@ -2844,6 +3318,18 @@
       "url": "https://x.com/aleabitoreddit/status/2076767097674514474"
     },
     "lead_2a2bd717d58af305235d2e3588a596cb": {
+      "entities": {
+        "company_ids": [
+          "co:lumentum"
+        ],
+        "tickers": [
+          "RDDT",
+          "MU",
+          "LITE",
+          "HOOD",
+          "HIMS"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:19.113125+00:00",
       "lead_id": "lead_2a2bd717d58af305235d2e3588a596cb",
       "media": [
@@ -2883,6 +3369,14 @@
       "url": "https://x.com/aleabitoreddit/status/2074240512593481955"
     },
     "lead_2a55aeb6fff1b9590b520af4daafed47": {
+      "entities": {
+        "company_ids": [
+          "co:lam_research"
+        ],
+        "tickers": [
+          "LRCX"
+        ]
+      },
       "first_seen": "2026-07-29T22:35:10.288856+00:00",
       "lead_id": "lead_2a55aeb6fff1b9590b520af4daafed47",
       "published_at": "2026-07-29",
@@ -2900,6 +3394,10 @@
       "url": "https://www.sec.gov/Archives/edgar/data/707549/000070754926000033/lrcx-20260729.htm"
     },
     "lead_2b43cb181b7cac79e1ef6a05bad6b150": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:47:01.129884+00:00",
       "lead_id": "lead_2b43cb181b7cac79e1ef6a05bad6b150",
       "media": [],
@@ -2925,6 +3423,13 @@
       "url": "https://x.com/aleabitoreddit/status/2077412680668008546"
     },
     "lead_2c0614883bf6ec94c3032ccda5c7ff70": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "TSLA",
+          "CCXI"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:32.691394+00:00",
       "lead_id": "lead_2c0614883bf6ec94c3032ccda5c7ff70",
       "media": [
@@ -3005,6 +3510,15 @@
       "url": "https://x.com/aleabitoreddit/status/2072630036600103340"
     },
     "lead_2cb82f4c0c7b93fbf18be123045d671e": {
+      "entities": {
+        "company_ids": [
+          "co:globalfoundries"
+        ],
+        "tickers": [
+          "SIVE",
+          "GFS"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:40.329605+00:00",
       "lead_id": "lead_2cb82f4c0c7b93fbf18be123045d671e",
       "media": [
@@ -3044,6 +3558,19 @@
       "url": "https://x.com/aleabitoreddit/status/2072007692684837039"
     },
     "lead_2e0c7f6c8054c3ddcb37ef825ec4e508": {
+      "entities": {
+        "company_ids": [
+          "co:applied_optoelectronics",
+          "co:lumentum",
+          "co:coherent"
+        ],
+        "tickers": [
+          "AAOI",
+          "LITE",
+          "COHR",
+          "SIVE"
+        ]
+      },
       "first_seen": "2026-07-29T13:46:43.254752+00:00",
       "lead_id": "lead_2e0c7f6c8054c3ddcb37ef825ec4e508",
       "media": [],
@@ -3069,6 +3596,12 @@
       "url": "https://x.com/aleabitoreddit/status/2080456465509454053"
     },
     "lead_2e14f147a22fe616a2906c8e52c625ce": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "SIVE"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:39.981333+00:00",
       "lead_id": "lead_2e14f147a22fe616a2906c8e52c625ce",
       "media": [
@@ -3118,6 +3651,15 @@
       "url": "https://x.com/aleabitoreddit/status/2072152226169331776"
     },
     "lead_2e2d386f636b9656a8df1df13aeb7a96": {
+      "entities": {
+        "company_ids": [
+          "co:applied_optoelectronics"
+        ],
+        "tickers": [
+          "SIVE",
+          "AAOI"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:19.395582+00:00",
       "lead_id": "lead_2e2d386f636b9656a8df1df13aeb7a96",
       "media": [],
@@ -3143,6 +3685,14 @@
       "url": "https://x.com/aleabitoreddit/status/2074152813958152688"
     },
     "lead_2e9d49d9fa6fefb00d51be474d642064": {
+      "entities": {
+        "company_ids": [
+          "co:meta"
+        ],
+        "tickers": [
+          "META"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:19.635594+00:00",
       "lead_id": "lead_2e9d49d9fa6fefb00d51be474d642064",
       "media": [
@@ -3182,6 +3732,14 @@
       "url": "https://x.com/aleabitoreddit/status/2074143469015281953"
     },
     "lead_2ea3e59722e5e136cf2f82e823cbe7e6": {
+      "entities": {
+        "company_ids": [
+          "co:applied_optoelectronics"
+        ],
+        "tickers": [
+          "AAOI"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:23.595633+00:00",
       "lead_id": "lead_2ea3e59722e5e136cf2f82e823cbe7e6",
       "published_at": "2026-07-01",
@@ -3206,6 +3764,14 @@
     },
     "lead_2f5aebfb7785c12a8fb2fe665f8a26ff": {
       "content_updated_at": "2026-07-29T13:46:42.606858+00:00",
+      "entities": {
+        "company_ids": [
+          "co:nvidia"
+        ],
+        "tickers": [
+          "NVDA"
+        ]
+      },
       "first_seen": "2026-07-27T14:17:21.432272+00:00",
       "lead_id": "lead_2f5aebfb7785c12a8fb2fe665f8a26ff",
       "media": [
@@ -3247,6 +3813,14 @@
       "url": "https://x.com/aleabitoreddit/status/2081548360818004299"
     },
     "lead_2fb91876b881e2393f73b030a188ffa5": {
+      "entities": {
+        "company_ids": [
+          "co:tsmc"
+        ],
+        "tickers": [
+          "TSM"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:38.703785+00:00",
       "lead_id": "lead_2fb91876b881e2393f73b030a188ffa5",
       "media": [
@@ -3287,6 +3861,15 @@
     },
     "lead_2ffb199ff20ab64369580b427464efcf": {
       "content_updated_at": "2026-07-29T13:46:49.445916+00:00",
+      "entities": {
+        "company_ids": [
+          "co:nvidia"
+        ],
+        "tickers": [
+          "AMD",
+          "NVDA"
+        ]
+      },
       "first_seen": "2026-07-25T09:06:50.926829+00:00",
       "lead_id": "lead_2ffb199ff20ab64369580b427464efcf",
       "media": [
@@ -3328,6 +3911,10 @@
       "url": "https://x.com/aleabitoreddit/status/2079947242455335379"
     },
     "lead_315a647abff24052efe39be5708d29b1": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:53:36.702975+00:00",
       "lead_id": "lead_315a647abff24052efe39be5708d29b1",
       "media": [],
@@ -3353,6 +3940,10 @@
       "url": "https://x.com/aleabitoreddit/status/2072278885526565214"
     },
     "lead_31bd2551d0705528631248b8908aa2a5": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:53:31.315071+00:00",
       "lead_id": "lead_31bd2551d0705528631248b8908aa2a5",
       "media": [],
@@ -3378,6 +3969,16 @@
       "url": "https://x.com/aleabitoreddit/status/2072739784376897733"
     },
     "lead_31c2872a55bcdd3158bc7e803d62c58a": {
+      "entities": {
+        "company_ids": [
+          "co:axt"
+        ],
+        "tickers": [
+          "SIVE",
+          "AEHR",
+          "AXTI"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:17.340835+00:00",
       "lead_id": "lead_31c2872a55bcdd3158bc7e803d62c58a",
       "media": [
@@ -3417,6 +4018,16 @@
       "url": "https://x.com/aleabitoreddit/status/2074533565505876218"
     },
     "lead_32467138b3832782d89c940740dff50c": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia",
+          "co:tsmc"
+        ],
+        "tickers": [
+          "NVDA",
+          "TSM"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:06.139626+00:00",
       "lead_id": "lead_32467138b3832782d89c940740dff50c",
       "media": [],
@@ -3442,6 +4053,14 @@
       "url": "https://x.com/aleabitoreddit/status/2076266613675069628"
     },
     "lead_330dd99ad380ce1a207e4fb53c046f03": {
+      "entities": {
+        "company_ids": [
+          "co:tower_semiconductor"
+        ],
+        "tickers": [
+          "TSEM"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:25.644432+00:00",
       "lead_id": "lead_330dd99ad380ce1a207e4fb53c046f03",
       "published_at": "2026-07-15",
@@ -3459,6 +4078,14 @@
       "url": "https://www.sec.gov/Archives/edgar/data/928876/000197640826000651/xslF345X06/primary_doc.xml"
     },
     "lead_346c43a02c97ab876fd90f6845f10629": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "MU",
+          "SNDK",
+          "SIMO"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:23.677208+00:00",
       "lead_id": "lead_346c43a02c97ab876fd90f6845f10629",
       "media": [],
@@ -3494,6 +4121,15 @@
       "url": "https://x.com/aleabitoreddit/status/2073793206408667392"
     },
     "lead_34b927765030ee93e0d3b15c77c79815": {
+      "entities": {
+        "company_ids": [
+          "co:meta"
+        ],
+        "tickers": [
+          "META",
+          "NBIS"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:28.350841+00:00",
       "lead_id": "lead_34b927765030ee93e0d3b15c77c79815",
       "media": [
@@ -3533,6 +4169,10 @@
       "url": "https://x.com/aleabitoreddit/status/2072922974345445511"
     },
     "lead_362b47c2ab593d8ad2f06d2fcc0e59a2": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:46:59.949486+00:00",
       "lead_id": "lead_362b47c2ab593d8ad2f06d2fcc0e59a2",
       "media": [],
@@ -3558,6 +4198,12 @@
       "url": "https://x.com/aleabitoreddit/status/2077742769800728726"
     },
     "lead_365ec889606d873ac6e7124564a01590": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "WULF"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:20.031577+00:00",
       "lead_id": "lead_365ec889606d873ac6e7124564a01590",
       "media": [
@@ -3602,6 +4248,12 @@
       "url": "https://x.com/aleabitoreddit/status/2074109998544846954"
     },
     "lead_38941d65f87191b303cd3fa4b70e59f8": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "NBIS"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:18.849369+00:00",
       "lead_id": "lead_38941d65f87191b303cd3fa4b70e59f8",
       "media": [],
@@ -3627,6 +4279,15 @@
       "url": "https://x.com/aleabitoreddit/status/2074243322475171872"
     },
     "lead_39a7564998ac959ad2c54d7815b905e7": {
+      "entities": {
+        "company_ids": [
+          "co:applied_optoelectronics"
+        ],
+        "tickers": [
+          "AMD",
+          "AAOI"
+        ]
+      },
       "first_seen": "2026-07-29T13:46:50.752399+00:00",
       "lead_id": "lead_39a7564998ac959ad2c54d7815b905e7",
       "media": [
@@ -3666,6 +4327,30 @@
       "url": "https://x.com/aleabitoreddit/status/2079502019933732884"
     },
     "lead_3a46a020555dc48189780ff7686f778b": {
+      "entities": {
+        "company_ids": [
+          "co:lumentum",
+          "co:jabil",
+          "co:globalfoundries",
+          "co:nvidia",
+          "co:poet_technologies",
+          "co:marvell_technology",
+          "co:applied_optoelectronics"
+        ],
+        "tickers": [
+          "SIVE",
+          "LITE",
+          "JBL",
+          "GFS",
+          "AMD",
+          "NVDA",
+          "AEVA",
+          "POET",
+          "MRVL",
+          "FN",
+          "AAOI"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:21.434060+00:00",
       "lead_id": "lead_3a46a020555dc48189780ff7686f778b",
       "media": [],
@@ -3691,6 +4376,14 @@
       "url": "https://x.com/aleabitoreddit/status/2074046947434860971"
     },
     "lead_3b455d0e21ff3e18ccf24fffb5f906e2": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "SPCX",
+          "TSLA",
+          "CCXI"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:19.113247+00:00",
       "lead_id": "lead_3b455d0e21ff3e18ccf24fffb5f906e2",
       "media": [],
@@ -3716,6 +4409,14 @@
       "url": "https://x.com/aleabitoreddit/status/2074223485921243237"
     },
     "lead_3db17a26b013cc15fab10c297fbd02bc": {
+      "entities": {
+        "company_ids": [
+          "co:globalfoundries"
+        ],
+        "tickers": [
+          "GFS"
+        ]
+      },
       "first_seen": "2026-07-30T22:38:48.776604+00:00",
       "lead_id": "lead_3db17a26b013cc15fab10c297fbd02bc",
       "published_at": "2026-07-30",
@@ -3734,6 +4435,27 @@
     },
     "lead_3e383a34e368086c3f09085532274856": {
       "content_updated_at": "2026-07-28T12:28:35.362386+00:00",
+      "entities": {
+        "company_ids": [
+          "co:broadcom",
+          "co:nvidia",
+          "co:meta",
+          "co:intel"
+        ],
+        "tickers": [
+          "CXMT",
+          "AVGO",
+          "SOI",
+          "NVDA",
+          "LPK",
+          "QCOM",
+          "META",
+          "INTC",
+          "AMD",
+          "ORCL",
+          "CCXI"
+        ]
+      },
       "first_seen": "2026-07-27T14:17:21.432289+00:00",
       "lead_id": "lead_3e383a34e368086c3f09085532274856",
       "media": [],
@@ -3761,6 +4483,18 @@
       "url": "https://x.com/aleabitoreddit/status/2081472671129501729"
     },
     "lead_3e80264199dbf5a29442251cec37ca9a": {
+      "entities": {
+        "company_ids": [
+          "co:globalfoundries",
+          "co:jabil"
+        ],
+        "tickers": [
+          "SIVE",
+          "SIVEF",
+          "GFS",
+          "JBL"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:10.874519+00:00",
       "lead_id": "lead_3e80264199dbf5a29442251cec37ca9a",
       "media": [],
@@ -3786,6 +4520,17 @@
       "url": "https://x.com/aleabitoreddit/status/2075289915697553697"
     },
     "lead_3e93bffb7290bcd3f84258a630841a1a": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia"
+        ],
+        "tickers": [
+          "CCXI",
+          "AMZN",
+          "NVDA",
+          "TSLA"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:36.372547+00:00",
       "lead_id": "lead_3e93bffb7290bcd3f84258a630841a1a",
       "media": [
@@ -3864,6 +4609,15 @@
       "url": "https://x.com/aleabitoreddit/status/2072367082248040621"
     },
     "lead_3ef9e4336061e83b2373bbe13a13c2e4": {
+      "entities": {
+        "company_ids": [
+          "co:lumentum"
+        ],
+        "tickers": [
+          "LITE",
+          "SIVE"
+        ]
+      },
       "first_seen": "2026-07-29T13:46:58.698895+00:00",
       "lead_id": "lead_3ef9e4336061e83b2373bbe13a13c2e4",
       "media": [],
@@ -3889,6 +4643,17 @@
       "url": "https://x.com/aleabitoreddit/status/2077773622513643592"
     },
     "lead_401029a4e651dfda8b38277e5ff97db5": {
+      "entities": {
+        "company_ids": [
+          "co:google",
+          "co:meta"
+        ],
+        "tickers": [
+          "GOOGL",
+          "META",
+          "ASML"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:43.457150+00:00",
       "lead_id": "lead_401029a4e651dfda8b38277e5ff97db5",
       "media": [
@@ -3928,6 +4693,13 @@
       "url": "https://x.com/aleabitoreddit/status/2071903552608362500"
     },
     "lead_4248bf6af7d35b790d8079bc1a15a943": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "AMZN",
+          "CCXI"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:25.562608+00:00",
       "lead_id": "lead_4248bf6af7d35b790d8079bc1a15a943",
       "media": [
@@ -3967,6 +4739,10 @@
       "url": "https://x.com/aleabitoreddit/status/2073351980131754203"
     },
     "lead_425590a53b84368ed5667d44f7291660": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:47:14.162181+00:00",
       "lead_id": "lead_425590a53b84368ed5667d44f7291660",
       "media": [
@@ -4006,6 +4782,10 @@
       "url": "https://x.com/aleabitoreddit/status/2074799339680202869"
     },
     "lead_42710cc4d64ee33cedd9e286a169f328": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:47:18.849315+00:00",
       "lead_id": "lead_42710cc4d64ee33cedd9e286a169f328",
       "media": [
@@ -4046,6 +4826,15 @@
     },
     "lead_435289261da3b093b9ed384b989c839c": {
       "content_updated_at": "2026-07-29T13:46:51.988873+00:00",
+      "entities": {
+        "company_ids": [
+          "co:nvidia"
+        ],
+        "tickers": [
+          "NBIS",
+          "NVDA"
+        ]
+      },
       "first_seen": "2026-07-25T09:06:50.926886+00:00",
       "lead_id": "lead_435289261da3b093b9ed384b989c839c",
       "media": [
@@ -4100,6 +4889,14 @@
       "url": "https://x.com/aleabitoreddit/status/2079319999915925938"
     },
     "lead_43609d9692fc28caa7b42cd8f10ba21e": {
+      "entities": {
+        "company_ids": [
+          "co:meta"
+        ],
+        "tickers": [
+          "META"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:12.738541+00:00",
       "lead_id": "lead_43609d9692fc28caa7b42cd8f10ba21e",
       "media": [
@@ -4139,6 +4936,12 @@
       "url": "https://x.com/aleabitoreddit/status/2074965761345642660"
     },
     "lead_442d7e50dfb28699c68236c766e1134b": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "SIVE"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:12.738608+00:00",
       "lead_id": "lead_442d7e50dfb28699c68236c766e1134b",
       "media": [],
@@ -4164,6 +4967,17 @@
       "url": "https://x.com/aleabitoreddit/status/2074961844184506526"
     },
     "lead_44415159a59bce1a3eed7c7ca5f97086": {
+      "entities": {
+        "company_ids": [
+          "co:applied_optoelectronics",
+          "co:lumentum"
+        ],
+        "tickers": [
+          "AAOI",
+          "SIVE",
+          "LITE"
+        ]
+      },
       "first_seen": "2026-07-29T13:46:54.703913+00:00",
       "lead_id": "lead_44415159a59bce1a3eed7c7ca5f97086",
       "media": [],
@@ -4189,6 +5003,14 @@
       "url": "https://x.com/aleabitoreddit/status/2078272513755263319"
     },
     "lead_44ce140c224422130eecf4bb9766219e": {
+      "entities": {
+        "company_ids": [
+          "co:axt"
+        ],
+        "tickers": [
+          "AXTI"
+        ]
+      },
       "first_seen": "2026-07-29T22:35:11.212742+00:00",
       "lead_id": "lead_44ce140c224422130eecf4bb9766219e",
       "published_at": "2026-07-29",
@@ -4206,6 +5028,19 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1051627/000143774926024882/axti20260729_8k.htm"
     },
     "lead_44d33f5c904cb1fb75c452098d739e55": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia",
+          "co:lumentum"
+        ],
+        "tickers": [
+          "NVDA",
+          "OUST",
+          "AEVA",
+          "LITE",
+          "SIVE"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:15.389575+00:00",
       "lead_id": "lead_44d33f5c904cb1fb75c452098d739e55",
       "media": [
@@ -4260,6 +5095,17 @@
       "url": "https://x.com/aleabitoreddit/status/2074581698604593367"
     },
     "lead_45471772e76a5682418cca948152f7da": {
+      "entities": {
+        "company_ids": [
+          "co:tsmc",
+          "co:nvidia"
+        ],
+        "tickers": [
+          "FORM",
+          "TSM",
+          "NVDA"
+        ]
+      },
       "first_seen": "2026-07-30T22:38:41.241331+00:00",
       "lead_id": "lead_45471772e76a5682418cca948152f7da",
       "media": [
@@ -4308,6 +5154,15 @@
       "url": "https://x.com/aleabitoreddit/status/2082720873908494456"
     },
     "lead_46349b1959ac51a47111c54f5337062c": {
+      "entities": {
+        "company_ids": [
+          "co:applied_optoelectronics"
+        ],
+        "tickers": [
+          "SIVE",
+          "AAOI"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:35.435967+00:00",
       "lead_id": "lead_46349b1959ac51a47111c54f5337062c",
       "media": [],
@@ -4333,6 +5188,14 @@
       "url": "https://x.com/aleabitoreddit/status/2072371706568806595"
     },
     "lead_46944fdf1d1e34e38f5a9e32bc1c3fc8": {
+      "entities": {
+        "company_ids": [
+          "co:lam_research"
+        ],
+        "tickers": [
+          "LRCX"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:21.356596+00:00",
       "lead_id": "lead_46944fdf1d1e34e38f5a9e32bc1c3fc8",
       "published_at": "2026-07-06",
@@ -4350,6 +5213,16 @@
       "url": "https://www.sec.gov/Archives/edgar/data/707549/000134360026000009/xslF345X06/wk-form4_1783355605.xml"
     },
     "lead_476bd1f07c60e2995ad96640688707ee": {
+      "entities": {
+        "company_ids": [
+          "co:applied_optoelectronics"
+        ],
+        "tickers": [
+          "SNDK",
+          "MU",
+          "AAOI"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:43.724885+00:00",
       "lead_id": "lead_476bd1f07c60e2995ad96640688707ee",
       "media": [],
@@ -4375,6 +5248,15 @@
       "url": "https://x.com/aleabitoreddit/status/2071743355684626656"
     },
     "lead_486e4bcc8003167a6997376455b5a2c9": {
+      "entities": {
+        "company_ids": [
+          "co:jabil"
+        ],
+        "tickers": [
+          "CCXI",
+          "JBL"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:09.722687+00:00",
       "lead_id": "lead_486e4bcc8003167a6997376455b5a2c9",
       "media": [
@@ -4429,6 +5311,12 @@
       "url": "https://x.com/aleabitoreddit/status/2075557588159058076"
     },
     "lead_496f512a7f74e83fb5975f6e5377e757": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "SIVE"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:21.433978+00:00",
       "lead_id": "lead_496f512a7f74e83fb5975f6e5377e757",
       "media": [],
@@ -4454,6 +5342,12 @@
       "url": "https://x.com/aleabitoreddit/status/2074057730692898839"
     },
     "lead_49efa46f3c9013be2b0d00e2a5d96a78": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "BRUN"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:12.738673+00:00",
       "lead_id": "lead_49efa46f3c9013be2b0d00e2a5d96a78",
       "media": [],
@@ -4479,6 +5373,13 @@
       "url": "https://x.com/aleabitoreddit/status/2074954930939625564"
     },
     "lead_4a1bf28869638f159ef3a11327ffce7c": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "RDDT",
+          "CBRS"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:43.047721+00:00",
       "lead_id": "lead_4a1bf28869638f159ef3a11327ffce7c",
       "media": [
@@ -4518,6 +5419,17 @@
       "url": "https://x.com/aleabitoreddit/status/2071961279380791729"
     },
     "lead_4b0defa4e0d88836477e134a919527e8": {
+      "entities": {
+        "company_ids": [
+          "co:google",
+          "co:lumentum"
+        ],
+        "tickers": [
+          "AMZN",
+          "GOOGL",
+          "LITE"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:22.346190+00:00",
       "lead_id": "lead_4b0defa4e0d88836477e134a919527e8",
       "media": [
@@ -4557,6 +5469,10 @@
       "url": "https://x.com/aleabitoreddit/status/2073873043672420517"
     },
     "lead_4ba9a159a1ed39a176d0e15238150bf7": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:47:14.858065+00:00",
       "lead_id": "lead_4ba9a159a1ed39a176d0e15238150bf7",
       "media": [
@@ -4596,6 +5512,20 @@
       "url": "https://x.com/aleabitoreddit/status/2074776109074583565"
     },
     "lead_4d161f4994267a4f969c75ab283463e5": {
+      "entities": {
+        "company_ids": [
+          "co:intel"
+        ],
+        "tickers": [
+          "NBIS",
+          "IREN",
+          "SHAZ",
+          "SNDK",
+          "BE",
+          "SKHY",
+          "INTC"
+        ]
+      },
       "first_seen": "2026-07-30T22:38:41.241291+00:00",
       "lead_id": "lead_4d161f4994267a4f969c75ab283463e5",
       "media": [
@@ -4629,6 +5559,16 @@
       "url": "https://x.com/aleabitoreddit/status/2082896789880119590"
     },
     "lead_4e0f84a6d779f0506d91b111aeeabe31": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia",
+          "co:intel"
+        ],
+        "tickers": [
+          "NVDA",
+          "INTC"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:07.791834+00:00",
       "lead_id": "lead_4e0f84a6d779f0506d91b111aeeabe31",
       "media": [
@@ -4681,6 +5621,10 @@
       "url": "https://x.com/aleabitoreddit/status/2076030743655109063"
     },
     "lead_4f7fae31a0641d93886720165aa31a2f": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-30T08:05:28.741030+00:00",
       "lead_id": "lead_4f7fae31a0641d93886720165aa31a2f",
       "published_at": "2026-07-30",
@@ -4704,6 +5648,10 @@
       "url": "https://www.agilityrobotics.com/"
     },
     "lead_4f9a17ae6baa44defb87cd1b81ec2fbd": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:47:19.113185+00:00",
       "lead_id": "lead_4f9a17ae6baa44defb87cd1b81ec2fbd",
       "media": [],
@@ -4729,6 +5677,12 @@
       "url": "https://x.com/aleabitoreddit/status/2074226270125383744"
     },
     "lead_5227e314f46bb4d27af3ac74ca931661": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "AEHR"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:01.994311+00:00",
       "lead_id": "lead_5227e314f46bb4d27af3ac74ca931661",
       "media": [],
@@ -4754,6 +5708,18 @@
       "url": "https://x.com/aleabitoreddit/status/2077212864948162871"
     },
     "lead_55925c19c133e8fc22b61a43cf2b13bb": {
+      "entities": {
+        "company_ids": [
+          "co:meta",
+          "co:applied_optoelectronics"
+        ],
+        "tickers": [
+          "META",
+          "AAOI",
+          "SIVE",
+          "CCXI"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:27.982691+00:00",
       "lead_id": "lead_55925c19c133e8fc22b61a43cf2b13bb",
       "media": [],
@@ -4779,6 +5745,12 @@
       "url": "https://x.com/aleabitoreddit/status/2072925550608523738"
     },
     "lead_56c00023183b77584494c96d3ff61ed2": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "XPEV"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:35.435998+00:00",
       "lead_id": "lead_56c00023183b77584494c96d3ff61ed2",
       "media": [],
@@ -4804,6 +5776,14 @@
       "url": "https://x.com/aleabitoreddit/status/2072369811791946173"
     },
     "lead_57cf81e3979adf60169cbebabc245435": {
+      "entities": {
+        "company_ids": [
+          "co:applied_optoelectronics"
+        ],
+        "tickers": [
+          "AAOI"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:23.595734+00:00",
       "lead_id": "lead_57cf81e3979adf60169cbebabc245435",
       "published_at": "2026-06-16",
@@ -4821,6 +5801,10 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826004880/xslF345X06/ownership.xml"
     },
     "lead_57e947145911bb0c85682c7b4a184e7a": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:47:14.509344+00:00",
       "lead_id": "lead_57e947145911bb0c85682c7b4a184e7a",
       "media": [
@@ -4860,6 +5844,16 @@
       "url": "https://x.com/aleabitoreddit/status/2074782041909195014"
     },
     "lead_586d4451effd3b1206f2076b29aab69a": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia",
+          "co:apple"
+        ],
+        "tickers": [
+          "NVDA",
+          "AAPL"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:17.943338+00:00",
       "lead_id": "lead_586d4451effd3b1206f2076b29aab69a",
       "media": [],
@@ -4886,6 +5880,12 @@
     },
     "lead_58cf007b302a50a1e3d05e7dfe6acef7": {
       "content_updated_at": "2026-07-29T13:46:43.560100+00:00",
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "AMD"
+        ]
+      },
       "first_seen": "2026-07-25T09:06:50.926738+00:00",
       "lead_id": "lead_58cf007b302a50a1e3d05e7dfe6acef7",
       "media": [],
@@ -4917,6 +5917,10 @@
       "url": "https://x.com/aleabitoreddit/status/2080394259535221222"
     },
     "lead_5a2a7cfa72c8ccbb49bb34009c8a3783": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:47:07.791890+00:00",
       "lead_id": "lead_5a2a7cfa72c8ccbb49bb34009c8a3783",
       "media": [],
@@ -4942,6 +5946,14 @@
       "url": "https://x.com/aleabitoreddit/status/2075987162080928251"
     },
     "lead_5a2bd2c90d6f38fdb3db6673c309109a": {
+      "entities": {
+        "company_ids": [
+          "co:tower_semiconductor"
+        ],
+        "tickers": [
+          "TSEM"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:25.644469+00:00",
       "lead_id": "lead_5a2bd2c90d6f38fdb3db6673c309109a",
       "published_at": "2026-07-06",
@@ -4959,6 +5971,10 @@
       "url": "https://www.sec.gov/Archives/edgar/data/928876/000197640826000636/xslF345X06/primary_doc.xml"
     },
     "lead_5a7da4330a7b4dcc3b2987af503b0ee8": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:47:07.791924+00:00",
       "lead_id": "lead_5a7da4330a7b4dcc3b2987af503b0ee8",
       "media": [],
@@ -4984,6 +6000,14 @@
       "url": "https://x.com/aleabitoreddit/status/2075908823521583440"
     },
     "lead_5b5eba0facd3a53d102a06029dfc20cc": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia"
+        ],
+        "tickers": [
+          "NVDA"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:19.395481+00:00",
       "lead_id": "lead_5b5eba0facd3a53d102a06029dfc20cc",
       "media": [
@@ -5023,6 +6047,12 @@
       "url": "https://x.com/aleabitoreddit/status/2074170197486039524"
     },
     "lead_5b6c52c2bed7adba87c1d45940ca44c6": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "SIVE"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:38.313518+00:00",
       "lead_id": "lead_5b6c52c2bed7adba87c1d45940ca44c6",
       "media": [
@@ -5067,6 +6097,12 @@
       "url": "https://x.com/aleabitoreddit/status/2072219315760488615"
     },
     "lead_5c09b2d3f4baa9d5133948b9b9e7ebfa": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "SPCX"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:17.943267+00:00",
       "lead_id": "lead_5c09b2d3f4baa9d5133948b9b9e7ebfa",
       "media": [
@@ -5106,6 +6142,14 @@
       "url": "https://x.com/aleabitoreddit/status/2074466925263061100"
     },
     "lead_5d739525279dfae394f8c8e213084633": {
+      "entities": {
+        "company_ids": [
+          "co:globalfoundries"
+        ],
+        "tickers": [
+          "GFS"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:26.728926+00:00",
       "lead_id": "lead_5d739525279dfae394f8c8e213084633",
       "published_at": "2026-07-10",
@@ -5123,6 +6167,10 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000151/xslF345X06/wk-form4_1783706629.xml"
     },
     "lead_5e20380a8c1d3b3b909e40f41398c9c8": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:47:10.874603+00:00",
       "lead_id": "lead_5e20380a8c1d3b3b909e40f41398c9c8",
       "media": [],
@@ -5148,6 +6196,12 @@
       "url": "https://x.com/aleabitoreddit/status/2075204059506806850"
     },
     "lead_5eb94b76fed30142b819bc2f05616e8f": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "RKLB"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:32.691553+00:00",
       "lead_id": "lead_5eb94b76fed30142b819bc2f05616e8f",
       "media": [],
@@ -5173,6 +6227,14 @@
       "url": "https://x.com/aleabitoreddit/status/2072613688557859319"
     },
     "lead_6041bcf25186add2dfd90c1aa8e8c4e4": {
+      "entities": {
+        "company_ids": [
+          "co:meta"
+        ],
+        "tickers": [
+          "META"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:29.057195+00:00",
       "lead_id": "lead_6041bcf25186add2dfd90c1aa8e8c4e4",
       "media": [
@@ -5212,6 +6274,14 @@
       "url": "https://x.com/aleabitoreddit/status/2072906728853881251"
     },
     "lead_6076a9d2224995bfb0874bc42fefa9b0": {
+      "entities": {
+        "company_ids": [
+          "co:applied_materials"
+        ],
+        "tickers": [
+          "AMAT"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:20.250709+00:00",
       "lead_id": "lead_6076a9d2224995bfb0874bc42fefa9b0",
       "published_at": "2026-06-17",
@@ -5229,6 +6299,14 @@
       "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026044048/xslF345X06/wk-form4_1781734174.xml"
     },
     "lead_61053b6d935c61b2c3def03c953b1994": {
+      "entities": {
+        "company_ids": [
+          "co:lam_research"
+        ],
+        "tickers": [
+          "LRCX"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:21.356668+00:00",
       "lead_id": "lead_61053b6d935c61b2c3def03c953b1994",
       "published_at": "2026-04-23",
@@ -5246,6 +6324,16 @@
       "url": "https://www.sec.gov/Archives/edgar/data/707549/000070754926000022/lrcx-20260329.htm"
     },
     "lead_61824d59402ac0ef12852f81b222428a": {
+      "entities": {
+        "company_ids": [
+          "co:meta",
+          "co:nvidia"
+        ],
+        "tickers": [
+          "META",
+          "NVDA"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:18.521281+00:00",
       "lead_id": "lead_61824d59402ac0ef12852f81b222428a",
       "media": [
@@ -5298,6 +6386,10 @@
       "url": "https://x.com/aleabitoreddit/status/2074405723816304743"
     },
     "lead_61ba3559030de45318c16c8689e688dc": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:53:31.667044+00:00",
       "lead_id": "lead_61ba3559030de45318c16c8689e688dc",
       "media": [
@@ -5338,6 +6430,10 @@
     },
     "lead_6218747d4f0360a48659c5c6f95cc735": {
       "content_updated_at": "2026-07-29T13:46:52.972371+00:00",
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-25T09:06:50.926898+00:00",
       "lead_id": "lead_6218747d4f0360a48659c5c6f95cc735",
       "media": [
@@ -5418,6 +6514,20 @@
       "url": "https://x.com/aleabitoreddit/status/2079289335351062693"
     },
     "lead_62327c9dc121465c4438192595499d27": {
+      "entities": {
+        "company_ids": [
+          "co:applied_optoelectronics",
+          "co:lumentum",
+          "co:coherent"
+        ],
+        "tickers": [
+          "AAOI",
+          "MTSI",
+          "SIVE",
+          "LITE",
+          "COHR"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:05.295799+00:00",
       "lead_id": "lead_62327c9dc121465c4438192595499d27",
       "media": [],
@@ -5451,6 +6561,17 @@
       "url": "https://x.com/aleabitoreddit/status/2076763334930812936"
     },
     "lead_62902718f2adde48a5edcfa0563df489": {
+      "entities": {
+        "company_ids": [
+          "co:applied_optoelectronics",
+          "co:nvidia"
+        ],
+        "tickers": [
+          "AAOI",
+          "SIVE",
+          "NVDA"
+        ]
+      },
       "first_seen": "2026-07-29T13:46:57.013275+00:00",
       "lead_id": "lead_62902718f2adde48a5edcfa0563df489",
       "media": [],
@@ -5476,6 +6597,14 @@
       "url": "https://x.com/aleabitoreddit/status/2078130772121399553"
     },
     "lead_62fb4326975492b9f826c63bb266571d": {
+      "entities": {
+        "company_ids": [
+          "co:applied_optoelectronics"
+        ],
+        "tickers": [
+          "AAOI"
+        ]
+      },
       "first_seen": "2026-07-25T09:06:56.758379+00:00",
       "lead_id": "lead_62fb4326975492b9f826c63bb266571d",
       "published_at": "2026-07-23",
@@ -5493,6 +6622,15 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826005737/xslF345X06/ownership.xml"
     },
     "lead_630ef87d8be3d5321db6a94b52dd8d74": {
+      "entities": {
+        "company_ids": [
+          "co:axt"
+        ],
+        "tickers": [
+          "AXTI",
+          "SNDK"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:31.315102+00:00",
       "lead_id": "lead_630ef87d8be3d5321db6a94b52dd8d74",
       "media": [],
@@ -5518,6 +6656,14 @@
       "url": "https://x.com/aleabitoreddit/status/2072733748261720186"
     },
     "lead_645d1fd05b13b7b735654ef26b9b3c60": {
+      "entities": {
+        "company_ids": [
+          "co:globalfoundries"
+        ],
+        "tickers": [
+          "GFS"
+        ]
+      },
       "first_seen": "2026-07-25T09:06:58.734861+00:00",
       "lead_id": "lead_645d1fd05b13b7b735654ef26b9b3c60",
       "published_at": "2026-07-24",
@@ -5535,6 +6681,14 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1709048/000162828026049554/xslF345X06/wk-form4_1784918046.xml"
     },
     "lead_649c104b63846fa7ff3cecbc703cb560": {
+      "entities": {
+        "company_ids": [
+          "co:globalfoundries"
+        ],
+        "tickers": [
+          "GFS"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:26.728902+00:00",
       "lead_id": "lead_649c104b63846fa7ff3cecbc703cb560",
       "published_at": "2026-07-20",
@@ -5552,6 +6706,10 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1709048/000162828026048834/xslF345X06/wk-form4_1784581401.xml"
     },
     "lead_64a83648dba254bef6bccd411eceef6b": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:47:19.395615+00:00",
       "lead_id": "lead_64a83648dba254bef6bccd411eceef6b",
       "media": [],
@@ -5577,6 +6735,10 @@
       "url": "https://x.com/aleabitoreddit/status/2074147829619310962"
     },
     "lead_653b2da7843a6e6e52e432b66f37e379": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:47:13.884407+00:00",
       "lead_id": "lead_653b2da7843a6e6e52e432b66f37e379",
       "media": [
@@ -5616,6 +6778,10 @@
       "url": "https://x.com/aleabitoreddit/status/2074802313324384645"
     },
     "lead_65546bfed2ab1a31f12490ec777bac1d": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:47:09.304922+00:00",
       "lead_id": "lead_65546bfed2ab1a31f12490ec777bac1d",
       "media": [],
@@ -5641,6 +6807,14 @@
       "url": "https://x.com/aleabitoreddit/status/2075559573520519562"
     },
     "lead_65ee4298b4ed323ef3394c30c29fe4bd": {
+      "entities": {
+        "company_ids": [
+          "co:coherent"
+        ],
+        "tickers": [
+          "COHR"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:18.082205+00:00",
       "lead_id": "lead_65ee4298b4ed323ef3394c30c29fe4bd",
       "published_at": "2026-04-28",
@@ -5658,6 +6832,10 @@
       "url": "https://www.sec.gov/Archives/edgar/data/820318/000119312526187297/d107137d8k.htm"
     },
     "lead_66b81bcd4fc27bc231ea075bf6c660eb": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:47:17.663810+00:00",
       "lead_id": "lead_66b81bcd4fc27bc231ea075bf6c660eb",
       "media": [
@@ -5697,6 +6875,14 @@
       "url": "https://x.com/aleabitoreddit/status/2074525146736738396"
     },
     "lead_68b6a66c25484dc609df16fa560aee98": {
+      "entities": {
+        "company_ids": [
+          "co:globalfoundries"
+        ],
+        "tickers": [
+          "GFS"
+        ]
+      },
       "first_seen": "2026-07-30T22:38:48.776623+00:00",
       "lead_id": "lead_68b6a66c25484dc609df16fa560aee98",
       "published_at": "2026-07-30",
@@ -5714,6 +6900,10 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000184/xslF345X06/wk-form4_1785439247.xml"
     },
     "lead_68c4183e9eb7455fcc377e304d327db9": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:46:47.957699+00:00",
       "lead_id": "lead_68c4183e9eb7455fcc377e304d327db9",
       "media": [],
@@ -5739,6 +6929,12 @@
       "url": "https://x.com/aleabitoreddit/status/2080039431499919449"
     },
     "lead_68f65cfdfa5a8d6eac300aafb6e0dd23": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "NBIS"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:26.416137+00:00",
       "lead_id": "lead_68f65cfdfa5a8d6eac300aafb6e0dd23",
       "media": [
@@ -5778,6 +6974,16 @@
       "url": "https://x.com/aleabitoreddit/status/2073305375957541013"
     },
     "lead_6ac3699094b2106a3af12848febb87f3": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "CCXI",
+          "OUST",
+          "AEVA",
+          "FCEL",
+          "BE"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:36.703058+00:00",
       "lead_id": "lead_6ac3699094b2106a3af12848febb87f3",
       "media": [],
@@ -5804,6 +7010,21 @@
     },
     "lead_6b03a1645ffd5ff134e1bac977b1154c": {
       "content_updated_at": "2026-07-29T13:46:51.380917+00:00",
+      "entities": {
+        "company_ids": [
+          "co:nvidia",
+          "co:globalfoundries",
+          "co:broadcom"
+        ],
+        "tickers": [
+          "AMD",
+          "NVDA",
+          "SIVE",
+          "GFS",
+          "ALAB",
+          "AVGO"
+        ]
+      },
       "first_seen": "2026-07-25T09:06:50.926863+00:00",
       "lead_id": "lead_6b03a1645ffd5ff134e1bac977b1154c",
       "media": [
@@ -5871,6 +7092,12 @@
       "url": "https://x.com/aleabitoreddit/status/2079495178793201678"
     },
     "lead_6d1adf0b8604fa090d3511191a19f7e4": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "IREN"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:33.021726+00:00",
       "lead_id": "lead_6d1adf0b8604fa090d3511191a19f7e4",
       "media": [
@@ -5910,6 +7137,21 @@
       "url": "https://x.com/aleabitoreddit/status/2072610437817078056"
     },
     "lead_6d6393468a44e9d39e518ee6cb700d20": {
+      "entities": {
+        "company_ids": [
+          "co:jabil",
+          "co:globalfoundries",
+          "co:nvidia",
+          "co:poet_technologies"
+        ],
+        "tickers": [
+          "JBL",
+          "GFS",
+          "SIVE",
+          "NVDA",
+          "POET"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:31.315136+00:00",
       "lead_id": "lead_6d6393468a44e9d39e518ee6cb700d20",
       "media": [],
@@ -5940,6 +7182,14 @@
       "url": "https://x.com/aleabitoreddit/status/2072732576952012829"
     },
     "lead_6d7f2db8281ed629582c179a8aaeca5a": {
+      "entities": {
+        "company_ids": [
+          "co:meta"
+        ],
+        "tickers": [
+          "META"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:36.702916+00:00",
       "lead_id": "lead_6d7f2db8281ed629582c179a8aaeca5a",
       "media": [
@@ -5979,6 +7229,12 @@
       "url": "https://x.com/aleabitoreddit/status/2072301677211009426"
     },
     "lead_6ed7944da9ec678b1ed94af8269e41fe": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "AMD"
+        ]
+      },
       "first_seen": "2026-07-29T13:46:43.851112+00:00",
       "lead_id": "lead_6ed7944da9ec678b1ed94af8269e41fe",
       "media": [
@@ -6018,6 +7274,10 @@
       "url": "https://x.com/aleabitoreddit/status/2080380170779898186"
     },
     "lead_6fb8bec46249fc64d7301c1c9fd7be96": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:46:41.611505+00:00",
       "lead_id": "lead_6fb8bec46249fc64d7301c1c9fd7be96",
       "media": [],
@@ -6043,6 +7303,14 @@
       "url": "https://x.com/aleabitoreddit/status/2082237871768166511"
     },
     "lead_6fe8187893d0e728c504af8f4d20d66d": {
+      "entities": {
+        "company_ids": [
+          "co:axt"
+        ],
+        "tickers": [
+          "AXTI"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:22.502775+00:00",
       "lead_id": "lead_6fe8187893d0e728c504af8f4d20d66d",
       "published_at": "2026-06-17",
@@ -6060,6 +7328,13 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1051627/000143774926020894/xslF345X06/rdgdoc.xml"
     },
     "lead_705649a420dd727efc8440a77a92c307": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "AMD",
+          "SIVE"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:09.722757+00:00",
       "lead_id": "lead_705649a420dd727efc8440a77a92c307",
       "media": [],
@@ -6085,6 +7360,12 @@
       "url": "https://x.com/aleabitoreddit/status/2075548289697792305"
     },
     "lead_70685d4e83abf0f1405809b368db1069": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "VPG"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:06.139585+00:00",
       "lead_id": "lead_70685d4e83abf0f1405809b368db1069",
       "media": [],
@@ -6110,6 +7391,14 @@
       "url": "https://x.com/aleabitoreddit/status/2076281362248769713"
     },
     "lead_70a564244c8beb93470c9853a36df18a": {
+      "entities": {
+        "company_ids": [
+          "co:google"
+        ],
+        "tickers": [
+          "GOOGL"
+        ]
+      },
       "first_seen": "2026-07-29T13:46:41.611687+00:00",
       "lead_id": "lead_70a564244c8beb93470c9853a36df18a",
       "media": [],
@@ -6135,6 +7424,16 @@
       "url": "https://x.com/aleabitoreddit/status/2082176491216085377"
     },
     "lead_713e031c961ce368a24f92dc65d7525b": {
+      "entities": {
+        "company_ids": [
+          "co:meta",
+          "co:nvidia"
+        ],
+        "tickers": [
+          "META",
+          "NVDA"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:17.663878+00:00",
       "lead_id": "lead_713e031c961ce368a24f92dc65d7525b",
       "media": [],
@@ -6160,6 +7459,12 @@
       "url": "https://x.com/aleabitoreddit/status/2074507578877599867"
     },
     "lead_74225cd7714e9466dcb4f602dc412919": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "EWY"
+        ]
+      },
       "first_seen": "2026-07-29T13:46:57.013337+00:00",
       "lead_id": "lead_74225cd7714e9466dcb4f602dc412919",
       "media": [],
@@ -6186,6 +7491,10 @@
     },
     "lead_7492a9c7d071032785306522c73abe39": {
       "content_updated_at": "2026-07-29T13:46:54.378118+00:00",
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-25T09:06:50.926934+00:00",
       "lead_id": "lead_7492a9c7d071032785306522c73abe39",
       "media": [
@@ -6240,6 +7549,14 @@
       "url": "https://x.com/aleabitoreddit/status/2078914447180263438"
     },
     "lead_7542d1fbe0f10b6a3b60b28c3851444e": {
+      "entities": {
+        "company_ids": [
+          "co:globalfoundries"
+        ],
+        "tickers": [
+          "GFS"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:26.728879+00:00",
       "lead_id": "lead_7542d1fbe0f10b6a3b60b28c3851444e",
       "published_at": "2026-07-20",
@@ -6257,6 +7574,14 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1709048/000162828026048836/xslF345X06/wk-form4_1784581782.xml"
     },
     "lead_760eb6913a23e02842e06ac15b77d48d": {
+      "entities": {
+        "company_ids": [
+          "co:tower_semiconductor"
+        ],
+        "tickers": [
+          "TSEM"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:25.644504+00:00",
       "lead_id": "lead_760eb6913a23e02842e06ac15b77d48d",
       "published_at": "2026-07-06",
@@ -6274,6 +7599,10 @@
       "url": "https://www.sec.gov/Archives/edgar/data/928876/000197640826000633/xslF345X06/primary_doc.xml"
     },
     "lead_7616e21403402691df6bf7de672d6d5c": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:47:15.389629+00:00",
       "lead_id": "lead_7616e21403402691df6bf7de672d6d5c",
       "media": [],
@@ -6299,6 +7628,14 @@
       "url": "https://x.com/aleabitoreddit/status/2074571766186524811"
     },
     "lead_762d8753ad5c0a8fd5a14a5ccbad9d83": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "SPCX",
+          "CBRS",
+          "CCXI"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:31.314963+00:00",
       "lead_id": "lead_762d8753ad5c0a8fd5a14a5ccbad9d83",
       "media": [],
@@ -6324,6 +7661,14 @@
       "url": "https://x.com/aleabitoreddit/status/2072745577310564861"
     },
     "lead_77fcb309c1c680e74f05d7e23fc66b30": {
+      "entities": {
+        "company_ids": [
+          "co:globalfoundries"
+        ],
+        "tickers": [
+          "GFS"
+        ]
+      },
       "first_seen": "2026-07-30T22:38:48.776591+00:00",
       "lead_id": "lead_77fcb309c1c680e74f05d7e23fc66b30",
       "published_at": "2026-07-30",
@@ -6341,6 +7686,19 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000186/xslF345X06/wk-form4_1785439258.xml"
     },
     "lead_78a655cf74ea5516f2d24b2ac3eeb8bf": {
+      "entities": {
+        "company_ids": [
+          "co:globalfoundries",
+          "co:lumentum",
+          "co:intel"
+        ],
+        "tickers": [
+          "GFS",
+          "SIVE",
+          "LITE",
+          "INTC"
+        ]
+      },
       "first_seen": "2026-07-29T22:35:06.358066+00:00",
       "lead_id": "lead_78a655cf74ea5516f2d24b2ac3eeb8bf",
       "media": [
@@ -6403,6 +7761,14 @@
       "url": "https://x.com/aleabitoreddit/status/2082513405219631384"
     },
     "lead_795d937852b829058416270a4f3b8c6c": {
+      "entities": {
+        "company_ids": [
+          "co:applied_optoelectronics"
+        ],
+        "tickers": [
+          "AAOI"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:23.595719+00:00",
       "lead_id": "lead_795d937852b829058416270a4f3b8c6c",
       "published_at": "2026-06-16",
@@ -6420,6 +7786,19 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826004881/xslF345X06/ownership.xml"
     },
     "lead_798000da36c2b1aa3070ddf51bdd6019": {
+      "entities": {
+        "company_ids": [
+          "co:meta"
+        ],
+        "tickers": [
+          "META",
+          "AMZN",
+          "VRT",
+          "ETN",
+          "BWA",
+          "ENS"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:23.983520+00:00",
       "lead_id": "lead_798000da36c2b1aa3070ddf51bdd6019",
       "media": [
@@ -6464,6 +7843,10 @@
       "url": "https://x.com/aleabitoreddit/status/2073763512216899825"
     },
     "lead_79a1d5eda34eb4c7c518dd0d3268d807": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:47:10.874475+00:00",
       "lead_id": "lead_79a1d5eda34eb4c7c518dd0d3268d807",
       "media": [],
@@ -6489,6 +7872,14 @@
       "url": "https://x.com/aleabitoreddit/status/2075291803537027204"
     },
     "lead_7a35cedfdcf7226f4b045d3f83b84c9b": {
+      "entities": {
+        "company_ids": [
+          "co:tower_semiconductor"
+        ],
+        "tickers": [
+          "TSEM"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:25.644481+00:00",
       "lead_id": "lead_7a35cedfdcf7226f4b045d3f83b84c9b",
       "published_at": "2026-07-06",
@@ -6506,6 +7897,14 @@
       "url": "https://www.sec.gov/Archives/edgar/data/928876/000197640826000635/xslF345X06/primary_doc.xml"
     },
     "lead_7a5e9e5d146fe9cfec4419ea453876c3": {
+      "entities": {
+        "company_ids": [
+          "co:applied_optoelectronics"
+        ],
+        "tickers": [
+          "AAOI"
+        ]
+      },
       "first_seen": "2026-07-25T09:06:56.758390+00:00",
       "lead_id": "lead_7a5e9e5d146fe9cfec4419ea453876c3",
       "published_at": "2026-07-23",
@@ -6523,6 +7922,15 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826005736/xslF345X06/ownership.xml"
     },
     "lead_7ab349347cfb868df1d54d45a29e91a9": {
+      "entities": {
+        "company_ids": [
+          "co:lumentum"
+        ],
+        "tickers": [
+          "SIVE",
+          "LITE"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:10.874576+00:00",
       "lead_id": "lead_7ab349347cfb868df1d54d45a29e91a9",
       "media": [],
@@ -6548,6 +7956,14 @@
       "url": "https://x.com/aleabitoreddit/status/2075218841266016561"
     },
     "lead_7b9c116e84b64ff60100e1157c2e398e": {
+      "entities": {
+        "company_ids": [
+          "co:axt"
+        ],
+        "tickers": [
+          "AXTI"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:22.502741+00:00",
       "lead_id": "lead_7b9c116e84b64ff60100e1157c2e398e",
       "published_at": "2026-06-22",
@@ -6572,6 +7988,10 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1051627/000143774926021307/axti20260622_8k.htm"
     },
     "lead_7bbf1d134806b235e07a8de3130ac5db": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-22T15:37:16.686268+00:00",
       "lead_id": "lead_7bbf1d134806b235e07a8de3130ac5db",
       "published_at": "Tue, 19 May 2026 10:42:15 GMT",
@@ -6591,6 +8011,10 @@
       "url": "https://aleabitoreddit.substack.com/p/sivers-semi-sive-the-cpo-laser-supplier"
     },
     "lead_7d745e51747c8b36b02f3fddb1fafe51": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:46:56.349841+00:00",
       "lead_id": "lead_7d745e51747c8b36b02f3fddb1fafe51",
       "media": [
@@ -6630,6 +8054,12 @@
       "url": "https://x.com/aleabitoreddit/status/2078150537074373117"
     },
     "lead_7d77eec195b215634ac6408c9d644f80": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "CCXI"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:28.683841+00:00",
       "lead_id": "lead_7d77eec195b215634ac6408c9d644f80",
       "media": [
@@ -6670,6 +8100,12 @@
     },
     "lead_7d78fe6824f7f8f545c4eb8b23bb234f": {
       "content_updated_at": "2026-07-29T13:46:46.371264+00:00",
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "AMD"
+        ]
+      },
       "first_seen": "2026-07-25T09:06:50.926761+00:00",
       "lead_id": "lead_7d78fe6824f7f8f545c4eb8b23bb234f",
       "media": [
@@ -6750,6 +8186,10 @@
       "url": "https://x.com/aleabitoreddit/status/2080334612807758136"
     },
     "lead_7d8dcbc9bc78a8c0e104e5cecfe91a10": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:53:29.057253+00:00",
       "lead_id": "lead_7d8dcbc9bc78a8c0e104e5cecfe91a10",
       "media": [],
@@ -6775,6 +8215,13 @@
       "url": "https://x.com/aleabitoreddit/status/2072904441104343444"
     },
     "lead_7e4fdb78156a257629a5ff5f7fe3e54a": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "CCXI",
+          "TSLA"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:31.667257+00:00",
       "lead_id": "lead_7e4fdb78156a257629a5ff5f7fe3e54a",
       "media": [],
@@ -6800,6 +8247,17 @@
       "url": "https://x.com/aleabitoreddit/status/2072636916173066624"
     },
     "lead_7e6f1178ba5944f08d3c40007f219e72": {
+      "entities": {
+        "company_ids": [
+          "co:intel",
+          "co:lumentum"
+        ],
+        "tickers": [
+          "INTC",
+          "LITE",
+          "RDDT"
+        ]
+      },
       "first_seen": "2026-07-29T13:46:58.698761+00:00",
       "lead_id": "lead_7e6f1178ba5944f08d3c40007f219e72",
       "media": [
@@ -6878,6 +8336,14 @@
       "url": "https://x.com/aleabitoreddit/status/2077784594959725056"
     },
     "lead_7f7729ed1b82edffd1cd8a0750ffa6f0": {
+      "entities": {
+        "company_ids": [
+          "co:axt"
+        ],
+        "tickers": [
+          "AXTI"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:22.502764+00:00",
       "lead_id": "lead_7f7729ed1b82edffd1cd8a0750ffa6f0",
       "published_at": "2026-06-17",
@@ -6895,6 +8361,10 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1051627/000143774926020895/xslF345X06/rdgdoc.xml"
     },
     "lead_7f7981f4df0c91f7bd0d0914159ce93a": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:47:19.113286+00:00",
       "lead_id": "lead_7f7981f4df0c91f7bd0d0914159ce93a",
       "media": [],
@@ -6920,6 +8390,22 @@
       "url": "https://x.com/aleabitoreddit/status/2074218760593195010"
     },
     "lead_800fb456828b63727b76094378540c82": {
+      "entities": {
+        "company_ids": [
+          "co:jabil",
+          "co:poet_technologies",
+          "co:globalfoundries",
+          "co:apple"
+        ],
+        "tickers": [
+          "SIVE",
+          "JBL",
+          "AEVA",
+          "POET",
+          "GFS",
+          "AAPL"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:13.384765+00:00",
       "lead_id": "lead_800fb456828b63727b76094378540c82",
       "media": [
@@ -6964,6 +8450,16 @@
       "url": "https://x.com/aleabitoreddit/status/2074842421620527157"
     },
     "lead_8088f665e358a7744d9b6bc1646bccbf": {
+      "entities": {
+        "company_ids": [
+          "co:axt"
+        ],
+        "tickers": [
+          "AXTI",
+          "IQE",
+          "SNDK"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:21.999750+00:00",
       "lead_id": "lead_8088f665e358a7744d9b6bc1646bccbf",
       "media": [
@@ -7026,6 +8522,14 @@
       "url": "https://x.com/aleabitoreddit/status/2074007618046345249"
     },
     "lead_81ba31cd1de380267a03be48750212c2": {
+      "entities": {
+        "company_ids": [
+          "co:coherent"
+        ],
+        "tickers": [
+          "COHR"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:18.082120+00:00",
       "lead_id": "lead_81ba31cd1de380267a03be48750212c2",
       "published_at": "2026-06-05",
@@ -7043,6 +8547,14 @@
       "url": "https://www.sec.gov/Archives/edgar/data/820318/000089914026000627/xslF345X06/form4.xml"
     },
     "lead_81d995b60ddd4b0f93ec28d89298c823": {
+      "entities": {
+        "company_ids": [
+          "co:google"
+        ],
+        "tickers": [
+          "GOOGL"
+        ]
+      },
       "first_seen": "2026-07-29T13:46:47.957635+00:00",
       "lead_id": "lead_81d995b60ddd4b0f93ec28d89298c823",
       "media": [],
@@ -7068,6 +8580,10 @@
       "url": "https://x.com/aleabitoreddit/status/2080042335388500360"
     },
     "lead_82588db79284b466e46edffff6c0a878": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:46:43.560010+00:00",
       "lead_id": "lead_82588db79284b466e46edffff6c0a878",
       "media": [],
@@ -7093,6 +8609,14 @@
       "url": "https://x.com/aleabitoreddit/status/2080428892863803778"
     },
     "lead_830c264f2672720822ce495e715d1893": {
+      "entities": {
+        "company_ids": [
+          "co:globalfoundries"
+        ],
+        "tickers": [
+          "GFS"
+        ]
+      },
       "first_seen": "2026-07-30T22:38:48.776531+00:00",
       "lead_id": "lead_830c264f2672720822ce495e715d1893",
       "published_at": "2026-07-30",
@@ -7110,6 +8634,10 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000190/xslF345X06/wk-form4_1785439283.xml"
     },
     "lead_83d49b45107bf97f2c98508d73279111": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:47:01.129852+00:00",
       "lead_id": "lead_83d49b45107bf97f2c98508d73279111",
       "media": [],
@@ -7135,6 +8663,10 @@
       "url": "https://x.com/aleabitoreddit/status/2077414086959112629"
     },
     "lead_8482d009db1c60e12c73a8a726d8a0df": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T22:35:06.358051+00:00",
       "lead_id": "lead_8482d009db1c60e12c73a8a726d8a0df",
       "media": [
@@ -7168,6 +8700,14 @@
       "url": "https://x.com/aleabitoreddit/status/2082529316655763703"
     },
     "lead_85718e111d4463facc284308619b8be1": {
+      "entities": {
+        "company_ids": [
+          "co:applied_optoelectronics"
+        ],
+        "tickers": [
+          "AAOI"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:09.991474+00:00",
       "lead_id": "lead_85718e111d4463facc284308619b8be1",
       "media": [
@@ -7208,6 +8748,21 @@
     },
     "lead_857582308bdff8e00dd648d213f7d679": {
       "content_updated_at": "2026-07-29T13:46:46.674539+00:00",
+      "entities": {
+        "company_ids": [
+          "co:intel",
+          "co:lumentum",
+          "co:coherent"
+        ],
+        "tickers": [
+          "INTC",
+          "AMD",
+          "MU",
+          "SNDK",
+          "LITE",
+          "COHR"
+        ]
+      },
       "first_seen": "2026-07-25T09:06:50.926772+00:00",
       "lead_id": "lead_857582308bdff8e00dd648d213f7d679",
       "media": [
@@ -7267,6 +8822,16 @@
       "url": "https://x.com/aleabitoreddit/status/2080153334888182065"
     },
     "lead_8731ea81a6fcb4e666a7f2c5cea71e2b": {
+      "entities": {
+        "company_ids": [
+          "co:globalfoundries"
+        ],
+        "tickers": [
+          "AMD",
+          "SIVE",
+          "GFS"
+        ]
+      },
       "first_seen": "2026-07-29T13:46:43.560048+00:00",
       "lead_id": "lead_8731ea81a6fcb4e666a7f2c5cea71e2b",
       "media": [],
@@ -7292,6 +8857,14 @@
       "url": "https://x.com/aleabitoreddit/status/2080411863448522994"
     },
     "lead_873e98e4ef4115a235ec9ab644c8ed63": {
+      "entities": {
+        "company_ids": [
+          "co:lam_research"
+        ],
+        "tickers": [
+          "LRCX"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:21.356657+00:00",
       "lead_id": "lead_873e98e4ef4115a235ec9ab644c8ed63",
       "published_at": "2026-04-28",
@@ -7309,6 +8882,14 @@
       "url": "https://www.sec.gov/Archives/edgar/data/707549/000164241526000008/xslF345X06/wk-form4_1777399454.xml"
     },
     "lead_878039c1c6b351d4cbf7c4477fefa6a5": {
+      "entities": {
+        "company_ids": [
+          "co:applied_optoelectronics"
+        ],
+        "tickers": [
+          "AAOI"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:23.595654+00:00",
       "lead_id": "lead_878039c1c6b351d4cbf7c4477fefa6a5",
       "published_at": "2026-06-18",
@@ -7326,6 +8907,10 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826004979/xslF345X06/ownership.xml"
     },
     "lead_8830680ca1a27e2cd82df03ef10ce133": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:47:13.884466+00:00",
       "lead_id": "lead_8830680ca1a27e2cd82df03ef10ce133",
       "media": [],
@@ -7351,6 +8936,16 @@
       "url": "https://x.com/aleabitoreddit/status/2074801157365780888"
     },
     "lead_8838f7b84c0dd94f7e0b8a037085e35f": {
+      "entities": {
+        "company_ids": [
+          "co:axt",
+          "co:coherent"
+        ],
+        "tickers": [
+          "AXTI",
+          "COHR"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:30.382859+00:00",
       "lead_id": "lead_8838f7b84c0dd94f7e0b8a037085e35f",
       "media": [
@@ -7401,6 +8996,12 @@
       "url": "https://x.com/aleabitoreddit/status/2072795186263187831"
     },
     "lead_885ddd69b263f8197cfbe2db5825c332": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "AMD"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:06.139547+00:00",
       "lead_id": "lead_885ddd69b263f8197cfbe2db5825c332",
       "media": [],
@@ -7426,6 +9027,12 @@
       "url": "https://x.com/aleabitoreddit/status/2076284746385240101"
     },
     "lead_89656d14e16503d68cf12c4366c75045": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "CCXI"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:31.017316+00:00",
       "lead_id": "lead_89656d14e16503d68cf12c4366c75045",
       "media": [
@@ -7478,6 +9085,17 @@
       "url": "https://x.com/aleabitoreddit/status/2072765527764971642"
     },
     "lead_89f2cee24a796d94b33e85d1dd5e0b04": {
+      "entities": {
+        "company_ids": [
+          "co:meta"
+        ],
+        "tickers": [
+          "NBIS",
+          "SPCX",
+          "META",
+          "MSFT"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:03.519352+00:00",
       "lead_id": "lead_89f2cee24a796d94b33e85d1dd5e0b04",
       "media": [
@@ -7535,6 +9153,20 @@
       "url": "https://x.com/aleabitoreddit/status/2077044786402660829"
     },
     "lead_8ae4bd1a71426bd5346bf5cd45cc94ba": {
+      "entities": {
+        "company_ids": [
+          "co:jabil",
+          "co:poet_technologies",
+          "co:globalfoundries"
+        ],
+        "tickers": [
+          "SIVE",
+          "JBL",
+          "POET",
+          "AEVA",
+          "GFS"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:31.667103+00:00",
       "lead_id": "lead_8ae4bd1a71426bd5346bf5cd45cc94ba",
       "media": [],
@@ -7560,6 +9192,12 @@
       "url": "https://x.com/aleabitoreddit/status/2072730156297556328"
     },
     "lead_8bda4fb157bb814d2bbddf2c694f4e86": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "MU"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:01.994218+00:00",
       "lead_id": "lead_8bda4fb157bb814d2bbddf2c694f4e86",
       "media": [
@@ -7617,6 +9255,14 @@
       "url": "https://x.com/aleabitoreddit/status/2077228758491386121"
     },
     "lead_8c3fba30392e99a9ac7922057f6994d9": {
+      "entities": {
+        "company_ids": [
+          "co:lam_research"
+        ],
+        "tickers": [
+          "LRCX"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:21.356622+00:00",
       "lead_id": "lead_8c3fba30392e99a9ac7922057f6994d9",
       "published_at": "2026-06-15",
@@ -7634,6 +9280,28 @@
       "url": "https://www.sec.gov/Archives/edgar/data/707549/000119063926000004/xslF345X06/wk-form4_1781540828.xml"
     },
     "lead_8e16834b3c423735ad20eb6f6be7d63b": {
+      "entities": {
+        "company_ids": [
+          "co:lumentum",
+          "co:google",
+          "co:applied_optoelectronics",
+          "co:meta"
+        ],
+        "tickers": [
+          "BE",
+          "TER",
+          "LITE",
+          "SNDK",
+          "AMKR",
+          "GOOGL",
+          "CXMT",
+          "SIVE",
+          "AAOI",
+          "META",
+          "NBIS",
+          "MU"
+        ]
+      },
       "first_seen": "2026-07-28T22:33:39.749915+00:00",
       "lead_id": "lead_8e16834b3c423735ad20eb6f6be7d63b",
       "media": [],
@@ -7661,6 +9329,10 @@
       "url": "https://x.com/aleabitoreddit/status/2082230983487803755"
     },
     "lead_8edbe0cb7532bcaa1445d3147be5140a": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:47:00.513254+00:00",
       "lead_id": "lead_8edbe0cb7532bcaa1445d3147be5140a",
       "media": [
@@ -7700,6 +9372,12 @@
       "url": "https://x.com/aleabitoreddit/status/2077445202252529956"
     },
     "lead_8fcdc53c2a4d4d5d089ec784a2f0241c": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "AMD"
+        ]
+      },
       "first_seen": "2026-07-29T13:46:43.254696+00:00",
       "lead_id": "lead_8fcdc53c2a4d4d5d089ec784a2f0241c",
       "media": [
@@ -7739,6 +9417,13 @@
       "url": "https://x.com/aleabitoreddit/status/2080462582335619169"
     },
     "lead_90c5dcc2d514c7ed4342bd2acdad08f7": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "TSLA",
+          "CCXI"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:10.603128+00:00",
       "lead_id": "lead_90c5dcc2d514c7ed4342bd2acdad08f7",
       "media": [],
@@ -7764,6 +9449,14 @@
       "url": "https://x.com/aleabitoreddit/status/2075306506585813108"
     },
     "lead_91566124ed7104cd67577f995d19c83f": {
+      "entities": {
+        "company_ids": [
+          "co:lam_research"
+        ],
+        "tickers": [
+          "LRCX"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:21.356633+00:00",
       "lead_id": "lead_91566124ed7104cd67577f995d19c83f",
       "published_at": "2026-06-02",
@@ -7781,6 +9474,14 @@
       "url": "https://www.sec.gov/Archives/edgar/data/707549/000196659826000004/xslF345X06/wk-form4_1780416309.xml"
     },
     "lead_928514b80dea6644f199f48c0803092d": {
+      "entities": {
+        "company_ids": [
+          "co:axt"
+        ],
+        "tickers": [
+          "AXTI"
+        ]
+      },
       "first_seen": "2026-07-29T22:35:11.212717+00:00",
       "lead_id": "lead_928514b80dea6644f199f48c0803092d",
       "published_at": "2026-07-29",
@@ -7798,6 +9499,14 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1051627/000143774926024883/axti20260715_8k.htm"
     },
     "lead_9560cb7de6f030c75af6b74251114924": {
+      "entities": {
+        "company_ids": [
+          "co:applied_optoelectronics"
+        ],
+        "tickers": [
+          "AAOI"
+        ]
+      },
       "first_seen": "2026-07-29T13:46:54.703941+00:00",
       "lead_id": "lead_9560cb7de6f030c75af6b74251114924",
       "media": [],
@@ -7823,6 +9532,21 @@
       "url": "https://x.com/aleabitoreddit/status/2078259660784910661"
     },
     "lead_9764dccc195ed2f828b901eacabe0b2c": {
+      "entities": {
+        "company_ids": [
+          "co:globalfoundries",
+          "co:jabil",
+          "co:poet_technologies",
+          "co:lumentum"
+        ],
+        "tickers": [
+          "SIVE",
+          "GFS",
+          "JBL",
+          "POET",
+          "LITE"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:17.663916+00:00",
       "lead_id": "lead_9764dccc195ed2f828b901eacabe0b2c",
       "media": [],
@@ -7848,6 +9572,18 @@
       "url": "https://x.com/aleabitoreddit/status/2074504394608193799"
     },
     "lead_97d627b017131ff39599b413b00c2e15": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia",
+          "co:apple"
+        ],
+        "tickers": [
+          "TSLA",
+          "MSFT",
+          "NVDA",
+          "AAPL"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:07.791962+00:00",
       "lead_id": "lead_97d627b017131ff39599b413b00c2e15",
       "media": [],
@@ -7873,6 +9609,17 @@
       "url": "https://x.com/aleabitoreddit/status/2075896028323254679"
     },
     "lead_9888828c69141e06a021cb380a098abd": {
+      "entities": {
+        "company_ids": [
+          "co:lumentum",
+          "co:coherent"
+        ],
+        "tickers": [
+          "SIVE",
+          "LITE",
+          "COHR"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:03.519413+00:00",
       "lead_id": "lead_9888828c69141e06a021cb380a098abd",
       "media": [],
@@ -7898,6 +9645,12 @@
       "url": "https://x.com/aleabitoreddit/status/2077044267151925411"
     },
     "lead_98f8189824f53a0f3b6a58e79133dc6b": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "CCXI"
+        ]
+      },
       "first_seen": "2026-07-28T22:33:39.749946+00:00",
       "lead_id": "lead_98f8189824f53a0f3b6a58e79133dc6b",
       "media": [
@@ -7980,6 +9733,12 @@
       "url": "https://x.com/aleabitoreddit/status/2082175588555702410"
     },
     "lead_9b290ae15ba6fd6584afe7f3af56b234": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "CCXI"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:20.328935+00:00",
       "lead_id": "lead_9b290ae15ba6fd6584afe7f3af56b234",
       "media": [],
@@ -8005,6 +9764,12 @@
       "url": "https://x.com/aleabitoreddit/status/2074087304688497118"
     },
     "lead_9b2aad2219b0e2ff47232047db467bfa": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "LPK"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:27.982506+00:00",
       "lead_id": "lead_9b2aad2219b0e2ff47232047db467bfa",
       "media": [
@@ -8062,6 +9827,14 @@
       "url": "https://x.com/aleabitoreddit/status/2072986020640076052"
     },
     "lead_9c307b5e44b4cd9b129d36163d450b50": {
+      "entities": {
+        "company_ids": [
+          "co:intel"
+        ],
+        "tickers": [
+          "INTC"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:35.435865+00:00",
       "lead_id": "lead_9c307b5e44b4cd9b129d36163d450b50",
       "media": [
@@ -8101,6 +9874,14 @@
       "url": "https://x.com/aleabitoreddit/status/2072570681586553112"
     },
     "lead_9c9f51de58d334452a3838d5db8636e1": {
+      "entities": {
+        "company_ids": [
+          "co:applied_materials"
+        ],
+        "tickers": [
+          "AMAT"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:20.250697+00:00",
       "lead_id": "lead_9c9f51de58d334452a3838d5db8636e1",
       "published_at": "2026-06-17",
@@ -8119,6 +9900,10 @@
     },
     "lead_9cfeeb81b915d59d455bcb7b619ddc55": {
       "content_updated_at": "2026-07-29T13:46:54.703832+00:00",
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-25T09:06:50.926955+00:00",
       "lead_id": "lead_9cfeeb81b915d59d455bcb7b619ddc55",
       "media": [],
@@ -8159,6 +9944,10 @@
       "url": "https://x.com/aleabitoreddit/status/2078283847612186739"
     },
     "lead_9fd9b50cd11ff697931a504dad6df774": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:47:10.874548+00:00",
       "lead_id": "lead_9fd9b50cd11ff697931a504dad6df774",
       "media": [],
@@ -8184,6 +9973,14 @@
       "url": "https://x.com/aleabitoreddit/status/2075228811315343460"
     },
     "lead_9ff86c00d2d3b0d1bcfedc009510393f": {
+      "entities": {
+        "company_ids": [
+          "co:axt"
+        ],
+        "tickers": [
+          "AXTI"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:22.502752+00:00",
       "lead_id": "lead_9ff86c00d2d3b0d1bcfedc009510393f",
       "published_at": "2026-06-17",
@@ -8209,6 +10006,10 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1051627/000143774926020978/axti20260615_8k.htm"
     },
     "lead_a0ed818dccc2bdce19f8a00f8491d54f": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:47:15.764271+00:00",
       "lead_id": "lead_a0ed818dccc2bdce19f8a00f8491d54f",
       "media": [],
@@ -8234,6 +10035,14 @@
       "url": "https://x.com/aleabitoreddit/status/2074554046325850160"
     },
     "lead_a0f96bdc5c67066a8eda0bae84f57523": {
+      "entities": {
+        "company_ids": [
+          "co:lumentum"
+        ],
+        "tickers": [
+          "LITE"
+        ]
+      },
       "first_seen": "2026-07-30T22:38:43.285872+00:00",
       "lead_id": "lead_a0f96bdc5c67066a8eda0bae84f57523",
       "published_at": "2026-07-30",
@@ -8251,6 +10060,22 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1633978/000162828026051078/lite-20260727.htm"
     },
     "lead_a233915b0ec4520fd7aa34f73d8e1613": {
+      "entities": {
+        "company_ids": [
+          "co:lumentum",
+          "co:tsmc",
+          "co:applied_optoelectronics",
+          "co:axt"
+        ],
+        "tickers": [
+          "LITE",
+          "SIVE",
+          "TSM",
+          "AAOI",
+          "IQE",
+          "AXTI"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:10.603088+00:00",
       "lead_id": "lead_a233915b0ec4520fd7aa34f73d8e1613",
       "media": [],
@@ -8276,6 +10101,14 @@
       "url": "https://x.com/aleabitoreddit/status/2075496116481884524"
     },
     "lead_a2c7358ac3d8e81ef853864b7d00073b": {
+      "entities": {
+        "company_ids": [
+          "co:lam_research"
+        ],
+        "tickers": [
+          "LRCX"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:21.356609+00:00",
       "lead_id": "lead_a2c7358ac3d8e81ef853864b7d00073b",
       "published_at": "2026-06-15",
@@ -8293,6 +10126,14 @@
       "url": "https://www.sec.gov/Archives/edgar/data/707549/000119063926000006/xslF345X06/wk-form4_1781566408.xml"
     },
     "lead_a3548c3bb8a56282baecde6c9e90734e": {
+      "entities": {
+        "company_ids": [
+          "co:lumentum"
+        ],
+        "tickers": [
+          "LITE"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:19.172597+00:00",
       "lead_id": "lead_a3548c3bb8a56282baecde6c9e90734e",
       "published_at": "2026-07-16",
@@ -8310,6 +10151,14 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1633978/000160799026000001/xslF345X06/form4-07172026_120732.xml"
     },
     "lead_a440efe914fc9272a997fa97c3694a0d": {
+      "entities": {
+        "company_ids": [
+          "co:applied_optoelectronics"
+        ],
+        "tickers": [
+          "AAOI"
+        ]
+      },
       "first_seen": "2026-07-25T09:06:56.758367+00:00",
       "lead_id": "lead_a440efe914fc9272a997fa97c3694a0d",
       "published_at": "2026-07-23",
@@ -8328,6 +10177,24 @@
     },
     "lead_a4eca2bd1a52d9a049fe6a5f6a642aab": {
       "content_updated_at": "2026-07-29T13:46:51.647894+00:00",
+      "entities": {
+        "company_ids": [
+          "co:lumentum",
+          "co:applied_optoelectronics",
+          "co:intel",
+          "co:marvell_technology"
+        ],
+        "tickers": [
+          "SIVE",
+          "LITE",
+          "AAOI",
+          "NBIS",
+          "IREN",
+          "INTC",
+          "AMD",
+          "MRVL"
+        ]
+      },
       "first_seen": "2026-07-25T09:06:50.926873+00:00",
       "lead_id": "lead_a4eca2bd1a52d9a049fe6a5f6a642aab",
       "media": [
@@ -8382,6 +10249,15 @@
       "url": "https://x.com/aleabitoreddit/status/2079479755481776221"
     },
     "lead_a53867cc19e44995d9ee1ef2fb2c8fbd": {
+      "entities": {
+        "company_ids": [
+          "co:meta"
+        ],
+        "tickers": [
+          "META",
+          "SNDK"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:11.610595+00:00",
       "lead_id": "lead_a53867cc19e44995d9ee1ef2fb2c8fbd",
       "media": [
@@ -8439,6 +10315,10 @@
       "url": "https://x.com/aleabitoreddit/status/2075199849507762279"
     },
     "lead_a7798e522426f8ada1f00a87cfb5d74e": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:47:14.162242+00:00",
       "lead_id": "lead_a7798e522426f8ada1f00a87cfb5d74e",
       "media": [],
@@ -8464,6 +10344,12 @@
       "url": "https://x.com/aleabitoreddit/status/2074793083137556545"
     },
     "lead_a7e1fbdd7e16b66481bc53a3d934c128": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "IREN"
+        ]
+      },
       "first_seen": "2026-07-29T13:46:57.013216+00:00",
       "lead_id": "lead_a7e1fbdd7e16b66481bc53a3d934c128",
       "media": [],
@@ -8489,6 +10375,14 @@
       "url": "https://x.com/aleabitoreddit/status/2078136855154094272"
     },
     "lead_a8256faf3304ce743ea2bc0a9724edff": {
+      "entities": {
+        "company_ids": [
+          "co:coherent"
+        ],
+        "tickers": [
+          "COHR"
+        ]
+      },
       "first_seen": "2026-07-25T09:06:52.028389+00:00",
       "lead_id": "lead_a8256faf3304ce743ea2bc0a9724edff",
       "published_at": "2026-07-24",
@@ -8506,6 +10400,14 @@
       "url": "https://www.sec.gov/Archives/edgar/data/820318/000089914026000726/xslF345X06/form4.xml"
     },
     "lead_a86ef356511602e278888eabb9b34082": {
+      "entities": {
+        "company_ids": [
+          "co:lam_research"
+        ],
+        "tickers": [
+          "LRCX"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:21.356568+00:00",
       "lead_id": "lead_a86ef356511602e278888eabb9b34082",
       "published_at": "2026-07-14",
@@ -8523,6 +10425,14 @@
       "url": "https://www.sec.gov/Archives/edgar/data/707549/000131606526000012/xslF345X06/wk-form4_1784048170.xml"
     },
     "lead_a9b6bd59cd2a456b0f7bc1ffa27245f6": {
+      "entities": {
+        "company_ids": [
+          "co:lumentum"
+        ],
+        "tickers": [
+          "LITE"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:19.172746+00:00",
       "lead_id": "lead_a9b6bd59cd2a456b0f7bc1ffa27245f6",
       "published_at": "2026-06-04",
@@ -8541,6 +10451,34 @@
     },
     "lead_a9cbebd4ff6590c97c5a7f1919e72261": {
       "content_updated_at": "2026-07-29T13:46:50.528703+00:00",
+      "entities": {
+        "company_ids": [
+          "co:applied_optoelectronics",
+          "co:axt",
+          "co:tower_semiconductor",
+          "co:lumentum",
+          "co:intel",
+          "co:marvell_technology"
+        ],
+        "tickers": [
+          "SIVEF",
+          "IQEF",
+          "AEHR",
+          "CIFR",
+          "NBIS",
+          "AAOI",
+          "LPK",
+          "AXTI",
+          "MU",
+          "SNDK",
+          "SOI",
+          "TSEM",
+          "LITE",
+          "INTC",
+          "AMD",
+          "MRVL"
+        ]
+      },
       "first_seen": "2026-07-25T09:06:50.926852+00:00",
       "lead_id": "lead_a9cbebd4ff6590c97c5a7f1919e72261",
       "media": [],
@@ -8581,6 +10519,12 @@
       "url": "https://x.com/aleabitoreddit/status/2079622706572804368"
     },
     "lead_a9decd56cd086ff593d6e307c0508b48": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "AEVA"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:27.289011+00:00",
       "lead_id": "lead_a9decd56cd086ff593d6e307c0508b48",
       "media": [
@@ -8648,6 +10592,14 @@
       "url": "https://x.com/aleabitoreddit/status/2073044119287722024"
     },
     "lead_a9eecd775218a780048490e677cf5364": {
+      "entities": {
+        "company_ids": [
+          "co:lumentum"
+        ],
+        "tickers": [
+          "LITE"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:19.172710+00:00",
       "lead_id": "lead_a9eecd775218a780048490e677cf5364",
       "published_at": "2026-07-16",
@@ -8665,6 +10617,14 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1633978/000171103526000002/xslF345X06/form4-07172026_120709.xml"
     },
     "lead_aa00cda139834f060a0d24b0245844ac": {
+      "entities": {
+        "company_ids": [
+          "co:applied_materials"
+        ],
+        "tickers": [
+          "AMAT"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:20.250671+00:00",
       "lead_id": "lead_aa00cda139834f060a0d24b0245844ac",
       "published_at": "2026-07-01",
@@ -8682,6 +10642,14 @@
       "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026046609/xslF345X06/wk-form4_1782940748.xml"
     },
     "lead_abc654e19602954c8069ad594c1aa440": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia"
+        ],
+        "tickers": [
+          "NVDA"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:27.982629+00:00",
       "lead_id": "lead_abc654e19602954c8069ad594c1aa440",
       "media": [],
@@ -8707,6 +10675,14 @@
       "url": "https://x.com/aleabitoreddit/status/2072936659369517341"
     },
     "lead_ac2d4f7e3c0a017783e2221a8e1bddb7": {
+      "entities": {
+        "company_ids": [
+          "co:tower_semiconductor"
+        ],
+        "tickers": [
+          "TSEM"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:25.644525+00:00",
       "lead_id": "lead_ac2d4f7e3c0a017783e2221a8e1bddb7",
       "published_at": "2026-07-06",
@@ -8724,6 +10700,14 @@
       "url": "https://www.sec.gov/Archives/edgar/data/928876/000197640826000631/xslF345X06/primary_doc.xml"
     },
     "lead_ac6c5e295b150a9c5fb79f9252ab9dd0": {
+      "entities": {
+        "company_ids": [
+          "co:meta"
+        ],
+        "tickers": [
+          "META"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:33.649038+00:00",
       "lead_id": "lead_ac6c5e295b150a9c5fb79f9252ab9dd0",
       "media": [
@@ -8763,6 +10747,10 @@
       "url": "https://x.com/aleabitoreddit/status/2072577526384546095"
     },
     "lead_acc03d30170607ddd77f9bf24ec3bdb7": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:47:19.113359+00:00",
       "lead_id": "lead_acc03d30170607ddd77f9bf24ec3bdb7",
       "media": [],
@@ -8788,6 +10776,10 @@
       "url": "https://x.com/aleabitoreddit/status/2074178455047147526"
     },
     "lead_ad330c67a354d9bebadefb95d712616d": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:47:16.108207+00:00",
       "lead_id": "lead_ad330c67a354d9bebadefb95d712616d",
       "media": [
@@ -8842,6 +10834,12 @@
       "url": "https://x.com/aleabitoreddit/status/2074550520975679762"
     },
     "lead_ad5384c50b83b2e45b0cf0041cb1a878": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "SIVE"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:10.603006+00:00",
       "lead_id": "lead_ad5384c50b83b2e45b0cf0041cb1a878",
       "media": [
@@ -8894,6 +10892,14 @@
       "url": "https://x.com/aleabitoreddit/status/2075539824589860866"
     },
     "lead_ad57b7f621a69d781b3bd9da17b8f776": {
+      "entities": {
+        "company_ids": [
+          "co:coherent"
+        ],
+        "tickers": [
+          "COHR"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:18.082188+00:00",
       "lead_id": "lead_ad57b7f621a69d781b3bd9da17b8f776",
       "published_at": "2026-05-06",
@@ -8911,6 +10917,12 @@
       "url": "https://www.sec.gov/Archives/edgar/data/820318/000082031826000013/iivi-20260331.htm"
     },
     "lead_ad963c03ff79f01c91aa8bc1e924e47f": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "SKHY"
+        ]
+      },
       "first_seen": "2026-07-29T13:46:54.378220+00:00",
       "lead_id": "lead_ad963c03ff79f01c91aa8bc1e924e47f",
       "media": [],
@@ -8936,6 +10948,14 @@
       "url": "https://x.com/aleabitoreddit/status/2078341955411738744"
     },
     "lead_af57fda547a71e40dc0b6a4eb5b3ddf2": {
+      "entities": {
+        "company_ids": [
+          "co:applied_optoelectronics"
+        ],
+        "tickers": [
+          "AAOI"
+        ]
+      },
       "first_seen": "2026-07-25T09:06:56.758332+00:00",
       "lead_id": "lead_af57fda547a71e40dc0b6a4eb5b3ddf2",
       "published_at": "2026-07-23",
@@ -8953,6 +10973,16 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826005740/xslF345X06/ownership.xml"
     },
     "lead_afa72193be496499ef950552d9146c38": {
+      "entities": {
+        "company_ids": [
+          "co:meta"
+        ],
+        "tickers": [
+          "META",
+          "BE",
+          "ASX"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:38.703858+00:00",
       "lead_id": "lead_afa72193be496499ef950552d9146c38",
       "media": [],
@@ -8983,6 +11013,16 @@
       "url": "https://x.com/aleabitoreddit/status/2072178393878290789"
     },
     "lead_b054372ac860dbc6e270ecc7a4d9d50e": {
+      "entities": {
+        "company_ids": [
+          "co:tower_semiconductor",
+          "co:applied_optoelectronics"
+        ],
+        "tickers": [
+          "TSEM",
+          "AAOI"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:04.408278+00:00",
       "lead_id": "lead_b054372ac860dbc6e270ecc7a4d9d50e",
       "media": [
@@ -9040,6 +11080,10 @@
       "url": "https://x.com/aleabitoreddit/status/2077039373711970804"
     },
     "lead_b094e05cb5d191f83d94d06167577a5a": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:53:26.416197+00:00",
       "lead_id": "lead_b094e05cb5d191f83d94d06167577a5a",
       "media": [],
@@ -9065,6 +11109,13 @@
       "url": "https://x.com/aleabitoreddit/status/2073196939785711796"
     },
     "lead_b0b7ecd2d8229b1f3a1f01c557f5339c": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "TSLA",
+          "CCXI"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:10.874384+00:00",
       "lead_id": "lead_b0b7ecd2d8229b1f3a1f01c557f5339c",
       "media": [
@@ -9120,6 +11171,23 @@
       "url": "https://x.com/aleabitoreddit/status/2075302956581449892"
     },
     "lead_b1e793c560334131dfe7c1619715784d": {
+      "entities": {
+        "company_ids": [
+          "co:coherent",
+          "co:lumentum",
+          "co:tsmc",
+          "co:globalfoundries",
+          "co:tower_semiconductor"
+        ],
+        "tickers": [
+          "SIVE",
+          "COHR",
+          "LITE",
+          "TSM",
+          "GFS",
+          "TSEM"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:05.852218+00:00",
       "lead_id": "lead_b1e793c560334131dfe7c1619715784d",
       "media": [
@@ -9177,6 +11245,10 @@
       "url": "https://x.com/aleabitoreddit/status/2076748688559587338"
     },
     "lead_b27ffbab577a82de6e3f7c9ed96e0445": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T04:32:41.209438+00:00",
       "lead_id": "lead_b27ffbab577a82de6e3f7c9ed96e0445",
       "published_at": "2026-02-27",
@@ -9199,6 +11271,12 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1158114/000143774926005875/aaoi20251231_10k.htm"
     },
     "lead_b28a08cabcbecaf261ad0a353cf1a5e1": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "SIVE"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:22.886947+00:00",
       "lead_id": "lead_b28a08cabcbecaf261ad0a353cf1a5e1",
       "media": [],
@@ -9224,6 +11302,16 @@
       "url": "https://x.com/aleabitoreddit/status/2073536758604771517"
     },
     "lead_b2ba8e71225c75239273d6a3b9c54a03": {
+      "entities": {
+        "company_ids": [
+          "co:apple",
+          "co:google"
+        ],
+        "tickers": [
+          "AAPL",
+          "GOOGL"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:07.791993+00:00",
       "lead_id": "lead_b2ba8e71225c75239273d6a3b9c54a03",
       "media": [],
@@ -9249,6 +11337,13 @@
       "url": "https://x.com/aleabitoreddit/status/2075894311741440041"
     },
     "lead_b30c33e9af50c65b8fc4cf8a05f80184": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "TSLA",
+          "CCXI"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:16.464876+00:00",
       "lead_id": "lead_b30c33e9af50c65b8fc4cf8a05f80184",
       "media": [
@@ -9303,6 +11398,10 @@
       "url": "https://x.com/aleabitoreddit/status/2074548850996707412"
     },
     "lead_b33a80a4573acf8a053ea2324993af7b": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:53:43.457239+00:00",
       "lead_id": "lead_b33a80a4573acf8a053ea2324993af7b",
       "media": [],
@@ -9328,6 +11427,14 @@
       "url": "https://x.com/aleabitoreddit/status/2071850120745013623"
     },
     "lead_b3503ff4c9d89e278f35dcadc4f19a4a": {
+      "entities": {
+        "company_ids": [
+          "co:globalfoundries"
+        ],
+        "tickers": [
+          "GFS"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:26.728937+00:00",
       "lead_id": "lead_b3503ff4c9d89e278f35dcadc4f19a4a",
       "published_at": "2026-07-07",
@@ -9346,6 +11453,12 @@
     },
     "lead_b48a6c9a349398a5d0d3ab8732a05d54": {
       "content_updated_at": "2026-07-29T13:46:45.021215+00:00",
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "AMD"
+        ]
+      },
       "first_seen": "2026-07-25T09:06:50.926750+00:00",
       "lead_id": "lead_b48a6c9a349398a5d0d3ab8732a05d54",
       "media": [
@@ -9426,6 +11539,10 @@
       "url": "https://x.com/aleabitoreddit/status/2080379612736221325"
     },
     "lead_b4cc43c25317bda42306e4eb33851448": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:47:07.315053+00:00",
       "lead_id": "lead_b4cc43c25317bda42306e4eb33851448",
       "media": [
@@ -9465,6 +11582,12 @@
       "url": "https://x.com/aleabitoreddit/status/2076035405338812805"
     },
     "lead_b556950618d8a8f969895cc45a2a506a": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "NBIS"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:43.457206+00:00",
       "lead_id": "lead_b556950618d8a8f969895cc45a2a506a",
       "media": [],
@@ -9490,6 +11613,10 @@
       "url": "https://x.com/aleabitoreddit/status/2071851376246989079"
     },
     "lead_b6f6f4eabd6f1712350e991a9da89f90": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:53:44.435563+00:00",
       "lead_id": "lead_b6f6f4eabd6f1712350e991a9da89f90",
       "media": [
@@ -9557,6 +11684,18 @@
       "url": "https://x.com/aleabitoreddit/status/2071730699363881241"
     },
     "lead_b72df36ba871db77a524b7178d3b4944": {
+      "entities": {
+        "company_ids": [
+          "co:meta",
+          "co:google"
+        ],
+        "tickers": [
+          "META",
+          "GOOGL",
+          "CRWV",
+          "NBIS"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:36.372620+00:00",
       "lead_id": "lead_b72df36ba871db77a524b7178d3b4944",
       "media": [],
@@ -9582,6 +11721,25 @@
       "url": "https://x.com/aleabitoreddit/status/2072314906729455876"
     },
     "lead_b75a2feb576f619129330908245b248a": {
+      "entities": {
+        "company_ids": [
+          "co:jabil",
+          "co:globalfoundries",
+          "co:axt"
+        ],
+        "tickers": [
+          "RPI",
+          "SIVE",
+          "JBL",
+          "GFS",
+          "XFAB",
+          "RDDT",
+          "AXTI",
+          "NBIS",
+          "ALAB",
+          "CBRS"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:43.724829+00:00",
       "lead_id": "lead_b75a2feb576f619129330908245b248a",
       "media": [
@@ -9621,6 +11779,14 @@
       "url": "https://x.com/aleabitoreddit/status/2071763387948859506"
     },
     "lead_b8b6907dcdb7b1cb07a9eed1abcb7556": {
+      "entities": {
+        "company_ids": [
+          "co:axt"
+        ],
+        "tickers": [
+          "AXTI"
+        ]
+      },
       "first_seen": "2026-07-30T22:38:46.076853+00:00",
       "lead_id": "lead_b8b6907dcdb7b1cb07a9eed1abcb7556",
       "published_at": "2026-07-30",
@@ -9638,6 +11804,14 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1051627/000143774926025061/axti20260609_8k.htm"
     },
     "lead_b94949da2feeb98fb8d6c03bf6504c48": {
+      "entities": {
+        "company_ids": [
+          "co:applied_optoelectronics"
+        ],
+        "tickers": [
+          "AAOI"
+        ]
+      },
       "first_seen": "2026-07-25T09:06:56.758354+00:00",
       "lead_id": "lead_b94949da2feeb98fb8d6c03bf6504c48",
       "published_at": "2026-07-23",
@@ -9655,6 +11829,17 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826005739/xslF345X06/ownership.xml"
     },
     "lead_ba4073c079bac993eaafc74feb7c6df3": {
+      "entities": {
+        "company_ids": [
+          "co:lumentum",
+          "co:coherent"
+        ],
+        "tickers": [
+          "SIVE",
+          "LITE",
+          "COHR"
+        ]
+      },
       "first_seen": "2026-07-29T13:46:58.698859+00:00",
       "lead_id": "lead_ba4073c079bac993eaafc74feb7c6df3",
       "media": [],
@@ -9680,6 +11865,14 @@
       "url": "https://x.com/aleabitoreddit/status/2077775453604176247"
     },
     "lead_ba473b6b6bca2ceba19958fee04b0fa2": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia"
+        ],
+        "tickers": [
+          "NVDA"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:05.295640+00:00",
       "lead_id": "lead_ba473b6b6bca2ceba19958fee04b0fa2",
       "media": [
@@ -9737,6 +11930,10 @@
       "url": "https://x.com/aleabitoreddit/status/2076846994614792663"
     },
     "lead_ba7eb2d78fd80f7264bdb783a4f16616": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:47:12.738793+00:00",
       "lead_id": "lead_ba7eb2d78fd80f7264bdb783a4f16616",
       "media": [],
@@ -9763,6 +11960,16 @@
     },
     "lead_bab7554c6ae3edbc39c38e11cf3fa953": {
       "content_updated_at": "2026-07-29T13:46:49.149374+00:00",
+      "entities": {
+        "company_ids": [
+          "co:google",
+          "co:meta"
+        ],
+        "tickers": [
+          "GOOGL",
+          "META"
+        ]
+      },
       "first_seen": "2026-07-25T09:06:50.926806+00:00",
       "lead_id": "lead_bab7554c6ae3edbc39c38e11cf3fa953",
       "media": [
@@ -9830,6 +12037,10 @@
       "url": "https://x.com/aleabitoreddit/status/2080031508656746874"
     },
     "lead_bb690d43949cd335d4d2bf91e5d527f8": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:46:47.957666+00:00",
       "lead_id": "lead_bb690d43949cd335d4d2bf91e5d527f8",
       "media": [],
@@ -9855,6 +12066,10 @@
       "url": "https://x.com/aleabitoreddit/status/2080040423805047054"
     },
     "lead_bbf30d0ff2ae469b7a9ec6957aca3098": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:53:39.981429+00:00",
       "lead_id": "lead_bbf30d0ff2ae469b7a9ec6957aca3098",
       "media": [],
@@ -9880,6 +12095,14 @@
       "url": "https://x.com/aleabitoreddit/status/2072008436292948376"
     },
     "lead_bdd03e8e9f98242b0023cb2a3a7eff0c": {
+      "entities": {
+        "company_ids": [
+          "co:coherent"
+        ],
+        "tickers": [
+          "COHR"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:18.082085+00:00",
       "lead_id": "lead_bdd03e8e9f98242b0023cb2a3a7eff0c",
       "published_at": "2026-07-06",
@@ -9898,6 +12121,12 @@
     },
     "lead_be022ca8c6ef56ae177d7f60e36f5273": {
       "content_updated_at": "2026-07-29T13:46:42.247056+00:00",
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "CMXT"
+        ]
+      },
       "first_seen": "2026-07-27T14:17:21.432239+00:00",
       "lead_id": "lead_be022ca8c6ef56ae177d7f60e36f5273",
       "media": [
@@ -9965,6 +12194,21 @@
       "url": "https://x.com/aleabitoreddit/status/2081579593815978273"
     },
     "lead_be21abf1f81488ab1256d281e2a1d1c1": {
+      "entities": {
+        "company_ids": [
+          "co:applied_optoelectronics",
+          "co:coherent",
+          "co:lumentum",
+          "co:jabil"
+        ],
+        "tickers": [
+          "AAOI",
+          "COHR",
+          "LITE",
+          "SIVE",
+          "JBL"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:05.295725+00:00",
       "lead_id": "lead_be21abf1f81488ab1256d281e2a1d1c1",
       "media": [],
@@ -10000,6 +12244,14 @@
       "url": "https://x.com/aleabitoreddit/status/2076808331453415674"
     },
     "lead_bebe8b1765b25e199fcbe8b0652be2ac": {
+      "entities": {
+        "company_ids": [
+          "co:google"
+        ],
+        "tickers": [
+          "GOOGL"
+        ]
+      },
       "first_seen": "2026-07-29T13:46:48.464833+00:00",
       "lead_id": "lead_bebe8b1765b25e199fcbe8b0652be2ac",
       "media": [
@@ -10039,6 +12291,14 @@
       "url": "https://x.com/aleabitoreddit/status/2080032221638119603"
     },
     "lead_c47b75e7f3907d271c4707876b56a30a": {
+      "entities": {
+        "company_ids": [
+          "co:applied_materials"
+        ],
+        "tickers": [
+          "AMAT"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:20.250684+00:00",
       "lead_id": "lead_c47b75e7f3907d271c4707876b56a30a",
       "published_at": "2026-06-22",
@@ -10057,6 +12317,16 @@
     },
     "lead_c51e7f15f13fcaaa3f781e8cdf9ea9f4": {
       "content_updated_at": "2026-07-29T13:46:47.957572+00:00",
+      "entities": {
+        "company_ids": [
+          "co:tsmc"
+        ],
+        "tickers": [
+          "TSLA",
+          "MU",
+          "TSM"
+        ]
+      },
       "first_seen": "2026-07-25T09:06:50.926784+00:00",
       "lead_id": "lead_c51e7f15f13fcaaa3f781e8cdf9ea9f4",
       "media": [
@@ -10165,6 +12435,14 @@
       "url": "https://x.com/aleabitoreddit/status/2080149813065396454"
     },
     "lead_c52bbb5dfebba938fa1694d1c4596f4e": {
+      "entities": {
+        "company_ids": [
+          "co:coherent"
+        ],
+        "tickers": [
+          "COHR"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:18.082138+00:00",
       "lead_id": "lead_c52bbb5dfebba938fa1694d1c4596f4e",
       "published_at": "2026-05-13",
@@ -10182,6 +12460,10 @@
       "url": "https://www.sec.gov/Archives/edgar/data/820318/000089914026000476/xslF345X06/form4.xml"
     },
     "lead_c56124b706fa43d5ee03a44016c276b0": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:47:00.225392+00:00",
       "lead_id": "lead_c56124b706fa43d5ee03a44016c276b0",
       "media": [],
@@ -10207,6 +12489,14 @@
       "url": "https://x.com/aleabitoreddit/status/2077740809022296552"
     },
     "lead_c79853952e8130f1c0d6680388d3b020": {
+      "entities": {
+        "company_ids": [
+          "co:lumentum"
+        ],
+        "tickers": [
+          "LITE"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:19.172678+00:00",
       "lead_id": "lead_c79853952e8130f1c0d6680388d3b020",
       "published_at": "2026-07-16",
@@ -10224,6 +12514,10 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1633978/000172228926000001/xslF345X06/form4-07172026_120708.xml"
     },
     "lead_c7fdc817e8fdac9bad4573c4a9c9e678": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:46:54.703874+00:00",
       "lead_id": "lead_c7fdc817e8fdac9bad4573c4a9c9e678",
       "media": [],
@@ -10249,6 +12543,14 @@
       "url": "https://x.com/aleabitoreddit/status/2078274370795954384"
     },
     "lead_c9225fcf3ddafb198bd230cda3ae8f5e": {
+      "entities": {
+        "company_ids": [
+          "co:applied_materials"
+        ],
+        "tickers": [
+          "AMAT"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:20.250721+00:00",
       "lead_id": "lead_c9225fcf3ddafb198bd230cda3ae8f5e",
       "published_at": "2026-06-17",
@@ -10266,6 +12568,12 @@
       "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026044046/xslF345X06/wk-form4_1781733868.xml"
     },
     "lead_c95925a7449580e24cce7512ebad08b4": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "TSLA"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:42.611353+00:00",
       "lead_id": "lead_c95925a7449580e24cce7512ebad08b4",
       "media": [],
@@ -10291,6 +12599,10 @@
       "url": "https://x.com/aleabitoreddit/status/2071977219002613768"
     },
     "lead_ca3427d944ab987703c0fe625915dc9b": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:47:12.738642+00:00",
       "lead_id": "lead_ca3427d944ab987703c0fe625915dc9b",
       "media": [],
@@ -10316,6 +12628,14 @@
       "url": "https://x.com/aleabitoreddit/status/2074959083728413072"
     },
     "lead_cacb967c193853afdf372069a7b2e9f9": {
+      "entities": {
+        "company_ids": [
+          "co:globalfoundries"
+        ],
+        "tickers": [
+          "GFS"
+        ]
+      },
       "first_seen": "2026-07-30T22:38:48.776567+00:00",
       "lead_id": "lead_cacb967c193853afdf372069a7b2e9f9",
       "published_at": "2026-07-30",
@@ -10333,6 +12653,16 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000188/xslF345X06/wk-form4_1785439270.xml"
     },
     "lead_cb2644d6e095834e6f0d38ff5348f862": {
+      "entities": {
+        "company_ids": [
+          "co:intel"
+        ],
+        "tickers": [
+          "SKHY",
+          "INTC",
+          "MU"
+        ]
+      },
       "first_seen": "2026-07-29T13:46:57.601569+00:00",
       "lead_id": "lead_cb2644d6e095834e6f0d38ff5348f862",
       "media": [
@@ -10390,6 +12720,10 @@
       "url": "https://x.com/aleabitoreddit/status/2077955479742173422"
     },
     "lead_cb56a79ffa56ba645719c1c85e86df8f": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:46:45.336771+00:00",
       "lead_id": "lead_cb56a79ffa56ba645719c1c85e86df8f",
       "media": [
@@ -10429,6 +12763,12 @@
       "url": "https://x.com/aleabitoreddit/status/2080351269718507966"
     },
     "lead_cb6591537df5b9f6f13b7a79af9b206c": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "SIVE"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:08.730898+00:00",
       "lead_id": "lead_cb6591537df5b9f6f13b7a79af9b206c",
       "media": [],
@@ -10454,6 +12794,14 @@
       "url": "https://x.com/aleabitoreddit/status/2075613235756294559"
     },
     "lead_cc4797205853458be513a748c01e2735": {
+      "entities": {
+        "company_ids": [
+          "co:globalfoundries"
+        ],
+        "tickers": [
+          "GFS"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:26.728914+00:00",
       "lead_id": "lead_cc4797205853458be513a748c01e2735",
       "published_at": "2026-07-13",
@@ -10471,6 +12819,19 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1709048/000162828026047972/xslF345X06/wk-form4_1783962211.xml"
     },
     "lead_cc5e07e8ced6ce59f302397d8583de9c": {
+      "entities": {
+        "company_ids": [
+          "co:marvell_technology",
+          "co:applied_materials",
+          "co:applied_optoelectronics"
+        ],
+        "tickers": [
+          "MRVL",
+          "AMAT",
+          "NBIS",
+          "AAOI"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:34.458942+00:00",
       "lead_id": "lead_cc5e07e8ced6ce59f302397d8583de9c",
       "media": [
@@ -10523,6 +12884,10 @@
       "url": "https://x.com/aleabitoreddit/status/2072575509880512555"
     },
     "lead_ccea00c05e700362c98c32fdb21178f3": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:53:27.982598+00:00",
       "lead_id": "lead_ccea00c05e700362c98c32fdb21178f3",
       "media": [],
@@ -10548,6 +12913,18 @@
       "url": "https://x.com/aleabitoreddit/status/2072940349300122098"
     },
     "lead_cdd584e252b586185333a12973d7d69f": {
+      "entities": {
+        "company_ids": [
+          "co:marvell_technology",
+          "co:applied_optoelectronics"
+        ],
+        "tickers": [
+          "MRVL",
+          "AAOI",
+          "SIVE",
+          "AEHR"
+        ]
+      },
       "first_seen": "2026-07-29T13:46:58.698823+00:00",
       "lead_id": "lead_cdd584e252b586185333a12973d7d69f",
       "media": [],
@@ -10573,6 +12950,12 @@
       "url": "https://x.com/aleabitoreddit/status/2077779117114626132"
     },
     "lead_ce347329549c13919637113c1643c03a": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "RDDT"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:18.849401+00:00",
       "lead_id": "lead_ce347329549c13919637113c1643c03a",
       "media": [],
@@ -10598,6 +12981,10 @@
       "url": "https://x.com/aleabitoreddit/status/2074241633345048684"
     },
     "lead_ce38909dd74008d06aee57f6390d3a70": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:47:17.014089+00:00",
       "lead_id": "lead_ce38909dd74008d06aee57f6390d3a70",
       "media": [],
@@ -10623,6 +13010,10 @@
       "url": "https://x.com/aleabitoreddit/status/2074535692361937070"
     },
     "lead_cf4c4517f580464eb4ca369b9d204cb8": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:53:39.543217+00:00",
       "lead_id": "lead_cf4c4517f580464eb4ca369b9d204cb8",
       "media": [
@@ -10676,6 +13067,17 @@
     },
     "lead_d024baf2ef9f980060fbac0805025087": {
       "content_updated_at": "2026-07-29T13:46:49.149482+00:00",
+      "entities": {
+        "company_ids": [
+          "co:google",
+          "co:lumentum"
+        ],
+        "tickers": [
+          "GOOGL",
+          "SPCX",
+          "LITE"
+        ]
+      },
       "first_seen": "2026-07-25T09:06:50.926818+00:00",
       "lead_id": "lead_d024baf2ef9f980060fbac0805025087",
       "media": [],
@@ -10716,6 +13118,14 @@
       "url": "https://x.com/aleabitoreddit/status/2080027058063958323"
     },
     "lead_d038e162169964320fa1bc8354c2349c": {
+      "entities": {
+        "company_ids": [
+          "co:applied_optoelectronics"
+        ],
+        "tickers": [
+          "AAOI"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:23.595596+00:00",
       "lead_id": "lead_d038e162169964320fa1bc8354c2349c",
       "published_at": "2026-07-14",
@@ -10733,6 +13143,12 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826005532/xslF345X06/ownership.xml"
     },
     "lead_d0590be2d3e5bc4881dcae5b02aa99bc": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "SPCX"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:12.413696+00:00",
       "lead_id": "lead_d0590be2d3e5bc4881dcae5b02aa99bc",
       "media": [
@@ -10798,6 +13214,19 @@
       "url": "https://x.com/aleabitoreddit/status/2074979055410266452"
     },
     "lead_d0c1e3a405d5ef6c42473f982c21edd9": {
+      "entities": {
+        "company_ids": [
+          "co:applied_optoelectronics",
+          "co:lumentum",
+          "co:coherent"
+        ],
+        "tickers": [
+          "AAOI",
+          "LITE",
+          "SIVEF",
+          "COHR"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:08.730814+00:00",
       "lead_id": "lead_d0c1e3a405d5ef6c42473f982c21edd9",
       "media": [
@@ -10837,6 +13266,12 @@
       "url": "https://x.com/aleabitoreddit/status/2075634064518955297"
     },
     "lead_d0d95a0fb61bae0dc0870391b1065f1d": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "IREN"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:16.464940+00:00",
       "lead_id": "lead_d0d95a0fb61bae0dc0870391b1065f1d",
       "media": [],
@@ -10862,6 +13297,10 @@
       "url": "https://x.com/aleabitoreddit/status/2074540168674160931"
     },
     "lead_d0e1846d248cd66cefcf402c24668b69": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:47:20.328877+00:00",
       "lead_id": "lead_d0e1846d248cd66cefcf402c24668b69",
       "media": [
@@ -10901,6 +13340,10 @@
       "url": "https://x.com/aleabitoreddit/status/2074102035675570457"
     },
     "lead_d0f6631162e0ee617ba4b9a7b6244b41": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:53:27.982565+00:00",
       "lead_id": "lead_d0f6631162e0ee617ba4b9a7b6244b41",
       "media": [],
@@ -10926,6 +13369,13 @@
       "url": "https://x.com/aleabitoreddit/status/2072941265956864451"
     },
     "lead_d10925b96c29176f352f2e8004869fe5": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "RKLB",
+          "ASTS"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:13.677110+00:00",
       "lead_id": "lead_d10925b96c29176f352f2e8004869fe5",
       "media": [
@@ -10965,6 +13415,10 @@
       "url": "https://x.com/aleabitoreddit/status/2074838397341065516"
     },
     "lead_d22b1b06ba8ec23b7671ce5c6d7b54cd": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:47:07.315107+00:00",
       "lead_id": "lead_d22b1b06ba8ec23b7671ce5c6d7b54cd",
       "media": [],
@@ -10990,6 +13444,18 @@
       "url": "https://x.com/aleabitoreddit/status/2076032645172187292"
     },
     "lead_d247dffc1ed48d89a68d7abe6e9a1f51": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia"
+        ],
+        "tickers": [
+          "CCXI",
+          "TSLA",
+          "AMZN",
+          "MELI",
+          "NVDA"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:31.315035+00:00",
       "lead_id": "lead_d247dffc1ed48d89a68d7abe6e9a1f51",
       "media": [],
@@ -11016,6 +13482,10 @@
     },
     "lead_d27d7ed2236215408d3ea9b5edacccfe": {
       "content_updated_at": "2026-07-29T13:46:50.528637+00:00",
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-25T09:06:50.926839+00:00",
       "lead_id": "lead_d27d7ed2236215408d3ea9b5edacccfe",
       "media": [
@@ -11096,6 +13566,14 @@
       "url": "https://x.com/aleabitoreddit/status/2079673469567226149"
     },
     "lead_d36507e875209c42b224d82b9ac1a247": {
+      "entities": {
+        "company_ids": [
+          "co:meta"
+        ],
+        "tickers": [
+          "META"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:35.087183+00:00",
       "lead_id": "lead_d36507e875209c42b224d82b9ac1a247",
       "media": [
@@ -11153,6 +13631,15 @@
       "url": "https://x.com/aleabitoreddit/status/2072574465763111166"
     },
     "lead_d4486d3793fa99db26f51b1ade2eec41": {
+      "entities": {
+        "company_ids": [
+          "co:lumentum"
+        ],
+        "tickers": [
+          "HIMX",
+          "LITE"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:24.555537+00:00",
       "lead_id": "lead_d4486d3793fa99db26f51b1ade2eec41",
       "media": [
@@ -11205,6 +13692,15 @@
       "url": "https://x.com/aleabitoreddit/status/2073467493998555192"
     },
     "lead_d5d2b65e1c4d593c77075d2d499b7144": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia"
+        ],
+        "tickers": [
+          "AEHR",
+          "NVDA"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:01.994277+00:00",
       "lead_id": "lead_d5d2b65e1c4d593c77075d2d499b7144",
       "media": [],
@@ -11230,6 +13726,20 @@
       "url": "https://x.com/aleabitoreddit/status/2077217140042760358"
     },
     "lead_d6549e74ff9c3d00e666bcd47db73e12": {
+      "entities": {
+        "company_ids": [
+          "co:globalfoundries",
+          "co:jabil",
+          "co:poet_technologies"
+        ],
+        "tickers": [
+          "SIVE",
+          "AMD",
+          "GFS",
+          "JBL",
+          "POET"
+        ]
+      },
       "first_seen": "2026-07-29T13:46:59.272625+00:00",
       "lead_id": "lead_d6549e74ff9c3d00e666bcd47db73e12",
       "media": [
@@ -11282,6 +13792,10 @@
       "url": "https://x.com/aleabitoreddit/status/2077768896061563339"
     },
     "lead_d81e421129940939faa5bd6571aa449a": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:47:06.139492+00:00",
       "lead_id": "lead_d81e421129940939faa5bd6571aa449a",
       "media": [
@@ -11321,6 +13835,10 @@
       "url": "https://x.com/aleabitoreddit/status/2076372905450188998"
     },
     "lead_d8bebc01333faf4d6bc1b73c865f4709": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:53:23.661843+00:00",
       "lead_id": "lead_d8bebc01333faf4d6bc1b73c865f4709",
       "media": [],
@@ -11346,6 +13864,16 @@
       "url": "https://x.com/aleabitoreddit/status/2073486870315745406"
     },
     "lead_d95d26c1e9be71f3422d0b4d10ee6ad8": {
+      "entities": {
+        "company_ids": [
+          "co:meta"
+        ],
+        "tickers": [
+          "META",
+          "CRVW",
+          "ORCL"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:15.764219+00:00",
       "lead_id": "lead_d95d26c1e9be71f3422d0b4d10ee6ad8",
       "media": [
@@ -11385,6 +13913,14 @@
       "url": "https://x.com/aleabitoreddit/status/2074568161299771394"
     },
     "lead_d980d3e0d3b02fb6aa301dba929334c6": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "BE",
+          "SNDK",
+          "SHAZ"
+        ]
+      },
       "first_seen": "2026-07-30T22:38:41.241314+00:00",
       "lead_id": "lead_d980d3e0d3b02fb6aa301dba929334c6",
       "media": [],
@@ -11404,6 +13940,10 @@
       "url": "https://x.com/aleabitoreddit/status/2082740477795745942"
     },
     "lead_dae04385f45136615df2ad59e89981e4": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:46:57.013305+00:00",
       "lead_id": "lead_dae04385f45136615df2ad59e89981e4",
       "media": [],
@@ -11429,6 +13969,14 @@
       "url": "https://x.com/aleabitoreddit/status/2078119073741971893"
     },
     "lead_db65b9b3833c1035e39aaa450f5a079a": {
+      "entities": {
+        "company_ids": [
+          "co:lumentum"
+        ],
+        "tickers": [
+          "LITE"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:19.172694+00:00",
       "lead_id": "lead_db65b9b3833c1035e39aaa450f5a079a",
       "published_at": "2026-07-16",
@@ -11446,6 +13994,14 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1633978/000123201926000005/xslF345X06/form4-07172026_120757.xml"
     },
     "lead_db77cee320ee409a222adb1b88f865bc": {
+      "entities": {
+        "company_ids": [
+          "co:axt"
+        ],
+        "tickers": [
+          "AXTI"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:22.502728+00:00",
       "lead_id": "lead_db77cee320ee409a222adb1b88f865bc",
       "published_at": "2026-07-02",
@@ -11470,6 +14026,14 @@
     },
     "lead_dbc94158a40139d8ae06d646603deb10": {
       "content_updated_at": "2026-07-29T13:46:42.901079+00:00",
+      "entities": {
+        "company_ids": [
+          "co:nvidia"
+        ],
+        "tickers": [
+          "NVDA"
+        ]
+      },
       "first_seen": "2026-07-25T09:06:50.926707+00:00",
       "lead_id": "lead_dbc94158a40139d8ae06d646603deb10",
       "media": [],
@@ -11510,6 +14074,12 @@
       "url": "https://x.com/aleabitoreddit/status/2080689966045348047"
     },
     "lead_dd2497fca7ff2eabec9253ff6997b359": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "SKHYV"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:09.020047+00:00",
       "lead_id": "lead_dd2497fca7ff2eabec9253ff6997b359",
       "media": [
@@ -11549,6 +14119,13 @@
       "url": "https://x.com/aleabitoreddit/status/2075611260771852590"
     },
     "lead_de706fce93908f982e16a397ea25436d": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "AEHR",
+          "SNDK"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:02.921691+00:00",
       "lead_id": "lead_de706fce93908f982e16a397ea25436d",
       "media": [
@@ -11614,6 +14191,17 @@
       "url": "https://x.com/aleabitoreddit/status/2077208587005542464"
     },
     "lead_de998cc23111396bc0d20f99c2d456a8": {
+      "entities": {
+        "company_ids": [
+          "co:apple",
+          "co:meta"
+        ],
+        "tickers": [
+          "AAPL",
+          "MSFT",
+          "META"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:01.129794+00:00",
       "lead_id": "lead_de998cc23111396bc0d20f99c2d456a8",
       "media": [
@@ -11653,6 +14241,12 @@
       "url": "https://x.com/aleabitoreddit/status/2077421268991926703"
     },
     "lead_dec3d9cd6d2c56b4233f1ba977bf0e45": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "MU"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:20.328971+00:00",
       "lead_id": "lead_dec3d9cd6d2c56b4233f1ba977bf0e45",
       "media": [],
@@ -11678,6 +14272,14 @@
       "url": "https://x.com/aleabitoreddit/status/2074086399616385425"
     },
     "lead_dee82a9115f873fef9c46f319bd6500f": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia"
+        ],
+        "tickers": [
+          "NVDA"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:01.493764+00:00",
       "lead_id": "lead_dee82a9115f873fef9c46f319bd6500f",
       "media": [
@@ -11717,6 +14319,12 @@
       "url": "https://x.com/aleabitoreddit/status/2077406548012466390"
     },
     "lead_dfb9cfa871bd657c7b4dad52eef691c4": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "NBIS"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:36.372696+00:00",
       "lead_id": "lead_dfb9cfa871bd657c7b4dad52eef691c4",
       "media": [],
@@ -11742,6 +14350,14 @@
       "url": "https://x.com/aleabitoreddit/status/2072303237806624817"
     },
     "lead_dff5a2a6ef33a72e4cf07fda277f6bd2": {
+      "entities": {
+        "company_ids": [
+          "co:tower_semiconductor"
+        ],
+        "tickers": [
+          "TSEM"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:25.644492+00:00",
       "lead_id": "lead_dff5a2a6ef33a72e4cf07fda277f6bd2",
       "published_at": "2026-07-06",
@@ -11759,6 +14375,12 @@
       "url": "https://www.sec.gov/Archives/edgar/data/928876/000197640826000634/xslF345X06/primary_doc.xml"
     },
     "lead_e039c3c894b17b758efbf223182c0ade": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "NBIS"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:19.395543+00:00",
       "lead_id": "lead_e039c3c894b17b758efbf223182c0ade",
       "media": [],
@@ -11784,6 +14406,10 @@
       "url": "https://x.com/aleabitoreddit/status/2074159948523860147"
     },
     "lead_e10152e8e0e54f6f01a0fe1d6d619a10": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:47:17.663946+00:00",
       "lead_id": "lead_e10152e8e0e54f6f01a0fe1d6d619a10",
       "media": [],
@@ -11809,6 +14435,10 @@
       "url": "https://x.com/aleabitoreddit/status/2074496053030830172"
     },
     "lead_e39d378c77a5abbc11223b02bbae1959": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:47:04.408335+00:00",
       "lead_id": "lead_e39d378c77a5abbc11223b02bbae1959",
       "media": [],
@@ -11834,6 +14464,13 @@
       "url": "https://x.com/aleabitoreddit/status/2076847779037790620"
     },
     "lead_e44de3abd3c8ac71e015b657616a2c06": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "MU",
+          "QCOM"
+        ]
+      },
       "first_seen": "2026-07-29T13:46:59.949434+00:00",
       "lead_id": "lead_e44de3abd3c8ac71e015b657616a2c06",
       "media": [
@@ -11891,6 +14528,14 @@
       "url": "https://x.com/aleabitoreddit/status/2077753660592033828"
     },
     "lead_e48d58c39e20202b653eecf6cff75adc": {
+      "entities": {
+        "company_ids": [
+          "co:lumentum"
+        ],
+        "tickers": [
+          "LITE"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:19.172660+00:00",
       "lead_id": "lead_e48d58c39e20202b653eecf6cff75adc",
       "published_at": "2026-07-16",
@@ -11908,6 +14553,14 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1633978/000164823126000004/xslF345X06/form4-07172026_120753.xml"
     },
     "lead_e54a283404bc6c658c3c9a636199ce2e": {
+      "entities": {
+        "company_ids": [
+          "co:meta"
+        ],
+        "tickers": [
+          "META"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:29.859316+00:00",
       "lead_id": "lead_e54a283404bc6c658c3c9a636199ce2e",
       "media": [
@@ -11960,6 +14613,14 @@
       "url": "https://x.com/aleabitoreddit/status/2072902886712094919"
     },
     "lead_e590eca752d976cef58be766a5b17d62": {
+      "entities": {
+        "company_ids": [
+          "co:applied_optoelectronics"
+        ],
+        "tickers": [
+          "AAOI"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:23.595687+00:00",
       "lead_id": "lead_e590eca752d976cef58be766a5b17d62",
       "published_at": "2026-06-16",
@@ -11983,6 +14644,17 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826004885/aaoi_8k.htm"
     },
     "lead_e5f4088218bafff7538c5eec808ea96e": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "CCXI",
+          "TSLA",
+          "AMZN",
+          "FDX",
+          "GM",
+          "FORD"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:23.677126+00:00",
       "lead_id": "lead_e5f4088218bafff7538c5eec808ea96e",
       "media": [
@@ -12076,6 +14748,12 @@
       "url": "https://x.com/aleabitoreddit/status/2073867745243127973"
     },
     "lead_e75d4f496e44d27bd5f1b5b8f7ad0e24": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "SIVE"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:36.703121+00:00",
       "lead_id": "lead_e75d4f496e44d27bd5f1b5b8f7ad0e24",
       "media": [],
@@ -12101,6 +14779,12 @@
       "url": "https://x.com/aleabitoreddit/status/2072225122057142691"
     },
     "lead_e7d012889c91027f839151169ba60e6d": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "MSFT"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:26.035123+00:00",
       "lead_id": "lead_e7d012889c91027f839151169ba60e6d",
       "media": [
@@ -12140,6 +14824,18 @@
       "url": "https://x.com/aleabitoreddit/status/2073307016760791512"
     },
     "lead_e82207f384c613479e9e4f48ef8ffe8f": {
+      "entities": {
+        "company_ids": [
+          "co:meta"
+        ],
+        "tickers": [
+          "SE",
+          "MELI",
+          "JD",
+          "AMZN",
+          "META"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:22.886875+00:00",
       "lead_id": "lead_e82207f384c613479e9e4f48ef8ffe8f",
       "media": [],
@@ -12165,6 +14861,12 @@
       "url": "https://x.com/aleabitoreddit/status/2073537674905055568"
     },
     "lead_e8401fcea0059c70577286f509884e9f": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "IBM"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:03.519446+00:00",
       "lead_id": "lead_e8401fcea0059c70577286f509884e9f",
       "media": [],
@@ -12190,6 +14892,17 @@
       "url": "https://x.com/aleabitoreddit/status/2077040840837632253"
     },
     "lead_e87032df984f0fa40a6bd12a7130b39a": {
+      "entities": {
+        "company_ids": [
+          "co:meta"
+        ],
+        "tickers": [
+          "META",
+          "SPCX",
+          "NBIS",
+          "IREN"
+        ]
+      },
       "first_seen": "2026-07-29T13:46:55.745856+00:00",
       "lead_id": "lead_e87032df984f0fa40a6bd12a7130b39a",
       "media": [
@@ -12234,6 +14947,10 @@
       "url": "https://x.com/aleabitoreddit/status/2078175882620059719"
     },
     "lead_e8857898c506db1a35168bd9bb042e93": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:47:09.304856+00:00",
       "lead_id": "lead_e8857898c506db1a35168bd9bb042e93",
       "media": [
@@ -12273,6 +14990,10 @@
       "url": "https://x.com/aleabitoreddit/status/2075590371531493729"
     },
     "lead_e9647a0b870713c84433daea4c8d1b55": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:46:41.611799+00:00",
       "lead_id": "lead_e9647a0b870713c84433daea4c8d1b55",
       "media": [],
@@ -12298,6 +15019,16 @@
       "url": "https://x.com/aleabitoreddit/status/2081581943142167034"
     },
     "lead_ea9347e48fbc93a2e8839be63e24f862": {
+      "entities": {
+        "company_ids": [
+          "co:axt",
+          "co:lumentum"
+        ],
+        "tickers": [
+          "AXTI",
+          "LITE"
+        ]
+      },
       "first_seen": "2026-07-29T22:35:06.358014+00:00",
       "lead_id": "lead_ea9347e48fbc93a2e8839be63e24f862",
       "media": [
@@ -12346,6 +15077,14 @@
       "url": "https://x.com/aleabitoreddit/status/2082578803189268855"
     },
     "lead_ebb4a71c7f16ef7faf37e8d17bb2d337": {
+      "entities": {
+        "company_ids": [
+          "co:coherent"
+        ],
+        "tickers": [
+          "COHR"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:18.082171+00:00",
       "lead_id": "lead_ebb4a71c7f16ef7faf37e8d17bb2d337",
       "published_at": "2026-05-06",
@@ -12363,6 +15102,16 @@
       "url": "https://www.sec.gov/Archives/edgar/data/820318/000119312526208972/d57080d8k.htm"
     },
     "lead_ecaab49dd6acfe4163a0128d2f522cb8": {
+      "entities": {
+        "company_ids": [
+          "co:meta"
+        ],
+        "tickers": [
+          "SNDK",
+          "META",
+          "MU"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:00.794267+00:00",
       "lead_id": "lead_ecaab49dd6acfe4163a0128d2f522cb8",
       "media": [],
@@ -12388,6 +15137,10 @@
       "url": "https://x.com/aleabitoreddit/status/2077423269066784942"
     },
     "lead_ede1b7dbf287a915abb1e9fa0fdc5a80": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:53:38.072113+00:00",
       "lead_id": "lead_ede1b7dbf287a915abb1e9fa0fdc5a80",
       "media": [
@@ -12427,6 +15180,10 @@
       "url": "https://x.com/aleabitoreddit/status/2072221956020326528"
     },
     "lead_efb79fe6c3a2151204346c0f55d9f033": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:46:49.149537+00:00",
       "lead_id": "lead_efb79fe6c3a2151204346c0f55d9f033",
       "media": [],
@@ -12452,6 +15209,10 @@
       "url": "https://x.com/aleabitoreddit/status/2079954027312513328"
     },
     "lead_f0186379a66c1d120ec387bcaa768c86": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:46:45.336825+00:00",
       "lead_id": "lead_f0186379a66c1d120ec387bcaa768c86",
       "media": [],
@@ -12477,6 +15238,14 @@
       "url": "https://x.com/aleabitoreddit/status/2080347872965579171"
     },
     "lead_f05f3fd8a753c084704afc3b06330a47": {
+      "entities": {
+        "company_ids": [
+          "co:axt"
+        ],
+        "tickers": [
+          "AXTI"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:22.502705+00:00",
       "lead_id": "lead_f05f3fd8a753c084704afc3b06330a47",
       "published_at": "2026-07-08",
@@ -12500,6 +15269,10 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1051627/000143774926022984/axti20260629_8k.htm"
     },
     "lead_f0a30dff943c91f3afccfca442d2c103": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:47:00.794138+00:00",
       "lead_id": "lead_f0a30dff943c91f3afccfca442d2c103",
       "media": [
@@ -12540,6 +15313,16 @@
     },
     "lead_f10510a87362e2f2d5a785c9d573e7ef": {
       "content_updated_at": "2026-07-29T13:46:42.901012+00:00",
+      "entities": {
+        "company_ids": [
+          "co:google"
+        ],
+        "tickers": [
+          "GOOGL",
+          "UBER",
+          "NBIS"
+        ]
+      },
       "first_seen": "2026-07-25T09:06:50.926679+00:00",
       "lead_id": "lead_f10510a87362e2f2d5a785c9d573e7ef",
       "media": [
@@ -12594,6 +15377,14 @@
       "url": "https://x.com/aleabitoreddit/status/2080750537121874206"
     },
     "lead_f14b0508299201ea095bacf1ed3a083d": {
+      "entities": {
+        "company_ids": [
+          "co:globalfoundries"
+        ],
+        "tickers": [
+          "GFS"
+        ]
+      },
       "first_seen": "2026-07-27T22:31:57.627669+00:00",
       "lead_id": "lead_f14b0508299201ea095bacf1ed3a083d",
       "published_at": "2026-07-27",
@@ -12613,6 +15404,14 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1709048/000162828026049740/xslF345X06/wk-form4_1785173635.xml"
     },
     "lead_f1d18173b1d1d173650f0dae1545c692": {
+      "entities": {
+        "company_ids": [
+          "co:globalfoundries"
+        ],
+        "tickers": [
+          "GFS"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:26.728975+00:00",
       "lead_id": "lead_f1d18173b1d1d173650f0dae1545c692",
       "published_at": "2026-06-23",
@@ -12630,6 +15429,18 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000145/xslF345X06/wk-form4_1782235966.xml"
     },
     "lead_f269244fdea7f0701dbf4a9be0a19de2": {
+      "entities": {
+        "company_ids": [
+          "co:apple",
+          "co:google",
+          "co:meta"
+        ],
+        "tickers": [
+          "AAPL",
+          "GOOGL",
+          "META"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:00.794212+00:00",
       "lead_id": "lead_f269244fdea7f0701dbf4a9be0a19de2",
       "media": [],
@@ -12655,6 +15466,26 @@
       "url": "https://x.com/aleabitoreddit/status/2077423502119026841"
     },
     "lead_f3cf03ef3623277171d343ff96e81a95": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia",
+          "co:lumentum",
+          "co:poet_technologies",
+          "co:coherent",
+          "co:applied_optoelectronics",
+          "co:meta"
+        ],
+        "tickers": [
+          "NVDA",
+          "LITE",
+          "POET",
+          "COHR",
+          "AAOI",
+          "SIVE",
+          "AMD",
+          "META"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:31.667184+00:00",
       "lead_id": "lead_f3cf03ef3623277171d343ff96e81a95",
       "media": [],
@@ -12680,6 +15511,14 @@
       "url": "https://x.com/aleabitoreddit/status/2072726120706007465"
     },
     "lead_f3e56795bfca2293387a43788e5e450c": {
+      "entities": {
+        "company_ids": [
+          "co:apple"
+        ],
+        "tickers": [
+          "AAPL"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:00.794316+00:00",
       "lead_id": "lead_f3e56795bfca2293387a43788e5e450c",
       "media": [],
@@ -12705,6 +15544,10 @@
       "url": "https://x.com/aleabitoreddit/status/2077422416482250990"
     },
     "lead_f4c9a6456a0b346e060a8b9136b7d2e1": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:47:20.978787+00:00",
       "lead_id": "lead_f4c9a6456a0b346e060a8b9136b7d2e1",
       "media": [
@@ -12757,6 +15600,17 @@
       "url": "https://x.com/aleabitoreddit/status/2074075634851340779"
     },
     "lead_f4cd256b67d8749a077a4db502311334": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia"
+        ],
+        "tickers": [
+          "CCXI",
+          "AMZN",
+          "NVDA",
+          "SPCX"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:19.113329+00:00",
       "lead_id": "lead_f4cd256b67d8749a077a4db502311334",
       "media": [],
@@ -12782,6 +15636,15 @@
       "url": "https://x.com/aleabitoreddit/status/2074214669808717906"
     },
     "lead_f5f85aea8cfdf80892631a51e4c05f77": {
+      "entities": {
+        "company_ids": [
+          "co:axt"
+        ],
+        "tickers": [
+          "AXTI",
+          "EWY"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:12.413751+00:00",
       "lead_id": "lead_f5f85aea8cfdf80892631a51e4c05f77",
       "media": [],
@@ -12807,6 +15670,14 @@
       "url": "https://x.com/aleabitoreddit/status/2074972411557249248"
     },
     "lead_f627113d66acc2f60c59a27d9a078f82": {
+      "entities": {
+        "company_ids": [
+          "co:tsmc"
+        ],
+        "tickers": [
+          "TSM"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:08.730866+00:00",
       "lead_id": "lead_f627113d66acc2f60c59a27d9a078f82",
       "media": [],
@@ -12832,6 +15703,14 @@
       "url": "https://x.com/aleabitoreddit/status/2075613590955106581"
     },
     "lead_f6638511ba40483beddf169eeb48fcb8": {
+      "entities": {
+        "company_ids": [
+          "co:marvell_technology"
+        ],
+        "tickers": [
+          "MRVL"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:30.382922+00:00",
       "lead_id": "lead_f6638511ba40483beddf169eeb48fcb8",
       "media": [],
@@ -12857,6 +15736,14 @@
       "url": "https://x.com/aleabitoreddit/status/2072781715916169660"
     },
     "lead_f6d7fdd6bff7d38b4edf021c49835f5f": {
+      "entities": {
+        "company_ids": [
+          "co:axt"
+        ],
+        "tickers": [
+          "AXTI"
+        ]
+      },
       "first_seen": "2026-07-23T11:56:53.279849+00:00",
       "lead_id": "lead_f6d7fdd6bff7d38b4edf021c49835f5f",
       "published_at": "2026-07-22",
@@ -12878,6 +15765,10 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1051627/000143774926024184/axti20260720_8k.htm"
     },
     "lead_f6d937f3627b2cb3420a1a8e2a7bef5a": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:53:36.703088+00:00",
       "lead_id": "lead_f6d937f3627b2cb3420a1a8e2a7bef5a",
       "media": [],
@@ -12903,6 +15794,18 @@
       "url": "https://x.com/aleabitoreddit/status/2072242322688057579"
     },
     "lead_f7728f22823043a4cd86afba8ca11ac9": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia",
+          "co:google"
+        ],
+        "tickers": [
+          "CCXI",
+          "AMZN",
+          "NVDA",
+          "GOOGL"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:36.703022+00:00",
       "lead_id": "lead_f7728f22823043a4cd86afba8ca11ac9",
       "media": [],
@@ -12928,6 +15831,27 @@
       "url": "https://x.com/aleabitoreddit/status/2072275805330362648"
     },
     "lead_f7882130d1f1e8a992a0de76cf4b19fd": {
+      "entities": {
+        "company_ids": [
+          "co:meta",
+          "co:applied_optoelectronics",
+          "co:corning",
+          "co:marvell_technology",
+          "co:lumentum"
+        ],
+        "tickers": [
+          "META",
+          "AEHR",
+          "AAOI",
+          "SIVEF",
+          "SNDK",
+          "TER",
+          "GLW",
+          "MRVL",
+          "LITE",
+          "NBIS"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:31.314869+00:00",
       "lead_id": "lead_f7882130d1f1e8a992a0de76cf4b19fd",
       "media": [
@@ -12967,6 +15891,12 @@
       "url": "https://x.com/aleabitoreddit/status/2072760446617280650"
     },
     "lead_f7c1a2e7c62b2eae1d81de417fb754f7": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "IREN"
+        ]
+      },
       "first_seen": "2026-07-29T22:35:06.358037+00:00",
       "lead_id": "lead_f7c1a2e7c62b2eae1d81de417fb754f7",
       "media": [],
@@ -12986,6 +15916,20 @@
       "url": "https://x.com/aleabitoreddit/status/2082557648298516918"
     },
     "lead_f8b105284a2de000d25fbd902912ae77": {
+      "entities": {
+        "company_ids": [
+          "co:tsmc",
+          "co:applied_optoelectronics",
+          "co:lumentum"
+        ],
+        "tickers": [
+          "TSM",
+          "SIVE",
+          "SOI",
+          "AAOI",
+          "LITE"
+        ]
+      },
       "first_seen": "2026-07-29T13:46:55.433500+00:00",
       "lead_id": "lead_f8b105284a2de000d25fbd902912ae77",
       "media": [
@@ -13038,6 +15982,10 @@
       "url": "https://x.com/aleabitoreddit/status/2078228019584668121"
     },
     "lead_f94a189ddbbc45691fecb4f67ceb73ee": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-29T13:47:07.025185+00:00",
       "lead_id": "lead_f94a189ddbbc45691fecb4f67ceb73ee",
       "media": [],
@@ -13063,6 +16011,12 @@
       "url": "https://x.com/aleabitoreddit/status/2076232450121118133"
     },
     "lead_fa0497398cd950fd6a1fd04ece5ad847": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "IREN"
+        ]
+      },
       "first_seen": "2026-07-29T13:53:32.691470+00:00",
       "lead_id": "lead_fa0497398cd950fd6a1fd04ece5ad847",
       "media": [],
@@ -13088,6 +16042,14 @@
       "url": "https://x.com/aleabitoreddit/status/2072616481846898782"
     },
     "lead_fabcb44c5a4191a580c4d959fd22de5e": {
+      "entities": {
+        "company_ids": [
+          "co:globalfoundries"
+        ],
+        "tickers": [
+          "GFS"
+        ]
+      },
       "first_seen": "2026-07-30T22:38:48.776579+00:00",
       "lead_id": "lead_fabcb44c5a4191a580c4d959fd22de5e",
       "published_at": "2026-07-30",
@@ -13106,6 +16068,14 @@
     },
     "lead_fcbf2bd4a87932e4d67c12f0c188c3ac": {
       "content_updated_at": "2026-07-29T13:46:48.255609+00:00",
+      "entities": {
+        "company_ids": [
+          "co:google"
+        ],
+        "tickers": [
+          "GOOGL"
+        ]
+      },
       "first_seen": "2026-07-25T09:06:50.926795+00:00",
       "lead_id": "lead_fcbf2bd4a87932e4d67c12f0c188c3ac",
       "media": [
@@ -13147,6 +16117,10 @@
       "url": "https://x.com/aleabitoreddit/status/2080035769062916479"
     },
     "lead_fcc4ddc4ac5a29b00466bd580c5d4e6a": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
       "first_seen": "2026-07-26T08:23:40.494911+00:00",
       "lead_id": "lead_fcc4ddc4ac5a29b00466bd580c5d4e6a",
       "published_at": "2026-07-21",
@@ -13171,6 +16145,14 @@
       "url": "https://www.prnewswire.com/news-releases/update-on-expiry-of-lock-up-undertaking-and-insider-transactions-in-sivers-semiconductors-302831179.html"
     },
     "lead_fd354516dc2093159fc7d48737016b84": {
+      "entities": {
+        "company_ids": [
+          "co:coherent"
+        ],
+        "tickers": [
+          "COHR"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:18.082155+00:00",
       "lead_id": "lead_fd354516dc2093159fc7d48737016b84",
       "published_at": "2026-05-13",
@@ -13188,6 +16170,14 @@
       "url": "https://www.sec.gov/Archives/edgar/data/820318/000089914026000475/xslF345X06/form4.xml"
     },
     "lead_fd75b848c93c7fc3fd0a1cb241fd22d6": {
+      "entities": {
+        "company_ids": [
+          "co:applied_optoelectronics"
+        ],
+        "tickers": [
+          "AAOI"
+        ]
+      },
       "first_seen": "2026-07-22T15:37:23.595670+00:00",
       "lead_id": "lead_fd75b848c93c7fc3fd0a1cb241fd22d6",
       "published_at": "2026-06-18",
@@ -13205,6 +16195,13 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826004977/xslF345X06/ownership.xml"
     },
     "lead_fe39d568d8fb1ac17f6c58b224e6ecf9": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "OUST",
+          "AEVA"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:14.858124+00:00",
       "lead_id": "lead_fe39d568d8fb1ac17f6c58b224e6ecf9",
       "media": [],
@@ -13230,6 +16227,23 @@
       "url": "https://x.com/aleabitoreddit/status/2074587024959709419"
     },
     "lead_ffa5bc2151dea963a2b5f704afeb3880": {
+      "entities": {
+        "company_ids": [
+          "co:marvell_technology",
+          "co:intel",
+          "co:lumentum"
+        ],
+        "tickers": [
+          "NBIS",
+          "MRVL",
+          "INTC",
+          "SNDK",
+          "AMD",
+          "SIVE",
+          "MU",
+          "LITE"
+        ]
+      },
       "first_seen": "2026-07-29T13:47:17.663979+00:00",
       "lead_id": "lead_ffa5bc2151dea963a2b5f704afeb3880",
       "media": [],
@@ -13256,6 +16270,13 @@
     },
     "lead_ffdc392c947397e9a649b634ed41f0c8": {
       "content_updated_at": "2026-07-29T13:46:54.064189+00:00",
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "TTMI",
+          "VSH"
+        ]
+      },
       "first_seen": "2026-07-25T09:06:50.926923+00:00",
       "lead_id": "lead_ffdc392c947397e9a649b634ed41f0c8",
       "media": [
