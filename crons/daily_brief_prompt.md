@@ -17,7 +17,8 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
 1. 先讀 `AGENTS.md` 與 `skills/daily-brief/SKILL.md`。Codex desktop 執行時，第一個 App 動作必須實際呼叫
    `codex_app__set_thread_title`，把目前 task 改成 `StockBotv2 Daily Brief — YYYY-MM-DD`（日期取
    Asia/Taipei 當日），並確認工具回傳成功；只在 brief 內輸出帶日期標題或只說「已更名」不算完成。
-   若工具不可用或呼叫失敗，routine 仍繼續，但健康段落必須列 `title_update_failed`。
+   若工具不可用或呼叫失敗，routine 仍繼續，但健康段落必須列 `title_update_failed` 加上可觀測原因
+   （例如 `App callback timeout／no response`、例外類別、嘗試次數與 `success_receipt=false`）；不得只列裸旗標。
    確認目前 branch 是 `master`；若不是就停止並回報，不自行切 branch。若 working tree 有與本 routine
    無關的使用者變更，保留不碰。
 2. Windows 一律使用專案 interpreter：`.venv\Scripts\python.exe`，不得用 bare `python`。
@@ -63,6 +64,8 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
    追源未果的 park 必須帶 `trace_status`／`trace_attempts_ref`／`trace_next_trigger`／`trace_requires_user`；
    一般 event／scheduled retry 留 pq1，只有需要合法 access／付費／人工優先權時才進 `source_trace_review` pq2。
    只有 prepared RA 才進 pq2；triage PASS 與 pq1 自動研究都不代表入圖核准。
+   `drain` 本身只列 bounded jobs，不執行研究；brief 必須分開寫出本輪已研究、因 cap／同分 tie-break 延後、
+   以及尚未 harvest／triage 的 lead，並在延後項目附 score、排序理由與 `first_seen`，不可只說「沒看到」。
    Decision work order 必須 checkpoint researching；若純唯讀研究即可補齊，產 assessment 後才跑
    research-intent reassess，並以新 decision receipt 結案。若需入圖、Engine C manual observation、thesis
    revise／retire 或其他 authority mutation，先 checkpoint awaiting_approval，完整 packet 回 pq2；不得拿舊
@@ -108,7 +111,9 @@ TL;DR：<誰、對誰、做了什麼>
 go 授權：<bounded research／exact graph admission／manual observation／thesis review>
 
 ## 新 leads（依 priority）
-<僅列 pq1 進度／失敗；raw lead 不占 pq2 編號>
+<僅列 pq1 進度／失敗；raw lead 不占 pq2 編號。每筆 `parked` 必須列完整主詞／ticker、`parked_reason`、
+`trace_status`、`trace_next_trigger`、`trace_requires_user`、是否產生 prepared RA；`original_obtained` 要說明
+已取得原文但屬時變 observation／無唯一 graph delta，`isolated_tier_3`／截圖／paywall 要說明缺哪份一手原文。>
 
 ## Beta capital observation（無 pq2 編號）
 TL;DR：<約 30 年後 retirement_net_terminal_wealth 目標；今日哪些標的可人工評估；最重要的動態風控 warning>

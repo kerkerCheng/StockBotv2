@@ -35,8 +35,9 @@ admission 必經核准 exact 對象、深挖由 priority 排序但入圖仍核�
 Codex desktop scheduled run 的第一個 App 動作必須實際呼叫 `codex_app__set_thread_title`，把目前 task
 改為 `StockBotv2 Daily Brief — YYYY-MM-DD`（日期取 Asia/Taipei 當日），並確認工具回傳成功後才繼續。
 只在 brief 內輸出日期標題、或只用自然語言說「已更名」，都不算完成。若工具在該 executor 不可用或
-呼叫失敗，routine 仍繼續，但健康段落必須列 `title_update_failed`；非 Codex desktop executor 跳過此
-App-specific 動作。
+呼叫失敗，routine 仍繼續，但健康段落必須列 `title_update_failed` 加上可觀測原因（例如
+`App callback timeout／no response`、例外類別、嘗試次數與 `success_receipt=false`）；不得只留裸旗標，
+也不得把「呼叫已送出」寫成成功。非 Codex desktop executor 跳過此 App-specific 動作。
 
 ### Step 1 — 本機資料更新（零 token）
 
@@ -110,6 +111,10 @@ budget 取 leads（依 priority；pop triaged_go＋researching）。每輪 limit
 **pq1＝source-trace＋extraction**（`skills/source-trace`＋`skills/lead-intake` 的研究部分），逐則
 checkpoint 狀態。Triage PASS 只授權研究、不授權入圖；prepared RA 進 pq2 後才等待使用者 `go`：
 
+`drain` 命令本身只列 bounded jobs，不會自動完成研究。brief 必須分開報告「本輪實際選中並研究」、
+「仍在 `triaged_go` 但因本輪 cap／同分 tie-break 延後」與「未出現在候選（例如尚未 harvest／triage）」；
+對延後項目列 score、排序原因與 `first_seen`，不可籠統寫成「沒看到」或「優先度不夠」。
+
 ```powershell
 & '.venv\Scripts\python.exe' -m engine_b.cli advance <lead_id> researching        # 開始
 & '.venv\Scripts\python.exe' -m engine_b.cli advance <lead_id> action_prepared --ref research_action_id=<ra_id>   # prepare 完
@@ -153,6 +158,12 @@ prepare 前先把「graph delta 涵蓋哪些公司」與「完成後唯一要建
 
 一般 event／scheduled trigger 仍回 pq1；只有 `trace_requires_user=true` 才由 `todo sync` 建立
 `source_trace_review`。其 `go` 只 dispatch exact lead 回 pq1，不接受 claim、不提高 tier，也不授權付費。
+
+brief 的 pq1 進度不得只寫「park」或只列數量。每一筆本輪處理的 `parked` lead 至少列：完整主詞／ticker、
+`parked_reason`（自然語言）、`trace_status`、`trace_next_trigger`、`trace_requires_user`，以及「是否產生
+prepared RA」（通常為否）。`original_obtained` 也要說明「已取得原文但屬時變 observation／沒有唯一 graph delta」；
+`isolated_tier_3`／截圖／paywall 則要說明「缺哪一份可逐字核對的一手原文」。park 不得被簡寫成已入圖或
+「已完成」；若沒有任何可核對 reason，視為 brief 缺欄而非正常 park。
 
 ### Step 4 — 今日決策佇列與到期 thesis
 
@@ -214,6 +225,9 @@ go 授權：exact graph delta＋已揭露的 Decision handoff
 完成：AXTI 8-K ×3 → prepared `ra_xxx`，已以上方穩定編號 [2] 等核准
 park：社群 CPO 推論 → 一手來源未支持，不產空 RA
 續跑：尚有 triaged_go ×N
+每筆 park 必須附：`parked_reason`、`trace_status`、`trace_next_trigger`、`trace_requires_user`、
+以及「是否產生 prepared RA」；每筆尚未 drain 的 lead 必須標明「本輪 cap 延後／尚未 harvest／尚未 triage」
+等具體原因與 score，不能只列總數。
 
 ## Beta capital observation（無 pq2 編號）
 TL;DR：最大化約 30 年後 `retirement_net_terminal_wealth`；technical 只決定新增 timing／pace；列今日可人工評估標的與最重要的動態風控 warning
