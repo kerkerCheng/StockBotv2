@@ -90,6 +90,14 @@ brainstorm；範圍大到需要驗收條件才開 plan。brainstorm 用 frontmat
 - **Sheet writer** — 現行所有 runtime 都不寫 Google Sheet
 - **本機 single-writer guard** — 目前靠人工紀律確保同一 working tree 只有一個 agent 寫入
 
+出自 [`2026-07-31-leverage-glide-path-requirements.md`](brainstorms/2026-07-31-leverage-glide-path-requirements.md)：
+
+- **總曝險硬擋（唯一必要的新 gate）** — 現行 `hard_blocks` 只擋槓桿 ETF，
+  已提款借款完全不受硬擋約束；未動用額度 USD 185,793 ＝ NAV 的 46.1%，
+  全額提款買 1x 標的會讓總曝險由約 1.0x 升至約 1.46x 而儀表板顯示正常
+- **槓桿 glide path** — 需先定義 exact 目標財富與年份（`Capital Authority` 新 record type）
+  與 exact 借款利率；後者可能讓「用 3x ETF」整個變成不必要
+
 其餘五份 brainstorm 的主體都已交付（見上方表格），保留作需求推導的歷史。
 
 ---
