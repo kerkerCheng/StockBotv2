@@ -1067,6 +1067,123 @@
       "result": "ok",
       "run_at": "2026-07-30T22:38:48.776640+00:00",
       "source": "edgar:GFS"
+    },
+    {
+      "failure_class": "provider_api_error",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-31T22:40:02.450857+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-31T22:40:03.008000+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-31T22:40:03.412673+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-31T22:40:03.834611+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-31T22:40:04.256147+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-31T22:40:04.680258+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-31T22:40:05.116620+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-31T22:40:05.554178+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-07-31T22:40:05.973316+00:00",
+      "source": "edgar:GFS"
+    },
+    {
+      "new": 6,
+      "result": "ok",
+      "run_at": "2026-07-31T22:40:20.723489+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-31T22:40:21.887253+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-31T22:40:22.961252+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-31T22:40:24.060122+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-31T22:40:25.418659+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-31T22:40:26.424284+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-31T22:40:28.499149+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-07-31T22:40:29.509374+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "new": 8,
+      "result": "ok",
+      "run_at": "2026-07-31T22:40:30.491672+00:00",
+      "source": "edgar:GFS"
     }
   ],
   "leads": {
@@ -1558,6 +1675,32 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2071986411461546148"
+    },
+    "lead_06a8ab213ca272d827b9843386179945": {
+      "entities": {
+        "company_ids": [
+          "co:globalfoundries"
+        ],
+        "tickers": [
+          "GFS"
+        ]
+      },
+      "first_seen": "2026-07-31T22:40:30.491592+00:00",
+      "lead_id": "lead_06a8ab213ca272d827b9843386179945",
+      "published_at": "2026-07-31",
+      "refs": {},
+      "source": "edgar:GFS",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "GFS 4 filed 2026-07-31",
+      "triage": {
+        "decided_at": "2026-07-31T22:42:08.135067+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "關聯已追蹤 GFS；SEC Form 4 含 issuer、form、date 與可逐字核對 XML，先交 pq1 判斷是否僅屬時變 insider／稀釋觀測。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000200/xslF345X06/wk-form4_1785530533.xml"
     },
     "lead_0726807b61154ece1783f363349f1ec1": {
       "entities": {
@@ -3684,6 +3827,32 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2076767097674514474"
     },
+    "lead_29afe4c0a51033dc69959a4c05534d55": {
+      "entities": {
+        "company_ids": [
+          "co:globalfoundries"
+        ],
+        "tickers": [
+          "GFS"
+        ]
+      },
+      "first_seen": "2026-07-31T22:40:30.491551+00:00",
+      "lead_id": "lead_29afe4c0a51033dc69959a4c05534d55",
+      "published_at": "2026-07-31",
+      "refs": {},
+      "source": "edgar:GFS",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "GFS 4 filed 2026-07-31",
+      "triage": {
+        "decided_at": "2026-07-31T22:42:08.331582+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "關聯已追蹤 GFS；SEC Form 4 含 issuer、form、date 與可逐字核對 XML，先交 pq1 判斷是否僅屬時變 insider／稀釋觀測。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000201/xslF345X06/wk-form4_1785530539.xml"
+    },
     "lead_2a2bd717d58af305235d2e3588a596cb": {
       "entities": {
         "company_ids": [
@@ -4766,10 +4935,15 @@
         "campaign_topic": "ai_infrastructure",
         "campaign_window_end": "2026-07-29T13:46:25Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
-        "research_mode": "delta_only"
+        "parked_reason": "TeraWulf 官方 2026-07-06 8-K／Exhibit 99.1 確認 Anthropic 20 年、約 401MW、約 US$19B contracted lease revenue，2027 下半年至 2028 初分期交付；屬帶日期的容量／商業合約觀測，且目前無唯一 tracked graph focus，不製造 RA。",
+        "research_mode": "delta_only",
+        "trace_attempts_ref": "TeraWulf 2026-07-06 SEC 8-K + official Exhibit 99.1",
+        "trace_next_trigger": "new_WULF_primary_filing_with_delivered_capacity_or_unique_tracked_company_graph_delta",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "Wow, $WULF signs a $19B DC lease with Anthropic today. Probably a very positive tailwind for the Neocloud/Colo sector. https://t.co/82tncsG3us",
       "triage": {
@@ -4940,6 +5114,72 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2074046947434860971"
+    },
+    "lead_3a7c4e5db3ecc1c420c1464fb73ac3c2": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "XFAB",
+          "NVTS",
+          "POWI"
+        ]
+      },
+      "first_seen": "2026-07-31T22:40:20.716613+00:00",
+      "lead_id": "lead_3a7c4e5db3ecc1c420c1464fb73ac3c2",
+      "media": [
+        {
+          "cache": {
+            "bytes": 116977,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_3a7c4e5db3ecc1c420c1464fb73ac3c2/3_2083106485232611328.jpg",
+            "sha256": "7361b577616482fee29f010f97f54b2e863469faf8d87b1f27261c83c1e4cfb8"
+          },
+          "height": 456,
+          "media_key": "3_2083106485232611328",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HOiuT8GaMAA0AKM.jpg",
+          "width": 1202
+        },
+        {
+          "cache": {
+            "bytes": 199473,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_3a7c4e5db3ecc1c420c1464fb73ac3c2/3_2083106485207494656.jpg",
+            "sha256": "c91f042b55d7b19fef83126de2bdce5a2db150fc3369a7b36eac73e0e0c03878"
+          },
+          "height": 893,
+          "media_key": "3_2083106485207494656",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HOiuT8Aa8AAWpz1.jpg",
+          "width": 1364
+        }
+      ],
+      "published_at": "2026-07-31T08:25:39.000Z",
+      "raw_text": "For $XFAB ER transcript:  \n\nJust to recap, my idea on $XFAB foundry growth opportunities stemmed from SiC for 800v and photonixfab/MTP for CPO applicability.   \n\n- $XFAB: \"We are making progress in co-packaged optics\".  \n\n- \"The transition to 800v... is expected to support demand for both SiC and GaN... for XFAB\"  \n\nSo those analysts/people that were confidently bearposting about $XFAB that they had \"0 exposure to 800V, photonics, CPO\" just turned out plainly wrong. \n\nAt the time I shared my idea, industry materials showed ASE and others cited photonixfab + XFAB as an upcoming CPO player in EU. And filings showed they had exposure names like $NVTS / $POWI in general. \n\nSo glad $XFAB went out to explicitly clear things up to state they were developing in CPO/800v.   \n\nOkay back to the ER:  \n\n- \"We continue to expect photonics volume production to start in 2028\".  Company currently has three silicon photonics projects in development with key partners.   \n\nI thought it would ramp sometime in H2 2027, but was probably early by a few months. \n\n- Several new data center design wins, eg. 3 new SiC design wins (consistent with general 2027 ramp as 800v deployment takes off).  \n\nSo once those ramp in 2027-2028, (markets tend to price things ahead of time), I'd expect $XFAB to be rerated based on growth opportunities.   \n\nTLDR:  \n- Current revenue numbers not as impressive.\n- $XFAB confirmed direct exposure to CPO and 800V shifts (biggest win for thesis) \n- 800V exposure opportunities for SiC (should be 2027)\n-  Timeline is 2028 ramp for photonics volume production  \n\nHappy exposure thesis to CPO/800V was confirmed from this ER. Might be a bit of waiting for revenue ramp.",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CPO",
+            "co-packaged optics"
+          ]
+        }
+      },
+      "title": "For $XFAB ER transcript: Just to recap, my idea on $XFAB foundry growth opportunities stemmed from SiC for 800v and photonixfab/MTP for CPO applicability. - $XFAB: \"We are making progress in co-packaged optics\". - \"The transition to 800v... is expected to support demand for both SiC and GaN... for XFAB\" So those analysts/people that were confidently bearposting about $XFAB that they had \"0 exposure to 800V, photonics, CPO\" just turned out plainly wrong. At the time I shared my idea, industry materials showed ASE and others cited photonixfab + XFAB as an upcoming CPO player in EU. And filings showed they had exposure names like $NVTS / $POWI in general. So glad $XFAB went out to explicitly clear things up to state they were developing in CPO/800v. Okay back to the ER: - \"We continue to expect photonics volume production to start in 2028\". Company currently has three silicon photonics projects in development with key partners. I thought it would ramp sometime in H2 2027, but was probably early by a few months. - Several new data center design wins, eg. 3 new SiC design wins (consistent with general 2027 ramp as 800v deployment takes off). So once those ramp in 2027-2028, (markets tend to price things ahead of time), I'd expect $XFAB to be rerated based on growth opportunities. TLDR: - Current revenue numbers not as impressive. - $XFAB confirmed direct exposure to CPO and 800V shifts (biggest win for thesis) - 800V exposure opportunities for SiC (should be 2027) - Timeline is 2028 ramp for photonics volume production Happy exposure thesis to CPO/800V was confirmed from this ER. Might be a bit of waiting for revenue ramp.",
+      "triage": {
+        "decided_at": "2026-07-31T22:42:09.778554+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "XFAB 與 CPO／800V 主題相關，轉述含可追查法說措辭、三項 silicon photonics 專案與 2028 volume-production 時程；社群來源需追回公司原文。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2083106805949878330"
     },
     "lead_3b455d0e21ff3e18ccf24fffb5f906e2": {
       "entities": {
@@ -6010,6 +6250,32 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2071743355684626656"
     },
+    "lead_477d6e1322452cf1c85480334f567405": {
+      "entities": {
+        "company_ids": [
+          "co:globalfoundries"
+        ],
+        "tickers": [
+          "GFS"
+        ]
+      },
+      "first_seen": "2026-07-31T22:40:30.491424+00:00",
+      "lead_id": "lead_477d6e1322452cf1c85480334f567405",
+      "published_at": "2026-07-31",
+      "refs": {},
+      "source": "edgar:GFS",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "GFS 4 filed 2026-07-31",
+      "triage": {
+        "decided_at": "2026-07-31T22:42:08.531173+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "關聯已追蹤 GFS；SEC Form 4 含 issuer、form、date 與可逐字核對 XML，先交 pq1 判斷是否僅屬時變 insider／稀釋觀測。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000204/xslF345X06/wk-form4_1785530587.xml"
+    },
     "lead_486e4bcc8003167a6997376455b5a2c9": {
       "entities": {
         "company_ids": [
@@ -6500,6 +6766,32 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2074226270125383744"
     },
+    "lead_5134606e6235f2b112f74185eca6f514": {
+      "entities": {
+        "company_ids": [
+          "co:globalfoundries"
+        ],
+        "tickers": [
+          "GFS"
+        ]
+      },
+      "first_seen": "2026-07-31T22:40:30.491377+00:00",
+      "lead_id": "lead_5134606e6235f2b112f74185eca6f514",
+      "published_at": "2026-07-31",
+      "refs": {},
+      "source": "edgar:GFS",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "GFS 4 filed 2026-07-31",
+      "triage": {
+        "decided_at": "2026-07-31T22:42:08.729826+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "關聯已追蹤 GFS；SEC Form 4 含 issuer、form、date 與可逐字核對 XML，先交 pq1 判斷是否僅屬時變 insider／稀釋觀測。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000205/xslF345X06/wk-form4_1785530595.xml"
+    },
     "lead_5227e314f46bb4d27af3ac74ca931661": {
       "entities": {
         "company_ids": [],
@@ -6531,6 +6823,46 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2077212864948162871"
+    },
+    "lead_54084fde3dc1564e704dd777f2b73eb7": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "RDDT"
+        ]
+      },
+      "first_seen": "2026-07-31T22:40:20.712213+00:00",
+      "lead_id": "lead_54084fde3dc1564e704dd777f2b73eb7",
+      "media": [
+        {
+          "cache": {
+            "bytes": 73955,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_54084fde3dc1564e704dd777f2b73eb7/3_2083220296207884288.jpg",
+            "sha256": "e09f010823f0c60d6d8af6b8c00640e44acaa3bc04bd79de90166c58beba3ace"
+          },
+          "height": 1626,
+          "media_key": "3_2083220296207884288",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HOkV0nBa4AAZLoI.jpg",
+          "width": 2041
+        }
+      ],
+      "published_at": "2026-07-31T16:18:47.000Z",
+      "raw_text": "$RDDT ER in a nutshell:\n\nRevenue: $804.9M vs. $730.4M (expected).\nEPS: $1.25 vs. ~$0.95.\nNet income: $252.8M vs. $196.5M\n\nQ3 guidance:\nRevenue: $860–870M vs. 829.1M\nAdjusted EBITDA: $385-395M vs. $369M\n\nBlowout financials, market always like to explain the drop 22.6% off some new BS narrative. \n\nLast quarter: \"AI will disrupt Reddit causing revenue loss!\"\n\nThis quarter: \"See, DAU fell .6%!\" (proceeds to ignore any revenue/profitability growth)",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "$RDDT ER in a nutshell: Revenue: $804.9M vs. $730.4M (expected). EPS: $1.25 vs. ~$0.95. Net income: $252.8M vs. $196.5M Q3 guidance: Revenue: $860–870M vs. 829.1M Adjusted EBITDA: $385-395M vs. $369M Blowout financials, market always like to explain the drop 22.6% off some new BS narrative. Last quarter: \"AI will disrupt Reddit causing revenue loss!\" This quarter: \"See, DAU fell .6%!\" (proceeds to ignore any revenue/profitability growth)",
+      "triage": {
+        "decided_at": "2026-07-31T22:42:09.986213+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "RDDT 財報與已追蹤供應鏈／技術主題無直接關聯，內容主要是績效與市場敘事。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2083225872207937687"
     },
     "lead_55925c19c133e8fc22b61a43cf2b13bb": {
       "entities": {
@@ -6953,10 +7285,15 @@
         "campaign_topic": "photonics",
         "campaign_window_end": "2026-07-05T09:45:21Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
-        "research_mode": "delta_only"
+        "parked_reason": "Sivers 官方 2026-04-16 公告與 2025 Annual Report 只支持「評估 Nasdaq New York 雙重上市」及準備財報；未找到「未來幾季完成」的公司逐字原文，不能把社群措辭升格成正式完成時程。",
+        "research_mode": "delta_only",
+        "trace_attempts_ref": "Sivers 2026-04-16 official dual-listing release + 2025 Annual Report + exact-phrase search",
+        "trace_next_trigger": "Sivers_files_Nasdaq_application_registration_statement_or_official_completion_timetable",
+        "trace_requires_user": "false",
+        "trace_status": "partial"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -7938,6 +8275,66 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2073305375957541013"
     },
+    "lead_6a56acb8a4aa5260483a3b14600db949": {
+      "entities": {
+        "company_ids": [
+          "co:meta",
+          "co:google",
+          "co:nvidia"
+        ],
+        "tickers": [
+          "AMZN",
+          "META",
+          "GOOGL",
+          "MSFT",
+          "NVDA"
+        ]
+      },
+      "first_seen": "2026-07-31T22:40:20.678052+00:00",
+      "lead_id": "lead_6a56acb8a4aa5260483a3b14600db949",
+      "media": [
+        {
+          "cache": {
+            "bytes": 137966,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_6a56acb8a4aa5260483a3b14600db949/3_2083268177627377664.jpg",
+            "sha256": "f4c98b1c40f5e1cc4f169b9b3d9fbf77b695b83e9053a97eb2acbdd217091cfd"
+          },
+          "height": 1526,
+          "media_key": "3_2083268177627377664",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HOlBXrNa8AAUeRQ.jpg",
+          "width": 1610
+        }
+      ],
+      "published_at": "2026-07-31T19:16:17.000Z",
+      "raw_text": "As a earnings recap: $AMZN, $META, $GOOGL, and $MSFT guided a 2026 combined capex forecast to ~$720-$745 Billion.\n\nUp from $695-$725B Billion previously.\n\nAmazon: $220B\nGoogle: $195B-$205B\nMeta: $130B-$145B\nMicrosoft: $175B\n\nWe've already seen significant deleveraging and retail/institutional margin liquidations (maybe it continues for more time, who knows). \n\nBut medium-long term, I'm not quite sure how anyone can be bearish the upstream semis or neoclouds. \n\nGiven each hyperscaler has flagged either compute shortages, rising cloud demand + pricing power, or increased spending for chips/networking.  \n\nMy \"bottleneck\" thesis with many of these upstream semi supply chains is that when trillions in capital flows into things from InP substrates or memory (which were both treated as cheap commodities) or even energy. \n\nLot of these current AI names that were treated as useless before in telecom cycles or even toilet sellers. \n\nGets rerated when their inflection period hits and capex flows into their balance sheets. \n\nAs seen with $NVDA GPUs past few years, memory this year, CPUs/MLCCs next few years, CPO in 2027, Glass Substrates in 2027, 800V in 2027, and so on.",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CPO",
+            "InP",
+            "NVDA"
+          ]
+        }
+      },
+      "title": "As a earnings recap: $AMZN, $META, $GOOGL, and $MSFT guided a 2026 combined capex forecast to ~$720-$745 Billion. Up from $695-$725B Billion previously. Amazon: $220B Google: $195B-$205B Meta: $130B-$145B Microsoft: $175B We've already seen significant deleveraging and retail/institutional margin liquidations (maybe it continues for more time, who knows). But medium-long term, I'm not quite sure how anyone can be bearish the upstream semis or neoclouds. Given each hyperscaler has flagged either compute shortages, rising cloud demand + pricing power, or increased spending for chips/networking. My \"bottleneck\" thesis with many of these upstream semi supply chains is that when trillions in capital flows into things from InP substrates or memory (which were both treated as cheap commodities) or even energy. Lot of these current AI names that were treated as useless before in telecom cycles or even toilet sellers. Gets rerated when their inflection period hits and capex flows into their balance sheets. As seen with $NVDA GPUs past few years, memory this year, CPUs/MLCCs next few years, CPO in 2027, Glass Substrates in 2027, 800V in 2027, and so on.",
+      "triage": {
+        "decided_at": "2026-07-31T22:42:10.184852+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "具名 hyperscaler 與 2026 capex 數字，能追查法說／guidance，可能影響 AI 上游半導體需求；社群彙整需逐家公司追原文。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2083270545320386734"
+    },
     "lead_6ac3699094b2106a3af12848febb87f3": {
       "entities": {
         "company_ids": [],
@@ -8084,6 +8481,32 @@
       ],
       "url": "https://x.com/aleabitoreddit/status/2079495178793201678"
     },
+    "lead_6baf3ec25835e624b5763ea8212236e2": {
+      "entities": {
+        "company_ids": [
+          "co:globalfoundries"
+        ],
+        "tickers": [
+          "GFS"
+        ]
+      },
+      "first_seen": "2026-07-31T22:40:30.491466+00:00",
+      "lead_id": "lead_6baf3ec25835e624b5763ea8212236e2",
+      "published_at": "2026-07-31",
+      "refs": {},
+      "source": "edgar:GFS",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "GFS 4 filed 2026-07-31",
+      "triage": {
+        "decided_at": "2026-07-31T22:42:08.929055+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "關聯已追蹤 GFS；SEC Form 4 含 issuer、form、date 與可逐字核對 XML，先交 pq1 判斷是否僅屬時變 insider／稀釋觀測。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000203/xslF345X06/wk-form4_1785530578.xml"
+    },
     "lead_6d1adf0b8604fa090d3511191a19f7e4": {
       "entities": {
         "company_ids": [],
@@ -8158,10 +8581,15 @@
         "campaign_topic": "photonics",
         "campaign_window_end": "2026-07-05T09:45:21Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
-        "research_mode": "delta_only"
+        "parked_reason": "官方文件確認 Sivers 與 Jabil、O-Net、GlobalFoundries、Ayar、POET 的開發／reference-design／production-readiness 關係，但不支持貼文把所有專案直接寫成已 mass production 或已 revenue；Eoptolink／Innolight 亦未獲一手確認，既有圖已涵蓋主要伙伴關係，沒有新 graph delta。",
+        "research_mode": "delta_only",
+        "trace_attempts_ref": "Sivers official Jabil/O-Net/GF/Ayar releases + POET-Sivers official collaboration + Sivers graph context",
+        "trace_next_trigger": "customer_qualification_completion_purchase_order_or_partner_revenue_disclosure",
+        "trace_requires_user": "false",
+        "trace_status": "partial"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -8909,10 +9337,15 @@
         "campaign_topic": "memory_packaging",
         "campaign_window_end": "2026-07-29T13:46:25Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
-        "research_mode": "delta_only"
+        "parked_reason": "Samsung SDI 官方資料支持 AI datacenter BBU 需求成長與 21700 圓柱電芯用途，但 Samsung SDI→Simplo→Meta/Amazon 供應鏈及 Samsung／Panasonic 缺貨只見 tier-3 產業轉述，未取得 Simplo／客戶／供應商一手逐字確認；不產 extraction 或 RA。",
+        "research_mode": "delta_only",
+        "trace_attempts_ref": "Samsung SDI InterBattery/earnings official pages + Panasonic 2026 energy IR + Simplo/MOPS official search + Digitimes/TheElec metadata",
+        "trace_next_trigger": "Simplo_MOPS_or_Samsung_Panasonic_primary_disclosure_names_supply_chain_and_constraints",
+        "trace_requires_user": "false",
+        "trace_status": "isolated_tier_3"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "Looks like there's a high power cylindrical cell / BBU cell shortage (aka: bottleneck): - Samsung SDI supplies the cells to Simplo, which assembles them into BBUs for $META to $AMZN. - As demand from data centers has increased, production of Samsung SDI's cylindrical cells has also risen sharply. - Industry sources said Panasonic, Samsung are experiencing supply shortages for BBU cells. So main beneficiaries imo look like: - Samsung SDI (KRX: 006400) / Panasonic Energy as cleaneset winners - Murata (6981) / this keeps showing up everywhere with MLCC and others lol - LG Energy (KRX: 373220) / incoming There's not really much direct US players? But adjacent read through like $VRT, $ETN or $BWA / $ENS. Not quite in my domain emphasis cup of tea though. I wouldn't conflate this as all shortages having a massive TAM, but there could be opportunities...",
       "triage": {
@@ -9598,10 +10031,15 @@
         "campaign_topic": "photonics",
         "campaign_window_end": "2026-07-29T13:46:25Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
-        "research_mode": "delta_only"
+        "parked_reason": "官方文件只支持 Jabil 1.6T LRO 開發、POET-Sivers 2026 年底 production readiness、GF reference design 與既有 O-Net／Ayar 合作；貼文推導的 1–4 月 qualification、2027 mass production 與 Apple／其他客戶時程未獲一手確認，主要關係已在圖中，無材料 graph delta。",
+        "research_mode": "delta_only",
+        "trace_attempts_ref": "Jabil 2026 JPM event notice + Sivers Q1/Annual Report/partner releases + POET official Sivers release + graph context",
+        "trace_next_trigger": "Jabil_POET_GF_Ayar_or_O-Net_announces_qualification_completion_volume_order_or_revenue",
+        "trace_requires_user": "false",
+        "trace_status": "partial"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -9873,6 +10311,32 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2077414086959112629"
+    },
+    "lead_8449bc608af931881de4f3306385d5ab": {
+      "entities": {
+        "company_ids": [
+          "co:globalfoundries"
+        ],
+        "tickers": [
+          "GFS"
+        ]
+      },
+      "first_seen": "2026-07-31T22:40:30.491638+00:00",
+      "lead_id": "lead_8449bc608af931881de4f3306385d5ab",
+      "published_at": "2026-07-31",
+      "refs": {},
+      "source": "edgar:GFS",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "GFS 4 filed 2026-07-31",
+      "triage": {
+        "decided_at": "2026-07-31T22:42:09.114318+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "關聯已追蹤 GFS；SEC Form 4 含 issuer、form、date 與可逐字核對 XML，先交 pq1 判斷是否僅屬時變 insider／稀釋觀測。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000199/xslF345X06/wk-form4_1785530512.xml"
     },
     "lead_8482d009db1c60e12c73a8a726d8a0df": {
       "entities": {
@@ -12503,6 +12967,32 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2078341955411738744"
     },
+    "lead_ae452fe9b53575a3b5e5096268aae023": {
+      "entities": {
+        "company_ids": [
+          "co:globalfoundries"
+        ],
+        "tickers": [
+          "GFS"
+        ]
+      },
+      "first_seen": "2026-07-31T22:40:30.491509+00:00",
+      "lead_id": "lead_ae452fe9b53575a3b5e5096268aae023",
+      "published_at": "2026-07-31",
+      "refs": {},
+      "source": "edgar:GFS",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "GFS 4 filed 2026-07-31",
+      "triage": {
+        "decided_at": "2026-07-31T22:42:09.319283+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "關聯已追蹤 GFS；SEC Form 4 含 issuer、form、date 與可逐字核對 XML，先交 pq1 判斷是否僅屬時變 insider／稀釋觀測。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000202/xslF345X06/wk-form4_1785530570.xml"
+    },
     "lead_af57fda547a71e40dc0b6a4eb5b3ddf2": {
       "entities": {
         "company_ids": [
@@ -13318,6 +13808,32 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2071730699363881241"
+    },
+    "lead_b6f806984f680a042a3abd3bb409b9ac": {
+      "entities": {
+        "company_ids": [
+          "co:globalfoundries"
+        ],
+        "tickers": [
+          "GFS"
+        ]
+      },
+      "first_seen": "2026-07-31T22:40:30.491295+00:00",
+      "lead_id": "lead_b6f806984f680a042a3abd3bb409b9ac",
+      "published_at": "2026-07-31",
+      "refs": {},
+      "source": "edgar:GFS",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "GFS 4 filed 2026-07-31",
+      "triage": {
+        "decided_at": "2026-07-31T22:42:09.528703+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "關聯已追蹤 GFS；SEC Form 4 含 issuer、form、date 與可逐字核對 XML，先交 pq1 判斷是否僅屬時變 insider／稀釋觀測。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000206/xslF345X06/wk-form4_1785530603.xml"
     },
     "lead_b72df36ba871db77a524b7178d3b4944": {
       "entities": {
@@ -14302,6 +14818,58 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2078274370795954384"
     },
+    "lead_c91246f27ecce6763d075ed638d3f163": {
+      "entities": {
+        "company_ids": [
+          "co:axt",
+          "co:google",
+          "co:meta",
+          "co:coherent",
+          "co:lumentum"
+        ],
+        "tickers": [
+          "AXTI",
+          "AMZN",
+          "MU",
+          "GOOGL",
+          "META",
+          "MSFT",
+          "COHR",
+          "LITE"
+        ]
+      },
+      "first_seen": "2026-07-31T22:40:20.719590+00:00",
+      "lead_id": "lead_c91246f27ecce6763d075ed638d3f163",
+      "media": [],
+      "published_at": "2026-07-31T07:14:23.000Z",
+      "raw_text": "Few earnings TLDRs with my favorite $AXTI and $AMZN:\n\nAmazon:\n- Raised 2026 capex to $220B vs. prior $200B (partly due to higher memory costs, which is bullish on $MU to Samsung) \n- Even at $220B, Amazon will not have enough capacity to meet all 2026 demand; Jassy expects the same in 2027.\n- Most incoming 2027 capacity is already reserved, with substantial 2028 capacity also reserved.\n\nMostly read through on upstream semis. $GOOGL, $META, $AMZN, and $MSFT all identified compute shortage. \n\nAll the narratives a few weeks earlier was \"excess compute\" from Meta and others + hyperscalers cutting back on spend... All BS. \n\nAmazon earnings was very bullish on AI semi trade. \n\nAXTI:\n\n- AXT to double InP capacity during 2026. Then double again in 2027. \n\nThis is expected to make AXT \"by far the largest indium phosphide producer in the world.\" - LFG\n\n- Q2 rev was $47.6M, the highest quarterly revenue in AXT history (InP revenue reached a record $30.7M, from DC applications.)\n- Revenue increased 77% sequentially and 164% year over year.\n- InP revenue-capacity targets: $60M per quarter exiting 2026.\n- $130M per quarter exiting 2027 \n\nThat $130m target could be hiked too since management stated they find \"whatever ways to increase that capacity expansion\"\n\n- Management said the reported backlog remains well above $100M, but that number no longer reflects all available demand.\n\n\"Customer demand continues to outpace supply, no matter how fast we add capacity.\" 800G/1.6T is driving the current cycle, while NPO/CPO extends it beyond 2027. \n\nAlso they're targeting 50%-plus gross margin: \"We should definitely be targeting a number that begins with a five.\"\n\nChina demand more than doubled, and their agreements with Casela, $COHR and $LITE did not materially drive Q2. \n\nThis is not even considering my projected massive ASP hikes yet as InP substrates get more bottlenecked. \n\nTLDR:\n\n- Amazon too much compute demands, needs capex to fufill it, so upstream semis go brrr. \n- AXT world largest InP substrate supplier, high gross margins, expansion, and supply can't keep up with demand.  \n\nBullish on demand side from Amazon + capex. Bullish on upstream optical supply chains from too much demand.",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "COHR",
+            "CPO",
+            "InP",
+            "LITE"
+          ]
+        }
+      },
+      "title": "Few earnings TLDRs with my favorite $AXTI and $AMZN: Amazon: - Raised 2026 capex to $220B vs. prior $200B (partly due to higher memory costs, which is bullish on $MU to Samsung) - Even at $220B, Amazon will not have enough capacity to meet all 2026 demand; Jassy expects the same in 2027. - Most incoming 2027 capacity is already reserved, with substantial 2028 capacity also reserved. Mostly read through on upstream semis. $GOOGL, $META, $AMZN, and $MSFT all identified compute shortage. All the narratives a few weeks earlier was \"excess compute\" from Meta and others + hyperscalers cutting back on spend... All BS. Amazon earnings was very bullish on AI semi trade. AXTI: - AXT to double InP capacity during 2026. Then double again in 2027. This is expected to make AXT \"by far the largest indium phosphide producer in the world.\" - LFG - Q2 rev was $47.6M, the highest quarterly revenue in AXT history (InP revenue reached a record $30.7M, from DC applications.) - Revenue increased 77% sequentially and 164% year over year. - InP revenue-capacity targets: $60M per quarter exiting 2026. - $130M per quarter exiting 2027 That $130m target could be hiked too since management stated they find \"whatever ways to increase that capacity expansion\" - Management said the reported backlog remains well above $100M, but that number no longer reflects all available demand. \"Customer demand continues to outpace supply, no matter how fast we add capacity.\" 800G/1.6T is driving the current cycle, while NPO/CPO extends it beyond 2027. Also they're targeting 50%-plus gross margin: \"We should definitely be targeting a number that begins with a five.\" China demand more than doubled, and their agreements with Casela, $COHR and $LITE did not materially drive Q2. This is not even considering my projected massive ASP hikes yet as InP substrates get more bottlenecked. TLDR: - Amazon too much compute demands, needs capex to fufill it, so upstream semis go brrr. - AXT world largest InP substrate supplier, high gross margins, expansion, and supply can't keep up with demand. Bullish on demand side from Amazon + capex. Bullish on upstream optical supply chains from too much demand.",
+      "triage": {
+        "decided_at": "2026-07-31T22:42:10.376068+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "AXT／AXTI 為已追蹤標的，含 InP 產能、營收、backlog、毛利與 2026–2027 量產目標等具體可核對主張；需追回 AXTI 與 Amazon 一手法說。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2083088870942642391"
+    },
     "lead_c9225fcf3ddafb198bd230cda3ae8f5e": {
       "entities": {
         "company_ids": [
@@ -14879,6 +15447,38 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2072161782005936487"
+    },
+    "lead_cf8c8b7144aa9c1a3ae81cae195eaf14": {
+      "entities": {
+        "company_ids": [
+          "co:google",
+          "co:meta"
+        ],
+        "tickers": [
+          "GOOGL",
+          "MSFT",
+          "META",
+          "AMZN"
+        ]
+      },
+      "first_seen": "2026-07-31T22:40:20.714173+00:00",
+      "lead_id": "lead_cf8c8b7144aa9c1a3ae81cae195eaf14",
+      "media": [],
+      "published_at": "2026-07-31T10:10:30.000Z",
+      "raw_text": "Just a TLDR of this week:\n\nMedia: Hyperscalers overbuilt and are selling excess compute.\n-> $GOOGL, $MSFT, $META, and $AMZN: Demand for compute far exceeds capacity. Capex go brrr.\n\nInstitutions: Emergency rate hike or 3x rate hikes, it's all over.\n-> Kevin Warsh: No rate Hike.\n\nRetail/Media: AI is crashing because it's a bubble. \n-> Citadel looking to buy AI leveraged hedge funds positions: 👀\n\nJim Cramer: Sell all your leveraged DC stocks.\n-> Koreans: SK Hynix +30%, Samsung +26.81%",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "Just a TLDR of this week: Media: Hyperscalers overbuilt and are selling excess compute. -> $GOOGL, $MSFT, $META, and $AMZN: Demand for compute far exceeds capacity. Capex go brrr. Institutions: Emergency rate hike or 3x rate hikes, it's all over. -> Kevin Warsh: No rate Hike. Retail/Media: AI is crashing because it's a bubble. -> Citadel looking to buy AI leveraged hedge funds positions: 👀 Jim Cramer: Sell all your leveraged DC stocks. -> Koreans: SK Hynix +30%, Samsung +26.81%",
+      "triage": {
+        "decided_at": "2026-07-31T22:42:10.578327+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "主要是媒體／社群情緒與價格表現對照，缺少可拆成供應鏈機制且可逐字追查的一手 claim。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2083133191112843575"
     },
     "lead_d024baf2ef9f980060fbac0805025087": {
       "content_updated_at": "2026-07-29T13:46:49.149482+00:00",
@@ -15493,6 +16093,89 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2072574465763111166"
+    },
+    "lead_d3b3988d99ff494fe07af958c6b5bc1e": {
+      "entities": {
+        "company_ids": [
+          "co:poet_technologies",
+          "co:jabil"
+        ],
+        "tickers": [
+          "POET",
+          "SIVE",
+          "JBL"
+        ]
+      },
+      "first_seen": "2026-07-31T22:40:20.715480+00:00",
+      "lead_id": "lead_d3b3988d99ff494fe07af958c6b5bc1e",
+      "media": [
+        {
+          "cache": {
+            "bytes": 214987,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_d3b3988d99ff494fe07af958c6b5bc1e/3_2083111678858997760.jpg",
+            "sha256": "b90f973df1c64bdc9c27ff1268e8e045258383c753ad71ad008c03e0deb0c626"
+          },
+          "height": 1281,
+          "media_key": "3_2083111678858997760",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HOizCP3bsAAdN_3.jpg",
+          "width": 1936
+        },
+        {
+          "cache": {
+            "bytes": 135856,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_d3b3988d99ff494fe07af958c6b5bc1e/3_2083111688342298624.jpg",
+            "sha256": "4b2d4cbc2abdb24610add31ba4e6a6e26275360a00ef9243d88edda8b99a1fdd"
+          },
+          "height": 1681,
+          "media_key": "3_2083111688342298624",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HOizCzMbYAA16xf.jpg",
+          "width": 1846
+        }
+      ],
+      "published_at": "2026-07-31T08:57:11.000Z",
+      "raw_text": "Now that I think of it more, $POET optical interposer piece is actually a little more material than I thought with $SIVE. \n\nOriginally the wording was \"readiness\" for EOY 2026. \n\nBut $POET upgraded that wording, by stating \"production\" with Sivers lasers projected EOY 2026. \n\nSo a volume orders from across $JBL to $POET, should hit in H1 2027. Which makes a bit of sense, since Sivers did raise an institutional oversubscribed round for future mass production.  \n\nOn a side note, can't believe it's already August and 5 months left until 2027... Which was my inflection window for glass substrates, CPO, 800v, and new architectures to ramp.",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CPO"
+          ]
+        },
+        "robotics": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "JBL"
+          ]
+        },
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "SIVE",
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Now that I think of it more, $POET optical interposer piece is actually a little more material than I thought with $SIVE. Originally the wording was \"readiness\" for EOY 2026. But $POET upgraded that wording, by stating \"production\" with Sivers lasers projected EOY 2026. So a volume orders from across $JBL to $POET, should hit in H1 2027. Which makes a bit of sense, since Sivers did raise an institutional oversubscribed round for future mass production. On a side note, can't believe it's already August and 5 months left until 2027... Which was my inflection window for glass substrates, CPO, 800v, and new architectures to ramp.",
+      "triage": {
+        "decided_at": "2026-07-31T22:42:10.818524+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "POET／Sivers 為已追蹤 CPO 標的，production readiness 轉 production、2026 年底與 2027 上半年時程是具體可追查的潛在新事件；需追回公司原文。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2083114743729107236"
     },
     "lead_d4486d3793fa99db26f51b1ade2eec41": {
       "entities": {
@@ -18508,8 +19191,8 @@
   "schema_version": "2",
   "source_state": {
     "x:aleabitoreddit": {
-      "since_id": "2082896789880119590",
-      "updated_at": "2026-07-30T22:38:41.241357+00:00",
+      "since_id": "2083270545320386734",
+      "updated_at": "2026-07-31T22:40:20.723473+00:00",
       "user_id": "1940360837547565056"
     }
   }
