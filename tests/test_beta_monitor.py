@@ -121,6 +121,35 @@ def test_signal_state_uses_macd_and_ma_as_pace_guard_not_extra_votes() -> None:
     assert bearish["pace"] == 0.25
 
 
+def test_stretched_above_sma200_downgrades_pace_even_on_a_real_drawdown() -> None:
+    """回撤 tier 只看「跌了多少」，看不出「跌之前漲了多少」。
+
+    2026-07-31 實況：SOXX 距高點 -23%、RSI 42.5，看似便宜，但仍在 200 日均線
+    上方 +25.7%——它跌得多是因為先漲得更多。以 30 年累積為目標時，買在趨勢
+    之上不該與買在趨勢附近同速。
+    """
+    policy = load_beta_policy()
+    threshold = policy["signal"]["stretched_above_sma200"]
+    base = dict(
+        benchmark_key="soxx",
+        data_status="observed",
+        drawdown_252=-0.23,
+        rsi_14=42.5,
+        macd_histogram_slope=0.1,
+        sma_50_slope_5=-0.003,
+        blockers=[],
+    )
+
+    stretched = signal_state({**base, "distance_sma_200": threshold + 0.05}, policy)
+    near_trend = signal_state({**base, "distance_sma_200": 0.03}, policy)
+
+    assert stretched["tier"] == near_trend["tier"], "只降 pace，不改 tier 判定"
+    assert stretched["stretched_above_sma200"] is True
+    assert near_trend["stretched_above_sma200"] is False
+    assert stretched["pace"] < near_trend["pace"]
+    assert stretched["pace"] in policy["signal"]["allowed_paces"]
+
+
 def test_ranges_share_one_frozen_deployable_cash_budget() -> None:
     policy = load_beta_policy()
     observations = _observations(policy)
@@ -391,7 +420,7 @@ def test_markdown_is_aggregate_and_preserves_human_boundary() -> None:
     assert "技術訊號只決定新增的時點與節奏" in rendered
     assert "月息不得依賴被迫賣出 beta" in rendered
     assert "節奏 " in rendered
-    assert "1日 -1.0%｜5日 -3.0%｜20日 -8.0%" in rendered
+    assert "5日 -3.0%｜20日 -8.0%" in rendered
     assert "## 主力 ETF／權值" in rendered
     assert rendered.index("QQQ") < rendered.index("TQQQ")
     assert "不代表已核准、已提款、已下單或已寫回" in rendered

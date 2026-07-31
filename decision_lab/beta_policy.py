@@ -88,9 +88,19 @@ def validate_beta_policy(source: Mapping[str, Any]) -> dict[str, Any]:
         "allowed_paces",
         "max_refresh_age_hours",
         "repeat_after_sessions",
+        "stretched_above_sma200",
         "tiers",
     }:
         raise BetaPolicyError("signal policy fields do not match schema")
+    # 距 200 日均線超過此值時降一級 pace。回撤 tier 只看「跌了多少」，看不出
+    # 「跌之前漲了多少」——標的可能距高點 -23% 卻仍在長期趨勢上方 +26%。
+    stretched = signal.get("stretched_above_sma200")
+    if (
+        isinstance(stretched, bool)
+        or not isinstance(stretched, (int, float))
+        or not 0.0 < float(stretched) <= 1.0
+    ):
+        raise BetaPolicyError("stretched_above_sma200 must be within (0, 1]")
     paces = signal.get("allowed_paces")
     if not isinstance(paces, list) or sorted(paces) != [0.0, 0.25, 0.5, 1.0]:
         raise BetaPolicyError("allowed_paces must be the closed v1 set")
@@ -307,6 +317,7 @@ def validate_beta_policy(source: Mapping[str, Any]) -> dict[str, Any]:
             "allowed_paces": [0.0, 0.25, 0.5, 1.0],
             "max_refresh_age_hours": max_age,
             "repeat_after_sessions": repeat,
+            "stretched_above_sma200": float(stretched),
             "tiers": normalized_tiers,
         },
         "risk": normalized_risk,

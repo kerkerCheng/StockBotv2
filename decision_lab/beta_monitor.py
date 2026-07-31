@@ -138,6 +138,7 @@ def signal_state(observation: Mapping[str, Any] | None, policy: Mapping[str, Any
     slope_50 = required["sma_50_slope_5"]
     assert drawdown is not None and rsi is not None
     assert histogram_slope is not None and distance_200 is not None and slope_50 is not None
+    stretched = False
     matched: Mapping[str, Any] | None = None
     for tier in reversed(list(policy["signal"]["tiers"])):
         if drawdown <= float(tier["drawdown_at_most"]) and rsi <= float(tier["rsi_at_most"]):
@@ -154,6 +155,20 @@ def signal_state(observation: Mapping[str, Any] | None, policy: Mapping[str, Any
         # 長均線與中期斜率同時偏空時，MACD 單日改善不足以直接使用最高 pace。
         if bearish_regime and pace > float(matched["base_pace"]):
             pace = float(matched["base_pace"])
+        # 對稱的另一側：回撤 tier 只看「跌了多少」，看不出「跌之前漲了多少」。
+        # 仍遠高於 200 日均線時降一級——買在趨勢之上不該與買在趨勢附近同速。
+        stretched_threshold = _finite(
+            policy["signal"].get("stretched_above_sma200"), non_negative=True
+        )
+        if stretched_threshold is not None and distance_200 > stretched_threshold:
+            allowed = sorted(
+                float(value) for value in policy["signal"]["allowed_paces"]
+            )
+            lower = [value for value in allowed if value < pace]
+            pace = lower[-1] if lower else 0.0
+            stretched = True
+        else:
+            stretched = False
         tier_name = str(matched["name"])
     regime = (
         "below_sma200_falling_sma50"
@@ -168,6 +183,7 @@ def signal_state(observation: Mapping[str, Any] | None, policy: Mapping[str, Any
         "pace": pace,
         "turning": turning,
         "regime": regime,
+        "stretched_above_sma200": stretched,
         "blockers": [],
     }
 
@@ -527,11 +543,35 @@ def _signed_pct(value: Any) -> str:
 
 
 def _moves(indicator: Mapping[str, Any]) -> str:
+    """只顯示對 30 年累積目標有意義的區間。
+
+    1 日報酬是雜訊：它會讓大跌後的反彈看起來像動能，對「何時加碼」沒有資訊。
+    20 日報酬保留為近期方向，5 日次之。
+    """
     return (
-        f"1日 {_signed_pct(indicator.get('return_1d'))}｜"
         f"5日 {_signed_pct(indicator.get('return_5d'))}｜"
         f"20日 {_signed_pct(indicator.get('return_20d'))}"
     )
+
+
+def _heat(indicator: Mapping[str, Any]) -> str:
+    """距 200 日均線＝單一「熱度」讀數。
+
+    距高點只說跌了多少，不說跌之前漲了多少。兩者合看才知道現在是回到趨勢
+    還是仍在趨勢之上：SOXX 曾同時出現「距高點 -23%」與「距 200 日均線 +26%」。
+    """
+    value = _finite(indicator.get("distance_sma_200"))
+    if value is None:
+        return "距200日均線 n/a"
+    if value > 0.20:
+        tag = "偏熱"
+    elif value > 0.05:
+        tag = "偏高"
+    elif value >= -0.05:
+        tag = "近趨勢"
+    else:
+        tag = "低於趨勢"
+    return f"距200日均線 {_signed_pct(value)}（{tag}）"
 
 
 def _pace_label(value: Any) -> str:
@@ -798,7 +838,8 @@ def render_beta_monitor_markdown(
         lines.append(
             f"- {_display_label(item)}｜"
             f"{item['ticker']}｜{_moves(indicator)}｜"
-            f"RSI {_finite(indicator.get('rsi_14')) or 0:.1f}｜距高點 {_pct(indicator.get('drawdown_252'))}｜"
+            f"距高點 {_pct(indicator.get('drawdown_252'))}｜{_heat(indicator)}｜"
+            f"RSI {_finite(indicator.get('rsi_14')) or 0:.1f}｜"
             f"{_signal_tier_label(item['signal_tier'])} / {_pace_label(item['signal_pace'])}｜"
             f"自有現金評估上限 "
             f"{_money(_primary_supported_ceiling(item), currency)}｜"
@@ -840,8 +881,9 @@ def render_beta_monitor_markdown(
             lines.append(
                 f"- {_display_label(item)}｜"
                 f"{item['ticker']}｜{_moves(indicator)}｜"
-                f"RSI {_finite(indicator.get('rsi_14')) or 0:.1f}｜"
                 f"距高點 {_pct(indicator.get('drawdown_252'))}｜"
+                f"{_heat(indicator)}｜"
+                f"RSI {_finite(indicator.get('rsi_14')) or 0:.1f}｜"
                 f"{_signal_tier_label(item['signal_tier'])} / {_pace_label(item['signal_pace'])}"
             )
     else:
