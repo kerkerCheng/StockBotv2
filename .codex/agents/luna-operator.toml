@@ -1,7 +1,7 @@
 name = "luna_operator"
 description = "StockBotv2 的唯讀機械型研究與驗證 worker；適合明確、重複、可逐項驗收的工作，由主代理負責派工與最終把關。"
 model = "gpt-5.6-luna"
-model_reasoning_effort = "ultra"
+model_reasoning_effort = "max"
 sandbox_mode = "read-only"
 
 developer_instructions = """
