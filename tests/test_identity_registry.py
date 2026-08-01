@@ -29,7 +29,7 @@ def test_neutral_registry_preserves_known_company_mappings() -> None:
     assert registry.research_ticker("co:anthropic") is None
     assert registry.research_ticker("co:agility_robotics") is None
     assert registry.research_ticker("co:gxo_logistics") == "GXO"
-    assert registry.research_ticker("co:schaeffler") == "SHA.DE"
+    assert registry.research_ticker("co:schaeffler") == "SHA0.DE"
     assert registry.research_ticker("co:hyundai_mobis") == "012330.KS"
     assert registry.research_ticker("co:boston_dynamics") is None
     assert registry.company_id_for_ticker("sive.st") == "co:sivers_semiconductors"
