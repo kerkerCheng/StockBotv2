@@ -15,6 +15,13 @@
 - 本機開發 agent 可以是 Claude Code 或 Codex；架構中明指 `claude.ai` custom connector 的遠端流程仍維持 Claude，不因本機開發工具切換而改名。
 - **Push 政策（2026-07-22 使用者定案）：** push 是常規動作——session 收尾（邏輯 commits 完成後）把 master push 到 origin，不需逐次人工確認。私有隔離依 `.gitignore`（`library/private/`、`.env`）；push 前 sanity check：`git ls-files library/private` 應為空。本機 daily scheduled task 只可經 `scripts/publish_daily_state.py` 發布 `pending_leads.json`＋`todo_pool.json`；不得用 unattended 廣泛 Git 命令碰其他檔。
 
+### Codex custom-agent 委派契約（2026-08-01 使用者定案）
+
+- 專案級 `.codex/agents/luna-operator.toml` 定義 `luna_operator`：使用 `gpt-5.6-luna`／`ultra`／`read-only`，只接明確、重複、可逐項驗收的機械型工作。主代理負責拆 scope、列 acceptance criteria、檢查回傳證據，並作最後判斷。
+- 適合委派：repo／queue 盤點、確定性資料檢查、測試與 log 分析、pq1 原始文件追源與原子 claim 抽取、依固定清單蒐集 alpha 財務事實與反證。所有回傳都只是 review packet，不是 authority。
+- 不得委派給 `luna_operator`：任何 working-tree 或 private authority 寫入、evidence tier 升級、graph admission、pq2 核准／resolve、thesis revise／retire、資本配置、live choice／fill、commit 或 push。這些仍由主代理依既有人工 gate 執行。
+- 同一 working tree 維持主代理為唯一 writer。若未來確需 writing subagent，必須另建 worktree／branch、明確指定唯一 owner，且不得沿用 `luna_operator` 的唯讀角色暗示授權。
+
 ## 工作語言（繁體中文）
 
 **與使用者的所有溝通、以及實作過程本身的敘述，一律用繁體中文——不只是最終答案，過程也是。**
