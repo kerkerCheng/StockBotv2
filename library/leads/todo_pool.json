@@ -1107,9 +1107,10 @@
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 77,
       "reason": null,
+      "receipt": null,
       "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "drop",
+      "resolved_at": "2026-08-01T02:36:38.426968+00:00",
       "source": "decision_lab",
       "title": "REVIEW — co:applied_optoelectronics",
       "type": "decision_review"
@@ -2228,6 +2229,15 @@
       "ref_id": "dc_b1225ef0ebbf6dab001ec8cabb11f4e1",
       "type": "decision_review",
       "verb": "pending"
+    },
+    {
+      "at": "2026-08-01T02:36:38.426968+00:00",
+      "n": 77,
+      "reason": null,
+      "receipt": null,
+      "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
+      "type": "decision_review",
+      "verb": "drop"
     }
   ],
   "next_n": 78,
