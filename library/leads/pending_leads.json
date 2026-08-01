@@ -5962,7 +5962,7 @@
       "lead_id": "lead_44ce140c224422130eecf4bb9766219e",
       "published_at": "2026-07-29",
       "refs": {
-        "park_reason": "governance_only_bylaw_quorum_reduction_majority_to_33.3pct_no_supply_chain_or_thesis_content"
+        "parked_reason": "governance_only_bylaw_quorum_reduction_majority_to_33.3pct_no_supply_chain_or_thesis_content"
       },
       "source": "edgar:AXTI",
       "status": "parked",
@@ -18515,7 +18515,7 @@
       "lead_id": "lead_f6d7fdd6bff7d38b4edf021c49835f5f",
       "published_at": "2026-07-22",
       "refs": {
-        "park_reason": "governance_only_new_independent_director_jia_bin_duh_no_supply_chain_or_thesis_content"
+        "parked_reason": "governance_only_new_independent_director_jia_bin_duh_no_supply_chain_or_thesis_content"
       },
       "source": "edgar:AXTI",
       "status": "parked",
