@@ -8892,6 +8892,44 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2082176491216085377"
     },
+    "lead_710727a716f3a5b78ae729c52154cd85": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-01T16:44:13.211951+00:00",
+      "lead_id": "lead_710727a716f3a5b78ae729c52154cd85",
+      "published_at": null,
+      "refs": {
+        "action_digest": "f2cf87eafc3e45e00dcf245c4b40465ed3d6a134e7188c4a9b7dbe6e5ab555f5",
+        "campaign_topic": "meta_vistara_cxl",
+        "canonical_url": "https://aisystemcodesign.github.io/papers/isca26/vistara_camera_ready.pdf",
+        "focus_company_id": "co:meta",
+        "outcome": "prepared_reviewed_minimal_vistara_graph_delta",
+        "primary_url": "https://aisystemcodesign.github.io/papers/isca26/vistara_camera_ready.pdf",
+        "research_action_id": "ra_62c5841f8de2c67890cbefb805ba8d77",
+        "research_mode": "delta_only",
+        "research_run": "luna_reviewer_2026-08-02_pq1_10",
+        "source_doc": "meta_vistara_isca_2026",
+        "trace_origin_entity": "Meta Platforms",
+        "trace_status": "original_obtained"
+      },
+      "source": "paper:meta",
+      "status": "action_prepared",
+      "themes": {},
+      "title": "Vistara: Making CXL Real—Full Path from ASIC Design and OS Support to Hyperscale Deployment",
+      "triage": {
+        "decided_at": "2026-08-01T16:44:22.244863+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true,
+          "novelty": true
+        },
+        "reason": "Meta 作者群的一手 ISCA 2026 論文，明確揭露 Vistara 自研 CXL ASIC、架構與 hyperscale production deployment；需準備最小 graph delta 並保留人工 admission gate。",
+        "tier": 1
+      },
+      "url": "https://aisystemcodesign.github.io/papers/isca26/vistara_camera_ready.pdf"
+    },
     "lead_713e031c961ce368a24f92dc65d7525b": {
       "entities": {
         "company_ids": [
@@ -12265,10 +12303,18 @@
         "campaign_topic": "photonics",
         "campaign_window_end": "2026-07-29T13:46:25Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
-        "research_mode": "delta_only"
+        "original_claim_status": "partial_support_lta_and_capacity_exact_unverified",
+        "parked_reason": "Reuters 支持 memo 所述 LTA/7GW/145B/cadence，但 internal memo 與三家具名 LTA 一手文件不可得；capex/cadence 僅有部分 Meta 官方旁證，數字屬時變 observation",
+        "research_mode": "delta_only",
+        "research_outcome": "partial_official_context_exact_memo_lta_unavailable",
+        "research_run": "luna_reviewer_2026-08-02_pq1_10",
+        "trace_attempts_ref": "Reuters 2026-07-09 syndicated article；Meta custom-silicon PR、Q1 10-Q、Q2 Exhibit；Samsung/SanDisk/Sumitomo official search",
+        "trace_next_trigger": "取得 Meta internal memo 原文，或 Meta/Samsung/SanDisk/Sumitomo 具名 LTA 一手披露",
+        "trace_requires_user": "false",
+        "trace_status": "isolated_tier_3"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "Nothing like an internal $META memo getting published. Showing AI ramping as usual: - LTAs signed with Samsung and $SNDK for memory - LTAs signed with Sumitomo Electric for fiber optics - Expected to deploy 7GW compute infra this year, and doubling in 2027. - as much as $145B capex spend this year “It plans to launch a chip about every six months through 2027”",
       "triage": {
@@ -13083,10 +13129,19 @@
         "campaign_topic": "memory_packaging",
         "campaign_window_end": "2026-07-05T09:45:21Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
-        "research_mode": "delta_only"
+        "original_claim_status": "partial_one_of_eight_primary_confirmed",
+        "parked_reason": "八個互不相干的 claim 混在同一貼文；僅 Vistara 找到 Meta 一手論文並拆為獨立 lead，其餘券商／付費媒體轉述未達可入圖證據，Bloom 官方資料也只支持合作額度而不支持電網瓶頸因果。",
+        "related_research_action_id": "ra_62c5841f8de2c67890cbefb805ba8d77",
+        "research_mode": "delta_only",
+        "research_outcome": "composite_split_vistara_to_derived_lead",
+        "research_run": "luna_reviewer_2026-08-02_pq1_10",
+        "trace_attempts_ref": "luna_packet_plus_main_review_meta_paper_morgan_digitimes_company_sources",
+        "trace_next_trigger": "new_primary_for_remaining_atoms_or_exact_user_priority",
+        "trace_requires_user": "false",
+        "trace_status": "isolated_tier_3"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "robotics": {
           "counter_only": false,
@@ -13159,10 +13214,18 @@
         "campaign_topic": "photonics",
         "campaign_window_end": "2026-07-29T13:46:25Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
-        "research_mode": "delta_only"
+        "original_claim_status": "core_events_supported_already_admitted_author_valuation_inference_rejected",
+        "parked_reason": "官方事件成立，但 Tower/AAOI 同事件已完成 extraction 與 graph admission，沒有新 graph delta；forward targets 與估值屬時變觀察",
+        "research_mode": "delta_only",
+        "research_outcome": "duplicate_existing_extraction_graph",
+        "research_run": "luna_reviewer_2026-08-02_pq1_10",
+        "trace_attempts_ref": "Tower official IR 2026-07-14；AAOI official IR 2026-07-14；既有 extractions 與 2026-07-16 intake/graph",
+        "trace_next_trigger": "新擴產里程碑、實際投產/利用率或與既有文件不同的獨立 customer evidence",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "Two different capacity expansion announcements today across $TSEM and $AAOI. Tower Semi, supported by the Japanese government, announced expansion of its 300mm Silicon Photonics (SiPho), Silicon Germanium (SiGe), and advanced packaging capabilities. Targeting $1.2B net profit, and $3.6B revenue in 2028 (with a ~$28B MC, that's ~23.3 2028 forward p/e). AAOI announced the commencement of its buildout, roughly 400,000 square feet of manufacturing to make 800g/1.6T production go brrr. The overall expansion is also supported by the local city government in Texas. (they also $20.85M worth of subsidies from the State earlier). This one isn't exactly as materially new as Tower, since AAOI originally announced these plans before. Just commencement of it. Regardless, glad to see both of these companies in their Anime training arc phase as they power up.",
       "triage": {
@@ -13337,10 +13400,18 @@
         "campaign_topic": "photonics",
         "campaign_window_end": "2026-07-29T13:46:25Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
-        "research_mode": "delta_only"
+        "original_claim_status": "unverified_with_existing_graph_conflict",
+        "parked_reason": "Morgan Stanley participant map 與 Rosenblatt China laser claim 只取得截圖及二手轉述；現有圖多為既有關係，且 POET/Celestial 已有 dated cancellation 反證，不能推定 current active mapping",
+        "research_mode": "delta_only",
+        "research_outcome": "tier4_paid_note_unavailable_existing_map_not_actionable",
+        "research_run": "luna_reviewer_2026-08-02_pq1_10",
+        "trace_attempts_ref": "Morgan Stanley/Rosenblatt exact report search；issuer/graph cross-check；private screenshots",
+        "trace_next_trigger": "canonical Morgan/Rosenblatt report，或 issuer/customer 公開具名揭露同一 product/date scope",
+        "trace_requires_user": "false",
+        "trace_status": "lead_only_tier_4"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -14008,9 +14079,19 @@
       "first_seen": "2026-07-30T22:38:46.076853+00:00",
       "lead_id": "lead_b8b6907dcdb7b1cb07a9eed1abcb7556",
       "published_at": "2026-07-30",
-      "refs": {},
+      "refs": {
+        "original_claim_status": "q2_metrics_supported_generic_demand_not_graph_delta",
+        "parked_reason": "SEC 原文支持 Q2 2026 revenue、margin、income 與 generic data-center demand；皆屬帶日期財務/市場 observation，沒有新的具名 Engine A relationship",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1051627/000143774926025061/axti20260609_8k.htm",
+        "research_outcome": "engine_c_observation_candidate_no_graph_delta",
+        "research_run": "luna_reviewer_2026-08-02_pq1_10",
+        "trace_attempts_ref": "SEC 8-K accession 000143774926025061＋Exhibit 99.1；existing AXT extraction/graph search",
+        "trace_next_trigger": "AXT Q3 filing、具名 customer disclosure，或 Engine C Q2 snapshot 另案核准",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
       "source": "edgar:AXTI",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "AXTI 8-K filed 2026-07-30",
       "triage": {
@@ -14150,10 +14231,18 @@
         "campaign_topic": "ai_infrastructure",
         "campaign_window_end": "2026-07-29T13:46:25Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
-        "research_mode": "delta_only"
+        "original_claim_status": "partial_support_exact_quantitative_claims_unverified",
+        "parked_reason": "NVIDIA 官方只支持廣義 800V/Kyber/CPO roadmap；Rubin delay、frontier lab 50% compute 與約 20% demand 等精確 Morgan roadshow claim 未取得原文，且廣義 facts 已有既有 extraction",
+        "research_mode": "delta_only",
+        "research_outcome": "official_broad_roadmap_existing_exact_note_claims_unverified",
+        "research_run": "luna_reviewer_2026-08-02_pq1_10",
+        "trace_attempts_ref": "NVIDIA official 800V/Kyber/Vera Rubin/CPO pages；Morgan roadshow exact-phrase search；private screenshots",
+        "trace_next_trigger": "public Morgan note，或 NVIDIA/customer filing/interview 逐字揭露相同 quantitative claims",
+        "trace_requires_user": "false",
+        "trace_status": "lead_only_tier_4"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -15084,10 +15173,19 @@
         "campaign_topic": "memory_packaging",
         "campaign_window_end": "2026-07-29T13:46:25Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
-        "research_mode": "delta_only"
+        "original_claim_status": "partially_confirmed_with_corrections",
+        "parked_reason": "Meritz 的供需履約率是券商預測；Intel 到 2028 的精確措辭僅部分符合公開報導；Micron 一手資料確認 16 份 SCA 與 take-or-pay／價格上下限，但原貼誤稱 LTA，且既有 Serenity/Micron 文件已涵蓋，沒有新增圖譜 delta。",
+        "primary_url": "https://investors.micron.com/static-files/9308df88-5159-4bc8-923f-6f97adfb1ce8",
+        "research_mode": "delta_only",
+        "research_outcome": "duplicate_and_engine_c_time_varying_no_graph_delta",
+        "research_run": "luna_reviewer_2026-08-02_pq1_10",
+        "trace_attempts_ref": "meritz_official_telegram_bloomberg_micron_q3fy26_prepared_remarks_existing_serenity_report",
+        "trace_next_trigger": "new_company_filing_changes_sca_terms_or_realized_supply",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "Kim Sunwoo of Meritz Securities: \"This Is Not the Time to Sell Samsung Electronics and $SKHY\" They claim markets are excessively misunderstanding the situation with semis. And that DRAM shortage will intensify in the second half of this year. - H2 2026: \"suppliers can fulfill only 75%–80% of DRAM demand\". - 2027: \"fulfillment is expected to fall into the 60% range.\" In the article, they attached market forecasts that show SK Hynix with a 2027 3.5x P/E and Samsung a 3.9x P/E. Think the $INTC CEO said it best around timeframes with his quote \"no relief in memory supply or pricing until at least 2028\". Especially after $MU 16 LTAs with favorable take or pay volume contracts... memory demand seems structural.",
       "triage": {
@@ -16117,10 +16215,18 @@
         "campaign_topic": "ai_infrastructure",
         "campaign_window_end": "2026-07-05T09:45:21Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
-        "research_mode": "delta_only"
+        "original_claim_status": "unverified_author_and_broker_inference",
+        "parked_reason": "所有 unit economics、neocloud validation 與 market misunderstanding 結論都來自不可取得的 Wells note 或作者推論；Meta 官方只支持考慮 direct compute monetization，未支持 exact broker claims",
+        "research_mode": "delta_only",
+        "research_outcome": "broker_note_unavailable_official_context_not_exact_claim",
+        "research_run": "luna_reviewer_2026-08-02_pq1_10",
+        "trace_attempts_ref": "Wells Fargo exact-note search；X screenshots；Meta Q2 2026 transcript/Exhibit context",
+        "trace_next_trigger": "Wells Fargo canonical note/report，或 Meta filing/transcript 逐字披露具體 excess-compute terms 與 economics",
+        "trace_requires_user": "false",
+        "trace_status": "lead_only_tier_4"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "Wells Fargo: $META intent to sell excess compute is a positive signal around underlying demand and unit economics of AI. “Despite this shift, we don’t expect a pullback in Meta’s capex or that overall compute needs are lower” Regarding Neoclouds: WF thinks it validated the massive AI infra opportunity as well as acquisition opportunities. Despite any potential competition for Neoclouds. I’m inclined to agree with Wells Fargo here and say markets completely misunderstood Meta’s excess compute comment.",
       "triage": {
@@ -17184,10 +17290,19 @@
         "campaign_topic": "memory_packaging",
         "campaign_window_end": "2026-07-29T13:46:25Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
-        "research_mode": "delta_only"
+        "original_claim_status": "partially_confirmed_with_corrections",
+        "parked_reason": "Micron 一手公告確認與 Qualcomm 的 automotive Strategic Customer Agreement，但未稱 LTA、未揭露期間／數量／take-or-pay；股價跌幅與去槓桿因果是作者推論。registry 尚無 Micron、Qualcomm canonical ID，不能猜 ID 入圖。",
+        "primary_url": "https://investors.micron.com/node/50811",
+        "research_mode": "delta_only",
+        "research_outcome": "graph_candidate_blocked_by_missing_canonical_identities",
+        "research_run": "luna_reviewer_2026-08-02_pq1_10",
+        "trace_attempts_ref": "micron_official_2026_07_16_pr_plus_secondary_same_origin",
+        "trace_next_trigger": "micron_and_qualcomm_identity_onboarding_or_new_contract_terms",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "Today, $MU announced it signed memory LTAs with $QCOM. Interesting reaction to see Micron proceeded to drop 5.37% right after. Doesn’t quite feel like there’s anything individually wrong with memory or AI names with all these structural agreements signed? More like the tail end of deleveraging / margin cascades.",
       "triage": {
@@ -17649,10 +17764,18 @@
         "campaign_topic": "ai_infrastructure",
         "campaign_window_end": "2026-07-29T13:46:25Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
-        "research_mode": "delta_only"
+        "original_claim_status": "partial_support_potential_talks_contract_inference_rejected",
+        "parked_reason": "Reuters 支持 Meta/Anthropic 潛在 compute lease talks，但明示 early、terms 可變、可能不成且公司未確認；NYT 原文不可得，$10B 不是已簽約價值，neocloud read-through 為作者推論",
+        "research_mode": "delta_only",
+        "research_outcome": "tier3_talks_corroborated_no_signed_primary_no_graph_delta",
+        "research_run": "luna_reviewer_2026-08-02_pq1_10",
+        "trace_attempts_ref": "NYT canonical access failed；Reuters MarketScreener/CNA same-origin reprints；Meta Q2 transcript與BlackRock El Paso official context",
+        "trace_next_trigger": "NYT 原文可核對，或 Meta/Anthropic official announcement/filing、Reuters 後續確認 signed terms",
+        "trace_requires_user": "false",
+        "trace_status": "isolated_tier_3"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "$META in talks to lease compute to Anthropic in a $10B dollar deal. Seems like they saw how profitable $SPCX $45B compute deal was. But just goes to validate Neocloud business models like $NBIS, $IREN, and co if hyperscalers are copying their homework. Source: NYT https://t.co/3Mu3UXQtFT",
       "triage": {

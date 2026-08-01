@@ -1138,6 +1138,50 @@
       "source": "decision_lab",
       "title": "REVIEW — co:applied_optoelectronics",
       "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-01T16:49:19.511745+00:00",
+      "hint": "核准 exact graph delta；Decision handoff：co:meta。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 80,
+      "reason": "主代理 review 發現 paper demand_proof 應為 inferred；此草稿由 ra_62c5841f8de2c67890cbefb805ba8d77 取代，不得 apply。",
+      "receipt": "superseded_by_ra_62c5841f8de2c67890cbefb805ba8d77",
+      "ref_id": "ra_50f3ddb6cfe718afd7e2ef8b0481e686",
+      "resolution": "drop",
+      "resolved_at": "2026-08-01T16:52:02.825715+00:00",
+      "source": "research_action",
+      "title": "Meta Vistara CXL 記憶體擴充平台",
+      "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-08-01T16:52:04.597887+00:00",
+      "deferred_at": "2026-08-01T16:53:01.937549+00:00",
+      "hint": "BLOCKER：Research Action 尚未聲明唯一 focus_company_id；先回 pq1 補 Decision handoff，不得先 apply。",
+      "n": 81,
+      "reason": null,
+      "ref_id": "ra_50f3ddb6cfe718afd7e2ef8b0481e686",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "Meta Vistara CXL 記憶體擴充平台",
+      "type": "ra_admission",
+      "waiting_on": {
+        "reason": "主代理 review 後由 pq2 [82] 的 corrected RA 取代。",
+        "set_at": "2026-08-01T16:53:01.937549+00:00",
+        "trigger": "舊 RA 自動到期後 drop；不得核准或 apply",
+        "until": "2026-08-31"
+      }
+    },
+    {
+      "added_at": "2026-08-01T16:52:04.597917+00:00",
+      "hint": "核准 exact graph delta；Decision handoff：co:meta。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 82,
+      "reason": null,
+      "ref_id": "ra_62c5841f8de2c67890cbefb805ba8d77",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "Meta Vistara CXL 記憶體擴充平台（reviewed）",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -2262,8 +2306,26 @@
       "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
       "type": "decision_review",
       "verb": "drop"
+    },
+    {
+      "at": "2026-08-01T16:52:02.825715+00:00",
+      "n": 80,
+      "reason": "主代理 review 發現 paper demand_proof 應為 inferred；此草稿由 ra_62c5841f8de2c67890cbefb805ba8d77 取代，不得 apply。",
+      "receipt": "superseded_by_ra_62c5841f8de2c67890cbefb805ba8d77",
+      "ref_id": "ra_50f3ddb6cfe718afd7e2ef8b0481e686",
+      "type": "ra_admission",
+      "verb": "drop"
+    },
+    {
+      "at": "2026-08-01T16:53:01.937549+00:00",
+      "n": 81,
+      "reason": "主代理 review 後由 pq2 [82] 的 corrected RA 取代。",
+      "receipt": null,
+      "ref_id": "ra_50f3ddb6cfe718afd7e2ef8b0481e686",
+      "type": "ra_admission",
+      "verb": "pending"
     }
   ],
-  "next_n": 80,
+  "next_n": 83,
   "schema_version": "1"
 }
