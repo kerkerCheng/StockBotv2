@@ -18,6 +18,7 @@
 ### Codex custom-agent 委派契約（2026-08-01 使用者定案）
 
 - 專案級 `.codex/agents/luna-operator.toml` 定義 `luna_operator`：使用 `gpt-5.6-luna`／`max`／`read-only`，只接明確、重複、可逐項驗收的機械型工作。`ultra` 經 2026-08-01 實際 spawn 驗證不受 Luna runtime 支援；`max` 是目前最高可用 effort。主代理負責拆 scope、列 acceptance criteria、檢查回傳證據，並作最後判斷。
+- **預設關閉、每次明確 opt-in（2026-08-02 使用者定案）：** 跨 session 入口是 `$luna-reviewer ...` 或 `Luna reviewer：...`（半形冒號亦可）；只有該次指令啟動，完成後自動退出。未出現明確入口時不得因工作看似機械、便宜或適合平行化而自行派 Luna。完整分工與 pq1／alpha 路由以 `skills/luna-reviewer/SKILL.md` 為準；它只啟動既有 `luna_operator`，不是第二個 agent。
 - 適合委派：repo／queue 盤點、確定性資料檢查、測試與 log 分析、pq1 原始文件追源與原子 claim 抽取、依固定清單蒐集 alpha 財務事實與反證。所有回傳都只是 review packet，不是 authority。
 - 不得委派給 `luna_operator`：任何 working-tree 或 private authority 寫入、evidence tier 升級、graph admission、pq2 核准／resolve、thesis revise／retire、資本配置、live choice／fill、commit 或 push。這些仍由主代理依既有人工 gate 執行。
 - 同一 working tree 維持主代理為唯一 writer。若未來確需 writing subagent，必須另建 worktree／branch、明確指定唯一 owner，且不得沿用 `luna_operator` 的唯讀角色暗示授權。

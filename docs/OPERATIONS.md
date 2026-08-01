@@ -35,6 +35,20 @@ Codex local scheduled task
 
 ## 常用指令
 
+### Luna reviewer（手動 opt-in）
+
+預設不啟動。每次要用時在指令前加 `$luna-reviewer` 或 `Luna reviewer：`；只對該次指令有效，不會黏到下一個 session／下一個請求。
+
+```text
+Luna reviewer：pq1 5
+$luna-reviewer pq1 5
+Luna reviewer：alpha NBIS，先做財務五項與反證蒐集
+Luna reviewer：repo audit，檢查 queue schema 與測試失敗
+Luna reviewer：停止
+```
+
+入口會啟動既有 `.codex/agents/luna-operator.toml`：Luna 唯讀批量執行，主代理逐項 review 並保留唯一寫入與所有人工 gate。若 Luna runtime 不可用，不自動換成較昂貴 subagent。完整契約見 `skills/luna-reviewer/SKILL.md`。
+
 ### 待辦池（統一 pq2）
 ```powershell
 & '.venv\Scripts\python.exe' -m engine_b.todo sync          # 同步後列出（＝「待辦事項統整」）
