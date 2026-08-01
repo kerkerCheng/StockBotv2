@@ -86,6 +86,27 @@ Leads authority 是 tracked `library/leads/pending_leads.json`；狀態機與 AP
 ```
 輸出明標 `policy_mode=paper_observation`、`capital_scope=shared_cash_pool`；不建立 choice／fill、不下單、不寫 Sheet、不把 undrawn loan 算資本。
 
+### 記錄成交（手動下單後）
+
+```powershell
+& '.venv\Scripts\python.exe' scriptsecord_trade.py --symbol QQQ --side buy `
+    --shares 10 --price 687.79 --executed-at 2026-07-31T13:04:53-04:00 `
+    --broker IB --account-ref "U****1599" --note "<券商通知逐字內容>"
+```
+
+預設 **dry-run**，只印出將變更的三格（`shares`／`avg_cost`／現金）。確認後：
+
+- `--apply`：實際寫入 Sheet 並記錄事件
+- `--log-only`：**Sheet 已由你手動更新過**時使用，只記事件不碰 Sheet。
+  腳本無法自行判斷 Sheet 是否已更新，重複 `--apply` 會把同一筆算兩次。
+
+寫入的三個不變量（有測試守住）：按**欄名**定位（你調欄序不會寫錯欄）、
+**只寫指定儲存格**（不會蓋掉你手填的欄位）、**寫前比對現值**（不符即整批中止）。
+市值與 NAV 不由本腳本改動。
+
+事件紀錄在 tracked `library/trades/trade_log.jsonl`（append-only）。
+它是「發生了什麼」的稽核軌跡，**不是持股真相**——後者永遠只有 Sheet。
+
 ### 入圖收尾
 ```powershell
 & '.venv\Scripts\python.exe' scripts\commit_pending_intake.py --status | --dry-run
@@ -110,6 +131,10 @@ Leads authority 是 tracked `library/leads/pending_leads.json`；狀態機與 AP
 | X harvest（**只放本機**） | `X_BEARER_TOKEN` |
 | Engine C Postgres（可選，預設 SQLite） | `POSTGRES_HOST`／`POSTGRES_DSN` |
 | MCP | `GRAPH_MCP_PORT`、`GRAPH_MCP_TOKEN` |
+
+Sheet 的 credential scope 分兩種：日常全部走 `SCOPES`（`spreadsheets.readonly`），
+只有 `scripts/record_trade.py --apply` 會走 `WRITE_SCOPES`（`spreadsheets`）。
+這個分離讓 daily brief、beta snapshot、Engine D 等流程不會持有可寫 token。
 
 Sheet adapter 的標準輸出是 `ticker`、`shares`、`currency`、`market_value_base`、`nav_base`、`base_currency`；可直接提供完整標準欄位，或以逐列 mark-to-market `market_usd` 安全正規化成 USD NAV。**禁止退回 `avg_cost` 或 `market_twd` 猜值。**
 

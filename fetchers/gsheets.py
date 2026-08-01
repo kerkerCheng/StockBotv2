@@ -53,7 +53,11 @@ CAPITAL_AUTHORITY_SHEET_NAME = os.environ.get(
 )
 SERVICE_ACCOUNT_FILE = os.environ.get("GSHEETS_SERVICE_ACCOUNT_JSON", "")
 
+# 讀取用唯讀 scope；寫入另外要求 read/write，兩者分開建立 client。
+# 分開的理由：日常 routine（daily brief、beta snapshot、Engine D）全部只讀，
+# 不應該在流程中持有可寫 token。只有明確的人工記帳動作才走 WRITE_SCOPES。
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
+WRITE_SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 
 CAPITAL_AUTHORITY_HEADERS = (
     "record_id",
@@ -113,8 +117,12 @@ _TICKER_ENRICHMENT: dict[str, dict] = {
 }
 
 
-def _get_service():
-    """Build the Google Sheets API service object."""
+def _get_service(*, writable: bool = False):
+    """Build the Google Sheets API service object.
+
+    `writable=True` 才要求 read/write scope。預設唯讀，確保任何忘記標註的
+    呼叫端拿到的都是不能寫的 token。
+    """
     try:
         from google.oauth2 import service_account
         from googleapiclient.discovery import build
@@ -135,9 +143,102 @@ def _get_service():
         raise FileNotFoundError(f"Service Account JSON 不存在: {SERVICE_ACCOUNT_FILE}")
 
     creds = service_account.Credentials.from_service_account_file(
-        SERVICE_ACCOUNT_FILE, scopes=SCOPES
+        SERVICE_ACCOUNT_FILE, scopes=WRITE_SCOPES if writable else SCOPES
     )
     return build("sheets", "v4", credentials=creds)
+
+
+def _column_letter(index: int) -> str:
+    """0-based 欄索引 → A1 欄字母。讀取範圍是 A:Z，超過即拒絕。"""
+    if not 0 <= index < 26:
+        raise ValueError(f"欄索引 {index} 超出 A:Z 範圍")
+    return chr(ord("A") + index)
+
+
+def locate_portfolio_cells(requests: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """依「欄名 + 列比對條件」定位儲存格，回傳 A1 位址與目前值。
+
+    **絕不使用欄位位置索引** —— 使用者會調整欄序（2026-08-01 實際發生過），
+    位置索引會讓寫入靜默落到錯的欄。列同樣以內容比對（ticker／broker＋bucket）
+    定位，不用列號。
+
+    request 格式：``{"match": {"ticker": "QQQ"}, "column": "shares"}``
+    """
+    service = _get_service()
+    rows = (
+        service.spreadsheets()
+        .values()
+        .get(spreadsheetId=SPREADSHEET_ID, range=f"{SHEET_NAME}!A:Z")
+        .execute()
+        .get("values", [])
+    )
+    if not rows:
+        raise ValueError("Portfolio 工作表是空的")
+    headers = [h.strip().lower() for h in rows[0]]
+    located: list[dict[str, Any]] = []
+    for request in requests:
+        column = str(request["column"]).strip().lower()
+        if column not in headers:
+            raise ValueError(f"找不到欄位 {column!r}；現有欄位：{headers}")
+        col_index = headers.index(column)
+        match = {str(k).strip().lower(): str(v) for k, v in request["match"].items()}
+        hits = []
+        for offset, row in enumerate(rows[1:], start=2):
+            padded = row + [""] * (len(headers) - len(row))
+            item = dict(zip(headers, padded))
+            if all(
+                str(item.get(key, "")).strip().casefold() == value.strip().casefold()
+                for key, value in match.items()
+            ):
+                hits.append((offset, padded))
+        if len(hits) != 1:
+            raise ValueError(
+                f"比對條件 {match} 命中 {len(hits)} 列，必須恰好 1 列才可寫入"
+            )
+        row_number, padded = hits[0]
+        located.append(
+            {
+                "a1": f"{SHEET_NAME}!{_column_letter(col_index)}{row_number}",
+                "column": column,
+                "match": match,
+                "current": padded[col_index],
+            }
+        )
+    return located
+
+
+def write_portfolio_cells(writes: list[dict[str, Any]]) -> dict[str, Any]:
+    """逐格寫入，且寫入前必須通過「現值仍等於 expected」檢查。
+
+    這道檢查是為了讓人工編輯與程式寫入安全共存：若使用者在定位與寫入之間
+    改動了同一格，整批中止而不是覆蓋。**只寫指定儲存格，永不寫整列或範圍**
+    ——批次覆蓋範圍會把使用者手填的欄位一併清掉。
+    """
+    if not writes:
+        return {"status": "noop", "written": []}
+    service = _get_service(writable=True)
+    values = service.spreadsheets().values()
+    # 先全部重讀確認，再全部寫入；任何一格不符即中止且不寫任何一格。
+    for write in writes:
+        current = values.get(
+            spreadsheetId=SPREADSHEET_ID, range=write["a1"]
+        ).execute().get("values", [[""]])
+        actual = (current[0][0] if current and current[0] else "")
+        if str(actual).strip() != str(write["expected"]).strip():
+            raise ValueError(
+                f"{write['a1']} 現值為 {actual!r}，與預期的 {write['expected']!r} 不符"
+                "——可能是同時被手動編輯過。整批中止，未寫入任何儲存格。"
+            )
+    written = []
+    for write in writes:
+        values.update(
+            spreadsheetId=SPREADSHEET_ID,
+            range=write["a1"],
+            valueInputOption="USER_ENTERED",
+            body={"values": [[write["value"]]]},
+        ).execute()
+        written.append({"a1": write["a1"], "from": write["expected"], "to": write["value"]})
+    return {"status": "written", "written": written}
 
 
 def fetch_portfolio(*, strict_operational: bool = False) -> list[dict[str, Any]]:
