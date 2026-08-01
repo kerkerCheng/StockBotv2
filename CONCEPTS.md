@@ -69,9 +69,27 @@ The shared repo skill that turns the source registry's routing knowledge (US →
 The disposition for signals that pass triage but fail primary-source tracing, applied by tier: tier 1–2 sources (filings, earnings calls known to exist) still produce extraction drafts with honest relay marking; tier 3+ (social relays) produce no draft and instead land in the weekly report's untraced list plus a `weekly-scan` labeled Issue, surfacing via the existing session-start digest. Closing the Issue means the source was recovered (re-enters intake) or abandoned. Trades draft volume for graph trustworthiness.
 *Avoid:* failed-trace park, blocked signals
 
+### ⚠ 「Backlog」一詞在本專案有四個互不相關的意思
+
+同一個字橫跨三個引擎加專案管理，講的時候**必須加限定詞**，不要單獨說「backlog」：
+
+| 說法 | 意思 | 在哪 |
+|---|---|---|
+| **訂單 backlog**／訂單能見度 | 公司未交付訂單金額，財務核驗清單第 3 項 | Engine C（`engine_c/checklist.py`） |
+| **Corroboration Backlog**（待印證清單） | 所有來源同一 `origin_entity`、待獨立印證的 claim | Engine A（圖查詢導出） |
+| **Trace backlog**（追源 backlog） | 追源未果、等事件才能推進的 parked lead | Engine B（`engine_b.cli trace-backlog`） |
+| **開放 backlog** | 未完成的開發項目 | 專案管理（`docs/ROADMAP.md`） |
+
+前三者是系統概念、各有 authority；第四個純粹是待辦清單。
+「AXT 的 backlog 逾 $100M」與「trace-backlog 有 21 筆」毫無關係。
+
 ### Corroboration Backlog（待印證清單）
 The set of claims whose sources all share a single `origin_entity`, derived on demand by graph query — never maintained as a file or ledger. A claim leaves the backlog automatically when a second independent `origin_entity` source is loaded. Finding corroboration is not required in the week a claim enters the graph; the backlog exists so single-origin claims stay visible until upgraded (L8).
 *Avoid:* pending-verification file, corroboration ledger
+
+### Trace Backlog（追源 backlog）
+The set of `parked` leads whose source tracing did not reach a verbatim primary document, each carrying `trace_status`, `trace_next_trigger`, `trace_attempts_ref` and `trace_requires_user` in its `refs`. Listed by `engine_b.cli trace-backlog`. Leads whose trace succeeded (`original_obtained`) are filtered out — "traced but not graph-worthy" and "could not trace" are different dispositions and only the latter belongs here. `trace_requires_user=false` means a scheduled or event-triggered recheck suffices and it consumes no pq2 number. Distinct from Corroboration Backlog (single-origin claims already in the graph) and from a company's order backlog.
+*Avoid:* park list, unresolved leads
 
 ### PQ1（研究佇列 / pq1）
 Daily Approval Loop 的**昂貴研究階段**，包含兩種 bounded job：（1）priority 排序的 `triaged_go` lead，跑 source-trace + extraction；（2）使用者對 `decision_review` 明確 `go` 後 dispatch 的 Engine D gap work order。後者優先使用本輪 budget；未經 go 的 proposed work order 不可被 routine 自動研究。兩者都靠持久狀態 checkpoint 做到跨 session 續跑。需要 Engine A／Engine C／thesis authority mutation 的結果只產完整核准 packet，**不在 pq1 自行寫入**；純唯讀研究補齊 assessment 後才可 research-intent reassess。
