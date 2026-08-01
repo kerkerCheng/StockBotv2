@@ -208,6 +208,29 @@ def compose_risk_snapshot(
     drawn_base = _finite(capital_view.get("drawn_debt_base"), non_negative=True)
     loan = drawn_base / nav if drawn_base is not None and nav > 0 else None
     combined = effective + loan if effective is not None and loan is not None else None
+    # 負債分兩類。可被追繳的借款（IB margin 等）在遠早於自有資本歸零之前就會
+    # 強制平倉——1.74x 時 Reg-T 25% 維持保證金在指數跌 43% 即追繳，而 30 年期
+    # 不可追繳額度要跌 57% 才歸零且永不強制賣出。兩者不可當同類資本合計。
+    callable_base = _finite(
+        capital_view.get("callable_drawn_debt_base"), non_negative=True
+    ) or 0.0
+    callable_weight = callable_base / nav if nav > 0 else None
+    # 總曝險倍數＝市場曝險 ÷ 自有資本。
+    #   分子：非現金持股 ＋ 槓桿 ETF 的額外曝險。借來的錢已經買成持股、
+    #         本來就在 market_total_base 裡，**不可再把負債加一次**（重複計算）。
+    #   分母：Sheet 的 nav_base 是毛資產（持股＋現金，不扣負債），
+    #         自有資本必須另外減去已提款負債。
+    # 台股已由 holdings adapter 換算為 base currency，NAV 本身即含其匯率波動，
+    # 因此分子必須納入台股，排除才是口徑錯誤。
+    non_cash = (
+        float(components.get("market_total_base") or 0.0)
+        - float(components.get("cash_base") or 0.0)
+    )
+    etf_extra = float(components.get("leveraged_effective_base") or 0.0) - float(
+        components.get("leveraged_nominal_base") or 0.0
+    )
+    own_capital = nav - (drawn_base or 0.0)
+    total_exposure = (non_cash + etf_extra) / own_capital if own_capital > 0 else None
     alpha_total = float(components.get("alpha_total_base") or 0.0) / nav if nav > 0 else None
     direct = components.get("issuer_direct_base") or {}
     indirect = components.get("issuer_indirect_base") or {}
@@ -232,6 +255,15 @@ def compose_risk_snapshot(
             hard_blocks.append("etf_leverage_effective_cap_reached")
         elif effective >= float(risk["leveraged_effective_warning"]):
             warnings.append("leveraged_effective_warning")
+    # 總曝險硬擋。在此之前 hard_blocks 只看槓桿 ETF，已提款借款完全不受約束——
+    # 全額提款買 1x 會讓總曝險升到 1.43x 而儀表板顯示一切正常。
+    if total_exposure is not None:
+        if total_exposure >= float(risk["total_exposure_cap"]):
+            hard_blocks.append("total_exposure_cap_reached")
+        elif total_exposure >= float(risk["total_exposure_warning"]):
+            warnings.append("total_exposure_warning")
+    if callable_weight is not None and callable_weight > float(risk["callable_debt_cap"]):
+        hard_blocks.append("callable_debt_cap_reached")
     if alpha_total is not None and alpha_total >= float(risk["alpha_total_warning"]):
         warnings.append("alpha_total_warning")
     for issuer, exposure in issuers.items():
@@ -251,6 +283,14 @@ def compose_risk_snapshot(
         },
         "loan_leverage_weight": loan,
         "combined_leverage_weight": combined,
+        "total_exposure_weight": total_exposure,
+        "total_exposure_cap": float(risk["total_exposure_cap"]),
+        "callable_debt_weight": callable_weight,
+        # 維持 L 倍時，指數跌 100/L% 自有資本歸零。這是使用者接受風險水準的
+        # 唯一直觀數字，必須與倍數同時呈現。
+        "wipeout_index_drawdown": (
+            1.0 / total_exposure if total_exposure and total_exposure > 0 else None
+        ),
         "alpha_total_weight": alpha_total,
         "issuer_exposures": issuers,
         "issuer_coverage": {

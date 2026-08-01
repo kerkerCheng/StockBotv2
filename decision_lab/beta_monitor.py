@@ -739,6 +739,18 @@ def _risk_snapshot_lines(report: Mapping[str, Any], *, full: bool) -> list[str]:
         return []
     etf = snapshot["etf_leverage"]
     lines = ["", "## 投組風險變化" if not full else "## 投組風險完整快照"]
+    # 總曝險永遠顯示：它是唯一同時涵蓋持股、槓桿 ETF 與借款的口徑，
+    # 而借款在 2026-08-01 之前完全不受任何硬擋約束。歸零門檻與它並列，
+    # 因為「1.5x」對人沒有感覺，「指數跌 67% 自有資本歸零」才有。
+    total = _finite(snapshot.get("total_exposure_weight"), non_negative=True)
+    if total is not None:
+        wipeout = _finite(snapshot.get("wipeout_index_drawdown"), non_negative=True)
+        cap = _finite(snapshot.get("total_exposure_cap"), non_negative=True)
+        lines.append(
+            f"- **總曝險 {total:.2f}x**"
+            + (f"（上限 {cap:.2f}x）" if cap else "")
+            + (f"；自有資本歸零門檻：指數跌 {wipeout:.0%}" if wipeout else "")
+        )
     if full or any("leverage" in str(item.get("metric")) for item in changes):
         lines.append(
             f"- 槓桿 ETF 資金占比：{_pct(etf.get('nominal_weight'))}；"

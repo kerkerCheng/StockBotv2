@@ -31,6 +31,16 @@ def _finite_fraction(value: Any, field: str, *, positive: bool = False) -> float
     return parsed
 
 
+def _finite_multiple(value: Any, field: str) -> float:
+    """曝險倍數：可以大於 1（1.5x、1.75x），但必須有限且有界。"""
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise BetaPolicyError(f"{field} must be numeric")
+    parsed = float(value)
+    if not math.isfinite(parsed) or not 0 < parsed <= 5:
+        raise BetaPolicyError(f"{field} must be a finite multiple within (0, 5]")
+    return parsed
+
+
 def _text(value: Any, field: str) -> str:
     if not isinstance(value, str) or not value.strip():
         raise BetaPolicyError(f"{field} must be non-empty text")
@@ -178,16 +188,26 @@ def validate_beta_policy(source: Mapping[str, Any]) -> dict[str, Any]:
         "leveraged_effective_cap",
         "issuer_concentration_warning",
         "alpha_total_warning",
+        "callable_debt_cap",
     }
-    if not isinstance(risk, Mapping) or set(risk) != risk_scalar_keys | {
+    multiple_keys = {"total_exposure_warning", "total_exposure_cap"}
+    if not isinstance(risk, Mapping) or set(risk) != risk_scalar_keys | multiple_keys | {
         "daily_display_change",
         "event_monitor",
     }:
         raise BetaPolicyError("risk policy fields do not match schema")
     normalized_risk = {
-        key: _finite_fraction(risk.get(key), key, positive=True)
+        key: _finite_fraction(
+            risk.get(key), key, positive=key != "callable_debt_cap"
+        )
         for key in risk_scalar_keys
     }
+    # 總曝險以 NAV 的倍數表示，可大於 1，故用另一個驗證器。
+    normalized_risk.update(
+        {key: _finite_multiple(risk.get(key), key) for key in multiple_keys}
+    )
+    if normalized_risk["total_exposure_warning"] >= normalized_risk["total_exposure_cap"]:
+        raise BetaPolicyError("total_exposure warning must be below cap")
     for prefix in ("leveraged_nominal", "leveraged_effective"):
         if normalized_risk[f"{prefix}_warning"] >= normalized_risk[f"{prefix}_cap"]:
             raise BetaPolicyError(f"{prefix} warning must be below cap")

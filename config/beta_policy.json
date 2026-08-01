@@ -1,6 +1,6 @@
 {
   "schema_version": "beta-policy-v2",
-  "policy_version": "2026-08-01.1",
+  "policy_version": "2026-08-01.2",
   "mode": "paper_observation",
   "capital_scope": "shared_cash_pool",
   "capital": {
@@ -43,6 +43,9 @@
     "leveraged_nominal_cap": 0.2,
     "leveraged_effective_warning": 0.3,
     "leveraged_effective_cap": 0.4,
+    "total_exposure_warning": 1.5,
+    "total_exposure_cap": 1.75,
+    "callable_debt_cap": 0.0,
     "issuer_concentration_warning": 0.25,
     "alpha_total_warning": 0.2,
     "daily_display_change": {
