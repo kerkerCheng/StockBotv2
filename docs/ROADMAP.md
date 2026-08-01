@@ -47,6 +47,28 @@ brainstorm；範圍大到需要驗收條件才開 plan。brainstorm 用 frontmat
 - MACOM／Semtech 作為 Tower TIA 客戶（tier 3，待客戶端揭露印證）
 - GF 對 Tower 專利訴訟未追源
 
+**看起來像缺口但不是——請勿「修正」：**
+
+- **Beta 例行成交不進 Engine D 的 `record-fill`，這是設計正確。**
+  `record_live_fill` 要求的不只是 `decision_id`，而是一整條責任鏈：
+  decision → `record-choice`（使用者明確接受某個部位大小）→ fill，並驗證成交時間
+  不早於 choice、幣別符合凍結 context 的執行身分。目的是回答「Engine D 的建議準不準」。
+
+  Beta 例行投入沒有 decision、沒有支持區間、沒有接受動作——**它是時間表不是決策**。
+  硬塞進去要替每筆投入捏造 decision，後果是 Decision Store 被假決策汙染、
+  outcome attribution 變成把 QQQ 漲跌歸因給「今天是 15 號」、以及同一筆成交
+  出現在兩處成為第二個真相來源。且 2026-08-01 已實測 beta 訊號 0 勝 3 敗，
+  替它建 attribution 是測量已知無效的東西。
+
+  **正確分工：** beta 例行成交 → `library/trades/trade_log.jsonl`（事件紀錄）；
+  alpha thesis 驅動成交 → 未來同時進 trade_log 與 Engine D fill。
+
+  **真正待補的是後者**，但 `live_choices`／`live_execution_reports`／`paper_events`
+  目前皆為 0 筆——這條路徑從未被走過，所有 decision 都是 research intent、
+  supported range 為 0，連 `record-choice` 都無從執行。等真正要下第一筆
+  Engine D 驅動的 alpha 單時再加 `record_trade.py --decision-id`，
+  那時需求才具體；現在補等於對沒跑過的路徑猜規格。
+
 **已知未修的操作缺陷：**
 - `harvest_x` 不分頁，長時間未跑後可能永久漏掉中間批次（見 [`OPERATIONS.md`](OPERATIONS.md)）
 - `decision_review` 若研究已完成但 work order 已 terminal，狀態機沒有 `go` 路徑，只能 `pending`（2026-07-30 [64] 實例）
