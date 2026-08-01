@@ -1154,7 +1154,7 @@
     },
     {
       "added_at": "2026-08-01T16:52:04.597887+00:00",
-      "deferred_at": "2026-08-01T16:53:01.937549+00:00",
+      "deferred_at": "2026-08-01T16:54:56.194511+00:00",
       "hint": "BLOCKER：Research Action 尚未聲明唯一 focus_company_id；先回 pq1 補 Decision handoff，不得先 apply。",
       "n": 81,
       "reason": null,
@@ -1165,10 +1165,10 @@
       "title": "Meta Vistara CXL 記憶體擴充平台",
       "type": "ra_admission",
       "waiting_on": {
-        "reason": "主代理 review 後由 pq2 [82] 的 corrected RA 取代。",
-        "set_at": "2026-08-01T16:53:01.937549+00:00",
+        "reason": "主代理 review 後由 pq2 [82] 的 corrected RA 取代；日期按 Asia/Taipei 對齊實際 expiry。",
+        "set_at": "2026-08-01T16:54:56.194511+00:00",
         "trigger": "舊 RA 自動到期後 drop；不得核准或 apply",
-        "until": "2026-08-31"
+        "until": "2026-09-01"
       }
     },
     {
@@ -2320,6 +2320,15 @@
       "at": "2026-08-01T16:53:01.937549+00:00",
       "n": 81,
       "reason": "主代理 review 後由 pq2 [82] 的 corrected RA 取代。",
+      "receipt": null,
+      "ref_id": "ra_50f3ddb6cfe718afd7e2ef8b0481e686",
+      "type": "ra_admission",
+      "verb": "pending"
+    },
+    {
+      "at": "2026-08-01T16:54:56.194511+00:00",
+      "n": 81,
+      "reason": "主代理 review 後由 pq2 [82] 的 corrected RA 取代；日期按 Asia/Taipei 對齊實際 expiry。",
       "receipt": null,
       "ref_id": "ra_50f3ddb6cfe718afd7e2ef8b0481e686",
       "type": "ra_admission",
