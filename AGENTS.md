@@ -172,6 +172,16 @@ Decision gap jobs 優先占用同一個 daily pq1 budget。若研究結果需要
 
 燈號固定配文字：🟢可評估、🟡冷卻／排序中、⚪觀察、🔴資料不足／暫停新增。Beta 區先用三行 TL;DR 說明目標、今日可人工評估標的與已觸發風控；technical signal 只決定新增 timing／pace，**不因一般回檔自動賣出**。
 
+### 技術訊號的地位（2026-08-01 實測後定案）
+
+**訊號不得 gate 自有現金投入。** `config/beta_policy.json` 的 `signal.baseline_pace` 是不受訊號影響的例行投入下限，訊號只能在其上加碼。
+
+三次實測全部失敗：以訊號 gate 現金投入使終值**輸給無腦定投 8.5%**（QQQ 91.5%、SOXX 91.9%）；訊號調節借款提取**無可測得效果**；訊號決定投給哪個標的**輸給固定單押最佳標的 22%**，且三分之一時間買進 CAGR 僅 7.2% 的弱標的——「買跌最深的」會系統性把錢導向長期較弱的資產。`stretched_above_sma200` 同為未實測的推論。
+
+因此：**未驗證的訊號機制不得覆蓋有證據的 baseline**；呈現須寫「例行投入 / 節奏 X%」而非自相矛盾的「未觸發 / 節奏 X%」。但 baseline 不等於「無論如何都投」——資料不足／stale／quarantined 時仍誠實歸零。
+
+**須區分量測與訊號：** 總曝險倍數、歸零門檻、追繳門檻、利息覆蓋屬**量測**，有價值且應強化（本輪所有決策翻轉皆由此而來）；RSI／MACD／tier／pace 屬**訊號**，三次受測皆未通過。完整證據與未實作項見 [`docs/brainstorms/2026-07-31-leverage-glide-path-requirements.md`](docs/brainstorms/2026-07-31-leverage-glide-path-requirements.md)。
+
 ### 事件監控
 
 issuer 曝險 ≥20% 且對應 series 單日報酬首次跌破 -4% 才產 ephemeral `event_search_requests`；daily agent 只做一次 WebSearch，輸出可能原因＋曝險並標未經查證，**不建 lead／decision、不進 pq1/pq2、不寫 Engine A**。需要深挖才另走 lead-intake。
