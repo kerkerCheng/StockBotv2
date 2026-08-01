@@ -210,6 +210,17 @@ brainstorm；範圍大到需要驗收條件才開 plan。brainstorm 用 frontmat
 
 判準與封閉字彙表同一條：**會改變決策的事實不能只住在自由文字裡。** `trace_next_trigger` 現在正好違反這條。
 
+#### lead `refs` 是未登記字彙
+
+2026-08-01 實測：`library/leads/pending_leads.json` 的 `refs` 目前有 **56 個不同鍵名**，
+多數只出現一次；拼錯不會有任何錯誤訊息。當天即因把 `parked_reason` 寫成 `park_reason`
+而讓 park 理由對所有讀取端不可見——寫得進去、讀不出來。
+
+與 Engine C 觀測欄位、blocker、authority token 同型，解法也相同：
+建一份 `config/lead_ref_keys.json` 登記合法鍵名與用途，`annotate`／`advance` 拒絕未登記的鍵。
+成本低（既有三個 registry 可直接抄），但**必須先盤點既有 56 個鍵哪些是活的**，
+否則會把歷史資料一次全判為非法。
+
 #### 其他
 
 - **技術指標擴充**（相對強弱 vs QQQ、ATR）— `engine_c/technical.py` 的 `_METRIC_COLUMNS` 寫死且是 DB 欄位，需配 migration
