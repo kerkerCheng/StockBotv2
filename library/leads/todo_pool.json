@@ -1114,6 +1114,30 @@
       "source": "decision_lab",
       "title": "REVIEW — co:applied_optoelectronics",
       "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-01T16:06:19.781580+00:00",
+      "hint": "核准 exact graph delta；Decision handoff：co:axt。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 78,
+      "reason": null,
+      "ref_id": "ra_83889cf03637953caa587c21f8e97886",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "AXT–Lumentum 六年 InP substrate capacity reservation",
+      "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-08-01T16:06:19.781609+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 79,
+      "reason": null,
+      "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:applied_optoelectronics",
+      "type": "decision_review"
     }
   ],
   "log": [
@@ -2240,6 +2264,6 @@
       "verb": "drop"
     }
   ],
-  "next_n": 78,
+  "next_n": 80,
   "schema_version": "1"
 }

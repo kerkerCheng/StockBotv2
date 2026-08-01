@@ -10467,10 +10467,18 @@
         "campaign_topic": "memory_packaging",
         "campaign_window_end": "2026-07-29T13:46:25Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
-        "research_mode": "delta_only"
+        "original_claim_status": "partial_support_author_inference_rejected",
+        "parked_reason": "複合線索把 CPU、memory、photonics 多個不同事件合成單一 LTA／bubble thesis；Reuters 與多份 issuer 文件只支持部分子主張，Samsung／SK hynix／AMD CW exact LTA 仍未取得，無一致且最小的 graph delta",
+        "research_mode": "delta_only",
+        "research_outcome": "composite_split_required_no_single_graph_delta",
+        "research_run": "luna_reviewer_2026-08-01_pq1_5",
+        "trace_attempts_ref": "Reuters Intel／AMD carrier；Micron 10-Q；Sandisk 8-K；Lumentum／Coherent IR；Samsung／SK hynix／TrendForce exact search",
+        "trace_next_trigger": "官方 filing／IR 具名揭露產品、對手方與合約期限，或取得 exact TrendForce AMD／CW LTA 原文後拆成獨立 lead",
+        "trace_requires_user": "false",
+        "trace_status": "partial"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -10862,10 +10870,18 @@
         "campaign_topic": "ai_infrastructure",
         "campaign_window_end": "2026-07-29T13:46:25Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
-        "research_mode": "delta_only"
+        "original_claim_status": "core_event_supported_author_inferences_rejected",
+        "parked_reason": "Reuters、Bloomberg 與 TechCrunch 支持 Nebius–Reflection AI 超過十億美元 compute agreement，二手報導並稱 GB300 至 2029；但未取得 Nebius／Reflection 可逐字核對的直接聲明或 filing，市場反應與資金能力敘事屬作者推論，不產 graph RA",
+        "research_mode": "delta_only",
+        "research_outcome": "tier3_core_corroborated_no_primary_no_graph_ra",
+        "research_run": "luna_reviewer_2026-08-01_pq1_5",
+        "trace_attempts_ref": "Reuters syndicated carrier；Bloomberg accessible excerpt；TechCrunch；Reflection official news index；Nebius／Reflection official and SEC search",
+        "trace_next_trigger": "Nebius 或 Reflection 發布官方合約、capacity、GB300 或期限文件；另行取得 WSJ 融資原文",
+        "trace_requires_user": "false",
+        "trace_status": "isolated_tier_3"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "$NBIS signs $1B+ compute agreement with Reflection AI, for GB300 access through 2029. Reflection also signed a multi-billion dollar agreement with $SPCX earlier. Interesting to say the least, seeing Nebius drop -5% off the news today. Also... counterparty to get this done kinda reminds me of OpenAI, where they might not have the funds to actually execute on these LTAs yet compared to $META or $MSFT. But generally positive long term developments, customer diversification was one of the core strengths of Nebius.",
       "triage": {
@@ -10982,10 +10998,19 @@
         "campaign_topic": "memory_packaging",
         "campaign_window_end": "2026-07-29T13:46:25Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
-        "research_mode": "delta_only"
+        "original_claim_status": "forecast_and_share_supported_valuation_inference_rejected",
+        "parked_reason": "TrendForce 官方預測與 Winbond issuer deck 已取得，支持 SLC NAND H2 2026 漲價預測及 2025 revenue share 表；這些是帶日期的市場 forecast／self-reported share observation，Puya 僅支持間接控制 SkyHigh，現無可直接入圖的投資 thesis graph delta",
+        "primary_url": "https://www.trendforce.com/presscenter/news/20260713-13142.html",
+        "research_mode": "delta_only",
+        "research_outcome": "engine_c_observation_candidate_no_graph_delta",
+        "research_run": "luna_reviewer_2026-08-01_pq1_5",
+        "trace_attempts_ref": "TrendForce 2026-07-13 official release；Winbond Q1 2026 IR P25；Puya 2025 annual report；Macronix official access attempt",
+        "trace_next_trigger": "H2 2026 realized contract prices、獨立 market-share dataset，或使用者優先核准相關公司 identity／Engine C observation",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "Well, looks like SLC NAND is forcasted to rise up 120-170% for H2 2026 per Trendforce. There's $MU (21%), Kioxia (20%) as largest share, but clearer beneficiaries appears to be: 1. Winbond (2344): ~15% of the SLC NAND market 2. Macronix (2337): ~11% market share 3. SkyHigh Memory via Puya Semi: ~14% market share Given Micron at $1T and others are a bit large relative to SLC NAND TAM. (source: Q1 2026 Winbond presentation/Trendforce).",
       "triage": {
@@ -11263,9 +11288,17 @@
       "first_seen": "2026-07-29T22:35:11.212717+00:00",
       "lead_id": "lead_928514b80dea6644f199f48c0803092d",
       "published_at": "2026-07-29",
-      "refs": {},
+      "refs": {
+        "action_digest": "5ff8fc562c3de899caa8772db45466b64cb38f4a548863c7e13d217089253e4a",
+        "focus_company_id": "co:axt",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1051627/000143774926024883/axti20260715_8k.htm",
+        "research_action_id": "ra_83889cf03637953caa587c21f8e97886",
+        "research_run": "luna_reviewer_2026-08-01_pq1_5",
+        "source_doc": "axti_8_k_20260729",
+        "trace_status": "original_obtained"
+      },
       "source": "edgar:AXTI",
-      "status": "triaged_go",
+      "status": "action_prepared",
       "themes": {},
       "title": "AXTI 8-K filed 2026-07-29",
       "triage": {
@@ -11668,10 +11701,18 @@
         "campaign_topic": "memory_packaging",
         "campaign_window_end": "2026-07-05T09:45:21Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
-        "research_mode": "delta_only"
+        "original_claim_status": "jv_supported_commercialization_partial_lpkf_mapping_rejected",
+        "parked_reason": "Sumitomo Chemical 與 Samsung Electro-Mechanics 官方文件確認 GlaSSEM JV、KRW 482.1bn 資本與 H2 FY2027 supply-system 時程，但未確認 LPKF／E&R／Onto 是 GlaSSEM 供應商或受益者；LPKF 70% LIDE 目標仍只取得 Warburg tier-3 轉述，且必要公司 identity 尚未登記，不能外推具名 graph edge",
+        "research_mode": "delta_only",
+        "research_outcome": "official_jv_obtained_named_beneficiary_mapping_unproven",
+        "research_run": "luna_reviewer_2026-08-01_pq1_5",
+        "trace_attempts_ref": "Sumitomo Chemical 2026-07-02 PR；Samsung Electro-Mechanics disclosure；LPKF Q1／Q2／Q3 2026 IR與2025 annual report；Warburg 2026-03-27；official exact search",
+        "trace_next_trigger": "LPKF first-party 70% source、GlaSSEM 具名設備訂單／qualification，或完成 Samsung Electro-Mechanics／Sumitomo Chemical／Dongwoo／LPKF identity onboarding",
+        "trace_requires_user": "false",
+        "trace_status": "partial"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "So positive readthrough on the upstream glass substrate supply chain: - Sumitomo Chemical and Samsung Electro-Mechanics formally establish JV in Korea within the year to handle the glass core substrate business (GlaSSEM). Main thing was timeline/funding was finalized: \"full scale commercialization targeted H2 2027\" for the Samsung/Dongwoo JV / KRW 482.1B planned capital. Think the \"full scale commercialization\" is the word to highlight, since that would imply timeline moving faster than expected than starting ramp or early production H2 2027. So... TGV/LIDE with $LPK (that I own)/E&R and Onto in terms of yields are just some examples of possible sector beneficiaries. Since companies like LPK stated in the past: “80% of customers among major global players have selected LPKF equipment” and targeted \"70% of LIDE market share target for TGV in the glass-core ramp\". These players also typically have revenue pulled forward, since equipment orders during capex cycle hit before actual ramp. Regardless, just an update on developments.",
       "triage": {
