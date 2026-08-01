@@ -10,6 +10,8 @@ from contextlib import redirect_stderr, redirect_stdout
 from datetime import datetime, timezone
 from typing import Any, Iterable, Mapping, Sequence
 
+from .twse import twse_code
+
 
 _STATUS = {"observed", "insufficient_history", "unavailable", "quarantined"}
 _METRIC_COLUMNS = (
@@ -171,6 +173,68 @@ def unavailable_observation(
         "warnings": [],
     }
     result.update({key: None for key in _METRIC_COLUMNS})
+    return result
+
+
+def reconcile_twse_freshness(
+    observation: Mapping[str, Any],
+    *,
+    reference: Mapping[str, Any] | None,
+    oracle_error: str | None = None,
+    provider_symbol: str | None = None,
+) -> dict[str, Any]:
+    """Attach the TWSE reference row and quarantine a lagging Yahoo bar.
+
+    The reference is intentionally transient (``_twse_reference``).  It is
+    carried by the current refresh into the public beta report, while the
+    TechnicalObservation ledger remains an adjusted-close projection and does
+    not mix raw TWSE prices into its indicator series.
+    """
+
+    result = dict(observation)
+    symbol = str(provider_symbol or result.get("provider_symbol") or "")
+    if twse_code(symbol) is None:
+        return result
+
+    blockers = {str(item) for item in result.get("blockers") or []}
+    warnings = {str(item) for item in result.get("warnings") or []}
+    if reference is None:
+        result["_twse_reference"] = {
+            "status": "unavailable",
+            "source": "https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL",
+            "error": oracle_error or "twse_symbol_missing",
+        }
+        blockers.add("technical_twse_freshness_unavailable")
+        if str(result.get("data_status")) == "observed":
+            result["data_status"] = "quarantined"
+        result["blockers"] = sorted(blockers)
+        result["warnings"] = sorted(warnings)
+        return result
+
+    reference_payload = dict(reference)
+    yahoo_session = str(result.get("session_date") or "")
+    twse_session = str(reference_payload.get("session_date") or "")
+    if not twse_session:
+        reference_payload["status"] = "unavailable"
+        blockers.add("technical_twse_freshness_unavailable")
+        if str(result.get("data_status")) == "observed":
+            result["data_status"] = "quarantined"
+    elif not yahoo_session:
+        reference_payload["status"] = "reference_only"
+    elif twse_session > yahoo_session:
+        reference_payload["status"] = "provider_lagging"
+        blockers.add("technical_session_stale_vs_twse")
+        if str(result.get("data_status")) in {"observed", "insufficient_history"}:
+            result["data_status"] = "quarantined"
+    elif twse_session == yahoo_session:
+        reference_payload["status"] = "matched"
+    else:
+        reference_payload["status"] = "provider_ahead"
+        warnings.add("twse_reference_older_than_provider")
+
+    result["_twse_reference"] = reference_payload
+    result["blockers"] = sorted(blockers)
+    result["warnings"] = sorted(warnings)
     return result
 
 
@@ -613,5 +677,6 @@ __all__ = [
     "fetch_technical_observation",
     "latest_technical_status",
     "recent_technical_observations",
+    "reconcile_twse_freshness",
     "unavailable_observation",
 ]

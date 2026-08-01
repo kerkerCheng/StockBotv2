@@ -180,6 +180,35 @@ def test_ranges_share_one_frozen_deployable_cash_budget() -> None:
     assert report["policy_mode"] == "paper_observation"
 
 
+def test_twse_reference_is_rendered_without_becoming_adjusted_indicator() -> None:
+    policy = load_beta_policy()
+    observations = _observations(policy)
+    observations["tw50"]["_twse_reference"] = {
+        "status": "provider_lagging",
+        "session_date": "2026-07-31",
+        "close_raw": 102.85,
+        "change_raw": 9.35,
+        "change_pct": 0.1,
+        "source": "fixture://twse",
+    }
+    histories = {key: [value] for key, value in observations.items()}
+
+    report = build_beta_monitor(
+        observations_by_benchmark=observations,
+        history_by_benchmark=histories,
+        holdings_rows=_holdings(cash=10.0),
+        capital_authority_rows=_capital_rows(),
+        as_of=NOW,
+        policy=policy,
+    )
+
+    tw50 = next(item for item in report["items"] if item["ticker"] == "0050.TW")
+    assert tw50["indicator"]["twse_session_date"] == "2026-07-31"
+    assert tw50["indicator"]["twse_change_pct"] == 0.1
+    rendered = render_beta_monitor_markdown(report)
+    assert "TWSE 官方 2026-07-31 +10.0%" in rendered
+
+
 def test_shared_cash_pool_subtracts_only_floor_and_never_uses_credit() -> None:
     policy = load_beta_policy()
     observations = _observations(policy)

@@ -436,6 +436,18 @@ def build_beta_monitor(
                 "realized_vol_60",
             )
         }
+        reference = observation.get("_twse_reference") if observation else None
+        if isinstance(reference, Mapping):
+            indicator.update(
+                {
+                    "twse_session_date": reference.get("session_date"),
+                    "twse_close_raw": reference.get("close_raw"),
+                    "twse_change_raw": reference.get("change_raw"),
+                    "twse_change_pct": reference.get("change_pct"),
+                    "twse_status": reference.get("status"),
+                    "twse_source": reference.get("source"),
+                }
+            )
         items.append(
             {
                 "ticker": instrument["ticker"],
@@ -566,6 +578,14 @@ def _moves(indicator: Mapping[str, Any]) -> str:
     )
 
 
+def _twse_snapshot(indicator: Mapping[str, Any]) -> str:
+    session = indicator.get("twse_session_date")
+    change_pct = _finite(indicator.get("twse_change_pct"))
+    if not session or change_pct is None:
+        return ""
+    return f"TWSE 官方 {session} {_signed_pct(change_pct)}｜"
+
+
 def _heat(indicator: Mapping[str, Any]) -> str:
     """距 200 日均線＝單一「熱度」讀數。
 
@@ -626,6 +646,8 @@ def _constraint_label(value: Any) -> str:
         "technical_history_insufficient_252_sessions": "歷史不足 252 個交易日",
         "technical_observation_missing": "缺少技術資料",
         "technical_observation_stale": "技術資料過期",
+        "technical_session_stale_vs_twse": "TWSE 官方行情較新，技術訊號暫停",
+        "technical_twse_freshness_unavailable": "TWSE freshness 校驗不可用",
         "technical_signal_metric_missing": "技術指標不完整",
         "safe_capacity_exhausted": "本輪可用上限已用完",
     }
@@ -645,6 +667,8 @@ def _warning_label(value: Any) -> str:
         ),
         "drawn_debt_present": "已有提款貸款",
         "credit_terms_incomplete": "貸款條件資料不完整",
+        "twse_freshness_unavailable": "TWSE freshness 校驗不可用",
+        "twse_reference_older_than_provider": "TWSE 參考列落後供應商列",
     }.get(raw, raw.replace("_", " "))
 
 
@@ -848,6 +872,12 @@ def render_beta_monitor_markdown(
         lines.append(f"- Portfolio blockers：{'、'.join(str(item) for item in blockers)}")
     if warnings:
         lines.append(f"- 風險提醒：{'、'.join(_warning_label(item) for item in warnings)}")
+    twse_freshness = report.get("twse_freshness") or {}
+    if twse_freshness.get("status") not in {None, "not_required", "not_available"}:
+        lines.append(
+            f"- 台股行情 freshness：{twse_freshness.get('status')}；"
+            "TWSE 官方列只作最新交易日校驗，不混入 adjusted-close 指標"
+        )
 
     lines += _risk_snapshot_lines(report, full=risk_view == "full")
     requests = report.get("event_search_requests") or []
@@ -875,6 +905,7 @@ def render_beta_monitor_markdown(
         lines.append(
             f"- {_display_label(item)}｜"
             f"{item['ticker']}｜{_moves(indicator)}｜"
+            f"{_twse_snapshot(indicator)}"
             f"距高點 {_pct(indicator.get('drawdown_252'))}｜{_heat(indicator)}｜"
             f"RSI {_finite(indicator.get('rsi_14')) or 0:.1f}｜"
             f"{_pace_reason(item)}｜"
@@ -896,6 +927,7 @@ def render_beta_monitor_markdown(
             lines.append(
                 f"- {_display_label(item)}｜"
                 f"{item['ticker']}｜{_moves(indicator)}｜"
+                f"{_twse_snapshot(indicator)}"
                 "原因="
                 + (
                     "、".join(
@@ -918,6 +950,7 @@ def render_beta_monitor_markdown(
             lines.append(
                 f"- {_display_label(item)}｜"
                 f"{item['ticker']}｜{_moves(indicator)}｜"
+                f"{_twse_snapshot(indicator)}"
                 f"距高點 {_pct(indicator.get('drawdown_252'))}｜"
                 f"{_heat(indicator)}｜"
                 f"RSI {_finite(indicator.get('rsi_14')) or 0:.1f}｜"

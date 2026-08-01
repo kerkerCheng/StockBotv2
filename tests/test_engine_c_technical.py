@@ -169,6 +169,58 @@ def test_refresh_fetches_each_unique_benchmark_once_and_keeps_partial_results() 
     conn.close()
 
 
+def test_refresh_applies_twse_freshness_to_custom_transport() -> None:
+    policy = load_beta_policy()
+
+    def fetcher(key: str, symbol: str):
+        return _observation(key=key)
+
+    def twse_fetcher():
+        return {
+            "0050": {
+                "code": "0050",
+                "session_date": "2026-07-31",
+                "close_raw": 102.85,
+                "change_raw": 9.35,
+                "change_pct": 0.1,
+                "source": "fixture://twse",
+            },
+            "00981A": {
+                "code": "00981A",
+                "session_date": "2026-07-31",
+                "close_raw": 26.13,
+                "change_raw": 2.37,
+                "change_pct": 0.1,
+                "source": "fixture://twse",
+            },
+            "2330": {
+                "code": "2330",
+                "session_date": "2026-07-31",
+                "close_raw": 2425.0,
+                "change_raw": 220.0,
+                "change_pct": 0.1,
+                "source": "fixture://twse",
+            },
+        }
+
+    conn = _conn()
+    result = refresh_technical_observations(
+        policy=policy,
+        fetcher=fetcher,
+        twse_fetcher=twse_fetcher,
+        conn=conn,
+    )
+
+    assert result["twse_freshness"]["status"] == "ok"
+    tw50 = next(item for item in result["items"] if item["benchmark_key"] == "tw50")
+    assert tw50["data_status"] == "quarantined"
+    assert tw50["blockers"] == ["technical_session_stale_vs_twse"]
+    assert tw50["twse_reference"]["status"] == "provider_lagging"
+    stored = latest_technical_status(conn, "tw50")
+    assert "_twse_reference" not in stored
+    conn.close()
+
+
 def test_unavailable_observation_is_appendable_and_sanitized() -> None:
     conn = _conn()
     result = unavailable_observation(

@@ -32,7 +32,9 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
      Decision sizing、單筆上限與風控決定；不得推導 operating／alpha reserve、planned outflows 或雙 cash view。
      Engine C 保存 adjusted-close 1／5／20-session return；`contingent_credit_available` 顯示未動用額度、
      已借款與估計利息但不算自有現金，`loan_funded_supported_range` 固定人工 review；只呈現、不推定
-     draw／choice／fill）
+     draw／choice／fill）。台股 `.TW` 的最新交易日另由 TWSE 官方 `STOCK_DAY_ALL` OpenAPI 校驗；
+     Yahoo 落後、TWSE 代碼缺列或 freshness 校驗不可用時，該標的 technical signal／supported range 必須
+     fail closed。TWSE 未還權 OHLC 只作最新日期與當日漲跌 reference，不混入 adjusted-close 長期序列。
    - 對今日新增 pending leads 套 `skills/signal-triage/SKILL.md`，用本機 CLI 寫回 triage
    - `.venv\Scripts\python.exe -m engine_b.cli trace-backlog`（顯示 parked 追源未果及下一 trigger；不把一般 backlog 全塞 pq2）
    - `.venv\Scripts\python.exe -m decision_lab today --format markdown`

@@ -180,6 +180,8 @@ Decision gap jobs 優先占用同一個 daily pq1 budget。若研究結果需要
 
 因此：**未驗證的訊號機制不得覆蓋有證據的 baseline**；呈現須寫「例行投入 / 節奏 X%」而非自相矛盾的「未觸發 / 節奏 X%」。但 baseline 不等於「無論如何都投」——資料不足／stale／quarantined 時仍誠實歸零。
 
+**台股 technical freshness（2026-08-01）：** `.TW` 的最新交易日先用 TWSE 官方 `STOCK_DAY_ALL` OpenAPI 校驗；Yahoo session 落後、官方代碼缺列或 TWSE freshness 無法取得時，該標的 technical signal 必須 `quarantined`／supported range 歸零。TWSE 的未還權 OHLC 只作最新日期與當日漲跌 reference，不得直接混入 Yahoo adjusted-close 長期序列；完整還權歷史另需明確的資料源與調整規則。
+
 **須區分量測與訊號：** 總曝險倍數、歸零門檻、追繳門檻、利息覆蓋屬**量測**，有價值且應強化（本輪所有決策翻轉皆由此而來）；RSI／MACD／tier／pace 屬**訊號**，三次受測皆未通過。完整證據與未實作項見 [`docs/brainstorms/2026-07-31-leverage-glide-path-requirements.md`](docs/brainstorms/2026-07-31-leverage-glide-path-requirements.md)。
 
 ### 事件監控

@@ -19,16 +19,23 @@ if str(Path(__file__).resolve().parents[1]) not in sys.path:
 
 from decision_lab.beta_policy import load_beta_policy, unique_benchmarks
 from engine_c.db import DB_TYPE, get_conn
-from engine_c.technical import append_technical_observation, fetch_technical_observation
+from engine_c.technical import (
+    append_technical_observation,
+    fetch_technical_observation,
+    reconcile_twse_freshness,
+)
+from engine_c.twse import fetch_twse_latest_rows, twse_code
 
 
 TechnicalFetcher = Callable[[str, str], Mapping[str, Any]]
+TwseFetcher = Callable[[], Mapping[str, Mapping[str, Any]]]
 
 
 def refresh_technical_observations(
     *,
     policy: Mapping[str, Any] | None = None,
     fetcher: TechnicalFetcher = fetch_technical_observation,
+    twse_fetcher: TwseFetcher | None = None,
     conn=None,
 ) -> dict[str, Any]:
     """Refresh every unique benchmark; one failure never suppresses siblings。"""
@@ -38,12 +45,40 @@ def refresh_technical_observations(
     owns_connection = conn is None
     connection = conn or get_conn()
     items: list[dict[str, Any]] = []
+    twse_symbols = [
+        str(target["benchmark_symbol"])
+        for target in targets
+        if twse_code(str(target["benchmark_symbol"])) is not None
+    ]
+    twse_rows: Mapping[str, Mapping[str, Any]] = {}
+    twse_status = "not_required"
+    twse_error: str | None = None
+    # Custom fetchers are used by deterministic tests and callers that already
+    # own their transport.  The scheduled/default path owns the official check.
+    if twse_symbols and (fetcher is fetch_technical_observation or twse_fetcher is not None):
+        try:
+            twse_rows = dict((twse_fetcher or fetch_twse_latest_rows)())
+            twse_status = "ok"
+        except Exception as exc:
+            twse_status = "unavailable"
+            twse_error = type(exc).__name__
+    elif twse_symbols:
+        twse_status = "skipped_custom_fetcher"
     try:
         for target in targets:
             key = target["benchmark_key"]
             symbol = target["benchmark_symbol"]
             try:
                 observation = dict(fetcher(key, symbol))
+                if twse_code(str(symbol)) is not None and twse_status != "skipped_custom_fetcher":
+                    reference = twse_rows.get(twse_code(str(symbol)) or "")
+                    observation = reconcile_twse_freshness(
+                        observation,
+                        reference=reference,
+                        oracle_error=twse_error or (None if reference else "twse_symbol_missing"),
+                        provider_symbol=str(symbol),
+                    )
+                twse_reference = observation.pop("_twse_reference", None)
                 observation_id = append_technical_observation(
                     connection, observation, commit=False
                 )
@@ -56,6 +91,8 @@ def refresh_technical_observations(
                         "data_status": observation["data_status"],
                         "session_date": observation.get("session_date"),
                         "blockers": list(observation.get("blockers") or []),
+                        "warnings": list(observation.get("warnings") or []),
+                        "twse_reference": twse_reference,
                     }
                 )
             except Exception:
@@ -68,6 +105,8 @@ def refresh_technical_observations(
                         "data_status": "unavailable",
                         "session_date": None,
                         "blockers": ["technical_refresh_failed"],
+                        "warnings": [],
+                        "twse_reference": None,
                     }
                 )
     finally:
@@ -90,6 +129,13 @@ def refresh_technical_observations(
         "observed_count": observed,
         "total_count": len(items),
         "items": items,
+        "twse_freshness": {
+            "status": twse_status,
+            "source": "https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL",
+            "symbols": twse_symbols,
+            "reference_count": len(twse_rows),
+            "error": twse_error,
+        },
     }
 
 

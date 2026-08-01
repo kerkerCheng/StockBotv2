@@ -92,6 +92,11 @@ def run(
                 }
         observations: dict[str, Mapping[str, Any] | None] = {}
         histories: dict[str, Sequence[Mapping[str, Any]]] = {}
+        twse_reference_by_key = {
+            str(item.get("benchmark_key")): item.get("twse_reference")
+            for item in refresh.get("items") or []
+            if item.get("twse_reference")
+        }
         failed_in_memory = {
             str(item["benchmark_key"]): item
             for item in refresh.get("items") or []
@@ -107,7 +112,12 @@ def run(
                 }
                 histories[key] = []
                 continue
-            observations[key] = latest_technical_status(connection, key)
+            observation = latest_technical_status(connection, key)
+            reference = twse_reference_by_key.get(key)
+            if observation is not None and reference is not None:
+                observation = dict(observation)
+                observation["_twse_reference"] = dict(reference)
+            observations[key] = observation
             histories[key] = recent_technical_observations(connection, key, limit=20)
         try:
             holdings = list(holdings_fetcher())
@@ -138,6 +148,14 @@ def run(
                     set(report.get("warnings") or []) | {"risk_history_write_failed"}
                 )
         report["risk_history_recorded"] = recorded
+        report["twse_freshness"] = refresh.get(
+            "twse_freshness",
+            {"status": "not_available", "source": None, "symbols": []},
+        )
+        if report["twse_freshness"].get("status") == "unavailable":
+            report["warnings"] = sorted(
+                set(report.get("warnings") or []) | {"twse_freshness_unavailable"}
+            )
         report["refresh"] = {
             key: refresh.get(key)
             for key in ("status", "observed_count", "total_count", "blockers")
