@@ -71,6 +71,13 @@ def load_config(path: Path | str = DEFAULT_CONFIG_PATH) -> dict:
     x_section = data.get("x_accounts") or {}
     if x_section and not isinstance(x_section.get("handles"), list):
         raise ValueError("x_accounts 必須有 handles list")
+    if x_section:
+        page_size = int(x_section.get("max_results", 25))
+        run_cap = int(x_section.get("max_posts_per_run", 200))
+        if not 5 <= page_size <= 100:
+            raise ValueError("x_accounts.max_results 必須介於 5–100")
+        if not 5 <= run_cap <= 1000:
+            raise ValueError("x_accounts.max_posts_per_run 必須介於 5–1000")
     return data
 
 
@@ -297,14 +304,33 @@ def harvest_x(config: dict, store: dict, *, seen_at: str | None = None) -> None:
         state = leads.get_source_state(store, source)
         try:
             user_id = state.get("user_id") or x_api.get_user_id(handle, token)
-            posts = x_api.get_user_posts(
-                user_id,
-                since_id=state.get("since_id"),
-                max_results=int(section.get("max_results", x_api.DEFAULT_MAX_RESULTS)),
-                exclude_replies=bool(section.get("exclude_replies", True)),
-                exclude_retweets=bool(section.get("exclude_retweets", True)),
-                token=token,
-            )
+            page_size = int(section.get("max_results", x_api.DEFAULT_MAX_RESULTS))
+            run_cap = int(section.get("max_posts_per_run", 200))
+            since_id = state.get("since_id")
+            frozen_since_id = state.get("x_pagination_since_id") or since_id
+            if frozen_since_id:
+                page = x_api.get_user_posts_since(
+                    user_id,
+                    since_id=str(frozen_since_id),
+                    pagination_token=state.get("x_pagination_token"),
+                    max_posts=run_cap,
+                    page_size=page_size,
+                    exclude_replies=bool(section.get("exclude_replies", True)),
+                    exclude_retweets=bool(section.get("exclude_retweets", True)),
+                    token=token,
+                    with_meta=True,
+                )
+                posts = list(page["posts"])
+            else:
+                # Cold start 只抓一頁，維持既有成本上限；完整歷史另走 bounded backfill。
+                posts = x_api.get_user_posts(
+                    user_id,
+                    max_results=page_size,
+                    exclude_replies=bool(section.get("exclude_replies", True)),
+                    exclude_retweets=bool(section.get("exclude_retweets", True)),
+                    token=token,
+                )
+                page = {"posts": posts, "truncated": False, "next_token": None}
         except x_api.XApiError as exc:
             leads.record_run(store, source=source, result="fetch_failed", new=0,
                              run_at=seen_at,
@@ -316,14 +342,45 @@ def harvest_x(config: dict, store: dict, *, seen_at: str | None = None) -> None:
 
         items = [_x_post_item(handle, post, section, x_api) for post in posts]
         new = _register_all(store, source, items, seen_at)
+        newest = x_api.newest_id(posts)
+        pending_high = state.get("x_pagination_high_watermark")
+        high_watermark = max(
+            (
+                value
+                for value in (pending_high, newest, state.get("since_id"))
+                if str(value or "").isdigit()
+            ),
+            key=int,
+            default=None,
+        )
         leads.set_source_state(
             store, source,
             user_id=user_id,
-            since_id=x_api.newest_id(posts) or state.get("since_id"),
+            **(
+                {
+                    "x_pagination_since_id": str(frozen_since_id),
+                    "x_pagination_token": page.get("next_token"),
+                    "x_pagination_high_watermark": high_watermark,
+                }
+                if page.get("truncated")
+                else {"since_id": high_watermark}
+            ),
         )
+        if not page.get("truncated"):
+            live_state = store.setdefault("source_state", {}).setdefault(source, {})
+            for key in (
+                "x_pagination_since_id",
+                "x_pagination_token",
+                "x_pagination_high_watermark",
+            ):
+                live_state.pop(key, None)
         leads.record_run(store, source=source, result="ok", new=new, run_at=seen_at)
         cost = len(posts) * 0.005
-        print(f"[harvest] {source} ok: {new} new / {len(posts)} posts (~${cost:.3f})")
+        continuation = "；分頁待下輪續抓" if page.get("truncated") else ""
+        print(
+            f"[harvest] {source} ok: {new} new / {len(posts)} posts "
+            f"(~${cost:.3f}){continuation}"
+        )
 
 
 def backfill_x_handle(

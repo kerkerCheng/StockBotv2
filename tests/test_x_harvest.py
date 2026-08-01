@@ -15,6 +15,7 @@ from fetchers import x_api
 def _config(**overrides):
     section = {"handles": ["aleabitoreddit"], "exclude_replies": True,
                "exclude_retweets": True, "max_results": 25,
+               "max_posts_per_run": 200,
                "cache_media": False}
     section.update(overrides)
     return {"feeds": [], "edgar_watch": {}, "x_accounts": section}
@@ -51,6 +52,15 @@ class _FakeApi:
 
     def get_user_posts_window(self, user_id, **kw):
         self.calls.append(("posts_window", user_id, kw))
+        if self.fail == "posts":
+            raise x_api.XApiError("http_429")
+        posts = self.posts[: int(kw["max_posts"])]
+        if kw.get("with_meta"):
+            return {"posts": posts, "truncated": False, "next_token": None}
+        return posts
+
+    def get_user_posts_since(self, user_id, **kw):
+        self.calls.append(("posts_since", user_id, kw))
         if self.fail == "posts":
             raise x_api.XApiError("http_429")
         posts = self.posts[: int(kw["max_posts"])]
@@ -253,6 +263,35 @@ def test_x_client_marks_window_truncated_at_cost_cap(monkeypatch) -> None:
     assert result["truncated"] is True
 
 
+def test_x_client_paginates_bounded_since_id(monkeypatch) -> None:
+    calls = []
+
+    def fake_get(path, params, token):
+        calls.append(dict(params))
+        if "pagination_token" not in params:
+            return {
+                "data": [{"id": "301", "text": "new"}],
+                "meta": {"next_token": "next"},
+            }
+        return {"data": [{"id": "300", "text": "older"}], "meta": {}}
+
+    monkeypatch.setattr(x_api, "_get", fake_get)
+    result = x_api.get_user_posts_since(
+        "123",
+        since_id="200",
+        max_posts=200,
+        page_size=25,
+        token="token",
+        with_meta=True,
+    )
+
+    assert [post["id"] for post in result["posts"]] == ["301", "300"]
+    assert result["truncated"] is False
+    assert calls[0]["since_id"] == "200"
+    assert calls[1]["since_id"] == "200"
+    assert calls[1]["pagination_token"] == "next"
+
+
 def test_second_run_sends_since_id_and_skips_user_lookup(monkeypatch) -> None:
     fake = _FakeApi([{"id": "300", "text": "new", "created_at": "2026-07-25T01:00:00Z"}])
     _install(monkeypatch, fake)
@@ -263,11 +302,54 @@ def test_second_run_sends_since_id_and_skips_user_lookup(monkeypatch) -> None:
 
     kinds = [c[0] for c in fake.calls]
     assert "user_id" not in kinds  # user_id 有快取 → 不重複計費
-    posts_call = next(c for c in fake.calls if c[0] == "posts")
+    posts_call = next(c for c in fake.calls if c[0] == "posts_since")
     assert posts_call[2]["since_id"] == "200"  # 只抓新的
     assert posts_call[2]["exclude_replies"] is True
     assert posts_call[2]["exclude_retweets"] is True
-    assert posts_call[2]["max_results"] == 25
+    assert posts_call[2]["page_size"] == 25
+    assert posts_call[2]["max_posts"] == 200
+
+
+def test_daily_pagination_checkpoint_delays_since_id_until_final_page(monkeypatch) -> None:
+    class _PagedFake(_FakeApi):
+        def __init__(self):
+            super().__init__([])
+            self.pages = [
+                {
+                    "posts": [{"id": "301", "text": "newest"}],
+                    "truncated": True,
+                    "next_token": "page-2",
+                },
+                {
+                    "posts": [{"id": "250", "text": "older"}],
+                    "truncated": False,
+                    "next_token": None,
+                },
+            ]
+
+        def get_user_posts_since(self, user_id, **kw):
+            self.calls.append(("posts_since", user_id, kw))
+            return self.pages.pop(0)
+
+    fake = _PagedFake()
+    _install(monkeypatch, fake)
+    store = leads.empty_store()
+    leads.set_source_state(store, "x:aleabitoreddit", user_id="12345", since_id="200")
+
+    harvest_leads.harvest_x(_config(max_posts_per_run=5), store)
+    pending = leads.get_source_state(store, "x:aleabitoreddit")
+    assert pending["since_id"] == "200"
+    assert pending["x_pagination_since_id"] == "200"
+    assert pending["x_pagination_token"] == "page-2"
+    assert pending["x_pagination_high_watermark"] == "301"
+
+    harvest_leads.harvest_x(_config(max_posts_per_run=5), store)
+    complete = leads.get_source_state(store, "x:aleabitoreddit")
+    assert complete["since_id"] == "301"
+    assert "x_pagination_token" not in complete
+    assert fake.calls[1][2]["since_id"] == "200"
+    assert fake.calls[1][2]["pagination_token"] == "page-2"
+    assert len(store["leads"]) == 2
 
 
 def test_missing_token_logs_fetch_failed_not_crash(monkeypatch) -> None:

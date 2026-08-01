@@ -61,6 +61,8 @@ Codex desktop scheduled run 的第一個 App 動作必須實際呼叫 `codex_app
 `loan_funded_supported_range=manual_review_required`。Portfolio cash 仍是自有 cash 唯一 authority，undrawn
 credit 不進 NAV／cash／allocation。technical／capital telemetry 不進 pq1，recommendation
 不推定 choice／fill，也不推定 draw，且不寫 Google Sheet。fetch／parse 失敗各記 harvest_log；
+自有現金 baseline 每 5 個完整交易日固定主動提醒一次，週期由 Engine C 全部 distinct observed sessions
+定錨，不綁 RSI／MACD／tier；資料不足仍歸零。貸款不在例行提醒內，提款時間表留待另案人工核准。
 **解析失敗 ≠ 無新文**。每筆失敗必須保存 `failure_class`；最新一次仍失敗的來源由
 `harvest-health` 持續顯示。fixed entry 若疑似 sandbox／proxy／本機網路權限受阻，原命令必須在允許
 本機網路的權限下重跑一次；第一次記 `access_blocked`，只有同一來源後續成功才標 recovered，重跑仍失敗
@@ -77,8 +79,8 @@ return、RSI、252-session drawdown、signal tier、cooldown 與 capital constra
 `effective_weight` 才稱「換算槓桿曝險」，不得再輸出模糊的「名目槓桿」。`pace=0.25` 顯示為
 「節奏 25%」，並解釋它是該 sleeve 完整 campaign budget 的四分之一，不是 NAV／現金／持倉的 25%。
 Portfolio risk 另以 ignored append-only JSONL 保存 aggregate snapshot：Daily 只顯示門檻跨越／狀態翻轉，
-Weekly 才用 `--risk-view full --no-record-risk` 顯示完整快照。硬擋只含 ETF nominal／effective 槓桿 cap
-與 investment policy 的 5% 單筆上限；issuer concentration、alpha 總量與 drawn loan leverage 只警告。
+Weekly 才用 `--risk-view full --no-record-risk` 顯示完整快照。硬擋包含 ETF nominal／effective 槓桿 cap、
+總曝險 cap、callable debt cap 與 investment policy 的 5% 單筆上限；issuer concentration 與 alpha 總量只警告。
 `issuer_loads` 是已知、partial ownership look-through，不是完整 ETF 成分，也不含 Engine A 上游依賴。
 若輸出 `event_search_requests`，只對該 packet 做一次 WebSearch，列可能原因、曝險與「未經查證」；不得
 建立 lead／pq1／pq2、不得寫 Engine A／C／D authority，深入研究必須另走 lead-intake。
@@ -233,10 +235,11 @@ park：社群 CPO 推論 → 一手來源未支持，不產空 RA
 
 ## Beta capital observation（無 pq2 編號）
 TL;DR：最大化約 30 年後 `retirement_net_terminal_wealth`；technical 只決定新增 timing／pace；列今日可人工評估標的與最重要的動態風控 warning
+例行提醒：<每 5 個完整交易日一次；本期是否到期；只涵蓋自有現金，貸款不在提醒內>
 自有現金可部署：<Portfolio CASH − cash floor；Alpha／Beta 共用>
 本輪可評估上限：<同一主路徑經 technical 節奏與 risk caps 後的 ceiling；不是下單金額>
 未動用貸款額度：<amount／已借款／估計利息／terms status；明標不算自有現金、未納入本輪上限>
-貸款投入：manual_review_required
+貸款投入：不在例行提醒內；提款時間表未建立，仍為 manual_review_required
 | 標的 | 系統動作 | 一句 TL;DR（燈號＋RSI 水位＋1／5／20 日變化＋距高點／趨勢或回檔） | 今日節奏／資本限制 |
 |---|---|---|---|
 | QQQ | HOLD | ⚪ RSI 43.2（弱／中性）；… | 0%；… |
@@ -320,6 +323,7 @@ fill。系統不連 broker。
 
 Beta 的 `CONTRIBUTE REVIEW` 只是一個當日人工 capital discussion prompt，不因出現在 brief 就取得 pq2
 approval、loan draw、choice 或 fill 語意。貸款路徑在沒有 exact draw／instrument／tranche 核准前不得輸出自動金額。
+固定例行提醒亦同：它只以自有現金 baseline 提醒使用者評估，不包含或暗示貸款提款。
 
 ### Step 7 — 收尾同步
 

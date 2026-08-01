@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
 from decision_lab.context import build_context_bundle, holdings_snapshot_digest
 from decision_lab.coverage import assess_coverage
 from decision_lab.store import DecisionStore
@@ -270,5 +272,69 @@ def test_queue_capacity_preserves_backlog_and_stable_ranking(tmp_path: Path) -> 
         assert len(ranked_once["backlog"]) == 2
         assert store.table_count("research_work_orders") == 7
         assert all(result.work_order_id for result in results)
+    finally:
+        store.close()
+
+
+def test_terminal_work_order_requires_explicit_pq2_receipt_to_redispatch(
+    tmp_path: Path,
+) -> None:
+    store = _store(tmp_path)
+    try:
+        result = _assess(
+            store,
+            _bundle(
+                store,
+                evidence={
+                    "focus_company": None,
+                    "subject_origin_entity": "Unknown",
+                    "sources": [],
+                    "causal_paths": [],
+                    "counter_paths": [],
+                },
+            ),
+        )
+        work_order_id = result.work_order_id
+        assert work_order_id is not None
+        store.transition_research_work_order(
+            work_order_id=work_order_id,
+            to_status="queued",
+            operation_key="todo:64:go:first",
+            receipt={"todo_n": 64, "prior_work_order_status": "proposed"},
+            observed_at=NOW,
+        )
+        store.transition_research_work_order(
+            work_order_id=work_order_id,
+            to_status="researching",
+            operation_key="todo:64:researching",
+            receipt={"todo_n": 64, "reference": "research:first"},
+            observed_at=NOW,
+        )
+        store.transition_research_work_order(
+            work_order_id=work_order_id,
+            to_status="completed",
+            operation_key="todo:64:completed",
+            receipt={"todo_n": 64, "reference": "research:done"},
+            observed_at=NOW,
+        )
+
+        with pytest.raises(ValueError, match="illegal research work order transition"):
+            store.transition_research_work_order(
+                work_order_id=work_order_id,
+                to_status="queued",
+                operation_key="unsafe-reopen",
+                receipt={"todo_n": 64},
+                observed_at=NOW,
+            )
+
+        reopened = store.transition_research_work_order(
+            work_order_id=work_order_id,
+            to_status="queued",
+            operation_key="todo:64:go:retry",
+            receipt={"todo_n": 64, "prior_work_order_status": "completed"},
+            observed_at=NOW,
+        )
+        assert reopened["status"] == "queued"
+        assert store.rank_work_orders(capacity=5)["selected"][0]["work_order_id"] == work_order_id
     finally:
         store.close()

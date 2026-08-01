@@ -203,10 +203,26 @@ def _review_cadence(
     current: Mapping[str, Any],
     history: Sequence[Mapping[str, Any]],
     policy: Mapping[str, Any],
+    observed_session_count: int | None = None,
 ) -> dict[str, Any]:
     pace = float(current["pace"])
+    repeat = int(policy["signal"]["repeat_after_sessions"])
+    session_count = (
+        int(observed_session_count)
+        if isinstance(observed_session_count, int) and observed_session_count > 0
+        else max(len(history), 1)
+    )
+    routine_due = session_count == 1 or (session_count - 1) % repeat == 0
+    sessions_until_routine = repeat - ((session_count - 1) % repeat)
     if pace == 0:
-        return {"review_due": False, "consecutive_sessions": 0, "reason": "no_signal"}
+        return {
+            "review_due": False,
+            "routine_due": routine_due,
+            "observed_session_count": session_count,
+            "sessions_until_routine": sessions_until_routine,
+            "consecutive_sessions": 0,
+            "reason": "data_unavailable",
+        }
     states = [signal_state(item, policy) for item in history]
     if not states or states[0]["tier"] != current["tier"] or states[0]["pace"] != pace:
         states.insert(0, dict(current))
@@ -217,13 +233,27 @@ def _review_cadence(
         else:
             break
     previous_pace = float(states[1]["pace"]) if len(states) > 1 else 0.0
-    escalated = pace > previous_pace
-    repeat = int(policy["signal"]["repeat_after_sessions"])
-    repeated = consecutive == 1 or (consecutive - 1) % repeat == 0
+    signal_active = str(current.get("pace_source") or "baseline") == "signal"
+    escalated = signal_active and pace > previous_pace
+    signal_repeated = signal_active and (
+        consecutive == 1 or (consecutive - 1) % repeat == 0
+    )
+    review_due = routine_due or escalated or signal_repeated
     return {
-        "review_due": escalated or repeated,
+        "review_due": review_due,
+        "routine_due": routine_due,
+        "observed_session_count": session_count,
+        "sessions_until_routine": sessions_until_routine,
         "consecutive_sessions": consecutive,
-        "reason": "signal_escalated" if escalated else "repeat_cadence" if repeated else "cooldown",
+        "reason": (
+            "signal_escalated"
+            if escalated
+            else "signal_repeat"
+            if signal_repeated
+            else "routine_reminder"
+            if routine_due
+            else "cooldown"
+        ),
     }
 
 
@@ -348,6 +378,7 @@ def build_beta_monitor(
     as_of: str,
     policy: Mapping[str, Any] | None = None,
     previous_risk_snapshot: Mapping[str, Any] | None = None,
+    session_counts_by_benchmark: Mapping[str, int] | None = None,
 ) -> dict[str, Any]:
     """Build one public, non-executing beta contribution report。"""
 
@@ -368,6 +399,7 @@ def build_beta_monitor(
             state,
             history_by_benchmark.get(benchmark_key, ()),
             resolved_policy,
+            (session_counts_by_benchmark or {}).get(benchmark_key),
         )
         prepared.append(
             {
@@ -492,8 +524,20 @@ def build_beta_monitor(
     self_funded_allocated = (
         float(self_funded_cash["deployable_cash_base"]) - remaining_cash
     )
+    repeat_sessions = int(resolved_policy["signal"]["repeat_after_sessions"])
+    routine_due_items = [
+        item
+        for item in items
+        if item["technical_status"] == "observed"
+        and bool(item["review_cadence"].get("routine_due"))
+    ]
+    observed_cadences = [
+        item["review_cadence"]
+        for item in items
+        if item["technical_status"] == "observed"
+    ]
     report = {
-        "schema_version": "engine-d-beta-monitor-v4",
+        "schema_version": "engine-d-beta-monitor-v5",
         "as_of": evaluation_at,
         "policy_version": resolved_policy["policy_version"],
         "policy_mode": resolved_policy["mode"],
@@ -532,6 +576,24 @@ def build_beta_monitor(
         "self_funded_supported_range": [0.0, self_funded_allocated],
         "contingent_credit_available": capital_view["contingent_credit_available"],
         "loan_funded_supported_range": capital_view["loan_funded_supported_range"],
+        "routine_reminder": {
+            "cadence_sessions": repeat_sessions,
+            "due": bool(routine_due_items),
+            "due_tickers": [str(item["ticker"]) for item in routine_due_items],
+            "sessions_until_next": (
+                0
+                if routine_due_items
+                else min(
+                    (
+                        int(cadence["sessions_until_routine"])
+                        for cadence in observed_cadences
+                    ),
+                    default=None,
+                )
+            ),
+            "scope": "self_funded_cash_only",
+            "loan_included": False,
+        },
         "risk_snapshot": risk_snapshot,
         "risk_changes": risk_changes(risk_snapshot, previous_risk_snapshot, resolved_policy),
         "event_search_requests": event_search_requests(
@@ -641,7 +703,7 @@ def _constraint_label(value: Any) -> str:
         "deployable_cash": "可部署現金",
         "leveraged_nominal_capacity": "槓桿 ETF 資金上限",
         "leveraged_effective_capacity": "換算槓桿曝險上限",
-        "signal_review_cooldown": "尚在冷卻期",
+        "signal_review_cooldown": "尚在例行／加碼提醒冷卻期",
         "overlapping_instrument_deferred": "同基準標的已優先評估",
         "technical_history_insufficient_252_sessions": "歷史不足 252 個交易日",
         "technical_observation_missing": "缺少技術資料",
@@ -832,12 +894,36 @@ def render_beta_monitor_markdown(
         if _primary_action(item) == "CONTRIBUTE REVIEW"
     ]
     review_names = "、".join(str(item["ticker"]) for item in reviews) or "無"
+    routine = report.get("routine_reminder") or {}
+    cadence_sessions = int(routine.get("cadence_sessions") or 5)
+    if routine.get("due"):
+        routine_line = (
+            f"- 例行提醒：每 {cadence_sessions} 個完整交易日一次的自有現金評估本期已到；"
+            + (
+                f"{review_names} 可進人工評估。"
+                if reviews
+                else "目前因資料／風控限制沒有可評估標的。"
+            )
+            + "貸款不在本提醒內。"
+        )
+    else:
+        remaining = routine.get("sessions_until_next")
+        routine_line = (
+            f"- 例行提醒：每 {cadence_sessions} 個完整交易日一次；"
+            + (
+                f"距下一次約 {remaining} 個完整交易日。"
+                if isinstance(remaining, int)
+                else "下一次待有效行情恢復後計算。"
+            )
+            + "只涵蓋自有現金，貸款不在本提醒內。"
+        )
     lines = [
         "# Beta Technical Monitor",
         "",
         "## TL;DR",
         "",
         "- 目標：最大化約 30 年後的退休淨終值；Beta 維持只累積、不因一般回檔自動賣出，技術訊號只決定新增的時點與節奏。",
+        routine_line,
         f"- 今日：{review_names} 可進人工評估；自有現金的本輪可評估上限 "
         f"{_money(supported_ceiling, currency)}，不是下單金額。",
         f"- 風控：{_risk_hint_summary(report)}；未動用貸款額度 "
@@ -853,7 +939,7 @@ def render_beta_monitor_markdown(
         "不算自有現金）",
         f"- 已借款：{_money(contingent.get('drawn_amount_base'), currency)}；"
         f"估計月息：{_money(contingent.get('estimated_monthly_interest_base'), currency)}",
-        "- 貸款投入：尚未核准；提款金額、標的與批次必須另案人工核准，且月息不得依賴被迫賣出 beta",
+        "- 貸款投入：不在例行提醒內且尚未核准；提款時間表、金額、標的與批次留待另案人工核准，且月息不得依賴被迫賣出 beta",
         f"- 共同現金池計算：Portfolio CASH {_money(portfolio.get('cash_base'), currency)} − "
         f"cash floor {_money(self_funded_cash.get('cash_floor_base'), currency)}；"
         "cash floor 以上全部可供 Alpha 與 Beta 共用",
@@ -982,7 +1068,7 @@ def render_beta_monitor_markdown(
         lines.append("- 無")
     lines += [
         "",
-        "> 所有金額都只是人工評估上限；未動用貸款額度不計入投資資產或自有現金，也不代表已核准、已提款、已下單或已寫回 Google Sheet。",
+        "> 所有金額都只是人工評估上限；例行提醒只涵蓋自有現金。未動用貸款額度不計入投資資產或自有現金，也不代表已核准、已提款、已下單或已寫回 Google Sheet。",
     ]
     return "\n".join(lines)
 

@@ -78,6 +78,7 @@ def test_shipped_config_registries_exist_on_disk() -> None:
         "config/company_identity.json",
         "config/engine_c_observation_fields.json",
         "config/decision_blockers.json",
+        "config/lead_ref_keys.json",
         "config/investment_policy.json",
         "config/beta_policy.json",
     ):

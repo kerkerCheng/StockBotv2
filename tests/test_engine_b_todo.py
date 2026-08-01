@@ -141,6 +141,45 @@ def test_decision_review_go_dispatches_pq1_without_resolving() -> None:
     assert todo.actionable_items(pool) == []
     assert pool["log"][-1]["verb"] == "pq1_queued"
 
+    repeated = todo.dispatch_decision_review(pool, 1, store=store)
+    assert repeated["work_order"]["status"] == "queued"
+    assert len(store.transitions) == 1
+    assert len([row for row in pool["log"] if row["verb"] == "pq1_queued"]) == 1
+
+
+@pytest.mark.parametrize("terminal_status", ["completed", "parked"])
+def test_decision_review_go_carries_explicit_terminal_redispatch_receipt(
+    terminal_status: str,
+) -> None:
+    pool = _pool_with({"type": "decision_review", "ref_id": "dc_1", "title": "REVIEW"})
+    store = _WorkOrderStore()
+    store.status = terminal_status
+
+    todo.dispatch_decision_review(
+        pool, 1, store=store, at="2026-07-30T00:00:00+00:00"
+    )
+
+    receipt = store.transitions[-1]["receipt"]
+    assert receipt["todo_n"] == 1
+    assert receipt["prior_work_order_status"] == terminal_status
+    assert store.status == "queued"
+
+
+def test_same_todo_can_redispatch_after_work_order_becomes_terminal() -> None:
+    pool = _pool_with({"type": "decision_review", "ref_id": "dc_1", "title": "REVIEW"})
+    store = _WorkOrderStore()
+
+    todo.dispatch_decision_review(pool, 1, store=store)
+    store.status = "completed"
+    todo.dispatch_decision_review(pool, 1, store=store)
+
+    assert [row["operation_key"] for row in store.transitions] == [
+        "todo:1:go:1",
+        "todo:1:go:2",
+    ]
+    assert pool["log"][-1]["receipt"] == "wo_1"
+    assert todo.get(pool, 1)["dispatch_attempt"] == 2
+
 
 def test_batch_cannot_bare_go_a_decision_review() -> None:
     pool = _pool_with({"type": "decision_review", "ref_id": "dc_1", "title": "REVIEW"})

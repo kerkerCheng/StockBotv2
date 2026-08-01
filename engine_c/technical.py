@@ -637,6 +637,36 @@ def recent_technical_observations(conn, benchmark_key: str, *, limit: int = 10) 
     return result
 
 
+def technical_observation_session_count(conn, benchmark_key: str) -> int:
+    """回傳已保存的 distinct observed sessions，供固定例行提醒定錨。
+
+    不能用「最近 N 筆」的 list 長度做 modulo：history window 填滿後長度不再
+    增加，固定提醒會永久停住。這個 count 只讀 append-only TechnicalObservation。
+    """
+
+    key = benchmark_key.strip().casefold()
+    try:
+        from engine_c.db import DB_TYPE
+    except ImportError:
+        DB_TYPE = "sqlite"
+    if DB_TYPE == "postgres":
+        with conn.cursor() as cursor:
+            cursor.execute(
+                "SELECT COUNT(DISTINCT session_date) FROM technical_observations "
+                "WHERE benchmark_key = %s AND data_status = 'observed'",
+                (key,),
+            )
+            row = cursor.fetchone()
+    else:
+        ensure_technical_schema(conn)
+        row = conn.execute(
+            "SELECT COUNT(DISTINCT session_date) FROM technical_observations "
+            "WHERE benchmark_key = ? AND data_status = 'observed'",
+            (key,),
+        ).fetchone()
+    return int(row[0] if row else 0)
+
+
 def latest_technical_status(conn, benchmark_key: str) -> dict[str, Any] | None:
     """Return newest fetch status, including unavailable／partial states。"""
 
@@ -677,6 +707,7 @@ __all__ = [
     "fetch_technical_observation",
     "latest_technical_status",
     "recent_technical_observations",
+    "technical_observation_session_count",
     "reconcile_twse_freshness",
     "unavailable_observation",
 ]

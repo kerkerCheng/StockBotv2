@@ -35,6 +35,7 @@ brainstorm；範圍大到需要驗收條件才開 plan。brainstorm 用 frontmat
 | 2026-07-29 | **Portfolio Risk Policy Redesign** — 統一 numeric SSOT；只有 ETF 槓桿 cap 與 5% 單筆上限歸零 live range，其餘只記錄／警告 | [2026-07-29-001](plans/2026-07-29-001-refactor-portfolio-risk-policy-plan.md) |
 | 2026-07-29 | **Serenity 30-Day Research Campaign** — 279 則回補、robotics ontology mini-slice 入圖 | [2026-07-29-002](plans/2026-07-29-002-feat-serenity-30d-research-campaign-plan.md)、[報告](reports/serenity_30d_research_2026-07-29.md) |
 | 2026-07-30 | **封閉字彙收斂** — Engine C 觀測欄位 registry、blocker registry、authority token 單一權威；待辦池分離「等決定／等事件」 | [封閉字彙登記表](solutions/architecture-patterns/closed-vocabulary-registry.md) |
+| 2026-08-01 | **Routine reliability 收尾** — daily X bounded pagination checkpoint、lead refs registry、terminal Decision gap 明確 redispatch、自有現金每 5 個完整交易日例行提醒 | — |
 
 **Engine D 仍未包含：** notification、remote Decision MCP、broker routing。
 
@@ -70,8 +71,6 @@ brainstorm；範圍大到需要驗收條件才開 plan。brainstorm 用 frontmat
   那時需求才具體；現在補等於對沒跑過的路徑猜規格。
 
 **已知未修的操作缺陷：**
-- `harvest_x` 不分頁，長時間未跑後可能永久漏掉中間批次（見 [`OPERATIONS.md`](OPERATIONS.md)）
-- `decision_review` 若研究已完成但 work order 已 terminal，狀態機沒有 `go` 路徑，只能 `pending`（2026-07-30 [64] 實例）
 - 同一公司可能同時存在 claim-keyed 與 company-keyed 兩個 cohort（2026-07-30 [74]／[75] 實例）；Decision Store append-only，不做破壞性去重
 
 ---
@@ -114,11 +113,9 @@ brainstorm；範圍大到需要驗收條件才開 plan。brainstorm 用 frontmat
 
 出自 [`2026-07-31-leverage-glide-path-requirements.md`](brainstorms/2026-07-31-leverage-glide-path-requirements.md)：
 
-- **總曝險硬擋（唯一必要的新 gate）** — 現行 `hard_blocks` 只擋槓桿 ETF，
-  已提款借款完全不受硬擋約束；未動用額度 USD 185,793 ＝ NAV 的 46.1%，
-  全額提款買 1x 標的會讓總曝險由約 1.0x 升至約 1.46x 而儀表板顯示正常
-- **槓桿 glide path** — 需先定義 exact 目標財富與年份（`Capital Authority` 新 record type）
-  與 exact 借款利率；後者可能讓「用 3x ETF」整個變成不必要
+- 總曝險硬擋與自有現金固定例行提醒已於 2026-08-01 完成。
+- 唯一剩餘的**貸款提款時間表**由使用者明確暫緩；目前不預期這麼早手動投入貸款，
+  未來若重啟再核准 exact 日期／金額／標的／tranche。glide path 公式亦延後，現況資源尚不構成綁定。
 
 其餘五份 brainstorm 的主體都已交付（見上方表格），保留作需求推導的歷史。
 
@@ -234,14 +231,9 @@ brainstorm；範圍大到需要驗收條件才開 plan。brainstorm 用 frontmat
 
 #### lead `refs` 是未登記字彙
 
-2026-08-01 實測：`library/leads/pending_leads.json` 的 `refs` 目前有 **56 個不同鍵名**，
-多數只出現一次；拼錯不會有任何錯誤訊息。當天即因把 `parked_reason` 寫成 `park_reason`
-而讓 park 理由對所有讀取端不可見——寫得進去、讀不出來。
-
-與 Engine C 觀測欄位、blocker、authority token 同型，解法也相同：
-建一份 `config/lead_ref_keys.json` 登記合法鍵名與用途，`annotate`／`advance` 拒絕未登記的鍵。
-成本低（既有三個 registry 可直接抄），但**必須先盤點既有 56 個鍵哪些是活的**，
-否則會把歷史資料一次全判為非法。
+~~2026-08-01 實測：`refs` 有 56 個不同鍵名，拼錯會靜默失效。~~ **已實作：**
+`config/lead_ref_keys.json` 已盤點並登記全部 56 個既有鍵與 value type；`annotate`／`advance`
+拒絕未登記鍵，近似拼錯會提示已知名稱。既有歷史資料保持可讀。
 
 #### 其他
 

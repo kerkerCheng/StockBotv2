@@ -176,6 +176,8 @@ Decision gap jobs 優先占用同一個 daily pq1 budget。若研究結果需要
 
 **訊號不得 gate 自有現金投入。** `config/beta_policy.json` 的 `signal.baseline_pace` 是不受訊號影響的例行投入下限，訊號只能在其上加碼。
 
+**例行提醒與貸款分離（2026-08-01）：** 自有現金 baseline 每 5 個完整交易日主動提醒一次；週期以 Engine C append-only `TechnicalObservation` 的 distinct session count 定錨，不跟 RSI／MACD／tier 變化走。提醒只是人工評估 prompt，不是下單許可。貸款不在例行提醒內；提款時間表、金額、標的與 tranche 留待未來另案人工核准。
+
 三次實測全部失敗：以訊號 gate 現金投入使終值**輸給無腦定投 8.5%**（QQQ 91.5%、SOXX 91.9%）；訊號調節借款提取**無可測得效果**；訊號決定投給哪個標的**輸給固定單押最佳標的 22%**，且三分之一時間買進 CAGR 僅 7.2% 的弱標的——「買跌最深的」會系統性把錢導向長期較弱的資產。`stretched_above_sma200` 同為未實測的推論。
 
 因此：**未驗證的訊號機制不得覆蓋有證據的 baseline**；呈現須寫「例行投入 / 節奏 X%」而非自相矛盾的「未觸發 / 節奏 X%」。但 baseline 不等於「無論如何都投」——資料不足／stale／quarantined 時仍誠實歸零。

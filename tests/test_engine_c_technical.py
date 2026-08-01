@@ -15,6 +15,7 @@ from engine_c.technical import (
     ensure_technical_schema,
     latest_technical_status,
     recent_technical_observations,
+    technical_observation_session_count,
     unavailable_observation,
 )
 from engine_c.technical import _row_to_observation
@@ -129,7 +130,14 @@ def test_append_is_idempotent_and_recent_query_deduplicates_session() -> None:
     append_technical_observation(conn, newer)
     assert conn.execute("SELECT COUNT(*) FROM technical_observations").fetchone()[0] == 2
     assert len(recent_technical_observations(conn, "qqq")) == 1
+    assert technical_observation_session_count(conn, "qqq") == 1
     assert latest_technical_status(conn, "qqq")["fetched_at"] == newer["fetched_at"]
+
+    next_session = dict(first)
+    next_session["session_date"] = "2026-07-29"
+    next_session["fetched_at"] = "2026-07-29T01:00:00+00:00"
+    append_technical_observation(conn, next_session)
+    assert technical_observation_session_count(conn, "qqq") == 2
     conn.close()
 
 

@@ -917,7 +917,21 @@ class DecisionStore:
             # Legacy v1.2 rows were born as queued.  A first explicit pq2 dispatch may
             # therefore audit queued -> queued; all other same-state transitions fail.
             legacy_dispatch = current == to_status == "queued"
-            if not legacy_dispatch and to_status not in transitions.get(current, set()):
+            # 已完成／parked 的 bounded job receipt 仍保留在 append-only events；若
+            # 同一 pq2 decision gap 再次收到 exact user go，允許明確重啟同一 work
+            # order。這不是一般狀態回退：receipt 必須聲明並吻合 terminal prior
+            # status，且帶穩定 todo 編號，否則仍 fail closed。
+            terminal_redispatch = (
+                current in {"completed", "parked"}
+                and to_status == "queued"
+                and receipt.get("prior_work_order_status") == current
+                and isinstance(receipt.get("todo_n"), int)
+            )
+            if (
+                not legacy_dispatch
+                and not terminal_redispatch
+                and to_status not in transitions.get(current, set())
+            ):
                 raise ValueError(
                     f"illegal research work order transition: {current} -> {to_status}"
                 )

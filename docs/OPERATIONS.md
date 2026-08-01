@@ -146,7 +146,7 @@ Price／FX 預設 yfinance（無 API key）。非同幣 FX 缺失或方向不符
 
 **X API 是主來源**（`crons/harvest_leads.py` 的 `harvest_x`）。曾經的「SubStack RSS 就夠」前提已被推翻：該 feed 至今只有 1 篇 2026-05-19 舊文，但本人在 X 極度活躍（[@aleabitoreddit](https://x.com/aleabitoreddit)，顯示名 Serenity）。substack feed 已於 2026-07-25 移除。
 
-**成本模型（2026-02 起 pay-per-use）：** 約 $0.005/則、按回傳貼文數計費、無月費下限。控制四件套實測有效：`since_id` 增量、`exclude=replies,retweets`、`max_results` 上限、`user_id` 快取。實測首抓 23 則 $0.115；立即重跑 0 則 $0.000。日常估 $1–2/月。
+**成本模型（2026-02 起 pay-per-use）：** 約 $0.005/則、按回傳貼文數計費、無月費下限。控制組合：`since_id` 增量、`exclude=replies,retweets`、`max_posts_per_run` 單輪硬上限、`max_results` page size、`user_id` 快取。實測首抓 23 則 $0.115；立即重跑 0 則 $0.000。日常估 $1–2/月。
 
 **內容保存：** tracked lead 存單行可搜尋全文 `title` 與保留換行的 `raw_text`；API 同回應請求 `note_tweet` 與 `attachments.media_keys` expansion，media metadata 隨 lead 保存，預覽快取至 ignored `library/private/lead_media/`。harvest 不做 OCR。舊 lead 可用 `--refresh-x-lead <lead_id>` 精準回填，不做全量昂貴 backfill。
 
@@ -154,7 +154,7 @@ Price／FX 預設 yfinance（無 API key）。非同幣 FX 缺失或方向不符
 
 **⚠ 只在本機跑。** 任何 cloud fallback 都不得抓 X，避免重複計費與擴大計費憑證 blast radius。
 
-**⚠ 已知限制（未修）：** `harvest_x` 不分頁。若新貼文數超過 `max_results`（預設 25），單次只取部分而 `since_id` 仍前進 → **可能永久漏掉中間那批**。日常每天跑不會觸發；長時間沒跑（估 >2–3 天）再開機時要留意。要修就是加分頁並設總量上限。
+**Daily 分頁與成本上限：** `max_results` 是 page size（預設 25），`max_posts_per_run` 是單輪成本硬上限（預設 200）。超過單輪上限時保存 `x_pagination_*` checkpoint，下次 scheduled run 從相同 frozen `since_id`＋pagination token 續抓；最後一頁完成前不推進 durable `since_id`，避免長時間未跑後永久漏掉中間批次。
 
 **來源存取防漏：** harvest 失敗保存 bounded `failure_class`。疑似 sandbox／proxy／網路權限造成的 `access_blocked` **必須原命令權限重跑一次**；仍失敗再走 `$source-trace` 官方替代路徑。`blocked` 永遠不等於「零筆新資料」或 `no_result`，後續同來源成功才算 recovered。
 

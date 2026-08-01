@@ -57,6 +57,7 @@ tags:
 | Engine C 人工觀測欄位 | `config/engine_c_observation_fields.json` | 加一項且 `gate_member` 必須為 false；`engine_c/observation_fields.py` 是唯一 loader |
 | Blocker 說明與分類 | `config/decision_blockers.json` | 加 exact code 或 prefix；`decision_lab/blockers.py` 是唯一 loader |
 | Authority token（證據來自哪個引擎、哪個軸能引用） | `config/authority_tokens.json` | 加一項並指定 `owner`；`identity/authority_tokens.py` 是唯一 loader，Engine C 與 Decision Lab 共用 |
+| Engine B lead `refs` 鍵名 | `config/lead_ref_keys.json` | 加一項並說明用途與 value type；`engine_b/lead_refs.py` 是唯一 loader，`annotate`／`advance` 拒絕未登記鍵 |
 | 投資／beta 政策數值、持股覆蓋分類、daily routine 參數、信號來源 | `config/investment_policy.json`、`config/beta_policy.json`、`config/holdings_coverage.json`、`config/daily_routine.json`、`config/signal_sources.json` | 各自為該領域的 numeric／設定 SSOT |
 
 > ⚠ `config/*.json` 在 `.gitignore` 中**預設被忽略**（該目錄放 Google service account 憑證），靠白名單開例外。新增 config 檔一定要補 `!config/<name>.json`，否則 fresh clone 與另一個 agent 會缺檔而整個功能靜默失效——本機因為檔案在，測試還會全綠。2026-07-30 一天內踩到兩次。`tests/test_config_tracking.py` 是這道剎車。

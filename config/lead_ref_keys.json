@@ -1,0 +1,70 @@
+{
+  "_comment": "Engine B pending lead refs 的唯一鍵名字彙。現有 authority 可保留任何已登記鍵；annotate／advance 拒絕未知鍵，避免 park_reason／parked_reason 這類靜默漂移。新增用途先在此登記，不用改 Python。",
+  "version": 1,
+  "categories": {
+    "graph_admission": {
+      "action_digest": {"value_type": "string", "description": "Research Action content digest"},
+      "focus_company_id": {"value_type": "string", "description": "入圖後唯一 Decision handoff 公司"},
+      "intake_commit": {"value_type": "string", "description": "已發布 intake 的 Git commit receipt"},
+      "related_research_action_id": {"value_type": "string", "description": "相關但非本 lead 主 action 的 RA ID"},
+      "research_action_id": {"value_type": "string", "description": "本 lead prepared／applied 的 RA ID"},
+      "source_doc": {"value_type": "string", "description": "已產生或沿用的 SourceDoc ID"}
+    },
+    "campaign": {
+      "campaign_focus": {"value_type": "string", "description": "campaign 內的 primary／context 角色"},
+      "campaign_ids": {"value_type": "string_list", "description": "歷次納入的具名 campaign ID"},
+      "campaign_topic": {"value_type": "string", "description": "campaign 主題"},
+      "campaign_window_end": {"value_type": "string", "description": "campaign 搜尋窗終點"},
+      "campaign_window_start": {"value_type": "string", "description": "campaign 搜尋窗起點"},
+      "ontology_authority": {"value_type": "string", "description": "ontology 人工核准 receipt"},
+      "ontology_status": {"value_type": "string", "description": "ontology admission 狀態"},
+      "pq2_item": {"value_type": "string", "description": "campaign 對應的穩定 pq2 編號"},
+      "research_bundle_id": {"value_type": "string", "description": "具名研究 bundle ID"},
+      "research_mode": {"value_type": "string", "description": "full／delta-only 等研究模式"},
+      "research_report": {"value_type": "string", "description": "研究報告相對路徑"},
+      "research_run": {"value_type": "string", "description": "產生結果的 routine／run ID"}
+    },
+    "audio_trace": {
+      "asr_audio_duration_seconds": {"value_type": "string", "description": "ASR 音訊秒數"},
+      "asr_engine": {"value_type": "string", "description": "ASR engine"},
+      "asr_model": {"value_type": "string", "description": "ASR model"},
+      "asr_segment_count": {"value_type": "string", "description": "ASR segment 數"},
+      "asr_status": {"value_type": "string", "description": "ASR 僅定位或已人工核對狀態"},
+      "asr_timestamp": {"value_type": "string", "description": "可回聽核對的 timestamp locator"},
+      "asr_transcript_path": {"value_type": "string", "description": "private transcript 路徑"},
+      "audio_sha256": {"value_type": "string", "description": "音訊內容 SHA-256"},
+      "audio_url": {"value_type": "string", "description": "官方音訊 URL"}
+    },
+    "trace_and_outcome": {
+      "canonical_url": {"value_type": "string", "description": "正規化後原文 URL"},
+      "claimed_origin": {"value_type": "string", "description": "轉述聲稱的原始來源"},
+      "gap": {"value_type": "string", "description": "追源後仍未支持的核心缺口"},
+      "original_claim_status": {"value_type": "string", "description": "原始主張核驗狀態"},
+      "outcome": {"value_type": "string", "description": "pq1／trace 最終結果摘要"},
+      "parked_reason": {"value_type": "string", "description": "park 的完整自然語言理由"},
+      "pq2_ref": {"value_type": "string", "description": "相關 pq2 authority ref"},
+      "primary_url": {"value_type": "string", "description": "取得的一手文件 URL"},
+      "research_outcome": {"value_type": "string", "description": "研究未產 RA 的結論"},
+      "storage_permission": {"value_type": "string", "description": "原始材料的合法保存範圍"},
+      "trace_access_method": {"value_type": "string", "description": "取得原文的合法 access 方法"},
+      "trace_attempts_ref": {"value_type": "string", "description": "已嘗試來源與查找 receipt"},
+      "trace_cost_authorized": {"value_type": "string", "description": "是否已有付費 access 授權"},
+      "trace_next_trigger": {"value_type": "string", "description": "下一次重查的事件條件"},
+      "trace_origin_entity": {"value_type": "string", "description": "原始發布實體"},
+      "trace_origin_linkage": {"value_type": "string", "description": "來源獨立性／關聯性"},
+      "trace_original_date": {"value_type": "string", "description": "原始文件日期"},
+      "trace_original_url": {"value_type": "string", "description": "追回的原始 URL"},
+      "trace_request_kind": {"value_type": "string", "description": "人工 trace request 類型"},
+      "trace_request_resolved": {"value_type": "string", "description": "trace request 是否已結案"},
+      "trace_requeue_trigger": {"value_type": "string", "description": "parked lead 重排觸發原因"},
+      "trace_requeued_at": {"value_type": "string", "description": "parked lead 重排時間"},
+      "trace_requires_user": {"value_type": "string", "description": "是否需要使用者提供 access／決策"},
+      "trace_review_hint": {"value_type": "string", "description": "source trace review 的完整提示"},
+      "trace_review_title": {"value_type": "string", "description": "source trace review 標題"},
+      "trace_status": {"value_type": "string", "description": "source-trace 結構化狀態"},
+      "trace_storage_default": {"value_type": "string", "description": "追源材料預設保存策略"},
+      "trace_storage_permission": {"value_type": "string", "description": "追源材料本次保存許可"},
+      "trace_transformation_service": {"value_type": "string", "description": "合法轉換／下載服務"}
+    }
+  }
+}

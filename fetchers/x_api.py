@@ -5,7 +5,7 @@
 
 1. `since_id` 增量——只抓上次之後的新貼文（最大的成本槓桿）
 2. `exclude=replies,retweets`——只要原創貼文（省錢且訊號更高）
-3. `max_results` 上限——即使 since_id 失效也有成本天花板
+3. `max_posts` 單輪硬上限＋`max_results` page size——分頁仍有成本天花板
 4. `user_id` 快取——避免每次重複 user lookup
 
 認證只需 Bearer Token（`X_BEARER_TOKEN`）；不需要 OAuth 1.0a 四把鑰匙。
@@ -183,6 +183,60 @@ def get_user_posts_window(
             user_id,
             start_time=start_time,
             end_time=end_time,
+            pagination_token=next_token,
+            max_results=min(size, remaining),
+            exclude_replies=exclude_replies,
+            exclude_retweets=exclude_retweets,
+            token=token,
+        )
+        posts = list(page["posts"])
+        output.extend(posts[:remaining])
+        next_token = page.get("next_token")
+        if not next_token or not posts:
+            break
+    result = {
+        "posts": output,
+        "truncated": bool(next_token),
+        "next_token": next_token,
+    }
+    return result if with_meta else output
+
+
+def get_user_posts_since(
+    user_id: str,
+    *,
+    since_id: str,
+    pagination_token: str | None = None,
+    max_posts: int = 200,
+    page_size: int = DEFAULT_MAX_RESULTS,
+    exclude_replies: bool = True,
+    exclude_retweets: bool = True,
+    token: str | None = None,
+    with_meta: bool = False,
+) -> list[dict[str, Any]] | dict[str, Any]:
+    """分頁取得 ``since_id`` 之後的貼文，並以 ``max_posts`` 鎖住單輪成本。
+
+    ``pagination_token`` 讓 daily harvest 可以跨 scheduled runs 續抓同一個
+    snapshot；只有最後一頁完成後，呼叫端才可推進 durable ``since_id``。
+    """
+
+    base = str(since_id or "").strip()
+    if not base:
+        raise XApiError("missing_since_id")
+    cap = int(max_posts)
+    if cap < 5:
+        raise XApiError("max_posts_below_api_minimum")
+    size = max(5, min(100, int(page_size)))
+    token = token or bearer_token()
+    output: list[dict[str, Any]] = []
+    next_token = str(pagination_token).strip() if pagination_token else None
+    while len(output) < cap:
+        remaining = cap - len(output)
+        if remaining < 5:
+            break
+        page = get_user_posts_page(
+            user_id,
+            since_id=base,
             pagination_token=next_token,
             max_results=min(size, remaining),
             exclude_replies=exclude_replies,

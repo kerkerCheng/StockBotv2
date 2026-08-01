@@ -239,12 +239,14 @@ def _cmd_advance(args: argparse.Namespace) -> int:
     ref = {}
     if args.ref:
         for pair in args.ref:
-            key, _, value = pair.partition("=")
-            if key:
-                ref[key] = value
+            key, separator, value = pair.partition("=")
+            if not separator or not key.strip():
+                print(f"advance 失敗：ref 必須是非空 key=value：{pair}", file=sys.stderr)
+                return 1
+            ref[key.strip()] = value
     try:
         leads.advance(store, args.lead_id, args.to_status, ref=ref or None)
-    except leads.LeadStateError as exc:
+    except (leads.LeadStateError, ValueError) as exc:
         print(f"advance 失敗：{exc}", file=sys.stderr)
         return 1
     leads.save(store, args.leads)

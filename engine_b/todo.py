@@ -312,8 +312,20 @@ def dispatch_decision_review(
     work_order = store.latest_research_work_order(cohort_id)
     if work_order is None:
         raise TodoError(f"cohort {cohort_id} 的最新 decision 沒有 research work order")
+    if (
+        str(work_order.get("status")) in {"queued", "researching", "awaiting_approval"}
+        and item.get("dispatch_ref") == str(work_order["work_order_id"])
+    ):
+        # 同一 bounded job 已在 pq1 中；重送不建立新的 go event，也不重複提醒。
+        item["dispatch_status"] = str(work_order["status"])
+        return {"item": item, "work_order": work_order}
     stamp = at or _now()
-    operation_key = f"todo:{n}:go"
+    dispatch_attempt = 1 + sum(
+        1
+        for entry in pool["log"]
+        if entry.get("n") == int(n) and entry.get("verb") == "pq1_queued"
+    )
+    operation_key = f"todo:{n}:go:{dispatch_attempt}"
     transitioned = store.transition_research_work_order(
         work_order_id=str(work_order["work_order_id"]),
         to_status="queued",
@@ -322,18 +334,23 @@ def dispatch_decision_review(
             "todo_n": int(n),
             "todo_ref_id": cohort_id,
             "baseline_decision_id": str(work_order["decision_id"]),
+            # completed／parked work order 只可由 exact pq2 go 明確重啟；
+            # store 會核對這個 prior status，不把 terminal receipt 靜默抹掉。
+            "prior_work_order_status": str(work_order["status"]),
         },
         observed_at=stamp,
     )
     item["dispatch_status"] = "queued"
     item["dispatch_ref"] = str(work_order["work_order_id"])
     item["dispatch_baseline_decision_id"] = str(work_order["decision_id"])
+    item["dispatch_attempt"] = dispatch_attempt
     item["dispatched_at"] = stamp
     item.pop("deferred_at", None)
     if not any(
         entry.get("n") == int(n)
         and entry.get("verb") == "pq1_queued"
         and entry.get("receipt") == item["dispatch_ref"]
+        and int(entry.get("attempt") or 1) == dispatch_attempt
         for entry in pool["log"]
     ):
         pool["log"].append({
@@ -344,6 +361,7 @@ def dispatch_decision_review(
             "verb": "pq1_queued",
             "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
             "receipt": item["dispatch_ref"],
+            "attempt": dispatch_attempt,
         })
     return {"item": item, "work_order": transitioned}
 

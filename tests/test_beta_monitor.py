@@ -373,6 +373,56 @@ def test_same_signal_respects_repeat_cadence() -> None:
     assert tqqq["action"] == "HOLD"
 
 
+def test_self_funded_routine_reminder_uses_full_session_count_not_signal() -> None:
+    policy = load_beta_policy()
+    observations = _observations(
+        policy,
+        drawdown=-0.02,
+        rsi=62.0,
+        histogram_slope=-0.1,
+        distance_200=0.08,
+        slope_50=0.01,
+    )
+    histories = {key: [value] for key, value in observations.items()}
+    due_counts = {key: 21 for key in observations}
+    cooldown_counts = {key: 22 for key in observations}
+
+    due = build_beta_monitor(
+        observations_by_benchmark=observations,
+        history_by_benchmark=histories,
+        holdings_rows=_holdings(cash=20.0),
+        capital_authority_rows=_capital_rows(),
+        as_of=NOW,
+        policy=policy,
+        session_counts_by_benchmark=due_counts,
+    )
+    cooldown = build_beta_monitor(
+        observations_by_benchmark=observations,
+        history_by_benchmark=histories,
+        holdings_rows=_holdings(cash=20.0),
+        capital_authority_rows=_capital_rows(),
+        as_of=NOW,
+        policy=policy,
+        session_counts_by_benchmark=cooldown_counts,
+    )
+
+    assert due["routine_reminder"] == {
+        "cadence_sessions": 5,
+        "due": True,
+        "due_tickers": [item["ticker"] for item in due["items"]],
+        "sessions_until_next": 0,
+        "scope": "self_funded_cash_only",
+        "loan_included": False,
+    }
+    assert any(item["action"] == "CONTRIBUTE REVIEW" for item in due["items"])
+    assert cooldown["routine_reminder"]["due"] is False
+    assert cooldown["routine_reminder"]["sessions_until_next"] == 4
+    assert all(item["action"] != "CONTRIBUTE REVIEW" for item in cooldown["items"])
+    rendered = render_beta_monitor_markdown(due)
+    assert "每 5 個完整交易日一次的自有現金評估本期已到" in rendered
+    assert "貸款不在本提醒內" in rendered
+
+
 def test_known_tsmc_concentration_warns_without_pausing_additions() -> None:
     policy = load_beta_policy()
     observations = _observations(policy)

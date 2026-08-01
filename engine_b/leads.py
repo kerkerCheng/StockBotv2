@@ -19,6 +19,7 @@ from typing import Any
 from urllib.parse import urlsplit, urlunsplit
 
 from access_failures import FAILURE_CLASSES
+from engine_b.lead_refs import validate_ref_updates
 
 SCHEMA_VERSION = "2"
 _SUPPORTED_SCHEMA_VERSIONS = frozenset({"1", SCHEMA_VERSION})
@@ -301,6 +302,7 @@ def advance(
     """一般性 guarded 轉移；非法轉移 raise LeadStateError。"""
     if to_status not in ALL_STATUSES:
         raise LeadStateError(f"未知狀態：{to_status}")
+    cleaned_ref = validate_ref_updates(ref) if ref else {}
     lead = _require(store, lead_id)
     current = lead["status"]
     if to_status not in ALLOWED_TRANSITIONS[current]:
@@ -309,8 +311,8 @@ def advance(
     if to_status == "pending":
         # un-park：清掉舊 triage，回到待判斷
         lead["triage"] = None
-    if ref:
-        lead["refs"].update(ref)
+    if cleaned_ref:
+        lead["refs"].update(cleaned_ref)
     return lead
 
 
@@ -323,14 +325,7 @@ def annotate_refs(
     """補充 lead provenance metadata，但不改變狀態或 evidence tier。"""
     if not refs:
         raise ValueError("refs 不可為空")
-    cleaned: dict[str, Any] = {}
-    for raw_key, value in refs.items():
-        key = str(raw_key).strip()
-        if not key:
-            raise ValueError("ref key 不可為空")
-        if value is None:
-            raise ValueError(f"ref {key} 不可為 null")
-        cleaned[key] = value
+    cleaned = validate_ref_updates(refs)
     lead = _require(store, lead_id)
     lead.setdefault("refs", {}).update(cleaned)
     return lead
