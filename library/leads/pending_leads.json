@@ -1184,6 +1184,123 @@
       "result": "ok",
       "run_at": "2026-07-31T22:40:30.491672+00:00",
       "source": "edgar:GFS"
+    },
+    {
+      "failure_class": "provider_api_error",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-08-01T22:39:36.260710+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-08-01T22:39:36.796866+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-08-01T22:39:37.222838+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-08-01T22:39:37.627067+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-08-01T22:39:38.031157+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-08-01T22:39:38.458657+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-08-01T22:39:38.878602+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-08-01T22:39:39.314925+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-08-01T22:39:39.737986+00:00",
+      "source": "edgar:GFS"
+    },
+    {
+      "new": 2,
+      "result": "ok",
+      "run_at": "2026-08-01T22:39:54.806441+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-01T22:39:55.940671+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-01T22:39:56.936070+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-01T22:39:57.938962+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-01T22:39:58.892583+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-01T22:39:59.875056+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-01T22:40:01.918806+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-01T22:40:02.886323+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-01T22:40:03.895543+00:00",
+      "source": "edgar:GFS"
     }
   ],
   "leads": {
@@ -1498,6 +1615,33 @@
         }
       ],
       "url": "https://x.com/aleabitoreddit/status/2076248337863639506"
+    },
+    "lead_03ec88277b05d7cb337f5367d546ff0e": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "SNDK",
+          "BE"
+        ]
+      },
+      "first_seen": "2026-08-01T22:39:54.804420+00:00",
+      "lead_id": "lead_03ec88277b05d7cb337f5367d546ff0e",
+      "media": [],
+      "published_at": "2026-07-31T22:52:21.000Z",
+      "raw_text": "The media framing and X reactions around Leopold are egregious.\n\nFraming his successful multi-year thesis from $SNDK to $BE as a \"collapse\" or \"failure\".\n\nAfter July's surprising crash, then personally attacking him on top is just pathetic to witness. \n\nIt's almost like everyone is cheering for the downfall of others. \n\nYes, July's crash exposed problems with SA’s leverage, liquidity management, and hedging. \n\nBut his current YTD performance remains +80%, ranking among the best performing hedge funds. And he still has public equities after all this (just removed leverage). \n\nI think he's doing something unique while being successful at it. And this draws the envy of others.",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "The media framing and X reactions around Leopold are egregious. Framing his successful multi-year thesis from $SNDK to $BE as a \"collapse\" or \"failure\". After July's surprising crash, then personally attacking him on top is just pathetic to witness. It's almost like everyone is cheering for the downfall of others. Yes, July's crash exposed problems with SA’s leverage, liquidity management, and hedging. But his current YTD performance remains +80%, ranking among the best performing hedge funds. And he still has public equities after all this (just removed leverage). I think he's doing something unique while being successful at it. And this draws the envy of others.",
+      "triage": {
+        "decided_at": "2026-08-01T22:41:35.456225+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "Leopold／Serenity fund 的績效、槓桿與社群評價屬市場情緒敘事；未對現行追蹤公司或供應鏈提出可逐字驗證的產品／客戶／技術 claim，關聯性與可引用性不足",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2083324920214536208"
     },
     "lead_043e94a0e70f703a76115cf09f96b438": {
       "entities": {
@@ -6537,6 +6681,73 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2073873043672420517"
     },
+    "lead_4b489fb42886aec73de22800986eda74": {
+      "entities": {
+        "company_ids": [
+          "co:lumentum",
+          "co:applied_optoelectronics",
+          "co:coherent"
+        ],
+        "tickers": [
+          "LITE",
+          "AAOI",
+          "SIVE",
+          "COHR"
+        ]
+      },
+      "first_seen": "2026-08-01T22:39:54.785466+00:00",
+      "lead_id": "lead_4b489fb42886aec73de22800986eda74",
+      "media": [
+        {
+          "cache": {
+            "bytes": 59336,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_4b489fb42886aec73de22800986eda74/3_2083436557965639680.jpg",
+            "sha256": "598cd4e853a486a953652d516e743d6d14f39f7b7c8d567c3296ee1e2106d36a"
+          },
+          "height": 570,
+          "media_key": "3_2083436557965639680",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HOnags2awAACJgB.jpg",
+          "width": 2124
+        }
+      ],
+      "published_at": "2026-08-01T06:24:58.000Z",
+      "raw_text": "$LITE CEO Michael Hurlston at the RAISE Summit warned that the supply gap for InP lasers for AI DCs:\n\nIs facing a more severe supply chain crisis than memory. \n\nAnd with Lumentum's 5 InP fabs, shipments would be more than 30%+ below customer demand.\n\nThis is especially visible with EMLs today but is already expanding to CW, especially as CPO ramps.\n\nI've always been a fan of the laser chokepoint + bottleneck from $AAOI, $SIVE, $LITE, and $COHR. And glad this thesis is starting to see validation.",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "COHR",
+            "CPO",
+            "InP",
+            "LITE"
+          ]
+        },
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "SIVE"
+          ]
+        }
+      },
+      "title": "$LITE CEO Michael Hurlston at the RAISE Summit warned that the supply gap for InP lasers for AI DCs: Is facing a more severe supply chain crisis than memory. And with Lumentum's 5 InP fabs, shipments would be more than 30%+ below customer demand. This is especially visible with EMLs today but is already expanding to CW, especially as CPO ramps. I've always been a fan of the laser chokepoint + bottleneck from $AAOI, $SIVE, $LITE, and $COHR. And glad this thesis is starting to see validation.",
+      "triage": {
+        "decided_at": "2026-08-01T22:41:42.058819+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "命中 Lumentum（LITE）、Applied Optoelectronics（AAOI）、Sivers、Coherent（COHR）與 InP／EML／CW／CPO；包含 CEO、會議、五座 InP fab、供應低於需求 30%+ 等可追回逐字原文的具體 claim。原貼仍是 tier-4 轉述，供應商自報不能當瓶頸獨立證據，pq1 必須先追 RAISE Summit 原始談話與客戶端反證",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2083438823548293140"
+    },
     "lead_4ba9a159a1ed39a176d0e15238150bf7": {
       "entities": {
         "company_ids": [],
@@ -9275,9 +9486,23 @@
       ],
       "published_at": "2026-07-29T17:07:41.000Z",
       "raw_text": "US Gov to take 1% stake in $GFS, and award them $300m for the US CHIPS ACT.\n\nThis is actually a strong read through on $SIVE / $LITE, given this CHIPS ACT is specifically aimed at advancing CPO + Silicon Photonics. \n\n(For reference, Sivers and Lumentum were the only two public laser suppliers named in GFS presentation slides. Sivers laser arrays was named recently as a reference design in Globalfoundries SCALE for CPO).  \n\nPer US Gov announcement: \"GlobalFoundries will receive up to $300 million to accelerate domestic CPO R&D by two to three years\" (NIST)\n\nNever thought we'd see the US Gov / $INTC foundry playbook for CPO in specific...",
-      "refs": {},
+      "refs": {
+        "canonical_url": "https://www.nist.gov/news-events/news/2026/07/department-commerce-announces-letters-intent-7-companies-874-million",
+        "claimed_origin": "NIST／Commerce CPO LOI＋Dow Jones 1% stake headline",
+        "original_claim_status": "partial_conflated",
+        "parked_reason": "NIST 一手公告證實 GlobalFoundries（GFS）取得非約束性 LOI、擬提供最多 US$300m 以把美國 CPO 研發加速 2–3 年，並要求 minority non-controlling equity stake；但 July CPO 公告沒有寫 1%。1% 來自 GF 2026-05 量子 foundry 的另一份官方協議，原貼把兩案合併。此案仍待 diligence／final award，且圖中已有 GFS→Silicon Photonics、CHIPS Act 與 Sivers partnership；屬 dated policy／funding observation，沒有唯一新增 graph delta，不產 RA",
+        "primary_url": "https://www.nist.gov/news-events/news/2026/07/department-commerce-announces-letters-intent-7-companies-874-million",
+        "research_outcome": "dated_policy_observation_no_new_graph_delta",
+        "research_run": "daily_brief_2026_08_02",
+        "trace_attempts_ref": "NIST_CHIPS_index_and_2026_07_7_companies_874m_release;GF_2026_05_quantum_official_release;graph_context_co_globalfoundries",
+        "trace_next_trigger": "final_award_or_GFS_filing_confirms_CPO_equity_percentage_and_milestones",
+        "trace_origin_entity": "U.S. Department of Commerce／NIST",
+        "trace_origin_linkage": "official_for_300m_CPO_LOI;1pct_from_separate_May_quantum_agreement",
+        "trace_requires_user": "false",
+        "trace_status": "partial"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -9571,9 +9796,23 @@
       "first_seen": "2026-07-22T15:37:16.686268+00:00",
       "lead_id": "lead_7bbf1d134806b235e07a8de3130ac5db",
       "published_at": "Tue, 19 May 2026 10:42:15 GMT",
-      "refs": {},
+      "refs": {
+        "canonical_url": "https://aleabitoreddit.substack.com/p/sivers-semi-sive-the-cpo-laser-supplier",
+        "original_claim_status": "previously_extracted_with_counterevidence",
+        "parked_reason": "此 2026-05-19 Substack 文章已於 2026-07-10 依合法保存邊界做成 extractions/silicon_matter_ayar_labs.json，並納入 Sivers v3 evidence bundle。既有抽取只保留 Ayar Labs、Marvell Celestial 與 WIN Semi 三個窄主張；其中 Sivers→Ayar 仍為 tier-3 inferred，WIN Semi 僅證明 partnership scope 未定，而「Sivers 直接供應 Marvell」已被一手材料反證為間接路徑且相關 PO 於 2026-04 取消。本文不是新 origin，也沒有未處理的 graph delta；重複 prepare 會雙重計數，所以 park。",
+        "primary_url": "https://aleabitoreddit.substack.com/p/sivers-semi-sive-the-cpo-laser-supplier",
+        "research_outcome": "duplicate_of_existing_extraction_and_graph_context",
+        "research_run": "daily_brief_2026_08_02",
+        "source_doc": "aleabitoreddit_sivers_cpo_customer_map",
+        "trace_attempts_ref": "repo extraction de-dup; Sivers v3 evidence bundle cross-check; existing counterevidence review",
+        "trace_next_trigger": "Ayar Labs／Marvell／Sivers／WIN Semi 新的一手文件明確更新 current supplier、qualification 或 volume 狀態時再追",
+        "trace_origin_entity": "aleabitoreddit",
+        "trace_origin_linkage": "Tier-3 analyst article already retrieved 2026-07-10 and stored as a rights-safe excerpt; not independent of its cited primary documents",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
       "source": "aleabitoreddit_rss",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -14973,9 +15212,22 @@
       "media": [],
       "published_at": "2026-07-31T07:14:23.000Z",
       "raw_text": "Few earnings TLDRs with my favorite $AXTI and $AMZN:\n\nAmazon:\n- Raised 2026 capex to $220B vs. prior $200B (partly due to higher memory costs, which is bullish on $MU to Samsung) \n- Even at $220B, Amazon will not have enough capacity to meet all 2026 demand; Jassy expects the same in 2027.\n- Most incoming 2027 capacity is already reserved, with substantial 2028 capacity also reserved.\n\nMostly read through on upstream semis. $GOOGL, $META, $AMZN, and $MSFT all identified compute shortage. \n\nAll the narratives a few weeks earlier was \"excess compute\" from Meta and others + hyperscalers cutting back on spend... All BS. \n\nAmazon earnings was very bullish on AI semi trade. \n\nAXTI:\n\n- AXT to double InP capacity during 2026. Then double again in 2027. \n\nThis is expected to make AXT \"by far the largest indium phosphide producer in the world.\" - LFG\n\n- Q2 rev was $47.6M, the highest quarterly revenue in AXT history (InP revenue reached a record $30.7M, from DC applications.)\n- Revenue increased 77% sequentially and 164% year over year.\n- InP revenue-capacity targets: $60M per quarter exiting 2026.\n- $130M per quarter exiting 2027 \n\nThat $130m target could be hiked too since management stated they find \"whatever ways to increase that capacity expansion\"\n\n- Management said the reported backlog remains well above $100M, but that number no longer reflects all available demand.\n\n\"Customer demand continues to outpace supply, no matter how fast we add capacity.\" 800G/1.6T is driving the current cycle, while NPO/CPO extends it beyond 2027. \n\nAlso they're targeting 50%-plus gross margin: \"We should definitely be targeting a number that begins with a five.\"\n\nChina demand more than doubled, and their agreements with Casela, $COHR and $LITE did not materially drive Q2. \n\nThis is not even considering my projected massive ASP hikes yet as InP substrates get more bottlenecked. \n\nTLDR:\n\n- Amazon too much compute demands, needs capex to fufill it, so upstream semis go brrr. \n- AXT world largest InP substrate supplier, high gross margins, expansion, and supply can't keep up with demand.  \n\nBullish on demand side from Amazon + capex. Bullish on upstream optical supply chains from too much demand.",
-      "refs": {},
+      "refs": {
+        "canonical_url": "https://ir.aboutamazon.com/news-release/news-release-details/2026/Amazon-com-Announces-Second-Quarter-Results/default.aspx",
+        "original_claim_status": "partial_mixed",
+        "parked_reason": "AXTI 官方 Exhibit 99.1 支持 Q2 revenue US$47.6m、77% QoQ／164% YoY、GAAP gross margin 44.9%、record InP revenue 與 generic data-center demand／capacity addition；Amazon 官方 Q2 release 支持 AWS revenue +37%、AI/chips run-rate 與現金 capex 實績，但 X 帖中的 AXTI InP US$30.7m、US$60m／US$130m quarterly capacity、backlog >US$100m、50%+ gross-margin target，以及 Amazon US$220bn／2027–2028 reservation 屬法說逐字內容，缺官方 transcript／timestamp locator，不能作可抽取 quote。可核對部分屬 Engine C dated observations 或宏觀 demand context，沒有新的供應關係 edge；不 prepare RA。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1051627/000143774926025061/ex_974537.htm",
+        "research_outcome": "dated_financial_observations_and_unverified_call_detail_no_graph_delta",
+        "research_run": "daily_brief_2026_08_02",
+        "trace_attempts_ref": "SEC AXTI 8-K Exhibit 99.1; Amazon IR Q2 release; Amazon IR event listing; AP earnings-call cross-check",
+        "trace_next_trigger": "AXTI／Amazon 官方逐字稿、帶 timestamp webcast locator、或下一份 10-Q 出現相同容量／backlog／reservation 數字時重查",
+        "trace_origin_entity": "AXT Inc.／Amazon.com",
+        "trace_origin_linkage": "AXTI 2026-07-30 SEC Exhibit 99.1 + Amazon 2026-Q2 official release; earnings-call-only assertions cross-checked against AP but no official text locator",
+        "trace_requires_user": "false",
+        "trace_status": "partial"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -17915,9 +18167,19 @@
       ],
       "published_at": "2026-07-29T21:27:33.000Z",
       "raw_text": "$AXTI enters long term agreement with $LITE for InP substrates. \n\nLumentum has agreed to pay a deposit of $43.5M as a reservation for capacity. https://t.co/5Dl3L9EYRa",
-      "refs": {},
+      "refs": {
+        "parked_reason": "AXT 2026-07-29 tier-1 8-K 已由 lead_928514b80dea6644f199f48c0803092d 逐字核對並 prepared 為 RA [78]；本社群貼文只是同一 filing 的轉述，不新增 origin、claim 或 graph delta，故去重 park，不產第二份 RA",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1051627/000143774926024883/axti20260715_8k.htm",
+        "related_research_action_id": "ra_83889cf03637953caa587c21f8e97886",
+        "research_outcome": "duplicate_of_prepared_ra",
+        "research_run": "daily_brief_2026_08_02",
+        "trace_attempts_ref": "existing_RA_ra_83889cf03637953caa587c21f8e97886_and_EDGAR_accession_000143774926024883",
+        "trace_next_trigger": "RA_78_expiry_or_materially_new_Lumentum_origin",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -18268,9 +18530,22 @@
       "first_seen": "2026-07-27T22:31:57.627669+00:00",
       "lead_id": "lead_f14b0508299201ea095bacf1ed3a083d",
       "published_at": "2026-07-27",
-      "refs": {},
+      "refs": {
+        "canonical_url": "https://www.sec.gov/Archives/edgar/data/1709048/000162828026049740/xslF345X06/wk-form4_1785173635.xml",
+        "original_claim_status": "verified",
+        "parked_reason": "SEC Form 4 顯示 GFS Chief Legal Officer Samak L Azar 於 2026-07-23 依既有 Rule 10b5-1 plan 賣出 335 股、每股 US$57.12，交易後直接持有 12,144 股。這是小額、預先安排的時變 insider transaction，屬 Engine C／稀釋與內部人交易監控 observation；不代表供應鏈關係或慢變公司屬性，沒有 graph delta，因此不 prepare RA。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1709048/000162828026049740/xslF345X06/wk-form4_1785173635.xml",
+        "research_outcome": "dated_insider_transaction_observation_no_graph_delta",
+        "research_run": "daily_brief_2026_08_02",
+        "trace_attempts_ref": "SEC EDGAR official rendered Form 4 inspected line-by-line",
+        "trace_next_trigger": "若後續形成同一 insider／多名高管連續賣出 cluster，或 Engine C 建立 insider ledger 時再聚合",
+        "trace_origin_entity": "GLOBALFOUNDRIES Inc.／SEC EDGAR",
+        "trace_origin_linkage": "Issuer Form 4; reporting person Samak L Azar, Chief Legal Officer",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
       "source": "edgar:GFS",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "GFS 4 filed 2026-07-27",
       "triage": {
@@ -19355,8 +19630,8 @@
   "schema_version": "2",
   "source_state": {
     "x:aleabitoreddit": {
-      "since_id": "2083270545320386734",
-      "updated_at": "2026-07-31T22:40:20.723473+00:00",
+      "since_id": "2083438823548293140",
+      "updated_at": "2026-08-01T22:39:54.806431+00:00",
       "user_id": "1940360837547565056"
     }
   }
