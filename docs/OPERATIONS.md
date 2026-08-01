@@ -89,7 +89,7 @@ Leads authority 是 tracked `library/leads/pending_leads.json`；狀態機與 AP
 ### 記錄成交（手動下單後）
 
 ```powershell
-& '.venv\Scripts\python.exe' scriptsecord_trade.py --symbol QQQ --side buy `
+& '.venv\Scripts\python.exe' scripts\record_trade.py --symbol QQQ --side buy `
     --shares 10 --price 687.79 --executed-at 2026-07-31T13:04:53-04:00 `
     --broker IB --account-ref "U****1599" --note "<券商通知逐字內容>"
 ```
