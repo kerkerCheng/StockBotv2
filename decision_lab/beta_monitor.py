@@ -144,6 +144,7 @@ def signal_state(observation: Mapping[str, Any] | None, policy: Mapping[str, Any
         if drawdown <= float(tier["drawdown_at_most"]) and rsi <= float(tier["rsi_at_most"]):
             matched = tier
             break
+    baseline_pace = float(policy["signal"]["baseline_pace"])
     if matched is None:
         pace = 0.0
         tier_name = "none"
@@ -170,6 +171,12 @@ def signal_state(observation: Mapping[str, Any] | None, policy: Mapping[str, Any
         else:
             stretched = False
         tier_name = str(matched["name"])
+    # 例行投入下限：訊號只能把 pace 往上加，不能把它壓到 baseline 以下。
+    # 2026-08-01 實測，以訊號 gate 自有現金投入使終值輸給無腦定投 8.5%
+    # （QQQ 91.5%、SOXX 91.9%）；訊號調節借款提取則無可測得效果。
+    # 因此 baseline 之上的部分屬未驗證的行為輔助，baseline 本身才是有證據的機制。
+    signal_pace = pace
+    pace = max(pace, baseline_pace)
     regime = (
         "below_sma200_falling_sma50"
         if distance_200 < 0 and slope_50 < 0
@@ -181,6 +188,10 @@ def signal_state(observation: Mapping[str, Any] | None, policy: Mapping[str, Any
         "data_status": "observed",
         "tier": tier_name,
         "pace": pace,
+        "baseline_pace": baseline_pace,
+        # 訊號自身算出的 pace；低於 baseline 時代表本期投入完全來自例行時間表
+        "signal_pace_raw": signal_pace,
+        "pace_source": "baseline" if signal_pace <= baseline_pace else "signal",
         "turning": turning,
         "regime": regime,
         "stretched_above_sma200": stretched,
@@ -433,6 +444,7 @@ def build_beta_monitor(
                 "technical_status": state["data_status"],
                 "signal_tier": state["tier"],
                 "signal_pace": state["pace"],
+                "pace_source": state.get("pace_source", "baseline"),
                 "signal_regime": state["regime"],
                 "review_cadence": cadence,
                 "indicator": indicator,
@@ -577,6 +589,19 @@ def _heat(indicator: Mapping[str, Any]) -> str:
 def _pace_label(value: Any) -> str:
     parsed = _finite(value, non_negative=True)
     return "節奏未知" if parsed is None else f"節奏 {parsed * 100:.0f}%"
+
+
+def _pace_reason(item: Mapping[str, Any]) -> str:
+    """說明本期節奏的來源。
+
+    baseline 是唯一有實測支持的機制（訊號 gate 現金投入實測輸定投 8.5%），
+    訊號只在 baseline 之上加碼。因此來源為 baseline 時必須寫「例行投入」，
+    不能寫「未觸發 / 節奏 25%」——那會讓讀者以為系統發現了什麼。
+    """
+    pace = _pace_label(item.get("signal_pace"))
+    if str(item.get("pace_source") or "baseline") == "baseline":
+        return f"例行投入 / {pace}"
+    return f"{_signal_tier_label(item.get('signal_tier'))}加碼 / {pace}"
 
 
 def _signal_tier_label(value: Any) -> str:
@@ -840,7 +865,7 @@ def render_beta_monitor_markdown(
             f"{item['ticker']}｜{_moves(indicator)}｜"
             f"距高點 {_pct(indicator.get('drawdown_252'))}｜{_heat(indicator)}｜"
             f"RSI {_finite(indicator.get('rsi_14')) or 0:.1f}｜"
-            f"{_signal_tier_label(item['signal_tier'])} / {_pace_label(item['signal_pace'])}｜"
+            f"{_pace_reason(item)}｜"
             f"自有現金評估上限 "
             f"{_money(_primary_supported_ceiling(item), currency)}｜"
             "限制 "
@@ -884,7 +909,7 @@ def render_beta_monitor_markdown(
                 f"距高點 {_pct(indicator.get('drawdown_252'))}｜"
                 f"{_heat(indicator)}｜"
                 f"RSI {_finite(indicator.get('rsi_14')) or 0:.1f}｜"
-                f"{_signal_tier_label(item['signal_tier'])} / {_pace_label(item['signal_pace'])}"
+                f"{_pace_reason(item)}"
             )
     else:
         lines.append("- 無")

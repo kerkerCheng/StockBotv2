@@ -86,6 +86,7 @@ def validate_beta_policy(source: Mapping[str, Any]) -> dict[str, Any]:
     signal = source.get("signal")
     if not isinstance(signal, Mapping) or set(signal) != {
         "allowed_paces",
+        "baseline_pace",
         "max_refresh_age_hours",
         "repeat_after_sessions",
         "stretched_above_sma200",
@@ -104,6 +105,12 @@ def validate_beta_policy(source: Mapping[str, Any]) -> dict[str, Any]:
     paces = signal.get("allowed_paces")
     if not isinstance(paces, list) or sorted(paces) != [0.0, 0.25, 0.5, 1.0]:
         raise BetaPolicyError("allowed_paces must be the closed v1 set")
+    # 不受訊號影響的投入下限。2026-08-01 實測：以訊號 gate 自有現金投入，
+    # 終值輸給無腦定投 8.5%（QQQ 91.5%、SOXX 91.9%）——市場多數時間在漲，
+    # 等回檔等於在上漲期間抱現金。baseline 保證例行投入不被訊號擋掉。
+    baseline = signal.get("baseline_pace")
+    if isinstance(baseline, bool) or baseline not in set(paces):
+        raise BetaPolicyError("baseline_pace must be one of allowed_paces")
     repeat = signal.get("repeat_after_sessions")
     if isinstance(repeat, bool) or not isinstance(repeat, int) or repeat < 1:
         raise BetaPolicyError("repeat_after_sessions must be a positive integer")
@@ -317,6 +324,7 @@ def validate_beta_policy(source: Mapping[str, Any]) -> dict[str, Any]:
             "allowed_paces": [0.0, 0.25, 0.5, 1.0],
             "max_refresh_age_hours": max_age,
             "repeat_after_sessions": repeat,
+            "baseline_pace": float(baseline),
             "stretched_above_sma200": float(stretched),
             "tiers": normalized_tiers,
         },

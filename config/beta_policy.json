@@ -1,6 +1,6 @@
 {
   "schema_version": "beta-policy-v2",
-  "policy_version": "2026-07-31.3",
+  "policy_version": "2026-08-01.1",
   "mode": "paper_observation",
   "capital_scope": "shared_cash_pool",
   "capital": {
@@ -10,6 +10,7 @@
   },
   "signal": {
     "allowed_paces": [0.0, 0.25, 0.5, 1.0],
+    "baseline_pace": 0.25,
     "stretched_above_sma200": 0.2,
     "max_refresh_age_hours": 96,
     "repeat_after_sessions": 5,

@@ -146,8 +146,14 @@ def test_stretched_above_sma200_downgrades_pace_even_on_a_real_drawdown() -> Non
     assert stretched["tier"] == near_trend["tier"], "只降 pace，不改 tier 判定"
     assert stretched["stretched_above_sma200"] is True
     assert near_trend["stretched_above_sma200"] is False
-    assert stretched["pace"] < near_trend["pace"]
+    # guard 作用在訊號自算的 pace 上
+    assert stretched["signal_pace_raw"] < near_trend["signal_pace_raw"]
     assert stretched["pace"] in policy["signal"]["allowed_paces"]
+    # 但它壓不到 baseline 以下：baseline 有實測證據（gate 現金投入輸定投 8.5%），
+    # stretched guard 是未驗證的推論——未驗證的機制不得覆蓋有證據的下限。
+    baseline = policy["signal"]["baseline_pace"]
+    assert stretched["pace"] >= baseline
+    assert stretched["pace_source"] == "baseline"
 
 
 def test_ranges_share_one_frozen_deployable_cash_budget() -> None:
@@ -463,3 +469,40 @@ def test_daily_risk_view_is_silent_without_change_but_weekly_full_is_explicit() 
     assert "換算槓桿曝險" in weekly
     assert "名目槓桿" not in weekly
     assert "科技 effective proxy" not in weekly
+
+
+def test_baseline_pace_floors_contribution_regardless_of_signal() -> None:
+    """訊號不得 gate 掉例行投入。
+
+    2026-08-01 實測：以訊號 gate 自有現金投入，終值輸給無腦定投 8.5%
+    （QQQ 91.5%、SOXX 91.9%）——市場多數時間在漲，等回檔等於在上漲期間抱現金。
+    因此 baseline 是有證據的機制，訊號只能往上加。
+    """
+    policy = load_beta_policy()
+    baseline = policy["signal"]["baseline_pace"]
+    # 完全不觸發任何 tier 的平靜多頭
+    calm = signal_state(
+        {
+            "benchmark_key": "qqq",
+            "data_status": "observed",
+            "drawdown_252": -0.02,
+            "rsi_14": 62.0,
+            "macd_histogram_slope": -0.1,
+            "distance_sma_200": 0.08,
+            "sma_50_slope_5": 0.01,
+            "blockers": [],
+        },
+        policy,
+    )
+    assert calm["tier"] == "none", "此情境本來就不該觸發訊號"
+    assert calm["signal_pace_raw"] == 0.0
+    assert calm["pace"] == baseline, "訊號歸零時仍須維持例行投入"
+    assert calm["pace_source"] == "baseline"
+
+
+def test_baseline_does_not_fabricate_contribution_when_data_is_missing() -> None:
+    """資料不足時仍誠實歸零——baseline 不是「無論如何都投」。"""
+    policy = load_beta_policy()
+    for status in ("insufficient_history", "unavailable", "quarantined"):
+        state = signal_state({"data_status": status, "blockers": []}, policy)
+        assert state["pace"] == 0.0, status
