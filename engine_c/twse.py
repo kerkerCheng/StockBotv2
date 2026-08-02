@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import re
+import ssl
 from datetime import date
 from typing import Any, Callable, Mapping
 from urllib.request import urlopen
@@ -12,6 +13,22 @@ TWSE_STOCK_DAY_ALL_URL = (
     "https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL"
 )
 _ROC_DATE = re.compile(r"^(?P<year>\d{3})(?P<month>\d{2})(?P<day>\d{2})$")
+
+
+def _twse_ssl_context() -> ssl.SSLContext:
+    """Build a verified TLS context compatible with TWSE's certificate chain.
+
+    Python 3.14 enables OpenSSL's strict X.509 extension checks by default.  The
+    TWSE public endpoint's otherwise trusted chain currently lacks a Subject Key
+    Identifier on one certificate, so strict mode rejects it.  Clearing only the
+    strict flag keeps CA validation and hostname verification enabled.
+    """
+
+    context = ssl.create_default_context()
+    strict_flag = getattr(ssl, "VERIFY_X509_STRICT", 0)
+    if strict_flag:
+        context.verify_flags &= ~strict_flag
+    return context
 
 
 def twse_code(provider_symbol: str) -> str | None:
@@ -87,7 +104,13 @@ def fetch_twse_latest_rows(
     indicator builder.
     """
 
-    open_fn = opener or urlopen
+    if opener is None:
+        context = _twse_ssl_context()
+
+        def open_fn(url: str, *, timeout: float):
+            return urlopen(url, timeout=timeout, context=context)
+    else:
+        open_fn = opener
     last_error: Exception | None = None
     for _attempt in range(2):
         try:

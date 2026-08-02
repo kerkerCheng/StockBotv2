@@ -2,9 +2,11 @@
 from __future__ import annotations
 
 import json
+import ssl
 
 import pytest
 
+import engine_c.twse as twse
 from engine_c.technical import build_technical_observation, reconcile_twse_freshness
 from engine_c.twse import TWSE_STOCK_DAY_ALL_URL, fetch_twse_latest_rows
 
@@ -79,6 +81,38 @@ def test_fetch_twse_latest_rows_retries_one_transient_transport_error() -> None:
 
     assert len(calls) == 2
     assert rows["0050"]["session_date"] == "2026-07-31"
+
+
+def test_default_transport_keeps_tls_verification_without_x509_strict(
+    monkeypatch,
+) -> None:
+    captured = {}
+
+    def fake_urlopen(url, *, timeout, context):
+        captured.update(url=url, timeout=timeout, context=context)
+        return _Response(
+            [
+                {
+                    "Date": "1150731",
+                    "Code": "0050",
+                    "ClosingPrice": "102.85",
+                    "Change": "+9.3500",
+                }
+            ]
+        )
+
+    monkeypatch.setattr(twse, "urlopen", fake_urlopen)
+
+    rows = fetch_twse_latest_rows()
+
+    context = captured["context"]
+    assert rows["0050"]["session_date"] == "2026-07-31"
+    assert captured["url"] == TWSE_STOCK_DAY_ALL_URL
+    assert context.verify_mode == ssl.CERT_REQUIRED
+    assert context.check_hostname is True
+    strict_flag = getattr(ssl, "VERIFY_X509_STRICT", 0)
+    if strict_flag:
+        assert not context.verify_flags & strict_flag
 
 
 def test_twse_newer_session_quarantines_old_yahoo_signal() -> None:
