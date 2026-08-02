@@ -1203,6 +1203,18 @@
       "source": "research_action",
       "title": "Meta Vistara CXL 記憶體擴充平台（reviewed）",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-08-02T02:26:04.627522+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 83,
+      "reason": null,
+      "ref_id": "dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:meta",
+      "type": "decision_review"
     }
   ],
   "log": [
@@ -2384,6 +2396,6 @@
       "verb": "pq1_queued"
     }
   ],
-  "next_n": 83,
+  "next_n": 84,
   "schema_version": "1"
 }
