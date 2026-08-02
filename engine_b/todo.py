@@ -256,6 +256,7 @@ def resolve(
     at: str | None = None,
     until: str | None = None,
     trigger: str | None = None,
+    event_type: str | None = None,
 ) -> dict[str, Any]:
     """以動詞處理一個編號。`pending` 不 resolve（明確 defer，留在池中）。
 
@@ -268,8 +269,10 @@ def resolve(
     item = get(pool, n)
     if verb == "go":
         _validate_go_receipt(item, receipt)
-    if (until or trigger) and verb != "pending":
-        raise TodoError("until／trigger 只適用於 pending")
+    if (until or trigger or event_type) and verb != "pending":
+        raise TodoError("until／trigger／event-type 只適用於 pending")
+    if event_type and not trigger:
+        raise TodoError("event-type 必須搭配人類可讀的 trigger")
     stamp = at or _now()
     if verb == "pending":
         item["deferred_at"] = stamp
@@ -279,6 +282,7 @@ def resolve(
                 "trigger": trigger or None,
                 "reason": reason or None,
                 "set_at": stamp,
+                **({"event_type": event_type} if event_type else {}),
             }
     else:
         item.pop("waiting_on", None)
@@ -346,6 +350,7 @@ def dispatch_decision_review(
     item["dispatch_attempt"] = dispatch_attempt
     item["dispatched_at"] = stamp
     item.pop("deferred_at", None)
+    item.pop("waiting_on", None)
     if not any(
         entry.get("n") == int(n)
         and entry.get("verb") == "pq1_queued"
@@ -456,6 +461,7 @@ def dispatch_source_trace_review(
     item["dispatch_ref"] = f"lead:{lead['lead_id']}"
     item["dispatched_at"] = stamp
     item.pop("deferred_at", None)
+    item.pop("waiting_on", None)
     pool["log"].append({
         "at": stamp,
         "n": int(n),
@@ -747,20 +753,103 @@ def sync(
     刻意的：resolve 表示「當時處理過」，不是永久黑名單。
     """
     added = 0
+    reactivated = 0
+    stamp = at or _now()
     for row in incoming:
         before = len(pool["items"])
-        upsert(
+        item = upsert(
             pool,
             item_type=str(row["type"]),
             ref_id=str(row["ref_id"]),
             title=str(row.get("title") or ""),
             hint=str(row.get("hint") or ""),
             source=str(row.get("source") or ""),
-            at=at,
+            at=stamp,
         )
         if len(pool["items"]) > before:
             added += 1
-    return {"added": added, "active": len(active_items(pool))}
+
+        incoming_waiting = row.get("waiting_on")
+        event_link = row.get("event_link")
+        event_type = str((event_link or {}).get("type") or "")
+        event_value = str((event_link or {}).get("value") or "")
+        waiting_event_type = str(
+            (item.get("waiting_on") or {}).get("event_type") or ""
+        )
+        dispatch_in_flight = item.get("dispatch_status") in {
+            "queued",
+            "researching",
+            "awaiting_approval",
+        }
+        if dispatch_in_flight and (item.get("waiting_on") or {}).get(
+            "derived_from_blockers"
+        ):
+            item.pop("waiting_on", None)
+        material_decision_event = (
+            item["type"] == "decision_review"
+            and event_type == "decision_evidence_delta"
+            and event_value in {"material", "positive", "negative"}
+            and waiting_event_type == event_type
+            and not dispatch_in_flight
+        )
+
+        # 使用者或 blocker 衍生的 waiting item 不能只靠自然語言等人記得回來。
+        # Engine D 對同一 cohort 產生 material evidence delta 時，以 decision receipt
+        # 喚醒原 stable pq2 item；這只恢復人工判斷，不 dispatch 研究、不建 decision。
+        if material_decision_event and item.get("waiting_on"):
+            prior_waiting = dict(item.get("waiting_on") or {})
+            item.pop("waiting_on", None)
+            item.pop("deferred_at", None)
+            item["reactivated_at"] = stamp
+            item["reactivation_event"] = dict(event_link)
+            pool["log"].append({
+                "at": stamp,
+                "n": item["n"],
+                "type": item["type"],
+                "ref_id": item["ref_id"],
+                "verb": "event_reactivated",
+                "reason": "同一 cohort 出現 material evidence delta，恢復人工複查",
+                "receipt": str((event_link or {}).get("receipt") or "") or None,
+                "prior_waiting_on": prior_waiting,
+            })
+            reactivated += 1
+        elif (
+            item.get("waiting_on", {}).get("derived_from_blockers")
+            and not incoming_waiting
+        ):
+            # blocker 已不再全屬 awaiting_external／system_internal，保守地回到
+            # 決策佇列。人工設定的 waiting_on 不由此分支清除。
+            prior_waiting = dict(item.get("waiting_on") or {})
+            item.pop("waiting_on", None)
+            item.pop("deferred_at", None)
+            item["reactivated_at"] = stamp
+            item["reactivation_event"] = {
+                "type": "decision_blocker_mode_changed",
+            }
+            pool["log"].append({
+                "at": stamp,
+                "n": item["n"],
+                "type": item["type"],
+                "ref_id": item["ref_id"],
+                "verb": "event_reactivated",
+                "reason": "blocker 已不再全屬等待事件，恢復人工複查",
+                "receipt": None,
+                "prior_waiting_on": prior_waiting,
+            })
+            reactivated += 1
+        elif (
+            incoming_waiting
+            and not item.get("waiting_on")
+            and not material_decision_event
+            and not dispatch_in_flight
+        ):
+            item["waiting_on"] = dict(incoming_waiting)
+
+    return {
+        "added": added,
+        "reactivated": reactivated,
+        "active": len(active_items(pool)),
+    }
 
 
 # ── 來源蒐集（lazy import，避免 engine_b 反向依賴 Engine A/C/D）─────────────
@@ -939,10 +1028,25 @@ def collect_from_decisions() -> list[dict[str, Any]]:
                if not item.get("sheet_only") else {}),
             "source": "decision_lab",
         }
+        if not item.get("sheet_only") and item.get("evidence_delta"):
+            row["event_link"] = {
+                "type": "decision_evidence_delta",
+                "value": str(item.get("evidence_delta") or "none"),
+                "receipt": (
+                    f"decision:{item['decision_id']}"
+                    if item.get("decision_id")
+                    else ""
+                ),
+            }
         # 若這個決策的所有 blocker 都不需要使用者決定（純粹在等世界產生新資料），
         # 就直接帶著推導出的等待理由入池，不佔決策注意力。保守規則：只要有一個
         # blocker 需要人決定就照舊進決策佇列。
-        waiting = _derive_waiting_on(item.get("blockers") or [])
+        waiting = (
+            None
+            if str(item.get("evidence_delta") or "none")
+            in {"material", "positive", "negative"}
+            else _derive_waiting_on(item.get("blockers") or [])
+        )
         if waiting:
             row["waiting_on"] = waiting
         rows.append(row)
@@ -1054,6 +1158,12 @@ def main(argv: list[str] | None = None) -> int:
         "--trigger", default=None,
         help="pending 專用：等哪個事件（如「S-4 公開」）。",
     )
+    p_res.add_argument(
+        "--event-type",
+        default=None,
+        choices=("decision_evidence_delta",),
+        help="把人類 trigger 綁到可執行事件；目前支援 decision_evidence_delta。",
+    )
 
     p_dispatch = sub.add_parser(
         "dispatch", help="把 decision／source-trace review 的 go checkpoint 成 pq1 job"
@@ -1118,6 +1228,7 @@ def main(argv: list[str] | None = None) -> int:
                     pool, int(raw), args.verb,
                     reason=args.reason, receipt=args.receipt,
                     until=args.until, trigger=args.trigger,
+                    event_type=args.event_type,
                 )
                 suffix = ""
                 if args.verb == "pending" and (args.until or args.trigger):

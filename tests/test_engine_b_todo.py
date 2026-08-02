@@ -103,6 +103,85 @@ def test_resolved_item_can_reenter_pool_with_new_number() -> None:
     assert len(items) == 1 and items[0]["n"] != n1
 
 
+def test_material_decision_event_reactivates_waiting_stable_item() -> None:
+    pool = _pool_with({"type": "decision_review", "ref_id": "dc_1", "title": "REVIEW"})
+    todo.resolve(
+        pool,
+        1,
+        "pending",
+        trigger="下一份公司 filing",
+        event_type="decision_evidence_delta",
+        at="2026-08-01T00:00:00+00:00",
+    )
+
+    result = todo.sync(
+        pool,
+        [{
+            "type": "decision_review",
+            "ref_id": "dc_1",
+            "title": "REVIEW — co:axt",
+            "event_link": {
+                "type": "decision_evidence_delta",
+                "value": "material",
+                "receipt": "decision:pd_new",
+            },
+        }],
+        at="2026-08-02T00:00:00+00:00",
+    )
+
+    item = todo.get(pool, 1)
+    assert result["reactivated"] == 1
+    assert "waiting_on" not in item
+    assert "deferred_at" not in item
+    assert item["reactivation_event"]["receipt"] == "decision:pd_new"
+    assert pool["log"][-1]["verb"] == "event_reactivated"
+
+
+def test_material_event_does_not_guess_unbound_human_trigger() -> None:
+    pool = _pool_with({"type": "decision_review", "ref_id": "dc_1", "title": "REVIEW"})
+    todo.resolve(pool, 1, "pending", trigger="只等 S-4 公開")
+
+    result = todo.sync(pool, [{
+        "type": "decision_review",
+        "ref_id": "dc_1",
+        "title": "REVIEW",
+        "event_link": {
+            "type": "decision_evidence_delta",
+            "value": "material",
+            "receipt": "decision:pd_other",
+        },
+    }])
+
+    assert result["reactivated"] == 0
+    assert todo.get(pool, 1)["waiting_on"]["trigger"] == "只等 S-4 公開"
+
+
+def test_sync_persists_derived_waiting_and_clears_it_when_mode_changes() -> None:
+    waiting = {
+        "until": None,
+        "trigger": "等下一份 filing",
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-08-01T00:00:00+00:00",
+        "derived_from_blockers": True,
+    }
+    pool = todo.empty_pool()
+    todo.sync(pool, [{
+        "type": "decision_review",
+        "ref_id": "dc_1",
+        "title": "REVIEW",
+        "waiting_on": waiting,
+    }])
+    assert todo.get(pool, 1)["waiting_on"] == waiting
+
+    result = todo.sync(pool, [{
+        "type": "decision_review",
+        "ref_id": "dc_1",
+        "title": "REVIEW — needs choice",
+    }])
+    assert result["reactivated"] == 1
+    assert "waiting_on" not in todo.get(pool, 1)
+
+
 class _WorkOrderStore:
     def __init__(self) -> None:
         self.status = "proposed"
@@ -145,6 +224,25 @@ def test_decision_review_go_dispatches_pq1_without_resolving() -> None:
     assert repeated["work_order"]["status"] == "queued"
     assert len(store.transitions) == 1
     assert len([row for row in pool["log"] if row["verb"] == "pq1_queued"]) == 1
+
+
+def test_dispatch_clears_waiting_metadata_and_sync_does_not_restore_it() -> None:
+    pool = _pool_with({"type": "decision_review", "ref_id": "dc_1", "title": "REVIEW"})
+    todo.resolve(pool, 1, "pending", trigger="等 filing")
+    store = _WorkOrderStore()
+
+    todo.dispatch_decision_review(pool, 1, store=store)
+    assert "waiting_on" not in todo.get(pool, 1)
+    todo.sync(pool, [{
+        "type": "decision_review",
+        "ref_id": "dc_1",
+        "title": "REVIEW",
+        "waiting_on": {
+            "trigger": "系統狀態待更新",
+            "derived_from_blockers": True,
+        },
+    }])
+    assert "waiting_on" not in todo.get(pool, 1)
 
 
 @pytest.mark.parametrize("terminal_status", ["completed", "parked"])
@@ -584,6 +682,28 @@ def test_collect_from_decisions_uses_company_hint_only_as_display_label(
         "hint": "核准 bounded gap research；完成後才 reassess",
         "source": "decision_lab",
     }]
+
+
+def test_collect_material_decision_never_derives_waiting_from_system_blockers(
+    monkeypatch,
+) -> None:
+    from mcp_server import decision_tools
+
+    monkeypatch.setattr(decision_tools, "get_decision_brief_core", lambda: {
+        "action_needed": True,
+        "items": [{
+            "cohort_id": "dc_axt",
+            "decision_id": "pd_axt",
+            "company_id": "co:axt",
+            "recommended_action": "REVIEW",
+            "evidence_delta": "material",
+            "blockers": ["market_stale_since_decision"],
+        }],
+    })
+
+    row = todo.collect_from_decisions()[0]
+    assert "waiting_on" not in row
+    assert row["event_link"]["receipt"] == "decision:pd_axt"
 
 
 def test_raw_leads_are_not_pq2_and_legacy_items_migrate_with_audit() -> None:

@@ -872,22 +872,21 @@
     },
     {
       "added_at": "2026-07-29T15:16:58.028043+00:00",
-      "deferred_at": "2026-07-30T15:33:50.003109+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 64,
+      "reactivated_at": "2026-08-02T03:19:56.526850+00:00",
+      "reactivation_event": {
+        "receipt": "decision:pd_e5d82e5323b49d7946373509dcde3536",
+        "type": "decision_evidence_delta",
+        "value": "material"
+      },
       "reason": null,
       "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
       "title": "REVIEW — co:axt",
-      "type": "decision_review",
-      "waiting_on": {
-        "reason": null,
-        "set_at": "2026-07-30T15:33:50.003109+00:00",
-        "trigger": "下一個 review 點或新 AXT filing（研究已完成，pd_e5d82e53）",
-        "until": null
-      }
+      "type": "decision_review"
     },
     {
       "added_at": "2026-07-29T15:16:58.028071+00:00",
@@ -2394,6 +2393,72 @@
       "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
       "type": "decision_review",
       "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-08-02T03:12:47.018658+00:00",
+      "n": 64,
+      "reason": "將既有自然語言等待條件綁定為可執行事件；不 dispatch、不 reassess",
+      "receipt": null,
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "type": "decision_review",
+      "verb": "pending"
+    },
+    {
+      "at": "2026-08-02T03:12:57.865227+00:00",
+      "n": 64,
+      "prior_waiting_on": {
+        "event_type": "decision_evidence_delta",
+        "reason": "將既有自然語言等待條件綁定為可執行事件；不 dispatch、不 reassess",
+        "set_at": "2026-08-02T03:12:47.018658+00:00",
+        "trigger": "下一個 review 點或新 AXT filing（同 cohort material evidence delta）",
+        "until": null
+      },
+      "reason": "同一 cohort 出現 material evidence delta，恢復人工複查",
+      "receipt": "decision:pd_e5d82e5323b49d7946373509dcde3536",
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "type": "decision_review",
+      "verb": "event_reactivated"
+    },
+    {
+      "at": "2026-08-02T03:14:39.008379+00:00",
+      "n": 64,
+      "prior_waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-08-02T03:13:58.282920+00:00",
+        "trigger": "執行面 context 缺失／市場資料問題",
+        "until": null
+      },
+      "reason": "blocker 已不再全屬等待事件，恢復人工複查",
+      "receipt": null,
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "type": "decision_review",
+      "verb": "event_reactivated"
+    },
+    {
+      "at": "2026-08-02T03:19:45.569882+00:00",
+      "n": 64,
+      "reason": "確認 executable event linkage receipt",
+      "receipt": null,
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "type": "decision_review",
+      "verb": "pending"
+    },
+    {
+      "at": "2026-08-02T03:19:56.526850+00:00",
+      "n": 64,
+      "prior_waiting_on": {
+        "event_type": "decision_evidence_delta",
+        "reason": "確認 executable event linkage receipt",
+        "set_at": "2026-08-02T03:19:45.569882+00:00",
+        "trigger": "下一個 review 點或新 AXT filing（同 cohort material evidence delta）",
+        "until": null
+      },
+      "reason": "同一 cohort 出現 material evidence delta，恢復人工複查",
+      "receipt": "decision:pd_e5d82e5323b49d7946373509dcde3536",
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "type": "decision_review",
+      "verb": "event_reactivated"
     }
   ],
   "next_n": 84,

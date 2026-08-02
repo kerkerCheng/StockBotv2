@@ -158,7 +158,7 @@ Decision gap jobs 優先占用同一個 daily pq1 budget。若研究結果需要
 
 一般 scheduled／event-triggered 重查仍屬 pq1，不占 pq2；只有需要使用者提供合法 access、核准付費或明確改變研究優先權時，`todo sync` 才建立 `source_trace_review`。該類型的 `go` 只把 exact lead dispatch 回 pq1，**不代表相信截圖、提高 evidence tier 或 graph admission**；取得原文並 prepare 後，入圖仍是另一個 `ra_admission` pq2。任何新訂閱／購買必須另列 exact 金額與方案。
 
-**Lead 之間的關聯鍵（2026-07-30）：** URL hash 只認同一篇文章。跨文章的關聯靠 `engine_b/entities.py` 的具名標的做**確定性**比對（cashtag、`edgar:<TICKER>`、registry 反查的 `co:*`）。主題相關但無共同 ticker 的仍靠語意，`trace_next_trigger` 仍是自由文字且**沒有任何程式在評估它**——改善方向見 [`ROADMAP.md`](docs/ROADMAP.md)。
+**Lead 之間的關聯鍵（2026-07-30；2026-08-02 補 executable linkage）：** URL hash 只認同一篇文章。跨文章的關聯靠 `engine_b/entities.py` 的具名標的做**確定性**比對（cashtag、`edgar:<TICKER>`、registry 反查的 `co:*`）。主題相關但無共同 ticker 的仍靠語意。`trace_next_trigger` 保留給人讀；機器改用 `trace_trigger_kind=related_entity_signal`＋`trace_trigger_entities`。同標的的新 lead 通過 triage 後，會把不需人工 access／付費的 parked trace 排回 bounded pq1，留下 triggering lead receipt；不提高 evidence tier、不授權入圖。Decision `waiting_on` 只有明確綁定 `event_type=decision_evidence_delta` 時，才由同 cohort 的 material evidence receipt 喚醒原 stable pq2 編號；不猜測其他自然語言 trigger，只恢復人工複查，不自動 dispatch。
 
 ### 資本與風控
 
@@ -166,11 +166,11 @@ Decision gap jobs 優先占用同一個 daily pq1 budget。若研究結果需要
 
 **共同可投資現金池只有一條：** `Portfolio CASH − cash floor`，供 Alpha／Beta 共用。不扣 operating reserve、alpha reserve 或 planned outflows，沒有 Sheet／household 雙 range。Alpha／Beta 如何分配由各自 campaign budget、Decision sizing、單筆上限與風控決定，**cash floor 不承擔 sleeve allocation**。cash floor authority 失效時 fail closed，不回退到百分比 reserve。
 
-**兩個槓桿指標不得混用：** `nominal_weight` 是「投入槓桿 ETF 的資金占 NAV」（5/8% warning/cap）；`effective_weight` 是乘上 2x／3x 後的「換算槓桿曝險」（15/20% warning/cap）。面向使用者不得把前者寫成模糊的「名目槓桿」。
+**兩個槓桿指標不得混用：** `nominal_weight` 是「投入槓桿 ETF 的資金占 NAV」（12.5%／20% warning/cap）；`effective_weight` 是乘上 2x／3x 後的「換算槓桿曝險」（30%／40% warning/cap）。面向使用者不得把前者寫成模糊的「名目槓桿」。數值仍只以 `config/beta_policy.json` 為 SSOT；本段是人類可讀鏡像。
 
 **Capital Authority：** 私人 Google Sheet 只保留 `cash_floor` 與 `credit_facility` 兩種 record；日常 credential scope 只有 `spreadsheets.readonly`。貸款額度、已借款、利率、計息方式、期限與還本方式獨立保存；**未動用額度不算 NAV／cash／allocation**。每次提款、標的與 tranche 都是 explicit manual review，「高信心」不構成 machine permission。
 
-**曝險邊界：** Sheet `bucket=CASH` 列計入 NAV 但不計曝險。未知非現金持股按 unlevered direct issuer ＋ alpha exposure 誠實降級，不因缺 mapping 阻擋。`issuer_loads` 只代表 policy 已登記的 ownership look-through，輸出必標 `partial`；Engine A 上游依賴不可混成 issuer ownership。**既有 frozen decision 不回寫**，重新 reassess 才使用新 policy／calculator。
+**曝險邊界：** Sheet `bucket=CASH` 列計入 NAV 但不計曝險。未知非現金持股按 unlevered direct issuer ＋ alpha exposure 誠實降級，不因缺 mapping 阻擋。`issuer_loads` 只代表 policy 已登記的 ownership look-through，輸出必標 `partial`；coverage 為 partial 時，人類輸出一律寫「已知至少 X%」，不得把已建模部分冒充完整曝險。Engine A 上游依賴不可混成 issuer ownership。**既有 frozen decision 不回寫**，重新 reassess 才使用新 policy／calculator。
 
 **退休貸款資本目標（2026-07-28 使用者定案）：** 使用者約 30 歲、退休目標約 60 歲；可長抱至到期的貸款資本以約 30 年後 `retirement_net_terminal_wealth` 最大化為方向，不以降低中途回撤為第一目標。契約為利息按月支付、期間不攤還本金、到期一次還本、允許投資用途。broad unlevered beta 是主要候選；daily 3x 可投資但維持衛星定位，exact review 必須扣除借款成本與到期本金比較退休淨終值，**月息若需靠賣出 beta 支付則該 tranche 不成立**。
 
@@ -179,6 +179,8 @@ Decision gap jobs 優先占用同一個 daily pq1 budget。若研究結果需要
 底層與首屏都只保存一條 `self_funded_supported_range`。自有現金可部署固定顯示 `Portfolio CASH − cash floor`，並明說 cash floor 以上為 Alpha／Beta 共用。另獨立顯示「未動用貸款額度／已借款／估計利息」，明標貸款不算自有現金。**不得用未解釋的斜線或 raw field name。**
 
 燈號固定配文字：🟢可評估、🟡冷卻／排序中、⚪觀察、🔴資料不足／暫停新增。Beta 區先用三行 TL;DR 說明目標、今日可人工評估標的與已觸發風控；technical signal 只決定新增 timing／pace，**不因一般回檔自動賣出**。
+
+每檔呈現固定拆成三個不同語意欄：**例行投入排程**（是否到每 5 個完整交易日的人工評估日，以及 baseline pace）、**Signal 加碼**（baseline 以上的未驗證增量，沒有就明寫 +0%）、**今日資本限制**（今日可評估上限與真正 hard blockers）。冷卻／排序不得再冒充資本限制；pace 百分比必須標為該 sleeve 單輪 campaign budget 的比例。
 
 ### 技術訊號的地位（2026-08-01 實測後定案）
 

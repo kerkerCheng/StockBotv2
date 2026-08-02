@@ -314,7 +314,7 @@ def _allocate_ranges(
             action = "HOLD"
         elif not cadence["review_due"]:
             action = "HOLD"
-            blockers.append("signal_review_cooldown")
+            blockers.append("routine_review_cooldown")
         elif group in claimed_groups:
             action = "HOLD"
             blockers.append("overlapping_instrument_deferred")
@@ -488,9 +488,43 @@ def build_beta_monitor(
                 "technical_status": state["data_status"],
                 "signal_tier": state["tier"],
                 "signal_pace": state["pace"],
+                "signal_pace_raw": state.get("signal_pace_raw", 0.0),
                 "pace_source": state.get("pace_source", "baseline"),
                 "signal_regime": state["regime"],
                 "review_cadence": cadence,
+                "routine_schedule": {
+                    "cadence_sessions": int(
+                        resolved_policy["signal"]["repeat_after_sessions"]
+                    ),
+                    "due": bool(cadence.get("routine_due")),
+                    "sessions_until_next": (
+                        0
+                        if cadence.get("routine_due")
+                        else cadence.get("sessions_until_routine")
+                    ),
+                    "baseline_pace": float(
+                        state.get(
+                            "baseline_pace",
+                            resolved_policy["signal"]["baseline_pace"],
+                        )
+                    ),
+                    "scope": "self_funded_cash_only",
+                },
+                "signal_add_on": {
+                    "tier": state["tier"],
+                    "raw_pace": float(state.get("signal_pace_raw") or 0.0),
+                    "incremental_pace": max(
+                        float(state.get("signal_pace_raw") or 0.0)
+                        - float(
+                            state.get(
+                                "baseline_pace",
+                                resolved_policy["signal"]["baseline_pace"],
+                            )
+                        ),
+                        0.0,
+                    ),
+                    "validated": False,
+                },
                 "indicator": indicator,
                 "current_nominal_weight": current_value / nav if nav > 0 else None,
                 "current_effective_weight": (
@@ -500,6 +534,28 @@ def build_beta_monitor(
                 ),
                 "supported_order_range_base": allocation["supported_order_range_base"],
                 "binding_constraints": allocation["binding_constraints"],
+                "capital_constraints": {
+                    "status": (
+                        "review_open"
+                        if allocation["action"] == "CONTRIBUTE REVIEW"
+                        else "blocked"
+                        if allocation["action"] == "PAUSE CONTRIBUTION"
+                        else "not_open_today"
+                    ),
+                    "supported_order_range_base": allocation[
+                        "supported_order_range_base"
+                    ],
+                    "binding_constraints": allocation["binding_constraints"],
+                    "hard_blockers": [
+                        blocker
+                        for blocker in allocation["blockers"]
+                        if blocker
+                        not in {
+                            "routine_review_cooldown",
+                            "overlapping_instrument_deferred",
+                        }
+                    ],
+                },
                 "blockers": allocation["blockers"],
                 "warnings": allocation["warnings"],
                 "action": allocation["action"],
@@ -537,7 +593,7 @@ def build_beta_monitor(
         if item["technical_status"] == "observed"
     ]
     report = {
-        "schema_version": "engine-d-beta-monitor-v5",
+        "schema_version": "engine-d-beta-monitor-v6",
         "as_of": evaluation_at,
         "policy_version": resolved_policy["policy_version"],
         "policy_mode": resolved_policy["mode"],
@@ -696,6 +752,72 @@ def _signal_tier_label(value: Any) -> str:
     }.get(str(value), str(value))
 
 
+def _routine_schedule_label(item: Mapping[str, Any]) -> str:
+    schedule = item.get("routine_schedule") or {}
+    baseline = _finite(schedule.get("baseline_pace"), non_negative=True)
+    baseline_label = (
+        "例行節奏未知"
+        if baseline is None
+        else f"baseline {baseline * 100:.0f}% 單輪預算"
+    )
+    if item.get("technical_status") != "observed":
+        return f"行情不可用；{baseline_label} 暫停"
+    if schedule.get("due"):
+        return f"本期已到；{baseline_label}"
+    remaining = schedule.get("sessions_until_next")
+    return (
+        f"距下次 {remaining} 個完整交易日；{baseline_label}"
+        if isinstance(remaining, int)
+        else f"下次待有效行情恢復後計算；{baseline_label}"
+    )
+
+
+def _signal_add_on_label(item: Mapping[str, Any]) -> str:
+    signal = item.get("signal_add_on") or {}
+    if item.get("technical_status") != "observed":
+        return "不可用（不覆蓋 baseline）"
+    incremental = _finite(signal.get("incremental_pace"), non_negative=True) or 0.0
+    tier = _signal_tier_label(signal.get("tier"))
+    if incremental <= 0:
+        return f"+0%（{tier}；未驗證）"
+    return f"+{incremental * 100:.0f}% 單輪預算（{tier}；未驗證）"
+
+
+def _capital_constraint_label(item: Mapping[str, Any], currency: str | None) -> str:
+    capital = item.get("capital_constraints") or {}
+    status = str(capital.get("status") or "")
+    ceiling = (capital.get("supported_order_range_base") or [0.0, 0.0])[1]
+    hard = [str(value) for value in capital.get("hard_blockers") or []]
+    binding = [str(value) for value in capital.get("binding_constraints") or []]
+    if status == "not_open_today":
+        return "今日非評估日；資本上限未啟用"
+    labels = hard or binding
+    suffix = "、".join(_constraint_label(value) for value in labels) or "無"
+    return f"上限 {_money(ceiling, currency)}；硬限制 {suffix}"
+
+
+def _rsi_zone(value: Any) -> str:
+    parsed = _finite(value)
+    if parsed is None:
+        return "n/a"
+    if parsed < 30:
+        return f"{parsed:.1f} 超賣區"
+    if parsed < 50:
+        return f"{parsed:.1f} 弱／中性"
+    if parsed <= 70:
+        return f"{parsed:.1f} 偏強"
+    return f"{parsed:.1f} 過熱"
+
+
+def _primary_tldr(item: Mapping[str, Any]) -> str:
+    indicator = item["indicator"]
+    return (
+        f"{_display_label(item)}；RSI {_rsi_zone(indicator.get('rsi_14'))}；"
+        f"{_moves(indicator)}；距高點 {_pct(indicator.get('drawdown_252'))}；"
+        f"{_heat(indicator)}"
+    )
+
+
 def _constraint_label(value: Any) -> str:
     raw = str(value)
     labels = {
@@ -703,7 +825,7 @@ def _constraint_label(value: Any) -> str:
         "deployable_cash": "可部署現金",
         "leveraged_nominal_capacity": "槓桿 ETF 資金上限",
         "leveraged_effective_capacity": "換算槓桿曝險上限",
-        "signal_review_cooldown": "尚在例行／加碼提醒冷卻期",
+        "routine_review_cooldown": "尚未到例行投入評估日",
         "overlapping_instrument_deferred": "同基準標的已優先評估",
         "technical_history_insufficient_252_sessions": "歷史不足 252 個交易日",
         "technical_observation_missing": "缺少技術資料",
@@ -768,7 +890,7 @@ def _display_label(item: Mapping[str, Any]) -> str:
     if item["technical_status"] != "observed":
         return "🔴 資料不足"
     blockers = set(_primary_blockers(item))
-    if "signal_review_cooldown" in blockers or "overlapping_instrument_deferred" in blockers:
+    if "routine_review_cooldown" in blockers or "overlapping_instrument_deferred" in blockers:
         return "🟡 冷卻／排序中"
     if action == "PAUSE CONTRIBUTION":
         return "🔴 暫停新增"
@@ -818,6 +940,11 @@ def _money(value: Any, currency: str | None) -> str:
     return "未知" if parsed is None else f"{currency or ''} {parsed:,.0f}".strip()
 
 
+def _issuer_exposure_label(value: Any, coverage_status: Any) -> str:
+    exposure = _pct(value)
+    return f"已知至少 {exposure}" if str(coverage_status) == "partial" else exposure
+
+
 def _risk_snapshot_lines(report: Mapping[str, Any], *, full: bool) -> list[str]:
     snapshot = report["risk_snapshot"]
     changes = report.get("risk_changes") or []
@@ -851,13 +978,14 @@ def _risk_snapshot_lines(report: Mapping[str, Any], *, full: bool) -> list[str]:
         for item in changes
         if str(item.get("metric") or "").startswith("issuer_exposure:")
     }
+    coverage = snapshot["issuer_coverage"]
     for issuer, exposure in snapshot.get("issuer_exposures", {}).items():
         if full or issuer in changed_issuers:
             lines.append(
-                f"- {issuer}：總曝險 {_pct(exposure.get('total_weight'))}"
+                f"- {issuer}：總曝險 "
+                f"{_issuer_exposure_label(exposure.get('total_weight'), coverage.get('status'))}"
                 f"（直接 {_pct(exposure.get('direct_weight'))}／間接 {_pct(exposure.get('indirect_weight'))}）"
             )
-    coverage = snapshot["issuer_coverage"]
     if full:
         lines.append(
             f"- Issuer look-through coverage：{coverage['status']}；method={coverage['method']}；"
@@ -969,85 +1097,55 @@ def render_beta_monitor_markdown(
     requests = report.get("event_search_requests") or []
     if requests:
         lines += ["", "## 集中曝險事件搜尋請求（未經查證、不寫入 authority）"]
+        coverage_status = (report["risk_snapshot"].get("issuer_coverage") or {}).get(
+            "status"
+        )
         for request in requests:
             lines.append(
                 f"- {request['issuer']}｜1日 {_signed_pct(request['return_1d'])}｜"
-                f"曝險 {_pct(request['exposure_weight'])}（直接 {_pct(request['direct_weight'])}／"
+                f"曝險 {_issuer_exposure_label(request['exposure_weight'], coverage_status)}"
+                f"（直接 {_pct(request['direct_weight'])}／"
                 f"間接 {_pct(request['indirect_weight'])}）｜WebSearch：{request['search_query']}"
             )
 
-    paused = [
-        item
-        for item in report["items"]
-        if item not in reviews
-        and _primary_action(item) == "PAUSE CONTRIBUTION"
-    ]
-    holds = [item for item in report["items"] if item not in reviews and item not in paused]
     lines += ["", "## 需要人工判斷"]
     if not reviews:
         lines.append("- NO ACTION")
-    for item in reviews:
-        indicator = item["indicator"]
+    else:
         lines.append(
-            f"- {_display_label(item)}｜"
-            f"{item['ticker']}｜{_moves(indicator)}｜"
-            f"{_twse_snapshot(indicator)}"
-            f"距高點 {_pct(indicator.get('drawdown_252'))}｜{_heat(indicator)}｜"
-            f"RSI {_finite(indicator.get('rsi_14')) or 0:.1f}｜"
-            f"{_pace_reason(item)}｜"
-            f"自有現金評估上限 "
-            f"{_money(_primary_supported_ceiling(item), currency)}｜"
-            "限制 "
-            + (
-                "、".join(
-                    _constraint_label(value)
-                    for value in _primary_binding_constraints(item)
-                )
-                or "無"
-            )
+            "- 今日可人工評估："
+            + "、".join(str(item["ticker"]) for item in reviews)
+            + "；仍需逐筆核准，未產生 live permission。"
         )
-    if paused:
-        lines += ["", "## 暫停新增"]
-        for item in paused:
-            indicator = item["indicator"]
-            lines.append(
-                f"- {_display_label(item)}｜"
-                f"{item['ticker']}｜{_moves(indicator)}｜"
-                f"{_twse_snapshot(indicator)}"
-                "原因="
-                + (
-                    "、".join(
-                        _constraint_label(value)
-                    for value in _primary_blockers(item)
-                    )
-                    or _primary_action(item)
-                )
-            )
     primary_rank = {ticker: index for index, ticker in enumerate(_PRIMARY_DISPLAY_ORDER)}
-    primary_holds = sorted(
-        (item for item in holds if item["ticker"] in primary_rank),
+    primary_items = sorted(
+        (item for item in report["items"] if item["ticker"] in primary_rank),
         key=lambda item: primary_rank[item["ticker"]],
     )
-    secondary_holds = [item for item in holds if item["ticker"] not in primary_rank]
+    secondary_items = [
+        item for item in report["items"] if item["ticker"] not in primary_rank
+    ]
     lines += ["", "## 主力 ETF／權值"]
-    if primary_holds:
-        for item in primary_holds:
+    if primary_items:
+        lines += [
+            "| 標的 | 系統動作 | 一句 TL;DR | 例行投入排程 | Signal 加碼（未驗證） | 今日資本限制 |",
+            "|---|---|---|---|---|---|",
+        ]
+        for item in primary_items:
             indicator = item["indicator"]
+            twse = _twse_snapshot(indicator).rstrip("｜")
+            tldr = _primary_tldr(item) + (f"；{twse}" if twse else "")
             lines.append(
-                f"- {_display_label(item)}｜"
-                f"{item['ticker']}｜{_moves(indicator)}｜"
-                f"{_twse_snapshot(indicator)}"
-                f"距高點 {_pct(indicator.get('drawdown_252'))}｜"
-                f"{_heat(indicator)}｜"
-                f"RSI {_finite(indicator.get('rsi_14')) or 0:.1f}｜"
-                f"{_pace_reason(item)}"
+                f"| {item['ticker']} | {_primary_action(item)} | {tldr} | "
+                f"{_routine_schedule_label(item)} | {_signal_add_on_label(item)} | "
+                f"{_capital_constraint_label(item, currency)} |"
             )
     else:
         lines.append("- 無")
     lines += ["", "## 個股與其他（摘要）"]
-    if secondary_holds:
-        other_etfs = [item for item in secondary_holds if item["ticker"] in {"0050.TW", "006208.TW"}]
-        individual_names = [item for item in secondary_holds if item not in other_etfs]
+    if secondary_items:
+        other_etfs = [item for item in secondary_items if item["ticker"] in {"0050.TW", "006208.TW"}]
+        individual_names = [item for item in secondary_items if item not in other_etfs]
         if other_etfs:
             lines.append(
                 "- 其他 ETF："

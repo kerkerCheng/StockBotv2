@@ -70,7 +70,7 @@ credit 不進 NAV／cash／allocation。technical／capital telemetry 不進 pq1
 technical 或 self-funded range 歸零。Windows 本機與
 scheduled task 一律使用 repo `.venv`，不要依賴父 shell 是否剛好 activate。
 Engine C 同一筆 observation 保存 adjusted-close 的 1／5／20-session return；Engine D 才負責把
-return、RSI、252-session drawdown、signal tier、cooldown 與 capital constraints 組成 Mobile-friendly
+return、RSI、252-session drawdown、例行投入排程、signal add-on 與 capital constraints 組成 Mobile-friendly
 燈號。燈號必須配 `可評估／冷卻／觀察／資料不足` 文字與明確系統動作，且不構成 live permission。
 燈號與文字不得在 agent 摘要時省略：🟢 `可評估`、🟡 `冷卻／排序中`、⚪ `觀察`、🔴 `資料不足／暫停新增`。
 動作對照固定為：`CONTRIBUTE REVIEW`＝可新增評估（不是買進）；`HOLD`＝維持／等待；
@@ -81,7 +81,8 @@ return、RSI、252-session drawdown、signal tier、cooldown 與 capital constra
 Portfolio risk 另以 ignored append-only JSONL 保存 aggregate snapshot：Daily 只顯示門檻跨越／狀態翻轉，
 Weekly 才用 `--risk-view full --no-record-risk` 顯示完整快照。硬擋包含 ETF nominal／effective 槓桿 cap、
 總曝險 cap、callable debt cap 與 investment policy 的 5% 單筆上限；issuer concentration 與 alpha 總量只警告。
-`issuer_loads` 是已知、partial ownership look-through，不是完整 ETF 成分，也不含 Engine A 上游依賴。
+`issuer_loads` 是已知、partial ownership look-through，不是完整 ETF 成分，也不含 Engine A 上游依賴；
+coverage 為 `partial` 時一律顯示「已知至少 X%」，不得輸出成完整曝險估計。
 若輸出 `event_search_requests`，只對該 packet 做一次 WebSearch，列可能原因、曝險與「未經查證」；不得
 建立 lead／pq1／pq2、不得寫 Engine A／C／D authority，深入研究必須另走 lead-intake。
 
@@ -162,6 +163,10 @@ prepare 前先把「graph delta 涵蓋哪些公司」與「完成後唯一要建
 
 一般 event／scheduled trigger 仍回 pq1；只有 `trace_requires_user=true` 才由 `todo sync` 建立
 `source_trace_review`。其 `go` 只 dispatch exact lead 回 pq1，不接受 claim、不提高 tier，也不授權付費。
+`trace_next_trigger` 只做人類說明；可執行 linkage 使用
+`trace_trigger_kind=related_entity_signal`＋`trace_trigger_entities`。同標的新 lead 通過 triage 時會留下
+triggering lead receipt 並重排不需人工 authority 的 exact parked trace；沒有共同具名 ticker／company_id
+時不得靠語意自動喚醒。
 
 brief 的 pq1 進度不得只寫「park」或只列數量。每一筆本輪處理的 `parked` lead 至少列：完整主詞／ticker、
 `parked_reason`（自然語言）、`trace_status`、`trace_next_trigger`、`trace_requires_user`，以及「是否產生
@@ -240,11 +245,14 @@ TL;DR：最大化約 30 年後 `retirement_net_terminal_wealth`；technical 只�
 本輪可評估上限：<同一主路徑經 technical 節奏與 risk caps 後的 ceiling；不是下單金額>
 未動用貸款額度：<amount／已借款／估計利息／terms status；明標不算自有現金、未納入本輪上限>
 貸款投入：不在例行提醒內；提款時間表未建立，仍為 manual_review_required
-| 標的 | 系統動作 | 一句 TL;DR（燈號＋RSI 水位＋1／5／20 日變化＋距高點／趨勢或回檔） | 今日節奏／資本限制 |
-|---|---|---|---|
-| QQQ | HOLD | ⚪ RSI 43.2（弱／中性）；… | 0%；… |
-| SOXX | CONTRIBUTE REVIEW | 🟢 RSI 42.5（弱／中性）；… | 25%；上限 … |
-| DRAM | PAUSE CONTRIBUTION | 🔴 資料不足；… | 暫停新增 |
+| 標的 | 系統動作 | 一句 TL;DR（燈號＋RSI 水位＋1／5／20 日變化＋距高點／趨勢或回檔） | 例行投入排程 | Signal 加碼（未驗證） | 今日資本限制 |
+|---|---|---|---|---|---|
+`例行投入排程` 顯示是否到每 5 個完整交易日的人工評估日與 baseline pace；`Signal 加碼` 只顯示
+baseline 以上增量（沒有就寫 `+0%`）；`今日資本限制` 才能放 supported range 與 hard blockers。
+冷卻／排序不是資本限制。所有 pace 都要標明是該 sleeve 單輪 campaign budget 比例，不是 NAV 比例。
+| QQQ | HOLD | ⚪ RSI 43.2（弱／中性）；… | 距下次 4 個完整交易日；baseline 25% 單輪預算 | +0%（未驗證） | 今日非評估日；資本上限未啟用 |
+| SOXX | CONTRIBUTE REVIEW | 🟢 RSI 42.5（弱／中性）；… | 本期已到；baseline 25% 單輪預算 | +25% 單輪預算（未驗證） | 上限 …；硬限制 … |
+| DRAM | PAUSE CONTRIBUTION | 🔴 資料不足；… | 行情不可用；baseline 暫停 | 不可用 | 上限 0；硬限制技術資料不足 |
 
 ## 低優先（摺疊）
 EDGAR Form 4 ×55、較舊 filing——預設摺疊只列數量（要看再展開）

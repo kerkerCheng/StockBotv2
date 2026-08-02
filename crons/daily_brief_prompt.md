@@ -125,7 +125,7 @@ TL;DR：<約 30 年後 retirement_net_terminal_wealth 目標；今日哪些標�
 自有現金可部署：<Portfolio CASH − cash floor；Alpha／Beta 共用>
 本輪可評估上限：<同一主路徑經 technical 節奏與 risk caps 後的 ceiling；不是下單金額>
 未動用貸款額度：<另列已借款與估計利息；明標不算自有現金、未納入本輪上限；不在例行提醒內，貸款投入仍 manual_review_required>
-<先列需要人工判斷，再用表格逐列列出主力 QQQ／TQQQ／LON:VWRA／SOXX／00631L.TW／2330.TW／00981A.TW；欄位固定為「標的｜系統動作｜一句 TL;DR｜今日節奏／資本限制」。系統動作只能用 `CONTRIBUTE REVIEW`（可新增評估，不是買進）、`HOLD`（維持／等待）、`PAUSE CONTRIBUTION`（暫停新增）。每列 TL;DR 必須包含 🟢可評估／🟡冷卻／⚪觀察／🔴資料不足文字燈號、RSI 所在區間（<30 超賣區、30–50 弱／中性、50–70 偏強、>70 過熱；僅解讀、不代表買賣）、1／5／20 日漲跌、距高點或趨勢／回檔判讀。不得只列 raw 數字；個股與其他仍可縮成摘要，但每檔保留一列焦點>
+<先列需要人工判斷，再用表格逐列列出主力 QQQ／TQQQ／LON:VWRA／SOXX／00631L.TW／2330.TW／00981A.TW；欄位固定為「標的｜系統動作｜一句 TL;DR｜例行投入排程｜Signal 加碼（未驗證）｜今日資本限制」。例行欄顯示是否到每 5 個完整交易日的人工評估日與 baseline pace；Signal 欄只顯示 baseline 以上增量，無增量明寫 +0%；資本欄才放 supported range 與 hard blockers，冷卻／排序不得放成資本限制。pace 必須說明是該 sleeve 單輪 campaign budget 比例。系統動作只能用 `CONTRIBUTE REVIEW`（可新增評估，不是買進）、`HOLD`（維持／等待）、`PAUSE CONTRIBUTION`（暫停新增）。每列 TL;DR 必須包含 🟢可評估／🟡冷卻／⚪觀察／🔴資料不足文字燈號、RSI 所在區間（<30 超賣區、30–50 弱／中性、50–70 偏強、>70 過熱；僅解讀、不代表買賣）、1／5／20 日漲跌、距高點或趨勢／回檔判讀。不得只列 raw 數字；個股與其他仍可縮成摘要，但每檔保留一列焦點>
 
 ## 健康／資料降級
 <本次 harvest、Engine C、beta technical、Neo4j、Sheet 的失敗或缺口；無則寫正常>
@@ -139,7 +139,7 @@ TL;DR：<約 30 年後 retirement_net_terminal_wealth 目標；今日哪些標�
 Codex desktop 若支援 inline mobile visualization，Beta 區依「自有現金可部署／本輪可評估上限／未動用
 貸款額度 → 風險燈號 → 標的燈號」層級呈現；不支援時輸出等價 Markdown。不得輸出模糊的「名目槓桿」：
 內部 `nominal_weight` 顯示為「槓桿 ETF 資金占比」，乘上 2x／3x 的 `effective_weight` 顯示為
-「換算槓桿曝險」。不得用未解釋的斜線並列兩個 cash view。
+「換算槓桿曝險」。Issuer look-through coverage 為 partial 時顯示「已知至少 X%」。不得用未解釋的斜線並列兩個 cash view。
 
 即使無新事項，也輸出 `NO ACTION + 日期` 心跳。Daily brief 不另存 report；稽核由 todo log、leads
 狀態機、Decision Store 與窄 state commit 承擔。

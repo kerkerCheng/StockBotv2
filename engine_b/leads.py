@@ -304,6 +304,21 @@ def advance(
         raise LeadStateError(f"未知狀態：{to_status}")
     cleaned_ref = validate_ref_updates(ref) if ref else {}
     lead = _require(store, lead_id)
+    if (
+        to_status == "parked"
+        and cleaned_ref.get("trace_next_trigger")
+        and str(cleaned_ref.get("trace_requires_user") or "").lower()
+        not in {"1", "true", "yes"}
+    ):
+        # trace_next_trigger 保留給人讀；真正的 routine linkage 使用封閉 kind
+        # 與確定性 entities。新 related signal 只把它排回 bounded pq1，不提高
+        # evidence tier，也不放寬 graph admission。
+        from engine_b.entities import lead_entities
+
+        entities = sorted(lead_entities(lead))
+        if entities:
+            cleaned_ref.setdefault("trace_trigger_kind", "related_entity_signal")
+            cleaned_ref.setdefault("trace_trigger_entities", entities)
     current = lead["status"]
     if to_status not in ALLOWED_TRANSITIONS[current]:
         raise LeadStateError(f"非法轉移：{current} → {to_status}")
@@ -523,14 +538,86 @@ def triage(
         if (priority_flags or {}).get(key)
     }
     lead["status"] = target
+    stamp = decided_at or _now()
     lead["triage"] = {
         "decision": "go" if go else "no_go",
         "tier": int(tier),
         "reason": reason.strip(),
-        "decided_at": decided_at or _now(),
+        "decided_at": stamp,
         "priority_flags": flags,
     }
+    if go:
+        requeued = _requeue_related_trace_backlog(
+            store,
+            event_lead_id=lead_id,
+            event_at=stamp,
+        )
+        if requeued:
+            # receipt 掛在觸發 lead 的 triage 上，讓 routine 能說明本次額外
+            # pq1 jobs 從哪個 event 來；它不是 claim／graph authority。
+            lead["triage"]["related_trace_requeues"] = requeued
     return lead
+
+
+def _requeue_related_trace_backlog(
+    store: dict[str, Any],
+    *,
+    event_lead_id: str,
+    event_at: str,
+) -> list[str]:
+    """新 triage PASS lead 以具名標的喚醒相關 trace backlog。
+
+    只處理不需要人工 access／付費的 parked trace；自然語言
+    ``trace_next_trigger`` 是人類說明，機器判斷只靠共用 ticker／company_id。
+    """
+
+    from engine_b.entities import lead_entities
+
+    event_lead = _require(store, event_lead_id)
+    event_entities = lead_entities(event_lead)
+    if not event_entities:
+        return []
+    requeued: list[str] = []
+    for candidate_id, candidate in list(store["leads"].items()):
+        if candidate_id == event_lead_id or candidate.get("status") != "parked":
+            continue
+        refs = candidate.get("refs") or {}
+        trace_status = str(refs.get("trace_status") or "").strip()
+        parked_reason = str(refs.get("parked_reason") or "").strip()
+        if not trace_status and "trace" not in parked_reason.lower():
+            continue
+        if trace_status in {"original_obtained", "tier_1_2_honest_passthrough"}:
+            continue
+        if str(refs.get("trace_requires_user") or "").lower() in {"1", "true", "yes"}:
+            continue
+        trigger_kind = str(refs.get("trace_trigger_kind") or "").strip()
+        if trigger_kind and trigger_kind != "related_entity_signal":
+            continue
+        # 新格式直接讀 frozen trigger entities；舊 backlog 若只有自然語言 trigger，
+        # 以 lead 自身確定性 entities 做 lazy migration，避免永遠沉底。
+        trigger_entities = set(refs.get("trace_trigger_entities") or ())
+        if not trigger_entities and refs.get("trace_next_trigger"):
+            trigger_entities = lead_entities(candidate)
+        shared = sorted(event_entities & trigger_entities)
+        if not shared:
+            continue
+        requeue_trace(
+            store,
+            candidate_id,
+            trigger=f"related_triaged_lead:{event_lead_id}",
+            reason=(
+                f"新 triage PASS lead {event_lead_id} 與 parked trace 共用具名標的 "
+                f"{', '.join(shared)}；事件觸發 bounded pq1 重查"
+            ),
+            requeued_at=event_at,
+        )
+        candidate.setdefault("refs", {}).update({
+            "trace_trigger_kind": "related_entity_signal",
+            "trace_trigger_entities": sorted(trigger_entities),
+            "trace_trigger_event_ref": f"lead:{event_lead_id}",
+        })
+        requeued.append(candidate_id)
+    return sorted(requeued)
 
 
 def record_run(

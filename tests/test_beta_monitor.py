@@ -418,9 +418,19 @@ def test_self_funded_routine_reminder_uses_full_session_count_not_signal() -> No
     assert cooldown["routine_reminder"]["due"] is False
     assert cooldown["routine_reminder"]["sessions_until_next"] == 4
     assert all(item["action"] != "CONTRIBUTE REVIEW" for item in cooldown["items"])
+    qqq = next(item for item in cooldown["items"] if item["ticker"] == "QQQ")
+    assert qqq["routine_schedule"]["sessions_until_next"] == 4
+    assert qqq["signal_add_on"]["incremental_pace"] == 0.0
+    assert qqq["capital_constraints"]["status"] == "not_open_today"
+    assert qqq["capital_constraints"]["hard_blockers"] == []
+    assert "routine_review_cooldown" in qqq["blockers"]
     rendered = render_beta_monitor_markdown(due)
     assert "每 5 個完整交易日一次的自有現金評估本期已到" in rendered
     assert "貸款不在本提醒內" in rendered
+    cooldown_rendered = render_beta_monitor_markdown(cooldown, risk_view="full")
+    assert "| 例行投入排程 | Signal 加碼（未驗證） | 今日資本限制 |" in cooldown_rendered
+    assert "今日非評估日；資本上限未啟用" in cooldown_rendered
+    assert "+0%（未觸發；未驗證）" in cooldown_rendered
 
 
 def test_known_tsmc_concentration_warns_without_pausing_additions() -> None:
@@ -459,6 +469,8 @@ def test_known_tsmc_concentration_warns_without_pausing_additions() -> None:
     assert exposure["total_weight"] == pytest.approx(0.36)
     assert exposure["direct_weight"] == pytest.approx(0.36)
     assert "issuer_concentration_warning:TSMC" in report["warnings"]
+    rendered = render_beta_monitor_markdown(report, risk_view="full")
+    assert "TSMC：總曝險 已知至少 36.0%" in rendered
 
 
 def test_drawn_debt_is_separate_from_etf_leverage_and_combined() -> None:

@@ -173,6 +173,74 @@ def test_triage_only_from_pending() -> None:
         leads.triage(store, lead_id, go=True, tier=2, reason="再一次")
 
 
+def test_related_triaged_lead_requeues_machine_linked_trace_backlog() -> None:
+    store = leads.empty_store()
+    parked_id, _ = leads.register(
+        store,
+        source="x:old",
+        url="https://x.com/old/status/trace",
+        title="Waiting for $AXTI primary source",
+    )
+    leads.triage(store, parked_id, go=True, tier=4, reason="需要追原文")
+    leads.advance(store, parked_id, "parked", ref={
+        "parked_reason": "目前只有 tier 3 轉述",
+        "trace_status": "isolated_tier_3",
+        "trace_next_trigger": "下一份 AXT filing 或一手文件",
+        "trace_requires_user": "false",
+    })
+    assert store["leads"][parked_id]["refs"]["trace_trigger_kind"] == (
+        "related_entity_signal"
+    )
+
+    event_id, _ = leads.register(
+        store,
+        source="edgar:AXTI",
+        url="https://www.sec.gov/Archives/edgar/data/axt/new-filing",
+        title="AXTI 8-K",
+    )
+    event = leads.triage(
+        store,
+        event_id,
+        go=True,
+        tier=1,
+        reason="一手 filing，值得追源",
+        decided_at="2026-08-02T00:00:00+00:00",
+    )
+
+    parked = store["leads"][parked_id]
+    assert parked["status"] == "triaged_go"
+    assert parked["refs"]["trace_requeue_trigger"] == (
+        f"related_triaged_lead:{event_id}"
+    )
+    assert parked["refs"]["trace_trigger_event_ref"] == f"lead:{event_id}"
+    assert event["triage"]["related_trace_requeues"] == [parked_id]
+
+
+def test_related_signal_never_bypasses_trace_requiring_user() -> None:
+    store = leads.empty_store()
+    parked_id, _ = leads.register(
+        store,
+        source="x:old",
+        url="https://x.com/old/status/paywall-axti",
+        title="$AXTI paywalled report",
+    )
+    leads.triage(store, parked_id, go=True, tier=4, reason="需要合法 access")
+    leads.advance(store, parked_id, "parked", ref={
+        "parked_reason": "需使用者提供合法 access",
+        "trace_status": "isolated_tier_3",
+        "trace_next_trigger": "取得合法報告全文",
+        "trace_requires_user": "true",
+    })
+    event_id, _ = leads.register(
+        store,
+        source="edgar:AXTI",
+        url="https://www.sec.gov/Archives/edgar/data/axt/other",
+    )
+    leads.triage(store, event_id, go=True, tier=1, reason="新 filing")
+
+    assert store["leads"][parked_id]["status"] == "parked"
+
+
 def test_campaign_requeue_preserves_prior_triage_receipt() -> None:
     store = leads.empty_store()
     lead_id, _ = leads.register(
