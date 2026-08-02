@@ -169,6 +169,7 @@ def _normalize_financial(
         "fetched_at": payload["fetched_at"],
         "source": payload["source"],
         "checklist": checklist,
+        "observations": deepcopy(payload.get("observations") or {}),
         "runway": runway,
         "blockers": (
             ([] if status == "available" else ["financial_stale"])

@@ -315,6 +315,42 @@ def test_context_builds_canonical_reference_index_from_frozen_authorities(
         store.close()
 
 
+def test_non_gate_manual_observations_reach_the_reference_index(
+    tmp_path: Path,
+) -> None:
+    """非 gate 的人工觀測必須傳到凍結 context，否則寫了也沒有軸能引用。
+
+    _normalize_financial 曾漏傳 observations，使 Engine C 的或有請求權、監管依賴等
+    欄位靜默無法被 Confidence 軸引用——寫入成功、reference index 卻沒有它。
+    """
+    store = _store(tmp_path)
+    inputs = complete_inputs()
+    inputs["financial"]["observations"] = {
+        "contingent_liquidity_claims": {
+            "status": "manual_reviewed",
+            "value": "redemption right disclosed",
+            "source": "fixture://contingent-claims",
+            "authorities": ["engine_c_financial", "engine_c_manual"],
+        },
+    }
+    try:
+        bundle = build_context_bundle(
+            store,
+            cohort_id=_cohort(store, "extended-observations"),
+            evaluation_at=NOW,
+            policy_version="probe-v1",
+            **inputs,
+        )
+
+        financial = bundle.payload["financial"]
+        assert "contingent_liquidity_claims" in financial["observations"]
+
+        entry = bundle.payload["reference_index"]["fixture://contingent-claims"]
+        assert entry["authorities"] == ["engine_c_financial", "engine_c_manual"]
+    finally:
+        store.close()
+
+
 def test_secret_bearing_external_payload_is_rejected_before_persistence(
     tmp_path: Path,
 ) -> None:
