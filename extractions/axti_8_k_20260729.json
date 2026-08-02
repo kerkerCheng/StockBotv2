@@ -1,0 +1,148 @@
+{
+  "claims": [
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Downgrade if AXT or Lumentum later discloses rescission, termination, material narrowing, or if the full agreement in AXT's Q3 2026 10-Q materially changes the disclosed capacity-reservation terms.",
+      "id": "axti_8_k_20260729_cl1",
+      "source_ids": [
+        "axti_8_k_20260729_s1",
+        "axti_8_k_20260729_s2",
+        "axti_8_k_20260729_s7"
+      ],
+      "statement": "AXT and Lumentum Operations LLC entered an InP wafer-substrate Capacity Reservation Agreement on 2026-07-26; AXT agreed to reserve Lumentum's minimum annual Product Capacity for six years, support additional required capacity, and allow one-year renewals.",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Downgrade if the full agreement or a later filing cancels or materially changes either deposit, its timing, or its application as shipment credits.",
+      "id": "axti_8_k_20260729_cl2",
+      "source_ids": [
+        "axti_8_k_20260729_s3",
+        "axti_8_k_20260729_s4",
+        "axti_8_k_20260729_s7"
+      ],
+      "statement": "Lumentum agreed to two US$43.5 million deposits for the Product Capacity reservation; the first is due within 30 business days, the second's timing and terms remain to be determined in calendar year 2028, and deposits are applied as shipment credits rather than recognized revenue by default.",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Downgrade if the full agreement or a later filing materially narrows the shortfall, breach, or refund remedies, or if the agreement is terminated before the stated period.",
+      "id": "axti_8_k_20260729_cl3",
+      "source_ids": [
+        "axti_8_k_20260729_s5",
+        "axti_8_k_20260729_s6",
+        "axti_8_k_20260729_s7"
+      ],
+      "statement": "Subject to disclosed exceptions, Lumentum is responsible for annual purchase shortfalls; AXT's uncured failure to deliver minimum annual capacity can require refund of unapplied deposit amounts. These remedies do not establish sole-source, exclusivity, qualification status, realized shipment volume, or realized revenue.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "co:lumentum",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "axti_8_k_20260729_s1",
+        "axti_8_k_20260729_s2"
+      ],
+      "src_id": "co:axt"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "AXT Inc.",
+        "AXTI",
+        "AXT-Tongmei"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:axt",
+      "name": "AXT",
+      "role": "material_base",
+      "source_ids": [
+        "axti_8_k_20260729_s1",
+        "axti_8_k_20260729_s2",
+        "axti_8_k_20260729_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "Lumentum Operations LLC",
+        "Lumentum",
+        "LITE"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:lumentum",
+      "name": "Lumentum",
+      "role": "bottleneck_supplier",
+      "source_ids": [
+        "axti_8_k_20260729_s1",
+        "axti_8_k_20260729_s2",
+        "axti_8_k_20260729_s3"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "axti_8_k_20260729",
+    "evidence_tier": 1,
+    "origin_entity": "AXT",
+    "permission_basis": "SEC EDGAR public filing; store the canonical URL and only the research-relevant Item 1.01 excerpt.",
+    "published_at": "2026-07-29",
+    "publisher": "SEC EDGAR",
+    "retrieved_at": "2026-08-01",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "AXT Form 8-K — Lumentum Capacity Reservation Agreement for InP wafer substrates",
+    "url": "https://www.sec.gov/Archives/edgar/data/1051627/000143774926024883/axti20260715_8k.htm"
+  },
+  "sources": [
+    {
+      "id": "axti_8_k_20260729_s1",
+      "locator": "Item 1.01, first paragraph",
+      "quote": "On July 26, 2026, AXT Inc. ... and Lumentum Operations LLC ... entered into a Capacity Reservation Agreement ... for the supply and capacity reservation of indium phosphide (\"InP\") wafer substrates."
+    },
+    {
+      "id": "axti_8_k_20260729_s2",
+      "locator": "Item 1.01, first paragraph",
+      "quote": "AXT has agreed to reserve a minimum annual commitment of the Products by Lumentum ... for a six (6) year period beginning upon entry into the Agreement and to support any additional capacity that may be required."
+    },
+    {
+      "id": "axti_8_k_20260729_s3",
+      "locator": "Item 1.01, second paragraph",
+      "quote": "Lumentum has agreed to pay AXT (i) an initial deposit of $43,500,000, due within thirty (30) business days after entry into the Agreement, and (ii) a second deposit of $43,500,000, with the timing and terms surrounding payment to be subsequently determined during calendar year 2028."
+    },
+    {
+      "id": "axti_8_k_20260729_s4",
+      "locator": "Item 1.01, second paragraph",
+      "quote": "The deposits shall be applied as shipment credits towards the purchase of the Products, until such deposit is exhausted."
+    },
+    {
+      "id": "axti_8_k_20260729_s5",
+      "locator": "Item 1.01, second paragraph",
+      "quote": "Lumentum shall be responsible for the shortfall between the Annual Purchase Commitment and the quantity actually purchased."
+    },
+    {
+      "id": "axti_8_k_20260729_s6",
+      "locator": "Item 1.01, second paragraph",
+      "quote": "failure to deliver the minimum annual Product Capacity by AXT shall constitute a material breach ... AXT will be required to refund to Lumentum the portion of deposit ... not previously been applied as shipment credits."
+    },
+    {
+      "id": "axti_8_k_20260729_s7",
+      "locator": "Item 1.01, final paragraph",
+      "quote": "The foregoing description of the Agreement does not purport to be complete ... the full text of the Agreement ... will be filed as an exhibit ... for the period ended September 30, 2026."
+    }
+  ]
+}

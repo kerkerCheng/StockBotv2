@@ -1,0 +1,10 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1051627/000143774926024883/axti20260715_8k.htm
+
+Excerpt:
+Item 1.01 research excerpt:
+- On 2026-07-26, AXT and Lumentum Operations LLC entered a Capacity Reservation Agreement for InP wafer substrates.
+- AXT reserves a minimum annual capacity commitment for six years, renewable in one-year periods.
+- Lumentum agreed to an initial US$43.5 million deposit due within 30 business days and a second US$43.5 million deposit whose timing and terms are to be determined in 2028; deposits become shipment credits.
+- Annual purchase shortfalls and AXT delivery failures carry contractual remedies, subject to disclosed exceptions.
+- The full agreement is expected as an exhibit to AXT's Q3 2026 Form 10-Q.
+Boundary: AXT issuer disclosure alone does not establish sole source, exclusivity, qualification, realized shipments, or recognized revenue.
