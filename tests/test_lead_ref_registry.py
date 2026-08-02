@@ -19,6 +19,13 @@ ROOT = Path(__file__).resolve().parent.parent
 
 
 def test_shipped_registry_covers_every_existing_authority_key() -> None:
+    """既有資料裡出現過的每個 ref key 都必須已登記。
+
+    刻意不斷言 key 的精確數量：用已登記的 key 寫 metadata 是日常操作，
+    只要有 lead 第一次用到某個既有 key，distinct 數就會變，硬編碼的計數
+    因此會在完全正常的使用下誤報，而它並不比覆蓋關係多擋任何東西
+    （寫入端另有 validate_ref_updates 當第一道攔截）。
+    """
     registry = get_lead_ref_registry()
     store = json.loads(
         (ROOT / "library" / "leads" / "pending_leads.json").read_text(encoding="utf-8")
@@ -28,9 +35,11 @@ def test_shipped_registry_covers_every_existing_authority_key() -> None:
         for lead in store["leads"].values()
         for key in (lead.get("refs") or {})
     }
-    assert len(existing) == 56, "新增歷史鍵時必須同步登記用途"
-    assert existing <= set(registry.keys)
-    assert len(registry.keys) >= 56
+    assert existing, "應至少讀到一個既有 ref key"
+    unregistered = sorted(existing - set(registry.keys))
+    assert not unregistered, (
+        f"未登記的 ref key：{unregistered}；請先在 config/lead_ref_keys.json 登記用途"
+    )
 
 
 def test_unknown_key_is_rejected_with_nearest_registered_name() -> None:
