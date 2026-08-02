@@ -1146,15 +1146,18 @@
       "added_at": "2026-08-01T16:06:19.781609+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_8e6917ab2c5d2438eed27876132f3cd9",
+      "dispatch_receipt": "decision:pd_0a0b28a84859817afabaafa9f1411298",
       "dispatch_ref": "wo_dc79ed71de333dade7e3d3dff89de9d4",
-      "dispatch_status": "queued",
+      "dispatch_status": "completed",
+      "dispatch_updated_at": "2026-08-02T22:45:30.150655+00:00",
       "dispatched_at": "2026-08-02T02:15:41.990193+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 79,
-      "reason": null,
+      "reason": "dispatch baseline pd_8e6917ab2c5d2438eed27876132f3cd9 的 disproof_missing 已由較新 decision 補齊；驗證 receipt 後完成，未建立重複 decision。",
+      "receipt": "decision:pd_0a0b28a84859817afabaafa9f1411298",
       "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-02T22:45:30.150655+00:00",
       "source": "decision_lab",
       "title": "REVIEW — co:applied_optoelectronics",
       "type": "decision_review"
@@ -1222,6 +1225,25 @@
       "source": "decision_lab",
       "title": "REVIEW — co:meta",
       "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-02T22:42:49.491922+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 84,
+      "reason": null,
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:axt",
+      "type": "decision_review",
+      "waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-08-02T22:42:49.491837+00:00",
+        "trigger": "市場資料問題",
+        "until": null
+      }
     }
   ],
   "log": [
@@ -2504,8 +2526,35 @@
       "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
       "type": "decision_review",
       "verb": "go"
+    },
+    {
+      "at": "2026-08-02T22:45:22.006729+00:00",
+      "n": 79,
+      "reason": "核對同 cohort 較新 immutable decision；已具 catalyst、disproof 與完整五軸 assessment，無需重複追源。",
+      "receipt": "audit:pd_0a0b28a84859817afabaafa9f1411298",
+      "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-08-02T22:45:30.150655+00:00",
+      "n": 79,
+      "reason": "dispatch baseline pd_8e6917ab2c5d2438eed27876132f3cd9 的 disproof_missing 已由較新 decision 補齊；驗證 receipt 後完成，未建立重複 decision。",
+      "receipt": "decision:pd_0a0b28a84859817afabaafa9f1411298",
+      "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
+      "type": "decision_review",
+      "verb": "pq1_completed"
+    },
+    {
+      "at": "2026-08-02T22:45:30.150655+00:00",
+      "n": 79,
+      "reason": "dispatch baseline pd_8e6917ab2c5d2438eed27876132f3cd9 的 disproof_missing 已由較新 decision 補齊；驗證 receipt 後完成，未建立重複 decision。",
+      "receipt": "decision:pd_0a0b28a84859817afabaafa9f1411298",
+      "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
+      "type": "decision_review",
+      "verb": "go"
     }
   ],
-  "next_n": 84,
+  "next_n": 85,
   "schema_version": "1"
 }

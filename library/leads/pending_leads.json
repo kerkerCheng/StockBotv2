@@ -1301,6 +1301,123 @@
       "result": "ok",
       "run_at": "2026-08-01T22:40:03.895543+00:00",
       "source": "edgar:GFS"
+    },
+    {
+      "failure_class": "provider_api_error",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-08-02T22:39:44.344310+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-08-02T22:39:44.877494+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-08-02T22:39:45.292549+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-08-02T22:39:45.696720+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-08-02T22:39:46.121352+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-08-02T22:39:46.559133+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-08-02T22:39:46.978095+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-08-02T22:39:47.419141+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-08-02T22:39:47.852249+00:00",
+      "source": "edgar:GFS"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-08-02T22:40:01.935492+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-02T22:40:03.155830+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-02T22:40:04.146427+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-02T22:40:05.187073+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-02T22:40:07.273214+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-02T22:40:08.260523+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-02T22:40:09.285396+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-02T22:40:10.315562+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-02T22:40:11.256968+00:00",
+      "source": "edgar:GFS"
     }
   ],
   "leads": {
@@ -1832,9 +1949,23 @@
       "first_seen": "2026-07-31T22:40:30.491592+00:00",
       "lead_id": "lead_06a8ab213ca272d827b9843386179945",
       "published_at": "2026-07-31",
-      "refs": {},
+      "refs": {
+        "outcome": "tax_withholding_insider_observation_no_graph_delta",
+        "parked_reason": "SEC 原始 Form 4 顯示 GlobalFoundries director Camilla Languille 因 5,567 RSUs vesting／settlement，由公司代扣 1,671 股履行稅務義務（代碼 F，US$49.02）；不是主動公開市場賣出，也不形成供應鏈 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000200/wk-form4_1785530533.xml",
+        "storage_permission": "repo_excerpt",
+        "trace_attempts_ref": "SEC accession 000170904826000200 原始 XML逐欄核對 reporting owner、code F、shares 與 footnotes",
+        "trace_next_trigger": "後續 Form 4 出現重大主動市場買賣、控制權變動或可量化稀釋事件",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "GFS",
+          "co:globalfoundries"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:GFS",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "GFS 4 filed 2026-07-31",
       "triage": {
@@ -1858,9 +1989,23 @@
       "first_seen": "2026-07-30T22:38:48.776635+00:00",
       "lead_id": "lead_0726807b61154ece1783f363349f1ec1",
       "published_at": "2026-07-30",
-      "refs": {},
+      "refs": {
+        "outcome": "routine_director_rsu_award_no_graph_delta",
+        "parked_reason": "SEC 原始 Form 4 顯示 GlobalFoundries director Camilla Languille 獲授 3,291 個一年後歸屬的 RSUs（代碼 A、價格 0）；屬例行董事薪酬／時變治理 observation，不形成供應鏈 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000183/wk-form4_1785439240.xml",
+        "storage_permission": "repo_excerpt",
+        "trace_attempts_ref": "SEC accession 000170904826000183 原始 XML逐欄核對 reporting owner、RSU grant、vesting 與 footnotes",
+        "trace_next_trigger": "後續 filing 顯示重大治理變更、主動市場交易或可量化稀釋事件",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "GFS",
+          "co:globalfoundries"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:GFS",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "GFS 4 filed 2026-07-30",
       "triage": {
@@ -2302,9 +2447,23 @@
       "first_seen": "2026-07-30T22:38:48.776553+00:00",
       "lead_id": "lead_0b9e021ae81e0515bcf3ac09e3f473a1",
       "published_at": "2026-07-30",
-      "refs": {},
+      "refs": {
+        "outcome": "routine_director_rsu_award_no_graph_delta",
+        "parked_reason": "SEC 原始 Form 4 顯示 GlobalFoundries director David M. Kerko 獲授 3,291 個於 2027-07-28 歸屬的 RSUs（代碼 A、價格 0）；屬例行董事薪酬／時變治理 observation，不形成供應鏈 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000189/xslF345X06/wk-form4_1785439277.xml",
+        "storage_permission": "repo_excerpt",
+        "trace_attempts_ref": "SEC accession 000170904826000189 原始 Form 4逐欄核對 reporting owner、RSU grant、vesting 與 footnotes",
+        "trace_next_trigger": "後續 filing 顯示重大治理變更、主動市場交易或可量化稀釋事件",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "GFS",
+          "co:globalfoundries"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:GFS",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "GFS 4 filed 2026-07-30",
       "triage": {
@@ -3136,9 +3295,31 @@
       "media": [],
       "published_at": "2026-07-29T23:13:55.000Z",
       "raw_text": "Just some takeaways from $META | $MSFT earnings calls:\n\nMicrosoft:\n- Expected to be FCF positive in 2027, despite the increase in capex (extremely positive for AI buildout that it's funded by operating income)\n- \"Free cash flow was $19.6 billion, reflecting higher capital expenditures\"\n- Quartely capex was $41B, roughly 2/3rds were \"short lived assets, primarily CPUs and GPUs\"\n- Expects capex spend will be over $50 billion for next quarter\n- Capex Guidance at ~$175 billion and 2027 capex roughly the same. Spending plans unchanged and in line. \n- \"Extending the estimated useful life of our data centers from 15 to 25 years\"\n- \"We will be among the first cloud providers to deploy next generation rack-scale AI infrastructure based on $AMD Helios and $NVDA Vera Rubin\"\n- \"Customer demand continues to exceed available capacity\"\n\nMeta:\n- Capex $130-$145 billion (narrowed range), from $125B-$145B. \n- Meta is receiving offers at a \"significant premium\" to what they paid for it (compute scarcity, positive for neoclouds like $IREN / $NBIS )\n- Expects significant portion of compute (like the 1 GW DC in El Paso) to develop internal models. \n- Meta has multiple ROI-positive uses for additional compute across its core business (internally, not Meta Compute)\n- \"Finally, we believe that overall industry capacity is going to remain tight for the foreseeable future\" \n- \"The industry has under-built historically for the wave of AI adoption, making existing capacity, including our own, extremely valuable\" - Susan Li\n\nTLDR:\n- $MSFT and $GOOGL largely sustaining AI capex buildout while remaining FCF positive or through operating incomes.\n- $META flags available compute materially below demand at least through 2027. And $MSFT also flags compute demand far exceeds supply. \n- All three hyperscaler capex largely in line with Google hiking capex figures.\n\nAI selloff seems extremely overblown now, hyperscalers continuing capex in line (with Microsoft being FCF positive) or even hiked with $GOOGL. \n\nCompute scarcity is visible throughout every single hyperscaler ER.",
-      "refs": {},
+      "refs": {
+        "outcome": "dated_financial_capacity_observation_no_unique_graph_delta",
+        "parked_reason": "已追回 Microsoft FY2026 Q4 官方逐字稿與 Meta Q2 2026 官方結果；核心內容是 capex、FCF、capacity 與管理層需求展望的時變財務／營運 observation，社群作者的『AI selloff overblown』屬市場判斷，沒有唯一 Engine A graph delta。",
+        "primary_url": "https://www.microsoft.com/en-us/investor/events/fy-2026/earnings-fy-2026-q4",
+        "storage_permission": "repo_excerpt",
+        "trace_attempts_ref": "Microsoft FY2026 Q4 IR transcript 2026-07-29；Meta Q2 2026 official results 2026-07-29；逐項核對 capex、FCF、capacity 與 guidance",
+        "trace_next_trigger": "Microsoft／Meta 後續 10-Q 或 earnings 出現可歸屬於既有 supply-chain edge 的具名供應商／產品 qualification disclosure",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "AMD",
+          "GOOGL",
+          "IREN",
+          "META",
+          "MSFT",
+          "NBIS",
+          "NVDA",
+          "co:google",
+          "co:meta",
+          "co:nvidia"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -13274,6 +13455,57 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/820318/000082031826000013/iivi-20260331.htm"
     },
+    "lead_ad8c109515f1b83e324503669515c95e": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-02T22:40:01.917323+00:00",
+      "lead_id": "lead_ad8c109515f1b83e324503669515c95e",
+      "media": [
+        {
+          "cache": {
+            "bytes": 198328,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_ad8c109515f1b83e324503669515c95e/3_2083760314487824384.jpg",
+            "sha256": "b6092f8fbd0b39e98c10cb8a524076462473cc72b7bd884ef5b197498140385e"
+          },
+          "height": 1237,
+          "media_key": "3_2083760314487824384",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HOsA9z4aYAAN7pf.jpg",
+          "width": 1240
+        },
+        {
+          "cache": {
+            "bytes": 200003,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_ad8c109515f1b83e324503669515c95e/3_2083760314492030976.jpg",
+            "sha256": "b265d119664a78c1e20b1d0959a1cde246cdd149aa5f81895d41bb7a21d73e34"
+          },
+          "height": 1286,
+          "media_key": "3_2083760314492030976",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HOsA9z5akAAK3z_.jpg",
+          "width": 1260
+        }
+      ],
+      "published_at": "2026-08-02T03:42:29.000Z",
+      "raw_text": "Trump announced that US has cancelled its attack on Iran.\n\nAnd that they’ve agreed to the perimeters of a deal to open the Strait and end the nuclear program.\n\nAnyone else feel like they’ve aged a few years in the past 6 months? https://t.co/4PK671c548",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "Trump announced that US has cancelled its attack on Iran. And that they’ve agreed to the perimeters of a deal to open the Strait and end the nuclear program. Anyone else feel like they’ve aged a few years in the past 6 months? https://t.co/4PK671c548",
+      "triage": {
+        "decided_at": "2026-08-02T22:41:46.257366+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "泛地緣政治與市場情緒貼文；未連到現行追蹤公司、產品或供應鏈主題，且只有社群轉述，沒有值得進 pq1 的標的特定可引用 claim。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2083760320062083406"
+    },
     "lead_ad963c03ff79f01c91aa8bc1e924e47f": {
       "entities": {
         "company_ids": [],
@@ -19644,8 +19876,8 @@
   "schema_version": "2",
   "source_state": {
     "x:aleabitoreddit": {
-      "since_id": "2083438823548293140",
-      "updated_at": "2026-08-01T22:39:54.806431+00:00",
+      "since_id": "2083760320062083406",
+      "updated_at": "2026-08-02T22:40:01.935475+00:00",
       "user_id": "1940360837547565056"
     }
   }
