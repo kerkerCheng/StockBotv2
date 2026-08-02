@@ -1,0 +1,89 @@
+{
+  "claims": [
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "Withdraw if Meta issues an erratum or later primary documentation shows that Vistara is not a Meta-developed CXL memory-expander ASIC or does not bridge DDR4 memory to host processors as described.",
+      "id": "meta_vistara_isca_2026_cl1",
+      "source_ids": [
+        "meta_vistara_isca_2026_s1",
+        "meta_vistara_isca_2026_s2"
+      ],
+      "statement": "Meta describes Vistara as an in-house CXL memory-expander ASIC that bridges DDR4 memory to host processors.",
+      "subject_id": "prod:vistara"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "prod:vistara",
+      "id": "e1",
+      "relation": "develops",
+      "source_ids": [
+        "meta_vistara_isca_2026_s1"
+      ],
+      "src_id": "co:meta"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "end_demand",
+      "aliases": [
+        "Meta Platforms"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:meta",
+      "name": "Meta",
+      "role": "adjacent_silicon",
+      "source_ids": [
+        "meta_vistara_isca_2026_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "Vistara ASIC",
+        "Vistara CXL ASIC"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "prod:vistara",
+      "name": "Vistara",
+      "role": null,
+      "source_ids": [
+        "meta_vistara_isca_2026_s1",
+        "meta_vistara_isca_2026_s2"
+      ],
+      "type": "Product"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "meta_vistara_isca_2026",
+    "evidence_tier": 1,
+    "origin_entity": "Meta Platforms",
+    "permission_basis": "Canonical paper is publicly downloadable without login; retain its URL and only short, attributed research excerpts rather than the PDF.",
+    "published_at": "2026-06-29",
+    "publisher": "ISCA 2026",
+    "retrieved_at": "2026-08-02",
+    "source_type": "paper",
+    "storage_permission": "repo_excerpt",
+    "title": "Vistara: Making CXL Real—Full Path from ASIC Design and OS Support to Hyperscale Deployment",
+    "url": "https://aisystemcodesign.github.io/papers/isca26/vistara_camera_ready.pdf"
+  },
+  "sources": [
+    {
+      "id": "meta_vistara_isca_2026_s1",
+      "locator": "PDF p.1, Introduction, lines 73–75",
+      "quote": "we design an in-house CXL ASIC, Vistara"
+    },
+    {
+      "id": "meta_vistara_isca_2026_s2",
+      "locator": "PDF p.3, III.A Memory Subsystem, lines 260–262",
+      "quote": "bridge DDR4 memory to host processors"
+    }
+  ]
+}

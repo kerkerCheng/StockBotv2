@@ -1,0 +1,5 @@
+Source URL: https://aisystemcodesign.github.io/papers/isca26/vistara_camera_ready.pdf
+
+Excerpt:
+PDF p.1: we design an in-house CXL ASIC, Vistara
+PDF p.3: bridge DDR4 memory to host processors
