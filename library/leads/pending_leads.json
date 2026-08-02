@@ -14321,6 +14321,7 @@
       "refs": {
         "original_claim_status": "q2_metrics_supported_generic_demand_not_graph_delta",
         "parked_reason": "SEC 原文支持 Q2 2026 revenue、margin、income 與 generic data-center demand；皆屬帶日期財務/市場 observation，沒有新的具名 Engine A relationship",
+        "pq2_ref": "todo-64（2026-08-02 使用者核准）已完成 trace_next_trigger 所指的「Engine C Q2 snapshot 另案核准」：依本 8-K 的 Exhibit 99.1 逐字寫入 Engine C manual observations contingent_liquidity_claims=mo_c89d93307c6daa81a8a7028ba39c729f、dilution=mo_1bdefe6fd5fb78afe72447c689174b12、backlog=mo_7e9e1bbcebdbf50a16ea8549f8eaaf22、regulatory_dependency=mo_538281e70db29d837c0c6e4a906cce10，並產生新 decision receipt decision:pd_78364234e23f6f1deceae00e5662dea6。park 結論不變——本文件仍無 Engine A graph delta，不需入圖。",
         "primary_url": "https://www.sec.gov/Archives/edgar/data/1051627/000143774926025061/axti20260609_8k.htm",
         "research_outcome": "engine_c_observation_candidate_no_graph_delta",
         "research_run": "luna_reviewer_2026-08-02_pq1_10",

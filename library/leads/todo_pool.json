@@ -872,6 +872,13 @@
     },
     {
       "added_at": "2026-07-29T15:16:58.028043+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_c4f127d6aef075a5a30a22610e714e08",
+      "dispatch_receipt": "decision:pd_78364234e23f6f1deceae00e5662dea6",
+      "dispatch_ref": "wo_ad3bcb0304d451c9cf2d8ada1008baaa",
+      "dispatch_status": "completed",
+      "dispatch_updated_at": "2026-08-02T04:21:44.971211+00:00",
+      "dispatched_at": "2026-08-02T04:03:13.528232+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 64,
       "reactivated_at": "2026-08-02T03:19:56.526850+00:00",
@@ -880,10 +887,11 @@
         "type": "decision_evidence_delta",
         "value": "material"
       },
-      "reason": null,
+      "reason": "pq1 completed",
+      "receipt": "decision:pd_78364234e23f6f1deceae00e5662dea6",
       "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-02T04:21:44.971211+00:00",
       "source": "decision_lab",
       "title": "REVIEW — co:axt",
       "type": "decision_review"
@@ -2459,6 +2467,43 @@
       "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
       "type": "decision_review",
       "verb": "event_reactivated"
+    },
+    {
+      "at": "2026-08-02T04:03:13.528232+00:00",
+      "attempt": 1,
+      "n": 64,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_ad3bcb0304d451c9cf2d8ada1008baaa",
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-08-02T04:04:01.259908+00:00",
+      "n": 64,
+      "reason": null,
+      "receipt": "wo_ad3bcb0304d451c9cf2d8ada1008baaa:claude_session_2026-08-02_axt_gap_research",
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-08-02T04:21:44.971211+00:00",
+      "n": 64,
+      "reason": null,
+      "receipt": "decision:pd_78364234e23f6f1deceae00e5662dea6",
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "type": "decision_review",
+      "verb": "pq1_completed"
+    },
+    {
+      "at": "2026-08-02T04:21:44.971211+00:00",
+      "n": 64,
+      "reason": "pq1 completed",
+      "receipt": "decision:pd_78364234e23f6f1deceae00e5662dea6",
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "type": "decision_review",
+      "verb": "go"
     }
   ],
   "next_n": 84,
