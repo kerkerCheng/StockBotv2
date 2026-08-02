@@ -9126,7 +9126,7 @@
         "trace_status": "original_obtained"
       },
       "source": "paper:meta",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {},
       "title": "Vistara: Making CXL Real—Full Path from ASIC Design and OS Support to Hyperscale Deployment",
       "triage": {
@@ -11575,7 +11575,7 @@
         "trace_status": "original_obtained"
       },
       "source": "edgar:AXTI",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {},
       "title": "AXTI 8-K filed 2026-07-29",
       "triage": {

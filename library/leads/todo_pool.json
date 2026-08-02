@@ -1117,18 +1117,31 @@
     },
     {
       "added_at": "2026-08-01T16:06:19.781580+00:00",
+      "completion_authority": {
+        "action_digest": "5ff8fc562c3de899caa8772db45466b64cb38f4a548863c7e13d217089253e4a",
+        "cohort_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+        "commit": "12062ab7b350c212bdf9aee2e12923ad6656e07e",
+        "company_id": "co:axt",
+        "verified_at": "2026-08-02T02:15:24.827873+00:00"
+      },
       "hint": "核准 exact graph delta；Decision handoff：co:axt。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 78,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_83889cf03637953caa587c21f8e97886;digest:5ff8fc562c3de899caa8772db45466b64cb38f4a548863c7e13d217089253e4a;commit:12062ab7b350c212bdf9aee2e12923ad6656e07e;cohort:dc_ab4aa345d1c85b0f3c365a0ec71dad13",
       "ref_id": "ra_83889cf03637953caa587c21f8e97886",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-02T02:15:24.827873+00:00",
       "source": "research_action",
       "title": "AXT–Lumentum 六年 InP substrate capacity reservation",
       "type": "ra_admission"
     },
     {
       "added_at": "2026-08-01T16:06:19.781609+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_8e6917ab2c5d2438eed27876132f3cd9",
+      "dispatch_ref": "wo_dc79ed71de333dade7e3d3dff89de9d4",
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-08-02T02:15:41.990193+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 79,
       "reason": null,
@@ -1173,12 +1186,20 @@
     },
     {
       "added_at": "2026-08-01T16:52:04.597917+00:00",
+      "completion_authority": {
+        "action_digest": "f2cf87eafc3e45e00dcf245c4b40465ed3d6a134e7188c4a9b7dbe6e5ab555f5",
+        "cohort_id": "dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
+        "commit": "f950fd103c01e2219165244eb47580860aebce0d",
+        "company_id": "co:meta",
+        "verified_at": "2026-08-02T02:15:30.666083+00:00"
+      },
       "hint": "核准 exact graph delta；Decision handoff：co:meta。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 82,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_62c5841f8de2c67890cbefb805ba8d77;digest:f2cf87eafc3e45e00dcf245c4b40465ed3d6a134e7188c4a9b7dbe6e5ab555f5;commit:f950fd103c01e2219165244eb47580860aebce0d;cohort:dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
       "ref_id": "ra_62c5841f8de2c67890cbefb805ba8d77",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-02T02:15:30.666083+00:00",
       "source": "research_action",
       "title": "Meta Vistara CXL 記憶體擴充平台（reviewed）",
       "type": "ra_admission"
@@ -2333,6 +2354,34 @@
       "ref_id": "ra_50f3ddb6cfe718afd7e2ef8b0481e686",
       "type": "ra_admission",
       "verb": "pending"
+    },
+    {
+      "at": "2026-08-02T02:15:24.827873+00:00",
+      "n": 78,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_83889cf03637953caa587c21f8e97886;digest:5ff8fc562c3de899caa8772db45466b64cb38f4a548863c7e13d217089253e4a;commit:12062ab7b350c212bdf9aee2e12923ad6656e07e;cohort:dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "ref_id": "ra_83889cf03637953caa587c21f8e97886",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-02T02:15:30.666083+00:00",
+      "n": 82,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_62c5841f8de2c67890cbefb805ba8d77;digest:f2cf87eafc3e45e00dcf245c4b40465ed3d6a134e7188c4a9b7dbe6e5ab555f5;commit:f950fd103c01e2219165244eb47580860aebce0d;cohort:dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
+      "ref_id": "ra_62c5841f8de2c67890cbefb805ba8d77",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-02T02:15:41.990193+00:00",
+      "attempt": 1,
+      "n": 79,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_dc79ed71de333dade7e3d3dff89de9d4",
+      "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
+      "type": "decision_review",
+      "verb": "pq1_queued"
     }
   ],
   "next_n": 83,
