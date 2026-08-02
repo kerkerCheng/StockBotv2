@@ -171,18 +171,67 @@ def test_cross_context_or_wrong_authority_ref_fails_closed(
         store.close()
 
 
-def test_coverage_gate_cannot_be_overridden_by_high_axis_levels(tmp_path: Path) -> None:
+def test_fatal_coverage_gap_cannot_be_overridden_by_high_axis_levels(
+    tmp_path: Path,
+) -> None:
+    """五軸再漂亮，也不能蓋過「連在講哪家公司都不確定」。
+
+    原版只把 status 設成 coverage_pending 而讓 blockers 留空，但真實流程裡
+    status 是由 blockers 推導出來的，這個組合不會出現。改用真實的致命
+    blocker，守的契約不變。
+    """
     store = _store(tmp_path)
     try:
         bundle = _bundle(store)
         pending = _coverage(bundle)
-        pending = CoverageResult(**{**pending.__dict__, "status": "coverage_pending"})
+        pending = CoverageResult(
+            **{
+                **pending.__dict__,
+                "status": "coverage_pending",
+                "blockers": ("identity_unresolved",),
+            }
+        )
 
         result = calculate_probe_limits(bundle, pending, _assessment())
 
         assert result.paper_max_supported_position == 0.0
         assert result.live_supported_range == (0.0, 0.0)
         assert any(
+            item["constraint"] == "coverage_gate" and item["cap_weight"] == 0.0
+            for item in result.constraint_trace
+        )
+    finally:
+        store.close()
+
+
+def test_incomplete_research_reduces_size_instead_of_zeroing_it(
+    tmp_path: Path,
+) -> None:
+    """功課沒做完只降尺寸，不禁止參與。
+
+    等到每一項 coverage 都補齊，alpha 通常已被市場定價完畢；用尺寸承擔
+    不確定性，而不是用 gate 把部位打成零。
+    """
+    store = _store(tmp_path)
+    try:
+        bundle = _bundle(store)
+        pending = _coverage(bundle)
+        pending = CoverageResult(
+            **{
+                **pending.__dict__,
+                "status": "coverage_pending",
+                "blockers": (
+                    "financial_runway_manual_required",
+                    "independent_source_missing",
+                    "counter_path_missing",
+                ),
+            }
+        )
+
+        result = calculate_probe_limits(bundle, pending, _assessment())
+
+        assert result.paper_max_supported_position > 0.0
+        assert not any(
             item["constraint"] == "coverage_gate" and item["cap_weight"] == 0.0
             for item in result.constraint_trace
         )

@@ -117,6 +117,17 @@ brainstorm；範圍大到需要驗收條件才開 plan。brainstorm 用 frontmat
 - 唯一剩餘的**貸款提款時間表**由使用者明確暫緩；目前不預期這麼早手動投入貸款，
   未來若重啟再核准 exact 日期／金額／標的／tranche。glide path 公式亦延後，現況資源尚不構成綁定。
 
+出自 [`2026-08-02-confidence-axes-restructure-requirements.md`](brainstorms/2026-08-02-confidence-axes-restructure-requirements.md)：
+
+- **Confidence 五軸重構為三類（否決／信心／賠率）** — 現行五軸全在問「證據多強」，
+  高度相關又取 min，等於最弱那份文件決定一切；且完全沒有賠率維度，系統只能用
+  「不參與」表達不確定性。提議拆成二元否決類、序數信心類、連續賠率類。
+- 該檔的**最小改動已於 2026-08-02 交付**：coverage blocker 依嚴重度分成「致命（仍歸零）」
+  與「研究不完整（只降尺寸）」，讓 `axis_ceiling` 得以生效。動軸結構前先跑一兩週看樣本
+  品質——若變成可評估的標的其實不值得看，問題在 pq1 選題而不在 gate。
+- 動工前必讀該檔第 6 節：`closed-vocabulary-registry.md` 仍把五軸列為「刻意凍結」，
+  但那個理由已因 `rubric_version` 版本化而失效，需一併更新登記表。
+
 其餘五份 brainstorm 的主體都已交付（見上方表格），保留作需求推導的歷史。
 
 ---

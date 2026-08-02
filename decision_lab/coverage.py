@@ -17,6 +17,44 @@ _CHECKLIST_ITEMS = (
 )
 _EXECUTION_INTENTS = {"research", "paper", "live"}
 
+# Coverage blocker 分兩類，因為它們擋的是完全不同的東西。
+#
+# 「研究還不完整」＝知道在講哪家公司、也有可稽核的骨架，只是功課沒做完。這類
+# 不該歸零資本，該讓 Confidence 的 axis_ceiling 生效——證據不完備就只能小注，
+# 但不是不能參與。等到每一項都補齊，alpha 通常也已經被市場定價完畢。
+#
+# 「連在講什麼都不確定」＝身分無法解析、圖裡沒有這家公司、一份來源都沒有、
+# 財務 authority 掛掉、沒有證偽條件、決策沒有有效期。這類仍然歸零：它們不是
+# 「還沒被證實的好消息」，而是讓整筆決策無法被稽核或事後檢驗的缺陷。
+#
+# 未列入 _INCOMPLETE 的一律當致命處理（fail closed）。新增 blocker 時
+# tests/test_coverage_severity.py 會失敗，強迫做出分類決定而不是預設放行。
+_INCOMPLETE_COVERAGE_BLOCKERS = frozenset(
+    {
+        # 只有當事人來源；證據弱，但主張本身是明確的。
+        "independent_source_missing",
+        # 圖裡還沒有反面路徑。
+        "counter_path_missing",
+        # Engine C 算不出 runway（yfinance 在財報後常暫時缺 FCF）。
+        "financial_runway_manual_required",
+        # 還沒寫催化劑。disproof 是硬性的（L7），catalyst 不是。
+        "catalyst_missing",
+    }
+)
+
+
+def _is_incomplete_research(blocker: str) -> bool:
+    if blocker in _INCOMPLETE_COVERAGE_BLOCKERS:
+        return True
+    # 財務核驗清單五項的各種缺漏：功課沒做完，不是不知道在講誰。
+    return any(blocker.startswith(f"financial_{item}_") for item in _CHECKLIST_ITEMS)
+
+
+def fatal_blockers(blockers: tuple[str, ...]) -> tuple[str, ...]:
+    """回傳應使資本歸零的 blocker；研究不完整的項目不在其中。"""
+
+    return tuple(b for b in blockers if not _is_incomplete_research(b))
+
 
 def apply_execution_intent(
     coverage: CoverageResult, execution_intent: str

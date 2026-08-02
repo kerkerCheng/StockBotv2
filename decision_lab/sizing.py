@@ -9,6 +9,7 @@ from identity.registry import IdentityRegistry, get_registry
 from thesis.investment_policy import PolicyError, load_policy, validate_policy
 
 from .beta_policy import load_beta_policy
+from .coverage import fatal_blockers
 from .models import ContextBundle, CoverageResult, ProbeSizingResult
 from .portfolio_risk import build_portfolio_components
 
@@ -231,7 +232,12 @@ def calculate_probe_limits(
     research_ticker = str(identity.get("research_ticker") or "")
     trace: list[dict[str, Any]] = []
 
-    coverage_cap = probe["single_probe_nav_cap"] if coverage.status == "analyzable" else 0.0
+    # 研究不完整不歸零，只讓 axis_ceiling 生效——用尺寸承擔不確定性，而不是
+    # 用 gate 禁止參與。只有 fatal blocker（見 coverage._INCOMPLETE_COVERAGE_BLOCKERS
+    # 的說明）才把資本打成零。
+    coverage_cap = (
+        0.0 if fatal_blockers(coverage.blockers) else probe["single_probe_nav_cap"]
+    )
     for lane in ("paper", "live"):
         trace.extend(
             [
