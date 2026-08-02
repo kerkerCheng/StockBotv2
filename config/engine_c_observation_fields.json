@@ -1,7 +1,7 @@
 {
   "_comment": "Engine C 人工觀測欄位對照表（階層式：category → field_name）。照 schema/vocab.json 的先例——表的形狀鎖死、字彙留鬆：新增一類財務事實只要在此加一項，不改 Python。engine_c/observation_fields.py 是唯一 loader，set_manual_field 會拒絕未登記的 field_name 以防同義詞漂移。",
   "version": 1,
-  "_gate_contract": "gate_member=true 的五項就是 L9 前置條件 #3 的財務核驗清單，thesis/preconditions.py 依賴它；這五項是凍結契約，新增欄位一律 gate_member=false，否則會讓所有既有標的的 gate_pass 退化。",
+  "_gate_contract": "gate_member=true 的五項就是 L9 前置條件 #3 的財務核驗清單，thesis/preconditions.py 依賴它；這五項是凍結契約，新增欄位一律 gate_member=false，否則會讓所有既有標的的 gate_pass 退化。凍結的是五項的組成，不是取值優先序：auto_source 欄位若存在同名人工觀測，一律以人工觀測為準（checklist._prefer_manual），自動值整包留在 auto_item 供對照。理由是自動值只看得到當期快照，shares_outstanding 每天相同會讓稀釋永遠算成 +0.0%，與財報加權平均股數矛盾（AXT Q2 2026 實為 +45.2%）——gate 不得用已知錯誤的數字通過。",
   "_authority_contract": "authorities 是 Engine D 的 reference index token，決定哪個 Confidence 軸可以引用此欄位（對照 decision_lab/sizing.py 的 AXIS_REFERENCE_AUTHORITIES）：engine_c_financial→financial_resilience；engine_c_manual→financial_resilience；engine_c_customer→commercial_maturity；engine_c_backlog→commercial_maturity；engine_c_valuation→valuation_payoff。",
   "categories": {
     "demand_and_orders": {

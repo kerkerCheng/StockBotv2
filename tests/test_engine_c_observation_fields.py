@@ -9,6 +9,7 @@ contingent_liquidity_claims 被當成兩個欄位，使查詢與引用都失效�
 """
 from __future__ import annotations
 
+import ast
 import json
 from pathlib import Path
 
@@ -61,15 +62,22 @@ def test_gate_fields_match_checklist_items_exactly() -> None:
 
     checklist 的 gate_pass 對 items 全體取 all()，兩邊若漂移，
     registry 就會謊報哪些欄位會影響升格 gate。
+
+    比對走 AST 而非原始碼文字：先前的實作逐行抓行首字串，任何讓 label 或
+    續行落在行首的純格式調整都會被誤判成契約漂移，而真正該擋的是 items
+    鍵集合本身的變化。
     """
-    source = (ROOT / "engine_c" / "checklist.py").read_text(encoding="utf-8")
-    marker = "    items = {\n"
-    start = source.index(marker) + len(marker)
-    block = source[start : source.index("    }", start)]
+    tree = ast.parse((ROOT / "engine_c" / "checklist.py").read_text(encoding="utf-8"))
+    dicts = [
+        node.value
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Assign)
+        and isinstance(node.value, ast.Dict)
+        and any(isinstance(t, ast.Name) and t.id == "items" for t in node.targets)
+    ]
+    assert len(dicts) == 1, "checklist.py 應只有一處 items dict 賦值"
     declared = {
-        line.split('"')[1]
-        for line in block.splitlines()
-        if line.strip().startswith('"')
+        key.value for key in dicts[0].keys if isinstance(key, ast.Constant)
     }
     registry = get_observation_field_registry()
     assert declared == set(registry.gate_field_names)

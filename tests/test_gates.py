@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from engine_c.checklist import _prefer_manual
 from thesis.preconditions import _check_financial_checklist, _check_second_slice
 
 
@@ -125,3 +126,43 @@ def test_financial_gate_passes_only_when_all_five_items_complete(monkeypatch) ->
 
     assert result["ok"] is True
     assert "SIVE.ST" in result["detail"]
+
+
+def test_manual_observation_overrides_misleading_auto_gate_value() -> None:
+    """逐字核對過的人工觀測必須勝過 financial_snapshots 的衍生值。
+
+    shares_outstanding 是當期快照、每天相同，稀釋因此永遠算成 +0.0%；AXT
+    Q2 2026 的財報加權平均股數實際是 +45.2%。自動值不得讓 gate 以錯誤數字通過。
+    """
+    auto_item = {
+        "status": "ok",
+        "value": [("2026-08-02", 65_423_184), ("2026-07-29", 65_423_184)],
+        "shares_change": "+0.0%",
+        "label": "稀釋分析（股數趨勢）",
+    }
+    manual = {
+        "dilution": (
+            "加權平均 diluted 股數由 43,710 千股增至 63,474 千股（+45.2%）",
+            "AXT Form 8-K filed 2026-07-30, Exhibit 99.1",
+        )
+    }
+
+    item = _prefer_manual(auto_item, manual, "dilution", "稀釋分析（股數趨勢）")
+
+    assert item["status"] == "manual_reviewed"
+    assert "+45.2%" in item["value"]
+    assert item["source"] == "AXT Form 8-K filed 2026-07-30, Exhibit 99.1"
+    # 自動值保留供對照，但不得散落成會被誤讀的裸鍵。
+    assert item["auto_item"]["shares_change"] == "+0.0%"
+    assert "shares_change" not in item
+
+
+def test_auto_gate_value_survives_when_no_manual_observation_exists() -> None:
+    auto_item = {"status": "ok", "value": 0.449, "latest": "44.9%", "label": "毛利率趨勢"}
+
+    assert _prefer_manual(auto_item, {}, "gross_margin_trend", "毛利率趨勢") is auto_item
+    assert (
+        _prefer_manual(auto_item, {"gross_margin_trend": ("值", None)},
+                       "gross_margin_trend", "毛利率趨勢")
+        is auto_item
+    )

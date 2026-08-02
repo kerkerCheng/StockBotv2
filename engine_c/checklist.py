@@ -48,6 +48,26 @@ def _manual_status(value: str | None, label: str, source_note: str | None = None
     return {"status": "manual_required", "value": None, "label": label}
 
 
+def _prefer_manual(auto_item: dict, manual: dict, field_name: str, label: str) -> dict:
+    """已逐字核對的人工觀測優先於 financial_snapshots 的衍生值。
+
+    自動值只看得到當期快照，會在真實世界變動時給出錯誤答案：shares_outstanding
+    每天相同，稀釋因此永遠算成 +0.0%，與財報加權平均股數的實際變化矛盾（AXT
+    Q2 2026 為 +45.2%）。有登記的人工觀測代表有人核過一手文件，讓它勝出；
+    自動值整包留在 auto_item，不散落成會被誤讀的裸鍵。
+    """
+    value, source_note = manual.get(field_name, (None, None))
+    if not value or not source_note:
+        return auto_item
+    return {
+        "status": "manual_reviewed",
+        "value": value,
+        "source": source_note,
+        "label": label,
+        "auto_item": auto_item,
+    }
+
+
 def _extended_observations(manual: dict) -> dict:
     """把非 gate 的已登記人工觀測整理成開放讀取表面。
 
@@ -179,6 +199,7 @@ def get_checklist(ticker: str) -> dict:
         oldest = gm_vals[-1][1]
         gm_item["trend"] = "上升" if latest > oldest else ("下滑" if latest < oldest else "持平")
         gm_item["latest"] = f"{latest:.1%}"
+    gm_item = _prefer_manual(gm_item, manual, "gross_margin_trend", "毛利率趨勢（近 4 季）")
 
     # 2. 客戶集中度（人工填入）
     cc_value, cc_source = manual.get("customer_concentration", (None, None))
@@ -198,6 +219,7 @@ def get_checklist(ticker: str) -> dict:
     if dil_item["status"] == "ok" and len(shares) >= 2:
         delta = (shares[0][1] - shares[-1][1]) / shares[-1][1]
         dil_item["shares_change"] = f"{delta:+.1%}"
+    dil_item = _prefer_manual(dil_item, manual, "dilution", "稀釋分析（股數趨勢）")
 
     # 5. 估值壓力
     r0 = snaps[0]
@@ -205,10 +227,12 @@ def get_checklist(ticker: str) -> dict:
         "price": r0[5], "pe_forward": r0[3], "ev_revenue": r0[4],
         "analyst_target_mean": r0[6], "analyst_target_count": r0[7],
     }
+    val_label = "估值壓力（P/E, EV/Rev, 分析師目標價）"
     val_item = _snap_status(
         val_data if any(v is not None for v in val_data.values()) else None,
-        "估值壓力（P/E, EV/Rev, 分析師目標價）"
+        val_label,
     )
+    val_item = _prefer_manual(val_item, manual, "valuation_pressure", val_label)
 
     items = {
         "gross_margin_trend":     gm_item,
