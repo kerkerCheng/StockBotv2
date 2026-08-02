@@ -12238,9 +12238,22 @@
       "first_seen": "2026-07-30T22:38:43.285872+00:00",
       "lead_id": "lead_a0f96bdc5c67066a8eda0bae84f57523",
       "published_at": "2026-07-30",
-      "refs": {},
+      "refs": {
+        "parked_reason": "LITE 2026-07-30 8-K（accession 000162828026051078，事件日 2026-07-27）內容為 Item 5.02 高管異動：Vincent Retort（EVP, Global Reliability & Quality）通知將於 2026-10 退休，並簽兩年顧問合約使既有股權獎勵續行 vesting。與 AXT 的 InP 產能保留協議無關，日期相近純屬巧合。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1633978/000162828026051078/lite-20260727.htm",
+        "research_outcome": "governance_only_no_graph_delta；併帶一項對 AXT 有用的負面結果：Lumentum 並未就 2026-07-26 的 US$43.5M capacity reservation deposit 發布 8-K，顯示該金額對 LITE 規模不構成應報告事件。因此 AXT source_reliability 所缺的客戶端獨立證實不會出現在 LITE 的 8-K，須改等 Lumentum 10-Q 的 commitments／purchase obligations 附註或法說會具名揭露。",
+        "trace_attempts_ref": "SEC EDGAR accession 000162828026051078 全文逐字核對（lite-20260727.htm）",
+        "trace_next_trigger": "Lumentum 下一份 10-Q 的 commitments／purchase obligations 附註，或法說會具名揭露對 AXT 的 InP 產能保留與 deposit",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "LITE",
+          "co:lumentum"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:LITE",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
