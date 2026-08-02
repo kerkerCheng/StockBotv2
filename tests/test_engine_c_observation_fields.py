@@ -15,7 +15,7 @@ from pathlib import Path
 
 import pytest
 
-from engine_c.checklist import _extended_observations
+from engine_c.checklist import _extended_observations, _parse_runway_inputs
 from engine_c.observation_fields import (
     KNOWN_AUTHORITIES,
     ObservationFieldError,
@@ -230,3 +230,47 @@ def test_every_registered_field_is_citable_by_at_least_one_axis() -> None:
             if set(spec.authorities) & set(allowed)
         ]
         assert citable_by, f"{name} 宣告的 authorities {spec.authorities} 沒有任何軸接受"
+
+
+def test_runway_inputs_require_all_three_numbers_and_provenance() -> None:
+    """runway 是除法，部分推導只會給出看似精確的錯誤答案。
+
+    因此三個數值缺一、或缺 source／as_of，一律視為未提供而非部分接受。
+    """
+    complete = json.dumps(
+        {
+            "cash_and_equivalents": 412_167_000,
+            "total_debt": 85_397_000,
+            "free_cash_flow_ttm": -25_000_000,
+            "note": "取自 Q2 10-Q 現金流量表",
+        }
+    )
+
+    parsed = _parse_runway_inputs(complete, "AXT Q2 2026 10-Q", "2026-06-30T00:00:00+00:00")
+    assert parsed == {
+        "cash_and_equivalents": 412_167_000.0,
+        "total_debt": 85_397_000.0,
+        "free_cash_flow_ttm": -25_000_000.0,
+        "source": "AXT Q2 2026 10-Q",
+        "as_of": "2026-06-30T00:00:00+00:00",
+    }
+
+    partial = json.dumps({"cash_and_equivalents": 1, "total_debt": 2})
+    assert _parse_runway_inputs(partial, "src", "2026-06-30") is None
+    assert _parse_runway_inputs("not json at all", "src", "2026-06-30") is None
+    assert _parse_runway_inputs(complete, None, "2026-06-30") is None
+    assert _parse_runway_inputs(complete, "src", None) is None
+    # 布林是 int 的子類，不得被當成金額。
+    bool_value = json.dumps(
+        {"cash_and_equivalents": True, "total_debt": 2, "free_cash_flow_ttm": -1}
+    )
+    assert _parse_runway_inputs(bool_value, "src", "2026-06-30") is None
+
+
+def test_runway_inputs_field_is_registered_and_not_a_gate_member() -> None:
+    registry = get_observation_field_registry()
+    spec = registry.get("runway_inputs")
+
+    assert spec is not None, "runway_inputs 必須登記，否則 set_manual_field 會拒寫"
+    assert spec.gate_member is False
+    assert "engine_c_manual" in spec.authorities

@@ -506,6 +506,11 @@ class DefaultRuntimeProvider:
             "checklist": normalized_checklist,
             "observations": normalized_observations,
         }
+        # yfinance 在財報後常暫時清空 free_cash_flow_ttm。derive_runway 接受人工
+        # 補值並自行驗證 timestamp，但要有人把它帶過來才用得上。
+        manual_runway = baseline.get("manual_runway")
+        if isinstance(manual_runway, Mapping):
+            result["manual_runway"] = dict(manual_runway)
         orders: list[AuthorityWorkOrder] = []
         if not checklist.get("engine_c_available"):
             orders.append(

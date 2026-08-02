@@ -9,6 +9,7 @@ get_checklist(ticker) -> dict
 """
 from __future__ import annotations
 
+import json
 import sys
 from pathlib import Path
 
@@ -254,6 +255,52 @@ def get_checklist(ticker: str) -> dict:
     }
 
 
+_RUNWAY_INPUT_KEYS = ("cash_and_equivalents", "total_debt", "free_cash_flow_ttm")
+
+
+def _parse_runway_inputs(value, source_note, as_of) -> dict | None:
+    """把 runway_inputs 人工觀測轉成 decision_lab.derive_runway 能吃的 payload。
+
+    三個數值缺一即視為未提供：runway 是除法，部分推導只會給出看起來精確的
+    錯誤答案。provenance 沿用該筆觀測自己的 source 與 as_of，讓 decision_lab
+    既有的 timestamp future／stale 檢查照常生效。
+    """
+    if not value or not source_note or not as_of:
+        return None
+    try:
+        payload = json.loads(value)
+    except (TypeError, ValueError):
+        return None
+    if not isinstance(payload, dict):
+        return None
+    numbers = {}
+    for key in _RUNWAY_INPUT_KEYS:
+        raw = payload.get(key)
+        if isinstance(raw, bool) or not isinstance(raw, (int, float)):
+            return None
+        numbers[key] = float(raw)
+    return numbers | {"source": str(source_note), "as_of": str(as_of)}
+
+
+def _fetch_runway_inputs(connection, ticker: str, *, is_pg: bool) -> dict | None:
+    sql = (
+        "SELECT value, source_note, updated_at FROM manual_fields "
+        "WHERE ticker = {ph} AND field_name = 'runway_inputs'"
+    ).format(ph="%s" if is_pg else "?")
+    try:
+        if is_pg:
+            with connection.cursor() as cursor:
+                cursor.execute(sql, (ticker,))
+                row = cursor.fetchone()
+        else:
+            row = connection.execute(sql, (ticker,)).fetchone()
+    except Exception:
+        return None
+    if row is None:
+        return None
+    return _parse_runway_inputs(row[0], row[1], row[2])
+
+
 def get_probe_financial_baseline(ticker: str, *, conn=None) -> dict:
     """回傳 runway 所需的 point-in-time raw scalars，不在 Engine C 算部位。"""
 
@@ -304,13 +351,15 @@ def get_probe_financial_baseline(ticker: str, *, conn=None) -> dict:
         }
         result["status"] = (
             "observed"
-            if all(result[key] is not None for key in (
-                "cash_and_equivalents",
-                "total_debt",
-                "free_cash_flow_ttm",
-            ))
+            if all(result[key] is not None for key in _RUNWAY_INPUT_KEYS)
             else "manual_required"
         )
+        if result["status"] == "manual_required":
+            manual_runway = _fetch_runway_inputs(
+                connection, ticker, is_pg=_use_postgres()
+            )
+            if manual_runway is not None:
+                result["manual_runway"] = manual_runway
         return result
     except Exception:
         return {"ticker": ticker, "status": "unavailable"}

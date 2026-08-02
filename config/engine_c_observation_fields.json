@@ -89,6 +89,15 @@
       "why": "現金與負債快照看不到或有請求權。AXT 的 PE 基金贖回權加 Coherent 可退預付款上限約 US$71.3M，足以把淨現金翻負。"
     },
     {
+      "field_name": "runway_inputs",
+      "category": "liquidity_and_capital",
+      "label": "Runway 輸入值（現金／總債／自由現金流 TTM）",
+      "gate_member": false,
+      "auto_source": "financial_snapshots",
+      "authorities": ["engine_c_financial", "engine_c_manual"],
+      "why": "yfinance 在財報後常暫時清空 free_cash_flow_ttm，runway 因此變成 manual_required 並讓 coverage gate 歸零。decision_lab 的 derive_runway 早就接受並驗證 manual_runway（含 timestamp future／stale 檢查），卻沒有任何地方提供它——這個欄位就是那條缺掉的走廊。value 必須是 JSON 物件，含 cash_and_equivalents、total_debt、free_cash_flow_ttm 三個數值，單位與 financial_snapshots 一致（報表原幣別絕對金額），可另帶 note 說明取自哪一段一手文件；三者缺一即視為未提供，不做部分推導。"
+    },
+    {
       "field_name": "debt_maturity_and_covenants",
       "category": "liquidity_and_capital",
       "label": "債務到期時程與 covenant 條件",

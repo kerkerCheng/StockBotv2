@@ -358,3 +358,40 @@ def test_decision_lab_does_not_import_concrete_current_state_authorities() -> No
             if any(name == prefix or name.startswith(prefix + ".") for name in names for prefix in forbidden):
                 findings.append(f"{path.name}:{names}")
     assert findings == []
+
+
+def test_manual_runway_reaches_the_frozen_financial_snapshot() -> None:
+    """人工補的 runway 輸入值必須一路傳到決策層。
+
+    yfinance 在財報後常暫時清空 free_cash_flow_ttm，runway 因此變成
+    manual_required 並讓 coverage gate 歸零。derive_runway 早就接受
+    manual_runway 並自行驗證 timestamp，但先前沒有任何地方提供它——
+    這個測試守的就是那條走廊。
+    """
+    baseline = _financial() | {
+        "status": "manual_required",
+        "free_cash_flow_ttm": None,
+        "manual_runway": {
+            "cash_and_equivalents": 412.0,
+            "total_debt": 85.0,
+            "free_cash_flow_ttm": -25.0,
+            "source": "fixture://q2-cash-flow-statement",
+            "as_of": "2026-07-20",
+        },
+    }
+    provider = _provider(financial_fetcher=lambda _ticker: baseline)
+    identity = provider.resolve_identity(ticker_hint="SIVE.ST")
+
+    snapshot = provider.snapshot(identity=identity, evaluation_at=NOW)
+
+    assert snapshot.financial["manual_runway"]["free_cash_flow_ttm"] == -25.0
+    assert snapshot.financial["manual_runway"]["source"] == "fixture://q2-cash-flow-statement"
+
+
+def test_absent_manual_runway_does_not_fabricate_the_key() -> None:
+    provider = _provider(financial_fetcher=lambda _ticker: _financial())
+    identity = provider.resolve_identity(ticker_hint="SIVE.ST")
+
+    snapshot = provider.snapshot(identity=identity, evaluation_at=NOW)
+
+    assert "manual_runway" not in snapshot.financial
