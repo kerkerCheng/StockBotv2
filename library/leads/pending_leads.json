@@ -1418,6 +1418,123 @@
       "result": "ok",
       "run_at": "2026-08-02T22:40:11.256968+00:00",
       "source": "edgar:GFS"
+    },
+    {
+      "failure_class": "provider_api_error",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-08-03T22:32:43.639266+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-08-03T22:32:44.242926+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-08-03T22:32:44.671665+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-08-03T22:32:45.090753+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-08-03T22:32:45.495246+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-08-03T22:32:45.899015+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-08-03T22:32:46.321948+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-08-03T22:32:46.763066+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-08-03T22:32:47.186182+00:00",
+      "source": "edgar:GFS"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-08-03T22:33:07.508988+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-03T22:33:08.810108+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-03T22:33:09.915933+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-03T22:33:10.922109+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-03T22:33:12.050051+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-03T22:33:13.085862+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-03T22:33:29.443367+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-03T22:33:30.510874+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-03T22:33:46.489486+00:00",
+      "source": "edgar:GFS"
     }
   ],
   "leads": {
@@ -4164,9 +4281,15 @@
       "first_seen": "2026-07-31T22:40:30.491551+00:00",
       "lead_id": "lead_29afe4c0a51033dc69959a4c05534d55",
       "published_at": "2026-07-31",
-      "refs": {},
+      "refs": {
+        "parked_reason": "SEC Form 4 為 GFS 董事 Rao Bobby Satyadev 的 5,567 股 RSU vesting/settlement 與續存 3,291 股 RSU，非公開市場買賣；屬時變 insider compensation，沒有新的 Engine A 結構主張。",
+        "trace_attempts_ref": "SEC Form 4 filed 2026-07-31；原始文件 gfs_4_20260731.txt",
+        "trace_next_trigger": "同一 insider 後續出現非預排的公開市場買賣、異常集中處分或與 thesis 相關的新揭露",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
       "source": "edgar:GFS",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "GFS 4 filed 2026-07-31",
       "triage": {
@@ -4250,9 +4373,16 @@
       "first_seen": "2026-07-29T22:35:10.288856+00:00",
       "lead_id": "lead_2a55aeb6fff1b9590b520af4daafed47",
       "published_at": "2026-07-29",
-      "refs": {},
+      "refs": {
+        "parked_reason": "SEC 8-K／Exhibit 99.1 已取得：2026 年 6 月季營收 67.22 億美元、GAAP 毛利率 51.7%、遞延收入 24.3 億美元，並給 9 月季營收 81.0 億美元 ±4.0 億美元指引。這些是 Engine C 的帶時戳財務 observation，不應當成 Engine A 結構 edge；本輪沒有需人工 graph admission 的新主張。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/707549/000070754926000033/lrcx_exhibitx991xq4x2026.htm",
+        "trace_attempts_ref": "SEC Form 8-K filed 2026-07-29 與 Exhibit 99.1 已逐字核對",
+        "trace_next_trigger": "若建立 SEC fundamentals ETL、出現結構性產品／客戶／產能揭露，或 Decision gap 明確需要該季數字時再排回 pq1",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
       "source": "edgar:LRCX",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "LRCX 8-K filed 2026-07-29",
       "triage": {
@@ -6804,9 +6934,16 @@
       "first_seen": "2026-08-03T16:17:55.520387+00:00",
       "lead_id": "lead_4a2cf61fdcea8f932c4c115bbc8d98af",
       "published_at": "2026-06-16",
-      "refs": {},
+      "refs": {
+        "intake_commit": "ff6ab216fec3aa24ac70946635f1ee112dc0beb7",
+        "parked_reason": "exact_source_already_user_approved_and_loaded_to_graph_commit_ff6ab216fec3aa24ac70946635f1ee112dc0beb7_no_new_delta",
+        "trace_attempts_ref": "jx_official_2026_06_16_plus_existing_extraction_and_graph_load_commit_ff6ab216",
+        "trace_next_trigger": "jx_reports_actual_capex_site_completion_yield_or_customer_qualification",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
       "source": "official:jx_metals",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -17634,9 +17771,17 @@
       "first_seen": "2026-08-03T16:17:55.809327+00:00",
       "lead_id": "lead_dfb87221b5c2e6ddfc1c91ec3304a051",
       "published_at": "2026-07-13",
-      "refs": {},
+      "refs": {
+        "action_digest": "0751edf7c522abe22fe735ff58dc5c14f2a379866196a6a1fa3b09ba34a3810e",
+        "focus_company_id": "co:axt",
+        "research_action_id": "ra_05f68d361992f99e624ec752abb6fe62",
+        "trace_attempts_ref": "sumitomo_official_2025_ir_deck_plus_2026_midterm_plan",
+        "trace_next_trigger": "sumitomo_official_update_confirms_18bn_or_3.1x",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
       "source": "trendforce:sumitomo",
-      "status": "triaged_go",
+      "status": "action_prepared",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -18549,6 +18694,30 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/820318/000119312526208972/d57080d8k.htm"
+    },
+    "lead_ebe6da3b3c481f0e90ffc1a5c9e58583": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-03T22:33:07.475787+00:00",
+      "lead_id": "lead_ebe6da3b3c481f0e90ffc1a5c9e58583",
+      "media": [],
+      "published_at": "2026-08-03T21:16:45.000Z",
+      "raw_text": "The bears have gone back into hibernation",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "The bears have gone back into hibernation",
+      "triage": {
+        "decided_at": "2026-08-03T22:35:45.495401+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "泛市場情緒：「空頭回去冬眠」未點名任何追蹤公司、產品、技術、事件或可逐字追查數字；關聯性與可引用性兩個硬指標皆不足",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2084388023689679001"
     },
     "lead_ecaab49dd6acfe4163a0128d2f522cb8": {
       "entities": {
@@ -19944,8 +20113,8 @@
   "schema_version": "2",
   "source_state": {
     "x:aleabitoreddit": {
-      "since_id": "2083760320062083406",
-      "updated_at": "2026-08-02T22:40:01.935475+00:00",
+      "since_id": "2084388023689679001",
+      "updated_at": "2026-08-03T22:33:07.508973+00:00",
       "user_id": "1940360837547565056"
     }
   }

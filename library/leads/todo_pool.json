@@ -1218,8 +1218,10 @@
       "added_at": "2026-08-02T02:26:04.627522+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_477223f3a4c9647253b8c440db127979",
+      "dispatch_receipt": "packet:library/private/decision_lab/daily_gap_research_meta_2026-08-04.json",
       "dispatch_ref": "wo_2f362f30db3af87670dab873513a3fed",
-      "dispatch_status": "queued",
+      "dispatch_status": "awaiting_approval",
+      "dispatch_updated_at": "2026-08-03T22:42:56.682384+00:00",
       "dispatched_at": "2026-08-03T01:14:04.295874+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 83,
@@ -1249,6 +1251,49 @@
         "trigger": "市場資料問題",
         "until": null
       }
+    },
+    {
+      "added_at": "2026-08-03T22:36:54.439794+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 85,
+      "reason": null,
+      "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:applied_optoelectronics",
+      "type": "decision_review",
+      "waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-08-03T22:36:54.439666+00:00",
+        "trigger": "執行面 context 缺失／市場資料問題",
+        "until": null
+      }
+    },
+    {
+      "added_at": "2026-08-03T22:43:07.867146+00:00",
+      "hint": "TL;DR：Meta Platforms（META）自研 Vistara CXL memory-expander ASIC 已有一手 ISCA 論文支持內部 production deployment；為補齊 Decision gap，需核准兩筆 Engine C append-only observation。客戶集中：FY2025 10-K 明示 2025–2023 均無單一客戶占營收或應收帳款 10% 以上，但未揭露前三大合計。Backlog：公司未揭露 sales backlog／RPO；Q2 2026 的 US$349.31B 不可取消承諾與 US$14.72B 或有 cloud capacity 是 Meta 對供應商的支出義務，不是客戶訂單、Vistara 外部營收或 commercial proof。成熟度：Vistara 是 Meta 內部 deployed platform，無外售 revenue。go 授權：只 append 這兩筆 exact Engine C manual observations，然後用新 refs 對 baseline pd_477223f3a4c9647253b8c440db127979 做 research-intent reassess；不入圖、不改 thesis、不建立 paper/live、不推定 holdings、choice、fill 或交易。完整 packet：library/private/decision_lab/daily_gap_research_meta_2026-08-04.json",
+      "n": 86,
+      "reason": null,
+      "ref_id": "engine_c_manual:wo_2f362f30db3af87670dab873513a3fed",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "ENGINE C APPROVAL — Meta Platforms（META）customer concentration／backlog",
+      "type": "manual"
+    },
+    {
+      "added_at": "2026-08-03T22:51:40.998736+00:00",
+      "hint": "核准 exact graph delta；Decision handoff：co:axt。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 87,
+      "reason": null,
+      "ref_id": "ra_05f68d361992f99e624ec752abb6fe62",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "Sumitomo Electric official InP substrate capacity plan",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -2568,8 +2613,26 @@
       "ref_id": "dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
       "type": "decision_review",
       "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-08-03T22:38:31.492869+00:00",
+      "n": 83,
+      "reason": null,
+      "receipt": "daily:2026-08-04:meta_gap_research_start",
+      "ref_id": "dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-08-03T22:42:56.682384+00:00",
+      "n": 83,
+      "reason": null,
+      "receipt": "packet:library/private/decision_lab/daily_gap_research_meta_2026-08-04.json",
+      "ref_id": "dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
+      "type": "decision_review",
+      "verb": "pq1_awaiting_approval"
     }
   ],
-  "next_n": 85,
+  "next_n": 88,
   "schema_version": "1"
 }
