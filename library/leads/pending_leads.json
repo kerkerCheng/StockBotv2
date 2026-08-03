@@ -6796,6 +6796,40 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2071961279380791729"
     },
+    "lead_4a2cf61fdcea8f932c4c115bbc8d98af": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-03T16:17:55.520387+00:00",
+      "lead_id": "lead_4a2cf61fdcea8f932c4c115bbc8d98af",
+      "published_at": "2026-06-16",
+      "refs": {},
+      "source": "official:jx_metals",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "InP"
+          ]
+        }
+      },
+      "title": "JX金屬決定 InP 基板大幅擴產：四年最多 1,200 億日圓，產能提升至 FY2025 的 7-10 倍",
+      "triage": {
+        "decided_at": "2026-08-03T16:18:10.033026+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "contradiction": true,
+          "independent_source": true,
+          "novelty": true
+        },
+        "reason": "JX金屬官方新聞稿（tier 1，非當事人 AXT 自報）。逐字：四年最多 1,200 億日圓設備投資、合計先前公告後產能提升至 2025 年度的 7-10 倍、磯原工場加新設常陸那珂據點。直接觸發 axt_inp thesis 的 disproof 條件第 6 條（Sumitomo 或 JX 宣布 InP 擴產），並實質反駁 v3 對 AXT「增量產能關鍵來源」的定位。",
+        "tier": 1
+      },
+      "url": "https://www.jx-nmm.com/newsrelease/2026/20260616_01.html"
+    },
     "lead_4b0defa4e0d88836477e134a919527e8": {
       "entities": {
         "company_ids": [
@@ -10585,10 +10619,11 @@
         "campaign_topic": "photonics",
         "campaign_window_end": "2026-07-29T13:46:25Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
+        "gap": "InP 基板 ASP 漲幅缺乏任何可逐字核對的一手來源。這是分辨 axt_inp thesis「週期 vs 結構」的關鍵缺口，目前無法由公開資料填補；最可能的解答來源是 AXT 自己在 Q3 財報揭露 ASP 貢獻，或下游公司揭露基板成本上升。",
         "research_mode": "delta_only",
-        "research_outcome": "report_not_obtained_no_extraction",
-        "trace_attempts_ref": "nomura_2026-07-06_exact-phrase_and_AXT_IQE_official_search",
-        "trace_next_trigger": "canonical_nomura_report_or_issuer_price_disclosure",
+        "research_outcome": "nomura_original_not_obtained_second_attempt；替代來源全數不合格：BigGo Finance 聚合文（2 吋 US$800→2,300-2,500、6 吋 US$1,400→5,000、現貨>3,000、全球產能 60-75 萬片／需求 260-300 萬片）僅稱 Market data 與 research estimates，無超連結、無註腳、無具名分析師；且其全球產能 60-75 萬片與圖中 gsr 來源的「Sumitomo 一家約 80 萬片」直接矛盾，至少一組數字錯誤。依 source-trace 規則不得採用，ASP 對 2026 Q2 毛利率 44.9% 的貢獻仍為未知。",
+        "trace_attempts_ref": "2026-08-04 第二輪追源（原 nomura_2026-07-06_exact-phrase_and_AXT_IQE_official_search 之後）：(1) grep 自家庫 AXT FY2025 10-K 與 Q1 2026 10-Q，僅有 average selling prices may decline 的風險語言，公司從未揭露任何 InP 漲價；(2) Engine A 既有 gsr_inp_substrate_market_2026_05_16 全文無任何價格欄位；(3) Lumentum Q2/Q3 FY26 逐字稿的 ASP 上升來自 100G→200G lane speed 產品世代升級（2:1 ASP uplift），與上游基板售價無關；(4) web search 未取得 Nomura 原始報告。",
+        "trace_next_trigger": "AXT Q3 2026 財報若揭露 ASP 或單價貢獻；或 Coherent／Lumentum／LandMark／VPEC 任一方揭露 InP 基板採購成本上升；或取得 Nomura 報告 canonical 原文",
         "trace_requires_user": "false",
         "trace_status": "isolated_tier_3"
       },
@@ -17590,6 +17625,39 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2077406548012466390"
+    },
+    "lead_dfb87221b5c2e6ddfc1c91ec3304a051": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-03T16:17:55.809327+00:00",
+      "lead_id": "lead_dfb87221b5c2e6ddfc1c91ec3304a051",
+      "published_at": "2026-07-13",
+      "refs": {},
+      "source": "trendforce:sumitomo",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "InP"
+          ]
+        }
+      },
+      "title": "住友電工 InP 基板擴產上修：180 億日圓，FY2028 產能達 FY2024 的 3.1 倍（TrendForce 轉述日經）",
+      "triage": {
+        "decided_at": "2026-08-03T16:18:10.300388+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "contradiction": true,
+          "novelty": true
+        },
+        "reason": "TrendForce 轉述日經：住友電工 180 億日圓、FY2028 產能達 FY2024 的 3.1 倍，且由 2025-11 公告的 2.4 倍上修。與 JX 同為 axt_inp disproof 條件 6 的觸發事件。tier 3 因係產業媒體轉述，一手為日經與住友官方，pq1 需追回。",
+        "tier": 3
+      },
+      "url": "https://www.trendforce.com/news/2026/07/13/news-sumitomo-electric-to-raise-inp-substrate-expansion-scale-with-jpy-18-billion/"
     },
     "lead_dfb9cfa871bd657c7b4dad52eef691c4": {
       "entities": {
