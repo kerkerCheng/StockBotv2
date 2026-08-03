@@ -14,12 +14,7 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
 
 ## 執行契約
 
-1. 先讀 `AGENTS.md` 與 `skills/daily-brief/SKILL.md`。Codex desktop 執行時，第一個 App 動作必須實際呼叫
-   `codex_app__set_thread_title`，把目前 task 改成 `StockBotv2 Daily Brief — YYYY-MM-DD`（日期取
-   Asia/Taipei 當日），並確認工具回傳成功；只在 brief 內輸出帶日期標題或只說「已更名」不算完成。
-   若工具不可用或呼叫失敗，routine 仍繼續，但健康段落必須列 `title_update_failed` 加上可觀測原因
-   （例如 `App callback timeout／no response`、例外類別、嘗試次數與 `success_receipt=false`）；不得只列裸旗標。
-   確認目前 branch 是 `master`；若不是就停止並回報，不自行切 branch。若 working tree 有與本 routine
+1. 先讀 `AGENTS.md` 與 `skills/daily-brief/SKILL.md`。確認目前 branch 是 `master`；若不是就停止並回報，不自行切 branch。若 working tree 有與本 routine
    無關的使用者變更，保留不碰。
 2. Windows 一律使用專案 interpreter：`.venv\Scripts\python.exe`，不得用 bare `python`。
 3. 依序執行：
@@ -125,7 +120,7 @@ TL;DR：<約 30 年後 retirement_net_terminal_wealth 目標；今日哪些標�
 自有現金可部署：<Portfolio CASH − cash floor；Alpha／Beta 共用>
 本輪可評估上限：<同一主路徑經 technical 節奏與 risk caps 後的 ceiling；不是下單金額>
 未動用貸款額度：<另列已借款與估計利息；明標不算自有現金、未納入本輪上限；不在例行提醒內，貸款投入仍 manual_review_required>
-<先列需要人工判斷，再用表格逐列列出主力 QQQ／TQQQ／LON:VWRA／SOXX／00631L.TW／2330.TW／00981A.TW；欄位固定為「標的｜系統動作｜一句 TL;DR｜例行投入排程｜Signal 加碼（未驗證）｜今日資本限制」。例行欄顯示是否到每 5 個完整交易日的人工評估日與 baseline pace；Signal 欄只顯示 baseline 以上增量，無增量明寫 +0%；資本欄才放 supported range 與 hard blockers，冷卻／排序不得放成資本限制。pace 必須說明是該 sleeve 單輪 campaign budget 比例。系統動作只能用 `CONTRIBUTE REVIEW`（可新增評估，不是買進）、`HOLD`（維持／等待）、`PAUSE CONTRIBUTION`（暫停新增）。每列 TL;DR 必須包含 🟢可評估／🟡冷卻／⚪觀察／🔴資料不足文字燈號、RSI 所在區間（<30 超賣區、30–50 弱／中性、50–70 偏強、>70 過熱；僅解讀、不代表買賣）、1／5／20 日漲跌、距高點或趨勢／回檔判讀。不得只列 raw 數字；個股與其他仍可縮成摘要，但每檔保留一列焦點>
+<先直接回答「今天是否應啟動人工投入評估」，再列一次全局例行日期、自有現金與投組 hard caps。表格逐列比較主力 QQQ／TQQQ／LON:VWRA／SOXX／00631L.TW／2330.TW／00981A.TW；欄位固定為「標的｜系統動作｜每檔 TL;DR（商品自身價格）｜相對結論｜個別例外／上限」。若全部只有 baseline，明說沒有證據可排首選。個別欄只放 freshness、單輪預算、槓桿容量與重疊排序等確實因商品而異的條件。pace 仍須說明是該 sleeve 單輪 campaign budget 比例。系統動作只能用 `CONTRIBUTE REVIEW`（可新增評估，不是買進）、`HOLD`（維持／等待）、`PAUSE CONTRIBUTION`（暫停新增）。每列 TL;DR 必須包含 🟢可評估／🟡冷卻／⚪觀察／🔴資料不足文字燈號、商品自身 RSI、1／5／20 日漲跌、距高點或趨勢／回檔；signal benchmark 與商品不同時須明寫，例如 TQQQ 自身價格但節奏訊號看 QQQ。不得只列 raw 數字；個股與其他仍可縮成摘要，但每檔保留一列焦點>
 
 ## 健康／資料降級
 <本次 harvest、Engine C、beta technical、Neo4j、Sheet 的失敗或缺口；無則寫正常>

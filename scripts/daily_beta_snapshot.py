@@ -21,7 +21,7 @@ except ImportError:
     pass
 
 from decision_lab.beta_monitor import build_beta_monitor, render_beta_monitor_markdown
-from decision_lab.beta_policy import load_beta_policy, unique_benchmarks
+from decision_lab.beta_policy import load_beta_policy, unique_technical_targets
 from decision_lab.portfolio_risk import append_risk_snapshot, read_latest_risk_snapshot
 from engine_c.db import get_conn
 from engine_c.etl_technical import refresh_technical_observations
@@ -78,7 +78,7 @@ def run(
                 "policy_version": resolved_policy["policy_version"],
                 "status": "skipped",
                 "observed_count": 0,
-                "total_count": len(unique_benchmarks(resolved_policy)),
+                "total_count": len(unique_technical_targets(resolved_policy)),
                 "items": [],
             }
         else:
@@ -90,7 +90,7 @@ def run(
                     "policy_version": resolved_policy["policy_version"],
                     "status": "fatal",
                     "observed_count": 0,
-                    "total_count": len(unique_benchmarks(resolved_policy)),
+                    "total_count": len(unique_technical_targets(resolved_policy)),
                     "items": [],
                     "blockers": ["technical_refresh_fatal"],
                 }
@@ -107,7 +107,7 @@ def run(
             for item in refresh.get("items") or []
             if item.get("observation_id") is None
         }
-        for target in unique_benchmarks(resolved_policy):
+        for target in unique_technical_targets(resolved_policy):
             key = target["benchmark_key"]
             if refresh.get("status") == "fatal" or key in failed_in_memory:
                 observations[key] = {

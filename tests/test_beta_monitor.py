@@ -6,7 +6,11 @@ from copy import deepcopy
 import pytest
 
 from decision_lab.beta_monitor import build_beta_monitor, render_beta_monitor_markdown, signal_state
-from decision_lab.beta_policy import load_beta_policy, unique_benchmarks
+from decision_lab.beta_policy import (
+    instrument_price_key,
+    load_beta_policy,
+    unique_technical_targets,
+)
 
 
 NOW = "2026-07-28T00:00:00+00:00"
@@ -46,7 +50,7 @@ def _observation(
 def _observations(policy, **kwargs):
     return {
         item["benchmark_key"]: _observation(item["benchmark_key"], **kwargs)
-        for item in unique_benchmarks(policy)
+        for item in unique_technical_targets(policy)
     }
 
 
@@ -428,9 +432,9 @@ def test_self_funded_routine_reminder_uses_full_session_count_not_signal() -> No
     assert "每 5 個完整交易日一次的自有現金評估本期已到" in rendered
     assert "貸款不在本提醒內" in rendered
     cooldown_rendered = render_beta_monitor_markdown(cooldown, risk_view="full")
-    assert "| 例行投入排程 | Signal 加碼（未驗證） | 今日資本限制 |" in cooldown_rendered
-    assert "今日非評估日；資本上限未啟用" in cooldown_rendered
-    assert "+0%（未觸發；未驗證）" in cooldown_rendered
+    assert "| 每檔 TL;DR（自身價格） | 相對結論 | 個別例外／上限 |" in cooldown_rendered
+    assert "今天不用啟動投入評估" in cooldown_rendered
+    assert "今日不比較（尚未到投入評估日）" in cooldown_rendered
 
 
 def test_known_tsmc_concentration_warns_without_pausing_additions() -> None:
@@ -517,7 +521,9 @@ def test_markdown_is_aggregate_and_preserves_human_boundary() -> None:
     assert "技術訊號只決定新增的時點與節奏" in rendered
     assert "月息不得依賴被迫賣出 beta" in rendered
     assert "節奏 " in rendered
-    assert "5日 -3.0%｜20日 -8.0%" in rendered
+    assert "1日 -1.0%｜5日 -3.0%｜20日 -8.0%" in rendered
+    assert "今天是否投入" in rendered
+    assert "相對比較" in rendered
     assert "## 主力 ETF／權值" in rendered
     assert rendered.index("QQQ") < rendered.index("TQQQ")
     assert "不代表已核准、已提款、已下單或已寫回" in rendered
@@ -528,6 +534,41 @@ def test_markdown_is_aggregate_and_preserves_human_boundary() -> None:
     ):
         assert raw not in rendered
     assert "shares" not in rendered
+
+
+def test_leveraged_product_uses_underlying_signal_but_own_price_tldr() -> None:
+    policy = load_beta_policy()
+    observations = _observations(policy)
+    tqqq_policy = next(
+        item for item in policy["instruments"] if item["ticker"] == "TQQQ"
+    )
+    tqqq_price_key = instrument_price_key(tqqq_policy)
+    observations[tqqq_price_key] = {
+        **observations[tqqq_price_key],
+        "return_1d": -0.03,
+        "return_5d": -0.09,
+        "return_20d": -0.20,
+        "rsi_14": 28.0,
+        "drawdown_252": -0.40,
+    }
+    report = build_beta_monitor(
+        observations_by_benchmark=observations,
+        history_by_benchmark={key: [value] for key, value in observations.items()},
+        holdings_rows=_holdings(),
+        capital_authority_rows=_capital_rows(),
+        as_of=NOW,
+        policy=policy,
+    )
+
+    tqqq = next(item for item in report["items"] if item["ticker"] == "TQQQ")
+    assert tqqq["signal_benchmark"] == "QQQ"
+    assert tqqq["price_symbol"] == "TQQQ"
+    assert tqqq["indicator"]["return_1d"] == pytest.approx(-0.03)
+    assert tqqq["indicator"]["return_20d"] == pytest.approx(-0.20)
+    rendered = render_beta_monitor_markdown(report)
+    tqqq_row = next(line for line in rendered.splitlines() if line.startswith("| TQQQ |"))
+    assert "1日 -3.0%｜5日 -9.0%｜20日 -20.0%" in tqqq_row
+    assert "節奏訊號看 QQQ" in tqqq_row
 
 
 def test_daily_risk_view_is_silent_without_change_but_weekly_full_is_explicit() -> None:

@@ -377,10 +377,46 @@ def unique_benchmarks(policy: Mapping[str, Any]) -> list[dict[str, str]]:
     return [result[key] for key in sorted(result)]
 
 
+def instrument_price_key(instrument: Mapping[str, Any]) -> str:
+    """Return the Engine C series key used for the instrument's own price display。
+
+    Leveraged and overlapping products may intentionally use an unlevered benchmark
+    for signal timing.  Their own return／RSI／drawdown must still come from their
+    provider symbol, never from that signal benchmark.
+    """
+
+    provider_symbol = str(instrument["provider_symbol"]).upper()
+    benchmark_symbol = str(instrument["benchmark_symbol"]).upper()
+    if provider_symbol == benchmark_symbol:
+        return str(instrument["benchmark_key"])
+    return f"price:{str(instrument['ticker']).casefold()}"
+
+
+def unique_technical_targets(policy: Mapping[str, Any]) -> list[dict[str, str]]:
+    """Return signal benchmarks plus distinct instrument-price series targets。"""
+
+    result = {
+        str(target["benchmark_key"]): dict(target)
+        for target in unique_benchmarks(policy)
+    }
+    for instrument in policy.get("instruments") or []:
+        key = instrument_price_key(instrument)
+        result.setdefault(
+            key,
+            {
+                "benchmark_key": key,
+                "benchmark_symbol": str(instrument["provider_symbol"]),
+            },
+        )
+    return [result[key] for key in sorted(result)]
+
+
 __all__ = [
     "BetaPolicyError",
     "DEFAULT_POLICY_PATH",
+    "instrument_price_key",
     "load_beta_policy",
     "unique_benchmarks",
+    "unique_technical_targets",
     "validate_beta_policy",
 ]

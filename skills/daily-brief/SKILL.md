@@ -30,15 +30,6 @@ admission 必經核准 exact 對象、深挖由 priority 排序但入圖仍核�
 
 ## 執行流程
 
-### Step 0 — Codex task 識別
-
-Codex desktop scheduled run 的第一個 App 動作必須實際呼叫 `codex_app__set_thread_title`，把目前 task
-改為 `StockBotv2 Daily Brief — YYYY-MM-DD`（日期取 Asia/Taipei 當日），並確認工具回傳成功後才繼續。
-只在 brief 內輸出日期標題、或只用自然語言說「已更名」，都不算完成。若工具在該 executor 不可用或
-呼叫失敗，routine 仍繼續，但健康段落必須列 `title_update_failed` 加上可觀測原因（例如
-`App callback timeout／no response`、例外類別、嘗試次數與 `success_receipt=false`）；不得只留裸旗標，
-也不得把「呼叫已送出」寫成成功。非 Codex desktop executor 跳過此 App-specific 動作。
-
 ### Step 1 — 本機資料更新（零 token）
 
 ```powershell
@@ -69,8 +60,9 @@ credit 不進 NAV／cash／allocation。technical／capital telemetry 不進 pq1
 不得改寫成「零筆」或 `no_result`。`insufficient_history`／`unavailable`／`stale` 也必須在健康段落明示並讓受影響的
 technical 或 self-funded range 歸零。Windows 本機與
 scheduled task 一律使用 repo `.venv`，不要依賴父 shell 是否剛好 activate。
-Engine C 同一筆 observation 保存 adjusted-close 的 1／5／20-session return；Engine D 才負責把
-return、RSI、252-session drawdown、例行投入排程、signal add-on 與 capital constraints 組成 Mobile-friendly
+Engine C 同一筆 observation 保存 adjusted-close 的 1／5／20-session return；Engine D 必須分開保存
+signal benchmark 與商品自身價格序列。TQQQ／00631L 等可使用未槓桿 benchmark 決定 timing／pace，但人類
+看到的 return、RSI、drawdown 與均線熱度必須來自該商品自身 provider symbol。Engine D 再把這些資料組成 Mobile-friendly
 燈號。燈號必須配 `可評估／冷卻／觀察／資料不足` 文字與明確系統動作，且不構成 live permission。
 燈號與文字不得在 agent 摘要時省略：🟢 `可評估`、🟡 `冷卻／排序中`、⚪ `觀察`、🔴 `資料不足／暫停新增`。
 動作對照固定為：`CONTRIBUTE REVIEW`＝可新增評估（不是買進）；`HOLD`＝維持／等待；
@@ -240,19 +232,22 @@ park：社群 CPO 推論 → 一手來源未支持，不產空 RA
 
 ## Beta capital observation（無 pq2 編號）
 TL;DR：最大化約 30 年後 `retirement_net_terminal_wealth`；technical 只決定新增 timing／pace；列今日可人工評估標的與最重要的動態風控 warning
-例行提醒：<每 5 個完整交易日一次；本期是否到期；只涵蓋自有現金，貸款不在提醒內>
+今天是否投入：<先直接回答今天是否應啟動人工投入評估>
+例行提醒：<每 5 個完整交易日一次；本期是否到期；只涵蓋自有現金，貸款不在提醒內；只在此處列一次>
 自有現金可部署：<Portfolio CASH − cash floor；Alpha／Beta 共用>
 本輪可評估上限：<同一主路徑經 technical 節奏與 risk caps 後的 ceiling；不是下單金額>
 未動用貸款額度：<amount／已借款／估計利息／terms status；明標不算自有現金、未納入本輪上限>
 貸款投入：不在例行提醒內；提款時間表未建立，仍為 manual_review_required
-| 標的 | 系統動作 | 一句 TL;DR（燈號＋RSI 水位＋1／5／20 日變化＋距高點／趨勢或回檔） | 例行投入排程 | Signal 加碼（未驗證） | 今日資本限制 |
-|---|---|---|---|---|---|
-`例行投入排程` 顯示是否到每 5 個完整交易日的人工評估日與 baseline pace；`Signal 加碼` 只顯示
-baseline 以上增量（沒有就寫 `+0%`）；`今日資本限制` 才能放 supported range 與 hard blockers。
-冷卻／排序不是資本限制。所有 pace 都要標明是該 sleeve 單輪 campaign budget 比例，不是 NAV 比例。
-| QQQ | HOLD | ⚪ RSI 43.2（弱／中性）；… | 距下次 4 個完整交易日；baseline 25% 單輪預算 | +0%（未驗證） | 今日非評估日；資本上限未啟用 |
-| SOXX | CONTRIBUTE REVIEW | 🟢 RSI 42.5（弱／中性）；… | 本期已到；baseline 25% 單輪預算 | +25% 單輪預算（未驗證） | 上限 …；硬限制 … |
-| DRAM | PAUSE CONTRIBUTION | 🔴 資料不足；… | 行情不可用；baseline 暫停 | 不可用 | 上限 0；硬限制技術資料不足 |
+相對比較：<有無相對加碼證據；若全部只有 baseline，明說沒有證據可排首選>
+| 標的 | 系統動作 | 每檔 TL;DR（商品自身價格） | 相對結論 | 個別例外／上限 |
+|---|---|---|---|---|
+評估日期、可部署現金與投組 hard caps 在表格上方只列一次。每列只保留商品自身的 RSI／1／5／20 日變化／
+距高點／趨勢、相對比較結論，以及真正會因標的不同而變化的 freshness、單輪預算、槓桿容量與重疊排序。
+若 signal benchmark 與商品不同，TL;DR 必須明寫（例如「自身價格看 TQQQ；節奏訊號看 QQQ」）。所有 pace
+仍是該 sleeve 單輪 campaign budget 比例，不是 NAV 比例。
+| QQQ | HOLD | 🟡 自身 RSI 43.2；… | 今日不比較（尚未到投入評估日） | 無；共用條件見上方 |
+| SOXX | CONTRIBUTE REVIEW | 🟢 自身 RSI 42.5；… | 例行候選；沒有相對加碼證據 | 本檔人工評估上限 … |
+| TQQQ | CONTRIBUTE REVIEW | 🟢 TQQQ 自身漲跌／RSI；節奏訊號看 QQQ | 回檔觀察優先；Signal 尚未驗證 | 槓桿容量 … |
 
 ## 低優先（摺疊）
 EDGAR Form 4 ×55、較舊 filing——預設摺疊只列數量（要看再展開）
@@ -266,7 +261,7 @@ paper 無異動｜live 無 pending fill｜...
 
 pq2／lead priority **不使用顏色維度**（顏色曾混淆 triage 與優先度），一律使用明確指令字串。Beta
 technical 區可用配有文字的燈號表達 deterministic state，但不得只靠顏色，也不得把 `可評估` 寫成 `買進`。
-Beta 必須使用上述表格，每個 ticker 一列；不能再用一長串 bullet 堆 raw 數字。TL;DR 至少回答「現在在什麼水位、這是趨勢還是回檔、今天能不能新增、限制是什麼」。RSI 區間只是一致的解讀標籤，不改變 `config/beta_policy.json` 的 numeric gate，也不構成 live permission。
+Beta 必須使用上述表格，每個 ticker 一列；不能再用一長串 bullet 堆 raw 數字。首屏先回答今天是否啟動投入評估，表格才比較商品。TL;DR 至少回答「商品自身現在在什麼水位、這是趨勢還是回檔、訊號基準是什麼、是否有個別例外」。RSI 區間只是一致的解讀標籤，不改變 `config/beta_policy.json` 的 numeric gate，也不構成 live permission。
 Codex desktop 若支援 inline mobile visualization，Beta 區依「自有現金可部署／本輪可評估上限／未動用貸款
 額度 → 風險燈號 → 標的燈號」層級呈現；不支援的 executor 必須輸出相同層級的 Markdown，不能因此退化成
 raw field names 或省略燈號。

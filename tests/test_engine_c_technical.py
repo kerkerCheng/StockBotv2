@@ -7,7 +7,7 @@ from decimal import Decimal
 
 import pytest
 
-from decision_lab.beta_policy import load_beta_policy, unique_benchmarks
+from decision_lab.beta_policy import load_beta_policy, unique_technical_targets
 from engine_c.etl_technical import refresh_technical_observations
 from engine_c.technical import (
     append_technical_observation,
@@ -156,7 +156,7 @@ def test_sqlite_schema_upgrade_adds_return_columns_non_destructively() -> None:
     conn.close()
 
 
-def test_refresh_fetches_each_unique_benchmark_once_and_keeps_partial_results() -> None:
+def test_refresh_fetches_signal_and_instrument_price_series_once() -> None:
     policy = load_beta_policy()
     calls: list[tuple[str, str]] = []
 
@@ -169,11 +169,11 @@ def test_refresh_fetches_each_unique_benchmark_once_and_keeps_partial_results() 
     conn = _conn()
     result = refresh_technical_observations(policy=policy, fetcher=fetcher, conn=conn)
 
-    assert len(calls) == len(unique_benchmarks(policy)) == 11
-    assert len(set(calls)) == 11
+    assert len(calls) == len(unique_technical_targets(policy)) == 14
+    assert len(set(calls)) == 14
     assert result["status"] == "partial"
-    assert result["observed_count"] == 10
-    assert conn.execute("SELECT COUNT(*) FROM technical_observations").fetchone()[0] == 11
+    assert result["observed_count"] == 13
+    assert conn.execute("SELECT COUNT(*) FROM technical_observations").fetchone()[0] == 14
     conn.close()
 
 

@@ -17,7 +17,7 @@ except ImportError:
 if str(Path(__file__).resolve().parents[1]) not in sys.path:
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from decision_lab.beta_policy import load_beta_policy, unique_benchmarks
+from decision_lab.beta_policy import load_beta_policy, unique_technical_targets
 from engine_c.db import DB_TYPE, get_conn
 from engine_c.technical import (
     append_technical_observation,
@@ -38,10 +38,10 @@ def refresh_technical_observations(
     twse_fetcher: TwseFetcher | None = None,
     conn=None,
 ) -> dict[str, Any]:
-    """Refresh every unique benchmark; one failure never suppresses siblings。"""
+    """Refresh every signal and instrument-price series; failures stay isolated。"""
 
     resolved_policy = dict(policy or load_beta_policy())
-    targets = unique_benchmarks(resolved_policy)
+    targets = unique_technical_targets(resolved_policy)
     owns_connection = conn is None
     connection = conn or get_conn()
     items: list[dict[str, Any]] = []

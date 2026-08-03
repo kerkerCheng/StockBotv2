@@ -5,7 +5,7 @@ import math
 from datetime import datetime, timezone
 from typing import Any, Mapping, Sequence
 
-from .beta_policy import load_beta_policy
+from .beta_policy import instrument_price_key, load_beta_policy
 from .capital_authority import build_capital_view
 from .portfolio_risk import (
     build_portfolio_components,
@@ -394,6 +394,18 @@ def build_beta_monitor(
             evaluation_at=evaluation_at,
             max_age_hours=int(resolved_policy["signal"]["max_refresh_age_hours"]),
         )
+        price_key = instrument_price_key(instrument)
+        price_observation = (
+            observation
+            if price_key == benchmark_key
+            else _fresh_observation(
+                observations_by_benchmark.get(price_key),
+                evaluation_at=evaluation_at,
+                max_age_hours=int(
+                    resolved_policy["signal"]["max_refresh_age_hours"]
+                ),
+            )
+        )
         state = signal_state(observation, resolved_policy)
         cadence = _review_cadence(
             state,
@@ -405,6 +417,8 @@ def build_beta_monitor(
             {
                 "instrument": instrument,
                 "observation": observation,
+                "price_key": price_key,
+                "price_observation": price_observation,
                 "state": state,
                 "cadence": cadence,
             }
@@ -446,11 +460,12 @@ def build_beta_monitor(
     for candidate, allocation in zip(prepared, allocations, strict=True):
         instrument = candidate["instrument"]
         observation = candidate["observation"]
+        price_observation = candidate["price_observation"]
         state = candidate["state"]
         cadence = candidate["cadence"]
         current_value = float(portfolio["instrument_values"].get(instrument["ticker"], 0.0))
         indicator = {
-            key: observation.get(key) if observation else None
+            key: price_observation.get(key) if price_observation else None
             for key in (
                 "session_date",
                 "return_1d",
@@ -468,7 +483,11 @@ def build_beta_monitor(
                 "realized_vol_60",
             )
         }
-        reference = observation.get("_twse_reference") if observation else None
+        reference = (
+            price_observation.get("_twse_reference")
+            if price_observation
+            else None
+        )
         if isinstance(reference, Mapping):
             indicator.update(
                 {
@@ -485,6 +504,13 @@ def build_beta_monitor(
                 "ticker": instrument["ticker"],
                 "sleeve": instrument["sleeve"],
                 "signal_benchmark": instrument["benchmark_symbol"],
+                "price_symbol": instrument["provider_symbol"],
+                "price_series_key": candidate["price_key"],
+                "price_status": (
+                    str(price_observation.get("data_status") or "missing")
+                    if price_observation
+                    else "missing"
+                ),
                 "technical_status": state["data_status"],
                 "signal_tier": state["tier"],
                 "signal_pace": state["pace"],
@@ -685,12 +711,10 @@ def _signed_pct(value: Any) -> str:
 
 
 def _moves(indicator: Mapping[str, Any]) -> str:
-    """只顯示對 30 年累積目標有意義的區間。
+    """顯示商品自身的短中期價格變化；訊號基準另列。"""
 
-    1 日報酬是雜訊：它會讓大跌後的反彈看起來像動能，對「何時加碼」沒有資訊。
-    20 日報酬保留為近期方向，5 日次之。
-    """
     return (
+        f"1日 {_signed_pct(indicator.get('return_1d'))}｜"
         f"5日 {_signed_pct(indicator.get('return_5d'))}｜"
         f"20日 {_signed_pct(indicator.get('return_20d'))}"
     )
@@ -729,19 +753,6 @@ def _pace_label(value: Any) -> str:
     return "節奏未知" if parsed is None else f"節奏 {parsed * 100:.0f}%"
 
 
-def _pace_reason(item: Mapping[str, Any]) -> str:
-    """說明本期節奏的來源。
-
-    baseline 是唯一有實測支持的機制（訊號 gate 現金投入實測輸定投 8.5%），
-    訊號只在 baseline 之上加碼。因此來源為 baseline 時必須寫「例行投入」，
-    不能寫「未觸發 / 節奏 25%」——那會讓讀者以為系統發現了什麼。
-    """
-    pace = _pace_label(item.get("signal_pace"))
-    if str(item.get("pace_source") or "baseline") == "baseline":
-        return f"例行投入 / {pace}"
-    return f"{_signal_tier_label(item.get('signal_tier'))}加碼 / {pace}"
-
-
 def _signal_tier_label(value: Any) -> str:
     return {
         "none": "未觸發",
@@ -750,50 +761,6 @@ def _signal_tier_label(value: Any) -> str:
         "capitulation": "急跌",
         "unavailable": "資料不足",
     }.get(str(value), str(value))
-
-
-def _routine_schedule_label(item: Mapping[str, Any]) -> str:
-    schedule = item.get("routine_schedule") or {}
-    baseline = _finite(schedule.get("baseline_pace"), non_negative=True)
-    baseline_label = (
-        "例行節奏未知"
-        if baseline is None
-        else f"baseline {baseline * 100:.0f}% 單輪預算"
-    )
-    if item.get("technical_status") != "observed":
-        return f"行情不可用；{baseline_label} 暫停"
-    if schedule.get("due"):
-        return f"本期已到；{baseline_label}"
-    remaining = schedule.get("sessions_until_next")
-    return (
-        f"距下次 {remaining} 個完整交易日；{baseline_label}"
-        if isinstance(remaining, int)
-        else f"下次待有效行情恢復後計算；{baseline_label}"
-    )
-
-
-def _signal_add_on_label(item: Mapping[str, Any]) -> str:
-    signal = item.get("signal_add_on") or {}
-    if item.get("technical_status") != "observed":
-        return "不可用（不覆蓋 baseline）"
-    incremental = _finite(signal.get("incremental_pace"), non_negative=True) or 0.0
-    tier = _signal_tier_label(signal.get("tier"))
-    if incremental <= 0:
-        return f"+0%（{tier}；未驗證）"
-    return f"+{incremental * 100:.0f}% 單輪預算（{tier}；未驗證）"
-
-
-def _capital_constraint_label(item: Mapping[str, Any], currency: str | None) -> str:
-    capital = item.get("capital_constraints") or {}
-    status = str(capital.get("status") or "")
-    ceiling = (capital.get("supported_order_range_base") or [0.0, 0.0])[1]
-    hard = [str(value) for value in capital.get("hard_blockers") or []]
-    binding = [str(value) for value in capital.get("binding_constraints") or []]
-    if status == "not_open_today":
-        return "今日非評估日；資本上限未啟用"
-    labels = hard or binding
-    suffix = "、".join(_constraint_label(value) for value in labels) or "無"
-    return f"上限 {_money(ceiling, currency)}；硬限制 {suffix}"
 
 
 def _rsi_zone(value: Any) -> str:
@@ -811,11 +778,49 @@ def _rsi_zone(value: Any) -> str:
 
 def _primary_tldr(item: Mapping[str, Any]) -> str:
     indicator = item["indicator"]
-    return (
-        f"{_display_label(item)}；RSI {_rsi_zone(indicator.get('rsi_14'))}；"
-        f"{_moves(indicator)}；距高點 {_pct(indicator.get('drawdown_252'))}；"
-        f"{_heat(indicator)}"
+    benchmark_note = (
+        f"；節奏訊號看 {item['signal_benchmark']}"
+        if item.get("price_symbol") != item.get("signal_benchmark")
+        else ""
     )
+    if item.get("price_status") != "observed":
+        return (
+            f"{_display_label(item)}；{item.get('price_symbol') or item['ticker']} "
+            f"自身價格資料不足{benchmark_note}"
+        )
+    return (
+        f"{_display_label(item)}；自身 RSI {_rsi_zone(indicator.get('rsi_14'))}；"
+        f"{_moves(indicator)}；距高點 {_pct(indicator.get('drawdown_252'))}；"
+        f"{_heat(indicator)}{benchmark_note}"
+    )
+
+
+def _relative_conclusion_label(item: Mapping[str, Any]) -> str:
+    if _primary_action(item) == "PAUSE CONTRIBUTION":
+        return "排除：資料或個別限制未通過"
+    if _primary_action(item) != "CONTRIBUTE REVIEW":
+        return "今日不比較（尚未到投入評估日）"
+    incremental = _finite(
+        (item.get("signal_add_on") or {}).get("incremental_pace"),
+        non_negative=True,
+    ) or 0.0
+    if incremental > 0:
+        return "回檔觀察優先；Signal 尚未驗證"
+    return "例行候選；沒有相對加碼證據"
+
+
+def _individual_exception_label(item: Mapping[str, Any], currency: str | None) -> str:
+    capital = item.get("capital_constraints") or {}
+    hard = [str(value) for value in capital.get("hard_blockers") or []]
+    blockers = set(_primary_blockers(item))
+    if hard:
+        return "、".join(_constraint_label(value) for value in hard)
+    if "overlapping_instrument_deferred" in blockers:
+        return "同基準商品已優先配置，本檔後延"
+    if _primary_action(item) == "CONTRIBUTE REVIEW":
+        ceiling = _primary_supported_ceiling(item)
+        return f"本檔人工評估上限 {_money(ceiling, currency)}"
+    return "無；共用日期／現金／投組上限見表格上方"
 
 
 def _constraint_label(value: Any) -> str:
@@ -898,10 +903,12 @@ def _display_label(item: Mapping[str, Any]) -> str:
 
 
 def _compact_monitor_item(item: Mapping[str, Any]) -> str:
+    twse = _twse_snapshot(item["indicator"]).rstrip("｜")
     return (
         f"{item['ticker']} {_display_label(item)}"
         f"（{_moves(item['indicator'])}，"
         f"{_signal_tier_label(item['signal_tier'])}/{_pace_label(item['signal_pace'])}"
+        + (f"，{twse}" if twse else "")
         + (
             "，"
             + "、".join(
@@ -1025,6 +1032,7 @@ def render_beta_monitor_markdown(
     routine = report.get("routine_reminder") or {}
     cadence_sessions = int(routine.get("cadence_sessions") or 5)
     if routine.get("due"):
+        invest_today = "應啟動人工投入評估"
         routine_line = (
             f"- 例行提醒：每 {cadence_sessions} 個完整交易日一次的自有現金評估本期已到；"
             + (
@@ -1035,6 +1043,7 @@ def render_beta_monitor_markdown(
             + "貸款不在本提醒內。"
         )
     else:
+        invest_today = "今天不用啟動投入評估"
         remaining = routine.get("sessions_until_next")
         routine_line = (
             f"- 例行提醒：每 {cadence_sessions} 個完整交易日一次；"
@@ -1045,14 +1054,41 @@ def render_beta_monitor_markdown(
             )
             + "只涵蓋自有現金，貸款不在本提醒內。"
         )
+    signal_candidates = [
+        item
+        for item in reviews
+        if (
+            _finite(
+                (item.get("signal_add_on") or {}).get("incremental_pace"),
+                non_negative=True,
+            )
+            or 0.0
+        )
+        > 0
+    ]
+    if not reviews:
+        comparison_line = "今天不是投入評估日，因此不做標的排名。"
+    elif signal_candidates:
+        comparison_line = (
+            "回檔觀察可先比較 "
+            + "、".join(str(item["ticker"]) for item in signal_candidates)
+            + "；但 Signal 加碼尚未通過驗證，不等於預期報酬較高。"
+        )
+    else:
+        comparison_line = (
+            "本輪可評估標的都只有例行 baseline，沒有相對加碼證據；"
+            "系統不硬排一個沒有證據的首選。"
+        )
     lines = [
         "# Beta Technical Monitor",
         "",
         "## TL;DR",
         "",
         "- 目標：最大化約 30 年後的退休淨終值；Beta 維持只累積、不因一般回檔自動賣出，技術訊號只決定新增的時點與節奏。",
+        f"- **今天是否投入：{invest_today}。**",
         routine_line,
-        f"- 今日：{review_names} 可進人工評估；自有現金的本輪可評估上限 "
+        f"- **相對比較：{comparison_line}**",
+        f"- 今日候選：{review_names}；自有現金的本輪可評估上限 "
         f"{_money(supported_ceiling, currency)}，不是下單金額。",
         f"- 風控：{_risk_hint_summary(report)}；未動用貸款額度 "
         f"{_money(contingent.get('undrawn_amount_base'), currency)} 不算自有現金，也未納入本輪上限。",
@@ -1073,6 +1109,7 @@ def render_beta_monitor_markdown(
         "cash floor 以上全部可供 Alpha 與 Beta 共用",
         "- Alpha／Beta 分配：由各自的 campaign budget、Decision sizing、單筆上限與風控另外決定；不預扣 alpha reserve。",
         "- 節奏說明：25% 代表使用該類資產完整單輪預算的四分之一，不是投入總資產的 25%。",
+        "- 限制口徑：評估日期、可部署現金與投組 hard caps 是全局條件；商品資料 freshness、單輪預算、槓桿容量與重疊商品排序才會造成個別差異。",
     ]
     blockers = report.get("blockers") or []
     warnings = list(report.get("warnings") or [])
@@ -1128,8 +1165,8 @@ def render_beta_monitor_markdown(
     lines += ["", "## 主力 ETF／權值"]
     if primary_items:
         lines += [
-            "| 標的 | 系統動作 | 一句 TL;DR | 例行投入排程 | Signal 加碼（未驗證） | 今日資本限制 |",
-            "|---|---|---|---|---|---|",
+            "| 標的 | 系統動作 | 每檔 TL;DR（自身價格） | 相對結論 | 個別例外／上限 |",
+            "|---|---|---|---|---|",
         ]
         for item in primary_items:
             indicator = item["indicator"]
@@ -1137,8 +1174,8 @@ def render_beta_monitor_markdown(
             tldr = _primary_tldr(item) + (f"；{twse}" if twse else "")
             lines.append(
                 f"| {item['ticker']} | {_primary_action(item)} | {tldr} | "
-                f"{_routine_schedule_label(item)} | {_signal_add_on_label(item)} | "
-                f"{_capital_constraint_label(item, currency)} |"
+                f"{_relative_conclusion_label(item)} | "
+                f"{_individual_exception_label(item, currency)} |"
             )
     else:
         lines.append("- 無")

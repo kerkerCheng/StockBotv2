@@ -5,7 +5,7 @@ import io
 import json
 import sqlite3
 
-from decision_lab.beta_policy import load_beta_policy, unique_benchmarks
+from decision_lab.beta_policy import load_beta_policy, unique_technical_targets
 from engine_c.technical import ensure_technical_schema
 from scripts.daily_beta_snapshot import run
 
@@ -64,7 +64,7 @@ def _refresh(*, policy, conn):
     from engine_c.technical import append_technical_observation
 
     items = []
-    for target in unique_benchmarks(policy):
+    for target in unique_technical_targets(policy):
         observation = _observed(target["benchmark_key"], target["benchmark_symbol"])
         observation_id = append_technical_observation(conn, observation)
         items.append(

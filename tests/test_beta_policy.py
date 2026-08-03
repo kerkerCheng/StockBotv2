@@ -7,8 +7,10 @@ import pytest
 
 from decision_lab.beta_policy import (
     BetaPolicyError,
+    instrument_price_key,
     load_beta_policy,
     unique_benchmarks,
+    unique_technical_targets,
     validate_beta_policy,
 )
 
@@ -26,14 +28,18 @@ def test_repository_beta_policy_has_fourteen_instruments_and_eleven_series() -> 
     }
     assert len(policy["instruments"]) == 14
     assert len(unique_benchmarks(policy)) == 11
+    assert len(unique_technical_targets(policy)) == 14
     by_ticker = {item["ticker"]: item for item in policy["instruments"]}
     assert by_ticker["TQQQ"]["benchmark_key"] == by_ticker["QQQ"]["benchmark_key"]
+    assert instrument_price_key(by_ticker["TQQQ"]) == "price:tqqq"
+    assert instrument_price_key(by_ticker["QQQ"]) == "qqq"
     assert by_ticker["TQQQ"]["leverage_multiple"] == 3.0
     assert {
         by_ticker[ticker]["benchmark_key"]
         for ticker in ("0050.TW", "006208.TW", "00631L.TW")
     } == {"tw50"}
     assert by_ticker["00631L.TW"]["leverage_multiple"] == 2.0
+    assert instrument_price_key(by_ticker["00631L.TW"]) == "price:00631l.tw"
     assert "technology_proxy_load" not in by_ticker["QQQ"]
     assert "issuer_concentration_warning" in policy["risk"]
     assert "technology_effective_cap" not in policy["risk"]
