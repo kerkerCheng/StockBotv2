@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "memo_path": "axt_inp_v1_lane_memo.md",
-  "memo_sha256": "e699634128698630e96d48787df589ef25fe6975d61b9db4a7c1bcbd80d1a9e4",
+  "memo_sha256": "9266194510c827e256f4a0a237fc1ccb5a0241af8320d3fc67f0afd08496e335",
   "output_type": "Watchlist Candidate",
   "ticker": "AXTI",
   "company_id": "co:axt",
@@ -3883,7 +3883,7 @@
     "annotations": {}
   },
   "engine_c_context": {
-    "financial_checklist_markdown": "## 5 項財務核驗清單：AXTI\n✓ 毛利率趨勢（近 4 季）  趨勢：上升，最新：32.2%\n✓(人工) 客戶集中度（前三大客戶 % 收入）\n✓(人工) Backlog/訂單能見度\n✓(人工) 稀釋分析（股數趨勢）\n✓ 估值壓力（P/E, EV/Rev, 分析師目標價）  $60.43, FwdPE=27.1x, EV/Rev=27.4x, 分析師=$91.60(N=5)\n\n**✓ Gate 通過 → 可升格 Watchlist**\n",
+    "financial_checklist_markdown": "## 5 項財務核驗清單：AXTI\n✓(人工) 毛利率趨勢（近 4 季）\n✓(人工) 客戶集中度（前三大客戶 % 收入）\n✓(人工) Backlog/訂單能見度\n✓(人工) 稀釋分析（股數趨勢）\n✓ 估值壓力（P/E, EV/Rev, 分析師目標價）  $60.43, FwdPE=27.1x, EV/Rev=27.4x, 分析師=$91.60(N=5)\n\n**✓ Gate 通過 → 可升格 Watchlist**\n",
     "market_snapshot_markdown": "## 市場定價數據：AXTI（Variant Perception 錨點）\n- 當前股價：$60.43\n- Trailing P/E：2014.3x\n- Forward P/E：27.1x\n- EV/Revenue：27.38x\n- 分析師目標價均值：$91.60  (N=5)\n- 毛利率（最新）：32.2%\n\n**隱含假設提示：** EV/Rev=27.4x + 毛利率=32% → 市場可能定價的收入增長率約為 881%-1155%/年（粗估）。\n[請在 Variant Perception 填寫：市場假設 X，本 thesis 認為 Y，催化劑 Z]\n"
   },
   "other_gates": {

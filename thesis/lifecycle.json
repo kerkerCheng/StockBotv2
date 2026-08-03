@@ -3,10 +3,10 @@
     "status": "active",
     "memo": "thesis/axt_inp_v1_lane_memo.md",
     "ticker": "AXTI",
-    "last_checked": "2026-08-02",
+    "last_checked": "2026-08-03",
     "next_check": "2026-11-15",
     "check_interval_days": 90,
-    "note": "2026-08-02 首建（pq2 [64] 完成後）。庫內第一份 evidence gate 全過的 memo：checklist/l9/l8/manifest/promotion 皆 pass，標記 [Watchlist Candidate]；正式升格 Watchlist 仍待 scoring 通過失敗閾值。核心 variant perception 是監管而非需求：Coherent 三年協議與 Lumentum 六年產能保留的交易對手都是美國法人，而 AXT 對美 InP 出口許可至今未取得（FY2025 10-K 逐字：初始許可僅涵蓋 certain customers in Europe and Japan；Q1 2026 10-Q 逐字：unable to estimate when we will receive the necessary export permits），管理層自陳許可是 Q2 及以後成長的最重要單一因素。next_check 對齊 2026 Q3 Form 10-Q（預計 11 月初），該文件將同時揭露 Lumentum 合約全文、許可進展與 Q3 InP 營收／毛利率。任一 disproof 觸發須 48h 內人工決策。"
+    "note": "2026-08-02 首建（pq2 [64] 完成後），2026-08-03 經 blind-spot-audit 紅隊後重寫為 v3。evidence gate 五道全過、scoring 26/30 PASS，但**暫緩升格 Watchlist**——理由不是分數而是時序：核心問題有一個日期明確、成本為零的裁決點。v1 的核心論點（對美出口許可壓縮營收認列）已被紅隊推翻並降級：該風險是 AXT 自己 10-K Risk Factors 首項、公開逾一年，分析師均價 US$91.6 對現價 US$60.43 仍隱含 +51% 空間，屬已定價的風險揭露而非認知差異。v3 核心論點改為週期／結構之爭：10-K 逐字載明 2022 Q3 毛利率已達 42.0%、四個季度內崩至 10.7%，與 2026 Q2 的 44.9% 同量級；Q2 營收 +164.8% 而銷貨成本僅 +58.5%，指向稼動率而非單價驅動，而公司自述固定成本比重高、稼動率對毛利率至為關鍵。分辨兩者的唯一缺口是 ASP（Nomura 報告仍 tier-3 隔離未追回原文）。裁決點為 2026 Q3 財報毛利率：維持 44%+ 且揭露 ASP 上漲則結構解釋勝出並可升格；回落至 30% 附近則 thesis 需重寫。Q3 10-Q 另將揭露 Lumentum 合約交付條款（是否涉美國關境）、許可進展與 PE 基金贖回。最弱環節為可信度 3/5（剛好在線）：核心證據歷史毛利率未入圖、僅以 Engine C manual observation 承載。任一 disproof 觸發須 48h 內人工決策。"
   },
   "coherent_cpo": {
     "status": "active",
