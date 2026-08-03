@@ -1,0 +1,91 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "jx_metals_inp_capacity_pr_2026_06_16",
+    "title": "JX Advanced Metals — InP substrate capacity expansion investment policy (up to JPY 120 billion over four years)",
+    "url": "https://www.jx-nmm.com/newsrelease/2026/20260616_01.html",
+    "publisher": "JX Advanced Metals newsroom",
+    "origin_entity": "JX Advanced Metals",
+    "source_type": "news",
+    "evidence_tier": 2,
+    "published_at": "2026-06-16",
+    "retrieved_at": "2026-08-04",
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "Publicly available corporate news release; store the canonical URL and only the research-relevant excerpt."
+  },
+  "sources": [
+    {
+      "id": "jx_metals_inp_capacity_pr_2026_06_16_s1",
+      "locator": "News release body, first paragraph",
+      "quote": "ＪＸ金属株式会社（社長：林 陽一、以下「当社」）は、光通信分野向けの結晶材料であるインジウムリン（以下「InP」）基板の生産能力をさらに強化するため、今後4か年にわたり最大1,200億円 ※１ の設備投資を実施する方針を決定いたしました。"
+    },
+    {
+      "id": "jx_metals_inp_capacity_pr_2026_06_16_s2",
+      "locator": "News release body, capacity paragraph",
+      "quote": "磯原工場（茨城県北茨城市）に加え、新たにひたちなか地区（茨城県ひたちなか市）においても生産体制の強化を進め、これまで公表した投資と合わせて生産能力を2025年度比で7～10倍に引き上げる予定です。"
+    },
+    {
+      "id": "jx_metals_inp_capacity_pr_2026_06_16_s3",
+      "locator": "News release body, demand rationale paragraph",
+      "quote": "当社は、この需要拡大に対応すべく、段階的にInP基板の生産能力増強を進めております ※２※３※４ が、各顧客との対話を重ねる中で、各社の設備増強に伴う大幅な増産要請を継続して受けており、同製品の需要はこれまでの見立てを大きく上回る水準で一層拡大していくとの認識を強めています。"
+    },
+    {
+      "id": "jx_metals_inp_capacity_pr_2026_06_16_s4",
+      "locator": "News release body, InP role paragraph",
+      "quote": "InPは、電気信号と光信号を相互に変換できる特性を持つことから、光通信分野において中核的な役割を担う光トランシーバーに使用されており、AIの高度化に伴い増加する大容量データ通信を支えています。"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:jx_advanced_metals",
+      "name": "JX Advanced Metals",
+      "type": "Company",
+      "role": "material_base",
+      "abstraction_level": "materials_substrate",
+      "aliases": ["ＪＸ金属株式会社", "JX Metals", "JX Nippon Mining & Metals"],
+      "attributes": {},
+      "confidence": 0.85,
+      "source_ids": [
+        "jx_metals_inp_capacity_pr_2026_06_16_s1",
+        "jx_metals_inp_capacity_pr_2026_06_16_s2"
+      ]
+    }
+  ],
+  "edges": [],
+  "claims": [
+    {
+      "id": "jx_metals_inp_capacity_pr_2026_06_16_cl1",
+      "subject_id": "co:jx_advanced_metals",
+      "statement": "JX Advanced Metals decided on 2026-06-16 to invest up to JPY 120 billion over the next four years to further expand InP substrate production capacity. This is issuer disclosure by an AXT competitor, not by AXT; it is a dated capital-commitment observation and does not by itself prove capacity was built or qualified.",
+      "source_ids": [
+        "jx_metals_inp_capacity_pr_2026_06_16_s1"
+      ],
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Downgrade if JX later reduces, defers, or cancels the investment plan, or if a subsequent filing discloses a materially smaller figure or a longer period than four years."
+    },
+    {
+      "id": "jx_metals_inp_capacity_pr_2026_06_16_cl2",
+      "subject_id": "co:jx_advanced_metals",
+      "statement": "Combined with previously announced investments, JX Advanced Metals plans to raise InP substrate production capacity to 7-10 times its fiscal 2025 level, adding a new Hitachinaka production base alongside the existing Isohara plant. Announced capacity plans are forward-looking and do not establish delivered wafers, yield, or customer qualification.",
+      "source_ids": [
+        "jx_metals_inp_capacity_pr_2026_06_16_s2"
+      ],
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Downgrade if JX later revises the 7-10x multiple downward, delays the Hitachinaka site, or if FY2028-FY2029 disclosures show realized capacity materially below the announced range."
+    },
+    {
+      "id": "jx_metals_inp_capacity_pr_2026_06_16_cl3",
+      "subject_id": "co:jx_advanced_metals",
+      "statement": "JX Advanced Metals states it continues to receive substantial increased-production requests from customers in connection with those customers' own capacity expansions, and that InP demand will grow well beyond its previous expectations. Because the origin entity is an AXT competitor rather than AXT itself, this is non-AXT corroboration that upstream InP demand is real; it simultaneously indicates the same demand is being served by an expanding competitor.",
+      "source_ids": [
+        "jx_metals_inp_capacity_pr_2026_06_16_s3",
+        "jx_metals_inp_capacity_pr_2026_06_16_s4"
+      ],
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Downgrade if JX later reports order cancellations or demand below plan, or if the increased-production requests are disclosed to originate from a single customer rather than multiple ones."
+    }
+  ]
+}
