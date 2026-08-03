@@ -87,6 +87,14 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
 8. 收尾執行 `.venv\Scripts\python.exe scripts\publish_daily_state.py`。這支固定 publisher 只准提交
    `library/leads/pending_leads.json` 與 `library/leads/todo_pool.json`；若 guard 拒絕，保留檔案並在 brief
    回報，不要改用廣泛 `git add/commit/push` 繞過。
+9. Daily Brief 的**最終完整 Markdown 已組成後**，以同一份文字呼叫
+   `.venv\Scripts\python.exe scripts\publish_daily_brief.py --stdin --summary "<摘要>"`，必要時附
+   `--claude-share-url`、`--claude-session-id`、`--codex-thread-id`。這是 Codex／本機 Claude Code 共用的
+   provider-neutral outbound publisher；它只傳送，不接受 Discord 指令，不寫 todo／Decision／Graph／Sheet。
+   `NOTIFY_DISCORD_TAG_USER_ID` 只用於摘要 mention；`NOTIFY_DISCORD_WEBHOOK_URL` 只從本機 `.env` 讀取。
+   publisher 會以 `brief_digest + channel_alias` 去重、分段傳完整 Markdown、保存 private delivery receipt，
+   每段最多重試 3 次。通知失敗必須列 `delivery_failed`／`not_configured` 但不能阻斷 brief；不要用
+   `--strict` 於排程流程。
 
 ## 輸出
 

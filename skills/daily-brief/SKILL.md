@@ -335,6 +335,31 @@ approval、loan draw、choice 或 fill 語意。貸款路徑在沒有 exact draw
 - **入圖帳本**：有實際 apply 才另外跑 `scripts/commit_pending_intake.py`。
 - **遠端 chat fallback**：`record_lead_decision` 仍由本機 MCP server 窄 pathset commit+push leads.json。
 
+### Step 8 — provider-neutral 單向通知（best effort）
+
+Daily Brief 組成後，Codex 與本機 Claude Code 都呼叫同一支 repo publisher；不得在兩份 hook／prompt
+各自複製 Discord 業務邏輯。publisher 只做 outbound，不接受 Discord 的 `go`、交易、入圖或任何核准指令，
+也不改變 todo／Decision／Graph／Sheet authority。
+
+把**同一份最終 Markdown**（包含日期、pq2 穩定編號與回覆語法）由 stdin 或私有檔交給：
+
+```powershell
+Get-Content <private-brief.md> | & '.venv\Scripts\python.exe' scripts\publish_daily_brief.py `
+  --stdin --summary "<一則 action-first 摘要>" `
+  [--claude-share-url <url>] [--claude-session-id <id>] [--codex-thread-id <id>]
+```
+
+設定由本機 `.env` 讀取：`NOTIFY_DISCORD_WEBHOOK_URL`（Discord private channel webhook）、
+`NOTIFY_DISCORD_TAG_USER_ID`（摘要 mention）、`NOTIFY_CHANNEL_ALIAS`、`NOTIFY_CONTENT_CLASS`、
+`NOTIFY_MAX_ATTEMPTS=3`。Webhook secret 不得輸出或進 Git；不需要 Discord bot token、OAuth、Claude API key
+或 Codex API key。完整 Markdown 超過 Discord 單則上限時由 publisher 分段，私有 SQLite outbox 以
+`brief_digest + channel_alias` 去重並保存每段 delivery attempt receipt。Claude Code session 以可複製
+`claude -r <session-id>` 附上；Claude App share URL 能取得才附；Codex 只附 thread ID，第一版不猜
+未文件化的 app URI。
+
+發送失敗只回傳 `delivery_failed`／`not_configured` receipt 並繼續輸出 Daily Brief；CLI 預設永遠不以
+通知失敗阻斷 routine，只有診斷時才使用 `--strict`。
+
 ---
 
 ## 現行本機排程與遠端 fallback

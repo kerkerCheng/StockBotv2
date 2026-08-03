@@ -208,6 +208,22 @@ issuer 曝險 ≥20% 且對應 series 單日報酬首次跌破 -4% 才產 epheme
 
 **Weekly authority hierarchy：** `AGENTS.md` 是政策 SSOT；`crons/weekly_scan_prompt.md` 是 executable runbook，只有開發／人工修 policy 時才改，**weekly routine 本身不得自我改寫**。`docs/reports/weekly_scan_<date>.md` 是當週 point-in-time 歷史報告，不是 current-state truth。
 
+### Daily Brief provider-neutral outbound 通知（2026-08-04）
+
+Daily Brief 完成後可由 Codex 或本機 Claude Code 呼叫同一支
+`scripts/publish_daily_brief.py`，把完整 Markdown 以 outbound-only 方式送到 Discord private channel。
+通知不是 authority：不接受 Discord `go`／交易／入圖指令，不寫 todo、Decision、Graph 或 Sheet，也不改變
+人工 graph admission／live gate。Discord 只使用本機 `.env` 的
+`NOTIFY_DISCORD_WEBHOOK_URL` 與可選 `NOTIFY_DISCORD_TAG_USER_ID`；不需要 Discord bot token、OAuth、
+Claude API key 或 Codex API key。
+
+Publisher 的 private SQLite outbox 以 `brief_digest + channel_alias` 做唯一去重鍵，完整 Markdown 超過單則
+限制時分段傳送，逐段保存 append-only delivery attempts／receipt，單段最多重試 3 次。發送失敗是
+`delivery_failed`／`not_configured` 的 best-effort 狀態，不得阻斷 Daily Brief；`.env`、webhook 與
+`library/private/notifications/` 永遠不得進 Git。Session metadata 只作通知附註：Claude Code 可附
+`claude -r <session-id>`、Claude App share URL（若有）、Codex thread ID；第一版不採未文件化的
+`stockbot://` launcher。
+
 ---
 
 ---
