@@ -1,0 +1,56 @@
+{
+  "claims": [
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "guided",
+      "disproof_condition": "Downgrade if Sumitomo later reduces, delays, or cancels the fiscal 2028 InP substrate expansion plan, or reports realized capacity materially below 2.4 times fiscal 2024.",
+      "id": "sumitomo_growth_strategy_dc_2025_11_13_cl1",
+      "source_ids": [
+        "sumitomo_growth_strategy_dc_2025_11_13_s1"
+      ],
+      "statement": "Sumitomo Electric's 2025-11-13 official data-center growth strategy presents a plan to expand size-standardized InP substrate production capacity to 2.4 times the fiscal 2024 level by fiscal 2028. This is an announced forward capacity plan, not evidence that the capacity has been built, yielded, or customer-qualified.",
+      "subject_id": "co:sumitomo_electric"
+    }
+  ],
+  "edges": [],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Sumitomo Electric",
+        "住友電気工業",
+        "住友電工"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:sumitomo_electric",
+      "name": "Sumitomo Electric Industries",
+      "role": "material_base",
+      "source_ids": [
+        "sumitomo_growth_strategy_dc_2025_11_13_s1"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "sumitomo_growth_strategy_dc_2025_11_13",
+    "evidence_tier": 2,
+    "origin_entity": "Sumitomo Electric Industries",
+    "permission_basis": "Publicly downloadable issuer IR presentation; retain the canonical URL and only the research-relevant excerpt.",
+    "published_at": "2025-11-13",
+    "publisher": "Sumitomo Electric Industries",
+    "retrieved_at": "2026-08-04",
+    "source_type": "ir_deck",
+    "storage_permission": "repo_excerpt",
+    "title": "Sumitomo Electric — Growth strategy for data center-related business",
+    "url": "https://sumitomoelectric.com/sites/default/files/2025-11/download_documents/Growth%20strategy%20for%20data%20center-related%20business_2025.pdf"
+  },
+  "sources": [
+    {
+      "id": "sumitomo_growth_strategy_dc_2025_11_13_s1",
+      "locator": "PDF p.12/13, Production Capacity for Optical Devices and InP Substrates",
+      "quote": "Production capacity for InP substrates also expanded ... InP Substrate production capacity (Standardized by size) ... 2024 ... 2028 ... 2.4x"
+    }
+  ]
+}
