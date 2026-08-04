@@ -3,6 +3,7 @@
   "companies": [
     {"company_id": "co:coherent", "research_ticker": "COHR", "market_currency": "USD", "execution_currency": "USD", "execution_venue": "NYSE"},
     {"company_id": "co:lumentum", "research_ticker": "LITE", "market_currency": "USD", "execution_currency": "USD", "execution_venue": "NASDAQ"},
+    {"company_id": "co:iqe", "research_ticker": "IQE.L", "market_currency": "GBp"},
     {"company_id": "co:broadcom", "research_ticker": "AVGO"},
     {"company_id": "co:nvidia", "research_ticker": "NVDA"},
     {"company_id": "co:tsmc", "research_ticker": "TSM"},
