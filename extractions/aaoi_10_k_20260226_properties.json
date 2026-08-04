@@ -1,0 +1,49 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "aaoi_10_k_20260226_properties",
+    "title": "AAOI Form 10-K FY2025 — Item 2 Properties",
+    "url": "https://www.sec.gov/Archives/edgar/data/1158114/000143774926005875/aaoi20251231_10k.htm",
+    "origin_entity": "Applied Optoelectronics",
+    "publisher": "SEC EDGAR",
+    "published_at": "2026-02-26",
+    "retrieved_at": "2026-08-04",
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "SEC EDGAR public filing; store the canonical URL and only the research-relevant Item 2 Properties facilities table.",
+    "source_type": "filing",
+    "evidence_tier": 1,
+    "section": "properties"
+  },
+  "sources": [
+    {
+      "id": "aaoi_10_k_20260226_properties_s1",
+      "locator": "Item 2 Properties, facilities table",
+      "quote": "We maintain manufacturing, research and development, sales and administrative offices in the U.S., China and Taiwan. Our corporate headquarters is located at our facility in Sugar Land, Texas. The table below provides information regarding our facilities. Sugar Land, Texas — Owned and leased — 139,450 — Administration, sales, manufacturing, research and development. Duluth, Georgia — Leased — 38,900 — Sales, research and development. Ningbo, China — Owned — 1,203,740 — Administration, sales, manufacturing, research and development. Taipei, Taiwan — Leased — 705,760 — Administration, sales, manufacturing, research and development."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:applied_optoelectronics",
+      "type": "Company",
+      "name": "Applied Optoelectronics",
+      "abstraction_level": "module_subsystem",
+      "role": null,
+      "aliases": ["AAOI"],
+      "attributes": {},
+      "confidence": 0.85,
+      "source_ids": ["aaoi_10_k_20260226_properties_s1"]
+    }
+  ],
+  "edges": [],
+  "claims": [
+    {
+      "id": "aaoi_10_k_20260226_properties_cl1",
+      "statement": "AAOI's own FY2025 10-K (Item 2 Properties) discloses four facilities by owned/leased square footage: Sugar Land, Texas 139,450 sq ft (admin/sales/manufacturing/R&D, HQ); Duluth, Georgia 38,900 sq ft (sales/R&D); Ningbo, China 1,203,740 sq ft, owned (admin/sales/manufacturing/R&D); Taipei, Taiwan 705,760 sq ft (admin/sales/manufacturing/R&D). By square footage Ningbo is AAOI's single largest site, roughly 8.6x the Sugar Land HQ/manufacturing footprint. The filing does not itself state a per-product China value-content percentage or which site produces which product line (e.g. legacy CATV/broadband vs AI-datacenter 800G/1.6T transceivers), so it neither confirms nor refutes a specific value-content figure — but it is issuer-disclosed physical-footprint evidence that sits in direct tension with the graph's existing inferred claim (confidence 0.50, single secondary source primetrading_aaoi_deepdive_2026_02_27) that 'less than 10% of the value in its 800G/1.6T modules currently originates from China.'",
+      "subject_id": "co:applied_optoelectronics",
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "A later AAOI filing or investor disclosure states an explicit China value-content percentage for 800G/1.6T datacenter products that corroborates the <10% figure, or discloses that Ningbo no longer manufactures datacenter transceiver product lines (legacy-only site) — either would resolve this tension in a specific direction rather than leaving it as an open contradiction.",
+      "confidence": 0.90,
+      "source_ids": ["aaoi_10_k_20260226_properties_s1"]
+    }
+  ]
+}
