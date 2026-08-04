@@ -3991,6 +3991,42 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2074953917084127537"
     },
+    "lead_23b32554ba8379eb61692a965d949349": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-04T07:14:42.639267+00:00",
+      "lead_id": "lead_23b32554ba8379eb61692a965d949349",
+      "published_at": null,
+      "refs": {
+        "focus_company_id": "co:iqe",
+        "research_action_id": "ra_d59d7ec7a19e6aefeac374d34e47e57b"
+      },
+      "source": "iqe:official_ir",
+      "status": "action_prepared",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "InP"
+          ]
+        }
+      },
+      "title": "IQE plc onboarding：Tower Semiconductor 多年期 InP epiwafer 供應協議",
+      "triage": {
+        "decided_at": "2026-08-04T07:14:50.662771+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true,
+          "novelty": true
+        },
+        "reason": "雙方共同官方公告，具名客戶端確認，含 minimum purchase/volume commitment",
+        "tier": 1
+      },
+      "url": "https://www.iqep.com/media/press-releases/2026/iqe-and-tower-semiconductor-announce-multi-year-inp-epiwafer-supply-agreement/"
+    },
     "lead_24275206bfbcff3a5904bde1187763f8": {
       "entities": {
         "company_ids": [

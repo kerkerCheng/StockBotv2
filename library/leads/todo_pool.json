@@ -1329,6 +1329,44 @@
       "source": "decision_lab",
       "title": "REVIEW — co:meta",
       "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-04T07:15:07.633970+00:00",
+      "hint": "核准 exact graph delta；Decision handoff：co:lumentum。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 90,
+      "reason": "同 [88]：ra_5ee3b696 與既有 doc lumentum_q3fy26_cpo 重複，apply 遭 DuplicateUrlError 擋下",
+      "receipt": null,
+      "ref_id": "ra_5ee3b69676bf9ea15225ea6034edf819",
+      "resolution": "drop",
+      "resolved_at": "2026-08-04T07:15:29.899531+00:00",
+      "source": "research_action",
+      "title": "Lumentum fifth InP fab (Greensboro) forward capacity plan",
+      "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-08-04T07:15:07.633970+00:00",
+      "hint": "核准 exact graph delta；Decision handoff：co:iqe。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 91,
+      "reason": null,
+      "ref_id": "ra_d59d7ec7a19e6aefeac374d34e47e57b",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "IQE plc onboarding: Tower Semiconductor multi-year InP epiwafer supply agreement",
+      "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-08-04T07:15:45.928610+00:00",
+      "hint": "核准 exact graph delta；Decision handoff：co:lumentum。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 92,
+      "reason": "重複 RA，apply 不可能成功；每次 sync 重生是待修 bug",
+      "receipt": null,
+      "ref_id": "ra_5ee3b69676bf9ea15225ea6034edf819",
+      "resolution": "drop",
+      "resolved_at": "2026-08-04T07:17:32.838094+00:00",
+      "source": "research_action",
+      "title": "Lumentum fifth InP fab (Greensboro) forward capacity plan",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -2711,8 +2749,26 @@
       "ref_id": "ra_5ee3b69676bf9ea15225ea6034edf819",
       "type": "ra_admission",
       "verb": "drop"
+    },
+    {
+      "at": "2026-08-04T07:15:29.899531+00:00",
+      "n": 90,
+      "reason": "同 [88]：ra_5ee3b696 與既有 doc lumentum_q3fy26_cpo 重複，apply 遭 DuplicateUrlError 擋下",
+      "receipt": null,
+      "ref_id": "ra_5ee3b69676bf9ea15225ea6034edf819",
+      "type": "ra_admission",
+      "verb": "drop"
+    },
+    {
+      "at": "2026-08-04T07:17:32.838094+00:00",
+      "n": 92,
+      "reason": "重複 RA，apply 不可能成功；每次 sync 重生是待修 bug",
+      "receipt": null,
+      "ref_id": "ra_5ee3b69676bf9ea15225ea6034edf819",
+      "type": "ra_admission",
+      "verb": "drop"
     }
   ],
-  "next_n": 90,
+  "next_n": 93,
   "schema_version": "1"
 }
