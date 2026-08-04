@@ -1218,17 +1218,18 @@
       "added_at": "2026-08-02T02:26:04.627522+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_477223f3a4c9647253b8c440db127979",
-      "dispatch_receipt": "packet:library/private/decision_lab/daily_gap_research_meta_2026-08-04.json",
+      "dispatch_receipt": "decision:pd_223388c35618313d49b189aba9c3f18a",
       "dispatch_ref": "wo_2f362f30db3af87670dab873513a3fed",
-      "dispatch_status": "awaiting_approval",
-      "dispatch_updated_at": "2026-08-03T22:42:56.682384+00:00",
+      "dispatch_status": "completed",
+      "dispatch_updated_at": "2026-08-04T05:50:41.172693+00:00",
       "dispatched_at": "2026-08-03T01:14:04.295874+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 83,
-      "reason": null,
+      "reason": "pq1 completed",
+      "receipt": "decision:pd_223388c35618313d49b189aba9c3f18a",
       "ref_id": "dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-04T05:50:41.172693+00:00",
       "source": "decision_lab",
       "title": "REVIEW — co:meta",
       "type": "decision_review"
@@ -1275,25 +1276,58 @@
       "added_at": "2026-08-03T22:43:07.867146+00:00",
       "hint": "TL;DR：Meta Platforms（META）自研 Vistara CXL memory-expander ASIC 已有一手 ISCA 論文支持內部 production deployment；為補齊 Decision gap，需核准兩筆 Engine C append-only observation。客戶集中：FY2025 10-K 明示 2025–2023 均無單一客戶占營收或應收帳款 10% 以上，但未揭露前三大合計。Backlog：公司未揭露 sales backlog／RPO；Q2 2026 的 US$349.31B 不可取消承諾與 US$14.72B 或有 cloud capacity 是 Meta 對供應商的支出義務，不是客戶訂單、Vistara 外部營收或 commercial proof。成熟度：Vistara 是 Meta 內部 deployed platform，無外售 revenue。go 授權：只 append 這兩筆 exact Engine C manual observations，然後用新 refs 對 baseline pd_477223f3a4c9647253b8c440db127979 做 research-intent reassess；不入圖、不改 thesis、不建立 paper/live、不推定 holdings、choice、fill 或交易。完整 packet：library/private/decision_lab/daily_gap_research_meta_2026-08-04.json",
       "n": 86,
-      "reason": null,
+      "reason": "兩筆 META manual observation 已 append（backlog 含逐字更正 mo_aedf9e48）；已用新 refs 完成 research-intent reassess → decision pd_223388c35618313d49b189aba9c3f18a",
+      "receipt": "authority:engine_c_manual_observation;ref:mo_22f06842ef9da32dbe26badc1aa6eb2f+mo_aedf9e488b3a212d8a44e05718cfda23",
       "ref_id": "engine_c_manual:wo_2f362f30db3af87670dab873513a3fed",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-04T05:50:35.297998+00:00",
       "source": "manual",
       "title": "ENGINE C APPROVAL — Meta Platforms（META）customer concentration／backlog",
       "type": "manual"
     },
     {
       "added_at": "2026-08-03T22:51:40.998736+00:00",
+      "completion_authority": {
+        "action_digest": "0751edf7c522abe22fe735ff58dc5c14f2a379866196a6a1fa3b09ba34a3810e",
+        "cohort_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+        "commit": "d1bd51904d3ef2673d92a21c8a5dc4393ec3e9f2",
+        "company_id": "co:axt",
+        "verified_at": "2026-08-04T05:46:20.287141+00:00"
+      },
       "hint": "核准 exact graph delta；Decision handoff：co:axt。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 87,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_05f68d361992f99e624ec752abb6fe62;digest:0751edf7c522abe22fe735ff58dc5c14f2a379866196a6a1fa3b09ba34a3810e;commit:d1bd51904d3ef2673d92a21c8a5dc4393ec3e9f2;cohort:dc_ab4aa345d1c85b0f3c365a0ec71dad13",
       "ref_id": "ra_05f68d361992f99e624ec752abb6fe62",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-04T05:46:20.287141+00:00",
       "source": "research_action",
       "title": "Sumitomo Electric official InP substrate capacity plan",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-08-04T05:57:16.865177+00:00",
+      "hint": "核准 exact graph delta；Decision handoff：co:lumentum。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 88,
+      "reason": null,
+      "ref_id": "ra_5ee3b69676bf9ea15225ea6034edf819",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "Lumentum fifth InP fab (Greensboro) forward capacity plan",
+      "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-08-04T05:57:16.865177+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 89,
+      "reason": null,
+      "ref_id": "dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:meta",
+      "type": "decision_review"
     }
   ],
   "log": [
@@ -2631,8 +2665,44 @@
       "ref_id": "dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
       "type": "decision_review",
       "verb": "pq1_awaiting_approval"
+    },
+    {
+      "at": "2026-08-04T05:46:20.287141+00:00",
+      "n": 87,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_05f68d361992f99e624ec752abb6fe62;digest:0751edf7c522abe22fe735ff58dc5c14f2a379866196a6a1fa3b09ba34a3810e;commit:d1bd51904d3ef2673d92a21c8a5dc4393ec3e9f2;cohort:dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "ref_id": "ra_05f68d361992f99e624ec752abb6fe62",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-04T05:50:35.297998+00:00",
+      "n": 86,
+      "reason": "兩筆 META manual observation 已 append（backlog 含逐字更正 mo_aedf9e48）；已用新 refs 完成 research-intent reassess → decision pd_223388c35618313d49b189aba9c3f18a",
+      "receipt": "authority:engine_c_manual_observation;ref:mo_22f06842ef9da32dbe26badc1aa6eb2f+mo_aedf9e488b3a212d8a44e05718cfda23",
+      "ref_id": "engine_c_manual:wo_2f362f30db3af87670dab873513a3fed",
+      "type": "manual",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-04T05:50:41.172693+00:00",
+      "n": 83,
+      "reason": null,
+      "receipt": "decision:pd_223388c35618313d49b189aba9c3f18a",
+      "ref_id": "dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
+      "type": "decision_review",
+      "verb": "pq1_completed"
+    },
+    {
+      "at": "2026-08-04T05:50:41.172693+00:00",
+      "n": 83,
+      "reason": "pq1 completed",
+      "receipt": "decision:pd_223388c35618313d49b189aba9c3f18a",
+      "ref_id": "dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
+      "type": "decision_review",
+      "verb": "go"
     }
   ],
-  "next_n": 88,
+  "next_n": 90,
   "schema_version": "1"
 }

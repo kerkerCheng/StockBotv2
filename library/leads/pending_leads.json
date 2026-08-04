@@ -6560,9 +6560,23 @@
       ],
       "published_at": "2026-07-30T06:52:06.000Z",
       "raw_text": "Just some interesting takeaways from $FORM earnings call on CPO:\n\nSince they attributed systems revenue nearly doubled due to: \"accelerating growth in co-packaged optics or CPO\". \n\nQ1 2026: \"we now expect 2026 CPO revenues to come in at the high end of the $10 million to $20 million range\"\n\nQ2 2026 (now): \"expect to exceed that range by the end of the third quarter, and to significantly exceed the $20 million level for the year overall.\"\n\nManagement stated \"We’re seeing some significant acceleration in this [CPO] business\". \n\nQ: CPO adoption outlook. Are we perhaps expecting the timeline to accelerate a little bit?\n\nA: \"What I would say is there’s acceleration here in the very short term.\" But management stated there's not a significant pull-in on timelines. \n\nCiting production infrastructure (not just R&D) for:\n\n- The growing volumes of CPO chips planned for later this year + test insertion for scale-up and scale-out switches. \n- Seems like that CPO piece flows through $TSM COUPE [ likely maps to $NVDA CPO products] - \"The CPO piece does flow through that 10% customer\"\n\nSo now, test is ramping given management cited growing volumes of CPO chips. \n\n\"The rapid recent growth of our CPO business is an exciting development, which we believe represents the very early stages of widespread adoption of silicon photonics in the broader semiconductor industry\"\n\nTLDR: Fundamentally, CPO as a theme is very early, and should start to go brrr soon since it's starting to show up in earnings now (equipment/test players usually appear up first before optical engines / laser volumes ramp). \n\nPersonally once all the deleveraging stops, I think markets will start to care more.",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已取得一手：FormFactor 2026-07-29 Q2 FY2026 法說會確認 2026 CPO 營收由 US$10-20M 指引上修為 Q3 底超過 US$20M、全年顯著超過；Q2 營收 US$258.2M。惟此為 L4 時變財務觀測（營收指引），歸 Engine C，無唯一 graph delta，故不產 RA。推文另稱 CPO 流經 TSMC COUPE 的 10% 客戶，未經一手點名核對。",
+        "trace_attempts_ref": "formfactor_q2fy2026_call_2026_07_29_secondary_transcripts",
+        "trace_next_trigger": "FORM Q3 FY2026 法說會揭露 CPO 實際營收，或出現可入圖的 CPO 測試環節結構關係一手來源",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "FORM",
+          "NVDA",
+          "TSM",
+          "co:nvidia",
+          "co:tsmc"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -7066,9 +7080,15 @@
       ],
       "published_at": "2026-08-01T06:24:58.000Z",
       "raw_text": "$LITE CEO Michael Hurlston at the RAISE Summit warned that the supply gap for InP lasers for AI DCs:\n\nIs facing a more severe supply chain crisis than memory. \n\nAnd with Lumentum's 5 InP fabs, shipments would be more than 30%+ below customer demand.\n\nThis is especially visible with EMLs today but is already expanding to CW, especially as CPO ramps.\n\nI've always been a fan of the laser chokepoint + bottleneck from $AAOI, $SIVE, $LITE, and $COHR. And glad this thesis is starting to see validation.",
-      "refs": {},
+      "refs": {
+        "focus_company_id": "co:lumentum",
+        "research_action_id": "ra_5ee3b69676bf9ea15225ea6034edf819",
+        "trace_attempts_ref": "raise_summit_secondary_blocked_lumentum_q3fy26_call_obtained",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "action_prepared",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -16955,9 +16975,23 @@
       ],
       "published_at": "2026-07-31T08:57:11.000Z",
       "raw_text": "Now that I think of it more, $POET optical interposer piece is actually a little more material than I thought with $SIVE. \n\nOriginally the wording was \"readiness\" for EOY 2026. \n\nBut $POET upgraded that wording, by stating \"production\" with Sivers lasers projected EOY 2026. \n\nSo a volume orders from across $JBL to $POET, should hit in H1 2027. Which makes a bit of sense, since Sivers did raise an institutional oversubscribed round for future mass production.  \n\nOn a side note, can't believe it's already August and 5 months left until 2027... Which was my inflection window for glass substrates, CPO, 800v, and new architectures to ramp.",
-      "refs": {},
+      "refs": {
+        "parked_reason": "推文主張 POET 把 Sivers 光源措辭由 readiness 升級為 production，但官方一手（POET/Sivers 2025-09-30 與 2025-11-06 公告）仍只寫 production readiness targeted end of 2026；未找到 2026 年 7-8 月的新官方公告支持措辭升級。不產 RA。",
+        "trace_attempts_ref": "poet_sivers_official_pr_2025_09_and_2025_11_only",
+        "trace_next_trigger": "POET 或 Sivers 下一份官方公告／財報明確使用 production 或揭露量產訂單",
+        "trace_requires_user": "false",
+        "trace_status": "isolated_tier_4",
+        "trace_trigger_entities": [
+          "JBL",
+          "POET",
+          "SIVE",
+          "co:jabil",
+          "co:poet_technologies"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -17781,7 +17815,7 @@
         "trace_status": "original_obtained"
       },
       "source": "trendforce:sumitomo",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {
         "cpo": {
           "counter_only": false,
