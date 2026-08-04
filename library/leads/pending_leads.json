@@ -12043,6 +12043,35 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2078259660784910661"
     },
+    "lead_96e4ba8b7c960f7b40a3953b101bca75": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-04T14:29:08.588002+00:00",
+      "lead_id": "lead_96e4ba8b7c960f7b40a3953b101bca75",
+      "published_at": "2026-08-04",
+      "refs": {
+        "trace_next_trigger": "中際旭創(300308.SZ)年報/交易所公告/互動易揭露 Thailand TeraHop 實際出貨量、良率與占總出貨比例(目前來源疑似同源轉述同一份 IR record,未獨立佐證)",
+        "trace_requires_user": "false",
+        "trace_status": "isolated_tier_3"
+      },
+      "source": "futunn_industry_report",
+      "status": "parked",
+      "themes": {},
+      "title": "中際旭創 Thailand/TeraHop 海外產能與營收占比(90.58% 海外營收,$517M TeraHop 增資,產能爬坡進度不明)",
+      "triage": {
+        "decided_at": "2026-08-04T14:29:26.428215+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "contradiction": true,
+          "independent_source": true
+        },
+        "reason": "中際旭創 Thailand/TeraHop 海外產能與 90.58% 海外營收占比,若成立將大幅弱化'禁中國進口=重傷 Innolight'的市場敘事;多篇來源疑似同源轉述同一份 IR record/公告,需回互動易/年報核對獨立性",
+        "tier": 3
+      },
+      "url": "https://news.futunn.com/en/post/59427787/zhongji-innolight-300308-company-event-commentary-report-gross-margin-increases"
+    },
     "lead_9764dccc195ed2f828b901eacabe0b2c": {
       "entities": {
         "company_ids": [
@@ -14562,6 +14591,35 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2071851376246989079"
     },
+    "lead_b6c4615d9d72866db4490807ec73045a": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-04T14:29:10.484873+00:00",
+      "lead_id": "lead_b6c4615d9d72866db4490807ec73045a",
+      "published_at": "2026-08-04",
+      "refs": {
+        "focus_company_id": "co:applied_optoelectronics",
+        "research_action_id": "ra_779585ee4e9ee9ec0d1b7df3b028cd48",
+        "trace_status": "original_obtained"
+      },
+      "source": "yahoo_finance_company_profile",
+      "status": "applied",
+      "themes": {},
+      "title": "AAOI Ningbo,China 廠 2,927 名員工(全公司最大單一據點)與圖內既有'<10% 中國原產值'主張(confidence 0.50,單一來源)之張力,需查 10-K Item 2 Properties 逐字核對",
+      "triage": {
+        "decided_at": "2026-08-04T14:29:26.611390+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "contradiction": true,
+          "independent_source": true
+        },
+        "reason": "AAOI Ningbo 中國廠 2,927 員工(全公司最大據點)與圖內既有 <10% 中國原產值主張(confidence 0.50,單一來源 primetrading deepdive)產生張力;此為既有 thesis 假設的直接矛盾候選,非單純新聞",
+        "tier": 3
+      },
+      "url": "https://finance.yahoo.com/quote/AAOI/profile/"
+    },
     "lead_b6f6f4eabd6f1712350e991a9da89f90": {
       "entities": {
         "company_ids": [],
@@ -15390,6 +15448,35 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2080032221638119603"
+    },
+    "lead_c470eb6eb0cf85806619a921cd756db0": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-04T14:29:06.479627+00:00",
+      "lead_id": "lead_c470eb6eb0cf85806619a921cd756db0",
+      "published_at": "2026-08-04",
+      "refs": {
+        "trace_next_trigger": "FCC 官方 docket 或 Federal Register 公布本規則正式文本/NPRM;或 AWS/Meta/Google 等雲端業者對供應商轉單的官方公告",
+        "trace_requires_user": "false",
+        "trace_status": "isolated_tier_3"
+      },
+      "source": "reuters_wire",
+      "status": "parked",
+      "themes": {},
+      "title": "Exclusive-Trump Administration Drafting Ban on Chinese Data Center Devices, Sources Say",
+      "triage": {
+        "decided_at": "2026-08-04T14:29:26.248057+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true,
+          "novelty": true
+        },
+        "reason": "Reuters 獨家(經多家媒體轉載),FCC 草擬禁中國光收發模組進口;已引動 AAOI/COHR/LITE/GLW 單日大漲,關聯圖內既有 co:coherent/co:lumentum/co:applied_optoelectronics/co:corning/co:zhongji_innolight thesis;規則本文未公布,原文不存在",
+        "tier": 3
+      },
+      "url": "https://www.usnews.com/news/top-news/articles/2026-08-04/exclusive-trump-administration-drafting-ban-on-chinese-data-center-devices-sources-say"
     },
     "lead_c47b75e7f3907d271c4707876b56a30a": {
       "entities": {
