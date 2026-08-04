@@ -7082,13 +7082,25 @@
       "raw_text": "$LITE CEO Michael Hurlston at the RAISE Summit warned that the supply gap for InP lasers for AI DCs:\n\nIs facing a more severe supply chain crisis than memory. \n\nAnd with Lumentum's 5 InP fabs, shipments would be more than 30%+ below customer demand.\n\nThis is especially visible with EMLs today but is already expanding to CW, especially as CPO ramps.\n\nI've always been a fan of the laser chokepoint + bottleneck from $AAOI, $SIVE, $LITE, and $COHR. And glad this thesis is starting to see validation.",
       "refs": {
         "focus_company_id": "co:lumentum",
+        "parked_reason": "一手已取得（Lumentum Q3 FY2026 法說會 2026-05-06），但該文件已完整入圖於 doc_id lumentum_q3fy26_cpo；準備的 RA ra_5ee3b696 與既有 cl1/cl3 重複，apply 遭 DuplicateUrlError 擋下並撤回。唯一尚未入圖的細節是「Greensboro 為第五座 InP fab」此一數量事實。",
         "research_action_id": "ra_5ee3b69676bf9ea15225ea6034edf819",
-        "trace_attempts_ref": "raise_summit_secondary_blocked_lumentum_q3fy26_call_obtained",
+        "trace_attempts_ref": "raise_summit_not_traced_lumentum_q3fy26_already_in_graph",
+        "trace_next_trigger": "RAISE Summit 官方逐字／Lumentum 官方 8-K 取得，或決定補「五座 InP fab」數量事實",
         "trace_requires_user": "false",
-        "trace_status": "original_obtained"
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "AAOI",
+          "COHR",
+          "LITE",
+          "SIVE",
+          "co:applied_optoelectronics",
+          "co:coherent",
+          "co:lumentum"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "action_prepared",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,

@@ -1309,10 +1309,11 @@
       "added_at": "2026-08-04T05:57:16.865177+00:00",
       "hint": "核准 exact graph delta；Decision handoff：co:lumentum。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 88,
-      "reason": null,
+      "reason": "apply 時撞到 DuplicateUrlError：同一份 Lumentum Q3 FY2026 法說會已以 doc_id lumentum_q3fy26_cpo 完整入圖（6 claims），既有 cl3 已涵蓋 Greensboro InP fab 約六季後才貢獻營收、cl1 已涵蓋 >30% 供需失衡。本 RA 無新增 graph delta，不重複入圖。",
+      "receipt": null,
       "ref_id": "ra_5ee3b69676bf9ea15225ea6034edf819",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "drop",
+      "resolved_at": "2026-08-04T06:52:56.288470+00:00",
       "source": "research_action",
       "title": "Lumentum fifth InP fab (Greensboro) forward capacity plan",
       "type": "ra_admission"
@@ -2701,6 +2702,15 @@
       "ref_id": "dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
       "type": "decision_review",
       "verb": "go"
+    },
+    {
+      "at": "2026-08-04T06:52:56.288470+00:00",
+      "n": 88,
+      "reason": "apply 時撞到 DuplicateUrlError：同一份 Lumentum Q3 FY2026 法說會已以 doc_id lumentum_q3fy26_cpo 完整入圖（6 claims），既有 cl3 已涵蓋 Greensboro InP fab 約六季後才貢獻營收、cl1 已涵蓋 >30% 供需失衡。本 RA 無新增 graph delta，不重複入圖。",
+      "receipt": null,
+      "ref_id": "ra_5ee3b69676bf9ea15225ea6034edf819",
+      "type": "ra_admission",
+      "verb": "drop"
     }
   ],
   "next_n": 90,
