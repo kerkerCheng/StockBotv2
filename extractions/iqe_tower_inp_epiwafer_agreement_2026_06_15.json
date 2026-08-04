@@ -1,0 +1,112 @@
+{
+  "claims": [
+    {
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Downgrade if either party discloses termination, non-renewal or waiver of the minimum purchase or minimum volume commitments, if Tower qualifies an alternative InP epiwafer supplier for the same 200Gb/lane and OCS programmes, or if IQE later restates the arrangement as non-binding.",
+      "id": "iqe_tower_inp_epiwafer_agreement_2026_06_15_cl1",
+      "source_ids": [
+        "iqe_tower_inp_epiwafer_agreement_2026_06_15_s1",
+        "iqe_tower_inp_epiwafer_agreement_2026_06_15_s2"
+      ],
+      "statement": "On 2026-06-15 IQE plc and Tower Semiconductor jointly announced a multi-year agreement under which IQE supplies InP epiwafers to Tower for silicon photonics optical connectivity serving AI data centre infrastructure. The agreement includes a minimum purchase commitment by Tower in the first year, a reciprocal supply commitment from IQE, and minimum volume commitments thereafter. Contract value, volumes, duration and exclusivity are not disclosed.",
+      "subject_id": "co:iqe"
+    },
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Downgrade if Tower discloses that the 200Gb/lane programme does not reach volume production, or if the optical-circuit-switch application is dropped from the agreement scope.",
+      "id": "iqe_tower_inp_epiwafer_agreement_2026_06_15_cl2",
+      "source_ids": [
+        "iqe_tower_inp_epiwafer_agreement_2026_06_15_s3"
+      ],
+      "statement": "Tower Semiconductor's disclosed application scope for the IQE InP epiwafers covers 200Gb/lane pluggable transceivers, prototyping of next-generation 400Gb/lane modulators, and optical-circuit-switches for datacentre deployment. The 400Gb/lane element is explicitly described as prototyping, not volume production.",
+      "subject_id": "co:tower_semiconductor"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "co:tower_semiconductor",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "iqe_tower_inp_epiwafer_agreement_2026_06_15_s1",
+        "iqe_tower_inp_epiwafer_agreement_2026_06_15_s2",
+        "iqe_tower_inp_epiwafer_agreement_2026_06_15_s4"
+      ],
+      "src_id": "co:iqe"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "IQE",
+        "IQE.L"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:iqe",
+      "name": "IQE plc",
+      "role": "material_base",
+      "source_ids": [
+        "iqe_tower_inp_epiwafer_agreement_2026_06_15_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [
+        "Tower",
+        "TSEM"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:tower_semiconductor",
+      "name": "Tower Semiconductor",
+      "role": "foundry",
+      "source_ids": [
+        "iqe_tower_inp_epiwafer_agreement_2026_06_15_s1"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "iqe_tower_inp_epiwafer_agreement_2026_06_15",
+    "evidence_tier": 1,
+    "origin_entity": "IQE plc and Tower Semiconductor (joint announcement with named executives from both parties)",
+    "permission_basis": "Publicly available issuer RNS/press release on the company's own IR site; retain the canonical URL and only the research-relevant excerpt.",
+    "published_at": "2026-06-15",
+    "publisher": "IQE plc",
+    "retrieved_at": "2026-08-04",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "IQE and Tower Semiconductor announce multi-year InP epiwafer supply agreement",
+    "url": "https://www.iqep.com/media/press-releases/2026/iqe-and-tower-semiconductor-announce-multi-year-inp-epiwafer-supply-agreement/"
+  },
+  "sources": [
+    {
+      "id": "iqe_tower_inp_epiwafer_agreement_2026_06_15_s1",
+      "locator": "Announcement body - agreement scope",
+      "quote": "Multi-year agreement for the supply of Indium Phosphide (InP) epiwafers for optical connectivity solutions serving AI-driven data centre infrastructure."
+    },
+    {
+      "id": "iqe_tower_inp_epiwafer_agreement_2026_06_15_s2",
+      "locator": "Announcement body - commitments",
+      "quote": "The agreement provides for a minimum purchase commitment by Tower in the first year, a reciprocal supply commitment from IQE, and minimum volume commitments thereafter."
+    },
+    {
+      "id": "iqe_tower_inp_epiwafer_agreement_2026_06_15_s3",
+      "locator": "Announcement body - application scope",
+      "quote": "200Gbs/lane for pluggable transceivers and the prototyping of next-generation 400Gb/lane modulators, as well as other critical applications including optical-circuit-switches for deployment in datacentres."
+    },
+    {
+      "id": "iqe_tower_inp_epiwafer_agreement_2026_06_15_s4",
+      "locator": "Announcement body - Tower executive quote",
+      "quote": "We are pleased to partner with IQE as a key supplier for our next-generation photonic technologies."
+    }
+  ]
+}
