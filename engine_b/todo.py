@@ -740,6 +740,17 @@ def retire_legacy_pq1_items(
 retire_legacy_lead_research = retire_legacy_pq1_items
 
 
+def _dropped_before(pool: Mapping[str, Any], row: Mapping[str, Any]) -> bool:
+    """該 (type, ref_id) 是否已被使用者明確 drop 過。"""
+    key = _key(str(row["type"]), str(row["ref_id"]))
+    return any(
+        _key(item["type"], item["ref_id"]) == key
+        and item.get("resolved_at")
+        and item.get("resolution") == "drop"
+        for item in pool["items"]
+    )
+
+
 def sync(
     pool: dict[str, Any],
     incoming: Iterable[Mapping[str, Any]],
@@ -751,11 +762,19 @@ def sync(
     `incoming` 每筆需有 type／ref_id／title，可選 hint／source。已 resolve 的
     (type, ref_id) 會重新進池（代表它又出現了，例如新的 evidence-delta）——這是
     刻意的：resolve 表示「當時處理過」，不是永久黑名單。
+
+    唯一例外是 `ra_admission`：Research Action 是 content-addressed 凍結物件，
+    digest 固定、內容不會自行改變，所以 `drop` 一個 exact action_id 就是永久
+    決定。若不排除，apply 永遠失敗的 RA（例如撞 DuplicateUrlError 而停在
+    `partial`）會每次 sync 都取得新編號，把待辦池洗成噪音。要重新提出必須重跑
+    prepare，那會產生新的 action_id 與 digest，自然重新進池。
     """
     added = 0
     reactivated = 0
     stamp = at or _now()
     for row in incoming:
+        if str(row["type"]) == "ra_admission" and _dropped_before(pool, row):
+            continue
         before = len(pool["items"])
         item = upsert(
             pool,

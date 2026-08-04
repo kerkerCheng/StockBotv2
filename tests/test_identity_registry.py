@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ast
+import json
 from pathlib import Path
 
 from decision_lab.identity import resolve_identity
@@ -33,7 +34,12 @@ def test_neutral_registry_preserves_known_company_mappings() -> None:
     assert registry.research_ticker("co:hyundai_mobis") == "012330.KS"
     assert registry.research_ticker("co:boston_dynamics") is None
     assert registry.company_id_for_ticker("sive.st") == "co:sivers_semiconductors"
-    assert len(TICKER_MAP) == 52
+    # 每個 registry 條目都要出現在 TICKER_MAP（含 research_ticker 為 None 的私人公司）。
+    # 比對 config 而非硬編數字，才不會每 onboard 一家公司就得改測試。
+    registered = json.loads(
+        (ROOT / "config" / "company_identity.json").read_text(encoding="utf-8")
+    )["companies"]
+    assert len(TICKER_MAP) == len(registered)
 
 
 def test_all_known_consumers_import_ticker_map_from_neutral_registry() -> None:

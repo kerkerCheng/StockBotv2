@@ -182,6 +182,48 @@ def test_sync_persists_derived_waiting_and_clears_it_when_mode_changes() -> None
     assert "waiting_on" not in todo.get(pool, 1)
 
 
+def test_dropped_ra_admission_is_not_rebuilt_by_sync() -> None:
+    """apply 永遠失敗的 RA 被 drop 後不得每次 sync 都取得新編號。"""
+    row = {
+        "type": "ra_admission",
+        "ref_id": "ra_dup",
+        "title": "撞 DuplicateUrlError 的 RA",
+    }
+    pool = todo.empty_pool()
+    todo.sync(pool, [row])
+    todo.resolve(pool, 1, "drop", reason="與既有 doc 重複，apply 不可能成功")
+
+    result = todo.sync(pool, [row])
+
+    assert result["added"] == 0
+    assert result["reactivated"] == 0
+    assert [item["n"] for item in todo.active_items(pool)] == []
+
+
+def test_dropped_ra_admission_returns_under_a_fresh_action_id() -> None:
+    """重跑 prepare 產生新 action_id 時仍要重新進池。"""
+    pool = todo.empty_pool()
+    todo.sync(pool, [{"type": "ra_admission", "ref_id": "ra_old", "title": "舊 RA"}])
+    todo.resolve(pool, 1, "drop", reason="重複")
+
+    todo.sync(pool, [{"type": "ra_admission", "ref_id": "ra_new", "title": "重做的 RA"}])
+
+    assert [item["ref_id"] for item in todo.active_items(pool)] == ["ra_new"]
+
+
+def test_dropped_decision_review_still_reactivates() -> None:
+    """drop 的例外只限 ra_admission；decision_review 仍可因新 delta 回池。"""
+    row = {"type": "decision_review", "ref_id": "dc_1", "title": "REVIEW"}
+    pool = todo.empty_pool()
+    todo.sync(pool, [row])
+    todo.resolve(pool, 1, "drop", reason="本次略過")
+
+    result = todo.sync(pool, [row])
+
+    assert result["added"] == 1
+    assert [item["ref_id"] for item in todo.active_items(pool)] == ["dc_1"]
+
+
 class _WorkOrderStore:
     def __init__(self) -> None:
         self.status = "proposed"
