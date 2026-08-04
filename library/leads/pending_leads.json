@@ -4000,11 +4000,12 @@
       "lead_id": "lead_23b32554ba8379eb61692a965d949349",
       "published_at": null,
       "refs": {
+        "action_digest": "e936f10a7c6d7f899447190a1ef408d3f43b2db1f905230eeb501421af130a14",
         "focus_company_id": "co:iqe",
         "research_action_id": "ra_d59d7ec7a19e6aefeac374d34e47e57b"
       },
       "source": "iqe:official_ir",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {
         "cpo": {
           "counter_only": false,

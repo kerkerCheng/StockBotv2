@@ -1345,12 +1345,20 @@
     },
     {
       "added_at": "2026-08-04T07:15:07.633970+00:00",
+      "completion_authority": {
+        "action_digest": "e936f10a7c6d7f899447190a1ef408d3f43b2db1f905230eeb501421af130a14",
+        "cohort_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+        "commit": "59b4f7cd768fcd721fddc1d01cfb41157e5c6a61",
+        "company_id": "co:iqe",
+        "verified_at": "2026-08-04T07:25:01.509852+00:00"
+      },
       "hint": "核准 exact graph delta；Decision handoff：co:iqe。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 91,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_d59d7ec7a19e6aefeac374d34e47e57b;digest:e936f10a7c6d7f899447190a1ef408d3f43b2db1f905230eeb501421af130a14;commit:59b4f7cd768fcd721fddc1d01cfb41157e5c6a61;cohort:dc_6d08fd8f2b2c77b9f7734b464cfb8510",
       "ref_id": "ra_d59d7ec7a19e6aefeac374d34e47e57b",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-04T07:25:01.509852+00:00",
       "source": "research_action",
       "title": "IQE plc onboarding: Tower Semiconductor multi-year InP epiwafer supply agreement",
       "type": "ra_admission"
@@ -1367,6 +1375,25 @@
       "source": "research_action",
       "title": "Lumentum fifth InP fab (Greensboro) forward capacity plan",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-08-04T07:27:57.692312+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 93,
+      "reason": null,
+      "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:iqe",
+      "type": "decision_review",
+      "waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-08-04T07:27:57.692226+00:00",
+        "trigger": "該 Confidence 軸尚未提供有效評估／執行面 context 缺失／Engine C 無此標的財務資料",
+        "until": null
+      }
     }
   ],
   "log": [
@@ -2767,8 +2794,17 @@
       "ref_id": "ra_5ee3b69676bf9ea15225ea6034edf819",
       "type": "ra_admission",
       "verb": "drop"
+    },
+    {
+      "at": "2026-08-04T07:25:01.509852+00:00",
+      "n": 91,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_d59d7ec7a19e6aefeac374d34e47e57b;digest:e936f10a7c6d7f899447190a1ef408d3f43b2db1f905230eeb501421af130a14;commit:59b4f7cd768fcd721fddc1d01cfb41157e5c6a61;cohort:dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+      "ref_id": "ra_d59d7ec7a19e6aefeac374d34e47e57b",
+      "type": "ra_admission",
+      "verb": "go"
     }
   ],
-  "next_n": 93,
+  "next_n": 94,
   "schema_version": "1"
 }
