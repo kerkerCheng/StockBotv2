@@ -1394,6 +1394,19 @@
         "trigger": "該 Confidence 軸尚未提供有效評估／執行面 context 缺失／Engine C 無此標的財務資料",
         "until": null
       }
+    },
+    {
+      "added_at": "2026-08-04T22:38:03.641836+00:00",
+      "hint": "BLOCKER：Research Action 尚未聲明唯一 focus_company_id；先回 pq1 補 Decision handoff，不得先 apply。",
+      "n": 94,
+      "reason": "失敗 partial RA ra_59fd7818 已由同一 AAOI 10-K claim 的成功 action ra_779585ee 取代；後者已完成 graph apply 與 durable publication，舊 action 無新增 delta 且不可 apply。",
+      "receipt": "superseded_by:ra_779585ee4e9ee9ec0d1b7df3b028cd48;commit:42f655cb107006084c8f7daedb7050d1eff8bc78",
+      "ref_id": "ra_59fd7818573f6b4a8e0b03f92cc03ced",
+      "resolution": "drop",
+      "resolved_at": "2026-08-04T22:42:42.924839+00:00",
+      "source": "research_action",
+      "title": "AAOI 10-K Item 2 Properties：Ningbo 廠為全公司最大據點，與既有低中國含量主張產生張力",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -2803,8 +2816,17 @@
       "ref_id": "ra_d59d7ec7a19e6aefeac374d34e47e57b",
       "type": "ra_admission",
       "verb": "go"
+    },
+    {
+      "at": "2026-08-04T22:42:42.924839+00:00",
+      "n": 94,
+      "reason": "失敗 partial RA ra_59fd7818 已由同一 AAOI 10-K claim 的成功 action ra_779585ee 取代；後者已完成 graph apply 與 durable publication，舊 action 無新增 delta 且不可 apply。",
+      "receipt": "superseded_by:ra_779585ee4e9ee9ec0d1b7df3b028cd48;commit:42f655cb107006084c8f7daedb7050d1eff8bc78",
+      "ref_id": "ra_59fd7818573f6b4a8e0b03f92cc03ced",
+      "type": "ra_admission",
+      "verb": "drop"
     }
   ],
-  "next_n": 94,
+  "next_n": 95,
   "schema_version": "1"
 }
