@@ -1248,7 +1248,14 @@
       "resolved_at": null,
       "source": "decision_lab",
       "title": "REVIEW — co:axt",
-      "type": "decision_review"
+      "type": "decision_review",
+      "waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-08-05T11:34:41.621038+00:00",
+        "trigger": "僅剩系統內部狀態，重新 reassess 即可（無使用者決定）",
+        "until": null
+      }
     },
     {
       "added_at": "2026-08-03T22:36:54.439794+00:00",
