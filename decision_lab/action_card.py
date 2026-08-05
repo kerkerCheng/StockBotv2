@@ -362,8 +362,13 @@ def build_action_card(
     live_shares = sizing.get("live_supported_shares")
     if live_status != "ELIGIBLE":
         live_shares = None
+    # core_blockers（assessment ∪ coverage）正是把 action 判成 REVIEW 的原因，
+    # 必須出現在 card 自己的 blockers 裡。先前只放 assessment_blockers，於是
+    # coverage blocker（如 financial_runway_manual_required）會驅動 REVIEW 卻不
+    # 現身，下游只看得到 lane blocker，導致待辦池推導出「重新 reassess 即可」
+    # 這種與真正缺口無關的等待理由。
     blockers = sorted(
-        set(sizing.get("assessment_blockers", []))
+        set(core_blockers)
         | set(sizing.get("paper_blockers", []))
         | set(sizing.get("live_blockers", []))
         | set(current_paper_blockers)

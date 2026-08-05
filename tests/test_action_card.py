@@ -53,6 +53,78 @@ def test_action_card_leads_with_action_and_keeps_paper_live_separate(
         store.close()
 
 
+def test_coverage_blocker_that_drives_review_appears_in_card_blockers(
+    tmp_path: Path,
+) -> None:
+    """把 action 判成 REVIEW 的 core blocker 必須出現在 card 自己的 blockers 裡。
+
+    事發（2026-08-05）：co:axt 的唯一實質缺口是 coverage 的
+    financial_runway_manual_required，但 card blockers 只放 assessment_blockers，
+    所以下游只看得到 lane blocker（全屬 system_internal），待辦池因此推導出
+    「僅剩系統內部狀態，重新 reassess 即可」——與真正的缺口完全無關，而且會
+    誘導使用者去跑一個不會改變任何東西的 reassess。
+    """
+
+    from copy import deepcopy
+
+    from decision_lab.context import build_context_bundle, holdings_digest
+    from tests.test_decision_context import complete_inputs
+    from thesis.investment_policy import load_policy
+
+    store = _store(tmp_path)
+    try:
+        payload = deepcopy(complete_inputs())
+        identity = payload["identity"]
+        cohort_id = store.ensure_cohort(
+            dedupe_key="coverage-blocker",
+            company_id=identity["company_id"],
+            research_ticker=identity["research_ticker"],
+        ).cohort_id
+        store.record_holdings_confirmation(
+            holdings_digest(payload["holdings"]["rows"]),
+            confirmed_at="2026-07-21T09:00:00+00:00",
+        )
+        bundle = build_context_bundle(
+            store,
+            cohort_id=cohort_id,
+            evaluation_at=NOW,
+            policy_version=load_policy()["policy_version"],
+            **payload,
+        )
+        stored = store.record_coverage_assessment(
+            cohort_id=cohort_id,
+            context_digest=bundle.digest,
+            # 有 core blocker 時 coverage 依契約就是 coverage_pending，不可能是
+            # analyzable——這正是 co:axt 的真實狀態。
+            status="coverage_pending",
+            blockers=("financial_runway_manual_required",),
+            paper_blockers=(),
+            live_blockers=("holdings_unconfirmed",),
+            catalyst="next filing",
+            disproof="commercial evidence fails",
+            expiry="2026-08-21T00:00:00+00:00",
+            decision_relevance=8,
+            falsifiability=8,
+            information_value=7,
+        )
+        coverage = store.get_coverage_result(str(stored["assessment_id"]))
+        decision = assess_probe(
+            store,
+            bundle,
+            coverage,
+            _assessment(),
+            idempotency_key="assess:coverage-blocker",
+            effective_at="2026-07-21T12:00:00+00:00",
+        )
+
+        card = build_action_card(store, decision.decision_id, as_of=NOW)
+
+        assert card["action"] == "REVIEW"
+        assert "financial_runway_manual_required" in card["blockers"]
+    finally:
+        store.close()
+
+
 def test_beta_move_without_evidence_delta_is_not_called_thesis_disproof(
     tmp_path: Path,
 ) -> None:

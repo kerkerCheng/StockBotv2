@@ -182,6 +182,100 @@ def test_sync_persists_derived_waiting_and_clears_it_when_mode_changes() -> None
     assert "waiting_on" not in todo.get(pool, 1)
 
 
+def test_sync_refreshes_a_stale_derived_waiting_reason() -> None:
+    """blocker mode 沒變、但等的東西變了時，顯示文字必須跟著更新。
+
+    事發（2026-08-05）：co:applied_optoelectronics 的市場資料問題早已修好，池子卻
+    仍顯示「執行面 context 缺失／市場資料問題」——因為舊寫法只在 `waiting_on`
+    不存在時才填。結果是待辦池叫使用者去修一個已經修好的東西。
+    """
+
+    pool = todo.empty_pool()
+    todo.sync(pool, [{
+        "type": "decision_review",
+        "ref_id": "dc_1",
+        "title": "REVIEW",
+        "waiting_on": {
+            "until": None,
+            "trigger": "市場資料問題",
+            "reason": "所有 blocker 都不需要使用者決定",
+            "set_at": "2026-08-01T00:00:00+00:00",
+            "derived_from_blockers": True,
+        },
+    }])
+
+    result = todo.sync(pool, [{
+        "type": "decision_review",
+        "ref_id": "dc_1",
+        "title": "REVIEW",
+        "waiting_on": {
+            "until": None,
+            "trigger": "財務核驗清單欄位缺失或待人工填入",
+            "reason": "所有 blocker 都不需要使用者決定",
+            "set_at": "2026-08-05T00:00:00+00:00",
+            "derived_from_blockers": True,
+        },
+    }])
+
+    assert result["waiting_refreshed"] == 1
+    assert result["reactivated"] == 0  # 仍在等事件區，沒有回到決策佇列
+    assert todo.get(pool, 1)["waiting_on"]["trigger"] == "財務核驗清單欄位缺失或待人工填入"
+    assert any(
+        entry.get("verb") == "waiting_reason_refreshed" for entry in pool["log"]
+    )
+
+
+def test_sync_never_overwrites_a_user_set_waiting_reason() -> None:
+    """使用者用 --until/--trigger 明確設定的等待條件優先於自動推導。"""
+
+    pool = todo.empty_pool()
+    todo.sync(pool, [{"type": "decision_review", "ref_id": "dc_1", "title": "REVIEW"}])
+    todo.resolve(
+        pool, 1, "pending", until="2026-08-27", trigger="SIVE Q2 財報"
+    )
+
+    result = todo.sync(pool, [{
+        "type": "decision_review",
+        "ref_id": "dc_1",
+        "title": "REVIEW",
+        "waiting_on": {
+            "until": None,
+            "trigger": "市場資料問題",
+            "reason": "所有 blocker 都不需要使用者決定",
+            "set_at": "2026-08-05T00:00:00+00:00",
+            "derived_from_blockers": True,
+        },
+    }])
+
+    assert result["waiting_refreshed"] == 0
+    assert todo.get(pool, 1)["waiting_on"]["trigger"] == "SIVE Q2 財報"
+    assert todo.get(pool, 1)["waiting_on"]["until"] == "2026-08-27"
+
+
+def test_identical_derived_waiting_reason_is_not_rewritten_every_sync() -> None:
+    """set_at 每次推導都會變；只有語意欄位改變才算改變，否則會產生 log 噪音。"""
+
+    pool = todo.empty_pool()
+    base = {
+        "until": None,
+        "trigger": "市場資料問題",
+        "reason": "所有 blocker 都不需要使用者決定",
+        "derived_from_blockers": True,
+    }
+    todo.sync(pool, [{
+        "type": "decision_review", "ref_id": "dc_1", "title": "REVIEW",
+        "waiting_on": {**base, "set_at": "2026-08-01T00:00:00+00:00"},
+    }])
+
+    result = todo.sync(pool, [{
+        "type": "decision_review", "ref_id": "dc_1", "title": "REVIEW",
+        "waiting_on": {**base, "set_at": "2026-08-05T00:00:00+00:00"},
+    }])
+
+    assert result["waiting_refreshed"] == 0
+    assert todo.get(pool, 1)["waiting_on"]["set_at"] == "2026-08-01T00:00:00+00:00"
+
+
 def test_dropped_ra_admission_is_not_rebuilt_by_sync() -> None:
     """apply 永遠失敗的 RA 被 drop 後不得每次 sync 都取得新編號。"""
     row = {

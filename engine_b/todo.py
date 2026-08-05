@@ -771,6 +771,7 @@ def sync(
     """
     added = 0
     reactivated = 0
+    refreshed = 0
     stamp = at or _now()
     for row in incoming:
         if str(row["type"]) == "ra_admission" and _dropped_before(pool, row):
@@ -863,10 +864,35 @@ def sync(
             and not dispatch_in_flight
         ):
             item["waiting_on"] = dict(incoming_waiting)
+        elif (
+            incoming_waiting
+            and not material_decision_event
+            and not dispatch_in_flight
+            and (item.get("waiting_on") or {}).get("derived_from_blockers")
+            and _waiting_reason_changed(item["waiting_on"], incoming_waiting)
+        ):
+            # blocker 仍全屬等待事件（mode 沒變，所以上面的 reactivate 分支不會觸發），
+            # 但等的是不同的東西了。舊寫法只在沒有 waiting_on 時才填，於是顯示文字會
+            # 一直停在第一次推導的當下——會告訴使用者去修一個已經修好的東西。
+            # 只重算機器推導的；使用者以 --until/--trigger 明確設定的不動。
+            prior_waiting = dict(item["waiting_on"])
+            item["waiting_on"] = dict(incoming_waiting)
+            pool["log"].append({
+                "at": stamp,
+                "n": item["n"],
+                "type": item["type"],
+                "ref_id": item["ref_id"],
+                "verb": "waiting_reason_refreshed",
+                "reason": "blocker 內容改變，重新推導等待理由",
+                "receipt": None,
+                "prior_waiting_on": prior_waiting,
+            })
+            refreshed += 1
 
     return {
         "added": added,
         "reactivated": reactivated,
+        "waiting_refreshed": refreshed,
         "active": len(active_items(pool)),
     }
 
@@ -975,6 +1001,15 @@ def collect_from_lifecycle() -> list[dict[str, Any]]:
         }
         for tid, why in lifecycle_due()
     ]
+
+
+def _waiting_reason_changed(
+    current: Mapping[str, Any], incoming: Mapping[str, Any]
+) -> bool:
+    """只比對語意欄位；set_at 每次推導都會變，不算改變。"""
+
+    fields = ("trigger", "reason", "until", "event_type")
+    return any(current.get(field) != incoming.get(field) for field in fields)
 
 
 def _derive_waiting_on(blockers: Any) -> dict[str, Any] | None:
