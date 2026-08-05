@@ -1652,6 +1652,123 @@
       "result": "ok",
       "run_at": "2026-08-04T22:34:57.366251+00:00",
       "source": "edgar:GFS"
+    },
+    {
+      "failure_class": "provider_api_error",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-08-05T22:32:08.014140+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-08-05T22:32:08.579931+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-08-05T22:32:08.984200+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-08-05T22:32:09.388130+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-08-05T22:32:09.805394+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-08-05T22:32:10.249517+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-08-05T22:32:10.671949+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-08-05T22:32:11.097059+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-08-05T22:32:11.501185+00:00",
+      "source": "edgar:GFS"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-08-05T22:32:28.396917+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-05T22:32:29.652161+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-05T22:32:30.688831+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-05T22:32:31.826330+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-05T22:32:32.674948+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-05T22:32:33.713208+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-05T22:32:34.737347+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-05T22:32:35.744943+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-05T22:32:36.748068+00:00",
+      "source": "edgar:GFS"
     }
   ],
   "leads": {
@@ -8215,14 +8332,23 @@
         "campaign_topic": "photonics",
         "campaign_window_end": "2026-07-05T09:45:21Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
-        "parked_reason": "Sivers 官方 2026-04-16 公告與 2025 Annual Report 只支持「評估 Nasdaq New York 雙重上市」及準備財報；未找到「未來幾季完成」的公司逐字原文，不能把社群措辭升格成正式完成時程。",
+        "canonical_url": "https://www.sivers-semiconductors.com/press/sivers-semiconductors-has-resolved-on-a-directed-share-issue-of-shares-amounting-to-approximately-sek-700-million/",
+        "outcome": "parked；已取得原文但屬時變上市計畫觀測，無唯一 graph delta；未產生 prepared RA",
+        "parked_reason": "已追回 Sivers 2026-07-01 官方 directed share issue 公告；公司逐字写明 intent to complete the listing process over the next few quarters。這是上市計畫／公司事件觀測，未形成新的供應鏈 graph delta，不能把上市完成當成已完成。",
+        "primary_url": "https://www.sivers-semiconductors.com/press/sivers-semiconductors-has-resolved-on-a-directed-share-issue-of-shares-amounting-to-approximately-sek-700-million/",
         "research_mode": "delta_only",
-        "trace_attempts_ref": "Sivers 2026-04-16 official dual-listing release + 2025 Annual Report + exact-phrase search",
-        "trace_next_trigger": "Sivers_files_Nasdaq_application_registration_statement_or_official_completion_timetable",
+        "research_outcome": "original_obtained_no_unique_graph_delta",
+        "research_run": "daily_2026-08-06",
+        "trace_access_method": "official_ir",
+        "trace_attempts_ref": "Sivers 2026-04-16 dual-listing release、2025 Annual Report、2026-07-01 directed-share-issue official release、exact-phrase search",
+        "trace_next_trigger": "Sivers 提交 Nasdaq New York application／registration statement 或公告完成／延後／取消上市",
+        "trace_origin_entity": "Sivers Semiconductors AB",
+        "trace_original_date": "2026-07-01",
+        "trace_original_url": "https://www.sivers-semiconductors.com/press/sivers-semiconductors-has-resolved-on-a-directed-share-issue-of-shares-amounting-to-approximately-sek-700-million/",
         "trace_requeue_trigger": "related_triaged_lead:lead_7f66b743a034c41f6388aa800f333e62",
         "trace_requeued_at": "2026-08-04T22:36:55.816839+00:00",
         "trace_requires_user": "false",
-        "trace_status": "partial",
+        "trace_status": "original_obtained",
         "trace_trigger_entities": [
           "SIVE"
         ],
@@ -8230,7 +8356,7 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -8886,6 +9012,46 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2072733748261720186"
     },
+    "lead_63ec55c2f2d06961808063bf1f9f630a": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "RKLB"
+        ]
+      },
+      "first_seen": "2026-08-05T22:32:28.370505+00:00",
+      "lead_id": "lead_63ec55c2f2d06961808063bf1f9f630a",
+      "media": [
+        {
+          "cache": {
+            "bytes": 170183,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_63ec55c2f2d06961808063bf1f9f630a/3_2084795581973848064.jpg",
+            "sha256": "ae861e4a2a996982d311f5d2ec2ca21fb1736434f6a9dad0c7de0e1728f03600"
+          },
+          "height": 1100,
+          "media_key": "3_2084795581973848064",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HO6uiTza4AA2SKn.jpg",
+          "width": 1560
+        }
+      ],
+      "published_at": "2026-08-05T00:16:18.000Z",
+      "raw_text": "$RKLB has been awarded a $397M contract by the US Space Force.\n\nTo build out Flatellite satellites and launch them on their Medium Lift rocket, Neutron. https://t.co/0jsPPf9ucI",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "$RKLB has been awarded a $397M contract by the US Space Force. To build out Flatellite satellites and launch them on their Medium Lift rocket, Neutron. https://t.co/0jsPPf9ucI",
+      "triage": {
+        "decided_at": "2026-08-05T22:34:08.825465+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "RKLB 與 US Space Force 合約敘述具體且可追查，但不在目前追蹤主題／公司 registry；本輪沒有使用者指定的新領域探索 campaign，未通過關聯性硬指標，因此 FILTER，不進 pq1。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2084795597417263442"
+    },
     "lead_645d1fd05b13b7b735654ef26b9b3c60": {
       "entities": {
         "company_ids": [
@@ -9536,10 +9702,19 @@
         "campaign_topic": "photonics",
         "campaign_window_end": "2026-07-05T09:45:21Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
-        "parked_reason": "官方文件確認 Sivers 與 Jabil、O-Net、GlobalFoundries、Ayar、POET 的開發／reference-design／production-readiness 關係，但不支持貼文把所有專案直接寫成已 mass production 或已 revenue；Eoptolink／Innolight 亦未獲一手確認，既有圖已涵蓋主要伙伴關係，沒有新 graph delta。",
+        "canonical_url": "https://www.sivers-semiconductors.com/press/sivers-semiconductors-collaborates-with-jabil-on-energy-efficient-1-6t-pluggable-optical-transceiver-module/",
+        "outcome": "parked；部分支持但不證實全數量產／revenue；未產生 prepared RA",
+        "parked_reason": "追回 Sivers/Jabil 與夥伴官方文件後，只能支持 Jabil 1.6T LRO 開發、部分 partner/reference-design／production-readiness；貼文把 GFS、Ayar、POET 等不同成熟度關係合併成已量產／已 revenue，且 Eoptolink／Innolight 與 revenue mapping 未獲一手確認。新政策草案尚未形成客戶 qualification／訂單證據，沒有新的唯一 graph delta。",
+        "primary_url": "https://www.sivers-semiconductors.com/press/sivers-semiconductors-collaborates-with-jabil-on-energy-efficient-1-6t-pluggable-optical-transceiver-module/",
         "research_mode": "delta_only",
-        "trace_attempts_ref": "Sivers official Jabil/O-Net/GF/Ayar releases + POET-Sivers official collaboration + Sivers graph context",
-        "trace_next_trigger": "customer_qualification_completion_purchase_order_or_partner_revenue_disclosure",
+        "research_outcome": "partial_support_author_inference_rejected_no_new_graph_delta",
+        "research_run": "daily_2026-08-06",
+        "trace_access_method": "official_ir",
+        "trace_attempts_ref": "Sivers/Jabil official 1.6T LRO、Sivers Q1/Annual Report、O-Net/GFS/Ayar/POET official materials、related FCC draft-ban Reuters discovery",
+        "trace_next_trigger": "Jabil、GFS、Ayar、POET 或 O-Net 公告 qualification completion、volume order 或 revenue；或 FCC 公布中國光收發器規則正式文本",
+        "trace_origin_entity": "Sivers Semiconductors AB",
+        "trace_original_date": "2026-04-15",
+        "trace_original_url": "https://www.sivers-semiconductors.com/press/sivers-semiconductors-collaborates-with-jabil-on-energy-efficient-1-6t-pluggable-optical-transceiver-module/",
         "trace_requeue_trigger": "related_triaged_lead:lead_7f66b743a034c41f6388aa800f333e62",
         "trace_requeued_at": "2026-08-04T22:36:55.816839+00:00",
         "trace_requires_user": "false",
@@ -9559,7 +9734,7 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -11190,10 +11365,19 @@
         "campaign_topic": "photonics",
         "campaign_window_end": "2026-07-29T13:46:25Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
-        "parked_reason": "官方文件只支持 Jabil 1.6T LRO 開發、POET-Sivers 2026 年底 production readiness、GF reference design 與既有 O-Net／Ayar 合作；貼文推導的 1–4 月 qualification、2027 mass production 與 Apple／其他客戶時程未獲一手確認，主要關係已在圖中，無材料 graph delta。",
+        "canonical_url": "https://www.sivers-semiconductors.com/press/sivers-semiconductors-collaborates-with-jabil-on-energy-efficient-1-6t-pluggable-optical-transceiver-module/",
+        "outcome": "parked；成熟度時程仍未獲一手確認；未產生 prepared RA",
+        "parked_reason": "官方文件支持 Jabil 1.6T LRO 合作、Sivers/POET production-readiness 與部分夥伴關係，但沒有一手文件支持貼文推導的 1–4 個月 qualification、2027 mass production、Apple 或其他客戶時程；新 FCC 草案也仍只是政策草案，未提供 qualification／訂單 delta。",
+        "primary_url": "https://www.sivers-semiconductors.com/press/sivers-semiconductors-collaborates-with-jabil-on-energy-efficient-1-6t-pluggable-optical-transceiver-module/",
         "research_mode": "delta_only",
-        "trace_attempts_ref": "Jabil 2026 JPM event notice + Sivers Q1/Annual Report/partner releases + POET official Sivers release + graph context",
-        "trace_next_trigger": "Jabil_POET_GF_Ayar_or_O-Net_announces_qualification_completion_volume_order_or_revenue",
+        "research_outcome": "partial_support_timeline_inference_rejected_no_new_graph_delta",
+        "research_run": "daily_2026-08-06",
+        "trace_access_method": "official_ir",
+        "trace_attempts_ref": "Jabil official/Sivers official、Sivers Q1/Annual Report、POET official、partner materials、related FCC draft-ban Reuters discovery",
+        "trace_next_trigger": "Jabil、POET、GFS、Ayar 或 O-Net 公布 qualification completion、volume order／revenue 或確定 production timetable；或 FCC 正式規則",
+        "trace_origin_entity": "Sivers Semiconductors AB",
+        "trace_original_date": "2026-04-15",
+        "trace_original_url": "https://www.sivers-semiconductors.com/press/sivers-semiconductors-collaborates-with-jabil-on-energy-efficient-1-6t-pluggable-optical-transceiver-module/",
         "trace_requeue_trigger": "related_triaged_lead:lead_7f66b743a034c41f6388aa800f333e62",
         "trace_requeued_at": "2026-08-04T22:36:55.816839+00:00",
         "trace_requires_user": "false",
@@ -11214,7 +11398,7 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -11691,13 +11875,21 @@
         "campaign_topic": "memory_packaging",
         "campaign_window_end": "2026-07-29T13:46:25Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
+        "canonical_url": "https://www.investing.com/news/stock-market-news/exclusiveintel-amd-sign-longterm-server-cpu-deals-with-chinese-clients-as-prices-surge-4807453",
         "original_claim_status": "partial_support_author_inference_rejected",
-        "parked_reason": "複合線索把 CPU、memory、photonics 多個不同事件合成單一 LTA／bubble thesis；Reuters 與多份 issuer 文件只支持部分子主張，Samsung／SK hynix／AMD CW exact LTA 仍未取得，無一致且最小的 graph delta",
+        "outcome": "parked；部分支持但複合主張需拆分；未產生 prepared RA",
+        "parked_reason": "Reuters 二手報導可支持 Intel／AMD 與中國伺服器客戶洽談較長期 CPU 採購承諾及價格上升，但沒有取得 Intel／AMD 或客戶的具名合約、期限、產品與量；貼文又把 CPU、memory、photonics 多事件合併成單一 LTA／bubble thesis。新 FCC 草案不補足這些 LTA 缺口，無一致且最小 graph delta。",
+        "primary_url": "https://www.investing.com/news/stock-market-news/exclusiveintel-amd-sign-longterm-server-cpu-deals-with-chinese-clients-as-prices-surge-4807453",
         "research_mode": "delta_only",
-        "research_outcome": "composite_split_required_no_single_graph_delta",
-        "research_run": "luna_reviewer_2026-08-01_pq1_5",
-        "trace_attempts_ref": "Reuters Intel／AMD carrier；Micron 10-Q；Sandisk 8-K；Lumentum／Coherent IR；Samsung／SK hynix／TrendForce exact search",
-        "trace_next_trigger": "官方 filing／IR 具名揭露產品、對手方與合約期限，或取得 exact TrendForce AMD／CW LTA 原文後拆成獨立 lead",
+        "research_outcome": "partial_support_composite_claim_split_required_no_new_graph_delta",
+        "research_run": "daily_2026-08-06",
+        "trace_access_method": "secondary_reprint",
+        "trace_attempts_ref": "Reuters carrier、Intel/AMD official search、Micron 10-Q、Sandisk 8-K、Lumentum/Coherent IR、Samsung/SK hynix/TrendForce exact search",
+        "trace_next_trigger": "Intel／AMD／中國客戶官方 filing／IR 具名揭露產品、對手方與合約期限，或取得 exact TrendForce AMD／CW LTA 原文後拆成獨立 lead",
+        "trace_origin_entity": "Reuters",
+        "trace_origin_linkage": "metadata_only",
+        "trace_original_date": "2026-07-23",
+        "trace_original_url": "https://www.investing.com/news/stock-market-news/exclusiveintel-amd-sign-longterm-server-cpu-deals-with-chinese-clients-as-prices-surge-4807453",
         "trace_requeue_trigger": "related_triaged_lead:lead_7f66b743a034c41f6388aa800f333e62",
         "trace_requeued_at": "2026-08-04T22:36:55.816839+00:00",
         "trace_requires_user": "false",
@@ -11717,7 +11909,7 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -21096,8 +21288,8 @@
   "schema_version": "2",
   "source_state": {
     "x:aleabitoreddit": {
-      "since_id": "2084613071423893692",
-      "updated_at": "2026-08-04T22:34:39.195722+00:00",
+      "since_id": "2084795597417263442",
+      "updated_at": "2026-08-05T22:32:28.396902+00:00",
       "user_id": "1940360837547565056"
     }
   }

@@ -1314,8 +1314,10 @@
       "added_at": "2026-08-04T05:57:16.865177+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_223388c35618313d49b189aba9c3f18a",
+      "dispatch_receipt": "research_packet:library/private/decision_lab/daily_gap_research_2026-08-06.json",
       "dispatch_ref": "wo_abe7575f21af036d810808f4999175d8",
-      "dispatch_status": "queued",
+      "dispatch_status": "awaiting_approval",
+      "dispatch_updated_at": "2026-08-05T22:41:42.703155+00:00",
       "dispatched_at": "2026-08-05T01:28:16.102273+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 89,
@@ -1401,6 +1403,44 @@
       "source": "research_action",
       "title": "AAOI 10-K Item 2 Properties：Ningbo 廠為全公司最大據點，與既有低中國含量主張產生張力",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-08-05T22:34:50.515129+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 95,
+      "reason": null,
+      "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:applied_optoelectronics",
+      "type": "decision_review",
+      "waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-08-05T22:34:50.515015+00:00",
+        "trigger": "執行面 context 缺失／市場資料問題",
+        "until": null
+      }
+    },
+    {
+      "added_at": "2026-08-05T22:34:50.515129+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 96,
+      "reason": null,
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:axt",
+      "type": "decision_review",
+      "waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-08-05T22:34:50.515042+00:00",
+        "trigger": "市場資料問題",
+        "until": null
+      }
     }
   ],
   "log": [
@@ -2895,8 +2935,26 @@
       "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
       "type": "decision_review",
       "verb": "drop"
+    },
+    {
+      "at": "2026-08-05T22:37:47.422666+00:00",
+      "n": 89,
+      "reason": null,
+      "receipt": "research_started:meta_vistara_counter_path:turn2view0",
+      "ref_id": "dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-08-05T22:41:42.703155+00:00",
+      "n": 89,
+      "reason": "已完成 Meta Vistara counter-path source-trace；Meta ISCA 一手論文明列 CXL 頻寬／延遲 trade-off、部分 workload 可 opt out，但 current Engine A counter_paths 仍為空，需 exact graph admission 後才能 reassess。",
+      "receipt": "research_packet:library/private/decision_lab/daily_gap_research_2026-08-06.json",
+      "ref_id": "dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
+      "type": "decision_review",
+      "verb": "pq1_awaiting_approval"
     }
   ],
-  "next_n": 95,
+  "next_n": 97,
   "schema_version": "1"
 }
