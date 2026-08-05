@@ -1252,8 +1252,8 @@
       "waiting_on": {
         "derived_from_blockers": true,
         "reason": "所有 blocker 都不需要使用者決定",
-        "set_at": "2026-08-05T11:34:41.621038+00:00",
-        "trigger": "僅剩系統內部狀態，重新 reassess 即可（無使用者決定）",
+        "set_at": "2026-08-05T12:58:39.206086+00:00",
+        "trigger": "runway 需人工判讀",
         "until": null
       }
     },
@@ -1389,20 +1389,17 @@
       "added_at": "2026-08-04T07:27:57.692312+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 93,
+      "reactivated_at": "2026-08-05T12:58:39.206229+00:00",
+      "reactivation_event": {
+        "type": "decision_blocker_mode_changed"
+      },
       "reason": null,
       "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
       "title": "REVIEW — co:iqe",
-      "type": "decision_review",
-      "waiting_on": {
-        "derived_from_blockers": true,
-        "reason": "所有 blocker 都不需要使用者決定",
-        "set_at": "2026-08-04T07:27:57.692226+00:00",
-        "trigger": "該 Confidence 軸尚未提供有效評估／執行面 context 缺失／Engine C 無此標的財務資料",
-        "until": null
-      }
+      "type": "decision_review"
     },
     {
       "added_at": "2026-08-04T22:38:03.641836+00:00",
@@ -2858,6 +2855,38 @@
       "reason": "blocker 已不再全屬等待事件，恢復人工複查",
       "receipt": null,
       "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "type": "decision_review",
+      "verb": "event_reactivated"
+    },
+    {
+      "at": "2026-08-05T12:58:39.206229+00:00",
+      "n": 84,
+      "prior_waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-08-05T11:34:41.621038+00:00",
+        "trigger": "僅剩系統內部狀態，重新 reassess 即可（無使用者決定）",
+        "until": null
+      },
+      "reason": "blocker 內容改變，重新推導等待理由",
+      "receipt": null,
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "type": "decision_review",
+      "verb": "waiting_reason_refreshed"
+    },
+    {
+      "at": "2026-08-05T12:58:39.206229+00:00",
+      "n": 93,
+      "prior_waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-08-04T07:27:57.692226+00:00",
+        "trigger": "該 Confidence 軸尚未提供有效評估／執行面 context 缺失／Engine C 無此標的財務資料",
+        "until": null
+      },
+      "reason": "blocker 已不再全屬等待事件，恢復人工複查",
+      "receipt": null,
+      "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
       "type": "decision_review",
       "verb": "event_reactivated"
     }
