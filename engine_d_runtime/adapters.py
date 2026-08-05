@@ -19,6 +19,7 @@ from decision_lab.workflow_ports import (
 from engine_c.checklist import get_checklist, get_probe_financial_baseline
 from engine_c.market_data import get_fx_snapshot, get_tradeability_snapshot
 from fetchers.gsheets import fetch_portfolio, get_execution_aliases
+from identity.currency import settlement_currency
 from identity.registry import IdentityRegistry, get_registry
 
 
@@ -225,10 +226,20 @@ class DefaultRuntimeProvider:
             )
 
         blockers.extend(resolved.blockers)
+        # 幣別解析不出來有兩種成因，修法完全不同：registry 根本沒填（補 config
+        # 的 identity 那一列），或報價單位未登記（補 config/currency_units.json）。
         if resolved.market_currency is None:
-            blockers.append("market_currency_missing")
+            blockers.append(
+                "market_quote_unit_unregistered"
+                if resolved.market_quote_unit
+                else "market_currency_missing"
+            )
         if resolved.execution_currency is None:
-            blockers.append("execution_currency_missing")
+            blockers.append(
+                "execution_quote_unit_unregistered"
+                if resolved.execution_quote_unit
+                else "execution_currency_missing"
+            )
         if resolved.execution_venue is None:
             blockers.append("execution_venue_missing")
         status = "resolved" if not blockers else "partial"
@@ -240,6 +251,8 @@ class DefaultRuntimeProvider:
             market_currency=resolved.market_currency,
             execution_currency=resolved.execution_currency,
             execution_venue=resolved.execution_venue,
+            market_quote_unit=resolved.market_quote_unit,
+            execution_quote_unit=resolved.execution_quote_unit,
             blockers=tuple(sorted(set(blockers))),
         )
 
@@ -588,6 +601,12 @@ class DefaultRuntimeProvider:
                     "unit_status",
                     "source",
                     "blockers",
+                    # minor unit 換算留痕；只有 GBp／ILA 這類報價才會出現。
+                    "quote_currency",
+                    "quote_price",
+                    "quote_factor",
+                    # 丟棄了幾根未結算的 trailing bar；解釋 as_of 為何不是最新一根。
+                    "unsettled_trailing_rows",
                 )
                 if key in raw
             },
@@ -696,9 +715,10 @@ class DefaultRuntimeProvider:
                 nav_values.add(nav)
             raw_base = raw.get("base_currency")
             if raw_base is not None and raw_base != "":
-                if not isinstance(raw_base, str) or len(raw_base.strip()) != 3:
+                base_settlement = settlement_currency(raw_base)
+                if base_settlement is None:
                     return {"status": "malformed", "rows": [], "blockers": ["holdings_malformed"]}
-                base_currencies.add(raw_base.strip().upper())
+                base_currencies.add(base_settlement)
         if len(nav_values) != 1 or len(base_currencies) != 1:
             return {"status": "malformed", "rows": [], "blockers": ["holdings_malformed"]}
 
@@ -706,14 +726,13 @@ class DefaultRuntimeProvider:
         for raw in raw_rows:
             assert isinstance(raw, Mapping)
             ticker = raw.get("ticker")
-            currency = raw.get("currency")
+            row_currency = settlement_currency(raw.get("currency"))
             shares = _finite(raw.get("shares"))
             market_value = _finite(raw.get("market_value_base"), non_negative=True)
             if (
                 not isinstance(ticker, str)
                 or not ticker.strip()
-                or not isinstance(currency, str)
-                or len(currency.strip()) != 3
+                or row_currency is None
                 or shares is None
                 or market_value is None
             ):
@@ -721,7 +740,7 @@ class DefaultRuntimeProvider:
             row = {
                 "ticker": ticker.strip().upper(),
                 "shares": shares,
-                "currency": currency.strip().upper(),
+                "currency": row_currency,
                 "market_value_base": market_value,
             }
             # 現金列計入 NAV，但沒有 company／factor 曝險可解析；不標記的話
@@ -755,9 +774,10 @@ class DefaultRuntimeProvider:
     ) -> AuthoritySnapshot:
         evidence, graph_orders = self._read_graph(identity)
         financial, financial_orders = self._read_financial(identity.research_ticker)
+        # 行情層要的是交易所報價單位（才知道要不要除 100）；FX 要的是結算幣別。
         market, market_orders = self._read_market(
             identity.research_ticker,
-            identity.market_currency,
+            identity.market_quote_unit or identity.market_currency,
         )
         fx, fx_orders = self._read_fx(identity.market_currency, "USD", evaluation_at)
         holdings = dict(self.current_holdings(evaluation_at=evaluation_at))
@@ -782,7 +802,7 @@ class DefaultRuntimeProvider:
         ):
             execution_market, orders = self._read_market(
                 identity.execution_symbol,
-                identity.execution_currency,
+                identity.execution_quote_unit or identity.execution_currency,
             )
             execution_orders.extend(orders)
         holdings_base = holdings.get("base_currency")

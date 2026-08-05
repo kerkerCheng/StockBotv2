@@ -11,6 +11,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Mapping
 
+from identity.currency import is_settlement_currency
 from identity.registry import get_registry
 from storage.relational import (
     connect_sqlite,
@@ -1616,8 +1617,7 @@ class DecisionStore:
             or not math.isfinite(shares)
             or not math.isfinite(price)
             or price <= 0
-            or len(currency) != 3
-            or not currency.isupper()
+            or not is_settlement_currency(currency)
         ):
             raise ValueError("invalid live fill")
         fill_id = "lf_" + _digest(execution_ref)[:32]

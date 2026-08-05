@@ -1,0 +1,32 @@
+{
+  "_comment": "報價單位（quote unit）→ ISO-4217 結算幣別的對照表。交易所報價單位不等於結算幣別：LSE 以便士（GBp）報價、TASE 以 agorot（ILA）、JSE 以 cents（ZAc），而 Yahoo 等 provider 直接把報價單位當成 currency 回傳。唯一 loader 是 identity/currency.py。只登記 minor unit；形如 3 碼大寫英文字母的 ISO code（USD／TWD／SEK／EUR…）不需登記，會自動以 factor 1 通過。",
+  "_matching": "quote_code 比對大小寫敏感（GBp 與 GBP 只差大小寫，折疊會讓結算幣別被誤判成 minor unit）。registry 未命中且 upper() 後形如 ^[A-Z]{3}$ 者，視為 ISO 結算幣別、factor 1。兩者皆未命中即 fail closed。",
+  "_factor": "quote 報價 × factor = 結算幣別金額。例：IQE.L 報 44.8 GBp × 0.01 = 0.448 GBP。",
+  "version": 1,
+  "quote_units": [
+    {
+      "quote_code": "GBp",
+      "currency": "GBP",
+      "factor": 0.01,
+      "note": "London Stock Exchange 以便士報價；Yahoo 對 .L 標的回傳 GBp"
+    },
+    {
+      "quote_code": "GBX",
+      "currency": "GBP",
+      "factor": 0.01,
+      "note": "GBp 的另一種常見寫法（部分 data vendor 用 GBX）"
+    },
+    {
+      "quote_code": "ILA",
+      "currency": "ILS",
+      "factor": 0.01,
+      "note": "Tel Aviv Stock Exchange 以 agorot 報價"
+    },
+    {
+      "quote_code": "ZAc",
+      "currency": "ZAR",
+      "factor": 0.01,
+      "note": "Johannesburg Stock Exchange 以 cents 報價"
+    }
+  ]
+}

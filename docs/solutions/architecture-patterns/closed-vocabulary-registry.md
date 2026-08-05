@@ -54,6 +54,7 @@ tags:
 |---|---|---|
 | node_type／abstraction_level／role／relation／qualification_status／demand_proof_level／source_type／evidence_tier | `schema/vocab.json` | 加一項；`loader/validate.py` 讀同一份。2026-07-29 的 robotics ontology 就是這樣加的 |
 | 公司 ID ↔ research／execution 識別 | `config/company_identity.json` | 加一列；`identity/registry.py` 是唯一 loader |
+| 交易所報價單位 → ISO 結算幣別 | `config/currency_units.json` | 只登記 minor unit（GBp／ILA／ZAc…）；ISO code 形式的新幣別（TWD／JPY…）不必登記就自動通過。`identity/currency.py` 是唯一 loader |
 | Engine C 人工觀測欄位 | `config/engine_c_observation_fields.json` | 加一項且 `gate_member` 必須為 false；`engine_c/observation_fields.py` 是唯一 loader |
 | Blocker 說明與分類 | `config/decision_blockers.json` | 加 exact code 或 prefix；`decision_lab/blockers.py` 是唯一 loader |
 | Authority token（證據來自哪個引擎、哪個軸能引用） | `config/authority_tokens.json` | 加一項並指定 `owner`；`identity/authority_tokens.py` 是唯一 loader，Engine C 與 Decision Lab 共用 |

@@ -18,6 +18,7 @@ config/*.json
 !config/decision_blockers.json
 !config/authority_tokens.json
 !config/lead_ref_keys.json
+!config/currency_units.json
 
 # Claude Code 本機設定（不共用）；project skills 轉接層需納入版本控制
 .claude/*

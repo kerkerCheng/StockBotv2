@@ -16,6 +16,9 @@ class ResolvedIdentity:
     market_currency: str | None = None
     execution_currency: str | None = None
     execution_venue: str | None = None
+    # 交易所報價單位（如 LSE 的 GBp）。與 *_currency 的差別見 identity/currency.py。
+    market_quote_unit: str | None = None
+    execution_quote_unit: str | None = None
 
 
 def resolve_identity(
@@ -61,4 +64,6 @@ def resolve_identity(
         market_currency=company.market_currency if company else None,
         execution_currency=company.execution_currency if company else None,
         execution_venue=company.execution_venue if company else None,
+        market_quote_unit=company.market_quote_unit if company else None,
+        execution_quote_unit=company.execution_quote_unit if company else None,
     )

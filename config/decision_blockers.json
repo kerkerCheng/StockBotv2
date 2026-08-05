@@ -205,6 +205,20 @@
       "next_step": "未上市標的無行情；上市標的檢查 provider。"
     },
     {
+      "code": "market_quote_unit_unregistered",
+      "label": "交易所報價單位未登記",
+      "category": "market",
+      "resolution_mode": "user_decision",
+      "next_step": "該市場以 minor unit 報價（如 LSE 的 GBp）。在 config/currency_units.json 加一列 quote_code／currency／factor 後即可換算；不要直接把報價單位改成 ISO code，價格會差 100 倍。"
+    },
+    {
+      "code": "execution_quote_unit_unregistered",
+      "label": "執行市場報價單位未登記",
+      "category": "market",
+      "resolution_mode": "user_decision",
+      "next_step": "同 market_quote_unit_unregistered，補 config/currency_units.json 的 execution 側報價單位。"
+    },
+    {
       "code": "fx_missing",
       "label": "無匯率",
       "category": "market",

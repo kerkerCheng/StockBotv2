@@ -6,22 +6,48 @@ from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
 from types import MappingProxyType
-from typing import Mapping
+from typing import Any, Mapping
+
+from identity.currency import resolve_quote_unit
 
 
 _ROOT = Path(__file__).resolve().parent.parent
 _DEFAULT_REGISTRY_PATH = _ROOT / "config" / "company_identity.json"
 
 
+def _quote_code(raw: Any) -> str | None:
+    """保留 config 原始報價單位字串；未填為 None。"""
+
+    if raw is None:
+        return None
+    text = str(raw).strip()
+    return text or None
+
+
+def _settlement(raw: Any) -> str | None:
+    """把 config 的報價單位正規化成 ISO 結算幣別；未登記則 None。"""
+
+    unit = resolve_quote_unit(_quote_code(raw))
+    return unit.currency if unit is not None else None
+
+
 @dataclass(frozen=True)
 class CompanyIdentity:
-    """一家公司跨 Engine A/C 與市場資料的穩定 identity。"""
+    """一家公司跨 Engine A/C 與市場資料的穩定 identity。
+
+    ``config`` 寫的是交易所實際報價的單位（LSE 的 IQE 是 ``GBp``）；本 dataclass
+    對外一律以 ISO 結算幣別呈現 ``*_currency``，原始報價單位另存 ``*_quote_unit``
+    供行情層換算。未登記且非 ISO 形式的報價單位會讓 ``*_currency`` 為 None
+    （fail closed），由 identity 解析層轉成可行動的 blocker。
+    """
 
     company_id: str
     research_ticker: str | None
     market_currency: str | None = None
     execution_currency: str | None = None
     execution_venue: str | None = None
+    market_quote_unit: str | None = None
+    execution_quote_unit: str | None = None
 
 
 class IdentityRegistry:
@@ -61,9 +87,11 @@ class IdentityRegistry:
                     if item.get("research_ticker") is not None
                     else None
                 ),
-                market_currency=item.get("market_currency"),
-                execution_currency=item.get("execution_currency"),
+                market_currency=_settlement(item.get("market_currency")),
+                execution_currency=_settlement(item.get("execution_currency")),
                 execution_venue=item.get("execution_venue"),
+                market_quote_unit=_quote_code(item.get("market_currency")),
+                execution_quote_unit=_quote_code(item.get("execution_currency")),
             )
             for item in raw_companies
         )

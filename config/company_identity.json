@@ -12,7 +12,7 @@
     {"company_id": "co:apple", "research_ticker": "AAPL"},
     {"company_id": "co:corning", "research_ticker": "GLW"},
     {"company_id": "co:arista", "research_ticker": "ANET"},
-    {"company_id": "co:meta", "research_ticker": "META"},
+    {"company_id": "co:meta", "research_ticker": "META", "market_currency": "USD", "execution_currency": "USD", "execution_venue": "NASDAQ"},
     {"company_id": "co:google", "research_ticker": "GOOGL"},
     {"company_id": "co:jabil", "research_ticker": "JBL"},
     {"company_id": "co:anthropic", "research_ticker": null},

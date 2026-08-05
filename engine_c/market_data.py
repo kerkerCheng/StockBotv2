@@ -16,6 +16,7 @@ from datetime import datetime, timezone
 from typing import Any, Iterable, Mapping
 
 from access_failures import classify_access_failure
+from identity.currency import resolve_quote_unit, settlement_currency
 from identity.execution import yfinance_symbol
 
 
@@ -44,27 +45,61 @@ def build_tradeability_snapshot(
     fetched_at: str,
     source: str,
 ) -> dict[str, Any]:
-    """由具實際 session timestamp 的 history rows 建立 execution 快照。"""
+    """由具實際 session timestamp 的 history rows 建立 execution 快照。
+
+    ``currency`` 收的是**交易所報價單位**（Yahoo 對 .L 標的回傳 ``GBp``）。
+    快照對外一律換算成 ISO 結算幣別，minor unit 的原始報價另存 ``quote_*``
+    欄位留痕；未登記的報價單位 fail closed，不猜測換算倍率。
+    """
 
     blockers: list[str] = []
     sessions: dict[str, tuple[datetime, float, float]] = {}
     if not isinstance(ticker, str) or not ticker.strip():
         blockers.append("market_ticker_invalid")
-    if not isinstance(currency, str) or len(currency) != 3 or not currency.isupper():
-        blockers.append("market_currency_invalid")
+    unit = resolve_quote_unit(currency)
+    if unit is None:
+        blockers.append(
+            "market_quote_unit_unregistered"
+            if isinstance(currency, str) and currency.strip()
+            else "market_currency_invalid"
+        )
     if _timestamp(fetched_at) is None:
         blockers.append("market_fetched_at_invalid")
     if not isinstance(source, str) or not source.strip():
         blockers.append("market_source_missing")
+    # 尚未結算的 trailing bar：provider 已開出當日 row，但 close 還沒發佈（NaN）。
+    # 這在非美國交易所很常見（2026-08-05 實測 IQE.L／SIVE.ST／2DG.F 同時中招，
+    # 美股沒有）。它不是資料錯誤，只是資料還太年輕；先蒐集起來，等知道最後一根
+    # 有效 session 的時間之後再判斷。
+    unsettled: list[datetime] = []
     for row in rows:
         as_of = _timestamp(row.get("as_of"))
+        if as_of is None:
+            # 無法定位的 row 永遠是硬錯誤：不知道它在序列的哪裡，就無法判斷它
+            # 是「還沒結算」還是「中間破洞」。
+            blockers.append("market_history_row_invalid")
+            continue
         close = _finite_number(row.get("close"))
         volume = _finite_number(row.get("volume"))
-        if as_of is None or close is None or close <= 0 or volume is None or volume < 0:
+        if close is None or volume is None:
+            unsettled.append(as_of)
+            continue
+        if close <= 0 or volume < 0:
+            # 值有寫出來但超出合理範圍＝資料損毀，不是未結算。維持 fail closed。
             blockers.append("market_history_row_invalid")
             continue
         sessions[as_of.date().isoformat()] = (as_of, close, volume)
     parsed_rows = list(sessions.values())
+    latest_valid = max((row[0] for row in parsed_rows), default=None)
+    unsettled_trailing = 0
+    for as_of in unsettled:
+        if as_of.date().isoformat() in sessions:
+            continue  # 同一 session 另有完整 row，這筆被取代
+        if latest_valid is not None and as_of > latest_valid:
+            unsettled_trailing += 1  # 落在序列末端：丟棄，不 quarantine
+        else:
+            # 落在序列中間＝真的有破洞，整份仍 quarantine。
+            blockers.append("market_history_row_invalid")
     if not parsed_rows:
         blockers.append("market_history_missing")
     elif len(parsed_rows) < 20:
@@ -82,11 +117,13 @@ def build_tradeability_snapshot(
     fetched_time = _timestamp(fetched_at)
     if fetched_time is not None and latest_time > fetched_time:
         latest_time = fetched_time
-    return {
+    assert unit is not None
+    snapshot = {
         "status": "observed",
         "ticker": ticker.strip().upper(),
-        "price": latest_close,
-        "currency": currency,
+        # adv20 是股數，不隨報價單位換算；只有價格要換。
+        "price": unit.to_settlement(latest_close),
+        "currency": unit.currency,
         "adv20": adv20,
         "as_of": latest_time.isoformat(),
         "fetched_at": fetched_at,
@@ -94,6 +131,15 @@ def build_tradeability_snapshot(
         "source": source,
         "blockers": [],
     }
+    if unit.is_minor_unit:
+        snapshot["quote_currency"] = unit.quote_code
+        snapshot["quote_price"] = latest_close
+        snapshot["quote_factor"] = unit.factor
+    if unsettled_trailing:
+        # 留痕：解釋為什麼 as_of 不是 provider 回傳的最後一根 bar。丟幾根不設上限，
+        # 因為丟太多會自動被 20-session 門檻與下游 market_stale 擋下。
+        snapshot["unsettled_trailing_rows"] = unsettled_trailing
+    return snapshot
 
 
 def get_tradeability_snapshot(ticker: str, currency: str) -> dict[str, Any]:
@@ -130,6 +176,24 @@ def get_tradeability_snapshot(ticker: str, currency: str) -> dict[str, Any]:
     )
 
 
+def _settlement_pair(pair: Any) -> str | None:
+    """把 ``base/quote`` 正規化成結算幣別 pair；任一側無法確定即 None。
+
+    minor unit 只影響價格的計價單位，不影響匯率本身——換算倍率已在行情層套用，
+    這裡若再折一次就會重複計算。因此 ``GBp/USD`` 一律正規化成 ``GBP/USD``。
+    """
+
+    if not isinstance(pair, str):
+        return None
+    parts = pair.split("/")
+    if len(parts) != 2:
+        return None
+    settled = [settlement_currency(part) for part in parts]
+    if any(code is None for code in settled):
+        return None
+    return f"{settled[0]}/{settled[1]}"
+
+
 def build_fx_snapshot(
     *,
     pair: str,
@@ -139,15 +203,15 @@ def build_fx_snapshot(
 ) -> dict[str, Any]:
     """由 exact base/quote history 建立可追溯 FX observation。"""
 
-    parts = pair.split("/")
+    settled = _settlement_pair(pair)
     if (
-        len(parts) != 2
-        or any(len(part) != 3 or not part.isupper() for part in parts)
+        settled is None
         or _timestamp(fetched_at) is None
         or not isinstance(source, str)
         or not source.strip()
     ):
         return {"status": "malformed", "blockers": ["fx_metadata_invalid"]}
+    pair = settled
     observations: list[tuple[datetime, float]] = []
     for row in rows:
         as_of = _timestamp(row.get("as_of"))
@@ -178,14 +242,16 @@ def get_fx_snapshot(pair: str, evaluation_at: str) -> dict[str, Any]:
     """用 yfinance exact pair ticker 取得 FX；不倒數或猜測方向。"""
 
     del evaluation_at
-    parts = pair.split("/")
-    if len(parts) != 2 or any(len(part) != 3 or not part.isupper() for part in parts):
+    settled = _settlement_pair(pair)
+    if settled is None:
         return {"status": "malformed", "blockers": ["fx_pair_invalid"]}
+    pair = settled
+    base, quote = pair.split("/")
     try:
         import yfinance as yf
     except ImportError:
         return {"status": "unavailable", "pair": pair, "blockers": ["yfinance_unavailable"]}
-    symbol = f"{parts[0]}{parts[1]}=X"
+    symbol = f"{base}{quote}=X"
     fetched_at = datetime.now(timezone.utc).isoformat()
     try:
         history = yf.Ticker(symbol).history(period="5d", auto_adjust=False)

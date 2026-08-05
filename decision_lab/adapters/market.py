@@ -78,7 +78,7 @@ def normalize_market_snapshot(
         return _quarantined(*blockers)
     assert as_of is not None and evaluation is not None and price is not None
     status = "stale" if evaluation - as_of > timedelta(hours=max_age_hours) else "available"
-    return {
+    normalized = {
         "status": status,
         "ticker": expected_ticker,
         "price": price,
@@ -89,6 +89,16 @@ def normalize_market_snapshot(
         "source": payload["source"],
         "blockers": [] if status == "available" else ["market_stale"],
     }
+    # 報價單位不是結算幣別時（LSE 的 GBp 等），保留原始報價供人工核對——
+    # price 已是結算幣別金額，少了這三欄就無法回推 provider 實際回傳什麼。
+    quote_currency = payload.get("quote_currency")
+    quote_price = _finite(payload.get("quote_price"))
+    quote_factor = _finite(payload.get("quote_factor"))
+    if isinstance(quote_currency, str) and quote_price is not None and quote_factor:
+        normalized["quote_currency"] = quote_currency
+        normalized["quote_price"] = quote_price
+        normalized["quote_factor"] = quote_factor
+    return normalized
 
 
 def normalize_fx_snapshot(

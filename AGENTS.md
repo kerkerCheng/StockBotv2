@@ -211,18 +211,23 @@ issuer 曝險 ≥20% 且對應 series 單日報酬首次跌破 -4% 才產 epheme
 ### Daily Brief provider-neutral outbound 通知（2026-08-04）
 
 Daily Brief 完成後可由 Codex 或本機 Claude Code 呼叫同一支
-`scripts/publish_daily_brief.py`，把完整 Markdown 以 outbound-only 方式送到 Discord private channel。
+`scripts/publish_daily_brief.py`，把完整 Markdown 以 outbound-only 方式送到 Discord private Forum channel；每份 Daily Brief 建立一個新的每日討論串，摘要與完整內容分段放在同一串內。
 通知不是 authority：不接受 Discord `go`／交易／入圖指令，不寫 todo、Decision、Graph 或 Sheet，也不改變
 人工 graph admission／live gate。Discord 只使用本機 `.env` 的
 `NOTIFY_DISCORD_WEBHOOK_URL` 與可選 `NOTIFY_DISCORD_TAG_USER_ID`；不需要 Discord bot token、OAuth、
 Claude API key 或 Codex API key。
 
-Publisher 的 private SQLite outbox 以 `brief_digest + channel_alias` 做唯一去重鍵，完整 Markdown 超過單則
-限制時分段傳送，逐段保存 append-only delivery attempts／receipt，單段最多重試 3 次。發送失敗是
+Publisher 的 private SQLite outbox 以 `brief_digest + channel_alias` 做唯一去重鍵；建立 Forum 討論串後保存
+`thread_id`／`thread_name`，完整 Markdown 超過單則限制時分段傳送到同一串，逐段保存 append-only delivery
+attempts／receipt，單段最多重試 3 次。發送失敗是
 `delivery_failed`／`not_configured` 的 best-effort 狀態，不得阻斷 Daily Brief；`.env`、webhook 與
 `library/private/notifications/` 永遠不得進 Git。Session metadata 只作通知附註：Claude Code 可附
 `claude -r <session-id>`、Claude App share URL（若有）、Codex thread ID；第一版不採未文件化的
 `stockbot://` launcher。
+
+Windows PowerShell 5.1 的 `$OutputEncoding` 預設為 `us-ascii`；Daily Brief 含中文時，排程必須使用
+`--brief-file`，由 Python 直接以 UTF-8 讀取。不得直接用 `Get-Content | ... --stdin` 管線傳送，
+除非呼叫端已明確設定 UTF-8 stdin，否則中文會在進入 publisher 前被替換成問號。
 
 ---
 
@@ -240,6 +245,7 @@ Publisher 的 private SQLite outbox 以 `brief_digest + channel_alias` 做唯一
 
 **快速記憶：**
 - **圖公司 ID（`co:*`）不要憑公司名猜。** 唯一權威是 `config/company_identity.json`，由 `identity/registry.py` 載入；loader 的 `TICKER_MAP` 只是由同一 registry 生成的相容介面。查圖前先查 registry，或用 `query/health_audit.py` 的 `COMPANY_IDS_CYPHER` 列出圖中 Company 再比對。例：Sivers 是 `co:sivers_semiconductors`，不是 `co:sivers`（2026-07-21 週掃即因猜 ID 未命中而漏掉 Sivers 的圖內比對）。ID 未命中時要區分「ID 沒解析對」與「圖中真無此公司」，不能默默跳過。
+- **報價單位 ≠ 結算幣別（2026-08-05 定案）：** 交易所報價單位（LSE 的 `GBp`、TASE 的 `ILA`、JSE 的 `ZAc`）是 provider 直接回傳的 `currency`，但它是 minor unit，不是 ISO-4217 結算幣別。唯一正規化入口是 `identity/currency.py`＋`config/currency_units.json`；`config/company_identity.json` 寫交易所實際報價的單位，registry 對外一律以結算幣別呈現 `*_currency`、原始單位存 `*_quote_unit`。價格換算只在行情層做一次（`quote_price × factor`），FX pair 一律用結算幣別，不得再折第二次。ISO code 形式的新幣別不必登記；未登記且非 ISO 形式一律 fail closed 出 `market_quote_unit_unregistered`，**不得為了通過驗證把報價單位直接改寫成 ISO code——價格會差 100 倍。**
 - **Sivers 三層 symbol 不可混用：** Engine C／研究行情是瑞典主掛牌 `SIVE.ST`（SEK）；Google Sheet／execution authority 保留 `FRA:2DG`（EUR）；Yahoo provider syntax 由 `identity/execution.py` 正規化成 `2DG.F`。快照對外仍回 canonical `FRA:2DG`，不得把瑞典 ADV／currency 冒充 Frankfurt live liquidity。
 - node 帶內在慢變屬性（`ramp_difficulty_intrinsic`、`concentration_score` 為衍生值非手填）
 - edge 帶關係型屬性（`substitutability`、`sole_source`、`structural_lead_time_weeks`、`ramp_execution`）

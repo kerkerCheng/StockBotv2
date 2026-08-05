@@ -40,6 +40,10 @@ class IdentityAuthority:
     execution_currency: str | None = None
     execution_venue: str | None = None
     blockers: tuple[str, ...] = ()
+    # 報價單位只給行情層換算用，不進 frozen context identity——結算幣別才是
+    # 決策語意，換算事實由 market payload 的 quote_* 欄位留痕。
+    market_quote_unit: str | None = None
+    execution_quote_unit: str | None = None
 
     def as_context_input(self) -> dict[str, Any]:
         return {

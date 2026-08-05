@@ -9,6 +9,7 @@ from typing import Any, Callable, Mapping, Sequence
 from zoneinfo import ZoneInfo
 
 from decision_lab.adapters.market import normalize_fx_snapshot
+from identity.currency import is_settlement_currency
 
 
 FxFetcher = Callable[[str, str], Mapping[str, Any]]
@@ -127,9 +128,10 @@ def build_capital_view(
     evaluated = _evaluation_time(evaluation_at)
     currency = _text(base_currency).upper()
     cash = _finite(portfolio_cash_base, non_negative=True)
-    if authority_rows is None or not authority_rows or len(currency) != 3 or cash is None:
+    valid_currency = is_settlement_currency(currency)
+    if authority_rows is None or not authority_rows or not valid_currency or cash is None:
         blockers = ["capital_authority_unavailable"]
-        if cash is None or len(currency) != 3:
+        if cash is None or not valid_currency:
             blockers.append("portfolio_cash_base_unavailable")
         return _unavailable_view(
             evaluation_at=evaluation_at,
