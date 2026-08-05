@@ -145,7 +145,7 @@ Leads authority 是 tracked `library/leads/pending_leads.json`；狀態機與 AP
 | X harvest（**只放本機**） | `X_BEARER_TOKEN` |
 | Engine C Postgres（可選，預設 SQLite） | `POSTGRES_HOST`／`POSTGRES_DSN` |
 | MCP | `GRAPH_MCP_PORT`、`GRAPH_MCP_TOKEN` |
-| Daily Brief outbound Discord（**只放本機**） | `NOTIFY_DISCORD_WEBHOOK_URL`、可選 `NOTIFY_DISCORD_TAG_USER_ID`、`NOTIFY_CHANNEL_ALIAS`、`NOTIFY_CONTENT_CLASS`、`NOTIFY_MAX_ATTEMPTS`、`NOTIFY_TIMEOUT_SECONDS` |
+| Daily Brief outbound Discord Forum（**只放本機**） | `NOTIFY_DISCORD_WEBHOOK_URL`、可選 `NOTIFY_DISCORD_TAG_USER_ID`、`NOTIFY_CHANNEL_ALIAS`、`NOTIFY_CONTENT_CLASS`、`NOTIFY_MAX_ATTEMPTS`、`NOTIFY_TIMEOUT_SECONDS` |
 
 Sheet 的 credential scope 分兩種：日常全部走 `SCOPES`（`spreadsheets.readonly`），
 只有 `scripts/record_trade.py --apply` 會走 `WRITE_SCOPES`（`spreadsheets`）。
@@ -155,10 +155,11 @@ Sheet adapter 的標準輸出是 `ticker`、`shares`、`currency`、`market_valu
 
 Price／FX 預設 yfinance（無 API key）。非同幣 FX 缺失或方向不符一律 fail closed。
 
-Daily Brief 通知由 `.venv\Scripts\python.exe scripts\publish_daily_brief.py --stdin --summary "..."` 發送；
+Daily Brief 通知由 `.venv\Scripts\python.exe scripts\publish_daily_brief.py --brief-file <private-brief.md> --summary "..."` 發送；
 Codex 與本機 Claude Code 共用同一支 publisher。它只接受 stdin／私有 brief 檔，不提供 Discord inbound
-command surface。`library/private/notifications/outbox.db` 保存 digest/channel 去重與 delivery receipt；
-通知錯誤是 best-effort，不得阻斷 routine。Webhook secret 不得輸出或進 Git。
+command surface。Forum publisher 每日建立一個討論串，`library/private/notifications/outbox.db` 保存 digest/channel 去重、thread ID 與 delivery receipt；
+通知錯誤是 best-effort，不得阻斷 routine。Windows PowerShell 5.1 的 `$OutputEncoding` 預設是 ASCII，含中文的
+brief 不可直接用 `Get-Content | --stdin` 管線傳送；`--brief-file` 會由 Python 直接以 UTF-8 讀取。Webhook secret 不得輸出或進 Git。
 
 ---
 

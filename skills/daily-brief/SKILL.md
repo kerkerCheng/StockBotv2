@@ -351,18 +351,20 @@ Daily Brief 組成後，Codex 與本機 Claude Code 都呼叫同一支 repo publ
 把**同一份最終 Markdown**（包含日期、pq2 穩定編號、完整 Beta 表與回覆語法）由 stdin 或私有檔交給：
 
 ```powershell
-Get-Content <private-brief.md> | & '.venv\Scripts\python.exe' scripts\publish_daily_brief.py `
-  --stdin --summary "<一則 action-first 摘要>" `
+& '.venv\Scripts\python.exe' scripts\publish_daily_brief.py `
+  --brief-file <private-brief.md> --summary "<一則 action-first 摘要>" `
   [--claude-share-url <url>] [--claude-session-id <id>] [--codex-thread-id <id>]
 ```
 
-設定由本機 `.env` 讀取：`NOTIFY_DISCORD_WEBHOOK_URL`（Discord private channel webhook）、
+設定由本機 `.env` 讀取：`NOTIFY_DISCORD_WEBHOOK_URL`（Discord private Forum channel webhook）、
 `NOTIFY_DISCORD_TAG_USER_ID`（摘要 mention）、`NOTIFY_CHANNEL_ALIAS`、`NOTIFY_CONTENT_CLASS`、
 `NOTIFY_MAX_ATTEMPTS=3`。Webhook secret 不得輸出或進 Git；不需要 Discord bot token、OAuth、Claude API key
-或 Codex API key。完整 Markdown 超過 Discord 單則上限時由 publisher 分段，私有 SQLite outbox 以
-`brief_digest + channel_alias` 去重並保存每段 delivery attempt receipt。Claude Code session 以可複製
+或 Codex API key。每份 Daily Brief 先建立一個新的 Forum 討論串，再把摘要與完整 Markdown 分段送進同一串；
+私有 SQLite outbox 以 `brief_digest + channel_alias` 去重，保存 `thread_id`／`thread_name` 與每段 delivery attempt receipt。Claude Code session 以可複製
 `claude -r <session-id>` 附上；Claude App share URL 能取得才附；Codex 只附 thread ID，第一版不猜
-未文件化的 app URI。
+未文件化的 app URI。Windows PowerShell 5.1 的 `$OutputEncoding` 預設為 ASCII，**不得直接使用
+`Get-Content <private-brief.md> | ... --stdin` 傳送含中文的 brief；若無法使用 `--brief-file`，必須先明確把
+stdin 設為 UTF-8。
 
 發送失敗只回傳 `delivery_failed`／`not_configured` receipt 並繼續輸出 Daily Brief；CLI 預設永遠不以
 通知失敗阻斷 routine，只有診斷時才使用 `--strict`。

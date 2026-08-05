@@ -1,8 +1,13 @@
 """Best-effort outbound Daily Brief publisher for Codex and Claude Code.
 
 Usage (PowerShell):
-    Get-Content <private-brief.md> | .venv\\Scripts\\python.exe \
-        scripts\\publish_daily_brief.py --stdin --summary "..."
+    .venv\\Scripts\\python.exe scripts\\publish_daily_brief.py \
+        --brief-file <private-brief.md> --summary "..."
+
+Use ``--brief-file`` on Windows PowerShell. Windows PowerShell 5.1 defaults
+``$OutputEncoding`` to ASCII when piping text to a native process, which can
+replace non-ASCII characters before Python reads them. Use ``--stdin`` only
+when the caller has explicitly guaranteed UTF-8 bytes.
 
 The command always returns zero unless ``--strict`` is supplied.  A transport
 failure is printed as a redacted JSON result and must not block the Daily Brief.
@@ -28,8 +33,16 @@ from notifications.publisher import publish_daily_brief
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Publish one Daily Brief outbound notification")
     source = parser.add_mutually_exclusive_group(required=True)
-    source.add_argument("--stdin", action="store_true", help="read the exact final Markdown from stdin")
-    source.add_argument("--brief-file", type=Path, help="read the exact final Markdown from a private file")
+    source.add_argument(
+        "--stdin",
+        action="store_true",
+        help="read exact final Markdown from UTF-8 stdin (unsafe with default Windows PowerShell piping)",
+    )
+    source.add_argument(
+        "--brief-file",
+        type=Path,
+        help="read the exact final Markdown as UTF-8 from a private file",
+    )
     parser.add_argument("--summary", required=True, help="one-line or short action-first summary")
     parser.add_argument("--claude-share-url")
     parser.add_argument("--claude-session-id")

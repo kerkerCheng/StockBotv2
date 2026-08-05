@@ -2,8 +2,8 @@
 
 The publisher owns delivery bookkeeping, not any StockBotv2 authority.  It
 stores a private outbox/receipt database and delegates transport to an adapter.
-The first adapter is a Discord webhook; adding another channel must not change
-the Daily Brief or approval paths.
+The first adapter is a Discord Forum webhook; adding another channel must not
+change the Daily Brief or approval paths.
 """
 from __future__ import annotations
 
@@ -34,6 +34,7 @@ _DISCORD_MAX_CONTENT = 2_000
 _PART_BUDGET = 1_850
 _DISCORD_HOSTS = frozenset({"discord.com", "discordapp.com"})
 _USER_ID_RE = re.compile(r"^[0-9]{2,32}$")
+_DAILY_BRIEF_TITLE_RE = re.compile(r"^#\s+(Daily Brief\s+.+?)\s*$", re.MULTILINE)
 
 
 def _now() -> str:
@@ -195,12 +196,27 @@ def build_envelope(
 class NotificationTransport(Protocol):
     """One outbound provider operation; no inbound command surface."""
 
-    def send(self, content: str, *, allowed_mentions: dict[str, Any]) -> str | None:
-        """Send one message and return the provider message id if available."""
+    def send(
+        self,
+        content: str,
+        *,
+        allowed_mentions: dict[str, Any],
+        thread_name: str | None = None,
+        thread_id: str | None = None,
+    ) -> "TransportSendResult":
+        """Send one message, optionally creating or targeting a Forum thread."""
+
+
+@dataclass(frozen=True)
+class TransportSendResult:
+    """Provider ids returned by one outbound send."""
+
+    message_id: str | None = None
+    thread_id: str | None = None
 
 
 class DiscordWebhookTransport:
-    """Minimal Discord webhook adapter using the existing stdlib HTTP stack."""
+    """Discord Forum webhook adapter using the existing stdlib HTTP stack."""
 
     def __init__(self, webhook_url: str, *, timeout_seconds: int = 15):
         parsed = urllib.parse.urlparse(webhook_url)
@@ -211,15 +227,32 @@ class DiscordWebhookTransport:
         self._url = webhook_url
         self._timeout_seconds = timeout_seconds
 
-    def send(self, content: str, *, allowed_mentions: dict[str, Any]) -> str | None:
+    def send(
+        self,
+        content: str,
+        *,
+        allowed_mentions: dict[str, Any],
+        thread_name: str | None = None,
+        thread_id: str | None = None,
+    ) -> TransportSendResult:
         if len(content) > _DISCORD_MAX_CONTENT:
             raise ValueError("discord_content_exceeds_2000_characters")
-        url = self._url + ("&" if "?" in self._url else "?") + "wait=true"
+        if thread_name and thread_id:
+            raise ValueError("discord_thread_name_and_id_are_mutually_exclusive")
+        parsed = urllib.parse.urlparse(self._url)
+        query = urllib.parse.parse_qsl(parsed.query, keep_blank_values=True)
+        query.append(("wait", "true"))
+        if thread_id:
+            query.append(("thread_id", thread_id))
+        url = urllib.parse.urlunparse(parsed._replace(query=urllib.parse.urlencode(query)))
+        payload: dict[str, Any] = {
+            "content": content,
+            "allowed_mentions": allowed_mentions,
+        }
+        if thread_name:
+            payload["thread_name"] = thread_name
         body = json.dumps(
-            {
-                "content": content,
-                "allowed_mentions": allowed_mentions,
-            },
+            payload,
             ensure_ascii=False,
         ).encode("utf-8")
         request = urllib.request.Request(
@@ -244,8 +277,14 @@ class DiscordWebhookTransport:
             payload = json.loads(raw) if raw else {}
         except json.JSONDecodeError:
             payload = {}
-        message_id = payload.get("id") if isinstance(payload, dict) else None
-        return str(message_id) if message_id else None
+        if not isinstance(payload, dict):
+            return TransportSendResult()
+        message_id = payload.get("id")
+        response_thread_id = payload.get("channel_id")
+        return TransportSendResult(
+            message_id=str(message_id) if message_id else None,
+            thread_id=str(response_thread_id) if response_thread_id else None,
+        )
 
 
 def _split_content(text: str) -> list[str]:
@@ -289,6 +328,20 @@ def _summary_content(envelope: NotificationEnvelope) -> str:
     return "\n".join(lines)
 
 
+def _forum_thread_name(envelope: NotificationEnvelope) -> str:
+    """Return a deterministic, Discord-safe name for this Daily Brief thread."""
+
+    match = _DAILY_BRIEF_TITLE_RE.search(envelope.brief_text)
+    if match:
+        name = match.group(1).strip()
+    else:
+        # The normal Daily Brief always has the title above.  This fallback
+        # keeps ad-hoc smoke tests and older callers usable without inventing
+        # a second configuration surface.
+        name = f"Daily Brief {envelope.created_at[:10] or datetime.now(timezone.utc).date().isoformat()}"
+    return name[:100]
+
+
 @dataclass(frozen=True)
 class DeliveryResult:
     status: str
@@ -299,6 +352,7 @@ class DeliveryResult:
     total_parts: int = 0
     attempts: int = 0
     error_code: str | None = None
+    thread_id: str | None = None
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -310,6 +364,7 @@ class DeliveryResult:
             "total_parts": self.total_parts,
             "attempts": self.attempts,
             "error_code": self.error_code,
+            "thread_id": self.thread_id,
         }
 
 
@@ -388,8 +443,19 @@ class NotificationPublisher:
             CREATE UNIQUE INDEX IF NOT EXISTS delivery_attempt_key
                 ON delivery_attempts(delivery_key, part_index, attempt_number);
             INSERT OR IGNORE INTO notification_meta(key, value)
-                VALUES ('schema_version', '1');
+                VALUES ('schema_version', '2');
             """
+        )
+        columns = {
+            str(row[1])
+            for row in self.conn.execute("PRAGMA table_info(deliveries)").fetchall()
+        }
+        if "thread_id" not in columns:
+            self.conn.execute("ALTER TABLE deliveries ADD COLUMN thread_id TEXT")
+        if "thread_name" not in columns:
+            self.conn.execute("ALTER TABLE deliveries ADD COLUMN thread_name TEXT")
+        self.conn.execute(
+            "UPDATE notification_meta SET value = '2' WHERE key = 'schema_version'"
         )
         self.conn.commit()
 
@@ -473,6 +539,17 @@ class NotificationPublisher:
                 ),
             )
 
+    def _save_thread(self, delivery_key: str, *, thread_name: str, thread_id: str) -> None:
+        with immediate_transaction(self.conn):
+            self.conn.execute(
+                """
+                UPDATE deliveries
+                SET thread_name = ?, thread_id = ?
+                WHERE delivery_key = ?
+                """,
+                (thread_name, thread_id, delivery_key),
+            )
+
     def publish(self, envelope: NotificationEnvelope) -> DeliveryResult:
         """Best-effort publish; failures become a result and never raise."""
 
@@ -504,6 +581,7 @@ class NotificationPublisher:
                 delivery_key=envelope.delivery_key,
                 sent_parts=total,
                 total_parts=total,
+                thread_id=row["thread_id"],
             )
         if self.transport is None:
             self._mark_failed(envelope.delivery_key, "not_configured")
@@ -525,6 +603,14 @@ class NotificationPublisher:
         ]
         sent = self._sent_parts(envelope.delivery_key)
         attempts = 0
+        thread_name = row["thread_name"] or _forum_thread_name(envelope)
+        thread_id = row["thread_id"]
+        if row["thread_name"] != thread_name:
+            with immediate_transaction(self.conn):
+                self.conn.execute(
+                    "UPDATE deliveries SET thread_name = ? WHERE delivery_key = ?",
+                    (thread_name, envelope.delivery_key),
+                )
         allowed_mentions: dict[str, Any] = {"parse": []}
         if envelope.tag_user_id:
             allowed_mentions = {"users": [envelope.tag_user_id]}
@@ -540,7 +626,29 @@ class NotificationPublisher:
                     message_id = self.transport.send(
                         content,
                         allowed_mentions=allowed_mentions,
+                        thread_name=thread_name if thread_id is None else None,
+                        thread_id=thread_id,
                     )
+                    if isinstance(message_id, TransportSendResult):
+                        send_result = message_id
+                    elif isinstance(message_id, str):
+                        # Keep custom test/in-process transports source-compatible
+                        # while requiring a real Forum transport to return the
+                        # created thread id.
+                        send_result = TransportSendResult(message_id=message_id)
+                    elif message_id is None:
+                        send_result = TransportSendResult()
+                    else:
+                        raise TypeError("transport_send_result_invalid")
+                    if thread_id is None:
+                        if not send_result.thread_id:
+                            raise RuntimeError("discord_thread_id_missing")
+                        thread_id = send_result.thread_id
+                        self._save_thread(
+                            envelope.delivery_key,
+                            thread_name=thread_name,
+                            thread_id=thread_id,
+                        )
                 except Exception as exc:
                     last_error = f"transport_{type(exc).__name__}"
                     self._record_attempt(
@@ -556,7 +664,7 @@ class NotificationPublisher:
                     part_index=index,
                     attempt_number=attempt_number,
                     status="sent",
-                    message_id=message_id,
+                    message_id=send_result.message_id,
                 )
                 sent.add(index)
                 break
@@ -571,6 +679,7 @@ class NotificationPublisher:
                     total_parts=len(parts),
                     attempts=attempts,
                     error_code=last_error or "transport_failed",
+                    thread_id=thread_id,
                 )
 
         with immediate_transaction(self.conn):
@@ -586,6 +695,7 @@ class NotificationPublisher:
             sent_parts=len(parts),
             total_parts=len(parts),
             attempts=attempts,
+            thread_id=thread_id,
         )
 
     def _mark_failed(self, delivery_key: str, error_code: str) -> None:

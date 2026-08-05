@@ -7,6 +7,7 @@ from .publisher import (
     NotificationSettings,
     NotificationPublisher,
     NotificationTransport,
+    TransportSendResult,
     build_envelope,
     load_settings,
 )
@@ -18,6 +19,7 @@ __all__ = [
     "NotificationPublisher",
     "NotificationSettings",
     "NotificationTransport",
+    "TransportSendResult",
     "build_envelope",
     "load_settings",
 ]
