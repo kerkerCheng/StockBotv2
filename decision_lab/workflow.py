@@ -459,6 +459,7 @@ def evaluate_signal(
                 "fx_freshness_hours",
                 "holdings_freshness_days",
                 "financial_freshness_days",
+                "financial_runway_freshness_days",
             )
         },
         **inputs,

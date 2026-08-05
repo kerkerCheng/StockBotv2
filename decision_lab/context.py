@@ -123,6 +123,7 @@ def _normalize_financial(
     expected_ticker: str,
     evaluation_at: str,
     freshness_days: float = 14,
+    runway_freshness_days: float = 100,
 ) -> dict[str, Any]:
     if payload.get("status") in {"missing", "unavailable"}:
         status = str(payload["status"])
@@ -159,7 +160,12 @@ def _normalize_financial(
         if runway_as_of > evaluation:
             runway = {"status": "manual_required", "runway_months": None}
             runway_blockers.append("financial_runway_timestamp_future")
-        elif evaluation - runway_as_of > timedelta(days=freshness_days):
+        # 人工 runway 觀測的 as_of 是**資產負債表日**，由財報週期決定，不是抓取
+        # 時刻。套用給自動快照用的 financial_freshness_days（14 天）會讓這條路徑
+        # 結構上永遠打不開：財報通常落後季末 30-45 天，文件公開當天資產負債表就
+        # 已經超窗（AXT Q2 季末 2026-06-30、8-K 申報 2026-07-30，30 天）。
+        # 因此另用對齊財報節奏的窗口；自動快照的嚴格度不受影響。
+        elif evaluation - runway_as_of > timedelta(days=runway_freshness_days):
             runway = {"status": "manual_required", "runway_months": None}
             runway_blockers.append("financial_runway_stale")
     return {
@@ -474,6 +480,7 @@ def build_context_bundle(
         "fx_freshness_hours": 36.0,
         "holdings_freshness_days": 7.0,
         "financial_freshness_days": 14.0,
+        "financial_runway_freshness_days": 100.0,
     }
     if freshness_policy is not None:
         for field in freshness:
@@ -557,6 +564,7 @@ def build_context_bundle(
         expected_ticker=str(research_ticker or ""),
         evaluation_at=evaluation_at,
         freshness_days=freshness["financial_freshness_days"],
+        runway_freshness_days=freshness["financial_runway_freshness_days"],
     )
     normalized_holdings = _normalize_holdings(
         store,

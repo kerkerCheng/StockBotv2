@@ -205,6 +205,103 @@ def test_future_manual_runway_cannot_complete_current_financial_context(
         store.close()
 
 
+def _manual_runway_inputs(as_of: str) -> dict:
+    inputs = complete_inputs()
+    inputs["financial"].update(
+        {
+            "cash_and_equivalents": None,
+            "total_debt": None,
+            "free_cash_flow_ttm": None,
+            "manual_runway": {
+                "cash_and_equivalents": 412_167_000.0,
+                "total_debt": 84_233_000.0,
+                "free_cash_flow_ttm": -27_978_000.0,
+                "source": "fixture://quarterly-balance-sheet",
+                "as_of": as_of,
+            },
+        }
+    )
+    return inputs
+
+
+def test_quarterly_manual_runway_is_not_judged_by_the_daily_snapshot_window(
+    tmp_path: Path,
+) -> None:
+    """人工 runway 觀測的 as_of 是資產負債表日，不是抓取時刻。
+
+    事發（2026-08-05）：runway_inputs 這個欄位存在的理由就是替 derive_runway 補上
+    缺掉的走廊，但它被套用 financial_freshness_days（14 天，為每日刷新的 yfinance
+    快照而設）。財報通常落後季末 30-45 天——AXT Q2 季末 2026-06-30、8-K 申報
+    2026-07-30——所以文件公開當天資產負債表就已超窗，這條路徑結構上永遠打不開。
+    """
+
+    store = _store(tmp_path)
+    # 季末 36 天前：遠超 financial_freshness_days=14，但在財報節奏窗口內。
+    inputs = _manual_runway_inputs("2026-06-15T00:00:00+00:00")
+    try:
+        bundle = build_context_bundle(
+            store,
+            cohort_id=_cohort(store, "quarterly-runway"),
+            evaluation_at=NOW,
+            policy_version="probe-v1",
+            **inputs,
+        )
+
+        runway = bundle.payload["financial"]["runway"]
+        assert runway["status"] == "calculated"
+        assert runway["runway_months"] == pytest.approx(412_167_000.0 / (27_978_000.0 / 12))
+        assert "financial_runway_stale" not in bundle.payload["financial"]["blockers"]
+    finally:
+        store.close()
+
+
+def test_manual_runway_beyond_the_reporting_window_is_still_rejected(
+    tmp_path: Path,
+) -> None:
+    """新窗口不是把 staleness 檢查關掉——超過一個財報週期仍然擋。"""
+
+    store = _store(tmp_path)
+    # 評估日往前 200 天：已跨過兩個季度，該觀測早就該被新財報取代。
+    inputs = _manual_runway_inputs("2026-01-01T00:00:00+00:00")
+    try:
+        bundle = build_context_bundle(
+            store,
+            cohort_id=_cohort(store, "ancient-runway"),
+            evaluation_at=NOW,
+            policy_version="probe-v1",
+            **inputs,
+        )
+
+        assert bundle.payload["financial"]["runway"]["status"] == "manual_required"
+        assert "financial_runway_stale" in bundle.payload["financial"]["blockers"]
+    finally:
+        store.close()
+
+
+def test_runway_window_does_not_loosen_the_auto_snapshot_window(
+    tmp_path: Path,
+) -> None:
+    """兩個窗口不得互相取代：自動財務快照仍受 14 天約束。"""
+
+    store = _store(tmp_path)
+    inputs = complete_inputs()
+    # 自動快照本身過期（>14 天），但三個數值齊全，不走 manual runway 路徑。
+    inputs["financial"]["as_of"] = "2026-06-15T00:00:00+00:00"
+    try:
+        bundle = build_context_bundle(
+            store,
+            cohort_id=_cohort(store, "stale-auto-financial"),
+            evaluation_at=NOW,
+            policy_version="probe-v1",
+            **inputs,
+        )
+
+        assert bundle.payload["financial"]["status"] == "stale"
+        assert "financial_stale" in bundle.payload["financial"]["blockers"]
+    finally:
+        store.close()
+
+
 def test_context_identity_cannot_cross_fund_a_different_cohort(tmp_path: Path) -> None:
     store = _store(tmp_path)
     inputs = complete_inputs()

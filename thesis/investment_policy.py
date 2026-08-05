@@ -37,6 +37,7 @@ _PROBE_REQUIRED_KEYS = {
     "fx_freshness_hours",
     "holdings_freshness_days",
     "financial_freshness_days",
+    "financial_runway_freshness_days",
 }
 _PROBE_LEVELS = ("unknown", "bounded_hypothesis", "corroborated")
 
@@ -133,6 +134,7 @@ def _validate_probe_lane(value: Any) -> dict[str, Any]:
         "fx_freshness_hours",
         "holdings_freshness_days",
         "financial_freshness_days",
+        "financial_runway_freshness_days",
     ):
         normalized[field] = _positive_number(value[field], f"probe_lane.{field}")
     return normalized
