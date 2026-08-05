@@ -1261,20 +1261,14 @@
       "added_at": "2026-08-03T22:36:54.439794+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 85,
-      "reason": null,
+      "reason": "Engine D 最新 decision pd_c17f84a51567ee17d27750cf97a18e55 為 NO ACTION，無實質缺口；來源 row 已不再產生，屬殘留項",
+      "receipt": null,
       "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "drop",
+      "resolved_at": "2026-08-05T16:51:23.923158+00:00",
       "source": "decision_lab",
       "title": "REVIEW — co:applied_optoelectronics",
-      "type": "decision_review",
-      "waiting_on": {
-        "derived_from_blockers": true,
-        "reason": "所有 blocker 都不需要使用者決定",
-        "set_at": "2026-08-03T22:36:54.439666+00:00",
-        "trigger": "執行面 context 缺失／市場資料問題",
-        "until": null
-      }
+      "type": "decision_review"
     },
     {
       "added_at": "2026-08-03T22:43:07.867146+00:00",
@@ -2889,6 +2883,15 @@
       "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
       "type": "decision_review",
       "verb": "event_reactivated"
+    },
+    {
+      "at": "2026-08-05T16:51:23.923158+00:00",
+      "n": 85,
+      "reason": "Engine D 最新 decision pd_c17f84a51567ee17d27750cf97a18e55 為 NO ACTION，無實質缺口；來源 row 已不再產生，屬殘留項",
+      "receipt": null,
+      "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
+      "type": "decision_review",
+      "verb": "drop"
     }
   ],
   "next_n": 95,

@@ -1,0 +1,1855 @@
+EX-99.1
+ 2
+ ex_974537.htm
+ EXHIBIT 99.1
+ 
+ 
+ ex_974537.htm 
+ 
+ 
+ 
+ &nbsp; 
+
+ 
+
+ 
+ 
+ 
+ 
+ 
+ &nbsp; 
+
+ &nbsp; 
+
+ &nbsp; 
+
+ Exhibit 99.1 
+ 
+ 
+
+ 
+
+ 
+
+ 
+ &nbsp; 
+ 
+ AXT, Inc.&nbsp; Second Quarter 2026 &nbsp;Results 
+
+ July 30, 2026 
+
+ Page 1 of 6 
+ 
+ 
+
+ 
+
+ &nbsp; 
+
+ AXT, Inc. Announces Second &nbsp;Quarter 2026 &nbsp;Financial Results 
+
+ &nbsp; 
+
+ FREMONT, Calif., July 30, 2026 &#8211; AXT, Inc. (NasdaqGS: AXTI), a leading manufacturer of compound semiconductor wafer substrates, today reported financial results for the second &nbsp;quarter, ended June 30, 2026 . 
+
+ &nbsp; 
+
+ Management Qualitative Comments 
+
+ &nbsp; 
+
+ &#8220;This is an incredibly exciting time for AXT,&#8221; said Morris Young, chief executive officer. &#8220;We have reached an inflection point in our business where strong customer demand for data center optical connectivity coupled with our continued success in adding manufacturing capacity and improving productivity are driving a step-function increase in our revenue. In Q2, we recorded our highest quarterly indium phosphide revenue to date.&nbsp;We are working closely with our direct customers as well as major end customers to understand their expected demand and roadmaps.&nbsp;We believe AXT is entering one of the most consequential chapters in our company&#8217;s history. The investments we are making today&#8212;in capacity, in technology, and in our uniquely integrated supply chain&#8212;position us to meet the extraordinary demand we see building across the optical and AI infrastructure markets.&#8221;&nbsp; 
+
+ &nbsp; 
+
+ Second &nbsp;Quarter&nbsp; 2026 Results 
+
+ &nbsp; 
+
+ In order to provide better clarity on its operational and financial results, AXT reports its financial results on both a GAAP and non-GAAP basis. Non-GAAP results exclude stock-based compensation expense. Investors can find GAAP to non-GAAP reconciliation tables in the financial statements in this earnings release. 
+
+ &nbsp; 
+
+ 
+
+ 
+ &nbsp; 
+ 
+ &#9679; 
+ 
+ 
+ Revenue for the second quarter of 2026&nbsp;was $47.6 million, compared with $26.9 million for the first&nbsp;quarter of 2026&nbsp;and $18.0 million for the second quarter of 2025. 
+ 
+ 
+
+ 
+
+ &nbsp; 
+
+ 
+
+ 
+ &nbsp; 
+ 
+ &#9679; 
+ 
+ 
+ GAAP gross margin was 44.9 percent of revenue for the second quarter of 2026, compared with 29.6 percent of revenue for the first&nbsp;quarter of 2026&nbsp;and 8.0 percent for the second&nbsp;quarter of 2025. 
+ 
+ 
+
+ 
+
+ &nbsp; 
+
+ 
+
+ 
+ &nbsp; 
+ 
+ &#9679; 
+ 
+ 
+ Non-GAAP gross margin, after excluding charges for stock-based compensation, was 45.0 percent of revenue for the second quarter of 2026, compared with 29.9 percent of revenue for the first&nbsp;quarter of 2026&nbsp;and 8.2 percent for the second&nbsp;quarter of 2025. 
+ 
+ 
+
+ 
+
+ &nbsp; 
+
+ 
+
+ 
+ &nbsp; 
+ 
+ &#9679; 
+ 
+ 
+ GAAP net income, after minority interests, for the second quarter of 2026 was a net income of $11.1 million, or $0.17 diluted income per share, compared with a net loss of $1.6 million, or $0.03 per share, for the first quarter of 2026&nbsp;and a net loss of $7.0 million, or $0.16&nbsp;per share, for the second&nbsp;quarter of 2025. 
+ 
+ 
+
+ 
+
+ &nbsp; 
+
+ 
+
+ 
+ &nbsp; 
+ 
+ &#9679; 
+ 
+ 
+ Non-GAAP net income for the second quarter of 2026 was a net income of $11.9&nbsp;million, or $0.19&nbsp;per share, compared with a net loss of $0.6 million, or $0.01&nbsp;per share, for the first quarter of 2026&nbsp;and a net loss of $6.4 million, or $0.15&nbsp;per share, for the second&nbsp;quarter of 2025. 
+ 
+ 
+
+ 
+
+ &nbsp; 
+
+ 
+ 
+ 
+ &nbsp; 
+ 
+ 
+
+ 
+ 
+ 
+ &nbsp; 
+ 
+ 
+ 
+
+ AXT, Inc.&nbsp; Second Quarter 2026 &nbsp;Results 
+
+ July 30, 2026 
+
+ Page 2 of 6 
+
+ &nbsp; 
+
+ Conference Call 
+
+ &nbsp; 
+
+ The company will host a conference call to discuss these results today at 1:30 p.m. PT. The conference call can be accessed at (833) 461-5787 (passcode 630205921). The call will also be simulcast at www.axt.com. The webcast will be available at http://www.axt.com until July 30, 2027. Additional investor information can be accessed at http://www.axt.com. 
+
+ &nbsp; 
+
+ About AXT, Inc. 
+
+ &nbsp; 
+
+ AXT is a material science company that develops and manufactures high-performance compound and single element semiconductor wafer substrates comprising indium phosphide (InP), gallium arsenide (GaAs) and germanium (Ge). The company&#8217;s wafer substrates are used when a typical silicon wafer substrate cannot meet the performance requirements of a semiconductor or optoelectronic device. End markets include 5G infrastructure, data center connectivity (silicon photonics), passive optical networks, LED lighting, lasers, sensors, power amplifiers for wireless devices and satellite solar cells. AXT&#8217;s worldwide headquarters are in Fremont, California where the company maintains sales, administration and customer service functions. AXT has its Asia headquarters in Beijing, China and manufacturing facilities in three separate locations in China. In addition, as part of its supply chain strategy, the company has partial ownership in more than ten companies in China producing raw materials and consumables for its manufacturing process. For more information, see AXT&#8217;s website at http://www.axt.com. 
+
+ &nbsp; 
+
+ Note Regarding Use of Non-GAAP Financial Measures 
+
+ &nbsp; 
+
+ As discussed above, the company provides certain non-GAAP financial measures that exclude stock-based compensation in addition to, and not as a substitute for, or because it believes that such information is superior to, financial measures calculated in accordance with GAAP. The company believes that non-GAAP financial measures, when taken collectively, may be helpful to investors because they provide consistency and comparability with past financial performance and provide better comparability with our peer companies, many of which also use similar non-GAAP financial measures. Further, the company believes that these non-GAAP financial measures offer an important analytical tool to help investors understand the company&#8217;s core operating results and trends. In addition, management uses non-GAAP financial measures to compare the company&#8217;s performance relative to forecasts and strategic plans and to benchmark its performance externally against peer companies. However, non-GAAP financial information is presented for supplemental informational purposes only, has limitations as an analytical tool and should not be considered in isolation or as a substitute for financial information presented in accordance with GAAP. In addition, other companies may calculate similarly-titled non-GAAP financial measures differently or may use other measures to evaluate their performance, all of which could reduce the usefulness of the company&#8217;s non-GAAP financial measures as tools for comparison. The company encourages investors to carefully consider its results under GAAP, as well as its supplemental non&#8208;GAAP information and the reconciliation between these presentations, to more fully understand its business. A reconciliation of our GAAP consolidated financial statements to our non-GAAP consolidated financial statements is provided below. 
+
+ &nbsp; 
+
+ &nbsp; 
+
+ 
+ 
+ 
+ &nbsp; 
+ 
+ 
+
+ 
+ 
+ 
+ &nbsp; 
+ 
+ 
+ 
+
+ AXT, Inc.&nbsp; Second Quarter 2026 &nbsp;Results 
+
+ July 30, 2026 
+
+ Page 3 of 6 
+
+ &nbsp; 
+
+ Forward-Looking Statements 
+
+ &nbsp; 
+
+ The foregoing paragraphs contain forward-looking statements within the meaning of Section 27A of the Securities Act of 1933, as amended, or the Securities Act, and Section 21E of the Securities Exchange Act of 1934, as amended, or the Exchange Act.&nbsp;For example, our plans and ability to increase&nbsp;manufacturing capacity and to enable our industry to meet future demands and needs for our indium phosphide wafer substrates. Statements relating to our expectations regarding the receipt of export permits for our indium phosphide substrates, results of operations, market and customer demand for our products, our ability to expand our markets or increase sales, emerging applications using chips or devices fabricated on our substrates, including the use of indium phosphide wafer substrates in artificial intelligence (&#8220;AI&#8221;) applications, product yields and gross margins, expense levels, our investments in capital projects, ramping production at our sites, our ability to utilize or increase our manufacturing capacity, and our belief that we have adequate cash and investments to meet our needs are also forward-looking statements. The words &#8220;believe,&#8221; &#8220;may,&#8221; &#8220;will,&#8221; &#8220;estimate,&#8221; &#8220;continue,&#8221; &#8220;anticipate,&#8221; &#8220;intend,&#8221; &#8220;expect,&#8221; &#8220;could,&#8221; &#8220;would,&#8221; &#8220;project,&#8221; &#8220;plan,&#8221; &#8220;potentially,&#8221; &#8220;likely,&#8221; and similar expressions and variations thereof are intended to identify forward-looking statements, but are not the exclusive means of identifying such statements. These statements appear in this press release and elsewhere, include statements regarding the intent, belief or current expectations of our management that are subject to known and unknown risks, uncertainties and assumptions which could cause actual results to differ materially from those expressed or implied in the forward-looking statement. These risks, uncertainties and assumptions include, but are not limited to, the receipt of export permits for our indium phosphide substrates, the withdrawal, cancellations or requests for redemptions by private equity funds in China of their investments in Tongmei, the administrative challenges in satisfying the requirements of various government agencies in China in connection with the investments in Tongmei, geopolitical tensions between China and the United States, and other factors described and captioned &#8220;Risk Factors&#8221; in &nbsp;the company&#8217;s Annual Report on Form 10-K, quarterly reports on Form 10-Q and other filings made with the Securities and Exchange Commission. Each of these factors is difficult to predict and many are beyond the company&#8217;s control. The company does not undertake any obligation to update any forward-looking statement, as a result of new information, future events or otherwise. You are cautioned that any such forward-looking statements are not guarantees of future performance and involve risks and uncertainties, and that actual results may differ materially from those projected in the forward-looking statements as a result of various factors. 
+
+ &nbsp; 
+
+ &nbsp; 
+
+ ### 
+
+ &nbsp; 
+
+ FINANCIAL TABLES TO FOLLOW 
+
+ &nbsp; 
+
+ 
+ 
+ 
+ &nbsp; 
+ 
+ 
+
+ 
+ 
+ 
+ &nbsp; 
+ 
+ 
+ 
+
+ AXT, Inc.&nbsp; Second Quarter 2026 &nbsp;Results 
+
+ July 30, 2026 
+
+ Page 4 of 6 
+
+ &nbsp; 
+
+ AXT, INC. 
+
+ CONDENSED CONSOLIDATED STATEMENTS OF OPERATIONS 
+
+ (Unaudited, in thousands, except per share data) 
+
+ &nbsp; 
+
+ 
+
+ 
+ &nbsp; 
+ &nbsp; 
+ 
+ Three Months Ended 
+ 
+ &nbsp; 
+ &nbsp; 
+ 
+ Six Months Ended 
+ 
+ &nbsp; 
+ 
+ 
+ &nbsp; 
+ &nbsp; 
+ 
+ June 30, 
+ 
+ &nbsp; 
+ &nbsp; 
+ 
+ June 30, 
+ 
+ &nbsp; 
+ 
+ 
+ &nbsp; 
+ &nbsp; 
+ 
+ 2026 
+ 
+ &nbsp; 
+ &nbsp; 
+ 
+ 2025 
+ 
+ &nbsp; 
+ &nbsp; 
+ 
+ 2026 
+ 
+ &nbsp; 
+ &nbsp; 
+ 
+ 2025 
+ 
+ &nbsp; 
+ 
+ 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 
+ 
+ 
+ Revenue 
+ 
+ &nbsp; 
+ $ 
+ 47,589 
+ &nbsp; 
+ &nbsp; 
+ $ 
+ 17,974 
+ &nbsp; 
+ &nbsp; 
+ $ 
+ 74,513 
+ &nbsp; 
+ &nbsp; 
+ $ 
+ 37,330 
+ &nbsp; 
+ 
+ 
+ 
+ Cost of revenue 
+ 
+ &nbsp; 
+ &nbsp; 
+ 26,223 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 16,541 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 45,169 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 37,138 
+ &nbsp; 
+ 
+ 
+ 
+ Gross profit 
+ 
+ &nbsp; 
+ &nbsp; 
+ 21,366 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 1,433 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 29,344 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 192 
+ &nbsp; 
+ 
+ 
+ 
+ Operating expenses: 
+ 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 
+ 
+ 
+ Selling, general and administrative 
+ 
+ &nbsp; 
+ &nbsp; 
+ 7,292 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 5,653 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 13,843 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 11,569 
+ &nbsp; 
+ 
+ 
+ 
+ Research and development 
+ 
+ &nbsp; 
+ &nbsp; 
+ 3,651 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 2,525 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 6,663 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 5,643 
+ &nbsp; 
+ 
+ 
+ 
+ Total operating expenses 
+ 
+ &nbsp; 
+ &nbsp; 
+ 10,943 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 8,178 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 20,506 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 17,212 
+ &nbsp; 
+ 
+ 
+ 
+ Income (loss) from operations 
+ 
+ &nbsp; 
+ &nbsp; 
+ 10,423 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ (6,745 
+ ) 
+ &nbsp; 
+ &nbsp; 
+ 8,838 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ (17,020 
+ ) 
+ 
+ 
+ 
+ Interest income (expense), net 
+ 
+ &nbsp; 
+ &nbsp; 
+ 4,728 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ (202 
+ ) 
+ &nbsp; 
+ &nbsp; 
+ 4,829 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ (471 
+ ) 
+ 
+ 
+ 
+ Equity in income (loss) of unconsolidated joint ventures 
+ 
+ &nbsp; 
+ &nbsp; 
+ 417 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ (171 
+ ) 
+ &nbsp; 
+ &nbsp; 
+ 770 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 77 
+ &nbsp; 
+ 
+ 
+ 
+ Other income (expense), net 
+ 
+ &nbsp; 
+ &nbsp; 
+ (436 
+ ) 
+ &nbsp; 
+ &nbsp; 
+ 23 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ (360 
+ ) 
+ &nbsp; 
+ &nbsp; 
+ 377 
+ &nbsp; 
+ 
+ 
+ 
+ Income (loss) before provision for income taxes 
+ 
+ &nbsp; 
+ &nbsp; 
+ 15,132 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ (7,095 
+ ) 
+ &nbsp; 
+ &nbsp; 
+ 14,077 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ (17,037 
+ ) 
+ 
+ 
+ 
+ Provision for income taxes 
+ 
+ &nbsp; 
+ &nbsp; 
+ 2,102 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 579 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 2,532 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 653 
+ &nbsp; 
+ 
+ 
+ 
+ Net income (loss) 
+ 
+ &nbsp; 
+ &nbsp; 
+ 13,030 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ (7,674 
+ ) 
+ &nbsp; 
+ &nbsp; 
+ 11,545 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ (17,690 
+ ) 
+ 
+ 
+ 
+ Less: Net (income) loss attributable to noncontrolling interests and redeemable noncontrolling interests 
+ 
+ &nbsp; 
+ &nbsp; 
+ (1,902 
+ ) 
+ &nbsp; 
+ &nbsp; 
+ 666 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ (2,037 
+ ) 
+ &nbsp; 
+ &nbsp; 
+ 1,884 
+ &nbsp; 
+ 
+ 
+ 
+ Net income (loss) attributable to AXT, Inc. 
+ 
+ &nbsp; 
+ $ 
+ 11,128 
+ &nbsp; 
+ &nbsp; 
+ $ 
+ (7,008 
+ ) 
+ &nbsp; 
+ $ 
+ 9,508 
+ &nbsp; 
+ &nbsp; 
+ $ 
+ (15,806 
+ ) 
+ 
+ 
+ 
+ Net income (loss) attributable to AXT, Inc. per common share: 
+ 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 
+ 
+ 
+ Basic 
+ 
+ &nbsp; 
+ $ 
+ 0.18 
+ &nbsp; 
+ &nbsp; 
+ $ 
+ (0.16 
+ ) 
+ &nbsp; 
+ $ 
+ 0.16 
+ &nbsp; 
+ &nbsp; 
+ $ 
+ (0.36 
+ ) 
+ 
+ 
+ 
+ Diluted 
+ 
+ &nbsp; 
+ $ 
+ 0.17 
+ &nbsp; 
+ &nbsp; 
+ $ 
+ (0.16 
+ ) 
+ &nbsp; 
+ $ 
+ 0.16 
+ &nbsp; 
+ &nbsp; 
+ $ 
+ (0.36 
+ ) 
+ 
+ 
+ 
+ Weighted-average number of common shares outstanding: 
+ 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 
+ 
+ 
+ Basic 
+ 
+ &nbsp; 
+ &nbsp; 
+ 61,227 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 43,710 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 57,274 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 43,630 
+ &nbsp; 
+ 
+ 
+ 
+ Diluted 
+ 
+ &nbsp; 
+ &nbsp; 
+ 63,474 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 43,710 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 59,642 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 43,630 
+ &nbsp; 
+ 
+
+ 
+
+ &nbsp; 
+
+ 
+ &nbsp; 
+
+ 
+ &nbsp; 
+ 
+
+ AXT, Inc.&nbsp; Second Quarter 2026 &nbsp;Results 
+
+ July 30, 2026 
+
+ Page 5 of 6 
+
+ &nbsp; 
+
+ AXT, INC. 
+
+ CONDENSED CONSOLIDATED BALANCE SHEETS 
+
+ (Unaudited, in thousands) 
+
+ &nbsp; 
+
+ 
+
+ 
+ &nbsp; 
+ &nbsp; 
+ 
+ June 30, 
+ 
+ &nbsp; 
+ &nbsp; 
+ 
+ December 31, 
+ 
+ &nbsp; 
+ 
+ 
+ &nbsp; 
+ &nbsp; 
+ 
+ 2026 
+ 
+ &nbsp; 
+ &nbsp; 
+ 
+ 2025 
+ 
+ &nbsp; 
+ 
+ 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 
+ 
+ 
+ ASSETS 
+ 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 
+ 
+ 
+ Current assets: 
+ 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 
+ 
+ 
+ Cash and cash equivalents 
+ 
+ &nbsp; 
+ $ 
+ 412,167 
+ &nbsp; 
+ &nbsp; 
+ $ 
+ 120,266 
+ &nbsp; 
+ 
+ 
+ 
+ Restricted cash 
+ 
+ &nbsp; 
+ &nbsp; 
+ 33,050 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 8,100 
+ &nbsp; 
+ 
+ 
+ 
+ Short-term investments 
+ 
+ &nbsp; 
+ &nbsp; 
+ 5,031 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &#8212; 
+ &nbsp; 
+ 
+ 
+ 
+ Accounts receivable, net 
+ 
+ &nbsp; 
+ &nbsp; 
+ 36,675 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 26,849 
+ &nbsp; 
+ 
+ 
+ 
+ Inventories 
+ 
+ &nbsp; 
+ &nbsp; 
+ 96,322 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 81,651 
+ &nbsp; 
+ 
+ 
+ 
+ Prepaid expenses and other current assets 
+ 
+ &nbsp; 
+ &nbsp; 
+ 15,558 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 9,690 
+ &nbsp; 
+ 
+ 
+ 
+ Total current assets 
+ 
+ &nbsp; 
+ &nbsp; 
+ 598,803 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 246,556 
+ &nbsp; 
+ 
+ 
+ 
+ Long-term investments 
+ 
+ &nbsp; 
+ &nbsp; 
+ 298,600 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &#8212; 
+ &nbsp; 
+ 
+ 
+ 
+ Property, plant and equipment, net 
+ 
+ &nbsp; 
+ &nbsp; 
+ 174,924 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 161,860 
+ &nbsp; 
+ 
+ 
+ 
+ Operating lease right-of-use assets 
+ 
+ &nbsp; 
+ &nbsp; 
+ 1,766 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 1,982 
+ &nbsp; 
+ 
+ 
+ 
+ Other assets 
+ 
+ &nbsp; 
+ &nbsp; 
+ 23,099 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 23,353 
+ &nbsp; 
+ 
+ 
+ 
+ Total assets 
+ 
+ &nbsp; 
+ $ 
+ 1,097,192 
+ &nbsp; 
+ &nbsp; 
+ $ 
+ 433,751 
+ &nbsp; 
+ 
+ 
+ 
+ LIABILITIES, REDEEMABLE NONCONTROLLING INTERESTS AND STOCKHOLDERS&#8217; EQUITY 
+ 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 
+ 
+ 
+ Current liabilities: 
+ 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 
+ 
+ 
+ Accounts payable 
+ 
+ &nbsp; 
+ $ 
+ 14,373 
+ &nbsp; 
+ &nbsp; 
+ $ 
+ 12,947 
+ &nbsp; 
+ 
+ 
+ 
+ Accrued liabilities 
+ 
+ &nbsp; 
+ &nbsp; 
+ 27,052 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 14,798 
+ &nbsp; 
+ 
+ 
+ 
+ Short-term loans 
+ 
+ &nbsp; 
+ &nbsp; 
+ 84,233 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 62,796 
+ &nbsp; 
+ 
+ 
+ 
+ Total current liabilities 
+ 
+ &nbsp; 
+ &nbsp; 
+ 125,658 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 90,541 
+ &nbsp; 
+ 
+ 
+ 
+ Noncurrent operating lease liabilities 
+ 
+ &nbsp; 
+ &nbsp; 
+ 1,164 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 1,441 
+ &nbsp; 
+ 
+ 
+ 
+ Other long-term liabilities 
+ 
+ &nbsp; 
+ &nbsp; 
+ 18,522 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 7,138 
+ &nbsp; 
+ 
+ 
+ 
+ Total liabilities 
+ 
+ &nbsp; 
+ &nbsp; 
+ 145,344 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 99,120 
+ &nbsp; 
+ 
+ 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 
+ 
+ 
+ Redeemable noncontrolling interests 
+ 
+ &nbsp; 
+ &nbsp; 
+ 39,735 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 38,056 
+ &nbsp; 
+ 
+ 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 
+ 
+ 
+ Stockholders&#8217; equity: 
+ 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 
+ 
+ 
+ Preferred stock 
+ 
+ &nbsp; 
+ &nbsp; 
+ 3,532 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 3,532 
+ &nbsp; 
+ 
+ 
+ 
+ Common stock 
+ 
+ &nbsp; 
+ &nbsp; 
+ 66 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 55 
+ &nbsp; 
+ 
+ 
+ 
+ Additional paid-in capital 
+ 
+ &nbsp; 
+ &nbsp; 
+ 943,758 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 339,922 
+ &nbsp; 
+ 
+ 
+ 
+ Accumulated deficit 
+ 
+ &nbsp; 
+ &nbsp; 
+ (55,416 
+ ) 
+ &nbsp; 
+ &nbsp; 
+ (64,924 
+ ) 
+ 
+ 
+ 
+ Accumulated other comprehensive loss 
+ 
+ &nbsp; 
+ &nbsp; 
+ (4,666 
+ ) 
+ &nbsp; 
+ &nbsp; 
+ (5,295 
+ ) 
+ 
+ 
+ 
+ Total AXT, Inc. stockholders&#8217; equity 
+ 
+ &nbsp; 
+ &nbsp; 
+ 887,274 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 273,290 
+ &nbsp; 
+ 
+ 
+ 
+ Noncontrolling interests 
+ 
+ &nbsp; 
+ &nbsp; 
+ 24,839 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 23,285 
+ &nbsp; 
+ 
+ 
+ 
+ Total stockholders&#8217; equity 
+ 
+ &nbsp; 
+ &nbsp; 
+ 912,113 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 296,575 
+ &nbsp; 
+ 
+ 
+ 
+ Total liabilities, redeemable noncontrolling interests and stockholders&#8217; equity 
+ 
+ &nbsp; 
+ $ 
+ 1,097,192 
+ &nbsp; 
+ &nbsp; 
+ $ 
+ 433,751 
+ &nbsp; 
+ 
+
+ 
+
+ &nbsp; 
+
+ 
+ &nbsp; 
+
+ 
+ &nbsp; 
+ 
+
+ AXT, Inc.&nbsp; Second Quarter 2026 &nbsp;Results 
+
+ July 30, 2026 
+
+ Page 6 of 6 
+
+ &nbsp; 
+
+ AXT, INC. 
+
+ Reconciliation of Statements of Operations Under GAAP and Non-GAAP 
+
+ (Unaudited, in thousands) 
+
+ &nbsp; 
+
+ 
+
+ 
+ &nbsp; 
+ &nbsp; 
+ 
+ Three Months Ended 
+ 
+ &nbsp; 
+ &nbsp; 
+ 
+ Six Months Ended 
+ 
+ &nbsp; 
+ 
+ 
+ &nbsp; 
+ &nbsp; 
+ 
+ June 30, 
+ 
+ &nbsp; 
+ &nbsp; 
+ 
+ June 30, 
+ 
+ &nbsp; 
+ 
+ 
+ &nbsp; 
+ &nbsp; 
+ 
+ 2026 
+ 
+ &nbsp; 
+ &nbsp; 
+ 
+ 2025 
+ 
+ &nbsp; 
+ &nbsp; 
+ 
+ 2026 
+ 
+ &nbsp; 
+ &nbsp; 
+ 
+ 2025 
+ 
+ &nbsp; 
+ 
+ 
+ 
+ GAAP gross profit 
+ 
+ &nbsp; 
+ $ 
+ 21,366 
+ &nbsp; 
+ &nbsp; 
+ $ 
+ 1,433 
+ &nbsp; 
+ &nbsp; 
+ $ 
+ 29,344 
+ &nbsp; 
+ &nbsp; 
+ $ 
+ 192 
+ &nbsp; 
+ 
+ 
+ 
+ Stock-based compensation expense 
+ 
+ &nbsp; 
+ &nbsp; 
+ 65 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 47 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 130 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 110 
+ &nbsp; 
+ 
+ 
+ 
+ Non-GAAP gross profit 
+ 
+ &nbsp; 
+ $ 
+ 21,431 
+ &nbsp; 
+ &nbsp; 
+ $ 
+ 1,480 
+ &nbsp; 
+ &nbsp; 
+ $ 
+ 29,474 
+ &nbsp; 
+ &nbsp; 
+ $ 
+ 302 
+ &nbsp; 
+ 
+ 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 
+ 
+ 
+ GAAP operating expenses 
+ 
+ &nbsp; 
+ $ 
+ 10,943 
+ &nbsp; 
+ &nbsp; 
+ $ 
+ 8,178 
+ &nbsp; 
+ &nbsp; 
+ $ 
+ 20,506 
+ &nbsp; 
+ &nbsp; 
+ $ 
+ 17,212 
+ &nbsp; 
+ 
+ 
+ 
+ Stock-based compensation expense 
+ 
+ &nbsp; 
+ &nbsp; 
+ 697 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 586 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 1,667 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 1,169 
+ &nbsp; 
+ 
+ 
+ 
+ Non-GAAP operating expenses 
+ 
+ &nbsp; 
+ $ 
+ 10,246 
+ &nbsp; 
+ &nbsp; 
+ $ 
+ 7,592 
+ &nbsp; 
+ &nbsp; 
+ $ 
+ 18,839 
+ &nbsp; 
+ &nbsp; 
+ $ 
+ 16,043 
+ &nbsp; 
+ 
+ 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 
+ 
+ 
+ GAAP income (loss) from operations 
+ 
+ &nbsp; 
+ $ 
+ 10,423 
+ &nbsp; 
+ &nbsp; 
+ $ 
+ (6,745 
+ ) 
+ &nbsp; 
+ $ 
+ 8,838 
+ &nbsp; 
+ &nbsp; 
+ $ 
+ (17,020 
+ ) 
+ 
+ 
+ 
+ Stock-based compensation expense 
+ 
+ &nbsp; 
+ &nbsp; 
+ 762 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 633 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 1,797 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 1,279 
+ &nbsp; 
+ 
+ 
+ 
+ Non-GAAP income (loss) from operations 
+ 
+ &nbsp; 
+ $ 
+ 11,185 
+ &nbsp; 
+ &nbsp; 
+ $ 
+ (6,112 
+ ) 
+ &nbsp; 
+ $ 
+ 10,635 
+ &nbsp; 
+ &nbsp; 
+ $ 
+ (15,741 
+ ) 
+ 
+ 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 
+ 
+ 
+ GAAP net income (loss) 
+ 
+ &nbsp; 
+ $ 
+ 11,128 
+ &nbsp; 
+ &nbsp; 
+ $ 
+ (7,008 
+ ) 
+ &nbsp; 
+ $ 
+ 9,508 
+ &nbsp; 
+ &nbsp; 
+ $ 
+ (15,806 
+ ) 
+ 
+ 
+ 
+ Stock-based compensation expense 
+ 
+ &nbsp; 
+ &nbsp; 
+ 762 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 633 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 1,797 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 1,279 
+ &nbsp; 
+ 
+ 
+ 
+ Non-GAAP net income (loss) 
+ 
+ &nbsp; 
+ $ 
+ 11,890 
+ &nbsp; 
+ &nbsp; 
+ $ 
+ (6,375 
+ ) 
+ &nbsp; 
+ $ 
+ 11,305 
+ &nbsp; 
+ &nbsp; 
+ $ 
+ (14,527 
+ ) 
+ 
+ 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 
+ 
+ 
+ GAAP net income (loss) per diluted share 
+ 
+ &nbsp; 
+ $ 
+ 0.17 
+ &nbsp; 
+ &nbsp; 
+ $ 
+ (0.16 
+ ) 
+ &nbsp; 
+ $ 
+ 0.16 
+ &nbsp; 
+ &nbsp; 
+ $ 
+ (0.36 
+ ) 
+ 
+ 
+ 
+ Stock-based compensation expense per diluted share 
+ 
+ &nbsp; 
+ $ 
+ 0.01 
+ &nbsp; 
+ &nbsp; 
+ $ 
+ 0.01 
+ &nbsp; 
+ &nbsp; 
+ $ 
+ 0.03 
+ &nbsp; 
+ &nbsp; 
+ $ 
+ 0.03 
+ &nbsp; 
+ 
+ 
+ 
+ Non-GAAP net income (loss) per diluted share 
+ 
+ &nbsp; 
+ $ 
+ 0.19 
+ &nbsp; 
+ &nbsp; 
+ $ 
+ (0.15 
+ ) 
+ &nbsp; 
+ $ 
+ 0.19 
+ &nbsp; 
+ &nbsp; 
+ $ 
+ (0.33 
+ ) 
+ 
+ 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 
+ 
+ 
+ Shares used to compute diluted net income per share 
+ 
+ &nbsp; 
+ &nbsp; 
+ 63,474 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 43,710 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 59,642 
+ &nbsp; 
+ &nbsp; 
+ &nbsp; 
+ 43,630 
+ &nbsp; 
+ 
+
+ 
+
+ &nbsp; 
+
+ 
+ 
+ 
+ &nbsp;
