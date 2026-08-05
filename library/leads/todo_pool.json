@@ -1238,20 +1238,17 @@
       "added_at": "2026-08-02T22:42:49.491922+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 84,
+      "reactivated_at": "2026-08-05T03:31:36.474050+00:00",
+      "reactivation_event": {
+        "type": "decision_blocker_mode_changed"
+      },
       "reason": null,
       "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
       "title": "REVIEW — co:axt",
-      "type": "decision_review",
-      "waiting_on": {
-        "derived_from_blockers": true,
-        "reason": "所有 blocker 都不需要使用者決定",
-        "set_at": "2026-08-02T22:42:49.491837+00:00",
-        "trigger": "市場資料問題",
-        "until": null
-      }
+      "type": "decision_review"
     },
     {
       "added_at": "2026-08-03T22:36:54.439794+00:00",
@@ -1320,6 +1317,11 @@
     },
     {
       "added_at": "2026-08-04T05:57:16.865177+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_223388c35618313d49b189aba9c3f18a",
+      "dispatch_ref": "wo_abe7575f21af036d810808f4999175d8",
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-08-05T01:28:16.102273+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 89,
       "reason": null,
@@ -2825,6 +2827,32 @@
       "ref_id": "ra_59fd7818573f6b4a8e0b03f92cc03ced",
       "type": "ra_admission",
       "verb": "drop"
+    },
+    {
+      "at": "2026-08-05T01:28:16.102273+00:00",
+      "attempt": 1,
+      "n": 89,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_abe7575f21af036d810808f4999175d8",
+      "ref_id": "dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-08-05T03:31:36.474050+00:00",
+      "n": 84,
+      "prior_waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-08-02T22:42:49.491837+00:00",
+        "trigger": "市場資料問題",
+        "until": null
+      },
+      "reason": "blocker 已不再全屬等待事件，恢復人工複查",
+      "receipt": null,
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "type": "decision_review",
+      "verb": "event_reactivated"
     }
   ],
   "next_n": 95,
