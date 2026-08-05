@@ -1242,20 +1242,14 @@
       "reactivation_event": {
         "type": "decision_blocker_mode_changed"
       },
-      "reason": null,
+      "reason": "runway_inputs 已填入（mo_eb08f615f2d2b433771fd0c988a8cb46），reassess 後 decision pd_cedc31f29a1cd7e2cc8060aab87eabb9 為 NO_ACTION，無實質缺口；來源 row 已不再產生，屬殘留項",
+      "receipt": null,
       "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "drop",
+      "resolved_at": "2026-08-05T17:08:21.025904+00:00",
       "source": "decision_lab",
       "title": "REVIEW — co:axt",
-      "type": "decision_review",
-      "waiting_on": {
-        "derived_from_blockers": true,
-        "reason": "所有 blocker 都不需要使用者決定",
-        "set_at": "2026-08-05T12:58:39.206086+00:00",
-        "trigger": "runway 需人工判讀",
-        "until": null
-      }
+      "type": "decision_review"
     },
     {
       "added_at": "2026-08-03T22:36:54.439794+00:00",
@@ -2890,6 +2884,15 @@
       "reason": "Engine D 最新 decision pd_c17f84a51567ee17d27750cf97a18e55 為 NO ACTION，無實質缺口；來源 row 已不再產生，屬殘留項",
       "receipt": null,
       "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
+      "type": "decision_review",
+      "verb": "drop"
+    },
+    {
+      "at": "2026-08-05T17:08:21.025904+00:00",
+      "n": 84,
+      "reason": "runway_inputs 已填入（mo_eb08f615f2d2b433771fd0c988a8cb46），reassess 後 decision pd_cedc31f29a1cd7e2cc8060aab87eabb9 為 NO_ACTION，無實質缺口；來源 row 已不再產生，屬殘留項",
+      "receipt": null,
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
       "type": "decision_review",
       "verb": "drop"
     }
