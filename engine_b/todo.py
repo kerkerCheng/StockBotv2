@@ -19,6 +19,7 @@ import json
 import os
 import re
 import tempfile
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable, Mapping
@@ -756,6 +757,7 @@ def sync(
     incoming: Iterable[Mapping[str, Any]],
     *,
     at: str | None = None,
+    healthy_sources: Iterable[str] | None = None,
 ) -> dict[str, int]:
     """把各來源蒐集到的項目 upsert 進池。
 
@@ -773,6 +775,8 @@ def sync(
     reactivated = 0
     refreshed = 0
     stamp = at or _now()
+    incoming = list(incoming)
+    seen_keys = {_key(str(row["type"]), str(row["ref_id"])) for row in incoming}
     for row in incoming:
         if str(row["type"]) == "ra_admission" and _dropped_before(pool, row):
             continue
@@ -889,15 +893,97 @@ def sync(
             })
             refreshed += 1
 
+    cleared, uncleared = _mark_source_cleared(
+        pool, seen_keys, healthy_sources, stamp=stamp
+    )
+
     return {
         "added": added,
         "reactivated": reactivated,
         "waiting_refreshed": refreshed,
+        "source_cleared": cleared,
+        "source_returned": uncleared,
         "active": len(active_items(pool)),
     }
 
 
+def _mark_source_cleared(
+    pool: dict[str, Any],
+    seen_keys: set[tuple[str, str]],
+    healthy_sources: Iterable[str] | None,
+    *,
+    stamp: str,
+) -> tuple[int, int]:
+    """標記「來源已成功執行但不再產出此項」的完成候選；**永不自動 resolve**。
+
+    來源消失是推論，不是收據——`AGENTS.md` 的 provider-neutral 契約要求 pq2 的
+    結案綁定使用者明確核准。這裡只把項目移出決策注意力並附上證據，關閉仍走
+    `todo resolve <n> --verb drop`。
+
+    只有 `healthy_sources` 明確列出的來源才判定；collector 失敗那一輪不列入，
+    因此斷線不會被誤讀成「全部做完了」。
+    """
+
+    healthy = frozenset(healthy_sources or ())
+    if not healthy:
+        return 0, 0
+    covered_types = {
+        item_type
+        for source, types in SOURCE_ITEM_TYPES.items()
+        if source in healthy
+        for item_type in types
+    }
+    cleared = 0
+    returned = 0
+    for item in active_items(pool):
+        if item["type"] not in covered_types:
+            continue
+        present = _key(str(item["type"]), str(item["ref_id"])) in seen_keys
+        if present and item.get("source_cleared"):
+            # 來源又產出它了（例如新證據把 decision 推回 REVIEW）：撤銷標記。
+            prior = dict(item.pop("source_cleared"))
+            pool["log"].append({
+                "at": stamp,
+                "n": item["n"],
+                "type": item["type"],
+                "ref_id": item["ref_id"],
+                "verb": "source_returned",
+                "reason": "來源再次產出此項，撤銷完成候選標記",
+                "receipt": None,
+                "prior_source_cleared": prior,
+            })
+            returned += 1
+            continue
+        if present or item.get("source_cleared"):
+            continue
+        item["source_cleared"] = {
+            "at": stamp,
+            "source_healthy": True,
+            "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        }
+        pool["log"].append({
+            "at": stamp,
+            "n": item["n"],
+            "type": item["type"],
+            "ref_id": item["ref_id"],
+            "verb": "source_cleared",
+            "reason": "來源本輪成功執行，但不再產出此項",
+            "receipt": None,
+        })
+        cleared += 1
+    return cleared, returned
+
+
 # ── 來源蒐集（lazy import，避免 engine_b 反向依賴 Engine A/C/D）─────────────
+
+def _fail_soft(collector: Any) -> list[dict[str, Any]]:
+    """任何例外都回空清單——不讓池因為 Neo4j／Sheet／網路不通就整個壞掉。"""
+
+    try:
+        return list(collector())
+    except Exception:
+        return []
+
 
 def collect_from_leads() -> list[dict[str, Any]]:
     """Raw／triaged leads 不屬 pq2；保留函式作相容面，永遠回空。"""
@@ -905,13 +991,17 @@ def collect_from_leads() -> list[dict[str, Any]]:
 
 
 def collect_from_source_trace_reviews() -> list[dict[str, Any]]:
+    """Fail-soft 外皮，維持既有呼叫面；健康狀態請改用 collect_all_with_health。"""
+
+    return _fail_soft(_collect_source_trace_rows)
+
+
+def _collect_source_trace_rows() -> list[dict[str, Any]]:
     """只有需要人類 authority 的 parked trace 才進 pq2；其餘仍屬 pq1/backlog。"""
 
-    try:
-        from engine_b.leads import load, trace_backlog
-        rows = trace_backlog(load())
-    except Exception:
-        return []
+    from engine_b.leads import load, trace_backlog
+
+    rows = trace_backlog(load())
     return [
         {
             "type": "source_trace_review",
@@ -932,11 +1022,15 @@ def collect_from_source_trace_reviews() -> list[dict[str, Any]]:
 
 
 def collect_from_research_actions() -> list[dict[str, Any]]:
+    """Fail-soft 外皮，維持既有呼叫面；健康狀態請改用 collect_all_with_health。"""
+
+    return _fail_soft(_collect_research_action_rows)
+
+
+def _collect_research_action_rows() -> list[dict[str, Any]]:
     """等核准入圖的 Research Action → 經典 pq2。"""
-    try:
-        from mcp_server.research_actions import iter_actions
-    except Exception:
-        return []
+    from mcp_server.research_actions import iter_actions
+
     rows: list[dict[str, Any]] = []
     for action in iter_actions():
         if action.get("state") in {
@@ -987,11 +1081,15 @@ def collect_from_research_actions() -> list[dict[str, Any]]:
 
 
 def collect_from_lifecycle() -> list[dict[str, Any]]:
+    """Fail-soft 外皮，維持既有呼叫面；健康狀態請改用 collect_all_with_health。"""
+
+    return _fail_soft(_collect_lifecycle_rows)
+
+
+def _collect_lifecycle_rows() -> list[dict[str, Any]]:
     """到期／review_required 的 thesis → 本機複查待辦。"""
-    try:
-        from crons.thesis_freshness_check import lifecycle_due
-    except Exception:
-        return []
+    from crons.thesis_freshness_check import lifecycle_due
+
     return [
         {
             "type": "thesis_lifecycle",
@@ -1043,17 +1141,20 @@ def _derive_waiting_on(blockers: Any) -> dict[str, Any] | None:
 
 
 def collect_from_decisions() -> list[dict[str, Any]]:
+    """Fail-soft 外皮，維持既有呼叫面；健康狀態請改用 collect_all_with_health。"""
+
+    return _fail_soft(_collect_decision_rows)
+
+
+def _collect_decision_rows() -> list[dict[str, Any]]:
     """需要動作的 Engine D 決策項（REVIEW／TRADE／HEDGE）→ 複查待辦。
 
-    需要本機 private Decision Store 與外部 authority；失敗時回空（不讓池因為
-    Neo4j/網路不通就整個壞掉）。
+    需要本機 private Decision Store 與外部 authority；失敗會往上拋，由呼叫端
+    決定是 fail-soft 還是記錄成「來源不健康」。
     """
-    try:
-        from mcp_server.decision_tools import get_decision_brief_core
+    from mcp_server.decision_tools import get_decision_brief_core
 
-        brief = get_decision_brief_core()
-    except Exception:
-        return []
+    brief = get_decision_brief_core()
     rows: list[dict[str, Any]] = []
     items = brief.get("items") or []
     for item in items:
@@ -1123,14 +1224,52 @@ def collect_from_decisions() -> list[dict[str, Any]]:
 
 
 def collect_all(*, include_decisions: bool = True) -> list[dict[str, Any]]:
-    rows = (
-        collect_from_research_actions()
-        + collect_from_source_trace_reviews()
-        + collect_from_lifecycle()
-    )
+    return collect_all_with_health(include_decisions=include_decisions).rows
+
+
+# 哪個 collector 負責哪些 pq2 類型。只有來源健康時，「該類型的 item 沒出現在
+# incoming」才可解讀成「它完成了」；`manual` 沒有 collector，永遠不自動標記。
+SOURCE_ITEM_TYPES: dict[str, frozenset[str]] = {
+    "research_actions": frozenset({"ra_admission"}),
+    "source_trace": frozenset({"source_trace_review"}),
+    "lifecycle": frozenset({"thesis_lifecycle"}),
+    "decisions": frozenset({"decision_review", "sheet_only_holding"}),
+}
+
+
+@dataclass(frozen=True)
+class SourceCollection:
+    """蒐集結果 ＋ 哪些來源真的成功執行過。
+
+    四個 collector 都是 fail-soft（任何例外回空清單），這在斷線時是對的，但也
+    製造了一個致命歧義：「來源成功執行、這個項目確實完成了」與「Neo4j 掛了、
+    什麼都讀不到」在 sync 眼中長得一模一樣。少了 `healthy` 這個訊號，任何
+    「來源消失就結案」的邏輯都會在斷線那次把整個池安靜清空。
+    """
+
+    rows: list[dict[str, Any]]
+    healthy: frozenset[str]
+
+
+def collect_all_with_health(*, include_decisions: bool = True) -> SourceCollection:
+    rows: list[dict[str, Any]] = []
+    healthy: set[str] = set()
+    sources: list[tuple[str, Any]] = [
+        ("research_actions", _collect_research_action_rows),
+        ("source_trace", _collect_source_trace_rows),
+        ("lifecycle", _collect_lifecycle_rows),
+    ]
     if include_decisions:
-        rows += collect_from_decisions()
-    return rows
+        sources.append(("decisions", _collect_decision_rows))
+    for name, collector in sources:
+        try:
+            collected = collector()
+        except Exception:
+            # 失敗就是失敗：不進 healthy，該來源的項目本輪一律不判定完成。
+            continue
+        rows += collected
+        healthy.add(name)
+    return SourceCollection(rows=rows, healthy=frozenset(healthy))
 
 
 # ── CLI ────────────────────────────────────────────────────────────────────
@@ -1158,8 +1297,12 @@ def _render(pool: Mapping[str, Any]) -> str:
         return "（待辦池已清空）"
     # 「等你決定」與「等世界發生某件事」分開呈現。後者仍在池中可稽核，
     # 但不佔用決策注意力——這是待辦池訊噪比的主要來源。
-    deciding = [i for i in items if not i.get("waiting_on")]
-    waiting = [i for i in items if i.get("waiting_on")]
+    # 第三區：來源已不再產出、很可能已完成的項目。它們既不需要你決定，也不是在
+    # 等世界發生什麼——只是等你確認關閉。混進前兩區會讓池子看起來比實際更忙。
+    cleared = [i for i in items if i.get("source_cleared")]
+    rest = [i for i in items if not i.get("source_cleared")]
+    deciding = [i for i in rest if not i.get("waiting_on")]
+    waiting = [i for i in rest if i.get("waiting_on")]
 
     lines: list[str] = []
     if deciding:
@@ -1179,6 +1322,18 @@ def _render(pool: Mapping[str, Any]) -> str:
         for item in waiting:
             lines.append(f"  [{item['n']}] {item['title']}")
             lines.append(f"        ↳ 等：{_waiting_label(item)}")
+        lines.append("")
+
+    if cleared:
+        numbers = " ".join(str(item["n"]) for item in cleared)
+        lines.append(
+            f"## 已完成，待確認關閉（{len(cleared)} 項；確認無誤可回 `{numbers} drop`）"
+        )
+        for item in cleared:
+            lines.append(f"  [{item['n']}] {item['title']}")
+            lines.append(
+                f"        ↳ {(item.get('source_cleared') or {}).get('reason', '')}"
+            )
         lines.append("")
     return "\n".join(lines).rstrip()
 
@@ -1263,7 +1418,10 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.command == "sync":
         retired = retire_legacy_pq1_items(pool)
-        result = sync(pool, collect_all(include_decisions=not args.no_decisions))
+        collected = collect_all_with_health(include_decisions=not args.no_decisions)
+        result = sync(
+            pool, collected.rows, healthy_sources=collected.healthy
+        )
         save(pool, args.pool)
         if args.json:
             print(json.dumps({**result, "items": active_items(pool)},

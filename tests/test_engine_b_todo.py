@@ -276,6 +276,126 @@ def test_identical_derived_waiting_reason_is_not_rewritten_every_sync() -> None:
     assert todo.get(pool, 1)["waiting_on"]["set_at"] == "2026-08-01T00:00:00+00:00"
 
 
+def _decision_row(ref_id: str = "dc_1") -> dict:
+    return {"type": "decision_review", "ref_id": ref_id, "title": "REVIEW — co:x"}
+
+
+def test_source_that_stops_producing_a_row_marks_it_as_done_candidate() -> None:
+    """來源成功執行但不再產出該項＝很可能已完成，移出決策注意力。
+
+    事發（2026-08-05）：[85] 與 [84] 在同一個 session 內先後變成殘留項。sync 只
+    走訪 incoming，而 collect_from_decisions 會跳過 NO ACTION 的 decision，所以
+    項目一旦「做完」，它的來源 row 就消失、再也沒有任何分支碰得到它——項目越
+    接近完成，池子越無法反映它。
+    """
+
+    pool = todo.empty_pool()
+    todo.sync(pool, [_decision_row()], healthy_sources={"decisions"})
+    assert not todo.get(pool, 1).get("source_cleared")
+
+    result = todo.sync(pool, [], healthy_sources={"decisions"})
+
+    assert result["source_cleared"] == 1
+    assert todo.get(pool, 1)["source_cleared"]["source_healthy"] is True
+    assert any(entry.get("verb") == "source_cleared" for entry in pool["log"])
+    # 只是標記，絕不自動結案。
+    assert todo.get(pool, 1).get("resolved_at") is None
+
+
+def test_unhealthy_source_never_marks_anything_even_with_zero_rows() -> None:
+    """斷線與「全部做完」在 sync 眼中不可以長得一樣。
+
+    四個 collector 都是 fail-soft（例外回空清單）。少了健康訊號，任何「來源消失
+    就結案」的邏輯都會在 Neo4j／Sheet 斷線那一次把整個池安靜清空。
+    """
+
+    pool = todo.empty_pool()
+    todo.sync(pool, [_decision_row("dc_1"), _decision_row("dc_2")],
+              healthy_sources={"decisions"})
+
+    result = todo.sync(pool, [], healthy_sources=set())  # collector 全掛
+
+    assert result["source_cleared"] == 0
+    assert not todo.get(pool, 1).get("source_cleared")
+    assert not todo.get(pool, 2).get("source_cleared")
+
+
+def test_healthy_source_does_not_clear_another_sources_items() -> None:
+    """decisions 正常、lifecycle 掛掉時，不得把 thesis_lifecycle 判成完成。"""
+
+    pool = todo.empty_pool()
+    todo.sync(
+        pool,
+        [_decision_row(), {"type": "thesis_lifecycle", "ref_id": "t1", "title": "到期"}],
+        healthy_sources={"decisions", "lifecycle"},
+    )
+
+    result = todo.sync(pool, [], healthy_sources={"decisions"})
+
+    assert result["source_cleared"] == 1
+    assert todo.get(pool, 1)["source_cleared"]        # decision_review 被標記
+    assert not todo.get(pool, 2).get("source_cleared")  # lifecycle 未判定
+
+
+def test_returning_row_revokes_the_done_candidate_mark() -> None:
+    """新證據把 decision 推回 REVIEW 時，標記要撤銷而不是留著誤導。"""
+
+    pool = todo.empty_pool()
+    todo.sync(pool, [_decision_row()], healthy_sources={"decisions"})
+    todo.sync(pool, [], healthy_sources={"decisions"})
+    assert todo.get(pool, 1)["source_cleared"]
+
+    result = todo.sync(pool, [_decision_row()], healthy_sources={"decisions"})
+
+    assert result["source_returned"] == 1
+    assert "source_cleared" not in todo.get(pool, 1)
+    assert any(entry.get("verb") == "source_returned" for entry in pool["log"])
+
+
+def test_done_candidates_render_in_their_own_section_with_drop_hint() -> None:
+    pool = todo.empty_pool()
+    todo.sync(pool, [_decision_row()], healthy_sources={"decisions"})
+    todo.sync(pool, [], healthy_sources={"decisions"})
+
+    rendered = todo._render(pool)
+
+    assert "已完成，待確認關閉" in rendered
+    assert "1 drop" in rendered
+    # 不得混進「等事件」或決策佇列。
+    assert "等事件" not in rendered
+
+
+def test_manual_items_are_never_auto_marked_by_any_source() -> None:
+    """`manual` 沒有 collector，缺席不代表完成。"""
+
+    pool = todo.empty_pool()
+    todo.upsert(pool, item_type="manual", ref_id="m1", title="手動待辦")
+
+    result = todo.sync(pool, [], healthy_sources=set(todo.SOURCE_ITEM_TYPES))
+
+    assert result["source_cleared"] == 0
+    assert not todo.get(pool, 1).get("source_cleared")
+
+
+def test_collect_all_with_health_reports_only_the_sources_that_ran(
+    monkeypatch,
+) -> None:
+    monkeypatch.setattr(todo, "_collect_research_action_rows", lambda: [])
+    monkeypatch.setattr(todo, "_collect_source_trace_rows", lambda: [])
+    monkeypatch.setattr(todo, "_collect_lifecycle_rows", lambda: [])
+
+    def boom():
+        raise RuntimeError("Neo4j unreachable")
+
+    monkeypatch.setattr(todo, "_collect_decision_rows", boom)
+
+    collected = todo.collect_all_with_health()
+
+    assert collected.rows == []
+    assert "decisions" not in collected.healthy
+    assert {"research_actions", "source_trace", "lifecycle"} <= collected.healthy
+
+
 def test_dropped_ra_admission_is_not_rebuilt_by_sync() -> None:
     """apply 永遠失敗的 RA 被 drop 後不得每次 sync 都取得新編號。"""
     row = {
