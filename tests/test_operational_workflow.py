@@ -296,6 +296,85 @@ def test_reassessment_accepts_explicit_gap_research_overrides_without_mutating_s
         store.close()
 
 
+def test_reassessment_carries_forward_disproof_and_catalyst_when_not_overridden(
+    tmp_path: Path,
+) -> None:
+    """reassess 不得靜默清空 disproof condition。
+
+    事發（2026-08-05）：disproof 與 catalyst 同樣存在 coverage metadata，但 reassess
+    只替 catalyst 準備了 fallback，disproof 卻只從 signal 讀。凡是在 evaluate 階段
+    用 --disproof 提供的 thesis，reassess 後都會退化成空字串，只在 decision payload
+    留下 disproof_missing（不進 action card）。co:axt 與 co:applied_optoelectronics
+    的 decision 歷史顯示 disproof 反覆 150→0→348→0，其中數對相隔僅數十秒——那是有人
+    發現不見了、手動帶 --disproof 重跑。可證偽是一等公民（L7），不得因為換一次
+    context 就掉。
+    """
+
+    store = _store(tmp_path)
+    provider = FixtureProvider()
+    try:
+        # 觸發序列必須是「disproof 只存在 coverage metadata、不在 signal 上」。
+        # reassess 的 explicit override 依契約不回寫 signal，所以第二次 reassess
+        # 就再也讀不到它——這正是 0→N→0→N 那個形狀的來源。
+        first = evaluate_signal(store, provider, _request(disproof=None))
+        supplied = reassess(
+            store,
+            provider,
+            first["decision_id"],
+            as_of="2026-07-22T11:00:00+00:00",
+            disproof="Q3 毛利率跌回 35% 以下即視為 step-function 未成為 run-rate。",
+        )
+        assert not str(
+            store.latest_signal_payload(first["cohort_id"]).get("disproof") or ""
+        )
+
+        third = reassess(
+            store,
+            provider,
+            supplied["decision_id"],
+            as_of="2026-07-22T12:00:00+00:00",
+        )
+
+        metadata = store.get_coverage_metadata(
+            store.get_decision(third["decision_id"])["payload"]["request"]["coverage"][
+                "assessment_id"
+            ]
+        )
+        assert (
+            metadata["disproof"]
+            == "Q3 毛利率跌回 35% 以下即視為 step-function 未成為 run-rate。"
+        )
+        assert metadata["catalyst"] == "客戶公布量產訂單。"
+    finally:
+        store.close()
+
+
+def test_explicit_disproof_override_still_wins_over_carried_forward_value(
+    tmp_path: Path,
+) -> None:
+    store = _store(tmp_path)
+    provider = FixtureProvider()
+    try:
+        first = evaluate_signal(store, provider, _request())
+
+        second = reassess(
+            store,
+            provider,
+            first["decision_id"],
+            as_of="2026-07-22T12:00:00+00:00",
+            disproof="新的反證條件取代舊的。",
+        )
+
+        metadata = store.get_coverage_metadata(
+            store.get_decision(second["decision_id"])["payload"]["request"]["coverage"][
+                "assessment_id"
+            ]
+        )
+        assert metadata["disproof"] == "新的反證條件取代舊的。"
+    finally:
+        store.close()
+
+
 def test_fake_assessment_ref_cannot_fund_paper(tmp_path: Path) -> None:
     store = _store(tmp_path)
     assessment = _assessment()

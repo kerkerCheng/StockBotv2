@@ -618,7 +618,16 @@ def reassess(
         or signal_hints.get("company_id"),
         thesis=str(signal.get("atomic_claim") or "") or None,
         catalyst=catalyst or str(old_coverage_metadata.get("catalyst") or "") or None,
-        disproof=disproof or str(signal.get("disproof") or "") or None,
+        # disproof 與 catalyst 同樣存在 coverage metadata。少了這道 fallback，凡是
+        # 在 evaluate 階段用 --disproof 提供的 thesis 都會被 reassess 靜默清空，只
+        # 留下 decision payload 裡的 disproof_missing（不進 action card，很難察覺）。
+        # 可證偽是一等公民（L7），不得因為換一次 context 就退化成空字串。
+        disproof=(
+            disproof
+            or str(old_coverage_metadata.get("disproof") or "")
+            or str(signal.get("disproof") or "")
+            or None
+        ),
         expiry=expiry,
         as_of=evaluation_at,
         execution_intent=execution_intent
