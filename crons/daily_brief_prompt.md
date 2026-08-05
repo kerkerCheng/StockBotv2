@@ -32,6 +32,9 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
      台股 `.TW` 的最新交易日另由 TWSE 官方 `STOCK_DAY_ALL` OpenAPI 校驗；
      Yahoo 落後、TWSE 代碼缺列或 freshness 校驗不可用時，該標的 technical signal／supported range 必須
      fail closed。TWSE 未還權 OHLC 只作最新日期與當日漲跌 reference，不混入 adjusted-close 長期序列。
+     主力逐檔表是每日心跳：即使今天不用啟動投入評估、所有標的都是 `HOLD`／`NO ACTION`，或本輪可評估
+     上限為 0，也必須保留。每列明示商品自身的「最新完整交易日 `YYYY-MM-DD`：1日 ±X%」；stale／
+     quarantined 時改列 TWSE 等官方 reference 日期、當日漲跌與降級原因，不得把最近收盤寫成即時行情。
    - 對今日新增 pending leads 套 `skills/signal-triage/SKILL.md`，用本機 CLI 寫回 triage
    - `.venv\Scripts\python.exe -m engine_b.cli trace-backlog`（顯示 parked 追源未果及下一 trigger；不把一般 backlog 全塞 pq2）
    - `.venv\Scripts\python.exe -m decision_lab today --format markdown`
@@ -95,6 +98,8 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
    publisher 會以 `brief_digest + channel_alias` 去重、分段傳完整 Markdown、保存 private delivery receipt，
    每段最多重試 3 次。通知失敗必須列 `delivery_failed`／`not_configured` 但不能阻斷 brief；不要用
    `--strict` 於排程流程。
+10. task 最終回覆必須原樣輸出第 9 步送入 publisher 的 canonical Markdown，不得在 receipt 回來後另寫
+    精簡版、摘要版或刪除 Beta 表格。delivery receipt 可附在完整 brief 後方，但不能取代或重寫任何 section。
 
 ## 輸出
 
@@ -128,7 +133,7 @@ TL;DR：<約 30 年後 retirement_net_terminal_wealth 目標；今日哪些標�
 自有現金可部署：<Portfolio CASH − cash floor；Alpha／Beta 共用>
 本輪可評估上限：<同一主路徑經 technical 節奏與 risk caps 後的 ceiling；不是下單金額>
 未動用貸款額度：<另列已借款與估計利息；明標不算自有現金、未納入本輪上限；不在例行提醒內，貸款投入仍 manual_review_required>
-<先直接回答「今天是否應啟動人工投入評估」，再列一次全局例行日期、自有現金與投組 hard caps。表格逐列比較主力 QQQ／TQQQ／LON:VWRA／SOXX／00631L.TW／2330.TW／00981A.TW；欄位固定為「標的｜系統動作｜每檔 TL;DR（商品自身價格）｜相對結論｜個別例外／上限」。若全部只有 baseline，明說沒有證據可排首選。個別欄只放 freshness、單輪預算、槓桿容量與重疊排序等確實因商品而異的條件。pace 仍須說明是該 sleeve 單輪 campaign budget 比例。系統動作只能用 `CONTRIBUTE REVIEW`（可新增評估，不是買進）、`HOLD`（維持／等待）、`PAUSE CONTRIBUTION`（暫停新增）。每列 TL;DR 必須包含 🟢可評估／🟡冷卻／⚪觀察／🔴資料不足文字燈號、商品自身 RSI、1／5／20 日漲跌、距高點或趨勢／回檔；signal benchmark 與商品不同時須明寫，例如 TQQQ 自身價格但節奏訊號看 QQQ。不得只列 raw 數字；個股與其他仍可縮成摘要，但每檔保留一列焦點>
+<先直接回答「今天是否應啟動人工投入評估」，再列一次全局例行日期、自有現金與投組 hard caps。表格逐列比較主力 QQQ／TQQQ／LON:VWRA／SOXX／00631L.TW／2330.TW／00981A.TW；欄位固定為「標的｜系統動作｜每檔 TL;DR（商品自身價格）｜相對結論｜個別例外／上限」。主力表在非投入日、全 HOLD／NO ACTION 或 ceiling=0 時仍強制保留。若全部只有 baseline，明說沒有證據可排首選。個別欄只放 freshness、單輪預算、槓桿容量與重疊排序等確實因商品而異的條件。pace 仍須說明是該 sleeve 單輪 campaign budget 比例。系統動作只能用 `CONTRIBUTE REVIEW`（可新增評估，不是買進）、`HOLD`（維持／等待）、`PAUSE CONTRIBUTION`（暫停新增）。每列 TL;DR 必須包含 🟢可評估／🟡冷卻／⚪觀察／🔴資料不足文字燈號、商品自身 RSI、「最新完整交易日 YYYY-MM-DD：1日 ±X%」與 5／20 日漲跌、距高點或趨勢／回檔；signal benchmark 與商品不同時須明寫，例如 TQQQ 自身價格但節奏訊號看 QQQ。stale／quarantined 時改列官方 reference 日期、當日漲跌與降級原因。不得只列 raw 數字；個股與其他仍可縮成摘要，但每檔保留一列焦點>
 
 ## 健康／資料降級
 <本次 harvest、Engine C、beta technical、Neo4j、Sheet 的失敗或缺口；無則寫正常>

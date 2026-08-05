@@ -5,6 +5,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parent.parent
+AGENTS = ROOT / "AGENTS.md"
 DAILY = ROOT / "crons" / "daily_brief_prompt.md"
 WEEKLY = ROOT / "crons" / "weekly_scan_prompt.md"
 
@@ -88,6 +89,21 @@ def test_daily_brief_title_carries_taipei_date() -> None:
         assert "# Daily Brief <YYYY-MM-DD> (Asia/Taipei)" in text
         assert "codex_app__set_thread_title" not in text
         assert "title_update_failed" not in text
+
+
+def test_daily_brief_preserves_beta_market_heartbeat_and_canonical_output() -> None:
+    for path in (AGENTS, DAILY, ROOT / "skills" / "daily-brief" / "SKILL.md"):
+        text = path.read_text(encoding="utf-8")
+        assert "最新完整交易日" in text
+        assert "1 日" in text or "1日" in text
+        assert "本輪可評估上限" in text
+        assert "canonical Markdown" in text or "Canonical Brief" in text
+    daily = DAILY.read_text(encoding="utf-8")
+    skill = (ROOT / "skills" / "daily-brief" / "SKILL.md").read_text(encoding="utf-8")
+    assert "主力表在非投入日、全 HOLD／NO ACTION 或 ceiling=0 時仍強制保留" in daily
+    assert "task 最終回覆必須原樣輸出" in daily
+    assert "`NO ACTION`／非投入評估日也不得刪除主力表" in skill
+    assert "不得在取得 delivery receipt 後另產生" in skill
 
 
 def test_daily_prompt_is_not_the_retired_cloud_runner() -> None:

@@ -184,6 +184,8 @@ Decision gap jobs 優先占用同一個 daily pq1 budget。若研究結果需要
 
 槓桿／重疊商品必須拆開**訊號基準**與**自身價格序列**：例如 TQQQ 可繼續用 QQQ 判斷新增 timing／pace，但 1／5／20 日漲跌、RSI、距高點與均線熱度必須使用 TQQQ 自身行情；00631L／006208 同理，不得把 0050 的價格表現冒充商品自身表現。
 
+**行情表是每日心跳，不受今日是否投入影響（2026-08-05 使用者定案）：** 即使今天不用啟動投入評估、所有標的都是 `HOLD`／`NO ACTION`，或本輪可評估上限為 0，主力逐檔表仍不得省略。每列必須明示商品自身的「最新完整交易日 `YYYY-MM-DD`＋1 日漲跌」；不能只寫沒有日期的「1 日」，也不能把最近收盤誤稱即時今日行情。`stale`／`quarantined` 時改列官方 reference 的日期與當日漲跌並附降級原因，不得因非操作日把行情濃縮成一行狀態摘要。
+
 ### 技術訊號的地位（2026-08-01 實測後定案）
 
 **訊號不得 gate 自有現金投入。** `config/beta_policy.json` 的 `signal.baseline_pace` 是不受訊號影響的例行投入下限，訊號只能在其上加碼。
@@ -228,6 +230,8 @@ attempts／receipt，單段最多重試 3 次。發送失敗是
 Windows PowerShell 5.1 的 `$OutputEncoding` 預設為 `us-ascii`；Daily Brief 含中文時，排程必須使用
 `--brief-file`，由 Python 直接以 UTF-8 讀取。不得直接用 `Get-Content | ... --stdin` 管線傳送，
 除非呼叫端已明確設定 UTF-8 stdin，否則中文會在進入 publisher 前被替換成問號。
+
+**Canonical Brief 只有一份：** task 最終回覆與 Discord publisher 必須使用同一份最終 Markdown。publisher 完成後不得再為 task 另寫精簡版、摘要版或刪除 Beta 表格；delivery receipt 可附在完整 brief 後方，但不能取代或重寫任何 section。
 
 ---
 

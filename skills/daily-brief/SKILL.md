@@ -64,6 +64,9 @@ Engine C 同一筆 observation 保存 adjusted-close 的 1／5／20-session retu
 signal benchmark 與商品自身價格序列。TQQQ／00631L 等可使用未槓桿 benchmark 決定 timing／pace，但人類
 看到的 return、RSI、drawdown 與均線熱度必須來自該商品自身 provider symbol。Engine D 再把這些資料組成 Mobile-friendly
 燈號。燈號必須配 `可評估／冷卻／觀察／資料不足` 文字與明確系統動作，且不構成 live permission。
+每個商品的 1 日漲跌前必須明列商品自身的最新完整交易日 `YYYY-MM-DD`；即使今日不用啟動投入評估、
+本輪可評估上限為 0 或所有標的都是 `HOLD`，主力逐檔行情表仍是每日心跳，不得省略或濃縮成狀態句。
+`stale`／`quarantined` 時改列官方 reference 日期與當日漲跌並附降級原因，不得把最近收盤誤稱即時今日行情。
 燈號與文字不得在 agent 摘要時省略：🟢 `可評估`、🟡 `冷卻／排序中`、⚪ `觀察`、🔴 `資料不足／暫停新增`。
 動作對照固定為：`CONTRIBUTE REVIEW`＝可新增評估（不是買進）；`HOLD`＝維持／等待；
 `PAUSE CONTRIBUTION`＝暫停新增。若使用者只看到顏色而看不到動作文字，視為 brief 缺欄。
@@ -243,6 +246,8 @@ TL;DR：最大化約 30 年後 `retirement_net_terminal_wealth`；technical 只�
 |---|---|---|---|---|
 評估日期、可部署現金與投組 hard caps 在表格上方只列一次。每列只保留商品自身的 RSI／1／5／20 日變化／
 距高點／趨勢、相對比較結論，以及真正會因標的不同而變化的 freshness、單輪預算、槓桿容量與重疊排序。
+每列的 1 日變化必須寫成「最新完整交易日 `YYYY-MM-DD`：1日 ±X%」，不能因今天不是投入評估日而省略；
+資料 stale／quarantined 時則顯示官方 reference 日期、當日漲跌與降級原因。
 若 signal benchmark 與商品不同，TL;DR 必須明寫（例如「自身價格看 TQQQ；節奏訊號看 QQQ」）。所有 pace
 仍是該 sleeve 單輪 campaign budget 比例，不是 NAV 比例。
 | QQQ | HOLD | 🟡 自身 RSI 43.2；… | 今日不比較（尚未到投入評估日） | 無；共用條件見上方 |
@@ -262,6 +267,8 @@ paper 無異動｜live 無 pending fill｜...
 pq2／lead priority **不使用顏色維度**（顏色曾混淆 triage 與優先度），一律使用明確指令字串。Beta
 technical 區可用配有文字的燈號表達 deterministic state，但不得只靠顏色，也不得把 `可評估` 寫成 `買進`。
 Beta 必須使用上述表格，每個 ticker 一列；不能再用一長串 bullet 堆 raw 數字。首屏先回答今天是否啟動投入評估，表格才比較商品。TL;DR 至少回答「商品自身現在在什麼水位、這是趨勢還是回檔、訊號基準是什麼、是否有個別例外」。RSI 區間只是一致的解讀標籤，不改變 `config/beta_policy.json` 的 numeric gate，也不構成 live permission。
+`NO ACTION`／非投入評估日也不得刪除主力表；「今天是否投入」只控制 capital discussion 與 ceiling，
+不控制行情是否顯示。
 Codex desktop 若支援 inline mobile visualization，Beta 區依「自有現金可部署／本輪可評估上限／未動用貸款
 額度 → 風險燈號 → 標的燈號」層級呈現；不支援的 executor 必須輸出相同層級的 Markdown，不能因此退化成
 raw field names 或省略燈號。
@@ -341,7 +348,7 @@ Daily Brief 組成後，Codex 與本機 Claude Code 都呼叫同一支 repo publ
 各自複製 Discord 業務邏輯。publisher 只做 outbound，不接受 Discord 的 `go`、交易、入圖或任何核准指令，
 也不改變 todo／Decision／Graph／Sheet authority。
 
-把**同一份最終 Markdown**（包含日期、pq2 穩定編號與回覆語法）由 stdin 或私有檔交給：
+把**同一份最終 Markdown**（包含日期、pq2 穩定編號、完整 Beta 表與回覆語法）由 stdin 或私有檔交給：
 
 ```powershell
 Get-Content <private-brief.md> | & '.venv\Scripts\python.exe' scripts\publish_daily_brief.py `
@@ -359,6 +366,8 @@ Get-Content <private-brief.md> | & '.venv\Scripts\python.exe' scripts\publish_da
 
 發送失敗只回傳 `delivery_failed`／`not_configured` receipt 並繼續輸出 Daily Brief；CLI 預設永遠不以
 通知失敗阻斷 routine，只有診斷時才使用 `--strict`。
+task 最終回覆必須原樣輸出送入 publisher 的 canonical Markdown；不得在取得 delivery receipt 後另產生
+精簡版、摘要版或重新措寫版。receipt 可附在完整 brief 後方，但不能取代、刪除或濃縮任何 section。
 
 ---
 

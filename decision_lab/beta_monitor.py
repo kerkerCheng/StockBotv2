@@ -713,8 +713,9 @@ def _signed_pct(value: Any) -> str:
 def _moves(indicator: Mapping[str, Any]) -> str:
     """顯示商品自身的短中期價格變化；訊號基準另列。"""
 
+    session = str(indicator.get("session_date") or "未知")
     return (
-        f"1日 {_signed_pct(indicator.get('return_1d'))}｜"
+        f"最新完整交易日 {session}：1日 {_signed_pct(indicator.get('return_1d'))}｜"
         f"5日 {_signed_pct(indicator.get('return_5d'))}｜"
         f"20日 {_signed_pct(indicator.get('return_20d'))}"
     )

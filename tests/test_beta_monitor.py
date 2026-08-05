@@ -435,6 +435,10 @@ def test_self_funded_routine_reminder_uses_full_session_count_not_signal() -> No
     assert "| 每檔 TL;DR（自身價格） | 相對結論 | 個別例外／上限 |" in cooldown_rendered
     assert "今天不用啟動投入評估" in cooldown_rendered
     assert "今日不比較（尚未到投入評估日）" in cooldown_rendered
+    cooldown_qqq_row = next(
+        line for line in cooldown_rendered.splitlines() if line.startswith("| QQQ |")
+    )
+    assert "最新完整交易日 2026-07-27：1日 -1.0%" in cooldown_qqq_row
 
 
 def test_known_tsmc_concentration_warns_without_pausing_additions() -> None:
@@ -521,7 +525,7 @@ def test_markdown_is_aggregate_and_preserves_human_boundary() -> None:
     assert "技術訊號只決定新增的時點與節奏" in rendered
     assert "月息不得依賴被迫賣出 beta" in rendered
     assert "節奏 " in rendered
-    assert "1日 -1.0%｜5日 -3.0%｜20日 -8.0%" in rendered
+    assert "最新完整交易日 2026-07-27：1日 -1.0%｜5日 -3.0%｜20日 -8.0%" in rendered
     assert "今天是否投入" in rendered
     assert "相對比較" in rendered
     assert "## 主力 ETF／權值" in rendered
@@ -567,7 +571,7 @@ def test_leveraged_product_uses_underlying_signal_but_own_price_tldr() -> None:
     assert tqqq["indicator"]["return_20d"] == pytest.approx(-0.20)
     rendered = render_beta_monitor_markdown(report)
     tqqq_row = next(line for line in rendered.splitlines() if line.startswith("| TQQQ |"))
-    assert "1日 -3.0%｜5日 -9.0%｜20日 -20.0%" in tqqq_row
+    assert "最新完整交易日 2026-07-27：1日 -3.0%｜5日 -9.0%｜20日 -20.0%" in tqqq_row
     assert "節奏訊號看 QQQ" in tqqq_row
 
 
