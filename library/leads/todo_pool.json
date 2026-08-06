@@ -1380,8 +1380,10 @@
       "added_at": "2026-08-04T07:27:57.692312+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_285c1b339ec9e6c2d01769fcb8b1ce05",
+      "dispatch_receipt": "research:iqe_tower_2026-08-07:official_iqe_trading_update_and_tower_agreement_review",
       "dispatch_ref": "wo_b1cf150dfd003e9e0f2cabd0f1b32f11",
-      "dispatch_status": "queued",
+      "dispatch_status": "awaiting_approval",
+      "dispatch_updated_at": "2026-08-06T22:41:01.656880+00:00",
       "dispatched_at": "2026-08-06T02:08:54.103448+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 93,
@@ -1423,13 +1425,15 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
-      "source_cleared": {
-        "at": "2026-08-06T12:42:18.897951+00:00",
-        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
-        "source_healthy": true
-      },
       "title": "REVIEW — co:applied_optoelectronics",
-      "type": "decision_review"
+      "type": "decision_review",
+      "waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-08-06T22:42:07.476836+00:00",
+        "trigger": "執行面 context 缺失／市場資料問題",
+        "until": null
+      }
     },
     {
       "added_at": "2026-08-05T22:34:50.515129+00:00",
@@ -1444,13 +1448,15 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
-      "source_cleared": {
-        "at": "2026-08-06T12:42:18.897951+00:00",
-        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
-        "source_healthy": true
-      },
       "title": "REVIEW — co:axt",
-      "type": "decision_review"
+      "type": "decision_review",
+      "waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-08-06T22:42:07.476866+00:00",
+        "trigger": "執行面 context 缺失／市場資料問題",
+        "until": null
+      }
     },
     {
       "added_at": "2026-08-06T07:20:16.767262+00:00",
@@ -1510,6 +1516,25 @@
       "source": "engine_c",
       "title": "Engine C 觀測：AXTI / runway_inputs",
       "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-08-06T22:42:07.476905+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 101,
+      "reason": null,
+      "ref_id": "dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:meta",
+      "type": "decision_review",
+      "waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-08-06T22:42:07.476886+00:00",
+        "trigger": "執行面 context 缺失／市場資料問題",
+        "until": null
+      }
     }
   ],
   "log": [
@@ -3182,8 +3207,54 @@
       "ref_id": "po_1b4ff0a04cdb73af7c904023d25389b3",
       "type": "engine_c_observation",
       "verb": "go"
+    },
+    {
+      "at": "2026-08-06T22:35:02.301280+00:00",
+      "n": 93,
+      "reason": null,
+      "receipt": "daily-brief-2026-08-07: pq1 bounded gap research started for co:iqe / Tower Semiconductor InP epiwafer supply agreement; no authority mutation authorized",
+      "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-08-06T22:41:01.656880+00:00",
+      "n": 93,
+      "reason": "已完成 bounded research：Tower/IQE 多年期 InP epiwafer 協議與 IQE 2026-07-21 trading update 支持 commercial catalyst，但 Tower 合約金額／量／期限／排他性未揭露，400Gb/lane 仍為 prototype；current Engine A 缺少可核准 counter-path／alternative supplier delta，需另列 exact graph admission packet，未執行 reassess、未入圖。",
+      "receipt": "research:iqe_tower_2026-08-07:official_iqe_trading_update_and_tower_agreement_review",
+      "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+      "type": "decision_review",
+      "verb": "pq1_awaiting_approval"
+    },
+    {
+      "at": "2026-08-06T22:42:07.476905+00:00",
+      "n": 95,
+      "prior_source_cleared": {
+        "at": "2026-08-06T12:42:18.897951+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
+      "reason": "來源再次產出此項，撤銷完成候選標記",
+      "receipt": null,
+      "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
+      "type": "decision_review",
+      "verb": "source_returned"
+    },
+    {
+      "at": "2026-08-06T22:42:07.476905+00:00",
+      "n": 96,
+      "prior_source_cleared": {
+        "at": "2026-08-06T12:42:18.897951+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
+      "reason": "來源再次產出此項，撤銷完成候選標記",
+      "receipt": null,
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "type": "decision_review",
+      "verb": "source_returned"
     }
   ],
-  "next_n": 101,
+  "next_n": 102,
   "schema_version": "1"
 }
