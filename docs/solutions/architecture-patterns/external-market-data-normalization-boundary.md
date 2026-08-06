@@ -159,6 +159,9 @@ co:meta   META  587.94 USD   work orders: [graph_coverage_deficit]
 
 ## 相關
 
+- [`one-representation-two-meanings.md`](one-representation-two-meanings.md)：本篇的
+  兩個問題與同日另外兩個缺陷（runway freshness 窗口、collector 的空結果與失敗同形）
+  是同一個形狀；那篇收錄提早認出它的五個訊號
 - 判準源頭：AGENTS.md 的「報價單位 ≠ 結算幣別」與 L10（早期資料庫以 correctness
   優先，不背錯誤相容包袱）
 - [`closed-vocabulary-registry.md`](closed-vocabulary-registry.md)：`config/currency_units.json`
