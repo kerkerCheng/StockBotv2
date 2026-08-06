@@ -1,0 +1,123 @@
+{
+  "claims": [
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Downgrade if Meta publishes an erratum revising these production bandwidth or latency figures, or if a later primary disclosure shows the CXL tier reaching parity with local DRAM on bandwidth and latency for the same deployment.",
+      "id": "meta_vistara_isca_2026_counter_path_cl1",
+      "source_ids": [
+        "meta_vistara_isca_2026_counter_path_s1",
+        "meta_vistara_isca_2026_counter_path_s4",
+        "meta_vistara_isca_2026_counter_path_s5"
+      ],
+      "statement": "Meta reports that the CXL-expanded memory it runs in production delivers roughly 10x lower bandwidth and roughly 60% higher latency than local memory; measured peak bandwidth is 48 GBps for CXL versus 497 GBps native on all-read traffic, and access latency at 60% bandwidth utilisation is 372 ns for CXL versus 234 ns native.",
+      "subject_id": "tech:cxl_memory_tiering"
+    },
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Downgrade if Meta later discloses that no workloads opt out of CXL capacity, or that expanded memory is enabled fleet-wide without per-workload exclusion.",
+      "id": "meta_vistara_isca_2026_counter_path_cl2",
+      "source_ids": [
+        "meta_vistara_isca_2026_counter_path_s2",
+        "meta_vistara_isca_2026_counter_path_s3"
+      ],
+      "statement": "Meta states that some workloads experience performance regressions on CXL-attached memory and are better served by opting out of CXL capacity, and that per-workload configuration automatically disables expanded memory for workloads that cannot tolerate the increased latency; the disclosed benefit is therefore capacity-bound and workload-selective rather than fleet-wide.",
+      "subject_id": "prod:vistara"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:cxl_memory_tiering",
+      "id": "e1",
+      "relation": "constrained_by",
+      "source_ids": [
+        "meta_vistara_isca_2026_counter_path_s1",
+        "meta_vistara_isca_2026_counter_path_s3",
+        "meta_vistara_isca_2026_counter_path_s4",
+        "meta_vistara_isca_2026_counter_path_s5"
+      ],
+      "src_id": "prod:vistara"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "Vistara ASIC",
+        "Vistara CXL ASIC"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "prod:vistara",
+      "name": "Vistara",
+      "role": null,
+      "source_ids": [
+        "meta_vistara_isca_2026_counter_path_s1"
+      ],
+      "type": "Product"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "CXL-attached memory tier",
+        "expanded memory tier"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:cxl_memory_tiering",
+      "name": "CXL memory tiering",
+      "role": null,
+      "source_ids": [
+        "meta_vistara_isca_2026_counter_path_s1",
+        "meta_vistara_isca_2026_counter_path_s4",
+        "meta_vistara_isca_2026_counter_path_s5"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "meta_vistara_isca_2026_counter_path",
+    "evidence_tier": 1,
+    "origin_entity": "Meta Platforms",
+    "permission_basis": "Official public conference paper; retain the canonical URL and only short research-relevant excerpts.",
+    "published_at": "2026-06-29",
+    "publisher": "ISCA 2026",
+    "retrieved_at": "2026-08-06",
+    "section": "counter_path",
+    "source_type": "paper",
+    "storage_permission": "repo_excerpt",
+    "title": "Vistara: Making CXL Real—Full Path from ASIC Design and OS Support to Hyperscale Deployment (counter-path pass)",
+    "url": "https://aisystemcodesign.github.io/papers/isca26/vistara_camera_ready.pdf"
+  },
+  "sources": [
+    {
+      "id": "meta_vistara_isca_2026_counter_path_s1",
+      "locator": "p.1, Introduction",
+      "quote": "the expanded memory we use in production delivers ≈10× lower bandwidth and ≈60% higher latency than local memory"
+    },
+    {
+      "id": "meta_vistara_isca_2026_counter_path_s2",
+      "locator": "p.1, Introduction",
+      "quote": "automate per-workload configuration, including disabling expanded memory for workloads that cannot tolerate the increased latency"
+    },
+    {
+      "id": "meta_vistara_isca_2026_counter_path_s3",
+      "locator": "p.3, Workload Selection",
+      "quote": "Some applications do not fully utilize the memory capacity, while others may experience performance regressions when accessing CXL-attached memory. These workloads are better served by opting out of CXL capacity to avoid regressions."
+    },
+    {
+      "id": "meta_vistara_isca_2026_counter_path_s4",
+      "locator": "p.4, Table III (Peak bandwidth, ALL Reads row)",
+      "quote": "ALL Reads 497 GBps (80%) 48 GBps (62%)"
+    },
+    {
+      "id": "meta_vistara_isca_2026_counter_path_s5",
+      "locator": "p.4, Characterizing Vistara's Performance",
+      "quote": "at 60% bandwidth utilization native memory exhibits a latency of 234 ns, while CXL memory reaches 372 ns"
+    }
+  ]
+}

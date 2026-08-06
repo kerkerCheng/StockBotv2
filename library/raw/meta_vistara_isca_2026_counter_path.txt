@@ -1,0 +1,7 @@
+Source URL: https://aisystemcodesign.github.io/papers/isca26/vistara_camera_ready.pdf
+
+Excerpt:
+PDF p.1: the expanded memory we use in production delivers ~10x lower bandwidth and ~60% higher latency than local memory
+PDF p.3: These workloads are better served by opting out of CXL capacity to avoid regressions.
+PDF p.4 Table III: ALL Reads 497 GBps (80%) / 48 GBps (62%)
+PDF p.4 Table IV: 60% BW util -> native 234 ns / CXL 372 ns
