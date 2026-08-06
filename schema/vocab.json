@@ -48,7 +48,13 @@
     "licenses_to",
     "about",
     "acquired",
-    "partnership_with"
+    "partnership_with",
+    "constrained_by"
+  ],
+  "_counter_path_relation_comment": "哪些 relation 算 counter path（Engine D 的 counter_path_missing 判定）。先前是對 relation 名稱做子字串比對（substitut/alternative/compete/counter）：既猜不到 constrained_by，未來也會誤命中像 counterfeits 這種無關的名字。改成明列；新增 relation 時要順便決定它算不算反向路徑。唯一 loader 是 engine_d_runtime/adapters.py 的 counter_path_relations()。",
+  "counter_path_relation": [
+    "competes_with",
+    "constrained_by"
   ],
   "qualification_status": [
     "none",

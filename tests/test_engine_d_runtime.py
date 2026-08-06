@@ -113,11 +113,15 @@ def _evidence_row(*, graph_count=10, focus_id="co:sivers_semiconductors"):
                 "edge_key": "edge:alternative",
                 "src_id": "co:other",
                 "dst_id": "comp:laser",
-                "relation": "SUBSTITUTES",
+                # counter path 改為明列後，relation 必須是 vocab 真的有的那些。
+                # 舊值 SUBSTITUTES 只是子字串比對時代的產物：vocab 裡沒有它，
+                # loader 會擋掉，圖裡不可能存在這種 relation。
+                "relation": "COMPETES_WITH",
                 "confidence": 0.5,
                 "source_ids": ["s2"],
             },
         ],
+        # 註：Neo4j 的 type(rel) 是大寫；判定端 casefold 後比對 vocab。
         "claims": [{"id": "claim:1", "statement": "bounded"}],
         "assertions": [{"id": "ea:1", "edge_key": "edge:laser"}],
         "claim_sources": [
@@ -395,3 +399,33 @@ def test_absent_manual_runway_does_not_fabricate_the_key() -> None:
     snapshot = provider.snapshot(identity=identity, evaluation_at=NOW)
 
     assert "manual_runway" not in snapshot.financial
+
+
+def test_counter_path_relations_are_enumerated_not_substring_guessed() -> None:
+    """counter path 的判定必須是明列，不是對 relation 名稱做子字串比對。
+
+    舊寫法比對 substitut／alternative／compete／counter 四個 token：既猜不到
+    constrained_by（真正表達「限定／反證」的關係），未來也會誤命中任何名字裡剛好
+    含 counter 的 relation。改成明列後，新增 relation 時必須順便回答「它算不算
+    反向路徑」——那正是應該被強迫回答的問題。
+    """
+
+    import json
+
+    from engine_d_runtime.adapters import counter_path_relations
+
+    relations = counter_path_relations()
+    root = Path(__file__).resolve().parent.parent
+    vocab = json.loads(
+        (root / "schema" / "vocab.json").read_text(encoding="utf-8")
+    )
+
+    # 唯一權威是 vocab，不是程式裡的字面值。
+    assert relations == frozenset(
+        value.casefold() for value in vocab["counter_path_relation"]
+    )
+    # 每個 counter path relation 都必須是合法 relation，否則 loader 根本寫不進圖。
+    assert set(vocab["counter_path_relation"]) <= set(vocab["relation"])
+    # 名字裡含 counter 不再等於是 counter path。
+    assert "counterfeits" not in relations
+    assert "constrained_by" in relations

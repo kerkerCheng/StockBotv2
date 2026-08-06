@@ -5,8 +5,11 @@ package；``decision_lab`` 只依賴 ``workflow_ports`` 的 normalized contract�
 """
 from __future__ import annotations
 
+import json
 import math
 from datetime import datetime, timezone
+from functools import lru_cache
+from pathlib import Path
 from typing import Any, Callable, Mapping, Sequence
 
 from decision_lab.adapters.graph import Neo4jReadOnlyQueryPort
@@ -29,6 +32,26 @@ FxFetcher = Callable[[str, str], Mapping[str, Any]]
 
 def _fetch_operational_portfolio() -> Sequence[Mapping[str, Any]]:
     return fetch_portfolio(strict_operational=True)
+
+
+_VOCAB_PATH = Path(__file__).resolve().parent.parent / "schema" / "vocab.json"
+
+
+@lru_cache(maxsize=1)
+def counter_path_relations() -> frozenset[str]:
+    """哪些 relation 算 counter path；唯一權威是 schema/vocab.json。
+
+    先前是對 relation 名稱做子字串比對（substitut／alternative／compete／counter）。
+    那讓「哪些關係算反向路徑」這件事沒有明確登記處：它猜不到 constrained_by，
+    也會誤命中未來任何名字裡剛好有 counter 的 relation。明列之後，新增 relation
+    時就必須順便決定它算不算反向路徑——這正是應該被強迫回答的問題。
+    """
+
+    payload = json.loads(_VOCAB_PATH.read_text(encoding="utf-8"))
+    values = payload.get("counter_path_relation")
+    if not isinstance(values, list) or not values:
+        raise ValueError("schema/vocab.json 缺少 counter_path_relation")
+    return frozenset(str(value).casefold() for value in values)
 
 
 # Sheet 的現金列標籤（大小寫與中英文皆可）。現金是 NAV 的一部分，但不是
@@ -388,15 +411,13 @@ class DefaultRuntimeProvider:
                 if isinstance(edge.get("edge_key"), str)
             }
         )
+        counter_relations = counter_path_relations()
         counter_paths = sorted(
             {
                 str(edge["edge_key"])
                 for edge in edges
                 if isinstance(edge.get("edge_key"), str)
-                and any(
-                    token in str(edge.get("relation") or "").casefold()
-                    for token in ("substitut", "alternative", "compete", "counter")
-                )
+                and str(edge.get("relation") or "").casefold() in counter_relations
             }
         )
         sources = [source_by_id[key] for key in sorted(source_by_id)]

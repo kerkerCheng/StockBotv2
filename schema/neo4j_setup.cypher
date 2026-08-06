@@ -46,6 +46,7 @@ MERGE (rel_source)-[:LICENSES_TO]->(rel_target)
 MERGE (rel_source)-[:ABOUT]->(rel_target)
 MERGE (rel_source)-[:ACQUIRED]->(rel_target)
 MERGE (rel_source)-[:PARTNERSHIP_WITH]->(rel_target)
+MERGE (rel_source)-[:CONSTRAINED_BY]->(rel_target)
 WITH rel_source, rel_target
 DETACH DELETE rel_source, rel_target;
 
