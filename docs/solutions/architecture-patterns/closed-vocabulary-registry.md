@@ -72,6 +72,7 @@ tags:
 | 軸 → authority 對照 | `decision_lab/sizing.py` 的 `AXIS_REFERENCE_AUTHORITIES` | 證據來源分權；它會擋下「拿 Engine A 文件冒充 Engine C 財務證據」這類錯誤 |
 | 財務核驗清單五項 | `engine_c/checklist.py` 的 `items` | L9 前置條件 #3 的 Watchlist 升格 gate。`gate_pass` 對全體取 `all()`，加第六項會讓**所有既有標的**的 gate 退化 |
 | lead 狀態機 | `engine_b/leads.py` 的 `ALLOWED_TRANSITIONS` | 狀態是行為不是分類；加狀態本來就要加邏輯 |
+| thesis 生命週期狀態機 | `thesis/pending_lifecycle.py` 的 `ALLOWED_TRANSITIONS` | L7 的語意骨架；`retired` 刻意是終局。開啟它等於改變 thesis 的意義，不是補字彙 |
 | 執行 intent | `decision_lab/workflow.py` 的 `_INTENTS`（research／paper／live） | 資本邊界 |
 | 使用者動詞 | `engine_b/todo.py` 的 `VERBS`（`engine_b/batch.py` 另有一份含 `skip`） | 對話介面契約 |
 | 資本 authority record 類型 | `decision_lab/capital_authority.py` 的 `_ALLOWED_TYPES` | 2026-07-30 定案只保留 cash_floor 與 credit_facility |

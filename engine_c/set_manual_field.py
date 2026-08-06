@@ -13,6 +13,10 @@ set_manual_field.py — 手動填入 Engine C 的人工觀測欄位。
 
 value 一律要求非空字串，`--source` 與 `--as-of` 皆必填（traceability 是硬規則）。
 
+⚠ 本指令**不直接寫入** ledger：它只建立待核准提案。append-only 觀測是 private
+   authority，寫入需要使用者對 exact pq2 編號的明確核准（見 engine_c/
+   pending_observations.py）。
+
 ⚠ 金額字串請勿經 PowerShell 傳參：`US$71.3M` 會被當變數前綴展開成 `US.3M`，
    在 append-only ledger 裡造成需要 supersede 才能更正的損毀。用 Python 或 heredoc。
 
@@ -31,8 +35,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from engine_c import pending_observations  # noqa: E402
 from engine_c.db import get_conn  # noqa: E402
-from engine_c.manual_observations import append_manual_observation  # noqa: E402
 from engine_c.observation_fields import (  # noqa: E402
     ObservationFieldError,
     get_observation_field_registry,
@@ -102,20 +106,21 @@ def main() -> int:
     if not args.source or not args.as_of:
         ap.error("manual observation 必須同時提供 --source 與 --as-of")
 
-    conn = get_conn()
-    try:
-        observation_id = append_manual_observation(
-            conn,
-            ticker=args.ticker,
-            field_name=args.field_name,
-            value=args.value,
-            source_ref=args.source,
-            as_of=args.as_of,
-            author=args.author,
-        )
-    finally:
-        conn.close()
-    print(f"✓ 已追加 {observation_id}：{args.ticker.upper()} / {args.field_name}")
+    # 寫入 append-only ledger 需要使用者對 exact pq2 編號的明確核准。這裡只建立
+    # content-addressed 提案；實際寫入由 `engine_b.todo complete-observation` 執行。
+    record = pending_observations.propose(
+        ticker=args.ticker,
+        field_name=args.field_name,
+        value=args.value,
+        source_ref=args.source,
+        as_of=args.as_of,
+        author=args.author,
+    )
+    state = record["state"]
+    print(f"✓ 已建立待核准提案 {record['proposal_id']}（state={state}）")
+    print(f"  {args.ticker.upper()} / {args.field_name}")
+    print("  執行 `python -m engine_b.todo sync` 取得 pq2 編號；核准後以")
+    print("  `python -m engine_b.todo complete-observation <編號>` 寫入 ledger。")
     return 0
 
 

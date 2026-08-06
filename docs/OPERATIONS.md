@@ -57,6 +57,8 @@ Luna reviewer：停止
 & '.venv\Scripts\python.exe' -m engine_b.todo dispatch <n>  # decision_review → pq1 job
 & '.venv\Scripts\python.exe' -m engine_b.todo work <n> --to researching|completed|parked --receipt ...
 & '.venv\Scripts\python.exe' -m engine_b.todo complete-ra <n> --digest <sha256> [--company-id ...]
+& '.venv\Scripts\python.exe' -m engine_b.todo complete-observation <n>       # Engine C 人工觀測寫入
+& '.venv\Scripts\python.exe' -m engine_b.todo complete-thesis-mutation <n>   # thesis lifecycle 變更
 ```
 
 `pending` 帶 `--until`／`--trigger` 會歸入「等事件」區，觸發前不佔決策注意力。分類判準見 `config/decision_blockers.json` 的 `resolution_mode`。
@@ -89,6 +91,7 @@ Leads authority 是 tracked `library/leads/pending_leads.json`；狀態機與 AP
 & '.venv\Scripts\python.exe' engine_c\etl_yfinance.py <TICKER>
 & '.venv\Scripts\python.exe' engine_c\checklist.py <TICKER>
 & '.venv\Scripts\python.exe' -m engine_c.set_manual_field --fields <T>   # 列出已登記觀測欄位（階層式）
+# ⚠ set_manual_field 只建立待核准提案，不直接寫 ledger；核准後走 todo complete-observation
 & '.venv\Scripts\python.exe' -m engine_c.set_manual_field --list <T>     # 列出該標的已填欄位
 ```
 

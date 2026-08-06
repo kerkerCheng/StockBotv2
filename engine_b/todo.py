@@ -37,6 +37,8 @@ ITEM_TYPES: dict[str, str] = {
     "source_trace_review": "核准人工 authority 後做 bounded 追源；go 只 dispatch 回 pq1",
     "thesis_lifecycle": "本機複查 thesis 並手動更新 lifecycle.json",
     "sheet_only_holding": "評估這筆 Sheet 持股（evaluate-signal 或 onboard）",
+    "engine_c_observation": "核准把人工觀測寫入 Engine C append-only ledger",
+    "thesis_mutation": "核准 thesis lifecycle 變更（revise／retire／watch）",
     "manual": "依 hint 執行",
 }
 
@@ -192,6 +194,18 @@ def _validate_go_receipt(item: Mapping[str, Any], receipt: str) -> None:
             raise TodoError("completed decision_review 必須附新 decision receipt")
         return
 
+    if item_type == "thesis_mutation":
+        raise TodoError(
+            "thesis_mutation 不得 bare go；請用 "
+            "`todo complete-thesis-mutation <編號>` 執行寫入"
+        )
+
+    if item_type == "engine_c_observation":
+        raise TodoError(
+            "engine_c_observation 不得 bare go；請用 "
+            "`todo complete-observation <編號>` 執行寫入並取得 observation receipt"
+        )
+
     if item_type == "source_trace_review":
         if item.get("dispatch_status") not in {"completed", "parked"}:
             raise TodoError("source_trace_review 不得 bare go；請先 dispatch 並完成 pq1 checkpoint")
@@ -258,6 +272,7 @@ def resolve(
     until: str | None = None,
     trigger: str | None = None,
     event_type: str | None = None,
+    _skip_receipt_validation: bool = False,
 ) -> dict[str, Any]:
     """以動詞處理一個編號。`pending` 不 resolve（明確 defer，留在池中）。
 
@@ -268,7 +283,8 @@ def resolve(
     if verb not in VERBS:
         raise TodoError(f"未知動詞：{verb}（可用：{', '.join(VERBS)}）")
     item = get(pool, n)
-    if verb == "go":
+    if verb == "go" and not _skip_receipt_validation:
+        # 只有已完成 underlying 寫入的 complete-* 入口才略過——它自己就是收據來源。
         _validate_go_receipt(item, receipt)
     if (until or trigger or event_type) and verb != "pending":
         raise TodoError("until／trigger／event-type 只適用於 pending")
@@ -620,6 +636,80 @@ def _lead_context_for_action(
     if len(companies) != 1:
         raise TodoError("applied lead 必須留下唯一 focus_company_id")
     return {"company_id": companies.pop()}
+
+
+def complete_engine_c_observation(
+    pool: dict[str, Any],
+    n: int,
+    *,
+    at: str | None = None,
+) -> dict[str, Any]:
+    """核准後才把提案內容寫入 append-only ledger，並以 observation_id 結案。
+
+    寫入動作刻意收在這裡而不是留在 CLI：讓「取得使用者對 exact 編號的核准」與
+    「實際落 authority」是同一個動作，中間沒有可以繞過的路徑。
+    """
+
+    from engine_c import pending_observations
+    from engine_c.db import get_conn
+    from engine_c.manual_observations import append_manual_observation
+
+    item = get(pool, n)
+    if item["type"] != "engine_c_observation":
+        raise TodoError(f"[{n}] 不是 engine_c_observation")
+    proposal_id = str(item["ref_id"])
+    record = pending_observations.read(proposal_id)
+    if record is None:
+        raise TodoError(f"找不到提案 {proposal_id}")
+    if record.get("state") != "pending":
+        raise TodoError(f"提案 {proposal_id} 已是 {record.get('state')}，不可重複寫入")
+
+    payload = dict(record["payload"])
+    conn = get_conn()
+    try:
+        observation_id = append_manual_observation(
+            conn,
+            ticker=payload["ticker"],
+            field_name=payload["field_name"],
+            value=payload["value"],
+            source_ref=payload["source_ref"],
+            as_of=payload["as_of"],
+            author=payload["author"],
+            supersedes_id=payload.get("supersedes_id"),
+        )
+    finally:
+        conn.close()
+    pending_observations.mark_applied(proposal_id, observation_id=observation_id)
+
+    receipt = f"observation:{observation_id};proposal:{proposal_id}"
+    resolve(pool, n, "go", reason="使用者核准後寫入 Engine C ledger",
+            receipt=receipt, at=at, _skip_receipt_validation=True)
+    return {"observation_id": observation_id, "receipt": receipt}
+
+
+def complete_thesis_mutation(
+    pool: dict[str, Any],
+    n: int,
+    *,
+    at: str | None = None,
+) -> dict[str, Any]:
+    """核准後才把提案寫入 lifecycle.json，並以 thesis 狀態結案。"""
+
+    from thesis.pending_lifecycle import apply_proposal
+
+    item = get(pool, n)
+    if item["type"] != "thesis_mutation":
+        raise TodoError(f"[{n}] 不是 thesis_mutation")
+    proposal_id = str(item["ref_id"])
+    try:
+        result = apply_proposal(proposal_id)
+    except Exception as exc:
+        raise TodoError(str(exc)) from exc
+
+    receipt = f"thesis:{result['thesis_id']}:{result['status']};proposal:{proposal_id}"
+    resolve(pool, n, "go", reason="使用者核准後寫入 thesis lifecycle",
+            receipt=receipt, at=at, _skip_receipt_validation=True)
+    return result | {"receipt": receipt}
 
 
 def _ensure_shadow_for_completion(
@@ -1121,6 +1211,55 @@ def _collect_research_action_rows() -> list[dict[str, Any]]:
     return [r for r in rows if r["ref_id"]]
 
 
+def _collect_engine_c_observation_rows() -> list[dict[str, Any]]:
+    """待核准的 Engine C 人工觀測提案 → pq2。"""
+    from engine_c.pending_observations import iter_pending
+
+    rows: list[dict[str, Any]] = []
+    for record in iter_pending():
+        payload = record.get("payload") or {}
+        rows.append({
+            "type": "engine_c_observation",
+            "ref_id": str(record["proposal_id"]),
+            "title": (
+                f"Engine C 觀測：{payload.get('ticker')} / {payload.get('field_name')}"
+            ),
+            "hint": (
+                "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；"
+                f"as_of={payload.get('as_of')}；來源={str(payload.get('source_ref'))[:80]}"
+            ),
+            "source": "engine_c",
+        })
+    return rows
+
+
+def _collect_thesis_mutation_rows() -> list[dict[str, Any]]:
+    """待核准的 thesis lifecycle 變更提案 → pq2。
+
+    與 `thesis_lifecycle` 的差別：那是「這條 thesis 到期了，去複查」；這是「複查
+    完了，主張它該轉成某個狀態」。前者由到期檢查產生，後者由研究結論產生。
+    """
+    from thesis.pending_lifecycle import iter_pending
+
+    rows: list[dict[str, Any]] = []
+    for record in iter_pending():
+        payload = record.get("payload") or {}
+        rows.append({
+            "type": "thesis_mutation",
+            "ref_id": str(record["proposal_id"]),
+            "title": (
+                f"thesis {payload.get('thesis_id')}："
+                f"{payload.get('from_status')} → {payload.get('to_status')}"
+            ),
+            "hint": (
+                "核准後以 `todo complete-thesis-mutation <編號>` 寫入 lifecycle.json；"
+                f"理由：{str(payload.get('rationale'))[:120]}"
+            ),
+            "source": "thesis",
+        })
+    return rows
+
+
 def collect_from_lifecycle() -> list[dict[str, Any]]:
     """Fail-soft 外皮，維持既有呼叫面；健康狀態請改用 collect_all_with_health。"""
 
@@ -1275,6 +1414,8 @@ SOURCE_ITEM_TYPES: dict[str, frozenset[str]] = {
     "source_trace": frozenset({"source_trace_review"}),
     "lifecycle": frozenset({"thesis_lifecycle"}),
     "decisions": frozenset({"decision_review", "sheet_only_holding"}),
+    "engine_c_observations": frozenset({"engine_c_observation"}),
+    "thesis_mutations": frozenset({"thesis_mutation"}),
 }
 
 
@@ -1299,6 +1440,8 @@ def collect_all_with_health(*, include_decisions: bool = True) -> SourceCollecti
         ("research_actions", _collect_research_action_rows),
         ("source_trace", _collect_source_trace_rows),
         ("lifecycle", _collect_lifecycle_rows),
+        ("engine_c_observations", _collect_engine_c_observation_rows),
+        ("thesis_mutations", _collect_thesis_mutation_rows),
     ]
     if include_decisions:
         sources.append(("decisions", _collect_decision_rows))
@@ -1476,6 +1619,18 @@ def main(argv: list[str] | None = None) -> int:
     p_work.add_argument("--reason", default="")
     p_work.add_argument("--leads", default="")
 
+    p_complete_obs = sub.add_parser(
+        "complete-observation",
+        help="核准後把 Engine C 觀測提案寫入 append-only ledger 並結案",
+    )
+    p_complete_obs.add_argument("number", type=int)
+
+    p_complete_tm = sub.add_parser(
+        "complete-thesis-mutation",
+        help="核准後把 thesis lifecycle 變更寫入 lifecycle.json 並結案",
+    )
+    p_complete_tm.add_argument("number", type=int)
+
     p_complete_ra = sub.add_parser(
         "complete-ra",
         help="驗證 RA durable apply＋Decision handoff 後結案 exact pq2 item",
@@ -1604,6 +1759,26 @@ def main(argv: list[str] | None = None) -> int:
             if decision_store is not None:
                 decision_store.close()
         return 1 if failures else 0
+
+    if args.command == "complete-observation":
+        try:
+            result = complete_engine_c_observation(pool, args.number)
+            save(pool, args.pool)
+            print(json.dumps(result, ensure_ascii=False, indent=2))
+            return 0
+        except TodoError as exc:
+            print(f"✗ [{args.number}]：{exc}", file=sys.stderr)
+            return 2
+
+    if args.command == "complete-thesis-mutation":
+        try:
+            result = complete_thesis_mutation(pool, args.number)
+            save(pool, args.pool)
+            print(json.dumps(result, ensure_ascii=False, indent=2))
+            return 0
+        except TodoError as exc:
+            print(f"✗ [{args.number}]：{exc}", file=sys.stderr)
+            return 2
 
     if args.command == "complete-ra":
         try:

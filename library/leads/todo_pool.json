@@ -1497,6 +1497,19 @@
       "source": "research_action",
       "title": "Meta Vistara CXL：效益的限定條件（counter path）",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-08-06T12:45:17.467926+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-06-30T00:00:00+00:00；來源=AXT Form 8-K filed 2026-07-30 Exhibit 99.1（gate 驗證）",
+      "n": 100,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_45b3924521bf252b59a592635227e7dd;proposal:po_1b4ff0a04cdb73af7c904023d25389b3",
+      "ref_id": "po_1b4ff0a04cdb73af7c904023d25389b3",
+      "resolution": "go",
+      "resolved_at": "2026-08-06T12:45:30.995677+00:00",
+      "source": "engine_c",
+      "title": "Engine C 觀測：AXTI / runway_inputs",
+      "type": "engine_c_observation"
     }
   ],
   "log": [
@@ -3160,8 +3173,17 @@
       "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
       "type": "decision_review",
       "verb": "source_cleared"
+    },
+    {
+      "at": "2026-08-06T12:45:30.995677+00:00",
+      "n": 100,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_45b3924521bf252b59a592635227e7dd;proposal:po_1b4ff0a04cdb73af7c904023d25389b3",
+      "ref_id": "po_1b4ff0a04cdb73af7c904023d25389b3",
+      "type": "engine_c_observation",
+      "verb": "go"
     }
   ],
-  "next_n": 100,
+  "next_n": 101,
   "schema_version": "1"
 }
