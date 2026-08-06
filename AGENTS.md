@@ -270,7 +270,7 @@ Windows PowerShell 5.1 的 `$OutputEncoding` 預設為 `us-ascii`；Daily Brief 
 
 ## 踩過的坑 / 通用判準 (Lessons)
 
-> **引用慣例（對使用者輸出時）：** 使用者記不住 L 編號對應。任何回覆或報告提到 L1–L10 時，
+> **引用慣例（對使用者輸出時）：** 使用者記不住 L 編號對應。任何回覆或報告提到 L1–L12 時，
 > 該編號第一次出現必須括號備註一句是哪條判準，例如「L7（thesis 生命週期：disproof 條件要附
 > 核查頻率 + 48h 觸發動作）」、「L8（來源獨立性：供應商自報不能當 sole_source 獨立佐證）」。
 > 同一份輸出內重複出現同編號可不再備註。
@@ -366,6 +366,18 @@ v0 schema 的對錯只有真實資料能驗證。凍結一個會壞的 v0 → �
 2. **對自己要輸出的事實，套用跟圖裡 claim 同一套 tier 與追源紀律。** 方向「感覺對」、剛好嵌得進已成形的敘事時，恰恰最該起疑（確認偏誤）；別對外部 claim 嚴、對自己引用鬆（雙重標準）。
 3. **多個二手都這樣說 ≠ 一手已證實。** 它們可能同源於一個原始誤述（假交叉驗證）；見 L8（來源獨立性：供應商／單一來源自報不算獨立佐證）與 source-trace 的 tier 3–4 隔離原則。
 4. **追源前先 grep 自家庫。** 一手常常已 ingest 在手邊（此例 raw excerpt 裡其實寫的是中性的「prepared on a going concern basis」＋一個風險段標題，早該提醒我那跟「審計保留意見」不是同一件事）。
+
+### L12 — 一個表示承載兩種語意：閘門顆粒度錯位的共同形狀
+
+**事發（2026-08-05）：** 一個 session 內修掉四個表面無關的缺陷——LSE 標的行情永遠 quarantine（`currency` 同時是報價單位 GBp 與結算幣別 GBP）、歐洲標的整份行情被一根未結算 bar 廢掉（`market_history_row_invalid` 同時是「值缺席」與「值損毀」）、人工 runway 觀測永遠過期（`financial_freshness_days` 同時管每日快照與財報週期兩種節奏）、待辦池無法得知項目已完成（collector 回傳 `[]` 同時是「成功但無結果」與「執行失敗」）。分屬 Engine B/C/D，卻是同一個形狀。
+
+**判準：** 某個表示同時承載兩種語意時，下游被迫二選一，而**兩邊都是錯的**——這正是它難修、也活得久的原因。修法形狀永遠一樣：**不是放寬也不是收緊，是先分開再各自定規則**；分開後每一邊都能套用比原本更嚴格的規則，混在一起時只能取兩者的下限。
+
+**最有用的兩個訊號：**（a）**兩個修法方向都會壞**——若「放寬」與「收緊」都能舉出具體災難，多半不是參數沒調好，是兩件事被壓在一起；（b）**修法讓警報消失得太乾淨**——把 registry 直接改成 ISO code 會通過所有驗證、清掉所有 blocker，卻餵出差 100 倍的價格，比原本整份 quarantine 危險得多（同 L11 的確認偏誤）。
+
+另一個相鄰但不同的毛病是**因果被截斷**：`action_card` 由 `core_blockers` 判成 REVIEW，卻只把 `assessment_blockers` 放進自己的 `blockers`，下游只能從殘餘資訊猜原因。判準：**任何會改變輸出的輸入，都必須出現在該輸出自己的證據欄位裡。**
+
+完整實例、五個訊號與修法對照見 [`docs/solutions/architecture-patterns/one-representation-two-meanings.md`](docs/solutions/architecture-patterns/one-representation-two-meanings.md)。
 
 ---
 
