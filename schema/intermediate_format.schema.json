@@ -281,7 +281,8 @@
               "licenses_to",
               "about",
               "acquired",
-              "partnership_with"
+              "partnership_with",
+              "constrained_by"
             ]
           },
           "attributes": {

@@ -670,6 +670,8 @@ def _prepare_research_action_impl(
         "report": request["report"],
         "documents": normalized_documents,
     }
+    if request.get("focus_company_id") is not None:
+        payload["focus_company_id"] = request["focus_company_id"]
     try:
         record = research_actions.create_action(payload, root=root)
     except (OSError, RuntimeError, ValueError) as exc:

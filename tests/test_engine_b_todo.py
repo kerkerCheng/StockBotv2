@@ -1016,3 +1016,50 @@ def test_cli_add_and_batch(tmp_path, capsys) -> None:
     out = json.loads(capsys.readouterr().out.strip())
     assert out["applied"] == [1] and out["failed"] == []
     assert todo.active_items(todo.load(path)) == []
+
+
+def _ready_action(action_id: str, *, focus: str | None = None) -> dict:
+    payload: dict = {"report": {"title": "RA 標題"}}
+    if focus is not None:
+        payload["focus_company_id"] = focus
+    return {"action_id": action_id, "state": "ready", "payload": payload}
+
+
+def test_ra_can_declare_its_own_decision_handoff(monkeypatch) -> None:
+    """從 decision gap work order 產出的 RA 沒有 lead 可綁。
+
+    事發（2026-08-06）：focus_company_id 只從綁定 lead 的 refs 讀，所以任何不是
+    從 lead 來的 RA 都被判成「未聲明 focus」而卡住——即使它的 cohort 早就指名了
+    公司。RA 自己聲明是那條缺掉的走廊。
+    """
+
+    monkeypatch.setattr(
+        todo, "iter_actions", lambda: [_ready_action("ra_x", focus="co:meta")],
+        raising=False,
+    )
+    monkeypatch.setitem(
+        __import__("sys").modules, "mcp_server.research_actions",
+        type("M", (), {"iter_actions": staticmethod(
+            lambda: [_ready_action("ra_x", focus="co:meta")]
+        )})(),
+    )
+
+    rows = todo._collect_research_action_rows()
+
+    assert len(rows) == 1
+    assert "Decision handoff：co:meta" in rows[0]["hint"]
+    assert "BLOCKER" not in rows[0]["hint"]
+
+
+def test_ra_without_any_focus_still_blocks(monkeypatch) -> None:
+    monkeypatch.setitem(
+        __import__("sys").modules, "mcp_server.research_actions",
+        type("M", (), {"iter_actions": staticmethod(
+            lambda: [_ready_action("ra_y")]
+        )})(),
+    )
+
+    rows = todo._collect_research_action_rows()
+
+    assert "BLOCKER" in rows[0]["hint"]
+    assert "尚未聲明唯一 focus_company_id" in rows[0]["hint"]

@@ -70,6 +70,9 @@ The caller injects `source_doc` (doc_id, title, source_type, evidence_tier) into
 `depends_on`      — A cannot function without B (critical input)
 `invests_in`      — A has financial stake in B
 `licenses_to`     — A licenses IP to B
+`constrained_by`  — A's stated benefit is conditional on B; use for a documented
+                    limitation that bounds where A applies (a counter path), not for
+                    a mere technical dependency (that is `depends_on`)
 
 ### edge.attributes.qualification_status  (only on supplies_to / depends_on)
 `none` | `sampling` | `qualifying` | `qualified` | `designed_in`

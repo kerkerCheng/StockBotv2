@@ -48,6 +48,10 @@ REPORT_HEADINGS = {
     "counterevidence_and_gaps": "反向證據與缺口",
 }
 REQUEST_FIELDS = {"schema_version", "action_slug", "report", "documents"}
+# 選填：這個 graph delta 完成後，唯一要建立／沿用哪個 Decision cohort。
+# 從 lead 來的 RA 由綁定 lead 的 refs.focus_company_id 提供；從 decision gap
+# work order 來的 RA 沒有 lead 可綁，必須在這裡自己聲明。
+REQUEST_OPTIONAL_FIELDS = {"focus_company_id"}
 DOCUMENT_REQUIRED_FIELDS = {
     "extraction_json",
     "storage_permission",
@@ -140,6 +144,35 @@ def _require_exact_fields(value: dict, expected: set[str], label: str) -> None:
         raise ValueError(f"{label} fields invalid: {'; '.join(details)}")
 
 
+def _require_allowed_fields(
+    value: dict, required: set[str], optional: set[str], label: str
+) -> None:
+    """必填欄位一個不能少，另外只接受明確登記的選填欄位。"""
+
+    missing = sorted(required - set(value))
+    extra = sorted(set(value) - required - optional)
+    if missing or extra:
+        details = []
+        if missing:
+            details.append(f"missing={missing}")
+        if extra:
+            details.append(f"unknown={extra}")
+        raise ValueError(f"{label} fields invalid: {'; '.join(details)}")
+
+
+def _validate_focus_company_id(value: object) -> str:
+    """只接受 registry 登記過的 company_id；不接受自由字串。"""
+
+    from identity.registry import get_registry
+
+    if not isinstance(value, str) or not value.strip():
+        raise ValueError("focus_company_id must be a non-empty string")
+    company_id = value.strip()
+    if not get_registry().has_company(company_id):
+        raise ValueError(f"focus_company_id 未在 registry 登記：{company_id}")
+    return company_id
+
+
 def _validate_report(report: object) -> dict[str, str]:
     if not isinstance(report, dict):
         raise ValueError("report must be an object")
@@ -171,13 +204,18 @@ def parse_action_request(action_json: str) -> dict:
         raise ValueError(f"action_json is not valid JSON: {exc}") from exc
     if not isinstance(request, dict):
         raise ValueError("action_json must decode to an object")
-    _require_exact_fields(request, REQUEST_FIELDS, "action")
+    _require_allowed_fields(request, REQUEST_FIELDS, REQUEST_OPTIONAL_FIELDS, "action")
     if request["schema_version"] != ACTION_PAYLOAD_SCHEMA:
         raise ValueError(
             f"unsupported action schema: expected {ACTION_PAYLOAD_SCHEMA!r}"
         )
     action_slug = validate_action_slug(request["action_slug"])
     report = _validate_report(request["report"])
+    focus_company_id = (
+        _validate_focus_company_id(request["focus_company_id"])
+        if request.get("focus_company_id") is not None
+        else None
+    )
     documents = request["documents"]
     if not isinstance(documents, list) or not documents:
         raise ValueError("documents must be a non-empty list")
@@ -216,12 +254,15 @@ def parse_action_request(action_json: str) -> dict:
                 raise ValueError(f"documents[{index}].{key} must be a string or null")
         normalized_documents.append(copy.deepcopy(document))
 
-    return {
+    parsed = {
         "schema_version": ACTION_PAYLOAD_SCHEMA,
         "action_slug": action_slug,
         "report": report,
         "documents": normalized_documents,
     }
+    if focus_company_id is not None:
+        parsed["focus_company_id"] = focus_company_id
+    return parsed
 
 
 def validate_normalized_payload(payload: object) -> dict:
@@ -229,11 +270,15 @@ def validate_normalized_payload(payload: object) -> dict:
 
     if not isinstance(payload, dict):
         raise ValueError("normalized action payload must be an object")
-    _require_exact_fields(payload, REQUEST_FIELDS, "normalized action")
+    _require_allowed_fields(
+        payload, REQUEST_FIELDS, REQUEST_OPTIONAL_FIELDS, "normalized action"
+    )
     if payload["schema_version"] != ACTION_PAYLOAD_SCHEMA:
         raise ValueError("unsupported normalized action schema")
     validate_action_slug(payload["action_slug"])
     _validate_report(payload["report"])
+    if payload.get("focus_company_id") is not None:
+        _validate_focus_company_id(payload["focus_company_id"])
     documents = payload["documents"]
     if not isinstance(documents, list) or not 1 <= len(documents) <= MAX_DOCUMENTS:
         raise ValueError("normalized documents count is invalid")

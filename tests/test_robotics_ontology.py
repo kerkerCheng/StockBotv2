@@ -121,3 +121,47 @@ def test_robotics_mini_slice_is_in_all_vocab_surfaces(tmp_path: Path) -> None:
     path = tmp_path / "robotics_ontology_test.json"
     path.write_text(json.dumps(extraction), encoding="utf-8")
     assert validate(str(path)) == []
+
+
+def test_every_vocab_term_exists_in_the_json_schema_enum() -> None:
+    """vocab 與 JSON Schema 是兩個字彙表面，必須同步。
+
+    事發（2026-08-06）：`constrained_by` 加進 vocab、加進 neo4j_setup 預熱、
+    counter-path 判定也讀到了，validate 卻仍然擋下來——因為
+    intermediate_format.schema.json 有自己的 relation enum。既有測試只檢查某個
+    robotics slice 出現在各表面，沒有任何東西保證「vocab 有的，schema 也有」。
+    這道測試就是那個保證。
+    """
+
+    vocab = json.loads((ROOT / "schema" / "vocab.json").read_text(encoding="utf-8"))
+    schema = json.loads(
+        (ROOT / "schema" / "intermediate_format.schema.json").read_text(encoding="utf-8")
+    )
+    node_schema = schema["properties"]["nodes"]["items"]["properties"]
+    edge_schema = schema["properties"]["edges"]["items"]["properties"]
+    claim_schema = schema["properties"]["claims"]["items"]["properties"]
+    source_doc_schema = schema["properties"]["source_doc"]["properties"]
+
+    surfaces = {
+        "node_type": node_schema["type"]["enum"],
+        "abstraction_level": node_schema["abstraction_level"]["enum"],
+        "role": node_schema["role"]["enum"],
+        "relation": edge_schema["relation"]["enum"],
+        "demand_proof_level": claim_schema["demand_proof_level"]["enum"],
+        "source_type": source_doc_schema["source_type"]["enum"],
+    }
+    drift = {
+        key: sorted(set(vocab[key]) - set(enum))
+        for key, enum in surfaces.items()
+        if set(vocab[key]) - set(enum)
+    }
+    assert not drift, (
+        "以下字彙在 schema/vocab.json 有、但 intermediate_format.schema.json 沒有；"
+        f"validate 會擋下合法資料：{drift}"
+    )
+
+
+def test_counter_path_relations_are_real_relations() -> None:
+    vocab = json.loads((ROOT / "schema" / "vocab.json").read_text(encoding="utf-8"))
+
+    assert set(vocab["counter_path_relation"]) <= set(vocab["relation"])

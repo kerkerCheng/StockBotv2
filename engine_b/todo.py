@@ -1037,6 +1037,12 @@ def _collect_research_action_rows() -> list[dict[str, Any]]:
             "ready", "applying", "partial", "ready_for_approval", "partial_apply"
         }:
             action_id = str(action.get("action_id") or action.get("id") or "")
+            # RA 自己聲明的 Decision handoff 優先。從 lead 來的 RA 由綁定 lead 提供
+            # focus，但 decision gap work order 產出的 RA 根本沒有 lead 可綁——先前
+            # 那類 RA 一律判成「未聲明 focus」而卡住，即使 cohort 早就指名了公司。
+            declared = str(
+                (action.get("payload") or {}).get("focus_company_id") or ""
+            ).strip()
             try:
                 from engine_b.leads import load as load_leads
 
@@ -1048,7 +1054,16 @@ def _collect_research_action_rows() -> list[dict[str, Any]]:
                 } - {""})
             except Exception:
                 focuses = []
-            if len(focuses) == 1:
+            conflict = bool(declared) and bool(focuses) and set(focuses) != {declared}
+            if declared and not conflict:
+                focuses = [declared]
+            if conflict:
+                # 兩個來源都說話但說得不一樣：不猜，交還人工。
+                handoff_hint = (
+                    f"BLOCKER：RA 自報 focus_company_id={declared}，綁定 lead 卻是 "
+                    f"{'、'.join(focuses)}；先回 pq1 對齊，不得先 apply。"
+                )
+            elif len(focuses) == 1:
                 handoff_hint = (
                     f"核准 exact graph delta；Decision handoff：{focuses[0]}。"
                     "RA 內其他公司只作 evidence／relationship context，不自動建 cohort。"
