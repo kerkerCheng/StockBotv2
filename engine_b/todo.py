@@ -1291,6 +1291,18 @@ def _item_line(item: Mapping[str, Any]) -> str:
     return f"  [{item['n']}] {item['title']}{flag}"
 
 
+def _last_checkpoint(
+    pool: Mapping[str, Any], n: int, verb: str
+) -> dict[str, Any] | None:
+    """取該編號最後一筆指定 verb 的 log。checkpoint 自己寫的理由比任何泛用
+    提示準確——它知道 pq1 到底停在什麼 gate 上。"""
+
+    for entry in reversed(pool.get("log") or []):
+        if entry.get("n") == int(n) and entry.get("verb") == verb:
+            return dict(entry)
+    return None
+
+
 def _render(pool: Mapping[str, Any]) -> str:
     items = active_items(pool)
     if not items:
@@ -1301,6 +1313,14 @@ def _render(pool: Mapping[str, Any]) -> str:
     # 等世界發生什麼——只是等你確認關閉。混進前兩區會讓池子看起來比實際更忙。
     cleared = [i for i in items if i.get("source_cleared")]
     rest = [i for i in items if not i.get("source_cleared")]
+    # 已 dispatch 的項目先前混在決策佇列裡，區標寫「回覆用編號 go｜drop｜pending」
+    # 而項目自己寫「無需再次 go」，自相矛盾；而且 awaiting_approval（pq1 做完、
+    # 等人工 gate）與 queued（還沒開始）長得一模一樣，兩者對使用者的意義完全不同。
+    gated = [i for i in rest if i.get("dispatch_status") == "awaiting_approval"]
+    in_flight = [
+        i for i in rest if i.get("dispatch_status") in {"queued", "researching"}
+    ]
+    rest = [i for i in rest if i not in gated and i not in in_flight]
     deciding = [i for i in rest if not i.get("waiting_on")]
     waiting = [i for i in rest if i.get("waiting_on")]
 
@@ -1316,6 +1336,31 @@ def _render(pool: Mapping[str, Any]) -> str:
             lines.append("")
     else:
         lines += ["待辦事項統整：目前沒有需要你決定的項目。", ""]
+
+    if gated:
+        lines.append(
+            f"## pq1 已交回，等人工 gate（{len(gated)} 項；不吃 go／drop／pending）"
+        )
+        for item in gated:
+            lines.append(f"  [{item['n']}] {item['title']}")
+            checkpoint = _last_checkpoint(pool, item["n"], "pq1_awaiting_approval")
+            reason = str((checkpoint or {}).get("reason") or "").strip()
+            receipt = str((checkpoint or {}).get("receipt") or "").strip()
+            if reason:
+                lines.append(f"        ↳ {reason}")
+            if receipt:
+                lines.append(f"        ↳ packet：{receipt}")
+            lines.append(f"        ↳ work order：{item.get('dispatch_ref')}")
+        lines.append("")
+
+    if in_flight:
+        lines.append(f"## pq1 進行中（{len(in_flight)} 項，不需動作）")
+        for item in in_flight:
+            lines.append(
+                f"  [{item['n']}] {item['title']}"
+                f"（{item.get('dispatch_status')}：{item.get('dispatch_ref')}）"
+            )
+        lines.append("")
 
     if waiting:
         lines.append(f"## 等事件（{len(waiting)} 項，觸發前不需動作）")

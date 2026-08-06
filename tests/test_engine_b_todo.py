@@ -276,6 +276,39 @@ def test_identical_derived_waiting_reason_is_not_rewritten_every_sync() -> None:
     assert todo.get(pool, 1)["waiting_on"]["set_at"] == "2026-08-01T00:00:00+00:00"
 
 
+def test_awaiting_gate_and_in_flight_leave_the_decision_queue() -> None:
+    """已 dispatch 的項目先前混在「回覆用編號 go｜drop｜pending」區裡，項目自己卻
+    寫「無需再次 go」——區標與內容互相矛盾；而且 awaiting_approval（pq1 做完、等
+    人工 gate）與 queued（還沒開始）長得一模一樣，對使用者的意義卻完全不同。
+    """
+
+    pool = todo.empty_pool()
+    todo.upsert(pool, item_type="decision_review", ref_id="dc_gate", title="REVIEW — A")
+    todo.upsert(pool, item_type="decision_review", ref_id="dc_run", title="REVIEW — B")
+    todo.get(pool, 1).update(
+        {"dispatch_status": "awaiting_approval", "dispatch_ref": "wo_gate"}
+    )
+    todo.get(pool, 2).update({"dispatch_status": "queued", "dispatch_ref": "wo_run"})
+    pool["log"].append({
+        "at": "2026-08-06T00:00:00+00:00",
+        "n": 1,
+        "verb": "pq1_awaiting_approval",
+        "reason": "需 exact graph admission 後才能 reassess",
+        "receipt": "research_packet:library/private/x.json",
+    })
+
+    rendered = todo._render(pool)
+
+    assert "pq1 已交回，等人工 gate" in rendered
+    assert "不吃 go／drop／pending" in rendered
+    # checkpoint 自己寫的理由比任何泛用提示準確。
+    assert "需 exact graph admission 後才能 reassess" in rendered
+    assert "research_packet:library/private/x.json" in rendered
+    assert "pq1 進行中" in rendered
+    # 兩者都不得出現在決策佇列。
+    assert "目前沒有需要你決定的項目" in rendered
+
+
 def _decision_row(ref_id: str = "dc_1") -> dict:
     return {"type": "decision_review", "ref_id": ref_id, "title": "REVIEW — co:x"}
 
