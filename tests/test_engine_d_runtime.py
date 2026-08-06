@@ -443,12 +443,29 @@ def test_counter_paths_are_not_crowded_out_by_the_edge_limit() -> None:
     from engine_d_runtime.adapters import bounded_evidence_query
 
     query = bounded_evidence_query()
-    order_by = [line for line in query.splitlines() if line.startswith("ORDER BY")]
+    tail = query[query.index("ORDER BY"):]
 
-    assert len(order_by) == 1
+    assert query.count("ORDER BY") == 1
     # is_counter 必須排在 confidence 之前。
-    assert order_by[0].index("is_counter") < order_by[0].index("confidence")
+    assert tail.index("is_counter") < tail.index("confidence")
     assert "$counter_relations" in query
+
+
+def test_focus_direct_edges_outrank_distant_neighbours() -> None:
+    """焦點公司自己的邊不得被遠處鄰居擠出取樣上限。
+
+    事發（2026-08-06）：evidence bound 放寬到 2 hop 後，co:axt 自己 8 條直接因果邊
+    被遠處高信心的邊擠掉，該 cohort 的 assessment evidence_refs 因此集體失效。距離
+    不是靠 hop 上限控制，是靠排序：反證 > 直接關係 > 信心。
+    """
+
+    from engine_d_runtime.adapters import bounded_evidence_query
+
+    query = bounded_evidence_query()
+    tail = query[query.index("ORDER BY"):]
+
+    assert "is_direct" in tail
+    assert tail.index("is_counter") < tail.index("is_direct") < tail.index("confidence")
 
 
 def test_evidence_hops_is_policy_driven_and_bounded() -> None:

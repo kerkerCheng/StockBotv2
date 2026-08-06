@@ -83,12 +83,20 @@ WITH graph_node_count, focus, rel,
      CASE
          WHEN rel IS NOT NULL AND toLower(type(rel)) IN $counter_relations THEN 1
          ELSE 0
-     END AS is_counter
-// counter path 優先佔位：edge_limit 是「取樣上限」，但反證正是 coverage gate 要看
-// 的東西。純以 confidence 排序時，放寬 hop 會讓遠處高信心的邊把低信心的反證擠掉
-// ——co:axt 的 COMPETES_WITH（confidence 0.5）就是這樣一度消失的。gate 結果不該
-// 因為無關的邊變多而翻轉。
-ORDER BY is_counter DESC, coalesce(rel.confidence, 0.0) DESC, coalesce(rel.edge_key, '')
+     END AS is_counter,
+     CASE
+         WHEN rel IS NOT NULL
+              AND (startNode(rel).id = $company_id OR endNode(rel).id = $company_id)
+         THEN 1 ELSE 0
+     END AS is_direct
+// edge_limit 是取樣上限，排序決定誰先被犧牲。放寬 hop 之後兩件事都實測壞過：
+//   1. co:axt 的 COMPETES_WITH（confidence 0.5）被遠處高信心邊擠掉 → gate 從
+//      available 退回 graph_coverage_deficit。反證是 gate 唯一要看的東西，必須優先。
+//   2. co:axt 自己 8 條直接因果邊被 2-hop 的遠處邊擠掉 → assessment 的 evidence_refs
+//      集體失效。焦點公司的直接關係永遠比遠處鄰居重要。
+// 因此排序是「反證 > 直接關係 > 信心」，距離不是靠 hop 上限來控制，是靠排序。
+ORDER BY is_counter DESC, is_direct DESC,
+         coalesce(rel.confidence, 0.0) DESC, coalesce(rel.edge_key, '')
 LIMIT $edge_limit
 OPTIONAL MATCH (claim:Claim)-[:ABOUT]->(focus)
 OPTIONAL MATCH (claim)-[:CITES]->(claim_doc:SourceDoc)
