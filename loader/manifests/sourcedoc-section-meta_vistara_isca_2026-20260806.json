@@ -1,0 +1,26 @@
+{
+  "backed_up_at": "2026-08-06T08:10:57.685200+00:00",
+  "reason": "2026-08-01 入圖時無分段概念，section 為 null；補上標籤以便同一份 ISCA 論文的 counter-path 段（ra_06141de4a05ca858a5e5f4c577a001e5）能通過 check_duplicate_url 的合法拆段條件。不動任何 claim/edge。",
+  "change": {
+    "doc_id": "meta_vistara_isca_2026",
+    "field": "section",
+    "from": null,
+    "to": "asic_and_deployment"
+  },
+  "objects": {
+    "source_doc": {
+      "storage_permission": "repo_excerpt",
+      "origin_entity": "Meta Platforms",
+      "publisher": "ISCA 2026",
+      "permission_basis": "Canonical paper is publicly downloadable without login; retain its URL and only short, attributed research excerpts rather than the PDF.",
+      "source_type": "paper",
+      "id": "meta_vistara_isca_2026",
+      "retrieved_at": "2026-08-02",
+      "title": "Vistara: Making CXL Real—Full Path from ASIC Design and OS Support to Hyperscale Deployment",
+      "published_at": "2026-06-29",
+      "url": "https://aisystemcodesign.github.io/papers/isca26/vistara_camera_ready.pdf",
+      "evidence_tier": 1
+    }
+  },
+  "same_url_docs": []
+}

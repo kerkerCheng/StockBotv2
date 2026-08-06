@@ -568,6 +568,24 @@ def _read_action_for_completion(action_id: str) -> dict[str, Any]:
     return read_action(action_id)
 
 
+def _declared_focus_for_action(action_id: str) -> str | None:
+    """讀 RA 自報的 focus_company_id；讀不到就回 None（由呼叫端決定怎麼辦）。"""
+
+    try:
+        from mcp_server.research_actions import read_action
+
+        action = read_action(action_id) or {}
+    except Exception:
+        return None
+    # compaction 後 payload 為 None，focus 會被提升到 record 頂層。
+    declared = str(
+        (action.get("payload") or {}).get("focus_company_id")
+        or action.get("focus_company_id")
+        or ""
+    ).strip()
+    return declared or None
+
+
 def _lead_context_for_action(
     action_id: str, *, action_digest: str, leads_path: Path | str
 ) -> dict[str, str]:
@@ -579,7 +597,15 @@ def _lead_context_for_action(
         if (lead.get("refs") or {}).get("research_action_id") == action_id
     ]
     if not matches:
-        raise TodoError(f"找不到綁定 {action_id} 的 lead receipt")
+        # 從 decision gap work order 產出的 RA 沒有來源 lead——它的 focus 由 RA
+        # 自己聲明（見 mcp_server/research_actions 的 focus_company_id）。lead
+        # receipt 對這類 RA 不存在，不能當成缺漏；action digest 已在呼叫端驗過。
+        declared = _declared_focus_for_action(action_id)
+        if declared:
+            return {"company_id": declared}
+        raise TodoError(
+            f"找不到綁定 {action_id} 的 lead receipt，且該 RA 未自報 focus_company_id"
+        )
     if any(lead.get("status") != "applied" for lead in matches):
         raise TodoError("Research Action 的來源 lead 尚未全部標記 applied")
     if any(

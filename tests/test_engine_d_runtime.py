@@ -6,14 +6,14 @@ from pathlib import Path
 from decision_lab.adapters.graph import Neo4jReadOnlyQueryPort
 from decision_lab.workflow_ports import WorkflowDataProvider
 from engine_d_runtime.adapters import DefaultRuntimeProvider
-from engine_d_runtime.adapters import _BOUNDED_EVIDENCE_QUERY
+from engine_d_runtime.adapters import bounded_evidence_query
 
 
 NOW = "2026-07-22T02:00:00+00:00"
 
 
 def test_bounded_graph_query_does_not_read_undefined_claim_type() -> None:
-    assert "claim.claim_type" not in _BOUNDED_EVIDENCE_QUERY
+    assert "claim.claim_type" not in bounded_evidence_query()
 
 
 class _GraphPort:
@@ -429,3 +429,39 @@ def test_counter_path_relations_are_enumerated_not_substring_guessed() -> None:
     # 名字裡含 counter 不再等於是 counter path。
     assert "counterfeits" not in relations
     assert "constrained_by" in relations
+
+
+def test_counter_paths_are_not_crowded_out_by_the_edge_limit() -> None:
+    """反證不得因為無關的邊變多而被取樣上限擠掉。
+
+    事發（2026-08-06）：evidence bound 從 1 hop 放寬到 2 hop 後，co:axt 的
+    COMPETES_WITH（confidence 0.5）被遠處高信心的邊擠出 edge_limit=24，coverage
+    gate 因此從 available 退回 graph_coverage_deficit——gate 結果被與 thesis 無關
+    的邊翻轉。查詢改成 counter path 優先佔位。
+    """
+
+    from engine_d_runtime.adapters import bounded_evidence_query
+
+    query = bounded_evidence_query()
+    order_by = [line for line in query.splitlines() if line.startswith("ORDER BY")]
+
+    assert len(order_by) == 1
+    # is_counter 必須排在 confidence 之前。
+    assert order_by[0].index("is_counter") < order_by[0].index("confidence")
+    assert "$counter_relations" in query
+
+
+def test_evidence_hops_is_policy_driven_and_bounded() -> None:
+    """hop 數是相關性的代理指標；它必須登記在 policy，而且不得無上限放大。"""
+
+    import json
+
+    from engine_d_runtime.adapters import evidence_hops
+
+    root = Path(__file__).resolve().parent.parent
+    policy = json.loads(
+        (root / "config" / "investment_policy.json").read_text(encoding="utf-8")
+    )
+
+    assert policy["probe_lane"]["evidence_hops"] == evidence_hops()
+    assert 1 <= evidence_hops() <= 3

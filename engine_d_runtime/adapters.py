@@ -68,14 +68,27 @@ LIMIT 2
 """.strip()
 
 
-_BOUNDED_EVIDENCE_QUERY = """
+# hop 上限是 literal：Cypher 不接受把 variable-length bound 參數化。值來自
+# evidence_hops()，經 int 驗證後代入，不接受外部字串。
+_BOUNDED_EVIDENCE_QUERY_TEMPLATE = """
 OPTIONAL MATCH (any:Entity)
 WITH count(any) AS graph_node_count
 OPTIONAL MATCH (focus:Entity {id: $company_id})
 WITH graph_node_count, focus
-OPTIONAL MATCH (focus)-[rel]-(neighbor:Entity)
-WITH graph_node_count, focus, rel, neighbor
-ORDER BY coalesce(rel.confidence, 0.0) DESC, coalesce(rel.edge_key, '')
+OPTIONAL MATCH path = (focus)-[*1..%(hops)d]-(:Entity)
+UNWIND CASE WHEN path IS NULL THEN [NULL] ELSE relationships(path) END AS rel
+WITH graph_node_count, focus, collect(DISTINCT rel) AS rels
+UNWIND CASE WHEN size(rels) = 0 THEN [NULL] ELSE rels END AS rel
+WITH graph_node_count, focus, rel,
+     CASE
+         WHEN rel IS NOT NULL AND toLower(type(rel)) IN $counter_relations THEN 1
+         ELSE 0
+     END AS is_counter
+// counter path 優先佔位：edge_limit 是「取樣上限」，但反證正是 coverage gate 要看
+// 的東西。純以 confidence 排序時，放寬 hop 會讓遠處高信心的邊把低信心的反證擠掉
+// ——co:axt 的 COMPETES_WITH（confidence 0.5）就是這樣一度消失的。gate 結果不該
+// 因為無關的邊變多而翻轉。
+ORDER BY is_counter DESC, coalesce(rel.confidence, 0.0) DESC, coalesce(rel.edge_key, '')
 LIMIT $edge_limit
 OPTIONAL MATCH (claim:Claim)-[:ABOUT]->(focus)
 OPTIONAL MATCH (claim)-[:CITES]->(claim_doc:SourceDoc)
@@ -116,6 +129,33 @@ RETURN graph_node_count,
            source_type: assertion_doc.source_type
        } END)[0..$source_limit] AS assertion_sources
 """.strip()
+
+
+@lru_cache(maxsize=1)
+def evidence_hops() -> int:
+    """證據 bound 從 focus 公司往外走幾 hop；唯一權威是 investment_policy。
+
+    先前寫死 1 hop，等於隱含「反證一定直接連到公司」。但 thesis 常常掛在產品上
+    （co:meta -develops-> prod:vistara -constrained_by-> tech:cxl_memory_tiering），
+    產品層級的反證因此對公司層級決策結構性隱形。
+
+    ⚠ hop 數是「相關性」的代理指標，不是相關性本身。把它一路調大不會更正確，只會
+    讓 edge_limit 被遠處的噪音佔滿。真正一般化的作法是讓 thesis 自己宣告它依賴哪些
+    節點，用那個集合當 bound；在那之前，這個值應該保守，且每次調整都要重跑既有
+    cohort 對照差異。
+    """
+
+    from thesis.investment_policy import load_policy
+
+    hops = int(load_policy()["probe_lane"]["evidence_hops"])
+    if not 1 <= hops <= 3:
+        raise ValueError(f"evidence_hops 必須在 1..3：{hops}")
+    return hops
+
+
+@lru_cache(maxsize=1)
+def bounded_evidence_query() -> str:
+    return _BOUNDED_EVIDENCE_QUERY_TEMPLATE % {"hops": evidence_hops()}
 
 
 def _finite(value: Any, *, non_negative: bool = False) -> float | None:
@@ -322,8 +362,9 @@ class DefaultRuntimeProvider:
             )
         try:
             rows = self._graph.query(
-                _BOUNDED_EVIDENCE_QUERY,
+                bounded_evidence_query(),
                 company_id=identity.company_id,
+                counter_relations=sorted(counter_path_relations()),
                 edge_limit=24,
                 claim_limit=24,
                 assertion_limit=24,
@@ -889,6 +930,7 @@ class DefaultRuntimeProvider:
 
 __all__ = [
     "DefaultRuntimeProvider",
-    "_BOUNDED_EVIDENCE_QUERY",
+    "bounded_evidence_query",
+    "evidence_hops",
     "_EXACT_COMPANY_QUERY",
 ]

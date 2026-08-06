@@ -1314,17 +1314,18 @@
       "added_at": "2026-08-04T05:57:16.865177+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_223388c35618313d49b189aba9c3f18a",
-      "dispatch_receipt": "research_packet:library/private/decision_lab/daily_gap_research_2026-08-06.json",
+      "dispatch_receipt": "decision:pd_7827daee3fcacfdac95b7fd60a1acd39",
       "dispatch_ref": "wo_abe7575f21af036d810808f4999175d8",
-      "dispatch_status": "awaiting_approval",
-      "dispatch_updated_at": "2026-08-05T22:41:42.703155+00:00",
+      "dispatch_status": "completed",
+      "dispatch_updated_at": "2026-08-06T08:36:40.214998+00:00",
       "dispatched_at": "2026-08-05T01:28:16.102273+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 89,
-      "reason": null,
+      "reason": "pq1 completed",
+      "receipt": "decision:pd_7827daee3fcacfdac95b7fd60a1acd39",
       "ref_id": "dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-06T08:36:40.214998+00:00",
       "source": "decision_lab",
       "title": "REVIEW — co:meta",
       "type": "decision_review"
@@ -1413,49 +1414,33 @@
       "added_at": "2026-08-05T22:34:50.515129+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 95,
+      "reactivated_at": "2026-08-06T08:37:02.590356+00:00",
+      "reactivation_event": {
+        "type": "decision_blocker_mode_changed"
+      },
       "reason": null,
       "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
-      "source_cleared": {
-        "at": "2026-08-06T07:20:16.767262+00:00",
-        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
-        "source_healthy": true
-      },
       "title": "REVIEW — co:applied_optoelectronics",
-      "type": "decision_review",
-      "waiting_on": {
-        "derived_from_blockers": true,
-        "reason": "所有 blocker 都不需要使用者決定",
-        "set_at": "2026-08-05T22:34:50.515015+00:00",
-        "trigger": "執行面 context 缺失／市場資料問題",
-        "until": null
-      }
+      "type": "decision_review"
     },
     {
       "added_at": "2026-08-05T22:34:50.515129+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 96,
+      "reactivated_at": "2026-08-06T08:37:02.590356+00:00",
+      "reactivation_event": {
+        "type": "decision_blocker_mode_changed"
+      },
       "reason": null,
       "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
-      "source_cleared": {
-        "at": "2026-08-06T07:20:16.767262+00:00",
-        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
-        "source_healthy": true
-      },
       "title": "REVIEW — co:axt",
-      "type": "decision_review",
-      "waiting_on": {
-        "derived_from_blockers": true,
-        "reason": "所有 blocker 都不需要使用者決定",
-        "set_at": "2026-08-05T22:34:50.515042+00:00",
-        "trigger": "市場資料問題",
-        "until": null
-      }
+      "type": "decision_review"
     },
     {
       "added_at": "2026-08-06T07:20:16.767262+00:00",
@@ -1474,10 +1459,31 @@
       "added_at": "2026-08-06T07:31:11.117741+00:00",
       "hint": "核准 exact graph delta；Decision handoff：co:meta。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 98,
-      "reason": null,
+      "reason": "同一 graph delta 由 ra_06141de4a05ca858a5e5f4c577a001e5 取代（補上 source_doc.section=counter_path，解 DuplicateUrlError）",
+      "receipt": null,
       "ref_id": "ra_f9fd7ed2e43a555d1d435b11d4f9184f",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "drop",
+      "resolved_at": "2026-08-06T08:05:25.593998+00:00",
+      "source": "research_action",
+      "title": "Meta Vistara CXL：效益的限定條件（counter path）",
+      "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-08-06T08:05:42.181070+00:00",
+      "completion_authority": {
+        "action_digest": "6567de9c87583ccc58dae968d1668c9ba0aa74fc46eb89947c8bca631592464e",
+        "cohort_id": "dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
+        "commit": "3153a5c863b9c1b488714ff577331a2b466b6250",
+        "company_id": "co:meta",
+        "verified_at": "2026-08-06T08:13:15.998582+00:00"
+      },
+      "hint": "核准 exact graph delta；Decision handoff：co:meta。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 99,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_06141de4a05ca858a5e5f4c577a001e5;digest:6567de9c87583ccc58dae968d1668c9ba0aa74fc46eb89947c8bca631592464e;commit:3153a5c863b9c1b488714ff577331a2b466b6250;cohort:dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
+      "ref_id": "ra_06141de4a05ca858a5e5f4c577a001e5",
+      "resolution": "go",
+      "resolved_at": "2026-08-06T08:13:15.998582+00:00",
       "source": "research_action",
       "title": "Meta Vistara CXL：效益的限定條件（counter path）",
       "type": "ra_admission"
@@ -3030,8 +3036,104 @@
       "ref_id": "ra_44ba7b6af467d474998327f7b4075254",
       "type": "ra_admission",
       "verb": "drop"
+    },
+    {
+      "at": "2026-08-06T08:05:25.593998+00:00",
+      "n": 98,
+      "reason": "同一 graph delta 由 ra_06141de4a05ca858a5e5f4c577a001e5 取代（補上 source_doc.section=counter_path，解 DuplicateUrlError）",
+      "receipt": null,
+      "ref_id": "ra_f9fd7ed2e43a555d1d435b11d4f9184f",
+      "type": "ra_admission",
+      "verb": "drop"
+    },
+    {
+      "at": "2026-08-06T08:13:15.998582+00:00",
+      "n": 99,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_06141de4a05ca858a5e5f4c577a001e5;digest:6567de9c87583ccc58dae968d1668c9ba0aa74fc46eb89947c8bca631592464e;commit:3153a5c863b9c1b488714ff577331a2b466b6250;cohort:dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
+      "ref_id": "ra_06141de4a05ca858a5e5f4c577a001e5",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-06T08:36:40.214998+00:00",
+      "n": 89,
+      "reason": null,
+      "receipt": "decision:pd_7827daee3fcacfdac95b7fd60a1acd39",
+      "ref_id": "dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
+      "type": "decision_review",
+      "verb": "pq1_completed"
+    },
+    {
+      "at": "2026-08-06T08:36:40.214998+00:00",
+      "n": 89,
+      "reason": "pq1 completed",
+      "receipt": "decision:pd_7827daee3fcacfdac95b7fd60a1acd39",
+      "ref_id": "dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
+      "type": "decision_review",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-06T08:37:02.590356+00:00",
+      "n": 95,
+      "prior_waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-08-05T22:34:50.515015+00:00",
+        "trigger": "執行面 context 缺失／市場資料問題",
+        "until": null
+      },
+      "reason": "blocker 已不再全屬等待事件，恢復人工複查",
+      "receipt": null,
+      "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
+      "type": "decision_review",
+      "verb": "event_reactivated"
+    },
+    {
+      "at": "2026-08-06T08:37:02.590356+00:00",
+      "n": 96,
+      "prior_waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-08-05T22:34:50.515042+00:00",
+        "trigger": "市場資料問題",
+        "until": null
+      },
+      "reason": "blocker 已不再全屬等待事件，恢復人工複查",
+      "receipt": null,
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "type": "decision_review",
+      "verb": "event_reactivated"
+    },
+    {
+      "at": "2026-08-06T08:37:02.590356+00:00",
+      "n": 95,
+      "prior_source_cleared": {
+        "at": "2026-08-06T07:20:16.767262+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
+      "reason": "來源再次產出此項，撤銷完成候選標記",
+      "receipt": null,
+      "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
+      "type": "decision_review",
+      "verb": "source_returned"
+    },
+    {
+      "at": "2026-08-06T08:37:02.590356+00:00",
+      "n": 96,
+      "prior_source_cleared": {
+        "at": "2026-08-06T07:20:16.767262+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
+      "reason": "來源再次產出此項，撤銷完成候選標記",
+      "receipt": null,
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "type": "decision_review",
+      "verb": "source_returned"
     }
   ],
-  "next_n": 99,
+  "next_n": 100,
   "schema_version": "1"
 }

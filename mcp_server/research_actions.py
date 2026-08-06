@@ -811,6 +811,11 @@ def compact_applied_payload(record: dict) -> dict:
     ):
         raise ValueError("cannot compact before every document completes")
     record["review"] = copy.deepcopy(payload["report"])
+    # focus_company_id 是 Decision handoff 的收據，不是可重建的來源正文——compaction
+    # 丟掉它，pq2 結案時就再也查不到「這批 delta 要沿用哪個 cohort」。從 lead 來的
+    # RA 還能回頭問 lead，decision gap 來的 RA 沒有 lead 可問，會直接卡死。
+    if payload.get("focus_company_id"):
+        record["focus_company_id"] = payload["focus_company_id"]
     record["payload"] = None
     record["compacted_at"] = _iso(_now())
     return record

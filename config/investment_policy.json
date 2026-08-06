@@ -27,6 +27,7 @@
     "fx_freshness_hours": 36,
     "holdings_freshness_days": 7,
     "financial_freshness_days": 14,
-    "financial_runway_freshness_days": 100
+    "financial_runway_freshness_days": 100,
+    "evidence_hops": 2
   }
 }
