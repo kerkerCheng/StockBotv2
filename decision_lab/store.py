@@ -13,6 +13,8 @@ from typing import Any, Callable, Mapping
 
 from identity.currency import is_settlement_currency
 from identity.registry import get_registry
+
+from .blocker_severity import fatal_blockers
 from storage.relational import (
     connect_sqlite,
     immediate_transaction,
@@ -686,8 +688,14 @@ class DecisionStore:
         paper_blockers = tuple(json.loads(row["paper_blockers_json"])["items"])
         live_blockers = tuple(json.loads(row["live_blockers_json"])["items"])
         status = str(row["status"])
-        paper_ready = status == "analyzable" and not paper_blockers
-        live_ready = status == "analyzable" and not live_blockers
+        # lane readiness 看的是「有沒有致命缺口」，不是 status 這個二元標籤。
+        # status 的 analyzable ⟺ 零 blocker 是持久化 invariant（見
+        # record_coverage_assessment），不能為了放行研究不完整的案例而鬆動；
+        # 但拿它當 readiness 判準，等於讓任何一個非致命 blocker 也把 lane 打成
+        # not_ready，於是 2026-08-02 對 coverage_cap 做的嚴重度分類在下游被抵銷。
+        fatal = fatal_blockers(blockers)
+        paper_ready = not fatal and not paper_blockers
+        live_ready = not fatal and not live_blockers
         return CoverageResult(
             assessment_id=str(row["assessment_id"]),
             cohort_id=str(row["cohort_id"]),

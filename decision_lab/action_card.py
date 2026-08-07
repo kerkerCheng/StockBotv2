@@ -6,6 +6,7 @@ import re
 from datetime import datetime, timedelta, timezone
 from typing import Any, Mapping, Sequence
 
+from .blocker_severity import fatal_blockers
 from .redaction import sensitive_payload_path
 from .store import DecisionStore
 
@@ -216,9 +217,24 @@ def build_action_card(
         paper_status = "NOT_REQUESTED"
     if not live_requested:
         live_status = "NOT_REQUESTED"
+    coverage_blockers = tuple(
+        (payload.get("request", {}).get("coverage") or {}).get("blockers", [])
+    )
     core_blockers = sorted(
-        set(sizing.get("assessment_blockers", []))
-        | set((payload.get("request", {}).get("coverage") or {}).get("blockers", []))
+        set(sizing.get("assessment_blockers", [])) | set(coverage_blockers)
+    )
+    # coverage.py 早已把 blocker 分成「致命」與「研究不完整」兩類，sizing 也依此
+    # 決定 coverage_cap 要不要歸零。但 card 先前對整個 core_blockers 一視同仁判
+    # REVIEW，等於把 sizing 已經放行的資本又在展示層擋掉一次——同一份清單被兩個
+    # 子系統套了兩套嚴重度政策，而使用者只看得到嚴格的那一套。
+    # 判準沿用 coverage 的分類：只有致命 coverage blocker 與 assessment blocker
+    # 才強制 REVIEW。assessment blocker 一律算致命，因為任何一軸失效都會讓
+    # axis_ceiling 取 min 後歸零，此時「研究不完整」的描述並不成立。
+    research_incomplete_blockers = sorted(
+        set(coverage_blockers) - set(fatal_blockers(coverage_blockers))
+    )
+    blocking_core_blockers = sorted(
+        set(core_blockers) - set(research_incomplete_blockers)
     )
 
     if disproof_triggered:
@@ -253,7 +269,7 @@ def build_action_card(
         single_name_action = "reassess_revised_epoch"
         reason = "Thesis 已 revised；舊 epoch 的 decision 不再授權新交易。"
         next_action = "在新 epoch 重新 freeze context、coverage 與 sizing。"
-    elif core_blockers:
+    elif blocking_core_blockers:
         action = "REVIEW"
         urgency = "next_review"
         portfolio_action = "none"
@@ -367,6 +383,9 @@ def build_action_card(
     # coverage blocker（如 financial_runway_manual_required）會驅動 REVIEW 卻不
     # 現身，下游只看得到 lane blocker，導致待辦池推導出「重新 reassess 即可」
     # 這種與真正缺口無關的等待理由。
+    # 研究不完整的 blocker 不再驅動 REVIEW，但仍必須留在 blockers 裡——它們透過
+    # axis_ceiling 影響尺寸，是「會改變輸出的輸入」，另以 research_incomplete_blockers
+    # 標明它們沒有阻擋，否則下游只會看到一份混在一起的清單而無法分辨。
     blockers = sorted(
         set(core_blockers)
         | set(sizing.get("paper_blockers", []))
@@ -420,6 +439,7 @@ def build_action_card(
         },
         "freshness": freshness,
         "blockers": blockers,
+        "research_incomplete_blockers": research_incomplete_blockers,
         "sources": sources,
         "policy_version": sizing["policy_version"],
         "calculator_version": sizing["calculator_version"],
@@ -435,6 +455,10 @@ def render_markdown(card: Mapping[str, Any]) -> str:
     paper = card["paper"]
     live = card["live"]
     blockers = ", ".join(markdown_text(item) for item in card["blockers"]) if card["blockers"] else "無"
+    incomplete = card.get("research_incomplete_blockers") or []
+    incomplete_line = (
+        ", ".join(markdown_text(item) for item in incomplete) if incomplete else "無"
+    )
     return "\n".join(
         [
             f"# {markdown_text(card['action'])} — {markdown_text(card['company_id'])} ({markdown_text(card['urgency'])})",
@@ -447,6 +471,7 @@ def render_markdown(card: Mapping[str, Any]) -> str:
             f"- Paper：{markdown_text(paper['status'])}；target={paper['target']:.4%}；funded={paper['funded']}",
             f"- Live：{markdown_text(live['status'])}；range={tuple(live['supported_range'])}",
             f"- Blockers：{blockers}",
+            f"- 研究不完整（不阻擋，只縮小尺寸）：{incomplete_line}",
             "",
             f"## 下一步\n{markdown_text(card['next_action'])}",
         ]
