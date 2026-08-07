@@ -1420,20 +1420,19 @@
       "reactivation_event": {
         "type": "decision_blocker_mode_changed"
       },
-      "reason": null,
+      "reason": "使用者確認：來源本輪已成功執行、不再產出新結果，判斷已完成",
+      "receipt": null,
       "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "drop",
+      "resolved_at": "2026-08-07T07:53:19.417324+00:00",
       "source": "decision_lab",
+      "source_cleared": {
+        "at": "2026-08-07T07:40:47.172166+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
       "title": "REVIEW — co:applied_optoelectronics",
-      "type": "decision_review",
-      "waiting_on": {
-        "derived_from_blockers": true,
-        "reason": "所有 blocker 都不需要使用者決定",
-        "set_at": "2026-08-06T22:42:07.476836+00:00",
-        "trigger": "執行面 context 缺失／市場資料問題",
-        "until": null
-      }
+      "type": "decision_review"
     },
     {
       "added_at": "2026-08-05T22:34:50.515129+00:00",
@@ -1443,20 +1442,19 @@
       "reactivation_event": {
         "type": "decision_blocker_mode_changed"
       },
-      "reason": null,
+      "reason": "使用者確認：來源本輪已成功執行、不再產出新結果，判斷已完成",
+      "receipt": null,
       "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "drop",
+      "resolved_at": "2026-08-07T07:53:19.548724+00:00",
       "source": "decision_lab",
+      "source_cleared": {
+        "at": "2026-08-07T07:40:47.172166+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
       "title": "REVIEW — co:axt",
-      "type": "decision_review",
-      "waiting_on": {
-        "derived_from_blockers": true,
-        "reason": "所有 blocker 都不需要使用者決定",
-        "set_at": "2026-08-06T22:42:07.476866+00:00",
-        "trigger": "執行面 context 缺失／市場資料問題",
-        "until": null
-      }
+      "type": "decision_review"
     },
     {
       "added_at": "2026-08-06T07:20:16.767262+00:00",
@@ -1521,20 +1519,19 @@
       "added_at": "2026-08-06T22:42:07.476905+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 101,
-      "reason": null,
+      "reason": "使用者確認：來源本輪已成功執行、不再產出新結果，判斷已完成",
+      "receipt": null,
       "ref_id": "dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "drop",
+      "resolved_at": "2026-08-07T07:53:19.682380+00:00",
       "source": "decision_lab",
+      "source_cleared": {
+        "at": "2026-08-07T07:40:47.172166+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
       "title": "REVIEW — co:meta",
-      "type": "decision_review",
-      "waiting_on": {
-        "derived_from_blockers": true,
-        "reason": "所有 blocker 都不需要使用者決定",
-        "set_at": "2026-08-06T22:42:07.476886+00:00",
-        "trigger": "執行面 context 缺失／市場資料問題",
-        "until": null
-      }
+      "type": "decision_review"
     }
   ],
   "log": [
@@ -3253,6 +3250,60 @@
       "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
       "type": "decision_review",
       "verb": "source_returned"
+    },
+    {
+      "at": "2026-08-07T07:40:47.172166+00:00",
+      "n": 95,
+      "reason": "來源本輪成功執行，但不再產出此項",
+      "receipt": null,
+      "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
+      "type": "decision_review",
+      "verb": "source_cleared"
+    },
+    {
+      "at": "2026-08-07T07:40:47.172166+00:00",
+      "n": 96,
+      "reason": "來源本輪成功執行，但不再產出此項",
+      "receipt": null,
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "type": "decision_review",
+      "verb": "source_cleared"
+    },
+    {
+      "at": "2026-08-07T07:40:47.172166+00:00",
+      "n": 101,
+      "reason": "來源本輪成功執行，但不再產出此項",
+      "receipt": null,
+      "ref_id": "dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
+      "type": "decision_review",
+      "verb": "source_cleared"
+    },
+    {
+      "at": "2026-08-07T07:53:19.417324+00:00",
+      "n": 95,
+      "reason": "使用者確認：來源本輪已成功執行、不再產出新結果，判斷已完成",
+      "receipt": null,
+      "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
+      "type": "decision_review",
+      "verb": "drop"
+    },
+    {
+      "at": "2026-08-07T07:53:19.548724+00:00",
+      "n": 96,
+      "reason": "使用者確認：來源本輪已成功執行、不再產出新結果，判斷已完成",
+      "receipt": null,
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "type": "decision_review",
+      "verb": "drop"
+    },
+    {
+      "at": "2026-08-07T07:53:19.682380+00:00",
+      "n": 101,
+      "reason": "使用者確認：來源本輪已成功執行、不再產出新結果，判斷已完成",
+      "receipt": null,
+      "ref_id": "dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
+      "type": "decision_review",
+      "verb": "drop"
     }
   ],
   "next_n": 102,
