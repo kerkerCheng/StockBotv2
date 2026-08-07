@@ -157,3 +157,63 @@ config 加 `approved_by` 欄位讓未簽名版本不被 sizing 採用。
 先讓 coverage 分類跑一兩週，看實際 daily brief 裡有多少標的從「零」變成「小注可評估」，
 以及那些小注的品質。**若多數變成可評估的標的其實不值得看，問題就不在 gate 而在 pq1
 的選題**，屆時重構三類軸也救不了。有實際樣本再決定是否動軸結構。
+
+---
+
+## 8. 第二回合（2026-08-08）：§5 的修正六天內沒有產生任何效果
+
+§7 的判準終於被執行了。答案是 **0 / 9**：沒有任何一個 cohort 因為 §5 的分類從
+「歸零」變成「小注可評估」。原因分兩層。
+
+### 8.1 分類只有一個消費者真的套用
+
+§5 改的是 `sizing.py` 的 `coverage_cap`。但同一份 blocker 清單另有四個消費者，
+它們各自用 `status == "analyzable"`（⟺ 零 blocker）或整份 `core_blockers` 這種更粗的
+判準，把放寬在下游完整抵銷：
+
+| 消費者 | 原本的判準 | 後果 |
+|---|---|---|
+| `sizing.calculate_probe_limits` | `fatal_blockers()` | ✅ 唯一正確 |
+| `store.get_coverage_result` | `status == "analyzable"` | lane 直接 not ready |
+| `coverage.assess_coverage` | 同上 | 同上 |
+| `coverage.apply_execution_intent` | 同上 | **覆寫** store 剛算對的值 |
+| `action_card.build_action_card` | 整份 `core_blockers` | 強制 REVIEW＋「去把研究做完」 |
+
+物理成因：分類住在 `coverage.py`，而 `coverage` 依賴 `store`，於是 `store` 想用就會
+循環 import。**它沒有一個所有層都拿得到的家，所以只有一層用得到它。**
+
+已修（2026-08-08）：抽出 `decision_lab/blocker_severity.py`，五處統一呼叫；
+`action_card` 另加 `research_incomplete_blockers` 欄位讓「不阻擋、只縮小尺寸」看得見。
+`tests/test_coverage_severity.py` 新增「所有消費者共用同一份分類」的整合測試——
+§5 之所以能靜默失效六天，就是因為當時只測分類本身、沒測有沒有人用它。
+
+### 8.2 真正的 binding constraint 不是 coverage
+
+修好一致性之後仍然是 0/9，因為卡住的根本是別的東西：
+
+| 實際瓶頸 | 佔比 | 性質 |
+|---|---|---|
+| `execution_intent: research` | **9 / 9** | research intent 從不 request paper lane，所以連 coverage 全乾淨的 4 個 cohort 也永遠 range 0 |
+| `disproof_missing` | 4 / 9 | 系統第一大單一 blocker，而它只是**一句話**，不依賴任何外部證據 |
+| `financial_missing` | 3 / 9 | Engine C 對那些 ticker 沒有資料 |
+
+三者沒有一個是「證據不夠強」。第一個是工作流程從未接線，第二個是研究產出規格
+缺一欄，第三個是資料覆蓋。**§2–§4 診斷的軸結構問題是真的，但它目前排在第四順位。**
+
+補充實測：九份既有 assessment 的軸幾乎全部落在 `bounded_hypothesis`，只有
+Agility（SPAC 未上市）有大量 `unknown`。因此**不要放寬 `axis_ceilings.unknown`**——
+`unknown → 0` 在真實案例裡是對的，五軸不是當前瓶頸。這個念頭在 2026-08-08 被提出、
+被資料否決；再有人想動它，先重跑一次上表。
+
+### 8.3 給下一輪的判準
+
+**不要再「憑理論修 gate、不驗證端到端」。** §5 與 8.1 是同一個錯誤犯了兩次：
+診斷正確、局部修正正確、沒有量測，於是帳面「已實作」而實際供給為零。
+
+任何對 gate 的改動，落地時必須同時回答：**改完之後，現有 cohort 有幾個的
+`supported_range` 真的變了？** 答案是 0 就代表沒改到 binding constraint，
+不論那個改動本身多正確。
+
+`paper` lane 從未被寫過這件事本身也值得記：paper ledger 的用途是累積反事實戰績，
+用來事後回答「系統的判斷準不準」。一個從不被寫入的模擬帳本是純成本、零效益，而且
+它讓「這系統值不值得留」永遠無法用證據回答。
