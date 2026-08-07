@@ -217,3 +217,243 @@ Agility（SPAC 未上市）有大量 `unknown`。因此**不要放寬 `axis_ceil
 `paper` lane 從未被寫過這件事本身也值得記：paper ledger 的用途是累積反事實戰績，
 用來事後回答「系統的判斷準不準」。一個從不被寫入的模擬帳本是純成本、零效益，而且
 它讓「這系統值不值得留」永遠無法用證據回答。
+
+---
+
+## 9. 第三回合（2026-08-08）：收斂 memo／cohort 模型與退場機制
+
+> 起因：使用者問「Lane Memo / Watchlist / Underwrite 三層有需要嗎？中間那層可以移除嗎？」
+> 以及「我們是不是做了太多寫死的 if/else，讓資訊消失在系統裡？是不是該開始減量？」
+> 本節記錄收斂結果與實測依據。**動工前讀完 §9，不要重新發明。**
+
+### 9.1 目標模型：一個 `go` = 一份 memo + 一到多個 cohort
+
+```
+Lane Memo（方向／敘事，可含多家公司，有版本）
+    └─→ 每點名一家公司 × 一條主張 = 一個 Cohort（可下注的單位）
+            └─→ Engine D 狀態：shadow → paper → live-eligible
+```
+
+**memo : cohort 不是 1:1，是 1:N。** 精確地說
+`thesis : memo 版本 : cohort = 1 : N : M`。理由是 Lane Memo 的單位本來就是「方向」
+而非公司——`cpo_v1_lane_memo.md` 涵蓋整個 CPO lane、
+`amat_lrcx_mature_node_v1_lane_memo.md` 同時涵蓋 AMAT 與 LRCX，而
+`sivers_v1/v2/v3` 是同一 thesis 的三個版本。
+
+**這正是三層階梯的收斂點：** Watchlist 原本定義為「thesis 成立後才給名字」——那不是
+一層，那就是 **memo → cohorts 的展開動作**。名字給出來的那一刻就是 cohort 誕生的那一刻；
+之後「夠不夠格」由 Engine D 的 shadow／paper／live 狀態連續表達，不需要「升格」這個
+離散事件。Lane Memo 保留（它有 Engine D 沒有的 variant perception），Underwrite Sheet
+保留（產出格式），**Watchlist 降級為 cohort 集合的查詢視圖**。
+
+**現況與目標的落差：memo 與 cohort 之間資料上零連結。**
+`decision_cohorts` 只有 `cohort_id / dedupe_key / company_id / research_ticker`，沒有
+memo 欄位；memo 檔也不知道自己對應哪個 cohort。實際狀態是三個互不重疊的集合：
+
+| 有 memo、無 cohort | 有 cohort、無 memo | 兩者皆有 |
+|---|---|---|
+| `amat_lrcx_mature_node_v1`、`cpo_v1` | AAOI、Meta、IQE、Lumentum、2 個 unresolved | AXT、Coherent、Sivers |
+
+**待補：`decision_cohorts.memo_ref`。** 沒有它，paper 部位無法歸因到 thesis，而歸因
+正是 paper ledger 存在的唯一理由。
+
+### 9.2 Cohort 粒度維持 per-claim（實測駁回 per-company）
+
+`dedupe_key = sha256({identity_token, atomic_claim, direction, expiry})`，所以 cohort 的
+單位是「公司 × 主張 × 方向 × 有效期」，不是公司。使用者提議改成以股票為單位以減少物件數。
+**實測顯示這個成本不存在：**
+
+- 9 個 cohort／7 家公司，**每個 cohort 恰好 1 個 `qualified_signal`**
+- `workflow_reassessment_delta` 共 43 筆；AAOI 累積 54 個 event、AXT 64 個，但各自只有 1 個 signal
+- 意即：同一家公司後續進來的多份文件（10-Q、8-K…）**走 `reassess`，不走 `capture_signal`**，
+  不會另開 cohort
+
+（先前推測「35 條 triaged lead 可能變成 35 個 cohort」是錯的，已由上述資料推翻；
+「帳本不可逆成長」這條顧慮應同步降級。）
+
+**不改成 per-company 的理由**（成本為零時應保留較強的設計）：
+
+1. **五軸取 min 會跨 thesis 互相拖累。** 五軸問的是「這條主張是否為真」。若 AAOI 的
+   800G thesis（`technical_causal_link: corroborated`）與 pump laser thesis（僅
+   select-customer sampling）合併成一個 cohort，就只能有一組軸，而 sizing 取 min ——
+   弱 thesis 會讓強 thesis 無法下注。這是 §2 問題的跨 thesis 升級版。
+2. **`disproof_condition` 與 `expiry` 都是單一欄位。** 兩條 thesis 共用一句證偽條件，
+   L7 的「觸發後 48h 動作」就失去對象；兩者時間跨度不同，expiry 也無法共用。
+3. **歸因會永久失效。** 「三個月後這筆賺了，是哪條 thesis 對了」是 paper ledger 唯一
+   要回答的問題；合併後永遠答不出來。LLM 能同時 handle 多條 thesis 是 agent 的能力，
+   不是帳本的能力。
+
+### 9.3 只有入口沒有出口：cohort 從不自動退場
+
+- `store.list_operational_cohorts` 是 `SELECT ... FROM decision_cohorts`，**沒有 WHERE**，
+  回傳所有曾建立的 cohort。
+- `brief.py` 會濾掉 `promoted／rejected／expired`，所以待辦清單眼前不會爆。
+- **但只有人工呼叫 `close_probe()` 能設成 terminal。`expiry` 到期不會自動 expire、
+  `review_due_at` 到期也不會自動轉 `review_required`。**
+
+實證：IQE 的 `expiry = 2026-08-07`（前一日）仍為 `active`；兩個 unresolved cohort 的
+`expiry = 2026-08-02`，逾期六天仍為 `active`。
+
+**這才是「越用越折磨」的實際機制**——不是資料量，是每個 cohort 都需要人主動關，
+而系統從不提醒。接線後每個 `go` 都會產生一個這種物件。
+
+**待做：`expiry` 到期自動轉 `expired`。** 欄位早已存在（`coverage.expiry`，且
+`expiry_invalid` 已是致命 blocker），只是沒有任何地方拿它做過期判定。
+
+### 9.4 Expiry 的訂定規則：催化劑驅動，不是固定期間
+
+`catalyst / disproof / expiry` 是一組：「我預期 X 在 T 之前發生；沒發生就代表時序假設
+錯了。」因此 expiry 回答的是**「證據最晚什麼時候該到」**，只能由催化劑的時鐘決定。
+
+現況多數並非如此：
+
+| Cohort | expiry | catalyst 實際時點 | |
+|---|---|---|---|
+| Sivers | 2026-08-28 | 2026-08-27 Q2 report | ✅ 催化劑 +1，唯一訂對 |
+| **AXT** | 2026-08-09 | **2026-11 初** Q3 10-Q | ❌ 比自己的催化劑早三個月 |
+| AAOI | 2026-08-09 | 2026 下半年財報 | ❌ 同上 |
+| Meta | 2026-08-09 | 無明確日期 | ⚠ |
+| IQE／Coherent／Lumentum／2×unresolved | 均已過期 | catalyst 空 | ❌ |
+
+AXT 是最清楚的錯誤：催化劑不可能在有效期內發生，這種 expiry **保證產生一次假到期**。
+
+**規則：**
+
+- 催化劑有明確日期 → `expiry = 該日 + 1–2 週緩衝`（涵蓋財報延期）
+- 催化劑無明確日期 → 用「下一個可能揭露的時點」，通常是下一次財報
+- **硬規則：`expiry` 不得早於催化劑的預期時點**（AXT 現況違反）
+
+### 9.5 Memo 核查頻率：thesis 驅動，不固定 90 天
+
+`thesis/lifecycle.json` 的 `check_interval_days` **已存在且已訂對**：
+
+```
+axt_inp       90   （disproof 是產能擴張／出口許可，慢變數）
+coherent_cpo  90
+sivers        30   （disproof 是現金 runway，快變數）
+```
+
+問題只在 `crons/thesis_freshness_check.py` 寫死 `STALE_DAYS = 90` 而忽略它。
+**核查頻率應跟著該 thesis 的 disproof 條件走（L7 本來就要求 disproof 附核查頻率），
+不該被抹平成固定 90。** 改成讀 `check_interval_days` 即可。
+
+### 9.6 Freshness「出生即過期」
+
+`market_freshness_hours: 36`，但日線 bar 的 `as_of` 是**交易日當地午夜**
+（`2026-08-05T00:00`），它代表的卻是**當天收盤**（美股約 20:00 UTC）。freshness 拿它
+當觀測時刻做小時級減法，等於憑空多算約 20 小時的假過期——36 小時上限實際只容許
+約 16 小時真實鮮度。
+
+實例（AXT，2026-08-08 實測）：
+
+```
+決策凍結     2026-08-06 12:41 UTC
+凍入行情     as_of = 2026-08-05 00:00（最後一個完整交易日）
+上限         2026-08-05 00:00 + 36h = 2026-08-06 12:00
+→ 決策在出生當下就已超時 41 分鐘
+```
+
+AAOI／AXT／Meta 三筆現在都帶 `market_stale_since_decision`。接線後的實際體驗不是
+「偶爾過期」，而是**每天所有 paper 部位都是 `DATA_NEEDED`、refresh 完仍是紅的**，
+直接毀掉 daily brief 的訊噪比。
+
+**修法：不要把 36 調大**（那會讓真正的過期也混過去）。正解是與 beta monitor 對齊——
+日線資料的 freshness 判準應為「**凍入的 bar 是否為最新的完整交易日**」，以交易日為單位
+而非小時。這樣週末與盤中都不會誤判。FX 與 financial 兩個維度維持現狀。
+
+這是 L12 的又一個實例：`as_of` 同時承載「交易日日期」與「觀測時刻」兩種語意。
+
+### 9.7 兩套 lifecycle 分裂（已知，本輪不修）
+
+系統存在兩套彼此不知道對方的 lifecycle，實測交叉引用次數皆為 0：
+`decision_lab/` 讀 `thesis/lifecycle.json` **0 次**；`thesis/`、`engine_b/`、`crons/`
+碰 Engine D lifecycle **0 次**。
+
+| Thesis | `thesis/lifecycle.json` | Engine D `current_lifecycle` |
+|---|---|---|
+| Sivers | `review_required`（使用者 2026-07-12 人工決議的 8/27 hold） | **`active`** |
+| Coherent | `active` | **`expired`** |
+| AXT | `active` | `active` ✓ |
+
+三個重疊項有兩個矛盾，且方向相反。
+
+**本輪不修的理由：** 有一個成立的反論——**paper 本來就應該無視人工 hold**。paper 的
+用途是記錄「若我未介入，系統會怎麼做」；若人工 hold 也壓住 paper，paper 就只是使用者
+判斷的鏡子，永遠學不到「系統是對的、那次 hold 錯了」。**live 反映使用者判斷，paper
+反映系統未經過濾的判斷，兩者不同步是設計而非缺陷。** 分裂真正有害處只在**呈現**
+（daily brief 會同時聲稱 Coherent thesis active 而 Engine D 已 expired），屬報告矛盾，
+非資本安全問題。
+
+若日後要修，方向建議 **Engine D 讀 `thesis/lifecycle.json` 作為 hold 來源**（thesis 層是
+人工判斷的家，Engine D 是系統執行狀態；應為「人的決定約束系統」而非平行真相），
+而非把兩者合併（單位不同：thesis vs cohort，合併需對映規則且工程量大）。
+
+### 9.8 已知重複，但本輪刻意不動
+
+`engine_c/checklist.py:247` 的 `gate_pass = all(status in ("ok","manual_reviewed"))` 與
+`coverage.assess_coverage` 的逐項 blocker，是**同一個判準掃同樣五項、跑兩次**，卻得出
+相反語意的結論：前者二元「不准升格 Watchlist」，後者連續「可以小注」。這是 L12 的形狀。
+
+**不現在刪的理由：** AXT 現況是 Lane Memo `Watchlist Candidate`、四道 gate 全過、
+Engine D coverage 零 blocker、supported range **仍為 0**（唯一原因是 `intent: research`）。
+**全綠而無事發生——刪掉重複的 gate 不會改變這個結果。** 等 paper 開始累積，才會知道
+兩套 gate 哪一套真有預測力；那時候刪是有證據的刪，現在刪是再一次憑理論動手（§8.3）。
+
+（另註：`thesis/generate_lane_memo.py` 與 `thesis/preconditions.py` 的 L9 gate **並非死碼**。
+AXT 2026-08-04 的 memo 帶有該 script 的 header 與 `.evidence.json` sidecar，L9 gate 通過，
+`Watchlist Candidate` 確實產出過。曾一度誤判為 vestigial，此處更正。）
+
+### 9.9 接線範圍與前置順序
+
+**接線內容（使用者 2026-08-08 核准方向）：**
+
+| # | 項目 | 說明 |
+|---|---|---|
+| 1 | intent `research` → `paper` | routine 產生 decision 時改用 paper intent，開始累積反事實戰績。live 仍 100% 人工 |
+| 2 | `disproof` 列入 pq1 研究產出規格 | 解掉第一大 blocker（4/9）。那句話隨 packet 進 pq2 由使用者核准——由「想證明 thesis 成立」的同一個 agent 自寫證偽條件有 L8 形狀的自我報告偏誤 |
+| 3 | live 轉綠時主動通知 | `live_status == ELIGIBLE` 已會產 `action=TRADE, urgency=user_decision`，只需確保它出現在 Daily Brief 首屏 |
+| 4 | cohort 只由使用者 `go` 建立 | 不讓 triage PASS 自動建，增長速度由人控制 |
+
+**不動：** live 100% 人工、Google Sheet 唯讀、graph admission 原 gate、既有 frozen
+decision 不回寫。
+
+**前置條件（必須先做，否則接完就是每日假警報）：**
+
+1. `expiry` 到期自動轉 `expired`（§9.3、§9.4）
+2. freshness 改以交易日為單位（§9.6）
+3. `thesis_freshness_check` 讀 `check_interval_days`（§9.5）
+
+**接線後的已知代價：**
+
+- **memo 不對稱：** AAOI、AXT、Meta 三筆會產生 paper 部位，但只有 AXT 有 lane memo。
+  「一個 `go` = 一份 memo」是往後的規則，不回頭補既有 cohort——要嘛補兩份，要嘛接受。
+- **樣本仍薄：** 3 個 paper 部位不足以回答「系統準不準」，只是開始累積。
+
+### 9.10 Sivers 個案（記錄判斷，不是通則）
+
+使用者問：能否基於 CW 雷射產品的不可取代性手動加 Sivers。拆解後：
+
+- **系統已同意該論點。** `technical_causal_link` 是 Sivers 五軸中唯一的 `corroborated`
+  （「Sivers lasers 與 O-Net／Enablence、GlobalFoundries reference-design 路徑有多個
+  來源支持」）。
+- **擋住它的是另外兩件不同性質的事：** `valuation_payoff: unknown`（五軸取 min → ceiling 0），
+  以及使用者自己 2026-07-12 設的 8/27 分辨點。**技術不可取代 ≠ 公司撐得到那天 ≠
+  現在的價格值得買**——正是 L12 要求分開的三件事。
+- **`valuation_payoff: unknown` 的成因已消失。** 當初理由是「SIVE.ST research-market
+  observation 被 quarantine」；2026-08-08 實測 `status=observed / unit_status=ok /
+  blockers=[] / price 40.18 SEK`。該 `unknown` 是**過期的資料問題，不是真的證據缺口**。
+
+**三條路：**
+
+- **A. Revise thesis** — 走 `thesis_mutation` → pq2 → `todo complete-thesis-mutation`。
+  副作用：epoch +1、舊 decision 不再授權交易。**這是設計上的正解**，因為用 override 開
+  部位會讓 thesis 永遠停在 `review_required`——持有部位而警報永遠響著，正是 L7 要防的事。
+- **B. 補 valuation 軸** — 系統自列缺兩項，其一（市場快照）已自行修復，其二
+  （以 pipeline conversion 與毛利率為基礎的 downside case）是分析工作。
+- **C. `live_override`** — 逃生門確實存在且**刻意保留**。實測 `store.apply_live_override`
+  **不檢查 lifecycle**，只要求 exact `selected_weight`、明確 `reason`、未過期的 prepared
+  action 與一次 native 核准，並留下 receipt。系統不代下單。
+
+**本輪決議：B 現在做但 reassess 留到 8/27；A 等 8/27 重編財務到位。**
+順序本身即可保護使用者設定的分辨點——B 只產出 assessment JSON，**部位是 reassess 才
+產生的**，因此不需要先修 §9.7 的 lifecycle 分裂。
