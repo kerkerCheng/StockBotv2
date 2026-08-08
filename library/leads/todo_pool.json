@@ -1380,10 +1380,10 @@
       "added_at": "2026-08-04T07:27:57.692312+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_285c1b339ec9e6c2d01769fcb8b1ce05",
-      "dispatch_receipt": "research:iqe_tower_2026-08-07:official_iqe_trading_update_and_tower_agreement_review",
+      "dispatch_receipt": "decision:pd_c3a1064daa4698ba24f4ffb21d718d1e",
       "dispatch_ref": "wo_b1cf150dfd003e9e0f2cabd0f1b32f11",
-      "dispatch_status": "awaiting_approval",
-      "dispatch_updated_at": "2026-08-06T22:41:01.656880+00:00",
+      "dispatch_status": "completed",
+      "dispatch_updated_at": "2026-08-08T13:37:50.019154+00:00",
       "dispatched_at": "2026-08-06T02:08:54.103448+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 93,
@@ -1391,10 +1391,11 @@
       "reactivation_event": {
         "type": "decision_blocker_mode_changed"
       },
-      "reason": null,
+      "reason": "pq1 completed",
+      "receipt": "decision:pd_c3a1064daa4698ba24f4ffb21d718d1e",
       "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-08T13:37:50.019154+00:00",
       "source": "decision_lab",
       "title": "REVIEW — co:iqe",
       "type": "decision_review"
@@ -3452,6 +3453,24 @@
       "receipt": "action:ra_d7a27bba9d0751a12ee8ae55d69d918a;digest:3ab19cdc371b50c279210081ed7e46ea57ede0db893e61348f9cb7dbd15d7af6;commit:5e6df87de6098c0fca612aa8722fa21dfe7d4ba7;cohort:dc_317c2897cdcffda26c2c2e0e79074670",
       "ref_id": "ra_d7a27bba9d0751a12ee8ae55d69d918a",
       "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-08T13:37:50.019154+00:00",
+      "n": 93,
+      "reason": null,
+      "receipt": "decision:pd_c3a1064daa4698ba24f4ffb21d718d1e",
+      "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+      "type": "decision_review",
+      "verb": "pq1_completed"
+    },
+    {
+      "at": "2026-08-08T13:37:50.019154+00:00",
+      "n": 93,
+      "reason": "pq1 completed",
+      "receipt": "decision:pd_c3a1064daa4698ba24f4ffb21d718d1e",
+      "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+      "type": "decision_review",
       "verb": "go"
     }
   ],
