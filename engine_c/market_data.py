@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import math
 import sys
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Any, Iterable, Mapping
 
 from access_failures import classify_access_failure
@@ -173,6 +173,63 @@ def get_tradeability_snapshot(ticker: str, currency: str) -> dict[str, Any]:
         rows=rows,
         fetched_at=fetched_at,
         source=f"yfinance://history/{provider_symbol}",
+    )
+
+
+def get_historical_tradeability_snapshot(
+    ticker: str, currency: str, *, before: str
+) -> dict[str, Any]:
+    """重建 ``before`` 當下應該看到的快照；用於修復遺失的 Shadow 錨點。
+
+    這條路存在的理由是「可重建的事實」與「只有當下才有的真相」必須分開處理：
+    decision context 是後者，必須 point-in-time 凍結、永不回寫；Shadow 錨點是
+    前者——它只是某個已知時刻的最後一個完整交易日收盤價，用歷史資料可以完整
+    重建，不該因為當下一次抓取失敗就永久遺失。
+
+    只採 **UTC 日期嚴格早於 ``before`` 當日** 的 bar：觀測當下該交易日可能尚未
+    收盤，取同日 bar 會拿到觀測者當時看不到的價格（實測 co:axt 觀測於
+    2026-07-29T00:59Z＝美東 07-28 晚間，同日 bar 會把錨點從 42.76 誤設為 36.97）。
+    """
+
+    try:
+        import yfinance as yf
+    except ImportError:
+        return {"status": "unavailable", "blockers": ["yfinance_unavailable"]}
+    moment = _timestamp(before)
+    if moment is None:
+        return {"status": "unavailable", "blockers": ["market_before_invalid"]}
+    cutoff = moment.astimezone(timezone.utc).date()
+    provider_symbol = yfinance_symbol(ticker)
+    try:
+        history = yf.Ticker(provider_symbol).history(
+            # 往前多取一季，確保過濾後仍滿足 20-session 門檻。
+            start=(cutoff - timedelta(days=180)).isoformat(),
+            end=cutoff.isoformat(),
+            auto_adjust=False,
+        )
+        rows = [
+            {
+                "as_of": index.to_pydatetime().isoformat(),
+                "close": row.get("Close"),
+                "volume": row.get("Volume"),
+            }
+            for index, row in history.iterrows()
+            if index.to_pydatetime().date() < cutoff
+        ]
+    except Exception as exc:
+        return {
+            "status": "unavailable",
+            "blockers": ["market_history_unavailable"],
+            "failure_class": classify_access_failure(exc),
+        }
+    return build_tradeability_snapshot(
+        ticker=ticker,
+        currency=currency,
+        rows=rows,
+        # 回填的 fetched_at 用觀測時刻，代表「這是當時該看到的值」，
+        # 並讓 build_ 內的 latest_time 夾制自然生效。
+        fetched_at=moment.isoformat(),
+        source=f"backfill://yfinance/{provider_symbol}@{cutoff.isoformat()}",
     )
 
 

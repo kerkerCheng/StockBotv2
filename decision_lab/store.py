@@ -521,6 +521,86 @@ class DecisionStore:
             raise KeyError(f"shadow not found for {cohort_id}")
         return ShadowBaseline(**dict(row))
 
+    def backfill_shadow(
+        self,
+        cohort_id: str,
+        snapshot: Mapping[str, Any],
+        *,
+        inception_at: str,
+        backfilled_at: str,
+        reason: str,
+    ) -> ShadowBaseline:
+        """把遺失的 Shadow 錨點以重建值補上；已觀測到的錨點永不覆寫。
+
+        Shadow 記的是某個已知時刻的最後一個完整交易日收盤價——那是**可重建的
+        事實**，不是只有當下才有的真相。因此一次瞬時故障造成的空錨點應該可以
+        修復，而不是永久遺失（實測：9 個 cohort 有 7 個沒有價格，其中包含 §1 的
+        co:axt）。
+
+        兩道限制不得放寬：
+
+        1. ``status == 'observed'`` 的錨點是已記錄的觀測，覆寫等於改寫歷史，
+           一律拒絕。
+        2. **回填值的 ``as_of`` 必須早於 inception 時刻。** 這是 hindsight 防線：
+           用 inception 之後的價格補錨點會把基準點偷偷往有利方向移動，
+           使「從知道這件事開始漲了多少」變成一個可被事後挑選的數字。
+           ``tests/test_shadow_baseline.py`` 已鎖住 intake 路徑不做事後回填；
+           這裡是明確、有稽核軌跡的修復路徑，同一條紀律必須成立。
+
+        每次回填都留下 append-only ``shadow_backfilled`` 事件，來源標 ``backfill://``
+        以便與真正的即時觀測區分——它是**可辯護的重建，不是重播**。
+        """
+
+        existing = self.get_shadow(cohort_id)
+        if existing.status == "observed":
+            raise ValueError(f"shadow already observed for {cohort_id}; refusing to overwrite")
+        if str(snapshot.get("status")) != "observed":
+            raise ValueError("backfill snapshot must be an observed market snapshot")
+        for field in ("ticker", "price", "currency", "source", "as_of", "fetched_at"):
+            if snapshot.get(field) in (None, ""):
+                raise ValueError(f"backfill snapshot is missing {field}")
+        inception = _timestamp(inception_at, "inception_at")
+        as_of = _timestamp(str(snapshot["as_of"]), "snapshot.as_of")
+        if datetime.fromisoformat(as_of) >= datetime.fromisoformat(inception):
+            raise ValueError(
+                "backfill snapshot must predate shadow inception; refusing hindsight anchor"
+            )
+        stamp = _timestamp(backfilled_at, "backfilled_at")
+        with immediate_transaction(self._conn):
+            self._conn.execute(
+                """
+                UPDATE shadow_observations
+                SET status = ?, ticker = ?, price = ?, currency = ?,
+                    source = ?, as_of = ?, fetched_at = ?
+                WHERE cohort_id = ? AND status != 'observed'
+                """,
+                (
+                    "observed",
+                    str(snapshot["ticker"]),
+                    float(snapshot["price"]),
+                    str(snapshot["currency"]),
+                    str(snapshot["source"]),
+                    str(snapshot["as_of"]),
+                    str(snapshot["fetched_at"]),
+                    cohort_id,
+                ),
+            )
+        self.append_event(
+            cohort_id=cohort_id,
+            event_type="shadow_backfilled",
+            payload={
+                "previous_status": existing.status,
+                "reason": reason,
+                "inception_at": inception,
+                "price": float(snapshot["price"]),
+                "currency": str(snapshot["currency"]),
+                "as_of": str(snapshot["as_of"]),
+                "source": str(snapshot["source"]),
+            },
+            observed_at=stamp,
+        )
+        return self.get_shadow(cohort_id)
+
     def count_shadows(self, cohort_id: str) -> int:
         row = self._conn.execute(
             "SELECT COUNT(*) AS count FROM shadow_observations WHERE cohort_id = ?",
