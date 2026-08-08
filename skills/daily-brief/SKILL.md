@@ -62,17 +62,12 @@ sandbox **第一次呼叫就可達**，不得先製造可預期的 `access_block
 `crons\harvest_leads.py`、`engine_c\etl_yfinance.py`、`scripts\daily_beta_snapshot.py`、
 `decision_lab today`、`engine_b.todo sync`、`scripts\publish_daily_state.py` 與
 `scripts\publish_daily_brief.py`。`publish_daily_state.py` 需要寫 `.git`，不擴張 profile 的 filesystem
-權限；首次呼叫就使用其 exact outside-sandbox prefix rule。若執行端在命令開始前已明示 profile 未載入，
-其他 fixed entry 也直接使用各自 exact prefix rule，不先跑一個注定斷網的 sandbox probe。
-`harvest-health`、queue list／count、JSON 檢查等純本機唯讀命令維持 sandbox。只有遇到未預期的
-sandbox／proxy／本機網路權限阻擋時，才把
-**原命令本身**在允許本機網路的權限下重跑一次；第一次記 `access_blocked`，只有
-同一來源後續成功才標 recovered，重跑仍失敗不得改寫成「零筆」或 `no_result`。**重跑對象必須是實際
-失敗的那一支腳本，不能用下游／後續腳本頂替**——
-例如 `engine_c\etl_yfinance.py` 失敗時要重跑 `etl_yfinance.py` 本身，不能改成重跑讀它結果的
-`scripts\daily_beta_snapshot.py` 或 `publish_daily_state.py`，那只會讓下游腳本在舊資料上再跑一次、
-表面看起來成功，實際上缺口沒補（2026-08-07 實測：`etl_yfinance.py` 失敗後只重跑了
-`daily_beta_snapshot.py` 兩次，Beta 價格全部維持「資料不足」到最後）。`insufficient_history`／`unavailable`／`stale`
+權限；它是唯一 outside-sandbox rule，首次呼叫就使用該 exact rule，但不構成第二套網路 fallback。
+其餘命令不得另留或臨時建立 network prefix rule。若 profile 未載入，或連外命令仍出現
+`access_blocked`，視為 permission profile 設定失效：保留結構化 failure、讓受影響資料 fail closed，
+不得以 `require_escalated`／第二套 network rule 事後補跑，也不得改寫成「零筆」或 `no_result`。
+`harvest-health`、queue list／count、JSON 檢查等純本機唯讀命令維持 sandbox。
+`insufficient_history`／`unavailable`／`stale`
 也必須在健康段落明示並讓受影響的
 technical 或 self-funded range 歸零。Windows 本機與
 scheduled task 一律使用 repo `.venv`，不要依賴父 shell 是否剛好 activate。

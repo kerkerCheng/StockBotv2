@@ -97,17 +97,17 @@ def test_codex_scheduled_run_does_not_depend_on_task_rename_app() -> None:
     assert "title_update_failed" not in text
 
 
-def test_access_blocked_is_retried_and_never_presented_as_no_result() -> None:
+def test_access_blocked_fails_closed_without_a_second_network_permission_path() -> None:
     text = _text()
     assert "harvest-health" in text
     assert "failure_class" in text
     assert "access_blocked" in text
     assert "`stockbot-daily` permission profile" in text
     assert "第一次呼叫就可達" in text
-    assert "不先跑一個注定斷網的 sandbox probe" in text
-    assert "exact outside-sandbox prefix rule" in text
+    assert "唯一 outside-sandbox rule" in text
+    assert "不得以 `require_escalated`／第二套 network rule 事後補跑" in text
     assert "把整個 PowerShell、Python 或 working tree 設成 unrestricted" in text
-    assert "同一來源後續成功才標 recovered" in text
+    assert "保留結構化 failure、讓受影響資料 fail closed" in text
     assert "不得改寫成「零筆」或 `no_result`" in text
 
 

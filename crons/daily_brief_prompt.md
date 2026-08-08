@@ -23,8 +23,9 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
    fixed entry 是 `crons\harvest_leads.py`、
    `engine_c\etl_yfinance.py`、`scripts\daily_beta_snapshot.py`、`decision_lab today`、
    `engine_b.todo sync`、`scripts\publish_daily_state.py`、`scripts\publish_daily_brief.py`。
-   `publish_daily_state.py` 需要寫 `.git`，首次呼叫直接使用 exact outside-sandbox prefix rule；若命令開始前
-   已明示 profile 未載入，其他 fixed entry 也直接使用各自 exact prefix rule，不先跑斷網 probe。
+   `publish_daily_state.py` 需要寫 `.git`，因此首次呼叫使用唯一的 exact outside-sandbox rule；它不構成
+   第二套網路 fallback。其餘命令不得另留或臨時建立 network prefix rule。若 profile 未載入，或連外
+   命令仍回 `access_blocked`，視為 profile 設定失效並 fail closed，不得以 `require_escalated` 事後補跑。
    `harvest-health`、queue list／count、JSON 檢查等純本機唯讀命令維持 sandbox。
 3. 依序執行：
    - `.venv\Scripts\python.exe crons\harvest_leads.py`（X＋EDGAR；以 `since_id`／URL hash 去重）
@@ -49,10 +50,10 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
    - `.venv\Scripts\python.exe -m decision_lab today --format markdown`
    - `.venv\Scripts\python.exe -m engine_b.todo sync`
    - `.venv\Scripts\python.exe -m engine_b.todo list`
-4. 任何來源失敗都要誠實列出 `fetch_failed`／`parse_failed` 與結構化 `failure_class`；若執行端無法預先套用
-   上述窄權限，或命令遭未預期的 sandbox／proxy／本機網路權限阻擋，必須以**完全相同的命令**在允許本機網路的權限下重跑一次，
-   不得把第一次 `access_blocked` 寫成「零筆新資料」或 `no_result`。同一來源後續成功才算 recovered；
-   重跑仍失敗則保留在 `harvest-health` 與健康段落，研究追源另依 `$source-trace` 嘗試一條官方替代路徑。
+4. 任何來源失敗都要誠實列出 `fetch_failed`／`parse_failed` 與結構化 `failure_class`；若 profile 未載入，
+   或命令遭 sandbox／proxy／本機網路權限阻擋，保留 `access_blocked` 並讓受影響資料 fail closed，
+   不得以第二套 network rule／`require_escalated` 事後補跑，也不得寫成「零筆新資料」或 `no_result`。
+   後續新一輪同來源成功才算 recovered；本輪研究追源可另依 `$source-trace` 嘗試一條已在 profile 內的官方替代路徑。
    beta technical 的 `insufficient_history`／
    `unavailable`／`stale` 也必須列在健康段落，該商品 supported range 歸零但不阻斷其他商品。Capital Authority
    的 cash floor 缺失／stale／FX 錯誤時，單一 self-funded range fail closed 歸零；不得回退到百分比 reserve

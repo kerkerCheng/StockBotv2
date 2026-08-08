@@ -37,15 +37,16 @@ def test_daily_profile_allows_required_domains_without_global_network_wildcard()
         assert domains[required] == "allow"
 
 
-def test_every_network_or_git_fixed_entry_has_an_outside_sandbox_fallback() -> None:
+def test_only_state_publisher_has_an_outside_sandbox_rule() -> None:
     rules = RULES.read_text(encoding="utf-8")
-    for command in (
+    assert rules.count("prefix_rule(") == 1
+    assert "scripts\\\\publish_daily_state.py" in rules
+    for network_command in (
         "crons\\\\harvest_leads.py",
         "engine_c\\\\etl_yfinance.py",
         "scripts\\\\daily_beta_snapshot.py",
         '"-m", "decision_lab", "today"',
         '"-m", "engine_b.todo", "sync"',
-        "scripts\\\\publish_daily_state.py",
         "scripts\\\\publish_daily_brief.py",
     ):
-        assert command in rules
+        assert network_command not in rules
