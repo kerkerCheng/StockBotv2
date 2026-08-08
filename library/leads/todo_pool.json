@@ -1537,10 +1537,11 @@
       "added_at": "2026-08-07T22:41:22.800262+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 102,
-      "reason": null,
+      "reason": "expiry 訂錯（早於各自催化劑）已於 2026-08-08 修正並 reassess，三筆新決策皆 NO_ACTION；成因已除，非僅清編號",
+      "receipt": null,
       "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "drop",
+      "resolved_at": "2026-08-08T05:13:51.376340+00:00",
       "source": "decision_lab",
       "source_cleared": {
         "at": "2026-08-07T22:41:57.396312+00:00",
@@ -1548,23 +1549,17 @@
         "source_healthy": true
       },
       "title": "REVIEW — co:applied_optoelectronics",
-      "type": "decision_review",
-      "waiting_on": {
-        "derived_from_blockers": true,
-        "reason": "所有 blocker 都不需要使用者決定",
-        "set_at": "2026-08-07T22:41:22.800191+00:00",
-        "trigger": "執行面 context 缺失／市場資料問題",
-        "until": null
-      }
+      "type": "decision_review"
     },
     {
       "added_at": "2026-08-07T22:41:22.800262+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 103,
-      "reason": null,
+      "reason": "expiry 訂錯（早於各自催化劑）已於 2026-08-08 修正並 reassess，三筆新決策皆 NO_ACTION；成因已除，非僅清編號",
+      "receipt": null,
       "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "drop",
+      "resolved_at": "2026-08-08T05:13:51.513835+00:00",
       "source": "decision_lab",
       "source_cleared": {
         "at": "2026-08-07T22:41:57.396312+00:00",
@@ -1572,23 +1567,17 @@
         "source_healthy": true
       },
       "title": "REVIEW — co:axt",
-      "type": "decision_review",
-      "waiting_on": {
-        "derived_from_blockers": true,
-        "reason": "所有 blocker 都不需要使用者決定",
-        "set_at": "2026-08-07T22:41:22.800221+00:00",
-        "trigger": "執行面 context 缺失／市場資料問題",
-        "until": null
-      }
+      "type": "decision_review"
     },
     {
       "added_at": "2026-08-07T22:41:22.800262+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 104,
-      "reason": null,
+      "reason": "expiry 訂錯（早於各自催化劑）已於 2026-08-08 修正並 reassess，三筆新決策皆 NO_ACTION；成因已除，非僅清編號",
+      "receipt": null,
       "ref_id": "dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "drop",
+      "resolved_at": "2026-08-08T05:13:51.649487+00:00",
       "source": "decision_lab",
       "source_cleared": {
         "at": "2026-08-07T22:41:57.396312+00:00",
@@ -1596,23 +1585,24 @@
         "source_healthy": true
       },
       "title": "REVIEW — co:meta",
-      "type": "decision_review",
-      "waiting_on": {
-        "derived_from_blockers": true,
-        "reason": "所有 blocker 都不需要使用者決定",
-        "set_at": "2026-08-07T22:41:22.800244+00:00",
-        "trigger": "執行面 context 缺失／市場資料問題",
-        "until": null
-      }
+      "type": "decision_review"
     },
     {
       "added_at": "2026-08-07T22:54:56.425388+00:00",
+      "completion_authority": {
+        "action_digest": "3ab19cdc371b50c279210081ed7e46ea57ede0db893e61348f9cb7dbd15d7af6",
+        "cohort_id": "dc_317c2897cdcffda26c2c2e0e79074670",
+        "commit": "5e6df87de6098c0fca612aa8722fa21dfe7d4ba7",
+        "company_id": "co:agility_robotics",
+        "verified_at": "2026-08-08T05:16:16.351123+00:00"
+      },
       "hint": "核准 exact graph delta；Decision handoff：co:agility_robotics。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 105,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_d7a27bba9d0751a12ee8ae55d69d918a;digest:3ab19cdc371b50c279210081ed7e46ea57ede0db893e61348f9cb7dbd15d7af6;commit:5e6df87de6098c0fca612aa8722fa21dfe7d4ba7;cohort:dc_317c2897cdcffda26c2c2e0e79074670",
       "ref_id": "ra_d7a27bba9d0751a12ee8ae55d69d918a",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-08T05:16:16.351123+00:00",
       "source": "research_action",
       "title": "FCC 2026-07-28 將外國製先進機器人納入 Covered List",
       "type": "ra_admission"
@@ -3415,6 +3405,42 @@
       "ref_id": "dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
       "type": "decision_review",
       "verb": "source_cleared"
+    },
+    {
+      "at": "2026-08-08T05:13:51.376340+00:00",
+      "n": 102,
+      "reason": "expiry 訂錯（早於各自催化劑）已於 2026-08-08 修正並 reassess，三筆新決策皆 NO_ACTION；成因已除，非僅清編號",
+      "receipt": null,
+      "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
+      "type": "decision_review",
+      "verb": "drop"
+    },
+    {
+      "at": "2026-08-08T05:13:51.513835+00:00",
+      "n": 103,
+      "reason": "expiry 訂錯（早於各自催化劑）已於 2026-08-08 修正並 reassess，三筆新決策皆 NO_ACTION；成因已除，非僅清編號",
+      "receipt": null,
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "type": "decision_review",
+      "verb": "drop"
+    },
+    {
+      "at": "2026-08-08T05:13:51.649487+00:00",
+      "n": 104,
+      "reason": "expiry 訂錯（早於各自催化劑）已於 2026-08-08 修正並 reassess，三筆新決策皆 NO_ACTION；成因已除，非僅清編號",
+      "receipt": null,
+      "ref_id": "dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
+      "type": "decision_review",
+      "verb": "drop"
+    },
+    {
+      "at": "2026-08-08T05:16:16.351123+00:00",
+      "n": 105,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_d7a27bba9d0751a12ee8ae55d69d918a;digest:3ab19cdc371b50c279210081ed7e46ea57ede0db893e61348f9cb7dbd15d7af6;commit:5e6df87de6098c0fca612aa8722fa21dfe7d4ba7;cohort:dc_317c2897cdcffda26c2c2e0e79074670",
+      "ref_id": "ra_d7a27bba9d0751a12ee8ae55d69d918a",
+      "type": "ra_admission",
+      "verb": "go"
     }
   ],
   "next_n": 106,

@@ -14094,7 +14094,7 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {
         "robotics": {
           "counter_only": false,
