@@ -477,7 +477,7 @@ def build_context_bundle(
         _reject_secrets(value)
     freshness = {
         "market_freshness_sessions": 2.0,
-        "fx_freshness_hours": 36.0,
+        "fx_freshness_sessions": 2.0,
         "holdings_freshness_days": 7.0,
         "financial_freshness_days": 14.0,
         "financial_runway_freshness_days": 100.0,
@@ -557,7 +557,7 @@ def build_context_bundle(
         fx,
         expected_pair=expected_pair,
         evaluation_at=evaluation_at,
-        max_age_hours=freshness["fx_freshness_hours"],
+        max_age_sessions=freshness["fx_freshness_sessions"],
     )
     normalized_financial = _normalize_financial(
         financial,
@@ -622,7 +622,7 @@ def build_context_bundle(
             execution_fx,
             expected_pair=execution_pair,
             evaluation_at=evaluation_at,
-            max_age_hours=freshness["fx_freshness_hours"],
+            max_age_sessions=freshness["fx_freshness_sessions"],
         )
         normalized_execution_fx["blockers"] = [
             blocker.replace("fx_", "execution_fx_", 1)

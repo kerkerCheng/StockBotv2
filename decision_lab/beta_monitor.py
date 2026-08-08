@@ -430,7 +430,11 @@ def build_beta_monitor(
         base_currency=portfolio["base_currency"],
         evaluation_at=evaluation_at,
         max_authority_age_days=int(resolved_policy["capital"]["authority_max_age_days"]),
-        max_fx_age_hours=int(resolved_policy["capital"]["fx_max_age_hours"]),
+        # beta policy 的 fx_max_age_hours 是給資本換匯用的獨立設定（與決策鮮度 gate
+        # 不同消費者），維持 hours 不改名；在呼叫點換算成交易日即可。
+        max_fx_age_sessions=max(
+            1, int(resolved_policy["capital"]["fx_max_age_hours"]) // 24
+        ),
         fx_fetcher=fx_fetcher,
     )
     risk_snapshot = compose_risk_snapshot(

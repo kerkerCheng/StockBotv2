@@ -135,7 +135,7 @@ def normalize_fx_snapshot(
     *,
     expected_pair: str,
     evaluation_at: str,
-    max_age_hours: float = 36,
+    max_age_sessions: float = 2,
 ) -> dict[str, Any]:
     upstream = payload.get("status")
     if upstream in {"missing", "unavailable"}:
@@ -167,7 +167,13 @@ def normalize_fx_snapshot(
     if blockers:
         return _quarantined(*blockers)
     assert as_of is not None and evaluation is not None and rate is not None
-    status = "stale" if evaluation - as_of > timedelta(hours=max_age_hours) else "available"
+    # FX 與行情同源同語意：provider 回的是 yfinance 日線 bar（`fx/SEKUSD=X`），
+    # as_of 標在當地午夜卻代表當日收盤。先前把 FX 留在小時制，理由是「FX 是連續
+    # 報價」——那是按概念推理而沒查資料源實際回傳什麼，於是昨天的收盤在 37 小時後
+    # 就被判 stale，與行情犯同一個錯（2026-08-08 由 Sivers live 實跑撞出）。
+    status = (
+        "stale" if sessions_between(as_of, evaluation) > max_age_sessions else "available"
+    )
     return {
         "status": status,
         "pair": expected_pair,

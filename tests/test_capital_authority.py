@@ -52,7 +52,7 @@ def _build(rows=None, **kwargs):
         base_currency="USD",
         evaluation_at=NOW,
         max_authority_age_days=90,
-        max_fx_age_hours=96,
+        max_fx_age_sessions=4,
         fx_fetcher=_fx,
         **kwargs,
     )
@@ -118,7 +118,7 @@ def test_wrong_direction_floor_fx_fails_but_drawn_debt_stays_separate() -> None:
         base_currency="USD",
         evaluation_at=NOW,
         max_authority_age_days=90,
-        max_fx_age_hours=96,
+        max_fx_age_sessions=4,
         fx_fetcher=wrong_fx,
     )
     drawn_view = _build(_rows(drawn="1"))
@@ -142,7 +142,7 @@ def test_missing_credit_fx_does_not_change_shared_cash_pool() -> None:
         base_currency="USD",
         evaluation_at=NOW,
         max_authority_age_days=90,
-        max_fx_age_hours=96,
+        max_fx_age_sessions=4,
         fx_fetcher=None,
     )
 

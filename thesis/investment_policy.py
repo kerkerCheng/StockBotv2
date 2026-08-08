@@ -34,7 +34,7 @@ _PROBE_REQUIRED_KEYS = {
     "axis_ceilings",
     "live_adv_fraction_cap",
     "market_freshness_sessions",
-    "fx_freshness_hours",
+    "fx_freshness_sessions",
     "holdings_freshness_days",
     "financial_freshness_days",
     "financial_runway_freshness_days",
@@ -132,7 +132,7 @@ def _validate_probe_lane(value: Any) -> dict[str, Any]:
     }
     for field in (
         "market_freshness_sessions",
-        "fx_freshness_hours",
+        "fx_freshness_sessions",
         "holdings_freshness_days",
         "financial_freshness_days",
         "financial_runway_freshness_days",

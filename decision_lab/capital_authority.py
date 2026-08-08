@@ -120,7 +120,7 @@ def build_capital_view(
     base_currency: str | None,
     evaluation_at: str,
     max_authority_age_days: int,
-    max_fx_age_hours: int,
+    max_fx_age_sessions: int,
     fx_fetcher: FxFetcher | None,
 ) -> dict[str, Any]:
     """Build one shared Alpha/Beta cash pool plus non-cash loan telemetry。"""
@@ -223,7 +223,7 @@ def build_capital_view(
             raw_fx,
             expected_pair=pair,
             evaluation_at=evaluation_at,
-            max_age_hours=max_fx_age_hours,
+            max_age_sessions=max_fx_age_sessions,
         )
         fx_cache[pair] = value
         return float(value["rate"]) if value.get("status") == "available" else None

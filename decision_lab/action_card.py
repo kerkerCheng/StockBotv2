@@ -125,14 +125,15 @@ def _runtime_freshness(
     # 凍入 08-05 的 bar，36 小時上限在 12:00Z 就到期——**決策在出生當下即已 stale**，
     # 三筆候選 cohort 同時中招。這會讓每份 brief 都在喊 refresh，而 refresh 完仍是紅的。
     #
-    # FX 與 financial 維持原本的時間單位：前者是連續報價、後者跟的是財報週期，
-    # 兩者都不是「以交易日為心跳」的資料。
+    # FX 同源同病：provider 回的也是 yfinance 日線 bar，先前留在小時制的理由
+    #（「FX 是連續報價」）是按概念推理而沒查資料源，已一併改為交易日。
+    # 只有 financial 維持 days——它跟的是財報週期，本來就不是以交易日為心跳。
     specs = {
         "market": ("market_freshness_sessions", "sessions", "paper"),
-        "fx": ("fx_freshness_hours", "hours", "paper"),
+        "fx": ("fx_freshness_sessions", "sessions", "paper"),
         "financial": ("financial_freshness_days", "days", "paper"),
         "execution_market": ("market_freshness_sessions", "sessions", "live"),
-        "execution_fx": ("fx_freshness_hours", "hours", "live"),
+        "execution_fx": ("fx_freshness_sessions", "sessions", "live"),
         "holdings": ("holdings_freshness_days", "days", "live"),
     }
     result = _freshness(context)
@@ -157,7 +158,12 @@ def _runtime_freshness(
             # **自己當時的 policy** 評估——那正是 policy_version 被凍進 context 的
             # 意義；若因為找不到新 key 就一律判 stale，等於用今天的規則追溯懲罰
             # 昨天的決策，而且會讓每份 brief 都在喊 refresh。
-            legacy = _finite(policy.get("market_freshness_hours"))
+            legacy_key = (
+                "fx_freshness_hours"
+                if policy_key.startswith("fx_")
+                else "market_freshness_hours"
+            )
+            legacy = _finite(policy.get(legacy_key))
             if legacy is not None and legacy > 0:
                 amount, unit = legacy, "hours"
         if amount is None or amount <= 0 or source_time > now:

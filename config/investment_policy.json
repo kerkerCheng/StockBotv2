@@ -24,7 +24,7 @@
     },
     "live_adv_fraction_cap": 0.01,
     "market_freshness_sessions": 2,
-    "fx_freshness_hours": 36,
+    "fx_freshness_sessions": 2,
     "holdings_freshness_days": 7,
     "financial_freshness_days": 14,
     "financial_runway_freshness_days": 100,

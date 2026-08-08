@@ -456,7 +456,7 @@ def evaluate_signal(
             name: policy["probe_lane"][name]
             for name in (
                 "market_freshness_sessions",
-                "fx_freshness_hours",
+                "fx_freshness_sessions",
                 "holdings_freshness_days",
                 "financial_freshness_days",
                 "financial_runway_freshness_days",
