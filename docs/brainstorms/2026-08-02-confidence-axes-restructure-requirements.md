@@ -493,17 +493,39 @@ co:iqe         IQE.L    建立 08-04  unavailable
 `market_return_status = "unknown"`。因此那 7 個的 `performance_since_tracked`
 **永遠是 null**。**shadow 最該發揮作用的那一次（AXT），它失敗了。**
 
-#### 根因：shadow 沿用 decision 的行情快照，失敗即永久遺失
+#### 傳導機制：shadow 沿用 decision 的行情快照，失敗即永久遺失
 
 `workflow.py:403` 以 `_StaticMarketObserver(snapshot.market)` 建立 shadow——
 它**不自行抓價，而是直接沿用該次 decision 的 `AuthoritySnapshot.market`**。
-因此 cohort 建立當下那一次行情抓取若失敗，shadow 錨點就永久遺失：**靜默、無重試、
-無回填**。（本機環境的行情抓取確實會間歇失敗——2026-08-07 早上 `etl_yfinance.py`
-在 sandbox 下 exit 1 就是同一類事件。）
+因此 cohort 建立當下那一次行情若不可用，shadow 錨點就永久遺失：**靜默、無重試、
+無回填**。
 
 `intake.capture_signal` 的 `except Exception: market_observation =
 MarketObservation(status="unavailable")` 讓失敗原因完全消失，屬 L12 的「一個表示承載
 兩種語意」：`unavailable` 同時代表「這檔沒有行情」與「這次抓取壞了」。
+
+#### 根因不是單一的，也**不是 Codex sandbox**
+
+> ⚠ 本小節曾一度寫成「本機環境行情抓取間歇失敗，與 2026-08-07 的 `etl_yfinance`
+> sandbox 失敗同一類事件」。**該推論已被自己的資料推翻，勿再沿用。**
+
+**沙箱相關性檢定（2026-08-08）：** 比對各 cohort 建立時刻與當日
+`~/.codex/.sandbox/sandbox.<date>.log` 的 `FAILURE` 數，**相關性是反的**——
+shadow 成功的 2026-07-26 時段有 3 次 sandbox FAILURE，而失敗的 07-22 與 08-04
+時段各為 0 次。
+
+逐一取出各 cohort 首筆 decision 的凍結 `market` 區段後，實際是**至少四種不同成因**：
+
+| Cohort | 建立當下 market 狀態 | 性質 |
+|---|---|---|
+| **COHR** | `market_timestamp_future` | **即 §9.6 的 `as_of` 語意 bug**——日線 bar 時戳被判成「在未來」 |
+| **IQE** | `market_adv_invalid` ＋ currency | GBp 未正規化；屬 2026-08-05 幣別修正之前的舊帳 |
+| **AXT** | `market_unavailable` | 唯一一筆真正的抓取失敗 |
+| LITE／META | `market_missing` | **未定**。凍結 bundle 顯示 currency 為 None，但兩者 2026-07-22 即已在 `config/company_identity.json`；可能只是 payload schema 版本差異，**尚無確證，不下結論** |
+
+**結論：多數不是環境問題，是 repo 內部的資料語意問題。** 這個區別決定解法方向——
+若是 sandbox 就該改環境；實際上解法在程式碼裡，而且其中兩項已經或即將被既有排程
+修掉（§9.6 的交易日 freshness、2026-08-05 的幣別正規化）。
 
 **已排除的假設（勿重查）：**
 
@@ -541,10 +563,14 @@ AXTI 已驗證無 split，量價齊揚（7/31 成交量 2,962 萬股），催化
 #### 待做（建議排在 paper 接線之前）
 
 1. **回填既有 7 筆 shadow**（歷史收盤，可完整重建）
-2. **shadow 改為獨立抓價，不沿用 decision 快照**；失敗時保留 `failure_class`，
-   不併入 `unavailable`
-3. **加入修復路徑**：shadow 為 unavailable 時，於後續 reassess 嘗試以歷史價回填
-   （它不是 point-in-time 敏感資料）
+2. **加一條 fallback，而不是改成完全獨立抓價。** 沿用 `snapshot.market` 有其價值——
+   它保證 shadow 與 decision 看到**同一個價格**；改成獨立抓取會讓兩者可能不一致，
+   反而更難稽核。正確做法是：`snapshot.market` 可用時照舊；不可用時改以**歷史收盤
+   回填**（shadow 是某個已知日期的價格，不是 point-in-time 敏感資料，回填不損稽核性）。
+3. **失敗時保留 `failure_class`**，不要讓 `market_timestamp_future`、
+   `market_unavailable`、`market_missing` 全部塌成同一個 `unavailable`——上表能區分出
+   四種成因，正是因為 decision 那側保留了 blocker，而 shadow 這側沒有。
+4. **加入修復路徑**：shadow 為 unavailable 時，於後續 reassess 嘗試回填。
 
 **理由是它比 paper 便宜且更早見效：** 不需要 coverage、不需要五軸、不需要 disproof，
 訊號進來記一個價即可；且既有 cohort 可立即回填，不必等三個月累積樣本。
