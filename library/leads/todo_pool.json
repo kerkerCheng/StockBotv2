@@ -1606,6 +1606,18 @@
       "source": "research_action",
       "title": "FCC 2026-07-28 將外國製先進機器人納入 Covered List",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-08-08T05:18:54.542554+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 106,
+      "reason": null,
+      "ref_id": "dc_317c2897cdcffda26c2c2e0e79074670",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:agility_robotics",
+      "type": "decision_review"
     }
   ],
   "log": [
@@ -3443,6 +3455,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 106,
+  "next_n": 107,
   "schema_version": "1"
 }
