@@ -618,7 +618,7 @@ def _lead_context_for_action(
         # receipt 對這類 RA 不存在，不能當成缺漏；action digest 已在呼叫端驗過。
         declared = _declared_focus_for_action(action_id)
         if declared:
-            return {"company_id": declared}
+            return {"company_id": declared, "title": ""}
         raise TodoError(
             f"找不到綁定 {action_id} 的 lead receipt，且該 RA 未自報 focus_company_id"
         )
@@ -635,7 +635,13 @@ def _lead_context_for_action(
     } - {""}
     if len(companies) != 1:
         raise TodoError("applied lead 必須留下唯一 focus_company_id")
-    return {"company_id": companies.pop()}
+    # lead title 是入圖當下對「這是什麼」最接近的一句話；帶下去當 atomic_claim，
+    # 讓 cohort 自己記得住當初的判斷，而不必事後翻 intake 報告反推。
+    titles = [str(lead.get("title") or "").strip() for lead in matches]
+    return {
+        "company_id": companies.pop(),
+        "title": next((title for title in titles if title), ""),
+    }
 
 
 def complete_engine_c_observation(
@@ -713,7 +719,7 @@ def complete_thesis_mutation(
 
 
 def _ensure_shadow_for_completion(
-    *, company_id: str, ticker: str | None, as_of: str
+    *, company_id: str, ticker: str | None, as_of: str, thesis: str | None = None
 ) -> dict[str, Any]:
     from decision_lab.bootstrap import open_default_store
     from decision_lab.workflow import ensure_shadow_for_company
@@ -729,6 +735,7 @@ def _ensure_shadow_for_completion(
             company_id=company_id,
             ticker=ticker,
             as_of=as_of,
+            thesis=thesis,
         )
     finally:
         try:
@@ -799,6 +806,7 @@ def complete_ra_admission(
         company_id=target_company,
         ticker=ticker,
         as_of=stamp,
+        thesis=lead_context.get("title"),
     )
     cohort_id = str(handoff.get("cohort_id") or "")
     if not cohort_id.startswith("dc_"):

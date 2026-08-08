@@ -515,6 +515,7 @@ def ensure_shadow_for_company(
     company_id: str,
     ticker: str | None = None,
     as_of: str | None = None,
+    thesis: str | None = None,
 ) -> dict[str, Any]:
     """入圖後自動追蹤（plan R13）：若該公司尚無 active cohort，用 research intent
     建立零資本 Shadow Observation；已有 probe 則回既有、改走 evidence-delta。
@@ -532,6 +533,11 @@ def ensure_shadow_for_company(
         provider,
         EvaluationRequest(
             raw_signal=f"入圖後自動追蹤 {company_id}",
+            # atomic_claim 是「當初我們認為這件事是什麼」的唯一可回溯紀錄。
+            # 先前這條路徑不帶 thesis，於是 10/10 個 cohort 的 claim 都是空的——
+            # 事後想問「7/28 那天我們的判斷是什麼」只能去翻 intake 報告反推。
+            # 而 dedupe_key 含 atomic_claim，空 claim 一旦建立就永久補不回來。
+            thesis=(thesis or "").strip() or None,
             ticker_hint=ticker,
             company_id_hint=company_id,
             execution_intent="research",

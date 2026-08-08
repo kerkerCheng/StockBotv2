@@ -717,7 +717,10 @@ def test_complete_ra_validates_authorities_hands_off_and_resolves(monkeypatch) -
     monkeypatch.setattr(
         todo,
         "_lead_context_for_action",
-        lambda action_id, action_digest, leads_path: {"company_id": "co:axt"},
+        lambda action_id, action_digest, leads_path: {
+            "company_id": "co:axt",
+            "title": "AXT／Casela 2027 InP 長約",
+        },
     )
     shadow_calls = []
 
@@ -745,6 +748,8 @@ def test_complete_ra_validates_authorities_hands_off_and_resolves(monkeypatch) -
         "company_id": "co:axt",
         "ticker": "AXTI",
         "as_of": "2026-07-29T00:00:00+00:00",
+        # lead title 必須傳到 Decision handoff：它會成為 cohort 的 atomic_claim。
+        "thesis": "AXT／Casela 2027 InP 長約",
     }]
     assert pool["log"][-1]["receipt"] == result["receipt"]
 
@@ -769,7 +774,9 @@ def test_ra_lead_context_requires_matching_digest(tmp_path) -> None:
 
     assert todo._lead_context_for_action(
         "ra_abc", action_digest="a" * 64, leads_path=path
-    ) == {"company_id": "co:axt"}
+    # title 一併回傳：它會成為 cohort 的 atomic_claim，讓「當初我們認為這是什麼」
+    # 有可回溯紀錄（先前 10/10 個 cohort 的 claim 都是空的）。
+    ) == {"company_id": "co:axt", "title": ""}
     with pytest.raises(todo.TodoError, match="action_digest"):
         todo._lead_context_for_action(
             "ra_abc", action_digest="b" * 64, leads_path=path
