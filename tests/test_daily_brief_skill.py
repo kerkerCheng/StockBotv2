@@ -102,10 +102,10 @@ def test_access_blocked_is_retried_and_never_presented_as_no_result() -> None:
     assert "harvest-health" in text
     assert "failure_class" in text
     assert "access_blocked" in text
-    assert "首次呼叫就直接使用" in text
-    assert "`require_escalated`" in text
-    assert "窄 prefix rule" in text
-    assert "不得先在 sandbox 製造可預期的失敗再重跑" in text
+    assert "`stockbot-daily` permission profile" in text
+    assert "第一次呼叫就可達" in text
+    assert "不先跑一個注定斷網的 sandbox probe" in text
+    assert "exact outside-sandbox prefix rule" in text
     assert "把整個 PowerShell、Python 或 working tree 設成 unrestricted" in text
     assert "同一來源後續成功才標 recovered" in text
     assert "不得改寫成「零筆」或 `no_result`" in text

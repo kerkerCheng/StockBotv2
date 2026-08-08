@@ -17,11 +17,14 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
 1. 先讀 `AGENTS.md` 與 `skills/daily-brief/SKILL.md`。確認目前 branch 是 `master`；若不是就停止並回報，不自行切 branch。若 working tree 有與本 routine
    無關的使用者變更，保留不碰。
 2. Windows 一律使用專案 interpreter：`.venv\Scripts\python.exe`，不得用 bare `python`。
-   Codex scheduled run 對已知會連外或寫 Git 的 fixed entry，首次呼叫就直接使用 `require_escalated`，並只
-   申請／使用該支命令的窄 prefix rule；不得先在 sandbox 製造可預期失敗再重試，也不得把整個 PowerShell、
-   Python 或 working tree 設為 unrestricted。fixed entry 是 `crons\harvest_leads.py`、
+   Codex scheduled run 的 primary path 是 project `.codex/config.toml` 內的 `stockbot-daily` permission
+   profile；固定 authority／publisher 網域必須在 sandbox 第一次呼叫就可達，不得先製造可預期失敗再重試。
+   `.env` 只讀、網域不得用 `*`，也不得把整個 PowerShell、Python 或 working tree 設為 unrestricted。
+   fixed entry 是 `crons\harvest_leads.py`、
    `engine_c\etl_yfinance.py`、`scripts\daily_beta_snapshot.py`、`decision_lab today`、
    `engine_b.todo sync`、`scripts\publish_daily_state.py`、`scripts\publish_daily_brief.py`。
+   `publish_daily_state.py` 需要寫 `.git`，首次呼叫直接使用 exact outside-sandbox prefix rule；若命令開始前
+   已明示 profile 未載入，其他 fixed entry 也直接使用各自 exact prefix rule，不先跑斷網 probe。
    `harvest-health`、queue list／count、JSON 檢查等純本機唯讀命令維持 sandbox。
 3. 依序執行：
    - `.venv\Scripts\python.exe crons\harvest_leads.py`（X＋EDGAR；以 `since_id`／URL hash 去重）

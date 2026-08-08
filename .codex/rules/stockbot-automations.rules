@@ -1,4 +1,5 @@
-# 本機 scheduled task 只放行三支固定入口；不放行任意 Python、shell 或 Git。
+# Permission profile 是 primary path；本檔只在 profile 未載入時，讓 exact fixed entry
+# 能首次直接在 sandbox 外執行，不放行任意 Python、shell 或 Git。
 prefix_rule(
     pattern=[".venv\\Scripts\\python.exe", "crons\\harvest_leads.py"],
     decision="allow",
@@ -21,4 +22,22 @@ prefix_rule(
     pattern=[".venv\\Scripts\\python.exe", "scripts\\publish_daily_state.py"],
     decision="allow",
     justification="固定 publisher 只提交兩個 daily state files 並推送 master。",
+)
+
+prefix_rule(
+    pattern=[".venv\\Scripts\\python.exe", "-m", "decision_lab", "today"],
+    decision="allow",
+    justification="Daily decision brief 只讀 Google Sheet、Neo4j 與 private Decision authorities。",
+)
+
+prefix_rule(
+    pattern=[".venv\\Scripts\\python.exe", "-m", "engine_b.todo", "sync"],
+    decision="allow",
+    justification="Daily todo sync 只同步本機 approval authorities 到 stable todo pool。",
+)
+
+prefix_rule(
+    pattern=[".venv\\Scripts\\python.exe", "scripts\\publish_daily_brief.py"],
+    decision="allow",
+    justification="Discord publisher 只把 canonical Daily Brief 送到既有 private Forum webhook。",
 )

@@ -136,6 +136,45 @@ def test_failed_part_is_retried_and_later_call_resumes_sent_parts(tmp_path: Path
     assert transport.calls[3][3] == "thread-1"
 
 
+def test_preserves_safe_discord_error_code_in_receipt(tmp_path: Path) -> None:
+    class BlockedDiscordTransport:
+        def send(self, *_args, **_kwargs) -> TransportSendResult:
+            raise RuntimeError("discord_transport_URLError")
+
+    settings = _settings(max_attempts=1)
+    publisher = NotificationPublisher(
+        repo_root=tmp_path,
+        settings=settings,
+        transport=BlockedDiscordTransport(),
+    )
+    try:
+        result = publisher.publish(_envelope(settings))
+    finally:
+        publisher.close()
+
+    assert result.status == "delivery_failed"
+    assert result.error_code == "discord_transport_URLError"
+
+
+def test_does_not_persist_arbitrary_transport_exception_text(tmp_path: Path) -> None:
+    class UnsafeTransport:
+        def send(self, *_args, **_kwargs) -> TransportSendResult:
+            raise RuntimeError("request failed with secret-bearing URL")
+
+    settings = _settings(max_attempts=1)
+    publisher = NotificationPublisher(
+        repo_root=tmp_path,
+        settings=settings,
+        transport=UnsafeTransport(),
+    )
+    try:
+        result = publisher.publish(_envelope(settings))
+    finally:
+        publisher.close()
+
+    assert result.error_code == "transport_RuntimeError"
+
+
 def test_discord_forum_transport_creates_then_targets_thread(monkeypatch) -> None:
     class FakeResponse:
         status = 200

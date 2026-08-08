@@ -35,6 +35,9 @@ _PART_BUDGET = 1_850
 _DISCORD_HOSTS = frozenset({"discord.com", "discordapp.com"})
 _USER_ID_RE = re.compile(r"^[0-9]{2,32}$")
 _DAILY_BRIEF_TITLE_RE = re.compile(r"^#\s+(Daily Brief\s+.+?)\s*$", re.MULTILINE)
+_DISCORD_ERROR_CODE_RE = re.compile(
+    r"^discord_(?:http_[0-9]{3}|transport_[A-Za-z0-9_]+|thread_id_missing)$"
+)
 
 
 def _now() -> str:
@@ -213,6 +216,15 @@ class TransportSendResult:
 
     message_id: str | None = None
     thread_id: str | None = None
+
+
+def _transport_error_code(exc: Exception) -> str:
+    """保留安全、可分類的 Discord error code，不把例外訊息或 webhook 洩漏到 receipt。"""
+
+    code = str(exc)
+    if _DISCORD_ERROR_CODE_RE.fullmatch(code):
+        return code
+    return f"transport_{type(exc).__name__}"
 
 
 class DiscordWebhookTransport:
@@ -650,7 +662,7 @@ class NotificationPublisher:
                             thread_id=thread_id,
                         )
                 except Exception as exc:
-                    last_error = f"transport_{type(exc).__name__}"
+                    last_error = _transport_error_code(exc)
                     self._record_attempt(
                         delivery_key=envelope.delivery_key,
                         part_index=index,

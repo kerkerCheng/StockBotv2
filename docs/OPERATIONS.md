@@ -158,6 +158,8 @@ Sheet adapter 的標準輸出是 `ticker`、`shares`、`currency`、`market_valu
 
 Price／FX 預設 yfinance（無 API key）。非同幣 FX 缺失或方向不符一律 fail closed。
 
+Codex 本機排程的 primary path 是專案級 `.codex/config.toml` 中的 `stockbot-daily` permission profile：只開放 Daily Brief 實際需要的固定網域，並只讀 `.env`；不使用 `*`、unrestricted shell 或全域 filesystem 權限。`.codex/rules/stockbot-automations.rules` 只保留固定命令的 outside-sandbox fallback，其中 state publisher 因需寫 `.git`，仍應在第一次呼叫就走 exact rule，不擴張整個 profile 的 Git 權限。修改 profile／rules 後須重啟 Codex，讓下一個 task／排程載入新設定。
+
 Daily Brief 通知由 `.venv\Scripts\python.exe scripts\publish_daily_brief.py --brief-file <private-brief.md> --summary "..."` 發送；
 Codex 與本機 Claude Code 共用同一支 publisher。它只接受 stdin／私有 brief 檔，不提供 Discord inbound
 command surface。Forum publisher 每日建立一個討論串，`library/private/notifications/outbox.db` 保存 digest/channel 去重、thread ID 與 delivery receipt；
@@ -180,7 +182,7 @@ brief 不可直接用 `Get-Content | --stdin` 管線傳送；`--brief-file` 會�
 
 **Daily 分頁與成本上限：** `max_results` 是 page size（預設 25），`max_posts_per_run` 是單輪成本硬上限（預設 200）。超過單輪上限時保存 `x_pagination_*` checkpoint，下次 scheduled run 從相同 frozen `since_id`＋pagination token 續抓；最後一頁完成前不推進 durable `since_id`，避免長時間未跑後永久漏掉中間批次。
 
-**來源存取防漏：** harvest 失敗保存 bounded `failure_class`。疑似 sandbox／proxy／網路權限造成的 `access_blocked` **必須原命令權限重跑一次**；仍失敗再走 `$source-trace` 官方替代路徑。`blocked` 永遠不等於「零筆新資料」或 `no_result`，後續同來源成功才算 recovered。
+**來源存取防漏：** harvest 失敗保存 bounded `failure_class`。正常路徑由 `stockbot-daily` profile 讓原命令第一次呼叫即可存取固定來源；若呼叫前已知 profile 未載入，第一次就使用對應 exact rule，不先做一個注定失敗的 sandbox probe。非預期的 sandbox／proxy／網路權限 `access_blocked` 仍以 exact rule 重跑一次作安全網；仍失敗再走 `$source-trace` 官方替代路徑。`blocked` 永遠不等於「零筆新資料」或 `no_result`，後續同來源成功才算 recovered。
 
 ---
 

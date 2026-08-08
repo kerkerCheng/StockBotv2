@@ -55,13 +55,17 @@ credit 不進 NAV／cash／allocation。technical／capital telemetry 不進 pq1
 自有現金 baseline 每 5 個完整交易日固定主動提醒一次，週期由 Engine C 全部 distinct observed sessions
 定錨，不綁 RSI／MACD／tier；資料不足仍歸零。貸款不在例行提醒內，提款時間表留待另案人工核准。
 **解析失敗 ≠ 無新文**。每筆失敗必須保存 `failure_class`；最新一次仍失敗的來源由
-`harvest-health` 持續顯示。Codex scheduled run 對已知會連外或寫 Git 的固定入口，**首次呼叫就直接使用
-`require_escalated`，並只搭配該支命令的窄 prefix rule**；不得先在 sandbox 製造可預期的失敗再重跑，也不得
-把整個 PowerShell、Python 或 working tree 設成 unrestricted。這組 fixed entry 包含
+`harvest-health` 持續顯示。Codex scheduled run 的 primary path 是 project
+`.codex/config.toml` 內的 `stockbot-daily` permission profile：已知 authority／publisher 網域必須在
+sandbox **第一次呼叫就可達**，不得先製造可預期的 `access_blocked` 再事後補跑；`.env` 在 profile 中只讀，
+網域不使用 `*`，也不把整個 PowerShell、Python 或 working tree 設成 unrestricted。這組 fixed entry 包含
 `crons\harvest_leads.py`、`engine_c\etl_yfinance.py`、`scripts\daily_beta_snapshot.py`、
 `decision_lab today`、`engine_b.todo sync`、`scripts\publish_daily_state.py` 與
-`scripts\publish_daily_brief.py`；`harvest-health`、queue list／count、JSON 檢查等純本機唯讀命令仍留在
-sandbox。只有執行端無法預先套用窄權限，或遇到未預期的 sandbox／proxy／本機網路權限阻擋時，才把
+`scripts\publish_daily_brief.py`。`publish_daily_state.py` 需要寫 `.git`，不擴張 profile 的 filesystem
+權限；首次呼叫就使用其 exact outside-sandbox prefix rule。若執行端在命令開始前已明示 profile 未載入，
+其他 fixed entry 也直接使用各自 exact prefix rule，不先跑一個注定斷網的 sandbox probe。
+`harvest-health`、queue list／count、JSON 檢查等純本機唯讀命令維持 sandbox。只有遇到未預期的
+sandbox／proxy／本機網路權限阻擋時，才把
 **原命令本身**在允許本機網路的權限下重跑一次；第一次記 `access_blocked`，只有
 同一來源後續成功才標 recovered，重跑仍失敗不得改寫成「零筆」或 `no_result`。**重跑對象必須是實際
 失敗的那一支腳本，不能用下游／後續腳本頂替**——
