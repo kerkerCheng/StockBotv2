@@ -1,0 +1,61 @@
+{
+  "claims": [
+    {
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Revise if the FCC removes or amends this Covered List category, grants a relevant Conditional Approval, or changes the equipment-authorization consequences.",
+      "id": "fcc_da_26_786_advanced_robotic_devices_2026_07_28_cl1",
+      "source_ids": [
+        "fcc_da_26_786_advanced_robotic_devices_2026_07_28_s1",
+        "fcc_da_26_786_advanced_robotic_devices_2026_07_28_s2"
+      ],
+      "statement": "On 2026-07-28, the FCC added foreign-produced advanced robotic devices to the Covered List, except devices granted a Department of War Conditional Approval; covered equipment cannot receive new FCC equipment authorizations.",
+      "subject_id": "tech:advanced_robotic_devices"
+    }
+  ],
+  "edges": [],
+  "nodes": [
+    {
+      "abstraction_level": "robot_system",
+      "aliases": [
+        "advanced robotic devices"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:advanced_robotic_devices",
+      "name": "Advanced robotic devices",
+      "role": null,
+      "source_ids": [
+        "fcc_da_26_786_advanced_robotic_devices_2026_07_28_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "fcc_da_26_786_advanced_robotic_devices_2026_07_28",
+    "evidence_tier": 1,
+    "origin_entity": "Federal Communications Commission",
+    "permission_basis": "美國聯邦政府 FCC 官方 Public Notice；依 17 U.S.C. §105 為 public domain，本 action 僅保存核對所需的有限節錄。",
+    "published_at": "2026-07-28",
+    "publisher": "Federal Communications Commission, Public Safety and Homeland Security Bureau",
+    "retrieved_at": "2026-08-08T06:52:05+08:00",
+    "section": "advanced_robotic_devices",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "FCC Public Notice DA 26-786 — Foreign-Produced Advanced Robotic Devices Added to Covered List",
+    "url": "https://docs.fcc.gov/public/attachments/DA-26-786A1.txt"
+  },
+  "sources": [
+    {
+      "id": "fcc_da_26_786_advanced_robotic_devices_2026_07_28_s1",
+      "locator": "Public Notice DA 26-786, p.2, Covered List update",
+      "quote": "Foreign-produced advanced robotic devices, except advanced robotic devices which have been granted a Conditional Approval by DoW."
+    },
+    {
+      "id": "fcc_da_26_786_advanced_robotic_devices_2026_07_28_s2",
+      "locator": "Public Notice DA 26-786, p.2, Equipment Authorization Impacts",
+      "quote": "Under the Commission's existing rules in section 2.903(a), once added to the Covered List, covered equipment is prohibited from receiving equipment authorizations."
+    }
+  ]
+}
