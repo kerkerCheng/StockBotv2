@@ -54,9 +54,16 @@ def test_market_anomalies_are_quarantined(overrides, blocker) -> None:
 
 
 def test_market_and_fx_staleness_use_observation_time_not_fetch_time() -> None:
+    """剛抓到不等於新鮮：判準是觀測時刻，不是抓取時刻。
+
+    行情的單位是**交易日**而非小時（日線 bar 的 as_of 是交易日午夜卻代表當天
+    收盤，用小時會多算約 20 小時假過期）。因此 as_of 取 07-14，距 07-21 有
+    五個交易日，穩定落在 `market_freshness_sessions` 之外；FX 仍以小時計。
+    """
+
     market = normalize_market_snapshot(
         _market(
-            as_of="2026-07-18T00:00:00+00:00",
+            as_of="2026-07-14T00:00:00+00:00",
             fetched_at="2026-07-21T11:59:00+00:00",
         ),
         expected_ticker="SIVE.ST",

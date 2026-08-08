@@ -455,7 +455,7 @@ def evaluate_signal(
         freshness_policy={
             name: policy["probe_lane"][name]
             for name in (
-                "market_freshness_hours",
+                "market_freshness_sessions",
                 "fx_freshness_hours",
                 "holdings_freshness_days",
                 "financial_freshness_days",

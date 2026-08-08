@@ -69,7 +69,12 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
    `drain` 本身只列 bounded jobs，不執行研究；brief 必須分開寫出本輪已研究、因 cap／同分 tie-break 延後、
    以及尚未 harvest／triage 的 lead，並在延後項目附 score、排序理由與 `first_seen`，不可只說「沒看到」。
    Decision work order 必須 checkpoint researching；若純唯讀研究即可補齊，產 assessment 後才跑
-   research-intent reassess，並以新 decision receipt 結案。若需入圖、Engine C manual observation、thesis
+   `--intent paper` reassess，並以新 decision receipt 結案。paper 是模擬帳本（不碰真錢、不寫 Sheet、
+   不建 live permission）；`research` intent 從不 request paper lane，用它等於讓 paper ledger 永遠是空的，
+   而空帳本無法回答「系統準不準」。只有標的正處於使用者設定的 hold 期間才改回 `--intent research`。
+   `--disproof` 必填且必須可觀測、有門檻、有日期（L7 另需核查頻率與觸發後 48h 動作）；它由 agent 起草，
+   但必須隨 packet 進 pq2 由使用者確認，不得自我核准。`--expiry` 由催化劑的預期時點決定（催化劑日 ＋1～2 週），
+   **不得早於催化劑本身**。若需入圖、Engine C manual observation、thesis
    revise／retire 或其他 authority mutation，先 checkpoint awaiting_approval，完整 packet 回 pq2；不得拿舊
    assessment bare reassess。
 6. Graph admission、thesis retire／revise、Google Sheet 真實持倉值、`record-choice`／`record-fill` 永遠

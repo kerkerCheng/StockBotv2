@@ -186,11 +186,13 @@ pq1。使用者對 action ID 明確回覆 `go` 後，另一個執行步驟才可
 assessment JSON；skill 只判斷 level／reason／missing data，不計算 Confidence ceiling 或部位。接著執行：
 
 ```powershell
-python -m decision_lab reassess <decision_id> --assessment <assessment.json> --intent research --format markdown
+python -m decision_lab reassess <decision_id> --assessment <assessment.json> --intent paper --format markdown
 ```
 
-只有使用者明確要求 paper 或評估 live 時，才把 `--intent` 改為 `paper`／`live`；live 另需當次
-`--confirm-holdings`。Workflow 會重讀 authorities、freeze 新 context、驗 refs、跑既有 Coverage／sizing，
+`paper` 是預設（2026-08-08 定案）：它是模擬帳本，不碰真錢、不寫 Google Sheet、不建 live
+permission。先前預設 `research` 的後果是 paper lane 從不被 request，帳本永遠是空的，因而
+無法回答「系統的判斷準不準」。只有標的正處於使用者設定的 hold 期間才用 `--intent research`；
+評估 live 時改 `--intent live`，另需當次 `--confirm-holdings`。Workflow 會重讀 authorities、freeze 新 context、驗 refs、跑既有 Coverage／sizing，
 舊 decision 不會被修改。缺圖、COHR `manual_required`、price／FX／Sheet 缺口都照 Card blocker 處理，
 不得在 skill 內補零值、替代 ref 或自行提高 evidence tier。
 

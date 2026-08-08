@@ -23,7 +23,7 @@
       "corroborated": 0.005
     },
     "live_adv_fraction_cap": 0.01,
-    "market_freshness_hours": 36,
+    "market_freshness_sessions": 2,
     "fx_freshness_hours": 36,
     "holdings_freshness_days": 7,
     "financial_freshness_days": 14,

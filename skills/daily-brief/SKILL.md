@@ -133,13 +133,42 @@ assessment bare reassess**：
 & '.venv\Scripts\python.exe' -m engine_b.todo work <todo_n> --to researching --receipt <研究起始ref>
 ```
 
-若只需讀既有 authorities／生成五軸 assessment，可完成研究後執行 research-intent `reassess`，再用新
+若只需讀既有 authorities／生成五軸 assessment，可完成研究後執行 `reassess`，再用新
 decision receipt 結案：
 
 ```powershell
-& '.venv\Scripts\python.exe' -m decision_lab reassess <baseline_decision_id> --assessment <assessment.json> --catalyst "<可驗證催化劑>" --disproof "<可證偽條件>" --expiry <ISO-8601> --intent research
+& '.venv\Scripts\python.exe' -m decision_lab reassess <baseline_decision_id> --assessment <assessment.json> --catalyst "<可驗證催化劑>" --disproof "<可證偽條件>" --expiry <ISO-8601> --intent paper
 & '.venv\Scripts\python.exe' -m engine_b.todo work <todo_n> --to completed --receipt decision:<new_decision_id>
 ```
+
+**`--intent paper` 是預設（2026-08-08 使用者定案）。** paper 是模擬帳本：不碰真錢、不寫
+Google Sheet、不建立 live permission，live 仍 100% 人工。改用 paper intent 的理由是
+`research` intent **從不 request paper lane**，於是連 coverage 全乾淨的標的也永遠 range 0——
+實測 9 個 cohort 全是 research intent，paper ledger 從未被寫過。而一個從不被寫入的模擬帳本
+是純成本、零效益：它讓「系統的判斷準不準」永遠無法用證據回答，也就無從決定系統該留該砍。
+
+只有在**明確不想留下模擬部位**時才用 `--intent research`（例如 thesis 正處於使用者設定的
+hold 期間）。
+
+**`--disproof` 是必填，不是選填。** 它只是一句話、不依賴任何外部證據，卻是系統第一大
+blocker（實測 9 個 cohort 有 4 個卡在 `disproof_missing`）。研究迴圈產 packet、產 work order，
+就是不產那句話——這是產出規格缺一欄，不是證據不足。合格的證偽條件必須**可觀測、有門檻、
+有日期**，並依 L7 附上核查頻率與觸發後 48 小時動作：
+
+- ✅「到 2027-06-30，IQE 的 photonics／InP 相關營收未出現連續兩季 YoY 成長 ≥20%」
+- ✅「Tower 或任何主要客戶公開宣布第二家合格 InP epiwafer 供應商」
+- ❌「thesis 被證明是錯的」（循環，不可觀測）
+- ❌「股價下跌 30%」（那是價格，不是 thesis 的證據；thesis 可以對而股價先跌）
+- ❌「競爭加劇」（沒有門檻，永遠無法判定觸發）
+
+證偽條件由 agent 起草，但**必須隨 packet 進 pq2 由使用者確認**：讓「想證明 thesis 成立」的
+同一個 agent 自己決定自己的證偽門檻，是 L8 形狀的自我報告偏誤，會寫出一個永遠不會響的警報。
+
+**`--expiry` 必須由催化劑的預期時點決定，不是固定期間。** `catalyst / disproof / expiry` 是
+一組：「我預期 X 在 T 之前發生；沒發生就代表時序假設錯了。」硬規則是 **expiry 不得早於
+催化劑的預期時點**——實測 co:axt 的 expiry 是 2026-08-09 而催化劑是 2026-11 初的 Q3 10-Q，
+催化劑根本不可能在有效期內發生，這種設定保證產生一次假到期。催化劑有明確日期時取
+「該日 ＋1～2 週緩衝」；沒有明確日期時取「下一個可能揭露的時點」，通常是下一次財報。
 
 若結果需要 Engine A 入圖、Engine C manual observation、thesis revise／retire 或其他 authority mutation，
 先 checkpoint `awaiting_approval` 並把完整 packet 放回 pq2；人工 gate 完成且取得 receipt 後才 reassess。

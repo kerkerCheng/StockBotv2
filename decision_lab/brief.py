@@ -81,8 +81,17 @@ def _decision_item(
         "supported_sizing_range": (card.get("live") or {}).get(
             "supported_range", [0.0, 0.0]
         ),
-        # Shadow-first：自追蹤（凍結決策時＝Shadow inception）到現在的價格變化。
-        "performance_since_tracked": current_authority.get("security_return"),
+        # 兩個時刻不是同一件事，先前把它們寫成同一個欄位，等於把最重要的那段藏起來。
+        #
+        # `performance_since_tracked` 錨在 **Shadow inception**——訊號第一次進來的
+        # 那一刻。它衡量的是**資訊價值**：從我們知道這件事開始，股價走了多少。
+        # `performance_since_decision` 錨在決策凍結時，衡量決策之後的表現。
+        #
+        # 兩者之間就是「從看到到研究完」的區間，也正是 gate 代價的所在：co:axt 的
+        # Shadow 錨在 2026-07-28（42.76），決策要到 08-06 才凍（行情 08-05、68.61）——
+        # 中間 9 天、78 個百分點，只看 since_decision 完全看不到。
+        "performance_since_tracked": current_authority.get("shadow_return"),
+        "performance_since_decision": current_authority.get("security_return"),
         "evidence_delta": evidence_delta,
         "blockers": blockers,
         "next_review_at": lifecycle.get("review_due_at"),
@@ -183,6 +192,19 @@ def _current_authority_context(
     security_return = _ratio(
         current_market.get("price"), (frozen.get("market") or {}).get("price")
     )
+    # Shadow 錨點是訊號第一次進來時的價格，與決策凍結時的價格是兩個不同的時刻。
+    # 幣別必須一致才可比——Shadow 存的是結算幣別，current_market 亦然。
+    try:
+        shadow = store.get_shadow(cohort_id)
+    except KeyError:
+        shadow = None
+    shadow_return = None
+    if (
+        shadow is not None
+        and shadow.status == "observed"
+        and shadow.currency == current_market.get("currency")
+    ):
+        shadow_return = _ratio(current_market.get("price"), shadow.price)
     fx_return = _ratio(
         current_fx.get("rate"), (frozen.get("fx") or {}).get("rate")
     )
@@ -197,6 +219,7 @@ def _current_authority_context(
         evidence_delta = "none"
     change = {
         "security_return": security_return,
+        "shadow_return": shadow_return,
         "benchmark_return": None,
         "evidence_delta": evidence_delta,
         "disproof_triggered": False,
@@ -206,6 +229,7 @@ def _current_authority_context(
         {
             "blockers": sorted(set(blockers)),
             "security_return": security_return,
+            "shadow_return": shadow_return,
             "fx_return": fx_return,
             "evidence_delta": evidence_delta,
         },
@@ -536,8 +560,12 @@ def render_today_markdown(brief: Mapping[str, Any]) -> str:
             company = markdown_text(label)
             action = markdown_text(item.get("recommended_action") or "")
             perf = _pct(item.get("performance_since_tracked"))
+            since_decision = _pct(item.get("performance_since_decision"))
             delta = markdown_text(item.get("evidence_delta") or "none")
-            lines.append(f"- [{idx}] {action} — {company}｜自追蹤 {perf}｜證據 {delta}")
+            lines.append(
+                f"- [{idx}] {action} — {company}｜自追蹤 {perf}"
+                f"（決策後 {since_decision}）｜證據 {delta}"
+            )
             resp = markdown_text(item.get("user_response_needed") or "")
             if resp:
                 lines.append(f"      → {resp}")

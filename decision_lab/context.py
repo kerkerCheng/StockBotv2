@@ -476,7 +476,7 @@ def build_context_bundle(
     ):
         _reject_secrets(value)
     freshness = {
-        "market_freshness_hours": 36.0,
+        "market_freshness_sessions": 2.0,
         "fx_freshness_hours": 36.0,
         "holdings_freshness_days": 7.0,
         "financial_freshness_days": 14.0,
@@ -550,7 +550,7 @@ def build_context_bundle(
         expected_ticker=str(research_ticker or ""),
         expected_currency=expected_currency,
         evaluation_at=evaluation_at,
-        max_age_hours=freshness["market_freshness_hours"],
+        max_age_sessions=freshness["market_freshness_sessions"],
     )
     expected_pair = f"{expected_currency}/USD"
     normalized_fx = normalize_fx_snapshot(
@@ -588,7 +588,7 @@ def build_context_bundle(
             expected_ticker=str(execution_symbol or ""),
             expected_currency=execution_currency,
             evaluation_at=evaluation_at,
-            max_age_hours=freshness["market_freshness_hours"],
+            max_age_sessions=freshness["market_freshness_sessions"],
         )
         normalized_execution_market["blockers"] = [
             blocker.replace("market_", "execution_market_", 1)

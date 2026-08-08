@@ -6,6 +6,7 @@ import re
 from datetime import datetime, timedelta, timezone
 from typing import Any, Mapping, Sequence
 
+from .adapters.market import sessions_between
 from .blocker_severity import fatal_blockers
 from .redaction import sensitive_payload_path
 from .store import DecisionStore
@@ -108,11 +109,19 @@ def _runtime_freshness(
 ) -> tuple[dict[str, Any], tuple[str, ...], tuple[str, ...]]:
     now = _time(as_of, "as_of")
     policy = context.get("freshness_policy") or {}
+    # 行情用「交易日」而不是「小時」量測。日線 bar 的 as_of 是交易日**當地午夜**，
+    # 但它代表的是當天收盤（美股約 20:00 UTC）；拿它當觀測時刻做小時級減法，等於
+    # 憑空多算約 20 小時的假過期。實測 co:axt 的決策凍結於 2026-08-06 12:41Z、
+    # 凍入 08-05 的 bar，36 小時上限在 12:00Z 就到期——**決策在出生當下即已 stale**，
+    # 三筆候選 cohort 同時中招。這會讓每份 brief 都在喊 refresh，而 refresh 完仍是紅的。
+    #
+    # FX 與 financial 維持原本的時間單位：前者是連續報價、後者跟的是財報週期，
+    # 兩者都不是「以交易日為心跳」的資料。
     specs = {
-        "market": ("market_freshness_hours", "hours", "paper"),
+        "market": ("market_freshness_sessions", "sessions", "paper"),
         "fx": ("fx_freshness_hours", "hours", "paper"),
         "financial": ("financial_freshness_days", "days", "paper"),
-        "execution_market": ("market_freshness_hours", "hours", "live"),
+        "execution_market": ("market_freshness_sessions", "sessions", "live"),
         "execution_fx": ("fx_freshness_hours", "hours", "live"),
         "holdings": ("holdings_freshness_days", "days", "live"),
     }
@@ -133,8 +142,18 @@ def _runtime_freshness(
             f"{section}.as_of",
         )
         amount = _finite(policy.get(policy_key))
+        if amount is None and unit == "sessions":
+            # 舊 decision 凍的是改制前的 market_freshness_hours。凍結決策必須用它
+            # **自己當時的 policy** 評估——那正是 policy_version 被凍進 context 的
+            # 意義；若因為找不到新 key 就一律判 stale，等於用今天的規則追溯懲罰
+            # 昨天的決策，而且會讓每份 brief 都在喊 refresh。
+            legacy = _finite(policy.get("market_freshness_hours"))
+            if legacy is not None and legacy > 0:
+                amount, unit = legacy, "hours"
         if amount is None or amount <= 0 or source_time > now:
             stale = True
+        elif unit == "sessions":
+            stale = sessions_between(source_time, now) > amount
         else:
             limit = timedelta(**{unit: amount})
             stale = now - source_time > limit

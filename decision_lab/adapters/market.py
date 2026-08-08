@@ -7,6 +7,33 @@ from datetime import datetime, timedelta
 from typing import Any, Mapping
 
 
+def sessions_between(earlier: datetime, later: datetime) -> int:
+    """兩個時刻之間隔了幾個交易日（以工作日近似）。
+
+    行情鮮度必須用交易日量測，不能用小時。日線 bar 的 ``as_of`` 是交易日**當地
+    午夜**，代表的卻是當天收盤（美股約 20:00 UTC）；拿它當觀測時刻做小時級減法
+    等於憑空多算約 20 小時的假過期，36 小時上限實際只剩約 16 小時真實鮮度。
+    2026-08-08 實測：三筆 cohort 的決策在**凍結當下即已 stale**，而 stale 會直接
+    封鎖 paper lane——等於資料一進來就被自己的鮮度規則廢掉。
+
+    純計算路徑不去抓「最新完整交易日是哪天」，因此用工作日近似。假日會讓容忍度
+    多出一天（偏寬鬆），但那遠比現況安全：現況是把每一筆行情都判成 stale。
+    真正的交易日 authority 仍在 Engine C 的 TechnicalObservation。
+    """
+
+    start = earlier.date()
+    end = later.date()
+    if end <= start:
+        return 0
+    sessions = 0
+    cursor = start
+    while cursor < end:
+        cursor += timedelta(days=1)
+        if cursor.weekday() < 5:
+            sessions += 1
+    return sessions
+
+
 def _time(value: Any) -> datetime | None:
     if not isinstance(value, str):
         return None
@@ -34,7 +61,7 @@ def normalize_market_snapshot(
     expected_ticker: str,
     expected_currency: str,
     evaluation_at: str,
-    max_age_hours: float = 36,
+    max_age_sessions: float = 2,
 ) -> dict[str, Any]:
     upstream = payload.get("status")
     if upstream in {"missing", "unavailable"}:
@@ -77,7 +104,9 @@ def normalize_market_snapshot(
     if blockers:
         return _quarantined(*blockers)
     assert as_of is not None and evaluation is not None and price is not None
-    status = "stale" if evaluation - as_of > timedelta(hours=max_age_hours) else "available"
+    status = (
+        "stale" if sessions_between(as_of, evaluation) > max_age_sessions else "available"
+    )
     normalized = {
         "status": status,
         "ticker": expected_ticker,

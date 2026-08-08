@@ -1,5 +1,10 @@
 """
-thesis_freshness_check.py — SessionStart hook: 提醒哪些 thesis 距上次核查已超過 90 天。
+thesis_freshness_check.py — SessionStart hook: 提醒哪些 thesis 已超過自己的核查週期。
+
+核查週期跟著各 thesis 的 `check_interval_days`（L7：disproof 條件必附核查頻率），
+不是一個全域天數——Sivers 是 30 天（disproof 是現金 runway，快變數），AXT 是 90 天
+（disproof 是產能擴張／出口許可，慢變數）。`STALE_DAYS` 只是「沒有 lifecycle entry
+的 memo」的預設值。
 
 只讀本機 thesis/*_lane_memo.md，不碰 Neo4j / Engine C（見 U8 修訂設計，
 docs/plans/2026-07-10-006-feat-personal-investment-advisor-roadmap-plan.md）。
@@ -21,6 +26,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 THESIS_DIR = ROOT / "thesis"
+LIFECYCLE = ROOT / "thesis" / "lifecycle.json"
+TODO_POOL = ROOT / "library" / "leads" / "todo_pool.json"
+# 只作為「沒有 lifecycle entry 的 memo」的預設；有 entry 的一律跟 check_interval_days。
 STALE_DAYS = 90
 
 DATE_RE = re.compile(r"生成日期[:：]\s*(\d{4}-\d{2}-\d{2})")
@@ -35,8 +43,35 @@ def _file_date(path: Path) -> date:
     return datetime.fromtimestamp(path.stat().st_mtime).date()
 
 
+def _check_intervals() -> dict[str, int]:
+    """每條 thesis 自己宣告的核查週期；memo 檔的門檻應該跟著它走。
+
+    核查頻率屬於 thesis 的一部分（L7 要求 disproof 條件必附核查頻率）：Sivers 是
+    30 天因為它的 disproof 是現金 runway 這種快變數，AXT 是 90 天因為它的 disproof
+    是產能擴張／出口許可這類慢變數。用一個全域常數去蓋掉這個差異，等於把「什麼時候
+    該重看」從 thesis 的性質改成日曆的性質。
+
+    ``STALE_DAYS`` 只留給**沒有 lifecycle entry 的 memo**當預設值。
+    """
+
+    try:
+        data = json.loads(LIFECYCLE.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+    intervals: dict[str, int] = {}
+    for tid, entry in (data.items() if isinstance(data, dict) else []):
+        if not isinstance(entry, dict):
+            continue
+        raw = entry.get("check_interval_days")
+        if isinstance(raw, bool) or not isinstance(raw, (int, float)):
+            continue
+        if raw > 0:
+            intervals[str(tid)] = int(raw)
+    return intervals
+
+
 def check() -> list[tuple[str, int]]:
-    """回傳 [(company, days_since), ...]，只含超過 STALE_DAYS 的公司。"""
+    """回傳 [(company, days_since), ...]，只含超過該 thesis 自己核查週期的公司。"""
     latest_by_company: dict[str, date] = {}
 
     for path in sorted(THESIS_DIR.glob("*_lane_memo.md")):
@@ -46,18 +81,16 @@ def check() -> list[tuple[str, int]]:
         if company not in latest_by_company or d > latest_by_company[company]:
             latest_by_company[company] = d
 
+    intervals = _check_intervals()
     today = date.today()
     stale = []
     for company, d in latest_by_company.items():
         days = (today - d).days
-        if days > STALE_DAYS:
+        if days > intervals.get(company, STALE_DAYS):
             stale.append((company, days))
 
     return sorted(stale, key=lambda x: -x[1])
 
-
-LIFECYCLE = ROOT / "thesis" / "lifecycle.json"
-TODO_POOL = ROOT / "library" / "leads" / "todo_pool.json"
 
 
 def lifecycle_due() -> list[tuple[str, str]]:
@@ -123,9 +156,14 @@ def main() -> int:
     if due:
         parts = ", ".join(f"{tid}（{why}）" for tid, why in due)
         segments.append(f"⛔ lifecycle 到期複查：{parts}")
+    stale = [(c, d) for c, d in stale if c not in {tid for tid, _ in due}]
     if stale:
-        parts = ", ".join(f"{company} {days}天" for company, days in stale)
-        segments.append(f"📋 memo 已超過 {STALE_DAYS} 天未核查：{parts}")
+        intervals = _check_intervals()
+        parts = ", ".join(
+            f"{company} {days}天／週期 {intervals.get(company, STALE_DAYS)}天"
+            for company, days in stale
+        )
+        segments.append(f"📋 memo 已超過各自核查週期：{parts}")
     msg = "thesis-monitor: " + "；".join(segments) + " — 要現在複查嗎？"
     # 單一 agent-visible channel：systemMessage 與 additionalContext 同時輸出會
     # 讓 Codex desktop 顯示一次、agent 又轉述一次。只保留 additionalContext，
