@@ -96,6 +96,8 @@ def _decision_item(
         "blockers": blockers,
         "next_review_at": lifecycle.get("review_due_at"),
         "disproof_condition": card.get("disproof_condition") or "",
+        "probe_expiry": card.get("probe_expiry"),
+        "expiry_lapsed": bool(card.get("expiry_lapsed")),
         "user_response_needed": (
             "請修復 current authority blocker 並執行 reassess。"
             if current_authority.get("blockers")

@@ -186,9 +186,23 @@ def build_action_card(
         (payload.get("request", {}).get("coverage") or {}).get("assessment_id") or ""
     )
     try:
-        disproof_condition = store.get_coverage_metadata(coverage_id)["disproof"]
+        coverage_metadata = store.get_coverage_metadata(coverage_id)
+        disproof_condition = coverage_metadata["disproof"]
     except (KeyError, TypeError):
+        coverage_metadata = {}
         disproof_condition = ""
+    # 有效期到了但沒人關，probe 會永遠停在 active 並每天占用注意力：`expiry` 只在
+    # coverage 建立當下被檢查一次（expiry_invalid），之後沒有任何東西回頭看它。
+    # 實測 co:iqe 的 expiry 是前一日、兩個 unresolved cohort 逾期六天，全都仍是
+    # active。這裡只**呈現**、不自動關閉——自動關閉需要 expiry 本身先訂對（實測
+    # co:axt 的 expiry 比它自己的催化劑早三個月，自動關會關掉一個還在跑的 thesis）。
+    probe_expiry = str(coverage_metadata.get("expiry") or "")
+    expiry_lapsed = False
+    if probe_expiry:
+        try:
+            expiry_lapsed = _time(card_as_of, "as_of") > _time(probe_expiry, "expiry")
+        except ValueError:
+            expiry_lapsed = False
     execution_intent = str(payload.get("request", {}).get("execution_intent") or "live")
     paper_requested = execution_intent in {"paper", "live"}
     live_requested = execution_intent == "live"
@@ -288,6 +302,16 @@ def build_action_card(
         single_name_action = "reassess_revised_epoch"
         reason = "Thesis 已 revised；舊 epoch 的 decision 不再授權新交易。"
         next_action = "在新 epoch 重新 freeze context、coverage 與 sizing。"
+    elif expiry_lapsed:
+        action = "REVIEW"
+        urgency = "prompt"
+        portfolio_action = "none"
+        single_name_action = "expiry_lapsed_close_or_extend"
+        reason = f"Probe 有效期 {probe_expiry[:10]} 已過，催化劑未在期限內發生。"
+        next_action = (
+            "決定 close_probe（expired）或以新催化劑時點 reassess 延期；"
+            "延期前先確認 expiry 不早於催化劑本身。"
+        )
     elif blocking_core_blockers:
         action = "REVIEW"
         urgency = "next_review"
@@ -434,6 +458,10 @@ def build_action_card(
             "started_at": lifecycle_started_at,
         },
         "disproof_condition": disproof_condition,
+        # 有效期是決策的一部分，必須跟 disproof 一樣出現在 card 自己的欄位裡：
+        # 只放進 reason 文字，下游任何覆蓋 reason 的地方都會把它弄丟。
+        "probe_expiry": probe_expiry or None,
+        "expiry_lapsed": expiry_lapsed,
         "weakest_link": {
             "axis": axis,
             "level": axis_result["level"],
