@@ -5,8 +5,9 @@ description: >
   當使用者想對自己的投資策略、產業 thesis、RAG 知識庫設計、量化訊號或開發 plan 做
   批判性檢查、devil's advocate、找漏洞、壓力測試、或問「我有沒有沒想到的盲點」時,
   務必使用本 skill。即使使用者只是丟一份 .md 規劃說「幫我看看」、「集思廣益」、
-  「critical thinking」、「review 一下我的策略」,也應觸發。本 skill 不審軟體架構與
-  程式碼品質,專攻投資邏輯、證據強度、量化方法論與系統整合縫隙的盲點。
+  「critical thinking」、「review 一下我的策略」,也應觸發。審查範圍包含投資邏輯、
+  證據強度、系統整合縫隙,以及**機制是否真的生效**(蓋好了但從未產出、修好了但端到端
+  無效果、閘門把自己的資料廢掉)。不審程式碼風格與命名品味。
 ---
 
 # 盲點紅隊審查 (Blind-Spot Audit)
@@ -60,28 +61,31 @@ description: >
 訂單、產能利用率、客戶集中度）？還是一個漂亮故事缺財務落點？對照 `AGENTS.md` 的財務核驗清單
 (客戶集中度 / 毛利 / backlog / 稀釋 / 估值)有沒有真的會被執行,還是只寫在規劃裡沒進 pipeline。
 
-### B. 量化 / 交易
+### B. 部位與資本
 
-**B6 回測誠實官 (Backtest honesty)** — look-ahead bias(用了當時拿不到的資料)、survivorship、
-過擬合、多重檢定 / p-hacking(試了 50 個因子挑最好的)、樣本內外沒分、交易成本 / 滑價 /
-流動性 / 借券成本沒算進去。問:這個策略的 Sharpe 扣掉成本、做了樣本外、會剩多少。
+> 已不再審回測誠實度與 regime 依賴：本系統的核心迴圈不是回測驅動，硬套這兩個 lens
+> 只會逼出湊數的批評。唯一做過的回測（2026-07-31 槓桿 glide path）已結案，結論寫在
+> `docs/brainstorms/2026-07-31-leverage-glide-path-requirements.md`。
 
-**B7 Regime 依賴** — 策略只在某種市場狀態有效?回測期間是不是剛好一個大多頭 / 一個利率環境。
-換 regime(升息→降息、AI 退潮)還活著嗎?有沒有隱含的宏觀因子曝險沒被認出來。
+**B8 訊號落地縫隙 (Signal-to-trade gap)** — 質化訊號具體怎麼變成部位？進場、持有期、
+出場、調倉頻率。**追問一層：規則存在不等於規則生效。** 這條規則歷來產出過幾筆非零
+`supported_range`？若答案是零，那它與「沒有規則」在結果上不可區分（2026-08-08 實測：
+9 個 cohort 全數 range 0，成因不是 gate 太嚴，而是 `intent: research` 從不 request paper lane）。
 
-**B8 訊號落地縫隙 (Signal-to-trade gap)** — 這是最容易被忽略的盲點:知識圖譜 / thesis 的
-**質化訊號,具體怎麼變成一個可交易的部位**?進場條件、持有期、出場 / 停損、調倉頻率是什麼?
-如果答不出「圖譜更新了一條邊 → 我該買多少 / 賣多少」,那引擎 A 和交易其實沒接上。
-
-**B9 風控 / 部位 (Risk & sizing)** — 單一標的集中度、標的間相關性(都押 AI 供應鏈 =
-一個 factor 重押)、最大回撤忍受度、thesis 被推翻時的退出機制、部位 sizing 規則
-(等權?凱利?波動度倒數?)。沒有 sizing 規則的「投資建議」只是選股清單。
+**B9 風控 / 部位 (Risk & sizing)** — 單一標的集中度、標的間相關性（都押 AI 供應鏈 ＝
+一個 factor 重押）、thesis 被推翻時的退出機制。sizing 規則本身已存在
+（`config/investment_policy.json`、`config/beta_policy.json`、五軸 ceiling），因此**不要再
+批評「沒有 sizing 規則」**；該問的是：這些 cap 之中哪一個是實際 binding 的？如果永遠是
+同一個、而且它是資料缺口而非風險判斷，那風控其實沒有在做風控。
 
 ### C. 元層 (Meta)
 
-**C10 系統整合縫隙 (Integration seams)** — 引擎 A(科研)/ B(SNS)/ C(基本面)之間的交接
-有沒有定義?三個引擎是真的會匯流成一個投資結論,還是各跑各的、最後靠人腦硬湊?
-特別查:B 的線索怎麼觸發 A、A 的圖譜怎麼餵 C 的估值、誰是最後拍板的那一層。
+**C10 系統整合縫隙 (Integration seams)** — 四引擎的交接：B 的線索怎麼觸發 A、A 的圖譜與
+C 的財務怎麼進 D 的 context bundle、D 的 supported range 怎麼回到使用者。
+**「誰是最後拍板的那一層」已有答案（Engine D＋人工 gate），因此不要再把它當缺口來報。**
+該審的是交接處的**語意一致**：同一個概念在兩個引擎裡是不是同一件事？
+（實例：`thesis/lifecycle.json` 與 Engine D `current_lifecycle` 是兩套互不知道的 lifecycle，
+三個重疊項有兩個矛盾；`gate_pass` 與 coverage 逐項 blocker 是同一判準跑兩次卻得出相反語意。）
 
 **C11 單一視角風險 (Monoculture)** — 方法論藍圖(如 chokepoint-atlas)若是「單一視角」
 (本專案明寫:偏小市值瓶頸獵手、高風險),整個系統會不會繼承這個偏誤,
@@ -90,6 +94,41 @@ description: >
 **C12 可操作性 / scope (Tractability)** — 野心 vs 真實資源(單人、本機、時間)。
 哪些是過度設計、現在不該做;第一條垂直切片是否真的最小可驗證;有沒有把「能跑」
 誤當成「會賺」。
+
+### D. 機制是否真的生效
+
+> 這一組 lens 是 2026-08-08 那次 session 加的。當天所有 binding constraint 都不在
+> 投資邏輯層，而在「機制蓋好了卻不生效」層——用舊版審查表會得出「投資邏輯很嚴謹」，
+> 而那正是問題所在。每個 lens 都錨定一個已發生的實例。
+
+**D13 空機制 (Dead mechanism)** — 這個機制實際被執行過幾次？產出過幾筆資料？
+不要看它「有沒有實作」，要看它**有沒有輸出**。
+實例：Shadow 錨點 9 個 cohort 有 7 個是空的（含隨後 +107% 的那一筆）；paper ledger 從未
+被寫過；五軸 assessment 累計只有 9 份。判準：**一個從不被寫入的帳本是純成本、零效益**，
+而且它讓「這個系統值不值得留」永遠無法用證據回答。
+
+**D14 修法有效性 (Fix efficacy)** — 上一次針對這個問題的修正，**改完之後有幾筆現有資料
+真的變了？** 答案是 0 就代表沒改到 binding constraint，不論那個改動本身多正確。
+實例：2026-08-02 把 `counter_path_missing` 分類成非致命以放行資本，但該分類只有一個消費者
+真的套用，其餘四處仍用更粗的判準，於是放寬在下游被完整抵銷、六天內效果為零而無人發現。
+**同一個錯誤在同一份文件裡犯了兩次**——診斷正確、局部修正正確、沒有量測。
+
+**D15 一個表示兩種語意 (L12)** — 有沒有某個欄位／狀態／回傳值同時承載兩種語意，
+使下游被迫二選一而兩邊都錯？最有用的兩個訊號：(a) 放寬與收緊**都能舉出具體災難**；
+(b) 某個修法讓警報**消失得太乾淨**。
+實例見 `docs/solutions/architecture-patterns/one-representation-two-meanings.md`（七個實例）。
+
+**D16 只有入口沒有出口 (No exit path)** — 這個東西怎麼離開？誰會關它？不關會怎樣？
+實例：cohort 的 `expiry` 只在建立當下被檢查一次，到期後沒有任何東西回頭看它，只有人工
+`close_probe` 能關 —— 逾期六天仍是 active；`todo drop` 只清編號不清成因，隔天 daily 會用
+新編號重新推導出同一個 `ref_id`。判準：**入口是使用者的一次動作，出口不該也要求使用者
+記得**。
+
+**D17 可重建卻被當成不可變 (Reconstructible frozen as point-in-time)** — 這筆資料如果今天
+重新取一次，能不能得到與當時**應該**看到的相同的值？能 → 它需要修復路徑；不能 → 才該
+凍結。把可重建的資料當成 point-in-time，一次瞬時故障就造成永久損失，而且「加重試」不會
+有用（缺的常常不是網路，是 registry 那一列）。
+實例與兩道 hindsight 防線見 `docs/solutions/architecture-patterns/reconstructible-vs-point-in-time.md`。
 
 ## 輸出格式
 
@@ -122,7 +161,13 @@ ALWAYS 用這個結構,並以**繁體中文**輸出:
 
 - ❌「建議多考慮風險管理」— 空泛,沒錨點。
 - ❌「資料品質很重要」— 廢話。
+- ❌「沒有 sizing 規則」／「缺少最後拍板的一層」— **已過時**，這兩者都已存在
+  （`config/investment_policy.json`、Engine D）。報這種洞代表沒讀現況。
 - ✅「你 plan 裡引擎 C 只寫『爬客觀數字出建議』,但沒定義從數字到部位 sizing 的規則,
   等於有選股沒有下單邏輯 → 建議先定義最小版:單檔上限 X%、thesis 失效即出場。」
+- ✅「`coverage.py` 已把 `counter_path_missing` 分類為非致命，但 `action_card.py:219` 對
+  整份 `core_blockers` 一視同仁判 REVIEW → 資本在 sizing 放行、卻在展示層被擋掉一次。
+  驗證方式：找一個只有非致命 blocker 的 cohort，看 `supported_range` 與 card action 是否
+  自相矛盾。」
 
 如果整份規劃寫得很好、某些 lens 真的撈不到洞,誠實說出來——假裝有問題比漏掉真問題更糟。
