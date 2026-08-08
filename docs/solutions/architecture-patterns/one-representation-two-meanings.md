@@ -36,7 +36,7 @@ tags:
 認出這個形狀比記住四個 bug 有用得多，因為二選一的兩邊都是錯的——這正是它們難修
 的原因，也是它們能存活很久的原因。
 
-## 四個實例
+## 實例
 
 | # | 表示 | 混在一起的兩種語意 | 二選一的代價 |
 |---|---|---|---|
@@ -44,6 +44,28 @@ tags:
 | 2 | `market_history_row_invalid` | 值**缺席**（未結算）／值**損毀**（超出範圍） | 一律擋 → 1 根壞 bar 廢掉 59 根；一律放 → 破洞資料進決策 |
 | 3 | `financial_freshness_days` | 每日刷新快照的 staleness／**財報週期**的 staleness | 用 14 天 → 人工 runway 永遠打不開；放寬 → 自動快照失去保護 |
 | 4 | collector 回傳 `[]` | 成功執行但**沒有結果**／**執行失敗** | 當成完成 → 斷線清空整池；當成失敗 → 永遠無法結案 |
+| 5 | `identity.status` | 身分**解析成功**／欄位**齊全** | 看 `resolved` 就走 → 建出永遠沒有錨點的 cohort；要求全齊 → 未上市公司無法追蹤 |
+| 6 | 行情 `as_of` | 交易日**日期**（日線 bar 標當地午夜）／**觀測時刻** | 當時刻算小時 → 決策出生即 stale；當日期放寬 → 真過期也混過去 |
+| 7 | shadow `unavailable` | 這檔**沒有行情**／這次**抓取壞了** | 當成沒行情 → 永不修復；當成抓壞了 → 對 registry 缺列無限重試 |
+
+### 2026-08-08 新增的三個（5–7）
+
+第 5 個最值得記：`co:meta` 的凍結 identity payload 同時是
+`"status": "resolved"` 與 `["market_currency_missing", "execution_currency_missing",
+"execution_venue_missing"]`。下游只看 `status` 就往前走，三個 `*_missing` 就在旁邊
+卻無人理會，於是建出一個**永遠沒有價格錨點的 cohort**——而該標的隨後自追蹤 +6.4%，
+`co:axt` 同型失敗的那筆則是 +107%。
+
+第 6 個是第 1 個的時間版：日線 bar 的 `as_of` 標的是交易日當地午夜，代表的卻是當天
+收盤（美股約 20:00 UTC）。拿它當觀測時刻做小時級減法，36 小時上限實際只剩約 16 小時
+真實鮮度——實測三筆決策在**凍結當下即已 stale**，而 stale 直接封鎖 paper lane。
+修法同樣是「先分開再各自定規則」：行情改以**交易日**計，FX 與 financial 維持時間單位
+（連續報價／財報週期本來就不是以交易日為心跳）。
+
+第 7 個的下游影響見
+[`reconstructible-vs-point-in-time.md`](reconstructible-vs-point-in-time.md)：
+失敗原因塌成單一 `unavailable` 之後，就分不出「該修」與「修不了」，因而也決定不了
+該加重試還是該加回填。
 
 第 3 個最能說明問題：`runway_inputs` 這個欄位存在的唯一理由，就是替
 `derive_runway` 補上「沒有任何地方提供 manual_runway」那條缺掉的走廊。走廊蓋好
