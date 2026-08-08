@@ -419,6 +419,7 @@ decision 不回寫。
 
 **前置條件（必須先做，否則接完就是每日假警報）：**
 
+0. **修復並回填 shadow（§9.11）——建議排最前面**，它最便宜且立刻能量化 gate 的代價
 1. `expiry` 到期自動轉 `expired`（§9.3、§9.4）
 2. freshness 改以交易日為單位（§9.6）
 3. `thesis_freshness_check` 讀 `check_interval_days`（§9.5）
@@ -457,3 +458,93 @@ decision 不回寫。
 **本輪決議：B 現在做但 reassess 留到 8/27；A 等 8/27 重編財務到位。**
 順序本身即可保護使用者設定的分辨點——B 只產出 assessment JSON，**部位是 reassess 才
 產生的**，因此不需要先修 §9.7 的 lifecycle 分裂。
+
+### 9.11 Shadow 與 Paper 不可合併，而 Shadow 目前 78% 是壞的
+
+使用者問「shadow 跟 paper 現在還需要分嗎？感覺是同一個東西」。**不能合，而且 shadow
+是更重要的那個。**
+
+| | Shadow | Paper |
+|---|---|---|
+| 內容 | 訊號進來那一刻的**價格錨點**（price／as_of／currency／source） | 有 **weight** 的模擬部位 |
+| 有部位 | 沒有 | 有 |
+| 需通過 gate | **不需要**，訊號一進來就記 | 需要（coverage ＋ 五軸） |
+| 回答 | 「從我們知道這件事開始，股價走了多少」＝**資訊價值** | 「照系統 sizing 下注，績效如何」＝**決策品質** |
+
+**關鍵：訊號可以是對的（股價漲），而系統把它 size 成 0（paper 什麼都沒有）。只有
+shadow 記錄「我們看到了但沒動作」。** 這正是本檔 §1 的 AXT 案例，也是本輪討論的核心
+問題「被 gate 擋住的代價有多大」——**shadow 是唯一能量化這個代價的東西**。合併就永遠
+只剩「我做了的決定準不準」，失去「我沒做的決定虧了多少」。
+
+#### 現況：9 個 cohort 有 7 個沒有 shadow 價格
+
+```
+co:coherent    COHR     建立 07-22  unavailable
+co:lumentum    LITE     建立 07-22  unavailable
+co:sivers      SIVE.ST  建立 07-26  observed  31.32  (as_of 2026-07-23T22:00Z)
+co:aaoi        AAOI     建立 07-26  observed 100.15  (as_of 2026-07-24T04:00Z)
+co:axt         AXTI     建立 07-29  unavailable   ← 就是本檔 §1 的那一筆
+co:meta        META     建立 08-02  unavailable
+co:iqe         IQE.L    建立 08-04  unavailable
+2 × unresolved          —           unavailable
+```
+
+`outcomes._market_outcome` 明訂：shadow 非 `observed` 或 price 為 None →
+`market_return_status = "unknown"`。因此那 7 個的 `performance_since_tracked`
+**永遠是 null**。**shadow 最該發揮作用的那一次（AXT），它失敗了。**
+
+#### 根因：shadow 沿用 decision 的行情快照，失敗即永久遺失
+
+`workflow.py:403` 以 `_StaticMarketObserver(snapshot.market)` 建立 shadow——
+它**不自行抓價，而是直接沿用該次 decision 的 `AuthoritySnapshot.market`**。
+因此 cohort 建立當下那一次行情抓取若失敗，shadow 錨點就永久遺失：**靜默、無重試、
+無回填**。（本機環境的行情抓取確實會間歇失敗——2026-08-07 早上 `etl_yfinance.py`
+在 sandbox 下 exit 1 就是同一類事件。）
+
+`intake.capture_signal` 的 `except Exception: market_observation =
+MarketObservation(status="unavailable")` 讓失敗原因完全消失，屬 L12 的「一個表示承載
+兩種語意」：`unavailable` 同時代表「這檔沒有行情」與「這次抓取壞了」。
+
+**已排除的假設（勿重查）：**
+
+- ❌ **時序條件**（`intake.py` 的 `as_of > observed_at` 或落後 > 4 天）：對失敗案例逐一
+  推算皆應通過。
+- ❌ **幣別不匹配**（`_validate_market` 的 `observation.currency != expected_currency`）：
+  2026-08-08 實測七檔 registry `market_currency` 與 provider `currency` **全部 MATCH**，
+  含 IQE 的 GBp→GBP 正規化。
+- ❌ **建立路徑不同**：AAOI（成功）與 AXT（失敗）的 `raw_signal` 都是「入圖後自動追蹤」，
+  同一條路徑、不同結果。
+- ❌ **時間分界**（曾誤判「某時點後全壞」）：7/26 兩筆成功，其前（7/22）與其後
+  （7/29、8/02、8/04）皆失敗，非chronological。
+
+#### Shadow 可以被正確回填（與 decision 不同）
+
+Decision 必須 point-in-time 凍結、不得回寫；但 **shadow 只是某個已知日期的歷史收盤價，
+可用歷史資料完整重建，不損及稽核性**。2026-08-08 實測回填結果：
+
+| Ticker | 錨點日 | 錨點價 | 2026-08-07 | 變化 |
+|---|---|---|---|---|
+| **AXTI** | 2026-07-29 | 36.97 | 88.58 | **+139.6%** |
+| COHR | 2026-07-22 | 312.19 | 379.13 | +21.4% |
+| LITE | 2026-07-22 | 829.70 | 890.17 | +7.3% |
+| META | 2026-07-31 | 556.71 | 592.10 | +6.4% |
+| IQE.L | 2026-08-04 | 44.80 | （最新列為 NaN，待查） | — |
+
+AXTI 已驗證無 split，量價齊揚（7/31 成交量 2,962 萬股），催化劑為已記錄的 Lumentum
+六年 InP 產能協議。
+
+**這個數字要正確解讀：** probe sizing 本來就極小，`single_probe_nav_cap` 為 0.5%、
+`bounded_hypothesis` 的 `axis_ceiling` 為 0.2%。即使 gate 全開，+139.6% 對 NAV 的貢獻
+約 +0.3%～+0.7%。**所以損失不在金額，在資訊**——系統的 pq1 選題選對了，而它對這件事
+**零紀錄**。沒有 shadow，「這系統選股行不行」這個問題連樣本都沒有。
+
+#### 待做（建議排在 paper 接線之前）
+
+1. **回填既有 7 筆 shadow**（歷史收盤，可完整重建）
+2. **shadow 改為獨立抓價，不沿用 decision 快照**；失敗時保留 `failure_class`，
+   不併入 `unavailable`
+3. **加入修復路徑**：shadow 為 unavailable 時，於後續 reassess 嘗試以歷史價回填
+   （它不是 point-in-time 敏感資料）
+
+**理由是它比 paper 便宜且更早見效：** 不需要 coverage、不需要五軸、不需要 disproof，
+訊號進來記一個價即可；且既有 cohort 可立即回填，不必等三個月累積樣本。
