@@ -140,7 +140,12 @@ def _market_outcome(
             benchmark.get("start_as_of"), "benchmark.start_as_of"
         )
         benchmark_as_of = _time(benchmark.get("as_of"), "benchmark.as_of")
-        if benchmark_start_as_of != shadow_as_of:
+        # 對齊判準是「同一個交易日」，不是同一個時戳。日線 bar 的時戳帶著交易所的
+        # 時區（Shadow 若錨在 SIVE.ST 是 +02:00，QQQ 是 −04:00），要求時戳完全相等
+        # 等於規定「只能拿同一個市場的標的當 benchmark」——那會讓所有跨市場歸因
+        # 永久不可能，而不是讓它們對齊。時戳同時承載「哪一個 session」與「哪個市場的
+        # 時鐘」兩種語意，這裡只該比前者。
+        if benchmark_start_as_of.date() != shadow_as_of.date():
             raise OutcomeError("benchmark start must align with Shadow inception")
         if benchmark_as_of < benchmark_start_as_of:
             raise OutcomeError("benchmark end predates its inception")

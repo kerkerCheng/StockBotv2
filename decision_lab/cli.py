@@ -81,6 +81,26 @@ def build_parser() -> argparse.ArgumentParser:
     reassess_parser.add_argument("--expiry")
     reassess_parser.add_argument("--format", choices=("json", "markdown"), default="markdown")
 
+    close_parser = subcommands.add_parser(
+        "close",
+        help="結案一個 probe 並寫入 outcome 歸因（人工判斷，不自動觸發）。",
+    )
+    close_parser.add_argument("cohort_id")
+    close_parser.add_argument(
+        "--terminal-status",
+        required=True,
+        choices=("promoted", "rejected", "expired", "revised"),
+    )
+    close_parser.add_argument(
+        "--claim-correctness",
+        required=True,
+        choices=("true", "false", "mixed", "unknown"),
+        help="事後看，這條 claim 對不對；unknown 是合法答案，不要硬猜。",
+    )
+    close_parser.add_argument("--reason", required=True)
+    close_parser.add_argument("--evidence-ref", action="append", default=[])
+    close_parser.add_argument("--format", choices=("json", "markdown"), default="json")
+
     today = subcommands.add_parser(
         "today",
         help="純讀回答今天是否需要 NO ACTION／REVIEW／TRADE／HEDGE。",
@@ -258,6 +278,53 @@ def run(
                 format_name=args.format,
                 stdout=stdout,
                 markdown_renderer=render_workflow_markdown,
+            )
+        elif args.command == "close":
+            from identity.registry import get_registry
+
+            from .outcomes import close_probe
+
+            runtime = _provider(provider)
+            shadow = store.get_shadow(args.cohort_id)
+            identity_row = store.cohort_identity(args.cohort_id)
+            identity = runtime.resolve_identity(
+                company_id_hint=identity_row.get("company_id"),
+                ticker_hint=identity_row.get("research_ticker"),
+            )
+            now = datetime.now(timezone.utc).isoformat()
+            snapshot = runtime.snapshot(identity=identity, evaluation_at=now)
+            company = get_registry().company(str(identity_row.get("company_id") or ""))
+            benchmark_symbol = getattr(company, "benchmark_symbol", "QQQ") if company else "QQQ"
+            # 沒有 Shadow 錨點就沒有可歸因的起點；此時 benchmark 一併標 unavailable，
+            # close_probe 會誠實輸出 market_return_status=unknown，而不是用 0 冒充。
+            benchmark = (
+                runtime.benchmark_snapshot(
+                    symbol=benchmark_symbol, since=str(shadow.as_of)
+                )
+                if shadow.status == "observed" and shadow.as_of
+                else {"status": "unavailable"}
+            )
+            result = close_probe(
+                store,
+                args.cohort_id,
+                terminal_status=args.terminal_status,
+                claim_correctness=args.claim_correctness,
+                current_market=dict(snapshot.market),
+                benchmark=benchmark,
+                reason=args.reason,
+                evidence_refs=tuple(args.evidence_ref),
+                effective_at=now,
+            )
+            _render(
+                {
+                    "cohort_id": args.cohort_id,
+                    "terminal_status": args.terminal_status,
+                    "benchmark_symbol": benchmark_symbol,
+                    "outcome": getattr(result, "payload", None) or str(result),
+                },
+                format_name=args.format,
+                stdout=stdout,
+                markdown_renderer=None,
             )
         elif args.command == "today":
             evaluation_at = _timestamp(args.as_of)

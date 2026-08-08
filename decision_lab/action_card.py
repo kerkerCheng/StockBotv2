@@ -50,8 +50,18 @@ def _alpha_beta(change: Mapping[str, Any] | None) -> dict[str, Any]:
             "benchmark_return": None,
         }
     evidence_delta = str(change.get("evidence_delta") or "unknown")
-    security = _finite(change.get("security_return"))
-    benchmark = _finite(change.get("benchmark_return"))
+    # 窗口必須是**追蹤期**（Shadow inception 起算），不是「自上次凍結 decision 以來」。
+    # 後者會被 reassess 重設，等於讓分類窗口可以被自己的操作縮短到零：2026-08-08
+    # 實測 co:axt 在 reassess 兩小時後被判 beta（自決策以來 +0.0% vs QQQ −1.2%），
+    # 而它自追蹤以來是 +107%、超額 +101pp——正確但毫無資訊，且蓋掉了真正的事實。
+    # 缺 Shadow 錨點時才退回決策錨點，兩側必須成對取用，不得混錨。
+    shadow_security = _finite(change.get("shadow_return"))
+    shadow_benchmark = _finite(change.get("benchmark_shadow_return"))
+    if shadow_security is not None and shadow_benchmark is not None:
+        security, benchmark = shadow_security, shadow_benchmark
+    else:
+        security = _finite(change.get("security_return"))
+        benchmark = _finite(change.get("benchmark_return"))
     disproof = change.get("disproof_triggered") is True
     if disproof or evidence_delta in {"positive", "negative", "material"}:
         classification = "alpha"

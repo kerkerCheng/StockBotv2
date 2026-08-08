@@ -867,6 +867,33 @@ class DefaultRuntimeProvider:
             return None
         return end_price / start_price - 1.0
 
+    def benchmark_snapshot(
+        self, *, symbol: str, since: str
+    ) -> dict[str, Any]:
+        """組出 ``outcomes.close_probe`` 需要的 benchmark 區段。
+
+        起點錨在 ``since``（＝Shadow inception）當日之前最後一個完整交易日，與
+        Shadow 回填同一條規則；close_probe 只比對日期，不比對時戳（跨市場標的的
+        bar 時戳帶各自交易所時區，比對時戳會讓跨市場歸因永久不可能）。
+        """
+
+        start = get_historical_market_snapshot(symbol, "USD", before=since)
+        end = self._market_fetcher(symbol, "USD")
+        if start.get("status") != "observed" or end.get("status") not in {
+            "observed",
+            "available",
+        }:
+            return {"status": "unavailable"}
+        return {
+            "status": "observed",
+            "ticker": symbol,
+            "start_price": start.get("price"),
+            "start_as_of": since,
+            "end_price": end.get("price"),
+            "as_of": end.get("as_of"),
+            "source": str(end.get("source") or "yfinance://history"),
+        }
+
     def snapshot(
         self,
         *,
