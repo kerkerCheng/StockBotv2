@@ -631,3 +631,136 @@ AXTI 已驗證無 split，量價齊揚（7/31 成交量 2,962 萬股），催化
 
 **理由是它比 paper 便宜且更早見效：** 不需要 coverage、不需要五軸、不需要 disproof，
 訊號進來記一個價即可；且既有 cohort 可立即回填，不必等三個月累積樣本。
+
+---
+
+## 10. 第四回合（2026-08-08 下午）：從「診斷」到「系統第一次能評估自己」
+
+> §9 收斂完模型後的實作與紅隊。本節記錄**做了什麼、量到什麼、以及三個當天犯下並
+> 更正的錯誤**。commit 只留下結果，脈絡在這裡。
+
+### 10.1 執行順序與實測效果（§8.3 判準：改完有幾筆資料真的變了）
+
+| # | 動作 | 現有資料改變數 |
+|---|---|---|
+| 0 | Shadow 回填 | **5 筆**（AXTI／COHR／LITE／META／IQE.L）→ `performance_since_tracked` 首次可用 |
+| 1 | Expiry 呈現（不自動關） | 3 筆逾期現形；**刻意不自動關**——co:axt 的 expiry 比自己的催化劑早三個月，自動關會關掉一個 +107% 且仍在跑的 thesis |
+| 2 | Freshness → 交易日 | 對新 decision 生效；舊 decision 用自己凍結的 legacy policy 評估 |
+| 3 | `check_interval_days` | 90 只留給無 lifecycle entry 的 memo |
+| 4 | intent → paper（接線） | **paper ledger 首次被寫入**：META／AXT／AAOI 各 0.1% NAV |
+
+**接線的另外兩項查證後未動程式**：`live 轉綠通知` 早已存在（`TRADE` 在
+`_ACTION_PRIORITY` 排第二）；`cohort 只由 go 建立` 早已成立（唯一入口是入圖完成後的
+`_ensure_shadow_for_completion`）。**查證後不改，比為了完成清單而改更有價值。**
+
+### 10.2 紅隊（審查表本身先更新，見 `skills/blind-spot-audit`）
+
+舊版 skill 的 description 明寫「不審軟體架構與程式碼品質」——而當天每一個 binding
+constraint 都落在那個被排除的區域。用它去審會得出「投資邏輯很嚴謹」，而那正是問題
+所在：**邏輯沒錯，管線把它靜默歸零。** 已改 scope 並新增 D 類五個 lens（空機制／
+修法有效性／L12／無出口／可重建卻被凍結），各錨定一個已發生的實例。
+
+紅隊三大發現與處置：
+
+1. **`benchmark_return` 在 production 寫死 `None`** → `classification == "beta"` 程式上
+   不可達（實測 23 筆 0 個 beta）。系統因此無法區分「thesis 對了」與「大盤漲了」。
+   → 已接上（10.4）。
+2. **outcome attribution 產出 2 筆、皆 `unknown`**，且 `close_probe` **根本沒有 CLI
+   入口**——不是沒人想關，是關不了。→ 新增 `decision_lab close`。
+3. **live 半邊四張表全 0 筆**。→ 實測發現**它是通的，只缺使用者的持倉聲明**（10.5）。
+
+### 10.3 AXT 的 provenance：不是好運，但也不是預測
+
+追蹤起點（Shadow 錨 2026-07-28）的觸發物是 `ra_a09b6e59`「AXT／Casela 2027 InP 長約」：
+AXT 2026-06-17 的 8-K 首次點名 Casela 為 InP 客戶，揭露**具預付款與最低採購保障**的
+2027 長期供應協議。隔天（07-29）Lumentum Capacity Reservation Agreement 8-K
+（US$43.5M deposit）——**結構上是同一個模式的更大實例**；再隔天 Q2 營收 +164%。
+
+所以系統是先讀到了建立該模式的公開文件，市場在同模式放大時才重新定價。**但三點必須
+誠實**：(a) 那份 8-K 早在 06-17 就公開，edge 在「比市場早消化已公開文件」而非預見未來；
+(b) cohort 的 `atomic_claim` 是空的、`evidence_tier: 4`，實質內容在圖裡不在 cohort，
+所以「當初的判斷」沒有被寫成一句可回頭檢驗的話；(c) **n=1**，模式辨識與幸運排序分不出來。
+
+### 10.4 Benchmark：選擇由實際持倉決定，不由論證決定
+
+先前手動用 QQQ 算超額報酬其實沒有依據。查實際持倉後：
+
+```
+VWRA 26.5%（beta core）  QQQ 家族 19.1% 名目／約 24% 換算  2330.TW 17.6%  0050 家族 16.3%
+```
+
+**alpha 主基準定為 QQQ**：alpha 標的全是科技／半導體，拿含金融、能源的全球指數當基準
+會系統性美化結果；QQQ 家族換算曝險約 24%，是這筆錢真實的替代去處。**VWRA 是 beta
+sleeve 的基準，不是 alpha 歸因的基準**——先前把這兩個角色混在一起。半導體標的可經
+registry 覆寫成 SOXX。**不採 provider 推斷的 sector**：那正是幣別那條路教過的錯誤。
+
+兩個錨點各配一個對齊的 benchmark（`excess_since_tracked` 錨在 Shadow、
+`excess_since_decision` 錨在決策）。用同一個 benchmark 減兩個不同起點會產生看起來精確的
+錯誤答案。
+
+**⚠ 原始超額報酬，未做風險調整。** 用一檔十天能漲 107%、也能跌 40% 的小型股贏過指數，
+不必然是技巧。n=5、窗口兩週，算 beta 太早；不算，但輸出必須標明未調整。
+
+### 10.5 Live lane：它是通的，只缺一句聲明
+
+實測真實 authority：Sheet 回得出 24 列／NAV 425,629／digest 算得出來；co:axt 與 co:meta
+的 identity resolved、execution 同 symbol 同幣別（execution_market 複用、execution_fx
+為 None）、行情 observed 有 price 與 adv20。
+
+**唯一缺口是 `holdings_confirmations`——「這確實是我的持倉」的使用者聲明，不由 agent
+代簽。** 使用者確認後（`hc_d80a0459`），Sivers 的 blocker 從 5 個收斂到 1 個，只剩
+`valuation_payoff_unknown`（軸本身，非資料管線）。
+
+補了兩個測試鎖住 production 形狀（既有 e2e 走的是 Sivers 跨市場形狀，與投組多數標的
+不同），其中一個專門鎖「**live 是等你一句話，不是等系統修東西**」——兩者輸出長得像，
+下一步完全不同。
+
+### 10.6 當天犯下並更正的三個錯誤
+
+**這三個都是自己撞上的，記下來比記下成果重要。**
+
+1. **alpha/beta 用錯窗口。** `_alpha_beta` 比的是決策錨點那一組，而決策錨點會被
+   reassess 重設——等於讓分類窗口可以被自己的操作縮短到零。實測 co:axt 在 reassess
+   兩小時後被判 `beta`（自決策 +0.0% vs QQQ −1.2%），而它自追蹤以來 +107%、超額 +101pp。
+   改用 Shadow 錨點後：co:meta 仍是 `beta`（超額 +0.6%，確實只跟著大盤），
+   co:axt／co:aaoi 變成 `mixed_or_unknown`——**超額很大但證據沒變，誠實地說「不知道
+   是 thesis 對了還是動能」**。
+
+2. **FX 留在小時制，理由是「FX 是連續報價」。** 由 Sivers live 實跑撞出 `fx_stale` 後
+   才查 provider：`source=yfinance://fx/SEKUSD=X`、`as_of=2026-08-07T00:00:00+01:00`
+   ——**同一個日線 bar、同一個午夜標籤**。我是**按概念推理而沒查資料源實際回傳什麼**，
+   正是這一整天在修的同一種錯誤，只是這次是自己犯的。
+
+3. **在 `decision_lab` 直接 import `engine_c.market_data`。**
+   `tests/test_engine_d_runtime.py` 立刻擋下——具體 current-state 依賴只能住在
+   `engine_d_runtime`。**改的是程式，不是測試**；加了 `WorkflowDataProvider.benchmark_return`
+   seam。一整天在修「邊界沒被遵守」造成的問題，不該自己再破一個。
+
+（另外一次：把 `beta_policy` 的 `fx_max_age_hours` 一併改名，弄壞 42 個測試——那是
+資本換匯的獨立設定、不同消費者，且 fixture 依賴很深。還原後改在呼叫點換算。
+**改名的成本與它的收益不成比例時，就不要改名。**）
+
+### 10.7 兩個「記錄了自己缺什麼、卻沒人行動」的修補
+
+- **`missing_data` 從未被消費。** 軸判 `unknown` 時會誠實記下缺什麼，但實測該欄位只被
+  `sizing` 驗證格式、被 card 顯示，**沒有任何地方問「這項現在拿得到了嗎」**。co:sivers 的
+  `valuation_payoff` 因行情 quarantine 判 unknown，quarantine 在 2026-08-05 已解除，
+  卻又卡了三天——而使用者實際持有該標的。
+  修法不解析自由文字（會變成猜測），改用既有軸→authority 對應做確定性比對。
+  實測抓到 co:sivers（valuation_payoff）與 co:iqe（五軸全部）。
+
+- **10/10 個 cohort 的 `atomic_claim` 全是空的。** 成因是「入圖後自動追蹤」這條唯一入口
+  從不帶 thesis——系統性，非個案。而 `dedupe_key` 含 `atomic_claim`，**空 claim 一旦
+  建立就永久補不回來**。已改為帶 applied lead 的 title；**既有 10 個是不可逆損失**。
+
+### 10.8 現在能回答與仍不能回答的
+
+**能回答了：** 從我們知道一件事開始股價走了多少（Shadow）；扣掉 benchmark 還剩多少
+（超額）；系統照自己的規則會下多大（paper）；哪些軸現在可以重評估。
+
+**仍不能回答：** 系統選股準不準。n=5、窗口兩週、零失敗樣本、未做風險調整——
+**這個數字現在只夠說「值得繼續累積」，不夠說「會賺」。**
+
+**下一輪的判準不變（§8.3）：任何 gate 改動落地時必須回答「現有 cohort 有幾個的
+`supported_range` 真的變了」。** 而新增一條：**任何「機制不生效」的修法，必須同時回答
+「它現在產出過幾筆」**——否則就是又蓋了一個空機制。
