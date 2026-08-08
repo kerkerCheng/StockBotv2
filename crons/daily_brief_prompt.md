@@ -17,6 +17,12 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
 1. 先讀 `AGENTS.md` 與 `skills/daily-brief/SKILL.md`。確認目前 branch 是 `master`；若不是就停止並回報，不自行切 branch。若 working tree 有與本 routine
    無關的使用者變更，保留不碰。
 2. Windows 一律使用專案 interpreter：`.venv\Scripts\python.exe`，不得用 bare `python`。
+   Codex scheduled run 對已知會連外或寫 Git 的 fixed entry，首次呼叫就直接使用 `require_escalated`，並只
+   申請／使用該支命令的窄 prefix rule；不得先在 sandbox 製造可預期失敗再重試，也不得把整個 PowerShell、
+   Python 或 working tree 設為 unrestricted。fixed entry 是 `crons\harvest_leads.py`、
+   `engine_c\etl_yfinance.py`、`scripts\daily_beta_snapshot.py`、`decision_lab today`、
+   `engine_b.todo sync`、`scripts\publish_daily_state.py`、`scripts\publish_daily_brief.py`。
+   `harvest-health`、queue list／count、JSON 檢查等純本機唯讀命令維持 sandbox。
 3. 依序執行：
    - `.venv\Scripts\python.exe crons\harvest_leads.py`（X＋EDGAR；以 `since_id`／URL hash 去重）
    - `.venv\Scripts\python.exe -m engine_b.cli harvest-health`（列出最新仍未恢復的來源失敗）
@@ -40,8 +46,8 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
    - `.venv\Scripts\python.exe -m decision_lab today --format markdown`
    - `.venv\Scripts\python.exe -m engine_b.todo sync`
    - `.venv\Scripts\python.exe -m engine_b.todo list`
-4. 任何來源失敗都要誠實列出 `fetch_failed`／`parse_failed` 與結構化 `failure_class`；若 fixed entry
-   疑似被 sandbox／proxy／本機網路權限擋住，必須以**完全相同的命令**在允許本機網路的權限下重跑一次，
+4. 任何來源失敗都要誠實列出 `fetch_failed`／`parse_failed` 與結構化 `failure_class`；若執行端無法預先套用
+   上述窄權限，或命令遭未預期的 sandbox／proxy／本機網路權限阻擋，必須以**完全相同的命令**在允許本機網路的權限下重跑一次，
    不得把第一次 `access_blocked` 寫成「零筆新資料」或 `no_result`。同一來源後續成功才算 recovered；
    重跑仍失敗則保留在 `harvest-health` 與健康段落，研究追源另依 `$source-trace` 嘗試一條官方替代路徑。
    beta technical 的 `insufficient_history`／

@@ -55,9 +55,16 @@ credit 不進 NAV／cash／allocation。technical／capital telemetry 不進 pq1
 自有現金 baseline 每 5 個完整交易日固定主動提醒一次，週期由 Engine C 全部 distinct observed sessions
 定錨，不綁 RSI／MACD／tier；資料不足仍歸零。貸款不在例行提醒內，提款時間表留待另案人工核准。
 **解析失敗 ≠ 無新文**。每筆失敗必須保存 `failure_class`；最新一次仍失敗的來源由
-`harvest-health` 持續顯示。fixed entry 若疑似 sandbox／proxy／本機網路權限受阻，**原命令本身**必須在允許
-本機網路的權限下重跑一次；第一次記 `access_blocked`，只有同一來源後續成功才標 recovered，重跑仍失敗
-不得改寫成「零筆」或 `no_result`。**重跑對象必須是實際失敗的那一支腳本，不能用下游／後續腳本頂替**——
+`harvest-health` 持續顯示。Codex scheduled run 對已知會連外或寫 Git 的固定入口，**首次呼叫就直接使用
+`require_escalated`，並只搭配該支命令的窄 prefix rule**；不得先在 sandbox 製造可預期的失敗再重跑，也不得
+把整個 PowerShell、Python 或 working tree 設成 unrestricted。這組 fixed entry 包含
+`crons\harvest_leads.py`、`engine_c\etl_yfinance.py`、`scripts\daily_beta_snapshot.py`、
+`decision_lab today`、`engine_b.todo sync`、`scripts\publish_daily_state.py` 與
+`scripts\publish_daily_brief.py`；`harvest-health`、queue list／count、JSON 檢查等純本機唯讀命令仍留在
+sandbox。只有執行端無法預先套用窄權限，或遇到未預期的 sandbox／proxy／本機網路權限阻擋時，才把
+**原命令本身**在允許本機網路的權限下重跑一次；第一次記 `access_blocked`，只有
+同一來源後續成功才標 recovered，重跑仍失敗不得改寫成「零筆」或 `no_result`。**重跑對象必須是實際
+失敗的那一支腳本，不能用下游／後續腳本頂替**——
 例如 `engine_c\etl_yfinance.py` 失敗時要重跑 `etl_yfinance.py` 本身，不能改成重跑讀它結果的
 `scripts\daily_beta_snapshot.py` 或 `publish_daily_state.py`，那只會讓下游腳本在舊資料上再跑一次、
 表面看起來成功，實際上缺口沒補（2026-08-07 實測：`etl_yfinance.py` 失敗後只重跑了
