@@ -123,3 +123,14 @@ class WorkflowDataProvider(Protocol):
     def current_holdings(self, *, evaluation_at: str) -> Mapping[str, Any]:
         """供 today brief 唯讀取得 current Sheet snapshot。"""
 
+    def benchmark_return(
+        self, *, symbol: str, since: str, evaluation_at: str
+    ) -> float | None:
+        """Benchmark 自 ``since`` 到 ``evaluation_at`` 的原始報酬；缺資料回 None。
+
+        走 provider seam 而非在 decision_lab 直接 import 行情層，理由與其他
+        authority 相同：具體 current-state 依賴一律留在 engine_d_runtime，
+        decision_lab 只認 normalized contract（tests/test_engine_d_runtime.py
+        鎖住這條邊界）。
+        """
+

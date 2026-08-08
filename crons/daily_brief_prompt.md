@@ -53,7 +53,7 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
 4. 任何來源失敗都要誠實列出 `fetch_failed`／`parse_failed` 與結構化 `failure_class`；若 profile 未載入，
    或命令遭 sandbox／proxy／本機網路權限阻擋，保留 `access_blocked` 並讓受影響資料 fail closed，
    不得以第二套 network rule／`require_escalated` 事後補跑，也不得寫成「零筆新資料」或 `no_result`。
-   後續新一輪同來源成功才算 recovered；本輪研究追源可另依 `$source-trace` 嘗試一條已在 profile 內的官方替代路徑。
+   同一來源後續成功才算 recovered（後續新一輪成功才算，不得把當次 blocked 寫成零筆）；本輪研究追源可另依 `$source-trace` 嘗試一條已在 profile 內的官方替代路徑。
    beta technical 的 `insufficient_history`／
    `unavailable`／`stale` 也必須列在健康段落，該商品 supported range 歸零但不阻斷其他商品。Capital Authority
    的 cash floor 缺失／stale／FX 錯誤時，單一 self-funded range fail closed 歸零；不得回退到百分比 reserve

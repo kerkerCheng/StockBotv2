@@ -48,6 +48,12 @@ class CompanyIdentity:
     execution_venue: str | None = None
     market_quote_unit: str | None = None
     execution_quote_unit: str | None = None
+    # Alpha 歸因的比較基準。缺省是 QQQ：alpha 標的目前全是科技／半導體，拿含金融、
+    # 能源、公用事業的全球指數（VWRA）當基準會系統性美化結果；而 QQQ 家族換算曝險
+    # 約佔 NAV 24%，是這筆錢真實的替代去處。VWRA 仍是 beta sleeve 的基準，不是
+    # alpha 歸因的基準——兩者角色不同。半導體標的可覆寫成 SOXX，回答「在對的產業
+    # 裡有沒有選對股」。值必須是系統已在抓行情的 symbol，否則歸因會靜默失效。
+    benchmark_symbol: str = "QQQ"
 
 
 class IdentityRegistry:
@@ -92,6 +98,7 @@ class IdentityRegistry:
                 execution_venue=item.get("execution_venue"),
                 market_quote_unit=_quote_code(item.get("market_currency")),
                 execution_quote_unit=_quote_code(item.get("execution_currency")),
+                benchmark_symbol=str(item.get("benchmark_symbol") or "QQQ").strip().upper(),
             )
             for item in raw_companies
         )

@@ -20,7 +20,11 @@ from decision_lab.workflow_ports import (
     IdentityAuthority,
 )
 from engine_c.checklist import get_checklist, get_probe_financial_baseline
-from engine_c.market_data import get_fx_snapshot, get_tradeability_snapshot
+from engine_c.market_data import (
+    get_fx_snapshot,
+    get_historical_tradeability_snapshot as get_historical_market_snapshot,
+    get_tradeability_snapshot,
+)
 from fetchers.gsheets import fetch_portfolio, get_execution_aliases
 from identity.currency import settlement_currency
 from identity.registry import IdentityRegistry, get_registry
@@ -835,6 +839,33 @@ class DefaultRuntimeProvider:
             "base_currency": next(iter(base_currencies)),
             "fetched_at": evaluation_at,
         }
+
+    def benchmark_return(
+        self, *, symbol: str, since: str, evaluation_at: str
+    ) -> float | None:
+        """Benchmark 自 ``since`` 到現在的原始報酬（未做風險調整）。
+
+        起點取「``since`` 之前最後一個完整交易日」，與 Shadow 回填同一條規則——
+        用同日 bar 會拿到觀測者當時看不到的價格，使超額報酬被系統性高估。
+
+        ⚠ 這是**原始**超額報酬。用一檔十天能漲 107%、也能跌 40% 的小型股贏過指數，
+        不必然是技巧，可能只是承擔了更多波動；樣本夠長之前不做 beta 調整，但呈現層
+        必須標明未調整。
+        """
+
+        del evaluation_at  # 現價一律取最新可得，不回溯到指定時刻
+        start = get_historical_market_snapshot(symbol, "USD", before=since)
+        end = self._market_fetcher(symbol, "USD")
+        start_price = _finite(start.get("price"), non_negative=True)
+        end_price = _finite(end.get("price"), non_negative=True)
+        if (
+            start.get("status") != "observed"
+            or end.get("status") not in {"observed", "available"}
+            or not start_price
+            or end_price is None
+        ):
+            return None
+        return end_price / start_price - 1.0
 
     def snapshot(
         self,

@@ -92,6 +92,16 @@ def _decision_item(
         # 中間 9 天、78 個百分點，只看 since_decision 完全看不到。
         "performance_since_tracked": current_authority.get("shadow_return"),
         "performance_since_decision": current_authority.get("security_return"),
+        # 超額報酬各自對齊自己的錨點；**未做風險調整**，見 _benchmark_return。
+        "benchmark_symbol": current_authority.get("benchmark_symbol"),
+        "excess_since_tracked": _ratio_diff(
+            current_authority.get("shadow_return"),
+            current_authority.get("benchmark_shadow_return"),
+        ),
+        "excess_since_decision": _ratio_diff(
+            current_authority.get("security_return"),
+            current_authority.get("benchmark_return"),
+        ),
         "evidence_delta": evidence_delta,
         "blockers": blockers,
         "next_review_at": lifecycle.get("review_due_at"),
@@ -163,12 +173,48 @@ def _ratio(current: Any, previous: Any) -> float | None:
     return float(current) / float(previous) - 1.0
 
 
+def _ratio_diff(security: Any, benchmark: Any) -> float | None:
+    """原始超額報酬（未風險調整）。任一側缺就回 None，不用 0 冒充 benchmark。"""
+    if not isinstance(security, (int, float)) or isinstance(security, bool):
+        return None
+    if not isinstance(benchmark, (int, float)) or isinstance(benchmark, bool):
+        return None
+    return float(security) - float(benchmark)
+
+
+def _benchmark_return(
+    provider: WorkflowDataProvider, symbol: str, since: str, as_of: str, cache: dict
+) -> float | None:
+    """Benchmark 自 ``since`` 到現在的報酬；同一次 brief 內以 (symbol, 錨點日) 快取。
+
+    比較必須錨在**同一個時刻**才有意義：`security_return` 錨在決策凍結時的行情，
+    `shadow_return` 錨在訊號進來時，兩者要各自配一個對齊的 benchmark 報酬。用同一個
+    benchmark 數字去減兩個不同起點的個股報酬，會產生看起來精確的錯誤答案。
+
+    ⚠ 這裡算的是**原始超額報酬，未做風險調整**。用一檔十天能漲 107%、也能跌 40% 的
+    小型股贏過指數，不必然是技巧，可能只是承擔了更多波動。樣本夠長之前不做 beta
+    調整，但輸出必須標明未調整。
+    """
+
+    anchor_day = str(since)[:10]
+    key = (symbol, anchor_day)
+    if key not in cache:
+        try:
+            cache[key] = provider.benchmark_return(
+                symbol=symbol, since=since, evaluation_at=as_of
+            )
+        except Exception:
+            cache[key] = None
+    return cache[key]
+
+
 def _current_authority_context(
     store: DecisionStore,
     provider: WorkflowDataProvider,
     summary: Mapping[str, Any],
     *,
     as_of: str,
+    benchmark_cache: dict | None = None,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     """讀 current authorities 並與 frozen context 比較；不建立新 decision。"""
 
@@ -207,6 +253,23 @@ def _current_authority_context(
         and shadow.currency == current_market.get("currency")
     ):
         shadow_return = _ratio(current_market.get("price"), shadow.price)
+
+    # Benchmark：alpha 歸因的比較基準，預設 QQQ（見 CompanyIdentity.benchmark_symbol）。
+    # 兩個錨點各配一個，否則「超額報酬」會用錯起點。
+    cache = benchmark_cache if benchmark_cache is not None else {}
+    company = get_registry().company(str(summary.get("company_id") or ""))
+    benchmark_symbol = getattr(company, "benchmark_symbol", "QQQ") if company else "QQQ"
+    benchmark_return = None
+    benchmark_shadow_return = None
+    frozen_as_of = (frozen.get("market") or {}).get("as_of")
+    if security_return is not None and frozen_as_of:
+        benchmark_return = _benchmark_return(
+            provider, benchmark_symbol, str(frozen_as_of), as_of, cache
+        )
+    if shadow_return is not None and shadow is not None and shadow.as_of:
+        benchmark_shadow_return = _benchmark_return(
+            provider, benchmark_symbol, str(shadow.as_of), as_of, cache
+        )
     fx_return = _ratio(
         current_fx.get("rate"), (frozen.get("fx") or {}).get("rate")
     )
@@ -222,7 +285,9 @@ def _current_authority_context(
     change = {
         "security_return": security_return,
         "shadow_return": shadow_return,
-        "benchmark_return": None,
+        "benchmark_return": benchmark_return,
+        "benchmark_shadow_return": benchmark_shadow_return,
+        "benchmark_symbol": benchmark_symbol,
         "evidence_delta": evidence_delta,
         "disproof_triggered": False,
         "fx_return": fx_return,
@@ -232,6 +297,9 @@ def _current_authority_context(
             "blockers": sorted(set(blockers)),
             "security_return": security_return,
             "shadow_return": shadow_return,
+            "benchmark_return": benchmark_return,
+            "benchmark_shadow_return": benchmark_shadow_return,
+            "benchmark_symbol": benchmark_symbol,
             "fx_return": fx_return,
             "evidence_delta": evidence_delta,
         },
@@ -415,9 +483,12 @@ def build_today_brief(
         except Exception:
             current_holdings = {"status": "unavailable"}
     if provider is not None:
+        # 同一次 brief 內共用 benchmark 快取：多個 cohort 常錨在同一個交易日，
+        # 不共用會對同一支 benchmark 重複抓十幾次。
+        benchmark_cache: dict = {}
         for summary in summaries:
             authority, derived_change = _current_authority_context(
-                store, provider, summary, as_of=as_of
+                store, provider, summary, as_of=as_of, benchmark_cache=benchmark_cache
             )
             current_authorities.setdefault(str(summary["cohort_id"]), authority)
             changes.setdefault(str(summary["cohort_id"]), derived_change)
