@@ -2003,6 +2003,69 @@
       "result": "ok",
       "run_at": "2026-08-07T22:33:38.451179+00:00",
       "source": "edgar:GFS"
+    },
+    {
+      "failure_class": "provider_api_error",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-08-08T22:33:42.579945+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-08-08T22:33:43.142375+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-08-08T22:33:43.545765+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-08-08T22:33:43.968118+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-08-08T22:33:44.406137+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-08-08T22:33:44.842291+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-08-08T22:33:45.263357+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-08-08T22:33:45.680642+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "failure_class": "transport_failure",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-08-08T22:33:46.102336+00:00",
+      "source": "edgar:GFS"
     }
   ],
   "leads": {
@@ -14203,9 +14266,31 @@
       ],
       "published_at": "2026-08-07T05:46:59.000Z",
       "raw_text": "Wow, there's gem after gem in $AAOI earnings for $SIVE + other laser player readthrough.\n\n1. AAOI not meaningfully participating in CPO first-gen deployments.\n\n\"We just can’t make enough of them [CPO lasers] to be involved in their current first-generation [CPO] deployments because there’s just not enough capacity.   We have to prioritize our ability to make lasers for our own  transceivers first\"\n\nSo first-gen CPO laser deployments, might even be narrowed down further for Western players like $SIVE, $LITE, $AVGO, and $COHR.\n\nAnd independent CPO CW laser capacity became more valuable if $AAOI had to turn away more customers...\n\nAlso remember Trendforce was talking about $AMD singing CW LTAs? $COHR / $LITE have capacity signed with $NVDA ...\n\nI thought it would be $AAOI, but they might be out of the equation. $MTSI also doesn't look meaningful with early CPO participation (eg. no mention in ER aside from NPO, and removal from Ayar website).\n\nSo I wonder who players like $AMD is going to go with for Helios (eg. Sivers + Ayar more likely candidate now)?\n\nBtw, this is not bearish AAOI because they have too much demand for optical transceiver business. Just more bullish on the existing few qualified CPO laser names that have capacity. \n\n2. Demand imbalance and bottleneck for InP lasers / optical transceivers.\n\nAOI's CEO stated kinda supported that when they said: \"The customer demand is 20%-40% higher\" than expanded built out capacity.\n\n\"We are getting this kind of demand from several big customers almost every week. Lasers are the biggest bottleneck right now for the transceiver business\"\n\n3. China being years away from having CPO DWDM specification lasers.\n\nI covered this earlier when looking at CPO competition from channel checks.\n\nBut AAOI confirming that China is \"easily at least two, three years or even longer from having CPO lasers is incredible tread through on defensibility Western laser positioning in the CPO laser chokepoint.\n\nTLDR:\n\n- High demand imbalance for CW lasers and optical transceivers.\n\n- $AAOI not in first-gen CPO due to capacity constraints (not exactly bearish AAOI because they have too much demand for their optical transciver business, but even better news for the few independent players with capacity coming online like $SIVE)\n\n- China years behind in CPO lasers.",
-      "refs": {},
+      "refs": {
+        "parked_reason": "本機 AAOI Q2 2026 10-Q 可逐字支持雷射垂直整合、擴產與 US$508.8M 現金，但兩張 transcript 截圖沒有 canonical URL／完整 locator；未取得 earnings-call 原文，不能把 20%–40% 需求差、CPO 兩三年差距或 SIVE/LITE/COHR read-through 當圖譜證據，不產 RA。",
+        "trace_attempts_ref": "library/raw/aaoi_10_q_20260806.txt；private lead_media transcript screenshots；2026-08-09 SEC/IR routes access_blocked",
+        "trace_next_trigger": "AAOI_Q2_2026_canonical_earnings_transcript_or_IR_replay_with_locator",
+        "trace_requires_user": "false",
+        "trace_status": "partial",
+        "trace_trigger_entities": [
+          "AAOI",
+          "AMD",
+          "AVGO",
+          "COHR",
+          "LITE",
+          "MTSI",
+          "NVDA",
+          "SIVE",
+          "co:applied_optoelectronics",
+          "co:broadcom",
+          "co:coherent",
+          "co:lumentum",
+          "co:nvidia"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -16024,12 +16109,12 @@
         "campaign_window_start": "2026-06-29T13:46:25Z",
         "ontology_authority": "todo:61",
         "ontology_status": "approved",
-        "parked_reason": "trace_backlog_or_lead_only_after_robotics_bundle",
+        "parked_reason": "本輪 related-entity 觸發後重查；只有 X 貼文與影片預覽，90% 全球出貨、1X 手部技術與 Agility 商業化外推均無 canonical 官方統計或部署文件；今日 permission profile 未載入，官方路徑 access_blocked，不產 RA。",
         "pq2_item": "61",
         "research_bundle_id": "serenity_robotics_20260729",
         "research_report": "docs/reports/serenity_30d_research_2026-07-29.md",
-        "trace_attempts_ref": "docs/reports/serenity_30d_research_2026-07-29.md#截圖paywall判讀",
-        "trace_next_trigger": "new_official_deployment_statistics",
+        "trace_attempts_ref": "docs/reports/serenity_30d_research_2026-07-29.md#截圖paywall判讀；2026-08-09 daily official routes access_blocked",
+        "trace_next_trigger": "new_official_deployment_statistics_or_named_company_primary_disclosure",
         "trace_requeue_trigger": "related_triaged_lead:lead_55d4f2734afbfab750d526b824198afb",
         "trace_requeued_at": "2026-08-07T22:39:26.929238+00:00",
         "trace_requires_user": "false",
@@ -16042,7 +16127,7 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "robotics": {
           "counter_only": false,
@@ -16360,12 +16445,12 @@
         "campaign_window_start": "2026-06-29T13:46:25Z",
         "ontology_authority": "todo:61",
         "ontology_status": "approved",
-        "parked_reason": "trace_backlog_or_lead_only_after_robotics_bundle",
+        "parked_reason": "本輪 related-entity 觸發後仍只有 Xinhua 數字截圖與 Morgan Stanley 二手轉述；未取得中國 2026 人形機器人 100,000+ 產量的 canonical 原文、方法或 Morgan Stanley 14,000 台報告，今日官方路徑 access_blocked，不產 RA。",
         "pq2_item": "61",
         "research_bundle_id": "serenity_robotics_20260729",
         "research_report": "docs/reports/serenity_30d_research_2026-07-29.md",
-        "trace_attempts_ref": "docs/reports/serenity_30d_research_2026-07-29.md#截圖paywall判讀",
-        "trace_next_trigger": "xinhua_original_and_methodology",
+        "trace_attempts_ref": "docs/reports/serenity_30d_research_2026-07-29.md#截圖paywall判讀；2026-08-09 daily official routes access_blocked",
+        "trace_next_trigger": "xinhua_original_and_methodology_or_morgan_stanley_canonical_report",
         "trace_requeue_trigger": "related_triaged_lead:lead_55d4f2734afbfab750d526b824198afb",
         "trace_requeued_at": "2026-08-07T22:39:26.929238+00:00",
         "trace_requires_user": "false",
@@ -16378,7 +16463,7 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "robotics": {
           "counter_only": false,
@@ -18110,9 +18195,29 @@
       ],
       "published_at": "2026-08-06T22:54:46.000Z",
       "raw_text": "Just some TLDR notes on $AAOI earnings:\n\n- Expects full qualification of 1.6T products by their hyperscaler customer within next couple of weeks \n\n(helpful revenue ramp #2, timelines)\n\n-  Continues to believe that AOI will have the largest AI DC transceiver production capacity in the US\n \n(reiterating ambitions during a time when their competitors might get banned)\n\n- Expects facilities toward InP capacity to come online in early 2027 \n\n(timeline FYI in terms of further ramp) \n\n- Total capacity is approaching 200,000/u per month, EOY 650,000/u per month of 800g/1.6t. EOY 2027, 930,000/u \n\n(this is the ramp i want to see)\n\n- \"increase our manufacturing capacity for our external light source or ELSFP. That's for co-packaged optics or CPO\". we anticipate ramping production later this year and into 2027, ultimately culminating in about 400,000 pieces per month in 2028\n\n(need some time to model this into revenue)\n\n- \"As we have mentioned before, we've been manufacturing lasers internally for many years. This has allowed us to avoid some of the shortages that  have affected others in the industry\"\n\n(vertical integration bull case during CW/EML laser shortages) \n\n- We believe that in the future, CPO will continue to drive increased demand for high-power lasers\n\n(thesis validation on CPO sector)\n\n- \"to our long-term objective of returning non-GAAP gross margins to around 40%\"\n\n-  \"We ended the second quarter with $508.8 million in total cash equivalents\"\n\nI need to double check if the ATM finished or not\n\n- \"our ability to deliver revenue in general, and specifically when it  comes to 800G products, is limited by our production capacity right now\" \"If we could produce more, we could ship more right now\"\n\nDemand > Supply validation. \n\n- \"Most of the increased capacity will be in U.S. Even so, let me say that, like I keep emphasizing, that is not good enough for the customer demand. The customer demand is 20%-40% higher.\"\n\nUnholy photonics demand validation across the whole sector, read through for $LITE, $SIVE / $JBL, and others is amazing. \n\n- \"Not in the next two, three years, especially the demand is so big. Okay?  Even combined AI, $LITE, $COHR, $AVGO all together, it's still very tough to meet the customer demand in the next few years\"\n\nMore optical sector demand validation. \n\n- CPO Timelines: \"If you're talking about really high volume manufacturer [for CPO market], I would say more like the late Q3 next year\" and \"We have been working very close with at least five customer\"\n\nIf you care about current earnings (which I'm not really looking at closely)\n\nRevenue: $191M vs. $190m \nEPS: $.06 vs. $.02\n\nTLDR: Extraordinary demand across the laser + optical sector read through. Kinda supporting Lumentum CEO statement that laser shortage is worse than memory shortages. \n\n2027 capacity ramp on track. To map inflection period with timelines, would be around early next year, as stated in their previous earnings call. \n\nAAOI has the customers now. Limitation is making enough lasers and transceivers.",
-      "refs": {},
+      "refs": {
+        "parked_reason": "本機 AAOI Q2 2026 10-Q 支持 800G/1.6T 擴產、雷射垂直整合與 US$508.8M 現金，但未取得完整 earnings-call canonical transcript；截圖只能部分核對需求高於產能與雷射瓶頸，不能驗證 1.6T qualification、400,000 件 ELSFP、Q3 2027 量產或同業外推，且多數為時變 observation，不產 RA。",
+        "trace_attempts_ref": "library/raw/aaoi_10_q_20260806.txt；library/raw/aaoi_8_k_20260806.txt；private lead_media transcript screenshots；2026-08-09 SEC/IR routes access_blocked",
+        "trace_next_trigger": "AAOI_Q2_2026_canonical_earnings_transcript_and_customer_or_IR_confirmation",
+        "trace_requires_user": "false",
+        "trace_status": "partial",
+        "trace_trigger_entities": [
+          "AAOI",
+          "AVGO",
+          "COHR",
+          "JBL",
+          "LITE",
+          "SIVE",
+          "co:applied_optoelectronics",
+          "co:broadcom",
+          "co:coherent",
+          "co:jabil",
+          "co:lumentum"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -20769,12 +20874,12 @@
         "campaign_window_start": "2026-06-29T13:46:25Z",
         "ontology_authority": "todo:61",
         "ontology_status": "approved",
-        "parked_reason": "trace_backlog_or_lead_only_after_robotics_bundle",
+        "parked_reason": "本輪 related-entity 觸發後未取得 SVRC Research State of Robotics 2026 canonical report、index、作者與 methodology；四張 branded 截圖只能作 discovery，不能確認 national champions、供應鏈脆弱點或 2027 併購預測，今日官方路徑 access_blocked，不產 RA。",
         "pq2_item": "61",
         "research_bundle_id": "serenity_robotics_20260729",
         "research_report": "docs/reports/serenity_30d_research_2026-07-29.md",
-        "trace_attempts_ref": "docs/reports/serenity_30d_research_2026-07-29.md#截圖paywall判讀",
-        "trace_next_trigger": "canonical_svrc_report_index_or_legal_excerpt",
+        "trace_attempts_ref": "docs/reports/serenity_30d_research_2026-07-29.md#截圖paywall判讀；2026-08-09 daily official routes access_blocked",
+        "trace_next_trigger": "canonical_svrc_report_index_or_legal_excerpt_with_methodology",
         "trace_requeue_trigger": "related_triaged_lead:lead_55d4f2734afbfab750d526b824198afb",
         "trace_requeued_at": "2026-08-07T22:39:26.929238+00:00",
         "trace_requires_user": "false",
@@ -20791,7 +20896,7 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "robotics": {
           "counter_only": false,
