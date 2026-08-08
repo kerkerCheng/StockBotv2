@@ -516,16 +516,55 @@ shadow 成功的 2026-07-26 時段有 3 次 sandbox FAILURE，而失敗的 07-22
 
 逐一取出各 cohort 首筆 decision 的凍結 `market` 區段後，實際是**至少四種不同成因**：
 
-| Cohort | 建立當下 market 狀態 | 性質 |
+| Cohort | 建立當下 market 狀態 | 根因 |
 |---|---|---|
-| **COHR** | `market_timestamp_future` | **即 §9.6 的 `as_of` 語意 bug**——日線 bar 時戳被判成「在未來」 |
-| **IQE** | `market_adv_invalid` ＋ currency | GBp 未正規化；屬 2026-08-05 幣別修正之前的舊帳 |
-| **AXT** | `market_unavailable` | 唯一一筆真正的抓取失敗 |
-| LITE／META | `market_missing` | **未定**。凍結 bundle 顯示 currency 為 None，但兩者 2026-07-22 即已在 `config/company_identity.json`；可能只是 payload schema 版本差異，**尚無確證，不下結論** |
+| **LITE** | `market_missing` | registry entry 當時**缺 `market_currency`**。cohort 建於 2026-07-22 23:44（台北）；該欄位由 `8e4a4865` 於 07-23 07:08 補上——**晚 7.4 小時** |
+| **META** | `market_missing` | 同上。cohort 建於 2026-08-02 10:15；該欄位由 `b5abbd3e`（即 2026-08-05 的幣別分離修正）於 08-05 11:34 補上——**晚 3 天** |
+| **COHR** | `market_timestamp_future` | `as_of` 落在 `fetched_at` 之後，`_validate_market` 的 `fetched_at < as_of` 直接判 unavailable。**即 §9.6 的 `as_of` 語意 bug** |
+| **IQE** | `market_adv_invalid` ＋ currency | GBp 未正規化；2026-08-05 幣別修正之前的舊帳 |
+| **AXT** | `market_unavailable` | **唯一一筆真正的抓取失敗** |
+| 2 × unresolved | `market_missing` | identity 未解析，預期內 |
 
-**結論：多數不是環境問題，是 repo 內部的資料語意問題。** 這個區別決定解法方向——
-若是 sandbox 就該改環境；實際上解法在程式碼裡，而且其中兩項已經或即將被既有排程
-修掉（§9.6 的交易日 freshness、2026-08-05 的幣別正規化）。
+（Sivers／AAOI 成功。兩者 bundle 顯示 `market_stale`，但 stale 不影響 shadow——
+shadow 用的是正規化**前**的原始 `snapshot.market`，`stale` 是 bundle 正規化後才貼上的。）
+
+**結論：六筆失敗中，五筆是 repo 內部的資料問題，一筆是外部抓取失敗，零筆是 sandbox。**
+這個區別決定解法方向——若是 sandbox 就該改環境；實際上解法在程式碼裡。
+
+**也解釋了為什麼「加重試」不是解法：** LITE 與 META 重試一百次都會失敗，因為缺的
+不是網路，是 `config/company_identity.json` 的那一列。
+
+#### 更深一層：兩個可獨立文件化的形狀
+
+**形狀一（L12 的新實例）：`identity.status` 同時承載兩種語意。**
+META 的凍結 identity payload 是：
+
+```json
+{"status": "resolved", "company_id": "co:meta", "research_ticker": "META",
+ "market_currency": null, "execution_currency": null, "execution_venue": null,
+ "blockers": ["market_currency_missing", "execution_currency_missing",
+              "execution_venue_missing"]}
+```
+
+`status` 一個欄位同時表示「身分解析成功」與「欄位齊全」。下游看 `status == "resolved"`
+就往前走，三個 `*_missing` blocker 明明就在旁邊卻無人理會。**應併入
+`docs/solutions/architecture-patterns/one-representation-two-meanings.md` 作為新實例。**
+
+**形狀二（不是 L12，值得新開一篇）：把可重建的資料當成 point-in-time 凍結。**
+這裡的資訊**一點都不模糊**——系統完整記錄了自己缺什麼；問題是沒有任何東西阻止或
+修復它，而後果不可逆。核心判準：
+
+> **先分清楚哪些資料是「只有當下才有的真相」，哪些是「隨時可重建的事實」。
+> 後者被當成前者凍結時，一次瞬時故障就會造成永久損失。**
+
+對照本專案：
+
+| 資料 | 性質 | 現況 |
+|---|---|---|
+| decision context bundle | 真 point-in-time | ✅ 正確地不可回寫 |
+| **shadow 錨點** | **某個已知日期的收盤價，可完整重建** | ❌ 被當成 point-in-time，一次故障即永久遺失 |
+
+這也是為什麼解法是**回填**而不是**重試**。
 
 **已排除的假設（勿重查）：**
 
@@ -571,6 +610,24 @@ AXTI 已驗證無 split，量價齊揚（7/31 成交量 2,962 萬股），催化
    `market_unavailable`、`market_missing` 全部塌成同一個 `unavailable`——上表能區分出
    四種成因，正是因為 decision 那側保留了 blocker，而 shadow 這側沒有。
 4. **加入修復路徑**：shadow 為 unavailable 時，於後續 reassess 嘗試回填。
+5. **`ensure_shadow_for_company` 不應在 `identity.blockers` 含 `market_currency_missing`
+   時逕自建立 cohort**——那等於明知會壞還先做，並讓錯誤不可逆。
+
+### 9.12 文件化待辦（本輪產出，尚未寫入）
+
+以下三項是本輪確認、但**刻意延後**到實作完成後再寫的沉澱：
+
+1. **併入既有 L12 文件**（不新增檔案）：`identity.status = "resolved"` 卻同時帶著三個
+   `*_missing` blocker，是「一個表示承載兩種語意」的新實例。
+   目標：`docs/solutions/architecture-patterns/one-representation-two-meanings.md`
+2. **新開一篇 solutions**：「可重建的資料不該被當成 point-in-time 凍結」
+   （§9.11 形狀二）。與 L12 的差別在於資訊並不模糊，缺的是**修復路徑**；
+   判準是先分類 point-in-time vs reconstructible，後者必須可回填。
+   目標：`docs/solutions/architecture-patterns/` 新檔。
+3. **L13 候選（延後決定）**：上述形狀二夠格成為 AGENTS.md 的判準，但 AGENTS.md
+   每個 session 全量載入，新增一段是永久 context 成本。**建議等它第二次咬到我們
+   再升格**——這正是 L12 自己的誕生方式（一個 session 內撞到四次同形狀才成為判準）。
+   在那之前只留 solutions 文件與本節紀錄。
 
 **理由是它比 paper 便宜且更早見效：** 不需要 coverage、不需要五軸、不需要 disproof，
 訊號進來記一個價即可；且既有 cohort 可立即回填，不必等三個月累積樣本。
