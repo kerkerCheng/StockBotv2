@@ -106,6 +106,8 @@ def _decision_item(
         "blockers": blockers,
         "next_review_at": lifecycle.get("review_due_at"),
         "disproof_condition": card.get("disproof_condition") or "",
+        # 這些軸的 authority 現在拿得到了，值得重評估（只是提示，不自動改等級）。
+        "reassessable_axes": list(current_authority.get("reassessable_axes") or []),
         "probe_expiry": card.get("probe_expiry"),
         "expiry_lapsed": bool(card.get("expiry_lapsed")),
         "user_response_needed": (
@@ -171,6 +173,62 @@ def _ratio(current: Any, previous: Any) -> float | None:
     ):
         return None
     return float(current) / float(previous) - 1.0
+
+
+# 哪一軸依賴哪些 authority section。這不是新字彙——它是
+# `sizing.AXIS_REFERENCE_AUTHORITIES` 的 snapshot-section 投影：那份對照表管的是
+# 「這一軸的 evidence_ref 可以引用哪些 authority」，這裡管的是「那些 authority
+# 現在拿不拿得到」。兩者必須同步修改。
+_AXIS_AUTHORITY_SECTIONS = {
+    "source_reliability": ("evidence",),
+    "technical_causal_link": ("evidence",),
+    "commercial_maturity": ("evidence", "financial"),
+    "financial_resilience": ("financial",),
+    "valuation_payoff": ("financial", "market", "fx"),
+}
+_AVAILABLE_STATUSES = frozenset({"available", "observed"})
+
+
+def _reassessable_axes(
+    frozen_assessment: Mapping[str, Any], snapshot: Any
+) -> list[str]:
+    """哪些 `unknown` 軸的 authority 現在拿得到了——亦即「可以重評估了」。
+
+    軸在被評成 `unknown` 時會誠實記下 `missing_data`，但那是自由文字，沒有任何
+    地方拿它去問「這項現在拿得到了嗎」。實測 co:sivers 的 `valuation_payoff` 因
+    SIVE.ST 行情被 quarantine 而判 unknown（2026-07-28），quarantine 在 2026-08-05
+    的幣別修正後就解除了，卻沒有任何東西回頭看它——該標的因此在一個**已經修好的
+    問題**上又卡了三天，而使用者實際持有它。
+
+    這裡不解析自由文字（那會變成猜測），只用既有的軸→authority 對應做確定性比對：
+    軸是 unknown、而它依賴的 authority 現在全部 available ⇒ 值得重評估。
+    這只是**提示**，不自動改任何軸的等級。
+    """
+
+    reassessable: list[str] = []
+    for axis, sections in _AXIS_AUTHORITY_SECTIONS.items():
+        entry = frozen_assessment.get(axis)
+        if not isinstance(entry, Mapping) or entry.get("level") != "unknown":
+            continue
+        ready = True
+        for section in sections:
+            payload = getattr(snapshot, section, None) or {}
+            status = str(payload.get("status") or "")
+            if section == "evidence":
+                # evidence 沒有 available/observed，用 coverage 的說法：
+                # 只要不是缺席或空圖就算拿得到。
+                ready = ready and status not in {
+                    "",
+                    "unresolved_identity",
+                    "graph_unavailable",
+                    "graph_empty",
+                    "graph_company_missing",
+                }
+            else:
+                ready = ready and status in _AVAILABLE_STATUSES
+        if ready:
+            reassessable.append(axis)
+    return sorted(reassessable)
 
 
 def _ratio_diff(security: Any, benchmark: Any) -> float | None:
@@ -282,6 +340,8 @@ def _current_authority_context(
         evidence_delta = "peripheral"
     else:
         evidence_delta = "none"
+    frozen_assessment = (latest["payload"].get("request") or {}).get("assessment") or {}
+    reassessable = _reassessable_axes(frozen_assessment, snapshot)
     change = {
         "security_return": security_return,
         "shadow_return": shadow_return,
@@ -302,6 +362,7 @@ def _current_authority_context(
             "benchmark_symbol": benchmark_symbol,
             "fx_return": fx_return,
             "evidence_delta": evidence_delta,
+            "reassessable_axes": reassessable,
         },
         change,
     )
