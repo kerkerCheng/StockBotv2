@@ -1619,6 +1619,82 @@
       "source": "decision_lab",
       "title": "REVIEW — co:agility_robotics",
       "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-08T20:07:50.101937+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 107,
+      "reason": null,
+      "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:applied_optoelectronics",
+      "type": "decision_review",
+      "waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-08-08T20:07:50.101826+00:00",
+        "trigger": "市場資料問題",
+        "until": null
+      }
+    },
+    {
+      "added_at": "2026-08-08T20:07:50.101937+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 108,
+      "reason": null,
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:axt",
+      "type": "decision_review",
+      "waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-08-08T20:07:50.101858+00:00",
+        "trigger": "市場資料問題",
+        "until": null
+      }
+    },
+    {
+      "added_at": "2026-08-08T20:07:50.101937+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 109,
+      "reason": null,
+      "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:iqe",
+      "type": "decision_review",
+      "waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-08-08T20:07:50.101889+00:00",
+        "trigger": "該 Confidence 軸尚未提供有效評估／圖中缺反向路徑（競爭者／可替代性）／執行面 context 缺失",
+        "until": null
+      }
+    },
+    {
+      "added_at": "2026-08-08T20:07:50.101937+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 110,
+      "reason": null,
+      "ref_id": "dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:meta",
+      "type": "decision_review",
+      "waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-08-08T20:07:50.101903+00:00",
+        "trigger": "市場資料問題",
+        "until": null
+      }
     }
   ],
   "log": [
@@ -3474,6 +3550,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 107,
+  "next_n": 111,
   "schema_version": "1"
 }
