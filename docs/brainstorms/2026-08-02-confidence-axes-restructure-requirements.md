@@ -764,3 +764,70 @@ registry 覆寫成 SOXX。**不採 provider 推斷的 sector**：那正是幣別
 **下一輪的判準不變（§8.3）：任何 gate 改動落地時必須回答「現有 cohort 有幾個的
 `supported_range` 真的變了」。** 而新增一條：**任何「機制不生效」的修法，必須同時回答
 「它現在產出過幾筆」**——否則就是又蓋了一個空機制。
+
+### 10.9 兩個由「處理四則推文」撞出的結構問題
+
+**（一）pq1 排序只看標題第一個 cashtag，且完全不看實際持股**
+
+`engine_b/priority.py` 的算分：
+
+```
+score = (5 − tier) + 5.0 矛盾 + 4.0 thesis_impact + 3.0 獨立來源
+      + 2.0 新穎 + 5.0 使用者指定 + 5.0 campaign
+```
+
+`thesis_impact` 由 `lead_ticker()` 判定，而它取的是**標題裡第一個 `$XXX`**。實例：
+
+> "Wow, there's gem after gem in **$AAOI** earnings for **$SIVE** + other laser player readthrough."
+
+第一個 cashtag 是 `$AAOI`，於是整則推文只用 AAOI 判斷重要性——但該則的實質重點是
+SIVE（使用者實際持有 FRA:2DG），且同時提到 LITE／AVGO／COHR／NVDA。
+**而 `engine_b/entities.py` 的抽取早就把五家都解析出來了**：
+
+```
+entities: ['co:applied_optoelectronics', 'co:lumentum',
+           'co:broadcom', 'co:coherent', 'co:nvidia']
+```
+
+**抽取抓到五個，排序只用一個。** 這是既有資料沒被下游使用，不是資訊不足。
+
+第二層：`tracked_tickers` 由「非 retired lifecycle ＋ 未結案 Decision cohort」導出，
+**不含 Google Sheet 持股**。因此**實際持有但尚未建 cohort 的標的，在研究排序上零加權**。
+
+實測後果（2026-08-08 的 drain 前五名）：三則機器人題材各 13.0 排在前面——而它們對應的
+三個 Agility cohort 至今 identity 仍是 `unresolved`、無 ticker、無法下注；關於使用者持股
+的那則排第四（10.0）。**每日只有 5 個 pq1 額度，先花在不能行動的東西上。**
+
+修法方向（未實作）：`thesis_impact` 改用 `lead.entities.company_ids` 全集合而非第一個
+cashtag；另加一個 holdings 維度（Sheet 持股 ⊂ 加權來源）。⚠ 加權不等於自動研究，
+pq2 人工 gate 不變。
+
+**（二）`graph_commercial` 是宣告存在、卻無人生產的 authority**
+
+`sizing.AXIS_REFERENCE_AUTHORITIES` 宣告 `commercial_maturity` 可由三種證據支持：
+
+```python
+"commercial_maturity": {"graph_commercial", "engine_c_backlog", "engine_c_customer"}
+```
+
+但 `graph_commercial` 對應 evidence payload 的 `commercial_assertions`，而全 repo 只有
+**消費端**（`context.py:397` 讀它），**沒有任何生產端**——`engine_d_runtime` 的 `_read_graph`
+產出 entities／edges／claims／assertions／sources／causal_paths／counter_paths，就是沒有
+`commercial_assertions`。
+
+於是宣告的三條路實際只有兩條，且兩條都要求 Engine C 有 `manual_reviewed` 的客戶集中度與
+backlog 觀測（`manual_required` 時 `source` 為 None，不會進 reference index）。
+
+**這造就一個看起來軟、實際上硬的閘門**：任何公司只要缺那兩筆人工觀測，
+`commercial_maturity` 恆為 `unknown`；五軸取 min ⇒ **supported range 恆為 0**。
+
+實測：co:iqe 於 2026-08-08 補齊四軸與 L7 證偽條件後仍是 `SHADOW_ONLY`，唯一原因就是該軸
+結構上無法被填；co:aaoi 能有 paper 部位，是因為它**剛好**已有那兩筆人工觀測。
+
+這是 D13（空機制）的新實例，且比先前幾個更隱蔽——它不是「蓋好沒人用」，是
+**「宣告了但從未存在」**，而宣告本身讓人以為有三條路可走。
+
+修法方向（未實作，二擇一）：讓 graph adapter 真的產出 `commercial_assertions`
+（來源是圖中 `supplies_to`／backlog 類 edge 的 assertion），或把 `graph_commercial`
+從 `AXIS_REFERENCE_AUTHORITIES` 移除並在文件明寫「本軸只能由 Engine C 人工觀測滿足」。
+**兩者都可接受，不可接受的是維持現狀**——現狀讓閘門的真實高度與宣告不符。
