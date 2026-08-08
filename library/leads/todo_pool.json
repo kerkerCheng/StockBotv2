@@ -1532,6 +1532,90 @@
       },
       "title": "REVIEW — co:meta",
       "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-07T22:41:22.800262+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 102,
+      "reason": null,
+      "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "source_cleared": {
+        "at": "2026-08-07T22:41:57.396312+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
+      "title": "REVIEW — co:applied_optoelectronics",
+      "type": "decision_review",
+      "waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-08-07T22:41:22.800191+00:00",
+        "trigger": "執行面 context 缺失／市場資料問題",
+        "until": null
+      }
+    },
+    {
+      "added_at": "2026-08-07T22:41:22.800262+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 103,
+      "reason": null,
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "source_cleared": {
+        "at": "2026-08-07T22:41:57.396312+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
+      "title": "REVIEW — co:axt",
+      "type": "decision_review",
+      "waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-08-07T22:41:22.800221+00:00",
+        "trigger": "執行面 context 缺失／市場資料問題",
+        "until": null
+      }
+    },
+    {
+      "added_at": "2026-08-07T22:41:22.800262+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 104,
+      "reason": null,
+      "ref_id": "dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "source_cleared": {
+        "at": "2026-08-07T22:41:57.396312+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
+      "title": "REVIEW — co:meta",
+      "type": "decision_review",
+      "waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-08-07T22:41:22.800244+00:00",
+        "trigger": "執行面 context 缺失／市場資料問題",
+        "until": null
+      }
+    },
+    {
+      "added_at": "2026-08-07T22:54:56.425388+00:00",
+      "hint": "核准 exact graph delta；Decision handoff：co:agility_robotics。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 105,
+      "reason": null,
+      "ref_id": "ra_d7a27bba9d0751a12ee8ae55d69d918a",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "FCC 2026-07-28 將外國製先進機器人納入 Covered List",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -3304,8 +3388,35 @@
       "ref_id": "dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
       "type": "decision_review",
       "verb": "drop"
+    },
+    {
+      "at": "2026-08-07T22:41:57.396312+00:00",
+      "n": 102,
+      "reason": "來源本輪成功執行，但不再產出此項",
+      "receipt": null,
+      "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
+      "type": "decision_review",
+      "verb": "source_cleared"
+    },
+    {
+      "at": "2026-08-07T22:41:57.396312+00:00",
+      "n": 103,
+      "reason": "來源本輪成功執行，但不再產出此項",
+      "receipt": null,
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "type": "decision_review",
+      "verb": "source_cleared"
+    },
+    {
+      "at": "2026-08-07T22:41:57.396312+00:00",
+      "n": 104,
+      "reason": "來源本輪成功執行，但不再產出此項",
+      "receipt": null,
+      "ref_id": "dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
+      "type": "decision_review",
+      "verb": "source_cleared"
     }
   ],
-  "next_n": 102,
+  "next_n": 106,
   "schema_version": "1"
 }
