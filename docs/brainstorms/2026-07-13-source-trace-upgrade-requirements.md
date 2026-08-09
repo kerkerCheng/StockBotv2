@@ -50,6 +50,7 @@ planned_in: docs/plans/2026-07-15-008-feat-unified-workplan-plan.md
 - R8. 週報新增「追源未果清單」段落：每項附原始訊號摘要與已嘗試路由。
 - R9. 追源未果項目同步開（或併入）一個 `weekly-scan` label 的 Issue，每項一個 checkbox；既有 digest 不需修改。
 - R10. 週報標記「單一 `origin_entity`」的主張；待印證全量清單以圖查詢即時導出，不落地成檔案。
+- R11. 對 `parked` 且 materiality 達門檻、但自動化因合法 access gap 無法完成的 lead，產生可由使用者接手的 `manual_source_trace_request`（明列缺少的原文、投資重要性、已嘗試路徑、可接受交付物與回填入口），使用者補回合法來源後由同一 lead／receipt 恢復 pq1，且不因此提高 evidence tier 或繞過 graph admission。
 
 ---
 
