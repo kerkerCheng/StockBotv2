@@ -543,9 +543,10 @@
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 42,
       "reason": null,
+      "receipt": null,
       "ref_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "drop",
+      "resolved_at": "2026-08-09T01:47:42.586127+00:00",
       "source": "decision_lab",
       "source_cleared": {
         "at": "2026-08-09T01:34:02.895408+00:00",
@@ -553,13 +554,7 @@
         "source_healthy": true
       },
       "title": "REVIEW — co:sivers_semiconductors",
-      "type": "decision_review",
-      "waiting_on": {
-        "reason": null,
-        "set_at": "2026-07-30T15:33:49.863872+00:00",
-        "trigger": "SIVE Q2 財報（Ningi 指控之分辨點）",
-        "until": "2026-08-27"
-      }
+      "type": "decision_review"
     },
     {
       "added_at": "2026-07-28T22:45:53.987413+00:00",
@@ -1615,6 +1610,11 @@
     },
     {
       "added_at": "2026-08-08T05:18:54.542554+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_10b65a3868623d84f6b7e56d37b1b931",
+      "dispatch_ref": "wo_6a639253c769a449a50619cf32602e44",
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-08-09T01:47:42.060007+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 106,
       "reason": null,
@@ -1630,9 +1630,10 @@
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 107,
       "reason": null,
+      "receipt": null,
       "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "drop",
+      "resolved_at": "2026-08-09T01:47:42.586161+00:00",
       "source": "decision_lab",
       "source_cleared": {
         "at": "2026-08-09T01:34:02.895408+00:00",
@@ -1640,23 +1641,17 @@
         "source_healthy": true
       },
       "title": "REVIEW — co:applied_optoelectronics",
-      "type": "decision_review",
-      "waiting_on": {
-        "derived_from_blockers": true,
-        "reason": "所有 blocker 都不需要使用者決定",
-        "set_at": "2026-08-08T20:07:50.101826+00:00",
-        "trigger": "市場資料問題",
-        "until": null
-      }
+      "type": "decision_review"
     },
     {
       "added_at": "2026-08-08T20:07:50.101937+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 108,
       "reason": null,
+      "receipt": null,
       "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "drop",
+      "resolved_at": "2026-08-09T01:47:42.586174+00:00",
       "source": "decision_lab",
       "source_cleared": {
         "at": "2026-08-09T01:34:02.895408+00:00",
@@ -1664,14 +1659,7 @@
         "source_healthy": true
       },
       "title": "REVIEW — co:axt",
-      "type": "decision_review",
-      "waiting_on": {
-        "derived_from_blockers": true,
-        "reason": "所有 blocker 都不需要使用者決定",
-        "set_at": "2026-08-08T20:07:50.101858+00:00",
-        "trigger": "市場資料問題",
-        "until": null
-      }
+      "type": "decision_review"
     },
     {
       "added_at": "2026-08-08T20:07:50.101937+00:00",
@@ -1697,9 +1685,10 @@
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 110,
       "reason": null,
+      "receipt": null,
       "ref_id": "dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "drop",
+      "resolved_at": "2026-08-09T01:47:42.586185+00:00",
       "source": "decision_lab",
       "source_cleared": {
         "at": "2026-08-09T01:34:02.895408+00:00",
@@ -1707,14 +1696,7 @@
         "source_healthy": true
       },
       "title": "REVIEW — co:meta",
-      "type": "decision_review",
-      "waiting_on": {
-        "derived_from_blockers": true,
-        "reason": "所有 blocker 都不需要使用者決定",
-        "set_at": "2026-08-08T20:07:50.101903+00:00",
-        "trigger": "市場資料問題",
-        "until": null
-      }
+      "type": "decision_review"
     }
   ],
   "log": [
@@ -3604,6 +3586,52 @@
       "ref_id": "dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
       "type": "decision_review",
       "verb": "source_cleared"
+    },
+    {
+      "at": "2026-08-09T01:47:42.060007+00:00",
+      "attempt": 1,
+      "n": 106,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_6a639253c769a449a50619cf32602e44",
+      "ref_id": "dc_317c2897cdcffda26c2c2e0e79074670",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-08-09T01:47:42.586127+00:00",
+      "n": 42,
+      "reason": null,
+      "receipt": null,
+      "ref_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
+      "type": "decision_review",
+      "verb": "drop"
+    },
+    {
+      "at": "2026-08-09T01:47:42.586161+00:00",
+      "n": 107,
+      "reason": null,
+      "receipt": null,
+      "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
+      "type": "decision_review",
+      "verb": "drop"
+    },
+    {
+      "at": "2026-08-09T01:47:42.586174+00:00",
+      "n": 108,
+      "reason": null,
+      "receipt": null,
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "type": "decision_review",
+      "verb": "drop"
+    },
+    {
+      "at": "2026-08-09T01:47:42.586185+00:00",
+      "n": 110,
+      "reason": null,
+      "receipt": null,
+      "ref_id": "dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
+      "type": "decision_review",
+      "verb": "drop"
     }
   ],
   "next_n": 111,
