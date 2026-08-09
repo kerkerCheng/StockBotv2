@@ -1,7 +1,44 @@
-# Daily 的所有網路權限只由 stockbot-daily profile 管理。
-# 本檔唯一例外是 state publisher 的窄 Git 寫入；它不是網路 fallback。
+# Codex standalone scheduled task 會沿用 workspace-write sandbox；以下七個 fixed entry
+# 是 Daily 唯一的 outside-sandbox 權限來源。首次呼叫就使用 exact rule，不先失敗再重跑；
+# 不放行任意 Python、PowerShell、shell、Git 或 working tree。
+prefix_rule(
+    pattern=[".venv\\Scripts\\python.exe", "crons\\harvest_leads.py"],
+    decision="allow",
+    justification="Daily harvest 需要連 X API 與 SEC EDGAR，憑證與 source_state 都留在本機。",
+)
+
+prefix_rule(
+    pattern=[".venv\\Scripts\\python.exe", "engine_c\\etl_yfinance.py"],
+    decision="allow",
+    justification="Daily Engine C ETL 需要連 Yahoo Finance 並只寫 ignored private runtime。",
+)
+
+prefix_rule(
+    pattern=[".venv\\Scripts\\python.exe", "scripts\\daily_beta_snapshot.py"],
+    decision="allow",
+    justification="Daily beta fixed entry 只刷新 Engine C technical observations、唯讀 Sheet 並產人工 review，不下單或寫 Sheet。",
+)
+
 prefix_rule(
     pattern=[".venv\\Scripts\\python.exe", "scripts\\publish_daily_state.py"],
     decision="allow",
     justification="固定 publisher 只提交兩個 daily state files 並推送 master。",
+)
+
+prefix_rule(
+    pattern=[".venv\\Scripts\\python.exe", "-m", "decision_lab", "today"],
+    decision="allow",
+    justification="Daily decision brief 只讀 Google Sheet、Neo4j 與 private Decision authorities。",
+)
+
+prefix_rule(
+    pattern=[".venv\\Scripts\\python.exe", "-m", "engine_b.todo", "sync"],
+    decision="allow",
+    justification="Daily todo sync 只同步本機 approval authorities 到 stable todo pool。",
+)
+
+prefix_rule(
+    pattern=[".venv\\Scripts\\python.exe", "scripts\\publish_daily_brief.py"],
+    decision="allow",
+    justification="Discord publisher 只把 canonical Daily Brief 送到既有 private Forum webhook。",
 )

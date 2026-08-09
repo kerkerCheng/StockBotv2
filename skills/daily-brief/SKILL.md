@@ -55,17 +55,20 @@ credit 不進 NAV／cash／allocation。technical／capital telemetry 不進 pq1
 自有現金 baseline 每 5 個完整交易日固定主動提醒一次，週期由 Engine C 全部 distinct observed sessions
 定錨，不綁 RSI／MACD／tier；資料不足仍歸零。貸款不在例行提醒內，提款時間表留待另案人工核准。
 **解析失敗 ≠ 無新文**。每筆失敗必須保存 `failure_class`；最新一次仍失敗的來源由
-`harvest-health` 持續顯示。Codex scheduled run 的 primary path 是 project
-`.codex/config.toml` 內的 `stockbot-daily` permission profile：已知 authority／publisher 網域必須在
-sandbox **第一次呼叫就可達**，不得先製造可預期的 `access_blocked` 再事後補跑；`.env` 在 profile 中只讀，
-網域不使用 `*`，也不把整個 PowerShell、Python 或 working tree 設成 unrestricted。這組 fixed entry 包含
+`harvest-health` 持續顯示。Codex standalone scheduled task 會沿用 legacy `workspace-write` sandbox，
+因此 Daily 的唯一權限來源是 `.codex/rules/stockbot-automations.rules` 的窄 fixed entry；不得再用 project
+permission profile 當成 scheduled primary path。下列連外命令**第一次呼叫就用 `require_escalated` 命中 exact
+outside-sandbox rule**，
+不是先製造可預期的 `access_blocked` 再以升權重重跑；不得放行整個 PowerShell、Python、Git 或 working tree。
+fixed entry 包含
 `crons\harvest_leads.py`、`engine_c\etl_yfinance.py`、`scripts\daily_beta_snapshot.py`、
 `decision_lab today`、`engine_b.todo sync`、`scripts\publish_daily_state.py` 與
-`scripts\publish_daily_brief.py`。`publish_daily_state.py` 需要寫 `.git`，不擴張 profile 的 filesystem
-權限；它是唯一 outside-sandbox rule，首次呼叫就使用該 exact rule，但不構成第二套網路 fallback。
-其餘命令不得另留或臨時建立 network prefix rule。若 profile 未載入，或連外命令仍出現
-`access_blocked`，視為 permission profile 設定失效：保留結構化 failure、讓受影響資料 fail closed，
-不得以 `require_escalated`／第二套 network rule 事後補跑，也不得改寫成「零筆」或 `no_result`。
+`scripts\publish_daily_brief.py`；七條 rule 就是單一 authority，不是 primary＋fallback 兩套來源。
+若 exact rule 未匹配、升權限被拒或命令仍出現 `access_blocked`，保留結構化 failure、讓受影響資料 fail closed，
+不得改用第二條更寬 rule、手動重跑或改寫成「零筆」／`no_result`。權限正確後若仍發生暫時性 transport error，
+只允許該命令**既有的 bounded、idempotent retry 作最後一步**（例如 TWSE bounded retry、Discord 每段最多
+3 次）；不得在 routine 層重跑整份 fixed entry、整份 Daily Brief，或重做已 checkpoint 的研究／authority
+mutation。retry 用盡後照樣保存 failure 並 fail closed。
 `harvest-health`、queue list／count、JSON 檢查等純本機唯讀命令維持 sandbox。
 `insufficient_history`／`unavailable`／`stale`
 也必須在健康段落明示並讓受影響的

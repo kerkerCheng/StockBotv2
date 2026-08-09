@@ -204,6 +204,14 @@ Decision gap jobs 優先占用同一個 daily pq1 budget。若研究結果需要
 
 issuer 曝險 ≥20% 且對應 series 單日報酬首次跌破 -4% 才產 ephemeral `event_search_requests`；daily agent 只做一次 WebSearch，輸出可能原因＋曝險並標未經查證，**不建 lead／decision、不進 pq1/pq2、不寫 Engine A**。需要深挖才另走 lead-intake。
 
+### Daily routine 權限與 retry 邊界（2026-08-09 使用者定案）
+
+Codex standalone scheduled task 會沿用 legacy `workspace-write` sandbox，project permission profile 不得再當作
+Daily 網路 authority；唯一權限來源是 `.codex/rules/stockbot-automations.rules` 的七個窄 fixed entry，連外命令
+**第一次呼叫就用 `require_escalated` 命中 exact outside-sandbox rule**，不是先失敗再以升權重重跑。權限取得後若仍遇暫時性 transport
+error，只允許該命令既有的 bounded、idempotent retry 作最後一步；不得重跑整份 Daily Brief、重做已 checkpoint
+的研究／authority mutation，或把 permission failure 冒充成「零筆」。retry 用盡後保存結構化 failure 並 fail closed。
+
 ### 報告留檔策略
 
 **daily brief 不留檔**（只出在 session；稽核價值由待辦池 log ＋ leads 狀態機 ＋ Decision Store 承擔）；**weekly report 留檔**（`docs/reports/`，含無法從池重建的 topic discovery 與健康審查趨勢）。不回到 PR/Issue 形式——那會產生與池競爭的第二個狀態源。

@@ -28,6 +28,16 @@ def test_daily_prompt_uses_local_authorities_and_repo_venv() -> None:
     assert "不要建立 branch" in text
 
 
+def test_daily_prompt_uses_fixed_entries_on_first_call_and_never_replays_permission_failures() -> None:
+    text = DAILY.read_text(encoding="utf-8")
+    assert "Daily 的唯一權限來源" in text
+    assert "第一次呼叫就用" in text and "`require_escalated` 命中 exact" in text
+    assert "不得先在 sandbox 製造可預期失敗再升權重重跑" in text
+    assert "bounded、idempotent retry 跑完作最後一步" in text
+    assert "不得在 routine" in text and "整份 Daily Brief" in text
+    assert "不得改用更寬 rule 或手動重跑" in text
+
+
 def test_daily_prompt_keeps_human_gates_and_batch_contract() -> None:
     text = DAILY.read_text(encoding="utf-8")
     assert "engine_b.cli drain" in text

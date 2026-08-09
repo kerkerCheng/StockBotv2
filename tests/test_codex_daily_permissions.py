@@ -1,8 +1,7 @@
-"""Daily Brief 的 project permission profile 必須窄、完整且可預期。"""
+"""Daily Brief scheduled task 只使用窄 fixed-entry rules。"""
 from __future__ import annotations
 
 from pathlib import Path
-import tomllib
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -10,43 +9,28 @@ CONFIG = ROOT / ".codex" / "config.toml"
 RULES = ROOT / ".codex" / "rules" / "stockbot-automations.rules"
 
 
-def test_daily_profile_allows_required_domains_without_global_network_wildcard() -> None:
-    config = tomllib.loads(CONFIG.read_text(encoding="utf-8"))
-    assert config["default_permissions"] == "stockbot-daily"
-    profile = config["permissions"]["stockbot-daily"]
-    assert profile["extends"] == ":workspace"
-    assert profile["filesystem"][":workspace_roots"][".env"] == "read"
-    network = profile["network"]
-    assert network["enabled"] is True
-    assert network["allow_local_binding"] is True
-    domains = network["domains"]
-    assert "*" not in domains
-    for required in (
-        "api.x.com",
-        "data.sec.gov",
-        "www.sec.gov",
-        "query1.finance.yahoo.com",
-        "query2.finance.yahoo.com",
-        "openapi.twse.com.tw",
-        "oauth2.googleapis.com",
-        "sheets.googleapis.com",
-        "localhost",
-        "github.com",
-        "discord.com",
-    ):
-        assert domains[required] == "allow"
+def test_project_does_not_define_an_ignored_permission_profile() -> None:
+    assert not CONFIG.exists()
 
 
-def test_only_state_publisher_has_an_outside_sandbox_rule() -> None:
+def test_only_daily_fixed_entries_have_outside_sandbox_rules() -> None:
     rules = RULES.read_text(encoding="utf-8")
-    assert rules.count("prefix_rule(") == 1
-    assert "scripts\\\\publish_daily_state.py" in rules
-    for network_command in (
+    assert rules.count("prefix_rule(") == 7
+    for fixed_entry in (
         "crons\\\\harvest_leads.py",
         "engine_c\\\\etl_yfinance.py",
         "scripts\\\\daily_beta_snapshot.py",
         '"-m", "decision_lab", "today"',
         '"-m", "engine_b.todo", "sync"',
+        "scripts\\\\publish_daily_state.py",
         "scripts\\\\publish_daily_brief.py",
     ):
-        assert network_command not in rules
+        assert fixed_entry in rules
+    for broad_entry in (
+        'pattern=["python"',
+        'pattern=[".venv\\\\Scripts\\\\python.exe"]',
+        'pattern=["powershell"',
+        'pattern=["git"',
+    ):
+        assert broad_entry not in rules
+    assert "stockbot-daily" not in rules
