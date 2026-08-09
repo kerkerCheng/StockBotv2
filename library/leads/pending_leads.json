@@ -2066,6 +2066,60 @@
       "result": "fetch_failed",
       "run_at": "2026-08-08T22:33:46.102336+00:00",
       "source": "edgar:GFS"
+    },
+    {
+      "new": 4,
+      "result": "ok",
+      "run_at": "2026-08-09T01:25:22.780650+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-09T01:25:24.071251+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-09T01:25:25.062288+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-09T01:25:25.930061+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-09T01:25:27.001638+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-09T01:25:28.013564+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-09T01:25:29.027717+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-09T01:25:30.069586+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-09T01:25:31.012365+00:00",
+      "source": "edgar:GFS"
     }
   ],
   "leads": {
@@ -2674,6 +2728,75 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2075670213169918070"
+    },
+    "lead_0624cbfddb41714f21502cc3f3da7a8a": {
+      "entities": {
+        "company_ids": [
+          "co:axt",
+          "co:lumentum",
+          "co:coherent",
+          "co:applied_optoelectronics"
+        ],
+        "tickers": [
+          "MU",
+          "AXTI",
+          "LITE",
+          "COHR",
+          "AAOI",
+          "SPCX"
+        ]
+      },
+      "first_seen": "2026-08-09T01:25:22.775318+00:00",
+      "lead_id": "lead_0624cbfddb41714f21502cc3f3da7a8a",
+      "media": [
+        {
+          "cache": {
+            "bytes": 78603,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_0624cbfddb41714f21502cc3f3da7a8a/3_2086144689368121344.jpg",
+            "sha256": "0b2183105307559ddf3e3f51d7d49cfaddba43d51b4f19075e1d05de220bb40a"
+          },
+          "height": 711,
+          "media_key": "3_2086144689368121344",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HPN5isfawAA4lXb.jpg",
+          "width": 1320
+        }
+      ],
+      "published_at": "2026-08-08T17:52:29.000Z",
+      "raw_text": "Yes, I'm still bullish on memory like $MU / Samsung.\n\nAs I said earlier, markets tend to rotate from bottleneck to bottleneck.\n\nThis week it looks $AXTI to $LITE in the photonics sector is the focus again. \n\nThe thing is... the primary thing that changed are the stock prices, followed by some narratives + updates sprinkled in here and there.\n\nFor photonics:\n\n> We already knew $COHR / $LITE lasers were completely sold out for the next 2 years during July's drop. \n\n> We knew about demand imbalance from $AAOI from last quarter's earnings calls.\n\nNothing deteriorated fundamentally during July's crash, other than listed price after liquidations. \n\nYet tons of people called $AAOI a \"scam\" when it dropped to $75, or $AXTI a \"scam\" on its drop to $35... \n\nBut are bullish again at $140 or $80, when the transciver/InP substrate bottleneck hasn't changed at all, but maybe even got worse... (eg. draft for US ban on new china optical transceivers, scale up demand projections)\n\nFor Memory:\n\nI'm witnessing a lot of retail capitulation, but the same people I'm seeing were mega bullish after $MU signed 16 SCAs and gave exceptional projections a month ago. \n\nOr were celebrating Samsung having the highest operating profit in the world.\n\nThere's updates here and there eg. Rubin Ultra with memory optimizations (which Nvidia strives for every generation), with prices no longer being hiked way above expectations to the extreme. \n\nBut the operating income relative to MC is just absurd around current prices, especially memory becomes structural. \n\nAnd the demand imbalance should be even worse next year.  \n\nPeople tend to capitulate and follow narratives when a sector drops (eg. Helium/LNG back in Iran war), even if the bottleneck or fundamental situation hasn't really changed much (eg. $SPCX Elon earnings call reiterating memory tightness). \n\nI can't tell others what to to do: \n\nBut $AAOI at $140 and $AAOI at $75 are the same company.\n\nSamsung at a $1.5T MC and Samsung at a $980B MC are the same company. \n\nJust valuations and narratives (often noise) change, and markets rotate from sector to sector.",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "COHR",
+            "InP",
+            "LITE"
+          ]
+        }
+      },
+      "title": "Yes, I'm still bullish on memory like $MU / Samsung. As I said earlier, markets tend to rotate from bottleneck to bottleneck. This week it looks $AXTI to $LITE in the photonics sector is the focus again. The thing is... the primary thing that changed are the stock prices, followed by some narratives + updates sprinkled in here and there. For photonics: > We already knew $COHR / $LITE lasers were completely sold out for the next 2 years during July's drop. > We knew about demand imbalance from $AAOI from last quarter's earnings calls. Nothing deteriorated fundamentally during July's crash, other than listed price after liquidations. Yet tons of people called $AAOI a \"scam\" when it dropped to $75, or $AXTI a \"scam\" on its drop to $35... But are bullish again at $140 or $80, when the transciver/InP substrate bottleneck hasn't changed at all, but maybe even got worse... (eg. draft for US ban on new china optical transceivers, scale up demand projections) For Memory: I'm witnessing a lot of retail capitulation, but the same people I'm seeing were mega bullish after $MU signed 16 SCAs and gave exceptional projections a month ago. Or were celebrating Samsung having the highest operating profit in the world. There's updates here and there eg. Rubin Ultra with memory optimizations (which Nvidia strives for every generation), with prices no longer being hiked way above expectations to the extreme. But the operating income relative to MC is just absurd around current prices, especially memory becomes structural. And the demand imbalance should be even worse next year. People tend to capitulate and follow narratives when a sector drops (eg. Helium/LNG back in Iran war), even if the bottleneck or fundamental situation hasn't really changed much (eg. $SPCX Elon earnings call reiterating memory tightness). I can't tell others what to to do: But $AAOI at $140 and $AAOI at $75 are the same company. Samsung at a $1.5T MC and Samsung at a $980B MC are the same company. Just valuations and narratives (often noise) change, and markets rotate from sector to sector.",
+      "triage": {
+        "decided_at": "2026-08-09T01:26:40.660274+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "具體命中 MU、Samsung、AXTI、LITE、COHR、AAOI 與 InP／雷射供需，並含兩年售罄、16 份 SCA 等可追回一手文件的原子主張；雖混有估值敘事，仍寬鬆放行追源。",
+        "related_trace_requeues": [
+          "lead_346c43a02c97ab876fd90f6845f10629",
+          "lead_44d33f5c904cb1fb75c452098d739e55",
+          "lead_8088f665e358a7744d9b6bc1646bccbf",
+          "lead_89f2cee24a796d94b33e85d1dd5e0b04",
+          "lead_9adb031e86660441500e62d9adc0bafe",
+          "lead_ca5b0998d48307f3e510f657f0bef877",
+          "lead_e87032df984f0fa40a6bd12a7130b39a"
+        ],
+        "tier": 3
+      },
+      "url": "https://x.com/aleabitoreddit/status/2086148557187461412"
     },
     "lead_063dffb7d73ace4f7a642322002304b7": {
       "entities": {
@@ -6201,8 +6324,8 @@
         "research_run": "daily_2026-08-05",
         "trace_attempts_ref": "TrendForce 2027 Global DRAM Outlook 2026-07-28；TrendForce NAND 2H27 easing 2026-07-21；Micron Q2/Q3 2026 official materials；DIGITIMES metadata",
         "trace_next_trigger": "取得 UBS/MS canonical 報告或 Micron/Samsung/SK hynix/Kioxia 具名 2027 allocation disclosure",
-        "trace_requeue_trigger": "related_triaged_lead:lead_dc1c77328d874e61b0abaee39391c054",
-        "trace_requeued_at": "2026-08-04T22:36:57.647476+00:00",
+        "trace_requeue_trigger": "related_triaged_lead:lead_0624cbfddb41714f21502cc3f3da7a8a",
+        "trace_requeued_at": "2026-08-09T01:26:40.660274+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
@@ -6210,21 +6333,21 @@
           "SIMO",
           "SNDK"
         ],
-        "trace_trigger_event_ref": "lead:lead_dc1c77328d874e61b0abaee39391c054",
+        "trace_trigger_event_ref": "lead:lead_0624cbfddb41714f21502cc3f3da7a8a",
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {},
       "title": "Just some consolidated updates on memory: - $MU leads new 1.5T Yen investment in Hiroshima ~$9.3B. (bullish read through for Disco, Advantest, Resonac, Towa) since capex is localized. - Morgan Stanley pointed out NAND will continue to be in short supply into 2027 so $SNDK / Kioxia type players are happy alongisde $SIMO and upstream. - MS remains especially positive on Macronix/Winbond - UBS expects the average price of DDR contracts in the Q3 2026 to increase 32% | 18% Q4, vs. 17% and 12% est. - UBS expects NAND flash to be raised 30% from prev quarter. - Samsung reportedly plans 20% DRAM hike Q3. TrendForce recently forecast DRAM contract prices to rise 13 to 18 percent in the third quarter from the previous quarter, so this hike beats expectations. Something to note: Lot people see 20%... and don't think it's a lot compared to the 70-80% from previous quarters. But if you hike something by 100%, then hike something by 100%, then hike something by 30%, it's a lot more than people estimate since it's compounded. Similar to tracking inflation. I've already made projections going into 2028 from the start of the year on my memory names... I'm just sitting back and watching things play out through all the \"memory optimization\" and \"they can't keep price hiking like this!\" noise.",
       "triage": {
-        "decided_at": "2026-08-04T22:36:57.647476+00:00",
+        "decided_at": "2026-08-09T01:26:40.660274+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true,
           "user_requested": true
         },
-        "reason": "新 triage PASS lead lead_dc1c77328d874e61b0abaee39391c054 與 parked trace 共用具名標的 MU, SNDK；事件觸發 bounded pq1 重查",
+        "reason": "新 triage PASS lead lead_0624cbfddb41714f21502cc3f3da7a8a 與 parked trace 共用具名標的 MU；事件觸發 bounded pq1 重查",
         "tier": 4
       },
       "triage_history": [
@@ -6241,6 +6364,22 @@
               "user_requested": true
             },
             "reason": "Memory／packaging 更新：含 LTA、供需缺口、價格、擴產或具名供應鏈的可追查 claim；進 pq1 拆 claim，券商轉述追不到原文則 park",
+            "tier": 4
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-09T01:26:40.660274+00:00",
+          "superseded_reason": "新 triage PASS lead lead_0624cbfddb41714f21502cc3f3da7a8a 與 parked trace 共用具名標的 MU；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_0624cbfddb41714f21502cc3f3da7a8a",
+          "triage": {
+            "decided_at": "2026-08-04T22:36:57.647476+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true,
+              "user_requested": true
+            },
+            "reason": "新 triage PASS lead lead_dc1c77328d874e61b0abaee39391c054 與 parked trace 共用具名標的 MU, SNDK；事件觸發 bounded pq1 重查",
             "tier": 4
           }
         }
@@ -7511,21 +7650,22 @@
         "ontology_authority": "todo:61",
         "ontology_status": "approved",
         "original_claim_status": "partial",
-        "parked_reason": "Hesai 與 NVIDIA 技術整合、DoD designation 及 firmware bug 有原始或具名來源，但沒有全面美國禁售、遠端後門或 LITE/SIVE 供應西方 lidar 廠的證據；Lumentum 反而是 Hesai 公開 VCSEL 合作方。新 SIVE entity trigger 與此事件無關，無 material evidence delta。",
+        "parked_reason": "新觸發 lead_0624cbfddb41714f21502cc3f3da7a8a 只重述 AXTI/LITE/AAOI/MU 的產業與價格敘事，沒有新的 Hesai/NVIDIA 合作、監管、firmware RCA 或 OUST/AEVA/LITE/SIVE 供應關係文件；既有一手 bundle 仍只部分支持，無 material evidence delta。",
         "pq2_item": "61",
         "research_bundle_id": "serenity_robotics_20260729",
-        "research_outcome": "primary event verified; key cyber and bullish supplier mapping unsupported; no prepared RA",
+        "research_mode": "delta_only",
+        "research_outcome": "related_entity_trigger_not_material_to_hesai_claims",
         "research_report": "docs/reports/serenity_30d_research_2026-07-29.md",
-        "research_run": "daily-brief-2026-08-08_hesai_nvidia_lidar",
+        "research_run": "daily-brief-2026-08-09-post-permission-recovery",
         "storage_permission": "repo_excerpt",
         "trace_access_method": "official_company_page+official_government_index+public_transcript",
-        "trace_attempts_ref": "Hesai NVIDIA Halos official；DoD Section 1260H list；Reuters court report；CNBC interview transcript；Hesai-Lumentum official；Ouster 10-K；Sivers official product page",
+        "trace_attempts_ref": "既有 Hesai/NVIDIA/DoD/Reuters/CNBC/Lumentum/Ouster/Sivers 追源 bundle＋2026-08-09 related-entity delta audit",
         "trace_next_trigger": "DoD/FCC/court legal status change；official incident RCA；OUST/AEVA/LITE/SIVE filing names supplier or customer relation",
         "trace_origin_entity": "Hesai Technology；NVIDIA；U.S. government records；CNBC",
         "trace_origin_linkage": "independent official corroboration for Hesai/NVIDIA relationship; regulatory claim remains media-led",
         "trace_original_url": "https://www.hesaitech.com/hesai-joins-nvidia-halos-ai-systems-inspection-lab-to-advance-safety-in-autonomous-vehicles-and-robotics/",
-        "trace_requeue_trigger": "related_triaged_lead:lead_0372f419a6423004be01bfb464111aa8",
-        "trace_requeued_at": "2026-08-07T22:39:25.783269+00:00",
+        "trace_requeue_trigger": "related_triaged_lead:lead_0624cbfddb41714f21502cc3f3da7a8a",
+        "trace_requeued_at": "2026-08-09T01:26:40.660274+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
@@ -7537,7 +7677,7 @@
           "co:lumentum",
           "co:nvidia"
         ],
-        "trace_trigger_event_ref": "lead:lead_0372f419a6423004be01bfb464111aa8",
+        "trace_trigger_event_ref": "lead:lead_0624cbfddb41714f21502cc3f3da7a8a",
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
@@ -7561,13 +7701,13 @@
       },
       "title": "Hesai Technology, a Chinese lidar maker faces US national scrutiny over its expanded partnership with $NVDA and lidar sensors. For $OUST, $AEVA, and Western lidar bros, this is generally positive if competitors get regulated out. Since there were warnings that: Sensors could be disabled or exploited remotely, given Hesai firmware update disabled lidar units on February 29 (as evidence). By second order effect, this is also bullish for upstream laser suppliers too like $LITE and $SIVE that are used in western lidar players.",
       "triage": {
-        "decided_at": "2026-08-07T22:39:25.783269+00:00",
+        "decided_at": "2026-08-09T01:26:40.660274+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true,
           "user_requested": true
         },
-        "reason": "新 triage PASS lead lead_0372f419a6423004be01bfb464111aa8 與 parked trace 共用具名標的 SIVE；事件觸發 bounded pq1 重查",
+        "reason": "新 triage PASS lead lead_0624cbfddb41714f21502cc3f3da7a8a 與 parked trace 共用具名標的 LITE, co:lumentum；事件觸發 bounded pq1 重查",
         "tier": 4
       },
       "triage_history": [
@@ -7616,6 +7756,22 @@
               "user_requested": true
             },
             "reason": "新 triage PASS lead lead_1aa835b32dc4e06468322d132acc925a 與 parked trace 共用具名標的 AEVA, SIVE；事件觸發 bounded pq1 重查",
+            "tier": 4
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-09T01:26:40.660274+00:00",
+          "superseded_reason": "新 triage PASS lead lead_0624cbfddb41714f21502cc3f3da7a8a 與 parked trace 共用具名標的 LITE, co:lumentum；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_0624cbfddb41714f21502cc3f3da7a8a",
+          "triage": {
+            "decided_at": "2026-08-07T22:39:25.783269+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true,
+              "user_requested": true
+            },
+            "reason": "新 triage PASS lead lead_0372f419a6423004be01bfb464111aa8 與 parked trace 共用具名標的 SIVE；事件觸發 bounded pq1 重查",
             "tier": 4
           }
         }
@@ -7850,6 +8006,40 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000204/xslF345X06/wk-form4_1785530587.xml"
+    },
+    "lead_47dc4d8a48eb43f47cc5ea3904195b01": {
+      "entities": {
+        "company_ids": [
+          "co:google",
+          "co:meta"
+        ],
+        "tickers": [
+          "NBIS",
+          "GOOGL",
+          "AMZN",
+          "META",
+          "NIKE",
+          "LULU"
+        ]
+      },
+      "first_seen": "2026-08-09T01:25:22.773499+00:00",
+      "lead_id": "lead_47dc4d8a48eb43f47cc5ea3904195b01",
+      "media": [],
+      "published_at": "2026-08-08T18:27:18.000Z",
+      "raw_text": "Today I'm writing a weekend guide on how to do DD when shorting $NBIS:\n\nFirst, you look at hyperscaler earnings for AI cloud read through: \n\n> $GOOGL: reports record AI cloud demand + backlog + margin increases from earnings\n\n> $AMZN: reports record AI Cloud demand + backlog + margin increases from earnings\n\n> $META: reports higher than expected prices for available capacity from earnings.\n\nNow, time to look at Nebius:\n\n-> $NBIS: Growing hundreds of percent to $7-9B ARR by Q4. Growing margins, and guided 4GW+ contracted power. \n-> Sees Uber/Waymo splitting, putting more focus on Avride\n-> Sees Clickhouse growing rapidly every quarter. \n\nOkay looks bad! But next, you need a hedge?\n\n-> Wow! A $NIKE brand executive, after the stock dropped 75% over the past 5 years, went to $LULU to save that brand next? Lululemon seems good.\n\nConclusion: Short Nebius and go long on $LULU",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "Today I'm writing a weekend guide on how to do DD when shorting $NBIS: First, you look at hyperscaler earnings for AI cloud read through: > $GOOGL: reports record AI cloud demand + backlog + margin increases from earnings > $AMZN: reports record AI Cloud demand + backlog + margin increases from earnings > $META: reports higher than expected prices for available capacity from earnings. Now, time to look at Nebius: -> $NBIS: Growing hundreds of percent to $7-9B ARR by Q4. Growing margins, and guided 4GW+ contracted power. -> Sees Uber/Waymo splitting, putting more focus on Avride -> Sees Clickhouse growing rapidly every quarter. Okay looks bad! But next, you need a hedge? -> Wow! A $NIKE brand executive, after the stock dropped 75% over the past 5 years, went to $LULU to save that brand next? Lululemon seems good. Conclusion: Short Nebius and go long on $LULU",
+      "triage": {
+        "decided_at": "2026-08-09T01:26:40.907863+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "核心是未追蹤的 NBIS／LULU 多空敘事；對既有 GOOGL／META 僅作泛用 read-through，沒有與目前追蹤供應鏈主題直接相關的可核查新事件。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2086157318065168490"
     },
     "lead_486e4bcc8003167a6997376455b5a2c9": {
       "entities": {
@@ -12500,14 +12690,14 @@
         "campaign_window_end": "2026-07-29T13:46:25Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
         "gap": "InP 基板 ASP 漲幅缺乏任何可逐字核對的一手來源。這是分辨 axt_inp thesis「週期 vs 結構」的關鍵缺口，目前無法由公開資料填補；最可能的解答來源是 AXT 自己在 Q3 財報揭露 ASP 貢獻，或下游公司揭露基板成本上升。",
-        "parked_reason": "2026-08-05 觸發來源只因 SNDK ticker 共享；新記憶體產能消息與 AXT/IQE InP 基板 ASP 無因果或文件關聯。既有 Nomura 原文仍未取得，官方 AXT/IQE/下游客戶亦未揭露 exact 漲幅。",
+        "parked_reason": "新觸發 lead_0624cbfddb41714f21502cc3f3da7a8a 只說 AXTI/LITE 再度成為市場焦點，沒有 Nomura canonical report、客戶採購成本或 AXT/IQE 官方 exact ASP 漲幅；原始 42–78% 價格主張仍無可逐字核對一手文件。",
         "research_mode": "delta_only",
-        "research_outcome": "shared_entity_trigger_not_material_to_inp_asp_claim",
-        "research_run": "daily_2026-08-05",
-        "trace_attempts_ref": "既有 Nomura/AXT/IQE/Lumentum 追源紀錄＋2026-08-05 related-entity trigger relevance audit",
+        "research_outcome": "shared_axt_entity_no_new_nomura_or_asp_source",
+        "research_run": "daily-brief-2026-08-09-post-permission-recovery",
+        "trace_attempts_ref": "既有 Nomura/AXT/IQE/Lumentum 追源紀錄＋2026-08-09 related-entity delta audit",
         "trace_next_trigger": "AXT Q3 2026 揭露 ASP，或下游客戶揭露 InP 基板採購成本，或取得 Nomura canonical 報告",
-        "trace_requeue_trigger": "related_triaged_lead:lead_dc1c77328d874e61b0abaee39391c054",
-        "trace_requeued_at": "2026-08-04T22:36:57.647476+00:00",
+        "trace_requeue_trigger": "related_triaged_lead:lead_0624cbfddb41714f21502cc3f3da7a8a",
+        "trace_requeued_at": "2026-08-09T01:26:40.660274+00:00",
         "trace_requires_user": "false",
         "trace_status": "isolated_tier_3",
         "trace_trigger_entities": [
@@ -12516,7 +12706,7 @@
           "SNDK",
           "co:axt"
         ],
-        "trace_trigger_event_ref": "lead:lead_dc1c77328d874e61b0abaee39391c054",
+        "trace_trigger_event_ref": "lead:lead_0624cbfddb41714f21502cc3f3da7a8a",
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
@@ -12532,13 +12722,13 @@
       },
       "title": "Nomura’s report cites $AXTI and $IQE as the leading players. Then regarding ASP updates: - 2in InP substrate price hike 42-76% - 3in InP substrates price hike 78% - 2in EML Epiwafer price hike 50-75% - 3in CW Epiwafer price hike ~40%+ - Prices lower domestically in China as expected. Hyperscalers bottlenecking upstream photonics confirmation validation… on all fronts from pricing, demand, to supply shortages. My personal expectation was that price hikes would keep going up like $SNDK given ramping optical demand. We’ll see if this turns out right given another 2 years of the demand curve.",
       "triage": {
-        "decided_at": "2026-08-04T22:36:57.647476+00:00",
+        "decided_at": "2026-08-09T01:26:40.660274+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true,
           "user_requested": true
         },
-        "reason": "新 triage PASS lead lead_dc1c77328d874e61b0abaee39391c054 與 parked trace 共用具名標的 SNDK；事件觸發 bounded pq1 重查",
+        "reason": "新 triage PASS lead lead_0624cbfddb41714f21502cc3f3da7a8a 與 parked trace 共用具名標的 AXTI, co:axt；事件觸發 bounded pq1 重查",
         "tier": 4
       },
       "triage_history": [
@@ -12555,6 +12745,22 @@
               "user_requested": true
             },
             "reason": "既有 photonics 更新：含融資／listing／客戶合約／ASP／capacity／CPO roadmap 的具體可追查增量；進 pq1 查官方文件，重複看多敘事不累加 origin",
+            "tier": 4
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-09T01:26:40.660274+00:00",
+          "superseded_reason": "新 triage PASS lead lead_0624cbfddb41714f21502cc3f3da7a8a 與 parked trace 共用具名標的 AXTI, co:axt；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_0624cbfddb41714f21502cc3f3da7a8a",
+          "triage": {
+            "decided_at": "2026-08-04T22:36:57.647476+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true,
+              "user_requested": true
+            },
+            "reason": "新 triage PASS lead lead_dc1c77328d874e61b0abaee39391c054 與 parked trace 共用具名標的 SNDK；事件觸發 bounded pq1 重查",
             "tier": 4
           }
         }
@@ -13335,23 +13541,52 @@
         "research_run": "luna_reviewer_2026-08-01_pq1_5",
         "trace_attempts_ref": "Reuters syndicated carrier；Bloomberg accessible excerpt；TechCrunch；Reflection official news index；Nebius／Reflection official and SEC search",
         "trace_next_trigger": "Nebius 或 Reflection 發布官方合約、capacity、GB300 或期限文件；另行取得 WSJ 融資原文",
+        "trace_requeue_trigger": "related_triaged_lead:lead_0624cbfddb41714f21502cc3f3da7a8a",
+        "trace_requeued_at": "2026-08-09T01:26:40.660274+00:00",
         "trace_requires_user": "false",
-        "trace_status": "isolated_tier_3"
+        "trace_status": "isolated_tier_3",
+        "trace_trigger_entities": [
+          "META",
+          "MSFT",
+          "NBIS",
+          "SPCX",
+          "co:meta"
+        ],
+        "trace_trigger_event_ref": "lead:lead_0624cbfddb41714f21502cc3f3da7a8a",
+        "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {},
       "title": "$NBIS signs $1B+ compute agreement with Reflection AI, for GB300 access through 2029. Reflection also signed a multi-billion dollar agreement with $SPCX earlier. Interesting to say the least, seeing Nebius drop -5% off the news today. Also... counterparty to get this done kinda reminds me of OpenAI, where they might not have the funds to actually execute on these LTAs yet compared to $META or $MSFT. But generally positive long term developments, customer diversification was one of the core strengths of Nebius.",
       "triage": {
-        "decided_at": "2026-07-29T14:01:05.946631+00:00",
+        "decided_at": "2026-08-09T01:26:40.660274+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true,
           "user_requested": true
         },
-        "reason": "AI infrastructure／power 方向：具名合約、容量、LTA 或 capex 數字可回公司／filing 追源；只作需求端研究，不把作者市場看法當 evidence",
+        "reason": "新 triage PASS lead lead_0624cbfddb41714f21502cc3f3da7a8a 與 parked trace 共用具名標的 SPCX；事件觸發 bounded pq1 重查",
         "tier": 4
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-09T01:26:40.660274+00:00",
+          "superseded_reason": "新 triage PASS lead lead_0624cbfddb41714f21502cc3f3da7a8a 與 parked trace 共用具名標的 SPCX；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_0624cbfddb41714f21502cc3f3da7a8a",
+          "triage": {
+            "decided_at": "2026-07-29T14:01:05.946631+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true,
+              "user_requested": true
+            },
+            "reason": "AI infrastructure／power 方向：具名合約、容量、LTA 或 capex 數字可回公司／filing 追源；只作需求端研究，不把作者市場看法當 evidence",
+            "tier": 4
+          }
+        }
+      ],
       "url": "https://x.com/aleabitoreddit/status/2077044786402660829"
     },
     "lead_8ae4bd1a71426bd5346bf5cd45cc94ba": {
@@ -14267,9 +14502,14 @@
       "published_at": "2026-08-07T05:46:59.000Z",
       "raw_text": "Wow, there's gem after gem in $AAOI earnings for $SIVE + other laser player readthrough.\n\n1. AAOI not meaningfully participating in CPO first-gen deployments.\n\n\"We just can’t make enough of them [CPO lasers] to be involved in their current first-generation [CPO] deployments because there’s just not enough capacity.   We have to prioritize our ability to make lasers for our own  transceivers first\"\n\nSo first-gen CPO laser deployments, might even be narrowed down further for Western players like $SIVE, $LITE, $AVGO, and $COHR.\n\nAnd independent CPO CW laser capacity became more valuable if $AAOI had to turn away more customers...\n\nAlso remember Trendforce was talking about $AMD singing CW LTAs? $COHR / $LITE have capacity signed with $NVDA ...\n\nI thought it would be $AAOI, but they might be out of the equation. $MTSI also doesn't look meaningful with early CPO participation (eg. no mention in ER aside from NPO, and removal from Ayar website).\n\nSo I wonder who players like $AMD is going to go with for Helios (eg. Sivers + Ayar more likely candidate now)?\n\nBtw, this is not bearish AAOI because they have too much demand for optical transceiver business. Just more bullish on the existing few qualified CPO laser names that have capacity. \n\n2. Demand imbalance and bottleneck for InP lasers / optical transceivers.\n\nAOI's CEO stated kinda supported that when they said: \"The customer demand is 20%-40% higher\" than expanded built out capacity.\n\n\"We are getting this kind of demand from several big customers almost every week. Lasers are the biggest bottleneck right now for the transceiver business\"\n\n3. China being years away from having CPO DWDM specification lasers.\n\nI covered this earlier when looking at CPO competition from channel checks.\n\nBut AAOI confirming that China is \"easily at least two, three years or even longer from having CPO lasers is incredible tread through on defensibility Western laser positioning in the CPO laser chokepoint.\n\nTLDR:\n\n- High demand imbalance for CW lasers and optical transceivers.\n\n- $AAOI not in first-gen CPO due to capacity constraints (not exactly bearish AAOI because they have too much demand for their optical transciver business, but even better news for the few independent players with capacity coming online like $SIVE)\n\n- China years behind in CPO lasers.",
       "refs": {
-        "parked_reason": "本機 AAOI Q2 2026 10-Q 可逐字支持雷射垂直整合、擴產與 US$508.8M 現金，但兩張 transcript 截圖沒有 canonical URL／完整 locator；未取得 earnings-call 原文，不能把 20%–40% 需求差、CPO 兩三年差距或 SIVE/LITE/COHR read-through 當圖譜證據，不產 RA。",
-        "trace_attempts_ref": "library/raw/aaoi_10_q_20260806.txt；private lead_media transcript screenshots；2026-08-09 SEC/IR routes access_blocked",
-        "trace_next_trigger": "AAOI_Q2_2026_canonical_earnings_transcript_or_IR_replay_with_locator",
+        "parked_reason": "AAOI 官方 IR 已定位 Q2 2026 webcast archive，但入口要求提交姓名、電郵與公司且沒有公開文字 transcript；未代填個資。現有 10-Q 只支持雷射垂直整合、擴產與現金，無法用 canonical locator 驗證 20–40% 需求差、CPO 兩三年差距或 SIVE/LITE/COHR 外推，不產 RA。",
+        "research_mode": "delta_plus_official_archive_check",
+        "research_outcome": "official_webcast_located_but_transcript_unavailable_claims_partial",
+        "research_run": "daily-brief-2026-08-09-post-permission-recovery",
+        "trace_attempts_ref": "AAOI 官方 IR event https://investors.ao-inc.com/events/event-details/applied-optoelectronics-q2-2026-earnings-call；webcast https://edge.media-server.com/mmc/p/fdq5dksv；library/raw/aaoi_10_q_20260806.txt；private transcript screenshots",
+        "trace_next_trigger": "AAOI 公開 ungated transcript/audio locator，或使用者合法提供本機音訊副本",
+        "trace_requeue_trigger": "related_triaged_lead:lead_0624cbfddb41714f21502cc3f3da7a8a",
+        "trace_requeued_at": "2026-08-09T01:26:40.660274+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
@@ -14287,6 +14527,7 @@
           "co:lumentum",
           "co:nvidia"
         ],
+        "trace_trigger_event_ref": "lead:lead_0624cbfddb41714f21502cc3f3da7a8a",
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
@@ -14315,18 +14556,36 @@
       },
       "title": "Wow, there's gem after gem in $AAOI earnings for $SIVE + other laser player readthrough. 1. AAOI not meaningfully participating in CPO first-gen deployments. \"We just can’t make enough of them [CPO lasers] to be involved in their current first-generation [CPO] deployments because there’s just not enough capacity. We have to prioritize our ability to make lasers for our own transceivers first\" So first-gen CPO laser deployments, might even be narrowed down further for Western players like $SIVE, $LITE, $AVGO, and $COHR. And independent CPO CW laser capacity became more valuable if $AAOI had to turn away more customers... Also remember Trendforce was talking about $AMD singing CW LTAs? $COHR / $LITE have capacity signed with $NVDA ... I thought it would be $AAOI, but they might be out of the equation. $MTSI also doesn't look meaningful with early CPO participation (eg. no mention in ER aside from NPO, and removal from Ayar website). So I wonder who players like $AMD is going to go with for Helios (eg. Sivers + Ayar more likely candidate now)? Btw, this is not bearish AAOI because they have too much demand for optical transceiver business. Just more bullish on the existing few qualified CPO laser names that have capacity. 2. Demand imbalance and bottleneck for InP lasers / optical transceivers. AOI's CEO stated kinda supported that when they said: \"The customer demand is 20%-40% higher\" than expanded built out capacity. \"We are getting this kind of demand from several big customers almost every week. Lasers are the biggest bottleneck right now for the transceiver business\" 3. China being years away from having CPO DWDM specification lasers. I covered this earlier when looking at CPO competition from channel checks. But AAOI confirming that China is \"easily at least two, three years or even longer from having CPO lasers is incredible tread through on defensibility Western laser positioning in the CPO laser chokepoint. TLDR: - High demand imbalance for CW lasers and optical transceivers. - $AAOI not in first-gen CPO due to capacity constraints (not exactly bearish AAOI because they have too much demand for their optical transciver business, but even better news for the few independent players with capacity coming online like $SIVE) - China years behind in CPO lasers.",
       "triage": {
-        "decided_at": "2026-08-07T22:39:30.098813+00:00",
+        "decided_at": "2026-08-09T01:26:40.660274+00:00",
         "decision": "go",
         "priority_flags": {
           "independent_source": true,
           "novelty": true
         },
-        "reason": "PASS：具體轉述 AAOI 對首代 CPO 參與受雷射產能限制、需求高於擴產 20%–40%、中國 CPO laser 落後 2–3 年等可核對說法；直接影響 Sivers／Lumentum／Coherent laser thesis，且 AAOI 是潛在獨立 origin_entity。",
-        "related_trace_requeues": [
-          "lead_ba473b6b6bca2ceba19958fee04b0fa2"
-        ],
+        "reason": "新 triage PASS lead lead_0624cbfddb41714f21502cc3f3da7a8a 與 parked trace 共用具名標的 AAOI, COHR, LITE, co:applied_optoelectronics, co:coherent, co:lumentum；事件觸發 bounded pq1 重查",
         "tier": 4
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-09T01:26:40.660274+00:00",
+          "superseded_reason": "新 triage PASS lead lead_0624cbfddb41714f21502cc3f3da7a8a 與 parked trace 共用具名標的 AAOI, COHR, LITE, co:applied_optoelectronics, co:coherent, co:lumentum；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_0624cbfddb41714f21502cc3f3da7a8a",
+          "triage": {
+            "decided_at": "2026-08-07T22:39:30.098813+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "independent_source": true,
+              "novelty": true
+            },
+            "reason": "PASS：具體轉述 AAOI 對首代 CPO 參與受雷射產能限制、需求高於擴產 20%–40%、中國 CPO laser 落後 2–3 年等可核對說法；直接影響 Sivers／Lumentum／Coherent laser thesis，且 AAOI 是潛在獨立 origin_entity。",
+            "related_trace_requeues": [
+              "lead_ba473b6b6bca2ceba19958fee04b0fa2"
+            ],
+            "tier": 4
+          }
+        }
+      ],
       "url": "https://x.com/aleabitoreddit/status/2085603590903902621"
     },
     "lead_9b290ae15ba6fd6584afe7f3af56b234": {
@@ -17635,6 +17894,69 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2080032221638119603"
     },
+    "lead_c3fa1ca7fd636810e6fababce5ce7f5a": {
+      "entities": {
+        "company_ids": [
+          "co:applied_optoelectronics"
+        ],
+        "tickers": [
+          "SIVE",
+          "AAOI",
+          "MTSI"
+        ]
+      },
+      "first_seen": "2026-08-09T01:25:22.749497+00:00",
+      "lead_id": "lead_c3fa1ca7fd636810e6fababce5ce7f5a",
+      "media": [
+        {
+          "cache": {
+            "bytes": 103888,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_c3fa1ca7fd636810e6fababce5ce7f5a/3_2086247062874836992.jpg",
+            "sha256": "d6b9b241dc13d7418024e2897b8d6efda52a1e31189af5dfe49a85c305617636"
+          },
+          "height": 754,
+          "media_key": "3_2086247062874836992",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HPPWpnhbUAA0kgU.jpg",
+          "width": 1250
+        }
+      ],
+      "published_at": "2026-08-09T00:23:56.000Z",
+      "raw_text": "I think it’s a good time to revisit $SIVE ~$427m/yr midpoint capacity revenue modeled projections.\n\nGiven recent industry earnings:\n\n> $AAOI cited +20-40% demand imbalance for transceivers (with lasers as the bottleneck).\n\n> $MTSI saying many \"Customers are coming to us with urgency due to the general supply shortage of indium phosphide DFB lasers\" (in other product lines)\n\n> US proposal ban on new Chinese optical transceivers (Innolight/Eoptolink)\n\n> AOI no meaningful participation in first-gen CPO deployments due to lasers being allocated toward transceivers. \n\nThe read through is that it’s possible to apply the same capacity-demand absorption modeling applying to $AAOI, but for other laser players like Sivers too.\n\nGiven the widespread shortage and demand imbalance for InP CW DFB capacity.",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CPO",
+            "InP"
+          ]
+        },
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "SIVE",
+            "Sivers"
+          ]
+        }
+      },
+      "title": "I think it’s a good time to revisit $SIVE ~$427m/yr midpoint capacity revenue modeled projections. Given recent industry earnings: > $AAOI cited +20-40% demand imbalance for transceivers (with lasers as the bottleneck). > $MTSI saying many \"Customers are coming to us with urgency due to the general supply shortage of indium phosphide DFB lasers\" (in other product lines) > US proposal ban on new Chinese optical transceivers (Innolight/Eoptolink) > AOI no meaningful participation in first-gen CPO deployments due to lasers being allocated toward transceivers. The read through is that it’s possible to apply the same capacity-demand absorption modeling applying to $AAOI, but for other laser players like Sivers too. Given the widespread shortage and demand imbalance for InP CW DFB capacity.",
+      "triage": {
+        "decided_at": "2026-08-09T01:26:41.152702+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "直接命中 Sivers／SIVE、AAOI、MTSI、InP CW DFB 雷射供需，含 4.27 億美元年產能推算、20–40% 需求缺口與客戶急迫性等具體可查主張，值得追原始法說。",
+        "tier": 3
+      },
+      "url": "https://x.com/aleabitoreddit/status/2086247069900300393"
+    },
     "lead_c470eb6eb0cf85806619a921cd756db0": {
       "entities": {
         "company_ids": [],
@@ -18196,9 +18518,14 @@
       "published_at": "2026-08-06T22:54:46.000Z",
       "raw_text": "Just some TLDR notes on $AAOI earnings:\n\n- Expects full qualification of 1.6T products by their hyperscaler customer within next couple of weeks \n\n(helpful revenue ramp #2, timelines)\n\n-  Continues to believe that AOI will have the largest AI DC transceiver production capacity in the US\n \n(reiterating ambitions during a time when their competitors might get banned)\n\n- Expects facilities toward InP capacity to come online in early 2027 \n\n(timeline FYI in terms of further ramp) \n\n- Total capacity is approaching 200,000/u per month, EOY 650,000/u per month of 800g/1.6t. EOY 2027, 930,000/u \n\n(this is the ramp i want to see)\n\n- \"increase our manufacturing capacity for our external light source or ELSFP. That's for co-packaged optics or CPO\". we anticipate ramping production later this year and into 2027, ultimately culminating in about 400,000 pieces per month in 2028\n\n(need some time to model this into revenue)\n\n- \"As we have mentioned before, we've been manufacturing lasers internally for many years. This has allowed us to avoid some of the shortages that  have affected others in the industry\"\n\n(vertical integration bull case during CW/EML laser shortages) \n\n- We believe that in the future, CPO will continue to drive increased demand for high-power lasers\n\n(thesis validation on CPO sector)\n\n- \"to our long-term objective of returning non-GAAP gross margins to around 40%\"\n\n-  \"We ended the second quarter with $508.8 million in total cash equivalents\"\n\nI need to double check if the ATM finished or not\n\n- \"our ability to deliver revenue in general, and specifically when it  comes to 800G products, is limited by our production capacity right now\" \"If we could produce more, we could ship more right now\"\n\nDemand > Supply validation. \n\n- \"Most of the increased capacity will be in U.S. Even so, let me say that, like I keep emphasizing, that is not good enough for the customer demand. The customer demand is 20%-40% higher.\"\n\nUnholy photonics demand validation across the whole sector, read through for $LITE, $SIVE / $JBL, and others is amazing. \n\n- \"Not in the next two, three years, especially the demand is so big. Okay?  Even combined AI, $LITE, $COHR, $AVGO all together, it's still very tough to meet the customer demand in the next few years\"\n\nMore optical sector demand validation. \n\n- CPO Timelines: \"If you're talking about really high volume manufacturer [for CPO market], I would say more like the late Q3 next year\" and \"We have been working very close with at least five customer\"\n\nIf you care about current earnings (which I'm not really looking at closely)\n\nRevenue: $191M vs. $190m \nEPS: $.06 vs. $.02\n\nTLDR: Extraordinary demand across the laser + optical sector read through. Kinda supporting Lumentum CEO statement that laser shortage is worse than memory shortages. \n\n2027 capacity ramp on track. To map inflection period with timelines, would be around early next year, as stated in their previous earnings call. \n\nAAOI has the customers now. Limitation is making enough lasers and transceivers.",
       "refs": {
-        "parked_reason": "本機 AAOI Q2 2026 10-Q 支持 800G/1.6T 擴產、雷射垂直整合與 US$508.8M 現金，但未取得完整 earnings-call canonical transcript；截圖只能部分核對需求高於產能與雷射瓶頸，不能驗證 1.6T qualification、400,000 件 ELSFP、Q3 2027 量產或同業外推，且多數為時變 observation，不產 RA。",
-        "trace_attempts_ref": "library/raw/aaoi_10_q_20260806.txt；library/raw/aaoi_8_k_20260806.txt；private lead_media transcript screenshots；2026-08-09 SEC/IR routes access_blocked",
-        "trace_next_trigger": "AAOI_Q2_2026_canonical_earnings_transcript_and_customer_or_IR_confirmation",
+        "parked_reason": "AAOI 官方 IR 已定位 Q2 2026 webcast archive，但入口要求提交姓名、電郵與公司且沒有公開文字 transcript；未代填個資。10-Q 可支持 800G/1.6T 擴產、雷射垂直整合與 US$508.8M 現金，但不能驗證 1.6T qualification、400,000 件 ELSFP、Q3 2027 高量產或同業 read-through，且多數屬時變 observation，不產 RA。",
+        "research_mode": "delta_plus_official_archive_check",
+        "research_outcome": "official_webcast_located_but_transcript_unavailable_claims_partial",
+        "research_run": "daily-brief-2026-08-09-post-permission-recovery",
+        "trace_attempts_ref": "AAOI 官方 IR event https://investors.ao-inc.com/events/event-details/applied-optoelectronics-q2-2026-earnings-call；webcast https://edge.media-server.com/mmc/p/fdq5dksv；library/raw/aaoi_10_q_20260806.txt；library/raw/aaoi_8_k_20260806.txt；private transcript screenshots",
+        "trace_next_trigger": "AAOI 公開 ungated transcript/audio locator，或使用者合法提供本機音訊副本",
+        "trace_requeue_trigger": "related_triaged_lead:lead_0624cbfddb41714f21502cc3f3da7a8a",
+        "trace_requeued_at": "2026-08-09T01:26:40.660274+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
@@ -18214,6 +18541,7 @@
           "co:jabil",
           "co:lumentum"
         ],
+        "trace_trigger_event_ref": "lead:lead_0624cbfddb41714f21502cc3f3da7a8a",
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
@@ -18248,15 +18576,33 @@
       },
       "title": "Just some TLDR notes on $AAOI earnings: - Expects full qualification of 1.6T products by their hyperscaler customer within next couple of weeks (helpful revenue ramp #2, timelines) - Continues to believe that AOI will have the largest AI DC transceiver production capacity in the US (reiterating ambitions during a time when their competitors might get banned) - Expects facilities toward InP capacity to come online in early 2027 (timeline FYI in terms of further ramp) - Total capacity is approaching 200,000/u per month, EOY 650,000/u per month of 800g/1.6t. EOY 2027, 930,000/u (this is the ramp i want to see) - \"increase our manufacturing capacity for our external light source or ELSFP. That's for co-packaged optics or CPO\". we anticipate ramping production later this year and into 2027, ultimately culminating in about 400,000 pieces per month in 2028 (need some time to model this into revenue) - \"As we have mentioned before, we've been manufacturing lasers internally for many years. This has allowed us to avoid some of the shortages that have affected others in the industry\" (vertical integration bull case during CW/EML laser shortages) - We believe that in the future, CPO will continue to drive increased demand for high-power lasers (thesis validation on CPO sector) - \"to our long-term objective of returning non-GAAP gross margins to around 40%\" - \"We ended the second quarter with $508.8 million in total cash equivalents\" I need to double check if the ATM finished or not - \"our ability to deliver revenue in general, and specifically when it comes to 800G products, is limited by our production capacity right now\" \"If we could produce more, we could ship more right now\" Demand > Supply validation. - \"Most of the increased capacity will be in U.S. Even so, let me say that, like I keep emphasizing, that is not good enough for the customer demand. The customer demand is 20%-40% higher.\" Unholy photonics demand validation across the whole sector, read through for $LITE, $SIVE / $JBL, and others is amazing. - \"Not in the next two, three years, especially the demand is so big. Okay? Even combined AI, $LITE, $COHR, $AVGO all together, it's still very tough to meet the customer demand in the next few years\" More optical sector demand validation. - CPO Timelines: \"If you're talking about really high volume manufacturer [for CPO market], I would say more like the late Q3 next year\" and \"We have been working very close with at least five customer\" If you care about current earnings (which I'm not really looking at closely) Revenue: $191M vs. $190m EPS: $.06 vs. $.02 TLDR: Extraordinary demand across the laser + optical sector read through. Kinda supporting Lumentum CEO statement that laser shortage is worse than memory shortages. 2027 capacity ramp on track. To map inflection period with timelines, would be around early next year, as stated in their previous earnings call. AAOI has the customers now. Limitation is making enough lasers and transceivers.",
       "triage": {
-        "decided_at": "2026-08-07T22:39:31.064312+00:00",
+        "decided_at": "2026-08-09T01:26:40.660274+00:00",
         "decision": "go",
         "priority_flags": {
           "independent_source": true,
           "novelty": true
         },
-        "reason": "PASS：AAOI earnings recap 含 1.6T qualification、800G／1.6T 與 ELSFP 產能時間表、CPO 客戶數、雷射垂直整合、現金與毛利目標等大量可逐字核對主張；與 AAOI／Sivers／Lumentum／Coherent 研究直接相關，應追回官方法說。",
+        "reason": "新 triage PASS lead lead_0624cbfddb41714f21502cc3f3da7a8a 與 parked trace 共用具名標的 AAOI, COHR, LITE, co:applied_optoelectronics, co:coherent, co:lumentum；事件觸發 bounded pq1 重查",
         "tier": 4
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-09T01:26:40.660274+00:00",
+          "superseded_reason": "新 triage PASS lead lead_0624cbfddb41714f21502cc3f3da7a8a 與 parked trace 共用具名標的 AAOI, COHR, LITE, co:applied_optoelectronics, co:coherent, co:lumentum；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_0624cbfddb41714f21502cc3f3da7a8a",
+          "triage": {
+            "decided_at": "2026-08-07T22:39:31.064312+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "independent_source": true,
+              "novelty": true
+            },
+            "reason": "PASS：AAOI earnings recap 含 1.6T qualification、800G／1.6T 與 ELSFP 產能時間表、CPO 客戶數、雷射垂直整合、現金與毛利目標等大量可逐字核對主張；與 AAOI／Sivers／Lumentum／Coherent 研究直接相關，應追回官方法說。",
+            "tier": 4
+          }
+        }
+      ],
       "url": "https://x.com/aleabitoreddit/status/2085499853099208716"
     },
     "lead_cacb967c193853afdf372069a7b2e9f9": {
@@ -21235,29 +21581,58 @@
         "campaign_window_end": "2026-07-29T13:46:25Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
         "original_claim_status": "partial_support_potential_talks_contract_inference_rejected",
-        "parked_reason": "Reuters 支持 Meta/Anthropic 潛在 compute lease talks，但明示 early、terms 可變、可能不成且公司未確認；NYT 原文不可得，$10B 不是已簽約價值，neocloud read-through 為作者推論",
+        "parked_reason": "新觸發 lead_0624cbfddb41714f21502cc3f3da7a8a 只在記憶體供需敘事中提到 SPCX，與 Meta/Anthropic compute lease talks 無事件關聯；仍無 Meta/Anthropic 官方公告、filing 或已簽條款，10B 美元不能視為成交價值。",
         "research_mode": "delta_only",
-        "research_outcome": "tier3_talks_corroborated_no_signed_primary_no_graph_delta",
-        "research_run": "luna_reviewer_2026-08-02_pq1_10",
-        "trace_attempts_ref": "NYT canonical access failed；Reuters MarketScreener/CNA same-origin reprints；Meta Q2 transcript與BlackRock El Paso official context",
+        "research_outcome": "shared_spcx_entity_unrelated_no_signed_terms",
+        "research_run": "daily-brief-2026-08-09-post-permission-recovery",
+        "trace_attempts_ref": "既有 NYT/Reuters/Meta official context＋2026-08-09 related-entity delta audit",
         "trace_next_trigger": "NYT 原文可核對，或 Meta/Anthropic official announcement/filing、Reuters 後續確認 signed terms",
+        "trace_requeue_trigger": "related_triaged_lead:lead_0624cbfddb41714f21502cc3f3da7a8a",
+        "trace_requeued_at": "2026-08-09T01:26:40.660274+00:00",
         "trace_requires_user": "false",
-        "trace_status": "isolated_tier_3"
+        "trace_status": "isolated_tier_3",
+        "trace_trigger_entities": [
+          "IREN",
+          "META",
+          "NBIS",
+          "SPCX",
+          "co:meta"
+        ],
+        "trace_trigger_event_ref": "lead:lead_0624cbfddb41714f21502cc3f3da7a8a",
+        "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
       "status": "parked",
       "themes": {},
       "title": "$META in talks to lease compute to Anthropic in a $10B dollar deal. Seems like they saw how profitable $SPCX $45B compute deal was. But just goes to validate Neocloud business models like $NBIS, $IREN, and co if hyperscalers are copying their homework. Source: NYT https://t.co/3Mu3UXQtFT",
       "triage": {
-        "decided_at": "2026-07-29T14:01:05.946644+00:00",
+        "decided_at": "2026-08-09T01:26:40.660274+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true,
           "user_requested": true
         },
-        "reason": "AI infrastructure／power 方向：具名合約、容量、LTA 或 capex 數字可回公司／filing 追源；只作需求端研究，不把作者市場看法當 evidence",
+        "reason": "新 triage PASS lead lead_0624cbfddb41714f21502cc3f3da7a8a 與 parked trace 共用具名標的 SPCX；事件觸發 bounded pq1 重查",
         "tier": 4
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-09T01:26:40.660274+00:00",
+          "superseded_reason": "新 triage PASS lead lead_0624cbfddb41714f21502cc3f3da7a8a 與 parked trace 共用具名標的 SPCX；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_0624cbfddb41714f21502cc3f3da7a8a",
+          "triage": {
+            "decided_at": "2026-07-29T14:01:05.946644+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true,
+              "user_requested": true
+            },
+            "reason": "AI infrastructure／power 方向：具名合約、容量、LTA 或 capex 數字可回公司／filing 追源；只作需求端研究，不把作者市場看法當 evidence",
+            "tier": 4
+          }
+        }
+      ],
       "url": "https://x.com/aleabitoreddit/status/2078175882620059719"
     },
     "lead_e8857898c506db1a35168bd9bb042e93": {
@@ -22598,6 +22973,38 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000187/xslF345X06/wk-form4_1785439264.xml"
     },
+    "lead_faf36ea9a80a99c8c47a0c1aeb58fed0": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-09T01:25:22.779009+00:00",
+      "lead_id": "lead_faf36ea9a80a99c8c47a0c1aeb58fed0",
+      "media": [],
+      "published_at": "2026-08-08T06:19:25.000Z",
+      "raw_text": "I've mapped the entire Wall Street bear playbook on AI names:\n\nHave your favorite institution/media insert one of these name down below:\n\n1. < ______ [GPUs, Transcivers, MLCC, Memory...] are a commodity set to crash> \n\n2. < ______ [YMTC, CXMT, Dongshan...] from China will flood the market > \n\n3. < ______ [Micron, Nvidia, ...] from unverifiable channel checks is facing issues > \n\n4. < ______ [Kospi, Sivers, ...] is a bubble like the ____ [2007, 2021] crash> \n\n5. <____ [1,2,3, ...] unexpected rate hikes this year>\n\n6. < _____ [Google, Nvidia, Deepseek ...] optimization removes the need of this!>  \n\nin a new headline, and it's ready to go!",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "I've mapped the entire Wall Street bear playbook on AI names: Have your favorite institution/media insert one of these name down below: 1. < ______ [GPUs, Transcivers, MLCC, Memory...] are a commodity set to crash> 2. < ______ [YMTC, CXMT, Dongshan...] from China will flood the market > 3. < ______ [Micron, Nvidia, ...] from unverifiable channel checks is facing issues > 4. < ______ [Kospi, Sivers, ...] is a bubble like the ____ [2007, 2021] crash> 5. <____ [1,2,3, ...] unexpected rate hikes this year> 6. < _____ [Google, Nvidia, Deepseek ...] optimization removes the need of this!> in a new headline, and it's ready to go!",
+      "triage": {
+        "decided_at": "2026-08-09T01:26:41.398821+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "只是泛化的市場空方敘事模板，沒有單一可定位事件、文件或可逐字核對的新 atomic claim；關聯性與可引用性不足。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2085974141501612461"
+    },
     "lead_fcbf2bd4a87932e4d67c12f0c188c3ac": {
       "content_updated_at": "2026-07-29T13:46:48.255609+00:00",
       "entities": {
@@ -22950,8 +23357,8 @@
   "schema_version": "2",
   "source_state": {
     "x:aleabitoreddit": {
-      "since_id": "2085823672569467005",
-      "updated_at": "2026-08-07T22:33:19.712069+00:00",
+      "since_id": "2086247069900300393",
+      "updated_at": "2026-08-09T01:25:22.780633+00:00",
       "user_id": "1940360837547565056"
     }
   }
