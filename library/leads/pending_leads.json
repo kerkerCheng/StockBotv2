@@ -2120,6 +2120,60 @@
       "result": "ok",
       "run_at": "2026-08-09T01:25:31.012365+00:00",
       "source": "edgar:GFS"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-08-09T22:33:30.444974+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-09T22:33:31.775453+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-09T22:33:32.760014+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-09T22:33:33.854541+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-09T22:33:34.696246+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-09T22:33:35.613438+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-09T22:33:36.691704+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-09T22:33:37.766644+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-09T22:33:38.705544+00:00",
+      "source": "edgar:GFS"
     }
   ],
   "leads": {
@@ -2985,12 +3039,12 @@
         "campaign_topic": "photonics",
         "campaign_window_end": "2026-07-29T13:46:25Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
-        "parked_reason": "新中國光收發器限制草案與 B. Riley/Rosenblatt 的 transceiver TAM、VCSEL/NPO、UHP CW 架構主張不是同一事件。Broadcom 官方有 VCSEL-based NPO 公開頁，但本輪未取得可定位全文以取代搜尋摘要；券商原文仍不可得。",
+        "parked_reason": "new_Aeva_event_did_not_unlock_Rosenblatt_or_B_Riley_primary_note_or_Broadcom_AWS_architecture_source",
         "research_mode": "delta_only",
-        "research_outcome": "shared_entity_trigger_not_material_broker_notes_still_unavailable",
-        "research_run": "daily_2026-08-05",
-        "trace_attempts_ref": "Broadcom OFC 2026／VCSEL-based NPO official page metadata；Rosenblatt/B. Riley exact search；trigger lead lead_7f66b743a034c41f6388aa800f333e62",
-        "trace_next_trigger": "公開 Rosenblatt/B. Riley 報告，或 Broadcom/AWS 可逐字核對的架構文件",
+        "research_outcome": "no_graph_or_decision_delta",
+        "research_run": "daily:2026-08-10",
+        "trace_attempts_ref": "sivers_official_lidar_gf_onet_jabil_and_aeva_ir_index_2026-08-10",
+        "trace_next_trigger": "canonical_broker_note_or_named_Aeva_Sivers_sourcing_document",
         "trace_requeue_trigger": "related_triaged_lead:lead_1aa835b32dc4e06468322d132acc925a",
         "trace_requeued_at": "2026-08-06T22:33:30.263789+00:00",
         "trace_requires_user": "false",
@@ -3005,7 +3059,7 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -6318,12 +6372,12 @@
         "campaign_topic": "memory_packaging",
         "campaign_window_end": "2026-07-29T13:46:25Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
-        "parked_reason": "官方資料支持 2027 DRAM/HBM capacity squeeze，但未核對 UBS/MS 報告與原貼具體價格預測；TrendForce 反而預期 NAND 緊張於 2027 下半年緩解，故不能把 blanket NAND sold-out 敘事升格。結果屬時變供需 observation，無唯一 graph delta。",
+        "parked_reason": "official_sources_support_memory_tightness_but_not_the_specific_broker_forecasts_or_blanket_NAND_claim",
         "research_mode": "delta_only",
-        "research_outcome": "partial_support_dram_contradiction_nand_exact_broker_numbers_unverified",
-        "research_run": "daily_2026-08-05",
-        "trace_attempts_ref": "TrendForce 2027 Global DRAM Outlook 2026-07-28；TrendForce NAND 2H27 easing 2026-07-21；Micron Q2/Q3 2026 official materials；DIGITIMES metadata",
-        "trace_next_trigger": "取得 UBS/MS canonical 報告或 Micron/Samsung/SK hynix/Kioxia 具名 2027 allocation disclosure",
+        "research_outcome": "no_unique_graph_delta_time_varying_market_claim_only",
+        "research_run": "daily:2026-08-10",
+        "trace_attempts_ref": "prior_official_memory_sources_plus_new_related_signal_2026-08-10",
+        "trace_next_trigger": "canonical_UBS_or_Morgan_Stanley_note_or_official_allocation_disclosure",
         "trace_requeue_trigger": "related_triaged_lead:lead_0624cbfddb41714f21502cc3f3da7a8a",
         "trace_requeued_at": "2026-08-09T01:26:40.660274+00:00",
         "trace_requires_user": "false",
@@ -6337,7 +6391,7 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "Just some consolidated updates on memory: - $MU leads new 1.5T Yen investment in Hiroshima ~$9.3B. (bullish read through for Disco, Advantest, Resonac, Towa) since capex is localized. - Morgan Stanley pointed out NAND will continue to be in short supply into 2027 so $SNDK / Kioxia type players are happy alongisde $SIMO and upstream. - MS remains especially positive on Macronix/Winbond - UBS expects the average price of DDR contracts in the Q3 2026 to increase 32% | 18% Q4, vs. 17% and 12% est. - UBS expects NAND flash to be raised 30% from prev quarter. - Samsung reportedly plans 20% DRAM hike Q3. TrendForce recently forecast DRAM contract prices to rise 13 to 18 percent in the third quarter from the previous quarter, so this hike beats expectations. Something to note: Lot people see 20%... and don't think it's a lot compared to the 70-80% from previous quarters. But if you hike something by 100%, then hike something by 100%, then hike something by 30%, it's a lot more than people estimate since it's compounded. Similar to tracking inflation. I've already made projections going into 2028 from the start of the year on my memory names... I'm just sitting back and watching things play out through all the \"memory optimization\" and \"they can't keep price hiking like this!\" noise.",
       "triage": {
@@ -10831,14 +10885,14 @@
         "campaign_window_start": "2026-06-29T13:46:25Z",
         "canonical_url": "https://www.sivers-semiconductors.com/press/sivers-semiconductors-collaborates-with-jabil-on-energy-efficient-1-6t-pluggable-optical-transceiver-module/",
         "outcome": "parked；部分支持但不證實全數量產／revenue；未產生 prepared RA",
-        "parked_reason": "追回 Sivers/Jabil 與夥伴官方文件後，只能支持 Jabil 1.6T LRO 開發、部分 partner/reference-design／production-readiness；貼文把 GFS、Ayar、POET 等不同成熟度關係合併成已量產／已 revenue，且 Eoptolink／Innolight 與 revenue mapping 未獲一手確認。新政策草案尚未形成客戶 qualification／訂單證據，沒有新的唯一 graph delta。",
+        "parked_reason": "official_sources_confirm_partnerships_and_readiness_but_not_named_Aeva_supply_or_that_all_programs_are_revenue",
         "primary_url": "https://www.sivers-semiconductors.com/press/sivers-semiconductors-collaborates-with-jabil-on-energy-efficient-1-6t-pluggable-optical-transceiver-module/",
         "research_mode": "delta_only",
-        "research_outcome": "partial_support_author_inference_rejected_no_new_graph_delta",
-        "research_run": "daily_2026-08-06",
+        "research_outcome": "no_research_action_prepared",
+        "research_run": "daily:2026-08-10",
         "trace_access_method": "official_ir",
-        "trace_attempts_ref": "Sivers/Jabil official 1.6T LRO、Sivers Q1/Annual Report、O-Net/GFS/Ayar/POET official materials、related FCC draft-ban Reuters discovery",
-        "trace_next_trigger": "Jabil、GFS、Ayar、POET 或 O-Net 公告 qualification completion、volume order 或 revenue；或 FCC 公布中國光收發器規則正式文本",
+        "trace_attempts_ref": "sivers_official_lidar_gf_onet_and_q1_letter_2026-08-10",
+        "trace_next_trigger": "official_named_qualification_order_revenue_or_named_Aeva_Sivers_source",
         "trace_origin_entity": "Sivers Semiconductors AB",
         "trace_original_date": "2026-04-15",
         "trace_original_url": "https://www.sivers-semiconductors.com/press/sivers-semiconductors-collaborates-with-jabil-on-energy-efficient-1-6t-pluggable-optical-transceiver-module/",
@@ -10861,7 +10915,7 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -12536,14 +12590,14 @@
         "campaign_window_start": "2026-06-29T13:46:25Z",
         "canonical_url": "https://www.sivers-semiconductors.com/press/sivers-semiconductors-collaborates-with-jabil-on-energy-efficient-1-6t-pluggable-optical-transceiver-module/",
         "outcome": "parked；成熟度時程仍未獲一手確認；未產生 prepared RA",
-        "parked_reason": "官方文件支持 Jabil 1.6T LRO 合作、Sivers/POET production-readiness 與部分夥伴關係，但沒有一手文件支持貼文推導的 1–4 個月 qualification、2027 mass production、Apple 或其他客戶時程；新 FCC 草案也仍只是政策草案，未提供 qualification／訂單 delta。",
+        "parked_reason": "official_sources_do_not_confirm_1_to_4_month_qualification_2027_mass_production_Apple_or_all_program_revenue_claims",
         "primary_url": "https://www.sivers-semiconductors.com/press/sivers-semiconductors-collaborates-with-jabil-on-energy-efficient-1-6t-pluggable-optical-transceiver-module/",
         "research_mode": "delta_only",
-        "research_outcome": "partial_support_timeline_inference_rejected_no_new_graph_delta",
-        "research_run": "daily_2026-08-06",
+        "research_outcome": "no_research_action_prepared",
+        "research_run": "daily:2026-08-10",
         "trace_access_method": "official_ir",
-        "trace_attempts_ref": "Jabil official/Sivers official、Sivers Q1/Annual Report、POET official、partner materials、related FCC draft-ban Reuters discovery",
-        "trace_next_trigger": "Jabil、POET、GFS、Ayar 或 O-Net 公布 qualification completion、volume order／revenue 或確定 production timetable；或 FCC 正式規則",
+        "trace_attempts_ref": "sivers_official_partnership_and_production_readiness_sources_2026-08-10",
+        "trace_next_trigger": "official_qualification_completion_order_revenue_or_product_timetable",
         "trace_origin_entity": "Sivers Semiconductors AB",
         "trace_original_date": "2026-04-15",
         "trace_original_url": "https://www.sivers-semiconductors.com/press/sivers-semiconductors-collaborates-with-jabil-on-energy-efficient-1-6t-pluggable-optical-transceiver-module/",
@@ -12567,7 +12621,7 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -20909,6 +20963,30 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1158114/000143774926026278/aaoi20260630_10q.htm"
     },
+    "lead_e2188414bbf98bcd91c73136242323e2": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-09T22:33:30.399881+00:00",
+      "lead_id": "lead_e2188414bbf98bcd91c73136242323e2",
+      "media": [],
+      "published_at": "2026-08-09T04:11:14.000Z",
+      "raw_text": "All right chat, it’s that time of the month again.\n\nWhat’s your #1 highest conviction stock and why? \n\nI actually learn a lot from reading these, so share some cool ideas.",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "All right chat, it’s that time of the month again. What’s your #1 highest conviction stock and why? I actually learn a lot from reading these, so share some cool ideas.",
+      "triage": {
+        "decided_at": "2026-08-09T22:34:49.839872+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "泛用最高信念持股徵集，未出現已追蹤公司／ticker／技術主題，也沒有可逐字查核的具體事件或數字；關聯性與可引用性均不足。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2086304269943419276"
+    },
     "lead_e39d378c77a5abbc11223b02bbae1959": {
       "entities": {
         "company_ids": [],
@@ -23357,8 +23435,8 @@
   "schema_version": "2",
   "source_state": {
     "x:aleabitoreddit": {
-      "since_id": "2086247069900300393",
-      "updated_at": "2026-08-09T01:25:22.780633+00:00",
+      "since_id": "2086304269943419276",
+      "updated_at": "2026-08-09T22:33:30.444960+00:00",
       "user_id": "1940360837547565056"
     }
   }

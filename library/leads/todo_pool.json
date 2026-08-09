@@ -1612,8 +1612,10 @@
       "added_at": "2026-08-08T05:18:54.542554+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_10b65a3868623d84f6b7e56d37b1b931",
+      "dispatch_receipt": "packet:gap_research_agility_todo106_2026-08-10",
       "dispatch_ref": "wo_6a639253c769a449a50619cf32602e44",
-      "dispatch_status": "queued",
+      "dispatch_status": "awaiting_approval",
+      "dispatch_updated_at": "2026-08-09T22:45:31.290234+00:00",
       "dispatched_at": "2026-08-09T01:47:42.060007+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 106,
@@ -1697,6 +1699,63 @@
       },
       "title": "REVIEW — co:meta",
       "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-09T22:36:03.607769+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 111,
+      "reason": null,
+      "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:applied_optoelectronics",
+      "type": "decision_review",
+      "waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-08-09T22:36:03.607678+00:00",
+        "trigger": "僅剩系統內部狀態，重新 reassess 即可（無使用者決定）",
+        "until": null
+      }
+    },
+    {
+      "added_at": "2026-08-09T22:36:03.607769+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 112,
+      "reason": null,
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:axt",
+      "type": "decision_review",
+      "waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-08-09T22:36:03.607707+00:00",
+        "trigger": "僅剩系統內部狀態，重新 reassess 即可（無使用者決定）",
+        "until": null
+      }
+    },
+    {
+      "added_at": "2026-08-09T22:36:03.607769+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 113,
+      "reason": null,
+      "ref_id": "dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:meta",
+      "type": "decision_review",
+      "waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-08-09T22:36:03.607746+00:00",
+        "trigger": "僅剩系統內部狀態，重新 reassess 即可（無使用者決定）",
+        "until": null
+      }
     }
   ],
   "log": [
@@ -3632,8 +3691,26 @@
       "ref_id": "dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
       "type": "decision_review",
       "verb": "drop"
+    },
+    {
+      "at": "2026-08-09T22:39:28.333723+00:00",
+      "n": 106,
+      "reason": "依使用者 go 開始 bounded company-level source trace；不授權 graph、Engine C、thesis、paper/live 或交易。",
+      "receipt": "daily:2026-08-10:agility-fcc-company-gap",
+      "ref_id": "dc_317c2897cdcffda26c2c2e0e79074670",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-08-09T22:45:31.290234+00:00",
+      "n": 106,
+      "reason": "FCC 機制已查清，但 Agility 特定受益、產品 origin／授權分類、公開 S-4 財務與 disproof authority 仍未成立；不沿用舊 assessment 做 bare reassess。",
+      "receipt": "packet:gap_research_agility_todo106_2026-08-10",
+      "ref_id": "dc_317c2897cdcffda26c2c2e0e79074670",
+      "type": "decision_review",
+      "verb": "pq1_awaiting_approval"
     }
   ],
-  "next_n": 111,
+  "next_n": 114,
   "schema_version": "1"
 }
