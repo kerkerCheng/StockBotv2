@@ -831,3 +831,65 @@ backlog 觀測（`manual_required` 時 `source` 為 None，不會進 reference i
 （來源是圖中 `supplies_to`／backlog 類 edge 的 assertion），或把 `graph_commercial`
 從 `AXIS_REFERENCE_AUTHORITIES` 移除並在文件明寫「本軸只能由 Engine C 人工觀測滿足」。
 **兩者都可接受，不可接受的是維持現狀**——現狀讓閘門的真實高度與宣告不符。
+
+### 10.10 這兩個核驗項該不該硬擋？——`manual_required` 又是一個表示兩種語意
+
+使用者問：「customer concentration 跟 backlog，如果沒追到會怎麼樣，就硬擋？這兩軸該
+怎麼看待？」這直接連回本檔起點的問題（gate 全過時 alpha 也沒了）。
+
+**先更正一個推理錯誤。** 本節作者一度說「這兩件都不是 blocking」，理由是四個 cohort
+都有部位。那是**倖存者偏誤**——那四個正是通過閘門的那些。查完整名單後相關性是 100%：
+
+| Ticker | customer_concentration | backlog | commercial_maturity | 部位 |
+|---|---|---|---|---|
+| AAOI／AXTI／META／SIVE.ST／COHR | `manual_reviewed` | `manual_reviewed` | `bounded_hypothesis` | 有 |
+| **IQE.L** | `manual_required` | `manual_required` | **`unknown`** | **0** |
+| **LITE** | `manual_required` | `manual_reviewed` | — | 會卡 |
+
+諷刺的是 `skills/blind-spot-audit` 的 A3 lens 明寫要防「倖存者偏誤：只研究還活著的
+贏家」，而該 skill 當天稍早才剛被更新。**紅隊判準寫下來不等於自己會套用。**
+
+#### 這道閘門的真實形狀
+
+新公司走到有部位的完整路徑：
+
+```
+lead → pq1 → 入圖核准（pq2）→ cohort → **客戶集中度觀測（pq2）**
+     → **backlog 觀測（pq2）** → 五軸 assessment → reassess → 部位
+```
+
+中間那兩步在任何 skill 流程文件裡都不是以「不做就永遠是 0」的形式出現——它們看起來
+像五項核驗清單裡的兩項，像選填。
+
+#### 該不該硬擋：不該，但也不該拿掉
+
+`manual_required` 目前同時代表兩件事：
+
+1. **「我們還沒查」** —— 該擋。你真的不知道。
+2. **「查了，公司不揭露」** —— **不該擋。它本身就是一個發現。**
+
+第二種非常常見（很多公司從不揭露 contracted backlog）。要求它等於**用揭露習慣篩公司，
+而不是用風險篩公司**。而揭露豐富的公司通常較大、分析師覆蓋較多、較不容易被錯價——
+**所以這道閘門會系統性地把系統推向 alpha 最不可能存在的地方。** 這就是「gate 全過時
+alpha 也沒了」的可指認機制，不是抽象擔憂。
+
+**反面必須同時記住：Sivers 是反例。** 它的 `commercial_maturity` 寫著「$799M 只是
+opportunity pipeline，未揭露 contracted backlog」——那個「未揭露」本身就是 thesis 的
+核心弱點。不做這個功課，會把 $799M 當成訂單。**功課有價值，即使答案是「查不到」。**
+
+#### 結論與待做
+
+保留功課，但讓兩種狀態分開——這與 `blocker_severity` 是同一個形狀：
+
+- `manual_required`（沒查）→ 軸 `unknown` → 歸零（維持現狀）
+- **新增**「查了、公司不揭露」狀態 → 軸可為 `bounded_hypothesis`，reason 記載
+  「公司不揭露 contracted backlog，成長可見度只能由 guidance 與產能推論」→ **降尺寸而非歸零**
+
+⚠ Engine C 目前字彙只有 `ok`／`missing`／`manual_required`／`manual_reviewed`，
+**無法表達第二種**。新增狀態屬 closed-vocabulary 變更（見
+`docs/solutions/architecture-patterns/closed-vocabulary-registry.md`），需同步
+`engine_c/observation_fields.py`、checklist、以及 coverage 的 blocker 分類；
+本輪只做到「讓閘門可見」（commit `586bfaf`），未動閘門本身。
+
+**動工前先確認一件事：** 新狀態必須要求 receipt——「查了但沒揭露」若不附追源紀錄，
+就會退化成「我沒查」的同義詞，那比現狀更糟（現狀至少誠實地擋著）。
