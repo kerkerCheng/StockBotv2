@@ -1,7 +1,13 @@
 # Neo4j local data — never commit DB files
 .neo4j/
 engine_c/.yfinance-cache/
-engine_c/stockbot.db
+# Engine C 的 SQLite authority 住在 ignored library/private/engine_c/。
+# 這裡是安全網：runtime_pointer.json 存的是相對路徑，任何從錯誤 base 解析它的
+# 腳本都會被 sqlite3 就地建出一個空 DB（2026-08-08 實際發生過一次）。
+# 那種檔案永遠不該進 Git——寧可多忽略，也不要讓 private runtime 檔外洩。
+engine_c/*.db
+engine_c/*.db-wal
+engine_c/*.db-shm
 paper_portfolio/config.json
 paper_portfolio/transactions.csv
 
