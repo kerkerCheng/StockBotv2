@@ -30,13 +30,66 @@ def _tracked(arg: str | None) -> frozenset[str]:
     return frozenset(t.strip().upper() for t in (arg or "").split(",") if t.strip())
 
 
+def _held() -> tuple[frozenset[str], frozenset[str]]:
+    """Google Sheet 的實際持股（ticker 與 company_id）。
+
+    `tracked_tickers` 由 lifecycle ＋ 未結案 cohort 導出，**不含持股**——因此在此
+    之前，一檔真的有部位、卻還沒建 cohort 的標的在 pq1 排序上等於不存在。
+    持股是唯讀輸入，取不到就回空集合（排序退回原行為），不阻斷 drain。
+    """
+
+    try:
+        from fetchers.gsheets import fetch_portfolio
+
+        rows = fetch_portfolio(strict_operational=True)
+    except Exception:
+        return frozenset(), frozenset()
+    tickers: set[str] = set()
+    company_ids: set[str] = set()
+    for row in rows:
+        ticker = str(row.get("ticker") or "").strip().upper()
+        if ticker and ticker != "—":
+            tickers.add(ticker)
+            # Sheet 用 execution symbol（FRA:2DG）；lead 的 cashtag 是 research
+            # ticker（$SIVE）。兩者都收，交集比對才不會漏。
+            if ":" in ticker:
+                tickers.add(ticker.split(":", 1)[1])
+        company_id = row.get("company_id") or row.get("neo4j_id")
+        if company_id:
+            company_ids.add(str(company_id))
+    # 同一家公司三個字串：Sheet 是 execution symbol（FRA:2DG）、registry 是 research
+    # ticker（SIVE.ST）、推文 cashtag 是 base（$SIVE）。lead 的 entities 是 harvest
+    # 當時算的、不會重算，所以要從持股這一側補上 research ticker 與其 base 形式，
+    # 否則「我持有的公司被點名」永遠比對不到。
+    try:
+        from identity.registry import get_registry
+
+        registry = get_registry()
+        for company_id in list(company_ids):
+            company = registry.company(company_id)
+            research = str(getattr(company, "research_ticker", "") or "").upper()
+            if research:
+                tickers.add(research)
+                if "." in research:
+                    tickers.add(research.split(".", 1)[0])
+    except Exception:
+        pass
+    return frozenset(tickers), frozenset(company_ids)
+
+
 def _cmd_list(args: argparse.Namespace) -> int:
     store = leads.load(args.leads)
     rows = list(store["leads"].values())
     if args.status:
         rows = [l for l in rows if l["status"] == args.status]
     if args.by_priority:
-        ranked = priority.rank_leads(rows, tracked_tickers=_tracked(args.tracked))
+        held_tickers, held_company_ids = _held()
+        ranked = priority.rank_leads(
+            rows,
+            tracked_tickers=_tracked(args.tracked),
+            held_tickers=held_tickers,
+            held_company_ids=held_company_ids,
+        )
         rows = [lead for _score, lead in ranked]
         scores = {lead["lead_id"]: score for score, lead in ranked}
     else:
@@ -115,7 +168,13 @@ def _cmd_drain(args: argparse.Namespace) -> int:
         l for l in store["leads"].values()
         if l["status"] in ("triaged_go", "researching")
     ]
-    ranked = priority.rank_leads(candidates, tracked_tickers=tracked)
+    held_tickers, held_company_ids = _held()
+    ranked = priority.rank_leads(
+        candidates,
+        tracked_tickers=tracked,
+        held_tickers=held_tickers,
+        held_company_ids=held_company_ids,
+    )
     lead_batch = ranked[:max(0, limit - len(decision_jobs))]
     if args.json:
         rows = [

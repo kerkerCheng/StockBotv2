@@ -38,6 +38,37 @@ def extract_cashtags(*texts: str | None) -> tuple[str, ...]:
     return tuple(seen)
 
 
+def _base_ticker_index(registry) -> dict[str, str]:
+    """交易所後綴去掉後的 ticker → company_id；只收**唯一**對應。
+
+    同一家公司在三個地方有三個字串：Google Sheet 用 execution symbol
+    （`FRA:2DG`）、registry 用 research ticker（`SIVE.ST`）、推文用 base cashtag
+    （`$SIVE`）。AGENTS.md 已載明「Sivers 三層 symbol 不可混用」——那是對的，
+    **價格**不可混。但「價格不可混用」不等於「不可辨識為同一家公司」，而先前連
+    辨識都做不到：2026-08-08 實測一則同時點名 AAOI／SIVE／LITE／AVGO／COHR 的推文，
+    company_ids 解析出五家卻**漏掉 Sivers**，因為 cashtag 是 `SIVE`、registry 是
+    `SIVE.ST`。
+
+    ⚠ 只用於 **lead 關聯**（排序、related_entity_signal），**不用於資本歸屬**。
+    `registry.company_id_for_ticker` 維持嚴格比對——holdings→company 的對應若放寬，
+    會把部位歸錯公司。lead 關聯可以寬鬆，資本歸屬必須精確。
+
+    base 有多於一家對應時整個丟棄（fail closed），不猜。
+    """
+
+    counts: dict[str, set[str]] = {}
+    for company in registry.companies:
+        ticker = str(getattr(company, "research_ticker", "") or "").upper()
+        if not ticker or "." not in ticker:
+            continue
+        base = ticker.split(".", 1)[0]
+        if base and base != ticker:
+            counts.setdefault(base, set()).add(company.company_id)
+    return {
+        base: next(iter(ids)) for base, ids in counts.items() if len(ids) == 1
+    }
+
+
 def resolve_company_ids(tickers: Iterable[str]) -> tuple[str, ...]:
     """把 ticker 反查成已登記的 company_id；查不到的直接略過。"""
 
@@ -47,9 +78,14 @@ def resolve_company_ids(tickers: Iterable[str]) -> tuple[str, ...]:
         registry = get_registry()
     except Exception:
         return ()
+    try:
+        base_index = _base_ticker_index(registry)
+    except Exception:
+        base_index = {}
     seen: dict[str, None] = {}
     for ticker in tickers:
-        company_id = registry.company_id_for_ticker(str(ticker))
+        raw = str(ticker).upper()
+        company_id = registry.company_id_for_ticker(raw) or base_index.get(raw)
         if company_id:
             seen.setdefault(company_id, None)
     return tuple(seen)

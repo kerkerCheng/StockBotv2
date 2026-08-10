@@ -123,6 +123,12 @@ class IdentityRegistry:
     def has_company(self, company_id: str) -> bool:
         return company_id in self._by_id
 
+    @property
+    def companies(self) -> tuple[CompanyIdentity, ...]:
+        """全部已登記公司；只讀，供需要掃描整份 registry 的呼叫端使用。"""
+
+        return tuple(self._by_id.values())
+
 
 @lru_cache(maxsize=1)
 def get_registry() -> IdentityRegistry:

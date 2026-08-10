@@ -16,6 +16,11 @@ from typing import Any, Iterable, Mapping
 PRIORITY_WEIGHTS: dict[str, float] = {
     "contradiction": 5.0,
     "thesis_impact": 4.0,
+    # 實際持有的標的優先於「有在追但沒部位」的。tracked_tickers 由 lifecycle ＋
+    # 未結案 cohort 導出，不含 Google Sheet 持股——因此在此之前，一檔你真的有
+    # 部位、卻還沒建 cohort 的標的在研究排序上等於不存在。權重刻意低於
+    # contradiction（反證仍最優先）但高於 novelty。
+    "holdings_impact": 4.0,
     "independent_source": 3.0,
     "novelty": 2.0,
     # 使用者明確指定的 bounded campaign 是 pq1 排程 authority，但仍不授權 pq2。
@@ -27,8 +32,42 @@ _EDGAR_SOURCE = re.compile(r"^edgar:([A-Z0-9.^_-]+)$")
 _CASHTAG = re.compile(r"(?<![A-Z0-9_])\$([A-Z][A-Z0-9.]{0,9})\b", re.IGNORECASE)
 
 
+def lead_tickers(lead: Mapping[str, Any]) -> frozenset[str]:
+    """這則 lead 提到的**所有** ticker（大寫）。
+
+    先前只取標題第一個 cashtag，於是一則同時點名五家的推文只用第一家判定重要性。
+    2026-08-08 實例：「gem after gem in $AAOI earnings for $SIVE + other laser
+    player readthrough」——第一個是 $AAOI，但該則的實質重點是使用者實際持有的
+    SIVE，且同時提到 LITE／AVGO／COHR／NVDA。而 `engine_b/entities.py` 的抽取
+    **早就把五家都解析出來了**：抽取抓到五個，排序只用一個。
+
+    優先用抽取結果（`entities.tickers`）；沒有時退回舊的單一 ticker 推導，
+    確保尚未被 entity 抽取處理過的舊 lead 行為不變。
+    """
+
+    entities = lead.get("entities") or {}
+    tickers = {
+        str(item).upper()
+        for item in (entities.get("tickers") or [])
+        if str(item).strip()
+    }
+    if tickers:
+        return frozenset(tickers)
+    single = lead_ticker(lead)
+    return frozenset({single.upper()}) if single else frozenset()
+
+
+def lead_company_ids(lead: Mapping[str, Any]) -> frozenset[str]:
+    """這則 lead 解析得到的所有 registry company_id。"""
+
+    entities = lead.get("entities") or {}
+    return frozenset(
+        str(item) for item in (entities.get("company_ids") or []) if str(item).strip()
+    )
+
+
 def lead_ticker(lead: Mapping[str, Any]) -> str | None:
-    """從 edgar: source 或標題 cashtag 取第一個 ticker。"""
+    """從 edgar: source 或標題 cashtag 取第一個 ticker（保留給既有呼叫端）。"""
     m = _EDGAR_SOURCE.match(str(lead.get("source") or ""))
     if m:
         return m.group(1)
@@ -36,7 +75,12 @@ def lead_ticker(lead: Mapping[str, Any]) -> str | None:
     return title_match.group(1).upper() if title_match else None
 
 
-def score_lead(lead: Mapping[str, Any], *, thesis_impact: bool = False) -> float:
+def score_lead(
+    lead: Mapping[str, Any],
+    *,
+    thesis_impact: bool = False,
+    holdings_impact: bool = False,
+) -> float:
     """單則 lead 的 priority 分數；高＝pq1 先處理。"""
     triage = lead.get("triage") or {}
     try:
@@ -51,6 +95,8 @@ def score_lead(lead: Mapping[str, Any], *, thesis_impact: bool = False) -> float
         score += PRIORITY_WEIGHTS["contradiction"]
     if thesis_impact:
         score += PRIORITY_WEIGHTS["thesis_impact"]
+    if holdings_impact:
+        score += PRIORITY_WEIGHTS["holdings_impact"]
     if flags.get("independent_source"):
         score += PRIORITY_WEIGHTS["independent_source"]
     if flags.get("novelty"):
@@ -66,17 +112,29 @@ def rank_leads(
     leads: Iterable[Mapping[str, Any]],
     *,
     tracked_tickers: frozenset[str] = frozenset(),
+    held_tickers: frozenset[str] = frozenset(),
+    held_company_ids: frozenset[str] = frozenset(),
 ) -> list[tuple[float, dict[str, Any]]]:
     """回 [(score, lead)] 依 score 由高到低（tie-break lead_id 穩定）。
 
-    thesis_impact 由 lead 的 ticker 是否在 tracked_tickers 推得——tracked 由
-    caller 注入（如已入圖/已入 probe 的公司），保持 priority 模組不硬耦合
-    Engine A/D。
+    比對用 lead 提到的**所有** ticker，不是第一個——抽取已經把它們都解析出來，
+    排序沒有理由只看一個。
+
+    `tracked_tickers`（有在追）與 `held_tickers`／`held_company_ids`（真的有部位）
+    分開注入：兩者語意不同，且先前只有前者，導致實際持股在排序上零加權。
+    priority 模組仍不硬耦合 Engine A/C/D——三者都由 caller 注入。
     """
     scored: list[tuple[float, dict[str, Any]]] = []
     for lead in leads:
-        ticker = lead_ticker(lead)
-        impact = ticker is not None and ticker.upper() in tracked_tickers
-        scored.append((score_lead(lead, thesis_impact=impact), dict(lead)))
+        tickers = lead_tickers(lead)
+        company_ids = lead_company_ids(lead)
+        impact = bool(tickers & tracked_tickers)
+        held = bool(tickers & held_tickers) or bool(company_ids & held_company_ids)
+        scored.append(
+            (
+                score_lead(lead, thesis_impact=impact, holdings_impact=held),
+                dict(lead),
+            )
+        )
     scored.sort(key=lambda item: (-item[0], item[1].get("lead_id", "")))
     return scored
