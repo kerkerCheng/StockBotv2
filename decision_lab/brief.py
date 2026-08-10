@@ -214,6 +214,12 @@ def _reassessable_axes(
         if not isinstance(entry, Mapping) or entry.get("level") != "unknown":
             continue
         ready = True
+        # commercial_maturity 的 authority 不是「financial 這個 section 拿不拿得到」，
+        # 而是「那兩筆人工觀測在不在」。用 section 層級判會產生自相矛盾的輸出：
+        # 2026-08-08 實測 co:iqe 同時被標成「commercial_maturity 可重評估」與
+        # 「缺 customer_concentration／backlog」——同一份 brief 兩個欄位互相打臉。
+        if axis == "commercial_maturity" and _missing_observations(snapshot):
+            continue
         for section in sections:
             payload = getattr(snapshot, section, None) or {}
             status = str(payload.get("status") or "")
