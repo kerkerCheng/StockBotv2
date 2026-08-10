@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import replace
 from pathlib import Path
 import json
 from urllib.parse import parse_qs, urlparse
@@ -91,6 +92,49 @@ def test_sends_summary_and_full_markdown_then_deduplicates(tmp_path: Path) -> No
     assert "codex-thread-1" in transport.calls[0][0]
     assert "| A | B |" in transport.calls[1][0]
     assert (tmp_path / "library" / "private" / "notifications" / "outbox.db").exists()
+
+
+def test_noncanonical_h1_uses_its_explicit_taipei_brief_date(tmp_path: Path) -> None:
+    transport = FakeTransport()
+    settings = _settings()
+    envelope = replace(
+        _envelope(
+            settings,
+            "# StockBotv2 Daily Approval Brief — 2026-08-10\n\nNO ACTION",
+        ),
+        created_at="2026-08-09T22:49:39+00:00",
+    )
+    publisher = NotificationPublisher(
+        repo_root=tmp_path,
+        settings=settings,
+        transport=transport,
+    )
+    try:
+        assert publisher.publish(envelope).status == "sent"
+    finally:
+        publisher.close()
+
+    assert transport.calls[0][2] == "Daily Brief 2026-08-10 (Asia/Taipei)"
+
+
+def test_missing_h1_date_falls_back_to_taipei_calendar_date(tmp_path: Path) -> None:
+    transport = FakeTransport()
+    settings = _settings()
+    envelope = replace(
+        _envelope(settings, "# StockBotv2 Daily Approval Brief\n\nNO ACTION"),
+        created_at="2026-08-09T22:49:39+00:00",
+    )
+    publisher = NotificationPublisher(
+        repo_root=tmp_path,
+        settings=settings,
+        transport=transport,
+    )
+    try:
+        assert publisher.publish(envelope).status == "sent"
+    finally:
+        publisher.close()
+
+    assert transport.calls[0][2] == "Daily Brief 2026-08-10 (Asia/Taipei)"
 
 
 def test_same_digest_can_publish_to_a_different_logical_channel(tmp_path: Path) -> None:

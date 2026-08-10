@@ -19,6 +19,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Mapping, Protocol
+from zoneinfo import ZoneInfo
 
 from storage.relational import (
     connect_sqlite,
@@ -35,9 +36,14 @@ _PART_BUDGET = 1_850
 _DISCORD_HOSTS = frozenset({"discord.com", "discordapp.com"})
 _USER_ID_RE = re.compile(r"^[0-9]{2,32}$")
 _DAILY_BRIEF_TITLE_RE = re.compile(r"^#\s+(Daily Brief\s+.+?)\s*$", re.MULTILINE)
+_BRIEF_HEADING_DATE_RE = re.compile(
+    r"^#\s+[^\n]*?\b(?P<date>[0-9]{4}-[0-9]{2}-[0-9]{2})\b[^\n]*$",
+    re.MULTILINE,
+)
 _DISCORD_ERROR_CODE_RE = re.compile(
     r"^discord_(?:http_[0-9]{3}|transport_[A-Za-z0-9_]+|thread_id_missing)$"
 )
+_TAIPEI = ZoneInfo("Asia/Taipei")
 
 
 def _now() -> str:
@@ -347,10 +353,24 @@ def _forum_thread_name(envelope: NotificationEnvelope) -> str:
     if match:
         name = match.group(1).strip()
     else:
-        # The normal Daily Brief always has the title above.  This fallback
-        # keeps ad-hoc smoke tests and older callers usable without inventing
-        # a second configuration surface.
-        name = f"Daily Brief {envelope.created_at[:10] or datetime.now(timezone.utc).date().isoformat()}"
+        # Prefer an explicit date from a non-canonical H1 so a presentation
+        # variation cannot silently shift the Forum thread by one day.
+        heading_date = _BRIEF_HEADING_DATE_RE.search(envelope.brief_text)
+        if heading_date:
+            brief_date = heading_date.group("date")
+        else:
+            # ``created_at`` is UTC in the normal path.  Daily Brief dates are
+            # authoritative in Asia/Taipei, so never slice the UTC timestamp.
+            try:
+                created_at = datetime.fromisoformat(
+                    envelope.created_at.replace("Z", "+00:00")
+                )
+                if created_at.tzinfo is None:
+                    raise ValueError("created_at must include timezone")
+            except (AttributeError, ValueError):
+                created_at = datetime.now(timezone.utc)
+            brief_date = created_at.astimezone(_TAIPEI).date().isoformat()
+        name = f"Daily Brief {brief_date} (Asia/Taipei)"
     return name[:100]
 
 
