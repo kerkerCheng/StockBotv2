@@ -54,6 +54,14 @@ def _base_ticker_index(registry) -> dict[str, str]:
     會把部位歸錯公司。lead 關聯可以寬鬆，資本歸屬必須精確。
 
     base 有多於一家對應時整個丟棄（fail closed），不猜。
+
+    ⚠ 已知的誤判風險（2026-08-08 掃過全表 53 家，13 家有後綴、無 base 衝突）：
+    多數 base 是純數字代碼（`2455`／`005930`／`300308`…），cashtag 幾乎不可能誤指；
+    但 **`ENA`（Enablence）與 `SOI`（Soitec）在美股／加密圈另有同名標的**
+    （$ENA＝Ethena、$SOI＝Solaris Oilfield）。誤判的後果被上述邊界限制在
+    **注意力分配**——最壞是某天 5 個 pq1 額度浪費一個，且 triage 通常會先擋掉
+    內容明顯無關的推文；不會把部位歸錯公司。若日後這兩個真的造成雜訊，
+    正解是在 registry 明列 alias／deny，而不是放棄整個 base 反查。
     """
 
     counts: dict[str, set[str]] = {}
