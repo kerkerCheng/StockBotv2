@@ -29,9 +29,16 @@ AXIS_REFERENCE_AUTHORITIES = {
     "technical_causal_link": frozenset(
         {"graph_entity", "graph_causal", "graph_source_assertion"}
     ),
-    "commercial_maturity": frozenset(
-        {"graph_commercial", "engine_c_backlog", "engine_c_customer"}
-    ),
+    # ⚠ 這裡刻意**不含** `graph_commercial`。該 authority 對應 evidence payload 的
+    # `commercial_assertions`，而全 repo 只有消費端（context._build_reference_index）、
+    # 沒有任何生產端——engine_d_runtime 的 _read_graph 產出 entities／edges／claims／
+    # assertions／sources／causal_paths／counter_paths，就是不產 commercial_assertions。
+    # 宣告它會讓這一軸看起來有三條路可走，實際只有兩條，而兩條都要求 Engine C 的
+    # `manual_reviewed` 觀測（manual_required 時 source 為 None，不進 reference index）。
+    # 2026-08-08 實測：有那兩筆觀測的 cohort 全部 bounded_hypothesis、有部位；
+    # 沒有的全部 unknown、部位 0——相關性 100%。閘門的真實高度必須等於宣告的高度。
+    # 若日後真的讓 graph 產出 commercial_assertions，再把它加回來。
+    "commercial_maturity": frozenset({"engine_c_backlog", "engine_c_customer"}),
     "financial_resilience": frozenset(
         {"engine_c_financial", "engine_c_manual"}
     ),

@@ -108,6 +108,9 @@ def _decision_item(
         "disproof_condition": card.get("disproof_condition") or "",
         # 這些軸的 authority 現在拿得到了，值得重評估（只是提示，不自動改等級）。
         "reassessable_axes": list(current_authority.get("reassessable_axes") or []),
+        # 缺這些 Engine C 人工觀測 ⇒ commercial_maturity 恆 unknown ⇒ 部位恆為 0。
+        # 它們是硬性前置條件，不是選填清單項，必須在撞牆前就看得見。
+        "missing_observations": list(current_authority.get("missing_observations") or []),
         "probe_expiry": card.get("probe_expiry"),
         "expiry_lapsed": bool(card.get("expiry_lapsed")),
         "user_response_needed": (
@@ -231,6 +234,28 @@ def _reassessable_axes(
     return sorted(reassessable)
 
 
+# 這兩項是 `commercial_maturity` 唯一的 authority 來源（見 sizing.AXIS_REFERENCE_
+# AUTHORITIES 的說明）。缺任一項該軸就恆為 unknown，五軸取 min ⇒ supported range 恆為 0。
+# 2026-08-08 實測相關性 100%：有這兩筆的 cohort 全部有部位，沒有的全部是 0。
+_POSITION_BLOCKING_OBSERVATIONS = ("customer_concentration", "backlog")
+
+
+def _missing_observations(snapshot: Any) -> list[str]:
+    """哪些 Engine C 人工觀測缺席，而它們正擋著這個 cohort 拿到任何部位。
+
+    先前只能靠「做完 assessment 拿到 0」才發現——那是撞牆後才知道牆在哪。
+    這裡讓它在 brief 就現形，成為明確的 pq2 待辦而不是隱藏前置條件。
+    """
+
+    checklist = ((getattr(snapshot, "financial", None) or {}).get("checklist")) or {}
+    missing: list[str] = []
+    for name in _POSITION_BLOCKING_OBSERVATIONS:
+        status = str((checklist.get(name) or {}).get("status") or "missing")
+        if status not in {"ok", "manual_reviewed"}:
+            missing.append(name)
+    return missing
+
+
 def _ratio_diff(security: Any, benchmark: Any) -> float | None:
     """原始超額報酬（未風險調整）。任一側缺就回 None，不用 0 冒充 benchmark。"""
     if not isinstance(security, (int, float)) or isinstance(security, bool):
@@ -342,6 +367,7 @@ def _current_authority_context(
         evidence_delta = "none"
     frozen_assessment = (latest["payload"].get("request") or {}).get("assessment") or {}
     reassessable = _reassessable_axes(frozen_assessment, snapshot)
+    missing_observations = _missing_observations(snapshot)
     change = {
         "security_return": security_return,
         "shadow_return": shadow_return,
@@ -363,6 +389,7 @@ def _current_authority_context(
             "fx_return": fx_return,
             "evidence_delta": evidence_delta,
             "reassessable_axes": reassessable,
+            "missing_observations": missing_observations,
         },
         change,
     )
