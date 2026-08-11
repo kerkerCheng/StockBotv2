@@ -2,7 +2,9 @@
   "_note": "Daily Approval Loop harvest 來源設定（plan U1/R3）。可手動編輯。feeds=RSS 類；x_accounts=X API；edgar_watch=SEC filing 監看。watch 清單 v0 手動維護是刻意的（plan R3 future note）。",
   "x_accounts": {
     "note": "X API v2 pay-per-use（約 $0.005/則、按回傳貼文數計費）。Daily 由 since_id＋exclude replies/retweets＋max_results page size＋max_posts_per_run 成本硬上限控制；超過單輪上限時保存 pagination checkpoint，下輪續抓，完成前不推進 since_id。具名探索 campaign 可用 bounded 30-day 分頁 backfill。note_tweet 全文與 media expansion 使用同一份貼文 response；圖片／影片預覽另存 ignored private cache，不做 OCR。需 .env 的 X_BEARER_TOKEN。加帳號只要往 handles 加，不必改程式。",
-    "handles": ["aleabitoreddit"],
+    "handles": [
+      "aleabitoreddit"
+    ],
     "exclude_replies": true,
     "exclude_retweets": true,
     "max_results": 25,
@@ -15,8 +17,24 @@
   "feeds": [],
   "edgar_watch": {
     "note": "只記 filing metadata（form/日期/URL），不下載全文。8-K/10-K/10-Q/Form 4 高優先；S-8 等註冊雜訊交 triage 判。下載＋抽取仍由使用者點名 research 動詞觸發。",
-    "tickers": ["COHR", "LITE", "AMAT", "LRCX", "AXTI", "AAOI", "TSEM", "GFS"],
-    "forms": ["8-K", "10-K", "10-Q", "4"],
+    "tickers": [
+      "AAOI",
+      "AMAT",
+      "AXTI",
+      "CCXI",
+      "COHR",
+      "GFS",
+      "LITE",
+      "LRCX",
+      "META",
+      "TSEM"
+    ],
+    "forms": [
+      "8-K",
+      "10-K",
+      "10-Q",
+      "4"
+    ],
     "lookback_count": 8
   }
 }
