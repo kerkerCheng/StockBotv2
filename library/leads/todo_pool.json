@@ -1614,15 +1614,16 @@
       "dispatch_baseline_decision_id": "pd_10b65a3868623d84f6b7e56d37b1b931",
       "dispatch_receipt": "packet:gap_research_agility_todo106_2026-08-10",
       "dispatch_ref": "wo_6a639253c769a449a50619cf32602e44",
-      "dispatch_status": "awaiting_approval",
-      "dispatch_updated_at": "2026-08-09T22:45:31.290234+00:00",
+      "dispatch_status": "parked",
+      "dispatch_updated_at": "2026-08-11T00:56:49.542117+00:00",
       "dispatched_at": "2026-08-09T01:47:42.060007+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 106,
-      "reason": null,
+      "reason": "缺口需要的是外部事件（CCXI/Agility S-4 公開揭露財務）而非更多研究功夫；已挖三輪皆同一面牆。與 [74] 同一等待條件，不應再占用 pq1 額度。⚠ CCXI 不在 EDGAR watch 清單，該事件目前無 watcher，須另補。",
+      "receipt": "packet:gap_research_agility_todo106_2026-08-10",
       "ref_id": "dc_317c2897cdcffda26c2c2e0e79074670",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-11T00:56:49.542117+00:00",
       "source": "decision_lab",
       "title": "REVIEW — co:agility_robotics",
       "type": "decision_review"
@@ -1753,6 +1754,25 @@
       },
       "title": "REVIEW — co:meta",
       "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-11T00:57:12.793957+00:00",
+      "deferred_at": "2026-08-11T00:57:27.803272+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 114,
+      "reason": null,
+      "ref_id": "dc_317c2897cdcffda26c2c2e0e79074670",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:agility_robotics",
+      "type": "decision_review",
+      "waiting_on": {
+        "reason": "缺口需外部事件而非更多研究；已挖三輪同一面牆。⚠ CCXI 不在 EDGAR watch，此事件目前無 watcher",
+        "set_at": "2026-08-11T00:57:27.803272+00:00",
+        "trigger": "CCXI/Agility S-4 公開揭露財務，或 4Q 2026 closing 後登記 AGLT（與 [74] 同一條件；[75] 亦為重複 cohort）",
+        "until": "2026-12-31"
+      }
     }
   ],
   "log": [
@@ -3760,8 +3780,35 @@
       "ref_id": "dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
       "type": "decision_review",
       "verb": "drop"
+    },
+    {
+      "at": "2026-08-11T00:56:49.542117+00:00",
+      "n": 106,
+      "reason": "缺口需要的是外部事件（CCXI/Agility S-4 公開揭露財務）而非更多研究功夫；已挖三輪皆同一面牆。與 [74] 同一等待條件，不應再占用 pq1 額度。⚠ CCXI 不在 EDGAR watch 清單，該事件目前無 watcher，須另補。",
+      "receipt": "packet:gap_research_agility_todo106_2026-08-10",
+      "ref_id": "dc_317c2897cdcffda26c2c2e0e79074670",
+      "type": "decision_review",
+      "verb": "pq1_parked"
+    },
+    {
+      "at": "2026-08-11T00:56:49.542117+00:00",
+      "n": 106,
+      "reason": "缺口需要的是外部事件（CCXI/Agility S-4 公開揭露財務）而非更多研究功夫；已挖三輪皆同一面牆。與 [74] 同一等待條件，不應再占用 pq1 額度。⚠ CCXI 不在 EDGAR watch 清單，該事件目前無 watcher，須另補。",
+      "receipt": "packet:gap_research_agility_todo106_2026-08-10",
+      "ref_id": "dc_317c2897cdcffda26c2c2e0e79074670",
+      "type": "decision_review",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-11T00:57:27.803272+00:00",
+      "n": 114,
+      "reason": "缺口需外部事件而非更多研究；已挖三輪同一面牆。⚠ CCXI 不在 EDGAR watch，此事件目前無 watcher",
+      "receipt": null,
+      "ref_id": "dc_317c2897cdcffda26c2c2e0e79074670",
+      "type": "decision_review",
+      "verb": "pending"
     }
   ],
-  "next_n": 114,
+  "next_n": 115,
   "schema_version": "1"
 }
