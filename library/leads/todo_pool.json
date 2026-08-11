@@ -1060,6 +1060,7 @@
     },
     {
       "added_at": "2026-07-30T10:11:44.913485+00:00",
+      "deferred_at": "2026-08-11T13:59:24.988661+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 74,
       "reactivated_at": "2026-08-11T13:58:33.812837+00:00",
@@ -1074,7 +1075,13 @@
       "resolved_at": null,
       "source": "decision_lab",
       "title": "REVIEW — co:agility_robotics",
-      "type": "decision_review"
+      "type": "decision_review",
+      "waiting_on": {
+        "reason": "2026-08-11：已消化一次 material evidence delta（decision:pd_efd4b796，來源為當日 [115] SVRC 入圖），未改變核心阻塞——registry 中 research_ticker 仍為 null。⚠ 刻意不設 --event-type decision_evidence_delta：engine_b/todo.py 的 material_decision_event 分支沒有 consumed-marker（reactivation_event 只寫不讀），只要 delta 維持 material 就會在每次 sync 重新喚醒，等待條件永遠黏不住。改用自然語言 trigger；實際 heartbeat 由 EDGAR watch 的 S-4 lead 承擔。",
+        "set_at": "2026-08-11T13:59:24.988661+00:00",
+        "trigger": "CCXI/Agility S-4 公開揭露財務（EDGAR watch 已補正確 CIK 2074973 與 S-4 form，S-4 轉公開時會以新 lead 出現在 daily brief），或 4Q 2026 closing 後 AGLT 掛牌並手動登記進 config/company_identity.json",
+        "until": "2026-12-31"
+      }
     },
     {
       "added_at": "2026-07-30T10:11:44.913513+00:00",
@@ -4148,6 +4155,15 @@
       "ref_id": "dc_6ae5b014dbbcd0774b45487542c9a102",
       "type": "decision_review",
       "verb": "event_reactivated"
+    },
+    {
+      "at": "2026-08-11T13:59:24.988661+00:00",
+      "n": 74,
+      "reason": "2026-08-11：已消化一次 material evidence delta（decision:pd_efd4b796，來源為當日 [115] SVRC 入圖），未改變核心阻塞——registry 中 research_ticker 仍為 null。⚠ 刻意不設 --event-type decision_evidence_delta：engine_b/todo.py 的 material_decision_event 分支沒有 consumed-marker（reactivation_event 只寫不讀），只要 delta 維持 material 就會在每次 sync 重新喚醒，等待條件永遠黏不住。改用自然語言 trigger；實際 heartbeat 由 EDGAR watch 的 S-4 lead 承擔。",
+      "receipt": null,
+      "ref_id": "dc_6ae5b014dbbcd0774b45487542c9a102",
+      "type": "decision_review",
+      "verb": "pending"
     }
   ],
   "next_n": 124,
