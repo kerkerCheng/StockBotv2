@@ -37,6 +37,25 @@
       "note": "公司站 WordPress press post_type feed，補 MFN 不載的商業 PR。視窗僅最新 10 篇，daily 節奏足夠。",
       "verified_at": "2026-08-11",
       "verified_items": 10
+    },
+    {
+      "source": "yahoo:iqe-l",
+      "url": "https://feeds.finance.yahoo.com/rss/2.0/headline?s=IQE.L&region=GB&lang=en-GB",
+      "note": "IQE plc（AIM: IQE，LSE）filing watcher。⚠ 這是 Yahoo 新聞聚合，不是 RNS 一手來源：只當『有事發生了』的觸發器，evidence tier 仍須依 skills/source-trace 追回 RNS／公司公告原文，不得直接引用 Yahoo 標題當證據。含 AIM Market Roundup 與一般選股文等雜訊，由 triage 過濾。視窗約 20 筆。",
+      "verified_at": "2026-08-11",
+      "verified_items": 20,
+      "verified_covers": [
+        "IQE and Tower Semiconductor Announce Multi-year InP epiwafer Supply Agreement（2026-06-15；直接對應 pq2 [109] 的 IQE thesis 與其 disproof 條件）",
+        "IQE raises 2026 revenue guidance on strong AI and data centre demand（2026-07-21）",
+        "IQE Schedules Annual General Meeting and Releases 2025 Annual Report（2026-06-03）",
+        "IQE completes fundraising and reports wider losses（2026-05-28 年度業績）"
+      ],
+      "rejected_candidates": [
+        "https://www.iqep.com/*（公司官網，含 /feed/ 與 ?feed=rss2&post_type=press）：SSL 憑證鏈驗證失敗（self-signed certificate in certificate chain），socket 層以預設 context 即失敗，非本機攔截所致。不為此關閉 fetch_url 的 SSL 驗證——那是全域共用路徑。",
+        "https://otp.tools.investis.com/clients/uk/iqe_plc/rns/rss.aspx：HTTP 200 但回傳 404 HTML 錯誤頁（軟性 404），parse_rss 正確地擲出 parse_error",
+        "investegate.co.uk 與 lse.co.uk 的 IQE 頁面：抓得到但 HTML head 未宣告任何 RSS/Atom feed；各式 /rss、/feed 路徑皆 404",
+        "region=US 的同一支 Yahoo feed：只有 10 筆且半數為 Form 8.3 揭露雜訊，故採 region=GB"
+      ]
     }
   ],
   "edgar_watch": {
