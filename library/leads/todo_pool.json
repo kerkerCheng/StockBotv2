@@ -1793,6 +1793,42 @@
       "source": "research_action",
       "title": "Agility Robotics（CCXI／未來 AGLT）致動器與稀土供應集中度風險",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-08-11T05:47:49.581411+00:00",
+      "hint": "核准 exact graph delta；Decision handoff：co:applied_optoelectronics。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 116,
+      "reason": null,
+      "ref_id": "ra_629fa230dd48b82ed39db2f3dc161027",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "AAOI 2026 Q2 法說會：CPO 雷射產能瓶頸與中國落後評估",
+      "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-08-11T05:47:49.581411+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 117,
+      "reason": null,
+      "ref_id": "dc_7907ce1d0c5b8f332d41b577713f4ac0",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:agility_robotics",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-11T05:51:30.788182+00:00",
+      "hint": "核准 exact graph delta；Decision handoff：co:sivers_semiconductors。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 118,
+      "reason": null,
+      "ref_id": "ra_7d465c3488c04765af70ca6a3ddd0d5d",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "Sivers × Jabil 1.6T LRO 光收發模組合作（DFB 雷射）",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -3838,6 +3874,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 116,
+  "next_n": 119,
   "schema_version": "1"
 }

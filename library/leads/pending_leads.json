@@ -2889,12 +2889,12 @@
         "campaign_window_start": "2026-06-29T13:46:25Z",
         "ontology_authority": "todo:61",
         "ontology_status": "approved",
-        "parked_reason": "trace_backlog_or_lead_only_after_robotics_bundle",
+        "parked_reason": "JD.com 以機器人取代 70 萬名外送員屬總體勞動市場/自動化趨勢敘事，非特定圖中已追蹤公司的供應鏈結構性 claim；JD 本身未入圖亦不在 config/themes.txt 追蹤範圍，屬 weekly topic discovery 候選而非 daily pq1 graph delta",
         "pq2_item": "61",
         "research_bundle_id": "serenity_robotics_20260729",
         "research_report": "docs/reports/serenity_30d_research_2026-07-29.md",
         "trace_attempts_ref": "docs/reports/serenity_30d_research_2026-07-29.md#截圖paywall判讀",
-        "trace_next_trigger": "canonical_ft_or_nikkei_text_or_new_official_event",
+        "trace_next_trigger": "若未來明確要研究 JD 機器人供應鏈或勞動替代對特定已追蹤機器人公司（如 CCXI/Agility、TSLA）的具體訂單影響，才重新評估",
         "trace_requeue_trigger": "related_triaged_lead:lead_e1daca4662d70cba294c939a608ae05c",
         "trace_requeued_at": "2026-08-11T05:08:15.230067+00:00",
         "trace_requires_user": "false",
@@ -2910,7 +2910,7 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "robotics": {
           "counter_only": false,
@@ -7516,10 +7516,32 @@
           "serenity_30d_20260729"
         ],
         "campaign_window_end": "2026-07-29T13:46:25Z",
-        "campaign_window_start": "2026-06-29T13:46:25Z"
+        "campaign_window_start": "2026-06-29T13:46:25Z",
+        "parked_reason": "多主題快訊彙整貼文（20+ 家公司/事件），僅 SOI.PA（FY2027 光子學營收展望倍增）與 AMD/Anthropic CPO-Ayar 路由訊號與已追蹤主題（cpo, robotics）沾邊，其餘（CXMT IPO、Samsung FC-BGA、SKC Absolics、QCOM 漲價、META El Paso 融資、Naver+Nvidia、DDR5 定價、INTC 14A、鎢原料、電池訂單等）皆非已追蹤標的；價值密度過低不適合單一 RA，若 SOI.PA 或 AMD-CPO 訊號有獨立來源重複出現再另案處理",
+        "trace_next_trigger": "若 SOI.PA FY2027 光子學營收指引或 AMD CPO-Ayar 供應關係出現獨立來源重複驗證，才重新評估",
+        "trace_requires_user": "false",
+        "trace_status": "isolated_tier_3",
+        "trace_trigger_entities": [
+          "AMD",
+          "AVGO",
+          "CCXI",
+          "CXMT",
+          "INTC",
+          "LPK",
+          "META",
+          "NVDA",
+          "ORCL",
+          "QCOM",
+          "SOI",
+          "co:broadcom",
+          "co:intel",
+          "co:meta",
+          "co:nvidia"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -11791,6 +11813,7 @@
         "outcome": "parked；部分支持但不證實全數量產／revenue；未產生 prepared RA",
         "parked_reason": "official_sources_confirm_partnerships_and_readiness_but_not_named_Aeva_supply_or_that_all_programs_are_revenue",
         "primary_url": "https://www.sivers-semiconductors.com/press/sivers-semiconductors-collaborates-with-jabil-on-energy-efficient-1-6t-pluggable-optical-transceiver-module/",
+        "research_action_id": "ra_7d465c3488c04765af70ca6a3ddd0d5d",
         "research_mode": "delta_only",
         "research_outcome": "no_research_action_prepared",
         "research_run": "daily:2026-08-10",
@@ -11819,7 +11842,7 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "action_prepared",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -12783,10 +12806,10 @@
         "campaign_topic": "memory_packaging",
         "campaign_window_end": "2026-07-29T13:46:25Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
-        "parked_reason": "Samsung SDI 官方資料支持 AI datacenter BBU 需求成長與 21700 圓柱電芯用途，但 Samsung SDI→Simplo→Meta/Amazon 供應鏈及 Samsung／Panasonic 缺貨只見 tier-3 產業轉述，未取得 Simplo／客戶／供應商一手逐字確認；不產 extraction 或 RA。",
+        "parked_reason": "資料中心 BBU 電池單元短缺，供應商為 Samsung SDI/Panasonic/LG Energy/Murata，均非已追蹤 ticker/主題；作者自陳『不是我的專長領域』。屬新主題候選非 daily pq1 graph delta",
         "research_mode": "delta_only",
         "trace_attempts_ref": "Samsung SDI InterBattery/earnings official pages + Panasonic 2026 energy IR + Simplo/MOPS official search + Digitimes/TheElec metadata",
-        "trace_next_trigger": "Simplo_MOPS_or_Samsung_Panasonic_primary_disclosure_names_supply_chain_and_constraints",
+        "trace_next_trigger": "若未來要開新主題追蹤資料中心電源/BBU 供應鏈，可作 weekly topic discovery 起點",
         "trace_requeue_trigger": "related_triaged_lead:lead_e1daca4662d70cba294c939a608ae05c",
         "trace_requeued_at": "2026-08-11T05:08:15.230067+00:00",
         "trace_requires_user": "false",
@@ -12804,7 +12827,7 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "Looks like there's a high power cylindrical cell / BBU cell shortage (aka: bottleneck): - Samsung SDI supplies the cells to Simplo, which assembles them into BBUs for $META to $AMZN. - As demand from data centers has increased, production of Samsung SDI's cylindrical cells has also risen sharply. - Industry sources said Panasonic, Samsung are experiencing supply shortages for BBU cells. So main beneficiaries imo look like: - Samsung SDI (KRX: 006400) / Panasonic Energy as cleaneset winners - Murata (6981) / this keeps showing up everywhere with MLCC and others lol - LG Energy (KRX: 373220) / incoming There's not really much direct US players? But adjacent read through like $VRT, $ETN or $BWA / $ENS. Not quite in my domain emphasis cup of tea though. I wouldn't conflate this as all shortages having a massive TAM, but there could be opportunities...",
       "triage": {
@@ -13600,6 +13623,7 @@
         "outcome": "parked；成熟度時程仍未獲一手確認；未產生 prepared RA",
         "parked_reason": "official_sources_do_not_confirm_1_to_4_month_qualification_2027_mass_production_Apple_or_all_program_revenue_claims",
         "primary_url": "https://www.sivers-semiconductors.com/press/sivers-semiconductors-collaborates-with-jabil-on-energy-efficient-1-6t-pluggable-optical-transceiver-module/",
+        "research_action_id": "ra_7d465c3488c04765af70ca6a3ddd0d5d",
         "research_mode": "delta_only",
         "research_outcome": "no_research_action_prepared",
         "research_run": "daily:2026-08-10",
@@ -13629,7 +13653,7 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "action_prepared",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -14613,12 +14637,12 @@
         "campaign_window_end": "2026-07-29T13:46:25Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
         "original_claim_status": "core_event_supported_author_inferences_rejected",
-        "parked_reason": "Reuters、Bloomberg 與 TechCrunch 支持 Nebius–Reflection AI 超過十億美元 compute agreement，二手報導並稱 GB300 至 2029；但未取得 Nebius／Reflection 可逐字核對的直接聲明或 filing，市場反應與資金能力敘事屬作者推論，不產 graph RA",
+        "parked_reason": "Nebius/Reflection AI/SpaceX 運算合約，皆非已追蹤標的（NBIS、Reflection AI、SPCX 均不在 config/themes.txt 或 registry），屬 neocloud/運算採購總體敘事非圖中已追蹤公司供應鏈 claim",
         "research_mode": "delta_only",
         "research_outcome": "tier3_core_corroborated_no_primary_no_graph_ra",
         "research_run": "luna_reviewer_2026-08-01_pq1_5",
         "trace_attempts_ref": "Reuters syndicated carrier；Bloomberg accessible excerpt；TechCrunch；Reflection official news index；Nebius／Reflection official and SEC search",
-        "trace_next_trigger": "Nebius 或 Reflection 發布官方合約、capacity、GB300 或期限文件；另行取得 WSJ 融資原文",
+        "trace_next_trigger": "若 Nebius 或 Reflection AI 未來成為明確追蹤標的，才重新評估",
         "trace_requeue_trigger": "related_triaged_lead:lead_0624cbfddb41714f21502cc3f3da7a8a",
         "trace_requeued_at": "2026-08-09T01:26:40.660274+00:00",
         "trace_requires_user": "false",
@@ -14634,7 +14658,7 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "$NBIS signs $1B+ compute agreement with Reflection AI, for GB300 access through 2029. Reflection also signed a multi-billion dollar agreement with $SPCX earlier. Interesting to say the least, seeing Nebius drop -5% off the news today. Also... counterparty to get this done kinda reminds me of OpenAI, where they might not have the funds to actually execute on these LTAs yet compared to $META or $MSFT. But generally positive long term developments, customer diversification was one of the core strengths of Nebius.",
       "triage": {
@@ -14907,10 +14931,33 @@
           "serenity_30d_20260729"
         ],
         "campaign_window_end": "2026-07-29T13:46:25Z",
-        "campaign_window_start": "2026-06-29T13:46:25Z"
+        "campaign_window_start": "2026-06-29T13:46:25Z",
+        "parked_reason": "總體市場情緒與多標的財報季評論（Fed 利率預期、GOOGL capex、記憶體需求等），無單一可查核的供應鏈 structural claim，屬總體敘事非圖譜可用內容",
+        "trace_next_trigger": "若其中提及的具體法說會數字（如 GOOGL capex -205B）需要單獨查證，改由對應公司的財報 lead 處理",
+        "trace_requires_user": "false",
+        "trace_status": "isolated_tier_3",
+        "trace_trigger_entities": [
+          "AAOI",
+          "AMKR",
+          "BE",
+          "CXMT",
+          "GOOGL",
+          "LITE",
+          "META",
+          "MU",
+          "NBIS",
+          "SIVE",
+          "SNDK",
+          "TER",
+          "co:applied_optoelectronics",
+          "co:google",
+          "co:lumentum",
+          "co:meta"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -15777,6 +15824,7 @@
       "raw_text": "Wow, there's gem after gem in $AAOI earnings for $SIVE + other laser player readthrough.\n\n1. AAOI not meaningfully participating in CPO first-gen deployments.\n\n\"We just can’t make enough of them [CPO lasers] to be involved in their current first-generation [CPO] deployments because there’s just not enough capacity.   We have to prioritize our ability to make lasers for our own  transceivers first\"\n\nSo first-gen CPO laser deployments, might even be narrowed down further for Western players like $SIVE, $LITE, $AVGO, and $COHR.\n\nAnd independent CPO CW laser capacity became more valuable if $AAOI had to turn away more customers...\n\nAlso remember Trendforce was talking about $AMD singing CW LTAs? $COHR / $LITE have capacity signed with $NVDA ...\n\nI thought it would be $AAOI, but they might be out of the equation. $MTSI also doesn't look meaningful with early CPO participation (eg. no mention in ER aside from NPO, and removal from Ayar website).\n\nSo I wonder who players like $AMD is going to go with for Helios (eg. Sivers + Ayar more likely candidate now)?\n\nBtw, this is not bearish AAOI because they have too much demand for optical transceiver business. Just more bullish on the existing few qualified CPO laser names that have capacity. \n\n2. Demand imbalance and bottleneck for InP lasers / optical transceivers.\n\nAOI's CEO stated kinda supported that when they said: \"The customer demand is 20%-40% higher\" than expanded built out capacity.\n\n\"We are getting this kind of demand from several big customers almost every week. Lasers are the biggest bottleneck right now for the transceiver business\"\n\n3. China being years away from having CPO DWDM specification lasers.\n\nI covered this earlier when looking at CPO competition from channel checks.\n\nBut AAOI confirming that China is \"easily at least two, three years or even longer from having CPO lasers is incredible tread through on defensibility Western laser positioning in the CPO laser chokepoint.\n\nTLDR:\n\n- High demand imbalance for CW lasers and optical transceivers.\n\n- $AAOI not in first-gen CPO due to capacity constraints (not exactly bearish AAOI because they have too much demand for their optical transciver business, but even better news for the few independent players with capacity coming online like $SIVE)\n\n- China years behind in CPO lasers.",
       "refs": {
         "parked_reason": "AAOI 官方 IR 已定位 Q2 2026 webcast archive，但入口要求提交姓名、電郵與公司且沒有公開文字 transcript；未代填個資。現有 10-Q 只支持雷射垂直整合、擴產與現金，無法用 canonical locator 驗證 20–40% 需求差、CPO 兩三年差距或 SIVE/LITE/COHR 外推，不產 RA。",
+        "research_action_id": "ra_629fa230dd48b82ed39db2f3dc161027",
         "research_mode": "delta_plus_official_archive_check",
         "research_outcome": "official_webcast_located_but_transcript_unavailable_claims_partial",
         "research_run": "daily-brief-2026-08-09-post-permission-recovery",
@@ -15805,7 +15853,7 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "action_prepared",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -17950,16 +17998,16 @@
         "campaign_window_end": "2026-07-29T13:46:25Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
         "original_claim_status": "unverified_with_existing_graph_conflict",
-        "parked_reason": "Morgan Stanley participant map 與 Rosenblatt China laser claim 只取得截圖及二手轉述；現有圖多為既有關係，且 POET/Celestial 已有 dated cancellation 反證，不能推定 current active mapping",
+        "parked_reason": "Morgan Stanley CPO 報告本身為機構訂閱付費內容無法直接存取；已用 WebSearch 找到兩則各自獨立的二手轉述（原推文本身＋另一則 P Equity Research 的 X 貼文），內容一致指出 MS 將 Sivers 與 Coherent/Lumentum 並列為三大 CPO 雷射供應商，但兩者都是二手轉述同一份報告，不構成獨立一手核對，SIVE 現有 credibility hold 亦需更高證據門檻",
         "research_mode": "delta_only",
         "research_outcome": "tier4_paid_note_unavailable_existing_map_not_actionable",
         "research_run": "luna_reviewer_2026-08-02_pq1_10",
         "trace_attempts_ref": "Morgan Stanley/Rosenblatt exact report search；issuer/graph cross-check；private screenshots",
-        "trace_next_trigger": "canonical Morgan/Rosenblatt report，或 issuer/customer 公開具名揭露同一 product/date scope",
+        "trace_next_trigger": "若取得 Morgan Stanley 報告本身逐字內容，或 Sivers/Coherent/Lumentum 任一方公開引用同一份報告，才重新評估",
         "trace_requeue_trigger": "related_triaged_lead:lead_7f66b743a034c41f6388aa800f333e62",
         "trace_requeued_at": "2026-08-04T22:36:55.816839+00:00",
         "trace_requires_user": "false",
-        "trace_status": "lead_only_tier_4",
+        "trace_status": "isolated_tier_3",
         "trace_trigger_entities": [
           "COHR",
           "GFS",
@@ -17977,7 +18025,7 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -20024,6 +20072,7 @@
       "raw_text": "Just some TLDR notes on $AAOI earnings:\n\n- Expects full qualification of 1.6T products by their hyperscaler customer within next couple of weeks \n\n(helpful revenue ramp #2, timelines)\n\n-  Continues to believe that AOI will have the largest AI DC transceiver production capacity in the US\n \n(reiterating ambitions during a time when their competitors might get banned)\n\n- Expects facilities toward InP capacity to come online in early 2027 \n\n(timeline FYI in terms of further ramp) \n\n- Total capacity is approaching 200,000/u per month, EOY 650,000/u per month of 800g/1.6t. EOY 2027, 930,000/u \n\n(this is the ramp i want to see)\n\n- \"increase our manufacturing capacity for our external light source or ELSFP. That's for co-packaged optics or CPO\". we anticipate ramping production later this year and into 2027, ultimately culminating in about 400,000 pieces per month in 2028\n\n(need some time to model this into revenue)\n\n- \"As we have mentioned before, we've been manufacturing lasers internally for many years. This has allowed us to avoid some of the shortages that  have affected others in the industry\"\n\n(vertical integration bull case during CW/EML laser shortages) \n\n- We believe that in the future, CPO will continue to drive increased demand for high-power lasers\n\n(thesis validation on CPO sector)\n\n- \"to our long-term objective of returning non-GAAP gross margins to around 40%\"\n\n-  \"We ended the second quarter with $508.8 million in total cash equivalents\"\n\nI need to double check if the ATM finished or not\n\n- \"our ability to deliver revenue in general, and specifically when it  comes to 800G products, is limited by our production capacity right now\" \"If we could produce more, we could ship more right now\"\n\nDemand > Supply validation. \n\n- \"Most of the increased capacity will be in U.S. Even so, let me say that, like I keep emphasizing, that is not good enough for the customer demand. The customer demand is 20%-40% higher.\"\n\nUnholy photonics demand validation across the whole sector, read through for $LITE, $SIVE / $JBL, and others is amazing. \n\n- \"Not in the next two, three years, especially the demand is so big. Okay?  Even combined AI, $LITE, $COHR, $AVGO all together, it's still very tough to meet the customer demand in the next few years\"\n\nMore optical sector demand validation. \n\n- CPO Timelines: \"If you're talking about really high volume manufacturer [for CPO market], I would say more like the late Q3 next year\" and \"We have been working very close with at least five customer\"\n\nIf you care about current earnings (which I'm not really looking at closely)\n\nRevenue: $191M vs. $190m \nEPS: $.06 vs. $.02\n\nTLDR: Extraordinary demand across the laser + optical sector read through. Kinda supporting Lumentum CEO statement that laser shortage is worse than memory shortages. \n\n2027 capacity ramp on track. To map inflection period with timelines, would be around early next year, as stated in their previous earnings call. \n\nAAOI has the customers now. Limitation is making enough lasers and transceivers.",
       "refs": {
         "parked_reason": "AAOI 官方 IR 已定位 Q2 2026 webcast archive，但入口要求提交姓名、電郵與公司且沒有公開文字 transcript；未代填個資。10-Q 可支持 800G/1.6T 擴產、雷射垂直整合與 US$508.8M 現金，但不能驗證 1.6T qualification、400,000 件 ELSFP、Q3 2027 高量產或同業 read-through，且多數屬時變 observation，不產 RA。",
+        "research_action_id": "ra_629fa230dd48b82ed39db2f3dc161027",
         "research_mode": "delta_plus_official_archive_check",
         "research_outcome": "official_webcast_located_but_transcript_unavailable_claims_partial",
         "research_run": "daily-brief-2026-08-09-post-permission-recovery",
@@ -20050,7 +20099,7 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "action_prepared",
       "themes": {
         "cpo": {
           "counter_only": false,
