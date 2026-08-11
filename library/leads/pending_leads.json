@@ -2588,6 +2588,90 @@
       "result": "ok",
       "run_at": "2026-08-11T13:44:28.901446+00:00",
       "source": "edgar:TSEM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T22:32:55.188802+00:00",
+      "source": "mfn:sivers-semiconductors"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T22:32:56.287624+00:00",
+      "source": "sivers:press"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T22:32:56.726306+00:00",
+      "source": "yahoo:iqe-l"
+    },
+    {
+      "new": 4,
+      "result": "ok",
+      "run_at": "2026-08-11T22:32:57.023997+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T22:32:58.181946+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T22:32:58.927949+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T22:32:59.689933+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T22:33:00.475926+00:00",
+      "source": "edgar:CCXI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T22:33:01.232075+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T22:33:01.991224+00:00",
+      "source": "edgar:GFS"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-08-11T22:33:02.729697+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T22:33:03.490420+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T22:33:04.205761+00:00",
+      "source": "edgar:META"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T22:33:04.957898+00:00",
+      "source": "edgar:TSEM"
     }
   ],
   "leads": {
@@ -3618,14 +3702,14 @@
         "campaign_topic": "photonics",
         "campaign_window_end": "2026-07-29T13:46:25Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
-        "parked_reason": "無法找到 Rosenblatt 逐字報告核對 VCSEL vs CW DFB／UHP CW 雷射架構論述；且推文指稱的 B.Riley『AAOI sell report 砍 40-50% transceiver TAM』與可查證的 B.Riley 分析方向不符——已知 B.Riley 是上調至 Neutral／目標價 15→54 美元並看好 Amazon 800G 需求，非維持 Sell，轉述可能已過時或失真，不產 RA",
+        "parked_reason": "本輪 related-entity trigger 只帶來另一則 AAOI 產能推文，未提供 Rosenblatt 或 B.Riley 報告原文。Broadcom 官方只確認 CPO 使用可更換雷射模組、並展示 VCSEL NPO；不支持「UHP CW 是唯一理想架構」、Sivers 受益，或 transceiver TAM 減少 40–50% 的 broker 原句，故不產 RA。",
         "research_mode": "delta_only",
-        "research_outcome": "no_graph_or_decision_delta",
-        "research_run": "daily:2026-08-10",
-        "trace_attempts_ref": "sivers_official_lidar_gf_onet_jabil_and_aeva_ir_index_2026-08-10",
-        "trace_next_trigger": "若取得 Rosenblatt 或 B.Riley 具名報告逐字原文，且與 SIVE CW DFB 雷射 thesis 直接相關，才重新評估",
-        "trace_requeue_trigger": "related_triaged_lead:lead_e1daca4662d70cba294c939a608ae05c",
-        "trace_requeued_at": "2026-08-11T05:08:15.230067+00:00",
+        "research_outcome": "trigger_did_not_supply_broker_original_no_graph_delta",
+        "research_run": "daily:2026-08-12",
+        "trace_attempts_ref": "Broadcom CPO 官方頁與 OFC 2026 官方文章；Rosenblatt／B.Riley exact-phrase search；trigger lead lead_7bffab80ea65599892880f07b65189d3",
+        "trace_next_trigger": "取得 Rosenblatt／B.Riley 具名報告逐字原文，或 Broadcom／客戶官方文件逐字比較 VCSEL、CW DFB 與 UHP CW 架構",
+        "trace_requeue_trigger": "related_triaged_lead:lead_7bffab80ea65599892880f07b65189d3",
+        "trace_requeued_at": "2026-08-11T22:34:51.034304+00:00",
         "trace_requires_user": "false",
         "trace_status": "isolated_tier_3",
         "trace_trigger_entities": [
@@ -3634,7 +3718,7 @@
           "SIVE",
           "co:applied_optoelectronics"
         ],
-        "trace_trigger_event_ref": "lead:lead_e1daca4662d70cba294c939a608ae05c",
+        "trace_trigger_event_ref": "lead:lead_7bffab80ea65599892880f07b65189d3",
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
@@ -3657,13 +3741,13 @@
       },
       "title": "Regarding $AMZN RNG + OpenAI’s MRC and VCSELs. In what appears to be an indirect response on B. Riley's $AAOI sell report regarding optimizations that \"flattens networks and cuts transceiver TAM 40-50%\". Rosenblatt TLDR: They've already modeled for this, even though each XPU may use fewer transceivers. The number of XPUs is growing so quickly that total optical demand should still rise. On lasers architectures for CPO: VCSELs are useful as a credible bridge for NPO/short reach. Ideal architecture though for CPO is UHP CW over other lasers, and cites Broadcom for that statements. Which happens to supports my core $SIVE thesis. I feel like Rosenblatt and I share the same views on a lot of things, I like the way they roll.",
       "triage": {
-        "decided_at": "2026-08-11T05:08:15.230067+00:00",
+        "decided_at": "2026-08-11T22:34:51.034304+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true,
           "user_requested": true
         },
-        "reason": "新 triage PASS lead lead_e1daca4662d70cba294c939a608ae05c 與 parked trace 共用具名標的 AMZN；事件觸發 bounded pq1 重查",
+        "reason": "新 triage PASS lead lead_7bffab80ea65599892880f07b65189d3 與 parked trace 共用具名標的 AAOI, co:applied_optoelectronics；事件觸發 bounded pq1 重查",
         "tier": 4
       },
       "triage_history": [
@@ -3712,6 +3796,22 @@
               "user_requested": true
             },
             "reason": "新 triage PASS lead lead_1aa835b32dc4e06468322d132acc925a 與 parked trace 共用具名標的 SIVE；事件觸發 bounded pq1 重查",
+            "tier": 4
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-11T22:34:51.034304+00:00",
+          "superseded_reason": "新 triage PASS lead lead_7bffab80ea65599892880f07b65189d3 與 parked trace 共用具名標的 AAOI, co:applied_optoelectronics；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_7bffab80ea65599892880f07b65189d3",
+          "triage": {
+            "decided_at": "2026-08-11T05:08:15.230067+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true,
+              "user_requested": true
+            },
+            "reason": "新 triage PASS lead lead_e1daca4662d70cba294c939a608ae05c 與 parked trace 共用具名標的 AMZN；事件觸發 bounded pq1 重查",
             "tier": 4
           }
         }
@@ -14236,6 +14336,61 @@
       },
       "url": "https://aleabitoreddit.substack.com/p/sivers-semi-sive-the-cpo-laser-supplier"
     },
+    "lead_7bffab80ea65599892880f07b65189d3": {
+      "entities": {
+        "company_ids": [
+          "co:applied_optoelectronics"
+        ],
+        "tickers": [
+          "AAOI"
+        ]
+      },
+      "first_seen": "2026-08-11T22:32:57.022371+00:00",
+      "lead_id": "lead_7bffab80ea65599892880f07b65189d3",
+      "media": [],
+      "published_at": "2026-08-11T18:46:52.000Z",
+      "raw_text": "Just putting it out there for people that think AAOI is a one year cycle...\n\n$AAOI projects their ELSFP capacity for CPO to be 400K/units a month in 2028.\n\n400k * ~$400 ELS ASP (GS assumptions) = + another ~$1.92B 2028 annualized revenue capacity added as a new distinct (>50% gross margin) product line. \n\nOn top of their existing 2027 projections (eg. ~$5.6B annualized transceiver revenue off $471m/month entering H2). \n\nTAM for 1.6T also goes brrr so I'd expect their end of H2 2027 projections to go up as more capacity comes online... \n\nFor certain optical names, it's one cycle (eg. 1.6T, CPO scale out/up, NPO etc. ), stacked on top of one another... stacked on top of another...  with TAM + margins stacking like minions after Anivia uses W in line. \n\nRather than one-and-done off of one year. \n\nThis is a stark contrast to some other sectors where growth is likely to decelerate after maybe 1 year of triple digit Y/Y revenue growth.",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CPO"
+          ]
+        },
+        "robotics": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Digit"
+          ]
+        },
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "ELS"
+          ]
+        }
+      },
+      "title": "Just putting it out there for people that think AAOI is a one year cycle... $AAOI projects their ELSFP capacity for CPO to be 400K/units a month in 2028. 400k * ~$400 ELS ASP (GS assumptions) = + another ~$1.92B 2028 annualized revenue capacity added as a new distinct (>50% gross margin) product line. On top of their existing 2027 projections (eg. ~$5.6B annualized transceiver revenue off $471m/month entering H2). TAM for 1.6T also goes brrr so I'd expect their end of H2 2027 projections to go up as more capacity comes online... For certain optical names, it's one cycle (eg. 1.6T, CPO scale out/up, NPO etc. ), stacked on top of one another... stacked on top of another... with TAM + margins stacking like minions after Anivia uses W in line. Rather than one-and-done off of one year. This is a stark contrast to some other sectors where growth is likely to decelerate after maybe 1 year of triple digit Y/Y revenue growth.",
+      "triage": {
+        "decided_at": "2026-08-11T22:34:51.034304+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "命中 AAOI／CPO／ELSFP，含 2028 月產能 40 萬、ASP 與年化容量的具體可核對主張；作者計算與 GS 假設需追一手來源，值得 pq1 驗證。",
+        "related_trace_requeues": [
+          "lead_075cb52a7fffdf3550210fc2a5f6fb8b"
+        ],
+        "tier": 3
+      },
+      "url": "https://x.com/aleabitoreddit/status/2087249406638862506"
+    },
     "lead_7d745e51747c8b36b02f3fddb1fafe51": {
       "entities": {
         "company_ids": [],
@@ -15357,20 +15512,20 @@
         "canonical_url": "https://www.investing.com/news/stock-market-news/exclusiveintel-amd-sign-longterm-server-cpu-deals-with-chinese-clients-as-prices-surge-4807453",
         "original_claim_status": "partial_support_author_inference_rejected",
         "outcome": "parked；未產生 prepared RA",
-        "parked_reason": "Reuters carrier 仍只支持 Intel／AMD 與中國客戶洽談較長期 CPU 採購及價格上漲；Intel Q1 2026 10-Q 另揭露未具名長期客戶安排與 US$1.7B 可執行 deposits，AMD 10-Q 只揭露中國銷售／出口限制，兩者都未逐字確認中國 AI data-center CPU 對手方、產品、期限或量。OCP 新事件也不補 memory／photonics LTA 拼接缺口，無最小一致 graph delta，不產 RA。",
+        "parked_reason": "Reuters carrier 仍只支持 Intel／AMD 與未具名中國 server 客戶洽談約一年、部分可達兩年以上的採購量承諾及價格上漲；本輪觸發來源是 LITE，沒有補上 CPU 對手方、產品、期限或量，也不能把 memory／photonics LTA 拼成同一因果邊，故不產 RA。",
         "primary_url": "https://www.investing.com/news/stock-market-news/exclusiveintel-amd-sign-longterm-server-cpu-deals-with-chinese-clients-as-prices-surge-4807453",
         "research_mode": "delta_only",
-        "research_outcome": "official_filings_do_not_name_claimed_china_cpu_lta_no_graph_delta",
-        "research_run": "daily-brief-2026-08-11",
+        "research_outcome": "related_lite_trigger_did_not_resolve_china_cpu_lta_counterparties",
+        "research_run": "daily:2026-08-12",
         "trace_access_method": "secondary_reprint",
-        "trace_attempts_ref": "Reuters carrier；Intel 2026 Q1 10-Q；AMD 2026 Q1 10-Q；Intel/AMD official exact search；既有 Micron/SanDisk/Lumentum/Coherent/TrendForce search",
-        "trace_next_trigger": "Intel／AMD／中國客戶 filing／IR 具名揭露 CPU 產品、對手方、期限與量，或取得 exact TrendForce AMD／CW LTA 原文後拆成獨立 lead",
+        "trace_attempts_ref": "Reuters 2026-07-23 carrier；Intel／AMD 既有 10-Q 與官方 exact search；trigger lead lead_891dfebbd908d822ef6f4a55e1e465c0",
+        "trace_next_trigger": "Intel／AMD／中國客戶 filing 或 IR 具名揭露 CPU 產品、對手方、期限與量；或取得 exact TrendForce AMD／CW LTA 原文",
         "trace_origin_entity": "Reuters",
         "trace_origin_linkage": "metadata_only",
         "trace_original_date": "2026-07-23",
         "trace_original_url": "https://www.investing.com/news/stock-market-news/exclusiveintel-amd-sign-longterm-server-cpu-deals-with-chinese-clients-as-prices-surge-4807453",
-        "trace_requeue_trigger": "related_triaged_lead:lead_65cd6e71ec67ef60eb999082611afa8b",
-        "trace_requeued_at": "2026-08-07T22:39:27.600157+00:00",
+        "trace_requeue_trigger": "related_triaged_lead:lead_891dfebbd908d822ef6f4a55e1e465c0",
+        "trace_requeued_at": "2026-08-11T22:34:50.401653+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
@@ -15384,7 +15539,7 @@
           "co:intel",
           "co:lumentum"
         ],
-        "trace_trigger_event_ref": "lead:lead_65cd6e71ec67ef60eb999082611afa8b",
+        "trace_trigger_event_ref": "lead:lead_891dfebbd908d822ef6f4a55e1e465c0",
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
@@ -15401,13 +15556,13 @@
       },
       "title": "$INTC and $AMD to sign CPU LTAs with Chinese customers for AI DCs (Reuters). - Prices of some CPU products have risen more than 40% in China since the start of the year from sources. - Month-on-month increases topping 10% for some products CPUs were already a bottleneck, following CPU ratios due to AI inference... But the broader trend of LTAs seems to be appearing from: - Memory, with $MU, Samsung, $SNDK, and SK Hynix signing DRAM/NAND LTAs. - Photonics, with $LITE, $COHR signing EML LTAs. And recent Trendforce reports that $AMD and hyperscalers are now pursuing CW LTAs. And I'm sure there's many more from MLCCs to all the way to substrates. +1 for the bottleneck investors... hard to be a \"bubble that pops\" if you have take or pay demand spanning multiple years.",
       "triage": {
-        "decided_at": "2026-08-07T22:39:27.600157+00:00",
+        "decided_at": "2026-08-11T22:34:50.401653+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true,
           "user_requested": true
         },
-        "reason": "新 triage PASS lead lead_65cd6e71ec67ef60eb999082611afa8b 與 parked trace 共用具名標的 LITE, co:lumentum；事件觸發 bounded pq1 重查",
+        "reason": "新 triage PASS lead lead_891dfebbd908d822ef6f4a55e1e465c0 與 parked trace 共用具名標的 LITE, co:lumentum；事件觸發 bounded pq1 重查",
         "tier": 4
       },
       "triage_history": [
@@ -15453,6 +15608,22 @@
               "user_requested": true
             },
             "reason": "新 triage PASS lead lead_7f66b743a034c41f6388aa800f333e62 與 parked trace 共用具名標的 LITE, co:lumentum；事件觸發 bounded pq1 重查",
+            "tier": 4
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-11T22:34:50.401653+00:00",
+          "superseded_reason": "新 triage PASS lead lead_891dfebbd908d822ef6f4a55e1e465c0 與 parked trace 共用具名標的 LITE, co:lumentum；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_891dfebbd908d822ef6f4a55e1e465c0",
+          "triage": {
+            "decided_at": "2026-08-07T22:39:27.600157+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true,
+              "user_requested": true
+            },
+            "reason": "新 triage PASS lead lead_65cd6e71ec67ef60eb999082611afa8b 與 parked trace 共用具名標的 LITE, co:lumentum；事件觸發 bounded pq1 重查",
             "tier": 4
           }
         }
@@ -15716,6 +15887,49 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2076284746385240101"
+    },
+    "lead_891dfebbd908d822ef6f4a55e1e465c0": {
+      "entities": {
+        "company_ids": [
+          "co:lumentum"
+        ],
+        "tickers": [
+          "CRWV",
+          "SMCI",
+          "LITE"
+        ]
+      },
+      "first_seen": "2026-08-11T22:32:56.977769+00:00",
+      "lead_id": "lead_891dfebbd908d822ef6f4a55e1e465c0",
+      "media": [],
+      "published_at": "2026-08-11T21:09:43.000Z",
+      "raw_text": "Insane earnings today for the AI theme with $CRWV, $SMCI, and $LITE. \n\nCoreweave: Absurd ~$104B+ backlog, which doesn't include $25B+ of new customer agreements added in early Q3. \n\nCompute demand read through for Neoclouds is enormous (For Nebius, Iren and others)\n\nSupermicro:  Absurd $65-72B in revenue guidance, adding $60B+ in new orders... \n\nAI DC buildout read through is just enormous. \n\nLumentum: $808M -> $1.01B -> $1.25B revenue ramp, with operating margins growing quarter after quarter. \n\nPhotonics players just keeps printing. \n\nTLDR: Every layer of the AI buildout goes brrrrr, and it's showing up in earnings.",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "LITE"
+          ]
+        }
+      },
+      "title": "Insane earnings today for the AI theme with $CRWV, $SMCI, and $LITE. Coreweave: Absurd ~$104B+ backlog, which doesn't include $25B+ of new customer agreements added in early Q3. Compute demand read through for Neoclouds is enormous (For Nebius, Iren and others) Supermicro: Absurd $65-72B in revenue guidance, adding $60B+ in new orders... AI DC buildout read through is just enormous. Lumentum: $808M -> $1.01B -> $1.25B revenue ramp, with operating margins growing quarter after quarter. Photonics players just keeps printing. TLDR: Every layer of the AI buildout goes brrrrr, and it's showing up in earnings.",
+      "triage": {
+        "decided_at": "2026-08-11T22:34:50.401653+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "命中已追蹤 Lumentum（LITE），含可追回 FY2026 Q4 earnings 的具體營收與 AI 資料中心需求數字；雖與同作者 LITE 專文重疊，仍依寬鬆規則進 pq1 核對原始財報。",
+        "related_trace_requeues": [
+          "lead_857582308bdff8e00dd648d213f7d679",
+          "lead_8e16834b3c423735ad20eb6f6be7d63b",
+          "lead_b1e793c560334131dfe7c1619715784d"
+        ],
+        "tier": 3
+      },
+      "url": "https://x.com/aleabitoreddit/status/2087285356999958663"
     },
     "lead_89656d14e16503d68cf12c4366c75045": {
       "entities": {
@@ -16158,6 +16372,8 @@
         "campaign_window_start": "2026-06-29T13:46:25Z",
         "parked_reason": "總體市場情緒與多標的財報季評論（Fed 利率預期、GOOGL capex、記憶體需求等），無單一可查核的供應鏈 structural claim，屬總體敘事非圖譜可用內容",
         "trace_next_trigger": "若其中提及的具體法說會數字（如 GOOGL capex -205B）需要單獨查證，改由對應公司的財報 lead 處理",
+        "trace_requeue_trigger": "related_triaged_lead:lead_891dfebbd908d822ef6f4a55e1e465c0",
+        "trace_requeued_at": "2026-08-11T22:34:50.401653+00:00",
         "trace_requires_user": "false",
         "trace_status": "isolated_tier_3",
         "trace_trigger_entities": [
@@ -16178,10 +16394,11 @@
           "co:lumentum",
           "co:meta"
         ],
+        "trace_trigger_event_ref": "lead:lead_891dfebbd908d822ef6f4a55e1e465c0",
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -16200,14 +16417,31 @@
       },
       "title": "I personally see it as extreme short term deleveraging that overshot many individual names. - $BE to $TER reported blowout results, with Bloom reporting 166% Y/Y rev growth + expanding margins + raised 2026 guidance... Teradyne reported 104% Y/Y revenue growth with 300%+ EPS growth. Your leading optical players over in China reported amazing preliminary earnings + extremely strong read through for the Western photonics sector. Think earnings season tend to remind markets about continued AI acceleration. I'm expecting $LITE, $SNDK / SK Hynix, and sector leader ERs to continue that trend. But it does feel like markets are rewarding existing acceleration more rather than future growth a year out over near-term revisions as seen with $AMKR. But as a TLDR, looks very positive for the themes I'm tracking. - Then you have $GOOGL capex raised to $195-$205B, which is typically the biggest AI demand signal from hyperscalers. - 77% 0bps change est. next FOMC decision from prediction markets. Trump administration on Monday called for the Fed to lower interest rates. So your 3x rate hikes fears this year seem kinda overblown. - Chinese fears from DUV to $CXMT overflooding are extremely overblown as well. We see this with every sector from time to time until people remember that lasers or HBM bottlenecks for a reason. As for personal thoughts, it was unhealthy seeing everything rise up or down together, especially with these themes. But I'm personally not worried since I have full conviction in my names, especially optical interconnects like $SIVE or $AAOI. $META compute and $GOOGL GCP margins/growth shows increasing demand for $NBIS and similar neocloud business models. $META + other hyperscaler notes around LTAs with $SNDK and Samsung/SK Hynix, $MU point to structural memory demand. Can go on and on... But when you have Jim Cramer telling every margined DC trader to \"sell everything\" at market open and news saying there's an AI bubble. I do hate it when others say \"it's dropping so sell\". My belief is that the important thing to look is accelerating revenue/EPS growth. And if that thesis stays in-tact with revenue acceleration in line with hyperscaler capex. TLDR: I see signs of AI demand / revenue acceleration, hyperscaler capex is one of the most important things to track. And my guess is that we'll see the theme recover broadly. But I can't predict what hour, day, or week that happens.",
       "triage": {
-        "decided_at": "2026-07-28T22:34:59.195565+00:00",
+        "decided_at": "2026-08-11T22:34:50.401653+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true
         },
-        "reason": "直接命中 LITE、SIVE、AAOI 與 optical interconnect／hyperscaler capex；含營收成長與 GOOGL capex 等可逐字追查數字。作者推論不作證據，送 pq1 追回公司 filing／IR。",
+        "reason": "新 triage PASS lead lead_891dfebbd908d822ef6f4a55e1e465c0 與 parked trace 共用具名標的 LITE, co:lumentum；事件觸發 bounded pq1 重查",
         "tier": 3
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-11T22:34:50.401653+00:00",
+          "superseded_reason": "新 triage PASS lead lead_891dfebbd908d822ef6f4a55e1e465c0 與 parked trace 共用具名標的 LITE, co:lumentum；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_891dfebbd908d822ef6f4a55e1e465c0",
+          "triage": {
+            "decided_at": "2026-07-28T22:34:59.195565+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true
+            },
+            "reason": "直接命中 LITE、SIVE、AAOI 與 optical interconnect／hyperscaler capex；含營收成長與 GOOGL capex 等可逐字追查數字。作者推論不作證據，送 pq1 追回公司 filing／IR。",
+            "tier": 3
+          }
+        }
+      ],
       "url": "https://x.com/aleabitoreddit/status/2082230983487803755"
     },
     "lead_8edbe0cb7532bcaa1445d3147be5140a": {
@@ -17033,6 +17267,33 @@
       "title": "IQE Secures $14 Million AI and Datacentre Semiconductor Contract (IQE)",
       "triage": null,
       "url": "https://uk.advfn.com/market-news/article/19464/iqe-secures-14-million-ai-and-datacentre-semiconductor-contract-iqe?.tsrc=rss"
+    },
+    "lead_9a9bc78fb2b55441c6a1d61bf9987a0c": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "SMCI",
+          "SPCX"
+        ]
+      },
+      "first_seen": "2026-08-11T22:32:57.018898+00:00",
+      "lead_id": "lead_9a9bc78fb2b55441c6a1d61bf9987a0c",
+      "media": [],
+      "published_at": "2026-08-11T20:51:04.000Z",
+      "raw_text": "$SMCI 2027 guidance was actually unholy: $65-$72 billion FY 2027 revenue guidance... \n\nvs. ~$52.4B expected, a casual +$16.1B above consensus. \n\nSMCI logged a massive $60B+ in news order from this earnings. \n\nThat timeline is also interesting when they announced a plan to co-build $SPCX + xAI  DCs \"within a year\" back in June..\n\nBut if SMCI sustain 10-15% gross margins off that ~$70B revenue guidance... I think there's a lot of room for rerating given MC is ~$20B (NFA, I have short term positions in SMCI now from this ER). \n\nMost important thing is learning about 2027 margins from call today.",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "$SMCI 2027 guidance was actually unholy: $65-$72 billion FY 2027 revenue guidance... vs. ~$52.4B expected, a casual +$16.1B above consensus. SMCI logged a massive $60B+ in news order from this earnings. That timeline is also interesting when they announced a plan to co-build $SPCX + xAI DCs \"within a year\" back in June.. But if SMCI sustain 10-15% gross margins off that ~$70B revenue guidance... I think there's a lot of room for rerating given MC is ~$20B (NFA, I have short term positions in SMCI now from this ER). Most important thing is learning about 2027 margins from call today.",
+      "triage": {
+        "decided_at": "2026-08-11T22:34:50.613184+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "主體為 SMCI／SpaceX／xAI 的伺服器營收與估值敘事，未連到現行追蹤公司、CPO／光學或明確供應鏈機制；雖有數字但關聯性硬指標不足。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2087280662802026931"
     },
     "lead_9adb031e86660441500e62d9adc0bafe": {
       "entities": {
@@ -17942,12 +18203,12 @@
         "campaign_window_end": "2026-07-29T13:46:25Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
         "original_claim_status": "partial_support_lta_and_capacity_exact_unverified",
-        "parked_reason": "Meta 官方 2026-03 文件可核對每六個月或更快的 MTIA cadence，但未披露 Samsung/SanDisk 記憶體 LTA、Sumitomo fiber LTA、7GW 或 145B internal memo；新記憶體產能 lead 也沒有 Meta 具名合約。",
+        "parked_reason": "Meta 官方 2026 Q1 10-Q 支持 2026 capex USD 125–145B，官方 MTIA 文章支持每六個月或更快的晶片 cadence；但這些屬財務／產品時變觀測，且仍未逐字揭露 Samsung／SanDisk 記憶體 LTA、Sumitomo fiber LTA 或 7GW internal memo，沒有唯一新 graph delta，不產 RA。",
         "research_mode": "delta_only",
-        "research_outcome": "partial_official_cadence_exact_lta_and_internal_memo_unavailable",
-        "research_run": "daily_2026-08-05",
-        "trace_attempts_ref": "Meta official Expanding Meta's Custom Silicon 2026-03；Meta/Samsung/SanDisk/Sumitomo official exact search；trigger lead lead_dc1c77328d874e61b0abaee39391c054",
-        "trace_next_trigger": "Meta internal memo 原文，或 Meta/Samsung/SanDisk/Sumitomo 具名 LTA 一手披露",
+        "research_outcome": "official_meta_supports_capex_and_chip_cadence_not_claimed_ltas_or_7gw",
+        "research_run": "daily:2026-08-12",
+        "trace_attempts_ref": "Meta 2026 Q1 10-Q；Meta 2026-03 MTIA 官方文章；Meta／Samsung／SanDisk／Sumitomo official exact search；trigger lead lead_79471f7e1d9ce0cea1a806571cfa4f9d",
+        "trace_next_trigger": "Meta internal memo 原文，或 Meta／Samsung／SanDisk／Sumitomo 具名 LTA 一手披露",
         "trace_requeue_trigger": "related_triaged_lead:lead_79471f7e1d9ce0cea1a806571cfa4f9d",
         "trace_requeued_at": "2026-08-11T05:08:22.553104+00:00",
         "trace_requires_user": "false",
@@ -17961,7 +18222,7 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "Nothing like an internal $META memo getting published. Showing AI ramping as usual: - LTAs signed with Samsung and $SNDK for memory - LTAs signed with Sumitomo Electric for fiber optics - Expected to deploy 7GW compute infra this year, and doubling in 2027. - as much as $145B capex spend this year “It plans to launch a chip about every six months through 2027”",
       "triage": {
@@ -19025,13 +19286,13 @@
         "campaign_window_end": "2026-07-05T09:45:21Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
         "original_claim_status": "partial_one_of_eight_primary_confirmed",
-        "parked_reason": "八個互不相干的 claim 混在同一貼文；僅 Vistara 找到 Meta 一手論文並拆為獨立 lead，其餘券商／付費媒體轉述未達可入圖證據，Bloom 官方資料也只支持合作額度而不支持電網瓶頸因果。",
+        "parked_reason": "八個互不相干主張中，Vistara 已另拆並處理；本輪 shared-Meta trigger 沒有提供 Morgan Stanley 出貨預測、probe card／socket、MLCC LTA、OpenAI 成本、Bloom 電網因果或 Digitimes OSAT 價格的原始文件，其餘仍是同源二手拼盤，不能形成一致 graph delta，不產 RA。",
         "related_research_action_id": "ra_62c5841f8de2c67890cbefb805ba8d77",
         "research_mode": "delta_only",
-        "research_outcome": "composite_split_vistara_to_derived_lead",
-        "research_run": "luna_reviewer_2026-08-02_pq1_10",
-        "trace_attempts_ref": "luna_packet_plus_main_review_meta_paper_morgan_digitimes_company_sources",
-        "trace_next_trigger": "new_primary_for_remaining_atoms_or_exact_user_priority",
+        "research_outcome": "related_meta_trigger_no_new_primary_for_remaining_composite_atoms",
+        "research_run": "daily:2026-08-12",
+        "trace_attempts_ref": "既有 Meta Vistara 官方論文與 RA；Morgan Stanley／Digitimes／公司官方來源既有追源；trigger lead lead_79471f7e1d9ce0cea1a806571cfa4f9d",
+        "trace_next_trigger": "任一剩餘 atomic claim 出現具名公司一手文件，或使用者指定 exact atom 提高優先權",
         "trace_requeue_trigger": "related_triaged_lead:lead_79471f7e1d9ce0cea1a806571cfa4f9d",
         "trace_requeued_at": "2026-08-11T05:08:22.553104+00:00",
         "trace_requires_user": "false",
@@ -19046,7 +19307,7 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "robotics": {
           "counter_only": false,
@@ -19392,14 +19653,14 @@
         "campaign_window_end": "2026-07-29T13:46:25Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
         "original_claim_status": "unverified_with_existing_graph_conflict",
-        "parked_reason": "Morgan Stanley CPO 報告本身為機構訂閱付費內容無法直接存取；已用 WebSearch 找到兩則各自獨立的二手轉述（原推文本身＋另一則 P Equity Research 的 X 貼文），內容一致指出 MS 將 Sivers 與 Coherent/Lumentum 並列為三大 CPO 雷射供應商，但兩者都是二手轉述同一份報告，不構成獨立一手核對，SIVE 現有 credibility hold 亦需更高證據門檻",
+        "parked_reason": "Morgan Stanley CPO 報告仍是機構訂閱內容；新增 Reddit／X 轉述都明示只看過分享截圖，與原貼文同源，不能形成第二 origin。Broadcom 官方頁可支持 CPO 平台與 foundry／laser 類別背景，但不能驗證 MS 將 Sivers、Coherent、Lumentum 列為三家關鍵雷射供應商；現有 Sivers credibility hold 下不升格、不產 RA。",
         "research_mode": "delta_only",
-        "research_outcome": "tier4_paid_note_unavailable_existing_map_not_actionable",
-        "research_run": "luna_reviewer_2026-08-02_pq1_10",
-        "trace_attempts_ref": "Morgan Stanley/Rosenblatt exact report search；issuer/graph cross-check；private screenshots",
-        "trace_next_trigger": "若取得 Morgan Stanley 報告本身逐字內容，或 Sivers/Coherent/Lumentum 任一方公開引用同一份報告，才重新評估",
-        "trace_requeue_trigger": "related_triaged_lead:lead_7f66b743a034c41f6388aa800f333e62",
-        "trace_requeued_at": "2026-08-04T22:36:55.816839+00:00",
+        "research_outcome": "paid_note_still_unavailable_new_lite_signal_not_independent_validation",
+        "research_run": "daily:2026-08-12",
+        "trace_attempts_ref": "Morgan Stanley／Rosenblatt exact report search；Reddit 同源截圖轉述；Broadcom CPO 官方頁；trigger lead lead_891dfebbd908d822ef6f4a55e1e465c0",
+        "trace_next_trigger": "取得 Morgan Stanley 報告本身逐字內容，或 Sivers／Coherent／Lumentum／客戶官方引用同一供應商清單",
+        "trace_requeue_trigger": "related_triaged_lead:lead_891dfebbd908d822ef6f4a55e1e465c0",
+        "trace_requeued_at": "2026-08-11T22:34:50.401653+00:00",
         "trace_requires_user": "false",
         "trace_status": "isolated_tier_3",
         "trace_trigger_entities": [
@@ -19415,7 +19676,7 @@
           "co:tower_semiconductor",
           "co:tsmc"
         ],
-        "trace_trigger_event_ref": "lead:lead_7f66b743a034c41f6388aa800f333e62",
+        "trace_trigger_event_ref": "lead:lead_891dfebbd908d822ef6f4a55e1e465c0",
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
@@ -19440,13 +19701,13 @@
       },
       "title": "Morgan Stanley note on CPO today. Key participants include: - $SIVE, $COHR, and $LITE in laser supply - Broadcom and Nvidia in switch platforms - Lightmatter, Ayar Labs, Marvell/Celestial, and POET in optical engines and photonics, - $TSM, $GFS, and $TSEM in silicon photonics foundry capacity I’ve covered all of these before, like Tower Semi. But I’m especially happy that Morgan Stanley validated my research that $SIVE is one of the critical global players in CPO. A small $1.5B laser company next to your two leading $60B+ companies… If you also synthesize Rosenblatt Securities recent note that China laser suppliers were quite far from having CPO lasers. This kinda magnifies importance of the three Western leaders of that laser chokepoint.",
       "triage": {
-        "decided_at": "2026-08-04T22:36:55.816839+00:00",
+        "decided_at": "2026-08-11T22:34:50.401653+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true,
           "user_requested": true
         },
-        "reason": "新 triage PASS lead lead_7f66b743a034c41f6388aa800f333e62 與 parked trace 共用具名標的 LITE, SIVE, co:lumentum；事件觸發 bounded pq1 重查",
+        "reason": "新 triage PASS lead lead_891dfebbd908d822ef6f4a55e1e465c0 與 parked trace 共用具名標的 LITE, co:lumentum；事件觸發 bounded pq1 重查",
         "tier": 4
       },
       "triage_history": [
@@ -19463,6 +19724,22 @@
               "user_requested": true
             },
             "reason": "既有 photonics 更新：含融資／listing／客戶合約／ASP／capacity／CPO roadmap 的具體可追查增量；進 pq1 查官方文件，重複看多敘事不累加 origin",
+            "tier": 4
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-11T22:34:50.401653+00:00",
+          "superseded_reason": "新 triage PASS lead lead_891dfebbd908d822ef6f4a55e1e465c0 與 parked trace 共用具名標的 LITE, co:lumentum；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_891dfebbd908d822ef6f4a55e1e465c0",
+          "triage": {
+            "decided_at": "2026-08-04T22:36:55.816839+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true,
+              "user_requested": true
+            },
+            "reason": "新 triage PASS lead lead_7f66b743a034c41f6388aa800f333e62 與 parked trace 共用具名標的 LITE, SIVE, co:lumentum；事件觸發 bounded pq1 重查",
             "tier": 4
           }
         }
@@ -22660,6 +22937,42 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2074838397341065516"
     },
+    "lead_d144605273591c7cecce472033bb367a": {
+      "entities": {
+        "company_ids": [
+          "co:lumentum"
+        ],
+        "tickers": [
+          "LITE"
+        ]
+      },
+      "first_seen": "2026-08-11T22:33:02.729531+00:00",
+      "lead_id": "lead_d144605273591c7cecce472033bb367a",
+      "published_at": "2026-08-11",
+      "refs": {},
+      "source": "edgar:LITE",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "LITE"
+          ]
+        }
+      },
+      "title": "LITE 8-K filed 2026-08-11",
+      "triage": {
+        "decided_at": "2026-08-11T22:34:51.243969+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "SEC 官方 Lumentum 8-K，標的與 CPO 主題直接相關，且可取得逐字一手財報／附件；進 pq1 抽取新季度事實。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1633978/000162828026055726/lite-20260811.htm"
+    },
     "lead_d22b1b06ba8ec23b7671ce5c6d7b54cd": {
       "entities": {
         "company_ids": [],
@@ -23294,6 +23607,56 @@
       "title": "Förändring av det totala antalet aktier och röster i Sivers Semiconductors AB",
       "triage": null,
       "url": "https://www.sivers-semiconductors.com/press/forandring-av-det-totala-antalet-aktier-och-roster-i-sivers-semiconductors-ab-11/"
+    },
+    "lead_d7fd5c6982c274f3d2426c6d6b2fdafe": {
+      "entities": {
+        "company_ids": [
+          "co:lumentum",
+          "co:coherent"
+        ],
+        "tickers": [
+          "LITE",
+          "SIVEF",
+          "COHR"
+        ]
+      },
+      "first_seen": "2026-08-11T22:32:57.020031+00:00",
+      "lead_id": "lead_d7fd5c6982c274f3d2426c6d6b2fdafe",
+      "media": [],
+      "published_at": "2026-08-11T20:16:01.000Z",
+      "raw_text": "$LITE earnings are out, very strong earnings:\n\nRevenue: $1.01B, +24.5% Q/Q, +109.3% Y/Y growth\nvs. ~$984.6M\nAdj. EPS: $3.23 vs. ~$2.95\nGross Margin (non-gaap): 50.4% / Operating margin (non-gaap) 36.6%\n\nQ1 FY2027 guidance is probably more important:\n\nRevenue: $1.225–1.275B vs. ~$1.16B\nAdj. EPS: $4.05–4.35 vs. ~$3.63\nOperating margin (non-gaap) of 39.5% - 40.5%\n\nIn terms of notes: \n\nSees: \"Increasing demand for ultra-high-power CPO lasers, an initial order for ELS modules\" \n\n- Great read through on other CPO players like $SIVEF, $COHR, and others. (maybe not AAOI since they're missing out on first-gen deployments)\n\n- \"Breath of NPO engagements are the first signs that optics are starting  to penetrate in-rack connectivity, significantly upping our optical TAM\"\n \n- Revenue projections \"reaching our target model more than a quarter ahead of schedule.\"\n\nExtremely strong earnings as expected, you have revenue going from:\n\n$808M -> $1.01B -> $1.25B while operating margin keeps increasing... Just my first impressions. \n\nMost important thing is the earnings call coming up soon.",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "COHR",
+            "CPO",
+            "LITE"
+          ]
+        },
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "ELS"
+          ]
+        }
+      },
+      "title": "$LITE earnings are out, very strong earnings: Revenue: $1.01B, +24.5% Q/Q, +109.3% Y/Y growth vs. ~$984.6M Adj. EPS: $3.23 vs. ~$2.95 Gross Margin (non-gaap): 50.4% / Operating margin (non-gaap) 36.6% Q1 FY2027 guidance is probably more important: Revenue: $1.225–1.275B vs. ~$1.16B Adj. EPS: $4.05–4.35 vs. ~$3.63 Operating margin (non-gaap) of 39.5% - 40.5% In terms of notes: Sees: \"Increasing demand for ultra-high-power CPO lasers, an initial order for ELS modules\" - Great read through on other CPO players like $SIVEF, $COHR, and others. (maybe not AAOI since they're missing out on first-gen deployments) - \"Breath of NPO engagements are the first signs that optics are starting to penetrate in-rack connectivity, significantly upping our optical TAM\" - Revenue projections \"reaching our target model more than a quarter ahead of schedule.\" Extremely strong earnings as expected, you have revenue going from: $808M -> $1.01B -> $1.25B while operating margin keeps increasing... Just my first impressions. Most important thing is the earnings call coming up soon.",
+      "triage": {
+        "decided_at": "2026-08-11T22:34:50.820204+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "命中 LITE／COHR／Sivers 與 CPO／ELS，含可逐字核對的超高功率 CPO 雷射、ELS module 初始訂單、NPO engagement 與 FY2027 指引數字。",
+        "tier": 3
+      },
+      "url": "https://x.com/aleabitoreddit/status/2087271842696593764"
     },
     "lead_d81e421129940939faa5bd6571aa449a": {
       "entities": {
@@ -27214,8 +27577,8 @@
   "schema_version": "2",
   "source_state": {
     "x:aleabitoreddit": {
-      "since_id": "2087030220213870632",
-      "updated_at": "2026-08-11T13:44:16.168258+00:00",
+      "since_id": "2087285356999958663",
+      "updated_at": "2026-08-11T22:32:57.023990+00:00",
       "user_id": "1940360837547565056"
     }
   }
