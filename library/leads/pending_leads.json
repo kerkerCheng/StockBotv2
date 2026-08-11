@@ -11803,6 +11803,7 @@
       "published_at": "2026-07-02T17:22:10.000Z",
       "raw_text": "Are you stupid? \n\n1. $JBL mass producing 1.6T LRO is revenue. \n2 O-Net mass producing ELS is revenue.\n3. $GFS using $SIVE as reference laser for the hyperscalers is revenue. \n4. Ayar joining $NVDA NVLink for CPO and using $SIVE for mass production is revenue. \n5. Other pluggable players, potentially Eoptolink/Innolight mass producing pluggables with $SIVE as lasers is revenue. \n6. $POET entering volume production is revenue.",
       "refs": {
+        "action_digest": "baa39de4020863228aebc863709a81628bde3e257b9b4d2ad3990fd2393d8833",
         "campaign_ids": [
           "serenity_30d_20260729"
         ],
@@ -11810,6 +11811,7 @@
         "campaign_window_end": "2026-07-05T09:45:21Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
         "canonical_url": "https://www.sivers-semiconductors.com/press/sivers-semiconductors-collaborates-with-jabil-on-energy-efficient-1-6t-pluggable-optical-transceiver-module/",
+        "focus_company_id": "co:sivers_semiconductors",
         "outcome": "parked；部分支持但不證實全數量產／revenue；未產生 prepared RA",
         "parked_reason": "official_sources_confirm_partnerships_and_readiness_but_not_named_Aeva_supply_or_that_all_programs_are_revenue",
         "primary_url": "https://www.sivers-semiconductors.com/press/sivers-semiconductors-collaborates-with-jabil-on-energy-efficient-1-6t-pluggable-optical-transceiver-module/",
@@ -11842,7 +11844,7 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -13613,6 +13615,7 @@
       "published_at": "2026-07-08T13:05:56.000Z",
       "raw_text": "For this type of mapping with $SIVE, it's a good idea look at their partners and their timelines.\n\n- $JBL confirmed via JPM fireside chat they have a relatively dramatic moat with their 1.6T LRO and are getting qualified done over next 1-4 months (2 months ago). So should be August 2026 to March 2027 timeframes for qual completion, then mass prod start with Sivers in pluggables.\n\n-  $AEVA are targeting HVM prob q4 2026, $POET is starting off production H2 2026 but probably later in H1 should kick off more.  \n\nO-Net, Ayar, $GFS and others are somewhere in 2027 I think and that's more along the lines of CPO timelines rather than $SIVE per say. \n\nVery confident in terms of execution, since $SIVE has a technical + qualification moat into many different hyperscaler supplier sources. \n\nAnd everyone is incentivized to produce as much as possible, with Sivers as the laser supplier. Not including likely names like $AAPL in 2028. \n\nHow both the $SIVE CEO and $JBL stated it is:\n\nIt's more about how much they can make rather than looking at competition (cause demand is so high + different chokepoints are bottlenecked). \n\nFor me personally, it's just waiting for things to play out.\n\nThe main area of interest is downstream IP acquisition for TAM expansion, so I think that opportunity pipeline undersells forward growth going forward.",
       "refs": {
+        "action_digest": "baa39de4020863228aebc863709a81628bde3e257b9b4d2ad3990fd2393d8833",
         "campaign_ids": [
           "serenity_30d_20260729"
         ],
@@ -13620,6 +13623,7 @@
         "campaign_window_end": "2026-07-29T13:46:25Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
         "canonical_url": "https://www.sivers-semiconductors.com/press/sivers-semiconductors-collaborates-with-jabil-on-energy-efficient-1-6t-pluggable-optical-transceiver-module/",
+        "focus_company_id": "co:sivers_semiconductors",
         "outcome": "parked；成熟度時程仍未獲一手確認；未產生 prepared RA",
         "parked_reason": "official_sources_do_not_confirm_1_to_4_month_qualification_2027_mass_production_Apple_or_all_program_revenue_claims",
         "primary_url": "https://www.sivers-semiconductors.com/press/sivers-semiconductors-collaborates-with-jabil-on-energy-efficient-1-6t-pluggable-optical-transceiver-module/",
@@ -13653,7 +13657,7 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -15823,6 +15827,8 @@
       "published_at": "2026-08-07T05:46:59.000Z",
       "raw_text": "Wow, there's gem after gem in $AAOI earnings for $SIVE + other laser player readthrough.\n\n1. AAOI not meaningfully participating in CPO first-gen deployments.\n\n\"We just can’t make enough of them [CPO lasers] to be involved in their current first-generation [CPO] deployments because there’s just not enough capacity.   We have to prioritize our ability to make lasers for our own  transceivers first\"\n\nSo first-gen CPO laser deployments, might even be narrowed down further for Western players like $SIVE, $LITE, $AVGO, and $COHR.\n\nAnd independent CPO CW laser capacity became more valuable if $AAOI had to turn away more customers...\n\nAlso remember Trendforce was talking about $AMD singing CW LTAs? $COHR / $LITE have capacity signed with $NVDA ...\n\nI thought it would be $AAOI, but they might be out of the equation. $MTSI also doesn't look meaningful with early CPO participation (eg. no mention in ER aside from NPO, and removal from Ayar website).\n\nSo I wonder who players like $AMD is going to go with for Helios (eg. Sivers + Ayar more likely candidate now)?\n\nBtw, this is not bearish AAOI because they have too much demand for optical transceiver business. Just more bullish on the existing few qualified CPO laser names that have capacity. \n\n2. Demand imbalance and bottleneck for InP lasers / optical transceivers.\n\nAOI's CEO stated kinda supported that when they said: \"The customer demand is 20%-40% higher\" than expanded built out capacity.\n\n\"We are getting this kind of demand from several big customers almost every week. Lasers are the biggest bottleneck right now for the transceiver business\"\n\n3. China being years away from having CPO DWDM specification lasers.\n\nI covered this earlier when looking at CPO competition from channel checks.\n\nBut AAOI confirming that China is \"easily at least two, three years or even longer from having CPO lasers is incredible tread through on defensibility Western laser positioning in the CPO laser chokepoint.\n\nTLDR:\n\n- High demand imbalance for CW lasers and optical transceivers.\n\n- $AAOI not in first-gen CPO due to capacity constraints (not exactly bearish AAOI because they have too much demand for their optical transciver business, but even better news for the few independent players with capacity coming online like $SIVE)\n\n- China years behind in CPO lasers.",
       "refs": {
+        "action_digest": "5d6915de3846913dbddd3d5f376a76ced06585a1150457ad040c6d4bd55744b6",
+        "focus_company_id": "co:applied_optoelectronics",
         "parked_reason": "AAOI 官方 IR 已定位 Q2 2026 webcast archive，但入口要求提交姓名、電郵與公司且沒有公開文字 transcript；未代填個資。現有 10-Q 只支持雷射垂直整合、擴產與現金，無法用 canonical locator 驗證 20–40% 需求差、CPO 兩三年差距或 SIVE/LITE/COHR 外推，不產 RA。",
         "research_action_id": "ra_629fa230dd48b82ed39db2f3dc161027",
         "research_mode": "delta_plus_official_archive_check",
@@ -15853,7 +15859,7 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -20071,6 +20077,8 @@
       "published_at": "2026-08-06T22:54:46.000Z",
       "raw_text": "Just some TLDR notes on $AAOI earnings:\n\n- Expects full qualification of 1.6T products by their hyperscaler customer within next couple of weeks \n\n(helpful revenue ramp #2, timelines)\n\n-  Continues to believe that AOI will have the largest AI DC transceiver production capacity in the US\n \n(reiterating ambitions during a time when their competitors might get banned)\n\n- Expects facilities toward InP capacity to come online in early 2027 \n\n(timeline FYI in terms of further ramp) \n\n- Total capacity is approaching 200,000/u per month, EOY 650,000/u per month of 800g/1.6t. EOY 2027, 930,000/u \n\n(this is the ramp i want to see)\n\n- \"increase our manufacturing capacity for our external light source or ELSFP. That's for co-packaged optics or CPO\". we anticipate ramping production later this year and into 2027, ultimately culminating in about 400,000 pieces per month in 2028\n\n(need some time to model this into revenue)\n\n- \"As we have mentioned before, we've been manufacturing lasers internally for many years. This has allowed us to avoid some of the shortages that  have affected others in the industry\"\n\n(vertical integration bull case during CW/EML laser shortages) \n\n- We believe that in the future, CPO will continue to drive increased demand for high-power lasers\n\n(thesis validation on CPO sector)\n\n- \"to our long-term objective of returning non-GAAP gross margins to around 40%\"\n\n-  \"We ended the second quarter with $508.8 million in total cash equivalents\"\n\nI need to double check if the ATM finished or not\n\n- \"our ability to deliver revenue in general, and specifically when it  comes to 800G products, is limited by our production capacity right now\" \"If we could produce more, we could ship more right now\"\n\nDemand > Supply validation. \n\n- \"Most of the increased capacity will be in U.S. Even so, let me say that, like I keep emphasizing, that is not good enough for the customer demand. The customer demand is 20%-40% higher.\"\n\nUnholy photonics demand validation across the whole sector, read through for $LITE, $SIVE / $JBL, and others is amazing. \n\n- \"Not in the next two, three years, especially the demand is so big. Okay?  Even combined AI, $LITE, $COHR, $AVGO all together, it's still very tough to meet the customer demand in the next few years\"\n\nMore optical sector demand validation. \n\n- CPO Timelines: \"If you're talking about really high volume manufacturer [for CPO market], I would say more like the late Q3 next year\" and \"We have been working very close with at least five customer\"\n\nIf you care about current earnings (which I'm not really looking at closely)\n\nRevenue: $191M vs. $190m \nEPS: $.06 vs. $.02\n\nTLDR: Extraordinary demand across the laser + optical sector read through. Kinda supporting Lumentum CEO statement that laser shortage is worse than memory shortages. \n\n2027 capacity ramp on track. To map inflection period with timelines, would be around early next year, as stated in their previous earnings call. \n\nAAOI has the customers now. Limitation is making enough lasers and transceivers.",
       "refs": {
+        "action_digest": "5d6915de3846913dbddd3d5f376a76ced06585a1150457ad040c6d4bd55744b6",
+        "focus_company_id": "co:applied_optoelectronics",
         "parked_reason": "AAOI 官方 IR 已定位 Q2 2026 webcast archive，但入口要求提交姓名、電郵與公司且沒有公開文字 transcript；未代填個資。10-Q 可支持 800G/1.6T 擴產、雷射垂直整合與 US$508.8M 現金，但不能驗證 1.6T qualification、400,000 件 ELSFP、Q3 2027 高量產或同業 read-through，且多數屬時變 observation，不產 RA。",
         "research_action_id": "ra_629fa230dd48b82ed39db2f3dc161027",
         "research_mode": "delta_plus_official_archive_check",
@@ -20099,7 +20107,7 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {
         "cpo": {
           "counter_only": false,

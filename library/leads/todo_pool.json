@@ -1796,18 +1796,27 @@
     },
     {
       "added_at": "2026-08-11T05:47:49.581411+00:00",
+      "completion_authority": {
+        "action_digest": "5d6915de3846913dbddd3d5f376a76ced06585a1150457ad040c6d4bd55744b6",
+        "cohort_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
+        "commit": "9ab94accf8f5e7df092343922c80ec456b7b13d7",
+        "company_id": "co:applied_optoelectronics",
+        "verified_at": "2026-08-11T08:02:47.650509+00:00"
+      },
       "hint": "核准 exact graph delta；Decision handoff：co:applied_optoelectronics。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 116,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_629fa230dd48b82ed39db2f3dc161027;digest:5d6915de3846913dbddd3d5f376a76ced06585a1150457ad040c6d4bd55744b6;commit:9ab94accf8f5e7df092343922c80ec456b7b13d7;cohort:dc_a94362af0d6a7398f02bdeb4f0fb893c",
       "ref_id": "ra_629fa230dd48b82ed39db2f3dc161027",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-11T08:02:47.650509+00:00",
       "source": "research_action",
       "title": "AAOI 2026 Q2 法說會：CPO 雷射產能瓶頸與中國落後評估",
       "type": "ra_admission"
     },
     {
       "added_at": "2026-08-11T05:47:49.581411+00:00",
+      "deferred_at": "2026-08-11T08:01:48.255826+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 117,
       "reason": null,
@@ -1820,12 +1829,20 @@
     },
     {
       "added_at": "2026-08-11T05:51:30.788182+00:00",
+      "completion_authority": {
+        "action_digest": "baa39de4020863228aebc863709a81628bde3e257b9b4d2ad3990fd2393d8833",
+        "cohort_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
+        "commit": "89d8ca575ff509fc315bc3a3123851ab3d2fd3b5",
+        "company_id": "co:sivers_semiconductors",
+        "verified_at": "2026-08-11T08:02:49.306517+00:00"
+      },
       "hint": "核准 exact graph delta；Decision handoff：co:sivers_semiconductors。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 118,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_7d465c3488c04765af70ca6a3ddd0d5d;digest:baa39de4020863228aebc863709a81628bde3e257b9b4d2ad3990fd2393d8833;commit:89d8ca575ff509fc315bc3a3123851ab3d2fd3b5;cohort:dc_7dc03795699f2169e9c8adc6d3d10179",
       "ref_id": "ra_7d465c3488c04765af70ca6a3ddd0d5d",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-11T08:02:49.306517+00:00",
       "source": "research_action",
       "title": "Sivers × Jabil 1.6T LRO 光收發模組合作（DFB 雷射）",
       "type": "ra_admission"
@@ -3870,6 +3887,33 @@
       "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
       "receipt": "action:ra_319c1ee97cc94aa392ed4cc248dd21ef;digest:e32e6089062c3b040d513b63892ca4fd2c3233555af06c900e494d8b3ac11f24;commit:08c04650471dd1ff30b365291c882179b3101b70;cohort:dc_7907ce1d0c5b8f332d41b577713f4ac0",
       "ref_id": "ra_319c1ee97cc94aa392ed4cc248dd21ef",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-11T08:01:48.255826+00:00",
+      "n": 117,
+      "reason": null,
+      "receipt": null,
+      "ref_id": "dc_7907ce1d0c5b8f332d41b577713f4ac0",
+      "type": "decision_review",
+      "verb": "pending"
+    },
+    {
+      "at": "2026-08-11T08:02:47.650509+00:00",
+      "n": 116,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_629fa230dd48b82ed39db2f3dc161027;digest:5d6915de3846913dbddd3d5f376a76ced06585a1150457ad040c6d4bd55744b6;commit:9ab94accf8f5e7df092343922c80ec456b7b13d7;cohort:dc_a94362af0d6a7398f02bdeb4f0fb893c",
+      "ref_id": "ra_629fa230dd48b82ed39db2f3dc161027",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-11T08:02:49.306517+00:00",
+      "n": 118,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_7d465c3488c04765af70ca6a3ddd0d5d;digest:baa39de4020863228aebc863709a81628bde3e257b9b4d2ad3990fd2393d8833;commit:89d8ca575ff509fc315bc3a3123851ab3d2fd3b5;cohort:dc_7dc03795699f2169e9c8adc6d3d10179",
+      "ref_id": "ra_7d465c3488c04765af70ca6a3ddd0d5d",
       "type": "ra_admission",
       "verb": "go"
     }
