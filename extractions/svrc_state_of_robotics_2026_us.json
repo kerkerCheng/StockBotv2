@@ -1,0 +1,153 @@
+{
+  "claims": [
+    {
+      "confidence": 0.65,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "若到 2027-12-31 前，第三方研究或 Agility/GXO/主要致動器供應商的公開揭露顯示美國/盟友（非日德中）致動器產能占比已提升至可觀測門檻（例如單一美系或北美供應商達成 ≥10% 全球致動器市場份額，或 Agility 公開揭露改用北美/盟友供應鏈致動器），視為此依賴 結構已顯著改變，需重新評估。核查頻率：每季隨新一期產業報告或 10-K/10-Q 供應鏈揭露 複查；觸發後 48 小時內：重新確認具體供應商與占比來源，更新 edge attributes 或 retire。",
+      "id": "svrc_state_of_robotics_2026_us_cl1",
+      "source_ids": [
+        "svrc_state_of_robotics_2026_us_s2",
+        "svrc_state_of_robotics_2026_us_s3"
+      ],
+      "statement": "SVRC Research（third-party industry report, 2026-04）指出美國人形機器人（含 Agility Robotics）的精密致動器（series elastic actuators、quasi-direct-drive motors、precision reducers）供應高度集中於日本/德國/中國，中國約佔全球致動器市場 26%，美國僅約 5%（引用 Goldman Sachs 數據）。",
+      "subject_id": "co:agility_robotics"
+    },
+    {
+      "confidence": 0.65,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "若到 2027-12-31 前，可查證的稀土產量統計顯示中國占比降至顯著低於 60%（例如 <45%），或主要人形機器人 OEM 公開揭露已採用非稀土馬達技術（如 ferrite-based 或 rare-earth-free 設計）達到量產規模，視為此曝險假設減弱。核查頻率：每半年隨 USGS 稀土產量統計更新複查；觸發後 48 小時內：確認新產量占比來源與口徑一致性，更新 confidence 或觸發 review。",
+      "id": "svrc_state_of_robotics_2026_us_cl2",
+      "source_ids": [
+        "svrc_state_of_robotics_2026_us_s4",
+        "svrc_state_of_robotics_2026_us_s5"
+      ],
+      "statement": "同份報告指出稀土（neodymium 用於馬達、samarium-cobalt 用於高溫應用）供應風險：中國控制全球稀土產量約 60%，替代來源尚屬萌芽階段，直接影響致動器馬達的原料端。",
+      "subject_id": "mat:rare_earth_magnets"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.65,
+      "dst_id": "comp:humanoid_precision_actuators",
+      "id": "e1",
+      "relation": "constrained_by",
+      "source_ids": [
+        "svrc_state_of_robotics_2026_us_s2",
+        "svrc_state_of_robotics_2026_us_s3"
+      ],
+      "src_id": "co:agility_robotics"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.65,
+      "dst_id": "mat:rare_earth_magnets",
+      "id": "e2",
+      "relation": "depends_on",
+      "source_ids": [
+        "svrc_state_of_robotics_2026_us_s4",
+        "svrc_state_of_robotics_2026_us_s5"
+      ],
+      "src_id": "comp:humanoid_precision_actuators"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "robot_system",
+      "aliases": [
+        "Agility",
+        "Digit",
+        "Agility Robotics Inc."
+      ],
+      "attributes": {},
+      "confidence": 0.75,
+      "id": "co:agility_robotics",
+      "name": "Agility Robotics",
+      "role": "robot_oem",
+      "source_ids": [
+        "svrc_state_of_robotics_2026_us_s1",
+        "svrc_state_of_robotics_2026_us_s2",
+        "svrc_state_of_robotics_2026_us_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "robot_subsystem",
+      "aliases": [
+        "precision actuators",
+        "series elastic actuators",
+        "quasi-direct-drive motors",
+        "precision reducers"
+      ],
+      "attributes": {},
+      "confidence": 0.7,
+      "id": "comp:humanoid_precision_actuators",
+      "name": "Humanoid precision actuators (series elastic / quasi-direct-drive / precision reducers)",
+      "role": "robot_component_supplier",
+      "source_ids": [
+        "svrc_state_of_robotics_2026_us_s2",
+        "svrc_state_of_robotics_2026_us_s3"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "neodymium",
+        "samarium-cobalt",
+        "rare earth magnets"
+      ],
+      "attributes": {},
+      "confidence": 0.7,
+      "id": "mat:rare_earth_magnets",
+      "name": "Rare earth magnets (neodymium, samarium-cobalt)",
+      "role": "material_base",
+      "source_ids": [
+        "svrc_state_of_robotics_2026_us_s4",
+        "svrc_state_of_robotics_2026_us_s5"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "svrc_state_of_robotics_2026_us",
+    "evidence_tier": 2,
+    "origin_entity": "SVRC Research (Robotics Center of Silicon Valley)",
+    "permission_basis": "Third-party public industry research report; store the canonical URL and only the research-relevant excerpt.",
+    "published_at": "2026-04",
+    "publisher": "Robotics Center of Silicon Valley",
+    "retrieved_at": "2026-08-11",
+    "source_type": "industry_report",
+    "storage_permission": "repo_excerpt",
+    "title": "State of Robotics 2026 — United States",
+    "url": "https://www.roboticscenter.ai/state-of-robotics-2026-united-states"
+  },
+  "sources": [
+    {
+      "id": "svrc_state_of_robotics_2026_us_s1",
+      "locator": "National Champions section",
+      "quote": "Digit is the only humanoid currently generating revenue from productive commercial work — 100,000+ totes moved at GXO"
+    },
+    {
+      "id": "svrc_state_of_robotics_2026_us_s2",
+      "locator": "Executive Summary / Challenges section",
+      "quote": "China controls roughly 26% of the global actuator market versus ~5% for the US"
+    },
+    {
+      "id": "svrc_state_of_robotics_2026_us_s3",
+      "locator": "Challenges section, actuator dependency",
+      "quote": "Series elastic actuators, quasi-direct-drive motors, and precision reducers overwhelmingly sourced from Japan, Germany, and China"
+    },
+    {
+      "id": "svrc_state_of_robotics_2026_us_s4",
+      "locator": "Challenges section, rare earth exposure",
+      "quote": "China controls ~60% of global rare-earth production"
+    },
+    {
+      "id": "svrc_state_of_robotics_2026_us_s5",
+      "locator": "Challenges section, rare earth exposure",
+      "quote": "Neodymium for motors, samarium-cobalt for high-temp applications — alternative sourcing is nascent"
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+Source URL: https://www.roboticscenter.ai/state-of-robotics-2026-united-states
+
+Excerpt:
+Source URL: https://www.roboticscenter.ai/state-of-robotics-2026-united-states
+Title: State of Robotics 2026 — United States
+Publisher: SVRC Research (Robotics Center of Silicon Valley)
+Published: 2026-04
+Retrieved: 2026-08-11
+
+Research excerpt:
+- National Champions section names Agility Robotics ($CCXI at lead time; Agility Robotics
+  going public via Churchill Capital Corp XI SPAC merger, ticker AGLT post-close) among the
+  top-10 US humanoid robotics companies, alongside Figure AI, Apptronik, Tesla, Boston
+  Dynamics, Physical Intelligence, 1X Technologies, Amazon Robotics, Covariant, Skild AI.
+- Digit is described as the only humanoid currently generating revenue from productive
+  commercial work, citing 100,000+ totes moved at GXO.
+- RoboFab manufacturing capacity is cited at 10,000 units/year; Agility has raised $641M.
+- Challenges section frames rare earth exposure (neodymium for motors, samarium-cobalt for
+  high-temp applications; alternative sourcing described as nascent) and actuator dependency
+  (series elastic actuators, quasi-direct-drive motors, precision reducers overwhelmingly
+  sourced from Japan, Germany, China) as structural vulnerabilities for the US humanoid sector.
+- Citing Goldman Sachs data, China controls roughly 26% of the global actuator market versus
+  ~5% for the US; China also controls ~60% of global rare-earth production.
+- Report projects at least two significant consolidation events (acquisition or merger) among
+  US humanoid companies in 2027, given at least six well-funded competitors in an early-formation market.
+
+Boundary: this is an independent third-party industry report (origin_entity=SVRC Research),
+not Agility's own disclosure — satisfies L8 independence for a company whose graph presence
+so far would otherwise rely on self-reported or SPAC-filing sources. The report does not name
+specific actuator/rare-earth supplier companies for Agility; only aggregate country-level
+market-share figures are cited, so no specific supplier company node/edge is asserted.
