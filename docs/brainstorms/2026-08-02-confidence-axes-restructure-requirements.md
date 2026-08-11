@@ -935,3 +935,82 @@ backlog」，**同一份 brief 兩個欄位互相打臉**。已改為該軸直�
 
 判準：**當一個軸的 authority 是「特定幾筆資料」而非「整個 section」時，可用性檢查必須
 下探到那幾筆**，否則會產出看起來精確的錯誤提示。
+
+### 10.11 待辦池的重生迴圈、work order 無出口、以及 filing watcher 的缺口
+
+> 起因：使用者第四次問「這幾筆為什麼每天出現又說不用動作」。前三次的診斷都錯了。
+
+#### （一）持倉確認每天失效 —— 待辦重生的真正根因
+
+同一個 cohort 的 `ref_id` 累積出現次數：**AAOI 11 次、AXT 7 次、META 6 次**。
+使用者已 drop 三輪（95/96/101 → 102/103/104 → 111/112/113），全部無效。
+2026-08-10 我判定「成因已除（expiry 已修）」——**那是錯的，隔天又回來**。
+
+真正的根因：`holdings_snapshot_digest` 把 `market_value_base` 與 `nav_base` 一起 hash。
+
+```
+2026-08-08 確認的 digest : cb755ea8…
+2026-08-11 的 digest     : 615c1c04…   ← 只因為股價動了
+```
+
+⇒ `holdings_unconfirmed` 每天回來 ⇒ `live_context_not_ready` ⇒ card 判 REVIEW
+⇒ collector 每天替同一個 cohort 配一個新 pq2 編號。
+
+**又是一個表示承載兩種語意**：使用者確認的是「我持有 2,000 股 FRA:2DG」（事實聲明），
+而 digest 綁的是「持倉組成＋當下估值」。市值變不代表持倉變了，且行情鮮度另有
+`market_freshness_sessions`／`fx_freshness_sessions` 在管，不需由持倉確認代管。
+
+已修（commit `0fa5551`）：digest 只涵蓋 `ticker/shares/currency/company_id/is_cash`
+＋`base_currency`。驗證：股價 +7% → digest 不變；多買 1 股 → digest 改變。
+三筆 reassess 後皆 `NO_ACTION`，collector 不再產出，drop 這次會黏住。
+
+**判準：使用者確認的對象必須等於 digest 的涵蓋範圍。** 多綁一個會變的欄位，
+確認就會自動失效，而失效的成本是每天一個假待辦。
+
+#### （二）work order 也有「只有入口沒有出口」
+
+`[106]`（Agility）連續三天占用 pq1 額度撞同一面牆。它的缺口是「公開 S-4 財務」——
+**那是一個外部事件，不是努力程度的問題**，挖一百次也挖不出還沒公開的文件。
+而 `[74]` 早就正確地 parked-with-trigger 在等同一份文件。
+
+**判準不是「撞幾次算上限」，而是：這個缺口需要的是「更多功夫」還是「一個外部事件」？**
+後者應該**立刻 park 並附觸發條件，一次都不該重試**。
+
+已處理：`[106]` → parked → 新編號 `[114]` → `pending --until 2026-12-31 --trigger`。
+⚠ 注意：**單純 park 不夠**——collector 立刻補了一個新編號，必須再明確設等待條件
+才會移出決策佇列。
+
+#### （三）等待條件沒有 watcher ＝ 等運氣
+
+harvest 實際只有兩個來源（`crons/harvest_config.json`）：
+
+```
+X       @aleabitoreddit（唯一帳號）
+EDGAR   watch tickers ＋ forms 8-K/10-K/10-Q/4
+RSS     feeds: []   ← 欄位存在、parse_rss() 已實作、但清單是空的
+```
+
+而 watch 清單與實際追蹤的標的**雙向漂移**：
+
+```
+tracked 但沒 watch : IQE.L, META, SIVE.ST
+watch 但沒 tracked : AMAT, GFS, LITE, LRCX, TSEM
+```
+
+- **META**：美股上市、有 paper 部位、活躍 cohort，**卻沒有 filing watcher**
+- **CCXI**（Agility 的 SPAC 載體）：`[74]`／`[114]` 等的就是它的 S-4，而沒人在看
+- **IQE.L／SIVE.ST**：外國發行人，EDGAR 永遠不會有它們的申報
+
+已修（commit `67ef425`）：watch 補上 `META` 與 `CCXI`。
+
+#### 待做（三件，按建議順序）
+
+| # | 內容 | 為什麼等 |
+|---|---|---|
+| 1 | **EDGAR watch 改為自動導出**：`discover_tracked_tickers() ∩ 美股上市` ∪ 手動額外項 | 手維護清單與可導出資訊並存、各自演化，是今天反覆修的同一形狀。但需實地驗證，不宜與其他改動同時上 |
+| 2 | **外國發行人 filing watcher**：填 `feeds`（公司 IR RSS／LSE RNS／Nasdaq Stockholm） | `parse_rss()` 已實作、槽已存在，只缺 URL。**必須實地驗證每個 feed 抓得到且 parse 得出來**，不可憑印象填 |
+| 3 | work order 的「外部事件 vs 更多功夫」判定自動化 | 目前靠人看出來；樣本還太少，先手動處理累積案例 |
+
+**⚠ 第 2 項不可省略的理由：** 使用者**實際持有 SIVE**，而 `[10]` 等的 2026-08-27 Q2
+重編分辨點目前**完全靠人記得**——沒有任何 watcher 會在那天提醒。這是唯一一個
+「持有部位 ＋ 已知關鍵日期 ＋ 零自動監測」的組合。
