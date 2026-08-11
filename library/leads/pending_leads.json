@@ -2360,6 +2360,72 @@
       "result": "ok",
       "run_at": "2026-08-11T05:12:57.096256+00:00",
       "source": "edgar:TSEM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T12:18:25.763063+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T12:18:26.811879+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T12:18:27.414264+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T12:18:28.139770+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T12:18:28.892739+00:00",
+      "source": "edgar:CCXI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T12:18:29.661938+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T12:18:30.370300+00:00",
+      "source": "edgar:GFS"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T12:18:31.099817+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T12:18:31.648866+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T12:18:32.198476+00:00",
+      "source": "edgar:META"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T12:18:32.983447+00:00",
+      "source": "edgar:TSEM"
     }
   ],
   "leads": {
@@ -25267,7 +25333,7 @@
   "source_state": {
     "x:aleabitoreddit": {
       "since_id": "2087030220213870632",
-      "updated_at": "2026-08-11T05:12:49.418591+00:00",
+      "updated_at": "2026-08-11T12:18:25.763048+00:00",
       "user_id": "1940360837547565056"
     }
   }

@@ -1816,7 +1816,7 @@
     },
     {
       "added_at": "2026-08-11T05:47:49.581411+00:00",
-      "deferred_at": "2026-08-11T08:01:48.255826+00:00",
+      "deferred_at": "2026-08-11T12:18:08.459362+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 117,
       "reason": null,
@@ -1825,7 +1825,14 @@
       "resolved_at": null,
       "source": "decision_lab",
       "title": "REVIEW — co:agility_robotics",
-      "type": "decision_review"
+      "type": "decision_review",
+      "waiting_on": {
+        "event_type": "decision_evidence_delta",
+        "reason": "結構性阻塞非研究不足：co:agility_robotics 在 registry 的 research_ticker 為 null（尚未掛牌），decision_lab/workflow.py:435 要求 company_id+research_ticker 同時存在才能 bind_cohort_identity，故 cohort 身分永遠 unresolved，任何 gap research 都會撞同一組 market/fx/financial blocker",
+        "set_at": "2026-08-11T12:18:08.459362+00:00",
+        "trigger": "CCXI/Agility S-4 公開揭露財務，或 4Q 2026 closing 後 AGLT 掛牌並登記進 config/company_identity.json（與 [74]/[75]/[114] 同一外部事件）",
+        "until": "2026-12-31"
+      }
     },
     {
       "added_at": "2026-08-11T05:51:30.788182+00:00",
@@ -3916,6 +3923,15 @@
       "ref_id": "ra_7d465c3488c04765af70ca6a3ddd0d5d",
       "type": "ra_admission",
       "verb": "go"
+    },
+    {
+      "at": "2026-08-11T12:18:08.459362+00:00",
+      "n": 117,
+      "reason": "結構性阻塞非研究不足：co:agility_robotics 在 registry 的 research_ticker 為 null（尚未掛牌），decision_lab/workflow.py:435 要求 company_id+research_ticker 同時存在才能 bind_cohort_identity，故 cohort 身分永遠 unresolved，任何 gap research 都會撞同一組 market/fx/financial blocker",
+      "receipt": null,
+      "ref_id": "dc_7907ce1d0c5b8f332d41b577713f4ac0",
+      "type": "decision_review",
+      "verb": "pending"
     }
   ],
   "next_n": 119,
