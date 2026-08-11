@@ -1858,6 +1858,11 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
+      "source_cleared": {
+        "at": "2026-08-11T14:18:54.095157+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
       "title": "REVIEW — co:applied_optoelectronics",
       "type": "decision_review"
     },
@@ -4164,6 +4169,15 @@
       "ref_id": "dc_6ae5b014dbbcd0774b45487542c9a102",
       "type": "decision_review",
       "verb": "pending"
+    },
+    {
+      "at": "2026-08-11T14:18:54.095157+00:00",
+      "n": 119,
+      "reason": "來源本輪成功執行，但不再產出此項",
+      "receipt": null,
+      "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
+      "type": "decision_review",
+      "verb": "source_cleared"
     }
   ],
   "next_n": 124,
