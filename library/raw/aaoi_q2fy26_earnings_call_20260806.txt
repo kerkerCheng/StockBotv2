@@ -1,0 +1,32 @@
+Source URL: https://www.investing.com/news/transcripts/earnings-call-transcript-applied-optoelectronics-tops-q2-2026-forecasts-93CH-4844551
+
+Excerpt:
+Source URL: https://www.investing.com/news/transcripts/earnings-call-transcript-applied-optoelectronics-tops-q2-2026-forecasts-93CH-4844551
+Title: Applied Optoelectronics, Inc. (AAOI) Q2 2026 Earnings Call Transcript
+Call date: 2026-08-06 (Q2 FY2026 results)
+Retrieved: 2026-08-11
+
+Research excerpt (executive quotes):
+- CFO Stefan Murry: "We just can't make enough of them to be involved in their current
+  first-generation deployments because there's just not enough capacity."
+- CFO Stefan Murry: "We have to prioritize our ability to make lasers for our own
+  transceivers first, and then as we expand the fab... then we'll have more capacity for
+  the ESAP, for the CPO type laser."
+- CFO Stefan Murry: "Forecast demand for 800G and 1.6 terabit modules are projected to
+  continue to exceed our production capacity through mid-2027."
+- CEO Thompson Lin: customer demand is "20%-40% higher" than current capacity.
+- CEO Thompson Lin, on Chinese CPO laser competitors: "If you're talking about reasonable
+  year and no quality issue or performance issue, I would say easily at least two, three
+  years or even longer."
+- CFO Stefan Murry, on ELS/ELSFP ramp: "We have very limited production of these modules
+  now, but we anticipate ramping production later this year and into 2027, ultimately
+  culminating in about 400,000 pieces per month in 2028."
+- Q2 2026 results: revenue $191.9M (record, +86% YoY, +27% QoQ), non-GAAP EPS $0.06 beat.
+
+Boundary: this is AAOI's own management commentary (self-report), not independent
+third-party confirmation. The "China 2-3 years behind" assessment is forward-looking
+management judgment, not a filed fact, and management has an incentive to frame Western
+laser positioning favorably — scored as guided/lower-confidence, not confirmed. No claim
+is made here that this benefits SIVE, LITE, AVGO, or COHR specifically; that inference
+was in the originating social posts but is not stated by AAOI management and is not
+asserted as a graph claim.

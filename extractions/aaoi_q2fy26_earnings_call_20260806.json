@@ -1,0 +1,144 @@
+{
+  "claims": [
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "若 AAOI 後續法說會或申報揭露已具備足夠產能參與 first-gen CPO 部署（例如宣布具名 CPO 客戶 design-win 或量產出貨），或 800G/1.6T 需求早於 2027 年中降至產能以下，則本產能瓶頸假設失效。核查頻率：每季法說會後；觸發後 48 小時內覆核最新產能利用率與訂單 backlog 揭露，更新或 retire。",
+      "id": "aaoi_q2fy26_earnings_call_20260806_cl1",
+      "source_ids": [
+        "aaoi_q2fy26_earnings_call_20260806_s1",
+        "aaoi_q2fy26_earnings_call_20260806_s2",
+        "aaoi_q2fy26_earnings_call_20260806_s3"
+      ],
+      "statement": "AAOI CFO Stefan Murry（2026 Q2 法說會）表示，AAOI 因產能不足無法參與客戶first-generation CPO 部署，優先把既有雷射產能用於自家 transceiver，需待 fab 擴產後才有更多產能投入 CPO 用外部光源（ESAP/ELS）雷射；800G/1.6T 模組需求預期持續超過產能直到 2027 年中。",
+      "subject_id": "co:applied_optoelectronics"
+    },
+    {
+      "confidence": 0.55,
+      "demand_proof_level": "guided",
+      "disproof_condition": "若到 2028-12-31 前，任何中國雷射廠商公開宣布或經第三方查證取得主要西方或全球hyperscaler 客戶的 CPO 等級雷射 design-win／量產訂單，視為此評估失效。核查頻率：每半年隨產業報告／中國供應商公告複查；觸發後 48 小時內確認具名客戶與量產規模，更新或 retire。",
+      "id": "aaoi_q2fy26_earnings_call_20260806_cl2",
+      "source_ids": [
+        "aaoi_q2fy26_earnings_call_20260806_s5"
+      ],
+      "statement": "AAOI CEO Thompson Lin 於同場法說會評估：在無品質或良率問題的合理情境下，中國廠商距離具備 CPO 等級雷射能力『至少還要兩三年、甚至更久』。此為管理層前瞻性競爭評估（非申報確認事實），且管理層在西方雷射供應商定位上有既得利益，需視為 guided而非 confirmed。",
+      "subject_id": "co:applied_optoelectronics"
+    },
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "guided",
+      "disproof_condition": "若 AAOI 2027 年底前的月產量遠低於放量時間表（例如落後 2028 年 40 萬件目標達 50% 以上），或该產品線被公開取消/降規格，則此產能時間表假設失效。核查頻率：每季法說會後；觸發後 48 小時內比對最新產能揭露數字。",
+      "id": "aaoi_q2fy26_earnings_call_20260806_cl3",
+      "source_ids": [
+        "aaoi_q2fy26_earnings_call_20260806_s6"
+      ],
+      "statement": "AAOI 目前 ELS/ELSFP（CPO 外部光源模組）產量非常有限，計畫於 2026 下半年至 2027 年逐步放量，2028 年目標達每月約 40 萬件——與既有 400mW narrow-linewidth pump laser 產品為同一產品線在同場法說會的最新量產時間表更新。",
+      "subject_id": "prod:aaoi_400mw_narrow_linewidth_pump_laser"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {
+        "qualification_status": "sampling"
+      },
+      "confidence": 0.8,
+      "dst_id": "prod:aaoi_400mw_narrow_linewidth_pump_laser",
+      "id": "e1",
+      "relation": "constrained_by",
+      "source_ids": [
+        "aaoi_q2fy26_earnings_call_20260806_s1",
+        "aaoi_q2fy26_earnings_call_20260806_s2"
+      ],
+      "src_id": "co:applied_optoelectronics"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "AOI",
+        "AAOI",
+        "Applied Optoelectronics Inc."
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:applied_optoelectronics",
+      "name": "Applied Optoelectronics",
+      "role": "bottleneck_supplier",
+      "source_ids": [
+        "aaoi_q2fy26_earnings_call_20260806_s1",
+        "aaoi_q2fy26_earnings_call_20260806_s2",
+        "aaoi_q2fy26_earnings_call_20260806_s3",
+        "aaoi_q2fy26_earnings_call_20260806_s4",
+        "aaoi_q2fy26_earnings_call_20260806_s5",
+        "aaoi_q2fy26_earnings_call_20260806_s6"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "400mW laser",
+        "ELS",
+        "ELSFP",
+        "external light source"
+      ],
+      "attributes": {},
+      "confidence": 0.8,
+      "id": "prod:aaoi_400mw_narrow_linewidth_pump_laser",
+      "name": "AAOI 400mW narrow-linewidth pump laser",
+      "role": null,
+      "source_ids": [
+        "aaoi_q2fy26_earnings_call_20260806_s2",
+        "aaoi_q2fy26_earnings_call_20260806_s6"
+      ],
+      "type": "Product"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "aaoi_q2fy26_earnings_call_20260806",
+    "evidence_tier": 2,
+    "origin_entity": "Applied Optoelectronics",
+    "permission_basis": "Official public earnings call transcript (aggregator-hosted); store the canonical URL and only the research-relevant excerpt.",
+    "published_at": "2026-08-06",
+    "publisher": "Investing.com (transcript aggregator)",
+    "retrieved_at": "2026-08-11",
+    "source_type": "transcript",
+    "storage_permission": "repo_excerpt",
+    "title": "Applied Optoelectronics, Inc. (AAOI) Q2 2026 Earnings Call Transcript",
+    "url": "https://www.investing.com/news/transcripts/earnings-call-transcript-applied-optoelectronics-tops-q2-2026-forecasts-93CH-4844551"
+  },
+  "sources": [
+    {
+      "id": "aaoi_q2fy26_earnings_call_20260806_s1",
+      "locator": "CFO Stefan Murry, CPO capacity Q&A",
+      "quote": "We just can't make enough of them to be involved in their current first-generation deployments because there's just not enough capacity."
+    },
+    {
+      "id": "aaoi_q2fy26_earnings_call_20260806_s2",
+      "locator": "CFO Stefan Murry, CPO capacity Q&A",
+      "quote": "We have to prioritize our ability to make lasers for our own transceivers first, and then as we expand the fab, like Thompson mentioned, then we'll have more capacity for the ESAP, for the CPO type laser."
+    },
+    {
+      "id": "aaoi_q2fy26_earnings_call_20260806_s3",
+      "locator": "CFO Stefan Murry, demand/capacity outlook",
+      "quote": "Forecast demand for 800G and 1.6 terabit modules are projected to continue to exceed our production capacity through mid-2027."
+    },
+    {
+      "id": "aaoi_q2fy26_earnings_call_20260806_s4",
+      "locator": "CEO Thompson Lin, customer demand commentary",
+      "quote": "the customer demand is 20%-40% higher\" than current capacity"
+    },
+    {
+      "id": "aaoi_q2fy26_earnings_call_20260806_s5",
+      "locator": "CEO Thompson Lin, China CPO laser competitive assessment",
+      "quote": "If you're talking about reasonable year and no quality issue or performance issue, I would say easily at least two, three years or even longer."
+    },
+    {
+      "id": "aaoi_q2fy26_earnings_call_20260806_s6",
+      "locator": "CFO Stefan Murry, ELS/ELSFP production ramp",
+      "quote": "We have very limited production of these modules now, but we anticipate ramping production later this year and into 2027, ultimately culminating in about 400,000 pieces per month in 2028."
+    }
+  ]
+}
