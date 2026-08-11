@@ -161,5 +161,16 @@ def test_runtime_authority_files_are_not_in_git_index() -> None:
 
     assert tracked == []
     ignore = (repo / ".gitignore").read_text(encoding="utf-8")
-    assert "engine_c/stockbot.db" in ignore
+    # 檢查「有沒有被忽略」而不是「有沒有這一行字面」：真實檔名帶 hash
+    # （stockbot-engine-c-private-v1-<sha>.db），寫死 engine_c/stockbot.db 蓋不到它。
+    # 2026-08-08 實際發生過——一支從錯誤 base 解析 runtime_pointer 的腳本在 tracked
+    # 的 engine_c/ 底下生出未被忽略的空 DB。改用 git check-ignore 驗真實行為。
+    assert "engine_c/*.db" in ignore
+    for candidate in (
+        "engine_c/stockbot.db",
+        "engine_c/stockbot-engine-c-private-v1-458db5270ee2.db",
+    ):
+        assert subprocess.run(
+            ["git", "check-ignore", "-q", candidate], cwd=repo
+        ).returncode == 0, f"{candidate} 必須被 .gitignore 涵蓋"
     assert "paper_portfolio/transactions.csv" in ignore

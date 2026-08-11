@@ -64,19 +64,40 @@ def holdings_digest(rows: Sequence[Mapping[str, Any]]) -> str:
     return hashlib.sha256(_canonical(normalized).encode("utf-8")).hexdigest()
 
 
+# 使用者確認的是「我持有什麼、多少股、什麼幣別」——那是一個事實聲明。
+# 市值與 NAV 是行情的衍生值：它們每個交易日都在變，但**變了不代表持倉變了**。
+# 先前把兩者一起 hash，導致確認在隔天自動失效——2026-08-08 確認的 digest
+# `cb755ea8…` 到 08-11 已變成 `615c1c04…`，於是 holdings_unconfirmed 每天回來、
+# live lane 永遠 not ready、collector 每天替同一個 cohort 配一個新 pq2 編號
+# （AAOI 累積 11 次、AXT 7 次、META 6 次；使用者 drop 三輪都無效）。
+# 這是一個表示同時承載「持倉組成」與「當下估值」兩種語意，而確認只針對前者。
+# 行情鮮度另有 market_freshness_sessions／fx_freshness_sessions 在管，不需要
+# 由持倉確認代管。
+_CONFIRMED_HOLDING_FIELDS = ("ticker", "shares", "currency", "company_id", "is_cash")
+
+
 def holdings_snapshot_digest(
     rows: Sequence[Mapping[str, Any]],
     *,
     nav_base: float | None = None,
     base_currency: str | None = None,
 ) -> str:
-    """Bind optional mark-to-market NAV to the same explicit confirmation."""
+    """持倉組成的 digest；刻意不含市值與 NAV（見上方說明）。
 
-    payload: list[Mapping[str, Any]] = list(rows)
-    if nav_base is not None:
-        payload.append(
-            {"portfolio_nav_base": nav_base, "base_currency": base_currency}
-        )
+    `nav_base`／`base_currency` 保留在簽名裡是為了呼叫端相容，但只有
+    `base_currency` 進 digest——它是持倉的屬性，不是行情的衍生值。
+    """
+
+    payload: list[Mapping[str, Any]] = [
+        {
+            field: row[field]
+            for field in _CONFIRMED_HOLDING_FIELDS
+            if field in row
+        }
+        for row in rows
+    ]
+    if base_currency is not None:
+        payload.append({"base_currency": base_currency})
     return holdings_digest(payload)
 
 
