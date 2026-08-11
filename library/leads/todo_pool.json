@@ -1060,23 +1060,21 @@
     },
     {
       "added_at": "2026-07-30T10:11:44.913485+00:00",
-      "deferred_at": "2026-08-11T13:40:37.561805+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 74,
+      "reactivated_at": "2026-08-11T13:57:04.274541+00:00",
+      "reactivation_event": {
+        "receipt": "decision:pd_efd4b7965b9d73547aeb9d1d9d77d9e8",
+        "type": "decision_evidence_delta",
+        "value": "material"
+      },
       "reason": null,
       "ref_id": "dc_6ae5b014dbbcd0774b45487542c9a102",
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
       "title": "REVIEW — co:agility_robotics",
-      "type": "decision_review",
-      "waiting_on": {
-        "event_type": "decision_evidence_delta",
-        "reason": "唯一存續的 co:agility_robotics cohort（dc_b1225ef0／dc_317c2897／dc_7907ce1d 已於 2026-08-11 以 expired 併入本項）。結構性阻塞非研究不足：registry 中 research_ticker 為 null，decision_lab/workflow.py:435 要求 company_id+research_ticker 同時存在才 bind_cohort_identity，故 cohort identity 永遠 unresolved、任何 gap research 都撞同一組 market/fx/financial blocker。⚠ 已知副作用：identity 未綁定使 ensure_shadow_for_company 的既有 cohort 比對（比 company_id）永不相等，故每次對本標的 apply RA 都會再生一個新 cohort。",
-        "set_at": "2026-08-11T13:40:37.561805+00:00",
-        "trigger": "CCXI/Agility S-4 公開揭露財務（EDGAR watch 已於 2026-08-11 補上 CCXI 正確 CIK 2074973 與 S-4 form），或 4Q 2026 closing 後 AGLT 掛牌並手動登記進 config/company_identity.json",
-        "until": "2026-12-31"
-      }
+      "type": "decision_review"
     },
     {
       "added_at": "2026-07-30T10:11:44.913513+00:00",
@@ -1858,12 +1856,20 @@
     },
     {
       "added_at": "2026-08-11T13:36:08.757245+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_11ec8776b62cc368c5549c3d7ce7833c",
+      "dispatch_receipt": "decision:pd_52d99b4d5e888f505324beca21b16ddb",
+      "dispatch_ref": "wo_a3e54af91361c3babb82b9d66e2d0ace",
+      "dispatch_status": "completed",
+      "dispatch_updated_at": "2026-08-11T13:56:15.933454+00:00",
+      "dispatched_at": "2026-08-11T13:56:13.235937+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 120,
-      "reason": null,
+      "reason": "reassess 完成：expiry 由 2026-08-11 延至 2026-09-10（catalyst 2026-08-27 Q2 財報 +2 週緩衝）。catalyst／disproof／assessment 全部沿用未改寫。action REVIEW→NO_ACTION，research_incomplete_blockers 清空。",
+      "receipt": "decision:pd_52d99b4d5e888f505324beca21b16ddb",
       "ref_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-11T13:56:15.933454+00:00",
       "source": "decision_lab",
       "title": "REVIEW — co:sivers_semiconductors",
       "type": "decision_review"
@@ -4064,6 +4070,59 @@
       "ref_id": "dc_6ae5b014dbbcd0774b45487542c9a102",
       "type": "decision_review",
       "verb": "pending"
+    },
+    {
+      "at": "2026-08-11T13:56:13.235937+00:00",
+      "attempt": 1,
+      "n": 120,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_a3e54af91361c3babb82b9d66e2d0ace",
+      "ref_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-08-11T13:56:14.598102+00:00",
+      "n": 120,
+      "reason": "缺口為 probe expiry 早於自身催化劑（expiry 2026-08-11 vs catalyst 2026-08-27），屬設定錯誤非證據不足；研究動作為依既有 authorities 重跑 assessment 並對齊 expiry。",
+      "receipt": "reassess:dc_7dc03795699f2169e9c8adc6d3d10179",
+      "ref_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-08-11T13:56:15.933454+00:00",
+      "n": 120,
+      "reason": "reassess 完成：expiry 由 2026-08-11 延至 2026-09-10（catalyst 2026-08-27 Q2 財報 +2 週緩衝）。catalyst／disproof／assessment 全部沿用未改寫。action REVIEW→NO_ACTION，research_incomplete_blockers 清空。",
+      "receipt": "decision:pd_52d99b4d5e888f505324beca21b16ddb",
+      "ref_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
+      "type": "decision_review",
+      "verb": "pq1_completed"
+    },
+    {
+      "at": "2026-08-11T13:56:15.933454+00:00",
+      "n": 120,
+      "reason": "reassess 完成：expiry 由 2026-08-11 延至 2026-09-10（catalyst 2026-08-27 Q2 財報 +2 週緩衝）。catalyst／disproof／assessment 全部沿用未改寫。action REVIEW→NO_ACTION，research_incomplete_blockers 清空。",
+      "receipt": "decision:pd_52d99b4d5e888f505324beca21b16ddb",
+      "ref_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
+      "type": "decision_review",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-11T13:57:04.274541+00:00",
+      "n": 74,
+      "prior_waiting_on": {
+        "event_type": "decision_evidence_delta",
+        "reason": "唯一存續的 co:agility_robotics cohort（dc_b1225ef0／dc_317c2897／dc_7907ce1d 已於 2026-08-11 以 expired 併入本項）。結構性阻塞非研究不足：registry 中 research_ticker 為 null，decision_lab/workflow.py:435 要求 company_id+research_ticker 同時存在才 bind_cohort_identity，故 cohort identity 永遠 unresolved、任何 gap research 都撞同一組 market/fx/financial blocker。⚠ 已知副作用：identity 未綁定使 ensure_shadow_for_company 的既有 cohort 比對（比 company_id）永不相等，故每次對本標的 apply RA 都會再生一個新 cohort。",
+        "set_at": "2026-08-11T13:40:37.561805+00:00",
+        "trigger": "CCXI/Agility S-4 公開揭露財務（EDGAR watch 已於 2026-08-11 補上 CCXI 正確 CIK 2074973 與 S-4 form），或 4Q 2026 closing 後 AGLT 掛牌並手動登記進 config/company_identity.json",
+        "until": "2026-12-31"
+      },
+      "reason": "同一 cohort 出現 material evidence delta，恢復人工複查",
+      "receipt": "decision:pd_efd4b7965b9d73547aeb9d1d9d77d9e8",
+      "ref_id": "dc_6ae5b014dbbcd0774b45487542c9a102",
+      "type": "decision_review",
+      "verb": "event_reactivated"
     }
   ],
   "next_n": 124,
