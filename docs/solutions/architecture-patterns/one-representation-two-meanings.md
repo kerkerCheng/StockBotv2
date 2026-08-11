@@ -124,6 +124,10 @@ tags:
   #1 與 #2 的完整追查、換算契約與測試
 - [`closed-vocabulary-registry.md`](closed-vocabulary-registry.md)：分開之後，
   新的那一半該住 config 還是 code（taxonomy vs contract）
+- [`lifecycle-terminal-verbs.md`](lifecycle-terminal-verbs.md)：相鄰但不同的形狀——
+  那裡的字彙定義乾淨、下游處理正確，混淆發生在**呼叫端**挑錯值（`--terminal-status`
+  的四個值裡有一個不終止 lifecycle）。判準也不同：不是「先分開再各自定規則」，而是
+  「沒有值精確符合意圖時，選最少斷言的那個」
 - AGENTS.md 的 L4（屬性歸位三分）是同一判準在 schema 上的版本：換掉關係另一端會
   不會變、會不會隨時間變、講的是物理現實還是證據強度——三問也是在逼你把混在一起
   的語意拆開
