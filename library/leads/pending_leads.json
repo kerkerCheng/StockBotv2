@@ -2504,6 +2504,90 @@
       "result": "ok",
       "run_at": "2026-08-11T13:08:02.182020+00:00",
       "source": "edgar:TSEM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T13:44:14.089742+00:00",
+      "source": "mfn:sivers-semiconductors"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T13:44:15.658244+00:00",
+      "source": "sivers:press"
+    },
+    {
+      "new": 20,
+      "result": "ok",
+      "run_at": "2026-08-11T13:44:15.937695+00:00",
+      "source": "yahoo:iqe-l"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T13:44:16.168274+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T13:44:17.114043+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T13:44:18.061389+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T13:44:18.927708+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T13:44:19.877279+00:00",
+      "source": "edgar:CCXI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T13:44:21.523087+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T13:44:22.621991+00:00",
+      "source": "edgar:GFS"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T13:44:25.533805+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T13:44:26.504667+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T13:44:27.810727+00:00",
+      "source": "edgar:META"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T13:44:28.901446+00:00",
+      "source": "edgar:TSEM"
     }
   ],
   "leads": {
@@ -3190,6 +3274,22 @@
         }
       ],
       "url": "https://x.com/aleabitoreddit/status/2073523410643366242"
+    },
+    "lead_04dc35fd02b79ef30f014f2810fe4a47": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:44:15.937399+00:00",
+      "lead_id": "lead_04dc35fd02b79ef30f014f2810fe4a47",
+      "published_at": "Tue, 28 Apr 2026 10:31:00 +0000",
+      "refs": {},
+      "source": "yahoo:iqe-l",
+      "status": "pending",
+      "themes": {},
+      "title": "IQE shares fall 19% after £81m fundraise priced at steep discount",
+      "triage": null,
+      "url": "https://www.proactiveinvestors.co.uk/companies/news/1091312/iqe-shares-fall-19-after-81m-fundraise-priced-at-steep-discount-1091312.html?.tsrc=rss"
     },
     "lead_061fe889e9090fd14b4711fafda3fafe": {
       "entities": {
@@ -4543,6 +4643,22 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2074536982311743623"
     },
+    "lead_14c7b0f1b50b1882ef206203b2dfad09": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:44:15.935964+00:00",
+      "lead_id": "lead_14c7b0f1b50b1882ef206203b2dfad09",
+      "published_at": "Tue, 21 Jul 2026 16:06:55 +0000",
+      "refs": {},
+      "source": "yahoo:iqe-l",
+      "status": "pending",
+      "themes": {},
+      "title": "AIM Market Roundup: IQE, Harvest Minerals, Midwich",
+      "triage": null,
+      "url": "https://www.thearmchairtrader.com/aim-market-roundup/iqe-harvest-minerals-midwich/?.tsrc=rss"
+    },
     "lead_16795901900503525cb8a921bca69711": {
       "entities": {
         "company_ids": [
@@ -5372,6 +5488,22 @@
       ],
       "url": "https://x.com/aleabitoreddit/status/2071995924172394695"
     },
+    "lead_1d67e0381b9d95fb0175b3b217c8c016": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:44:15.936683+00:00",
+      "lead_id": "lead_1d67e0381b9d95fb0175b3b217c8c016",
+      "published_at": "Thu, 11 Jun 2026 16:17:51 +0000",
+      "refs": {},
+      "source": "yahoo:iqe-l",
+      "status": "pending",
+      "themes": {},
+      "title": "AIM Market Roundup: Mercantile Ports, IQE, Empire Metals",
+      "triage": null,
+      "url": "https://www.thearmchairtrader.com/aim-market-roundup/mercantile-ports-iqe-empire-metals/?.tsrc=rss"
+    },
     "lead_1f55ec9eae7d1e4a1b68fa245ed1ee7f": {
       "entities": {
         "company_ids": [],
@@ -5990,6 +6122,22 @@
       "title": "Uppdatering avseende utgången lock-up-period och insynspersoners transaktioner i Sivers Semiconductors",
       "triage": null,
       "url": "https://mfn.se/cis/a/sivers-semiconductors/uppdatering-avseende-utgangen-lock-up-period-och-insynspersoners-transaktioner-i-sivers-semiconductors-4334453c"
+    },
+    "lead_27625bd16af9f120f0ea459c102ad987": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:44:15.936885+00:00",
+      "lead_id": "lead_27625bd16af9f120f0ea459c102ad987",
+      "published_at": "Thu, 28 May 2026 06:57:00 +0000",
+      "refs": {},
+      "source": "yahoo:iqe-l",
+      "status": "pending",
+      "themes": {},
+      "title": "IQE completes fundraising and reports wider losses but improved trading",
+      "triage": null,
+      "url": "https://www.proactiveinvestors.co.uk/companies/news/1093024/iqe-completes-fundraising-and-reports-wider-losses-but-improved-trading-1093024.html?.tsrc=rss"
     },
     "lead_27df1c1cee4ff9a145687be99ae312f9": {
       "entities": {
@@ -7631,6 +7779,22 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2074109998544846954"
     },
+    "lead_37ff6857b89331239fad429190f6f235": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:44:15.936158+00:00",
+      "lead_id": "lead_37ff6857b89331239fad429190f6f235",
+      "published_at": "Tue, 21 Jul 2026 07:28:24 +0000",
+      "refs": {},
+      "source": "yahoo:iqe-l",
+      "status": "pending",
+      "themes": {},
+      "title": "IQE raises 2026 revenue guidance on strong AI and data centre demand",
+      "triage": null,
+      "url": "https://uk.advfn.com/market-news/article/19908/iqe-raises-2026-revenue-guidance-on-strong-ai-and-data-centre-demand?.tsrc=rss"
+    },
     "lead_381b8a554b089b34a9f31e841f4aa05e": {
       "entities": {
         "company_ids": [],
@@ -8843,6 +9007,22 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2078272513755263319"
+    },
+    "lead_444321009c01e4e1916898709e39fc80": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:44:15.914948+00:00",
+      "lead_id": "lead_444321009c01e4e1916898709e39fc80",
+      "published_at": "Sun, 02 Aug 2026 06:31:00 +0000",
+      "refs": {},
+      "source": "yahoo:iqe-l",
+      "status": "pending",
+      "themes": {},
+      "title": "Up 523% in 6 months! Is this the best growth stock to buy in August 2026?",
+      "triage": null,
+      "url": "https://www.twelfthmagpie.com/2026/08/02/up-523-in-6-months-is-this-the-best-growth-stock-to-buy-in-august-2026/?.tsrc=rss"
     },
     "lead_44ce140c224422130eecf4bb9766219e": {
       "entities": {
@@ -10158,6 +10338,22 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2077212864948162871"
     },
+    "lead_537a5fe78ab0995f1ca8fb14b42018b6": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:44:15.936778+00:00",
+      "lead_id": "lead_537a5fe78ab0995f1ca8fb14b42018b6",
+      "published_at": "Wed, 03 Jun 2026 07:37:21 +0000",
+      "refs": {},
+      "source": "yahoo:iqe-l",
+      "status": "pending",
+      "themes": {},
+      "title": "IQE Schedules Annual General Meeting and Releases 2025 Annual Report (IQE)",
+      "triage": null,
+      "url": "https://uk.advfn.com/market-news/article/16903/iqe-schedules-annual-general-meeting-and-releases-2025-annual-report-iqe?.tsrc=rss"
+    },
     "lead_53f19d8df30938f84517824490af0695": {
       "entities": {
         "company_ids": [],
@@ -10763,6 +10959,22 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2084613071423893692"
     },
+    "lead_59855c9e77cf0ab94e37eee4ba83a3a7": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:44:15.935730+00:00",
+      "lead_id": "lead_59855c9e77cf0ab94e37eee4ba83a3a7",
+      "published_at": "Thu, 23 Jul 2026 04:34:30 +0000",
+      "refs": {},
+      "source": "yahoo:iqe-l",
+      "status": "pending",
+      "themes": {},
+      "title": "IQE (AIM:IQE) Stock Fair Value Rises After Analysts Back Stronger Demand",
+      "triage": null,
+      "url": "https://finance.yahoo.com/markets/stocks/articles/iqe-aim-iqe-stock-fair-043430133.html?.tsrc=rss"
+    },
     "lead_5a2a7cfa72c8ccbb49bb34009c8a3783": {
       "entities": {
         "company_ids": [],
@@ -11048,6 +11260,22 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2074466925263061100"
+    },
+    "lead_5d4775ae3e7cfda8c51492fe6a22309a": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:44:15.936988+00:00",
+      "lead_id": "lead_5d4775ae3e7cfda8c51492fe6a22309a",
+      "published_at": "Wed, 27 May 2026 10:30:00 +0000",
+      "refs": {},
+      "source": "yahoo:iqe-l",
+      "status": "pending",
+      "themes": {},
+      "title": "Deutsche Bank reinitiates IQE at buy with 60p target as end markets boom",
+      "triage": null,
+      "url": "https://www.proactiveinvestors.co.uk/companies/news/1092951/deutsche-bank-reinitiates-iqe-at-buy-with-60p-target-as-end-markets-boom-1092951.html?.tsrc=rss"
     },
     "lead_5d739525279dfae394f8c8e213084633": {
       "entities": {
@@ -12446,6 +12674,22 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000203/xslF345X06/wk-form4_1785530578.xml"
+    },
+    "lead_6c3652ed7b88cf8eb2287ac92e2c59b9": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:44:15.936052+00:00",
+      "lead_id": "lead_6c3652ed7b88cf8eb2287ac92e2c59b9",
+      "published_at": "Tue, 21 Jul 2026 09:10:00 +0000",
+      "refs": {},
+      "source": "yahoo:iqe-l",
+      "status": "pending",
+      "themes": {},
+      "title": "IQE shares surge as AI demand lifts guidance and prompts broker upgrades",
+      "triage": null,
+      "url": "https://www.proactiveinvestors.co.uk/companies/news/1095761/iqe-shares-surge-as-ai-demand-lifts-guidance-and-prompts-broker-upgrades-1095761.html?.tsrc=rss"
     },
     "lead_6cc7c974eab84a76ef68831129f474e3": {
       "entities": {
@@ -14785,6 +15029,22 @@
       ],
       "url": "https://x.com/aleabitoreddit/status/2074007618046345249"
     },
+    "lead_80f63251f847cdfa862e9b4596b9f24c": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:44:15.935875+00:00",
+      "lead_id": "lead_80f63251f847cdfa862e9b4596b9f24c",
+      "published_at": "Tue, 21 Jul 2026 19:10:26 +0000",
+      "refs": {},
+      "source": "yahoo:iqe-l",
+      "status": "pending",
+      "themes": {},
+      "title": "Why Applied Materials (AMAT) Stock Is Up Today",
+      "triage": null,
+      "url": "https://finance.yahoo.com/markets/stocks/articles/why-applied-materials-amat-stock-191026429.html?.tsrc=rss"
+    },
     "lead_81ba31cd1de380267a03be48750212c2": {
       "entities": {
         "company_ids": [
@@ -16758,6 +17018,22 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2086988264448409739"
     },
+    "lead_9a2ffd7e7870046120ddfd0a757c77a5": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:44:15.936261+00:00",
+      "lead_id": "lead_9a2ffd7e7870046120ddfd0a757c77a5",
+      "published_at": "Tue, 14 Jul 2026 07:25:04 +0000",
+      "refs": {},
+      "source": "yahoo:iqe-l",
+      "status": "pending",
+      "themes": {},
+      "title": "IQE Secures $14 Million AI and Datacentre Semiconductor Contract (IQE)",
+      "triage": null,
+      "url": "https://uk.advfn.com/market-news/article/19464/iqe-secures-14-million-ai-and-datacentre-semiconductor-contract-iqe?.tsrc=rss"
+    },
     "lead_9adb031e86660441500e62d9adc0bafe": {
       "entities": {
         "company_ids": [
@@ -17503,6 +17779,30 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826005738/xslF345X06/ownership.xml"
     },
+    "lead_a4bcda1ee521396e8761564750f3927c": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:44:15.936571+00:00",
+      "lead_id": "lead_a4bcda1ee521396e8761564750f3927c",
+      "published_at": "Mon, 15 Jun 2026 06:00:00 +0000",
+      "refs": {},
+      "source": "yahoo:iqe-l",
+      "status": "pending",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "InP"
+          ]
+        }
+      },
+      "title": "IQE and Tower Semiconductor Announce Multi-year InP epiwafer Supply Agreement",
+      "triage": null,
+      "url": "https://finance.yahoo.com/sectors/technology/articles/iqe-tower-semiconductor-announce-multi-060000113.html?.tsrc=rss"
+    },
     "lead_a4eca2bd1a52d9a049fe6a5f6a642aab": {
       "content_updated_at": "2026-07-29T13:46:51.647894+00:00",
       "entities": {
@@ -17813,6 +18113,22 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2074793083137556545"
+    },
+    "lead_a7ab5e10e98df1235415c697e5c1ece3": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:44:15.936364+00:00",
+      "lead_id": "lead_a7ab5e10e98df1235415c697e5c1ece3",
+      "published_at": "Wed, 01 Jul 2026 07:20:10 +0000",
+      "refs": {},
+      "source": "yahoo:iqe-l",
+      "status": "pending",
+      "themes": {},
+      "title": "IQE appoints MACOM executives to board under strategic partnership agreement (IQE)",
+      "triage": null,
+      "url": "https://uk.advfn.com/market-news/article/18722/iqe-appoints-macom-executives-to-board-under-strategic-partnership-agreement-iqe?.tsrc=rss"
     },
     "lead_a7e1fbdd7e16b66481bc53a3d934c128": {
       "entities": {
@@ -18193,6 +18509,22 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026046609/xslF345X06/wk-form4_1782940748.xml"
+    },
+    "lead_ab48b8caa9cc06f28e122a36caa6eaf7": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:44:15.937180+00:00",
+      "lead_id": "lead_ab48b8caa9cc06f28e122a36caa6eaf7",
+      "published_at": "Sat, 23 May 2026 21:14:59 +0000",
+      "refs": {},
+      "source": "yahoo:iqe-l",
+      "status": "pending",
+      "themes": {},
+      "title": "MACOM (MTSI) to Enter Long-Term Supply Agreements with IQE plc",
+      "triage": null,
+      "url": "https://finance.yahoo.com/markets/stocks/articles/macom-mtsi-enter-long-term-200959451.html?.tsrc=rss"
     },
     "lead_ab7275ecca8f13b4118ba0714346c27b": {
       "entities": {
@@ -19970,6 +20302,22 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826005739/xslF345X06/ownership.xml"
+    },
+    "lead_b95d8f5c59ac3b8a1b0237761fb9d62d": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:44:15.937281+00:00",
+      "lead_id": "lead_b95d8f5c59ac3b8a1b0237761fb9d62d",
+      "published_at": "Wed, 29 Apr 2026 14:58:00 +0000",
+      "refs": {},
+      "source": "yahoo:iqe-l",
+      "status": "pending",
+      "themes": {},
+      "title": "IQE's MACOM deal and link to Nvidia are 'exciting', but shares downgraded after surge",
+      "triage": null,
+      "url": "https://www.proactiveinvestors.co.uk/companies/news/1091435/iqe-s-macom-deal-and-link-to-nvidia-are-exciting-but-shares-downgraded-after-surge-1091435.html?.tsrc=rss"
     },
     "lead_ba4073c079bac993eaafc74feb7c6df3": {
       "entities": {
@@ -22907,6 +23255,22 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2077768896061563339"
     },
+    "lead_d704186deecf318bbe9a73fa936e6fca": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:44:15.937499+00:00",
+      "lead_id": "lead_d704186deecf318bbe9a73fa936e6fca",
+      "published_at": "Tue, 28 Apr 2026 06:57:00 +0000",
+      "refs": {},
+      "source": "yahoo:iqe-l",
+      "status": "pending",
+      "themes": {},
+      "title": "IQE seals £13m equity raise as it works to complete larger funding package",
+      "triage": null,
+      "url": "https://www.proactiveinvestors.co.uk/companies/news/1091301/iqe-seals-13m-equity-raise-as-it-works-to-complete-larger-funding-package-1091301.html?.tsrc=rss"
+    },
     "lead_d7e8d31c0e28967bb10b7f1baeb13d7b": {
       "entities": {
         "company_ids": [],
@@ -23711,6 +24075,22 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2074159948523860147"
     },
+    "lead_e0e737fc24bb3ae8e114a32c5ff423ce": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:44:15.937607+00:00",
+      "lead_id": "lead_e0e737fc24bb3ae8e114a32c5ff423ce",
+      "published_at": "Mon, 27 Apr 2026 16:00:00 +0000",
+      "refs": {},
+      "source": "yahoo:iqe-l",
+      "status": "pending",
+      "themes": {},
+      "title": "MACOM to Enter into Agreements to Further Strengthen Supply Chain",
+      "triage": null,
+      "url": "https://finance.yahoo.com/markets/stocks/articles/macom-enter-agreements-further-strengthen-160000950.html?.tsrc=rss"
+    },
     "lead_e10152e8e0e54f6f01a0fe1d6d619a10": {
       "entities": {
         "company_ids": [],
@@ -24311,6 +24691,22 @@
         }
       ],
       "url": "https://x.com/aleabitoreddit/status/2073867745243127973"
+    },
+    "lead_e6ac612b5b13830ecda4555936d789f8": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:44:15.936475+00:00",
+      "lead_id": "lead_e6ac612b5b13830ecda4555936d789f8",
+      "published_at": "Mon, 15 Jun 2026 12:47:18 +0000",
+      "refs": {},
+      "source": "yahoo:iqe-l",
+      "status": "pending",
+      "themes": {},
+      "title": "AIM Market Roundup: Pri0r1ty Intelligence, IQE, Union Jack Oil",
+      "triage": null,
+      "url": "https://www.thearmchairtrader.com/aim-market-roundup/pri0r1ty-intelligence-iqe-union-jack-oil/?.tsrc=rss"
     },
     "lead_e75d4f496e44d27bd5f1b5b8f7ad0e24": {
       "entities": {
@@ -25542,6 +25938,22 @@
       "title": "Sivers Semiconductors uppdaterar sin finansiella kalender",
       "triage": null,
       "url": "https://www.sivers-semiconductors.com/press/sivers-semiconductors-uppdaterar-sin-finansiella-kalender/"
+    },
+    "lead_f35d5676219a38f12f600e64ef76590e": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:44:15.937093+00:00",
+      "lead_id": "lead_f35d5676219a38f12f600e64ef76590e",
+      "published_at": "Tue, 26 May 2026 16:33:06 +0000",
+      "refs": {},
+      "source": "yahoo:iqe-l",
+      "status": "pending",
+      "themes": {},
+      "title": "AIM Market Roundup: Bradda Head, IQE, Kazera Global",
+      "triage": null,
+      "url": "https://www.thearmchairtrader.com/aim-market-roundup/bradda-head-iqe-kazera-global/?.tsrc=rss"
     },
     "lead_f3cf03ef3623277171d343ff96e81a95": {
       "entities": {
@@ -26803,7 +27215,7 @@
   "source_state": {
     "x:aleabitoreddit": {
       "since_id": "2087030220213870632",
-      "updated_at": "2026-08-11T13:07:54.207127+00:00",
+      "updated_at": "2026-08-11T13:44:16.168258+00:00",
       "user_id": "1940360837547565056"
     }
   }
