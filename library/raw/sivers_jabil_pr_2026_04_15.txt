@@ -1,0 +1,26 @@
+Source URL: https://www.sivers-semiconductors.com/press/sivers-semiconductors-collaborates-with-jabil-on-energy-efficient-1-6t-pluggable-optical-transceiver-module/
+
+Excerpt:
+Source URL: https://www.sivers-semiconductors.com/press/sivers-semiconductors-collaborates-with-jabil-on-energy-efficient-1-6t-pluggable-optical-transceiver-module/
+Title: Sivers Semiconductors Collaborates With Jabil on Energy Efficient 1.6T Pluggable Optical Transceiver Module
+Published: 2026-04-15
+Retrieved: 2026-08-11
+
+Research excerpt:
+- Jabil plans to develop a 1.6T LRO transceiver module using Sivers' DFB lasers, targeting
+  next-generation hyperscale AI data centers with 2.5x lower energy footprint versus
+  traditional alternatives.
+- Jabil executive: "Working with Sivers will allow us to deliver a 1.6T LRO solution that
+  meets both data center performance and power targets at scale."
+- The release does not disclose a specific qualification completion date, shipment
+  timeline, or volume commitment.
+
+Boundary: this is a joint company press release (both Sivers and Jabil are named
+principals, not independent third-party confirmation) announcing a development
+collaboration, not a confirmed design-win, qualification-complete, or revenue event.
+The originating social lead's framing ("mass producing... is revenue") is not supported
+by this source — the release describes a development-stage collaboration. A separate
+social lead (unconfirmed, citing an unlinked JPMorgan fireside chat) claimed Jabil
+targets qualification completion in the August 2026-March 2027 window; that specific
+timeline claim could not be independently verified against a primary transcript and is
+not included in this extraction.

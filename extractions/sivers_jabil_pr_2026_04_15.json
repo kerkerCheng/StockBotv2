@@ -1,0 +1,132 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "guided",
+      "disproof_condition": "若到 2027-06-30 前，Jabil 或 Sivers 未公開揭露此 1.6T LRO 模組完成客戶端 qualification 或開始出貨/認列營收，或雙方合作被公開終止/改用其他雷射供應商，則此合作路徑視為停滯，需重新評估。核查頻率：每季雙方法說會/新聞稿；觸發後 48 小時內確認最新揭露並更新 qualification_status 或 retire。",
+      "id": "sivers_jabil_pr_2026_04_15_cl1",
+      "source_ids": [
+        "sivers_jabil_pr_2026_04_15_s1",
+        "sivers_jabil_pr_2026_04_15_s2",
+        "sivers_jabil_pr_2026_04_15_s3"
+      ],
+      "statement": "Sivers 與 Jabil 於 2026-04-15 官方新聞稿宣布合作開發使用 Sivers DFB 雷射的 1.6T LRO（linear receive optical）pluggable 光收發模組，鎖定次世代 hyperscale AI 資料中心；新聞稿本身未揭露具體出貨時程或量產規模，屬開發階段合作宣布，非已確認營收。",
+      "subject_id": "co:sivers_semiconductors"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {
+        "qualification_status": "sampling"
+      },
+      "confidence": 0.6,
+      "dst_id": "co:jabil",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "sivers_jabil_pr_2026_04_15_s1",
+        "sivers_jabil_pr_2026_04_15_s3"
+      ],
+      "src_id": "co:sivers_semiconductors"
+    },
+    {
+      "attributes": {
+        "qualification_status": "sampling"
+      },
+      "confidence": 0.6,
+      "dst_id": "prod:jabil_sivers_1_6t_lro_module",
+      "id": "e2",
+      "relation": "develops",
+      "source_ids": [
+        "sivers_jabil_pr_2026_04_15_s1",
+        "sivers_jabil_pr_2026_04_15_s2",
+        "sivers_jabil_pr_2026_04_15_s3"
+      ],
+      "src_id": "co:jabil"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "Sivers",
+        "SIVE",
+        "SIVE.ST"
+      ],
+      "attributes": {},
+      "confidence": 0.65,
+      "id": "co:sivers_semiconductors",
+      "name": "Sivers Semiconductors",
+      "role": "bottleneck_supplier",
+      "source_ids": [
+        "sivers_jabil_pr_2026_04_15_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "JBL",
+        "Jabil Inc."
+      ],
+      "attributes": {},
+      "confidence": 0.65,
+      "id": "co:jabil",
+      "name": "Jabil",
+      "role": "robot_component_supplier",
+      "source_ids": [
+        "sivers_jabil_pr_2026_04_15_s1",
+        "sivers_jabil_pr_2026_04_15_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "1.6T LRO",
+        "linear receive optical transceiver"
+      ],
+      "attributes": {},
+      "confidence": 0.6,
+      "id": "prod:jabil_sivers_1_6t_lro_module",
+      "name": "Jabil 1.6T LRO pluggable optical transceiver module (Sivers DFB laser)",
+      "role": null,
+      "source_ids": [
+        "sivers_jabil_pr_2026_04_15_s1",
+        "sivers_jabil_pr_2026_04_15_s2"
+      ],
+      "type": "Product"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "sivers_jabil_pr_2026_04_15",
+    "evidence_tier": 2,
+    "origin_entity": "Sivers Semiconductors",
+    "permission_basis": "Official public press release; store the canonical URL and only the research-relevant excerpt.",
+    "published_at": "2026-04-15",
+    "publisher": "Sivers Semiconductors newsroom",
+    "retrieved_at": "2026-08-11",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Sivers Semiconductors Collaborates With Jabil on Energy Efficient 1.6T Pluggable Optical Transceiver Module",
+    "url": "https://www.sivers-semiconductors.com/press/sivers-semiconductors-collaborates-with-jabil-on-energy-efficient-1-6t-pluggable-optical-transceiver-module/"
+  },
+  "sources": [
+    {
+      "id": "sivers_jabil_pr_2026_04_15_s1",
+      "locator": "opening paragraph",
+      "quote": "Jabil plans to develop a 1.6T linear receive optical (LRO) transceiver module using Sivers' high-performance Distributed Feedback (DFB) lasers."
+    },
+    {
+      "id": "sivers_jabil_pr_2026_04_15_s2",
+      "locator": "product description",
+      "quote": "The new pluggable module will provide highly energy efficient optical interconnect speeds to accelerate deployment for next generation hyperscale AI data centers."
+    },
+    {
+      "id": "sivers_jabil_pr_2026_04_15_s3",
+      "locator": "Jabil executive quote",
+      "quote": "Working with Sivers will allow us to deliver a 1.6T LRO solution that meets both data center performance and power targets at scale."
+    }
+  ]
+}
