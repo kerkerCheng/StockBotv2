@@ -2426,6 +2426,84 @@
       "result": "ok",
       "run_at": "2026-08-11T12:18:32.983447+00:00",
       "source": "edgar:TSEM"
+    },
+    {
+      "new": 48,
+      "result": "ok",
+      "run_at": "2026-08-11T13:07:53.112694+00:00",
+      "source": "mfn:sivers-semiconductors"
+    },
+    {
+      "new": 10,
+      "result": "ok",
+      "run_at": "2026-08-11T13:07:53.954512+00:00",
+      "source": "sivers:press"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T13:07:54.207145+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T13:07:55.442040+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T13:07:56.205334+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T13:07:56.958293+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T13:07:57.770345+00:00",
+      "source": "edgar:CCXI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T13:07:58.527320+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T13:07:59.225371+00:00",
+      "source": "edgar:GFS"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T13:07:59.959965+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T13:08:00.717125+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T13:08:01.441912+00:00",
+      "source": "edgar:META"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T13:08:02.182020+00:00",
+      "source": "edgar:TSEM"
     }
   ],
   "leads": {
@@ -2462,6 +2540,30 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1633978/000171491026000003/xslF345X06/form4-07172026_120713.xml"
+    },
+    "lead_001e17e6dd6bced9a0785c38eefc6c6a": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.107969+00:00",
+      "lead_id": "lead_001e17e6dd6bced9a0785c38eefc6c6a",
+      "published_at": "Tue, 30 Jun 2026 23:15:00 +0000",
+      "refs": {},
+      "source": "mfn:sivers-semiconductors",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Sivers Semiconductors has resolved on a directed share issue of shares amounting to approximately SEK 700 million",
+      "triage": null,
+      "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-has-resolved-on-a-directed-share-issue-of-shares-amounting-to-approximately-sek-700-million-a4130eba"
     },
     "lead_0038006b3b3cf08cd61a9e411468c05a": {
       "entities": {
@@ -2657,6 +2759,54 @@
         }
       ],
       "url": "https://x.com/aleabitoreddit/status/2079254669793316962"
+    },
+    "lead_011ada7ebedc8c7a3ab6ccafa182101e": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.107714+00:00",
+      "lead_id": "lead_011ada7ebedc8c7a3ab6ccafa182101e",
+      "published_at": "Fri, 03 Jul 2026 16:30:00 +0000",
+      "refs": {},
+      "source": "mfn:sivers-semiconductors",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Sivers Semiconductors' Lender Bootstrap Europe Exercises Conversion Right Under Existing Convertible Loan",
+      "triage": null,
+      "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-lender-bootstrap-europe-exercises-conversion-right-under-existing-convertible-loan-314f3dcb"
+    },
+    "lead_0332ef0064c4828e1a68fdaa45432e9c": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.112575+00:00",
+      "lead_id": "lead_0332ef0064c4828e1a68fdaa45432e9c",
+      "published_at": "Wed, 15 Apr 2026 22:23:20 +0000",
+      "refs": {},
+      "source": "mfn:sivers-semiconductors",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Sivers Semiconductors has resolved on a directed share issue of shares amounting to approximately 125 MSEK",
+      "triage": null,
+      "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-has-resolved-on-a-directed-share-issue-of-shares-amounting-to-approximately-125-msek-2e81dac5"
     },
     "lead_0372f419a6423004be01bfb464111aa8": {
       "entities": {
@@ -2902,6 +3052,30 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2083324920214536208"
     },
+    "lead_03f9e6516060ab0dad5e5983a8914300": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.110691+00:00",
+      "lead_id": "lead_03f9e6516060ab0dad5e5983a8914300",
+      "published_at": "Thu, 14 May 2026 16:36:13 +0000",
+      "refs": {},
+      "source": "mfn:sivers-semiconductors",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Notice to attend the Annual General Meeting of Sivers Semiconductors AB (publ)",
+      "triage": null,
+      "url": "https://mfn.se/cis/a/sivers-semiconductors/notice-to-attend-the-annual-general-meeting-of-sivers-semiconductors-ab-publ-6825ad74"
+    },
     "lead_043e94a0e70f703a76115cf09f96b438": {
       "entities": {
         "company_ids": [],
@@ -3132,6 +3306,30 @@
         "tier": 3
       },
       "url": "https://x.com/aleabitoreddit/status/2086148557187461412"
+    },
+    "lead_063b0cb20795afd74dee613916775d21": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.112003+00:00",
+      "lead_id": "lead_063b0cb20795afd74dee613916775d21",
+      "published_at": "Wed, 15 Apr 2026 22:50:00 +0000",
+      "refs": {},
+      "source": "mfn:sivers-semiconductors",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Kallelse till extra bolagsstämma i Sivers Semiconductors AB (publ)",
+      "triage": null,
+      "url": "https://mfn.se/cis/a/sivers-semiconductors/kallelse-till-extra-bolagsstamma-i-sivers-semiconductors-ab-publ-2b52ba00"
     },
     "lead_063dffb7d73ace4f7a642322002304b7": {
       "entities": {
@@ -3464,6 +3662,30 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2072728939324428655"
+    },
+    "lead_08a45ebf832a2e8484d241e9b4060df5": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.107401+00:00",
+      "lead_id": "lead_08a45ebf832a2e8484d241e9b4060df5",
+      "published_at": "Mon, 13 Jul 2026 05:00:00 +0000",
+      "refs": {},
+      "source": "mfn:sivers-semiconductors",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Sivers Semiconductors: Sivers styrelse slutför köp av aktier i enlighet med beslutet vid årsstämman i juni 2026",
+      "triage": null,
+      "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-sivers-styrelse-slutfor-kop-av-aktier-i-enlighet-med-beslutet-vid-arsstamman-i-juni-2026-a890d9c4"
     },
     "lead_08a496cc0d099d7509a44dc50a225701": {
       "entities": {
@@ -5220,6 +5442,30 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2073704784398528599"
     },
+    "lead_1f94c9c988f5ce11e7adcb2dffa3ef0a": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.107538+00:00",
+      "lead_id": "lead_1f94c9c988f5ce11e7adcb2dffa3ef0a",
+      "published_at": "Thu, 09 Jul 2026 05:00:00 +0000",
+      "refs": {},
+      "source": "mfn:sivers-semiconductors",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Sivers Semiconductors uppdaterar sin finansiella kalender",
+      "triage": null,
+      "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-uppdaterar-sin-finansiella-kalender-9ca54615"
+    },
     "lead_1fa5e4b88de07ce8b801e2468729c087": {
       "entities": {
         "company_ids": [
@@ -5445,6 +5691,30 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000147/xslF345X06/wk-form4_1782496850.xml"
+    },
+    "lead_235412651973a56c50f902fc69f1216b": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.110798+00:00",
+      "lead_id": "lead_235412651973a56c50f902fc69f1216b",
+      "published_at": "Wed, 13 May 2026 17:32:35 +0000",
+      "refs": {},
+      "source": "mfn:sivers-semiconductors",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Sivers Semiconductors offentliggör årsredovisningen för 2025 och justerar tidigare rapporterad finansiell information som ett led i förberedelserna inför en potentiell dubbelnotering i USA.",
+      "triage": null,
+      "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-offentliggor-arsredovisningen-for-2025-och-justerar-tidigare-rapporterad-finansiell-information-som-ett-led-i-forberedelserna-infor-en-potentiell-dubbelnotering-i-usa-67472781"
     },
     "lead_238e9bc2281f34aae6ce26a6de502605": {
       "entities": {
@@ -5697,6 +5967,54 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2073374325420503417"
     },
+    "lead_26ed9096f88f869e77178205b74682d7": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.106949+00:00",
+      "lead_id": "lead_26ed9096f88f869e77178205b74682d7",
+      "published_at": "Tue, 21 Jul 2026 17:30:00 +0000",
+      "refs": {},
+      "source": "mfn:sivers-semiconductors",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Uppdatering avseende utgången lock-up-period och insynspersoners transaktioner i Sivers Semiconductors",
+      "triage": null,
+      "url": "https://mfn.se/cis/a/sivers-semiconductors/uppdatering-avseende-utgangen-lock-up-period-och-insynspersoners-transaktioner-i-sivers-semiconductors-4334453c"
+    },
+    "lead_27df1c1cee4ff9a145687be99ae312f9": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.109758+00:00",
+      "lead_id": "lead_27df1c1cee4ff9a145687be99ae312f9",
+      "published_at": "Fri, 29 May 2026 06:30:00 +0000",
+      "refs": {},
+      "source": "mfn:sivers-semiconductors",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Förändring av det totala antalet aktier och röster i Sivers Semiconductors AB",
+      "triage": null,
+      "url": "https://mfn.se/cis/a/sivers-semiconductors/forandring-av-det-totala-antalet-aktier-och-roster-i-sivers-semiconductors-ab-87a6edf2"
+    },
     "lead_28c13e03ca83db717f75de93f5053bf7": {
       "entities": {
         "company_ids": [
@@ -5799,6 +6117,30 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2076767097674514474"
+    },
+    "lead_299f984635431d6b8702ba9406cbf8e8": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.107626+00:00",
+      "lead_id": "lead_299f984635431d6b8702ba9406cbf8e8",
+      "published_at": "Thu, 09 Jul 2026 05:00:00 +0000",
+      "refs": {},
+      "source": "mfn:sivers-semiconductors",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Sivers Semiconductors Updates Financial Reporting Calendar",
+      "triage": null,
+      "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-updates-financial-reporting-calendar-c1f73551"
     },
     "lead_29afe4c0a51033dc69959a4c05534d55": {
       "entities": {
@@ -5956,6 +6298,30 @@
         "tier": 4
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1340652/000089924322034089/xslF345X03/doc4.xml"
+    },
+    "lead_2a6c0c8a97d0f70458f2487cb8ea4ada": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.109048+00:00",
+      "lead_id": "lead_2a6c0c8a97d0f70458f2487cb8ea4ada",
+      "published_at": "Mon, 15 Jun 2026 06:00:00 +0000",
+      "refs": {},
+      "source": "mfn:sivers-semiconductors",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Sivers Semiconductors Withdraws Items From the Agenda of the 2026 Annual General Meeting",
+      "triage": null,
+      "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-withdraws-items-from-the-agenda-of-the-2026-annual-general-meeting-29ebe74f"
     },
     "lead_2b43cb181b7cac79e1ef6a05bad6b150": {
       "entities": {
@@ -6356,6 +6722,30 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2074152813958152688"
     },
+    "lead_2e5d8c3fee25947f81b5d4ea4aa373e6": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.111694+00:00",
+      "lead_id": "lead_2e5d8c3fee25947f81b5d4ea4aa373e6",
+      "published_at": "Fri, 24 Apr 2026 13:24:26 +0000",
+      "refs": {},
+      "source": "mfn:sivers-semiconductors",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Sivers Semiconductors AB Postpones Publication of Annual Report 2025 Amid Dual Listing Evaluation",
+      "triage": null,
+      "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-ab-postpones-publication-of-annual-report-2025-amid-dual-listing-evaluation-3f38520a"
+    },
     "lead_2e9d49d9fa6fefb00d51be474d642064": {
       "entities": {
         "company_ids": [
@@ -6450,6 +6840,30 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826005221/aaoi_8k.htm"
+    },
+    "lead_2ecd28c56d0e0fac45e1a5a5faf5c308": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.108713+00:00",
+      "lead_id": "lead_2ecd28c56d0e0fac45e1a5a5faf5c308",
+      "published_at": "Mon, 15 Jun 2026 14:15:00 +0000",
+      "refs": {},
+      "source": "mfn:sivers-semiconductors",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Bulletin from Sivers Semiconductors AB (publ)'s Annual General Meeting on 15 June 2026",
+      "triage": null,
+      "url": "https://mfn.se/cis/a/sivers-semiconductors/bulletin-from-sivers-semiconductors-ab-publ-s-annual-general-meeting-on-15-june-2026-cf1d358b"
     },
     "lead_2ee701a5079310b10ee292bfc2c1e523": {
       "entities": {
@@ -6813,6 +7227,30 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2074533565505876218"
     },
+    "lead_31e58cd4ab2b5a981f46b69c8310b015": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.066368+00:00",
+      "lead_id": "lead_31e58cd4ab2b5a981f46b69c8310b015",
+      "published_at": "Fri, 31 Jul 2026 06:00:00 +0000",
+      "refs": {},
+      "source": "mfn:sivers-semiconductors",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Förändring av det totala antalet aktier och röster i Sivers Semiconductors AB",
+      "triage": null,
+      "url": "https://mfn.se/cis/a/sivers-semiconductors/forandring-av-det-totala-antalet-aktier-och-roster-i-sivers-semiconductors-ab-a02b82e0"
+    },
     "lead_32467138b3832782d89c940740dff50c": {
       "entities": {
         "company_ids": [
@@ -6882,6 +7320,30 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/928876/000197640826000651/xslF345X06/primary_doc.xml"
+    },
+    "lead_33ffeb9a39a2ab2921e43cad5650eda9": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.110103+00:00",
+      "lead_id": "lead_33ffeb9a39a2ab2921e43cad5650eda9",
+      "published_at": "Wed, 20 May 2026 05:00:00 +0000",
+      "refs": {},
+      "source": "mfn:sivers-semiconductors",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Sivers Semiconductors välkomnar nomineringen av de nya styrelseledamöterna Joakim Nideborn och Helena Svancar",
+      "triage": null,
+      "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-valkomnar-nomineringen-av-de-nya-styrelseledamoterna-joakim-nideborn-och-helena-svancar-8b3b2de1"
     },
     "lead_346c43a02c97ab876fd90f6845f10629": {
       "entities": {
@@ -7020,6 +7482,30 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2072922974345445511"
+    },
+    "lead_354c8cf5c41dff8d5a05e7f9ff6e281c": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.108941+00:00",
+      "lead_id": "lead_354c8cf5c41dff8d5a05e7f9ff6e281c",
+      "published_at": "Mon, 15 Jun 2026 06:00:00 +0000",
+      "refs": {},
+      "source": "mfn:sivers-semiconductors",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Sivers Semiconductors återkallar punkter från dagordningen för årsstämman 2026",
+      "triage": null,
+      "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-aterkallar-punkter-fran-dagordningen-for-arsstamman-2026-fb23131a"
     },
     "lead_359c76e1b5ba4604a130d611f742085a": {
       "entities": {
@@ -7399,6 +7885,30 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2083106805949878330"
+    },
+    "lead_3aa739e0a4f78efe0a97975cfb7f3838": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.111855+00:00",
+      "lead_id": "lead_3aa739e0a4f78efe0a97975cfb7f3838",
+      "published_at": "Fri, 24 Apr 2026 13:24:26 +0000",
+      "refs": {},
+      "source": "mfn:sivers-semiconductors",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Sivers Semiconductors AB senarelägger publiceringen av årsredovisningen för 2025 med anledning av utvärdering av dubbelnotering",
+      "triage": null,
+      "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-ab-senarelagger-publiceringen-av-arsredovisningen-for-2025-med-anledning-av-utvardering-av-dubbelnotering-2c801b01"
     },
     "lead_3b455d0e21ff3e18ccf24fffb5f906e2": {
       "entities": {
@@ -8939,6 +9449,30 @@
       ],
       "url": "https://x.com/aleabitoreddit/status/2075557588159058076"
     },
+    "lead_492f568e8e93d8d0ba4463edbfd7c3bb": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.106827+00:00",
+      "lead_id": "lead_492f568e8e93d8d0ba4463edbfd7c3bb",
+      "published_at": "Tue, 21 Jul 2026 17:30:00 +0000",
+      "refs": {},
+      "source": "mfn:sivers-semiconductors",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Update on Expiry of Lock-up Undertaking and Insider Transactions in Sivers Semiconductors",
+      "triage": null,
+      "url": "https://mfn.se/cis/a/sivers-semiconductors/update-on-expiry-of-lock-up-undertaking-and-insider-transactions-in-sivers-semiconductors-9e6d34a5"
+    },
     "lead_496f512a7f74e83fb5975f6e5377e757": {
       "entities": {
         "company_ids": [],
@@ -9445,6 +9979,30 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2076030743655109063"
     },
+    "lead_4eb41f582cae2cf14b51c88326c53a48": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.112461+00:00",
+      "lead_id": "lead_4eb41f582cae2cf14b51c88326c53a48",
+      "published_at": "Wed, 15 Apr 2026 22:23:20 +0000",
+      "refs": {},
+      "source": "mfn:sivers-semiconductors",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Sivers Semiconductors har beslutat om en riktad nyemission av aktier om cirka 125 MSEK",
+      "triage": null,
+      "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-har-beslutat-om-en-riktad-nyemission-av-aktier-om-cirka-125-msek-5b14f4c9"
+    },
     "lead_4f7fae31a0641d93886720165aa31a2f": {
       "entities": {
         "company_ids": [],
@@ -9888,6 +10446,30 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2072369811791946173"
     },
+    "lead_570689516b769e6b6df3e16fb8f8bc04": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.109164+00:00",
+      "lead_id": "lead_570689516b769e6b6df3e16fb8f8bc04",
+      "published_at": "Tue, 09 Jun 2026 05:00:00 +0000",
+      "refs": {},
+      "source": "mfn:sivers-semiconductors",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "ALL.SPACE lägger produktionsorder värd 8,2 MUSD hos Sivers Semiconductors för Ka-band beamforming-kretsar",
+      "triage": null,
+      "url": "https://mfn.se/cis/a/sivers-semiconductors/all-space-lagger-produktionsorder-vard-8-2-musd-hos-sivers-semiconductors-for-ka-band-beamforming-kretsar-07d97937"
+    },
     "lead_572f73ed0ae5002a8e9091d316c88565": {
       "entities": {
         "company_ids": [],
@@ -10036,6 +10618,30 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2074416685843612031"
+    },
+    "lead_58ae8600cc04edda2d29fcec84604130": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.108104+00:00",
+      "lead_id": "lead_58ae8600cc04edda2d29fcec84604130",
+      "published_at": "Tue, 30 Jun 2026 23:15:00 +0000",
+      "refs": {},
+      "source": "mfn:sivers-semiconductors",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Sivers Semiconductors har beslutat om en riktad nyemission av aktier om cirka 700 MSEK",
+      "triage": null,
+      "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-har-beslutat-om-en-riktad-nyemission-av-aktier-om-cirka-700-msek-fe89f203"
     },
     "lead_58b59fd0835f9f7b078e5dfdde222517": {
       "entities": {
@@ -10898,6 +11504,30 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2076763334930812936"
     },
+    "lead_6268798ca02bbb8e42404bce03b467ff": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.108444+00:00",
+      "lead_id": "lead_6268798ca02bbb8e42404bce03b467ff",
+      "published_at": "Tue, 30 Jun 2026 15:31:00 +0000",
+      "refs": {},
+      "source": "mfn:sivers-semiconductors",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Sivers Semiconductors offentliggör avsikt att genomföra en riktad nyemission av aktier om cirka 600 miljoner kronor",
+      "triage": null,
+      "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-offentliggor-avsikt-att-genomfora-en-riktad-nyemission-av-aktier-om-cirka-600-miljoner-kronor-8f17ae83"
+    },
     "lead_62902718f2adde48a5edcfa0563df489": {
       "entities": {
         "company_ids": [
@@ -11160,6 +11790,30 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2074147829619310962"
     },
+    "lead_64cae3ed38ea58d7908c1e68cb1d00ef": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.953549+00:00",
+      "lead_id": "lead_64cae3ed38ea58d7908c1e68cb1d00ef",
+      "published_at": "Tue, 21 Jul 2026 17:30:00 +0000",
+      "refs": {},
+      "source": "sivers:press",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Update on Expiry of Lock-up Undertaking and Insider Transactions in Sivers Semiconductors",
+      "triage": null,
+      "url": "https://www.sivers-semiconductors.com/press/update-on-expiry-of-lock-up-undertaking-and-insider-transactions-in-sivers-semiconductors/"
+    },
     "lead_653b2da7843a6e6e52e432b66f37e379": {
       "entities": {
         "company_ids": [],
@@ -11341,6 +11995,30 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/820318/000119312526187297/d107137d8k.htm"
     },
+    "lead_6635c6a04ee2823324fcb2047f811704": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.111429+00:00",
+      "lead_id": "lead_6635c6a04ee2823324fcb2047f811704",
+      "published_at": "Wed, 06 May 2026 05:00:00 +0000",
+      "refs": {},
+      "source": "mfn:sivers-semiconductors",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Tachyon Networks utökar sin FWA-portfölj genom utvecklingssamarbete värt USD 1,5 miljoner med Sivers Semiconductors",
+      "triage": null,
+      "url": "https://mfn.se/cis/a/sivers-semiconductors/tachyon-networks-utokar-sin-fwa-portfolj-genom-utvecklingssamarbete-vart-usd-1-5-miljoner-med-sivers-semiconductors-a2aa6f3f"
+    },
     "lead_66b81bcd4fc27bc231ea075bf6c660eb": {
       "entities": {
         "company_ids": [],
@@ -11486,6 +12164,30 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2073305375957541013"
+    },
+    "lead_697707f81d2c1aaa1467741b18f19fe8": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.109420+00:00",
+      "lead_id": "lead_697707f81d2c1aaa1467741b18f19fe8",
+      "published_at": "Tue, 02 Jun 2026 05:00:00 +0000",
+      "refs": {},
+      "source": "mfn:sivers-semiconductors",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Sivers Semiconductors: Sivers & GlobalFoundries Advance AI Data Center Optical Solutions",
+      "triage": null,
+      "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-sivers-and-globalfoundries-advance-ai-data-center-optical-solutions-c7523cc4"
     },
     "lead_6a56acb8a4aa5260483a3b14600db949": {
       "entities": {
@@ -12119,6 +12821,30 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1326801/000095010326011908/xslF345X06/ownership.xml"
     },
+    "lead_6f6669ac64fe02856629f37cc85f9d79": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.107840+00:00",
+      "lead_id": "lead_6f6669ac64fe02856629f37cc85f9d79",
+      "published_at": "Fri, 03 Jul 2026 16:30:00 +0000",
+      "refs": {},
+      "source": "mfn:sivers-semiconductors",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Sivers Semiconductors långivare Bootstrap Europe påkallar konvertering av befintligt konvertibelt lån",
+      "triage": null,
+      "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-langivare-bootstrap-europe-pakallar-konvertering-av-befintligt-konvertibelt-lan-773313b5"
+    },
     "lead_6fb8bec46249fc64d7301c1c9fd7be96": {
       "entities": {
         "company_ids": [],
@@ -12371,6 +13097,54 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2074507578877599867"
     },
+    "lead_71c5aa52802ede6fa0fb78ed6d0f291e": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.108828+00:00",
+      "lead_id": "lead_71c5aa52802ede6fa0fb78ed6d0f291e",
+      "published_at": "Mon, 15 Jun 2026 14:15:00 +0000",
+      "refs": {},
+      "source": "mfn:sivers-semiconductors",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Stämmokommuniké från årsstämma den 15 juni 2026 i Sivers Semiconductors AB (publ)",
+      "triage": null,
+      "url": "https://mfn.se/cis/a/sivers-semiconductors/stammokommunike-fran-arsstamma-den-15-juni-2026-i-sivers-semiconductors-ab-publ-0bdd0ae1"
+    },
+    "lead_71d8cbb9c051bf031ce63f29d69d8feb": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.111570+00:00",
+      "lead_id": "lead_71d8cbb9c051bf031ce63f29d69d8feb",
+      "published_at": "Wed, 06 May 2026 05:00:00 +0000",
+      "refs": {},
+      "source": "mfn:sivers-semiconductors",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Tachyon Networks Expands FWA Portfolio With $1.5M Development Partnership With Sivers Semiconductors",
+      "triage": null,
+      "url": "https://mfn.se/cis/a/sivers-semiconductors/tachyon-networks-expands-fwa-portfolio-with-1-5m-development-partnership-with-sivers-semiconductors-3575c079"
+    },
     "lead_74225cd7714e9466dcb4f602dc412919": {
       "entities": {
         "company_ids": [],
@@ -12402,6 +13176,30 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2077999291856273873"
+    },
+    "lead_743165e1c595a223f38f37db4893efb8": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.110991+00:00",
+      "lead_id": "lead_743165e1c595a223f38f37db4893efb8",
+      "published_at": "Wed, 13 May 2026 17:32:35 +0000",
+      "refs": {},
+      "source": "mfn:sivers-semiconductors",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Sivers Semiconductors publishes the 2025 Annual Report, adjusting prior reported financials as preparation for a potential dual listing in the United States",
+      "triage": null,
+      "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-publishes-the-2025-annual-report-adjusting-prior-reported-financials-as-preparation-for-a-potential-dual-listing-in-the-united-states-be8b1e15"
     },
     "lead_7492a9c7d071032785306522c73abe39": {
       "content_updated_at": "2026-07-29T13:46:54.378118+00:00",
@@ -12488,6 +13286,30 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1709048/000162828026048836/xslF345X06/wk-form4_1784581782.xml"
+    },
+    "lead_757b348192d6559c1ec1b99f34fa8fb6": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.110475+00:00",
+      "lead_id": "lead_757b348192d6559c1ec1b99f34fa8fb6",
+      "published_at": "Tue, 19 May 2026 05:00:00 +0000",
+      "refs": {},
+      "source": "mfn:sivers-semiconductors",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Microelectronics Commons stärker sitt engagemang i Sivers Semiconductors med finansiering för andra året",
+      "triage": null,
+      "url": "https://mfn.se/cis/a/sivers-semiconductors/microelectronics-commons-starker-sitt-engagemang-i-sivers-semiconductors-med-finansiering-for-andra-aret-ffc72f3e"
     },
     "lead_760eb6913a23e02842e06ac15b77d48d": {
       "entities": {
@@ -13009,6 +13831,30 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826005736/xslF345X06/ownership.xml"
+    },
+    "lead_7a87efdaa6106938acd5693a3a7fa9a7": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.109534+00:00",
+      "lead_id": "lead_7a87efdaa6106938acd5693a3a7fa9a7",
+      "published_at": "Tue, 02 Jun 2026 05:00:00 +0000",
+      "refs": {},
+      "source": "mfn:sivers-semiconductors",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Sivers Semiconductors: Sivers & GlobalFoundries avancerade optiska lösningar för AI-datacenter",
+      "triage": null,
+      "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-sivers-and-globalfoundries-avancerade-optiska-losningar-for-ai-datacenter-f4490031"
     },
     "lead_7ab349347cfb868df1d54d45a29e91a9": {
       "entities": {
@@ -14353,6 +15199,30 @@
       ],
       "url": "https://x.com/aleabitoreddit/status/2080153334888182065"
     },
+    "lead_8610653924d5d66801d50a14f07414ce": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.108582+00:00",
+      "lead_id": "lead_8610653924d5d66801d50a14f07414ce",
+      "published_at": "Tue, 30 Jun 2026 15:31:00 +0000",
+      "refs": {},
+      "source": "mfn:sivers-semiconductors",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Sivers Semiconductors Announces Intention to Carry Out a Directed Share Issue of Approximately SEK 600 Million",
+      "triage": null,
+      "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-announces-intention-to-carry-out-a-directed-share-issue-of-approximately-sek-600-million-0cd572e0"
+    },
     "lead_8731ea81a6fcb4e666a7f2c5cea71e2b": {
       "entities": {
         "company_ids": [
@@ -14760,6 +15630,30 @@
         }
       ],
       "url": "https://x.com/aleabitoreddit/status/2077044786402660829"
+    },
+    "lead_8a772eedb46f9af575752521eed37f12": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.954225+00:00",
+      "lead_id": "lead_8a772eedb46f9af575752521eed37f12",
+      "published_at": "Fri, 03 Jul 2026 16:30:00 +0000",
+      "refs": {},
+      "source": "sivers:press",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Sivers Semiconductors’ Lender Bootstrap Europe Exercises Conversion Right Under Existing Convertible Loan",
+      "triage": null,
+      "url": "https://www.sivers-semiconductors.com/press/sivers-semiconductors-lender-bootstrap-europe-exercises-conversion-right-under-existing-convertible-loan/"
     },
     "lead_8ae4bd1a71426bd5346bf5cd45cc94ba": {
       "entities": {
@@ -15407,6 +16301,30 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2085823672569467005"
+    },
+    "lead_94735248dfc62df34c9d7781fa7771fd": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.112100+00:00",
+      "lead_id": "lead_94735248dfc62df34c9d7781fa7771fd",
+      "published_at": "Wed, 15 Apr 2026 22:50:00 +0000",
+      "refs": {},
+      "source": "mfn:sivers-semiconductors",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Notice to attend the Extraordinary General Meeting of Sivers Semiconductors AB (publ)",
+      "triage": null,
+      "url": "https://mfn.se/cis/a/sivers-semiconductors/notice-to-attend-the-extraordinary-general-meeting-of-sivers-semiconductors-ab-publ-bbe6aad1"
     },
     "lead_9560cb7de6f030c75af6b74251114924": {
       "entities": {
@@ -16792,6 +17710,54 @@
       ],
       "url": "https://x.com/aleabitoreddit/status/2075199849507762279"
     },
+    "lead_a543e18f9714b0f7b004a899beddaccb": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.954048+00:00",
+      "lead_id": "lead_a543e18f9714b0f7b004a899beddaccb",
+      "published_at": "Thu, 09 Jul 2026 05:00:00 +0000",
+      "refs": {},
+      "source": "sivers:press",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Sivers Semiconductors Updates Financial Reporting Calendar",
+      "triage": null,
+      "url": "https://www.sivers-semiconductors.com/press/sivers-semiconductors-updates-financial-reporting-calendar/"
+    },
+    "lead_a5994c5dad62b00badecbb0b3a0eff54": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.953663+00:00",
+      "lead_id": "lead_a5994c5dad62b00badecbb0b3a0eff54",
+      "published_at": "Tue, 21 Jul 2026 17:30:00 +0000",
+      "refs": {},
+      "source": "sivers:press",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Uppdatering avseende utgången lock-up-period och insynspersoners transaktioner i Sivers Semiconductors",
+      "triage": null,
+      "url": "https://www.sivers-semiconductors.com/press/uppdatering-avseende-utgangen-lock-up-period-och-insynspersoners-transaktioner-i-sivers-semiconductors/"
+    },
     "lead_a7655e310d5e73cb919a0cdbd5f5e84d": {
       "entities": {
         "company_ids": [
@@ -17227,6 +18193,30 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026046609/xslF345X06/wk-form4_1782940748.xml"
+    },
+    "lead_ab7275ecca8f13b4118ba0714346c27b": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.109652+00:00",
+      "lead_id": "lead_ab7275ecca8f13b4118ba0714346c27b",
+      "published_at": "Fri, 29 May 2026 06:30:00 +0000",
+      "refs": {},
+      "source": "mfn:sivers-semiconductors",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Change in The Total Number of Shares and Votes in Sivers Semiconductors AB",
+      "triage": null,
+      "url": "https://mfn.se/cis/a/sivers-semiconductors/change-in-the-total-number-of-shares-and-votes-in-sivers-semiconductors-ab-6e5e553c"
     },
     "lead_abc654e19602954c8069ad594c1aa440": {
       "entities": {
@@ -18445,6 +19435,30 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000149/xslF345X06/wk-form4_1783445628.xml"
     },
+    "lead_b438b59a16bf43f336d2b594fe606849": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.112337+00:00",
+      "lead_id": "lead_b438b59a16bf43f336d2b594fe606849",
+      "published_at": "Wed, 15 Apr 2026 22:40:00 +0000",
+      "refs": {},
+      "source": "mfn:sivers-semiconductors",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Sivers Semiconductors AB evaluates a potential dual listing of its shares on the Nasdaq New York",
+      "triage": null,
+      "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-ab-evaluates-a-potential-dual-listing-of-its-shares-on-the-nasdaq-new-york-69346db5"
+    },
     "lead_b48a6c9a349398a5d0d3ab8732a05d54": {
       "content_updated_at": "2026-07-29T13:46:45.021215+00:00",
       "entities": {
@@ -19519,6 +20533,54 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2080032221638119603"
     },
+    "lead_c01e5a312817d1ae6c629b4005a773c3": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.110601+00:00",
+      "lead_id": "lead_c01e5a312817d1ae6c629b4005a773c3",
+      "published_at": "Thu, 14 May 2026 16:36:13 +0000",
+      "refs": {},
+      "source": "mfn:sivers-semiconductors",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Kallelse till årsstämma i Sivers Semiconductors AB (publ)",
+      "triage": null,
+      "url": "https://mfn.se/cis/a/sivers-semiconductors/kallelse-till-arsstamma-i-sivers-semiconductors-ab-publ-7c0595a8"
+    },
+    "lead_c27e417db9b04ea06a227bedfb773c88": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.953804+00:00",
+      "lead_id": "lead_c27e417db9b04ea06a227bedfb773c88",
+      "published_at": "Mon, 13 Jul 2026 05:00:00 +0000",
+      "refs": {},
+      "source": "sivers:press",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Sivers styrelse slutför köp av aktier i enlighet med beslutet vid årsstämman i juni 2026",
+      "triage": null,
+      "url": "https://www.sivers-semiconductors.com/press/sivers-styrelse-slutfor-kop-av-aktier-i-enlighet-med-beslutet-vid-arsstamman-i-juni-2026/"
+    },
     "lead_c3fa1ca7fd636810e6fababce5ce7f5a": {
       "entities": {
         "company_ids": [
@@ -19864,6 +20926,30 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1633978/000172228926000001/xslF345X06/form4-07172026_120708.xml"
     },
+    "lead_c7cd227d4b3deb2abab969bdee986d0d": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.109992+00:00",
+      "lead_id": "lead_c7cd227d4b3deb2abab969bdee986d0d",
+      "published_at": "Fri, 29 May 2026 05:00:00 +0000",
+      "refs": {},
+      "source": "mfn:sivers-semiconductors",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Sivers Semiconductors AB (publ), Publishes Interim Report Q1, January - March 2026",
+      "triage": null,
+      "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-ab-publ-publishes-interim-report-q1-january-march-2026-a14cb894"
+    },
     "lead_c7fdc817e8fdac9bad4573c4a9c9e678": {
       "entities": {
         "company_ids": [],
@@ -20020,6 +21106,30 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026044046/xslF345X06/wk-form4_1781733868.xml"
+    },
+    "lead_c937d07e4da639d2468765a34b92031f": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.954391+00:00",
+      "lead_id": "lead_c937d07e4da639d2468765a34b92031f",
+      "published_at": "Fri, 03 Jul 2026 16:30:00 +0000",
+      "refs": {},
+      "source": "sivers:press",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Sivers Semiconductors långivare Bootstrap Europe påkallar konvertering av befintligt konvertibelt lån",
+      "triage": null,
+      "url": "https://www.sivers-semiconductors.com/press/sivers-semiconductors-langivare-bootstrap-europe-pakallar-konvertering-av-befintligt-konvertibelt-lan/"
     },
     "lead_c95925a7449580e24cce7512ebad08b4": {
       "entities": {
@@ -20565,6 +21675,30 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2072940349300122098"
+    },
+    "lead_cd45be9f8f96a123f579b730130c9766": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.953292+00:00",
+      "lead_id": "lead_cd45be9f8f96a123f579b730130c9766",
+      "published_at": "Fri, 31 Jul 2026 06:00:00 +0000",
+      "refs": {},
+      "source": "sivers:press",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Change in the Total Number of Shares and Votes in Sivers Semiconductors AB",
+      "triage": null,
+      "url": "https://www.sivers-semiconductors.com/press/change-in-the-total-number-of-shares-and-votes-in-sivers-semiconductors-ab-11/"
     },
     "lead_cdd584e252b586185333a12973d7d69f": {
       "entities": {
@@ -21773,6 +22907,30 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2077768896061563339"
     },
+    "lead_d7e8d31c0e28967bb10b7f1baeb13d7b": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.953438+00:00",
+      "lead_id": "lead_d7e8d31c0e28967bb10b7f1baeb13d7b",
+      "published_at": "Fri, 31 Jul 2026 06:00:00 +0000",
+      "refs": {},
+      "source": "sivers:press",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Förändring av det totala antalet aktier och röster i Sivers Semiconductors AB",
+      "triage": null,
+      "url": "https://www.sivers-semiconductors.com/press/forandring-av-det-totala-antalet-aktier-och-roster-i-sivers-semiconductors-ab-11/"
+    },
     "lead_d81e421129940939faa5bd6571aa449a": {
       "entities": {
         "company_ids": [],
@@ -22020,6 +23178,30 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1051627/000143774926022557/axti20260630_8k.htm"
+    },
+    "lead_db869c311295a3e9c66c26bafd4a45de": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.108332+00:00",
+      "lead_id": "lead_db869c311295a3e9c66c26bafd4a45de",
+      "published_at": "Tue, 30 Jun 2026 17:00:00 +0000",
+      "refs": {},
+      "source": "mfn:sivers-semiconductors",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Change in the Total Number of Shares and Votes in Sivers Semiconductors AB",
+      "triage": null,
+      "url": "https://mfn.se/cis/a/sivers-semiconductors/change-in-the-total-number-of-shares-and-votes-in-sivers-semiconductors-ab-c4480cb7"
     },
     "lead_dbc94158a40139d8ae06d646603deb10": {
       "content_updated_at": "2026-07-29T13:46:42.901079+00:00",
@@ -23260,6 +24442,30 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2085649654059016387"
     },
+    "lead_e7aa38c464cef9d7581ebaa76406ba66": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.108218+00:00",
+      "lead_id": "lead_e7aa38c464cef9d7581ebaa76406ba66",
+      "published_at": "Tue, 30 Jun 2026 17:00:00 +0000",
+      "refs": {},
+      "source": "mfn:sivers-semiconductors",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Förändring av det totala antalet aktier och röster i Sivers Semiconductors AB",
+      "triage": null,
+      "url": "https://mfn.se/cis/a/sivers-semiconductors/forandring-av-det-totala-antalet-aktier-och-roster-i-sivers-semiconductors-ab-a1f4fed1"
+    },
     "lead_e7d012889c91027f839151169ba60e6d": {
       "entities": {
         "company_ids": [],
@@ -23305,6 +24511,30 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2073307016760791512"
+    },
+    "lead_e802c02bae622375182980890a3dbdfd": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.110233+00:00",
+      "lead_id": "lead_e802c02bae622375182980890a3dbdfd",
+      "published_at": "Wed, 20 May 2026 05:00:00 +0000",
+      "refs": {},
+      "source": "mfn:sivers-semiconductors",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Sivers Semiconductors Welcomes the Nomination of New Board Members Joakim Nideborn and Helena Svancar",
+      "triage": null,
+      "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-welcomes-the-nomination-of-new-board-members-joakim-nideborn-and-helena-svancar-83998a2b"
     },
     "lead_e82207f384c613479e9e4f48ef8ffe8f": {
       "entities": {
@@ -23653,6 +24883,30 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2082578803189268855"
     },
+    "lead_eaf7084a77a59c31daa8026d70f0ca75": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.111276+00:00",
+      "lead_id": "lead_eaf7084a77a59c31daa8026d70f0ca75",
+      "published_at": "Mon, 11 May 2026 10:59:19 +0000",
+      "refs": {},
+      "source": "mfn:sivers-semiconductors",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Bulletin from the Extraordinary General Meeting in Sivers Semiconductors AB (publ) on 11 May 2026",
+      "triage": null,
+      "url": "https://mfn.se/cis/a/sivers-semiconductors/bulletin-from-the-extraordinary-general-meeting-in-sivers-semiconductors-ab-publ-on-11-may-2026-a51ce490"
+    },
     "lead_ebb4a71c7f16ef7faf37e8d17bb2d337": {
       "entities": {
         "company_ids": [
@@ -23746,6 +25000,30 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2077423269066784942"
+    },
+    "lead_ed08de0f389beecc9f7566fba4fcf0b7": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.107263+00:00",
+      "lead_id": "lead_ed08de0f389beecc9f7566fba4fcf0b7",
+      "published_at": "Mon, 13 Jul 2026 05:00:00 +0000",
+      "refs": {},
+      "source": "mfn:sivers-semiconductors",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Sivers Semiconductors: Sivers Board Completes Purchase of Shares as Approved at the June 2026 AGM",
+      "triage": null,
+      "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-sivers-board-completes-purchase-of-shares-as-approved-at-the-june-2026-agm-2300464a"
     },
     "lead_edb7d8187be32344b2f90b0dfc7bcf11": {
       "entities": {
@@ -23969,6 +25247,30 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2080347872965579171"
+    },
+    "lead_f02561968e2e5bbdeb1ada752f11f19c": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.110356+00:00",
+      "lead_id": "lead_f02561968e2e5bbdeb1ada752f11f19c",
+      "published_at": "Tue, 19 May 2026 05:00:00 +0000",
+      "refs": {},
+      "source": "mfn:sivers-semiconductors",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Microelectronics Commons Strengthens Commitment to Sivers Semiconductors With Year 2 Funding",
+      "triage": null,
+      "url": "https://mfn.se/cis/a/sivers-semiconductors/microelectronics-commons-strengthens-commitment-to-sivers-semiconductors-with-year-2-funding-8ddd55df"
     },
     "lead_f05f3fd8a753c084704afc3b06330a47": {
       "entities": {
@@ -24217,6 +25519,30 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2077423502119026841"
     },
+    "lead_f275a2d4b77157ab52541b6725567d8a": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.954137+00:00",
+      "lead_id": "lead_f275a2d4b77157ab52541b6725567d8a",
+      "published_at": "Thu, 09 Jul 2026 05:00:00 +0000",
+      "refs": {},
+      "source": "sivers:press",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Sivers Semiconductors uppdaterar sin finansiella kalender",
+      "triage": null,
+      "url": "https://www.sivers-semiconductors.com/press/sivers-semiconductors-uppdaterar-sin-finansiella-kalender/"
+    },
     "lead_f3cf03ef3623277171d343ff96e81a95": {
       "entities": {
         "company_ids": [
@@ -24280,6 +25606,30 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2072726120706007465"
     },
+    "lead_f3d8f87ad9b75162067f16afa1a5bfff": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.953941+00:00",
+      "lead_id": "lead_f3d8f87ad9b75162067f16afa1a5bfff",
+      "published_at": "Mon, 13 Jul 2026 05:00:00 +0000",
+      "refs": {},
+      "source": "sivers:press",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Sivers Board Completes Purchase of Shares as Approved at the June 2026 AGM",
+      "triage": null,
+      "url": "https://www.sivers-semiconductors.com/press/sivers-board-completes-purchase-of-shares-as-approved-at-the-june-2026-agm/"
+    },
     "lead_f3e56795bfca2293387a43788e5e450c": {
       "entities": {
         "company_ids": [
@@ -24313,6 +25663,30 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2077422416482250990"
+    },
+    "lead_f46f2008ddd3e1d7f2629a34dbd95207": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.112213+00:00",
+      "lead_id": "lead_f46f2008ddd3e1d7f2629a34dbd95207",
+      "published_at": "Wed, 15 Apr 2026 22:40:00 +0000",
+      "refs": {},
+      "source": "mfn:sivers-semiconductors",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Sivers Semiconductors AB utvärderar en potentiell dubbelnotering av bolagets aktier på Nasdaq New York",
+      "triage": null,
+      "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-ab-utvarderar-en-potentiell-dubbelnotering-av-bolagets-aktier-pa-nasdaq-new-york-d26a48eb"
     },
     "lead_f4c9a6456a0b346e060a8b9136b7d2e1": {
       "entities": {
@@ -24431,6 +25805,30 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2074214669808717906"
+    },
+    "lead_f4fb2cf351b84cc980791d686c03e41d": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.111158+00:00",
+      "lead_id": "lead_f4fb2cf351b84cc980791d686c03e41d",
+      "published_at": "Mon, 11 May 2026 10:59:19 +0000",
+      "refs": {},
+      "source": "mfn:sivers-semiconductors",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Stämmokommuniké från extra bolagsstämma den 11 maj 2026 i Sivers Semiconductors AB (publ)",
+      "triage": null,
+      "url": "https://mfn.se/cis/a/sivers-semiconductors/stammokommunike-fran-extra-bolagsstamma-den-11-maj-2026-i-sivers-semiconductors-ab-publ-6047d633"
     },
     "lead_f5f85aea8cfdf80892631a51e4c05f77": {
       "entities": {
@@ -24778,6 +26176,30 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2082557648298516918"
     },
+    "lead_f88ba21d25dd7c61a7beef3e06283b06": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.106684+00:00",
+      "lead_id": "lead_f88ba21d25dd7c61a7beef3e06283b06",
+      "published_at": "Fri, 31 Jul 2026 06:00:00 +0000",
+      "refs": {},
+      "source": "mfn:sivers-semiconductors",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Change in the Total Number of Shares and Votes in Sivers Semiconductors AB",
+      "triage": null,
+      "url": "https://mfn.se/cis/a/sivers-semiconductors/change-in-the-total-number-of-shares-and-votes-in-sivers-semiconductors-ab-39de956e"
+    },
     "lead_f8b105284a2de000d25fbd902912ae77": {
       "entities": {
         "company_ids": [
@@ -24980,6 +26402,30 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2085974141501612461"
     },
+    "lead_fb1ecac3bdee6a762bce908056cb2711": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.109299+00:00",
+      "lead_id": "lead_fb1ecac3bdee6a762bce908056cb2711",
+      "published_at": "Tue, 09 Jun 2026 05:00:00 +0000",
+      "refs": {},
+      "source": "mfn:sivers-semiconductors",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "ALL.SPACE Awards $8.2M Production Order to Sivers Semiconductors for Ka-Band Beamforming ICs",
+      "triage": null,
+      "url": "https://mfn.se/cis/a/sivers-semiconductors/all-space-awards-8-2m-production-order-to-sivers-semiconductors-for-ka-band-beamforming-ics-c26f39e4"
+    },
     "lead_fcbf2bd4a87932e4d67c12f0c188c3ac": {
       "content_updated_at": "2026-07-29T13:46:48.255609+00:00",
       "entities": {
@@ -25067,6 +26513,30 @@
         "tier": 2
       },
       "url": "https://www.prnewswire.com/news-releases/update-on-expiry-of-lock-up-undertaking-and-insider-transactions-in-sivers-semiconductors-302831179.html"
+    },
+    "lead_fd0331aad7c0e549334920d0799a0c42": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T13:07:53.109867+00:00",
+      "lead_id": "lead_fd0331aad7c0e549334920d0799a0c42",
+      "published_at": "Fri, 29 May 2026 05:00:00 +0000",
+      "refs": {},
+      "source": "mfn:sivers-semiconductors",
+      "status": "pending",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Sivers Semiconductors AB (publ), publicerar delårsrapport för första kvartalet, januari - mars 2026",
+      "triage": null,
+      "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-ab-publ-publicerar-delarsrapport-for-forsta-kvartalet-januari-mars-2026-b2e0d82a"
     },
     "lead_fd354516dc2093159fc7d48737016b84": {
       "entities": {
@@ -25333,7 +26803,7 @@
   "source_state": {
     "x:aleabitoreddit": {
       "since_id": "2087030220213870632",
-      "updated_at": "2026-08-11T12:18:25.763048+00:00",
+      "updated_at": "2026-08-11T13:07:54.207127+00:00",
       "user_id": "1940360837547565056"
     }
   }
