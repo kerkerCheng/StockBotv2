@@ -2719,7 +2719,7 @@
       "published_at": "Tue, 30 Jun 2026 23:15:00 +0000",
       "refs": {},
       "source": "mfn:sivers-semiconductors",
-      "status": "pending",
+      "status": "triaged_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -2730,7 +2730,15 @@
         }
       },
       "title": "Sivers Semiconductors has resolved on a directed share issue of shares amounting to approximately SEK 700 million",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.842982+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "SIVE/IQE 為已追蹤標的且有 active thesis；本則屬法定揭露或具名商業事件（訂單／供應協議／稀釋／財報／行事曆），具可逐字查核內容",
+        "tier": 1
+      },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-has-resolved-on-a-directed-share-issue-of-shares-amounting-to-approximately-sek-700-million-a4130eba"
     },
     "lead_0038006b3b3cf08cd61a9e411468c05a": {
@@ -2938,7 +2946,7 @@
       "published_at": "Fri, 03 Jul 2026 16:30:00 +0000",
       "refs": {},
       "source": "mfn:sivers-semiconductors",
-      "status": "pending",
+      "status": "triaged_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -2949,7 +2957,15 @@
         }
       },
       "title": "Sivers Semiconductors' Lender Bootstrap Europe Exercises Conversion Right Under Existing Convertible Loan",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844084+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "SIVE/IQE 為已追蹤標的且有 active thesis；本則屬法定揭露或具名商業事件（訂單／供應協議／稀釋／財報／行事曆），具可逐字查核內容",
+        "tier": 1
+      },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-lender-bootstrap-europe-exercises-conversion-right-under-existing-convertible-loan-314f3dcb"
     },
     "lead_0332ef0064c4828e1a68fdaa45432e9c": {
@@ -2962,7 +2978,7 @@
       "published_at": "Wed, 15 Apr 2026 22:23:20 +0000",
       "refs": {},
       "source": "mfn:sivers-semiconductors",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -2973,7 +2989,13 @@
         }
       },
       "title": "Sivers Semiconductors has resolved on a directed share issue of shares amounting to approximately 125 MSEK",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844451+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "跨 feed 同事件重複：同一則發布同時出現在 mfn:sivers-semiconductors（法定揭露）與 sivers:press（公司站），保留 mfn 版本",
+        "tier": 4
+      },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-has-resolved-on-a-directed-share-issue-of-shares-amounting-to-approximately-125-msek-2e81dac5"
     },
     "lead_0372f419a6423004be01bfb464111aa8": {
@@ -3230,7 +3252,7 @@
       "published_at": "Thu, 14 May 2026 16:36:13 +0000",
       "refs": {},
       "source": "mfn:sivers-semiconductors",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -3241,7 +3263,13 @@
         }
       },
       "title": "Notice to attend the Annual General Meeting of Sivers Semiconductors AB (publ)",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844229+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "行政/程序性公告（股數變動、股東會通知與公報、董事持股、lock-up、提名）或財經媒體二手評論（AIM Market Roundup、券商評等、選股文），無可抽取的供應鏈／技術／客戶 structural claim",
+        "tier": 4
+      },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/notice-to-attend-the-annual-general-meeting-of-sivers-semiconductors-ab-publ-6825ad74"
     },
     "lead_043e94a0e70f703a76115cf09f96b438": {
@@ -3300,13 +3328,14 @@
         "parked_reason": "JD.com 以機器人取代 70 萬名外送員屬總體勞動市場/自動化趨勢敘事，非特定圖中已追蹤公司的供應鏈結構性 claim；JD 本身未入圖亦不在 config/themes.txt 追蹤範圍，屬 weekly topic discovery 候選而非 daily pq1 graph delta",
         "pq2_item": "61",
         "research_bundle_id": "serenity_robotics_20260729",
+        "research_outcome": "2026-08-12 更正 trace_status：原標 isolated_tier_3 有誤。原文已取得（推文本身即一手），park 理由是內容不屬圖譜材料（超出已追蹤主題／無唯一 graph delta），不是缺一手來源。isolated_tier_3 會讓 _requeue_related_trace_backlog 在任一共用 ticker 出現新 lead 時重排 pq1，而內容不會因此改變，重查必然得到同一結論。改為 original_obtained（豁免自動 requeue），符合 skill 對該值的定義。",
         "research_report": "docs/reports/serenity_30d_research_2026-07-29.md",
         "trace_attempts_ref": "docs/reports/serenity_30d_research_2026-07-29.md#截圖paywall判讀",
         "trace_next_trigger": "若未來明確要研究 JD 機器人供應鏈或勞動替代對特定已追蹤機器人公司（如 CCXI/Agility、TSLA）的具體訂單影響，才重新評估",
         "trace_requeue_trigger": "related_triaged_lead:lead_e1daca4662d70cba294c939a608ae05c",
         "trace_requeued_at": "2026-08-11T05:08:15.230067+00:00",
         "trace_requires_user": "false",
-        "trace_status": "isolated_tier_3",
+        "trace_status": "original_obtained",
         "trace_trigger_entities": [
           "AMZN",
           "DASH",
@@ -3369,10 +3398,18 @@
       "published_at": "Tue, 28 Apr 2026 10:31:00 +0000",
       "refs": {},
       "source": "yahoo:iqe-l",
-      "status": "pending",
+      "status": "triaged_go",
       "themes": {},
       "title": "IQE shares fall 19% after £81m fundraise priced at steep discount",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844097+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "IQE 為已追蹤標的（pq2 [109] thesis）；Yahoo 聚合僅作觸發器，evidence tier 須由 source-trace 追回 RNS 一手",
+        "tier": 3
+      },
       "url": "https://www.proactiveinvestors.co.uk/companies/news/1091312/iqe-shares-fall-19-after-81m-fundraise-priced-at-steep-discount-1091312.html?.tsrc=rss"
     },
     "lead_061fe889e9090fd14b4711fafda3fafe": {
@@ -3501,7 +3538,7 @@
       "published_at": "Wed, 15 Apr 2026 22:50:00 +0000",
       "refs": {},
       "source": "mfn:sivers-semiconductors",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -3512,7 +3549,13 @@
         }
       },
       "title": "Kallelse till extra bolagsstämma i Sivers Semiconductors AB (publ)",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844333+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "瑞典文版本；同一事件的英文版已在同批 harvest 中並依內容各自 triage。MFN 與公司站對每則發布都同時發瑞典文與英文，URL hash 不同故各成一筆 lead",
+        "tier": 4
+      },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/kallelse-till-extra-bolagsstamma-i-sivers-semiconductors-ab-publ-2b52ba00"
     },
     "lead_063dffb7d73ace4f7a642322002304b7": {
@@ -3873,7 +3916,7 @@
       "published_at": "Mon, 13 Jul 2026 05:00:00 +0000",
       "refs": {},
       "source": "mfn:sivers-semiconductors",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -3884,7 +3927,13 @@
         }
       },
       "title": "Sivers Semiconductors: Sivers styrelse slutför köp av aktier i enlighet med beslutet vid årsstämman i juni 2026",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844337+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "瑞典文版本；同一事件的英文版已在同批 harvest 中並依內容各自 triage。MFN 與公司站對每則發布都同時發瑞典文與英文，URL hash 不同故各成一筆 lead",
+        "tier": 4
+      },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-sivers-styrelse-slutfor-kop-av-aktier-i-enlighet-med-beslutet-vid-arsstamman-i-juni-2026-a890d9c4"
     },
     "lead_08a496cc0d099d7509a44dc50a225701": {
@@ -4753,10 +4802,16 @@
       "published_at": "Tue, 21 Jul 2026 16:06:55 +0000",
       "refs": {},
       "source": "yahoo:iqe-l",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {},
       "title": "AIM Market Roundup: IQE, Harvest Minerals, Midwich",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844234+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "行政/程序性公告（股數變動、股東會通知與公報、董事持股、lock-up、提名）或財經媒體二手評論（AIM Market Roundup、券商評等、選股文），無可抽取的供應鏈／技術／客戶 structural claim",
+        "tier": 4
+      },
       "url": "https://www.thearmchairtrader.com/aim-market-roundup/iqe-harvest-minerals-midwich/?.tsrc=rss"
     },
     "lead_16795901900503525cb8a921bca69711": {
@@ -5598,10 +5653,16 @@
       "published_at": "Thu, 11 Jun 2026 16:17:51 +0000",
       "refs": {},
       "source": "yahoo:iqe-l",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {},
       "title": "AIM Market Roundup: Mercantile Ports, IQE, Empire Metals",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844238+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "行政/程序性公告（股數變動、股東會通知與公報、董事持股、lock-up、提名）或財經媒體二手評論（AIM Market Roundup、券商評等、選股文），無可抽取的供應鏈／技術／客戶 structural claim",
+        "tier": 4
+      },
       "url": "https://www.thearmchairtrader.com/aim-market-roundup/mercantile-ports-iqe-empire-metals/?.tsrc=rss"
     },
     "lead_1f55ec9eae7d1e4a1b68fa245ed1ee7f": {
@@ -5684,7 +5745,7 @@
       "published_at": "Thu, 09 Jul 2026 05:00:00 +0000",
       "refs": {},
       "source": "mfn:sivers-semiconductors",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -5695,7 +5756,13 @@
         }
       },
       "title": "Sivers Semiconductors uppdaterar sin finansiella kalender",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844341+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "瑞典文版本；同一事件的英文版已在同批 harvest 中並依內容各自 triage。MFN 與公司站對每則發布都同時發瑞典文與英文，URL hash 不同故各成一筆 lead",
+        "tier": 4
+      },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-uppdaterar-sin-finansiella-kalender-9ca54615"
     },
     "lead_1fa5e4b88de07ce8b801e2468729c087": {
@@ -5934,7 +6001,7 @@
       "published_at": "Wed, 13 May 2026 17:32:35 +0000",
       "refs": {},
       "source": "mfn:sivers-semiconductors",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -5945,7 +6012,13 @@
         }
       },
       "title": "Sivers Semiconductors offentliggör årsredovisningen för 2025 och justerar tidigare rapporterad finansiell information som ett led i förberedelserna inför en potentiell dubbelnotering i USA.",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844345+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "瑞典文版本；同一事件的英文版已在同批 harvest 中並依內容各自 triage。MFN 與公司站對每則發布都同時發瑞典文與英文，URL hash 不同故各成一筆 lead",
+        "tier": 4
+      },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-offentliggor-arsredovisningen-for-2025-och-justerar-tidigare-rapporterad-finansiell-information-som-ett-led-i-forberedelserna-infor-en-potentiell-dubbelnotering-i-usa-67472781"
     },
     "lead_238e9bc2281f34aae6ce26a6de502605": {
@@ -6209,7 +6282,7 @@
       "published_at": "Tue, 21 Jul 2026 17:30:00 +0000",
       "refs": {},
       "source": "mfn:sivers-semiconductors",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -6220,7 +6293,13 @@
         }
       },
       "title": "Uppdatering avseende utgången lock-up-period och insynspersoners transaktioner i Sivers Semiconductors",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844349+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "瑞典文版本；同一事件的英文版已在同批 harvest 中並依內容各自 triage。MFN 與公司站對每則發布都同時發瑞典文與英文，URL hash 不同故各成一筆 lead",
+        "tier": 4
+      },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/uppdatering-avseende-utgangen-lock-up-period-och-insynspersoners-transaktioner-i-sivers-semiconductors-4334453c"
     },
     "lead_27625bd16af9f120f0ea459c102ad987": {
@@ -6233,10 +6312,18 @@
       "published_at": "Thu, 28 May 2026 06:57:00 +0000",
       "refs": {},
       "source": "yahoo:iqe-l",
-      "status": "pending",
+      "status": "triaged_go",
       "themes": {},
       "title": "IQE completes fundraising and reports wider losses but improved trading",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844105+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "IQE 為已追蹤標的（pq2 [109] thesis）；Yahoo 聚合僅作觸發器，evidence tier 須由 source-trace 追回 RNS 一手",
+        "tier": 3
+      },
       "url": "https://www.proactiveinvestors.co.uk/companies/news/1093024/iqe-completes-fundraising-and-reports-wider-losses-but-improved-trading-1093024.html?.tsrc=rss"
     },
     "lead_27df1c1cee4ff9a145687be99ae312f9": {
@@ -6249,7 +6336,7 @@
       "published_at": "Fri, 29 May 2026 06:30:00 +0000",
       "refs": {},
       "source": "mfn:sivers-semiconductors",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -6260,7 +6347,13 @@
         }
       },
       "title": "Förändring av det totala antalet aktier och röster i Sivers Semiconductors AB",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844354+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "瑞典文版本；同一事件的英文版已在同批 harvest 中並依內容各自 triage。MFN 與公司站對每則發布都同時發瑞典文與英文，URL hash 不同故各成一筆 lead",
+        "tier": 4
+      },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/forandring-av-det-totala-antalet-aktier-och-roster-i-sivers-semiconductors-ab-87a6edf2"
     },
     "lead_28c13e03ca83db717f75de93f5053bf7": {
@@ -6376,7 +6469,7 @@
       "published_at": "Thu, 09 Jul 2026 05:00:00 +0000",
       "refs": {},
       "source": "mfn:sivers-semiconductors",
-      "status": "pending",
+      "status": "triaged_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -6387,7 +6480,15 @@
         }
       },
       "title": "Sivers Semiconductors Updates Financial Reporting Calendar",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844112+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "SIVE/IQE 為已追蹤標的且有 active thesis；本則屬法定揭露或具名商業事件（訂單／供應協議／稀釋／財報／行事曆），具可逐字查核內容",
+        "tier": 1
+      },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-updates-financial-reporting-calendar-c1f73551"
     },
     "lead_29afe4c0a51033dc69959a4c05534d55": {
@@ -6557,7 +6658,7 @@
       "published_at": "Mon, 15 Jun 2026 06:00:00 +0000",
       "refs": {},
       "source": "mfn:sivers-semiconductors",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -6568,7 +6669,13 @@
         }
       },
       "title": "Sivers Semiconductors Withdraws Items From the Agenda of the 2026 Annual General Meeting",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844243+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "行政/程序性公告（股數變動、股東會通知與公報、董事持股、lock-up、提名）或財經媒體二手評論（AIM Market Roundup、券商評等、選股文），無可抽取的供應鏈／技術／客戶 structural claim",
+        "tier": 4
+      },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-withdraws-items-from-the-agenda-of-the-2026-annual-general-meeting-29ebe74f"
     },
     "lead_2b43cb181b7cac79e1ef6a05bad6b150": {
@@ -6980,7 +7087,7 @@
       "published_at": "Fri, 24 Apr 2026 13:24:26 +0000",
       "refs": {},
       "source": "mfn:sivers-semiconductors",
-      "status": "pending",
+      "status": "triaged_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -6991,7 +7098,15 @@
         }
       },
       "title": "Sivers Semiconductors AB Postpones Publication of Annual Report 2025 Amid Dual Listing Evaluation",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844118+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "SIVE/IQE 為已追蹤標的且有 active thesis；本則屬法定揭露或具名商業事件（訂單／供應協議／稀釋／財報／行事曆），具可逐字查核內容",
+        "tier": 1
+      },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-ab-postpones-publication-of-annual-report-2025-amid-dual-listing-evaluation-3f38520a"
     },
     "lead_2e9d49d9fa6fefb00d51be474d642064": {
@@ -7099,7 +7214,7 @@
       "published_at": "Mon, 15 Jun 2026 14:15:00 +0000",
       "refs": {},
       "source": "mfn:sivers-semiconductors",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -7110,7 +7225,13 @@
         }
       },
       "title": "Bulletin from Sivers Semiconductors AB (publ)'s Annual General Meeting on 15 June 2026",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844247+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "行政/程序性公告（股數變動、股東會通知與公報、董事持股、lock-up、提名）或財經媒體二手評論（AIM Market Roundup、券商評等、選股文），無可抽取的供應鏈／技術／客戶 structural claim",
+        "tier": 4
+      },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/bulletin-from-sivers-semiconductors-ab-publ-s-annual-general-meeting-on-15-june-2026-cf1d358b"
     },
     "lead_2ee701a5079310b10ee292bfc2c1e523": {
@@ -7485,7 +7606,7 @@
       "published_at": "Fri, 31 Jul 2026 06:00:00 +0000",
       "refs": {},
       "source": "mfn:sivers-semiconductors",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -7496,7 +7617,13 @@
         }
       },
       "title": "Förändring av det totala antalet aktier och röster i Sivers Semiconductors AB",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844357+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "瑞典文版本；同一事件的英文版已在同批 harvest 中並依內容各自 triage。MFN 與公司站對每則發布都同時發瑞典文與英文，URL hash 不同故各成一筆 lead",
+        "tier": 4
+      },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/forandring-av-det-totala-antalet-aktier-och-roster-i-sivers-semiconductors-ab-a02b82e0"
     },
     "lead_32467138b3832782d89c940740dff50c": {
@@ -7579,7 +7706,7 @@
       "published_at": "Wed, 20 May 2026 05:00:00 +0000",
       "refs": {},
       "source": "mfn:sivers-semiconductors",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -7590,7 +7717,13 @@
         }
       },
       "title": "Sivers Semiconductors välkomnar nomineringen av de nya styrelseledamöterna Joakim Nideborn och Helena Svancar",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844362+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "瑞典文版本；同一事件的英文版已在同批 harvest 中並依內容各自 triage。MFN 與公司站對每則發布都同時發瑞典文與英文，URL hash 不同故各成一筆 lead",
+        "tier": 4
+      },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-valkomnar-nomineringen-av-de-nya-styrelseledamoterna-joakim-nideborn-och-helena-svancar-8b3b2de1"
     },
     "lead_346c43a02c97ab876fd90f6845f10629": {
@@ -7741,7 +7874,7 @@
       "published_at": "Mon, 15 Jun 2026 06:00:00 +0000",
       "refs": {},
       "source": "mfn:sivers-semiconductors",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -7752,7 +7885,13 @@
         }
       },
       "title": "Sivers Semiconductors återkallar punkter från dagordningen för årsstämman 2026",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844365+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "瑞典文版本；同一事件的英文版已在同批 harvest 中並依內容各自 triage。MFN 與公司站對每則發布都同時發瑞典文與英文，URL hash 不同故各成一筆 lead",
+        "tier": 4
+      },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-aterkallar-punkter-fran-dagordningen-for-arsstamman-2026-fb23131a"
     },
     "lead_359c76e1b5ba4604a130d611f742085a": {
@@ -7889,10 +8028,18 @@
       "published_at": "Tue, 21 Jul 2026 07:28:24 +0000",
       "refs": {},
       "source": "yahoo:iqe-l",
-      "status": "pending",
+      "status": "triaged_go",
       "themes": {},
       "title": "IQE raises 2026 revenue guidance on strong AI and data centre demand",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844124+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "IQE 為已追蹤標的（pq2 [109] thesis）；Yahoo 聚合僅作觸發器，evidence tier 須由 source-trace 追回 RNS 一手",
+        "tier": 3
+      },
       "url": "https://uk.advfn.com/market-news/article/19908/iqe-raises-2026-revenue-guidance-on-strong-ai-and-data-centre-demand?.tsrc=rss"
     },
     "lead_381b8a554b089b34a9f31e841f4aa05e": {
@@ -8160,7 +8307,7 @@
       "published_at": "Fri, 24 Apr 2026 13:24:26 +0000",
       "refs": {},
       "source": "mfn:sivers-semiconductors",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -8171,7 +8318,13 @@
         }
       },
       "title": "Sivers Semiconductors AB senarelägger publiceringen av årsredovisningen för 2025 med anledning av utvärdering av dubbelnotering",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844369+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "瑞典文版本；同一事件的英文版已在同批 harvest 中並依內容各自 triage。MFN 與公司站對每則發布都同時發瑞典文與英文，URL hash 不同故各成一筆 lead",
+        "tier": 4
+      },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-ab-senarelagger-publiceringen-av-arsredovisningen-for-2025-med-anledning-av-utvardering-av-dubbelnotering-2c801b01"
     },
     "lead_3b455d0e21ff3e18ccf24fffb5f906e2": {
@@ -8358,9 +8511,10 @@
         "campaign_window_end": "2026-07-29T13:46:25Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
         "parked_reason": "多主題快訊彙整貼文（20+ 家公司/事件），僅 SOI.PA（FY2027 光子學營收展望倍增）與 AMD/Anthropic CPO-Ayar 路由訊號與已追蹤主題（cpo, robotics）沾邊，其餘（CXMT IPO、Samsung FC-BGA、SKC Absolics、QCOM 漲價、META El Paso 融資、Naver+Nvidia、DDR5 定價、INTC 14A、鎢原料、電池訂單等）皆非已追蹤標的；價值密度過低不適合單一 RA，若 SOI.PA 或 AMD-CPO 訊號有獨立來源重複出現再另案處理",
+        "research_outcome": "2026-08-12 更正 trace_status：原標 isolated_tier_3 有誤。原文已取得（推文本身即一手），park 理由是內容不屬圖譜材料（超出已追蹤主題／無唯一 graph delta），不是缺一手來源。isolated_tier_3 會讓 _requeue_related_trace_backlog 在任一共用 ticker 出現新 lead 時重排 pq1，而內容不會因此改變，重查必然得到同一結論。改為 original_obtained（豁免自動 requeue），符合 skill 對該值的定義。",
         "trace_next_trigger": "若 SOI.PA FY2027 光子學營收指引或 AMD CPO-Ayar 供應關係出現獨立來源重複驗證，才重新評估",
         "trace_requires_user": "false",
-        "trace_status": "isolated_tier_3",
+        "trace_status": "original_obtained",
         "trace_trigger_entities": [
           "AMD",
           "AVGO",
@@ -9118,10 +9272,16 @@
       "published_at": "Sun, 02 Aug 2026 06:31:00 +0000",
       "refs": {},
       "source": "yahoo:iqe-l",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {},
       "title": "Up 523% in 6 months! Is this the best growth stock to buy in August 2026?",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844251+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "行政/程序性公告（股數變動、股東會通知與公報、董事持股、lock-up、提名）或財經媒體二手評論（AIM Market Roundup、券商評等、選股文），無可抽取的供應鏈／技術／客戶 structural claim",
+        "tier": 4
+      },
       "url": "https://www.twelfthmagpie.com/2026/08/02/up-523-in-6-months-is-this-the-best-growth-stock-to-buy-in-august-2026/?.tsrc=rss"
     },
     "lead_44ce140c224422130eecf4bb9766219e": {
@@ -9739,7 +9899,7 @@
       "published_at": "Tue, 21 Jul 2026 17:30:00 +0000",
       "refs": {},
       "source": "mfn:sivers-semiconductors",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -9750,7 +9910,13 @@
         }
       },
       "title": "Update on Expiry of Lock-up Undertaking and Insider Transactions in Sivers Semiconductors",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844255+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "行政/程序性公告（股數變動、股東會通知與公報、董事持股、lock-up、提名）或財經媒體二手評論（AIM Market Roundup、券商評等、選股文），無可抽取的供應鏈／技術／客戶 structural claim",
+        "tier": 4
+      },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/update-on-expiry-of-lock-up-undertaking-and-insider-transactions-in-sivers-semiconductors-9e6d34a5"
     },
     "lead_496f512a7f74e83fb5975f6e5377e757": {
@@ -10269,7 +10435,7 @@
       "published_at": "Wed, 15 Apr 2026 22:23:20 +0000",
       "refs": {},
       "source": "mfn:sivers-semiconductors",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -10280,7 +10446,13 @@
         }
       },
       "title": "Sivers Semiconductors har beslutat om en riktad nyemission av aktier om cirka 125 MSEK",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844374+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "瑞典文版本；同一事件的英文版已在同批 harvest 中並依內容各自 triage。MFN 與公司站對每則發布都同時發瑞典文與英文，URL hash 不同故各成一筆 lead",
+        "tier": 4
+      },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-har-beslutat-om-en-riktad-nyemission-av-aktier-om-cirka-125-msek-5b14f4c9"
     },
     "lead_4f7fae31a0641d93886720165aa31a2f": {
@@ -10448,10 +10620,18 @@
       "published_at": "Wed, 03 Jun 2026 07:37:21 +0000",
       "refs": {},
       "source": "yahoo:iqe-l",
-      "status": "pending",
+      "status": "triaged_go",
       "themes": {},
       "title": "IQE Schedules Annual General Meeting and Releases 2025 Annual Report (IQE)",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844130+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "IQE 為已追蹤標的（pq2 [109] thesis）；Yahoo 聚合僅作觸發器，evidence tier 須由 source-trace 追回 RNS 一手",
+        "tier": 3
+      },
       "url": "https://uk.advfn.com/market-news/article/16903/iqe-schedules-annual-general-meeting-and-releases-2025-annual-report-iqe?.tsrc=rss"
     },
     "lead_53f19d8df30938f84517824490af0695": {
@@ -10752,7 +10932,7 @@
       "published_at": "Tue, 09 Jun 2026 05:00:00 +0000",
       "refs": {},
       "source": "mfn:sivers-semiconductors",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -10763,7 +10943,13 @@
         }
       },
       "title": "ALL.SPACE lägger produktionsorder värd 8,2 MUSD hos Sivers Semiconductors för Ka-band beamforming-kretsar",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844447+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "瑞典文版本；同一事件的英文版已在同批 harvest 中並依內容各自 triage。MFN 與公司站對每則發布都同時發瑞典文與英文，URL hash 不同故各成一筆 lead",
+        "tier": 4
+      },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/all-space-lagger-produktionsorder-vard-8-2-musd-hos-sivers-semiconductors-for-ka-band-beamforming-kretsar-07d97937"
     },
     "lead_572f73ed0ae5002a8e9091d316c88565": {
@@ -10925,7 +11111,7 @@
       "published_at": "Tue, 30 Jun 2026 23:15:00 +0000",
       "refs": {},
       "source": "mfn:sivers-semiconductors",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -10936,7 +11122,13 @@
         }
       },
       "title": "Sivers Semiconductors har beslutat om en riktad nyemission av aktier om cirka 700 MSEK",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844378+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "瑞典文版本；同一事件的英文版已在同批 harvest 中並依內容各自 triage。MFN 與公司站對每則發布都同時發瑞典文與英文，URL hash 不同故各成一筆 lead",
+        "tier": 4
+      },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-har-beslutat-om-en-riktad-nyemission-av-aktier-om-cirka-700-msek-fe89f203"
     },
     "lead_58b59fd0835f9f7b078e5dfdde222517": {
@@ -11069,10 +11261,16 @@
       "published_at": "Thu, 23 Jul 2026 04:34:30 +0000",
       "refs": {},
       "source": "yahoo:iqe-l",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {},
       "title": "IQE (AIM:IQE) Stock Fair Value Rises After Analysts Back Stronger Demand",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844260+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "行政/程序性公告（股數變動、股東會通知與公報、董事持股、lock-up、提名）或財經媒體二手評論（AIM Market Roundup、券商評等、選股文），無可抽取的供應鏈／技術／客戶 structural claim",
+        "tier": 4
+      },
       "url": "https://finance.yahoo.com/markets/stocks/articles/iqe-aim-iqe-stock-fair-043430133.html?.tsrc=rss"
     },
     "lead_5a2a7cfa72c8ccbb49bb34009c8a3783": {
@@ -11371,10 +11569,16 @@
       "published_at": "Wed, 27 May 2026 10:30:00 +0000",
       "refs": {},
       "source": "yahoo:iqe-l",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {},
       "title": "Deutsche Bank reinitiates IQE at buy with 60p target as end markets boom",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844264+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "行政/程序性公告（股數變動、股東會通知與公報、董事持股、lock-up、提名）或財經媒體二手評論（AIM Market Roundup、券商評等、選股文），無可抽取的供應鏈／技術／客戶 structural claim",
+        "tier": 4
+      },
       "url": "https://www.proactiveinvestors.co.uk/companies/news/1092951/deutsche-bank-reinitiates-iqe-at-buy-with-60p-target-as-end-markets-boom-1092951.html?.tsrc=rss"
     },
     "lead_5d739525279dfae394f8c8e213084633": {
@@ -11842,7 +12046,7 @@
       "published_at": "Tue, 30 Jun 2026 15:31:00 +0000",
       "refs": {},
       "source": "mfn:sivers-semiconductors",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -11853,7 +12057,13 @@
         }
       },
       "title": "Sivers Semiconductors offentliggör avsikt att genomföra en riktad nyemission av aktier om cirka 600 miljoner kronor",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844381+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "瑞典文版本；同一事件的英文版已在同批 harvest 中並依內容各自 triage。MFN 與公司站對每則發布都同時發瑞典文與英文，URL hash 不同故各成一筆 lead",
+        "tier": 4
+      },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-offentliggor-avsikt-att-genomfora-en-riktad-nyemission-av-aktier-om-cirka-600-miljoner-kronor-8f17ae83"
     },
     "lead_62902718f2adde48a5edcfa0563df489": {
@@ -12128,7 +12338,7 @@
       "published_at": "Tue, 21 Jul 2026 17:30:00 +0000",
       "refs": {},
       "source": "sivers:press",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -12139,7 +12349,13 @@
         }
       },
       "title": "Update on Expiry of Lock-up Undertaking and Insider Transactions in Sivers Semiconductors",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844269+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "行政/程序性公告（股數變動、股東會通知與公報、董事持股、lock-up、提名）或財經媒體二手評論（AIM Market Roundup、券商評等、選股文），無可抽取的供應鏈／技術／客戶 structural claim",
+        "tier": 4
+      },
       "url": "https://www.sivers-semiconductors.com/press/update-on-expiry-of-lock-up-undertaking-and-insider-transactions-in-sivers-semiconductors/"
     },
     "lead_653b2da7843a6e6e52e432b66f37e379": {
@@ -12333,7 +12549,7 @@
       "published_at": "Wed, 06 May 2026 05:00:00 +0000",
       "refs": {},
       "source": "mfn:sivers-semiconductors",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -12344,7 +12560,13 @@
         }
       },
       "title": "Tachyon Networks utökar sin FWA-portfölj genom utvecklingssamarbete värt USD 1,5 miljoner med Sivers Semiconductors",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844385+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "瑞典文版本；同一事件的英文版已在同批 harvest 中並依內容各自 triage。MFN 與公司站對每則發布都同時發瑞典文與英文，URL hash 不同故各成一筆 lead",
+        "tier": 4
+      },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/tachyon-networks-utokar-sin-fwa-portfolj-genom-utvecklingssamarbete-vart-usd-1-5-miljoner-med-sivers-semiconductors-a2aa6f3f"
     },
     "lead_66b81bcd4fc27bc231ea075bf6c660eb": {
@@ -12503,7 +12725,7 @@
       "published_at": "Tue, 02 Jun 2026 05:00:00 +0000",
       "refs": {},
       "source": "mfn:sivers-semiconductors",
-      "status": "pending",
+      "status": "triaged_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -12514,7 +12736,15 @@
         }
       },
       "title": "Sivers Semiconductors: Sivers & GlobalFoundries Advance AI Data Center Optical Solutions",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844136+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "SIVE/IQE 為已追蹤標的且有 active thesis；本則屬法定揭露或具名商業事件（訂單／供應協議／稀釋／財報／行事曆），具可逐字查核內容",
+        "tier": 1
+      },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-sivers-and-globalfoundries-advance-ai-data-center-optical-solutions-c7523cc4"
     },
     "lead_6a56acb8a4aa5260483a3b14600db949": {
@@ -12785,10 +13015,16 @@
       "published_at": "Tue, 21 Jul 2026 09:10:00 +0000",
       "refs": {},
       "source": "yahoo:iqe-l",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {},
       "title": "IQE shares surge as AI demand lifts guidance and prompts broker upgrades",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844329+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "行政/程序性公告（股數變動、股東會通知與公報、董事持股、lock-up、提名）或財經媒體二手評論（AIM Market Roundup、券商評等、選股文），無可抽取的供應鏈／技術／客戶 structural claim",
+        "tier": 4
+      },
       "url": "https://www.proactiveinvestors.co.uk/companies/news/1095761/iqe-shares-surge-as-ai-demand-lifts-guidance-and-prompts-broker-upgrades-1095761.html?.tsrc=rss"
     },
     "lead_6cc7c974eab84a76ef68831129f474e3": {
@@ -13175,7 +13411,7 @@
       "published_at": "Fri, 03 Jul 2026 16:30:00 +0000",
       "refs": {},
       "source": "mfn:sivers-semiconductors",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -13186,7 +13422,13 @@
         }
       },
       "title": "Sivers Semiconductors långivare Bootstrap Europe påkallar konvertering av befintligt konvertibelt lån",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844389+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "瑞典文版本；同一事件的英文版已在同批 harvest 中並依內容各自 triage。MFN 與公司站對每則發布都同時發瑞典文與英文，URL hash 不同故各成一筆 lead",
+        "tier": 4
+      },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-langivare-bootstrap-europe-pakallar-konvertering-av-befintligt-konvertibelt-lan-773313b5"
     },
     "lead_6fb8bec46249fc64d7301c1c9fd7be96": {
@@ -13451,7 +13693,7 @@
       "published_at": "Mon, 15 Jun 2026 14:15:00 +0000",
       "refs": {},
       "source": "mfn:sivers-semiconductors",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -13462,7 +13704,13 @@
         }
       },
       "title": "Stämmokommuniké från årsstämma den 15 juni 2026 i Sivers Semiconductors AB (publ)",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844393+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "瑞典文版本；同一事件的英文版已在同批 harvest 中並依內容各自 triage。MFN 與公司站對每則發布都同時發瑞典文與英文，URL hash 不同故各成一筆 lead",
+        "tier": 4
+      },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/stammokommunike-fran-arsstamma-den-15-juni-2026-i-sivers-semiconductors-ab-publ-0bdd0ae1"
     },
     "lead_71d8cbb9c051bf031ce63f29d69d8feb": {
@@ -13475,7 +13723,7 @@
       "published_at": "Wed, 06 May 2026 05:00:00 +0000",
       "refs": {},
       "source": "mfn:sivers-semiconductors",
-      "status": "pending",
+      "status": "triaged_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -13486,7 +13734,15 @@
         }
       },
       "title": "Tachyon Networks Expands FWA Portfolio With $1.5M Development Partnership With Sivers Semiconductors",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844142+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "SIVE/IQE 為已追蹤標的且有 active thesis；本則屬法定揭露或具名商業事件（訂單／供應協議／稀釋／財報／行事曆），具可逐字查核內容",
+        "tier": 1
+      },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/tachyon-networks-expands-fwa-portfolio-with-1-5m-development-partnership-with-sivers-semiconductors-3575c079"
     },
     "lead_74225cd7714e9466dcb4f602dc412919": {
@@ -13531,7 +13787,7 @@
       "published_at": "Wed, 13 May 2026 17:32:35 +0000",
       "refs": {},
       "source": "mfn:sivers-semiconductors",
-      "status": "pending",
+      "status": "triaged_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -13542,7 +13798,15 @@
         }
       },
       "title": "Sivers Semiconductors publishes the 2025 Annual Report, adjusting prior reported financials as preparation for a potential dual listing in the United States",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844149+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "SIVE/IQE 為已追蹤標的且有 active thesis；本則屬法定揭露或具名商業事件（訂單／供應協議／稀釋／財報／行事曆），具可逐字查核內容",
+        "tier": 1
+      },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-publishes-the-2025-annual-report-adjusting-prior-reported-financials-as-preparation-for-a-potential-dual-listing-in-the-united-states-be8b1e15"
     },
     "lead_7492a9c7d071032785306522c73abe39": {
@@ -13641,7 +13905,7 @@
       "published_at": "Tue, 19 May 2026 05:00:00 +0000",
       "refs": {},
       "source": "mfn:sivers-semiconductors",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -13652,7 +13916,13 @@
         }
       },
       "title": "Microelectronics Commons stärker sitt engagemang i Sivers Semiconductors med finansiering för andra året",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844397+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "瑞典文版本；同一事件的英文版已在同批 harvest 中並依內容各自 triage。MFN 與公司站對每則發布都同時發瑞典文與英文，URL hash 不同故各成一筆 lead",
+        "tier": 4
+      },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/microelectronics-commons-starker-sitt-engagemang-i-sivers-semiconductors-med-finansiering-for-andra-aret-ffc72f3e"
     },
     "lead_760eb6913a23e02842e06ac15b77d48d": {
@@ -14042,12 +14312,13 @@
         "campaign_window_start": "2026-06-29T13:46:25Z",
         "parked_reason": "資料中心 BBU 電池單元短缺，供應商為 Samsung SDI/Panasonic/LG Energy/Murata，均非已追蹤 ticker/主題；作者自陳『不是我的專長領域』。屬新主題候選非 daily pq1 graph delta",
         "research_mode": "delta_only",
+        "research_outcome": "2026-08-12 更正 trace_status：原標 isolated_tier_3 有誤。原文已取得（推文本身即一手），park 理由是內容不屬圖譜材料（超出已追蹤主題／無唯一 graph delta），不是缺一手來源。isolated_tier_3 會讓 _requeue_related_trace_backlog 在任一共用 ticker 出現新 lead 時重排 pq1，而內容不會因此改變，重查必然得到同一結論。改為 original_obtained（豁免自動 requeue），符合 skill 對該值的定義。",
         "trace_attempts_ref": "Samsung SDI InterBattery/earnings official pages + Panasonic 2026 energy IR + Simplo/MOPS official search + Digitimes/TheElec metadata",
         "trace_next_trigger": "若未來要開新主題追蹤資料中心電源/BBU 供應鏈，可作 weekly topic discovery 起點",
         "trace_requeue_trigger": "related_triaged_lead:lead_e1daca4662d70cba294c939a608ae05c",
         "trace_requeued_at": "2026-08-11T05:08:15.230067+00:00",
         "trace_requires_user": "false",
-        "trace_status": "isolated_tier_3",
+        "trace_status": "original_obtained",
         "trace_trigger_entities": [
           "AMZN",
           "BWA",
@@ -14186,7 +14457,7 @@
       "published_at": "Tue, 02 Jun 2026 05:00:00 +0000",
       "refs": {},
       "source": "mfn:sivers-semiconductors",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -14197,7 +14468,13 @@
         }
       },
       "title": "Sivers Semiconductors: Sivers & GlobalFoundries avancerade optiska lösningar för AI-datacenter",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844401+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "瑞典文版本；同一事件的英文版已在同批 harvest 中並依內容各自 triage。MFN 與公司站對每則發布都同時發瑞典文與英文，URL hash 不同故各成一筆 lead",
+        "tier": 4
+      },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-sivers-and-globalfoundries-avancerade-optiska-losningar-for-ai-datacenter-f4490031"
     },
     "lead_7ab349347cfb868df1d54d45a29e91a9": {
@@ -15194,10 +15471,16 @@
       "published_at": "Tue, 21 Jul 2026 19:10:26 +0000",
       "refs": {},
       "source": "yahoo:iqe-l",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {},
       "title": "Why Applied Materials (AMAT) Stock Is Up Today",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844274+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "行政/程序性公告（股數變動、股東會通知與公報、董事持股、lock-up、提名）或財經媒體二手評論（AIM Market Roundup、券商評等、選股文），無可抽取的供應鏈／技術／客戶 structural claim",
+        "tier": 4
+      },
       "url": "https://finance.yahoo.com/markets/stocks/articles/why-applied-materials-amat-stock-191026429.html?.tsrc=rss"
     },
     "lead_81ba31cd1de380267a03be48750212c2": {
@@ -15640,7 +15923,7 @@
       "published_at": "Tue, 30 Jun 2026 15:31:00 +0000",
       "refs": {},
       "source": "mfn:sivers-semiconductors",
-      "status": "pending",
+      "status": "triaged_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -15651,7 +15934,15 @@
         }
       },
       "title": "Sivers Semiconductors Announces Intention to Carry Out a Directed Share Issue of Approximately SEK 600 Million",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844155+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "SIVE/IQE 為已追蹤標的且有 active thesis；本則屬法定揭露或具名商業事件（訂單／供應協議／稀釋／財報／行事曆），具可逐字查核內容",
+        "tier": 1
+      },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-announces-intention-to-carry-out-a-directed-share-issue-of-approximately-sek-600-million-0cd572e0"
     },
     "lead_8731ea81a6fcb4e666a7f2c5cea71e2b": {
@@ -16053,14 +16344,14 @@
         "original_claim_status": "core_event_supported_author_inferences_rejected",
         "parked_reason": "Nebius/Reflection AI/SpaceX 運算合約，皆非已追蹤標的（NBIS、Reflection AI、SPCX 均不在 config/themes.txt 或 registry），屬 neocloud/運算採購總體敘事非圖中已追蹤公司供應鏈 claim",
         "research_mode": "delta_only",
-        "research_outcome": "tier3_core_corroborated_no_primary_no_graph_ra",
+        "research_outcome": "2026-08-12 更正 trace_status：原標 isolated_tier_3 有誤。原文已取得（推文本身即一手），park 理由是內容不屬圖譜材料（超出已追蹤主題／無唯一 graph delta），不是缺一手來源。isolated_tier_3 會讓 _requeue_related_trace_backlog 在任一共用 ticker 出現新 lead 時重排 pq1，而內容不會因此改變，重查必然得到同一結論。改為 original_obtained（豁免自動 requeue），符合 skill 對該值的定義。",
         "research_run": "luna_reviewer_2026-08-01_pq1_5",
         "trace_attempts_ref": "Reuters syndicated carrier；Bloomberg accessible excerpt；TechCrunch；Reflection official news index；Nebius／Reflection official and SEC search",
         "trace_next_trigger": "若 Nebius 或 Reflection AI 未來成為明確追蹤標的，才重新評估",
         "trace_requeue_trigger": "related_triaged_lead:lead_0624cbfddb41714f21502cc3f3da7a8a",
         "trace_requeued_at": "2026-08-09T01:26:40.660274+00:00",
         "trace_requires_user": "false",
-        "trace_status": "isolated_tier_3",
+        "trace_status": "original_obtained",
         "trace_trigger_entities": [
           "META",
           "MSFT",
@@ -16115,7 +16406,7 @@
       "published_at": "Fri, 03 Jul 2026 16:30:00 +0000",
       "refs": {},
       "source": "sivers:press",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -16126,7 +16417,13 @@
         }
       },
       "title": "Sivers Semiconductors’ Lender Bootstrap Europe Exercises Conversion Right Under Existing Convertible Loan",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844455+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "跨 feed 同事件重複：同一則發布同時出現在 mfn:sivers-semiconductors（法定揭露）與 sivers:press（公司站），保留 mfn 版本",
+        "tier": 4
+      },
       "url": "https://www.sivers-semiconductors.com/press/sivers-semiconductors-lender-bootstrap-europe-exercises-conversion-right-under-existing-convertible-loan/"
     },
     "lead_8ae4bd1a71426bd5346bf5cd45cc94ba": {
@@ -16371,11 +16668,12 @@
         "campaign_window_end": "2026-07-29T13:46:25Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
         "parked_reason": "總體市場情緒與多標的財報季評論（Fed 利率預期、GOOGL capex、記憶體需求等），無單一可查核的供應鏈 structural claim，屬總體敘事非圖譜可用內容",
+        "research_outcome": "2026-08-12 以正確 trace_status 重新 park。2026-08-11 誤標 isolated_tier_3，導致 2026-08-11T22:34 被 related_triaged_lead:lead_891dfeb（LITE 財報）喚醒——本 lead entities 含 12 個 ticker（BE/TER/LITE/SNDK/AMKR/GOOGL/CXMT/SIVE/AAOI/META/NBIS/MU），且未設 trace_trigger_entities，故 lazy migration 取其全部 entities 當觸發集合，等於任一 ticker 有新 lead 就重排，且會排在 drain 隊首。原文已取得（推文本身即一手），缺的不是來源而是可入圖的 structural claim，內容不因相關 ticker 有新聞而改變。",
         "trace_next_trigger": "若其中提及的具體法說會數字（如 GOOGL capex -205B）需要單獨查證，改由對應公司的財報 lead 處理",
         "trace_requeue_trigger": "related_triaged_lead:lead_891dfebbd908d822ef6f4a55e1e465c0",
         "trace_requeued_at": "2026-08-11T22:34:50.401653+00:00",
         "trace_requires_user": "false",
-        "trace_status": "isolated_tier_3",
+        "trace_status": "original_obtained",
         "trace_trigger_entities": [
           "AAOI",
           "AMKR",
@@ -16398,7 +16696,7 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -16806,7 +17104,7 @@
       "published_at": "Wed, 15 Apr 2026 22:50:00 +0000",
       "refs": {},
       "source": "mfn:sivers-semiconductors",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -16817,7 +17115,13 @@
         }
       },
       "title": "Notice to attend the Extraordinary General Meeting of Sivers Semiconductors AB (publ)",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844278+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "行政/程序性公告（股數變動、股東會通知與公報、董事持股、lock-up、提名）或財經媒體二手評論（AIM Market Roundup、券商評等、選股文），無可抽取的供應鏈／技術／客戶 structural claim",
+        "tier": 4
+      },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/notice-to-attend-the-extraordinary-general-meeting-of-sivers-semiconductors-ab-publ-bbe6aad1"
     },
     "lead_9560cb7de6f030c75af6b74251114924": {
@@ -17262,10 +17566,18 @@
       "published_at": "Tue, 14 Jul 2026 07:25:04 +0000",
       "refs": {},
       "source": "yahoo:iqe-l",
-      "status": "pending",
+      "status": "triaged_go",
       "themes": {},
       "title": "IQE Secures $14 Million AI and Datacentre Semiconductor Contract (IQE)",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844165+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "IQE 為已追蹤標的（pq2 [109] thesis）；Yahoo 聚合僅作觸發器，evidence tier 須由 source-trace 追回 RNS 一手",
+        "tier": 3
+      },
       "url": "https://uk.advfn.com/market-news/article/19464/iqe-secures-14-million-ai-and-datacentre-semiconductor-contract-iqe?.tsrc=rss"
     },
     "lead_9a9bc78fb2b55441c6a1d61bf9987a0c": {
@@ -18050,7 +18362,7 @@
       "published_at": "Mon, 15 Jun 2026 06:00:00 +0000",
       "refs": {},
       "source": "yahoo:iqe-l",
-      "status": "pending",
+      "status": "triaged_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -18061,7 +18373,15 @@
         }
       },
       "title": "IQE and Tower Semiconductor Announce Multi-year InP epiwafer Supply Agreement",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844170+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "IQE 為已追蹤標的（pq2 [109] thesis）；Yahoo 聚合僅作觸發器，evidence tier 須由 source-trace 追回 RNS 一手",
+        "tier": 3
+      },
       "url": "https://finance.yahoo.com/sectors/technology/articles/iqe-tower-semiconductor-announce-multi-060000113.html?.tsrc=rss"
     },
     "lead_a4eca2bd1a52d9a049fe6a5f6a642aab": {
@@ -18281,7 +18601,7 @@
       "published_at": "Thu, 09 Jul 2026 05:00:00 +0000",
       "refs": {},
       "source": "sivers:press",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -18292,7 +18612,13 @@
         }
       },
       "title": "Sivers Semiconductors Updates Financial Reporting Calendar",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844459+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "跨 feed 同事件重複：同一則發布同時出現在 mfn:sivers-semiconductors（法定揭露）與 sivers:press（公司站），保留 mfn 版本",
+        "tier": 4
+      },
       "url": "https://www.sivers-semiconductors.com/press/sivers-semiconductors-updates-financial-reporting-calendar/"
     },
     "lead_a5994c5dad62b00badecbb0b3a0eff54": {
@@ -18305,7 +18631,7 @@
       "published_at": "Tue, 21 Jul 2026 17:30:00 +0000",
       "refs": {},
       "source": "sivers:press",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -18316,7 +18642,13 @@
         }
       },
       "title": "Uppdatering avseende utgången lock-up-period och insynspersoners transaktioner i Sivers Semiconductors",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844406+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "瑞典文版本；同一事件的英文版已在同批 harvest 中並依內容各自 triage。MFN 與公司站對每則發布都同時發瑞典文與英文，URL hash 不同故各成一筆 lead",
+        "tier": 4
+      },
       "url": "https://www.sivers-semiconductors.com/press/uppdatering-avseende-utgangen-lock-up-period-och-insynspersoners-transaktioner-i-sivers-semiconductors/"
     },
     "lead_a7655e310d5e73cb919a0cdbd5f5e84d": {
@@ -18385,10 +18717,18 @@
       "published_at": "Wed, 01 Jul 2026 07:20:10 +0000",
       "refs": {},
       "source": "yahoo:iqe-l",
-      "status": "pending",
+      "status": "triaged_go",
       "themes": {},
       "title": "IQE appoints MACOM executives to board under strategic partnership agreement (IQE)",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844176+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "IQE 為已追蹤標的（pq2 [109] thesis）；Yahoo 聚合僅作觸發器，evidence tier 須由 source-trace 追回 RNS 一手",
+        "tier": 3
+      },
       "url": "https://uk.advfn.com/market-news/article/18722/iqe-appoints-macom-executives-to-board-under-strategic-partnership-agreement-iqe?.tsrc=rss"
     },
     "lead_a7e1fbdd7e16b66481bc53a3d934c128": {
@@ -18781,10 +19121,18 @@
       "published_at": "Sat, 23 May 2026 21:14:59 +0000",
       "refs": {},
       "source": "yahoo:iqe-l",
-      "status": "pending",
+      "status": "triaged_go",
       "themes": {},
       "title": "MACOM (MTSI) to Enter Long-Term Supply Agreements with IQE plc",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844181+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "IQE 為已追蹤標的（pq2 [109] thesis）；Yahoo 聚合僅作觸發器，evidence tier 須由 source-trace 追回 RNS 一手",
+        "tier": 3
+      },
       "url": "https://finance.yahoo.com/markets/stocks/articles/macom-mtsi-enter-long-term-200959451.html?.tsrc=rss"
     },
     "lead_ab7275ecca8f13b4118ba0714346c27b": {
@@ -18797,7 +19145,7 @@
       "published_at": "Fri, 29 May 2026 06:30:00 +0000",
       "refs": {},
       "source": "mfn:sivers-semiconductors",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -18808,7 +19156,13 @@
         }
       },
       "title": "Change in The Total Number of Shares and Votes in Sivers Semiconductors AB",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844282+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "行政/程序性公告（股數變動、股東會通知與公報、董事持股、lock-up、提名）或財經媒體二手評論（AIM Market Roundup、券商評等、選股文），無可抽取的供應鏈／技術／客戶 structural claim",
+        "tier": 4
+      },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/change-in-the-total-number-of-shares-and-votes-in-sivers-semiconductors-ab-6e5e553c"
     },
     "lead_abc654e19602954c8069ad594c1aa440": {
@@ -20054,7 +20408,7 @@
       "published_at": "Wed, 15 Apr 2026 22:40:00 +0000",
       "refs": {},
       "source": "mfn:sivers-semiconductors",
-      "status": "pending",
+      "status": "triaged_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -20065,7 +20419,15 @@
         }
       },
       "title": "Sivers Semiconductors AB evaluates a potential dual listing of its shares on the Nasdaq New York",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844187+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "SIVE/IQE 為已追蹤標的且有 active thesis；本則屬法定揭露或具名商業事件（訂單／供應協議／稀釋／財報／行事曆），具可逐字查核內容",
+        "tier": 1
+      },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-ab-evaluates-a-potential-dual-listing-of-its-shares-on-the-nasdaq-new-york-69346db5"
     },
     "lead_b48a6c9a349398a5d0d3ab8732a05d54": {
@@ -20590,10 +20952,16 @@
       "published_at": "Wed, 29 Apr 2026 14:58:00 +0000",
       "refs": {},
       "source": "yahoo:iqe-l",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {},
       "title": "IQE's MACOM deal and link to Nvidia are 'exciting', but shares downgraded after surge",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844286+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "行政/程序性公告（股數變動、股東會通知與公報、董事持股、lock-up、提名）或財經媒體二手評論（AIM Market Roundup、券商評等、選股文），無可抽取的供應鏈／技術／客戶 structural claim",
+        "tier": 4
+      },
       "url": "https://www.proactiveinvestors.co.uk/companies/news/1091435/iqe-s-macom-deal-and-link-to-nvidia-are-exciting-but-shares-downgraded-after-surge-1091435.html?.tsrc=rss"
     },
     "lead_ba4073c079bac993eaafc74feb7c6df3": {
@@ -21168,7 +21536,7 @@
       "published_at": "Thu, 14 May 2026 16:36:13 +0000",
       "refs": {},
       "source": "mfn:sivers-semiconductors",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -21179,7 +21547,13 @@
         }
       },
       "title": "Kallelse till årsstämma i Sivers Semiconductors AB (publ)",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844410+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "瑞典文版本；同一事件的英文版已在同批 harvest 中並依內容各自 triage。MFN 與公司站對每則發布都同時發瑞典文與英文，URL hash 不同故各成一筆 lead",
+        "tier": 4
+      },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/kallelse-till-arsstamma-i-sivers-semiconductors-ab-publ-7c0595a8"
     },
     "lead_c27e417db9b04ea06a227bedfb773c88": {
@@ -21192,7 +21566,7 @@
       "published_at": "Mon, 13 Jul 2026 05:00:00 +0000",
       "refs": {},
       "source": "sivers:press",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -21203,7 +21577,13 @@
         }
       },
       "title": "Sivers styrelse slutför köp av aktier i enlighet med beslutet vid årsstämman i juni 2026",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844414+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "瑞典文版本；同一事件的英文版已在同批 harvest 中並依內容各自 triage。MFN 與公司站對每則發布都同時發瑞典文與英文，URL hash 不同故各成一筆 lead",
+        "tier": 4
+      },
       "url": "https://www.sivers-semiconductors.com/press/sivers-styrelse-slutfor-kop-av-aktier-i-enlighet-med-beslutet-vid-arsstamman-i-juni-2026/"
     },
     "lead_c3fa1ca7fd636810e6fababce5ce7f5a": {
@@ -21561,7 +21941,7 @@
       "published_at": "Fri, 29 May 2026 05:00:00 +0000",
       "refs": {},
       "source": "mfn:sivers-semiconductors",
-      "status": "pending",
+      "status": "triaged_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -21572,7 +21952,15 @@
         }
       },
       "title": "Sivers Semiconductors AB (publ), Publishes Interim Report Q1, January - March 2026",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844193+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "SIVE/IQE 為已追蹤標的且有 active thesis；本則屬法定揭露或具名商業事件（訂單／供應協議／稀釋／財報／行事曆），具可逐字查核內容",
+        "tier": 1
+      },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-ab-publ-publishes-interim-report-q1-january-march-2026-a14cb894"
     },
     "lead_c7fdc817e8fdac9bad4573c4a9c9e678": {
@@ -21742,7 +22130,7 @@
       "published_at": "Fri, 03 Jul 2026 16:30:00 +0000",
       "refs": {},
       "source": "sivers:press",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -21753,7 +22141,13 @@
         }
       },
       "title": "Sivers Semiconductors långivare Bootstrap Europe påkallar konvertering av befintligt konvertibelt lån",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844418+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "瑞典文版本；同一事件的英文版已在同批 harvest 中並依內容各自 triage。MFN 與公司站對每則發布都同時發瑞典文與英文，URL hash 不同故各成一筆 lead",
+        "tier": 4
+      },
       "url": "https://www.sivers-semiconductors.com/press/sivers-semiconductors-langivare-bootstrap-europe-pakallar-konvertering-av-befintligt-konvertibelt-lan/"
     },
     "lead_c95925a7449580e24cce7512ebad08b4": {
@@ -22311,7 +22705,7 @@
       "published_at": "Fri, 31 Jul 2026 06:00:00 +0000",
       "refs": {},
       "source": "sivers:press",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -22322,7 +22716,13 @@
         }
       },
       "title": "Change in the Total Number of Shares and Votes in Sivers Semiconductors AB",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844291+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "行政/程序性公告（股數變動、股東會通知與公報、董事持股、lock-up、提名）或財經媒體二手評論（AIM Market Roundup、券商評等、選股文），無可抽取的供應鏈／技術／客戶 structural claim",
+        "tier": 4
+      },
       "url": "https://www.sivers-semiconductors.com/press/change-in-the-total-number-of-shares-and-votes-in-sivers-semiconductors-ab-11/"
     },
     "lead_cdd584e252b586185333a12973d7d69f": {
@@ -23578,10 +23978,18 @@
       "published_at": "Tue, 28 Apr 2026 06:57:00 +0000",
       "refs": {},
       "source": "yahoo:iqe-l",
-      "status": "pending",
+      "status": "triaged_go",
       "themes": {},
       "title": "IQE seals £13m equity raise as it works to complete larger funding package",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844200+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "IQE 為已追蹤標的（pq2 [109] thesis）；Yahoo 聚合僅作觸發器，evidence tier 須由 source-trace 追回 RNS 一手",
+        "tier": 3
+      },
       "url": "https://www.proactiveinvestors.co.uk/companies/news/1091301/iqe-seals-13m-equity-raise-as-it-works-to-complete-larger-funding-package-1091301.html?.tsrc=rss"
     },
     "lead_d7e8d31c0e28967bb10b7f1baeb13d7b": {
@@ -23594,7 +24002,7 @@
       "published_at": "Fri, 31 Jul 2026 06:00:00 +0000",
       "refs": {},
       "source": "sivers:press",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -23605,7 +24013,13 @@
         }
       },
       "title": "Förändring av det totala antalet aktier och röster i Sivers Semiconductors AB",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844422+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "瑞典文版本；同一事件的英文版已在同批 harvest 中並依內容各自 triage。MFN 與公司站對每則發布都同時發瑞典文與英文，URL hash 不同故各成一筆 lead",
+        "tier": 4
+      },
       "url": "https://www.sivers-semiconductors.com/press/forandring-av-det-totala-antalet-aktier-och-roster-i-sivers-semiconductors-ab-11/"
     },
     "lead_d7fd5c6982c274f3d2426c6d6b2fdafe": {
@@ -23916,7 +24330,7 @@
       "published_at": "Tue, 30 Jun 2026 17:00:00 +0000",
       "refs": {},
       "source": "mfn:sivers-semiconductors",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -23927,7 +24341,13 @@
         }
       },
       "title": "Change in the Total Number of Shares and Votes in Sivers Semiconductors AB",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844296+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "行政/程序性公告（股數變動、股東會通知與公報、董事持股、lock-up、提名）或財經媒體二手評論（AIM Market Roundup、券商評等、選股文），無可抽取的供應鏈／技術／客戶 structural claim",
+        "tier": 4
+      },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/change-in-the-total-number-of-shares-and-votes-in-sivers-semiconductors-ab-c4480cb7"
     },
     "lead_dbc94158a40139d8ae06d646603deb10": {
@@ -24448,10 +24868,18 @@
       "published_at": "Mon, 27 Apr 2026 16:00:00 +0000",
       "refs": {},
       "source": "yahoo:iqe-l",
-      "status": "pending",
+      "status": "triaged_go",
       "themes": {},
       "title": "MACOM to Enter into Agreements to Further Strengthen Supply Chain",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844205+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "IQE 為已追蹤標的（pq2 [109] thesis）；Yahoo 聚合僅作觸發器，evidence tier 須由 source-trace 追回 RNS 一手",
+        "tier": 3
+      },
       "url": "https://finance.yahoo.com/markets/stocks/articles/macom-enter-agreements-further-strengthen-160000950.html?.tsrc=rss"
     },
     "lead_e10152e8e0e54f6f01a0fe1d6d619a10": {
@@ -25065,10 +25493,16 @@
       "published_at": "Mon, 15 Jun 2026 12:47:18 +0000",
       "refs": {},
       "source": "yahoo:iqe-l",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {},
       "title": "AIM Market Roundup: Pri0r1ty Intelligence, IQE, Union Jack Oil",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844300+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "行政/程序性公告（股數變動、股東會通知與公報、董事持股、lock-up、提名）或財經媒體二手評論（AIM Market Roundup、券商評等、選股文），無可抽取的供應鏈／技術／客戶 structural claim",
+        "tier": 4
+      },
       "url": "https://www.thearmchairtrader.com/aim-market-roundup/pri0r1ty-intelligence-iqe-union-jack-oil/?.tsrc=rss"
     },
     "lead_e75d4f496e44d27bd5f1b5b8f7ad0e24": {
@@ -25211,7 +25645,7 @@
       "published_at": "Tue, 30 Jun 2026 17:00:00 +0000",
       "refs": {},
       "source": "mfn:sivers-semiconductors",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -25222,7 +25656,13 @@
         }
       },
       "title": "Förändring av det totala antalet aktier och röster i Sivers Semiconductors AB",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844427+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "瑞典文版本；同一事件的英文版已在同批 harvest 中並依內容各自 triage。MFN 與公司站對每則發布都同時發瑞典文與英文，URL hash 不同故各成一筆 lead",
+        "tier": 4
+      },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/forandring-av-det-totala-antalet-aktier-och-roster-i-sivers-semiconductors-ab-a1f4fed1"
     },
     "lead_e7d012889c91027f839151169ba60e6d": {
@@ -25281,7 +25721,7 @@
       "published_at": "Wed, 20 May 2026 05:00:00 +0000",
       "refs": {},
       "source": "mfn:sivers-semiconductors",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -25292,7 +25732,13 @@
         }
       },
       "title": "Sivers Semiconductors Welcomes the Nomination of New Board Members Joakim Nideborn and Helena Svancar",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844304+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "行政/程序性公告（股數變動、股東會通知與公報、董事持股、lock-up、提名）或財經媒體二手評論（AIM Market Roundup、券商評等、選股文），無可抽取的供應鏈／技術／客戶 structural claim",
+        "tier": 4
+      },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-welcomes-the-nomination-of-new-board-members-joakim-nideborn-and-helena-svancar-83998a2b"
     },
     "lead_e82207f384c613479e9e4f48ef8ffe8f": {
@@ -25652,7 +26098,7 @@
       "published_at": "Mon, 11 May 2026 10:59:19 +0000",
       "refs": {},
       "source": "mfn:sivers-semiconductors",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -25663,7 +26109,13 @@
         }
       },
       "title": "Bulletin from the Extraordinary General Meeting in Sivers Semiconductors AB (publ) on 11 May 2026",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844309+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "行政/程序性公告（股數變動、股東會通知與公報、董事持股、lock-up、提名）或財經媒體二手評論（AIM Market Roundup、券商評等、選股文），無可抽取的供應鏈／技術／客戶 structural claim",
+        "tier": 4
+      },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/bulletin-from-the-extraordinary-general-meeting-in-sivers-semiconductors-ab-publ-on-11-may-2026-a51ce490"
     },
     "lead_ebb4a71c7f16ef7faf37e8d17bb2d337": {
@@ -25770,7 +26222,7 @@
       "published_at": "Mon, 13 Jul 2026 05:00:00 +0000",
       "refs": {},
       "source": "mfn:sivers-semiconductors",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -25781,7 +26233,13 @@
         }
       },
       "title": "Sivers Semiconductors: Sivers Board Completes Purchase of Shares as Approved at the June 2026 AGM",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844314+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "行政/程序性公告（股數變動、股東會通知與公報、董事持股、lock-up、提名）或財經媒體二手評論（AIM Market Roundup、券商評等、選股文），無可抽取的供應鏈／技術／客戶 structural claim",
+        "tier": 4
+      },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-sivers-board-completes-purchase-of-shares-as-approved-at-the-june-2026-agm-2300464a"
     },
     "lead_edb7d8187be32344b2f90b0dfc7bcf11": {
@@ -26017,7 +26475,7 @@
       "published_at": "Tue, 19 May 2026 05:00:00 +0000",
       "refs": {},
       "source": "mfn:sivers-semiconductors",
-      "status": "pending",
+      "status": "triaged_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -26028,7 +26486,15 @@
         }
       },
       "title": "Microelectronics Commons Strengthens Commitment to Sivers Semiconductors With Year 2 Funding",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844211+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "SIVE/IQE 為已追蹤標的且有 active thesis；本則屬法定揭露或具名商業事件（訂單／供應協議／稀釋／財報／行事曆），具可逐字查核內容",
+        "tier": 1
+      },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/microelectronics-commons-strengthens-commitment-to-sivers-semiconductors-with-year-2-funding-8ddd55df"
     },
     "lead_f05f3fd8a753c084704afc3b06330a47": {
@@ -26288,7 +26754,7 @@
       "published_at": "Thu, 09 Jul 2026 05:00:00 +0000",
       "refs": {},
       "source": "sivers:press",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -26299,7 +26765,13 @@
         }
       },
       "title": "Sivers Semiconductors uppdaterar sin finansiella kalender",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844430+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "瑞典文版本；同一事件的英文版已在同批 harvest 中並依內容各自 triage。MFN 與公司站對每則發布都同時發瑞典文與英文，URL hash 不同故各成一筆 lead",
+        "tier": 4
+      },
       "url": "https://www.sivers-semiconductors.com/press/sivers-semiconductors-uppdaterar-sin-finansiella-kalender/"
     },
     "lead_f35d5676219a38f12f600e64ef76590e": {
@@ -26312,10 +26784,16 @@
       "published_at": "Tue, 26 May 2026 16:33:06 +0000",
       "refs": {},
       "source": "yahoo:iqe-l",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {},
       "title": "AIM Market Roundup: Bradda Head, IQE, Kazera Global",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844318+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "行政/程序性公告（股數變動、股東會通知與公報、董事持股、lock-up、提名）或財經媒體二手評論（AIM Market Roundup、券商評等、選股文），無可抽取的供應鏈／技術／客戶 structural claim",
+        "tier": 4
+      },
       "url": "https://www.thearmchairtrader.com/aim-market-roundup/bradda-head-iqe-kazera-global/?.tsrc=rss"
     },
     "lead_f3cf03ef3623277171d343ff96e81a95": {
@@ -26391,7 +26869,7 @@
       "published_at": "Mon, 13 Jul 2026 05:00:00 +0000",
       "refs": {},
       "source": "sivers:press",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -26402,7 +26880,13 @@
         }
       },
       "title": "Sivers Board Completes Purchase of Shares as Approved at the June 2026 AGM",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844322+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "行政/程序性公告（股數變動、股東會通知與公報、董事持股、lock-up、提名）或財經媒體二手評論（AIM Market Roundup、券商評等、選股文），無可抽取的供應鏈／技術／客戶 structural claim",
+        "tier": 4
+      },
       "url": "https://www.sivers-semiconductors.com/press/sivers-board-completes-purchase-of-shares-as-approved-at-the-june-2026-agm/"
     },
     "lead_f3e56795bfca2293387a43788e5e450c": {
@@ -26449,7 +26933,7 @@
       "published_at": "Wed, 15 Apr 2026 22:40:00 +0000",
       "refs": {},
       "source": "mfn:sivers-semiconductors",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -26460,7 +26944,13 @@
         }
       },
       "title": "Sivers Semiconductors AB utvärderar en potentiell dubbelnotering av bolagets aktier på Nasdaq New York",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844434+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "瑞典文版本；同一事件的英文版已在同批 harvest 中並依內容各自 triage。MFN 與公司站對每則發布都同時發瑞典文與英文，URL hash 不同故各成一筆 lead",
+        "tier": 4
+      },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-ab-utvarderar-en-potentiell-dubbelnotering-av-bolagets-aktier-pa-nasdaq-new-york-d26a48eb"
     },
     "lead_f4c9a6456a0b346e060a8b9136b7d2e1": {
@@ -26591,7 +27081,7 @@
       "published_at": "Mon, 11 May 2026 10:59:19 +0000",
       "refs": {},
       "source": "mfn:sivers-semiconductors",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -26602,7 +27092,13 @@
         }
       },
       "title": "Stämmokommuniké från extra bolagsstämma den 11 maj 2026 i Sivers Semiconductors AB (publ)",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844438+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "瑞典文版本；同一事件的英文版已在同批 harvest 中並依內容各自 triage。MFN 與公司站對每則發布都同時發瑞典文與英文，URL hash 不同故各成一筆 lead",
+        "tier": 4
+      },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/stammokommunike-fran-extra-bolagsstamma-den-11-maj-2026-i-sivers-semiconductors-ab-publ-6047d633"
     },
     "lead_f5f85aea8cfdf80892631a51e4c05f77": {
@@ -26961,7 +27457,7 @@
       "published_at": "Fri, 31 Jul 2026 06:00:00 +0000",
       "refs": {},
       "source": "mfn:sivers-semiconductors",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -26972,7 +27468,13 @@
         }
       },
       "title": "Change in the Total Number of Shares and Votes in Sivers Semiconductors AB",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844326+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "行政/程序性公告（股數變動、股東會通知與公報、董事持股、lock-up、提名）或財經媒體二手評論（AIM Market Roundup、券商評等、選股文），無可抽取的供應鏈／技術／客戶 structural claim",
+        "tier": 4
+      },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/change-in-the-total-number-of-shares-and-votes-in-sivers-semiconductors-ab-39de956e"
     },
     "lead_f8b105284a2de000d25fbd902912ae77": {
@@ -27187,7 +27689,7 @@
       "published_at": "Tue, 09 Jun 2026 05:00:00 +0000",
       "refs": {},
       "source": "mfn:sivers-semiconductors",
-      "status": "pending",
+      "status": "triaged_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -27198,7 +27700,15 @@
         }
       },
       "title": "ALL.SPACE Awards $8.2M Production Order to Sivers Semiconductors for Ka-Band Beamforming ICs",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844216+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "SIVE/IQE 為已追蹤標的且有 active thesis；本則屬法定揭露或具名商業事件（訂單／供應協議／稀釋／財報／行事曆），具可逐字查核內容",
+        "tier": 1
+      },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/all-space-awards-8-2m-production-order-to-sivers-semiconductors-for-ka-band-beamforming-ics-c26f39e4"
     },
     "lead_fcbf2bd4a87932e4d67c12f0c188c3ac": {
@@ -27299,7 +27809,7 @@
       "published_at": "Fri, 29 May 2026 05:00:00 +0000",
       "refs": {},
       "source": "mfn:sivers-semiconductors",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -27310,7 +27820,13 @@
         }
       },
       "title": "Sivers Semiconductors AB (publ), publicerar delårsrapport för första kvartalet, januari - mars 2026",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-11T23:42:16.844442+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "瑞典文版本；同一事件的英文版已在同批 harvest 中並依內容各自 triage。MFN 與公司站對每則發布都同時發瑞典文與英文，URL hash 不同故各成一筆 lead",
+        "tier": 4
+      },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-ab-publ-publicerar-delarsrapport-for-forsta-kvartalet-januari-mars-2026-b2e0d82a"
     },
     "lead_fd354516dc2093159fc7d48737016b84": {

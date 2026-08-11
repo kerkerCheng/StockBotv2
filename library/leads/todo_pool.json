@@ -1853,10 +1853,11 @@
       "added_at": "2026-08-11T13:36:08.757245+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 119,
-      "reason": null,
+      "reason": "使用者於 2026-08-12 確認關閉。底層 cohort dc_a94362af（co:applied_optoelectronics）已於 2026-08-11 reassess，expiry 對齊 Q3 財報（2026-11-20），action 為 NO_ACTION，collector 不再產出此項。",
+      "receipt": null,
       "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "drop",
+      "resolved_at": "2026-08-11T23:35:35.088785+00:00",
       "source": "decision_lab",
       "source_cleared": {
         "at": "2026-08-11T14:18:54.095157+00:00",
@@ -4178,6 +4179,15 @@
       "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
       "type": "decision_review",
       "verb": "source_cleared"
+    },
+    {
+      "at": "2026-08-11T23:35:35.088785+00:00",
+      "n": 119,
+      "reason": "使用者於 2026-08-12 確認關閉。底層 cohort dc_a94362af（co:applied_optoelectronics）已於 2026-08-11 reassess，expiry 對齊 Q3 財報（2026-11-20），action 為 NO_ACTION，collector 不再產出此項。",
+      "receipt": null,
+      "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
+      "type": "decision_review",
+      "verb": "drop"
     }
   ],
   "next_n": 124,
