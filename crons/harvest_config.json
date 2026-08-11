@@ -16,7 +16,7 @@
   "_feeds_note": "2026-07-25：移除 aleabitoreddit substack feed——查證確認他的產出在 X 不在 Substack（該 feed 至今只有 1 篇 2026-05-19 舊文），已由上方 x_accounts 覆蓋；他若發長文也會在 X 貼連結。留空陣列供未來其他 RSS 來源使用。",
   "feeds": [],
   "edgar_watch": {
-    "note": "只記 filing metadata（form/日期/URL），不下載全文。8-K/10-K/10-Q/Form 4 高優先；S-8 等註冊雜訊交 triage 判。下載＋抽取仍由使用者點名 research 動詞觸發。",
+    "note": "只記 filing metadata（form/日期/URL），不下載全文。8-K/10-K/10-Q/Form 4 高優先；S-8 等註冊雜訊交 triage 判。下載＋抽取仍由使用者點名 research 動詞觸發。⚠ forms 是 exact match（fetchers/edgar.py get_filings），不做 prefix 比對：把 ticker 加進 watch 但該事件的 form 不在下方清單，watcher 看起來在跑卻永遠看不到它——CCXI 就是這樣，加進 watch 是為了 [74]/[114] 等的 S-4，但 S-4 原本不在清單。S-4/S-4A 為 SPAC 併購財務揭露本體（8-K/425 只是宣布遞交，不含財務）。",
     "tickers": [
       "AAOI",
       "AMAT",
@@ -33,7 +33,9 @@
       "8-K",
       "10-K",
       "10-Q",
-      "4"
+      "4",
+      "S-4",
+      "S-4/A"
     ],
     "lookback_count": 8
   }
