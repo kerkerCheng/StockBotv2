@@ -1704,58 +1704,55 @@
       "added_at": "2026-08-09T22:36:03.607769+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 111,
-      "reason": null,
+      "reason": "根因已除：holdings_digest 不再涵蓋市值，持倉確認不會因股價變動而失效；三筆 reassess 後皆 NO_ACTION，collector 不再產出",
+      "receipt": null,
       "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "drop",
+      "resolved_at": "2026-08-11T00:14:15.219611+00:00",
       "source": "decision_lab",
+      "source_cleared": {
+        "at": "2026-08-11T00:13:47.126670+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
       "title": "REVIEW — co:applied_optoelectronics",
-      "type": "decision_review",
-      "waiting_on": {
-        "derived_from_blockers": true,
-        "reason": "所有 blocker 都不需要使用者決定",
-        "set_at": "2026-08-09T22:36:03.607678+00:00",
-        "trigger": "僅剩系統內部狀態，重新 reassess 即可（無使用者決定）",
-        "until": null
-      }
+      "type": "decision_review"
     },
     {
       "added_at": "2026-08-09T22:36:03.607769+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 112,
-      "reason": null,
+      "reason": "根因已除：holdings_digest 不再涵蓋市值，持倉確認不會因股價變動而失效；三筆 reassess 後皆 NO_ACTION，collector 不再產出",
+      "receipt": null,
       "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "drop",
+      "resolved_at": "2026-08-11T00:14:15.378715+00:00",
       "source": "decision_lab",
+      "source_cleared": {
+        "at": "2026-08-11T00:13:47.126670+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
       "title": "REVIEW — co:axt",
-      "type": "decision_review",
-      "waiting_on": {
-        "derived_from_blockers": true,
-        "reason": "所有 blocker 都不需要使用者決定",
-        "set_at": "2026-08-09T22:36:03.607707+00:00",
-        "trigger": "僅剩系統內部狀態，重新 reassess 即可（無使用者決定）",
-        "until": null
-      }
+      "type": "decision_review"
     },
     {
       "added_at": "2026-08-09T22:36:03.607769+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 113,
-      "reason": null,
+      "reason": "根因已除：holdings_digest 不再涵蓋市值，持倉確認不會因股價變動而失效；三筆 reassess 後皆 NO_ACTION，collector 不再產出",
+      "receipt": null,
       "ref_id": "dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "drop",
+      "resolved_at": "2026-08-11T00:14:15.541055+00:00",
       "source": "decision_lab",
+      "source_cleared": {
+        "at": "2026-08-11T00:13:47.126670+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
       "title": "REVIEW — co:meta",
-      "type": "decision_review",
-      "waiting_on": {
-        "derived_from_blockers": true,
-        "reason": "所有 blocker 都不需要使用者決定",
-        "set_at": "2026-08-09T22:36:03.607746+00:00",
-        "trigger": "僅剩系統內部狀態，重新 reassess 即可（無使用者決定）",
-        "until": null
-      }
+      "type": "decision_review"
     }
   ],
   "log": [
@@ -3709,6 +3706,60 @@
       "ref_id": "dc_317c2897cdcffda26c2c2e0e79074670",
       "type": "decision_review",
       "verb": "pq1_awaiting_approval"
+    },
+    {
+      "at": "2026-08-11T00:13:47.126670+00:00",
+      "n": 111,
+      "reason": "來源本輪成功執行，但不再產出此項",
+      "receipt": null,
+      "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
+      "type": "decision_review",
+      "verb": "source_cleared"
+    },
+    {
+      "at": "2026-08-11T00:13:47.126670+00:00",
+      "n": 112,
+      "reason": "來源本輪成功執行，但不再產出此項",
+      "receipt": null,
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "type": "decision_review",
+      "verb": "source_cleared"
+    },
+    {
+      "at": "2026-08-11T00:13:47.126670+00:00",
+      "n": 113,
+      "reason": "來源本輪成功執行，但不再產出此項",
+      "receipt": null,
+      "ref_id": "dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
+      "type": "decision_review",
+      "verb": "source_cleared"
+    },
+    {
+      "at": "2026-08-11T00:14:15.219611+00:00",
+      "n": 111,
+      "reason": "根因已除：holdings_digest 不再涵蓋市值，持倉確認不會因股價變動而失效；三筆 reassess 後皆 NO_ACTION，collector 不再產出",
+      "receipt": null,
+      "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
+      "type": "decision_review",
+      "verb": "drop"
+    },
+    {
+      "at": "2026-08-11T00:14:15.378715+00:00",
+      "n": 112,
+      "reason": "根因已除：holdings_digest 不再涵蓋市值，持倉確認不會因股價變動而失效；三筆 reassess 後皆 NO_ACTION，collector 不再產出",
+      "receipt": null,
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "type": "decision_review",
+      "verb": "drop"
+    },
+    {
+      "at": "2026-08-11T00:14:15.541055+00:00",
+      "n": 113,
+      "reason": "根因已除：holdings_digest 不再涵蓋市值，持倉確認不會因股價變動而失效；三筆 reassess 後皆 NO_ACTION，collector 不再產出",
+      "receipt": null,
+      "ref_id": "dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
+      "type": "decision_review",
+      "verb": "drop"
     }
   ],
   "next_n": 114,
