@@ -75,38 +75,44 @@ def _strip_html(html: str) -> str:
 
 
 def get_cik(ticker: str) -> str | None:
-    """ticker → CIK（10 位補零格式）。"""
-    url = f"https://www.sec.gov/cgi-bin/browse-edgar?company=&CIK={ticker}&type=&dateb=&owner=include&count=1&search_text=&action=getcompany&output=atom"
-    headers = _build_headers()
-    headers["Host"] = "www.sec.gov"
-    rate_sleep()
-    try:
-        resp = requests.get(url, headers=headers, timeout=15)
-        resp.raise_for_status()
-        # Parse CIK from response
-        match = re.search(r"CIK=(\d+)", resp.text)
-        if match:
-            return match.group(1).zfill(10)
-    except Exception as e:
-        print(f"[edgar] CIK lookup failed for {ticker}: {e}", file=sys.stderr)
+    """ticker → CIK（10 位補零格式）。
 
-    # Fallback: company_tickers JSON
+    company_tickers.json 是 SEC 現行 ticker→CIK 唯一權威，優先查它；browse-edgar 的
+    `CIK=<ticker>` 參數會做寬鬆公司搜尋，命中已下市公司的**歷史** ticker（例：CCXI 曾是
+    ChemoCentryx 舊代號，2022 年被 Amgen 收購下市後 ticker 被 Churchill Capital Corp XI
+    回收，但 browse-edgar 仍優先吐出舊 CIK），只在 company_tickers.json 找不到時才當備援。
+    """
     rate_sleep()
     try:
-        headers2 = _build_headers()
-        headers2["Host"] = "www.sec.gov"
-        r2 = requests.get(
+        headers = _build_headers()
+        headers["Host"] = "www.sec.gov"
+        resp = requests.get(
             "https://www.sec.gov/files/company_tickers.json",
-            headers=headers2, timeout=15
+            headers=headers, timeout=15
         )
-        r2.raise_for_status()
-        data = r2.json()
+        resp.raise_for_status()
+        data = resp.json()
         ticker_upper = ticker.upper()
         for entry in data.values():
             if entry.get("ticker", "").upper() == ticker_upper:
                 return str(entry["cik_str"]).zfill(10)
     except Exception as e:
-        print(f"[edgar] company_tickers fallback failed: {e}", file=sys.stderr)
+        print(f"[edgar] company_tickers lookup failed for {ticker}: {e}", file=sys.stderr)
+
+    # Fallback: browse-edgar 寬鬆搜尋（可能命中歷史 ticker，僅在權威來源找不到時使用）
+    url = f"https://www.sec.gov/cgi-bin/browse-edgar?company=&CIK={ticker}&type=&dateb=&owner=include&count=1&search_text=&action=getcompany&output=atom"
+    headers2 = _build_headers()
+    headers2["Host"] = "www.sec.gov"
+    rate_sleep()
+    try:
+        resp2 = requests.get(url, headers=headers2, timeout=15)
+        resp2.raise_for_status()
+        match = re.search(r"CIK=(\d+)", resp2.text)
+        if match:
+            print(f"[edgar] WARNING: {ticker} 只在 browse-edgar 寬鬆搜尋命中，未經 company_tickers.json 驗證，CIK 可能是歷史/已下市公司", file=sys.stderr)
+            return match.group(1).zfill(10)
+    except Exception as e:
+        print(f"[edgar] browse-edgar fallback failed for {ticker}: {e}", file=sys.stderr)
 
     return None
 
