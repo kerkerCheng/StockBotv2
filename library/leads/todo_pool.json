@@ -1773,6 +1773,18 @@
         "trigger": "CCXI/Agility S-4 公開揭露財務，或 4Q 2026 closing 後登記 AGLT（與 [74] 同一條件；[75] 亦為重複 cohort）",
         "until": "2026-12-31"
       }
+    },
+    {
+      "added_at": "2026-08-11T05:20:03.944967+00:00",
+      "hint": "核准 exact graph delta；Decision handoff：co:agility_robotics。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 115,
+      "reason": null,
+      "ref_id": "ra_319c1ee97cc94aa392ed4cc248dd21ef",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "Agility Robotics（CCXI／未來 AGLT）致動器與稀土供應集中度風險",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -3809,6 +3821,6 @@
       "verb": "pending"
     }
   ],
-  "next_n": 115,
+  "next_n": 116,
   "schema_version": "1"
 }

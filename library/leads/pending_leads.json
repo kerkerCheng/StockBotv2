@@ -2228,6 +2228,138 @@
       "result": "ok",
       "run_at": "2026-08-10T22:32:48.229188+00:00",
       "source": "edgar:GFS"
+    },
+    {
+      "new": 4,
+      "result": "ok",
+      "run_at": "2026-08-11T05:06:00.638012+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T05:06:01.986262+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T05:06:03.079697+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T05:06:04.201220+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 8,
+      "result": "ok",
+      "run_at": "2026-08-11T05:06:05.241734+00:00",
+      "source": "edgar:CCXI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T05:06:06.344321+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T05:06:07.296079+00:00",
+      "source": "edgar:GFS"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T05:06:08.308459+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T05:06:09.423438+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 8,
+      "result": "ok",
+      "run_at": "2026-08-11T05:06:10.562279+00:00",
+      "source": "edgar:META"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T05:06:11.646923+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T05:12:49.418609+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T05:12:50.323459+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T05:12:51.071672+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T05:12:51.796074+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 8,
+      "result": "ok",
+      "run_at": "2026-08-11T05:12:52.616870+00:00",
+      "source": "edgar:CCXI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T05:12:53.378734+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T05:12:54.109411+00:00",
+      "source": "edgar:GFS"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T05:12:54.869924+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T05:12:55.580884+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T05:12:56.332349+00:00",
+      "source": "edgar:META"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-11T05:12:57.096256+00:00",
+      "source": "edgar:TSEM"
     }
   ],
   "leads": {
@@ -2763,11 +2895,22 @@
         "research_report": "docs/reports/serenity_30d_research_2026-07-29.md",
         "trace_attempts_ref": "docs/reports/serenity_30d_research_2026-07-29.md#截圖paywall判讀",
         "trace_next_trigger": "canonical_ft_or_nikkei_text_or_new_official_event",
+        "trace_requeue_trigger": "related_triaged_lead:lead_e1daca4662d70cba294c939a608ae05c",
+        "trace_requeued_at": "2026-08-11T05:08:15.230067+00:00",
         "trace_requires_user": "false",
-        "trace_status": "isolated_tier_3"
+        "trace_status": "isolated_tier_3",
+        "trace_trigger_entities": [
+          "AMZN",
+          "DASH",
+          "JD",
+          "MELI",
+          "UBER"
+        ],
+        "trace_trigger_event_ref": "lead:lead_e1daca4662d70cba294c939a608ae05c",
+        "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {
         "robotics": {
           "counter_only": false,
@@ -2779,15 +2922,33 @@
       },
       "title": "Nikkei - $JD E-Commerce Giant CEO warns \"Robots Will Replace 700,000 Delivery Workers\". Per FT's earlier piece last month: The 700,000 delivery personnel working for the firm will be replaced by robots, highlighting how rapid automation has become a new threat to China's already severe job market. Liu Qiangdong, revealed that the company has signed contracts with approximately 120 schools to retrain its delivery workers, enabling them to transition into new roles such as robot repair and maintenance... \"Beijing has started to track AI’s hit to jobs as a national priority.\" This follows other corporate strategy reports like $AMZN, of avoiding 600,000 future hires with robots. But it's very interesting to see the shift in worker roles to robot support. Maybe $DASH to $UBER to $MELI, we'll all start to see this rollout following China. There's a lot of retail disbelief over humanoid/robotics commercialization. But feels like the direction industry is heading down is pretty clear.",
       "triage": {
-        "decided_at": "2026-07-29T14:00:33.049926+00:00",
+        "decided_at": "2026-08-11T05:08:15.230067+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true,
           "user_requested": true
         },
-        "reason": "Robotics 探索：具名公司／零件／政策與可追查數字或原始事件；進 pq1 追官方與客戶端來源，不把 Serenity 或圖片視為證據",
+        "reason": "新 triage PASS lead lead_e1daca4662d70cba294c939a608ae05c 與 parked trace 共用具名標的 AMZN；事件觸發 bounded pq1 重查",
         "tier": 4
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-11T05:08:15.230067+00:00",
+          "superseded_reason": "新 triage PASS lead lead_e1daca4662d70cba294c939a608ae05c 與 parked trace 共用具名標的 AMZN；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_e1daca4662d70cba294c939a608ae05c",
+          "triage": {
+            "decided_at": "2026-07-29T14:00:33.049926+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true,
+              "user_requested": true
+            },
+            "reason": "Robotics 探索：具名公司／零件／政策與可追查數字或原始事件；進 pq1 追官方與客戶端來源，不把 Serenity 或圖片視為證據",
+            "tier": 4
+          }
+        }
+      ],
       "url": "https://x.com/aleabitoreddit/status/2073523410643366242"
     },
     "lead_061fe889e9090fd14b4711fafda3fafe": {
@@ -3093,14 +3254,14 @@
         "campaign_topic": "photonics",
         "campaign_window_end": "2026-07-29T13:46:25Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
-        "parked_reason": "new_Aeva_event_did_not_unlock_Rosenblatt_or_B_Riley_primary_note_or_Broadcom_AWS_architecture_source",
+        "parked_reason": "無法找到 Rosenblatt 逐字報告核對 VCSEL vs CW DFB／UHP CW 雷射架構論述；且推文指稱的 B.Riley『AAOI sell report 砍 40-50% transceiver TAM』與可查證的 B.Riley 分析方向不符——已知 B.Riley 是上調至 Neutral／目標價 15→54 美元並看好 Amazon 800G 需求，非維持 Sell，轉述可能已過時或失真，不產 RA",
         "research_mode": "delta_only",
         "research_outcome": "no_graph_or_decision_delta",
         "research_run": "daily:2026-08-10",
         "trace_attempts_ref": "sivers_official_lidar_gf_onet_jabil_and_aeva_ir_index_2026-08-10",
-        "trace_next_trigger": "canonical_broker_note_or_named_Aeva_Sivers_sourcing_document",
-        "trace_requeue_trigger": "related_triaged_lead:lead_1aa835b32dc4e06468322d132acc925a",
-        "trace_requeued_at": "2026-08-06T22:33:30.263789+00:00",
+        "trace_next_trigger": "若取得 Rosenblatt 或 B.Riley 具名報告逐字原文，且與 SIVE CW DFB 雷射 thesis 直接相關，才重新評估",
+        "trace_requeue_trigger": "related_triaged_lead:lead_e1daca4662d70cba294c939a608ae05c",
+        "trace_requeued_at": "2026-08-11T05:08:15.230067+00:00",
         "trace_requires_user": "false",
         "trace_status": "isolated_tier_3",
         "trace_trigger_entities": [
@@ -3109,7 +3270,7 @@
           "SIVE",
           "co:applied_optoelectronics"
         ],
-        "trace_trigger_event_ref": "lead:lead_1aa835b32dc4e06468322d132acc925a",
+        "trace_trigger_event_ref": "lead:lead_e1daca4662d70cba294c939a608ae05c",
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
@@ -3132,13 +3293,13 @@
       },
       "title": "Regarding $AMZN RNG + OpenAI’s MRC and VCSELs. In what appears to be an indirect response on B. Riley's $AAOI sell report regarding optimizations that \"flattens networks and cuts transceiver TAM 40-50%\". Rosenblatt TLDR: They've already modeled for this, even though each XPU may use fewer transceivers. The number of XPUs is growing so quickly that total optical demand should still rise. On lasers architectures for CPO: VCSELs are useful as a credible bridge for NPO/short reach. Ideal architecture though for CPO is UHP CW over other lasers, and cites Broadcom for that statements. Which happens to supports my core $SIVE thesis. I feel like Rosenblatt and I share the same views on a lot of things, I like the way they roll.",
       "triage": {
-        "decided_at": "2026-08-06T22:33:30.263789+00:00",
+        "decided_at": "2026-08-11T05:08:15.230067+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true,
           "user_requested": true
         },
-        "reason": "新 triage PASS lead lead_1aa835b32dc4e06468322d132acc925a 與 parked trace 共用具名標的 SIVE；事件觸發 bounded pq1 重查",
+        "reason": "新 triage PASS lead lead_e1daca4662d70cba294c939a608ae05c 與 parked trace 共用具名標的 AMZN；事件觸發 bounded pq1 重查",
         "tier": 4
       },
       "triage_history": [
@@ -3171,6 +3332,22 @@
               "user_requested": true
             },
             "reason": "新 triage PASS lead lead_7f66b743a034c41f6388aa800f333e62 與 parked trace 共用具名標的 AAOI, SIVE, co:applied_optoelectronics；事件觸發 bounded pq1 重查",
+            "tier": 4
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-11T05:08:15.230067+00:00",
+          "superseded_reason": "新 triage PASS lead lead_e1daca4662d70cba294c939a608ae05c 與 parked trace 共用具名標的 AMZN；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_e1daca4662d70cba294c939a608ae05c",
+          "triage": {
+            "decided_at": "2026-08-06T22:33:30.263789+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true,
+              "user_requested": true
+            },
+            "reason": "新 triage PASS lead lead_1aa835b32dc4e06468322d132acc925a 與 parked trace 共用具名標的 SIVE；事件觸發 bounded pq1 重查",
             "tier": 4
           }
         }
@@ -3644,6 +3821,32 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2074019505932845352"
+    },
+    "lead_0cf48c49ce64319ab2539da52196b068": {
+      "entities": {
+        "company_ids": [
+          "co:meta"
+        ],
+        "tickers": [
+          "META"
+        ]
+      },
+      "first_seen": "2026-08-11T05:06:10.562088+00:00",
+      "lead_id": "lead_0cf48c49ce64319ab2539da52196b068",
+      "published_at": "2026-07-29",
+      "refs": {},
+      "source": "edgar:META",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "META 4 filed 2026-07-29",
+      "triage": {
+        "decided_at": "2026-08-11T05:08:39.063159+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "例行內部人 Form 4 持股變動申報，無可抽取的供應鏈/技術/客戶主張",
+        "tier": 4
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1326801/000095010326011342/xslF345X06/ownership.xml"
     },
     "lead_0d354d118432139af93f2f07f5623ff2": {
       "entities": {
@@ -4168,6 +4371,41 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2074951295027568736"
+    },
+    "lead_17864efa590ef84785c24a4ed01004c5": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "CCXI"
+        ]
+      },
+      "first_seen": "2026-08-11T05:12:52.616521+00:00",
+      "lead_id": "lead_17864efa590ef84785c24a4ed01004c5",
+      "published_at": "2026-03-26",
+      "refs": {},
+      "source": "edgar:CCXI",
+      "status": "triaged_go",
+      "themes": {
+        "robotics": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CCXI"
+          ]
+        }
+      },
+      "title": "CCXI 10-K filed 2026-03-26",
+      "triage": {
+        "decided_at": "2026-08-11T05:13:15.888250+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true,
+          "novelty": true
+        },
+        "reason": "CIK 修正後首次抓到正確 Churchill Capital Corp XI（CCXI）一手 filing；robotics 主題核心公司，Agility Robotics 併購交易一手文件",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/2074973/000121390026034863/ea0282743-10k_churchill11.htm"
     },
     "lead_18364e727aae3737941be1d12d8f086e": {
       "entities": {
@@ -5621,6 +5859,38 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/707549/000070754926000033/lrcx-20260729.htm"
     },
+    "lead_2a65cf2b13969a40fc093c5e090c8d9f": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "CCXI"
+        ]
+      },
+      "first_seen": "2026-08-11T05:06:05.241178+00:00",
+      "lead_id": "lead_2a65cf2b13969a40fc093c5e090c8d9f",
+      "published_at": "2022-10-24",
+      "refs": {},
+      "source": "edgar:CCXI",
+      "status": "triaged_no_go",
+      "themes": {
+        "robotics": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CCXI"
+          ]
+        }
+      },
+      "title": "CCXI 4 filed 2022-10-24",
+      "triage": {
+        "decided_at": "2026-08-11T05:08:39.273657+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "例行內部人 Form 4 持股變動申報，無可抽取的供應鏈/技術/客戶主張",
+        "tier": 4
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1340652/000089924322034089/xslF345X03/doc4.xml"
+    },
     "lead_2b43cb181b7cac79e1ef6a05bad6b150": {
       "entities": {
         "company_ids": [],
@@ -6685,6 +6955,44 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2072922974345445511"
     },
+    "lead_359c76e1b5ba4604a130d611f742085a": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T05:06:00.595272+00:00",
+      "lead_id": "lead_359c76e1b5ba4604a130d611f742085a",
+      "media": [
+        {
+          "cache": {
+            "bytes": 168472,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_359c76e1b5ba4604a130d611f742085a/3_2087029603923791872.jpg",
+            "sha256": "e260ea71107ac16e0109f988ba8076b40ea629f76622c5bf22d4c68a4c6f3038"
+          },
+          "height": 1034,
+          "media_key": "3_2087029603923791872",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HPaeXgGaEAA5gO1.jpg",
+          "width": 1193
+        }
+      ],
+      "published_at": "2026-08-11T04:15:54.000Z",
+      "raw_text": "Holy... We've reached 1,000,000 followers! \n\nIt's genuinely incredible that so many people care to read about my ideas around AI chokepoints and bottlenecks.\n\nFrom substrates, lasers, actuators, memory, power to some of the most niche parts of upstream supply chains.\n\nI've had a lot of fun sharing free thoughts I've come across along the way and tracking whether they get validated over time. \n\nA lot worked out, some haven't, and some are still playing out!\n\nBut honestly, all of this attention has come as a massive surprise to me this year, especially globally, from Sweden, Japan, Korea, to China. \n\nThank you for all your support! I'll be announcing something soon to celebrate.",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "Holy... We've reached 1,000,000 followers! It's genuinely incredible that so many people care to read about my ideas around AI chokepoints and bottlenecks. From substrates, lasers, actuators, memory, power to some of the most niche parts of upstream supply chains. I've had a lot of fun sharing free thoughts I've come across along the way and tracking whether they get validated over time. A lot worked out, some haven't, and some are still playing out! But honestly, all of this attention has come as a massive surprise to me this year, especially globally, from Sweden, Japan, Korea, to China. Thank you for all your support! I'll be announcing something soon to celebrate.",
+      "triage": {
+        "decided_at": "2026-08-11T05:08:52.467753+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "1M followers 慶祝貼文，無具體公司/數字/主張可查核",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2087030220213870632"
+    },
     "lead_362b47c2ab593d8ad2f06d2fcc0e59a2": {
       "entities": {
         "company_ids": [],
@@ -6770,6 +7078,38 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2074109998544846954"
+    },
+    "lead_381b8a554b089b34a9f31e841f4aa05e": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "CCXI"
+        ]
+      },
+      "first_seen": "2026-08-11T05:06:05.241473+00:00",
+      "lead_id": "lead_381b8a554b089b34a9f31e841f4aa05e",
+      "published_at": "2022-10-24",
+      "refs": {},
+      "source": "edgar:CCXI",
+      "status": "triaged_no_go",
+      "themes": {
+        "robotics": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CCXI"
+          ]
+        }
+      },
+      "title": "CCXI 4 filed 2022-10-24",
+      "triage": {
+        "decided_at": "2026-08-11T05:08:39.481069+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "例行內部人 Form 4 持股變動申報，無可抽取的供應鏈/技術/客戶主張",
+        "tier": 4
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1340652/000089924322034081/xslF345X03/doc4.xml"
     },
     "lead_38941d65f87191b303cd3fa4b70e59f8": {
       "entities": {
@@ -7980,7 +8320,7 @@
         "ontology_status": "approved",
         "original_claim_status": "partial",
         "outcome": "parked；未產生 prepared RA",
-        "parked_reason": "新觸發的 OCP APAC／Unitree 事件只與 LITE、NVDA 等標的重疊，未提供新的 Hesai／NVIDIA 合作、DoD／FCC／法院狀態、firmware incident RCA，或 OUST／AEVA／LITE／SIVE 具名供應文件；delta-only 官方查找亦無 material evidence delta，不產 RA。",
+        "parked_reason": "Hesai DoD 認定與 Nvidia lidar 合作為已查證一手事實，但推文所稱『對 LITE/SIVE 上游雷射供應商利多』屬作者二階推論，無具體可查核的供應鏈 edge（Hesai 是 lidar 感測器不是雷射供應商本身，未指名 LITE/SIVE 實際客戶關係）",
         "pq2_item": "61",
         "research_bundle_id": "serenity_robotics_20260729",
         "research_mode": "delta_only",
@@ -7990,14 +8330,14 @@
         "storage_permission": "repo_excerpt",
         "trace_access_method": "official_company_page+official_government_index+public_transcript",
         "trace_attempts_ref": "既有 Hesai/NVIDIA/DoD/Reuters/CNBC/Lumentum/Ouster/Sivers bundle＋2026-08-11 OCP related-entity delta audit與官方 exact search",
-        "trace_next_trigger": "DoD／FCC／court legal status change；official incident RCA；OUST／AEVA／LITE／SIVE filing names supplier or customer relation",
+        "trace_next_trigger": "若未來有具名文件指出 LITE 或 SIVE 與西方 lidar 廠商（OUST/AEVA）有直接雷射供應合約，才重新評估",
         "trace_origin_entity": "Hesai Technology；NVIDIA；U.S. government records；CNBC",
         "trace_origin_linkage": "independent official corroboration for Hesai/NVIDIA relationship; regulatory claim remains media-led",
         "trace_original_url": "https://www.hesaitech.com/hesai-joins-nvidia-halos-ai-systems-inspection-lab-to-advance-safety-in-autonomous-vehicles-and-robotics/",
-        "trace_requeue_trigger": "related_triaged_lead:lead_3df060cf842783e4709ae6cd86b1be74",
-        "trace_requeued_at": "2026-08-10T22:34:00.650809+00:00",
+        "trace_requeue_trigger": "related_triaged_lead:lead_e1daca4662d70cba294c939a608ae05c",
+        "trace_requeued_at": "2026-08-11T05:08:15.230067+00:00",
         "trace_requires_user": "false",
-        "trace_status": "partial",
+        "trace_status": "tier_1_2_honest_passthrough",
         "trace_trigger_entities": [
           "AEVA",
           "LITE",
@@ -8007,7 +8347,7 @@
           "co:lumentum",
           "co:nvidia"
         ],
-        "trace_trigger_event_ref": "lead:lead_3df060cf842783e4709ae6cd86b1be74",
+        "trace_trigger_event_ref": "lead:lead_e1daca4662d70cba294c939a608ae05c",
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
@@ -8031,13 +8371,13 @@
       },
       "title": "Hesai Technology, a Chinese lidar maker faces US national scrutiny over its expanded partnership with $NVDA and lidar sensors. For $OUST, $AEVA, and Western lidar bros, this is generally positive if competitors get regulated out. Since there were warnings that: Sensors could be disabled or exploited remotely, given Hesai firmware update disabled lidar units on February 29 (as evidence). By second order effect, this is also bullish for upstream laser suppliers too like $LITE and $SIVE that are used in western lidar players.",
       "triage": {
-        "decided_at": "2026-08-10T22:34:00.650809+00:00",
+        "decided_at": "2026-08-11T05:08:15.230067+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true,
           "user_requested": true
         },
-        "reason": "新 triage PASS lead lead_3df060cf842783e4709ae6cd86b1be74 與 parked trace 共用具名標的 LITE, NVDA, co:lumentum, co:nvidia；事件觸發 bounded pq1 重查",
+        "reason": "新 triage PASS lead lead_e1daca4662d70cba294c939a608ae05c 與 parked trace 共用具名標的 NVDA, co:nvidia；事件觸發 bounded pq1 重查",
         "tier": 4
       },
       "triage_history": [
@@ -8118,6 +8458,22 @@
               "user_requested": true
             },
             "reason": "新 triage PASS lead lead_0624cbfddb41714f21502cc3f3da7a8a 與 parked trace 共用具名標的 LITE, co:lumentum；事件觸發 bounded pq1 重查",
+            "tier": 4
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-11T05:08:15.230067+00:00",
+          "superseded_reason": "新 triage PASS lead lead_e1daca4662d70cba294c939a608ae05c 與 parked trace 共用具名標的 NVDA, co:nvidia；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_e1daca4662d70cba294c939a608ae05c",
+          "triage": {
+            "decided_at": "2026-08-10T22:34:00.650809+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true,
+              "user_requested": true
+            },
+            "reason": "新 triage PASS lead lead_3df060cf842783e4709ae6cd86b1be74 與 parked trace 共用具名標的 LITE, NVDA, co:lumentum, co:nvidia；事件觸發 bounded pq1 重查",
             "tier": 4
           }
         }
@@ -8850,6 +9206,38 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2074776109074583565"
     },
+    "lead_4cfd1607064be4fe2b8f26a49e3458f8": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "CCXI"
+        ]
+      },
+      "first_seen": "2026-08-11T05:06:05.241681+00:00",
+      "lead_id": "lead_4cfd1607064be4fe2b8f26a49e3458f8",
+      "published_at": "2022-10-24",
+      "refs": {},
+      "source": "edgar:CCXI",
+      "status": "triaged_no_go",
+      "themes": {
+        "robotics": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CCXI"
+          ]
+        }
+      },
+      "title": "CCXI 4 filed 2022-10-24",
+      "triage": {
+        "decided_at": "2026-08-11T05:08:39.693409+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "例行內部人 Form 4 持股變動申報，無可抽取的供應鏈/技術/客戶主張",
+        "tier": 4
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1340652/000089924322034075/xslF345X03/doc4.xml"
+    },
     "lead_4d161f4994267a4f969c75ab283463e5": {
       "entities": {
         "company_ids": [
@@ -9124,6 +9512,38 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2077212864948162871"
     },
+    "lead_53f19d8df30938f84517824490af0695": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "CCXI"
+        ]
+      },
+      "first_seen": "2026-08-11T05:06:05.241280+00:00",
+      "lead_id": "lead_53f19d8df30938f84517824490af0695",
+      "published_at": "2022-10-24",
+      "refs": {},
+      "source": "edgar:CCXI",
+      "status": "triaged_no_go",
+      "themes": {
+        "robotics": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CCXI"
+          ]
+        }
+      },
+      "title": "CCXI 4 filed 2022-10-24",
+      "triage": {
+        "decided_at": "2026-08-11T05:08:39.915715+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "例行內部人 Form 4 持股變動申報，無可抽取的供應鏈/技術/客戶主張",
+        "tier": 4
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1340652/000089924322034087/xslF345X03/doc4.xml"
+    },
     "lead_54084fde3dc1564e704dd777f2b73eb7": {
       "entities": {
         "company_ids": [],
@@ -9163,6 +9583,41 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2083225872207937687"
+    },
+    "lead_54bf82feffa718f34f8d8ce6e2a6184a": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "CCXI"
+        ]
+      },
+      "first_seen": "2026-08-11T05:12:52.616401+00:00",
+      "lead_id": "lead_54bf82feffa718f34f8d8ce6e2a6184a",
+      "published_at": "2026-05-13",
+      "refs": {},
+      "source": "edgar:CCXI",
+      "status": "triaged_go",
+      "themes": {
+        "robotics": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CCXI"
+          ]
+        }
+      },
+      "title": "CCXI 10-Q filed 2026-05-13",
+      "triage": {
+        "decided_at": "2026-08-11T05:13:15.676192+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true,
+          "novelty": true
+        },
+        "reason": "CIK 修正後首次抓到正確 Churchill Capital Corp XI（CCXI）一手 filing；robotics 主題核心公司，Agility Robotics 併購交易一手文件",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/2074973/000121390026055787/ea0289622-10q_churchill11.htm"
     },
     "lead_55925c19c133e8fc22b61a43cf2b13bb": {
       "entities": {
@@ -9278,6 +9733,41 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2085644051446108223"
     },
+    "lead_569add44124d25b961da71868b7e1fb6": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "CCXI"
+        ]
+      },
+      "first_seen": "2026-08-11T05:12:52.616274+00:00",
+      "lead_id": "lead_569add44124d25b961da71868b7e1fb6",
+      "published_at": "2026-06-24",
+      "refs": {},
+      "source": "edgar:CCXI",
+      "status": "triaged_go",
+      "themes": {
+        "robotics": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CCXI"
+          ]
+        }
+      },
+      "title": "CCXI 8-K filed 2026-06-24",
+      "triage": {
+        "decided_at": "2026-08-11T05:13:15.467114+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true,
+          "novelty": true
+        },
+        "reason": "CIK 修正後首次抓到正確 Churchill Capital Corp XI（CCXI）一手 filing；robotics 主題核心公司，Agility Robotics 併購交易一手文件",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/2074973/000121390026071287/ea0295484-8k425_church11.htm"
+    },
     "lead_56c00023183b77584494c96d3ff61ed2": {
       "entities": {
         "company_ids": [],
@@ -9309,6 +9799,41 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2072369811791946173"
+    },
+    "lead_572f73ed0ae5002a8e9091d316c88565": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "CCXI"
+        ]
+      },
+      "first_seen": "2026-08-11T05:12:52.616150+00:00",
+      "lead_id": "lead_572f73ed0ae5002a8e9091d316c88565",
+      "published_at": "2026-07-06",
+      "refs": {},
+      "source": "edgar:CCXI",
+      "status": "triaged_go",
+      "themes": {
+        "robotics": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CCXI"
+          ]
+        }
+      },
+      "title": "CCXI 8-K filed 2026-07-06",
+      "triage": {
+        "decided_at": "2026-08-11T05:13:15.259003+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true,
+          "novelty": true
+        },
+        "reason": "CIK 修正後首次抓到正確 Churchill Capital Corp XI（CCXI）一手 filing；robotics 主題核心公司，Agility Robotics 併購交易一手文件",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/2074973/000121390026075480/ea0296510-8k_church11.htm"
     },
     "lead_57cf81e3979adf60169cbebabc245435": {
       "entities": {
@@ -9423,6 +9948,41 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2074416685843612031"
+    },
+    "lead_58b59fd0835f9f7b078e5dfdde222517": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "CCXI"
+        ]
+      },
+      "first_seen": "2026-08-11T05:12:52.616641+00:00",
+      "lead_id": "lead_58b59fd0835f9f7b078e5dfdde222517",
+      "published_at": "2026-03-17",
+      "refs": {},
+      "source": "edgar:CCXI",
+      "status": "triaged_go",
+      "themes": {
+        "robotics": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CCXI"
+          ]
+        }
+      },
+      "title": "CCXI 8-K filed 2026-03-17",
+      "triage": {
+        "decided_at": "2026-08-11T05:13:16.114827+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true,
+          "novelty": true
+        },
+        "reason": "CIK 修正後首次抓到正確 Churchill Capital Corp XI（CCXI）一手 filing；robotics 主題核心公司，Agility Robotics 併購交易一手文件",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/2074973/000121390026029178/ea0282101-8k_church11.htm"
     },
     "lead_58cf007b302a50a1e3d05e7dfe6acef7": {
       "content_updated_at": "2026-07-29T13:46:43.560100+00:00",
@@ -10404,6 +10964,32 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2084795597417263442"
     },
+    "lead_6445efcb201d9e947c22a834a3888aa3": {
+      "entities": {
+        "company_ids": [
+          "co:meta"
+        ],
+        "tickers": [
+          "META"
+        ]
+      },
+      "first_seen": "2026-08-11T05:06:10.561900+00:00",
+      "lead_id": "lead_6445efcb201d9e947c22a834a3888aa3",
+      "published_at": "2026-08-04",
+      "refs": {},
+      "source": "edgar:META",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "META 4 filed 2026-08-04",
+      "triage": {
+        "decided_at": "2026-08-11T05:08:40.152127+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "例行內部人 Form 4 持股變動申報，無可抽取的供應鏈/技術/客戶主張",
+        "tier": 4
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1326801/000095010326011909/xslF345X06/ownership.xml"
+    },
     "lead_645d1fd05b13b7b735654ef26b9b3c60": {
       "entities": {
         "company_ids": [
@@ -11019,6 +11605,32 @@
       ],
       "url": "https://x.com/aleabitoreddit/status/2079495178793201678"
     },
+    "lead_6b63135367084e019bec3fc2452d3d25": {
+      "entities": {
+        "company_ids": [
+          "co:meta"
+        ],
+        "tickers": [
+          "META"
+        ]
+      },
+      "first_seen": "2026-08-11T05:06:10.561737+00:00",
+      "lead_id": "lead_6b63135367084e019bec3fc2452d3d25",
+      "published_at": "2026-08-06",
+      "refs": {},
+      "source": "edgar:META",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "META 4 filed 2026-08-06",
+      "triage": {
+        "decided_at": "2026-08-11T05:08:40.383680+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "例行內部人 Form 4 持股變動申報，無可抽取的供應鏈/技術/客戶主張",
+        "tier": 4
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1326801/000116007726000008/xslF345X06/form4-08072026_010856.xml"
+    },
     "lead_6baf3ec25835e624b5763ea8212236e2": {
       "entities": {
         "company_ids": [
@@ -11389,6 +12001,32 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2080380170779898186"
+    },
+    "lead_6f0d069c11495d85373a26da5a4d61e6": {
+      "entities": {
+        "company_ids": [
+          "co:meta"
+        ],
+        "tickers": [
+          "META"
+        ]
+      },
+      "first_seen": "2026-08-11T05:06:10.561962+00:00",
+      "lead_id": "lead_6f0d069c11495d85373a26da5a4d61e6",
+      "published_at": "2026-08-04",
+      "refs": {},
+      "source": "edgar:META",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "META 4 filed 2026-08-04",
+      "triage": {
+        "decided_at": "2026-08-11T05:08:40.637829+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "例行內部人 Form 4 持股變動申報，無可抽取的供應鏈/技術/客戶主張",
+        "tier": 4
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1326801/000095010326011908/xslF345X06/ownership.xml"
     },
     "lead_6fb8bec46249fc64d7301c1c9fd7be96": {
       "entities": {
@@ -12048,6 +12686,37 @@
       ],
       "url": "https://x.com/aleabitoreddit/status/2082513405219631384"
     },
+    "lead_79471f7e1d9ce0cea1a806571cfa4f9d": {
+      "entities": {
+        "company_ids": [
+          "co:meta"
+        ],
+        "tickers": [
+          "META"
+        ]
+      },
+      "first_seen": "2026-08-11T05:06:10.562162+00:00",
+      "lead_id": "lead_79471f7e1d9ce0cea1a806571cfa4f9d",
+      "published_at": "2026-07-29",
+      "refs": {},
+      "source": "edgar:META",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "META 8-K filed 2026-07-29",
+      "triage": {
+        "decided_at": "2026-08-11T05:08:22.553104+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "META 8-K 一手文件，追蹤標的重大事項揭露，可能含 AI capex/資本支出訊號",
+        "related_trace_requeues": [
+          "lead_a53867cc19e44995d9ee1ef2fb2c8fbd",
+          "lead_afa72193be496499ef950552d9146c38",
+          "lead_d36507e875209c42b224d82b9ac1a247"
+        ],
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1326801/000162828026050596/meta-20260729.htm"
+    },
     "lead_795d937852b829058416270a4f3b8c6c": {
       "entities": {
         "company_ids": [
@@ -12118,23 +12787,54 @@
         "research_mode": "delta_only",
         "trace_attempts_ref": "Samsung SDI InterBattery/earnings official pages + Panasonic 2026 energy IR + Simplo/MOPS official search + Digitimes/TheElec metadata",
         "trace_next_trigger": "Simplo_MOPS_or_Samsung_Panasonic_primary_disclosure_names_supply_chain_and_constraints",
+        "trace_requeue_trigger": "related_triaged_lead:lead_e1daca4662d70cba294c939a608ae05c",
+        "trace_requeued_at": "2026-08-11T05:08:15.230067+00:00",
         "trace_requires_user": "false",
-        "trace_status": "isolated_tier_3"
+        "trace_status": "isolated_tier_3",
+        "trace_trigger_entities": [
+          "AMZN",
+          "BWA",
+          "ENS",
+          "ETN",
+          "META",
+          "VRT",
+          "co:meta"
+        ],
+        "trace_trigger_event_ref": "lead:lead_e1daca4662d70cba294c939a608ae05c",
+        "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {},
       "title": "Looks like there's a high power cylindrical cell / BBU cell shortage (aka: bottleneck): - Samsung SDI supplies the cells to Simplo, which assembles them into BBUs for $META to $AMZN. - As demand from data centers has increased, production of Samsung SDI's cylindrical cells has also risen sharply. - Industry sources said Panasonic, Samsung are experiencing supply shortages for BBU cells. So main beneficiaries imo look like: - Samsung SDI (KRX: 006400) / Panasonic Energy as cleaneset winners - Murata (6981) / this keeps showing up everywhere with MLCC and others lol - LG Energy (KRX: 373220) / incoming There's not really much direct US players? But adjacent read through like $VRT, $ETN or $BWA / $ENS. Not quite in my domain emphasis cup of tea though. I wouldn't conflate this as all shortages having a massive TAM, but there could be opportunities...",
       "triage": {
-        "decided_at": "2026-07-29T14:00:56.777961+00:00",
+        "decided_at": "2026-08-11T05:08:15.230067+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true,
           "user_requested": true
         },
-        "reason": "Memory／packaging 更新：含 LTA、供需缺口、價格、擴產或具名供應鏈的可追查 claim；進 pq1 拆 claim，券商轉述追不到原文則 park",
+        "reason": "新 triage PASS lead lead_e1daca4662d70cba294c939a608ae05c 與 parked trace 共用具名標的 AMZN；事件觸發 bounded pq1 重查",
         "tier": 4
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-11T05:08:15.230067+00:00",
+          "superseded_reason": "新 triage PASS lead lead_e1daca4662d70cba294c939a608ae05c 與 parked trace 共用具名標的 AMZN；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_e1daca4662d70cba294c939a608ae05c",
+          "triage": {
+            "decided_at": "2026-07-29T14:00:56.777961+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true,
+              "user_requested": true
+            },
+            "reason": "Memory／packaging 更新：含 LTA、供需缺口、價格、擴產或具名供應鏈的可追查 claim；進 pq1 拆 claim，券商轉述追不到原文則 park",
+            "tier": 4
+          }
+        }
+      ],
       "url": "https://x.com/aleabitoreddit/status/2073763512216899825"
     },
     "lead_79a1d5eda34eb4c7c518dd0d3268d807": {
@@ -14148,6 +14848,32 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826005947/xslF345X06/ownership.xml"
     },
+    "lead_8d147304399b5153fb89b3c8149d9d3d": {
+      "entities": {
+        "company_ids": [
+          "co:meta"
+        ],
+        "tickers": [
+          "META"
+        ]
+      },
+      "first_seen": "2026-08-11T05:06:10.562227+00:00",
+      "lead_id": "lead_8d147304399b5153fb89b3c8149d9d3d",
+      "published_at": "2026-07-22",
+      "refs": {},
+      "source": "edgar:META",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "META 4 filed 2026-07-22",
+      "triage": {
+        "decided_at": "2026-08-11T05:08:40.853374+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "例行內部人 Form 4 持股變動申報，無可抽取的供應鏈/技術/客戶主張",
+        "tier": 4
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1326801/000095010326011028/xslF345X06/ownership.xml"
+    },
     "lead_8e16834b3c423735ad20eb6f6be7d63b": {
       "entities": {
         "company_ids": [
@@ -14256,6 +14982,73 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2077445202252529956"
+    },
+    "lead_8f1c99c133204c13cac86a48ffd39f82": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "CCXI"
+        ]
+      },
+      "first_seen": "2026-08-11T05:12:52.616759+00:00",
+      "lead_id": "lead_8f1c99c133204c13cac86a48ffd39f82",
+      "published_at": "2026-02-05",
+      "refs": {},
+      "source": "edgar:CCXI",
+      "status": "triaged_go",
+      "themes": {
+        "robotics": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CCXI"
+          ]
+        }
+      },
+      "title": "CCXI 8-K filed 2026-02-05",
+      "triage": {
+        "decided_at": "2026-08-11T05:13:16.357164+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true,
+          "novelty": true
+        },
+        "reason": "CIK 修正後首次抓到正確 Churchill Capital Corp XI（CCXI）一手 filing；robotics 主題核心公司，Agility Robotics 併購交易一手文件",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/2074973/000121390026012794/ea0275776-8k_church11.htm"
+    },
+    "lead_8f6d772fadcdb6aeff0365b985396a34": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "CCXI"
+        ]
+      },
+      "first_seen": "2026-08-11T05:06:05.241411+00:00",
+      "lead_id": "lead_8f6d772fadcdb6aeff0365b985396a34",
+      "published_at": "2022-10-24",
+      "refs": {},
+      "source": "edgar:CCXI",
+      "status": "triaged_no_go",
+      "themes": {
+        "robotics": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CCXI"
+          ]
+        }
+      },
+      "title": "CCXI 4 filed 2022-10-24",
+      "triage": {
+        "decided_at": "2026-08-11T05:08:41.058884+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "例行內部人 Form 4 持股變動申報，無可抽取的供應鏈/技術/客戶主張",
+        "tier": 4
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1340652/000089924322034084/xslF345X03/doc4.xml"
     },
     "lead_8fcdc53c2a4d4d5d089ec784a2f0241c": {
       "entities": {
@@ -14372,6 +15165,41 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/707549/000196659826000004/xslF345X06/wk-form4_1780416309.xml"
+    },
+    "lead_91a73c290d7257f4102c49d31d1b3c19": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "CCXI"
+        ]
+      },
+      "first_seen": "2026-08-11T05:12:52.596239+00:00",
+      "lead_id": "lead_91a73c290d7257f4102c49d31d1b3c19",
+      "published_at": "2026-08-10",
+      "refs": {},
+      "source": "edgar:CCXI",
+      "status": "triaged_go",
+      "themes": {
+        "robotics": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CCXI"
+          ]
+        }
+      },
+      "title": "CCXI 8-K filed 2026-08-10",
+      "triage": {
+        "decided_at": "2026-08-11T05:13:14.849213+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true,
+          "novelty": true
+        },
+        "reason": "CIK 修正後首次抓到正確 Churchill Capital Corp XI（CCXI）一手 filing；robotics 主題核心公司，Agility Robotics 併購交易一手文件",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/2074973/000121390026086928/ea0301196-8k_church11.htm"
     },
     "lead_928514b80dea6644f199f48c0803092d": {
       "entities": {
@@ -14827,6 +15655,74 @@
       ],
       "url": "https://x.com/aleabitoreddit/status/2082175588555702410"
     },
+    "lead_9957a9e65aee680f5aa5bba637494eac": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "RIOT",
+          "AMD",
+          "IREN"
+        ]
+      },
+      "first_seen": "2026-08-11T05:06:00.636824+00:00",
+      "lead_id": "lead_9957a9e65aee680f5aa5bba637494eac",
+      "media": [
+        {
+          "cache": {
+            "bytes": 39021,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_9957a9e65aee680f5aa5bba637494eac/3_2086988257569718272.jpg",
+            "sha256": "e068d699fe00f026beea9b5a9616d2b28c366ab84648e664d145fe7c0b1ca6d5"
+          },
+          "height": 354,
+          "media_key": "3_2086988257569718272",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HPZ4w07awAAFTPQ.jpg",
+          "width": 1197
+        },
+        {
+          "cache": {
+            "bytes": 73038,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_9957a9e65aee680f5aa5bba637494eac/3_2086988257590710272.jpg",
+            "sha256": "3cff56c1d292165647d5910512a1222c828a2c0733fe964137a0f4a9094ad8e7"
+          },
+          "height": 814,
+          "media_key": "3_2086988257590710272",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HPZ4w1AbEAAJTnW.jpg",
+          "width": 1233
+        },
+        {
+          "cache": {
+            "bytes": 133714,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_9957a9e65aee680f5aa5bba637494eac/3_2086988257578078208.jpg",
+            "sha256": "859aa71311cc8e291bc0b5a3d299d68f085af05e3557fe6e9b3f7edc1eeb13b8"
+          },
+          "height": 1274,
+          "media_key": "3_2086988257578078208",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HPZ4w09aUAAWiBI.jpg",
+          "width": 1223
+        }
+      ],
+      "published_at": "2026-08-11T01:29:11.000Z",
+      "raw_text": "Woah, $RIOT announced a $9.1B deal with Anthropic, with a possible contract extending to $16.1B, over 20Y.\n\n$AMD also exercised its option to expand its existing deal with Riot. (And they still have another 1 GW campus they have LOI with for a tenant)\n\nIn terms of timelines, seem like most of the Colo basket have their revenue inflections hit H2 2027? \n\n(Eg. Riot Anthropic deal targets Dec 2027 for first 96 MW, AMD full 50 MW - May 2027)\n\nIt’s cute to see all the former miners like $IREN and co. grow up.",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "Woah, $RIOT announced a $9.1B deal with Anthropic, with a possible contract extending to $16.1B, over 20Y. $AMD also exercised its option to expand its existing deal with Riot. (And they still have another 1 GW campus they have LOI with for a tenant) In terms of timelines, seem like most of the Colo basket have their revenue inflections hit H2 2027? (Eg. Riot Anthropic deal targets Dec 2027 for first 96 MW, AMD full 50 MW - May 2027) It’s cute to see all the former miners like $IREN and co. grow up.",
+      "triage": {
+        "decided_at": "2026-08-11T05:08:52.900122+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "RIOT/AMD/Anthropic 資料中心 colo 主題不在 config/themes.txt 已追蹤 ticker/主題（cpo/sivers/robotics 皆未涵蓋），無使用者明確 scoped campaign；標記為 weekly topic discovery 候選，非 daily pq1",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2086988264448409739"
+    },
     "lead_9adb031e86660441500e62d9adc0bafe": {
       "entities": {
         "company_ids": [
@@ -15094,6 +15990,38 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2072986020640076052"
+    },
+    "lead_9b773925fda70342e92b1998762998a3": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "CCXI"
+        ]
+      },
+      "first_seen": "2026-08-11T05:06:05.241597+00:00",
+      "lead_id": "lead_9b773925fda70342e92b1998762998a3",
+      "published_at": "2022-10-24",
+      "refs": {},
+      "source": "edgar:CCXI",
+      "status": "triaged_no_go",
+      "themes": {
+        "robotics": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CCXI"
+          ]
+        }
+      },
+      "title": "CCXI 4 filed 2022-10-24",
+      "triage": {
+        "decided_at": "2026-08-11T05:08:41.274996+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "例行內部人 Form 4 持股變動申報，無可抽取的供應鏈/技術/客戶主張",
+        "tier": 4
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1340652/000089924322034076/xslF345X03/doc4.xml"
     },
     "lead_9c307b5e44b4cd9b129d36163d450b50": {
       "entities": {
@@ -15682,8 +16610,8 @@
         "research_run": "daily_2026-08-05",
         "trace_attempts_ref": "Meta official Expanding Meta's Custom Silicon 2026-03；Meta/Samsung/SanDisk/Sumitomo official exact search；trigger lead lead_dc1c77328d874e61b0abaee39391c054",
         "trace_next_trigger": "Meta internal memo 原文，或 Meta/Samsung/SanDisk/Sumitomo 具名 LTA 一手披露",
-        "trace_requeue_trigger": "related_triaged_lead:lead_dc1c77328d874e61b0abaee39391c054",
-        "trace_requeued_at": "2026-08-04T22:36:57.647476+00:00",
+        "trace_requeue_trigger": "related_triaged_lead:lead_79471f7e1d9ce0cea1a806571cfa4f9d",
+        "trace_requeued_at": "2026-08-11T05:08:22.553104+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
@@ -15691,21 +16619,21 @@
           "SNDK",
           "co:meta"
         ],
-        "trace_trigger_event_ref": "lead:lead_dc1c77328d874e61b0abaee39391c054",
+        "trace_trigger_event_ref": "lead:lead_79471f7e1d9ce0cea1a806571cfa4f9d",
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {},
       "title": "Nothing like an internal $META memo getting published. Showing AI ramping as usual: - LTAs signed with Samsung and $SNDK for memory - LTAs signed with Sumitomo Electric for fiber optics - Expected to deploy 7GW compute infra this year, and doubling in 2027. - as much as $145B capex spend this year “It plans to launch a chip about every six months through 2027”",
       "triage": {
-        "decided_at": "2026-08-04T22:36:57.647476+00:00",
+        "decided_at": "2026-08-11T05:08:22.553104+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true,
           "user_requested": true
         },
-        "reason": "新 triage PASS lead lead_dc1c77328d874e61b0abaee39391c054 與 parked trace 共用具名標的 SNDK；事件觸發 bounded pq1 重查",
+        "reason": "新 triage PASS lead lead_79471f7e1d9ce0cea1a806571cfa4f9d 與 parked trace 共用具名標的 META, co:meta；事件觸發 bounded pq1 重查",
         "tier": 4
       },
       "triage_history": [
@@ -15724,9 +16652,51 @@
             "reason": "AI infrastructure／power 方向：具名合約、容量、LTA 或 capex 數字可回公司／filing 追源；只作需求端研究，不把作者市場看法當 evidence",
             "tier": 4
           }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-11T05:08:22.553104+00:00",
+          "superseded_reason": "新 triage PASS lead lead_79471f7e1d9ce0cea1a806571cfa4f9d 與 parked trace 共用具名標的 META, co:meta；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_79471f7e1d9ce0cea1a806571cfa4f9d",
+          "triage": {
+            "decided_at": "2026-08-04T22:36:57.647476+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true,
+              "user_requested": true
+            },
+            "reason": "新 triage PASS lead lead_dc1c77328d874e61b0abaee39391c054 與 parked trace 共用具名標的 SNDK；事件觸發 bounded pq1 重查",
+            "tier": 4
+          }
         }
       ],
       "url": "https://x.com/aleabitoreddit/status/2075199849507762279"
+    },
+    "lead_a7655e310d5e73cb919a0cdbd5f5e84d": {
+      "entities": {
+        "company_ids": [
+          "co:meta"
+        ],
+        "tickers": [
+          "META"
+        ]
+      },
+      "first_seen": "2026-08-11T05:06:10.561835+00:00",
+      "lead_id": "lead_a7655e310d5e73cb919a0cdbd5f5e84d",
+      "published_at": "2026-08-05",
+      "refs": {},
+      "source": "edgar:META",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "META 4 filed 2026-08-05",
+      "triage": {
+        "decided_at": "2026-08-11T05:08:41.503383+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "例行內部人 Form 4 持股變動申報，無可抽取的供應鏈/技術/客戶主張",
+        "tier": 4
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1326801/000095010326011964/xslF345X06/ownership.xml"
     },
     "lead_a7798e522426f8ada1f00a87cfb5d74e": {
       "entities": {
@@ -16620,11 +17590,21 @@
         "research_run": "luna_reviewer_2026-08-02_pq1_10",
         "trace_attempts_ref": "luna_packet_plus_main_review_meta_paper_morgan_digitimes_company_sources",
         "trace_next_trigger": "new_primary_for_remaining_atoms_or_exact_user_priority",
+        "trace_requeue_trigger": "related_triaged_lead:lead_79471f7e1d9ce0cea1a806571cfa4f9d",
+        "trace_requeued_at": "2026-08-11T05:08:22.553104+00:00",
         "trace_requires_user": "false",
-        "trace_status": "isolated_tier_3"
+        "trace_status": "isolated_tier_3",
+        "trace_trigger_entities": [
+          "ASX",
+          "BE",
+          "META",
+          "co:meta"
+        ],
+        "trace_trigger_event_ref": "lead:lead_79471f7e1d9ce0cea1a806571cfa4f9d",
+        "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {
         "robotics": {
           "counter_only": false,
@@ -16636,15 +17616,33 @@
       },
       "title": "Just some of the more interesting news I came across recently: 1. MS: Revised China humanoid shipments to reach 50,000 in 2026 from 14,000u and 28,000u earlier this year. 2. MS: Probe cards and test sockets likely to be priced hike (precious metal hikes + severe shortage of test pin capacity) 3. Capacitor price hikes: MLCC, aluminum electrolytic, tantalum, polymer aluminum, film, and super capacitors from Yageo. 4. $META Vistara architecture: Older DDR4 Memory with CXL as memory expansion 5. OpenAI achieved inference optimization breakthrough that halves costs and reduces GPU requirements. 6. LTAs are being signed with MLCC after Samsung signed LTA with US big tech customer 7. Grid power bottlenecks triggered 5x increase ($25B) in Brookfield's financing for $BE fuel cells. 8. Taiwan's chip packaging and testing supply chain includes major OSAT providers such as $ASX, Powertech, Winstek Semiconductor, Chipbond, ChipMOS, and ShunSin. Dedicated testing companies include KYEC, Ardentec, and Sigurd Microelectronics, while testing interface suppliers include WinWay, MPI, Keystone Microtech, Chunghwa Precision, and Hermes Testing Solutions. Leadframe makers include Jih Lin Tech, SDI, and CWTC, while major IC substrate suppliers include Unimicron, Kinsus, Nan Ya PCB, and Zhen Ding Tech. (Digitimes) - Taiwan-based OSAT providers are raising prices - Memory and IC packaging and testing capacity have both become bottlenecks in the semiconductor supply chain",
       "triage": {
-        "decided_at": "2026-07-29T14:00:56.777937+00:00",
+        "decided_at": "2026-08-11T05:08:22.553104+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true,
           "user_requested": true
         },
-        "reason": "Memory／packaging 更新：含 LTA、供需缺口、價格、擴產或具名供應鏈的可追查 claim；進 pq1 拆 claim，券商轉述追不到原文則 park",
+        "reason": "新 triage PASS lead lead_79471f7e1d9ce0cea1a806571cfa4f9d 與 parked trace 共用具名標的 META, co:meta；事件觸發 bounded pq1 重查",
         "tier": 4
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-11T05:08:22.553104+00:00",
+          "superseded_reason": "新 triage PASS lead lead_79471f7e1d9ce0cea1a806571cfa4f9d 與 parked trace 共用具名標的 META, co:meta；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_79471f7e1d9ce0cea1a806571cfa4f9d",
+          "triage": {
+            "decided_at": "2026-07-29T14:00:56.777937+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true,
+              "user_requested": true
+            },
+            "reason": "Memory／packaging 更新：含 LTA、供需缺口、價格、擴產或具名供應鏈的可追查 claim；進 pq1 拆 claim，券商轉述追不到原文則 park",
+            "tier": 4
+          }
+        }
+      ],
       "url": "https://x.com/aleabitoreddit/status/2072178393878290789"
     },
     "lead_b054372ac860dbc6e270ecc7a4d9d50e": {
@@ -16794,7 +17792,7 @@
         "ontology_status": "approved",
         "original_claim_status": "partial",
         "outcome": "parked；未產生 prepared RA",
-        "parked_reason": "已取得 1X 2026-07-09 官方 NEO hand 公告，可確認 25-DoF、tendon-driven 與具體力矩／精度，但「最先進」是供應商自評；原貼文的中國約 90% 全球 humanoid 出貨與 Agility／Amazon 商業化外推仍無同一份可逐字核對的官方統計或部署文件，沒有唯一 graph delta，不產 RA。",
+        "parked_reason": "CCXI／Agility Robotics 與 Amazon 商用化的核心事實已由二手報導（TechCrunch/GeekWire）確認，但更高證據強度的一手來源（Churchill Capital Corp XI SEC 8-K/10-Q）已因 CIK 修復重新抓到並排入 pq1（lead_569add44...等 8 筆），改由那批一手文件產生 RA，避免對同一事實重複抽取／用較弱來源",
         "pq2_item": "61",
         "primary_url": "https://www.1x.tech/discover/neos-hands",
         "research_bundle_id": "serenity_robotics_20260729",
@@ -16802,20 +17800,20 @@
         "research_report": "docs/reports/serenity_30d_research_2026-07-29.md",
         "research_run": "daily-brief-2026-08-11",
         "trace_attempts_ref": "1X NEO Hands 官方頁；Agility Amazon／SPAC 官方頁；2026-08-11 exact source search",
-        "trace_next_trigger": "官方全球 humanoid shipment 統計，或 Agility S-4／客戶部署文件逐字揭露 commercialization 與 Amazon scope",
+        "trace_next_trigger": "待 CCXI 一手 8-K/10-Q（本輪已 triaged_go）完成 pq1 drain 後直接產生涵蓋同一事實的 RA",
         "trace_origin_entity": "1X Technologies；Agility Robotics",
         "trace_origin_linkage": "1X official self-report；Agility official self-report；global 90% claim unresolved",
         "trace_original_date": "2026-07-09",
         "trace_original_url": "https://www.1x.tech/discover/neos-hands",
-        "trace_requeue_trigger": "related_triaged_lead:lead_3df060cf842783e4709ae6cd86b1be74",
-        "trace_requeued_at": "2026-08-10T22:34:00.650809+00:00",
+        "trace_requeue_trigger": "related_triaged_lead:lead_e1daca4662d70cba294c939a608ae05c",
+        "trace_requeued_at": "2026-08-11T05:08:15.230067+00:00",
         "trace_requires_user": "false",
-        "trace_status": "partial",
+        "trace_status": "original_obtained",
         "trace_trigger_entities": [
           "CCXI",
           "TSLA"
         ],
-        "trace_trigger_event_ref": "lead:lead_3df060cf842783e4709ae6cd86b1be74",
+        "trace_trigger_event_ref": "lead:lead_e1daca4662d70cba294c939a608ae05c",
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
@@ -16833,13 +17831,13 @@
       },
       "title": "\"China is shipping ~90% of the world's humanoid robots. We cannot keep taking them lightly.\" Elon's comment: \"For now\" Meanwhile, 1X today posts a video of the most advanced humanoid hand. Looks like the inflection point for American humanoid programs is here? Both technologically with players like 1X and with mass production with $TSLA? I'm am personally long on Agility through $CCXI targeting commercialization with Amazon and others. But I'm proud to see American robotics as a whole go brrrr.",
       "triage": {
-        "decided_at": "2026-08-10T22:34:00.650809+00:00",
+        "decided_at": "2026-08-11T05:08:15.230067+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true,
           "user_requested": true
         },
-        "reason": "新 triage PASS lead lead_3df060cf842783e4709ae6cd86b1be74 與 parked trace 共用具名標的 CCXI；事件觸發 bounded pq1 重查",
+        "reason": "新 triage PASS lead lead_e1daca4662d70cba294c939a608ae05c 與 parked trace 共用具名標的 CCXI；事件觸發 bounded pq1 重查",
         "tier": 4
       },
       "triage_history": [
@@ -16872,6 +17870,22 @@
               "user_requested": true
             },
             "reason": "新 triage PASS lead lead_55d4f2734afbfab750d526b824198afb 與 parked trace 共用具名標的 CCXI；事件觸發 bounded pq1 重查",
+            "tier": 4
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-11T05:08:15.230067+00:00",
+          "superseded_reason": "新 triage PASS lead lead_e1daca4662d70cba294c939a608ae05c 與 parked trace 共用具名標的 CCXI；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_e1daca4662d70cba294c939a608ae05c",
+          "triage": {
+            "decided_at": "2026-08-10T22:34:00.650809+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true,
+              "user_requested": true
+            },
+            "reason": "新 triage PASS lead lead_3df060cf842783e4709ae6cd86b1be74 與 parked trace 共用具名標的 CCXI；事件觸發 bounded pq1 重查",
             "tier": 4
           }
         }
@@ -17156,7 +18170,7 @@
         "ontology_status": "approved",
         "original_claim_status": "partial",
         "outcome": "parked；屬時變 observation；未產生 prepared RA",
-        "parked_reason": "已取得新華社 2026-07-07 原文：工信部官員預期中國 2026 年 humanoid robot 產量超過 100,000 台；但這是帶時間戳的產量預測，依 L4 進 Engine C observation 而非靜態圖。Morgan Stanley 14,000 台舊預測仍無 canonical 報告，因此複合比較未完整驗證，不產 RA。",
+        "parked_reason": "推文稱『中國今年人形機器人產量將破 10 萬台，Morgan Stanley 原估 1.4 萬台』與可查證分析不符：Morgan Stanley 最新（2026 年中）預測為 5 萬台（從年初 1.4 萬→2.8 萬→5 萬逐步上修），非推文所述數字；且屬產業總量統計非特定公司供應鏈 claim，與圖中 co:agility_robotics／CCXI 無直接連結",
         "pq2_item": "61",
         "primary_url": "https://english.news.cn/20260707/064b35b3a22c477ebac191da796c0eb0/c.html",
         "research_bundle_id": "serenity_robotics_20260729",
@@ -17164,20 +18178,20 @@
         "research_report": "docs/reports/serenity_30d_research_2026-07-29.md",
         "research_run": "daily-brief-2026-08-11",
         "trace_attempts_ref": "Xinhua 2026-07-07 canonical article；Morgan Stanley 14,000 exact report search；2026-08-11 delta audit",
-        "trace_next_trigger": "取得 Morgan Stanley canonical report，或 MIIT／統計 authority 公布 2026 實際產量",
+        "trace_next_trigger": "若找到 Xinhua 原文逐字數字且與具名公司供應鏈直接相關，才重新評估",
         "trace_origin_entity": "Xinhua；MIIT official statement",
         "trace_origin_linkage": "canonical Xinhua report of named MIIT official；Morgan Stanley comparison unresolved",
         "trace_original_date": "2026-07-07",
         "trace_original_url": "https://english.news.cn/20260707/064b35b3a22c477ebac191da796c0eb0/c.html",
-        "trace_requeue_trigger": "related_triaged_lead:lead_3df060cf842783e4709ae6cd86b1be74",
-        "trace_requeued_at": "2026-08-10T22:34:00.650809+00:00",
+        "trace_requeue_trigger": "related_triaged_lead:lead_e1daca4662d70cba294c939a608ae05c",
+        "trace_requeued_at": "2026-08-11T05:08:15.230067+00:00",
         "trace_requires_user": "false",
-        "trace_status": "partial",
+        "trace_status": "isolated_tier_3",
         "trace_trigger_entities": [
           "CCXI",
           "TSLA"
         ],
-        "trace_trigger_event_ref": "lead:lead_3df060cf842783e4709ae6cd86b1be74",
+        "trace_trigger_event_ref": "lead:lead_e1daca4662d70cba294c939a608ae05c",
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
@@ -17194,13 +18208,13 @@
       },
       "title": "How is the US so far behind? Xinhua: China's output of humanoids are expected to hit 100,000+ this year. Even Morgan Stanley originally projected 14,000 for 2026... Really need Elon's $TSLA, $CCXI (Agility), Apptronik, and Figure to catchup. And for more US Gov. subsidies to pour into upstream supply chains + rare earths. Cause this disparity between US vs. China mass production is getting ridiculous... But it almost feels like the start of Russia/US Space race Sputnik Moment for robotics?",
       "triage": {
-        "decided_at": "2026-08-10T22:34:00.650809+00:00",
+        "decided_at": "2026-08-11T05:08:15.230067+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true,
           "user_requested": true
         },
-        "reason": "新 triage PASS lead lead_3df060cf842783e4709ae6cd86b1be74 與 parked trace 共用具名標的 CCXI；事件觸發 bounded pq1 重查",
+        "reason": "新 triage PASS lead lead_e1daca4662d70cba294c939a608ae05c 與 parked trace 共用具名標的 CCXI；事件觸發 bounded pq1 重查",
         "tier": 4
       },
       "triage_history": [
@@ -17233,6 +18247,22 @@
               "user_requested": true
             },
             "reason": "新 triage PASS lead lead_55d4f2734afbfab750d526b824198afb 與 parked trace 共用具名標的 CCXI；事件觸發 bounded pq1 重查",
+            "tier": 4
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-11T05:08:15.230067+00:00",
+          "superseded_reason": "新 triage PASS lead lead_e1daca4662d70cba294c939a608ae05c 與 parked trace 共用具名標的 CCXI；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_e1daca4662d70cba294c939a608ae05c",
+          "triage": {
+            "decided_at": "2026-08-10T22:34:00.650809+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true,
+              "user_requested": true
+            },
+            "reason": "新 triage PASS lead lead_3df060cf842783e4709ae6cd86b1be74 與 parked trace 共用具名標的 CCXI；事件觸發 bounded pq1 重查",
             "tier": 4
           }
         }
@@ -19521,6 +20551,38 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2074535692361937070"
     },
+    "lead_cea0eb86b7b4363c4cd432fdf328b029": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "CCXI"
+        ]
+      },
+      "first_seen": "2026-08-11T05:06:05.241535+00:00",
+      "lead_id": "lead_cea0eb86b7b4363c4cd432fdf328b029",
+      "published_at": "2022-10-24",
+      "refs": {},
+      "source": "edgar:CCXI",
+      "status": "triaged_no_go",
+      "themes": {
+        "robotics": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CCXI"
+          ]
+        }
+      },
+      "title": "CCXI 4 filed 2022-10-24",
+      "triage": {
+        "decided_at": "2026-08-11T05:08:41.756216+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "例行內部人 Form 4 持股變動申報，無可抽取的供應鏈/技術/客戶主張",
+        "tier": 4
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1340652/000089924322034077/xslF345X03/doc4.xml"
+    },
     "lead_cf4c4517f580464eb4ca369b9d204cb8": {
       "entities": {
         "company_ids": [],
@@ -20221,23 +21283,49 @@
         "research_run": "luna_reviewer_2026-08-02_pq1_10",
         "trace_attempts_ref": "Wells Fargo exact-note search；X screenshots；Meta Q2 2026 transcript/Exhibit context",
         "trace_next_trigger": "Wells Fargo canonical note/report，或 Meta filing/transcript 逐字披露具體 excess-compute terms 與 economics",
+        "trace_requeue_trigger": "related_triaged_lead:lead_79471f7e1d9ce0cea1a806571cfa4f9d",
+        "trace_requeued_at": "2026-08-11T05:08:22.553104+00:00",
         "trace_requires_user": "false",
-        "trace_status": "lead_only_tier_4"
+        "trace_status": "lead_only_tier_4",
+        "trace_trigger_entities": [
+          "META",
+          "co:meta"
+        ],
+        "trace_trigger_event_ref": "lead:lead_79471f7e1d9ce0cea1a806571cfa4f9d",
+        "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {},
       "title": "Wells Fargo: $META intent to sell excess compute is a positive signal around underlying demand and unit economics of AI. “Despite this shift, we don’t expect a pullback in Meta’s capex or that overall compute needs are lower” Regarding Neoclouds: WF thinks it validated the massive AI infra opportunity as well as acquisition opportunities. Despite any potential competition for Neoclouds. I’m inclined to agree with Wells Fargo here and say markets completely misunderstood Meta’s excess compute comment.",
       "triage": {
-        "decided_at": "2026-07-29T14:01:05.946648+00:00",
+        "decided_at": "2026-08-11T05:08:22.553104+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true,
           "user_requested": true
         },
-        "reason": "AI infrastructure／power 方向：具名合約、容量、LTA 或 capex 數字可回公司／filing 追源；只作需求端研究，不把作者市場看法當 evidence",
+        "reason": "新 triage PASS lead lead_79471f7e1d9ce0cea1a806571cfa4f9d 與 parked trace 共用具名標的 META, co:meta；事件觸發 bounded pq1 重查",
         "tier": 4
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-11T05:08:22.553104+00:00",
+          "superseded_reason": "新 triage PASS lead lead_79471f7e1d9ce0cea1a806571cfa4f9d 與 parked trace 共用具名標的 META, co:meta；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_79471f7e1d9ce0cea1a806571cfa4f9d",
+          "triage": {
+            "decided_at": "2026-07-29T14:01:05.946648+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true,
+              "user_requested": true
+            },
+            "reason": "AI infrastructure／power 方向：具名合約、容量、LTA 或 capex 數字可回公司／filing 追源；只作需求端研究，不把作者市場看法當 evidence",
+            "tier": 4
+          }
+        }
+      ],
       "url": "https://x.com/aleabitoreddit/status/2072574465763111166"
     },
     "lead_d3b3988d99ff494fe07af958c6b5bc1e": {
@@ -21400,6 +22488,79 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1158114/000143774926026278/aaoi20260630_10q.htm"
     },
+    "lead_e1daca4662d70cba294c939a608ae05c": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia"
+        ],
+        "tickers": [
+          "NVDA",
+          "AMZN",
+          "CCXI"
+        ]
+      },
+      "first_seen": "2026-08-11T05:06:00.635995+00:00",
+      "lead_id": "lead_e1daca4662d70cba294c939a608ae05c",
+      "media": [
+        {
+          "cache": {
+            "bytes": 112743,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_e1daca4662d70cba294c939a608ae05c/3_2086999691884199937.jpg",
+            "sha256": "7d7c07f8a1c9adc556c45f654a4b986c5044c577041b0910e2ee633c1c89119f"
+          },
+          "height": 1074,
+          "media_key": "3_2086999691884199937",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HPaDKZEbgAE0KXX.jpg",
+          "width": 1965
+        }
+      ],
+      "published_at": "2026-08-11T02:19:36.000Z",
+      "raw_text": "uhhh... the Unitree IPO is more than 8000 times oversubscribed by retail investors. \n\nThe demand for pure play humanoid companies is absolutely enormous?\n\nI'm personally in the US-based Agility Robotics club (Softbank, $NVDA, $AMZN, Foxconn, etc), at $2.5B premoney via $CCXI. \n\nAnd my take is that Unitree likely opening at $30B+ (from pre-ipo perps), might bring the leading US players some more attention in a week or two. \n\nRegardless that's just absurd demand.",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "NVDA"
+          ]
+        },
+        "robotics": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Agility Robotics",
+            "CCXI",
+            "humanoid"
+          ]
+        }
+      },
+      "title": "uhhh... the Unitree IPO is more than 8000 times oversubscribed by retail investors. The demand for pure play humanoid companies is absolutely enormous? I'm personally in the US-based Agility Robotics club (Softbank, $NVDA, $AMZN, Foxconn, etc), at $2.5B premoney via $CCXI. And my take is that Unitree likely opening at $30B+ (from pre-ipo perps), might bring the leading US players some more attention in a week or two. Regardless that's just absurd demand.",
+      "triage": {
+        "decided_at": "2026-08-11T05:08:15.230067+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true,
+          "novelty": true
+        },
+        "reason": "robotics 主題核心公司 CCXI 具體投資曝險（Agility Robotics .5B premoney）＋ Unitree IPO 估值錨點，第三方社群來源非公司自報",
+        "related_trace_requeues": [
+          "lead_043e94a0e70f703a76115cf09f96b438",
+          "lead_075cb52a7fffdf3550210fc2a5f6fb8b",
+          "lead_44d33f5c904cb1fb75c452098d739e55",
+          "lead_798000da36c2b1aa3070ddf51bdd6019",
+          "lead_b0b7ecd2d8229b1f3a1f01c557f5339c",
+          "lead_b30c33e9af50c65b8fc4cf8a05f80184",
+          "lead_e5f4088218bafff7538c5eec808ea96e"
+        ],
+        "tier": 3
+      },
+      "url": "https://x.com/aleabitoreddit/status/2087000954742927390"
+    },
     "lead_e2188414bbf98bcd91c73136242323e2": {
       "entities": {
         "company_ids": [],
@@ -21740,6 +22901,7 @@
         "parked_reason": "已取得標為 SVRC Research《State of Robotics 2026》的可搜尋 PDF mirror；可核對的 21 頁版本支持中國製造速度、Figure／Agility／Apptronik 的美國公司對照與物流部署方向，但全文找不到貼文聲稱的 National Champions 清單、rare-earth／actuator vulnerability、2027 兩起 consolidation 預測。版本／頁面不一致，不能用截圖補成證據，不產 RA。",
         "pq2_item": "61",
         "primary_url": "https://outlook.stpi.niar.org.tw/pdfview/tdop/2c94808a9e679eca019e865f973b6503",
+        "research_action_id": "ra_319c1ee97cc94aa392ed4cc248dd21ef",
         "research_bundle_id": "serenity_robotics_20260729",
         "research_outcome": "report_obtained_but_claimed_atoms_absent_no_graph_delta",
         "research_report": "docs/reports/serenity_30d_research_2026-07-29.md",
@@ -21749,8 +22911,8 @@
         "trace_origin_entity": "SVRC Research（STPI/NIAR mirror）",
         "trace_origin_linkage": "mirror of claimed report；claimed screenshot atoms mismatch searchable text",
         "trace_original_date": "2026-03",
-        "trace_requeue_trigger": "related_triaged_lead:lead_3df060cf842783e4709ae6cd86b1be74",
-        "trace_requeued_at": "2026-08-10T22:34:00.650809+00:00",
+        "trace_requeue_trigger": "related_triaged_lead:lead_e1daca4662d70cba294c939a608ae05c",
+        "trace_requeued_at": "2026-08-11T05:08:15.230067+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
@@ -21761,11 +22923,11 @@
           "GM",
           "TSLA"
         ],
-        "trace_trigger_event_ref": "lead:lead_3df060cf842783e4709ae6cd86b1be74",
+        "trace_trigger_event_ref": "lead:lead_e1daca4662d70cba294c939a608ae05c",
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "action_prepared",
       "themes": {
         "robotics": {
           "counter_only": false,
@@ -21782,13 +22944,13 @@
       },
       "title": "Came across an interesting report from SVRC Research called \"State of Robotics 2026\", published in April. Which listed: 1. Figure AI 2. Agility Robotics $CCXI 3. Apptronik 4. $TSLA 5. Boston Dynamics 6. Physical Intelligence 7. 1X Technologies 8. $AMZN Robotics 9. Covariant 10. Skild AI As the National Champions of the United States robotics program. \"The United States leads the world in where robotics is heading: Fundation models, OpenAI-style scaling laws applied to action, autonomous vehicles. While losing the race on where robotics is shipping today.\" Then it frames: 1. Rare Earths Exposure: from Neodymium for motors to samarium-cobalt for high-temp applications as a critical vulnerability. 2. Actuator dependency. Series elastic actuators, quasi-direct-drive motors, and precision reducers overwhelmingly sourced from Japan, Germany, and China As one of the main vulnerabilities alongside Manufacturing velocity/data collection cost/regulations. Then their take was: \"With at least six well-funded US humanoid companies competing for a market still in early formation, we expect at least two significant consolidation events (acquisition or merger) in 2027\". With Logistics / E-commerce (like $AMZN / $FDX) and Automotive from $GM to $FORD as being the immediate top use cases for deployment. I think it's just interesting to see a lot of my points I've been talking about reiterated by research firms. Regardless, I do think it's going to be a major frontier race between the US and China. Agility Robotics (which I own), Tesla, Figure, and Apptronik as leaders representing the USA. Competing against Unitree, AGIbot, Ubtech, and others in China.",
       "triage": {
-        "decided_at": "2026-08-10T22:34:00.650809+00:00",
+        "decided_at": "2026-08-11T05:08:15.230067+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true,
           "user_requested": true
         },
-        "reason": "新 triage PASS lead lead_3df060cf842783e4709ae6cd86b1be74 與 parked trace 共用具名標的 CCXI；事件觸發 bounded pq1 重查",
+        "reason": "新 triage PASS lead lead_e1daca4662d70cba294c939a608ae05c 與 parked trace 共用具名標的 AMZN, CCXI；事件觸發 bounded pq1 重查",
         "tier": 4
       },
       "triage_history": [
@@ -21821,6 +22983,22 @@
               "user_requested": true
             },
             "reason": "新 triage PASS lead lead_55d4f2734afbfab750d526b824198afb 與 parked trace 共用具名標的 CCXI；事件觸發 bounded pq1 重查",
+            "tier": 4
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-11T05:08:15.230067+00:00",
+          "superseded_reason": "新 triage PASS lead lead_e1daca4662d70cba294c939a608ae05c 與 parked trace 共用具名標的 AMZN, CCXI；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_e1daca4662d70cba294c939a608ae05c",
+          "triage": {
+            "decided_at": "2026-08-10T22:34:00.650809+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true,
+              "user_requested": true
+            },
+            "reason": "新 triage PASS lead lead_3df060cf842783e4709ae6cd86b1be74 與 parked trace 共用具名標的 CCXI；事件觸發 bounded pq1 重查",
             "tier": 4
           }
         }
@@ -22444,6 +23622,32 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2077423269066784942"
     },
+    "lead_edb7d8187be32344b2f90b0dfc7bcf11": {
+      "entities": {
+        "company_ids": [
+          "co:meta"
+        ],
+        "tickers": [
+          "META"
+        ]
+      },
+      "first_seen": "2026-08-11T05:06:10.562024+00:00",
+      "lead_id": "lead_edb7d8187be32344b2f90b0dfc7bcf11",
+      "published_at": "2026-07-30",
+      "refs": {},
+      "source": "edgar:META",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "META 10-Q filed 2026-07-30",
+      "triage": {
+        "decided_at": "2026-08-11T05:08:22.769745+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "META 10-Q 一手財報，追蹤標的季度數字與 capex guidance",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1326801/000162828026050705/meta-20260630.htm"
+    },
     "lead_ede1b7dbf287a915abb1e9fa0fdc5a80": {
       "entities": {
         "company_ids": [],
@@ -22513,6 +23717,73 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826005948/xslF345X06/ownership.xml"
+    },
+    "lead_eea44f3ae623397f4f337620ce0e1c41": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "CCXI"
+        ]
+      },
+      "first_seen": "2026-08-11T05:12:52.616007+00:00",
+      "lead_id": "lead_eea44f3ae623397f4f337620ce0e1c41",
+      "published_at": "2026-07-14",
+      "refs": {},
+      "source": "edgar:CCXI",
+      "status": "triaged_go",
+      "themes": {
+        "robotics": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CCXI"
+          ]
+        }
+      },
+      "title": "CCXI 8-K filed 2026-07-14",
+      "triage": {
+        "decided_at": "2026-08-11T05:13:15.053699+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true,
+          "novelty": true
+        },
+        "reason": "CIK 修正後首次抓到正確 Churchill Capital Corp XI（CCXI）一手 filing；robotics 主題核心公司，Agility Robotics 併購交易一手文件",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/2074973/000121390026077978/ea0297923-8k425_churchill11.htm"
+    },
+    "lead_eeeaadc30d6e4c258e42483085b3e32f": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "CCXI"
+        ]
+      },
+      "first_seen": "2026-08-11T05:06:05.241347+00:00",
+      "lead_id": "lead_eeeaadc30d6e4c258e42483085b3e32f",
+      "published_at": "2022-10-24",
+      "refs": {},
+      "source": "edgar:CCXI",
+      "status": "triaged_no_go",
+      "themes": {
+        "robotics": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CCXI"
+          ]
+        }
+      },
+      "title": "CCXI 4 filed 2022-10-24",
+      "triage": {
+        "decided_at": "2026-08-11T05:08:41.973676+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "例行內部人 Form 4 持股變動申報，無可抽取的供應鏈/技術/客戶主張",
+        "tier": 4
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1340652/000089924322034086/xslF345X03/doc4.xml"
     },
     "lead_efb79fe6c3a2151204346c0f55d9f033": {
       "entities": {
@@ -23138,6 +24409,30 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2072781715916169660"
+    },
+    "lead_f692fd01ed5edda7518ab206324906ab": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-11T05:06:00.635889+00:00",
+      "lead_id": "lead_f692fd01ed5edda7518ab206324906ab",
+      "media": [],
+      "published_at": "2026-08-11T03:39:23.000Z",
+      "raw_text": "We're almost there...",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "We're almost there...",
+      "triage": {
+        "decided_at": "2026-08-11T05:08:52.687754+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "無實質內容的預告貼文，無可查核主張",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2087021031320072235"
     },
     "lead_f6d7fdd6bff7d38b4edf021c49835f5f": {
       "entities": {
@@ -23912,8 +25207,8 @@
   "schema_version": "2",
   "source_state": {
     "x:aleabitoreddit": {
-      "since_id": "2086840511164514742",
-      "updated_at": "2026-08-10T22:32:39.701655+00:00",
+      "since_id": "2087030220213870632",
+      "updated_at": "2026-08-11T05:12:49.418591+00:00",
       "user_id": "1940360837547565056"
     }
   }
