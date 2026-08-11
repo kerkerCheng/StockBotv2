@@ -13,8 +13,32 @@
     "cache_media": true,
     "media_max_bytes": 20971520
   },
-  "_feeds_note": "2026-07-25：移除 aleabitoreddit substack feed——查證確認他的產出在 X 不在 Substack（該 feed 至今只有 1 篇 2026-05-19 舊文），已由上方 x_accounts 覆蓋；他若發長文也會在 X 貼連結。留空陣列供未來其他 RSS 來源使用。",
-  "feeds": [],
+  "_feeds_note": "2026-07-25：移除 aleabitoreddit substack feed——查證確認他的產出在 X 不在 Substack（該 feed 至今只有 1 篇 2026-05-19 舊文），已由上方 x_accounts 覆蓋；他若發長文也會在 X 貼連結。2026-08-11：補外國發行人 filing watcher——SIVE.ST／IQE.L 是 EDGAR 永遠不會有的外國發行人，先前完全無自動監測（§10.11 待做 #2）。每個 feed 都經 fetch＋parse_rss 實測，不憑印象填；下方 verified_* 記錄實測結果。⚠ MFN 只載 regulatory disclosure，純商業 PR（如 2026-04-15 Jabil 合作）不在其中，故 sivers 需兩個 feed 互補。⚠ 兩個 feed 都是瑞典文＋英文雙語各發一篇，同一事件會產生兩筆 lead（URL hash 不同），由 triage 過濾。",
+  "feeds": [
+    {
+      "source": "mfn:sivers-semiconductors",
+      "url": "https://mfn.se/all/a/sivers-semiconductors.rss",
+      "note": "Nasdaq Stockholm 法定訊息揭露（MFN）。這是 [10] 等的 2026-08-27 Q2 分辨點唯一自動監測來源。",
+      "verified_at": "2026-08-11",
+      "verified_items": 48,
+      "verified_covers": [
+        "Interim Report Q1 2026（季報會出現 → 8/27 Q2 會被抓到）",
+        "Updates Financial Reporting Calendar（財報日期若改期也會被抓到）",
+        "publishes the 2025 Annual Report, adjusting prior reported financials（重編揭露）",
+        "Sivers & GlobalFoundries Advance AI Data Center Optical Solutions"
+      ],
+      "verified_misses": [
+        "2026-04-15 Jabil 1.6T LRO 合作 PR（走 PR Newswire／公司站，不經 MFN）"
+      ]
+    },
+    {
+      "source": "sivers:press",
+      "url": "https://www.sivers-semiconductors.com/?feed=rss2&post_type=press",
+      "note": "公司站 WordPress press post_type feed，補 MFN 不載的商業 PR。視窗僅最新 10 篇，daily 節奏足夠。",
+      "verified_at": "2026-08-11",
+      "verified_items": 10
+    }
+  ],
   "edgar_watch": {
     "note": "只記 filing metadata（form/日期/URL），不下載全文。8-K/10-K/10-Q/Form 4 高優先；S-8 等註冊雜訊交 triage 判。下載＋抽取仍由使用者點名 research 動詞觸發。⚠ forms 是 exact match（fetchers/edgar.py get_filings），不做 prefix 比對：把 ticker 加進 watch 但該事件的 form 不在下方清單，watcher 看起來在跑卻永遠看不到它——CCXI 就是這樣，加進 watch 是為了 [74]/[114] 等的 S-4，但 S-4 原本不在清單。S-4/S-4A 為 SPAC 併購財務揭露本體（8-K/425 只是宣布遞交，不含財務）。",
     "tickers": [
