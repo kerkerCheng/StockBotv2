@@ -9,173 +9,129 @@ description: >
 
 # Source Trace — 原始來源追索手冊
 
-## 定位
+## 核心判準
 
-**線索不是證據。先追回可逐字核對的原始文件，再決定是否抽取；追不到時要誠實降級，
-不能把轉述者冒充成原始事件，也不能讓低品質材料形成互相引用的假共識。**
+**線索不是證據。只有真正取得、可定位、可逐字核對的文件內容，才能支持 claim。**
 
-本手冊必須能在遠端 chat 單獨使用。標有「本機入口」的命令只適用於本機 session；
-cloud routine／手機不能假設可碰本機檔案或 localhost。
+搜尋摘要、LLM 摘要、無 locator 截圖、同源轉述、只有標題或「某券商說」都不算原文。
+`evidence_tier` 依實際取得的文件評，不繼承線索宣稱的來源等級。
 
-### 本機音訊／podcast 入口
+## 先分流，不要把所有缺口都叫追源
 
-官方音訊沒有逐字稿時，本機 session 可執行：
+| 缺口 | 路由 |
+|---|---|
+| 某份文件／報告到底寫了什麼 | source trace |
+| customer concentration、backlog、財務或時變數字 | 追到 filing 後交 Engine C manual observation |
+| 競爭者、供應關係、可替代性、counter-path | 追一手文件後走 Graph research／RA admission |
+| execution context、policy、paper／live 狀態 | Decision Lab／private authority，不用 Web 搜尋補 |
+
+若缺口不依賴未取得文件的逐字內容，就不要建立 `source_trace_review`。
+
+## 實際執行路由鏈
+
+### 1. 拆 claim
+
+每條只保留一個可驗證 atom：主體、動作／關係、對象、時間，以及線索聲稱的原始文件或事件。
+先判斷這個 atom 是否真的會影響 thesis／decision；不重要的付費報告細節直接 park。
+
+### 2. 依序嘗試四條路徑
+
+1. **原始登記表／官方頁：**
+   - 美股：SEC EDGAR、公司 IR、法說逐字稿。
+   - 台股：MOPS、交易所、公司 IR。
+   - A 股：交易所公告、年／季報、問詢函、互動易。
+   - 技術：DOI／publisher、arXiv、OFC／ECOC、標準組織、專利。
+2. **交叉方官方文件：** 被點名客戶、供應商、合作方或監管機構的 filing、公告與法說。
+3. **精確搜尋：** 用 exact title、作者、日期、報告編號或獨特句子搜尋，再打開 canonical／作者頁。
+   搜尋摘要只用來找路；多篇重述同一報告仍是 `same_origin`。
+4. **可讀性恢復：** 「公開內容的 access recovery 梯子」只適用於原本即公開的頁面：
+   in-app browser → 官方下載／公開文字版 → `txtify.it`；
+   使用者合法持有的本機副本標 `local_only`。官方音訊無 transcript 時，本機可用：
 
 ```powershell
 & '.venv\Scripts\python.exe' scripts\transcribe_audio.py '<本機檔案或直接音訊 URL>'
 ```
 
-預設用 `small.en`＋CPU int8 在本機推論；首次使用會下載模型，之後從
-`library/private/models/faster-whisper/` 讀 cache。完整逐字稿只寫入 ignored 的
-`library/private/transcripts/`，固定標為 `local_only`。ASR 只用來找 timestamp；技術名詞、
-數字與要引用的句子仍須回到該 timestamp 音訊核對。不得因「有機器逐字稿」就提高
-`evidence_tier`，辨識含糊時仍依下方規則降級。
+ASR 只用來找 timestamp；數字、技術詞與 quote 必須回聽核對。
 
-## 什麼算「追到原文」
+### 3. access boundary
 
-至少滿足以下一種：
+遇到 paywall、login、CAPTCHA、anti-bot 或其他 access control 就停止。不得偽裝 Googlebot、偽造
+Referer；不得使用外洩鏡像、共用登入或規避限制的代理／快取。公開頁可以去除導覽、廣告與 UI 雜訊，
+但只保存研究必要的有限 quote 與 locator，不重製全文。
 
-1. 可存取的官方／原作者頁面或文件，能看到所需主張的逐字文本，並保存穩定 URL、
-   文件 metadata、locator 與有限 quote。
-2. 來源授權允許保存原文時，取得逐字文件內容與可定位位置。
-3. 原站只允許有限節錄時，保存 canonical URL + 研究所需的有限逐字 excerpt + locator。
+### 4. 核對與 origin 去重
 
-以下都**不算**原文：搜尋摘要、LLM 摘要、沒有 URL/locator 的截圖、轉述者自己的改寫、
-「某券商說」但找不到報告、只看到標題、或 quote 實際為 null。即使內容看起來可信，
-也只能依目前真正取得的文件分級。
+- 公司名、產品、數字與關係必須真的出現在 quote；類別詞不能推出具名公司。
+- `origin_entity` 是目前取得文件的發出者；`origin_event` 是它描述的原始事件。
+- 搜尋摘要只供 discovery；同標題報導、公開 reader 與同一張截圖都標 `same_origin`／`origin_linkage`，
+  代理輸出本身不是新的 origin。
+- 找到官方廣義方向，不等於找到券商的排名、TAM、目標價或獨家原句。
 
-## 路由鏈：先專用登記表，再通用搜尋
+## 結果只用這六種
 
-每條 atomic claim 依序走；前一層有結果就優先使用，不為湊三份而收集同源轉述。
-
-| 類型／市場 | 第一層：原始登記表 | 第二層：交叉方 | 第三層：通用搜尋 |
-|---|---|---|---|
-| 美股公司 | SEC EDGAR 的 10-K/10-Q/8-K/S-1/Form 4、公司 IR、法說逐字稿 | 客戶／供應商 filing、官方產品／design-win 公告 | 用公司名 + exact phrase + filing/form/date 搜尋 |
-| 台股公司 | MOPS 公告、月營收、財報、法說會／IR | 上下游上市公司 MOPS、交易所公告 | 公司名／代號 + 公告關鍵字 + 日期 |
-| A 股（備用） | 年報／季報／臨時公告、交易所問詢函、互動易 | 招投標、中標、環評能評、海關、上下游公告 | 公司名 + exact phrase + 公告類型 |
-| 技術／學術 | arXiv、DOI/publisher page、OFC/ECOC 議程與論文、標準組織 | 作者／實驗室頁、專利、公司技術白皮書 | 論文標題 exact phrase、作者、conference/year |
-| 產業／供應鏈 | 當事公司官方文件或被點名客戶／合作方文件 | 監管文件、正式產能／qualification 通知 | 產業媒體、券商摘要、Substack、社群只作 discovery |
-
-美股本機可用 `fetchers/edgar.py`，但這是**本機入口**；cloud routine 應用 web search
-打開 SEC/IR 原頁。通用搜尋永遠是第三層 discovery，不因搜尋結果彼此重複就算多個
-`origin_entity` 或 `origin_event`。
-
-## 公開內容的 access recovery 梯子
-
-遇到 JS rendering、壞連結、地區 routing、搜尋只見摘要或一般抓取器讀不到時，依序嘗試並記錄；
-目的只是**恢復對公開內容的正常讀取**，不是繞過付費、登入、授權或技術性 access control：
-
-1. 先找 canonical URL、官方 research／IR index、作者頁、文件編號、日期與公開下載 endpoint。
-2. 用 exact title、作者、日期、報告編號、獨特句子與當地語言查找；搜尋摘要只供 discovery，
-   不能充當 quote 或原文。
-3. 找相同標題的媒體報導以恢復 metadata／claimed origin；若它只是重述同一報告或同一貼文，標
-   `same_origin`，不得當獨立佐證。發布時間緊接原線索、保留原線索特有評論或數字時，預設同源。
-4. 回到被點名公司、客戶、供應商、監管機構或作者的官方頁，逐條獨立核對 atomic claims；
-   可以確認廣義方向，但不得把 broad corroboration 外推成 exact named supplier mapping。
-5. 公開 reader／文字轉換服務（例如 `txtify.it`）只可用於 canonical URL **原本即公開、無需登入／
-   訂閱／cookie，且障礙只是 rendering compatibility** 的情況。必須同時保存 canonical URL、轉換服務、
-   取得時間，並抽查標題／作者／日期／關鍵段落與原站一致；代理輸出本身不是新的 origin。
-6. 使用者合法持有的本機副本預設 `local_only`；只保存研究必要 excerpt／locator，不上傳 cookie、
-   token URL 或未授權全文。
-7. 遇到 paywall、login、CAPTCHA、robots／anti-bot 或其他 access control 就停止；不得使用外洩鏡像、
-   偽造憑證、規避限制的代理或其他 circumvention。需要購買時另走 exact vendor／金額核准。
-
-`txtify.it` 不是預設路徑，也不是「看到 403 就試」的繞過器。若原站 403 的原因不明，先記
-`access_blocked` 並做同路徑權限重跑；確認是公開頁的 rendering 問題後，才可走第 5 層。
-
-## 每條 claim 的 Trace 迴圈
-
-1. **拆 atomic claim：** 主體、動作／屬性、對象、時間、原線索說它來自哪裡。
-2. **辨識聲稱的原始事件：** filing、法說、公告、論文、客戶名單或只是作者推斷。
-3. **走對應路由：** 先官方登記表，再交叉方，最後 exact-phrase 通用搜尋。
-4. **核對逐字內容：** 公司名、產品型號、數字與關係必須真的出現在 quote；只出現類別詞
-   不可推導具體實體。
-5. **登記 origin：** `origin_entity` 是真正發出目前取得文件的人；`origin_event` 是原始事件。
-   找不到聲稱的原文件時，不得把轉述者標成原事件的發出者，也不得反過來把被轉述機構
-   寫成目前文件的 `origin_entity`。
-6. **依下表處置，留下完整嘗試紀錄。** 若失敗看起來來自 sandbox／proxy／本機網路權限，先將
-   `failure_class` 記為 `access_blocked`，再以完全相同路徑在允許本機網路的權限下重跑一次；仍失敗時，
-   至少再試一條官方替代路徑。`blocked` 不是 `no_result`、不支持也不反駁 claim，必須留在追源 backlog。
-7. **park 必須帶下一個 trigger：** 寫入 lead refs 的 `trace_status`、`trace_attempts_ref`、
-   `trace_next_trigger`、`trace_requires_user`，並由 Daily 的 `engine_b.cli trace-backlog` 持續可見。
-   `trace_requires_user=true` 只用於需要合法 access／付費／人工優先權的 exact 問題；一般新 metadata、
-   官方事件或 scheduled retry 仍留 pq1，不占 pq2。
-
-## 分級處置（追不到不是同一種結果）
-
-| 最終可取得材料 | 處置 |
+| 結果 | 處置 |
 |---|---|
-| 找到線索所聲稱的原始文件與逐字 quote | `original_obtained`：保存原文件 origin、URL、locator、quote；tier 1–2 可進 extract，tier 3 仍維持 tier 3，依 lead-intake 產低 confidence／needs_review RA 或 park，不因「找到原報告」升級 |
-| 目前真正取得的文件本身是 tier 1–2，但它提到另一個拿不到的事件 | `tier_1_2_honest_passthrough`：可產草稿，但只引用目前文件的逐字文字；明標「原事件未獨立取得」，不可算第二 origin |
-| tier 3 報導／研究，且聲稱的原文追不到 | `isolated_tier_3`：不產 extraction 草稿、不入圖；進「追源未果」backlog，保留 lead 與嘗試紀錄 |
-| tier 4 社群／論壇／截圖，且原文追不到 | `lead_only_tier_4`：只留線索，不產草稿、不呼叫 `load_extraction` |
-| 找到原文但它不支持、只部分支持、或直接反駁原線索 | 以原文為準，記 `contradicts`／`partial`；反向證據仍優先進 triage，不把它當追源失敗 |
-| 原文有 paywall／授權限制 | 授權允許才保存；否則只存 canonical URL、metadata 與允許的有限 excerpt，或 `local_only`。付費不等於可上傳 |
+| `original_obtained` | 有原文、URL、quote、locator；依 tier 進 extract 或 park |
+| `tier_1_2_honest_passthrough` | 取得的一手文件提到另一個拿不到的事件；只抽目前文件明寫的內容 |
+| `partial` | 只有部分 atoms 被一手來源支持；其餘逐項標未驗證 |
+| `contradicts` | 原文不支持或反駁線索；以原文為準，反證回 triage |
+| `isolated_tier_3` | tier 3 報導／券商轉述追不到原文；不產 extraction、不入圖 |
+| `lead_only_tier_4` | 社群／論壇／截圖追不到原文；只留 lead |
 
-`evidence_tier` 依真正取得的文件評，不繼承線索宣稱的來源等級。tier 3–4 追不到原文時
-隔離，是為了阻止多篇轉述同一未見文件的報導形成假交叉驗證。
+只找到報告標題、作者、日期或 canonical URL 時，寫進 `attempts_ref`，但不另創 trace status，
+也不提高 evidence tier。
 
-## 嘗試紀錄格式
+取得 tier 3 報告只解決可核對性；tier 3 仍維持 tier 3，不因「找到原報告」升級。
 
-每條 claim 都輸出一筆，成功與失敗都記：
+## 最小紀錄
+
+每條 claim 至少留下：
 
 ```yaml
 claim: "可單獨驗證的主張"
-lead_url: "起始線索 URL"
-claimed_origin: "線索聲稱來自誰／哪個事件"
-attempts:
-  - route: "SEC EDGAR | MOPS | customer IR | arXiv | exact-phrase search | ..."
-    access_method: "canonical | official_index | exact_title | same_title_media | public_transformer | local_copy"
-    query_or_url: "實際查過的 query 或 canonical URL"
-    canonical_url: "聲稱原文的穩定 URL；沒有則 null"
-    transformation_service: "例如 txtify.it；未使用則 null"
-    origin_linkage: "independent | same_origin | metadata_only | unknown"
-    result: "found | no_result | blocked | paywalled | mismatch | contradicts"
-    failure_class: "access_blocked | paywall_or_login | anti_bot | timeout | tls_failure | transport_failure | provider_api_error | null"
-    note: "找到/沒找到什麼"
-trace_status: "original_obtained | tier_1_2_honest_passthrough | isolated_tier_3 | lead_only_tier_4"
+claimed_origin: "聲稱來自哪份文件／事件"
+attempts_ref: "查過的官方登記表、交叉方與 exact query／URL"
+trace_status: "六種結果之一"
 obtained_origin_entity: "真正取得文件的發出者；沒有則 null"
-obtained_source_type: "filing | transcript | official_pr | paper | industry_report | social | ..."
-evidence_tier: 1
-quote: "逐字引文；追不到則 null"
-locator: "頁碼／段落／timestamp；追不到則 null"
-storage_permission: "repo_full | repo_excerpt | local_only | unknown"
-next_action: "extract | park_trace_backlog | lead_only | investigate_contradiction"
+quote: "必要有限引文；沒有則 null"
+locator: "頁碼／段落／timestamp；沒有則 null"
+storage_permission: "repo_excerpt | local_only | unknown"
+trace_next_trigger: "什麼新事件值得再查"
+trace_requires_user: false
 ```
 
-### Backlog → pq1／pq2 路由
+禁止只寫「Google 沒找到」。若某路徑是網路／權限失敗，記 `access_blocked`，不能改寫成
+`no_result`；但不用為同一個失敗反覆製造沒有新資訊的 retry。
 
-- `trace_requires_user=false`：保留在 trace backlog；`trace_next_trigger` 命中後重新排入 pq1。
-- `trace_requires_user=true`：`todo sync` 建立 `source_trace_review`。使用者 `go` 只授權 bounded
-  source trace 並 dispatch 回 pq1；不代表接受 claim，也不授權付費或入圖。
-- pq1 取得可引用原文並產生 graph delta：prepare Research Action，另進 `ra_admission` pq2。
-- pq1 仍未取得原文：以 `trace:<trace_status>` terminal receipt 結束本次 review，保留下一個 trigger。
-- 需要購買新報告／訂閱：必須另提出 vendor、方案、exact 金額與 storage permission；不得由一般
-  `source_trace_review go` 推定消費核准。
+## 付費報告
 
-禁止只寫「Google 沒找到」。至少記錄試過的專用登記表、交叉方與 exact-phrase query；
-若環境無法連某路徑，寫 `blocked`，不要假裝已查完；完成權限重跑與官方替代路徑前，不得改寫成
-`no_result`。後續成功時保留原 attempt 並加 recovered attempt，不能刪掉第一次失敗造成的觀測偏誤。
-同標題報導、搜尋摘要與公開轉換服務還必須記 `origin_linkage`；它們可以幫忙找路，不能製造新的
-evidence origin。
+先拆成兩類：
 
-## 遠端 chat／routine intake SOP
+- **公開一手來源可驗證的 atoms：** 照正常 SOP 處理。
+- **只有報告原文能證明的 atoms：** 如排名、TAM、目標價、券商原句；未合法取得前維持未驗證。
 
-1. 收到未驗證線索先讀本手冊（手機／網頁用 MCP `get_source_trace_manual`；cloud routine
-   也可直接讀 repo 本檔）。
-2. 拆 claim 並跑 Trace；tier 3–4 未果只回 lead/backlog，不生成假 extraction。
-3. 通過者再讀 `get_extraction_rules`，依 quote 與真正 origin 產 provider-independent JSON。
-4. 向使用者展示來源核對表與降級標記；只有人工核准後才能呼叫 `load_extraction`。
-5. 寫入工具若支援 raw/provenance 參數，依 `storage_permission` 傳 canonical URL、有限 excerpt
-   或獲授權全文；授權不明預設 `local_only`，不得把 secret-bearing URL/cookie 寫入 repo。
-6. 回報實際落地／入圖結果。失敗保留為 pending，不可宣稱完成。
+預設 `trace_requires_user=false` 並 park。只有 exact atom 對現有 thesis／decision 具實質影響，且下一步
+確實需要使用者提供合法副本、決定是否付費或提高優先權時，才設 `true` 建立
+`source_trace_review`。一般 `go` 只 dispatch bounded pq1，不授權購買；購買必須另列 vendor、方案、
+exact 金額、保存範圍與預期解鎖的 atoms。
 
-## 快速走查
+## Queue 契約
 
-- Tier 3 文章聲稱「客戶只用 Sivers」，SEC/客戶 IR/官方公告都找不到：
-  `isolated_tier_3`，進追源未果清單，**沒有 extraction 草稿**。
-- 官方合作方公告提到 Sivers 元件，但拿不到它引用的客戶測試：
-  `tier_1_2_honest_passthrough`，只抽公告實際寫出的合作內容，客戶測試標未獨立取得。
-- 推文截圖聲稱 Broadcom 客戶轉回 copper，找到客戶法說逐字原文：以客戶法說為 evidence；
-  即使方向反駁現有 CPO thesis，也交 signal-triage 優先放行。
-- 社群謠言無 URL、無 quote、無原文：`lead_only_tier_4`，不呼叫寫圖工具。
+- `trace_requires_user=false`：留 trace backlog；明確 trigger 命中後回 pq1。
+- `trace_requires_user=true`：`todo sync` 建 `source_trace_review`；`go` 不接受 claim、不提高 tier、不入圖。
+- 取得原文且有 graph delta：prepare RA，另進 `ra_admission` pq2。
+- 只屬 Engine C observation：交對應 authority lane，不製造空 RA。
+- 仍未取得：以 `trace:<trace_status>` terminal receipt 結束本次 review，保留下一個 trigger。
+
+## 對使用者的短格式
+
+```text
+已取得：<文件／quote／locator，或「無」>
+支持：<被支持的 atoms>
+未支持：<仍缺原文的 atoms>
+結果：<trace_status>
+下一步：<extract／其他 authority／park + trigger／需要使用者的 exact 選擇>
+```
+
+本機與遠端都遵守同一判準；只有本機可假設能讀 private local copy、執行音訊轉錄或寫入本機 authority。
