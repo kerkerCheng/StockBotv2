@@ -1952,12 +1952,20 @@
     },
     {
       "added_at": "2026-08-12T11:39:40.767562+00:00",
+      "completion_authority": {
+        "action_digest": "9448dd39c01f091ea741bbe47b8e17935e0ffd055cf024feb80e858293f5e6fe",
+        "cohort_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
+        "commit": "a73b290ec3cd1b0f53d48233b886076500e1ac55",
+        "company_id": "co:sivers_semiconductors",
+        "verified_at": "2026-08-12T11:53:51.874765+00:00"
+      },
       "hint": "核准 exact graph delta；Decision handoff：co:sivers_semiconductors。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 126,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_34e091e4cc47c08499c0b859c931a4d3;digest:9448dd39c01f091ea741bbe47b8e17935e0ffd055cf024feb80e858293f5e6fe;commit:a73b290ec3cd1b0f53d48233b886076500e1ac55;cohort:dc_7dc03795699f2169e9c8adc6d3d10179",
       "ref_id": "ra_34e091e4cc47c08499c0b859c931a4d3",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-12T11:53:51.874765+00:00",
       "source": "research_action",
       "title": "MACOM（MTSI）InP DFB 短缺表態與 InP photonics 進入計畫（反向證據）",
       "type": "ra_admission"
@@ -4224,6 +4232,15 @@
       "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
       "type": "decision_review",
       "verb": "drop"
+    },
+    {
+      "at": "2026-08-12T11:53:51.874765+00:00",
+      "n": 126,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_34e091e4cc47c08499c0b859c931a4d3;digest:9448dd39c01f091ea741bbe47b8e17935e0ffd055cf024feb80e858293f5e6fe;commit:a73b290ec3cd1b0f53d48233b886076500e1ac55;cohort:dc_7dc03795699f2169e9c8adc6d3d10179",
+      "ref_id": "ra_34e091e4cc47c08499c0b859c931a4d3",
+      "type": "ra_admission",
+      "verb": "go"
     }
   ],
   "next_n": 127,

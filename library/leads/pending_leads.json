@@ -12483,10 +12483,12 @@
       "published_at": "2026-08-06T23:41:38.000Z",
       "raw_text": "$MTSI earnings transcript: \n\n\"Customers are coming to us with urgency due to the general supply shortage of indium phosphide DFB lasers\"\n\nEmphasis on \"Urgency\", CW \"DFB lasers\", \"coming to us\".\n\nCW DFB names, such as like $SIVE and $LITE should be happy to hear about this laser bottleneck getting validated.",
       "refs": {
+        "action_digest": "9448dd39c01f091ea741bbe47b8e17935e0ffd055cf024feb80e858293f5e6fe",
+        "focus_company_id": "co:sivers_semiconductors",
         "research_action_id": "ra_34e091e4cc47c08499c0b859c931a4d3"
       },
       "source": "x:aleabitoreddit",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {
         "cpo": {
           "counter_only": false,
