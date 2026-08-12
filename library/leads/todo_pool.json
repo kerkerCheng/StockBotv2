@@ -1930,11 +1930,17 @@
       "added_at": "2026-08-12T05:55:59.084402+00:00",
       "hint": "go 只排入 bounded pq1 取得原文並追源；不接受轉述當證據、不授權入圖。已查證 Broadcom 官方頁面只能支持 CPO 平台背景，不支持「UHP CW 是唯一理想架構」、SIVE 受益或 transceiver TAM 減少 40-50% 的 broker 原句；且推文轉述的 B.Riley 立場與可查證方向不符（實際已上調至 Neutral、目標價 15→54）。若決定付費，需另核准 exact 金額與方案（我未查價）。",
       "n": 124,
-      "reason": null,
+      "reason": "使用者確認關閉；二次追源已改判 partial 並移回一般 trace backlog",
+      "receipt": null,
       "ref_id": "lead_075cb52a7fffdf3550210fc2a5f6fb8b",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "drop",
+      "resolved_at": "2026-08-12T13:42:57.883282+00:00",
       "source": "source_trace",
+      "source_cleared": {
+        "at": "2026-08-12T13:40:33.831861+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
       "title": "Rosenblatt／B.Riley 對 AAOI 與 CPO 雷射架構的具名報告",
       "type": "source_trace_review"
     },
@@ -1942,11 +1948,17 @@
       "added_at": "2026-08-12T05:55:59.084402+00:00",
       "hint": "go 只排入 bounded pq1 取得原文並追源；不接受轉述當證據、不提高 evidence tier、不授權入圖。目前唯一可靠解鎖路徑是取得 Morgan Stanley 該份報告逐字內容——公開轉述（X 貼文、Reddit）經查證皆只看過分享截圖且與原貼文同源，不構成第二 origin。你實際持有 SIVE，且 [10] 的 credibility hold 下不得以二手轉述升格。若決定付費，需另核准 exact 金額與方案（我未查價）；亦可回 drop 表示不值得為此付費。",
       "n": 125,
-      "reason": null,
+      "reason": "使用者確認關閉；二次追源已改判 partial 並移回一般 trace backlog",
+      "receipt": null,
       "ref_id": "lead_b1e793c560334131dfe7c1619715784d",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "drop",
+      "resolved_at": "2026-08-12T13:42:57.883325+00:00",
       "source": "source_trace",
+      "source_cleared": {
+        "at": "2026-08-12T13:40:33.831861+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
       "title": "Morgan Stanley CPO 供應商清單報告（SIVE 被列為三大 CPO 雷射供應商之一）",
       "type": "source_trace_review"
     },
@@ -1969,6 +1981,74 @@
       "source": "research_action",
       "title": "MACOM（MTSI）InP DFB 短缺表態與 InP photonics 進入計畫（反向證據）",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-08-12T14:02:30.737122+00:00",
+      "completion_authority": {
+        "action_digest": "66e91e30e7b8f8b3a42e1e87b155eb4a1a401f2c90133877d3ee950a7af86da0",
+        "cohort_id": "dc_4d28e50810e46da7fd77ee042ee7bd1c",
+        "commit": "4d4269370eb639a7e36308073b2d9ed572310083",
+        "company_id": "co:lumentum",
+        "verified_at": "2026-08-12T14:57:37.077882+00:00"
+      },
+      "hint": "核准 exact graph delta；Decision handoff：co:lumentum。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 127,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_8fd1a64f65506fe0257f203051cc613f;digest:66e91e30e7b8f8b3a42e1e87b155eb4a1a401f2c90133877d3ee950a7af86da0;commit:4d4269370eb639a7e36308073b2d9ed572310083;cohort:dc_4d28e50810e46da7fd77ee042ee7bd1c",
+      "ref_id": "ra_8fd1a64f65506fe0257f203051cc613f",
+      "resolution": "go",
+      "resolved_at": "2026-08-12T14:57:37.077882+00:00",
+      "source": "research_action",
+      "title": "Lumentum Q4 FY2026：ELS 模組由機會推進至初始訂單",
+      "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-08-12T15:06:20.702884+00:00",
+      "hint": "核准 exact graph delta；Decision handoff：co:nvidia。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 128,
+      "reason": null,
+      "ref_id": "ra_166cb097067148893a78f1f91af44c4f",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "Anthropic 宣布最高 2GW AMD Helios／MI450 部署，形成 NVIDIA 供應替代路徑",
+      "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-08-12T15:06:20.702884+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 129,
+      "reason": null,
+      "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:applied_optoelectronics",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-12T15:06:20.702884+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 130,
+      "reason": null,
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:axt",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-12T15:06:20.702884+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 131,
+      "reason": null,
+      "ref_id": "dc_4d28e50810e46da7fd77ee042ee7bd1c",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:lumentum",
+      "type": "decision_review"
     }
   ],
   "log": [
@@ -4241,8 +4321,53 @@
       "ref_id": "ra_34e091e4cc47c08499c0b859c931a4d3",
       "type": "ra_admission",
       "verb": "go"
+    },
+    {
+      "at": "2026-08-12T13:40:33.831861+00:00",
+      "n": 124,
+      "reason": "來源本輪成功執行，但不再產出此項",
+      "receipt": null,
+      "ref_id": "lead_075cb52a7fffdf3550210fc2a5f6fb8b",
+      "type": "source_trace_review",
+      "verb": "source_cleared"
+    },
+    {
+      "at": "2026-08-12T13:40:33.831861+00:00",
+      "n": 125,
+      "reason": "來源本輪成功執行，但不再產出此項",
+      "receipt": null,
+      "ref_id": "lead_b1e793c560334131dfe7c1619715784d",
+      "type": "source_trace_review",
+      "verb": "source_cleared"
+    },
+    {
+      "at": "2026-08-12T13:42:57.883282+00:00",
+      "n": 124,
+      "reason": "使用者確認關閉；二次追源已改判 partial 並移回一般 trace backlog",
+      "receipt": null,
+      "ref_id": "lead_075cb52a7fffdf3550210fc2a5f6fb8b",
+      "type": "source_trace_review",
+      "verb": "drop"
+    },
+    {
+      "at": "2026-08-12T13:42:57.883325+00:00",
+      "n": 125,
+      "reason": "使用者確認關閉；二次追源已改判 partial 並移回一般 trace backlog",
+      "receipt": null,
+      "ref_id": "lead_b1e793c560334131dfe7c1619715784d",
+      "type": "source_trace_review",
+      "verb": "drop"
+    },
+    {
+      "at": "2026-08-12T14:57:37.077882+00:00",
+      "n": 127,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_8fd1a64f65506fe0257f203051cc613f;digest:66e91e30e7b8f8b3a42e1e87b155eb4a1a401f2c90133877d3ee950a7af86da0;commit:4d4269370eb639a7e36308073b2d9ed572310083;cohort:dc_4d28e50810e46da7fd77ee042ee7bd1c",
+      "ref_id": "ra_8fd1a64f65506fe0257f203051cc613f",
+      "type": "ra_admission",
+      "verb": "go"
     }
   ],
-  "next_n": 127,
+  "next_n": 132,
   "schema_version": "1"
 }

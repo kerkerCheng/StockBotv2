@@ -3745,26 +3745,14 @@
         "campaign_topic": "photonics",
         "campaign_window_end": "2026-07-29T13:46:25Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
-        "parked_reason": "本輪 related-entity trigger 只帶來另一則 AAOI 產能推文，未提供 Rosenblatt 或 B.Riley 報告原文。Broadcom 官方只確認 CPO 使用可更換雷射模組、並展示 VCSEL NPO；不支持「UHP CW 是唯一理想架構」、Sivers 受益，或 transceiver TAM 減少 40–50% 的 broker 原句，故不產 RA。",
+        "parked_reason": "本機截圖保留 Rosenblatt 對 MRC／RNG、transceiver 數量與 ultra-high-power CW CPO 的逐字段落。OpenAI MRC、Amazon RNG 與 Broadcom OFC 2026 官方資料可獨立支持網路扁平化、VCSEL NPO、CWL／CPO 的廣義方向，但不支持 40–50% TAM、Sivers 受益或券商的 North Star 判斷。結果為 partial，不產 RA，也不需為補報告 metadata 佔用人工 pq2。",
         "research_mode": "delta_only",
-        "research_outcome": "2026-08-12 標記 trace_requires_user：唯一可靠解鎖路徑是取得機構訂閱／付費報告原文，不是任何自動訊號。先前設 related_entity_signal 使它在每次相關 ticker 有新聞時空轉重查；但若只加 consumed-marker 而不標 requires_user，標的消化完後會永久沉底且無人知道。改為進 pq2 source_trace_review，由使用者決定是否付費或放棄。",
+        "research_outcome": "2026-08-12 二次追源：本機截圖已提供 report excerpt，官方技術文件可驗證廣義方向；剩餘 report-only atoms 不足以改變目前 decision，故降回一般 trace backlog，不要求購買或人工 source-trace 決策。",
         "research_run": "daily:2026-08-12",
-        "trace_attempts_ref": "Broadcom CPO 官方頁與 OFC 2026 官方文章；Rosenblatt／B.Riley exact-phrase search；trigger lead lead_7bffab80ea65599892880f07b65189d3",
-        "trace_next_trigger": "取得 Rosenblatt／B.Riley 具名報告逐字原文，或 Broadcom／客戶官方文件逐字比較 VCSEL、CW DFB 與 UHP CW 架構",
-        "trace_requeue_trigger": "related_triaged_lead:lead_7bffab80ea65599892880f07b65189d3",
-        "trace_requeued_at": "2026-08-11T22:34:51.034304+00:00",
-        "trace_requires_user": "true",
-        "trace_review_hint": "go 只排入 bounded pq1 取得原文並追源；不接受轉述當證據、不授權入圖。已查證 Broadcom 官方頁面只能支持 CPO 平台背景，不支持「UHP CW 是唯一理想架構」、SIVE 受益或 transceiver TAM 減少 40-50% 的 broker 原句；且推文轉述的 B.Riley 立場與可查證方向不符（實際已上調至 Neutral、目標價 15→54）。若決定付費，需另核准 exact 金額與方案（我未查價）。",
-        "trace_review_title": "Rosenblatt／B.Riley 對 AAOI 與 CPO 雷射架構的具名報告",
-        "trace_status": "isolated_tier_3",
-        "trace_trigger_entities": [
-          "AAOI",
-          "AMZN",
-          "SIVE",
-          "co:applied_optoelectronics"
-        ],
-        "trace_trigger_event_ref": "lead:lead_7bffab80ea65599892880f07b65189d3",
-        "trace_trigger_kind": "related_entity_signal"
+        "trace_attempts_ref": "本機 Rosenblatt excerpt 截圖；OpenAI MRC 官方文；Amazon Science RNG 官方文；Broadcom OFC 2026 官方資料；Rosenblatt／B.Riley exact-title 與 exact-phrase 搜尋",
+        "trace_next_trigger": "Rosenblatt／B.Riley 公開報告 metadata，或客戶／Broadcom 量化揭露網路扁平化對 transceiver 數量與 CPO 光源選型的實際影響",
+        "trace_requires_user": "false",
+        "trace_status": "partial"
       },
       "source": "x:aleabitoreddit",
       "status": "parked",
@@ -7330,10 +7318,25 @@
           "serenity_30d_20260729"
         ],
         "campaign_window_end": "2026-07-29T13:46:25Z",
-        "campaign_window_start": "2026-06-29T13:46:25Z"
+        "campaign_window_start": "2026-06-29T13:46:25Z",
+        "claimed_origin": "Wall Street Journal 2026-07-26",
+        "parked_reason": "WSJ 截圖與 Reuters 都指向同一份 WSJ 匿名來源報導；NVIDIA 官方只確認一般 revenue-sharing／credit-support 商業模式，未確認 OpenAI、Ohio 10GW、2500 億美元擔保或另案 3500 億美元晶片融資，且報導明載條款未定、可能破局。",
+        "primary_url": "https://blogs.nvidia.com/blog/nvidia-unlocks-ai-compute-at-scale-capital-partners-to-power-ai-infrastructure-buildout/",
+        "research_outcome": "official_general_financing_model_only_exact_250b_350b_deal_unverified",
+        "trace_attempts_ref": "WSJ canonical title/screenshot；Reuters same-origin carrier；NVIDIA 2026-07-01 official credit-support model blog；NVIDIA/OpenAI/SoftBank official exact search",
+        "trace_next_trigger": "NVIDIA、OpenAI 或 SoftBank 官方公告／filing 揭露 Ohio 專案的已簽融資擔保、租約或晶片採購條款",
+        "trace_origin_entity": "NVIDIA",
+        "trace_origin_linkage": "NVIDIA 官方頁只支持一般機制；Reuters／其他轉述皆同源於 WSJ 匿名消息",
+        "trace_requires_user": "false",
+        "trace_status": "partial",
+        "trace_trigger_entities": [
+          "NVDA",
+          "co:nvidia"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -7434,14 +7437,18 @@
       "published_at": "2026-07-22T15:10:40.000Z",
       "raw_text": "$AMD to invest $5B in Anthropic.\n\nAnthropic in turn will sign a 2 GW deal to buy AMD’s latest chips, worth tens of billions of dollars.\n\nLooks like they’re copying the $NVDA playbook with Anthropic last year. https://t.co/SXBUq65u6P",
       "refs": {
+        "action_digest": "d086e493b1e50bf6c5fe86c9c44784d6548b1018a443c398b0c913acaebbec99",
         "campaign_ids": [
           "serenity_30d_20260729"
         ],
         "campaign_window_end": "2026-07-29T13:46:25Z",
-        "campaign_window_start": "2026-06-29T13:46:25Z"
+        "campaign_window_start": "2026-06-29T13:46:25Z",
+        "focus_company_id": "co:nvidia",
+        "research_action_id": "ra_166cb097067148893a78f1f91af44c4f",
+        "source_doc": "amd_anthropic_helios_partnership_20260722"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "action_prepared",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -10877,9 +10884,20 @@
       "first_seen": "2026-08-11T05:12:52.616274+00:00",
       "lead_id": "lead_569add44124d25b961da71868b7e1fb6",
       "published_at": "2026-06-24",
-      "refs": {},
+      "refs": {
+        "canonical_url": "https://www.sec.gov/Archives/edgar/data/2074973/000121390026071287/ea0295484-8k425_church11.htm",
+        "outcome": "original_obtained_dedup_existing_ra",
+        "parked_reason": "SEC 8-K 原文已取得；這是 2026-06-24 Agility 合併公告，交易與商業主張已由既有 SEC investor presentation RA 覆蓋。文件只說將提交 S-4，並非公開 S-4，無新增 graph delta。",
+        "pq2_ref": "74",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/2074973/000121390026071287/ea0295484-8k425_church11.htm",
+        "related_research_action_id": "ra_155541bb6c18e49d0d58140b242c8331",
+        "research_outcome": "no_new_graph_delta_dedup_existing_ra",
+        "trace_attempts_ref": "SEC issuer filing exact URL; full filing text checked",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
       "source": "edgar:CCXI",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "robotics": {
           "counter_only": false,
@@ -10974,9 +10992,18 @@
       "first_seen": "2026-08-11T05:12:52.616150+00:00",
       "lead_id": "lead_572f73ed0ae5002a8e9091d316c88565",
       "published_at": "2026-07-06",
-      "refs": {},
+      "refs": {
+        "canonical_url": "https://www.sec.gov/Archives/edgar/data/2074973/000121390026075480/ea0296510-8k_church11.htm",
+        "outcome": "original_obtained_no_graph_delta",
+        "parked_reason": "SEC 8-K 原文已取得；2026-07-02 向 sponsor 發行最高 150 萬美元、無息的 SPAC 營運資金票據，未揭露 Agility 營運或財務，無 Engine A graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/2074973/000121390026075480/ea0296510-8k_church11.htm",
+        "research_outcome": "no_graph_delta_spac_working_capital_note",
+        "trace_attempts_ref": "SEC issuer filing exact URL; full filing text checked",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
       "source": "edgar:CCXI",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "robotics": {
           "counter_only": false,
@@ -11153,9 +11180,18 @@
       "first_seen": "2026-08-11T05:12:52.616641+00:00",
       "lead_id": "lead_58b59fd0835f9f7b078e5dfdde222517",
       "published_at": "2026-03-17",
-      "refs": {},
+      "refs": {
+        "canonical_url": "https://www.sec.gov/Archives/edgar/data/2074973/000121390026029178/ea0282101-8k_church11.htm",
+        "outcome": "original_obtained_no_graph_delta",
+        "parked_reason": "SEC 8-K 原文已取得；2026-03-17 董事任命與董事報酬，發生於 Agility 合併公告前，未含 Agility 營運或供應鏈資訊，無 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/2074973/000121390026029178/ea0282101-8k_church11.htm",
+        "research_outcome": "no_graph_delta_pre_deal_director_appointments",
+        "trace_attempts_ref": "SEC issuer filing exact URL; full filing text checked",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
       "source": "edgar:CCXI",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "robotics": {
           "counter_only": false,
@@ -14154,12 +14190,13 @@
         "canonical_url": "https://www.nist.gov/news-events/news/2026/07/department-commerce-announces-letters-intent-7-companies-874-million",
         "claimed_origin": "NIST／Commerce CPO LOI＋Dow Jones 1% stake headline",
         "original_claim_status": "partial_conflated",
-        "parked_reason": "NIST 一手公告證實 GlobalFoundries（GFS）取得非約束性 LOI、擬提供最多 US$300m 以把美國 CPO 研發加速 2–3 年，並要求 minority non-controlling equity stake；但 July CPO 公告沒有寫 1%。1% 來自 GF 2026-05 量子 foundry 的另一份官方協議，原貼把兩案合併。此案仍待 diligence／final award，且圖中已有 GFS→Silicon Photonics、CHIPS Act 與 Sivers partnership；屬 dated policy／funding observation，沒有唯一新增 graph delta，不產 RA",
+        "outcome": "trigger_unrelated_original_partial_unchanged",
+        "parked_reason": "新觸發 lead 是中國光收發器限制草案，與 GFS CPO LOI 的 final award 無事件關聯。NIST 仍只證實最高 3 億美元、加速 2–3 年且須後續 diligence；1% 股權來自另一份量子 foundry 協議，原貼仍為 partial。",
         "primary_url": "https://www.nist.gov/news-events/news/2026/07/department-commerce-announces-letters-intent-7-companies-874-million",
-        "research_outcome": "dated_policy_observation_no_new_graph_delta",
+        "research_outcome": "transceiver_policy_trigger_does_not_confirm_gfs_final_award",
         "research_run": "daily_brief_2026_08_02",
-        "trace_attempts_ref": "NIST_CHIPS_index_and_2026_07_7_companies_874m_release;GF_2026_05_quantum_official_release;graph_context_co_globalfoundries",
-        "trace_next_trigger": "final_award_or_GFS_filing_confirms_CPO_equity_percentage_and_milestones",
+        "trace_attempts_ref": "NIST CPO LOI rechecked; trigger lead_7f66b743a034c41f6388aa800f333e62 is a separate optical-transceiver policy event",
+        "trace_next_trigger": "Commerce final award or GFS filing confirms CPO equity percentage and milestones",
         "trace_origin_entity": "U.S. Department of Commerce／NIST",
         "trace_origin_linkage": "official_for_300m_CPO_LOI;1pct_from_separate_May_quantum_agreement",
         "trace_requeue_trigger": "related_triaged_lead:lead_7f66b743a034c41f6388aa800f333e62",
@@ -14168,18 +14205,13 @@
         "trace_status": "partial",
         "trace_trigger_entities": [
           "GFS",
-          "INTC",
-          "LITE",
-          "SIVE",
-          "co:globalfoundries",
-          "co:intel",
-          "co:lumentum"
+          "co:globalfoundries"
         ],
         "trace_trigger_event_ref": "lead:lead_7f66b743a034c41f6388aa800f333e62",
-        "trace_trigger_kind": "related_entity_signal"
+        "trace_trigger_kind": "primary_source_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -14241,9 +14273,24 @@
       "first_seen": "2026-08-11T05:06:10.562162+00:00",
       "lead_id": "lead_79471f7e1d9ce0cea1a806571cfa4f9d",
       "published_at": "2026-07-29",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已取得 META 2026-07-29 Form 8-K 與 Exhibit 99.1；內容是 Q2 財務與全年 capex outlook（1300–1450 億美元），屬 Engine C 時變 observation，沒有具名供應商、產品、合約或可新增的 Engine A 關係。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1326801/000162828026050596/meta-06302026xexhibit991.htm",
+        "research_outcome": "engine_c_financial_observation_no_graph_delta",
+        "storage_permission": "repo_excerpt",
+        "trace_attempts_ref": "META Form 8-K Item 2.02；SEC Exhibit 99.1 lines 47-55；repo exact URL/SourceDoc search",
+        "trace_next_trigger": "Meta 後續 filing／官方 transcript 具名揭露供應商、產品、長約、compute lease 或其他會改變供應鏈圖的條款",
+        "trace_origin_entity": "Meta Platforms",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "META",
+          "co:meta"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:META",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "META 8-K filed 2026-07-29",
       "triage": {
@@ -14643,9 +14690,26 @@
       "media": [],
       "published_at": "2026-08-11T18:46:52.000Z",
       "raw_text": "Just putting it out there for people that think AAOI is a one year cycle...\n\n$AAOI projects their ELSFP capacity for CPO to be 400K/units a month in 2028.\n\n400k * ~$400 ELS ASP (GS assumptions) = + another ~$1.92B 2028 annualized revenue capacity added as a new distinct (>50% gross margin) product line. \n\nOn top of their existing 2027 projections (eg. ~$5.6B annualized transceiver revenue off $471m/month entering H2). \n\nTAM for 1.6T also goes brrr so I'd expect their end of H2 2027 projections to go up as more capacity comes online... \n\nFor certain optical names, it's one cycle (eg. 1.6T, CPO scale out/up, NPO etc. ), stacked on top of one another... stacked on top of another...  with TAM + margins stacking like minions after Anivia uses W in line. \n\nRather than one-and-done off of one year. \n\nThis is a stark contrast to some other sectors where growth is likely to decelerate after maybe 1 year of triple digit Y/Y revenue growth.",
-      "refs": {},
+      "refs": {
+        "parked_reason": "AAOI 法說會的 2028 年 ELS／ELSFP 月產約 40 萬件目標已由 ra_629fa230dd48b82ed39db2f3dc161027 入圖；本推文新增的每件約 400 美元、年化 19.2 億美元、年化 transceiver 56 億美元與毛利率大於 50% 是 GS 假設或作者算術，未出現在已取得逐字稿、10-Q 或 8-K，不能重複 prepare。",
+        "primary_url": "https://www.investing.com/news/transcripts/earnings-call-transcript-applied-optoelectronics-tops-q2-2026-forecasts-93CH-4844551",
+        "related_research_action_id": "ra_629fa230dd48b82ed39db2f3dc161027",
+        "research_outcome": "duplicate_existing_graph_evidence_unverified_broker_arithmetic",
+        "source_doc": "aaoi_q2fy26_earnings_call_20260806",
+        "storage_permission": "repo_excerpt",
+        "trace_attempts_ref": "既有 AAOI Q2 2026 earnings-call transcript/extraction/RA；使用者本機 AAOI 2026-08-06 10-Q 與 8-K 關鍵詞核對；AAOI IR official search",
+        "trace_next_trigger": "AAOI 官方揭露 ELS／ELSFP 實際出貨量、實現 ASP／毛利、具名 CPO 訂單，或 2027–2028 產能目標更新",
+        "trace_origin_entity": "Applied Optoelectronics",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "AAOI",
+          "co:applied_optoelectronics"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -16599,9 +16663,24 @@
       "first_seen": "2026-08-04T22:34:45.462027+00:00",
       "lead_id": "lead_8c6a55f00e0b344e80493463e6c5ab29",
       "published_at": "2026-08-04",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已取得 SEC Form 4：AAOI 亞洲區總經理 Joshua Yeh 於 2026-08-04 依 2026-03-19 採用的 Rule 10b5-1 計畫出售 4,715 股，加權均價 126.50 美元，交易後直接持有 383,498 股；這是 insider transaction 時變 observation，不是 Engine A 供應鏈 delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826005947/ownership.xml",
+        "research_outcome": "form4_time_series_observation_no_graph_delta",
+        "storage_permission": "unknown",
+        "trace_attempts_ref": "SEC accession 0001683168-26-005947 ownership.xml；issuer、owner、transaction code、footnote 逐欄核對",
+        "trace_next_trigger": "出現非 10b5-1 的重大 insider 交易、多人集中交易，或交易規模相對持股／薪酬達 material threshold 時再評估",
+        "trace_origin_entity": "SEC filing by Joshua Yeh / Applied Optoelectronics",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "AAOI",
+          "co:applied_optoelectronics"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:AAOI",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "AAOI 4 filed 2026-08-04",
       "triage": {
@@ -16802,9 +16881,18 @@
       "first_seen": "2026-08-11T05:12:52.616759+00:00",
       "lead_id": "lead_8f1c99c133204c13cac86a48ffd39f82",
       "published_at": "2026-02-05",
-      "refs": {},
+      "refs": {
+        "canonical_url": "https://www.sec.gov/Archives/edgar/data/2074973/000121390026012794/ea0275776-8k_church11.htm",
+        "outcome": "original_obtained_no_graph_delta",
+        "parked_reason": "SEC 8-K 原文已取得；2026-02-05 只公告 CCXI units 可拆分交易，發生於 Agility 合併公告前，無 Agility 或供應鏈 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/2074973/000121390026012794/ea0275776-8k_church11.htm",
+        "research_outcome": "no_graph_delta_pre_deal_unit_separation",
+        "trace_attempts_ref": "SEC issuer filing exact URL; full filing text checked",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
       "source": "edgar:CCXI",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "robotics": {
           "counter_only": false,
@@ -16985,9 +17073,19 @@
       "first_seen": "2026-08-11T05:12:52.596239+00:00",
       "lead_id": "lead_91a73c290d7257f4102c49d31d1b3c19",
       "published_at": "2026-08-10",
-      "refs": {},
+      "refs": {
+        "canonical_url": "https://www.sec.gov/Archives/edgar/data/2074973/000121390026086928/ea0301196-8k_church11.htm",
+        "outcome": "original_obtained_no_graph_delta",
+        "parked_reason": "SEC 8-K 原文已取得；2026-08-07 再向 sponsor 發行最高 150 萬美元、無息的 SPAC 營運資金票據，並非公開 S-4，也未揭露 Agility 營運或財務，無 Engine A graph delta。",
+        "pq2_ref": "74",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/2074973/000121390026086928/ea0301196-8k_church11.htm",
+        "research_outcome": "no_graph_delta_spac_working_capital_note",
+        "trace_attempts_ref": "SEC issuer filing exact URL; full filing text checked",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
       "source": "edgar:CCXI",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "robotics": {
           "counter_only": false,
@@ -20014,33 +20112,14 @@
         "campaign_window_end": "2026-07-29T13:46:25Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
         "original_claim_status": "unverified_with_existing_graph_conflict",
-        "parked_reason": "Morgan Stanley CPO 報告仍是機構訂閱內容；新增 Reddit／X 轉述都明示只看過分享截圖，與原貼文同源，不能形成第二 origin。Broadcom 官方頁可支持 CPO 平台與 foundry／laser 類別背景，但不能驗證 MS 將 Sivers、Coherent、Lumentum 列為三家關鍵雷射供應商；現有 Sivers credibility hold 下不升格、不產 RA。",
+        "parked_reason": "本機 Morgan Stanley excerpt 截圖逐字將 Lumentum、Coherent、Sivers 列為 CPO laser supply 的 key participants；但『三大領導者／chokepoint』是轉述者加碼，不在截圖原句。Sivers×GlobalFoundries 與 Sivers×O-Net×Enablence 官方公告可獨立支持 Sivers 參與 CPO laser／ELS，不能支持排名、份額或 sole-source。結果為 partial；Sivers credibility hold 下不升格、不產 RA，也不需為補報告 metadata 佔用人工 pq2。",
         "research_mode": "delta_only",
-        "research_outcome": "2026-08-12 標記 trace_requires_user：唯一可靠解鎖路徑是取得機構訂閱／付費報告原文，不是任何自動訊號。先前設 related_entity_signal 使它在每次相關 ticker 有新聞時空轉重查；但若只加 consumed-marker 而不標 requires_user，標的消化完後會永久沉底且無人知道。改為進 pq2 source_trace_review，由使用者決定是否付費或放棄。",
+        "research_outcome": "2026-08-12 二次追源：本機截圖已提供 exact list，官方合作公告可驗證較窄的 CPO participation；報告完整 metadata 與轉述者的 leader／chokepoint 推論未取得，但不是目前需要使用者付費解鎖的 decision-critical atom。",
         "research_run": "daily:2026-08-12",
-        "trace_attempts_ref": "Morgan Stanley／Rosenblatt exact report search；Reddit 同源截圖轉述；Broadcom CPO 官方頁；trigger lead lead_891dfebbd908d822ef6f4a55e1e465c0",
-        "trace_next_trigger": "取得 Morgan Stanley 報告本身逐字內容，或 Sivers／Coherent／Lumentum／客戶官方引用同一供應商清單",
-        "trace_requeue_trigger": "related_triaged_lead:lead_891dfebbd908d822ef6f4a55e1e465c0",
-        "trace_requeued_at": "2026-08-11T22:34:50.401653+00:00",
-        "trace_requires_user": "true",
-        "trace_review_hint": "go 只排入 bounded pq1 取得原文並追源；不接受轉述當證據、不提高 evidence tier、不授權入圖。目前唯一可靠解鎖路徑是取得 Morgan Stanley 該份報告逐字內容——公開轉述（X 貼文、Reddit）經查證皆只看過分享截圖且與原貼文同源，不構成第二 origin。你實際持有 SIVE，且 [10] 的 credibility hold 下不得以二手轉述升格。若決定付費，需另核准 exact 金額與方案（我未查價）；亦可回 drop 表示不值得為此付費。",
-        "trace_review_title": "Morgan Stanley CPO 供應商清單報告（SIVE 被列為三大 CPO 雷射供應商之一）",
-        "trace_status": "isolated_tier_3",
-        "trace_trigger_entities": [
-          "COHR",
-          "GFS",
-          "LITE",
-          "SIVE",
-          "TSEM",
-          "TSM",
-          "co:coherent",
-          "co:globalfoundries",
-          "co:lumentum",
-          "co:tower_semiconductor",
-          "co:tsmc"
-        ],
-        "trace_trigger_event_ref": "lead:lead_891dfebbd908d822ef6f4a55e1e465c0",
-        "trace_trigger_kind": "related_entity_signal"
+        "trace_attempts_ref": "本機 Morgan Stanley excerpt 截圖；Morgan Stanley exact-title／exact-phrase 搜尋；Reddit／X 同源轉述；Sivers×GlobalFoundries 與 Sivers×O-Net×Enablence 官方公告",
+        "trace_next_trigger": "Morgan Stanley 公開報告 metadata，或客戶／合作方一手揭露 Sivers 的 qualification、volume、share 或替代供應商",
+        "trace_requires_user": "false",
+        "trace_status": "partial"
       },
       "source": "x:aleabitoreddit",
       "status": "parked",
@@ -23358,9 +23437,14 @@
       "first_seen": "2026-08-11T22:33:02.729531+00:00",
       "lead_id": "lead_d144605273591c7cecce472033bb367a",
       "published_at": "2026-08-11",
-      "refs": {},
+      "refs": {
+        "action_digest": "66e91e30e7b8f8b3a42e1e87b155eb4a1a401f2c90133877d3ee950a7af86da0",
+        "focus_company_id": "co:lumentum",
+        "research_action_id": "ra_8fd1a64f65506fe0257f203051cc613f",
+        "source_doc": "lumentum_q4fy26_els_order"
+      },
       "source": "edgar:LITE",
-      "status": "triaged_go",
+      "status": "applied",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -23603,26 +23687,28 @@
         "campaign_topic": "ai_infrastructure",
         "campaign_window_end": "2026-07-05T09:45:21Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
-        "original_claim_status": "unverified_author_and_broker_inference",
-        "parked_reason": "所有 unit economics、neocloud validation 與 market misunderstanding 結論都來自不可取得的 Wells note 或作者推論；Meta 官方只支持考慮 direct compute monetization，未支持 exact broker claims",
+        "original_claim_status": "partial_official_capex_context_broker_claims_unverified",
+        "outcome": "partial_official_capex_context",
+        "parked_reason": "Meta Q2 2026 Exhibit 99.1 將全年 capex 指引收斂至 1,300–1,450 億美元、下限高於先前 1,250 億；但未提 excess-compute 銷售、unit economics、neocloud validation 或 Wells 原句。只支持 capex context，不支持券商／作者推論。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1326801/000162828026050596/meta-06302026xexhibit991.htm",
         "research_mode": "delta_only",
-        "research_outcome": "broker_note_unavailable_official_context_not_exact_claim",
+        "research_outcome": "meta_q2_filing_supports_capex_not_excess_compute_broker_inference",
         "research_run": "luna_reviewer_2026-08-02_pq1_10",
-        "trace_attempts_ref": "Wells Fargo exact-note search；X screenshots；Meta Q2 2026 transcript/Exhibit context",
-        "trace_next_trigger": "Wells Fargo canonical note/report，或 Meta filing/transcript 逐字披露具體 excess-compute terms 與 economics",
+        "trace_attempts_ref": "Wells exact-note search; X screenshots; Meta Q2 2026 Form 8-K and Exhibit 99.1; triggering filing audit",
+        "trace_next_trigger": "Wells Fargo canonical note, or Meta filing/transcript explicitly discloses excess-compute sale terms and economics",
         "trace_requeue_trigger": "related_triaged_lead:lead_79471f7e1d9ce0cea1a806571cfa4f9d",
         "trace_requeued_at": "2026-08-11T05:08:22.553104+00:00",
         "trace_requires_user": "false",
-        "trace_status": "lead_only_tier_4",
+        "trace_status": "partial",
         "trace_trigger_entities": [
           "META",
           "co:meta"
         ],
         "trace_trigger_event_ref": "lead:lead_79471f7e1d9ce0cea1a806571cfa4f9d",
-        "trace_trigger_kind": "related_entity_signal"
+        "trace_trigger_kind": "primary_source_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "Wells Fargo: $META intent to sell excess compute is a positive signal around underlying demand and unit economics of AI. “Despite this shift, we don’t expect a pullback in Meta’s capex or that overall compute needs are lower” Regarding Neoclouds: WF thinks it validated the massive AI infra opportunity as well as acquisition opportunities. Despite any potential competition for Neoclouds. I’m inclined to agree with Wells Fargo here and say markets completely misunderstood Meta’s excess compute comment.",
       "triage": {
@@ -25872,28 +25958,26 @@
         "campaign_window_end": "2026-07-29T13:46:25Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
         "original_claim_status": "partial_support_potential_talks_contract_inference_rejected",
-        "parked_reason": "新觸發 lead_0624cbfddb41714f21502cc3f3da7a8a 只在記憶體供需敘事中提到 SPCX，與 Meta/Anthropic compute lease talks 無事件關聯；仍無 Meta/Anthropic 官方公告、filing 或已簽條款，10B 美元不能視為成交價值。",
+        "outcome": "trigger_unrelated_trace_unchanged",
+        "parked_reason": "觸發重查的 lead_3df060cf842783e4709ae6cd86b1be74 只列 NBIS 財報與 OCP／Unitree 時程，沒有 Meta–Anthropic 事件關聯；仍無可逐字核對的 NYT 原文、官方公告或 signed terms，100 億美元不能視為成交價值。",
         "research_mode": "delta_only",
-        "research_outcome": "shared_spcx_entity_unrelated_no_signed_terms",
+        "research_outcome": "nbis_ocp_event_does_not_support_meta_anthropic_terms",
         "research_run": "daily-brief-2026-08-09-post-permission-recovery",
-        "trace_attempts_ref": "既有 NYT/Reuters/Meta official context＋2026-08-09 related-entity delta audit",
-        "trace_next_trigger": "NYT 原文可核對，或 Meta/Anthropic official announcement/filing、Reuters 後續確認 signed terms",
+        "trace_attempts_ref": "Existing NYT/Reuters/Meta context plus trigger audit of lead_3df060cf842783e4709ae6cd86b1be74",
+        "trace_next_trigger": "NYT original becomes readable, or Meta/Anthropic official announcement or filing confirms signed terms",
         "trace_requeue_trigger": "related_triaged_lead:lead_3df060cf842783e4709ae6cd86b1be74",
         "trace_requeued_at": "2026-08-10T22:34:00.650809+00:00",
         "trace_requires_user": "false",
         "trace_status": "isolated_tier_3",
         "trace_trigger_entities": [
-          "IREN",
           "META",
-          "NBIS",
-          "SPCX",
           "co:meta"
         ],
         "trace_trigger_event_ref": "lead:lead_3df060cf842783e4709ae6cd86b1be74",
-        "trace_trigger_kind": "related_entity_signal"
+        "trace_trigger_kind": "primary_source_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "$META in talks to lease compute to Anthropic in a $10B dollar deal. Seems like they saw how profitable $SPCX $45B compute deal was. But just goes to validate Neocloud business models like $NBIS, $IREN, and co if hyperscalers are copying their homework. Source: NYT https://t.co/3Mu3UXQtFT",
       "triage": {
@@ -26362,9 +26446,20 @@
       "first_seen": "2026-08-11T05:12:52.616007+00:00",
       "lead_id": "lead_eea44f3ae623397f4f337620ce0e1c41",
       "published_at": "2026-07-14",
-      "refs": {},
+      "refs": {
+        "canonical_url": "https://www.sec.gov/Archives/edgar/data/2074973/000121390026077978/ea0297923-8k425_churchill11.htm",
+        "outcome": "original_obtained_transaction_milestone",
+        "parked_reason": "SEC 一手 8-K 證實 CCXI 與 Agility 於 2026-07-13 confidentially submitted draft S-4；這不是可公開讀取的 S-4，沒有新增財務揭露或 graph delta，[74] 仍等公開 S-4／closing。",
+        "pq2_ref": "74",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/2074973/000121390026077978/ea0297923-8k425_churchill11.htm",
+        "research_outcome": "confidential_draft_s4_not_public_registration_statement",
+        "trace_attempts_ref": "SEC Form 8-K and Exhibit 99.1 checked; filing states confidential draft S-4 submission only",
+        "trace_next_trigger": "公開 S-4 filing 或交易 closing；由 [74] 的 EDGAR watcher／外部事件條件處理",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
       "source": "edgar:CCXI",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "robotics": {
           "counter_only": false,
