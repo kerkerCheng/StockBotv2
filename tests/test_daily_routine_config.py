@@ -20,11 +20,31 @@ def test_config_owns_daily_drain_limit(tmp_path) -> None:
             "tracked_ticker_sources": {
                 "thesis_lifecycle": True,
                 "decision_cohorts": True,
+                "theme_core_companies": True,
             },
         },
     })
 
     assert routine_config.load_config(path)["pq1"]["drain_limit_per_run"] == 2
+
+
+def test_config_fails_closed_on_incomplete_tracked_ticker_sources(tmp_path) -> None:
+    """tracked_ticker_sources 的每個來源都必須明示 boolean，不得靠預設值靜默關閉。
+
+    這條先前被 Windows tmp_path 權限問題遮住：整個檔案在 setup 階段就 error，
+    於是 2026-08-12 新增 theme_core_companies 時，沒有任何測試指出缺鍵的 config 會失效。
+    """
+    path = tmp_path / "daily.json"
+    _write(path, {
+        "schema_version": "1",
+        "pq1": {
+            "drain_limit_per_run": 2,
+            "tracked_ticker_sources": {"thesis_lifecycle": True},
+        },
+    })
+
+    with pytest.raises(ValueError, match="decision_cohorts"):
+        routine_config.load_config(path)
 
 
 def test_config_rejects_unbounded_daily_drain(tmp_path) -> None:
