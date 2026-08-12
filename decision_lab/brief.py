@@ -461,6 +461,50 @@ def _ignored_holdings() -> dict[str, str]:
     return ignored
 
 
+def identity_registration_pending(
+    summaries: Sequence[Mapping[str, Any]],
+    registry: IdentityRegistry,
+) -> list[dict[str, Any]]:
+    """列出「研究對象已知、但 registry 還沒有可交易 ticker」的未終結 cohort。
+
+    這類 cohort 的 `market_missing`／`fx_missing`／`financial_missing` **不是研究不足**，
+    而是在該公司取得可交易 ticker 並手動登記進 `config/company_identity.json` 之前，
+    結構上無法評估——`bind_cohort_identity` 要求 company_id 與 research_ticker 成對。
+    再 dispatch 幾輪 bounded research 也不會改變任何一項。
+
+    為什麼要一個確定性檢查：先前這件事只存在於 brief 作者寫的自然語言裡（[74] Agility
+    Robotics）。作者換人或那天忘了寫，這個前提就悄悄消失，而它是該項目能否真正解鎖的
+    唯一關鍵動作——與 SIVE 2026-08-27 同屬「已知關鍵動作＋零自動監測」。
+    """
+
+    pending: list[dict[str, Any]] = []
+    for summary in summaries:
+        if str(summary.get("lifecycle_status") or "") in _TERMINAL_LIFECYCLE:
+            continue
+        if summary.get("research_ticker"):
+            continue
+        company_id = str(
+            summary.get("company_id") or summary.get("company_id_hint") or ""
+        ).strip()
+        if not company_id:
+            # 連研究對象都不知道是另一種問題（identity 完全未解析），不在本檢查範圍。
+            continue
+        company = registry.company(company_id)
+        if company is not None and company.research_ticker:
+            # registry 有 ticker 卻沒綁上，是 binding 沒跑，不是待登記——不同問題。
+            continue
+        pending.append({
+            "cohort_id": str(summary.get("cohort_id") or ""),
+            "company_id": company_id,
+            "registered": company is not None,
+            "blocking_action": (
+                f"在 config/company_identity.json 為 {company_id} 補上可交易 "
+                "research_ticker（該公司需先完成上市／掛牌）"
+            ),
+        })
+    return sorted(pending, key=lambda row: row["company_id"])
+
+
 def _sheet_only_items(
     holdings: Mapping[str, Any] | None,
     *,
@@ -682,6 +726,10 @@ def build_today_brief(
         ],
         "blockers": blockers,
         "next_review_at": min(review_times) if review_times else None,
+        # 結構性阻塞：研究做再多也解不開，只有補 registry ticker 能解。
+        "identity_registration_pending": identity_registration_pending(
+            summaries, get_registry()
+        ),
         "user_response_needed": [
             item["user_response_needed"]
             for item in ranked
@@ -741,6 +789,17 @@ def render_today_markdown(brief: Mapping[str, Any]) -> str:
             disproof = markdown_text(item.get("disproof_condition") or "")
             if disproof:
                 lines.append(f"      → Disproof：{disproof}")
+    pending_identity = brief.get("identity_registration_pending") or []
+    if pending_identity:
+        lines += [
+            "",
+            "## 結構性阻塞：等 registry 補可交易 ticker（研究無法解決）",
+        ]
+        for row in pending_identity:
+            company = markdown_text(row.get("company_id") or "")
+            action = markdown_text(row.get("blocking_action") or "")
+            state = "已登記但無 ticker" if row.get("registered") else "尚未登記"
+            lines.append(f"- {company}（{state}）→ {action}")
     lines += [
         "",
         "## 需要你回答或回報",

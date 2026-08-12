@@ -583,3 +583,48 @@ def test_primary_source_signal_only_wakes_on_tier1_documents() -> None:
     assert store["leads"][parked_id]["status"] == "triaged_go", (
         "同一實體的**下一份**一手文件仍必須觸發"
     )
+
+
+def test_trace_backlog_flags_entries_no_trigger_can_ever_reach() -> None:
+    """2026-08-13：既不需人工 authority、又沒有具名標的的 parked lead 已經死了。
+
+    兩種 trace_trigger_kind 都靠具名標的比對；沒有標的就永遠不會命中，而它看起來
+    仍在「等事件」。標出來才不會變成安靜沉底的黑洞（同 §10.11 的「有入口沒出口」）。
+    """
+    store = leads.empty_store()
+
+    def _park(url: str, title: str, ref: dict) -> str:
+        lead_id, _ = leads.register(store, source="x:t", url=url, title=title)
+        leads.triage(store, lead_id, go=True, tier=4, reason="r")
+        leads.advance(store, lead_id, "parked", ref=ref)
+        return lead_id
+
+    base = {
+        "parked_reason": "trace 未果",
+        "trace_status": "isolated_tier_3",
+        "trace_requires_user": "false",
+    }
+    # 有具名標的 → 可觸發
+    reachable = _park(
+        "https://x.com/a/1", "$AXTI 相關轉述",
+        base | {"trace_next_trigger": "AXT 一手揭露"},
+    )
+    # 無標的、也不需人工 authority → 永遠不會命中
+    unreachable = _park(
+        "https://x.com/a/2", "某份政府報告的轉述（無具名公司）",
+        base | {"trace_next_trigger": "canonical_dhs_committee_report"},
+    )
+    # 無標的但需人工 authority → 走 pq2，本來就不靠自動觸發
+    manual = _park(
+        "https://x.com/a/3", "付費報告轉述（無具名公司）",
+        base | {"trace_next_trigger": "取得報告原文", "trace_requires_user": "true"},
+    )
+
+    rows = {row["lead_id"]: row for row in leads.trace_backlog(store)}
+    assert rows[reachable]["auto_trigger_reachable"] is True
+    assert rows[reachable]["unreachable_reason"] is None
+    assert rows[unreachable]["auto_trigger_reachable"] is False
+    assert "無具名標的" in rows[unreachable]["unreachable_reason"]
+    assert rows[manual]["auto_trigger_reachable"] is True, (
+        "requires_user 走 pq2 人工授權，不該被標成不可達"
+    )

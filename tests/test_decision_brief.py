@@ -290,3 +290,41 @@ def test_today_reads_current_market_fx_without_deriving_legacy_factor_hedge(
         assert risk["fx_return"] == pytest.approx(0.1)
     finally:
         store.close()
+
+
+def test_identity_registration_pending_surfaces_structural_blocker() -> None:
+    """2026-08-13：未上市公司的 cohort 缺 registry ticker 時，研究做再多都解不開。
+
+    先前這件事只存在於 brief 作者寫的自然語言（[74] Agility）；作者換人或忘了寫就消失。
+    """
+    from decision_lab.brief import identity_registration_pending
+
+    class _Registry:
+        def company(self, company_id):
+            class _C:
+                research_ticker = "AAOI" if company_id == "co:applied_optoelectronics" else None
+            return _C() if company_id.startswith("co:") else None
+
+    summaries = [
+        # 未上市：registry 有登記但沒有 ticker → 應列出
+        {"cohort_id": "dc_a", "company_id": None,
+         "company_id_hint": "co:agility_robotics",
+         "research_ticker": None, "lifecycle_status": "active"},
+        # 已終結：不再是待辦
+        {"cohort_id": "dc_b", "company_id": None,
+         "company_id_hint": "co:agility_robotics",
+         "research_ticker": None, "lifecycle_status": "expired"},
+        # 已有 ticker：正常
+        {"cohort_id": "dc_c", "company_id": "co:applied_optoelectronics",
+         "company_id_hint": None,
+         "research_ticker": "AAOI", "lifecycle_status": "active"},
+        # 連研究對象都不知道：屬 identity 完全未解析，不在本檢查範圍
+        {"cohort_id": "dc_d", "company_id": None, "company_id_hint": None,
+         "research_ticker": None, "lifecycle_status": "active"},
+    ]
+
+    rows = identity_registration_pending(summaries, _Registry())
+    assert [r["cohort_id"] for r in rows] == ["dc_a"]
+    assert rows[0]["company_id"] == "co:agility_robotics"
+    assert rows[0]["registered"] is True
+    assert "company_identity.json" in rows[0]["blocking_action"]

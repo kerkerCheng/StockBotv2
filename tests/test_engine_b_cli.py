@@ -121,6 +121,13 @@ def test_trace_backlog_keeps_legacy_parked_trace_visible(tmp_path, capsys) -> No
         "attempts_ref": None,
         "requires_user": False,
         "lane": "event_or_scheduled_pq1",
+        # 這筆正是「有入口沒出口」的樣本：不需人工 authority，卻也沒有任何具名標的可
+        # 比對，兩種 trace_trigger_kind 都永遠不會命中。它看起來在等事件，實際已經死了。
+        "auto_trigger_reachable": False,
+        "unreachable_reason": (
+            "無具名標的可比對：兩種 trace_trigger_kind 都不會命中，"
+            "需人工重排或改設 trace_requires_user"
+        ),
         "review_title": None,
         "review_hint": None,
         # 具名標的：讓「新 lead 是否與此 parked 有關」可確定性比對，

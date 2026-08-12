@@ -412,6 +412,8 @@ def trace_backlog(store: dict[str, Any]) -> list[dict[str, Any]]:
     不表示 claim 可信或可入圖。
     """
 
+    from engine_b.entities import lead_entities
+
     rows: list[dict[str, Any]] = []
     for lead in store["leads"].values():
         if lead.get("status") != "parked":
@@ -428,6 +430,14 @@ def trace_backlog(store: dict[str, Any]) -> list[dict[str, Any]]:
         }
         full_title = " ".join(str(lead.get("title") or "").split())
         short_title = full_title[:197] + "..." if len(full_title) > 200 else full_title
+        # 自動觸發是否**有可能**發生。requires_user 的走 pq2 由人決定，本來就不靠自動
+        # 觸發；但既不需人工 authority、又沒有任何具名標的可比對的項目，任何
+        # related_entity_signal／primary_source_signal 都永遠不會命中——它不是在等，
+        # 是已經死了，只是沒人知道。標出來才不會變成安靜沉底的黑洞。
+        trigger_entities = set(refs.get("trace_trigger_entities") or ())
+        if not trigger_entities and refs.get("trace_next_trigger"):
+            trigger_entities = lead_entities(lead)
+        auto_reachable = requires_user or bool(trigger_entities)
         rows.append({
             "lead_id": lead["lead_id"],
             "title": short_title,
@@ -437,6 +447,11 @@ def trace_backlog(store: dict[str, Any]) -> list[dict[str, Any]]:
             "attempts_ref": refs.get("trace_attempts_ref"),
             "requires_user": requires_user,
             "lane": "pq2_manual_authority" if requires_user else "event_or_scheduled_pq1",
+            "auto_trigger_reachable": auto_reachable,
+            "unreachable_reason": (
+                None if auto_reachable
+                else "無具名標的可比對：兩種 trace_trigger_kind 都不會命中，需人工重排或改設 trace_requires_user"
+            ),
             "review_title": refs.get("trace_review_title"),
             "review_hint": refs.get("trace_review_hint"),
         })
