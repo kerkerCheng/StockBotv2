@@ -2004,18 +2004,31 @@
     },
     {
       "added_at": "2026-08-12T15:06:20.702884+00:00",
+      "completion_authority": {
+        "action_digest": "d086e493b1e50bf6c5fe86c9c44784d6548b1018a443c398b0c913acaebbec99",
+        "cohort_id": "dc_c0b6f81e3507a83b857258907fafa635",
+        "commit": "e827ca05f7c73dd4c8d9c16a0f889d9ea84afd8d",
+        "company_id": "co:nvidia",
+        "verified_at": "2026-08-12T23:41:22.970641+00:00"
+      },
       "hint": "核准 exact graph delta；Decision handoff：co:nvidia。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 128,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_166cb097067148893a78f1f91af44c4f;digest:d086e493b1e50bf6c5fe86c9c44784d6548b1018a443c398b0c913acaebbec99;commit:e827ca05f7c73dd4c8d9c16a0f889d9ea84afd8d;cohort:dc_c0b6f81e3507a83b857258907fafa635",
       "ref_id": "ra_166cb097067148893a78f1f91af44c4f",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-12T23:41:22.970641+00:00",
       "source": "research_action",
       "title": "Anthropic 宣布最高 2GW AMD Helios／MI450 部署，形成 NVIDIA 供應替代路徑",
       "type": "ra_admission"
     },
     {
       "added_at": "2026-08-12T15:06:20.702884+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_880a9a7fa1682a3acfb827e7d39fd96e",
+      "dispatch_ref": "wo_e16027bd75baee9d9935f42c21a68761",
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-08-12T23:41:36.683430+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 129,
       "reason": null,
@@ -2028,6 +2041,11 @@
     },
     {
       "added_at": "2026-08-12T15:06:20.702884+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_023deab6fa06ad34b3f2d9e7069da0ff",
+      "dispatch_ref": "wo_25341729f295cd68a4b4a30369b964a2",
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-08-12T23:41:36.697251+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 130,
       "reason": null,
@@ -2040,6 +2058,11 @@
     },
     {
       "added_at": "2026-08-12T15:06:20.702884+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_e0f213a4bbc75598270ce0b73facec88",
+      "dispatch_ref": "wo_098e1e19ddf736978aa345a586b951fd",
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-08-12T23:41:36.710007+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 131,
       "reason": null,
@@ -4366,6 +4389,45 @@
       "ref_id": "ra_8fd1a64f65506fe0257f203051cc613f",
       "type": "ra_admission",
       "verb": "go"
+    },
+    {
+      "at": "2026-08-12T23:41:22.970641+00:00",
+      "n": 128,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_166cb097067148893a78f1f91af44c4f;digest:d086e493b1e50bf6c5fe86c9c44784d6548b1018a443c398b0c913acaebbec99;commit:e827ca05f7c73dd4c8d9c16a0f889d9ea84afd8d;cohort:dc_c0b6f81e3507a83b857258907fafa635",
+      "ref_id": "ra_166cb097067148893a78f1f91af44c4f",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-12T23:41:36.683430+00:00",
+      "attempt": 1,
+      "n": 129,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_e16027bd75baee9d9935f42c21a68761",
+      "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-08-12T23:41:36.697251+00:00",
+      "attempt": 1,
+      "n": 130,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_25341729f295cd68a4b4a30369b964a2",
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-08-12T23:41:36.710007+00:00",
+      "attempt": 1,
+      "n": 131,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_098e1e19ddf736978aa345a586b951fd",
+      "ref_id": "dc_4d28e50810e46da7fd77ee042ee7bd1c",
+      "type": "decision_review",
+      "verb": "pq1_queued"
     }
   ],
   "next_n": 132,
