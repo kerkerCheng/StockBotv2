@@ -387,6 +387,15 @@ v0 schema 的對錯只有真實資料能驗證。凍結一個會壞的 v0 → �
 
 完整實例、五個訊號與修法對照見 [`docs/solutions/architecture-patterns/one-representation-two-meanings.md`](docs/solutions/architecture-patterns/one-representation-two-meanings.md)。
 
+### L13 — 基礎設施改動的驗收是「端到端有產出」，不是「元件會動」
+
+**事發（2026-08-11～12，兩天內三次）：**（一）補上 SIVE／IQE filing watcher，feed 抓得到、`parse_rss` 解得出、harvest 實跑 78 筆 new，於是宣告「SIVE 從完全靠人記得變成有自動監測」——但那 78 筆全部躺在 `pending`，排程只 triage 自己當輪抓到的，`pending` 不進 pq1 drain。管子只接了一頭。（二）替待辦項目綁 `--event-type decision_evidence_delta`，它正確喚醒了，於是宣告「這樣比較嚴格」——但 `reactivation_event` 只寫不讀，沒有 consumed-marker，於是每次 sync 都重新喚醒，等待條件永遠黏不住。（三）從 `counts` 沒有 `researching`／`action_prepared` 推論「排程沒跑 pq1」——但**跑完**的 drain 同樣不留 in-flight 狀態，實際上 5 個 slot 全滿。
+
+**判準：**
+1. **驗收條件寫成「產出出現在下游消費者手上」，不是「這一步回傳成功」。** 交付前必須答得出「這條路徑的產出最後出現在哪裡、誰會消費它」；答不出來就是死路，不算完成。
+2. **最危險的是成功與失敗在同一個訊號上同形**——空集合、沒有 in-flight 狀態、回傳 OK 都是。要驗就驗那個會因為「真的成功」而改變的東西（例如再跑一次 sync 看「新增 0」，而不是看命令有沒有報錯）。
+3. 這是 L12 的操作版：L12 說一個表示承載兩種語意會讓下游二選一；這裡是**驗證者**自己讀了那個兩義訊號，於是把「沒發生」誤讀成「已完成」。
+
 ---
 
 ## 文件化學習
