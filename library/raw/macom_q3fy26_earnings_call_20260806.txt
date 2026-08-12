@@ -1,0 +1,29 @@
+Source URL: https://m.investing.com/news/transcripts/earnings-call-transcript-macom-tops-q3-2026-estimates-shares-jump-98-93CH-4842890
+
+Excerpt:
+Source URL: https://m.investing.com/news/transcripts/earnings-call-transcript-macom-tops-q3-2026-estimates-shares-jump-98-93CH-4842890
+Title: MACOM Technology Solutions (MTSI) Q3 FY2026 Earnings Call Transcript
+Call date: 2026-08-06
+Retrieved: 2026-08-12
+
+Research excerpt (CEO Steve Daly):
+- "Customers are coming to us with urgency due to the general supply shortage of
+  indium phosphide DFB lasers."
+- The products referenced are 25G DFB lasers serving 100G QSFP, CWDM-4 and LR4
+  applications; previously qualified by customers in some cases.
+- "developing plans to support a potential start to production in late calendar 2027,
+  which includes scoping modest CapEx investments and fab space requirements to support
+  a rapid, high volume ramp for a few strategic customers"
+- "We believe our indium phosphide photonics product lines represent a large growth
+  opportunity for MACOM, and we expect to gain meaningful market share over the next
+  three years."
+- Q4 FY2026 adjusted EPS $1.40 vs $1.34 consensus; revenue $342.2M vs $335.11M consensus.
+
+Boundary / counter-evidence note: the originating social lead framed this as validating
+the CPO laser bottleneck and as bullish for CW DFB names ($SIVE, $LITE). That inference
+is NOT supported by the transcript: MACOM's cited shortage concerns 25G DFB lasers for
+100G optics, a different application class from the CW DFB external light sources used
+in CPO. Management names no CPO customer and makes no claim about CW DFB. Conversely,
+MACOM's stated intent to enter InP photonics at volume from late 2027 and take
+"meaningful market share" is a competitive-entry signal that runs *against* a durable
+InP laser chokepoint thesis — it is recorded here as counter-evidence, not corroboration.

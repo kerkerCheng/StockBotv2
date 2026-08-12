@@ -1,0 +1,148 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "若到 2027-12-31 前，MACOM 或其他 InP DFB 供應商在法說會／申報中表示 InP DFB 供應已回到供需平衡、或客戶不再有 lead-time 壓力，則此短缺狀態失效。核查頻率：每季 MACOM 法說會；觸發後 48 小時內比對同期 Lumentum／Coherent 的 InP 供需表述是否一致（目前圖中 Lumentum EML 供需失衡 >30%）。",
+      "id": "macom_q3fy26_earnings_call_20260806_cl1",
+      "source_ids": [
+        "macom_q3fy26_earnings_call_20260806_s1",
+        "macom_q3fy26_earnings_call_20260806_s2"
+      ],
+      "statement": "MACOM CEO Steve Daly（2026-08-06 Q3 FY2026 法說會）表示客戶因 InP DFB 雷射普遍供應短缺而急迫接洽。**邊界：MACOM 指的產品線是服務 100G QSFP／CWDM-4／LR4 的 25G DFB 雷射，與 CPO 外部光源使用的 CW DFB 不是同一應用類別**；本則支持「InP DFB 雷射整體供應偏緊」，不足以證明 CPO 用 CW DFB 短缺，也未提及任何 CPO 客戶或競爭者受益。",
+      "subject_id": "tech:inp_dfb_laser"
+    },
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "guided",
+      "disproof_condition": "若到 2028-06-30 前 MACOM 未開始 InP photonics 量產、公開延後或取消該產能計畫，或三年後其 InP photonics 營收占比與市占仍無可辨識成長，則此競爭威脅未實現。核查頻率：每季法說會；觸發後 48 小時內更新 confidence 或 retire。",
+      "id": "macom_q3fy26_earnings_call_20260806_cl2",
+      "source_ids": [
+        "macom_q3fy26_earnings_call_20260806_s3",
+        "macom_q3fy26_earnings_call_20260806_s4"
+      ],
+      "statement": "MACOM 規劃 InP photonics 於 2027 年曆年下半可能開始量產，含適度資本支出與潔淨室空間，以支援少數策略客戶的快速放量，並預期未來三年取得「有意義的市場份額」。這是**新進產能與競爭意圖**的表態，方向與「InP 雷射為結構性瓶頸且既有供應商可長期收租」的假設相反，屬反向證據而非佐證。",
+      "subject_id": "co:macom"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {
+        "qualification_status": "qualified"
+      },
+      "confidence": 0.75,
+      "dst_id": "tech:inp_dfb_laser",
+      "id": "e1",
+      "relation": "develops",
+      "source_ids": [
+        "macom_q3fy26_earnings_call_20260806_s1",
+        "macom_q3fy26_earnings_call_20260806_s2"
+      ],
+      "src_id": "co:macom"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "mat:inp_substrate",
+      "id": "e2",
+      "relation": "depends_on",
+      "source_ids": [
+        "macom_q3fy26_earnings_call_20260806_s1",
+        "macom_q3fy26_earnings_call_20260806_s2"
+      ],
+      "src_id": "tech:inp_dfb_laser"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "MACOM",
+        "MTSI",
+        "MACOM Technology Solutions Holdings"
+      ],
+      "attributes": {},
+      "confidence": 0.75,
+      "id": "co:macom",
+      "name": "MACOM Technology Solutions",
+      "role": "bottleneck_supplier",
+      "source_ids": [
+        "macom_q3fy26_earnings_call_20260806_s1",
+        "macom_q3fy26_earnings_call_20260806_s3",
+        "macom_q3fy26_earnings_call_20260806_s4"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "InP DFB laser",
+        "25G DFB",
+        "indium phosphide DFB"
+      ],
+      "attributes": {},
+      "confidence": 0.75,
+      "id": "tech:inp_dfb_laser",
+      "name": "InP DFB laser (directly modulated, 25G class)",
+      "role": null,
+      "source_ids": [
+        "macom_q3fy26_earnings_call_20260806_s1",
+        "macom_q3fy26_earnings_call_20260806_s2"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "InP substrate",
+        "indium phosphide"
+      ],
+      "attributes": {},
+      "confidence": 0.7,
+      "id": "mat:inp_substrate",
+      "name": "Indium Phosphide (InP) substrate",
+      "role": "material_base",
+      "source_ids": [
+        "macom_q3fy26_earnings_call_20260806_s1",
+        "macom_q3fy26_earnings_call_20260806_s2"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "macom_q3fy26_earnings_call_20260806",
+    "evidence_tier": 2,
+    "origin_entity": "MACOM Technology Solutions",
+    "permission_basis": "Public earnings call transcript (aggregator-hosted); store the canonical URL and only the research-relevant excerpt.",
+    "published_at": "2026-08-06",
+    "publisher": "Investing.com (transcript aggregator)",
+    "retrieved_at": "2026-08-12",
+    "source_type": "transcript",
+    "storage_permission": "repo_excerpt",
+    "title": "MACOM Technology Solutions (MTSI) Q3 FY2026 Earnings Call Transcript",
+    "url": "https://m.investing.com/news/transcripts/earnings-call-transcript-macom-tops-q3-2026-estimates-shares-jump-98-93CH-4842890"
+  },
+  "sources": [
+    {
+      "id": "macom_q3fy26_earnings_call_20260806_s1",
+      "locator": "CEO Steve Daly, InP photonics commentary",
+      "quote": "Customers are coming to us with urgency due to the general supply shortage of indium phosphide DFB lasers."
+    },
+    {
+      "id": "macom_q3fy26_earnings_call_20260806_s2",
+      "locator": "CEO Steve Daly, product line detail",
+      "quote": "25G DFB laser products, which serve the 100G QSFP, CWDM-4, and LR4 applications"
+    },
+    {
+      "id": "macom_q3fy26_earnings_call_20260806_s3",
+      "locator": "CEO Steve Daly, capacity plan",
+      "quote": "developing plans to support a potential start to production in late calendar 2027, which includes scoping modest CapEx investments and fab space requirements to support a rapid, high volume ramp for a few strategic customers"
+    },
+    {
+      "id": "macom_q3fy26_earnings_call_20260806_s4",
+      "locator": "CEO Steve Daly, market ambition",
+      "quote": "We believe our indium phosphide photonics product lines represent a large growth opportunity for MACOM, and we expect to gain meaningful market share over the next three years."
+    }
+  ]
+}
