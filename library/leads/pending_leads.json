@@ -3747,13 +3747,15 @@
         "campaign_window_start": "2026-06-29T13:46:25Z",
         "parked_reason": "本輪 related-entity trigger 只帶來另一則 AAOI 產能推文，未提供 Rosenblatt 或 B.Riley 報告原文。Broadcom 官方只確認 CPO 使用可更換雷射模組、並展示 VCSEL NPO；不支持「UHP CW 是唯一理想架構」、Sivers 受益，或 transceiver TAM 減少 40–50% 的 broker 原句，故不產 RA。",
         "research_mode": "delta_only",
-        "research_outcome": "trigger_did_not_supply_broker_original_no_graph_delta",
+        "research_outcome": "2026-08-12 標記 trace_requires_user：唯一可靠解鎖路徑是取得機構訂閱／付費報告原文，不是任何自動訊號。先前設 related_entity_signal 使它在每次相關 ticker 有新聞時空轉重查；但若只加 consumed-marker 而不標 requires_user，標的消化完後會永久沉底且無人知道。改為進 pq2 source_trace_review，由使用者決定是否付費或放棄。",
         "research_run": "daily:2026-08-12",
         "trace_attempts_ref": "Broadcom CPO 官方頁與 OFC 2026 官方文章；Rosenblatt／B.Riley exact-phrase search；trigger lead lead_7bffab80ea65599892880f07b65189d3",
         "trace_next_trigger": "取得 Rosenblatt／B.Riley 具名報告逐字原文，或 Broadcom／客戶官方文件逐字比較 VCSEL、CW DFB 與 UHP CW 架構",
         "trace_requeue_trigger": "related_triaged_lead:lead_7bffab80ea65599892880f07b65189d3",
         "trace_requeued_at": "2026-08-11T22:34:51.034304+00:00",
-        "trace_requires_user": "false",
+        "trace_requires_user": "true",
+        "trace_review_hint": "go 只排入 bounded pq1 取得原文並追源；不接受轉述當證據、不授權入圖。已查證 Broadcom 官方頁面只能支持 CPO 平台背景，不支持「UHP CW 是唯一理想架構」、SIVE 受益或 transceiver TAM 減少 40-50% 的 broker 原句；且推文轉述的 B.Riley 立場與可查證方向不符（實際已上調至 Neutral、目標價 15→54）。若決定付費，需另核准 exact 金額與方案（我未查價）。",
+        "trace_review_title": "Rosenblatt／B.Riley 對 AAOI 與 CPO 雷射架構的具名報告",
         "trace_status": "isolated_tier_3",
         "trace_trigger_entities": [
           "AAOI",
@@ -7749,7 +7751,7 @@
         "campaign_window_start": "2026-06-29T13:46:25Z",
         "parked_reason": "official_sources_support_memory_tightness_but_not_the_specific_broker_forecasts_or_blanket_NAND_claim",
         "research_mode": "delta_only",
-        "research_outcome": "no_unique_graph_delta_time_varying_market_claim_only",
+        "research_outcome": "2026-08-12 改用 primary_source_signal：本筆等的是記憶體廠官方 allocation 揭露，不是「該公司被提到」。原設定（related_entity_signal＋全部 entities）會被任何一則相關推文觸發，每次都得到「trigger 沒帶來新東西」——2026-08-12 當日 5 個 pq1 slot 全被這類重排吃光、0 筆 prepared RA。改為只有指定實體的 tier-1 一手來源才觸發。",
         "research_run": "daily:2026-08-10",
         "trace_attempts_ref": "prior_official_memory_sources_plus_new_related_signal_2026-08-10",
         "trace_next_trigger": "canonical_UBS_or_Morgan_Stanley_note_or_official_allocation_disclosure",
@@ -7763,7 +7765,7 @@
           "SNDK"
         ],
         "trace_trigger_event_ref": "lead:lead_0624cbfddb41714f21502cc3f3da7a8a",
-        "trace_trigger_kind": "related_entity_signal"
+        "trace_trigger_kind": "primary_source_signal"
       },
       "source": "x:aleabitoreddit",
       "status": "parked",
@@ -15386,7 +15388,7 @@
         "gap": "InP 基板 ASP 漲幅缺乏任何可逐字核對的一手來源。這是分辨 axt_inp thesis「週期 vs 結構」的關鍵缺口，目前無法由公開資料填補；最可能的解答來源是 AXT 自己在 Q3 財報揭露 ASP 貢獻，或下游公司揭露基板成本上升。",
         "parked_reason": "新觸發 lead_0624cbfddb41714f21502cc3f3da7a8a 只說 AXTI/LITE 再度成為市場焦點，沒有 Nomura canonical report、客戶採購成本或 AXT/IQE 官方 exact ASP 漲幅；原始 42–78% 價格主張仍無可逐字核對一手文件。",
         "research_mode": "delta_only",
-        "research_outcome": "shared_axt_entity_no_new_nomura_or_asp_source",
+        "research_outcome": "2026-08-12 改用 primary_source_signal：本筆等的是AXT Q3 2026 揭露 InP ASP，或下游客戶揭露採購成本，不是「該公司被提到」。原設定（related_entity_signal＋全部 entities）會被任何一則相關推文觸發，每次都得到「trigger 沒帶來新東西」——2026-08-12 當日 5 個 pq1 slot 全被這類重排吃光、0 筆 prepared RA。改為只有指定實體的 tier-1 一手來源才觸發。",
         "research_run": "daily-brief-2026-08-09-post-permission-recovery",
         "trace_attempts_ref": "既有 Nomura/AXT/IQE/Lumentum 追源紀錄＋2026-08-09 related-entity delta audit",
         "trace_next_trigger": "AXT Q3 2026 揭露 ASP，或下游客戶揭露 InP 基板採購成本，或取得 Nomura canonical 報告",
@@ -15395,13 +15397,10 @@
         "trace_requires_user": "false",
         "trace_status": "isolated_tier_3",
         "trace_trigger_entities": [
-          "AXTI",
-          "IQE",
-          "SNDK",
-          "co:axt"
+          "AXTI"
         ],
         "trace_trigger_event_ref": "lead:lead_0624cbfddb41714f21502cc3f3da7a8a",
-        "trace_trigger_kind": "related_entity_signal"
+        "trace_trigger_kind": "primary_source_signal"
       },
       "source": "x:aleabitoreddit",
       "status": "parked",
@@ -15798,7 +15797,7 @@
         "parked_reason": "Reuters carrier 仍只支持 Intel／AMD 與未具名中國 server 客戶洽談約一年、部分可達兩年以上的採購量承諾及價格上漲；本輪觸發來源是 LITE，沒有補上 CPU 對手方、產品、期限或量，也不能把 memory／photonics LTA 拼成同一因果邊，故不產 RA。",
         "primary_url": "https://www.investing.com/news/stock-market-news/exclusiveintel-amd-sign-longterm-server-cpu-deals-with-chinese-clients-as-prices-surge-4807453",
         "research_mode": "delta_only",
-        "research_outcome": "related_lite_trigger_did_not_resolve_china_cpu_lta_counterparties",
+        "research_outcome": "2026-08-12 改用 primary_source_signal：本筆等的是Intel／AMD 具名揭露 CPU 產品、對手方、期限與量，不是「該公司被提到」。原設定（related_entity_signal＋全部 entities）會被任何一則相關推文觸發，每次都得到「trigger 沒帶來新東西」——2026-08-12 當日 5 個 pq1 slot 全被這類重排吃光、0 筆 prepared RA。改為只有指定實體的 tier-1 一手來源才觸發。",
         "research_run": "daily:2026-08-12",
         "trace_access_method": "secondary_reprint",
         "trace_attempts_ref": "Reuters 2026-07-23 carrier；Intel／AMD 既有 10-Q 與官方 exact search；trigger lead lead_891dfebbd908d822ef6f4a55e1e465c0",
@@ -15813,17 +15812,10 @@
         "trace_status": "partial",
         "trace_trigger_entities": [
           "AMD",
-          "COHR",
-          "INTC",
-          "LITE",
-          "MU",
-          "SNDK",
-          "co:coherent",
-          "co:intel",
-          "co:lumentum"
+          "INTC"
         ],
         "trace_trigger_event_ref": "lead:lead_891dfebbd908d822ef6f4a55e1e465c0",
-        "trace_trigger_kind": "related_entity_signal"
+        "trace_trigger_kind": "primary_source_signal"
       },
       "source": "x:aleabitoreddit",
       "status": "parked",
@@ -17855,12 +17847,16 @@
         "original_claim_status": "jv_supported_commercialization_partial_lpkf_mapping_rejected",
         "parked_reason": "Sumitomo Chemical 與 Samsung Electro-Mechanics 官方文件確認 GlaSSEM JV、KRW 482.1bn 資本與 H2 FY2027 supply-system 時程，但未確認 LPKF／E&R／Onto 是 GlaSSEM 供應商或受益者；LPKF 70% LIDE 目標仍只取得 Warburg tier-3 轉述，且必要公司 identity 尚未登記，不能外推具名 graph edge",
         "research_mode": "delta_only",
-        "research_outcome": "official_jv_obtained_named_beneficiary_mapping_unproven",
+        "research_outcome": "2026-08-12 改用 primary_source_signal：本筆等的是LPKF first-party 揭露或 GlaSSEM 具名設備訂單，不是「該公司被提到」。原設定（related_entity_signal＋全部 entities）會被任何一則相關推文觸發，每次都得到「trigger 沒帶來新東西」——2026-08-12 當日 5 個 pq1 slot 全被這類重排吃光、0 筆 prepared RA。改為只有指定實體的 tier-1 一手來源才觸發。",
         "research_run": "luna_reviewer_2026-08-01_pq1_5",
         "trace_attempts_ref": "Sumitomo Chemical 2026-07-02 PR；Samsung Electro-Mechanics disclosure；LPKF Q1／Q2／Q3 2026 IR與2025 annual report；Warburg 2026-03-27；official exact search",
         "trace_next_trigger": "LPKF first-party 70% source、GlaSSEM 具名設備訂單／qualification，或完成 Samsung Electro-Mechanics／Sumitomo Chemical／Dongwoo／LPKF identity onboarding",
         "trace_requires_user": "false",
-        "trace_status": "partial"
+        "trace_status": "partial",
+        "trace_trigger_entities": [
+          "LPK"
+        ],
+        "trace_trigger_kind": "primary_source_signal"
       },
       "source": "x:aleabitoreddit",
       "status": "parked",
@@ -18525,7 +18521,7 @@
         "original_claim_status": "partial_support_lta_and_capacity_exact_unverified",
         "parked_reason": "Meta 官方 2026 Q1 10-Q 支持 2026 capex USD 125–145B，官方 MTIA 文章支持每六個月或更快的晶片 cadence；但這些屬財務／產品時變觀測，且仍未逐字揭露 Samsung／SanDisk 記憶體 LTA、Sumitomo fiber LTA 或 7GW internal memo，沒有唯一新 graph delta，不產 RA。",
         "research_mode": "delta_only",
-        "research_outcome": "official_meta_supports_capex_and_chip_cadence_not_claimed_ltas_or_7gw",
+        "research_outcome": "2026-08-12 改用 primary_source_signal：本筆等的是Meta internal memo 或 Meta／Samsung／SanDisk／Sumitomo 具名 LTA 一手披露，不是「該公司被提到」。原設定（related_entity_signal＋全部 entities）會被任何一則相關推文觸發，每次都得到「trigger 沒帶來新東西」——2026-08-12 當日 5 個 pq1 slot 全被這類重排吃光、0 筆 prepared RA。改為只有指定實體的 tier-1 一手來源才觸發。",
         "research_run": "daily:2026-08-12",
         "trace_attempts_ref": "Meta 2026 Q1 10-Q；Meta 2026-03 MTIA 官方文章；Meta／Samsung／SanDisk／Sumitomo official exact search；trigger lead lead_79471f7e1d9ce0cea1a806571cfa4f9d",
         "trace_next_trigger": "Meta internal memo 原文，或 Meta／Samsung／SanDisk／Sumitomo 具名 LTA 一手披露",
@@ -18535,11 +18531,10 @@
         "trace_status": "partial",
         "trace_trigger_entities": [
           "META",
-          "SNDK",
-          "co:meta"
+          "SNDK"
         ],
         "trace_trigger_event_ref": "lead:lead_79471f7e1d9ce0cea1a806571cfa4f9d",
-        "trace_trigger_kind": "related_entity_signal"
+        "trace_trigger_kind": "primary_source_signal"
       },
       "source": "x:aleabitoreddit",
       "status": "parked",
@@ -19643,7 +19638,7 @@
         "parked_reason": "八個互不相干主張中，Vistara 已另拆並處理；本輪 shared-Meta trigger 沒有提供 Morgan Stanley 出貨預測、probe card／socket、MLCC LTA、OpenAI 成本、Bloom 電網因果或 Digitimes OSAT 價格的原始文件，其餘仍是同源二手拼盤，不能形成一致 graph delta，不產 RA。",
         "related_research_action_id": "ra_62c5841f8de2c67890cbefb805ba8d77",
         "research_mode": "delta_only",
-        "research_outcome": "related_meta_trigger_no_new_primary_for_remaining_composite_atoms",
+        "research_outcome": "2026-08-12 改用 primary_source_signal：本筆等的是任一剩餘 atomic claim 出現具名公司一手文件，不是「該公司被提到」。原設定（related_entity_signal＋全部 entities）會被任何一則相關推文觸發，每次都得到「trigger 沒帶來新東西」——2026-08-12 當日 5 個 pq1 slot 全被這類重排吃光、0 筆 prepared RA。改為只有指定實體的 tier-1 一手來源才觸發。",
         "research_run": "daily:2026-08-12",
         "trace_attempts_ref": "既有 Meta Vistara 官方論文與 RA；Morgan Stanley／Digitimes／公司官方來源既有追源；trigger lead lead_79471f7e1d9ce0cea1a806571cfa4f9d",
         "trace_next_trigger": "任一剩餘 atomic claim 出現具名公司一手文件，或使用者指定 exact atom 提高優先權",
@@ -19652,13 +19647,11 @@
         "trace_requires_user": "false",
         "trace_status": "isolated_tier_3",
         "trace_trigger_entities": [
-          "ASX",
           "BE",
-          "META",
-          "co:meta"
+          "META"
         ],
         "trace_trigger_event_ref": "lead:lead_79471f7e1d9ce0cea1a806571cfa4f9d",
-        "trace_trigger_kind": "related_entity_signal"
+        "trace_trigger_kind": "primary_source_signal"
       },
       "source": "x:aleabitoreddit",
       "status": "parked",
@@ -20009,13 +20002,15 @@
         "original_claim_status": "unverified_with_existing_graph_conflict",
         "parked_reason": "Morgan Stanley CPO 報告仍是機構訂閱內容；新增 Reddit／X 轉述都明示只看過分享截圖，與原貼文同源，不能形成第二 origin。Broadcom 官方頁可支持 CPO 平台與 foundry／laser 類別背景，但不能驗證 MS 將 Sivers、Coherent、Lumentum 列為三家關鍵雷射供應商；現有 Sivers credibility hold 下不升格、不產 RA。",
         "research_mode": "delta_only",
-        "research_outcome": "paid_note_still_unavailable_new_lite_signal_not_independent_validation",
+        "research_outcome": "2026-08-12 標記 trace_requires_user：唯一可靠解鎖路徑是取得機構訂閱／付費報告原文，不是任何自動訊號。先前設 related_entity_signal 使它在每次相關 ticker 有新聞時空轉重查；但若只加 consumed-marker 而不標 requires_user，標的消化完後會永久沉底且無人知道。改為進 pq2 source_trace_review，由使用者決定是否付費或放棄。",
         "research_run": "daily:2026-08-12",
         "trace_attempts_ref": "Morgan Stanley／Rosenblatt exact report search；Reddit 同源截圖轉述；Broadcom CPO 官方頁；trigger lead lead_891dfebbd908d822ef6f4a55e1e465c0",
         "trace_next_trigger": "取得 Morgan Stanley 報告本身逐字內容，或 Sivers／Coherent／Lumentum／客戶官方引用同一供應商清單",
         "trace_requeue_trigger": "related_triaged_lead:lead_891dfebbd908d822ef6f4a55e1e465c0",
         "trace_requeued_at": "2026-08-11T22:34:50.401653+00:00",
-        "trace_requires_user": "false",
+        "trace_requires_user": "true",
+        "trace_review_hint": "go 只排入 bounded pq1 取得原文並追源；不接受轉述當證據、不提高 evidence tier、不授權入圖。目前唯一可靠解鎖路徑是取得 Morgan Stanley 該份報告逐字內容——公開轉述（X 貼文、Reddit）經查證皆只看過分享截圖且與原貼文同源，不構成第二 origin。你實際持有 SIVE，且 [10] 的 credibility hold 下不得以二手轉述升格。若決定付費，需另核准 exact 金額與方案（我未查價）；亦可回 drop 表示不值得為此付費。",
+        "trace_review_title": "Morgan Stanley CPO 供應商清單報告（SIVE 被列為三大 CPO 雷射供應商之一）",
         "trace_status": "isolated_tier_3",
         "trace_trigger_entities": [
           "COHR",
@@ -28068,10 +28063,16 @@
         "campaign_window_start": "2026-06-29T13:46:25Z",
         "claimed_origin": "digitimes_2026_07_20",
         "outcome": "paywalled_timeline_not_independently_quotable",
+        "research_outcome": "2026-08-12 改用 primary_source_signal：本筆等的是供應商官方 lead-time 揭露，不是「該公司被提到」。原設定（related_entity_signal＋全部 entities）會被任何一則相關推文觸發，每次都得到「trigger 沒帶來新東西」——2026-08-12 當日 5 個 pq1 slot 全被這類重排吃光、0 筆 prepared RA。改為只有指定實體的 tier-1 一手來源才觸發。",
         "trace_attempts_ref": "claimed_origin:digitimes_2026_07_20",
         "trace_next_trigger": "canonical_digitimes_article_or_supplier_lead_time_disclosure",
         "trace_requires_user": "false",
-        "trace_status": "isolated_tier_3"
+        "trace_status": "isolated_tier_3",
+        "trace_trigger_entities": [
+          "TTMI",
+          "VSH"
+        ],
+        "trace_trigger_kind": "primary_source_signal"
       },
       "source": "x:aleabitoreddit",
       "status": "parked",

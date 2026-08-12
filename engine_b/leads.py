@@ -559,6 +559,23 @@ def triage(
     return lead
 
 
+# 機器可執行的 trace 觸發類型（封閉字彙）。自然語言 `trace_next_trigger` 只給人讀，
+# 不參與判斷——讓機器讀懂它會把語意猜測帶回自動化路徑。新增一種 kind 就是在承認
+# 「有一類等待條件目前無法被既有 kind 正確表達」，而不是放寬既有 kind。
+TRACE_TRIGGER_KINDS = frozenset({"related_entity_signal", "primary_source_signal"})
+
+# triage 的 tier 是來源初步分級（tier1 ＝ SEC filing／法定揭露等一手文件），
+# 不是 evidence tier，也不影響入圖強度。
+PRIMARY_SOURCE_TIER = 1
+
+
+def _is_primary_source(lead: Mapping[str, Any]) -> bool:
+    try:
+        return int(((lead.get("triage") or {}).get("tier"))) <= PRIMARY_SOURCE_TIER
+    except (TypeError, ValueError):
+        return False
+
+
 def _requeue_related_trace_backlog(
     store: dict[str, Any],
     *,
@@ -591,8 +608,10 @@ def _requeue_related_trace_backlog(
         if str(refs.get("trace_requires_user") or "").lower() in {"1", "true", "yes"}:
             continue
         trigger_kind = str(refs.get("trace_trigger_kind") or "").strip()
-        if trigger_kind and trigger_kind != "related_entity_signal":
+        if trigger_kind and trigger_kind not in TRACE_TRIGGER_KINDS:
             continue
+        # 舊 backlog 沒有 kind 時沿用預設，才不會因為缺欄位而永遠沉底。
+        resolved_kind = trigger_kind or "related_entity_signal"
         # 新格式直接讀 frozen trigger entities；舊 backlog 若只有自然語言 trigger，
         # 以 lead 自身確定性 entities 做 lazy migration，避免永遠沉底。
         trigger_entities = set(refs.get("trace_trigger_entities") or ())
@@ -601,6 +620,13 @@ def _requeue_related_trace_backlog(
         shared = sorted(event_entities & trigger_entities)
         if not shared:
             continue
+        # `primary_source_signal`：只有指定實體的 tier-1 一手來源才算觸發。
+        # 這是為了讓「等某方未來的具名揭露」（Meta internal memo、Intel／AMD 具名客戶、
+        # Xinhua 原文）有地方住——它們等的是**特定實體發布特定類型文件**，不是「該實體
+        # 被人提到」。用 related_entity_signal 表達會被任何一則推文觸發，於是每次都
+        # 得到「trigger 沒帶來新東西」。仍然完全確定性：只看 triage 的來源分級，不猜語意。
+        if resolved_kind == "primary_source_signal" and not _is_primary_source(event_lead):
+            continue
         # Consumed-marker：同一個標的已經觸發過一次自動重排就不再重複。
         # 沒有這道閘門時，只要 parked lead 的任一標的持續有新聞，它就會被無限喚醒——
         # 而 park 的理由（缺某份特定文件、內容不屬圖譜材料）不會因為「又一則提到同一
@@ -608,12 +634,19 @@ def _requeue_related_trace_backlog(
         # 2026-08-12 實測：當日 5 個 pq1 slot 全部被這類重排吃光，0 筆 prepared RA，
         # 同時把 tier-1 的 Lumentum 8-K 擠出預算。
         # 只擋「同一標的的第二次」，不擋新標的：真正出現新的具名關聯時仍會喚醒。
+        # consumed-marker 只適用於 related_entity_signal：同一檔的第二則轉述不會帶來
+        # 新事證。primary_source_signal 相反——每一份新的一手文件本身就是新事件
+        # （下一季的 10-Q 可能正好含有等待中的揭露），故不以標的消化。重複觸發由
+        # 「每個 event lead 只會觸發一次」自然界定。
         consumed = {
             str(item).strip().upper()
             for item in (refs.get("trace_requeue_consumed_entities") or ())
             if str(item).strip()
         }
-        novel = [item for item in shared if item.strip().upper() not in consumed]
+        if resolved_kind == "primary_source_signal":
+            novel = shared
+        else:
+            novel = [item for item in shared if item.strip().upper() not in consumed]
         if not novel:
             continue
         requeue_trace(
@@ -621,19 +654,25 @@ def _requeue_related_trace_backlog(
             candidate_id,
             trigger=f"related_triaged_lead:{event_lead_id}",
             reason=(
-                f"新 triage PASS lead {event_lead_id} 與 parked trace 共用具名標的 "
-                f"{', '.join(novel)}（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查"
+                f"{'指定實體的 tier-1 一手來源' if resolved_kind == 'primary_source_signal' else '新 triage PASS lead'} "
+                f"{event_lead_id} 與 parked trace 共用具名標的 {', '.join(novel)}"
+                f"{'' if resolved_kind == 'primary_source_signal' else '（首次觸發；其餘共用標的已消化）'}"
+                "；事件觸發 bounded pq1 重查"
             ),
             requeued_at=event_at,
         )
-        candidate.setdefault("refs", {}).update({
-            "trace_trigger_kind": "related_entity_signal",
+        # 保留原 kind：primary_source_signal 若被覆寫回 related_entity_signal，
+        # 下一則推文就又能觸發它，等於這道限縮只生效一次。
+        updates = {
+            "trace_trigger_kind": resolved_kind,
             "trace_trigger_entities": sorted(trigger_entities),
             "trace_trigger_event_ref": f"lead:{event_lead_id}",
-            "trace_requeue_consumed_entities": sorted(
+        }
+        if resolved_kind == "related_entity_signal":
+            updates["trace_requeue_consumed_entities"] = sorted(
                 consumed | {item.strip().upper() for item in shared}
-            ),
-        })
+            )
+        candidate.setdefault("refs", {}).update(updates)
         requeued.append(candidate_id)
     return sorted(requeued)
 

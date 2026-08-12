@@ -529,3 +529,57 @@ def test_requeue_consumed_marker_stops_same_entity_waking_lead_repeatedly() -> N
     assert store["leads"][parked_id]["status"] == "triaged_go", (
         "尚未消化過的新標的仍必須能觸發重查"
     )
+
+
+def test_primary_source_signal_only_wakes_on_tier1_documents() -> None:
+    """B 類等待條件：等某方未來的具名一手揭露，不是「該實體被提到」。
+
+    用 related_entity_signal 表達時，任何一則提到該公司的推文都會觸發重查，於是每次
+    都得到「trigger 沒帶來新東西」（2026-08-12 實測，5 個 pq1 slot 全被這類重排吃光）。
+    """
+    store = leads.empty_store()
+    parked_id, _ = leads.register(
+        store,
+        source="x:old",
+        url="https://x.com/old/status/memo",
+        title="$META internal memo 轉述",
+    )
+    leads.triage(store, parked_id, go=True, tier=4, reason="需要 memo 原文")
+    leads.advance(store, parked_id, "parked", ref={
+        "parked_reason": "只有二手轉述，未見 memo 原文",
+        "trace_status": "partial",
+        "trace_next_trigger": "Meta 一手揭露",
+        "trace_requires_user": "false",
+        "trace_trigger_kind": "primary_source_signal",
+        "trace_trigger_entities": ["META"],
+    })
+
+    def _fire(source: str, url: str, title: str, tier: int, at: str) -> None:
+        lead_id, _ = leads.register(store, source=source, url=url, title=title)
+        leads.triage(store, lead_id, go=True, tier=tier, reason="r", decided_at=at)
+
+    # 又一則提到 $META 的推文（tier 4）→ 不得觸發
+    _fire("x:someone", "https://x.com/a/1", "$META 又有新聞", 4, "2026-08-02T00:00:00+00:00")
+    assert store["leads"][parked_id]["status"] == "parked", (
+        "primary_source_signal 不應被二手轉述觸發"
+    )
+
+    # Meta 的 tier-1 一手 filing → 必須觸發
+    _fire("edgar:META", "https://sec.gov/meta/10q", "META 10-Q", 1, "2026-08-03T00:00:00+00:00")
+    assert store["leads"][parked_id]["status"] == "triaged_go"
+    refs = store["leads"][parked_id]["refs"]
+    assert refs["trace_trigger_kind"] == "primary_source_signal", (
+        "kind 不得被覆寫回 related_entity_signal，否則限縮只生效一次"
+    )
+    # 一手來源不以標的消化：下一季的 filing 可能正好含有等待中的揭露
+    assert "trace_requeue_consumed_entities" not in refs
+
+    leads.advance(store, parked_id, "parked", ref={
+        "parked_reason": "該季 filing 未含 memo 內容",
+        "trace_status": "partial",
+        "trace_requires_user": "false",
+    })
+    _fire("edgar:META", "https://sec.gov/meta/10k", "META 10-K", 1, "2026-08-04T00:00:00+00:00")
+    assert store["leads"][parked_id]["status"] == "triaged_go", (
+        "同一實體的**下一份**一手文件仍必須觸發"
+    )

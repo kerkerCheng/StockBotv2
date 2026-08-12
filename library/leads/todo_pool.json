@@ -1925,6 +1925,30 @@
       "source": "decision_lab",
       "title": "REVIEW — co:agility_robotics",
       "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-12T05:55:59.084402+00:00",
+      "hint": "go 只排入 bounded pq1 取得原文並追源；不接受轉述當證據、不授權入圖。已查證 Broadcom 官方頁面只能支持 CPO 平台背景，不支持「UHP CW 是唯一理想架構」、SIVE 受益或 transceiver TAM 減少 40-50% 的 broker 原句；且推文轉述的 B.Riley 立場與可查證方向不符（實際已上調至 Neutral、目標價 15→54）。若決定付費，需另核准 exact 金額與方案（我未查價）。",
+      "n": 124,
+      "reason": null,
+      "ref_id": "lead_075cb52a7fffdf3550210fc2a5f6fb8b",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "source_trace",
+      "title": "Rosenblatt／B.Riley 對 AAOI 與 CPO 雷射架構的具名報告",
+      "type": "source_trace_review"
+    },
+    {
+      "added_at": "2026-08-12T05:55:59.084402+00:00",
+      "hint": "go 只排入 bounded pq1 取得原文並追源；不接受轉述當證據、不提高 evidence tier、不授權入圖。目前唯一可靠解鎖路徑是取得 Morgan Stanley 該份報告逐字內容——公開轉述（X 貼文、Reddit）經查證皆只看過分享截圖且與原貼文同源，不構成第二 origin。你實際持有 SIVE，且 [10] 的 credibility hold 下不得以二手轉述升格。若決定付費，需另核准 exact 金額與方案（我未查價）；亦可回 drop 表示不值得為此付費。",
+      "n": 125,
+      "reason": null,
+      "ref_id": "lead_b1e793c560334131dfe7c1619715784d",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "source_trace",
+      "title": "Morgan Stanley CPO 供應商清單報告（SIVE 被列為三大 CPO 雷射供應商之一）",
+      "type": "source_trace_review"
     }
   ],
   "log": [
@@ -4190,6 +4214,6 @@
       "verb": "drop"
     }
   ],
-  "next_n": 124,
+  "next_n": 126,
   "schema_version": "1"
 }
