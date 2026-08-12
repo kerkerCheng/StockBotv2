@@ -1,0 +1,15 @@
+Source URL: https://ir.amd.com/news-events/press-releases/detail/1292/amd-and-anthropic-announce-strategic-partnership-to-deploy-up-to-2-gigawatts-of-amd-instinct-mi450-series-gpus
+
+Excerpt:
+AMD and Anthropic Announce Strategic Partnership to Deploy Up to 2 Gigawatts of AMD Instinct MI450 Series GPUs
+Released July 22, 2026
+
+Anthropic to deploy up to 2 gigawatts of MI450 Series GPUs in AMD Helios rack-scale solutions, with deployment of the first gigawatt beginning in the first half of 2027.
+
+Anthropic will deploy AMD Helios rack-scale solutions featuring AMD Instinct MI455X GPUs, part of the AMD Instinct MI450 Series, together with AMD EPYC 'Venice' CPUs, AMD Pensando networking and ROCm software.
+
+AMD has committed to make a strategic equity investment of up to $5 billion in Anthropic in the future.
+
+Anthropic co-founder Tom Brown: "Running across a diversified range of hardware lets us map the right workloads to the right hardware."
+
+Canonical URL: https://ir.amd.com/news-events/press-releases/detail/1292/amd-and-anthropic-announce-strategic-partnership-to-deploy-up-to-2-gigawatts-of-amd-instinct-mi450-series-gpus

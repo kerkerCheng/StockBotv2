@@ -1,0 +1,140 @@
+{
+  "claims": [
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "guided",
+      "disproof_condition": "Downgrade if AMD or Anthropic cancels or materially reduces the commitment, or if no first-gigawatt deployment is reported by 2027-07-15. Check quarterly; on trigger, review both parties' latest filings and announcements within 48 hours.",
+      "id": "amd_anthropic_helios_partnership_20260722_cl1",
+      "source_ids": [
+        "amd_anthropic_helios_partnership_20260722_s1",
+        "amd_anthropic_helios_partnership_20260722_s2",
+        "amd_anthropic_helios_partnership_20260722_s4"
+      ],
+      "statement": "Anthropic and AMD announced a planned deployment of up to 2 GW of AMD Instinct MI450 Series GPUs in Helios rack-scale systems; the first 1 GW is expected to begin deployment in the first half of 2027. This is a named alternative accelerator commitment alongside Anthropic's existing NVIDIA supply relationship, but not proof of delivered capacity or revenue.",
+      "subject_id": "co:anthropic"
+    },
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "guided",
+      "disproof_condition": "Revise when AMD or Anthropic discloses funded tranches, final investment terms, cancellation, or an amount below the announced ceiling. Check quarterly and update within 48 hours of a filing or official announcement.",
+      "id": "amd_anthropic_helios_partnership_20260722_cl2",
+      "source_ids": [
+        "amd_anthropic_helios_partnership_20260722_s3"
+      ],
+      "statement": "AMD committed to make a future strategic equity investment of up to $5 billion in Anthropic; the announcement does not establish that the full amount has been funded.",
+      "subject_id": "co:anthropic"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {
+        "qualification_status": "designed_in"
+      },
+      "confidence": 0.85,
+      "dst_id": "prod:amd_helios_mi450",
+      "id": "e1",
+      "relation": "deploys",
+      "source_ids": [
+        "amd_anthropic_helios_partnership_20260722_s1",
+        "amd_anthropic_helios_partnership_20260722_s2"
+      ],
+      "src_id": "co:anthropic"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "prod:amd_helios_mi450",
+      "id": "e2",
+      "relation": "is_component_of",
+      "source_ids": [
+        "amd_anthropic_helios_partnership_20260722_s2"
+      ],
+      "src_id": "prod:amd_instinct_mi455x"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "end_demand",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:anthropic",
+      "name": "Anthropic",
+      "role": "adjacent_silicon",
+      "source_ids": [
+        "amd_anthropic_helios_partnership_20260722_s1",
+        "amd_anthropic_helios_partnership_20260722_s2",
+        "amd_anthropic_helios_partnership_20260722_s4"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "AMD Helios",
+        "MI450 Series Helios"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "prod:amd_helios_mi450",
+      "name": "AMD Helios rack-scale solution with Instinct MI450 Series",
+      "role": null,
+      "source_ids": [
+        "amd_anthropic_helios_partnership_20260722_s1",
+        "amd_anthropic_helios_partnership_20260722_s2"
+      ],
+      "type": "Product"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "MI455X",
+        "Instinct MI450 Series GPU"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "prod:amd_instinct_mi455x",
+      "name": "AMD Instinct MI455X GPU",
+      "role": null,
+      "source_ids": [
+        "amd_anthropic_helios_partnership_20260722_s2"
+      ],
+      "type": "Product"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "amd_anthropic_helios_partnership_20260722",
+    "evidence_tier": 2,
+    "origin_entity": "AMD and Anthropic",
+    "permission_basis": "Joint corporate press release distributed publicly; retain only short attributed excerpts needed to verify the announced deployment and investment commitments.",
+    "published_at": "2026-07-22",
+    "retrieved_at": "2026-08-12",
+    "source_type": "ir_deck",
+    "storage_permission": "repo_excerpt",
+    "title": "AMD and Anthropic Announce Strategic Partnership to Deploy Up to 2 Gigawatts of AMD Instinct MI450 Series GPUs",
+    "url": "https://ir.amd.com/news-events/press-releases/detail/1292/amd-and-anthropic-announce-strategic-partnership-to-deploy-up-to-2-gigawatts-of-amd-instinct-mi450-series-gpus"
+  },
+  "sources": [
+    {
+      "id": "amd_anthropic_helios_partnership_20260722_s1",
+      "locator": "News Highlights and opening paragraph",
+      "quote": "Anthropic to deploy up to 2 gigawatts of MI450 Series GPUs in AMD Helios rack-scale solutions, with deployment of the first gigawatt beginning in the first half of 2027"
+    },
+    {
+      "id": "amd_anthropic_helios_partnership_20260722_s2",
+      "locator": "Product-stack paragraph",
+      "quote": "Anthropic will deploy AMD Helios rack-scale solutions featuring AMD Instinct MI455X GPUs, part of the AMD Instinct MI450 Series, together with AMD EPYC 'Venice' CPUs, AMD Pensando networking and ROCm software."
+    },
+    {
+      "id": "amd_anthropic_helios_partnership_20260722_s3",
+      "locator": "Investment paragraph",
+      "quote": "AMD has committed to make a strategic equity investment of up to $5 billion in Anthropic in the future."
+    },
+    {
+      "id": "amd_anthropic_helios_partnership_20260722_s4",
+      "locator": "Anthropic co-founder quote",
+      "quote": "Running across a diversified range of hardware lets us map the right workloads to the right hardware."
+    }
+  ]
+}
