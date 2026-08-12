@@ -65,3 +65,33 @@ def test_missing_or_invalid_tier_defaults_to_weakest() -> None:
     assert priority.score_lead({"triage": {"tier": None}}) == 1.0
     assert priority.score_lead({"triage": {}}) == 1.0
     assert priority.score_lead({}) == 1.0
+
+
+def test_focus_factor_dilutes_impact_for_broad_ticker_mentions() -> None:
+    # 3 檔以內不打折；越廣稀釋越重。
+    assert priority.focus_factor(0) == 1.0
+    assert priority.focus_factor(1) == 1.0
+    assert priority.focus_factor(3) == 1.0
+    assert priority.focus_factor(6) == 0.5
+    assert priority.focus_factor(12) == 0.25
+
+
+def test_broad_macro_post_no_longer_outranks_focused_tier1_filing() -> None:
+    """2026-08-12 迴歸：提到 12 檔的總體評論曾以 12 分擠掉 tier-1 的 LITE 8-K（6 分）。
+
+    impact 權重只要任一 ticker 命中就給滿分，於是「提到越多檔」＝越容易同時拿到
+    thesis_impact 與 holdings_impact——而廣度正是低價值的特徵。
+    """
+    macro = _triaged("x:serenity", tier=4, flags={"novelty": True})
+    macro["title"] = (
+        "$BE $TER $LITE $SNDK $AMKR $GOOGL $CXMT $SIVE $AAOI $META $NBIS $MU 財報季總評"
+    )
+    filing = _triaged("edgar:LITE", tier=1)
+
+    tracked = frozenset({"LITE", "AAOI", "META", "SIVE"})
+    ranked = priority.rank_leads([macro, filing], tracked_tickers=tracked, held_tickers=tracked)
+    order = [lead["source"] for _score, lead in ranked]
+    assert order[0] == "edgar:LITE", "tier-1 單一標的 filing 應排在廣泛總體評論之前"
+
+    scores = {lead["source"]: score for score, lead in ranked}
+    assert scores["x:serenity"] < scores["edgar:LITE"]

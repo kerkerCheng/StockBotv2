@@ -28,6 +28,16 @@ PRIORITY_WEIGHTS: dict[str, float] = {
     "campaign_focus": 5.0,
 }
 
+# thesis／holdings impact 的**聚焦上限**：命中與否原本是 bool，一則貼文只要提到任一
+# 已追蹤 ticker 就拿滿分。於是「提到越多 ticker」＝「越容易同時命中 tracked 與 held」
+# ＝分數越高——而提到十幾檔正是「這是總體評論、不是具體供應鏈事件」的特徵，排序等於
+# 獎勵了恰好該扣分的東西。2026-08-12 實測：一則提到 12 檔的財報季總評（已兩度被判定
+# 無可入圖內容）拿 12 分，把同日 tier-1 的 Lumentum 8-K（6 分）擠出當輪 pq1 預算。
+# 因此改為依聚焦度稀釋：命中權重乘上 min(1, FOCUS_TICKER_CAP / 提及檔數)。
+# 供應鏈事件通常牽涉 1–3 家（供應商、客戶、材料），故 cap 取 3——3 檔以內不打折，
+# 12 檔打到四分之一。這只調整 pq1 注意力排序，不影響 evidence tier 或任何 gate。
+FOCUS_TICKER_CAP = 3.0
+
 _EDGAR_SOURCE = re.compile(r"^edgar:([A-Z0-9.^_-]+)$")
 _CASHTAG = re.compile(r"(?<![A-Z0-9_])\$([A-Z][A-Z0-9.]{0,9})\b", re.IGNORECASE)
 
@@ -75,13 +85,28 @@ def lead_ticker(lead: Mapping[str, Any]) -> str | None:
     return title_match.group(1).upper() if title_match else None
 
 
+def focus_factor(mentioned_tickers: int) -> float:
+    """提及檔數 → impact 權重的聚焦係數（1.0 表示不打折）。
+
+    只用於 thesis／holdings impact；tier、反證、新穎性等與「提到幾檔」無關的成分不受影響。
+    """
+    if mentioned_tickers <= 0:
+        return 1.0
+    return min(1.0, FOCUS_TICKER_CAP / float(mentioned_tickers))
+
+
 def score_lead(
     lead: Mapping[str, Any],
     *,
     thesis_impact: bool = False,
     holdings_impact: bool = False,
+    mentioned_tickers: int = 0,
 ) -> float:
-    """單則 lead 的 priority 分數；高＝pq1 先處理。"""
+    """單則 lead 的 priority 分數；高＝pq1 先處理。
+
+    ``mentioned_tickers`` 是該 lead 提及的具名標的總數，用來稀釋 impact 權重
+    （見 FOCUS_TICKER_CAP）。0 表示呼叫端未提供，維持不打折的舊行為。
+    """
     triage = lead.get("triage") or {}
     try:
         tier = int(triage.get("tier"))
@@ -91,12 +116,13 @@ def score_lead(
     # tier base：tier1（最強來源）=4 … tier4=1
     score = float(5 - tier)
     flags = triage.get("priority_flags") or {}
+    focus = focus_factor(mentioned_tickers)
     if flags.get("contradiction"):
         score += PRIORITY_WEIGHTS["contradiction"]
     if thesis_impact:
-        score += PRIORITY_WEIGHTS["thesis_impact"]
+        score += PRIORITY_WEIGHTS["thesis_impact"] * focus
     if holdings_impact:
-        score += PRIORITY_WEIGHTS["holdings_impact"]
+        score += PRIORITY_WEIGHTS["holdings_impact"] * focus
     if flags.get("independent_source"):
         score += PRIORITY_WEIGHTS["independent_source"]
     if flags.get("novelty"):
@@ -132,7 +158,12 @@ def rank_leads(
         held = bool(tickers & held_tickers) or bool(company_ids & held_company_ids)
         scored.append(
             (
-                score_lead(lead, thesis_impact=impact, holdings_impact=held),
+                score_lead(
+                    lead,
+                    thesis_impact=impact,
+                    holdings_impact=held,
+                    mentioned_tickers=len(tickers),
+                ),
                 dict(lead),
             )
         )

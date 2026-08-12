@@ -57,3 +57,14 @@ def test_tracked_tickers_merge_lifecycle_and_nonterminal_cohorts(tmp_path) -> No
 
     assert routine_config.lifecycle_tickers(lifecycle) == frozenset({"COHR"})
     assert routine_config.cohort_tickers(rows) == frozenset({"NVDA"})
+
+
+def test_theme_core_companies_join_tracked_universe() -> None:
+    """2026-08-12 迴歸：COHR／LITE 已列為 cpo 主題核心公司、EDGAR watch 也在抓它們的
+    filing，卻因為沒有 active cohort 而在 pq1 排序上等於未追蹤——harvest 花錢抓進來、
+    排序又把它壓下去，是兩個 authority 互相矛盾。
+    """
+    from engine_b.routine_config import theme_core_tickers
+
+    core = theme_core_tickers()
+    assert {"COHR", "LITE"} <= core, "themes.txt 的核心公司必須進入 tracked universe"

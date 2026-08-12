@@ -4,7 +4,8 @@
     "drain_limit_per_run": 5,
     "tracked_ticker_sources": {
       "thesis_lifecycle": true,
-      "decision_cohorts": true
+      "decision_cohorts": true,
+      "theme_core_companies": true
     }
   }
 }

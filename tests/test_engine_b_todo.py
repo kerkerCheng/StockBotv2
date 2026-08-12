@@ -1070,3 +1070,48 @@ def test_ra_without_any_focus_still_blocks(monkeypatch) -> None:
 
     assert "BLOCKER" in rows[0]["hint"]
     assert "尚未聲明唯一 focus_company_id" in rows[0]["hint"]
+
+
+def test_same_decision_receipt_does_not_rewake_item_every_sync() -> None:
+    """2026-08-11 迴歸：綁 event_type 後等待條件永遠黏不住。
+
+    `reactivation_event` 先前只寫不讀，於是只要 collector 還回報同一筆 material
+    delta，使用者每次設回等待、下一輪 sync 就被打回決策佇列——把「永遠不會醒」
+    換成「永遠不睡」。同一筆 receipt 只該喚醒一次；換新 decision 仍要喚醒。
+    """
+    pool = _pool_with({"type": "decision_review", "ref_id": "dc_1", "title": "REVIEW"})
+
+    def _row(receipt: str) -> dict:
+        return {
+            "type": "decision_review",
+            "ref_id": "dc_1",
+            "title": "REVIEW — co:agility_robotics",
+            "event_link": {
+                "type": "decision_evidence_delta",
+                "value": "material",
+                "receipt": receipt,
+            },
+        }
+
+    def _wait(at: str) -> None:
+        todo.resolve(
+            pool, 1, "pending",
+            trigger="等 S-4 公開",
+            event_type="decision_evidence_delta",
+            at=at,
+        )
+
+    _wait("2026-08-01T00:00:00+00:00")
+    first = todo.sync(pool, [_row("decision:pd_a")], at="2026-08-02T00:00:00+00:00")
+    assert first["reactivated"] == 1
+
+    # 看過後設回等待；同一筆 receipt 再 sync 不得重新喚醒
+    _wait("2026-08-03T00:00:00+00:00")
+    again = todo.sync(pool, [_row("decision:pd_a")], at="2026-08-04T00:00:00+00:00")
+    assert again["reactivated"] == 0, "同一筆 decision receipt 不應重複喚醒"
+    assert "waiting_on" in todo.get(pool, 1)
+
+    # 換一筆新 decision（新 receipt）仍必須喚醒
+    fresh = todo.sync(pool, [_row("decision:pd_b")], at="2026-08-05T00:00:00+00:00")
+    assert fresh["reactivated"] == 1
+    assert "waiting_on" not in todo.get(pool, 1)

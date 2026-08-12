@@ -601,13 +601,28 @@ def _requeue_related_trace_backlog(
         shared = sorted(event_entities & trigger_entities)
         if not shared:
             continue
+        # Consumed-marker：同一個標的已經觸發過一次自動重排就不再重複。
+        # 沒有這道閘門時，只要 parked lead 的任一標的持續有新聞，它就會被無限喚醒——
+        # 而 park 的理由（缺某份特定文件、內容不屬圖譜材料）不會因為「又一則提到同一
+        # 檔的貼文」而改變，於是每次重查都得到同一個「trigger 沒帶來新東西」。
+        # 2026-08-12 實測：當日 5 個 pq1 slot 全部被這類重排吃光，0 筆 prepared RA，
+        # 同時把 tier-1 的 Lumentum 8-K 擠出預算。
+        # 只擋「同一標的的第二次」，不擋新標的：真正出現新的具名關聯時仍會喚醒。
+        consumed = {
+            str(item).strip().upper()
+            for item in (refs.get("trace_requeue_consumed_entities") or ())
+            if str(item).strip()
+        }
+        novel = [item for item in shared if item.strip().upper() not in consumed]
+        if not novel:
+            continue
         requeue_trace(
             store,
             candidate_id,
             trigger=f"related_triaged_lead:{event_lead_id}",
             reason=(
                 f"新 triage PASS lead {event_lead_id} 與 parked trace 共用具名標的 "
-                f"{', '.join(shared)}；事件觸發 bounded pq1 重查"
+                f"{', '.join(novel)}（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查"
             ),
             requeued_at=event_at,
         )
@@ -615,6 +630,9 @@ def _requeue_related_trace_backlog(
             "trace_trigger_kind": "related_entity_signal",
             "trace_trigger_entities": sorted(trigger_entities),
             "trace_trigger_event_ref": f"lead:{event_lead_id}",
+            "trace_requeue_consumed_entities": sorted(
+                consumed | {item.strip().upper() for item in shared}
+            ),
         })
         requeued.append(candidate_id)
     return sorted(requeued)

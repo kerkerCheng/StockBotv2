@@ -479,3 +479,53 @@ def test_run_records_fetch_failed_for_unreachable_feed(monkeypatch) -> None:
         "failure_class": "transport_failure",
     }
     assert len(store["leads"]) == 0
+
+
+def test_requeue_consumed_marker_stops_same_entity_waking_lead_repeatedly() -> None:
+    """2026-08-12 迴歸：同一個標的重複觸發，會把 pq1 預算耗在必然無產出的重查上。
+
+    park 的理由（缺某份特定文件、內容不屬圖譜材料）不會因為「又一則提到同一檔的
+    貼文」而改變，因此第二次以後的同標的觸發必須被擋下；新標的仍應正常喚醒。
+    """
+    store = leads.empty_store()
+    parked_id, _ = leads.register(
+        store,
+        source="x:old",
+        url="https://x.com/old/status/macro",
+        title="$AXTI and $LITE macro roundup",
+    )
+    leads.triage(store, parked_id, go=True, tier=4, reason="需要追原文")
+    leads.advance(store, parked_id, "parked", ref={
+        "parked_reason": "只有 tier 3 轉述",
+        "trace_status": "isolated_tier_3",
+        "trace_next_trigger": "取得券商報告原文",
+        "trace_requires_user": "false",
+    })
+
+    def _fire(source: str, url: str, title: str, at: str) -> None:
+        lead_id, _ = leads.register(store, source=source, url=url, title=title)
+        leads.triage(store, lead_id, go=True, tier=1, reason="一手 filing", decided_at=at)
+
+    # 第一次 AXTI 觸發 → 喚醒
+    _fire("edgar:AXTI", "https://sec.gov/axt/1", "AXTI 8-K", "2026-08-02T00:00:00+00:00")
+    assert store["leads"][parked_id]["status"] == "triaged_go"
+    consumed = store["leads"][parked_id]["refs"]["trace_requeue_consumed_entities"]
+    assert "AXTI" in consumed
+
+    # 重新 park 後，同一個 AXTI 再來一次 → 不得再喚醒
+    leads.advance(store, parked_id, "parked", ref={
+        "parked_reason": "重查後仍無新事證",
+        "trace_status": "isolated_tier_3",
+        "trace_next_trigger": "取得券商報告原文",
+        "trace_requires_user": "false",
+    })
+    _fire("edgar:AXTI", "https://sec.gov/axt/2", "AXTI 8-K 第二份", "2026-08-03T00:00:00+00:00")
+    assert store["leads"][parked_id]["status"] == "parked", (
+        "同一標的的第二次觸發不應再喚醒已重查過的 parked lead"
+    )
+
+    # 但**新**標的（LITE）仍應喚醒
+    _fire("edgar:LITE", "https://sec.gov/lite/1", "LITE 8-K", "2026-08-04T00:00:00+00:00")
+    assert store["leads"][parked_id]["status"] == "triaged_go", (
+        "尚未消化過的新標的仍必須能觸發重查"
+    )

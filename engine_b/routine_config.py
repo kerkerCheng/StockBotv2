@@ -25,7 +25,7 @@ def load_config(path: Path = DEFAULT_CONFIG) -> dict[str, Any]:
     sources = pq1.get("tracked_ticker_sources")
     if not isinstance(sources, dict):
         raise ValueError("pq1.tracked_ticker_sources 必須是 object")
-    for key in ("thesis_lifecycle", "decision_cohorts"):
+    for key in ("thesis_lifecycle", "decision_cohorts", "theme_core_companies"):
         if not isinstance(sources.get(key), bool):
             raise ValueError(f"tracked_ticker_sources.{key} 必須是 boolean")
     return payload
@@ -44,6 +44,29 @@ def lifecycle_tickers(path: Path = DEFAULT_LIFECYCLE) -> frozenset[str]:
         if ticker:
             tickers.add(ticker)
     return frozenset(tickers)
+
+
+def theme_core_tickers() -> frozenset[str]:
+    """`config/themes.txt` 每個主題的「核心公司」。
+
+    加這個來源的理由：先前 tracked 只由 thesis lifecycle ＋ 未結案 cohort 導出，
+    於是 COHR／LITE 這種「已列為 cpo 主題核心公司、EDGAR watch 也在抓它們的 filing」
+    的標的，因為沒有 active cohort 而在排序上等於未追蹤——2026-08-12 實測，Lumentum
+    當日的 tier-1 8-K 因此只拿到 6 分，被一則已兩度判定無用的總體評論（12 分）擠出
+    當輪 pq1。harvest 花錢抓進來、排序又把它壓下去，是兩個 authority 互相矛盾。
+    """
+    try:
+        from engine_b.themes import load_themes
+
+        return frozenset(
+            ticker.strip().upper()
+            for theme in load_themes().values()
+            for ticker in theme.tickers
+            if ticker.strip()
+        )
+    except Exception:
+        # themes.txt 缺失或格式錯誤時安全降級；其餘來源仍可提供 tracked universe。
+        return frozenset()
 
 
 def cohort_tickers(rows: Iterable[Mapping[str, Any]]) -> frozenset[str]:
@@ -80,4 +103,6 @@ def discover_tracked_tickers(
         except Exception:
             # Private store 尚未建立或暫時不可讀時，lifecycle 仍可提供安全降級。
             pass
+    if sources["theme_core_companies"]:
+        tickers.update(theme_core_tickers())
     return frozenset(tickers)

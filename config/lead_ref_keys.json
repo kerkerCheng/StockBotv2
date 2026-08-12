@@ -56,6 +56,7 @@
       "trace_original_url": {"value_type": "string", "description": "追回的原始 URL"},
       "trace_request_kind": {"value_type": "string", "description": "人工 trace request 類型"},
       "trace_request_resolved": {"value_type": "string", "description": "trace request 是否已結案"},
+      "trace_requeue_consumed_entities": {"value_type": "string_list", "description": "已觸發過自動重排的具名標的（consumed-marker）；同一標的不再重複喚醒"},
       "trace_requeue_trigger": {"value_type": "string", "description": "parked lead 重排觸發原因"},
       "trace_requeued_at": {"value_type": "string", "description": "parked lead 重排時間"},
       "trace_requires_user": {"value_type": "string", "description": "是否需要使用者提供 access／決策"},

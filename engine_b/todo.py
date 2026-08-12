@@ -933,12 +933,22 @@ def sync(
             "derived_from_blockers"
         ):
             item.pop("waiting_on", None)
+        # Consumed-marker：同一筆 decision receipt 只喚醒一次。`reactivation_event`
+        # 先前只寫不讀，於是只要 collector 還回報同一個 material delta，每次 sync 都會
+        # 重新喚醒——使用者剛設回等待，下一輪就被打回決策佇列，等待條件永遠黏不住
+        # （2026-08-11 實測 [74]）。綁 event_type 因此把「永遠不會醒」換成「永遠不睡」。
+        # 比對 receipt 而非布林旗標：換一筆新 decision（新 receipt）仍會正常喚醒。
+        consumed_receipt = str(
+            (item.get("reactivation_event") or {}).get("receipt") or ""
+        ).strip()
+        incoming_receipt = str((event_link or {}).get("receipt") or "").strip()
         material_decision_event = (
             item["type"] == "decision_review"
             and event_type == "decision_evidence_delta"
             and event_value in {"material", "positive", "negative"}
             and waiting_event_type == event_type
             and not dispatch_in_flight
+            and not (incoming_receipt and incoming_receipt == consumed_receipt)
         )
 
         # 使用者或 blocker 衍生的 waiting item 不能只靠自然語言等人記得回來。
