@@ -332,3 +332,71 @@ def test_engine_c_rebuild_and_private_restore_preserve_frozen_decision_audit(
         assert restored.table_count("decision_cohorts") == 1
     finally:
         restored.close()
+
+
+def test_shadow_dedupes_tickerless_company_by_hint(monkeypatch) -> None:
+    """2026-08-12 迴歸：未上市公司每次入圖都新建一個重複 cohort。
+
+    bind_cohort_identity 要求 company_id 與 research_ticker 成對，未上市公司沒有
+    ticker，於是 store 的 company_id 永遠是 None；而 ensure_shadow_for_company 只比對
+    company_id，導致去重永不命中。實測 co:agility_robotics 累積四個重複 cohort。
+    真正的意圖一直存在於 company_id_hint。
+    """
+    from decision_lab.workflow import ensure_shadow_for_company
+
+    calls: list[str] = []
+
+    class _Store:
+        def list_operational_cohorts(self, *, as_of):
+            return [
+                # 終態 cohort：即使公司對得上也不能沿用，否則 handoff 指向死 cohort
+                {
+                    "cohort_id": "dc_dead",
+                    "company_id": None,
+                    "company_id_hint": "co:agility_robotics",
+                    "lifecycle_status": "expired",
+                },
+                {
+                    "cohort_id": "dc_live",
+                    "company_id": None,
+                    "company_id_hint": "co:agility_robotics",
+                    "lifecycle_status": "active",
+                },
+            ]
+
+    def _boom(*args, **kwargs):
+        calls.append("evaluate_signal")
+        raise AssertionError("不應為已存在的公司新建 cohort")
+
+    monkeypatch.setattr("decision_lab.workflow.evaluate_signal", _boom)
+
+    result = ensure_shadow_for_company(
+        _Store(), object(), company_id="co:agility_robotics", as_of="2026-08-12T00:00:00+00:00"
+    )
+    assert result == {"created": False, "cohort_id": "dc_live"}
+    assert calls == []
+
+
+def test_shadow_skips_terminal_cohort_and_creates_new_one(monkeypatch) -> None:
+    """終態 cohort 不得被當成「已在追蹤」——否則 handoff 指向不會再產生 decision 的死 cohort。"""
+    from decision_lab.workflow import ensure_shadow_for_company
+
+    class _Store:
+        def list_operational_cohorts(self, *, as_of):
+            return [{
+                "cohort_id": "dc_dead",
+                "company_id": "co:coherent",
+                "company_id_hint": None,
+                "lifecycle_status": "expired",
+            }]
+
+    monkeypatch.setattr(
+        "decision_lab.workflow.evaluate_signal",
+        lambda *a, **k: {"cohort_id": "dc_new", "decision_id": "pd_new"},
+    )
+
+    result = ensure_shadow_for_company(
+        _Store(), object(), company_id="co:coherent", as_of="2026-08-12T00:00:00+00:00"
+    )
+    assert result["created"] is True
+    assert result["cohort_id"] == "dc_new"

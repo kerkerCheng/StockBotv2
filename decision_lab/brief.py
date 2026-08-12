@@ -8,13 +8,15 @@ from typing import Any, Mapping, Sequence
 
 from identity.registry import IdentityRegistry, get_registry
 from .action_card import assert_safe_payload, build_action_card, markdown_text
+from .models import TERMINAL_LIFECYCLE_STATUSES
 from .store import DecisionStore
 from .workflow_ports import WorkflowDataProvider
 
 
 _ACTION_PRIORITY = {"NO ACTION": 0, "TRADE": 1, "HEDGE": 2, "REVIEW": 3}
 # 已結案的 probe 不再進今日待辦；`revised` 刻意不在內（新 epoch 需 reassess）。
-_TERMINAL_LIFECYCLE = frozenset({"promoted", "rejected", "expired"})
+# 字彙集中在 models，避免 workflow／brief 兩處各自複製而漂移。
+_TERMINAL_LIFECYCLE = TERMINAL_LIFECYCLE_STATUSES
 
 
 def _time(value: str, field: str) -> datetime:

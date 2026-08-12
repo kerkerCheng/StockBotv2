@@ -16,7 +16,7 @@ from .context import build_context_bundle, holdings_snapshot_digest
 from .coverage import assess_coverage
 from .execution import assess_probe
 from .intake import SignalSourceRegistry, capture_signal
-from .models import MarketObservation, SignalInput
+from .models import TERMINAL_LIFECYCLE_STATUSES, MarketObservation, SignalInput
 from .sizing import AXES
 from .store import DecisionStore
 from .workflow_ports import AuthoritySnapshot, IdentityAuthority, WorkflowDataProvider
@@ -525,8 +525,23 @@ def ensure_shadow_for_company(
     permission，只保存 Signal／Shadow／cohort。
     """
     now = as_of or _now()
+    target = str(company_id or "").strip()
     for summary in store.list_operational_cohorts(as_of=now):
-        if summary.get("company_id") == company_id:
+        # `list_operational_cohorts` 回傳所有 cohort（名稱有誤導性），終態的必須跳過：
+        # 否則對一個已 promoted／rejected／expired 的公司再次入圖，會把 handoff 指向
+        # 一個死掉的 cohort，看起來「已在追蹤」但實際不會再產生任何 decision。
+        if str(summary.get("lifecycle_status") or "") in TERMINAL_LIFECYCLE_STATUSES:
+            continue
+        # 未上市公司沒有 research_ticker，`bind_cohort_identity` 要求 company_id 與
+        # ticker 成對才綁定，於是 store 的 company_id 永遠是 None——而去重只比對它，
+        # 導致每次入圖都新建一個 cohort。實測 co:agility_robotics 因此累積四個重複
+        # cohort（2026-08-12 合併）。真正的意圖一直存在於 company_id_hint，只是沒被讀。
+        # 這裡只用 hint 做**去重**，不寫回 identity、不提升 authority——與 store 註解
+        # 「hint 只供顯示，不提升 identity authority」一致：避免重複建立不是身分主張。
+        if target and target in {
+            str(summary.get("company_id") or ""),
+            str(summary.get("company_id_hint") or ""),
+        }:
             return {"created": False, "cohort_id": str(summary["cohort_id"])}
     result = evaluate_signal(
         store,

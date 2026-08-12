@@ -163,3 +163,12 @@ class OutcomeResult:
     market_return_status: str
     absolute_return: float | None
     benchmark_adjusted_return: float | None
+
+
+# Probe lifecycle 的**終態**集合。刻意不含 `revised`——它在 L7 語意是「修正後 thesis
+# 繼續成立」，store 會為它開啟新 epoch，因此仍是進行中的 probe。誤把 revised 當終態
+# 會讓已合併／已修正的 cohort 從佇列消失；反之誤把終態當進行中，會讓 handoff 指向一個
+# 不會再產生 decision 的死 cohort。兩邊都踩過，故字彙集中在此，不在各模組各自複製。
+TERMINAL_LIFECYCLE_STATUSES: frozenset[str] = frozenset(
+    {"promoted", "rejected", "expired"}
+)
