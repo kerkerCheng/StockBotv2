@@ -1,0 +1,86 @@
+{
+  "claims": [
+    {
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Revise the milestone if Lumentum reports cancellation before shipment, or if its FY2027 10-K still shows no ELS module shipment or revenue evidence.",
+      "id": "cl1",
+      "source_ids": [
+        "lumentum_q4fy26_els_order_s1"
+      ],
+      "statement": "Lumentum reported an initial order for ELS modules in its Q4 FY2026 results, advancing the previously disclosed ELS opportunity to an initial commercial-order milestone.",
+      "subject_id": "tech:els_pluggable_module"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {
+        "qualification_status": "qualifying"
+      },
+      "confidence": 0.9,
+      "dst_id": "tech:els_pluggable_module",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "lumentum_q4fy26_els_order_s1"
+      ],
+      "src_id": "co:lumentum"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "Lumentum Holdings Inc.",
+        "LITE"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:lumentum",
+      "name": "Lumentum",
+      "role": "bottleneck_supplier",
+      "source_ids": [
+        "lumentum_q4fy26_els_order_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "ELS module",
+        "turnkey ELS module"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:els_pluggable_module",
+      "name": "Pluggable turnkey ELS module",
+      "role": null,
+      "source_ids": [
+        "lumentum_q4fy26_els_order_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "lumentum_q4fy26_els_order",
+    "evidence_tier": 1,
+    "origin_entity": "Lumentum Holdings Inc.",
+    "permission_basis": "SEC-filed issuer press release; retain only a short attributed excerpt needed to verify the ELS order milestone.",
+    "published_at": "2026-08-11",
+    "publisher": "U.S. Securities and Exchange Commission",
+    "retrieved_at": "2026-08-12",
+    "section": "Exhibit 99.1 CEO opening remarks — ELS commercial milestone",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Lumentum Announces Fourth Quarter and Full Fiscal Year 2026 Results — ELS order excerpt",
+    "url": "https://www.sec.gov/Archives/edgar/data/1633978/000162828026055726/lite_ex991xq4fy26.htm"
+  },
+  "sources": [
+    {
+      "id": "lumentum_q4fy26_els_order_s1",
+      "locator": "Exhibit 99.1, opening CEO quotation",
+      "quote": "Increasing demand for ultra-high-power CPO lasers, an initial order for ELS modules, as well as our breadth of NPO engagements"
+    }
+  ]
+}
