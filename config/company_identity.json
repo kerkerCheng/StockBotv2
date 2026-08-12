@@ -23,6 +23,7 @@
     {"company_id": "co:marvell_technology", "research_ticker": "MRVL"},
     {"company_id": "co:poet_technologies", "research_ticker": "POET"},
     {"company_id": "co:applied_optoelectronics", "research_ticker": "AAOI", "market_currency": "USD", "execution_currency": "USD", "execution_venue": "NASDAQ"},
+    {"company_id": "co:macom", "research_ticker": "MTSI", "market_currency": "USD", "execution_currency": "USD", "execution_venue": "NASDAQ"},
     {"company_id": "co:globalfoundries", "research_ticker": "GFS", "market_currency": "USD", "execution_currency": "USD", "execution_venue": "NASDAQ"},
     {"company_id": "co:cadence", "research_ticker": "CDNS"},
     {"company_id": "co:apollo", "research_ticker": "APO"},
