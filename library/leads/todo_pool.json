@@ -1949,6 +1949,18 @@
       "source": "source_trace",
       "title": "Morgan Stanley CPO 供應商清單報告（SIVE 被列為三大 CPO 雷射供應商之一）",
       "type": "source_trace_review"
+    },
+    {
+      "added_at": "2026-08-12T11:39:40.767562+00:00",
+      "hint": "核准 exact graph delta；Decision handoff：co:sivers_semiconductors。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 126,
+      "reason": null,
+      "ref_id": "ra_34e091e4cc47c08499c0b859c931a4d3",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "MACOM（MTSI）InP DFB 短缺表態與 InP photonics 進入計畫（反向證據）",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -4214,6 +4226,6 @@
       "verb": "drop"
     }
   ],
-  "next_n": 126,
+  "next_n": 127,
   "schema_version": "1"
 }

@@ -4943,9 +4943,14 @@
       "first_seen": "2026-08-11T05:12:52.616521+00:00",
       "lead_id": "lead_17864efa590ef84785c24a4ed01004c5",
       "published_at": "2026-03-26",
-      "refs": {},
+      "refs": {
+        "parked_reason": "Churchill Capital Corp XI FY2025 10-K（2026-03-26 申報）以本機 fetchers/edgar.py 取得原文並全文比對：agility 0 次、robotics 0 次。該 10-K 涵蓋期間與申報日均早於 2026-06-24 的併購宣布，是尚無標的的空白支票 SPAC 年報，不含任何 Agility Robotics 財務或營運揭露，無 graph delta。",
+        "research_outcome": "一手文件已取得並逐字比對，確認不含目標公司內容；非追源失敗，是該文件本身早於事件。不設 entity 觸發器：本文件內容不會再改變。",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
       "source": "edgar:CCXI",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "robotics": {
           "counter_only": false,
@@ -10718,9 +10723,14 @@
       "first_seen": "2026-08-11T05:12:52.616401+00:00",
       "lead_id": "lead_54bf82feffa718f34f8d8ce6e2a6184a",
       "published_at": "2026-05-13",
-      "refs": {},
+      "refs": {
+        "parked_reason": "Churchill Capital Corp XI Q1 2026 10-Q（期末 2026-03-31、2026-05-13 申報）以本機 fetchers/edgar.py 取得原文並全文比對：agility 0 次、robotics 0 次、minimum cash 0 次。同樣早於 2026-06-24 併購宣布，內容為 trust account、redemption 條款與 business combination 期限（2027-12-18，若已簽定義文件則展延至 2028-03-18），不含 Agility 財務揭露，無 graph delta。",
+        "research_outcome": "一手文件已取得並逐字比對，確認不含目標公司內容。附帶確認 [74] 的等待條件仍未滿足且設定正確：S-4 於 2026-07-14 為 confidential submission，截至 2026-08-12 CCXI 所有公開申報均無 Agility 財務。",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
       "source": "edgar:CCXI",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "robotics": {
           "counter_only": false,
@@ -12472,9 +12482,11 @@
       ],
       "published_at": "2026-08-06T23:41:38.000Z",
       "raw_text": "$MTSI earnings transcript: \n\n\"Customers are coming to us with urgency due to the general supply shortage of indium phosphide DFB lasers\"\n\nEmphasis on \"Urgency\", CW \"DFB lasers\", \"coming to us\".\n\nCW DFB names, such as like $SIVE and $LITE should be happy to hear about this laser bottleneck getting validated.",
-      "refs": {},
+      "refs": {
+        "research_action_id": "ra_34e091e4cc47c08499c0b859c931a4d3"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "action_prepared",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -21062,16 +21074,16 @@
         "campaign_window_end": "2026-07-29T13:46:25Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
         "original_claim_status": "partial_support_exact_quantitative_claims_unverified",
-        "parked_reason": "NVIDIA 官方只支持廣義 800V/Kyber/CPO roadmap；Rubin delay、frontier lab 50% compute 與約 20% demand 等精確 Morgan roadshow claim 未取得原文，且廣義 facts 已有既有 extraction",
+        "parked_reason": "推文核心事實查證屬實（Jensen Huang 否認 Rubin Ultra 延到 2028、稱 800V 與 rack-to-rack 光互連依原計畫無實質延遲、NVIDIA 官方稱 roadmap intact），但推文只呈現單方說法：此為 SemiAnalysis 報導 Kyber 機櫃架構延後逾 12 個月至 2028 之後的回應。第三方與當事公司說法直接衝突且尚未有可裁決的一手證據；Jensen 發言屬 L8 當事人自報，不能單獨作為結構性事實入圖。",
         "research_mode": "delta_only",
-        "research_outcome": "official_broad_roadmap_existing_exact_note_claims_unverified",
+        "research_outcome": "爭議未決：SemiAnalysis（第三方）稱延後 vs NVIDIA（當事人）稱無延遲。時序爭議屬時變 observation，非結構性 graph delta；待 NVIDIA 一手申報或實際出貨揭露裁決。不入圖以免把單方說法固化成事實。",
         "research_run": "luna_reviewer_2026-08-02_pq1_10",
         "trace_attempts_ref": "NVIDIA official 800V/Kyber/Vera Rubin/CPO pages；Morgan roadshow exact-phrase search；private screenshots",
         "trace_next_trigger": "public Morgan note，或 NVIDIA/customer filing/interview 逐字揭露相同 quantitative claims",
         "trace_requeue_trigger": "related_triaged_lead:lead_9adb031e86660441500e62d9adc0bafe",
         "trace_requeued_at": "2026-08-07T22:39:30.098813+00:00",
         "trace_requires_user": "false",
-        "trace_status": "lead_only_tier_4",
+        "trace_status": "original_obtained",
         "trace_trigger_entities": [
           "NVDA",
           "co:nvidia"
@@ -21080,7 +21092,7 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -24989,9 +25001,14 @@
       ],
       "published_at": "2026-08-11T02:19:36.000Z",
       "raw_text": "uhhh... the Unitree IPO is more than 8000 times oversubscribed by retail investors. \n\nThe demand for pure play humanoid companies is absolutely enormous?\n\nI'm personally in the US-based Agility Robotics club (Softbank, $NVDA, $AMZN, Foxconn, etc), at $2.5B premoney via $CCXI. \n\nAnd my take is that Unitree likely opening at $30B+ (from pre-ipo perps), might bring the leading US players some more attention in a week or two. \n\nRegardless that's just absurd demand.",
-      "refs": {},
+      "refs": {
+        "parked_reason": "Unitree 上海 IPO 事實查證：2026-08-06 定價每股人民幣 150.8 元、估值約人民幣 610 億（約 US\\.04B）、對 2025 預估獲利 219 倍、售 4045 萬股佔擴大後股本 10%、募資約人民幣 61 億；為中國首檔純人形機器人掛牌。⚠ 超額認購倍數各來源不一致（Bloomberg 5,526 倍 vs 其他 8,289 倍），推文採 8000+；且推文所稱『開盤 US\\+，來自 pre-IPO 永續合約』是衍生品推測非事實。內容屬估值／市場情緒觀測（Engine C 性質），非供應鏈結構性 claim。",
+        "research_outcome": "事實已查證但屬估值與市場情緒觀測，非 Engine A graph delta。Unitree 亦不在 config/themes.txt 追蹤範圍（robotics 主題核心公司為 CCXI/TSLA/JBL）。可作 Agility 估值 comp 的參考，但 comp 屬 Engine C 時變資料。",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
