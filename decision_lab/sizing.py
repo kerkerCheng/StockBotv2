@@ -298,7 +298,11 @@ def calculate_probe_limits(
             )
         )
     paper_max = _lane_max(trace, "paper")
-    if paper_blockers:
+    # 只有對 paper 致命的 blocker 才歸零。先前是 `if paper_blockers:`——不分嚴重度
+    # 無條件歸零，於是 2026-08-02 建立的分類完全沒套用到真正 binding 的這一行
+    # （實測 paper_lane_blockers binding 59/72）。
+    paper_fatal = fatal_blockers(paper_blockers, lane="paper")
+    if paper_fatal:
         trace.append(_constraint("paper", "paper_lane_blockers", 0.0, bundle.digest, status="blocked"))
         paper_max = 0.0
     paper_floor = min(_level_floor(weakest_level, probe["axis_ceilings"]), paper_max)
@@ -381,11 +385,14 @@ def calculate_probe_limits(
                 status="missing",
             )
         )
-    if live_blockers:
+    # 同 paper：只有對 live 致命的才歸零（先前 live_lane_blockers binding 71/72，
+    # 主因是 diagnostic 級的 execution_intent_research_only 與 holdings_unconfirmed）。
+    live_fatal = fatal_blockers(live_blockers, lane="live")
+    if live_fatal:
         trace.append(_constraint("live", "live_lane_blockers", 0.0, bundle.digest, status="blocked"))
     live_max = _lane_max(trace, "live")
     live_floor = min(_level_floor(weakest_level, probe["axis_ceilings"]), live_max)
-    live_range = (live_floor, live_max) if not live_blockers else (0.0, 0.0)
+    live_range = (live_floor, live_max) if not live_fatal else (0.0, 0.0)
     if live_range[1] > 0 and live_nav > 0 and price and fx_rate:
         live_shares = (
             live_range[0] * live_nav / (price * fx_rate),

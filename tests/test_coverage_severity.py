@@ -10,6 +10,11 @@ from copy import deepcopy
 from pathlib import Path
 
 from decision_lab.action_card import build_action_card
+from decision_lab.blocker_severity import (
+    diagnostic_blockers,
+    registered_keys,
+    severity_of,
+)
 from decision_lab.context import build_context_bundle, holdings_digest
 from decision_lab.coverage import _CHECKLIST_ITEMS, fatal_blockers
 from decision_lab.execution import assess_probe
@@ -22,22 +27,71 @@ from thesis.investment_policy import load_policy
 # 讓資本歸零：這些缺陷使決策無法稽核或事後檢驗，不是「還沒被證實的好消息」。
 FATAL = (
     "identity_unresolved",
-    "graph_company_missing",
     "best_source_missing",
     "causal_path_missing",
-    "financial_missing",
-    "financial_unavailable",
-    "financial_quarantined",
     "disproof_missing",
     "expiry_invalid",
+    # 報價單位未登記會差 100 倍（IQE.L 2026-08-13 實例）——猜單位比不算更危險。
+    "market_quote_unit_unregistered",
+    # 抓到別的標的／單位不明／價格損毀：不是「還沒查」，是「查到的東西是錯的」。
+    "market_ticker_mismatch",
+    "market_unit_unverified",
+    "market_price_invalid",
+    # 缺幣別無法換算成 NAV 計價，與 unit_unverified 同族。
+    "market_currency_missing",
+    # quarantined ＝ 已知壞掉，不是還沒查。沿用 beta technical 的既有先例
+    # （AGENTS.md 2026-08-01：資料不足／stale／quarantined 時誠實歸零）。
+    "financial_quarantined",
 )
 
-# 只降尺寸：知道在講哪家公司、骨架可稽核，只是研究還沒做完。
+# 只降尺寸：知道在講哪家公司、骨架可稽核，只是研究還沒做完或資料還沒到。
 INCOMPLETE = (
     "independent_source_missing",
     "counter_path_missing",
     "financial_runway_manual_required",
     "catalyst_missing",
+    # ↓ 2026-08-13 由 fatal 降級，各有明確理由：
+    # graph_company_missing 清除率 0%，且 config 自承「名稱誤導，可能只是 identity
+    # 未綁定」——拿可能是假訊號的東西歸零。要恢復 fatal 必須先能區分「圖裡真的
+    # 沒有」與「identity 沒綁對」。
+    "graph_company_missing",
+    # financial_missing／unavailable：financial_resilience 軸的 authority 就是
+    # Engine C，缺了那一軸自然變 unknown → ceiling 0。再讓 blocker 歸零是同一件事
+    # 罰兩次，且把「這家公司沒資料」誤當成「這家公司有問題」。
+    "financial_missing",
+    "financial_unavailable",
+    # 過期不等於錯，只降尺寸。
+    "market_stale",
+    "financial_stale",
+    "fx_stale",
+    # ADV 只影響 live 執行尺寸，由 execution_adv_1pct 單獨處理。
+    "market_adv_invalid",
+)
+
+# 完全不影響資本，只出現在報表：請求參數、由其他 blocker 導出、或系統自身作業狀態。
+# 這一級是 2026-08-13 新增的，因為前兩名觸發者（80.6% 與 66.7%）都屬於此類，
+# 而它們在舊制下把 live lane 擋掉 71/72 次。
+DIAGNOSTIC = (
+    "execution_intent_research_only",
+    "execution_intent_paper_only",
+    "paper_context_not_ready",
+    "live_context_not_ready",
+    "coverage_pending",
+    "technical_history_insufficient",
+    "sheet_only_holding",
+)
+
+# 只對 live 致命：live 需要 NAV 與執行 context，paper 在 probe 尺度不需要。
+LIVE_ONLY_FATAL = (
+    "holdings_unavailable",
+    "execution_fx_missing",
+    "portfolio_leverage_unavailable",
+    "execution_quote_unit_unregistered",
+    # 2026-08-13：曾一度誤判為 diagnostic，被 test_live_lane_reachable 抓到。
+    # config 原文「只有真的要 size live 部位時才需要 --confirm-holdings」講的是
+    # 「live 需要」——沒有經確認的持倉就沒有 NAV，live 區間算不出來。
+    # 對 paper／research 它才是必然結果而非缺口。
+    "holdings_unconfirmed",
 )
 
 
@@ -49,6 +103,41 @@ def test_fatal_blockers_zero_out_capital() -> None:
 def test_incomplete_research_does_not_zero_out_capital() -> None:
     for blocker in INCOMPLETE:
         assert fatal_blockers((blocker,)) == (), f"{blocker} 不應歸零，應只降尺寸"
+
+
+def test_diagnostic_blockers_never_zero_any_lane() -> None:
+    """診斷級永遠不得歸零——它們不是關於標的的事實。
+
+    `execution_intent_research_only` 是請求參數（config 自述「此項不是缺口」），
+    `holdings_unconfirmed` 是我的試算表狀態（自述「對研究用途是必然結果」）。
+    這兩者在 2026-08-13 之前把 live lane 擋掉 71/72 次。
+    """
+    for blocker in DIAGNOSTIC:
+        assert severity_of(blocker) == "diagnostic", f"{blocker} 應為 diagnostic"
+        for lane in (None, "paper", "live"):
+            assert fatal_blockers((blocker,), lane=lane) == (), f"{blocker} 不得擋 {lane}"
+    assert set(diagnostic_blockers(DIAGNOSTIC)) == set(DIAGNOSTIC)
+
+
+def test_live_only_fatal_does_not_block_paper() -> None:
+    """持股與執行 context 缺失只擋 live；paper 在 0.2% 尺度不需要 NAV 與執行市場。"""
+    for blocker in LIVE_ONLY_FATAL:
+        assert fatal_blockers((blocker,), lane="live") == (blocker,), f"{blocker} 應擋 live"
+        assert fatal_blockers((blocker,), lane="paper") == (), f"{blocker} 不應擋 paper"
+        # lane=None 沿用舊語意「在任一 lane 致命即算」，供非 lane-scoped 清單使用。
+        assert fatal_blockers((blocker,)) == (blocker,)
+
+
+def test_registry_is_the_single_source_of_severity() -> None:
+    """分類只有一份，住在 config/decision_blockers.json。
+
+    先前這裡是硬編碼 frozenset，而 config 另有一套 51 項的 resolution_mode 分類——
+    兩套互不知道，一套給人看、一套決定資本（L12）。
+    """
+    keys = registered_keys()
+    assert len(keys) == len(set(keys)), "登記表不得有重複 key"
+    for blocker in FATAL + INCOMPLETE + DIAGNOSTIC + LIVE_ONLY_FATAL:
+        assert severity_of(blocker) in {"fatal", "sizing", "diagnostic"}
 
 
 def test_financial_checklist_gaps_only_reduce_size() -> None:
@@ -87,7 +176,7 @@ def test_every_known_blocker_has_a_deliberate_classification() -> None:
     這是那道剎車：新增一種 blocker 時，這個測試會逼人明確決定它屬於
     「歸零」還是「降尺寸」，而不是靠 fail-closed 預設安靜地擋掉資本。
     """
-    known = set(FATAL) | set(INCOMPLETE) | {
+    known = set(FATAL) | set(INCOMPLETE) | set(DIAGNOSTIC) | {
         f"financial_{item}_{suffix}"
         for item in _CHECKLIST_ITEMS
         for suffix in ("missing", "manual_required", "manual_source_missing")
@@ -95,6 +184,14 @@ def test_every_known_blocker_has_a_deliberate_classification() -> None:
     classified_fatal = {b for b in known if fatal_blockers((b,))}
 
     assert classified_fatal == set(FATAL)
+
+    # 每一個都必須是**明確登記**的，不能靠 fail-closed 預設落進 fatal。
+    # 判準是「有沒有在 config 命中一條規則」：命中 diagnostic/sizing 顯然是明確的；
+    # 命中 fatal 也必須來自登記，而不是未登記的預設。
+    from decision_lab.blocker_severity import _match  # noqa: PLC0415 — 僅測試用
+
+    for blocker in sorted(known | set(LIVE_ONLY_FATAL)):
+        assert _match(blocker) is not None, f"{blocker} 未登記於 config/decision_blockers.json"
 
 
 def _decision_with_coverage_blockers(store, blockers: tuple[str, ...], *, key: str):

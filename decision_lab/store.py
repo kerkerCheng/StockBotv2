@@ -773,9 +773,12 @@ class DecisionStore:
         # record_coverage_assessment），不能為了放行研究不完整的案例而鬆動；
         # 但拿它當 readiness 判準，等於讓任何一個非致命 blocker 也把 lane 打成
         # not_ready，於是 2026-08-02 對 coverage_cap 做的嚴重度分類在下游被抵銷。
+        # lane blocker 也走同一套嚴重度分類（2026-08-13）：先前 `not paper_blockers`
+        # ／`not live_blockers` 讓任一非致命 lane blocker 也把 lane 打成 not_ready，
+        # 於是 diagnostic 級的 execution_intent_* 與 holdings_unconfirmed 擋掉 live 71/72 次。
         fatal = fatal_blockers(blockers)
-        paper_ready = not fatal and not paper_blockers
-        live_ready = not fatal and not live_blockers
+        paper_ready = not fatal and not fatal_blockers(paper_blockers, lane="paper")
+        live_ready = not fatal and not fatal_blockers(live_blockers, lane="live")
         return CoverageResult(
             assessment_id=str(row["assessment_id"]),
             cohort_id=str(row["cohort_id"]),

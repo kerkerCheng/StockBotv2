@@ -1,6 +1,6 @@
 {
   "_comment": "Blocker 字彙登記表。Blocker code 是散落在 coverage.py／sizing.py／adapters.py 產生、又被 brief／todo 消費的承重字串；本檔是它們唯一的說明權威。這是讀側分類層——只描述既有 code 的意義，不改變任何 code 的產生方式，因此不影響已凍結的 decision payload。",
-  "version": 1,
+  "version": 3,
   "_resolution_modes": {
     "user_decision": "使用者現在就能做出決定推進它。應留在決策佇列。",
     "awaiting_external": "需要世界上先發生某件事（新 filing、上市、更多文件、下一個財報）。不該持續佔用決策注意力，應轉為帶觸發條件的等待項。",
@@ -12,6 +12,7 @@
       "code": "execution_intent_research_only",
       "label": "本次只要求研究，未要求任何部位",
       "category": "intent",
+      "severity": "diagnostic",
       "resolution_mode": "system_internal",
       "next_step": "無需動作。research intent 依定義不建立部位，此項不是缺口。"
     },
@@ -19,6 +20,7 @@
       "code": "execution_intent_paper_only",
       "label": "本次只要求 paper，未要求 live",
       "category": "intent",
+      "severity": "diagnostic",
       "resolution_mode": "system_internal",
       "next_step": "無需動作。"
     },
@@ -26,6 +28,7 @@
       "code": "paper_context_not_ready",
       "label": "paper lane 的 context 未齊備",
       "category": "lane",
+      "severity": "diagnostic",
       "resolution_mode": "system_internal",
       "next_step": "由其他 blocker 導出，修那些即可。"
     },
@@ -33,6 +36,7 @@
       "code": "live_context_not_ready",
       "label": "live lane 的 context 未齊備",
       "category": "lane",
+      "severity": "diagnostic",
       "resolution_mode": "system_internal",
       "next_step": "由其他 blocker 導出，修那些即可。"
     },
@@ -40,6 +44,7 @@
       "code": "coverage_pending",
       "label": "Coverage 尚未完成評估",
       "category": "lane",
+      "severity": "diagnostic",
       "resolution_mode": "system_internal",
       "next_step": "由其他 blocker 導出。"
     },
@@ -47,6 +52,7 @@
       "code": "identity_unresolved",
       "label": "公司身分未綁定（缺 research ticker 或未登記）",
       "category": "identity",
+      "severity": "fatal",
       "resolution_mode": "user_decision",
       "next_step": "在 config/company_identity.json 登記；若標的尚未上市（ticker 不存在），此項實為 awaiting_external，應以觸發條件轉為等待。"
     },
@@ -54,6 +60,7 @@
       "code": "graph_company_missing",
       "label": "凍結 identity 與圖中 focus company 對不上",
       "category": "identity",
+      "severity": "sizing",
       "resolution_mode": "user_decision",
       "next_step": "注意名稱誤導：圖中可能有該公司，只是 identity 未綁定就會丟掉 company_id（見 decision_lab/context.py 的 core_fields）。先確認是「圖裡真的沒有」還是「identity 未綁定」。"
     },
@@ -61,6 +68,7 @@
       "code": "unresolved_identity",
       "label": "無法由名稱／ticker 解析出唯一公司",
       "category": "identity",
+      "severity": "fatal",
       "resolution_mode": "user_decision",
       "next_step": "提供 exact company_id 或在 config/company_identity.json 登記；系統不做 fuzzy match。"
     },
@@ -68,6 +76,7 @@
       "code": "graph_unavailable",
       "label": "Neo4j 不可用，無法解析身分",
       "category": "identity",
+      "severity": "fatal",
       "resolution_mode": "system_internal",
       "next_step": "確認 Neo4j 與唯讀帳號設定後重試。"
     },
@@ -75,6 +84,7 @@
       "code": "research_ticker_unavailable",
       "label": "registry 未登記 research ticker",
       "category": "identity",
+      "severity": "fatal",
       "resolution_mode": "awaiting_external",
       "next_step": "未上市標的須等掛牌後才有 ticker 可登記。"
     },
@@ -82,6 +92,7 @@
       "code": "best_source_missing",
       "label": "圖中該公司沒有任何來源文件",
       "category": "evidence",
+      "severity": "fatal",
       "resolution_mode": "awaiting_external",
       "next_step": "走 source-trace 取得一手文件並入圖。"
     },
@@ -89,6 +100,7 @@
       "code": "independent_source_missing",
       "label": "缺與主體不同 origin_entity 的獨立佐證",
       "category": "evidence",
+      "severity": "sizing",
       "resolution_mode": "awaiting_external",
       "next_step": "需要客戶端／第三方的新文件（L8）。注意 bounded read 只走 1 hop，證據必須掛在直接連到公司節點的邊上才看得到。"
     },
@@ -96,6 +108,7 @@
       "code": "causal_path_missing",
       "label": "圖中缺因果路徑",
       "category": "evidence",
+      "severity": "fatal",
       "resolution_mode": "awaiting_external",
       "next_step": "補足供應鏈／技術關係邊。"
     },
@@ -103,6 +116,7 @@
       "code": "counter_path_missing",
       "label": "圖中缺反向路徑（競爭者／可替代性）",
       "category": "evidence",
+      "severity": "sizing",
       "resolution_mode": "awaiting_external",
       "next_step": "把競爭者與 competes_with 邊入圖，才能呈現可替代性。"
     },
@@ -110,6 +124,7 @@
       "code": "graph_coverage_deficit",
       "label": "圖對該公司的覆蓋深度不足",
       "category": "evidence",
+      "severity": "sizing",
       "resolution_mode": "awaiting_external",
       "next_step": "灌入更多不同 origin 的文件。"
     },
@@ -117,6 +132,7 @@
       "code": "research_assessment_missing",
       "label": "尚未提供五軸 Confidence assessment",
       "category": "assessment",
+      "severity": "fatal",
       "resolution_mode": "awaiting_external",
       "next_step": "由研究 agent 產生 assessment JSON 後 reassess。"
     },
@@ -124,6 +140,7 @@
       "code": "catalyst_missing",
       "label": "未填 catalyst",
       "category": "assessment",
+      "severity": "sizing",
       "resolution_mode": "user_decision",
       "next_step": "reassess 時以 --catalyst 提供。"
     },
@@ -131,6 +148,7 @@
       "code": "disproof_missing",
       "label": "未填 disproof condition",
       "category": "assessment",
+      "severity": "fatal",
       "resolution_mode": "user_decision",
       "next_step": "reassess 時以 --disproof 提供；可證偽性是一等公民（L7）。"
     },
@@ -138,6 +156,7 @@
       "code": "expiry_invalid",
       "label": "expiry 不合法",
       "category": "assessment",
+      "severity": "fatal",
       "resolution_mode": "user_decision",
       "next_step": "以 --expiry 提供合法 ISO-8601 時間。"
     },
@@ -145,6 +164,7 @@
       "code": "financial_missing",
       "label": "Engine C 無此標的財務資料",
       "category": "financial",
+      "severity": "sizing",
       "resolution_mode": "awaiting_external",
       "next_step": "未上市或未 ETL；上市標的可跑 engine_c/etl_yfinance.py。"
     },
@@ -152,6 +172,7 @@
       "code": "financial_identity_missing",
       "label": "缺 ticker 因此無法讀財務",
       "category": "financial",
+      "severity": "sizing",
       "resolution_mode": "awaiting_external",
       "next_step": "等標的掛牌或先解決 identity。"
     },
@@ -159,6 +180,7 @@
       "code": "financial_unavailable",
       "label": "Engine C 財務暫時不可用",
       "category": "financial",
+      "severity": "sizing",
       "resolution_mode": "system_internal",
       "next_step": "確認 Engine C runtime 後重試。"
     },
@@ -166,6 +188,7 @@
       "code": "financial_malformed",
       "label": "Engine C 財務 provenance／timestamp 不完整",
       "category": "financial",
+      "severity": "sizing",
       "resolution_mode": "system_internal",
       "next_step": "修正 observation 的 as_of／fetched_at／source。"
     },
@@ -173,6 +196,7 @@
       "code": "financial_checklist_unavailable",
       "label": "財務核驗清單不可用",
       "category": "financial",
+      "severity": "sizing",
       "resolution_mode": "system_internal",
       "next_step": "確認 Engine C runtime。"
     },
@@ -180,6 +204,7 @@
       "code": "financial_runway_manual_required",
       "label": "runway 需人工判讀",
       "category": "financial",
+      "severity": "sizing",
       "resolution_mode": "awaiting_external",
       "next_step": "由一手 filing 取得現金消耗與資本承諾後填 manual observation。"
     },
@@ -187,13 +212,21 @@
       "code": "holdings_unconfirmed",
       "label": "持股快照尚未經使用者確認",
       "category": "holdings",
+      "severity": "fatal",
+      "fatal_lanes": [
+        "live"
+      ],
       "resolution_mode": "system_internal",
-      "next_step": "只有真的要 size live 部位時才需要 --confirm-holdings；它出現在每一個 research decision 上，對研究用途是必然結果而非缺口。"
+      "next_step": "只有真的要 size live 部位時才需要 --confirm-holdings：沒有經確認的持倉快照就沒有 NAV 與現有部位，live 支持區間無法計算，因此對 live 致命。對 paper／research 它是必然結果而非缺口，不影響 paper lane。"
     },
     {
       "code": "holdings_unavailable",
       "label": "無法取得 Google Sheet 持股",
       "category": "holdings",
+      "severity": "fatal",
+      "fatal_lanes": [
+        "live"
+      ],
       "resolution_mode": "system_internal",
       "next_step": "檢查 GSHEETS 憑證與試算表存取。"
     },
@@ -201,6 +234,7 @@
       "code": "market_missing",
       "label": "無市場行情",
       "category": "market",
+      "severity": "fatal",
       "resolution_mode": "awaiting_external",
       "next_step": "未上市標的無行情；上市標的檢查 provider。"
     },
@@ -208,6 +242,7 @@
       "code": "market_quote_unit_unregistered",
       "label": "交易所報價單位未登記",
       "category": "market",
+      "severity": "fatal",
       "resolution_mode": "user_decision",
       "next_step": "該市場以 minor unit 報價（如 LSE 的 GBp）。在 config/currency_units.json 加一列 quote_code／currency／factor 後即可換算；不要直接把報價單位改成 ISO code，價格會差 100 倍。"
     },
@@ -215,6 +250,10 @@
       "code": "execution_quote_unit_unregistered",
       "label": "執行市場報價單位未登記",
       "category": "market",
+      "severity": "fatal",
+      "fatal_lanes": [
+        "live"
+      ],
       "resolution_mode": "user_decision",
       "next_step": "同 market_quote_unit_unregistered，補 config/currency_units.json 的 execution 側報價單位。"
     },
@@ -222,6 +261,7 @@
       "code": "fx_missing",
       "label": "無匯率",
       "category": "market",
+      "severity": "fatal",
       "resolution_mode": "awaiting_external",
       "next_step": "非同幣計價需 FX；缺失一律 fail closed。"
     },
@@ -229,6 +269,7 @@
       "code": "sheet_only_holding",
       "label": "Sheet 有持股但無任何機制負責",
       "category": "holdings",
+      "severity": "diagnostic",
       "resolution_mode": "user_decision",
       "next_step": "改覆蓋分類（config/holdings_coverage.json 或 beta policy）或建立 cohort；直接 drop 無效，sync 會重新推導。"
     },
@@ -236,6 +277,7 @@
       "code": "single_position_nav_cap_reached",
       "label": "已達單筆部位 NAV 上限（investment policy 硬擋）",
       "category": "policy_cap",
+      "severity": "fatal",
       "resolution_mode": "user_decision",
       "next_step": "這不是資料缺口而是政策硬上限；要突破只能由使用者走 prepared live_override 留下 exact action＋reason receipt，系統不自動放寬。"
     },
@@ -243,6 +285,7 @@
       "code": "etf_leverage_nominal_cap_reached",
       "label": "已達槓桿 ETF 資金占比上限",
       "category": "policy_cap",
+      "severity": "fatal",
       "resolution_mode": "user_decision",
       "next_step": "指投入槓桿 ETF 的資金占 NAV 比例達 cap；與換算槓桿曝險是兩個不同指標，不要混用。"
     },
@@ -250,6 +293,7 @@
       "code": "etf_leverage_effective_cap_reached",
       "label": "已達換算槓桿曝險上限",
       "category": "policy_cap",
+      "severity": "fatal",
       "resolution_mode": "user_decision",
       "next_step": "指乘上 2x／3x 後的曝險達 cap。"
     },
@@ -257,6 +301,10 @@
       "code": "portfolio_leverage_unavailable",
       "label": "無法計算投組槓桿",
       "category": "policy_cap",
+      "severity": "fatal",
+      "fatal_lanes": [
+        "live"
+      ],
       "resolution_mode": "system_internal",
       "next_step": "portfolio risk snapshot 不可用；檢查 Sheet 與 policy 設定後重試。"
     },
@@ -264,6 +312,10 @@
       "code": "paper_exposure_invalid",
       "label": "paper 帳本曝險資料不合法",
       "category": "lane",
+      "severity": "fatal",
+      "fatal_lanes": [
+        "paper"
+      ],
       "resolution_mode": "system_internal",
       "next_step": "檢查 Decision Store 的 paper ledger 完整性。"
     },
@@ -271,6 +323,7 @@
       "prefix": "assessment_context_mismatch:",
       "label": "該軸引用了此 context 不接受的 authority",
       "category": "assessment",
+      "severity": "diagnostic",
       "resolution_mode": "user_decision",
       "next_step": "evidence_refs 必須落在該軸接受的 authority（見 decision_lab/sizing.py 的 AXIS_REFERENCE_AUTHORITIES）；例如財務軸不接受 Engine A 文件當 ref。"
     },
@@ -278,27 +331,18 @@
       "prefix": "financial_checklist_",
       "label": "財務核驗清單項目缺失或待人工填入",
       "category": "financial",
+      "severity": "sizing",
       "resolution_mode": "awaiting_external",
       "next_step": "依 source-trace 取得一手來源後以 engine_c/set_manual_field 新增有 provenance 的 observation。"
-    },
-    {
-      "prefix": "holdings_company_mapping_unresolved:",
-      "label": "（已淘汰）持股列無法對應到已登記公司",
-      "category": "holdings",
-      "resolution_mode": "system_internal",
-      "next_step": "此概念已於 2026-07-29 portfolio risk policy redesign 移除，只會出現在該日之前凍結的舊 decision。重新 reassess 即消失，不需登記任何 mapping。"
-    },
-    {
-      "prefix": "holdings_factor_mapping_unresolved:",
-      "label": "（已淘汰）持股列無法對應到 factor",
-      "category": "holdings",
-      "resolution_mode": "system_internal",
-      "next_step": "同上：factor_tags／factor_exposure_caps 已整套移除，reassess 即消失。"
     },
     {
       "prefix": "holdings_market_value_missing:",
       "label": "持股列缺市值",
       "category": "holdings",
+      "severity": "fatal",
+      "fatal_lanes": [
+        "live"
+      ],
       "resolution_mode": "user_decision",
       "next_step": "補齊 Sheet 該列的 market value。"
     },
@@ -306,13 +350,18 @@
       "prefix": "financial_",
       "label": "財務核驗清單欄位缺失或待人工填入",
       "category": "financial",
+      "severity": "fatal",
       "resolution_mode": "awaiting_external",
-      "next_step": "由一手 filing 取得後填入 manual observation；未揭露時填替代指標並註明。"
+      "next_step": "由一手 filing 取得後填入 manual observation；未揭露時填替代指標並註明。⚠ 本 prefix 是家族 fail-closed 預設：未明列為 sizing 的同族 code 一律歸零，新增精度／功課類 code 時必須明確加一條 sizing 例外，不得依賴預設放行。"
     },
     {
       "prefix": "execution_",
       "label": "執行面 context 缺失",
       "category": "execution",
+      "severity": "fatal",
+      "fatal_lanes": [
+        "live"
+      ],
       "resolution_mode": "awaiting_external",
       "next_step": "執行市場／匯率／別名缺失；未上市標的屬正常。"
     },
@@ -320,6 +369,7 @@
       "prefix": "fx_stale_since_decision",
       "label": "凍結當時的匯率已過期",
       "category": "staleness",
+      "severity": "sizing",
       "resolution_mode": "system_internal",
       "next_step": "重新 reassess 即取得新 context；舊 decision 依契約不回寫。"
     },
@@ -327,6 +377,7 @@
       "prefix": "execution_fx_stale_since_decision",
       "label": "凍結當時的執行匯率已過期",
       "category": "staleness",
+      "severity": "sizing",
       "resolution_mode": "system_internal",
       "next_step": "重新 reassess 即可。"
     },
@@ -334,6 +385,10 @@
       "prefix": "holdings_",
       "label": "持股 context 問題",
       "category": "holdings",
+      "severity": "fatal",
+      "fatal_lanes": [
+        "live"
+      ],
       "resolution_mode": "system_internal",
       "next_step": "檢查 Sheet 標準欄位與幣別一致性。"
     },
@@ -341,6 +396,7 @@
       "prefix": "identity_",
       "label": "身分解析問題",
       "category": "identity",
+      "severity": "fatal",
       "resolution_mode": "user_decision",
       "next_step": "檢查 config/company_identity.json。"
     },
@@ -348,22 +404,169 @@
       "prefix": "market_",
       "label": "市場資料問題",
       "category": "market",
+      "severity": "fatal",
       "resolution_mode": "awaiting_external",
-      "next_step": "檢查行情 provider 或標的是否上市。"
+      "next_step": "檢查行情 provider 或標的是否上市。⚠ 本 prefix 是家族 fail-closed 預設：未明列為 sizing 的同族 code 一律歸零，新增精度／功課類 code 時必須明確加一條 sizing 例外，不得依賴預設放行。"
     },
     {
       "prefix": "fx_",
       "label": "匯率資料問題",
       "category": "market",
+      "severity": "fatal",
       "resolution_mode": "awaiting_external",
-      "next_step": "檢查 FX provider 與方向。"
+      "next_step": "檢查 FX provider 與方向。⚠ 本 prefix 是家族 fail-closed 預設：未明列為 sizing 的同族 code 一律歸零，新增精度／功課類 code 時必須明確加一條 sizing 例外，不得依賴預設放行。"
     },
     {
       "prefix": "technical_",
       "label": "技術指標觀測問題",
       "category": "technical",
+      "severity": "diagnostic",
       "resolution_mode": "awaiting_external",
       "next_step": "歷史不足或 provider 失敗；等資料累積或重跑 ETL。"
+    },
+    {
+      "code": "market_ticker_mismatch",
+      "label": "行情回傳的 ticker 與凍結身分不符",
+      "category": "market",
+      "severity": "fatal",
+      "resolution_mode": "system_internal",
+      "next_step": "抓到的是別的標的——價格正確與否無關緊要，因為它不是這家公司。檢查 provider symbol 與 registry 的 research_ticker。"
+    },
+    {
+      "code": "market_unit_unverified",
+      "label": "行情報價單位未經驗證",
+      "category": "market",
+      "severity": "fatal",
+      "resolution_mode": "system_internal",
+      "next_step": "單位不明就換算，GBp/GBP 這類差 100 倍。補 config/currency_units.json 或確認 registry 的 market_currency。"
+    },
+    {
+      "code": "market_currency_mismatch",
+      "label": "行情幣別與凍結身分登記不符",
+      "category": "market",
+      "severity": "fatal",
+      "resolution_mode": "system_internal",
+      "next_step": "registry 與 provider 對同一標的的幣別不一致；先確認哪一邊錯，不要直接改 registry 遷就 provider。"
+    },
+    {
+      "code": "market_price_invalid",
+      "label": "行情價格非正數或非有限值",
+      "category": "market",
+      "severity": "fatal",
+      "resolution_mode": "system_internal",
+      "next_step": "資料損毀，不是缺席；重抓並檢查 provider 回傳。"
+    },
+    {
+      "code": "market_timestamp_invalid",
+      "label": "行情時戳無法解析",
+      "category": "market",
+      "severity": "fatal",
+      "resolution_mode": "system_internal",
+      "next_step": "時戳損毀會讓所有 freshness 判斷失效；重抓。"
+    },
+    {
+      "code": "market_timestamp_future",
+      "label": "行情時戳落在未來",
+      "category": "market",
+      "severity": "fatal",
+      "resolution_mode": "system_internal",
+      "next_step": "時戳損毀或時區處理錯誤，會讓 freshness 永遠通過；查 provider 時區與本機時鐘。"
+    },
+    {
+      "code": "market_unavailable",
+      "label": "行情 provider 暫時不可用",
+      "category": "market",
+      "severity": "fatal",
+      "resolution_mode": "system_internal",
+      "next_step": "沒有價格就無法換算部位；稍後重試。"
+    },
+    {
+      "code": "market_stale",
+      "label": "行情已過期",
+      "category": "market",
+      "severity": "sizing",
+      "resolution_mode": "system_internal",
+      "next_step": "過期不等於錯；valuation_payoff 軸的證據自然變弱，由 axis_ceiling 承擔。"
+    },
+    {
+      "code": "market_adv_invalid",
+      "label": "行情成交量資料不合法",
+      "category": "market",
+      "severity": "sizing",
+      "resolution_mode": "system_internal",
+      "next_step": "ADV 只影響 live 執行尺寸，由 execution_adv_1pct 約束單獨處理。"
+    },
+    {
+      "code": "market_source_missing",
+      "label": "行情缺 provenance",
+      "category": "market",
+      "severity": "sizing",
+      "resolution_mode": "system_internal",
+      "next_step": "provenance 缺口降低證據強度，不使價格失效。"
+    },
+    {
+      "code": "fx_stale",
+      "label": "匯率已過期",
+      "category": "market",
+      "severity": "sizing",
+      "resolution_mode": "system_internal",
+      "next_step": "同 market_stale：過期只降尺寸。"
+    },
+    {
+      "code": "financial_stale",
+      "label": "財務快照已過期",
+      "category": "financial",
+      "severity": "sizing",
+      "resolution_mode": "system_internal",
+      "next_step": "過期不等於錯；financial_resilience 軸的 authority 就是 Engine C，資料過期時該軸自然變弱。再歸零是同一件事罰兩次。"
+    },
+    {
+      "code": "market_currency_missing",
+      "label": "行情缺幣別",
+      "category": "market",
+      "severity": "fatal",
+      "resolution_mode": "system_internal",
+      "next_step": "沒有幣別就無法換算成 NAV 計價；與 market_unit_unverified 同族，猜幣別比不算更危險。"
+    },
+    {
+      "prefix": "financial_gross_margin_trend_",
+      "label": "財務核驗清單：gross_margin_trend 缺失或待人工填入",
+      "category": "financial",
+      "severity": "sizing",
+      "resolution_mode": "awaiting_external",
+      "next_step": "由一手 filing 取得後以 engine_c/set_manual_field 填入 manual observation；功課沒做完只降尺寸。"
+    },
+    {
+      "prefix": "financial_customer_concentration_",
+      "label": "財務核驗清單：customer_concentration 缺失或待人工填入",
+      "category": "financial",
+      "severity": "sizing",
+      "resolution_mode": "awaiting_external",
+      "next_step": "由一手 filing 取得後以 engine_c/set_manual_field 填入 manual observation；功課沒做完只降尺寸。"
+    },
+    {
+      "prefix": "financial_backlog_",
+      "label": "財務核驗清單：backlog 缺失或待人工填入",
+      "category": "financial",
+      "severity": "sizing",
+      "resolution_mode": "awaiting_external",
+      "next_step": "由一手 filing 取得後以 engine_c/set_manual_field 填入 manual observation；功課沒做完只降尺寸。"
+    },
+    {
+      "prefix": "financial_dilution_",
+      "label": "財務核驗清單：dilution 缺失或待人工填入",
+      "category": "financial",
+      "severity": "sizing",
+      "resolution_mode": "awaiting_external",
+      "next_step": "由一手 filing 取得後以 engine_c/set_manual_field 填入 manual observation；功課沒做完只降尺寸。"
+    },
+    {
+      "prefix": "financial_valuation_pressure_",
+      "label": "財務核驗清單：valuation_pressure 缺失或待人工填入",
+      "category": "financial",
+      "severity": "sizing",
+      "resolution_mode": "awaiting_external",
+      "next_step": "由一手 filing 取得後以 engine_c/set_manual_field 填入 manual observation；功課沒做完只降尺寸。"
     }
   ],
   "_axis_unknown_suffix": {
@@ -372,5 +575,6 @@
     "category": "assessment",
     "resolution_mode": "awaiting_external",
     "next_step": "補足該軸所需 authority 後於 assessment 提供 level 與 evidence_refs。"
-  }
+  },
+  "_severity": "severity 決定 blocker 對資本的權力，與 resolution_mode（誰能解）正交。fatal＝歸零（必須講得出「亮起時標的更可能變壞」的因果機制，或決策根本無法稽核）；sizing＝只降 axis_ceiling，不歸零（研究／資料不完整）；diagnostic＝完全不影響資本，只出現在報表（請求參數、由其他 blocker 導出、或系統自身的作業狀態）。fatal_lanes 缺席＝兩個 lane 都致命；['live'] 表示只有 live 致命（paper 不需要 NAV 與執行 context）。未登記的 code 一律 fail closed 當 fatal。分類依據與實測觸發／清除率見 docs/brainstorms/2026-08-13-capital-expression-direction-requirements.md。"
 }

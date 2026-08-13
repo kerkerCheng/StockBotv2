@@ -3,6 +3,7 @@ from __future__ import annotations
 from copy import deepcopy
 from pathlib import Path
 
+from decision_lab.blocker_severity import severity_of
 from decision_lab.workflow import EvaluationRequest, evaluate_signal, reassess
 from decision_lab.workflow_ports import AuthoritySnapshot, IdentityAuthority
 from tests.test_decision_context import complete_inputs
@@ -135,17 +136,24 @@ def test_partial_execution_metadata_captures_without_crash(tmp_path: Path) -> No
         )
 
         assert result["status"] == "completed_with_blockers"
-        assert result["action_card"]["action"] == "REVIEW"
         # 核心 identity 存活（company_id 有綁定，coverage 不報 identity_unresolved）。
         bundle = store.get_context_bundle(result["context_digest"])
         frozen_identity = bundle.payload["identity"]
         assert frozen_identity["status"] == "resolved"
         assert frozen_identity["company_id"] == "co:broadcom"
         assert "identity_unresolved" not in result["blockers"]
-        # execution metadata 缺失以 identity blocker 呈現、且封鎖資本 lane。
         assert "market_currency_missing" in frozen_identity["blockers"]
-        assert result["action_card"]["paper"]["max_supported_position"] == 0
+
+        # 2026-08-13 行為變更：execution metadata 缺失只封鎖 **live**，不再連坐 paper。
+        # 缺的是執行匯率、使用者 NAV 與投組槓桿——那是「能不能真的下單」需要的東西，
+        # 一筆 0.5% 的 paper probe 不需要它們。先前 `if live_blockers: paper_max = 0`
+        # 式的無條件連坐，正是讓 2026-08-02 嚴重度分類變成 no-op 的那一行。
         assert result["action_card"]["live"]["supported_range"] == [0.0, 0.0]
+        assert result["action_card"]["paper"]["max_supported_position"] > 0
+
+        # 但擋住 live 的理由必須看得見：會改變輸出的輸入要出現在輸出自己的證據欄位。
+        for blocker in ("execution_fx_missing", "live_nav_missing", "portfolio_leverage_unavailable"):
+            assert blocker in result["action_card"]["blockers"]
     finally:
         store.close()
 
@@ -197,8 +205,29 @@ def test_raw_only_unresolved_signal_still_creates_zero_size_card_and_work_order(
         store.close()
 
 
-def test_financial_manual_required_and_stale_states_fail_closed(tmp_path: Path) -> None:
+def test_financial_manual_required_and_stale_states_reduce_size_not_zero(
+    tmp_path: Path,
+) -> None:
+    """2026-08-13：本測試先前斷言的是一個 bug 的行為，且與另一個測試互相矛盾。
+
+    `tests/test_coverage_severity.py::test_financial_checklist_gaps_only_reduce_size`
+    早就斷言 `financial_customer_concentration_manual_required` 是**非致命**的，
+    而本測試斷言同一個 blocker 會讓 `max_supported_position == 0`。**兩者同時是綠的**，
+    因為當時嚴重度分類只套用在 `coverage_cap`，而 `sizing` 另有一行
+    `if paper_blockers: paper_max = 0.0` 無條件歸零——兩條路徑各自回答，
+    於是兩個相反的斷言都成立。這正是 L12 在測試層的簽名。
+
+    現在只有一套分類：核驗清單缺漏與過期都只降尺寸，blocker 仍必須現形。
+
+    ⚠ `manual` 那一格的可承受尺寸仍是 0，但**成因換了**：不再是 blocker 把 lane 打成
+    零，而是 `assessment_context_mismatch:commercial_maturity` 讓該軸被改寫成
+    `unknown` → `axis_ceiling = 0`（`sizing.py` 的 `_validate_assessment`）。
+    也就是它現在走的是信心維度而不是閘門。那條改寫本身是配線問題冒充信心不足，
+    列在 `docs/brainstorms/2026-08-13-capital-expression-direction-requirements.md`
+    §4 第 4 項；等該項落地後，這一格的期望值要改成 > 0。
+    """
     cases = (
+        # (名稱, checklist patch, 預期 blocker, 期望可承受尺寸是否 > 0)
         (
             "manual",
             {
@@ -206,10 +235,11 @@ def test_financial_manual_required_and_stale_states_fail_closed(tmp_path: Path) 
                 "backlog": {"status": "manual_required"},
             },
             "financial_customer_concentration_manual_required",
+            False,
         ),
-        ("stale", None, "financial_stale"),
+        ("stale", None, "financial_stale", True),
     )
-    for name, checklist_patch, expected in cases:
+    for name, checklist_patch, expected, expect_positive_size in cases:
         case_root = tmp_path / name
         case_root.mkdir()
         store = _store(case_root)
@@ -225,8 +255,18 @@ def test_financial_manual_required_and_stale_states_fail_closed(tmp_path: Path) 
                 _request(raw_signal=f"case:{name}"),
             )
             assert expected in result["blockers"]
+            # research intent 不 request paper lane，因此仍不建立 paper 部位。
             assert result["paper_event_id"] is None
-            assert result["action_card"]["paper"]["max_supported_position"] == 0
+            # 關鍵斷言：這兩個 blocker 本身不再有歸零的權力。
+            assert severity_of(expected) == "sizing"
+            size = result["action_card"]["paper"]["max_supported_position"]
+            if expect_positive_size:
+                # 過期只降尺寸，不禁止參與。
+                assert size > 0, f"{name}: 過期不該把可承受尺寸打成零"
+            else:
+                # 仍為 0，但成因是軸而非閘門（見 docstring）。
+                assert size == 0
+                assert "assessment_context_mismatch:commercial_maturity" in result["blockers"]
         finally:
             store.close()
 

@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pytest
 
+from decision_lab.blocker_severity import severity_of
 from decision_lab.context import build_context_bundle, holdings_snapshot_digest
 from decision_lab.coverage import assess_coverage
 from decision_lab.store import DecisionStore
@@ -184,9 +185,24 @@ def test_live_stale_does_not_destroy_paper_research_analyzability(tmp_path: Path
         store.close()
 
 
-def test_stale_financial_snapshot_blocks_paper_lane_but_keeps_research_state(
+def test_stale_financial_snapshot_reduces_size_without_closing_the_paper_lane(
     tmp_path: Path,
 ) -> None:
+    """2026-08-13 行為變更：`financial_stale` 由「關閉 paper lane」改為「只降尺寸」。
+
+    理由與 `market_stale` 同一條：**過期不等於錯**，而 `financial_resilience` 軸的
+    authority 就是 Engine C——資料過期時該軸的證據自然變弱，`axis_ceiling` 會反映
+    它。再讓 blocker 關閉整個 lane 是同一件事罰兩次（D2：不確定性用尺寸承擔，
+    不用 gate 禁止參與）。
+
+    ⚠ 這條的相反意見值得記著：paper ledger 的用途是累積反事實戰績，用過期資料寫進去
+    會讓「系統當時相信什麼」失真。目前靠 context bundle 凍結 `as_of` 保持誠實——
+    紀錄裡看得到用的是哪一天的財務。若日後發現 paper 戰績因此失真，這裡是第一個
+    該回頭改的地方。
+
+    blocker 本身仍必須出現在 `paper_blockers`：會改變輸出的輸入要出現在輸出自己的
+    證據欄位（L12 的相鄰判準）。
+    """
     store = _store(tmp_path)
     inputs = complete_inputs()
     inputs["financial"]["as_of"] = "2026-06-01T00:00:00+00:00"
@@ -221,9 +237,11 @@ def test_stale_financial_snapshot_blocks_paper_lane_but_keeps_research_state(
         )
 
         assert result.status == "analyzable"
-        assert result.paper_context_ready is False
+        assert result.paper_context_ready is True
         assert result.live_context_ready is True
+        # 仍必須現形，只是不再歸零。
         assert "financial_stale" in result.paper_blockers
+        assert severity_of("financial_stale") == "sizing"
     finally:
         store.close()
 

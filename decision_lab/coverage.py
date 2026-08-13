@@ -36,8 +36,10 @@ def apply_execution_intent(
         coverage,
         paper_blockers=normalized_paper,
         live_blockers=normalized_live,
-        paper_context_ready=not fatal and not normalized_paper,
-        live_context_ready=not fatal and not normalized_live,
+        paper_context_ready=not fatal
+        and not fatal_blockers(normalized_paper, lane="paper"),
+        live_context_ready=not fatal
+        and not fatal_blockers(normalized_live, lane="live"),
     )
 
 
@@ -174,12 +176,16 @@ def assess_coverage(
         blockers=tuple(sorted(set(blockers))),
         paper_blockers=paper_blockers,
         live_blockers=live_blockers,
+        # lane readiness 只看「對該 lane 致命」的 blocker。先前是 `not paper_blockers`
+        # ／`not live_blockers`——任一非致命 lane blocker 也會打成 not ready。
+        # holdings 的確認需求不在此硬編碼：它由 holdings_unavailable（fatal，僅 live）
+        # 與 holdings_unconfirmed（diagnostic）表達，寫在這裡等於同一條政策的第三份
+        # 表示，且會覆寫剛做完的嚴重度分類。
         paper_context_ready=not fatal_blockers(tuple(sorted(set(blockers))))
-        and not paper_blockers,
+        and not fatal_blockers(paper_blockers, lane="paper"),
         live_context_ready=(
             not fatal_blockers(tuple(sorted(set(blockers))))
-            and holdings.get("status") in {"confirmed", "confirmed_empty"}
-            and not live_blockers
+            and not fatal_blockers(live_blockers, lane="live")
         ),
         paper_supported_position=0.0,
         live_supported_range=(0.0, 0.0),

@@ -130,7 +130,9 @@ fail closed 是好的預設，但它不是免於驗證的理由。
 | 指標 | 2026-08-13 值 | 想要的方向 |
 |---|---|---|
 | `system_decisions` 總數 | 72 | — |
-| `live_supported_range` 非零筆數 | **0 / 72** | > 0 |
+| `live_supported_range` 非零筆數（既有 frozen decision） | **0 / 72** | 依 point-in-time 契約**不回寫**，此列永遠是 0 |
+| ├ 以真實 calculator 對既有 context 重算（§4 第 3 項後） | **0 → 8**（54 筆可重建者；19 筆 context 無法重建） | 新產生的 decision 應非零 |
+| ├ live binding constraint 分布 | 舊：`live_lane_blockers` 71/72（近乎全部）<br>新：`live_lane_blockers` 44、**`weakest_axis` 31**、`coverage_gate` 19、`execution_adv_1pct` 12 | 應為信心或風險，不是管線 |
 | `axis_ceiling` 的歷史值域 | `{0.0: 37, 0.002: 35}`，**從未達 0.005** | 出現 > 0.002 |
 | `action` 分布 | `DATA_NEEDED` 59、`HOLD_PAPER` 7、`FUND_PAPER` 4、`SHADOW_ONLY` 2 | `DATA_NEEDED` 佔比下降 |
 | paper 實際部位 | 4 檔 × 0.1% NAV（META／AXT／AAOI／SIVE） | 單筆有經濟意義 |
@@ -325,9 +327,9 @@ message），則本節推測作廢，該尺度是刻意的。
 
 | # | 動作 | 驗收條件（可證偽） | 依賴 |
 |---|---|---|---|
-| **1** | **對 7 個有 shadow 錨點的 cohort 補跑 outcome 量測**（唯讀「若今天結算」報表，不 close cohort、不動 authority） | 報表出現 ≥ 5 筆非 null `absolute_return`，且 AXTI 相對 $42.76 顯示約 +85% | 無（資料齊備） |
-| **2** | **逐項分類 49 個 blocker**：機制一句話 ＋ 建議分類（可歸零／只縮小／純診斷）＋ 實測觸發／清除率，交使用者逐項核可 | 使用者核可後，「可歸零」類 ≤ 8 個 | 無（config 改動） |
-| **3** | **把 lane blockers 接進 `fatal_blockers()`**（`sizing.py:301`／`:386`），並讓兩套分類系統合一（§3.2） | 拿現有 72 筆重算：`live_supported_range` 非零筆數 **從 0 變成 > 0**；若仍為 0，此步無效，不得標記完成 | 2 |
+| ~~**1**~~ ✅ | **對 7 個有 shadow 錨點的 cohort 補跑 outcome 量測** | ✅ **7/7 可量測**，AXTI +83.5%（見 §2.7）。`scripts/outcome_if_settled_today.py` | 無 |
+| ~~**2**~~ ✅ | **逐項分類 blocker** | ✅ 使用者 2026-08-13 核可。67 條登記：`fatal` 27 ＋ `fatal(live)` 7 ＋ `fatal(paper)` 1、`sizing` 24、`diagnostic` 8；2 條已淘汰刪除。可歸零仍是 **8 個概念**，code 數較多是因為 identity 家族與 `market_` 家族被拆開 | 無 |
+| ~~**3**~~ ✅ | **把 lane blockers 接進 `fatal_blockers()`** 並讓兩套分類系統合一（§3.2） | ✅ 真實 calculator 全量重算：**live 非零 0 → 8**（54 筆可重建者），binding 由 `live_lane_blockers` 71/72 變成 `weakest_axis` 31 為主。`severity` 現住 config，`blocker_severity.py` 讀它，硬編碼 frozenset 消滅 | 2 |
 | **4** | **修 §3.3 的第 1、2 點**：`unknown` 不再映射到 0；`corroborated + missing_data` 不再懲罰 | 重算 72 筆：`axis_ceiling` 出現 > 0.002 的值 | 3 |
 | **5** | **決定 alpha baseline 尺寸**（使用者決定，見 D5） | — | 1、3 |
 | **6** | `lifecycle.json` 加 `catalyst_checkpoints`，`next_check` 取 `min(cadence, 最近催化劑)` | AXT 的 `next_check` 從 2026-11-15 移到 Q3 財報日 | 無 |
