@@ -88,3 +88,37 @@ def test_theme_core_companies_join_tracked_universe() -> None:
 
     core = theme_core_tickers()
     assert {"COHR", "LITE"} <= core, "themes.txt 的核心公司必須進入 tracked universe"
+
+
+def test_us_edgar_candidates_excludes_foreign_issuers() -> None:
+    """EDGAR 只有美國註冊人；外國發行人放進 watch 只會每天產生找不到 CIK 的失敗。"""
+    from engine_b.routine_config import us_edgar_candidates
+
+    got = us_edgar_candidates(
+        {"AAOI", "NVDA", "IQE.L", "SIVE.ST", "2330.TW", "", "  "}
+    )
+    assert got == frozenset({"AAOI", "NVDA"})
+
+
+def test_edgar_watch_manual_list_is_a_floor_not_a_replacement() -> None:
+    """derivation 只補「已追蹤卻沒 watcher」，不得縮減既有監看。
+
+    上游（lifecycle／Decision store／themes.txt）任一暫時讀不到都會讓 tracked 縮小；
+    若採取代語意就會靜默停止監看既有標的，而漏掉的 filing 沒有人會發現。
+    """
+    from engine_b.routine_config import edgar_watch_tickers
+
+    watch = {"tickers": ["AMAT", "GFS"], "derive_from_tracked": True}
+
+    # 正常：手動 ∪ 導出（外國發行人被排除）
+    assert edgar_watch_tickers(
+        watch, tracked=frozenset({"NVDA", "SIVE.ST"})
+    ) == ["AMAT", "GFS", "NVDA"]
+
+    # 上游全空：不得縮減
+    assert edgar_watch_tickers(watch, tracked=frozenset()) == ["AMAT", "GFS"]
+
+    # 未開啟 derivation：維持手動清單
+    assert edgar_watch_tickers(
+        {"tickers": ["AMAT", "GFS"]}, tracked=frozenset({"NVDA"})
+    ) == ["AMAT", "GFS"]

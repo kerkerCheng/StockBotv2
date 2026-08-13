@@ -542,9 +542,29 @@ def refresh_x_lead(config: dict, store: dict, lead_id: str) -> dict:
     return store["leads"][lead_id]
 
 
+def _edgar_watch_tickers(watch: dict) -> list[str]:
+    """手動清單 ∪ tracked universe 中的美股（見 routine_config.edgar_watch_tickers）。
+
+    derivation 的上游讀不到時 fail-safe 回手動清單：少監看幾檔新標的可以事後補，
+    靜默停止監看既有標的則不會有人發現。
+    """
+    try:
+        from engine_b.routine_config import (
+            discover_tracked_tickers,
+            edgar_watch_tickers,
+            load_config,
+        )
+
+        tracked = discover_tracked_tickers(load_config()) if watch.get("derive_from_tracked") else frozenset()
+        return edgar_watch_tickers(watch, tracked=tracked)
+    except Exception as exc:  # noqa: BLE001 derivation 失敗不得讓既有監看歸零
+        print(f"[harvest] edgar watch derivation failed, 退回手動清單: {exc}", file=sys.stderr)
+        return sorted({str(t).strip().upper() for t in (watch.get("tickers") or []) if str(t).strip()})
+
+
 def harvest_edgar(config: dict, store: dict, *, seen_at: str | None = None) -> None:
     watch = config.get("edgar_watch") or {}
-    tickers = watch.get("tickers") or []
+    tickers = _edgar_watch_tickers(watch)
     forms = watch.get("forms") or []
     count = int(watch.get("lookback_count", 8))
     if not tickers:

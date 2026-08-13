@@ -60,6 +60,8 @@
   ],
   "edgar_watch": {
     "note": "只記 filing metadata（form/日期/URL），不下載全文。8-K/10-K/10-Q/Form 4 高優先；S-8 等註冊雜訊交 triage 判。下載＋抽取仍由使用者點名 research 動詞觸發。⚠ forms 是 exact match（fetchers/edgar.py get_filings），不做 prefix 比對：把 ticker 加進 watch 但該事件的 form 不在下方清單，watcher 看起來在跑卻永遠看不到它——CCXI 就是這樣，加進 watch 是為了 [74]/[114] 等的 S-4，但 S-4 原本不在清單。S-4/S-4A 為 SPAC 併購財務揭露本體（8-K/425 只是宣布遞交，不含財務）。",
+    "_derive_note": "derive_from_tracked=true 時，實際監看清單為下方手動清單 ∪ tracked universe（thesis lifecycle＋未結案 cohort＋themes.txt 核心公司）中的美股。手動清單是**下限不是全集**：derivation 的上游任一暫時讀不到都會讓 tracked 縮小，若採取代語意就會靜默停止監看既有標的，而漏掉的 filing 沒人會發現。derivation 只補「已追蹤卻沒 watcher」這一側的漂移——CCXI 與 META 就是這樣漏掉的（§10.11）。外國發行人（IQE.L／SIVE.ST）由 us_edgar_candidates 依交易所後綴與非 USD 報價幣別排除，EDGAR 沒有它們的申報；改由 feeds 監看。",
+    "derive_from_tracked": true,
     "tickers": [
       "AAOI",
       "AMAT",

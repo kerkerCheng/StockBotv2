@@ -69,6 +69,57 @@ def theme_core_tickers() -> frozenset[str]:
         return frozenset()
 
 
+def us_edgar_candidates(tickers: Iterable[str]) -> frozenset[str]:
+    """從 tracked universe 篩出「SEC EDGAR 可能有申報」的 ticker。
+
+    EDGAR 只有美國註冊人；外國發行人（IQE.L、SIVE.ST、2330.TW）放進 watch 只會每天
+    產生一筆找不到 CIK 的 fetch_failed。兩個確定性排除訊號：
+
+    1. 交易所後綴（含 `.`）——Yahoo／provider 對非美國掛牌一律加後綴。
+    2. registry 的 `market_currency` 非 USD。
+
+    刻意不用 `execution_venue`：registry 中 AVGO／NVDA／TSLA／CCXI 等美股該欄皆為
+    None，拿它當判準會把真正的美股全部濾掉。
+
+    已知限制：美股本身帶 `.` 的（如 BRK.B）會被誤排除。目前 universe 沒有這種標的；
+    真的需要時走 `extra_tickers` 手動補，而不是放寬這條規則。
+    """
+    from identity.registry import get_registry
+
+    registry = get_registry()
+    out: set[str] = set()
+    for raw in tickers:
+        ticker = str(raw or "").strip().upper()
+        if not ticker or "." in ticker:
+            continue
+        company_id = registry.company_id_for_ticker(ticker)
+        company = registry.company(company_id) if company_id else None
+        currency = str(getattr(company, "market_currency", None) or "").upper()
+        if currency and currency != "USD":
+            continue
+        out.add(ticker)
+    return frozenset(out)
+
+
+def edgar_watch_tickers(
+    watch: Mapping[str, Any],
+    *,
+    tracked: frozenset[str] = frozenset(),
+) -> list[str]:
+    """EDGAR watch 的實際監看清單。
+
+    `derive_from_tracked` 開啟時，把 tracked universe 中的美股**併入**手動清單，而不是
+    取代它。理由是 fail-safe：derivation 的上游（thesis lifecycle、Decision store、
+    themes.txt）任何一個暫時讀不到都會讓 tracked 縮小，若採取代語意就會靜默停止監看
+    既有標的——而漏掉的 filing 不會有人發現。手動清單因此是**下限**，derivation 只補
+    「已追蹤卻沒 watcher」這一側的漂移（CCXI 與 META 就是這樣漏掉的，見 §10.11）。
+    """
+    manual = {str(t).strip().upper() for t in (watch.get("tickers") or []) if str(t).strip()}
+    if not watch.get("derive_from_tracked"):
+        return sorted(manual)
+    return sorted(manual | us_edgar_candidates(tracked))
+
+
 def cohort_tickers(rows: Iterable[Mapping[str, Any]]) -> frozenset[str]:
     terminal = {"promoted", "rejected", "expired"}
     return frozenset(
