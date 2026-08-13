@@ -2756,6 +2756,114 @@
       "result": "ok",
       "run_at": "2026-08-12T22:33:40.399704+00:00",
       "source": "edgar:TSEM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-13T00:34:51.830917+00:00",
+      "source": "mfn:sivers-semiconductors"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-13T00:34:52.680522+00:00",
+      "source": "sivers:press"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-13T00:34:53.327211+00:00",
+      "source": "yahoo:iqe-l"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-08-13T00:34:54.517613+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-13T00:34:56.415441+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-13T00:34:57.192561+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 8,
+      "result": "ok",
+      "run_at": "2026-08-13T00:34:57.784150+00:00",
+      "source": "edgar:AVGO"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-13T00:34:58.563595+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-13T00:34:59.369464+00:00",
+      "source": "edgar:CCXI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-13T00:35:00.185495+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-13T00:35:00.902152+00:00",
+      "source": "edgar:GFS"
+    },
+    {
+      "new": 8,
+      "result": "ok",
+      "run_at": "2026-08-13T00:35:01.650171+00:00",
+      "source": "edgar:JBL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-13T00:35:02.194158+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-13T00:35:03.008873+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-13T00:35:03.756818+00:00",
+      "source": "edgar:META"
+    },
+    {
+      "new": 8,
+      "result": "ok",
+      "run_at": "2026-08-13T00:35:04.350368+00:00",
+      "source": "edgar:NVDA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-13T00:35:05.127873+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "new": 8,
+      "result": "ok",
+      "run_at": "2026-08-13T00:35:05.717235+00:00",
+      "source": "edgar:TSLA"
     }
   ],
   "leads": {
@@ -6387,6 +6495,32 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2073374325420503417"
     },
+    "lead_25f524c1ca59584f1fe0b2347f9d1b91": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "TSLA"
+        ]
+      },
+      "first_seen": "2026-08-13T00:35:05.717118+00:00",
+      "lead_id": "lead_25f524c1ca59584f1fe0b2347f9d1b91",
+      "published_at": "2026-05-04",
+      "refs": {},
+      "source": "edgar:TSLA",
+      "status": "pending",
+      "themes": {
+        "robotics": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "TSLA"
+          ]
+        }
+      },
+      "title": "TSLA 4 filed 2026-05-04",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1318605/000110465926055079/xslF345X06/tm2613330-1_4seq1.xml"
+    },
     "lead_26ed9096f88f869e77178205b74682d7": {
       "entities": {
         "company_ids": [],
@@ -6573,6 +6707,32 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2076767097674514474"
+    },
+    "lead_297e60d4932f3b8f5b0c6e39279510dd": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "TSLA"
+        ]
+      },
+      "first_seen": "2026-08-13T00:35:05.717182+00:00",
+      "lead_id": "lead_297e60d4932f3b8f5b0c6e39279510dd",
+      "published_at": "2026-04-23",
+      "refs": {},
+      "source": "edgar:TSLA",
+      "status": "pending",
+      "themes": {
+        "robotics": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "TSLA"
+          ]
+        }
+      },
+      "title": "TSLA 4 filed 2026-04-23",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1318605/000110465926047678/xslF345X06/tm2612285-1_4seq1.xml"
     },
     "lead_299f984635431d6b8702ba9406cbf8e8": {
       "entities": {
@@ -6953,6 +7113,32 @@
         }
       ],
       "url": "https://x.com/aleabitoreddit/status/2072630036600103340"
+    },
+    "lead_2ca9a6e6edfae16e892996fee78444ea": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "TSLA"
+        ]
+      },
+      "first_seen": "2026-08-13T00:35:05.717054+00:00",
+      "lead_id": "lead_2ca9a6e6edfae16e892996fee78444ea",
+      "published_at": "2026-05-15",
+      "refs": {},
+      "source": "edgar:TSLA",
+      "status": "pending",
+      "themes": {
+        "robotics": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "TSLA"
+          ]
+        }
+      },
+      "title": "TSLA 4 filed 2026-05-15",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1318605/000110465926062860/xslF345X06/tm2614845-1_4seq1.xml"
     },
     "lead_2cb82f4c0c7b93fbf18be123045d671e": {
       "entities": {
@@ -8028,6 +8214,34 @@
       },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-aterkallar-punkter-fran-dagordningen-for-arsstamman-2026-fb23131a"
     },
+    "lead_3550af54b806e4a7e943c8d26ad37be0": {
+      "entities": {
+        "company_ids": [
+          "co:broadcom"
+        ],
+        "tickers": [
+          "AVGO"
+        ]
+      },
+      "first_seen": "2026-08-13T00:34:57.783595+00:00",
+      "lead_id": "lead_3550af54b806e4a7e943c8d26ad37be0",
+      "published_at": "2026-07-14",
+      "refs": {},
+      "source": "edgar:AVGO",
+      "status": "pending",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "AVGO"
+          ]
+        }
+      },
+      "title": "AVGO 4 filed 2026-07-14",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1730168/000173016826000072/xslF345X06/wk-form4_1784075275.xml"
+    },
     "lead_359c76e1b5ba4604a130d611f742085a": {
       "entities": {
         "company_ids": [],
@@ -8345,6 +8559,34 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2074243322475171872"
     },
+    "lead_398261c97a8b3ab8127aff8c841f7a13": {
+      "entities": {
+        "company_ids": [
+          "co:broadcom"
+        ],
+        "tickers": [
+          "AVGO"
+        ]
+      },
+      "first_seen": "2026-08-13T00:34:57.784094+00:00",
+      "lead_id": "lead_398261c97a8b3ab8127aff8c841f7a13",
+      "published_at": "2026-06-26",
+      "refs": {},
+      "source": "edgar:AVGO",
+      "status": "pending",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "AVGO"
+          ]
+        }
+      },
+      "title": "AVGO 4 filed 2026-06-26",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1730168/000110465926078348/xslF345X06/tm2619044-1_4seq1.xml"
+    },
     "lead_39a7564998ac959ad2c54d7815b905e7": {
       "entities": {
         "company_ids": [
@@ -8609,6 +8851,34 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2074223485921243237"
+    },
+    "lead_3d938a5a87a025e1e067c3561fc9672c": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia"
+        ],
+        "tickers": [
+          "NVDA"
+        ]
+      },
+      "first_seen": "2026-08-13T00:35:04.349813+00:00",
+      "lead_id": "lead_3d938a5a87a025e1e067c3561fc9672c",
+      "published_at": "2026-08-12",
+      "refs": {},
+      "source": "edgar:NVDA",
+      "status": "pending",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "NVDA"
+          ]
+        }
+      },
+      "title": "NVDA 4 filed 2026-08-12",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1045810/000131026426000008/xslF345X06/wk-form4_1786569187.xml"
     },
     "lead_3db17a26b013cc15fab10c297fbd02bc": {
       "entities": {
@@ -9523,6 +9793,34 @@
       },
       "url": "https://www.twelfthmagpie.com/2026/08/02/up-523-in-6-months-is-this-the-best-growth-stock-to-buy-in-august-2026/?.tsrc=rss"
     },
+    "lead_447924a4a87e69d8a5393c695ad141af": {
+      "entities": {
+        "company_ids": [
+          "co:jabil"
+        ],
+        "tickers": [
+          "JBL"
+        ]
+      },
+      "first_seen": "2026-08-13T00:35:01.649722+00:00",
+      "lead_id": "lead_447924a4a87e69d8a5393c695ad141af",
+      "published_at": "2026-07-21",
+      "refs": {},
+      "source": "edgar:JBL",
+      "status": "pending",
+      "themes": {
+        "robotics": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "JBL"
+          ]
+        }
+      },
+      "title": "JBL 4 filed 2026-07-21",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/898293/000122520826006697/xslF345X06/doc4.xml"
+    },
     "lead_44ce140c224422130eecf4bb9766219e": {
       "entities": {
         "company_ids": [
@@ -9841,6 +10139,34 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2082720873908494456"
     },
+    "lead_45c16c3d1b589d5a3a64e100be09c1b2": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia"
+        ],
+        "tickers": [
+          "NVDA"
+        ]
+      },
+      "first_seen": "2026-08-13T00:35:04.350121+00:00",
+      "lead_id": "lead_45c16c3d1b589d5a3a64e100be09c1b2",
+      "published_at": "2026-06-30",
+      "refs": {},
+      "source": "edgar:NVDA",
+      "status": "pending",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "NVDA"
+          ]
+        }
+      },
+      "title": "NVDA 8-K filed 2026-06-30",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000056/nvda-20260624.htm"
+    },
     "lead_46349b1959ac51a47111c54f5337062c": {
       "entities": {
         "company_ids": [
@@ -9923,6 +10249,34 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/707549/000134360026000009/xslF345X06/wk-form4_1783355605.xml"
+    },
+    "lead_46d054515a551d6d89b10ece17164d1a": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia"
+        ],
+        "tickers": [
+          "NVDA"
+        ]
+      },
+      "first_seen": "2026-08-13T00:35:04.350055+00:00",
+      "lead_id": "lead_46d054515a551d6d89b10ece17164d1a",
+      "published_at": "2026-07-02",
+      "refs": {},
+      "source": "edgar:NVDA",
+      "status": "pending",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "NVDA"
+          ]
+        }
+      },
+      "title": "NVDA 8-K filed 2026-07-02",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000060/nvda-20260628.htm"
     },
     "lead_476bd1f07c60e2995ad96640688707ee": {
       "entities": {
@@ -11927,6 +12281,34 @@
       },
       "url": "https://www.proactiveinvestors.co.uk/companies/news/1092951/deutsche-bank-reinitiates-iqe-at-buy-with-60p-target-as-end-markets-boom-1092951.html?.tsrc=rss"
     },
+    "lead_5d72358756781cd2b02a4a3c3eb03b9b": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia"
+        ],
+        "tickers": [
+          "NVDA"
+        ]
+      },
+      "first_seen": "2026-08-13T00:35:04.349917+00:00",
+      "lead_id": "lead_5d72358756781cd2b02a4a3c3eb03b9b",
+      "published_at": "2026-08-07",
+      "refs": {},
+      "source": "edgar:NVDA",
+      "status": "pending",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "NVDA"
+          ]
+        }
+      },
+      "title": "NVDA 4 filed 2026-08-07",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1045810/000119764726000007/xslF345X06/wk-form4_1786135642.xml"
+    },
     "lead_5d739525279dfae394f8c8e213084633": {
       "entities": {
         "company_ids": [
@@ -12502,6 +12884,34 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2078130772121399553"
+    },
+    "lead_62b8e5bf01607049e3d8108570946b57": {
+      "entities": {
+        "company_ids": [
+          "co:jabil"
+        ],
+        "tickers": [
+          "JBL"
+        ]
+      },
+      "first_seen": "2026-08-13T00:35:01.649852+00:00",
+      "lead_id": "lead_62b8e5bf01607049e3d8108570946b57",
+      "published_at": "2026-07-08",
+      "refs": {},
+      "source": "edgar:JBL",
+      "status": "pending",
+      "themes": {
+        "robotics": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "JBL"
+          ]
+        }
+      },
+      "title": "JBL 4 filed 2026-07-08",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/898293/000122520826006546/xslF345X06/doc4.xml"
     },
     "lead_62fb4326975492b9f826c63bb266571d": {
       "entities": {
@@ -13468,6 +13878,34 @@
       },
       "url": "https://www.proactiveinvestors.co.uk/companies/news/1095761/iqe-shares-surge-as-ai-demand-lifts-guidance-and-prompts-broker-upgrades-1095761.html?.tsrc=rss"
     },
+    "lead_6c6ee0cc90206989d9672587f20a9dea": {
+      "entities": {
+        "company_ids": [
+          "co:broadcom"
+        ],
+        "tickers": [
+          "AVGO"
+        ]
+      },
+      "first_seen": "2026-08-13T00:34:57.783773+00:00",
+      "lead_id": "lead_6c6ee0cc90206989d9672587f20a9dea",
+      "published_at": "2026-07-10",
+      "refs": {},
+      "source": "edgar:AVGO",
+      "status": "pending",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "AVGO"
+          ]
+        }
+      },
+      "title": "AVGO 4 filed 2026-07-10",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1730168/000173016826000068/xslF345X06/wk-form4_1783723427.xml"
+    },
     "lead_6cc7c974eab84a76ef68831129f474e3": {
       "entities": {
         "company_ids": [
@@ -14186,6 +14624,34 @@
       },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/tachyon-networks-expands-fwa-portfolio-with-1-5m-development-partnership-with-sivers-semiconductors-3575c079"
     },
+    "lead_728850e5cfe698ffcb164cb0ffb42279": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia"
+        ],
+        "tickers": [
+          "NVDA"
+        ]
+      },
+      "first_seen": "2026-08-13T00:35:04.350187+00:00",
+      "lead_id": "lead_728850e5cfe698ffcb164cb0ffb42279",
+      "published_at": "2026-06-29",
+      "refs": {},
+      "source": "edgar:NVDA",
+      "status": "pending",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "NVDA"
+          ]
+        }
+      },
+      "title": "NVDA 4 filed 2026-06-29",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1045810/000119903926000009/xslF345X06/wk-form4_1782767219.xml"
+    },
     "lead_74225cd7714e9466dcb4f602dc412919": {
       "entities": {
         "company_ids": [],
@@ -14846,6 +15312,34 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2075291803537027204"
+    },
+    "lead_7a036af49c326a6c32a50d4c0a5255a2": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia"
+        ],
+        "tickers": [
+          "NVDA"
+        ]
+      },
+      "first_seen": "2026-08-13T00:35:04.350250+00:00",
+      "lead_id": "lead_7a036af49c326a6c32a50d4c0a5255a2",
+      "published_at": "2026-06-29",
+      "refs": {},
+      "source": "edgar:NVDA",
+      "status": "pending",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "NVDA"
+          ]
+        }
+      },
+      "title": "NVDA 4 filed 2026-06-29",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1045810/000172529226000004/xslF345X06/wk-form4_1782767179.xml"
     },
     "lead_7a35cedfdcf7226f4b045d3f83b84c9b": {
       "entities": {
@@ -15926,6 +16420,32 @@
         }
       ],
       "url": "https://x.com/aleabitoreddit/status/2074007618046345249"
+    },
+    "lead_80ad137ec40349c4a806e77e716c8391": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "TSLA"
+        ]
+      },
+      "first_seen": "2026-08-13T00:35:05.716685+00:00",
+      "lead_id": "lead_80ad137ec40349c4a806e77e716c8391",
+      "published_at": "2026-07-23",
+      "refs": {},
+      "source": "edgar:TSLA",
+      "status": "pending",
+      "themes": {
+        "robotics": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "TSLA"
+          ]
+        }
+      },
+      "title": "TSLA 10-Q filed 2026-07-23",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1318605/000162828026049270/tsla-20260630.htm"
     },
     "lead_80f63251f847cdfa862e9b4596b9f24c": {
       "entities": {
@@ -17133,6 +17653,34 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1326801/000095010326011028/xslF345X06/ownership.xml"
     },
+    "lead_8d6b5710ab62f537e8dd17d153adf10d": {
+      "entities": {
+        "company_ids": [
+          "co:broadcom"
+        ],
+        "tickers": [
+          "AVGO"
+        ]
+      },
+      "first_seen": "2026-08-13T00:34:57.783838+00:00",
+      "lead_id": "lead_8d6b5710ab62f537e8dd17d153adf10d",
+      "published_at": "2026-07-10",
+      "refs": {},
+      "source": "edgar:AVGO",
+      "status": "pending",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "AVGO"
+          ]
+        }
+      },
+      "title": "AVGO 4 filed 2026-07-10",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1730168/000173016826000066/xslF345X06/wk-form4_1783723055.xml"
+    },
     "lead_8e16834b3c423735ad20eb6f6be7d63b": {
       "entities": {
         "company_ids": [
@@ -17676,6 +18224,34 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2078259660784910661"
+    },
+    "lead_95daa27b4775895e2bec873b7b829bd5": {
+      "entities": {
+        "company_ids": [
+          "co:jabil"
+        ],
+        "tickers": [
+          "JBL"
+        ]
+      },
+      "first_seen": "2026-08-13T00:35:01.649620+00:00",
+      "lead_id": "lead_95daa27b4775895e2bec873b7b829bd5",
+      "published_at": "2026-08-05",
+      "refs": {},
+      "source": "edgar:JBL",
+      "status": "pending",
+      "themes": {
+        "robotics": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "JBL"
+          ]
+        }
+      },
+      "title": "JBL 4 filed 2026-08-05",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/898293/000122520826006945/xslF345X06/doc4.xml"
     },
     "lead_966dbb4d445ea90ff30a2086aab45a90": {
       "entities": {
@@ -18856,6 +19432,34 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2075496116481884524"
+    },
+    "lead_a270e36f331c79a362f629939c5c8dda": {
+      "entities": {
+        "company_ids": [
+          "co:broadcom"
+        ],
+        "tickers": [
+          "AVGO"
+        ]
+      },
+      "first_seen": "2026-08-13T00:34:57.783901+00:00",
+      "lead_id": "lead_a270e36f331c79a362f629939c5c8dda",
+      "published_at": "2026-07-06",
+      "refs": {},
+      "source": "edgar:AVGO",
+      "status": "pending",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "AVGO"
+          ]
+        }
+      },
+      "title": "AVGO 8-K filed 2026-07-06",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1730168/000119312526295589/d84378d8k.htm"
     },
     "lead_a2c7358ac3d8e81ef853864b7d00073b": {
       "entities": {
@@ -21152,6 +21756,32 @@
       ],
       "url": "https://x.com/aleabitoreddit/status/2080379612736221325"
     },
+    "lead_b4a3b997eb24ac512af213af8a885722": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "TSLA"
+        ]
+      },
+      "first_seen": "2026-08-13T00:35:05.716990+00:00",
+      "lead_id": "lead_b4a3b997eb24ac512af213af8a885722",
+      "published_at": "2026-06-09",
+      "refs": {},
+      "source": "edgar:TSLA",
+      "status": "pending",
+      "themes": {
+        "robotics": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "TSLA"
+          ]
+        }
+      },
+      "title": "TSLA 4 filed 2026-06-09",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1318605/000110465926071970/xslF345X06/tm2617365-1_4seq1.xml"
+    },
     "lead_b4cc43c25317bda42306e4eb33851448": {
       "entities": {
         "company_ids": [],
@@ -21929,6 +22559,62 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2072008436292948376"
     },
+    "lead_bc3c3f6b30ce00bd5a2292f3f580f961": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia"
+        ],
+        "tickers": [
+          "NVDA"
+        ]
+      },
+      "first_seen": "2026-08-13T00:35:04.349985+00:00",
+      "lead_id": "lead_bc3c3f6b30ce00bd5a2292f3f580f961",
+      "published_at": "2026-07-06",
+      "refs": {},
+      "source": "edgar:NVDA",
+      "status": "pending",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "NVDA"
+          ]
+        }
+      },
+      "title": "NVDA 4 filed 2026-07-06",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1045810/000119764726000005/xslF345X06/wk-form4_1783371701.xml"
+    },
+    "lead_bda14e2251939500ac89e6a7d487cc25": {
+      "entities": {
+        "company_ids": [
+          "co:broadcom"
+        ],
+        "tickers": [
+          "AVGO"
+        ]
+      },
+      "first_seen": "2026-08-13T00:34:57.784028+00:00",
+      "lead_id": "lead_bda14e2251939500ac89e6a7d487cc25",
+      "published_at": "2026-06-29",
+      "refs": {},
+      "source": "edgar:AVGO",
+      "status": "pending",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "AVGO"
+          ]
+        }
+      },
+      "title": "AVGO 4 filed 2026-06-29",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1730168/000173016826000064/xslF345X06/wk-form4_1782775021.xml"
+    },
     "lead_bdd03e8e9f98242b0023cb2a3a7eff0c": {
       "entities": {
         "company_ids": [
@@ -22190,6 +22876,34 @@
       },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/kallelse-till-arsstamma-i-sivers-semiconductors-ab-publ-7c0595a8"
     },
+    "lead_c19de5bf5bd91892f61df291b500bb98": {
+      "entities": {
+        "company_ids": [
+          "co:broadcom"
+        ],
+        "tickers": [
+          "AVGO"
+        ]
+      },
+      "first_seen": "2026-08-13T00:34:57.783966+00:00",
+      "lead_id": "lead_c19de5bf5bd91892f61df291b500bb98",
+      "published_at": "2026-07-01",
+      "refs": {},
+      "source": "edgar:AVGO",
+      "status": "pending",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "AVGO"
+          ]
+        }
+      },
+      "title": "AVGO 4 filed 2026-07-01",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1730168/000135956126000004/xslF345X06/wk-form4_1782940899.xml"
+    },
     "lead_c27e417db9b04ea06a227bedfb773c88": {
       "entities": {
         "company_ids": [],
@@ -22378,6 +23092,34 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026044741/xslF345X06/wk-form4_1782164283.xml"
+    },
+    "lead_c4880a725602f78dc035e4ae77667b3a": {
+      "entities": {
+        "company_ids": [
+          "co:jabil"
+        ],
+        "tickers": [
+          "JBL"
+        ]
+      },
+      "first_seen": "2026-08-13T00:35:01.649916+00:00",
+      "lead_id": "lead_c4880a725602f78dc035e4ae77667b3a",
+      "published_at": "2026-06-30",
+      "refs": {},
+      "source": "edgar:JBL",
+      "status": "pending",
+      "themes": {
+        "robotics": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "JBL"
+          ]
+        }
+      },
+      "title": "JBL 10-Q filed 2026-06-30",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/898293/000162828026046138/jbl-20260531.htm"
     },
     "lead_c51e7f15f13fcaaa3f781e8cdf9ea9f4": {
       "content_updated_at": "2026-07-29T13:46:47.957572+00:00",
@@ -23113,6 +23855,74 @@
         }
       ],
       "url": "https://x.com/aleabitoreddit/status/2085499853099208716"
+    },
+    "lead_caa3e0209d61d6de504ac996be1f03fc": {
+      "entities": {
+        "company_ids": [
+          "co:coherent",
+          "co:applied_optoelectronics",
+          "co:macom",
+          "co:poet_technologies",
+          "co:lumentum"
+        ],
+        "tickers": [
+          "COHR",
+          "AAOI",
+          "MTSI",
+          "POET",
+          "LITE"
+        ]
+      },
+      "first_seen": "2026-08-13T00:34:54.493686+00:00",
+      "lead_id": "lead_caa3e0209d61d6de504ac996be1f03fc",
+      "media": [
+        {
+          "cache": {
+            "bytes": 243893,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_caa3e0209d61d6de504ac996be1f03fc/3_2087670194768588800.jpg",
+            "sha256": "9c4453d0ce66d8e4551b04167d1e32b07d1ade017a038c4a4a186b6396e8e4a4"
+          },
+          "height": 1425,
+          "media_key": "3_2087670194768588800",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HPjk-y9aMAA0zbv.jpg",
+          "width": 1630
+        },
+        {
+          "cache": {
+            "bytes": 188027,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_caa3e0209d61d6de504ac996be1f03fc/3_2087670353921531904.jpg",
+            "sha256": "77673a4922ea4dc930c4f229974a3d2931bf1f16254780af0e617a121f902494"
+          },
+          "height": 1029,
+          "media_key": "3_2087670353921531904",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HPjlID2bYAAviBy.jpg",
+          "width": 1545
+        }
+      ],
+      "published_at": "2026-08-12T22:59:29.000Z",
+      "raw_text": "My main takeaway was that your merchant CW laser suppliers seem to be EXTREMELY IMPORTANT now. \n\nBut TLDR of $COHR earnings:\n\n\"given the demand that we see in our DC business with transceivers, I don’t see any time in the near future where we would be selling indium phosphide lasers externally\"\n\n- Ton more value placed on companies that sell InP lasers externally if $AAOI can't doesn't enough capacity for first gen-CPO deployments, $COHR not selling externally...  \n\nI guess that's why $MTSI said a ton of customers are approaching them with urgency for InP CW DFB lasers (and they dont even have meaningful capacity coming online until EOY 2027)\n\n$AAOI -> Internal\n$COHR -> Internal\nBuyers -> fewer places to look for capacity. \n\n \"Our backlog now extends out, fiscal 2027 is basically completely booked out. We are booked really through the end of calendar 2027\" [ Massive massive demand visibility]\n\n- Coherent also mentioned LTAs spanning end of decade. So this kinda reinforces what $POET CEO said at their AGM that the \"big 3\" are fully sold out next 2 years.\n\n\"we’re not constrained in the assembly and test capacity right now. We’re really just constrained by the ramp of the indium phosphide production\"\n\n- Just for the bottleneck bros in terms of assembly/test not a bottleneck. \n\n\"absolutely no push-out of CPO demand. In fact, it has been the opposite. We have seen demand increase and request from customers’ demand getting pulled in\"\n\n\"we continue to expect revenue from CPO for scale-up applications to start to flow in the second half of calendar 2027\" \n\n- Big read through on other CPO players for scale up if $LITE, $COHR reaffirm revenue from CPO scale up coming h2027. \n\n- \"quarterly revenue exceeding $3 billion by the end of fiscal 2027\" \n\n- $COHR revenue go brrr\n\nSo for regular numbers it's:\n\n- $2.046B revenue (+13.3% Q/Q, +33.8% Y/Y), main revenue ramp looks to be happening entering Q4 into 2027\n- Non-GAAP gross margins: 40.2%\n\nNext quarter guide is:\n- Revenue: $2.2–$2.4B revenue\n- Non-GAAP gross margins: 39.5-41.5%\n\nBasically:\n$1.69B -> $1.81B -> $2.05B -> ~$2.30B -> $3.0B (end of FY 2027) \n~39% -> 39.6% -> 40.2% -> ~40.5% (gross margins)\n\nFor operating margins:\n18.0% -> 19.5% -> 19.9% -> 20.3% -> 21.8%\n\nLittle less impressed compared to $LITE margin growth in terms of profitability, but revenue scale for $COHR growing rapidly.",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "pending",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "COHR",
+            "CPO",
+            "InP",
+            "LITE"
+          ]
+        }
+      },
+      "title": "My main takeaway was that your merchant CW laser suppliers seem to be EXTREMELY IMPORTANT now. But TLDR of $COHR earnings: \"given the demand that we see in our DC business with transceivers, I don’t see any time in the near future where we would be selling indium phosphide lasers externally\" - Ton more value placed on companies that sell InP lasers externally if $AAOI can't doesn't enough capacity for first gen-CPO deployments, $COHR not selling externally... I guess that's why $MTSI said a ton of customers are approaching them with urgency for InP CW DFB lasers (and they dont even have meaningful capacity coming online until EOY 2027) $AAOI -> Internal $COHR -> Internal Buyers -> fewer places to look for capacity. \"Our backlog now extends out, fiscal 2027 is basically completely booked out. We are booked really through the end of calendar 2027\" [ Massive massive demand visibility] - Coherent also mentioned LTAs spanning end of decade. So this kinda reinforces what $POET CEO said at their AGM that the \"big 3\" are fully sold out next 2 years. \"we’re not constrained in the assembly and test capacity right now. We’re really just constrained by the ramp of the indium phosphide production\" - Just for the bottleneck bros in terms of assembly/test not a bottleneck. \"absolutely no push-out of CPO demand. In fact, it has been the opposite. We have seen demand increase and request from customers’ demand getting pulled in\" \"we continue to expect revenue from CPO for scale-up applications to start to flow in the second half of calendar 2027\" - Big read through on other CPO players for scale up if $LITE, $COHR reaffirm revenue from CPO scale up coming h2027. - \"quarterly revenue exceeding $3 billion by the end of fiscal 2027\" - $COHR revenue go brrr So for regular numbers it's: - $2.046B revenue (+13.3% Q/Q, +33.8% Y/Y), main revenue ramp looks to be happening entering Q4 into 2027 - Non-GAAP gross margins: 40.2% Next quarter guide is: - Revenue: $2.2–$2.4B revenue - Non-GAAP gross margins: 39.5-41.5% Basically: $1.69B -> $1.81B -> $2.05B -> ~$2.30B -> $3.0B (end of FY 2027) ~39% -> 39.6% -> 40.2% -> ~40.5% (gross margins) For operating margins: 18.0% -> 19.5% -> 19.9% -> 20.3% -> 21.8% Little less impressed compared to $LITE margin growth in terms of profitability, but revenue scale for $COHR growing rapidly.",
+      "triage": null,
+      "url": "https://x.com/aleabitoreddit/status/2087675367595380783"
     },
     "lead_cacb967c193853afdf372069a7b2e9f9": {
       "entities": {
@@ -25577,6 +26387,32 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2077406548012466390"
     },
+    "lead_df8768dd263a4c8dd999f11abe902c8c": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "TSLA"
+        ]
+      },
+      "first_seen": "2026-08-13T00:35:05.716926+00:00",
+      "lead_id": "lead_df8768dd263a4c8dd999f11abe902c8c",
+      "published_at": "2026-06-17",
+      "refs": {},
+      "source": "edgar:TSLA",
+      "status": "pending",
+      "themes": {
+        "robotics": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "TSLA"
+          ]
+        }
+      },
+      "title": "TSLA 4 filed 2026-06-17",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1318605/000110465926075213/xslF345X06/tm2618092-2_4seq1.xml"
+    },
     "lead_dfb87221b5c2e6ddfc1c91ec3304a051": {
       "entities": {
         "company_ids": [],
@@ -25707,6 +26543,32 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2074159948523860147"
+    },
+    "lead_e06ae19be285787dd07e690fd6cb0abf": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "TSLA"
+        ]
+      },
+      "first_seen": "2026-08-13T00:35:05.716789+00:00",
+      "lead_id": "lead_e06ae19be285787dd07e690fd6cb0abf",
+      "published_at": "2026-07-22",
+      "refs": {},
+      "source": "edgar:TSLA",
+      "status": "pending",
+      "themes": {
+        "robotics": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "TSLA"
+          ]
+        }
+      },
+      "title": "TSLA 8-K filed 2026-07-22",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1318605/000162828026049213/tsla-20260722.htm"
     },
     "lead_e0e737fc24bb3ae8e114a32c5ff423ce": {
       "entities": {
@@ -26390,6 +27252,32 @@
         }
       ],
       "url": "https://x.com/aleabitoreddit/status/2073867745243127973"
+    },
+    "lead_e5f4ae45354e9de33bef221952491fd4": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "TSLA"
+        ]
+      },
+      "first_seen": "2026-08-13T00:35:05.716860+00:00",
+      "lead_id": "lead_e5f4ae45354e9de33bef221952491fd4",
+      "published_at": "2026-07-02",
+      "refs": {},
+      "source": "edgar:TSLA",
+      "status": "pending",
+      "themes": {
+        "robotics": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "TSLA"
+          ]
+        }
+      },
+      "title": "TSLA 8-K filed 2026-07-02",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1318605/000162828026046717/tsla-20260702.htm"
     },
     "lead_e6ac612b5b13830ecda4555936d789f8": {
       "entities": {
@@ -27082,6 +27970,34 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2084388023689679001"
     },
+    "lead_ec22223e9d6a2ff8e896e8c881d01dad": {
+      "entities": {
+        "company_ids": [
+          "co:jabil"
+        ],
+        "tickers": [
+          "JBL"
+        ]
+      },
+      "first_seen": "2026-08-13T00:35:01.650048+00:00",
+      "lead_id": "lead_ec22223e9d6a2ff8e896e8c881d01dad",
+      "published_at": "2026-05-04",
+      "refs": {},
+      "source": "edgar:JBL",
+      "status": "pending",
+      "themes": {
+        "robotics": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "JBL"
+          ]
+        }
+      },
+      "title": "JBL 4 filed 2026-05-04",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/898293/000122520826004910/xslF345X06/doc4.xml"
+    },
     "lead_ecaab49dd6acfe4163a0128d2f522cb8": {
       "entities": {
         "company_ids": [
@@ -27117,6 +28033,34 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2077423269066784942"
+    },
+    "lead_ecf6a75f8cf51b5754d672b3db281d50": {
+      "entities": {
+        "company_ids": [
+          "co:jabil"
+        ],
+        "tickers": [
+          "JBL"
+        ]
+      },
+      "first_seen": "2026-08-13T00:35:01.649789+00:00",
+      "lead_id": "lead_ecf6a75f8cf51b5754d672b3db281d50",
+      "published_at": "2026-07-17",
+      "refs": {},
+      "source": "edgar:JBL",
+      "status": "pending",
+      "themes": {
+        "robotics": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "JBL"
+          ]
+        }
+      },
+      "title": "JBL 4 filed 2026-07-17",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/898293/000122520826006639/xslF345X06/doc4.xml"
     },
     "lead_ed08de0f389beecc9f7566fba4fcf0b7": {
       "entities": {
@@ -27322,6 +28266,34 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1340652/000089924322034086/xslF345X03/doc4.xml"
     },
+    "lead_efaed6f7fca48768336da263c8150d0e": {
+      "entities": {
+        "company_ids": [
+          "co:broadcom"
+        ],
+        "tickers": [
+          "AVGO"
+        ]
+      },
+      "first_seen": "2026-08-13T00:34:57.783705+00:00",
+      "lead_id": "lead_efaed6f7fca48768336da263c8150d0e",
+      "published_at": "2026-07-14",
+      "refs": {},
+      "source": "edgar:AVGO",
+      "status": "pending",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "AVGO"
+          ]
+        }
+      },
+      "title": "AVGO 4 filed 2026-07-14",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1730168/000173016826000070/xslF345X06/wk-form4_1784075021.xml"
+    },
     "lead_efb79fe6c3a2151204346c0f55d9f033": {
       "entities": {
         "company_ids": [],
@@ -27489,6 +28461,34 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2077437150715666900"
+    },
+    "lead_f0ee13549fb9a8fbd348f8282b221680": {
+      "entities": {
+        "company_ids": [
+          "co:jabil"
+        ],
+        "tickers": [
+          "JBL"
+        ]
+      },
+      "first_seen": "2026-08-13T00:35:01.650115+00:00",
+      "lead_id": "lead_f0ee13549fb9a8fbd348f8282b221680",
+      "published_at": "2026-04-29",
+      "refs": {},
+      "source": "edgar:JBL",
+      "status": "pending",
+      "themes": {
+        "robotics": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "JBL"
+          ]
+        }
+      },
+      "title": "JBL 4 filed 2026-04-29",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/898293/000122520826004703/xslF345X06/doc4.xml"
     },
     "lead_f10510a87362e2f2d5a785c9d573e7ef": {
       "content_updated_at": "2026-07-29T13:46:42.901012+00:00",
@@ -27690,6 +28690,34 @@
         "tier": 4
       },
       "url": "https://www.sivers-semiconductors.com/press/sivers-semiconductors-uppdaterar-sin-finansiella-kalender/"
+    },
+    "lead_f2a05f8ffbc3ad014140a10c39cbfe58": {
+      "entities": {
+        "company_ids": [
+          "co:jabil"
+        ],
+        "tickers": [
+          "JBL"
+        ]
+      },
+      "first_seen": "2026-08-13T00:35:01.649982+00:00",
+      "lead_id": "lead_f2a05f8ffbc3ad014140a10c39cbfe58",
+      "published_at": "2026-06-17",
+      "refs": {},
+      "source": "edgar:JBL",
+      "status": "pending",
+      "themes": {
+        "robotics": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "JBL"
+          ]
+        }
+      },
+      "title": "JBL 8-K filed 2026-06-17",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/898293/000162828026043719/jbl-20260617.htm"
     },
     "lead_f35d5676219a38f12f600e64ef76590e": {
       "entities": {
@@ -28017,6 +29045,34 @@
         "tier": 4
       },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/stammokommunike-fran-extra-bolagsstamma-den-11-maj-2026-i-sivers-semiconductors-ab-publ-6047d633"
+    },
+    "lead_f50ced72c2ecc601907c0e9c4e7e3675": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia"
+        ],
+        "tickers": [
+          "NVDA"
+        ]
+      },
+      "first_seen": "2026-08-13T00:35:04.350314+00:00",
+      "lead_id": "lead_f50ced72c2ecc601907c0e9c4e7e3675",
+      "published_at": "2026-06-29",
+      "refs": {},
+      "source": "edgar:NVDA",
+      "status": "pending",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "NVDA"
+          ]
+        }
+      },
+      "title": "NVDA 4 filed 2026-06-29",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1045810/000119765226000007/xslF345X06/wk-form4_1782767137.xml"
     },
     "lead_f5f85aea8cfdf80892631a51e4c05f77": {
       "entities": {
@@ -29042,8 +30098,8 @@
   "schema_version": "2",
   "source_state": {
     "x:aleabitoreddit": {
-      "since_id": "2087515371750490383",
-      "updated_at": "2026-08-12T22:33:32.653860+00:00",
+      "since_id": "2087675367595380783",
+      "updated_at": "2026-08-13T00:34:54.517599+00:00",
       "user_id": "1940360837547565056"
     }
   }
