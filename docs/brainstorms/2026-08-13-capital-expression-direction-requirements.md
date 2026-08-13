@@ -134,7 +134,8 @@ fail closed 是好的預設，但它不是免於驗證的理由。
 | `axis_ceiling` 的歷史值域 | `{0.0: 37, 0.002: 35}`，**從未達 0.005** | 出現 > 0.002 |
 | `action` 分布 | `DATA_NEEDED` 59、`HOLD_PAPER` 7、`FUND_PAPER` 4、`SHADOW_ONLY` 2 | `DATA_NEEDED` 佔比下降 |
 | paper 實際部位 | 4 檔 × 0.1% NAV（META／AXT／AAOI／SIVE） | 單筆有經濟意義 |
-| 已量測 outcome（`absolute_return` 非 null） | **0 / 8** | > 0 |
+| 已量測 outcome（`outcome_envelopes.absolute_return` 非 null） | **0 / 8** | > 0 |
+| ├ 唯讀報表已算出的報酬（不寫 Decision Store） | **7 / 7**（2026-08-13，§2.7） | — |
 | `live_choices` / `live_execution_reports` / `prepared_actions` | 0 / 0 / 0 | — |
 
 ### 2.2 哪些 constraint 真的 binding（72 筆）
@@ -194,6 +195,37 @@ technical_causal_link   unknown 22 / bounded 18 / corroborated 32
 
 **兩檔在上漲 30–64% 的同時 forward P/E 反而下降**——獲利預估上修快於股價。
 「已被 price in」的敘事式判斷在此被實時證偽（但 n=2，見 §5 待驗證項）。
+
+### 2.7 §4 第 1 項結果：若今天結算（2026-08-13）
+
+`scripts/outcome_if_settled_today.py`（唯讀，不寫任何 authority）。錨點 = Shadow 價格
+（Decision Store 的追蹤起點 authority），現價 = provider 最新已收盤 bar，兩端經
+`identity.currency` 正規化成結算幣別。
+
+| 標的 | 錨點日 | 絕對報酬 | QQQ | **超額（QQQ）** |
+|---|---|---|---|---|
+| AXTI | 07-28 | +83.5% | +7.1% | **+76.4%** |
+| AAOI | 07-24 | +37.9% | +5.8% | **+32.1%** |
+| SIVE.ST | 07-23 | +35.4% | +4.6% | **+30.9%** |
+| IQE.L | 08-03 | +21.6% | +3.4% | **+18.2%** |
+| COHR | 07-21 | +12.1% | +2.1% | **+10.0%** |
+| LITE | 07-21 | +11.3% | +2.1% | **+9.3%** |
+| META | 07-31 | +4.0% | +5.2% | **−1.2%** |
+
+**7 / 7 全部可量測。6 個 `unavailable` shadow 的 cohort 仍無錨點。**
+
+**這改變了什麼：** 系統的**選標的**能力第一次有了證據——7 檔有 6 檔跑贏 QQQ，中位超額
+約 +30%，且不是單一標的帶動。**這使「gate 擋掉的是雜訊」這個辯護站不住**：被擋在
+0.2% 的那批，事後看方向是對的。同時它也不構成「放寬 gate 就會賺」的證明——n=7、
+單一時間窗、全部同屬 AI 光通訊主題（§5 的共移問題），且**這是追蹤起點而非建議買點**。
+
+⚠ **`outcome_envelopes` 仍是 0/8，本項刻意不寫入**：寫 outcome 需 `close_probe`，而
+關閉 cohort 會關掉仍在跑的 thesis（AXT 的 expiry 比催化劑早三個月，見 `confidence-axes`
+§10.1）。量測與退場必須分開——**這正是 §2.1 拆成兩列的原因**。
+
+**同時撞出一個 Engine C 資料問題**（已進 ROADMAP 未排程）：`financial_snapshots.snapshot_date`
+不是行情交易日，而是跑 ETL 的日期——收盤後跑的批次被標成隔天，盤中跑的存盤中價。
+一個欄位三種語意（L12）。本報表因此改用 provider 的收盤序列取現價。
 
 ### 2.6 pipeline
 

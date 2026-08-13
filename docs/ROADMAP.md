@@ -80,7 +80,9 @@ brainstorm；範圍大到需要驗收條件才開 plan。brainstorm 用 frontmat
 | 項目 | 為什麼 | 驗收條件 | 前置 |
 |---|---|---|---|
 | **`AGENTS.md` L1–L14 整理** | 14 條含重複（L2／L3 近乎同義）、已完成的考古（L6 Gap 1–3 已修、L9 三前置已由 `thesis/preconditions.py` 機器強制，散文只是重複程式碼）、與已定案不會再翻的（L1 選型、L5 評估）。每條都在花掉**每一個** session 的 context | lessons 段落行數下降，且 L6 Gap 4／L8／L11／L12–L14 的區辨仍在。⚠ **不得刪掉任何仍會改變行為的判準**；L12／L13／L14 是三個不同時刻（表示層／驗收層／信任層），不合併 | §4 第 1 項 |
+| **Engine C `snapshot_date` 語意錯誤** | 2026-08-13 查證：該欄是「跑 ETL 的日期」不是行情交易日。收盤後跑的批次被標成隔天（`fetched_at` 07-28 22:34 取到 07-28 收盤 42.76，標成 `snapshot_date=07-29`），盤中跑的則存盤中價——一個欄位三種語意（L12）。任何拿它當 as-of 的消費者都系統性差一天，point-in-time 重建全部失準 | 分離成 `bar_date`（行情交易日）與 `fetched_at`（既有），並標記 intraday 與 close 兩種 `price_kind`；驗收＝拿現有 AXTI 序列重放，`bar_date` 與 provider 收盤日逐日對得上 | 無 |
 | **Engine D cohort 重複** | 同公司可能同時存在 claim-keyed 與 company-keyed 兩個 cohort（2026-07-30 [74]／[75] 實例） | 新建 cohort 時偵測同公司既有 cohort 並警告。**不回溯清理**——Decision Store append-only，不做破壞性去重 | 無 |
+| **6 個 `unavailable` Shadow 錨點回填** | 13 個 cohort 有 6 個 shadow 是 `unavailable`（含 2026-08-12 建立、明明有 `research_ticker` 的 LITE 與 NVDA）。錨點是**可重建**資料（L14／D17），今天仍查得到，卻被當 point-in-time 凍結 | 回填後 `scripts/outcome_if_settled_today.py` 的「已量測」從 7/13 上升 | 無 |
 | **ETF 完整 look-through** | `issuer_loads` 只涵蓋 policy 已登記的 ownership，曝險輸出恆為 `partial` | 曝險輸出出現 `coverage: full` 的標的 ≥1 | 無 |
 | **本機 single-writer guard** | 目前靠人工紀律確保同一 working tree 只有一個 agent 寫入 | 模擬兩個 writer 併發時會被擋下（可寫成測試） | 無 |
 | **Token-efficient Daily Runner 重構** | daily 的 token 成本 | 單次 daily run token 用量下降且產出不變。**動工前先量現值**，否則無從比較 | 先量 baseline |
