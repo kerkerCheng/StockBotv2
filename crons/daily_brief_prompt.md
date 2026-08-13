@@ -48,6 +48,13 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
      quarantined 時改列 TWSE 等官方 reference 日期、當日漲跌與降級原因，不得把最近收盤寫成即時行情。
    - 對今日新增 pending leads 套 `skills/signal-triage/SKILL.md`，用本機 CLI 寫回 triage
    - `.venv\Scripts\python.exe -m engine_b.cli trace-backlog`（顯示 parked 追源未果及下一 trigger；不把一般 backlog 全塞 pq2）
+     ⚠ `auto_trigger_reachable=false` 的項目**必須逐筆列出並附 `unreachable_reason`**，不得只回報總數。
+     那代表它既不需人工 authority、又沒有任何具名標的可比對，兩種 trace_trigger_kind 都永遠不會命中——
+     它看起來在「等事件」，實際上沒有任何機制會讓它前進。這種項目只有三種誠實處置，擇一並寫明理由：
+     (a) 主體其實有登記但沒填進機器欄位 → 補 `trace_trigger_entities`；
+     (b) 根本沒有可追的 claim（原文即該貼文本身）→ 改 `trace_status=original_obtained` 豁免重排；
+     (c) 真的需要人工 access／付費／改優先權 → 設 `trace_requires_user=true` 進 pq2。
+     不得原樣留著——那是安靜沉底，而漏掉時沒有人會發現。
    - `.venv\Scripts\python.exe -m decision_lab today --format markdown`
    - `.venv\Scripts\python.exe -m engine_b.todo sync`
    - `.venv\Scripts\python.exe -m engine_b.todo list`

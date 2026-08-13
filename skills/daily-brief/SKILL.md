@@ -201,10 +201,19 @@ prepare 前先把「graph delta 涵蓋哪些公司」與「完成後唯一要建
 
 一般 event／scheduled trigger 仍回 pq1；只有 `trace_requires_user=true` 才由 `todo sync` 建立
 `source_trace_review`。其 `go` 只 dispatch exact lead 回 pq1，不接受 claim、不提高 tier，也不授權付費。
-`trace_next_trigger` 只做人類說明；可執行 linkage 使用
-`trace_trigger_kind=related_entity_signal`＋`trace_trigger_entities`。同標的新 lead 通過 triage 時會留下
-triggering lead receipt 並重排不需人工 authority 的 exact parked trace；沒有共同具名 ticker／company_id
-時不得靠語意自動喚醒。
+`trace_next_trigger` 只做人類說明；可執行 linkage 使用 `trace_trigger_kind`＋`trace_trigger_entities`，
+kind 目前有兩種：`related_entity_signal`（任何共用具名標的的新 lead）與 `primary_source_signal`
+（只有該標的的 tier-1 一手來源才算）。同標的新 lead 通過 triage 時會留下 triggering lead receipt 並重排
+不需人工 authority 的 exact parked trace；沒有共同具名 ticker／company_id 時不得靠語意自動喚醒。
+`related_entity_signal` 以 `trace_requeue_consumed_entities` 記錄已消化標的，同一標的只喚醒一次——
+park 的理由不會因為「又一則提到同一檔的貼文」而改變。
+
+**`auto_trigger_reachable=false` 必須逐筆列出並附 `unreachable_reason`，不得只回報總數。** 那代表它
+既不需人工 authority、又沒有任何具名標的可比對，兩種 kind 都永遠不會命中——看起來在等事件，實際上
+沒有任何機制會讓它前進。只有三種誠實處置，擇一並寫明理由：(a) 主體其實已登記但沒填進機器欄位 →
+補 `trace_trigger_entities`；(b) 根本沒有可追的 claim（原文即該貼文本身）→ 改
+`trace_status=original_obtained` 豁免重排；(c) 真的需要人工 access／付費／改優先權 → 設
+`trace_requires_user=true` 進 pq2。**不得原樣留著**——那是安靜沉底，漏掉時沒有人會發現。
 
 brief 的 pq1 進度不得只寫「park」或只列數量。每一筆本輪處理的 `parked` lead 至少列：完整主詞／ticker、
 `parked_reason`（自然語言）、`trace_status`、`trace_next_trigger`、`trace_requires_user`，以及「是否產生
