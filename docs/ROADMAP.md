@@ -16,11 +16,16 @@ ROADMAP「未來想法」  →  docs/brainstorms/  →  docs/plans/  →  實作
 brainstorm；範圍大到需要驗收條件才開 plan。brainstorm 用 frontmatter 的 `planned_in:`
 指向自己的 plan，plan 完成後回填到上方「已交付」表。
 
-**目前沒有進行中的 plan。** 七份 brainstorm 中仍有未實作項目，見下方「已 brainstorm 但未實作」。
+**目前沒有進行中的 plan。** 仍有未實作的 brainstorm 項目，見下方「開放 backlog」與「已 brainstorm 但未實作」。
 
 ---
 
 ## 已交付
+
+> **記錄實測 before → after，不只記「做了什麼」。** 一個改動若說不出哪個現有數字變了，
+> 它與沒做在結果上不可區分（`AGENTS.md` L14 第 1 條）。翻歷史時要看得出哪些是真交付、
+> 哪些是白工——2026-08-02 至 08-08 的四次「已實作但供給為零」如果當初這樣記，
+> 第二次就會被抓到。
 
 | 完成日 | 項目 | 歷史 plan |
 |--------|------|-----------|
@@ -43,10 +48,53 @@ brainstorm；範圍大到需要驗收條件才開 plan。brainstorm 用 frontmat
 
 ## 開放 backlog
 
-**M1 遺留（仍開）：**
-- TSEM intake（`ra_2bf1494b`）的 2027–29 光通訊集體擴產 oversupply watch
-- MACOM／Semtech 作為 Tower TIA 客戶（tier 3，待客戶端揭露印證）
-- GF 對 Tower 專利訴訟未追源
+> **這是 loop #2 的工作台。** 開發／維護的推進靠使用者主動進來，不靠自動提醒——
+> 因此本節要解決的不是「會不會想起來」，而是**打開後能不能立刻知道下一步做什麼、
+> 以及上一步有沒有成功**。
+>
+> **每項強制四欄：項目／為什麼／驗收條件（哪個數字會變）／前置。**
+> 沒有驗收條件的不准進佇列（`AGENTS.md` L14 第 1 條）。動工前先看驗收條件，
+> 做完後回頭比對，再把實測 before → after 記進「已交付」。
+
+### 進行中
+
+目前唯一 workstream：**資本表達層**——把 Engine D 從「永遠不下注」變成「小注但有意義」。
+
+| 內容 | 位置 |
+|---|---|
+| 方向（D1–D7） | [`2026-08-13-capital-expression-direction`](brainstorms/2026-08-13-capital-expression-direction-requirements.md) **§1** |
+| 凍結的 baseline 數字（audit 拿它做 diff） | 同檔 **§2** |
+| **六步工作清單＋各步驗收條件** | 同檔 **§4** |
+| 明確待驗證、尚不得當結論 | 同檔 **§5** |
+
+**步驟表只有一份，在該檔 §4，本檔不複製**（複製會漂移）。
+
+**下一步 = §4 第 1 項**：對 7 個有 shadow 錨點的 cohort 補跑 outcome 量測（唯讀報表，
+不 close cohort、不動 authority）。驗收：報表出現 ≥5 筆非 null `absolute_return`，
+且 AXTI 相對 $42.76 顯示約 +85%。
+
+⚠ **§4 第 1 項必須先於第 3、4 項**（先量測後放閘，見該檔 D7）。
+
+### 未排程
+
+| 項目 | 為什麼 | 驗收條件 | 前置 |
+|---|---|---|---|
+| **`AGENTS.md` L1–L14 整理** | 14 條含重複（L2／L3 近乎同義）、已完成的考古（L6 Gap 1–3 已修、L9 三前置已由 `thesis/preconditions.py` 機器強制，散文只是重複程式碼）、與已定案不會再翻的（L1 選型、L5 評估）。每條都在花掉**每一個** session 的 context | lessons 段落行數下降，且 L6 Gap 4／L8／L11／L12–L14 的區辨仍在。⚠ **不得刪掉任何仍會改變行為的判準**；L12／L13／L14 是三個不同時刻（表示層／驗收層／信任層），不合併 | §4 第 1 項 |
+| **Engine D cohort 重複** | 同公司可能同時存在 claim-keyed 與 company-keyed 兩個 cohort（2026-07-30 [74]／[75] 實例） | 新建 cohort 時偵測同公司既有 cohort 並警告。**不回溯清理**——Decision Store append-only，不做破壞性去重 | 無 |
+| **ETF 完整 look-through** | `issuer_loads` 只涵蓋 policy 已登記的 ownership，曝險輸出恆為 `partial` | 曝險輸出出現 `coverage: full` 的標的 ≥1 | 無 |
+| **本機 single-writer guard** | 目前靠人工紀律確保同一 working tree 只有一個 agent 寫入 | 模擬兩個 writer 併發時會被擋下（可寫成測試） | 無 |
+| **Token-efficient Daily Runner 重構** | daily 的 token 成本 | 單次 daily run token 用量下降且產出不變。**動工前先量現值**，否則無從比較 | 先量 baseline |
+| **Workstream B：Paywall ROI／合法手動入口** | 付費來源何時值得買、合法人工取得路徑 | 產出「已遇到的 paywall 清單＋各自 exact 金額與方案」，使用者可逐項核可（`AGENTS.md`：任何新訂閱須另列 exact 金額） | 無 |
+| **Sheet writer** | 現行所有 runtime 都不寫 Google Sheet | ⚠ **需求尚不具體。動工前先確認要寫什麼欄位、為什麼不能唯讀**；在那之前維持不做 | 需求具體化 |
+| **Confidence 五軸重構為三類**（否決／信心／賠率） | [`confidence-axes`](brainstorms/2026-08-02-confidence-axes-restructure-requirements.md) §4 | **部分已被 §4 第 4 步取代**（`unknown → 0`、`corroborated + missing_data` 懲罰）。剩餘未解的是「賠率類」維度——目前完全不存在，且如何量化尚未決定（見該檔 §6「尚未決定」） | §4 第 4 項完成後**重評是否仍需要** |
+
+**M1 研究遺留（仍開）：**
+
+| 項目 | 為什麼 | 驗收條件 | 前置 |
+|---|---|---|---|
+| TSEM intake（`ra_2bf1494b`）2027–29 光通訊集體擴產 oversupply watch | 供給側擴張正是 AXT v4 由偏多轉謹慎偏空的同一主軸 | 圖中出現可支持／反駁 oversupply 的 dated claim ≥1，或明確結案為「本輪無新證據」 | 無 |
+| MACOM／Semtech 作為 Tower TIA 客戶 | tier 3，待客戶端揭露印證（L8） | 取得客戶端一手揭露 → 升 tier 入圖；**或**判定「對方結構上不會揭露」→ 標為永久 tier 3 並停止重試（見 §1 D4） | 無 |
+| GF 對 Tower 專利訴訟未追源 | M1 遺留 | 追到一手訴狀／法院文件，或確認公開管道不可得並記錄 | 無 |
 
 **看起來像缺口但不是——請勿「修正」：**
 
@@ -64,11 +112,12 @@ brainstorm；範圍大到需要驗收條件才開 plan。brainstorm 用 frontmat
   **正確分工：** beta 例行成交 → `library/trades/trade_log.jsonl`（事件紀錄）；
   alpha thesis 驅動成交 → 未來同時進 trade_log 與 Engine D fill。
 
-  **真正待補的是後者**，但 `live_choices`／`live_execution_reports`／`paper_events`
-  目前皆為 0 筆——這條路徑從未被走過，所有 decision 都是 research intent、
-  supported range 為 0，連 `record-choice` 都無從執行。等真正要下第一筆
-  Engine D 驅動的 alpha 單時再加 `record_trade.py --decision-id`，
-  那時需求才具體；現在補等於對沒跑過的路徑猜規格。
+  **真正待補的是後者**，但 `live_choices`／`live_execution_reports` 仍為 0 筆
+  （`paper_events` 已於 2026-08-08 首次寫入，現 4 筆 × 0.1% NAV）——live 這條路徑
+  從未被走過，72 筆 decision 的 `live_supported_range` 全為 0，連 `record-choice`
+  都無從執行。等真正要下第一筆 Engine D 驅動的 alpha 單時再加
+  `record_trade.py --decision-id`，那時需求才具體；現在補等於對沒跑過的路徑猜規格。
+  **解除條件是資本表達層 workstream（見「進行中」），不是補這支腳本。**
 
 **已知未修的操作缺陷：**
 - 同一公司可能同時存在 claim-keyed 與 company-keyed 兩個 cohort（2026-07-30 [74]／[75] 實例）；Decision Store append-only，不做破壞性去重
@@ -116,6 +165,20 @@ brainstorm；範圍大到需要驗收條件才開 plan。brainstorm 用 frontmat
 - 總曝險硬擋與自有現金固定例行提醒已於 2026-08-01 完成。
 - 唯一剩餘的**貸款提款時間表**由使用者明確暫緩；目前不預期這麼早手動投入貸款，
   未來若重啟再核准 exact 日期／金額／標的／tranche。glide path 公式亦延後，現況資源尚不構成綁定。
+
+出自 [`2026-08-13-capital-expression-direction-requirements.md`](brainstorms/2026-08-13-capital-expression-direction-requirements.md)
+— **要動資本層先讀這份，它取代 `confidence-axes` §7 的順序判準**：
+
+- **方向已定案（D1–D7）**：研究是手段不是目的；不確定性用尺寸承擔不用 gate 禁止參與；
+  診斷與閘門分離（49 個 blocker 全留當診斷，只有講得出因果機制的能歸零）；證據標準
+  校準到個人投資者可達成的補救；alpha 需要 baseline（beta 已有 `baseline_pace`，
+  alpha 從未 port）；**gate 本身也不得未經量測就享有默認信任**；先量測後放閘。
+- **§2 凍結了 2026-08-13 的 baseline 數字**，未來 audit 拿它做 diff 而非做判斷。
+  關鍵三項：`live_supported_range` 非零 **0/72**、`axis_ceiling` 從未達 0.005、
+  已量測 outcome **0/8**。
+- **§4 的六步含可證偽驗收條件**，第 1 項（補跑 7 個 cohort 的 outcome 量測）必須先做。
+- ⚠ **§6 的防呆不可省略**：daily brief 需增加兩個常駐計數器，否則本檔會變成第五份
+  被堆積的正確診斷（同一結論已被正確寫下四次，見該檔 §0）。
 
 出自 [`2026-08-02-confidence-axes-restructure-requirements.md`](brainstorms/2026-08-02-confidence-axes-restructure-requirements.md)：
 

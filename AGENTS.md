@@ -365,6 +365,8 @@ v0 schema 的對錯只有真實資料能驗證。凍結一個會壞的 v0 → �
 
 目前圖譜與資料量仍小，schema／attribute／ID 設計的 refactor 成本很低。遇到 provenance、資料正確性或安全邊界等高風險問題時，**允許直接改 schema、搬移／重建／覆寫既有資料與調整介面**；不要為了保留已知不正確的相容性而疊 workaround。仍須保留 Neo4j dump／資料備份、dry-run、migration manifest、reconciliation 與測試，確保變更可驗證、可回復。此授權不等於任意擴 scope；只用於修正已確認的高風險設計問題。
 
+**⚠ 適用範圍（2026-08-13 補；本條寫於只有 Neo4j 的時期）：** 只適用 **Engine A graph、tracked schema 與可由 ETL 重建的 projection**。**不適用 private append-only authority**——Engine C 的 manual observation ledger（`library/private/engine_c/`）與 Decision Store（`library/private/decision_lab/`）都是**沒有第二份來源、Git 救不回**的真相。那兩者依各自契約辦理：只允許 backup／restore 與 append-only correction，**不做破壞性 reset、不覆寫、不重建**；發現錯誤用新的 correction record supersede 舊筆，兩筆都留在 ledger 裡。判準：**問「這筆資料今天重新取一次拿得回來嗎？」拿得回來 → 適用本條；拿不回來 → 只能 append。**
+
 ### L11 — 自己引用的「事實」要套跟圖裡 claim 同一套追源紀律（尤其審計／法律術語）
 
 **事發（2026-07-20）：** 追 SIVE 的 Ningi 做空 audit 時，把「公司／Board 在 2025 年報**自揭** material going-concern uncertainty」誤述成「**審計出具** going-concern 保留意見」，還在 audit ledger／trace 報告裡標成「公司 tier-1 審計佐證」。實際來源只是二手聚合新聞的措辭「auditor going-concern qualification」＋ 自家二手 memo，沒追到逐字一手。諷刺的是當下正在執行 source-trace、正在替 SIVE 掛 credibility hold——對圖裡的 claim 嚴格追源，對自己口頭引用的事實卻放鬆。被使用者追問「這是哪份文件」後，才逐字核 AR PDF（Deloitte 簽證）發現落差：一手只支持「公司自揭 material uncertainty」，`qualified opinion`／`material uncertainty related to going concern` 等審計正式用語在可抽文字中為 0。
@@ -395,6 +397,38 @@ v0 schema 的對錯只有真實資料能驗證。凍結一個會壞的 v0 → �
 1. **驗收條件寫成「產出出現在下游消費者手上」，不是「這一步回傳成功」。** 交付前必須答得出「這條路徑的產出最後出現在哪裡、誰會消費它」；答不出來就是死路，不算完成。
 2. **最危險的是成功與失敗在同一個訊號上同形**——空集合、沒有 in-flight 狀態、回傳 OK 都是。要驗就驗那個會因為「真的成功」而改變的東西（例如再跑一次 sync 看「新增 0」，而不是看命令有沒有報錯）。
 3. 這是 L12 的操作版：L12 說一個表示承載兩種語意會讓下游二選一；這裡是**驗證者**自己讀了那個兩義訊號，於是把「沒發生」誤讀成「已完成」。
+
+---
+
+### L14 — 未經量測的機制不得享有默認信任，**gate 也不例外**
+
+**事發（2026-08-13）：** 使用者問「AXTI／LITE／COHR／SIVE 兩週漲 31–64%，系統為何沒形成
+入場判斷」。實測 Engine D 全部 **72 筆 decision 的 `live_supported_range` 都是 [0,0]**，
+`axis_ceiling` 值域只有 `{0.0, 0.002}`、從未達 0.005，已量測 outcome **0/8**。
+100% 的歸零由資料與研究完整度造成——三個真正的資本上限（單筆 5%、單 probe 0.5%、
+probe book 2%）**一次都沒 binding 過**。而同一診斷已被正確寫下四次
+（2026-08-02 §2–§4、`blocker_severity.py:37` 註解、2026-08-08 §8.2、§8.3），
+每次都沒改到 binding constraint。
+
+**判準：**
+1. **驗收條件寫成「現有資料有幾筆真的變了」**，不是「這一步回傳成功」。答案是 0 就代表
+   沒改到 binding constraint，不論改動本身多正確，**不得標記完成**。這是 L13 的量化版。
+2. **gate 本身也要被驗證。** 2026-08-01 已對技術訊號執行過這條（0 勝 3 敗，於是移出資本
+   路徑）；同一標準從未套用到 49 個 blocker。**「更嚴格比較安全」不是免於驗證的理由**——
+   在 outcome 量測建立前，不得以此為由新增或收緊任何 gate。
+3. **順序不可顛倒：先量測，後放閘。** 先放寬而沒有量測 ＝ 拆煞車不裝儀表板，比現狀更糟。
+4. 判斷 gate 有沒有用的三個**免 outcome** 測試：**恆亮**（觸發率近 100% ＝ 零鑑別力）、
+   **不會滅**（清除率近 0 ＝ 那是牆不是閘門）、**講不出因果機制**（說不出「亮起時標的更
+   可能變壞」＝ 行政流程假扮風控）。第四種失效「會滅但沒用」需要 outcome 才測得了。
+
+**⚠ 寫進本檔不等於會生效。** L12（2026-08-06）與其操作版 L13（2026-08-12）相隔六天，
+就是因為同一形狀在本檔已完整載入的情況下復發（L13 自記「兩天內三次」）。**真正的防呆是
+會自己出現的常駐計數器，不是要人讀的段落。**
+
+**動 Engine D 資本層前必讀**
+[`docs/brainstorms/2026-08-13-capital-expression-direction-requirements.md`](docs/brainstorms/2026-08-13-capital-expression-direction-requirements.md)
+的 §2（凍結的 baseline 數字，audit 拿它做 diff）與 §4（六步順序與驗收條件）。
+該檔 §1 的 D1–D5 是**方向、尚未成為政策**——實測前不得升格為本檔規則。
 
 ---
 
