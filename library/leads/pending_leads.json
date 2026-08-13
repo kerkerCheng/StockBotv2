@@ -18330,9 +18330,14 @@
       "lead_id": "lead_96e4ba8b7c960f7b40a3953b101bca75",
       "published_at": "2026-08-04",
       "refs": {
+        "research_outcome": "2026-08-13：先前 auto_trigger_reachable=false，因為主體是中文公司名「中際旭創」，而 entities.py 刻意只做 cashtag 與已登記 ticker 的逐字比對、不做公司名比對（避免模糊匹配）。registry 其實有 300308.SZ → co:zhongji_innolight，只是它寫在人讀的 trace_next_trigger 註記裡、沒填進機器欄位。改設 primary_source_signal＋明確 trigger entity：等該公司年報／交易所公告等一手揭露。這不是不可達，是欄位沒填。",
         "trace_next_trigger": "中際旭創(300308.SZ)年報/交易所公告/互動易揭露 Thailand TeraHop 實際出貨量、良率與占總出貨比例(目前來源疑似同源轉述同一份 IR record,未獨立佐證)",
         "trace_requires_user": "false",
-        "trace_status": "isolated_tier_3"
+        "trace_status": "isolated_tier_3",
+        "trace_trigger_entities": [
+          "300308.SZ"
+        ],
+        "trace_trigger_kind": "primary_source_signal"
       },
       "source": "futunn_industry_report",
       "status": "parked",
@@ -20567,11 +20572,12 @@
         "parked_reason": "trace_backlog_or_lead_only_after_robotics_bundle",
         "pq2_item": "61",
         "research_bundle_id": "serenity_robotics_20260729",
+        "research_outcome": "2026-08-13：重新判定。tier 4 社群貼文轉述 DHS 委員會對中國人形機器人進展的評論，無具名公司、無可入圖的供應鏈 claim。原文即該推文本身。先前掛 canonical_dhs_committee_report 作為 trigger，但那不是任何 entity-based 機制能觸發的，等於永久沉底。改 original_obtained 豁免自動重排；若日後真要查該報告，走人工。",
         "research_report": "docs/reports/serenity_30d_research_2026-07-29.md",
         "trace_attempts_ref": "docs/reports/serenity_30d_research_2026-07-29.md#截圖paywall判讀",
         "trace_next_trigger": "canonical_dhs_committee_report",
         "trace_requires_user": "false",
-        "trace_status": "lead_only_tier_4"
+        "trace_status": "original_obtained"
       },
       "source": "x:aleabitoreddit",
       "status": "parked",
@@ -21937,11 +21943,12 @@
         "parked_reason": "trace_backlog_or_lead_only_after_robotics_bundle",
         "pq2_item": "61",
         "research_bundle_id": "serenity_robotics_20260729",
+        "research_outcome": "2026-08-13：重新判定。內容是純個人持倉偏好陳述，沒有任何可追源的 claim——原文就是這則推文本身，不缺一手來源。先前標 lead_only_tier_4 並掛一個永遠不會命中的 trigger，是把「沒有東西可追」誤記成「還沒追到」。改 original_obtained 豁免自動重排。",
         "research_report": "docs/reports/serenity_30d_research_2026-07-29.md",
         "trace_attempts_ref": "docs/reports/serenity_30d_research_2026-07-29.md#截圖paywall判讀",
         "trace_next_trigger": "named_supplier_primary_disclosure",
         "trace_requires_user": "false",
-        "trace_status": "lead_only_tier_4"
+        "trace_status": "original_obtained"
       },
       "source": "x:aleabitoreddit",
       "status": "parked",
@@ -23047,9 +23054,14 @@
       "lead_id": "lead_c470eb6eb0cf85806619a921cd756db0",
       "published_at": "2026-08-04",
       "refs": {
+        "research_outcome": "2026-08-13：本筆自己的 trace_next_trigger 已列出替代解鎖路徑「AWS/Meta/Google 等雲端業者對供應商轉單的官方公告」，而 META 有登記。改設 primary_source_signal＋META。主要路徑（FCC 官方 docket／Federal Register）不是公司 filing，兩種 trigger kind 都涵蓋不到；若長期無進展，該考慮是否需要法規來源 watcher。",
         "trace_next_trigger": "FCC 官方 docket 或 Federal Register 公布本規則正式文本/NPRM;或 AWS/Meta/Google 等雲端業者對供應商轉單的官方公告",
         "trace_requires_user": "false",
-        "trace_status": "isolated_tier_3"
+        "trace_status": "isolated_tier_3",
+        "trace_trigger_entities": [
+          "META"
+        ],
+        "trace_trigger_kind": "primary_source_signal"
       },
       "source": "reuters_wire",
       "status": "parked",
