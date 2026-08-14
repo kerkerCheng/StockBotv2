@@ -3189,6 +3189,114 @@
       "result": "ok",
       "run_at": "2026-08-14T06:32:40.962138+00:00",
       "source": "edgar:TSLA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-14T22:33:20.007106+00:00",
+      "source": "mfn:sivers-semiconductors"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-14T22:33:20.831568+00:00",
+      "source": "sivers:press"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-14T22:33:21.518095+00:00",
+      "source": "yahoo:iqe-l"
+    },
+    {
+      "new": 2,
+      "result": "ok",
+      "run_at": "2026-08-14T22:33:22.903061+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-14T22:33:25.127642+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-14T22:33:25.859646+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-14T22:33:26.395011+00:00",
+      "source": "edgar:AVGO"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-14T22:33:27.147293+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-14T22:33:27.835515+00:00",
+      "source": "edgar:CCXI"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-08-14T22:33:28.557473+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-14T22:33:29.273436+00:00",
+      "source": "edgar:GFS"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-14T22:33:29.964356+00:00",
+      "source": "edgar:JBL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-14T22:33:30.651258+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-14T22:33:31.351530+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-14T22:33:32.048169+00:00",
+      "source": "edgar:META"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-14T22:33:32.778395+00:00",
+      "source": "edgar:NVDA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-14T22:33:33.504209+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-14T22:33:34.344537+00:00",
+      "source": "edgar:TSLA"
     }
   ],
   "leads": {
@@ -4263,12 +4371,12 @@
         "campaign_window_end": "2026-07-29T13:46:25Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
         "claimed_origin": "Rosenblatt 對 B. Riley AAOI sell report 的回應",
-        "parked_reason": "已取得 OpenAI MRC 官方說明與 Broadcom 官方 CPO／800mW CWDM 外部光源資料，但未取得 Rosenblatt 或 B. Riley 原報告；無法核對 40–50% transceiver TAM 及總光學需求結論，也不能由 Broadcom 架構推定 Sivers 受惠。Broadcom CPO／外部光源結構已在圖中，沒有唯一新 graph delta。",
+        "parked_reason": "新觸發的 POET 社群貼文只猜測 POET 可能與 Sivers 簽 CW 協議，沒有 Rosenblatt／B. Riley canonical note，也未量化 MRC／RNG 對 optical unit demand 的影響。Broadcom 官方資料只再次支持 CPO 使用 external CW laser、VCSEL 在高資料率受 reach／bandwidth 限制，不能推出 40–50% TAM 或 Sivers 受益；既有 graph 已涵蓋該技術關係，不產 RA。",
         "primary_url": "https://openai.com/index/mrc-supercomputer-networking/",
         "research_mode": "delta_only",
-        "research_outcome": "no_prepared_ra_partial_source_trace",
-        "research_run": "daily:2026-08-12",
-        "trace_attempts_ref": "Exact Rosenblatt／B. Riley query；OpenAI 2026-05-05 MRC 官方文章；Broadcom CPO 與 800mW CWDM pluggable laser source 官方產品頁／brief；FortuneTrace／BlockTempo 為同源轉述",
+        "research_outcome": "no_prepared_ra_trigger_did_not_resolve_claim",
+        "research_run": "daily-brief-2026-08-15",
+        "trace_attempts_ref": "既有 OpenAI MRC 與 Broadcom 官方資料；本輪核對 Broadcom CPO／optics 官方頁及 POET triggering lead lead_c7ca9aa7169d5ffa4a621430cac35d5e",
         "trace_next_trigger": "取得 canonical Rosenblatt／B. Riley note，或 AAOI／Broadcom 官方量化 MRC／RNG 對 optical unit demand 的影響",
         "trace_requeue_consumed_entities": [
           "AAOI",
@@ -4283,17 +4391,15 @@
         "trace_storage_permission": "repo_excerpt",
         "trace_trigger_entities": [
           "AAOI",
-          "AVGO",
+          "AMZN",
           "SIVE",
-          "co:applied_optoelectronics",
-          "co:broadcom",
-          "co:sivers_semiconductors"
+          "co:applied_optoelectronics"
         ],
         "trace_trigger_event_ref": "lead:lead_c7ca9aa7169d5ffa4a621430cac35d5e",
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -8556,6 +8662,48 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/928876/000197640826000651/xslF345X06/primary_doc.xml"
+    },
+    "lead_33f49001378b51073f41b05958b0da6a": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "SHKY",
+          "SNDK",
+          "MU"
+        ]
+      },
+      "first_seen": "2026-08-14T22:33:22.861981+00:00",
+      "lead_id": "lead_33f49001378b51073f41b05958b0da6a",
+      "media": [
+        {
+          "cache": {
+            "bytes": 59169,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_33f49001378b51073f41b05958b0da6a/3_2088226185671254016.jpg",
+            "sha256": "0cd23ab6f7e37744bcc4ecd23c0587f7a4708efafaa7df827b177d9047899bf3"
+          },
+          "height": 663,
+          "media_key": "3_2088226185671254016",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HPrepueaoAA5jYw.jpg",
+          "width": 1317
+        }
+      ],
+      "published_at": "2026-08-14T11:29:05.000Z",
+      "raw_text": "The $SHKY, Samsung, $SNDK, $MU memory bottleneck never changed anon https://t.co/6Xyih3pM9D https://t.co/bKsEc6rSmD",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "The $SHKY, Samsung, $SNDK, $MU memory bottleneck never changed anon https://t.co/6Xyih3pM9D https://t.co/bKsEc6rSmD",
+      "triage": {
+        "decided_at": "2026-08-14T22:35:20.158046+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "貼文只以社群主觀語句稱 memory 而非 compute 是 Agentic Era 的 rate limiter，再由轉貼者羅列 SHKY／Samsung／SNDK／MU；沒有公司動作、數字、文件或可追的一手事件，屬不可引用的泛化敘事。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2088226398708338889"
     },
     "lead_33ffeb9a39a2ab2921e43cad5650eda9": {
       "entities": {
@@ -17222,24 +17370,27 @@
         "campaign_window_end": "2026-07-29T13:46:25Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
         "gap": "InP 基板 ASP 漲幅缺乏任何可逐字核對的一手來源。這是分辨 axt_inp thesis「週期 vs 結構」的關鍵缺口，目前無法由公開資料填補；最可能的解答來源是 AXT 自己在 Q3 財報揭露 ASP 貢獻，或下游公司揭露基板成本上升。",
-        "parked_reason": "新觸發 lead_0624cbfddb41714f21502cc3f3da7a8a 只說 AXTI/LITE 再度成為市場焦點，沒有 Nomura canonical report、客戶採購成本或 AXT/IQE 官方 exact ASP 漲幅；原始 42–78% 價格主張仍無可逐字核對一手文件。",
+        "parked_reason": "觸發來源 AXTI 2026-08-13 10-Q 已由 [130] decision gap 完整研究並 coalesce；該 filing 更新現金、投資與營運，但沒有 Nomura canonical report、AXT／IQE official ASP 或客戶採購成本，原始 42–78% InP substrate／epiwafer 漲幅仍不可逐字核對，不產 RA。",
         "research_mode": "delta_only",
-        "research_outcome": "2026-08-12 改用 primary_source_signal：本筆等的是AXT Q3 2026 揭露 InP ASP，或下游客戶揭露採購成本，不是「該公司被提到」。原設定（related_entity_signal＋全部 entities）會被任何一則相關推文觸發，每次都得到「trigger 沒帶來新東西」——2026-08-12 當日 5 個 pq1 slot 全被這類重排吃光、0 筆 prepared RA。改為只有指定實體的 tier-1 一手來源才觸發。",
-        "research_run": "daily-brief-2026-08-09-post-permission-recovery",
-        "trace_attempts_ref": "既有 Nomura/AXT/IQE/Lumentum 追源紀錄＋2026-08-09 related-entity delta audit",
-        "trace_next_trigger": "AXT Q3 2026 揭露 ASP，或下游客戶揭露 InP 基板採購成本，或取得 Nomura canonical 報告",
+        "research_outcome": "no_prepared_ra_primary_source_did_not_contain_asp",
+        "research_run": "daily-brief-2026-08-15",
+        "trace_attempts_ref": "Nomura／AXT／IQE 既有追源；AXTI 2026-08-13 10-Q；todo:130 work order wo_25341729f295cd68a4b4a30369b964a2",
+        "trace_next_trigger": "AXT Q3 2026 揭露 ASP、下游客戶揭露 InP 採購成本，或取得 Nomura canonical report",
         "trace_requeue_trigger": "related_triaged_lead:lead_858f34fcfe2e81ce825b004406087391",
         "trace_requeued_at": "2026-08-13T22:36:36.627987+00:00",
         "trace_requires_user": "false",
         "trace_status": "isolated_tier_3",
         "trace_trigger_entities": [
-          "AXTI"
+          "AXTI",
+          "IQE",
+          "SNDK",
+          "co:axt"
         ],
         "trace_trigger_event_ref": "lead:lead_858f34fcfe2e81ce825b004406087391",
-        "trace_trigger_kind": "primary_source_signal"
+        "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -20888,11 +21039,11 @@
         "campaign_window_end": "2026-07-29T13:46:25Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
         "original_claim_status": "partial_support_lta_and_capacity_exact_unverified",
-        "parked_reason": "Meta 官方 2026 Q1 10-Q 支持 2026 capex USD 125–145B，官方 MTIA 文章支持每六個月或更快的晶片 cadence；但這些屬財務／產品時變觀測，且仍未逐字揭露 Samsung／SanDisk 記憶體 LTA、Sumitomo fiber LTA 或 7GW internal memo，沒有唯一新 graph delta，不產 RA。",
+        "parked_reason": "觸發來源 META 2026-08-12 Form 4 只屬 insider／稀釋監控，沒有 internal memo、Samsung／SanDisk memory LTA、Sumitomo fiber LTA 或 7GW 揭露；Meta 官方 MTIA 頁僅支持每六個月或更快的 chip cadence。其餘仍未驗證，且已支持內容屬時變 observation，沒有唯一 graph delta，不產 RA。",
         "research_mode": "delta_only",
-        "research_outcome": "2026-08-12 改用 primary_source_signal：本筆等的是Meta internal memo 或 Meta／Samsung／SanDisk／Sumitomo 具名 LTA 一手披露，不是「該公司被提到」。原設定（related_entity_signal＋全部 entities）會被任何一則相關推文觸發，每次都得到「trigger 沒帶來新東西」——2026-08-12 當日 5 個 pq1 slot 全被這類重排吃光、0 筆 prepared RA。改為只有指定實體的 tier-1 一手來源才觸發。",
-        "research_run": "daily:2026-08-12",
-        "trace_attempts_ref": "Meta 2026 Q1 10-Q；Meta 2026-03 MTIA 官方文章；Meta／Samsung／SanDisk／Sumitomo official exact search；trigger lead lead_79471f7e1d9ce0cea1a806571cfa4f9d",
+        "research_outcome": "no_prepared_ra_form4_unrelated_to_lta_claims",
+        "research_run": "daily-brief-2026-08-15",
+        "trace_attempts_ref": "Meta 2026-08-12 Form 4；Meta MTIA 官方文章；既有 Meta 10-Q 與官方 exact search",
         "trace_next_trigger": "Meta internal memo 原文，或 Meta／Samsung／SanDisk／Sumitomo 具名 LTA 一手披露",
         "trace_requeue_trigger": "related_triaged_lead:lead_9a326a7ac257806d6a1828ffc106028b",
         "trace_requeued_at": "2026-08-13T22:36:37.087730+00:00",
@@ -20900,13 +21051,14 @@
         "trace_status": "partial",
         "trace_trigger_entities": [
           "META",
-          "SNDK"
+          "SNDK",
+          "co:meta"
         ],
         "trace_trigger_event_ref": "lead:lead_9a326a7ac257806d6a1828ffc106028b",
-        "trace_trigger_kind": "primary_source_signal"
+        "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "Nothing like an internal $META memo getting published. Showing AI ramping as usual: - LTAs signed with Samsung and $SNDK for memory - LTAs signed with Sumitomo Electric for fiber optics - Expected to deploy 7GW compute infra this year, and doubling in 2027. - as much as $145B capex spend this year “It plans to launch a chip about every six months through 2027”",
       "triage": {
@@ -22045,26 +22197,28 @@
         "campaign_window_end": "2026-07-05T09:45:21Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
         "original_claim_status": "partial_one_of_eight_primary_confirmed",
-        "parked_reason": "八個互不相干主張中，Vistara 已另拆並處理；本輪 shared-Meta trigger 沒有提供 Morgan Stanley 出貨預測、probe card／socket、MLCC LTA、OpenAI 成本、Bloom 電網因果或 Digitimes OSAT 價格的原始文件，其餘仍是同源二手拼盤，不能形成一致 graph delta，不產 RA。",
+        "parked_reason": "八項二手拼盤的本次觸發同樣只是 META Form 4，沒有補到 Morgan Stanley humanoid／probe-card、Yageo price hike、OpenAI inference、MLCC LTA、Bloom financing 或 Digitimes OSAT 的原始文件；Vistara 已另案入圖，本筆沒有一致的新 graph delta，不產 RA。",
         "related_research_action_id": "ra_62c5841f8de2c67890cbefb805ba8d77",
         "research_mode": "delta_only",
-        "research_outcome": "2026-08-12 改用 primary_source_signal：本筆等的是任一剩餘 atomic claim 出現具名公司一手文件，不是「該公司被提到」。原設定（related_entity_signal＋全部 entities）會被任何一則相關推文觸發，每次都得到「trigger 沒帶來新東西」——2026-08-12 當日 5 個 pq1 slot 全被這類重排吃光、0 筆 prepared RA。改為只有指定實體的 tier-1 一手來源才觸發。",
-        "research_run": "daily:2026-08-12",
-        "trace_attempts_ref": "既有 Meta Vistara 官方論文與 RA；Morgan Stanley／Digitimes／公司官方來源既有追源；trigger lead lead_79471f7e1d9ce0cea1a806571cfa4f9d",
+        "research_outcome": "no_prepared_ra_form4_unrelated_to_composite_claims",
+        "research_run": "daily-brief-2026-08-15",
+        "trace_attempts_ref": "既有 Vistara 官方論文與 RA；Morgan Stanley／Digitimes／公司官方來源追源；本輪 META Form 4 trigger relevance audit",
         "trace_next_trigger": "任一剩餘 atomic claim 出現具名公司一手文件，或使用者指定 exact atom 提高優先權",
         "trace_requeue_trigger": "related_triaged_lead:lead_9a326a7ac257806d6a1828ffc106028b",
         "trace_requeued_at": "2026-08-13T22:36:37.087730+00:00",
         "trace_requires_user": "false",
         "trace_status": "isolated_tier_3",
         "trace_trigger_entities": [
+          "ASX",
           "BE",
-          "META"
+          "META",
+          "co:meta"
         ],
         "trace_trigger_event_ref": "lead:lead_9a326a7ac257806d6a1828ffc106028b",
-        "trace_trigger_kind": "primary_source_signal"
+        "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "robotics": {
           "counter_only": false,
@@ -22367,6 +22521,42 @@
         }
       ],
       "url": "https://x.com/aleabitoreddit/status/2075302956581449892"
+    },
+    "lead_b17774619e11d4e923796f2710a55e58": {
+      "entities": {
+        "company_ids": [
+          "co:coherent"
+        ],
+        "tickers": [
+          "COHR"
+        ]
+      },
+      "first_seen": "2026-08-14T22:33:28.557302+00:00",
+      "lead_id": "lead_b17774619e11d4e923796f2710a55e58",
+      "published_at": "2026-08-14",
+      "refs": {},
+      "source": "edgar:COHR",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "COHR"
+          ]
+        }
+      },
+      "title": "COHR 10-K filed 2026-08-14",
+      "triage": {
+        "decided_at": "2026-08-14T22:35:19.927882+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "Coherent（COHR）2026-08-14 10-K 為 SEC 一手 filing，標的在既有 CPO 追蹤範圍，具完整可逐字核對的年度財務／營運內容；新文件具 novelty，進 pq1 比對既有 claim 與五項財務 gate。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/820318/000082031826000020/iivi-20260630.htm"
     },
     "lead_b1e793c560334131dfe7c1619715784d": {
       "entities": {
@@ -25382,9 +25572,32 @@
       ],
       "published_at": "2026-08-12T22:59:29.000Z",
       "raw_text": "My main takeaway was that your merchant CW laser suppliers seem to be EXTREMELY IMPORTANT now. \n\nBut TLDR of $COHR earnings:\n\n\"given the demand that we see in our DC business with transceivers, I don’t see any time in the near future where we would be selling indium phosphide lasers externally\"\n\n- Ton more value placed on companies that sell InP lasers externally if $AAOI can't doesn't enough capacity for first gen-CPO deployments, $COHR not selling externally...  \n\nI guess that's why $MTSI said a ton of customers are approaching them with urgency for InP CW DFB lasers (and they dont even have meaningful capacity coming online until EOY 2027)\n\n$AAOI -> Internal\n$COHR -> Internal\nBuyers -> fewer places to look for capacity. \n\n \"Our backlog now extends out, fiscal 2027 is basically completely booked out. We are booked really through the end of calendar 2027\" [ Massive massive demand visibility]\n\n- Coherent also mentioned LTAs spanning end of decade. So this kinda reinforces what $POET CEO said at their AGM that the \"big 3\" are fully sold out next 2 years.\n\n\"we’re not constrained in the assembly and test capacity right now. We’re really just constrained by the ramp of the indium phosphide production\"\n\n- Just for the bottleneck bros in terms of assembly/test not a bottleneck. \n\n\"absolutely no push-out of CPO demand. In fact, it has been the opposite. We have seen demand increase and request from customers’ demand getting pulled in\"\n\n\"we continue to expect revenue from CPO for scale-up applications to start to flow in the second half of calendar 2027\" \n\n- Big read through on other CPO players for scale up if $LITE, $COHR reaffirm revenue from CPO scale up coming h2027. \n\n- \"quarterly revenue exceeding $3 billion by the end of fiscal 2027\" \n\n- $COHR revenue go brrr\n\nSo for regular numbers it's:\n\n- $2.046B revenue (+13.3% Q/Q, +33.8% Y/Y), main revenue ramp looks to be happening entering Q4 into 2027\n- Non-GAAP gross margins: 40.2%\n\nNext quarter guide is:\n- Revenue: $2.2–$2.4B revenue\n- Non-GAAP gross margins: 39.5-41.5%\n\nBasically:\n$1.69B -> $1.81B -> $2.05B -> ~$2.30B -> $3.0B (end of FY 2027) \n~39% -> 39.6% -> 40.2% -> ~40.5% (gross margins)\n\nFor operating margins:\n18.0% -> 19.5% -> 19.9% -> 20.3% -> 21.8%\n\nLittle less impressed compared to $LITE margin growth in terms of profitability, but revenue scale for $COHR growing rapidly.",
-      "refs": {},
+      "refs": {
+        "claimed_origin": "Coherent FY2026 Q4 earnings call／IR presentation／SEC filing",
+        "parked_reason": "Coherent 2026-08-12 一手 earnings presentation 支持 Q4 revenue USD 2.046B、internal InP output 年底前倍增且 2027 再倍增；SEC Q3 10-Q 亦支持 InP 擴產與 industry-wide shortage。但仍未取得可逐字核對的官方 Q4 transcript，無法確認社群貼文所引「不外售 InP lasers」「backlog 到 2027 底」「assembly/test 非瓶頸」「CPO demand pull-in」等 exact quotes；一手已支持的 6 吋 InP 擴產關係已在圖中，故不產 RA。",
+        "primary_url": "https://www.coherent.com/content/dam/coherent/site/en/documents/investors/investor-presentations/2026/august-12/investor-presentation-20260812.pdf",
+        "research_outcome": "no_prepared_ra_partial_exact_transcript_missing",
+        "research_run": "daily-brief-2026-08-15",
+        "trace_attempts_ref": "Coherent 2026-08-12 IR earnings presentation；SEC 2026 Q3 10-Q／2026-08-14 10-K canonical filing；四組 exact quote 官方網域搜尋",
+        "trace_next_trigger": "Coherent 公開 FY2026 Q4 transcript，或可逐字核對的 2026 10-K／客戶端文件確認外售政策、backlog 與 CPO pull-in",
+        "trace_requires_user": "false",
+        "trace_status": "partial",
+        "trace_trigger_entities": [
+          "AAOI",
+          "COHR",
+          "LITE",
+          "MTSI",
+          "POET",
+          "co:applied_optoelectronics",
+          "co:coherent",
+          "co:lumentum",
+          "co:macom",
+          "co:poet_technologies"
+        ],
+        "trace_trigger_kind": "primary_source_signal"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -30736,6 +30949,61 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1045810/000119765226000007/xslF345X06/wk-form4_1782767137.xml"
     },
+    "lead_f58ed857803307e89daf910eb18b6116": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "UMAC",
+          "ONDS",
+          "RCAT"
+        ]
+      },
+      "first_seen": "2026-08-14T22:33:22.902238+00:00",
+      "lead_id": "lead_f58ed857803307e89daf910eb18b6116",
+      "media": [
+        {
+          "cache": {
+            "bytes": 211231,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_f58ed857803307e89daf910eb18b6116/3_2088179511783522304.jpg",
+            "sha256": "65b1bb22c1b1e0acc65a5db1703eb0e5437472947c8d5d5e2feb5ccfc244bce7"
+          },
+          "height": 2117,
+          "media_key": "3_2088179511783522304",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HPq0M8sbAAAm9j8.jpg",
+          "width": 1839
+        },
+        {
+          "cache": {
+            "bytes": 223083,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_f58ed857803307e89daf910eb18b6116/3_2088179513020874752.jpg",
+            "sha256": "a1c969d57b71866de8977a46cc0f88ff6b13abeaad497aa0564114d79f3f5377"
+          },
+          "height": 1529,
+          "media_key": "3_2088179513020874752",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HPq0NBTbgAAQNYf.jpg",
+          "width": 1684
+        }
+      ],
+      "published_at": "2026-08-14T08:30:20.000Z",
+      "raw_text": "Donald Trump signs a proclamation to strengthen US supply chains for drones.\n\nBenefiting U.S. drone component suppliers like $UMAC to UAS manufacturers like $ONDS + $RCAT. \n\n TLDR, 100% tariffs on:\n- UAS docking stations + certain critical components\n- certain parts for >25 kg drones\n- Drones >25 kg\n\n25% tariffs on: \n- broader components \n \nUAS = Unmanned Aircraft System (don't have any positions in any above)",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "Donald Trump signs a proclamation to strengthen US supply chains for drones. Benefiting U.S. drone component suppliers like $UMAC to UAS manufacturers like $ONDS + $RCAT. TLDR, 100% tariffs on: - UAS docking stations + certain critical components - certain parts for >25 kg drones - Drones >25 kg 25% tariffs on: - broader components UAS = Unmanned Aircraft System (don't have any positions in any above)",
+      "triage": {
+        "decided_at": "2026-08-14T22:35:20.383900+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "白宮 tariff fact sheet 本身具體可追，但貼文點名的 UMAC／ONDS／RCAT 均不在現行追蹤 registry／themes，且使用者未指定 drone 探索 campaign；公司受益映射也是作者推論，依 relevance hard gate 篩掉。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2088181416148562017"
+    },
     "lead_f5f85aea8cfdf80892631a51e4c05f77": {
       "entities": {
         "company_ids": [
@@ -31760,8 +32028,8 @@
   "schema_version": "2",
   "source_state": {
     "x:aleabitoreddit": {
-      "since_id": "2088115008827715971",
-      "updated_at": "2026-08-14T06:32:29.437012+00:00",
+      "since_id": "2088226398708338889",
+      "updated_at": "2026-08-14T22:33:22.903054+00:00",
       "user_id": "1940360837547565056"
     }
   }
