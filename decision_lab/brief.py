@@ -735,6 +735,18 @@ def build_today_brief(
             for item in ranked
             if item["user_response_needed"].startswith("請")
         ],
+        # 兩個常駐計數器：讓開發迴圈（loop #2）的進展每天自己出現在使用者眼前，
+        # 而不必記得回去讀 brainstorm。只要還是 0，就代表系統仍未輸出過資本、
+        # 或仍無法用證據回答「判斷準不準」。詳見 store.capital_expression_counters。
+        #
+        # `build_today_brief` 的 store contract 刻意是窄 duck-type（遠端受限 surface
+        # 也要能產 brief），因此這裡不硬性要求該方法：提供就給數字，沒提供就是
+        # None，由 renderer 略過。None 只有一個意思——「這個 surface 不提供」，
+        # 不與「數字是 0」混用。
+        "capital_expression": (
+            counters() if callable(counters := getattr(store, "capital_expression_counters", None))
+            else None
+        ),
         "items": ranked,
     }
     assert_safe_payload(brief)
@@ -764,6 +776,22 @@ def render_today_markdown(brief: Mapping[str, Any]) -> str:
         f"- Blockers：{blockers}",
         f"- 下一個 review：{markdown_text(brief.get('next_review_at') or '尚未排定')}",
     ]
+    counters = brief.get("capital_expression") or {}
+    if counters:
+        live = int(counters.get("live_range_nonzero") or 0)
+        decisions = int(counters.get("decisions") or 0)
+        measured = int(counters.get("measured_outcomes") or 0)
+        outcomes = int(counters.get("outcomes") or 0)
+        line = (
+            f"- 資本表達：非零 live 區間 {live}/{decisions} 筆"
+            f"｜已量測 outcome {measured}/{outcomes} 筆"
+        )
+        # 只在「仍為 0」時加警語——它要刺眼到不會被略過，但不該每天喊。
+        if live == 0 and decisions:
+            line += "　⚠ 系統至今從未輸出過可入場區間"
+        if measured == 0 and outcomes:
+            line += "　⚠ 判斷準不準仍無法用證據回答"
+        lines.append(line)
     items = brief.get("items") or []
     if items:
         lines += ["", "## 項目（回覆用編號）"]

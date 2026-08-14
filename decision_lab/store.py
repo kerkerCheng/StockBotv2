@@ -608,6 +608,44 @@ class DecisionStore:
         ).fetchone()
         return int(row["count"])
 
+    def capital_expression_counters(self) -> dict[str, int]:
+        """兩個常駐計數器：系統至今**輸出過**多少資本，以及**驗證過**多少判斷。
+
+        它們存在的理由不是報表好看，是為了讓「開發迴圈有沒有進展」每天自己出現在
+        使用者眼前。2026-08-13 的 audit 發現同一個診斷被正確寫下四次卻從未改到
+        binding constraint，成因是判準住在要人主動想起來去讀的文件裡（D16：入口是
+        使用者的一次動作，出口不該也要求使用者記得）。只要這兩個數字還是 0，
+        每天的 brief 都會說出來。
+
+        - ``live_range_nonzero``：歷來 ``live_supported_range`` 上界 > 0 的 decision 數。
+          0 代表系統從未對任何標的說出「可以入場」——不論研究做得多好。
+        - ``measured_outcomes``：``outcome_envelopes`` 中 ``absolute_return`` 非 null 的
+          筆數。0 代表「系統的判斷準不準」永遠無法用證據回答。
+        """
+
+        decisions = 0
+        live_nonzero = 0
+        for row in self._conn.execute("SELECT payload_json FROM system_decisions"):
+            decisions += 1
+            try:
+                sizing = json.loads(row["payload_json"]).get("sizing") or {}
+                upper = (sizing.get("live_supported_range") or (0, 0))[1]
+            except (ValueError, TypeError, IndexError, KeyError):
+                continue
+            if isinstance(upper, (int, float)) and not isinstance(upper, bool) and upper > 0:
+                live_nonzero += 1
+        outcomes = self._conn.execute(
+            "SELECT COUNT(*) AS total,"
+            " SUM(CASE WHEN absolute_return IS NOT NULL THEN 1 ELSE 0 END) AS measured"
+            " FROM outcome_envelopes"
+        ).fetchone()
+        return {
+            "decisions": decisions,
+            "live_range_nonzero": live_nonzero,
+            "outcomes": int(outcomes["total"] or 0),
+            "measured_outcomes": int(outcomes["measured"] or 0),
+        }
+
     def get_probe(self, cohort_id: str) -> ProbeRecord:
         row = self._conn.execute(
             """

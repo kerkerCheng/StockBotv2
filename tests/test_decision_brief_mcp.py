@@ -22,6 +22,17 @@ class _FakeStore:
             raise RuntimeError(f"boom at {_FAKE_PRIVATE_PATH}")
         return list(self._cohorts)
 
+    def capital_expression_counters(self):
+        # brief 的 store contract 是窄 duck-type；這裡實作它是為了讓契約寫在測試裡，
+        # 而不是靠 build_today_brief 的 getattr 靜默降級。真正沒有這個方法的
+        # surface（遠端受限）會拿到 capital_expression=None，由 renderer 略過。
+        return {
+            "decisions": 0,
+            "live_range_nonzero": 0,
+            "outcomes": 0,
+            "measured_outcomes": 0,
+        }
+
     def close(self):
         self.closed = True
 

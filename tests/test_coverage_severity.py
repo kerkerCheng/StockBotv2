@@ -309,3 +309,55 @@ def test_one_fatal_blocker_still_forces_research_completion(tmp_path: Path) -> N
         assert "disproof_missing" not in card["research_incomplete_blockers"]
     finally:
         store.close()
+
+
+def test_daily_brief_carries_the_two_standing_counters(tmp_path: Path) -> None:
+    """兩個常駐計數器必須出現在 brief，且為 0 時要有警語。
+
+    它們存在的理由不是報表好看：2026-08-13 的 audit 發現同一個診斷被正確寫下四次
+    卻從未改到 binding constraint，成因是判準住在要人主動想起來去讀的文件裡
+    （D16：入口是使用者的一次動作，出口不該也要求使用者記得）。計數器讓開發迴圈
+    的進展每天自己出現，不需要任何人記得回去看 brainstorm。
+    """
+    from decision_lab.brief import build_today_brief, render_today_markdown
+
+    store = _store(tmp_path)
+    try:
+        counters = store.capital_expression_counters()
+        assert set(counters) == {
+            "decisions",
+            "live_range_nonzero",
+            "outcomes",
+            "measured_outcomes",
+        }
+
+        brief = build_today_brief(store, as_of=NOW)
+        assert brief["capital_expression"] == counters
+
+        # 全新 store：沒有 decision 也沒有 outcome，不該喊警語（沒東西可喊）。
+        assert "資本表達" in render_today_markdown(brief)
+
+        primed = dict(brief)
+        primed["capital_expression"] = {
+            "decisions": 73,
+            "live_range_nonzero": 0,
+            "outcomes": 8,
+            "measured_outcomes": 0,
+        }
+        text = render_today_markdown(primed)
+        assert "非零 live 區間 0/73" in text
+        assert "已量測 outcome 0/8" in text
+        assert "系統至今從未輸出過可入場區間" in text
+        assert "判斷準不準仍無法用證據回答" in text
+
+        # 一旦有產出就不再喊——警語要刺眼到不被略過，但不該每天喊。
+        primed["capital_expression"] = {
+            "decisions": 73,
+            "live_range_nonzero": 8,
+            "outcomes": 8,
+            "measured_outcomes": 7,
+        }
+        quiet = render_today_markdown(primed)
+        assert "⚠" not in quiet.split("資本表達")[1].split("\n")[0]
+    finally:
+        store.close()
