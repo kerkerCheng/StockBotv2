@@ -73,6 +73,38 @@ def _si(val) -> int | None:
         return None
 
 
+def _bar_identity(info: dict) -> tuple[str | None, str | None]:
+    """由 provider **明示欄位**導出 (bar_date, price_kind)；導不出就回 (None, None)。
+
+    2026-08-13 查證：`snapshot_date` 存的是跑 ETL 的當地日期，而 `price` 取自
+    `currentPrice`／`regularMarketPrice`——盤中跑是盤中價、收盤後跑是收盤價，且
+    UTC 晚班會把當天的美股收盤標成隔天。一個欄位承載三種語意（L12），拿它當 as-of
+    的消費者全部系統性差一天。
+
+    這裡只讀 provider 明講的欄位（`regularMarketTime` 的 epoch ＋
+    `exchangeTimezoneName` ＋ `marketState`），**不做推斷**——「不採 provider 推斷的
+    sector」那條路教過的錯誤（見 AGENTS.md 報價單位一節）。欄位缺就誠實回 None，
+    由 NULL 表示「as-of 未知」，不猜。
+
+    `price_kind`：`marketState == "REGULAR"` 代表盤中，價格還會變；其餘狀態
+    （PRE／PREPRE／POST／POSTPOST／CLOSED）代表 regular session 已結束，
+    `regularMarketPrice` 就是該交易日收盤。
+    """
+    epoch = info.get("regularMarketTime")
+    tz_name = info.get("exchangeTimezoneName")
+    if not isinstance(epoch, (int, float)) or isinstance(epoch, bool) or not tz_name:
+        return None, None
+    try:
+        from zoneinfo import ZoneInfo
+
+        stamp = datetime.fromtimestamp(float(epoch), ZoneInfo(str(tz_name)))
+    except Exception:
+        return None, None
+    state = str(info.get("marketState") or "").upper()
+    kind = "intraday" if state == "REGULAR" else "close"
+    return stamp.date().isoformat(), kind
+
+
 def fetch_snapshot(ticker: str) -> dict | None:
     """yfinance 抓一個 ticker 的當日快照。"""
     if yf is None:
@@ -93,9 +125,14 @@ def fetch_snapshot(ticker: str) -> dict | None:
         print(f"[etl] WARN: no price data for {ticker}", file=sys.stderr)
         return None
 
+    bar_date, price_kind = _bar_identity(info)
     return {
         "ticker":               ticker,
+        # ⚠ snapshot_date 是「跑 ETL 的當地日期」，**不是行情交易日**。它是 UNIQUE
+        # 鍵的一半，保留原語意不動；要 as-of 的消費者一律讀 bar_date。
         "snapshot_date":        date.today(),
+        "bar_date":             bar_date,
+        "price_kind":           price_kind,
         "gross_margin":         _sf(info.get("grossMargins")),
         "operating_margin":     _sf(info.get("operatingMargins")),
         "revenue_ttm":          _si(info.get("totalRevenue")),

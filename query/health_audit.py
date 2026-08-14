@@ -217,7 +217,14 @@ def active_edge_keys_from_manifests(thesis_dir: Path = THESIS_DIR) -> set[str]:
 # ── 本機專屬檢查 ──────────────────────────────────────────────────────────────
 
 def engine_c_freshness(conn, tickers: list[str], *, today: date, stale_days: int = ENGINE_C_STALE_DAYS) -> dict:
-    """每個 ticker 的最後 snapshot 日期；超過 stale_days 或沒資料就列出來。"""
+    """每個 ticker 的最後 snapshot 日期；超過 stale_days 或沒資料就列出來。
+
+    ⚠ 這裡刻意用 `snapshot_date`（ETL 執行日）而**不是** `bar_date`（行情交易日）。
+    本函式問的是「上次抓資料是什麼時候」，`snapshot_date` 正是那題的答案。
+    2026-08-14 把兩者拆開後，容易有人順手把這裡也改成 bar_date——不要改：
+    改了會把「provider 週末沒有新 bar」誤報成「我們的 ETL 停了」。
+    需要「這個價格屬於哪一天」的消費者才讀 `bar_date`。
+    """
 
     rows = conn.execute(
         "SELECT ticker, MAX(snapshot_date) AS latest FROM financial_snapshots GROUP BY ticker"

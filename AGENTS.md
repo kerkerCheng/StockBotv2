@@ -278,19 +278,15 @@ Windows PowerShell 5.1 的 `$OutputEncoding` 預設為 `us-ascii`；Daily Brief 
 
 ## 踩過的坑 / 通用判準 (Lessons)
 
-> **引用慣例（對使用者輸出時）：** 使用者記不住 L 編號對應。任何回覆或報告提到 L1–L12 時，
+> **引用慣例（對使用者輸出時）：** 使用者記不住 L 編號對應。任何回覆或報告提到 L1–L15 時，
 > 該編號第一次出現必須括號備註一句是哪條判準，例如「L7（thesis 生命週期：disproof 條件要附
 > 核查頻率 + 48h 觸發動作）」、「L8（來源獨立性：供應商自報不能當 sole_source 獨立佐證）」。
 > 同一份輸出內重複出現同編號可不再備註。
 
 ### L1 — 不要為了「少裝一個系統」而用不成熟工具去做專案核心
-**事發:** 一開始為了「單一系統省維運」推薦 Postgres+pgvector+**AGE** 做知識圖譜。但 AGE 是整個棧裡最不成熟的一塊,而知識圖譜是本專案最核心的部分 → 等於用最弱的工具做最重要的事。後修正為 Neo4j。
+**事發：** 曾為「單一系統省維運」選 Postgres+pgvector+**AGE** 做知識圖譜——用整個棧裡最不成熟的一塊做最核心的事。後改 Neo4j（已定案，不再重開）。
 
-**通用判準(下次這樣想):**
-1. 先問「**這個元件是不是專案的核心 / 皇冠寶石?**」核心元件 → 優化**能力、生態系成熟度、可觀測性(尤其視覺化/人工 review)**,而不是優化「系統數量」。
-2. 「少一個系統」這個好處,在**本機/單人/Docker** 情境下其實很廉價,不該拿它去換核心能力。只有在多人維運、雲端成本、SRE 負擔重時,「系統數量」才是該優化的目標。
-3. 需要**人工 review / 持續成長**的資料結構 → 視覺化能力是硬需求,選型必須把它當一等公民。
-4. polyglot(多種 DB 各司其職)對「質化知識 + 量化數字」雙軌系統是**正確架構**,不是過度設計。別用「統一技術棧」當反射性理由。
+**判準：** 核心元件優化**能力、生態成熟度、可觀測性**，不優化「系統數量」——後者在本機／單人情境下很廉價，只有多人維運／SRE 負擔重時才值得優化。需要人工 review 的資料結構，視覺化是硬需求。polyglot 對「質化知識＋量化數字」雙軌是正確架構，別拿「統一技術棧」當反射性理由。
 
 ### L2 — 不要在動工前追求「完美 schema」
 v0 schema 的對錯只有真實資料能驗證。凍結一個會壞的 v0 → 用真實資料撞它 → 撞出的洞才是真需求。判準:「現在搞錯、以後要搬全部資料才能修」的決定才現在想清楚(表的形狀);「以後加一列設定就能補」的(字彙)直接動工讓資料教你。
@@ -310,28 +306,18 @@ v0 schema 的對錯只有真實資料能驗證。凍結一個會壞的 v0 → �
 **一句話：瓶頸的 alpha 大半在邊上，不在點上。**
 
 ### L5 — chokepoint-atlas / serenity-skill 是方法論藍圖，不是相依套件
-兩者都是純 prompt 的研究方法論 skill，沒有持久化知識庫。**抄骨架（stack 分層、role 分類、證據四階、output-formats 當報告模板），不裝套件、不綁相依。** 它們補的是「怎麼想」，我們專案補的是它們缺的「記得」（持久化知識庫）。注意是**單一 lens**（偏小市值瓶頸獵手），當眾多視角之一，別讓系統世界觀被綁死。
-
-**已評估、可撿的零件：**
-- serenity-skill 的 `market-source-playbook` → 已併入上方「一手來源」登記表（尤其台股 MOPS/月營收）。
-- serenity-skill 的 `bottleneck-scorecard.json` → **留給引擎C 參考**，不是引擎A 要用的。
+兩者是純 prompt 的方法論 skill，沒有持久化知識庫。**抄骨架（stack 分層、role 分類、證據四階、output-formats），不裝套件、不綁相依。** 它們補「怎麼想」，本專案補它們缺的「記得」。注意它是**單一 lens**（偏小市值瓶頸獵手）——當眾多視角之一，別讓系統世界觀被綁死。評估已結案：`market-source-playbook` 併入「一手來源」登記表；`bottleneck-scorecard.json` 留給 Engine C 參考、不進 Engine A。
 
 ### L6 — 第一次真實抽取撞出的 schema/pipeline gap
 
-**事發：** 用 Coherent Q3 FY2026 法說會 CPO 段落跑完 extract → validate → load → Browser review 後發現。
+**事發：** Coherent Q3 FY2026 法說會 CPO 段落跑完 extract → validate → load 後撞出四個洞。
+Gap 1–3（Claim 缺 `name`、`source_ids` 是文件內局部 ID、`ABOUT` 未登記 vocab）**均已修復並於 2026-08-14 逐一驗證**，留作歷史。
 
-**Gap 1 — Claim 節點沒有 `name` 欄位：** loader 在寫入 Claim 時自動從 `statement` 截前 30 字填成 `name`。
-
-**Gap 2 — `source_ids` 是文件內局部 ID，跨文件後無法追溯：** source ID 改成全域唯一格式 `<doc_id>_s<N>`（例：`coherent_q3fy26_s2`）；或把 sources 寫成 Neo4j 節點（`Source` label）。
-
-**Gap 3 — `ABOUT` 邊類型未在 `vocab.json` 登記：** 在 `vocab.json` 的 relation 清單補上 `about`；同步更新 `loader/validate.py`。
-
-**Gap 4 — LLM 從類別詞推斷出具體產品節點（幻覺型態）：** quote 只說「data center interconnect 需求強」，LLM 自己推出 ZR/ZR+ 節點。修法：`prompts/extract_system.md` 加規則「具體型號/公司名必須在 quote 裡逐字出現」。
+**Gap 4 仍然活著——LLM 從類別詞推斷出具體實體（最常見的幻覺型態）：** quote 只說「data center interconnect 需求強」，LLM 自己推出 ZR/ZR+ 節點。防線在 `prompts/extract_system.md`：**具體型號／公司名必須在 quote 裡逐字出現**；review 時重點抽查這一項。
 
 **通用判準：**
 1. Schema gap 只有真實資料撞上去才會現形（L2 再次驗證）。
 2. 局部 ID 在單文件內沒問題，跨文件 MERGE 後會命名空間衝突。
-3. LLM 最常見幻覺型態：從類別詞推斷具體實體。review 時重點抽查「具體型號/公司名是否逐字出現在 quote 裡」。
 
 ### L7 — Thesis 生命週期:`disproof_condition` 是欄位,不是流程
 **判準:** 光是填 `disproof_condition` 不夠。欄位有填但沒有後續流程,等於貼了一個永遠不會響的火警警報。
@@ -356,10 +342,7 @@ v0 schema 的對錯只有真實資料能驗證。凍結一個會壞的 v0 → �
 ### L9 — 上游三引擎匯流至 Engine D 的前置條件（Engine C 與 formal 投資建議開放前必做）
 **Engine A→C join key：** Engine A 的圖節點（如 `co:coherent`）和 Engine C 的財務數字（Coherent 的毛利率）要能自動對齊，需要共同 ID（如 ticker `COHR`）。join key 由 `config/company_identity.json`／`identity.registry` 維護（靜態 lookup，不用 LLM 推斷）；loader 的 `TICKER_MAP` 由此生成。私人公司映射到 `None`（不是空缺，是明確標記）。
 
-**投資諮詢開放的三個前置條件（全部滿足才開放）：**
-1. 第二條垂直切片必須是**非 AI / 非 CPO** 主題，且跑通相同的 extract → thesis → 評分流程。
-2. thesis→部位的最小規則已定義（進場條件 / 單檔上限 / 持有期 / thesis 失效即出場），哪怕是人工執行的規則。見 [`docs/investment-sop.md`](docs/investment-sop.md)（`thesis/preconditions.py` 的 `_check_investment_rules()` 依賴此檔）。
-3. 財務核驗清單 5 項（客戶集中度 / 毛利率趨勢 / backlog / 稀釋 / 估值壓力）已能一鍵從 Engine C 查出，並且必須在 Watchlist 升格前執行。
+**投資諮詢開放的三個前置條件**（第二條非 AI／CPO 垂直切片、thesis→部位最小規則、財務核驗清單五項可一鍵查出）**已於 2026-07-22 全部達標，gate 已開放**；判準與現況由 `thesis/preconditions.py` 機器強制（`check_all()` 隨時可跑），不在此複述以免與程式漂移。三者的規格分別住 `docs/investment-sop.md`、`engine_c/checklist.py`。**核驗清單五項仍是 Watchlist 升格前的必要 gate。**
 
 ### L10 — 早期資料庫以 correctness 優先，不背錯誤相容包袱
 
@@ -402,72 +385,61 @@ v0 schema 的對錯只有真實資料能驗證。凍結一個會壞的 v0 → �
 
 ### L14 — 未經量測的機制不得享有默認信任，**gate 也不例外**
 
-**事發（2026-08-13）：** 使用者問「AXTI／LITE／COHR／SIVE 兩週漲 31–64%，系統為何沒形成
-入場判斷」。實測 Engine D 全部 **72 筆 decision 的 `live_supported_range` 都是 [0,0]**，
-`axis_ceiling` 值域只有 `{0.0, 0.002}`、從未達 0.005，已量測 outcome **0/8**。
-100% 的歸零由資料與研究完整度造成——三個真正的資本上限（單筆 5%、單 probe 0.5%、
-probe book 2%）**一次都沒 binding 過**。而同一診斷已被正確寫下四次
-（2026-08-02 §2–§4、`blocker_severity.py:37` 註解、2026-08-08 §8.2、§8.3），
-每次都沒改到 binding constraint。
+**事發（2026-08-13）：** 「AXTI／LITE／COHR／SIVE 兩週漲 31–64%，系統為何沒形成入場判斷」。
+實測 72 筆 decision 的 `live_supported_range` **全是 [0,0]**、`axis_ceiling` 從未超過
+0.002、已量測 outcome 0/8；三個真正的資本上限（單筆 5%、單 probe 0.5%、probe book 2%）
+**一次都沒 binding 過**——100% 的歸零由資料與研究完整度造成。而同一診斷已被正確寫下
+四次，每次都沒改到 binding constraint。
 
 **判準：**
 1. **驗收條件寫成「現有資料有幾筆真的變了」**，不是「這一步回傳成功」。答案是 0 就代表
    沒改到 binding constraint，不論改動本身多正確，**不得標記完成**。這是 L13 的量化版。
-2. **gate 本身也要被驗證。** 2026-08-01 已對技術訊號執行過這條（0 勝 3 敗，於是移出資本
-   路徑）；同一標準從未套用到 49 個 blocker。**「更嚴格比較安全」不是免於驗證的理由**——
-   在 outcome 量測建立前，不得以此為由新增或收緊任何 gate。
-3. **順序不可顛倒：先量測，後放閘。** 先放寬而沒有量測 ＝ 拆煞車不裝儀表板，比現狀更糟。
+2. **gate 本身也要被驗證。** 2026-08-01 已對技術訊號執行過（0 勝 3 敗，於是移出資本
+   路徑），同一標準卻從未套用到 blocker。**「更嚴格比較安全」不是免於驗證的理由。**
+3. **順序不可顛倒：先量測，後放閘。** 先放寬而沒有量測 ＝ 拆煞車不裝儀表板。
 4. 判斷 gate 有沒有用的三個**免 outcome** 測試：**恆亮**（觸發率近 100% ＝ 零鑑別力）、
    **不會滅**（清除率近 0 ＝ 那是牆不是閘門）、**講不出因果機制**（說不出「亮起時標的更
    可能變壞」＝ 行政流程假扮風控）。第四種失效「會滅但沒用」需要 outcome 才測得了。
-5. **每次修東西先分兩類，否則會「東補西補一個月而沒有方向」（2026-08-13 使用者實際感受）：**
-   - **維持營運**（管線壞了、抓不到資料、腳本報錯）→ 直接修，不必對齊終點。這類必然
-     存在，不算沒方向；但它**也不算進展**，不要因為修了很多就以為在前進。
-   - **改變行為**（新增或收緊 gate、改判準、改欄位語意、改 sizing）→ 動手前必須答出
-     **「這會讓哪個 baseline 數字變？」**。答不出來就不做，或先進 ROADMAP 未排程等排序。
-   兩類混在一起是上述一個月的成因：管線修復帶來進展的**感覺**，而改變行為的那些從未
-   被量測。baseline 數字見
-   [`docs/brainstorms/2026-08-13-capital-expression-direction-requirements.md`](docs/brainstorms/2026-08-13-capital-expression-direction-requirements.md) §2。
+5. **每次修東西先分兩類**，否則會「東補西補一個月而沒有方向」（2026-08-13 使用者實測感受）：
+   **維持營運**（管線壞了、腳本報錯）直接修、不必對齊終點，但**它也不算進展**；
+   **改變行為**（新增／收緊 gate、改判準、改欄位語意、改 sizing）動手前必須答出
+   **「這會讓哪個 baseline 數字變？」**，答不出來就不做或先進 ROADMAP 未排程。
+   混在一起就是那一個月的成因：管線修復帶來進展的**感覺**，改變行為的那些從未被量測。
 
-**⚠ 寫進本檔不等於會生效。** L12（2026-08-06）與其操作版 L13（2026-08-12）相隔六天，
-就是因為同一形狀在本檔已完整載入的情況下復發（L13 自記「兩天內三次」）。**真正的防呆是
-會自己出現的常駐計數器，不是要人讀的段落。**
+**⚠ 寫進本檔不等於會生效。** L12（08-06）與其操作版 L13（08-12）相隔六天，就是同一形狀
+在本檔已完整載入的情況下復發。**真正的防呆是會自己出現的常駐計數器，不是要人讀的段落**
+（現行：daily brief 首屏的「非零 live 區間 / 已量測 outcome」兩個數字）。
 
 **動 Engine D 資本層前必讀**
-[`docs/brainstorms/2026-08-13-capital-expression-direction-requirements.md`](docs/brainstorms/2026-08-13-capital-expression-direction-requirements.md)
-的 §2（凍結的 baseline 數字，audit 拿它做 diff）與 §4（六步順序與驗收條件）。
-該檔 §1 的 D1–D5 是**方向、尚未成為政策**——實測前不得升格為本檔規則。
+[`2026-08-13-capital-expression-direction`](docs/brainstorms/2026-08-13-capital-expression-direction-requirements.md)
+的 §2（凍結 baseline，audit 拿它做 diff）與 §4（步驟與驗收條件）。該檔 §1 的 D1–D5 是
+**方向、尚未成為政策**——實測前不得升格為本檔規則。
 
 ---
 
 ### L15 — Gate 與語言處理的分工：先解析「這是什麼」，再判「它算不算數」
 
-**事發（2026-08-13～14）：** 五軸的 evidence gate 用 `ref in reference_index`（exact
-字串相等）當判準。研究者寫 `yfinance://history`，index 的 key 是
-`yfinance://history/AAOI`——**一個少了 ticker 後綴的字串，讓整筆決策的資本歸零**，
-實測 22 次，佔「做了研究卻有軸 unknown」的三分之二。gate 問的是字串相不相等，
-真正要問的是「這個引用指不指向同一份來源」；那是語意問題，用字串比對當代理，
-**攔下的是格式不是風險**。同一輪還發現判準是 `any(失敗)` 而非「至少一個合格」，
-於是多附一個脈絡引用就整軸歸零。
+**事發（2026-08-13～14）：** 五軸 evidence gate 用 `ref in reference_index`（exact 字串相等）
+當判準。研究者寫 `yfinance://history`，index 的 key 是 `yfinance://history/AAOI`——
+**一個少了 ticker 後綴的字串，讓整筆決策的資本歸零**，實測 22 次。gate 問的是字串相不相等，
+真正要問的是「這個引用指不指向同一份來源」；用機械比對當語意問題的代理，**攔下的是格式
+不是風險**。同輪另發現判準是 `any(失敗)` 而非「至少一個合格」，多附一個脈絡引用就整軸歸零。
 
 **判準：**
-1. **gate 的正當性來自「它對目標有幫助」，不來自「它存在」或「它比較嚴格」**（L14 的
-   延伸）。自問：**這個 gate 攔下的，是不是它想攔的東西？** 若它攔的是格式、時區、
-   字串後綴、單位寫法、缺一個參數——它攔錯了，該修的是它問問題的方式。
-2. **分工：語意問題交給語言處理，權限問題永遠 deterministic。**
-   - **語意**（LLM 擅長，機械比對必誤判）：兩個引用是不是同一份來源、這段陳述算不算
-     獨立佐證、這則推文在講哪家公司、這份文件屬於哪個 `origin_entity`。
-   - **權限**（永遠由 registry／人工 gate 決定）：這份來源具不具備該軸接受的
-     authority、evidence tier 能不能升、資本能不能動、graph admission、live choice。
-   - **LLM 可以解析與提議，不可以授權。** 不確定時用語言能力去解決，不要被自己的
-     gate 卡死；但解析結果必須落成可稽核的確定性紀錄，不得只留結論。
-3. **順序不可反：先解析身分，再查權限。** 若解析時偏好「能通過的答案」，等於讓引用
-   去尋找能通過的權威——那正是 L8／L11 要防的 laundering。實作把這條寫死在
-   `decision_lab/sizing.py` 的 `_resolve_reference` 註解裡：解析只認身分，不看 authority。
-4. **放寬解析不等於放寬判準——分開之後兩邊都要更嚴。** 引用改成無歧義解析
-   （exact → 唯一前綴，兩個以上候選就不猜）＋「至少一個合格」之後，**零個合格引用
-   仍然歸零**（那才是真的 laundering），且不合格者必須列進 `context_only_refs` 現形
-   供稽核。這是 L12 的形狀：先分開再各自定規則，分開後每一邊都能比原本更嚴。
+1. **gate 的正當性來自「它對目標有幫助」，不來自「它存在」或「它比較嚴格」**（L14 延伸）。
+   自問：**這個 gate 攔下的，是不是它想攔的東西？** 若攔的是格式、時區、字串後綴、單位
+   寫法、缺一個參數——它攔錯了，該修的是它問問題的方式。
+2. **語意交給語言處理，權限永遠 deterministic。**
+   語意（LLM 擅長、機械比對必誤判）：兩個引用是否同一來源、某陳述算不算獨立佐證、
+   推文在講哪家公司、文件屬於哪個 `origin_entity`。
+   權限（永遠由 registry／人工 gate 決定）：authority 歸屬、evidence tier、資本、
+   graph admission、live choice。**LLM 可以解析與提議，不可以授權**；不確定時用語言能力
+   去解決、不要被自己的 gate 卡死，但解析結果必須落成可稽核的確定性紀錄。
+3. **順序不可反：先解析身分，再查權限。** 解析時若偏好「能通過的答案」，等於讓引用去尋找
+   能通過的權威——那正是 L8／L11 要防的 laundering（實作見 `sizing.py::_resolve_reference`）。
+4. **放寬解析不等於放寬判準——分開之後兩邊都要更嚴。** 引用改成無歧義解析（exact →
+   唯一前綴，兩個以上候選就不猜）＋「至少一個合格」之後，**零個合格仍然歸零**，且不合格者
+   必須列進 `context_only_refs` 現形供稽核。這是 L12 的形狀。
 
 ---
 

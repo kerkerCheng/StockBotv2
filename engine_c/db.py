@@ -109,6 +109,13 @@ def _ensure_sqlite_schema(conn: sqlite3.Connection) -> None:
             analyst_target_low   REAL,
             analyst_target_count INTEGER,
             fetched_at           TEXT NOT NULL DEFAULT (datetime('now')),
+            -- bar_date／price_kind 是 2026-08-14 從 snapshot_date 拆出來的兩種語意。
+            -- snapshot_date 一直是「跑 ETL 的當地日期」，不是行情交易日：收盤後跑的
+            -- 批次被標成隔天（fetched_at 07-28 22:34 取到 07-28 收盤，卻標 07-29），
+            -- 盤中跑的存的是盤中價。任何拿它當 as-of 的消費者都系統性差一天。
+            -- NULL 表示「這列早於本次修正，as-of 未知」——不得猜測補值。
+            bar_date             TEXT,
+            price_kind           TEXT,
             UNIQUE (ticker, snapshot_date)
         );
         CREATE TABLE IF NOT EXISTS manual_fields (
@@ -148,6 +155,10 @@ def _ensure_sqlite_schema(conn: sqlite3.Connection) -> None:
     ):
         if name not in columns:
             conn.execute(f"ALTER TABLE financial_snapshots ADD COLUMN {name} REAL")
+    for name in ("bar_date", "price_kind"):
+        # 既有列一律留 NULL：它們的 as-of 真的不可知，補值等於用猜測冒充事實。
+        if name not in columns:
+            conn.execute(f"ALTER TABLE financial_snapshots ADD COLUMN {name} TEXT")
     from engine_c.manual_observations import ensure_manual_observation_schema
     from engine_c.technical import ensure_technical_schema
 
@@ -213,6 +224,8 @@ def upsert_snapshot(conn, snap: dict, *, commit: bool = True) -> None:
         "cash_and_equivalents",
         "total_debt",
         "free_cash_flow_ttm",
+        "bar_date",
+        "price_kind",
     ):
         snapshot.setdefault(key, None)
     if _use_postgres():
@@ -223,7 +236,7 @@ def upsert_snapshot(conn, snap: dict, *, commit: bool = True) -> None:
             cash_and_equivalents, total_debt, free_cash_flow_ttm,
             ev_revenue, pe_trailing, pe_forward, price,
             analyst_target_mean, analyst_target_high, analyst_target_low,
-            analyst_target_count, fetched_at
+            analyst_target_count, fetched_at, bar_date, price_kind
         ) VALUES (
             %(ticker)s, %(snapshot_date)s,
             %(gross_margin)s, %(operating_margin)s, %(revenue_ttm)s,
@@ -232,7 +245,8 @@ def upsert_snapshot(conn, snap: dict, *, commit: bool = True) -> None:
             %(ev_revenue)s, %(pe_trailing)s,
             %(pe_forward)s, %(price)s,
             %(analyst_target_mean)s, %(analyst_target_high)s,
-            %(analyst_target_low)s, %(analyst_target_count)s, %(fetched_at)s
+            %(analyst_target_low)s, %(analyst_target_count)s, %(fetched_at)s,
+            %(bar_date)s, %(price_kind)s
         ) ON CONFLICT (ticker, snapshot_date) DO UPDATE SET
             gross_margin=EXCLUDED.gross_margin,
             operating_margin=EXCLUDED.operating_margin,
@@ -247,7 +261,8 @@ def upsert_snapshot(conn, snap: dict, *, commit: bool = True) -> None:
             analyst_target_high=EXCLUDED.analyst_target_high,
             analyst_target_low=EXCLUDED.analyst_target_low,
             analyst_target_count=EXCLUDED.analyst_target_count,
-            fetched_at=EXCLUDED.fetched_at
+            fetched_at=EXCLUDED.fetched_at,
+            bar_date=EXCLUDED.bar_date, price_kind=EXCLUDED.price_kind
         """
         with conn.cursor() as cur:
             cur.execute(sql, snapshot)
@@ -262,8 +277,8 @@ def upsert_snapshot(conn, snap: dict, *, commit: bool = True) -> None:
             cash_and_equivalents, total_debt, free_cash_flow_ttm,
             ev_revenue, pe_trailing, pe_forward, price,
             analyst_target_mean, analyst_target_high, analyst_target_low,
-            analyst_target_count, fetched_at
-        ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+            analyst_target_count, fetched_at, bar_date, price_kind
+        ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
         """
         conn.execute(sql, (
             snapshot["ticker"], str(snapshot["snapshot_date"]),
@@ -275,6 +290,7 @@ def upsert_snapshot(conn, snap: dict, *, commit: bool = True) -> None:
             snapshot["analyst_target_mean"], snapshot["analyst_target_high"],
             snapshot["analyst_target_low"], snapshot["analyst_target_count"],
             str(snapshot["fetched_at"]),
+            snapshot.get("bar_date"), snapshot.get("price_kind"),
         ))
         if commit:
             conn.commit()
