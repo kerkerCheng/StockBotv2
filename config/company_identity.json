@@ -1,59 +1,264 @@
 {
   "version": 1,
   "companies": [
-    {"company_id": "co:coherent", "research_ticker": "COHR", "market_currency": "USD", "execution_currency": "USD", "execution_venue": "NYSE"},
-    {"company_id": "co:lumentum", "research_ticker": "LITE", "market_currency": "USD", "execution_currency": "USD", "execution_venue": "NASDAQ"},
-    {"company_id": "co:iqe", "research_ticker": "IQE.L", "market_currency": "GBp"},
-    {"company_id": "co:broadcom", "research_ticker": "AVGO"},
-    {"company_id": "co:nvidia", "research_ticker": "NVDA"},
-    {"company_id": "co:tsmc", "research_ticker": "TSM"},
-    {"company_id": "co:intel", "research_ticker": "INTC"},
-    {"company_id": "co:samsung", "research_ticker": "005930.KS"},
-    {"company_id": "co:apple", "research_ticker": "AAPL"},
-    {"company_id": "co:corning", "research_ticker": "GLW"},
-    {"company_id": "co:arista", "research_ticker": "ANET"},
-    {"company_id": "co:meta", "research_ticker": "META", "market_currency": "USD", "execution_currency": "USD", "execution_venue": "NASDAQ"},
-    {"company_id": "co:google", "research_ticker": "GOOGL"},
-    {"company_id": "co:jabil", "research_ticker": "JBL"},
-    {"company_id": "co:anthropic", "research_ticker": null},
-    {"company_id": "co:openai", "research_ticker": null},
-    {"company_id": "co:sivers_semiconductors", "research_ticker": "SIVE.ST", "market_currency": "SEK", "execution_currency": "EUR", "execution_venue": "FRA"},
-    {"company_id": "co:axt", "research_ticker": "AXTI", "market_currency": "USD", "execution_currency": "USD", "execution_venue": "NASDAQ"},
-    {"company_id": "co:tower_semiconductor", "research_ticker": "TSEM", "market_currency": "USD", "execution_currency": "USD", "execution_venue": "NASDAQ"},
-    {"company_id": "co:marvell_technology", "research_ticker": "MRVL"},
-    {"company_id": "co:poet_technologies", "research_ticker": "POET"},
-    {"company_id": "co:applied_optoelectronics", "research_ticker": "AAOI", "market_currency": "USD", "execution_currency": "USD", "execution_venue": "NASDAQ"},
-    {"company_id": "co:macom", "research_ticker": "MTSI", "market_currency": "USD", "execution_currency": "USD", "execution_venue": "NASDAQ"},
-    {"company_id": "co:globalfoundries", "research_ticker": "GFS", "market_currency": "USD", "execution_currency": "USD", "execution_venue": "NASDAQ"},
-    {"company_id": "co:cadence", "research_ticker": "CDNS"},
-    {"company_id": "co:apollo", "research_ticker": "APO"},
-    {"company_id": "co:blackstone", "research_ticker": "BX"},
-    {"company_id": "co:sumitomo_electric", "research_ticker": "5802.T"},
-    {"company_id": "co:jx_advanced_metals", "research_ticker": "5016.T"},
-    {"company_id": "co:enablence_technologies", "research_ticker": "ENA.V"},
-    {"company_id": "co:zhongji_innolight", "research_ticker": "300308.SZ"},
-    {"company_id": "co:vpec", "research_ticker": "2455.TW"},
-    {"company_id": "co:win_semiconductor", "research_ticker": "3105.TWO"},
-    {"company_id": "co:landmark_optoelectronics", "research_ticker": "3081.TWO"},
-    {"company_id": "co:applied_materials", "research_ticker": "AMAT", "market_currency": "USD", "execution_currency": "USD", "execution_venue": "NASDAQ"},
-    {"company_id": "co:lam_research", "research_ticker": "LRCX", "market_currency": "USD", "execution_currency": "USD", "execution_venue": "NASDAQ"},
-    {"company_id": "co:texas_instruments", "research_ticker": "TXN", "market_currency": "USD", "execution_currency": "USD", "execution_venue": "NASDAQ"},
-    {"company_id": "co:umc", "research_ticker": "UMC"},
-    {"company_id": "co:soitec", "research_ticker": "SOI.PA"},
-    {"company_id": "co:ayar_labs", "research_ticker": null},
-    {"company_id": "co:celestial_ai", "research_ticker": null},
-    {"company_id": "co:newphotonics", "research_ticker": null},
-    {"company_id": "co:openlight_photonics", "research_ticker": null},
-    {"company_id": "co:lightium_ag", "research_ticker": null},
-    {"company_id": "co:nava_thailand", "research_ticker": null},
-    {"company_id": "co:ime_cas", "research_ticker": null},
-    {"company_id": "co:ansys", "research_ticker": null},
-    {"company_id": "co:o_net_technologies", "research_ticker": null},
-    {"company_id": "co:mips_holding", "research_ticker": null},
-    {"company_id": "co:agility_robotics", "research_ticker": null},
-    {"company_id": "co:gxo_logistics", "research_ticker": "GXO", "market_currency": "USD", "execution_currency": "USD", "execution_venue": "NYSE"},
-    {"company_id": "co:schaeffler", "research_ticker": "SHA0.DE", "market_currency": "EUR"},
-    {"company_id": "co:hyundai_mobis", "research_ticker": "012330.KS", "market_currency": "KRW"},
-    {"company_id": "co:boston_dynamics", "research_ticker": null}
+    {
+      "company_id": "co:coherent",
+      "research_ticker": "COHR",
+      "market_currency": "USD",
+      "execution_currency": "USD",
+      "execution_venue": "NYSE"
+    },
+    {
+      "company_id": "co:lumentum",
+      "research_ticker": "LITE",
+      "market_currency": "USD",
+      "execution_currency": "USD",
+      "execution_venue": "NASDAQ"
+    },
+    {
+      "company_id": "co:iqe",
+      "research_ticker": "IQE.L",
+      "market_currency": "GBp"
+    },
+    {
+      "company_id": "co:broadcom",
+      "research_ticker": "AVGO"
+    },
+    {
+      "company_id": "co:nvidia",
+      "research_ticker": "NVDA",
+      "market_currency": "USD"
+    },
+    {
+      "company_id": "co:tsmc",
+      "research_ticker": "TSM"
+    },
+    {
+      "company_id": "co:intel",
+      "research_ticker": "INTC"
+    },
+    {
+      "company_id": "co:samsung",
+      "research_ticker": "005930.KS"
+    },
+    {
+      "company_id": "co:apple",
+      "research_ticker": "AAPL"
+    },
+    {
+      "company_id": "co:corning",
+      "research_ticker": "GLW"
+    },
+    {
+      "company_id": "co:arista",
+      "research_ticker": "ANET"
+    },
+    {
+      "company_id": "co:meta",
+      "research_ticker": "META",
+      "market_currency": "USD",
+      "execution_currency": "USD",
+      "execution_venue": "NASDAQ"
+    },
+    {
+      "company_id": "co:google",
+      "research_ticker": "GOOGL"
+    },
+    {
+      "company_id": "co:jabil",
+      "research_ticker": "JBL"
+    },
+    {
+      "company_id": "co:anthropic",
+      "research_ticker": null
+    },
+    {
+      "company_id": "co:openai",
+      "research_ticker": null
+    },
+    {
+      "company_id": "co:sivers_semiconductors",
+      "research_ticker": "SIVE.ST",
+      "market_currency": "SEK",
+      "execution_currency": "EUR",
+      "execution_venue": "FRA"
+    },
+    {
+      "company_id": "co:axt",
+      "research_ticker": "AXTI",
+      "market_currency": "USD",
+      "execution_currency": "USD",
+      "execution_venue": "NASDAQ"
+    },
+    {
+      "company_id": "co:tower_semiconductor",
+      "research_ticker": "TSEM",
+      "market_currency": "USD",
+      "execution_currency": "USD",
+      "execution_venue": "NASDAQ"
+    },
+    {
+      "company_id": "co:marvell_technology",
+      "research_ticker": "MRVL"
+    },
+    {
+      "company_id": "co:poet_technologies",
+      "research_ticker": "POET"
+    },
+    {
+      "company_id": "co:applied_optoelectronics",
+      "research_ticker": "AAOI",
+      "market_currency": "USD",
+      "execution_currency": "USD",
+      "execution_venue": "NASDAQ"
+    },
+    {
+      "company_id": "co:macom",
+      "research_ticker": "MTSI",
+      "market_currency": "USD",
+      "execution_currency": "USD",
+      "execution_venue": "NASDAQ"
+    },
+    {
+      "company_id": "co:globalfoundries",
+      "research_ticker": "GFS",
+      "market_currency": "USD",
+      "execution_currency": "USD",
+      "execution_venue": "NASDAQ"
+    },
+    {
+      "company_id": "co:cadence",
+      "research_ticker": "CDNS"
+    },
+    {
+      "company_id": "co:apollo",
+      "research_ticker": "APO"
+    },
+    {
+      "company_id": "co:blackstone",
+      "research_ticker": "BX"
+    },
+    {
+      "company_id": "co:sumitomo_electric",
+      "research_ticker": "5802.T"
+    },
+    {
+      "company_id": "co:jx_advanced_metals",
+      "research_ticker": "5016.T"
+    },
+    {
+      "company_id": "co:enablence_technologies",
+      "research_ticker": "ENA.V"
+    },
+    {
+      "company_id": "co:zhongji_innolight",
+      "research_ticker": "300308.SZ"
+    },
+    {
+      "company_id": "co:vpec",
+      "research_ticker": "2455.TW"
+    },
+    {
+      "company_id": "co:win_semiconductor",
+      "research_ticker": "3105.TWO"
+    },
+    {
+      "company_id": "co:landmark_optoelectronics",
+      "research_ticker": "3081.TWO"
+    },
+    {
+      "company_id": "co:applied_materials",
+      "research_ticker": "AMAT",
+      "market_currency": "USD",
+      "execution_currency": "USD",
+      "execution_venue": "NASDAQ"
+    },
+    {
+      "company_id": "co:lam_research",
+      "research_ticker": "LRCX",
+      "market_currency": "USD",
+      "execution_currency": "USD",
+      "execution_venue": "NASDAQ"
+    },
+    {
+      "company_id": "co:texas_instruments",
+      "research_ticker": "TXN",
+      "market_currency": "USD",
+      "execution_currency": "USD",
+      "execution_venue": "NASDAQ"
+    },
+    {
+      "company_id": "co:umc",
+      "research_ticker": "UMC"
+    },
+    {
+      "company_id": "co:soitec",
+      "research_ticker": "SOI.PA"
+    },
+    {
+      "company_id": "co:ayar_labs",
+      "research_ticker": null
+    },
+    {
+      "company_id": "co:celestial_ai",
+      "research_ticker": null
+    },
+    {
+      "company_id": "co:newphotonics",
+      "research_ticker": null
+    },
+    {
+      "company_id": "co:openlight_photonics",
+      "research_ticker": null
+    },
+    {
+      "company_id": "co:lightium_ag",
+      "research_ticker": null
+    },
+    {
+      "company_id": "co:nava_thailand",
+      "research_ticker": null
+    },
+    {
+      "company_id": "co:ime_cas",
+      "research_ticker": null
+    },
+    {
+      "company_id": "co:ansys",
+      "research_ticker": null
+    },
+    {
+      "company_id": "co:o_net_technologies",
+      "research_ticker": null
+    },
+    {
+      "company_id": "co:mips_holding",
+      "research_ticker": null
+    },
+    {
+      "company_id": "co:agility_robotics",
+      "research_ticker": null
+    },
+    {
+      "company_id": "co:gxo_logistics",
+      "research_ticker": "GXO",
+      "market_currency": "USD",
+      "execution_currency": "USD",
+      "execution_venue": "NYSE"
+    },
+    {
+      "company_id": "co:schaeffler",
+      "research_ticker": "SHA0.DE",
+      "market_currency": "EUR"
+    },
+    {
+      "company_id": "co:hyundai_mobis",
+      "research_ticker": "012330.KS",
+      "market_currency": "KRW"
+    },
+    {
+      "company_id": "co:boston_dynamics",
+      "research_ticker": null
+    }
   ]
 }
