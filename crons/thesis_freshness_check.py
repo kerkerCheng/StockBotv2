@@ -24,7 +24,14 @@ import re
 from datetime import date, datetime
 from pathlib import Path
 
+import sys
+
 ROOT = Path(__file__).resolve().parent.parent
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from thesis.lifecycle_schedule import is_due  # noqa: E402
+
 THESIS_DIR = ROOT / "thesis"
 LIFECYCLE = ROOT / "thesis" / "lifecycle.json"
 TODO_POOL = ROOT / "library" / "leads" / "todo_pool.json"
@@ -94,8 +101,12 @@ def check() -> list[tuple[str, int]]:
 
 
 def lifecycle_due() -> list[tuple[str, str]]:
-    """讀 lifecycle.json，回 [(thesis_id, 原因)]——到期（next_check<=今天）或
-    review_required。這是 lifecycle 的權威到期訊號（memo 檔日期只是次要 fallback）。
+    """讀 lifecycle.json，回 [(thesis_id, 原因)]——到期或 review_required。
+    這是 lifecycle 的權威到期訊號（memo 檔日期只是次要 fallback）。
+
+    到期判準委派給 `thesis.lifecycle_schedule`：固定週期與催化劑取較早者。先前這裡
+    只讀 `next_check`，而 `next_check` 是 `last_checked + check_interval_days` 機械算出
+    的日曆——thesis 明明寫了裁決點（AXT 是 Q3 財報與 10-Q exhibit），排程卻讀不到。
 
     lifecycle 的正式狀態更新（disproof 評估、retired/revised）需人工判斷，本 hook
     只 surface 到期供你本機手動複查（plan R17）；不寫入。
@@ -109,15 +120,9 @@ def lifecycle_due() -> list[tuple[str, str]]:
     for tid, entry in (data.items() if isinstance(data, dict) else []):
         if not isinstance(entry, dict):
             continue
-        if entry.get("status") == "review_required":
-            due.append((tid, "review_required"))
-            continue
-        nc = entry.get("next_check")
-        try:
-            if nc and date.fromisoformat(str(nc)) <= today:
-                due.append((tid, f"到期 {nc}"))
-        except ValueError:
-            continue
+        due_now, reason = is_due(entry, today=today)
+        if due_now:
+            due.append((tid, reason))
     return due
 
 

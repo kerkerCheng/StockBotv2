@@ -111,6 +111,22 @@ L8（來源獨立性：供應商自報不算獨立佐證）這個**原則保留*
 推論：**在 outcome 量測建立之前，不得以「更嚴格比較安全」為由新增或收緊任何 gate。**
 fail closed 是好的預設，但它不是免於驗證的理由。
 
+### D8 — Gate 與語言處理要有分工，不要被自己的 gate 卡死（2026-08-14 使用者定調）
+
+> 「不全然相信 gate，我們只相信 gate 的存在意義對我們的目標有幫助。如果不明確，
+> 我們 leverage LLM 的語言處理能力去解決，不必被自己的 gate 卡死。」
+
+多數 gate 實際上是用**機械代理**（字串相等、日期比較、集合包含）去回答一個**語意
+問題**。代理答錯時，被擋下的是格式而不是風險——實測 22 次的引用格式歸零就是這個
+形狀。**gate 的正當性來自它對目標有幫助，不來自它存在或它比較嚴格。**
+
+分工線：**語意交給語言處理，權限永遠 deterministic；LLM 可以解析與提議，不可以授權。**
+順序固定「先解析身分 → 再查權限」，反過來就是讓引用去尋找能通過的權威（L8／L11）。
+且**放寬解析必須伴隨判準變嚴**——分開之後每一邊都能比混在一起時更嚴（L12）。
+
+完整判準已升格為 `AGENTS.md` **L15**（本檔 §7 的原則：實測驗證過的才升格為政策；
+本條有 2026-08-13～14 的實測與落地實作，故升格）。
+
 ### D7 — 順序不可顛倒：先量測，後放閘
 
 現行設計有一個真實優點：它永遠不會因為爛研究賠錢——因為它永遠不下注。
@@ -369,7 +385,7 @@ message），則本節推測作廢，該尺度是刻意的。
 | ~~**3**~~ ✅ | **把 lane blockers 接進 `fatal_blockers()`** 並讓兩套分類系統合一（§3.2） | ✅ 真實 calculator 全量重算：**live 非零 0 → 8**（54 筆可重建者），binding 由 `live_lane_blockers` 71/72 變成 `weakest_axis` 31 為主。`severity` 現住 config，`blocker_severity.py` 讀它，硬編碼 frozenset 消滅 | 2 |
 | ~~**4**~~ ✅ | **修 §3.3 的第 2 點＋引用解析**（第 1 點經重跑資料後**否決**，理由見下） | ✅ 重算：`axis_ceiling` 0 的筆數 **23 → 17**（6 筆由 0 變 0.002）。⚠ 原驗收條件「出現 > 0.002」**不可能由歷史資料成立**——那需五軸全 `corroborated`，而 `corroborated + missing_data` 歷史上出現 0 次（評估者早已學會迴避）。單調性改由 `tests/test_probe_sizing.py::test_declaring_corroborated_never_yields_less_than_bounded_hypothesis` 鎖住 | 3 |
 | **5** | **決定 alpha baseline 尺寸**（使用者決定，見 D5） | — | 1、3 |
-| **6** | `lifecycle.json` 加 `catalyst_checkpoints`，`next_check` 取 `min(cadence, 最近催化劑)` | AXT 的 `next_check` 從 2026-11-15 移到 Q3 財報日 | 無 |
+| ~~**6**~~ ✅ | `lifecycle.json` 加 `catalyst_checkpoints`，到期取 `min(cadence, 最近催化劑)` | ✅ AXT 生效複查日 **2026-11-15 → 2026-10-30**（Q3 財報）。新增 `thesis/lifecycle_schedule.py` 為唯一判準——先前 `crons/thesis_freshness_check.py` 與 `query/health_audit.py` 各有一份只讀 `next_check` 的實作。推估日期照樣排程但標明 `date_confidence` 與 `basis`，不得讓推估看起來像已公告 | 無 |
 
 **第 1 項必須排在第 3、4 項之前**（D7：先量測後放閘）。第 2 項可與第 1 項並行，
 因為它只產出待核可清單、不改行為。

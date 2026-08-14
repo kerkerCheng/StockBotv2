@@ -21,6 +21,10 @@ import sys
 from datetime import date, datetime
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from thesis.lifecycle_schedule import is_due as lifecycle_is_due  # noqa: E402
+
 try:
     from dotenv import load_dotenv
 except ImportError:  # pragma: no cover
@@ -129,17 +133,19 @@ ORDER BY company_id
 # ── 純函式（雲端/本機/測試共用，不碰 DB）────────────────────────────────────
 
 def lifecycle_due(lifecycle: dict, today: date) -> list[dict]:
-    """回傳到期（next_check <= today）的 thesis 條目，review_required 恆視為到期。"""
+    """回傳到期的 thesis 條目，review_required 恆視為到期。
+
+    到期判準委派給 `thesis.lifecycle_schedule`——固定週期與催化劑取較早者。先前這裡
+    與 `crons/thesis_freshness_check.py` 各有一份只讀 `next_check` 的實作，是同一個
+    判準跑兩次。`due_reason` 讓下游看得出是例行到期還是催化劑到了（後者帶著「去讀
+    哪份文件」的資訊，例行複查沒有）。
+    """
 
     due = []
     for thesis_id, entry in sorted(lifecycle.items()):
-        next_check = entry.get("next_check")
-        try:
-            next_date = datetime.strptime(next_check, "%Y-%m-%d").date()
-        except (TypeError, ValueError):
-            next_date = None
-        if entry.get("status") == "review_required" or next_date is None or next_date <= today:
-            due.append({"thesis_id": thesis_id, **entry})
+        due_now, reason = lifecycle_is_due(entry, today=today)
+        if due_now:
+            due.append({"thesis_id": thesis_id, "due_reason": reason, **entry})
     return due
 
 
