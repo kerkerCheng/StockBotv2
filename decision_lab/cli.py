@@ -18,6 +18,7 @@ from .execution import (
     record_live_choice,
     record_live_fill,
 )
+from .references import build_reference_options, render_reference_options_markdown
 from .store import DecisionStore
 from .workflow import (
     EvaluationRequest,
@@ -107,6 +108,16 @@ def build_parser() -> argparse.ArgumentParser:
     )
     today.add_argument("--as-of")
     today.add_argument("--format", choices=("json", "markdown"), default="markdown")
+
+    references = subcommands.add_parser(
+        "references",
+        help="純讀列出各信心軸有哪些合格引用可用；寫 assessment 前先查，不要猜。",
+    )
+    references.add_argument("target_id", help="decision_id 或 cohort_id")
+    references.add_argument(
+        "--assessment", help="一併診斷這份 assessment 的引用會不會讓某軸歸零。"
+    )
+    references.add_argument("--format", choices=("json", "markdown"), default="markdown")
 
     card = subcommands.add_parser("card", help="純讀既有 decision 的 Action Card。")
     card.add_argument("decision_id")
@@ -346,6 +357,18 @@ def run(
                 format_name=args.format,
                 stdout=stdout,
                 markdown_renderer=render_today_markdown,
+            )
+        elif args.command == "references":
+            result = build_reference_options(
+                store,
+                args.target_id,
+                assessment=_read_optional_json(args.assessment),
+            )
+            _render(
+                result,
+                format_name=args.format,
+                stdout=stdout,
+                markdown_renderer=render_reference_options_markdown,
             )
         elif args.command == "card":
             card = build_action_card(store, args.decision_id, as_of=args.as_of)

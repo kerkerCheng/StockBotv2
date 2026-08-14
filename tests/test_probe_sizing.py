@@ -674,3 +674,87 @@ def test_declaring_corroborated_never_yields_less_than_bounded_hypothesis(
         )
     finally:
         store.close()
+
+
+def test_describe_axis_references_lists_only_qualifying_keys() -> None:
+    """寫 assessment 的人看不到 index，只能猜引用字串——這是歸零的真正源頭。"""
+
+    from decision_lab.sizing import describe_axis_references
+
+    index = {
+        "yfinance.info": {"authorities": ["engine_c_financial"]},
+        "LITE 10-Q Note 17": {"authorities": ["engine_c_customer", "engine_c_manual"]},
+        "co:lumentum": {"authorities": ["graph_entity"]},
+    }
+
+    options = describe_axis_references(index)
+
+    assert [row["reference"] for row in options["commercial_maturity"]] == [
+        "LITE 10-Q Note 17"
+    ]
+    assert [row["reference"] for row in options["technical_causal_link"]] == [
+        "co:lumentum"
+    ]
+    # 該軸完全沒有合格來源時要回空，讓呼叫端能說「改引用救不了」。
+    assert options["valuation_payoff"] == ()
+
+
+def test_diagnose_reports_why_each_ref_was_rejected() -> None:
+    """診斷必須分辨『解析不到』與『解析到了但 authority 不對』——兩者的修法不同。"""
+
+    from decision_lab.sizing import diagnose_assessment_references
+
+    index = {
+        "LITE 10-Q Note 17": {"authorities": ["engine_c_customer"]},
+        "lumentum_els_order": {"authorities": ["graph_source_assertion"]},
+    }
+    assessment = {
+        axis: {
+            "level": "bounded_hypothesis",
+            "evidence_refs": [],
+            "reason": "x",
+            "missing_data": [],
+        }
+        for axis in AXES
+    }
+    assessment["commercial_maturity"]["evidence_refs"] = [
+        "LITE 10-Q, filed 2026-05-06",  # 同一份文件的另一種寫法 → 解析不到
+        "lumentum_els_order",           # 解析得到，但 authority 不被這一軸接受
+    ]
+
+    report = diagnose_assessment_references(assessment, index)["commercial_maturity"]
+
+    assert report["would_zero_out"] is True
+    assert report["accepted_refs"] == ()
+    reasons = {row["reference"]: row["why"] for row in report["rejected_refs"]}
+    assert reasons["LITE 10-Q, filed 2026-05-06"] == "unresolved"
+    assert reasons["lumentum_els_order"] == "authority_mismatch"
+
+
+def test_diagnose_marks_axis_safe_when_one_ref_qualifies() -> None:
+    """判準是『至少一個合格』，多附脈絡引用不得讓整軸歸零。"""
+
+    from decision_lab.sizing import diagnose_assessment_references
+
+    index = {
+        "LITE 10-Q Note 17": {"authorities": ["engine_c_customer"]},
+        "lumentum_els_order": {"authorities": ["graph_source_assertion"]},
+    }
+    assessment = {
+        axis: {
+            "level": "bounded_hypothesis",
+            "evidence_refs": [],
+            "reason": "x",
+            "missing_data": [],
+        }
+        for axis in AXES
+    }
+    assessment["commercial_maturity"]["evidence_refs"] = [
+        "LITE 10-Q Note 17",
+        "lumentum_els_order",
+    ]
+
+    report = diagnose_assessment_references(assessment, index)["commercial_maturity"]
+
+    assert report["would_zero_out"] is False
+    assert report["accepted_refs"] == ("LITE 10-Q Note 17",)

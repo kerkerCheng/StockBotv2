@@ -98,6 +98,82 @@ def _resolve_reference(
     return None
 
 
+def describe_axis_references(
+    reference_index: Mapping[str, Any],
+) -> dict[str, tuple[dict[str, Any], ...]]:
+    """每個軸有哪些引用真的支撐得了它——寫 assessment 前該先看的東西。
+
+    2026-08-14 實測：LITE 的 `commercial_maturity` 與 `financial_resilience` 雙雙
+    歸零，而 index 裡明明有合格的 key。引用寫的是**同一份 10-Q、同一個 SEC
+    accession**，字面卻和 index 的 key 差了一段描述（一邊寫 `filed 2026-05-06`、
+    一邊寫 `Note 17, …, https://…`），分歧在字串中段，三種解析都不命中。
+
+    根源不是 gate 太嚴，是寫 assessment 的人看不到 index 有哪些 key 可用、只能猜。
+    攤開可用 key 讓身分在源頭就確定，比事後放寬比對安全：解析規則不動，也就沒有
+    「引用去尋找能通過的權威」的空間（L15）。
+    """
+
+    options: dict[str, tuple[dict[str, Any], ...]] = {}
+    for axis, wanted in AXIS_REFERENCE_AUTHORITIES.items():
+        rows: list[dict[str, Any]] = []
+        for key, entry in reference_index.items():
+            authorities = tuple(sorted(set((entry or {}).get("authorities") or ())))
+            if set(authorities) & wanted:
+                rows.append({"reference": key, "authorities": authorities})
+        options[axis] = tuple(sorted(rows, key=lambda row: row["reference"]))
+    return options
+
+
+def diagnose_assessment_references(
+    assessment: Mapping[str, Any],
+    reference_index: Mapping[str, Any],
+) -> dict[str, dict[str, Any]]:
+    """逐軸說明每個 evidence_ref 被判成什麼，以及該軸會不會因此歸零。
+
+    刻意只回報、不修改：解析與權限規則仍然只有 `_validate_assessment` 一份，
+    這裡重用同一支 `_resolve_reference`，避免診斷和實際判準各講一套。
+    """
+
+    report: dict[str, dict[str, Any]] = {}
+    for axis in AXES:
+        raw = assessment.get(axis)
+        if not isinstance(raw, Mapping):
+            continue
+        wanted = AXIS_REFERENCE_AUTHORITIES[axis]
+        accepted: list[str] = []
+        context_only: list[dict[str, Any]] = []
+        for reference in raw.get("evidence_refs") or []:
+            if not isinstance(reference, str) or not reference.strip():
+                continue
+            reference = reference.strip()
+            resolved = _resolve_reference(reference, reference_index)
+            if resolved is None:
+                context_only.append({"reference": reference, "why": "unresolved"})
+                continue
+            key, how = resolved
+            entry = reference_index.get(key)
+            authorities = tuple(sorted(set((entry or {}).get("authorities") or ())))
+            if set(authorities) & wanted:
+                accepted.append(reference)
+            else:
+                context_only.append({
+                    "reference": reference,
+                    "why": "authority_mismatch",
+                    "resolved_to": key,
+                    "resolved_how": how,
+                    "authorities": authorities,
+                })
+        report[axis] = {
+            "declared_level": raw.get("level"),
+            "accepted_refs": tuple(accepted),
+            "rejected_refs": tuple(context_only),
+            "accepts_authorities": tuple(sorted(wanted)),
+            # 這一軸會不會被改寫成 unknown → ceiling 0。
+            "would_zero_out": not accepted and raw.get("level") != "unknown",
+        }
+    return report
+
+
 def _validate_assessment(
     assessment: Mapping[str, Any],
     ceilings: Mapping[str, float],
