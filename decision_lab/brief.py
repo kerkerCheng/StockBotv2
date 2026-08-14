@@ -782,13 +782,25 @@ def render_today_markdown(brief: Mapping[str, Any]) -> str:
         decisions = int(counters.get("decisions") or 0)
         measured = int(counters.get("measured_outcomes") or 0)
         outcomes = int(counters.get("outcomes") or 0)
+        version = counters.get("calculator_version")
+        current_total = int(counters.get("decisions_current_calculator") or 0)
+        current_live = int(counters.get("live_range_nonzero_current") or 0)
         line = (
             f"- 資本表達：非零 live 區間 {live}/{decisions} 筆"
             f"｜已量測 outcome {measured}/{outcomes} 筆"
         )
-        # 只在「仍為 0」時加警語——它要刺眼到不會被略過，但不該每天喊。
-        if live == 0 and decisions:
+        # 「機制從未產出」與「gate 改過但還沒有新 decision」是兩件事，不共用同一個 0。
+        # 既有 decision 依 point-in-time 契約永不回寫，所以分母只在新 decision 產生時才長；
+        # 少了這一句，讀到 0/N 的人（或 agent）會把它誤讀成「修法無效」。
+        if version and current_total == 0 and decisions:
+            line += (
+                f"　⚠ 計價骨架已更新為 {markdown_text(version)}，"
+                "尚無新 decision——下次 reassess 才會反映，此數字現在不代表修法有效或無效"
+            )
+        elif live == 0 and decisions:
             line += "　⚠ 系統至今從未輸出過可入場區間"
+        elif current_total:
+            line += f"（現行 {markdown_text(version)} 骨架：{current_live}/{current_total}）"
         if measured == 0 and outcomes:
             line += "　⚠ 判斷準不準仍無法用證據回答"
         lines.append(line)

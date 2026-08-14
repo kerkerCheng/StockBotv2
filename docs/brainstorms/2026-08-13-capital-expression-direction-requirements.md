@@ -434,8 +434,18 @@ message），則本節推測作廢，該尺度是刻意的。
 
    ⚠ **計數器讀的是既有 frozen decision，依 point-in-time 契約不回寫**，所以
    `live_range_nonzero` 會維持 0 直到**新的** decision 產生。這是刻意的：它量的是
-   「系統實際輸出過什麼」，不是「如果重算會是什麼」。重算結果請跑
-   §4 第 3 項的驗證腳本。
+   「系統實際輸出過什麼」，不是「如果重算會是什麼」。
+
+   **2026-08-14 這個 caveat 立刻造成一次假陰性，已修：** 一個 daily session 讀到
+   「0/73」後推論「gate 還是壞的，做完那三件事若仍是 0 就停下來重新診斷」。它的紀律
+   是對的（正是 L14 第 1 條），但那個 0 不會動——**不是因為修法無效，是因為既有
+   decision 永不回寫**。計數器把「機制從未產出」與「gate 改過但尚無新 decision」壓在
+   同一個 0 上——**我自己犯的 L12**。
+   已拆開：`calculator_version` bump 到 `probe-limit-v3`，計數器另回
+   `decisions_current_calculator` 與 `live_range_nonzero_current`，brief 在現行骨架
+   尚無 decision 時明說「此數字現在不代表修法有效或無效」。
+   同時修掉一個真的契約違反：**今天改了 sizing 語意卻沒 bump `calculator_version`**，
+   等於讓同一個版本標籤底下有兩套規則。
 
 2. **audit 檢驗時比 §2 的表，不比感覺。** 「有沒有往想要的方向走」＝ 這些數字有沒有動。
    若一輪工作後 §2.1 沒有任何一列改變，那一輪就是**沒改到 binding constraint**，

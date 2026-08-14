@@ -3,11 +3,14 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 import sqlite3
-from datetime import datetime, timezone
+from datetime import date, datetime, time, timezone
 from typing import Any, Mapping
 
 from decision_lab.redaction import sensitive_payload_path
+
+_DATE_ONLY = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
 
 def _canonical(value: Mapping[str, Any]) -> str:
@@ -24,11 +27,29 @@ def _is_sqlite(conn: Any) -> bool:
     return isinstance(conn, sqlite3.Connection)
 
 
-def _utc_timestamp(value: str) -> str:
+def normalize_as_of(value: str) -> str:
+    """把 as_of 正規化成 UTC ISO-8601；這是 as_of 形式的唯一權威。
+
+    刻意分開兩種輸入：純日期（財報／財季結束日就是這樣揭露的，日內時刻沒有意義）
+    補該日 UTC 午夜；帶時刻但沒有時區的字串仍然拒絕——那是「寫了時刻卻沒說哪個
+    時區」，替它猜一個等於製造無聲的偏移。
+
+    提案層必須 import 本函式而不是自己複製規則：2026-08-14 的 LITE 客戶集中度
+    提案就是因為兩端各有一套 as_of 契約，提案建立成功、進池取得編號、使用者核准
+    完成，卻在最後一刻寫入 ledger 時才失敗。
+    """
+
+    text = str(value).strip()
+    if _DATE_ONLY.match(text):
+        return datetime.combine(
+            date.fromisoformat(text), time.min, tzinfo=timezone.utc
+        ).isoformat()
     try:
-        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        parsed = datetime.fromisoformat(text.replace("Z", "+00:00"))
     except (AttributeError, ValueError) as exc:
-        raise ValueError("manual observation as_of must be an ISO-8601 timestamp") from exc
+        raise ValueError(
+            "manual observation as_of must be an ISO-8601 date or timestamp"
+        ) from exc
     if parsed.tzinfo is None:
         raise ValueError("manual observation as_of must include timezone")
     return parsed.astimezone(timezone.utc).isoformat()
@@ -84,7 +105,7 @@ def append_manual_observation(
         "ticker", "field_name", "value", "source_ref", "as_of", "author"
     )):
         raise ValueError("manual observation requires value, provenance, as_of, and author")
-    fields["as_of"] = _utc_timestamp(str(fields["as_of"]))
+    fields["as_of"] = normalize_as_of(str(fields["as_of"]))
     sensitive = sensitive_payload_path(fields, "manual_observation")
     if sensitive is not None:
         raise ValueError(f"secret-bearing manual observation rejected at {sensitive}")

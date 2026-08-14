@@ -15,6 +15,7 @@ from decision_lab.outcomes import (
 from tests.test_decision_execution import _bundle, _store
 from tests.test_probe_sizing import _assessment
 from decision_lab.execution import assess_probe, record_live_choice
+from thesis.investment_policy import load_policy
 
 
 class FixedMarket:
@@ -323,7 +324,10 @@ def test_outcome_freezes_system_vs_user_choice_and_calculator_trace(
         assert frozen["decision_attribution"]["system_paper_target"] == pytest.approx(0.0035)
         assert frozen["decision_attribution"]["user_live_weight"] == 0.0
         assert frozen["decision_attribution"]["user_choice_type"] == "skipped"
-        assert frozen["calculator_version"] == "probe-limit-v2"
+        # 讀 policy 而非寫死版本字串：這裡要守的是「凍結值等於當時 policy 說的值」，
+        # 不是某個特定版本號。寫死會讓每次 calculator 語意變更都被迫改測試，
+        # 而那正是 2026-08-14 差點漏掉的事（改了 sizing 語意卻沒 bump 版本）。
+        assert frozen["calculator_version"] == load_policy()["probe_lane"]["calculator_version"]
         assert frozen["constraint_trace"]
     finally:
         store.close()

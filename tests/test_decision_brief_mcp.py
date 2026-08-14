@@ -31,6 +31,9 @@ class _FakeStore:
             "live_range_nonzero": 0,
             "outcomes": 0,
             "measured_outcomes": 0,
+            "calculator_version": None,
+            "decisions_current_calculator": 0,
+            "live_range_nonzero_current": 0,
         }
 
     def close(self):

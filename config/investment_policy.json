@@ -12,7 +12,7 @@
   "minimum_holding_days": 90,
   "probe_lane": {
     "rubric_version": "confidence-envelope-v1",
-    "calculator_version": "probe-limit-v2",
+    "calculator_version": "probe-limit-v3",
     "paper_nav": 100.0,
     "single_probe_nav_cap": 0.005,
     "probe_book_nav_cap": 0.02,

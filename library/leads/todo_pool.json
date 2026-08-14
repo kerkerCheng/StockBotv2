@@ -2045,17 +2045,18 @@
       "added_at": "2026-08-12T15:06:20.702884+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_023deab6fa06ad34b3f2d9e7069da0ff",
-      "dispatch_receipt": "research_packet:library/private/decision_lab/assessment_axt_2026-08-14.json;decision:pd_d214a6d7ccb93dbf2fcd620dad791cef",
+      "dispatch_receipt": "decision:pd_2d219a1037a187b60e151986680460cb",
       "dispatch_ref": "wo_25341729f295cd68a4b4a30369b964a2",
-      "dispatch_status": "awaiting_approval",
-      "dispatch_updated_at": "2026-08-13T22:54:46.200599+00:00",
+      "dispatch_status": "completed",
+      "dispatch_updated_at": "2026-08-14T07:08:34.071512+00:00",
       "dispatched_at": "2026-08-12T23:41:36.697251+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 130,
-      "reason": null,
+      "reason": "pq1 completed",
+      "receipt": "decision:pd_2d219a1037a187b60e151986680460cb",
       "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-14T07:08:34.071512+00:00",
       "source": "decision_lab",
       "title": "REVIEW — co:axt",
       "type": "decision_review"
@@ -2119,13 +2120,52 @@
       "added_at": "2026-08-13T22:55:28.250264+00:00",
       "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-03-28；來源=Lumentum Q3 FY2026 Form 10-Q, Note 17, SEC accession 000162828026030777, https:/",
       "n": 135,
-      "reason": null,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_1c18e5134343f9559742c8e6cf76c777;proposal:po_373d7edd4c46b121af95b8c6713e2c9b",
       "ref_id": "po_373d7edd4c46b121af95b8c6713e2c9b",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-14T07:07:22.368404+00:00",
       "source": "engine_c",
       "title": "Engine C 觀測：LITE / customer_concentration",
       "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-08-14T06:37:55.335929+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 136,
+      "reason": null,
+      "ref_id": "dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:meta",
+      "type": "decision_review",
+      "waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-08-14T06:37:55.335895+00:00",
+        "trigger": "執行面 context 缺失／市場資料問題",
+        "until": null
+      }
+    },
+    {
+      "added_at": "2026-08-14T06:37:55.335929+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 137,
+      "reason": null,
+      "ref_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:sivers_semiconductors",
+      "type": "decision_review",
+      "waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-08-14T06:37:55.335914+00:00",
+        "trigger": "執行面 context 缺失／市場資料問題",
+        "until": null
+      }
     }
   ],
   "log": [
@@ -4536,8 +4576,35 @@
       "ref_id": "dc_4d28e50810e46da7fd77ee042ee7bd1c",
       "type": "decision_review",
       "verb": "pq1_awaiting_approval"
+    },
+    {
+      "at": "2026-08-14T07:07:22.368404+00:00",
+      "n": 135,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_1c18e5134343f9559742c8e6cf76c777;proposal:po_373d7edd4c46b121af95b8c6713e2c9b",
+      "ref_id": "po_373d7edd4c46b121af95b8c6713e2c9b",
+      "type": "engine_c_observation",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-14T07:08:34.071512+00:00",
+      "n": 130,
+      "reason": null,
+      "receipt": "decision:pd_2d219a1037a187b60e151986680460cb",
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "type": "decision_review",
+      "verb": "pq1_completed"
+    },
+    {
+      "at": "2026-08-14T07:08:34.071512+00:00",
+      "n": 130,
+      "reason": "pq1 completed",
+      "receipt": "decision:pd_2d219a1037a187b60e151986680460cb",
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "type": "decision_review",
+      "verb": "go"
     }
   ],
-  "next_n": 136,
+  "next_n": 138,
   "schema_version": "1"
 }

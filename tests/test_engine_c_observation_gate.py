@@ -65,6 +65,37 @@ def test_unregistered_field_name_is_rejected_before_minting(pending_root) -> Non
     assert list(pending_observations.iter_pending()) == []
 
 
+def test_date_only_as_of_survives_the_whole_gate(pending_root, tmp_path, monkeypatch) -> None:
+    """事發（2026-08-14）：LITE 客戶集中度提案的 as_of 是財季結束日 `2026-03-28`。
+
+    提案層當時不驗 as_of、ledger 層要求帶時區，於是提案建得成、進得了池、拿得到
+    編號、使用者也核准了，卻在最後一刻寫入時炸掉——核准動作完全無法完成。驗收
+    條件因此是「ledger 裡真的多一列」，不是「propose 回傳成功」。
+    """
+
+    record = _propose(as_of="2026-03-28")
+    assert record["payload"]["as_of"] == "2026-03-28T00:00:00+00:00"
+
+    db_path = tmp_path / "engine_c.db"
+    monkeypatch.setattr("engine_c.db.get_conn", lambda *a, **k: _open(db_path))
+    pool = todo.empty_pool()
+    todo.sync(pool, todo._collect_engine_c_observation_rows())
+    todo.complete_engine_c_observation(pool, 1)
+
+    with _open(db_path) as check:
+        stored = check.execute("SELECT as_of FROM manual_observations").fetchall()
+    assert [row[0] for row in stored] == ["2026-03-28T00:00:00+00:00"]
+
+
+def test_as_of_without_timezone_is_rejected_before_minting(pending_root) -> None:
+    """帶時刻卻沒有時區的字串仍然要在發編號前就擋下，不能替它猜一個。"""
+
+    with pytest.raises(pending_observations.ProposalError, match="as_of"):
+        _propose(as_of="2026-03-28T09:30:00")
+
+    assert list(pending_observations.iter_pending()) == []
+
+
 def test_bare_go_cannot_write_the_ledger(pending_root) -> None:
     """核准動詞不能替代實際寫入——否則 pq2 會顯示已完成，ledger 卻是空的。"""
 

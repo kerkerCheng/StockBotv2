@@ -2973,6 +2973,222 @@
       "result": "ok",
       "run_at": "2026-08-13T22:33:32.688933+00:00",
       "source": "edgar:TSLA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-14T06:29:48.230844+00:00",
+      "source": "mfn:sivers-semiconductors"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-14T06:29:49.822557+00:00",
+      "source": "sivers:press"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-14T06:29:50.463770+00:00",
+      "source": "yahoo:iqe-l"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-08-14T06:29:51.668788+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-14T06:29:53.715349+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-14T06:29:54.279601+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-14T06:29:55.048499+00:00",
+      "source": "edgar:AVGO"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-14T06:29:55.784873+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-14T06:29:56.597032+00:00",
+      "source": "edgar:CCXI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-14T06:29:57.378447+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-14T06:29:58.366371+00:00",
+      "source": "edgar:GFS"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-14T06:29:59.151156+00:00",
+      "source": "edgar:JBL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-14T06:29:59.973482+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-14T06:30:00.725425+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-14T06:30:01.503121+00:00",
+      "source": "edgar:META"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-14T06:30:02.070433+00:00",
+      "source": "edgar:NVDA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-14T06:30:02.823959+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-14T06:30:03.406660+00:00",
+      "source": "edgar:TSLA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-14T06:32:27.208923+00:00",
+      "source": "mfn:sivers-semiconductors"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-14T06:32:27.941469+00:00",
+      "source": "sivers:press"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-14T06:32:28.652055+00:00",
+      "source": "yahoo:iqe-l"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-14T06:32:29.437027+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-14T06:32:31.329015+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-14T06:32:31.926102+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-14T06:32:32.688843+00:00",
+      "source": "edgar:AVGO"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-14T06:32:33.641924+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-14T06:32:34.403862+00:00",
+      "source": "edgar:CCXI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-14T06:32:35.029030+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-14T06:32:35.869267+00:00",
+      "source": "edgar:GFS"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-14T06:32:36.619061+00:00",
+      "source": "edgar:JBL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-14T06:32:37.375175+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-14T06:32:38.195800+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-14T06:32:38.771572+00:00",
+      "source": "edgar:META"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-14T06:32:39.362020+00:00",
+      "source": "edgar:NVDA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-14T06:32:40.176514+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-14T06:32:40.962138+00:00",
+      "source": "edgar:TSLA"
     }
   ],
   "leads": {
@@ -6753,7 +6969,7 @@
       "published_at": "2026-05-04",
       "refs": {},
       "source": "edgar:TSLA",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "robotics": {
           "counter_only": false,
@@ -6764,7 +6980,13 @@
         }
       },
       "title": "TSLA 4 filed 2026-05-04",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-14T06:35:58.953550+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "Form 4 内部人交易申報，无供应链 claim、无可抽取关系主张；冷启动 EDGAR seed 杂讯",
+        "tier": 4
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/1318605/000110465926055079/xslF345X06/tm2613330-1_4seq1.xml"
     },
     "lead_26ed9096f88f869e77178205b74682d7": {
@@ -6966,7 +7188,7 @@
       "published_at": "2026-04-23",
       "refs": {},
       "source": "edgar:TSLA",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "robotics": {
           "counter_only": false,
@@ -6977,7 +7199,13 @@
         }
       },
       "title": "TSLA 4 filed 2026-04-23",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-14T06:35:59.168570+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "Form 4 内部人交易申報，无供应链 claim、无可抽取关系主张；冷启动 EDGAR seed 杂讯",
+        "tier": 4
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/1318605/000110465926047678/xslF345X06/tm2612285-1_4seq1.xml"
     },
     "lead_299f984635431d6b8702ba9406cbf8e8": {
@@ -7409,7 +7637,7 @@
       "published_at": "2026-05-15",
       "refs": {},
       "source": "edgar:TSLA",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "robotics": {
           "counter_only": false,
@@ -7420,7 +7648,13 @@
         }
       },
       "title": "TSLA 4 filed 2026-05-15",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-14T06:35:59.380936+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "Form 4 内部人交易申報，无供应链 claim、无可抽取关系主张；冷启动 EDGAR seed 杂讯",
+        "tier": 4
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/1318605/000110465926062860/xslF345X06/tm2614845-1_4seq1.xml"
     },
     "lead_2cb82f4c0c7b93fbf18be123045d671e": {
@@ -7916,16 +8150,23 @@
         "trace_next_trigger": "NVIDIA、OpenAI 或 SoftBank 官方公告／filing 揭露 Ohio 專案的已簽融資擔保、租約或晶片採購條款",
         "trace_origin_entity": "NVIDIA",
         "trace_origin_linkage": "NVIDIA 官方頁只支持一般機制；Reuters／其他轉述皆同源於 WSJ 匿名消息",
+        "trace_requeue_consumed_entities": [
+          "CO:NVIDIA",
+          "NVDA"
+        ],
+        "trace_requeue_trigger": "related_triaged_lead:lead_45c16c3d1b589d5a3a64e100be09c1b2",
+        "trace_requeued_at": "2026-08-14T06:36:25.066817+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
           "NVDA",
           "co:nvidia"
         ],
+        "trace_trigger_event_ref": "lead:lead_45c16c3d1b589d5a3a64e100be09c1b2",
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -7937,14 +8178,31 @@
       },
       "title": "Nvidia in talks to backstop $250B worth of OpenAI DC financing. - Softbank’s SB energy develops 10 GW Ohio campus - OpenAI signs long term lease - $NVDA guarantees $250B in financing - OpenAI discussing separate agreement to buy up to $350B in Nvidia chips. Not quite sure if this circular financing is healthy long term, but given the massive size of AI infrastructure spending… Feels like capex beneficiaries will be extremely happy.",
       "triage": {
-        "decided_at": "2026-07-27T14:19:01.895098+00:00",
+        "decided_at": "2026-08-14T06:36:25.066817+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true
         },
-        "reason": "命中已追蹤 NVDA／OpenAI，含 250B 融資 backstop、10 GW Ohio campus 等可追源的具體公司與數字；原始連結尚待 pq1 核對，按新穎性寬鬆放行。",
+        "reason": "新 triage PASS lead lead_45c16c3d1b589d5a3a64e100be09c1b2 與 parked trace 共用具名標的 NVDA, co:nvidia（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
         "tier": 3
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-14T06:36:25.066817+00:00",
+          "superseded_reason": "新 triage PASS lead lead_45c16c3d1b589d5a3a64e100be09c1b2 與 parked trace 共用具名標的 NVDA, co:nvidia（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_45c16c3d1b589d5a3a64e100be09c1b2",
+          "triage": {
+            "decided_at": "2026-07-27T14:19:01.895098+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true
+            },
+            "reason": "命中已追蹤 NVDA／OpenAI，含 250B 融資 backstop、10 GW Ohio campus 等可追源的具體公司與數字；原始連結尚待 pq1 核對，按新穎性寬鬆放行。",
+            "tier": 3
+          }
+        }
+      ],
       "url": "https://x.com/aleabitoreddit/status/2081548360818004299"
     },
     "lead_2fb91876b881e2393f73b030a188ffa5": {
@@ -8511,7 +8769,7 @@
       "published_at": "2026-07-14",
       "refs": {},
       "source": "edgar:AVGO",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -8522,7 +8780,13 @@
         }
       },
       "title": "AVGO 4 filed 2026-07-14",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-14T06:36:01.380607+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "Form 4 内部人交易申報，无供应链 claim、无可抽取关系主张；冷启动 EDGAR seed 杂讯",
+        "tier": 4
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/1730168/000173016826000072/xslF345X06/wk-form4_1784075275.xml"
     },
     "lead_359c76e1b5ba4604a130d611f742085a": {
@@ -8880,7 +9144,7 @@
       "published_at": "2026-06-26",
       "refs": {},
       "source": "edgar:AVGO",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -8891,7 +9155,13 @@
         }
       },
       "title": "AVGO 4 filed 2026-06-26",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-14T06:36:01.624369+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "Form 4 内部人交易申報，无供应链 claim、无可抽取关系主张；冷启动 EDGAR seed 杂讯",
+        "tier": 4
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/1730168/000110465926078348/xslF345X06/tm2619044-1_4seq1.xml"
     },
     "lead_39a7564998ac959ad2c54d7815b905e7": {
@@ -9213,7 +9483,7 @@
       "published_at": "2026-08-12",
       "refs": {},
       "source": "edgar:NVDA",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -9224,7 +9494,13 @@
         }
       },
       "title": "NVDA 4 filed 2026-08-12",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-14T06:36:00.024368+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "Form 4 内部人交易申報，无供应链 claim、无可抽取关系主张；冷启动 EDGAR seed 杂讯",
+        "tier": 4
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/1045810/000131026426000008/xslF345X06/wk-form4_1786569187.xml"
     },
     "lead_3db17a26b013cc15fab10c297fbd02bc": {
@@ -10154,7 +10430,7 @@
       "published_at": "2026-07-21",
       "refs": {},
       "source": "edgar:JBL",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "robotics": {
           "counter_only": false,
@@ -10165,7 +10441,13 @@
         }
       },
       "title": "JBL 4 filed 2026-07-21",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-14T06:36:02.965924+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "Form 4 内部人交易申報，无供应链 claim、无可抽取关系主张；冷启动 EDGAR seed 杂讯",
+        "tier": 4
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/898293/000122520826006697/xslF345X06/doc4.xml"
     },
     "lead_44ce140c224422130eecf4bb9766219e": {
@@ -10500,7 +10782,7 @@
       "published_at": "2026-06-30",
       "refs": {},
       "source": "edgar:NVDA",
-      "status": "pending",
+      "status": "triaged_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -10511,7 +10793,16 @@
         }
       },
       "title": "NVDA 8-K filed 2026-06-30",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-14T06:36:25.066817+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "SEC 一手 filing 且属 AI／光通讯供应链追踪标的（NVDA／AVGO／JBL）；可逐字引用，但尚不知是否含供应链 claim，无加权 flag 排在优先度后段",
+        "related_trace_requeues": [
+          "lead_2f5aebfb7785c12a8fb2fe665f8a26ff"
+        ],
+        "tier": 1
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000056/nvda-20260624.htm"
     },
     "lead_46349b1959ac51a47111c54f5337062c": {
@@ -10611,7 +10902,7 @@
       "published_at": "2026-07-02",
       "refs": {},
       "source": "edgar:NVDA",
-      "status": "pending",
+      "status": "triaged_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -10622,7 +10913,13 @@
         }
       },
       "title": "NVDA 8-K filed 2026-07-02",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-14T06:36:25.281033+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "SEC 一手 filing 且属 AI／光通讯供应链追踪标的（NVDA／AVGO／JBL）；可逐字引用，但尚不知是否含供应链 claim，无加权 flag 排在优先度后段",
+        "tier": 1
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000060/nvda-20260628.htm"
     },
     "lead_476bd1f07c60e2995ad96640688707ee": {
@@ -12731,7 +13028,7 @@
       "published_at": "2026-08-07",
       "refs": {},
       "source": "edgar:NVDA",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -12742,7 +13039,13 @@
         }
       },
       "title": "NVDA 4 filed 2026-08-07",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-14T06:36:00.256448+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "Form 4 内部人交易申報，无供应链 claim、无可抽取关系主张；冷启动 EDGAR seed 杂讯",
+        "tier": 4
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/1045810/000119764726000007/xslF345X06/wk-form4_1786135642.xml"
     },
     "lead_5d739525279dfae394f8c8e213084633": {
@@ -13367,7 +13670,7 @@
       "published_at": "2026-07-08",
       "refs": {},
       "source": "edgar:JBL",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "robotics": {
           "counter_only": false,
@@ -13378,7 +13681,13 @@
         }
       },
       "title": "JBL 4 filed 2026-07-08",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-14T06:36:03.187242+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "Form 4 内部人交易申報，无供应链 claim、无可抽取关系主张；冷启动 EDGAR seed 杂讯",
+        "tier": 4
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/898293/000122520826006546/xslF345X06/doc4.xml"
     },
     "lead_62fb4326975492b9f826c63bb266571d": {
@@ -14440,7 +14749,7 @@
       "published_at": "2026-07-10",
       "refs": {},
       "source": "edgar:AVGO",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -14451,7 +14760,13 @@
         }
       },
       "title": "AVGO 4 filed 2026-07-10",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-14T06:36:01.842059+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "Form 4 内部人交易申報，无供应链 claim、无可抽取关系主张；冷启动 EDGAR seed 杂讯",
+        "tier": 4
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/1730168/000173016826000068/xslF345X06/wk-form4_1783723427.xml"
     },
     "lead_6cc7c974eab84a76ef68831129f474e3": {
@@ -15186,7 +15501,7 @@
       "published_at": "2026-06-29",
       "refs": {},
       "source": "edgar:NVDA",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -15197,7 +15512,13 @@
         }
       },
       "title": "NVDA 4 filed 2026-06-29",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-14T06:36:00.498976+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "Form 4 内部人交易申報，无供应链 claim、无可抽取关系主张；冷启动 EDGAR seed 杂讯",
+        "tier": 4
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/1045810/000119903926000009/xslF345X06/wk-form4_1782767219.xml"
     },
     "lead_74225cd7714e9466dcb4f602dc412919": {
@@ -15875,7 +16196,7 @@
       "published_at": "2026-06-29",
       "refs": {},
       "source": "edgar:NVDA",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -15886,7 +16207,13 @@
         }
       },
       "title": "NVDA 4 filed 2026-06-29",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-14T06:36:00.719914+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "Form 4 内部人交易申報，无供应链 claim、无可抽取关系主张；冷启动 EDGAR seed 杂讯",
+        "tier": 4
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/1045810/000172529226000004/xslF345X06/wk-form4_1782767179.xml"
     },
     "lead_7a35cedfdcf7226f4b045d3f83b84c9b": {
@@ -16997,7 +17324,7 @@
       "published_at": "2026-07-23",
       "refs": {},
       "source": "edgar:TSLA",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "robotics": {
           "counter_only": false,
@@ -17008,7 +17335,13 @@
         }
       },
       "title": "TSLA 10-Q filed 2026-07-23",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-14T06:36:24.425406+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "TSLA 一般 filing，与 CPO／InP／光通讯供应链 thesis 无关联；关联性是硬指标，不通过",
+        "tier": 4
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/1318605/000162828026049270/tsla-20260630.htm"
     },
     "lead_80d545d4322502fe47d4fe9cb5c5dd1c": {
@@ -18369,7 +18702,7 @@
       "published_at": "2026-07-10",
       "refs": {},
       "source": "edgar:AVGO",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -18380,7 +18713,13 @@
         }
       },
       "title": "AVGO 4 filed 2026-07-10",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-14T06:36:02.056924+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "Form 4 内部人交易申報，无供应链 claim、无可抽取关系主张；冷启动 EDGAR seed 杂讯",
+        "tier": 4
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/1730168/000173016826000066/xslF345X06/wk-form4_1783723055.xml"
     },
     "lead_8e16834b3c423735ad20eb6f6be7d63b": {
@@ -18989,7 +19328,7 @@
       "published_at": "2026-08-05",
       "refs": {},
       "source": "edgar:JBL",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "robotics": {
           "counter_only": false,
@@ -19000,7 +19339,13 @@
         }
       },
       "title": "JBL 4 filed 2026-08-05",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-14T06:36:03.403859+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "Form 4 内部人交易申報，无供应链 claim、无可抽取关系主张；冷启动 EDGAR seed 杂讯",
+        "tier": 4
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/898293/000122520826006945/xslF345X06/doc4.xml"
     },
     "lead_966dbb4d445ea90ff30a2086aab45a90": {
@@ -20237,7 +20582,7 @@
       "published_at": "2026-07-06",
       "refs": {},
       "source": "edgar:AVGO",
-      "status": "pending",
+      "status": "triaged_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -20248,7 +20593,13 @@
         }
       },
       "title": "AVGO 8-K filed 2026-07-06",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-14T06:36:25.497468+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "SEC 一手 filing 且属 AI／光通讯供应链追踪标的（NVDA／AVGO／JBL）；可逐字引用，但尚不知是否含供应链 claim，无加权 flag 排在优先度后段",
+        "tier": 1
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/1730168/000119312526295589/d84378d8k.htm"
     },
     "lead_a2c7358ac3d8e81ef853864b7d00073b": {
@@ -22656,7 +23007,7 @@
       "published_at": "2026-06-09",
       "refs": {},
       "source": "edgar:TSLA",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "robotics": {
           "counter_only": false,
@@ -22667,7 +23018,13 @@
         }
       },
       "title": "TSLA 4 filed 2026-06-09",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-14T06:35:59.594785+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "Form 4 内部人交易申報，无供应链 claim、无可抽取关系主张；冷启动 EDGAR seed 杂讯",
+        "tier": 4
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/1318605/000110465926071970/xslF345X06/tm2617365-1_4seq1.xml"
     },
     "lead_b4cc43c25317bda42306e4eb33851448": {
@@ -23042,6 +23399,62 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1051627/000143774926025061/axti20260609_8k.htm"
+    },
+    "lead_b8f9702c8ecfe86f412b0bee7f882128": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "LPK"
+        ]
+      },
+      "first_seen": "2026-08-14T06:29:51.648636+00:00",
+      "lead_id": "lead_b8f9702c8ecfe86f412b0bee7f882128",
+      "media": [
+        {
+          "cache": {
+            "bytes": 182340,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_b8f9702c8ecfe86f412b0bee7f882128/3_2088112557085413376.jpg",
+            "sha256": "8291bd6952e738b6a985f469f23c03b4ab5ecbde771512ba10c6d7fd80689407"
+          },
+          "height": 952,
+          "media_key": "3_2088112557085413376",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HPp3TrAb0AAHwbx.jpg",
+          "width": 1329
+        },
+        {
+          "cache": {
+            "bytes": 144627,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_b8f9702c8ecfe86f412b0bee7f882128/3_2088113111685545984.jpg",
+            "sha256": "45a1ce5998427b7f4d9a6efe5aba53d99ef1cbf9e3c5ebc4adb97c034a771724"
+          },
+          "height": 979,
+          "media_key": "3_2088113111685545984",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HPp3z9DaQAAIWfb.jpg",
+          "width": 1558
+        }
+      ],
+      "published_at": "2026-08-14T04:06:28.000Z",
+      "raw_text": "Feels like glass substrate timelines got pushed back at least another quarter.\n\n- \"Samsung Electro-Mechanics Delays Semiconductor Glass Substrate Investment\" due to a bottleneck in customer reliability evaluations of prototypes.\n\nAt its recent second-quarter earnings presentation, less than a month later, the company revised the start of operations to 2028.\n\n- \"SKC Reportedly Pushes Glass Substrate Mass Production to 2027, Targets Final Validation by Year-end\" (Trendforce), earlier last month. \n\nTLDR: \n- SKC Absolics H2 2026 -> H1 2027\n- Samsung H2 2027 -> H1 2028\n\nNot everything is always good news with timeline shifts, but glass core substrate shifts do feel imminent.\n\nVolume ramp for some players eg. $LPK / Philoptics (161580) / E&R (8027) likely track these  mass production timelines.",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "Feels like glass substrate timelines got pushed back at least another quarter. - \"Samsung Electro-Mechanics Delays Semiconductor Glass Substrate Investment\" due to a bottleneck in customer reliability evaluations of prototypes. At its recent second-quarter earnings presentation, less than a month later, the company revised the start of operations to 2028. - \"SKC Reportedly Pushes Glass Substrate Mass Production to 2027, Targets Final Validation by Year-end\" (Trendforce), earlier last month. TLDR: - SKC Absolics H2 2026 -> H1 2027 - Samsung H2 2027 -> H1 2028 Not everything is always good news with timeline shifts, but glass core substrate shifts do feel imminent. Volume ramp for some players eg. $LPK / Philoptics (161580) / E&R (8027) likely track these mass production timelines.",
+      "triage": {
+        "decided_at": "2026-08-14T06:35:27.516712+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "contradiction": true,
+          "novelty": true
+        },
+        "reason": "玻璃基板量產時程集體遞延：Samsung Electro-Mechanics H2-2027→H1-2028、SKC Absolics H2-2026→H1-2027，卡在客戶樣品可靠度驗證；對先進封裝時程假設是反證訊號，需追回法說會與 Trendforce 原文",
+        "tier": 3
+      },
+      "url": "https://x.com/aleabitoreddit/status/2088115008827715971"
     },
     "lead_b92a4885b62b1c782ea0ceae85125983": {
       "entities": {
@@ -23499,7 +23912,7 @@
       "published_at": "2026-07-06",
       "refs": {},
       "source": "edgar:NVDA",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -23510,7 +23923,13 @@
         }
       },
       "title": "NVDA 4 filed 2026-07-06",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-14T06:36:00.933228+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "Form 4 内部人交易申報，无供应链 claim、无可抽取关系主张；冷启动 EDGAR seed 杂讯",
+        "tier": 4
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/1045810/000119764726000005/xslF345X06/wk-form4_1783371701.xml"
     },
     "lead_bda14e2251939500ac89e6a7d487cc25": {
@@ -23527,7 +23946,7 @@
       "published_at": "2026-06-29",
       "refs": {},
       "source": "edgar:AVGO",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -23538,7 +23957,13 @@
         }
       },
       "title": "AVGO 4 filed 2026-06-29",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-14T06:36:02.274313+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "Form 4 内部人交易申報，无供应链 claim、无可抽取关系主张；冷启动 EDGAR seed 杂讯",
+        "tier": 4
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/1730168/000173016826000064/xslF345X06/wk-form4_1782775021.xml"
     },
     "lead_bdd03e8e9f98242b0023cb2a3a7eff0c": {
@@ -23816,7 +24241,7 @@
       "published_at": "2026-07-01",
       "refs": {},
       "source": "edgar:AVGO",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -23827,7 +24252,13 @@
         }
       },
       "title": "AVGO 4 filed 2026-07-01",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-14T06:36:02.503459+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "Form 4 内部人交易申報，无供应链 claim、无可抽取关系主张；冷启动 EDGAR seed 杂讯",
+        "tier": 4
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/1730168/000135956126000004/xslF345X06/wk-form4_1782940899.xml"
     },
     "lead_c27e417db9b04ea06a227bedfb773c88": {
@@ -24085,7 +24516,7 @@
       "published_at": "2026-06-30",
       "refs": {},
       "source": "edgar:JBL",
-      "status": "pending",
+      "status": "triaged_go",
       "themes": {
         "robotics": {
           "counter_only": false,
@@ -24096,7 +24527,13 @@
         }
       },
       "title": "JBL 10-Q filed 2026-06-30",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-14T06:36:25.976526+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "SEC 一手 filing 且属 AI／光通讯供应链追踪标的（NVDA／AVGO／JBL）；可逐字引用，但尚不知是否含供应链 claim，无加权 flag 排在优先度后段",
+        "tier": 1
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/898293/000162828026046138/jbl-20260531.htm"
     },
     "lead_c51e7f15f13fcaaa3f781e8cdf9ea9f4": {
@@ -24947,7 +25384,7 @@
       "raw_text": "My main takeaway was that your merchant CW laser suppliers seem to be EXTREMELY IMPORTANT now. \n\nBut TLDR of $COHR earnings:\n\n\"given the demand that we see in our DC business with transceivers, I don’t see any time in the near future where we would be selling indium phosphide lasers externally\"\n\n- Ton more value placed on companies that sell InP lasers externally if $AAOI can't doesn't enough capacity for first gen-CPO deployments, $COHR not selling externally...  \n\nI guess that's why $MTSI said a ton of customers are approaching them with urgency for InP CW DFB lasers (and they dont even have meaningful capacity coming online until EOY 2027)\n\n$AAOI -> Internal\n$COHR -> Internal\nBuyers -> fewer places to look for capacity. \n\n \"Our backlog now extends out, fiscal 2027 is basically completely booked out. We are booked really through the end of calendar 2027\" [ Massive massive demand visibility]\n\n- Coherent also mentioned LTAs spanning end of decade. So this kinda reinforces what $POET CEO said at their AGM that the \"big 3\" are fully sold out next 2 years.\n\n\"we’re not constrained in the assembly and test capacity right now. We’re really just constrained by the ramp of the indium phosphide production\"\n\n- Just for the bottleneck bros in terms of assembly/test not a bottleneck. \n\n\"absolutely no push-out of CPO demand. In fact, it has been the opposite. We have seen demand increase and request from customers’ demand getting pulled in\"\n\n\"we continue to expect revenue from CPO for scale-up applications to start to flow in the second half of calendar 2027\" \n\n- Big read through on other CPO players for scale up if $LITE, $COHR reaffirm revenue from CPO scale up coming h2027. \n\n- \"quarterly revenue exceeding $3 billion by the end of fiscal 2027\" \n\n- $COHR revenue go brrr\n\nSo for regular numbers it's:\n\n- $2.046B revenue (+13.3% Q/Q, +33.8% Y/Y), main revenue ramp looks to be happening entering Q4 into 2027\n- Non-GAAP gross margins: 40.2%\n\nNext quarter guide is:\n- Revenue: $2.2–$2.4B revenue\n- Non-GAAP gross margins: 39.5-41.5%\n\nBasically:\n$1.69B -> $1.81B -> $2.05B -> ~$2.30B -> $3.0B (end of FY 2027) \n~39% -> 39.6% -> 40.2% -> ~40.5% (gross margins)\n\nFor operating margins:\n18.0% -> 19.5% -> 19.9% -> 20.3% -> 21.8%\n\nLittle less impressed compared to $LITE margin growth in terms of profitability, but revenue scale for $COHR growing rapidly.",
       "refs": {},
       "source": "x:aleabitoreddit",
-      "status": "pending",
+      "status": "triaged_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -24961,7 +25398,17 @@
         }
       },
       "title": "My main takeaway was that your merchant CW laser suppliers seem to be EXTREMELY IMPORTANT now. But TLDR of $COHR earnings: \"given the demand that we see in our DC business with transceivers, I don’t see any time in the near future where we would be selling indium phosphide lasers externally\" - Ton more value placed on companies that sell InP lasers externally if $AAOI can't doesn't enough capacity for first gen-CPO deployments, $COHR not selling externally... I guess that's why $MTSI said a ton of customers are approaching them with urgency for InP CW DFB lasers (and they dont even have meaningful capacity coming online until EOY 2027) $AAOI -> Internal $COHR -> Internal Buyers -> fewer places to look for capacity. \"Our backlog now extends out, fiscal 2027 is basically completely booked out. We are booked really through the end of calendar 2027\" [ Massive massive demand visibility] - Coherent also mentioned LTAs spanning end of decade. So this kinda reinforces what $POET CEO said at their AGM that the \"big 3\" are fully sold out next 2 years. \"we’re not constrained in the assembly and test capacity right now. We’re really just constrained by the ramp of the indium phosphide production\" - Just for the bottleneck bros in terms of assembly/test not a bottleneck. \"absolutely no push-out of CPO demand. In fact, it has been the opposite. We have seen demand increase and request from customers’ demand getting pulled in\" \"we continue to expect revenue from CPO for scale-up applications to start to flow in the second half of calendar 2027\" - Big read through on other CPO players for scale up if $LITE, $COHR reaffirm revenue from CPO scale up coming h2027. - \"quarterly revenue exceeding $3 billion by the end of fiscal 2027\" - $COHR revenue go brrr So for regular numbers it's: - $2.046B revenue (+13.3% Q/Q, +33.8% Y/Y), main revenue ramp looks to be happening entering Q4 into 2027 - Non-GAAP gross margins: 40.2% Next quarter guide is: - Revenue: $2.2–$2.4B revenue - Non-GAAP gross margins: 39.5-41.5% Basically: $1.69B -> $1.81B -> $2.05B -> ~$2.30B -> $3.0B (end of FY 2027) ~39% -> 39.6% -> 40.2% -> ~40.5% (gross margins) For operating margins: 18.0% -> 19.5% -> 19.9% -> 20.3% -> 21.8% Little less impressed compared to $LITE margin growth in terms of profitability, but revenue scale for $COHR growing rapidly.",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-14T06:35:17.293239+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "contradiction": true,
+          "independent_source": true,
+          "novelty": true
+        },
+        "reason": "COHR 法說會逐字 quote：InP 雷射不外售、backlog 訂滿至 2027 底、CPO 需求 pull-in、瓶頸在 InP 產能非組裝測試；直擊外購 CW 雷射供應商稀缺性（MTSI/AAOI/POET）核心 thesis，需追回法說會一手逐字稿",
+        "tier": 3
+      },
       "url": "https://x.com/aleabitoreddit/status/2087675367595380783"
     },
     "lead_cacb967c193853afdf372069a7b2e9f9": {
@@ -27485,7 +27932,7 @@
       "published_at": "2026-06-17",
       "refs": {},
       "source": "edgar:TSLA",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "robotics": {
           "counter_only": false,
@@ -27496,7 +27943,13 @@
         }
       },
       "title": "TSLA 4 filed 2026-06-17",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-14T06:35:59.807214+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "Form 4 内部人交易申報，无供应链 claim、无可抽取关系主张；冷启动 EDGAR seed 杂讯",
+        "tier": 4
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/1318605/000110465926075213/xslF345X06/tm2618092-2_4seq1.xml"
     },
     "lead_dfb87221b5c2e6ddfc1c91ec3304a051": {
@@ -27664,7 +28117,7 @@
       "published_at": "2026-07-22",
       "refs": {},
       "source": "edgar:TSLA",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "robotics": {
           "counter_only": false,
@@ -27675,7 +28128,13 @@
         }
       },
       "title": "TSLA 8-K filed 2026-07-22",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-14T06:36:24.640208+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "TSLA 一般 filing，与 CPO／InP／光通讯供应链 thesis 无关联；关联性是硬指标，不通过",
+        "tier": 4
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/1318605/000162828026049213/tsla-20260722.htm"
     },
     "lead_e0e737fc24bb3ae8e114a32c5ff423ce": {
@@ -28410,7 +28869,7 @@
       "published_at": "2026-07-02",
       "refs": {},
       "source": "edgar:TSLA",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "robotics": {
           "counter_only": false,
@@ -28421,7 +28880,13 @@
         }
       },
       "title": "TSLA 8-K filed 2026-07-02",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-14T06:36:24.852591+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "TSLA 一般 filing，与 CPO／InP／光通讯供应链 thesis 无关联；关联性是硬指标，不通过",
+        "tier": 4
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/1318605/000162828026046717/tsla-20260702.htm"
     },
     "lead_e6ac612b5b13830ecda4555936d789f8": {
@@ -29145,7 +29610,7 @@
       "published_at": "2026-05-04",
       "refs": {},
       "source": "edgar:JBL",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "robotics": {
           "counter_only": false,
@@ -29156,7 +29621,13 @@
         }
       },
       "title": "JBL 4 filed 2026-05-04",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-14T06:36:03.633167+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "Form 4 内部人交易申報，无供应链 claim、无可抽取关系主张；冷启动 EDGAR seed 杂讯",
+        "tier": 4
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/898293/000122520826004910/xslF345X06/doc4.xml"
     },
     "lead_ecaab49dd6acfe4163a0128d2f522cb8": {
@@ -29209,7 +29680,7 @@
       "published_at": "2026-07-17",
       "refs": {},
       "source": "edgar:JBL",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "robotics": {
           "counter_only": false,
@@ -29220,7 +29691,13 @@
         }
       },
       "title": "JBL 4 filed 2026-07-17",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-14T06:36:03.882164+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "Form 4 内部人交易申報，无供应链 claim、无可抽取关系主张；冷启动 EDGAR seed 杂讯",
+        "tier": 4
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/898293/000122520826006639/xslF345X06/doc4.xml"
     },
     "lead_ed08de0f389beecc9f7566fba4fcf0b7": {
@@ -29441,7 +29918,7 @@
       "published_at": "2026-07-14",
       "refs": {},
       "source": "edgar:AVGO",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -29452,7 +29929,13 @@
         }
       },
       "title": "AVGO 4 filed 2026-07-14",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-14T06:36:02.746554+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "Form 4 内部人交易申報，无供应链 claim、无可抽取关系主张；冷启动 EDGAR seed 杂讯",
+        "tier": 4
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/1730168/000173016826000070/xslF345X06/wk-form4_1784075021.xml"
     },
     "lead_efb79fe6c3a2151204346c0f55d9f033": {
@@ -29637,7 +30120,7 @@
       "published_at": "2026-04-29",
       "refs": {},
       "source": "edgar:JBL",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "robotics": {
           "counter_only": false,
@@ -29648,7 +30131,13 @@
         }
       },
       "title": "JBL 4 filed 2026-04-29",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-14T06:36:04.099269+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "Form 4 内部人交易申報，无供应链 claim、无可抽取关系主张；冷启动 EDGAR seed 杂讯",
+        "tier": 4
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/898293/000122520826004703/xslF345X06/doc4.xml"
     },
     "lead_f10510a87362e2f2d5a785c9d573e7ef": {
@@ -29866,7 +30355,7 @@
       "published_at": "2026-06-17",
       "refs": {},
       "source": "edgar:JBL",
-      "status": "pending",
+      "status": "triaged_go",
       "themes": {
         "robotics": {
           "counter_only": false,
@@ -29877,7 +30366,13 @@
         }
       },
       "title": "JBL 8-K filed 2026-06-17",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-14T06:36:25.730444+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "SEC 一手 filing 且属 AI／光通讯供应链追踪标的（NVDA／AVGO／JBL）；可逐字引用，但尚不知是否含供应链 claim，无加权 flag 排在优先度后段",
+        "tier": 1
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/898293/000162828026043719/jbl-20260617.htm"
     },
     "lead_f35d5676219a38f12f600e64ef76590e": {
@@ -30221,7 +30716,7 @@
       "published_at": "2026-06-29",
       "refs": {},
       "source": "edgar:NVDA",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -30232,7 +30727,13 @@
         }
       },
       "title": "NVDA 4 filed 2026-06-29",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-14T06:36:01.149439+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "Form 4 内部人交易申報，无供应链 claim、无可抽取关系主张；冷启动 EDGAR seed 杂讯",
+        "tier": 4
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/1045810/000119765226000007/xslF345X06/wk-form4_1782767137.xml"
     },
     "lead_f5f85aea8cfdf80892631a51e4c05f77": {
@@ -31259,8 +31760,8 @@
   "schema_version": "2",
   "source_state": {
     "x:aleabitoreddit": {
-      "since_id": "2087867722784805170",
-      "updated_at": "2026-08-13T22:33:21.031990+00:00",
+      "since_id": "2088115008827715971",
+      "updated_at": "2026-08-14T06:32:29.437012+00:00",
       "user_id": "1940360837547565056"
     }
   }

@@ -20,6 +20,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterator, Mapping
 
+from engine_c.manual_observations import normalize_as_of
 from engine_c.observation_fields import validate_field_name
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -95,6 +96,13 @@ def propose(
     missing = [key for key in _PAYLOAD_FIELDS if not payload[key]]
     if missing:
         raise ProposalError(f"提案缺少必填欄位：{missing}")
+    # as_of 用 ledger 那一端的同一支正規化，且必須在 digest 之前：提案是
+    # content-addressed 的凍結物件，若這裡放行一個 ledger 寫不進去的形式，
+    # 錯誤會遲到使用者核准之後才出現，而那時編號已經發出去了。
+    try:
+        payload["as_of"] = normalize_as_of(payload["as_of"])
+    except ValueError as exc:
+        raise ProposalError(f"提案 as_of 不合法：{exc}") from exc
     if supersedes_id is not None:
         payload["supersedes_id"] = str(supersedes_id).strip() or None
 

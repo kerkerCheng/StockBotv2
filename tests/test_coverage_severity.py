@@ -329,6 +329,9 @@ def test_daily_brief_carries_the_two_standing_counters(tmp_path: Path) -> None:
             "live_range_nonzero",
             "outcomes",
             "measured_outcomes",
+            "calculator_version",
+            "decisions_current_calculator",
+            "live_range_nonzero_current",
         }
 
         brief = build_today_brief(store, as_of=NOW)
@@ -338,11 +341,15 @@ def test_daily_brief_carries_the_two_standing_counters(tmp_path: Path) -> None:
         assert "資本表達" in render_today_markdown(brief)
 
         primed = dict(brief)
+        # (a) 骨架沒換過、確實從未產出 → 喊「從未輸出過」。
         primed["capital_expression"] = {
             "decisions": 73,
             "live_range_nonzero": 0,
             "outcomes": 8,
             "measured_outcomes": 0,
+            "calculator_version": "probe-limit-v3",
+            "decisions_current_calculator": 73,
+            "live_range_nonzero_current": 0,
         }
         text = render_today_markdown(primed)
         assert "非零 live 區間 0/73" in text
@@ -350,12 +357,34 @@ def test_daily_brief_carries_the_two_standing_counters(tmp_path: Path) -> None:
         assert "系統至今從未輸出過可入場區間" in text
         assert "判斷準不準仍無法用證據回答" in text
 
+        # (b) 骨架剛換、尚無新 decision → 必須明說這個 0 不代表修法無效。
+        # 2026-08-14 一個 daily session 正是讀到 0/73 後推論「gate 還是壞的」，
+        # 而既有 decision 依 point-in-time 契約永不回寫，那是假陰性。
+        primed["capital_expression"] = {
+            "decisions": 73,
+            "live_range_nonzero": 0,
+            "outcomes": 8,
+            "measured_outcomes": 0,
+            "calculator_version": "probe-limit-v3",
+            "decisions_current_calculator": 0,
+            "live_range_nonzero_current": 0,
+        }
+        # renderer 會 escape markdown（probe\-limit\-v3），比對前先去掉反斜線。
+        fresh = render_today_markdown(primed).replace("\\", "")
+        assert "probe-limit-v3" in fresh
+        assert "尚無新 decision" in fresh
+        assert "不代表修法有效或無效" in fresh
+        assert "系統至今從未輸出過可入場區間" not in fresh
+
         # 一旦有產出就不再喊——警語要刺眼到不被略過，但不該每天喊。
         primed["capital_expression"] = {
             "decisions": 73,
             "live_range_nonzero": 8,
             "outcomes": 8,
             "measured_outcomes": 7,
+            "calculator_version": "probe-limit-v3",
+            "decisions_current_calculator": 12,
+            "live_range_nonzero_current": 8,
         }
         quiet = render_today_markdown(primed)
         assert "⚠" not in quiet.split("資本表達")[1].split("\n")[0]

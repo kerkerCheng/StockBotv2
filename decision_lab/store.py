@@ -623,10 +623,27 @@ class DecisionStore:
           筆數。0 代表「系統的判斷準不準」永遠無法用證據回答。
         """
 
+        try:  # lazy import：避免 store 為了一個版本字串而依賴 policy 載入器
+            from thesis.investment_policy import load_policy
+
+            current_calculator = str(load_policy()["probe_lane"]["calculator_version"])
+        except Exception:  # noqa: BLE001 — 取不到版本只降級，不阻斷 brief
+            current_calculator = None
+
         decisions = 0
         live_nonzero = 0
-        for row in self._conn.execute("SELECT payload_json FROM system_decisions"):
+        current_decisions = 0
+        current_live_nonzero = 0
+        for row in self._conn.execute(
+            "SELECT payload_json, calculator_version FROM system_decisions"
+        ):
             decisions += 1
+            is_current = (
+                current_calculator is not None
+                and str(row["calculator_version"]) == current_calculator
+            )
+            if is_current:
+                current_decisions += 1
             try:
                 sizing = json.loads(row["payload_json"]).get("sizing") or {}
                 upper = (sizing.get("live_supported_range") or (0, 0))[1]
@@ -634,6 +651,8 @@ class DecisionStore:
                 continue
             if isinstance(upper, (int, float)) and not isinstance(upper, bool) and upper > 0:
                 live_nonzero += 1
+                if is_current:
+                    current_live_nonzero += 1
         outcomes = self._conn.execute(
             "SELECT COUNT(*) AS total,"
             " SUM(CASE WHEN absolute_return IS NOT NULL THEN 1 ELSE 0 END) AS measured"
@@ -644,6 +663,15 @@ class DecisionStore:
             "live_range_nonzero": live_nonzero,
             "outcomes": int(outcomes["total"] or 0),
             "measured_outcomes": int(outcomes["measured"] or 0),
+            # ⚠ 分母只有在**新 decision 產生**時才會長。2026-08-14 一個 daily session
+            # 讀到「0/73」後推論「gate 還是壞的，做完那三件事若仍是 0 就重新診斷」——
+            # 那會是假陰性：既有 decision 依 point-in-time 契約永不回寫，計數器本來
+            # 就不會因為修好 gate 而改變。這是我自己犯的 L12：把「機制從未產出」與
+            # 「修好後尚無新 decision」壓在同一個 0 上。
+            # 現在拆開：current_* 只算現行 calculator 骨架下的 decision。
+            "calculator_version": current_calculator,
+            "decisions_current_calculator": current_decisions,
+            "live_range_nonzero_current": current_live_nonzero,
         }
 
     def get_probe(self, cohort_id: str) -> ProbeRecord:
