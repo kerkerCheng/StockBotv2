@@ -1451,18 +1451,33 @@ class SourceCollection:
     healthy: frozenset[str]
 
 
+# 待辦來源的唯一登記表。`collect_all_with_health` 與測試都由它導出，
+# 因為手維護兩份清單的後果已經發生過：測試逐一 monkeypatch collector 名稱，
+# 新增第 5、6 個 collector 時沒人記得更新，於是那兩個未被 patch 的 collector
+# **讀到真實 private runtime 狀態**，測試從此隨 daily 產出漂移而恆紅
+# （2026-08-13 發現）。恆紅的測試會讓整套 suite 失去鑑別力——下次真的壞掉時
+# 是「2 failed」，沒人分得出差別（L13：成功與失敗在同一個訊號上同形）。
+#
+# 以「屬性名」而非函式物件登記，是為了讓 monkeypatch 能生效：collector 在
+# 呼叫當下才由模組 globals 解析。
+SOURCE_COLLECTORS: tuple[tuple[str, str], ...] = (
+    ("research_actions", "_collect_research_action_rows"),
+    ("source_trace", "_collect_source_trace_rows"),
+    ("lifecycle", "_collect_lifecycle_rows"),
+    ("engine_c_observations", "_collect_engine_c_observation_rows"),
+    ("thesis_mutations", "_collect_thesis_mutation_rows"),
+    ("decisions", "_collect_decision_rows"),
+)
+
+
 def collect_all_with_health(*, include_decisions: bool = True) -> SourceCollection:
     rows: list[dict[str, Any]] = []
     healthy: set[str] = set()
     sources: list[tuple[str, Any]] = [
-        ("research_actions", _collect_research_action_rows),
-        ("source_trace", _collect_source_trace_rows),
-        ("lifecycle", _collect_lifecycle_rows),
-        ("engine_c_observations", _collect_engine_c_observation_rows),
-        ("thesis_mutations", _collect_thesis_mutation_rows),
+        (name, globals()[attr])
+        for name, attr in SOURCE_COLLECTORS
+        if include_decisions or name != "decisions"
     ]
-    if include_decisions:
-        sources.append(("decisions", _collect_decision_rows))
     for name, collector in sources:
         try:
             collected = collector()

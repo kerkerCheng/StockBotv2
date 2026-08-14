@@ -413,9 +413,14 @@ def test_manual_items_are_never_auto_marked_by_any_source() -> None:
 def test_collect_all_with_health_reports_only_the_sources_that_ran(
     monkeypatch,
 ) -> None:
-    monkeypatch.setattr(todo, "_collect_research_action_rows", lambda: [])
-    monkeypatch.setattr(todo, "_collect_source_trace_rows", lambda: [])
-    monkeypatch.setattr(todo, "_collect_lifecycle_rows", lambda: [])
+    # 由登記表導出要 patch 的 collector，不逐一手寫名稱。
+    # 手寫的後果已經發生過：新增第 5、6 個 collector 時沒人記得更新這裡，
+    # 那兩個未被 patch 的 collector 讀到**真實 private runtime 狀態**，
+    # 於是本測試隨 daily 產出漂移而恆紅。恆紅＝整套 suite 失去鑑別力。
+    for name, attr in todo.SOURCE_COLLECTORS:
+        if name == "decisions":
+            continue
+        monkeypatch.setattr(todo, attr, lambda: [])
 
     def boom():
         raise RuntimeError("Neo4j unreachable")
@@ -424,9 +429,10 @@ def test_collect_all_with_health_reports_only_the_sources_that_ran(
 
     collected = todo.collect_all_with_health()
 
-    assert collected.rows == []
+    assert collected.rows == [], "所有 collector 都被 patch 成空，不得有真實資料漏進來"
     assert "decisions" not in collected.healthy
-    assert {"research_actions", "source_trace", "lifecycle"} <= collected.healthy
+    expected_healthy = {name for name, _ in todo.SOURCE_COLLECTORS} - {"decisions"}
+    assert collected.healthy == expected_healthy
 
 
 def test_dropped_ra_admission_is_not_rebuilt_by_sync() -> None:

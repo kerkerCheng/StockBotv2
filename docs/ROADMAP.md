@@ -29,6 +29,7 @@ brainstorm；範圍大到需要驗收條件才開 plan。brainstorm 用 frontmat
 
 | 完成日 | 項目 | 歷史 plan |
 |--------|------|-----------|
+| 2026-08-14 | **資本表達層 workstream（§4 六步完成 5 項）** — outcome 量測 0→7/7（AXTI +83.5%、超額 QQQ +76.4%）；blocker severity 移進 config ＋ lane 維度，live 非零 0→8、binding 由 `live_lane_blockers` 71/72 變成 `weakest_axis` 31；引用無歧義解析＋「至少一個合格」，`axis_ceiling==0` 23→17；催化劑排程使 AXT 複查日 2026-11-15→2026-10-30；daily brief 兩個常駐計數器上線 | [方向與 baseline](brainstorms/2026-08-13-capital-expression-direction-requirements.md) |
 | 2026-07-18 | **M1 CPO Depth Sprint** — AXT onboard；Coherent／Lumentum／NVIDIA／Broadcom 各 ≥3 distinct `origin_entity`；20 條 edge conflict 全數 resolve 並 project 進圖 | — |
 | 2026-07-19 | **第二條垂直切片／L9 前置 #1** — AMAT/LRCX mature-node Lane Memo（非 AI／非 CPO），評分 23/30，`_check_second_slice()` 通過（commit `a7abdf5`） | [005](plans/2026-07-08-005-feat-second-vertical-slice-plan.md) |
 | 2026-07-21 | **Action-Oriented Alpha Decision Lab v1** — Signal → Shadow → Coverage／Confidence → sizing → funded paper／Action Card → outcome 閉環 | [2026-07-21-001](plans/2026-07-21-001-feat-action-oriented-alpha-decision-lab-plan.md) |
@@ -80,7 +81,6 @@ brainstorm；範圍大到需要驗收條件才開 plan。brainstorm 用 frontmat
 | 項目 | 為什麼 | 驗收條件 | 前置 |
 |---|---|---|---|
 | **`AGENTS.md` L1–L14 整理** | 14 條含重複（L2／L3 近乎同義）、已完成的考古（L6 Gap 1–3 已修、L9 三前置已由 `thesis/preconditions.py` 機器強制，散文只是重複程式碼）、與已定案不會再翻的（L1 選型、L5 評估）。每條都在花掉**每一個** session 的 context | lessons 段落行數下降，且 L6 Gap 4／L8／L11／L12–L14 的區辨仍在。⚠ **不得刪掉任何仍會改變行為的判準**；L12／L13／L14 是三個不同時刻（表示層／驗收層／信任層），不合併 | §4 第 1 項 |
-| **`test_collect_all_with_health_reports_only_the_sources_that_ran` 依賴 private runtime 實際狀態** | 2026-08-13 發現（**先於本次改動即失敗**，clean tree 上同樣紅）。它斷言 `collected.rows == []`，但實際讀到真實的 Engine C 觀測（LITE customer concentration）。測試讀 private 真相＝結果隨 daily 產出漂移，紅燈與程式對錯無關 | 該測試改用 fixture／隔離 store；驗收＝在有 Engine C 觀測的機器上仍為綠 | 無 |
 | **Engine C `snapshot_date` 語意錯誤** | 2026-08-13 查證：該欄是「跑 ETL 的日期」不是行情交易日。收盤後跑的批次被標成隔天（`fetched_at` 07-28 22:34 取到 07-28 收盤 42.76，標成 `snapshot_date=07-29`），盤中跑的則存盤中價——一個欄位三種語意（L12）。任何拿它當 as-of 的消費者都系統性差一天，point-in-time 重建全部失準 | 分離成 `bar_date`（行情交易日）與 `fetched_at`（既有），並標記 intraday 與 close 兩種 `price_kind`；驗收＝拿現有 AXTI 序列重放，`bar_date` 與 provider 收盤日逐日對得上 | 無 |
 | **Engine D cohort 重複** | 同公司可能同時存在 claim-keyed 與 company-keyed 兩個 cohort（2026-07-30 [74]／[75] 實例） | 新建 cohort 時偵測同公司既有 cohort 並警告。**不回溯清理**——Decision Store append-only，不做破壞性去重 | 無 |
 | **6 個 `unavailable` Shadow 錨點回填** | 13 個 cohort 有 6 個 shadow 是 `unavailable`（含 2026-08-12 建立、明明有 `research_ticker` 的 LITE 與 NVDA）。錨點是**可重建**資料（L14／D17），今天仍查得到，卻被當 point-in-time 凍結 | 回填後 `scripts/outcome_if_settled_today.py` 的「已量測」從 7/13 上升 | 無 |
