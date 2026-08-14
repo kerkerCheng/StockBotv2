@@ -70,6 +70,34 @@ def _string_list(value: Any, field: str) -> tuple[str, ...]:
     return result
 
 
+def _resolve_reference(
+    reference: str, reference_index: Mapping[str, Any]
+) -> tuple[str, str] | None:
+    """把 evidence_ref 解析成 reference index 的 key；回傳 (key, 解析方式)。
+
+    2026-08-13：先前只做 exact 比對，於是 ``yfinance://history`` 對不上 index 裡的
+    ``yfinance://history/AAOI``——**一個少了 ticker 後綴的引用字串，讓整筆決策的資本
+    歸零**（實測 22 次，佔「做了研究卻有軸 unknown」的三分之二）。內容是對的，
+    來源真的存在，罰的卻是格式。正解是遇到就解析，不是打折。
+
+    只做**無歧義**解析，不猜：exact 命中優先；否則該 ref 必須恰好是 index 中
+    **唯一一個** key 的前綴。兩個以上候選就不解析——寧可報 mismatch，也不挑一個。
+
+    ⚠ 解析只認身分，不看 authority。挑 key 時若偏好「該軸接受的 authority」，
+    等於讓引用去尋找能通過的權威，那正是這道檢查要防的 authority laundering
+    （L8／L11）。因此順序固定為：先解析身分 → 再查 authority，兩者不得互相影響。
+    """
+    if reference in reference_index:
+        return reference, "exact"
+    trimmed = reference.rstrip("/")
+    if trimmed != reference and trimmed in reference_index:
+        return trimmed, "trailing_slash"
+    candidates = [key for key in reference_index if key.startswith(reference)]
+    if len(candidates) == 1:
+        return candidates[0], "unique_prefix"
+    return None
+
+
 def _validate_assessment(
     assessment: Mapping[str, Any],
     ceilings: Mapping[str, float],
@@ -94,26 +122,58 @@ def _validate_assessment(
         reason = raw["reason"]
         if not isinstance(reason, str) or not reason.strip():
             blockers.append(f"{axis}_reason_missing")
+        resolutions: dict[str, str] = {}
         if level == "unknown":
             blockers.append(f"{axis}_unknown")
         elif not refs:
             blockers.append(f"{axis}_evidence_missing")
-        elif any(
-            not isinstance(reference_index.get(reference), Mapping)
-            or not (
-                set(reference_index[reference].get("authorities") or ())
-                & AXIS_REFERENCE_AUTHORITIES[axis]
-            )
-            for reference in refs
-        ):
-            blockers.append(f"assessment_context_mismatch:{axis}")
+        else:
+            # 判準是「**至少有一個**引用落在該軸接受的 authority」，不是「每一個都要」。
+            # 先前是 any(失敗) → 整軸歸零，於是 META 的 technical_causal_link 有
+            # co:meta 與 meta_vistara_isca_2026 兩個合格引用，只因為多附了一個
+            # prod:vistara 就被打成 unknown；AXTI 的 financial_resilience 有合格的
+            # yfinance.info，卻因為多附兩份 8-K 脈絡而歸零。
+            # 那不是 authority laundering——laundering 是「**沒有**合格來源卻假裝有」，
+            # 而那個情況（零個合格引用）仍然歸零。多附的脈絡引用改列 context_only，
+            # 必須在輸出現形供人稽核，但不再有歸零的權力。
+            accepted: list[str] = []
+            context_only: list[str] = []
+            for reference in refs:
+                resolved = _resolve_reference(reference, reference_index)
+                if resolved is None:
+                    context_only.append(reference)
+                    continue
+                key, how = resolved
+                if how != "exact":
+                    # 解析過程必須留痕：會改變輸出的輸入要出現在輸出自己的證據欄位。
+                    resolutions[reference] = f"{key} ({how})"
+                entry = reference_index.get(key)
+                if isinstance(entry, Mapping) and (
+                    set(entry.get("authorities") or ()) & AXIS_REFERENCE_AUTHORITIES[axis]
+                ):
+                    accepted.append(reference)
+                else:
+                    context_only.append(reference)
+            if not accepted:
+                blockers.append(f"assessment_context_mismatch:{axis}")
         if level == "corroborated" and missing_data:
             blockers.append(f"{axis}_corroboration_incomplete")
         context_mismatch = f"assessment_context_mismatch:{axis}" in blockers
-        effective_ceiling = 0.0 if (
-            context_mismatch
-            or any(blocker.startswith(f"{axis}_") for blocker in blockers)
-        ) else ceilings[level]
+        # 單調性：宣告較高信心不得拿到比宣告較低信心更少的額度。
+        # 先前 `corroborated + missing_data` → ceiling 0，比誠實降級成
+        # bounded_hypothesis（同一批待補項，0.002）**更差**——於是評估者學會迴避那個
+        # 組合（實測 72 筆出現 0 次），規則在暗中形塑了評估行為。現在 missing_data
+        # 只把 corroborated 壓回下一階，不再歸零。
+        fatal_axis_blocker = any(
+            blocker.startswith(f"{axis}_") and not blocker.endswith("_corroboration_incomplete")
+            for blocker in blockers
+        )
+        if context_mismatch or fatal_axis_blocker:
+            effective_ceiling = 0.0
+        elif f"{axis}_corroboration_incomplete" in blockers:
+            effective_ceiling = min(ceilings[level], _level_floor(level, ceilings))
+        else:
+            effective_ceiling = ceilings[level]
         normalized[axis] = {
             "level": "unknown" if context_mismatch else level,
             "evidence_refs": refs,
@@ -121,6 +181,13 @@ def _validate_assessment(
             "missing_data": missing_data,
             "ceiling": effective_ceiling,
         }
+        if resolutions:
+            normalized[axis]["reference_resolutions"] = resolutions
+        if level != "unknown" and refs:
+            # 稽核用：哪些引用真的支撐了這一軸、哪些只是脈絡。不得只留下結論。
+            normalized[axis]["accepted_refs"] = tuple(accepted)
+            if context_only:
+                normalized[axis]["context_only_refs"] = tuple(context_only)
     return normalized, tuple(sorted(set(blockers)))
 
 

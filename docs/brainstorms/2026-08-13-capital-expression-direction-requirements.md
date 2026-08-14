@@ -229,6 +229,43 @@ technical_causal_link   unknown 22 / bounded 18 / corroborated 32
 不是行情交易日，而是跑 ETL 的日期——收盤後跑的批次被標成隔天，盤中跑的存盤中價。
 一個欄位三種語意（L12）。本報表因此改用 provider 的收盤序列取現價。
 
+### 2.8 §4 第 4 項：`unknown` 的兩種語意（2026-08-14）
+
+重跑 2026-08-08 §8.2 指定的那張表（該節明訂「再有人想動 `axis_ceilings.unknown`，
+先重跑一次上表」）。結論：**該節的禁令維持有效，但它的理由是錯的。**
+
+原理由是「unknown 只集中在未上市的 Agility」。73 筆重跑後不成立——LITE 5.0/5、
+NVDA 5.0/5、COHR 4.0/5 都是上市公司。真正的分布是：
+
+| 類別 | 筆數 | 該不該歸零 |
+|---|---|---|
+| 五軸全 unknown（＝還沒做研究） | 18 | ✅ 該。沒有評估就沒有東西可 size |
+| 部分 unknown（做了研究但某軸缺） | 20 | ⚠ 這才是 `min()` 傷害的地方 |
+
+而那 20 筆裡的 33 個 unknown 軸，**22 個是被配線改寫的，只有 11 個是研究者宣告的**：
+
+```
+被改寫 22：valuation_payoff 10、technical_causal_link 5、commercial_maturity 4、
+           source_reliability 2、financial_resilience 1
+宣告   11：valuation_payoff 6、commercial_maturity 3、financial_resilience 2
+```
+
+逐筆追下去，改寫有兩個成因，**都不是「我們不知道」**：
+
+1. **引用字串格式不符。** 研究者寫 `yfinance://history`，index 的 key 是
+   `yfinance://history/AAOI`。少一個 ticker 後綴 → 整筆決策資本歸零。
+2. **判準是 `any(失敗)` 而非「至少一個合格」。** META 的 `technical_causal_link`
+   有 `co:meta` 與 `meta_vistara_isca_2026` 兩個合格引用，只因多附一個
+   `prod:vistara` 就整軸歸零；AXTI 的 `financial_resilience` 有合格的
+   `yfinance.info`，卻因多附兩份 8-K 脈絡而歸零。
+
+**因此不動 `axis_ceilings.unknown`**（宣告的 unknown 歸零是對的），改修上述兩點：
+引用先做**無歧義**解析（exact → 去尾斜線 → 唯一前綴；兩個以上候選就不解析，
+寧可報 mismatch 也不挑一個），且只要有**至少一個**合格引用即成立；不合格的改列
+`context_only_refs` 現形供稽核。**零個合格引用仍歸零**——那才是 authority
+laundering。⚠ 解析只認身分不看 authority，順序固定「先解析身分 → 再查 authority」，
+否則等於讓引用去尋找能通過的權威（L8／L11）。
+
 ### 2.6 pipeline
 
 `pending` 33、`triaged_go` **62**（最舊 2026-07-25，19 天）、`applied` 22、
@@ -330,7 +367,7 @@ message），則本節推測作廢，該尺度是刻意的。
 | ~~**1**~~ ✅ | **對 7 個有 shadow 錨點的 cohort 補跑 outcome 量測** | ✅ **7/7 可量測**，AXTI +83.5%（見 §2.7）。`scripts/outcome_if_settled_today.py` | 無 |
 | ~~**2**~~ ✅ | **逐項分類 blocker** | ✅ 使用者 2026-08-13 核可。67 條登記：`fatal` 27 ＋ `fatal(live)` 7 ＋ `fatal(paper)` 1、`sizing` 24、`diagnostic` 8；2 條已淘汰刪除。可歸零仍是 **8 個概念**，code 數較多是因為 identity 家族與 `market_` 家族被拆開 | 無 |
 | ~~**3**~~ ✅ | **把 lane blockers 接進 `fatal_blockers()`** 並讓兩套分類系統合一（§3.2） | ✅ 真實 calculator 全量重算：**live 非零 0 → 8**（54 筆可重建者），binding 由 `live_lane_blockers` 71/72 變成 `weakest_axis` 31 為主。`severity` 現住 config，`blocker_severity.py` 讀它，硬編碼 frozenset 消滅 | 2 |
-| **4** | **修 §3.3 的第 1、2 點**：`unknown` 不再映射到 0；`corroborated + missing_data` 不再懲罰 | 重算 72 筆：`axis_ceiling` 出現 > 0.002 的值 | 3 |
+| ~~**4**~~ ✅ | **修 §3.3 的第 2 點＋引用解析**（第 1 點經重跑資料後**否決**，理由見下） | ✅ 重算：`axis_ceiling` 0 的筆數 **23 → 17**（6 筆由 0 變 0.002）。⚠ 原驗收條件「出現 > 0.002」**不可能由歷史資料成立**——那需五軸全 `corroborated`，而 `corroborated + missing_data` 歷史上出現 0 次（評估者早已學會迴避）。單調性改由 `tests/test_probe_sizing.py::test_declaring_corroborated_never_yields_less_than_bounded_hypothesis` 鎖住 | 3 |
 | **5** | **決定 alpha baseline 尺寸**（使用者決定，見 D5） | — | 1、3 |
 | **6** | `lifecycle.json` 加 `catalyst_checkpoints`，`next_check` 取 `min(cadence, 最近催化劑)` | AXT 的 `next_check` 從 2026-11-15 移到 Q3 財報日 | 無 |
 
