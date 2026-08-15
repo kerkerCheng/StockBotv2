@@ -212,8 +212,15 @@ def _validate_go_receipt(item: Mapping[str, Any], receipt: str) -> None:
             raise TodoError("source_trace_review 不得 bare go；請先 dispatch 並完成 pq1 checkpoint")
         if not receipt.strip() or receipt != item.get("dispatch_receipt"):
             raise TodoError("source_trace_review receipt 必須等於 terminal pq1 checkpoint receipt")
-        if item.get("dispatch_status") == "completed" and not receipt.startswith("action:ra_"):
-            raise TodoError("completed source_trace_review 必須附 prepared action receipt")
+        if item.get("dispatch_status") == "completed" and not (
+            receipt.startswith("action:ra_") or receipt.startswith("graph:")
+        ):
+            # 兩條入圖路徑都可結案；graph: 的實體存在性已在
+            # checkpoint_source_trace_review 驗過（extractions/<doc_id>.json 必須存在，
+            # 且 lead 必須 applied），此處只認前綴，不重複那道檢查。
+            raise TodoError(
+                "completed source_trace_review 必須附 action:<ra_id> 或 graph:<source_doc> receipt"
+            )
         if item.get("dispatch_status") == "parked" and not receipt.startswith("trace:"):
             raise TodoError("parked source_trace_review 必須附 trace outcome receipt")
         return
@@ -524,11 +531,37 @@ def checkpoint_source_trace_review(
     if lead is None:
         raise TodoError("source_trace_review 對應 lead 不存在")
     if to_status == "completed":
-        action_id = str((lead.get("refs") or {}).get("research_action_id") or "")
         if lead.get("status") not in {"action_prepared", "applied"}:
             raise TodoError("completed trace lead 尚未 action_prepared／applied")
-        if receipt != f"action:{action_id}" or not action_id.startswith("ra_"):
-            raise TodoError("completed trace receipt 必須對應 lead 的 prepared action")
+        refs = lead.get("refs") or {}
+        action_id = str(refs.get("research_action_id") or "")
+        source_doc = str(refs.get("source_doc") or "")
+        # 兩條入圖路徑，各自要求自己的完整 receipt——不是二選一放寬，是分開後兩邊都更嚴。
+        #
+        # (a) Research Action：MCP prepare→apply 流程，receipt 是 ra_ id。
+        # (b) loader.load_to_neo4j：repo 內既有的正規入圖路徑，但**不產生 RA id**，
+        #     於是 2026-08-15 的 COHR／MTSI 兩筆逐字稿入圖後結不了案——圖裡資料是
+        #     真的、lead 已 applied、commit 也在，卻被擋在 receipt 格式上。那是
+        #     gate 攔格式而不是攔風險（L15 第 1 條），正確的入圖路徑就該結得了案。
+        #
+        # (b) 的門檻刻意比 (a) 高一項：除了 receipt 與 refs 一致，還要求
+        # extractions/<doc_id>.json 實際存在。receipt 因此指向一個可稽核的實體，
+        # 而不只是一個字串——否則放寬解析就會變成放寬判準（L15 第 5 條）。
+        # 另要求 lead 必須是 applied：loader 路徑沒有 prepared 中間態，
+        # 停在 action_prepared 就代表根本還沒載入。
+        if receipt.startswith("graph:"):
+            doc_id = receipt[len("graph:"):]
+            if not doc_id or doc_id != source_doc:
+                raise TodoError("graph receipt 必須是 graph:<lead refs 的 source_doc>")
+            if lead.get("status") != "applied":
+                raise TodoError("graph receipt 要求 lead 已 applied（loader 無 prepared 中間態）")
+            if not (_ROOT / "extractions" / f"{doc_id}.json").exists():
+                raise TodoError(f"找不到 extractions/{doc_id}.json，graph receipt 無可稽核依據")
+        elif receipt != f"action:{action_id}" or not action_id.startswith("ra_"):
+            raise TodoError(
+                "completed trace receipt 必須是 action:<ra_id>（RA 路徑）"
+                "或 graph:<source_doc>（loader 入圖路徑）"
+            )
     elif to_status == "parked":
         trace_status = str((lead.get("refs") or {}).get("trace_status") or "")
         if lead.get("status") != "parked" or receipt != f"trace:{trace_status}":

@@ -1254,3 +1254,102 @@ def test_same_decision_receipt_does_not_rewake_item_every_sync() -> None:
     fresh = todo.sync(pool, [_row("decision:pd_b")], at="2026-08-05T00:00:00+00:00")
     assert fresh["reactivated"] == 1
     assert "waiting_on" not in todo.get(pool, 1)
+
+
+def _trace_lead_applied(tmp_path, doc_id: str, *, stop_at_prepared: bool = False):
+    """建一筆走 loader 入圖路徑（無 RA id）而 applied 的 trace lead。"""
+
+    leads_path = tmp_path / "leads.json"
+    store = leads.empty_store()
+    lead_id, _ = leads.register(
+        store, source="x:test", url="https://x.com/test/status/transcript"
+    )
+    leads.triage(store, lead_id, go=True, tier=2, reason="追法說會逐字稿")
+    leads.advance(store, lead_id, "parked", ref={
+        "trace_status": "partial", "trace_requires_user": "true",
+    })
+    leads.save(store, leads_path)
+    pool = _pool_with({
+        "type": "source_trace_review",
+        "ref_id": lead_id,
+        "title": "追法說會逐字稿",
+    })
+    # dispatch 會把 parked lead requeue 回 pq1；之後才走到 applied，與真實流程一致。
+    todo.dispatch_source_trace_review(pool, 1, leads_path=leads_path)
+    resumed = leads.load(leads_path)
+    if resumed["leads"][lead_id]["status"] != "researching":
+        leads.advance(resumed, lead_id, "researching")
+    leads.advance(resumed, lead_id, "action_prepared", ref={"source_doc": doc_id})
+    if stop_at_prepared:
+        leads.save(resumed, leads_path)
+        return pool, leads_path
+    leads.advance(resumed, lead_id, "applied", ref={"source_doc": doc_id})
+    leads.save(resumed, leads_path)
+    return pool, leads_path
+
+
+def test_loader_graph_receipt_can_complete_a_trace_review(tmp_path) -> None:
+    """正確的入圖路徑就該結得了案。
+
+    事發（2026-08-15）：COHR 與 MTSI 兩場法說會逐字稿追到、抽取、validate、load 進
+    Neo4j 全部完成，lead 也 applied，卻結不了案——完成規則只認 action:ra_*，而
+    `loader.load_to_neo4j`（repo 內既有的正規入圖路徑）根本不產生 RA id。
+    那是 gate 攔格式而不是攔風險（L15 第 1 條）。
+    """
+
+    doc_id = "cohr_q4fy26_earnings_call_2026_08_12"  # 真實存在於 extractions/
+    pool, leads_path = _trace_lead_applied(tmp_path, doc_id)
+
+    result = todo.checkpoint_source_trace_review(
+        pool, 1, leads_path=leads_path,
+        to_status="completed", receipt=f"graph:{doc_id}",
+        at="2026-08-15T01:00:00+00:00",
+    )
+
+    assert result["item"]["resolved_at"]
+    assert result["item"]["receipt"] == f"graph:{doc_id}"
+
+
+def test_graph_receipt_requires_an_auditable_extraction_file(tmp_path) -> None:
+    """放寬解析不等於放寬判準：receipt 必須指向可稽核的實體，不能只是字串。
+
+    graph 路徑的門檻刻意比 RA 路徑高一項——extractions/<doc_id>.json 必須真的存在。
+    否則「改成接受 graph:」就會變成「接受任何自稱入過圖的字串」（L15 第 5 條）。
+    """
+
+    doc_id = "never_extracted_doc_id"
+    pool, leads_path = _trace_lead_applied(tmp_path, doc_id)
+
+    with pytest.raises(todo.TodoError, match="無可稽核依據"):
+        todo.checkpoint_source_trace_review(
+            pool, 1, leads_path=leads_path,
+            to_status="completed", receipt=f"graph:{doc_id}",
+        )
+
+
+def test_graph_receipt_must_match_the_lead_source_doc(tmp_path) -> None:
+    """receipt 不得指向另一份文件——那會讓入圖紀錄與 pq2 收據脫鉤。"""
+
+    pool, leads_path = _trace_lead_applied(
+        tmp_path, "cohr_q4fy26_earnings_call_2026_08_12"
+    )
+
+    with pytest.raises(todo.TodoError, match="source_doc"):
+        todo.checkpoint_source_trace_review(
+            pool, 1, leads_path=leads_path,
+            to_status="completed",
+            receipt="graph:mtsi_q3fy26_earnings_call_2026_08_06",
+        )
+
+
+def test_graph_receipt_rejects_a_lead_that_was_never_loaded(tmp_path) -> None:
+    """loader 路徑沒有 prepared 中間態：停在 action_prepared 就代表還沒真的載入。"""
+
+    doc_id = "cohr_q4fy26_earnings_call_2026_08_12"
+    pool, leads_path = _trace_lead_applied(tmp_path, doc_id, stop_at_prepared=True)
+
+    with pytest.raises(todo.TodoError, match="applied"):
+        todo.checkpoint_source_trace_review(
+            pool, 1, leads_path=leads_path,
+            to_status="completed", receipt=f"graph:{doc_id}",
+        )
