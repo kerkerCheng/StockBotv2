@@ -650,7 +650,16 @@ def reassess(
             or str(signal.get("disproof") or "")
             or None
         ),
-        expiry=expiry,
+        # expiry 與 catalyst／disproof 是同一組人工核准的可證偽契約。若 reassess
+        # 沒有 explicit override，不能偷偷回退成 policy 的三天預設值；那會把原本
+        # 以財報／量產里程碑定錨的期限改造成假急件，並讓 daily brief 反覆喚醒。
+        # 舊期限若已過，evaluate_signal 會誠實拒絕而要求新的 catalyst window，
+        # 不替使用者猜一個新日期。
+        expiry=(
+            expiry
+            or str(old_coverage_metadata.get("expiry") or "")
+            or None
+        ),
         as_of=evaluation_at,
         execution_intent=execution_intent
         or str(old_request.get("execution_intent") or "research"),

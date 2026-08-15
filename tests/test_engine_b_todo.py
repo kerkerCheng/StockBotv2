@@ -322,6 +322,37 @@ def test_awaiting_gate_and_in_flight_leave_the_decision_queue() -> None:
     assert "目前沒有需要你決定的項目" in rendered
 
 
+def test_explicit_external_waiting_overrides_prior_awaiting_approval() -> None:
+    """研究完成後若確認只能等外部 filing，不得因舊 dispatch 狀態繼續顯示人工 gate。"""
+
+    pool = todo.empty_pool()
+    item = todo.upsert(
+        pool,
+        item_type="decision_review",
+        ref_id="dc_lite",
+        title="REVIEW — co:lumentum",
+    )
+    item.update(
+        {
+            "dispatch_status": "awaiting_approval",
+            "dispatch_ref": "wo_old_gate",
+            "waiting_on": {
+                "until": "2026-08-20",
+                "trigger": "Lumentum FY2026 Form 10-K 公開完整 cash-flow statement",
+                "reason": "現有 8-K 沒有 FCF；這是等外部文件，不是等人工判讀",
+                "set_at": "2026-08-15T00:00:00+00:00",
+            },
+        }
+    )
+
+    rendered = todo._render(pool)
+
+    assert "## 等事件（1 項，觸發前不需動作）" in rendered
+    assert "Lumentum FY2026 Form 10-K" in rendered
+    assert "pq1 已交回，等人工 gate" not in rendered
+    assert todo.actionable_items(pool) == []
+
+
 def _decision_row(ref_id: str = "dc_1") -> dict:
     return {"type": "decision_review", "ref_id": ref_id, "title": "REVIEW — co:x"}
 

@@ -107,7 +107,8 @@ def actionable_items(pool: Mapping[str, Any]) -> list[dict[str, Any]]:
 
     return [
         item for item in active_items(pool)
-        if item.get("dispatch_status") not in {
+        if not item.get("waiting_on")
+        and item.get("dispatch_status") not in {
             "queued", "researching", "awaiting_approval"
         }
     ]
@@ -1628,13 +1629,17 @@ def _render(pool: Mapping[str, Any]) -> str:
     # 已 dispatch 的項目先前混在決策佇列裡，區標寫「回覆用編號 go｜drop｜pending」
     # 而項目自己寫「無需再次 go」，自相矛盾；而且 awaiting_approval（pq1 做完、
     # 等人工 gate）與 queued（還沒開始）長得一模一樣，兩者對使用者的意義完全不同。
+    # explicit waiting_on 是使用者／已完成研究對「下一個可執行觸發」的較新判斷，
+    # 必須優先於舊 dispatch_status。否則一個已確認只能等 filing 的 work order，
+    # 仍會因先前的 awaiting_approval 被錯列成「等人工 gate」。
+    waiting = [i for i in rest if i.get("waiting_on")]
+    rest = [i for i in rest if i not in waiting]
     gated = [i for i in rest if i.get("dispatch_status") == "awaiting_approval"]
     in_flight = [
         i for i in rest if i.get("dispatch_status") in {"queued", "researching"}
     ]
     rest = [i for i in rest if i not in gated and i not in in_flight]
-    deciding = [i for i in rest if not i.get("waiting_on")]
-    waiting = [i for i in rest if i.get("waiting_on")]
+    deciding = rest
 
     lines: list[str] = []
     if deciding:

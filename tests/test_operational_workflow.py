@@ -389,6 +389,37 @@ def test_reassessment_carries_forward_disproof_and_catalyst_when_not_overridden(
         store.close()
 
 
+def test_reassessment_carries_forward_expiry_when_not_overridden(
+    tmp_path: Path,
+) -> None:
+    """reassess 不得把已核准的 catalyst expiry 偷換成三天後。
+
+    事發（2026-08-15）：AXT 的 2026-11-24 與 Lumentum 的 2028-01-14
+    expiry 在沒有傳 ``--expiry`` 的 routine reassess 後，都被改成 policy 預設的
+    三天後，製造假急件。expiry 是 catalyst／disproof 契約的一部分，必須一併繼承。
+    """
+
+    store = _store(tmp_path)
+    try:
+        first = evaluate_signal(store, FixtureProvider(), _request())
+
+        second = reassess(
+            store,
+            FixtureProvider(),
+            first["decision_id"],
+            as_of="2026-07-22T12:00:00+00:00",
+        )
+
+        metadata = store.get_coverage_metadata(
+            store.get_decision(second["decision_id"])["payload"]["request"][
+                "coverage"
+            ]["assessment_id"]
+        )
+        assert metadata["expiry"] == "2026-12-31T00:00:00+00:00"
+    finally:
+        store.close()
+
+
 def test_explicit_disproof_override_still_wins_over_carried_forward_value(
     tmp_path: Path,
 ) -> None:
