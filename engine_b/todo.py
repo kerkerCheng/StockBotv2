@@ -1115,6 +1115,27 @@ def _mark_source_cleared(
     for item in active_items(pool):
         if item["type"] not in covered_types:
             continue
+        dispatch_in_flight = item.get("dispatch_status") in {
+            "queued", "researching", "awaiting_approval",
+        }
+        if dispatch_in_flight:
+            # Collector 不再產出 row，不能覆蓋 work order 自己更強的 current-state
+            # authority。特別是 awaiting_approval 代表已知還有 exact gate；若此時標成
+            # 「很可能完成，可 drop」，會直接把尚未寫入的 graph／ledger 修正藏掉。
+            if item.get("source_cleared"):
+                prior = dict(item.pop("source_cleared"))
+                pool["log"].append({
+                    "at": stamp,
+                    "n": item["n"],
+                    "type": item["type"],
+                    "ref_id": item["ref_id"],
+                    "verb": "source_returned",
+                    "reason": "pq1 work order 尚在進行或等待 exact gate，撤銷完成候選標記",
+                    "receipt": item.get("dispatch_receipt"),
+                    "prior_source_cleared": prior,
+                })
+                returned += 1
+            continue
         present = _key(str(item["type"]), str(item["ref_id"])) in seen_keys
         if present and item.get("source_cleared"):
             # 來源又產出它了（例如新證據把 decision 推回 REVIEW）：撤銷標記。

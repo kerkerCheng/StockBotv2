@@ -348,6 +348,26 @@ def test_source_that_stops_producing_a_row_marks_it_as_done_candidate() -> None:
     assert todo.get(pool, 1).get("resolved_at") is None
 
 
+def test_in_flight_work_order_is_never_marked_source_cleared() -> None:
+    """awaiting exact gate 比 collector 缺席更有權威，不得提示使用者 drop。"""
+    pool = todo.empty_pool()
+    todo.sync(pool, [_decision_row()], healthy_sources={"decisions"})
+    item = todo.get(pool, 1)
+    item["dispatch_status"] = "awaiting_approval"
+    item["dispatch_receipt"] = "observation-proposal:po_1"
+    item["source_cleared"] = {
+        "at": "2026-08-15T00:00:00+00:00",
+        "source_healthy": True,
+        "reason": "stale marker",
+    }
+
+    result = todo.sync(pool, [], healthy_sources={"decisions"})
+
+    assert result["source_cleared"] == 0
+    assert result["source_returned"] == 1
+    assert "source_cleared" not in todo.get(pool, 1)
+
+
 def test_unhealthy_source_never_marks_anything_even_with_zero_rows() -> None:
     """斷線與「全部做完」在 sync 眼中不可以長得一樣。
 
