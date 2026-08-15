@@ -697,12 +697,20 @@ class DecisionStore:
         # 以公司為單位是對的，但不能因此把重複 cohort 藏起來——那會讓指標變乾淨、
         # 問題變隱形（ROADMAP 的「Engine D cohort 重複」backlog 就永遠不會有人發現）。
         # 同公司多 cohort 仍必須在 brief 現形，只是不再汙染上線比率的分母。
+        # 只算**同時有多個 active probe** 的公司。2026-08-15 實測：co:lumentum 的兩個
+        # cohort 中，舊的 probe 早已 `expired`——那本身就是終結狀態，`close` 會拒絕
+        # 再結一次，ROADMAP 也明訂 Decision Store append-only、不回溯清理。
+        # 提醒一個沒有任何合法動作可做的狀態，只會變成每天都在的背景雜訊，
+        # 使用者學會略過它之後，真正需要合併的那天也不會被看見。
         duplicates = tuple(
             str(row["company_id"])
             for row in self._conn.execute(
-                "SELECT company_id, COUNT(*) AS n FROM decision_cohorts"
-                " WHERE company_id IS NOT NULL GROUP BY company_id HAVING n > 1"
-                " ORDER BY company_id"
+                "SELECT c.company_id AS company_id, COUNT(*) AS n"
+                " FROM decision_cohorts c"
+                " JOIN probe_projection p ON p.cohort_id = c.cohort_id"
+                " WHERE c.company_id IS NOT NULL AND p.status = 'active'"
+                " GROUP BY c.company_id HAVING n > 1"
+                " ORDER BY c.company_id"
             )
         )
         # 無 identity 的殘骸同理：不計進分母，但要數得出來——它們仍在汙染
