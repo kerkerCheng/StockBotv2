@@ -8538,11 +8538,11 @@
         "campaign_window_end": "2026-07-29T13:46:25Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
         "claimed_origin": "Wall Street Journal 2026-07-26",
-        "parked_reason": "WSJ 截圖與 Reuters 都指向同一份 WSJ 匿名來源報導；NVIDIA 官方只確認一般 revenue-sharing／credit-support 商業模式，未確認 OpenAI、Ohio 10GW、2500 億美元擔保或另案 3500 億美元晶片融資，且報導明載條款未定、可能破局。",
+        "parked_reason": "原貼自述為 in talks（未定案傳聞）。US$250B 擔保若成立屬 NVDA 重大事件，須 8-K 揭露；issuer 至今無此揭露，故 claim 停在媒體轉述層級，不得入圖",
         "primary_url": "https://blogs.nvidia.com/blog/nvidia-unlocks-ai-compute-at-scale-capital-partners-to-power-ai-infrastructure-buildout/",
         "research_outcome": "official_general_financing_model_only_exact_250b_350b_deal_unverified",
-        "trace_attempts_ref": "WSJ canonical title/screenshot；Reuters same-origin carrier；NVIDIA 2026-07-01 official credit-support model blog；NVIDIA/OpenAI/SoftBank official exact search",
-        "trace_next_trigger": "NVIDIA、OpenAI 或 SoftBank 官方公告／filing 揭露 Ohio 專案的已簽融資擔保、租約或晶片採購條款",
+        "trace_attempts_ref": "查 NVDA 全部 2026-06 以後 8-K（acc 0001045810-26-000056 Item 5.07 股東會投票、0001045810-26-000060 Item 5.02 高管異動、0001193125-26-275783）：無任何 OpenAI／backstop／financing／guarantee 揭露",
+        "trace_next_trigger": "NVDA 8-K 或 10-Q 揭露對 OpenAI／資料中心融資的擔保或承諾；或 OpenAI／SoftBank 側的正式公告",
         "trace_origin_entity": "NVIDIA",
         "trace_origin_linkage": "NVIDIA 官方頁只支持一般機制；Reuters／其他轉述皆同源於 WSJ 匿名消息",
         "trace_requeue_consumed_entities": [
@@ -8552,7 +8552,7 @@
         "trace_requeue_trigger": "related_triaged_lead:lead_45c16c3d1b589d5a3a64e100be09c1b2",
         "trace_requeued_at": "2026-08-14T06:36:25.066817+00:00",
         "trace_requires_user": "false",
-        "trace_status": "partial",
+        "trace_status": "isolated_tier_3",
         "trace_trigger_entities": [
           "NVDA",
           "co:nvidia"
@@ -8561,7 +8561,7 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -11243,9 +11243,13 @@
       "first_seen": "2026-08-13T00:35:04.350121+00:00",
       "lead_id": "lead_45c16c3d1b589d5a3a64e100be09c1b2",
       "published_at": "2026-06-30",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已取得一手原文並讀畢：內容為公司治理／高管人事（Item 5.07 股東會投票結果、Item 5.02 EVP 異動），不含供應鏈、產能、客戶或技術關係主張，無 graph delta 可入圖。非追源未果",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
       "source": "edgar:NVDA",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -11363,9 +11367,13 @@
       "first_seen": "2026-08-13T00:35:04.350055+00:00",
       "lead_id": "lead_46d054515a551d6d89b10ece17164d1a",
       "published_at": "2026-07-02",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已取得一手原文並讀畢：內容為公司治理／高管人事（Item 5.07 股東會投票結果、Item 5.02 EVP 異動），不含供應鏈、產能、客戶或技術關係主張，無 graph delta 可入圖。非追源未果",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
       "source": "edgar:NVDA",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -16497,8 +16505,8 @@
         "primary_url": "https://www.nist.gov/news-events/news/2026/07/department-commerce-announces-letters-intent-7-companies-874-million",
         "research_outcome": "transceiver_policy_trigger_does_not_confirm_gfs_final_award",
         "research_run": "daily_brief_2026_08_02",
-        "trace_attempts_ref": "NIST CPO LOI rechecked; trigger lead_7f66b743a034c41f6388aa800f333e62 is a separate optical-transceiver policy event",
-        "trace_next_trigger": "Commerce final award or GFS filing confirms CPO equity percentage and milestones",
+        "trace_attempts_ref": "2026-08-15 新增 issuer 自揭一手：GFS Form 6-K Q2 2026 earnings release (acc 0001709048-26-000218) 逐字確認 July 2026 與 Commerce 簽 LOI、CHIPS R&D Office 預期撥款 US$300M 推進 silicon photonics。已存 library/raw/gfs_6k_20260805_chips_loi_silicon_photonics.txt。先前 NIST 公告仍為第二 origin",
+        "trace_next_trigger": "Commerce final award 公告，或 GFS filing 出現 (a) LOI 轉 definitive award 的 milestone、或 (b) 任何政府股權／warrant 揭露。issuer 措辭仍是 letter of intent／is expected to award",
         "trace_origin_entity": "U.S. Department of Commerce／NIST",
         "trace_origin_linkage": "official_for_300m_CPO_LOI;1pct_from_separate_May_quantum_agreement",
         "trace_requeue_trigger": "related_triaged_lead:lead_46eab040757a85c528d884e48c674b30",
@@ -16513,7 +16521,7 @@
         "trace_trigger_kind": "primary_source_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
