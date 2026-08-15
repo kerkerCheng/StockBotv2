@@ -26300,8 +26300,8 @@
         "primary_url": "https://www.coherent.com/content/dam/coherent/site/en/documents/investors/investor-presentations/2026/august-12/investor-presentation-20260812.pdf",
         "research_outcome": "no_prepared_ra_partial_exact_transcript_missing",
         "research_run": "daily-brief-2026-08-15",
-        "trace_attempts_ref": "Coherent 2026-08-12 IR earnings presentation；SEC 2026 Q3 10-Q／2026-08-14 10-K canonical filing；四組 exact quote 官方網域搜尋",
-        "trace_next_trigger": "Coherent 公開 FY2026 Q4 transcript，或可逐字核對的 2026 10-K／客戶端文件確認外售政策、backlog 與 CPO pull-in",
+        "trace_attempts_ref": "COHR 8-K 2026-08-12 EX-99.1 (acc 0001193125-26-346860) 已核實全部財務數字；COHR FY2026 10-K 2026-08-14 (acc 0000820318-26-000020) 已定位 InP／垂直整合／供應商集中段落並存成 library/raw/cohr_10_k_20260814_inp_vertical_integration.txt",
+        "trace_next_trigger": "Coherent Q4 FY2026 法說會逐字稿：press release 與 10-K 均不含『不外售 InP 雷射』『瓶頸在 InP ramp 非封測』『backlog 訂滿至 2027 底』三句口頭 quote",
         "trace_requeue_trigger": "related_triaged_lead:lead_105118dfda204e29a99f82160ad2f751",
         "trace_requeued_at": "2026-08-15T06:38:16.293973+00:00",
         "trace_requires_user": "false",
@@ -26322,7 +26322,7 @@
         "trace_trigger_kind": "primary_source_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "researching",
       "themes": {
         "cpo": {
           "counter_only": false,
