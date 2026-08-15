@@ -301,6 +301,12 @@ def resolve(
                 "set_at": stamp,
                 **({"event_type": event_type} if event_type else {}),
             }
+        else:
+            # 無條件 pending 的語意是「尚待人工決定」，不是沿用上一輪的外部事件。
+            # 舊行為會保留既有 waiting_on，讓一個已知可由人現在判斷的項目永久躺在
+            # 「等事件」區；人工判讀因而被錯當成外部觸發。明確不帶 until／trigger
+            # 時清除舊條件，保留 stable 編號並回到決策佇列。
+            item.pop("waiting_on", None)
     else:
         item.pop("waiting_on", None)
         item["resolved_at"] = stamp

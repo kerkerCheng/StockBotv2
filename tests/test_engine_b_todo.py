@@ -63,6 +63,19 @@ def test_pending_defers_but_keeps_item_active() -> None:
     assert pool["log"][-1]["verb"] == "pending"
 
 
+def test_unconditional_pending_clears_stale_external_wait() -> None:
+    """人工判讀不得因上一輪 trigger 繼續被藏在「等事件」。"""
+    pool = _pool_with({"type": "manual", "ref_id": "x", "title": "A"})
+    todo.resolve(pool, 1, "pending", trigger="等 Q3 guidance")
+    assert todo.get(pool, 1)["waiting_on"]["trigger"] == "等 Q3 guidance"
+
+    todo.resolve(pool, 1, "pending", reason="也可由使用者現在指定門檻")
+
+    assert "waiting_on" not in todo.get(pool, 1)
+    assert todo.get(pool, 1)["reason"] is None
+    assert pool["log"][-1]["reason"] == "也可由使用者現在指定門檻"
+
+
 def test_batch_applies_and_reports_failures() -> None:
     pool = _pool_with(
         {"type": "lead_research", "ref_id": "a", "title": "A"},
