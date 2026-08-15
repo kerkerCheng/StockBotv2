@@ -673,27 +673,39 @@ class DecisionStore:
         # LITE／IQE／NVDA 的舊版本——decision 依 point-in-time 契約永不回寫，於是每
         # reassess 一次分母就 +1，**改進反而讓比率變難看**。按 cohort 去重後真實
         # 狀態是 3/13。分母混合「當前狀態」與「歷史軌跡」是壞指標的典型形狀（L12）。
-        eligible = self._conn.execute(
+        # 以**公司**為單位，不是以 cohort 為單位。2026-08-15 第二次踩同一個坑：
+        # 首屏一度顯示「上線標的 8/13」，讀起來像有 5 個卡住，實際上那 5 個是
+        # 3 個 atomic_claim 缺失的空 signal 殘骸、1 個未上市無 ticker 的 Agility、
+        # 以及 co:lumentum 的重複舊 cohort——**沒有一個是研究做了卻卡住的**。
+        # 分母若含永遠不可能上線的東西，這個指標就會謊報「還有救得回來的標的」。
+        # 無 company_id 的 cohort 一律不計；同公司多 cohort 取最新 decision。
+        latest: dict[str, tuple[str, str]] = {}
+        for row in self._conn.execute(
             """
-            SELECT COUNT(*) AS n FROM (
-              SELECT d.payload_json AS pj FROM system_decisions d
-              JOIN (
-                SELECT cohort_id, MAX(effective_at) AS m
-                FROM system_decisions GROUP BY cohort_id
-              ) t ON t.cohort_id = d.cohort_id AND t.m = d.effective_at
-              GROUP BY d.cohort_id
-            ) WHERE json_extract(pj, '$.sizing.paper_status') = 'ELIGIBLE'
+            SELECT c.company_id AS company_id, d.effective_at AS at,
+                   json_extract(d.payload_json, '$.sizing.paper_status') AS status
+            FROM decision_cohorts c
+            JOIN system_decisions d ON d.cohort_id = c.cohort_id
+            WHERE c.company_id IS NOT NULL
             """
-        ).fetchone()
-        cohorts = self._conn.execute(
-            "SELECT COUNT(*) AS n FROM decision_cohorts"
-        ).fetchone()
+        ):
+            company = str(row["company_id"])
+            at = str(row["at"] or "")
+            if company not in latest or at > latest[company][0]:
+                latest[company] = (at, str(row["status"] or ""))
+        eligible_n = sum(1 for _, status in latest.values() if status == "ELIGIBLE")
+        # 同樣以公司為單位：無 identity 的 cohort 其 Shadow 恆為 `unavailable`
+        # （沒有 ticker 就沒有價格），計進分母只會讓「可量測比率」永遠到不了 100%。
         measurable = self._conn.execute(
-            "SELECT COUNT(DISTINCT cohort_id) AS n FROM shadow_observations"
-            " WHERE status = 'observed' AND price IS NOT NULL"
+            "SELECT COUNT(DISTINCT c.company_id) AS n FROM shadow_observations s"
+            " JOIN decision_cohorts c ON c.cohort_id = s.cohort_id"
+            " WHERE c.company_id IS NOT NULL"
+            " AND s.status = 'observed' AND s.price IS NOT NULL"
         ).fetchone()
         anchored = self._conn.execute(
-            "SELECT COUNT(DISTINCT cohort_id) AS n FROM shadow_observations"
+            "SELECT COUNT(DISTINCT c.company_id) AS n FROM shadow_observations s"
+            " JOIN decision_cohorts c ON c.cohort_id = s.cohort_id"
+            " WHERE c.company_id IS NOT NULL"
         ).fetchone()
         return {
             "decisions": decisions,
@@ -705,8 +717,9 @@ class DecisionStore:
             "shadow_measurable_cohorts": int(measurable["n"] or 0),
             "shadow_anchored_cohorts": int(anchored["n"] or 0),
             # 上線標的數：使用者實際要盯的廣度指標（ROADMAP 新 workstream 第一條）。
-            "eligible_cohorts": int(eligible["n"] or 0),
-            "total_cohorts": int(cohorts["n"] or 0),
+            # 分母是「有 identity 的公司數」，不含無 company_id 的殘骸與重複 cohort。
+            "eligible_cohorts": eligible_n,
+            "total_cohorts": len(latest),
             # ⚠ 分母只有在**新 decision 產生**時才會長。2026-08-14 一個 daily session
             # 讀到「0/73」後推論「gate 還是壞的，做完那三件事若仍是 0 就重新診斷」——
             # 那會是假陰性：既有 decision 依 point-in-time 契約永不回寫，計數器本來

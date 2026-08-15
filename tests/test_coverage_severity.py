@@ -351,8 +351,8 @@ def test_daily_brief_counters_track_breadth_and_measurability(tmp_path) -> None:
             "outcomes": 8,
         }
         quiet = render_today_markdown(primed)
-        assert "上線標的 8/13" in quiet
-        assert "可量測 cohort 9/13" in quiet
+        assert "上線標的 8/13 檔" in quiet
+        assert "可量測 9/13 檔" in quiet
         assert "⚠" not in quiet.split("研究進展")[1].splitlines()[0]
 
         # 沒有標的、沒有錨點 → 兩個警語都要出現，且要刺眼。

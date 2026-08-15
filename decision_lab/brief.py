@@ -795,9 +795,11 @@ def render_today_markdown(brief: Mapping[str, Any]) -> str:
         # 首屏只放使用者實際在盯的三條（ROADMAP 新 workstream）：廣度、量測。
         # 舊的「非零 live 區間 N/決策數」已移除：尺寸不再對人呈現（Alpha 呈現契約），
         # 且它的分母數的是歷來 decision，同一標的每 reassess 一次就 +1。
+        # 單位是「有 identity 的公司」不是 cohort：無 company_id 的殘骸與同公司的
+        # 重複 cohort 都不計，否則分母會謊報「還有救得回來的標的」。
         line = (
-            f"- 研究進展：上線標的 {eligible}/{total_cohorts} 個"
-            f"｜可量測 cohort {measurable}/{anchored} 個"
+            f"- 研究進展：上線標的 {eligible}/{total_cohorts} 檔"
+            f"｜可量測 {measurable}/{anchored} 檔"
         )
         if eligible == 0 and total_cohorts:
             line += "　⚠ 目前沒有任何可評估標的"
