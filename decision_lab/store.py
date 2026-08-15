@@ -658,11 +658,32 @@ class DecisionStore:
             " SUM(CASE WHEN absolute_return IS NOT NULL THEN 1 ELSE 0 END) AS measured"
             " FROM outcome_envelopes"
         ).fetchone()
+        # ⚠ `outcome_envelopes` 只在人工 `close` 之後才有列，而 close 是終結性動作
+        # （probe 結案），不會為了量測而跑。2026-08-15 實測：8 筆 envelope 有 6 筆
+        # 來自三個沒有 ticker 的廢棄 cohort（atomic_claim 缺失的空 signal 殘骸），
+        # 它們永遠算不出報酬。於是 brief 每天喊「已量測 0/8」，而真相是 9 個有
+        # Shadow 錨點的 cohort **全部可量測**、7/9 超額為正。
+        #
+        # 一個由垃圾撐起分母、且方向與事實相反的計數器，比沒有計數器更糟——它讓人
+        # 以為系統從未被驗證過（L14 說常駐計數器是防呆，但接錯資料源的計數器是反向
+        # 防呆）。Shadow 錨點才是報酬量測的真實前提：
+        # `absolute_return = current_price / shadow.price - 1`，完全不經過 close。
+        measurable = self._conn.execute(
+            "SELECT COUNT(DISTINCT cohort_id) AS n FROM shadow_observations"
+            " WHERE status = 'observed' AND price IS NOT NULL"
+        ).fetchone()
+        anchored = self._conn.execute(
+            "SELECT COUNT(DISTINCT cohort_id) AS n FROM shadow_observations"
+        ).fetchone()
         return {
             "decisions": decisions,
             "live_range_nonzero": live_nonzero,
             "outcomes": int(outcomes["total"] or 0),
             "measured_outcomes": int(outcomes["measured"] or 0),
+            # 可量測 = 有 Shadow 價格錨、算得出報酬的 cohort；分母是有 Shadow 記錄的
+            # 全部 cohort（含 `unavailable`，那些多半是無 ticker 的未上市或殘骸）。
+            "shadow_measurable_cohorts": int(measurable["n"] or 0),
+            "shadow_anchored_cohorts": int(anchored["n"] or 0),
             # ⚠ 分母只有在**新 decision 產生**時才會長。2026-08-14 一個 daily session
             # 讀到「0/73」後推論「gate 還是壞的，做完那三件事若仍是 0 就重新診斷」——
             # 那會是假陰性：既有 decision 依 point-in-time 契約永不回寫，計數器本來

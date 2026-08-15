@@ -61,34 +61,36 @@ brainstorm；範圍大到需要驗收條件才開 plan。brainstorm 用 frontmat
 
 ### 進行中
 
-目前唯一 workstream：**資本表達層**——把 Engine D 從「永遠不下注」變成「小注但有意義」。
+**資本表達層 workstream 已於 2026-08-15 結案。** 原目標「把 Engine D 從永遠不下注變成
+小注但有意義」已達成：live 非零 **0/72 → 9/89**（現行骨架 9/16）、ELIGIBLE cohort **0 → 8**。
+但它的下半段（§4 第 5 項「決定 alpha baseline 尺寸」）被使用者用另一種方式結掉了——
+**決定不看尺寸**（見 `AGENTS.md`「Alpha 呈現契約」）。理由是實測：6 個 ELIGIBLE cohort 的
+target 全是同一個 0.1%，常數不帶資訊，而使用者要的是「撒網、推薦幾檔、追蹤新事件」。
 
-| 內容 | 位置 |
-|---|---|
-| 方向（D1–D7） | [`2026-08-13-capital-expression-direction`](brainstorms/2026-08-13-capital-expression-direction-requirements.md) **§1** |
-| 凍結的 baseline 數字（audit 拿它做 diff） | 同檔 **§2** |
-| **六步工作清單＋各步驗收條件** | 同檔 **§4** |
-| 明確待驗證、尚不得當結論 | 同檔 **§5** |
+新 workstream：**廣度、事件追蹤、量測**。三條各有可驗證的數字，取代舊的「非零 live 區間」：
 
-**步驟表只有一份，在該檔 §4，本檔不複製**（複製會漂移）。
+| 目標 | 現值（2026-08-15） | 怎麼變好 |
+|---|---|---|
+| **廣度**：可評估標的數 | 8 個 ELIGIBLE cohort | 清 pq1 積壓（83 條 triaged_go）、擴 harvest 來源、onboard 新標的 |
+| **事件追蹤**：新事件進 brief 的延遲 | 未量測 | 先補 watcher 覆蓋（今天才發現 TSEM 長期空轉），再談延遲 |
+| **量測**：可量測 cohort 與超額中位數 | **9/13 個**，超額中位數 **+11.1%**（vs QQQ） | 累積樣本期；目前僅 3 週–1 個月、9 筆，且落在強勢期 |
 
-**§4 六步已完成 1、2、3、4、6（2026-08-14）。**
+⚠ **量測那條的已知偏誤，解讀前必讀：** Shadow 錨點日就是 cohort 建立日，而 cohort 建立在
+研究之後。若 lead 當初是因為「股價已經在動」才通過 triage，超額就有一部分是選擇偏誤而非
+判斷力。**它是訊號，不是證明**；要變成證明需要更長樣本期與「錨點早於行情啟動」的案例。
 
-**下一步 = §4 第 5 項：決定 alpha baseline 尺寸——這是使用者的決定，不是實作項。**
-使用者已選「先修單調性，數字等量測再決定」，因此它的前置不是程式而是**更多 outcome
-樣本**：重跑 `python scripts/outcome_if_settled_today.py` 即可累積。
+**舊 workstream 的步驟表仍在 [`2026-08-13-capital-expression-direction`](brainstorms/2026-08-13-capital-expression-direction-requirements.md) §4**，
+六步已全部完成或被上述決定取代，保留作需求推導的歷史。
 
-現況：`weakest_axis` 已是主要的 live binding constraint（31/54），閘門從管線移到了信心
-維度——這是想要的方向；但那把尺目前最高只到 0.002，能不能往上走取決於量測。
-
-⚠ **不得因為「閘門已經修好了」就順手調大 `axis_ceilings`**（D7：先量測後放閘；
-D6：未經量測的機制不得享有默認信任，包含放寬本身）。
+⚠ **仍然有效的一條：不得因為「閘門已經修好了」就順手調大 `axis_ceilings`**（D7 先量測後放閘）。
+現在更沒有理由動它——尺寸已不對使用者呈現，調大它不會改變任何人看到的東西，只會讓
+paper 記分板失去可比性。
 
 ### 未排程
 
 | 項目 | 為什麼 | 驗收條件 | 前置 |
 |---|---|---|---|
-| **補齊各 cohort 的 `commercial_maturity` 觀測** | 該軸只接受 `engine_c_backlog`／`engine_c_customer`，沒有觀測就整軸歸零（IQE 因此停在 `SHADOW_ONLY`）。2026-08-15 已驗證**這不是非美股的結構性障礙**：SIVE 用年報 Note 5「Information about major customers」、IQE 用 Note 4.3，兩者都揭露。缺的是有人去讀年報附註並建觀測 | 因 `commercial_maturity_unknown` 而 `axis_ceiling=0` 的 cohort 數下降；IQE 由 `SHADOW_ONLY` → `ELIGIBLE` | 逐一取得該公司最新年報 PDF 的分部／客戶附註 |
+| **補齊各 cohort 的 `commercial_maturity` 觀測** | 該軸只接受 `engine_c_backlog`／`engine_c_customer`，沒有觀測就整軸歸零。IQE 曾因此停在 `SHADOW_ONLY`，2026-08-15 補上 FY2025 年報 Note 4.3 的客戶集中度觀測後轉為 `ELIGIBLE`。2026-08-15 已驗證**這不是非美股的結構性障礙**：SIVE 用年報 Note 5「Information about major customers」、IQE 用 Note 4.3，兩者都揭露。缺的是有人去讀年報附註並建觀測 | 因 `commercial_maturity_unknown` 而 `axis_ceiling=0` 的 cohort 數下降（IQE 已完成，見左欄） | 逐一取得該公司最新年報 PDF 的分部／客戶附註 |
 | **Engine D cohort 重複** | 同公司可能同時存在 claim-keyed 與 company-keyed 兩個 cohort（2026-07-30 [74]／[75] 實例） | 新建 cohort 時偵測同公司既有 cohort 並警告。**不回溯清理**——Decision Store append-only，不做破壞性去重 | 無 |
 | **ETF 完整 look-through** | `issuer_loads` 只涵蓋 policy 已登記的 ownership，曝險輸出恆為 `partial` | 曝險輸出出現 `coverage: full` 的標的 ≥1 | 無 |
 | **本機 single-writer guard** | 目前靠人工紀律確保同一 working tree 只有一個 agent 寫入 | 模擬兩個 writer 併發時會被擋下（可寫成測試） | 無 |

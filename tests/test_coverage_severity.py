@@ -329,6 +329,8 @@ def test_daily_brief_carries_the_two_standing_counters(tmp_path: Path) -> None:
             "live_range_nonzero",
             "outcomes",
             "measured_outcomes",
+            "shadow_measurable_cohorts",
+            "shadow_anchored_cohorts",
             "calculator_version",
             "decisions_current_calculator",
             "live_range_nonzero_current",
@@ -347,13 +349,18 @@ def test_daily_brief_carries_the_two_standing_counters(tmp_path: Path) -> None:
             "live_range_nonzero": 0,
             "outcomes": 8,
             "measured_outcomes": 0,
+            "shadow_measurable_cohorts": 0,
+            "shadow_anchored_cohorts": 0,
             "calculator_version": "probe-limit-v3",
             "decisions_current_calculator": 73,
             "live_range_nonzero_current": 0,
         }
         text = render_today_markdown(primed)
         assert "非零 live 區間 0/73" in text
-        assert "已量測 outcome 0/8" in text
+        # 量測改讀 Shadow 錨點：outcome_envelopes 要人工 close 才有列，且實測分母
+        # 曾被三個無 ticker 的廢棄 cohort 撐大，喊出與事實相反的「已量測 0/8」。
+        assert "可量測 cohort 0/0" in text
+        assert "無 Shadow 錨點" in text
         assert "系統至今從未輸出過可入場區間" in text
         assert "判斷準不準仍無法用證據回答" in text
 
@@ -365,6 +372,8 @@ def test_daily_brief_carries_the_two_standing_counters(tmp_path: Path) -> None:
             "live_range_nonzero": 0,
             "outcomes": 8,
             "measured_outcomes": 0,
+            "shadow_measurable_cohorts": 0,
+            "shadow_anchored_cohorts": 0,
             "calculator_version": "probe-limit-v3",
             "decisions_current_calculator": 0,
             "live_range_nonzero_current": 0,
@@ -382,6 +391,8 @@ def test_daily_brief_carries_the_two_standing_counters(tmp_path: Path) -> None:
             "live_range_nonzero": 8,
             "outcomes": 8,
             "measured_outcomes": 7,
+            "shadow_measurable_cohorts": 9,
+            "shadow_anchored_cohorts": 9,
             "calculator_version": "probe-limit-v3",
             "decisions_current_calculator": 12,
             "live_range_nonzero_current": 8,

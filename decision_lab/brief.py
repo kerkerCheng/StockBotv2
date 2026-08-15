@@ -785,9 +785,14 @@ def render_today_markdown(brief: Mapping[str, Any]) -> str:
         version = counters.get("calculator_version")
         current_total = int(counters.get("decisions_current_calculator") or 0)
         current_live = int(counters.get("live_range_nonzero_current") or 0)
+        measurable = int(counters.get("shadow_measurable_cohorts") or 0)
+        anchored = int(counters.get("shadow_anchored_cohorts") or 0)
+        # 量測以 Shadow 錨點為準，不以 outcome_envelopes 為準：後者要人工 close 才有列，
+        # 且 2026-08-15 實測 8 筆有 6 筆來自無 ticker 的廢棄 cohort，永遠算不出報酬。
+        # 拿它當分母會每天喊「已量測 0/8」，而事實是 9 個有錨點的 cohort 全部可量測。
         line = (
             f"- 資本表達：非零 live 區間 {live}/{decisions} 筆"
-            f"｜已量測 outcome {measured}/{outcomes} 筆"
+            f"｜可量測 cohort {measurable}/{anchored} 個"
         )
         # 「機制從未產出」與「gate 改過但還沒有新 decision」是兩件事，不共用同一個 0。
         # 既有 decision 依 point-in-time 契約永不回寫，所以分母只在新 decision 產生時才長；
@@ -801,8 +806,14 @@ def render_today_markdown(brief: Mapping[str, Any]) -> str:
             line += "　⚠ 系統至今從未輸出過可入場區間"
         elif current_total:
             line += f"（現行 {markdown_text(version)} 骨架：{current_live}/{current_total}）"
-        if measured == 0 and outcomes:
-            line += "　⚠ 判斷準不準仍無法用證據回答"
+        if measurable == 0:
+            line += "　⚠ 判斷準不準仍無法用證據回答（無 Shadow 錨點）"
+        elif measured == 0 and outcomes:
+            # 有錨點就算得出報酬，但尚未有任何 probe 正式結案歸因。
+            line += (
+                f"　ℹ 報酬可量測但尚無結案歸因（outcome_envelopes {measured}/{outcomes}）；"
+                "跑 scripts/outcome_if_settled_today.py 看目前表現"
+            )
         lines.append(line)
     items = brief.get("items") or []
     if items:
