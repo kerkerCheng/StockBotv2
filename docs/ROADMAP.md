@@ -29,6 +29,7 @@ brainstorm；範圍大到需要驗收條件才開 plan。brainstorm 用 frontmat
 
 | 完成日 | 項目 | 歷史 plan |
 |--------|------|-----------|
+| 2026-08-15 | **引用解析缺口修復＋全域 cohort 掃描** — `assessment_context_mismatch` 使 AXT／LITE 的 paper 由 `SHADOW_ONLY／target 0` → **`ELIGIBLE／target 0.1%`**，frozen 非零 live 區間 **0/75 → 2/77**（現行 v3 骨架 **2/4**）；成因是引用字串與 `reference_index` 的 key 對不上——最刺眼一筆兩邊是**同一份 10-Q、同一個 SEC accession**，只因描述段不同而三種解析全不命中。修法選在源頭消歧義（新增 `decision_lab references`，寫 assessment 前看得到合格引用），**解析規則一字未動**，故無 authority laundering 空間。另修 Engine C 觀測提案 `as_of` 契約與 ledger 不一致（提案曾能建立、進池、被使用者核准，卻在寫入 ledger 那一刻才失敗）。**全域掃描 13 個 cohort 確認引用問題只影響這 2 筆**，並非原先推測的普遍主因 | — |
 | 2026-08-14 | **資本表達層 workstream（§4 六步完成五項，僅第 5 項待使用者決定）** — outcome 量測 0→9/9（AXTI 超額 QQQ +72.8%）；blocker severity 移進 config ＋ lane 維度，live 非零 **0→8**、binding 由 `live_lane_blockers` 71/72 變成 **`weakest_axis` 31**；引用無歧義解析＋「至少一個合格」，`axis_ceiling==0` **23→17**；催化劑排程使 AXT 複查日 **2026-11-15→2026-10-30**；daily brief 兩個常駐計數器上線 | [方向與 baseline](brainstorms/2026-08-13-capital-expression-direction-requirements.md) |
 | 2026-08-14 | **量測與資料語意收尾** — Shadow 錨點回填使可量測 cohort **7→9**（另 4 個無 ticker，屬正確 unavailable）；Engine C 拆出 `bar_date`／`price_kind`，`snapshot_date`（ETL 執行日）不再被誤當行情交易日；`engine_b.todo.SOURCE_COLLECTORS` 單一登記表使全套測試由 **911/1 紅 → 918/0**；`AGENTS.md` lessons **188→160 行**（15 個編號全保留，砍考古留判準） | — |
 | 2026-07-18 | **M1 CPO Depth Sprint** — AXT onboard；Coherent／Lumentum／NVIDIA／Broadcom 各 ≥3 distinct `origin_entity`；20 條 edge conflict 全數 resolve 並 project 進圖 | — |
@@ -87,6 +88,8 @@ D6：未經量測的機制不得享有默認信任，包含放寬本身）。
 
 | 項目 | 為什麼 | 驗收條件 | 前置 |
 |---|---|---|---|
+| **補齊各 cohort 的 `commercial_maturity` 觀測** | 該軸只接受 `engine_c_backlog`／`engine_c_customer`，沒有觀測就整軸歸零（IQE 因此停在 `SHADOW_ONLY`）。2026-08-15 已驗證**這不是非美股的結構性障礙**：SIVE 用年報 Note 5「Information about major customers」、IQE 用 Note 4.3，兩者都揭露。缺的是有人去讀年報附註並建觀測 | 因 `commercial_maturity_unknown` 而 `axis_ceiling=0` 的 cohort 數下降；IQE 由 `SHADOW_ONLY` → `ELIGIBLE` | 逐一取得該公司最新年報 PDF 的分部／客戶附註 |
+| **一手文件搜尋不可只靠關鍵字字面** | 2026-08-15 實測：查 IQE 客戶集中度時搜 `accounted for`（過去式），年報寫的是 `account for`（現在式），於是四輪查詢都回「未揭露」，我據此推論出「gate 對非美股結構性不可及」——**一個時態差異造出一條假的架構結論**。與同日修掉的引用字串歸零是同一形狀（機械比對冒充語意判斷，L15） | 追源 skill 明確要求：關鍵字未命中時必須改用語意定位（找分部附註／IFRS 8 段落）再下「未揭露」結論；並區分「解析失敗」與「確認不存在」 | 無 |
 | **Engine D cohort 重複** | 同公司可能同時存在 claim-keyed 與 company-keyed 兩個 cohort（2026-07-30 [74]／[75] 實例） | 新建 cohort 時偵測同公司既有 cohort 並警告。**不回溯清理**——Decision Store append-only，不做破壞性去重 | 無 |
 | **ETF 完整 look-through** | `issuer_loads` 只涵蓋 policy 已登記的 ownership，曝險輸出恆為 `partial` | 曝險輸出出現 `coverage: full` 的標的 ≥1 | 無 |
 | **本機 single-writer guard** | 目前靠人工紀律確保同一 working tree 只有一個 agent 寫入 | 模擬兩個 writer 併發時會被擋下（可寫成測試） | 無 |
@@ -120,9 +123,10 @@ D6：未經量測的機制不得享有默認信任，包含放寬本身）。
   alpha thesis 驅動成交 → 未來同時進 trade_log 與 Engine D fill。
 
   **真正待補的是後者**，但 `live_choices`／`live_execution_reports` 仍為 0 筆
-  （`paper_events` 已於 2026-08-08 首次寫入，現 4 筆 × 0.1% NAV）——live 這條路徑
-  從未被走過，72 筆 decision 的 `live_supported_range` 全為 0，連 `record-choice`
-  都無從執行。等真正要下第一筆 Engine D 驅動的 alpha 單時再加
+  （`paper_events` 已於 2026-08-08 首次寫入）——live 這條路徑從未被走過。
+  2026-08-15 起 `live_supported_range` 首次出現非零（AXT／LITE，各 `(0, 0.002)`），
+  但兩筆的 intent 都是 paper、`live_status` 仍為 `NOT_REQUESTED`，
+  `record-choice` 依舊無從執行。等真正要下第一筆 Engine D 驅動的 alpha 單時再加
   `record_trade.py --decision-id`，那時需求才具體；現在補等於對沒跑過的路徑猜規格。
   **解除條件是資本表達層 workstream（見「進行中」），不是補這支腳本。**
 

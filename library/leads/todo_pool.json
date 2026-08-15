@@ -2213,6 +2213,18 @@
         "trigger": "runway 需人工判讀／技術指標觀測問題",
         "until": null
       }
+    },
+    {
+      "added_at": "2026-08-15T01:20:40.215933+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2025-12-31T00:00:00+00:00；來源=IQE plc Annual Report and Accounts 2025, Note 4.3 Revenue - Disaggregation of se",
+      "n": 140,
+      "reason": null,
+      "ref_id": "po_2d86608a6c97eb32aa807c466cf761fc",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "engine_c",
+      "title": "Engine C 觀測：IQE.L / customer_concentration",
+      "type": "engine_c_observation"
     }
   ],
   "log": [
@@ -4688,6 +4700,6 @@
       "verb": "pending"
     }
   ],
-  "next_n": 140,
+  "next_n": 141,
   "schema_version": "1"
 }
