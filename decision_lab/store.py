@@ -668,6 +668,26 @@ class DecisionStore:
         # 以為系統從未被驗證過（L14 說常駐計數器是防呆，但接錯資料源的計數器是反向
         # 防呆）。Shadow 錨點才是報酬量測的真實前提：
         # `absolute_return = current_price / shadow.price - 1`，完全不經過 close。
+        # 「上線標的數」必須按 cohort 取**最新**一筆 decision，不能數歷來 decision。
+        # 2026-08-15：`live_range_nonzero_current` 是 9/16，但那 7 筆零值全是 AXT／
+        # LITE／IQE／NVDA 的舊版本——decision 依 point-in-time 契約永不回寫，於是每
+        # reassess 一次分母就 +1，**改進反而讓比率變難看**。按 cohort 去重後真實
+        # 狀態是 3/13。分母混合「當前狀態」與「歷史軌跡」是壞指標的典型形狀（L12）。
+        eligible = self._conn.execute(
+            """
+            SELECT COUNT(*) AS n FROM (
+              SELECT d.payload_json AS pj FROM system_decisions d
+              JOIN (
+                SELECT cohort_id, MAX(effective_at) AS m
+                FROM system_decisions GROUP BY cohort_id
+              ) t ON t.cohort_id = d.cohort_id AND t.m = d.effective_at
+              GROUP BY d.cohort_id
+            ) WHERE json_extract(pj, '$.sizing.paper_status') = 'ELIGIBLE'
+            """
+        ).fetchone()
+        cohorts = self._conn.execute(
+            "SELECT COUNT(*) AS n FROM decision_cohorts"
+        ).fetchone()
         measurable = self._conn.execute(
             "SELECT COUNT(DISTINCT cohort_id) AS n FROM shadow_observations"
             " WHERE status = 'observed' AND price IS NOT NULL"
@@ -684,6 +704,9 @@ class DecisionStore:
             # 全部 cohort（含 `unavailable`，那些多半是無 ticker 的未上市或殘骸）。
             "shadow_measurable_cohorts": int(measurable["n"] or 0),
             "shadow_anchored_cohorts": int(anchored["n"] or 0),
+            # 上線標的數：使用者實際要盯的廣度指標（ROADMAP 新 workstream 第一條）。
+            "eligible_cohorts": int(eligible["n"] or 0),
+            "total_cohorts": int(cohorts["n"] or 0),
             # ⚠ 分母只有在**新 decision 產生**時才會長。2026-08-14 一個 daily session
             # 讀到「0/73」後推論「gate 還是壞的，做完那三件事若仍是 0 就重新診斷」——
             # 那會是假陰性：既有 decision 依 point-in-time 契約永不回寫，計數器本來

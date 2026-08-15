@@ -790,22 +790,17 @@ def render_today_markdown(brief: Mapping[str, Any]) -> str:
         # 量測以 Shadow 錨點為準，不以 outcome_envelopes 為準：後者要人工 close 才有列，
         # 且 2026-08-15 實測 8 筆有 6 筆來自無 ticker 的廢棄 cohort，永遠算不出報酬。
         # 拿它當分母會每天喊「已量測 0/8」，而事實是 9 個有錨點的 cohort 全部可量測。
+        eligible = int(counters.get("eligible_cohorts") or 0)
+        total_cohorts = int(counters.get("total_cohorts") or 0)
+        # 首屏只放使用者實際在盯的三條（ROADMAP 新 workstream）：廣度、量測。
+        # 舊的「非零 live 區間 N/決策數」已移除：尺寸不再對人呈現（Alpha 呈現契約），
+        # 且它的分母數的是歷來 decision，同一標的每 reassess 一次就 +1。
         line = (
-            f"- 資本表達：非零 live 區間 {live}/{decisions} 筆"
+            f"- 研究進展：上線標的 {eligible}/{total_cohorts} 個"
             f"｜可量測 cohort {measurable}/{anchored} 個"
         )
-        # 「機制從未產出」與「gate 改過但還沒有新 decision」是兩件事，不共用同一個 0。
-        # 既有 decision 依 point-in-time 契約永不回寫，所以分母只在新 decision 產生時才長；
-        # 少了這一句，讀到 0/N 的人（或 agent）會把它誤讀成「修法無效」。
-        if version and current_total == 0 and decisions:
-            line += (
-                f"　⚠ 計價骨架已更新為 {markdown_text(version)}，"
-                "尚無新 decision——下次 reassess 才會反映，此數字現在不代表修法有效或無效"
-            )
-        elif live == 0 and decisions:
-            line += "　⚠ 系統至今從未輸出過可入場區間"
-        elif current_total:
-            line += f"（現行 {markdown_text(version)} 骨架：{current_live}/{current_total}）"
+        if eligible == 0 and total_cohorts:
+            line += "　⚠ 目前沒有任何可評估標的"
         if measurable == 0:
             line += "　⚠ 判斷準不準仍無法用證據回答（無 Shadow 錨點）"
         elif measured == 0 and outcomes:

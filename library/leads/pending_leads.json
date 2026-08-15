@@ -4147,10 +4147,18 @@
       "published_at": "2026-07-14",
       "refs": {},
       "source": "edgar:TSEM",
-      "status": "pending",
+      "status": "triaged_go",
       "themes": {},
       "title": "TSEM 6-K filed 2026-07-14",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-15T06:38:15.792631+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true
+        },
+        "reason": "SEC 一手 filing（6-K／10-Q／8-K）且屬 InP／CPO 瓶頸鏈追蹤標的；外國發行人的 6-K 是重大事件報告，地位等同 8-K",
+        "tier": 1
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/928876/000117891326003477/zk2635682.htm"
     },
     "lead_04dc35fd02b79ef30f014f2810fe4a47": {
@@ -4681,10 +4689,16 @@
       "published_at": "2026-06-29",
       "refs": {},
       "source": "edgar:MTSI",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {},
       "title": "MTSI 4 filed 2026-06-29",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-15T06:38:16.045216+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "Form 4 內部人交易申報，無供應鏈 claim、無可抽取關係主張",
+        "tier": 4
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/1493594/000090445426000379/xslF345X06/edgar.xml"
     },
     "lead_083f344e7f03004a3a2f55d8e9c3f7bd": {
@@ -5434,10 +5448,21 @@
       "published_at": "2026-05-15",
       "refs": {},
       "source": "edgar:POET",
-      "status": "pending",
+      "status": "triaged_go",
       "themes": {},
       "title": "POET 6-K filed 2026-05-15",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-15T06:38:16.293973+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true
+        },
+        "reason": "SEC 一手 filing（6-K／10-Q／8-K）且屬 InP／CPO 瓶頸鏈追蹤標的；外國發行人的 6-K 是重大事件報告，地位等同 8-K",
+        "related_trace_requeues": [
+          "lead_caa3e0209d61d6de504ac996be1f03fc"
+        ],
+        "tier": 1
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/1437424/000117184326003486/f6k_051526.htm"
     },
     "lead_10ce3c3e5213479b8624d7b3e59899f2": {
@@ -5580,10 +5605,18 @@
       "published_at": "2026-06-30",
       "refs": {},
       "source": "edgar:POET",
-      "status": "pending",
+      "status": "triaged_go",
       "themes": {},
       "title": "POET 6-K filed 2026-06-30",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-15T06:38:16.527196+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true
+        },
+        "reason": "SEC 一手 filing（6-K／10-Q／8-K）且屬 InP／CPO 瓶頸鏈追蹤標的；外國發行人的 6-K 是重大事件報告，地位等同 8-K",
+        "tier": 1
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/1437424/000117184326004397/f6k_063026.htm"
     },
     "lead_12f5545a0584132a028176abe9bcdbbb": {
@@ -5970,10 +6003,18 @@
       "published_at": "2026-05-18",
       "refs": {},
       "source": "edgar:POET",
-      "status": "pending",
+      "status": "triaged_go",
       "themes": {},
       "title": "POET 6-K filed 2026-05-18",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-15T06:38:16.769630+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true
+        },
+        "reason": "SEC 一手 filing（6-K／10-Q／8-K）且屬 InP／CPO 瓶頸鏈追蹤標的；外國發行人的 6-K 是重大事件報告，地位等同 8-K",
+        "tier": 1
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/1437424/000117184326003507/f6k_051826.htm"
     },
     "lead_1aa835b32dc4e06468322d132acc925a": {
@@ -7148,10 +7189,18 @@
       "published_at": "2026-08-04",
       "refs": {},
       "source": "edgar:TSEM",
-      "status": "pending",
+      "status": "triaged_go",
       "themes": {},
       "title": "TSEM 6-K filed 2026-08-04",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-15T06:38:17.003413+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true
+        },
+        "reason": "SEC 一手 filing（6-K／10-Q／8-K）且屬 InP／CPO 瓶頸鏈追蹤標的；外國發行人的 6-K 是重大事件報告，地位等同 8-K",
+        "tier": 1
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/928876/000117891326003776/zk2635828.htm"
     },
     "lead_24700653e97ff33c21c1dc97cfb66341": {
@@ -10704,10 +10753,16 @@
       "published_at": "2026-06-02",
       "refs": {},
       "source": "edgar:MTSI",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {},
       "title": "MTSI 4 filed 2026-06-02",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-15T06:38:17.239805+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "Form 4 內部人交易申報，無供應鏈 claim、無可抽取關係主張",
+        "tier": 4
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/1493594/000090445426000328/xslF345X06/edgar.xml"
     },
     "lead_442d7e50dfb28699c68236c766e1134b": {
@@ -11344,10 +11399,21 @@
       "published_at": "2026-08-05",
       "refs": {},
       "source": "edgar:GFS",
-      "status": "pending",
+      "status": "triaged_go",
       "themes": {},
       "title": "GFS 6-K filed 2026-08-05",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-15T06:38:17.524361+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true
+        },
+        "reason": "SEC 一手 filing（6-K／10-Q／8-K）且屬 InP／CPO 瓶頸鏈追蹤標的；外國發行人的 6-K 是重大事件報告，地位等同 8-K",
+        "related_trace_requeues": [
+          "lead_78a655cf74ea5516f2d24b2ac3eeb8bf"
+        ],
+        "tier": 1
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000219/gfs-20260630.htm"
     },
     "lead_476bd1f07c60e2995ad96640688707ee": {
@@ -13664,10 +13730,18 @@
       "published_at": "2026-08-13",
       "refs": {},
       "source": "edgar:POET",
-      "status": "pending",
+      "status": "triaged_go",
       "themes": {},
       "title": "POET 6-K filed 2026-08-13",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-15T06:38:17.791369+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true
+        },
+        "reason": "SEC 一手 filing（6-K／10-Q／8-K）且屬 InP／CPO 瓶頸鏈追蹤標的；外國發行人的 6-K 是重大事件報告，地位等同 8-K",
+        "tier": 1
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/1437424/000117184326005485/f6k_081326.htm"
     },
     "lead_6076a9d2224995bfb0874bc42fefa9b0": {
@@ -15333,10 +15407,18 @@
       "published_at": "2026-08-13",
       "refs": {},
       "source": "edgar:POET",
-      "status": "pending",
+      "status": "triaged_go",
       "themes": {},
       "title": "POET 6-K filed 2026-08-13",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-15T06:38:18.022264+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true
+        },
+        "reason": "SEC 一手 filing（6-K／10-Q／8-K）且屬 InP／CPO 瓶頸鏈追蹤標的；外國發行人的 6-K 是重大事件報告，地位等同 8-K",
+        "tier": 1
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/1437424/000149315226037615/form6-k.htm"
     },
     "lead_6d6393468a44e9d39e518ee6cb700d20": {
@@ -16067,10 +16149,18 @@
       "published_at": "2026-08-05",
       "refs": {},
       "source": "edgar:GFS",
-      "status": "pending",
+      "status": "triaged_go",
       "themes": {},
       "title": "GFS 6-K filed 2026-08-05",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-15T06:38:18.269793+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true
+        },
+        "reason": "SEC 一手 filing（6-K／10-Q／8-K）且屬 InP／CPO 瓶頸鏈追蹤標的；外國發行人的 6-K 是重大事件報告，地位等同 8-K",
+        "tier": 1
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000218/form6-kshellxearningsrelea.htm"
     },
     "lead_7492a9c7d071032785306522c73abe39": {
@@ -16411,19 +16501,19 @@
         "trace_next_trigger": "Commerce final award or GFS filing confirms CPO equity percentage and milestones",
         "trace_origin_entity": "U.S. Department of Commerce／NIST",
         "trace_origin_linkage": "official_for_300m_CPO_LOI;1pct_from_separate_May_quantum_agreement",
-        "trace_requeue_trigger": "related_triaged_lead:lead_7f66b743a034c41f6388aa800f333e62",
-        "trace_requeued_at": "2026-08-04T22:36:55.816839+00:00",
+        "trace_requeue_trigger": "related_triaged_lead:lead_46eab040757a85c528d884e48c674b30",
+        "trace_requeued_at": "2026-08-15T06:38:17.524361+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
           "GFS",
           "co:globalfoundries"
         ],
-        "trace_trigger_event_ref": "lead:lead_7f66b743a034c41f6388aa800f333e62",
+        "trace_trigger_event_ref": "lead:lead_46eab040757a85c528d884e48c674b30",
         "trace_trigger_kind": "primary_source_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -16444,13 +16534,13 @@
       },
       "title": "US Gov to take 1% stake in $GFS, and award them $300m for the US CHIPS ACT. This is actually a strong read through on $SIVE / $LITE, given this CHIPS ACT is specifically aimed at advancing CPO + Silicon Photonics. (For reference, Sivers and Lumentum were the only two public laser suppliers named in GFS presentation slides. Sivers laser arrays was named recently as a reference design in Globalfoundries SCALE for CPO). Per US Gov announcement: \"GlobalFoundries will receive up to $300 million to accelerate domestic CPO R&D by two to three years\" (NIST) Never thought we'd see the US Gov / $INTC foundry playbook for CPO in specific...",
       "triage": {
-        "decided_at": "2026-08-04T22:36:55.816839+00:00",
+        "decided_at": "2026-08-15T06:38:17.524361+00:00",
         "decision": "go",
         "priority_flags": {
           "independent_source": true,
           "novelty": true
         },
-        "reason": "新 triage PASS lead lead_7f66b743a034c41f6388aa800f333e62 與 parked trace 共用具名標的 LITE, SIVE, co:lumentum；事件觸發 bounded pq1 重查",
+        "reason": "指定實體的 tier-1 一手來源 lead_46eab040757a85c528d884e48c674b30 與 parked trace 共用具名標的 GFS, co:globalfoundries；事件觸發 bounded pq1 重查",
         "tier": 3
       },
       "triage_history": [
@@ -16467,6 +16557,22 @@
               "novelty": true
             },
             "reason": "關聯 GFS／SIVE／LITE 與 CPO，含政府持股、CHIPS Act 300M 美元及 2–3 年研發時程等可追查主張；NIST／GFS 官方文件可望提供獨立來源。",
+            "tier": 3
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-15T06:38:17.524361+00:00",
+          "superseded_reason": "指定實體的 tier-1 一手來源 lead_46eab040757a85c528d884e48c674b30 與 parked trace 共用具名標的 GFS, co:globalfoundries；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_46eab040757a85c528d884e48c674b30",
+          "triage": {
+            "decided_at": "2026-08-04T22:36:55.816839+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "independent_source": true,
+              "novelty": true
+            },
+            "reason": "新 triage PASS lead lead_7f66b743a034c41f6388aa800f333e62 與 parked trace 共用具名標的 LITE, SIVE, co:lumentum；事件觸發 bounded pq1 重查",
             "tier": 3
           }
         }
@@ -17367,10 +17473,18 @@
       "published_at": "2026-08-11",
       "refs": {},
       "source": "edgar:TSEM",
-      "status": "pending",
+      "status": "triaged_go",
       "themes": {},
       "title": "TSEM 6-K filed 2026-08-11",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-15T06:38:18.544271+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true
+        },
+        "reason": "SEC 一手 filing（6-K／10-Q／8-K）且屬 InP／CPO 瓶頸鏈追蹤標的；外國發行人的 6-K 是重大事件報告，地位等同 8-K",
+        "tier": 1
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/928876/000117891326004009/zk2635926.htm"
     },
     "lead_7f66b743a034c41f6388aa800f333e62": {
@@ -18583,10 +18697,18 @@
       "published_at": "2026-07-06",
       "refs": {},
       "source": "edgar:TSEM",
-      "status": "pending",
+      "status": "triaged_go",
       "themes": {},
       "title": "TSEM 6-K filed 2026-07-06",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-15T06:38:18.825118+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true
+        },
+        "reason": "SEC 一手 filing（6-K／10-Q／8-K）且屬 InP／CPO 瓶頸鏈追蹤標的；外國發行人的 6-K 是重大事件報告，地位等同 8-K",
+        "tier": 1
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/928876/000117891326003419/zk2635649.htm"
     },
     "lead_8830680ca1a27e2cd82df03ef10ce133": {
@@ -18702,10 +18824,18 @@
       "published_at": "2026-07-07",
       "refs": {},
       "source": "edgar:TSEM",
-      "status": "pending",
+      "status": "triaged_go",
       "themes": {},
       "title": "TSEM 6-K filed 2026-07-07",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-15T06:38:19.058505+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true
+        },
+        "reason": "SEC 一手 filing（6-K／10-Q／8-K）且屬 InP／CPO 瓶頸鏈追蹤標的；外國發行人的 6-K 是重大事件報告，地位等同 8-K",
+        "tier": 1
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/928876/000117891326003423/zk2635656.htm"
     },
     "lead_885ddd69b263f8197cfbe2db5825c332": {
@@ -18784,10 +18914,18 @@
       "published_at": "2026-08-06",
       "refs": {},
       "source": "edgar:MTSI",
-      "status": "pending",
+      "status": "triaged_go",
       "themes": {},
       "title": "MTSI 10-Q filed 2026-08-06",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-15T06:38:19.303890+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true
+        },
+        "reason": "SEC 一手 filing（6-K／10-Q／8-K）且屬 InP／CPO 瓶頸鏈追蹤標的；外國發行人的 6-K 是重大事件報告，地位等同 8-K",
+        "tier": 1
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/1493594/000149359426000038/mtsi-20260703.htm"
     },
     "lead_891dfebbd908d822ef6f4a55e1e465c0": {
@@ -19504,10 +19642,16 @@
       "published_at": "2026-05-20",
       "refs": {},
       "source": "edgar:MTSI",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {},
       "title": "MTSI 4 filed 2026-05-20",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-15T06:38:19.569287+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "Form 4 內部人交易申報，無供應鏈 claim、無可抽取關係主張",
+        "tier": 4
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/1493594/000090445426000310/xslF345X06/edgar.xml"
     },
     "lead_8f6d772fadcdb6aeff0365b985396a34": {
@@ -19694,10 +19838,16 @@
       "published_at": "2026-05-20",
       "refs": {},
       "source": "edgar:MTSI",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {},
       "title": "MTSI 4 filed 2026-05-20",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-15T06:38:19.855544+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "Form 4 內部人交易申報，無供應鏈 claim、無可抽取關係主張",
+        "tier": 4
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/1493594/000090445426000314/xslF345X06/edgar.xml"
     },
     "lead_91566124ed7104cd67577f995d19c83f": {
@@ -22621,10 +22771,18 @@
       "published_at": "2026-08-06",
       "refs": {},
       "source": "edgar:MTSI",
-      "status": "pending",
+      "status": "triaged_go",
       "themes": {},
       "title": "MTSI 8-K filed 2026-08-06",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-15T06:38:20.090320+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true
+        },
+        "reason": "SEC 一手 filing（6-K／10-Q／8-K）且屬 InP／CPO 瓶頸鏈追蹤標的；外國發行人的 6-K 是重大事件報告，地位等同 8-K",
+        "tier": 1
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/1493594/000149359426000036/mtsi-20260806.htm"
     },
     "lead_af57fda547a71e40dc0b6a4eb5b3ddf2": {
@@ -24485,10 +24643,18 @@
       "published_at": "2026-05-18",
       "refs": {},
       "source": "edgar:POET",
-      "status": "pending",
+      "status": "triaged_go",
       "themes": {},
       "title": "POET 6-K filed 2026-05-18",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-15T06:38:20.315130+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true
+        },
+        "reason": "SEC 一手 filing（6-K／10-Q／8-K）且屬 InP／CPO 瓶頸鏈追蹤標的；外國發行人的 6-K 是重大事件報告，地位等同 8-K",
+        "tier": 1
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/1437424/000149315226024093/form6-k.htm"
     },
     "lead_bb690d43949cd335d4d2bf91e5d527f8": {
@@ -24931,10 +25097,18 @@
       "published_at": "2026-08-03",
       "refs": {},
       "source": "edgar:POET",
-      "status": "pending",
+      "status": "triaged_go",
       "themes": {},
       "title": "POET 6-K filed 2026-08-03",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-15T06:38:20.563318+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true
+        },
+        "reason": "SEC 一手 filing（6-K／10-Q／8-K）且屬 InP／CPO 瓶頸鏈追蹤標的；外國發行人的 6-K 是重大事件報告，地位等同 8-K",
+        "tier": 1
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/1437424/000117184326005153/f6k_080326.htm"
     },
     "lead_c19de5bf5bd91892f61df291b500bb98": {
@@ -25037,10 +25211,18 @@
       "published_at": "2026-05-15",
       "refs": {},
       "source": "edgar:POET",
-      "status": "pending",
+      "status": "triaged_go",
       "themes": {},
       "title": "POET 6-K filed 2026-05-15",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-15T06:38:20.850251+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true
+        },
+        "reason": "SEC 一手 filing（6-K／10-Q／8-K）且屬 InP／CPO 瓶頸鏈追蹤標的；外國發行人的 6-K 是重大事件報告，地位等同 8-K",
+        "tier": 1
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/1437424/000117184326003487/f6k_051526.htm"
     },
     "lead_c3fa1ca7fd636810e6fababce5ce7f5a": {
@@ -26120,6 +26302,8 @@
         "research_run": "daily-brief-2026-08-15",
         "trace_attempts_ref": "Coherent 2026-08-12 IR earnings presentation；SEC 2026 Q3 10-Q／2026-08-14 10-K canonical filing；四組 exact quote 官方網域搜尋",
         "trace_next_trigger": "Coherent 公開 FY2026 Q4 transcript，或可逐字核對的 2026 10-K／客戶端文件確認外售政策、backlog 與 CPO pull-in",
+        "trace_requeue_trigger": "related_triaged_lead:lead_105118dfda204e29a99f82160ad2f751",
+        "trace_requeued_at": "2026-08-15T06:38:16.293973+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
@@ -26134,10 +26318,11 @@
           "co:macom",
           "co:poet_technologies"
         ],
+        "trace_trigger_event_ref": "lead:lead_105118dfda204e29a99f82160ad2f751",
         "trace_trigger_kind": "primary_source_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -26152,16 +26337,35 @@
       },
       "title": "My main takeaway was that your merchant CW laser suppliers seem to be EXTREMELY IMPORTANT now. But TLDR of $COHR earnings: \"given the demand that we see in our DC business with transceivers, I don’t see any time in the near future where we would be selling indium phosphide lasers externally\" - Ton more value placed on companies that sell InP lasers externally if $AAOI can't doesn't enough capacity for first gen-CPO deployments, $COHR not selling externally... I guess that's why $MTSI said a ton of customers are approaching them with urgency for InP CW DFB lasers (and they dont even have meaningful capacity coming online until EOY 2027) $AAOI -> Internal $COHR -> Internal Buyers -> fewer places to look for capacity. \"Our backlog now extends out, fiscal 2027 is basically completely booked out. We are booked really through the end of calendar 2027\" [ Massive massive demand visibility] - Coherent also mentioned LTAs spanning end of decade. So this kinda reinforces what $POET CEO said at their AGM that the \"big 3\" are fully sold out next 2 years. \"we’re not constrained in the assembly and test capacity right now. We’re really just constrained by the ramp of the indium phosphide production\" - Just for the bottleneck bros in terms of assembly/test not a bottleneck. \"absolutely no push-out of CPO demand. In fact, it has been the opposite. We have seen demand increase and request from customers’ demand getting pulled in\" \"we continue to expect revenue from CPO for scale-up applications to start to flow in the second half of calendar 2027\" - Big read through on other CPO players for scale up if $LITE, $COHR reaffirm revenue from CPO scale up coming h2027. - \"quarterly revenue exceeding $3 billion by the end of fiscal 2027\" - $COHR revenue go brrr So for regular numbers it's: - $2.046B revenue (+13.3% Q/Q, +33.8% Y/Y), main revenue ramp looks to be happening entering Q4 into 2027 - Non-GAAP gross margins: 40.2% Next quarter guide is: - Revenue: $2.2–$2.4B revenue - Non-GAAP gross margins: 39.5-41.5% Basically: $1.69B -> $1.81B -> $2.05B -> ~$2.30B -> $3.0B (end of FY 2027) ~39% -> 39.6% -> 40.2% -> ~40.5% (gross margins) For operating margins: 18.0% -> 19.5% -> 19.9% -> 20.3% -> 21.8% Little less impressed compared to $LITE margin growth in terms of profitability, but revenue scale for $COHR growing rapidly.",
       "triage": {
-        "decided_at": "2026-08-14T06:35:17.293239+00:00",
+        "decided_at": "2026-08-15T06:38:16.293973+00:00",
         "decision": "go",
         "priority_flags": {
           "contradiction": true,
           "independent_source": true,
           "novelty": true
         },
-        "reason": "COHR 法說會逐字 quote：InP 雷射不外售、backlog 訂滿至 2027 底、CPO 需求 pull-in、瓶頸在 InP 產能非組裝測試；直擊外購 CW 雷射供應商稀缺性（MTSI/AAOI/POET）核心 thesis，需追回法說會一手逐字稿",
+        "reason": "指定實體的 tier-1 一手來源 lead_105118dfda204e29a99f82160ad2f751 與 parked trace 共用具名標的 POET, co:poet_technologies；事件觸發 bounded pq1 重查",
         "tier": 3
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-15T06:38:16.293973+00:00",
+          "superseded_reason": "指定實體的 tier-1 一手來源 lead_105118dfda204e29a99f82160ad2f751 與 parked trace 共用具名標的 POET, co:poet_technologies；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_105118dfda204e29a99f82160ad2f751",
+          "triage": {
+            "decided_at": "2026-08-14T06:35:17.293239+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "contradiction": true,
+              "independent_source": true,
+              "novelty": true
+            },
+            "reason": "COHR 法說會逐字 quote：InP 雷射不外售、backlog 訂滿至 2027 底、CPO 需求 pull-in、瓶頸在 InP 產能非組裝測試；直擊外購 CW 雷射供應商稀缺性（MTSI/AAOI/POET）核心 thesis，需追回法說會一手逐字稿",
+            "tier": 3
+          }
+        }
+      ],
       "url": "https://x.com/aleabitoreddit/status/2087675367595380783"
     },
     "lead_cacb967c193853afdf372069a7b2e9f9": {
@@ -26805,10 +27009,18 @@
       "published_at": "2026-08-12",
       "refs": {},
       "source": "edgar:TSEM",
-      "status": "pending",
+      "status": "triaged_go",
       "themes": {},
       "title": "TSEM 6-K filed 2026-08-12",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-15T06:38:21.098641+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true
+        },
+        "reason": "SEC 一手 filing（6-K／10-Q／8-K）且屬 InP／CPO 瓶頸鏈追蹤標的；外國發行人的 6-K 是重大事件報告，地位等同 8-K",
+        "tier": 1
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/928876/000117891326004045/zk2635939.htm"
     },
     "lead_d024baf2ef9f980060fbac0805025087": {
@@ -27764,10 +27976,16 @@
       "published_at": "2026-05-21",
       "refs": {},
       "source": "edgar:MTSI",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {},
       "title": "MTSI 4 filed 2026-05-21",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-15T06:38:21.334374+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "Form 4 內部人交易申報，無供應鏈 claim、無可抽取關係主張",
+        "tier": 4
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/1493594/000090445426000317/xslF345X06/edgar.xml"
     },
     "lead_d63109271e1043f807fa19be3bbd69c5": {
@@ -30000,10 +30218,16 @@
       "published_at": "2026-05-20",
       "refs": {},
       "source": "edgar:MTSI",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {},
       "title": "MTSI 4 filed 2026-05-20",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-08-15T06:38:21.589184+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "Form 4 內部人交易申報，無供應鏈 claim、無可抽取關係主張",
+        "tier": 4
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/1493594/000090445426000312/xslF345X06/edgar.xml"
     },
     "lead_e8401fcea0059c70577286f509884e9f": {

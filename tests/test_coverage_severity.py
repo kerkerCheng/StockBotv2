@@ -311,93 +311,76 @@ def test_one_fatal_blocker_still_forces_research_completion(tmp_path: Path) -> N
         store.close()
 
 
-def test_daily_brief_carries_the_two_standing_counters(tmp_path: Path) -> None:
-    """兩個常駐計數器必須出現在 brief，且為 0 時要有警語。
+def test_daily_brief_counters_track_breadth_and_measurability(tmp_path) -> None:
+    """首屏計數器盯的是廣度與可量測性，不是部位尺寸。
 
-    它們存在的理由不是報表好看：2026-08-13 的 audit 發現同一個診斷被正確寫下四次
-    卻從未改到 binding constraint，成因是判準住在要人主動想起來去讀的文件裡
-    （D16：入口是使用者的一次動作，出口不該也要求使用者記得）。計數器讓開發迴圈
-    的進展每天自己出現，不需要任何人記得回去看 brainstorm。
+    2026-08-15 兩次修正：
+    (a) 量測改讀 Shadow 錨點。`outcome_envelopes` 要人工 `close` 才有列，實測 8 筆
+        有 6 筆來自無 ticker 的廢棄 cohort，於是 brief 每天喊「已量測 0/8」，而
+        9 個有錨點的 cohort 其實全部可量測——方向與事實相反的計數器比沒有更糟。
+    (b) 移除「非零 live 區間 N/決策數」。尺寸已不對人呈現（Alpha 呈現契約），
+        且那個分母數的是歷來 decision：同一標的每 reassess 一次就 +1，7 筆零值全是
+        AXT／LITE／IQE／NVDA 的舊版本，**改進反而讓比率變難看**。上線標的改按
+        cohort 取最新 decision 計算。
     """
     from decision_lab.brief import build_today_brief, render_today_markdown
 
     store = _store(tmp_path)
     try:
         counters = store.capital_expression_counters()
-        assert set(counters) == {
-            "decisions",
-            "live_range_nonzero",
-            "outcomes",
-            "measured_outcomes",
+        assert {
             "shadow_measurable_cohorts",
             "shadow_anchored_cohorts",
-            "calculator_version",
-            "decisions_current_calculator",
-            "live_range_nonzero_current",
-        }
+            "eligible_cohorts",
+            "total_cohorts",
+        } <= set(counters)
 
         brief = build_today_brief(store, as_of=NOW)
         assert brief["capital_expression"] == counters
-
-        # 全新 store：沒有 decision 也沒有 outcome，不該喊警語（沒東西可喊）。
-        assert "資本表達" in render_today_markdown(brief)
+        assert "研究進展" in render_today_markdown(brief)
 
         primed = dict(brief)
-        # (a) 骨架沒換過、確實從未產出 → 喊「從未輸出過」。
+        # 有標的、有錨點、已歸因 → 不喊任何警語。
         primed["capital_expression"] = {
-            "decisions": 73,
-            "live_range_nonzero": 0,
-            "outcomes": 8,
-            "measured_outcomes": 0,
-            "shadow_measurable_cohorts": 0,
-            "shadow_anchored_cohorts": 0,
-            "calculator_version": "probe-limit-v3",
-            "decisions_current_calculator": 73,
-            "live_range_nonzero_current": 0,
-        }
-        text = render_today_markdown(primed)
-        assert "非零 live 區間 0/73" in text
-        # 量測改讀 Shadow 錨點：outcome_envelopes 要人工 close 才有列，且實測分母
-        # 曾被三個無 ticker 的廢棄 cohort 撐大，喊出與事實相反的「已量測 0/8」。
-        assert "可量測 cohort 0/0" in text
-        assert "無 Shadow 錨點" in text
-        assert "系統至今從未輸出過可入場區間" in text
-        assert "判斷準不準仍無法用證據回答" in text
-
-        # (b) 骨架剛換、尚無新 decision → 必須明說這個 0 不代表修法無效。
-        # 2026-08-14 一個 daily session 正是讀到 0/73 後推論「gate 還是壞的」，
-        # 而既有 decision 依 point-in-time 契約永不回寫，那是假陰性。
-        primed["capital_expression"] = {
-            "decisions": 73,
-            "live_range_nonzero": 0,
-            "outcomes": 8,
-            "measured_outcomes": 0,
-            "shadow_measurable_cohorts": 0,
-            "shadow_anchored_cohorts": 0,
-            "calculator_version": "probe-limit-v3",
-            "decisions_current_calculator": 0,
-            "live_range_nonzero_current": 0,
-        }
-        # renderer 會 escape markdown（probe\-limit\-v3），比對前先去掉反斜線。
-        fresh = render_today_markdown(primed).replace("\\", "")
-        assert "probe-limit-v3" in fresh
-        assert "尚無新 decision" in fresh
-        assert "不代表修法有效或無效" in fresh
-        assert "系統至今從未輸出過可入場區間" not in fresh
-
-        # 一旦有產出就不再喊——警語要刺眼到不被略過，但不該每天喊。
-        primed["capital_expression"] = {
-            "decisions": 73,
-            "live_range_nonzero": 8,
-            "outcomes": 8,
-            "measured_outcomes": 7,
+            **counters,
+            "eligible_cohorts": 8,
+            "total_cohorts": 13,
             "shadow_measurable_cohorts": 9,
-            "shadow_anchored_cohorts": 9,
-            "calculator_version": "probe-limit-v3",
-            "decisions_current_calculator": 12,
-            "live_range_nonzero_current": 8,
+            "shadow_anchored_cohorts": 13,
+            "measured_outcomes": 7,
+            "outcomes": 8,
         }
         quiet = render_today_markdown(primed)
-        assert "⚠" not in quiet.split("資本表達")[1].split("\n")[0]
+        assert "上線標的 8/13" in quiet
+        assert "可量測 cohort 9/13" in quiet
+        assert "⚠" not in quiet.split("研究進展")[1].splitlines()[0]
+
+        # 沒有標的、沒有錨點 → 兩個警語都要出現，且要刺眼。
+        primed["capital_expression"] = {
+            **counters,
+            "eligible_cohorts": 0,
+            "total_cohorts": 13,
+            "shadow_measurable_cohorts": 0,
+            "shadow_anchored_cohorts": 0,
+            "measured_outcomes": 0,
+            "outcomes": 8,
+        }
+        loud = render_today_markdown(primed)
+        assert "目前沒有任何可評估標的" in loud
+        assert "無 Shadow 錨點" in loud
+
+        # 有錨點但尚未結案歸因 → 只提示去跑模擬，不喊「無法用證據回答」。
+        primed["capital_expression"] = {
+            **counters,
+            "eligible_cohorts": 8,
+            "total_cohorts": 13,
+            "shadow_measurable_cohorts": 9,
+            "shadow_anchored_cohorts": 13,
+            "measured_outcomes": 0,
+            "outcomes": 8,
+        }
+        info = render_today_markdown(primed)
+        assert "尚無結案歸因" in info
+        assert "無法用證據回答" not in info
     finally:
         store.close()
