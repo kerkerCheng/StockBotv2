@@ -1669,20 +1669,17 @@
       "added_at": "2026-08-08T20:07:50.101937+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 109,
+      "reactivated_at": "2026-08-15T02:24:09.979552+00:00",
+      "reactivation_event": {
+        "type": "decision_blocker_mode_changed"
+      },
       "reason": null,
       "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
       "title": "REVIEW — co:iqe",
-      "type": "decision_review",
-      "waiting_on": {
-        "derived_from_blockers": true,
-        "reason": "所有 blocker 都不需要使用者決定",
-        "set_at": "2026-08-15T02:15:10.678796+00:00",
-        "trigger": "圖中缺反向路徑（競爭者／可替代性）／執行面 context 缺失／財務核驗清單：backlog 缺失或待人工填入",
-        "until": null
-      }
+      "type": "decision_review"
     },
     {
       "added_at": "2026-08-08T20:07:50.101937+00:00",
@@ -2147,77 +2144,57 @@
       "added_at": "2026-08-14T06:37:55.335929+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 136,
-      "reason": null,
+      "reason": "blocker registry 判定只剩 system_internal；不需要使用者決定，亦不冒充外部事件",
       "ref_id": "dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "system_internal",
+      "resolved_at": "2026-08-15T02:24:09.979552+00:00",
       "source": "decision_lab",
       "title": "REVIEW — co:meta",
-      "type": "decision_review",
-      "waiting_on": {
-        "derived_from_blockers": true,
-        "reason": "所有 blocker 都不需要使用者決定",
-        "set_at": "2026-08-14T06:37:55.335895+00:00",
-        "trigger": "執行面 context 缺失／市場資料問題",
-        "until": null
-      }
+      "type": "decision_review"
     },
     {
       "added_at": "2026-08-14T06:37:55.335929+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 137,
-      "reason": null,
+      "reason": "blocker registry 判定只剩 system_internal；不需要使用者決定，亦不冒充外部事件",
       "ref_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "system_internal",
+      "resolved_at": "2026-08-15T02:24:09.979552+00:00",
       "source": "decision_lab",
       "title": "REVIEW — co:sivers_semiconductors",
-      "type": "decision_review",
-      "waiting_on": {
-        "derived_from_blockers": true,
-        "reason": "所有 blocker 都不需要使用者決定",
-        "set_at": "2026-08-14T06:37:55.335914+00:00",
-        "trigger": "執行面 context 缺失／市場資料問題",
-        "until": null
-      }
+      "type": "decision_review"
     },
     {
       "added_at": "2026-08-14T22:45:36.984090+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 138,
+      "reactivated_at": "2026-08-15T02:24:09.979552+00:00",
+      "reactivation_event": {
+        "type": "decision_blocker_mode_changed"
+      },
       "reason": null,
       "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
       "title": "REVIEW — co:axt",
-      "type": "decision_review",
-      "waiting_on": {
-        "derived_from_blockers": true,
-        "reason": "所有 blocker 都不需要使用者決定",
-        "set_at": "2026-08-14T22:45:36.983980+00:00",
-        "trigger": "財務核驗清單欄位缺失或待人工填入",
-        "until": null
-      }
+      "type": "decision_review"
     },
     {
       "added_at": "2026-08-14T22:45:36.984090+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 139,
+      "reactivated_at": "2026-08-15T02:24:09.979552+00:00",
+      "reactivation_event": {
+        "type": "decision_blocker_mode_changed"
+      },
       "reason": null,
       "ref_id": "dc_4d28e50810e46da7fd77ee042ee7bd1c",
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
       "title": "REVIEW — co:lumentum",
-      "type": "decision_review",
-      "waiting_on": {
-        "derived_from_blockers": true,
-        "reason": "所有 blocker 都不需要使用者決定",
-        "set_at": "2026-08-14T22:45:36.984037+00:00",
-        "trigger": "runway 需人工判讀／技術指標觀測問題",
-        "until": null
-      }
+      "type": "decision_review"
     },
     {
       "added_at": "2026-08-15T01:20:40.215933+00:00",
@@ -4739,6 +4716,86 @@
       "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
       "type": "decision_review",
       "verb": "waiting_reason_refreshed"
+    },
+    {
+      "at": "2026-08-15T02:24:09.979552+00:00",
+      "n": 138,
+      "prior_waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-08-14T22:45:36.983980+00:00",
+        "trigger": "財務核驗清單欄位缺失或待人工填入",
+        "until": null
+      },
+      "reason": "blocker 已不再全屬等待事件，恢復人工複查",
+      "receipt": null,
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "type": "decision_review",
+      "verb": "event_reactivated"
+    },
+    {
+      "at": "2026-08-15T02:24:09.979552+00:00",
+      "n": 109,
+      "prior_waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-08-15T02:15:10.678796+00:00",
+        "trigger": "圖中缺反向路徑（競爭者／可替代性）／執行面 context 缺失／財務核驗清單：backlog 缺失或待人工填入",
+        "until": null
+      },
+      "reason": "blocker 已不再全屬等待事件，恢復人工複查",
+      "receipt": null,
+      "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+      "type": "decision_review",
+      "verb": "event_reactivated"
+    },
+    {
+      "at": "2026-08-15T02:24:09.979552+00:00",
+      "n": 139,
+      "prior_waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-08-14T22:45:36.984037+00:00",
+        "trigger": "runway 需人工判讀／技術指標觀測問題",
+        "until": null
+      },
+      "reason": "blocker 已不再全屬等待事件，恢復人工複查",
+      "receipt": null,
+      "ref_id": "dc_4d28e50810e46da7fd77ee042ee7bd1c",
+      "type": "decision_review",
+      "verb": "event_reactivated"
+    },
+    {
+      "at": "2026-08-15T02:24:09.979552+00:00",
+      "n": 136,
+      "prior_waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-08-14T06:37:55.335895+00:00",
+        "trigger": "執行面 context 缺失／市場資料問題",
+        "until": null
+      },
+      "reason": "blocker registry 判定只剩 system_internal；不需要使用者決定，亦不冒充外部事件",
+      "receipt": "blocker-registry:system_internal",
+      "ref_id": "dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
+      "type": "decision_review",
+      "verb": "system_internal_retired"
+    },
+    {
+      "at": "2026-08-15T02:24:09.979552+00:00",
+      "n": 137,
+      "prior_waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-08-14T06:37:55.335914+00:00",
+        "trigger": "執行面 context 缺失／市場資料問題",
+        "until": null
+      },
+      "reason": "blocker registry 判定只剩 system_internal；不需要使用者決定，亦不冒充外部事件",
+      "receipt": "blocker-registry:system_internal",
+      "ref_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
+      "type": "decision_review",
+      "verb": "system_internal_retired"
     }
   ],
   "next_n": 141,

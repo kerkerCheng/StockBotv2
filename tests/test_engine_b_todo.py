@@ -1008,6 +1008,75 @@ def test_collect_material_decision_never_derives_waiting_from_system_blockers(
     assert row["event_link"]["receipt"] == "decision:pd_axt"
 
 
+def test_collect_marks_pure_system_internal_decision_for_retirement(
+    monkeypatch,
+) -> None:
+    """純 stale context 要交給 sync 留 audit，不可冒充「等事件」。"""
+
+    from mcp_server import decision_tools
+
+    monkeypatch.setattr(decision_tools, "get_decision_brief_core", lambda: {
+        "action_needed": True,
+        "items": [{
+            "cohort_id": "dc_meta",
+            "decision_id": "pd_meta",
+            "company_id": "co:meta",
+            "recommended_action": "REVIEW",
+            "evidence_delta": "none",
+            "blockers": [
+                "execution_fx_stale_since_decision",
+                "execution_market_stale_since_decision",
+                "fx_stale_since_decision",
+                "market_stale_since_decision",
+            ],
+        }],
+    })
+
+    row = todo.collect_from_decisions()[0]
+    assert row["system_internal_only"] is True
+    assert "waiting_on" not in row
+
+
+def test_sync_retires_existing_pure_system_internal_item_without_new_pq2() -> None:
+    pool = todo.empty_pool()
+    todo.sync(pool, [{
+        "type": "decision_review",
+        "ref_id": "dc_meta",
+        "title": "REVIEW — co:meta",
+        "source": "decision_lab",
+        "waiting_on": {
+            "derived_from_blockers": True,
+            "reason": "所有 blocker 都不需要使用者決定",
+            "trigger": "市場資料問題",
+            "until": None,
+        },
+    }], healthy_sources={"decisions"})
+
+    result = todo.sync(pool, [{
+        "type": "decision_review",
+        "ref_id": "dc_meta",
+        "title": "REVIEW — co:meta",
+        "source": "decision_lab",
+        "system_internal_only": True,
+    }], healthy_sources={"decisions"})
+
+    assert result["system_internal_retired"] == 1
+    assert todo.active_items(pool) == []
+    assert pool["items"][0]["resolution"] == "system_internal"
+    assert pool["log"][-1]["verb"] == "system_internal_retired"
+
+    fresh = todo.empty_pool()
+    result = todo.sync(fresh, [{
+        "type": "decision_review",
+        "ref_id": "dc_meta",
+        "title": "REVIEW — co:meta",
+        "source": "decision_lab",
+        "system_internal_only": True,
+    }], healthy_sources={"decisions"})
+    assert result["added"] == 0
+    assert todo.active_items(fresh) == []
+
+
 def test_raw_leads_are_not_pq2_and_legacy_items_migrate_with_audit() -> None:
     pool = _pool_with(
         {"type": "lead_research", "ref_id": "lead_a", "title": "raw lead"},

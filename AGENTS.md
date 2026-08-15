@@ -134,6 +134,8 @@ fetchers/edgar.py ──────↑                        engine_c/etl_yfin
 
 **「等你決定」與「等事件」分離（2026-07-30）：** 池子同時裝著兩種性質不同的東西，混在一起會讓訊噪比降到約 1:1（歷來 76 個編號有 31 個被 drop）。`config/decision_blockers.json` 的 `resolution_mode` 是分類判準：`user_decision`／`awaiting_external`／`system_internal`。保守規則——**只要有一個 blocker 需要人決定，整個項目就留在決策佇列**，寧可多問也不要安靜藏起來。使用者亦可用 `pending --until/--trigger` 明確指定等待條件，優先於自動推導。
 
+**人工判讀不等於外部事件（2026-08-15 使用者定案）：** 若現有公開資料已可開始 bounded research、source-trace、assessment 或 manual observation proposal，`go` 的決定是「是否啟動這份研究」，所以項目必須留在 `user_decision`；不能因 next step 含「人工填入／人工判讀」就藏進 `awaiting_external`。只有世界必須先產生新 filing、掛牌或到達既定日期才屬 `awaiting_external`。純 `system_internal`（例如 frozen market／FX context 的自然老化）不建立 pq2；既有誤分類項由 sync 留下 deterministic retirement audit 後結案。Graph admission、Engine C observation 寫入、thesis mutation 與 live gate 仍各自另取 exact 人工核准，研究 `go` 不會跨越它們。
+
 **Daily pq1 budget：** 每輪上限唯一 authority 是 `config/daily_routine.json`（目前 5，是吞吐量 cap 不是每日 quota）；排序權重唯一 authority 是 `engine_b/priority.py`。tracked thesis impact 由非 retired lifecycle ＋ non-terminal Decision cohorts 自動導出。
 
 **待核准內容密度（2026-07-30 使用者定案）：** stable pq2 編號不只列短標題。每項先給一段 TL;DR，再明列完整公司／ticker、誰供應誰、產品／材料／技術、事件成熟度、投資意義、證據與反證限制，以及 `go` 實際授權的 action type；**不得假設使用者能從 `co:*` ID 或內部術語自行還原主詞。** 這是 `skills/daily-brief/SKILL.md` 的共用 presentation contract。

@@ -898,10 +898,46 @@ def sync(
     added = 0
     reactivated = 0
     refreshed = 0
+    system_internal_retired = 0
     stamp = at or _now()
     incoming = list(incoming)
     seen_keys = {_key(str(row["type"]), str(row["ref_id"])) for row in incoming}
     for row in incoming:
+        if row.get("system_internal_only"):
+            key = _key(str(row["type"]), str(row["ref_id"]))
+            existing = next(
+                (
+                    candidate for candidate in active_items(pool)
+                    if _key(candidate["type"], candidate["ref_id"]) == key
+                ),
+                None,
+            )
+            if existing is not None and existing.get("dispatch_status") not in {
+                "queued", "researching", "awaiting_approval"
+            }:
+                prior_waiting = dict(existing.get("waiting_on") or {})
+                existing.pop("waiting_on", None)
+                existing.pop("deferred_at", None)
+                existing["resolved_at"] = stamp
+                existing["resolution"] = "system_internal"
+                existing["reason"] = (
+                    "blocker registry 判定只剩 system_internal；不需要使用者決定，"
+                    "亦不冒充外部事件"
+                )
+                pool["log"].append({
+                    "at": stamp,
+                    "n": existing["n"],
+                    "type": existing["type"],
+                    "ref_id": existing["ref_id"],
+                    "verb": "system_internal_retired",
+                    "reason": existing["reason"],
+                    "receipt": "blocker-registry:system_internal",
+                    **({"prior_waiting_on": prior_waiting} if prior_waiting else {}),
+                })
+                system_internal_retired += 1
+            # 新出現的純系統狀態不建立 pq2；既有 in-flight work order 也不由
+            # classifier 越權結案，仍交給它自己的 terminal receipt。
+            continue
         if str(row["type"]) == "ra_admission" and _dropped_before(pool, row):
             continue
         before = len(pool["items"])
@@ -1037,6 +1073,7 @@ def sync(
         "waiting_refreshed": refreshed,
         "source_cleared": cleared,
         "source_returned": uncleared,
+        "system_internal_retired": system_internal_retired,
         "active": len(active_items(pool)),
     }
 
@@ -1338,6 +1375,28 @@ def _derive_waiting_on(blockers: Any) -> dict[str, Any] | None:
     }
 
 
+def _only_system_internal_blockers(blockers: Any) -> bool:
+    """是否只有不該進 pq2 的系統內部狀態。
+
+    ``system_internal`` 與 ``awaiting_external`` 對使用者都不需要立即決定，
+    但前者依 registry 契約「不該呈現為待辦」。先前兩者共用
+    ``_derive_waiting_on``，導致 stale context 等系統狀態永久躺在「等事件」。
+    """
+
+    codes = [str(b) for b in blockers if isinstance(b, str)]
+    if not codes:
+        return False
+    try:
+        from decision_lab.blockers import get_blocker_registry
+
+        grouped = get_blocker_registry().classify(codes)
+    except Exception:
+        return False
+    return bool(grouped["system_internal"]) and not (
+        grouped["user_decision"] or grouped["awaiting_external"]
+    )
+
+
 def collect_from_decisions() -> list[dict[str, Any]]:
     """Fail-soft 外皮，維持既有呼叫面；健康狀態請改用 collect_all_with_health。"""
 
@@ -1370,6 +1429,10 @@ def _collect_decision_rows() -> list[dict[str, Any]]:
             ref = f"sheet:{identity}" if identity else ""
         if not ref:
             continue
+        blockers = item.get("blockers") or []
+        material_event = str(item.get("evidence_delta") or "none") in {
+            "material", "positive", "negative"
+        }
         label = company if company not in {"", "unknown", "unresolved"} else (
             company_hint or ticker or "unknown"
         )
@@ -1391,14 +1454,19 @@ def _collect_decision_rows() -> list[dict[str, Any]]:
                     else ""
                 ),
             }
+        # 純 system_internal 狀態不是 pq2，也不是外部事件。仍回傳給 sync，讓
+        # 既有 stable item 留下 deterministic retirement audit；新狀態則不建 item。
+        # material evidence 優先，不能因同時有 stale 診斷而被吞掉。
+        if not item.get("sheet_only") and not material_event and \
+                _only_system_internal_blockers(blockers):
+            row["system_internal_only"] = True
+            rows.append(row)
+            continue
         # 若這個決策的所有 blocker 都不需要使用者決定（純粹在等世界產生新資料），
         # 就直接帶著推導出的等待理由入池，不佔決策注意力。保守規則：只要有一個
         # blocker 需要人決定就照舊進決策佇列。
         waiting = (
-            None
-            if str(item.get("evidence_delta") or "none")
-            in {"material", "positive", "negative"}
-            else _derive_waiting_on(item.get("blockers") or [])
+            None if material_event else _derive_waiting_on(blockers)
         )
         if waiting:
             row["waiting_on"] = waiting

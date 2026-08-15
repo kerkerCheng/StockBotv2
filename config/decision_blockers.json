@@ -1,6 +1,6 @@
 {
   "_comment": "Blocker 字彙登記表。Blocker code 是散落在 coverage.py／sizing.py／adapters.py 產生、又被 brief／todo 消費的承重字串；本檔是它們唯一的說明權威。這是讀側分類層——只描述既有 code 的意義，不改變任何 code 的產生方式，因此不影響已凍結的 decision payload。",
-  "version": 3,
+  "version": 4,
   "_resolution_modes": {
     "user_decision": "使用者現在就能做出決定推進它。應留在決策佇列。",
     "awaiting_external": "需要世界上先發生某件事（新 filing、上市、更多文件、下一個財報）。不該持續佔用決策注意力，應轉為帶觸發條件的等待項。",
@@ -93,48 +93,48 @@
       "label": "圖中該公司沒有任何來源文件",
       "category": "evidence",
       "severity": "fatal",
-      "resolution_mode": "awaiting_external",
-      "next_step": "走 source-trace 取得一手文件並入圖。"
+      "resolution_mode": "user_decision",
+      "next_step": "核准 bounded source-trace；若產生 graph delta，入圖仍需另一個 exact admission gate。"
     },
     {
       "code": "independent_source_missing",
       "label": "缺與主體不同 origin_entity 的獨立佐證",
       "category": "evidence",
       "severity": "sizing",
-      "resolution_mode": "awaiting_external",
-      "next_step": "需要客戶端／第三方的新文件（L8）。注意 bounded read 只走 1 hop，證據必須掛在直接連到公司節點的邊上才看得到。"
+      "resolution_mode": "user_decision",
+      "next_step": "核准 bounded source-trace 尋找客戶端／第三方文件（L8）。若現有公開資料確實沒有，再明確 pending 到下一份 filing；bounded read 只走 1 hop，證據必須掛在直接連到公司節點的邊上才看得到。"
     },
     {
       "code": "causal_path_missing",
       "label": "圖中缺因果路徑",
       "category": "evidence",
       "severity": "fatal",
-      "resolution_mode": "awaiting_external",
-      "next_step": "補足供應鏈／技術關係邊。"
+      "resolution_mode": "user_decision",
+      "next_step": "核准 bounded gap research；產生 exact graph delta 後另走 graph admission。"
     },
     {
       "code": "counter_path_missing",
       "label": "圖中缺反向路徑（競爭者／可替代性）",
       "category": "evidence",
       "severity": "sizing",
-      "resolution_mode": "awaiting_external",
-      "next_step": "把競爭者與 competes_with 邊入圖，才能呈現可替代性。"
+      "resolution_mode": "user_decision",
+      "next_step": "核准 bounded gap research，先找競爭者與可替代性證據；產生 competes_with graph delta 後另走 graph admission。"
     },
     {
       "code": "graph_coverage_deficit",
       "label": "圖對該公司的覆蓋深度不足",
       "category": "evidence",
       "severity": "sizing",
-      "resolution_mode": "awaiting_external",
-      "next_step": "灌入更多不同 origin 的文件。"
+      "resolution_mode": "user_decision",
+      "next_step": "核准 bounded gap research，補不同 origin 的文件；任何 graph delta 仍須 exact admission。"
     },
     {
       "code": "research_assessment_missing",
       "label": "尚未提供五軸 Confidence assessment",
       "category": "assessment",
       "severity": "fatal",
-      "resolution_mode": "awaiting_external",
-      "next_step": "由研究 agent 產生 assessment JSON 後 reassess。"
+      "resolution_mode": "user_decision",
+      "next_step": "核准 bounded gap research，由研究 agent 產生 assessment JSON；若只讀 authority 足夠，完成後以新 decision receipt 結案。"
     },
     {
       "code": "catalyst_missing",
@@ -205,8 +205,8 @@
       "label": "runway 需人工判讀",
       "category": "financial",
       "severity": "sizing",
-      "resolution_mode": "awaiting_external",
-      "next_step": "由一手 filing 取得現金消耗與資本承諾後填 manual observation。"
+      "resolution_mode": "user_decision",
+      "next_step": "核准 bounded filing research；agent 先提出有 provenance 的 manual observation proposal，寫入 Engine C 仍需 exact 人工 gate。"
     },
     {
       "code": "holdings_unconfirmed",
@@ -332,8 +332,16 @@
       "label": "財務核驗清單項目缺失或待人工填入",
       "category": "financial",
       "severity": "sizing",
-      "resolution_mode": "awaiting_external",
-      "next_step": "依 source-trace 取得一手來源後以 engine_c/set_manual_field 新增有 provenance 的 observation。"
+      "resolution_mode": "user_decision",
+      "next_step": "核准 bounded filing research；agent 取得一手來源並提出 observation proposal，寫入 Engine C 仍需 exact 人工 gate。"
+    },
+    {
+      "code": "financial_resilience_corroboration_incomplete",
+      "label": "財務韌性缺獨立或一手 corroboration",
+      "category": "financial",
+      "severity": "fatal",
+      "resolution_mode": "user_decision",
+      "next_step": "核准 bounded filing research，補齊可稽核的 corroboration；若需要 manual observation，先提出 proposal 再走 exact 人工 gate。"
     },
     {
       "prefix": "holdings_market_value_missing:",
@@ -380,6 +388,25 @@
       "severity": "sizing",
       "resolution_mode": "system_internal",
       "next_step": "重新 reassess 即可。"
+    },
+    {
+      "code": "market_stale_since_decision",
+      "label": "凍結決策的行情已過期",
+      "category": "staleness",
+      "severity": "fatal",
+      "resolution_mode": "system_internal",
+      "next_step": "這是 point-in-time decision 的自然老化，不需要使用者決定；有 material evidence 或正式 reassess 時重凍 context。"
+    },
+    {
+      "code": "execution_market_stale_since_decision",
+      "label": "凍結決策的執行行情已過期",
+      "category": "staleness",
+      "severity": "fatal",
+      "fatal_lanes": [
+        "live"
+      ],
+      "resolution_mode": "system_internal",
+      "next_step": "這是 point-in-time decision 的自然老化，不需要使用者決定；live 仍以新 decision 與明確 choice/fill 為準。"
     },
     {
       "prefix": "holdings_",
@@ -533,48 +560,48 @@
       "label": "財務核驗清單：gross_margin_trend 缺失或待人工填入",
       "category": "financial",
       "severity": "sizing",
-      "resolution_mode": "awaiting_external",
-      "next_step": "由一手 filing 取得後以 engine_c/set_manual_field 填入 manual observation；功課沒做完只降尺寸。"
+      "resolution_mode": "user_decision",
+      "next_step": "核准 bounded filing research；agent 先提出有 provenance 的 manual observation proposal，寫入 Engine C 仍需 exact 人工 gate。功課沒做完只降尺寸。"
     },
     {
       "prefix": "financial_customer_concentration_",
       "label": "財務核驗清單：customer_concentration 缺失或待人工填入",
       "category": "financial",
       "severity": "sizing",
-      "resolution_mode": "awaiting_external",
-      "next_step": "由一手 filing 取得後以 engine_c/set_manual_field 填入 manual observation；功課沒做完只降尺寸。"
+      "resolution_mode": "user_decision",
+      "next_step": "核准 bounded filing research；agent 先提出有 provenance 的 manual observation proposal，寫入 Engine C 仍需 exact 人工 gate。功課沒做完只降尺寸。"
     },
     {
       "prefix": "financial_backlog_",
       "label": "財務核驗清單：backlog 缺失或待人工填入",
       "category": "financial",
       "severity": "sizing",
-      "resolution_mode": "awaiting_external",
-      "next_step": "由一手 filing 取得後以 engine_c/set_manual_field 填入 manual observation；功課沒做完只降尺寸。"
+      "resolution_mode": "user_decision",
+      "next_step": "核准 bounded filing research；agent 先提出有 provenance 的 manual observation proposal，寫入 Engine C 仍需 exact 人工 gate。功課沒做完只降尺寸。"
     },
     {
       "prefix": "financial_dilution_",
       "label": "財務核驗清單：dilution 缺失或待人工填入",
       "category": "financial",
       "severity": "sizing",
-      "resolution_mode": "awaiting_external",
-      "next_step": "由一手 filing 取得後以 engine_c/set_manual_field 填入 manual observation；功課沒做完只降尺寸。"
+      "resolution_mode": "user_decision",
+      "next_step": "核准 bounded filing research；agent 先提出有 provenance 的 manual observation proposal，寫入 Engine C 仍需 exact 人工 gate。功課沒做完只降尺寸。"
     },
     {
       "prefix": "financial_valuation_pressure_",
       "label": "財務核驗清單：valuation_pressure 缺失或待人工填入",
       "category": "financial",
       "severity": "sizing",
-      "resolution_mode": "awaiting_external",
-      "next_step": "由一手 filing 取得後以 engine_c/set_manual_field 填入 manual observation；功課沒做完只降尺寸。"
+      "resolution_mode": "user_decision",
+      "next_step": "核准 bounded filing research；agent 先提出有 provenance 的 manual observation proposal，寫入 Engine C 仍需 exact 人工 gate。功課沒做完只降尺寸。"
     }
   ],
   "_axis_unknown_suffix": {
     "suffix": "_unknown",
     "label": "該 Confidence 軸尚未提供有效評估",
     "category": "assessment",
-    "resolution_mode": "awaiting_external",
-    "next_step": "補足該軸所需 authority 後於 assessment 提供 level 與 evidence_refs。"
+    "resolution_mode": "user_decision",
+    "next_step": "核准 bounded gap research；agent 補足該軸所需 authority 後於 assessment 提供 level 與 evidence_refs。"
   },
   "_severity": "severity 決定 blocker 對資本的權力，與 resolution_mode（誰能解）正交。fatal＝歸零（必須講得出「亮起時標的更可能變壞」的因果機制，或決策根本無法稽核）；sizing＝只降 axis_ceiling，不歸零（研究／資料不完整）；diagnostic＝完全不影響資本，只出現在報表（請求參數、由其他 blocker 導出、或系統自身的作業狀態）。fatal_lanes 缺席＝兩個 lane 都致命；['live'] 表示只有 live 致命（paper 不需要 NAV 與執行 context）。未登記的 code 一律 fail closed 當 fatal。分類依據與實測觸發／清除率見 docs/brainstorms/2026-08-13-capital-expression-direction-requirements.md。"
 }

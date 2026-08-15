@@ -71,7 +71,7 @@ def test_parameterised_blockers_resolve_via_longest_prefix() -> None:
 def test_axis_unknown_suffix_is_recognised() -> None:
     spec = describe_blocker("commercial_maturity_unknown")
     assert spec is not UNKNOWN
-    assert spec.resolution_mode == "awaiting_external"
+    assert spec.resolution_mode == "user_decision"
 
 
 def test_unknown_blocker_defaults_to_needing_a_human() -> None:
@@ -98,10 +98,24 @@ def test_needs_user_decision_is_conservative() -> None:
     assert registry.needs_user_decision(
         ["financial_missing", "market_missing", "identity_unresolved"]
     )
-    # 全部等外部 → 可轉為等待
+    # 全部真的等外部 → 可轉為等待
     assert not registry.needs_user_decision(
-        ["financial_missing", "market_missing", "counter_path_missing"]
+        ["financial_missing", "market_missing", "research_ticker_unavailable"]
     )
+
+
+def test_agent_research_gaps_are_not_hidden_as_external_events() -> None:
+    """人工判讀／bounded research 是可立即 dispatch 的工作，不是世界事件。"""
+
+    for code in (
+        "counter_path_missing",
+        "research_assessment_missing",
+        "financial_runway_manual_required",
+        "financial_checklist_manual_required:backlog",
+        "financial_resilience_corroboration_incomplete",
+        "commercial_maturity_unknown",
+    ):
+        assert describe_blocker(code).resolution_mode == "user_decision", code
 
 
 def test_waiting_reasons_are_deduplicated_and_human_readable() -> None:
