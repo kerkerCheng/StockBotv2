@@ -174,6 +174,25 @@ Decision gap jobs 優先占用同一個 daily pq1 budget。若研究結果需要
 
 **退休貸款資本目標（2026-07-28 使用者定案）：** 使用者約 30 歲、退休目標約 60 歲；可長抱至到期的貸款資本以約 30 年後 `retirement_net_terminal_wealth` 最大化為方向，不以降低中途回撤為第一目標。契約為利息按月支付、期間不攤還本金、到期一次還本、允許投資用途。broad unlevered beta 是主要候選；daily 3x 可投資但維持衛星定位，exact review 必須扣除借款成本與到期本金比較退休淨終值，**月息若需靠賣出 beta 支付則該 tranche 不成立**。
 
+### Alpha 呈現契約（2026-08-15 使用者定案）
+
+**alpha 對使用者的輸出是「候選＋事件追蹤」，不是部位尺寸。** 系統只負責兩件使用者自己做不動的事：
+**哪些標的值得看**、以及**它們有什麼新事件**；買多少、什麼時候買由使用者決定。
+
+理由是實測而非偏好：6 個 ELIGIBLE cohort 每檔 target 固定 0.1% NAV、合計 0.6%（以可部署現金
+USD 30,567 計，每檔約 30 美元），而該尺寸來自從未被 outcome 驗證的 `axis_ceiling`
+（`measured_outcomes` 至今 0/8）。依 L14「未經量測的機制不得享有默認信任，**gate 也不例外**」，
+它沒有資格決定資本。使用者的原話是「繞了這麼久只得到我很早就看到的幾間公司、都等於 0.2%，
+我會不知道我到底做了什麼」——**產出若無法讓人分辨做了什麼與沒做，它就不算產出**。
+
+**paper lane 繼續運作，但定位改變：它是記分板，不是建議。** 0.1% 模擬部位是 outcome 量測的
+唯一資料來源，砍掉就永遠無法回答「系統判斷準不準」。brief 不得再把 paper target 或
+live supported range 當成行動指引呈現，但也不得停止累積它們。
+
+**真正的風控完全不變：** 5% 單筆上限、ETF 槓桿 nominal／effective cap、總曝險 cap 全部保留
+（numeric SSOT 仍是 `config/investment_policy.json` 與 `config/beta_policy.json`）。
+live choice／fill 仍然 100% 人工，系統不連 broker。
+
 ### Beta 呈現契約（2026-07-30 使用者定案）
 
 底層與首屏都只保存一條 `self_funded_supported_range`。自有現金可部署固定顯示 `Portfolio CASH − cash floor`，並明說 cash floor 以上為 Alpha／Beta 共用。另獨立顯示「未動用貸款額度／已借款／估計利息」，明標貸款不算自有現金。**不得用未解釋的斜線或 raw field name。**

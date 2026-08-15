@@ -59,7 +59,7 @@
     }
   ],
   "edgar_watch": {
-    "note": "只記 filing metadata（form/日期/URL），不下載全文。8-K/10-K/10-Q/Form 4 高優先；S-8 等註冊雜訊交 triage 判。下載＋抽取仍由使用者點名 research 動詞觸發。⚠ forms 是 exact match（fetchers/edgar.py get_filings），不做 prefix 比對：把 ticker 加進 watch 但該事件的 form 不在下方清單，watcher 看起來在跑卻永遠看不到它——CCXI 就是這樣，加進 watch 是為了 [74]/[114] 等的 S-4，但 S-4 原本不在清單。S-4/S-4A 為 SPAC 併購財務揭露本體（8-K/425 只是宣布遞交，不含財務）。",
+    "note": "只記 filing metadata（form/日期/URL），不下載全文。8-K/10-K/10-Q/Form 4 高優先；S-8 等註冊雜訊交 triage 判。下載＋抽取仍由使用者點名 research 動詞觸發。⚠ forms 是 exact match（fetchers/edgar.py get_filings），不做 prefix 比對：把 ticker 加進 watch 但該事件的 form 不在下方清單，watcher 看起來在跑卻永遠看不到它——CCXI 就是這樣，加進 watch 是為了 [74]/[114] 等的 S-4，但 S-4 原本不在清單。S-4/S-4A 為 SPAC 併購財務揭露本體（8-K/425 只是宣布遞交，不含財務）。2026-08-15：同一個坑第二次發生，這次是**外國發行人的 form 家族**。TSEM 早就在 tickers 裡，但 Tower 是以色列發行人、近期申報為 6-K ×727／20-F ×19、零筆 8-K／10-K／10-Q，於是 watcher 每天照跑卻永遠命中 0 筆——連 Tower／IQE 的 InP epiwafer 協議都沒看到（當時是靠 yahoo:iqe-l feed 撿到的）。POET（加拿大發行人）同型：6-K ×383／20-F ×11。已補 6-K 與 20-F。**加 ticker 前先查該公司實際申報的 form 家族**（data.sec.gov/submissions/CIK<10碼>.json 的 filings.recent.form 分布），不要假設美股 form 集合適用。",
     "_derive_note": "derive_from_tracked=true 時，實際監看清單為下方手動清單 ∪ tracked universe（thesis lifecycle＋未結案 cohort＋themes.txt 核心公司）中的美股。手動清單是**下限不是全集**：derivation 的上游任一暫時讀不到都會讓 tracked 縮小，若採取代語意就會靜默停止監看既有標的，而漏掉的 filing 沒人會發現。derivation 只補「已追蹤卻沒 watcher」這一側的漂移——CCXI 與 META 就是這樣漏掉的（§10.11）。外國發行人（IQE.L／SIVE.ST）由 us_edgar_candidates 依交易所後綴與非 USD 報價幣別排除，EDGAR 沒有它們的申報；改由 feeds 監看。",
     "derive_from_tracked": true,
     "tickers": [
@@ -72,6 +72,8 @@
       "LITE",
       "LRCX",
       "META",
+      "MTSI",
+      "POET",
       "TSEM"
     ],
     "forms": [
@@ -80,7 +82,9 @@
       "10-Q",
       "4",
       "S-4",
-      "S-4/A"
+      "S-4/A",
+      "6-K",
+      "20-F"
     ],
     "lookback_count": 8
   }
