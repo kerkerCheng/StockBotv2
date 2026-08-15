@@ -2090,17 +2090,18 @@
       "added_at": "2026-08-13T22:38:11.789464+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_0c419255bb4f1dcd4935b6c0f8a96202",
-      "dispatch_receipt": "decision:pd_f7404c602ae2d655fc57061b04b9eb95;manual_todo:147",
+      "dispatch_receipt": "decision:pd_06098038319698af27a783b2919b3ae3",
       "dispatch_ref": "wo_08da6fc8c1d466fa2ee31b7301a78b15",
-      "dispatch_status": "awaiting_approval",
-      "dispatch_updated_at": "2026-08-15T03:32:06.986982+00:00",
+      "dispatch_status": "completed",
+      "dispatch_updated_at": "2026-08-15T05:06:56.646165+00:00",
       "dispatched_at": "2026-08-15T02:13:40.942684+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 132,
-      "reason": null,
+      "reason": "NVDA 五軸與使用者核准 catalyst/disproof/expiry 已完成 paper reassess；paper ELIGIBLE，system NO_ACTION，未請求 live",
+      "receipt": "decision:pd_06098038319698af27a783b2919b3ae3",
       "ref_id": "dc_c0b6f81e3507a83b857258907fafa635",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-15T05:06:56.646165+00:00",
       "source": "decision_lab",
       "title": "REVIEW — co:nvidia",
       "type": "decision_review"
@@ -2200,6 +2201,7 @@
     },
     {
       "added_at": "2026-08-14T22:45:36.984090+00:00",
+      "deferred_at": "2026-08-15T05:14:38.698408+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_89f95297e179a7d820069dae311ab785",
       "dispatch_receipt": "observation-proposal:po_6179ae191cd7046ebf74271cca369aff",
@@ -2219,7 +2221,13 @@
       "resolved_at": null,
       "source": "decision_lab",
       "title": "REVIEW — co:lumentum",
-      "type": "decision_review"
+      "type": "decision_review",
+      "waiting_on": {
+        "reason": "[150] correction 已入 ledger，但 2026-03-28 runway 超過 100 天窗口；Q4 FY2026 SEC 8-K/Exhibit 99.1 只有期末 balance sheet，未提供可逐字重建 FCF 的 cash-flow statement。這是等外部 10-K，不是等人工判讀。",
+        "set_at": "2026-08-15T05:14:38.698408+00:00",
+        "trigger": "Lumentum FY2026 Form 10-K 公開完整 cash-flow statement；自動重建截至 2026-06-27 的 cash／total debt／FCF TTM proposal 後再走 exact Engine C gate",
+        "until": "2026-08-20"
+      }
     },
     {
       "added_at": "2026-08-15T01:20:40.215933+00:00",
@@ -2330,10 +2338,11 @@
       "added_at": "2026-08-15T03:31:40.634886+00:00",
       "hint": "TL;DR：NVIDIA（NVDA）五軸與 Q1 FY2027 customer concentration／RPO 已完成；要建立 paper 記分板，仍需由你確認自我證偽門檻。建議 catalyst：Q2 FY2027 財報確認 Data Center 成長與 gross margin，並於 Q3 FY2027 財報確認 Vera Rubin volume ramp。建議 disproof：任一成立即 revise／retire：(1) 2026-12-15 前公司把 Vera Rubin volume ramp 從 Q3 FY2027 延後超過一季；(2) Q2 或 Q3 FY2027 Data Center 營收季減至少 10%，且同季 non-GAAP gross margin 低於 70%。每季財報核查，觸發後 48 小時內 reassess 並停止新增 paper。expiry=2026-12-15。go 授權：只把這組 catalyst／disproof／expiry 用於 NVDA paper reassess；不入圖、不寫 Engine C、不授權 live／下單。",
       "n": 147,
-      "reason": null,
+      "reason": "已用核准條件建立 NVDA paper decision",
+      "receipt": "authority:decision;ref:pd_06098038319698af27a783b2919b3ae3",
       "ref_id": "decision-disproof:dc_c0b6f81e3507a83b857258907fafa635:2026-08-15",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-15T05:06:56.795222+00:00",
       "source": "manual",
       "title": "確認 NVIDIA catalyst／disproof／expiry",
       "type": "manual"
@@ -2353,12 +2362,20 @@
     },
     {
       "added_at": "2026-08-15T03:33:25.100536+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_d214a6d7ccb93dbf2fcd620dad791cef",
+      "dispatch_receipt": "decision:pd_033b3441f15a7a60f8aef994b5958637",
+      "dispatch_ref": "wo_5e0740f5325705ce5eaf8ed602c72054",
+      "dispatch_status": "completed",
+      "dispatch_updated_at": "2026-08-15T05:09:36.352796+00:00",
+      "dispatched_at": "2026-08-15T05:07:04.111729+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 149,
-      "reason": null,
+      "reason": "已將 IQE 年報 InP counter-path 納入 AXT technical_causal_link；僅支持基板結構重要性，不推論 AXT qualification/合約履約/sole_source；paper ELIGIBLE，system NO_ACTION",
+      "receipt": "decision:pd_033b3441f15a7a60f8aef994b5958637",
       "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-15T05:09:36.352796+00:00",
       "source": "decision_lab",
       "title": "REVIEW — co:axt",
       "type": "decision_review"
@@ -2367,10 +2384,11 @@
       "added_at": "2026-08-15T03:37:29.870874+00:00",
       "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-03-28T00:00:00+00:00；來源=Lumentum Q3 FY2026 Form 10-Q, filed 2026-05-06, accession 000162828026030777, ba",
       "n": 150,
-      "reason": null,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_6179ae191cd7046ebf74271cca369aff;proposal:po_6179ae191cd7046ebf74271cca369aff",
       "ref_id": "po_6179ae191cd7046ebf74271cca369aff",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-15T05:04:07.993497+00:00",
       "source": "engine_c",
       "title": "Engine C 觀測：LITE / runway_inputs",
       "type": "engine_c_observation"
@@ -5277,6 +5295,88 @@
       "ref_id": "dc_4d28e50810e46da7fd77ee042ee7bd1c",
       "type": "decision_review",
       "verb": "source_returned"
+    },
+    {
+      "at": "2026-08-15T05:04:07.993497+00:00",
+      "n": 150,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_6179ae191cd7046ebf74271cca369aff;proposal:po_6179ae191cd7046ebf74271cca369aff",
+      "ref_id": "po_6179ae191cd7046ebf74271cca369aff",
+      "type": "engine_c_observation",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-15T05:06:56.646165+00:00",
+      "n": 132,
+      "reason": "NVDA 五軸與使用者核准 catalyst/disproof/expiry 已完成 paper reassess；paper ELIGIBLE，system NO_ACTION，未請求 live",
+      "receipt": "decision:pd_06098038319698af27a783b2919b3ae3",
+      "ref_id": "dc_c0b6f81e3507a83b857258907fafa635",
+      "type": "decision_review",
+      "verb": "pq1_completed"
+    },
+    {
+      "at": "2026-08-15T05:06:56.646165+00:00",
+      "n": 132,
+      "reason": "NVDA 五軸與使用者核准 catalyst/disproof/expiry 已完成 paper reassess；paper ELIGIBLE，system NO_ACTION，未請求 live",
+      "receipt": "decision:pd_06098038319698af27a783b2919b3ae3",
+      "ref_id": "dc_c0b6f81e3507a83b857258907fafa635",
+      "type": "decision_review",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-15T05:06:56.795222+00:00",
+      "n": 147,
+      "reason": "已用核准條件建立 NVDA paper decision",
+      "receipt": "authority:decision;ref:pd_06098038319698af27a783b2919b3ae3",
+      "ref_id": "decision-disproof:dc_c0b6f81e3507a83b857258907fafa635:2026-08-15",
+      "type": "manual",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-15T05:07:04.111729+00:00",
+      "attempt": 1,
+      "n": 149,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_5e0740f5325705ce5eaf8ed602c72054",
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-08-15T05:07:05.337307+00:00",
+      "n": 149,
+      "reason": "核對 IQE 2025 年報原文新增的 InP raw-material counter-path，僅更新 AXT assessment 與 paper decision",
+      "receipt": "scope:iqe-inp-counterpath",
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-08-15T05:09:36.352796+00:00",
+      "n": 149,
+      "reason": "已將 IQE 年報 InP counter-path 納入 AXT technical_causal_link；僅支持基板結構重要性，不推論 AXT qualification/合約履約/sole_source；paper ELIGIBLE，system NO_ACTION",
+      "receipt": "decision:pd_033b3441f15a7a60f8aef994b5958637",
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "type": "decision_review",
+      "verb": "pq1_completed"
+    },
+    {
+      "at": "2026-08-15T05:09:36.352796+00:00",
+      "n": 149,
+      "reason": "已將 IQE 年報 InP counter-path 納入 AXT technical_causal_link；僅支持基板結構重要性，不推論 AXT qualification/合約履約/sole_source；paper ELIGIBLE，system NO_ACTION",
+      "receipt": "decision:pd_033b3441f15a7a60f8aef994b5958637",
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "type": "decision_review",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-15T05:14:38.698408+00:00",
+      "n": 139,
+      "reason": "[150] correction 已入 ledger，但 2026-03-28 runway 超過 100 天窗口；Q4 FY2026 SEC 8-K/Exhibit 99.1 只有期末 balance sheet，未提供可逐字重建 FCF 的 cash-flow statement。這是等外部 10-K，不是等人工判讀。",
+      "receipt": "source-trace:partial;decision:pd_f9d25b48ca3054dfadc384f7c6ee6447",
+      "ref_id": "dc_4d28e50810e46da7fd77ee042ee7bd1c",
+      "type": "decision_review",
+      "verb": "pending"
     }
   ],
   "next_n": 151,
