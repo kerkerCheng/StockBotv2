@@ -1,0 +1,29 @@
+SOURCE: Coherent Corp. Q4 FY2026 Earnings Call, 2026-08-12. Speaker: Jim Anderson (CEO).
+TRANSCRIPT PROVIDER: Investing.com（免費、無 paywall）
+https://www.investing.com/news/transcripts/earnings-call-transcript-coherent-tops-revenue-forecast-in-q4-2026-stock-swings-93CH-4856322
+
+⚠ EVIDENCE TIER：第三方逐字轉錄，**非 issuer 官方發布**。對「CEO 說了什麼」是標準
+做法且三家提供商互相可校對，但要升到 tier 1 需以 Coherent IR 的 webcast replay 逐句核對。
+未核對前不得標記為 issuer 一手。
+
+--- 逐字 quote（三句，對應原始推文的三個主張）---
+
+[1] 不外售 InP 雷射
+"I think on the last point, given the demand that we see in our data center business
+with transceivers, I don't see any time in the near future where we would be selling
+indium phosphide lasers externally."
+
+[2] 瓶頸在 InP 產能，不在封裝測試
+"Indium phosphide capacity continues to be our primary constraint... we're not
+constrained, for instance, if you look at transceivers, we're not constrained in the
+assembly and test capacity right now."
+
+[3] backlog 訂滿至 2027 底
+"Our backlog now extends out, fiscal 2027 is basically completely booked out.
+We are booked really through the end of calendar 2027."
+
+--- 交叉核對 ---
+同場財務數字已由 SEC 一手獨立確認（8-K 2026-08-12 EX-99.1, acc 0001193125-26-346860）：
+Q4 營收 $2,046M、+33.8% Y/Y、Non-GAAP GM 40.2%、Q1 FY27 guide $2.2-2.4B。
+FY2026 10-K（acc 0000820318-26-000020）另載 "InP is a foundational technology for
+next-generation AI optical interconnects" 與垂直整合自製雷射，與 [1][2] 方向一致但不等價。

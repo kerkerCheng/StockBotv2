@@ -2421,10 +2421,11 @@
       "added_at": "2026-08-15T07:50:42.739811+00:00",
       "hint": "TL;DR：Aeva Technologies（Nasdaq: AEVA，原為 4D LiDAR 公司）宣布跨入 AI 資料中心光連接，並已與一家未具名「major customer」簽署 joint development agreement，把自家 high-power optical source 技術用於某 hyperscaler 的 Near-Packaged Optics（NPO）方案。\n\n證據：AEVA 8-K Exhibit 99.1（Q2 2026 earnings release，filed 2026-08-05，SEC accession 0001193125-26-335102）逐字揭露，issuer 一手 tier 1。已存 library/raw/aeva_8k_ex991_20260805_optical_connectivity_npo.txt。\n\n成熟度：JDA 已簽署（高於 MOU／評估），但尚未量產——initial deployment 目標 H2 2027、production ramp 目標 2028。屬 agreement 階段，非 revenue。\n\n投資意義：NPO 是 CPO 的相鄰路線，光源仍是瓶頸環節。AEVA 從 LiDAR 跨進資料中心光源，等於這條供應鏈多一個非傳統玩家；對現有 InP／CW 雷射稀缺性的 thesis 是新變數（可能是新供給，也可能是新需求方）。\n\n證據邊界（重要）：原始推文推測「Sivers 是 Aeva 的 CW DFB 雷射／放大器供應商」「likely SIVE DFB + Aeva PIC」——這在 AEVA 全文 0 hits（Sivers／laser／ELSFP／foundry 皆無），issuer 用語是 high-power optical source 而非 laser，且只說 major customer 不是 optical engine player。該供應關係目前無任何一手支持。\n\ngo 授權：(a) 把 AEVA onboard 進 config/company_identity.json，(b) 以該 EX-99.1 為來源 prepare Research Action，入圖 AEVA→未具名 hyperscaler 的 NPO JDA 關係與 Optical Connectivity 業務線。**不授權**入圖 SIVE↔AEVA 供應關係。",
       "n": 153,
-      "reason": null,
+      "reason": "使用者核准：AEVA 已 onboard 進 identity registry（co:aeva，NASDAQ／USD），並以 8-K EX-99.1 為唯一來源入圖 2 nodes／1 edge／2 claims。未入圖 SIVE↔AEVA 供應關係（issuer 文件 0 hits）",
+      "receipt": "authority:graph;ref:aeva_8k_ex991_20260805_optical_connectivity",
       "ref_id": "source_ref=SEC accession 0001193125-26-335102",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-15T11:20:18.138648+00:00",
       "source": "manual",
       "title": "Onboard Aeva Technologies（AEVA）並入圖 NPO JDA — 本輪唯一有一手 graph delta 的新標的",
       "type": "manual"
@@ -5413,6 +5414,15 @@
       "ref_id": "dc_4d28e50810e46da7fd77ee042ee7bd1c",
       "type": "decision_review",
       "verb": "pending"
+    },
+    {
+      "at": "2026-08-15T11:20:18.138648+00:00",
+      "n": 153,
+      "reason": "使用者核准：AEVA 已 onboard 進 identity registry（co:aeva，NASDAQ／USD），並以 8-K EX-99.1 為唯一來源入圖 2 nodes／1 edge／2 claims。未入圖 SIVE↔AEVA 供應關係（issuer 文件 0 hits）",
+      "receipt": "authority:graph;ref:aeva_8k_ex991_20260805_optical_connectivity",
+      "ref_id": "source_ref=SEC accession 0001193125-26-335102",
+      "type": "manual",
+      "verb": "go"
     }
   ],
   "next_n": 154,

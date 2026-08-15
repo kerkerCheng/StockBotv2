@@ -6058,14 +6058,16 @@
       "published_at": "2026-08-06T04:12:45.000Z",
       "raw_text": "The unexpected thing of the week... Was $AEVA becoming a CPO/NPO optical source player. \n\nFor background: $SIVE is viewed as the high confidence CW DFB laser supplier to Aeva (which is known for lidar). \n\nToday, Aeva reacted with +18.26% AH on news that they signed a JDA with an optical engine player for deployment at a major hyperscaler in H2 2027, production ramp 2028. \n\n\"Optical Connectivity will leverage that foundation along with Aeva’s EXISTING high-volume manufacturing and foundry supply chain\" for:\n\n- ELSFP (similar to O-Net/Enablence + $SIVE), with Sivers as the likely CW laser + potential amplifier supplier\n\n- On-chip integrated light source (likely $SIVE DFB + Aeva PIC on the architecture/integration side)\n\nTLDR: New TAM and a hyperscaler programs for Aeva for CPO/NPO, positive read through for upstream suppliers like $SIVE.",
       "refs": {
+        "focus_company_id": "co:aeva",
         "parked_reason": "追源成功：AEVA 8-K EX-99.1 (acc 0001193125-26-335102) 一手逐字確認 Optical Connectivity 業務啟動、JDA 已簽、NPO 方案、hyperscaler、H2 2027 部署／2028 量產。但入圖前置未備：AEVA 未登記於 config/company_identity.json，且原貼的 SIVE 供應關係在 issuer 文件中 0 hits（Sivers／laser／ELSFP／foundry 皆無），屬作者推測",
+        "source_doc": "aeva_8k_ex991_20260805_optical_connectivity",
         "trace_next_trigger": "Sivers 或 Aeva 任一方具名揭露雙方供應關係；或 AEVA 後續 filing 揭露 NPO 客戶身分與光源供應商",
         "trace_requires_user": "true",
         "trace_review_hint": "這是本輪唯一有真實 graph delta 的 lead，也是新標的候選（對應「讓上線標的變多」）。go 授權：(a) 將 AEVA onboard 進 identity registry，(b) 以此 EX-99.1 為來源 prepare RA 入圖 AEVA→未具名 hyperscaler 的 NPO JDA 關係。**不授權**入圖 SIVE↔AEVA 供應關係——那在 issuer 文件中不存在，需 Sivers 或 Aeva 任一方具名揭露才能另案處理",
         "trace_status": "original_obtained"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "applied",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -6086,21 +6088,16 @@
       },
       "title": "The unexpected thing of the week... Was $AEVA becoming a CPO/NPO optical source player. For background: $SIVE is viewed as the high confidence CW DFB laser supplier to Aeva (which is known for lidar). Today, Aeva reacted with +18.26% AH on news that they signed a JDA with an optical engine player for deployment at a major hyperscaler in H2 2027, production ramp 2028. \"Optical Connectivity will leverage that foundation along with Aeva’s EXISTING high-volume manufacturing and foundry supply chain\" for: - ELSFP (similar to O-Net/Enablence + $SIVE), with Sivers as the likely CW laser + potential amplifier supplier - On-chip integrated light source (likely $SIVE DFB + Aeva PIC on the architecture/integration side) TLDR: New TAM and a hyperscaler programs for Aeva for CPO/NPO, positive read through for upstream suppliers like $SIVE.",
       "triage": {
-        "decided_at": "2026-08-06T22:33:30.263789+00:00",
+        "decided_at": "2026-08-15T11:21:18.541529+00:00",
         "decision": "go",
         "priority_flags": {
-          "independent_source": true,
-          "novelty": true
+          "independent_source": true
         },
-        "reason": "PASS：材料明確提到 Aeva 與高階 hyperscaler 的 JDA、H2 2027 deployment、2028 production ramp 及 existing manufacturing／foundry supply chain，且具體連到已追蹤 Sivers／CPO upstream；原始推文仍需 source-trace 驗證。",
+        "reason": "AEVA 8-K EX-99.1 一手已取得並逐字核實；使用者已於 pq2 [153] 核准 onboard 與入圖",
         "related_trace_requeues": [
-          "lead_075cb52a7fffdf3550210fc2a5f6fb8b",
-          "lead_44d33f5c904cb1fb75c452098d739e55",
-          "lead_6d6393468a44e9d39e518ee6cb700d20",
-          "lead_800fb456828b63727b76094378540c82",
           "lead_a9decd56cd086ff593d6e307c0508b48"
         ],
-        "tier": 3
+        "tier": 1
       },
       "url": "https://x.com/aleabitoreddit/status/2085217487864643658"
     },
@@ -22154,8 +22151,11 @@
         "trace_next_trigger": "具名中國 VC／投資機構原始數據、公司融資公告或可核對的研究方法／報告",
         "trace_origin_entity": "aleabitoreddit；Serenity",
         "trace_origin_linkage": "same_origin reposts; no independent primary dataset",
+        "trace_requeue_consumed_entities": [
+          "AEVA"
+        ],
         "trace_requeue_trigger": "related_triaged_lead:lead_1aa835b32dc4e06468322d132acc925a",
-        "trace_requeued_at": "2026-08-06T22:33:30.263789+00:00",
+        "trace_requeued_at": "2026-08-15T11:21:18.541529+00:00",
         "trace_requires_user": "false",
         "trace_status": "lead_only_tier_4",
         "trace_trigger_entities": [
@@ -22165,7 +22165,7 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {
         "robotics": {
           "counter_only": false,
@@ -22178,13 +22178,13 @@
       },
       "title": "Just some public market read through from Chinese private VC markets: Institutions are pouring funds into physical AI and world models. 1. Large models / LLMs: ~$23.56B 2. AI infrastructure + technical layer: ~$15.74B 3. Embodied intelligence / physical AI: ~$13.36B 4. AIGC applications: ~$8.79B 5. Autonomous driving + other Top-20 cluster: ~$3.82B, but not apples-to-apples with the above. Some notes: - \"Early-stage pure foundation-model funding is basically closed\". Looks like more funding is just being put into existing leaders and going into World Model companies. My guess is that we'll likely see the same in the US with Anthorpic/OpenAI consolidation. - \"World models have become the biggest consensus in early-stage investment.\" I said months ago 4D AI/World Models would be the most interesting moving forward, and called out $AEVA as potential exposure. But there's not exactly any pure play exposure. But probably next we'll wait for the next IPOs here in this sector maybe H1 next year. - AIGC application sector is the most mature for AI technology commercialization \"Artificial Intelligence Generated Content commercialization is mature but no clear winner yet\". Makes sense. in the US there's stuff like Grok Imagine, Google Nano Banana, etc. no clear winner too. especially for video. _ TLDR: Continued funding into AI infrastructure/semiconductor supply chains. Huge capital rotation influx into physical AI / embodied brain / humanoids + world models from capital inflow. Consolidation around leading frontier model companies. Personally just validated what I've been focusing on with Agility Robotics and physical AI players (eg. leaderdrive, harmonic, etc) in public markets... As new potential opportunities in terms of capital rotation. But sadly no world model pure play exposure yet.",
       "triage": {
-        "decided_at": "2026-08-06T22:33:30.263789+00:00",
+        "decided_at": "2026-08-15T11:21:18.541529+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true,
           "user_requested": true
         },
-        "reason": "新 triage PASS lead lead_1aa835b32dc4e06468322d132acc925a 與 parked trace 共用具名標的 AEVA；事件觸發 bounded pq1 重查",
+        "reason": "新 triage PASS lead lead_1aa835b32dc4e06468322d132acc925a 與 parked trace 共用具名標的 AEVA（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
         "tier": 4
       },
       "triage_history": [
@@ -22201,6 +22201,22 @@
               "user_requested": true
             },
             "reason": "Robotics 探索：具名公司／零件／政策與可追查數字或原始事件；進 pq1 追官方與客戶端來源，不把 Serenity 或圖片視為證據",
+            "tier": 4
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-15T11:21:18.541529+00:00",
+          "superseded_reason": "新 triage PASS lead lead_1aa835b32dc4e06468322d132acc925a 與 parked trace 共用具名標的 AEVA（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_1aa835b32dc4e06468322d132acc925a",
+          "triage": {
+            "decided_at": "2026-08-06T22:33:30.263789+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true,
+              "user_requested": true
+            },
+            "reason": "新 triage PASS lead lead_1aa835b32dc4e06468322d132acc925a 與 parked trace 共用具名標的 AEVA；事件觸發 bounded pq1 重查",
             "tier": 4
           }
         }
@@ -26315,13 +26331,13 @@
         "primary_url": "https://www.coherent.com/content/dam/coherent/site/en/documents/investors/investor-presentations/2026/august-12/investor-presentation-20260812.pdf",
         "research_outcome": "no_prepared_ra_partial_exact_transcript_missing",
         "research_run": "daily-brief-2026-08-15",
-        "trace_attempts_ref": "COHR 8-K 2026-08-12 EX-99.1 (acc 0001193125-26-346860) 已核實全部財務數字；COHR FY2026 10-K 2026-08-14 (acc 0000820318-26-000020) 已定位 InP／垂直整合／供應商集中段落並存成 library/raw/cohr_10_k_20260814_inp_vertical_integration.txt",
+        "trace_attempts_ref": "2026-08-15 取得免費逐字稿：Investing.com（Yahoo／Motley Fool 皆 404、MarketScreener 403、Seeking Alpha paywall）。三句 quote 全部逐字核實，已存 library/raw/cohr_q4fy26_earnings_call_quotes.txt。paywall 不再是阻礙",
         "trace_next_trigger": "使用者核准取得 Q4 FY2026 法說會逐字稿（Seeking Alpha 訂閱需另列 exact 金額與方案），或 Coherent IR 公開釋出 transcript／webcast replay",
         "trace_requeue_trigger": "related_triaged_lead:lead_105118dfda204e29a99f82160ad2f751",
         "trace_requeued_at": "2026-08-15T06:38:16.293973+00:00",
-        "trace_requires_user": "true",
+        "trace_requires_user": "false",
         "trace_review_hint": "Workstream B（Paywall ROI）首個實例：go 只授權取得該場法說會逐字稿並回 pq1，不接受二手轉述當證據、不提高 evidence tier、不授權入圖。搜尋摘要另提到 InP 產能 YoY 翻倍、6 月季雷射產量 +80%、6 吋良率超越 3 吋——同屬法說會內容，未經逐字核對前不得引用",
-        "trace_status": "partial",
+        "trace_status": "original_obtained",
         "trace_trigger_entities": [
           "AAOI",
           "COHR",

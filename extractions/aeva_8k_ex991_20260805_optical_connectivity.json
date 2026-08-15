@@ -1,0 +1,94 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "aeva_8k_ex991_20260805_optical_connectivity",
+    "title": "Aeva Reports Second Quarter 2026 Results — Launched Optical Connectivity Business with First Customer Agreement Signed for a Major Hyperscaler Deployment (Form 8-K Exhibit 99.1)",
+    "url": "https://www.sec.gov/Archives/edgar/data/1789029/000119312526335102/aeva-ex99_1.htm",
+    "origin_entity": "Aeva Technologies",
+    "source_type": "filing",
+    "evidence_tier": 1,
+    "published_at": "2026-08-05",
+    "permission_basis": "SEC EDGAR 公開 8-K 附件，保存有限逐字節錄與 canonical URL",
+    "storage_permission": "repo_excerpt"
+  },
+  "sources": [
+    {
+      "id": "aeva_8k_ex991_20260805_optical_connectivity_s1",
+      "locator": "Key Company Highlights, bullet 1",
+      "quote": "Launched Optical Connectivity business, using Aeva's proprietary high-power optical source technology for next-generation AI data centers."
+    },
+    {
+      "id": "aeva_8k_ex991_20260805_optical_connectivity_s2",
+      "locator": "Key Company Highlights, bullet 2",
+      "quote": "Signed joint development agreement with major customer to use Aeva's high-power optical source technology in a Near-Packaged Optics (NPO) solution for a hyperscaler with initial deployment targeted for second-half 2027 and production ramp targeted for 2028"
+    },
+    {
+      "id": "aeva_8k_ex991_20260805_optical_connectivity_s3",
+      "locator": "Press release headline",
+      "quote": "Launched Optical Connectivity Business with First Customer Agreement Signed for a Major Hyperscaler Deployment"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:aeva",
+      "type": "Company",
+      "name": "Aeva Technologies",
+      "abstraction_level": "device_chip",
+      "role": "disruptor",
+      "aliases": ["AEVA", "Aeva"],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "aeva_8k_ex991_20260805_optical_connectivity_s1",
+        "aeva_8k_ex991_20260805_optical_connectivity_s2"
+      ]
+    },
+    {
+      "id": "tech:near_package_optics",
+      "type": "TechNode",
+      "name": "Near-Packaged Optics (NPO)",
+      "abstraction_level": "module_subsystem",
+      "role": "network",
+      "aliases": ["NPO"],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": ["aeva_8k_ex991_20260805_optical_connectivity_s2"]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:aeva",
+      "dst_id": "tech:near_package_optics",
+      "relation": "supplies_to",
+      "attributes": {
+        "qualification_status": "none"
+      },
+      "confidence": 0.75,
+      "source_ids": ["aeva_8k_ex991_20260805_optical_connectivity_s2"]
+    }
+  ],
+  "claims": [
+    {
+      "id": "aeva_8k_ex991_20260805_optical_connectivity_cl1",
+      "statement": "Aeva has launched an Optical Connectivity business line that applies its proprietary high-power optical source technology to next-generation AI data centers, extending the company beyond its established 4D LiDAR sensing market.",
+      "subject_id": "co:aeva",
+      "demand_proof_level": "confirmed",
+      "confidence": 0.9,
+      "disproof_condition": "If Aeva discontinues or fails to report the Optical Connectivity business line in subsequent quarterly filings, or reclassifies it back into sensing without datacenter revenue, the business-line entry is invalidated. Check each quarterly filing; on trigger, review within 48 hours.",
+      "source_ids": [
+        "aeva_8k_ex991_20260805_optical_connectivity_s1",
+        "aeva_8k_ex991_20260805_optical_connectivity_s3"
+      ]
+    },
+    {
+      "id": "aeva_8k_ex991_20260805_optical_connectivity_cl2",
+      "statement": "Aeva signed a joint development agreement with an unnamed major customer to use Aeva's high-power optical source technology in a Near-Packaged Optics (NPO) solution for an unnamed hyperscaler, with initial deployment targeted for second-half 2027 and production ramp targeted for 2028. The agreement is a JDA at announcement, not qualified volume production, and neither the customer nor the hyperscaler is named by the issuer.",
+      "subject_id": "co:aeva",
+      "demand_proof_level": "guided",
+      "confidence": 0.8,
+      "disproof_condition": "If the JDA is terminated, the H2 2027 initial deployment slips beyond one further quarter without restatement, or Aeva reports no Optical Connectivity revenue by end of calendar 2028, the NPO commercialization path fails. Check each quarterly filing and any 8-K on the agreement; on trigger, review within 48 hours.",
+      "source_ids": ["aeva_8k_ex991_20260805_optical_connectivity_s2"]
+    }
+  ]
+}
