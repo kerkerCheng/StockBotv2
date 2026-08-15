@@ -2443,6 +2443,80 @@
       "source": "manual",
       "title": "Onboard Aeva Technologies（AEVA）並入圖 NPO JDA — 本輪唯一有一手 graph delta 的新標的",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-08-15T20:06:20.186969+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 154,
+      "reason": null,
+      "ref_id": "dc_2906500af891541ea4bdd52503b9b3aa",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:aeva",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-15T20:06:20.186969+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 155,
+      "reason": null,
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:axt",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-15T20:06:20.186969+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 156,
+      "reason": null,
+      "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:iqe",
+      "type": "decision_review",
+      "waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-08-15T20:06:20.186911+00:00",
+        "trigger": "執行面 context 缺失／匯率資料問題",
+        "until": null
+      }
+    },
+    {
+      "added_at": "2026-08-15T20:06:20.186969+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 157,
+      "reason": null,
+      "ref_id": "dc_c0b6f81e3507a83b857258907fafa635",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:nvidia",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-15T20:06:20.186969+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 158,
+      "reason": null,
+      "ref_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:sivers_semiconductors",
+      "type": "decision_review",
+      "waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-08-15T20:06:20.186955+00:00",
+        "trigger": "匯率資料問題",
+        "until": null
+      }
     }
   ],
   "log": [
@@ -5511,6 +5585,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 154,
+  "next_n": 159,
   "schema_version": "1"
 }
