@@ -1,0 +1,101 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "cohr_q4fy26_earnings_call_2026_08_12",
+    "title": "Coherent Corp. Q4 FY2026 Earnings Call (2026-08-12) — CEO Jim Anderson on indium phosphide capacity, external laser sales and backlog",
+    "url": "https://www.investing.com/news/transcripts/earnings-call-transcript-coherent-tops-revenue-forecast-in-q4-2026-stock-swings-93CH-4856322",
+    "origin_entity": "Coherent Corp.",
+    "source_type": "transcript",
+    "evidence_tier": 2,
+    "published_at": "2026-08-12",
+    "permission_basis": "第三方逐字轉錄（Investing.com，免費無 paywall），保存有限逐字節錄與 canonical URL。非 issuer 官方發布：對『CEO 說了什麼』可用，但要升 tier 1 須以 Coherent IR webcast replay 逐句核對後才改標。",
+    "storage_permission": "repo_excerpt"
+  },
+  "sources": [
+    {
+      "id": "cohr_q4fy26_earnings_call_2026_08_12_s1",
+      "locator": "Q&A, Jim Anderson (CEO)",
+      "quote": "I think on the last point, given the demand that we see in our data center business with transceivers, I don't see any time in the near future where we would be selling indium phosphide lasers externally."
+    },
+    {
+      "id": "cohr_q4fy26_earnings_call_2026_08_12_s2",
+      "locator": "Q&A, Jim Anderson (CEO)",
+      "quote": "Indium phosphide capacity continues to be our primary constraint... we're not constrained, for instance, if you look at transceivers, we're not constrained in the assembly and test capacity right now."
+    },
+    {
+      "id": "cohr_q4fy26_earnings_call_2026_08_12_s3",
+      "locator": "Q&A, Jim Anderson (CEO)",
+      "quote": "Our backlog now extends out, fiscal 2027 is basically completely booked out. We are booked really through the end of calendar 2027."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:coherent",
+      "type": "Company",
+      "name": "Coherent",
+      "abstraction_level": "module_subsystem",
+      "role": "leader",
+      "aliases": ["COHR"],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "cohr_q4fy26_earnings_call_2026_08_12_s1",
+        "cohr_q4fy26_earnings_call_2026_08_12_s2"
+      ]
+    },
+    {
+      "id": "tech:inp_dfb_laser",
+      "type": "TechNode",
+      "name": "InP DFB laser",
+      "abstraction_level": "device_chip",
+      "role": "bottleneck_supplier",
+      "aliases": ["indium phosphide laser"],
+      "attributes": {},
+      "confidence": 0.85,
+      "source_ids": [
+        "cohr_q4fy26_earnings_call_2026_08_12_s1",
+        "cohr_q4fy26_earnings_call_2026_08_12_s2"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:coherent",
+      "dst_id": "tech:inp_dfb_laser",
+      "relation": "constrained_by",
+      "attributes": {},
+      "confidence": 0.85,
+      "source_ids": ["cohr_q4fy26_earnings_call_2026_08_12_s2"]
+    }
+  ],
+  "claims": [
+    {
+      "id": "cohr_q4fy26_earnings_call_2026_08_12_cl1",
+      "statement": "Coherent's CEO stated that, given demand in its own data center transceiver business, he does not see Coherent selling indium phosphide lasers externally at any time in the near future. Coherent's InP laser output is therefore directed to internal transceiver consumption rather than the merchant laser market. This is a stated sales-policy intention on the earnings call, not a contractual commitment or a filed disclosure.",
+      "subject_id": "co:coherent",
+      "demand_proof_level": "guided",
+      "confidence": 0.8,
+      "disproof_condition": "If Coherent announces external merchant sales of indium phosphide lasers, names an external laser customer, or reports a merchant laser revenue line in any subsequent filing or earnings call, this claim is invalidated. Check each quarterly earnings call and filing; on trigger, review within 48 hours.",
+      "source_ids": ["cohr_q4fy26_earnings_call_2026_08_12_s1"]
+    },
+    {
+      "id": "cohr_q4fy26_earnings_call_2026_08_12_cl2",
+      "statement": "Coherent's CEO identified indium phosphide capacity as the company's primary constraint, and explicitly stated that transceiver assembly and test capacity is not currently a constraint. This locates the bottleneck at InP production rather than at back-end assembly and test.",
+      "subject_id": "co:coherent",
+      "demand_proof_level": "confirmed",
+      "confidence": 0.85,
+      "disproof_condition": "If Coherent later identifies assembly/test, packaging or another stage as its primary constraint, or states that indium phosphide capacity is no longer the binding constraint, this bottleneck location is invalidated. Check each quarterly earnings call; on trigger, review within 48 hours.",
+      "source_ids": ["cohr_q4fy26_earnings_call_2026_08_12_s2"]
+    },
+    {
+      "id": "cohr_q4fy26_earnings_call_2026_08_12_cl3",
+      "statement": "Coherent's CEO stated that backlog extends such that fiscal 2027 is basically completely booked out, with bookings running through the end of calendar 2027. No backlog dollar amount was disclosed on the call.",
+      "subject_id": "co:coherent",
+      "demand_proof_level": "guided",
+      "confidence": 0.8,
+      "disproof_condition": "If Coherent reports backlog cancellations, reduces forward revenue guidance for fiscal 2027, or discloses a backlog figure inconsistent with a fully booked fiscal 2027, this demand-visibility claim is invalidated. Check each quarterly earnings call and filing; on trigger, review within 48 hours.",
+      "source_ids": ["cohr_q4fy26_earnings_call_2026_08_12_s3"]
+    }
+  ]
+}

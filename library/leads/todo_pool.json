@@ -2395,6 +2395,10 @@
     },
     {
       "added_at": "2026-08-15T07:49:44.743255+00:00",
+      "deferred_at": "2026-08-15T12:56:14.747930+00:00",
+      "dispatch_ref": "lead:lead_c3fa1ca7fd636810e6fababce5ce7f5a",
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-08-15T12:54:39.664211+00:00",
       "hint": "已取得的一手硬數據（屬 Engine C 非 graph）：MTSI 10-Q Data Center 營收 US$137.584M vs 去年 US$75.822M（+81% YoY）；FQ4 guidance 營收 US$415-425M、adjusted GM 60-61%。SIVE 的 US$427M/yr 產能營收模型本身是原貼作者自建模型，非 issuer 揭露，不得入圖",
       "n": 151,
       "reason": null,
@@ -2403,10 +2407,20 @@
       "resolved_at": null,
       "source": "source_trace",
       "title": "追原報告／來源 access — I think it’s a good time to revisit $SIVE ~$427m/yr midpoint capacity revenue modeled projections. Given recent industry earnings: > $AAOI cited +20-40% demand imbalance for transceivers (with lase...",
-      "type": "source_trace_review"
+      "type": "source_trace_review",
+      "waiting_on": {
+        "reason": "研究與入圖完成：MACOM CEO 逐字確認 InP DFB 雷射普遍供應短缺造成客戶急迫（Motley Fool 免費全文）。已入圖 co:macom -[SUPPLIES_TO]-> tech:inp_dfb_laser ＋1 claim。⚠ 推文括號補充『產能要到 EOY 2027 才有意義』NOT IN TRANSCRIPT，未入圖。receipt 格式問題同 [152]",
+        "set_at": "2026-08-15T12:56:14.747930+00:00",
+        "trigger": "同 [152]：擇一補走 prepare_research_action 產生 ra_ id，或放寬完成規則接受 graph:<doc_id>",
+        "until": null
+      }
     },
     {
       "added_at": "2026-08-15T07:49:44.743255+00:00",
+      "deferred_at": "2026-08-15T12:53:04.336847+00:00",
+      "dispatch_ref": "lead:lead_caa3e0209d61d6de504ac996be1f03fc",
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-08-15T12:50:57.435828+00:00",
       "hint": "Workstream B（Paywall ROI）首個實例：go 只授權取得該場法說會逐字稿並回 pq1，不接受二手轉述當證據、不提高 evidence tier、不授權入圖。搜尋摘要另提到 InP 產能 YoY 翻倍、6 月季雷射產量 +80%、6 吋良率超越 3 吋——同屬法說會內容，未經逐字核對前不得引用",
       "n": 152,
       "reason": null,
@@ -2415,7 +2429,13 @@
       "resolved_at": null,
       "source": "source_trace",
       "title": "追原報告／來源 access — My main takeaway was that your merchant CW laser suppliers seem to be EXTREMELY IMPORTANT now. But TLDR of $COHR earnings: \"given the demand that we see in our DC business with transceivers, I don’...",
-      "type": "source_trace_review"
+      "type": "source_trace_review",
+      "waiting_on": {
+        "reason": "研究與入圖皆已完成，但 receipt 格式不匹配：完成規則要求 action:ra_*（prepare_research_action 產生），而本次走 loader.load_to_neo4j 直接載入，不產生 RA id。圖中資料為真：co:coherent -[CONSTRAINED_BY]-> tech:inp_dfb_laser、3 claims，doc_id=cohr_q4fy26_earnings_call_2026_08_12，lead 已 applied",
+        "set_at": "2026-08-15T12:53:04.336847+00:00",
+        "trigger": "擇一：(a) 補走 prepare_research_action 產生 ra_ id 後以 action:<id> 結案；(b) 放寬 source_trace_review 完成規則，接受 graph:<doc_id> 形式的入圖 receipt",
+        "until": null
+      }
     },
     {
       "added_at": "2026-08-15T07:50:42.739811+00:00",
@@ -5423,6 +5443,42 @@
       "ref_id": "source_ref=SEC accession 0001193125-26-335102",
       "type": "manual",
       "verb": "go"
+    },
+    {
+      "at": "2026-08-15T12:50:57.435828+00:00",
+      "n": 152,
+      "reason": "使用者 go 只授權 bounded source trace",
+      "receipt": "lead:lead_caa3e0209d61d6de504ac996be1f03fc",
+      "ref_id": "lead_caa3e0209d61d6de504ac996be1f03fc",
+      "type": "source_trace_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-08-15T12:53:04.336847+00:00",
+      "n": 152,
+      "reason": "研究與入圖皆已完成，但 receipt 格式不匹配：完成規則要求 action:ra_*（prepare_research_action 產生），而本次走 loader.load_to_neo4j 直接載入，不產生 RA id。圖中資料為真：co:coherent -[CONSTRAINED_BY]-> tech:inp_dfb_laser、3 claims，doc_id=cohr_q4fy26_earnings_call_2026_08_12，lead 已 applied",
+      "receipt": null,
+      "ref_id": "lead_caa3e0209d61d6de504ac996be1f03fc",
+      "type": "source_trace_review",
+      "verb": "pending"
+    },
+    {
+      "at": "2026-08-15T12:54:39.664211+00:00",
+      "n": 151,
+      "reason": "使用者 go 只授權 bounded source trace",
+      "receipt": "lead:lead_c3fa1ca7fd636810e6fababce5ce7f5a",
+      "ref_id": "lead_c3fa1ca7fd636810e6fababce5ce7f5a",
+      "type": "source_trace_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-08-15T12:56:14.747930+00:00",
+      "n": 151,
+      "reason": "研究與入圖完成：MACOM CEO 逐字確認 InP DFB 雷射普遍供應短缺造成客戶急迫（Motley Fool 免費全文）。已入圖 co:macom -[SUPPLIES_TO]-> tech:inp_dfb_laser ＋1 claim。⚠ 推文括號補充『產能要到 EOY 2027 才有意義』NOT IN TRANSCRIPT，未入圖。receipt 格式問題同 [152]",
+      "receipt": null,
+      "ref_id": "lead_c3fa1ca7fd636810e6fababce5ce7f5a",
+      "type": "source_trace_review",
+      "verb": "pending"
     }
   ],
   "next_n": 154,

@@ -25287,9 +25287,11 @@
       "raw_text": "I think it’s a good time to revisit $SIVE ~$427m/yr midpoint capacity revenue modeled projections.\n\nGiven recent industry earnings:\n\n> $AAOI cited +20-40% demand imbalance for transceivers (with lasers as the bottleneck).\n\n> $MTSI saying many \"Customers are coming to us with urgency due to the general supply shortage of indium phosphide DFB lasers\" (in other product lines)\n\n> US proposal ban on new Chinese optical transceivers (Innolight/Eoptolink)\n\n> AOI no meaningful participation in first-gen CPO deployments due to lasers being allocated toward transceivers. \n\nThe read through is that it’s possible to apply the same capacity-demand absorption modeling applying to $AAOI, but for other laser players like Sivers too.\n\nGiven the widespread shortage and demand imbalance for InP CW DFB capacity.",
       "refs": {
         "claimed_origin": "AAOI／MACOM industry earnings read-through 與作者的 Sivers USD 427M capacity-revenue model",
+        "focus_company_id": "co:macom",
         "parked_reason": "MTSI 逐字 quote（customers coming with urgency due to general supply shortage of InP DFB lasers）不在任何 SEC filing：10-Q (acc 0001493594-26-000038) 與 8-K EX-99.1 (acc 0001493594-26-000036) 的 laser／indium／DFB／shortage 全部 0 hits，CEO 評論僅一句泛泛成長策略。屬法說會口頭內容",
         "primary_url": "https://www.sivers-semiconductors.com/2026/02/26/vickram-vathulyas-letter-to-shareholders-interim-report-q4-2025/",
         "research_outcome": "no_prepared_ra_partial_author_inference",
+        "source_doc": "mtsi_q3fy26_earnings_call_2026_08_06",
         "trace_attempts_ref": "AAOI 2026-08-06 10-Q 本機合法副本；AAOI IR capacity releases；Sivers FY2025／Q1 2026 官方 reports；MACOM official exact search；社群 quote search",
         "trace_next_trigger": "使用者核准取得 MACOM FQ3 2026 法說會逐字稿（同 COHR 的 paywall 問題），或 MACOM IR 公開釋出 transcript",
         "trace_requeue_consumed_entities": [
@@ -25298,8 +25300,8 @@
           "CO:SIVERS_SEMICONDUCTORS",
           "SIVE"
         ],
-        "trace_requeue_trigger": "related_triaged_lead:lead_c7ca9aa7169d5ffa4a621430cac35d5e",
-        "trace_requeued_at": "2026-08-13T22:36:35.461760+00:00",
+        "trace_requeue_trigger": "user_go",
+        "trace_requeued_at": "2026-08-15T12:54:39.664211+00:00",
         "trace_requires_user": "true",
         "trace_review_hint": "已取得的一手硬數據（屬 Engine C 非 graph）：MTSI 10-Q Data Center 營收 US$137.584M vs 去年 US$75.822M（+81% YoY）；FQ4 guidance 營收 US$415-425M、adjusted GM 60-61%。SIVE 的 US$427M/yr 產能營收模型本身是原貼作者自建模型，非 issuer 揭露，不得入圖",
         "trace_status": "partial",
@@ -25316,7 +25318,7 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "applied",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -25337,12 +25339,13 @@
       },
       "title": "I think it’s a good time to revisit $SIVE ~$427m/yr midpoint capacity revenue modeled projections. Given recent industry earnings: > $AAOI cited +20-40% demand imbalance for transceivers (with lasers as the bottleneck). > $MTSI saying many \"Customers are coming to us with urgency due to the general supply shortage of indium phosphide DFB lasers\" (in other product lines) > US proposal ban on new Chinese optical transceivers (Innolight/Eoptolink) > AOI no meaningful participation in first-gen CPO deployments due to lasers being allocated toward transceivers. The read through is that it’s possible to apply the same capacity-demand absorption modeling applying to $AAOI, but for other laser players like Sivers too. Given the widespread shortage and demand imbalance for InP CW DFB capacity.",
       "triage": {
-        "decided_at": "2026-08-13T22:36:35.461760+00:00",
+        "decided_at": "2026-08-15T12:54:39.664211+00:00",
         "decision": "go",
         "priority_flags": {
-          "novelty": true
+          "novelty": true,
+          "user_requested": true
         },
-        "reason": "新 triage PASS lead lead_c7ca9aa7169d5ffa4a621430cac35d5e 與 parked trace 共用具名標的 AAOI, SIVE, co:applied_optoelectronics, co:sivers_semiconductors（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+        "reason": "使用者核准 exact source_trace_review；排入 bounded pq1，尚未接受 claim 或核准入圖",
         "tier": 3
       },
       "triage_history": [
@@ -25358,6 +25361,21 @@
               "novelty": true
             },
             "reason": "直接命中 Sivers／SIVE、AAOI、MTSI、InP CW DFB 雷射供需，含 4.27 億美元年產能推算、20–40% 需求缺口與客戶急迫性等具體可查主張，值得追原始法說。",
+            "tier": 3
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-15T12:54:39.664211+00:00",
+          "superseded_reason": "使用者核准 exact source_trace_review；排入 bounded pq1，尚未接受 claim 或核准入圖",
+          "trace_trigger": "user_go",
+          "triage": {
+            "decided_at": "2026-08-13T22:36:35.461760+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true
+            },
+            "reason": "新 triage PASS lead lead_c7ca9aa7169d5ffa4a621430cac35d5e 與 parked trace 共用具名標的 AAOI, SIVE, co:applied_optoelectronics, co:sivers_semiconductors（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
             "tier": 3
           }
         }
@@ -26327,14 +26345,16 @@
       "raw_text": "My main takeaway was that your merchant CW laser suppliers seem to be EXTREMELY IMPORTANT now. \n\nBut TLDR of $COHR earnings:\n\n\"given the demand that we see in our DC business with transceivers, I don’t see any time in the near future where we would be selling indium phosphide lasers externally\"\n\n- Ton more value placed on companies that sell InP lasers externally if $AAOI can't doesn't enough capacity for first gen-CPO deployments, $COHR not selling externally...  \n\nI guess that's why $MTSI said a ton of customers are approaching them with urgency for InP CW DFB lasers (and they dont even have meaningful capacity coming online until EOY 2027)\n\n$AAOI -> Internal\n$COHR -> Internal\nBuyers -> fewer places to look for capacity. \n\n \"Our backlog now extends out, fiscal 2027 is basically completely booked out. We are booked really through the end of calendar 2027\" [ Massive massive demand visibility]\n\n- Coherent also mentioned LTAs spanning end of decade. So this kinda reinforces what $POET CEO said at their AGM that the \"big 3\" are fully sold out next 2 years.\n\n\"we’re not constrained in the assembly and test capacity right now. We’re really just constrained by the ramp of the indium phosphide production\"\n\n- Just for the bottleneck bros in terms of assembly/test not a bottleneck. \n\n\"absolutely no push-out of CPO demand. In fact, it has been the opposite. We have seen demand increase and request from customers’ demand getting pulled in\"\n\n\"we continue to expect revenue from CPO for scale-up applications to start to flow in the second half of calendar 2027\" \n\n- Big read through on other CPO players for scale up if $LITE, $COHR reaffirm revenue from CPO scale up coming h2027. \n\n- \"quarterly revenue exceeding $3 billion by the end of fiscal 2027\" \n\n- $COHR revenue go brrr\n\nSo for regular numbers it's:\n\n- $2.046B revenue (+13.3% Q/Q, +33.8% Y/Y), main revenue ramp looks to be happening entering Q4 into 2027\n- Non-GAAP gross margins: 40.2%\n\nNext quarter guide is:\n- Revenue: $2.2–$2.4B revenue\n- Non-GAAP gross margins: 39.5-41.5%\n\nBasically:\n$1.69B -> $1.81B -> $2.05B -> ~$2.30B -> $3.0B (end of FY 2027) \n~39% -> 39.6% -> 40.2% -> ~40.5% (gross margins)\n\nFor operating margins:\n18.0% -> 19.5% -> 19.9% -> 20.3% -> 21.8%\n\nLittle less impressed compared to $LITE margin growth in terms of profitability, but revenue scale for $COHR growing rapidly.",
       "refs": {
         "claimed_origin": "Coherent FY2026 Q4 earnings call／IR presentation／SEC filing",
+        "focus_company_id": "co:coherent",
         "parked_reason": "財務數字已用 8-K EX-99.1 一手全部核實；三句關鍵 quote（不外售 InP 雷射／瓶頸在 InP ramp 非封測／backlog 訂滿 2027）僅存在於 Q4 FY2026 法說會口頭內容。免費 transcript 來源 (Yahoo Finance、Motley Fool) 皆 404，可得者為 Seeking Alpha paywall",
         "primary_url": "https://www.coherent.com/content/dam/coherent/site/en/documents/investors/investor-presentations/2026/august-12/investor-presentation-20260812.pdf",
         "research_outcome": "no_prepared_ra_partial_exact_transcript_missing",
         "research_run": "daily-brief-2026-08-15",
+        "source_doc": "cohr_q4fy26_earnings_call_2026_08_12",
         "trace_attempts_ref": "2026-08-15 取得免費逐字稿：Investing.com（Yahoo／Motley Fool 皆 404、MarketScreener 403、Seeking Alpha paywall）。三句 quote 全部逐字核實，已存 library/raw/cohr_q4fy26_earnings_call_quotes.txt。paywall 不再是阻礙",
         "trace_next_trigger": "使用者核准取得 Q4 FY2026 法說會逐字稿（Seeking Alpha 訂閱需另列 exact 金額與方案），或 Coherent IR 公開釋出 transcript／webcast replay",
-        "trace_requeue_trigger": "related_triaged_lead:lead_105118dfda204e29a99f82160ad2f751",
-        "trace_requeued_at": "2026-08-15T06:38:16.293973+00:00",
+        "trace_requeue_trigger": "user_go",
+        "trace_requeued_at": "2026-08-15T12:50:57.435828+00:00",
         "trace_requires_user": "false",
         "trace_review_hint": "Workstream B（Paywall ROI）首個實例：go 只授權取得該場法說會逐字稿並回 pq1，不接受二手轉述當證據、不提高 evidence tier、不授權入圖。搜尋摘要另提到 InP 產能 YoY 翻倍、6 月季雷射產量 +80%、6 吋良率超越 3 吋——同屬法說會內容，未經逐字核對前不得引用",
         "trace_status": "original_obtained",
@@ -26354,7 +26374,7 @@
         "trace_trigger_kind": "primary_source_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "applied",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -26369,14 +26389,15 @@
       },
       "title": "My main takeaway was that your merchant CW laser suppliers seem to be EXTREMELY IMPORTANT now. But TLDR of $COHR earnings: \"given the demand that we see in our DC business with transceivers, I don’t see any time in the near future where we would be selling indium phosphide lasers externally\" - Ton more value placed on companies that sell InP lasers externally if $AAOI can't doesn't enough capacity for first gen-CPO deployments, $COHR not selling externally... I guess that's why $MTSI said a ton of customers are approaching them with urgency for InP CW DFB lasers (and they dont even have meaningful capacity coming online until EOY 2027) $AAOI -> Internal $COHR -> Internal Buyers -> fewer places to look for capacity. \"Our backlog now extends out, fiscal 2027 is basically completely booked out. We are booked really through the end of calendar 2027\" [ Massive massive demand visibility] - Coherent also mentioned LTAs spanning end of decade. So this kinda reinforces what $POET CEO said at their AGM that the \"big 3\" are fully sold out next 2 years. \"we’re not constrained in the assembly and test capacity right now. We’re really just constrained by the ramp of the indium phosphide production\" - Just for the bottleneck bros in terms of assembly/test not a bottleneck. \"absolutely no push-out of CPO demand. In fact, it has been the opposite. We have seen demand increase and request from customers’ demand getting pulled in\" \"we continue to expect revenue from CPO for scale-up applications to start to flow in the second half of calendar 2027\" - Big read through on other CPO players for scale up if $LITE, $COHR reaffirm revenue from CPO scale up coming h2027. - \"quarterly revenue exceeding $3 billion by the end of fiscal 2027\" - $COHR revenue go brrr So for regular numbers it's: - $2.046B revenue (+13.3% Q/Q, +33.8% Y/Y), main revenue ramp looks to be happening entering Q4 into 2027 - Non-GAAP gross margins: 40.2% Next quarter guide is: - Revenue: $2.2–$2.4B revenue - Non-GAAP gross margins: 39.5-41.5% Basically: $1.69B -> $1.81B -> $2.05B -> ~$2.30B -> $3.0B (end of FY 2027) ~39% -> 39.6% -> 40.2% -> ~40.5% (gross margins) For operating margins: 18.0% -> 19.5% -> 19.9% -> 20.3% -> 21.8% Little less impressed compared to $LITE margin growth in terms of profitability, but revenue scale for $COHR growing rapidly.",
       "triage": {
-        "decided_at": "2026-08-15T06:38:16.293973+00:00",
+        "decided_at": "2026-08-15T12:50:57.435828+00:00",
         "decision": "go",
         "priority_flags": {
           "contradiction": true,
           "independent_source": true,
-          "novelty": true
+          "novelty": true,
+          "user_requested": true
         },
-        "reason": "指定實體的 tier-1 一手來源 lead_105118dfda204e29a99f82160ad2f751 與 parked trace 共用具名標的 POET, co:poet_technologies；事件觸發 bounded pq1 重查",
+        "reason": "使用者核准 exact source_trace_review；排入 bounded pq1，尚未接受 claim 或核准入圖",
         "tier": 3
       },
       "triage_history": [
@@ -26394,6 +26415,23 @@
               "novelty": true
             },
             "reason": "COHR 法說會逐字 quote：InP 雷射不外售、backlog 訂滿至 2027 底、CPO 需求 pull-in、瓶頸在 InP 產能非組裝測試；直擊外購 CW 雷射供應商稀缺性（MTSI/AAOI/POET）核心 thesis，需追回法說會一手逐字稿",
+            "tier": 3
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-15T12:50:57.435828+00:00",
+          "superseded_reason": "使用者核准 exact source_trace_review；排入 bounded pq1，尚未接受 claim 或核准入圖",
+          "trace_trigger": "user_go",
+          "triage": {
+            "decided_at": "2026-08-15T06:38:16.293973+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "contradiction": true,
+              "independent_source": true,
+              "novelty": true
+            },
+            "reason": "指定實體的 tier-1 一手來源 lead_105118dfda204e29a99f82160ad2f751 與 parked trace 共用具名標的 POET, co:poet_technologies；事件觸發 bounded pq1 重查",
             "tier": 3
           }
         }

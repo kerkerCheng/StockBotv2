@@ -1,0 +1,69 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mtsi_q3fy26_earnings_call_2026_08_06",
+    "title": "MACOM Technology Solutions Q3 FY2026 Earnings Call (2026-08-06) — CEO Stephen Daly on customer urgency from the indium phosphide DFB laser supply shortage",
+    "url": "https://www.fool.com/earnings/call-transcripts/2026/08/13/macom-mtsi-q3-2026-earnings-call-transcript/",
+    "origin_entity": "MACOM Technology Solutions",
+    "source_type": "transcript",
+    "evidence_tier": 2,
+    "published_at": "2026-08-06",
+    "permission_basis": "第三方逐字轉錄（The Motley Fool，免費無 paywall），保存有限逐字節錄與 canonical URL。非 issuer 官方發布：對『CEO 說了什麼』可用，要升 tier 1 須以 MACOM IR webcast replay 逐句核對後才改標。",
+    "storage_permission": "repo_excerpt"
+  },
+  "sources": [
+    {
+      "id": "mtsi_q3fy26_earnings_call_2026_08_06_s1",
+      "locator": "Prepared remarks / Q&A, Stephen Daly (CEO)",
+      "quote": "Customers are coming to us with urgency due to the general supply shortage of indium phosphide DFB lasers."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:macom",
+      "type": "Company",
+      "name": "MACOM Technology Solutions",
+      "abstraction_level": "device_chip",
+      "role": "bottleneck_supplier",
+      "aliases": ["MTSI", "MACOM"],
+      "attributes": {},
+      "confidence": 0.85,
+      "source_ids": ["mtsi_q3fy26_earnings_call_2026_08_06_s1"]
+    },
+    {
+      "id": "tech:inp_dfb_laser",
+      "type": "TechNode",
+      "name": "InP DFB laser",
+      "abstraction_level": "device_chip",
+      "role": "bottleneck_supplier",
+      "aliases": ["indium phosphide DFB laser"],
+      "attributes": {},
+      "confidence": 0.85,
+      "source_ids": ["mtsi_q3fy26_earnings_call_2026_08_06_s1"]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:macom",
+      "dst_id": "tech:inp_dfb_laser",
+      "relation": "supplies_to",
+      "attributes": {
+        "qualification_status": "none"
+      },
+      "confidence": 0.75,
+      "source_ids": ["mtsi_q3fy26_earnings_call_2026_08_06_s1"]
+    }
+  ],
+  "claims": [
+    {
+      "id": "mtsi_q3fy26_earnings_call_2026_08_06_cl1",
+      "statement": "MACOM's CEO stated that customers are approaching MACOM with urgency because of a general supply shortage of indium phosphide DFB lasers. This is a merchant-supplier account of demand pull caused by market-wide InP DFB laser scarcity, and is an independent origin_entity from Coherent's own statement that it does not sell indium phosphide lasers externally. The transcript does not state when additional MACOM DFB laser capacity comes online; any 'capacity not until end of 2027' figure circulating in secondary commentary is NOT supported by this call.",
+      "subject_id": "co:macom",
+      "demand_proof_level": "confirmed",
+      "confidence": 0.8,
+      "disproof_condition": "If MACOM subsequently reports that customer urgency has abated, that InP DFB laser supply has normalised, or if merchant laser suppliers publicly report excess InP DFB capacity, the shortage-driven demand-pull claim is invalidated. Check each quarterly earnings call; on trigger, review within 48 hours.",
+      "source_ids": ["mtsi_q3fy26_earnings_call_2026_08_06_s1"]
+    }
+  ]
+}
