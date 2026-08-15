@@ -58,6 +58,12 @@ def test_proposal_is_content_addressed_and_idempotent(pending_root) -> None:
     assert len(list(pending_observations.iter_pending())) == 1
 
 
+def test_correction_proposal_preserves_supersedes_link(pending_root) -> None:
+    record = _propose(supersedes_id="mo_original")
+
+    assert record["payload"]["supersedes_id"] == "mo_original"
+
+
 def test_unregistered_field_name_is_rejected_before_minting(pending_root) -> None:
     with pytest.raises(Exception):
         _propose(field_name="not_a_registered_field")
@@ -92,6 +98,25 @@ def test_as_of_without_timezone_is_rejected_before_minting(pending_root) -> None
 
     with pytest.raises(pending_observations.ProposalError, match="as_of"):
         _propose(as_of="2026-03-28T09:30:00")
+
+    assert list(pending_observations.iter_pending()) == []
+
+
+@pytest.mark.parametrize(
+    "value",
+    [
+        "{cash_and_equivalents:1,total_debt:2,free_cash_flow_ttm:3}",
+        '{"cash_and_equivalents":1,"total_debt":2}',
+        '{"cash_and_equivalents":true,"total_debt":2,"free_cash_flow_ttm":3}',
+    ],
+)
+def test_invalid_runway_payload_is_rejected_before_minting(
+    pending_root, value: str
+) -> None:
+    """不可發出一個 ledger 寫得進去、Decision coverage 卻吃不到的編號。"""
+
+    with pytest.raises(pending_observations.ProposalError, match="runway_inputs.value"):
+        _propose(value=value)
 
     assert list(pending_observations.iter_pending()) == []
 

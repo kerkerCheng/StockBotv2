@@ -72,6 +72,11 @@ def main() -> int:
     ap.add_argument("--source", required=False, help="依據的 filing（必填）")
     ap.add_argument("--as-of", dest="as_of", help="觀測日期／時間（必填，ISO-8601）")
     ap.add_argument("--author", default="user", help="輸入者識別（預設 user）")
+    ap.add_argument(
+        "--supersedes",
+        dest="supersedes_id",
+        help="修正既有 append-only observation 時，填入被取代的 mo_* ID",
+    )
     ap.add_argument("--list", dest="do_list", action="store_true", help="列出該 ticker 已填欄位")
     ap.add_argument(
         "--fields",
@@ -115,6 +120,7 @@ def main() -> int:
         source_ref=args.source,
         as_of=args.as_of,
         author=args.author,
+        supersedes_id=args.supersedes_id,
     )
     state = record["state"]
     print(f"✓ 已建立待核准提案 {record['proposal_id']}（state={state}）")

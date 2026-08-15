@@ -103,6 +103,20 @@ def propose(
         payload["as_of"] = normalize_as_of(payload["as_of"])
     except ValueError as exc:
         raise ProposalError(f"提案 as_of 不合法：{exc}") from exc
+    if spec.field_name == "runway_inputs":
+        # 這個欄位不是一般敘述字串；Decision coverage 會以 JSON 解析三個數值。
+        # 若只在 ledger 寫入後才發現格式錯，使用者已核准的 exact proposal 仍會變成
+        # 不可用 authority，還得再走一次 superseding gate。發編號前就用 consumer
+        # 的同一支 parser 驗證，避免「看得見、吃不到」的觀測。
+        from engine_c.checklist import _parse_runway_inputs
+
+        if _parse_runway_inputs(
+            payload["value"], payload["source_ref"], payload["as_of"]
+        ) is None:
+            raise ProposalError(
+                "runway_inputs.value 必須是合法 JSON 物件，且包含 "
+                "cash_and_equivalents、total_debt、free_cash_flow_ttm 三個數值"
+            )
     if supersedes_id is not None:
         payload["supersedes_id"] = str(supersedes_id).strip() or None
 
