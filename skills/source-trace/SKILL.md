@@ -38,6 +38,19 @@ description: >
 
 1. **原始登記表／官方頁：**
    - 美股：SEC EDGAR、公司 IR、法說逐字稿。
+   - **法說會 quote 專用路由（2026-08-15 實測，省下重走四條死路）：**
+     推文／二手轉述引用的管理層說法，**多半不在任何 SEC filing 裡**——實測 COHR 的
+     press release ＋ 10-K 對 `indium phosphide`／`backlog` 皆 0 hits、MTSI 的 10-Q ＋
+     8-K EX-99.1 對 `laser`／`DFB`／`shortage` 皆 0 hits，兩者的 CEO 評論在 filing 裡
+     只有一句泛泛場面話。**先查 filing 會落空，直接去 transcript。**
+     依序：公司 IR 的 webcast replay（唯一 tier-1）→ **Investing.com（免費全文，實測
+     可取得完整逐字）** → Motley Fool（只有部分季度，非每季都有）→ Yahoo Finance
+     ／MarketScreener（實測 404／403）→ Seeking Alpha（paywall，須依「付費報告」節
+     另行核准）。
+     ⚠ **第三方轉錄不是 issuer 一手。** 對「CEO 說了什麼」是標準做法且多家可互相
+     校對，但 evidence tier 最高 2；要升 tier 1 必須以 IR replay 逐句核對後才改標。
+     ⚠ 不要用猜的 URL 格式——2026-08-15 兩次直接組 fool.com／Yahoo 的 transcript
+     路徑都吃 404，改用 exact 標題搜尋才找到真正可得的那一家。
    - 台股：MOPS、交易所、公司 IR。
    - A 股：交易所公告、年／季報、問詢函、互動易。
    - 技術：DOI／publisher、arXiv、OFC／ECOC、標準組織、專利。
