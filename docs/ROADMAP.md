@@ -89,7 +89,6 @@ D6：未經量測的機制不得享有默認信任，包含放寬本身）。
 | 項目 | 為什麼 | 驗收條件 | 前置 |
 |---|---|---|---|
 | **補齊各 cohort 的 `commercial_maturity` 觀測** | 該軸只接受 `engine_c_backlog`／`engine_c_customer`，沒有觀測就整軸歸零（IQE 因此停在 `SHADOW_ONLY`）。2026-08-15 已驗證**這不是非美股的結構性障礙**：SIVE 用年報 Note 5「Information about major customers」、IQE 用 Note 4.3，兩者都揭露。缺的是有人去讀年報附註並建觀測 | 因 `commercial_maturity_unknown` 而 `axis_ceiling=0` 的 cohort 數下降；IQE 由 `SHADOW_ONLY` → `ELIGIBLE` | 逐一取得該公司最新年報 PDF 的分部／客戶附註 |
-| **一手文件搜尋不可只靠關鍵字字面** | 2026-08-15 實測：查 IQE 客戶集中度時搜 `accounted for`（過去式），年報寫的是 `account for`（現在式），於是四輪查詢都回「未揭露」，我據此推論出「gate 對非美股結構性不可及」——**一個時態差異造出一條假的架構結論**。與同日修掉的引用字串歸零是同一形狀（機械比對冒充語意判斷，L15） | 追源 skill 明確要求：關鍵字未命中時必須改用語意定位（找分部附註／IFRS 8 段落）再下「未揭露」結論；並區分「解析失敗」與「確認不存在」 | 無 |
 | **Engine D cohort 重複** | 同公司可能同時存在 claim-keyed 與 company-keyed 兩個 cohort（2026-07-30 [74]／[75] 實例） | 新建 cohort 時偵測同公司既有 cohort 並警告。**不回溯清理**——Decision Store append-only，不做破壞性去重 | 無 |
 | **ETF 完整 look-through** | `issuer_loads` 只涵蓋 policy 已登記的 ownership，曝險輸出恆為 `partial` | 曝險輸出出現 `coverage: full` 的標的 ≥1 | 無 |
 | **本機 single-writer guard** | 目前靠人工紀律確保同一 working tree 只有一個 agent 寫入 | 模擬兩個 writer 併發時會被擋下（可寫成測試） | 無 |

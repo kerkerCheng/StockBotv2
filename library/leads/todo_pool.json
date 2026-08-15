@@ -2218,10 +2218,11 @@
       "added_at": "2026-08-15T01:20:40.215933+00:00",
       "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2025-12-31T00:00:00+00:00；來源=IQE plc Annual Report and Accounts 2025, Note 4.3 Revenue - Disaggregation of se",
       "n": 140,
-      "reason": null,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_37aabfd50a5e50d001e52e4bc5073bda;proposal:po_2d86608a6c97eb32aa807c466cf761fc",
       "ref_id": "po_2d86608a6c97eb32aa807c466cf761fc",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-15T01:23:40.435636+00:00",
       "source": "engine_c",
       "title": "Engine C 觀測：IQE.L / customer_concentration",
       "type": "engine_c_observation"
@@ -4698,6 +4699,15 @@
       "ref_id": "decision-disproof:dc_a94362af0d6a7398f02bdeb4f0fb893c:2026-08-14",
       "type": "manual",
       "verb": "pending"
+    },
+    {
+      "at": "2026-08-15T01:23:40.435636+00:00",
+      "n": 140,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_37aabfd50a5e50d001e52e4bc5073bda;proposal:po_2d86608a6c97eb32aa807c466cf761fc",
+      "ref_id": "po_2d86608a6c97eb32aa807c466cf761fc",
+      "type": "engine_c_observation",
+      "verb": "go"
     }
   ],
   "next_n": 141,
