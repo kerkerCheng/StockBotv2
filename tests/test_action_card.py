@@ -435,3 +435,44 @@ def test_new_live_choice_requires_its_own_fill(tmp_path: Path) -> None:
         assert card["scope"]["single_name"] == "execute_confirmed_live_choice"
     finally:
         store.close()
+
+
+def test_markdown_does_not_present_a_recommended_size() -> None:
+    """Alpha 呈現契約（2026-08-15）：不對人輸出建議尺寸。
+
+    事發：6 個 ELIGIBLE cohort 的 target 全是同一個 0.1% NAV（合計 0.6%，以可部署
+    現金計每檔約 30 美元）。那個數字來自從未被 outcome 驗證的 axis_ceiling
+    （measured_outcomes 0/8），是常數、不帶資訊，卻讓人讀成系統在建議部位。
+    使用者的話：「繞了這麼久只得到我很早就看到的幾間公司、都等於 0.2%。」
+
+    數值仍必須完整保留在 JSON——outcome 量測與稽核要用，拔掉就再也答不出
+    「系統準不準」。這裡鎖的只是「不對人呈現成行動指引」。
+    """
+
+    import re
+    from decision_lab.action_card import render_markdown
+
+    card = {
+        "action": "REVIEW",
+        "company_id": "co:test",
+        "urgency": "next_review",
+        "reason": "r",
+        "alpha_beta": {"classification": "alpha"},
+        "disproof_condition": "d",
+        "weakest_link": {"axis": "source_reliability", "level": "bounded_hypothesis", "reason": "w"},
+        "execution_intent": "paper",
+        "paper": {"status": "ELIGIBLE", "target": 0.001, "funded": True},
+        "live": {"status": "NOT_REQUESTED", "supported_range": [0.0, 0.002]},
+        "blockers": [],
+        "incomplete_research": [],
+        "next_action": "n",
+    }
+
+    out = render_markdown(card)
+
+    assert "0.1000%" not in out and "0.002" not in out, "不得把尺寸當行動指引呈現"
+    assert not re.search(r"target=", out)
+    # 但狀態與診斷必須留著——今天整天就是靠 blockers 找到問題的。
+    assert "ELIGIBLE" in out
+    assert "Blockers" in out
+    assert "人工決定" in out

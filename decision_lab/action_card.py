@@ -531,8 +531,13 @@ def render_markdown(card: Mapping[str, Any]) -> str:
             f"- Disproof condition：{markdown_text(card.get('disproof_condition') or '未提供')}",
             f"- Weakest link：{markdown_text(weakest['axis'])} / {markdown_text(weakest['level'])} — {markdown_text(weakest['reason'])}",
             f"- Intent：{markdown_text(card.get('execution_intent', 'live'))}",
-            f"- Paper：{markdown_text(paper['status'])}；target={paper['target']:.4%}；funded={paper['funded']}",
-            f"- Live：{markdown_text(live['status'])}；range={tuple(live['supported_range'])}",
+            # Alpha 呈現契約（2026-08-15）：不對人輸出建議尺寸。
+            # 那個數字來自從未被 outcome 驗證的 axis_ceiling，且實測 6 個 ELIGIBLE
+            # cohort 全是同一個 0.1%——常數不帶資訊，卻讓人以為系統在給建議。
+            # 數值仍完整保留在 JSON（稽核與 outcome 量測要用），只是不再當行動指引呈現。
+            f"- Paper 記分板：{markdown_text(paper['status'])}"
+            f"（模擬部位持續累積，供 outcome 量測；不是建議部位）",
+            "- Live：人工決定——系統不輸出建議尺寸",
             f"- Blockers：{blockers}",
             f"- 研究不完整（不阻擋，只縮小尺寸）：{incomplete_line}",
             "",
