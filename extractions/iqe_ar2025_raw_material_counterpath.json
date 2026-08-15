@@ -1,0 +1,97 @@
+{
+  "claims": [
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Downgrade this supply-risk path if IQE later documents fully diversified, qualified multi-region sources for critical indium-bearing inputs with no material exposure to export controls or supply shortages.",
+      "id": "iqe_ar2025_raw_material_counterpath_cl1",
+      "source_ids": [
+        "iqe_ar2025_raw_material_counterpath_s1",
+        "iqe_ar2025_raw_material_counterpath_s2",
+        "iqe_ar2025_raw_material_counterpath_s3"
+      ],
+      "statement": "IQE identifies supply of critical compound-semiconductor raw materials, including indium-bearing substrates, as a principal operating risk: export controls or global shortages can delay customer orders and revenue, while its stated mitigation includes alternative suppliers outside China. This is a documented counter-thesis path against assuming uninterrupted InP epiwafer fulfilment; it does not establish that a disruption has occurred.",
+      "subject_id": "co:iqe"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "mat:inp_substrate",
+      "id": "e1",
+      "relation": "constrained_by",
+      "source_ids": [
+        "iqe_ar2025_raw_material_counterpath_s1",
+        "iqe_ar2025_raw_material_counterpath_s2",
+        "iqe_ar2025_raw_material_counterpath_s3"
+      ],
+      "src_id": "co:iqe"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "IQE",
+        "IQE.L"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:iqe",
+      "name": "IQE plc",
+      "role": "material_base",
+      "source_ids": [
+        "iqe_ar2025_raw_material_counterpath_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "InP substrate",
+        "indium phosphide substrate"
+      ],
+      "attributes": {},
+      "confidence": 0.75,
+      "id": "mat:inp_substrate",
+      "name": "Indium Phosphide (InP) substrate",
+      "role": null,
+      "source_ids": [
+        "iqe_ar2025_raw_material_counterpath_s1"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "iqe_ar2025_raw_material_counterpath",
+    "evidence_tier": 1,
+    "origin_entity": "IQE plc",
+    "permission_basis": "Official public annual report on the IQE investor-relations site; retain the canonical URL and only the research-relevant excerpt.",
+    "published_at": "2026-05-28",
+    "publisher": "IQE plc",
+    "retrieved_at": "2026-08-15",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "IQE Annual Report and Accounts 2025 - supply of raw materials principal risk",
+    "url": "https://www.iqep.com/media/ceqnt5tt/iqe-2025-annual-report.pdf"
+  },
+  "sources": [
+    {
+      "id": "iqe_ar2025_raw_material_counterpath_s1",
+      "locator": "Annual Report and Accounts 2025, p.47, principal risk 8 - Supply of raw materials, Context",
+      "quote": "Geopolitical tensions have resulted in a specific risk for IQE relating to the supply of critical compound semiconductor raw materials such Gallium, Indium, Antimony and Germanium, including substrates incorporating those materials."
+    },
+    {
+      "id": "iqe_ar2025_raw_material_counterpath_s2",
+      "locator": "Annual Report and Accounts 2025, p.47, principal risk 8 - Supply of raw materials, Risk and Possible impact",
+      "quote": "Supply chain disruption due to the imposition of export controls and/or global supply shortages"
+    },
+    {
+      "id": "iqe_ar2025_raw_material_counterpath_s3",
+      "locator": "Annual Report and Accounts 2025, p.47, principal risk 8 - Supply of raw materials, Mitigation",
+      "quote": "Engagement with relevant government bodies and alternative material suppliers, specifically suppliers outside of China"
+    }
+  ]
+}
