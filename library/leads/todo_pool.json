@@ -1667,6 +1667,13 @@
     },
     {
       "added_at": "2026-08-08T20:07:50.101937+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_08309301779fe5f4fc97f93aafdcbfa2",
+      "dispatch_receipt": "research-gates:ra_176d95c45114f7cc38a3bebc376e3394+po_1547d22f17b09dbd5f9451d48cbc8f9a",
+      "dispatch_ref": "wo_b473fcfc46342a890031663dcfef5b64",
+      "dispatch_status": "awaiting_approval",
+      "dispatch_updated_at": "2026-08-15T03:03:09.250777+00:00",
+      "dispatched_at": "2026-08-15T02:46:56.015741+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 109,
       "reactivated_at": "2026-08-15T02:24:09.979552+00:00",
@@ -2082,8 +2089,10 @@
       "added_at": "2026-08-13T22:38:11.789464+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_0c419255bb4f1dcd4935b6c0f8a96202",
+      "dispatch_receipt": "research-gates:todo-143+todo-144;assessment:library/private/decision_lab/assessment_nvda_2026-08-15_prepared.json",
       "dispatch_ref": "wo_08da6fc8c1d466fa2ee31b7301a78b15",
-      "dispatch_status": "queued",
+      "dispatch_status": "awaiting_approval",
+      "dispatch_updated_at": "2026-08-15T03:10:37.811528+00:00",
       "dispatched_at": "2026-08-15T02:13:40.942684+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 132,
@@ -2110,7 +2119,7 @@
     },
     {
       "added_at": "2026-08-13T22:54:28.916939+00:00",
-      "deferred_at": "2026-08-14T10:43:00.616164+00:00",
+      "deferred_at": "2026-08-15T03:19:08.798999+00:00",
       "hint": "TL;DR：Applied Optoelectronics（AAOI）的 800G／1.6T、FAB4／Pearland 與 400mW CPO pump laser thesis 已有一手材料，但 disproof 尚未由你確認。建議條件：若 AAOI Q4 2026 實際營收低於 US，或截至 2026-12-31 800G 仍未超過 400G 出貨／營收、400mW pump laser 仍停在 sampling，則成長／CPO thesis 失效；每季財報核查，觸發後 48 小時內 reassess 並停止新增 paper。Catalyst：Q4 2026 財報，預計 2027 年 2 月；expiry=2027-02-20。go 授權：把這組 catalyst／disproof／expiry 用於下一次 paper reassess；不下單、不入圖、不改 Sheet。",
       "n": 134,
       "reason": null,
@@ -2119,13 +2128,7 @@
       "resolved_at": null,
       "source": "manual",
       "title": "確認 AAOI decision disproof 與 Q4 2026 catalyst",
-      "type": "manual",
-      "waiting_on": {
-        "reason": "建議 disproof 的營收門檻數字缺失（原文寫成『低於 US，』），不符合可觀測有門檻的判準，不得核准",
-        "set_at": "2026-08-14T10:43:00.616164+00:00",
-        "trigger": "補上 AAOI Q4 2026 營收門檻具體數字（查 Q3 財報 guidance 或由使用者指定）後重新提出",
-        "until": null
-      }
+      "type": "manual"
     },
     {
       "added_at": "2026-08-13T22:55:28.250264+00:00",
@@ -2166,22 +2169,37 @@
     },
     {
       "added_at": "2026-08-14T22:45:36.984090+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_d214a6d7ccb93dbf2fcd620dad791cef",
+      "dispatch_receipt": "decision:pd_fdd8467f919eadbc48e8f97032191ebb",
+      "dispatch_ref": "wo_5e0740f5325705ce5eaf8ed602c72054",
+      "dispatch_status": "completed",
+      "dispatch_updated_at": "2026-08-15T02:52:22.952793+00:00",
+      "dispatched_at": "2026-08-15T02:46:56.030035+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 138,
       "reactivated_at": "2026-08-15T02:24:09.979552+00:00",
       "reactivation_event": {
         "type": "decision_blocker_mode_changed"
       },
-      "reason": null,
+      "reason": "dispatch baseline pd_d214a6d7ccb93dbf2fcd620dad791cef 後已有新五軸 decision；coverage analyzable 且 blockers 為空，舊缺口快照已失效",
+      "receipt": "decision:pd_fdd8467f919eadbc48e8f97032191ebb",
       "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-15T02:52:22.952793+00:00",
       "source": "decision_lab",
       "title": "REVIEW — co:axt",
       "type": "decision_review"
     },
     {
       "added_at": "2026-08-14T22:45:36.984090+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_89f95297e179a7d820069dae311ab785",
+      "dispatch_receipt": "observation-proposal:po_770975aa5b16b59fe6c15876167105ab",
+      "dispatch_ref": "wo_83ef7b00ea20333355e43cfc1532d1a7",
+      "dispatch_status": "awaiting_approval",
+      "dispatch_updated_at": "2026-08-15T02:55:46.858468+00:00",
+      "dispatched_at": "2026-08-15T02:46:56.042533+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 139,
       "reactivated_at": "2026-08-15T02:24:09.979552+00:00",
@@ -2208,6 +2226,86 @@
       "source": "engine_c",
       "title": "Engine C 觀測：IQE.L / customer_concentration",
       "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-08-15T03:10:23.531520+00:00",
+      "hint": "核准 exact graph delta；Decision handoff：co:iqe。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 141,
+      "reason": null,
+      "ref_id": "ra_176d95c45114f7cc38a3bebc376e3394",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "IQE 原料供應 counter-path 入圖提案",
+      "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-08-15T03:10:23.531520+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-06-15T00:00:00+00:00；來源=IQE plc and Tower Semiconductor joint announcement, 2026-06-15, “IQE and Tower S",
+      "n": 142,
+      "reason": null,
+      "ref_id": "po_1547d22f17b09dbd5f9451d48cbc8f9a",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "engine_c",
+      "title": "Engine C 觀測：IQE.L / backlog",
+      "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-08-15T03:10:23.531520+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-04-26T00:00:00+00:00；來源=NVIDIA Q1 FY2027 Form 10-Q, filed 2026-05-20, accession 000104581026000052, Note",
+      "n": 143,
+      "reason": null,
+      "ref_id": "po_54491e53faa3ea153f271daa5743d0cf",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "engine_c",
+      "title": "Engine C 觀測：NVDA / backlog",
+      "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-08-15T03:10:23.531520+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-04-26T00:00:00+00:00；來源=NVIDIA Q1 FY2027 Form 10-Q, filed 2026-05-20, accession 000104581026000052, Note",
+      "n": 144,
+      "reason": null,
+      "ref_id": "po_6025049400b567da2fb5cf1ce3d868c0",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "engine_c",
+      "title": "Engine C 觀測：NVDA / customer_concentration",
+      "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-08-15T03:10:23.531520+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-03-28T00:00:00+00:00；來源=Lumentum Q3 FY2026 Form 10-Q, filed 2026-05-06, accession 000162828026030777, ba",
+      "n": 145,
+      "reason": null,
+      "ref_id": "po_770975aa5b16b59fe6c15876167105ab",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "engine_c",
+      "title": "Engine C 觀測：LITE / runway_inputs",
+      "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-08-15T03:10:23.531520+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_d214a6d7ccb93dbf2fcd620dad791cef",
+      "dispatch_receipt": "decision:pd_7058045c5ca86e9216af59d424333ed6",
+      "dispatch_ref": "wo_5e0740f5325705ce5eaf8ed602c72054",
+      "dispatch_status": "completed",
+      "dispatch_updated_at": "2026-08-15T03:17:01.149316+00:00",
+      "dispatched_at": "2026-08-15T03:16:44.388620+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 146,
+      "reason": "[138] 核准範圍內的同 cohort 重生項；已誠實把含 missing_data 的 financial_resilience 降為 bounded_hypothesis，references 全軸可解析，新 decision 僅剩 paper-only gate且 NO_ACTION",
+      "receipt": "decision:pd_7058045c5ca86e9216af59d424333ed6",
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "resolution": "go",
+      "resolved_at": "2026-08-15T03:17:01.149316+00:00",
+      "source": "decision_lab",
+      "title": "REVIEW — co:axt",
+      "type": "decision_review"
     }
   ],
   "log": [
@@ -4796,8 +4894,165 @@
       "ref_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
       "type": "decision_review",
       "verb": "system_internal_retired"
+    },
+    {
+      "at": "2026-08-15T02:46:56.015741+00:00",
+      "attempt": 1,
+      "n": 109,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_b473fcfc46342a890031663dcfef5b64",
+      "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-08-15T02:46:56.030035+00:00",
+      "attempt": 1,
+      "n": 138,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_5e0740f5325705ce5eaf8ed602c72054",
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-08-15T02:46:56.042533+00:00",
+      "attempt": 1,
+      "n": 139,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_83ef7b00ea20333355e43cfc1532d1a7",
+      "ref_id": "dc_4d28e50810e46da7fd77ee042ee7bd1c",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-08-15T02:52:15.841444+00:00",
+      "n": 138,
+      "reason": "檢查 dispatch baseline 後的新 decision 是否已填補舊缺口",
+      "receipt": "authority-audit:pd_fdd8467f919eadbc48e8f97032191ebb",
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-08-15T02:52:22.952793+00:00",
+      "n": 138,
+      "reason": "dispatch baseline pd_d214a6d7ccb93dbf2fcd620dad791cef 後已有新五軸 decision；coverage analyzable 且 blockers 為空，舊缺口快照已失效",
+      "receipt": "decision:pd_fdd8467f919eadbc48e8f97032191ebb",
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "type": "decision_review",
+      "verb": "pq1_completed"
+    },
+    {
+      "at": "2026-08-15T02:52:22.952793+00:00",
+      "n": 138,
+      "reason": "dispatch baseline pd_d214a6d7ccb93dbf2fcd620dad791cef 後已有新五軸 decision；coverage analyzable 且 blockers 為空，舊缺口快照已失效",
+      "receipt": "decision:pd_fdd8467f919eadbc48e8f97032191ebb",
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "type": "decision_review",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-15T02:52:57.897641+00:00",
+      "n": 139,
+      "reason": "最新 Engine C 已有完整 runway 自動輸入；用既有核准 catalyst/disproof 做 paper reassess",
+      "receipt": "assessment:library/private/decision_lab/assessment_lumentum_2026-08-14_refs_resolved.json",
+      "ref_id": "dc_4d28e50810e46da7fd77ee042ee7bd1c",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-08-15T02:55:46.858468+00:00",
+      "n": 139,
+      "reason": "已從 Lumentum Q3 FY2026 10-Q、FY2025 10-K 與 Q3 FY2025 10-Q 重建 TTM runway；寫 ledger 仍需 exact pq2 核准",
+      "receipt": "observation-proposal:po_770975aa5b16b59fe6c15876167105ab",
+      "ref_id": "dc_4d28e50810e46da7fd77ee042ee7bd1c",
+      "type": "decision_review",
+      "verb": "pq1_awaiting_approval"
+    },
+    {
+      "at": "2026-08-15T02:56:26.355320+00:00",
+      "n": 109,
+      "reason": "補 IQE backlog authority 與 graph counter-path，保留 graph admission／Engine C 人工 gate",
+      "receipt": "assessment:library/private/decision_lab/assessment_iqe_2026-08-15.json",
+      "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-08-15T03:03:09.250777+00:00",
+      "n": 109,
+      "reason": "bounded research 完成；IQE backlog observation 與 Engine A counter-path 各自等待 exact pq2 核准，未自行寫 ledger／graph",
+      "receipt": "research-gates:ra_176d95c45114f7cc38a3bebc376e3394+po_1547d22f17b09dbd5f9451d48cbc8f9a",
+      "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+      "type": "decision_review",
+      "verb": "pq1_awaiting_approval"
+    },
+    {
+      "at": "2026-08-15T03:06:27.420641+00:00",
+      "n": 132,
+      "reason": "完整五軸研究；先查 references、graph 與 Engine C，再決定需不需要新 pq2 gate",
+      "receipt": "research-start:pd_0c419255bb4f1dcd4935b6c0f8a96202",
+      "ref_id": "dc_c0b6f81e3507a83b857258907fafa635",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-08-15T03:10:37.811528+00:00",
+      "n": 132,
+      "reason": "完整五軸研究已完成；graph／runway 可用，commercial maturity 僅待 [143][144] observation exact gate；未自行寫 Engine C 或 reassess",
+      "receipt": "research-gates:todo-143+todo-144;assessment:library/private/decision_lab/assessment_nvda_2026-08-15_prepared.json",
+      "ref_id": "dc_c0b6f81e3507a83b857258907fafa635",
+      "type": "decision_review",
+      "verb": "pq1_awaiting_approval"
+    },
+    {
+      "at": "2026-08-15T03:16:44.388620+00:00",
+      "attempt": 1,
+      "n": 146,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_5e0740f5325705ce5eaf8ed602c72054",
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-08-15T03:16:59.874234+00:00",
+      "n": 146,
+      "reason": "沿用 [138] 已核准的同 cohort gap research",
+      "receipt": "scope:[138]-continuation",
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-08-15T03:17:01.149316+00:00",
+      "n": 146,
+      "reason": "[138] 核准範圍內的同 cohort 重生項；已誠實把含 missing_data 的 financial_resilience 降為 bounded_hypothesis，references 全軸可解析，新 decision 僅剩 paper-only gate且 NO_ACTION",
+      "receipt": "decision:pd_7058045c5ca86e9216af59d424333ed6",
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "type": "decision_review",
+      "verb": "pq1_completed"
+    },
+    {
+      "at": "2026-08-15T03:17:01.149316+00:00",
+      "n": 146,
+      "reason": "[138] 核准範圍內的同 cohort 重生項；已誠實把含 missing_data 的 financial_resilience 降為 bounded_hypothesis，references 全軸可解析，新 decision 僅剩 paper-only gate且 NO_ACTION",
+      "receipt": "decision:pd_7058045c5ca86e9216af59d424333ed6",
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "type": "decision_review",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-15T03:19:08.798999+00:00",
+      "n": 134,
+      "reason": "此缺口可由使用者現在指定營收門檻，不是純外部事件；恢復人工決策佇列",
+      "receipt": null,
+      "ref_id": "decision-disproof:dc_a94362af0d6a7398f02bdeb4f0fb893c:2026-08-14",
+      "type": "manual",
+      "verb": "pending"
     }
   ],
-  "next_n": 141,
+  "next_n": 147,
   "schema_version": "1"
 }
