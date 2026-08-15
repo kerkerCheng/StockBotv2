@@ -1679,8 +1679,8 @@
       "waiting_on": {
         "derived_from_blockers": true,
         "reason": "所有 blocker 都不需要使用者決定",
-        "set_at": "2026-08-08T20:07:50.101889+00:00",
-        "trigger": "該 Confidence 軸尚未提供有效評估／圖中缺反向路徑（競爭者／可替代性）／執行面 context 缺失",
+        "set_at": "2026-08-15T02:15:10.678796+00:00",
+        "trigger": "圖中缺反向路徑（競爭者／可替代性）／執行面 context 缺失／財務核驗清單：backlog 缺失或待人工填入",
         "until": null
       }
     },
@@ -2083,6 +2083,11 @@
     },
     {
       "added_at": "2026-08-13T22:38:11.789464+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_0c419255bb4f1dcd4935b6c0f8a96202",
+      "dispatch_ref": "wo_08da6fc8c1d466fa2ee31b7301a78b15",
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-08-15T02:13:40.942684+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 132,
       "reason": null,
@@ -4708,6 +4713,32 @@
       "ref_id": "po_2d86608a6c97eb32aa807c466cf761fc",
       "type": "engine_c_observation",
       "verb": "go"
+    },
+    {
+      "at": "2026-08-15T02:13:40.942684+00:00",
+      "attempt": 1,
+      "n": 132,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_08da6fc8c1d466fa2ee31b7301a78b15",
+      "ref_id": "dc_c0b6f81e3507a83b857258907fafa635",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-08-15T02:15:10.678863+00:00",
+      "n": 109,
+      "prior_waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-08-08T20:07:50.101889+00:00",
+        "trigger": "該 Confidence 軸尚未提供有效評估／圖中缺反向路徑（競爭者／可替代性）／執行面 context 缺失",
+        "until": null
+      },
+      "reason": "blocker 內容改變，重新推導等待理由",
+      "receipt": null,
+      "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+      "type": "decision_review",
+      "verb": "waiting_reason_refreshed"
     }
   ],
   "next_n": 141,
