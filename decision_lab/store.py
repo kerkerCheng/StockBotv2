@@ -608,7 +608,7 @@ class DecisionStore:
         ).fetchone()
         return int(row["count"])
 
-    def capital_expression_counters(self) -> dict[str, int]:
+    def capital_expression_counters(self) -> dict[str, Any]:
         """兩個常駐計數器：系統至今**輸出過**多少資本，以及**驗證過**多少判斷。
 
         它們存在的理由不是報表好看，是為了讓「開發迴圈有沒有進展」每天自己出現在
@@ -694,6 +694,22 @@ class DecisionStore:
             if company not in latest or at > latest[company][0]:
                 latest[company] = (at, str(row["status"] or ""))
         eligible_n = sum(1 for _, status in latest.values() if status == "ELIGIBLE")
+        # 以公司為單位是對的，但不能因此把重複 cohort 藏起來——那會讓指標變乾淨、
+        # 問題變隱形（ROADMAP 的「Engine D cohort 重複」backlog 就永遠不會有人發現）。
+        # 同公司多 cohort 仍必須在 brief 現形，只是不再汙染上線比率的分母。
+        duplicates = tuple(
+            str(row["company_id"])
+            for row in self._conn.execute(
+                "SELECT company_id, COUNT(*) AS n FROM decision_cohorts"
+                " WHERE company_id IS NOT NULL GROUP BY company_id HAVING n > 1"
+                " ORDER BY company_id"
+            )
+        )
+        # 無 identity 的殘骸同理：不計進分母，但要數得出來——它們仍在汙染
+        # outcome_envelopes（8 筆有 6 筆來自它們）。
+        orphans = self._conn.execute(
+            "SELECT COUNT(*) AS n FROM decision_cohorts WHERE company_id IS NULL"
+        ).fetchone()
         # 同樣以公司為單位：無 identity 的 cohort 其 Shadow 恆為 `unavailable`
         # （沒有 ticker 就沒有價格），計進分母只會讓「可量測比率」永遠到不了 100%。
         measurable = self._conn.execute(
@@ -720,6 +736,9 @@ class DecisionStore:
             # 分母是「有 identity 的公司數」，不含無 company_id 的殘骸與重複 cohort。
             "eligible_cohorts": eligible_n,
             "total_cohorts": len(latest),
+            # 不進分母，但必須現形，否則修好指標等於把缺陷藏起來。
+            "duplicate_cohort_companies": duplicates,
+            "orphan_cohorts": int(orphans["n"] or 0),
             # ⚠ 分母只有在**新 decision 產生**時才會長。2026-08-14 一個 daily session
             # 讀到「0/73」後推論「gate 還是壞的，做完那三件事若仍是 0 就重新診斷」——
             # 那會是假陰性：既有 decision 依 point-in-time 契約永不回寫，計數器本來

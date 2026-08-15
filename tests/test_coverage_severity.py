@@ -384,3 +384,50 @@ def test_daily_brief_counters_track_breadth_and_measurability(tmp_path) -> None:
         assert "無法用證據回答" not in info
     finally:
         store.close()
+
+
+def test_duplicate_and_orphan_cohorts_stay_visible(tmp_path) -> None:
+    """以公司為單位計數是對的，但不能因此把待修的 cohort 藏起來。
+
+    2026-08-15：上線比率改以公司為單位後（8/13 → 8/8），`co:lumentum` 的重複
+    cohort 與 4 個無 identity 的殘骸就從指標裡消失了。指標乾淨了，問題卻變成沒人
+    會發現——那是把缺陷掃到地毯下，ROADMAP 的「Engine D cohort 重複」backlog 會
+    永遠沒有觸發點。它們不進分母（本來就不可能上線），但必須各自現形。
+    """
+    from decision_lab.brief import build_today_brief, render_today_markdown
+
+    store = _store(tmp_path)
+    try:
+        brief = build_today_brief(store, as_of=NOW)
+        primed = dict(brief)
+        primed["capital_expression"] = {
+            **store.capital_expression_counters(),
+            "eligible_cohorts": 8,
+            "total_cohorts": 8,
+            "shadow_measurable_cohorts": 8,
+            "shadow_anchored_cohorts": 8,
+            "measured_outcomes": 7,
+            "outcomes": 8,
+            "duplicate_cohort_companies": ("co:lumentum",),
+            "orphan_cohorts": 4,
+        }
+        text = render_today_markdown(primed)
+
+        assert "上線標的 8/8 檔" in text
+        assert "co:lumentum" in text and "重複 cohort" in text
+        assert "4 個無 identity" in text
+        # 提醒必須自成一行，不得串在狀態行尾巴（手機讀不完）。
+        head = text.split("研究進展")[1].splitlines()[0]
+        assert "重複 cohort" not in head and "殘骸" not in head
+
+        # 沒有重複、沒有殘骸時完全不出現——exception-first。
+        primed["capital_expression"] = {
+            **primed["capital_expression"],
+            "duplicate_cohort_companies": (),
+            "orphan_cohorts": 0,
+        }
+        clean = render_today_markdown(primed)
+        assert "重複 cohort" not in clean
+        assert "殘骸" not in clean
+    finally:
+        store.close()

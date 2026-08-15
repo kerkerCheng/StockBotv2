@@ -803,15 +803,32 @@ def render_today_markdown(brief: Mapping[str, Any]) -> str:
         )
         if eligible == 0 and total_cohorts:
             line += "　⚠ 目前沒有任何可評估標的"
+        lines.append(line)
+        # 提醒各自一行：主行是狀態、子行是待處理項。串在同一行會長到手機讀不完，
+        # 而且會讓「數字」與「要做的事」混在一起。exception-first，沒問題就不出現。
+        #
+        # 公司已上線但底下有重複 cohort：不影響上線比率，但要有人去合併／結案，
+        # 否則 Decision Store 會長出兩條互不知道的軌跡（ROADMAP backlog）。
+        # 以公司為單位計數是對的，但不能因此把它藏起來——那是把缺陷掃到地毯下。
+        dupes = tuple(counters.get("duplicate_cohort_companies") or ())
+        if dupes:
+            names = "、".join(markdown_text(name) for name in dupes[:3])
+            more = f" 等 {len(dupes)} 檔" if len(dupes) > 3 else ""
+            lines.append(f"  - ⚠ {names}{more} 有重複 cohort，待合併")
+        orphans = int(counters.get("orphan_cohorts") or 0)
+        if orphans:
+            lines.append(
+                f"  - ℹ {orphans} 個無 identity 的 cohort 殘骸；不計入分母，"
+                "但仍在 outcome_envelopes 裡（Decision Store append-only，不刪除）"
+            )
         if measurable == 0:
-            line += "　⚠ 判斷準不準仍無法用證據回答（無 Shadow 錨點）"
+            lines.append("  - ⚠ 判斷準不準仍無法用證據回答（無 Shadow 錨點）")
         elif measured == 0 and outcomes:
             # 有錨點就算得出報酬，但尚未有任何 probe 正式結案歸因。
-            line += (
-                f"　ℹ 報酬可量測但尚無結案歸因（outcome_envelopes {measured}/{outcomes}）；"
-                "跑 scripts/outcome_if_settled_today.py 看目前表現"
+            lines.append(
+                f"  - ℹ 報酬可量測但尚無結案歸因（outcome_envelopes {measured}/{outcomes}）；"
+                "跑 `scripts/outcome_if_settled_today.py` 看目前表現"
             )
-        lines.append(line)
     items = brief.get("items") or []
     if items:
         lines += ["", "## 項目（回覆用編號）"]
