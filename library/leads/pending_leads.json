@@ -6057,9 +6057,15 @@
       ],
       "published_at": "2026-08-06T04:12:45.000Z",
       "raw_text": "The unexpected thing of the week... Was $AEVA becoming a CPO/NPO optical source player. \n\nFor background: $SIVE is viewed as the high confidence CW DFB laser supplier to Aeva (which is known for lidar). \n\nToday, Aeva reacted with +18.26% AH on news that they signed a JDA with an optical engine player for deployment at a major hyperscaler in H2 2027, production ramp 2028. \n\n\"Optical Connectivity will leverage that foundation along with Aeva’s EXISTING high-volume manufacturing and foundry supply chain\" for:\n\n- ELSFP (similar to O-Net/Enablence + $SIVE), with Sivers as the likely CW laser + potential amplifier supplier\n\n- On-chip integrated light source (likely $SIVE DFB + Aeva PIC on the architecture/integration side)\n\nTLDR: New TAM and a hyperscaler programs for Aeva for CPO/NPO, positive read through for upstream suppliers like $SIVE.",
-      "refs": {},
+      "refs": {
+        "parked_reason": "追源成功：AEVA 8-K EX-99.1 (acc 0001193125-26-335102) 一手逐字確認 Optical Connectivity 業務啟動、JDA 已簽、NPO 方案、hyperscaler、H2 2027 部署／2028 量產。但入圖前置未備：AEVA 未登記於 config/company_identity.json，且原貼的 SIVE 供應關係在 issuer 文件中 0 hits（Sivers／laser／ELSFP／foundry 皆無），屬作者推測",
+        "trace_next_trigger": "Sivers 或 Aeva 任一方具名揭露雙方供應關係；或 AEVA 後續 filing 揭露 NPO 客戶身分與光源供應商",
+        "trace_requires_user": "true",
+        "trace_review_hint": "這是本輪唯一有真實 graph delta 的 lead，也是新標的候選（對應「讓上線標的變多」）。go 授權：(a) 將 AEVA onboard 進 identity registry，(b) 以此 EX-99.1 為來源 prepare RA 入圖 AEVA→未具名 hyperscaler 的 NPO JDA 關係。**不授權**入圖 SIVE↔AEVA 供應關係——那在 issuer 文件中不存在，需 Sivers 或 Aeva 任一方具名揭露才能另案處理",
+        "trace_status": "original_obtained"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -23263,12 +23269,12 @@
         "campaign_window_start": "2026-06-29T13:46:25Z",
         "claimed_origin": "Morgan Stanley 2026-07-13 CPO research note",
         "original_claim_status": "unverified_with_existing_graph_conflict",
-        "parked_reason": "只找到同一 Morgan Stanley CPO map 的社群轉貼與截圖文字，沒有可逐字核對的 canonical note；不能把多個同源轉述當獨立 tier-3 evidence。圖中已分別有 Sivers／Coherent／Lumentum laser、Broadcom／NVIDIA switch、Tower／GFS foundry 關係，故不產空 RA。",
+        "parked_reason": "內容為賣方券商報告的二手轉述（Morgan Stanley CPO 參與者名單／Wells Fargo 對 META 出售多餘算力的看法）。券商觀點是第三方意見不是可核對事實，且原始報告僅供客戶、無合法公開取得途徑。名單型內容即使取得也只是他人研究結論，不構成 Engine A 可入圖的關係主張（L8：需要客戶端或第三方對事實本身的印證，不是分析師的看法）",
         "research_mode": "delta_only",
         "research_outcome": "no_prepared_ra_isolated_tier_3",
         "research_run": "daily:2026-08-12",
         "trace_attempts_ref": "Exact title／quoted participant list／date search；Serenity Stock、Reddit、Sotwe 皆為同一社群截圖／轉述；未找到 Morgan Stanley canonical report 或 licensed copy",
-        "trace_next_trigger": "Morgan Stanley 公開 canonical note，或使用者合法持有的報告副本可逐字核對 participant map",
+        "trace_next_trigger": "名單中的具名關係若由 issuer 自己揭露（如 GFS 簡報具名雷射供應商、SIVE 公告設計案），改由該 issuer 一手來源另開 lead 追",
         "trace_requeue_consumed_entities": [
           "CO:LUMENTUM",
           "CO:SIVERS_SEMICONDUCTORS",
@@ -23278,7 +23284,7 @@
         "trace_requeue_trigger": "related_triaged_lead:lead_c7ca9aa7169d5ffa4a621430cac35d5e",
         "trace_requeued_at": "2026-08-13T22:36:35.461760+00:00",
         "trace_requires_user": "false",
-        "trace_status": "isolated_tier_3",
+        "trace_status": "lead_only_tier_4",
         "trace_storage_permission": "unknown",
         "trace_trigger_entities": [
           "COHR",
@@ -23296,7 +23302,7 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -25265,11 +25271,11 @@
       "raw_text": "I think it’s a good time to revisit $SIVE ~$427m/yr midpoint capacity revenue modeled projections.\n\nGiven recent industry earnings:\n\n> $AAOI cited +20-40% demand imbalance for transceivers (with lasers as the bottleneck).\n\n> $MTSI saying many \"Customers are coming to us with urgency due to the general supply shortage of indium phosphide DFB lasers\" (in other product lines)\n\n> US proposal ban on new Chinese optical transceivers (Innolight/Eoptolink)\n\n> AOI no meaningful participation in first-gen CPO deployments due to lasers being allocated toward transceivers. \n\nThe read through is that it’s possible to apply the same capacity-demand absorption modeling applying to $AAOI, but for other laser players like Sivers too.\n\nGiven the widespread shortage and demand imbalance for InP CW DFB capacity.",
       "refs": {
         "claimed_origin": "AAOI／MACOM industry earnings read-through 與作者的 Sivers USD 427M capacity-revenue model",
-        "parked_reason": "AAOI 10-Q 支持持續擴充 semiconductor laser 與 800G／1.6T capacity，Sivers 官方文件支持 CW DFB sampling、2027 production-readiness 目標與未來供給吃緊方向；但沒有一手來源支持 USD 427M midpoint capacity revenue、AAOI 的需求缺口會自動吸收 Sivers 產能，或具名客戶 purchase commitment。作者 extrapolation 不能入圖。",
+        "parked_reason": "MTSI 逐字 quote（customers coming with urgency due to general supply shortage of InP DFB lasers）不在任何 SEC filing：10-Q (acc 0001493594-26-000038) 與 8-K EX-99.1 (acc 0001493594-26-000036) 的 laser／indium／DFB／shortage 全部 0 hits，CEO 評論僅一句泛泛成長策略。屬法說會口頭內容",
         "primary_url": "https://www.sivers-semiconductors.com/2026/02/26/vickram-vathulyas-letter-to-shareholders-interim-report-q4-2025/",
         "research_outcome": "no_prepared_ra_partial_author_inference",
         "trace_attempts_ref": "AAOI 2026-08-06 10-Q 本機合法副本；AAOI IR capacity releases；Sivers FY2025／Q1 2026 官方 reports；MACOM official exact search；社群 quote search",
-        "trace_next_trigger": "Sivers 2026-08-27 財報或客戶端文件揭露 qualified volume、具名 production order、產能與可辨識 revenue",
+        "trace_next_trigger": "使用者核准取得 MACOM FQ3 2026 法說會逐字稿（同 COHR 的 paywall 問題），或 MACOM IR 公開釋出 transcript",
         "trace_requeue_consumed_entities": [
           "AAOI",
           "CO:APPLIED_OPTOELECTRONICS",
@@ -25278,7 +25284,8 @@
         ],
         "trace_requeue_trigger": "related_triaged_lead:lead_c7ca9aa7169d5ffa4a621430cac35d5e",
         "trace_requeued_at": "2026-08-13T22:36:35.461760+00:00",
-        "trace_requires_user": "false",
+        "trace_requires_user": "true",
+        "trace_review_hint": "已取得的一手硬數據（屬 Engine C 非 graph）：MTSI 10-Q Data Center 營收 US$137.584M vs 去年 US$75.822M（+81% YoY）；FQ4 guidance 營收 US$415-425M、adjusted GM 60-61%。SIVE 的 US$427M/yr 產能營收模型本身是原貼作者自建模型，非 issuer 揭露，不得入圖",
         "trace_status": "partial",
         "trace_storage_permission": "local_only",
         "trace_trigger_entities": [
@@ -25293,7 +25300,7 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -26304,15 +26311,16 @@
       "raw_text": "My main takeaway was that your merchant CW laser suppliers seem to be EXTREMELY IMPORTANT now. \n\nBut TLDR of $COHR earnings:\n\n\"given the demand that we see in our DC business with transceivers, I don’t see any time in the near future where we would be selling indium phosphide lasers externally\"\n\n- Ton more value placed on companies that sell InP lasers externally if $AAOI can't doesn't enough capacity for first gen-CPO deployments, $COHR not selling externally...  \n\nI guess that's why $MTSI said a ton of customers are approaching them with urgency for InP CW DFB lasers (and they dont even have meaningful capacity coming online until EOY 2027)\n\n$AAOI -> Internal\n$COHR -> Internal\nBuyers -> fewer places to look for capacity. \n\n \"Our backlog now extends out, fiscal 2027 is basically completely booked out. We are booked really through the end of calendar 2027\" [ Massive massive demand visibility]\n\n- Coherent also mentioned LTAs spanning end of decade. So this kinda reinforces what $POET CEO said at their AGM that the \"big 3\" are fully sold out next 2 years.\n\n\"we’re not constrained in the assembly and test capacity right now. We’re really just constrained by the ramp of the indium phosphide production\"\n\n- Just for the bottleneck bros in terms of assembly/test not a bottleneck. \n\n\"absolutely no push-out of CPO demand. In fact, it has been the opposite. We have seen demand increase and request from customers’ demand getting pulled in\"\n\n\"we continue to expect revenue from CPO for scale-up applications to start to flow in the second half of calendar 2027\" \n\n- Big read through on other CPO players for scale up if $LITE, $COHR reaffirm revenue from CPO scale up coming h2027. \n\n- \"quarterly revenue exceeding $3 billion by the end of fiscal 2027\" \n\n- $COHR revenue go brrr\n\nSo for regular numbers it's:\n\n- $2.046B revenue (+13.3% Q/Q, +33.8% Y/Y), main revenue ramp looks to be happening entering Q4 into 2027\n- Non-GAAP gross margins: 40.2%\n\nNext quarter guide is:\n- Revenue: $2.2–$2.4B revenue\n- Non-GAAP gross margins: 39.5-41.5%\n\nBasically:\n$1.69B -> $1.81B -> $2.05B -> ~$2.30B -> $3.0B (end of FY 2027) \n~39% -> 39.6% -> 40.2% -> ~40.5% (gross margins)\n\nFor operating margins:\n18.0% -> 19.5% -> 19.9% -> 20.3% -> 21.8%\n\nLittle less impressed compared to $LITE margin growth in terms of profitability, but revenue scale for $COHR growing rapidly.",
       "refs": {
         "claimed_origin": "Coherent FY2026 Q4 earnings call／IR presentation／SEC filing",
-        "parked_reason": "Coherent 2026-08-12 一手 earnings presentation 支持 Q4 revenue USD 2.046B、internal InP output 年底前倍增且 2027 再倍增；SEC Q3 10-Q 亦支持 InP 擴產與 industry-wide shortage。但仍未取得可逐字核對的官方 Q4 transcript，無法確認社群貼文所引「不外售 InP lasers」「backlog 到 2027 底」「assembly/test 非瓶頸」「CPO demand pull-in」等 exact quotes；一手已支持的 6 吋 InP 擴產關係已在圖中，故不產 RA。",
+        "parked_reason": "財務數字已用 8-K EX-99.1 一手全部核實；三句關鍵 quote（不外售 InP 雷射／瓶頸在 InP ramp 非封測／backlog 訂滿 2027）僅存在於 Q4 FY2026 法說會口頭內容。免費 transcript 來源 (Yahoo Finance、Motley Fool) 皆 404，可得者為 Seeking Alpha paywall",
         "primary_url": "https://www.coherent.com/content/dam/coherent/site/en/documents/investors/investor-presentations/2026/august-12/investor-presentation-20260812.pdf",
         "research_outcome": "no_prepared_ra_partial_exact_transcript_missing",
         "research_run": "daily-brief-2026-08-15",
         "trace_attempts_ref": "COHR 8-K 2026-08-12 EX-99.1 (acc 0001193125-26-346860) 已核實全部財務數字；COHR FY2026 10-K 2026-08-14 (acc 0000820318-26-000020) 已定位 InP／垂直整合／供應商集中段落並存成 library/raw/cohr_10_k_20260814_inp_vertical_integration.txt",
-        "trace_next_trigger": "Coherent Q4 FY2026 法說會逐字稿：press release 與 10-K 均不含『不外售 InP 雷射』『瓶頸在 InP ramp 非封測』『backlog 訂滿至 2027 底』三句口頭 quote",
+        "trace_next_trigger": "使用者核准取得 Q4 FY2026 法說會逐字稿（Seeking Alpha 訂閱需另列 exact 金額與方案），或 Coherent IR 公開釋出 transcript／webcast replay",
         "trace_requeue_trigger": "related_triaged_lead:lead_105118dfda204e29a99f82160ad2f751",
         "trace_requeued_at": "2026-08-15T06:38:16.293973+00:00",
-        "trace_requires_user": "false",
+        "trace_requires_user": "true",
+        "trace_review_hint": "Workstream B（Paywall ROI）首個實例：go 只授權取得該場法說會逐字稿並回 pq1，不接受二手轉述當證據、不提高 evidence tier、不授權入圖。搜尋摘要另提到 InP 產能 YoY 翻倍、6 月季雷射產量 +80%、6 吋良率超越 3 吋——同屬法說會內容，未經逐字核對前不得引用",
         "trace_status": "partial",
         "trace_trigger_entities": [
           "AAOI",
@@ -26330,7 +26338,7 @@
         "trace_trigger_kind": "primary_source_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "researching",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -27670,17 +27678,17 @@
         "campaign_window_start": "2026-06-29T13:46:25Z",
         "original_claim_status": "partial_official_capex_context_broker_claims_unverified",
         "outcome": "partial_official_capex_context",
-        "parked_reason": "Meta Q2 2026 Exhibit 99.1 將全年 capex 指引收斂至 1,300–1,450 億美元、下限高於先前 1,250 億；但未提 excess-compute 銷售、unit economics、neocloud validation 或 Wells 原句。只支持 capex context，不支持券商／作者推論。",
+        "parked_reason": "內容為賣方券商報告的二手轉述（Morgan Stanley CPO 參與者名單／Wells Fargo 對 META 出售多餘算力的看法）。券商觀點是第三方意見不是可核對事實，且原始報告僅供客戶、無合法公開取得途徑。名單型內容即使取得也只是他人研究結論，不構成 Engine A 可入圖的關係主張（L8：需要客戶端或第三方對事實本身的印證，不是分析師的看法）",
         "primary_url": "https://www.sec.gov/Archives/edgar/data/1326801/000162828026050596/meta-06302026xexhibit991.htm",
         "research_mode": "delta_only",
         "research_outcome": "meta_q2_filing_supports_capex_not_excess_compute_broker_inference",
         "research_run": "luna_reviewer_2026-08-02_pq1_10",
         "trace_attempts_ref": "Wells exact-note search; X screenshots; Meta Q2 2026 Form 8-K and Exhibit 99.1; triggering filing audit",
-        "trace_next_trigger": "Wells Fargo canonical note, or Meta filing/transcript explicitly discloses excess-compute sale terms and economics",
+        "trace_next_trigger": "名單中的具名關係若由 issuer 自己揭露（如 GFS 簡報具名雷射供應商、SIVE 公告設計案），改由該 issuer 一手來源另開 lead 追",
         "trace_requeue_trigger": "related_triaged_lead:lead_9a326a7ac257806d6a1828ffc106028b",
         "trace_requeued_at": "2026-08-13T22:36:37.087730+00:00",
         "trace_requires_user": "false",
-        "trace_status": "partial",
+        "trace_status": "lead_only_tier_4",
         "trace_trigger_entities": [
           "META",
           "co:meta"
@@ -27689,7 +27697,7 @@
         "trace_trigger_kind": "primary_source_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "Wells Fargo: $META intent to sell excess compute is a positive signal around underlying demand and unit economics of AI. “Despite this shift, we don’t expect a pullback in Meta’s capex or that overall compute needs are lower” Regarding Neoclouds: WF thinks it validated the massive AI infra opportunity as well as acquisition opportunities. Despite any potential competition for Neoclouds. I’m inclined to agree with Wells Fargo here and say markets completely misunderstood Meta’s excess compute comment.",
       "triage": {

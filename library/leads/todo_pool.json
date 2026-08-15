@@ -2392,6 +2392,42 @@
       "source": "engine_c",
       "title": "Engine C 觀測：LITE / runway_inputs",
       "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-08-15T07:49:44.743255+00:00",
+      "hint": "已取得的一手硬數據（屬 Engine C 非 graph）：MTSI 10-Q Data Center 營收 US$137.584M vs 去年 US$75.822M（+81% YoY）；FQ4 guidance 營收 US$415-425M、adjusted GM 60-61%。SIVE 的 US$427M/yr 產能營收模型本身是原貼作者自建模型，非 issuer 揭露，不得入圖",
+      "n": 151,
+      "reason": null,
+      "ref_id": "lead_c3fa1ca7fd636810e6fababce5ce7f5a",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "source_trace",
+      "title": "追原報告／來源 access — I think it’s a good time to revisit $SIVE ~$427m/yr midpoint capacity revenue modeled projections. Given recent industry earnings: > $AAOI cited +20-40% demand imbalance for transceivers (with lase...",
+      "type": "source_trace_review"
+    },
+    {
+      "added_at": "2026-08-15T07:49:44.743255+00:00",
+      "hint": "Workstream B（Paywall ROI）首個實例：go 只授權取得該場法說會逐字稿並回 pq1，不接受二手轉述當證據、不提高 evidence tier、不授權入圖。搜尋摘要另提到 InP 產能 YoY 翻倍、6 月季雷射產量 +80%、6 吋良率超越 3 吋——同屬法說會內容，未經逐字核對前不得引用",
+      "n": 152,
+      "reason": null,
+      "ref_id": "lead_caa3e0209d61d6de504ac996be1f03fc",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "source_trace",
+      "title": "追原報告／來源 access — My main takeaway was that your merchant CW laser suppliers seem to be EXTREMELY IMPORTANT now. But TLDR of $COHR earnings: \"given the demand that we see in our DC business with transceivers, I don’...",
+      "type": "source_trace_review"
+    },
+    {
+      "added_at": "2026-08-15T07:50:42.739811+00:00",
+      "hint": "TL;DR：Aeva Technologies（Nasdaq: AEVA，原為 4D LiDAR 公司）宣布跨入 AI 資料中心光連接，並已與一家未具名「major customer」簽署 joint development agreement，把自家 high-power optical source 技術用於某 hyperscaler 的 Near-Packaged Optics（NPO）方案。\n\n證據：AEVA 8-K Exhibit 99.1（Q2 2026 earnings release，filed 2026-08-05，SEC accession 0001193125-26-335102）逐字揭露，issuer 一手 tier 1。已存 library/raw/aeva_8k_ex991_20260805_optical_connectivity_npo.txt。\n\n成熟度：JDA 已簽署（高於 MOU／評估），但尚未量產——initial deployment 目標 H2 2027、production ramp 目標 2028。屬 agreement 階段，非 revenue。\n\n投資意義：NPO 是 CPO 的相鄰路線，光源仍是瓶頸環節。AEVA 從 LiDAR 跨進資料中心光源，等於這條供應鏈多一個非傳統玩家；對現有 InP／CW 雷射稀缺性的 thesis 是新變數（可能是新供給，也可能是新需求方）。\n\n證據邊界（重要）：原始推文推測「Sivers 是 Aeva 的 CW DFB 雷射／放大器供應商」「likely SIVE DFB + Aeva PIC」——這在 AEVA 全文 0 hits（Sivers／laser／ELSFP／foundry 皆無），issuer 用語是 high-power optical source 而非 laser，且只說 major customer 不是 optical engine player。該供應關係目前無任何一手支持。\n\ngo 授權：(a) 把 AEVA onboard 進 config/company_identity.json，(b) 以該 EX-99.1 為來源 prepare Research Action，入圖 AEVA→未具名 hyperscaler 的 NPO JDA 關係與 Optical Connectivity 業務線。**不授權**入圖 SIVE↔AEVA 供應關係。",
+      "n": 153,
+      "reason": null,
+      "ref_id": "source_ref=SEC accession 0001193125-26-335102",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "Onboard Aeva Technologies（AEVA）並入圖 NPO JDA — 本輪唯一有一手 graph delta 的新標的",
+      "type": "manual"
     }
   ],
   "log": [
@@ -5379,6 +5415,6 @@
       "verb": "pending"
     }
   ],
-  "next_n": 151,
+  "next_n": 154,
   "schema_version": "1"
 }
