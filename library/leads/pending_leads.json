@@ -3417,6 +3417,132 @@
       "result": "ok",
       "run_at": "2026-08-15T01:47:09.050351+00:00",
       "source": "edgar:TSLA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-15T22:32:12.051781+00:00",
+      "source": "mfn:sivers-semiconductors"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-15T22:32:12.965935+00:00",
+      "source": "sivers:press"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-15T22:32:13.328428+00:00",
+      "source": "yahoo:iqe-l"
+    },
+    {
+      "new": 2,
+      "result": "ok",
+      "run_at": "2026-08-15T22:32:14.083638+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-15T22:32:16.359631+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 8,
+      "result": "ok",
+      "run_at": "2026-08-15T22:32:17.141145+00:00",
+      "source": "edgar:AEVA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-15T22:32:17.941767+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-15T22:32:18.500244+00:00",
+      "source": "edgar:AVGO"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-15T22:32:19.273510+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-15T22:32:20.041780+00:00",
+      "source": "edgar:CCXI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-15T22:32:20.822642+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-15T22:32:21.590049+00:00",
+      "source": "edgar:GFS"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-15T22:32:22.376215+00:00",
+      "source": "edgar:JBL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-15T22:32:23.140677+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-15T22:32:23.994621+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-15T22:32:24.692653+00:00",
+      "source": "edgar:META"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-15T22:32:25.495628+00:00",
+      "source": "edgar:MTSI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-15T22:32:26.012778+00:00",
+      "source": "edgar:NVDA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-15T22:32:26.803278+00:00",
+      "source": "edgar:POET"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-15T22:32:27.546530+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-15T22:32:28.088689+00:00",
+      "source": "edgar:TSLA"
     }
   ],
   "leads": {
@@ -3536,6 +3662,48 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2084422873423519844"
+    },
+    "lead_006b8786fd4026bcec4e8314540e8130": {
+      "entities": {
+        "company_ids": [
+          "co:aeva"
+        ],
+        "tickers": [
+          "AEVA"
+        ]
+      },
+      "first_seen": "2026-08-15T22:32:17.140756+00:00",
+      "lead_id": "lead_006b8786fd4026bcec4e8314540e8130",
+      "published_at": "2026-08-12",
+      "refs": {
+        "parked_reason": "已逐字核對 SEC Form 4：AEVA CTO Mina Rezk 依既有 Rule 10b5-1 計畫於 2026-08-10 出售合計 100,000 股；屬 insider dated observation，不是供應鏈或產品 graph delta",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1789029/000119312526347439/xslF345X06/ownership.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "trace_next_trigger": "後續 Form 4 出現非 10b5-1 的重大集中買賣，或 10-Q 揭露 dilution／ownership 變化",
+        "trace_origin_entity": "SEC/Aeva Technologies",
+        "trace_original_date": "2026-08-12",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "AEVA",
+          "co:aeva"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
+      "source": "edgar:AEVA",
+      "status": "parked",
+      "themes": {},
+      "title": "AEVA 4 filed 2026-08-12",
+      "triage": {
+        "decided_at": "2026-08-15T22:33:59.476107+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true
+        },
+        "reason": "AEVA 官方 Form 4，具體 issuer、filing date 與 ownership XML 可逐字核對；低優先但具 insider／稀釋 observation 價值",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1789029/000119312526347439/xslF345X06/ownership.xml"
     },
     "lead_0075b8c7d0fdb5d3e6aed5e07b9b107b": {
       "entities": {
@@ -5870,6 +6038,44 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/2074973/000121390026034863/ea0282743-10k_churchill11.htm"
     },
+    "lead_17b80226aa0367963dac8f81fdda14d5": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-15T22:32:14.063155+00:00",
+      "lead_id": "lead_17b80226aa0367963dac8f81fdda14d5",
+      "media": [
+        {
+          "cache": {
+            "bytes": 43644,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_17b80226aa0367963dac8f81fdda14d5/3_2088501126744457216.jpg",
+            "sha256": "6573bf536bef83f934ba54c3e194cc451683221f73cae156e57c8a4ad408ee2a"
+          },
+          "height": 980,
+          "media_key": "3_2088501126744457216",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HPvYtZybQAAkeWP.jpg",
+          "width": 1260
+        }
+      ],
+      "published_at": "2026-08-15T05:40:47.000Z",
+      "raw_text": "说我归零的传闻未免也太夸张了吧 哈哈\n\n经历了7月份AI板块的崩盘后，我的YTD收益依然还有 +2,411.84% https://t.co/m49XcPRgC3 https://t.co/ZI53zvbTQU",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "说我归零的传闻未免也太夸张了吧 哈哈 经历了7月份AI板块的崩盘后，我的YTD收益依然还有 +2,411.84% https://t.co/m49XcPRgC3 https://t.co/ZI53zvbTQU",
+      "triage": {
+        "decided_at": "2026-08-15T22:33:58.554804+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "只宣稱個人 YTD 報酬與 AI 板塊波動，沒有可追查的公司事件、產品關係或原子 claim；關聯性與可引用性不足",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2088501133543407959"
+    },
     "lead_18364e727aae3737941be1d12d8f086e": {
       "entities": {
         "company_ids": [
@@ -6340,6 +6546,52 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2079953508904964575"
+    },
+    "lead_1cc0a6e4bca5cf0f85d002cb4dde875a": {
+      "entities": {
+        "company_ids": [
+          "co:apple"
+        ],
+        "tickers": [
+          "AAPL",
+          "MU",
+          "SKHY"
+        ]
+      },
+      "first_seen": "2026-08-15T22:32:14.082989+00:00",
+      "lead_id": "lead_1cc0a6e4bca5cf0f85d002cb4dde875a",
+      "media": [
+        {
+          "cache": {
+            "bytes": 63871,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_1cc0a6e4bca5cf0f85d002cb4dde875a/3_2088455954056744961.jpg",
+            "sha256": "1279e0594dbe0d6613381dbaa52e4902650681a39588a2086374e2ee9fc5ad8d"
+          },
+          "height": 567,
+          "media_key": "3_2088455954056744961",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HPuvoAaaEAEId36.jpg",
+          "width": 1288
+        }
+      ],
+      "published_at": "2026-08-15T02:46:31.000Z",
+      "raw_text": "US Government urges $AAPL not to buy Chinese memory chips. \n\n$MU, $SKHY, and Samsung are happy to hear this...\n\nHilariously enough, CXMT/YMTC is price hiking too, so it's not exactly \"cheap Chinese memory that floods the market\". \n\nApple once upon a time actually had extreme supplier leverage before the AI boom.",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "US Government urges $AAPL not to buy Chinese memory chips. $MU, $SKHY, and Samsung are happy to hear this... Hilariously enough, CXMT/YMTC is price hiking too, so it's not exactly \"cheap Chinese memory that floods the market\". Apple once upon a time actually had extreme supplier leverage before the AI boom.",
+      "triage": {
+        "decided_at": "2026-08-15T22:33:58.786273+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "具名 Apple、Micron、SK hynix、Samsung、CXMT、YMTC 與美國政府供應鏈動作，可追回政策或公司一手文件；與已登記 AAPL 及 Beta MU／memory 主題相關",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2088457278928412812"
     },
     "lead_1cc53b8f399fa19d8de9097b212b2d50": {
       "entities": {
@@ -8650,6 +8902,48 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2072183248629923918"
+    },
+    "lead_2fdb51c1443d787ac140032edb41936c": {
+      "entities": {
+        "company_ids": [
+          "co:aeva"
+        ],
+        "tickers": [
+          "AEVA"
+        ]
+      },
+      "first_seen": "2026-08-15T22:32:17.141028+00:00",
+      "lead_id": "lead_2fdb51c1443d787ac140032edb41936c",
+      "published_at": "2026-07-29",
+      "refs": {
+        "parked_reason": "已逐字核對 SEC Form 4：AEVA CTO Mina Rezk 因 time-based RSU vesting，自動出售 10,304 股支付稅款；非 discretionary thesis event，無 graph delta",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1789029/000119312526324438/xslF345X06/ownership.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "trace_next_trigger": "後續 Form 4 出現非稅款自動出售的重大集中買賣",
+        "trace_origin_entity": "SEC/Aeva Technologies",
+        "trace_original_date": "2026-07-29",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "AEVA",
+          "co:aeva"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
+      "source": "edgar:AEVA",
+      "status": "parked",
+      "themes": {},
+      "title": "AEVA 4 filed 2026-07-29",
+      "triage": {
+        "decided_at": "2026-08-15T22:33:59.724165+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true
+        },
+        "reason": "AEVA 官方 Form 4，具體 issuer、filing date 與 ownership XML 可逐字核對；低優先但具 insider／稀釋 observation 價值",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1789029/000119312526324438/xslF345X06/ownership.xml"
     },
     "lead_2ffb199ff20ab64369580b427464efcf": {
       "content_updated_at": "2026-07-29T13:46:49.445916+00:00",
@@ -19442,6 +19736,48 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1730168/000173016826000066/xslF345X06/wk-form4_1783723055.xml"
     },
+    "lead_8db3c04adc3aad50284c288883a5238a": {
+      "entities": {
+        "company_ids": [
+          "co:aeva"
+        ],
+        "tickers": [
+          "AEVA"
+        ]
+      },
+      "first_seen": "2026-08-15T22:32:17.140964+00:00",
+      "lead_id": "lead_8db3c04adc3aad50284c288883a5238a",
+      "published_at": "2026-07-29",
+      "refs": {
+        "parked_reason": "已逐字核對 SEC Form 4：AEVA CEO Soroush Salehian 因 time-based RSU vesting，自動出售 10,304 股支付稅款；非 discretionary thesis event，無 graph delta",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1789029/000119312526324440/xslF345X06/ownership.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "trace_next_trigger": "後續 Form 4 出現非稅款自動出售的重大集中買賣",
+        "trace_origin_entity": "SEC/Aeva Technologies",
+        "trace_original_date": "2026-07-29",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "AEVA",
+          "co:aeva"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
+      "source": "edgar:AEVA",
+      "status": "parked",
+      "themes": {},
+      "title": "AEVA 4 filed 2026-07-29",
+      "triage": {
+        "decided_at": "2026-08-15T22:33:59.987128+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true
+        },
+        "reason": "AEVA 官方 Form 4，具體 issuer、filing date 與 ownership XML 可逐字核對；低優先但具 insider／稀釋 observation 價值",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1789029/000119312526324440/xslF345X06/ownership.xml"
+    },
     "lead_8e16834b3c423735ad20eb6f6be7d63b": {
       "entities": {
         "company_ids": [
@@ -20285,6 +20621,48 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2074504394608193799"
     },
+    "lead_9766c07e071be8d46637df5aa4e1c371": {
+      "entities": {
+        "company_ids": [
+          "co:aeva"
+        ],
+        "tickers": [
+          "AEVA"
+        ]
+      },
+      "first_seen": "2026-08-15T22:32:17.140576+00:00",
+      "lead_id": "lead_9766c07e071be8d46637df5aa4e1c371",
+      "published_at": "2026-08-14",
+      "refs": {
+        "parked_reason": "已逐字核對 SEC Form 4：AEVA director Katherine Motlagh 於 2026-08-12 以 US$25.50 出售 2,500 股；屬小額 insider dated observation，無供應鏈 graph delta",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1789029/000119312526352272/xslF345X06/ownership.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "trace_next_trigger": "後續 Form 4 出現對持有量具實質影響的集中買賣或公司 filing 提供相關原因",
+        "trace_origin_entity": "SEC/Aeva Technologies",
+        "trace_original_date": "2026-08-14",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "AEVA",
+          "co:aeva"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
+      "source": "edgar:AEVA",
+      "status": "parked",
+      "themes": {},
+      "title": "AEVA 4 filed 2026-08-14",
+      "triage": {
+        "decided_at": "2026-08-15T22:34:00.247020+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true
+        },
+        "reason": "AEVA 官方 Form 4，具體 issuer、filing date 與 ownership XML 可逐字核對；低優先但具 insider／稀釋 observation 價值",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1789029/000119312526352272/xslF345X06/ownership.xml"
+    },
     "lead_97d627b017131ff39599b413b00c2e15": {
       "entities": {
         "company_ids": [
@@ -20627,9 +21005,23 @@
       "first_seen": "2026-08-13T22:33:30.693911+00:00",
       "lead_id": "lead_9a326a7ac257806d6a1828ffc106028b",
       "published_at": "2026-08-12",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC Form 4：META COO Javier Olivan 依 2025-11-17 採用的 Rule 10b5-1 計畫於 2026-08-10 出售合計 1,692 股；屬 dated ownership observation，無產品或供應鏈 graph delta",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1326801/000095010326012279/xslF345X06/ownership.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "trace_next_trigger": "後續 Form 4 出現非 10b5-1 的重大集中買賣，或 filing 揭露相關資本配置原因",
+        "trace_origin_entity": "SEC/Meta Platforms",
+        "trace_original_date": "2026-08-12",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "META",
+          "co:meta"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:META",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "META 4 filed 2026-08-12",
       "triage": {
@@ -22139,16 +22531,16 @@
         "ontology_authority": "todo:61",
         "ontology_status": "approved",
         "original_claim_status": "unverified",
-        "parked_reason": "原文是 tier 4 社群貼文，雖列出中國 AI／physical AI／world model 資金數字，但沒有具名 VC、交易清單、計算口徑或可逐字核對的一手資料；KuCoin 與 Odaily 只是同源轉述，不能形成獨立佐證，因此只保留 lead-only，不產 extraction 或 prepared RA。",
+        "parked_reason": "只追回同一作者推文與同源轉載；轉載頁明示 US$23.56B／15.74B／13.36B 等為作者個人統計，未提供原始 dataset、分類方法或逐筆融資清單。對 AEVA 的 world-model exposure 亦是作者推論，沒有公司事件可抽取",
         "pq2_item": "61",
         "research_bundle_id": "serenity_robotics_20260729",
-        "research_outcome": "lead_only_tier_4: exact funding buckets and capital-rotation thesis not independently verifiable",
+        "research_outcome": "no_prepared_ra_social_stats_without_primary_dataset",
         "research_report": "docs/reports/serenity_30d_research_2026-07-29.md",
         "research_run": "daily-brief-2026-08-07_chinese_vc_physical_ai",
         "storage_permission": "repo_excerpt",
         "trace_access_method": "exact_phrase_search+official_company_and_funding_search",
-        "trace_attempts_ref": "原始 X 貼文；KuCoin 2026-07-03 flash；Odaily 2026-07-03 同源轉述；Forbes world-model funding 只支持全球部分、不能驗證中國分項；未找到 claimed VC dataset 或 methodology",
-        "trace_next_trigger": "具名中國 VC／投資機構原始數據、公司融資公告或可核對的研究方法／報告",
+        "trace_attempts_ref": "精確搜尋五組金額與 world models；BlockTempo 為同一 X origin 的轉載，明示數字未經其查證",
+        "trace_next_trigger": "作者公開原始 dataset／方法論，或具名公司 filing 揭露可逐筆核對的 physical-AI／world-model 融資事件",
         "trace_origin_entity": "aleabitoreddit；Serenity",
         "trace_origin_linkage": "same_origin reposts; no independent primary dataset",
         "trace_requeue_consumed_entities": [
@@ -22165,7 +22557,7 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "robotics": {
           "counter_only": false,
@@ -23202,9 +23594,24 @@
       "first_seen": "2026-08-14T22:33:28.557302+00:00",
       "lead_id": "lead_b17774619e11d4e923796f2710a55e58",
       "published_at": "2026-08-14",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已取得 Coherent FY2026 10-K：一手確認垂直整合 transceiver／laser／detector／PIC、持續擴充美歐 6-inch InP capacity，以及 NVIDIA multi-year supply agreement。現有 graph 已有 Coherent 6-inch InP、CPO／ELS、NVIDIA partnership 與供應關係；本文件僅 corroboration，沒有唯一新 graph delta",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/820318/000082031826000020/iivi-20260630.htm",
+        "research_outcome": "corroboration_only_existing_graph_no_prepared_ra",
+        "source_doc": "cohr_10_k_20260814_inp_vertical_integration",
+        "trace_next_trigger": "Coherent 後續 filing 揭露 6-inch InP 實際產能／良率、外部 substrate 依賴或 NVIDIA 客戶集中數字",
+        "trace_origin_entity": "Coherent Corp./SEC",
+        "trace_original_date": "2026-08-14",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "COHR",
+          "co:coherent"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:COHR",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -25908,6 +26315,49 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2078274370795954384"
+    },
+    "lead_c8aedcfeccfebd35b0baad3bf4be5225": {
+      "entities": {
+        "company_ids": [
+          "co:aeva"
+        ],
+        "tickers": [
+          "AEVA"
+        ]
+      },
+      "first_seen": "2026-08-15T22:32:17.140826+00:00",
+      "lead_id": "lead_c8aedcfeccfebd35b0baad3bf4be5225",
+      "published_at": "2026-08-06",
+      "refs": {
+        "parked_reason": "已取得 AEVA Q2 2026 10-Q：Q2 revenue US$6.136M、RPO US$28.7M（約 30% 預期 12 個月內認列）、cash＋marketable securities US$177.889M、單一客戶占 A/R 28%。均為 Engine C 財務／客戶集中 dated inputs；NPO JDA 不在 10-Q 主文，既有 8-K graph delta 已另行入圖，故本 lead 不製造重複 RA",
+        "pq2_ref": "154",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1789029/000119312526338179/aeva-20260630.htm",
+        "research_outcome": "engine_c_inputs_identified_no_authority_write_no_prepared_ra",
+        "trace_next_trigger": "[154] bounded research 啟動後，將 RPO／customer concentration／runway 拆成 exact Engine C observation proposals；或下一份 10-Q 更新",
+        "trace_origin_entity": "Aeva Technologies/SEC",
+        "trace_original_date": "2026-08-06",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "AEVA",
+          "co:aeva"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
+      "source": "edgar:AEVA",
+      "status": "parked",
+      "themes": {},
+      "title": "AEVA 10-Q filed 2026-08-06",
+      "triage": {
+        "decided_at": "2026-08-15T22:33:59.014553+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true
+        },
+        "reason": "AEVA 官方 10-Q，具體 issuer、form、期間與 filing URL，可逐字核對營運、客戶與財務 observation；先進 pq1 判斷是否有 graph delta",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1789029/000119312526338179/aeva-20260630.htm"
     },
     "lead_c91246f27ecce6763d075ed638d3f163": {
       "entities": {
@@ -28618,6 +29068,48 @@
       ],
       "url": "https://x.com/aleabitoreddit/status/2080689966045348047"
     },
+    "lead_dc01ada30c1a699ba26b7b47b9acf058": {
+      "entities": {
+        "company_ids": [
+          "co:aeva"
+        ],
+        "tickers": [
+          "AEVA"
+        ]
+      },
+      "first_seen": "2026-08-15T22:32:17.141091+00:00",
+      "lead_id": "lead_dc01ada30c1a699ba26b7b47b9acf058",
+      "published_at": "2026-07-29",
+      "refs": {
+        "parked_reason": "已逐字核對 SEC Form 4：AEVA CFO Saurabh Sinha 因 time-based RSU vesting，自動出售 6,830 股支付稅款；非 discretionary thesis event，無 graph delta",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1789029/000119312526324436/xslF345X06/ownership.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "trace_next_trigger": "後續 Form 4 出現非稅款自動出售的重大集中買賣",
+        "trace_origin_entity": "SEC/Aeva Technologies",
+        "trace_original_date": "2026-07-29",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "AEVA",
+          "co:aeva"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
+      "source": "edgar:AEVA",
+      "status": "parked",
+      "themes": {},
+      "title": "AEVA 4 filed 2026-07-29",
+      "triage": {
+        "decided_at": "2026-08-15T22:34:00.498675+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true
+        },
+        "reason": "AEVA 官方 Form 4，具體 issuer、filing date 與 ownership XML 可逐字核對；低優先但具 insider／稀釋 observation 價值",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1789029/000119312526324436/xslF345X06/ownership.xml"
+    },
     "lead_dc1c77328d874e61b0abaee39391c054": {
       "entities": {
         "company_ids": [],
@@ -30370,27 +30862,33 @@
         "campaign_topic": "ai_infrastructure",
         "campaign_window_end": "2026-07-29T13:46:25Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
+        "claimed_origin": "New York Times 及三名知情人士",
         "original_claim_status": "partial_support_potential_talks_contract_inference_rejected",
         "outcome": "trigger_unrelated_trace_unchanged",
-        "parked_reason": "觸發重查的 lead_3df060cf842783e4709ae6cd86b1be74 只列 NBIS 財報與 OCP／Unitree 時程，沒有 Meta–Anthropic 事件關聯；仍無可逐字核對的 NYT 原文、官方公告或 signed terms，100 億美元不能視為成交價值。",
+        "parked_reason": "追回 Reuters 2026-07-17 carrier：Meta 與 Anthropic 僅在 early-stage talks，潛在兩年最高 US$10B，條款可變且雙方可提前退出；Meta 未回覆、Anthropic 拒評。可支持洽談存在，不能寫成已簽合約、已承諾收入或 neocloud model 已驗證",
         "research_mode": "delta_only",
-        "research_outcome": "nbis_ocp_event_does_not_support_meta_anthropic_terms",
+        "research_outcome": "partial_tier3_talks_only_no_prepared_ra",
         "research_run": "daily-brief-2026-08-09-post-permission-recovery",
-        "trace_attempts_ref": "Existing NYT/Reuters/Meta context plus trigger audit of lead_3df060cf842783e4709ae6cd86b1be74",
-        "trace_next_trigger": "NYT original becomes readable, or Meta/Anthropic official announcement or filing confirms signed terms",
+        "trace_attempts_ref": "Reuters carrier 與同源二手報導；未取得 Meta／Anthropic 正式合約或公司公告",
+        "trace_next_trigger": "Meta 或 Anthropic 公告 definitive compute lease，或 Meta filing 揭露對手方、期限、capacity 與 revenue commitment",
+        "trace_origin_entity": "Reuters/unnamed source",
+        "trace_origin_linkage": "Reuters 與 NYT 都依未具名知情人士；公司方未確認",
         "trace_requeue_trigger": "related_triaged_lead:lead_9a326a7ac257806d6a1828ffc106028b",
         "trace_requeued_at": "2026-08-13T22:36:37.087730+00:00",
         "trace_requires_user": "false",
-        "trace_status": "isolated_tier_3",
+        "trace_status": "partial",
         "trace_trigger_entities": [
+          "IREN",
           "META",
+          "NBIS",
+          "SPCX",
           "co:meta"
         ],
         "trace_trigger_event_ref": "lead:lead_9a326a7ac257806d6a1828ffc106028b",
-        "trace_trigger_kind": "primary_source_signal"
+        "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "$META in talks to lease compute to Anthropic in a $10B dollar deal. Seems like they saw how profitable $SPCX $45B compute deal was. But just goes to validate Neocloud business models like $NBIS, $IREN, and co if hyperscalers are copying their homework. Source: NYT https://t.co/3Mu3UXQtFT",
       "triage": {
@@ -30498,6 +30996,48 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2075590371531493729"
+    },
+    "lead_e8cef605c60f6b36ad82feb2849600e4": {
+      "entities": {
+        "company_ids": [
+          "co:aeva"
+        ],
+        "tickers": [
+          "AEVA"
+        ]
+      },
+      "first_seen": "2026-08-15T22:32:17.140686+00:00",
+      "lead_id": "lead_e8cef605c60f6b36ad82feb2849600e4",
+      "published_at": "2026-08-12",
+      "refs": {
+        "parked_reason": "已逐字核對 SEC Form 4：AEVA CEO Soroush Salehian 依既有 Rule 10b5-1 計畫於 2026-08-10 至 08-11 出售合計 305,099 股；屬 insider dated observation，不是供應鏈或產品 graph delta",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1789029/000119312526347443/xslF345X06/ownership.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "trace_next_trigger": "後續 Form 4 出現非 10b5-1 的重大集中買賣，或 10-Q 揭露 dilution／ownership 變化",
+        "trace_origin_entity": "SEC/Aeva Technologies",
+        "trace_original_date": "2026-08-12",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "AEVA",
+          "co:aeva"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
+      "source": "edgar:AEVA",
+      "status": "parked",
+      "themes": {},
+      "title": "AEVA 4 filed 2026-08-12",
+      "triage": {
+        "decided_at": "2026-08-15T22:34:00.734698+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true
+        },
+        "reason": "AEVA 官方 Form 4，具體 issuer、filing date 與 ownership XML 可逐字核對；低優先但具 insider／稀釋 observation 價值",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1789029/000119312526347443/xslF345X06/ownership.xml"
     },
     "lead_e9647a0b870713c84433daea4c8d1b55": {
       "entities": {
@@ -31246,6 +31786,49 @@
         "tier": 4
       },
       "url": "https://www.sec.gov/Archives/edgar/data/898293/000122520826004703/xslF345X06/doc4.xml"
+    },
+    "lead_f1018c2c5b37d811292d3f3fe1fb29c7": {
+      "entities": {
+        "company_ids": [
+          "co:aeva"
+        ],
+        "tickers": [
+          "AEVA"
+        ]
+      },
+      "first_seen": "2026-08-15T22:32:17.140895+00:00",
+      "lead_id": "lead_f1018c2c5b37d811292d3f3fe1fb29c7",
+      "published_at": "2026-08-05",
+      "refs": {
+        "parked_reason": "已取得 AEVA 8-K EX-99.1；Optical Connectivity、unnamed major customer NPO JDA、H2 2027 initial deployment 與 2028 ramp 已在 2026-08-15 以 authority:graph;ref:aeva_8k_ex991_20260805_optical_connectivity 入圖。Sivers／laser／ELSFP 仍為 0 hits；本 lead 無新增 delta，不建立重複 RA",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1789029/000119312526335102/aeva-20260730.htm",
+        "research_outcome": "duplicate_existing_graph_authority_no_prepared_ra",
+        "source_doc": "aeva_8k_ex991_20260805_optical_connectivity",
+        "trace_next_trigger": "後續 10-Q／8-K 具名 JDA 對手方、hyperscaler、qualification 或 revenue；不得由作者推測補 Sivers 關係",
+        "trace_origin_entity": "Aeva Technologies/SEC",
+        "trace_original_date": "2026-08-05",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "AEVA",
+          "co:aeva"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
+      "source": "edgar:AEVA",
+      "status": "parked",
+      "themes": {},
+      "title": "AEVA 8-K filed 2026-08-05",
+      "triage": {
+        "decided_at": "2026-08-15T22:33:59.245264+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true
+        },
+        "reason": "AEVA 官方 8-K，具體 issuer、form、日期與 filing URL，可逐字核對事件；先進 pq1 判斷 graph delta 或時變 observation",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1789029/000119312526335102/aeva-20260730.htm"
     },
     "lead_f10510a87362e2f2d5a785c9d573e7ef": {
       "content_updated_at": "2026-07-29T13:46:42.901012+00:00",
@@ -32922,8 +33505,8 @@
   "schema_version": "2",
   "source_state": {
     "x:aleabitoreddit": {
-      "since_id": "2088226398708338889",
-      "updated_at": "2026-08-15T01:46:56.695406+00:00",
+      "since_id": "2088501133543407959",
+      "updated_at": "2026-08-15T22:32:14.083632+00:00",
       "user_id": "1940360837547565056"
     }
   }

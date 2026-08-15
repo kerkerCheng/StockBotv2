@@ -2477,6 +2477,11 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
+      "source_cleared": {
+        "at": "2026-08-15T22:35:21.602190+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
       "title": "REVIEW — co:iqe",
       "type": "decision_review",
       "waiting_on": {
@@ -2503,20 +2508,13 @@
       "added_at": "2026-08-15T20:06:20.186969+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 158,
-      "reason": null,
+      "reason": "blocker registry 判定只剩 system_internal；不需要使用者決定，亦不冒充外部事件",
       "ref_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "system_internal",
+      "resolved_at": "2026-08-15T22:35:21.602190+00:00",
       "source": "decision_lab",
       "title": "REVIEW — co:sivers_semiconductors",
-      "type": "decision_review",
-      "waiting_on": {
-        "derived_from_blockers": true,
-        "reason": "所有 blocker 都不需要使用者決定",
-        "set_at": "2026-08-15T20:06:20.186955+00:00",
-        "trigger": "匯率資料問題",
-        "until": null
-      }
+      "type": "decision_review"
     }
   ],
   "log": [
@@ -5583,6 +5581,31 @@
       "ref_id": "lead_c3fa1ca7fd636810e6fababce5ce7f5a",
       "type": "source_trace_review",
       "verb": "go"
+    },
+    {
+      "at": "2026-08-15T22:35:21.602190+00:00",
+      "n": 158,
+      "prior_waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-08-15T20:06:20.186955+00:00",
+        "trigger": "匯率資料問題",
+        "until": null
+      },
+      "reason": "blocker registry 判定只剩 system_internal；不需要使用者決定，亦不冒充外部事件",
+      "receipt": "blocker-registry:system_internal",
+      "ref_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
+      "type": "decision_review",
+      "verb": "system_internal_retired"
+    },
+    {
+      "at": "2026-08-15T22:35:21.602190+00:00",
+      "n": 156,
+      "reason": "來源本輪成功執行，但不再產出此項",
+      "receipt": null,
+      "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+      "type": "decision_review",
+      "verb": "source_cleared"
     }
   ],
   "next_n": 159,
