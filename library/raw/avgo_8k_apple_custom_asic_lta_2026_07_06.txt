@@ -1,0 +1,11 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1730168/000119312526295589/d84378d8k.htm
+
+Excerpt:
+Source URL: https://www.sec.gov/Archives/edgar/data/1730168/000119312526295589/d84378d8k.htm
+Published: 2026-07-06
+Retrieved: 2026-08-17
+
+Item 8.01 excerpt:
+Broadcom Inc. ("Broadcom") and Apple Inc. ("Apple") have agreed to expand their long-standing technology collaboration through 2031 by entering into new multi-year long-term agreements for Broadcom to develop and supply a range of custom ASIC silicon products for use in multiple generations of Apple products.
+
+Boundary: one Broadcom filing origin_event. No contract value, minimum purchase, exclusivity, product category, annual revenue cadence, AI/CPO designation, or Apple-side independent confirmation.

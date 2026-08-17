@@ -1,0 +1,113 @@
+{
+  "claims": [
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "若 Broadcom 或 Apple 後續公告終止、重大縮減或不再延續此 LTA，或 Broadcom filing 揭露相關 custom-ASIC demand materially below plan，則人工 reassess；每季 filing 核查。",
+      "id": "avgo_8k_apple_custom_asic_lta_2026_07_06_cl1",
+      "source_ids": [
+        "avgo_8k_apple_custom_asic_lta_2026_07_06_s1"
+      ],
+      "statement": "Broadcom 與 Apple 已簽訂新的多年 long-term agreements，合作延伸至 2031，由 Broadcom 開發並供應用於多代 Apple 產品的 custom ASIC silicon products。文件未揭露合約金額、最低採購量、產品別、獨家性或逐年收入。",
+      "subject_id": "co:broadcom"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {
+        "qualification_status": "designed_in"
+      },
+      "confidence": 0.85,
+      "dst_id": "co:apple",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "avgo_8k_apple_custom_asic_lta_2026_07_06_s1"
+      ],
+      "src_id": "co:broadcom"
+    },
+    {
+      "attributes": {
+        "qualification_status": "designed_in"
+      },
+      "confidence": 0.85,
+      "dst_id": "prod:apple_broadcom_custom_asic_program",
+      "id": "e2",
+      "relation": "develops",
+      "source_ids": [
+        "avgo_8k_apple_custom_asic_lta_2026_07_06_s1"
+      ],
+      "src_id": "co:broadcom"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "Broadcom Inc.",
+        "AVGO"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:broadcom",
+      "name": "Broadcom",
+      "role": "adjacent_silicon",
+      "source_ids": [
+        "avgo_8k_apple_custom_asic_lta_2026_07_06_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "end_demand",
+      "aliases": [
+        "Apple Inc.",
+        "AAPL"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:apple",
+      "name": "Apple",
+      "role": "leader",
+      "source_ids": [
+        "avgo_8k_apple_custom_asic_lta_2026_07_06_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "Apple custom ASIC silicon products"
+      ],
+      "attributes": {},
+      "confidence": 0.8,
+      "id": "prod:apple_broadcom_custom_asic_program",
+      "name": "Apple–Broadcom custom ASIC silicon program",
+      "role": null,
+      "source_ids": [
+        "avgo_8k_apple_custom_asic_lta_2026_07_06_s1"
+      ],
+      "type": "Product"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "avgo_8k_apple_custom_asic_lta_2026_07_06",
+    "evidence_tier": 1,
+    "origin_entity": "Broadcom Inc.",
+    "permission_basis": "Public SEC filing; store only the research-relevant excerpt.",
+    "published_at": "2026-07-06",
+    "publisher": "U.S. Securities and Exchange Commission",
+    "retrieved_at": "2026-08-17",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Broadcom Form 8-K: expanded Apple custom-ASIC collaboration through 2031",
+    "url": "https://www.sec.gov/Archives/edgar/data/1730168/000119312526295589/d84378d8k.htm"
+  },
+  "sources": [
+    {
+      "id": "avgo_8k_apple_custom_asic_lta_2026_07_06_s1",
+      "locator": "Item 8.01 — Other Events",
+      "quote": "Broadcom Inc. (\"Broadcom\") and Apple Inc. (\"Apple\") have agreed to expand their long-standing technology collaboration through 2031 by entering into new multi-year long-term agreements for Broadcom to develop and supply a range of custom ASIC silicon products for use in multiple generations of Apple products."
+    }
+  ]
+}
