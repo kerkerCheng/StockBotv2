@@ -3669,6 +3669,133 @@
       "result": "ok",
       "run_at": "2026-08-16T22:32:17.911087+00:00",
       "source": "edgar:TSLA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-17T22:32:27.381741+00:00",
+      "source": "mfn:sivers-semiconductors"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-17T22:32:29.310773+00:00",
+      "source": "sivers:press"
+    },
+    {
+      "failure_class": "provider_api_error",
+      "new": 0,
+      "result": "fetch_failed",
+      "run_at": "2026-08-17T22:32:30.609024+00:00",
+      "source": "yahoo:iqe-l"
+    },
+    {
+      "new": 6,
+      "result": "ok",
+      "run_at": "2026-08-17T22:32:32.649367+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-17T22:32:35.075703+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-17T22:32:35.783097+00:00",
+      "source": "edgar:AEVA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-17T22:32:36.469583+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-17T22:32:37.197838+00:00",
+      "source": "edgar:AVGO"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-17T22:32:37.905718+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-17T22:32:38.638544+00:00",
+      "source": "edgar:CCXI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-17T22:32:39.317464+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-08-17T22:32:40.027998+00:00",
+      "source": "edgar:GFS"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-17T22:32:40.738564+00:00",
+      "source": "edgar:JBL"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-08-17T22:32:41.458330+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-17T22:32:42.187156+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-17T22:32:42.926112+00:00",
+      "source": "edgar:META"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-17T22:32:43.712550+00:00",
+      "source": "edgar:MTSI"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-08-17T22:32:44.233400+00:00",
+      "source": "edgar:NVDA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-17T22:32:44.984026+00:00",
+      "source": "edgar:POET"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-08-17T22:32:45.702794+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-17T22:32:46.230079+00:00",
+      "source": "edgar:TSLA"
     }
   ],
   "leads": {
@@ -4254,6 +4381,49 @@
       ],
       "url": "https://x.com/aleabitoreddit/status/2076248337863639506"
     },
+    "lead_03e036c05aea97310171ca07772eb352": {
+      "entities": {
+        "company_ids": [
+          "co:tower_semiconductor"
+        ],
+        "tickers": [
+          "TSEM"
+        ]
+      },
+      "first_seen": "2026-08-17T22:32:45.702590+00:00",
+      "lead_id": "lead_03e036c05aea97310171ca07772eb352",
+      "published_at": "2026-08-17",
+      "refs": {
+        "parked_reason": "6-K_wrapper已取得但本次未取得interim_statement_exhibits；沒有可驗證的新graph_delta",
+        "trace_attempts_ref": "SEC_TSEM_6-K_2026-08-17_wrapper",
+        "trace_next_trigger": "取得並解析6-K_exhibits或Tower官方Q2報告",
+        "trace_requires_user": "false",
+        "trace_status": "partial",
+        "trace_trigger_entities": [
+          "TSEM",
+          "co:tower_semiconductor"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
+      "source": "edgar:TSEM",
+      "status": "parked",
+      "themes": {},
+      "title": "TSEM 6-K filed 2026-08-17",
+      "triage": {
+        "decided_at": "2026-08-17T22:34:27.864087+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true,
+          "novelty": true
+        },
+        "reason": "TSEM 為已登記研究公司；官方 6-K 可逐字核對，放行追查是否含新供應鏈或財務事件",
+        "related_trace_requeues": [
+          "lead_b1e793c560334131dfe7c1619715784d"
+        ],
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/928876/000117891326004158/zk2635857.htm"
+    },
     "lead_03ec88277b05d7cb337f5367d546ff0e": {
       "entities": {
         "company_ids": [],
@@ -4439,9 +4609,21 @@
       "first_seen": "2026-08-15T01:47:08.542511+00:00",
       "lead_id": "lead_044f4bac035e99bae20544c3c96367df",
       "published_at": "2026-07-14",
-      "refs": {},
+      "refs": {
+        "parked_reason": "同一官方文件已由ra_2bf1494bca01adbb0083fa27d1ea0637入圖；本輪不重複建立RA",
+        "research_action_id": "ra_2bf1494bca01adbb0083fa27d1ea0637",
+        "trace_attempts_ref": "Tower_METI_2026-07-14_exact_already_applied",
+        "trace_next_trigger": "Tower揭露超出既有action的新執行milestone",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "TSEM",
+          "co:tower_semiconductor"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:TSEM",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "TSEM 6-K filed 2026-07-14",
       "triage": {
@@ -5930,6 +6112,37 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1437424/000117184326004397/f6k_063026.htm"
     },
+    "lead_12e6d36358668be9a97afc6c21f89b74": {
+      "entities": {
+        "company_ids": [
+          "co:globalfoundries"
+        ],
+        "tickers": [
+          "GFS"
+        ]
+      },
+      "first_seen": "2026-08-17T22:32:40.027834+00:00",
+      "lead_id": "lead_12e6d36358668be9a97afc6c21f89b74",
+      "published_at": "2026-08-17",
+      "refs": {},
+      "source": "edgar:GFS",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "GFS 4 filed 2026-08-17",
+      "triage": {
+        "decided_at": "2026-08-17T22:34:28.091555+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true
+        },
+        "reason": "GFS 為已登記研究公司；官方 Form 4 可逐字核對，雖通常低優先仍交 pq1 判斷是否僅 dated observation",
+        "related_trace_requeues": [
+          "lead_78a655cf74ea5516f2d24b2ac3eeb8bf"
+        ],
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1709048/000162828026057360/xslF345X06/wk-form4_1786997021.xml"
+    },
     "lead_12f5545a0584132a028176abe9bcdbbb": {
       "entities": {
         "company_ids": [
@@ -6023,6 +6236,38 @@
         "tier": 4
       },
       "url": "https://www.thearmchairtrader.com/aim-market-roundup/iqe-harvest-minerals-midwich/?.tsrc=rss"
+    },
+    "lead_1662a082af8a32775df02aef43c5faa2": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-17T22:32:32.599504+00:00",
+      "lead_id": "lead_1662a082af8a32775df02aef43c5faa2",
+      "media": [],
+      "published_at": "2026-08-17T18:42:13.000Z",
+      "raw_text": "I've decided to name my next two pets Applied Optoelectronics and Sivers Semiconductors",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "I've decided to name my next two pets Applied Optoelectronics and Sivers Semiconductors",
+      "triage": {
+        "decided_at": "2026-08-17T22:34:28.321715+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "只是在替寵物命名的玩笑，沒有可驗證公司動作、數字或供應鏈 claim",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2089422562019393654"
     },
     "lead_16795901900503525cb8a921bca69711": {
       "entities": {
@@ -7203,6 +7448,90 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2080754547757391897"
+    },
+    "lead_2061d895e6e162c47132019a07869d92": {
+      "entities": {
+        "company_ids": [
+          "co:axt",
+          "co:iqe"
+        ],
+        "tickers": [
+          "AXTI",
+          "IQE"
+        ]
+      },
+      "first_seen": "2026-08-17T22:32:32.647324+00:00",
+      "lead_id": "lead_2061d895e6e162c47132019a07869d92",
+      "media": [
+        {
+          "cache": {
+            "bytes": 249743,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_2061d895e6e162c47132019a07869d92/3_2089163964936798208.jpg",
+            "sha256": "d008661f992bbc22a4a4536d51e130296f3d2491afaab5a910b34f76c7c56964"
+          },
+          "height": 1485,
+          "media_key": "3_2089163964936798208",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HP4zjqeawAARuiN.jpg",
+          "width": 1308
+        },
+        {
+          "cache": {
+            "bytes": 236178,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_2061d895e6e162c47132019a07869d92/3_2089163965792428032.jpg",
+            "sha256": "c297e9bad146ec231f527f1ca3792677f9e1f8c0c165d0e0fa066e9a08714be2"
+          },
+          "height": 1426,
+          "media_key": "3_2089163965792428032",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HP4zjtqaoAAy1Fr.jpg",
+          "width": 1368
+        }
+      ],
+      "published_at": "2026-08-17T01:39:22.000Z",
+      "raw_text": "\"Severe InP Shortage Triggers Largest Price Hike Ever\" - $AXTI. \n\nSuppliers have bluntly stated that \"even if you have the money, you still may not be able to get the material\" (lol). \n\n- Industry sources revealed that InP substrate prices began rising in Q4 last year and was the fourth consecutive substrate price hike. \n\n- The latest Q4 hike is expected to be >10%,\n\n- Meanwhile, prices for epitaxial wafers made from those substrates have already been raised two times, and the market is moving toward a 3rd consecutive increase in Q4. (I also wrote a thesis on $IQE, which benefits here too). \n\nArticle states VPEC, Landmark, IET benefits (Taiwan centric reporting). \n\nI did predict this last year... The bottleneck is real, but I do have higher expectations for price hikes that comes next. \n\nGlad it's starting to play out.",
+      "refs": {
+        "parked_reason": "產業報導支持InP短缺與價格跳升，但未支持第四次Q4漲價、最新大於10%及epi連續漲價等exact_claim",
+        "trace_attempts_ref": "ETNews_2026-07-08_industry_report_plus_issuer_search",
+        "trace_next_trigger": "issuer或台灣供應商正式披露價格與調價次數",
+        "trace_requires_user": "false",
+        "trace_status": "partial",
+        "trace_trigger_entities": [
+          "AXTI",
+          "IQE",
+          "co:axt",
+          "co:iqe"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
+      "source": "x:aleabitoreddit",
+      "status": "parked",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "InP"
+          ]
+        }
+      },
+      "title": "\"Severe InP Shortage Triggers Largest Price Hike Ever\" - $AXTI. Suppliers have bluntly stated that \"even if you have the money, you still may not be able to get the material\" (lol). - Industry sources revealed that InP substrate prices began rising in Q4 last year and was the fourth consecutive substrate price hike. - The latest Q4 hike is expected to be >10%, - Meanwhile, prices for epitaxial wafers made from those substrates have already been raised two times, and the market is moving toward a 3rd consecutive increase in Q4. (I also wrote a thesis on $IQE, which benefits here too). Article states VPEC, Landmark, IET benefits (Taiwan centric reporting). I did predict this last year... The bottleneck is real, but I do have higher expectations for price hikes that comes next. Glad it's starting to play out.",
+      "triage": {
+        "decided_at": "2026-08-17T22:34:28.548522+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "contradiction": true,
+          "novelty": true
+        },
+        "reason": "具名 AXTI／IQE 與 InP substrate 漲價、次數及 >10% 門檻；高度關聯既有 InP thesis，值得追原始產業報導與反證",
+        "related_trace_requeues": [
+          "lead_8088f665e358a7744d9b6bc1646bccbf"
+        ],
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2089165155741622679"
     },
     "lead_2093c12993bd8ad33512c4db06525336": {
       "entities": {
@@ -13048,6 +13377,48 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2085644051446108223"
     },
+    "lead_568fc9e6338b158802f8a22dd967fe73": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "SNDK",
+          "SKHY",
+          "MU"
+        ]
+      },
+      "first_seen": "2026-08-17T22:32:32.643501+00:00",
+      "lead_id": "lead_568fc9e6338b158802f8a22dd967fe73",
+      "media": [
+        {
+          "cache": {
+            "bytes": 112993,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_568fc9e6338b158802f8a22dd967fe73/3_2089264616438366211.jpg",
+            "sha256": "fe027f85ab0de418598d67953569a73752c3664dc04d7e531b7670c2d338d404"
+          },
+          "height": 1052,
+          "media_key": "3_2089264616438366211",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HP6PGWiaAAMmne-.jpg",
+          "width": 2149
+        }
+      ],
+      "published_at": "2026-08-17T08:16:04.000Z",
+      "raw_text": "Just some more demand imbalance visibility for $SNDK, $SKHY, $MU, Kioxia, and your NAND players. \n\nPhison CEO: \"2027 capacity constraints will be even more severe than in 2026.\"\n\n\"Upstream suppliers need up to 4 years from plant construction and equipment investment to actual production.\n\nWith demand growing explosively and supply expansion limited, the NAND shortage is likely to last for years.\"\n\nDon't quite think I agree with the people claiming it's all over for memory, esp. NAND bottlenecks in 2026...",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "Just some more demand imbalance visibility for $SNDK, $SKHY, $MU, Kioxia, and your NAND players. Phison CEO: \"2027 capacity constraints will be even more severe than in 2026.\" \"Upstream suppliers need up to 4 years from plant construction and equipment investment to actual production. With demand growing explosively and supply expansion limited, the NAND shortage is likely to last for years.\" Don't quite think I agree with the people claiming it's all over for memory, esp. NAND bottlenecks in 2026...",
+      "triage": {
+        "decided_at": "2026-08-17T22:34:28.779402+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "NAND 記憶體敘事雖有具名公司與引述，但未命中現行研究主題或登記研究公司；MU 僅屬 Beta 行情 universe，不能據此開 Alpha pq1",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2089264987328151637"
+    },
     "lead_569add44124d25b961da71868b7e1fb6": {
       "entities": {
         "company_ids": [],
@@ -15123,6 +15494,54 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2075559573520519562"
     },
+    "lead_6574768017ccfb16b337b7c86dd5d0fe": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-17T22:32:32.642881+00:00",
+      "lead_id": "lead_6574768017ccfb16b337b7c86dd5d0fe",
+      "media": [
+        {
+          "cache": {
+            "bytes": 109828,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_6574768017ccfb16b337b7c86dd5d0fe/3_2089352403942567937.jpg",
+            "sha256": "6a8bdde13db1da14a0a6bd78587569426f2b894de962eea54167b45e6f501c93"
+          },
+          "height": 771,
+          "media_key": "3_2089352403942567937",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HP7e8Qea8AEqzyv.jpg",
+          "width": 1423
+        }
+      ],
+      "published_at": "2026-08-17T14:16:27.000Z",
+      "raw_text": "It's official, Unitree the 8000x+ retail oversubscribed humanoid company in China.\n\nIs expected to go public in 2 days! So the 19th. \n\nOpening is implied to be around ~$41.66B MC per derivatives, around +363.3% above its ~$9B IPO valuation. \n\nFun times for humanoids this week. https://t.co/yav4oRs2bO",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_go",
+      "themes": {
+        "robotics": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "humanoid"
+          ]
+        }
+      },
+      "title": "It's official, Unitree the 8000x+ retail oversubscribed humanoid company in China. Is expected to go public in 2 days! So the 19th. Opening is implied to be around ~$41.66B MC per derivatives, around +363.3% above its ~$9B IPO valuation. Fun times for humanoids this week. https://t.co/yav4oRs2bO",
+      "triage": {
+        "decided_at": "2026-08-17T22:34:29.021562+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "命中 robotics 主題且有 Unitree 預計掛牌日期、IPO 與衍生品估值等可追原子 claim；放行追官方招股／交易所資料",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2089355682286092748"
+    },
     "lead_65cd6e71ec67ef60eb999082611afa8b": {
       "entities": {
         "company_ids": [
@@ -16950,24 +17369,29 @@
         "claimed_origin": "NIST／Commerce CPO LOI＋Dow Jones 1% stake headline",
         "original_claim_status": "partial_conflated",
         "outcome": "trigger_unrelated_original_partial_unchanged",
-        "parked_reason": "新觸發 lead 是中國光收發器限制草案，與 GFS CPO LOI 的 final award 無事件關聯。NIST 仍只證實最高 3 億美元、加速 2–3 年且須後續 diligence；1% 股權來自另一份量子 foundry 協議，原貼仍為 partial。",
+        "parked_reason": "一手來源支持最高3億美元CPO研發LOI與1%政府股權安排，但未具名Sivers或Lumentum供應關係；保留dated_policy_observation",
         "primary_url": "https://www.nist.gov/news-events/news/2026/07/department-commerce-announces-letters-intent-7-companies-874-million",
         "research_outcome": "transceiver_policy_trigger_does_not_confirm_gfs_final_award",
         "research_run": "daily_brief_2026_08_02",
-        "trace_attempts_ref": "2026-08-15 新增 issuer 自揭一手：GFS Form 6-K Q2 2026 earnings release (acc 0001709048-26-000218) 逐字確認 July 2026 與 Commerce 簽 LOI、CHIPS R&D Office 預期撥款 US$300M 推進 silicon photonics。已存 library/raw/gfs_6k_20260805_chips_loi_silicon_photonics.txt。先前 NIST 公告仍為第二 origin",
-        "trace_next_trigger": "Commerce final award 公告，或 GFS filing 出現 (a) LOI 轉 definitive award 的 milestone、或 (b) 任何政府股權／warrant 揭露。issuer 措辭仍是 letter of intent／is expected to award",
+        "trace_attempts_ref": "GFS_issuer_announcement_and_NIST_LOI",
+        "trace_next_trigger": "Commerce_definitive_award或issuer具名供應商披露",
         "trace_origin_entity": "U.S. Department of Commerce／NIST",
         "trace_origin_linkage": "official_for_300m_CPO_LOI;1pct_from_separate_May_quantum_agreement",
-        "trace_requeue_trigger": "related_triaged_lead:lead_46eab040757a85c528d884e48c674b30",
-        "trace_requeued_at": "2026-08-15T06:38:17.524361+00:00",
+        "trace_requeue_trigger": "related_triaged_lead:lead_12e6d36358668be9a97afc6c21f89b74",
+        "trace_requeued_at": "2026-08-17T22:34:28.091555+00:00",
         "trace_requires_user": "false",
-        "trace_status": "partial",
+        "trace_status": "original_obtained",
         "trace_trigger_entities": [
           "GFS",
-          "co:globalfoundries"
+          "INTC",
+          "LITE",
+          "SIVE",
+          "co:globalfoundries",
+          "co:intel",
+          "co:lumentum"
         ],
-        "trace_trigger_event_ref": "lead:lead_46eab040757a85c528d884e48c674b30",
-        "trace_trigger_kind": "primary_source_signal"
+        "trace_trigger_event_ref": "lead:lead_12e6d36358668be9a97afc6c21f89b74",
+        "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
       "status": "parked",
@@ -16991,13 +17415,13 @@
       },
       "title": "US Gov to take 1% stake in $GFS, and award them $300m for the US CHIPS ACT. This is actually a strong read through on $SIVE / $LITE, given this CHIPS ACT is specifically aimed at advancing CPO + Silicon Photonics. (For reference, Sivers and Lumentum were the only two public laser suppliers named in GFS presentation slides. Sivers laser arrays was named recently as a reference design in Globalfoundries SCALE for CPO). Per US Gov announcement: \"GlobalFoundries will receive up to $300 million to accelerate domestic CPO R&D by two to three years\" (NIST) Never thought we'd see the US Gov / $INTC foundry playbook for CPO in specific...",
       "triage": {
-        "decided_at": "2026-08-15T06:38:17.524361+00:00",
+        "decided_at": "2026-08-17T22:34:28.091555+00:00",
         "decision": "go",
         "priority_flags": {
           "independent_source": true,
           "novelty": true
         },
-        "reason": "指定實體的 tier-1 一手來源 lead_46eab040757a85c528d884e48c674b30 與 parked trace 共用具名標的 GFS, co:globalfoundries；事件觸發 bounded pq1 重查",
+        "reason": "指定實體的 tier-1 一手來源 lead_12e6d36358668be9a97afc6c21f89b74 與 parked trace 共用具名標的 GFS, co:globalfoundries；事件觸發 bounded pq1 重查",
         "tier": 3
       },
       "triage_history": [
@@ -17030,6 +17454,22 @@
               "novelty": true
             },
             "reason": "新 triage PASS lead lead_7f66b743a034c41f6388aa800f333e62 與 parked trace 共用具名標的 LITE, SIVE, co:lumentum；事件觸發 bounded pq1 重查",
+            "tier": 3
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-17T22:34:28.091555+00:00",
+          "superseded_reason": "指定實體的 tier-1 一手來源 lead_12e6d36358668be9a97afc6c21f89b74 與 parked trace 共用具名標的 GFS, co:globalfoundries；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_12e6d36358668be9a97afc6c21f89b74",
+          "triage": {
+            "decided_at": "2026-08-15T06:38:17.524361+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "independent_source": true,
+              "novelty": true
+            },
+            "reason": "指定實體的 tier-1 一手來源 lead_46eab040757a85c528d884e48c674b30 與 parked trace 共用具名標的 GFS, co:globalfoundries；事件觸發 bounded pq1 重查",
             "tier": 3
           }
         }
@@ -18301,18 +18741,19 @@
         "campaign_window_end": "2026-07-29T13:46:25Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
         "gap": "InP 基板 ASP 漲幅缺乏任何可逐字核對的一手來源。這是分辨 axt_inp thesis「週期 vs 結構」的關鍵缺口，目前無法由公開資料填補；最可能的解答來源是 AXT 自己在 Q3 財報揭露 ASP 貢獻，或下游公司揭露基板成本上升。",
-        "parked_reason": "今日觸發 lead_f6b1dedf52a7ea56170c3531676a5ace 仍未附 Nomura canonical report；AXT／IQE 官方資料也未披露 42–78% InP substrate／epiwafer ASP 漲幅，無新 graph delta。",
+        "parked_reason": "未取得Nomura_canonical_report；公開一手資料未披露42-78%_ASP漲幅",
         "research_mode": "delta_only",
         "research_outcome": "no_prepared_ra_new_trigger_no_primary_delta",
         "research_run": "daily:2026-08-17",
-        "trace_attempts_ref": "既有 Nomura／AXT／IQE 追源；今日 triggering lead lead_f6b1dedf52a7ea56170c3531676a5ace",
-        "trace_next_trigger": "AXT Q3 2026 揭露 ASP、下游客戶揭露 InP 採購成本，或取得 Nomura canonical report",
+        "trace_attempts_ref": "Nomura_exact-title_plus_AXT_IQE_official_search",
+        "trace_next_trigger": "AXT_Q3披露ASP、下游客戶披露InP成本或取得Nomura原報告",
         "trace_requeue_consumed_entities": [
           "AXTI",
-          "CO:AXT"
+          "CO:AXT",
+          "IQE"
         ],
-        "trace_requeue_trigger": "related_triaged_lead:lead_f6b1dedf52a7ea56170c3531676a5ace",
-        "trace_requeued_at": "2026-08-16T22:33:43.590233+00:00",
+        "trace_requeue_trigger": "related_triaged_lead:lead_2061d895e6e162c47132019a07869d92",
+        "trace_requeued_at": "2026-08-17T22:34:28.548522+00:00",
         "trace_requires_user": "false",
         "trace_status": "isolated_tier_3",
         "trace_trigger_entities": [
@@ -18321,7 +18762,7 @@
           "SNDK",
           "co:axt"
         ],
-        "trace_trigger_event_ref": "lead:lead_f6b1dedf52a7ea56170c3531676a5ace",
+        "trace_trigger_event_ref": "lead:lead_2061d895e6e162c47132019a07869d92",
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
@@ -18337,13 +18778,13 @@
       },
       "title": "Nomura’s report cites $AXTI and $IQE as the leading players. Then regarding ASP updates: - 2in InP substrate price hike 42-76% - 3in InP substrates price hike 78% - 2in EML Epiwafer price hike 50-75% - 3in CW Epiwafer price hike ~40%+ - Prices lower domestically in China as expected. Hyperscalers bottlenecking upstream photonics confirmation validation… on all fronts from pricing, demand, to supply shortages. My personal expectation was that price hikes would keep going up like $SNDK given ramping optical demand. We’ll see if this turns out right given another 2 years of the demand curve.",
       "triage": {
-        "decided_at": "2026-08-16T22:33:43.590233+00:00",
+        "decided_at": "2026-08-17T22:34:28.548522+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true,
           "user_requested": true
         },
-        "reason": "新 triage PASS lead lead_f6b1dedf52a7ea56170c3531676a5ace 與 parked trace 共用具名標的 AXTI, co:axt（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+        "reason": "新 triage PASS lead lead_2061d895e6e162c47132019a07869d92 與 parked trace 共用具名標的 IQE（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
         "tier": 4
       },
       "triage_history": [
@@ -18408,6 +18849,22 @@
               "user_requested": true
             },
             "reason": "指定實體的 tier-1 一手來源 lead_858f34fcfe2e81ce825b004406087391 與 parked trace 共用具名標的 AXTI；事件觸發 bounded pq1 重查",
+            "tier": 4
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-17T22:34:28.548522+00:00",
+          "superseded_reason": "新 triage PASS lead lead_2061d895e6e162c47132019a07869d92 與 parked trace 共用具名標的 IQE（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_2061d895e6e162c47132019a07869d92",
+          "triage": {
+            "decided_at": "2026-08-16T22:33:43.590233+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true,
+              "user_requested": true
+            },
+            "reason": "新 triage PASS lead lead_f6b1dedf52a7ea56170c3531676a5ace 與 parked trace 共用具名標的 AXTI, co:axt（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
             "tier": 4
           }
         }
@@ -23969,24 +24426,26 @@
         "campaign_window_start": "2026-06-29T13:46:25Z",
         "claimed_origin": "Morgan Stanley 2026-07-13 CPO research note",
         "original_claim_status": "unverified_with_existing_graph_conflict",
-        "parked_reason": "今日觸發 lead_f6b1dedf52a7ea56170c3531676a5ace 仍是社群 composite，沒有 Morgan Stanley canonical note 或 issuer 一手具名供應關係；券商名單不是可直接入圖的事實。",
+        "parked_reason": "未取得券商canonical_note；參與者名單與排名不能替代issuer一手具名關係",
         "research_mode": "delta_only",
         "research_outcome": "no_prepared_ra_new_trigger_no_primary_delta",
         "research_run": "daily:2026-08-17",
-        "trace_attempts_ref": "既有 exact-title search；今日 triggering lead lead_f6b1dedf52a7ea56170c3531676a5ace",
-        "trace_next_trigger": "名單中的具名關係由 issuer 自己披露時，改由該 issuer 一手來源另開 lead",
+        "trace_attempts_ref": "Morgan_Stanley_exact-note_search_plus_issuer_docs",
+        "trace_next_trigger": "取得canonical_note或issuer披露具名客戶與供應關係",
         "trace_requeue_consumed_entities": [
           "CO:COHERENT",
           "CO:LUMENTUM",
           "CO:SIVERS_SEMICONDUCTORS",
+          "CO:TOWER_SEMICONDUCTOR",
           "COHR",
           "LITE",
-          "SIVE"
+          "SIVE",
+          "TSEM"
         ],
-        "trace_requeue_trigger": "related_triaged_lead:lead_f6b1dedf52a7ea56170c3531676a5ace",
-        "trace_requeued_at": "2026-08-16T22:33:43.590233+00:00",
+        "trace_requeue_trigger": "related_triaged_lead:lead_03e036c05aea97310171ca07772eb352",
+        "trace_requeued_at": "2026-08-17T22:34:27.864087+00:00",
         "trace_requires_user": "false",
-        "trace_status": "lead_only_tier_4",
+        "trace_status": "isolated_tier_3",
         "trace_storage_permission": "unknown",
         "trace_trigger_entities": [
           "COHR",
@@ -24001,7 +24460,7 @@
           "co:tower_semiconductor",
           "co:tsmc"
         ],
-        "trace_trigger_event_ref": "lead:lead_f6b1dedf52a7ea56170c3531676a5ace",
+        "trace_trigger_event_ref": "lead:lead_03e036c05aea97310171ca07772eb352",
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
@@ -24026,13 +24485,13 @@
       },
       "title": "Morgan Stanley note on CPO today. Key participants include: - $SIVE, $COHR, and $LITE in laser supply - Broadcom and Nvidia in switch platforms - Lightmatter, Ayar Labs, Marvell/Celestial, and POET in optical engines and photonics, - $TSM, $GFS, and $TSEM in silicon photonics foundry capacity I’ve covered all of these before, like Tower Semi. But I’m especially happy that Morgan Stanley validated my research that $SIVE is one of the critical global players in CPO. A small $1.5B laser company next to your two leading $60B+ companies… If you also synthesize Rosenblatt Securities recent note that China laser suppliers were quite far from having CPO lasers. This kinda magnifies importance of the three Western leaders of that laser chokepoint.",
       "triage": {
-        "decided_at": "2026-08-16T22:33:43.590233+00:00",
+        "decided_at": "2026-08-17T22:34:27.864087+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true,
           "user_requested": true
         },
-        "reason": "新 triage PASS lead lead_f6b1dedf52a7ea56170c3531676a5ace 與 parked trace 共用具名標的 COHR, co:coherent（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+        "reason": "新 triage PASS lead lead_03e036c05aea97310171ca07772eb352 與 parked trace 共用具名標的 TSEM, co:tower_semiconductor（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
         "tier": 4
       },
       "triage_history": [
@@ -24115,6 +24574,22 @@
             "reason": "新 triage PASS lead lead_c7ca9aa7169d5ffa4a621430cac35d5e 與 parked trace 共用具名標的 co:sivers_semiconductors（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
             "tier": 4
           }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-17T22:34:27.864087+00:00",
+          "superseded_reason": "新 triage PASS lead lead_03e036c05aea97310171ca07772eb352 與 parked trace 共用具名標的 TSEM, co:tower_semiconductor（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_03e036c05aea97310171ca07772eb352",
+          "triage": {
+            "decided_at": "2026-08-16T22:33:43.590233+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true,
+              "user_requested": true
+            },
+            "reason": "新 triage PASS lead lead_f6b1dedf52a7ea56170c3531676a5ace 與 parked trace 共用具名標的 COHR, co:coherent（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+            "tier": 4
+          }
         }
       ],
       "url": "https://x.com/aleabitoreddit/status/2076748688559587338"
@@ -24185,6 +24660,54 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2073536758604771517"
+    },
+    "lead_b2aa3a1dbcfc5b94bf97800afc86d487": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia"
+        ],
+        "tickers": [
+          "NVDA"
+        ]
+      },
+      "first_seen": "2026-08-17T22:32:44.233227+00:00",
+      "lead_id": "lead_b2aa3a1dbcfc5b94bf97800afc86d487",
+      "published_at": "2026-08-17",
+      "refs": {
+        "parked_reason": "官方8-K已取得；已另建Engine_C_proposal_po_c230a61d2fe662955c02d67c7506414a；不建立graph關係",
+        "trace_attempts_ref": "SEC_NVDA_8-K_2026-08-17_exact",
+        "trace_next_trigger": "使用者核准exact_Engine_C_proposal或後續filing出現重大變動",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "NVDA",
+          "co:nvidia"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
+      "source": "edgar:NVDA",
+      "status": "parked",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "NVDA"
+          ]
+        }
+      },
+      "title": "NVDA 8-K filed 2026-08-17",
+      "triage": {
+        "decided_at": "2026-08-17T22:34:29.281076+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true,
+          "novelty": true
+        },
+        "reason": "NVDA 為 CPO 核心與 active cohort；官方 8-K 可逐字核對，放行判斷是否有 material evidence delta",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000069/nvda-20260817.htm"
     },
     "lead_b2ba8e71225c75239273d6a3b9c54a03": {
       "entities": {
@@ -29020,9 +29543,23 @@
       "media": [],
       "published_at": "2026-08-11T20:16:01.000Z",
       "raw_text": "$LITE earnings are out, very strong earnings:\n\nRevenue: $1.01B, +24.5% Q/Q, +109.3% Y/Y growth\nvs. ~$984.6M\nAdj. EPS: $3.23 vs. ~$2.95\nGross Margin (non-gaap): 50.4% / Operating margin (non-gaap) 36.6%\n\nQ1 FY2027 guidance is probably more important:\n\nRevenue: $1.225–1.275B vs. ~$1.16B\nAdj. EPS: $4.05–4.35 vs. ~$3.63\nOperating margin (non-gaap) of 39.5% - 40.5%\n\nIn terms of notes: \n\nSees: \"Increasing demand for ultra-high-power CPO lasers, an initial order for ELS modules\" \n\n- Great read through on other CPO players like $SIVEF, $COHR, and others. (maybe not AAOI since they're missing out on first-gen deployments)\n\n- \"Breath of NPO engagements are the first signs that optics are starting  to penetrate in-rack connectivity, significantly upping our optical TAM\"\n \n- Revenue projections \"reaching our target model more than a quarter ahead of schedule.\"\n\nExtremely strong earnings as expected, you have revenue going from:\n\n$808M -> $1.01B -> $1.25B while operating margin keeps increasing... Just my first impressions. \n\nMost important thing is the earnings call coming up soon.",
-      "refs": {},
+      "refs": {
+        "parked_reason": "官方filing支持財務與CPO需求背景，但initial_ELS_order與earnings_call逐字主張仍缺官方release或transcript",
+        "trace_attempts_ref": "LITE_8-K_wrapper_plus_10-K_plus_official_OFC_page",
+        "trace_next_trigger": "Lumentum官方Q4_FY2026新聞稿或earnings_transcript",
+        "trace_requires_user": "false",
+        "trace_status": "partial",
+        "trace_trigger_entities": [
+          "COHR",
+          "LITE",
+          "SIVEF",
+          "co:coherent",
+          "co:lumentum"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -30136,6 +30673,44 @@
         "tier": 3
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1158114/000143774926026278/aaoi20260630_10q.htm"
+    },
+    "lead_e12ff9062535402e48cdf1215ad7db26": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-17T22:32:32.648792+00:00",
+      "lead_id": "lead_e12ff9062535402e48cdf1215ad7db26",
+      "media": [
+        {
+          "cache": {
+            "bytes": 142592,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_e12ff9062535402e48cdf1215ad7db26/3_2089147467338309633.jpg",
+            "sha256": "0574e37a6935d6e0baa3928045055bed7829501b546afba571ac34aa00bf94d4"
+          },
+          "height": 804,
+          "media_key": "3_2089147467338309633",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HP4kjYIbYAEZuTs.jpg",
+          "width": 1348
+        }
+      ],
+      "published_at": "2026-08-17T00:34:43.000Z",
+      "raw_text": "Stripe reportedly buys OpenRouter for $7 Billion.\n\nI think their orchestration is easy to replicate and switch from. And there's very little moat.\n\nBut atm, OpenRouter has the userbase, valuable dataset, + momentum. \n\nWhat's your take... Yay or Nay for the payments firm? https://t.co/AqOlKlwCzc",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "Stripe reportedly buys OpenRouter for $7 Billion. I think their orchestration is easy to replicate and switch from. And there's very little moat. But atm, OpenRouter has the userbase, valuable dataset, + momentum. What's your take... Yay or Nay for the payments firm? https://t.co/AqOlKlwCzc",
+      "triage": {
+        "decided_at": "2026-08-17T22:34:29.534356+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "Stripe／OpenRouter 不在現行研究主題或 company registry；內容主要是作者對 moat 的主觀推論",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2089148883838611460"
     },
     "lead_e1daca4662d70cba294c939a608ae05c": {
       "entities": {
@@ -31710,9 +32285,20 @@
       "first_seen": "2026-08-11T05:06:10.562024+00:00",
       "lead_id": "lead_edb7d8187be32344b2f90b0dfc7bcf11",
       "published_at": "2026-07-30",
-      "refs": {},
+      "refs": {
+        "parked_reason": "一手10-Q已取得；只支持彙總承諾與雲端容量等dated_observation，未具名貼文所稱counterparties，無新graph_delta",
+        "trace_attempts_ref": "SEC_META_10-Q_2026-07-30_exact",
+        "trace_next_trigger": "META或合作方正式披露具名LTA",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "META",
+          "co:meta"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:META",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "META 10-Q filed 2026-07-30",
       "triage": {
@@ -31780,9 +32366,20 @@
       "first_seen": "2026-08-04T22:34:45.461944+00:00",
       "lead_id": "lead_ee019a60899b083be321d631feb6469c",
       "published_at": "2026-08-04",
-      "refs": {},
+      "refs": {
+        "parked_reason": "官方Form4為依10b5-1計畫的dated_insider_sale；不構成供應鏈或thesis_delta",
+        "trace_attempts_ref": "SEC_AAOI_Form4_2026-08-12_nearby_latest",
+        "trace_next_trigger": "issuer結構性insider或稀釋filing",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "AAOI",
+          "co:applied_optoelectronics"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:AAOI",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "AAOI 4 filed 2026-08-04",
       "triage": {
@@ -31871,6 +32468,54 @@
         "tier": 4
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1340652/000089924322034086/xslF345X03/doc4.xml"
+    },
+    "lead_efa5f283c3211ed78bb7c3199dc2068e": {
+      "entities": {
+        "company_ids": [
+          "co:lumentum"
+        ],
+        "tickers": [
+          "LITE"
+        ]
+      },
+      "first_seen": "2026-08-17T22:32:41.458159+00:00",
+      "lead_id": "lead_efa5f283c3211ed78bb7c3199dc2068e",
+      "published_at": "2026-08-17",
+      "refs": {
+        "parked_reason": "官方10-K已取得；已另建Engine_C_proposal_po_b9bf90919da1242bef528a46db4f380f；不建立graph關係",
+        "trace_attempts_ref": "SEC_LITE_10-K_2026-08-17_exact",
+        "trace_next_trigger": "使用者核准exact_Engine_C_proposal或後續filing更新",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "LITE",
+          "co:lumentum"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
+      "source": "edgar:LITE",
+      "status": "parked",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "LITE"
+          ]
+        }
+      },
+      "title": "LITE 10-K filed 2026-08-17",
+      "triage": {
+        "decided_at": "2026-08-17T22:34:29.763882+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true,
+          "novelty": true
+        },
+        "reason": "Lumentum 為 CPO 核心且 [139] 正等待 FY2026 10-K cash-flow；這份官方 filing 直接命中既定外部 trigger",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1633978/000162828026057358/lite-20260627.htm"
     },
     "lead_efaed6f7fca48768336da263c8150d0e": {
       "entities": {
@@ -32364,9 +33009,20 @@
       "first_seen": "2026-08-13T00:35:01.649982+00:00",
       "lead_id": "lead_f2a05f8ffbc3ad014140a10c39cbfe58",
       "published_at": "2026-06-17",
-      "refs": {},
+      "refs": {
+        "parked_reason": "8-K_wrapper僅指向季度結果exhibit；未取得可支持robotics供應鏈的新exact_claim",
+        "trace_attempts_ref": "SEC_JBL_8-K_2026-06-17_wrapper",
+        "trace_next_trigger": "取得官方exhibit或Jabil具名robotics客戶披露",
+        "trace_requires_user": "false",
+        "trace_status": "partial",
+        "trace_trigger_entities": [
+          "JBL",
+          "co:jabil"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:JBL",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "robotics": {
           "counter_only": false,
@@ -33948,13 +34604,39 @@
         "tier": 3
       },
       "url": "https://x.com/aleabitoreddit/status/2079089592385610023"
+    },
+    "lead_ffffdf5e4ec5ac32ef572c7e4a916988": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "MU"
+        ]
+      },
+      "first_seen": "2026-08-17T22:32:32.644486+00:00",
+      "lead_id": "lead_ffffdf5e4ec5ac32ef572c7e4a916988",
+      "media": [],
+      "published_at": "2026-08-17T02:52:12.000Z",
+      "raw_text": "I think we're seeing AI server MLCC demand cause an interesting effect... with tightening capacity for consumer/general-purpose MLCCs.\n\nIf you get Vietnam flashbacks like I do to $MU / Samsung / SK Hynix -> Legacy DRAM: \n\nMy thesis is we'll see the same thing here maybe late H2, early 2027 with consumer/broad MLCCs. \n\nFrom July 6th: \n\n\"the crowding-out effect from AI-oriented high-end MLCC production has begun spilling over into both the automotive and consumer markets.\" \n\nJuly 28th: \n\n\"AI Demand Pushes Japanese and Korean MLCC Suppliers to Record Monthly Shipments; Consumer-Grade Order Spillovers Continue to Surge\"\n\nAug 12: \n\nAs [MLCC] capacity shifts from consumer grades to AI-oriented products... (Trendforce)\n\nAug 12: \n\nChina's electronics market channel checks found 22µF and 47µF MLCCs (used more broadly) out of stock. Then found and said certain manufacturers had stopped taking orders. \n\n(for reference: Walsin said high-volume smartphone/PC products such as... 22µF, so it's broader MLCCs)\n\nObviously Samsung Electro-Mechanics/Murata are main beneficiaries of AI server MLCC ramp. \n\nBut companies with large market share of overall MLCCs like Taiyo Yuden (6976, disclosure: I have positions) with less AI server share, would be a major beneficiary of this. \n\nFun part is, we're only in H2 2026, so the next major bottleneck should be fun!",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "I think we're seeing AI server MLCC demand cause an interesting effect... with tightening capacity for consumer/general-purpose MLCCs. If you get Vietnam flashbacks like I do to $MU / Samsung / SK Hynix -> Legacy DRAM: My thesis is we'll see the same thing here maybe late H2, early 2027 with consumer/broad MLCCs. From July 6th: \"the crowding-out effect from AI-oriented high-end MLCC production has begun spilling over into both the automotive and consumer markets.\" July 28th: \"AI Demand Pushes Japanese and Korean MLCC Suppliers to Record Monthly Shipments; Consumer-Grade Order Spillovers Continue to Surge\" Aug 12: As [MLCC] capacity shifts from consumer grades to AI-oriented products... (Trendforce) Aug 12: China's electronics market channel checks found 22µF and 47µF MLCCs (used more broadly) out of stock. Then found and said certain manufacturers had stopped taking orders. (for reference: Walsin said high-volume smartphone/PC products such as... 22µF, so it's broader MLCCs) Obviously Samsung Electro-Mechanics/Murata are main beneficiaries of AI server MLCC ramp. But companies with large market share of overall MLCCs like Taiyo Yuden (6976, disclosure: I have positions) with less AI server share, would be a major beneficiary of this. Fun part is, we're only in H2 2026, so the next major bottleneck should be fun!",
+      "triage": {
+        "decided_at": "2026-08-17T22:34:29.996304+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "MLCC crowding-out 是作者跨市場類比與受益推論，未命中現行 themes／登記研究公司，且關鍵來源仍是二手摘要",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2089183484556480536"
     }
   },
   "schema_version": "2",
   "source_state": {
     "x:aleabitoreddit": {
-      "since_id": "2089057857652338993",
-      "updated_at": "2026-08-16T22:32:04.238743+00:00",
+      "since_id": "2089422562019393654",
+      "updated_at": "2026-08-17T22:32:32.649360+00:00",
       "user_id": "1940360837547565056"
     }
   }

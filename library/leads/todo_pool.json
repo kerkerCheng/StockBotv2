@@ -2609,6 +2609,11 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
+      "source_cleared": {
+        "at": "2026-08-17T22:35:56.631644+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
       "title": "REVIEW — co:axt",
       "type": "decision_review"
     },
@@ -2621,6 +2626,11 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
+      "source_cleared": {
+        "at": "2026-08-17T22:35:56.631644+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
       "title": "REVIEW — co:nvidia",
       "type": "decision_review"
     },
@@ -2681,6 +2691,11 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
+      "source_cleared": {
+        "at": "2026-08-17T22:35:56.631644+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
       "title": "REVIEW — co:iqe",
       "type": "decision_review",
       "waiting_on": {
@@ -2690,6 +2705,30 @@
         "trigger": "執行面 context 缺失",
         "until": null
       }
+    },
+    {
+      "added_at": "2026-08-17T22:47:16.360936+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-06-27T00:00:00+00:00；來源=Lumentum FY2026 Form 10-K, filed 2026-08-17, accession 000162828026057358; balan",
+      "n": 170,
+      "reason": null,
+      "ref_id": "po_b9bf90919da1242bef528a46db4f380f",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "engine_c",
+      "title": "Engine C 觀測：LITE / runway_inputs",
+      "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-08-17T22:47:16.360936+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-08-17T00:00:00+00:00；來源=NVIDIA Form 8-K filed 2026-08-17, accession 000104581026000069, Items 1.01 and 2",
+      "n": 171,
+      "reason": null,
+      "ref_id": "po_c230a61d2fe662955c02d67c7506414a",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "engine_c",
+      "title": "Engine C 觀測：NVDA / contingent_liquidity_claims",
+      "type": "engine_c_observation"
     }
   ],
   "log": [
@@ -5946,8 +5985,35 @@
       "ref_id": "dc_2906500af891541ea4bdd52503b9b3aa",
       "type": "decision_review",
       "verb": "go"
+    },
+    {
+      "at": "2026-08-17T22:35:56.631644+00:00",
+      "n": 163,
+      "reason": "來源本輪成功執行，但不再產出此項",
+      "receipt": null,
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "type": "decision_review",
+      "verb": "source_cleared"
+    },
+    {
+      "at": "2026-08-17T22:35:56.631644+00:00",
+      "n": 164,
+      "reason": "來源本輪成功執行，但不再產出此項",
+      "receipt": null,
+      "ref_id": "dc_c0b6f81e3507a83b857258907fafa635",
+      "type": "decision_review",
+      "verb": "source_cleared"
+    },
+    {
+      "at": "2026-08-17T22:35:56.631644+00:00",
+      "n": 169,
+      "reason": "來源本輪成功執行，但不再產出此項",
+      "receipt": null,
+      "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+      "type": "decision_review",
+      "verb": "source_cleared"
     }
   ],
-  "next_n": 170,
+  "next_n": 172,
   "schema_version": "1"
 }
