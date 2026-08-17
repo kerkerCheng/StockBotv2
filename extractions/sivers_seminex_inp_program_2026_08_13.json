@@ -1,0 +1,148 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "guided",
+      "disproof_condition": "若 2027-12-31 前 Sivers 或 SemiNex 未公開揭露 customer sampling 已開始、qualification milestone 或 early production shipment，或任一方宣布 program 終止／改期超過兩季，則此開發路徑視為停滯；每季新聞稿與財報核查，觸發後 48 小時內人工 reassess 並更新 qualification_status。",
+      "id": "sivers_seminex_inp_program_2026_08_13_cl1",
+      "source_ids": [
+        "sivers_seminex_inp_program_2026_08_13_s1",
+        "sivers_seminex_inp_program_2026_08_13_s2",
+        "sivers_seminex_inp_program_2026_08_13_s3"
+      ],
+      "statement": "Sivers 與 SemiNex 於 2026-08-13 宣布一項初始價值約 US$3.4M 的次世代 InP 光源共同 program，產品 scope 包含 CPO high-power external laser sources、high-channel-count DFB arrays 與 SOA gain stages；customer sampling 與 early production ramp 目標為 2027 下半年。此為共同開發與目標時程，並非已完成 qualification、最低採購量、量產收入或 hyperscaler design-win。",
+      "subject_id": "co:sivers_semiconductors"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {
+        "qualification_status": "sampling"
+      },
+      "confidence": 0.6,
+      "dst_id": "co:seminex",
+      "id": "e1",
+      "relation": "partnership_with",
+      "source_ids": [
+        "sivers_seminex_inp_program_2026_08_13_s1",
+        "sivers_seminex_inp_program_2026_08_13_s3"
+      ],
+      "src_id": "co:sivers_semiconductors"
+    },
+    {
+      "attributes": {
+        "qualification_status": "sampling"
+      },
+      "confidence": 0.6,
+      "dst_id": "prod:sivers_seminex_inp_light_source_program",
+      "id": "e2",
+      "relation": "develops",
+      "source_ids": [
+        "sivers_seminex_inp_program_2026_08_13_s1",
+        "sivers_seminex_inp_program_2026_08_13_s2",
+        "sivers_seminex_inp_program_2026_08_13_s3"
+      ],
+      "src_id": "co:sivers_semiconductors"
+    },
+    {
+      "attributes": {
+        "qualification_status": "sampling"
+      },
+      "confidence": 0.6,
+      "dst_id": "prod:sivers_seminex_inp_light_source_program",
+      "id": "e3",
+      "relation": "develops",
+      "source_ids": [
+        "sivers_seminex_inp_program_2026_08_13_s1",
+        "sivers_seminex_inp_program_2026_08_13_s2",
+        "sivers_seminex_inp_program_2026_08_13_s3"
+      ],
+      "src_id": "co:seminex"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "Sivers",
+        "SIVE",
+        "SIVE.ST"
+      ],
+      "attributes": {},
+      "confidence": 0.65,
+      "id": "co:sivers_semiconductors",
+      "name": "Sivers Semiconductors",
+      "role": "bottleneck_supplier",
+      "source_ids": [
+        "sivers_seminex_inp_program_2026_08_13_s1",
+        "sivers_seminex_inp_program_2026_08_13_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "SemiNex"
+      ],
+      "attributes": {},
+      "confidence": 0.65,
+      "id": "co:seminex",
+      "name": "SemiNex Corporation",
+      "role": "disruptor",
+      "source_ids": [
+        "sivers_seminex_inp_program_2026_08_13_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "high-power CPO external laser sources",
+        "high-channel-count DFB arrays",
+        "SOA gain stages"
+      ],
+      "attributes": {},
+      "confidence": 0.6,
+      "id": "prod:sivers_seminex_inp_light_source_program",
+      "name": "Sivers–SemiNex next-generation InP light-source program",
+      "role": null,
+      "source_ids": [
+        "sivers_seminex_inp_program_2026_08_13_s1",
+        "sivers_seminex_inp_program_2026_08_13_s2",
+        "sivers_seminex_inp_program_2026_08_13_s3"
+      ],
+      "type": "Product"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "sivers_seminex_inp_program_2026_08_13",
+    "evidence_tier": 2,
+    "origin_entity": "Sivers Semiconductors and SemiNex Corporation",
+    "permission_basis": "Official public joint press release; store only the research-relevant excerpt.",
+    "published_at": "2026-08-13",
+    "publisher": "Sivers Semiconductors newsroom",
+    "retrieved_at": "2026-08-17",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Sivers Semiconductors Announces $3.4M Program With SemiNex for Next-Generation InP Light Sources Used to Power AI Data Centers",
+    "url": "https://www.sivers-semiconductors.com/press/sivers-semiconductors-announces-3-4m-program-with-seminex-for-next-generation-inp-light-sources-used-to-power-ai-data-centers/"
+  },
+  "sources": [
+    {
+      "id": "sivers_seminex_inp_program_2026_08_13_s1",
+      "locator": "opening announcement paragraph",
+      "quote": "Sivers Semiconductors AB (STO:SIVE) ... and SemiNex Corporation ... today announced a program for next-generation InP light sources for AI data center interconnects. The program is initially valued at approximately $3.4 million."
+    },
+    {
+      "id": "sivers_seminex_inp_program_2026_08_13_s2",
+      "locator": "program scope paragraph",
+      "quote": "The program targets high-power external laser sources for co-packaged optics (CPO), high-channel-count DFB arrays for wavelength-multiplexed links, and SOA gain stages that extend optical reach as channel counts scale."
+    },
+    {
+      "id": "sivers_seminex_inp_program_2026_08_13_s3",
+      "locator": "commercial timeline paragraph",
+      "quote": "Customer sampling and early production ramps are targeted for 2H 2027."
+    }
+  ]
+}

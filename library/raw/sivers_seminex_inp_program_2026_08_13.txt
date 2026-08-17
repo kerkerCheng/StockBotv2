@@ -1,0 +1,14 @@
+Source URL: https://www.sivers-semiconductors.com/press/sivers-semiconductors-announces-3-4m-program-with-seminex-for-next-generation-inp-light-sources-used-to-power-ai-data-centers/
+
+Excerpt:
+Source URL: https://www.sivers-semiconductors.com/press/sivers-semiconductors-announces-3-4m-program-with-seminex-for-next-generation-inp-light-sources-used-to-power-ai-data-centers/
+Title: Sivers Semiconductors Announces $3.4M Program With SemiNex for Next-Generation InP Light Sources Used to Power AI Data Centers
+Published: 2026-08-13
+Retrieved: 2026-08-17
+
+Research excerpt:
+- Sivers and SemiNex announced a next-generation InP light-source program for AI data-center interconnects, initially valued at approximately US$3.4M.
+- Scope: high-power external laser sources for CPO, high-channel-count DFB arrays, and SOA gain stages.
+- Customer sampling and early production ramps are targeted for 2H 2027.
+
+Boundary: this is one joint origin_event from the two program principals. It does not name a customer, hyperscaler, qualification result, minimum purchase commitment, payment schedule, or recognized revenue. SemiNex can also be a capability and competition path; the announcement does not prove Sivers sole-source status or moat expansion.
