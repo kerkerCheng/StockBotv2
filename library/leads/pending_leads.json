@@ -10251,7 +10251,7 @@
         "trace_status": "original_obtained"
       },
       "source": "sivers:press",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -21991,7 +21991,7 @@
         "trace_status": "original_obtained"
       },
       "source": "edgar:AVGO",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {
         "cpo": {
           "counter_only": false,
