@@ -12,6 +12,7 @@ applies_when:
   - 同一個常數被套用在兩種來源／節奏不同的資料上
   - catch 之後回傳空值，而空值同時是合法結果
   - 修法讓警報消失得「太乾淨」
+  - date-only 的值被貼上時區，而產生它的那一端用的是另一個時區
 tags:
   - fail-closed
   - fail-soft
@@ -47,6 +48,7 @@ tags:
 | 5 | `identity.status` | 身分**解析成功**／欄位**齊全** | 看 `resolved` 就走 → 建出永遠沒有錨點的 cohort；要求全齊 → 未上市公司無法追蹤 |
 | 6 | 行情 `as_of` | 交易日**日期**（日線 bar 標當地午夜）／**觀測時刻** | 當時刻算小時 → 決策出生即 stale；當日期放寬 → 真過期也混過去 |
 | 7 | shadow `unavailable` | 這檔**沒有行情**／這次**抓取壞了** | 當成沒行情 → 永不修復；當成抓壞了 → 對 registry 缺列無限重試 |
+| 8 | 財務 `as_of`（date-only） | **本機時區**的日曆日／**UTC** 的精確 instant | 貼 UTC 午夜 → 台北早班每天判 future 並整份 quarantine；不比 → 隔日資料混進決策 |
 
 ### 2026-08-08 新增的三個（5–7）
 
@@ -67,6 +69,21 @@ tags:
 失敗原因塌成單一 `unavailable` 之後，就分不出「該修」與「修不了」，因而也決定不了
 該加重試還是該加回填。
 
+### 2026-08-17 新增的第 8 個
+
+第 8 個是第 6 個的**時區版**，而且它連續兩天讓 daily routine 的財務層整份歸零
+（2026-08-14、08-17）。`financial_snapshots.snapshot_date` 由 `date.today()` 產生，
+是**本機時區的日曆日**；`engine_d_runtime.adapters._safe_timestamp` 卻一律把
+date-only 值貼上 **UTC 午夜**。產生端與解釋端用了不同時區，於是憑空把 as_of 推到
+未來最多一個時區位移——台北 06:30 的 routine 拿到 `as_of=今日 00:00Z`、
+`evaluation_at=昨日 22:5xZ`，`_normalize_financial` 判 `financial_timestamp_future`
+並 quarantine 整份財務。**台北 00:00–08:00 之間結構上必中，不是偶發**；閘門攔下的
+是時區寫法，不是未來資料（L15：gate 攔的若是格式，該修的是它問問題的方式）。
+
+修法是讓兩端用同一個時區：`date.today()` 產生的日曆日，就用**本機**當日 00:00 當它
+的最早 instant（`.astimezone()`）。UTC 機器上行為不變（對稱），genuinely future
+的隔日日期仍晚於 now 而被擋，且 as_of 比原本早一個時區位移、14 天 stale 窗反而更嚴。
+
 第 3 個最能說明問題：`runway_inputs` 這個欄位存在的唯一理由，就是替
 `derive_runway` 補上「沒有任何地方提供 manual_runway」那條缺掉的走廊。走廊蓋好
 了，門口卻裝著為別種資料設計的鎖——財報落後季末 30-45 天，AXT Q2 季末
@@ -81,6 +98,7 @@ tags:
 2. row 迴圈分成「缺席且在序列末端＝未結算」與「超出範圍＝損毀」
 3. `financial_runway_freshness_days` 與 `financial_freshness_days` 各管各的
 4. `SourceCollection(rows, healthy)` — 空結果與失敗不再同形
+5. date-only as_of 用**產生它的那個時區**解釋，完整 timestamp 維持精確 instant
 
 分開之後，每一邊都可以套用比原本更嚴格的規則，而不是更寬鬆。#2 修完仍然擋掉序列
 中間的破洞、負值與無法定位的 row；#4 修完仍然不自動 resolve，只標記候選。**顆粒度

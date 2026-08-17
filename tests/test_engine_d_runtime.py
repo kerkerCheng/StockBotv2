@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 import ast
+import os
+import time
+from contextlib import contextmanager
 from pathlib import Path
 
 from decision_lab.adapters.graph import Neo4jReadOnlyQueryPort
@@ -482,3 +485,82 @@ def test_evidence_hops_is_policy_driven_and_bounded() -> None:
 
     assert policy["probe_lane"]["evidence_hops"] == evidence_hops()
     assert 1 <= evidence_hops() <= 3
+
+
+@contextmanager
+def _local_timezone(name: str):
+    """暫時把 process 的本機時區換掉，離開時還原。"""
+
+    previous = os.environ.get("TZ")
+    os.environ["TZ"] = name
+    time.tzset()
+    try:
+        yield
+    finally:
+        if previous is None:
+            os.environ.pop("TZ", None)
+        else:
+            os.environ["TZ"] = previous
+        time.tzset()
+
+
+def test_local_calendar_snapshot_date_is_not_pushed_into_the_future() -> None:
+    """date-only 的 `snapshot_date` 是本機日曆日，不得貼 UTC 午夜。
+
+    事發（2026-08-14、08-17 兩次實測）：`financial_snapshots.snapshot_date` 由
+    `date.today()` 產生（本機時區），`_safe_timestamp` 卻貼 UTC 午夜。台北 06:30 的
+    daily routine 因此拿到 as_of=今日 00:00Z、evaluation_at=昨日 22:xxZ，
+    `_normalize_financial` 判 financial_timestamp_future 把整份財務 quarantine。
+    台北 00:00–08:00 之間結構上必中——閘門攔下的是時區寫法，不是未來資料（L15）。
+    """
+
+    from decision_lab.context import _normalize_financial
+    from engine_d_runtime.adapters import _safe_timestamp
+
+    # 台北 2026-08-17 06:51 跑 routine：本機日曆日已跨日，UTC 還在前一天。
+    evaluation_at = "2026-08-16T22:51:45+00:00"
+
+    def normalize(snapshot_date: str) -> dict:
+        return _normalize_financial(
+            {
+                "status": "observed",
+                "ticker": "AXTI",
+                "as_of": _safe_timestamp(snapshot_date),
+                "fetched_at": _safe_timestamp("2026-08-16T22:30:00+00:00"),
+                "source": "yfinance.info",
+                "cash_and_equivalents": 100.0,
+                "total_debt": 20.0,
+                "free_cash_flow_ttm": -40.0,
+            },
+            expected_ticker="AXTI",
+            evaluation_at=evaluation_at,
+        )
+
+    with _local_timezone("Asia/Taipei"):
+        today = normalize("2026-08-17")
+        assert "financial_timestamp_future" not in today["blockers"]
+        assert today["status"] == "available"
+
+        # 分開解釋不等於放寬：真正的未來日期仍必須 fail closed。
+        tomorrow = normalize("2026-08-18")
+        assert tomorrow["status"] == "quarantined"
+        assert tomorrow["blockers"] == ["financial_timestamp_future"]
+
+        # 本機日 00:00 比 UTC 午夜早一個時區位移，stale 窗因此更嚴、不是更鬆。
+        assert normalize("2026-07-20")["status"] == "stale"
+
+
+def test_date_only_timestamp_is_symmetric_with_date_today() -> None:
+    """解釋端與產生端共用同一個本機時區：UTC 機器上行為不變。"""
+
+    from engine_d_runtime.adapters import _safe_timestamp
+
+    with _local_timezone("UTC"):
+        assert _safe_timestamp("2026-08-17") == "2026-08-17T00:00:00+00:00"
+    with _local_timezone("Asia/Taipei"):
+        assert _safe_timestamp("2026-08-17") == "2026-08-17T00:00:00+08:00"
+    # 完整 timestamp 不受影響——它本來就是精確 instant。
+    with _local_timezone("Asia/Taipei"):
+        assert (
+            _safe_timestamp("2026-08-16T22:30:00+00:00") == "2026-08-16T22:30:00+00:00"
+        )

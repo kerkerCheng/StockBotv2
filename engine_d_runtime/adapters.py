@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import json
 import math
-from datetime import datetime, timezone
+from datetime import datetime
 from functools import lru_cache
 from pathlib import Path
 from typing import Any, Callable, Mapping, Sequence
@@ -183,12 +183,29 @@ def _finite(value: Any, *, non_negative: bool = False) -> float | None:
 
 
 def _safe_timestamp(value: Any) -> str | None:
+    """把 Engine C 的 timestamp 正規化成帶時區的 ISO 字串。
+
+    ⚠ date-only 值與完整 timestamp 是兩種語意，不能同一套轉換（L12）。
+    `financial_snapshots.snapshot_date` 由 `date.today()` 產生——那是**本機時區的
+    日曆日**，不是 UTC 日曆日；而 `fetched_at` 是 `datetime.now(timezone.utc)`，
+    本來就是精確 instant。先前把 date-only 一律貼 UTC 午夜，等於憑空把它推到未來
+    最多一個時區位移：台北（UTC+8）06:30 跑 daily routine 時 `date.today()` 已是
+    08-17，`evaluation_at` 卻是 08-16T22:51Z，於是 `_normalize_financial` 判
+    `financial_timestamp_future` 並把整份財務 quarantine（2026-08-14、08-17 兩次
+    實測；台北 00:00–08:00 之間結構上必中，不是偶發）。
+
+    修法是讓解釋端與產生端用同一個時區：`date.today()` 是本機的，就用本機當日
+    00:00 當它的最早 instant。兩邊對稱，因此在 UTC 機器上行為不變。這不是放寬——
+    genuinely future（隔日日期）仍晚於 now 而被擋，且 as_of 比原本早一個時區位移，
+    14 天 stale 窗反而更嚴。
+    """
+
     if not isinstance(value, str) or not value.strip():
         return None
     raw = value.strip()
     try:
         if len(raw) == 10:
-            parsed = datetime.fromisoformat(raw).replace(tzinfo=timezone.utc)
+            parsed = datetime.fromisoformat(raw).astimezone()
         else:
             parsed = datetime.fromisoformat(raw.replace("Z", "+00:00"))
             if parsed.tzinfo is None:
