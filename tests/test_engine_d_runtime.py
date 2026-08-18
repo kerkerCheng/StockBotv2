@@ -489,7 +489,19 @@ def test_evidence_hops_is_policy_driven_and_bounded() -> None:
 
 @contextmanager
 def _local_timezone(name: str):
-    """暫時把 process 的本機時區換掉，離開時還原。"""
+    """暫時把 process 的本機時區換掉，離開時還原。
+
+    ⚠ `TZ` ＋ `tzset()` 只在 POSIX 有效；Windows 沒有 `time.tzset`，`.astimezone()`
+    讀的是系統時區。本專案的主要開發機是 Windows，所以這裡必須明確 skip 而不是
+    讓整份 suite 在此硬失敗（`pytest -x` 會停在這裡，後面的測試等於不存在）。
+    **skip 不等於已驗證**：這條路徑在 Windows 上沒有被測到，真正的修法是讓
+    `_safe_timestamp` 可注入時區而非依賴 process 全域狀態（已登記 ROADMAP 未排程）。
+    """
+
+    if not hasattr(time, "tzset"):
+        import pytest
+
+        pytest.skip("需要 POSIX 的 TZ/tzset；Windows 無法切換 process 本機時區")
 
     previous = os.environ.get("TZ")
     os.environ["TZ"] = name

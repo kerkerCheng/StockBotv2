@@ -55,6 +55,17 @@ REFERENCE_BENCHMARK = "SOXX"
 # 差一兩個交易日落在區間內；GBp/GBP 這種登記錯誤會是 ~100x，必然出界。
 UNIT_SANITY_RANGE = (0.5, 2.0)
 
+# 錨點前回看天數（日曆日）。用來分辨「系統在追高」與「系統在低點接」——
+# ROADMAP「進行中」曾把整條超額量測標為可能是選擇偏誤：Shadow 錨點日就是 cohort
+# 建立日，而 cohort 建立在研究之後，若 lead 當初是因為「股價已經在動」才通過 triage，
+# 超額就有一部分是追高而非判斷力。那條警告從未被驗過，而它足以廢掉整張表的意義。
+#
+# 2026-08-18 首次實測：9 個 cohort 的錨點前 30 日中位 **-9.2%**、錨點後中位 **+14.4%**，
+# 只有 2/9 是追高形狀（AXTI 錨點前 -40.2%、SIVE.ST -61.6%）。偏誤方向與擔心的相反。
+# ⚠ 但同期 SOXX 是 -16.7% → +13.8%，**同一天見底**——本欄能排除「追動能」，
+# **不能**排除「高 beta ＋ 剛好在 sector 底部做研究」。要分辨那個需要跨主題樣本。
+PRE_ANCHOR_DAYS = 30
+
 
 def _connect_ro(path: Path) -> sqlite3.Connection:
     conn = sqlite3.connect(f"file:{path}?mode=ro", uri=True)
@@ -125,18 +136,36 @@ def _snapshots(conn: sqlite3.Connection, ticker: str) -> list[sqlite3.Row]:
     ).fetchall()
 
 
-def _latest_close(ticker: str) -> tuple[date, float] | None:
-    """最新一根**已收盤** bar 的 (交易日, 收盤價)，單位為 provider 報價單位。"""
+def _provider_series(ticker: str, start: date) -> dict[date, float]:
+    """provider 已收盤序列 {交易日: 收盤價}，單位為 provider 報價單位。
+
+    一次抓足回看窗與現價，避免同一檔重複請求。單位不在此正規化——本序列的兩個用途
+    （現價、錨點前漲幅）一個之後會正規化、一個是同序列相除，比值自動消單位。
+    """
     try:
         import yfinance as yf
 
-        hist = yf.Ticker(ticker).history(period="1mo", auto_adjust=True)["Close"].dropna()
+        hist = yf.Ticker(ticker).history(
+            start=start.isoformat(), auto_adjust=True
+        )["Close"].dropna()
     except Exception as exc:  # noqa: BLE001
         print(f"  ⚠ {ticker} 收盤序列抓取失敗：{type(exc).__name__}: {exc}", file=sys.stderr)
+        return {}
+    return {ts.date(): float(close) for ts, close in hist.items() if close == close}
+
+
+def _pre_anchor_return(series: dict[date, float], anchor: date) -> float | None:
+    """錨點前 PRE_ANCHOR_DAYS 日的漲跌幅。
+
+    ⚠ 兩端都取自**同一條 provider 序列**，不混入 Shadow 價格。Shadow 與 provider 的
+    報價單位／還權基準未必相同，混用會重蹈 GBp/GBP 那類 100 倍錯誤；同序列相除則
+    比值自動消單位，不需要 `_to_settlement`。
+    """
+    at = _at_or_before(series, anchor)
+    before = _at_or_before(series, anchor - timedelta(days=PRE_ANCHOR_DAYS))
+    if not at or not before or before[1] <= 0 or at[0] == before[0]:
         return None
-    if hist.empty:
-        return None
-    return hist.index[-1].date(), float(hist.iloc[-1])
+    return at[1] / before[1] - 1.0
 
 
 def _benchmark_series(symbols: list[str], start: date, end: date) -> dict[str, dict[date, float]]:
@@ -199,9 +228,20 @@ def main() -> int:
             # 日期」而非行情交易日，收盤後跑的那批被標成隔天（fetched 07-28 22:34
             # 取到 07-28 收盤 42.76，卻標 snapshot_date=07-29），盤中跑的那批則是
             # 盤中價。一個欄位承載三種語意（L12），拿它當 as-of 會系統性差一天。
-            bar = _latest_close(ticker) if ticker else None
-            if bar:
-                row["current_date"], row["current_raw"] = bar
+            anchor_date = row["anchor_date"]
+            series = (
+                _provider_series(
+                    ticker,
+                    (anchor_date or date.today()) - timedelta(days=PRE_ANCHOR_DAYS + 15),
+                )
+                if ticker
+                else {}
+            )
+            if series:
+                bar_date = max(series)
+                row["current_date"], row["current_raw"] = bar_date, series[bar_date]
+                if anchor_date:
+                    row["pre_anchor_return"] = _pre_anchor_return(series, anchor_date)
             else:
                 row["note"].append("provider 無此 ticker 的收盤序列 → 不計算")
 
@@ -280,8 +320,11 @@ def _pct(value: float | None) -> str:
 
 def _render(results: list[dict], unavailable: list[dict], has_bench: bool) -> None:
     print(f"# 若今天結算（{date.today().isoformat()}）— 唯讀，未寫入任何 authority\n")
-    header = f"| {'標的':9} | {'錨點日':10} | {'現價日':10} | {'絕對報酬':>9} |"
-    rule = f"|{'-' * 11}|{'-' * 12}|{'-' * 12}|{'-' * 11}|"
+    header = (
+        f"| {'標的':9} | {'錨點日':10} | {'現價日':10} "
+        f"| {f'錨點前{PRE_ANCHOR_DAYS}日':>10} | {'絕對報酬':>9} |"
+    )
+    rule = f"|{'-' * 11}|{'-' * 12}|{'-' * 12}|{'-' * 12}|{'-' * 11}|"
     if has_bench:
         header += f" {'QQQ':>8} | {'超額(QQQ)':>10} | {'SOXX':>8} |"
         rule += f"{'-' * 10}|{'-' * 12}|{'-' * 10}|"
@@ -292,7 +335,9 @@ def _render(results: list[dict], unavailable: list[dict], has_bench: bool) -> No
     for row in sorted(results, key=lambda r: -(r.get("absolute_return") or -9)):
         line = (
             f"| {str(row['ticker']):9} | {str(row.get('anchor_date') or '—'):10} "
-            f"| {str(row.get('current_date') or '—'):10} | {_pct(row.get('absolute_return')):>9} |"
+            f"| {str(row.get('current_date') or '—'):10} "
+            f"| {_pct(row.get('pre_anchor_return')):>10} "
+            f"| {_pct(row.get('absolute_return')):>9} |"
         )
         if has_bench:
             line += (
@@ -307,6 +352,50 @@ def _render(results: list[dict], unavailable: list[dict], has_bench: bool) -> No
     print(f"\n**已量測 {measured} / {len(results)} 個有 Shadow 錨點的 cohort。**")
     if unavailable:
         print(f"另有 {len(unavailable)} 個 cohort 的 Shadow 是 `unavailable`，無錨點可計算。")
+
+    _render_chase_check(results)
+
+
+def _median(values: list[float]) -> float:
+    ordered = sorted(values)
+    mid = len(ordered) // 2
+    return ordered[mid] if len(ordered) % 2 else (ordered[mid - 1] + ordered[mid]) / 2
+
+
+def _render_chase_check(results: list[dict]) -> None:
+    """追高檢查：常駐輸出，不需要任何人記得去跑。
+
+    存在理由見 PRE_ANCHOR_DAYS 的註解與 `2026-08-13-capital-expression-direction` §6
+    ——那一節的結論是「檢查點住在一份要人主動想起來去讀的文件裡」就會失效。
+    """
+    paired = [
+        r
+        for r in results
+        if r.get("pre_anchor_return") is not None and r.get("absolute_return") is not None
+    ]
+    if not paired:
+        return
+    chasing = [r for r in paired if r["pre_anchor_return"] > r["absolute_return"]]
+    pre_med = _median([r["pre_anchor_return"] for r in paired])
+    post_med = _median([r["absolute_return"] for r in paired])
+    print(
+        f"\n## 追高檢查（n={len(paired)}）\n\n"
+        f"- 錨點前 {PRE_ANCHOR_DAYS} 日中位：**{_pct(pre_med)}**"
+        f"｜錨點後中位：**{_pct(post_med)}**\n"
+        f"- 錨點前漲幅大於錨點後（追高形狀）：**{len(chasing)} / {len(paired)}**"
+        + (f"（{'、'.join(str(r['ticker']) for r in chasing)}）" if chasing else "")
+    )
+    if pre_med > 0:
+        print(
+            "\n⚠ **錨點前中位為正**——cohort 傾向在標的已經上漲之後才建立，"
+            "超額有一部分可能是追高而非判斷力。解讀超額欄時必須扣掉這一段。"
+        )
+    else:
+        print(
+            "\n本輪不是追高形狀（錨點前中位為負＝在下跌之後才建 cohort）。"
+            "⚠ 這只排除「追動能」，**不排除**「高 beta ＋ 剛好在 sector 底部做研究」——"
+            "要分辨需要跨主題、跨時窗的樣本。"
+        )
 
     notes = [(r["ticker"], n) for r in results for n in r.get("note", [])]
     if notes:
