@@ -2605,9 +2605,10 @@
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 163,
       "reason": null,
+      "receipt": null,
       "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "drop",
+      "resolved_at": "2026-08-17T23:59:36.291946+00:00",
       "source": "decision_lab",
       "source_cleared": {
         "at": "2026-08-17T22:35:56.631644+00:00",
@@ -2622,9 +2623,10 @@
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 164,
       "reason": null,
+      "receipt": null,
       "ref_id": "dc_c0b6f81e3507a83b857258907fafa635",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "drop",
+      "resolved_at": "2026-08-17T23:59:36.291974+00:00",
       "source": "decision_lab",
       "source_cleared": {
         "at": "2026-08-17T22:35:56.631644+00:00",
@@ -2636,6 +2638,7 @@
     },
     {
       "added_at": "2026-08-17T00:05:29.905984+00:00",
+      "deferred_at": "2026-08-17T23:59:36.292006+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 165,
       "reason": null,
@@ -2648,6 +2651,13 @@
     },
     {
       "added_at": "2026-08-17T00:05:29.905984+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_6d38eed69eacf8f93754c7a0cf2281b4",
+      "dispatch_receipt": "observation-proposal:po_1cd9fb49336af20483b09dcdea0a9be3;observation-proposal:po_3eb55972ff70defd517cb4bdb4968323;manual_todo:172",
+      "dispatch_ref": "wo_e49ee8bf02484fc2ec755bcabd1361bd",
+      "dispatch_status": "awaiting_approval",
+      "dispatch_updated_at": "2026-08-18T00:05:16.762076+00:00",
+      "dispatched_at": "2026-08-17T23:59:31.658024+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 166,
       "reason": null,
@@ -2660,6 +2670,7 @@
     },
     {
       "added_at": "2026-08-17T00:05:29.905984+00:00",
+      "deferred_at": "2026-08-17T23:59:36.292020+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 167,
       "reason": null,
@@ -2672,6 +2683,7 @@
     },
     {
       "added_at": "2026-08-17T00:05:29.905984+00:00",
+      "deferred_at": "2026-08-17T23:59:36.292033+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 168,
       "reason": null,
@@ -2687,9 +2699,10 @@
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 169,
       "reason": null,
+      "receipt": null,
       "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "drop",
+      "resolved_at": "2026-08-17T23:59:36.291991+00:00",
       "source": "decision_lab",
       "source_cleared": {
         "at": "2026-08-17T22:35:56.631644+00:00",
@@ -2697,23 +2710,17 @@
         "source_healthy": true
       },
       "title": "REVIEW — co:iqe",
-      "type": "decision_review",
-      "waiting_on": {
-        "derived_from_blockers": true,
-        "reason": "所有 blocker 都不需要使用者決定",
-        "set_at": "2026-08-17T01:35:31.016299+00:00",
-        "trigger": "執行面 context 缺失",
-        "until": null
-      }
+      "type": "decision_review"
     },
     {
       "added_at": "2026-08-17T22:47:16.360936+00:00",
       "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-06-27T00:00:00+00:00；來源=Lumentum FY2026 Form 10-K, filed 2026-08-17, accession 000162828026057358; balan",
       "n": 170,
-      "reason": null,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_b9bf90919da1242bef528a46db4f380f;proposal:po_b9bf90919da1242bef528a46db4f380f",
       "ref_id": "po_b9bf90919da1242bef528a46db4f380f",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-17T23:59:20.264294+00:00",
       "source": "engine_c",
       "title": "Engine C 觀測：LITE / runway_inputs",
       "type": "engine_c_observation"
@@ -2722,13 +2729,69 @@
       "added_at": "2026-08-17T22:47:16.360936+00:00",
       "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-08-17T00:00:00+00:00；來源=NVIDIA Form 8-K filed 2026-08-17, accession 000104581026000069, Items 1.01 and 2",
       "n": 171,
-      "reason": null,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_dd4de43eccad027e694a326af1e16ac9;proposal:po_c230a61d2fe662955c02d67c7506414a",
       "ref_id": "po_c230a61d2fe662955c02d67c7506414a",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-17T23:59:25.739702+00:00",
       "source": "engine_c",
       "title": "Engine C 觀測：NVDA / contingent_liquidity_claims",
       "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-08-18T00:05:04.587802+00:00",
+      "hint": "TL;DR：Broadcom（AVGO）custom AI accelerator（XPU）＋CPO thesis 的 catalyst／disproof 尚未由你確認，這是 cohort dc_718d04ef 目前四個 blocker 其中兩個。\n\n本輪 bounded research 已從一手 filing 補齊另外兩個財務 blocker（另見 Engine C 觀測提案）：截至 2026-05-03，firmly committed RPO 約 US164.6B（FY2025 年底僅約 US33.3B），公司明示增量含 Q2 FY2026 當季簽訂的 custom AI accelerator 長期合約，約 30% 預計 12 個月內認列；同期前五大 end customers 占 net revenue 約 45%，單一 distributor 客戶單獨占 42%（去年同期 29%）。\n\n建議 catalyst：Q3 FY2026 財報（AVGO 慣例為 9 月上旬），揭露 RPO 是否維持／續增、custom AI accelerator 交付時程是否重申、以及 CPO（Tomahawk + co-packaged optics）量產導入進度。\n\n建議 disproof（任一成立即視為 thesis 失效）：(1) 到 2026-12-31 的 Q4 FY2026 財報，firmly committed RPO 自 US164.6B 下滑超過 15%（即低於約 US140B），或公司揭露任一 custom AI accelerator 長期合約被取消或重議；(2) 到 2027-06-30，AI 相關半導體營收未出現連續兩季 QoQ 成長；(3) 到 2027-06-30，公司未重申或明確延後 CPO／co-packaged optics 於資料中心的量產導入超過一季。核查頻率：每季財報；觸發後 48 小時內人工 review 決定 retire 或 revise。\n\n建議 expiry：2026-09-20（catalyst 預期時點 ＋約兩週緩衝，符合「expiry 不得早於催化劑時點」）。\n\ngo 授權：把這組 catalyst／disproof／expiry 用於 AVGO 的下一次 paper reassess。不下單、不入圖、不改 Google Sheet。",
+      "n": 172,
+      "reason": null,
+      "ref_id": "decision-disproof:dc_718d04ef9859103e5fa07d4defa1e6b3:2026-08-18",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "確認 Broadcom（AVGO）decision catalyst／disproof 與 Q3 FY2026 時點",
+      "type": "manual"
+    },
+    {
+      "added_at": "2026-08-18T00:05:54.299066+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-05-03T00:00:00+00:00；來源=Broadcom Q2 FY2026 Form 10-Q, filed 2026-06-09, CIK 0001730168, accession 000173",
+      "n": 173,
+      "reason": null,
+      "ref_id": "po_1cd9fb49336af20483b09dcdea0a9be3",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "engine_c",
+      "title": "Engine C 觀測：AVGO / customer_concentration",
+      "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-08-18T00:05:54.299066+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-05-03T00:00:00+00:00；來源=Broadcom Q2 FY2026 Form 10-Q, filed 2026-06-09, CIK 0001730168, accession 000173",
+      "n": 174,
+      "reason": null,
+      "ref_id": "po_3eb55972ff70defd517cb4bdb4968323",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "engine_c",
+      "title": "Engine C 觀測：AVGO / backlog",
+      "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-08-18T00:05:54.299066+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 175,
+      "reason": null,
+      "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:iqe",
+      "type": "decision_review",
+      "waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-08-18T00:05:54.299039+00:00",
+        "trigger": "執行面 context 缺失",
+        "until": null
+      }
     }
   ],
   "log": [
@@ -6012,8 +6075,108 @@
       "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
       "type": "decision_review",
       "verb": "source_cleared"
+    },
+    {
+      "at": "2026-08-17T23:59:20.264294+00:00",
+      "n": 170,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_b9bf90919da1242bef528a46db4f380f;proposal:po_b9bf90919da1242bef528a46db4f380f",
+      "ref_id": "po_b9bf90919da1242bef528a46db4f380f",
+      "type": "engine_c_observation",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-17T23:59:25.739702+00:00",
+      "n": 171,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_dd4de43eccad027e694a326af1e16ac9;proposal:po_c230a61d2fe662955c02d67c7506414a",
+      "ref_id": "po_c230a61d2fe662955c02d67c7506414a",
+      "type": "engine_c_observation",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-17T23:59:31.658024+00:00",
+      "attempt": 1,
+      "n": 166,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_e49ee8bf02484fc2ec755bcabd1361bd",
+      "ref_id": "dc_718d04ef9859103e5fa07d4defa1e6b3",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-08-17T23:59:36.291946+00:00",
+      "n": 163,
+      "reason": null,
+      "receipt": null,
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "type": "decision_review",
+      "verb": "drop"
+    },
+    {
+      "at": "2026-08-17T23:59:36.291974+00:00",
+      "n": 164,
+      "reason": null,
+      "receipt": null,
+      "ref_id": "dc_c0b6f81e3507a83b857258907fafa635",
+      "type": "decision_review",
+      "verb": "drop"
+    },
+    {
+      "at": "2026-08-17T23:59:36.291991+00:00",
+      "n": 169,
+      "reason": null,
+      "receipt": null,
+      "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+      "type": "decision_review",
+      "verb": "drop"
+    },
+    {
+      "at": "2026-08-17T23:59:36.292006+00:00",
+      "n": 165,
+      "reason": null,
+      "receipt": null,
+      "ref_id": "dc_2906500af891541ea4bdd52503b9b3aa",
+      "type": "decision_review",
+      "verb": "pending"
+    },
+    {
+      "at": "2026-08-17T23:59:36.292020+00:00",
+      "n": 167,
+      "reason": null,
+      "receipt": null,
+      "ref_id": "dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
+      "type": "decision_review",
+      "verb": "pending"
+    },
+    {
+      "at": "2026-08-17T23:59:36.292033+00:00",
+      "n": 168,
+      "reason": null,
+      "receipt": null,
+      "ref_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
+      "type": "decision_review",
+      "verb": "pending"
+    },
+    {
+      "at": "2026-08-18T00:00:46.321939+00:00",
+      "n": 166,
+      "reason": null,
+      "receipt": "work_order:wo_e49ee8bf02484fc2ec755bcabd1361bd",
+      "ref_id": "dc_718d04ef9859103e5fa07d4defa1e6b3",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-08-18T00:05:16.762076+00:00",
+      "n": 166,
+      "reason": "四個 blocker：backlog／customer_concentration 已由 AVGO Q2 FY2026 10-Q 一手資料產出兩筆 Engine C 觀測提案（等 exact 人工核准寫入 ledger）；catalyst／disproof 已起草進 pq2 [172] 等使用者確認。四者全部核准後才 reassess。",
+      "receipt": "observation-proposal:po_1cd9fb49336af20483b09dcdea0a9be3;observation-proposal:po_3eb55972ff70defd517cb4bdb4968323;manual_todo:172",
+      "ref_id": "dc_718d04ef9859103e5fa07d4defa1e6b3",
+      "type": "decision_review",
+      "verb": "pq1_awaiting_approval"
     }
   ],
-  "next_n": 172,
+  "next_n": 176,
   "schema_version": "1"
 }
