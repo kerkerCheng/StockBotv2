@@ -55,16 +55,27 @@ REFERENCE_BENCHMARK = "SOXX"
 # 差一兩個交易日落在區間內；GBp/GBP 這種登記錯誤會是 ~100x，必然出界。
 UNIT_SANITY_RANGE = (0.5, 2.0)
 
-# 錨點前回看天數（日曆日）。用來分辨「系統在追高」與「系統在低點接」——
-# ROADMAP「進行中」曾把整條超額量測標為可能是選擇偏誤：Shadow 錨點日就是 cohort
-# 建立日，而 cohort 建立在研究之後，若 lead 當初是因為「股價已經在動」才通過 triage，
-# 超額就有一部分是追高而非判斷力。那條警告從未被驗過，而它足以廢掉整張表的意義。
+# 錨點前回看天數（日曆日）。原本的用途是分辨「系統在追高」與「系統在低點接」。
 #
-# 2026-08-18 首次實測：9 個 cohort 的錨點前 30 日中位 **-9.2%**、錨點後中位 **+14.4%**，
-# 只有 2/9 是追高形狀（AXTI 錨點前 -40.2%、SIVE.ST -61.6%）。偏誤方向與擔心的相反。
-# ⚠ 但同期 SOXX 是 -16.7% → +13.8%，**同一天見底**——本欄能排除「追動能」，
-# **不能**排除「高 beta ＋ 剛好在 sector 底部做研究」。要分辨那個需要跨主題樣本。
+# ⚠⚠ **2026-08-18 使用者指出、當日查證屬實：本報表的超額欄不能當成選股能力證據。**
+# 兩個查證結果：
+#   1. `decision_cohorts.dedupe_key` **全部**是 `claim:<hash>`——cohort 由**入圖**建立，
+#      不是由「現在可以買」的判斷建立。錨點日的真實語意是「這家公司的 claim 那天進圖」。
+#   2. 10 個 observed 錨點全部落在 2026-07-21 ~ 08-14（24 天），而 SOXX 在 07-28 見底，
+#      正好在窗口正中間；全部又同屬 AI 光通訊主題。
+# 合起來：**n 實際上是 1，不是 10**——一次 sector 移動被高度相關的標的複製了 10 次，
+# 而那個窗口就是系統被建起來的期間。
+#
+# 因此本欄的正確讀法是「這批 cohort 是在什麼行情位置被建立的」，**不是**「系統挑得準不準」。
+# 首版的結論行寫成「本輪不是追高形狀」，讀起來像背書——那是 L14 說的**接錯資料源的
+# 計數器＝反向防呆**，比沒有計數器更糟。已改為強制先講清楚錨點的語意與樣本獨立性。
+#
+# 要讓這張表變成真的證據，需要的不是更多列，而是**錨點來自進場判斷**：
+# 見 `docs/brainstorms/2026-08-18-alpha-live-user-sized-requirements.md` §7。
 PRE_ANCHOR_DAYS = 30
+
+# 錨點集中度警示門檻：跨度短於此天數就視為「同一次行情」，不得當成獨立樣本。
+ANCHOR_SPAN_WARN_DAYS = 60
 
 
 def _connect_ro(path: Path) -> sqlite3.Connection:
@@ -363,10 +374,14 @@ def _median(values: list[float]) -> float:
 
 
 def _render_chase_check(results: list[dict]) -> None:
-    """追高檢查：常駐輸出，不需要任何人記得去跑。
+    """錨點體檢：常駐輸出，不需要任何人記得去跑。
 
-    存在理由見 PRE_ANCHOR_DAYS 的註解與 `2026-08-13-capital-expression-direction` §6
-    ——那一節的結論是「檢查點住在一份要人主動想起來去讀的文件裡」就會失效。
+    存在理由見 `2026-08-13-capital-expression-direction` §6——那一節的結論是
+    「檢查點住在一份要人主動想起來去讀的文件裡」就會失效。
+
+    ⚠ 本段**刻意先講樣本效度、再講數字**。反過來寫的話，讀者會先看到「超額 +11%」
+    再把 caveat 當客套話——首版正是那樣，於是一份有效 n=1 的觀測讀起來像 10 個
+    獨立驗證。這是 L14 說的「接錯資料源的計數器＝反向防呆」。
     """
     paired = [
         r
@@ -375,26 +390,38 @@ def _render_chase_check(results: list[dict]) -> None:
     ]
     if not paired:
         return
+
+    anchors = sorted(r["anchor_date"] for r in paired)
+    span = (anchors[-1] - anchors[0]).days
+    weeks = len({(d.isocalendar()[0], d.isocalendar()[1]) for d in anchors})
+    print(f"\n## 錨點體檢（列 {len(paired)} 筆）\n")
+    print(
+        "- **錨點日 ≠ 進場判斷日。** cohort 由入圖建立（`dedupe_key=claim:*`），"
+        "錨點的語意是「這家公司的 claim 那天進圖」，不是「那天該買」。"
+    )
+    print(
+        f"- 錨點跨度：{anchors[0]} ~ {anchors[-1]}（**{span} 天**）｜獨立日曆週數：**{weeks}**"
+    )
+    if span < ANCHOR_SPAN_WARN_DAYS:
+        print(
+            f"\n🔴 **跨度僅 {span} 天——不得視為 {len(paired)} 個獨立樣本。**"
+            " 這批 cohort 建立於同一段期間，若又同屬一個主題，超額很可能是**同一次行情**"
+            "被相關標的複製多次（有效 n 接近 1）。下方數字只描述「這批標的是在什麼行情"
+            "位置入圖的」，**不構成選股能力的證據**。"
+        )
+
     chasing = [r for r in paired if r["pre_anchor_return"] > r["absolute_return"]]
     pre_med = _median([r["pre_anchor_return"] for r in paired])
     post_med = _median([r["absolute_return"] for r in paired])
     print(
-        f"\n## 追高檢查（n={len(paired)}）\n\n"
-        f"- 錨點前 {PRE_ANCHOR_DAYS} 日中位：**{_pct(pre_med)}**"
-        f"｜錨點後中位：**{_pct(post_med)}**\n"
-        f"- 錨點前漲幅大於錨點後（追高形狀）：**{len(chasing)} / {len(paired)}**"
+        f"\n- 錨點前 {PRE_ANCHOR_DAYS} 日中位：{_pct(pre_med)}｜錨點後中位：{_pct(post_med)}\n"
+        f"- 錨點前漲幅大於錨點後：{len(chasing)} / {len(paired)}"
         + (f"（{'、'.join(str(r['ticker']) for r in chasing)}）" if chasing else "")
     )
     if pre_med > 0:
         print(
-            "\n⚠ **錨點前中位為正**——cohort 傾向在標的已經上漲之後才建立，"
-            "超額有一部分可能是追高而非判斷力。解讀超額欄時必須扣掉這一段。"
-        )
-    else:
-        print(
-            "\n本輪不是追高形狀（錨點前中位為負＝在下跌之後才建 cohort）。"
-            "⚠ 這只排除「追動能」，**不排除**「高 beta ＋ 剛好在 sector 底部做研究」——"
-            "要分辨需要跨主題、跨時窗的樣本。"
+            "\n⚠ 錨點前中位為正——這批標的在入圖前已經在漲。日後若把錨點改成真正的"
+            "進場判斷日，這一段必須先扣掉。"
         )
 
     notes = [(r["ticker"], n) for r in results for n in r.get("note", [])]
