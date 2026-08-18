@@ -4222,8 +4222,10 @@
       "refs": {
         "action_digest": "f87997010f2714942c5dea35606b95c3256d51272d1e77b6f54ff6d90f582c55",
         "focus_company_id": "co:poet_technologies",
+        "intake_commit": "1253c241e0b171576f014b5ea7fa14b77751373e",
         "research_action_id": "ra_8453b5ad4d5f6216824d15dde37bf825",
         "research_outcome": "5,000 萬美元首期採購單與 5 億美元五年上限均獲一手確認；但推文『supplying a top 3 hyperscaler』屬作者 OSINT 推論，一手完全未具名，不入圖",
+        "source_doc": "poet_6_k_20260514",
         "storage_permission": "repo_full",
         "trace_attempts_ref": "Lumilens 融資數字以 businesswire 官方稿交叉確認；POET 側採購單以 SEC 6-K Ex-99.1 一手取得",
         "trace_origin_entity": "POET Technologies Inc. / Lumilens",
@@ -4232,7 +4234,7 @@
         "trace_status": "original_obtained"
       },
       "source": "x:aleabitoreddit",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -5953,8 +5955,10 @@
       "refs": {
         "action_digest": "f87997010f2714942c5dea35606b95c3256d51272d1e77b6f54ff6d90f582c55",
         "focus_company_id": "co:poet_technologies",
+        "intake_commit": "1253c241e0b171576f014b5ea7fa14b77751373e",
         "research_action_id": "ra_8453b5ad4d5f6216824d15dde37bf825",
         "research_outcome": "本 6-K 為 4 億美元 registered direct offering（資本事件，屬 Engine C 不進圖）；graph delta 來自相鄰 accession 的 Q1 業績新聞稿",
+        "source_doc": "poet_6_k_20260514",
         "storage_permission": "repo_full",
         "trace_attempts_ref": "WebFetch 抓 SEC 得 403；改用 repo fetchers/edgar.py。6-K 本體僅封面，實質內容在 Exhibit 99.1（由 accession index.json 取得）",
         "trace_origin_entity": "POET Technologies Inc.",
@@ -5963,7 +5967,7 @@
         "trace_status": "original_obtained"
       },
       "source": "edgar:POET",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {},
       "title": "POET 6-K filed 2026-05-15",
       "triage": {
@@ -10228,8 +10232,10 @@
       "refs": {
         "action_digest": "60bbb3dc7d9f0926261c0de6055cfc10d8d2b2c1939d3433baeec772aefc2688",
         "focus_company_id": "co:lumentum",
+        "intake_commit": "20a6cce4ca124858d549534147d5f51a9aa56cc1",
         "research_action_id": "ra_eb23842d34fb13c18aff5b779e8898c3",
         "research_outcome": "推文 quote 全部屬實；但其結論『H2 2027 CPO scale-up』與原文不符——原文為客戶部署落在 calendar 2028",
+        "source_doc": "lite_transcript_q4fy2026",
         "storage_permission": "repo_excerpt",
         "trace_attempts_ref": "IR webcast replay 無逐字文本；改用 Investing.com 全文轉錄，逐句核對十餘條 quote 並反向確認 delay 一詞不存在",
         "trace_origin_entity": "Lumentum Holdings Inc.",
@@ -10238,7 +10244,7 @@
         "trace_status": "original_obtained"
       },
       "source": "x:aleabitoreddit",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {
         "cpo": {
           "counter_only": false,

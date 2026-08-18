@@ -2778,44 +2778,69 @@
       "added_at": "2026-08-18T00:05:54.299066+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 175,
+      "reactivated_at": "2026-08-18T11:16:47.740144+00:00",
+      "reactivation_event": {
+        "type": "decision_blocker_mode_changed"
+      },
       "reason": null,
       "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
       "title": "REVIEW — co:iqe",
-      "type": "decision_review",
-      "waiting_on": {
-        "derived_from_blockers": true,
-        "reason": "所有 blocker 都不需要使用者決定",
-        "set_at": "2026-08-18T00:05:54.299039+00:00",
-        "trigger": "執行面 context 缺失",
-        "until": null
-      }
+      "type": "decision_review"
     },
     {
       "added_at": "2026-08-18T10:12:09.749170+00:00",
+      "completion_authority": {
+        "action_digest": "f87997010f2714942c5dea35606b95c3256d51272d1e77b6f54ff6d90f582c55",
+        "cohort_id": "dc_606a4a50609e3b708f2138bb597ffacc",
+        "commit": "1253c241e0b171576f014b5ea7fa14b77751373e",
+        "company_id": "co:poet_technologies",
+        "verified_at": "2026-08-18T11:15:32.045708+00:00"
+      },
       "hint": "核准 exact graph delta；Decision handoff：co:poet_technologies。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 176,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_8453b5ad4d5f6216824d15dde37bf825;digest:f87997010f2714942c5dea35606b95c3256d51272d1e77b6f54ff6d90f582c55;commit:1253c241e0b171576f014b5ea7fa14b77751373e;cohort:dc_606a4a50609e3b708f2138bb597ffacc",
       "ref_id": "ra_8453b5ad4d5f6216824d15dde37bf825",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-18T11:15:32.045708+00:00",
       "source": "research_action",
       "title": "POET Technologies：Lumilens 下 5,000 萬美元首期採購單（可擴至 5 億美元／五年），並與 LITEON、Lessengers 建立合作",
       "type": "ra_admission"
     },
     {
       "added_at": "2026-08-18T10:12:09.749170+00:00",
+      "completion_authority": {
+        "action_digest": "60bbb3dc7d9f0926261c0de6055cfc10d8d2b2c1939d3433baeec772aefc2688",
+        "cohort_id": "dc_4d28e50810e46da7fd77ee042ee7bd1c",
+        "commit": "20a6cce4ca124858d549534147d5f51a9aa56cc1",
+        "company_id": "co:lumentum",
+        "verified_at": "2026-08-18T11:15:38.764601+00:00"
+      },
       "hint": "核准 exact graph delta；Decision handoff：co:lumentum。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 177,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_eb23842d34fb13c18aff5b779e8898c3;digest:60bbb3dc7d9f0926261c0de6055cfc10d8d2b2c1939d3433baeec772aefc2688;commit:20a6cce4ca124858d549534147d5f51a9aa56cc1;cohort:dc_4d28e50810e46da7fd77ee042ee7bd1c",
       "ref_id": "ra_eb23842d34fb13c18aff5b779e8898c3",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-18T11:15:38.764601+00:00",
       "source": "research_action",
       "title": "Lumentum (LITE) Q4 FY2026 法說會：UHP 雷射供給落後、AXT 成為追加 InP 基板來源、CPO 客戶放量落在 2028",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-08-18T11:16:47.740144+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 178,
+      "reason": null,
+      "ref_id": "dc_606a4a50609e3b708f2138bb597ffacc",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:poet_technologies",
+      "type": "decision_review"
     }
   ],
   "log": [
@@ -6199,8 +6224,42 @@
       "ref_id": "dc_718d04ef9859103e5fa07d4defa1e6b3",
       "type": "decision_review",
       "verb": "pq1_awaiting_approval"
+    },
+    {
+      "at": "2026-08-18T11:15:32.045708+00:00",
+      "n": 176,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_8453b5ad4d5f6216824d15dde37bf825;digest:f87997010f2714942c5dea35606b95c3256d51272d1e77b6f54ff6d90f582c55;commit:1253c241e0b171576f014b5ea7fa14b77751373e;cohort:dc_606a4a50609e3b708f2138bb597ffacc",
+      "ref_id": "ra_8453b5ad4d5f6216824d15dde37bf825",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-18T11:15:38.764601+00:00",
+      "n": 177,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_eb23842d34fb13c18aff5b779e8898c3;digest:60bbb3dc7d9f0926261c0de6055cfc10d8d2b2c1939d3433baeec772aefc2688;commit:20a6cce4ca124858d549534147d5f51a9aa56cc1;cohort:dc_4d28e50810e46da7fd77ee042ee7bd1c",
+      "ref_id": "ra_eb23842d34fb13c18aff5b779e8898c3",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-18T11:16:47.740144+00:00",
+      "n": 175,
+      "prior_waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-08-18T00:05:54.299039+00:00",
+        "trigger": "執行面 context 缺失",
+        "until": null
+      },
+      "reason": "blocker 已不再全屬等待事件，恢復人工複查",
+      "receipt": null,
+      "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+      "type": "decision_review",
+      "verb": "event_reactivated"
     }
   ],
-  "next_n": 178,
+  "next_n": 179,
   "schema_version": "1"
 }
