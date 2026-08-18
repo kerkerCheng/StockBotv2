@@ -65,6 +65,30 @@ def _pct(new, old):
     return new / old - 1.0
 
 
+def _provider_close(ticker: str) -> tuple[str, float] | None:
+    """最新一根**實際 K 線**的 (交易日, 收盤價)。盤中時該根尚未收盤，輸出會標示。
+
+    ⚠ **現價不取自 Engine C `financial_snapshots.price`。** 2026-08-18 實測：該欄取自
+    `yfinance.info` 的快照 dict（`previousClose`），而那個值對不上任何一天的實際收盤——
+    COHR 記 351.22，實際 08-14 收 325.83、08-18 收 309.00。更糟的是 ETL 另外蓋了
+    `bar_date=2026-08-17`，**那天根本沒有開市**（週五 08-14 → 週二 08-18）：
+    一個看起來很權威、實際憑空生成的日期。
+
+    本檔首版直接用了 `financial_snapshots.price`，於是把 COHR 距分析師目標的空間
+    算成 +17%（實際 +33%）。`outcome_if_settled_today.py` 早就避開這個坑並在
+    docstring 寫明理由——同一個教訓在同一天被重踩，因為新檔案沒有繼承那段知識。
+    """
+    try:
+        import yfinance as yf
+
+        hist = yf.Ticker(ticker).history(period="1mo", auto_adjust=False)["Close"].dropna()
+    except Exception:  # noqa: BLE001 — 抓不到就退回 Engine C 並標示
+        return None
+    if hist.empty:
+        return None
+    return hist.index[-1].date().isoformat(), float(hist.iloc[-1])
+
+
 def _positive_pe(value) -> float | None:
     """只有正的 forward P/E 才能做倍數分解。
 
@@ -105,8 +129,18 @@ def main() -> int:
             # 錨點日當天或之後的第一筆；Engine C 的覆蓋期可能晚於 Shadow 錨點。
             start = next((s for s in snaps if str(s["snapshot_date"]) >= anchor), snaps[0])
             end = snaps[-1]
-            price_chg = _pct(end["price"], start["price"])
+            # 現價一律用 provider 實際收盤；Engine C 只提供「共識 EPS」這個它真正加值的部分。
+            bar = _provider_close(ticker)
+            end_price = bar[1] if bar else end["price"]
+            price_source = f"bar@{bar[0]}" if bar else "engine_c(⚠未校正)"
+
             pe_from, pe_to = _positive_pe(start["pe_forward"]), _positive_pe(end["pe_forward"])
+            # forward P/E 與 price 同源，price 錯它也錯。可還原的是隱含的 forward EPS
+            # （= price ÷ pe），那才是 Engine C 真正帶來的資訊；用正確價格重算倍數。
+            if pe_to and end["price"]:
+                implied_eps = end["price"] / pe_to
+                pe_to = end_price / implied_eps if implied_eps else pe_to
+            price_chg = _pct(end_price, start["price"])
             pe_chg = _pct(pe_to, pe_from)
             implied = (
                 (1 + price_chg) / (1 + pe_chg) - 1
@@ -114,7 +148,7 @@ def main() -> int:
                 else None
             )
             target = end["analyst_target_mean"]
-            upside = _pct(target, end["price"]) if target else None
+            upside = _pct(target, end_price) if target else None
             rows.append(
                 {
                     "ticker": ticker,
@@ -126,7 +160,8 @@ def main() -> int:
                     "pe_chg": pe_chg,
                     "implied_eps": implied,
                     "gm_chg": _pct(end["gross_margin"], start["gross_margin"]),
-                    "price": end["price"],
+                    "price": end_price,
+                    "price_source": price_source,
                     "target": target,
                     "upside": upside,
                 }
@@ -151,6 +186,11 @@ def main() -> int:
             f"| {_fmt(r['pe_chg'])} | {_fmt(r['implied_eps'])} "
             f"| {_fmt(r['upside'])}{flag} |"
         )
+
+    print("\n**現價來源**（不使用 Engine C 快照，理由見 `_provider_close`）：")
+    for r in sorted(rows, key=lambda x: x["ticker"]):
+        note = "（盤中，非最終收盤）" if "bar@" in r["price_source"] else ""
+        print(f"- {r['ticker']}：{r['price']:.2f}　{r['price_source']}{note}")
 
     print(
         "\n**怎麼讀：**\n"
