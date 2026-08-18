@@ -225,9 +225,20 @@ prepared RA」（通常為否）。`original_obtained` 也要說明「已取得�
 
 ```powershell
 & '.venv\Scripts\python.exe' -m decision_lab today --format markdown
+& '.venv\Scripts\python.exe' scripts\catalyst_watch.py
 ```
 
-回今日 `NO ACTION / REVIEW / TRADE / HEDGE`，每個 probe 附**自追蹤變化%**與**evidence_delta**
+第二支是**賣出側**：把每筆 decision 已經必填的 `disproof`／`catalyst`／`expiry` 從卡片上的
+散文變成每天被檢查的狀態。L7 的原話是「欄位有填但沒有後續流程，等於貼了一個永遠不會響的
+火警警報」——這一支就是那個缺掉的流程。它是**條件檢查不是訊號**（只回答「你自己寫下的條件
+今天到了沒」，不預測任何東西），因此不受 D7「先量測後放閘」限制。輸出四態：
+`設定不完整`／`已逾期`／`即將到期`／`監控中`，**`設定不完整` 排最前面**——它的到期提醒本身
+就是假的，先修它才有意義。散文裡的日期**不猜**：只用結構化的 `expiry` 與
+`thesis/lifecycle.json` 的 `catalyst_checkpoints`，猜出來的日期會產生「看起來有排程、
+其實是編的」提醒，比沒有提醒危險。報表末尾必須顯示「N/M 檔有結構化催化劑日期」——
+其餘檔的 `expiry 早於催化劑` 錯誤測不到，**沒抓到問題不等於沒有問題**（L13）。
+
+第一支回今日 `NO ACTION / REVIEW / TRADE / HEDGE`，每個 probe 附**自追蹤變化%**與**evidence_delta**
 （material=有觸及 thesis 因果結構的新證據 → 建議 reassess；peripheral=只多週邊 source；none=無變或
 純價格波動）。再讀 `thesis/lifecycle.json` 列到期需複查的 thesis。純讀，不建 decision。
 
