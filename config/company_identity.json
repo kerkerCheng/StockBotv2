@@ -148,8 +148,16 @@
       "research_ticker": "3081.TWO"
     },
     {
+      "company_id": "co:lessengers",
+      "research_ticker": null
+    },
+    {
       "company_id": "co:lightium_ag",
       "research_ticker": null
+    },
+    {
+      "company_id": "co:liteon",
+      "research_ticker": "2301.TW"
     },
     {
       "company_id": "co:lumentum",
@@ -157,6 +165,10 @@
       "market_currency": "USD",
       "execution_currency": "USD",
       "execution_venue": "NASDAQ"
+    },
+    {
+      "company_id": "co:lumilens",
+      "research_ticker": null
     },
     {
       "company_id": "co:macom",
