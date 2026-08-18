@@ -246,3 +246,185 @@ Engine D 不需要複製它（ROADMAP「看起來像缺口但不是」：第二�
 買入時點則相反：任何「現在該買」的機制都是未經量測的新訊號，依 D6 不得享有默認信任。
 誠實的做法是系統只回答**「為什麼是現在、下一個催化劑是什麼、什麼時候」**，
 由使用者決定買不買。
+
+---
+
+## 8. 瓶頸鏈排序（2026-08-18 使用者定調；本節是主體）
+
+使用者看過催化劑範例後的回應，重新定義了優先序：
+
+> 「我想像中的 flow 應該是：我跟你對話、或自動列出 cohort 中**真的技術瓶頸**的股票 →
+> 看近期催化劑追蹤 → 要不要進場看我自己。其實我最想的可能是第一步，技術瓶頸的部分。」
+
+**這個優先序是對的，理由不是偏好而是差異化：** 財報日曆是商品化的東西，到處都有且免費；
+**瓶頸結構不是**。第一步是這套系統唯一無法外購的部分，也正是 Engine A 存在的理由。
+
+### 8.1 使用者的鏈路模型（已對圖驗證通過）
+
+> 「CPO 是 AI SERVER 的瓶頸，InP 是 CPO 的瓶頸，瓶頸相連要能連到真的市場有在放 CapEx 的地方。」
+> 「我只是想表達要是真的市場有在投資的點，不然一個沒人用的技術的瓶頸，好像也沒用。」
+
+**判準因此是：瓶頸必須錨定在有人真的在花錢的需求上，否則它只是冷知識。**
+
+圖上實測（2026-08-18）：
+
+```
+tech:ai_compute_buildout ─[enables]→ tech:cpo          ← 需求錨點（5 條邊）
+tech:ai_switch           ─[enables]→ tech:cpo
+      tech:cpo ─[depends_on, sub=5]→ tech:external_laser_source
+      tech:uhp_laser / cw_dfb_laser / inp_eml / eml_laser / inp_cpo
+                       ─[depends_on, sub=5]→ mat:inp_substrate
+      co:coherent / co:lumentum ─[depends_on, sub=5]→ mat:inp_substrate
+```
+
+`mat:inp_substrate` 有 **8 條 sub=5 入邊**，是全圖最強收斂點。
+
+**結構關鍵：需求向上、瓶頸向下，用不同邊型。** 向上走 `enables`／`is_component_of`
+找需求錨點（這些邊的 `substitutability` 是 None，本來就不該有）；向下走
+`depends_on`／`supplies_to` 找 chokepoint，只有向下的腿計權重。**不需要改 schema。**
+
+### 8.2 三層，順序不可反
+
+| 層 | 內容 | 為什麼必須排在前面 |
+|---|---|---|
+| **L8 修復** | 依 `origin_entity` 判定 sole_source 是否供應商自報 | 見 8.3——不修就會把行銷話術排第一 |
+| **瓶頸鏈排序** | 輸出「公司 × 瓶頸邊」，附鏈路與需求錨點 | 主體 |
+| **催化劑接入** | 用 `qualification_status` 當瓶頸 thesis 的真催化劑 | 需要前兩層的輸出當輸入 |
+
+排序單位使用者選定為**「公司 × 瓶頸邊」**而非公司：AXT 本身不是瓶頸，
+**AXT 在 InP 基板這條邊上**才是；一家公司可出現多列。
+
+### 8.3 L8 檢查從未執行過——實際是 1/3 自報（✅ 2026-08-18 已修）
+
+⚠ **本節初稿寫「4/4 全是供應商自吹」，是錯的，錯因值得記下來。**
+初稿是**逐 EdgeAssertion** 判定，而每個 assertion 只引一份文件，於是每一筆看起來都同源。
+但 `schema/graph_schema.md` §7 的判定單位是 **canonical edge（`edge_key`）的「所有
+source_ids」**——必須跨 assertion 聚合 origin。改用正確單位後結果完全不同：
+
+| sole_source 邊 | 全部 `origin_entity` | 判定 |
+|---|---|---|
+| co:coherent → co:nvidia | Coherent、**NVIDIA**、Global Semi Research | ✅ **客戶端本人印證**，正是 §7 要求的 `verified_by_search` |
+| co:broadcom → tech:cpo | Broadcom、The Next Platform | 🟡 待人工判定（見下） |
+| co:lumentum → tech:uhp_laser | 只有 Lumentum | 🔴 自報 → **已降級** |
+
+**已執行：** `scripts/audit_sole_source_independence.py --apply`，
+`lumentum_q2fy26_cpo_e9` 與 `lumentum_q3fy26_cpo_e5` 寫入
+`sole_source_evidence_quality=weak`、confidence **0.9 → 0.5**，manifest 存於
+ignored `library/private/graph_migrations/`。重跑冪等。
+
+### 8.3.1 稽核腳本自己踩到的 L12（已修，值得記）
+
+首版判定式是 `resolved == {subject}`——只要有任何 origin **解析不出 `co:*`**，
+集合就不等於 `{subject}`，於是**自動被當成外部佐證放行**。
+
+但 `None` 同時承載兩種相反語意：(a) 真的是第三方媒體（§7 接受）、
+(b) 沒解析出來的子公司或別名（§7 不接受）。下游被迫二選一而兩邊都可能錯。
+`co:broadcom → tech:cpo` 就是實例：唯一的非本人 origin 是 `The Next Platform`，
+它**恰好**真的是第三方媒體，所以首版的結論碰巧正確——**但那是運氣，不是判準**。
+
+已改成三分：解析到不同公司 → `externally_corroborated`；只剩無法解析者 →
+`needs_review`（不自動放行）；全是本人 → `self_reported`。
+
+### 8.3.2 更大的問題在 substitutability，不在 sole_source
+
+擴大統計（`--all-bottleneck`）：**58 條帶 `substitutability` 的 canonical edge，
+50% 只有供應商自報 origin。** §7 的規則只寫給 `sole_source`（3 條），
+但排序主要吃的是 `substitutability`（58 條）——**修了小的、放過大的**。
+
+排名輸出因此必須逐列標示證據等級（自報／外部印證），且**證據等級是排名的上限**：
+一條只有供應商自評 sub=5 的邊，不得排在有客戶端印證的 sub=4 之前。
+
+### 8.4 資料現況與已知限制（必須常駐於輸出）
+
+423 條 EdgeAssertion，瓶頸屬性存在 `attributes` JSON blob：
+
+| 屬性 | 覆蓋 | 值分布 |
+|---|---|---|
+| `qualification_status` | 167（39%） | 最多，但沒接到任何消費者 |
+| `substitutability` | 91（22%） | 5:21、4:31、3:19、1:1 |
+| `ramp_execution` | 63（15%） | 4:28、3:18、5:1 |
+| `sole_source` | 44 | true 僅 4（見 8.3） |
+| `structural_lead_time_weeks` | 17 | **16 個是 null，實際只有 1 個真值** |
+| `sole_source_evidence_quality` | **0** | 從未填過 |
+
+**覆蓋率 22% 是已知限制，採方案 (a)：先做排序、把限制標在輸出上**，而不是先回頭補 332 條邊。
+理由是先看到東西才知道值不值得補、以及該優先補哪些。⚠ 但排名必然偏向「剛好被抽過的邊」，
+這個偏誤**必須每次隨排名出現**，不得只寫在文件裡（L14：常駐計數器才是防呆）。
+
+### 8.5 CapEx 錨點：第一版只做結構，不帶金額
+
+使用者澄清 CapEx 的用途是**存在性判準**（「有沒有人真的在花錢」），不是權重來源。
+因此第一版只需回答「這條鏈路走不走得到需求錨點」，走不到就降級或不列。
+金額（hyperscaler capex 等，目前躺在 leads 裡）若日後要接，走 Engine C observation，
+**不進 Engine A**（L4 第 2 問：會隨時間變的不是靜態圖屬性）。
+
+### 8.6 順帶查出、需另案處理的兩件事
+
+1. **188 個 Claim 節點貼著 `:Entity` 標籤**（ID 形如 `<doc_id>_cl1`、name 是 claim 全文）。
+   真正的 Entity 有 223 個、**100% 有 type 且前綴與 type 完全一致**。
+   所以這不是型別覆蓋缺口，排序只需一行過濾（排除無前綴者）；但
+   **任何 `MATCH (n:Entity)` 都會多撈到 188 個 claim**，是會反覆咬人的那種問題，應給 Claim 自己的 label。
+2. `comp:humanoid_precision_actuators` 前綴為 `comp:` 但 type 是 `TechNode`——唯一不符前綴慣例者。
+
+### 8.8 紅隊審查結論（2026-08-18，`blind-spot-audit`）
+
+**已撤回一條：** 審查原本報「排名會重現使用者最初的抱怨（sub≥4 有 52% 集中在 InP／光通訊鏈）」。
+使用者澄清後撤回——
+
+> 「好像不衝突，我們就是從我們讀到的公司，也就是我們繞了很久的公司之中，挑出最有機會成為
+> 瓶頸的。如果還是這幾家那也沒關係。」
+
+原始抱怨是**尺寸沒有資訊量**（全是 0.1%），不是名字太熟。名字熟但系統能說出「卡在哪條邊、
+多難繞過、上面接到誰在花錢」，就是新資訊。**排名的任務是排序，不是發現。**
+
+**但這使另一條升級：** 若任務是「在讀過的公司裡排序」，排名就**絕對不能是「我們讀了多少」
+的函數**。實測 `co:axt → mat:inp_substrate` 有 4 條邊來自 4 份文件、`co:lumentum` 3 條、
+`co:coherent` 2 條；24 條入邊去重後只剩 16 個 `(src, relation)`。
+**再 ingest 五份 InP 報導，分數就會上升而世界沒有改變。**
+→ 排名必須先以 `(src, relation, dst)` 去重，且**每組取最高 confidence，不做加總**。
+
+其餘未解項（按優先序）：
+
+| # | 發現 | 狀態 |
+|---|---|---|
+| 1 | 排名分數與 ingestion 量混淆 | 🔴 未解，實作前必須先驗去重後排序有無大洗牌 |
+| 2 | `user_sized` 沒有入口——daily brief 不提示，`live_choices` 仍 0 筆 | 🔴 未解；修法是 brief 直接印可複製指令 |
+| 3 | `user_sized` 的資本上限讀凍結快照，無時效上界 | 🔴 未解；三個月前的 decision 仍可放行，可疊出超過 5% |
+| 4 | `ANCHOR_SPAN_WARN_DAYS=60` keyed 在錯的變數 | 🔴 未解；跨度自然增長會讓紅字自己關掉，而語意問題還在。應改 keyed 在「有幾筆錨點來自 `live_choices`」 |
+| 5 | `structural_lead_time_weeks` 只有 1 個真值 | 🟡 排名須標明未含 lead time；補它比補 332 條 `substitutability` 更有價值 |
+| 6 | 排名列與 cohort 的對應未定義 | 🟡 傾向：排名列是唯讀呈現單位、不建 cohort |
+
+### 8.9 反向使用：用瓶頸目標驅動研究優先序（使用者 2026-08-18 提出）
+
+> 「未來決定何者先做研究的方向，也可以先訂找瓶頸這個目標。那為了達成這個目標，
+> 我們要怎麼抓新公司進來做研究？」
+
+**這把箭頭反過來，是本輪最有價值的想法。** 圖已經知道 chokepoint 在哪
+（`mat:inp_substrate`，8 條 sub=5 入邊），也知道目前掛在上面的供應商只有
+AXT／Sumitomo／JX Advanced Metals／Casela。**「這條 chokepoint 上還有誰沒被研究過」
+是一個精準的 harvest 目標**，比通用抓取好得多，而且它直接回答 ROADMAP「廣度」那條
+（現況：清 pq1 積壓、擴 harvest 來源——都是無方向的）。
+
+迴圈形狀：
+
+```
+瓶頸排名（讀過的公司）→ 找出供應商覆蓋不完整的 chokepoint
+   → 產生具名的 research target → onboard → 回到排名
+```
+
+⚠ 這條迴圈**尚未設計，也不在本輪 scope**。登記在此以免流失；動工前必須先解 8.8 的第 1 項，
+否則「覆蓋不完整」的判定會跟排名分數犯同一個錯（把「我們讀得少」當成「供應商少」）。
+
+### 8.7 買賣資訊的方向性（使用者提出）
+
+> 「這些催化劑是看多看空？然後真的成了是好是壞？這些能一起揭露給我嗎？」
+
+現況：每筆 decision 強制有 `disproof_condition`（什麼會殺死 thesis），
+**但沒有對稱的 confirmation 欄位**，所以系統只能說何時該賣、不能說何時變更好；
+催化劑文字目前一律寫成「揭露 X」，方向中性。
+
+同時使用者觀察到「這些好像都是財報的催化劑」——**屬實且成因可診斷**：
+skill 要求催化劑「可觀測、有門檻、有日期」，財報是最容易同時滿足三條的東西，
+於是起草者每次都選它。但瓶頸 thesis 的真催化劑是圖事件（第二供應商合格、產能擴張、
+design-win），而 `qualification_status` 正是「第二供應商合格了沒」的追蹤器——
+**填得最多（167 筆）卻沒接到任何地方**。8.2 第三層要接的就是它。
