@@ -1,0 +1,402 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "guided",
+      "disproof_condition": "If Lumilens cancels or significantly reduces the purchase order, or if a competing photonic integration platform is selected for frontier AI infrastructure at scale, this claim should be downgraded.",
+      "id": "poet_6_k_20260514_cl1",
+      "source_ids": [
+        "poet_6_k_20260514_s7"
+      ],
+      "statement": "Lumilens initial $50M purchase order for EOI-based optical engines could scale to $500M+ in cumulative purchases from POET over five years, representing a major frontier AI infrastructure supply relationship.",
+      "subject_id": "e5"
+    },
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "guided",
+      "disproof_condition": "If POET announces abandonment of the Malaysia production move or retains China as primary production site, this claim should be downgraded.",
+      "id": "poet_6_k_20260514_cl2",
+      "source_ids": [
+        "poet_6_k_20260514_s11"
+      ],
+      "statement": "POET is moving production capacity from China to Malaysia, representing a significant manufacturing geography shift for its photonic integration platform.",
+      "subject_id": "co:poet_technologies"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:poet_optical_interposer",
+      "id": "e1",
+      "relation": "enables",
+      "source_ids": [
+        "poet_6_k_20260514_s1"
+      ],
+      "src_id": "tech:ai_compute_buildout"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "tech:poet_optical_interposer",
+      "id": "e2",
+      "relation": "develops",
+      "source_ids": [
+        "poet_6_k_20260514_s8"
+      ],
+      "src_id": "co:poet_technologies"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "prod:poet_optical_engine",
+      "id": "e3",
+      "relation": "is_component_of",
+      "source_ids": [
+        "poet_6_k_20260514_s2",
+        "poet_6_k_20260514_s7"
+      ],
+      "src_id": "tech:poet_optical_interposer"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "prod:poet_optical_engine",
+      "id": "e4",
+      "relation": "develops",
+      "source_ids": [
+        "poet_6_k_20260514_s2",
+        "poet_6_k_20260514_s7"
+      ],
+      "src_id": "co:poet_technologies"
+    },
+    {
+      "attributes": {
+        "qualification_status": "designed_in",
+        "substitutability": 4
+      },
+      "confidence": 0.85,
+      "dst_id": "co:lumilens",
+      "id": "e5",
+      "relation": "supplies_to",
+      "source_ids": [
+        "poet_6_k_20260514_s2",
+        "poet_6_k_20260514_s7"
+      ],
+      "src_id": "co:poet_technologies"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "prod:1_6t_dr4_transceiver",
+      "id": "e6",
+      "relation": "develops",
+      "source_ids": [
+        "poet_6_k_20260514_s5"
+      ],
+      "src_id": "co:poet_technologies"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "prod:1_6t_dr4_transceiver",
+      "id": "e7",
+      "relation": "develops",
+      "source_ids": [
+        "poet_6_k_20260514_s5"
+      ],
+      "src_id": "co:lessengers"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "prod:1_6t_dr4_transceiver",
+      "id": "e8",
+      "relation": "is_component_of",
+      "source_ids": [
+        "poet_6_k_20260514_s3",
+        "poet_6_k_20260514_s5"
+      ],
+      "src_id": "tech:poet_optical_interposer"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "co:liteon",
+      "id": "e9",
+      "relation": "partnership_with",
+      "source_ids": [
+        "poet_6_k_20260514_s4"
+      ],
+      "src_id": "co:poet_technologies"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:poet_optical_interposer",
+      "id": "e10",
+      "relation": "enables",
+      "source_ids": [
+        "poet_6_k_20260514_s8",
+        "poet_6_k_20260514_s6"
+      ],
+      "src_id": "tech:wafer_level_photonic_integration"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:light_source_chip_to_chip",
+      "id": "e11",
+      "relation": "enables",
+      "source_ids": [
+        "poet_6_k_20260514_s9"
+      ],
+      "src_id": "tech:poet_optical_interposer"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:ai_compute_buildout",
+      "id": "e12",
+      "relation": "enables",
+      "source_ids": [
+        "poet_6_k_20260514_s5"
+      ],
+      "src_id": "prod:1_6t_dr4_transceiver"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "POET"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 4
+      },
+      "confidence": 0.9,
+      "id": "co:poet_technologies",
+      "name": "POET Technologies",
+      "role": "disruptor",
+      "source_ids": [
+        "poet_6_k_20260514_s1",
+        "poet_6_k_20260514_s8"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "end_demand",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:ai_compute_buildout",
+      "name": "AI training/inference cluster buildout",
+      "role": null,
+      "source_ids": [
+        "poet_6_k_20260514_s1",
+        "poet_6_k_20260514_s5"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Optical Interposer platform"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 4
+      },
+      "confidence": 0.9,
+      "id": "tech:poet_optical_interposer",
+      "name": "POET Optical Interposer",
+      "role": null,
+      "source_ids": [
+        "poet_6_k_20260514_s1",
+        "poet_6_k_20260514_s8"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "EOI-based engines"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "prod:poet_optical_engine",
+      "name": "EOI-based optical engine",
+      "role": null,
+      "source_ids": [
+        "poet_6_k_20260514_s2",
+        "poet_6_k_20260514_s7"
+      ],
+      "type": "Product"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "1.6T transceiver platform"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "prod:1_6t_dr4_transceiver",
+      "name": "1.6T 2×DR4 optical transceiver module",
+      "role": null,
+      "source_ids": [
+        "poet_6_k_20260514_s5",
+        "poet_6_k_20260514_s3"
+      ],
+      "type": "Product"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:lumilens",
+      "name": "Lumilens",
+      "role": "adjacent_silicon",
+      "source_ids": [
+        "poet_6_k_20260514_s2",
+        "poet_6_k_20260514_s7"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:lessengers",
+      "name": "Lessengers",
+      "role": "adjacent_silicon",
+      "source_ids": [
+        "poet_6_k_20260514_s3",
+        "poet_6_k_20260514_s5"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "LITEON"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:liteon",
+      "name": "LITEON Technology",
+      "role": "adjacent_silicon",
+      "source_ids": [
+        "poet_6_k_20260514_s4"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [
+        "wafer-level semiconductor manufacturing"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 5
+      },
+      "confidence": 0.85,
+      "id": "tech:wafer_level_photonic_integration",
+      "name": "Wafer-level photonic integration",
+      "role": null,
+      "source_ids": [
+        "poet_6_k_20260514_s6",
+        "poet_6_k_20260514_s8"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "novel light source products"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:light_source_chip_to_chip",
+      "name": "Light source for chip-to-chip data communication",
+      "role": null,
+      "source_ids": [
+        "poet_6_k_20260514_s9"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "poet_6_k_20260514",
+    "evidence_tier": 2,
+    "origin_entity": "POET Technologies",
+    "permission_basis": "美國 SEC EDGAR 公開 filing（Form 6-K Exhibit 99.1），政府公開登記文件，可全文保存。",
+    "published_at": "2026-05-14",
+    "source_type": "filing",
+    "storage_permission": "repo_full",
+    "title": "POET Technologies Q1 2026 Results (6-K Ex-99.1, 2026-05-14)",
+    "url": "https://www.sec.gov/Archives/edgar/data/1410172/000121390026043870/exh_991.htm"
+  },
+  "sources": [
+    {
+      "id": "poet_6_k_20260514_s1",
+      "locator": "Management Commentary, para 1",
+      "quote": "Our partnerships with industry leaders such as LITEON, Lessengers and Lumilens validate the growing demand for POET's Optical Interposer platform and our ability to enable next-generation photonic integration solutions."
+    },
+    {
+      "id": "poet_6_k_20260514_s2",
+      "locator": "Management Commentary, para 1",
+      "quote": "The joint development agreement with Lumilens, including an initial $50 million purchase order for EOI-based optical engines, represents an important commercial milestone for the Company and establishes the framework for what we believe could become a substantial long-term supplier relationship supporting frontier AI infrastructure."
+    },
+    {
+      "id": "poet_6_k_20260514_s3",
+      "locator": "Management Commentary, para 2",
+      "quote": "We also continued to advance our product roadmap through the joint development of a 1.6T transceiver platform with Lessengers, while strengthening our global market position through our collaboration with LITEON."
+    },
+    {
+      "id": "poet_6_k_20260514_s4",
+      "locator": "Notable Business Highlights, bullet 1",
+      "quote": "Announced a strategic collaboration with LITEON Technology, one of the world's leading providers of optoelectronic semiconductor components and high-power optical systems. The partnership aims to co-develop next-generation optical communication modules built on POET's patented optical interposer technology and integration platform."
+    },
+    {
+      "id": "poet_6_k_20260514_s5",
+      "locator": "Notable Business Highlights, bullet 2",
+      "quote": "Announced the joint development of a 1.6T 2×DR4 optical transceiver module designed for next-generation AI clusters and hyperscale data center networks with Lessengers."
+    },
+    {
+      "id": "poet_6_k_20260514_s6",
+      "locator": "Notable Business Highlights, bullet 4",
+      "quote": "Entered into a supply agreement that establishes a strategic joint development and commercial technology partnership to advance a new class of wafer-level photonic integration for frontier AI infrastructure."
+    },
+    {
+      "id": "poet_6_k_20260514_s7",
+      "locator": "Notable Business Highlights, bullet 4",
+      "quote": "Lumilens has placed an initial purchase order with the Company for the manufacturing of EOI-based engines valued at $50 million. This purchase order represents the first phase of a broader supplier relationship that could scale to $500+ million in cumulative purchases from the Company over five years."
+    },
+    {
+      "id": "poet_6_k_20260514_s8",
+      "locator": "About POET Technologies Inc.",
+      "quote": "POET's photonic integration solutions are based on the POET Optical Interposer™, a novel, patented platform that allows the seamless integration of electronic and photonic devices into a single chip using advanced wafer-level semiconductor manufacturing techniques."
+    },
+    {
+      "id": "poet_6_k_20260514_s9",
+      "locator": "About POET Technologies Inc.",
+      "quote": "In addition to providing high-speed (800G, 1.6T and above) optical engines and optical modules for AI clusters and hyperscale data centers, POET has designed and produced novel light source products for chip-to-chip data communication within and between AI servers."
+    },
+    {
+      "id": "poet_6_k_20260514_s10",
+      "locator": "About POET Technologies Inc.",
+      "quote": "POET is headquartered in Toronto, Canada, with operations in Allentown, PA, Shenzhen, China, and Singapore."
+    },
+    {
+      "id": "poet_6_k_20260514_s11",
+      "locator": "Forward-Looking Statements",
+      "quote": "Such statements include the Company's expectations with respect to its move of production capacity from China to Malaysia, the ability of its partners to install and operate production equipment."
+    },
+    {
+      "id": "poet_6_k_20260514_s12",
+      "locator": "About POET Technologies Inc.",
+      "quote": "POET is a design and development company offering high-speed optical modules, optical engines and light source products to the artificial intelligence systems market and to hyperscale data centers."
+    }
+  ]
+}
