@@ -1,0 +1,78 @@
+Source URL: https://www.investing.com/news/transcripts/earnings-call-transcript-lumentum-tops-q4-2026-forecasts-as-ai-demand-lifts-outlook-93CH-4852933
+
+Excerpt:
+Lumentum Holdings Inc. (NASDAQ: LITE) — Q4 FY2026 Earnings Call
+Call date: 2026-08-11
+Transcript source: Investing.com published transcript (third-party transcription, not issuer IR replay)
+
+NOTE ON SCOPE: This file is a curated excerpt, not a reproduction of the full transcript.
+Only quotes needed to verify specific supply-chain claims are retained, per source-trace
+storage policy. Evidence tier capped at 2 because this is a third-party transcription;
+raising to tier 1 requires line-by-line verification against the company IR webcast replay.
+
+--- PREPARED REMARKS / Q&A EXCERPTS (verbatim) ---
+
+[CPO timing — Michael Hurlston, CEO]
+"Our visibility into the timing of CPO scale-up deployments has also sharpened. We remain
+confident in a demand ramp for our ultra-high-power laser chips in the second half of
+calendar 2027 ahead of customer scale-up deployments in calendar 2028."
+
+[CPO lead customer — Michael Hurlston, CEO]
+"I'd like to address some recent market noise around co-packaged and near-packaged optics.
+First, our lead CPO customer's production plans remain very much on track."
+
+"Our lead CPO customer's production plans remain very much on track, and their demand
+signal has increased since our last update."
+
+[External light source module — Michael Hurlston, CEO]
+"We were recently given our first external light source, or ELS, module purchase for
+delivery by the second half of calendar 2027."
+
+[Near-packaged optics — Michael Hurlston, CEO]
+"The rest of our customer base is currently prioritizing near-packaged architectures as an
+intermediate step to the eventual adoption of CPO."
+
+"The NPO opportunity is completely additive for us, significantly increasing the optical TAM."
+
+[Substrate supply — Michael Hurlston, CEO]
+"What we are trying to do ... is secure even more substrate supply ... we went out and we
+found additional substrate help from AXT, Inc."
+
+"They are a great partner ... and we think we are going to need their help just given the
+surge in demand."
+
+"If this vector continues, we are probably going to need to look for more help on substrate."
+
+[High-power laser supply shortfall — Michael Hurlston, CEO]
+"We are way behind in our shipments, unfortunately, on high-powered lasers."
+
+"If one vector has really changed since the last time you and I talked, I'd say it's your
+high-powered lasers, and we are very much further behind."
+
+[CW laser pricing — Michael Hurlston, CEO]
+"Even in CW, we've been surprised at our ability to price up, given what we said in the
+prepared remarks, that customers are seeing far better yields given our ability to deliver
+consistent performance on our lasers. They just simply don't deviate. The width of the spec
+is very narrow, and that results in far better transceiver yields for the customers that
+we've actually started shipping CW lasers to. As a result, we are able to command a nice
+price premium that we expect to sustain, as these Chinese if these Chinese guys come online."
+
+[Chinese laser suppliers — Michael Hurlston, CEO]
+"I caution people also, I think people are some of these Chinese laser suppliers are not
+delivering in the market today, so they have there is no recourse when they throw out these
+big numbers."
+
+[UHP laser revenue scale — Michael Hurlston, CEO]
+"I think the third quarter is when you would see the first triple digit quarter for
+ultra-high powered lasers. So, we are executing, we are shipping today. We had good
+shipments in the reported quarter, Q4. We would expect that to build somewhere in the
+$50 million range by the end of the calendar year."
+
+[Transceiver products — Michael Hurlston, CEO]
+"In cloud transceivers, we achieved record 800G shipments while initiating production of our
+next generation 1.6T modules."
+
+"We expect the 1.6T transceiver uptake to intensify starting in fiscal Q1 and sustain through
+calendar 2027."
+
+--- END OF EXCERPT ---

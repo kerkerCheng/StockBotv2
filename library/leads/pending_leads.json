@@ -4219,9 +4219,20 @@
       ],
       "published_at": "2026-08-07T07:26:37.000Z",
       "raw_text": "Earlier today, optical interconnect company Lumilens \"emerges from stealth\" at a $5.5B valuation, after raising $700m.\n\nJust as a recap from $POET / $SIVE Linkedin OSINT mapping I shared earlier, Lumilens was supplying a top 3 hyperscaler customer. \n\nSo we got confirmation of that a month later, along with the material figure that Lumilens has a \"multi-billion-dollar customer agreement\". \n\nAnd just for reference, $POET has existing contracts with Lumilens ($50m purchase order, up to $500m) + contracts with $SIVE (depending on product lines). \n\nI actually took tiny positions in POET again after reading this news, since it finally gives them visibility into extremely well funded hyperscaler suppliers (on top of Poet's really large balance sheet). \n\nBut TLDR: \n> Lumilens around similar (or even higher) valuations as Lightmatter/Ayar, bigger than markets thought with hyperscaler customers. \n> nice read through upstream on $POET (derisking) /  $SIVE.\n> Great for optical valuations in general, seeing a company go to $5.5B in 2 years.",
-      "refs": {},
+      "refs": {
+        "action_digest": "f87997010f2714942c5dea35606b95c3256d51272d1e77b6f54ff6d90f582c55",
+        "focus_company_id": "co:poet_technologies",
+        "research_action_id": "ra_8453b5ad4d5f6216824d15dde37bf825",
+        "research_outcome": "5,000 萬美元首期採購單與 5 億美元五年上限均獲一手確認；但推文『supplying a top 3 hyperscaler』屬作者 OSINT 推論，一手完全未具名，不入圖",
+        "storage_permission": "repo_full",
+        "trace_attempts_ref": "Lumilens 融資數字以 businesswire 官方稿交叉確認；POET 側採購單以 SEC 6-K Ex-99.1 一手取得",
+        "trace_origin_entity": "POET Technologies Inc. / Lumilens",
+        "trace_original_date": "2026-05-14",
+        "trace_original_url": "https://www.sec.gov/Archives/edgar/data/1437424/000117184326003487/exh_991.htm",
+        "trace_status": "original_obtained"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "action_prepared",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -5939,9 +5950,20 @@
       "first_seen": "2026-08-15T01:47:07.838102+00:00",
       "lead_id": "lead_105118dfda204e29a99f82160ad2f751",
       "published_at": "2026-05-15",
-      "refs": {},
+      "refs": {
+        "action_digest": "f87997010f2714942c5dea35606b95c3256d51272d1e77b6f54ff6d90f582c55",
+        "focus_company_id": "co:poet_technologies",
+        "research_action_id": "ra_8453b5ad4d5f6216824d15dde37bf825",
+        "research_outcome": "本 6-K 為 4 億美元 registered direct offering（資本事件，屬 Engine C 不進圖）；graph delta 來自相鄰 accession 的 Q1 業績新聞稿",
+        "storage_permission": "repo_full",
+        "trace_attempts_ref": "WebFetch 抓 SEC 得 403；改用 repo fetchers/edgar.py。6-K 本體僅封面，實質內容在 Exhibit 99.1（由 accession index.json 取得）",
+        "trace_origin_entity": "POET Technologies Inc.",
+        "trace_original_date": "2026-05-15",
+        "trace_original_url": "https://www.sec.gov/Archives/edgar/data/1437424/000117184326003486/exh_991.htm",
+        "trace_status": "original_obtained"
+      },
       "source": "edgar:POET",
-      "status": "triaged_go",
+      "status": "action_prepared",
       "themes": {},
       "title": "POET 6-K filed 2026-05-15",
       "triage": {
@@ -10203,9 +10225,20 @@
       ],
       "published_at": "2026-08-12T00:06:12.000Z",
       "raw_text": "$LITE earnings transcript TLDRs:\n\n- \"Our visibility into the timing of CPO scale-up deployments has also sharpened. We remain confident in a demand ramp for our ultra-high-power  laser chips in the second half of calendar 2027\"\n\nH2 2027 start of CPO scale up ramp confirmed from Lumentum for their lead customer. \n\n- \"We were recently given our first external light source, or ELS, module purchase for delivery by the second half of calendar 2027\" \n\nELS industry ramp timelines\n\n- \"The NPO opportunity is completely additive for us, significantly increasing the optical TAM.\"\n\nMore TAM for laser chokepoint club\n\n- \"we expect the 1.6T transceiver uptake to intensify starting in fiscal Q1 and sustain through calendar 2027.\"\n\n- \"Even in CW, we’ve been surprised at our ability to price up\"\n\nPositive pricing power for $SIVE and the other CW laser players. \n\n- \"As a result, we are able to command a nice price premium that we expect  to sustain, as these Chinese if these Chinese guys come online. \n\nI caution people also, I think people are some of these Chinese laser suppliers are not delivering in the market today, so they have there is no recourse when they throw out these big numbers. We have not seen anything like that to date in terms of their output.\"\n\nChinese players are more behind than markets expect, corroborated by $AAOI and $LITE. \n\n- \"We are way behind in our shipments, unfortunately, on high-powered lasers\"\n\n\"The demand signal has increased, and we are very much further behind relative to our ability to supply.\"\n\nExtreme demand imbalance for UHP CW laser capacity, continued demand imbalance for EML. Shipping roughly +$50M year end -> $100m+ (\"triple digit quarter\") into much larger H2 2027 and 2028 scale up demand,.\n\n- \"So what we are trying to do, I think, really in the last three months is secure even more substrate supply\" (because of demand imbalance), \"we found additional substrate help from $AXTI They are a great partner.\"\n\nHello InP substrate bottleneck. \n\nTLDR:\n\n- Lumentum CPO scale up H2 2027 shipments got confirmed, dismissed any \"delay\" news as market \"noise\". (one delay report caused so much damage, and it took Nvidia, Lumentum, and all these companies weeks to do damage control). \n- CW lasers demand ramp second half of 2027\n- Extreme demand imbalance for UHP CW laser capacity surprised Lumentum\n- UHP lasers commands very high margins and is able to price up CW laser capacity. \n- China further behind in the laser/capacity angle. \n\nBasically just validated timelines + demand/pricing for Western CW laser players. \n\nCW laser scarcity is already happening before the main volume ramp even begins...",
-      "refs": {},
+      "refs": {
+        "action_digest": "60bbb3dc7d9f0926261c0de6055cfc10d8d2b2c1939d3433baeec772aefc2688",
+        "focus_company_id": "co:lumentum",
+        "research_action_id": "ra_eb23842d34fb13c18aff5b779e8898c3",
+        "research_outcome": "推文 quote 全部屬實；但其結論『H2 2027 CPO scale-up』與原文不符——原文為客戶部署落在 calendar 2028",
+        "storage_permission": "repo_excerpt",
+        "trace_attempts_ref": "IR webcast replay 無逐字文本；改用 Investing.com 全文轉錄，逐句核對十餘條 quote 並反向確認 delay 一詞不存在",
+        "trace_origin_entity": "Lumentum Holdings Inc.",
+        "trace_original_date": "2026-08-11",
+        "trace_original_url": "https://www.investing.com/news/transcripts/earnings-call-transcript-lumentum-tops-q4-2026-forecasts-as-ai-demand-lifts-outlook-93CH-4852933",
+        "trace_status": "original_obtained"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "action_prepared",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -10779,9 +10812,14 @@
       ],
       "published_at": "2026-08-10T02:03:29.000Z",
       "raw_text": "Just some near term events:\n\n- OCP APAC tomorrow (Ayar, Lightmatter, $AMD, $NVDA) and your CPO players are giving announcements/updates.\n\nThis should be a catalyst for certain optical players.\n\n- Earnings week: with $ASTS, $RKLB reporting today (space), $LITE on Tuesday (photonics), $NBIS in the middle of the week (Neocloud), and more.\n\n- Unitree IPO subscriptions opened up today and Listing is expected this month.\n\nShould be a potential catalyst for the humanoid + robotics sector if it opens up well eg. $CCXI.\n\nFun week ahead.",
-      "refs": {},
+      "refs": {
+        "parked_reason": "行事曆型貼文本身無 claim；其中 LITE 財報已另由 lead_37c0882c 完整追源入 RA",
+        "research_outcome": "為 2026-08-10 當週事件行事曆（OCP APAC、LITE／NBIS 財報、Unitree IPO），時效已過",
+        "trace_requires_user": "false",
+        "trace_status": "lead_only_tier_4"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -15887,9 +15925,17 @@
       ],
       "published_at": "2026-07-31T19:16:17.000Z",
       "raw_text": "As a earnings recap: $AMZN, $META, $GOOGL, and $MSFT guided a 2026 combined capex forecast to ~$720-$745 Billion.\n\nUp from $695-$725B Billion previously.\n\nAmazon: $220B\nGoogle: $195B-$205B\nMeta: $130B-$145B\nMicrosoft: $175B\n\nWe've already seen significant deleveraging and retail/institutional margin liquidations (maybe it continues for more time, who knows). \n\nBut medium-long term, I'm not quite sure how anyone can be bearish the upstream semis or neoclouds. \n\nGiven each hyperscaler has flagged either compute shortages, rising cloud demand + pricing power, or increased spending for chips/networking.  \n\nMy \"bottleneck\" thesis with many of these upstream semi supply chains is that when trillions in capital flows into things from InP substrates or memory (which were both treated as cheap commodities) or even energy. \n\nLot of these current AI names that were treated as useless before in telecom cycles or even toilet sellers. \n\nGets rerated when their inflection period hits and capex flows into their balance sheets. \n\nAs seen with $NVDA GPUs past few years, memory this year, CPUs/MLCCs next few years, CPO in 2027, Glass Substrates in 2027, 800V in 2027, and so on.",
-      "refs": {},
+      "refs": {
+        "gap": "Amazon／Meta／Microsoft 各自最新 capex 指引的一手出處",
+        "parked_reason": "同屬 Engine C 時變觀測；且合計值為二手彙整，不得當一手事實",
+        "research_outcome": "Alphabet 部分與一手相符；四家合計 7,200–7,450 億美元為推文自行加總，未逐家驗證",
+        "trace_attempts_ref": "僅逐一核對 Alphabet 一手指引；其餘三家合計數字未逐家回一手 filing",
+        "trace_origin_entity": "Alphabet / Amazon / Meta / Microsoft",
+        "trace_requires_user": "false",
+        "trace_status": "partial"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -18415,9 +18461,27 @@
       ],
       "published_at": "2026-08-04T11:09:35.000Z",
       "raw_text": "A very material catalyst came about for Western supply chains from $AAOI, $SIVE / Jabil, to $LITE and Coherent: \n\nThe Trump administration is drafting a ban of new Chinese optical transceivers and DC devices. \n\nWhich would likely hit China’s Innolight, Eoptolink, and other Chinese optical interconnect supply chains. \n\n\"The agency would ban all imports of new transceiver models ​and then exempt many ⁠non-Chinese suppliers from the restrictions\"\n\nWe'll likely see a larger bifurcation of supply chains with even greater importance put on Western players.",
-      "refs": {},
+      "refs": {
+        "claimed_origin": "未標出處的逐字引號，追回為 Reuters 2026-08-04 exclusive",
+        "gap": "FCC 正式規則文本、生效範圍與豁免清單",
+        "parked_reason": "政策尚在草擬、FCC 未做最終決定；無一手可核對文件，不得作為圖中事實",
+        "research_outcome": "引號內容與 Reuters 報導一致（FCC 擬禁新型中國光收發器並豁免多數非中國供應商），但全文依據匿名消息人士，政府一手文件不存在",
+        "trace_attempts_ref": "以逐字句搜尋定位到 Reuters 獨家報導及多家轉載；FCC 尚未公布任何規則草案文本",
+        "trace_next_trigger": "FCC 公布 NPRM／規則文本或正式新聞稿",
+        "trace_origin_entity": "Reuters",
+        "trace_requires_user": "false",
+        "trace_status": "isolated_tier_3",
+        "trace_trigger_entities": [
+          "AAOI",
+          "LITE",
+          "SIVE",
+          "co:applied_optoelectronics",
+          "co:lumentum"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -19495,9 +19559,14 @@
       ],
       "published_at": "2026-08-16T18:33:00.000Z",
       "raw_text": "I think @elonmusk said it best: \n\n“Robots don’t all need to be humanoid. \n\nBut a general-purpose robot intended to replace human labor should fit the world humans already built.\n\nRoger, roger.”\n\nPersonally, I expect $TSLA Optimus form factor to converge to the right image. https://t.co/il7tND3n59 https://t.co/gKq6fGBBJG",
-      "refs": {},
+      "refs": {
+        "parked_reason": "純觀點，無可入圖的實體或關係；機器人主題目前無對應 thesis",
+        "research_outcome": "內容為 Elon Musk 發言的轉引加作者對 Optimus 外形收斂的個人推測；無供應鏈結構事實",
+        "trace_requires_user": "false",
+        "trace_status": "lead_only_tier_4"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "robotics": {
           "counter_only": false,
@@ -27068,9 +27137,30 @@
       ],
       "published_at": "2026-08-13T10:17:49.000Z",
       "raw_text": "Okay here's my take on $POET, since apparently people are celebrating on the subreddit that I took small positions. \n\n- I have 0 idea. ZERO. How they convinced shareholders to allow them dilute SO MUCH to the point:\n\nThey have an absurd ~$830m cash on hand now. \n\nAnd my guess is that they're close to done, since I would be in disbelief if they needed more. \n\nSo now... they have ~$830m to grow their business like M&A, and EV actually dropped really low recently (eg. $1.25B MC vs. $830m cash on hand), that I thought it was compelling to take a risk. \n\n- Annualized production capacity target is 12M optical engines/year for 2027, which is pretty absurd ramp. \n\nNeed to do more research into ASP for Poet's products, but maybe $125-$200? So at ~$150 ASP, $1.8B revenue ceiling. \n\nBut they're like inverse AAOI right now: no visible demand to fill all that capacity. Aside from Lumilens, which is now a highly valued hyperscaler supplier (probably Amazon or Microsoft), with billions in customer agreements. \n\nThe interesting thing is if Poet signed prepayment EML agreements with players like Mitsubishi, or CW agreements with Sivers behind the scenes with that balance sheet. \n\nAnd given the current bottleneck, players might use Poet as a workaround for supply procurement. \n\nBut basically, you have a super cash-rich company with a ton of capacity coming online. And they're not really disappearing anytime soon with their financials. \n\nI don't quite think it's as technically defensible compared to upstream laser chokepoints with something like $SIVE around the same valuation in terms of technical moat for CW lasers vs. OE packaging side. As you've seen recently with Celestial and Poet. \n\nBut maybe... there's a chance some hyperscaler or downstream company announces a volume agreement sometime in the future. and $POET takes off. And they do have the supply chain setup for ramp with that.  \n\nThat's the risk I ended up taking, but it's not exactly a clear as day long for me like $AAOI.",
-      "refs": {},
+      "refs": {
+        "gap": "12M engines/year 2027 產能目標的一手出處；ASP 假設完全未驗證",
+        "parked_reason": "財務數字屬 Engine C 時變觀測（L4），不進 Engine A；產能目標缺一手來源",
+        "related_research_action_id": "ra_8453b5ad4d5f6216824d15dde37bf825",
+        "research_outcome": "現金一手為 7.963 億美元（Q2 季末），非推文所稱約 8.3 億；1,200 萬顆年產能目標未獲一手佐證",
+        "storage_permission": "repo_full",
+        "trace_attempts_ref": "取得 POET Q1/Q2 2026 6-K Ex-99.1 一手；對 12M optical engines 年產能目標在兩份 filing 中皆無命中",
+        "trace_next_trigger": "POET 下一份 20-F 或投資人簡報明確揭露光引擎年產能目標",
+        "trace_origin_entity": "POET Technologies Inc.",
+        "trace_original_url": "https://www.sec.gov/Archives/edgar/data/1437424/000117184326005485/exh_991.htm",
+        "trace_requires_user": "false",
+        "trace_status": "partial",
+        "trace_trigger_entities": [
+          "AAOI",
+          "POET",
+          "SIVE",
+          "co:applied_optoelectronics",
+          "co:poet_technologies",
+          "co:sivers_semiconductors"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -29139,13 +29229,16 @@
       "published_at": "2026-07-31T08:57:11.000Z",
       "raw_text": "Now that I think of it more, $POET optical interposer piece is actually a little more material than I thought with $SIVE. \n\nOriginally the wording was \"readiness\" for EOY 2026. \n\nBut $POET upgraded that wording, by stating \"production\" with Sivers lasers projected EOY 2026. \n\nSo a volume orders from across $JBL to $POET, should hit in H1 2027. Which makes a bit of sense, since Sivers did raise an institutional oversubscribed round for future mass production.  \n\nOn a side note, can't believe it's already August and 5 months left until 2027... Which was my inflection window for glass substrates, CPO, 800v, and new architectures to ramp.",
       "refs": {
-        "parked_reason": "推文主張 POET 把 Sivers 光源措辭由 readiness 升級為 production，但官方一手（POET/Sivers 2025-09-30 與 2025-11-06 公告）仍只寫 production readiness targeted end of 2026；未找到 2026 年 7-8 月的新官方公告支持措辭升級。不產 RA。",
-        "trace_attempts_ref": "poet_sivers_official_pr_2025_09_and_2025_11_only",
-        "trace_next_trigger": "POET 或 Sivers 下一份官方公告／財報明確使用 production 或揭露量產訂單",
+        "gap": "POET 那家未具名 Tier 1 laser company 究竟是誰",
+        "parked_reason": "推文核心 claim 未獲一手支持且方向為誇大：把未具名的 Tier 1 laser company 讀成 Sivers（L6 Gap 4），並把 readiness 讀成 production（L11 措辭精度）",
+        "research_outcome": "查無『production』措辭升級。一手措辭自始至今為 production readiness by end of 2026；POET Q2 filing 只寫 a Tier 1 laser company，全程未具名 Sivers",
+        "trace_attempts_ref": "掃過 POET 近 5 份 6-K（含 2026-06-30／08-03／08-13）全部無 Sivers 字串；另核 2025-09-29 POET/Sivers 合作新聞稿與 Sivers 官方社群最新表述",
+        "trace_next_trigger": "POET 或 Sivers 任一方具名公告 ELS 進入 production，或 POET 揭露該 Tier 1 laser company 身分",
+        "trace_origin_entity": "POET Technologies Inc. / Sivers Semiconductors AB",
         "trace_requeue_trigger": "related_triaged_lead:lead_7f66b743a034c41f6388aa800f333e62",
         "trace_requeued_at": "2026-08-04T22:36:55.816839+00:00",
         "trace_requires_user": "false",
-        "trace_status": "isolated_tier_4",
+        "trace_status": "contradicts",
         "trace_trigger_entities": [
           "JBL",
           "POET",
@@ -29157,7 +29250,7 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -31478,9 +31571,27 @@
       ],
       "published_at": "2026-08-07T08:50:01.000Z",
       "raw_text": "I usually make fun of sellside, but Rosenblatt has pretty goated channel checks on optical names, and their reports are one of the few I like talking about. \n\n$AAOI, $LITE, $SIVE, and the laser party has started to recover around the est. timing windows. \n\neg. last month: \"Multiple short sellers told them they will likely close their positions... late July and early August\". \n\nThey might have missed that they believed $AMD would be $AAOI's first CPO customer... since AAOI said they would be missing from first-gen CPO (maybe future gen?)\n\nBut lot of their talking points about China CPO laser positioning (eg. 2-3 years behind) got corroborated word-for-word from AAOI earnings today.",
-      "refs": {},
+      "refs": {
+        "claimed_origin": "Rosenblatt Securities channel checks 報告",
+        "parked_reason": "排名與券商原句只有報告本身能證明；核心結論已有一手替代來源，不值得付費",
+        "research_outcome": "推文可驗證的部分（中國 CW 雷射落後、西方雷射供給吃緊）已由 LITE Q4 FY2026 逐字稿獨立佐證，不需依賴該報告",
+        "trace_attempts_ref": "券商報告原文屬付費 sell-side research，未取得；未授權任何採購",
+        "trace_cost_authorized": "false",
+        "trace_next_trigger": "該報告內容被公開報導逐字引用，或出現可驗證的具名 channel check 事實",
+        "trace_requires_user": "false",
+        "trace_status": "isolated_tier_3",
+        "trace_trigger_entities": [
+          "AAOI",
+          "AMD",
+          "LITE",
+          "SIVE",
+          "co:applied_optoelectronics",
+          "co:lumentum"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -33607,9 +33718,14 @@
       "media": [],
       "published_at": "2026-08-16T11:15:15.000Z",
       "raw_text": "I feel like AI investing is simpler than what people expect. \n\nBecause $NVDA + Jensen literally tells everyone what's coming. \n\nBut somehow. Almost every. single. time. Markets dismiss it until it actually happens? \n\nBe Nvidia in 2025:  Buys up EML and laser capacity. \n\nMarkets dismissing it: \"Photonics is a bubble and like quantum! ____ company is a scam with shady management\" \n\n1 year later: $LITE +678%, $AAOI +475.12%, $COHR +260.7%, $AXTI +3,843.9%.\n\n_\n\nNvidia in 2026: \n\nBuys up CW/EML capacity with LTAs. 800V shift. Extraordinary explicit about CPO shift. States Physical AI as the next theme. \n\nMarkets now: \"CW players are meme stocks! 800v, CPO is not coming anytime soon, Humanoids are not profitable!\" \n\nYeah... We'll see what happens in 2027. \n\nI think I'm putting my money on Jensen/Nvidia as the leading indicator.",
-      "refs": {},
+      "refs": {
+        "parked_reason": "無可驗證的新供應鏈事實；跟隨 Jensen 的主張屬 market timing，非 Engine A 範疇",
+        "research_outcome": "敘事型貼文；所列漲幅為既成市場資料，非新結構資訊",
+        "trace_requires_user": "false",
+        "trace_status": "lead_only_tier_4"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -34255,10 +34371,17 @@
           "serenity_30d_20260729"
         ],
         "campaign_window_end": "2026-07-29T13:46:25Z",
-        "campaign_window_start": "2026-06-29T13:46:25Z"
+        "campaign_window_start": "2026-06-29T13:46:25Z",
+        "parked_reason": "總體 capex 為帶時戳的時變觀測，依 L4 屬 Engine C，不進 Engine A 圖譜",
+        "research_outcome": "數字屬實：FY2026 capex 指引上調至 1,950–2,050 億美元（原 1,800–1,900 億），Q2 單季 capex 449 億美元，並表示 2027 將顯著增加",
+        "trace_attempts_ref": "以 Alphabet Q2 2026 財報與法說會揭露交叉確認",
+        "trace_origin_entity": "Alphabet Inc.",
+        "trace_original_date": "2026-07-22",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "$GOOGL updates FY 2026 capex guidance: To $195B-$205B. Up from $180B-$190B. Google is also expected to significantly increase capex in 2027. This is perhaps the most bullish read through on upstream semis from a hyperscaler. https://t.co/dXiI0Ien8X",
       "triage": {
