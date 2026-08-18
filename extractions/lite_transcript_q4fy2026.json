@@ -1,0 +1,551 @@
+{
+  "claims": [
+    {
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Lumentum reports that shipments are on track or ahead of plan in a subsequent earnings call, or a competing supplier qualifies and ships at volume.",
+      "id": "lite_transcript_q4fy2026_cl1",
+      "source_ids": [
+        "lite_transcript_q4fy2026_s9",
+        "lite_transcript_q4fy2026_s10"
+      ],
+      "statement": "Lumentum is materially behind on shipments of ultra-high-power lasers, signaling a supply-side bottleneck for CPO/NPO deployments.",
+      "subject_id": "prod:uhp_laser"
+    },
+    {
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "The purchase order is cancelled or deferred beyond 2H 2027, or an alternative ELS supplier wins the design-in.",
+      "id": "lite_transcript_q4fy2026_cl2",
+      "source_ids": [
+        "lite_transcript_q4fy2026_s3"
+      ],
+      "statement": "Lumentum received its first ELS module purchase order for delivery in 2H calendar 2027, marking the first commercial commitment for CPO external light source supply.",
+      "subject_id": "prod:els_module"
+    },
+    {
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Lumentum reports sufficient substrate inventory or qualifies additional suppliers eliminating supply risk in a subsequent update.",
+      "id": "lite_transcript_q4fy2026_cl3",
+      "source_ids": [
+        "lite_transcript_q4fy2026_s6",
+        "lite_transcript_q4fy2026_s7",
+        "lite_transcript_q4fy2026_s8"
+      ],
+      "statement": "Lumentum's InP substrate supply is constrained and requires sourcing from AXT as an additional supplier; further substrate sourcing may be needed if demand continues to surge.",
+      "subject_id": "mat:inp_substrate"
+    },
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "guided",
+      "disproof_condition": "Chinese laser suppliers achieve volume qualification at comparable spec levels and erode Lumentum's pricing power as reported in a subsequent period.",
+      "id": "lite_transcript_q4fy2026_cl4",
+      "source_ids": [
+        "lite_transcript_q4fy2026_s11",
+        "lite_transcript_q4fy2026_s12"
+      ],
+      "statement": "Lumentum's CW DFB laser delivers narrow-spec consistent performance, enabling superior transceiver yields for customers and supporting a price premium that is expected to sustain even as Chinese competitors enter.",
+      "subject_id": "tech:cw_dfb_laser"
+    },
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "guided",
+      "disproof_condition": "Lumentum reports UHP laser revenue below $50M by end of calendar 2026 or delays triple-digit quarter beyond Q3 FY2027.",
+      "id": "lite_transcript_q4fy2026_cl5",
+      "source_ids": [
+        "lite_transcript_q4fy2026_s13"
+      ],
+      "statement": "UHP laser quarterly revenue is expected to reach triple digits (>$100M) by Q3 FY2027, with a $50M run-rate target by end of calendar 2026.",
+      "subject_id": "prod:uhp_laser"
+    },
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "guided",
+      "disproof_condition": "Customers skip NPO and move directly to CPO, or NPO cannibalizes Lumentum's existing transceiver revenue rather than adding to it.",
+      "id": "lite_transcript_q4fy2026_cl6",
+      "source_ids": [
+        "lite_transcript_q4fy2026_s4",
+        "lite_transcript_q4fy2026_s5"
+      ],
+      "statement": "Near-packaged optics (NPO) is an additive TAM opportunity for Lumentum as an intermediate step for customers before full CPO adoption.",
+      "subject_id": "tech:npo"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:cpo",
+      "id": "e1",
+      "relation": "enables",
+      "source_ids": [
+        "lite_transcript_q4fy2026_s1"
+      ],
+      "src_id": "tech:ai_compute_buildout"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:npo",
+      "id": "e2",
+      "relation": "enables",
+      "source_ids": [
+        "lite_transcript_q4fy2026_s4"
+      ],
+      "src_id": "tech:ai_compute_buildout"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "prod:uhp_laser",
+      "id": "e3",
+      "relation": "develops",
+      "source_ids": [
+        "lite_transcript_q4fy2026_s1",
+        "lite_transcript_q4fy2026_s13"
+      ],
+      "src_id": "co:lumentum"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "prod:els_module",
+      "id": "e4",
+      "relation": "develops",
+      "source_ids": [
+        "lite_transcript_q4fy2026_s3"
+      ],
+      "src_id": "co:lumentum"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "tech:cpo",
+      "id": "e5",
+      "relation": "is_component_of",
+      "source_ids": [
+        "lite_transcript_q4fy2026_s1"
+      ],
+      "src_id": "prod:uhp_laser"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "tech:cpo",
+      "id": "e6",
+      "relation": "is_component_of",
+      "source_ids": [
+        "lite_transcript_q4fy2026_s3"
+      ],
+      "src_id": "prod:els_module"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "tech:cpo",
+      "id": "e7",
+      "relation": "is_component_of",
+      "source_ids": [
+        "lite_transcript_q4fy2026_s3"
+      ],
+      "src_id": "tech:external_laser_source"
+    },
+    {
+      "attributes": {
+        "qualification_status": "qualifying",
+        "sole_source": false,
+        "substitutability": 4
+      },
+      "confidence": 0.9,
+      "dst_id": "co:lumentum",
+      "id": "e9",
+      "relation": "supplies_to",
+      "source_ids": [
+        "lite_transcript_q4fy2026_s6",
+        "lite_transcript_q4fy2026_s7"
+      ],
+      "src_id": "co:axt"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "prod:uhp_laser",
+      "id": "e10",
+      "relation": "is_component_of",
+      "source_ids": [
+        "lite_transcript_q4fy2026_s6"
+      ],
+      "src_id": "mat:inp_substrate"
+    },
+    {
+      "attributes": {
+        "sole_source": false,
+        "substitutability": 4
+      },
+      "confidence": 0.9,
+      "dst_id": "mat:inp_substrate",
+      "id": "e11",
+      "relation": "depends_on",
+      "source_ids": [
+        "lite_transcript_q4fy2026_s6",
+        "lite_transcript_q4fy2026_s8"
+      ],
+      "src_id": "co:lumentum"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:cpo",
+      "id": "e12",
+      "relation": "enables",
+      "source_ids": [
+        "lite_transcript_q4fy2026_s4"
+      ],
+      "src_id": "tech:npo"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "prod:800g_transceiver",
+      "id": "e13",
+      "relation": "develops",
+      "source_ids": [
+        "lite_transcript_q4fy2026_s14"
+      ],
+      "src_id": "co:lumentum"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "prod:1p6t_transceiver",
+      "id": "e14",
+      "relation": "develops",
+      "source_ids": [
+        "lite_transcript_q4fy2026_s14",
+        "lite_transcript_q4fy2026_s15"
+      ],
+      "src_id": "co:lumentum"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "tech:cw_dfb_laser",
+      "id": "e15",
+      "relation": "develops",
+      "source_ids": [
+        "lite_transcript_q4fy2026_s11"
+      ],
+      "src_id": "co:lumentum"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:npo",
+      "id": "e17",
+      "relation": "is_component_of",
+      "source_ids": [
+        "lite_transcript_q4fy2026_s4"
+      ],
+      "src_id": "prod:uhp_laser"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "LITE"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 5
+      },
+      "confidence": 0.9,
+      "id": "co:lumentum",
+      "name": "Lumentum",
+      "role": "bottleneck_supplier",
+      "source_ids": [
+        "lite_transcript_q4fy2026_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "CPO"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 5
+      },
+      "confidence": 0.9,
+      "id": "tech:cpo",
+      "name": "Co-Packaged Optics",
+      "role": null,
+      "source_ids": [
+        "lite_transcript_q4fy2026_s1",
+        "lite_transcript_q4fy2026_s2"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "ELS"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 5
+      },
+      "confidence": 0.9,
+      "id": "tech:external_laser_source",
+      "name": "External Laser Source",
+      "role": null,
+      "source_ids": [
+        "lite_transcript_q4fy2026_s3"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "CW laser"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 5
+      },
+      "confidence": 0.9,
+      "id": "tech:cw_dfb_laser",
+      "name": "High-power CW DFB laser",
+      "role": null,
+      "source_ids": [
+        "lite_transcript_q4fy2026_s11"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "InP substrate"
+      ],
+      "attributes": {
+        "concentration_score": 4,
+        "ramp_difficulty_intrinsic": 5
+      },
+      "confidence": 0.9,
+      "id": "mat:inp_substrate",
+      "name": "Indium Phosphide (InP) substrate",
+      "role": null,
+      "source_ids": [
+        "lite_transcript_q4fy2026_s6",
+        "lite_transcript_q4fy2026_s7",
+        "lite_transcript_q4fy2026_s8"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "end_demand",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:ai_compute_buildout",
+      "name": "AI training/inference cluster buildout",
+      "role": null,
+      "source_ids": [
+        "lite_transcript_q4fy2026_s1"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "NPO",
+        "near-packaged optics"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 3
+      },
+      "confidence": 0.9,
+      "id": "tech:npo",
+      "name": "Near-Packaged Optics",
+      "role": null,
+      "source_ids": [
+        "lite_transcript_q4fy2026_s4",
+        "lite_transcript_q4fy2026_s5"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "UHP laser",
+        "ultra-high powered lasers",
+        "high-powered lasers"
+      ],
+      "attributes": {
+        "intrinsic_cycle_time_weeks": null,
+        "ramp_difficulty_intrinsic": 5
+      },
+      "confidence": 0.9,
+      "id": "prod:uhp_laser",
+      "name": "Ultra-High-Power laser chips",
+      "role": null,
+      "source_ids": [
+        "lite_transcript_q4fy2026_s1",
+        "lite_transcript_q4fy2026_s9",
+        "lite_transcript_q4fy2026_s13"
+      ],
+      "type": "Product"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "ELS module"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 5
+      },
+      "confidence": 0.9,
+      "id": "prod:els_module",
+      "name": "External Light Source module",
+      "role": null,
+      "source_ids": [
+        "lite_transcript_q4fy2026_s3"
+      ],
+      "type": "Product"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "800G modules"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "prod:800g_transceiver",
+      "name": "800G cloud transceiver",
+      "role": null,
+      "source_ids": [
+        "lite_transcript_q4fy2026_s14"
+      ],
+      "type": "Product"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "1.6T modules"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "prod:1p6t_transceiver",
+      "name": "1.6T transceiver module",
+      "role": null,
+      "source_ids": [
+        "lite_transcript_q4fy2026_s14",
+        "lite_transcript_q4fy2026_s15"
+      ],
+      "type": "Product"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "AXT"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:axt",
+      "name": "AXT, Inc.",
+      "role": "material_base",
+      "source_ids": [
+        "lite_transcript_q4fy2026_s6",
+        "lite_transcript_q4fy2026_s7"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "lite_transcript_q4fy2026",
+    "evidence_tier": 2,
+    "origin_entity": "Lumentum Holdings Inc.",
+    "permission_basis": "第三方公開轉錄（Investing.com）之免費可讀頁面；依 source-trace 僅保存驗證所需的有限逐字 quote 與 locator，不重製全文，evidence tier 上限 2。",
+    "published_at": "2026-08-11",
+    "source_type": "transcript",
+    "storage_permission": "repo_excerpt",
+    "title": "Lumentum Q4 FY2026 Earnings Call (curated excerpt)",
+    "url": "https://www.investing.com/news/transcripts/earnings-call-transcript-lumentum-tops-q4-2026-forecasts-as-ai-demand-lifts-outlook-93CH-4852933"
+  },
+  "sources": [
+    {
+      "id": "lite_transcript_q4fy2026_s1",
+      "locator": "Prepared remarks, CEO Michael Hurlston — CPO timing",
+      "quote": "We remain confident in a demand ramp for our ultra-high-power laser chips in the second half of calendar 2027 ahead of customer scale-up deployments in calendar 2028."
+    },
+    {
+      "id": "lite_transcript_q4fy2026_s2",
+      "locator": "Prepared remarks / Q&A, CEO Michael Hurlston — CPO lead customer",
+      "quote": "Our lead CPO customer's production plans remain very much on track, and their demand signal has increased since our last update."
+    },
+    {
+      "id": "lite_transcript_q4fy2026_s3",
+      "locator": "Prepared remarks, CEO Michael Hurlston — ELS module purchase",
+      "quote": "We were recently given our first external light source, or ELS, module purchase for delivery by the second half of calendar 2027."
+    },
+    {
+      "id": "lite_transcript_q4fy2026_s4",
+      "locator": "Prepared remarks, CEO Michael Hurlston — near-packaged optics",
+      "quote": "The rest of our customer base is currently prioritizing near-packaged architectures as an intermediate step to the eventual adoption of CPO."
+    },
+    {
+      "id": "lite_transcript_q4fy2026_s5",
+      "locator": "Prepared remarks, CEO Michael Hurlston — NPO TAM",
+      "quote": "The NPO opportunity is completely additive for us, significantly increasing the optical TAM."
+    },
+    {
+      "id": "lite_transcript_q4fy2026_s6",
+      "locator": "Q&A, CEO Michael Hurlston — substrate supply / AXT",
+      "quote": "What we are trying to do ... is secure even more substrate supply ... we went out and we found additional substrate help from AXT, Inc."
+    },
+    {
+      "id": "lite_transcript_q4fy2026_s7",
+      "locator": "Q&A, CEO Michael Hurlston — substrate demand surge",
+      "quote": "They are a great partner ... and we think we are going to need their help just given the surge in demand."
+    },
+    {
+      "id": "lite_transcript_q4fy2026_s8",
+      "locator": "Q&A, CEO Michael Hurlston — further substrate sourcing",
+      "quote": "If this vector continues, we are probably going to need to look for more help on substrate."
+    },
+    {
+      "id": "lite_transcript_q4fy2026_s9",
+      "locator": "Q&A, CEO Michael Hurlston — high-power laser supply shortfall",
+      "quote": "We are way behind in our shipments, unfortunately, on high-powered lasers."
+    },
+    {
+      "id": "lite_transcript_q4fy2026_s10",
+      "locator": "Q&A, CEO Michael Hurlston — high-power laser further behind",
+      "quote": "If one vector has really changed since the last time you and I talked, I'd say it's your high-powered lasers, and we are very much further behind."
+    },
+    {
+      "id": "lite_transcript_q4fy2026_s11",
+      "locator": "Q&A, CEO Michael Hurlston — CW laser pricing premium",
+      "quote": "Even in CW, we've been surprised at our ability to price up ... customers are seeing far better yields given our ability to deliver consistent performance on our lasers. They just simply don't deviate."
+    },
+    {
+      "id": "lite_transcript_q4fy2026_s12",
+      "locator": "Q&A, CEO Michael Hurlston — Chinese laser suppliers",
+      "quote": "I think people are some of these Chinese laser suppliers are not delivering in the market today, so they have there is no recourse when they throw out these big numbers."
+    },
+    {
+      "id": "lite_transcript_q4fy2026_s13",
+      "locator": "Q&A, CEO Michael Hurlston — UHP laser revenue ramp",
+      "quote": "I think the third quarter is when you would see the first triple digit quarter for ultra-high powered lasers ... we would expect that to build somewhere in the $50 million range by the end of the calendar year."
+    },
+    {
+      "id": "lite_transcript_q4fy2026_s14",
+      "locator": "Prepared remarks, CEO Michael Hurlston — 800G record shipments",
+      "quote": "In cloud transceivers, we achieved record 800G shipments while initiating production of our next generation 1.6T modules."
+    },
+    {
+      "id": "lite_transcript_q4fy2026_s15",
+      "locator": "Prepared remarks, CEO Michael Hurlston — 1.6T ramp",
+      "quote": "We expect the 1.6T transceiver uptake to intensify starting in fiscal Q1 and sustain through calendar 2027."
+    }
+  ]
+}
