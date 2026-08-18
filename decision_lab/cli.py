@@ -133,6 +133,14 @@ def build_parser() -> argparse.ArgumentParser:
     choice.add_argument("--reason")
     choice.add_argument("--confirmation-ref", required=True)
     choice.add_argument("--explicit", action="store_true")
+    choice.add_argument(
+        "--user-sized",
+        action="store_true",
+        help=(
+            "尺寸由使用者決定，不與系統 live_supported_range 比較（--reason 必填）。"
+            "5%% 單筆上限與 ETF 槓桿 cap 仍硬擋。"
+        ),
+    )
     choice.add_argument("--format", choices=("json", "markdown"), default="json")
 
     fill = subcommands.add_parser(
@@ -388,11 +396,13 @@ def run(
                 explicit=args.explicit,
                 reason=args.reason,
                 confirmation_ref=args.confirmation_ref,
+                user_sized=args.user_sized,
             )
             payload = {
                 "status": "recorded",
                 "choice_id": choice_id,
                 "decision_id": args.decision_id,
+                "sizing_source": "user" if args.user_sized else "system",
             }
             _render(
                 payload,

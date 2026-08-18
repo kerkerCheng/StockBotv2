@@ -36,7 +36,63 @@ from .redaction import sensitive_payload_path
 
 
 _SCHEMA_PATH = Path(__file__).with_name("schema.sql")
-_SCHEMA_VERSION = "7"
+_SCHEMA_VERSION = "8"
+
+# `user_sized` 仍然硬擋的 blocker。判準來自 `AGENTS.md`「資本與風控」：
+# **只有 ETF 槓桿 cap 與 5% 單筆上限會把 live supported range 歸零，其餘曝險只記錄／警告。**
+# 這三碼是那句話在 `sizing.py` 的實作對應（`config/decision_blockers.json` 亦標 fatal）。
+#
+# ⚠ **`portfolio_leverage_unavailable` 刻意不在此列**，儘管它在
+# `config/decision_blockers.json` 標為 fatal。首版曾納入（理由是「無法驗證的上限不能宣稱
+# 已執行」），但實測當場推翻：它在乾淨測試 fixture 與**每一筆**真實 decision 上都亮，
+# 觸發率近 100%——那是 `capital-expression-direction` §3.5 的「恆亮」測試，零鑑別力。
+#
+# 更關鍵的是它過不了機制測試（D3）：說不出「這碼亮起時，這檔標的更可能變壞」。
+# 它的實際語意是 `sizing.py` 一個寬 except 捕捉到的三種情況之一——NAV 讀不到、
+# beta policy 載入失敗、component 組不起來（又一個 L12，已登記 ROADMAP）。
+# 那是管線狀態，不是風險判斷，依 D3 不得有資本否決權。
+#
+# 附帶理由：ETF 槓桿 cap 管的是 beta sleeve 的組合結構，買一檔 alpha 個股（AXTI／LITE）
+# 根本不改變槓桿比率。拿算不出來的 beta 控制去擋 alpha 決策是把控制掛錯層。
+# 下面三碼保留，因為它們的語意是「某個上限**確實已經**觸頂」，不是「算不出來」。
+_HARD_CAP_BLOCKERS = frozenset(
+    {
+        "single_position_nav_cap_reached",
+        "etf_leverage_nominal_cap_reached",
+        "etf_leverage_effective_cap_reached",
+    }
+)
+
+
+def _assert_user_sized_within_capital_caps(
+    sizing: Mapping[str, Any], selected_weight: float
+) -> None:
+    """`user_sized` 不比 supported_range，但三個真正的資本上限照樣硬擋。
+
+    刻意**不**檢查研究完整度、五軸 ceiling 或 coverage blocker——那些是研究進度，
+    不是風險判斷（D2／D3）。實測依據：72 筆 decision 裡三個資本上限一次都沒 binding 過，
+    100% 的歸零由資料與研究完整度造成。
+    """
+
+    blocked = sorted(_HARD_CAP_BLOCKERS.intersection(sizing.get("live_blockers") or ()))
+    if blocked:
+        raise ValueError(f"user_sized choice blocked by capital caps: {', '.join(blocked)}")
+
+    # 單筆 NAV 上限取自該 decision 自己凍結的 constraint trace，不重算——point-in-time
+    # 契約要求用當時的 policy 版本，且重算需要重讀 holdings／NAV。
+    cap = None
+    for entry in sizing.get("constraint_trace") or ():
+        if entry.get("lane") == "live" and entry.get("constraint") == "single_position_cap":
+            cap = entry.get("cap_weight")
+            break
+    if cap is None or not isinstance(cap, (int, float)) or isinstance(cap, bool):
+        raise ValueError(
+            "user_sized choice requires a frozen single_position_cap in the decision trace"
+        )
+    if selected_weight > float(cap) + 1e-12:
+        raise ValueError(
+            f"user_sized weight {selected_weight:.4f} exceeds single position cap {float(cap):.4f}"
+        )
 
 
 def _canonical_json(payload: Mapping[str, Any]) -> str:
@@ -1745,12 +1801,27 @@ class DecisionStore:
         confirmation_ref: str | None = None,
         approved_action_id: str | None = None,
         force_override: bool = False,
+        user_sized: bool = False,
     ) -> str:
+        """記錄一筆 live 選擇。
+
+        `user_sized=True` 走 2026-08-18 定案的 alpha live 路徑：**尺寸來源是使用者，
+        不是系統**，因此不與 `live_supported_range` 比較。這不是放寬——分開之後兩邊
+        各自更嚴（L12）：`user_sized` 改為硬擋 `_HARD_CAP_BLOCKERS`＋單筆 NAV 上限，
+        而研究完整度／五軸／coverage 那些 blocker 不再參與（D2：不確定性用尺寸承擔，
+        不用 gate 禁止參與）。理由與交換條件見
+        `docs/brainstorms/2026-08-18-alpha-live-user-sized-requirements.md`。
+        """
+
         decided_at = _timestamp(decided_at, "decided_at")
         if not math.isfinite(selected_weight) or selected_weight < 0:
             raise ValueError("selected_weight must be finite and non-negative")
         if confirmation_ref is not None and not confirmation_ref.strip():
             raise ValueError("confirmation_ref must be non-empty when provided")
+        if user_sized and force_override:
+            raise ValueError("user_sized and force_override are mutually exclusive")
+        if user_sized and (not reason or not reason.strip()):
+            raise ValueError("user_sized choice requires an explicit reason")
         with immediate_transaction(self._conn):
             decision = self._conn.execute(
                 """
@@ -1766,13 +1837,18 @@ class DecisionStore:
             ):
                 raise ValueError("live choice cannot predate its decision")
             payload = json.loads(decision["payload_json"])
-            lower, upper = payload["sizing"]["live_supported_range"]
-            if selected_weight > float(upper) + 1e-12 and not force_override:
+            sizing = payload["sizing"]
+            lower, upper = sizing["live_supported_range"]
+            if user_sized:
+                _assert_user_sized_within_capital_caps(sizing, selected_weight)
+            elif selected_weight > float(upper) + 1e-12 and not force_override:
                 raise ValueError("selected live weight exceeds supported cap")
             if force_override and (not reason or not reason.strip() or not approved_action_id):
                 raise ValueError("live override requires reason and approved action")
             choice_type = (
-                "override"
+                "user_sized"
+                if user_sized
+                else "override"
                 if force_override
                 else "skipped"
                 if selected_weight == 0
@@ -1794,8 +1870,8 @@ class DecisionStore:
                 """
                 INSERT OR IGNORE INTO live_choices (
                     choice_id, decision_id, selected_weight, choice_type,
-                    reason, approved_action_id, decided_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                    reason, approved_action_id, system_supported_upper, decided_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     choice_id,
@@ -1804,6 +1880,7 @@ class DecisionStore:
                     choice_type,
                     reason,
                     approved_action_id,
+                    float(upper),
                     decided_at,
                 ),
             )

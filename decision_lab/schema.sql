@@ -56,13 +56,24 @@ CREATE TABLE IF NOT EXISTS system_decisions (
     UNIQUE (decision_id, decision_digest)
 );
 
+-- `choice_type` 的前四種全部是**相對於系統區間**定義的（接受／低於下緣／略過／覆寫），
+-- 字彙裡沒有「系統對尺寸沒有意見、由使用者自己定」這個選項。2026-08-15 的 Alpha 呈現
+-- 契約定案「系統不呈現尺寸、買多少由使用者決定」之後，這個缺口讓每一筆真實下單都被迫
+-- 走 `override`——設計成例外的路徑變成唯一的路徑（L12：一個欄位兩種語意）。
+-- `user_sized` 是把那兩種語意分開後的第五種；分開之後兩邊各自更嚴，見
+-- `store.record_live_choice` 的 HARD_CAP 檢查。
+--
+-- `system_supported_upper` 保存下單當時系統自己的區間上界。它**不是** gate（user_sized
+-- 不與它比較），而是歸因資料：讓記分板日後能回答「使用者比系統的數字多下了多少、
+-- 結果如何」。缺它就等於把系統的意見丟掉，之後永遠無法比較人與系統。
 CREATE TABLE IF NOT EXISTS live_choices (
     choice_id          TEXT PRIMARY KEY,
     decision_id        TEXT NOT NULL REFERENCES system_decisions(decision_id),
     selected_weight    REAL NOT NULL CHECK (selected_weight >= 0),
-    choice_type        TEXT NOT NULL CHECK (choice_type IN ('accepted', 'skipped', 'below_range', 'override')),
+    choice_type        TEXT NOT NULL CHECK (choice_type IN ('accepted', 'skipped', 'below_range', 'override', 'user_sized')),
     reason             TEXT,
     approved_action_id TEXT,
+    system_supported_upper REAL,
     decided_at         TEXT NOT NULL,
     created_at         TEXT NOT NULL DEFAULT (datetime('now')),
     UNIQUE (decision_id, selected_weight, decided_at)
@@ -237,5 +248,5 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_paper_events_approved_action
     ON paper_events (approved_action_id)
     WHERE approved_action_id IS NOT NULL;
 INSERT INTO decision_store_meta (key, value)
-VALUES ('schema_version', '7')
+VALUES ('schema_version', '8')
 ON CONFLICT(key) DO NOTHING;

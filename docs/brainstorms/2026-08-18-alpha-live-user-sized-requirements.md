@@ -131,10 +131,44 @@ ROADMAP「進行中」同時標了一條**從未被驗過**的警告：錨點日
 
 ---
 
-## 6. 待決（實作前要問使用者的）
+## 6. 實作紀錄（2026-08-18）
 
-1. **`user_sized` 是否需要 `prepare_action` ＋ native approval 兩段式？**
-   現行 `override` 走兩段（prepare → apply）。兩段比較安全，但也比較煩；
-   考量到這是**每次真實下單都會走**的路徑，一段式（explicit flag ＋必填 reason）可能更合理。
-2. **第一筆要拿哪一檔試？** 建議 AXTI 或 LITE——兩者 paper 都是 ELIGIBLE、
-   財務 gate 已過、且 Shadow 錨點與價格序列都健康，回溯歸因最乾淨。
+**已完成驗收條件 1–3。** 使用者選定**一段式**（`--explicit` ＋必填 `--reason`），
+理由是這是**每次真實下單都會走**的路徑而非例外路徑，兩段式的摩擦會讓人乾脆不記錄，
+而不被記錄的 fill 等於記分板永遠答不出來。
+
+落點：`decision_lab/store.py`（`_HARD_CAP_BLOCKERS`、`_assert_user_sized_within_capital_caps`、
+`record_live_choice(user_sized=...)`）、`execution.py`、`cli.py --user-sized`、
+`schema.sql` v7→v8、`scripts/migrate_decision_store_v8.py`。
+測試：`tests/test_decision_execution.py` 兩條，全 suite 942 passed / 2 skipped。
+
+### 實作時被實測推翻的一個設計
+
+首版把 **`portfolio_leverage_unavailable` 納入硬擋**，理由是「無法驗證的上限不能宣稱已執行」，
+聽起來像正確的 fail-closed。**測試當場推翻**：它在乾淨 fixture 與**每一筆**真實 decision
+上都亮——觸發率近 100%，正是 `capital-expression-direction` §3.5 的**恆亮測試**（零鑑別力）。
+
+更關鍵的是它過不了**機制測試**（D3）：說不出「這碼亮起時，這檔標的更可能變壞」。
+它實際上是 `sizing.py` 一個寬 except 捕捉到的三種情況之一（NAV 讀不到／beta policy 載入失敗／
+component 組不起來），是管線狀態不是風險判斷。附帶理由：ETF 槓桿 cap 管的是 beta sleeve
+的組合結構，買一檔 alpha 個股根本不改變槓桿比率——拿算不出來的 beta 控制去擋 alpha 決策，
+是把控制掛錯層。
+
+**這件事本身就是 D6 的示範：一個看起來更嚴格、寫進 config 標了 `fatal` 的 blocker，
+在第一次被實際量測時就沒通過。** 判斷已用一條測試鎖住，未來想加回去會先撞到理由。
+
+### 還沒做的（驗收條件 4–5）
+
+第 4 項（`live_execution_reports` 0 → ≥1）**必須由一筆真實下單觸發**，不能靠測試偽造。
+第 5 項（outcome 報表分辨 live／paper cohort）等有第一筆 fill 之後才有東西可分辨。
+
+**第一筆建議拿 AXTI 或 LITE 試**：兩者 paper 都是 ELIGIBLE、財務 gate 已過、
+Shadow 錨點與價格序列健康，回溯歸因最乾淨。實際流程：
+
+```powershell
+& '.venv\Scripts\python.exe' -m decision_lab record-choice <decision_id> `
+  --selected-weight 0.01 --explicit --user-sized `
+  --reason "<為什麼是這個尺寸>" --confirmation-ref "<你自己的紀錄編號>"
+& '.venv\Scripts\python.exe' -m decision_lab record-fill <decision_id> `
+  --execution-ref "<券商成交編號>" --shares <股數> --price <成交價> --currency USD --explicit
+```

@@ -125,6 +125,7 @@ def record_live_choice(
     explicit: bool,
     reason: str | None = None,
     confirmation_ref: str | None = None,
+    user_sized: bool = False,
 ) -> str:
     if not explicit:
         raise ExecutionError("live choice requires explicit user confirmation")
@@ -135,6 +136,7 @@ def record_live_choice(
             decided_at=decided_at,
             reason=reason,
             confirmation_ref=confirmation_ref,
+            user_sized=user_sized,
         )
     except (KeyError, ValueError) as exc:
         raise ExecutionError(str(exc)) from exc

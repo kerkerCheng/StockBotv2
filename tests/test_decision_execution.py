@@ -17,7 +17,7 @@ from decision_lab.execution import (
     record_live_choice,
     record_live_fill,
 )
-from decision_lab.store import DecisionStore
+from decision_lab.store import DecisionStore, _assert_user_sized_within_capital_caps
 from paper_portfolio.ledger import replay_decision_store_events
 from storage.relational import initialize_private_root
 from tests.test_decision_context import NOW, complete_inputs
@@ -491,6 +491,142 @@ def test_live_choice_and_fill_require_explicit_user_facts_and_do_not_rewrite_sys
         assert choice_id
         assert store.get_decision(decision.decision_id)["decision_digest"] == original_digest
         assert store.table_count("live_execution_reports") == 0
+    finally:
+        store.close()
+
+
+def test_user_sized_choice_bypasses_supported_range_but_not_capital_caps(
+    tmp_path: Path,
+) -> None:
+    """驗收條件 1–3（`2026-08-18-alpha-live-user-sized-requirements` §4）。
+
+    `user_sized` 的尺寸來源是使用者，不與 `live_supported_range` 比較——因為
+    2026-08-15 起系統已不對使用者呈現尺寸。但這**不是**放寬：分開之後兩邊各自更嚴
+    （L12），單筆 NAV 上限與 ETF 槓桿 cap 照樣硬擋。
+    """
+
+    store = _store(tmp_path)
+    try:
+        bundle, coverage = _bundle(store, "user-sized")
+        decision = assess_probe(
+            store, bundle, coverage, _assessment(),
+            idempotency_key="assess:user-sized", effective_at=NOW,
+        )
+        sizing = store.get_decision(decision.decision_id)["payload"]["sizing"]
+        supported_upper = float(sizing["live_supported_range"][1])
+        single_position_cap = next(
+            e["cap_weight"]
+            for e in sizing["constraint_trace"]
+            if e["lane"] == "live" and e["constraint"] == "single_position_cap"
+        )
+
+        # 驗收 3：研究完整度／lane blocker 讓系統區間歸零，user_sized 仍可記錄。
+        # 這一筆若被擋，就代表 gate 又在用研究進度否決資本（D2 要修掉的正是這個）。
+        assert supported_upper < single_position_cap
+        chosen = single_position_cap / 2.0
+        assert chosen > supported_upper
+
+        with pytest.raises(ExecutionError, match="reason"):
+            record_live_choice(
+                store, decision.decision_id, selected_weight=chosen,
+                decided_at=NOW, explicit=True, user_sized=True,
+            )
+
+        choice_id = record_live_choice(
+            store,
+            decision.decision_id,
+            selected_weight=chosen,
+            decided_at=NOW,
+            explicit=True,
+            user_sized=True,
+            reason="thesis 已成立，依自己的判斷定尺寸",
+        )
+        assert choice_id
+
+        row = store._conn.execute(
+            "SELECT choice_type, selected_weight, system_supported_upper "
+            "FROM live_choices WHERE choice_id = ?",
+            (choice_id,),
+        ).fetchone()
+        assert row["choice_type"] == "user_sized"
+        # 系統當時的意見必須被保存下來，否則日後無法比較「人 vs 系統」。
+        assert row["system_supported_upper"] == pytest.approx(supported_upper)
+        assert row["selected_weight"] > row["system_supported_upper"]
+
+        # 驗收 2：剛好等於單筆上限可以，超過不行。
+        record_live_choice(
+            store, decision.decision_id, selected_weight=single_position_cap,
+            decided_at="2026-07-21T12:06:00+00:00", explicit=True, user_sized=True,
+            reason="押到單筆上限",
+        )
+        with pytest.raises(ExecutionError, match="single position cap"):
+            record_live_choice(
+                store, decision.decision_id,
+                selected_weight=single_position_cap + 0.001,
+                decided_at="2026-07-21T12:07:00+00:00", explicit=True, user_sized=True,
+                reason="想超過上限",
+            )
+
+        # user_sized 與 override 是兩條互斥路徑，不得疊用來繞過彼此的要求。
+        with pytest.raises(ValueError, match="mutually exclusive"):
+            store.record_live_choice(
+                decision_id=decision.decision_id, selected_weight=chosen,
+                decided_at="2026-07-21T12:08:00+00:00", user_sized=True,
+                force_override=True, reason="兩個都要", approved_action_id="pa_x",
+            )
+    finally:
+        store.close()
+
+
+def test_user_sized_choice_is_still_blocked_by_real_capital_caps(tmp_path: Path) -> None:
+    """槓桿／單筆上限已觸頂時，`user_sized` 必須被擋——那才是真正的風控。
+
+    對照組是上一個測試：研究完整度 blocker 擋不住 user_sized，資本上限擋得住。
+    兩者都成立，`user_sized` 才算「分開之後兩邊更嚴」而不是整體放寬。
+    """
+
+    store = _store(tmp_path)
+    try:
+        bundle, coverage = _bundle(store, "user-sized-capped")
+        decision = assess_probe(
+            store, bundle, coverage, _assessment(),
+            idempotency_key="assess:user-sized-capped", effective_at=NOW,
+        )
+        stored = store.get_decision(decision.decision_id)
+        sizing = deepcopy(stored["payload"]["sizing"])
+
+        for blocker in (
+            "single_position_nav_cap_reached",
+            "etf_leverage_nominal_cap_reached",
+            "etf_leverage_effective_cap_reached",
+        ):
+            capped = deepcopy(sizing)
+            capped["live_blockers"] = [blocker]
+            with pytest.raises(ValueError, match="capital caps"):
+                _assert_user_sized_within_capital_caps(capped, 0.01)
+
+        # `portfolio_leverage_unavailable` 雖標 fatal，但**不得**擋 user_sized。
+        # 它在每一筆真實 decision 上都亮（恆亮＝零鑑別力），且說不出「亮起時標的更可能
+        # 變壞」的機制——那是管線狀態不是風險判斷（D3）。這一行鎖住那個判斷，
+        # 若未來有人想把它加回 _HARD_CAP_BLOCKERS，會先撞到這裡並被迫重讀理由。
+        unavailable = deepcopy(sizing)
+        unavailable["live_blockers"] = ["portfolio_leverage_unavailable"]
+        _assert_user_sized_within_capital_caps(unavailable, 0.01)
+
+        # 沒有資本上限 blocker 時，同一筆權重就通得過——證明擋下來的是那四碼，
+        # 不是別的東西順帶擋掉的。
+        clean = deepcopy(sizing)
+        clean["live_blockers"] = ["execution_intent_paper_only", "holdings_unconfirmed"]
+        _assert_user_sized_within_capital_caps(clean, 0.01)
+
+        # 凍結的 trace 缺 single_position_cap 時 fail closed：無法驗證的上限
+        # 不得被當成已通過。
+        no_cap = deepcopy(clean)
+        no_cap["constraint_trace"] = [
+            e for e in no_cap["constraint_trace"] if e["constraint"] != "single_position_cap"
+        ]
+        with pytest.raises(ValueError, match="frozen single_position_cap"):
+            _assert_user_sized_within_capital_caps(no_cap, 0.01)
     finally:
         store.close()
 
