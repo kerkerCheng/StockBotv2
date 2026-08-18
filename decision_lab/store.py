@@ -63,9 +63,24 @@ _HARD_CAP_BLOCKERS = frozenset(
     }
 )
 
+# `user_sized` 可以沿用一筆 decision 多久。
+#
+# ⚠ 這個上界是必要的，不是保守癖。資本上限的判定**全部來自凍結快照**：單筆 NAV 上限來自
+# `constraint_trace`、已持有部位來自 `live_current_position`、觸頂與否來自 `live_blockers`。
+# 沒有時效上界時，一筆三個月前的 decision 仍會說「未觸頂」，而期間使用者可能已買到 4.9%
+# NAV——系統會放行再買一次，疊出遠超 5% 的部位（2026-08-18 紅隊審查發現）。
+# holdings 由 Google Sheet 每日更新，所以「凍結超過一週」等於拿過期的投組狀態當風控依據。
+#
+# 解法不是放寬，是 `decision_lab reassess` 重新凍結一次——那很便宜，且順便刷新五軸與行情。
+USER_SIZED_MAX_DECISION_AGE_DAYS = 7
+
 
 def _assert_user_sized_within_capital_caps(
-    sizing: Mapping[str, Any], selected_weight: float
+    sizing: Mapping[str, Any],
+    selected_weight: float,
+    *,
+    decision_effective_at: str | None = None,
+    decided_at: str | None = None,
 ) -> None:
     """`user_sized` 不比 supported_range，但三個真正的資本上限照樣硬擋。
 
@@ -78,6 +93,19 @@ def _assert_user_sized_within_capital_caps(
     if blocked:
         raise ValueError(f"user_sized choice blocked by capital caps: {', '.join(blocked)}")
 
+    # 凍結快照有時效。見 USER_SIZED_MAX_DECISION_AGE_DAYS 的註解。
+    if decision_effective_at and decided_at:
+        age_days = (
+            _time(decided_at, "decided_at")
+            - _time(decision_effective_at, "decision.effective_at")
+        ).total_seconds() / 86400.0
+        if age_days > USER_SIZED_MAX_DECISION_AGE_DAYS:
+            raise ValueError(
+                f"user_sized choice needs a decision frozen within "
+                f"{USER_SIZED_MAX_DECISION_AGE_DAYS} days; this one is {age_days:.1f} days old"
+                " — run `decision_lab reassess` to refresh holdings and caps"
+            )
+
     # 單筆 NAV 上限取自該 decision 自己凍結的 constraint trace，不重算——point-in-time
     # 契約要求用當時的 policy 版本，且重算需要重讀 holdings／NAV。
     cap = None
@@ -89,9 +117,16 @@ def _assert_user_sized_within_capital_caps(
         raise ValueError(
             "user_sized choice requires a frozen single_position_cap in the decision trace"
         )
-    if selected_weight > float(cap) + 1e-12:
+
+    # ⚠ 上限管的是**部位總量**，不是單次買入量。首版只比 `selected_weight`，於是已持有
+    # 4% 的標的還能再買 5%。`live_current_position` 就在同一份 sizing 裡，沒有理由不看。
+    current = sizing.get("live_current_position")
+    held = float(current) if isinstance(current, (int, float)) and not isinstance(current, bool) else 0.0
+    total = held + selected_weight
+    if total > float(cap) + 1e-12:
         raise ValueError(
-            f"user_sized weight {selected_weight:.4f} exceeds single position cap {float(cap):.4f}"
+            f"user_sized weight {selected_weight:.4f} + existing {held:.4f} = {total:.4f} "
+            f"exceeds single position cap {float(cap):.4f}"
         )
 
 
@@ -1840,7 +1875,12 @@ class DecisionStore:
             sizing = payload["sizing"]
             lower, upper = sizing["live_supported_range"]
             if user_sized:
-                _assert_user_sized_within_capital_caps(sizing, selected_weight)
+                _assert_user_sized_within_capital_caps(
+                    sizing,
+                    selected_weight,
+                    decision_effective_at=str(decision["effective_at"]),
+                    decided_at=decided_at,
+                )
             elif selected_weight > float(upper) + 1e-12 and not force_override:
                 raise ValueError("selected live weight exceeds supported cap")
             if force_override and (not reason or not reason.strip() or not approved_action_id):

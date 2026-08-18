@@ -388,11 +388,12 @@ ignored `library/private/graph_migrations/`。重跑冪等。
 | # | 發現 | 狀態 |
 |---|---|---|
 | 1 | 排名分數與 ingestion 量混淆 | ✅ **已解**（`query/bottleneck.py`）：先以 `(src, relation, dst)` 去重，423 assertion → 345 canonical edge（收斂 78 筆）；`documents` 保留但不參與排序 |
-| 2 | `user_sized` 沒有入口——daily brief 不提示，`live_choices` 仍 0 筆 | 🔴 未解；修法是 brief 直接印可複製指令 |
-| 3 | `user_sized` 的資本上限讀凍結快照，無時效上界 | 🔴 未解；三個月前的 decision 仍可放行，可疊出超過 5% |
-| 4 | `ANCHOR_SPAN_WARN_DAYS=60` keyed 在錯的變數 | 🔴 未解；跨度自然增長會讓紅字自己關掉，而語意問題還在。應改 keyed 在「有幾筆錨點來自 `live_choices`」 |
-| 5 | `structural_lead_time_weeks` 只有 1 個真值 | 🟡 排名須標明未含 lead time；補它比補 332 條 `substitutability` 更有價值 |
-| 6 | 排名列與 cohort 的對應未定義 | 🟡 傾向：排名列是唯讀呈現單位、不建 cohort |
+| 2 | `user_sized` 沒有入口——daily brief 不提示，`live_choices` 仍 0 筆 | ✅ **已解**：brief 新增「若你今天決定進場／加碼（指令，不是建議）」段，逐檔印可複製的 `record-choice` 指令。`--selected-weight` 刻意留空，不違反 Alpha 呈現契約 |
+| 3 | `user_sized` 的資本上限讀凍結快照，無時效上界 | ✅ **已解**：(a) 上限改比**部位總量**（`live_current_position + selected_weight`），首版只比單次買入量，已持有 4% 還能再買 5%；(b) 新增 `USER_SIZED_MAX_DECISION_AGE_DAYS=7`，逾期要求先 `reassess` 重新凍結 |
+| 4 | `ANCHOR_SPAN_WARN_DAYS=60` keyed 在錯的變數 | ✅ **已解**：主要判準改成 `_judgment_anchor_count()`（有幾筆錨點來自 `live_choices`），**時間經過不會讓它自己滿足**；跨度降為次要的 🟠 提示 |
+| 5 | `structural_lead_time_weeks` 只有 1 個真值 | 🟡 未解。排名已標明未含 lead time；補它比補 332 條 `substitutability` 更有價值 |
+| 6 | 排名列與 cohort 的對應未定義 | 🟡 未解。傾向：排名列是唯讀呈現單位、不建 cohort |
+| 7 | `substitutability` 有 50% 只有供應商自報 origin | 🟡 未解。§7 的規則只寫給 `sole_source`（3 條），排序主要吃 substitutability（58 條）——修了小的、放過大的 |
 
 ### 8.8.1 排名已實作（`query/bottleneck.py`，2026-08-18）
 

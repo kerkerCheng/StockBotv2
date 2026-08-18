@@ -854,6 +854,48 @@ def render_today_markdown(brief: Mapping[str, Any]) -> str:
             disproof = markdown_text(item.get("disproof_condition") or "")
             if disproof:
                 lines.append(f"      → Disproof：{disproof}")
+    # ── live 入口 ──────────────────────────────────────────────────────────
+    # 2026-08-18 紅隊審查 B8：`record-choice --user-sized` 蓋好了，但**沒有任何入口**
+    # ——brief 不提、todo pool 不提、Action Card 不提，它是一個使用者必須自己記得的
+    # CLI。`live_choices` 至今 0 筆，與「沒有這條路徑」在結果上不可區分（D13）。
+    # 這一段把「要記得」變成「看得到」。
+    #
+    # ⚠ 這**不是**行動指引，不違反 Alpha 呈現契約：指令裡的 `--selected-weight` 刻意
+    # 留空給使用者填，brief 不提供任何建議尺寸；系統也不判斷現在該不該買。
+    # 它只解決一件事：真的決定要買的時候，有地方可以記錄，記分板才可能有資料。
+    actionable = [
+        item
+        for item in items
+        if item.get("decision_id")
+        and str(item.get("company_id") or "") not in {"", "unresolved"}
+    ]
+    if actionable:
+        lines += [
+            "",
+            "## 若你今天決定進場／加碼（指令，不是建議）",
+            "",
+            "尺寸由你決定；系統不建議金額，也不判斷時點。記錄下來只為了讓「判斷準不準」"
+            "日後能用證據回答——目前 `live_choices` 仍是 0 筆，這個問題還無法回答。",
+            "",
+        ]
+        for item in actionable[:8]:
+            label = markdown_text(item.get("ticker") or item.get("company_id"))
+            lines.append(
+                f"- **{label}**：`python -m decision_lab record-choice "
+                f"{item['decision_id']} --selected-weight <你的NAV占比> "
+                f"--explicit --user-sized --reason \"<為什麼是這個尺寸>\" "
+                f"--confirmation-ref \"<你的紀錄編號>\"`"
+            )
+        lines.append(
+            "\n成交後再回報：`python -m decision_lab record-fill <decision_id> "
+            "--execution-ref <券商成交編號> --shares <股數> --price <成交價> "
+            "--currency <幣別> --explicit`"
+        )
+        lines.append(
+            "⚠ decision 凍結超過 7 天會被拒絕（資本上限讀的是凍結當時的持股快照）；"
+            "先跑 `decision_lab reassess` 重新凍結。"
+        )
+
     pending_identity = brief.get("identity_registration_pending") or []
     if pending_identity:
         lines += [

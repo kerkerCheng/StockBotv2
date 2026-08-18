@@ -578,6 +578,48 @@ def test_user_sized_choice_bypasses_supported_range_but_not_capital_caps(
         store.close()
 
 
+def test_user_sized_cap_counts_existing_position_and_rejects_stale_decisions(
+    tmp_path: Path,
+) -> None:
+    """兩個 2026-08-18 紅隊審查抓到的資本安全洞。
+
+    (1) 上限管的是**部位總量**不是單次買入量——首版只比 `selected_weight`，於是已持有
+        4% 的標的還能再買 5%。
+    (2) 凍結快照有時效——沒有上界時，三個月前的 decision 仍會說「未觸頂」，而期間
+        持股早已變動。
+    """
+
+    from decision_lab.store import USER_SIZED_MAX_DECISION_AGE_DAYS
+
+    sizing = {
+        "live_blockers": [],
+        "live_current_position": 0.04,
+        "constraint_trace": [
+            {"lane": "live", "constraint": "single_position_cap", "cap_weight": 0.05},
+        ],
+    }
+
+    # 已持有 4%，再買 2% 會超過 5% 上限——即使 2% 本身遠低於上限。
+    with pytest.raises(ValueError, match="exceeds single position cap"):
+        _assert_user_sized_within_capital_caps(sizing, 0.02)
+    # 剛好補到上限可以。
+    _assert_user_sized_within_capital_caps(sizing, 0.01)
+
+    fresh = "2026-07-21T12:00:00+00:00"
+    stale_days = USER_SIZED_MAX_DECISION_AGE_DAYS + 1
+    with pytest.raises(ValueError, match="frozen within"):
+        _assert_user_sized_within_capital_caps(
+            sizing,
+            0.001,
+            decision_effective_at=fresh,
+            decided_at=f"2026-07-{21 + stale_days:02d}T12:00:00+00:00",
+        )
+    # 期限內不擋。
+    _assert_user_sized_within_capital_caps(
+        sizing, 0.001, decision_effective_at=fresh, decided_at="2026-07-25T12:00:00+00:00"
+    )
+
+
 def test_user_sized_choice_is_still_blocked_by_real_capital_caps(tmp_path: Path) -> None:
     """槓桿／單筆上限已觸頂時，`user_sized` 必須被擋——那才是真正的風控。
 

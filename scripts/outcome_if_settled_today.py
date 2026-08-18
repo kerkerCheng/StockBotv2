@@ -75,6 +75,11 @@ UNIT_SANITY_RANGE = (0.5, 2.0)
 PRE_ANCHOR_DAYS = 30
 
 # 錨點集中度警示門檻：跨度短於此天數就視為「同一次行情」，不得當成獨立樣本。
+#
+# ⚠ **跨度只是次要條件，不是主要判準。** 首版把紅字綁在跨度上，但跨度會隨 cohort 累積
+# 自然超過 60 天，於是紅字**會自己關掉——而錨點仍然是入圖日、仍然不是進場判斷**。
+# 語意問題沒被修，警報卻不響了（2026-08-18 紅隊審查抓到；同一形狀我當天早上才批評過）。
+# 主要判準改成下方 `_judgment_anchor_count()`：有幾筆錨點真的來自使用者的進場決定。
 ANCHOR_SPAN_WARN_DAYS = 60
 
 
@@ -367,6 +372,23 @@ def _render(results: list[dict], unavailable: list[dict], has_bench: bool) -> No
     _render_chase_check(results)
 
 
+def _judgment_anchor_count() -> int:
+    """有幾筆 live choice 帶著使用者的進場判斷（`user_sized` 或明確接受系統區間）。
+
+    這是「這張表算不算證據」的主要判準，取代原本綁在錨點跨度上的警示——
+    跨度會隨時間自然增長而讓警報自己關掉，這個數字不會。
+    """
+    try:
+        with _connect_ro(DECISION_DB) as conn:
+            row = conn.execute(
+                "SELECT count(*) AS n FROM live_choices WHERE selected_weight > 0"
+            ).fetchone()
+        return int(row["n"] or 0)
+    except sqlite3.Error:
+        # 讀不到就當 0——fail closed。宣稱「已被量測」的舉證責任在有資料那一方。
+        return 0
+
+
 def _median(values: list[float]) -> float:
     ordered = sorted(values)
     mid = len(ordered) // 2
@@ -394,20 +416,32 @@ def _render_chase_check(results: list[dict]) -> None:
     anchors = sorted(r["anchor_date"] for r in paired)
     span = (anchors[-1] - anchors[0]).days
     weeks = len({(d.isocalendar()[0], d.isocalendar()[1]) for d in anchors})
+    judgment = _judgment_anchor_count()
+
     print(f"\n## 錨點體檢（列 {len(paired)} 筆）\n")
     print(
-        "- **錨點日 ≠ 進場判斷日。** cohort 由入圖建立（`dedupe_key=claim:*`），"
-        "錨點的語意是「這家公司的 claim 那天進圖」，不是「那天該買」。"
+        f"- **來自進場判斷的錨點：{judgment} 筆**"
+        f"（`live_choices.decided_at`）｜來自入圖日：{len(paired)} 筆"
     )
     print(
-        f"- 錨點跨度：{anchors[0]} ~ {anchors[-1]}（**{span} 天**）｜獨立日曆週數：**{weeks}**"
+        f"- 錨點跨度：{anchors[0]} ~ {anchors[-1]}（{span} 天）｜獨立日曆週數：{weeks}"
     )
+
+    # 主要判準：有沒有任何一筆錨點帶進場判斷語意。**這個條件不會因為時間經過而自動滿足。**
+    if judgment == 0:
+        print(
+            "\n🔴 **沒有任何錨點來自進場判斷——本表不構成選股能力的證據。**\n"
+            "  cohort 由入圖建立（`dedupe_key=claim:*`），錨點的語意是「這家公司的 claim"
+            " 那天進圖」，不是「那天該買」。下方數字只描述**這批標的是在什麼行情位置入圖的**。\n"
+            "  要讓這張表變成證據，需要的不是等更久，是讓錨點帶有進場判斷——"
+            "`decision_lab record-choice --user-sized` 的 `decided_at` 天生就是那個錨點。"
+        )
+    # 次要判準：即使已有判斷錨點，樣本仍可能擠在同一次行情裡。
     if span < ANCHOR_SPAN_WARN_DAYS:
         print(
-            f"\n🔴 **跨度僅 {span} 天——不得視為 {len(paired)} 個獨立樣本。**"
+            f"\n🟠 **錨點跨度僅 {span} 天——不得視為 {len(paired)} 個獨立樣本。**"
             " 這批 cohort 建立於同一段期間，若又同屬一個主題，超額很可能是**同一次行情**"
-            "被相關標的複製多次（有效 n 接近 1）。下方數字只描述「這批標的是在什麼行情"
-            "位置入圖的」，**不構成選股能力的證據**。"
+            "被相關標的複製多次（有效 n 接近 1）。"
         )
 
     chasing = [r for r in paired if r["pre_anchor_return"] > r["absolute_return"]]
