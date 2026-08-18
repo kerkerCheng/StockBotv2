@@ -1,0 +1,27 @@
+{
+  "schema_version": "1",
+  "resolution_id": "resolution_f119c2f7a44c3e85fa798d6294008461c6f74cb716d51e453a9502f2acfb04e3_b528479416e8",
+  "conflict_id": "conflict_f119c2f7a44c3e85fa798d6294008461c6f74cb716d51e453a9502f2acfb04e3",
+  "edge_key": "edge:ee40df30b3fb6014bd5f0a545ebd696d077587c5e0ef02c19eab40d819854f59",
+  "attribute": "substitutability",
+  "candidate_set_hash": "b528479416e8167550889a224fb08cc71d056122123cf8c18624498660e939b9",
+  "action": "choose_value",
+  "selected_value": 5,
+  "supporting_assertion_ids": [
+    "lumentum_q2fy26_cpo_e21",
+    "lumentum_q3fy26_cpo_e19",
+    "reuters_inp_export_controls_2026_06_11_e10"
+  ],
+  "rejected_assertion_ids": [
+    "lite_transcript_q4fy2026_e11"
+  ],
+  "supporting_source_ids": [
+    "lumentum_q2fy26_cpo_s20",
+    "lumentum_q3fy26_cpo_s4",
+    "reuters_inp_export_controls_2026_06_11_s2"
+  ],
+  "rationale": "schema 定義 substitutability 為對這條特定關係而言的不可替代性，而本邊是 co:lumentum depends_on mat:inp_substrate，問的是 Lumentum 對 InP 這個材料的依賴可否被替代，不是能否更換基板供應商。本輪新增的候選值 4 來自 2026-08-11 法說會 found additional substrate help from AXT, Inc.，那是供應來源多元化，屬於 co:axt 對 co:lumentum 那條 supplies_to 邊的屬性，被錯置到本邊。且該 quote 語意恰好相反：Lumentum 必須四處尋找更多 InP 供給，正說明它無法改用其他材料，支持 5 而非 4。既有三份候選一致為 5，其中 Reuters 為第三方來源，明言 moving to a new supplier requires lengthy qualification cycles；Lumentum 自報部分（收購第五座 InP fab、Sagamihara 擴產）方向是持續加碼自有 InP 產能，同樣不支持材料層級的可替代性。",
+  "resolved_confidence": 0.85,
+  "approved_by": "Cheng",
+  "approved_at": "2026-08-18T22:25:03+08:00"
+}

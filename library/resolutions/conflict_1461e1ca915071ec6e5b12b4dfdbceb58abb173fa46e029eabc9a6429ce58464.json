@@ -1,0 +1,24 @@
+{
+  "schema_version": "1",
+  "resolution_id": "resolution_1461e1ca915071ec6e5b12b4dfdbceb58abb173fa46e029eabc9a6429ce58464_955a8b89746b",
+  "conflict_id": "conflict_1461e1ca915071ec6e5b12b4dfdbceb58abb173fa46e029eabc9a6429ce58464",
+  "edge_key": "edge:eb6265a3fa4d3c9bcc2294466dc5fccec12b6d4678b586638128fcdd3f325220",
+  "attribute": "qualification_status",
+  "candidate_set_hash": "955a8b89746b369c599c1bd2ca411dbbb41e3aa405a52e219e13dbf11cc80c32",
+  "action": "choose_value",
+  "selected_value": "qualifying",
+  "supporting_assertion_ids": [
+    "poet_6_k_20260813_e5"
+  ],
+  "rejected_assertion_ids": [
+    "poet_6_k_20260514_e5"
+  ],
+  "supporting_source_ids": [
+    "poet_6_k_20260813_s5",
+    "poet_6_k_20260813_s14"
+  ],
+  "rationale": "兩份候選並非狀態隨時間前進，而是同一筆事實被抽取兩次判讀不同：Q2 的 s5 幾乎是 Q1 s7 的逐字重述，只把 EOI-based 改寫為 POET Optical Interposer-based。因此不以較新決勝。實際判準是逐字證據：兩份文件全部 quote 只描述 joint development agreement、establishes the framework、initial purchase order 與 first phase，沒有任何一句宣稱產品已完成設計導入，designed_in 因此缺乏證據支持；Q2 的 s14 明說 supply agreement 是 to support the joint development program，符合 qualifying。兩份同為 POET 自報（tier 2、同一 origin_entity），無客戶端或第三方獨立佐證，故 resolved_confidence 保守。",
+  "resolved_confidence": 0.6,
+  "approved_by": "Cheng",
+  "approved_at": "2026-08-18T22:25:03+08:00"
+}
