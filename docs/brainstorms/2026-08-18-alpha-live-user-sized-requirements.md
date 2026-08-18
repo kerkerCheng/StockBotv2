@@ -387,12 +387,50 @@ ignored `library/private/graph_migrations/`。重跑冪等。
 
 | # | 發現 | 狀態 |
 |---|---|---|
-| 1 | 排名分數與 ingestion 量混淆 | 🔴 未解，實作前必須先驗去重後排序有無大洗牌 |
+| 1 | 排名分數與 ingestion 量混淆 | ✅ **已解**（`query/bottleneck.py`）：先以 `(src, relation, dst)` 去重，423 assertion → 345 canonical edge（收斂 78 筆）；`documents` 保留但不參與排序 |
 | 2 | `user_sized` 沒有入口——daily brief 不提示，`live_choices` 仍 0 筆 | 🔴 未解；修法是 brief 直接印可複製指令 |
 | 3 | `user_sized` 的資本上限讀凍結快照，無時效上界 | 🔴 未解；三個月前的 decision 仍可放行，可疊出超過 5% |
 | 4 | `ANCHOR_SPAN_WARN_DAYS=60` keyed 在錯的變數 | 🔴 未解；跨度自然增長會讓紅字自己關掉，而語意問題還在。應改 keyed 在「有幾筆錨點來自 `live_choices`」 |
 | 5 | `structural_lead_time_weeks` 只有 1 個真值 | 🟡 排名須標明未含 lead time；補它比補 332 條 `substitutability` 更有價值 |
 | 6 | 排名列與 cohort 的對應未定義 | 🟡 傾向：排名列是唯讀呈現單位、不建 cohort |
+
+### 8.8.1 排名已實作（`query/bottleneck.py`，2026-08-18）
+
+指令：`python -m query.bottleneck`。25 列「公司 × 瓶頸邊」，前六名：
+
+| # | 標的 | 卡在哪 | 替代難度 | 證據 | 需求錨點 |
+|---|---|---|---|---|---|
+| 1 | COHR | supplies_to `co:nvidia` | 5/5｜sole_source | 外部印證 | `tech:ai_switch`（2 跳） |
+| 2 | COHR | depends_on `mat:inp_substrate` | 5/5 | 外部印證 | `tech:ai_switch`（2 跳） |
+| 3 | AVGO | supplies_to `tech:cpo` | 5/5｜sole_source | 待判定 | `tech:ai_switch`（1 跳） |
+| 4 | LITE | depends_on `mat:inp_substrate` | 5/5 | 待判定 | `tech:ai_compute_buildout`（3 跳） |
+| 5 | **AXTI** | supplies_to `co:coherent` | 4/5 | 待判定 | `tech:ai_switch`（2 跳） |
+| 6 | 5802.T | supplies_to `co:lumentum` | 4/5 | 待判定 | `tech:ai_compute_buildout`（3 跳） |
+
+AXT 的鏈路 `tech:ai_switch → tech:cpo → co:coherent → co:axt` 正是使用者的模型。
+
+**排序鍵是明確優先序，不是加權綜合分數**（綜合分數會是未經量測的新機制，D6，
+且會把證據強度與瓶頸強度壓成一個數字，L12）：
+`(需求可達, 證據等級, substitutability, sole_source, qualification, 距需求端跳數)`。
+
+#### 跑出來才發現的四個 bug（已修，各有一條測試鎖住）
+
+1. **需求鏈是垃圾。** 首版用「往上走最長路徑、端點即錨點」，圖裡有環於是繞回目標本身
+   （`… → tech:ai_compute_buildout → co:lumentum`），端點常是 `tech:semicon_manuf_equipment`
+   這種上游設備而非需求。**看起來結構化、實際無意義的欄位比沒有這一欄危險。**
+   改成明確列舉 `DEMAND_ANCHORS` ＋ BFS 最短路徑，**走不到就回 None，不用最近節點充數**。
+2. **AXT 整個從排名消失。** 收斂時「取 confidence 最高那份 assertion 的全部屬性」，
+   若該份沒填 `substitutability` 就整條邊丟值。改成**逐屬性**取最佳 confidence——
+   語意是「對這個屬性發言過的文件裡，最可信的那份怎麼說」。覆蓋率也從假掉的 16% 回到 17%。
+3. **向上索引漏了 `supplies_to`。** `A supplies_to B` ⇒ B 需要 A，需求要沿它往上傳；
+   漏掉導致任何「瓶頸目標是一家公司」的列都顯示無錨點。`supplies_to` 同時在向下
+   （帶 substitutability）與向上（需求傳遞）兩個索引裡是正確的——同一條有方向的供需邊，
+   兩邊問的問題不同。
+4. **需求鏈從瓶頸節點走而非從公司走。** 於是 LITE 那列的鏈路繞經 Coherent——對
+   `mat:inp_substrate` 正確，但不是那一列在問的問題（「這家公司的產出有沒有人在花錢買」）。
+
+⚠ **`DEMAND_ANCHORS` 是封閉字彙，目前只有四個 AI/光通訊節點。** 圖擴到別的領域時它會靜默
+地讓新領域全部顯示「無錨點」——擴充改那個常數，不要改演算法。
 
 ### 8.9 反向使用：用瓶頸目標驅動研究優先序（使用者 2026-08-18 提出）
 

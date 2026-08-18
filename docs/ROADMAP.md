@@ -71,7 +71,7 @@ target 全是同一個 0.1%，常數不帶資訊，而使用者要的是「撒�
 
 | 目標 | 現值（2026-08-15） | 怎麼變好 |
 |---|---|---|
-| **廣度**：可評估標的數 | 8 個 ELIGIBLE cohort | 清 pq1 積壓（83 條 triaged_go）、擴 harvest 來源、onboard 新標的 |
+| **廣度**：可評估標的數 | 8 個 ELIGIBLE cohort | **改用瓶頸目標導向**：`query/bottleneck.py` 已能列出 chokepoint 與其已知供應商，缺的是「這條 chokepoint 上還有誰沒研究過」→ 具名 harvest target（見 [`2026-08-18-alpha-live-user-sized`](brainstorms/2026-08-18-alpha-live-user-sized-requirements.md) §8.9）。舊做法（清 pq1 積壓、擴來源）沒有方向 |
 | **事件追蹤**：新事件進 brief 的延遲 | 未量測 | 先補 watcher 覆蓋（今天才發現 TSEM 長期空轉），再談延遲 |
 | **量測**：可量測 cohort 與超額中位數 | 10/15 個可算出數字，但**有效 n≈1**（見下） | **先讓錨點帶有進場判斷**，再談樣本期 |
 
