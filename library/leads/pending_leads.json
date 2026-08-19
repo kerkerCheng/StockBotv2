@@ -3916,6 +3916,126 @@
       "result": "ok",
       "run_at": "2026-08-18T23:03:58.274057+00:00",
       "source": "edgar:TSLA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-19T22:31:54.652259+00:00",
+      "source": "mfn:sivers-semiconductors"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-19T22:31:55.909276+00:00",
+      "source": "sivers:press"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-19T22:31:56.608129+00:00",
+      "source": "yahoo:iqe-l"
+    },
+    {
+      "new": 3,
+      "result": "ok",
+      "run_at": "2026-08-19T22:31:58.080519+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-19T22:32:00.539053+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-19T22:32:01.234711+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-19T22:32:01.766875+00:00",
+      "source": "edgar:AVGO"
+    },
+    {
+      "new": 2,
+      "result": "ok",
+      "run_at": "2026-08-19T22:32:02.636586+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-19T22:32:03.350314+00:00",
+      "source": "edgar:CCXI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-19T22:32:04.055947+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-19T22:32:04.975590+00:00",
+      "source": "edgar:GFS"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-19T22:32:05.792998+00:00",
+      "source": "edgar:JBL"
+    },
+    {
+      "new": 5,
+      "result": "ok",
+      "run_at": "2026-08-19T22:32:06.497334+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-19T22:32:07.361017+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 8,
+      "result": "ok",
+      "run_at": "2026-08-19T22:32:08.069057+00:00",
+      "source": "edgar:META"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-08-19T22:32:08.774015+00:00",
+      "source": "edgar:MTSI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-19T22:32:09.629739+00:00",
+      "source": "edgar:NVDA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-19T22:32:10.357924+00:00",
+      "source": "edgar:POET"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-19T22:32:11.191186+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-19T22:32:11.707347+00:00",
+      "source": "edgar:TSLA"
     }
   ],
   "leads": {
@@ -4253,6 +4373,41 @@
         "tier": 1
       },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-lender-bootstrap-europe-exercises-conversion-right-under-existing-convertible-loan-314f3dcb"
+    },
+    "lead_018171ed92846e0a0f14f1c1a20e6c07": {
+      "entities": {
+        "company_ids": [
+          "co:meta"
+        ],
+        "tickers": [
+          "META"
+        ]
+      },
+      "first_seen": "2026-08-19T22:32:08.068471+00:00",
+      "lead_id": "lead_018171ed92846e0a0f14f1c1a20e6c07",
+      "published_at": "2026-08-18",
+      "refs": {},
+      "source": "edgar:META",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "META 4 filed 2026-08-18",
+      "triage": {
+        "decided_at": "2026-08-19T22:33:19.248616+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true
+        },
+        "reason": "具名追蹤公司、SEC Form 4 一手文件與明確 filing 日期；可逐字核對 insider transaction／持股變化，先進低優先 pq1，是否僅為時變 observation 由追源決定。",
+        "related_trace_requeues": [
+          "lead_6a56acb8a4aa5260483a3b14600db949",
+          "lead_a53867cc19e44995d9ee1ef2fb2c8fbd",
+          "lead_afa72193be496499ef950552d9146c38",
+          "lead_d36507e875209c42b224d82b9ac1a247",
+          "lead_e87032df984f0fa40a6bd12a7130b39a"
+        ],
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1326801/000095010326012611/xslF345X06/ownership.xml"
     },
     "lead_0332ef0064c4828e1a68fdaa45432e9c": {
       "entities": {
@@ -6827,11 +6982,19 @@
       "published_at": "2026-08-18T17:27:07.000Z",
       "raw_text": "My $AAOI TLDR notes at Rosenblatt summit:\n\n- Expected to get paid premiums for US production of 800g/1.6T (very positive for ASP/margins).\n\n- Several LTAs on the table, but doesn't want to sign to get capacity blocked by other customers (cough cough $NVDA). \n\n- Sold out at least through second half of next year and beyond. (High demand visibility like $LITE)\n\n- Has 300-400 mW lasers already. \n\n- Expects margins to be above 40%+ once CPO comes about (probably most material for rerating). \n\nI can't see how anyone can be bearish on this company...",
       "refs": {
-        "parked_reason": "官方只確認 2026-08-18 Rosenblatt fireside chat 舉行且錄影將上架；US 製造 premium、LTA、sold-out 時程、300–400mW laser 與 40%+ margin 尚無可逐字核對原文",
+        "outcome": "no_prepared_ra_partial_and_existing_claims",
+        "parked_reason": "已取得 AAOI 官方 Rosenblatt summit 摘要，支持 400G／800G qualification、台灣廠合格、2–3 倍擴產與內製雷射抗供應短缺；但不支持推文的 US premium、數份 LTA、sold out 至 2027H2、300–400mW 或 CPO 毛利率逾 40% 等精確 atoms，且較強 Q2 法說 graph claim 已存在。",
+        "primary_url": "https://newsroom.ao-inc.com/blog/insights-from-stefan-murry-at-the-rosenblatt-age-of-ai-summit/",
         "research_outcome": "取得 AAOI 2026-08-04 官方活動公告，未取得 8 月 18 日 webcast recording 或 transcript；社群摘要不得代替管理層原話",
-        "trace_attempts_ref": "AAOI_IR_event_announcement_plus_exact_claim_search",
-        "trace_next_trigger": "AAOI_IR_posts_Rosenblatt_6th_Summit_recording_or_transcript",
-        "trace_origin_entity": "Applied Optoelectronics Inc.",
+        "trace_attempts_ref": "AAOI Newsroom Rosenblatt summit 摘要；AAOI Q1/Q2 2026 transcript／filing 交叉核對",
+        "trace_next_trigger": "取得 Rosenblatt summit 完整錄影／逐字稿，或 AAOI filing／法說逐項確認 US premium、LTA、sold-out 時程與 CPO 毛利門檻",
+        "trace_origin_entity": "Applied Optoelectronics",
+        "trace_requeue_consumed_entities": [
+          "CO:LUMENTUM",
+          "LITE"
+        ],
+        "trace_requeue_trigger": "related_triaged_lead:lead_195ceecf47e7ad69bd0384d070268431",
+        "trace_requeued_at": "2026-08-19T22:33:19.491469+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
@@ -6842,6 +7005,7 @@
           "co:lumentum",
           "co:nvidia"
         ],
+        "trace_trigger_event_ref": "lead:lead_195ceecf47e7ad69bd0384d070268431",
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
@@ -6859,21 +7023,86 @@
       },
       "title": "My $AAOI TLDR notes at Rosenblatt summit: - Expected to get paid premiums for US production of 800g/1.6T (very positive for ASP/margins). - Several LTAs on the table, but doesn't want to sign to get capacity blocked by other customers (cough cough $NVDA). - Sold out at least through second half of next year and beyond. (High demand visibility like $LITE) - Has 300-400 mW lasers already. - Expects margins to be above 40%+ once CPO comes about (probably most material for rerating). I can't see how anyone can be bearish on this company...",
       "triage": {
-        "decided_at": "2026-08-18T23:05:45.408019+00:00",
+        "decided_at": "2026-08-19T22:33:19.491469+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true
         },
-        "reason": "PASS：AAOI 與 CPO／800G／1.6T 明確命中追蹤標的，含 US 製造 premium、LTA、sold-out 時程、300–400mW laser 與 40%+ margin 等可追查具體主張；先追回 Rosenblatt summit 一手材料。",
-        "related_trace_requeues": [
-          "lead_7f66b743a034c41f6388aa800f333e62",
-          "lead_c7ca9aa7169d5ffa4a621430cac35d5e",
-          "lead_d7fd5c6982c274f3d2426c6d6b2fdafe",
-          "lead_e766f19b8dc748d744d0b4cc6dc21071"
-        ],
+        "reason": "新 triage PASS lead lead_195ceecf47e7ad69bd0384d070268431 與 parked trace 共用具名標的 LITE, co:lumentum（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
         "tier": 3
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-19T22:33:19.491469+00:00",
+          "superseded_reason": "新 triage PASS lead lead_195ceecf47e7ad69bd0384d070268431 與 parked trace 共用具名標的 LITE, co:lumentum（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_195ceecf47e7ad69bd0384d070268431",
+          "triage": {
+            "decided_at": "2026-08-18T23:05:45.408019+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true
+            },
+            "reason": "PASS：AAOI 與 CPO／800G／1.6T 明確命中追蹤標的，含 US 製造 premium、LTA、sold-out 時程、300–400mW laser 與 40%+ margin 等可追查具體主張；先追回 Rosenblatt summit 一手材料。",
+            "related_trace_requeues": [
+              "lead_7f66b743a034c41f6388aa800f333e62",
+              "lead_c7ca9aa7169d5ffa4a621430cac35d5e",
+              "lead_d7fd5c6982c274f3d2426c6d6b2fdafe",
+              "lead_e766f19b8dc748d744d0b4cc6dc21071"
+            ],
+            "tier": 3
+          }
+        }
+      ],
       "url": "https://x.com/aleabitoreddit/status/2089766053274661143"
+    },
+    "lead_195ceecf47e7ad69bd0384d070268431": {
+      "entities": {
+        "company_ids": [
+          "co:lumentum"
+        ],
+        "tickers": [
+          "LITE"
+        ]
+      },
+      "first_seen": "2026-08-19T22:32:06.497109+00:00",
+      "lead_id": "lead_195ceecf47e7ad69bd0384d070268431",
+      "published_at": "2026-08-18",
+      "refs": {
+        "outcome": "no_prepared_ra_dated_insider_observation",
+        "parked_reason": "Lumentum（LITE） 官方 SEC Form 4 已取得；內容只屬帶日期的 insider 持股／股權交易 observation，沒有唯一供應鏈 graph delta，因此不製造空 Research Action。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1633978/000157046526000004/xslF345X06/form4-08192026_120815.xml",
+        "storage_permission": "repo_excerpt",
+        "trace_attempts_ref": "SEC canonical Form 4 URL；fetchers/edgar.py 官方下載",
+        "trace_origin_entity": "SEC／issuer",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
+      "source": "edgar:LITE",
+      "status": "parked",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "LITE"
+          ]
+        }
+      },
+      "title": "LITE 4 filed 2026-08-18",
+      "triage": {
+        "decided_at": "2026-08-19T22:33:19.491469+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true
+        },
+        "reason": "具名追蹤公司、SEC Form 4 一手文件與明確 filing 日期；可逐字核對 insider transaction／持股變化，先進低優先 pq1，是否僅為時變 observation 由追源決定。",
+        "related_trace_requeues": [
+          "lead_1940958c3136e0a33b4e0856b7b05d82"
+        ],
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1633978/000157046526000004/xslF345X06/form4-08192026_120815.xml"
     },
     "lead_1a9c1baadcfa09d748a4832bb75cfdc5": {
       "entities": {
@@ -7798,17 +8027,26 @@
       "published_at": "2026-08-17T01:39:22.000Z",
       "raw_text": "\"Severe InP Shortage Triggers Largest Price Hike Ever\" - $AXTI. \n\nSuppliers have bluntly stated that \"even if you have the money, you still may not be able to get the material\" (lol). \n\n- Industry sources revealed that InP substrate prices began rising in Q4 last year and was the fourth consecutive substrate price hike. \n\n- The latest Q4 hike is expected to be >10%,\n\n- Meanwhile, prices for epitaxial wafers made from those substrates have already been raised two times, and the market is moving toward a 3rd consecutive increase in Q4. (I also wrote a thesis on $IQE, which benefits here too). \n\nArticle states VPEC, Landmark, IET benefits (Taiwan centric reporting). \n\nI did predict this last year... The bottleneck is real, but I do have higher expectations for price hikes that comes next. \n\nGlad it's starting to play out.",
       "refs": {
-        "parked_reason": "產業報導支持InP短缺與價格跳升，但未支持第四次Q4漲價、最新大於10%及epi連續漲價等exact_claim",
-        "trace_attempts_ref": "ETNews_2026-07-08_industry_report_plus_issuer_search",
-        "trace_next_trigger": "issuer或台灣供應商正式披露價格與調價次數",
+        "claimed_origin": "未具名產業文章／industry sources",
+        "outcome": "no_prepared_ra_original_not_obtained",
+        "parked_reason": "AXTI／IQE 的 InP 第四次漲價與 Q4 再漲逾 10% 只追回社群轉述與同源鏡像；未找到聲稱的產業文章或供應商逐字原文，不能把價格與受益公司當 evidence。",
+        "trace_attempts_ref": "exact title／獨特句搜尋；AXT、IQE、VPEC、LandMark、IET 官方路徑",
+        "trace_next_trigger": "AXT／IQE／VPEC／LandMark／IET 官方揭露 InP substrate 或 epiwafer 漲價、交期或供應限制，或取得原始產業文章",
+        "trace_requeue_consumed_entities": [
+          "AXTI",
+          "CO:AXT"
+        ],
+        "trace_requeue_trigger": "related_triaged_lead:lead_291b058af07f3f0a6e43107b0bec57b3",
+        "trace_requeued_at": "2026-08-19T22:33:19.734483+00:00",
         "trace_requires_user": "false",
-        "trace_status": "partial",
+        "trace_status": "isolated_tier_3",
         "trace_trigger_entities": [
           "AXTI",
           "IQE",
           "co:axt",
           "co:iqe"
         ],
+        "trace_trigger_event_ref": "lead:lead_291b058af07f3f0a6e43107b0bec57b3",
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
@@ -7824,18 +8062,36 @@
       },
       "title": "\"Severe InP Shortage Triggers Largest Price Hike Ever\" - $AXTI. Suppliers have bluntly stated that \"even if you have the money, you still may not be able to get the material\" (lol). - Industry sources revealed that InP substrate prices began rising in Q4 last year and was the fourth consecutive substrate price hike. - The latest Q4 hike is expected to be >10%, - Meanwhile, prices for epitaxial wafers made from those substrates have already been raised two times, and the market is moving toward a 3rd consecutive increase in Q4. (I also wrote a thesis on $IQE, which benefits here too). Article states VPEC, Landmark, IET benefits (Taiwan centric reporting). I did predict this last year... The bottleneck is real, but I do have higher expectations for price hikes that comes next. Glad it's starting to play out.",
       "triage": {
-        "decided_at": "2026-08-17T22:34:28.548522+00:00",
+        "decided_at": "2026-08-19T22:33:19.734483+00:00",
         "decision": "go",
         "priority_flags": {
           "contradiction": true,
           "novelty": true
         },
-        "reason": "具名 AXTI／IQE 與 InP substrate 漲價、次數及 >10% 門檻；高度關聯既有 InP thesis，值得追原始產業報導與反證",
-        "related_trace_requeues": [
-          "lead_8088f665e358a7744d9b6bc1646bccbf"
-        ],
+        "reason": "新 triage PASS lead lead_291b058af07f3f0a6e43107b0bec57b3 與 parked trace 共用具名標的 AXTI, co:axt（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
         "tier": 4
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-19T22:33:19.734483+00:00",
+          "superseded_reason": "新 triage PASS lead lead_291b058af07f3f0a6e43107b0bec57b3 與 parked trace 共用具名標的 AXTI, co:axt（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_291b058af07f3f0a6e43107b0bec57b3",
+          "triage": {
+            "decided_at": "2026-08-17T22:34:28.548522+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "contradiction": true,
+              "novelty": true
+            },
+            "reason": "具名 AXTI／IQE 與 InP substrate 漲價、次數及 >10% 門檻；高度關聯既有 InP thesis，值得追原始產業報導與反證",
+            "related_trace_requeues": [
+              "lead_8088f665e358a7744d9b6bc1646bccbf"
+            ],
+            "tier": 4
+          }
+        }
+      ],
       "url": "https://x.com/aleabitoreddit/status/2089165155741622679"
     },
     "lead_2093c12993bd8ad33512c4db06525336": {
@@ -8615,6 +8871,46 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2076767097674514474"
+    },
+    "lead_291b058af07f3f0a6e43107b0bec57b3": {
+      "entities": {
+        "company_ids": [
+          "co:axt"
+        ],
+        "tickers": [
+          "AXTI"
+        ]
+      },
+      "first_seen": "2026-08-19T22:32:02.636469+00:00",
+      "lead_id": "lead_291b058af07f3f0a6e43107b0bec57b3",
+      "published_at": "2026-08-19",
+      "refs": {
+        "outcome": "no_prepared_ra_dated_insider_observation",
+        "parked_reason": "AXT（AXTI） 官方 SEC Form 4 已取得；內容只屬帶日期的 insider 持股／股權交易 observation，沒有唯一供應鏈 graph delta，因此不製造空 Research Action。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1051627/000143774926028573/xslF345X06/rdgdoc.xml",
+        "storage_permission": "repo_excerpt",
+        "trace_attempts_ref": "SEC canonical Form 4 URL；fetchers/edgar.py 官方下載",
+        "trace_origin_entity": "SEC／issuer",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
+      "source": "edgar:AXTI",
+      "status": "parked",
+      "themes": {},
+      "title": "AXTI 4 filed 2026-08-19",
+      "triage": {
+        "decided_at": "2026-08-19T22:33:19.734483+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true
+        },
+        "reason": "具名追蹤公司、SEC Form 4 一手文件與明確 filing 日期；可逐字核對 insider transaction／持股變化，先進低優先 pq1，是否僅為時變 observation 由追源決定。",
+        "related_trace_requeues": [
+          "lead_2061d895e6e162c47132019a07869d92"
+        ],
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1051627/000143774926028573/xslF345X06/rdgdoc.xml"
     },
     "lead_297e60d4932f3b8f5b0c6e39279510dd": {
       "entities": {
@@ -9644,6 +9940,51 @@
         }
       ],
       "url": "https://x.com/aleabitoreddit/status/2081548360818004299"
+    },
+    "lead_2fa783489f20d8c0b75d4e6d9a28ac09": {
+      "entities": {
+        "company_ids": [
+          "co:lumentum"
+        ],
+        "tickers": [
+          "LITE"
+        ]
+      },
+      "first_seen": "2026-08-19T22:32:06.497244+00:00",
+      "lead_id": "lead_2fa783489f20d8c0b75d4e6d9a28ac09",
+      "published_at": "2026-08-18",
+      "refs": {
+        "outcome": "no_prepared_ra_dated_insider_observation",
+        "parked_reason": "Lumentum（LITE） 官方 SEC Form 4 已取得；內容只屬帶日期的 insider 持股／股權交易 observation，沒有唯一供應鏈 graph delta，因此不製造空 Research Action。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1633978/000156110026000004/xslF345X06/form4-08192026_120838.xml",
+        "storage_permission": "repo_excerpt",
+        "trace_attempts_ref": "SEC canonical Form 4 URL；fetchers/edgar.py 官方下載",
+        "trace_origin_entity": "SEC／issuer",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
+      "source": "edgar:LITE",
+      "status": "parked",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "LITE"
+          ]
+        }
+      },
+      "title": "LITE 4 filed 2026-08-18",
+      "triage": {
+        "decided_at": "2026-08-19T22:33:19.993332+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true
+        },
+        "reason": "具名追蹤公司、SEC Form 4 一手文件與明確 filing 日期；可逐字核對 insider transaction／持股變化，先進低優先 pq1，是否僅為時變 observation 由追源決定。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1633978/000156110026000004/xslF345X06/form4-08192026_120838.xml"
     },
     "lead_2fb91876b881e2393f73b030a188ffa5": {
       "entities": {
@@ -13750,15 +14091,21 @@
         "trace_attempts_ref": "SSE_Unitree_IPO_announcement_20260731",
         "trace_next_trigger": "SSE_publishes_final_offer_price_allotment_and_first_trading_receipt",
         "trace_origin_entity": "Shanghai Stock Exchange / Unitree Robotics",
+        "trace_requeue_consumed_entities": [
+          "CCXI"
+        ],
+        "trace_requeue_trigger": "related_triaged_lead:lead_826473daf6f4deaaff8503a106f6efd6",
+        "trace_requeued_at": "2026-08-19T22:33:23.215534+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
           "CCXI"
         ],
+        "trace_trigger_event_ref": "lead:lead_826473daf6f4deaaff8503a106f6efd6",
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {
         "robotics": {
           "counter_only": false,
@@ -13772,24 +14119,78 @@
       },
       "title": "Unitree, China's humanoid leader, is set to IPO this month at a $9B valuation! (~$6.2B originally per March filing). Derivative markets are pricing open at an implied $36.04B MC, roughly ~4X listing price. $CCXI / Agility Robotics, the first US publicly listed pure play humanoid leader, is also going public later in Q4, at a ~$2.5B pre-money valuation. It will be interesting to see how markets price in America vs. Chinese Humanoid leaders.",
       "triage": {
-        "decided_at": "2026-08-07T22:39:26.929238+00:00",
+        "decided_at": "2026-08-19T22:33:23.215534+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true
         },
-        "reason": "PASS：具體點名 Unitree 與 Agility Robotics／CCXI 的 IPO 時間及 90 億、25 億美元估值，命中既有 robotics／Agility 研究脈絡；屬可追查上市文件與官方公告的事件，值得追回原文。",
-        "related_trace_requeues": [
-          "lead_1d29da0283f3c7f84f5ee2cfdb7ee8d0",
-          "lead_2c0614883bf6ec94c3032ccda5c7ff70",
-          "lead_486e4bcc8003167a6997376455b5a2c9",
-          "lead_98f8189824f53a0f3b6a58e79133dc6b",
-          "lead_b0b7ecd2d8229b1f3a1f01c557f5339c",
-          "lead_b30c33e9af50c65b8fc4cf8a05f80184",
-          "lead_e5f4088218bafff7538c5eec808ea96e"
-        ],
+        "reason": "新 triage PASS lead lead_826473daf6f4deaaff8503a106f6efd6 與 parked trace 共用具名標的 CCXI（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
         "tier": 4
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-19T22:33:23.215534+00:00",
+          "superseded_reason": "新 triage PASS lead lead_826473daf6f4deaaff8503a106f6efd6 與 parked trace 共用具名標的 CCXI（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_826473daf6f4deaaff8503a106f6efd6",
+          "triage": {
+            "decided_at": "2026-08-07T22:39:26.929238+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true
+            },
+            "reason": "PASS：具體點名 Unitree 與 Agility Robotics／CCXI 的 IPO 時間及 90 億、25 億美元估值，命中既有 robotics／Agility 研究脈絡；屬可追查上市文件與官方公告的事件，值得追回原文。",
+            "related_trace_requeues": [
+              "lead_1d29da0283f3c7f84f5ee2cfdb7ee8d0",
+              "lead_2c0614883bf6ec94c3032ccda5c7ff70",
+              "lead_486e4bcc8003167a6997376455b5a2c9",
+              "lead_98f8189824f53a0f3b6a58e79133dc6b",
+              "lead_b0b7ecd2d8229b1f3a1f01c557f5339c",
+              "lead_b30c33e9af50c65b8fc4cf8a05f80184",
+              "lead_e5f4088218bafff7538c5eec808ea96e"
+            ],
+            "tier": 4
+          }
+        }
+      ],
       "url": "https://x.com/aleabitoreddit/status/2085644051446108223"
+    },
+    "lead_562b72dc85828086e5489daff91712c0": {
+      "entities": {
+        "company_ids": [
+          "co:axt"
+        ],
+        "tickers": [
+          "AXTI"
+        ]
+      },
+      "first_seen": "2026-08-19T22:32:02.636361+00:00",
+      "lead_id": "lead_562b72dc85828086e5489daff91712c0",
+      "published_at": "2026-08-19",
+      "refs": {
+        "outcome": "no_prepared_ra_dated_insider_observation",
+        "parked_reason": "AXT（AXTI） 官方 SEC Form 4 已取得；內容只屬帶日期的 insider 持股／股權交易 observation，沒有唯一供應鏈 graph delta，因此不製造空 Research Action。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1051627/000143774926028577/xslF345X06/rdgdoc.xml",
+        "storage_permission": "repo_excerpt",
+        "trace_attempts_ref": "SEC canonical Form 4 URL；fetchers/edgar.py 官方下載",
+        "trace_origin_entity": "SEC／issuer",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
+      "source": "edgar:AXTI",
+      "status": "parked",
+      "themes": {},
+      "title": "AXTI 4 filed 2026-08-19",
+      "triage": {
+        "decided_at": "2026-08-19T22:33:20.251442+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true
+        },
+        "reason": "具名追蹤公司、SEC Form 4 一手文件與明確 filing 日期；可逐字核對 insider transaction／持股變化，先進低優先 pq1，是否僅為時變 observation 由追源決定。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1051627/000143774926028577/xslF345X06/rdgdoc.xml"
     },
     "lead_568fc9e6338b158802f8a22dd967fe73": {
       "entities": {
@@ -14292,6 +14693,51 @@
         "tier": 3
       },
       "url": "https://x.com/aleabitoreddit/status/2080394259535221222"
+    },
+    "lead_5927c3a613d2a847596f3689a364e4d9": {
+      "entities": {
+        "company_ids": [
+          "co:lumentum"
+        ],
+        "tickers": [
+          "LITE"
+        ]
+      },
+      "first_seen": "2026-08-19T22:32:06.497177+00:00",
+      "lead_id": "lead_5927c3a613d2a847596f3689a364e4d9",
+      "published_at": "2026-08-18",
+      "refs": {
+        "outcome": "no_prepared_ra_dated_insider_observation",
+        "parked_reason": "Lumentum（LITE） 官方 SEC Form 4 已取得；內容只屬帶日期的 insider 持股／股權交易 observation，沒有唯一供應鏈 graph delta，因此不製造空 Research Action。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1633978/000157333826000014/xslF345X06/form4-08192026_120840.xml",
+        "storage_permission": "repo_excerpt",
+        "trace_attempts_ref": "SEC canonical Form 4 URL；fetchers/edgar.py 官方下載",
+        "trace_origin_entity": "SEC／issuer",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
+      "source": "edgar:LITE",
+      "status": "parked",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "LITE"
+          ]
+        }
+      },
+      "title": "LITE 4 filed 2026-08-18",
+      "triage": {
+        "decided_at": "2026-08-19T22:33:20.528380+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true
+        },
+        "reason": "具名追蹤公司、SEC Form 4 一手文件與明確 filing 日期；可逐字核對 insider transaction／持股變化，先進低優先 pq1，是否僅為時變 observation 由追源決定。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1633978/000157333826000014/xslF345X06/form4-08192026_120840.xml"
     },
     "lead_595253f50b671bb5f2398b149cfaeb49": {
       "entities": {
@@ -16344,6 +16790,51 @@
       },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-sivers-and-globalfoundries-advance-ai-data-center-optical-solutions-c7523cc4"
     },
+    "lead_6978b4a67bf1463a394d020440eee576": {
+      "entities": {
+        "company_ids": [
+          "co:lumentum"
+        ],
+        "tickers": [
+          "LITE"
+        ]
+      },
+      "first_seen": "2026-08-19T22:32:06.496926+00:00",
+      "lead_id": "lead_6978b4a67bf1463a394d020440eee576",
+      "published_at": "2026-08-18",
+      "refs": {
+        "outcome": "no_prepared_ra_dated_insider_observation",
+        "parked_reason": "Lumentum（LITE） 官方 SEC Form 4 已取得；內容只屬帶日期的 insider 持股／股權交易 observation，沒有唯一供應鏈 graph delta，因此不製造空 Research Action。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1633978/000148955026000003/xslF345X06/form4-08192026_120833.xml",
+        "storage_permission": "repo_excerpt",
+        "trace_attempts_ref": "SEC canonical Form 4 URL；fetchers/edgar.py 官方下載",
+        "trace_origin_entity": "SEC／issuer",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
+      "source": "edgar:LITE",
+      "status": "parked",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "LITE"
+          ]
+        }
+      },
+      "title": "LITE 4 filed 2026-08-18",
+      "triage": {
+        "decided_at": "2026-08-19T22:33:20.773321+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true
+        },
+        "reason": "具名追蹤公司、SEC Form 4 一手文件與明確 filing 日期；可逐字核對 insider transaction／持股變化，先進低優先 pq1，是否僅為時變 observation 由追源決定。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1633978/000148955026000003/xslF345X06/form4-08192026_120833.xml"
+    },
     "lead_6a56acb8a4aa5260483a3b14600db949": {
       "entities": {
         "company_ids": [
@@ -16384,6 +16875,8 @@
         "research_outcome": "Alphabet 部分與一手相符；四家合計 7,200–7,450 億美元為推文自行加總，未逐家驗證",
         "trace_attempts_ref": "僅逐一核對 Alphabet 一手指引；其餘三家合計數字未逐家回一手 filing",
         "trace_origin_entity": "Alphabet / Amazon / Meta / Microsoft",
+        "trace_requeue_trigger": "related_triaged_lead:lead_018171ed92846e0a0f14f1c1a20e6c07",
+        "trace_requeued_at": "2026-08-19T22:33:19.248616+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
@@ -16392,10 +16885,11 @@
           "META",
           "MSFT"
         ],
+        "trace_trigger_event_ref": "lead:lead_018171ed92846e0a0f14f1c1a20e6c07",
         "trace_trigger_kind": "primary_source_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -16409,14 +16903,31 @@
       },
       "title": "As a earnings recap: $AMZN, $META, $GOOGL, and $MSFT guided a 2026 combined capex forecast to ~$720-$745 Billion. Up from $695-$725B Billion previously. Amazon: $220B Google: $195B-$205B Meta: $130B-$145B Microsoft: $175B We've already seen significant deleveraging and retail/institutional margin liquidations (maybe it continues for more time, who knows). But medium-long term, I'm not quite sure how anyone can be bearish the upstream semis or neoclouds. Given each hyperscaler has flagged either compute shortages, rising cloud demand + pricing power, or increased spending for chips/networking. My \"bottleneck\" thesis with many of these upstream semi supply chains is that when trillions in capital flows into things from InP substrates or memory (which were both treated as cheap commodities) or even energy. Lot of these current AI names that were treated as useless before in telecom cycles or even toilet sellers. Gets rerated when their inflection period hits and capex flows into their balance sheets. As seen with $NVDA GPUs past few years, memory this year, CPUs/MLCCs next few years, CPO in 2027, Glass Substrates in 2027, 800V in 2027, and so on.",
       "triage": {
-        "decided_at": "2026-07-31T22:42:10.184852+00:00",
+        "decided_at": "2026-08-19T22:33:19.248616+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true
         },
-        "reason": "具名 hyperscaler 與 2026 capex 數字，能追查法說／guidance，可能影響 AI 上游半導體需求；社群彙整需逐家公司追原文。",
+        "reason": "指定實體的 tier-1 一手來源 lead_018171ed92846e0a0f14f1c1a20e6c07 與 parked trace 共用具名標的 META；事件觸發 bounded pq1 重查",
         "tier": 4
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-19T22:33:19.248616+00:00",
+          "superseded_reason": "指定實體的 tier-1 一手來源 lead_018171ed92846e0a0f14f1c1a20e6c07 與 parked trace 共用具名標的 META；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_018171ed92846e0a0f14f1c1a20e6c07",
+          "triage": {
+            "decided_at": "2026-07-31T22:42:10.184852+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true
+            },
+            "reason": "具名 hyperscaler 與 2026 capex 數字，能追查法說／guidance，可能影響 AI 上游半導體需求；社群彙整需逐家公司追原文。",
+            "tier": 4
+          }
+        }
+      ],
       "url": "https://x.com/aleabitoreddit/status/2083270545320386734"
     },
     "lead_6ac3699094b2106a3af12848febb87f3": {
@@ -17466,6 +17977,34 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1045810/000119903926000009/xslF345X06/wk-form4_1782767219.xml"
     },
+    "lead_729d8ae123c2ddb5398ec37a4b8864f4": {
+      "entities": {
+        "company_ids": [
+          "co:meta"
+        ],
+        "tickers": [
+          "META"
+        ]
+      },
+      "first_seen": "2026-08-19T22:32:08.068732+00:00",
+      "lead_id": "lead_729d8ae123c2ddb5398ec37a4b8864f4",
+      "published_at": "2026-08-18",
+      "refs": {},
+      "source": "edgar:META",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "META 4 filed 2026-08-18",
+      "triage": {
+        "decided_at": "2026-08-19T22:33:21.016336+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true
+        },
+        "reason": "具名追蹤公司、SEC Form 4 一手文件與明確 filing 日期；可逐字核對 insider transaction／持股變化，先進低優先 pq1，是否僅為時變 observation 由追源決定。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1326801/000095010326012608/xslF345X06/ownership.xml"
+    },
     "lead_74225cd7714e9466dcb4f602dc412919": {
       "entities": {
         "company_ids": [],
@@ -18509,6 +19048,34 @@
         "tier": 3
       },
       "url": "https://aleabitoreddit.substack.com/p/sivers-semi-sive-the-cpo-laser-supplier"
+    },
+    "lead_7be0827a837c14570d33adbc9cb6f25b": {
+      "entities": {
+        "company_ids": [
+          "co:meta"
+        ],
+        "tickers": [
+          "META"
+        ]
+      },
+      "first_seen": "2026-08-19T22:32:08.068937+00:00",
+      "lead_id": "lead_7be0827a837c14570d33adbc9cb6f25b",
+      "published_at": "2026-08-18",
+      "refs": {},
+      "source": "edgar:META",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "META 4 filed 2026-08-18",
+      "triage": {
+        "decided_at": "2026-08-19T22:33:21.255966+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true
+        },
+        "reason": "具名追蹤公司、SEC Form 4 一手文件與明確 filing 日期；可逐字核對 insider transaction／持股變化，先進低優先 pq1，是否僅為時變 observation 由追源決定。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1326801/000095010326012605/xslF345X06/ownership.xml"
     },
     "lead_7bffab80ea65599892880f07b65189d3": {
       "entities": {
@@ -19713,6 +20280,74 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2080428892863803778"
     },
+    "lead_826473daf6f4deaaff8503a106f6efd6": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia"
+        ],
+        "tickers": [
+          "NVDA",
+          "AMZN",
+          "CCXI",
+          "TSLA"
+        ]
+      },
+      "first_seen": "2026-08-19T22:31:58.079456+00:00",
+      "lead_id": "lead_826473daf6f4deaaff8503a106f6efd6",
+      "media": [
+        {
+          "cache": {
+            "bytes": 101631,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_826473daf6f4deaaff8503a106f6efd6/3_2089908192272924672.jpg",
+            "sha256": "bfb8186e9574d68e765c7e3b9af00d785e6f43c605fd9994ec819a9a6d7ecae2"
+          },
+          "height": 834,
+          "media_key": "3_2089908192272924672",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HQDYbZWbQAAYiNj.jpg",
+          "width": 1217
+        }
+      ],
+      "published_at": "2026-08-19T02:51:57.000Z",
+      "raw_text": "Unitree (688836) is now public.\n\nAnd is valued at ~$53.3B, after rising +492.18%\n\nWe finally have a major public company benchmark for humanoids.\n\nFor reference, Agility (backed by $NVDA, $AMZN) via $CCXI is expected to go public at $2.5B premoney valuation Q4. \n\n$TSLA is $1T+, but Optimus is wrapped inside a much larger company.\n\nBut I think Unitree showed that the demand for pure play humanoid players is much larger… than people expected in public markets.",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "NVDA"
+          ]
+        },
+        "robotics": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CCXI",
+            "Optimus",
+            "TSLA",
+            "humanoid"
+          ]
+        }
+      },
+      "title": "Unitree (688836) is now public. And is valued at ~$53.3B, after rising +492.18% We finally have a major public company benchmark for humanoids. For reference, Agility (backed by $NVDA, $AMZN) via $CCXI is expected to go public at $2.5B premoney valuation Q4. $TSLA is $1T+, but Optimus is wrapped inside a much larger company. But I think Unitree showed that the demand for pure play humanoid players is much larger… than people expected in public markets.",
+      "triage": {
+        "decided_at": "2026-08-19T22:33:23.215534+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "Unitree／Agility／CCXI／NVDA／AMZN／TSLA 與 humanoid 公開市場 benchmark 具體相關，含估值、漲幅與預期上市時點，可追回交易所／公司文件；數字未核實故僅授權 pq1。",
+        "related_trace_requeues": [
+          "lead_55d4f2734afbfab750d526b824198afb"
+        ],
+        "tier": 3
+      },
+      "url": "https://x.com/aleabitoreddit/status/2089908198694351064"
+    },
     "lead_830c264f2672720822ce495e715d1893": {
       "entities": {
         "company_ids": [
@@ -20085,6 +20720,91 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1051627/000143774926027677/axti20260630_10q.htm"
     },
+    "lead_85a70a23ae1002dabdedefb41b9bf721": {
+      "entities": {
+        "company_ids": [
+          "co:lumentum",
+          "co:macom",
+          "co:applied_optoelectronics"
+        ],
+        "tickers": [
+          "LITE",
+          "MTSI",
+          "AAOI"
+        ]
+      },
+      "first_seen": "2026-08-19T22:31:58.077992+00:00",
+      "lead_id": "lead_85a70a23ae1002dabdedefb41b9bf721",
+      "media": [
+        {
+          "cache": {
+            "bytes": 133143,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_85a70a23ae1002dabdedefb41b9bf721/3_2089970797838557184.jpg",
+            "sha256": "507eaef04df66e2f968088a21898eaa3e7f0bbaac6de2db3c94962f1fd4d8629"
+          },
+          "height": 792,
+          "media_key": "3_2089970797838557184",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HQERXhQbYAAQGR4.jpg",
+          "width": 1583
+        },
+        {
+          "cache": {
+            "bytes": 103588,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_85a70a23ae1002dabdedefb41b9bf721/3_2089970888477417472.jpg",
+            "sha256": "437a0f37bccf894640a0bfcb56c4f8cab089912388ed2372dc7eec6c385bc42e"
+          },
+          "height": 471,
+          "media_key": "3_2089970888477417472",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HQERcy6aoAAbzQz.jpg",
+          "width": 1579
+        }
+      ],
+      "published_at": "2026-08-19T07:11:47.000Z",
+      "raw_text": "We got $LITE, $MTSI, $AAOI all pointing to extreme demand imbalances with lasers/TIA/DSP/etc from earnings... \n\nAnd now Elazr GM at their investor conference stated: \n\nOptical supply is still far behind the market demand, the expected AI optical supply chain are likely to continue for years.\n\n- \"the entire supply chain is out of stock\"\n\n- \"the supply is still far behind the market demand\"\n\n- \"the shortage will continue to the next few years\"\n\n\"Whether it is PCB, carrier board, laser chip, or even related packaging  capacity, as long as the AI supply chain link, almost all are in short supply.\" \n\nWhen demand visibility extends for years with the supply chain bottlenecked:\n\nIt's getting difficult not to see photonics echoing the memory supercycle entering 2027.",
+      "refs": {
+        "outcome": "no_prepared_ra_exact_origin_missing",
+        "parked_reason": "LITE／MTSI／AAOI 光學供應短缺方向可由 Fabrinet transcript 的 lasers／memory／ASIC constraints 部分交叉支持，但未找到推文所稱 Elazr GM／investor conference 的正確講者、活動或逐字原文；「整條供應鏈缺貨數年」不能升格。",
+        "trace_attempts_ref": "逐字引號、Elazr／講者變體、investor conference exact search；Fabrinet Q3 FY2026 transcript 交叉核對",
+        "trace_next_trigger": "取得該 investor conference 的 canonical agenda／錄影／逐字稿，或 LITE／MTSI／AAOI／Fabrinet 一手文件量化 laser／TIA／DSP／packaging 供應缺口與時程",
+        "trace_requires_user": "false",
+        "trace_status": "partial",
+        "trace_trigger_entities": [
+          "AAOI",
+          "LITE",
+          "MTSI",
+          "co:applied_optoelectronics",
+          "co:lumentum",
+          "co:macom"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
+      "source": "x:aleabitoreddit",
+      "status": "parked",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "LITE"
+          ]
+        }
+      },
+      "title": "We got $LITE, $MTSI, $AAOI all pointing to extreme demand imbalances with lasers/TIA/DSP/etc from earnings... And now Elazr GM at their investor conference stated: Optical supply is still far behind the market demand, the expected AI optical supply chain are likely to continue for years. - \"the entire supply chain is out of stock\" - \"the supply is still far behind the market demand\" - \"the shortage will continue to the next few years\" \"Whether it is PCB, carrier board, laser chip, or even related packaging capacity, as long as the AI supply chain link, almost all are in short supply.\" When demand visibility extends for years with the supply chain bottlenecked: It's getting difficult not to see photonics echoing the memory supercycle entering 2027.",
+      "triage": {
+        "decided_at": "2026-08-19T22:33:23.454059+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "LITE／MTSI／AAOI 與 AI optical supply shortage 直接相關，含具體公司、元件與逐字引號；可追 investor conference 原始材料，可能新增跨公司需求證據。",
+        "tier": 3
+      },
+      "url": "https://x.com/aleabitoreddit/status/2089973586425766134"
+    },
     "lead_85f0e54130000bfc62725a57c4da02cf": {
       "entities": {
         "company_ids": [],
@@ -20156,6 +20876,34 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2089057857652338993"
+    },
+    "lead_8601e0f81517fd0e7852fb7642d66762": {
+      "entities": {
+        "company_ids": [
+          "co:meta"
+        ],
+        "tickers": [
+          "META"
+        ]
+      },
+      "first_seen": "2026-08-19T22:32:08.068578+00:00",
+      "lead_id": "lead_8601e0f81517fd0e7852fb7642d66762",
+      "published_at": "2026-08-18",
+      "refs": {},
+      "source": "edgar:META",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "META 4 filed 2026-08-18",
+      "triage": {
+        "decided_at": "2026-08-19T22:33:21.497352+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true
+        },
+        "reason": "具名追蹤公司、SEC Form 4 一手文件與明確 filing 日期；可逐字核對 insider transaction／持股變化，先進低優先 pq1，是否僅為時變 observation 由追源決定。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1326801/000095010326012610/xslF345X06/ownership.xml"
     },
     "lead_8610653924d5d66801d50a14f07414ce": {
       "entities": {
@@ -20938,6 +21686,34 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2077228758491386121"
+    },
+    "lead_8bfed96650ca8c5d643ae26ee43c0af7": {
+      "entities": {
+        "company_ids": [
+          "co:meta"
+        ],
+        "tickers": [
+          "META"
+        ]
+      },
+      "first_seen": "2026-08-19T22:32:08.069002+00:00",
+      "lead_id": "lead_8bfed96650ca8c5d643ae26ee43c0af7",
+      "published_at": "2026-08-18",
+      "refs": {},
+      "source": "edgar:META",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "META 4 filed 2026-08-18",
+      "triage": {
+        "decided_at": "2026-08-19T22:33:21.747311+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true
+        },
+        "reason": "具名追蹤公司、SEC Form 4 一手文件與明確 filing 日期；可逐字核對 insider transaction／持股變化，先進低優先 pq1，是否僅為時變 observation 由追源決定。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1326801/000095010326012604/xslF345X06/ownership.xml"
     },
     "lead_8c3fba30392e99a9ac7922057f6994d9": {
       "entities": {
@@ -22855,6 +23631,34 @@
       ],
       "url": "https://x.com/aleabitoreddit/status/2078283847612186739"
     },
+    "lead_9f9ed402e43168da878626a812f3a150": {
+      "entities": {
+        "company_ids": [
+          "co:macom"
+        ],
+        "tickers": [
+          "MTSI"
+        ]
+      },
+      "first_seen": "2026-08-19T22:32:08.773854+00:00",
+      "lead_id": "lead_9f9ed402e43168da878626a812f3a150",
+      "published_at": "2026-08-19",
+      "refs": {},
+      "source": "edgar:MTSI",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "MTSI 4 filed 2026-08-19",
+      "triage": {
+        "decided_at": "2026-08-19T22:33:21.985387+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true
+        },
+        "reason": "具名追蹤公司、SEC Form 4 一手文件與明確 filing 日期；可逐字核對 insider transaction／持股變化，先進低優先 pq1，是否僅為時變 observation 由追源決定。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1493594/000090445426000468/xslF345X06/edgar.xml"
+    },
     "lead_9fd9b50cd11ff697931a504dad6df774": {
       "entities": {
         "company_ids": [],
@@ -22918,6 +23722,54 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1051627/000143774926020978/axti20260615_8k.htm"
+    },
+    "lead_a0bd6fe7a49456be4c19949c9717c138": {
+      "entities": {
+        "company_ids": [
+          "co:marvell_technology",
+          "co:google"
+        ],
+        "tickers": [
+          "MRVL",
+          "GOOGL",
+          "AMZN"
+        ]
+      },
+      "first_seen": "2026-08-19T22:31:58.034906+00:00",
+      "lead_id": "lead_a0bd6fe7a49456be4c19949c9717c138",
+      "media": [
+        {
+          "cache": {
+            "bytes": 125229,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_a0bd6fe7a49456be4c19949c9717c138/3_2090102252568784896.jpg",
+            "sha256": "e2b2726eae70f92c40cb9a74c1832ed8dc308ede736e8d3ce09d56fbdbbf9b91"
+          },
+          "height": 919,
+          "media_key": "3_2090102252568784896",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HQGI7MSbMAAi0pJ.jpg",
+          "width": 1626
+        }
+      ],
+      "published_at": "2026-08-19T15:49:36.000Z",
+      "raw_text": "$MRVL gives $GOOGL options to buy $12.2B of the company. \n\n\"The Marvell-Google deal covers a broad range of technologies used ​with TPUs, including processors that run AI models, manage data storage ​and  move information ⁠across networks.\"\n\nWhich could translate into ~$120 billion ​in revenue through 2033. \n\nMarvell also has separate warrants with $AMZN after their Celestial acquisition (for purchases of photonic fabric).\n\nRemember the good times when Jensen said Marvell would be the next $1T+ company?  \n\nSeems Nvidia knew Marvell was \"networking\" its way into all the hyperscalers with warrants.",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "$MRVL gives $GOOGL options to buy $12.2B of the company. \"The Marvell-Google deal covers a broad range of technologies used ​with TPUs, including processors that run AI models, manage data storage ​and move information ⁠across networks.\" Which could translate into ~$120 billion ​in revenue through 2033. Marvell also has separate warrants with $AMZN after their Celestial acquisition (for purchases of photonic fabric). Remember the good times when Jensen said Marvell would be the next $1T+ company? Seems Nvidia knew Marvell was \"networking\" its way into all the hyperscalers with warrants.",
+      "triage": {
+        "decided_at": "2026-08-19T22:33:23.698133+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true,
+          "novelty": true
+        },
+        "reason": "MRVL 與 GOOGL／AMZN 的 TPU、networking、photonic fabric 合作含具體 warrant／金額／期間主張，可追回公司或 SEC 文件，具潛在客戶端獨立印證價值。",
+        "tier": 3
+      },
+      "url": "https://x.com/aleabitoreddit/status/2090103899302826302"
     },
     "lead_a0ed818dccc2bdce19f8a00f8491d54f": {
       "entities": {
@@ -23402,18 +24254,26 @@
         "campaign_topic": "photonics",
         "campaign_window_end": "2026-07-29T13:46:25Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
+        "focus_company_id": "co:meta",
+        "gap": "underlying Meta memo 未公開；供應商未確認；RA staging local_PrivateStorageError",
         "original_claim_status": "partial_support_lta_and_capacity_exact_unverified",
+        "outcome": "validated_extraction_ra_prepare_blocked_private_acl",
         "parked_reason": "今日觸發 lead_f9bdf048e23b0239b1acbde1497744e5 未帶來 Meta internal memo 或 Meta／Samsung／SanDisk／Sumitomo 的具名 LTA 一手披露；既有官方資料只能支持 chip cadence，無新 graph delta。",
+        "primary_url": "https://www.investing.com/news/stock-market-news/meta-to-put-ai-chip-into-production-in-september-as-it-looks-to-double-computing-capacity-memo-shows-4787372",
         "research_mode": "delta_only",
         "research_outcome": "no_prepared_ra_new_trigger_no_primary_delta",
         "research_run": "daily:2026-08-17",
-        "trace_attempts_ref": "既有 Meta 10-Q、MTIA 官方文章；今日 triggering lead lead_f9bdf048e23b0239b1acbde1497744e5",
-        "trace_next_trigger": "Meta internal memo 原文，或 Meta／Samsung／SanDisk／Sumitomo 具名 LTA 一手披露",
+        "source_doc": "reuters_meta_compute_supply_lta_2026_07_09",
+        "trace_attempts_ref": "Reuters syndicated report＋Meta Q2 2026 earnings call；extraction validation OK；RA prepare 被 private storage ACL 擋下",
+        "trace_next_trigger": "library/private owner-only ACL 恢復後，以同一 validated extraction 重試 prepare_research_action",
+        "trace_origin_entity": "Reuters",
         "trace_requeue_consumed_entities": [
+          "CO:META",
+          "META",
           "SNDK"
         ],
-        "trace_requeue_trigger": "related_triaged_lead:lead_f9bdf048e23b0239b1acbde1497744e5",
-        "trace_requeued_at": "2026-08-16T22:33:43.823721+00:00",
+        "trace_requeue_trigger": "related_triaged_lead:lead_018171ed92846e0a0f14f1c1a20e6c07",
+        "trace_requeued_at": "2026-08-19T22:33:19.248616+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
@@ -23421,21 +24281,21 @@
           "SNDK",
           "co:meta"
         ],
-        "trace_trigger_event_ref": "lead:lead_f9bdf048e23b0239b1acbde1497744e5",
+        "trace_trigger_event_ref": "lead:lead_018171ed92846e0a0f14f1c1a20e6c07",
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "researching",
       "themes": {},
       "title": "Nothing like an internal $META memo getting published. Showing AI ramping as usual: - LTAs signed with Samsung and $SNDK for memory - LTAs signed with Sumitomo Electric for fiber optics - Expected to deploy 7GW compute infra this year, and doubling in 2027. - as much as $145B capex spend this year “It plans to launch a chip about every six months through 2027”",
       "triage": {
-        "decided_at": "2026-08-16T22:33:43.823721+00:00",
+        "decided_at": "2026-08-19T22:33:19.248616+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true,
           "user_requested": true
         },
-        "reason": "新 triage PASS lead lead_f9bdf048e23b0239b1acbde1497744e5 與 parked trace 共用具名標的 SNDK（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+        "reason": "新 triage PASS lead lead_018171ed92846e0a0f14f1c1a20e6c07 與 parked trace 共用具名標的 META, co:meta（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
         "tier": 4
       },
       "triage_history": [
@@ -23500,6 +24360,22 @@
               "user_requested": true
             },
             "reason": "指定實體的 tier-1 一手來源 lead_9a326a7ac257806d6a1828ffc106028b 與 parked trace 共用具名標的 META；事件觸發 bounded pq1 重查",
+            "tier": 4
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-19T22:33:19.248616+00:00",
+          "superseded_reason": "新 triage PASS lead lead_018171ed92846e0a0f14f1c1a20e6c07 與 parked trace 共用具名標的 META, co:meta（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_018171ed92846e0a0f14f1c1a20e6c07",
+          "triage": {
+            "decided_at": "2026-08-16T22:33:43.823721+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true,
+              "user_requested": true
+            },
+            "reason": "新 triage PASS lead lead_f9bdf048e23b0239b1acbde1497744e5 與 parked trace 共用具名標的 SNDK（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
             "tier": 4
           }
         }
@@ -24627,24 +25503,31 @@
         "campaign_window_end": "2026-07-05T09:45:21Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
         "original_claim_status": "partial_one_of_eight_primary_confirmed",
-        "parked_reason": "八項二手拼盤的本次觸發同樣只是 META Form 4，沒有補到 Morgan Stanley humanoid／probe-card、Yageo price hike、OpenAI inference、MLCC LTA、Bloom financing 或 Digitimes OSAT 的原始文件；Vistara 已另案入圖，本筆沒有一致的新 graph delta，不產 RA。",
+        "outcome": "no_prepared_ra_mixed_bundle_partial",
+        "parked_reason": "八項混合新聞中，Bloom Energy／Brookfield 官方公告確認 AI power financing framework 由 US$5B 擴至 US$25B；Meta Vistara 已由一手 ISCA 論文入圖。其餘 Morgan Stanley humanoid／test interface 漲價、電容 LTA、OpenAI 推論優化與 OSAT 漲價仍缺各自原始文件；混合貼文不產跨主題空 RA。",
+        "primary_url": "https://investor.bloomenergy.com/press-releases/press-release-details/2026/Brookfield-and-Bloom-Energy-Expand-AI-Infrastructure-Partnership-to-25-Billion-Fivefold-Increase-to-Build-and-Finance-Rapid-Power-for-AI-Infrastructure/default.aspx",
         "related_research_action_id": "ra_62c5841f8de2c67890cbefb805ba8d77",
         "research_mode": "delta_only",
         "research_outcome": "no_prepared_ra_form4_unrelated_to_composite_claims",
         "research_run": "daily-brief-2026-08-15",
-        "trace_attempts_ref": "既有 Vistara 官方論文與 RA；Morgan Stanley／Digitimes／公司官方來源追源；本輪 META Form 4 trigger relevance audit",
-        "trace_next_trigger": "任一剩餘 atomic claim 出現具名公司一手文件，或使用者指定 exact atom 提高優先權",
-        "trace_requeue_trigger": "related_triaged_lead:lead_9a326a7ac257806d6a1828ffc106028b",
-        "trace_requeued_at": "2026-08-13T22:36:37.087730+00:00",
+        "trace_attempts_ref": "Bloom Energy 2026-06-30 官方公告；Meta Vistara ISCA 2026；其餘各 atom exact search",
+        "trace_next_trigger": "各 atom 出現 issuer／客戶／監管或 canonical 券商原文時分開註冊，不再以混合貼文當單一證據",
+        "trace_origin_entity": "Bloom Energy／Brookfield",
+        "trace_requeue_consumed_entities": [
+          "CO:META",
+          "META"
+        ],
+        "trace_requeue_trigger": "related_triaged_lead:lead_018171ed92846e0a0f14f1c1a20e6c07",
+        "trace_requeued_at": "2026-08-19T22:33:19.248616+00:00",
         "trace_requires_user": "false",
-        "trace_status": "isolated_tier_3",
+        "trace_status": "partial",
         "trace_trigger_entities": [
           "ASX",
           "BE",
           "META",
           "co:meta"
         ],
-        "trace_trigger_event_ref": "lead:lead_9a326a7ac257806d6a1828ffc106028b",
+        "trace_trigger_event_ref": "lead:lead_018171ed92846e0a0f14f1c1a20e6c07",
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
@@ -24660,13 +25543,13 @@
       },
       "title": "Just some of the more interesting news I came across recently: 1. MS: Revised China humanoid shipments to reach 50,000 in 2026 from 14,000u and 28,000u earlier this year. 2. MS: Probe cards and test sockets likely to be priced hike (precious metal hikes + severe shortage of test pin capacity) 3. Capacitor price hikes: MLCC, aluminum electrolytic, tantalum, polymer aluminum, film, and super capacitors from Yageo. 4. $META Vistara architecture: Older DDR4 Memory with CXL as memory expansion 5. OpenAI achieved inference optimization breakthrough that halves costs and reduces GPU requirements. 6. LTAs are being signed with MLCC after Samsung signed LTA with US big tech customer 7. Grid power bottlenecks triggered 5x increase ($25B) in Brookfield's financing for $BE fuel cells. 8. Taiwan's chip packaging and testing supply chain includes major OSAT providers such as $ASX, Powertech, Winstek Semiconductor, Chipbond, ChipMOS, and ShunSin. Dedicated testing companies include KYEC, Ardentec, and Sigurd Microelectronics, while testing interface suppliers include WinWay, MPI, Keystone Microtech, Chunghwa Precision, and Hermes Testing Solutions. Leadframe makers include Jih Lin Tech, SDI, and CWTC, while major IC substrate suppliers include Unimicron, Kinsus, Nan Ya PCB, and Zhen Ding Tech. (Digitimes) - Taiwan-based OSAT providers are raising prices - Memory and IC packaging and testing capacity have both become bottlenecks in the semiconductor supply chain",
       "triage": {
-        "decided_at": "2026-08-13T22:36:37.087730+00:00",
+        "decided_at": "2026-08-19T22:33:19.248616+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true,
           "user_requested": true
         },
-        "reason": "指定實體的 tier-1 一手來源 lead_9a326a7ac257806d6a1828ffc106028b 與 parked trace 共用具名標的 META；事件觸發 bounded pq1 重查",
+        "reason": "新 triage PASS lead lead_018171ed92846e0a0f14f1c1a20e6c07 與 parked trace 共用具名標的 META, co:meta（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
         "tier": 4
       },
       "triage_history": [
@@ -24699,6 +25582,22 @@
               "user_requested": true
             },
             "reason": "新 triage PASS lead lead_79471f7e1d9ce0cea1a806571cfa4f9d 與 parked trace 共用具名標的 META, co:meta；事件觸發 bounded pq1 重查",
+            "tier": 4
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-19T22:33:19.248616+00:00",
+          "superseded_reason": "新 triage PASS lead lead_018171ed92846e0a0f14f1c1a20e6c07 與 parked trace 共用具名標的 META, co:meta（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_018171ed92846e0a0f14f1c1a20e6c07",
+          "triage": {
+            "decided_at": "2026-08-13T22:36:37.087730+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true,
+              "user_requested": true
+            },
+            "reason": "指定實體的 tier-1 一手來源 lead_9a326a7ac257806d6a1828ffc106028b 與 parked trace 共用具名標的 META；事件觸發 bounded pq1 重查",
             "tier": 4
           }
         }
@@ -25595,6 +26494,51 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000149/xslF345X06/wk-form4_1783445628.xml"
     },
+    "lead_b39d9c0a32a37cbba8970db2880e81d0": {
+      "entities": {
+        "company_ids": [
+          "co:lumentum"
+        ],
+        "tickers": [
+          "LITE"
+        ]
+      },
+      "first_seen": "2026-08-19T22:32:06.497038+00:00",
+      "lead_id": "lead_b39d9c0a32a37cbba8970db2880e81d0",
+      "published_at": "2026-08-18",
+      "refs": {
+        "outcome": "no_prepared_ra_dated_insider_observation",
+        "parked_reason": "Lumentum（LITE） 官方 SEC Form 4 已取得；內容只屬帶日期的 insider 持股／股權交易 observation，沒有唯一供應鏈 graph delta，因此不製造空 Research Action。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1633978/000164825626000005/xslF345X06/form4-08192026_120810.xml",
+        "storage_permission": "repo_excerpt",
+        "trace_attempts_ref": "SEC canonical Form 4 URL；fetchers/edgar.py 官方下載",
+        "trace_origin_entity": "SEC／issuer",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
+      "source": "edgar:LITE",
+      "status": "parked",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "LITE"
+          ]
+        }
+      },
+      "title": "LITE 4 filed 2026-08-18",
+      "triage": {
+        "decided_at": "2026-08-19T22:33:22.223962+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true
+        },
+        "reason": "具名追蹤公司、SEC Form 4 一手文件與明確 filing 日期；可逐字核對 insider transaction／持股變化，先進低優先 pq1，是否僅為時變 observation 由追源決定。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1633978/000164825626000005/xslF345X06/form4-08192026_120810.xml"
+    },
     "lead_b438b59a16bf43f336d2b594fe606849": {
       "entities": {
         "company_ids": [],
@@ -26082,6 +27026,34 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2071763387948859506"
+    },
+    "lead_b7686de3a17a6d33ca7b3691b3a2fb44": {
+      "entities": {
+        "company_ids": [
+          "co:meta"
+        ],
+        "tickers": [
+          "META"
+        ]
+      },
+      "first_seen": "2026-08-19T22:32:08.068872+00:00",
+      "lead_id": "lead_b7686de3a17a6d33ca7b3691b3a2fb44",
+      "published_at": "2026-08-18",
+      "refs": {},
+      "source": "edgar:META",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "META 4 filed 2026-08-18",
+      "triage": {
+        "decided_at": "2026-08-19T22:33:22.481438+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true
+        },
+        "reason": "具名追蹤公司、SEC Form 4 一手文件與明確 filing 日期；可逐字核對 insider transaction／持股變化，先進低優先 pq1，是否僅為時變 observation 由追源決定。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1326801/000095010326012606/xslF345X06/ownership.xml"
     },
     "lead_b8b6907dcdb7b1cb07a9eed1abcb7556": {
       "entities": {
@@ -29714,29 +30686,29 @@
         "research_run": "luna_reviewer_2026-08-02_pq1_10",
         "trace_attempts_ref": "Wells exact-note search; X screenshots; Meta Q2 2026 Form 8-K and Exhibit 99.1; triggering filing audit",
         "trace_next_trigger": "名單中的具名關係若由 issuer 自己揭露（如 GFS 簡報具名雷射供應商、SIVE 公告設計案），改由該 issuer 一手來源另開 lead 追",
-        "trace_requeue_trigger": "related_triaged_lead:lead_9a326a7ac257806d6a1828ffc106028b",
-        "trace_requeued_at": "2026-08-13T22:36:37.087730+00:00",
+        "trace_requeue_trigger": "related_triaged_lead:lead_018171ed92846e0a0f14f1c1a20e6c07",
+        "trace_requeued_at": "2026-08-19T22:33:19.248616+00:00",
         "trace_requires_user": "false",
         "trace_status": "lead_only_tier_4",
         "trace_trigger_entities": [
           "META",
           "co:meta"
         ],
-        "trace_trigger_event_ref": "lead:lead_9a326a7ac257806d6a1828ffc106028b",
+        "trace_trigger_event_ref": "lead:lead_018171ed92846e0a0f14f1c1a20e6c07",
         "trace_trigger_kind": "primary_source_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {},
       "title": "Wells Fargo: $META intent to sell excess compute is a positive signal around underlying demand and unit economics of AI. “Despite this shift, we don’t expect a pullback in Meta’s capex or that overall compute needs are lower” Regarding Neoclouds: WF thinks it validated the massive AI infra opportunity as well as acquisition opportunities. Despite any potential competition for Neoclouds. I’m inclined to agree with Wells Fargo here and say markets completely misunderstood Meta’s excess compute comment.",
       "triage": {
-        "decided_at": "2026-08-13T22:36:37.087730+00:00",
+        "decided_at": "2026-08-19T22:33:19.248616+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true,
           "user_requested": true
         },
-        "reason": "指定實體的 tier-1 一手來源 lead_9a326a7ac257806d6a1828ffc106028b 與 parked trace 共用具名標的 META, co:meta；事件觸發 bounded pq1 重查",
+        "reason": "指定實體的 tier-1 一手來源 lead_018171ed92846e0a0f14f1c1a20e6c07 與 parked trace 共用具名標的 META, co:meta；事件觸發 bounded pq1 重查",
         "tier": 4
       },
       "triage_history": [
@@ -29769,6 +30741,22 @@
               "user_requested": true
             },
             "reason": "新 triage PASS lead lead_79471f7e1d9ce0cea1a806571cfa4f9d 與 parked trace 共用具名標的 META, co:meta；事件觸發 bounded pq1 重查",
+            "tier": 4
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-19T22:33:19.248616+00:00",
+          "superseded_reason": "指定實體的 tier-1 一手來源 lead_018171ed92846e0a0f14f1c1a20e6c07 與 parked trace 共用具名標的 META, co:meta；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_018171ed92846e0a0f14f1c1a20e6c07",
+          "triage": {
+            "decided_at": "2026-08-13T22:36:37.087730+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true,
+              "user_requested": true
+            },
+            "reason": "指定實體的 tier-1 一手來源 lead_9a326a7ac257806d6a1828ffc106028b 與 parked trace 共用具名標的 META, co:meta；事件觸發 bounded pq1 重查",
             "tier": 4
           }
         }
@@ -31332,6 +32320,34 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2074496053030830172"
     },
+    "lead_e11b0bf0e840788d964f0fd8e75b40b9": {
+      "entities": {
+        "company_ids": [
+          "co:meta"
+        ],
+        "tickers": [
+          "META"
+        ]
+      },
+      "first_seen": "2026-08-19T22:32:08.068805+00:00",
+      "lead_id": "lead_e11b0bf0e840788d964f0fd8e75b40b9",
+      "published_at": "2026-08-18",
+      "refs": {},
+      "source": "edgar:META",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "META 4 filed 2026-08-18",
+      "triage": {
+        "decided_at": "2026-08-19T22:33:22.732189+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true
+        },
+        "reason": "具名追蹤公司、SEC Form 4 一手文件與明確 filing 日期；可逐字核對 insider transaction／持股變化，先進低優先 pq1，是否僅為時變 observation 由追源決定。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1326801/000095010326012607/xslF345X06/ownership.xml"
+    },
     "lead_e123ebff0d822e6c32b9a2b089646aab": {
       "entities": {
         "company_ids": [
@@ -31844,6 +32860,34 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826004885/aaoi_8k.htm"
+    },
+    "lead_e5c642239fefa5ac4b912d2d10a5c866": {
+      "entities": {
+        "company_ids": [
+          "co:meta"
+        ],
+        "tickers": [
+          "META"
+        ]
+      },
+      "first_seen": "2026-08-19T22:32:08.068648+00:00",
+      "lead_id": "lead_e5c642239fefa5ac4b912d2d10a5c866",
+      "published_at": "2026-08-18",
+      "refs": {},
+      "source": "edgar:META",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "META 4 filed 2026-08-18",
+      "triage": {
+        "decided_at": "2026-08-19T22:33:22.977639+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true
+        },
+        "reason": "具名追蹤公司、SEC Form 4 一手文件與明確 filing 日期；可逐字核對 insider transaction／持股變化，先進低優先 pq1，是否僅為時變 observation 由追源決定。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1326801/000095010326012609/xslF345X06/ownership.xml"
     },
     "lead_e5f4088218bafff7538c5eec808ea96e": {
       "entities": {
@@ -32523,8 +33567,12 @@
         "trace_next_trigger": "Meta 或 Anthropic 公告 definitive compute lease，或 Meta filing 揭露對手方、期限、capacity 與 revenue commitment",
         "trace_origin_entity": "Reuters/unnamed source",
         "trace_origin_linkage": "Reuters 與 NYT 都依未具名知情人士；公司方未確認",
-        "trace_requeue_trigger": "related_triaged_lead:lead_9a326a7ac257806d6a1828ffc106028b",
-        "trace_requeued_at": "2026-08-13T22:36:37.087730+00:00",
+        "trace_requeue_consumed_entities": [
+          "CO:META",
+          "META"
+        ],
+        "trace_requeue_trigger": "related_triaged_lead:lead_018171ed92846e0a0f14f1c1a20e6c07",
+        "trace_requeued_at": "2026-08-19T22:33:19.248616+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
@@ -32534,21 +33582,21 @@
           "SPCX",
           "co:meta"
         ],
-        "trace_trigger_event_ref": "lead:lead_9a326a7ac257806d6a1828ffc106028b",
+        "trace_trigger_event_ref": "lead:lead_018171ed92846e0a0f14f1c1a20e6c07",
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {},
       "title": "$META in talks to lease compute to Anthropic in a $10B dollar deal. Seems like they saw how profitable $SPCX $45B compute deal was. But just goes to validate Neocloud business models like $NBIS, $IREN, and co if hyperscalers are copying their homework. Source: NYT https://t.co/3Mu3UXQtFT",
       "triage": {
-        "decided_at": "2026-08-13T22:36:37.087730+00:00",
+        "decided_at": "2026-08-19T22:33:19.248616+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true,
           "user_requested": true
         },
-        "reason": "指定實體的 tier-1 一手來源 lead_9a326a7ac257806d6a1828ffc106028b 與 parked trace 共用具名標的 META, co:meta；事件觸發 bounded pq1 重查",
+        "reason": "新 triage PASS lead lead_018171ed92846e0a0f14f1c1a20e6c07 與 parked trace 共用具名標的 META, co:meta（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
         "tier": 4
       },
       "triage_history": [
@@ -32597,6 +33645,22 @@
               "user_requested": true
             },
             "reason": "新 triage PASS lead lead_3df060cf842783e4709ae6cd86b1be74 與 parked trace 共用具名標的 NBIS；事件觸發 bounded pq1 重查",
+            "tier": 4
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-19T22:33:19.248616+00:00",
+          "superseded_reason": "新 triage PASS lead lead_018171ed92846e0a0f14f1c1a20e6c07 與 parked trace 共用具名標的 META, co:meta（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_018171ed92846e0a0f14f1c1a20e6c07",
+          "triage": {
+            "decided_at": "2026-08-13T22:36:37.087730+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true,
+              "user_requested": true
+            },
+            "reason": "指定實體的 tier-1 一手來源 lead_9a326a7ac257806d6a1828ffc106028b 與 parked trace 共用具名標的 META, co:meta；事件觸發 bounded pq1 重查",
             "tier": 4
           }
         }
@@ -35403,8 +36467,8 @@
   "schema_version": "2",
   "source_state": {
     "x:aleabitoreddit": {
-      "since_id": "2089766053274661143",
-      "updated_at": "2026-08-18T23:03:44.937389+00:00",
+      "since_id": "2090103899302826302",
+      "updated_at": "2026-08-19T22:31:58.080512+00:00",
       "user_id": "1940360837547565056"
     }
   }
