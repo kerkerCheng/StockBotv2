@@ -356,3 +356,81 @@ def test_terminal_work_order_requires_explicit_pq2_receipt_to_redispatch(
         assert store.rank_work_orders(capacity=5)["selected"][0]["work_order_id"] == work_order_id
     finally:
         store.close()
+
+
+def test_reopen_lifecycle_epoch_restores_ability_to_record_outcome(tmp_path: Path) -> None:
+    """非 revised 終態後仍能重新啟用並產出 outcome——L13：驗收是端到端有產出。
+
+    事發（2026-08-19）：COHR 以 expired 結案後，使用者對它建立真實 live 部位並綁定
+    新的 disproof；再次結案會拋「terminal epoch already has a different outcome」，
+    等於新 disproof 觸發時拿不到 claim_correctness。
+    """
+
+    store = _store(tmp_path)
+    try:
+        cohort_id = store.ensure_cohort(
+            dedupe_key="fixture", company_id="co:sivers_semiconductors",
+            research_ticker="SIVE.ST",
+        )
+        cohort_id = cohort_id.cohort_id
+        first = store.close_lifecycle_with_outcome(
+            cohort_id=cohort_id,
+            terminal_status="expired",
+            outcome_payload={"claim_correctness": "unknown",
+                             "market_return_status": "unavailable",
+                             "reason": "到期未驗證", "evidence_refs": ()},
+            effective_at="2026-07-25T00:00:00+00:00",
+        )
+        assert first.terminal_status == "expired"
+
+        # 修復前：這裡會 raise，新 disproof 永遠拿不到 outcome
+        with pytest.raises(ValueError, match="terminal epoch already has"):
+            store.close_lifecycle_with_outcome(
+                cohort_id=cohort_id,
+                terminal_status="rejected",
+                outcome_payload={"claim_correctness": "false",
+                                 "market_return_status": "unavailable",
+                                 "reason": "disproof 觸發", "evidence_refs": ()},
+                effective_at="2027-03-01T00:00:00+00:00",
+            )
+
+        reopened = store.reopen_lifecycle_epoch(
+            cohort_id=cohort_id,
+            reason="使用者建立真實 live 部位並綁定新 disproof",
+            effective_at="2026-08-19T00:00:00+00:00",
+        )
+        assert reopened.epoch == 2
+        assert reopened.status == "active"
+
+        second = store.close_lifecycle_with_outcome(
+            cohort_id=cohort_id,
+            terminal_status="rejected",
+            outcome_payload={"claim_correctness": "false",
+                             "market_return_status": "unavailable",
+                             "reason": "disproof 觸發", "evidence_refs": ()},
+            effective_at="2027-03-01T00:00:00+00:00",
+        )
+        assert second.epoch == 2
+        assert second.claim_correctness == "false"
+
+        # append 不是覆寫：epoch 1 與其 outcome 原封不動
+        rows = store._conn.execute(
+            "SELECT epoch, terminal_status, claim_correctness FROM outcome_envelopes"
+            " WHERE cohort_id = ? ORDER BY epoch", (cohort_id,),
+        ).fetchall()
+        assert [(r["epoch"], r["terminal_status"], r["claim_correctness"]) for r in rows] == [
+            (1, "expired", "unknown"), (2, "rejected", "false"),
+        ]
+
+        # 仍在進行中的 lifecycle 不得 reopen
+        store.reopen_lifecycle_epoch(
+            cohort_id=cohort_id, reason="再開一次以測試 guard",
+            effective_at="2027-03-02T00:00:00+00:00",
+        )
+        with pytest.raises(ValueError, match="仍在進行中"):
+            store.reopen_lifecycle_epoch(
+                cohort_id=cohort_id, reason="重複 reopen",
+                effective_at="2027-03-03T00:00:00+00:00",
+            )
+    finally:
+        store.close()

@@ -2469,6 +2469,97 @@ class DecisionStore:
                 cohort_id, int(current["epoch"]), "review_required", review_due_at, event_id
             )
 
+    def reopen_lifecycle_epoch(
+        self,
+        *,
+        cohort_id: str,
+        reason: str,
+        effective_at: str,
+    ) -> LifecycleResult:
+        """為已 terminal 的 cohort 開新 epoch，讓它能再次被結案並產出 outcome。
+
+        事發（2026-08-19）：COHR 於 2026-07-25 以 `expired` 結案，使用者於 2026-08-18
+        對它建立**真實 live 部位**，08-19 又綁定新的 catalyst／disproof／expiry
+        （decision `pd_ed3b4543`，到期 2027-02-28）。但 `close_lifecycle_with_outcome`
+        只在 `terminal_status == 'revised'` 時自動開新 epoch，`expired`／`promoted`／
+        `rejected` 都不會；而 `_ensure_lifecycle_epoch` 對已存在的 epoch 直接回傳、
+        不遞增。實測後果：再次結案會拋
+        `terminal epoch already has a different outcome`——**新 disproof 觸發時無法寫入
+        outcome**，而 `claim_correctness` 正是「系統判斷準不準」的唯一資料來源
+        （長期 0/8 的那個空洞）。
+
+        ⚠ 這是 append 不是覆寫：epoch 1 與其 outcome 完全保留，只新增 epoch N+1，
+        符合 L10 對 private authority 的限制（只允許 append-only correction）。
+        `revised` 已有自動開新 epoch 的路徑，本函式只補「非 revised 終態後又重新啟用」
+        這個缺口，不改變任何既有 epoch 的狀態。
+        """
+
+        effective_at = _timestamp(effective_at, "effective_at")
+        if not reason.strip():
+            raise ValueError("reopen 必須附 reason")
+        with immediate_transaction(self._conn):
+            current = self._conn.execute(
+                """
+                SELECT epoch, status FROM probe_lifecycle_epochs
+                WHERE cohort_id = ? ORDER BY epoch DESC LIMIT 1
+                """,
+                (cohort_id,),
+            ).fetchone()
+            if current is None:
+                raise ValueError(f"cohort 尚無 lifecycle epoch：{cohort_id}")
+            status = str(current["status"])
+            if status in {"active", "review_required"}:
+                raise ValueError(
+                    f"lifecycle 仍在進行中（{status}），不需要 reopen"
+                )
+            epoch = int(current["epoch"])
+            next_epoch = epoch + 1
+            event_payload = {
+                "cohort_id": cohort_id,
+                "epoch": next_epoch,
+                "from_status": status,
+                "to_status": "active",
+                "reason": reason,
+                "effective_at": effective_at,
+            }
+            digest = _digest(_canonical_json(event_payload))
+            event_id = "le_" + digest[:32]
+            self._conn.execute(
+                """
+                INSERT INTO probe_lifecycle_epochs (
+                    cohort_id, epoch, status, started_at
+                ) VALUES (?, ?, 'active', ?)
+                """,
+                (cohort_id, next_epoch, effective_at),
+            )
+            self._conn.execute(
+                """
+                INSERT OR IGNORE INTO probe_lifecycle_events (
+                    lifecycle_event_id, cohort_id, epoch, from_status,
+                    to_status, reason, evidence_refs_json,
+                    event_digest, effective_at
+                ) VALUES (?, ?, ?, ?, 'active', ?, ?, ?, ?)
+                """,
+                (
+                    event_id,
+                    cohort_id,
+                    next_epoch,
+                    status,
+                    reason,
+                    _canonical_json({"items": ()}),
+                    digest,
+                    effective_at,
+                ),
+            )
+            self._conn.execute(
+                """
+                UPDATE probe_projection SET status = 'active', updated_at = datetime('now')
+                WHERE cohort_id = ?
+                """,
+                (cohort_id,),
+            )
+            return LifecycleResult(cohort_id, next_epoch, "active", None, event_id)
+
     @staticmethod
     def _outcome_result(payload: Mapping[str, Any]) -> OutcomeResult:
         return OutcomeResult(
