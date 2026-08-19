@@ -174,8 +174,16 @@ paper 記分板失去可比性。
   **正確分工：** beta 例行成交 → `library/trades/trade_log.jsonl`（事件紀錄）；
   alpha thesis 驅動成交 → 未來同時進 trade_log 與 Engine D fill。
 
-  **真正待補的是後者**，但 `live_choices`／`live_execution_reports` 仍為 0 筆
-  （`paper_events` 已於 2026-08-08 首次寫入）——live 這條路徑從未被走過。
+  **真正待補的是後者。** ⚠ **2026-08-19 更正：本段原寫「`live_choices`／
+  `live_execution_reports` 仍為 0 筆——live 這條路徑從未被走過」，該陳述已過期。**
+  實測：`live_choices` 1 筆（`lc_734a39a6`，COHR 10 股、`selected_weight=0.00732`、
+  `choice_type=user_sized`，系統當時 supported upper 僅 0.002）、
+  `live_execution_reports` 1 筆（`lf_92aede7e`，`ib-cohr-2026-08-18-10sh`，
+  10 股 @ USD 316.23），**2026-08-18 已首次走完 decision → choice → fill 全鏈**。
+  `paper_events` 已於 2026-08-08 首次寫入。
+  📌 教訓：本檔的「目前為 0 筆」型陳述會過期，引用前必須查 DB 而非引用本檔——
+  2026-08-19 就有一次直接引用本段過期文字對使用者說「這條路徑從未被走過」，
+  而一個 `select count(*)` 即可否證（L11 第 2 點：別對外部 claim 嚴、對自家文件鬆）。
   2026-08-15 起 `live_supported_range` 首次出現非零（AXT／LITE，各 `(0, 0.002)`），
   但兩筆的 intent 都是 paper、`live_status` 仍為 `NOT_REQUESTED`，
   `record-choice` 依舊無從執行。等真正要下第一筆 Engine D 驅動的 alpha 單時再加
