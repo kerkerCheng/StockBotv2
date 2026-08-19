@@ -57,16 +57,10 @@
 ### Skill 層（Claude Code / Codex 共用操作介面）
 權威內容存在 `skills/` 目錄，每個 skill 是告訴研究 agent「如何使用記憶層」的操作手冊；兩端的自動發現路徑由上方轉接層提供。
 
-| Skill | 觸發場景 |
-|-------|---------|
-| `skills/investment-research` | 問投資問題、評估標的、生成 thesis |
-| `skills/lead-intake` | 丟來一條推文/報導/消息，要入庫 |
-| `skills/blind-spot-audit` | 已有 thesis，要找反駁角度 |
-| `skills/company-onboard` | 新公司尚未入圖，要找文件並 onboarding |
-| `skills/signal-triage` | harvest 後判斷是否值得進自動 pq1；PASS 只授權追源／抽取，不授權入圖 |
-| `skills/source-trace` | 推文／轉述／截圖／二手報導先追回原文；tier 3–4 未果隔離 |
-| `skills/evidence-conflict-resolution` | EdgeAssertion 屬性衝突產 proposal；只在人工核准後寫 resolution |
-| `skills/daily-brief` | 本機每日 harvest／Engine C refresh／triage／today／穩定 pq2 核准 brief |
+**這裡不重抄 skill 清單與觸發場景**——每個 `skills/*/SKILL.md` 的 `description` frontmatter
+就是權威，兩端 harness 都會自動載入。曾經在此維護一張表，結果新增 `luna-reviewer` 後沒同步，
+表上長期少一個（2026-08-19 發現）。同理適用於任何 repo 裡已有結構化來源的清單：
+**清單會腐壞，判準不會**（見「現況數字會過期，判準不會」）。
 
 ### 決策層（Engine D — Decision & Accountability Engine／Decision Lab）
 
@@ -93,8 +87,7 @@ fetchers/edgar.py ──────↑                        engine_c/etl_yfin
 - **fetchers（已有）：** `fetchers/edgar.py`（美股 SEC EDGAR，免費無 paywall）。
 - **引擎B（X／EDGAR daily harvest 已建；trending horizon 由 weekly 負責）：** `crons/harvest_leads.py` 在本機以 X API `since_id`＋EDGAR watch 抓 metadata → triage PASS → routine 依 priority 自動 pq1（source-trace＋extract）→ prepared Research Action 才進 pq2 等使用者核准入圖。ad hoc 手機入口仍走 `skills/lead-intake`。
 - **本機音訊追源：** 官方 podcast／錄音沒有 transcript 時，用 `scripts/transcribe_audio.py` 跑 `faster-whisper`；預設 CPU `small.en`，模型與完整逐字稿只存 ignored `library/private/`。ASR 只提供 timestamp locator，不自行提高 evidence tier；精確技術詞與 quote 仍須回聽核對。cloud fallback 不假設有此工具。
-- **每週審查（Codex 本機排程，台北週日 04:00，`crons/weekly_scan_prompt.md`）：** 只做 topic discovery（不追源、不抽取）＋thesis lifecycle 唯讀提醒＋完整本機健康審查。可確定性維護先修；需要證據／thesis／持倉 authority 的大事才進統一 pq2。刻意與 daily 06:30 錯開，報告留 `docs/reports/`。
-  - **Weekly authority hierarchy：** `AGENTS.md` 是政策 SSOT；`crons/weekly_scan_prompt.md` 是 executable runbook，只有開發／人工修 policy 時才改，weekly routine 本身不得自我改寫。`docs/reports/weekly_scan_<date>.md` 是當週 point-in-time 歷史報告，不是 current-state truth；現況仍以 leads／todo pool／lifecycle／Engine A-C-D 各自 authority 為準。
+- **每週審查（Codex 本機排程，台北週日 04:00，`crons/weekly_scan_prompt.md`）：** 只做 topic discovery（不追源、不抽取）＋thesis lifecycle 唯讀提醒＋完整本機健康審查。可確定性維護先修；需要證據／thesis／持倉 authority 的大事才進統一 pq2。刻意與 daily 06:30 錯開，報告留 `docs/reports/`。authority hierarchy 見「報告留檔策略」。
 - **各類來源的 AI 抽取 instruction：** [`docs/extraction-instructions.md`](docs/extraction-instructions.md)
 - **遠端存取（手機 App／web／Claude chat fallback）：** 本機 MCP server（`mcp_server/graph_mcp.py`）+ Cloudflare Tunnel + connector。十二工具 surface，Git 能力僅 leads.json 一個窄例外；daily／weekly 現行排程不需要 MCP，因為直接在本機 repo 執行。完整資料流、安全邊界、Research Action／storage 協定與跨平台限制：[`docs/remote-access-architecture.md`](docs/remote-access-architecture.md)
 
@@ -119,6 +112,29 @@ fetchers/edgar.py ──────↑                        engine_c/etl_yfin
 
 **新增內容放哪：** 是判準或會約束行為的規則 → 本檔；是怎麼跑的程序 → OPERATIONS；
 是做完什麼或想做什麼 → ROADMAP。
+
+### ⚠ 現況數字會過期，判準不會（2026-08-19 定案）
+
+**任何「目前 N 筆」「至今 0／8」「從未發生過」型陳述，在文件裡都是會腐壞的快照。**
+判準寫進文件是對的（它不隨時間變），**現況數字寫進文件是錯的**——它會在某天悄悄變成假的，
+而讀者無從察覺。
+
+實測代價（2026-08-19 一天內兩次）：① ROADMAP 寫著「`live_choices`／`live_execution_reports`
+仍為 0 筆——live 這條路徑從未被走過」，agent 直接引用它告訴使用者「這條路徑從未被走過」，
+但使用者前一天就走完了全鏈；② ROADMAP 寫著 `commercial_maturity` 的缺口是「缺人去讀年報」，
+agent 差點照做，實測後發現 7 個積壓沒有一個是讀年報能解的。
+
+**規則：**
+1. 政策檔與 ROADMAP 陳述現況時，**必須附上查證命令或 authority 路徑**，讓讀者能一行驗證，
+   而不是相信文字。例：不寫「`live_choices` 為 0 筆」，寫「`live_choices` 筆數見
+   `library/private/decision_lab/decision_lab.db`，查證：`select count(*) from live_choices`」。
+2. **引用自家文件的現況陳述前，先跑那條查證命令。** 這是 L11 第 2 點（別對外部 claim 嚴、
+   對自家文件鬆）的直接應用；兩次事故都是 30 秒內可否證。
+3. Lesson 的「事發」段落是**歷史記錄**，其中的數字是當時實測值，**不因現況改變而更新**；
+   但必須帶事發日期，避免被誤讀成現況。
+4. 數字若確實需要常駐可見，**做成會自己出現的計數器**（如 daily brief 首屏的「非零 live 區間／
+   已量測 outcome」），不要靠文件段落——L14 已經寫過「真正的防呆是會自己出現的常駐計數器，
+   不是要人讀的段落」。
 
 ---
 
@@ -270,32 +286,23 @@ error，只允許該命令既有的 bounded、idempotent retry 作最後一步�
 
 **daily brief 不留檔**（只出在 session；稽核價值由待辦池 log ＋ leads 狀態機 ＋ Decision Store 承擔）；**weekly report 留檔**（`docs/reports/`，含無法從池重建的 topic discovery 與健康審查趨勢）。不回到 PR/Issue 形式——那會產生與池競爭的第二個狀態源。
 
-**Weekly authority hierarchy：** `AGENTS.md` 是政策 SSOT；`crons/weekly_scan_prompt.md` 是 executable runbook，只有開發／人工修 policy 時才改，**weekly routine 本身不得自我改寫**。`docs/reports/weekly_scan_<date>.md` 是當週 point-in-time 歷史報告，不是 current-state truth。
+**Weekly authority hierarchy：** `AGENTS.md` 是政策 SSOT；`crons/weekly_scan_prompt.md` 是 executable runbook，只有開發／人工修 policy 時才改，**weekly routine 本身不得自我改寫**。`docs/reports/weekly_scan_<date>.md` 是當週 point-in-time 歷史報告，不是 current-state truth；現況仍以 leads／todo pool／lifecycle／Engine A-C-D 各自 authority 為準。
 
 ### Daily Brief provider-neutral outbound 通知（2026-08-04）
 
-Daily Brief 完成後可由 Codex 或本機 Claude Code 呼叫同一支
-`scripts/publish_daily_brief.py`，把完整 Markdown 以 outbound-only 方式送到 Discord private Forum channel；每份 Daily Brief 建立一個新的每日討論串，摘要與完整內容分段放在同一串內。
-通知不是 authority：不接受 Discord `go`／交易／入圖指令，不寫 todo、Decision、Graph 或 Sheet，也不改變
-人工 graph admission／live gate。Discord 只使用本機 `.env` 的
-`NOTIFY_DISCORD_WEBHOOK_URL` 與可選 `NOTIFY_DISCORD_TAG_USER_ID`；不需要 Discord bot token、OAuth、
-Claude API key 或 Codex API key。
+Daily Brief 完成後可由 Codex 或本機 Claude Code 呼叫同一支 `scripts/publish_daily_brief.py`，
+outbound-only 送到 Discord private Forum channel。**三條判準：**
 
-Publisher 的 private SQLite outbox 以 `brief_digest + channel_alias` 做唯一去重鍵；建立 Forum 討論串後保存
-`thread_id`／`thread_name`，完整 Markdown 超過單則限制時分段傳送到同一串，逐段保存 append-only delivery
-attempts／receipt，單段最多重試 3 次。發送失敗是
-`delivery_failed`／`not_configured` 的 best-effort 狀態，不得阻斷 Daily Brief；`.env`、webhook 與
-`library/private/notifications/` 永遠不得進 Git。Session metadata 只作通知附註：Claude Code 可附
-`claude -r <session-id>`、Claude App share URL（若有）、Codex thread ID；第一版不採未文件化的
-`stockbot://` launcher。
+- **通知不是 authority：** 不接受 Discord `go`／交易／入圖指令，不寫 todo、Decision、Graph 或 Sheet，
+  也不改變人工 graph admission／live gate。
+- **Canonical Brief 只有一份：** task 最終回覆與 Discord publisher 必須使用同一份最終 Markdown。
+  publisher 完成後不得再為 task 另寫精簡版、摘要版或刪除 Beta 表格；delivery receipt 可附在完整
+  brief 後方，但不能取代或重寫任何 section。
+- **失敗不得阻斷：** 發送失敗是 `delivery_failed`／`not_configured` 的 best-effort 狀態；
+  `.env`、webhook 與 `library/private/notifications/` 永遠不得進 Git。
 
-Windows PowerShell 5.1 的 `$OutputEncoding` 預設為 `us-ascii`；Daily Brief 含中文時，排程必須使用
-`--brief-file`，由 Python 直接以 UTF-8 讀取。不得直接用 `Get-Content | ... --stdin` 管線傳送，
-除非呼叫端已明確設定 UTF-8 stdin，否則中文會在進入 publisher 前被替換成問號。
-
-**Canonical Brief 只有一份：** task 最終回覆與 Discord publisher 必須使用同一份最終 Markdown。publisher 完成後不得再為 task 另寫精簡版、摘要版或刪除 Beta 表格；delivery receipt 可附在完整 brief 後方，但不能取代或重寫任何 section。
-
----
+去重鍵、Forum thread 保存、分段重試與 PowerShell UTF-8 陷阱等操作細節見
+[`docs/OPERATIONS.md`](docs/OPERATIONS.md)。
 
 ---
 
@@ -506,10 +513,5 @@ Gap 1–3（Claim 缺 `name`、`source_ids` 是文件內局部 ID、`ABOUT` 未�
 **遇到「某個事實塞不進既有欄位／狀態／關係」時先讀 [`docs/solutions/architecture-patterns/closed-vocabulary-registry.md`](docs/solutions/architecture-patterns/closed-vocabulary-registry.md)。** 它列出每個封閉字彙住在哪、能不能擴充、以及擴充要改 config 還是改 code，省去逐一讀 Python 才知道邊界的成本。判準是 taxonomy（世界會長出新品類→字彙留鬆，放 `config/`／`schema/`）vs contract（刻意有限→打開它是 bug）。⚠ 新增 `config/*.json` 必須同時在 `.gitignore` 補 `!config/<name>.json`，否則 fresh clone 與另一個 agent 會缺檔而靜默失效；`tests/test_config_tracking.py` 是這道剎車。
 
 ---
-
-<!-- ===== 自訂：Skill 輸出翻譯（2026-06 加） ===== -->
-## Skill 輸出語言
-併入上方「## 工作語言（繁體中文）」——Skill 最終輸出（含 last-30-days）一律翻成繁體中文；整個實作過程亦同。
-<!-- ===== 自訂結束 ===== -->
 
 ## Imported Claude Cowork project instructions

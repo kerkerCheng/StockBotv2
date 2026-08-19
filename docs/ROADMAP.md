@@ -44,6 +44,9 @@ brainstorm；範圍大到需要驗收條件才開 plan。brainstorm 用 frontmat
 | 2026-08-19 | 待辦池三個 `decision_review` 不退場是因為「空 `blockers` 被 `todo.py:1448` 判成非純系統」 | `sizing` 的 `assessment_blockers`／`paper_blockers` 確實全空，且 paper 已 ELIGIBLE；「空集合被判成非純系統」又是一個漂亮的 L12 案例 | `python -m decision_lab card <decision_id>` → `card.blockers` 有 **7 個碼**，不是空的 |
 | 2026-08-19 | 同上，第二版：「`execution_fx_stale_since_decision` 未登記，掉進 `execution_` 泛用 prefix 被判 `awaiting_external`」 | 自己寫的檢查腳本取「**第一個** prefix 匹配」而非登記表 `_matching` 規定的「**最長**匹配」，於是自製了一個不存在的 bug。剛好是 L15「gate 攔錯東西」的形狀，可執行、可驗收，看起來完全合理 | 讀 `config/decision_blockers.json` 的 `_matching` 那一行；或 `get_blocker_registry().classify(codes)` 直接跑。真相是它**早就以 exact prefix 登記為 `system_internal`**。補進去後被 `test_registry_is_the_single_source_of_severity` 以「重複 key 73≠72」擋下——**測試比我可靠** |
 
+| 2026-08-19 | 「`live_choices`／`live_execution_reports` 仍為 0 筆，live 這條路徑**從未被走過**」——並據此對使用者斷言 | **直接引用本檔自己的文字**，而該句寫於 2026-08-15 之前、當時為真。錯誤不在推理而在**根本沒推理**：把自家文件當成 current-state truth 引用，正是 L11 判準 2 說的「對外部 claim 嚴、對自家文件鬆」。使用者前一天才走完全鏈，且系統完整記錄了 choice 與 fill | `select count(*) from live_choices` → **1**。已改為附查證命令，並新增 `AGENTS.md`「現況數字會過期，判準不會」小節 |
+| 2026-08-19 | 「`commercial_maturity` 積壓缺的是**有人去讀年報附註**」 | 本檔原條目這樣寫，聽起來完全合理（IQE 正是這樣解掉的），差點就照做去讀年報 | 逐一看 7 個積壓的 `missing_data` → 6 個是 `research_assessment_missing`（**連 assessment 都沒有**，且五軸 reason 一字不差），AVGO 甚至早就有那兩筆觀測；第 7 個 Agility 未上市、沒有年報可讀。**靠讀年報能下降的是 0 個** |
+
 ⚠ **這一節自己的 disproof：** 若之後仍發生「診斷已落地才被推翻」，代表它沒生效，
 不要靠加字補救——那正是 L14 批評的「要人讀的段落」。屆時該做的是把否證步驟綁進
 會自己執行的東西（測試、hook、或 commit 前的檢查），而不是把這張表寫得更長。
@@ -384,5 +387,5 @@ paper 記分板失去可比性。
 #### 其他
 
 - **技術指標擴充**（相對強弱 vs QQQ、ATR）— `engine_c/technical.py` 的 `_METRIC_COLUMNS` 寫死且是 DB 欄位，需配 migration
-- **Engine D 未上市公司支援** — 2026-07-30 使用者定案暫不做。現況：`research_ticker` 屬核心 identity 欄位，缺它整組 fallback 成 unresolved 並丟掉 `company_id`，導致未上市公司無論圖品質多好都撞 `identity_unresolved`＋`graph_company_missing`。Lane Memo 不受影響（`generate_lane_memo.py` 完全不經過 Engine D，`--ticker` 為選用，無 ticker 走「產業全圖模式」）
+- **Engine D 未上市公司支援** — 2026-07-30 使用者定案暫不做。現況：`research_ticker` 屬核心 identity 欄位，缺它整組 fallback 成 unresolved 並丟掉 `company_id`，導致未上市公司無論圖品質多好都撞 `identity_unresolved`＋`graph_company_missing`。Lane Memo 不受影響（`thesis/generate_lane_memo.py` 完全不經過 Engine D，`--ticker` 為選用，無 ticker 走「產業全圖模式」）
 - **灌文件提升圖深度** — 2026-07-30 實測：53 家公司、63 份 SourceDoc，僅 3 家（Coherent、Sivers、AAOI）有 ≥3 distinct origin 可過 L8。**擋住 Lane Memo 的是證據深度不是 gate 嚴格度**；一家從 1 個 origin 到 3 個約需 2–3 份文件，零架構風險
