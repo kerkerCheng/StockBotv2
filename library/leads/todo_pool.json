@@ -2918,6 +2918,69 @@
       "source": "manual",
       "title": "確認 POET Technologies（POET）decision catalyst／disproof 與 Q3 2026 時點",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-08-19T06:06:46.434087+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-08-18T00:00:00+00:00；來源=Engine C financial_snapshots（yfinance.info）as_of 2026-08-18；現金與 contract liabili",
+      "n": 184,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_d082cc43a7904f2a82836081fa46252b;proposal:po_4b9efd1f8ebf8a9af63a0e08b073881f",
+      "ref_id": "po_4b9efd1f8ebf8a9af63a0e08b073881f",
+      "resolution": "go",
+      "resolved_at": "2026-08-19T06:11:36.527231+00:00",
+      "source": "engine_c",
+      "title": "Engine C 觀測：POET / valuation_pressure",
+      "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-08-19T06:06:46.434087+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-08-17T00:00:00+00:00；來源=Engine C financial_snapshots（yfinance.info）as_of 2026-08-17；runway 與毛利率取自同一快照的 r",
+      "n": 185,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_d6c9957f88924e81b40b3739276f1a01;proposal:po_7da0b5c1f36e8a950ed821b1422cc7e9",
+      "ref_id": "po_7da0b5c1f36e8a950ed821b1422cc7e9",
+      "resolution": "go",
+      "resolved_at": "2026-08-19T06:11:37.142918+00:00",
+      "source": "engine_c",
+      "title": "Engine C 觀測：AEVA / valuation_pressure",
+      "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-08-19T06:06:46.434087+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-08-18T00:00:00+00:00；來源=Engine C financial_snapshots（yfinance.info）as_of 2026-08-18；隱含假設解讀與 RPO 交叉比對由本輪人",
+      "n": 186,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_3054f1a83785ecd1ba2c70d955e590e3;proposal:po_910170ba51e71c38a56eab29c1e8a079",
+      "ref_id": "po_910170ba51e71c38a56eab29c1e8a079",
+      "resolution": "go",
+      "resolved_at": "2026-08-19T06:11:37.792152+00:00",
+      "source": "engine_c",
+      "title": "Engine C 觀測：AVGO / valuation_pressure",
+      "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-08-19T06:06:46.434087+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 187,
+      "reason": null,
+      "ref_id": "dc_718d04ef9859103e5fa07d4defa1e6b3",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:broadcom",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-19T06:06:46.434087+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 188,
+      "reason": null,
+      "ref_id": "dc_606a4a50609e3b708f2138bb597ffacc",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:poet_technologies",
+      "type": "decision_review"
     }
   ],
   "log": [
@@ -6611,8 +6674,35 @@
       "ref_id": "dc_606a4a50609e3b708f2138bb597ffacc",
       "type": "decision_review",
       "verb": "go"
+    },
+    {
+      "at": "2026-08-19T06:11:36.527231+00:00",
+      "n": 184,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_d082cc43a7904f2a82836081fa46252b;proposal:po_4b9efd1f8ebf8a9af63a0e08b073881f",
+      "ref_id": "po_4b9efd1f8ebf8a9af63a0e08b073881f",
+      "type": "engine_c_observation",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-19T06:11:37.142918+00:00",
+      "n": 185,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_d6c9957f88924e81b40b3739276f1a01;proposal:po_7da0b5c1f36e8a950ed821b1422cc7e9",
+      "ref_id": "po_7da0b5c1f36e8a950ed821b1422cc7e9",
+      "type": "engine_c_observation",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-19T06:11:37.792152+00:00",
+      "n": 186,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_3054f1a83785ecd1ba2c70d955e590e3;proposal:po_910170ba51e71c38a56eab29c1e8a079",
+      "ref_id": "po_910170ba51e71c38a56eab29c1e8a079",
+      "type": "engine_c_observation",
+      "verb": "go"
     }
   ],
-  "next_n": 184,
+  "next_n": 189,
   "schema_version": "1"
 }
