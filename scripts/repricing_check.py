@@ -30,7 +30,7 @@ from __future__ import annotations
 import json
 import sqlite3
 import sys
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -65,18 +65,31 @@ def _pct(new, old):
     return new / old - 1.0
 
 
-def _provider_close(ticker: str) -> tuple[str, float] | None:
-    """最新一根**實際 K 線**的 (交易日, 收盤價)。盤中時該根尚未收盤，輸出會標示。
+def _provider_close(ticker: str) -> tuple[str, float, bool] | None:
+    """最新一根**實際 K 線**的 (交易日, 收盤價, 是否尚未收盤)。
 
-    ⚠ **現價不取自 Engine C `financial_snapshots.price`。** 2026-08-18 實測：該欄取自
-    `yfinance.info` 的快照 dict（`previousClose`），而那個值對不上任何一天的實際收盤——
-    COHR 記 351.22，實際 08-14 收 325.83、08-18 收 309.00。更糟的是 ETL 另外蓋了
-    `bar_date=2026-08-17`，**那天根本沒有開市**（週五 08-14 → 週二 08-18）：
-    一個看起來很權威、實際憑空生成的日期。
+    現價取 provider K 線而非 Engine C `financial_snapshots.price`，理由是 **as-of 新鮮度**：
+    快照是每日 ETL 執行時的一個點，盤中比對時最新 K 線更貼近當下；兩者在同一交易日收盤後
+    應當一致。
 
-    本檔首版直接用了 `financial_snapshots.price`，於是把 COHR 距分析師目標的空間
-    算成 +17%（實際 +33%）。`outcome_if_settled_today.py` 早就避開這個坑並在
-    docstring 寫明理由——同一個教訓在同一天被重踩，因為新檔案沒有繼承那段知識。
+    ⚠ **2026-08-19 更正：本 docstring 的初版宣稱 Engine C 那欄「取自 `previousClose`、
+    對不上任何收盤，且 ETL 憑空蓋了 `bar_date=2026-08-17`（那天沒開市）」——三點全錯，
+    不要再沿用那套說法：**
+
+    - 2026-08-17 是**星期一**，正常交易日；初版寫的「週五 08-14 → 週二 08-18」漏掉了它。
+    - `yf.Ticker("COHR").history()` 實測**有** 08-17 那根 K 線，收盤 `351.220001`，
+      正是 Engine C 記下的值。
+    - `etl_yfinance.fetch_snapshot` 讀的是 `currentPrice`／`regularMarketPrice`；
+      `_bar_identity()` 只用 provider 明示的 `regularMarketTime`＋`exchangeTimezoneName`＋
+      `marketState`，**不做推斷**，欄位缺就回 `None`。它沒有生成任何日期。
+
+    當時的觸發現象（使用者 08-18 以 316.23 成交、系統顯示 351.22）是 **COHR 當天跌 12.7%**
+    （351.22 → 306.43，盤中低 305.50），不是資料污染；「+17% → +33%」則是 as-of 由 08-17
+    收盤換成 08-18 盤中的必然差異，不是修正了一個錯誤。
+
+    留下的教訓不是「Engine C 的價格不可信」，而是 L11／L15：**在自己的診斷上要套用跟圖裡
+    claim 同一套追源紀律**。當時只要多做一步（`history()` 印出來、或查 08-17 是星期幾），
+    整條推論就會停住；沒做那一步，錯誤結論反而被寫進 commit message、ROADMAP 和本檔。
     """
     try:
         import yfinance as yf
@@ -86,7 +99,17 @@ def _provider_close(ticker: str) -> tuple[str, float] | None:
         return None
     if hist.empty:
         return None
-    return hist.index[-1].date().isoformat(), float(hist.iloc[-1])
+    stamp = hist.index[-1]
+    # 第三個回傳值＝「這根 bar 的日期是交易所當地的今天」。yfinance 的 index 帶交易所
+    # 時區，所以直接跟同一時區的今天比，不必自己推時區。⚠ 它**不等於**「尚未收盤」——
+    # 美東晚間跑時當日 bar 早已定案，仍會是 True。要真正判斷收盤與否得看交易時段表或
+    # `marketState`，本函式不猜，只回報它查得到的事實。
+    try:
+        today_there = datetime.now(stamp.tzinfo).date() if stamp.tzinfo else date.today()
+    except Exception:  # noqa: BLE001 — 取不到就當作已收盤，不謊報盤中
+        today_there = None
+    unsettled = today_there is not None and stamp.date() == today_there
+    return stamp.date().isoformat(), float(hist.iloc[-1]), unsettled
 
 
 def _positive_pe(value) -> float | None:
@@ -129,14 +152,15 @@ def main() -> int:
             # 錨點日當天或之後的第一筆；Engine C 的覆蓋期可能晚於 Shadow 錨點。
             start = next((s for s in snaps if str(s["snapshot_date"]) >= anchor), snaps[0])
             end = snaps[-1]
-            # 現價一律用 provider 實際收盤；Engine C 只提供「共識 EPS」這個它真正加值的部分。
+            # 現價用 provider 最新 K 線（as-of 較新）；Engine C 提供共識 EPS。
             bar = _provider_close(ticker)
             end_price = bar[1] if bar else end["price"]
-            price_source = f"bar@{bar[0]}" if bar else "engine_c(⚠未校正)"
+            price_source = f"bar@{bar[0]}" if bar else "engine_c(⚠未取得 K 線)"
+            price_unsettled = bool(bar and bar[2])
 
             pe_from, pe_to = _positive_pe(start["pe_forward"]), _positive_pe(end["pe_forward"])
-            # forward P/E 與 price 同源，price 錯它也錯。可還原的是隱含的 forward EPS
-            # （= price ÷ pe），那才是 Engine C 真正帶來的資訊；用正確價格重算倍數。
+            # forward P/E 與 price 同源（同一份快照）。可還原的是隱含的 forward EPS
+            # （= price ÷ pe），再用現價重算倍數，讓兩者的 as-of 對齊。
             if pe_to and end["price"]:
                 implied_eps = end["price"] / pe_to
                 pe_to = end_price / implied_eps if implied_eps else pe_to
@@ -162,6 +186,7 @@ def main() -> int:
                     "gm_chg": _pct(end["gross_margin"], start["gross_margin"]),
                     "price": end_price,
                     "price_source": price_source,
+                    "price_unsettled": price_unsettled,
                     "target": target,
                     "upside": upside,
                 }
@@ -187,9 +212,11 @@ def main() -> int:
             f"| {_fmt(r['upside'])}{flag} |"
         )
 
-    print("\n**現價來源**（不使用 Engine C 快照，理由見 `_provider_close`）：")
+    print("\n**現價來源**（取 provider 最新 K 線，理由見 `_provider_close`）：")
     for r in sorted(rows, key=lambda x: x["ticker"]):
-        note = "（盤中，非最終收盤）" if "bar@" in r["price_source"] else ""
+        # 只斷言查得到的事實：這根 bar 的日期就是交易所當地的今天。它是否已過收盤鐘
+        # 需要交易時段表或 marketState 才知道，這裡不猜（L12：別讓一個標籤兼講兩件事）。
+        note = "（交易所當地今日 bar，可能尚在盤中）" if r["price_unsettled"] else ""
         print(f"- {r['ticker']}：{r['price']:.2f}　{r['price_source']}{note}")
 
     print(
