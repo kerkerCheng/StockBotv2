@@ -1,0 +1,69 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "reuters_meta_compute_supply_lta_2026_07_09",
+    "title": "Reuters: Meta internal memo describes multi-year compute supply agreements",
+    "url": "https://www.investing.com/news/stock-market-news/meta-to-put-ai-chip-into-production-in-september-as-it-looks-to-double-computing-capacity-memo-shows-4787372",
+    "origin_entity": "Reuters",
+    "publisher": "Reuters (syndicated by Investing.com)",
+    "published_at": "2026-07-09",
+    "retrieved_at": "2026-08-20",
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "Copyrighted Reuters reporting; retain only one short, attributed research excerpt and the canonical public URL.",
+    "source_type": "news",
+    "evidence_tier": 3
+  },
+  "sources": [
+    {
+      "id": "reuters_meta_compute_supply_lta_2026_07_09_s1",
+      "locator": "Reuters syndicated article, paragraph 75",
+      "quote": "Those include agreements with Samsung Electronics for memory chips, Sandisk for flash storage and Sumitomo Electric for fiber-optic equipment."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:meta",
+      "type": "Company",
+      "name": "Meta",
+      "abstraction_level": "end_demand",
+      "role": "adjacent_silicon",
+      "aliases": ["Meta Platforms", "META"],
+      "attributes": {},
+      "confidence": 0.5,
+      "source_ids": ["reuters_meta_compute_supply_lta_2026_07_09_s1"]
+    },
+    {
+      "id": "co:sumitomo_electric",
+      "type": "Company",
+      "name": "Sumitomo Electric Industries",
+      "abstraction_level": "materials_substrate",
+      "role": "material_base",
+      "aliases": ["Sumitomo Electric", "5802.T"],
+      "attributes": {},
+      "confidence": 0.5,
+      "source_ids": ["reuters_meta_compute_supply_lta_2026_07_09_s1"]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:sumitomo_electric",
+      "dst_id": "co:meta",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.45,
+      "source_ids": ["reuters_meta_compute_supply_lta_2026_07_09_s1"]
+    }
+  ],
+  "claims": [
+    {
+      "id": "reuters_meta_compute_supply_lta_2026_07_09_cl1",
+      "statement": "Reuters reported that a Meta internal memo described a multi-year supply agreement under which Sumitomo Electric provides fiber-optic equipment to Meta. The underlying memo was not obtained and Sumitomo did not confirm the report, so this is a tier-3 needs-review relationship claim only; it does not establish volume, exclusivity, qualification scope, price, or realized revenue.",
+      "subject_id": "e1",
+      "demand_proof_level": "inferred",
+      "disproof_condition": "Meta or Sumitomo Electric denies the agreement, or later primary documentation shows that the arrangement does not cover fiber-optic equipment supply to Meta.",
+      "confidence": 0.45,
+      "source_ids": ["reuters_meta_compute_supply_lta_2026_07_09_s1"]
+    }
+  ]
+}

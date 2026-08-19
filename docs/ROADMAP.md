@@ -166,6 +166,17 @@ paper 記分板失去可比性。
 
 **看起來像缺口但不是——請勿「修正」：**
 
+- **5 個 cohort 的最新 `expiry` 仍是 `+72h` 預設值，不要去清。**
+  2026-08-19 全庫掃描：16 個 cohort 中有 5 個（4 個無 ticker 的歷史 cohort ＋ LITE 的舊
+  重複 cohort `dc_ebaf2286`）最新 assessment 的 expiry ＝ `created_at + 72h`，是
+  2026-08-15 修復前的遺留。**但它們的 lifecycle 全部已 `expired`，且 `catalyst_watch`
+  根本不顯示它們**（無 ticker 者 `company_id IS NULL` 被查詢排除；LITE 因同 company_id
+  去重只取最新的 `dc_4d28e508`）。依 L14，修它們會讓 **0 筆**下游資料變化。
+  根因（reassess 未帶 `--expiry` 時回退成 policy 三天預設，把財報里程碑改造成假急件）
+  已由 `300b8e0`（2026-08-15 05:19 UTC）修復，並有 `tests/test_operational_workflow.py:399`
+  防迴歸；逐筆核對修復後只剩兩筆 `+72h`，兩筆都是**新建 cohort**（無舊值可繼承），屬正常。
+
+
 - **Beta 例行成交不進 Engine D 的 `record-fill`，這是設計正確。**
   `record_live_fill` 要求的不只是 `decision_id`，而是一整條責任鏈：
   decision → `record-choice`（使用者明確接受某個部位大小）→ fill，並驗證成交時間
