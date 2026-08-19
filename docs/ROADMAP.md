@@ -101,7 +101,8 @@ target 全是同一個 0.1%，常數不帶資訊，而使用者要的是「撒�
 
 | 目標 | 現值（2026-08-15） | 怎麼變好 |
 |---|---|---|
-| **廣度**：可評估標的數 | 8 個 ELIGIBLE cohort | **改用瓶頸目標導向**：`query/bottleneck.py` 已能列出 chokepoint 與其已知供應商，缺的是「這條 chokepoint 上還有誰沒研究過」→ 具名 harvest target（見 [`2026-08-18-alpha-live-user-sized`](brainstorms/2026-08-18-alpha-live-user-sized-requirements.md) §8.9）。舊做法（清 pq1 積壓、擴來源）沒有方向 |
+| 🔴 **可執行性**：使用者能否據此下手 | **2026-08-19 前為 0** | **本表原本缺這一列，是最上游的問題。** 前三個目標全是「系統內部指標」，沒有一個回答使用者真正的問題——「我不知道投哪個，你能幫我做到什麼」。實測後果：`rank_bottlenecks()` 早就把 COHR→NVIDIA（5/5 `sole_source`、外部印證、距需求端 2 跳）排在第 1，但它**從未進入 daily 流程**，於是使用者被迫自己判斷，而 agent 被問到推薦時以「outcome 0/8 未驗證」拒答。判準與交付要求已寫入 `AGENTS.md` Alpha 呈現契約「哪些標的值得看」小節，消費端已補進 `skills/daily-brief/SKILL.md`（Step 4 ＋ `## Alpha 候選` 段落）。**驗收：daily brief 每天輸出有序候選＋明確首選＋各自 disproof** |
+| **廣度**：可評估標的數 | 8 個 ELIGIBLE cohort | ⚠ **這一列的指標本身有問題**：`ELIGIBLE` 是 paper 資本閘門，不是選股判準，把它當「廣度」會誤導成「候選越多越好」。使用者要的是**收斂到首選**，不是擴大清單——16 個 cohort 高度集中於 AI 光互連，列 N 檔不等於 N 個獨立機會（同一 sector 移動被複製 N 次，見下方錨點效度下修）。真正的廣度缺口是**不同主題的瓶頸**，做法仍是瓶頸目標導向：`query/bottleneck.py` 已能列 chokepoint 與已知供應商，缺的是「這條 chokepoint 上還有誰沒研究過」→ 具名 harvest target（見 [`2026-08-18-alpha-live-user-sized`](brainstorms/2026-08-18-alpha-live-user-sized-requirements.md) §8.9）。舊做法（清 pq1 積壓、擴來源）沒有方向 |
 | **事件追蹤**：新事件進 brief 的延遲 | 未量測 | 先補 watcher 覆蓋（今天才發現 TSEM 長期空轉），再談延遲 |
 | **量測**：可量測 cohort 與超額中位數 | 10/15 個可算出數字，但**有效 n≈1**（見下） | **先讓錨點帶有進場判斷**，再談樣本期 |
 

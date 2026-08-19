@@ -9,7 +9,7 @@ description: >
   每日摘要、今天有什麼、待判斷、今天需要動作嗎。
 ---
 
-# Daily Approval Brief Skill（v1.5）
+# Daily Approval Brief Skill（v1.6）
 
 ## 定位一句話
 
@@ -221,12 +221,24 @@ prepared RA」（通常為否）。`original_obtained` 也要說明「已取得�
 `isolated_tier_3`／截圖／paywall 則要說明「缺哪一份可逐字核對的一手原文」。park 不得被簡寫成已入圖或
 「已完成」；若沒有任何可核對 reason，視為 brief 缺欄而非正常 park。
 
-### Step 4 — 今日決策佇列與到期 thesis
+### Step 4 — 今日決策佇列、alpha 候選與到期 thesis
 
 ```powershell
 & '.venv\Scripts\python.exe' -m decision_lab today --format markdown
 & '.venv\Scripts\python.exe' scripts\catalyst_watch.py
+& '.venv\Scripts\python.exe' -m query.bottleneck
 ```
+
+第三支是**買進側**，與第二支的賣出側對稱。它回答使用者實際的選股問題——
+「哪個公司佔據了瓶頸、且是市場資金關注的部分」——輸出即
+`## Alpha 候選（瓶頸 × 資金關注）` 的唯一排序來源（判準見 `AGENTS.md` Alpha 呈現契約）。
+表格已同時給出三個判準欄位：替代難度／`sole_source`（瓶頸地位）、證據分級（L8：外部印證
+＞待判定＞供應商自報）、需求錨點與距需求端跳數（資金是否在那條鏈上）。
+⚠ **2026-08-19 之前這支從未進入 daily 流程**：`rank_bottlenecks()` 早就把 COHR→NVIDIA
+（5/5 sole_source、外部印證、距需求端 2 跳）排在第 1，但 brief 沒有消費端，使用者看不到，
+於是 agent 被問「推薦哪一檔」時只能答「無法推薦」。這是 L13「管子只接了一頭」的實例。
+它的已知限制必須隨表一起呈現，不得只貼排名：`substitutability` 覆蓋率僅約 16%（沒填的邊
+是隱形的）、不含 lead time（難替代 ≠ 換掉要很久）、`documents` 是注意力指標不參與排序。
 
 第二支是**賣出側**：把每筆 decision 已經必填的 `disproof`／`catalyst`／`expiry` 從卡片上的
 散文變成每天被檢查的狀態。L7 的原話是「欄位有填但沒有後續流程，等於貼了一個永遠不會響的
@@ -295,6 +307,30 @@ park：社群 CPO 推論 → 一手來源未支持，不產空 RA
 每筆 park 必須附：`parked_reason`、`trace_status`、`trace_next_trigger`、`trace_requires_user`、
 以及「是否產生 prepared RA」；每筆尚未 drain 的 lead 必須標明「本輪 cap 延後／尚未 harvest／尚未 triage」
 等具體原因與 score，不能只列總數。
+
+## Alpha 候選（瓶頸 × 資金關注｜無 pq2 編號）
+TL;DR：<直接回答「今天要不要加碼、加哪一檔」；不得只列清單不給首選>
+排序來源：`query/bottleneck.py` 的 `rank_bottlenecks()`（唯一權威；不得用 axis_ceiling／paper target／ELIGIBLE 數量代替）
+相關性提醒：<本清單集中在哪個主題；列 N 檔不等於 N 個獨立機會，全買是同一賭注下 N 次>
+判斷性質：研究判斷，非回測或統計勝率；尺寸一律不給，由使用者決定
+| # | 標的 | 卡在哪（瓶頸邊） | 替代難度 | 證據強度 | 需求錨點／距需求端 | 現在的判斷 | disproof 狀態 |
+|---|---|---|---|---|---|---|---|
+| 1 | Coherent（COHR） | supplies_to → co:nvidia | 5/5｜sole_source | 外部印證（客戶端出資） | tech:ai_switch／2 跳 | 首選；已持有可加碼 | 已綁定，Q1 FY2027 檢查毛利率 40.2% |
+| 2 | … | … | … | 供應商自報（L8 弱） | … | 觀察；等客戶端印證 | 未綁定 → 該補 |
+
+必填規則：
+- **證據強度**依 L8 分三級（外部印證／待判定／供應商自報），不得省略；供應商自報不得排首選。
+- **需求錨點為空者不列入候選**——有瓶頸但沒有資金在那條鏈上（實測如 GlobalFoundries 那批）。
+- **首選必須明寫**。若證據不足以排序，指出缺哪一項具體證據；**不得以「outcome 未經驗證」為由拒絕排序**
+  （L14 管的是資本尺寸，不是研究判斷；不出手就沒 outcome 是死循環）。
+- 已持有部位必須列 disproof 狀態；`None` 或 lifecycle `expired` 要當成缺口提出。
+- 本段**不得因今天無新事件而省略**，規則同 Beta 主力表。
+
+## 已持有 alpha 部位的 disproof 追蹤（無 pq2 編號）
+| 標的 | 進場 | 現價／損益 | catalyst（何時會知道） | disproof 是否觸發 | lifecycle |
+|---|---|---|---|---|---|
+逐筆列出 `live_execution_reports` 中的部位。**進場價與 disproof 判準必須同列**，
+否則使用者只看得到損益、看不到「當初憑什麼買、什麼情況該認錯」。
 
 ## Beta capital observation（無 pq2 編號）
 TL;DR：最大化約 30 年後 `retirement_net_terminal_wealth`；technical 只決定新增 timing／pace；列今日可人工評估標的與最重要的動態風控 warning
