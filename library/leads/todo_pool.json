@@ -2762,10 +2762,11 @@
       "added_at": "2026-08-18T00:05:04.587802+00:00",
       "hint": "TL;DR：Broadcom（AVGO）custom AI accelerator（XPU）＋CPO thesis 的 catalyst／disproof 尚未由你確認，這是 cohort dc_718d04ef 目前四個 blocker 其中兩個。\n\n本輪 bounded research 已從一手 filing 補齊另外兩個財務 blocker（另見 Engine C 觀測提案）：截至 2026-05-03，firmly committed RPO 約 US164.6B（FY2025 年底僅約 US33.3B），公司明示增量含 Q2 FY2026 當季簽訂的 custom AI accelerator 長期合約，約 30% 預計 12 個月內認列；同期前五大 end customers 占 net revenue 約 45%，單一 distributor 客戶單獨占 42%（去年同期 29%）。\n\n建議 catalyst：Q3 FY2026 財報（AVGO 慣例為 9 月上旬），揭露 RPO 是否維持／續增、custom AI accelerator 交付時程是否重申、以及 CPO（Tomahawk + co-packaged optics）量產導入進度。\n\n建議 disproof（任一成立即視為 thesis 失效）：(1) 到 2026-12-31 的 Q4 FY2026 財報，firmly committed RPO 自 US164.6B 下滑超過 15%（即低於約 US140B），或公司揭露任一 custom AI accelerator 長期合約被取消或重議；(2) 到 2027-06-30，AI 相關半導體營收未出現連續兩季 QoQ 成長；(3) 到 2027-06-30，公司未重申或明確延後 CPO／co-packaged optics 於資料中心的量產導入超過一季。核查頻率：每季財報；觸發後 48 小時內人工 review 決定 retire 或 revise。\n\n建議 expiry：2026-09-20（catalyst 預期時點 ＋約兩週緩衝，符合「expiry 不得早於催化劑時點」）。\n\ngo 授權：把這組 catalyst／disproof／expiry 用於 AVGO 的下一次 paper reassess。不下單、不入圖、不改 Google Sheet。",
       "n": 172,
-      "reason": null,
+      "reason": "使用者核准該組 catalyst／disproof／expiry，已用於 Broadcom（AVGO）paper reassess",
+      "receipt": "authority:decision;ref:pd_098c84de40ab01a4a02628d70856083c",
       "ref_id": "decision-disproof:dc_718d04ef9859103e5fa07d4defa1e6b3:2026-08-18",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-18T23:54:33.507996+00:00",
       "source": "manual",
       "title": "確認 Broadcom（AVGO）decision catalyst／disproof 與 Q3 FY2026 時點",
       "type": "manual"
@@ -2774,10 +2775,11 @@
       "added_at": "2026-08-18T00:05:54.299066+00:00",
       "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-05-03T00:00:00+00:00；來源=Broadcom Q2 FY2026 Form 10-Q, filed 2026-06-09, CIK 0001730168, accession 000173",
       "n": 173,
-      "reason": null,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_9b75af4ae17549b4321d0a350cb0f432;proposal:po_1cd9fb49336af20483b09dcdea0a9be3",
       "ref_id": "po_1cd9fb49336af20483b09dcdea0a9be3",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-18T23:51:11.921217+00:00",
       "source": "engine_c",
       "title": "Engine C 觀測：AVGO / customer_concentration",
       "type": "engine_c_observation"
@@ -2786,10 +2788,11 @@
       "added_at": "2026-08-18T00:05:54.299066+00:00",
       "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-05-03T00:00:00+00:00；來源=Broadcom Q2 FY2026 Form 10-Q, filed 2026-06-09, CIK 0001730168, accession 000173",
       "n": 174,
-      "reason": null,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_41ad5cca163cb24ba015aa5d294e4ffd;proposal:po_3eb55972ff70defd517cb4bdb4968323",
       "ref_id": "po_3eb55972ff70defd517cb4bdb4968323",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-18T23:51:34.715496+00:00",
       "source": "engine_c",
       "title": "Engine C 觀測：AVGO / backlog",
       "type": "engine_c_observation"
@@ -6342,6 +6345,33 @@
       "ref_id": "dc_606a4a50609e3b708f2138bb597ffacc",
       "type": "decision_review",
       "verb": "source_cleared"
+    },
+    {
+      "at": "2026-08-18T23:51:11.921217+00:00",
+      "n": 173,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_9b75af4ae17549b4321d0a350cb0f432;proposal:po_1cd9fb49336af20483b09dcdea0a9be3",
+      "ref_id": "po_1cd9fb49336af20483b09dcdea0a9be3",
+      "type": "engine_c_observation",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-18T23:51:34.715496+00:00",
+      "n": 174,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_41ad5cca163cb24ba015aa5d294e4ffd;proposal:po_3eb55972ff70defd517cb4bdb4968323",
+      "ref_id": "po_3eb55972ff70defd517cb4bdb4968323",
+      "type": "engine_c_observation",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-18T23:54:33.507996+00:00",
+      "n": 172,
+      "reason": "使用者核准該組 catalyst／disproof／expiry，已用於 Broadcom（AVGO）paper reassess",
+      "receipt": "authority:decision;ref:pd_098c84de40ab01a4a02628d70856083c",
+      "ref_id": "decision-disproof:dc_718d04ef9859103e5fa07d4defa1e6b3:2026-08-18",
+      "type": "manual",
+      "verb": "go"
     }
   ],
   "next_n": 179,
