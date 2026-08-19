@@ -161,13 +161,33 @@ component 組不起來），是管線狀態不是風險判斷。附帶理由：E
 **這件事本身就是 D6 的示範：一個看起來更嚴格、寫進 config 標了 `fatal` 的 blocker，
 在第一次被實際量測時就沒通過。** 判斷已用一條測試鎖住，未來想加回去會先撞到理由。
 
-### 還沒做的（驗收條件 4–5）
+### ✅ 驗收條件 4–5 已完成（4 於 2026-08-18、5 於 2026-08-19）
 
-第 4 項（`live_execution_reports` 0 → ≥1）**必須由一筆真實下單觸發**，不能靠測試偽造。
-第 5 項（outcome 報表分辨 live／paper cohort）等有第一筆 fill 之後才有東西可分辨。
+**第 4 項達成：`live_execution_reports` 0 → 1。** 使用者 2026-08-18 美股盤中經 IB
+買進 **COHR 10 股 @ USD 316.23**（約 0.732% NAV），`choice_type='user_sized'`、
+`selected_weight=0.00732`，遠高於當時 `system_supported_upper=0.002`——
+三個資本上限沒有 binding，研究完整度 blocker 也沒擋住，正是本檔 §2 要的形狀。
+落點：`lc_734a39a65c5bab4e3273dbab028dc628` / `lf_92aede7e75bf55cd8d4242dbe40fd5f0`。
 
-**第一筆建議拿 AXTI 或 LITE 試**：兩者 paper 都是 ELIGIBLE、財務 gate 已過、
-Shadow 錨點與價格序列健康，回溯歸因最乾淨。實際流程：
+**第 5 項達成（2026-08-19）：** `scripts/outcome_if_settled_today.py` 新增
+`_live_fills()` ＋ `_render_live_lane()`，把有 live fill 的 cohort 與只有 paper 的
+分開呈現並**各自算報酬**。首跑實測：
+
+| 錨點 | 值 | 報酬 |
+|---|---|---|
+| live（實際成交） | 2026-08-18 @ 316.23 | **-3.1%** |
+| shadow（入圖日） | 2026-07-21 @ 317.22 | -3.4% |
+
+⚠ 兩者只差 0.3%，**但那是巧合，不是「反正差不多」**。語意完全不同：一個是使用者
+決定買的那天，一個是這家公司的 claim 進圖那天。下一筆可能差很多——AXT 的
+Shadow 錨在 07-28（42.76）、決策 08-06 才凍（68.61），中間就是 78 個百分點。
+
+報表同時常駐顯示「live 樣本僅 N 檔，不足以回答系統準不準」，且該警示**不會因時間
+經過而自動消失**——只有累積真實下單才會讓它變大（對照 §7 對「跨度警示會自己關掉」
+的批評）。
+
+**下一筆的實際流程**（第一筆已用 COHR 走過；AXTI／LITE 仍是好候選，paper
+ELIGIBLE、財務 gate 已過、Shadow 錨點與價格序列健康）：
 
 ```powershell
 & '.venv\Scripts\python.exe' -m decision_lab record-choice <decision_id> `

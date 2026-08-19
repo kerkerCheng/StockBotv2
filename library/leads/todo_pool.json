@@ -1078,11 +1078,6 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
-      "source_cleared": {
-        "at": "2026-08-18T23:12:00.918176+00:00",
-        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
-        "source_healthy": true
-      },
       "title": "REVIEW — co:agility_robotics",
       "type": "decision_review"
     },
@@ -2653,11 +2648,6 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
-      "source_cleared": {
-        "at": "2026-08-18T23:12:00.918176+00:00",
-        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
-        "source_healthy": true
-      },
       "title": "REVIEW — co:aeva",
       "type": "decision_review"
     },
@@ -2690,11 +2680,6 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
-      "source_cleared": {
-        "at": "2026-08-18T23:12:00.918176+00:00",
-        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
-        "source_healthy": true
-      },
       "title": "REVIEW — co:meta",
       "type": "decision_review"
     },
@@ -2708,11 +2693,6 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
-      "source_cleared": {
-        "at": "2026-08-18T23:12:00.918176+00:00",
-        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
-        "source_healthy": true
-      },
       "title": "REVIEW — co:sivers_semiconductors",
       "type": "decision_review"
     },
@@ -2812,11 +2792,6 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
-      "source_cleared": {
-        "at": "2026-08-18T23:12:00.918176+00:00",
-        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
-        "source_healthy": true
-      },
       "title": "REVIEW — co:iqe",
       "type": "decision_review"
     },
@@ -2874,11 +2849,6 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
-      "source_cleared": {
-        "at": "2026-08-18T23:12:00.918176+00:00",
-        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
-        "source_healthy": true
-      },
       "title": "REVIEW — co:poet_technologies",
       "type": "decision_review"
     }
@@ -6409,6 +6379,90 @@
       "ref_id": "dc_606a4a50609e3b708f2138bb597ffacc",
       "type": "decision_review",
       "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-08-19T00:43:33.686909+00:00",
+      "n": 74,
+      "prior_source_cleared": {
+        "at": "2026-08-18T23:12:00.918176+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
+      "reason": "pq1 work order 尚在進行或等待 exact gate，撤銷完成候選標記",
+      "receipt": null,
+      "ref_id": "dc_6ae5b014dbbcd0774b45487542c9a102",
+      "type": "decision_review",
+      "verb": "source_returned"
+    },
+    {
+      "at": "2026-08-19T00:43:33.686909+00:00",
+      "n": 165,
+      "prior_source_cleared": {
+        "at": "2026-08-18T23:12:00.918176+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
+      "reason": "pq1 work order 尚在進行或等待 exact gate，撤銷完成候選標記",
+      "receipt": null,
+      "ref_id": "dc_2906500af891541ea4bdd52503b9b3aa",
+      "type": "decision_review",
+      "verb": "source_returned"
+    },
+    {
+      "at": "2026-08-19T00:43:33.686909+00:00",
+      "n": 167,
+      "prior_source_cleared": {
+        "at": "2026-08-18T23:12:00.918176+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
+      "reason": "來源再次產出此項，撤銷完成候選標記",
+      "receipt": null,
+      "ref_id": "dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
+      "type": "decision_review",
+      "verb": "source_returned"
+    },
+    {
+      "at": "2026-08-19T00:43:33.686909+00:00",
+      "n": 168,
+      "prior_source_cleared": {
+        "at": "2026-08-18T23:12:00.918176+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
+      "reason": "來源再次產出此項，撤銷完成候選標記",
+      "receipt": null,
+      "ref_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
+      "type": "decision_review",
+      "verb": "source_returned"
+    },
+    {
+      "at": "2026-08-19T00:43:33.686909+00:00",
+      "n": 175,
+      "prior_source_cleared": {
+        "at": "2026-08-18T23:12:00.918176+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
+      "reason": "來源再次產出此項，撤銷完成候選標記",
+      "receipt": null,
+      "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+      "type": "decision_review",
+      "verb": "source_returned"
+    },
+    {
+      "at": "2026-08-19T00:43:33.686909+00:00",
+      "n": 178,
+      "prior_source_cleared": {
+        "at": "2026-08-18T23:12:00.918176+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
+      "reason": "pq1 work order 尚在進行或等待 exact gate，撤銷完成候選標記",
+      "receipt": null,
+      "ref_id": "dc_606a4a50609e3b708f2138bb597ffacc",
+      "type": "decision_review",
+      "verb": "source_returned"
     }
   ],
   "next_n": 179,

@@ -369,7 +369,125 @@ def _render(results: list[dict], unavailable: list[dict], has_bench: bool) -> No
     if unavailable:
         print(f"另有 {len(unavailable)} 個 cohort 的 Shadow 是 `unavailable`，無錨點可計算。")
 
+    _render_live_lane(results, _live_fills())
     _render_chase_check(results)
+
+
+def _live_fills() -> dict[str, list[dict]]:
+    """ticker → 該檔的真實 live fill（使用者手動下單後回報的成交）。
+
+    這是 `2026-08-18-alpha-live-user-sized` §4 驗收條件 5 的資料源：報表必須能分辨
+    「有 live fill 的 cohort」與「只有 paper 的 cohort」，並各自算報酬。
+
+    ⚠ **為什麼不能只用 Shadow 錨點算完就算數（§7）：** Shadow 錨點的語意是「這家公司的
+    claim 那天進圖」，**不含任何進場時點判斷**——`decision_cohorts.dedupe_key` 全部是
+    `claim:<hash>` 就是證據。fill 錨點才是「使用者決定買的那天、那個價」。兩者可能很接近
+    （COHR 首筆：shadow@07-21 317.22 vs fill@08-18 316.23，差 0.3%），但那是巧合，
+    語意完全不同，下一筆可能差很多。
+    """
+
+    fills: dict[str, list[dict]] = {}
+    query = """
+        SELECT f.execution_ref, f.shares, f.price, f.currency, f.executed_at,
+               lc.selected_weight, lc.choice_type, dc.research_ticker
+        FROM live_execution_reports f
+        JOIN live_choices lc ON lc.choice_id = f.choice_id
+        JOIN system_decisions sd ON sd.decision_id = f.decision_id
+        JOIN decision_cohorts dc ON dc.cohort_id = sd.cohort_id
+    """
+    try:
+        with _connect_ro(DECISION_DB) as conn:
+            rows = conn.execute(query).fetchall()
+    except sqlite3.Error:
+        # 讀不到就當沒有 live fill——fail closed，宣稱「已有真實部位」的舉證責任在有資料那方。
+        return fills
+    for row in rows:
+        ticker = str(row["research_ticker"] or "").strip()
+        if not ticker:
+            continue
+        fills.setdefault(ticker, []).append(
+            {
+                "execution_ref": row["execution_ref"],
+                "shares": float(row["shares"] or 0.0),
+                "price": float(row["price"] or 0.0),
+                "currency": str(row["currency"] or ""),
+                "executed_at": _as_date(row["executed_at"]),
+                "selected_weight": row["selected_weight"],
+                "choice_type": row["choice_type"],
+            }
+        )
+    return fills
+
+
+def _render_live_lane(results: list[dict], fills: dict[str, list[dict]]) -> None:
+    """把「真的下了單的」與「只有 paper 的」分開算——驗收條件 5。
+
+    這一段刻意獨立於主表，而不是在主表加一欄。主表回答的是「這批標的自入圖以來走勢
+    如何」，本段回答的是**「Engine D 有意見之後，使用者依它下的注表現如何」**——後者
+    才是「系統準不準」的證據，前者不是（§7）。混在同一張表會讓兩個問題共用一個數字。
+    """
+
+    print("\n## Live 部位 vs 只有 paper 的 cohort\n")
+
+    by_ticker = {str(r["ticker"]): r for r in results if r.get("ticker")}
+    live_tickers = [t for t in fills if t in by_ticker]
+    paper_only = [t for t in by_ticker if t not in fills]
+
+    if not live_tickers:
+        print(
+            "- **live fill：0 筆。** 目前所有 cohort 都只有 paper 記分板，"
+            "「系統的建議準不準」還沒有任何真實資本的證據。"
+        )
+        print(f"- 只有 paper 的 cohort：{len(paper_only)} 個。")
+        return
+
+    header = (
+        f"| {'標的':9} | {'成交日':10} | {'成交價':>10} | {'股數':>7} "
+        f"| {'現價':>10} | {'live 報酬':>10} | {'同檔 shadow 報酬':>16} |"
+    )
+    print(header)
+    print(
+        f"|{'-' * 11}|{'-' * 12}|{'-' * 12}|{'-' * 9}"
+        f"|{'-' * 12}|{'-' * 12}|{'-' * 18}|"
+    )
+
+    measured = 0
+    for ticker in sorted(live_tickers):
+        row = by_ticker[ticker]
+        current_val, current_ccy = _to_settlement(
+            row.get("current_raw"), _market_quote_unit(row.get("company_id"), ticker)
+        )
+        for fill in sorted(fills[ticker], key=lambda f: f["executed_at"] or date.min):
+            live_ret = None
+            # fill 的 currency 已是結算幣別（record-fill 要求明確指定），不再折第二次；
+            # 與現價的結算幣別不一致就 fail closed，不猜匯率。
+            if (
+                current_val is not None
+                and fill["price"] > 0
+                and fill["currency"] == current_ccy
+            ):
+                live_ret = current_val / fill["price"] - 1.0
+                measured += 1
+            print(
+                f"| {ticker:9} | {str(fill['executed_at'] or '—'):10} "
+                f"| {fill['price']:>10.2f} | {fill['shares']:>7.4g} "
+                f"| {(f'{current_val:.2f}' if current_val else '—'):>10} "
+                f"| {_pct(live_ret):>10} | {_pct(row.get('absolute_return')):>16} |"
+            )
+
+    print(
+        f"\n- **有 live fill：{len(live_tickers)} 檔（已算出報酬 {measured} 筆）"
+        f"｜只有 paper：{len(paper_only)} 個 cohort。**"
+    )
+    print(
+        "- 「live 報酬」以**實際成交價**為錨點，「shadow 報酬」以**入圖日**為錨點。"
+        "兩者語意不同：後者不含任何進場時點判斷，不構成選股能力的證據（§7）。"
+    )
+    if len(live_tickers) < 3:
+        print(
+            f"- 🟠 **live 樣本僅 {len(live_tickers)} 檔，不足以回答「系統準不準」。**"
+            "這個數字只有靠累積真實下單才會變大，時間經過不會讓它自己滿足。"
+        )
 
 
 def _judgment_anchor_count() -> int:
