@@ -20,6 +20,36 @@ brainstorm；範圍大到需要驗收條件才開 plan。brainstorm 用 frontmat
 
 ---
 
+## 已撤回的診斷（開工前掃一遍）
+
+> **這一節不是自責，是一份檢查清單。** 每一筆都是「已經寫進 commit／ROADMAP／程式註解，
+> 事後被推翻」的技術診斷——不是待辦、不是 bug，是**曾經看起來完全正確的錯誤結論**。
+>
+> **為什麼需要它：** 2026-08-19 一天之內有三個診斷被推翻，共同形狀是
+> **錯誤有方向性——全都朝「產生一個有洞察力的結論」偏**，而且每一個都能用專案自己的
+> lesson 語言包裝（L12 一表兩義、L15 gate 攔錯東西）。**模式匹配是提出假說，不是確認假說。**
+> 一個現象能被套進某條 L，只代表它值得查，不代表它已經被查過。
+>
+> `AGENTS.md` L11 判準 2 已經逐字寫下這個失效模式（「剛好嵌得進已成形的敘事時，
+> 恰恰最該起疑」），L14 也已寫下「寫進本檔不等於會生效」——**所以解方不是再加判準**。
+> 第三欄才是重點：**每個錯誤診斷都有一條 30 秒就能否證它的命令，而當下沒有人跑。**
+>
+> **用法：** 宣稱「找到根因了」之前，先跑一條**試圖讓自己的結論變成假的**命令
+> （不是驗證它為真——那是確認偏誤）。專案對每個 thesis 都強制 `disproof_condition`，
+> 這一節是把同一個要求套到自己的技術診斷上。
+
+| 日期 | 被推翻的診斷 | 當時為什麼看起來對 | 一條就能否證它的命令 |
+|---|---|---|---|
+| 2026-08-18→19 | COHR「Engine C 的 `bar_date` 是憑空生成的、`price` 對不上任何收盤」 | 使用者成交價與系統顯示差 10%，需要一個解釋；`history()` 當下沒回 08-17 那根（**盤中查的**，最後一根是進行中的 bar），拼出「08-17 不存在」。剛好是漂亮的 L12「一表兩義」案例，於是寫進 commit message、ROADMAP 🔴 與程式 docstring，還差點據此在 ETL 加一道會 quarantine 掉正確資料的交叉驗證 | `date(2026,8,17).strftime('%A')` → `Monday`。**08-17 是星期一，一本日曆就能否證** |
+| 2026-08-19 | 待辦池三個 `decision_review` 不退場是因為「空 `blockers` 被 `todo.py:1448` 判成非純系統」 | `sizing` 的 `assessment_blockers`／`paper_blockers` 確實全空，且 paper 已 ELIGIBLE；「空集合被判成非純系統」又是一個漂亮的 L12 案例 | `python -m decision_lab card <decision_id>` → `card.blockers` 有 **7 個碼**，不是空的 |
+| 2026-08-19 | 同上，第二版：「`execution_fx_stale_since_decision` 未登記，掉進 `execution_` 泛用 prefix 被判 `awaiting_external`」 | 自己寫的檢查腳本取「**第一個** prefix 匹配」而非登記表 `_matching` 規定的「**最長**匹配」，於是自製了一個不存在的 bug。剛好是 L15「gate 攔錯東西」的形狀，可執行、可驗收，看起來完全合理 | 讀 `config/decision_blockers.json` 的 `_matching` 那一行；或 `get_blocker_registry().classify(codes)` 直接跑。真相是它**早就以 exact prefix 登記為 `system_internal`**。補進去後被 `test_registry_is_the_single_source_of_severity` 以「重複 key 73≠72」擋下——**測試比我可靠** |
+
+⚠ **這一節自己的 disproof：** 若之後仍發生「診斷已落地才被推翻」，代表它沒生效，
+不要靠加字補救——那正是 L14 批評的「要人讀的段落」。屆時該做的是把否證步驟綁進
+會自己執行的東西（測試、hook、或 commit 前的檢查），而不是把這張表寫得更長。
+
+---
+
 ## 已交付
 
 > **記錄實測 before → after，不只記「做了什麼」。** 一個改動若說不出哪個現有數字變了，
