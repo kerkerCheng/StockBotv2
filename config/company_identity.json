@@ -189,6 +189,13 @@
       "execution_venue": "NASDAQ"
     },
     {
+      "company_id": "co:micron_technology",
+      "research_ticker": "MU",
+      "market_currency": "USD",
+      "execution_currency": "USD",
+      "execution_venue": "NASDAQ"
+    },
+    {
       "company_id": "co:mips_holding",
       "research_ticker": null
     },
