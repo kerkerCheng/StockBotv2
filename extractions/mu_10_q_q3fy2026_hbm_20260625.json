@@ -1,0 +1,136 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mu_10_q_q3fy2026_20260625",
+    "title": "Micron Technology Q3 FY2026 Form 10-Q (quarterly period ended May 28, 2026)",
+    "url": "https://www.sec.gov/Archives/edgar/data/723125/000072312526000015/mu-20260528.htm",
+    "origin_entity": "Micron Technology, Inc.",
+    "publisher": "U.S. Securities and Exchange Commission (EDGAR)",
+    "published_at": "2026-06-25",
+    "retrieved_at": "2026-08-20",
+    "storage_permission": "repo_full",
+    "permission_basis": "U.S. SEC EDGAR filing, public domain government record.",
+    "source_type": "filing",
+    "evidence_tier": 1
+  },
+  "sources": [
+    {
+      "id": "mu_10_q_q3fy2026_20260625_s1",
+      "locator": "Item 2, Business overview — product descriptions (DRAM)",
+      "quote": "DRAM products include High-Bandwidth Memory (“HBM”), which is a 3D stacked DRAM architecture that utilizes through-silicon via (“TSV”) connections for more efficient communication giving it the ability to achieve a higher bandwidth while consuming less power compared to other memory types."
+    },
+    {
+      "id": "mu_10_q_q3fy2026_20260625_s2",
+      "locator": "Note 17, Segment and Other Information — business unit definitions",
+      "quote": "Cloud Memory Business Unit (“CMBU”): Focused on memory solutions for large hyperscale cloud customers, and HBM for all data center customers."
+    },
+    {
+      "id": "mu_10_q_q3fy2026_20260625_s3",
+      "locator": "Item 2, MD&A — remaining performance obligations",
+      "quote": "We recently executed certain strategic customer agreements, including agreements executed subsequent to May 28, 2026. These agreements are structured as take-or-pay agreements, with binding commitments for specific volumes over the multi-year contract terms and include contractually enforceable volumes. Pricing for most agreements is either fixed, or is subject to minimum and maximum pricing."
+    },
+    {
+      "id": "mu_10_q_q3fy2026_20260625_s4",
+      "locator": "Item 2, MD&A — remaining performance obligations (transaction price)",
+      "quote": "As of May 28, 2026, the transaction price allocated to our remaining performance obligations was approximately $ 5 billion, of which $ 422 million has been recognized as contract liabilities."
+    },
+    {
+      "id": "mu_10_q_q3fy2026_20260625_s5",
+      "locator": "Item 1A, Risk Factors — customer and end-market concentration",
+      "quote": "A significant portion of our revenue is concentrated with certain customers and end markets. In 2025, over half of our total revenue came from our top ten customers. Among our end markets, approximately one-half of our total revenue was concentrated in the data center end market."
+    },
+    {
+      "id": "mu_10_q_q3fy2026_20260625_s6",
+      "locator": "Note 12, Contingencies — Netlist patent litigation",
+      "quote": "On May 19, 2025, Netlist filed a complaint against Micron, MSP, and MTEC in E.D. Tex. alleging that one U.S. patent is infringed by our HBM products."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:micron_technology",
+      "type": "Company",
+      "name": "Micron Technology, Inc.",
+      "abstraction_level": "device_chip",
+      "role": "bottleneck_supplier",
+      "aliases": [
+        "Micron",
+        "MU"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "mu_10_q_q3fy2026_20260625_s1",
+        "mu_10_q_q3fy2026_20260625_s2"
+      ]
+    },
+    {
+      "id": "tech:hbm",
+      "type": "TechNode",
+      "name": "High-Bandwidth Memory (HBM)",
+      "abstraction_level": "device_chip",
+      "role": "bottleneck_supplier",
+      "aliases": [
+        "High-Bandwidth Memory"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "mu_10_q_q3fy2026_20260625_s1"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:micron_technology",
+      "dst_id": "tech:hbm",
+      "relation": "supplies_to",
+      "attributes": {
+        "qualification_status": "qualified"
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "mu_10_q_q3fy2026_20260625_s1",
+        "mu_10_q_q3fy2026_20260625_s2"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "mu_10_q_q3fy2026_20260625_cl1",
+      "statement": "Micron 在 Q3 FY2026 10-Q 一手揭露 HBM 屬其 DRAM 產品線（3D 堆疊 DRAM，使用 TSV 連接），且由 Cloud Memory Business Unit 負責「HBM for all data center customers」。此為出貨中的商業產品線而非研發階段，故 qualification_status 記為 qualified。⚠ 依 L8，本文件為供應商自報，可確立「Micron 供應 HBM」此一事實（公司對自身產品線的陳述屬可稽核揭露），但不足以確立市占、排他性或相對於 SK Hynix／Samsung 的競爭地位。",
+      "subject_id": "e1",
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Micron 後續 filing 停止揭露 HBM 產品線、或將 HBM 移出 CMBU 且未有替代業務單位承接；或公司公告退出 HBM 市場。核查頻率：每季 10-Q／10-K。",
+      "confidence": 0.9,
+      "source_ids": [
+        "mu_10_q_q3fy2026_20260625_s1",
+        "mu_10_q_q3fy2026_20260625_s2"
+      ]
+    },
+    {
+      "id": "mu_10_q_q3fy2026_20260625_cl2",
+      "statement": "截至 2026-05-28，Micron 一手揭露其近期簽訂的策略客戶協議為 take-or-pay 結構，含多年期特定數量的 binding commitments 與 contractually enforceable volumes，多數協議價格固定或設有價格上下限；分配至 remaining performance obligations 的交易價格約 50 億美元，其中 4.22 億美元已認列為 contract liabilities（客戶押金）。⚠ 三項限定：(1) 公司同時聲明該 RPO 揭露基於最低承諾數量與最低價格，且 not expected to be indicative of future revenue；(2) 未具名任何交易對手方，無法做 L8 客戶端印證；(3) 未揭露其中屬 HBM 的比例，不得逕自將 50 億美元歸給 HBM。",
+      "subject_id": "e1",
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "後續 filing 顯示 RPO 自約 50 億美元下滑逾 30%，或公司揭露 take-or-pay 協議遭重議、取消，或 contract liabilities 大幅迴轉而非轉列營收。核查頻率：每季 10-Q／10-K。",
+      "confidence": 0.85,
+      "source_ids": [
+        "mu_10_q_q3fy2026_20260625_s3",
+        "mu_10_q_q3fy2026_20260625_s4"
+      ]
+    },
+    {
+      "id": "mu_10_q_q3fy2026_20260625_cl3",
+      "statement": "反面事實兩項：(1) 2025 年前十大客戶合計占總營收逾一半，且資料中心終端市場約占總營收一半——集中度風險與 AI 資本支出週期高度綁定；(2) Netlist 於 2025-05-19 在 E.D. Tex. 起訴 Micron 及其子公司，指控一項美國專利遭其 HBM 產品侵權，該案已於 2026-03-06 移轉至 D. Del.。訴訟結果未定，本 claim 只記錄訴訟存在與其標的為 HBM 產品，不推斷勝負或損害金額。",
+      "subject_id": "e1",
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "客戶集中度：後續 filing 顯示前十大客戶占比降至一半以下。訴訟：法院作出對 Micron 有利之終局判決或雙方和解且無重大給付。核查頻率：每季 10-Q／10-K。",
+      "confidence": 0.85,
+      "source_ids": [
+        "mu_10_q_q3fy2026_20260625_s5",
+        "mu_10_q_q3fy2026_20260625_s6"
+      ]
+    }
+  ]
+}
