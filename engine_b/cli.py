@@ -30,6 +30,62 @@ def _tracked(arg: str | None) -> frozenset[str]:
     return frozenset(t.strip().upper() for t in (arg or "").split(",") if t.strip())
 
 
+def _chokepoint() -> tuple[frozenset[str], frozenset[str]]:
+    """位於已知瓶頸上的公司（ticker 與 company_id）。
+
+    2026-08-20 之前 pq1 排序完全不看瓶頸性——「AXT 供應 COHR 的 InP」與「財報季
+    總評」只由 tier 與 flags 區分，而系統整個定位就是找瓶頸。這裡把
+    `query/bottleneck.py` 已經算好的排序接進 priority。
+
+    **只收 `demand_anchor` 非空的列**：依既有判準，連不到有人花錢的地方的瓶頸沒有
+    投資意義（`rank_bottlenecks` 自己的排序鍵也把需求錨點可達性放第一）。
+    與 `_held()` 同樣是唯讀輸入，取不到就回空集合讓排序退回原行為，不阻斷 drain。
+    """
+
+    try:
+        import os
+
+        from neo4j import GraphDatabase
+
+        from identity.registry import get_registry
+        from query import bottleneck
+
+        password = os.environ.get("NEO4J_PASSWORD")
+        if not password:
+            return frozenset(), frozenset()
+        driver = GraphDatabase.driver(
+            os.environ.get("NEO4J_URI", "bolt://localhost:7687"),
+            auth=(os.environ.get("NEO4J_USER", "neo4j"), password),
+        )
+        try:
+            with driver.session() as session:
+                rows = bottleneck.fetch_assertions(session)
+        finally:
+            driver.close()
+        result = bottleneck.rank_bottlenecks(rows, get_registry())
+    except Exception:
+        return frozenset(), frozenset()
+
+    tickers: set[str] = set()
+    company_ids: set[str] = set()
+    for row in result.get("rows") or ():
+        if not row.get("demand_anchor"):
+            continue
+        company_id = row.get("company_id")
+        if company_id:
+            company_ids.add(str(company_id))
+        ticker = row.get("ticker")
+        if ticker:
+            ticker = str(ticker).upper()
+            tickers.add(ticker)
+            # registry 存 research ticker（SIVE.ST／6324.T），lead 的 cashtag 多是
+            # 無交易所後綴的形式（$SIVE）——兩者都收，交集比對才不會漏。
+            base = ticker.split(".", 1)[0]
+            if base:
+                tickers.add(base)
+    return frozenset(tickers), frozenset(company_ids)
+
+
 def _held() -> tuple[frozenset[str], frozenset[str]]:
     """Google Sheet 的實際持股（ticker 與 company_id）。
 
@@ -84,11 +140,14 @@ def _cmd_list(args: argparse.Namespace) -> int:
         rows = [l for l in rows if l["status"] == args.status]
     if args.by_priority:
         held_tickers, held_company_ids = _held()
+        choke_tickers, choke_company_ids = _chokepoint()
         ranked = priority.rank_leads(
             rows,
             tracked_tickers=_tracked(args.tracked),
             held_tickers=held_tickers,
             held_company_ids=held_company_ids,
+            chokepoint_tickers=choke_tickers,
+            chokepoint_company_ids=choke_company_ids,
         )
         rows = [lead for _score, lead in ranked]
         scores = {lead["lead_id"]: score for score, lead in ranked}
@@ -169,11 +228,14 @@ def _cmd_drain(args: argparse.Namespace) -> int:
         if l["status"] in ("triaged_go", "researching")
     ]
     held_tickers, held_company_ids = _held()
+    choke_tickers, choke_company_ids = _chokepoint()
     ranked = priority.rank_leads(
         candidates,
         tracked_tickers=tracked,
         held_tickers=held_tickers,
         held_company_ids=held_company_ids,
+        chokepoint_tickers=choke_tickers,
+        chokepoint_company_ids=choke_company_ids,
     )
     lead_batch = ranked[:max(0, limit - len(decision_jobs))]
     if args.json:

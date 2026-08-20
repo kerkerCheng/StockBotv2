@@ -3022,12 +3022,20 @@
     },
     {
       "added_at": "2026-08-20T11:02:30.643377+00:00",
+      "completion_authority": {
+        "action_digest": "4cfd3148dcaecb80103ad8d6756f0d3005c231e8f6320cac1af5c19bedae1341",
+        "cohort_id": "dc_cc46527aac12ba14191ee71c0460f3fe",
+        "commit": "486d21f2b049f8fca4c38a7274269fb7b01f5f25",
+        "company_id": "co:harmonic_drive_systems",
+        "verified_at": "2026-08-20T11:36:50.735483+00:00"
+      },
       "hint": "核准 exact graph delta；Decision handoff：co:harmonic_drive_systems。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 191,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_0bd19a3a5181bc29491c01ff9a70feeb;digest:4cfd3148dcaecb80103ad8d6756f0d3005c231e8f6320cac1af5c19bedae1341;commit:486d21f2b049f8fca4c38a7274269fb7b01f5f25;cohort:dc_cc46527aac12ba14191ee71c0460f3fe",
       "ref_id": "ra_0bd19a3a5181bc29491c01ff9a70feeb",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-20T11:36:50.735483+00:00",
       "source": "research_action",
       "title": "Harmonic Drive Systems → 諧波減速器：建立 humanoid actuator 供給側的第一格",
       "type": "ra_admission"
@@ -6926,6 +6934,15 @@
       "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
       "receipt": "action:ra_b70b26997b6f66774415e2dbe879ab62;digest:54e6589d51b7c01b32883162dbf523c04c8cea1646f49119b0567ca5ab810c18;commit:9bd0952cbc41b15f07a2a04eafd817606536d5ef;cohort:dc_b05cc1360e4bdf2a238787c23e7b227d",
       "ref_id": "ra_b70b26997b6f66774415e2dbe879ab62",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-20T11:36:50.735483+00:00",
+      "n": 191,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_0bd19a3a5181bc29491c01ff9a70feeb;digest:4cfd3148dcaecb80103ad8d6756f0d3005c231e8f6320cac1af5c19bedae1341;commit:486d21f2b049f8fca4c38a7274269fb7b01f5f25;cohort:dc_cc46527aac12ba14191ee71c0460f3fe",
+      "ref_id": "ra_0bd19a3a5181bc29491c01ff9a70feeb",
       "type": "ra_admission",
       "verb": "go"
     }
