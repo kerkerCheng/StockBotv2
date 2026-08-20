@@ -4036,6 +4036,138 @@
       "result": "ok",
       "run_at": "2026-08-19T22:32:11.707347+00:00",
       "source": "edgar:TSLA"
+    },
+    {
+      "new": 2,
+      "result": "ok",
+      "run_at": "2026-08-20T22:33:30.441607+00:00",
+      "source": "mfn:sivers-semiconductors"
+    },
+    {
+      "new": 2,
+      "result": "ok",
+      "run_at": "2026-08-20T22:33:31.654623+00:00",
+      "source": "sivers:press"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-20T22:33:32.069454+00:00",
+      "source": "yahoo:iqe-l"
+    },
+    {
+      "new": 3,
+      "result": "ok",
+      "run_at": "2026-08-20T22:33:33.387289+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-08-20T22:33:35.191597+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-20T22:33:36.014434+00:00",
+      "source": "edgar:AEVA"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-08-20T22:33:36.722737+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-20T22:33:37.269829+00:00",
+      "source": "edgar:AVGO"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-20T22:33:37.991075+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-20T22:33:38.775812+00:00",
+      "source": "edgar:CCXI"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-08-20T22:33:39.481682+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-08-20T22:33:40.338574+00:00",
+      "source": "edgar:GFS"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-20T22:33:41.064840+00:00",
+      "source": "edgar:JBL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-20T22:33:41.772561+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-20T22:33:42.475790+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-08-20T22:33:43.050605+00:00",
+      "source": "edgar:META"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-20T22:33:43.889087+00:00",
+      "source": "edgar:MTSI"
+    },
+    {
+      "new": 8,
+      "result": "ok",
+      "run_at": "2026-08-20T22:33:44.427132+00:00",
+      "source": "edgar:MU"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-20T22:33:44.948208+00:00",
+      "source": "edgar:NVDA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-20T22:33:45.655365+00:00",
+      "source": "edgar:POET"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-20T22:33:46.481003+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-20T22:33:47.023164+00:00",
+      "source": "edgar:TSLA"
     }
   ],
   "leads": {
@@ -6115,6 +6247,38 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2086730782425727183"
     },
+    "lead_0e0197f7c6c42939f7b285e7485f8aa7": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-20T22:33:31.653717+00:00",
+      "lead_id": "lead_0e0197f7c6c42939f7b285e7485f8aa7",
+      "published_at": "Thu, 20 Aug 2026 05:00:00 +0000",
+      "refs": {},
+      "source": "sivers:press",
+      "status": "triaged_go",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Invitation to Presentation of Sivers Semiconductors’ Q2 2026 Report",
+      "triage": {
+        "decided_at": "2026-08-20T22:36:14.864919+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "Sivers 官方 Q2 2026 報告簡報邀請，屬可核對的結構化催化事件；可追頁面確認日期與報告入口。",
+        "tier": 1
+      },
+      "url": "https://www.sivers-semiconductors.com/press/invitation-to-presentation-of-sivers-semiconductors-q2-2026-report/"
+    },
     "lead_0e28d2642bc702744d2960107565448e": {
       "entities": {
         "company_ids": [
@@ -7017,18 +7181,21 @@
       "raw_text": "My $AAOI TLDR notes at Rosenblatt summit:\n\n- Expected to get paid premiums for US production of 800g/1.6T (very positive for ASP/margins).\n\n- Several LTAs on the table, but doesn't want to sign to get capacity blocked by other customers (cough cough $NVDA). \n\n- Sold out at least through second half of next year and beyond. (High demand visibility like $LITE)\n\n- Has 300-400 mW lasers already. \n\n- Expects margins to be above 40%+ once CPO comes about (probably most material for rerating). \n\nI can't see how anyone can be bearish on this company...",
       "refs": {
         "outcome": "no_prepared_ra_partial_and_existing_claims",
-        "parked_reason": "已取得 AAOI 官方 Rosenblatt summit 摘要，支持 400G／800G qualification、台灣廠合格、2–3 倍擴產與內製雷射抗供應短缺；但不支持推文的 US premium、數份 LTA、sold out 至 2027H2、300–400mW 或 CPO 毛利率逾 40% 等精確 atoms，且較強 Q2 法說 graph claim 已存在。",
+        "parked_reason": "新 AAOI／Sivers 綜合貼文只重複 summit 與供應短缺轉述；既有 AAOI 官方活動摘要仍未支持 US premium、數份 LTA、sold out 至 2027H2、300–400mW 或 CPO 毛利率逾 40% 等精確 atoms。",
         "primary_url": "https://newsroom.ao-inc.com/blog/insights-from-stefan-murry-at-the-rosenblatt-age-of-ai-summit/",
-        "research_outcome": "取得 AAOI 2026-08-04 官方活動公告，未取得 8 月 18 日 webcast recording 或 transcript；社群摘要不得代替管理層原話",
-        "trace_attempts_ref": "AAOI Newsroom Rosenblatt summit 摘要；AAOI Q1/Q2 2026 transcript／filing 交叉核對",
-        "trace_next_trigger": "取得 Rosenblatt summit 完整錄影／逐字稿，或 AAOI filing／法說逐項確認 US premium、LTA、sold-out 時程與 CPO 毛利門檻",
+        "research_outcome": "no_new_primary_delta",
+        "research_run": "daily:2026-08-21",
+        "trace_attempts_ref": "AAOI Newsroom summit 摘要、Q1/Q2 2026 transcript／filing與今日綜合貼文；未取得完整 summit webcast 或 transcript。",
+        "trace_next_trigger": "取得 Rosenblatt summit 完整錄影／逐字稿，或 AAOI filing／法說逐項確認精確 atoms。",
         "trace_origin_entity": "Applied Optoelectronics",
         "trace_requeue_consumed_entities": [
+          "AAOI",
+          "CO:APPLIED_OPTOELECTRONICS",
           "CO:LUMENTUM",
           "LITE"
         ],
-        "trace_requeue_trigger": "related_triaged_lead:lead_195ceecf47e7ad69bd0384d070268431",
-        "trace_requeued_at": "2026-08-19T22:33:19.491469+00:00",
+        "trace_requeue_trigger": "related_triaged_lead:lead_7cd19ddab804188d2cb5a96b8dcd00b7",
+        "trace_requeued_at": "2026-08-20T22:36:14.618719+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
@@ -7039,7 +7206,7 @@
           "co:lumentum",
           "co:nvidia"
         ],
-        "trace_trigger_event_ref": "lead:lead_195ceecf47e7ad69bd0384d070268431",
+        "trace_trigger_event_ref": "lead:lead_7cd19ddab804188d2cb5a96b8dcd00b7",
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
@@ -7057,12 +7224,12 @@
       },
       "title": "My $AAOI TLDR notes at Rosenblatt summit: - Expected to get paid premiums for US production of 800g/1.6T (very positive for ASP/margins). - Several LTAs on the table, but doesn't want to sign to get capacity blocked by other customers (cough cough $NVDA). - Sold out at least through second half of next year and beyond. (High demand visibility like $LITE) - Has 300-400 mW lasers already. - Expects margins to be above 40%+ once CPO comes about (probably most material for rerating). I can't see how anyone can be bearish on this company...",
       "triage": {
-        "decided_at": "2026-08-19T22:33:19.491469+00:00",
+        "decided_at": "2026-08-20T22:36:14.618719+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true
         },
-        "reason": "新 triage PASS lead lead_195ceecf47e7ad69bd0384d070268431 與 parked trace 共用具名標的 LITE, co:lumentum（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+        "reason": "新 triage PASS lead lead_7cd19ddab804188d2cb5a96b8dcd00b7 與 parked trace 共用具名標的 AAOI, co:applied_optoelectronics（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
         "tier": 3
       },
       "triage_history": [
@@ -7084,6 +7251,21 @@
               "lead_d7fd5c6982c274f3d2426c6d6b2fdafe",
               "lead_e766f19b8dc748d744d0b4cc6dc21071"
             ],
+            "tier": 3
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-20T22:36:14.618719+00:00",
+          "superseded_reason": "新 triage PASS lead lead_7cd19ddab804188d2cb5a96b8dcd00b7 與 parked trace 共用具名標的 AAOI, co:applied_optoelectronics（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_7cd19ddab804188d2cb5a96b8dcd00b7",
+          "triage": {
+            "decided_at": "2026-08-19T22:33:19.491469+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true
+            },
+            "reason": "新 triage PASS lead lead_195ceecf47e7ad69bd0384d070268431 與 parked trace 共用具名標的 LITE, co:lumentum（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
             "tier": 3
           }
         }
@@ -7137,6 +7319,32 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1633978/000157046526000004/xslF345X06/form4-08192026_120815.xml"
+    },
+    "lead_1a70d988b953b5e01a4dab9ceb97184b": {
+      "entities": {
+        "company_ids": [
+          "co:applied_optoelectronics"
+        ],
+        "tickers": [
+          "AAOI"
+        ]
+      },
+      "first_seen": "2026-08-20T22:33:35.191383+00:00",
+      "lead_id": "lead_1a70d988b953b5e01a4dab9ceb97184b",
+      "published_at": "2026-08-20",
+      "refs": {},
+      "source": "edgar:AAOI",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "AAOI 4 filed 2026-08-20",
+      "triage": {
+        "decided_at": "2026-08-20T22:36:15.118738+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "AAOI 官方 SEC Form 4，具 issuer、form、日期與可核對原文；低優先但可作 insider／稀釋時變觀測。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826006634/xslF345X06/ownership.xml"
     },
     "lead_1a9c1baadcfa09d748a4832bb75cfdc5": {
       "entities": {
@@ -8561,6 +8769,53 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/928876/000117891326003776/zk2635828.htm"
     },
+    "lead_244fca10f947028444c8c7dcc4aad611": {
+      "entities": {
+        "company_ids": [
+          "co:coherent"
+        ],
+        "tickers": [
+          "COHR"
+        ]
+      },
+      "first_seen": "2026-08-20T22:33:39.481506+00:00",
+      "lead_id": "lead_244fca10f947028444c8c7dcc4aad611",
+      "published_at": "2026-08-20",
+      "refs": {
+        "parked_reason": "已取得 SEC Form 4 原文：COHR CFO Sherri Luther 於 2026-08-18 依 2025-11-13 Rule 10b5-1 plan 以每股 USD 324 售出 3,000 股，餘 64,475 股；屬 dated insider observation，沒有唯一 graph delta。",
+        "research_outcome": "dated_observation_no_graph_delta",
+        "research_run": "daily:2026-08-21",
+        "trace_attempts_ref": "SEC EDGAR accession 000089914026000912；library/raw/cohr_4_20260820.txt。",
+        "trace_next_trigger": "none_dated_observation",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "COHR",
+          "co:coherent"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
+      "source": "edgar:COHR",
+      "status": "parked",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "COHR"
+          ]
+        }
+      },
+      "title": "COHR 4 filed 2026-08-20",
+      "triage": {
+        "decided_at": "2026-08-20T22:36:14.361550+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "COHR 官方 SEC Form 4，具 issuer、form、日期與可核對原文；低優先但可作 insider／稀釋時變觀測。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/820318/000089914026000912/xslF345X06/form4.xml"
+    },
     "lead_24700653e97ff33c21c1dc97cfb66341": {
       "entities": {
         "company_ids": [
@@ -9071,6 +9326,36 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000201/xslF345X06/wk-form4_1785530539.xml"
+    },
+    "lead_2a2a89fbf356db7a31727282d6a012cc": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-20T22:33:31.654366+00:00",
+      "lead_id": "lead_2a2a89fbf356db7a31727282d6a012cc",
+      "published_at": "Thu, 20 Aug 2026 05:00:00 +0000",
+      "refs": {},
+      "source": "sivers:press",
+      "status": "triaged_no_go",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Inbjudan till presentation av Sivers Semiconductors rapport för andra kvartalet 2026",
+      "triage": {
+        "decided_at": "2026-08-20T22:36:15.365309+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "與同日 Sivers 官方英文 Q2 2026 簡報邀請屬同一 origin_event 的瑞典文重複，沒有新增可驗證事實。",
+        "tier": 1
+      },
+      "url": "https://www.sivers-semiconductors.com/press/inbjudan-till-presentation-av-sivers-semiconductors-rapport-for-andra-kvartalet-2026/"
     },
     "lead_2a2bd717d58af305235d2e3588a596cb": {
       "entities": {
@@ -9835,6 +10120,36 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826005221/aaoi_8k.htm"
     },
+    "lead_2eb0d6960c7a9fd49f152074871721d0": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-20T22:33:30.441027+00:00",
+      "lead_id": "lead_2eb0d6960c7a9fd49f152074871721d0",
+      "published_at": "Thu, 20 Aug 2026 05:00:00 +0000",
+      "refs": {},
+      "source": "mfn:sivers-semiconductors",
+      "status": "triaged_no_go",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Inbjudan till presentation av Sivers Semiconductors rapport för andra kvartalet 2026",
+      "triage": {
+        "decided_at": "2026-08-20T22:36:15.616245+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "MFN 轉載同一 Sivers Q2 2026 瑞典文簡報邀請，屬 same_origin 重複，沒有新增可驗證事實。",
+        "tier": 2
+      },
+      "url": "https://mfn.se/cis/a/sivers-semiconductors/inbjudan-till-presentation-av-sivers-semiconductors-rapport-for-andra-kvartalet-2026-8649ec8a"
+    },
     "lead_2ecd28c56d0e0fac45e1a5a5faf5c308": {
       "entities": {
         "company_ids": [],
@@ -10559,36 +10874,38 @@
         "campaign_topic": "memory_packaging",
         "campaign_window_end": "2026-07-29T13:46:25Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
-        "parked_reason": "official_sources_support_memory_tightness_but_not_the_specific_broker_forecasts_or_blanket_NAND_claim",
+        "parked_reason": "本次 primary-source trigger 只是 MU Form 4，沒有 memory allocation、contract-price 或 capacity 揭露；無法驗證 UBS／Morgan Stanley／Samsung 報價與全面 NAND 短缺主張。",
         "research_mode": "delta_only",
-        "research_outcome": "2026-08-12 改用 primary_source_signal：本筆等的是記憶體廠官方 allocation 揭露，不是「該公司被提到」。原設定（related_entity_signal＋全部 entities）會被任何一則相關推文觸發，每次都得到「trigger 沒帶來新東西」——2026-08-12 當日 5 個 pq1 slot 全被這類重排吃光、0 筆 prepared RA。改為只有指定實體的 tier-1 一手來源才觸發。",
-        "research_run": "daily:2026-08-10",
-        "trace_attempts_ref": "prior_official_memory_sources_plus_new_related_signal_2026-08-10",
-        "trace_next_trigger": "canonical_UBS_or_Morgan_Stanley_note_or_official_allocation_disclosure",
-        "trace_requeue_trigger": "related_triaged_lead:lead_0624cbfddb41714f21502cc3f3da7a8a",
-        "trace_requeued_at": "2026-08-09T01:26:40.660274+00:00",
+        "research_outcome": "trigger_irrelevant_no_new_delta",
+        "research_run": "daily:2026-08-21",
+        "trace_attempts_ref": "既有官方 memory sources 加查 MU 2026-07-17 Form 4 trigger；insider filing 不含等待中的供需／價格 atoms。",
+        "trace_next_trigger": "取得 canonical UBS／Morgan Stanley note，或 MU／SNDK／SIMO 官方 allocation、價格或產能揭露。",
+        "trace_requeue_trigger": "related_triaged_lead:lead_371966aa5c74144595758b25ae702179",
+        "trace_requeued_at": "2026-08-20T22:36:15.864487+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
           "MU",
           "SIMO",
-          "SNDK"
+          "SNDK",
+          "co:micron_technology",
+          "co:sandisk"
         ],
-        "trace_trigger_event_ref": "lead:lead_0624cbfddb41714f21502cc3f3da7a8a",
-        "trace_trigger_kind": "primary_source_signal"
+        "trace_trigger_event_ref": "lead:lead_371966aa5c74144595758b25ae702179",
+        "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
       "status": "parked",
       "themes": {},
       "title": "Just some consolidated updates on memory: - $MU leads new 1.5T Yen investment in Hiroshima ~$9.3B. (bullish read through for Disco, Advantest, Resonac, Towa) since capex is localized. - Morgan Stanley pointed out NAND will continue to be in short supply into 2027 so $SNDK / Kioxia type players are happy alongisde $SIMO and upstream. - MS remains especially positive on Macronix/Winbond - UBS expects the average price of DDR contracts in the Q3 2026 to increase 32% | 18% Q4, vs. 17% and 12% est. - UBS expects NAND flash to be raised 30% from prev quarter. - Samsung reportedly plans 20% DRAM hike Q3. TrendForce recently forecast DRAM contract prices to rise 13 to 18 percent in the third quarter from the previous quarter, so this hike beats expectations. Something to note: Lot people see 20%... and don't think it's a lot compared to the 70-80% from previous quarters. But if you hike something by 100%, then hike something by 100%, then hike something by 30%, it's a lot more than people estimate since it's compounded. Similar to tracking inflation. I've already made projections going into 2028 from the start of the year on my memory names... I'm just sitting back and watching things play out through all the \"memory optimization\" and \"they can't keep price hiking like this!\" noise.",
       "triage": {
-        "decided_at": "2026-08-09T01:26:40.660274+00:00",
+        "decided_at": "2026-08-20T22:36:15.864487+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true,
           "user_requested": true
         },
-        "reason": "新 triage PASS lead lead_0624cbfddb41714f21502cc3f3da7a8a 與 parked trace 共用具名標的 MU；事件觸發 bounded pq1 重查",
+        "reason": "指定實體的 tier-1 一手來源 lead_371966aa5c74144595758b25ae702179 與 parked trace 共用具名標的 MU；事件觸發 bounded pq1 重查",
         "tier": 4
       },
       "triage_history": [
@@ -10621,6 +10938,22 @@
               "user_requested": true
             },
             "reason": "新 triage PASS lead lead_dc1c77328d874e61b0abaee39391c054 與 parked trace 共用具名標的 MU, SNDK；事件觸發 bounded pq1 重查",
+            "tier": 4
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-20T22:36:15.864487+00:00",
+          "superseded_reason": "指定實體的 tier-1 一手來源 lead_371966aa5c74144595758b25ae702179 與 parked trace 共用具名標的 MU；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_371966aa5c74144595758b25ae702179",
+          "triage": {
+            "decided_at": "2026-08-09T01:26:40.660274+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true,
+              "user_requested": true
+            },
+            "reason": "新 triage PASS lead lead_0624cbfddb41714f21502cc3f3da7a8a 與 parked trace 共用具名標的 MU；事件觸發 bounded pq1 重查",
             "tier": 4
           }
         }
@@ -10888,6 +11221,35 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2074109998544846954"
+    },
+    "lead_371966aa5c74144595758b25ae702179": {
+      "entities": {
+        "company_ids": [
+          "co:micron_technology"
+        ],
+        "tickers": [
+          "MU"
+        ]
+      },
+      "first_seen": "2026-08-20T22:33:44.426779+00:00",
+      "lead_id": "lead_371966aa5c74144595758b25ae702179",
+      "published_at": "2026-07-17",
+      "refs": {},
+      "source": "edgar:MU",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "MU 4 filed 2026-07-17",
+      "triage": {
+        "decided_at": "2026-08-20T22:36:15.864487+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "MU 官方 SEC Form 4，具 issuer、form、日期與可核對原文；低優先但可作 insider／稀釋時變觀測。",
+        "related_trace_requeues": [
+          "lead_346c43a02c97ab876fd90f6845f10629"
+        ],
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/723125/000165214926000004/xslF345X06/primarydocument.xml"
     },
     "lead_37c0882c6be9e95e0538ced0c4766774": {
       "entities": {
@@ -14200,6 +14562,36 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2072925550608523738"
     },
+    "lead_55cab39b615fdf8874be6ca518e6618e": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-20T22:33:30.399418+00:00",
+      "lead_id": "lead_55cab39b615fdf8874be6ca518e6618e",
+      "published_at": "Thu, 20 Aug 2026 05:00:00 +0000",
+      "refs": {},
+      "source": "mfn:sivers-semiconductors",
+      "status": "triaged_no_go",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Invitation to Presentation of Sivers Semiconductors' Q2 2026 Report",
+      "triage": {
+        "decided_at": "2026-08-20T22:36:16.114164+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "MFN 轉載同一 Sivers Q2 2026 英文簡報邀請，屬 same_origin 重複，沒有新增可驗證事實。",
+        "tier": 2
+      },
+      "url": "https://mfn.se/cis/a/sivers-semiconductors/invitation-to-presentation-of-sivers-semiconductors-q2-2026-report-e04eed67"
+    },
     "lead_55d4f2734afbfab750d526b824198afb": {
       "entities": {
         "company_ids": [
@@ -14462,6 +14854,47 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2072369811791946173"
+    },
+    "lead_56d0fea5913320b3fb2d7a18236060f5": {
+      "entities": {
+        "company_ids": [
+          "co:sk_hynix"
+        ],
+        "tickers": [
+          "MRNA",
+          "EWY",
+          "SKHY",
+          "YMTC"
+        ]
+      },
+      "first_seen": "2026-08-20T22:33:33.384011+00:00",
+      "lead_id": "lead_56d0fea5913320b3fb2d7a18236060f5",
+      "media": [],
+      "published_at": "2026-08-20T09:45:17.000Z",
+      "raw_text": "I'm glad the leverage bros moved from AI stocks back to Hyerliquid and biotech like $MRNA, so maybe we'll see a faster recovery. \n\nAside from that just some TLDR stuff:\n\n- $EWY up, primarily from SK Hynix buybacks (they're just too profitable), and Samsung Foundry roughly ~10-15% price hikes. \n\n- $SKHY unveils CPO roadmap?? Apparently they're doing something with photonic interposer that links to memory, so I gotta look a bit deeper into this\n\nProbably going to be more TAM expansion, more supply chain beneficiaries (eg. lasers, PICs, packaging) off this.\n\n- $YMTC pursuing IPO next quarter following CMXT's successful IPO. \n\nThe Chinese IPO market is just going brrr from Unitree to memory makers. \n\nUS needs to do something similar rather than IPOing companies at trillion dollar valuations already. \n\n- Tyntek limit up there's now order visibility through 2028, given photodiode demand imbalance for photonics. \n\nElazr GM did say the entire optical supply chain was facing major shortages... I'll probably look more at high-end PD bottlenecks next.\n\n- MS forecasts a 50% Q/Q price increase for DDR4 for Q3, and 10%+ increase for Q4 2026. (Nanya/2408, Windbond/2344, should be happy). \n\n- China reportedly delays clearance from germanium, quartz-based materials, and neodymium magnets To taiwan. \n\nSo I'll probably have some fun looking into supply chains disruptions there over cup noodles.\n\n- High-end PCB drill shortage (still ongoing), Kawei (5498) said AI DCs, servers and optical communications are driving demand for PCBs, HDI and package substrates, while tungsten prices are rising. \n\nThough the world's five largest drill manufacturers are aggressively expanding capacity, supply remains far below overall market demand\n\nJust stuff I found interesting recently, obviously $MRNA stuff is too.",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CPO"
+          ]
+        }
+      },
+      "title": "I'm glad the leverage bros moved from AI stocks back to Hyerliquid and biotech like $MRNA, so maybe we'll see a faster recovery. Aside from that just some TLDR stuff: - $EWY up, primarily from SK Hynix buybacks (they're just too profitable), and Samsung Foundry roughly ~10-15% price hikes. - $SKHY unveils CPO roadmap?? Apparently they're doing something with photonic interposer that links to memory, so I gotta look a bit deeper into this Probably going to be more TAM expansion, more supply chain beneficiaries (eg. lasers, PICs, packaging) off this. - $YMTC pursuing IPO next quarter following CMXT's successful IPO. The Chinese IPO market is just going brrr from Unitree to memory makers. US needs to do something similar rather than IPOing companies at trillion dollar valuations already. - Tyntek limit up there's now order visibility through 2028, given photodiode demand imbalance for photonics. Elazr GM did say the entire optical supply chain was facing major shortages... I'll probably look more at high-end PD bottlenecks next. - MS forecasts a 50% Q/Q price increase for DDR4 for Q3, and 10%+ increase for Q4 2026. (Nanya/2408, Windbond/2344, should be happy). - China reportedly delays clearance from germanium, quartz-based materials, and neodymium magnets To taiwan. So I'll probably have some fun looking into supply chains disruptions there over cup noodles. - High-end PCB drill shortage (still ongoing), Kawei (5498) said AI DCs, servers and optical communications are driving demand for PCBs, HDI and package substrates, while tungsten prices are rising. Though the world's five largest drill manufacturers are aggressively expanding capacity, supply remains far below overall market demand Just stuff I found interesting recently, obviously $MRNA stuff is too.",
+      "triage": {
+        "decided_at": "2026-08-20T22:36:16.355544+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "命中 SK Hynix CPO／photonic interposer、Tyntek photodiode 至 2028、DDR4 漲價與 PCB drill shortage 等具名可追查 atoms；需逐項追回一手來源。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2090374603264929981"
     },
     "lead_56ea07feba6cd30f8b79b1182d30fbf4": {
       "entities": {
@@ -19337,6 +19770,114 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2087249406638862506"
     },
+    "lead_7cd19ddab804188d2cb5a96b8dcd00b7": {
+      "entities": {
+        "company_ids": [
+          "co:applied_optoelectronics",
+          "co:sivers_semiconductors",
+          "co:lumentum",
+          "co:macom"
+        ],
+        "tickers": [
+          "AAOI",
+          "SIVE",
+          "LITE",
+          "MTSI"
+        ]
+      },
+      "first_seen": "2026-08-20T22:33:33.381707+00:00",
+      "lead_id": "lead_7cd19ddab804188d2cb5a96b8dcd00b7",
+      "media": [
+        {
+          "cache": {
+            "bytes": 98301,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_7cd19ddab804188d2cb5a96b8dcd00b7/3_2090490093538807808.jpg",
+            "sha256": "9c1a03dbb862f686d86aef86a87d370ef4016cba885a91e541241be08ec591ee"
+          },
+          "height": 653,
+          "media_key": "3_2090490093538807808",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HQLpqgfakAARJe3.jpg",
+          "width": 1226
+        },
+        {
+          "cache": {
+            "bytes": 198240,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_7cd19ddab804188d2cb5a96b8dcd00b7/3_2090490093517819904.jpg",
+            "sha256": "d5c6333c8e109f33fe99acc89878922c23c31c54d27d5c64069409c157de7831"
+          },
+          "height": 1357,
+          "media_key": "3_2090490093517819904",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HQLpqgaaUAAl_DB.jpg",
+          "width": 1260
+        }
+      ],
+      "published_at": "2026-08-20T17:24:14.000Z",
+      "raw_text": "Very positive. My opinion is that the optical sector underperformance recently from $AAOI to $SIVE has been absurd.\n\nThe demand visibility... is just way too stupidly high.\n\nAOI: “Even combined AOI, Coherent program altogether, is still very tough to meet the customer demand in the next 3 years” (2029)\n\nElazr GM: \"entire optical supply chain was facing major shortages.\" \"The shortage will continue to the next few years\"\n\nSivers CEO said the same thing about InP laser demand imbalances expected for the next 3-5 years.\n\nCan go on and on about $LITE, $MTSI and other comments.\n\nWe haven't even hit the inflection point with 1.6T, NPO, CPO scale out/up, and optics with memory (as seen with SK Hynix).\n\nYet the industry is already bottlenecked by EML/CW and all your other upstream components from PDs/TIA/DSPs, transceivers, and soon FAU + others when CPO scales… \n\nI'm personally extremely comfortable watching this all play out, but just a little confused that markets don't know how to math a year or two ahead.",
+      "refs": {
+        "parked_reason": "這是同作者把 AAOI summit、未知 Elazr GM、Sivers CEO 與 LITE/MTSI 評論混成一則的二次轉述；既有來源支持光學需求偏緊方向，但未支持 AAOI 至 2029、Sivers 3–5 年或整條供應鏈精確短缺時程，不能形成新 graph delta。",
+        "research_outcome": "partial_same_origin_composite_no_graph_delta",
+        "research_run": "daily:2026-08-21",
+        "trace_attempts_ref": "AAOI 官方 summit 摘要、LITE Q4 transcript、Sivers／POET 既有官方文件與未知 Elazr quote 搜尋；只有部分方向可交叉支持。",
+        "trace_next_trigger": "取得 AAOI summit 完整 transcript、Sivers CEO 原始逐字稿與 Elazr canonical 活動原文。",
+        "trace_requires_user": "false",
+        "trace_status": "partial",
+        "trace_trigger_entities": [
+          "AAOI",
+          "LITE",
+          "MTSI",
+          "SIVE",
+          "co:applied_optoelectronics",
+          "co:lumentum",
+          "co:macom",
+          "co:sivers_semiconductors"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
+      "source": "x:aleabitoreddit",
+      "status": "parked",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CPO",
+            "InP",
+            "LITE"
+          ]
+        },
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "InP laser",
+            "SIVE",
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Very positive. My opinion is that the optical sector underperformance recently from $AAOI to $SIVE has been absurd. The demand visibility... is just way too stupidly high. AOI: “Even combined AOI, Coherent program altogether, is still very tough to meet the customer demand in the next 3 years” (2029) Elazr GM: \"entire optical supply chain was facing major shortages.\" \"The shortage will continue to the next few years\" Sivers CEO said the same thing about InP laser demand imbalances expected for the next 3-5 years. Can go on and on about $LITE, $MTSI and other comments. We haven't even hit the inflection point with 1.6T, NPO, CPO scale out/up, and optics with memory (as seen with SK Hynix). Yet the industry is already bottlenecked by EML/CW and all your other upstream components from PDs/TIA/DSPs, transceivers, and soon FAU + others when CPO scales… I'm personally extremely comfortable watching this all play out, but just a little confused that markets don't know how to math a year or two ahead.",
+      "triage": {
+        "decided_at": "2026-08-20T22:36:14.618719+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "命中 AAOI、Sivers、LITE、MTSI 與 EML／CW／InP，含 2029、3–5 年與供應短缺等可追查原句；需追回法說／IR 原文。",
+        "related_trace_requeues": [
+          "lead_1940958c3136e0a33b4e0856b7b05d82",
+          "lead_7f66b743a034c41f6388aa800f333e62",
+          "lead_85a70a23ae1002dabdedefb41b9bf721",
+          "lead_c7ca9aa7169d5ffa4a621430cac35d5e",
+          "lead_d3b3988d99ff494fe07af958c6b5bc1e"
+        ],
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2090490101260591481"
+    },
     "lead_7d745e51747c8b36b02f3fddb1fafe51": {
       "entities": {
         "company_ids": [],
@@ -19766,21 +20307,24 @@
       "refs": {
         "claimed_origin": "未標出處的逐字引號，追回為 Reuters 2026-08-04 exclusive",
         "gap": "FCC 正式規則文本、生效範圍與豁免清單",
-        "parked_reason": "已追源但無一手可用。多份二手（Caixin、Tom's Hardware、TechTimes、Electronics360）一致指向：FCC 正草擬規則禁止新型號中國光模組進口，可能 2026 年底前生效，但明確仍可能被修改或放棄，且不影響已安裝存量。⚠ 原推文措辭有誤並已更正：它寫 Trump administration drafting a ban，實際機制是 FCC 既有的 Covered List 設備授權框架，與商務部 BIS 出口管制是法律上不同的路徑（L11：監管術語的措辭精度本身就是一個 claim，不得沿用二手框架）。二手另載 Innolight 約 27% 全球市占、與 Eoptolink 合計掌握 800G+ 逾 60%、COHR／LITE 產能不足以完全替代——全部未經一手證實，不得入圖。⚠ 值得後續追的反向瓶頸線索：有報導稱西方替代品仍依賴中國 indium 供應，而銦正是 mat:inp_substrate 的原料；若屬實則禁令同時創造需求與上游約束。",
-        "research_outcome": "policy_draft_stage_no_primary_source",
-        "trace_attempts_ref": "以逐字句搜尋定位到 Reuters 獨家報導及多家轉載；FCC 尚未公布任何規則草案文本",
-        "trace_next_trigger": "FCC 正式發布 NPRM 或 Report and Order，或將中國光模組廠商列入 Covered List；屆時才有一手可入圖",
+        "parked_reason": "今日新貼文談光學需求，沒有 FCC 正式規則文本；既有 Reuters 只支持仍可能修改或放棄的 draft，且是 FCC Covered List／設備授權路徑，不是已生效的全面進口禁令。",
+        "research_outcome": "policy_draft_no_primary_rule",
+        "research_run": "daily:2026-08-21",
+        "trace_attempts_ref": "Reuters 2026-08-04 carrier、二手轉載與 FCC 官方規則搜尋；今日 trigger 未帶來 NPRM、Report and Order 或 Covered List 更新。",
+        "trace_next_trigger": "FCC 正式發布 NPRM／Report and Order，或把中國光模組廠列入 Covered List。",
         "trace_origin_entity": "Reuters",
         "trace_requeue_consumed_entities": [
           "AAOI",
           "CO:APPLIED_OPTOELECTRONICS",
           "CO:LUMENTUM",
-          "LITE"
+          "CO:SIVERS_SEMICONDUCTORS",
+          "LITE",
+          "SIVE"
         ],
-        "trace_requeue_trigger": "related_triaged_lead:lead_1940958c3136e0a33b4e0856b7b05d82",
-        "trace_requeued_at": "2026-08-18T23:05:45.408019+00:00",
+        "trace_requeue_trigger": "related_triaged_lead:lead_7cd19ddab804188d2cb5a96b8dcd00b7",
+        "trace_requeued_at": "2026-08-20T22:36:14.618719+00:00",
         "trace_requires_user": "false",
-        "trace_status": "secondary_only_no_primary",
+        "trace_status": "isolated_tier_3",
         "trace_trigger_entities": [
           "AAOI",
           "LITE",
@@ -19789,7 +20333,7 @@
           "co:lumentum",
           "co:sivers_semiconductors"
         ],
-        "trace_trigger_event_ref": "lead:lead_1940958c3136e0a33b4e0856b7b05d82",
+        "trace_trigger_event_ref": "lead:lead_7cd19ddab804188d2cb5a96b8dcd00b7",
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
@@ -19812,12 +20356,12 @@
       },
       "title": "A very material catalyst came about for Western supply chains from $AAOI, $SIVE / Jabil, to $LITE and Coherent: The Trump administration is drafting a ban of new Chinese optical transceivers and DC devices. Which would likely hit China’s Innolight, Eoptolink, and other Chinese optical interconnect supply chains. \"The agency would ban all imports of new transceiver models ​and then exempt many ⁠non-Chinese suppliers from the restrictions\" We'll likely see a larger bifurcation of supply chains with even greater importance put on Western players.",
       "triage": {
-        "decided_at": "2026-08-18T23:05:45.408019+00:00",
+        "decided_at": "2026-08-20T22:36:14.618719+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true
         },
-        "reason": "新 triage PASS lead lead_1940958c3136e0a33b4e0856b7b05d82 與 parked trace 共用具名標的 AAOI, LITE, co:applied_optoelectronics, co:lumentum（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+        "reason": "新 triage PASS lead lead_7cd19ddab804188d2cb5a96b8dcd00b7 與 parked trace 共用具名標的 SIVE, co:sivers_semiconductors（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
         "tier": 4
       },
       "triage_history": [
@@ -19845,6 +20389,21 @@
               "lead_c91246f27ecce6763d075ed638d3f163",
               "lead_d3b3988d99ff494fe07af958c6b5bc1e"
             ],
+            "tier": 4
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-20T22:36:14.618719+00:00",
+          "superseded_reason": "新 triage PASS lead lead_7cd19ddab804188d2cb5a96b8dcd00b7 與 parked trace 共用具名標的 SIVE, co:sivers_semiconductors（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_7cd19ddab804188d2cb5a96b8dcd00b7",
+          "triage": {
+            "decided_at": "2026-08-18T23:05:45.408019+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true
+            },
+            "reason": "新 triage PASS lead lead_1940958c3136e0a33b4e0856b7b05d82 與 parked trace 共用具名標的 AAOI, LITE, co:applied_optoelectronics, co:lumentum（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
             "tier": 4
           }
         }
@@ -20453,6 +21012,46 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2080042335388500360"
     },
+    "lead_81f1979d3bdc16d4b6729ed42a7c83ae": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "SPCX"
+        ]
+      },
+      "first_seen": "2026-08-20T22:33:33.381032+00:00",
+      "lead_id": "lead_81f1979d3bdc16d4b6729ed42a7c83ae",
+      "media": [
+        {
+          "cache": {
+            "bytes": 67016,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_81f1979d3bdc16d4b6729ed42a7c83ae/3_2090510562551853056.jpg",
+            "sha256": "82bc9c08f964754e6d1c260735bad8b6fc37fae685f8db23a4d9a7cef7b5809e"
+          },
+          "height": 629,
+          "media_key": "3_2090510562551853056",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HQL8R9ga8AAwSQH.jpg",
+          "width": 1233
+        }
+      ],
+      "published_at": "2026-08-20T18:45:33.000Z",
+      "raw_text": "After seeing how the robotics and space sectors reacted to Unitree and $SPCX IPOs\n\nI’m not quite sure I want Anthropic to go public… https://t.co/hY6tM1r4Qb",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "After seeing how the robotics and space sectors reacted to Unitree and $SPCX IPOs I’m not quite sure I want Anthropic to go public… https://t.co/hY6tM1r4Qb",
+      "triage": {
+        "decided_at": "2026-08-20T22:36:16.608666+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "只有對 Unitree／SPCX IPO 後市場反應與 Anthropic 是否上市的情緒評論，沒有可逐字驗證的供應鏈動作、數字或事件。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2090510568474231045"
+    },
     "lead_82588db79284b466e46edffff6c0a878": {
       "entities": {
         "company_ids": [],
@@ -20975,9 +21574,21 @@
       "raw_text": "We got $LITE, $MTSI, $AAOI all pointing to extreme demand imbalances with lasers/TIA/DSP/etc from earnings... \n\nAnd now Elazr GM at their investor conference stated: \n\nOptical supply is still far behind the market demand, the expected AI optical supply chain are likely to continue for years.\n\n- \"the entire supply chain is out of stock\"\n\n- \"the supply is still far behind the market demand\"\n\n- \"the shortage will continue to the next few years\"\n\n\"Whether it is PCB, carrier board, laser chip, or even related packaging  capacity, as long as the AI supply chain link, almost all are in short supply.\" \n\nWhen demand visibility extends for years with the supply chain bottlenecked:\n\nIt's getting difficult not to see photonics echoing the memory supercycle entering 2027.",
       "refs": {
         "outcome": "no_prepared_ra_exact_origin_missing",
-        "parked_reason": "LITE／MTSI／AAOI 光學供應短缺方向可由 Fabrinet transcript 的 lasers／memory／ASIC constraints 部分交叉支持，但未找到推文所稱 Elazr GM／investor conference 的正確講者、活動或逐字原文；「整條供應鏈缺貨數年」不能升格。",
-        "trace_attempts_ref": "逐字引號、Elazr／講者變體、investor conference exact search；Fabrinet Q3 FY2026 transcript 交叉核對",
-        "trace_next_trigger": "取得該 investor conference 的 canonical agenda／錄影／逐字稿，或 LITE／MTSI／AAOI／Fabrinet 一手文件量化 laser／TIA／DSP／packaging 供應缺口與時程",
+        "parked_reason": "今日綜合貼文再次引用同一組 Elazr GM 供應短缺句，但仍無正確講者、活動或逐字原文；既有資料只支持光學供應偏緊方向，不能升格為整條供應鏈缺貨數年。",
+        "research_outcome": "no_new_primary_delta",
+        "research_run": "daily:2026-08-21",
+        "trace_attempts_ref": "逐字引號與講者變體搜尋、Fabrinet/LITE 一手或可核對 transcript，加查今日同源綜合貼文；無新 origin。",
+        "trace_next_trigger": "取得 canonical investor-conference agenda／錄影／逐字稿，或 issuer 一手量化供應缺口與時程。",
+        "trace_requeue_consumed_entities": [
+          "AAOI",
+          "CO:APPLIED_OPTOELECTRONICS",
+          "CO:LUMENTUM",
+          "CO:MACOM",
+          "LITE",
+          "MTSI"
+        ],
+        "trace_requeue_trigger": "related_triaged_lead:lead_7cd19ddab804188d2cb5a96b8dcd00b7",
+        "trace_requeued_at": "2026-08-20T22:36:14.618719+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
@@ -20988,6 +21599,7 @@
           "co:lumentum",
           "co:macom"
         ],
+        "trace_trigger_event_ref": "lead:lead_7cd19ddab804188d2cb5a96b8dcd00b7",
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
@@ -21003,14 +21615,31 @@
       },
       "title": "We got $LITE, $MTSI, $AAOI all pointing to extreme demand imbalances with lasers/TIA/DSP/etc from earnings... And now Elazr GM at their investor conference stated: Optical supply is still far behind the market demand, the expected AI optical supply chain are likely to continue for years. - \"the entire supply chain is out of stock\" - \"the supply is still far behind the market demand\" - \"the shortage will continue to the next few years\" \"Whether it is PCB, carrier board, laser chip, or even related packaging capacity, as long as the AI supply chain link, almost all are in short supply.\" When demand visibility extends for years with the supply chain bottlenecked: It's getting difficult not to see photonics echoing the memory supercycle entering 2027.",
       "triage": {
-        "decided_at": "2026-08-19T22:33:23.454059+00:00",
+        "decided_at": "2026-08-20T22:36:14.618719+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true
         },
-        "reason": "LITE／MTSI／AAOI 與 AI optical supply shortage 直接相關，含具體公司、元件與逐字引號；可追 investor conference 原始材料，可能新增跨公司需求證據。",
+        "reason": "新 triage PASS lead lead_7cd19ddab804188d2cb5a96b8dcd00b7 與 parked trace 共用具名標的 AAOI, LITE, MTSI, co:applied_optoelectronics, co:lumentum, co:macom（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
         "tier": 3
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-20T22:36:14.618719+00:00",
+          "superseded_reason": "新 triage PASS lead lead_7cd19ddab804188d2cb5a96b8dcd00b7 與 parked trace 共用具名標的 AAOI, LITE, MTSI, co:applied_optoelectronics, co:lumentum, co:macom（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_7cd19ddab804188d2cb5a96b8dcd00b7",
+          "triage": {
+            "decided_at": "2026-08-19T22:33:23.454059+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true
+            },
+            "reason": "LITE／MTSI／AAOI 與 AI optical supply shortage 直接相關，含具體公司、元件與逐字引號；可追 investor conference 原始材料，可能新增跨公司需求證據。",
+            "tier": 3
+          }
+        }
+      ],
       "url": "https://x.com/aleabitoreddit/status/2089973586425766134"
     },
     "lead_85f0e54130000bfc62725a57c4da02cf": {
@@ -21467,6 +22096,32 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2076284746385240101"
     },
+    "lead_88b3a120303773b02ca9264309234c0e": {
+      "entities": {
+        "company_ids": [
+          "co:micron_technology"
+        ],
+        "tickers": [
+          "MU"
+        ]
+      },
+      "first_seen": "2026-08-20T22:33:44.426924+00:00",
+      "lead_id": "lead_88b3a120303773b02ca9264309234c0e",
+      "published_at": "2026-07-02",
+      "refs": {},
+      "source": "edgar:MU",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "MU 4 filed 2026-07-02",
+      "triage": {
+        "decided_at": "2026-08-20T22:36:16.850960+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "MU 官方 SEC Form 4，具 issuer、form、日期與可核對原文；低優先但可作 insider／稀釋時變觀測。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/723125/000145336826000001/xslF345X06/primarydocument.xml"
+    },
     "lead_88ebe213f361b2bee4d6ddeb1e798f56": {
       "entities": {
         "company_ids": [],
@@ -21542,9 +22197,25 @@
       "media": [],
       "published_at": "2026-08-11T21:09:43.000Z",
       "raw_text": "Insane earnings today for the AI theme with $CRWV, $SMCI, and $LITE. \n\nCoreweave: Absurd ~$104B+ backlog, which doesn't include $25B+ of new customer agreements added in early Q3. \n\nCompute demand read through for Neoclouds is enormous (For Nebius, Iren and others)\n\nSupermicro:  Absurd $65-72B in revenue guidance, adding $60B+ in new orders... \n\nAI DC buildout read through is just enormous. \n\nLumentum: $808M -> $1.01B -> $1.25B revenue ramp, with operating margins growing quarter after quarter. \n\nPhotonics players just keeps printing. \n\nTLDR: Every layer of the AI buildout goes brrrrr, and it's showing up in earnings.",
-      "refs": {},
+      "refs": {
+        "parked_reason": "LITE Q4 FY2026 可核對 transcript／10-K 支持 AI photonics ramp、high-power laser shipment shortfall 與 UHP revenue build；但此混合貼文的 CoreWeave US$104B backlog、SMCI US$65–72B guidance 未在本輪逐項核完，且全部是 dated earnings observation，無唯一 graph delta。",
+        "research_outcome": "dated_earnings_observation_no_graph_delta",
+        "research_run": "daily:2026-08-21",
+        "trace_attempts_ref": "library/raw/lite_transcript_q4fy2026.txt、LITE FY2026 10-K；CRWV／SMCI exact filings 未作 graph extraction。",
+        "trace_next_trigger": "若要把 CRWV／SMCI 數字用於決策，取得兩家公司 exact earnings filing／IR 並分開註冊。",
+        "trace_requires_user": "false",
+        "trace_status": "partial",
+        "trace_trigger_entities": [
+          "CRWV",
+          "LITE",
+          "SMCI",
+          "co:coreweave",
+          "co:lumentum"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -24511,6 +25182,7 @@
       "published_at": "2026-07-09T12:46:14.000Z",
       "raw_text": "Nothing like an internal $META memo getting published.\n\nShowing AI ramping as usual:\n\n- LTAs signed with Samsung and $SNDK for memory\n- LTAs signed with Sumitomo Electric for fiber optics\n- Expected to deploy 7GW compute infra this year, and doubling in 2027. \n- as much as $145B capex spend this year \n\n“It plans to launch a chip about every six months through 2027”",
       "refs": {
+        "action_digest": "87026d6e52e60f9ab1ea30d91c42e572cbed867736c5f76a68b7ac583f2a5712",
         "campaign_ids": [
           "serenity_30d_20260729"
         ],
@@ -24523,9 +25195,10 @@
         "outcome": "validated_extraction_ra_prepare_blocked_private_acl",
         "parked_reason": "今日觸發 lead_f9bdf048e23b0239b1acbde1497744e5 未帶來 Meta internal memo 或 Meta／Samsung／SanDisk／Sumitomo 的具名 LTA 一手披露；既有官方資料只能支持 chip cadence，無新 graph delta。",
         "primary_url": "https://www.investing.com/news/stock-market-news/meta-to-put-ai-chip-into-production-in-september-as-it-looks-to-double-computing-capacity-memo-shows-4787372",
+        "research_action_id": "ra_36b579586f7cebb6c5e5130d9a0f67c7",
         "research_mode": "delta_only",
-        "research_outcome": "no_prepared_ra_new_trigger_no_primary_delta",
-        "research_run": "daily:2026-08-17",
+        "research_outcome": "prepared_tier3_meta_sumitomo_supply_relationship",
+        "research_run": "daily:2026-08-21",
         "source_doc": "reuters_meta_compute_supply_lta_2026_07_09",
         "trace_attempts_ref": "Reuters syndicated report＋Meta Q2 2026 earnings call；extraction validation OK；RA prepare 被 private storage ACL 擋下",
         "trace_next_trigger": "library/private owner-only ACL 恢復後，以同一 validated extraction 重試 prepare_research_action",
@@ -24548,7 +25221,7 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "researching",
+      "status": "action_prepared",
       "themes": {},
       "title": "Nothing like an internal $META memo getting published. Showing AI ramping as usual: - LTAs signed with Samsung and $SNDK for memory - LTAs signed with Sumitomo Electric for fiber optics - Expected to deploy 7GW compute infra this year, and doubling in 2027. - as much as $145B capex spend this year “It plans to launch a chip about every six months through 2027”",
       "triage": {
@@ -25316,6 +25989,32 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2072936659369517341"
     },
+    "lead_ac19b6d0b592484acada292ba8525bfe": {
+      "entities": {
+        "company_ids": [
+          "co:meta"
+        ],
+        "tickers": [
+          "META"
+        ]
+      },
+      "first_seen": "2026-08-20T22:33:43.050433+00:00",
+      "lead_id": "lead_ac19b6d0b592484acada292ba8525bfe",
+      "published_at": "2026-08-20",
+      "refs": {},
+      "source": "edgar:META",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "META 4 filed 2026-08-20",
+      "triage": {
+        "decided_at": "2026-08-20T22:36:17.104404+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "META 官方 SEC Form 4，具 issuer、form、日期與可核對原文；低優先但可作 insider／稀釋時變觀測。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1326801/000095010326012726/xslF345X06/ownership.xml"
+    },
     "lead_ac2d4f7e3c0a017783e2221a8e1bddb7": {
       "entities": {
         "company_ids": [
@@ -25882,6 +26581,32 @@
       ],
       "url": "https://x.com/aleabitoreddit/status/2072178393878290789"
     },
+    "lead_aff70803a3fe9d0ccd973dfae74d3eea": {
+      "entities": {
+        "company_ids": [
+          "co:micron_technology"
+        ],
+        "tickers": [
+          "MU"
+        ]
+      },
+      "first_seen": "2026-08-20T22:33:44.426851+00:00",
+      "lead_id": "lead_aff70803a3fe9d0ccd973dfae74d3eea",
+      "published_at": "2026-07-06",
+      "refs": {},
+      "source": "edgar:MU",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "MU 4 filed 2026-07-06",
+      "triage": {
+        "decided_at": "2026-08-20T22:36:17.348519+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "MU 官方 SEC Form 4，具 issuer、form、日期與可核對原文；低優先但可作 insider／稀釋時變觀測。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/723125/000163206326000003/xslF345X06/primarydocument.xml"
+    },
     "lead_b054372ac860dbc6e270ecc7a4d9d50e": {
       "entities": {
         "company_ids": [
@@ -26243,24 +26968,26 @@
         "campaign_window_start": "2026-06-29T13:46:25Z",
         "claimed_origin": "Morgan Stanley 2026-07-13 CPO research note",
         "original_claim_status": "unverified_with_existing_graph_conflict",
-        "parked_reason": "未取得券商canonical_note；參與者名單與排名不能替代issuer一手具名關係",
+        "parked_reason": "今日觸發是 GFS Form 4，與 Morgan Stanley CPO 參與者 note 無內容關聯；未取得 canonical 券商原報告，參與者名單仍不能替代 issuer 一手具名關係。",
         "research_mode": "delta_only",
-        "research_outcome": "no_prepared_ra_new_trigger_no_primary_delta",
-        "research_run": "daily:2026-08-17",
-        "trace_attempts_ref": "Morgan_Stanley_exact-note_search_plus_issuer_docs",
-        "trace_next_trigger": "取得canonical_note或issuer披露具名客戶與供應關係",
+        "research_outcome": "no_new_primary_delta",
+        "research_run": "daily:2026-08-21",
+        "trace_attempts_ref": "既有 Morgan Stanley exact-note／issuer 文件搜尋，加查今日 GFS Form 4 trigger；沒有原 note 或新供應關係。",
+        "trace_next_trigger": "取得 Morgan Stanley canonical note，或名單中 issuer 自己披露具名客戶／供應關係。",
         "trace_requeue_consumed_entities": [
           "CO:COHERENT",
+          "CO:GLOBALFOUNDRIES",
           "CO:LUMENTUM",
           "CO:SIVERS_SEMICONDUCTORS",
           "CO:TOWER_SEMICONDUCTOR",
           "COHR",
+          "GFS",
           "LITE",
           "SIVE",
           "TSEM"
         ],
-        "trace_requeue_trigger": "related_triaged_lead:lead_03e036c05aea97310171ca07772eb352",
-        "trace_requeued_at": "2026-08-17T22:34:27.864087+00:00",
+        "trace_requeue_trigger": "related_triaged_lead:lead_e530c84ac4d95741430cd21a813d8942",
+        "trace_requeued_at": "2026-08-20T22:36:18.838400+00:00",
         "trace_requires_user": "false",
         "trace_status": "isolated_tier_3",
         "trace_storage_permission": "unknown",
@@ -26274,10 +27001,11 @@
           "co:coherent",
           "co:globalfoundries",
           "co:lumentum",
+          "co:sivers_semiconductors",
           "co:tower_semiconductor",
           "co:tsmc"
         ],
-        "trace_trigger_event_ref": "lead:lead_03e036c05aea97310171ca07772eb352",
+        "trace_trigger_event_ref": "lead:lead_e530c84ac4d95741430cd21a813d8942",
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
@@ -26302,13 +27030,13 @@
       },
       "title": "Morgan Stanley note on CPO today. Key participants include: - $SIVE, $COHR, and $LITE in laser supply - Broadcom and Nvidia in switch platforms - Lightmatter, Ayar Labs, Marvell/Celestial, and POET in optical engines and photonics, - $TSM, $GFS, and $TSEM in silicon photonics foundry capacity I’ve covered all of these before, like Tower Semi. But I’m especially happy that Morgan Stanley validated my research that $SIVE is one of the critical global players in CPO. A small $1.5B laser company next to your two leading $60B+ companies… If you also synthesize Rosenblatt Securities recent note that China laser suppliers were quite far from having CPO lasers. This kinda magnifies importance of the three Western leaders of that laser chokepoint.",
       "triage": {
-        "decided_at": "2026-08-17T22:34:27.864087+00:00",
+        "decided_at": "2026-08-20T22:36:18.838400+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true,
           "user_requested": true
         },
-        "reason": "新 triage PASS lead lead_03e036c05aea97310171ca07772eb352 與 parked trace 共用具名標的 TSEM, co:tower_semiconductor（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+        "reason": "新 triage PASS lead lead_e530c84ac4d95741430cd21a813d8942 與 parked trace 共用具名標的 GFS, co:globalfoundries（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
         "tier": 4
       },
       "triage_history": [
@@ -26405,6 +27133,22 @@
               "user_requested": true
             },
             "reason": "新 triage PASS lead lead_f6b1dedf52a7ea56170c3531676a5ace 與 parked trace 共用具名標的 COHR, co:coherent（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+            "tier": 4
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-20T22:36:18.838400+00:00",
+          "superseded_reason": "新 triage PASS lead lead_e530c84ac4d95741430cd21a813d8942 與 parked trace 共用具名標的 GFS, co:globalfoundries（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_e530c84ac4d95741430cd21a813d8942",
+          "triage": {
+            "decided_at": "2026-08-17T22:34:27.864087+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true,
+              "user_requested": true
+            },
+            "reason": "新 triage PASS lead lead_03e036c05aea97310171ca07772eb352 與 parked trace 共用具名標的 TSEM, co:tower_semiconductor（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
             "tier": 4
           }
         }
@@ -27352,6 +28096,34 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1326801/000095010326012606/xslF345X06/ownership.xml"
+    },
+    "lead_b79863ea7b63f7fac47abf4b4c244d8a": {
+      "entities": {
+        "company_ids": [
+          "co:applied_materials"
+        ],
+        "tickers": [
+          "AMAT"
+        ]
+      },
+      "first_seen": "2026-08-20T22:33:36.722560+00:00",
+      "lead_id": "lead_b79863ea7b63f7fac47abf4b4c244d8a",
+      "published_at": "2026-08-20",
+      "refs": {},
+      "source": "edgar:AMAT",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "AMAT 10-Q filed 2026-08-20",
+      "triage": {
+        "decided_at": "2026-08-20T22:36:17.590058+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "AMAT 官方 10-Q，具 issuer、期間與完整 filing；可能提供半導體設備需求、客戶及財務時變觀測。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026058235/amat-20260726.htm"
     },
     "lead_b8b6907dcdb7b1cb07a9eed1abcb7556": {
       "entities": {
@@ -29007,10 +29779,12 @@
         "trace_original_url": "https://www.sec.gov/Archives/edgar/data/1437424/000117184326005485/exh_991.htm",
         "trace_requeue_consumed_entities": [
           "AAOI",
-          "CO:APPLIED_OPTOELECTRONICS"
+          "CO:APPLIED_OPTOELECTRONICS",
+          "CO:SIVERS_SEMICONDUCTORS",
+          "SIVE"
         ],
-        "trace_requeue_trigger": "related_triaged_lead:lead_1940958c3136e0a33b4e0856b7b05d82",
-        "trace_requeued_at": "2026-08-18T23:05:45.408019+00:00",
+        "trace_requeue_trigger": "related_triaged_lead:lead_7cd19ddab804188d2cb5a96b8dcd00b7",
+        "trace_requeued_at": "2026-08-20T22:36:14.618719+00:00",
         "trace_requires_user": "false",
         "trace_status": "opinion_no_primary",
         "trace_trigger_entities": [
@@ -29021,11 +29795,11 @@
           "co:poet_technologies",
           "co:sivers_semiconductors"
         ],
-        "trace_trigger_event_ref": "lead:lead_1940958c3136e0a33b4e0856b7b05d82",
+        "trace_trigger_event_ref": "lead:lead_7cd19ddab804188d2cb5a96b8dcd00b7",
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -29038,12 +29812,12 @@
       },
       "title": "Okay here's my take on $POET, since apparently people are celebrating on the subreddit that I took small positions. - I have 0 idea. ZERO. How they convinced shareholders to allow them dilute SO MUCH to the point: They have an absurd ~$830m cash on hand now. And my guess is that they're close to done, since I would be in disbelief if they needed more. So now... they have ~$830m to grow their business like M&A, and EV actually dropped really low recently (eg. $1.25B MC vs. $830m cash on hand), that I thought it was compelling to take a risk. - Annualized production capacity target is 12M optical engines/year for 2027, which is pretty absurd ramp. Need to do more research into ASP for Poet's products, but maybe $125-$200? So at ~$150 ASP, $1.8B revenue ceiling. But they're like inverse AAOI right now: no visible demand to fill all that capacity. Aside from Lumilens, which is now a highly valued hyperscaler supplier (probably Amazon or Microsoft), with billions in customer agreements. The interesting thing is if Poet signed prepayment EML agreements with players like Mitsubishi, or CW agreements with Sivers behind the scenes with that balance sheet. And given the current bottleneck, players might use Poet as a workaround for supply procurement. But basically, you have a super cash-rich company with a ton of capacity coming online. And they're not really disappearing anytime soon with their financials. I don't quite think it's as technically defensible compared to upstream laser chokepoints with something like $SIVE around the same valuation in terms of technical moat for CW lasers vs. OE packaging side. As you've seen recently with Celestial and Poet. But maybe... there's a chance some hyperscaler or downstream company announces a volume agreement sometime in the future. and $POET takes off. And they do have the supply chain setup for ramp with that. That's the risk I ended up taking, but it's not exactly a clear as day long for me like $AAOI.",
       "triage": {
-        "decided_at": "2026-08-18T23:05:45.408019+00:00",
+        "decided_at": "2026-08-20T22:36:14.618719+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true
         },
-        "reason": "新 triage PASS lead lead_1940958c3136e0a33b4e0856b7b05d82 與 parked trace 共用具名標的 AAOI, co:applied_optoelectronics（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+        "reason": "新 triage PASS lead lead_7cd19ddab804188d2cb5a96b8dcd00b7 與 parked trace 共用具名標的 SIVE, co:sivers_semiconductors（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
         "tier": 4
       },
       "triage_history": [
@@ -29064,6 +29838,21 @@
               "lead_b1e793c560334131dfe7c1619715784d",
               "lead_c3fa1ca7fd636810e6fababce5ce7f5a"
             ],
+            "tier": 4
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-20T22:36:14.618719+00:00",
+          "superseded_reason": "新 triage PASS lead lead_7cd19ddab804188d2cb5a96b8dcd00b7 與 parked trace 共用具名標的 SIVE, co:sivers_semiconductors（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_7cd19ddab804188d2cb5a96b8dcd00b7",
+          "triage": {
+            "decided_at": "2026-08-18T23:05:45.408019+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true
+            },
+            "reason": "新 triage PASS lead lead_1940958c3136e0a33b4e0856b7b05d82 與 parked trace 共用具名標的 AAOI, co:applied_optoelectronics（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
             "tier": 4
           }
         }
@@ -30103,6 +30892,32 @@
       },
       "url": "https://www.sivers-semiconductors.com/press/change-in-the-total-number-of-shares-and-votes-in-sivers-semiconductors-ab-11/"
     },
+    "lead_cd76b656370ae7a291e5de116bf5a679": {
+      "entities": {
+        "company_ids": [
+          "co:micron_technology"
+        ],
+        "tickers": [
+          "MU"
+        ]
+      },
+      "first_seen": "2026-08-20T22:33:44.426629+00:00",
+      "lead_id": "lead_cd76b656370ae7a291e5de116bf5a679",
+      "published_at": "2026-07-28",
+      "refs": {},
+      "source": "edgar:MU",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "MU 4 filed 2026-07-28",
+      "triage": {
+        "decided_at": "2026-08-20T22:36:17.839384+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "MU 官方 SEC Form 4，具 issuer、form、日期與可核對原文；低優先但可作 insider／稀釋時變觀測。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/723125/000124265426000013/xslF345X06/primarydocument.xml"
+    },
     "lead_cdd584e252b586185333a12973d7d69f": {
       "entities": {
         "company_ids": [
@@ -30371,6 +31186,32 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/928876/000117891326004045/zk2635939.htm"
+    },
+    "lead_d01847b89ecc06c127da2643a6518bb6": {
+      "entities": {
+        "company_ids": [
+          "co:micron_technology"
+        ],
+        "tickers": [
+          "MU"
+        ]
+      },
+      "first_seen": "2026-08-20T22:33:44.427070+00:00",
+      "lead_id": "lead_d01847b89ecc06c127da2643a6518bb6",
+      "published_at": "2026-07-02",
+      "refs": {},
+      "source": "edgar:MU",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "MU 4 filed 2026-07-02",
+      "triage": {
+        "decided_at": "2026-08-20T22:36:18.086946+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "MU 官方 SEC Form 4，具 issuer、form、日期與可核對原文；低優先但可作 insider／稀釋時變觀測。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/723125/000205876926000004/xslF345X06/primarydocument.xml"
     },
     "lead_d024baf2ef9f980060fbac0805025087": {
       "content_updated_at": "2026-07-29T13:46:49.149482+00:00",
@@ -31016,26 +31857,26 @@
         "campaign_window_start": "2026-06-29T13:46:25Z",
         "original_claim_status": "partial_official_capex_context_broker_claims_unverified",
         "outcome": "partial_official_capex_context",
-        "parked_reason": "內容為賣方券商報告的二手轉述（Morgan Stanley CPO 參與者名單／Wells Fargo 對 META 出售多餘算力的看法）。券商觀點是第三方意見不是可核對事實，且原始報告僅供客戶、無合法公開取得途徑。名單型內容即使取得也只是他人研究結論，不構成 Engine A 可入圖的關係主張（L8：需要客戶端或第三方對事實本身的印證，不是分析師的看法）",
+        "parked_reason": "今日 META Form 4 不包含 excess-compute 出售或 neocloud economics；Wells Fargo 二手觀點仍無 canonical note，Meta filing 只支持 capex context，不能把券商推論當 Engine A 事實。",
         "primary_url": "https://www.sec.gov/Archives/edgar/data/1326801/000162828026050596/meta-06302026xexhibit991.htm",
         "research_mode": "delta_only",
-        "research_outcome": "meta_q2_filing_supports_capex_not_excess_compute_broker_inference",
-        "research_run": "luna_reviewer_2026-08-02_pq1_10",
-        "trace_attempts_ref": "Wells exact-note search; X screenshots; Meta Q2 2026 Form 8-K and Exhibit 99.1; triggering filing audit",
-        "trace_next_trigger": "名單中的具名關係若由 issuer 自己揭露（如 GFS 簡報具名雷射供應商、SIVE 公告設計案），改由該 issuer 一手來源另開 lead 追",
+        "research_outcome": "no_new_primary_delta",
+        "research_run": "daily:2026-08-21",
+        "trace_attempts_ref": "Wells exact-note、Meta Q2 2026 8-K／Exhibit 99.1與今日 META Form 4；沒有新 primary claim。",
+        "trace_next_trigger": "Meta 官方具名揭露 excess compute 出售、對手方與容量，或取得 Wells Fargo canonical note。",
         "trace_requeue_trigger": "related_triaged_lead:lead_018171ed92846e0a0f14f1c1a20e6c07",
         "trace_requeued_at": "2026-08-19T22:33:19.248616+00:00",
         "trace_requires_user": "false",
-        "trace_status": "lead_only_tier_4",
+        "trace_status": "isolated_tier_3",
         "trace_trigger_entities": [
           "META",
           "co:meta"
         ],
         "trace_trigger_event_ref": "lead:lead_018171ed92846e0a0f14f1c1a20e6c07",
-        "trace_trigger_kind": "primary_source_signal"
+        "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "Wells Fargo: $META intent to sell excess compute is a positive signal around underlying demand and unit economics of AI. “Despite this shift, we don’t expect a pullback in Meta’s capex or that overall compute needs are lower” Regarding Neoclouds: WF thinks it validated the massive AI infra opportunity as well as acquisition opportunities. Despite any potential competition for Neoclouds. I’m inclined to agree with Wells Fargo here and say markets completely misunderstood Meta’s excess compute comment.",
       "triage": {
@@ -31147,13 +31988,17 @@
       "raw_text": "Now that I think of it more, $POET optical interposer piece is actually a little more material than I thought with $SIVE. \n\nOriginally the wording was \"readiness\" for EOY 2026. \n\nBut $POET upgraded that wording, by stating \"production\" with Sivers lasers projected EOY 2026. \n\nSo a volume orders from across $JBL to $POET, should hit in H1 2027. Which makes a bit of sense, since Sivers did raise an institutional oversubscribed round for future mass production.  \n\nOn a side note, can't believe it's already August and 5 months left until 2027... Which was my inflection window for glass substrates, CPO, 800v, and new architectures to ramp.",
       "refs": {
         "gap": "POET 那家未具名 Tier 1 laser company 究竟是誰",
-        "parked_reason": "推文核心 claim 未獲一手支持且方向為誇大：把未具名的 Tier 1 laser company 讀成 Sivers（L6 Gap 4），並把 readiness 讀成 production（L11 措辭精度）",
-        "research_outcome": "查無『production』措辭升級。一手措辭自始至今為 production readiness by end of 2026；POET Q2 filing 只寫 a Tier 1 laser company，全程未具名 Sivers",
-        "trace_attempts_ref": "掃過 POET 近 5 份 6-K（含 2026-06-30／08-03／08-13）全部無 Sivers 字串；另核 2025-09-29 POET/Sivers 合作新聞稿與 Sivers 官方社群最新表述",
-        "trace_next_trigger": "POET 或 Sivers 任一方具名公告 ELS 進入 production，或 POET 揭露該 Tier 1 laser company 身分",
+        "parked_reason": "今日綜合貼文只重複 Sivers 需求敘事，未帶來 POET 具名確認；一手資料仍寫 production readiness by end-2026，並未把未具名 Tier 1 laser company 證實為 Sivers，原 production 升級推論維持被反駁。",
+        "research_outcome": "contradiction_unchanged",
+        "research_run": "daily:2026-08-21",
+        "trace_attempts_ref": "POET 近五份 6-K、POET/Sivers 2025-09-29 合作公告與今日 Sivers 相關貼文；沒有具名 production 原文。",
+        "trace_next_trigger": "POET 或 Sivers 具名公告 ELS 進入 production，或 POET 揭露 Tier 1 laser company 身分。",
         "trace_origin_entity": "POET Technologies Inc. / Sivers Semiconductors AB",
-        "trace_requeue_trigger": "related_triaged_lead:lead_7f66b743a034c41f6388aa800f333e62",
-        "trace_requeued_at": "2026-08-04T22:36:55.816839+00:00",
+        "trace_requeue_consumed_entities": [
+          "SIVE"
+        ],
+        "trace_requeue_trigger": "related_triaged_lead:lead_7cd19ddab804188d2cb5a96b8dcd00b7",
+        "trace_requeued_at": "2026-08-20T22:36:14.618719+00:00",
         "trace_requires_user": "false",
         "trace_status": "contradicts",
         "trace_trigger_entities": [
@@ -31161,9 +32006,10 @@
           "POET",
           "SIVE",
           "co:jabil",
-          "co:poet_technologies"
+          "co:poet_technologies",
+          "co:sivers_semiconductors"
         ],
-        "trace_trigger_event_ref": "lead:lead_7f66b743a034c41f6388aa800f333e62",
+        "trace_trigger_event_ref": "lead:lead_7cd19ddab804188d2cb5a96b8dcd00b7",
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
@@ -31194,12 +32040,12 @@
       },
       "title": "Now that I think of it more, $POET optical interposer piece is actually a little more material than I thought with $SIVE. Originally the wording was \"readiness\" for EOY 2026. But $POET upgraded that wording, by stating \"production\" with Sivers lasers projected EOY 2026. So a volume orders from across $JBL to $POET, should hit in H1 2027. Which makes a bit of sense, since Sivers did raise an institutional oversubscribed round for future mass production. On a side note, can't believe it's already August and 5 months left until 2027... Which was my inflection window for glass substrates, CPO, 800v, and new architectures to ramp.",
       "triage": {
-        "decided_at": "2026-08-04T22:36:55.816839+00:00",
+        "decided_at": "2026-08-20T22:36:14.618719+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true
         },
-        "reason": "新 triage PASS lead lead_7f66b743a034c41f6388aa800f333e62 與 parked trace 共用具名標的 SIVE；事件觸發 bounded pq1 重查",
+        "reason": "新 triage PASS lead lead_7cd19ddab804188d2cb5a96b8dcd00b7 與 parked trace 共用具名標的 SIVE（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
         "tier": 4
       },
       "triage_history": [
@@ -31215,6 +32061,21 @@
               "novelty": true
             },
             "reason": "POET／Sivers 為已追蹤 CPO 標的，production readiness 轉 production、2026 年底與 2027 上半年時程是具體可追查的潛在新事件；需追回公司原文。",
+            "tier": 4
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-20T22:36:14.618719+00:00",
+          "superseded_reason": "新 triage PASS lead lead_7cd19ddab804188d2cb5a96b8dcd00b7 與 parked trace 共用具名標的 SIVE（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_7cd19ddab804188d2cb5a96b8dcd00b7",
+          "triage": {
+            "decided_at": "2026-08-04T22:36:55.816839+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true
+            },
+            "reason": "新 triage PASS lead lead_7f66b743a034c41f6388aa800f333e62 與 parked trace 共用具名標的 SIVE；事件觸發 bounded pq1 重查",
             "tier": 4
           }
         }
@@ -32938,6 +33799,58 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2086304269943419276"
     },
+    "lead_e28829cbe06215f29a34c994db872362": {
+      "entities": {
+        "company_ids": [
+          "co:micron_technology"
+        ],
+        "tickers": [
+          "MU"
+        ]
+      },
+      "first_seen": "2026-08-20T22:33:44.426511+00:00",
+      "lead_id": "lead_e28829cbe06215f29a34c994db872362",
+      "published_at": "2026-07-28",
+      "refs": {},
+      "source": "edgar:MU",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "MU 4 filed 2026-07-28",
+      "triage": {
+        "decided_at": "2026-08-20T22:36:18.338168+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "MU 官方 SEC Form 4，具 issuer、form、日期與可核對原文；低優先但可作 insider／稀釋時變觀測。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/723125/000124265426000014/xslF345X06/primarydocument.xml"
+    },
+    "lead_e2f0b3abb687d9fcc8a9667cf04091e0": {
+      "entities": {
+        "company_ids": [
+          "co:micron_technology"
+        ],
+        "tickers": [
+          "MU"
+        ]
+      },
+      "first_seen": "2026-08-20T22:33:44.426706+00:00",
+      "lead_id": "lead_e2f0b3abb687d9fcc8a9667cf04091e0",
+      "published_at": "2026-07-27",
+      "refs": {},
+      "source": "edgar:MU",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "MU 4 filed 2026-07-27",
+      "triage": {
+        "decided_at": "2026-08-20T22:36:18.585814+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "MU 官方 SEC Form 4，具 issuer、form、日期與可核對原文；低優先但可作 insider／稀釋時變觀測。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/723125/000165214926000005/xslF345X06/primarydocument.xml"
+    },
     "lead_e38023fe4b5822ceb51eb8bbce5bb0aa": {
       "entities": {
         "company_ids": [
@@ -33130,6 +34043,35 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1633978/000164823126000004/xslF345X06/form4-07172026_120753.xml"
+    },
+    "lead_e530c84ac4d95741430cd21a813d8942": {
+      "entities": {
+        "company_ids": [
+          "co:globalfoundries"
+        ],
+        "tickers": [
+          "GFS"
+        ]
+      },
+      "first_seen": "2026-08-20T22:33:40.338402+00:00",
+      "lead_id": "lead_e530c84ac4d95741430cd21a813d8942",
+      "published_at": "2026-08-20",
+      "refs": {},
+      "source": "edgar:GFS",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "GFS 4 filed 2026-08-20",
+      "triage": {
+        "decided_at": "2026-08-20T22:36:18.838400+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "GFS 官方 SEC Form 4，具 issuer、form、日期與可核對原文；低優先但可作 insider／稀釋時變觀測。",
+        "related_trace_requeues": [
+          "lead_b1e793c560334131dfe7c1619715784d"
+        ],
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1709048/000162828026058190/xslF345X06/wk-form4_1787243591.xml"
     },
     "lead_e54a283404bc6c658c3c9a636199ce2e": {
       "entities": {
@@ -33933,12 +34875,12 @@
         "claimed_origin": "New York Times 及三名知情人士",
         "original_claim_status": "partial_support_potential_talks_contract_inference_rejected",
         "outcome": "trigger_unrelated_trace_unchanged",
-        "parked_reason": "追回 Reuters 2026-07-17 carrier：Meta 與 Anthropic 僅在 early-stage talks，潛在兩年最高 US$10B，條款可變且雙方可提前退出；Meta 未回覆、Anthropic 拒評。可支持洽談存在，不能寫成已簽合約、已承諾收入或 neocloud model 已驗證",
+        "parked_reason": "今日 META Form 4 與 Anthropic compute lease 無關；Reuters／NYT 仍只支持 early-stage talks、兩年最高 US$10B 且條款可變，不能寫成已簽約、已承諾收入或 neocloud model 已驗證。",
         "research_mode": "delta_only",
-        "research_outcome": "partial_tier3_talks_only_no_prepared_ra",
-        "research_run": "daily-brief-2026-08-09-post-permission-recovery",
-        "trace_attempts_ref": "Reuters carrier 與同源二手報導；未取得 Meta／Anthropic 正式合約或公司公告",
-        "trace_next_trigger": "Meta 或 Anthropic 公告 definitive compute lease，或 Meta filing 揭露對手方、期限、capacity 與 revenue commitment",
+        "research_outcome": "trigger_irrelevant_talks_only",
+        "research_run": "daily:2026-08-21",
+        "trace_attempts_ref": "Reuters carrier、同源報導與今日 META Form 4；未取得 Meta／Anthropic definitive agreement 或公司公告。",
+        "trace_next_trigger": "Meta 或 Anthropic 公告 definitive compute lease，或 filing 揭露對手方、期限、capacity 與 revenue commitment。",
         "trace_origin_entity": "Reuters/unnamed source",
         "trace_origin_linkage": "Reuters 與 NYT 都依未具名知情人士；公司方未確認",
         "trace_requeue_consumed_entities": [
@@ -33954,13 +34896,15 @@
           "META",
           "NBIS",
           "SPCX",
-          "co:meta"
+          "co:iren",
+          "co:meta",
+          "co:nebius"
         ],
         "trace_trigger_event_ref": "lead:lead_018171ed92846e0a0f14f1c1a20e6c07",
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "$META in talks to lease compute to Anthropic in a $10B dollar deal. Seems like they saw how profitable $SPCX $45B compute deal was. But just goes to validate Neocloud business models like $NBIS, $IREN, and co if hyperscalers are copying their homework. Source: NYT https://t.co/3Mu3UXQtFT",
       "triage": {
@@ -34666,6 +35610,32 @@
         "tier": 4
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1340652/000089924322034086/xslF345X03/doc4.xml"
+    },
+    "lead_ef07c7dde73076d407bd4afa24b0e05c": {
+      "entities": {
+        "company_ids": [
+          "co:micron_technology"
+        ],
+        "tickers": [
+          "MU"
+        ]
+      },
+      "first_seen": "2026-08-20T22:33:44.426994+00:00",
+      "lead_id": "lead_ef07c7dde73076d407bd4afa24b0e05c",
+      "published_at": "2026-07-02",
+      "refs": {},
+      "source": "edgar:MU",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "MU 4 filed 2026-07-02",
+      "triage": {
+        "decided_at": "2026-08-20T22:36:19.084617+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "MU 官方 SEC Form 4，具 issuer、form、日期與可核對原文；低優先但可作 insider／稀釋時變觀測。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/723125/000121836326000003/xslF345X06/primarydocument.xml"
     },
     "lead_efa5f283c3211ed78bb7c3199dc2068e": {
       "entities": {
@@ -36873,8 +37843,8 @@
   "schema_version": "2",
   "source_state": {
     "x:aleabitoreddit": {
-      "since_id": "2090103899302826302",
-      "updated_at": "2026-08-19T22:31:58.080512+00:00",
+      "since_id": "2090510568474231045",
+      "updated_at": "2026-08-20T22:33:33.387271+00:00",
       "user_id": "1940360837547565056"
     }
   }

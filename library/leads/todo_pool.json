@@ -3075,6 +3075,18 @@
       "source": "decision_lab",
       "title": "REVIEW — co:harmonic_drive_systems",
       "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-20T22:44:59.777225+00:00",
+      "hint": "核准 exact graph delta；Decision handoff：co:meta。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 195,
+      "reason": null,
+      "ref_id": "ra_36b579586f7cebb6c5e5130d9a0f67c7",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "Meta–Sumitomo Electric 多年期光纖設備供應協議（tier-3）",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -6971,6 +6983,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 195,
+  "next_n": 196,
   "schema_version": "1"
 }
