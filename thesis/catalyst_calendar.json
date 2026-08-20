@@ -1,0 +1,104 @@
+{
+  "_comment": "非 thesis cohort 的結構化催化劑日曆。thesis/lifecycle.json 只涵蓋有 lane memo 的 thesis（目前 3 條：axt_inp／coherent_cpo／sivers），但 Engine D 有 16 個 cohort——`decision_lab/catalyst_watch.py` 的 docstring 早已記下「兩套 lifecycle 互不知道是既有的整合縫隙」。本檔補上後者，讓 catalyst_watch 對非 thesis 標的也能做結構化比對。",
+  "_why_not_lifecycle_json": "刻意不塞進 thesis/lifecycle.json：該檔的另外兩個消費者（crons/thesis_freshness_check.py 與 query/health_audit.py）會迭代每個 entry 當成一條 thesis，前者還會去找對應的 *_lane_memo.md。加入沒有 memo 的 cohort 會產生假的 thesis 到期提醒與找不到 memo 的錯誤。兩套東西語意不同：lifecycle.json 是「thesis 生命週期」，本檔只是「什麼時候會有新資訊」。",
+  "_schema": "entries[] 每項需 ticker 與 catalyst_checkpoints[]；checkpoint 欄位與 thesis/lifecycle.json 完全相同（date／what／decides／date_confidence／basis），由 thesis.lifecycle_schedule.catalyst_checkpoints() 共用同一支正規化函式解析。",
+  "_date_confidence": "confirmed=公司已公告確切日期；estimated=由歷史申報節奏或 provider 預估。依 lifecycle_schedule 的既有規則，estimated 照樣排程（提早看一次的成本遠低於錯過裁決點），但呈現時必須標明。",
+  "entries": [
+    {
+      "ticker": "AVGO",
+      "catalyst_checkpoints": [
+        {
+          "date": "2026-09-03",
+          "what": "Q3 FY2026 財報",
+          "decides": "firmly committed RPO 是否自 US$164.6B 維持或續增；custom AI accelerator 交付時程是否重申。對應 disproof 第 (1) 條",
+          "date_confidence": "estimated",
+          "basis": "yfinance calendar Earnings Date（2026-08-20 取得）；AVGO 慣例為 9 月上旬"
+        }
+      ]
+    },
+    {
+      "ticker": "POET",
+      "catalyst_checkpoints": [
+        {
+          "date": "2026-11-12",
+          "what": "Q3 2026 財報（6-K）",
+          "decides": "Lumilens US$50M 首期 PO 是否開始出貨並認列營收；剩餘 20,629,268 份 warrants 是否新增 vest。對應 disproof 第 (1)(2) 條",
+          "date_confidence": "estimated",
+          "basis": "yfinance calendar Earnings Date（2026-08-20 取得）"
+        }
+      ]
+    },
+    {
+      "ticker": "AEVA",
+      "catalyst_checkpoints": [
+        {
+          "date": "2026-11-05",
+          "what": "Q3 2026 財報",
+          "decides": "Optical Connectivity 是否揭露營收、backlog 或具名客戶；runway 僅約 15.3 個月，同時觀察是否已啟動融資",
+          "date_confidence": "estimated",
+          "basis": "yfinance calendar Earnings Date（2026-08-20 取得）"
+        }
+      ]
+    },
+    {
+      "ticker": "LITE",
+      "catalyst_checkpoints": [
+        {
+          "date": "2026-11-06",
+          "what": "Q1 FY2027 財報",
+          "decides": "InP 依賴與 OCS／ELS 出貨進度；瓶頸地位（bottleneck 排名第 4，5/5 替代難度）是否有客戶端印證",
+          "date_confidence": "estimated",
+          "basis": "yfinance calendar Earnings Date（2026-08-20 取得）"
+        }
+      ]
+    },
+    {
+      "ticker": "AAOI",
+      "catalyst_checkpoints": [
+        {
+          "date": "2026-11-06",
+          "what": "Q3 2026 財報",
+          "decides": "Q4 營收 guidance 下緣——待辦 [134] 明確在等這個數字才能設定可觀測 disproof 門檻",
+          "date_confidence": "estimated",
+          "basis": "yfinance calendar Earnings Date（2026-08-20 取得）"
+        }
+      ]
+    },
+    {
+      "ticker": "META",
+      "catalyst_checkpoints": [
+        {
+          "date": "2026-10-29",
+          "what": "Q3 2026 財報",
+          "decides": "AI capex 指引與自研晶片進度",
+          "date_confidence": "estimated",
+          "basis": "yfinance calendar Earnings Date（2026-08-20 取得）"
+        }
+      ]
+    },
+    {
+      "ticker": "NVDA",
+      "catalyst_checkpoints": [
+        {
+          "date": "2026-08-27",
+          "what": "Q2 FY2027 財報",
+          "decides": "資料中心營收與 CPO／光互連相關表述；為多數上游瓶頸標的的共同需求錨點",
+          "date_confidence": "estimated",
+          "basis": "yfinance calendar Earnings Date（2026-08-20 取得）"
+        }
+      ]
+    },
+    {
+      "ticker": "IQE.L",
+      "catalyst_checkpoints": [
+        {
+          "date": "2026-09-15",
+          "what": "H1 2026 interim results",
+          "decides": "Photonics／InP 營收動能與 Tower 協議首年最低採購履約進度。對應 disproof 第 (2)(3) 條",
+          "date_confidence": "estimated",
+          "basis": "coverage assessment 的 catalyst 散文載明「預計 2026 年 9 月」，未給確切日；取月中以免錯過。yfinance 對 LSE 半年報制標的無 Earnings Date"
+        }
+      ]
+    }
+  ]
+}
