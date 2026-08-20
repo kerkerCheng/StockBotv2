@@ -200,6 +200,13 @@
       "research_ticker": null
     },
     {
+      "company_id": "co:nabtesco",
+      "research_ticker": "6268.T",
+      "market_currency": "JPY",
+      "execution_currency": "JPY",
+      "execution_venue": "TSE"
+    },
+    {
       "company_id": "co:nava_thailand",
       "research_ticker": null
     },
@@ -258,6 +265,13 @@
       "market_currency": "USD",
       "execution_currency": "USD",
       "execution_venue": "NASDAQ"
+    },
+    {
+      "company_id": "co:thk",
+      "research_ticker": "6481.T",
+      "market_currency": "JPY",
+      "execution_currency": "JPY",
+      "execution_venue": "TSE"
     },
     {
       "company_id": "co:tower_semiconductor",
