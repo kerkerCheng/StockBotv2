@@ -1,0 +1,22 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/723125/000072312526000015/mu-20260528.htm
+
+Excerpt:
+Source URL: https://www.sec.gov/Archives/edgar/data/723125/000072312526000015/mu-20260528.htm
+Filed: 2026-06-25 (period ended 2026-05-28)
+Retrieved: 2026-08-20
+
+Key excerpts (verbatim):
+
+1) DRAM products include High-Bandwidth Memory ("HBM"), which is a 3D stacked DRAM architecture that utilizes through-silicon via ("TSV") connections for more efficient communication giving it the ability to achieve a higher bandwidth while consuming less power compared to other memory types.
+
+2) Cloud Memory Business Unit ("CMBU"): Focused on memory solutions for large hyperscale cloud customers, and HBM for all data center customers.
+
+3) We recently executed certain strategic customer agreements, including agreements executed subsequent to May 28, 2026. These agreements are structured as take-or-pay agreements, with binding commitments for specific volumes over the multi-year contract terms and include contractually enforceable volumes. Pricing for most agreements is either fixed, or is subject to minimum and maximum pricing.
+
+4) As of May 28, 2026, the transaction price allocated to our remaining performance obligations was approximately $ 5 billion, of which $ 422 million has been recognized as contract liabilities.
+
+5) A significant portion of our revenue is concentrated with certain customers and end markets. In 2025, over half of our total revenue came from our top ten customers. Among our end markets, approximately one-half of our total revenue was concentrated in the data center end market.
+
+6) On May 19, 2025, Netlist filed a complaint against Micron, MSP, and MTEC in E.D. Tex. alleging that one U.S. patent is infringed by our HBM products.
+
+Boundary: single Micron-origin filing. No HBM-specific share of RPO, no named counterparty, no HBM capacity or market-share disclosure.
