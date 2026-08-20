@@ -186,17 +186,33 @@ def related_leads(
     return matches
 
 
-def backfill_entities(store: dict) -> int:
-    """替尚未擷取實體的既有 lead 補上標記；回傳更新筆數。"""
+def backfill_entities(store: dict, *, rescan: bool = False) -> int:
+    """替既有 lead 補上實體標記；回傳**實際改變**的筆數。
+
+    ``rescan=False``（預設）只處理從未算過 entities 的 lead——原始行為。
+
+    ``rescan=True`` 重算全部。需要它的原因：entities 是 harvest 當時算的衍生值，
+    而 ticker→company_id 的解析依賴 registry。2026-08-20 一次登記 10 家公司後
+    （含 Tesla、CCXI、SK Hynix 與 SIVEF／SKHY 這類 alias），舊 lead 仍全部對不上，
+    因為上面那個 skip 條件讓它們永遠不重算——於是新登記的公司對 pq1 排序、
+    `related` 查詢與瓶頸比對通通不存在。工具存在但只做一半（L13）。
+
+    重算是安全的：entities 純粹由 title／raw_text／source 導出，不含人工判斷；
+    輸入沒變、registry 沒變時結果相同。只有真的改變才計入回傳值，讓「跑完顯示 0」
+    成為「確實沒有東西可更新」的可信訊號，而不是「跳過了所有東西」。
+    """
 
     updated = 0
     for lead in (store.get("leads") or {}).values():
-        if isinstance(lead.get("entities"), dict):
+        if not rescan and isinstance(lead.get("entities"), dict):
             continue
-        lead["entities"] = extract_entities(
+        computed = extract_entities(
             title=lead.get("title"),
             raw_text=lead.get("raw_text"),
             source=lead.get("source"),
         )
+        if lead.get("entities") == computed:
+            continue
+        lead["entities"] = computed
         updated += 1
     return updated

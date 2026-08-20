@@ -4205,7 +4205,9 @@
           "co:lumentum",
           "co:coherent",
           "co:applied_optoelectronics",
-          "co:meta"
+          "co:micron_technology",
+          "co:meta",
+          "co:aehr_test_systems"
         ],
         "tickers": [
           "POET",
@@ -4254,7 +4256,11 @@
     "lead_0105a33e36381612a823b981ec5e7bc6": {
       "content_updated_at": "2026-07-29T13:46:53.634187+00:00",
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:iren",
+          "co:nebius",
+          "co:coreweave"
+        ],
         "tickers": [
           "IREN",
           "HUT",
@@ -4442,7 +4448,8 @@
     "lead_0372f419a6423004be01bfb464111aa8": {
       "entities": {
         "company_ids": [
-          "co:poet_technologies"
+          "co:poet_technologies",
+          "co:sivers_semiconductors"
         ],
         "tickers": [
           "POET",
@@ -4537,7 +4544,11 @@
     },
     "lead_038fe471d126685d77dadb0045d9daa6": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:tesla",
+          "co:churchill_capital_xi",
+          "co:xpeng"
+        ],
         "tickers": [
           "TSLA",
           "CCXI",
@@ -4714,7 +4725,9 @@
     },
     "lead_03ec88277b05d7cb337f5367d546ff0e": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:sandisk"
+        ],
         "tickers": [
           "SNDK",
           "BE"
@@ -4951,7 +4964,9 @@
     },
     "lead_061fe889e9090fd14b4711fafda3fafe": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:sivers_semiconductors"
+        ],
         "tickers": [
           "SIVE"
         ]
@@ -4999,6 +5014,7 @@
     "lead_0624cbfddb41714f21502cc3f3da7a8a": {
       "entities": {
         "company_ids": [
+          "co:micron_technology",
           "co:axt",
           "co:lumentum",
           "co:coherent",
@@ -5248,7 +5264,8 @@
     "lead_075cb52a7fffdf3550210fc2a5f6fb8b": {
       "entities": {
         "company_ids": [
-          "co:applied_optoelectronics"
+          "co:applied_optoelectronics",
+          "co:sivers_semiconductors"
         ],
         "tickers": [
           "AMZN",
@@ -5485,6 +5502,7 @@
     "lead_083f344e7f03004a3a2f55d8e9c3f7bd": {
       "entities": {
         "company_ids": [
+          "co:sivers_semiconductors",
           "co:globalfoundries",
           "co:applied_optoelectronics"
         ],
@@ -5588,6 +5606,7 @@
       "entities": {
         "company_ids": [
           "co:applied_optoelectronics",
+          "co:sivers_semiconductors",
           "co:jabil",
           "co:lumentum"
         ],
@@ -5877,8 +5896,10 @@
           "co:apple",
           "co:intel",
           "co:tsmc",
+          "co:micron_technology",
           "co:meta",
-          "co:broadcom"
+          "co:broadcom",
+          "co:tesla"
         ],
         "tickers": [
           "GLW",
@@ -5940,6 +5961,7 @@
     "lead_0ca20286115cf0c010b7e77e0dcb4a9d": {
       "entities": {
         "company_ids": [
+          "co:micron_technology",
           "co:nvidia"
         ],
         "tickers": [
@@ -6095,7 +6117,9 @@
     },
     "lead_0e28d2642bc702744d2960107565448e": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:nebius"
+        ],
         "tickers": [
           "NBIS"
         ]
@@ -6288,7 +6312,8 @@
     "lead_11157f86578b06fe4ab6fb159213e386": {
       "entities": {
         "company_ids": [
-          "co:applied_optoelectronics"
+          "co:applied_optoelectronics",
+          "co:sivers_semiconductors"
         ],
         "tickers": [
           "AAOI",
@@ -6498,7 +6523,9 @@
     },
     "lead_1448cac72d89476ff3c76b88f2e11381": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:sivers_semiconductors"
+        ],
         "tickers": [
           "SIVEF"
         ]
@@ -6599,6 +6626,7 @@
     "lead_16795901900503525cb8a921bca69711": {
       "entities": {
         "company_ids": [
+          "co:x_fab",
           "co:nvidia"
         ],
         "tickers": [
@@ -6657,7 +6685,10 @@
     "lead_16bea92fbfb5a038e7dbe2edafba4f3f": {
       "entities": {
         "company_ids": [
-          "co:axt"
+          "co:nebius",
+          "co:axt",
+          "co:sivers_semiconductors",
+          "co:churchill_capital_xi"
         ],
         "tickers": [
           "NBIS",
@@ -6715,7 +6746,9 @@
     },
     "lead_17864efa590ef84785c24a4ed01004c5": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:churchill_capital_xi"
+        ],
         "tickers": [
           "CCXI"
         ]
@@ -6837,6 +6870,7 @@
     "lead_18da0ec221ed6ebc51ea83b93ee8e7d8": {
       "entities": {
         "company_ids": [
+          "co:sivers_semiconductors",
           "co:lumentum"
         ],
         "tickers": [
@@ -7147,7 +7181,10 @@
     },
     "lead_1aa835b32dc4e06468322d132acc925a": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:aeva",
+          "co:sivers_semiconductors"
+        ],
         "tickers": [
           "AEVA",
           "SIVE"
@@ -7231,7 +7268,9 @@
     },
     "lead_1ab4c55b114561825c6223094828f183": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:churchill_capital_xi"
+        ],
         "tickers": [
           "CCXI",
           "AGLT"
@@ -7364,7 +7403,10 @@
       "entities": {
         "company_ids": [
           "co:meta",
+          "co:amd",
           "co:nvidia",
+          "co:iren",
+          "co:nebius",
           "co:google"
         ],
         "tickers": [
@@ -7430,7 +7472,10 @@
     },
     "lead_1c49fc75353d0de4a5c08c02ad6e83bc": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:amd",
+          "co:sivers_semiconductors"
+        ],
         "tickers": [
           "AMD",
           "SIVE"
@@ -7472,7 +7517,9 @@
     "lead_1cc0a6e4bca5cf0f85d002cb4dde875a": {
       "entities": {
         "company_ids": [
-          "co:apple"
+          "co:apple",
+          "co:micron_technology",
+          "co:sk_hynix"
         ],
         "tickers": [
           "AAPL",
@@ -7552,7 +7599,9 @@
     "lead_1d14c346bf03346253d908e26f2d7406": {
       "content_updated_at": "2026-07-29T13:46:54.703757+00:00",
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:sk_hynix"
+        ],
         "tickers": [
           "SKHY"
         ]
@@ -7614,6 +7663,7 @@
     "lead_1d29da0283f3c7f84f5ee2cfdb7ee8d0": {
       "entities": {
         "company_ids": [
+          "co:churchill_capital_xi",
           "co:nvidia"
         ],
         "tickers": [
@@ -7776,7 +7826,9 @@
     },
     "lead_1f55ec9eae7d1e4a1b68fa245ed1ee7f": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:iren"
+        ],
         "tickers": [
           "IREN",
           "SHAZ"
@@ -7902,7 +7954,9 @@
     },
     "lead_1fdc116555056cf45f6c71ad58da24d7": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:churchill_capital_xi"
+        ],
         "tickers": [
           "RKLB",
           "CCXI"
@@ -7943,7 +7997,9 @@
     },
     "lead_204633b1f40ec42976958ec147bc5554": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:tesla"
+        ],
         "tickers": [
           "UBER",
           "LYFT",
@@ -8141,7 +8197,8 @@
     "lead_20eb32acaf78ffb751ee07966e185534": {
       "entities": {
         "company_ids": [
-          "co:applied_optoelectronics"
+          "co:applied_optoelectronics",
+          "co:macom"
         ],
         "tickers": [
           "AAOI",
@@ -8558,7 +8615,10 @@
     },
     "lead_250f6558cea6c4beab2a95e262024800": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:tesla",
+          "co:churchill_capital_xi"
+        ],
         "tickers": [
           "SPCX",
           "TSLA",
@@ -8655,7 +8715,9 @@
     },
     "lead_25f524c1ca59584f1fe0b2347f9d1b91": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:tesla"
+        ],
         "tickers": [
           "TSLA"
         ]
@@ -8914,7 +8976,9 @@
     },
     "lead_297e60d4932f3b8f5b0c6e39279510dd": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:tesla"
+        ],
         "tickers": [
           "TSLA"
         ]
@@ -9011,6 +9075,7 @@
     "lead_2a2bd717d58af305235d2e3588a596cb": {
       "entities": {
         "company_ids": [
+          "co:micron_technology",
           "co:lumentum"
         ],
         "tickers": [
@@ -9103,7 +9168,9 @@
     },
     "lead_2a65cf2b13969a40fc093c5e090c8d9f": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:churchill_capital_xi"
+        ],
         "tickers": [
           "CCXI"
         ]
@@ -9232,7 +9299,10 @@
     },
     "lead_2c0614883bf6ec94c3032ccda5c7ff70": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:tesla",
+          "co:churchill_capital_xi"
+        ],
         "tickers": [
           "TSLA",
           "CCXI"
@@ -9363,7 +9433,9 @@
     },
     "lead_2ca9a6e6edfae16e892996fee78444ea": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:tesla"
+        ],
         "tickers": [
           "TSLA"
         ]
@@ -9396,6 +9468,7 @@
     "lead_2cb82f4c0c7b93fbf18be123045d671e": {
       "entities": {
         "company_ids": [
+          "co:sivers_semiconductors",
           "co:globalfoundries"
         ],
         "tickers": [
@@ -9465,7 +9538,8 @@
         "company_ids": [
           "co:applied_optoelectronics",
           "co:lumentum",
-          "co:coherent"
+          "co:coherent",
+          "co:sivers_semiconductors"
         ],
         "tickers": [
           "AAOI",
@@ -9518,7 +9592,9 @@
     },
     "lead_2e14f147a22fe616a2906c8e52c625ce": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:sivers_semiconductors"
+        ],
         "tickers": [
           "SIVE"
         ]
@@ -9591,6 +9667,7 @@
     "lead_2e2d386f636b9656a8df1df13aeb7a96": {
       "entities": {
         "company_ids": [
+          "co:sivers_semiconductors",
           "co:applied_optoelectronics"
         ],
         "tickers": [
@@ -10080,6 +10157,7 @@
       "content_updated_at": "2026-07-29T13:46:49.445916+00:00",
       "entities": {
         "company_ids": [
+          "co:amd",
           "co:nvidia"
         ],
         "tickers": [
@@ -10218,6 +10296,8 @@
     "lead_31c2872a55bcdd3158bc7e803d62c58a": {
       "entities": {
         "company_ids": [
+          "co:sivers_semiconductors",
+          "co:aehr_test_systems",
           "co:axt"
         ],
         "tickers": [
@@ -10382,7 +10462,10 @@
     },
     "lead_33f49001378b51073f41b05958b0da6a": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:sandisk",
+          "co:micron_technology"
+        ],
         "tickers": [
           "SHKY",
           "SNDK",
@@ -10454,7 +10537,10 @@
     },
     "lead_346c43a02c97ab876fd90f6845f10629": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:micron_technology",
+          "co:sandisk"
+        ],
         "tickers": [
           "MU",
           "SNDK",
@@ -10544,7 +10630,8 @@
     "lead_34b927765030ee93e0d3b15c77c79815": {
       "entities": {
         "company_ids": [
-          "co:meta"
+          "co:meta",
+          "co:nebius"
         ],
         "tickers": [
           "META",
@@ -10946,7 +11033,9 @@
     },
     "lead_381b8a554b089b34a9f31e841f4aa05e": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:churchill_capital_xi"
+        ],
         "tickers": [
           "CCXI"
         ]
@@ -10978,7 +11067,9 @@
     },
     "lead_38941d65f87191b303cd3fa4b70e59f8": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:nebius"
+        ],
         "tickers": [
           "NBIS"
         ]
@@ -11045,6 +11136,7 @@
     "lead_39a7564998ac959ad2c54d7815b905e7": {
       "entities": {
         "company_ids": [
+          "co:amd",
           "co:applied_optoelectronics"
         ],
         "tickers": [
@@ -11094,10 +11186,13 @@
     "lead_3a46a020555dc48189780ff7686f778b": {
       "entities": {
         "company_ids": [
+          "co:sivers_semiconductors",
           "co:lumentum",
           "co:jabil",
           "co:globalfoundries",
+          "co:amd",
           "co:nvidia",
+          "co:aeva",
           "co:poet_technologies",
           "co:marvell_technology",
           "co:applied_optoelectronics"
@@ -11169,7 +11264,9 @@
     },
     "lead_3a7c4e5db3ecc1c420c1464fb73ac3c2": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:x_fab"
+        ],
         "tickers": [
           "XFAB",
           "NVTS",
@@ -11314,7 +11411,10 @@
     },
     "lead_3b455d0e21ff3e18ccf24fffb5f906e2": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:tesla",
+          "co:churchill_capital_xi"
+        ],
         "tickers": [
           "SPCX",
           "TSLA",
@@ -11419,8 +11519,11 @@
     "lead_3df060cf842783e4709ae6cd86b1be74": {
       "entities": {
         "company_ids": [
+          "co:amd",
           "co:nvidia",
-          "co:lumentum"
+          "co:lumentum",
+          "co:nebius",
+          "co:churchill_capital_xi"
         ],
         "tickers": [
           "AMD",
@@ -11507,9 +11610,12 @@
       "entities": {
         "company_ids": [
           "co:broadcom",
+          "co:soitec",
           "co:nvidia",
           "co:meta",
-          "co:intel"
+          "co:intel",
+          "co:amd",
+          "co:churchill_capital_xi"
         ],
         "tickers": [
           "CXMT",
@@ -11596,6 +11702,7 @@
     "lead_3e80264199dbf5a29442251cec37ca9a": {
       "entities": {
         "company_ids": [
+          "co:sivers_semiconductors",
           "co:globalfoundries",
           "co:jabil"
         ],
@@ -11657,7 +11764,9 @@
     "lead_3e93bffb7290bcd3f84258a630841a1a": {
       "entities": {
         "company_ids": [
-          "co:nvidia"
+          "co:churchill_capital_xi",
+          "co:nvidia",
+          "co:tesla"
         ],
         "tickers": [
           "CCXI",
@@ -11846,7 +11955,8 @@
     "lead_3ef9e4336061e83b2373bbe13a13c2e4": {
       "entities": {
         "company_ids": [
-          "co:lumentum"
+          "co:lumentum",
+          "co:sivers_semiconductors"
         ],
         "tickers": [
           "LITE",
@@ -11947,7 +12057,9 @@
     },
     "lead_4248bf6af7d35b790d8079bc1a15a943": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:churchill_capital_xi"
+        ],
         "tickers": [
           "AMZN",
           "CCXI"
@@ -12092,6 +12204,7 @@
       "content_updated_at": "2026-07-29T13:46:51.988873+00:00",
       "entities": {
         "company_ids": [
+          "co:nebius",
           "co:nvidia"
         ],
         "tickers": [
@@ -12237,7 +12350,9 @@
     },
     "lead_442d7e50dfb28699c68236c766e1134b": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:sivers_semiconductors"
+        ],
         "tickers": [
           "SIVE"
         ]
@@ -12279,6 +12394,7 @@
       "entities": {
         "company_ids": [
           "co:applied_optoelectronics",
+          "co:sivers_semiconductors",
           "co:lumentum"
         ],
         "tickers": [
@@ -12415,7 +12531,9 @@
       "entities": {
         "company_ids": [
           "co:nvidia",
-          "co:lumentum"
+          "co:aeva",
+          "co:lumentum",
+          "co:sivers_semiconductors"
         ],
         "tickers": [
           "NVDA",
@@ -12745,6 +12863,7 @@
     "lead_46349b1959ac51a47111c54f5337062c": {
       "entities": {
         "company_ids": [
+          "co:sivers_semiconductors",
           "co:applied_optoelectronics"
         ],
         "tickers": [
@@ -12910,6 +13029,8 @@
     "lead_476bd1f07c60e2995ad96640688707ee": {
       "entities": {
         "company_ids": [
+          "co:sandisk",
+          "co:micron_technology",
           "co:applied_optoelectronics"
         ],
         "tickers": [
@@ -12972,6 +13093,7 @@
     "lead_47dc4d8a48eb43f47cc5ea3904195b01": {
       "entities": {
         "company_ids": [
+          "co:nebius",
           "co:google",
           "co:meta"
         ],
@@ -13006,6 +13128,7 @@
     "lead_486e4bcc8003167a6997376455b5a2c9": {
       "entities": {
         "company_ids": [
+          "co:churchill_capital_xi",
           "co:jabil"
         ],
         "tickers": [
@@ -13143,7 +13266,9 @@
     },
     "lead_496f512a7f74e83fb5975f6e5377e757": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:sivers_semiconductors"
+        ],
         "tickers": [
           "SIVE"
         ]
@@ -13372,6 +13497,7 @@
         "company_ids": [
           "co:lumentum",
           "co:applied_optoelectronics",
+          "co:sivers_semiconductors",
           "co:coherent"
         ],
         "tickers": [
@@ -13498,7 +13624,9 @@
     },
     "lead_4cfd1607064be4fe2b8f26a49e3458f8": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:churchill_capital_xi"
+        ],
         "tickers": [
           "CCXI"
         ]
@@ -13531,6 +13659,10 @@
     "lead_4d161f4994267a4f969c75ab283463e5": {
       "entities": {
         "company_ids": [
+          "co:nebius",
+          "co:iren",
+          "co:sandisk",
+          "co:sk_hynix",
           "co:intel"
         ],
         "tickers": [
@@ -13773,7 +13905,8 @@
       "entities": {
         "company_ids": [
           "co:applied_optoelectronics",
-          "co:tsmc"
+          "co:tsmc",
+          "co:amd"
         ],
         "tickers": [
           "AAOI",
@@ -13802,7 +13935,9 @@
     },
     "lead_5227e314f46bb4d27af3ac74ca931661": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:aehr_test_systems"
+        ],
         "tickers": [
           "AEHR"
         ]
@@ -13896,7 +14031,9 @@
     },
     "lead_53f19d8df30938f84517824490af0695": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:churchill_capital_xi"
+        ],
         "tickers": [
           "CCXI"
         ]
@@ -13968,7 +14105,9 @@
     },
     "lead_54bf82feffa718f34f8d8ce6e2a6184a": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:churchill_capital_xi"
+        ],
         "tickers": [
           "CCXI"
         ]
@@ -14010,7 +14149,9 @@
       "entities": {
         "company_ids": [
           "co:meta",
-          "co:applied_optoelectronics"
+          "co:applied_optoelectronics",
+          "co:sivers_semiconductors",
+          "co:churchill_capital_xi"
         ],
         "tickers": [
           "META",
@@ -14061,7 +14202,9 @@
     },
     "lead_55d4f2734afbfab750d526b824198afb": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:churchill_capital_xi"
+        ],
         "tickers": [
           "CCXI"
         ]
@@ -14194,7 +14337,11 @@
     },
     "lead_568fc9e6338b158802f8a22dd967fe73": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:sandisk",
+          "co:sk_hynix",
+          "co:micron_technology"
+        ],
         "tickers": [
           "SNDK",
           "SKHY",
@@ -14236,7 +14383,9 @@
     },
     "lead_569add44124d25b961da71868b7e1fb6": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:churchill_capital_xi"
+        ],
         "tickers": [
           "CCXI"
         ]
@@ -14282,7 +14431,9 @@
     },
     "lead_56c00023183b77584494c96d3ff61ed2": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:xpeng"
+        ],
         "tickers": [
           "XPEV"
         ]
@@ -14366,7 +14517,9 @@
     },
     "lead_572f73ed0ae5002a8e9091d316c88565": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:churchill_capital_xi"
+        ],
         "tickers": [
           "CCXI"
         ]
@@ -14605,7 +14758,9 @@
     },
     "lead_58b59fd0835f9f7b078e5dfdde222517": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:churchill_capital_xi"
+        ],
         "tickers": [
           "CCXI"
         ]
@@ -14650,7 +14805,9 @@
     "lead_58cf007b302a50a1e3d05e7dfe6acef7": {
       "content_updated_at": "2026-07-29T13:46:43.560100+00:00",
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:amd"
+        ],
         "tickers": [
           "AMD"
         ]
@@ -15032,7 +15189,9 @@
     },
     "lead_5b6c52c2bed7adba87c1d45940ca44c6": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:sivers_semiconductors"
+        ],
         "tickers": [
           "SIVE"
         ]
@@ -15735,6 +15894,8 @@
       "entities": {
         "company_ids": [
           "co:applied_optoelectronics",
+          "co:macom",
+          "co:sivers_semiconductors",
           "co:lumentum",
           "co:coherent"
         ],
@@ -15830,6 +15991,7 @@
       "entities": {
         "company_ids": [
           "co:applied_optoelectronics",
+          "co:sivers_semiconductors",
           "co:nvidia"
         ],
         "tickers": [
@@ -15972,7 +16134,8 @@
     "lead_630ef87d8be3d5321db6a94b52dd8d74": {
       "entities": {
         "company_ids": [
-          "co:axt"
+          "co:axt",
+          "co:sandisk"
         ],
         "tickers": [
           "AXTI",
@@ -16046,7 +16209,9 @@
     },
     "lead_640392cc37bab48e7a36d4b8b91499b2": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:aehr_test_systems"
+        ],
         "tickers": [
           "AEHR"
         ]
@@ -16099,7 +16264,9 @@
     },
     "lead_642cfd67ada28b82f7cfb145055cfa57": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:churchill_capital_xi"
+        ],
         "tickers": [
           "CCXI"
         ]
@@ -16418,6 +16585,8 @@
     "lead_65cd6e71ec67ef60eb999082611afa8b": {
       "entities": {
         "company_ids": [
+          "co:macom",
+          "co:sivers_semiconductors",
           "co:lumentum"
         ],
         "tickers": [
@@ -16714,7 +16883,9 @@
     },
     "lead_68f65cfdfa5a8d6eac300aafb6e0dd23": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:nebius"
+        ],
         "tickers": [
           "NBIS"
         ]
@@ -16932,7 +17103,10 @@
     },
     "lead_6ac3699094b2106a3af12848febb87f3": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:churchill_capital_xi",
+          "co:aeva"
+        ],
         "tickers": [
           "CCXI",
           "OUST",
@@ -16979,7 +17153,9 @@
       "content_updated_at": "2026-07-29T13:46:51.380917+00:00",
       "entities": {
         "company_ids": [
+          "co:amd",
           "co:nvidia",
+          "co:sivers_semiconductors",
           "co:globalfoundries",
           "co:broadcom"
         ],
@@ -17214,7 +17390,9 @@
     },
     "lead_6d1adf0b8604fa090d3511191a19f7e4": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:iren"
+        ],
         "tickers": [
           "IREN"
         ]
@@ -17332,6 +17510,7 @@
         "company_ids": [
           "co:jabil",
           "co:globalfoundries",
+          "co:sivers_semiconductors",
           "co:nvidia",
           "co:poet_technologies"
         ],
@@ -17529,7 +17708,9 @@
     },
     "lead_6ed7944da9ec678b1ed94af8269e41fe": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:amd"
+        ],
         "tickers": [
           "AMD"
         ]
@@ -17687,7 +17868,10 @@
     },
     "lead_705649a420dd727efc8440a77a92c307": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:amd",
+          "co:sivers_semiconductors"
+        ],
         "tickers": [
           "AMD",
           "SIVE"
@@ -18284,7 +18468,9 @@
     },
     "lead_762d8753ad5c0a8fd5a14a5ccbad9d83": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:churchill_capital_xi"
+        ],
         "tickers": [
           "SPCX",
           "CBRS",
@@ -18433,6 +18619,7 @@
       "entities": {
         "company_ids": [
           "co:globalfoundries",
+          "co:sivers_semiconductors",
           "co:lumentum",
           "co:intel"
         ],
@@ -18916,6 +19103,7 @@
     "lead_7ab349347cfb868df1d54d45a29e91a9": {
       "entities": {
         "company_ids": [
+          "co:sivers_semiconductors",
           "co:lumentum"
         ],
         "tickers": [
@@ -19195,7 +19383,9 @@
     },
     "lead_7d77eec195b215634ac6408c9d644f80": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:churchill_capital_xi"
+        ],
         "tickers": [
           "CCXI"
         ]
@@ -19252,7 +19442,9 @@
     "lead_7d78fe6824f7f8f545c4eb8b23bb234f": {
       "content_updated_at": "2026-07-29T13:46:46.371264+00:00",
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:amd"
+        ],
         "tickers": [
           "AMD"
         ]
@@ -19369,7 +19561,10 @@
     },
     "lead_7e4fdb78156a257629a5ff5f7fe3e54a": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:churchill_capital_xi",
+          "co:tesla"
+        ],
         "tickers": [
           "CCXI",
           "TSLA"
@@ -19540,6 +19735,7 @@
       "entities": {
         "company_ids": [
           "co:applied_optoelectronics",
+          "co:sivers_semiconductors",
           "co:lumentum"
         ],
         "tickers": [
@@ -19722,7 +19918,9 @@
     "lead_800fb456828b63727b76094378540c82": {
       "entities": {
         "company_ids": [
+          "co:sivers_semiconductors",
           "co:jabil",
+          "co:aeva",
           "co:poet_technologies",
           "co:globalfoundries",
           "co:apple"
@@ -19889,7 +20087,9 @@
     "lead_8088f665e358a7744d9b6bc1646bccbf": {
       "entities": {
         "company_ids": [
-          "co:axt"
+          "co:axt",
+          "co:iqe",
+          "co:sandisk"
         ],
         "tickers": [
           "AXTI",
@@ -20069,7 +20269,9 @@
     },
     "lead_80ad137ec40349c4a806e77e716c8391": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:tesla"
+        ],
         "tickers": [
           "TSLA"
         ]
@@ -20283,7 +20485,9 @@
     "lead_826473daf6f4deaaff8503a106f6efd6": {
       "entities": {
         "company_ids": [
-          "co:nvidia"
+          "co:nvidia",
+          "co:churchill_capital_xi",
+          "co:tesla"
         ],
         "tickers": [
           "NVDA",
@@ -20521,6 +20725,9 @@
       "entities": {
         "company_ids": [
           "co:intel",
+          "co:amd",
+          "co:micron_technology",
+          "co:sandisk",
           "co:lumentum",
           "co:coherent"
         ],
@@ -20807,7 +21014,9 @@
     },
     "lead_85f0e54130000bfc62725a57c4da02cf": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:tesla"
+        ],
         "tickers": [
           "TSLA"
         ]
@@ -20966,6 +21175,8 @@
     "lead_8731ea81a6fcb4e666a7f2c5cea71e2b": {
       "entities": {
         "company_ids": [
+          "co:amd",
+          "co:sivers_semiconductors",
           "co:globalfoundries"
         ],
         "tickers": [
@@ -21223,7 +21434,9 @@
     },
     "lead_885ddd69b263f8197cfbe2db5825c332": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:amd"
+        ],
         "tickers": [
           "AMD"
         ]
@@ -21314,6 +21527,7 @@
     "lead_891dfebbd908d822ef6f4a55e1e465c0": {
       "entities": {
         "company_ids": [
+          "co:coreweave",
           "co:lumentum"
         ],
         "tickers": [
@@ -21356,7 +21570,9 @@
     },
     "lead_89656d14e16503d68cf12c4366c75045": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:churchill_capital_xi"
+        ],
         "tickers": [
           "CCXI"
         ]
@@ -21425,6 +21641,7 @@
     "lead_89f2cee24a796d94b33e85d1dd5e0b04": {
       "entities": {
         "company_ids": [
+          "co:nebius",
           "co:meta"
         ],
         "tickers": [
@@ -21561,8 +21778,10 @@
     "lead_8ae4bd1a71426bd5346bf5cd45cc94ba": {
       "entities": {
         "company_ids": [
+          "co:sivers_semiconductors",
           "co:jabil",
           "co:poet_technologies",
+          "co:aeva",
           "co:globalfoundries"
         ],
         "tickers": [
@@ -21616,7 +21835,9 @@
     },
     "lead_8bda4fb157bb814d2bbddf2c694f4e86": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:micron_technology"
+        ],
         "tickers": [
           "MU"
         ]
@@ -21888,9 +22109,13 @@
       "entities": {
         "company_ids": [
           "co:lumentum",
+          "co:sandisk",
           "co:google",
+          "co:sivers_semiconductors",
           "co:applied_optoelectronics",
-          "co:meta"
+          "co:meta",
+          "co:nebius",
+          "co:micron_technology"
         ],
         "tickers": [
           "BE",
@@ -22039,7 +22264,9 @@
     },
     "lead_8f1c99c133204c13cac86a48ffd39f82": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:churchill_capital_xi"
+        ],
         "tickers": [
           "CCXI"
         ]
@@ -22109,7 +22336,9 @@
     },
     "lead_8f6d772fadcdb6aeff0365b985396a34": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:churchill_capital_xi"
+        ],
         "tickers": [
           "CCXI"
         ]
@@ -22141,7 +22370,9 @@
     },
     "lead_8fcdc53c2a4d4d5d089ec784a2f0241c": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:amd"
+        ],
         "tickers": [
           "AMD"
         ]
@@ -22187,7 +22418,10 @@
     },
     "lead_90c5dcc2d514c7ed4342bd2acdad08f7": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:tesla",
+          "co:churchill_capital_xi"
+        ],
         "tickers": [
           "TSLA",
           "CCXI"
@@ -22331,7 +22565,9 @@
     },
     "lead_91a73c290d7257f4102c49d31d1b3c19": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:churchill_capital_xi"
+        ],
         "tickers": [
           "CCXI"
         ]
@@ -22564,7 +22800,11 @@
     },
     "lead_966dbb4d445ea90ff30a2086aab45a90": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:nebius",
+          "co:iren",
+          "co:coreweave"
+        ],
         "tickers": [
           "NBIS",
           "IREN",
@@ -22667,6 +22907,7 @@
     "lead_9764dccc195ed2f828b901eacabe0b2c": {
       "entities": {
         "company_ids": [
+          "co:sivers_semiconductors",
           "co:globalfoundries",
           "co:jabil",
           "co:poet_technologies",
@@ -22772,6 +23013,7 @@
     "lead_97d627b017131ff39599b413b00c2e15": {
       "entities": {
         "company_ids": [
+          "co:tesla",
           "co:nvidia",
           "co:apple"
         ],
@@ -22825,6 +23067,7 @@
     "lead_9888828c69141e06a021cb380a098abd": {
       "entities": {
         "company_ids": [
+          "co:sivers_semiconductors",
           "co:lumentum",
           "co:coherent"
         ],
@@ -22878,7 +23121,9 @@
     },
     "lead_98f8189824f53a0f3b6a58e79133dc6b": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:churchill_capital_xi"
+        ],
         "tickers": [
           "CCXI"
         ]
@@ -23009,7 +23254,10 @@
     },
     "lead_9957a9e65aee680f5aa5bba637494eac": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:amd",
+          "co:iren"
+        ],
         "tickers": [
           "RIOT",
           "AMD",
@@ -23179,10 +23427,13 @@
       "entities": {
         "company_ids": [
           "co:applied_optoelectronics",
+          "co:sivers_semiconductors",
           "co:lumentum",
           "co:broadcom",
           "co:coherent",
-          "co:nvidia"
+          "co:amd",
+          "co:nvidia",
+          "co:macom"
         ],
         "tickers": [
           "AAOI",
@@ -23335,7 +23586,9 @@
     },
     "lead_9b290ae15ba6fd6584afe7f3af56b234": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:churchill_capital_xi"
+        ],
         "tickers": [
           "CCXI"
         ]
@@ -23452,7 +23705,9 @@
     },
     "lead_9b773925fda70342e92b1998762998a3": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:churchill_capital_xi"
+        ],
         "tickers": [
           "CCXI"
         ]
@@ -23860,8 +24115,10 @@
       "entities": {
         "company_ids": [
           "co:lumentum",
+          "co:sivers_semiconductors",
           "co:tsmc",
           "co:applied_optoelectronics",
+          "co:iqe",
           "co:axt"
         ],
         "tickers": [
@@ -24120,9 +24377,13 @@
       "content_updated_at": "2026-07-29T13:46:51.647894+00:00",
       "entities": {
         "company_ids": [
+          "co:sivers_semiconductors",
           "co:lumentum",
           "co:applied_optoelectronics",
+          "co:nebius",
+          "co:iren",
           "co:intel",
+          "co:amd",
           "co:marvell_technology"
         ],
         "tickers": [
@@ -24208,7 +24469,8 @@
     "lead_a53867cc19e44995d9ee1ef2fb2c8fbd": {
       "entities": {
         "company_ids": [
-          "co:meta"
+          "co:meta",
+          "co:sandisk"
         ],
         "tickers": [
           "META",
@@ -24524,7 +24786,9 @@
     },
     "lead_a7e1fbdd7e16b66481bc53a3d934c128": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:iren"
+        ],
         "tickers": [
           "IREN"
         ]
@@ -24652,11 +24916,18 @@
       "content_updated_at": "2026-07-29T13:46:50.528703+00:00",
       "entities": {
         "company_ids": [
+          "co:sivers_semiconductors",
+          "co:aehr_test_systems",
+          "co:nebius",
           "co:applied_optoelectronics",
           "co:axt",
+          "co:micron_technology",
+          "co:sandisk",
+          "co:soitec",
           "co:tower_semiconductor",
           "co:lumentum",
           "co:intel",
+          "co:amd",
           "co:marvell_technology"
         ],
         "tickers": [
@@ -24728,7 +24999,9 @@
     },
     "lead_a9decd56cd086ff593d6e307c0508b48": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:aeva"
+        ],
         "tickers": [
           "AEVA"
         ]
@@ -25216,7 +25489,9 @@
     },
     "lead_ad5384c50b83b2e45b0cf0041cb1a878": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:sivers_semiconductors"
+        ],
         "tickers": [
           "SIVE"
         ]
@@ -25369,7 +25644,9 @@
     },
     "lead_ad963c03ff79f01c91aa8bc1e924e47f": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:sk_hynix"
+        ],
         "tickers": [
           "SKHY"
         ]
@@ -25712,7 +25989,10 @@
     },
     "lead_b0b7ecd2d8229b1f3a1f01c557f5339c": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:tesla",
+          "co:churchill_capital_xi"
+        ],
         "tickers": [
           "TSLA",
           "CCXI"
@@ -25905,6 +26185,7 @@
     "lead_b1e793c560334131dfe7c1619715784d": {
       "entities": {
         "company_ids": [
+          "co:sivers_semiconductors",
           "co:coherent",
           "co:lumentum",
           "co:tsmc",
@@ -26158,7 +26439,9 @@
     },
     "lead_b28a08cabcbecaf261ad0a353cf1a5e1": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:sivers_semiconductors"
+        ],
         "tickers": [
           "SIVE"
         ]
@@ -26282,7 +26565,10 @@
     },
     "lead_b30c33e9af50c65b8fc4cf8a05f80184": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:tesla",
+          "co:churchill_capital_xi"
+        ],
         "tickers": [
           "TSLA",
           "CCXI"
@@ -26574,7 +26860,9 @@
     "lead_b48a6c9a349398a5d0d3ab8732a05d54": {
       "content_updated_at": "2026-07-29T13:46:45.021215+00:00",
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:amd"
+        ],
         "tickers": [
           "AMD"
         ]
@@ -26661,7 +26949,9 @@
     },
     "lead_b4a3b997eb24ac512af213af8a885722": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:tesla"
+        ],
         "tickers": [
           "TSLA"
         ]
@@ -26737,7 +27027,9 @@
     },
     "lead_b556950618d8a8f969895cc45a2a506a": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:nebius"
+        ],
         "tickers": [
           "NBIS"
         ]
@@ -26911,7 +27203,9 @@
       "entities": {
         "company_ids": [
           "co:meta",
-          "co:google"
+          "co:google",
+          "co:coreweave",
+          "co:nebius"
         ],
         "tickers": [
           "META",
@@ -26948,9 +27242,12 @@
     "lead_b75a2feb576f619129330908245b248a": {
       "entities": {
         "company_ids": [
+          "co:sivers_semiconductors",
           "co:jabil",
           "co:globalfoundries",
-          "co:axt"
+          "co:x_fab",
+          "co:axt",
+          "co:nebius"
         ],
         "tickers": [
           "RPI",
@@ -27237,6 +27534,7 @@
     "lead_ba4073c079bac993eaafc74feb7c6df3": {
       "entities": {
         "company_ids": [
+          "co:sivers_semiconductors",
           "co:lumentum",
           "co:coherent"
         ],
@@ -27813,6 +28111,7 @@
           "co:applied_optoelectronics",
           "co:coherent",
           "co:lumentum",
+          "co:sivers_semiconductors",
           "co:jabil"
         ],
         "tickers": [
@@ -28104,7 +28403,9 @@
     "lead_c3fa1ca7fd636810e6fababce5ce7f5a": {
       "entities": {
         "company_ids": [
-          "co:applied_optoelectronics"
+          "co:sivers_semiconductors",
+          "co:applied_optoelectronics",
+          "co:macom"
         ],
         "tickers": [
           "SIVE",
@@ -28360,6 +28661,8 @@
       "content_updated_at": "2026-07-29T13:46:47.957572+00:00",
       "entities": {
         "company_ids": [
+          "co:tesla",
+          "co:micron_technology",
           "co:tsmc"
         ],
         "tickers": [
@@ -28860,6 +29163,7 @@
       "entities": {
         "company_ids": [
           "co:axt",
+          "co:micron_technology",
           "co:google",
           "co:meta",
           "co:coherent",
@@ -29015,7 +29319,9 @@
     },
     "lead_c95925a7449580e24cce7512ebad08b4": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:tesla"
+        ],
         "tickers": [
           "TSLA"
         ]
@@ -29089,6 +29395,7 @@
         "company_ids": [
           "co:applied_optoelectronics",
           "co:lumentum",
+          "co:sivers_semiconductors",
           "co:jabil",
           "co:coherent",
           "co:broadcom"
@@ -29414,7 +29721,9 @@
     "lead_cb2644d6e095834e6f0d38ff5348f862": {
       "entities": {
         "company_ids": [
-          "co:intel"
+          "co:sk_hynix",
+          "co:intel",
+          "co:micron_technology"
         ],
         "tickers": [
           "SKHY",
@@ -29534,7 +29843,9 @@
     },
     "lead_cb6591537df5b9f6f13b7a79af9b206c": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:sivers_semiconductors"
+        ],
         "tickers": [
           "SIVE"
         ]
@@ -29603,6 +29914,7 @@
         "company_ids": [
           "co:marvell_technology",
           "co:applied_materials",
+          "co:nebius",
           "co:applied_optoelectronics"
         ],
         "tickers": [
@@ -29779,7 +30091,9 @@
       "entities": {
         "company_ids": [
           "co:marvell_technology",
-          "co:applied_optoelectronics"
+          "co:applied_optoelectronics",
+          "co:sivers_semiconductors",
+          "co:aehr_test_systems"
         ],
         "tickers": [
           "MRVL",
@@ -29885,7 +30199,9 @@
     },
     "lead_cea0eb86b7b4363c4cd432fdf328b029": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:churchill_capital_xi"
+        ],
         "tickers": [
           "CCXI"
         ]
@@ -30204,6 +30520,7 @@
         "company_ids": [
           "co:applied_optoelectronics",
           "co:lumentum",
+          "co:sivers_semiconductors",
           "co:coherent"
         ],
         "tickers": [
@@ -30264,7 +30581,9 @@
     },
     "lead_d0d95a0fb61bae0dc0870391b1065f1d": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:iren"
+        ],
         "tickers": [
           "IREN"
         ]
@@ -30489,6 +30808,8 @@
     "lead_d247dffc1ed48d89a68d7abe6e9a1f51": {
       "entities": {
         "company_ids": [
+          "co:churchill_capital_xi",
+          "co:tesla",
           "co:nvidia"
         ],
         "tickers": [
@@ -30767,6 +31088,7 @@
       "entities": {
         "company_ids": [
           "co:poet_technologies",
+          "co:sivers_semiconductors",
           "co:jabil"
         ],
         "tickers": [
@@ -30957,6 +31279,7 @@
     "lead_d5d2b65e1c4d593c77075d2d499b7144": {
       "entities": {
         "company_ids": [
+          "co:aehr_test_systems",
           "co:nvidia"
         ],
         "tickers": [
@@ -31057,6 +31380,8 @@
     "lead_d6549e74ff9c3d00e666bcd47db73e12": {
       "entities": {
         "company_ids": [
+          "co:sivers_semiconductors",
+          "co:amd",
           "co:globalfoundries",
           "co:jabil",
           "co:poet_technologies"
@@ -31202,6 +31527,7 @@
       "entities": {
         "company_ids": [
           "co:lumentum",
+          "co:sivers_semiconductors",
           "co:coherent"
         ],
         "tickers": [
@@ -31414,7 +31740,9 @@
     },
     "lead_d980d3e0d3b02fb6aa301dba929334c6": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:sandisk"
+        ],
         "tickers": [
           "BE",
           "SNDK",
@@ -31668,7 +31996,10 @@
     },
     "lead_dc1c77328d874e61b0abaee39391c054": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:micron_technology",
+          "co:sandisk"
+        ],
         "tickers": [
           "MU",
           "SNDK"
@@ -31839,7 +32170,10 @@
     },
     "lead_de706fce93908f982e16a397ea25436d": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:aehr_test_systems",
+          "co:sandisk"
+        ],
         "tickers": [
           "AEHR",
           "SNDK"
@@ -31963,7 +32297,9 @@
     },
     "lead_dec3d9cd6d2c56b4233f1ba977bf0e45": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:micron_technology"
+        ],
         "tickers": [
           "MU"
         ]
@@ -32051,7 +32387,9 @@
     },
     "lead_df8768dd263a4c8dd999f11abe902c8c": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:tesla"
+        ],
         "tickers": [
           "TSLA"
         ]
@@ -32124,7 +32462,9 @@
     },
     "lead_dfb9cfa871bd657c7b4dad52eef691c4": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:nebius"
+        ],
         "tickers": [
           "NBIS"
         ]
@@ -32204,7 +32544,9 @@
     },
     "lead_e039c3c894b17b758efbf223182c0ade": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:nebius"
+        ],
         "tickers": [
           "NBIS"
         ]
@@ -32236,7 +32578,9 @@
     },
     "lead_e06ae19be285787dd07e690fd6cb0abf": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:tesla"
+        ],
         "tickers": [
           "TSLA"
         ]
@@ -32441,7 +32785,8 @@
     "lead_e1daca4662d70cba294c939a608ae05c": {
       "entities": {
         "company_ids": [
-          "co:nvidia"
+          "co:nvidia",
+          "co:churchill_capital_xi"
         ],
         "tickers": [
           "NVDA",
@@ -32662,7 +33007,9 @@
     },
     "lead_e44de3abd3c8ac71e015b657616a2c06": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:micron_technology"
+        ],
         "tickers": [
           "MU",
           "QCOM"
@@ -32891,7 +33238,10 @@
     },
     "lead_e5f4088218bafff7538c5eec808ea96e": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:churchill_capital_xi",
+          "co:tesla"
+        ],
         "tickers": [
           "CCXI",
           "TSLA",
@@ -33082,7 +33432,9 @@
     },
     "lead_e5f4ae45354e9de33bef221952491fd4": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:tesla"
+        ],
         "tickers": [
           "TSLA"
         ]
@@ -33136,7 +33488,9 @@
     },
     "lead_e75d4f496e44d27bd5f1b5b8f7ad0e24": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:sivers_semiconductors"
+        ],
         "tickers": [
           "SIVE"
         ]
@@ -33178,7 +33532,9 @@
       "entities": {
         "company_ids": [
           "co:applied_optoelectronics",
-          "co:lumentum"
+          "co:lumentum",
+          "co:sivers_semiconductors",
+          "co:amd"
         ],
         "tickers": [
           "AAOI",
@@ -33521,7 +33877,9 @@
     "lead_e87032df984f0fa40a6bd12a7130b39a": {
       "entities": {
         "company_ids": [
-          "co:meta"
+          "co:meta",
+          "co:nebius",
+          "co:iren"
         ],
         "tickers": [
           "META",
@@ -33994,7 +34352,9 @@
     "lead_ecaab49dd6acfe4163a0128d2f522cb8": {
       "entities": {
         "company_ids": [
-          "co:meta"
+          "co:sandisk",
+          "co:meta",
+          "co:micron_technology"
         ],
         "tickers": [
           "SNDK",
@@ -34211,7 +34571,9 @@
     },
     "lead_eea44f3ae623397f4f337620ce0e1c41": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:churchill_capital_xi"
+        ],
         "tickers": [
           "CCXI"
         ]
@@ -34257,7 +34619,9 @@
     },
     "lead_eeeaadc30d6e4c258e42483085b3e32f": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:churchill_capital_xi"
+        ],
         "tickers": [
           "CCXI"
         ]
@@ -34618,7 +34982,8 @@
       "content_updated_at": "2026-07-29T13:46:42.901012+00:00",
       "entities": {
         "company_ids": [
-          "co:google"
+          "co:google",
+          "co:nebius"
         ],
         "tickers": [
           "GOOGL",
@@ -34890,6 +35255,8 @@
           "co:poet_technologies",
           "co:coherent",
           "co:applied_optoelectronics",
+          "co:sivers_semiconductors",
+          "co:amd",
           "co:meta"
         ],
         "tickers": [
@@ -35107,6 +35474,7 @@
     "lead_f4cd256b67d8749a077a4db502311334": {
       "entities": {
         "company_ids": [
+          "co:churchill_capital_xi",
           "co:nvidia"
         ],
         "tickers": [
@@ -35567,6 +35935,7 @@
     "lead_f7728f22823043a4cd86afba8ca11ac9": {
       "entities": {
         "company_ids": [
+          "co:churchill_capital_xi",
           "co:nvidia",
           "co:google"
         ],
@@ -35624,10 +35993,14 @@
       "entities": {
         "company_ids": [
           "co:meta",
+          "co:aehr_test_systems",
           "co:applied_optoelectronics",
+          "co:sivers_semiconductors",
+          "co:sandisk",
           "co:corning",
           "co:marvell_technology",
-          "co:lumentum"
+          "co:lumentum",
+          "co:nebius"
         ],
         "tickers": [
           "META",
@@ -35691,7 +36064,9 @@
     },
     "lead_f7c1a2e7c62b2eae1d81de417fb754f7": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:iren"
+        ],
         "tickers": [
           "IREN"
         ]
@@ -35749,6 +36124,8 @@
       "entities": {
         "company_ids": [
           "co:tsmc",
+          "co:sivers_semiconductors",
+          "co:soitec",
           "co:applied_optoelectronics",
           "co:lumentum"
         ],
@@ -35860,6 +36237,8 @@
     "lead_f9bdf048e23b0239b1acbde1497744e5": {
       "entities": {
         "company_ids": [
+          "co:sandisk",
+          "co:coreweave",
           "co:nvidia",
           "co:tsmc",
           "co:marvell_technology",
@@ -35926,7 +36305,9 @@
     },
     "lead_fa0497398cd950fd6a1fd04ece5ad847": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:iren"
+        ],
         "tickers": [
           "IREN"
         ]
@@ -36285,7 +36666,9 @@
     },
     "lead_fe39d568d8fb1ac17f6c58b224e6ecf9": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:aeva"
+        ],
         "tickers": [
           "OUST",
           "AEVA"
@@ -36319,8 +36702,13 @@
     "lead_ffa5bc2151dea963a2b5f704afeb3880": {
       "entities": {
         "company_ids": [
+          "co:nebius",
           "co:marvell_technology",
           "co:intel",
+          "co:sandisk",
+          "co:amd",
+          "co:sivers_semiconductors",
+          "co:micron_technology",
           "co:lumentum"
         ],
         "tickers": [
@@ -36439,7 +36827,9 @@
     },
     "lead_ffffdf5e4ec5ac32ef572c7e4a916988": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:micron_technology"
+        ],
         "tickers": [
           "MU"
         ]

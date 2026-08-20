@@ -471,7 +471,7 @@ def _cmd_backfill_entities(args: argparse.Namespace) -> int:
     from engine_b.themes import backfill_themes
 
     store = leads.load(args.leads)
-    entities = backfill_entities(store)
+    entities = backfill_entities(store, rescan=args.rescan)
     themes = backfill_themes(store)
     if not args.dry_run and (entities or themes):
         leads.save(store, args.leads)
@@ -594,6 +594,14 @@ def build_parser() -> argparse.ArgumentParser:
         help="替既有 lead 補上具名標的標記（一次性）",
     )
     p_backfill.add_argument("--dry-run", action="store_true")
+    p_backfill.add_argument(
+        "--rescan",
+        action="store_true",
+        help=(
+            "重算所有 lead 的 entities，而不只補從未算過的。"
+            "registry 新增公司或 alias 後必須跑一次，否則舊 lead 永遠對不上新登記的公司。"
+        ),
+    )
     p_backfill.set_defaults(func=_cmd_backfill_entities)
     return ap
 

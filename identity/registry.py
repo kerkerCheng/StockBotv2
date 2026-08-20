@@ -43,6 +43,15 @@ class CompanyIdentity:
 
     company_id: str
     research_ticker: str | None
+    # 同一家公司的其他交易代號。research_ticker 是**研究用主掛牌**（Sivers 是瑞典
+    # 的 SIVE.ST），但同一家公司常有第二個公開代號：SIVEF 是 Sivers 的美國 OTC、
+    # SKHY 是 SK Hynix 的美國 OTC。這些代號會出現在推文 cashtag 裡，而
+    # `engine_b/entities.py` 的 base 反查只去交易所後綴（SIVE→SIVE.ST 可解，
+    # SIVEF 不可解），於是同一家公司的 lead 有一部分永遠解析不到 company_id。
+    # 該檔第 64 行的註解早已寫下「正解是在 registry 明列 alias／deny」——這就是它。
+    # ⚠ alias 不得與任何公司的 research_ticker 或其他 alias 衝突，衝突即 raise：
+    # registry 是 identity authority，寧可啟動失敗也不要靜默指向錯的公司。
+    aliases: tuple[str, ...] = ()
     market_currency: str | None = None
     execution_currency: str | None = None
     execution_venue: str | None = None
@@ -75,6 +84,15 @@ class IdentityRegistry:
                 if key in by_ticker:
                     raise ValueError(f"duplicate research ticker: {company.research_ticker}")
                 by_ticker[key] = company.company_id
+            for alias in company.aliases:
+                alias_key = str(alias).strip().upper()
+                if not alias_key:
+                    continue
+                if alias_key in by_ticker and by_ticker[alias_key] != company.company_id:
+                    raise ValueError(
+                        f"alias {alias_key} already maps to {by_ticker[alias_key]}"
+                    )
+                by_ticker[alias_key] = company.company_id
         self.version = version
         self._by_id: Mapping[str, CompanyIdentity] = MappingProxyType(by_id)
         self._by_ticker: Mapping[str, str] = MappingProxyType(by_ticker)
@@ -99,6 +117,11 @@ class IdentityRegistry:
                 market_quote_unit=_quote_code(item.get("market_currency")),
                 execution_quote_unit=_quote_code(item.get("execution_currency")),
                 benchmark_symbol=str(item.get("benchmark_symbol") or "QQQ").strip().upper(),
+                aliases=tuple(
+                    str(a).strip().upper()
+                    for a in (item.get("aliases") or ())
+                    if str(a).strip()
+                ),
             )
             for item in raw_companies
         )

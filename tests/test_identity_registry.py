@@ -110,3 +110,62 @@ def test_unresolved_identity_fails_closed_with_application_blocker() -> None:
     assert resolved.company_id is None
     assert resolved.execution_symbol is None
     assert resolved.blockers == ("unresolved_company_identity",)
+
+
+def test_alias_resolves_to_same_company() -> None:
+    """同一家公司的第二個交易代號必須解析得到——否則一部分 lead 永遠對不上。
+
+    事發（2026-08-20）：SIVEF 是 Sivers 的美國 OTC 代號、SKHY 是 SK Hynix 的美國
+    OTC，兩者都出現在推文 cashtag。`engine_b/entities.py` 的 base 反查只去交易所
+    後綴（SIVE→SIVE.ST 可解），SIVEF 不是任何 research ticker 的 base，於是解析
+    不到 company_id。該檔第 64 行的註解早已寫下「正解是在 registry 明列 alias」。
+    """
+
+    from identity.registry import CompanyIdentity, IdentityRegistry
+
+    registry = IdentityRegistry(
+        version=1,
+        companies=(
+            CompanyIdentity(
+                company_id="co:sivers_semiconductors",
+                research_ticker="SIVE.ST",
+                aliases=("SIVEF",),
+            ),
+        ),
+    )
+    assert registry.company_id_for_ticker("SIVE.ST") == "co:sivers_semiconductors"
+    assert registry.company_id_for_ticker("SIVEF") == "co:sivers_semiconductors"
+    assert registry.company_id_for_ticker("sivef") == "co:sivers_semiconductors"
+
+
+def test_alias_colliding_with_another_company_fails_closed() -> None:
+    """registry 是 identity authority：寧可啟動失敗，也不要靜默指向錯的公司。"""
+
+    import pytest
+
+    from identity.registry import CompanyIdentity, IdentityRegistry
+
+    with pytest.raises(ValueError, match="alias"):
+        IdentityRegistry(
+            version=1,
+            companies=(
+                CompanyIdentity(company_id="co:a", research_ticker="AAA"),
+                CompanyIdentity(
+                    company_id="co:b", research_ticker="BBB", aliases=("AAA",)
+                ),
+            ),
+        )
+
+
+def test_alias_absent_keeps_previous_behaviour() -> None:
+    """沒填 aliases 的公司行為完全不變（預設空 tuple）。"""
+
+    from identity.registry import CompanyIdentity, IdentityRegistry
+
+    registry = IdentityRegistry(
+        version=1,
+        companies=(CompanyIdentity(company_id="co:a", research_ticker="AAA"),),
+    )
+    assert registry.company("co:a").aliases == ()
+    assert registry.company_id_for_ticker("AAA") == "co:a"
+    assert registry.company_id_for_ticker("ZZZ") is None
