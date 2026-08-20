@@ -3051,6 +3051,30 @@
       "source": "decision_lab",
       "title": "REVIEW — co:micron_technology",
       "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-20T15:36:57.789792+00:00",
+      "hint": "go 只排入 bounded pq1；不接受 claim、不入圖。若需付費，另核准 exact 金額／方案。",
+      "n": 193,
+      "reason": null,
+      "ref_id": "lead_e766f19b8dc748d744d0b4cc6dc21071",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "source_trace",
+      "title": "追原報告／來源 access — I usually make fun of sellside, but Rosenblatt has pretty goated channel checks on optical names, and their reports are one of the few I like talking about. $AAOI, $LITE, $SIVE, and the laser party...",
+      "type": "source_trace_review"
+    },
+    {
+      "added_at": "2026-08-20T15:36:57.789792+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 194,
+      "reason": null,
+      "ref_id": "dc_cc46527aac12ba14191ee71c0460f3fe",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:harmonic_drive_systems",
+      "type": "decision_review"
     }
   ],
   "log": [
@@ -6947,6 +6971,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 193,
+  "next_n": 195,
   "schema_version": "1"
 }

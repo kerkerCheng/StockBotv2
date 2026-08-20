@@ -19766,10 +19766,10 @@
       "refs": {
         "claimed_origin": "未標出處的逐字引號，追回為 Reuters 2026-08-04 exclusive",
         "gap": "FCC 正式規則文本、生效範圍與豁免清單",
-        "parked_reason": "政策尚在草擬、FCC 未做最終決定；無一手可核對文件，不得作為圖中事實",
-        "research_outcome": "引號內容與 Reuters 報導一致（FCC 擬禁新型中國光收發器並豁免多數非中國供應商），但全文依據匿名消息人士，政府一手文件不存在",
+        "parked_reason": "已追源但無一手可用。多份二手（Caixin、Tom's Hardware、TechTimes、Electronics360）一致指向：FCC 正草擬規則禁止新型號中國光模組進口，可能 2026 年底前生效，但明確仍可能被修改或放棄，且不影響已安裝存量。⚠ 原推文措辭有誤並已更正：它寫 Trump administration drafting a ban，實際機制是 FCC 既有的 Covered List 設備授權框架，與商務部 BIS 出口管制是法律上不同的路徑（L11：監管術語的措辭精度本身就是一個 claim，不得沿用二手框架）。二手另載 Innolight 約 27% 全球市占、與 Eoptolink 合計掌握 800G+ 逾 60%、COHR／LITE 產能不足以完全替代——全部未經一手證實，不得入圖。⚠ 值得後續追的反向瓶頸線索：有報導稱西方替代品仍依賴中國 indium 供應，而銦正是 mat:inp_substrate 的原料；若屬實則禁令同時創造需求與上游約束。",
+        "research_outcome": "policy_draft_stage_no_primary_source",
         "trace_attempts_ref": "以逐字句搜尋定位到 Reuters 獨家報導及多家轉載；FCC 尚未公布任何規則草案文本",
-        "trace_next_trigger": "FCC 公布 NPRM／規則文本或正式新聞稿",
+        "trace_next_trigger": "FCC 正式發布 NPRM 或 Report and Order，或將中國光模組廠商列入 Covered List；屆時才有一手可入圖",
         "trace_origin_entity": "Reuters",
         "trace_requeue_consumed_entities": [
           "AAOI",
@@ -19780,19 +19780,20 @@
         "trace_requeue_trigger": "related_triaged_lead:lead_1940958c3136e0a33b4e0856b7b05d82",
         "trace_requeued_at": "2026-08-18T23:05:45.408019+00:00",
         "trace_requires_user": "false",
-        "trace_status": "isolated_tier_3",
+        "trace_status": "secondary_only_no_primary",
         "trace_trigger_entities": [
           "AAOI",
           "LITE",
           "SIVE",
           "co:applied_optoelectronics",
-          "co:lumentum"
+          "co:lumentum",
+          "co:sivers_semiconductors"
         ],
         "trace_trigger_event_ref": "lead:lead_1940958c3136e0a33b4e0856b7b05d82",
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -27815,9 +27816,14 @@
       "first_seen": "2026-08-15T01:47:07.837918+00:00",
       "lead_id": "lead_baf13ca0773a70940d289449b2d3d3e6",
       "published_at": "2026-05-18",
-      "refs": {},
+      "refs": {
+        "parked_reason": "POET 6-K 2026-05-18（accession 0001493152-26-024093）已取得一手：內容為 US$400M registered direct offering 的法律文件（Securities Purchase Agreement、Common Share Purchase Warrant 19,047,620 份、法律意見書）。該增資的財務事實已由 Q2 FY2026 6-K 的資產負債表與既有 Engine C 觀測涵蓋；純融資文件不含供應鏈或技術關係，無 graph delta。",
+        "research_outcome": "no_graph_delta_financing_documents",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
       "source": "edgar:POET",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "POET 6-K filed 2026-05-18",
       "triage": {
@@ -28270,9 +28276,14 @@
       "first_seen": "2026-08-15T01:47:07.837717+00:00",
       "lead_id": "lead_c0d903fffe41657bd0ebd171471eed13",
       "published_at": "2026-08-03",
-      "refs": {},
+      "refs": {
+        "parked_reason": "POET 6-K 2026-08-03（accession 0001171843-26-005153, EX-99.1）已取得一手：董事會人事案，任命 Dr. Bardia Pezeshki 與 Jean F. Rankin，Jean-Louis Malinge 辭任。人事任命不構成供應關係或技術瓶頸證據（schema 的 Person 節點不用於此類訊號），無 graph delta。⚠ 備註：Pezeshki 在光通訊領域具知名度，屬人才訊號，若日後出現其主導的具體產品或客戶關係再另立 lead。",
+        "research_outcome": "no_graph_delta_board_appointment",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
       "source": "edgar:POET",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "POET 6-K filed 2026-08-03",
       "triage": {
@@ -28384,9 +28395,14 @@
       "first_seen": "2026-08-15T01:47:07.837995+00:00",
       "lead_id": "lead_c3f2223f6b6fcce3d5e73fd0fa25d5af",
       "published_at": "2026-05-15",
-      "refs": {},
+      "refs": {
+        "parked_reason": "POET Q1 2026 財報新聞稿（6-K 2026-05-15, accession 0001171843-26-003487, EX-99.1）已取得一手全文。所提 Lumilens 50M PO、LITEON 合作、Lessengers 1.6T transceiver 共同開發三項，圖中皆已存在對應邊（SUPPLIES_TO co:lumilens、PARTNERSHIP_WITH co:liteon、DEVELOPS prod:1_6t_dr4_transceiver 且 co:lessengers 亦 DEVELOPS 同節點）。本文為 CEO 管理層評論、屬自報複述，無新可稽核事實，不產生 graph delta。",
+        "research_outcome": "no_graph_delta_ceo_commentary_restates_existing_edges",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
       "source": "edgar:POET",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "POET 6-K filed 2026-05-15",
       "triage": {
@@ -28981,12 +28997,12 @@
       "raw_text": "Okay here's my take on $POET, since apparently people are celebrating on the subreddit that I took small positions. \n\n- I have 0 idea. ZERO. How they convinced shareholders to allow them dilute SO MUCH to the point:\n\nThey have an absurd ~$830m cash on hand now. \n\nAnd my guess is that they're close to done, since I would be in disbelief if they needed more. \n\nSo now... they have ~$830m to grow their business like M&A, and EV actually dropped really low recently (eg. $1.25B MC vs. $830m cash on hand), that I thought it was compelling to take a risk. \n\n- Annualized production capacity target is 12M optical engines/year for 2027, which is pretty absurd ramp. \n\nNeed to do more research into ASP for Poet's products, but maybe $125-$200? So at ~$150 ASP, $1.8B revenue ceiling. \n\nBut they're like inverse AAOI right now: no visible demand to fill all that capacity. Aside from Lumilens, which is now a highly valued hyperscaler supplier (probably Amazon or Microsoft), with billions in customer agreements. \n\nThe interesting thing is if Poet signed prepayment EML agreements with players like Mitsubishi, or CW agreements with Sivers behind the scenes with that balance sheet. \n\nAnd given the current bottleneck, players might use Poet as a workaround for supply procurement. \n\nBut basically, you have a super cash-rich company with a ton of capacity coming online. And they're not really disappearing anytime soon with their financials. \n\nI don't quite think it's as technically defensible compared to upstream laser chokepoints with something like $SIVE around the same valuation in terms of technical moat for CW lasers vs. OE packaging side. As you've seen recently with Celestial and Poet. \n\nBut maybe... there's a chance some hyperscaler or downstream company announces a volume agreement sometime in the future. and $POET takes off. And they do have the supply chain setup for ramp with that.  \n\nThat's the risk I ended up taking, but it's not exactly a clear as day long for me like $AAOI.",
       "refs": {
         "gap": "12M engines/year 2027 產能目標的一手出處；ASP 假設完全未驗證",
-        "parked_reason": "財務數字屬 Engine C 時變觀測（L4），不進 Engine A；產能目標缺一手來源",
+        "parked_reason": "作者個人持倉觀點，非可入圖事實。其中可查證部分已由本輪一手涵蓋：所稱 ~$830m cash 實際為 US$796.3M（Q2 FY2026 6-K：現金 432.5M ＋短期投資 363.8M，已入 Engine C 觀測）。無法證實部分：2027 年 12M optical engines 年產能與 ASP $125-200 屬作者推估，POET 的 FY2025 20-F 與 Q2 FY2026 6-K 全文均無此數字；Lumilens 為 Amazon 或 Microsoft、與 Mitsubishi 的 prepayment EML、與 Sivers 的 CW 協議等皆為作者臆測並自陳不確定。技術判斷（OE 封裝護城河弱於上游 CW laser）與圖中既有的 tech:poet_optical_interposer 定位一致，無新 delta。",
         "related_research_action_id": "ra_8453b5ad4d5f6216824d15dde37bf825",
-        "research_outcome": "現金一手為 7.963 億美元（Q2 季末），非推文所稱約 8.3 億；1,200 萬顆年產能目標未獲一手佐證",
+        "research_outcome": "author_opinion_key_figures_already_covered_or_unverifiable",
         "storage_permission": "repo_full",
         "trace_attempts_ref": "取得 POET Q1/Q2 2026 6-K Ex-99.1 一手；對 12M optical engines 年產能目標在兩份 filing 中皆無命中",
-        "trace_next_trigger": "POET 下一份 20-F 或投資人簡報明確揭露光引擎年產能目標",
+        "trace_next_trigger": "POET 官方揭露 2027 年 optical engine 年產能目標或 ASP，或公布 Lumilens 以外的 volume agreement",
         "trace_origin_entity": "POET Technologies Inc.",
         "trace_original_url": "https://www.sec.gov/Archives/edgar/data/1437424/000117184326005485/exh_991.htm",
         "trace_requeue_consumed_entities": [
@@ -28996,7 +29012,7 @@
         "trace_requeue_trigger": "related_triaged_lead:lead_1940958c3136e0a33b4e0856b7b05d82",
         "trace_requeued_at": "2026-08-18T23:05:45.408019+00:00",
         "trace_requires_user": "false",
-        "trace_status": "partial",
+        "trace_status": "opinion_no_primary",
         "trace_trigger_entities": [
           "AAOI",
           "POET",
@@ -29009,7 +29025,7 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -33590,11 +33606,11 @@
       "raw_text": "I usually make fun of sellside, but Rosenblatt has pretty goated channel checks on optical names, and their reports are one of the few I like talking about. \n\n$AAOI, $LITE, $SIVE, and the laser party has started to recover around the est. timing windows. \n\neg. last month: \"Multiple short sellers told them they will likely close their positions... late July and early August\". \n\nThey might have missed that they believed $AMD would be $AAOI's first CPO customer... since AAOI said they would be missing from first-gen CPO (maybe future gen?)\n\nBut lot of their talking points about China CPO laser positioning (eg. 2-3 years behind) got corroborated word-for-word from AAOI earnings today.",
       "refs": {
         "claimed_origin": "Rosenblatt Securities channel checks 報告",
-        "parked_reason": "排名與券商原句只有報告本身能證明；核心結論已有一手替代來源，不值得付費",
-        "research_outcome": "推文可驗證的部分（中國 CW 雷射落後、西方雷射供給吃緊）已由 LITE Q4 FY2026 逐字稿獨立佐證，不需依賴該報告",
+        "parked_reason": "轉述 Rosenblatt 賣方 channel check，原始報告為付費研究、公開管道不可得，屬 tier 3 隔離。⚠ 依 L8 不得以轉述當獨立佐證：貼文自陳 Rosenblatt 曾誤判 AMD 為 AAOI 首個 CPO 客戶（AAOI 已否認將出現在第一代 CPO），該來源本身即有已知誤判紀錄。其中『中國 CPO laser 落後 2-3 年』一項，貼文稱已由 AAOI 財報逐字印證——若要入圖應直接引用 AAOI 一手法說逐字，而非經由此轉述。requires_user=true：是否付費取得原始報告需使用者明確決定與 exact 金額核准。",
+        "research_outcome": "paywalled_sellside_note_not_obtainable",
         "trace_attempts_ref": "券商報告原文屬付費 sell-side research，未取得；未授權任何採購",
         "trace_cost_authorized": "false",
-        "trace_next_trigger": "該報告內容被公開報導逐字引用，或出現可驗證的具名 channel check 事實",
+        "trace_next_trigger": "取得 Rosenblatt 原始 channel check 報告（付費研究，需使用者決定是否購買或以合法途徑取得）",
         "trace_requeue_consumed_entities": [
           "AAOI",
           "CO:APPLIED_OPTOELECTRONICS",
@@ -33603,7 +33619,7 @@
         ],
         "trace_requeue_trigger": "related_triaged_lead:lead_1940958c3136e0a33b4e0856b7b05d82",
         "trace_requeued_at": "2026-08-18T23:05:45.408019+00:00",
-        "trace_requires_user": "false",
+        "trace_requires_user": "true",
         "trace_status": "isolated_tier_3",
         "trace_trigger_entities": [
           "AAOI",
@@ -33617,7 +33633,7 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
