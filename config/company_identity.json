@@ -78,6 +78,13 @@
       "research_ticker": null
     },
     {
+      "company_id": "co:churchill_capital_xi",
+      "research_ticker": "CCXI",
+      "market_currency": "USD",
+      "execution_currency": "USD",
+      "execution_venue": "NASDAQ"
+    },
+    {
       "company_id": "co:coherent",
       "research_ticker": "COHR",
       "market_currency": "USD",
@@ -109,6 +116,13 @@
       "market_currency": "USD",
       "execution_currency": "USD",
       "execution_venue": "NYSE"
+    },
+    {
+      "company_id": "co:harmonic_drive_systems",
+      "research_ticker": "6324.T",
+      "market_currency": "JPY",
+      "execution_currency": "JPY",
+      "execution_venue": "TSE"
     },
     {
       "company_id": "co:hyundai_mobis",
@@ -146,6 +160,13 @@
     {
       "company_id": "co:landmark_optoelectronics",
       "research_ticker": "3081.TWO"
+    },
+    {
+      "company_id": "co:leaderdrive",
+      "research_ticker": "688017.SS",
+      "market_currency": "CNY",
+      "execution_currency": "CNY",
+      "execution_venue": "SSE"
     },
     {
       "company_id": "co:lessengers",
@@ -215,6 +236,13 @@
       "research_ticker": null
     },
     {
+      "company_id": "co:nidec",
+      "research_ticker": "6594.T",
+      "market_currency": "JPY",
+      "execution_currency": "JPY",
+      "execution_venue": "TSE"
+    },
+    {
       "company_id": "co:nvidia",
       "research_ticker": "NVDA",
       "market_currency": "USD"
@@ -245,6 +273,13 @@
       "market_currency": "EUR"
     },
     {
+      "company_id": "co:shuanghuan_driveline",
+      "research_ticker": "002472.SZ",
+      "market_currency": "CNY",
+      "execution_currency": "CNY",
+      "execution_venue": "SZSE"
+    },
+    {
       "company_id": "co:sivers_semiconductors",
       "research_ticker": "SIVE.ST",
       "market_currency": "SEK",
@@ -258,6 +293,13 @@
     {
       "company_id": "co:sumitomo_electric",
       "research_ticker": "5802.T"
+    },
+    {
+      "company_id": "co:tesla",
+      "research_ticker": "TSLA",
+      "market_currency": "USD",
+      "execution_currency": "USD",
+      "execution_venue": "NASDAQ"
     },
     {
       "company_id": "co:texas_instruments",
@@ -295,6 +337,13 @@
     {
       "company_id": "co:win_semiconductor",
       "research_ticker": "3105.TWO"
+    },
+    {
+      "company_id": "co:xpeng",
+      "research_ticker": "XPEV",
+      "market_currency": "USD",
+      "execution_currency": "USD",
+      "execution_venue": "NYSE"
     },
     {
       "company_id": "co:zhongji_innolight",
