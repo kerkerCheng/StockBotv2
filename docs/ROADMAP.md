@@ -102,6 +102,29 @@ brainstorm；範圍大到需要驗收條件才開 plan。brainstorm 用 frontmat
 **決定不看尺寸**（見 `AGENTS.md`「Alpha 呈現契約」）。理由是實測：6 個 ELIGIBLE cohort 的
 target 全是同一個 0.1%，常數不帶資訊，而使用者要的是「撒網、推薦幾檔、追蹤新事件」。
 
+### 主題範圍（2026-08-20 使用者定案）
+
+**以 CPO 與 humanoid 兩條為主。** 使用者原話：HBM「太大了，資金太瘋狂了，而且太寡占，
+感覺現在進去太晚了」。因此 HBM／記憶體軸**只做到 Micron 這筆入圖候選為止，不再往下深挖**
+（`co:micron_technology` 已註冊、prepared RA `ra_b70b2699` 待核准）；SK Hynix／Samsung
+不主動 onboarding。
+
+判準本身仍然有效——tech:hbm 確實是圖中最大的供給側空白——但**「是個真瓶頸」不等於
+「現在該投」**：寡占程度、資金擁擠度與進場時點是使用者的判斷維度，不由 chokepoint
+排名決定。往後做廣度掃描時，先用這條過濾，不要再把 HBM 當首選推薦。
+
+⚠ humanoid 的可投資機會在**零組件供應商**不在整機：`co:agility_robotics` 未上市
+（`research_ticker=null`，其 cohort 長期卡在「Agility 未上市，尚無任何紀錄」）、
+`co:boston_dynamics` 屬 Hyundai。圖中已有的實體關係只有
+`co:hyundai_mobis SUPPLIES_TO co:boston_dynamics` 與
+`co:schaeffler DEVELOPS prod:schaeffler_rotary_actuator_platform`
+（後者 `IS_COMPONENT_OF tech:humanoid_robot_systems`）。
+**5 個 robotics chokepoint 全部 0 個公司供應商**（`tech:robotic_actuator`、
+`tech:humanoid_robot_systems`、`tech:robotics_as_a_service`、
+`tech:advanced_robotic_devices`、`tech:logistics_tote_transfer`），
+而 `tech:robotic_actuator IS_COMPONENT_OF prod:atlas_humanoid_robot`——
+actuator 是已在圖中被標為關鍵零組件、卻完全沒有供給側的那一格。
+
 新 workstream：**廣度、事件追蹤、量測**。三條各有可驗證的數字，取代舊的「非零 live 區間」：
 
 | 目標 | 現值（2026-08-15） | 怎麼變好 |
