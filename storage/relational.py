@@ -68,9 +68,20 @@ def _current_windows_account() -> str:
 
 def _windows_owner(path: Path) -> str:
     escaped = str(path).replace("'", "''")
+    system_root = os.environ.get("SystemRoot") or os.environ.get("WINDIR")
+    if not system_root:
+        raise PrivateStorageError("cannot determine Windows system root")
+    windows_powershell_root = (
+        Path(system_root) / "System32" / "WindowsPowerShell" / "v1.0"
+    )
+    child_env = os.environ.copy()
+    # A parent PowerShell 7 process can prepend its own Modules directory to
+    # PSModulePath. Windows PowerShell 5.1 then tries to load the incompatible
+    # PowerShell 7 Security module and Get-Acl fails before checking the ACL.
+    child_env["PSModulePath"] = str(windows_powershell_root / "Modules")
     result = subprocess.run(
         [
-            "powershell.exe",
+            str(windows_powershell_root / "powershell.exe"),
             "-NoProfile",
             "-NonInteractive",
             "-Command",
@@ -79,6 +90,7 @@ def _windows_owner(path: Path) -> str:
         check=True,
         capture_output=True,
         text=True,
+        env=child_env,
     )
     owner = result.stdout.strip()
     if not owner:
