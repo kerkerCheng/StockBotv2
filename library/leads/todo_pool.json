@@ -3002,12 +3002,20 @@
     },
     {
       "added_at": "2026-08-20T01:30:20.219122+00:00",
+      "completion_authority": {
+        "action_digest": "54e6589d51b7c01b32883162dbf523c04c8cea1646f49119b0567ca5ab810c18",
+        "cohort_id": "dc_b05cc1360e4bdf2a238787c23e7b227d",
+        "commit": "9bd0952cbc41b15f07a2a04eafd817606536d5ef",
+        "company_id": "co:micron_technology",
+        "verified_at": "2026-08-20T04:38:33.534074+00:00"
+      },
       "hint": "核准 exact graph delta；Decision handoff：co:micron_technology。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 190,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_b70b26997b6f66774415e2dbe879ab62;digest:54e6589d51b7c01b32883162dbf523c04c8cea1646f49119b0567ca5ab810c18;commit:9bd0952cbc41b15f07a2a04eafd817606536d5ef;cohort:dc_b05cc1360e4bdf2a238787c23e7b227d",
       "ref_id": "ra_b70b26997b6f66774415e2dbe879ab62",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-20T04:38:33.534074+00:00",
       "source": "research_action",
       "title": "Micron（MU）→ HBM：一手確認供應關係，策略客戶協議為 take-or-pay",
       "type": "ra_admission"
@@ -6887,6 +6895,15 @@
       "ref_id": "dc_606a4a50609e3b708f2138bb597ffacc",
       "type": "decision_review",
       "verb": "source_returned"
+    },
+    {
+      "at": "2026-08-20T04:38:33.534074+00:00",
+      "n": 190,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_b70b26997b6f66774415e2dbe879ab62;digest:54e6589d51b7c01b32883162dbf523c04c8cea1646f49119b0567ca5ab810c18;commit:9bd0952cbc41b15f07a2a04eafd817606536d5ef;cohort:dc_b05cc1360e4bdf2a238787c23e7b227d",
+      "ref_id": "ra_b70b26997b6f66774415e2dbe879ab62",
+      "type": "ra_admission",
+      "verb": "go"
     }
   ],
   "next_n": 191,

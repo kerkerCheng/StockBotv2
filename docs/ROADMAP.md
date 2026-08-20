@@ -113,6 +113,17 @@ target 全是同一個 0.1%，常數不帶資訊，而使用者要的是「撒�
 「現在該投」**：寡占程度、資金擁擠度與進場時點是使用者的判斷維度，不由 chokepoint
 排名決定。往後做廣度掃描時，先用這條過濾，不要再把 HBM 當首選推薦。
 
+**優先序是主線／備援，不是並列（2026-08-20 澄清）：** 其他非 HBM 的 AI 相關瓶頸
+——SerDes／serializer、載板與中介層（`mat:glass_substrate`、`mat:silicon_interposer`）、
+測試（圖中連節點都還沒有）——使用者的原話是「上面暫時沒東西走的話可以挖」。
+**只有 CPO 與 humanoid 兩條主線當輪沒有可推進的工作時才動它們**，不得因為某個備援
+節點的 chokepoint 分數較高就插隊。已勘查的現況（留給屆時直接接手）：
+`tech:serdes` 0 供應商且 `IS_COMPONENT_OF tech:ai_switch`；
+`tech:dsp_1p6t` 0 供應商且 `IS_COMPONENT_OF tech:cpo`（這個其實長在 CPO 主線上）；
+Marvell FY2026 10-K Item 1 一段內同時逐字涵蓋 ultra-high-speed SerDes、PAM／coherent
+optical DSP、TIA、CPO、LPO chipset、AEC DSP 與 PCIe retimer，是補這幾格的現成一手來源
+（注意其 10-Q 為財務導向，`\bDSP\b`／SerDes／optical 皆 0 次，產品描述只在 10-K）。
+
 ⚠ humanoid 的可投資機會在**零組件供應商**不在整機：`co:agility_robotics` 未上市
 （`research_ticker=null`，其 cohort 長期卡在「Agility 未上市，尚無任何紀錄」）、
 `co:boston_dynamics` 屬 Hyundai。圖中已有的實體關係只有
