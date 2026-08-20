@@ -1,0 +1,119 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "hds_official_products_strain_wave_20260820",
+    "title": "Harmonic Drive Systems official product overview — strain wave gearing and rotary actuators",
+    "url": "https://www.hds.co.jp/english/products/",
+    "origin_entity": "Harmonic Drive Systems Inc.",
+    "publisher": "Harmonic Drive Systems Inc.",
+    "published_at": "2026-08-20",
+    "retrieved_at": "2026-08-20",
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "官方公開產品頁；只保存 canonical URL 與研究所需的有限逐字節錄。",
+    "source_type": "ir_deck",
+    "evidence_tier": 2
+  },
+  "sources": [
+    {
+      "id": "hds_official_products_strain_wave_20260820_s1",
+      "locator": "products overview, Harmonic Drive gearing section",
+      "quote": "The Harmonic Drive® is a speed reducer comprised of only three basic components, and is compact and lightweight yet high torque and high accuracy. It is used in a wide range of applications as a highly reliable precision speed reducer."
+    },
+    {
+      "id": "hds_official_products_strain_wave_20260820_s2",
+      "locator": "products overview, rotary actuators section",
+      "quote": "High accuracy and high torque actuators that provide an optimal combination of servo motor and highly accurate Harmonic Drive® products."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:harmonic_drive_systems",
+      "type": "Company",
+      "name": "Harmonic Drive Systems Inc.",
+      "abstraction_level": "robot_subsystem",
+      "role": "robot_component_supplier",
+      "aliases": [
+        "Harmonic Drive",
+        "HDS",
+        "6324.T"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "source_ids": [
+        "hds_official_products_strain_wave_20260820_s1",
+        "hds_official_products_strain_wave_20260820_s2"
+      ]
+    },
+    {
+      "id": "tech:strain_wave_gear",
+      "type": "TechNode",
+      "name": "Strain wave gearing (harmonic reducer)",
+      "abstraction_level": "robot_subsystem",
+      "role": "bottleneck_supplier",
+      "aliases": [
+        "harmonic drive",
+        "harmonic reducer",
+        "諧波減速器"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "source_ids": [
+        "hds_official_products_strain_wave_20260820_s1"
+      ]
+    },
+    {
+      "id": "tech:robotic_actuator",
+      "type": "TechNode",
+      "name": "Robotic actuator",
+      "abstraction_level": "robot_subsystem",
+      "role": "robot_component_supplier",
+      "aliases": [
+        "actuator"
+      ],
+      "attributes": {},
+      "confidence": 0.8,
+      "source_ids": [
+        "hds_official_products_strain_wave_20260820_s2"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:harmonic_drive_systems",
+      "dst_id": "tech:strain_wave_gear",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.85,
+      "source_ids": [
+        "hds_official_products_strain_wave_20260820_s1",
+        "hds_official_products_strain_wave_20260820_s2"
+      ]
+    },
+    {
+      "id": "e2",
+      "src_id": "tech:strain_wave_gear",
+      "dst_id": "tech:robotic_actuator",
+      "relation": "is_component_of",
+      "attributes": {},
+      "confidence": 0.8,
+      "source_ids": [
+        "hds_official_products_strain_wave_20260820_s2"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "hds_official_products_strain_wave_20260820_cl1",
+      "statement": "Harmonic Drive Systems 官方產品頁一手描述諧波減速器（strain wave gearing）的物理特性：僅三個基本元件構成、compact and lightweight yet high torque and high accuracy，並以 servo motor 與該減速器組合成 rotary actuator。此結構特性（輕、小、高扭矩、高精度）正是人形機器人關節的關鍵需求，與 RV 減速器適用中大型工業機器人手臂形成分工。⚠ 邊界必須隨值一起讀：**本頁官方列出的應用為 collaborative robots、6-axis robots、SCARA robots、晶圓處理與雷射加工等，完全未提及 humanoid 或人形機器人**。因此「諧波減速器是人形機器人瓶頸」在本文件中僅得到物理特性層面的支持，屬技術推論而非公司宣稱；市場給予該公司的 humanoid 溢價（1 年 +131%、forward P/E 76.6，2026-08-20 實測）並未獲得其自身一手揭露背書。",
+      "subject_id": "e1",
+      "demand_proof_level": "inferred",
+      "disproof_condition": "任一成立即視為本 claim 的技術分工假設失效：(1) 主要人形機器人開發商公開採用 RV 減速器或其他非諧波方案作為主要關節減速機構；(2) Harmonic Drive Systems 於財報或官方文件中揭露人形機器人相關營收，且金額顯示其占比長期低於 5%，代表純度敘事不成立；(3) 出現成本或性能上可取代諧波減速器的新關節方案並取得量產採用。核查頻率：每季財報與主要人形機器人發表會後；觸發後 48 小時內人工 review。",
+      "confidence": 0.7,
+      "source_ids": [
+        "hds_official_products_strain_wave_20260820_s1",
+        "hds_official_products_strain_wave_20260820_s2"
+      ]
+    }
+  ]
+}

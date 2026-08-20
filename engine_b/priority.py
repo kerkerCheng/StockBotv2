@@ -21,6 +21,16 @@ PRIORITY_WEIGHTS: dict[str, float] = {
     # 部位、卻還沒建 cohort 的標的在研究排序上等於不存在。權重刻意低於
     # contradiction（反證仍最優先）但高於 novelty。
     "holdings_impact": 4.0,
+    # 該 lead 提到的公司是否**位於已知 chokepoint 上**（`query/bottleneck.py` 的
+    # rank_bottlenecks 認定的瓶頸邊端點）。2026-08-20 使用者提問「它們應該會因為
+    # 瓶頸性排到 pq1 前面？」——實測答案當時是不會：本表原本七項權重全部不含瓶頸性，
+    # 於是「AXT 供應 COHR 的 InP」與「某公司財報季總評」在排序上只由 tier 與 flags
+    # 區分，而系統整個定位就是找瓶頸。
+    # 權重取 3.5：高於 independent_source（3.0）與 novelty（2.0），但低於
+    # thesis_impact／holdings_impact（4.0）與 contradiction（5.0）——結構上重要不等於
+    # 比「已有部位」或「可能推翻 thesis」更急。同樣套 focus 稀釋，否則提到十幾檔的
+    # 總體評論只要碰巧掃到一家瓶頸公司就拿滿分，正是 FOCUS_TICKER_CAP 要防的事。
+    "chokepoint_impact": 3.5,
     "independent_source": 3.0,
     "novelty": 2.0,
     # 使用者明確指定的 bounded campaign 是 pq1 排程 authority，但仍不授權 pq2。
@@ -100,12 +110,16 @@ def score_lead(
     *,
     thesis_impact: bool = False,
     holdings_impact: bool = False,
+    chokepoint_impact: bool = False,
     mentioned_tickers: int = 0,
 ) -> float:
     """單則 lead 的 priority 分數；高＝pq1 先處理。
 
     ``mentioned_tickers`` 是該 lead 提及的具名標的總數，用來稀釋 impact 權重
     （見 FOCUS_TICKER_CAP）。0 表示呼叫端未提供，維持不打折的舊行為。
+
+    ``chokepoint_impact`` 由呼叫端判定該 lead 是否提到位於已知瓶頸上的公司；
+    與 tracked/held 一樣採注入而非在此查圖，以保持本模組不依賴 Neo4j。
     """
     triage = lead.get("triage") or {}
     try:
@@ -123,6 +137,8 @@ def score_lead(
         score += PRIORITY_WEIGHTS["thesis_impact"] * focus
     if holdings_impact:
         score += PRIORITY_WEIGHTS["holdings_impact"] * focus
+    if chokepoint_impact:
+        score += PRIORITY_WEIGHTS["chokepoint_impact"] * focus
     if flags.get("independent_source"):
         score += PRIORITY_WEIGHTS["independent_source"]
     if flags.get("novelty"):
@@ -140,6 +156,8 @@ def rank_leads(
     tracked_tickers: frozenset[str] = frozenset(),
     held_tickers: frozenset[str] = frozenset(),
     held_company_ids: frozenset[str] = frozenset(),
+    chokepoint_tickers: frozenset[str] = frozenset(),
+    chokepoint_company_ids: frozenset[str] = frozenset(),
 ) -> list[tuple[float, dict[str, Any]]]:
     """回 [(score, lead)] 依 score 由高到低（tie-break lead_id 穩定）。
 
@@ -148,7 +166,10 @@ def rank_leads(
 
     `tracked_tickers`（有在追）與 `held_tickers`／`held_company_ids`（真的有部位）
     分開注入：兩者語意不同，且先前只有前者，導致實際持股在排序上零加權。
-    priority 模組仍不硬耦合 Engine A/C/D——三者都由 caller 注入。
+    `chokepoint_tickers`／`chokepoint_company_ids` 是位於已知瓶頸上的公司，
+    由 caller 從 `query/bottleneck.py` 的排序結果導出；本模組不查圖。
+
+    priority 模組仍不硬耦合 Engine A/C/D——四者都由 caller 注入。
     """
     scored: list[tuple[float, dict[str, Any]]] = []
     for lead in leads:
@@ -156,12 +177,16 @@ def rank_leads(
         company_ids = lead_company_ids(lead)
         impact = bool(tickers & tracked_tickers)
         held = bool(tickers & held_tickers) or bool(company_ids & held_company_ids)
+        choke = bool(tickers & chokepoint_tickers) or bool(
+            company_ids & chokepoint_company_ids
+        )
         scored.append(
             (
                 score_lead(
                     lead,
                     thesis_impact=impact,
                     holdings_impact=held,
+                    chokepoint_impact=choke,
                     mentioned_tickers=len(tickers),
                 ),
                 dict(lead),

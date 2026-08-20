@@ -326,6 +326,24 @@ TL;DR：<直接回答「今天要不要加碼、加哪一檔」；不得只列�
 - 已持有部位必須列 disproof 狀態；`None` 或 lifecycle `expired` 要當成缺口提出。
 - 本段**不得因今天無新事件而省略**，規則同 Beta 主力表。
 
+## 追蹤中的外部事件（無 pq2 編號）
+資料源：`& '.venv\Scripts\python.exe' -m engine_b.cli trace-backlog`
+| 標的／主題 | 在等什麼 | 可自動喚醒 | 已等待 |
+|---|---|---|---|
+| Agility Robotics（CCXI→AGLT） | 公開 Form S-4 含 Agility 經審計財務，或交易完成取得 AGLT ticker | 是 | 自 2026-08-13 |
+
+必填規則：
+- 只列 `trace_status=original_obtained` 或 `partial` **且**有 `trace_next_trigger` 的項目——
+  那代表「一手已追過、在等世界產生新事實」，不是研究失敗。
+- `trace_requires_user=true` 的**不放這裡**，它們該走 `source_trace_review` 取 pq2 編號。
+- ⚠ **本段不得因為「今天沒有新進展」而省略。** 這正是它存在的理由：
+  2026-08-20 使用者問「追蹤 X 這麼久，humanoid 的 lead 為何圖裡都沒有」，而 CCXI 那條
+  其實被處理得很好——9 筆 filing 逐一取得一手、逐字比對（`agility 0 次、robotics 0 次`）、
+  確認 S-4 仍為 confidential submission、設好 `related_entity_signal` 喚醒條件、並連到
+  pq2 [74]。問題只在於 brief 僅顯示**當輪** park 的項目，08-13 之後它就再也不出現，
+  使用者因此完全看不到系統正在等什麼。這與「bottleneck 排名早就把 COHR 排第一卻沒進
+  brief」是同一個病：**做了正確的工作，但產出沒有消費端**（L13）。
+
 ## 已持有 alpha 部位的 disproof 追蹤（無 pq2 編號）
 | 標的 | 進場 | 現價／損益 | catalyst（何時會知道） | disproof 是否觸發 | lifecycle |
 |---|---|---|---|---|---|

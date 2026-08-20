@@ -95,3 +95,45 @@ def test_broad_macro_post_no_longer_outranks_focused_tier1_filing() -> None:
 
     scores = {lead["source"]: score for score, lead in ranked}
     assert scores["x:serenity"] < scores["edgar:LITE"]
+
+
+def test_chokepoint_impact_lifts_supply_chain_leads_over_generic_commentary() -> None:
+    """瓶頸性參與 pq1 排序——系統整個定位就是找瓶頸，排序卻曾經不看它。
+
+    事發（2026-08-20）：使用者問「它們應該會因為瓶頸性排到 pq1 前面？」，實測答案是
+    不會——PRIORITY_WEIGHTS 七項全部不含瓶頸性，於是「AXT 供應 COHR 的 InP」與
+    「財報季總評」只由 tier 與 flags 區分。
+    """
+
+    from engine_b.priority import PRIORITY_WEIGHTS, rank_leads, score_lead
+
+    supply_chain = {
+        "lead_id": "a", "triage": {"tier": 2, "priority_flags": {}},
+        "entities": {"tickers": ["AXTI"]},
+    }
+    base = score_lead(supply_chain, mentioned_tickers=1)
+    lifted = score_lead(supply_chain, chokepoint_impact=True, mentioned_tickers=1)
+    assert lifted - base == PRIORITY_WEIGHTS["chokepoint_impact"]
+
+    # 注入後 rank_leads 應給出同樣的提升
+    ranked = rank_leads([supply_chain], chokepoint_tickers=frozenset({"AXTI"}))
+    assert ranked[0][0] == lifted
+
+    # 排序仍低於 contradiction：結構重要 ≠ 比「可能推翻 thesis」更急
+    assert PRIORITY_WEIGHTS["chokepoint_impact"] < PRIORITY_WEIGHTS["contradiction"]
+    assert PRIORITY_WEIGHTS["chokepoint_impact"] < PRIORITY_WEIGHTS["holdings_impact"]
+
+
+def test_chokepoint_impact_is_diluted_by_ticker_count() -> None:
+    """提到十幾檔的總評不該因為碰巧掃到一家瓶頸公司就拿滿分（FOCUS_TICKER_CAP）。"""
+
+    from engine_b.priority import PRIORITY_WEIGHTS, score_lead
+
+    broad = {
+        "lead_id": "b", "triage": {"tier": 2, "priority_flags": {}},
+        "entities": {"tickers": [f"T{i}" for i in range(12)]},
+    }
+    base = score_lead(broad, mentioned_tickers=12)
+    lifted = score_lead(broad, chokepoint_impact=True, mentioned_tickers=12)
+    assert lifted - base < PRIORITY_WEIGHTS["chokepoint_impact"]
+    assert abs((lifted - base) - PRIORITY_WEIGHTS["chokepoint_impact"] * 0.25) < 1e-9
