@@ -3184,6 +3184,30 @@
       "source": "decision_lab",
       "title": "REVIEW — co:agility_robotics",
       "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-21T06:31:47.875434+00:00",
+      "hint": "核准 exact graph delta；Decision handoff：co:marvell_technology。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 201,
+      "reason": null,
+      "ref_id": "ra_83e73ee3b6022e86db033058cbc94a9f",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "Marvell → LPO／CPO／TIA：補上孤立節點 tech:lpo 的第一條邊",
+      "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-08-21T06:31:47.875434+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 202,
+      "reason": null,
+      "ref_id": "dc_957bff3701ea4e46d962bfb9ff0932c8",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:coherent",
+      "type": "decision_review"
     }
   ],
   "log": [
@@ -7224,6 +7248,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 201,
+  "next_n": 203,
   "schema_version": "1"
 }
