@@ -5,24 +5,24 @@
   "_date_confidence": "confirmed=公司已公告確切日期；estimated=由歷史申報節奏或 provider 預估。依 lifecycle_schedule 的既有規則，estimated 照樣排程（提早看一次的成本遠低於錯過裁決點），但呈現時必須標明。",
   "entries": [
     {
-      "ticker": "AVGO",
+      "ticker": "6324.T",
       "catalyst_checkpoints": [
         {
-          "date": "2026-09-03",
-          "what": "Q3 FY2026 財報",
-          "decides": "firmly committed RPO 是否自 US$164.6B 維持或續增；custom AI accelerator 交付時程是否重申。對應 disproof 第 (1) 條",
+          "date": "2026-11-05",
+          "what": "Q2 FY2027 財報",
+          "decides": "是否首次單獨揭露 humanoid 相關營收或訂單；精密減速器部門營收動能。對應 disproof 第 (1) 條——若揭露後占比長期低於 5%，現行 forward P/E 77／1 年 +131% 的溢價即無基本面支撐",
           "date_confidence": "estimated",
-          "basis": "yfinance calendar Earnings Date（2026-08-20 取得）；AVGO 慣例為 9 月上旬"
+          "basis": "⚠ yfinance 回傳的 Earnings Date 2026-08-07 是**已發布的 Q1**，不可當下次催化劑（2026-08-21 查核）。公司財年 3 月底結束，Q2 財報慣例為 11 月上旬，取月初以免錯過"
         }
       ]
     },
     {
-      "ticker": "POET",
+      "ticker": "AAOI",
       "catalyst_checkpoints": [
         {
-          "date": "2026-11-12",
-          "what": "Q3 2026 財報（6-K）",
-          "decides": "Lumilens US$50M 首期 PO 是否開始出貨並認列營收；剩餘 20,629,268 份 warrants 是否新增 vest。對應 disproof 第 (1)(2) 條",
+          "date": "2026-11-06",
+          "what": "Q3 2026 財報",
+          "decides": "Q4 營收 guidance 下緣——待辦 [134] 明確在等這個數字才能設定可觀測 disproof 門檻",
           "date_confidence": "estimated",
           "basis": "yfinance calendar Earnings Date（2026-08-20 取得）"
         }
@@ -41,24 +41,36 @@
       ]
     },
     {
+      "ticker": "AVGO",
+      "catalyst_checkpoints": [
+        {
+          "date": "2026-09-03",
+          "what": "Q3 FY2026 財報",
+          "decides": "firmly committed RPO 是否自 US$164.6B 維持或續增；custom AI accelerator 交付時程是否重申。對應 disproof 第 (1) 條",
+          "date_confidence": "estimated",
+          "basis": "yfinance calendar Earnings Date（2026-08-20 取得）；AVGO 慣例為 9 月上旬"
+        }
+      ]
+    },
+    {
+      "ticker": "IQE.L",
+      "catalyst_checkpoints": [
+        {
+          "date": "2026-09-15",
+          "what": "H1 2026 interim results",
+          "decides": "Photonics／InP 營收動能與 Tower 協議首年最低採購履約進度。對應 disproof 第 (2)(3) 條",
+          "date_confidence": "estimated",
+          "basis": "coverage assessment 的 catalyst 散文載明「預計 2026 年 9 月」，未給確切日；取月中以免錯過。yfinance 對 LSE 半年報制標的無 Earnings Date"
+        }
+      ]
+    },
+    {
       "ticker": "LITE",
       "catalyst_checkpoints": [
         {
           "date": "2026-11-06",
           "what": "Q1 FY2027 財報",
           "decides": "InP 依賴與 OCS／ELS 出貨進度；瓶頸地位（bottleneck 排名第 4，5/5 替代難度）是否有客戶端印證",
-          "date_confidence": "estimated",
-          "basis": "yfinance calendar Earnings Date（2026-08-20 取得）"
-        }
-      ]
-    },
-    {
-      "ticker": "AAOI",
-      "catalyst_checkpoints": [
-        {
-          "date": "2026-11-06",
-          "what": "Q3 2026 財報",
-          "decides": "Q4 營收 guidance 下緣——待辦 [134] 明確在等這個數字才能設定可觀測 disproof 門檻",
           "date_confidence": "estimated",
           "basis": "yfinance calendar Earnings Date（2026-08-20 取得）"
         }
@@ -77,6 +89,18 @@
       ]
     },
     {
+      "ticker": "MU",
+      "catalyst_checkpoints": [
+        {
+          "date": "2026-09-24",
+          "what": "Q4 FY2026 財報",
+          "decides": "take-or-pay RPO（約 US$5B）是否維持或續增；US$422M contract liabilities 是否轉列營收而非迴轉；HBM 產能與定價動能。對應 disproof 第 (1)(2) 條",
+          "date_confidence": "estimated",
+          "basis": "yfinance calendar Earnings Date（2026-08-21 取得）；Micron 財年 8 月底結束，Q4 財報慣例為 9 月下旬"
+        }
+      ]
+    },
+    {
       "ticker": "NVDA",
       "catalyst_checkpoints": [
         {
@@ -89,14 +113,14 @@
       ]
     },
     {
-      "ticker": "IQE.L",
+      "ticker": "POET",
       "catalyst_checkpoints": [
         {
-          "date": "2026-09-15",
-          "what": "H1 2026 interim results",
-          "decides": "Photonics／InP 營收動能與 Tower 協議首年最低採購履約進度。對應 disproof 第 (2)(3) 條",
+          "date": "2026-11-12",
+          "what": "Q3 2026 財報（6-K）",
+          "decides": "Lumilens US$50M 首期 PO 是否開始出貨並認列營收；剩餘 20,629,268 份 warrants 是否新增 vest。對應 disproof 第 (1)(2) 條",
           "date_confidence": "estimated",
-          "basis": "coverage assessment 的 catalyst 散文載明「預計 2026 年 9 月」，未給確切日；取月中以免錯過。yfinance 對 LSE 半年報制標的無 Earnings Date"
+          "basis": "yfinance calendar Earnings Date（2026-08-20 取得）"
         }
       ]
     }

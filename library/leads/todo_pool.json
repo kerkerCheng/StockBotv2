@@ -2789,9 +2789,10 @@
         "type": "decision_blocker_mode_changed"
       },
       "reason": null,
+      "receipt": null,
       "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "drop",
+      "resolved_at": "2026-08-21T00:26:24.192283+00:00",
       "source": "decision_lab",
       "source_cleared": {
         "at": "2026-08-19T22:33:58.135528+00:00",
@@ -2889,6 +2890,7 @@
     },
     {
       "added_at": "2026-08-19T04:56:42.255659+00:00",
+      "deferred_at": "2026-08-21T00:26:24.192314+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 181,
       "reason": null,
@@ -2901,6 +2903,7 @@
     },
     {
       "added_at": "2026-08-19T04:56:42.255659+00:00",
+      "deferred_at": "2026-08-21T00:26:24.192331+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 182,
       "reason": null,
@@ -2965,6 +2968,7 @@
     },
     {
       "added_at": "2026-08-19T06:06:46.434087+00:00",
+      "deferred_at": "2026-08-21T00:26:24.192348+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 187,
       "reason": null,
@@ -2977,6 +2981,7 @@
     },
     {
       "added_at": "2026-08-19T06:06:46.434087+00:00",
+      "deferred_at": "2026-08-21T00:26:24.192363+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 188,
       "reason": null,
@@ -3054,6 +3059,7 @@
     },
     {
       "added_at": "2026-08-20T15:36:57.789792+00:00",
+      "deferred_at": "2026-08-21T00:26:24.192379+00:00",
       "hint": "go 只排入 bounded pq1；不接受 claim、不入圖。若需付費，另核准 exact 金額／方案。",
       "n": 193,
       "reason": null,
@@ -3078,12 +3084,20 @@
     },
     {
       "added_at": "2026-08-20T22:44:59.777225+00:00",
+      "completion_authority": {
+        "action_digest": "87026d6e52e60f9ab1ea30d91c42e572cbed867736c5f76a68b7ac583f2a5712",
+        "cohort_id": "dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
+        "commit": "46914591a7133fc301c6abdb6dd0cdacb031e517",
+        "company_id": "co:meta",
+        "verified_at": "2026-08-21T00:28:55.161600+00:00"
+      },
       "hint": "核准 exact graph delta；Decision handoff：co:meta。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 195,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_36b579586f7cebb6c5e5130d9a0f67c7;digest:87026d6e52e60f9ab1ea30d91c42e572cbed867736c5f76a68b7ac583f2a5712;commit:46914591a7133fc301c6abdb6dd0cdacb031e517;cohort:dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
       "ref_id": "ra_36b579586f7cebb6c5e5130d9a0f67c7",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-21T00:28:55.161600+00:00",
       "source": "research_action",
       "title": "Meta–Sumitomo Electric 多年期光纖設備供應協議（tier-3）",
       "type": "ra_admission"
@@ -3092,10 +3106,11 @@
       "added_at": "2026-08-21T00:20:58.284511+00:00",
       "hint": "TL;DR：Micron（NASDAQ: MU，記憶體三巨頭之一）於 2026-08-20 經 [190] 入圖後自動建立 cohort dc_b05cc136，但 decision 沒有 catalyst 與 disproof，系統套用 policy 的 +72h 預設 expiry（2026-08-23）。catalyst_watch 已正確把它標成🔴設定不完整——這是 L7 說的「永遠不會響的火警警報」，且成因是昨天入圖時我沒補上，不是外部事件。\n\n已有一手（Q3 FY2026 10-Q, filed 2026-06-25, accession 0000723125-26-000015，已入圖）：策略客戶協議為 take-or-pay 結構、含 contractually enforceable volumes，RPO 約 US$5B、其中 US$422M 已收為 contract liabilities；HBM 屬 DRAM 產品線（3D 堆疊＋TSV），由 CMBU 負責 HBM for all data center customers；2025 年前十大客戶占營收逾半、資料中心端約占一半；Netlist 於 2025-05-19 起訴指 HBM 產品侵權，2026-03-06 移轉 D. Del.。\n\n市場現況（yfinance 快照 2026-08-21，非一手）：股價 US$974.33、市值約 US$1.10T、forward P/E 6.26、毛利率 72.6%、年營收約 US$90.3B。⚠ forward P/E 僅 6.26 配 72.6% 毛利，隱含市場預期獲利將大幅下滑——記憶體週期性定價，與 AI 敘事方向相反，這個張力本身就是 thesis 的核心問題。\n\n建議 catalyst：Q4 FY2026 財報（yfinance 估 2026-09-24；Micron 財年 8 月底結束，該日期屬 estimated），揭露 (a) RPO 是否維持或續增、(b) contract liabilities 是否轉列營收、(c) HBM 產能與定價動能。\n\n建議 disproof（任一成立即視為 thesis 失效）：(1) 到 2027-03-31，RPO 自約 US$5B 下滑逾 30%，或公司揭露任一 take-or-pay 協議遭重議、取消；(2) 到 2027-03-31，US$422M contract liabilities 大幅迴轉而非轉列營收——那代表客戶押金退回而非出貨；(3) 到 2027-06-30，Netlist 訴訟出現對 Micron 不利的終局判決且損害金額重大；(4) 到 2027-06-30，公司將 HBM 移出 CMBU 且無替代業務單位承接，或停止揭露 HBM 產品線。核查頻率：每季 10-Q／10-K；觸發後 48 小時內人工 review 決定 retire 或 revise。\n\n建議 expiry：2026-10-15（Q4 財報預期時點加約三週緩衝，符合 expiry 不得早於催化劑時點）。\n\ngo 授權：把這組 catalyst／disproof／expiry 用於 MU 的下一次 reassess，並同步寫入 thesis/catalyst_calendar.json 讓 catalyst_watch 不再標設定不完整。不下單、不入圖、不改 Google Sheet。⚠ 提醒：你已定案 HBM 不深挖（太寡占、進場太晚），本項只是把既有 cohort 的判準補完整，不代表要投。",
       "n": 196,
-      "reason": null,
+      "reason": "使用者核准 MU catalyst／disproof／expiry：catalyst=Q4 FY2026 財報（估 2026-09-24）；disproof 四條（RPO 下滑逾 30%／contract liabilities 迴轉／Netlist 不利終局判決／HBM 移出 CMBU）；expiry=2026-10-15",
+      "receipt": "authority:decision;ref:pd_f87f24f695192e4901496350ea629b1b",
       "ref_id": "dc_b05cc1360e4bdf2a238787c23e7b227d",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-21T00:27:20.344457+00:00",
       "source": "manual",
       "title": "確認 Micron（MU）decision catalyst／disproof — 修 [192] 的假鬧鐘",
       "type": "manual"
@@ -3104,10 +3119,11 @@
       "added_at": "2026-08-21T00:21:26.925816+00:00",
       "hint": "TL;DR：Harmonic Drive Systems（東證 6324.T，諧波減速器／strain wave gearing 廠商）於 2026-08-20 經 [191] 入圖後自動建立 cohort dc_cc46527a，但 decision 沒有 catalyst 與 disproof，系統套 +72h 預設 expiry（2026-08-23）。catalyst_watch 已標🔴設定不完整。成因同 MU：昨天入圖時我沒補，不是外部事件。\n\n圖中位置：co:harmonic_drive_systems -[supplies_to]-> tech:strain_wave_gear -[is_component_of]-> tech:robotic_actuator -[is_component_of]-> prod:atlas_humanoid_robot。這是 humanoid actuator 供給側的第一格。\n\n已有一手（hds.co.jp 官方產品頁，tier 2，已入圖）：諧波減速器僅三個基本元件構成、compact and lightweight yet high torque and high accuracy，與 servo motor 組成 rotary actuator。⚠ 最重要的邊界已寫進 claim：**官方列出的應用是 collaborative robots、6-axis robots、SCARA robots、晶圓處理與雷射加工，完全未提 humanoid**。所以「諧波減速器＝人形機器人瓶頸」目前只有物理特性層面的支持，屬技術推論而非公司宣稱。\n\n市場現況（yfinance 快照 2026-08-21，非一手）：股價 JPY 5,830、市值約 JPY 552B、forward P/E 77.0、毛利率 32.3%、年營收約 JPY 62.7B。1 年報酬 +131%、2 年 +48%、距 52 週高 -35%。對照同業：Nabtesco EV/Rev 1.61（其 60% 市占是中大型**工業**機器人，非 humanoid）、綠的諧波 EV/Rev 90.7。⚠ 市場已把 humanoid 溢價集中打在純標的上，而**沒有任何一家做出可稽核的 humanoid 營收揭露**——這正是 thesis 的核心風險。\n\n建議 catalyst：Q2 FY2027 財報（公司財年 3 月底結束，Q2 財報慣例為 11 月上旬；⚠ yfinance 回傳的 2026-08-07 是**已發布的 Q1**，不可當下次催化劑用，故本日期為 estimated 而非 confirmed），觀察 (a) 是否首次單獨揭露 humanoid／人形機器人相關營收或訂單、(b) 精密減速器部門營收動能、(c) 產能擴張計畫。\n\n建議 disproof（任一成立即視為 thesis 失效）：(1) 到 2027-06-30，公司財報首次揭露 humanoid 相關營收，且金額顯示其占比長期低於 5%——代表純度敘事不成立，現行溢價無基本面支撐；(2) 到 2027-06-30，主要人形機器人開發商（Tesla Optimus、Figure、Agility、Unitree 任一）公開採用 RV 減速器或其他非諧波方案作為主要關節減速機構；(3) 到 2027-12-31，出現成本或性能上可取代諧波減速器的新關節方案並取得量產採用。核查頻率：每季財報與主要人形機器人發表會後；觸發後 48 小時內人工 review。\n\n建議 expiry：2026-12-15（Q2 財報預期時點加緩衝）。\n\ngo 授權：把這組 catalyst／disproof／expiry 用於 6324.T 的下一次 reassess，並同步寫入 thesis/catalyst_calendar.json。不下單、不入圖、不改 Google Sheet。",
       "n": 197,
-      "reason": null,
+      "reason": "使用者核准 6324.T catalyst／disproof／expiry：catalyst=Q2 FY2027 財報（估 11 月上旬）；disproof 三條（humanoid 營收占比低於 5%／主要開發商採用非諧波方案／出現可取代量產方案）；expiry=2026-12-15",
+      "receipt": "authority:decision;ref:pd_1a7bdffc5ee4c80cd89da79ea90f13f5",
       "ref_id": "dc_cc46527aac12ba14191ee71c0460f3fe",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-21T00:27:20.508524+00:00",
       "source": "manual",
       "title": "確認 Harmonic Drive Systems（6324.T）decision catalyst／disproof — 修 [194] 的假鬧鐘",
       "type": "manual"
@@ -7003,6 +7019,87 @@
       "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
       "receipt": "action:ra_0bd19a3a5181bc29491c01ff9a70feeb;digest:4cfd3148dcaecb80103ad8d6756f0d3005c231e8f6320cac1af5c19bedae1341;commit:486d21f2b049f8fca4c38a7274269fb7b01f5f25;cohort:dc_cc46527aac12ba14191ee71c0460f3fe",
       "ref_id": "ra_0bd19a3a5181bc29491c01ff9a70feeb",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-21T00:26:24.192283+00:00",
+      "n": 175,
+      "reason": null,
+      "receipt": null,
+      "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+      "type": "decision_review",
+      "verb": "drop"
+    },
+    {
+      "at": "2026-08-21T00:26:24.192314+00:00",
+      "n": 181,
+      "reason": null,
+      "receipt": null,
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "type": "decision_review",
+      "verb": "pending"
+    },
+    {
+      "at": "2026-08-21T00:26:24.192331+00:00",
+      "n": 182,
+      "reason": null,
+      "receipt": null,
+      "ref_id": "dc_c0b6f81e3507a83b857258907fafa635",
+      "type": "decision_review",
+      "verb": "pending"
+    },
+    {
+      "at": "2026-08-21T00:26:24.192348+00:00",
+      "n": 187,
+      "reason": null,
+      "receipt": null,
+      "ref_id": "dc_718d04ef9859103e5fa07d4defa1e6b3",
+      "type": "decision_review",
+      "verb": "pending"
+    },
+    {
+      "at": "2026-08-21T00:26:24.192363+00:00",
+      "n": 188,
+      "reason": null,
+      "receipt": null,
+      "ref_id": "dc_606a4a50609e3b708f2138bb597ffacc",
+      "type": "decision_review",
+      "verb": "pending"
+    },
+    {
+      "at": "2026-08-21T00:26:24.192379+00:00",
+      "n": 193,
+      "reason": null,
+      "receipt": null,
+      "ref_id": "lead_e766f19b8dc748d744d0b4cc6dc21071",
+      "type": "source_trace_review",
+      "verb": "pending"
+    },
+    {
+      "at": "2026-08-21T00:27:20.344457+00:00",
+      "n": 196,
+      "reason": "使用者核准 MU catalyst／disproof／expiry：catalyst=Q4 FY2026 財報（估 2026-09-24）；disproof 四條（RPO 下滑逾 30%／contract liabilities 迴轉／Netlist 不利終局判決／HBM 移出 CMBU）；expiry=2026-10-15",
+      "receipt": "authority:decision;ref:pd_f87f24f695192e4901496350ea629b1b",
+      "ref_id": "dc_b05cc1360e4bdf2a238787c23e7b227d",
+      "type": "manual",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-21T00:27:20.508524+00:00",
+      "n": 197,
+      "reason": "使用者核准 6324.T catalyst／disproof／expiry：catalyst=Q2 FY2027 財報（估 11 月上旬）；disproof 三條（humanoid 營收占比低於 5%／主要開發商採用非諧波方案／出現可取代量產方案）；expiry=2026-12-15",
+      "receipt": "authority:decision;ref:pd_1a7bdffc5ee4c80cd89da79ea90f13f5",
+      "ref_id": "dc_cc46527aac12ba14191ee71c0460f3fe",
+      "type": "manual",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-21T00:28:55.161600+00:00",
+      "n": 195,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_36b579586f7cebb6c5e5130d9a0f67c7;digest:87026d6e52e60f9ab1ea30d91c42e572cbed867736c5f76a68b7ac583f2a5712;commit:46914591a7133fc301c6abdb6dd0cdacb031e517;cohort:dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
+      "ref_id": "ra_36b579586f7cebb6c5e5130d9a0f67c7",
       "type": "ra_admission",
       "verb": "go"
     }
