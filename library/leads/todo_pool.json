@@ -2641,17 +2641,18 @@
       "added_at": "2026-08-17T00:05:29.905984+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_5169fba5cb2597d4c8a50d56a03536f6",
-      "dispatch_receipt": "research_action:ra_76fc9ee5ffb3fedd4500d613330342b5",
+      "dispatch_receipt": "decision:pd_b64ce4a43686c91ffc8b17fe09690aaf",
       "dispatch_ref": "wo_355cd6b34c545b73d50012a6ba77a4e1",
-      "dispatch_status": "awaiting_approval",
-      "dispatch_updated_at": "2026-08-21T05:39:27.847872+00:00",
+      "dispatch_status": "completed",
+      "dispatch_updated_at": "2026-08-21T05:52:16.824110+00:00",
       "dispatched_at": "2026-08-19T00:22:51.164506+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 165,
-      "reason": null,
+      "reason": "counter_path 入圖後 reassess：blockers 由 counter_path_missing／graph_coverage_deficit／execution_intent_paper_only 收斂為僅剩 execution_intent_paper_only（系統內部），research_incomplete_blockers 清空，action=NO_ACTION。",
+      "receipt": "decision:pd_b64ce4a43686c91ffc8b17fe09690aaf",
       "ref_id": "dc_2906500af891541ea4bdd52503b9b3aa",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-21T05:52:16.824110+00:00",
       "source": "decision_lab",
       "title": "REVIEW — co:aeva",
       "type": "decision_review"
@@ -3135,12 +3136,20 @@
     },
     {
       "added_at": "2026-08-21T05:39:13.337745+00:00",
+      "completion_authority": {
+        "action_digest": "368feb813443aab3e9f42590a5b756c928be4b560dae178fd6e5d940225f39f4",
+        "cohort_id": "dc_2906500af891541ea4bdd52503b9b3aa",
+        "commit": "05a7ee37eefa0509d9e9dc4a48d1b4c3233fc252",
+        "company_id": "co:aeva",
+        "verified_at": "2026-08-21T05:51:43.128769+00:00"
+      },
       "hint": "核准 exact graph delta；Decision handoff：co:aeva。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 198,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_76fc9ee5ffb3fedd4500d613330342b5;digest:368feb813443aab3e9f42590a5b756c928be4b560dae178fd6e5d940225f39f4;commit:05a7ee37eefa0509d9e9dc4a48d1b4c3233fc252;cohort:dc_2906500af891541ea4bdd52503b9b3aa",
       "ref_id": "ra_76fc9ee5ffb3fedd4500d613330342b5",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-21T05:51:43.128769+00:00",
       "source": "research_action",
       "title": "NPO ⟷ CPO 可替代性：補上 [165] Aeva 唯一缺的 counter_path",
       "type": "ra_admission"
@@ -7186,6 +7195,33 @@
       "ref_id": "dc_2906500af891541ea4bdd52503b9b3aa",
       "type": "decision_review",
       "verb": "pq1_awaiting_approval"
+    },
+    {
+      "at": "2026-08-21T05:51:43.128769+00:00",
+      "n": 198,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_76fc9ee5ffb3fedd4500d613330342b5;digest:368feb813443aab3e9f42590a5b756c928be4b560dae178fd6e5d940225f39f4;commit:05a7ee37eefa0509d9e9dc4a48d1b4c3233fc252;cohort:dc_2906500af891541ea4bdd52503b9b3aa",
+      "ref_id": "ra_76fc9ee5ffb3fedd4500d613330342b5",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-21T05:52:16.824110+00:00",
+      "n": 165,
+      "reason": "counter_path 入圖後 reassess：blockers 由 counter_path_missing／graph_coverage_deficit／execution_intent_paper_only 收斂為僅剩 execution_intent_paper_only（系統內部），research_incomplete_blockers 清空，action=NO_ACTION。",
+      "receipt": "decision:pd_b64ce4a43686c91ffc8b17fe09690aaf",
+      "ref_id": "dc_2906500af891541ea4bdd52503b9b3aa",
+      "type": "decision_review",
+      "verb": "pq1_completed"
+    },
+    {
+      "at": "2026-08-21T05:52:16.824110+00:00",
+      "n": 165,
+      "reason": "counter_path 入圖後 reassess：blockers 由 counter_path_missing／graph_coverage_deficit／execution_intent_paper_only 收斂為僅剩 execution_intent_paper_only（系統內部），research_incomplete_blockers 清空，action=NO_ACTION。",
+      "receipt": "decision:pd_b64ce4a43686c91ffc8b17fe09690aaf",
+      "ref_id": "dc_2906500af891541ea4bdd52503b9b3aa",
+      "type": "decision_review",
+      "verb": "go"
     }
   ],
   "next_n": 201,
