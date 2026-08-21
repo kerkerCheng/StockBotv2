@@ -4234,6 +4234,13 @@
       },
       "title": "Sivers Semiconductors has resolved on a directed share issue of shares amounting to approximately SEK 700 million",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "ranking",
+          "reason": "Sivers 定向增資約 7 億瑞典克朗：稀釋與存續能力"
+        },
         "decided_at": "2026-08-11T23:42:16.842982+00:00",
         "decision": "go",
         "priority_flags": {
@@ -4516,6 +4523,13 @@
       },
       "title": "Sivers Semiconductors' Lender Bootstrap Europe Exercises Conversion Right Under Existing Convertible Loan",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "confidence_only",
+          "reason": "Sivers 可轉債債權人行使轉換權"
+        },
         "decided_at": "2026-08-11T23:42:16.844084+00:00",
         "decision": "go",
         "priority_flags": {
@@ -5105,6 +5119,13 @@
       "themes": {},
       "title": "IQE shares fall 19% after £81m fundraise priced at steep discount",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "ranking",
+          "reason": "IQE 以大幅折價完成 8,100 萬英鎊增資，股價跌 19%"
+        },
         "decided_at": "2026-08-11T23:42:16.844097+00:00",
         "decision": "go",
         "priority_flags": {
@@ -5217,6 +5238,13 @@
       },
       "title": "Yes, I'm still bullish on memory like $MU / Samsung. As I said earlier, markets tend to rotate from bottleneck to bottleneck. This week it looks $AXTI to $LITE in the photonics sector is the focus again. The thing is... the primary thing that changed are the stock prices, followed by some narratives + updates sprinkled in here and there. For photonics: > We already knew $COHR / $LITE lasers were completely sold out for the next 2 years during July's drop. > We knew about demand imbalance from $AAOI from last quarter's earnings calls. Nothing deteriorated fundamentally during July's crash, other than listed price after liquidations. Yet tons of people called $AAOI a \"scam\" when it dropped to $75, or $AXTI a \"scam\" on its drop to $35... But are bullish again at $140 or $80, when the transciver/InP substrate bottleneck hasn't changed at all, but maybe even got worse... (eg. draft for US ban on new china optical transceivers, scale up demand projections) For Memory: I'm witnessing a lot of retail capitulation, but the same people I'm seeing were mega bullish after $MU signed 16 SCAs and gave exceptional projections a month ago. Or were celebrating Samsung having the highest operating profit in the world. There's updates here and there eg. Rubin Ultra with memory optimizations (which Nvidia strives for every generation), with prices no longer being hiked way above expectations to the extreme. But the operating income relative to MC is just absurd around current prices, especially memory becomes structural. And the demand imbalance should be even worse next year. People tend to capitulate and follow narratives when a sector drops (eg. Helium/LNG back in Iran war), even if the bottleneck or fundamental situation hasn't really changed much (eg. $SPCX Elon earnings call reiterating memory tightness). I can't tell others what to to do: But $AAOI at $140 and $AAOI at $75 are the same company. Samsung at a $1.5T MC and Samsung at a $980B MC are the same company. Just valuations and narratives (often noise) change, and markets rotate from sector to sector.",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "sentiment",
+          "decision_impact": "confidence_only",
+          "reason": "板塊輪動與價格評論；雖提及既有 chokepoint，但無新的可查核主張"
+        },
         "decided_at": "2026-08-09T01:26:40.660274+00:00",
         "decision": "go",
         "priority_flags": {},
@@ -6339,6 +6367,13 @@
       },
       "title": "Invitation to Presentation of Sivers Semiconductors’ Q2 2026 Report",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "no_content",
+          "decision_impact": "confidence_only",
+          "reason": "Q2 法說會邀請函"
+        },
         "decided_at": "2026-08-20T22:36:14.864919+00:00",
         "decision": "go",
         "priority_flags": {
@@ -7893,6 +7928,13 @@
       "themes": {},
       "title": "US Government urges $AAPL not to buy Chinese memory chips. $MU, $SKHY, and Samsung are happy to hear this... Hilariously enough, CXMT/YMTC is price hiking too, so it's not exactly \"cheap Chinese memory that floods the market\". Apple once upon a time actually had extreme supplier leverage before the AI boom.",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "confidence_only",
+          "reason": "美方勸阻 Apple 採購中國記憶體：記憶體軸已明文降範圍，不改候選或排序"
+        },
         "decided_at": "2026-08-15T22:33:58.786273+00:00",
         "decision": "go",
         "priority_flags": {
@@ -8587,6 +8629,13 @@
       "themes": {},
       "title": "Some more TLDR takeaways from $AAOI ER: - They also flagged DSP and TIA bottlenecks, which is a positive industry read through for names like $MXL, then $SMTC and $MTSI. - For revenue growth, they're expecting more than $500 million revenue Q4, which is absurd growth. For reference: Q2: $191.9M Q3: ~$255M-$290M Q4: $500M+ By mid-2027: ~$1.41B quarterly revenue run-rate Always impressed by the revenue ramp from some of these optical players.",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "AAOI 法說點名 DSP 與 TIA 瓶頸並牽出 MXL／SMTC／MTSI：可能新增候選"
+        },
         "decided_at": "2026-08-07T22:39:26.355409+00:00",
         "decision": "go",
         "priority_flags": {
@@ -8740,6 +8789,13 @@
       },
       "title": "In IPO news… Vantage Data Centers is exploring going public at an enormous $100B valuation. If you’re not familiar, $ORCL is their anchor tenant for Stargate (OpenAI end user), and Vantage develops/operates hyperscaler DCs. Anthropic IPO is also expected, with investors expecting $2T valuation, eclipsing $SPCX per FT. Yeah… idk about Anthropic valuations. Jim Cramer defending that valuation is never a good sign. On a side note, Opus 5 is probably the worst consumer LLM I’ve used to date, it’s like a 5 IQ LLM operating off terrible data retrieval. With a Fable-like God complex on top. Enterprise is probably having a better time though. Unitree IPO is also expected this month and priced it at a $9B valuation. Which is a positive tailwind for Unitree for the humanoid sectors. Not really an AI name but SHEIN is going public as soon as the 19th this month. Go ask any girl you know and they’re probably familiar with this platform.",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "confidence_only",
+          "reason": "Vantage Data Centers 傳 IPO：需求端已有錨點"
+        },
         "decided_at": "2026-08-13T22:36:35.239289+00:00",
         "decision": "go",
         "priority_flags": {
@@ -9235,6 +9291,13 @@
       "themes": {},
       "title": "IQE completes fundraising and reports wider losses but improved trading",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "ranking",
+          "reason": "IQE 完成籌資、虧損擴大但營運改善"
+        },
         "decided_at": "2026-08-11T23:42:16.844105+00:00",
         "decision": "go",
         "priority_flags": {
@@ -9488,6 +9551,13 @@
       },
       "title": "Sivers Semiconductors Updates Financial Reporting Calendar",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "no_content",
+          "decision_impact": "confidence_only",
+          "reason": "財報行事曆更新"
+        },
         "decided_at": "2026-08-11T23:42:16.844112+00:00",
         "decision": "go",
         "priority_flags": {
@@ -10239,6 +10309,13 @@
       },
       "title": "Sivers Semiconductors AB Postpones Publication of Annual Report 2025 Amid Dual Listing Evaluation",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "exit_condition",
+          "reason": "Sivers 於雙重上市評估期間延後 2025 年報：與重編同一條 disproof 線"
+        },
         "decided_at": "2026-08-11T23:42:16.844118+00:00",
         "decision": "go",
         "priority_flags": {
@@ -11378,6 +11455,13 @@
       "themes": {},
       "title": "Strong Share Price Appreciation Drives Revaluation of Social Tax Liability in Q2 2026",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "no_content",
+          "decision_impact": "confidence_only",
+          "reason": "股價上漲導致社會保險稅負債重估，屬會計技術項"
+        },
         "decided_at": "2026-08-13T22:36:34.753530+00:00",
         "decision": "go",
         "priority_flags": {
@@ -11642,6 +11726,13 @@
       "themes": {},
       "title": "IQE raises 2026 revenue guidance on strong AI and data centre demand",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "ranking",
+          "reason": "IQE 上調 2026 營收指引，理由是 AI 與資料中心需求"
+        },
         "decided_at": "2026-08-11T23:42:16.844124+00:00",
         "decision": "go",
         "priority_flags": {
@@ -11955,6 +12046,13 @@
       },
       "title": "For $XFAB ER transcript: Just to recap, my idea on $XFAB foundry growth opportunities stemmed from SiC for 800v and photonixfab/MTP for CPO applicability. - $XFAB: \"We are making progress in co-packaged optics\". - \"The transition to 800v... is expected to support demand for both SiC and GaN... for XFAB\" So those analysts/people that were confidently bearposting about $XFAB that they had \"0 exposure to 800V, photonics, CPO\" just turned out plainly wrong. At the time I shared my idea, industry materials showed ASE and others cited photonixfab + XFAB as an upcoming CPO player in EU. And filings showed they had exposure names like $NVTS / $POWI in general. So glad $XFAB went out to explicitly clear things up to state they were developing in CPO/800v. Okay back to the ER: - \"We continue to expect photonics volume production to start in 2028\". Company currently has three silicon photonics projects in development with key partners. I thought it would ramp sometime in H2 2027, but was probably early by a few months. - Several new data center design wins, eg. 3 new SiC design wins (consistent with general 2027 ramp as 800v deployment takes off). So once those ramp in 2027-2028, (markets tend to price things ahead of time), I'd expect $XFAB to be rerated based on growth opportunities. TLDR: - Current revenue numbers not as impressive. - $XFAB confirmed direct exposure to CPO and 800V shifts (biggest win for thesis) - 800V exposure opportunities for SiC (should be 2027) - Timeline is 2028 ramp for photonics volume production Happy exposure thesis to CPO/800V was confirmed from this ER. Might be a bit of waiting for revenue ramp.",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "X-FAB 自述 CPO 進展與 photonixfab：圖中尚無此節點，可能新增候選"
+        },
         "decided_at": "2026-07-31T22:42:09.778554+00:00",
         "decision": "go",
         "priority_flags": {
@@ -14710,6 +14808,13 @@
       "themes": {},
       "title": "IQE Schedules Annual General Meeting and Releases 2025 Annual Report (IQE)",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "no_content",
+          "decision_impact": "confidence_only",
+          "reason": "股東會日期與年報發布通知"
+        },
         "decided_at": "2026-08-11T23:42:16.844130+00:00",
         "decision": "go",
         "priority_flags": {
@@ -14990,6 +15095,13 @@
       },
       "title": "Unitree, China's humanoid leader, is set to IPO this month at a $9B valuation! (~$6.2B originally per March filing). Derivative markets are pricing open at an implied $36.04B MC, roughly ~4X listing price. $CCXI / Agility Robotics, the first US publicly listed pure play humanoid leader, is also going public later in Q4, at a ~$2.5B pre-money valuation. It will be interesting to see how markets price in America vs. Chinese Humanoid leaders.",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "candidate_set",
+          "reason": "Unitree IPO 與 Agility／CCXI 上市時程：humanoid 為既定主題，可能新增候選"
+        },
         "decided_at": "2026-08-19T22:33:23.215534+00:00",
         "decision": "go",
         "priority_flags": {
@@ -15229,6 +15341,13 @@
       },
       "title": "I'm glad the leverage bros moved from AI stocks back to Hyerliquid and biotech like $MRNA, so maybe we'll see a faster recovery. Aside from that just some TLDR stuff: - $EWY up, primarily from SK Hynix buybacks (they're just too profitable), and Samsung Foundry roughly ~10-15% price hikes. - $SKHY unveils CPO roadmap?? Apparently they're doing something with photonic interposer that links to memory, so I gotta look a bit deeper into this Probably going to be more TAM expansion, more supply chain beneficiaries (eg. lasers, PICs, packaging) off this. - $YMTC pursuing IPO next quarter following CMXT's successful IPO. The Chinese IPO market is just going brrr from Unitree to memory makers. US needs to do something similar rather than IPOing companies at trillion dollar valuations already. - Tyntek limit up there's now order visibility through 2028, given photodiode demand imbalance for photonics. Elazr GM did say the entire optical supply chain was facing major shortages... I'll probably look more at high-end PD bottlenecks next. - MS forecasts a 50% Q/Q price increase for DDR4 for Q3, and 10%+ increase for Q4 2026. (Nanya/2408, Windbond/2344, should be happy). - China reportedly delays clearance from germanium, quartz-based materials, and neodymium magnets To taiwan. So I'll probably have some fun looking into supply chains disruptions there over cup noodles. - High-end PCB drill shortage (still ongoing), Kawei (5498) said AI DCs, servers and optical communications are driving demand for PCBs, HDI and package substrates, while tungsten prices are rising. Though the world's five largest drill manufacturers are aggressively expanding capacity, supply remains far below overall market demand Just stuff I found interesting recently, obviously $MRNA stuff is too.",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "sentiment",
+          "decision_impact": "confidence_only",
+          "reason": "資金輪動評論"
+        },
         "decided_at": "2026-08-20T22:36:16.355544+00:00",
         "decision": "go",
         "priority_flags": {
@@ -16466,6 +16585,13 @@
       "themes": {},
       "title": "LRCX 10-Q filed 2026-04-23",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "confidence_only",
+          "reason": "LRCX 10-Q 例行申報"
+        },
         "decided_at": "2026-07-25T03:52:34.713776+00:00",
         "decision": "go",
         "priority_flags": {},
@@ -16496,6 +16622,13 @@
       },
       "title": "Bootstrap Exercises Warrants in Sivers Semiconductors",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "confidence_only",
+          "reason": "Bootstrap 行使 Sivers 認股權證"
+        },
         "decided_at": "2026-08-13T22:36:34.095070+00:00",
         "decision": "go",
         "priority_flags": {
@@ -17425,6 +17558,13 @@
       },
       "title": "It's official, Unitree the 8000x+ retail oversubscribed humanoid company in China. Is expected to go public in 2 days! So the 19th. Opening is implied to be around ~$41.66B MC per derivatives, around +363.3% above its ~$9B IPO valuation. Fun times for humanoids this week. https://t.co/yav4oRs2bO",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "confidence_only",
+          "reason": "Unitree 上市時程更新：與前一則重複"
+        },
         "decided_at": "2026-08-17T22:34:29.021562+00:00",
         "decision": "go",
         "priority_flags": {
@@ -17811,6 +17951,13 @@
       },
       "title": "Sivers Semiconductors: Sivers & GlobalFoundries Advance AI Data Center Optical Solutions",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "Sivers 與 GlobalFoundries 推進 AI DC 光學方案：兩個既有節點間可能的新邊"
+        },
         "decided_at": "2026-08-11T23:42:16.844136+00:00",
         "decision": "go",
         "priority_flags": {
@@ -17941,6 +18088,13 @@
       },
       "title": "As a earnings recap: $AMZN, $META, $GOOGL, and $MSFT guided a 2026 combined capex forecast to ~$720-$745 Billion. Up from $695-$725B Billion previously. Amazon: $220B Google: $195B-$205B Meta: $130B-$145B Microsoft: $175B We've already seen significant deleveraging and retail/institutional margin liquidations (maybe it continues for more time, who knows). But medium-long term, I'm not quite sure how anyone can be bearish the upstream semis or neoclouds. Given each hyperscaler has flagged either compute shortages, rising cloud demand + pricing power, or increased spending for chips/networking. My \"bottleneck\" thesis with many of these upstream semi supply chains is that when trillions in capital flows into things from InP substrates or memory (which were both treated as cheap commodities) or even energy. Lot of these current AI names that were treated as useless before in telecom cycles or even toilet sellers. Gets rerated when their inflection period hits and capex flows into their balance sheets. As seen with $NVDA GPUs past few years, memory this year, CPUs/MLCCs next few years, CPO in 2027, Glass Substrates in 2027, 800V in 2027, and so on.",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "confidence_only",
+          "reason": "四大雲廠 2026 capex 上修至 7,200–7,450 億美元：需求錨點已成立，不改候選或排序"
+        },
         "decided_at": "2026-08-19T22:33:19.248616+00:00",
         "decision": "go",
         "priority_flags": {
@@ -18266,6 +18420,13 @@
       "themes": {},
       "title": "LRCX 10-K filed 2026-08-07",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "confidence_only",
+          "reason": "LRCX 10-K 例行申報"
+        },
         "decided_at": "2026-08-07T22:39:28.207173+00:00",
         "decision": "go",
         "priority_flags": {
@@ -19026,6 +19187,14 @@
       },
       "title": "Tachyon Networks Expands FWA Portfolio With $1.5M Development Partnership With Sivers Semiconductors",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "capital_commitment",
+          "decision_impact": "ranking",
+          "payment_direction": "customer_to_supplier",
+          "reason": "Tachyon 對 Sivers 150 萬美元開發合作：金額小但方向是客戶付錢"
+        },
         "decided_at": "2026-08-11T23:42:16.844142+00:00",
         "decision": "go",
         "priority_flags": {
@@ -19166,6 +19335,13 @@
       },
       "title": "Sivers Semiconductors publishes the 2025 Annual Report, adjusting prior reported financials as preparation for a potential dual listing in the United States",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "exit_condition",
+          "reason": "Sivers 發布 2025 年報並調整先前申報財務——pq2 [10] 等的正是「Q2+ 財報重編分辨點」，屬 thesis disproof 的判別事件"
+        },
         "decided_at": "2026-08-11T23:42:16.844149+00:00",
         "decision": "go",
         "priority_flags": {
@@ -19490,6 +19666,13 @@
       "themes": {},
       "title": "I'm getting Vietnam flashbacks to the launch of OpenAi. Where with every model, it just keeps getting better... but now with hunanoids. Unitree has claimed that their humanoids: - Can now run faster than Usain Bolt. - Can now jump higher than any human. And with their IPO tomorrow, it seems like China is leading the hardware race.",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "sentiment",
+          "decision_impact": "confidence_only",
+          "reason": "Unitree 性能宣稱，無可逐字查核的供應鏈內容"
+        },
         "decided_at": "2026-08-18T23:05:48.089415+00:00",
         "decision": "go",
         "priority_flags": {
@@ -20815,6 +20998,13 @@
       "themes": {},
       "title": "TSEM 6-K filed 2026-08-11",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "confidence_only",
+          "reason": "TSEM 6-K 例行申報"
+        },
         "decided_at": "2026-08-15T06:38:18.544271+00:00",
         "decision": "go",
         "priority_flags": {
@@ -21472,6 +21662,14 @@
       },
       "title": "Feels like my $IQE thesis Feb this year got validated alongside $AXTI and others. (I still long on both) So I stopped covering them as much. But TLDR on updates: Early this year, IQE was a distressed but critical chokepoint in the optical supply chain with links to $LITE and others when I published my thesis on it. Since then: - $MTSI signed long term epiwafer supply agreements, took a stake in the company, now IQE is bank debt free (Macom has convertibles, but that's positive) - $TSEM signed agreements for InP epiwafers. - Management explicitly said its IQE agreement was signed to secure the \"strategic III-V epiwafer supply required for that roadmap\" - IQE signed another ~$14M mysterious AI DC contract. The only part that's still playing out with my earlier thesis is IQE converting their latent/underutilized capacity toward AI DC segment, to match peers like Landmark in the space (which takes time, like slightly over a year if I remember correctly). There's some national security implications that I'll avoid talking about that makes them more important. But basically: FY2025 revenue: £97.3m FY2026 guidance: over £126.5m They're rapidly growing again in the optical sector, out of bank debt/distressed liquidation state, and remains a critical chokepoint in Western optical supply chains. Now... with new agreements with your leading photonics companies for revenue growth, and players like Macom serving as a soft backstop. After a thesis gets validated, typically I just sit back and enjoy growth of a business.",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "capital_commitment",
+          "decision_impact": "ranking",
+          "payment_direction": "customer_to_supplier",
+          "reason": "MACOM 簽長期磊晶供應並取得 IQE 股權——客戶投資供應商，四維度第 3 項的正向樣態"
+        },
         "decided_at": "2026-08-13T22:36:35.681764+00:00",
         "decision": "go",
         "priority_flags": {
@@ -21706,6 +21904,13 @@
       },
       "title": "Unitree (688836) is now public. And is valued at ~$53.3B, after rising +492.18% We finally have a major public company benchmark for humanoids. For reference, Agility (backed by $NVDA, $AMZN) via $CCXI is expected to go public at $2.5B premoney valuation Q4. $TSLA is $1T+, but Optimus is wrapped inside a much larger company. But I think Unitree showed that the demand for pure play humanoid players is much larger… than people expected in public markets.",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "confidence_only",
+          "reason": "Unitree 掛牌後估值更新：與同批 Unitree lead 重複"
+        },
         "decided_at": "2026-08-19T22:33:23.215534+00:00",
         "decision": "go",
         "priority_flags": {
@@ -22354,6 +22559,13 @@
       },
       "title": "Sivers Semiconductors Announces Intention to Carry Out a Directed Share Issue of Approximately SEK 600 Million",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "confidence_only",
+          "reason": "Sivers 宣告擬進行定向增資（同案的意向公告，實際結果另有一則）"
+        },
         "decided_at": "2026-08-11T23:42:16.844155+00:00",
         "decision": "go",
         "priority_flags": {
@@ -22527,6 +22739,13 @@
       "themes": {},
       "title": "TSEM 6-K filed 2026-07-06",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "confidence_only",
+          "reason": "TSEM 6-K 例行申報"
+        },
         "decided_at": "2026-08-15T06:38:18.825118+00:00",
         "decision": "go",
         "priority_flags": {
@@ -22654,6 +22873,13 @@
       "themes": {},
       "title": "TSEM 6-K filed 2026-07-07",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "confidence_only",
+          "reason": "TSEM 6-K 例行申報"
+        },
         "decided_at": "2026-08-15T06:38:19.058505+00:00",
         "decision": "go",
         "priority_flags": {
@@ -22779,6 +23005,13 @@
       "themes": {},
       "title": "MTSI 10-Q filed 2026-08-06",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "confidence_only",
+          "reason": "MTSI 10-Q 例行申報"
+        },
         "decided_at": "2026-08-15T06:38:19.303890+00:00",
         "decision": "go",
         "priority_flags": {
@@ -24702,6 +24935,14 @@
       "themes": {},
       "title": "IQE Secures $14 Million AI and Datacentre Semiconductor Contract (IQE)",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "capital_commitment",
+          "decision_impact": "ranking",
+          "payment_direction": "customer_to_supplier",
+          "reason": "IQE 取得 1,400 萬美元 AI/DC 合約；客戶未具名，只能改排序不能新增候選"
+        },
         "decided_at": "2026-08-11T23:42:16.844165+00:00",
         "decision": "go",
         "priority_flags": {
@@ -25415,6 +25656,14 @@
       "themes": {},
       "title": "$MRVL gives $GOOGL options to buy $12.2B of the company. \"The Marvell-Google deal covers a broad range of technologies used ​with TPUs, including processors that run AI models, manage data storage ​and move information ⁠across networks.\" Which could translate into ~$120 billion ​in revenue through 2033. Marvell also has separate warrants with $AMZN after their Celestial acquisition (for purchases of photonic fabric). Remember the good times when Jensen said Marvell would be the next $1T+ company? Seems Nvidia knew Marvell was \"networking\" its way into all the hyperscalers with warrants.",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "capital_commitment",
+          "decision_impact": "candidate_set",
+          "payment_direction": "supplier_to_customer",
+          "reason": "Marvell 給 Google 可買進 122 億美元自家股份的認股權——供應商以股權換訂單，與 POET／Lumilens 同型。若成立，是 MRVL 不是瓶頸的證據，會改變候選集合"
+        },
         "decided_at": "2026-08-19T22:33:23.698133+00:00",
         "decision": "go",
         "priority_flags": {
@@ -25784,6 +26033,14 @@
       },
       "title": "IQE and Tower Semiconductor Announce Multi-year InP epiwafer Supply Agreement",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "capital_commitment",
+          "decision_impact": "candidate_set",
+          "payment_direction": "customer_to_supplier",
+          "reason": "Tower 與 IQE 多年期 InP epiwafer 供應協議：客戶端具名綁定上游磊晶產能"
+        },
         "decided_at": "2026-08-11T23:42:16.844170+00:00",
         "decision": "go",
         "priority_flags": {
@@ -26204,6 +26461,13 @@
       "themes": {},
       "title": "IQE appoints MACOM executives to board under strategic partnership agreement (IQE)",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "ranking",
+          "reason": "MACOM 高層進入 IQE 董事會：治理層綁定，補強同批供應協議"
+        },
         "decided_at": "2026-08-11T23:42:16.844176+00:00",
         "decision": "go",
         "priority_flags": {
@@ -26673,6 +26937,13 @@
       "themes": {},
       "title": "IQE Sets 7 September Date for H1 2026 Results as Semiconductor Demand Comes Into Focus",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "no_content",
+          "decision_impact": "confidence_only",
+          "reason": "H1 財報日期公告"
+        },
         "decided_at": "2026-08-12T22:36:28.415244+00:00",
         "decision": "go",
         "priority_flags": {
@@ -26697,6 +26968,14 @@
       "themes": {},
       "title": "MACOM (MTSI) to Enter Long-Term Supply Agreements with IQE plc",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "capital_commitment",
+          "decision_impact": "candidate_set",
+          "payment_direction": "customer_to_supplier",
+          "reason": "MACOM 與 IQE 長期供應協議：客戶端承諾，可能新增 InP 磊晶候選"
+        },
         "decided_at": "2026-08-11T23:42:16.844181+00:00",
         "decision": "go",
         "priority_flags": {
@@ -27232,6 +27511,13 @@
       "themes": {},
       "title": "MTSI 8-K filed 2026-08-06",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "confidence_only",
+          "reason": "MTSI 8-K 例行申報"
+        },
         "decided_at": "2026-08-15T06:38:20.090320+00:00",
         "decision": "go",
         "priority_flags": {
@@ -28432,6 +28718,13 @@
       },
       "title": "Sivers Semiconductors AB evaluates a potential dual listing of its shares on the Nasdaq New York",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "confidence_only",
+          "reason": "Sivers 評估於 Nasdaq 雙重上市"
+        },
         "decided_at": "2026-08-11T23:42:16.844187+00:00",
         "decision": "go",
         "priority_flags": {
@@ -28976,6 +29269,13 @@
       "themes": {},
       "title": "AMAT 10-Q filed 2026-08-20",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "confidence_only",
+          "reason": "AMAT 10-Q 例行申報"
+        },
         "decided_at": "2026-08-20T22:36:17.590058+00:00",
         "decision": "go",
         "priority_flags": {
@@ -30246,6 +30546,13 @@
       "themes": {},
       "title": "Exclusive-Trump Administration Drafting Ban on Chinese Data Center Devices, Sources Say",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "ranking",
+          "reason": "美方草擬中國資料中心設備禁令：影響可替代性，改排序不新增候選"
+        },
         "decided_at": "2026-08-13T22:36:37.087730+00:00",
         "decision": "go",
         "priority_flags": {
@@ -30608,6 +30915,13 @@
       },
       "title": "So this is just what I'm seeing with $SIVE and the CW DFB laser chokepoint right now. From optical earnings: 1. $LITE: unexpected demand and imbalance for UHP CW lasers. - Had ability to price up ASP for lasers. - Scale up CPO on track for H2 2027 shipments, called out any CPO scale up delay rumors as noise. Lumentum confirmed timelines (that CPO players like Sivers sold off of misleading reports from), high margins, and extreme demand for qualified CW lasers. 2. $AAOI: doesn’t have enough CW laser capacity because of too much optical transceiver demand. - Not meaningfully participating in first-gen CPO deployments, with $MTSI not looking like they're in it either but focusing on NPO. Haven't seen much with $SMTC after their HieFo acqusition. - Called lasers as the bottleneck within a 20-40% demand imbalance for transceivers. - Says customers approaching them every week asking them for supply + to move faster. AOI confirmed demand imbalances + bottlenecks for lasers. And we got an even smaller pool for first-gen CPO players. 3. Both $AAOI and $LITE claimed Chinese players were years behind for CPO lasers and far behind stated claims in qualified capacity. - $AAOI said 2-3 years+ behind with CPO lasers. - $LITE said they haven't seen anything like Chinese claims in terms of outputs (and no recourse if it's false). Reaffirms moat for CPO related lasers, and no flooding from some shortseller claims on the optical sector. 4. $MTSI said that many customers are approaching them with urgency due to the general supply shortage of indium phosphide DFB lasers. Again, puts Sivers in the that bottleneck, giving them likely more customer demand . Among $COHR ($72.54B), $LITE ($66.57B), $AVGO ($2.13T): It's very special you get one of the public 4 Western CPO leaders at a ~$1.5B MC with $SIVE. Feels like my thesis with both: - The CW bottleneck that I predicted - CW laser chokepoint (where there's only a few CPO players, at least for gen-1) Got validated from earnings, now it's just waiting for the inflection points of next optical architecture shifts.",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "ranking",
+          "reason": "LITE／AAOI 法說指 CW DFB 雷射供需失衡與中國落後：強化既有 chokepoint 排序"
+        },
         "decided_at": "2026-08-12T22:36:28.848843+00:00",
         "decision": "go",
         "priority_flags": {
@@ -30736,6 +31050,13 @@
       },
       "title": "Okay here's my take on $POET, since apparently people are celebrating on the subreddit that I took small positions. - I have 0 idea. ZERO. How they convinced shareholders to allow them dilute SO MUCH to the point: They have an absurd ~$830m cash on hand now. And my guess is that they're close to done, since I would be in disbelief if they needed more. So now... they have ~$830m to grow their business like M&A, and EV actually dropped really low recently (eg. $1.25B MC vs. $830m cash on hand), that I thought it was compelling to take a risk. - Annualized production capacity target is 12M optical engines/year for 2027, which is pretty absurd ramp. Need to do more research into ASP for Poet's products, but maybe $125-$200? So at ~$150 ASP, $1.8B revenue ceiling. But they're like inverse AAOI right now: no visible demand to fill all that capacity. Aside from Lumilens, which is now a highly valued hyperscaler supplier (probably Amazon or Microsoft), with billions in customer agreements. The interesting thing is if Poet signed prepayment EML agreements with players like Mitsubishi, or CW agreements with Sivers behind the scenes with that balance sheet. And given the current bottleneck, players might use Poet as a workaround for supply procurement. But basically, you have a super cash-rich company with a ton of capacity coming online. And they're not really disappearing anytime soon with their financials. I don't quite think it's as technically defensible compared to upstream laser chokepoints with something like $SIVE around the same valuation in terms of technical moat for CW lasers vs. OE packaging side. As you've seen recently with Celestial and Poet. But maybe... there's a chance some hyperscaler or downstream company announces a volume agreement sometime in the future. and $POET takes off. And they do have the supply chain setup for ramp with that. That's the risk I ended up taking, but it's not exactly a clear as day long for me like $AAOI.",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "ranking",
+          "reason": "POET 手握約 8.3 億美元現金但無可見需求：影響其在候選中的排序"
+        },
         "decided_at": "2026-08-20T22:36:14.618719+00:00",
         "decision": "go",
         "priority_flags": {
@@ -30805,6 +31126,13 @@
       },
       "title": "Sivers Semiconductors AB (publ), Publishes Interim Report Q1, January - March 2026",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "confidence_only",
+          "reason": "Sivers Q1 期中報告"
+        },
         "decided_at": "2026-08-11T23:42:16.844193+00:00",
         "decision": "go",
         "priority_flags": {
@@ -30963,6 +31291,13 @@
       },
       "title": "Few earnings TLDRs with my favorite $AXTI and $AMZN: Amazon: - Raised 2026 capex to $220B vs. prior $200B (partly due to higher memory costs, which is bullish on $MU to Samsung) - Even at $220B, Amazon will not have enough capacity to meet all 2026 demand; Jassy expects the same in 2027. - Most incoming 2027 capacity is already reserved, with substantial 2028 capacity also reserved. Mostly read through on upstream semis. $GOOGL, $META, $AMZN, and $MSFT all identified compute shortage. All the narratives a few weeks earlier was \"excess compute\" from Meta and others + hyperscalers cutting back on spend... All BS. Amazon earnings was very bullish on AI semi trade. AXTI: - AXT to double InP capacity during 2026. Then double again in 2027. This is expected to make AXT \"by far the largest indium phosphide producer in the world.\" - LFG - Q2 rev was $47.6M, the highest quarterly revenue in AXT history (InP revenue reached a record $30.7M, from DC applications.) - Revenue increased 77% sequentially and 164% year over year. - InP revenue-capacity targets: $60M per quarter exiting 2026. - $130M per quarter exiting 2027 That $130m target could be hiked too since management stated they find \"whatever ways to increase that capacity expansion\" - Management said the reported backlog remains well above $100M, but that number no longer reflects all available demand. \"Customer demand continues to outpace supply, no matter how fast we add capacity.\" 800G/1.6T is driving the current cycle, while NPO/CPO extends it beyond 2027. Also they're targeting 50%-plus gross margin: \"We should definitely be targeting a number that begins with a five.\" China demand more than doubled, and their agreements with Casela, $COHR and $LITE did not materially drive Q2. This is not even considering my projected massive ASP hikes yet as InP substrates get more bottlenecked. TLDR: - Amazon too much compute demands, needs capex to fufill it, so upstream semis go brrr. - AXT world largest InP substrate supplier, high gross margins, expansion, and supply can't keep up with demand. Bullish on demand side from Amazon + capex. Bullish on upstream optical supply chains from too much demand.",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "ranking",
+          "reason": "AXT 倍增 InP 產能、backlog 逾 1 億美元：既有候選的結構強度"
+        },
         "decided_at": "2026-08-04T22:36:55.816839+00:00",
         "decision": "go",
         "priority_flags": {
@@ -32143,6 +32478,13 @@
       "themes": {},
       "title": "TSEM 6-K filed 2026-08-12",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "confidence_only",
+          "reason": "TSEM 6-K 例行申報"
+        },
         "decided_at": "2026-08-15T06:38:21.098641+00:00",
         "decision": "go",
         "priority_flags": {
@@ -33347,6 +33689,13 @@
       "themes": {},
       "title": "IQE seals £13m equity raise as it works to complete larger funding package",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "confidence_only",
+          "reason": "IQE 完成 1,300 萬英鎊股權募集"
+        },
         "decided_at": "2026-08-11T23:42:16.844200+00:00",
         "decision": "go",
         "priority_flags": {
@@ -33921,6 +34270,13 @@
       "themes": {},
       "title": "SK Hynix, $MU , and Samsung have sold out of 2027 capacity for DRAM/HBM. $SNDK, Samsung, Micron current annual NAND capacity has been sold out, with Kioxia and SK Hynix expected to finalize allocations by August 2026. - Customers are being allocated only 60–70% of the volumes they initially requested - industry insiders pointed out that 2027 will enter the most severe moment of memory shortage - Allocation amounts are mostly decided, but final shipment pricing will be determined closer to delivery Source: Digitimes, citing industry sources. Hard to see those memory \"oversupply\" claims in early-mid 2027 when they're all sold out of capacity already.",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "confidence_only",
+          "reason": "記憶體 2027 產能售罄：記憶體軸已降範圍"
+        },
         "decided_at": "2026-08-04T22:36:57.647476+00:00",
         "decision": "go",
         "priority_flags": {
@@ -34516,6 +34872,14 @@
       "themes": {},
       "title": "MACOM to Enter into Agreements to Further Strengthen Supply Chain",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "capital_commitment",
+          "decision_impact": "ranking",
+          "payment_direction": "customer_to_supplier",
+          "reason": "MACOM 強化供應鏈之協議；與 IQE 案重疊，先以排序處理"
+        },
         "decided_at": "2026-08-11T23:42:16.844205+00:00",
         "decision": "go",
         "priority_flags": {
@@ -36914,6 +37278,14 @@
       },
       "title": "Microelectronics Commons Strengthens Commitment to Sivers Semiconductors With Year 2 Funding",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "capital_commitment",
+          "decision_impact": "ranking",
+          "payment_direction": "customer_to_supplier",
+          "reason": "Microelectronics Commons 第二年資助 Sivers：政府端資金，非商業客戶承諾"
+        },
         "decided_at": "2026-08-11T23:42:16.844211+00:00",
         "decision": "go",
         "priority_flags": {
@@ -38423,6 +38795,13 @@
       },
       "title": "Just some TLDRs of stuff I found interesting: - $SNDK 80% adjusted gross margins projections through 2030, ~75% operating margins and ~50% adjusted FCF margins from investor day. LTAs already 2/3rd of 2028 output. Minimum contracted revenue reaches $93B (MC is currently ~$239B)... Hard to be a cyclical stock when your revenue/targets are expected to continue 4Y later into 2030. - $CRWV signs contracts for 6Y old $NVDA A100 GPUs through 2029. For Neoclouds like Nebius/Iren, this is positive, since it's a counterargument for eg. Burry depreciation short thesis - conventional DRAM gross margins eg. Micron is estimated to reach an unprecedented 95% by 2027, surpassing HBM GMs per UBS read through for legacy/standard dram players like Nanya/Winbond should go brrrr if projections are correct. - Anthropic reportedly achieved 14x+ YoY growth and roughly 2.4x sequential revenue growth q2 to >$11.5B,. estimating growth to $190–200B in 2028r evenue numbers. Your frontier labs keep growing at stupidly fast paces, it would be worrisome if they didnt. - $NVDA reportedly in talks to invest $3B in SB Energy (Softbank subsidiary), creates a >$500B compute financing push with Apollo, BlackRock, Blackstone, Brookfield, Goldman, and others. $NVDA Feynman reportedly moves to TSMC A16 + SoIC + custom HBM + CPO in H2 2028 Just more nvidia news every day - $MSFT Maia 300 discussed $TSM capacity for >300k units in 2027, with expansion to 1m+. Unveils as soon as September. Likely $MRVL should be more happy from this news. For what's happening right now: - maybe GUC for Microsoft current ASIC ramp. - For the Amazon party, stuff like Alchip (I do own shares), likely is ramping now with $AMZN ASIC program H2 2026... So might be a good idea to look at hyperscaler ASIC ramp timelines + their beneficiaries. - $TSM VP of Advanced Packaging stated \"the industry is likely to face not only memory shortages but also tight ABF substrate supply over the next few years\"... Emphasis on few years for memory + ABF substrates for bottlenecks. Even upstream abf substrate equipment providers are happy, eg. Eternal Precision which uses vacuum lamination equipment stated orders surged, their plants have been running at full capacity, and 20%+ price hikes. - $AMAT expects advanced packaging revenue to grow >70% in 2026, versus prior >50%, and said customer discussions now extend all the way to 2030 (not too familiar with this company, but found their growth rate from 2025 Q4 $6.8B ->$7.01B -> 7.91B -> $9.12B -> $10.25B Q4 2026 projections pretty interesting) - Google said at OCP APAC said conventional 48V is running out of headroom. $NVDA detailed an 800VDC MGX-compatible rack H2 2026 (timeline, Delta / Lite-On beneficaries) - Aside from $SNDK, Nanya LTAs cover 50% of capacity. CXMT signed multi-year DRAM agreements last month, so entire memory industry seems to be following same playbook as ur big 3. - Probe cards remain a bottleneck, MPI(6223) said their probe card capacity remains fully utilized because demand exceeds supply. Already covered the CW laser bottleneck with $AAOI, $SIVE, and $LITE earlier this week, but that's another fun one. - some MLCC/component lead times have hit 36 weeks per Nichidenbo. Your Samsung Electro-Mechanics, Taiyo Yuden, Murata, players should be very happy to hear this. TLDR: AI supply chains go brrr.",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "sentiment",
+          "decision_impact": "confidence_only",
+          "reason": "橫跨十餘檔的綜合摘要——正是 2026-08-12 事故的形狀，不因提及多檔而升級"
+        },
         "decided_at": "2026-08-16T22:33:43.823721+00:00",
         "decision": "go",
         "priority_flags": {
@@ -38558,6 +38937,14 @@
       },
       "title": "ALL.SPACE Awards $8.2M Production Order to Sivers Semiconductors for Ka-Band Beamforming ICs",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "capital_commitment",
+          "decision_impact": "candidate_set",
+          "payment_direction": "customer_to_supplier",
+          "reason": "ALL.SPACE 對 Sivers 下 8.2M 美元量產訂單：客戶付錢，具名可核對"
+        },
         "decided_at": "2026-08-11T23:42:16.844216+00:00",
         "decision": "go",
         "priority_flags": {
