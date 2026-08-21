@@ -4197,6 +4197,13 @@
       },
       "title": "LITE 4 filed 2026-07-16",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713511+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -4320,6 +4327,13 @@
       "themes": {},
       "title": "AEVA 4 filed 2026-08-12",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-15T22:33:59.476107+00:00",
         "decision": "go",
         "priority_flags": {
@@ -4530,6 +4544,13 @@
       "themes": {},
       "title": "META 4 filed 2026-08-18",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-19T22:33:19.248616+00:00",
         "decision": "go",
         "priority_flags": {
@@ -5319,6 +5340,13 @@
       "themes": {},
       "title": "GFS 4 filed 2026-07-31",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-31T22:42:08.135067+00:00",
         "decision": "go",
         "priority_flags": {},
@@ -5359,6 +5387,13 @@
       "themes": {},
       "title": "GFS 4 filed 2026-07-30",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-30T22:40:41.121306+00:00",
         "decision": "go",
         "priority_flags": {},
@@ -5385,6 +5420,13 @@
       "themes": {},
       "title": "AAOI 4 filed 2026-06-16",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713527+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -5623,6 +5665,13 @@
       "themes": {},
       "title": "MTSI 4 filed 2026-06-29",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-15T06:38:16.045216+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -5725,6 +5774,13 @@
       "themes": {},
       "title": "AMAT 4 filed 2026-06-05",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713532+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -6012,6 +6068,13 @@
       "themes": {},
       "title": "GFS 4 filed 2026-07-30",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-30T22:41:02.748290+00:00",
         "decision": "go",
         "priority_flags": {},
@@ -6152,6 +6215,13 @@
       "themes": {},
       "title": "META 4 filed 2026-07-29",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-11T05:08:39.063159+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -6361,6 +6431,13 @@
       "themes": {},
       "title": "GFS 4 filed 2026-07-22",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713536+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -6395,6 +6472,13 @@
       },
       "title": "COHR 4 filed 2026-04-24",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713540+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -6465,6 +6549,13 @@
       "themes": {},
       "title": "GFS 4 filed 2026-06-29",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713544+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -6566,6 +6657,13 @@
       "themes": {},
       "title": "AMAT 4 filed 2026-06-17",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713548+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -6646,6 +6744,13 @@
       "themes": {},
       "title": "GFS 4 filed 2026-08-17",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-17T22:34:28.091555+00:00",
         "decision": "go",
         "priority_flags": {
@@ -6677,6 +6782,13 @@
       "themes": {},
       "title": "AXTI 4 filed 2026-06-16",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713552+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -7100,6 +7212,13 @@
       "themes": {},
       "title": "AMAT 4 filed 2026-07-06",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713556+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -7307,6 +7426,13 @@
       },
       "title": "LITE 4 filed 2026-08-18",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-19T22:33:19.491469+00:00",
         "decision": "go",
         "priority_flags": {
@@ -7338,6 +7464,13 @@
       "themes": {},
       "title": "AAOI 4 filed 2026-08-20",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-20T22:36:15.118738+00:00",
         "decision": "go",
         "priority_flags": {},
@@ -7796,6 +7929,13 @@
       },
       "title": "LITE 4 filed 2026-07-07",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713559+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -8152,6 +8292,13 @@
       "themes": {},
       "title": "LRCX 4 filed 2026-05-04",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713563+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -8468,6 +8615,13 @@
       "themes": {},
       "title": "GFS 4 filed 2026-06-26",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713566+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -8690,6 +8844,13 @@
       "themes": {},
       "title": "TSEM 4 filed 2026-07-06",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713570+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -8808,6 +8969,13 @@
       },
       "title": "COHR 4 filed 2026-08-20",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-20T22:36:14.361550+00:00",
         "decision": "go",
         "priority_flags": {},
@@ -8834,6 +9002,13 @@
       "themes": {},
       "title": "TSEM 4 filed 2026-07-06",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713573+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -8860,6 +9035,13 @@
       "themes": {},
       "title": "AXTI 4 filed 2026-06-15",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713577+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -8994,6 +9176,13 @@
       },
       "title": "TSLA 4 filed 2026-05-04",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-14T06:35:58.953550+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -9216,6 +9405,13 @@
       "themes": {},
       "title": "AXTI 4 filed 2026-08-19",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-19T22:33:19.734483+00:00",
         "decision": "go",
         "priority_flags": {
@@ -9255,6 +9451,13 @@
       },
       "title": "TSLA 4 filed 2026-04-23",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-14T06:35:59.168570+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -9319,6 +9522,13 @@
       "themes": {},
       "title": "GFS 4 filed 2026-07-31",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-31T22:42:08.331582+00:00",
         "decision": "go",
         "priority_flags": {},
@@ -9477,6 +9687,13 @@
       },
       "title": "CCXI 4 filed 2022-10-24",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-11T05:08:39.273657+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -9742,6 +9959,13 @@
       },
       "title": "TSLA 4 filed 2026-05-15",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-14T06:35:59.380936+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -10368,6 +10592,13 @@
       },
       "title": "LITE 4 filed 2026-08-18",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-19T22:33:19.993332+00:00",
         "decision": "go",
         "priority_flags": {
@@ -10458,6 +10689,13 @@
       "themes": {},
       "title": "AEVA 4 filed 2026-07-29",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-15T22:33:59.724165+00:00",
         "decision": "go",
         "priority_flags": {
@@ -10767,6 +11005,13 @@
       "themes": {},
       "title": "TSEM 4 filed 2026-07-15",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713580+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -11066,6 +11311,13 @@
       },
       "title": "AVGO 4 filed 2026-07-14",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-14T06:36:01.380607+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -11240,6 +11492,13 @@
       "themes": {},
       "title": "MU 4 filed 2026-07-17",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-20T22:36:15.864487+00:00",
         "decision": "go",
         "priority_flags": {},
@@ -11419,6 +11678,13 @@
       },
       "title": "CCXI 4 filed 2022-10-24",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-11T05:08:39.481069+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -11487,6 +11753,13 @@
       },
       "title": "AVGO 4 filed 2026-06-26",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-14T06:36:01.624369+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -11844,6 +12117,13 @@
       },
       "title": "NVDA 4 filed 2026-08-12",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-14T06:36:00.024368+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -11870,6 +12150,13 @@
       "themes": {},
       "title": "GFS 4 filed 2026-07-30",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-30T22:41:03.881232+00:00",
         "decision": "go",
         "priority_flags": {},
@@ -12702,6 +12989,13 @@
       "themes": {},
       "title": "MTSI 4 filed 2026-06-02",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-15T06:38:17.239805+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -12853,6 +13147,13 @@
       },
       "title": "JBL 4 filed 2026-07-21",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-14T06:36:02.965924+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -13298,6 +13599,13 @@
       "themes": {},
       "title": "LRCX 4 filed 2026-07-06",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713584+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -13444,6 +13752,13 @@
       "themes": {},
       "title": "GFS 4 filed 2026-07-31",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-31T22:42:08.531173+00:00",
         "decision": "go",
         "priority_flags": {},
@@ -14010,6 +14325,13 @@
       },
       "title": "CCXI 4 filed 2022-10-24",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-11T05:08:39.693409+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -14255,6 +14577,13 @@
       "themes": {},
       "title": "GFS 4 filed 2026-07-31",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-31T22:42:08.729826+00:00",
         "decision": "go",
         "priority_flags": {},
@@ -14417,6 +14746,13 @@
       },
       "title": "CCXI 4 filed 2022-10-24",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-11T05:08:39.915715+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -14717,6 +15053,13 @@
       "themes": {},
       "title": "AXTI 4 filed 2026-08-19",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-19T22:33:20.251442+00:00",
         "decision": "go",
         "priority_flags": {
@@ -15063,6 +15406,13 @@
       "themes": {},
       "title": "AAOI 4 filed 2026-06-16",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713587+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -15319,6 +15669,13 @@
       },
       "title": "LITE 4 filed 2026-08-18",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-19T22:33:20.528380+00:00",
         "decision": "go",
         "priority_flags": {
@@ -15526,6 +15883,13 @@
       "themes": {},
       "title": "TSEM 4 filed 2026-07-06",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713592+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -15814,6 +16178,13 @@
       },
       "title": "NVDA 4 filed 2026-08-07",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-14T06:36:00.256448+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -15840,6 +16211,13 @@
       "themes": {},
       "title": "GFS 4 filed 2026-07-10",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713595+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -16055,6 +16433,13 @@
       "themes": {},
       "title": "AMAT 4 filed 2026-06-17",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713599+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -16500,6 +16885,13 @@
       },
       "title": "JBL 4 filed 2026-07-08",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-14T06:36:03.187242+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -16526,6 +16918,13 @@
       "themes": {},
       "title": "AAOI 4 filed 2026-07-23",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T09:09:23.756256+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -16765,6 +17164,13 @@
       "themes": {},
       "title": "META 4 filed 2026-08-04",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-11T05:08:40.152127+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -16791,6 +17197,13 @@
       "themes": {},
       "title": "GFS 4 filed 2026-07-24",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T09:09:23.756259+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -16817,6 +17230,13 @@
       "themes": {},
       "title": "GFS 4 filed 2026-07-20",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713604+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -17276,6 +17696,13 @@
       "themes": {},
       "title": "GFS 4 filed 2026-07-30",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-30T22:41:05.934658+00:00",
         "decision": "go",
         "priority_flags": {},
@@ -17429,6 +17856,13 @@
       },
       "title": "LITE 4 filed 2026-08-18",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-19T22:33:20.773321+00:00",
         "decision": "go",
         "priority_flags": {
@@ -17703,6 +18137,13 @@
       "themes": {},
       "title": "META 4 filed 2026-08-06",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-11T05:08:40.383680+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -17729,6 +18170,13 @@
       "themes": {},
       "title": "GFS 4 filed 2026-07-31",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-31T22:42:08.929055+00:00",
         "decision": "go",
         "priority_flags": {},
@@ -17785,6 +18233,13 @@
       },
       "title": "AVGO 4 filed 2026-07-10",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-14T06:36:01.842059+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -17887,6 +18342,13 @@
       "themes": {},
       "title": "LRCX 4 filed 2026-08-06",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-06T22:33:45.237485+00:00",
         "decision": "go",
         "priority_flags": {
@@ -18205,6 +18667,13 @@
       "themes": {},
       "title": "META 4 filed 2026-08-04",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-11T05:08:40.637829+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -18291,6 +18760,13 @@
       "themes": {},
       "title": "AXTI 4 filed 2026-06-17",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713607+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -18586,6 +19062,13 @@
       },
       "title": "NVDA 4 filed 2026-06-29",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-14T06:36:00.498976+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -18612,6 +19095,13 @@
       "themes": {},
       "title": "META 4 filed 2026-08-18",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-19T22:33:21.016336+00:00",
         "decision": "go",
         "priority_flags": {
@@ -18805,6 +19295,13 @@
       "themes": {},
       "title": "GFS 4 filed 2026-07-20",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713611+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -18861,6 +19358,13 @@
       "themes": {},
       "title": "TSEM 4 filed 2026-07-06",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713614+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -19014,6 +19518,13 @@
       "themes": {},
       "title": "GFS 4 filed 2026-07-30",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-30T22:41:06.545976+00:00",
         "decision": "go",
         "priority_flags": {},
@@ -19040,6 +19551,13 @@
       "themes": {},
       "title": "LRCX 4 filed 2026-08-07",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-07T22:39:28.848886+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -19284,6 +19802,13 @@
       "themes": {},
       "title": "AAOI 4 filed 2026-06-16",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713618+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -19443,6 +19968,13 @@
       },
       "title": "NVDA 4 filed 2026-06-29",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-14T06:36:00.719914+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -19469,6 +20001,13 @@
       "themes": {},
       "title": "TSEM 4 filed 2026-07-06",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713621+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -19495,6 +20034,13 @@
       "themes": {},
       "title": "AAOI 4 filed 2026-07-23",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T09:09:23.756263+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -19688,6 +20234,13 @@
       "themes": {},
       "title": "META 4 filed 2026-08-18",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-19T22:33:21.255966+00:00",
         "decision": "go",
         "priority_flags": {
@@ -20428,6 +20981,13 @@
       "themes": {},
       "title": "AXTI 4 filed 2026-06-17",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713625+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -20970,6 +21530,13 @@
       },
       "title": "COHR 4 filed 2026-06-05",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713628+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -21170,6 +21737,13 @@
       "themes": {},
       "title": "GFS 4 filed 2026-07-30",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-30T22:41:07.219492+00:00",
         "decision": "go",
         "priority_flags": {},
@@ -21226,6 +21800,13 @@
       "themes": {},
       "title": "GFS 4 filed 2026-07-31",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-31T22:42:09.114318+00:00",
         "decision": "go",
         "priority_flags": {},
@@ -21734,6 +22315,13 @@
       "themes": {},
       "title": "META 4 filed 2026-08-18",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-19T22:33:21.497352+00:00",
         "decision": "go",
         "priority_flags": {
@@ -21873,6 +22461,13 @@
       "themes": {},
       "title": "LRCX 4 filed 2026-04-28",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713632+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -21899,6 +22494,13 @@
       "themes": {},
       "title": "AAOI 4 filed 2026-06-18",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713635+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -22114,6 +22716,13 @@
       "themes": {},
       "title": "MU 4 filed 2026-07-02",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-20T22:36:16.850960+00:00",
         "decision": "go",
         "priority_flags": {},
@@ -22598,6 +23207,13 @@
       "themes": {},
       "title": "META 4 filed 2026-08-18",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-19T22:33:21.747311+00:00",
         "decision": "go",
         "priority_flags": {
@@ -22626,6 +23242,13 @@
       "themes": {},
       "title": "LRCX 4 filed 2026-06-15",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713639+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -22667,6 +23290,13 @@
       "themes": {},
       "title": "AAOI 4 filed 2026-08-04",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-04T22:36:56.438907+00:00",
         "decision": "go",
         "priority_flags": {},
@@ -22693,6 +23323,13 @@
       "themes": {},
       "title": "META 4 filed 2026-07-22",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-11T05:08:40.853374+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -22727,6 +23364,13 @@
       },
       "title": "AVGO 4 filed 2026-07-10",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-14T06:36:02.056924+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -22767,6 +23411,13 @@
       "themes": {},
       "title": "AEVA 4 filed 2026-07-29",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-15T22:33:59.987128+00:00",
         "decision": "go",
         "priority_flags": {
@@ -22998,6 +23649,13 @@
       "themes": {},
       "title": "MTSI 4 filed 2026-05-20",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-15T06:38:19.569287+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -23032,6 +23690,13 @@
       },
       "title": "CCXI 4 filed 2022-10-24",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-11T05:08:41.058884+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -23201,6 +23866,13 @@
       "themes": {},
       "title": "MTSI 4 filed 2026-05-20",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-15T06:38:19.855544+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -23227,6 +23899,13 @@
       "themes": {},
       "title": "LRCX 4 filed 2026-06-02",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713642+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -23462,6 +24141,13 @@
       },
       "title": "JBL 4 filed 2026-08-05",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-14T06:36:03.403859+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -23672,6 +24358,13 @@
       "themes": {},
       "title": "AEVA 4 filed 2026-08-14",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-15T22:34:00.247020+00:00",
         "decision": "go",
         "priority_flags": {
@@ -24051,6 +24744,13 @@
       "themes": {},
       "title": "META 4 filed 2026-08-12",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-13T22:36:37.087730+00:00",
         "decision": "go",
         "priority_flags": {
@@ -24401,6 +25101,13 @@
       },
       "title": "CCXI 4 filed 2022-10-24",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-11T05:08:41.274996+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -24475,6 +25182,13 @@
       "themes": {},
       "title": "GFS 4 filed 2026-08-10",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-10T22:34:00.851139+00:00",
         "decision": "go",
         "priority_flags": {},
@@ -24504,6 +25218,13 @@
       "themes": {},
       "title": "AMAT 4 filed 2026-06-17",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713646+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -24576,6 +25297,13 @@
       "themes": {},
       "title": "MTSI 4 filed 2026-08-19",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-19T22:33:21.985387+00:00",
         "decision": "go",
         "priority_flags": {
@@ -24903,6 +25631,13 @@
       "themes": {},
       "title": "LRCX 4 filed 2026-06-15",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713649+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -24979,6 +25714,13 @@
       },
       "title": "LITE 4 filed 2026-07-16",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713653+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -25005,6 +25747,13 @@
       "themes": {},
       "title": "AAOI 4 filed 2026-07-23",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T09:09:23.756267+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -25396,6 +26145,13 @@
       "themes": {},
       "title": "META 4 filed 2026-08-05",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-11T05:08:41.503383+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -25518,6 +26274,13 @@
       },
       "title": "COHR 4 filed 2026-07-24",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T09:09:23.756271+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -25544,6 +26307,13 @@
       "themes": {},
       "title": "LRCX 4 filed 2026-07-14",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713656+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -25578,6 +26348,13 @@
       },
       "title": "LITE 4 filed 2026-06-04",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713660+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -25834,6 +26611,13 @@
       },
       "title": "LITE 4 filed 2026-07-16",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713664+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -25860,6 +26644,13 @@
       "themes": {},
       "title": "AMAT 4 filed 2026-07-01",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713667+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -26007,6 +26798,13 @@
       "themes": {},
       "title": "META 4 filed 2026-08-20",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-20T22:36:17.104404+00:00",
         "decision": "go",
         "priority_flags": {},
@@ -26033,6 +26831,13 @@
       "themes": {},
       "title": "TSEM 4 filed 2026-07-06",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713671+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -26394,6 +27199,13 @@
       "themes": {},
       "title": "GFS 4 filed 2026-07-31",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-31T22:42:09.319283+00:00",
         "decision": "go",
         "priority_flags": {},
@@ -26448,6 +27260,13 @@
       "themes": {},
       "title": "AAOI 4 filed 2026-07-23",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T09:09:23.756275+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -26599,6 +27418,13 @@
       "themes": {},
       "title": "MU 4 filed 2026-07-06",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-20T22:36:17.348519+00:00",
         "decision": "go",
         "priority_flags": {},
@@ -27517,6 +28343,13 @@
       "themes": {},
       "title": "GFS 4 filed 2026-07-07",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713674+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -27560,6 +28393,13 @@
       },
       "title": "LITE 4 filed 2026-08-18",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-19T22:33:22.223962+00:00",
         "decision": "go",
         "priority_flags": {
@@ -27718,6 +28558,13 @@
       },
       "title": "TSLA 4 filed 2026-06-09",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-14T06:35:59.594785+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -27936,6 +28783,13 @@
       "themes": {},
       "title": "GFS 4 filed 2026-07-31",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-31T22:42:09.528703+00:00",
         "decision": "go",
         "priority_flags": {},
@@ -28087,6 +28941,13 @@
       "themes": {},
       "title": "META 4 filed 2026-08-18",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-19T22:33:22.481438+00:00",
         "decision": "go",
         "priority_flags": {
@@ -28248,6 +29109,13 @@
       "themes": {},
       "title": "GFS 4 filed 2026-08-04",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-04T22:36:57.000200+00:00",
         "decision": "go",
         "priority_flags": {},
@@ -28274,6 +29142,13 @@
       "themes": {},
       "title": "AAOI 4 filed 2026-07-23",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T09:09:23.756279+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -28732,6 +29607,13 @@
       },
       "title": "NVDA 4 filed 2026-07-06",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-14T06:36:00.933228+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -28766,6 +29648,13 @@
       },
       "title": "AVGO 4 filed 2026-06-29",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-14T06:36:02.274313+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -28800,6 +29689,13 @@
       },
       "title": "COHR 4 filed 2026-07-06",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713679+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -29095,6 +29991,13 @@
       },
       "title": "AVGO 4 filed 2026-07-01",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-14T06:36:02.503459+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -29390,6 +30293,13 @@
       "themes": {},
       "title": "AMAT 4 filed 2026-06-22",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713682+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -29602,6 +30512,13 @@
       },
       "title": "COHR 4 filed 2026-05-13",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713686+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -29727,6 +30644,13 @@
       },
       "title": "LITE 4 filed 2026-07-16",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713689+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -30084,6 +31008,13 @@
       "themes": {},
       "title": "AMAT 4 filed 2026-06-17",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713693+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -30515,6 +31446,13 @@
       "themes": {},
       "title": "GFS 4 filed 2026-07-30",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-30T22:41:09.079006+00:00",
         "decision": "go",
         "priority_flags": {},
@@ -30706,6 +31644,13 @@
       "themes": {},
       "title": "GFS 4 filed 2026-07-13",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713696+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -30816,6 +31761,13 @@
       "themes": {},
       "title": "AAOI 4 filed 2026-08-12",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-12T22:36:29.061951+00:00",
         "decision": "go",
         "priority_flags": {},
@@ -30910,6 +31862,13 @@
       "themes": {},
       "title": "MU 4 filed 2026-07-28",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-20T22:36:17.839384+00:00",
         "decision": "go",
         "priority_flags": {},
@@ -31054,6 +32013,13 @@
       },
       "title": "CCXI 4 filed 2022-10-24",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-11T05:08:41.756216+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -31205,6 +32171,13 @@
       "themes": {},
       "title": "MU 4 filed 2026-07-02",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-20T22:36:18.086946+00:00",
         "decision": "go",
         "priority_flags": {},
@@ -31292,6 +32265,13 @@
       "themes": {},
       "title": "AAOI 4 filed 2026-07-14",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713700+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -32216,6 +33196,13 @@
       "themes": {},
       "title": "MTSI 4 filed 2026-05-21",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-15T06:38:21.334374+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -32701,6 +33688,13 @@
       },
       "title": "LITE 4 filed 2026-07-16",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713703+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -32861,6 +33855,13 @@
       "themes": {},
       "title": "AEVA 4 filed 2026-07-29",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-15T22:34:00.498675+00:00",
         "decision": "go",
         "priority_flags": {
@@ -33288,6 +34289,13 @@
       },
       "title": "TSLA 4 filed 2026-06-17",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-14T06:35:59.807214+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -33411,6 +34419,13 @@
       "themes": {},
       "title": "TSEM 4 filed 2026-07-06",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713708+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -33559,6 +34574,13 @@
       "themes": {},
       "title": "META 4 filed 2026-08-18",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-19T22:33:22.732189+00:00",
         "decision": "go",
         "priority_flags": {
@@ -33817,6 +34839,13 @@
       "themes": {},
       "title": "MU 4 filed 2026-07-28",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-20T22:36:18.338168+00:00",
         "decision": "go",
         "priority_flags": {},
@@ -33843,6 +34872,13 @@
       "themes": {},
       "title": "MU 4 filed 2026-07-27",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-20T22:36:18.585814+00:00",
         "decision": "go",
         "priority_flags": {},
@@ -34036,6 +35072,13 @@
       },
       "title": "LITE 4 filed 2026-07-16",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713711+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -34062,6 +35105,13 @@
       "themes": {},
       "title": "GFS 4 filed 2026-08-20",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-20T22:36:18.838400+00:00",
         "decision": "go",
         "priority_flags": {},
@@ -34184,6 +35234,13 @@
       "themes": {},
       "title": "META 4 filed 2026-08-18",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-19T22:33:22.977639+00:00",
         "decision": "go",
         "priority_flags": {
@@ -34792,6 +35849,13 @@
       "themes": {},
       "title": "MTSI 4 filed 2026-05-20",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-15T06:38:21.589184+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -35061,6 +36125,13 @@
       "themes": {},
       "title": "AEVA 4 filed 2026-08-12",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-15T22:34:00.734698+00:00",
         "decision": "go",
         "priority_flags": {
@@ -35301,6 +36372,13 @@
       },
       "title": "JBL 4 filed 2026-05-04",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-14T06:36:03.633167+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -35373,6 +36451,13 @@
       },
       "title": "JBL 4 filed 2026-07-17",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-14T06:36:03.882164+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -35521,6 +36606,13 @@
       "themes": {},
       "title": "AAOI 4 filed 2026-08-04",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-04T22:36:58.208881+00:00",
         "decision": "go",
         "priority_flags": {},
@@ -35603,6 +36695,13 @@
       },
       "title": "CCXI 4 filed 2022-10-24",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-11T05:08:41.973676+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -35629,6 +36728,13 @@
       "themes": {},
       "title": "MU 4 filed 2026-07-02",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-20T22:36:19.084617+00:00",
         "decision": "go",
         "priority_flags": {},
@@ -35711,6 +36817,13 @@
       },
       "title": "AVGO 4 filed 2026-07-14",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-14T06:36:02.746554+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -35913,6 +37026,13 @@
       },
       "title": "JBL 4 filed 2026-04-29",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-14T06:36:04.099269+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -36062,6 +37182,13 @@
       "themes": {},
       "title": "GFS 4 filed 2026-07-27",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-27T22:32:43.482003+00:00",
         "decision": "go",
         "priority_flags": {
@@ -36090,6 +37217,13 @@
       "themes": {},
       "title": "GFS 4 filed 2026-06-23",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713715+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -36567,6 +37701,13 @@
       },
       "title": "NVDA 4 filed 2026-06-29",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-14T06:36:01.149439+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -36910,6 +38051,13 @@
       "themes": {},
       "title": "TSEM 4 filed 2026-08-12",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-12T22:36:29.773989+00:00",
         "decision": "go",
         "priority_flags": {},
@@ -37341,6 +38489,13 @@
       "themes": {},
       "title": "GFS 4 filed 2026-07-30",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-30T22:41:10.337617+00:00",
         "decision": "go",
         "priority_flags": {},
@@ -37564,6 +38719,13 @@
       },
       "title": "COHR 4 filed 2026-05-13",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713718+00:00",
         "decision": "no_go",
         "priority_flags": {},
@@ -37642,6 +38804,13 @@
       "themes": {},
       "title": "AAOI 4 filed 2026-06-18",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T12:24:04.421886+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-07-25T03:52:34.713722+00:00",
         "decision": "no_go",
         "priority_flags": {},

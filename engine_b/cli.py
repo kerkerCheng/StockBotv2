@@ -166,8 +166,8 @@ def _cmd_list(args: argparse.Namespace) -> int:
             chokepoint_tickers=choke_tickers,
             chokepoint_company_ids=choke_company_ids,
         )
-        rows = [lead for _score, lead in ranked]
-        scores = {lead["lead_id"]: score for score, lead in ranked}
+        rows = [lead for _rank, lead in ranked]
+        scores = {lead["lead_id"]: rank.label for rank, lead in ranked}
     else:
         rows.sort(key=lambda l: (l.get("published_at") or "", l["lead_id"]), reverse=True)
         scores = {}
@@ -180,7 +180,7 @@ def _cmd_list(args: argparse.Namespace) -> int:
     for l in rows:
         tri = l.get("triage") or {}
         tag = f" [{tri.get('decision')}·tier{tri.get('tier')}]" if tri else ""
-        prefix = f"[{scores[l['lead_id']]:5.1f}] " if l["lead_id"] in scores else ""
+        prefix = f"[{scores[l['lead_id']]}] " if l["lead_id"] in scores else ""
         print(f"{prefix}{l['lead_id']}  {l['status']:15}{tag}  {l['source']}")
         print(f"    {l.get('title') or '(無標題)'}  {l.get('url')}")
     return 0
@@ -270,8 +270,8 @@ def _cmd_drain(args: argparse.Namespace) -> int:
             {"kind": "decision_work_order", "work_order": job}
             for job in decision_jobs
         ] + [
-            {"kind": "lead", "score": score, "lead": lead}
-            for score, lead in lead_batch
+            {"kind": "lead", "priority": rank.label, "lead": lead}
+            for rank, lead in lead_batch
         ]
         print(json.dumps(rows, ensure_ascii=False, indent=2))
         return 0
@@ -285,8 +285,8 @@ def _cmd_drain(args: argparse.Namespace) -> int:
             f"cohort={job['cohort_id']}"
         )
         print(f"            blockers={','.join(job.get('blockers') or [])}")
-    for score, l in lead_batch:
-        print(f"  [{score:5.1f}] {l['lead_id']}  {l['status']:12}  {l['source']}")
+    for rank, l in lead_batch:
+        print(f"  [{rank.label}] {l['lead_id']}  {l['status']:12}  {l['source']}")
         print(f"           {l.get('title') or '(無標題)'}  {l.get('url')}")
     return 0
 

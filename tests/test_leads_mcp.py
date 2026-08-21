@@ -33,7 +33,10 @@ def test_get_pending_leads_core_ranks_and_counts(tmp_path) -> None:
     assert result["counts"]["triaged_go"] == 2
     assert result["unresolved_harvest_failures"] == []
     assert result["leads"][0]["source"] == "edgar:COHR"  # 最高 priority 在前
-    assert result["leads"][0]["priority"] > result["leads"][1]["priority"]
+    # `priority` 自 2026-08-21 起是說明「為什麼排在這裡」的標籤，不是可比較的分數——
+    # 合併後的單一分數正是本次移除的東西（加權總分有補償性）。順序由回傳次序表達。
+    assert result["leads"][0]["priority"] == "出場條件·未分類"
+    assert result["leads"][1]["priority"] == "未分類·未分類"
 
 
 def test_record_triage_calls_committer_and_advances(tmp_path) -> None:

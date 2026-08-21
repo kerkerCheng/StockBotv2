@@ -77,6 +77,46 @@ prepared RA 入圖，不必在研究前先回答一次。判斷錯了的主要�
 - **PASS** → 寫回 `triaged_go`，由 routine 依 priority 自動 source-trace＋extract；prepared RA 才進 pq2
 - **FILTER** → 寫回 `triaged_no_go`／park，並記錄材料摘要 + 篩掉理由
 
+### PASS 的同時必須分類（2026-08-21 新增，pq1 排序的唯一語意輸入）
+
+**PASS 不再只是 PASS——還要回答「它有多急」。** 舊版只有 PASS／FILTER 兩格，於是
+「放行但低優先」無處可放。實測後果：agent 判定「MU 官方 SEC Form 4……**低優先**但可作
+insider／稀釋時變觀測」，那句「低優先」只能寫進自由文字 `reason`，`priority.py` 讀不到，
+於是它用 tier＋持股算出高分——**每日 5 個 pq1 slot 有 3 個被 7 週前的 Micron 內部人申報佔走**。
+同一類文件在 167 筆中被判 107 次 `no_go`、36 次 `go`，也證明沒有字彙時判斷會逐次飄移。
+
+這也解掉「寧可放行」的張力：那個偏好對**二元閘門**是對的，但當放行的唯一替代是擋掉時就有害。
+**現在可以既放行又降級。**
+
+寫回 `lead["triage"]["classification"]`，三個欄位都取自
+[`config/lead_classification.json`](../../config/lead_classification.json)（**唯一權威，
+不得自創值**）：
+
+| 欄位 | 問題 | 值 |
+|---|---|---|
+| `content_type` | 這則材料是什麼 | `capital_commitment`／`structural_fact`／`financial_fact`／`insider_transaction`／`sentiment`／`no_content` |
+| `decision_impact` | **答案回來會改變什麼** | `exit_condition`／`candidate_set`／`ranking`／`confidence_only` |
+| `payment_direction` | 僅 `capital_commitment` 必填 | `customer_to_supplier`／`supplier_to_customer`／`unclear` |
+
+再加 `classified_by`（`triage_semantic_v1`）、`classified_at`、`reason`。
+
+**`decision_impact` 是判斷核心，也最容易填錯。** 問法固定：*「如果查證結果是 A，什麼會變？
+是 B 呢？」*
+
+- 兩個答案都不改變候選集合與排序 → **`confidence_only`**。這是退化態：它的上限被鎖死在
+  「把已知第一名確認成第一名」。不是零價值，是最低價值。
+- ⚠ **不要因為材料是一手、或關於我們持有的公司，就往上填。** 那正是舊加權總分的病
+  （tier＋holdings＋thesis 三個弱理由相加壓過真正的資本承諾事件）。一手性與持股在排序裡
+  另有位置，不需要你在這裡替它們加分。
+
+**`payment_direction` 自帶方向性，是四維度裡最難偽造的一項，別填反：**
+客戶掏錢綁供應商（NVIDIA 對 COHR 20 億＋2030 產能協議、Micron take-or-pay＋押金）＝真瓶頸；
+**供應商付錢或給股權換訂單（POET 以 2,292 萬份認股權證換 Lumilens 訂單）＝不是瓶頸**。
+看不出誰付誰就填 `unclear`，**不要猜**。
+
+**分類只排注意力順序。** 它不影響 evidence tier、graph admission、pq2 核准或任何資本 gate；
+填錯的代價是多花或少花一點研究 token，不是放行一筆不該放行的東西。
+
 **寬鬆原則的具體操作：** 五要素中，關聯性和可引用性是硬指標（沒關聯、沒有可查核內容 → 直接 FILTER，抽取了也沒用）。新穎性、潛在獨立性與矛盾／反證價值是軟指標；後三者任一項不確定、可能有價值或明確命中時，一律 PASS。不要因為材料反駁現有 thesis、或與既有主題重疊就篩掉——這是「寧可多花一點抽取力氣、也不要悄悄漏掉好線索」的核心（R12）。
 
 ### 使用者指定的新領域探索 campaign

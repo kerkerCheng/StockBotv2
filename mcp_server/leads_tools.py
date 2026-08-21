@@ -38,7 +38,7 @@ def get_pending_leads_core(
     items = [
         {
             "lead_id": l["lead_id"],
-            "priority": score,
+            "priority": rank.label,
             "status": l["status"],
             "source": l["source"],
             "title": l.get("title") or "",
@@ -46,7 +46,7 @@ def get_pending_leads_core(
             "published_at": l.get("published_at"),
             "triage": l.get("triage"),
         }
-        for score, l in ranked[: max(0, int(limit))]
+        for rank, l in ranked[: max(0, int(limit))]
     ]
     return {
         "counts": leads.status_counts(store),

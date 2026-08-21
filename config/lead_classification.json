@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "_doc": [
+    "pq1 注意力排序的封閉字彙。判斷由 skills/signal-triage（LLM，語意）產生並存回 lead；",
+    "排序由 engine_b/priority.py（程式，字典序）消費。兩者不得互換角色——LLM 可以解析與",
+    "提議，不可以授權（AGENTS.md L15）。",
+    "",
+    "為什麼是字典序而不是加權總分：加權總分有補償性，很多個各自成立的弱理由可以合成一個",
+    "假的強理由。2026-08-21 實測，Micron 內部人 Form 4 以 tier 4.0 + holdings 4.0 +",
+    "thesis 4.0 = 12.0 佔掉每日 5 個 pq1 slot 中的 3 個；三項單獨看都成立，錯的是可以相加。",
+    "同一判斷在 rank_bottlenecks 已經做過（排序鍵是明確優先序，不是加權綜合分數）。",
+    "",
+    "本檔只決定注意力順序。evidence tier、graph admission、pq2 核准與資本 gate 一律不受影響。"
+  ],
+
+  "decision_impact": {
+    "_doc": "答案回來時會改變什麼。這是排序的第一鍵，因為它就是最佳化目標本身。",
+    "_order": ["exit_condition", "candidate_set", "ranking", "unknown", "confidence_only"],
+    "exit_condition": {
+      "label": "出場條件",
+      "hint": "可能觸發既有 thesis 的 disproof。沿用舊 contradiction 權重最高的理由：可能推翻 thesis 的事最急，且它保護的是已投入的資本。"
+    },
+    "candidate_set": {
+      "label": "候選集合",
+      "hint": "清單上會多一個或少一個名字。長期價值最高——不出手就沒有 outcome。"
+    },
+    "ranking": {
+      "label": "排序",
+      "hint": "候選不變，但誰是第一會變。例：查出客戶對某供應商有預付款。"
+    },
+    "unknown": {
+      "label": "未分類",
+      "hint": "尚未以本字彙分類（backfill 之前的舊 lead）。刻意排在 confidence_only 之上、其餘之下——不讓舊 lead 餓死，也不讓它插隊。這一格長期應為 0。"
+    },
+    "confidence_only": {
+      "label": "只是信心",
+      "hint": "排序不會動，只是更確定。退化態：它的上限被鎖死在『把已知第一名確認成第一名』。不是零價值，是最低價值。"
+    }
+  },
+
+  "content_type": {
+    "_doc": "這則材料是什麼。第二鍵，用來在同一 decision_impact 內排序。",
+    "_order": [
+      "capital_commitment",
+      "structural_fact",
+      "financial_fact",
+      "insider_transaction",
+      "sentiment",
+      "unknown",
+      "no_content"
+    ],
+    "capital_commitment": {
+      "label": "客戶端資本承諾",
+      "hint": "誰掏錢綁誰：投資、預付款、押金、take-or-pay、長期產能協議、以股權換訂單。四維度裡最難偽造的一項，且自帶方向性——必須同時記錄 payer 與 payee。"
+    },
+    "structural_fact": {
+      "label": "結構事實",
+      "hint": "供應／依賴／可替代性／合格狀態／sole_source。這是圖的建材。"
+    },
+    "financial_fact": {
+      "label": "財務事實",
+      "hint": "財報數字、指引、產能、backlog。多半屬 Engine C，不進圖。"
+    },
+    "insider_transaction": {
+      "label": "內部人交易",
+      "hint": "Form 4 等。既有 triage 已多次自行判定『個別 Form 4 資訊量低；應以彙總方式讀（Engine C 稀釋項），不逐筆進 pq1』——本字彙讓那個判斷有地方存，不必再靠 no_go 一刀切。"
+    },
+    "sentiment": {
+      "label": "情緒／看法",
+      "hint": "沒有可逐字查核的具體主張，只有方向性意見。"
+    },
+    "no_content": {
+      "label": "無可查核內容",
+      "hint": "連可追溯的具體陳述都沒有。"
+    },
+    "unknown": {
+      "label": "未分類",
+      "hint": "backfill 之前的舊 lead。排在 sentiment 與 no_content 之間。"
+    }
+  },
+
+  "payment_direction": {
+    "_doc": [
+      "僅在 content_type=capital_commitment 時必填。這是 2026-08-21 四維度收斂的核心：",
+      "客戶掏錢綁供應商＝真瓶頸（NVIDIA 對 COHR 20 億＋2030 產能協議；Micron take-or-pay",
+      "＋4.22 億押金）；供應商付錢或給股權換訂單＝不是瓶頸（POET 以 2,292 萬份認股權證",
+      "換 Lumilens 訂單）。任何以替代難度為主的排序都抓不到後者——POET 是 sub=4、有需求",
+      "錨點，看起來像瓶頸。",
+      "方向不明時填 unclear，不要猜。"
+    ],
+    "_order": ["customer_to_supplier", "unclear", "supplier_to_customer"],
+    "customer_to_supplier": {
+      "label": "客戶→供應商",
+      "hint": "真瓶頸訊號。"
+    },
+    "supplier_to_customer": {
+      "label": "供應商→客戶",
+      "hint": "反向訊號：供應商付錢或給股權買訂單，通常代表它不是瓶頸。排最後，但仍要研究——它是有價值的反證。"
+    },
+    "unclear": {
+      "label": "方向不明",
+      "hint": "有資本往來但看不出誰付誰。"
+    }
+  },
+
+  "sort_key": {
+    "_doc": [
+      "字典序，由高至低。每一鍵都是離散等級，不做加法、不做加權，因此不存在補償性——",
+      "一堆弱理由永遠不能合成一個強理由。",
+      "user_authority 仍居首：使用者明確指定的 campaign 是 pq1 排程 authority（但不授權 pq2）。"
+    ],
+    "_order": [
+      "user_authority",
+      "decision_impact",
+      "content_type",
+      "payment_direction",
+      "chokepoint",
+      "relevance",
+      "tier",
+      "independent_source",
+      "novelty",
+      "lead_id"
+    ]
+  }
+}
