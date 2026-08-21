@@ -3187,12 +3187,20 @@
     },
     {
       "added_at": "2026-08-21T06:31:47.875434+00:00",
+      "completion_authority": {
+        "action_digest": "c1d762a609bf478dd81bf060712e6e828c95e43db4ab12cb10952bfad3832d17",
+        "cohort_id": "dc_0fca807c963dc3b9888e0f83ba6d45a5",
+        "commit": "8b88059f869907b8741f98b71ac2a0783e129502",
+        "company_id": "co:marvell_technology",
+        "verified_at": "2026-08-21T06:34:07.266640+00:00"
+      },
       "hint": "核准 exact graph delta；Decision handoff：co:marvell_technology。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 201,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_83e73ee3b6022e86db033058cbc94a9f;digest:c1d762a609bf478dd81bf060712e6e828c95e43db4ab12cb10952bfad3832d17;commit:8b88059f869907b8741f98b71ac2a0783e129502;cohort:dc_0fca807c963dc3b9888e0f83ba6d45a5",
       "ref_id": "ra_83e73ee3b6022e86db033058cbc94a9f",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-21T06:34:07.266640+00:00",
       "source": "research_action",
       "title": "Marvell → LPO／CPO／TIA：補上孤立節點 tech:lpo 的第一條邊",
       "type": "ra_admission"
@@ -7245,6 +7253,15 @@
       "receipt": "decision:pd_b64ce4a43686c91ffc8b17fe09690aaf",
       "ref_id": "dc_2906500af891541ea4bdd52503b9b3aa",
       "type": "decision_review",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-21T06:34:07.266640+00:00",
+      "n": 201,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_83e73ee3b6022e86db033058cbc94a9f;digest:c1d762a609bf478dd81bf060712e6e828c95e43db4ab12cb10952bfad3832d17;commit:8b88059f869907b8741f98b71ac2a0783e129502;cohort:dc_0fca807c963dc3b9888e0f83ba6d45a5",
+      "ref_id": "ra_83e73ee3b6022e86db033058cbc94a9f",
+      "type": "ra_admission",
       "verb": "go"
     }
   ],
