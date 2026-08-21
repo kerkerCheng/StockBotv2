@@ -281,3 +281,40 @@ def test_drain_resumes_researching_leads(tmp_path, capsys) -> None:
     out = json.loads(capsys.readouterr().out.strip())
     # researching（中斷待續）仍要被 drain 撿回
     assert out[0]["lead"]["status"] == "researching"
+
+
+def test_default_drain_fails_closed_when_decision_store_is_unavailable(
+    tmp_path, capsys, monkeypatch
+) -> None:
+    path = tmp_path / "pending_leads.json"
+    leads.save(leads.empty_store(), path)
+    monkeypatch.setattr(leads, "DEFAULT_LEADS_PATH", path)
+
+    import decision_lab.bootstrap
+
+    def fail_open():
+        raise RuntimeError("private store blocked")
+
+    monkeypatch.setattr(decision_lab.bootstrap, "open_default_store", fail_open)
+
+    assert cli.main(["--leads", str(path), "drain"]) == 2
+    assert "Decision pq1 無法讀取" in capsys.readouterr().err
+
+
+def test_default_priority_list_fails_closed_when_holdings_are_unavailable(
+    tmp_path, capsys, monkeypatch
+) -> None:
+    path = tmp_path / "pending_leads.json"
+    leads.save(leads.empty_store(), path)
+    monkeypatch.setattr(leads, "DEFAULT_LEADS_PATH", path)
+
+    def fail_held(*, strict: bool = False):
+        assert strict is True
+        raise cli.PriorityContextError("無法載入 Google Sheet 持股 context")
+
+    monkeypatch.setattr(cli, "_held", fail_held)
+
+    assert cli.main([
+        "--leads", str(path), "list", "--by-priority",
+    ]) == 2
+    assert "pq1 priority context 無法讀取" in capsys.readouterr().err

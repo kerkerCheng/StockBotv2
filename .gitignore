@@ -83,4 +83,5 @@ extractions/silicon_matter_sivers_ayar_2026_03_14.json
 
 # Never commit local-only source-derived content.
 library/private/
+library/leads/action_drafts/
 .pytest_tmp/

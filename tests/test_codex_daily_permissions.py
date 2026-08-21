@@ -13,19 +13,25 @@ def test_project_does_not_define_an_ignored_permission_profile() -> None:
     assert not CONFIG.exists()
 
 
-def test_only_daily_fixed_entries_have_outside_sandbox_rules() -> None:
+def test_all_privileged_daily_entries_have_narrow_outside_sandbox_rules() -> None:
     rules = RULES.read_text(encoding="utf-8")
-    assert rules.count("prefix_rule(") == 7
+    assert rules.count("prefix_rule(") == 12
     for fixed_entry in (
         "crons\\\\harvest_leads.py",
         "engine_c\\\\etl_yfinance.py",
+        "fetchers\\\\edgar.py",
         "scripts\\\\daily_beta_snapshot.py",
+        '"-m", "engine_b.cli", "list"',
+        '"-m", "engine_b.cli", "drain"',
+        "scripts\\\\catalyst_watch.py",
+        "scripts\\\\prepare_research_action.py",
         '"-m", "decision_lab", "today"',
         '"-m", "engine_b.todo", "sync"',
         "scripts\\\\publish_daily_state.py",
         "scripts\\\\publish_daily_brief.py",
     ):
         assert fixed_entry in rules
+    assert '"scripts\\\\prepare_research_action.py", "--action-file"' in rules
     for broad_entry in (
         'pattern=["python"',
         'pattern=[".venv\\\\Scripts\\\\python.exe"]',

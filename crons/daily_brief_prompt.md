@@ -20,10 +20,11 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
    Codex standalone scheduled task 會沿用 legacy `workspace-write` sandbox；Daily 的唯一權限來源是
    `.codex/rules/stockbot-automations.rules` 的窄 fixed entry。下列連外命令第一次呼叫就用
    `require_escalated` 命中 exact outside-sandbox rule，不得先在 sandbox 製造可預期失敗再升權重重跑，也不得放行整個 PowerShell、
-   Python、Git 或 working tree。fixed entry 是 `crons\harvest_leads.py`、
-   `engine_c\etl_yfinance.py`、`scripts\daily_beta_snapshot.py`、`decision_lab today`、
+   Python、Git 或 working tree。fixed entry 是 `crons\harvest_leads.py`、`engine_c\etl_yfinance.py`、
+   `fetchers\edgar.py`、`scripts\daily_beta_snapshot.py`、`engine_b.cli list`、`engine_b.cli drain`、
+   `scripts\catalyst_watch.py`、`scripts\prepare_research_action.py --action-file`、`decision_lab today`、
    `engine_b.todo sync`、`scripts\publish_daily_state.py`、`scripts\publish_daily_brief.py`。
-   七條 rule 是單一 authority，不是 primary＋fallback 兩套權限。若 exact rule 未匹配、升權限被拒或命令
+   十二條 rule 是單一 authority，不是 primary＋fallback 兩套權限。若 exact rule 未匹配、升權限被拒或命令
    仍回 `access_blocked`，保留 failure 並 fail closed，不得改用更寬 rule 或手動重跑。權限正確後若仍發生
    暫時性 transport error，只讓該命令既有的 bounded、idempotent retry 跑完作最後一步；不得在 routine
    層重跑整個 fixed entry、整份 Daily Brief 或已 checkpoint 的工作。retry 用盡後照樣 fail closed。
@@ -46,7 +47,9 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
      主力逐檔表是每日心跳：即使今天不用啟動投入評估、所有標的都是 `HOLD`／`NO ACTION`，或本輪可評估
      上限為 0，也必須保留。每列明示商品自身的「最新完整交易日 `YYYY-MM-DD`：1日 ±X%」；stale／
      quarantined 時改列 TWSE 等官方 reference 日期、當日漲跌與降級原因，不得把最近收盤寫成即時行情。
-   - 對今日新增 pending leads 套 `skills/signal-triage/SKILL.md`，用本機 CLI 寫回 triage
+   - `.venv\Scripts\python.exe -m engine_b.cli list --status pending --by-priority`，再對今日新增 pending leads
+     套 `skills/signal-triage/SKILL.md`，用本機 CLI 寫回 triage。default store 的持股／瓶頸 context 任一讀取失敗
+     必須 exit 2、fail closed，不得以空集合繼續排序。
    - `.venv\Scripts\python.exe -m engine_b.cli trace-backlog`（顯示 parked 追源未果及下一 trigger；不把一般 backlog 全塞 pq2）
      ⚠ `auto_trigger_reachable=false` 的項目**必須逐筆列出並附 `unreachable_reason`**，不得只回報總數。
      那代表它既不需人工 authority、又沒有任何具名標的可比對，兩種 trace_trigger_kind 都永遠不會命中——
@@ -56,6 +59,8 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
      (c) 真的需要人工 access／付費／改優先權 → 設 `trace_requires_user=true` 進 pq2。
      不得原樣留著——那是安靜沉底，而漏掉時沒有人會發現。
    - `.venv\Scripts\python.exe -m decision_lab today --format markdown`
+   - `.venv\Scripts\python.exe scripts\catalyst_watch.py`
+   - `.venv\Scripts\python.exe -m query.bottleneck`（已可在 sandbox 讀本機 Neo4j，不需要 outside-sandbox rule）
    - `.venv\Scripts\python.exe -m engine_b.todo sync`
    - `.venv\Scripts\python.exe -m engine_b.todo list`
 4. 任何來源失敗都要誠實列出 `fetch_failed`／`parse_failed` 與結構化 `failure_class`；若 exact rule 未匹配，
@@ -76,10 +81,14 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
    標籤；不註冊 lead、不進 pq1／pq2、不寫任何 Engine authority。使用者要深挖時才另走
    `$lead-intake`／`$source-trace`。
 5. 先組出不會因研究失敗而消失的心跳 snapshot，再 best-effort 執行
-   `.venv\Scripts\python.exe -m engine_b.cli drain`。每輪上限由 `config/daily_routine.json` 控制；
+   `.venv\Scripts\python.exe -m engine_b.cli drain`（首次呼叫命中 exact rule）。每輪上限由 `config/daily_routine.json` 控制；
    使用者已 `go` 且有 dispatch receipt 的 Decision gap work order 優先，再以剩餘 budget 處理 leads；
    tracked tickers 由非 retired lifecycle 與 non-terminal Decision cohorts 自動導出。對最高 priority leads 逐則
-   source-trace＋extract，checkpoint `researching` → `action_prepared`。有可核准 graph delta 才 prepare；
+   source-trace＋extract，checkpoint `researching` → `action_prepared`。SEC 原文需要 repo fetcher 時使用
+   `.venv\Scripts\python.exe fetchers\edgar.py ...` 的 exact rule；一般公開頁仍可使用 WebSearch／Browser surface。
+   有可核准 graph delta 才把 request JSON 寫到 ignored `library/leads/action_drafts/<lead>.json`，再執行
+   `.venv\Scripts\python.exe scripts\prepare_research_action.py --action-file library\leads\action_drafts\<lead>.json`；
+   這一步只凍結 private staging，不 apply、不寫 Neo4j。prepare 成功後才 checkpoint `action_prepared`；
    追源未果、原主張被否定或僅屬 Engine C 時變 observation 時 park 並記 outcome，不製造空 RA。
    追源未果的 park 必須帶 `trace_status`／`trace_attempts_ref`／`trace_next_trigger`／`trace_requires_user`；
    一般 event／scheduled retry 留 pq1，只有需要合法 access／付費／人工優先權時才進 `source_trace_review` pq2。

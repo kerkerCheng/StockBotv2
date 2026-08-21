@@ -117,6 +117,9 @@ def test_first_call_uses_single_fixed_entry_path_and_retry_is_last_resort() -> N
 def test_scheduled_run_auto_drains_pq1_but_keeps_admission_gate() -> None:
     text = _text()
     assert "依每輪 limit 自動跑" in text
+    assert "scripts\\prepare_research_action.py --action-file" in text
+    assert "default store 的 Decision work orders" in text
+    assert "持股靜默降成空集合" in text
     assert "Triage PASS 只授權研究、不授權入圖" in text
     assert "prepared RA 進 pq2 後才等待使用者 `go`" in text
     assert "不為了讓每個 PASS 都進 pq2而製造空 Research Action".replace("pq2而", "pq2 而") in text

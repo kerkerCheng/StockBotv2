@@ -26,11 +26,15 @@ from engine_b import priority  # noqa: E402
 from engine_b import routine_config  # noqa: E402
 
 
+class PriorityContextError(RuntimeError):
+    """pq1 排序需要的 current-authority context 無法取得。"""
+
+
 def _tracked(arg: str | None) -> frozenset[str]:
     return frozenset(t.strip().upper() for t in (arg or "").split(",") if t.strip())
 
 
-def _chokepoint() -> tuple[frozenset[str], frozenset[str]]:
+def _chokepoint(*, strict: bool = False) -> tuple[frozenset[str], frozenset[str]]:
     """位於已知瓶頸上的公司（ticker 與 company_id）。
 
     2026-08-20 之前 pq1 排序完全不看瓶頸性——「AXT 供應 COHR 的 InP」與「財報季
@@ -52,7 +56,7 @@ def _chokepoint() -> tuple[frozenset[str], frozenset[str]]:
 
         password = os.environ.get("NEO4J_PASSWORD")
         if not password:
-            return frozenset(), frozenset()
+            raise PriorityContextError("缺少 NEO4J_PASSWORD，無法載入 chokepoint context")
         driver = GraphDatabase.driver(
             os.environ.get("NEO4J_URI", "bolt://localhost:7687"),
             auth=(os.environ.get("NEO4J_USER", "neo4j"), password),
@@ -63,7 +67,11 @@ def _chokepoint() -> tuple[frozenset[str], frozenset[str]]:
         finally:
             driver.close()
         result = bottleneck.rank_bottlenecks(rows, get_registry())
-    except Exception:
+    except Exception as exc:
+        if strict:
+            if isinstance(exc, PriorityContextError):
+                raise
+            raise PriorityContextError("無法載入 Neo4j chokepoint context") from exc
         return frozenset(), frozenset()
 
     tickers: set[str] = set()
@@ -86,7 +94,7 @@ def _chokepoint() -> tuple[frozenset[str], frozenset[str]]:
     return frozenset(tickers), frozenset(company_ids)
 
 
-def _held() -> tuple[frozenset[str], frozenset[str]]:
+def _held(*, strict: bool = False) -> tuple[frozenset[str], frozenset[str]]:
     """Google Sheet 的實際持股（ticker 與 company_id）。
 
     `tracked_tickers` 由 lifecycle ＋ 未結案 cohort 導出，**不含持股**——因此在此
@@ -98,7 +106,9 @@ def _held() -> tuple[frozenset[str], frozenset[str]]:
         from fetchers.gsheets import fetch_portfolio
 
         rows = fetch_portfolio(strict_operational=True)
-    except Exception:
+    except Exception as exc:
+        if strict:
+            raise PriorityContextError("無法載入 Google Sheet 持股 context") from exc
         return frozenset(), frozenset()
     tickers: set[str] = set()
     company_ids: set[str] = set()
@@ -136,11 +146,18 @@ def _held() -> tuple[frozenset[str], frozenset[str]]:
 def _cmd_list(args: argparse.Namespace) -> int:
     store = leads.load(args.leads)
     rows = list(store["leads"].values())
+    is_default_store = (
+        Path(args.leads).resolve() == leads.DEFAULT_LEADS_PATH.resolve()
+    )
     if args.status:
         rows = [l for l in rows if l["status"] == args.status]
     if args.by_priority:
-        held_tickers, held_company_ids = _held()
-        choke_tickers, choke_company_ids = _chokepoint()
+        try:
+            held_tickers, held_company_ids = _held(strict=is_default_store)
+            choke_tickers, choke_company_ids = _chokepoint(strict=is_default_store)
+        except PriorityContextError as exc:
+            print(f"錯誤：pq1 priority context 無法讀取：{exc}", file=sys.stderr)
+            return 2
         ranked = priority.rank_leads(
             rows,
             tracked_tickers=_tracked(args.tracked),
@@ -207,9 +224,12 @@ def _cmd_drain(args: argparse.Namespace) -> int:
         else routine_config.discover_tracked_tickers(config)
     )
     decision_jobs: list[dict] = []
+    is_default_store = (
+        Path(args.leads).resolve() == leads.DEFAULT_LEADS_PATH.resolve()
+    )
     include_decisions = args.decision_work_orders == "include" or (
         args.decision_work_orders == "auto"
-        and Path(args.leads).resolve() == leads.DEFAULT_LEADS_PATH.resolve()
+        and is_default_store
     )
     if include_decisions and limit:
         try:
@@ -221,14 +241,21 @@ def _cmd_drain(args: argparse.Namespace) -> int:
             finally:
                 decision_store.close()
         except Exception as exc:
+            if is_default_store:
+                print(f"錯誤：Decision pq1 無法讀取：{exc}", file=sys.stderr)
+                return 2
             print(f"警告：Decision pq1 無法讀取：{exc}", file=sys.stderr)
 
     candidates = [
         l for l in store["leads"].values()
         if l["status"] in ("triaged_go", "researching")
     ]
-    held_tickers, held_company_ids = _held()
-    choke_tickers, choke_company_ids = _chokepoint()
+    try:
+        held_tickers, held_company_ids = _held(strict=is_default_store)
+        choke_tickers, choke_company_ids = _chokepoint(strict=is_default_store)
+    except PriorityContextError as exc:
+        print(f"錯誤：pq1 priority context 無法讀取：{exc}", file=sys.stderr)
+        return 2
     ranked = priority.rank_leads(
         candidates,
         tracked_tickers=tracked,

@@ -277,10 +277,16 @@ issuer 曝險 ≥20% 且對應 series 單日報酬首次跌破 -4% 才產 epheme
 ### Daily routine 權限與 retry 邊界（2026-08-09 使用者定案）
 
 Codex standalone scheduled task 會沿用 legacy `workspace-write` sandbox，project permission profile 不得再當作
-Daily 網路 authority；唯一權限來源是 `.codex/rules/stockbot-automations.rules` 的七個窄 fixed entry，連外命令
+Daily authority；唯一權限來源是 `.codex/rules/stockbot-automations.rules` 的十二個窄 fixed entry，涵蓋固定連外、
+owner-only private read／staging 與 publisher；這些命令
 **第一次呼叫就用 `require_escalated` 命中 exact outside-sandbox rule**，不是先失敗再以升權重重跑。權限取得後若仍遇暫時性 transport
 error，只允許該命令既有的 bounded、idempotent retry 作最後一步；不得重跑整份 Daily Brief、重做已 checkpoint
 的研究／authority mutation，或把 permission failure 冒充成「零筆」。retry 用盡後保存結構化 failure 並 fail closed。
+
+十二個入口是：harvest、Engine C ETL、SEC EDGAR pq1 fetch、Beta snapshot、pending priority list、pq1 drain、
+catalyst watch、Research Action prepare、decision today、todo sync、state publisher、brief publisher。
+`query.bottleneck`、harvest health、trace backlog、todo list 與 JSON 檢查已可在 sandbox 正常執行，不另升權。
+使用者核准後的 apply／reassess／complete-ra／commit intake 不加入 unattended rule，仍走 type-aware 人工 gate。
 
 ### 報告留檔策略
 

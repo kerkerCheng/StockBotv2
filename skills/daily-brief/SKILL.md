@@ -61,9 +61,13 @@ permission profile 當成 scheduled primary path。下列連外命令**第一次
 outside-sandbox rule**，
 不是先製造可預期的 `access_blocked` 再以升權重重跑；不得放行整個 PowerShell、Python、Git 或 working tree。
 fixed entry 包含
-`crons\harvest_leads.py`、`engine_c\etl_yfinance.py`、`scripts\daily_beta_snapshot.py`、
+`crons\harvest_leads.py`、`engine_c\etl_yfinance.py`、`fetchers\edgar.py`、
+`scripts\daily_beta_snapshot.py`、`engine_b.cli list`、`engine_b.cli drain`、
+`scripts\catalyst_watch.py`、`scripts\prepare_research_action.py --action-file`、
 `decision_lab today`、`engine_b.todo sync`、`scripts\publish_daily_state.py` 與
-`scripts\publish_daily_brief.py`；七條 rule 就是單一 authority，不是 primary＋fallback 兩套來源。
+`scripts\publish_daily_brief.py`；十二條 rule 就是單一 authority，不是 primary＋fallback 兩套來源。
+`query.bottleneck`、harvest health、trace backlog、todo list 與 JSON 檢查已可留在 sandbox；使用者核准後的
+apply／reassess／complete-ra／commit intake 不加入 unattended rule，仍走 type-aware 人工 gate。
 若 exact rule 未匹配、升權限被拒或命令仍出現 `access_blocked`，保留結構化 failure、讓受影響資料 fail closed，
 不得改用第二條更寬 rule、手動重跑或改寫成「零筆」／`no_result`。權限正確後若仍發生暫時性 transport error，
 只允許該命令**既有的 bounded、idempotent retry 作最後一步**（例如 TWSE bounded retry、Discord 每段最多
@@ -101,6 +105,9 @@ coverage 為 `partial` 時一律顯示「已知至少 X%」，不得輸出成完
 & '.venv\Scripts\python.exe' -m engine_b.cli list --status pending --by-priority --tracked <已追蹤ticker>
 ```
 
+default store 的 Google Sheet 持股或 Neo4j chokepoint context 任一不可讀時，priority list 必須 exit 2、
+fail closed；不得把持股靜默降成空集合後仍宣稱已依完整 priority 排序。
+
 對每條**新** pending lead 套 `skills/signal-triage/SKILL.md` 五要素判準。判斷完寫回（本機用 CLI、
 雲端用 MCP `record_lead_decision`），並帶上 priority flags（供 pq1 排序）：
 
@@ -117,6 +124,9 @@ triage 寬鬆（關聯性與可引用性是硬指標，其餘軟指標命中即 
 ```powershell
 & '.venv\Scripts\python.exe' -m engine_b.cli drain
 ```
+
+`drain` 首次呼叫使用 exact outside-sandbox rule；default store 的 Decision work orders、Google Sheet 持股或
+Neo4j chokepoint context 任一不可讀時 exit 2，心跳仍輸出，但本輪不得用降級排序選 pq1。
 
 列出接下來可研究的 bounded jobs。**使用者已明確 go 的 Decision gap work order 優先**，再以剩餘
 budget 取 leads（依 priority；pop triaged_go＋researching）。每輪 limit 由
@@ -192,6 +202,18 @@ prepare 前先把「graph delta 涵蓋哪些公司」與「完成後唯一要建
 `Decision handoff：co:x`；RA 內其他公司預設只作 evidence／relationship context，不自動建 cohort。
 若沒有唯一 focus，先留 pq1 修正；若確實要追多個投資標的，分開提出明確 handoff，不由「入圖多家公司」
 推定「全部開始投資追蹤」。
+
+有 graph delta 時，把 research-action/v1 request 寫到 ignored
+`library/leads/action_drafts/<lead_id>.json`，再用窄 fixed entry 凍結 server-owned packet：
+
+```powershell
+& '.venv\Scripts\python.exe' scripts\prepare_research_action.py --action-file library\leads\action_drafts\<lead_id>.json
+```
+
+這支 CLI 只接受該 draft 目錄、重跑既有 extraction／storage／permission validation 並寫 owner-only private
+staging；不 apply、不寫 Neo4j、不建 Decision／live permission。只有回 `status=ready` 才可把 lead checkpoint
+成 `action_prepared`。SEC 原文若需 repo fetcher，使用 `fetchers\edgar.py` exact rule；其他公開頁可走
+WebSearch／Browser，兩者是 shell rules 之外的獨立權限 surface。
 
 每輪 drain 後另列不會被一般 queue 自動撿回的 trace backlog：
 
