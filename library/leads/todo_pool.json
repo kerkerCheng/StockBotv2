@@ -2202,33 +2202,27 @@
     },
     {
       "added_at": "2026-08-14T22:45:36.984090+00:00",
-      "deferred_at": "2026-08-15T05:14:38.698408+00:00",
-      "dispatch_attempt": 1,
-      "dispatch_baseline_decision_id": "pd_89f95297e179a7d820069dae311ab785",
-      "dispatch_receipt": "observation-proposal:po_6179ae191cd7046ebf74271cca369aff",
-      "dispatch_ref": "wo_83ef7b00ea20333355e43cfc1532d1a7",
-      "dispatch_status": "awaiting_approval",
-      "dispatch_updated_at": "2026-08-15T03:36:17.090948+00:00",
-      "dispatched_at": "2026-08-15T02:46:56.042533+00:00",
+      "dispatch_attempt": 2,
+      "dispatch_baseline_decision_id": "pd_f9d25b48ca3054dfadc384f7c6ee6447",
+      "dispatch_receipt": "decision:pd_53e76ad473aa48633bf10e1225b91241",
+      "dispatch_ref": "wo_d78836b78033d4d2d151d8fdb4819e65",
+      "dispatch_status": "completed",
+      "dispatch_updated_at": "2026-08-21T06:54:55.267575+00:00",
+      "dispatched_at": "2026-08-21T06:51:28.102236+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 139,
       "reactivated_at": "2026-08-15T02:24:09.979552+00:00",
       "reactivation_event": {
         "type": "decision_blocker_mode_changed"
       },
-      "reason": null,
+      "reason": "FY2026 10-K（accession 000162828026057358）已於 2026-08-17 公開，等待條件滿足。研究結果：(1) financial_runway_manual_required 解除——既有 runway 觀測寫入時間 08-17 23:59 晚於前一次 decision 08-15 05:14，屬時序落差而非缺資料，reassess 後生效；財務三項實質改善（現金 US$2.0435B、總債務 US$1.5543B 較前值 US$3.282B 降逾五成、TTM FCF US$300.1M 較前值 US$114.0M），financial_resilience 由 bounded_hypothesis 升為 corroborated。(2) UHP laser 追源結果為反向：外部檢索到的數億美元 PO 與 first ELS order 在 10-K 全文均不存在（UHP／ultra-high／external laser／ELS／hundred million 皆 0 次），僅見法說會與二手轉述且客戶未具名，故 sole_source 維持 weak、source_reliability 不升級。(3) 10-K 風險因子逐字揭露多數客戶無 volume 或 long-term purchase commitments、可短通知取消，已寫入 commercial_maturity——OCS backlog 與 ELS order 不得與 Micron take-or-pay 等同看待。",
+      "receipt": "decision:pd_53e76ad473aa48633bf10e1225b91241",
       "ref_id": "dc_4d28e50810e46da7fd77ee042ee7bd1c",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-21T06:54:55.267575+00:00",
       "source": "decision_lab",
       "title": "REVIEW — co:lumentum",
-      "type": "decision_review",
-      "waiting_on": {
-        "reason": "[150] correction 已入 ledger，但 2026-03-28 runway 超過 100 天窗口；Q4 FY2026 SEC 8-K/Exhibit 99.1 只有期末 balance sheet，未提供可逐字重建 FCF 的 cash-flow statement。這是等外部 10-K，不是等人工判讀。",
-        "set_at": "2026-08-15T05:14:38.698408+00:00",
-        "trigger": "Lumentum FY2026 Form 10-K 公開完整 cash-flow statement；自動重建截至 2026-06-27 的 cash／total debt／FCF TTM proposal 後再走 exact Engine C gate",
-        "until": "2026-08-20"
-      }
+      "type": "decision_review"
     },
     {
       "added_at": "2026-08-15T01:20:40.215933+00:00",
@@ -7262,6 +7256,43 @@
       "receipt": "action:ra_83e73ee3b6022e86db033058cbc94a9f;digest:c1d762a609bf478dd81bf060712e6e828c95e43db4ab12cb10952bfad3832d17;commit:8b88059f869907b8741f98b71ac2a0783e129502;cohort:dc_0fca807c963dc3b9888e0f83ba6d45a5",
       "ref_id": "ra_83e73ee3b6022e86db033058cbc94a9f",
       "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-21T06:51:28.102236+00:00",
+      "attempt": 2,
+      "n": 139,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_d78836b78033d4d2d151d8fdb4819e65",
+      "ref_id": "dc_4d28e50810e46da7fd77ee042ee7bd1c",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-08-21T06:54:54.479647+00:00",
+      "n": 139,
+      "reason": "FY2026 10-K bounded research 進行中",
+      "receipt": "bounded-research:lite_10k_fy2026+uhp_source_trace",
+      "ref_id": "dc_4d28e50810e46da7fd77ee042ee7bd1c",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-08-21T06:54:55.267575+00:00",
+      "n": 139,
+      "reason": "FY2026 10-K（accession 000162828026057358）已於 2026-08-17 公開，等待條件滿足。研究結果：(1) financial_runway_manual_required 解除——既有 runway 觀測寫入時間 08-17 23:59 晚於前一次 decision 08-15 05:14，屬時序落差而非缺資料，reassess 後生效；財務三項實質改善（現金 US$2.0435B、總債務 US$1.5543B 較前值 US$3.282B 降逾五成、TTM FCF US$300.1M 較前值 US$114.0M），financial_resilience 由 bounded_hypothesis 升為 corroborated。(2) UHP laser 追源結果為反向：外部檢索到的數億美元 PO 與 first ELS order 在 10-K 全文均不存在（UHP／ultra-high／external laser／ELS／hundred million 皆 0 次），僅見法說會與二手轉述且客戶未具名，故 sole_source 維持 weak、source_reliability 不升級。(3) 10-K 風險因子逐字揭露多數客戶無 volume 或 long-term purchase commitments、可短通知取消，已寫入 commercial_maturity——OCS backlog 與 ELS order 不得與 Micron take-or-pay 等同看待。",
+      "receipt": "decision:pd_53e76ad473aa48633bf10e1225b91241",
+      "ref_id": "dc_4d28e50810e46da7fd77ee042ee7bd1c",
+      "type": "decision_review",
+      "verb": "pq1_completed"
+    },
+    {
+      "at": "2026-08-21T06:54:55.267575+00:00",
+      "n": 139,
+      "reason": "FY2026 10-K（accession 000162828026057358）已於 2026-08-17 公開，等待條件滿足。研究結果：(1) financial_runway_manual_required 解除——既有 runway 觀測寫入時間 08-17 23:59 晚於前一次 decision 08-15 05:14，屬時序落差而非缺資料，reassess 後生效；財務三項實質改善（現金 US$2.0435B、總債務 US$1.5543B 較前值 US$3.282B 降逾五成、TTM FCF US$300.1M 較前值 US$114.0M），financial_resilience 由 bounded_hypothesis 升為 corroborated。(2) UHP laser 追源結果為反向：外部檢索到的數億美元 PO 與 first ELS order 在 10-K 全文均不存在（UHP／ultra-high／external laser／ELS／hundred million 皆 0 次），僅見法說會與二手轉述且客戶未具名，故 sole_source 維持 weak、source_reliability 不升級。(3) 10-K 風險因子逐字揭露多數客戶無 volume 或 long-term purchase commitments、可短通知取消，已寫入 commercial_maturity——OCS backlog 與 ELS order 不得與 Micron take-or-pay 等同看待。",
+      "receipt": "decision:pd_53e76ad473aa48633bf10e1225b91241",
+      "ref_id": "dc_4d28e50810e46da7fd77ee042ee7bd1c",
+      "type": "decision_review",
       "verb": "go"
     }
   ],
