@@ -1,0 +1,87 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "credo_npo_vs_cpo_20260821",
+    "title": "Credo Semiconductor: Near-Package Optics — architectural comparison with co-packaged optics",
+    "url": "https://credosemi.com/blogs/near-package-optics/",
+    "origin_entity": "Credo Semiconductor",
+    "publisher": "Credo Semiconductor",
+    "published_at": "2026-08-21",
+    "retrieved_at": "2026-08-21",
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "公開技術說明頁；只保存 canonical URL 與研究所需的有限逐字節錄。",
+    "source_type": "industry_report",
+    "evidence_tier": 3
+  },
+  "sources": [
+    {
+      "id": "credo_npo_vs_cpo_20260821_s1",
+      "locator": "architectural comparison section",
+      "quote": "CPO: Optical engines are co-packaged alongside the ASIC. NPO: Optical engines are mounted on the board near the compute device."
+    },
+    {
+      "id": "credo_npo_vs_cpo_20260821_s2",
+      "locator": "trade-off comparison section",
+      "quote": "CPO presents high packaging complexity and serviceability challenges, since optics are integrated within the ASIC package. NPO uses established PCB assembly and packaging processes and supports system-level serviceability."
+    },
+    {
+      "id": "credo_npo_vs_cpo_20260821_s3",
+      "locator": "positioning section",
+      "quote": "NPO is being evaluated as a practical architectural option that balances efficiency gains with manufacturing and operational considerations; an extension of CPO solutions, but simpler in implementation."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "tech:near_package_optics",
+      "type": "TechNode",
+      "name": "Near-Packaged Optics (NPO)",
+      "abstraction_level": "module_subsystem",
+      "role": "adjacent_silicon",
+      "aliases": ["NPO", "near-package optics"],
+      "attributes": {},
+      "confidence": 0.5,
+      "source_ids": ["credo_npo_vs_cpo_20260821_s1"]
+    },
+    {
+      "id": "tech:cpo",
+      "type": "TechNode",
+      "name": "Co-Packaged Optics (CPO)",
+      "abstraction_level": "module_subsystem",
+      "role": "adjacent_silicon",
+      "aliases": ["CPO", "co-packaged optics"],
+      "attributes": {},
+      "confidence": 0.5,
+      "source_ids": ["credo_npo_vs_cpo_20260821_s1"]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "tech:near_package_optics",
+      "dst_id": "tech:cpo",
+      "relation": "competes_with",
+      "attributes": {},
+      "confidence": 0.5,
+      "source_ids": [
+        "credo_npo_vs_cpo_20260821_s1",
+        "credo_npo_vs_cpo_20260821_s2",
+        "credo_npo_vs_cpo_20260821_s3"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "credo_npo_vs_cpo_20260821_cl1",
+      "statement": "NPO 與 CPO 是同一個資料中心光互連問題的兩種架構解法，彼此替代：CPO 把 optical engine 與 ASIC 共封裝（electrical path 最短、功耗效率最高），NPO 把 optical engine 放在 PCB 上、靠近運算元件但在封裝外。權衡明確且方向相反——CPO 封裝複雜度高且因光學整合進 ASIC package 而有 serviceability challenges；NPO 沿用既有 PCB 組裝製程並支援 system-level serviceability，但電氣路徑縮短幅度不如 CPO。來源將 NPO 定位為 an extension of CPO solutions, but simpler in implementation。⚠ 本 claim 建立的是 counter-path（可替代性），對 co:aeva 的 NPO 業務具直接反證意義：Aeva 的 Optical Connectivity 業務線完全押在 NPO 架構上（8-K 2026-08-05 一手），若客戶最終選擇 CPO 路徑，其 JDA 不必然轉為量產。⚠ 證據限制：本來源為 Credo Semiconductor 的公開技術說明頁，屬產業參與者的自述性技術比較（tier 3），非中立第三方基準測試，亦未給出市場份額或採用率數字；不得據此推論任一架構的實際勝出機率。",
+      "subject_id": "e1",
+      "demand_proof_level": "inferred",
+      "disproof_condition": "任一成立即視為本可替代性判斷失效：(1) 主要 hyperscaler 或交換機供應商公開宣布 NPO 與 CPO 並非替代關係而是必然並存的分層方案，且給出各自不重疊的應用邊界；(2) 出現一手基準顯示 NPO 在功耗與成本上同時優於 CPO，使 CPO 失去終極方案定位；(3) 到 2028 年底，NPO 與 CPO 的實際部署顯示兩者客戶群完全不重疊。核查頻率：每次主要 hyperscaler 或交換機供應商的架構發表；觸發後 48 小時內人工 review。",
+      "confidence": 0.5,
+      "source_ids": [
+        "credo_npo_vs_cpo_20260821_s1",
+        "credo_npo_vs_cpo_20260821_s2",
+        "credo_npo_vs_cpo_20260821_s3"
+      ]
+    }
+  ]
+}
