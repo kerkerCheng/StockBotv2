@@ -317,6 +317,13 @@ def rank_bottlenecks(
 
     # 排序鍵刻意有明確的優先序，不是加權綜合分數（那會是未經量測的新機制，D6）。
     # 需求錨點可達性排最前：依使用者判準，連不到有人花錢的地方的瓶頸沒有投資意義。
+    #
+    # ⚠ evidence 排在 substitutability 之前是**刻意的**，但只對「現在能投什麼」成立：
+    # 證據弱的邊不能拿來下注。代價是這份排序同時被「我們挖得多深」影響——`evidence`
+    # 的三級（self_reported → needs_review → externally_corroborated）中，最高級必須
+    # 靠研究去找到客戶端或第三方文件才拿得到，預設每條邊都是 self_reported。
+    # 2026-08-21 使用者指出：「研究筆數多 → 證據強，但不代表瓶頸性強」——屬實。
+    # 因此另出 `structural_rows`，見下。
     scored.sort(
         key=lambda r: (
             1 if r["demand_anchor"] else 0,
@@ -329,9 +336,30 @@ def rank_bottlenecks(
         reverse=True,
     )
 
+    # 純結構排序：只看瓶頸本身有多卡，**完全不看證據等級**。
+    # 兩份排序回答不同問題，不可互換：
+    #   rows            → 「現在能投什麼」（證據夠強才可行動）
+    #   structural_rows → 「該去補誰的證據」（結構很卡但證據沒跟上的，是研究最高 ROI）
+    # 實測差異（2026-08-21）：現行排序第 1 是 COHR→NVIDIA，純結構第 1 是 AVGO→CPO
+    # ——同為 sub=5／sole_source，但 AVGO 距需求端只有 1 跳，它排在後面純粹因為
+    # evidence 還是 needs_review。另有 LITE→UHP laser（sub=5、sole_source）因
+    # self_reported 幾乎在現行排序中看不到。
+    structural = sorted(
+        scored,
+        key=lambda r: (
+            1 if r["demand_anchor"] else 0,
+            r["substitutability"] or 0,
+            1 if r["sole_source"] else 0,
+            -(r["demand_hops"] if r["demand_hops"] is not None else 99),
+            QUALIFICATION_RANK.get(str(r["qualification_status"]), 0),
+        ),
+        reverse=True,
+    )
+
     with_sub = [e for e in edges if e.substitutability is not None]
     return {
         "rows": scored,
+        "structural_rows": structural,
         "coverage": {
             "assertions": len(rows),
             "canonical_edges": len(canonical),
@@ -399,6 +427,42 @@ def render_markdown(result: Mapping[str, Any]) -> str:
             f"| {r['substitutability']}/5{sole} | {EVIDENCE_LABEL[r['evidence']]} "
             f"| {r['qualification_status'] or '—'} | {r['documents']} "
             f"| {r['demand_anchor'] or '🔴 無'} |"
+        )
+
+    structural = result.get("structural_rows") or []
+    if structural:
+        out.append(
+            "\n## 純結構排序（只看多卡，**不看證據**）\n\n"
+            "> 上表回答「**現在能投什麼**」——證據不夠強的邊不能拿來下注，所以 evidence "
+            "排在 substitutability 之前。代價是它同時被「我們挖得多深」影響：`evidence` "
+            "的最高級必須靠研究找到客戶端或第三方文件才拿得到，預設每條邊都是 "
+            "`self_reported`。\n>\n"
+            "> 本表回答「**該去補誰的證據**」——結構很卡但證據沒跟上的邊，是研究投入的"
+            "最高 ROI。兩份排序用途不同，不可互換。"
+        )
+        out.append("\n| # | 標的 | 卡在哪 | 替代難度 | 距需求端 | 目前證據 | 落差 |")
+        out.append("|---|---|---|---|---|---|---|")
+        rank_in_actionable = {
+            id(r): i for i, r in enumerate(result["rows"], 1)
+        }
+        for i, r in enumerate(structural[:10], 1):
+            ticker = r["ticker"] or "—"
+            sole = "｜sole_source" if r["sole_source"] else ""
+            hops = r["demand_hops"] if r["demand_hops"] is not None else "—"
+            actionable_rank = rank_in_actionable.get(id(r))
+            gap = ""
+            if actionable_rank and actionable_rank - i >= 2:
+                gap = f"⬆ 可行動排序第 {actionable_rank}——補證據可翻上來"
+            out.append(
+                f"| {i} | {r['company_id']}（{ticker}） | {r['relation']} → "
+                f"`{r['bottleneck']}` | {r['substitutability']}/5{sole} | {hops} 跳 "
+                f"| {EVIDENCE_LABEL[r['evidence']]} | {gap} |"
+            )
+        out.append(
+            "\n⚠ **本表不含「瓶頸業務占該公司多少」**。同為 `sub=5`，大型多角化公司的"
+            "單一瓶頸邊對其整體營收影響可能很小（研究它接近研究 beta），小型專業廠則"
+            "接近純曝險。判斷投資意義時必須另看市值、營收結構與分析師覆蓋度——"
+            "那些資料在 Engine C，不在本排序內。"
         )
 
     out.append("\n## 需求鏈（誰在花錢 → 這家公司）\n")

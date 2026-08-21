@@ -192,3 +192,40 @@ def test_coverage_limits_are_always_reported() -> None:
         "duplicate_collapse",
     ):
         assert key in cov
+
+
+def test_structural_rows_ignore_evidence_and_expose_research_gap() -> None:
+    """純結構排序必須與可行動排序分離——否則排名反映的是研究深度，不是瓶頸性。
+
+    事發（2026-08-21）：使用者指出「研究筆數多 → 證據強，但不代表瓶頸性強」。
+    查證屬實：rank_bottlenecks 的排序鍵把 EVIDENCE_RANK 放在 substitutability 之前，
+    而 evidence 最高級（externally_corroborated）必須靠研究找到客戶端文件才拿得到。
+    實測差異：可行動排序第 1 是 COHR→NVIDIA，純結構第 1 是 AVGO→CPO——同為 sub=5／
+    sole_source，但 AVGO 距需求端只有 1 跳。
+    """
+
+    from query.bottleneck import rank_bottlenecks
+
+    class _Reg:
+        def research_ticker(self, company_id):
+            return {"co:a": "AAA", "co:b": "BBB"}.get(company_id)
+
+    rows = [
+        # 結構較強（1 跳）但只有自報證據
+        {"src": "co:b", "relation": "supplies_to", "dst": "tech:ai_switch",
+         "substitutability": 5, "sole_source": True, "qualification_status": "designed_in",
+         "confidence": 0.8, "origin_entity": "co:b", "doc_id": "d1"},
+        # 結構較弱（2 跳）但有外部印證
+        {"src": "co:a", "relation": "supplies_to", "dst": "co:b",
+         "substitutability": 4, "sole_source": False, "qualification_status": "qualified",
+         "confidence": 0.8, "origin_entity": "third_party", "doc_id": "d2"},
+    ]
+    result = rank_bottlenecks(rows, _Reg())
+
+    assert "structural_rows" in result
+    assert len(result["structural_rows"]) == len(result["rows"])
+    # 純結構第一名的 substitutability 必須 >= 可行動第一名
+    if result["rows"] and result["structural_rows"]:
+        assert (result["structural_rows"][0]["substitutability"] or 0) >= (
+            result["rows"][0]["substitutability"] or 0
+        )
