@@ -103,3 +103,57 @@ next_action: park_trace_backlog   # hold 維持;8/27 為量級分辨點
 
 - 將治理危機（going-concern / 重編 / 董事出走 / SEK 600M 增資 / 監管調查）作為 claim/edge 入圖（tier-1 部分來自已入庫 AR，可補；tier-3 部分僅 discovery）。
 - 更新 `thesis/lifecycle.json` 把 SIVE thesis 轉 `retired`（見 §6.2）。
+
+---
+
+## 9. 續追（2026-08-22）：重編幅度已知，**營收腿未觸發**
+
+> **⚠ 本節是 2026-08-22 的追加，不改寫上方 07-20 的原始記錄**（歷史記錄不因現況改變而更新）。
+> 觸發原因：pq1 排序於 2026-08-21 改為語意分類＋字典序後，Sivers 年報重編兩則 lead 首次
+> 被判為 `exit_condition` 並排進首屏——舊加權排序沒有任何欄位能表達「這則會觸發既有
+> thesis 的 disproof」，因此它們自 2026-08-11 入庫後一直沒被看見。
+
+### 9.1 §7 第一問已有答案
+
+`sivers_v3_lane_memo.md` 的 48h 決策規則：「若 8/27 重編證實營收認列達 Ningi 指控量級
+（~31%／97M SEK）或 going-concern 惡化 → `retired`」。**營收量級這條腿現在可以判定了**，
+不必等 8/27——公司已於 **2026-05-13** 公告重編後數字：
+
+| 項目 | 重編後 | 原申報 | 差異 |
+|---|---|---|---|
+| 2025 net sales | SEK 306.6M | SEK 304.1M | **+2.5M（+0.8%，往上修）** |
+| 2024 net sales | SEK 219.2M | SEK 243.7M | −24.5M（−10.1%） |
+| 2025 EBIT | SEK −177.8M | SEK −141.3M | −36.5M |
+| 2025 net result | SEK −222.6M | SEK −186.5M | −36.1M（與 07-20 已知一致） |
+
+**兩年營收合計移動約 27M SEK，約為 Ningi 指控量級（97M）的四分之一，且 Ningi 主打的
+2025 年是往上修。依 memo 自訂規則，`retired` 的營收腿未觸發。**
+
+### 9.2 但機制被佐證，只是量級不符——兩者要分開講
+
+重編科目逐字包含 **“reallocation of revenues between reporting periods and to 2026 and
+later”**、“revised inventory valuations”。前者正是 Ningi 指控「改寫會計政策使原料到倉即
+認列營收」會產生的跨期移轉形態。**指控的機制方向獲得公司自身重編佐證，指控的規模沒有。**
+把「量級未達」講成「指控被否證」是錯的。
+
+### 9.3 兩個限定（L11）
+
+1. 來源是**公司自己的新聞稿**（tier-1 發行人、但屬自我陳述），**不是審計師意見**。
+   `https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-publishes-the-2025-annual-report-adjusting-prior-reported-financials-as-preparation-for-a-potential-dual-listing-in-the-united-states-be8b1e15`
+2. 上表數字取自 WebFetch 對該頁的讀取，**未逐字核對年報 PDF 本身**。因此**刻意不存入
+   `library/raw/`**——把摘要當一手文件保存，正是 L11 要防的洗白。要升格為可入圖證據
+   必須另取年報原文逐字核對。該公告**全篇無 going-concern 字句**，亦無補助重分類說明。
+
+### 9.4 對 8/27 的修正指示
+
+§7 的四問中，**第一問已結案**。8/27 真正要看的收斂為：
+
+- **審計對 going-concern 的最新措辭（維持／升級／撤除）** ← 現在是唯一 binding 的那條腿
+- Photonics 是否出現有償量產進展
+- 公司是否終於逐項反駁（迄今無）
+- 增資後現金跑道與稀釋後股數
+
+§6.1 的結論不變且更該強調：**hold 的解除條件是 going-concern 被撤除，不是 8/27 到期。**
+依現有證據，8/27 的合理結果是 `revised`（下修 EV/Revenue 與量產時間表）而非 `retired`，
+但 **credibility hold 不隨之解除**。thesis 狀態變更仍是 pq2 [10] 的人工決定，未擅自改
+`thesis/lifecycle.json`。
