@@ -1,0 +1,15 @@
+Source URL: https://credosemi.com/blogs/near-package-optics/
+
+Excerpt:
+Source URL: https://credosemi.com/blogs/near-package-optics/
+Retrieved: 2026-08-21
+
+Verbatim excerpts:
+
+1) CPO: Optical engines are co-packaged alongside the ASIC. NPO: Optical engines are mounted on the board near the compute device.
+
+2) CPO presents high packaging complexity and serviceability challenges, since optics are integrated within the ASIC package. NPO uses established PCB assembly and packaging processes and supports system-level serviceability.
+
+3) NPO is being evaluated as a practical architectural option that balances efficiency gains with manufacturing and operational considerations; an extension of CPO solutions, but simpler in implementation.
+
+Boundary: Credo is an industry participant (SerDes/AEC supplier), not a neutral benchmark. No market share, adoption rate, or win-probability data.
