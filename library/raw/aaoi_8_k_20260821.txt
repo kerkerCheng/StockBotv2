@@ -1,0 +1,381 @@
+false 
+ 0001158114 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 0001158114 
+ 
+ 
+ 2026-08-21 
+ 2026-08-21 
+ 
+ 
+ 
+ iso4217:USD 
+ 
+ 
+ xbrli:shares 
+ 
+ 
+ 
+ 
+ iso4217:USD 
+ 
+ 
+ xbrli:shares 
+ 
+ 
+ 
+ 
+ 
+ 
+
+ 
+
+ 
+
+ &#160; 
+
+ &#160; 
+
+ UNITED STATES 
+
+ SECURITIES AND
+EXCHANGE COMMISSION 
+
+ Washington, D.C. 20549 
+
+ &#160; 
+
+ &#160; 
+
+ FORM 8-K 
+
+ &#160; 
+
+ CURRENT REPORT 
+
+ &#160; 
+
+ Pursuant to Section 13 or 15(d) of
+the 
+ Securities Exchange Act of 1934 
+
+ &#160; 
+
+ Date of Report (Date of earliest event reported): August 21, 2026 
+
+ &#160; 
+
+ Applied Optoelectronics, Inc. 
+
+ (Exact name of registrant as specified in its
+charter) 
+
+ &#160; 
+
+ 
+ 
+ Delaware 
+ 001-36083 
+ 76-0533927 
+ 
+ (State or other jurisdiction of 
+incorporation) 
+ (Commission File
+ Number) 
+ (IRS Employer
+ Identification 
+No.) 
+ 
+ &#160; 
+
+ 
+ 
+ 13139 Jess Pirtle Blvd. 
+ &#160; 
+ 
+ Sugar Land , Texas 
+ 77478 
+ 
+ (Address of principal executive offices) 
+ (Zip Code) 
+ 
+
+ &#160; 
+
+ ( 281 ) 295-1800 
+
+ (Registrant's telephone number, including area code) 
+
+ &#160; 
+
+ Not Applicable 
+
+ (Former name or former address, if changed
+since last report) 
+
+ &#160; 
+
+ Check the appropriate box below if the Form 8-K filing
+is intended to simultaneously satisfy the filing obligation of the registrant under any of the following provisions (see General Instruction A.2. below): 
+
+ &#160; 
+
+ 
+ 
+ &#168; 
+ Written communications pursuant to Rule 425 under the Securities Act (17 CFR 230.425) 
+ 
+ &#160; 
+
+ 
+ 
+ &#168; 
+ Soliciting material pursuant to Rule 14a-12 under the Exchange Act (17 CFR 240.14a-12) 
+ 
+ &#160; 
+
+ 
+ 
+ &#168; 
+ Pre-commencement communications pursuant to Rule 14d-2(b) under the Exchange Act (17 CFR 240.14d-2(b)) 
+ 
+ &#160; 
+
+ 
+ 
+ &#168; 
+ Pre-commencement communications pursuant to Rule 13e-4(c) under the Exchange Act (17 CFR 240.13e-4(c)) 
+ 
+ &#160; 
+
+ Securities
+registered pursuant to Section 12(b) of the Act: 
+
+ &#160; 
+
+ 
+ 
+ Title of each class 
+ Trading Symbol(s) 
+ Trading Name of each exchange on which 
+registered 
+ 
+ Common Stock, Par value $0.001 
+ AAOI 
+ NASDAQ Global Market 
+ 
+ &#160; 
+
+ Indicate by check mark whether the registrant
+is an emerging growth company as defined in Rule 405 of the Securities Act of 1933 (&#167;230.405 of this chapter) or Rule 12b-2 of the
+Securities Exchange Act of 1934 (&#167;240.12b-2 of this chapter). 
+
+ &#160; 
+
+ Emerging growth company &#168; 
+
+ &#160; 
+
+ If an emerging growth company, indicate by check
+mark if the registrant has elected not to use the extended transition period for complying with any new or revised financial accounting
+standards provided pursuant to Section 13(a) of the Exchange Act. &#168; 
+
+ 
+
+ &#160; 
+
+ 
+
+ &#160; 
+
+ &#160; 
+
+ 
+
+ 
+ &#160; 
+ &#160; 
+ 
+
+ &#160; 
+
+ Item 1.01. Entry into a Material Definitive Agreement. 
+
+ &#160; 
+
+ On August&#160;21, 2026, Applied Optoelectronics,&#160;Inc.
+(the &#8220;Company&#8221;) entered into an Equity Distribution Agreement (the &#8220;Agreement&#8221;) with Raymond James&#160;&amp;
+Associates,&#160;Inc. and Needham&#160;&amp; Company, LLC (collectively, the &#8220;Sales Agents&#8221;) pursuant to which the Company
+may issue and sell shares of the Company&#8217;s common stock, par value $0.001 per share (the &#8220;Shares&#8221;) having an aggregate
+offering price of up to $600 million from time to time through the Sales Agents. 
+
+ &#160; 
+
+ Upon delivery of a placement notice and subject
+to the terms and conditions of the Agreement, sales, if any, of the Shares will be made through the Sales Agents in transactions that
+are deemed to be &#8220;at the market&#8221; offerings as defined in Rule&#160;415 of the Securities Act of 1933, as amended (the &#8220;Securities
+Act&#8221;), including sales made through the facilities of the Nasdaq Global Market, the principal trading market for the Company&#8217;s
+common stock, on any other existing trading market for the Company&#8217;s common stock, to or through a market maker or as otherwise
+agreed by the Company and the Sales Agents. In the placement notice, the Company will designate the maximum number of Shares to be sold
+through the Sales Agents, the time period during which sales are requested to be made, the minimum price for the Shares to be sold, and
+any limitation on the number of Shares that may be sold in any one day. Subject to the terms and conditions of the Agreement, the Sales
+Agents will use their commercially reasonable efforts to sell Shares on the Company&#8217;s behalf up to the designated amount specified
+in the placement notice. The Company has no obligation to sell any Shares under the Agreement and may at any time suspend offers and sales
+of the Shares under the Agreement. 
+
+ &#160; 
+
+ The Agreement provides that the Sales Agents will
+be entitled to compensation of 2% of the gross sales price of the Shares sold through the Sales Agents from time to time. The Company
+has also agreed to reimburse the Sales Agents for certain specified expenses in connection with the registration of Shares under state
+blue sky laws and any filing with, and clearance of the offering by, the Financial Industry Regulatory Authority Inc., not to exceed $10,000
+in the aggregate, and any associated application fees incurred. Additionally, if the Agreement is terminated under certain circumstances,
+and the Company fails to sell a minimum amount of the Shares as set forth in the Agreement, then the Company has agreed to reimburse the
+Sales Agents for reasonable out-of-pocket expenses, including the reasonable fees and disbursements of counsel incurred by the Sales Agents,
+up to a maximum of $30,000 in the aggregate. The Company agreed to indemnify the Sales Agents against certain liabilities, including liabilities
+under the Securities Act, or to contribute to payments that the Sales Agents may be required to make because of any of those liabilities. 
+
+ &#160; 
+
+ The offering pursuant to the Agreement will terminate
+upon the sale of all Shares subject to the Agreement. The Agreement may also be terminated by the Company or by the Sales Agents at any
+time. 
+
+ &#160; 
+
+ The Shares to be issued and sold have been registered
+under the Securities Act, pursuant to the Company&#8217;s automatic shelf registration statement on Form&#160;S-3ASR (Registration No.&#160;333-283905),
+including the prospectus contained therein, as supplemented by the prospectus supplement filed with the Securities and Exchange Commission
+(the &#8220;SEC&#8221;) pursuant to Rule&#160;424(b)&#160;under the Securities Act on August&#160;21, 2026. 
+
+ &#160; 
+
+ The foregoing description of the Agreement does
+not purport to be complete and is qualified in its entirety by reference to the complete text of the Agreement, which is filed as Exhibit&#160;1.1
+to this Current Report on Form&#160;8-K and incorporated herein by reference. 
+
+ &#160; 
+
+ 
+
+ 
+ 
+ &#160; 
+ 
+
+ &#160; 
+
+ Item 9.01. Financial Statements and Exhibits. 
+
+ &#160; 
+
+ (d)&#160;Exhibits. 
+
+ &#160; 
+
+ 
+ 
+ Exhibit&#160;No. 
+ &#160; 
+ Description 
+ 
+ 1.1 
+ &#160; 
+ Equity Distribution Agreement,
+ dated August&#160;21, 2026, among Applied Optoelectronics,&#160;Inc., Raymond James&#160;&amp; Associates,&#160;Inc., and Needham&#160;&amp;
+ Company, LLC. 
+ 
+ &#160; 
+ &#160; 
+ &#160; 
+ 
+ 4.1 
+ &#160; 
+ Common Stock Specimen (incorporated
+ by reference to Exhibit&#160;4.1 of Applied Optoelectronics,&#160;Inc&#8217;s Form&#160;8-K (File No.&#160;001-36083) filed with
+ the SEC on November&#160;14, 2016). 
+ 
+ &#160; 
+ &#160; 
+ &#160; 
+ 
+ 5.1 
+ &#160; 
+ Opinion of Haynes and Boone,
+ LLP. 
+ 
+ &#160; 
+ &#160; 
+ &#160; 
+ 
+ 23.1 
+ &#160; 
+ Consent of Haynes and Boone,
+ LLP (included in Exhibit&#160;5.1). 
+ 
+ &#160; 
+ &#160; 
+ &#160; 
+ 
+ 104 
+ &#160; 
+ Cover Page&#160;Interactive
+ File (the cover page&#160;tags are embedded within the Inline XBRL document). 
+ 
+ &#160; 
+
+ 
+
+ 
+ 
+ &#160; 
+ 
+
+ &#160; 
+
+ SIGNATURES 
+
+ &#160; 
+
+ Pursuant to the requirements of the Securities
+Exchange Act of 1934, as amended, the registrant has duly caused this report to be signed on its behalf by the undersigned hereunto duly
+authorized. 
+
+ &#160; 
+
+ 
+ 
+ &#160; 
+ APPLIED OPTOELECTRONICS,&#160;INC. 
+ 
+ &#160; 
+ &#160; 
+ &#160; 
+ 
+ Date: August&#160;21, 2026 
+ By: 
+ /s/ David C. Kuo 
+ 
+ &#160; 
+ Name: 
+ David C. Kuo 
+ 
+ &#160; 
+ Title: 
+ Senior Vice President and Chief Legal Officer 
+ 
+ &#160; 
+
+ 
+
+ 
+ 
+ 
+
+ &#160;

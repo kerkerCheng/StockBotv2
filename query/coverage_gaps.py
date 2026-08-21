@@ -134,8 +134,12 @@ def render_markdown(rows: Iterable[Mapping[str, Any]]) -> list[str]:
 
 
 def main() -> int:
+    from dotenv import load_dotenv
     from neo4j import GraphDatabase
 
+    # `bottleneck.py` 一直有這行、本檔沒有，於是直接跑會報「請設 NEO4J_PASSWORD」，
+    # 看起來像設定漏了而不是程式漏了（2026-08-21 實測踩到）。
+    load_dotenv()
     password = os.environ.get("NEO4J_PASSWORD")
     if not password:
         print("請設 NEO4J_PASSWORD")

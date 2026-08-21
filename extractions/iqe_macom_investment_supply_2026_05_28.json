@@ -1,0 +1,97 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "iqe_macom_investment_supply_2026_05_28",
+    "title": "IQE FY2025 results — completed MACOM investment and long-term supply agreements",
+    "source_type": "filing",
+    "evidence_tier": 1,
+    "origin_entity": "IQE plc",
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "Public issuer regulatory announcement; retain the canonical URL and only research-relevant excerpts.",
+    "url": "https://www.iqep.com/media/press-releases/2026/full-year-2025-results/",
+    "publisher": "IQE plc",
+    "published_at": "2026-05-28",
+    "retrieved_at": "2026-08-22"
+  },
+  "sources": [
+    {
+      "id": "iqe_macom_investment_supply_2026_05_28_s1",
+      "locator": "2026 fundraise section",
+      "quote": "The fundraise included a £45m strategic investment from MACOM Technology Solutions Inc. ... £30m of equity and £15m in new non-interest bearing convertible loan notes."
+    },
+    {
+      "id": "iqe_macom_investment_supply_2026_05_28_s2",
+      "locator": "2026 fundraise section",
+      "quote": "Concurrently, IQE and MACOM also entered into long-term supply agreements."
+    },
+    {
+      "id": "iqe_macom_investment_supply_2026_05_28_s3",
+      "locator": "Current trading and outlook",
+      "quote": "IQE is seeing accelerated demand for the Group’s InP solutions, which support optical photonics products for data centre and AI infrastructure"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:iqe",
+      "type": "Company",
+      "name": "IQE plc",
+      "aliases": ["IQE", "IQE.L"],
+      "role": "material_base",
+      "abstraction_level": "materials_substrate",
+      "confidence": 0.9,
+      "source_ids": ["iqe_macom_investment_supply_2026_05_28_s1", "iqe_macom_investment_supply_2026_05_28_s2"],
+      "attributes": {}
+    },
+    {
+      "id": "co:macom",
+      "type": "Company",
+      "name": "MACOM Technology Solutions",
+      "aliases": ["MACOM", "MTSI"],
+      "role": "bottleneck_supplier",
+      "abstraction_level": "device_chip",
+      "confidence": 0.9,
+      "source_ids": ["iqe_macom_investment_supply_2026_05_28_s1", "iqe_macom_investment_supply_2026_05_28_s2"],
+      "attributes": {}
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:iqe",
+      "relation": "supplies_to",
+      "dst_id": "co:macom",
+      "confidence": 0.85,
+      "source_ids": ["iqe_macom_investment_supply_2026_05_28_s2"],
+      "attributes": {"qualification_status": "designed_in"}
+    },
+    {
+      "id": "e2",
+      "src_id": "co:macom",
+      "relation": "invests_in",
+      "dst_id": "co:iqe",
+      "confidence": 0.9,
+      "source_ids": ["iqe_macom_investment_supply_2026_05_28_s1"],
+      "attributes": {}
+    }
+  ],
+  "claims": [
+    {
+      "id": "iqe_macom_investment_supply_2026_05_28_cl1",
+      "statement": "MACOM, an IQE customer, completed a £45 million strategic investment in IQE through £30 million of equity and £15 million of non-interest-bearing convertible notes; IQE and MACOM concurrently entered long-term supply agreements.",
+      "subject_id": "co:iqe",
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "source_ids": ["iqe_macom_investment_supply_2026_05_28_s1", "iqe_macom_investment_supply_2026_05_28_s2"],
+      "disproof_condition": "Downgrade if IQE or MACOM terminates or materially narrows the supply agreements, MACOM exits the investment, or future disclosures show no commercial orders or volume production attributable to the agreements."
+    },
+    {
+      "id": "iqe_macom_investment_supply_2026_05_28_cl2",
+      "statement": "IQE reported accelerated demand for InP solutions supporting optical photonics for data-centre and AI infrastructure, but did not disclose the MACOM agreement's product mix, committed purchase volume, revenue, duration, or exclusivity.",
+      "subject_id": "co:iqe",
+      "confidence": 0.85,
+      "demand_proof_level": "guided",
+      "source_ids": ["iqe_macom_investment_supply_2026_05_28_s2", "iqe_macom_investment_supply_2026_05_28_s3"],
+      "disproof_condition": "Downgrade the AI/InP interpretation if later disclosures assign the MACOM agreements primarily to unrelated product lines or show no production conversion."
+    }
+  ]
+}

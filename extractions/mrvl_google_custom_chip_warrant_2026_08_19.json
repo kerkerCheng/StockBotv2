@@ -1,0 +1,113 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mrvl_google_custom_chip_warrant_2026_08_19",
+    "title": "Marvell Form 8-K — Google custom semiconductor agreement and warrant",
+    "source_type": "filing",
+    "evidence_tier": 1,
+    "origin_entity": "Marvell Technology, Inc.",
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "Official public SEC filing; retain the canonical URL and only research-relevant excerpts.",
+    "url": "https://www.sec.gov/Archives/edgar/data/1835632/000119312526356217/d412696d8k.htm",
+    "publisher": "SEC EDGAR",
+    "published_at": "2026-08-19",
+    "retrieved_at": "2026-08-22"
+  },
+  "sources": [
+    {
+      "id": "mrvl_google_custom_chip_warrant_2026_08_19_s1",
+      "locator": "Item 1.01, commercial agreement",
+      "quote": "Marvell entered into a commercial agreement with Google ... for Marvell’s development of custom semiconductor products for Google"
+    },
+    {
+      "id": "mrvl_google_custom_chip_warrant_2026_08_19_s2",
+      "locator": "Item 1.01, product scope",
+      "quote": "AI inference accelerators for the TPU ecosystem, storage controllers, network interface controllers, memory interface controllers and near-memory compute"
+    },
+    {
+      "id": "mrvl_google_custom_chip_warrant_2026_08_19_s3",
+      "locator": "Item 1.01, warrant economics",
+      "quote": "a warrant to purchase up to an aggregate of 58,970,907 ordinary shares ... exercise price of $206.58 per share"
+    },
+    {
+      "id": "mrvl_google_custom_chip_warrant_2026_08_19_s4",
+      "locator": "Item 1.01, performance vesting",
+      "quote": "240 equal tranches, with one tranche vesting for each $500 million of Custom Products Revenue"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:marvell_technology",
+      "type": "Company",
+      "name": "Marvell Technology",
+      "aliases": ["Marvell", "MRVL"],
+      "role": "adjacent_silicon",
+      "abstraction_level": "device_chip",
+      "confidence": 0.9,
+      "source_ids": ["mrvl_google_custom_chip_warrant_2026_08_19_s1"],
+      "attributes": {}
+    },
+    {
+      "id": "co:google",
+      "type": "Company",
+      "name": "Google",
+      "aliases": ["Alphabet", "GOOGL"],
+      "role": null,
+      "abstraction_level": "end_demand",
+      "confidence": 0.9,
+      "source_ids": ["mrvl_google_custom_chip_warrant_2026_08_19_s1"],
+      "attributes": {}
+    },
+    {
+      "id": "prod:google_marvell_custom_semiconductors",
+      "type": "Product",
+      "name": "Google custom semiconductor program with Marvell",
+      "aliases": ["Google Custom Products"],
+      "role": null,
+      "abstraction_level": "device_chip",
+      "confidence": 0.9,
+      "source_ids": ["mrvl_google_custom_chip_warrant_2026_08_19_s1", "mrvl_google_custom_chip_warrant_2026_08_19_s2"],
+      "attributes": {}
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:marvell_technology",
+      "relation": "supplies_to",
+      "dst_id": "co:google",
+      "confidence": 0.9,
+      "source_ids": ["mrvl_google_custom_chip_warrant_2026_08_19_s1", "mrvl_google_custom_chip_warrant_2026_08_19_s2"],
+      "attributes": {"qualification_status": "designed_in"}
+    },
+    {
+      "id": "e2",
+      "src_id": "co:marvell_technology",
+      "relation": "develops",
+      "dst_id": "prod:google_marvell_custom_semiconductors",
+      "confidence": 0.9,
+      "source_ids": ["mrvl_google_custom_chip_warrant_2026_08_19_s1", "mrvl_google_custom_chip_warrant_2026_08_19_s2"],
+      "attributes": {}
+    }
+  ],
+  "claims": [
+    {
+      "id": "mrvl_google_custom_chip_warrant_2026_08_19_cl1",
+      "statement": "Marvell entered a commercial agreement to develop custom semiconductor products for Google spanning TPU inference accelerators, storage controllers, network interface controllers, memory interface controllers and near-memory compute.",
+      "subject_id": "co:marvell_technology",
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "source_ids": ["mrvl_google_custom_chip_warrant_2026_08_19_s1", "mrvl_google_custom_chip_warrant_2026_08_19_s2"],
+      "disproof_condition": "Downgrade if Google or Marvell terminates or materially narrows the program, the custom products fail to enter production, or Google shifts the disclosed scope to another supplier."
+    },
+    {
+      "id": "mrvl_google_custom_chip_warrant_2026_08_19_cl2",
+      "statement": "Marvell granted Google a warrant for up to 58,970,907 Marvell shares at $206.58; most performance vesting occurs one tranche per $500 million of discretionary Google purchases, so the implied $12.2 billion exercise value is not cash invested today and the implied $120 billion revenue threshold is not a binding purchase commitment.",
+      "subject_id": "co:marvell_technology",
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "source_ids": ["mrvl_google_custom_chip_warrant_2026_08_19_s3", "mrvl_google_custom_chip_warrant_2026_08_19_s4"],
+      "disproof_condition": "Reassess if amended warrant terms create binding minimum purchases, remove discretionary purchase language, materially change the strike or share count, or the agreement is terminated."
+    }
+  ]
+}

@@ -1,0 +1,99 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "sivers_allspace_bfic_order_2026_06_09",
+    "title": "ALL.SPACE awards $8.2M production order to Sivers for Ka-band BFICs",
+    "source_type": "news",
+    "evidence_tier": 2,
+    "origin_entity": "Sivers Semiconductors, with a named ALL.SPACE customer quotation",
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "Public issuer announcement; retain the canonical URL and only research-relevant excerpts.",
+    "url": "https://www.sivers-semiconductors.com/press/all-space-awards-8-2m-production-order-to-sivers-semiconductors-for-ka-band-beamforming-ics/",
+    "publisher": "Sivers Semiconductors",
+    "published_at": "2026-06-09",
+    "retrieved_at": "2026-08-22"
+  },
+  "sources": [
+    {
+      "id": "sivers_allspace_bfic_order_2026_06_09_s1",
+      "locator": "Announcement opening paragraph",
+      "quote": "an $8.2M production order for 2027 from ALL.SPACE ... for Sivers’ multi-beam Ka-band beamforming integrated circuits (BFICs)"
+    },
+    {
+      "id": "sivers_allspace_bfic_order_2026_06_09_s2",
+      "locator": "Sivers CEO quotation",
+      "quote": "we move from development and initial production to scaled multi-year deployment"
+    },
+    {
+      "id": "sivers_allspace_bfic_order_2026_06_09_s3",
+      "locator": "ALL.SPACE CEO quotation",
+      "quote": "This production order reflects the strong performance of the jointly developed Ka-band beamforming technology"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:sivers_semiconductors",
+      "type": "Company",
+      "name": "Sivers Semiconductors",
+      "aliases": ["Sivers", "SIVE"],
+      "role": "bottleneck_supplier",
+      "abstraction_level": "device_chip",
+      "confidence": 0.8,
+      "source_ids": ["sivers_allspace_bfic_order_2026_06_09_s1"],
+      "attributes": {}
+    },
+    {
+      "id": "co:all_space",
+      "type": "Company",
+      "name": "ALL.SPACE",
+      "aliases": ["All.Space"],
+      "role": null,
+      "abstraction_level": "network_systems",
+      "confidence": 0.8,
+      "source_ids": ["sivers_allspace_bfic_order_2026_06_09_s1", "sivers_allspace_bfic_order_2026_06_09_s3"],
+      "attributes": {}
+    },
+    {
+      "id": "prod:sivers_ka_band_bfic",
+      "type": "Product",
+      "name": "Sivers multi-beam Ka-band beamforming IC",
+      "aliases": ["Ka-band BFIC"],
+      "role": null,
+      "abstraction_level": "device_chip",
+      "confidence": 0.8,
+      "source_ids": ["sivers_allspace_bfic_order_2026_06_09_s1"],
+      "attributes": {}
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:sivers_semiconductors",
+      "relation": "supplies_to",
+      "dst_id": "co:all_space",
+      "confidence": 0.8,
+      "source_ids": ["sivers_allspace_bfic_order_2026_06_09_s1", "sivers_allspace_bfic_order_2026_06_09_s3"],
+      "attributes": {"qualification_status": "designed_in"}
+    },
+    {
+      "id": "e2",
+      "src_id": "co:sivers_semiconductors",
+      "relation": "develops",
+      "dst_id": "prod:sivers_ka_band_bfic",
+      "confidence": 0.8,
+      "source_ids": ["sivers_allspace_bfic_order_2026_06_09_s1", "sivers_allspace_bfic_order_2026_06_09_s3"],
+      "attributes": {}
+    }
+  ],
+  "claims": [
+    {
+      "id": "sivers_allspace_bfic_order_2026_06_09_cl1",
+      "statement": "ALL.SPACE placed a US$8.2 million production order with Sivers for multi-beam Ka-band BFICs for 2027, moving the jointly developed technology from development and initial production toward scaled deployment.",
+      "subject_id": "co:sivers_semiconductors",
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "source_ids": ["sivers_allspace_bfic_order_2026_06_09_s1", "sivers_allspace_bfic_order_2026_06_09_s2", "sivers_allspace_bfic_order_2026_06_09_s3"],
+      "disproof_condition": "Downgrade if either company reports cancellation, material reduction, non-delivery, or that the 2027 production order remains development-only rather than converting to shipments and revenue."
+    }
+  ]
+}

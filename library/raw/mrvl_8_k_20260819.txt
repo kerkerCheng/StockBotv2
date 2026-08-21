@@ -1,0 +1,142 @@
+8-K 
+ 
+ 
+ false 0001835632 0001835632 2026-08-18 2026-08-18 &#160; &#160; UNITED STATES SECURITIES AND EXCHANGE COMMISSION Washington, D.C. 20549 &#160; &#160; FORM 8-K &#160; &#160; CURRENT REPORT Pursuant to Section 13 or 15(d) of the Securities Exchange Act of 1934 Date of Report: August 18, 2026 (Date of earliest event reported) &#160; &#160; MARVELL TECHNOLOGY, INC. (Exact name of registrant as specified in its charter) &#160; &#160; &#160; 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ Delaware 
+ &#160; 
+ 001-40357 
+ &#160; 
+ 85-3971597 
+ 
+ (State or other jurisdiction of incorporation) 
+ &#160; 
+ (Commission File Number) 
+ &#160; 
+ (IRS Employer Identification No.) 1000 N. West Street , Suite 1200 Wilmington , Delaware 19801 (Address of principal executive offices, including Zip Code) (302) 295-4840 (Registrant&#8217;s telephone number, including area code) &#160; &#160; Check the appropriate box below if the Form 8-K filing is intended to simultaneously satisfy the filing obligation of the registrant under any of the following provisions: &#160; 
+ 
+ 
+ &#160; 
+ &#9744; 
+ Written communications pursuant to Rule 425 under the Securities Act (17 CFR 230.425) &#160; 
+ 
+ 
+ &#160; 
+ &#9744; 
+ Soliciting material pursuant to Rule 14a-12 under the Exchange Act (17 CFR 240.14a-12) &#160; 
+ 
+ 
+ &#160; 
+ &#9744; 
+ Pre-commencement communications pursuant to Rule 14d-2(b) under the Exchange Act (17 CFR 240.14d-2(b)) &#160; 
+ 
+ 
+ &#160; 
+ &#9744; 
+ Pre-commencement communications pursuant to Rule 13e-4(c) under the Exchange Act (17 CFR 240.13e-4(c)) Securities registered pursuant to Section&#160;12(b) of the Act: &#160; 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ Title of each class 
+ &#160; 
+ Trading Symbol(s) 
+ &#160; 
+ Name of each exchange on which registered 
+ 
+ Common Stock, par value $0.002 per share 
+ &#160; 
+ MRVL 
+ &#160; 
+ The Nasdaq Global Select Market Indicate by check mark whether the registrant is an emerging growth company as defined in Rule 405 of the Securities Act of 1933 (&#167;230.405 of this chapter) or Rule 12b-2 of the Securities Exchange Act of 1934 (&#167;240.12b-2 of this chapter). Emerging growth company &#9744; If an emerging growth company, indicate by check mark if the registrant has elected not to use the extended transition period for complying with any new or revised financial accounting standards provided pursuant to Section&#160;13(a) of the Exchange Act. &#9744; &#160; &#160; &#160; 
+
+ 
+ 
+
+ 
+ Item&#8201;1.01 Entry into a Material Definitive Agreement. On July&#160;29, 2026, Marvell Technology, Inc. (the &#8220;Company&#8221;) and Google LLC (&#8220;Google&#8221;) entered into a commercial agreement relating to the Company&#8217;s development of custom semiconductor products to Google (the &#8220;Custom Products&#8221;). The expanded partnership spans a comprehensive range of custom silicon programs that attach to the TPU ecosystem, including AI inference accelerators, storage controllers, network interface controllers, memory interface controllers, and near-memory compute. In connection with this collaboration, on August&#160;18, 2026, the Company issued to Google a warrant (the &#8220;Warrant&#8221;) to purchase up to an aggregate of 58,970,907 shares of common stock of the Company (the &#8220;Warrant Shares&#8221;) at an exercise price of $206.58 per share. 1,360,867 of the Warrant Shares (the &#8220;Time-Based Warrant Shares&#8221;) vest in equal quarterly installments during the first year following the execution of the commercial agreement and the Warrant. The remaining Warrant Shares vest based on discretionary purchases from the Company&#8217;s third quarter of fiscal 2027 through the end of the Company&#8217;s fiscal year 2033 by or on behalf of Google and its affiliates in 240 equal tranches, with one tranche vesting for each $500&#160;million in Custom Products revenue. The exercise price and the number of Warrant Shares are subject to customary adjustments. Subject to the terms and conditions&#160;therein, including vesting, the Warrant is exercisable in whole or in part after the date of issuance until August&#160;18, 2033. The Warrant may not be transferred other than&#160;to controlled&#160;affiliates without the Company&#8217;s consent.&#160;The Warrant Shares are freely tradeable, subject to securities laws, specified trading volume restrictions and, with respect to the Time-Based Warrant Shares, certain lock-up limitations. Pursuant to the terms of the Warrant, Google has certain customary registration rights with respect to the Warrant Shares. The Warrant was issued, and the Warrant Shares, if vested, are expected to be, issued in reliance on the exemption from registration&#160;pursuant to&#160;Section 4(a)(2) of the Securities Act of 1933, as amended. The foregoing description is not complete and is qualified in its entirety by reference to the text of the Warrant in Exhibit 4.1 attached to this Current Report on Form 8-K and incorporated&#160;herein&#160;by reference. Item&#8201;3.02 Unregistered Sales of Equity Securities. The information&#160;set forth in&#160;Item 1.01 of this Current Report on Form 8-K is incorporated by reference into this Item 3.02. Item&#8201;9.01 Financial Statements and Exhibits (d) Exhibits. &#160; 
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+ 4.1 
+ &#160;&#160; 
+ Warrant Agreement, dated as of August&#160;18, 2026, between Marvell Technology, Inc. and Google LLC* 
+ 
+ 
+ 
+ 
+ 104 
+ &#160;&#160; 
+ Cover Page Interactive Data File (embedded within the Inline XBRL document) 
+ &#160; 
+ 
+ 
+ * 
+ Certain of the exhibits and schedules to this Exhibit have been omitted in accordance with Regulation S-K Item 601(a)(5). The Company agrees to furnish a copy of all omitted exhibits and schedules to the SEC upon its request. &#160; 
+ 
+
+ 
+ 
+
+ 
+ SIGNATURE Pursuant to the requirements of the Securities Exchange Act of 1934, as amended, the registrant has duly caused this report to be signed on its behalf by the undersigned hereunto duly authorized. &#160; 
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+ &#160; 
+ 
+ &#160; 
+ MARVELL&#160;TECHNOLOGY, INC. 
+ 
+ 
+ 
+ 
+ 
+ 
+ Date:&#8195;August&#160;19, 2026 
+ &#160; 
+ 
+ &#160; 
+ By: 
+ &#160; 
+ /s/ Mark Casper 
+ 
+ 
+ &#160; 
+ 
+ &#160; 
+ 
+ &#160; 
+ Mark Casper EVP. Chief Legal Officer and Secretary
