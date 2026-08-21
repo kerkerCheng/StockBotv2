@@ -440,6 +440,15 @@ ignored `library/private/graph_migrations/`。重跑冪等。
 
 ### 8.8.1 排名已實作（`query/bottleneck.py`，2026-08-18）
 
+> ⚠ **本節的數字與排名是 2026-08-18 的 point-in-time 快照，不是 current truth。**
+> 現值一律以 `python -m query.bottleneck` 實跑為準（2026-08-21 實跑已是 **27 列、
+> 468 assertion → 382 canonical edge、覆蓋率 16%**，與下表的 25／423／345／22% 全部不同）。
+>
+> **判準也已經被上層取代：** 選股判準於 2026-08-21 收斂為四維度（瓶頸地位／需求錨點／
+> **客戶端資本承諾**／標的純度），並新增「已知會失焦的指標」禁用清單；同日 `rank_bottlenecks()`
+> 拆成 `rows`（可行動，證據優先）與 `structural_rows`（純結構，不看證據）兩份不可互換的排序。
+> 唯一權威是 `AGENTS.md`「哪些標的值得看」，本節只保留當時的實作紀錄與 bug 追查過程。
+
 指令：`python -m query.bottleneck`。25 列「公司 × 瓶頸邊」，前六名：
 
 | # | 標的 | 卡在哪 | 替代難度 | 證據 | 需求錨點 |
