@@ -3210,6 +3210,66 @@
       "source": "decision_lab",
       "title": "REVIEW — co:coherent",
       "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-21T22:37:52.268912+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 203,
+      "reason": null,
+      "ref_id": "dc_4d28e50810e46da7fd77ee042ee7bd1c",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:lumentum",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-21T22:37:52.268912+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 204,
+      "reason": null,
+      "ref_id": "dc_0fca807c963dc3b9888e0f83ba6d45a5",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:marvell_technology",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-21T22:53:24.172587+00:00",
+      "hint": "核准 exact graph delta；Decision handoff：co:sivers_semiconductors。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 205,
+      "reason": null,
+      "ref_id": "ra_1cf115f88d793991932b0dbd046eb378",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "Sivers／ALL.SPACE 2027 Ka-band BFIC 量產訂單",
+      "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-08-21T22:53:24.172587+00:00",
+      "hint": "核准 exact graph delta；Decision handoff：co:iqe。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 206,
+      "reason": null,
+      "ref_id": "ra_746c588d8ca591e621a433379a18a8b1",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "MACOM 對 IQE 的 £45M 投資與長期供應協議",
+      "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-08-21T22:53:24.172587+00:00",
+      "hint": "核准 exact graph delta；Decision handoff：co:marvell_technology。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 207,
+      "reason": null,
+      "ref_id": "ra_85749b970268a50c252fa31fde5e7984",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "Marvell／Google custom-chip 合作與 warrant 方向性",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -7296,6 +7356,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 203,
+  "next_n": 208,
   "schema_version": "1"
 }
