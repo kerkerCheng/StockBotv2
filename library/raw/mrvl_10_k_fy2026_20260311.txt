@@ -1,0 +1,16 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1835632/000183563226000011/mrvl-20260131.htm
+
+Excerpt:
+Source URL: https://www.sec.gov/Archives/edgar/data/1835632/000183563226000011/mrvl-20260131.htm
+Filed: 2026-03-11 (FY ended 2026-01-31)
+Retrieved: 2026-08-21
+
+Verbatim excerpts (Item 1 Business — Interconnects):
+
+1) Our interconnect products include PAM (pulse amplitude modulation), coherent and coherent-lite DSPs (digital signal processors), laser drivers, TIAs (trans-impedance amplifiers), silicon photonics, CPO (co-packaged optics), LPO (linear pluggable optics) chipsets, DCI (data center interconnect), AEC (active electrical cable) DSPs and PCIe retimer solutions.
+
+2) Additionally, our LPO chipsets, comprising of optimized TIAs and laser drivers, address next-generation short-reach, compute fabric connectivity requirements inside AI data centers for connections that have a predictable and controlled channel. LPO modules enabled by our chipsets provide higher bandwidth and greater reach than copper cable interconnects, with optimal latency and power consumption.
+
+3) These custom offerings are built on our proven ASIC platform which leverages a broad suite of differentiated Marvell intellectual property including ultra-high-speed SerDes, ARM compute, security, storage, silicon photonics and advanced packaging, including die to die interconnects, chiplets, co-packaged optics ("CPO") and custom high-bandwidth memory ("HBM").
+
+Boundary: product-line description only. No revenue split, customer names, market share, substitutability or exclusivity. The phrase "1.6T DSP" does NOT appear; the single occurrence of 1.6T refers to Ethernet PHY speed range.

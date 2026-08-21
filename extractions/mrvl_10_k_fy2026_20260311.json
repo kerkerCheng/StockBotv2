@@ -1,0 +1,164 @@
+{
+  "claims": [
+    {
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Marvell 後續 10-K／10-Q 停止揭露 LPO chipsets 或 CPO 產品線，或將其移出 interconnect 產品組合而無替代表述。核查頻率：每年 10-K 與每季 10-Q。",
+      "id": "mrvl_10_k_fy2026_20260311_cl1",
+      "source_ids": [
+        "mrvl_10_k_fy2026_20260311_s1",
+        "mrvl_10_k_fy2026_20260311_s2"
+      ],
+      "statement": "Marvell FY2026 10-K Item 1 一手逐字列出其 interconnect 產品組合，同時涵蓋 CPO、LPO chipsets 與 TIA／laser driver——三者在本圖中原本分屬不同狀態：tech:cpo 已有 4 個供應商、tech:tia_driver 已有邊、而 tech:lpo 在此之前是**完全孤立的節點（0 條邊）**。LPO chipsets 由 optimized TIAs 與 laser drivers 組成，定位於 AI 資料中心內 predictable and controlled channel 的短距 compute fabric 連接，公司自述其提供高於銅纜的頻寬與距離。⚠ 邊界：(1) 本文件為產品線描述，**未揭露任一產品線的營收、占比、客戶或市占**，不得據此推論商業成熟度；(2) 三條邊的 substitutability／sole_source／qualification_status 皆刻意留空——10-K 沒有任何關於替代難度或獨家性的陳述，不編造；(3) 依 L8，這是供應商自報的產品組合，可確立「Marvell 供應這些產品」，不足以確立競爭地位。",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.9,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "取得 Marvell 或其客戶明確具名 1.6T DSP 產品的一手文件，即可建立該邊並使本註記失效。",
+      "id": "mrvl_10_k_fy2026_20260311_cl2",
+      "source_ids": [
+        "mrvl_10_k_fy2026_20260311_s1"
+      ],
+      "statement": "⚠ 本輪原目標是補 tech:dsp_1p6t（1.6T DSP）的供給側，**經逐字核對後判定 Marvell FY2026 10-K 不足以支持該邊**，故未建立。理由：全文 DSP 出現 9 次，明確者為 PAM DSPs、coherent／coherent-lite optical DSPs 與 AEC DSPs；`1.6T` 全文僅出現一次，且該句為「Our Ethernet physical-layer transceiver portfolio addresses all the critical speeds ranging from 10Mbps to 1.6Tbps」——講的是 Ethernet PHY 支援速率上限，不是 1.6T DSP 產品。依 L6 Gap 4（具體型號必須在 quote 內逐字出現），不得由「有 optical DSP」＋「有 1.6Tbps PHY」推論出「供應 1.6T DSP」。tech:dsp_1p6t 仍為 0 供應商，需另尋具名 1.6T DSP 的一手來源。",
+      "subject_id": "e2"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "tech:lpo",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mrvl_10_k_fy2026_20260311_s1",
+        "mrvl_10_k_fy2026_20260311_s2"
+      ],
+      "src_id": "co:marvell_technology"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "tech:cpo",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mrvl_10_k_fy2026_20260311_s1",
+        "mrvl_10_k_fy2026_20260311_s3"
+      ],
+      "src_id": "co:marvell_technology"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "tech:tia_driver",
+      "id": "e3",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mrvl_10_k_fy2026_20260311_s1",
+        "mrvl_10_k_fy2026_20260311_s2"
+      ],
+      "src_id": "co:marvell_technology"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "Marvell",
+        "MRVL"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:marvell_technology",
+      "name": "Marvell Technology, Inc.",
+      "role": "adjacent_silicon",
+      "source_ids": [
+        "mrvl_10_k_fy2026_20260311_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "LPO",
+        "linear pluggable optics"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:lpo",
+      "name": "Linear Pluggable Optics (LPO)",
+      "role": "adjacent_silicon",
+      "source_ids": [
+        "mrvl_10_k_fy2026_20260311_s1",
+        "mrvl_10_k_fy2026_20260311_s2"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "CPO"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:cpo",
+      "name": "Co-Packaged Optics (CPO)",
+      "role": "adjacent_silicon",
+      "source_ids": [
+        "mrvl_10_k_fy2026_20260311_s1"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "TIA",
+        "trans-impedance amplifier",
+        "laser driver"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:tia_driver",
+      "name": "TIA and driver (optical transceiver)",
+      "role": "adjacent_silicon",
+      "source_ids": [
+        "mrvl_10_k_fy2026_20260311_s1",
+        "mrvl_10_k_fy2026_20260311_s2"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mrvl_10_k_fy2026_20260311",
+    "evidence_tier": 1,
+    "origin_entity": "Marvell Technology, Inc.",
+    "permission_basis": "U.S. SEC EDGAR filing, public domain government record.",
+    "published_at": "2026-03-11",
+    "publisher": "U.S. Securities and Exchange Commission (EDGAR)",
+    "retrieved_at": "2026-08-21",
+    "source_type": "filing",
+    "storage_permission": "repo_full",
+    "title": "Marvell Technology FY2026 Form 10-K — Item 1 Business, Interconnects product portfolio",
+    "url": "https://www.sec.gov/Archives/edgar/data/1835632/000183563226000011/mrvl-20260131.htm"
+  },
+  "sources": [
+    {
+      "id": "mrvl_10_k_fy2026_20260311_s1",
+      "locator": "Item 1 Business — Interconnects",
+      "quote": "Our interconnect products include PAM (pulse amplitude modulation), coherent and coherent-lite DSPs (digital signal processors), laser drivers, TIAs (trans-impedance amplifiers), silicon photonics, CPO (co-packaged optics), LPO (linear pluggable optics) chipsets, DCI (data center interconnect), AEC (active electrical cable) DSPs and PCIe retimer solutions."
+    },
+    {
+      "id": "mrvl_10_k_fy2026_20260311_s2",
+      "locator": "Item 1 Business — Interconnects, LPO description",
+      "quote": "Additionally, our LPO chipsets, comprising of optimized TIAs and laser drivers, address next-generation short-reach, compute fabric connectivity requirements inside AI data centers for connections that have a predictable and controlled channel. LPO modules enabled by our chipsets provide higher bandwidth and greater reach than copper cable interconnects, with optimal latency and power consumption."
+    },
+    {
+      "id": "mrvl_10_k_fy2026_20260311_s3",
+      "locator": "Item 1 Business — Custom ASICs",
+      "quote": "These custom offerings are built on our proven ASIC platform which leverages a broad suite of differentiated Marvell intellectual property including ultra-high-speed SerDes, ARM compute, security, storage, silicon photonics and advanced packaging, including die to die interconnects, chiplets, co-packaged optics (“CPO”) and custom high-bandwidth memory (“HBM”)."
+    }
+  ]
+}
