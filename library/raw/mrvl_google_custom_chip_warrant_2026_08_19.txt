@@ -1,0 +1,4 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1835632/000119312526356217/d412696d8k.htm
+
+Excerpt:
+Marvell's Form 8-K describes a Google custom semiconductor agreement spanning TPU inference, storage, NIC, memory-interface and near-memory products. It also grants Google a warrant up to 58,970,907 shares at $206.58, with most vesting tied to discretionary purchases in $500m revenue tranches.
