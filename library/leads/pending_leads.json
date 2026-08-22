@@ -25886,6 +25886,47 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1340652/000089924322034076/xslF345X03/doc4.xml"
     },
+    "lead_9bea5f8821e22427497284c68f2551d4": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-22T20:07:13.115909+00:00",
+      "lead_id": "lead_9bea5f8821e22427497284c68f2551d4",
+      "published_at": "2026-08-19",
+      "refs": {},
+      "source": "weekly:robotics",
+      "status": "triaged_go",
+      "themes": {
+        "robotics": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Schaeffler",
+            "humanoid"
+          ]
+        }
+      },
+      "title": "Hexagon AEON 進入 Schaeffler Humanoid Gym，規劃至少部署 1,000 台",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-22T20:07:33.343481+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "Hexagon／Schaeffler 官方共同公告新增 AEON 工廠驗證與至少 1,000 台規劃部署；若落地將新增 humanoid demand anchor 與 supplier 路徑，若未落地則不應納入候選集合。公告未含具約束力付款或採購額，故不分類為 capital_commitment。"
+        },
+        "decided_at": "2026-08-22T20:07:20.145567+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true,
+          "novelty": true
+        },
+        "reason": "Hexagon 與 Schaeffler 官方共同公告具名 AEON、Humanoid Gym、至少 1,000 台規劃部署與六個月驗證窗口；可逐字查核且新增 robotics demand-anchor／supplier 路徑。公告未揭露約束性採購額，PASS 只授權 bounded pq1，不等於入圖。",
+        "tier": 1
+      },
+      "url": "https://hexagon.com/company/newsroom/press-releases/2026/towards-factory-deployment-how-aeon-is-trained-to-perform"
+    },
     "lead_9c307b5e44b4cd9b129d36163d450b50": {
       "entities": {
         "company_ids": [

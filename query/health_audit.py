@@ -39,6 +39,7 @@ if load_dotenv is not None:
 LIFECYCLE_FILE = ROOT / "thesis" / "lifecycle.json"
 THESIS_DIR = ROOT / "thesis"
 ENGINE_C_STALE_DAYS = 7
+MEMO_FRESHNESS_TITLE = "Memo 新鮮度（超過各自核查週期）"
 
 # L7：active memo 必須同時寫出「核查頻率」與「觸發後 48 小時內動作」。
 L7_REQUIRED_PATTERNS = {
@@ -441,7 +442,7 @@ def run_local_audit(*, today: date | None = None) -> str:  # pragma: no cover - 
     stale = stale_memos()
     report.extend(
         _section(
-            "Memo 新鮮度（>90 天）",
+            MEMO_FRESHNESS_TITLE,
             "yellow" if stale else "green",
             [f"- {company}：{days} 天未核查" for company, days in stale],
         )

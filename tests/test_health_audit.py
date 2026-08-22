@@ -7,6 +7,7 @@ import sqlite3
 from datetime import date
 
 from query.health_audit import (
+    MEMO_FRESHNESS_TITLE,
     active_edge_keys_from_manifests,
     engine_c_freshness,
     l7_field_gaps,
@@ -15,6 +16,10 @@ from query.health_audit import (
     split_conflicts_by_resolution,
     ticker_map_gaps,
 )
+
+
+def test_memo_freshness_title_describes_per_thesis_interval() -> None:
+    assert MEMO_FRESHNESS_TITLE == "Memo 新鮮度（超過各自核查週期）"
 
 
 def _entry(**overrides) -> dict:
