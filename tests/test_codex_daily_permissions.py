@@ -15,7 +15,7 @@ def test_project_does_not_define_an_ignored_permission_profile() -> None:
 
 def test_all_privileged_daily_entries_have_narrow_outside_sandbox_rules() -> None:
     rules = RULES.read_text(encoding="utf-8")
-    assert rules.count("prefix_rule(") == 12
+    assert rules.count("prefix_rule(") == 13
     for fixed_entry in (
         "crons\\\\harvest_leads.py",
         "engine_c\\\\etl_yfinance.py",
@@ -24,6 +24,7 @@ def test_all_privileged_daily_entries_have_narrow_outside_sandbox_rules() -> Non
         '"-m", "engine_b.cli", "list"',
         '"-m", "engine_b.cli", "drain"',
         "scripts\\\\catalyst_watch.py",
+        "scripts\\\\outcome_if_settled_today.py",
         "scripts\\\\prepare_research_action.py",
         '"-m", "decision_lab", "today"',
         '"-m", "engine_b.todo", "sync"',

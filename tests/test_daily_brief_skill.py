@@ -6,6 +6,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 SKILL = ROOT / "skills" / "daily-brief" / "SKILL.md"
+ALPHA_STATUS = ROOT / "skills" / "alpha-status" / "SKILL.md"
 
 
 def _text() -> str:
@@ -147,3 +148,21 @@ def test_decision_review_go_dispatches_gap_pq1_before_reassess() -> None:
     assert "不得立刻拿舊" in text and "bare reassess" in text
     assert "--to awaiting_approval" in text or "awaiting_approval" in text
     assert "decision:<new_decision_id>" in text
+
+
+def test_daily_embeds_full_alpha_status_contract() -> None:
+    text = _text()
+    alpha = ALPHA_STATUS.read_text(encoding="utf-8")
+    for token in (
+        "## Alpha 現況（完整四 pane｜無 pq2 編號）",
+        "### Pane 1 — 現在要投哪一檔",
+        "### Pane 2 — 該去補誰的證據",
+        "### Pane 3 — 哪裡還是空白",
+        "### Pane 4 — 部位與問責",
+        "query.coverage_gaps",
+        "scripts\\outcome_if_settled_today.py",
+        "不得因今天無新事件或 `NO ACTION` 而省略",
+    ):
+        assert token in text
+    assert "只出**可行動排序**" not in text
+    assert "daily-brief 目前嵌入本 skill 的完整四個 pane" in alpha

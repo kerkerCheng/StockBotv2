@@ -3,13 +3,13 @@ name: alpha-status
 description: >
   Alpha 現況總覽：回答「現在最值得投哪一檔」「該去補誰的證據」「哪裡還是空白」「已投的
   部位怎麼樣」四題。當使用者說「alpha status」「alpha 現況」「瓶頸排序」「現在該投什麼」
-  「我們缺什麼」「哪裡還沒挖」「挖到哪了」時使用；daily-brief 亦可引用本 skill 的 pane 1。
+  「我們缺什麼」「哪裡還沒挖」「挖到哪了」時使用；daily-brief 目前嵌入本 skill 的完整四個 pane。
   **純消費端：只讀既有 authority 的輸出，一個數字都不自己重算**——它報告排程實際做了什麼，
   不是自己另算一份。不入圖、不改 thesis、不動資本，所有人工 gate 不受影響。
   觸發詞：alpha status、alpha 現況、瓶頸排序、現在該投什麼、缺什麼、哪裡還沒挖。
 ---
 
-# Alpha Status Skill（v1）
+# Alpha Status Skill（v1.1）
 
 ## 定位一句話
 
@@ -34,7 +34,7 @@ description: >
 | 該補誰的證據 | 同上的 `structural_rows` | 同上（同一次輸出） |
 | 哪裡是空白 | `query/coverage_gaps.py` | `python -m query.coverage_gaps` |
 | 標的純度（市值／分析師） | Engine C `financial_snapshots`／`consensus_coverage_observations` | 見 §pane 1 |
-| 部位與計數器 | Decision Store（private） | 見 §pane 4 |
+| 部位與計數器 | `decision_lab today`＋`scripts/outcome_if_settled_today.py` | 見 §pane 4 |
 | 注意力佇列現況 | `engine_b/priority.py` 的分類 | `python -m engine_b.cli drain` |
 
 ---
@@ -152,13 +152,13 @@ PY
 
 ## Pane 4 — 部位與問責
 
-三塊，都讀 `library/private/decision_lab/decision_lab.db`（**只讀，不寫**）：
+三塊，使用既有唯讀入口，不以 ad-hoc SQL 另算：
 
-1. **兩個常駐計數器**（L14 要求「會自己出現」，不是靠人讀文件）
-   - 非零 live 區間：`select count(*) from system_decisions` 中 `live_supported_range` 非 `[0,0]` 的最新 decision 數 ／ cohort 總數
-   - 已量測 outcome：`select sum(case when absolute_return is not null then 1 else 0 end), count(*) from outcome_envelopes`
-2. **真實部位**：`live_choices` ＋ `live_execution_reports`。有 fill 就必須列出**成交價、
-   目前價、報酬**，以及該 cohort 的 epoch 與 disproof 狀態。
+1. **常駐計數器**：取 `python -m decision_lab today --format markdown` 已輸出的研究進展／可量測／
+   結案歸因計數；不得回頭直接掃歷史 decision 筆數製造另一個分母。
+2. **真實部位**：跑 `python scripts/outcome_if_settled_today.py`，只消費其 `Live 部位 vs 只有 paper`
+   與錨點體檢。成交價、最新已收盤價、live 報酬必須與同 cohort 的 epoch、catalyst、disproof／lifecycle
+   狀態合併呈現；後者取同一次 `decision_lab today`／`catalyst_watch.py`，不得只列損益。
 3. **監控覆蓋**：alpha live 部位目前**不在** `event_search_requests` 的覆蓋範圍內
    （`portfolio_risk.py` 只走 `beta_policy.json` 的 `instruments`）。有 live 部位時必須
    明示這一點，不得讓使用者以為有人在看。
@@ -177,7 +177,8 @@ PY
 
 ## 輸出格式
 
-四個 pane 依序出，每個 pane 開頭一句 TL;DR。**pane 1 必須有明確首選。**
+四個 pane 依序出，每個 pane 開頭一句 TL;DR。**pane 1 必須有明確首選。**獨立呼叫與嵌入
+Daily Brief 時使用同一份輸出契約；Daily 不得另建刪減版或平行判準，直到使用者看過完整成品後另行定案。
 
 **每一列都要標「答案回來會改變什麼」**：`候選集合`／`排序`／`出場條件`／`只是信心`。
 標到「只是信心」的，就是在告訴使用者別做——那一級的上限被鎖死在「把已知第一名確認成第一名」。
@@ -204,7 +205,7 @@ PY
 
 | 情況 | 用哪個 |
 |---|---|
-| 今天有什麼要核准 | `skills/daily-brief`（可引用本 skill 的 pane 1） |
+| 今天有什麼要核准 | `skills/daily-brief`（目前嵌入本 skill 的完整四個 pane） |
 | 單一標的深挖 | `skills/investment-research` |
 | 由上而下拆解一個系統、產生新節點 | `skills/system-decompose` |
 | 新公司入圖 | `skills/company-onboard` |

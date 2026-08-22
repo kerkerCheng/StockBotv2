@@ -2,14 +2,15 @@
 name: daily-brief
 description: >
   每日核准迴路：把 harvest → triage → pq1 自動研究 → 今日決策 → 到期 thesis 聚合成一份
-  action-first 的 Daily Approval Brief，使用者用一行批次語法（`1 3 7 go 4 drop 5 6 pending`）
+  action-first 的 Daily Approval Brief，並嵌入 alpha-status 的完整四 pane 現況。使用者用一行批次語法
+  （`1 3 7 go 4 drop 5 6 pending`）
   核准。當使用者說「daily brief」「今天有什麼要處理」「跑每日摘要」「有哪些待判斷」「今天需要
   動作嗎」時使用。三道閘門不放寬：graph admission 必經核准、深挖由 priority/使用者驅動但入圖仍
   核准、live 資本永遠人工。Scheduled run 可自動 pq1 到 prepared，但不建 decision、不下單、不自動入圖。觸發詞：daily brief、
   每日摘要、今天有什麼、待判斷、今天需要動作嗎。
 ---
 
-# Daily Approval Brief Skill（v1.6）
+# Daily Approval Brief Skill（v1.7）
 
 ## 定位一句話
 
@@ -63,10 +64,10 @@ outside-sandbox rule**，
 fixed entry 包含
 `crons\harvest_leads.py`、`engine_c\etl_yfinance.py`、`fetchers\edgar.py`、
 `scripts\daily_beta_snapshot.py`、`engine_b.cli list`、`engine_b.cli drain`、
-`scripts\catalyst_watch.py`、`scripts\prepare_research_action.py --action-file`、
+`scripts\catalyst_watch.py`、`scripts\outcome_if_settled_today.py`、`scripts\prepare_research_action.py --action-file`、
 `decision_lab today`、`engine_b.todo sync`、`scripts\publish_daily_state.py` 與
-`scripts\publish_daily_brief.py`；十二條 rule 就是單一 authority，不是 primary＋fallback 兩套來源。
-`query.bottleneck`、harvest health、trace backlog、todo list 與 JSON 檢查已可留在 sandbox；使用者核准後的
+`scripts\publish_daily_brief.py`；十三條 rule 就是單一 authority，不是 primary＋fallback 兩套來源。
+`query.bottleneck`、`query.coverage_gaps`、harvest health、trace backlog、todo list 與 JSON 檢查已可留在 sandbox；使用者核准後的
 apply／reassess／complete-ra／commit intake 不加入 unattended rule，仍走 type-aware 人工 gate。
 若 exact rule 未匹配、升權限被拒或命令仍出現 `access_blocked`，保留結構化 failure、讓受影響資料 fail closed，
 不得改用第二條更寬 rule、手動重跑或改寫成「零筆」／`no_result`。權限正確後若仍發生暫時性 transport error，
@@ -243,23 +244,28 @@ prepared RA」（通常為否）。`original_obtained` 也要說明「已取得�
 `isolated_tier_3`／截圖／paywall 則要說明「缺哪一份可逐字核對的一手原文」。park 不得被簡寫成已入圖或
 「已完成」；若沒有任何可核對 reason，視為 brief 缺欄而非正常 park。
 
-### Step 4 — 今日決策佇列、alpha 候選與到期 thesis
+### Step 4 — 今日決策佇列、完整 alpha 現況與到期 thesis
 
 ```powershell
 & '.venv\Scripts\python.exe' -m decision_lab today --format markdown
 & '.venv\Scripts\python.exe' scripts\catalyst_watch.py
 & '.venv\Scripts\python.exe' -m query.bottleneck
+& '.venv\Scripts\python.exe' -m query.coverage_gaps
+& '.venv\Scripts\python.exe' scripts\outcome_if_settled_today.py
 ```
 
-第三支是**買進側**，與第二支的賣出側對稱。它回答使用者實際的選股問題——
+第三支是 alpha-status Pane 1／2 的共同 authority：Pane 1 是**買進側**，與第二支的賣出側對稱；
+Pane 2 顯示純結構排序與最值得補證據的標的。第四支提供 Pane 3 的既有 chokepoint coverage gaps；
+第五支與第一支的 `decision_lab today` 共同提供 Pane 4 的計數器、真實 fill 與 point-in-time 報酬。
+它們合起來回答——
 「哪個公司佔據了瓶頸、且是市場資金關注的部分」——輸出即
-`## Alpha 候選（瓶頸 × 資金關注）` 的唯一排序來源。
+`## Alpha 現況（完整四 pane）`，不另建平行排序或重算數字。
 
 ⚠ **呈現判準委派給 [`skills/alpha-status`](../alpha-status/SKILL.md)，本檔不再複製一份。**
 2026-08-19 本節曾自行維護一份三維度判準，08-21 判準收斂為四維度（新增**客戶端資本承諾**
 與**標的純度**）後就地過期而無人察覺——同一份呈現契約有兩個副本時，後改的那份不會回頭
 更新前一份（`AGENTS.md`「清單會腐壞，判準不會」）。四維度、禁用指標、相關性警告與
-「outcome 0/8 不是拒絕排序的理由」一律以 alpha-status 的 pane 1 為準。
+「outcome 0/8 不是拒絕排序的理由」與四個 pane 的完整輸出契約一律以 alpha-status 為準。
 
 `bottleneck` 的表格直接給出四維度中的前兩項（替代難度／`sole_source`＝瓶頸地位；
 需求錨點與距需求端跳數＝資金是否在那條鏈上）。**第 3 項（誰付錢給誰）與第 4 項
@@ -338,7 +344,9 @@ park：社群 CPO 推論 → 一手來源未支持，不產空 RA
 以及「是否產生 prepared RA」；每筆尚未 drain 的 lead 必須標明「本輪 cap 延後／尚未 harvest／尚未 triage」
 等具體原因與 score，不能只列總數。
 
-## Alpha 候選（瓶頸 × 資金關注｜無 pq2 編號）
+## Alpha 現況（完整四 pane｜無 pq2 編號）
+
+### Pane 1 — 現在要投哪一檔
 TL;DR：<直接回答「今天要不要加碼、加哪一檔」；不得只列清單不給首選>
 排序來源：`query/bottleneck.py` 的 `rank_bottlenecks()`（唯一權威；不得用 axis_ceiling／paper target／ELIGIBLE 數量代替）
 相關性提醒：<本清單集中在哪個主題；列 N 檔不等於 N 個獨立機會，全買是同一賭注下 N 次>
@@ -348,14 +356,27 @@ TL;DR：<直接回答「今天要不要加碼、加哪一檔」；不得只列�
 | 1 | Coherent（COHR） | supplies_to → co:nvidia | 5/5｜sole_source | 外部印證（客戶端出資） | tech:ai_switch／2 跳 | 首選；已持有可加碼 | 已綁定，Q1 FY2027 檢查毛利率 40.2% |
 | 2 | … | … | … | 供應商自報（L8 弱） | … | 觀察；等客戶端印證 | 未綁定 → 該補 |
 
-必填規則**以 [`skills/alpha-status`](../alpha-status/SKILL.md) pane 1 為準**，此處只列
-daily 特有的兩條：
+### Pane 2 — 該去補誰的證據
+TL;DR：<取同一次 `rank_bottlenecks()` 的 `structural_rows`；指出與 Pane 1 排名差異最大的標的>
+<列有標的但證據沒跟上的最高 ROI 研究題目；每列標示答案會改變 `排序` 或 `只是信心`>
+
+### Pane 3 — 哪裡還是空白
+TL;DR：<取 `query.coverage_gaps`；把真正 chokepoint 研究缺口與文件掉出的產品名詞分開>
+<只把真正 chokepoint 缺口寫成「誰供應 tech:X」的可執行研究題目；每列標示答案會改變 `候選集合`>
+
+### Pane 4 — 部位與問責
+TL;DR：<上線標的／可量測／結案歸因常駐計數器；真實部位、錨點樣本效度與監控覆蓋>
+| 標的 | 進場 | 現價／損益 | catalyst（何時會知道） | disproof 是否觸發 | lifecycle／監控覆蓋 |
+|---|---|---|---|---|---|
+逐筆列出 `live_execution_reports` 中的部位。**進場價與 disproof 判準必須同列**，並明示 alpha live
+部位是否仍不在 `event_search_requests` 覆蓋範圍內。
+
+四個 pane 的完整必填規則**只以 [`skills/alpha-status`](../alpha-status/SKILL.md) 為準**。Daily
+不另存判準副本，只補兩條 daily 特有規則：
 
 - 已持有部位必須列 disproof 狀態；`None` 或 lifecycle `expired` 要當成缺口提出。
-- 只出**可行動排序**（`rows`）。`structural_rows`（該補誰的證據）與 coverage gaps
-  （哪裡是空白）不進 daily——那是使用者主動問「我們缺什麼」時才需要的深度，每天出會稀釋
-  brief 的 action-first 性質。要看完整四 pane 請直接呼叫 alpha-status。
-- 本段**不得因今天無新事件而省略**，規則同 Beta 主力表。
+- 四個 pane **不得因今天無新事件或 `NO ACTION` 而省略**；先完整放進 Daily，之後由使用者看過
+  實際成品再決定裁切哪一段。規則同 Beta 主力表。
 
 ## 追蹤中的外部事件（無 pq2 編號）
 資料源：`& '.venv\Scripts\python.exe' -m engine_b.cli trace-backlog`
@@ -374,12 +395,6 @@ daily 特有的兩條：
   pq2 [74]。問題只在於 brief 僅顯示**當輪** park 的項目，08-13 之後它就再也不出現，
   使用者因此完全看不到系統正在等什麼。這與「bottleneck 排名早就把 COHR 排第一卻沒進
   brief」是同一個病：**做了正確的工作，但產出沒有消費端**（L13）。
-
-## 已持有 alpha 部位的 disproof 追蹤（無 pq2 編號）
-| 標的 | 進場 | 現價／損益 | catalyst（何時會知道） | disproof 是否觸發 | lifecycle |
-|---|---|---|---|---|---|
-逐筆列出 `live_execution_reports` 中的部位。**進場價與 disproof 判準必須同列**，
-否則使用者只看得到損益、看不到「當初憑什麼買、什麼情況該認錯」。
 
 ## Beta capital observation（無 pq2 編號）
 TL;DR：最大化約 30 年後 `retirement_net_terminal_wealth`；technical 只決定新增 timing／pace；列今日可人工評估標的與最重要的動態風控 warning

@@ -1,4 +1,4 @@
-# Daily Approval Brief — Codex 本機排程 Prompt（v1.5）
+# Daily Approval Brief — Codex 本機排程 Prompt（v1.6）
 
 > 現行執行端是 Codex desktop 的 standalone local scheduled task，每日台北 06:30 直接在
 > `C:\Users\Cheng\code\StockBotv2` 的 `master` working tree 執行。電腦需保持開機、Codex App
@@ -8,13 +8,14 @@
 
 ## 任務
 
-明確使用 `$daily-brief` skill，產出一份繁體中文、action-first、穩定 pq2 編號的 Daily Brief。
+明確使用 `$daily-brief` 與 `$alpha-status` skill，產出一份繁體中文、action-first、穩定 pq2 編號，
+並含完整 Alpha 四個 pane 的 Daily Brief。
 這個本機 task 可直接讀 repo、`.env`、Neo4j、Engine C private runtime、Decision Store 與 Google Sheet；
 X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
 
 ## 執行契約
 
-1. 先讀 `AGENTS.md` 與 `skills/daily-brief/SKILL.md`。確認目前 branch 是 `master`；若不是就停止並回報，不自行切 branch。若 working tree 有與本 routine
+1. 先讀 `AGENTS.md`、`skills/daily-brief/SKILL.md` 與 `skills/alpha-status/SKILL.md`。確認目前 branch 是 `master`；若不是就停止並回報，不自行切 branch。若 working tree 有與本 routine
    無關的使用者變更，保留不碰。
 2. Windows 一律使用專案 interpreter：`.venv\Scripts\python.exe`，不得用 bare `python`。
    Codex standalone scheduled task 會沿用 legacy `workspace-write` sandbox；Daily 的唯一權限來源是
@@ -22,9 +23,9 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
    `require_escalated` 命中 exact outside-sandbox rule，不得先在 sandbox 製造可預期失敗再升權重重跑，也不得放行整個 PowerShell、
    Python、Git 或 working tree。fixed entry 是 `crons\harvest_leads.py`、`engine_c\etl_yfinance.py`、
    `fetchers\edgar.py`、`scripts\daily_beta_snapshot.py`、`engine_b.cli list`、`engine_b.cli drain`、
-   `scripts\catalyst_watch.py`、`scripts\prepare_research_action.py --action-file`、`decision_lab today`、
+   `scripts\catalyst_watch.py`、`scripts\outcome_if_settled_today.py`、`scripts\prepare_research_action.py --action-file`、`decision_lab today`、
    `engine_b.todo sync`、`scripts\publish_daily_state.py`、`scripts\publish_daily_brief.py`。
-   十二條 rule 是單一 authority，不是 primary＋fallback 兩套權限。若 exact rule 未匹配、升權限被拒或命令
+   十三條 rule 是單一 authority，不是 primary＋fallback 兩套權限。若 exact rule 未匹配、升權限被拒或命令
    仍回 `access_blocked`，保留 failure 並 fail closed，不得改用更寬 rule 或手動重跑。權限正確後若仍發生
    暫時性 transport error，只讓該命令既有的 bounded、idempotent retry 跑完作最後一步；不得在 routine
    層重跑整個 fixed entry、整份 Daily Brief 或已 checkpoint 的工作。retry 用盡後照樣 fail closed。
@@ -60,7 +61,9 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
      不得原樣留著——那是安靜沉底，而漏掉時沒有人會發現。
    - `.venv\Scripts\python.exe -m decision_lab today --format markdown`
    - `.venv\Scripts\python.exe scripts\catalyst_watch.py`
-   - `.venv\Scripts\python.exe -m query.bottleneck`（已可在 sandbox 讀本機 Neo4j，不需要 outside-sandbox rule）
+   - `.venv\Scripts\python.exe -m query.bottleneck`（Alpha Pane 1／2；已可在 sandbox 讀本機 Neo4j，不需要 outside-sandbox rule）
+   - `.venv\Scripts\python.exe -m query.coverage_gaps`（Alpha Pane 3；區分真正 chokepoint 缺口與產品名詞）
+   - `.venv\Scripts\python.exe scripts\outcome_if_settled_today.py`（Alpha Pane 4；唯讀真實 fill、最新已收盤價與報酬，不 close 或寫 authority）
    - `.venv\Scripts\python.exe -m engine_b.todo sync`
    - `.venv\Scripts\python.exe -m engine_b.todo list`
 4. 任何來源失敗都要誠實列出 `fetch_failed`／`parse_failed` 與結構化 `failure_class`；若 exact rule 未匹配，
@@ -159,6 +162,17 @@ go 授權：<bounded research／exact graph admission／manual observation／the
 <僅列 pq1 進度／失敗；raw lead 不占 pq2 編號。每筆 `parked` 必須列完整主詞／ticker、`parked_reason`、
 `trace_status`、`trace_next_trigger`、`trace_requires_user`、是否產生 prepared RA；`original_obtained` 要說明
 已取得原文但屬時變 observation／無唯一 graph delta，`isolated_tier_3`／截圖／paywall 要說明缺哪份一手原文。>
+
+## Alpha 現況（完整四 pane｜無 pq2 編號）
+### Pane 1 — 現在要投哪一檔
+<`rank_bottlenecks().rows` 的有序清單、明確首選、四維度、相關性警告、每檔 disproof；明標研究判斷且不給尺寸>
+### Pane 2 — 該去補誰的證據
+<同一次輸出的 `structural_rows`；點出與 Pane 1 的排名差異及最高 ROI 補證據題目>
+### Pane 3 — 哪裡還是空白
+<`query.coverage_gaps`；分開真正 chokepoint 研究缺口與抽取產生的產品名詞，只把前者轉成研究題目>
+### Pane 4 — 部位與問責
+<上線標的／可量測／結案歸因計數器、真實 fill／現價／損益／epoch／disproof、錨點樣本效度與 alpha live 監控覆蓋缺口>
+<四個 pane 每列都標答案會改變 `候選集合`／`排序`／`出場條件`／`只是信心`；即使 NO ACTION 或無新事件也不得省略。>
 
 ## Beta capital observation（無 pq2 編號）
 TL;DR：<約 30 年後 retirement_net_terminal_wealth 目標；今日哪些標的可人工評估；最重要的動態風控 warning>

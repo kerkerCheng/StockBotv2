@@ -1,4 +1,4 @@
-# Codex standalone scheduled task 會沿用 workspace-write sandbox；以下十二個 fixed entry
+# Codex standalone scheduled task 會沿用 workspace-write sandbox；以下十三個 fixed entry
 # 是 Daily 唯一的 outside-sandbox 權限來源。首次呼叫就使用 exact rule，不先失敗再重跑；
 # 不放行任意 Python、PowerShell、shell、Git 或 working tree。
 prefix_rule(
@@ -41,6 +41,12 @@ prefix_rule(
     pattern=[".venv\\Scripts\\python.exe", "scripts\\catalyst_watch.py"],
     decision="allow",
     justification="Daily catalyst watch 只讀 owner-only private Decision Store 與 tracked thesis lifecycle。",
+)
+
+prefix_rule(
+    pattern=[".venv\\Scripts\\python.exe", "scripts\\outcome_if_settled_today.py"],
+    decision="allow",
+    justification="Daily Alpha Pane 4 只讀 private Decision Store 與最新已收盤行情，計算 live／shadow 報酬，不寫任何 authority。",
 )
 
 prefix_rule(

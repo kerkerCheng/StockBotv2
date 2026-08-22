@@ -14,6 +14,7 @@ def test_daily_prompt_uses_local_authorities_and_repo_venv() -> None:
     text = DAILY.read_text(encoding="utf-8")
     for token in (
         "$daily-brief",
+        "$alpha-status",
         ".venv\\Scripts\\python.exe",
         "crons\\harvest_leads.py",
         "engine_b.cli harvest-health",
@@ -23,10 +24,12 @@ def test_daily_prompt_uses_local_authorities_and_repo_venv() -> None:
         "engine_b.cli list",
         "engine_b.cli drain",
         "scripts\\catalyst_watch.py",
+        "scripts\\outcome_if_settled_today.py",
         "scripts\\prepare_research_action.py",
         "decision_lab today",
         "engine_b.todo sync",
         "scripts\\publish_daily_state.py",
+        "query.coverage_gaps",
     ):
         assert token in text
     assert "master" in text
@@ -119,6 +122,19 @@ def test_daily_brief_preserves_beta_market_heartbeat_and_canonical_output() -> N
     assert "task 最終回覆必須原樣輸出" in daily
     assert "`NO ACTION`／非投入評估日也不得刪除主力表" in skill
     assert "不得在取得 delivery receipt 後另產生" in skill
+
+
+def test_daily_prompt_requires_complete_alpha_status_heartbeat() -> None:
+    text = DAILY.read_text(encoding="utf-8")
+    for token in (
+        "## Alpha 現況（完整四 pane｜無 pq2 編號）",
+        "### Pane 1 — 現在要投哪一檔",
+        "### Pane 2 — 該去補誰的證據",
+        "### Pane 3 — 哪裡還是空白",
+        "### Pane 4 — 部位與問責",
+        "即使 NO ACTION 或無新事件也不得省略",
+    ):
+        assert token in text
 
 
 def test_daily_prompt_is_not_the_retired_cloud_runner() -> None:
