@@ -4306,6 +4306,144 @@
       "result": "ok",
       "run_at": "2026-08-21T22:33:02.362428+00:00",
       "source": "edgar:TSLA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-22T22:32:55.871839+00:00",
+      "source": "mfn:sivers-semiconductors"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-22T22:32:57.274916+00:00",
+      "source": "sivers:press"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-22T22:32:58.116003+00:00",
+      "source": "yahoo:iqe-l"
+    },
+    {
+      "new": 2,
+      "result": "ok",
+      "run_at": "2026-08-22T22:32:59.286443+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-22T22:33:00.980779+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-22T22:33:01.827897+00:00",
+      "source": "edgar:AEVA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-22T22:33:02.546421+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-22T22:33:03.076371+00:00",
+      "source": "edgar:AVGO"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-22T22:33:03.825987+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-22T22:33:04.554054+00:00",
+      "source": "edgar:CCXI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-22T22:33:05.102090+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-22T22:33:05.925710+00:00",
+      "source": "edgar:GFS"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-22T22:33:06.641523+00:00",
+      "source": "edgar:JBL"
+    },
+    {
+      "new": 5,
+      "result": "ok",
+      "run_at": "2026-08-22T22:33:07.355142+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-22T22:33:08.128624+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-22T22:33:08.880974+00:00",
+      "source": "edgar:META"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-22T22:33:09.422058+00:00",
+      "source": "edgar:MRVL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-22T22:33:10.141443+00:00",
+      "source": "edgar:MTSI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-22T22:33:10.682654+00:00",
+      "source": "edgar:MU"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-22T22:33:11.392957+00:00",
+      "source": "edgar:NVDA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-22T22:33:12.103931+00:00",
+      "source": "edgar:POET"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-22T22:33:12.925221+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-22T22:33:13.480302+00:00",
+      "source": "edgar:TSLA"
     }
   ],
   "leads": {
@@ -4984,6 +5122,67 @@
         }
       ],
       "url": "https://x.com/aleabitoreddit/status/2076248337863639506"
+    },
+    "lead_03a1c39f40036bb5377dbdb0a90dd271": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "SPCX",
+          "RKLB"
+        ]
+      },
+      "first_seen": "2026-08-22T22:32:59.285489+00:00",
+      "lead_id": "lead_03a1c39f40036bb5377dbdb0a90dd271",
+      "media": [
+        {
+          "cache": {
+            "bytes": 140133,
+            "content_type": "image/png",
+            "local_path": "library/private/lead_media/lead_03a1c39f40036bb5377dbdb0a90dd271/3_2091177156533780480.png",
+            "sha256": "db95473f698e5e0737f97978392b54de8c0a5e36ef05a0266238178c3ceacb0f"
+          },
+          "height": 1199,
+          "media_key": "3_2091177156533780480",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HQVai1mbgAAF9Yr.png",
+          "width": 772
+        },
+        {
+          "cache": {
+            "bytes": 149099,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_03a1c39f40036bb5377dbdb0a90dd271/3_2091177156521156609.jpg",
+            "sha256": "5dcdca4b9518ab772362fc2304fe0ad41b8e6d294f86c83a781e24576f745012"
+          },
+          "height": 912,
+          "media_key": "3_2091177156521156609",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HQVai1ja4AEoCNf.jpg",
+          "width": 1200
+        }
+      ],
+      "published_at": "2026-08-22T14:54:25.000Z",
+      "raw_text": "It's been fun to read these US Gov fact sheets (few a week) recently. \n\nEarlier this week was \"Golden Age of Space Transportation\", with $SPCX hard carrying the launch sector like Faker. \n\nAnd $RKLB + other rocket companies as beneficiaries of the 1K launch/reentry goal by 2030. \n\nThis month we also had:\n- Drone component tariffs \n-  American Mining / Critical Mineral deals\n- Polysilicon supply chains tariffs\n\nand a lot more... So helpful to see what sectors US policy is focusing on.",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "It's been fun to read these US Gov fact sheets (few a week) recently. Earlier this week was \"Golden Age of Space Transportation\", with $SPCX hard carrying the launch sector like Faker. And $RKLB + other rocket companies as beneficiaries of the 1K launch/reentry goal by 2030. This month we also had: - Drone component tariffs - American Mining / Critical Mineral deals - Polysilicon supply chains tariffs and a lot more... So helpful to see what sectors US policy is focusing on.",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-22T22:36:38.166425+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "confidence_only",
+          "reason": "具體政策目標可追查，但屬現行追蹤範圍外的太空運輸與泛產業政策彙整；不改變目前候選集合或排序。"
+        },
+        "decided_at": "2026-08-22T22:36:24.774436+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "雖含美國太空運輸 2030 年 1,000 次 launch／reentry 目標等可查政策線索，但主體是 SPCX／RKLB 與泛產業政策彙整，未命中現行追蹤公司／主題，關聯性硬指標不足",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2091177173789069797"
     },
     "lead_03e036c05aea97310171ca07772eb352": {
       "entities": {
@@ -5954,6 +6153,50 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026041314/xslF345X06/wk-form4_1780693451.xml"
+    },
+    "lead_093b321c79c6e73e6c2aa73e787c4ef0": {
+      "entities": {
+        "company_ids": [
+          "co:lumentum"
+        ],
+        "tickers": [
+          "LITE"
+        ]
+      },
+      "first_seen": "2026-08-22T22:33:07.354703+00:00",
+      "lead_id": "lead_093b321c79c6e73e6c2aa73e787c4ef0",
+      "published_at": "2026-08-21",
+      "refs": {},
+      "source": "edgar:LITE",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "LITE"
+          ]
+        }
+      },
+      "title": "LITE 4 filed 2026-08-21",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-22T22:36:38.166425+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
+        "decided_at": "2026-08-22T22:36:23.482281+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "Lumentum 官方 Form 4；具名發行人與申報日可核對，僅作內部人／稀釋彙總觀測，個別申報不改變候選集合或排序",
+        "related_trace_requeues": [
+          "lead_891dfebbd908d822ef6f4a55e1e465c0"
+        ],
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1633978/000148955026000004/xslF345X06/form4-08222026_120847.xml"
     },
     "lead_09abba7335ec575ec76ca63a92e5663f": {
       "content_updated_at": "2026-07-29T13:46:43.559962+00:00",
@@ -9691,6 +9934,47 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1051627/000143774926028573/xslF345X06/rdgdoc.xml"
     },
+    "lead_2936b00bd007bf4ae531dd71f460f703": {
+      "entities": {
+        "company_ids": [
+          "co:lumentum"
+        ],
+        "tickers": [
+          "LITE"
+        ]
+      },
+      "first_seen": "2026-08-22T22:33:07.354899+00:00",
+      "lead_id": "lead_2936b00bd007bf4ae531dd71f460f703",
+      "published_at": "2026-08-21",
+      "refs": {},
+      "source": "edgar:LITE",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "LITE"
+          ]
+        }
+      },
+      "title": "LITE 4 filed 2026-08-21",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-22T22:36:38.166425+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
+        "decided_at": "2026-08-22T22:36:23.733210+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "Lumentum 官方 Form 4；具名發行人與申報日可核對，僅作內部人／稀釋彙總觀測，個別申報不改變候選集合或排序",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1633978/000157046526000005/xslF345X06/form4-08222026_120806.xml"
+    },
     "lead_297e60d4932f3b8f5b0c6e39279510dd": {
       "entities": {
         "company_ids": [
@@ -12262,9 +12546,22 @@
       ],
       "published_at": "2026-07-31T08:25:39.000Z",
       "raw_text": "For $XFAB ER transcript:  \n\nJust to recap, my idea on $XFAB foundry growth opportunities stemmed from SiC for 800v and photonixfab/MTP for CPO applicability.   \n\n- $XFAB: \"We are making progress in co-packaged optics\".  \n\n- \"The transition to 800v... is expected to support demand for both SiC and GaN... for XFAB\"  \n\nSo those analysts/people that were confidently bearposting about $XFAB that they had \"0 exposure to 800V, photonics, CPO\" just turned out plainly wrong. \n\nAt the time I shared my idea, industry materials showed ASE and others cited photonixfab + XFAB as an upcoming CPO player in EU. And filings showed they had exposure names like $NVTS / $POWI in general. \n\nSo glad $XFAB went out to explicitly clear things up to state they were developing in CPO/800v.   \n\nOkay back to the ER:  \n\n- \"We continue to expect photonics volume production to start in 2028\".  Company currently has three silicon photonics projects in development with key partners.   \n\nI thought it would ramp sometime in H2 2027, but was probably early by a few months. \n\n- Several new data center design wins, eg. 3 new SiC design wins (consistent with general 2027 ramp as 800v deployment takes off).  \n\nSo once those ramp in 2027-2028, (markets tend to price things ahead of time), I'd expect $XFAB to be rerated based on growth opportunities.   \n\nTLDR:  \n- Current revenue numbers not as impressive.\n- $XFAB confirmed direct exposure to CPO and 800V shifts (biggest win for thesis) \n- 800V exposure opportunities for SiC (should be 2027)\n-  Timeline is 2028 ramp for photonics volume production  \n\nHappy exposure thesis to CPO/800V was confirmed from this ER. Might be a bit of waiting for revenue ramp.",
-      "refs": {},
+      "refs": {
+        "parked_reason": "company_onboarding_source_review_required",
+        "trace_attempts_ref": "official_XFAB_Q4_2025_investor_presentation_and_2025_annual_report",
+        "trace_next_trigger": "customer_or_partner_officially_confirms_XFAB_photonics_role_and_source_diversity_review",
+        "trace_requires_user": "false",
+        "trace_status": "partial",
+        "trace_trigger_entities": [
+          "NVTS",
+          "POWI",
+          "XFAB",
+          "co:x_fab"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -15326,10 +15623,10 @@
       "published_at": "2026-08-07T08:27:45.000Z",
       "raw_text": "Unitree, China's humanoid leader, is set to IPO this month at a $9B valuation! (~$6.2B originally per March filing). \n\nDerivative markets are pricing open at an implied $36.04B MC, roughly ~4X listing price. \n\n$CCXI / Agility Robotics, the first US publicly listed pure play humanoid leader, is also going public later in Q4, at a ~$2.5B pre-money valuation.\n\nIt will be interesting to see how markets price in America vs. Chinese Humanoid leaders.",
       "refs": {
-        "parked_reason": "上交所官方資料支持 Unitree 啟動 STAR Market IPO、發行 40.45M shares 且占 enlarged capital 10%、8 月 10 日申購；未支持貼文的 US valuation 或衍生市場 US.04B implied opening",
+        "parked_reason": "ipo_event_superseded_and_engine_c_identity_observation",
         "research_outcome": "官方 IPO 流程可核對，但估值／開盤推論仍是二手市場觀察；對 Agility 的 read-through 不是 Engine A 關係",
-        "trace_attempts_ref": "SSE_Unitree_IPO_announcement_20260731",
-        "trace_next_trigger": "SSE_publishes_final_offer_price_allotment_and_first_trading_receipt",
+        "trace_attempts_ref": "Shanghai_Stock_Exchange_and_2026-08-19_listing",
+        "trace_next_trigger": "Unitree_first_post_listing_financial_or_commercial_report",
         "trace_origin_entity": "Shanghai Stock Exchange / Unitree Robotics",
         "trace_requeue_consumed_entities": [
           "CCXI"
@@ -15337,15 +15634,16 @@
         "trace_requeue_trigger": "related_triaged_lead:lead_826473daf6f4deaaff8503a106f6efd6",
         "trace_requeued_at": "2026-08-19T22:33:23.215534+00:00",
         "trace_requires_user": "false",
-        "trace_status": "partial",
+        "trace_status": "original_obtained",
         "trace_trigger_entities": [
-          "CCXI"
+          "CCXI",
+          "co:churchill_capital_xi"
         ],
         "trace_trigger_event_ref": "lead:lead_826473daf6f4deaaff8503a106f6efd6",
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "robotics": {
           "counter_only": false,
@@ -18267,9 +18565,15 @@
       "first_seen": "2026-08-11T13:07:53.109420+00:00",
       "lead_id": "lead_697707f81d2c1aaa1467741b18f19fe8",
       "published_at": "Tue, 02 Jun 2026 05:00:00 +0000",
-      "refs": {},
+      "refs": {
+        "parked_reason": "duplicate_existing_graph_delta",
+        "trace_attempts_ref": "Sivers_and_GlobalFoundries_official_2026-06-02_plus_current_graph",
+        "trace_next_trigger": "GF_or_Sivers_announces_new_order_qualification_or_volume_milestone",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
       "source": "mfn:sivers-semiconductors",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -19527,9 +19831,13 @@
       "first_seen": "2026-08-11T13:07:53.111570+00:00",
       "lead_id": "lead_71d8cbb9c051bf031ce63f29d69d8feb",
       "published_at": "Wed, 06 May 2026 05:00:00 +0000",
-      "refs": {},
+      "refs": {
+        "action_digest": "fc5773a03bd50a3535235ea7e37af2712605cd738cc1fd8dbffa228f5698f22c",
+        "focus_company_id": "co:sivers",
+        "research_action_id": "ra_e24936726a20ee8db0b53b8ef4367535"
+      },
       "source": "mfn:sivers-semiconductors",
-      "status": "triaged_go",
+      "status": "action_prepared",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -22033,9 +22341,28 @@
       ],
       "published_at": "2026-08-13T09:46:26.000Z",
       "raw_text": "Feels like my $IQE thesis Feb this year got validated alongside $AXTI and others. (I still long on both)  \n\nSo I stopped covering them as much. But TLDR on  updates:\n\nEarly this year, IQE was a distressed but critical chokepoint in the optical supply chain with links to $LITE and others when I published my thesis on it.\n\nSince then:\n\n- $MTSI signed long term epiwafer supply agreements, took a stake in the company, now IQE is bank debt free (Macom has convertibles, but that's positive)\n- $TSEM signed agreements for InP epiwafers. \n- Management explicitly said its IQE agreement was signed to secure the \"strategic III-V epiwafer supply required for that roadmap\"\n- IQE signed another ~$14M mysterious AI DC contract. \n\nThe only part that's still playing out with my earlier thesis is IQE converting their latent/underutilized capacity toward AI DC segment, to match peers like Landmark in the space (which takes time, like slightly over a year if I remember correctly). \n\nThere's some national security implications that I'll avoid talking about that makes them more important.\n\nBut basically:\nFY2025 revenue: £97.3m\nFY2026 guidance: over £126.5m\n\nThey're rapidly growing again in the optical sector, out of bank debt/distressed liquidation state, and remains a critical chokepoint in Western optical supply chains. \n\nNow... with new agreements with your leading photonics companies for revenue growth, and players like Macom serving as a soft backstop.  \n\nAfter a thesis gets validated, typically I just sit back and enjoy growth of a business.",
-      "refs": {},
+      "refs": {
+        "parked_reason": "existing_graph_plus_sibling_action_covers_material_atoms",
+        "trace_attempts_ref": "Tower_MACOM_graph_evidence_and_IQE_official_2026-08-21_order",
+        "trace_next_trigger": "IQE_reports_customer_name_material_or_revenue_conversion_for_14M_order",
+        "trace_requires_user": "false",
+        "trace_status": "partial",
+        "trace_trigger_entities": [
+          "AXTI",
+          "IQE",
+          "LITE",
+          "MTSI",
+          "TSEM",
+          "co:axt",
+          "co:iqe",
+          "co:lumentum",
+          "co:macom",
+          "co:tower_semiconductor"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -23541,6 +23868,12 @@
         "research_run": "daily:2026-08-21",
         "trace_attempts_ref": "library/raw/lite_transcript_q4fy2026.txt、LITE FY2026 10-K；CRWV／SMCI exact filings 未作 graph extraction。",
         "trace_next_trigger": "若要把 CRWV／SMCI 數字用於決策，取得兩家公司 exact earnings filing／IR 並分開註冊。",
+        "trace_requeue_consumed_entities": [
+          "CO:LUMENTUM",
+          "LITE"
+        ],
+        "trace_requeue_trigger": "related_triaged_lead:lead_093b321c79c6e73e6c2aa73e787c4ef0",
+        "trace_requeued_at": "2026-08-22T22:36:23.482281+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
@@ -23550,10 +23883,11 @@
           "co:coreweave",
           "co:lumentum"
         ],
+        "trace_trigger_event_ref": "lead:lead_093b321c79c6e73e6c2aa73e787c4ef0",
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -23565,17 +23899,32 @@
       },
       "title": "Insane earnings today for the AI theme with $CRWV, $SMCI, and $LITE. Coreweave: Absurd ~$104B+ backlog, which doesn't include $25B+ of new customer agreements added in early Q3. Compute demand read through for Neoclouds is enormous (For Nebius, Iren and others) Supermicro: Absurd $65-72B in revenue guidance, adding $60B+ in new orders... AI DC buildout read through is just enormous. Lumentum: $808M -> $1.01B -> $1.25B revenue ramp, with operating margins growing quarter after quarter. Photonics players just keeps printing. TLDR: Every layer of the AI buildout goes brrrrr, and it's showing up in earnings.",
       "triage": {
-        "decided_at": "2026-08-11T22:34:50.401653+00:00",
+        "decided_at": "2026-08-22T22:36:23.482281+00:00",
         "decision": "go",
         "priority_flags": {},
-        "reason": "命中已追蹤 Lumentum（LITE），含可追回 FY2026 Q4 earnings 的具體營收與 AI 資料中心需求數字；雖與同作者 LITE 專文重疊，仍依寬鬆規則進 pq1 核對原始財報。",
-        "related_trace_requeues": [
-          "lead_857582308bdff8e00dd648d213f7d679",
-          "lead_8e16834b3c423735ad20eb6f6be7d63b",
-          "lead_b1e793c560334131dfe7c1619715784d"
-        ],
+        "reason": "新 triage PASS lead lead_093b321c79c6e73e6c2aa73e787c4ef0 與 parked trace 共用具名標的 LITE, co:lumentum（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
         "tier": 3
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-22T22:36:23.482281+00:00",
+          "superseded_reason": "新 triage PASS lead lead_093b321c79c6e73e6c2aa73e787c4ef0 與 parked trace 共用具名標的 LITE, co:lumentum（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_093b321c79c6e73e6c2aa73e787c4ef0",
+          "triage": {
+            "decided_at": "2026-08-11T22:34:50.401653+00:00",
+            "decision": "go",
+            "priority_flags": {},
+            "reason": "命中已追蹤 Lumentum（LITE），含可追回 FY2026 Q4 earnings 的具體營收與 AI 資料中心需求數字；雖與同作者 LITE 專文重疊，仍依寬鬆規則進 pq1 核對原始財報。",
+            "related_trace_requeues": [
+              "lead_857582308bdff8e00dd648d213f7d679",
+              "lead_8e16834b3c423735ad20eb6f6be7d63b",
+              "lead_b1e793c560334131dfe7c1619715784d"
+            ],
+            "tier": 3
+          }
+        }
+      ],
       "url": "https://x.com/aleabitoreddit/status/2087285356999958663"
     },
     "lead_89656d14e16503d68cf12c4366c75045": {
@@ -25425,9 +25774,13 @@
       "first_seen": "2026-08-11T13:44:15.936261+00:00",
       "lead_id": "lead_9a2ffd7e7870046120ddfd0a757c77a5",
       "published_at": "Tue, 14 Jul 2026 07:25:04 +0000",
-      "refs": {},
+      "refs": {
+        "action_digest": "c65cfbc579176d49e4f7d25edb912ecb028f7b87f7e573cd0cac22e2f32a9833",
+        "focus_company_id": "co:iqe",
+        "research_action_id": "ra_712f7b718587e6c777684bd6c5d734fd"
+      },
       "source": "yahoo:iqe-l",
-      "status": "triaged_go",
+      "status": "action_prepared",
       "themes": {},
       "title": "IQE Secures $14 Million AI and Datacentre Semiconductor Contract (IQE)",
       "triage": {
@@ -25894,9 +26247,13 @@
       "first_seen": "2026-08-22T20:07:13.115909+00:00",
       "lead_id": "lead_9bea5f8821e22427497284c68f2551d4",
       "published_at": "2026-08-19",
-      "refs": {},
+      "refs": {
+        "action_digest": "d8efeff1d55c306c10b97175f42756b210040cc27c842bc0f7ea7ea566aa3539",
+        "focus_company_id": "co:schaeffler",
+        "research_action_id": "ra_0e9025b5ba0d34b49426cd1676edd4d4"
+      },
       "source": "weekly:robotics",
-      "status": "triaged_go",
+      "status": "action_prepared",
       "themes": {
         "robotics": {
           "counter_only": false,
@@ -29535,6 +29892,56 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2076035405338812805"
     },
+    "lead_b4ef61cc45a59f296b0dd82233e669fb": {
+      "entities": {
+        "company_ids": [
+          "co:marvell_technology"
+        ],
+        "tickers": [
+          "RDDT",
+          "MRVL"
+        ]
+      },
+      "first_seen": "2026-08-22T22:32:59.265484+00:00",
+      "lead_id": "lead_b4ef61cc45a59f296b0dd82233e669fb",
+      "media": [
+        {
+          "cache": {
+            "bytes": 80235,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_b4ef61cc45a59f296b0dd82233e669fb/3_2091264266506752000.jpg",
+            "sha256": "67ec2139e5379624e56b563dc68becf564dddcc6233ff43f3a59cb6a4d569120"
+          },
+          "height": 1590,
+          "media_key": "3_2091264266506752000",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HQWpxTiaUAACWpw.jpg",
+          "width": 1260
+        }
+      ],
+      "published_at": "2026-08-22T20:40:31.000Z",
+      "raw_text": "Apparently, $RDDT thinks $MRVL had two major catalysts recently:\n\nThe $12.2B Google TPU ecosystem agreement.\n\nAnd…\n\nSpider-Man: “Brand New Day” https://t.co/qmUvJqjcpo",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "Apparently, $RDDT thinks $MRVL had two major catalysts recently: The $12.2B Google TPU ecosystem agreement. And… Spider-Man: “Brand New Day” https://t.co/qmUvJqjcpo",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-22T22:36:38.166425+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "sentiment",
+          "decision_impact": "confidence_only",
+          "reason": "MRVL／Google TPU 協議已取得一手並入圖；新增內容只是 Reddit 的電影梗，不改變候選集合或排序。"
+        },
+        "decided_at": "2026-08-22T22:36:25.028612+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "MRVL／Google TPU 12.2B 美元協議已於前一輪取得一手並入圖；新增內容是 Reddit 把電影標題當催化劑的玩笑，沒有新的可查核投資 claim",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2091264273007960320"
+    },
     "lead_b556950618d8a8f969895cc45a2a506a": {
       "entities": {
         "company_ids": [
@@ -30931,6 +31338,47 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1730168/000135956126000004/xslF345X06/wk-form4_1782940899.xml"
     },
+    "lead_c25320aec473f73ca6c5f1b830e6ba27": {
+      "entities": {
+        "company_ids": [
+          "co:lumentum"
+        ],
+        "tickers": [
+          "LITE"
+        ]
+      },
+      "first_seen": "2026-08-22T22:33:07.354974+00:00",
+      "lead_id": "lead_c25320aec473f73ca6c5f1b830e6ba27",
+      "published_at": "2026-08-21",
+      "refs": {},
+      "source": "edgar:LITE",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "LITE"
+          ]
+        }
+      },
+      "title": "LITE 4 filed 2026-08-21",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-22T22:36:38.166425+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
+        "decided_at": "2026-08-22T22:36:23.984326+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "Lumentum 官方 Form 4；具名發行人與申報日可核對，僅作內部人／稀釋彙總觀測，個別申報不改變候選集合或排序",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1633978/000157333826000015/xslF345X06/form4-08222026_120853.xml"
+    },
     "lead_c27e417db9b04ea06a227bedfb773c88": {
       "entities": {
         "company_ids": [],
@@ -31011,9 +31459,15 @@
       ],
       "published_at": "2026-08-21T08:17:29.000Z",
       "raw_text": "There’s a lot of viral fabricated screenshots of me going around recently. \n\nSome are annoying jokes for engagement, like text-edited posts from me citing bible verses.\n\nBut some like “Innolight secures Nvidia NPO orders” or off platform promotional content are maliciously fabricated.\n\nUnfortunately I don’t have the power to prevent false images from circulating.\n\nSo please make sure to double check primary sources.",
-      "refs": {},
+      "refs": {
+        "parked_reason": "original_post_is_warning_not_graph_claim",
+        "trace_attempts_ref": "original_X_post_warning",
+        "trace_next_trigger": "fabricated_NPO_claim_recurs_with_canonical_source",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "There’s a lot of viral fabricated screenshots of me going around recently. Some are annoying jokes for engagement, like text-edited posts from me citing bible verses. But some like “Innolight secures Nvidia NPO orders” or off platform promotional content are maliciously fabricated. Unfortunately I don’t have the power to prevent false images from circulating. So please make sure to double check primary sources.",
       "triage": {
@@ -37310,6 +37764,47 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1789029/000119312526347443/xslF345X06/ownership.xml"
     },
+    "lead_e909b67f1150431797982719ffce53e2": {
+      "entities": {
+        "company_ids": [
+          "co:lumentum"
+        ],
+        "tickers": [
+          "LITE"
+        ]
+      },
+      "first_seen": "2026-08-22T22:33:07.355047+00:00",
+      "lead_id": "lead_e909b67f1150431797982719ffce53e2",
+      "published_at": "2026-08-21",
+      "refs": {},
+      "source": "edgar:LITE",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "LITE"
+          ]
+        }
+      },
+      "title": "LITE 4 filed 2026-08-21",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-22T22:36:38.166425+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
+        "decided_at": "2026-08-22T22:36:24.260345+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "Lumentum 官方 Form 4；具名發行人與申報日可核對，僅作內部人／稀釋彙總觀測，個別申報不改變候選集合或排序",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1633978/000156110026000005/xslF345X06/form4-08222026_120854.xml"
+    },
     "lead_e9647a0b870713c84433daea4c8d1b55": {
       "entities": {
         "company_ids": [],
@@ -38068,9 +38563,13 @@
       "first_seen": "2026-08-11T13:07:53.110356+00:00",
       "lead_id": "lead_f02561968e2e5bbdeb1ada752f11f19c",
       "published_at": "Tue, 19 May 2026 05:00:00 +0000",
-      "refs": {},
+      "refs": {
+        "action_digest": "6914bd59f07d0aa7ecfa5df193b27a8d4fee2772eab49e286d0c2b331f35d416",
+        "focus_company_id": "co:sivers",
+        "research_action_id": "ra_4ae42dd1b69d7a321eb9b986ba016829"
+      },
       "source": "mfn:sivers-semiconductors",
-      "status": "triaged_go",
+      "status": "action_prepared",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -39311,6 +39810,47 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/928876/000197640826000719/xslF345X06/primary_doc.xml"
     },
+    "lead_f710bb61150f7c468ba01f39952edf1e": {
+      "entities": {
+        "company_ids": [
+          "co:lumentum"
+        ],
+        "tickers": [
+          "LITE"
+        ]
+      },
+      "first_seen": "2026-08-22T22:33:07.354819+00:00",
+      "lead_id": "lead_f710bb61150f7c468ba01f39952edf1e",
+      "published_at": "2026-08-21",
+      "refs": {},
+      "source": "edgar:LITE",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "LITE"
+          ]
+        }
+      },
+      "title": "LITE 4 filed 2026-08-21",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-22T22:36:38.166425+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
+        "decided_at": "2026-08-22T22:36:24.512027+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "Lumentum 官方 Form 4；具名發行人與申報日可核對，僅作內部人／稀釋彙總觀測，個別申報不改變候選集合或排序",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1633978/000164825626000006/xslF345X06/form4-08222026_120820.xml"
+    },
     "lead_f7728f22823043a4cd86afba8ca11ac9": {
       "entities": {
         "company_ids": [
@@ -40499,8 +41039,8 @@
   "schema_version": "2",
   "source_state": {
     "x:aleabitoreddit": {
-      "since_id": "2090903631793127644",
-      "updated_at": "2026-08-21T22:32:48.522662+00:00",
+      "since_id": "2091264273007960320",
+      "updated_at": "2026-08-22T22:32:59.286436+00:00",
       "user_id": "1940360837547565056"
     }
   }
