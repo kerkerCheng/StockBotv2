@@ -26188,7 +26188,7 @@
         "trace_status": "original_obtained"
       },
       "source": "x:aleabitoreddit",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {},
       "title": "$MRVL gives $GOOGL options to buy $12.2B of the company. \"The Marvell-Google deal covers a broad range of technologies used ​with TPUs, including processors that run AI models, manage data storage ​and move information ⁠across networks.\" Which could translate into ~$120 billion ​in revenue through 2033. Marvell also has separate warrants with $AMZN after their Celestial acquisition (for purchases of photonic fabric). Remember the good times when Jensen said Marvell would be the next $1T+ company? Seems Nvidia knew Marvell was \"networking\" its way into all the hyperscalers with warrants.",
       "triage": {
@@ -27515,7 +27515,7 @@
         "trace_status": "original_obtained"
       },
       "source": "yahoo:iqe-l",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {},
       "title": "MACOM (MTSI) to Enter Long-Term Supply Agreements with IQE plc",
       "triage": {
@@ -39948,7 +39948,7 @@
         "trace_status": "original_obtained"
       },
       "source": "mfn:sivers-semiconductors",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {
         "sivers": {
           "counter_only": false,

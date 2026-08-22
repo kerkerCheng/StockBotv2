@@ -3047,6 +3047,7 @@
     },
     {
       "added_at": "2026-08-20T11:02:30.643377+00:00",
+      "deferred_at": "2026-08-22T00:09:48.274424+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 192,
       "reason": null,
@@ -3072,6 +3073,7 @@
     },
     {
       "added_at": "2026-08-20T15:36:57.789792+00:00",
+      "deferred_at": "2026-08-22T00:09:48.274456+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 194,
       "reason": null,
@@ -3152,23 +3154,21 @@
       "added_at": "2026-08-21T05:39:13.337745+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 199,
+      "reactivated_at": "2026-08-22T00:13:01.866109+00:00",
+      "reactivation_event": {
+        "type": "decision_blocker_mode_changed"
+      },
       "reason": null,
       "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
       "title": "REVIEW — co:iqe",
-      "type": "decision_review",
-      "waiting_on": {
-        "derived_from_blockers": true,
-        "reason": "所有 blocker 都不需要使用者決定",
-        "set_at": "2026-08-21T05:39:13.337645+00:00",
-        "trigger": "執行面 context 缺失",
-        "until": null
-      }
+      "type": "decision_review"
     },
     {
       "added_at": "2026-08-21T05:39:13.337745+00:00",
+      "deferred_at": "2026-08-22T00:09:48.274474+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 200,
       "reason": null,
@@ -3201,6 +3201,11 @@
     },
     {
       "added_at": "2026-08-21T06:31:47.875434+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_40e187d95a2fa8fd26e111a7974e8853",
+      "dispatch_ref": "wo_93f174f76e592cc5771befd8716b0de9",
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-08-22T00:10:05.428668+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 202,
       "reason": null,
@@ -3213,6 +3218,11 @@
     },
     {
       "added_at": "2026-08-21T22:37:52.268912+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_f9d25b48ca3054dfadc384f7c6ee6447",
+      "dispatch_ref": "wo_d78836b78033d4d2d151d8fdb4819e65",
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-08-22T00:10:05.450783+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 203,
       "reason": null,
@@ -3225,6 +3235,11 @@
     },
     {
       "added_at": "2026-08-21T22:37:52.268912+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_9a7d6db5f7562ce63ff8579f03537a47",
+      "dispatch_ref": "wo_468ecdef0047cb1a3d33d05c1c3de9fa",
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-08-22T00:10:05.468175+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 204,
       "reason": null,
@@ -3237,36 +3252,60 @@
     },
     {
       "added_at": "2026-08-21T22:53:24.172587+00:00",
+      "completion_authority": {
+        "action_digest": "7bb3452b8ad0c59fcf196683ddb46c97075fb0dd04cebf3c331c20885c5e3d4e",
+        "cohort_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
+        "commit": "fad0b3441448643a20c3f93dc3fc0ad15ad71ef4",
+        "company_id": "co:sivers_semiconductors",
+        "verified_at": "2026-08-22T00:12:05.165075+00:00"
+      },
       "hint": "核准 exact graph delta；Decision handoff：co:sivers_semiconductors。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 205,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_1cf115f88d793991932b0dbd046eb378;digest:7bb3452b8ad0c59fcf196683ddb46c97075fb0dd04cebf3c331c20885c5e3d4e;commit:fad0b3441448643a20c3f93dc3fc0ad15ad71ef4;cohort:dc_7dc03795699f2169e9c8adc6d3d10179",
       "ref_id": "ra_1cf115f88d793991932b0dbd046eb378",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-22T00:12:05.165075+00:00",
       "source": "research_action",
       "title": "Sivers／ALL.SPACE 2027 Ka-band BFIC 量產訂單",
       "type": "ra_admission"
     },
     {
       "added_at": "2026-08-21T22:53:24.172587+00:00",
+      "completion_authority": {
+        "action_digest": "f29bb3e044808d383096b613c23a849162fea6adf5ece138d1018ce6b0f0a5d1",
+        "cohort_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+        "commit": "2343340a200dde0868119a915bebc815b6d70f91",
+        "company_id": "co:iqe",
+        "verified_at": "2026-08-22T00:12:13.594769+00:00"
+      },
       "hint": "核准 exact graph delta；Decision handoff：co:iqe。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 206,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_746c588d8ca591e621a433379a18a8b1;digest:f29bb3e044808d383096b613c23a849162fea6adf5ece138d1018ce6b0f0a5d1;commit:2343340a200dde0868119a915bebc815b6d70f91;cohort:dc_6d08fd8f2b2c77b9f7734b464cfb8510",
       "ref_id": "ra_746c588d8ca591e621a433379a18a8b1",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-22T00:12:13.594769+00:00",
       "source": "research_action",
       "title": "MACOM 對 IQE 的 £45M 投資與長期供應協議",
       "type": "ra_admission"
     },
     {
       "added_at": "2026-08-21T22:53:24.172587+00:00",
+      "completion_authority": {
+        "action_digest": "46d87091b108cb00570f036101cf4f2100d3446b9e0ed15ad89876d71592017a",
+        "cohort_id": "dc_0fca807c963dc3b9888e0f83ba6d45a5",
+        "commit": "646133589e30383515476610f18f702009393cc5",
+        "company_id": "co:marvell_technology",
+        "verified_at": "2026-08-22T00:12:23.400220+00:00"
+      },
       "hint": "核准 exact graph delta；Decision handoff：co:marvell_technology。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 207,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_85749b970268a50c252fa31fde5e7984;digest:46d87091b108cb00570f036101cf4f2100d3446b9e0ed15ad89876d71592017a;commit:646133589e30383515476610f18f702009393cc5;cohort:dc_0fca807c963dc3b9888e0f83ba6d45a5",
       "ref_id": "ra_85749b970268a50c252fa31fde5e7984",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-22T00:12:23.400220+00:00",
       "source": "research_action",
       "title": "Marvell／Google custom-chip 合作與 warrant 方向性",
       "type": "ra_admission"
@@ -7354,6 +7393,106 @@
       "ref_id": "dc_4d28e50810e46da7fd77ee042ee7bd1c",
       "type": "decision_review",
       "verb": "go"
+    },
+    {
+      "at": "2026-08-22T00:09:48.274424+00:00",
+      "n": 192,
+      "reason": null,
+      "receipt": null,
+      "ref_id": "dc_b05cc1360e4bdf2a238787c23e7b227d",
+      "type": "decision_review",
+      "verb": "pending"
+    },
+    {
+      "at": "2026-08-22T00:09:48.274456+00:00",
+      "n": 194,
+      "reason": null,
+      "receipt": null,
+      "ref_id": "dc_cc46527aac12ba14191ee71c0460f3fe",
+      "type": "decision_review",
+      "verb": "pending"
+    },
+    {
+      "at": "2026-08-22T00:09:48.274474+00:00",
+      "n": 200,
+      "reason": null,
+      "receipt": null,
+      "ref_id": "dc_6ae5b014dbbcd0774b45487542c9a102",
+      "type": "decision_review",
+      "verb": "pending"
+    },
+    {
+      "at": "2026-08-22T00:10:05.428668+00:00",
+      "attempt": 1,
+      "n": 202,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_93f174f76e592cc5771befd8716b0de9",
+      "ref_id": "dc_957bff3701ea4e46d962bfb9ff0932c8",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-08-22T00:10:05.450783+00:00",
+      "attempt": 1,
+      "n": 203,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_d78836b78033d4d2d151d8fdb4819e65",
+      "ref_id": "dc_4d28e50810e46da7fd77ee042ee7bd1c",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-08-22T00:10:05.468175+00:00",
+      "attempt": 1,
+      "n": 204,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_468ecdef0047cb1a3d33d05c1c3de9fa",
+      "ref_id": "dc_0fca807c963dc3b9888e0f83ba6d45a5",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-08-22T00:12:05.165075+00:00",
+      "n": 205,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_1cf115f88d793991932b0dbd046eb378;digest:7bb3452b8ad0c59fcf196683ddb46c97075fb0dd04cebf3c331c20885c5e3d4e;commit:fad0b3441448643a20c3f93dc3fc0ad15ad71ef4;cohort:dc_7dc03795699f2169e9c8adc6d3d10179",
+      "ref_id": "ra_1cf115f88d793991932b0dbd046eb378",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-22T00:12:13.594769+00:00",
+      "n": 206,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_746c588d8ca591e621a433379a18a8b1;digest:f29bb3e044808d383096b613c23a849162fea6adf5ece138d1018ce6b0f0a5d1;commit:2343340a200dde0868119a915bebc815b6d70f91;cohort:dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+      "ref_id": "ra_746c588d8ca591e621a433379a18a8b1",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-22T00:12:23.400220+00:00",
+      "n": 207,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_85749b970268a50c252fa31fde5e7984;digest:46d87091b108cb00570f036101cf4f2100d3446b9e0ed15ad89876d71592017a;commit:646133589e30383515476610f18f702009393cc5;cohort:dc_0fca807c963dc3b9888e0f83ba6d45a5",
+      "ref_id": "ra_85749b970268a50c252fa31fde5e7984",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-22T00:13:01.866109+00:00",
+      "n": 199,
+      "prior_waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-08-21T05:39:13.337645+00:00",
+        "trigger": "執行面 context 缺失",
+        "until": null
+      },
+      "reason": "blocker 已不再全屬等待事件，恢復人工複查",
+      "receipt": null,
+      "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+      "type": "decision_review",
+      "verb": "event_reactivated"
     }
   ],
   "next_n": 208,
