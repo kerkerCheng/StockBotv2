@@ -1,0 +1,138 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "guided",
+      "disproof_condition": "Downgrade if either company cancels or materially reduces the 1,000-unit rollout, delays deployment beyond 2032, or discloses that AEON will not use Schaeffler actuators.",
+      "id": "hexagon_schaeffler_aeon_humanoid_gym_2026_08_19_cl1",
+      "source_ids": [
+        "hexagon_schaeffler_aeon_humanoid_gym_2026_08_19_s1",
+        "hexagon_schaeffler_aeon_humanoid_gym_2026_08_19_s2",
+        "hexagon_schaeffler_aeon_humanoid_gym_2026_08_19_s3"
+      ],
+      "statement": "Hexagon's AEON entered Schaeffler's Humanoid Gym for training and validation, supporting Schaeffler's plan to deploy at least 1,000 AEON humanoids across its factories by 2032; Schaeffler also supplies actuator technology to AEON.",
+      "subject_id": "co:schaeffler"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "prod:hexagon_aeon",
+      "id": "e1",
+      "relation": "develops",
+      "source_ids": [
+        "hexagon_schaeffler_aeon_humanoid_gym_2026_08_19_s1"
+      ],
+      "src_id": "co:hexagon"
+    },
+    {
+      "attributes": {
+        "qualification_status": "qualifying"
+      },
+      "confidence": 0.75,
+      "dst_id": "prod:hexagon_aeon",
+      "id": "e2",
+      "relation": "deploys",
+      "source_ids": [
+        "hexagon_schaeffler_aeon_humanoid_gym_2026_08_19_s1",
+        "hexagon_schaeffler_aeon_humanoid_gym_2026_08_19_s3"
+      ],
+      "src_id": "co:schaeffler"
+    },
+    {
+      "attributes": {
+        "qualification_status": "designed_in"
+      },
+      "confidence": 0.7,
+      "dst_id": "co:hexagon",
+      "id": "e3",
+      "relation": "supplies_to",
+      "source_ids": [
+        "hexagon_schaeffler_aeon_humanoid_gym_2026_08_19_s2"
+      ],
+      "src_id": "co:schaeffler"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "robot_subsystem",
+      "aliases": [
+        "Schaeffler AG"
+      ],
+      "attributes": {},
+      "confidence": 0.75,
+      "id": "co:schaeffler",
+      "name": "Schaeffler",
+      "role": "robot_component_supplier",
+      "source_ids": [
+        "hexagon_schaeffler_aeon_humanoid_gym_2026_08_19_s1",
+        "hexagon_schaeffler_aeon_humanoid_gym_2026_08_19_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "robot_system",
+      "aliases": [
+        "Hexagon AB",
+        "Hexagon Robotics"
+      ],
+      "attributes": {},
+      "confidence": 0.75,
+      "id": "co:hexagon",
+      "name": "Hexagon",
+      "role": "robot_oem",
+      "source_ids": [
+        "hexagon_schaeffler_aeon_humanoid_gym_2026_08_19_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "robot_system",
+      "aliases": [
+        "AEON humanoid"
+      ],
+      "attributes": {},
+      "confidence": 0.75,
+      "id": "prod:hexagon_aeon",
+      "name": "AEON industrial humanoid",
+      "role": null,
+      "source_ids": [
+        "hexagon_schaeffler_aeon_humanoid_gym_2026_08_19_s1",
+        "hexagon_schaeffler_aeon_humanoid_gym_2026_08_19_s3"
+      ],
+      "type": "Product"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "hexagon_schaeffler_aeon_humanoid_gym_2026_08_19",
+    "evidence_tier": 2,
+    "origin_entity": "Hexagon AB, with named Schaeffler management statements",
+    "permission_basis": "Public issuer or joint-company announcement; retain the canonical URL and only research-relevant excerpts.",
+    "published_at": "2026-08-19",
+    "publisher": "Hexagon AB",
+    "retrieved_at": "2026-08-23",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Towards factory deployment: How AEON is trained to perform",
+    "url": "https://hexagon.com/company/newsroom/press-releases/2026/towards-factory-deployment-how-aeon-is-trained-to-perform"
+  },
+  "sources": [
+    {
+      "id": "hexagon_schaeffler_aeon_humanoid_gym_2026_08_19_s1",
+      "locator": "19 Aug 2026 announcement, opening bullets",
+      "quote": "AEON enters Schaeffler's Humanoid Gym in Germany ... supporting the planned rollout of at least one thousand AEON humanoids"
+    },
+    {
+      "id": "hexagon_schaeffler_aeon_humanoid_gym_2026_08_19_s2",
+      "locator": "19 Aug 2026 announcement, collaboration paragraph",
+      "quote": "Schaeffler will supply advanced actuator technology to AEON"
+    },
+    {
+      "id": "hexagon_schaeffler_aeon_humanoid_gym_2026_08_19_s3",
+      "locator": "22 Apr 2026 joint announcement, deployment paragraph",
+      "quote": "Schaeffler plans to deploy at least 1,000 Hexagon Robotics humanoids across its global production system by 2032"
+    }
+  ]
+}
