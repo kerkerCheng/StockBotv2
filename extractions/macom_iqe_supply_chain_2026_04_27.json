@@ -1,0 +1,120 @@
+{
+  "claims": [
+    {
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Downgrade if MACOM or IQE terminates or materially narrows the supply agreements, or later disclosures show no commercial orders or production conversion.",
+      "id": "macom_iqe_supply_chain_2026_04_27_cl1",
+      "source_ids": [
+        "macom_iqe_supply_chain_2026_04_27_s1",
+        "macom_iqe_supply_chain_2026_04_27_s3"
+      ],
+      "statement": "MACOM announced customer-side long-term supply agreements with IQE for epitaxial services spanning multiple technologies and described IQE as an important supplier; the announcement did not disclose minimum purchase, product mix, duration, value, or exclusivity.",
+      "subject_id": "co:iqe"
+    },
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "guided",
+      "disproof_condition": "Treat this announcement as superseded by the later completion evidence; downgrade if the completed investment is reversed or MACOM exits the position.",
+      "id": "macom_iqe_supply_chain_2026_04_27_cl2",
+      "source_ids": [
+        "macom_iqe_supply_chain_2026_04_27_s2"
+      ],
+      "statement": "MACOM proposed a £45 million investment in IQE through equity and a convertible loan note, with board representation, subject at the announcement date to regulatory clearances and customary closing conditions.",
+      "subject_id": "co:iqe"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "co:macom",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "macom_iqe_supply_chain_2026_04_27_s1",
+        "macom_iqe_supply_chain_2026_04_27_s3"
+      ],
+      "src_id": "co:iqe"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "co:iqe",
+      "id": "e2",
+      "relation": "invests_in",
+      "source_ids": [
+        "macom_iqe_supply_chain_2026_04_27_s2"
+      ],
+      "src_id": "co:macom"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "IQE",
+        "IQE.L"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:iqe",
+      "name": "IQE plc",
+      "role": "material_base",
+      "source_ids": [
+        "macom_iqe_supply_chain_2026_04_27_s1",
+        "macom_iqe_supply_chain_2026_04_27_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "MACOM",
+        "MTSI"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:macom",
+      "name": "MACOM Technology Solutions",
+      "role": "bottleneck_supplier",
+      "source_ids": [
+        "macom_iqe_supply_chain_2026_04_27_s1",
+        "macom_iqe_supply_chain_2026_04_27_s2",
+        "macom_iqe_supply_chain_2026_04_27_s3"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "macom_iqe_supply_chain_2026_04_27",
+    "evidence_tier": 2,
+    "origin_entity": "MACOM Technology Solutions Inc.",
+    "permission_basis": "Public customer-side issuer announcement; retain the canonical URL and only research-relevant excerpts.",
+    "published_at": "2026-04-27",
+    "publisher": "MACOM Technology Solutions Inc.",
+    "retrieved_at": "2026-08-24",
+    "source_type": "ir_deck",
+    "storage_permission": "repo_excerpt",
+    "title": "MACOM to Enter into Agreements to Further Strengthen Supply Chain",
+    "url": "https://www.macom.com/updates/news/2026/macom-to-enter-into-agreements-to-further-strengthen-supply-chai"
+  },
+  "sources": [
+    {
+      "id": "macom_iqe_supply_chain_2026_04_27_s1",
+      "locator": "opening paragraph",
+      "quote": "Long-Term Supply Agreements with IQE for epitaxial services spanning multiple technologies."
+    },
+    {
+      "id": "macom_iqe_supply_chain_2026_04_27_s2",
+      "locator": "transaction paragraph",
+      "quote": "MACOM's proposed investment in IQE will total £45 million, in the form of equity and a convertible loan note."
+    },
+    {
+      "id": "macom_iqe_supply_chain_2026_04_27_s3",
+      "locator": "Stephen G. Daly statement",
+      "quote": "IQE is an important supplier to MACOM."
+    }
+  ]
+}
