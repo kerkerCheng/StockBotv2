@@ -3397,6 +3397,11 @@
     },
     {
       "added_at": "2026-08-23T02:35:45.020394+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_f5d3b323f0a6a18157be84b2f7bdaba0",
+      "dispatch_ref": "wo_63ce1bbd347fe71656beae4259f7da8a",
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-08-23T23:35:55.603203+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 212,
       "reason": null,
@@ -3416,6 +3421,11 @@
       "resolution": null,
       "resolved_at": null,
       "source": "research_action",
+      "source_cleared": {
+        "at": "2026-08-23T23:38:39.540603+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
       "title": "MACOM 客戶端確認 IQE 長期供應協議與條件式 £45M 投資",
       "type": "ra_admission"
     }
@@ -7648,6 +7658,25 @@
       "ref_id": "ra_e24936726a20ee8db0b53b8ef4367535",
       "type": "ra_admission",
       "verb": "go"
+    },
+    {
+      "at": "2026-08-23T23:35:55.603203+00:00",
+      "attempt": 1,
+      "n": 212,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_63ce1bbd347fe71656beae4259f7da8a",
+      "ref_id": "dc_912a03a50135ea5e29000a0417c3f477",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-08-23T23:38:39.540603+00:00",
+      "n": 213,
+      "reason": "來源本輪成功執行，但不再產出此項",
+      "receipt": null,
+      "ref_id": "ra_eb14a18b61a4a90e8071fb8d1537f3c0",
+      "type": "ra_admission",
+      "verb": "source_cleared"
     }
   ],
   "next_n": 214,
