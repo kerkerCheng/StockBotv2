@@ -1,0 +1,137 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "guided",
+      "disproof_condition": "Downgrade if the development program is cancelled, the 60 GHz product does not reach field deployment, or either party discloses that the collaboration will not proceed beyond development.",
+      "id": "sivers_tachyon_60ghz_development_2026_05_06_cl1",
+      "source_ids": [
+        "sivers_tachyon_60ghz_development_2026_05_06_s1",
+        "sivers_tachyon_60ghz_development_2026_05_06_s2",
+        "sivers_tachyon_60ghz_development_2026_05_06_s3"
+      ],
+      "statement": "Tachyon Networks and Sivers entered a US$1.5 million development partnership for a 60 GHz mmWave transceiver intended to extend Tachyon's FWA platform across both 28 GHz and 60 GHz deployments.",
+      "subject_id": "co:sivers_semiconductors"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "co:tachyon_networks",
+      "id": "e1",
+      "relation": "partnership_with",
+      "source_ids": [
+        "sivers_tachyon_60ghz_development_2026_05_06_s1",
+        "sivers_tachyon_60ghz_development_2026_05_06_s3"
+      ],
+      "src_id": "co:sivers_semiconductors"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "prod:sivers_60ghz_mmwave_transceiver",
+      "id": "e2",
+      "relation": "develops",
+      "source_ids": [
+        "sivers_tachyon_60ghz_development_2026_05_06_s1",
+        "sivers_tachyon_60ghz_development_2026_05_06_s2"
+      ],
+      "src_id": "co:sivers_semiconductors"
+    },
+    {
+      "attributes": {
+        "qualification_status": "sampling"
+      },
+      "confidence": 0.7,
+      "dst_id": "co:tachyon_networks",
+      "id": "e3",
+      "relation": "supplies_to",
+      "source_ids": [
+        "sivers_tachyon_60ghz_development_2026_05_06_s1",
+        "sivers_tachyon_60ghz_development_2026_05_06_s3"
+      ],
+      "src_id": "co:sivers_semiconductors"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "Sivers",
+        "SIVE"
+      ],
+      "attributes": {},
+      "confidence": 0.75,
+      "id": "co:sivers_semiconductors",
+      "name": "Sivers Semiconductors",
+      "role": "bottleneck_supplier",
+      "source_ids": [
+        "sivers_tachyon_60ghz_development_2026_05_06_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "Tachyon Networks Inc."
+      ],
+      "attributes": {},
+      "confidence": 0.75,
+      "id": "co:tachyon_networks",
+      "name": "Tachyon Networks",
+      "role": "network",
+      "source_ids": [
+        "sivers_tachyon_60ghz_development_2026_05_06_s1",
+        "sivers_tachyon_60ghz_development_2026_05_06_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "60 GHz mmWave transceiver"
+      ],
+      "attributes": {},
+      "confidence": 0.75,
+      "id": "prod:sivers_60ghz_mmwave_transceiver",
+      "name": "Sivers 60 GHz mmWave transceiver",
+      "role": null,
+      "source_ids": [
+        "sivers_tachyon_60ghz_development_2026_05_06_s1"
+      ],
+      "type": "Product"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "sivers_tachyon_60ghz_development_2026_05_06",
+    "evidence_tier": 2,
+    "origin_entity": "Sivers Semiconductors, with a named Tachyon Networks quotation",
+    "permission_basis": "Public issuer or joint-company announcement; retain the canonical URL and only research-relevant excerpts.",
+    "published_at": "2026-05-06",
+    "publisher": "Sivers Semiconductors via Cision/MFN",
+    "retrieved_at": "2026-08-23",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Tachyon Networks Expands FWA Portfolio With $1.5M Development Partnership With Sivers Semiconductors",
+    "url": "https://mfn.se/cis/a/sivers-semiconductors/tachyon-networks-expands-fwa-portfolio-with-1-5m-development-partnership-with-sivers-semiconductors-3575c079"
+  },
+  "sources": [
+    {
+      "id": "sivers_tachyon_60ghz_development_2026_05_06_s1",
+      "locator": "Announcement opening paragraph",
+      "quote": "a new $1.5M development partnership with Tachyon Networks Inc. ... for a 60 GHz mmWave transceiver"
+    },
+    {
+      "id": "sivers_tachyon_60ghz_development_2026_05_06_s2",
+      "locator": "Program description",
+      "quote": "enable faster, broader network deployment of 28GHz and 60GHz transceivers through Tachyon's unified platform"
+    },
+    {
+      "id": "sivers_tachyon_60ghz_development_2026_05_06_s3",
+      "locator": "Tachyon CEO quotation",
+      "quote": "provides a clear and scalable path forward for both 28GHz and 60GHz deployments"
+    }
+  ]
+}
