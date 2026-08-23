@@ -19833,11 +19833,11 @@
       "published_at": "Wed, 06 May 2026 05:00:00 +0000",
       "refs": {
         "action_digest": "fc5773a03bd50a3535235ea7e37af2712605cd738cc1fd8dbffa228f5698f22c",
-        "focus_company_id": "co:sivers",
+        "focus_company_id": "co:sivers_semiconductors",
         "research_action_id": "ra_e24936726a20ee8db0b53b8ef4367535"
       },
       "source": "mfn:sivers-semiconductors",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -25780,7 +25780,7 @@
         "research_action_id": "ra_712f7b718587e6c777684bd6c5d734fd"
       },
       "source": "yahoo:iqe-l",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {},
       "title": "IQE Secures $14 Million AI and Datacentre Semiconductor Contract (IQE)",
       "triage": {
@@ -26253,7 +26253,7 @@
         "research_action_id": "ra_0e9025b5ba0d34b49426cd1676edd4d4"
       },
       "source": "weekly:robotics",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {
         "robotics": {
           "counter_only": false,
@@ -38565,11 +38565,11 @@
       "published_at": "Tue, 19 May 2026 05:00:00 +0000",
       "refs": {
         "action_digest": "6914bd59f07d0aa7ecfa5df193b27a8d4fee2772eab49e286d0c2b331f35d416",
-        "focus_company_id": "co:sivers",
+        "focus_company_id": "co:sivers_semiconductors",
         "research_action_id": "ra_4ae42dd1b69d7a321eb9b986ba016829"
       },
       "source": "mfn:sivers-semiconductors",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {
         "sivers": {
           "counter_only": false,

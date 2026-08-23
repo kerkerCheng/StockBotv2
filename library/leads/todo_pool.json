@@ -3152,6 +3152,11 @@
     },
     {
       "added_at": "2026-08-21T05:39:13.337745+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_08309301779fe5f4fc97f93aafdcbfa2",
+      "dispatch_ref": "wo_b473fcfc46342a890031663dcfef5b64",
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-08-23T02:31:15.957167+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 199,
       "reactivated_at": "2026-08-22T00:13:01.866109+00:00",
@@ -3312,51 +3317,95 @@
     },
     {
       "added_at": "2026-08-22T22:50:51.034464+00:00",
+      "completion_authority": {
+        "action_digest": "d8efeff1d55c306c10b97175f42756b210040cc27c842bc0f7ea7ea566aa3539",
+        "cohort_id": "dc_912a03a50135ea5e29000a0417c3f477",
+        "commit": "1f2ec4e1d729ac90894c7ff49d3392e38888c6f4",
+        "company_id": "co:schaeffler",
+        "verified_at": "2026-08-23T02:34:27.362898+00:00"
+      },
       "hint": "核准 exact graph delta；Decision handoff：co:schaeffler。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 208,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_0e9025b5ba0d34b49426cd1676edd4d4;digest:d8efeff1d55c306c10b97175f42756b210040cc27c842bc0f7ea7ea566aa3539;commit:1f2ec4e1d729ac90894c7ff49d3392e38888c6f4;cohort:dc_912a03a50135ea5e29000a0417c3f477",
       "ref_id": "ra_0e9025b5ba0d34b49426cd1676edd4d4",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-23T02:34:27.362898+00:00",
       "source": "research_action",
       "title": "Hexagon AEON 進入 Schaeffler Humanoid Gym 與千台部署路徑",
       "type": "ra_admission"
     },
     {
       "added_at": "2026-08-22T22:50:51.034464+00:00",
-      "hint": "BLOCKER：RA 自報 focus_company_id=co:sivers_semiconductors，綁定 lead 卻是 co:sivers；先回 pq1 對齊，不得先 apply。",
+      "completion_authority": {
+        "action_digest": "6914bd59f07d0aa7ecfa5df193b27a8d4fee2772eab49e286d0c2b331f35d416",
+        "cohort_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
+        "commit": "7feb2a304e0e4b72e4ec96b0af57f7db2b495bf6",
+        "company_id": "co:sivers_semiconductors",
+        "verified_at": "2026-08-23T02:34:43.482933+00:00"
+      },
+      "hint": "核准 exact graph delta；Decision handoff：co:sivers_semiconductors。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 209,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_4ae42dd1b69d7a321eb9b986ba016829;digest:6914bd59f07d0aa7ecfa5df193b27a8d4fee2772eab49e286d0c2b331f35d416;commit:7feb2a304e0e4b72e4ec96b0af57f7db2b495bf6;cohort:dc_7dc03795699f2169e9c8adc6d3d10179",
       "ref_id": "ra_4ae42dd1b69d7a321eb9b986ba016829",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-23T02:34:43.482933+00:00",
       "source": "research_action",
       "title": "Sivers EW STAR 第二年 US$6.6M NEMC program award",
       "type": "ra_admission"
     },
     {
       "added_at": "2026-08-22T22:50:51.034464+00:00",
+      "completion_authority": {
+        "action_digest": "c65cfbc579176d49e4f7d25edb912ecb028f7b87f7e573cd0cac22e2f32a9833",
+        "cohort_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+        "commit": "9d3f5ca65c583c5d2a1c04dc73ccf332fea9bc4f",
+        "company_id": "co:iqe",
+        "verified_at": "2026-08-23T02:34:53.114138+00:00"
+      },
       "hint": "核准 exact graph delta；Decision handoff：co:iqe。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 210,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_712f7b718587e6c777684bd6c5d734fd;digest:c65cfbc579176d49e4f7d25edb912ecb028f7b87f7e573cd0cac22e2f32a9833;commit:9d3f5ca65c583c5d2a1c04dc73ccf332fea9bc4f;cohort:dc_6d08fd8f2b2c77b9f7734b464cfb8510",
       "ref_id": "ra_712f7b718587e6c777684bd6c5d734fd",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-23T02:34:53.114138+00:00",
       "source": "research_action",
       "title": "IQE 未具名客戶 US$14M AI／datacentre multi-year production order",
       "type": "ra_admission"
     },
     {
       "added_at": "2026-08-22T22:50:51.034464+00:00",
-      "hint": "BLOCKER：RA 自報 focus_company_id=co:sivers_semiconductors，綁定 lead 卻是 co:sivers；先回 pq1 對齊，不得先 apply。",
+      "completion_authority": {
+        "action_digest": "fc5773a03bd50a3535235ea7e37af2712605cd738cc1fd8dbffa228f5698f22c",
+        "cohort_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
+        "commit": "98ab4a78a9b605d624894ce880530f361f88ecc5",
+        "company_id": "co:sivers_semiconductors",
+        "verified_at": "2026-08-23T02:35:02.642661+00:00"
+      },
+      "hint": "核准 exact graph delta；Decision handoff：co:sivers_semiconductors。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 211,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_e24936726a20ee8db0b53b8ef4367535;digest:fc5773a03bd50a3535235ea7e37af2712605cd738cc1fd8dbffa228f5698f22c;commit:98ab4a78a9b605d624894ce880530f361f88ecc5;cohort:dc_7dc03795699f2169e9c8adc6d3d10179",
       "ref_id": "ra_e24936726a20ee8db0b53b8ef4367535",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-23T02:35:02.642661+00:00",
       "source": "research_action",
       "title": "Sivers／Tachyon 60 GHz FWA 開發合作",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-08-23T02:35:45.020394+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 212,
+      "reason": null,
+      "ref_id": "dc_912a03a50135ea5e29000a0417c3f477",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:schaeffler",
+      "type": "decision_review"
     }
   ],
   "log": [
@@ -7541,8 +7590,54 @@
       "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
       "type": "decision_review",
       "verb": "event_reactivated"
+    },
+    {
+      "at": "2026-08-23T02:31:15.957167+00:00",
+      "attempt": 1,
+      "n": 199,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_b473fcfc46342a890031663dcfef5b64",
+      "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-08-23T02:34:27.362898+00:00",
+      "n": 208,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_0e9025b5ba0d34b49426cd1676edd4d4;digest:d8efeff1d55c306c10b97175f42756b210040cc27c842bc0f7ea7ea566aa3539;commit:1f2ec4e1d729ac90894c7ff49d3392e38888c6f4;cohort:dc_912a03a50135ea5e29000a0417c3f477",
+      "ref_id": "ra_0e9025b5ba0d34b49426cd1676edd4d4",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-23T02:34:43.482933+00:00",
+      "n": 209,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_4ae42dd1b69d7a321eb9b986ba016829;digest:6914bd59f07d0aa7ecfa5df193b27a8d4fee2772eab49e286d0c2b331f35d416;commit:7feb2a304e0e4b72e4ec96b0af57f7db2b495bf6;cohort:dc_7dc03795699f2169e9c8adc6d3d10179",
+      "ref_id": "ra_4ae42dd1b69d7a321eb9b986ba016829",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-23T02:34:53.114138+00:00",
+      "n": 210,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_712f7b718587e6c777684bd6c5d734fd;digest:c65cfbc579176d49e4f7d25edb912ecb028f7b87f7e573cd0cac22e2f32a9833;commit:9d3f5ca65c583c5d2a1c04dc73ccf332fea9bc4f;cohort:dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+      "ref_id": "ra_712f7b718587e6c777684bd6c5d734fd",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-23T02:35:02.642661+00:00",
+      "n": 211,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_e24936726a20ee8db0b53b8ef4367535;digest:fc5773a03bd50a3535235ea7e37af2712605cd738cc1fd8dbffa228f5698f22c;commit:98ab4a78a9b605d624894ce880530f361f88ecc5;cohort:dc_7dc03795699f2169e9c8adc6d3d10179",
+      "ref_id": "ra_e24936726a20ee8db0b53b8ef4367535",
+      "type": "ra_admission",
+      "verb": "go"
     }
   ],
-  "next_n": 212,
+  "next_n": 213,
   "schema_version": "1"
 }
