@@ -1,0 +1,67 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Downgrade if IQE discloses cancellation or material reduction, or if subsequent reports show the order does not convert into shipments and revenue over the stated multi-year period.",
+      "id": "iqe_ai_datacentre_order_2026_07_14_cl1",
+      "source_ids": [
+        "iqe_ai_datacentre_order_2026_07_14_s1",
+        "iqe_ai_datacentre_order_2026_07_14_s2",
+        "iqe_ai_datacentre_order_2026_07_14_s3"
+      ],
+      "statement": "IQE secured a US$14 million multi-year production order from an unnamed strategic global technology customer, to be manufactured at IQE's Newport foundry for high-performance storage applications serving AI and datacentre markets.",
+      "subject_id": "co:iqe"
+    }
+  ],
+  "edges": [],
+  "nodes": [
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "IQE"
+      ],
+      "attributes": {},
+      "confidence": 0.7,
+      "id": "co:iqe",
+      "name": "IQE plc",
+      "role": "bottleneck_supplier",
+      "source_ids": [
+        "iqe_ai_datacentre_order_2026_07_14_s1",
+        "iqe_ai_datacentre_order_2026_07_14_s2"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "iqe_ai_datacentre_order_2026_07_14",
+    "evidence_tier": 2,
+    "origin_entity": "IQE plc",
+    "permission_basis": "Public issuer or joint-company announcement; retain the canonical URL and only research-relevant excerpts.",
+    "published_at": "2026-07-14",
+    "publisher": "IQE plc",
+    "retrieved_at": "2026-08-23",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "IQE secures $14 million production order with strategic customer for AI and datacentre markets",
+    "url": "https://www.iqep.com/media/press-releases/2026/iqe-secures-14-million-production-order-with-strategic-customer-for-ai-and-datacentre-markets/"
+  },
+  "sources": [
+    {
+      "id": "iqe_ai_datacentre_order_2026_07_14_s1",
+      "locator": "Announcement opening paragraph",
+      "quote": "secured a multi-year production order valued at $14 million from a strategic global technology customer"
+    },
+    {
+      "id": "iqe_ai_datacentre_order_2026_07_14_s2",
+      "locator": "Manufacturing and application paragraph",
+      "quote": "manufactured at IQE's Newport foundry ... supports applications serving AI and datacentre markets ... high-performance storage technologies"
+    },
+    {
+      "id": "iqe_ai_datacentre_order_2026_07_14_s3",
+      "locator": "CEO quotation",
+      "quote": "production order ... from IQE's volume manufacturing facility at Newport and expected to build over the coming years"
+    }
+  ]
+}
