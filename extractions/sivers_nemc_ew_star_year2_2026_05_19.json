@@ -1,0 +1,96 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "guided",
+      "disproof_condition": "Downgrade if the Year 2 award is cancelled or materially reduced, milestones are not completed, or subsequent disclosures show no path from the funded program to deployable technology.",
+      "id": "sivers_nemc_ew_star_year2_2026_05_19_cl1",
+      "source_ids": [
+        "sivers_nemc_ew_star_year2_2026_05_19_s1",
+        "sivers_nemc_ew_star_year2_2026_05_19_s2",
+        "sivers_nemc_ew_star_year2_2026_05_19_s3"
+      ],
+      "statement": "The NEMC Hub extended Sivers' EW STAR project into Year 2 with a US$6.6 million program award supporting wideband simultaneous transmit-and-receive antenna array technology for electronic warfare, communications and radar.",
+      "subject_id": "co:sivers_semiconductors"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:ew_star_wideband_array",
+      "id": "e1",
+      "relation": "develops",
+      "source_ids": [
+        "sivers_nemc_ew_star_year2_2026_05_19_s1",
+        "sivers_nemc_ew_star_year2_2026_05_19_s2"
+      ],
+      "src_id": "co:sivers_semiconductors"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "Sivers",
+        "SIVE"
+      ],
+      "attributes": {},
+      "confidence": 0.7,
+      "id": "co:sivers_semiconductors",
+      "name": "Sivers Semiconductors",
+      "role": "bottleneck_supplier",
+      "source_ids": [
+        "sivers_nemc_ew_star_year2_2026_05_19_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "EW STAR"
+      ],
+      "attributes": {},
+      "confidence": 0.7,
+      "id": "tech:ew_star_wideband_array",
+      "name": "EW STAR wideband simultaneous transmit-and-receive antenna array",
+      "role": null,
+      "source_ids": [
+        "sivers_nemc_ew_star_year2_2026_05_19_s1",
+        "sivers_nemc_ew_star_year2_2026_05_19_s2"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "sivers_nemc_ew_star_year2_2026_05_19",
+    "evidence_tier": 2,
+    "origin_entity": "Sivers Semiconductors",
+    "permission_basis": "Public issuer or joint-company announcement; retain the canonical URL and only research-relevant excerpts.",
+    "published_at": "2026-05-19",
+    "publisher": "Sivers Semiconductors",
+    "retrieved_at": "2026-08-23",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Microelectronics Commons Strengthens Commitment to Sivers Semiconductors With Year 2 Funding",
+    "url": "https://www.sivers-semiconductors.com/press/microelectronics-commons-strengthens-commitment-to-sivers-semiconductors-with-year-2-funding/"
+  },
+  "sources": [
+    {
+      "id": "sivers_nemc_ew_star_year2_2026_05_19_s1",
+      "locator": "Announcement headline and opening",
+      "quote": "$6.6M Year 2 Program Award through NEMC ... a second-year extension of its Electronic Warfare (EW STAR) project"
+    },
+    {
+      "id": "sivers_nemc_ew_star_year2_2026_05_19_s2",
+      "locator": "Technology description",
+      "quote": "wideband antenna array technologies that enable simultaneous transmit-and-receive operation for electronic warfare, communications, and radar"
+    },
+    {
+      "id": "sivers_nemc_ew_star_year2_2026_05_19_s3",
+      "locator": "Program paragraph",
+      "quote": "collaborating alongside BAE Systems, MIT Lincoln Laboratory, and Columbia University"
+    }
+  ]
+}
