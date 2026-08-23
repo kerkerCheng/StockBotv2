@@ -4444,6 +4444,144 @@
       "result": "ok",
       "run_at": "2026-08-22T22:33:13.480302+00:00",
       "source": "edgar:TSLA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-23T22:34:06.225041+00:00",
+      "source": "mfn:sivers-semiconductors"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-23T22:34:07.256186+00:00",
+      "source": "sivers:press"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-23T22:34:07.998649+00:00",
+      "source": "yahoo:iqe-l"
+    },
+    {
+      "new": 2,
+      "result": "ok",
+      "run_at": "2026-08-23T22:34:09.217627+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-23T22:34:11.731197+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-23T22:34:12.784139+00:00",
+      "source": "edgar:AEVA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-23T22:34:13.830473+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-23T22:34:14.895620+00:00",
+      "source": "edgar:AVGO"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-23T22:34:15.946921+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-23T22:34:17.045871+00:00",
+      "source": "edgar:CCXI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-23T22:34:18.091903+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-23T22:34:19.140678+00:00",
+      "source": "edgar:GFS"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-23T22:34:20.176334+00:00",
+      "source": "edgar:JBL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-23T22:34:21.258288+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-23T22:34:22.388480+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-23T22:34:23.442867+00:00",
+      "source": "edgar:META"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-23T22:34:24.359896+00:00",
+      "source": "edgar:MRVL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-23T22:34:25.457242+00:00",
+      "source": "edgar:MTSI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-23T22:34:26.473807+00:00",
+      "source": "edgar:MU"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-23T22:34:27.386889+00:00",
+      "source": "edgar:NVDA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-23T22:34:28.622802+00:00",
+      "source": "edgar:POET"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-23T22:34:29.766128+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-23T22:34:30.812314+00:00",
+      "source": "edgar:TSLA"
     }
   ],
   "leads": {
@@ -4496,9 +4634,16 @@
       "first_seen": "2026-08-11T13:07:53.107969+00:00",
       "lead_id": "lead_001e17e6dd6bced9a0785c38eefc6c6a",
       "published_at": "Tue, 30 Jun 2026 23:15:00 +0000",
-      "refs": {},
+      "refs": {
+        "parked_reason": "Sivers 官方公告確認 12,280,701 股定向增發、每股 SEK57、募資約 SEK700m、fully diluted 約 3.3% dilution，資金用於 InP laser／optical amplifier 產能與研發；屬 2026-07-01 dated financing fact，沒有新的供應關係 graph delta，也不建立 manual Engine C observation。",
+        "primary_url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-has-resolved-on-a-directed-share-issue-of-shares-amounting-to-approximately-sek-700-million-a4130eba",
+        "research_outcome": "original_obtained_dated_financing_fact_no_graph_delta",
+        "trace_attempts_ref": "MFN／Cision Sivers 官方公告 2026-07-01",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
       "source": "mfn:sivers-semiconductors",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -14673,6 +14818,38 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2074954930939625564"
+    },
+    "lead_4a154d8e0c5d8e32f2cd11568b75091d": {
+      "entities": {
+        "company_ids": [
+          "co:axt",
+          "co:nebius",
+          "co:amd"
+        ],
+        "tickers": [
+          "AXTI",
+          "NBIS",
+          "AMD"
+        ]
+      },
+      "first_seen": "2026-08-23T22:34:09.216543+00:00",
+      "lead_id": "lead_4a154d8e0c5d8e32f2cd11568b75091d",
+      "media": [],
+      "published_at": "2026-08-23T11:29:53.000Z",
+      "raw_text": "Having a mid-X identity crisis rn:\n\n✓ saw 2025 ideas from $AXTI to $NBIS play out with everyone\n✓ we got $AMD bandanas\n✓ #1 most subscribed person on X by accident\n✓ Chinese “White Hair” nicknames\n✓ 1M followers\n\nStill here to track ideas, but what’s the next side quest?",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "Having a mid-X identity crisis rn: ✓ saw 2025 ideas from $AXTI to $NBIS play out with everyone ✓ we got $AMD bandanas ✓ #1 most subscribed person on X by accident ✓ Chinese “White Hair” nicknames ✓ 1M followers Still here to track ideas, but what’s the next side quest?",
+      "triage": {
+        "decided_at": "2026-08-23T22:37:16.109531+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "FILTER：雖提及 AXTI、NBIS、AMD，但內容是作者近況與已實現想法回顧，沒有可逐字追查的新事件、數字或因果 claim；分類應為 no_content／confidence_only。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2091488091110531106"
     },
     "lead_4a1bf28869638f159ef3a11327ffce7c": {
       "entities": {
@@ -27397,9 +27574,17 @@
       "first_seen": "2026-08-11T13:44:15.936364+00:00",
       "lead_id": "lead_a7ab5e10e98df1235415c697e5c1ece3",
       "published_at": "Wed, 01 Jul 2026 07:20:10 +0000",
-      "refs": {},
+      "refs": {
+        "parked_reason": "IQE 一手 RNS 確認兩名 MACOM 代表董事就任；這是既有投資與長期供應協議的治理完成，沒有新增供應範圍。",
+        "primary_url": "https://www.investegate.co.uk/index.php/announcement/rns/iqe--iqe/iqe-plc-appointment-of-non-executive-directors/9645671",
+        "related_research_action_id": "ra_eb14a18b61a4a90e8071fb8d1537f3c0",
+        "research_outcome": "governance_completion_covered_by_prepared_customer_side_action",
+        "trace_attempts_ref": "Investegate IQE RNS 2026-07-01",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
       "source": "yahoo:iqe-l",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "IQE appoints MACOM executives to board under strategic partnership agreement (IQE)",
       "triage": {
@@ -27419,6 +27604,83 @@
         "tier": 3
       },
       "url": "https://uk.advfn.com/market-news/article/18722/iqe-appoints-macom-executives-to-board-under-strategic-partnership-agreement-iqe?.tsrc=rss"
+    },
+    "lead_a7bde7bc0f16b8d05ace967989d47a57": {
+      "entities": {
+        "company_ids": [
+          "co:google"
+        ],
+        "tickers": [
+          "GOOGL"
+        ]
+      },
+      "first_seen": "2026-08-23T22:34:09.174719+00:00",
+      "lead_id": "lead_a7bde7bc0f16b8d05ace967989d47a57",
+      "media": [
+        {
+          "cache": {
+            "bytes": 68244,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_a7bde7bc0f16b8d05ace967989d47a57/3_2091603004973817856.jpg",
+            "sha256": "034328a145ca74ccb4ceb4b707be3d34bc65bdd2635ea59348d6956a303b7a36"
+          },
+          "height": 573,
+          "media_key": "3_2091603004973817856",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HQbd2eqaoAApVvX.jpg",
+          "width": 860
+        },
+        {
+          "cache": {
+            "bytes": 100337,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_a7bde7bc0f16b8d05ace967989d47a57/3_2091603060430942208.jpg",
+            "sha256": "877d9f19a183bb51199a93040989ef13316e950e936b4e41f7b8a29c47ab8f67"
+          },
+          "height": 1082,
+          "media_key": "3_2091603060430942208",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HQbd5tQbMAAiM0c.jpg",
+          "width": 1883
+        },
+        {
+          "cache": {
+            "bytes": 118118,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_a7bde7bc0f16b8d05ace967989d47a57/3_2091606729511612416.jpg",
+            "sha256": "72fb367e2a176ed804f9388ccaf4ce5967ffa699b1a0a705fd53ca621a1506fc"
+          },
+          "height": 800,
+          "media_key": "3_2091606729511612416",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HQbhPRpbMAARuHm.jpg",
+          "width": 1200
+        }
+      ],
+      "published_at": "2026-08-23T19:43:52.000Z",
+      "raw_text": "After watching clips of China's humanoid Olympics... \n\nI think we're cooked chat. \n\nStill can't believe $GOOGL sold Boston Dynamics, don't think we have another humanoid that can backflip. https://t.co/uERCqW85F5",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_go",
+      "themes": {
+        "robotics": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Boston Dynamics",
+            "humanoid"
+          ]
+        }
+      },
+      "title": "After watching clips of China's humanoid Olympics... I think we're cooked chat. Still can't believe $GOOGL sold Boston Dynamics, don't think we have another humanoid that can backflip. https://t.co/uERCqW85F5",
+      "triage": {
+        "decided_at": "2026-08-23T22:37:17.056588+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "PASS（低優先）：humanoid 主題具關聯性，且『GOOGL 已出售 Boston Dynamics』是可追查的具名結構事實；若一手查證為真會影響 humanoid 候選集合，但貼文主體仍是個人觀感。分類應為 structural_fact／candidate_set／payment_direction=unclear。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2091612406900564407"
     },
     "lead_a7e1fbdd7e16b66481bc53a3d934c128": {
       "entities": {
@@ -31681,12 +31943,15 @@
       "lead_id": "lead_c470eb6eb0cf85806619a921cd756db0",
       "published_at": "2026-08-04",
       "refs": {
-        "research_outcome": "2026-08-13：本筆自己的 trace_next_trigger 已列出替代解鎖路徑「AWS/Meta/Google 等雲端業者對供應商轉單的官方公告」，而 META 有登記。改設 primary_source_signal＋META。主要路徑（FCC 官方 docket／Federal Register）不是公司 filing，兩種 trigger kind 都涵蓋不到；若長期無進展，該考慮是否需要法規來源 watcher。",
-        "trace_next_trigger": "FCC 官方 docket 或 Federal Register 公布本規則正式文本/NPRM;或 AWS/Meta/Google 等雲端業者對供應商轉單的官方公告",
+        "parked_reason": "已取得 Reuters 原文 carrier，僅支持美國政府正在討論／起草限制中國 data-center devices；尚無 FCC NPRM、Report and Order 或 Federal Register 正式文本，政策仍可變，也沒有具名 hyperscaler 轉單，因此不建立 supplier reallocation graph delta。",
+        "primary_url": "https://www.usnews.com/news/top-news/articles/2026-08-04/exclusive-trump-administration-drafting-ban-on-chinese-data-center-devices-sources-say",
+        "research_outcome": "original_obtained_draft_policy_no_graph_delta",
+        "trace_attempts_ref": "Reuters carrier（U.S. News）；FCC／Federal Register 官方檢索",
+        "trace_next_trigger": "FCC NPRM／Report and Order／Federal Register 正式文本，或 AWS／Meta／Google 具名 supplier-switch 公告",
         "trace_requeue_trigger": "related_triaged_lead:lead_9a326a7ac257806d6a1828ffc106028b",
         "trace_requeued_at": "2026-08-13T22:36:37.087730+00:00",
         "trace_requires_user": "false",
-        "trace_status": "isolated_tier_3",
+        "trace_status": "original_obtained",
         "trace_trigger_entities": [
           "META"
         ],
@@ -31694,7 +31959,7 @@
         "trace_trigger_kind": "primary_source_signal"
       },
       "source": "reuters_wire",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "Exclusive-Trump Administration Drafting Ban on Chinese Data Center Devices, Sources Say",
       "triage": {
@@ -32041,9 +32306,32 @@
       "media": [],
       "published_at": "2026-08-12T07:54:08.000Z",
       "raw_text": "So this is just what I'm seeing with $SIVE and the CW DFB laser chokepoint right now. \n\nFrom optical earnings: \n\n1. $LITE: unexpected demand and imbalance for UHP CW lasers. \n\n- Had ability to price up ASP for lasers. \n- Scale up CPO on track for H2 2027 shipments, called out any CPO scale up delay rumors as noise. \n\nLumentum confirmed timelines (that CPO players like Sivers sold off of misleading reports from), high margins, and extreme demand for qualified CW lasers. \n\n2. $AAOI: doesn’t have enough CW laser capacity because of too much optical transceiver demand.\n\n-  Not meaningfully participating in first-gen CPO deployments, with $MTSI not looking like they're in it either but focusing on NPO. Haven't seen much with $SMTC after their HieFo acqusition. \n- Called lasers as the bottleneck within a 20-40% demand imbalance for transceivers. \n- Says customers approaching them every week asking them for supply + to move faster.\n\nAOI confirmed demand imbalances  + bottlenecks for lasers. And we got an even smaller pool for first-gen CPO players. \n\n3. Both $AAOI and $LITE claimed Chinese players were years behind for CPO lasers and far behind stated claims in qualified capacity. \n\n- $AAOI said 2-3 years+ behind with CPO lasers. \n- $LITE said they haven't seen anything like Chinese claims in terms of outputs (and no recourse if it's false). \n\nReaffirms moat for CPO related lasers, and no flooding from some shortseller claims on the optical sector.  \n\n4. $MTSI said that many customers are approaching them with urgency due to the general supply shortage of indium phosphide DFB lasers. \n\nAgain, puts Sivers in the that bottleneck, giving them likely more customer demand .\n\nAmong $COHR ($72.54B), $LITE ($66.57B), $AVGO ($2.13T): \n\nIt's very special you get one of the public 4 Western CPO leaders at a ~$1.5B MC with $SIVE.  \n\nFeels like my thesis with both:\n\n- The CW bottleneck that I predicted\n- CW laser chokepoint (where there's only a few CPO players, at least for gen-1)\n\nGot validated from earnings, now it's just waiting for the inflection points of next optical architecture shifts.",
-      "refs": {},
+      "refs": {
+        "parked_reason": "Lumentum／MACOM／AAOI 一手或正式 transcript 只支持 UHP／InP DFB laser 供需吃緊；仍沒有客戶端文件證明 Sivers 已成為合格 CW DFB 量產供應商，因此不能把產業短缺直接外推成 Sivers 訂單或 graph edge。",
+        "research_outcome": "partial_industry_shortage_no_sivers_graph_delta",
+        "trace_attempts_ref": "Lumentum Q4 FY2026 transcript；MACOM Q3 transcript；既有 AAOI filing／transcript",
+        "trace_next_trigger": "Sivers 客戶或 CPO integrator 具名確認 Sivers 為 qualified CW DFB volume supplier，或 Sivers filing 揭露付費量產",
+        "trace_requires_user": "false",
+        "trace_status": "partial",
+        "trace_trigger_entities": [
+          "AAOI",
+          "AVGO",
+          "COHR",
+          "LITE",
+          "MTSI",
+          "SIVE",
+          "SMTC",
+          "co:applied_optoelectronics",
+          "co:broadcom",
+          "co:coherent",
+          "co:lumentum",
+          "co:macom",
+          "co:sivers_semiconductors"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -32159,12 +32447,12 @@
       "raw_text": "Okay here's my take on $POET, since apparently people are celebrating on the subreddit that I took small positions. \n\n- I have 0 idea. ZERO. How they convinced shareholders to allow them dilute SO MUCH to the point:\n\nThey have an absurd ~$830m cash on hand now. \n\nAnd my guess is that they're close to done, since I would be in disbelief if they needed more. \n\nSo now... they have ~$830m to grow their business like M&A, and EV actually dropped really low recently (eg. $1.25B MC vs. $830m cash on hand), that I thought it was compelling to take a risk. \n\n- Annualized production capacity target is 12M optical engines/year for 2027, which is pretty absurd ramp. \n\nNeed to do more research into ASP for Poet's products, but maybe $125-$200? So at ~$150 ASP, $1.8B revenue ceiling. \n\nBut they're like inverse AAOI right now: no visible demand to fill all that capacity. Aside from Lumilens, which is now a highly valued hyperscaler supplier (probably Amazon or Microsoft), with billions in customer agreements. \n\nThe interesting thing is if Poet signed prepayment EML agreements with players like Mitsubishi, or CW agreements with Sivers behind the scenes with that balance sheet. \n\nAnd given the current bottleneck, players might use Poet as a workaround for supply procurement. \n\nBut basically, you have a super cash-rich company with a ton of capacity coming online. And they're not really disappearing anytime soon with their financials. \n\nI don't quite think it's as technically defensible compared to upstream laser chokepoints with something like $SIVE around the same valuation in terms of technical moat for CW lasers vs. OE packaging side. As you've seen recently with Celestial and Poet. \n\nBut maybe... there's a chance some hyperscaler or downstream company announces a volume agreement sometime in the future. and $POET takes off. And they do have the supply chain setup for ramp with that.  \n\nThat's the risk I ended up taking, but it's not exactly a clear as day long for me like $AAOI.",
       "refs": {
         "gap": "12M engines/year 2027 產能目標的一手出處；ASP 假設完全未驗證",
-        "parked_reason": "作者個人持倉觀點，非可入圖事實。其中可查證部分已由本輪一手涵蓋：所稱 ~$830m cash 實際為 US$796.3M（Q2 FY2026 6-K：現金 432.5M ＋短期投資 363.8M，已入 Engine C 觀測）。無法證實部分：2027 年 12M optical engines 年產能與 ASP $125-200 屬作者推估，POET 的 FY2025 20-F 與 Q2 FY2026 6-K 全文均無此數字；Lumilens 為 Amazon 或 Microsoft、與 Mitsubishi 的 prepayment EML、與 Sivers 的 CW 協議等皆為作者臆測並自陳不確定。技術判斷（OE 封裝護城河弱於上游 CW laser）與圖中既有的 tech:poet_optical_interposer 定位一致，無新 delta。",
+        "parked_reason": "POET 官方財務資料支持約 US$796.3m 現金，且既有 Engine C observation 已覆蓋；X 帖的 US$830m、12m engines、ASP／客戶推算與 Sivers／AAOI 對比仍是作者模型，沒有獨立客戶文件或新 graph delta。",
         "related_research_action_id": "ra_8453b5ad4d5f6216824d15dde37bf825",
-        "research_outcome": "author_opinion_key_figures_already_covered_or_unverifiable",
+        "research_outcome": "financial_fact_already_observed_opinion_unverified_no_graph_delta",
         "storage_permission": "repo_full",
-        "trace_attempts_ref": "取得 POET Q1/Q2 2026 6-K Ex-99.1 一手；對 12M optical engines 年產能目標在兩份 filing 中皆無命中",
-        "trace_next_trigger": "POET 官方揭露 2027 年 optical engine 年產能目標或 ASP，或公布 Lumilens 以外的 volume agreement",
+        "trace_attempts_ref": "POET 官方財務 filing／investor disclosure；既有 Engine C observation",
+        "trace_next_trigger": "POET 官方揭露 2027 產能、ASP、具名非 Lumilens 客戶之付費量產或合約承購量",
         "trace_origin_entity": "POET Technologies Inc.",
         "trace_original_url": "https://www.sec.gov/Archives/edgar/data/1437424/000117184326005485/exh_991.htm",
         "trace_requeue_consumed_entities": [
@@ -32176,7 +32464,7 @@
         "trace_requeue_trigger": "related_triaged_lead:lead_7cd19ddab804188d2cb5a96b8dcd00b7",
         "trace_requeued_at": "2026-08-20T22:36:14.618719+00:00",
         "trace_requires_user": "false",
-        "trace_status": "opinion_no_primary",
+        "trace_status": "partial",
         "trace_trigger_entities": [
           "AAOI",
           "POET",
@@ -32189,7 +32477,7 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -32430,12 +32718,12 @@
       "refs": {
         "canonical_url": "https://ir.aboutamazon.com/news-release/news-release-details/2026/Amazon-com-Announces-Second-Quarter-Results/default.aspx",
         "original_claim_status": "partial_mixed",
-        "parked_reason": "AXTI 官方 Exhibit 99.1 支持 Q2 revenue US$47.6m、77% QoQ／164% YoY、GAAP gross margin 44.9%、record InP revenue 與 generic data-center demand／capacity addition；Amazon 官方 Q2 release 支持 AWS revenue +37%、AI/chips run-rate 與現金 capex 實績，但 X 帖中的 AXTI InP US$30.7m、US$60m／US$130m quarterly capacity、backlog >US$100m、50%+ gross-margin target，以及 Amazon US$220bn／2027–2028 reservation 屬法說逐字內容，缺官方 transcript／timestamp locator，不能作可抽取 quote。可核對部分屬 Engine C dated observations 或宏觀 demand context，沒有新的供應關係 edge；不 prepare RA。",
+        "parked_reason": "既有重查結果未變：AXTI 官方 Exhibit 99.1 支持 Q2 revenue、成長與 generic data-center demand，但 X 帖中的 InP US$30.7m、US$60m／US$130m capacity、backlog 與 50%+ margin target 仍缺官方 transcript／timestamp；Amazon 部分也缺可逐字核對的 US$220bn 與 2027–2028 reservation。可確認部分屬 dated financial／demand context，沒有新供應關係 edge。",
         "primary_url": "https://www.sec.gov/Archives/edgar/data/1051627/000143774926025061/ex_974537.htm",
         "research_outcome": "dated_financial_observations_and_unverified_call_detail_no_graph_delta",
         "research_run": "daily_brief_2026_08_02",
-        "trace_attempts_ref": "SEC AXTI 8-K Exhibit 99.1; Amazon IR Q2 release; Amazon IR event listing; AP earnings-call cross-check",
-        "trace_next_trigger": "AXTI／Amazon 官方逐字稿、帶 timestamp webcast locator、或下一份 10-Q 出現相同容量／backlog／reservation 數字時重查",
+        "trace_attempts_ref": "SEC AXTI 8-K Exhibit 99.1；Amazon IR Q2 release／event listing；本輪未出現新官方 transcript",
+        "trace_next_trigger": "AXTI／Amazon 官方逐字稿、帶 timestamp webcast locator，或下一份 10-Q 出現相同 capacity／backlog／reservation 數字",
         "trace_origin_entity": "AXT Inc.／Amazon.com",
         "trace_origin_linkage": "AXTI 2026-07-30 SEC Exhibit 99.1 + Amazon 2026-Q2 official release; earnings-call-only assertions cross-checked against AP but no official text locator",
         "trace_requeue_trigger": "related_triaged_lead:lead_7f66b743a034c41f6388aa800f333e62",
@@ -32455,13 +32743,14 @@
           "co:coherent",
           "co:google",
           "co:lumentum",
-          "co:meta"
+          "co:meta",
+          "co:micron_technology"
         ],
         "trace_trigger_event_ref": "lead:lead_7f66b743a034c41f6388aa800f333e62",
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -34941,9 +35230,17 @@
       "first_seen": "2026-08-21T22:32:58.442675+00:00",
       "lead_id": "lead_d710334801beece520ec2c7f9ac2ab25",
       "published_at": "2026-08-19",
-      "refs": {},
+      "refs": {
+        "parked_reason": "本筆 SEC 8-K 與既有 extraction 完全相同；Google custom semiconductor agreement／warrant 已由 Research Action ra_85749b970268a50c252fa31fde5e7984 入圖，沒有新文件或新 delta，不重複 prepare。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1835632/000119312526356217/d412696d8k.htm",
+        "related_research_action_id": "ra_85749b970268a50c252fa31fde5e7984",
+        "research_outcome": "duplicate_of_applied_research_action",
+        "trace_attempts_ref": "SEC 8-K；extractions/mrvl_google_custom_chip_warrant_2026_08_19.json；既有 intake receipt",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
       "source": "edgar:MRVL",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "MRVL 8-K filed 2026-08-19",
       "triage": {
@@ -36124,9 +36421,13 @@
       "first_seen": "2026-08-11T13:44:15.937607+00:00",
       "lead_id": "lead_e0e737fc24bb3ae8e114a32c5ff423ce",
       "published_at": "Mon, 27 Apr 2026 16:00:00 +0000",
-      "refs": {},
+      "refs": {
+        "action_digest": "08d726beb7dcd69fb1eebf5e76aa5c5952e6266fa050b88a621413732b806231",
+        "focus_company_id": "co:iqe",
+        "research_action_id": "ra_eb14a18b61a4a90e8071fb8d1537f3c0"
+      },
       "source": "yahoo:iqe-l",
-      "status": "triaged_go",
+      "status": "action_prepared",
       "themes": {},
       "title": "MACOM to Enter into Agreements to Further Strengthen Supply Chain",
       "triage": {
@@ -41039,8 +41340,8 @@
   "schema_version": "2",
   "source_state": {
     "x:aleabitoreddit": {
-      "since_id": "2091264273007960320",
-      "updated_at": "2026-08-22T22:32:59.286436+00:00",
+      "since_id": "2091612406900564407",
+      "updated_at": "2026-08-23T22:34:09.217619+00:00",
       "user_id": "1940360837547565056"
     }
   }

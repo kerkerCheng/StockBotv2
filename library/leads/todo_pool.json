@@ -3406,6 +3406,18 @@
       "source": "decision_lab",
       "title": "REVIEW — co:schaeffler",
       "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-23T22:49:18.493153+00:00",
+      "hint": "核准 exact graph delta；Decision handoff：co:iqe。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 213,
+      "reason": null,
+      "ref_id": "ra_eb14a18b61a4a90e8071fb8d1537f3c0",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "MACOM 客戶端確認 IQE 長期供應協議與條件式 £45M 投資",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -7638,6 +7650,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 213,
+  "next_n": 214,
   "schema_version": "1"
 }
