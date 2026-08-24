@@ -7125,6 +7125,44 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1709048/000162828026046017/xslF345X06/wk-form4_1782765252.xml"
     },
+    "lead_10eedf14d7d6b636e24e447dc6d6555b": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-24T07:01:09.822264+00:00",
+      "lead_id": "lead_10eedf14d7d6b636e24e447dc6d6555b",
+      "published_at": "2026-07-24",
+      "refs": {
+        "campaign_focus": "primary",
+        "campaign_topic": "pane3_glass_substrate",
+        "research_bundle_id": "alpha_gap_round2_20260824",
+        "research_mode": "full",
+        "research_run": "user_go_2026-08-24_round2"
+      },
+      "source": "official:intel",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "Intel and Lens Technology official glass-substrate advanced-packaging collaboration; map investable supplier set",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-24T07:02:14.025392+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "Mapping the glass-substrate supply chain can add investable suppliers to a currently uncovered chokepoint."
+        },
+        "decided_at": "2026-08-24T07:01:42.092817+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true,
+          "novelty": true
+        },
+        "reason": "User-approved glass-substrate candidate-set research. Intel cross-party official announcement names Lens Technology and an advanced-packaging mechanism for AI/data centers. PASS authorizes pq1 only.",
+        "tier": 1
+      },
+      "url": "https://newsroom.intel.com/new-technologies/intel-and-lens-technology-collaborate-to-enable-advanced-semiconductor-packaging-for-the-ai-era"
+    },
     "lead_11157f86578b06fe4ab6fb159213e386": {
       "entities": {
         "company_ids": [
@@ -12695,6 +12733,11 @@
         "parked_reason": "company_onboarding_source_review_required",
         "trace_attempts_ref": "official_XFAB_Q4_2025_investor_presentation_and_2025_annual_report",
         "trace_next_trigger": "customer_or_partner_officially_confirms_XFAB_photonics_role_and_source_diversity_review",
+        "trace_requeue_consumed_entities": [
+          "NVTS"
+        ],
+        "trace_requeue_trigger": "related_triaged_lead:lead_f82cfe4629a23bc3a83a328b45bc7676",
+        "trace_requeued_at": "2026-08-24T07:01:43.896952+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
@@ -12703,10 +12746,11 @@
           "XFAB",
           "co:x_fab"
         ],
+        "trace_trigger_event_ref": "lead:lead_f82cfe4629a23bc3a83a328b45bc7676",
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -12719,21 +12763,38 @@
       },
       "title": "For $XFAB ER transcript: Just to recap, my idea on $XFAB foundry growth opportunities stemmed from SiC for 800v and photonixfab/MTP for CPO applicability. - $XFAB: \"We are making progress in co-packaged optics\". - \"The transition to 800v... is expected to support demand for both SiC and GaN... for XFAB\" So those analysts/people that were confidently bearposting about $XFAB that they had \"0 exposure to 800V, photonics, CPO\" just turned out plainly wrong. At the time I shared my idea, industry materials showed ASE and others cited photonixfab + XFAB as an upcoming CPO player in EU. And filings showed they had exposure names like $NVTS / $POWI in general. So glad $XFAB went out to explicitly clear things up to state they were developing in CPO/800v. Okay back to the ER: - \"We continue to expect photonics volume production to start in 2028\". Company currently has three silicon photonics projects in development with key partners. I thought it would ramp sometime in H2 2027, but was probably early by a few months. - Several new data center design wins, eg. 3 new SiC design wins (consistent with general 2027 ramp as 800v deployment takes off). So once those ramp in 2027-2028, (markets tend to price things ahead of time), I'd expect $XFAB to be rerated based on growth opportunities. TLDR: - Current revenue numbers not as impressive. - $XFAB confirmed direct exposure to CPO and 800V shifts (biggest win for thesis) - 800V exposure opportunities for SiC (should be 2027) - Timeline is 2028 ramp for photonics volume production Happy exposure thesis to CPO/800V was confirmed from this ER. Might be a bit of waiting for revenue ramp.",
       "triage": {
-        "classification": {
-          "classified_at": "2026-08-21T16:05:59.208377+00:00",
-          "classified_by": "semantic_v1",
-          "content_type": "structural_fact",
-          "decision_impact": "candidate_set",
-          "reason": "X-FAB 自述 CPO 進展與 photonixfab：圖中尚無此節點，可能新增候選"
-        },
-        "decided_at": "2026-07-31T22:42:09.778554+00:00",
+        "decided_at": "2026-08-24T07:01:43.896952+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true
         },
-        "reason": "XFAB 與 CPO／800V 主題相關，轉述含可追查法說措辭、三項 silicon photonics 專案與 2028 volume-production 時程；社群來源需追回公司原文。",
+        "reason": "新 triage PASS lead lead_f82cfe4629a23bc3a83a328b45bc7676 與 parked trace 共用具名標的 NVTS（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
         "tier": 4
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-24T07:01:43.896952+00:00",
+          "superseded_reason": "新 triage PASS lead lead_f82cfe4629a23bc3a83a328b45bc7676 與 parked trace 共用具名標的 NVTS（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_f82cfe4629a23bc3a83a328b45bc7676",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-08-21T16:05:59.208377+00:00",
+              "classified_by": "semantic_v1",
+              "content_type": "structural_fact",
+              "decision_impact": "candidate_set",
+              "reason": "X-FAB 自述 CPO 進展與 photonixfab：圖中尚無此節點，可能新增候選"
+            },
+            "decided_at": "2026-07-31T22:42:09.778554+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true
+            },
+            "reason": "XFAB 與 CPO／800V 主題相關，轉述含可追查法說措辭、三項 silicon photonics 專案與 2028 volume-production 時程；社群來源需追回公司原文。",
+            "tier": 4
+          }
+        }
+      ],
       "url": "https://x.com/aleabitoreddit/status/2083106805949878330"
     },
     "lead_3a961f18b09ca9fd8c60d40209af24ce": {
@@ -31870,6 +31931,58 @@
       },
       "url": "https://www.sivers-semiconductors.com/press/sivers-styrelse-slutfor-kop-av-aktier-i-enlighet-med-beslutet-vid-arsstamman-i-juni-2026/"
     },
+    "lead_c2b12d2a18346c7b1f9d2ee165f535e6": {
+      "entities": {
+        "company_ids": [
+          "co:axt"
+        ],
+        "tickers": [
+          "AXTI"
+        ]
+      },
+      "first_seen": "2026-08-24T07:01:08.923623+00:00",
+      "lead_id": "lead_c2b12d2a18346c7b1f9d2ee165f535e6",
+      "published_at": "2026-03-20",
+      "refs": {
+        "campaign_focus": "primary",
+        "campaign_topic": "pane2_axti_customer_commitment",
+        "research_bundle_id": "alpha_gap_round2_20260824",
+        "research_mode": "full",
+        "research_run": "user_go_2026-08-24_round2"
+      },
+      "source": "official:sec_edgar",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "COHR",
+            "InP",
+            "LITE"
+          ]
+        }
+      },
+      "title": "$AXTI FY2025 10-K: InP substrate demand, export controls, and customer certification; trace COHR/LITE customer-side qualification",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-24T07:02:14.025392+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "ranking",
+          "reason": "AXTI customer-side qualification, commitment, or a credible counter-supplier would change the existing upstream candidate ranking."
+        },
+        "decided_at": "2026-08-24T07:01:41.203628+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "contradiction": true,
+          "novelty": true
+        },
+        "reason": "User-approved bounded AXTI research. SEC filing provides quotable InP demand, export-control, and customer-certification atoms; trace COHR/LITE customer-side qualification, commitment, and counter-supplier evidence. PASS authorizes pq1 only.",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1051627/000143774926008612/axti20251231_10k.htm"
+    },
     "lead_c305e0153545aec5bef3198d76a2b56a": {
       "entities": {
         "company_ids": [],
@@ -38061,6 +38174,45 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2077040840837632253"
     },
+    "lead_e84068655e3db45b0a81a9b5a1a0d546": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "ALAB"
+        ]
+      },
+      "first_seen": "2026-08-24T07:01:10.742490+00:00",
+      "lead_id": "lead_e84068655e3db45b0a81a9b5a1a0d546",
+      "published_at": null,
+      "refs": {
+        "campaign_focus": "primary",
+        "campaign_topic": "pane3_cxl_memory_tiering",
+        "research_bundle_id": "alpha_gap_round2_20260824",
+        "research_mode": "full",
+        "research_run": "user_go_2026-08-24_round2"
+      },
+      "source": "official:astera_labs",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "$ALAB Leo CXL smart memory controllers for AI memory expansion and pooling; verify customer adoption and competing suppliers",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-24T07:02:14.025392+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "Tracing production adoption and competing CXL memory-tiering suppliers can add or remove candidates in an uncovered layer."
+        },
+        "decided_at": "2026-08-24T07:01:43.004902+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "User-approved CXL memory-tiering candidate-set research. Official product page has concrete controller, memory expansion/pooling, and production-qualification claims; customer adoption remains to trace. PASS authorizes pq1 only.",
+        "tier": 1
+      },
+      "url": "https://www.asteralabs.com/products/leo-cxl-smart-memory-controllers/"
+    },
     "lead_e87032df984f0fa40a6bd12a7130b39a": {
       "entities": {
         "company_ids": [
@@ -40669,6 +40821,48 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2082557648298516918"
+    },
+    "lead_f82cfe4629a23bc3a83a328b45bc7676": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "NVTS"
+        ]
+      },
+      "first_seen": "2026-08-24T07:01:11.698257+00:00",
+      "lead_id": "lead_f82cfe4629a23bc3a83a328b45bc7676",
+      "published_at": "2026-06-03",
+      "refs": {
+        "campaign_focus": "primary",
+        "campaign_topic": "pane3_power_gan",
+        "research_bundle_id": "alpha_gap_round2_20260824",
+        "research_mode": "full",
+        "research_run": "user_go_2026-08-24_round2"
+      },
+      "source": "official:navitas",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "$NVTS official NVIDIA MGX ecosystem participation for 800 VDC AI infrastructure; map Power GaN bottleneck and customer qualification",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-24T07:02:14.025392+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "Tracing customer-qualified Power GaN suppliers for AI infrastructure can create a candidate set outside the current optical concentration."
+        },
+        "decided_at": "2026-08-24T07:01:43.896952+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "User-approved Power GaN candidate-set research. Official issuer announcement names NVIDIA MGX participation and 800 VDC AI infrastructure; customer-side qualification and competing suppliers remain to trace. PASS authorizes pq1 only.",
+        "related_trace_requeues": [
+          "lead_3a7c4e5db3ecc1c420c1464fb73ac3c2"
+        ],
+        "tier": 1
+      },
+      "url": "https://navitassemi.com/navitas-collaborates-with-nvidia-mgx-ecosystem-to-accelerate-800-vdc-ai-infrastructure/"
     },
     "lead_f88ba21d25dd7c61a7beef3e06283b06": {
       "entities": {
