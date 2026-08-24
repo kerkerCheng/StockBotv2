@@ -16756,6 +16756,43 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/928876/000197640826000636/xslF345X06/primary_doc.xml"
     },
+    "lead_5a69fa111a43ae7f99c258d4b6687924": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-24T05:07:25.147234+00:00",
+      "lead_id": "lead_5a69fa111a43ae7f99c258d4b6687924",
+      "published_at": null,
+      "refs": {
+        "campaign_focus": "primary",
+        "campaign_topic": "pane3_tfln_platform",
+        "research_bundle_id": "alpha_gap_20260824",
+        "research_mode": "full",
+        "research_run": "user_go_2026-08-24"
+      },
+      "source": "official:hyperlight",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "HyperLight official TFLN Chiplet platform and high-volume foundry claim; map investable suppliers and customer qualification",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-24T05:08:56.659585+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "TFLN 平台的 foundry、元件與已 qualification 供應商若被確認，會新增或排除 Alpha 候選。"
+        },
+        "decided_at": "2026-08-24T05:08:09.256149+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "使用者核准 Pane 3 TFLN platform supplier discovery；HyperLight 官方平台頁提供具名技術與製造主張，需追 foundry、客戶 qualification 與可投資供應商",
+        "tier": 2
+      },
+      "url": "https://www.tflnchiplet.com/public/company"
+    },
     "lead_5a7da4330a7b4dcc3b2987af503b0ee8": {
       "entities": {
         "company_ids": [],
@@ -20530,6 +20567,51 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2089746797300432912"
     },
+    "lead_779f0a8c12033e604608e1a1ed0c1c93": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-24T05:07:26.067832+00:00",
+      "lead_id": "lead_779f0a8c12033e604608e1a1ed0c1c93",
+      "published_at": "2025-03-27",
+      "refs": {
+        "campaign_focus": "primary",
+        "campaign_topic": "pane3_wdm_laser_16ch",
+        "research_bundle_id": "alpha_gap_20260824",
+        "research_mode": "full",
+        "research_run": "user_go_2026-08-24"
+      },
+      "source": "official:pilot_photonics",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CPO"
+          ]
+        }
+      },
+      "title": "Pilot Photonics official 16-channel O-band laser array for CPO and optical IO; map suppliers and qualification",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-24T05:08:56.659585+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "16-channel WDM laser 的量產與客戶 qualification 供應商若被確認，會新增或排除 Alpha 候選。"
+        },
+        "decided_at": "2026-08-24T05:08:10.225634+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "使用者核准 Pane 3 16-channel WDM laser supplier discovery；Pilot Photonics 官方發布具名產品、規格與 CPO 用途，需追量產、客戶 qualification 與其他供應商",
+        "tier": 2
+      },
+      "url": "https://content.pilotphotonics.com/press-releases/pilot-photonics-joins-cw-wdm-msa-consortium-and-unveils-first-"
+    },
     "lead_77fcb309c1c680e74f05d7e23fc66b30": {
       "entities": {
         "company_ids": [
@@ -22522,6 +22604,12 @@
         "parked_reason": "existing_graph_plus_sibling_action_covers_material_atoms",
         "trace_attempts_ref": "Tower_MACOM_graph_evidence_and_IQE_official_2026-08-21_order",
         "trace_next_trigger": "IQE_reports_customer_name_material_or_revenue_conversion_for_14M_order",
+        "trace_requeue_consumed_entities": [
+          "CO:LUMENTUM",
+          "LITE"
+        ],
+        "trace_requeue_trigger": "related_triaged_lead:lead_97335b4438ca7effdd04ebfa259dd39e",
+        "trace_requeued_at": "2026-08-24T05:08:08.337843+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
@@ -22536,10 +22624,11 @@
           "co:macom",
           "co:tower_semiconductor"
         ],
+        "trace_trigger_event_ref": "lead:lead_97335b4438ca7effdd04ebfa259dd39e",
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -22552,22 +22641,39 @@
       },
       "title": "Feels like my $IQE thesis Feb this year got validated alongside $AXTI and others. (I still long on both) So I stopped covering them as much. But TLDR on updates: Early this year, IQE was a distressed but critical chokepoint in the optical supply chain with links to $LITE and others when I published my thesis on it. Since then: - $MTSI signed long term epiwafer supply agreements, took a stake in the company, now IQE is bank debt free (Macom has convertibles, but that's positive) - $TSEM signed agreements for InP epiwafers. - Management explicitly said its IQE agreement was signed to secure the \"strategic III-V epiwafer supply required for that roadmap\" - IQE signed another ~$14M mysterious AI DC contract. The only part that's still playing out with my earlier thesis is IQE converting their latent/underutilized capacity toward AI DC segment, to match peers like Landmark in the space (which takes time, like slightly over a year if I remember correctly). There's some national security implications that I'll avoid talking about that makes them more important. But basically: FY2025 revenue: £97.3m FY2026 guidance: over £126.5m They're rapidly growing again in the optical sector, out of bank debt/distressed liquidation state, and remains a critical chokepoint in Western optical supply chains. Now... with new agreements with your leading photonics companies for revenue growth, and players like Macom serving as a soft backstop. After a thesis gets validated, typically I just sit back and enjoy growth of a business.",
       "triage": {
-        "classification": {
-          "classified_at": "2026-08-21T16:05:59.208377+00:00",
-          "classified_by": "semantic_v1",
-          "content_type": "capital_commitment",
-          "decision_impact": "ranking",
-          "payment_direction": "customer_to_supplier",
-          "reason": "MACOM 簽長期磊晶供應並取得 IQE 股權——客戶投資供應商，四維度第 3 項的正向樣態"
-        },
-        "decided_at": "2026-08-13T22:36:35.681764+00:00",
+        "decided_at": "2026-08-24T05:08:08.337843+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true
         },
-        "reason": "貼文具名 IQE、MACOM、Tower 與 2025／2026 收入數字，可追回官方 agreement／filing，直接影響既有 IQE thesis",
+        "reason": "新 triage PASS lead lead_97335b4438ca7effdd04ebfa259dd39e 與 parked trace 共用具名標的 LITE, co:lumentum（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
         "tier": 4
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-24T05:08:08.337843+00:00",
+          "superseded_reason": "新 triage PASS lead lead_97335b4438ca7effdd04ebfa259dd39e 與 parked trace 共用具名標的 LITE, co:lumentum（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_97335b4438ca7effdd04ebfa259dd39e",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-08-21T16:05:59.208377+00:00",
+              "classified_by": "semantic_v1",
+              "content_type": "capital_commitment",
+              "decision_impact": "ranking",
+              "payment_direction": "customer_to_supplier",
+              "reason": "MACOM 簽長期磊晶供應並取得 IQE 股權——客戶投資供應商，四維度第 3 項的正向樣態"
+            },
+            "decided_at": "2026-08-13T22:36:35.681764+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true
+            },
+            "reason": "貼文具名 IQE、MACOM、Tower 與 2025／2026 收入數字，可追回官方 agreement／filing，直接影響既有 IQE thesis",
+            "tier": 4
+          }
+        }
+      ],
       "url": "https://x.com/aleabitoreddit/status/2087838176677376186"
     },
     "lead_80f63251f847cdfa862e9b4596b9f24c": {
@@ -25516,6 +25622,61 @@
         "tier": 3
       },
       "url": "https://news.futunn.com/en/post/59427787/zhongji-innolight-300308-company-event-commentary-report-gross-margin-increases"
+    },
+    "lead_97335b4438ca7effdd04ebfa259dd39e": {
+      "entities": {
+        "company_ids": [
+          "co:lumentum"
+        ],
+        "tickers": [
+          "LITE"
+        ]
+      },
+      "first_seen": "2026-08-24T05:07:24.255538+00:00",
+      "lead_id": "lead_97335b4438ca7effdd04ebfa259dd39e",
+      "published_at": null,
+      "refs": {
+        "campaign_focus": "primary",
+        "campaign_topic": "pane2_lite_uhp_laser",
+        "research_bundle_id": "alpha_gap_20260824",
+        "research_mode": "full",
+        "research_run": "user_go_2026-08-24"
+      },
+      "source": "official:lumentum",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CPO",
+            "LITE"
+          ]
+        }
+      },
+      "title": "$LITE official UHP laser source for CPO; verify customer-side sole-source, qualification, and capacity commitment",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-24T05:08:56.659585+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "ranking",
+          "reason": "LITE 的 UHP laser 是否獲客戶端 sole-source／qualification 支持，會改變既有候選排序，不會新增公司。"
+        },
+        "decided_at": "2026-08-24T05:08:08.337843+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "使用者核准 Pane 2 LITE UHP laser bounded research；官方產品頁可逐字核對規格，但 sole-source、客戶 qualification 與資本承諾仍須獨立追證",
+        "related_trace_requeues": [
+          "lead_80d545d4322502fe47d4fe9cb5c5dd1c",
+          "lead_c7498202abd0bdcd20c035dc615bcec2",
+          "lead_c91246f27ecce6763d075ed638d3f163"
+        ],
+        "tier": 2
+      },
+      "url": "https://www.lumentum.com/en/products/data-center/cw-lasers/uhp-lasers-cpo"
     },
     "lead_9764dccc195ed2f828b901eacabe0b2c": {
       "entities": {
@@ -31496,6 +31657,44 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2080032221638119603"
     },
+    "lead_beead1ef179740b936455bc4ec49e528": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-24T05:07:26.975771+00:00",
+      "lead_id": "lead_beead1ef179740b936455bc4ec49e528",
+      "published_at": "2025-07-15",
+      "refs": {
+        "campaign_focus": "primary",
+        "campaign_topic": "pane3_rare_earth_magnets",
+        "research_bundle_id": "alpha_gap_20260824",
+        "research_mode": "full",
+        "research_run": "user_go_2026-08-24"
+      },
+      "source": "official:mp_materials",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "MP Materials official $500M Apple long-term recycled rare-earth magnet agreement; map magnet bottleneck and investable suppliers",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-24T05:08:56.659585+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "capital_commitment",
+          "decision_impact": "candidate_set",
+          "payment_direction": "customer_to_supplier",
+          "reason": "Apple 對 MP Materials 的長期採購與 5 億美元合作若經交叉方確認，會把具客戶資本承諾的磁材供應商納入候選集合。"
+        },
+        "decided_at": "2026-08-24T05:08:11.178861+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "使用者核准 Pane 3 rare-earth magnets supplier discovery；MP Materials 官方公告具名 Apple 長約與產能擴張，需追交叉方、量產時點及競爭供應鏈",
+        "tier": 2
+      },
+      "url": "https://investors.mpmaterials.com/investor-news/news-details/2025/MP-Materials-and-Apple-Announce-500-Million-Partnership-to-Produce-Recycled-Rare-Earth-Magnets-in-the-United-States/default.aspx"
+    },
     "lead_c01e5a312817d1ae6c629b4005a773c3": {
       "entities": {
         "company_ids": [],
@@ -32311,6 +32510,12 @@
         "research_outcome": "partial_industry_shortage_no_sivers_graph_delta",
         "trace_attempts_ref": "Lumentum Q4 FY2026 transcript；MACOM Q3 transcript；既有 AAOI filing／transcript",
         "trace_next_trigger": "Sivers 客戶或 CPO integrator 具名確認 Sivers 為 qualified CW DFB volume supplier，或 Sivers filing 揭露付費量產",
+        "trace_requeue_consumed_entities": [
+          "CO:LUMENTUM",
+          "LITE"
+        ],
+        "trace_requeue_trigger": "related_triaged_lead:lead_97335b4438ca7effdd04ebfa259dd39e",
+        "trace_requeued_at": "2026-08-24T05:08:08.337843+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
@@ -32328,10 +32533,11 @@
           "co:macom",
           "co:sivers_semiconductors"
         ],
+        "trace_trigger_event_ref": "lead:lead_97335b4438ca7effdd04ebfa259dd39e",
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -32355,21 +32561,38 @@
       },
       "title": "So this is just what I'm seeing with $SIVE and the CW DFB laser chokepoint right now. From optical earnings: 1. $LITE: unexpected demand and imbalance for UHP CW lasers. - Had ability to price up ASP for lasers. - Scale up CPO on track for H2 2027 shipments, called out any CPO scale up delay rumors as noise. Lumentum confirmed timelines (that CPO players like Sivers sold off of misleading reports from), high margins, and extreme demand for qualified CW lasers. 2. $AAOI: doesn’t have enough CW laser capacity because of too much optical transceiver demand. - Not meaningfully participating in first-gen CPO deployments, with $MTSI not looking like they're in it either but focusing on NPO. Haven't seen much with $SMTC after their HieFo acqusition. - Called lasers as the bottleneck within a 20-40% demand imbalance for transceivers. - Says customers approaching them every week asking them for supply + to move faster. AOI confirmed demand imbalances + bottlenecks for lasers. And we got an even smaller pool for first-gen CPO players. 3. Both $AAOI and $LITE claimed Chinese players were years behind for CPO lasers and far behind stated claims in qualified capacity. - $AAOI said 2-3 years+ behind with CPO lasers. - $LITE said they haven't seen anything like Chinese claims in terms of outputs (and no recourse if it's false). Reaffirms moat for CPO related lasers, and no flooding from some shortseller claims on the optical sector. 4. $MTSI said that many customers are approaching them with urgency due to the general supply shortage of indium phosphide DFB lasers. Again, puts Sivers in the that bottleneck, giving them likely more customer demand . Among $COHR ($72.54B), $LITE ($66.57B), $AVGO ($2.13T): It's very special you get one of the public 4 Western CPO leaders at a ~$1.5B MC with $SIVE. Feels like my thesis with both: - The CW bottleneck that I predicted - CW laser chokepoint (where there's only a few CPO players, at least for gen-1) Got validated from earnings, now it's just waiting for the inflection points of next optical architecture shifts.",
       "triage": {
-        "classification": {
-          "classified_at": "2026-08-21T16:05:59.208377+00:00",
-          "classified_by": "semantic_v1",
-          "content_type": "structural_fact",
-          "decision_impact": "ranking",
-          "reason": "LITE／AAOI 法說指 CW DFB 雷射供需失衡與中國落後：強化既有 chokepoint 排序"
-        },
-        "decided_at": "2026-08-12T22:36:28.848843+00:00",
+        "decided_at": "2026-08-24T05:08:08.337843+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true
         },
-        "reason": "直接命中 Sivers／Lumentum／AAOI／MTSI 與 CPO、CW DFB、InP laser；包含供需缺口、產能、定價與 2027 時點等可追回各公司 earnings transcript 的具體 atoms。",
+        "reason": "新 triage PASS lead lead_97335b4438ca7effdd04ebfa259dd39e 與 parked trace 共用具名標的 LITE, co:lumentum（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
         "tier": 4
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-24T05:08:08.337843+00:00",
+          "superseded_reason": "新 triage PASS lead lead_97335b4438ca7effdd04ebfa259dd39e 與 parked trace 共用具名標的 LITE, co:lumentum（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_97335b4438ca7effdd04ebfa259dd39e",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-08-21T16:05:59.208377+00:00",
+              "classified_by": "semantic_v1",
+              "content_type": "structural_fact",
+              "decision_impact": "ranking",
+              "reason": "LITE／AAOI 法說指 CW DFB 雷射供需失衡與中國落後：強化既有 chokepoint 排序"
+            },
+            "decided_at": "2026-08-12T22:36:28.848843+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true
+            },
+            "reason": "直接命中 Sivers／Lumentum／AAOI／MTSI 與 CPO、CW DFB、InP laser；包含供需缺口、產能、定價與 2027 時點等可追回各公司 earnings transcript 的具體 atoms。",
+            "tier": 4
+          }
+        }
+      ],
       "url": "https://x.com/aleabitoreddit/status/2087447527595692180"
     },
     "lead_c79853952e8130f1c0d6680388d3b020": {
@@ -32726,8 +32949,12 @@
         "trace_next_trigger": "AXTI／Amazon 官方逐字稿、帶 timestamp webcast locator，或下一份 10-Q 出現相同 capacity／backlog／reservation 數字",
         "trace_origin_entity": "AXT Inc.／Amazon.com",
         "trace_origin_linkage": "AXTI 2026-07-30 SEC Exhibit 99.1 + Amazon 2026-Q2 official release; earnings-call-only assertions cross-checked against AP but no official text locator",
-        "trace_requeue_trigger": "related_triaged_lead:lead_7f66b743a034c41f6388aa800f333e62",
-        "trace_requeued_at": "2026-08-04T22:36:55.816839+00:00",
+        "trace_requeue_consumed_entities": [
+          "CO:LUMENTUM",
+          "LITE"
+        ],
+        "trace_requeue_trigger": "related_triaged_lead:lead_97335b4438ca7effdd04ebfa259dd39e",
+        "trace_requeued_at": "2026-08-24T05:08:08.337843+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
@@ -32746,11 +32973,11 @@
           "co:meta",
           "co:micron_technology"
         ],
-        "trace_trigger_event_ref": "lead:lead_7f66b743a034c41f6388aa800f333e62",
+        "trace_trigger_event_ref": "lead:lead_97335b4438ca7effdd04ebfa259dd39e",
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -32765,19 +32992,12 @@
       },
       "title": "Few earnings TLDRs with my favorite $AXTI and $AMZN: Amazon: - Raised 2026 capex to $220B vs. prior $200B (partly due to higher memory costs, which is bullish on $MU to Samsung) - Even at $220B, Amazon will not have enough capacity to meet all 2026 demand; Jassy expects the same in 2027. - Most incoming 2027 capacity is already reserved, with substantial 2028 capacity also reserved. Mostly read through on upstream semis. $GOOGL, $META, $AMZN, and $MSFT all identified compute shortage. All the narratives a few weeks earlier was \"excess compute\" from Meta and others + hyperscalers cutting back on spend... All BS. Amazon earnings was very bullish on AI semi trade. AXTI: - AXT to double InP capacity during 2026. Then double again in 2027. This is expected to make AXT \"by far the largest indium phosphide producer in the world.\" - LFG - Q2 rev was $47.6M, the highest quarterly revenue in AXT history (InP revenue reached a record $30.7M, from DC applications.) - Revenue increased 77% sequentially and 164% year over year. - InP revenue-capacity targets: $60M per quarter exiting 2026. - $130M per quarter exiting 2027 That $130m target could be hiked too since management stated they find \"whatever ways to increase that capacity expansion\" - Management said the reported backlog remains well above $100M, but that number no longer reflects all available demand. \"Customer demand continues to outpace supply, no matter how fast we add capacity.\" 800G/1.6T is driving the current cycle, while NPO/CPO extends it beyond 2027. Also they're targeting 50%-plus gross margin: \"We should definitely be targeting a number that begins with a five.\" China demand more than doubled, and their agreements with Casela, $COHR and $LITE did not materially drive Q2. This is not even considering my projected massive ASP hikes yet as InP substrates get more bottlenecked. TLDR: - Amazon too much compute demands, needs capex to fufill it, so upstream semis go brrr. - AXT world largest InP substrate supplier, high gross margins, expansion, and supply can't keep up with demand. Bullish on demand side from Amazon + capex. Bullish on upstream optical supply chains from too much demand.",
       "triage": {
-        "classification": {
-          "classified_at": "2026-08-21T16:05:59.208377+00:00",
-          "classified_by": "semantic_v1",
-          "content_type": "structural_fact",
-          "decision_impact": "ranking",
-          "reason": "AXT 倍增 InP 產能、backlog 逾 1 億美元：既有候選的結構強度"
-        },
-        "decided_at": "2026-08-04T22:36:55.816839+00:00",
+        "decided_at": "2026-08-24T05:08:08.337843+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true
         },
-        "reason": "新 triage PASS lead lead_7f66b743a034c41f6388aa800f333e62 與 parked trace 共用具名標的 LITE, co:lumentum；事件觸發 bounded pq1 重查",
+        "reason": "新 triage PASS lead lead_97335b4438ca7effdd04ebfa259dd39e 與 parked trace 共用具名標的 LITE, co:lumentum（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
         "tier": 4
       },
       "triage_history": [
@@ -32793,6 +33013,28 @@
               "novelty": true
             },
             "reason": "AXT／AXTI 為已追蹤標的，含 InP 產能、營收、backlog、毛利與 2026–2027 量產目標等具體可核對主張；需追回 AXTI 與 Amazon 一手法說。",
+            "tier": 4
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-24T05:08:08.337843+00:00",
+          "superseded_reason": "新 triage PASS lead lead_97335b4438ca7effdd04ebfa259dd39e 與 parked trace 共用具名標的 LITE, co:lumentum（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_97335b4438ca7effdd04ebfa259dd39e",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-08-21T16:05:59.208377+00:00",
+              "classified_by": "semantic_v1",
+              "content_type": "structural_fact",
+              "decision_impact": "ranking",
+              "reason": "AXT 倍增 InP 產能、backlog 逾 1 億美元：既有候選的結構強度"
+            },
+            "decided_at": "2026-08-04T22:36:55.816839+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true
+            },
+            "reason": "新 triage PASS lead lead_7f66b743a034c41f6388aa800f333e62 與 parked trace 共用具名標的 LITE, co:lumentum；事件觸發 bounded pq1 重查",
             "tier": 4
           }
         }
