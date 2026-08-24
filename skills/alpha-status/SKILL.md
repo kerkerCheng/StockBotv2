@@ -61,23 +61,18 @@ description: >
 跑 `python -m query.bottleneck`，取 `rows`（可行動排序：`evidence` 優先於
 `substitutability`，回答「現在能投什麼」）。再對前段候選補上四維度中排序**不包含**的第 4 項：
 
-```bash
-python - <<'PY'
-import sqlite3
-c=sqlite3.connect('library/private/engine_c/<見 library/private/runtime_pointer.json>')
-c.row_factory=sqlite3.Row
-cur=c.cursor()
-cur.execute("""select f.ticker,f.snapshot_date,f.price,f.shares_outstanding,f.pe_forward,
- f.ev_revenue,f.analyst_target_count from financial_snapshots f join
- (select ticker,max(snapshot_date) m from financial_snapshots group by ticker) x
- on f.ticker=x.ticker and f.snapshot_date=x.m""")
-for r in cur.fetchall(): print(dict(r))
-PY
+```powershell
+& '.venv\Scripts\python.exe' scripts\alpha_purity_snapshot.py --format markdown --tickers <Pane 1 前段候選 tickers>
 ```
 
-⚠ **市值要自己乘且注意報價單位**：`price × shares_outstanding` 得到的是**交易所報價單位**的
-市值。`.L` 是 GBp、`.ST` 是 SEK、`.T` 是 JPY——直接跨市場比較會差兩個數量級。
-正規化規則見 `identity/currency.py`＋`config/currency_units.json`。
+這是正式的唯讀 consumer：它從 active Engine C authority 讀最新 `financial_snapshots` 與
+`consensus_coverage_observations`，依 `identity/currency.py`＋`config/currency_units.json` 把 GBp 等
+minor quote unit 換回結算幣別後輸出市值。**本 skill 只轉述結果，不再自己乘。** 不同結算幣別
+沒有做 FX，仍不得直接當成同一尺度排序；`manual_required` 是未知，不得寫成 0。
+
+此入口屬 Daily 的 exact outside-sandbox rule。若回 `private_acl_verification_unavailable`，意思是目前
+執行環境無法執行 owner-only ACL 驗證、所以 fail closed，**不等於 ACL 不合格**；不得再以 ad-hoc
+SQL 繞過。真正的 `private_storage_boundary_rejected` 才是 storage boundary 拒絕。
 
 ### 四維度（`AGENTS.md` 為唯一權威，此處只是操作提示）
 

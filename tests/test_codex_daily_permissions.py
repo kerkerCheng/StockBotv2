@@ -15,10 +15,11 @@ def test_project_does_not_define_an_ignored_permission_profile() -> None:
 
 def test_all_privileged_daily_entries_have_narrow_outside_sandbox_rules() -> None:
     rules = RULES.read_text(encoding="utf-8")
-    assert rules.count("prefix_rule(") == 13
+    assert rules.count("prefix_rule(") == 14
     for fixed_entry in (
         "crons\\\\harvest_leads.py",
         "engine_c\\\\etl_yfinance.py",
+        "scripts\\\\alpha_purity_snapshot.py",
         "fetchers\\\\edgar.py",
         "scripts\\\\daily_beta_snapshot.py",
         '"-m", "engine_b.cli", "list"',

@@ -25,6 +25,7 @@ def test_references_batch_verbs_and_operational_commands() -> None:
         "crons\\harvest_leads.py",
         "engine_c\\etl_yfinance.py",
         "scripts\\daily_beta_snapshot.py",
+        "scripts\\alpha_purity_snapshot.py",
         "-m engine_b.cli",
         "-m engine_b.todo sync",
         "-m decision_lab today",
@@ -161,6 +162,7 @@ def test_daily_embeds_full_alpha_status_contract() -> None:
         "### Pane 4 — 部位與問責",
         "query.coverage_gaps",
         "scripts\\outcome_if_settled_today.py",
+        "scripts\\alpha_purity_snapshot.py",
         "不得因今天無新事件或 `NO ACTION` 而省略",
     ):
         assert token in text

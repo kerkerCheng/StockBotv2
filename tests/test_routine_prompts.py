@@ -20,6 +20,7 @@ def test_daily_prompt_uses_local_authorities_and_repo_venv() -> None:
         "engine_b.cli harvest-health",
         "engine_c\\etl_yfinance.py",
         "scripts\\daily_beta_snapshot.py",
+        "scripts\\alpha_purity_snapshot.py",
         "fetchers\\edgar.py",
         "engine_b.cli list",
         "engine_b.cli drain",

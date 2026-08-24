@@ -158,7 +158,7 @@ Sheet adapter 的標準輸出是 `ticker`、`shares`、`currency`、`market_valu
 
 Price／FX 預設 yfinance（無 API key）。非同幣 FX 缺失或方向不符一律 fail closed。
 
-Codex standalone scheduled task 會沿用 legacy `workspace-write` sandbox，因此 project permission profile 不作 Daily authority。唯一權限來源是 `.codex/rules/stockbot-automations.rules` 的十三個窄 fixed entry：harvest、Engine C ETL、SEC EDGAR pq1 fetch、Beta snapshot、pending priority list、pq1 drain、catalyst watch、Alpha outcome snapshot、Research Action prepare、decision today、todo sync、state publisher、Discord publisher，第一次呼叫就用 `require_escalated` 命中各自 exact outside-sandbox rule；不先失敗再升權重補跑，也不放行任意 Python、PowerShell、Git 或 working tree。修改 rules 後須重啟 Codex，讓下一個 task／排程載入新設定。
+Codex standalone scheduled task 會沿用 legacy `workspace-write` sandbox，因此 project permission profile 不作 Daily authority。唯一權限來源是 `.codex/rules/stockbot-automations.rules` 的十四個窄 fixed entry：harvest、Engine C ETL、Alpha purity snapshot、SEC EDGAR pq1 fetch、Beta snapshot、pending priority list、pq1 drain、catalyst watch、Alpha outcome snapshot、Research Action prepare、decision today、todo sync、state publisher、Discord publisher，第一次呼叫就用 `require_escalated` 命中各自 exact outside-sandbox rule；不先失敗再升權重補跑，也不放行任意 Python、PowerShell、Git 或 working tree。修改 rules 後須重啟 Codex，讓下一個 task／排程載入新設定。
 
 Research Action prepare 的固定入口是 `.venv\Scripts\python.exe scripts\prepare_research_action.py --action-file library\leads\action_drafts\<lead>.json`。draft 目錄已 ignore；CLI 只接受該目錄下的 JSON，重跑 server-side validation 並寫 private staging，不 apply、不寫 Neo4j。`engine_b.cli list --by-priority` 與 `drain` 在 default store 讀不到 Decision／Sheet／Neo4j context 時 exit 2，不再把持股 silently 降成空集合。
 

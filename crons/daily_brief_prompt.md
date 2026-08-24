@@ -23,9 +23,9 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
    `require_escalated` 命中 exact outside-sandbox rule，不得先在 sandbox 製造可預期失敗再升權重重跑，也不得放行整個 PowerShell、
    Python、Git 或 working tree。fixed entry 是 `crons\harvest_leads.py`、`engine_c\etl_yfinance.py`、
    `fetchers\edgar.py`、`scripts\daily_beta_snapshot.py`、`engine_b.cli list`、`engine_b.cli drain`、
-   `scripts\catalyst_watch.py`、`scripts\outcome_if_settled_today.py`、`scripts\prepare_research_action.py --action-file`、`decision_lab today`、
+   `scripts\catalyst_watch.py`、`scripts\alpha_purity_snapshot.py`、`scripts\outcome_if_settled_today.py`、`scripts\prepare_research_action.py --action-file`、`decision_lab today`、
    `engine_b.todo sync`、`scripts\publish_daily_state.py`、`scripts\publish_daily_brief.py`。
-   十三條 rule 是單一 authority，不是 primary＋fallback 兩套權限。若 exact rule 未匹配、升權限被拒或命令
+   十四條 rule 是單一 authority，不是 primary＋fallback 兩套權限。若 exact rule 未匹配、升權限被拒或命令
    仍回 `access_blocked`，保留 failure 並 fail closed，不得改用更寬 rule 或手動重跑。權限正確後若仍發生
    暫時性 transport error，只讓該命令既有的 bounded、idempotent retry 跑完作最後一步；不得在 routine
    層重跑整個 fixed entry、整份 Daily Brief 或已 checkpoint 的工作。retry 用盡後照樣 fail closed。
@@ -62,6 +62,7 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
    - `.venv\Scripts\python.exe -m decision_lab today --format markdown`
    - `.venv\Scripts\python.exe scripts\catalyst_watch.py`
    - `.venv\Scripts\python.exe -m query.bottleneck`（Alpha Pane 1／2；已可在 sandbox 讀本機 Neo4j，不需要 outside-sandbox rule）
+   - `.venv\Scripts\python.exe scripts\alpha_purity_snapshot.py --format markdown --tickers <Pane 1 前段候選 tickers>`（Alpha Pane 1 標的純度；固定 outside-sandbox 唯讀 consumer，正規化市值並讀 analyst_count；不寫 Engine C）
    - `.venv\Scripts\python.exe -m query.coverage_gaps`（Alpha Pane 3；區分真正 chokepoint 缺口與產品名詞）
    - `.venv\Scripts\python.exe scripts\outcome_if_settled_today.py`（Alpha Pane 4；唯讀真實 fill、最新已收盤價與報酬，不 close 或寫 authority）
    - `.venv\Scripts\python.exe -m engine_b.todo sync`

@@ -24,6 +24,9 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from thesis.lifecycle_schedule import is_due as lifecycle_is_due  # noqa: E402
+from storage.relational import (  # noqa: E402
+    PrivateStorageVerificationUnavailable,
+)
 
 try:
     from dotenv import load_dotenv
@@ -488,6 +491,17 @@ def run_local_audit(*, today: date | None = None) -> str:  # pragma: no cover - 
                 checklist_lines.append(f"- `{ticker}` 待補：{'、'.join(missing)}")
         report.extend(
             _section("財務核驗清單可跑性", "yellow" if checklist_lines else "green", checklist_lines)
+        )
+    except PrivateStorageVerificationUnavailable:
+        report.extend(
+            _section(
+                "Engine C",
+                "yellow",
+                [
+                    "- private root owner-only 驗證工具在目前執行環境不可用；"
+                    "本輪唯讀檢查 fail closed，但這不代表 ACL 不合格"
+                ],
+            )
         )
     except Exception as exc:
         report.extend(_section("Engine C", "red", [f"- 檢查失敗：{exc}"]))

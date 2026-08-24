@@ -8,7 +8,9 @@ from typing import cast
 import pytest
 
 from storage.relational import (
+    OwnerOnlyVerification,
     PrivateStorageError,
+    PrivateStorageVerificationUnavailable,
     _windows_owner,
     initialize_private_root,
     validate_private_destination,
@@ -120,9 +122,35 @@ def test_non_owner_only_existing_root_fails_closed(
     repo.mkdir()
     private_root = tmp_path / "private"
     private_root.mkdir()
-    monkeypatch.setattr("storage.relational.verify_owner_only", lambda _path: False)
+    monkeypatch.setattr(
+        "storage.relational.inspect_owner_only",
+        lambda _path: OwnerOnlyVerification("invalid", "broad_write_principal"),
+    )
 
     with pytest.raises(PrivateStorageError, match="owner-only"):
+        validate_private_destination(
+            private_root / "decision.db",
+            private_root=private_root,
+            repo_root=repo,
+        )
+
+
+def test_acl_tool_failure_is_not_reported_as_invalid_acl(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    private_root = tmp_path / "private"
+    private_root.mkdir()
+    monkeypatch.setattr(
+        "storage.relational.inspect_owner_only",
+        lambda _path: OwnerOnlyVerification("unavailable", "icacls_failed"),
+    )
+
+    with pytest.raises(
+        PrivateStorageVerificationUnavailable,
+        match="verification is unavailable",
+    ):
         validate_private_destination(
             private_root / "decision.db",
             private_root=private_root,

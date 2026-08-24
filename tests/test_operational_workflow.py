@@ -142,7 +142,12 @@ def test_partial_execution_metadata_captures_without_crash(tmp_path: Path) -> No
         assert frozen_identity["status"] == "resolved"
         assert frozen_identity["company_id"] == "co:broadcom"
         assert "identity_unresolved" not in result["blockers"]
-        assert "market_currency_missing" in frozen_identity["blockers"]
+        # AVGO 的 market currency 已由 identity registry 補齊；這個案例只應留下
+        # execution metadata 缺口，不再把已知的 USD 報價幣別凍結成 missing。
+        assert frozen_identity["market_currency"] == "USD"
+        assert "market_currency_missing" not in frozen_identity["blockers"]
+        assert "execution_currency_missing" in frozen_identity["blockers"]
+        assert "execution_venue_missing" in frozen_identity["blockers"]
 
         # 2026-08-13 行為變更：execution metadata 缺失只封鎖 **live**，不再連坐 paper。
         # 缺的是執行匯率、使用者 NAV 與投組槓桿——那是「能不能真的下單」需要的東西，

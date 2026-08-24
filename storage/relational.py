@@ -7,13 +7,26 @@ import sqlite3
 import stat
 import subprocess
 from contextlib import contextmanager
+from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
-from typing import Callable, Iterator, Sequence
+from typing import Callable, Iterator, Literal, Sequence
 
 
 class PrivateStorageError(RuntimeError):
     """A private runtime destination failed closed."""
+
+
+class PrivateStorageVerificationUnavailable(PrivateStorageError):
+    """The ACL could not be inspected, so private access failed closed."""
+
+
+@dataclass(frozen=True)
+class OwnerOnlyVerification:
+    """Tri-state result that does not confuse an unreadable ACL with a bad ACL."""
+
+    status: Literal["valid", "invalid", "unavailable"]
+    reason: str
 
 
 def _resolved(path: Path) -> Path:
@@ -120,8 +133,8 @@ def _set_owner_only(path: Path) -> None:
     path.chmod(0o700)
 
 
-def verify_owner_only(path: Path) -> bool:
-    """Return whether ``path`` has no broad write-capable principal.
+def inspect_owner_only(path: Path) -> OwnerOnlyVerification:
+    """Inspect ``path`` without collapsing tool failure into an invalid ACL.
 
     Codex on Windows runs under a managed sandbox identity while the workspace is
     owned by the interactive user.  The sandbox adds inherited local SIDs so a
@@ -132,23 +145,33 @@ def verify_owner_only(path: Path) -> bool:
     """
     path = _resolved(path)
     if not path.exists():
-        return False
+        return OwnerOnlyVerification("invalid", "path_missing")
     if os.name != "nt":
-        return stat.S_IMODE(path.stat().st_mode) & 0o077 == 0
+        try:
+            owner_only = stat.S_IMODE(path.stat().st_mode) & 0o077 == 0
+        except OSError:
+            return OwnerOnlyVerification("unavailable", "posix_stat_failed")
+        return OwnerOnlyVerification(
+            "valid" if owner_only else "invalid",
+            "owner_only" if owner_only else "broad_posix_mode",
+        )
 
-    sid = _current_windows_sid().lower()
-    account = _current_windows_account().lower()
     try:
+        sid = _current_windows_sid().lower()
+        account = _current_windows_account().lower()
         owner = _windows_owner(path).lower()
     except (OSError, subprocess.SubprocessError, PrivateStorageError):
-        return False
-    result = subprocess.run(
-        ["icacls", str(path)],
-        capture_output=True,
-        text=True,
-    )
+        return OwnerOnlyVerification("unavailable", "windows_identity_or_owner_failed")
+    try:
+        result = subprocess.run(
+            ["icacls", str(path)],
+            capture_output=True,
+            text=True,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return OwnerOnlyVerification("unavailable", "icacls_launch_failed")
     if result.returncode:
-        return False
+        return OwnerOnlyVerification("unavailable", "icacls_failed")
     acl_lines: list[str] = []
     for index, raw_line in enumerate(result.stdout.splitlines()):
         line = raw_line.strip()
@@ -159,7 +182,7 @@ def verify_owner_only(path: Path) -> bool:
         if line:
             acl_lines.append(line)
     if not acl_lines:
-        return False
+        return OwnerOnlyVerification("unavailable", "icacls_empty")
     broad_principals = {
         "everyone",
         "builtin\\users",
@@ -178,7 +201,7 @@ def verify_owner_only(path: Path) -> bool:
         if principal in broad_principals and any(
             right in upper for right in ("(F)", "(M)", "(W)")
         ):
-            return False
+            return OwnerOnlyVerification("invalid", "broad_write_principal")
         if principal in {
             account,
             sid,
@@ -198,8 +221,29 @@ def verify_owner_only(path: Path) -> bool:
             continue
         # Named principals not covered above may be another interactive user.
         if any(right in upper for right in ("(F)", "(M)", "(W)")):
-            return False
-    return has_authorized_principal
+            return OwnerOnlyVerification("invalid", "unknown_write_principal")
+    return OwnerOnlyVerification(
+        "valid" if has_authorized_principal else "invalid",
+        "owner_only" if has_authorized_principal else "no_authorized_principal",
+    )
+
+
+def verify_owner_only(path: Path) -> bool:
+    """Backward-compatible boolean wrapper around :func:`inspect_owner_only`."""
+
+    return inspect_owner_only(path).status == "valid"
+
+
+def _require_owner_only(path: Path, *, existing: bool) -> None:
+    verification = inspect_owner_only(path)
+    if verification.status == "valid":
+        return
+    if verification.status == "unavailable":
+        raise PrivateStorageVerificationUnavailable(
+            "private root owner-only verification is unavailable; access failed closed"
+        )
+    prefix = "existing " if existing else ""
+    raise PrivateStorageError(f"{prefix}private root is not owner-only")
 
 
 def _default_public_roots() -> tuple[Path, ...]:
@@ -263,13 +307,19 @@ def initialize_private_root(
     existed = private_root.exists()
     if existed and not private_root.is_dir():
         raise PrivateStorageError("private root must be a directory")
-    if existed and not verify_owner_only(private_root):
-        raise PrivateStorageError("existing private root is not owner-only")
+    if existed:
+        _require_owner_only(private_root, existing=True)
     if not existed:
         private_root.mkdir(parents=True, exist_ok=False)
         _set_owner_only(private_root)
-        if not verify_owner_only(private_root):
-            raise PrivateStorageError("failed to establish owner-only private root")
+        try:
+            _require_owner_only(private_root, existing=False)
+        except PrivateStorageError as exc:
+            if isinstance(exc, PrivateStorageVerificationUnavailable):
+                raise
+            raise PrivateStorageError(
+                "failed to establish owner-only private root"
+            ) from exc
     return private_root
 
 
@@ -289,8 +339,7 @@ def validate_private_destination(
         repo_root=repo_root,
         public_roots=public,
     )
-    if not verify_owner_only(private_root):
-        raise PrivateStorageError("private root is not owner-only")
+    _require_owner_only(private_root, existing=False)
     return _resolved(destination)
 
 

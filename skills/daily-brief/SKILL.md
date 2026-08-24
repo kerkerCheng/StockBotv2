@@ -63,10 +63,11 @@ outside-sandbox rule**，
 不是先製造可預期的 `access_blocked` 再以升權重重跑；不得放行整個 PowerShell、Python、Git 或 working tree。
 fixed entry 包含
 `crons\harvest_leads.py`、`engine_c\etl_yfinance.py`、`fetchers\edgar.py`、
+`scripts\alpha_purity_snapshot.py`、
 `scripts\daily_beta_snapshot.py`、`engine_b.cli list`、`engine_b.cli drain`、
 `scripts\catalyst_watch.py`、`scripts\outcome_if_settled_today.py`、`scripts\prepare_research_action.py --action-file`、
 `decision_lab today`、`engine_b.todo sync`、`scripts\publish_daily_state.py` 與
-`scripts\publish_daily_brief.py`；十三條 rule 就是單一 authority，不是 primary＋fallback 兩套來源。
+`scripts\publish_daily_brief.py`；十四條 rule 就是單一 authority，不是 primary＋fallback 兩套來源。
 `query.bottleneck`、`query.coverage_gaps`、harvest health、trace backlog、todo list 與 JSON 檢查已可留在 sandbox；使用者核准後的
 apply／reassess／complete-ra／commit intake 不加入 unattended rule，仍走 type-aware 人工 gate。
 若 exact rule 未匹配、升權限被拒或命令仍出現 `access_blocked`，保留結構化 failure、讓受影響資料 fail closed，
@@ -250,13 +251,15 @@ prepared RA」（通常為否）。`original_obtained` 也要說明「已取得�
 & '.venv\Scripts\python.exe' -m decision_lab today --format markdown
 & '.venv\Scripts\python.exe' scripts\catalyst_watch.py
 & '.venv\Scripts\python.exe' -m query.bottleneck
+& '.venv\Scripts\python.exe' scripts\alpha_purity_snapshot.py --format markdown --tickers <Pane 1 前段候選 tickers>
 & '.venv\Scripts\python.exe' -m query.coverage_gaps
 & '.venv\Scripts\python.exe' scripts\outcome_if_settled_today.py
 ```
 
 第三支是 alpha-status Pane 1／2 的共同 authority：Pane 1 是**買進側**，與第二支的賣出側對稱；
-Pane 2 顯示純結構排序與最值得補證據的標的。第四支提供 Pane 3 的既有 chokepoint coverage gaps；
-第五支與第一支的 `decision_lab today` 共同提供 Pane 4 的計數器、真實 fill 與 point-in-time 報酬。
+Pane 2 顯示純結構排序與最值得補證據的標的。第四支只讀 Engine C，提供 Pane 1 的正規化市值與
+`analyst_count`，不寫 authority；第五支提供 Pane 3 的既有 chokepoint coverage gaps；
+第六支與第一支的 `decision_lab today` 共同提供 Pane 4 的計數器、真實 fill 與 point-in-time 報酬。
 它們合起來回答——
 「哪個公司佔據了瓶頸、且是市場資金關注的部分」——輸出即
 `## Alpha 現況（完整四 pane）`，不另建平行排序或重算數字。
@@ -269,7 +272,9 @@ Pane 2 顯示純結構排序與最值得補證據的標的。第四支提供 Pan
 
 `bottleneck` 的表格直接給出四維度中的前兩項（替代難度／`sole_source`＝瓶頸地位；
 需求錨點與距需求端跳數＝資金是否在那條鏈上）。**第 3 項（誰付錢給誰）與第 4 項
-（市值／`analyst_count`）不在排序內，必須另看** ——見 alpha-status pane 1。
+（市值／`analyst_count`）不在排序內，必須另看** ——固定消費端是
+`scripts\alpha_purity_snapshot.py`，呈現規則見 alpha-status pane 1。若它回
+`private_acl_verification_unavailable`，只能說 ACL 驗證工具不可用且本輪 fail closed，不得寫成 ACL 不合格。
 ⚠ **2026-08-19 之前這支從未進入 daily 流程**：`rank_bottlenecks()` 早就把 COHR→NVIDIA
 （5/5 sole_source、外部印證、距需求端 2 跳）排在第 1，但 brief 沒有消費端，使用者看不到，
 於是 agent 被問「推薦哪一檔」時只能答「無法推薦」。這是 L13「管子只接了一頭」的實例。

@@ -81,7 +81,8 @@
     },
     {
       "company_id": "co:broadcom",
-      "research_ticker": "AVGO"
+      "research_ticker": "AVGO",
+      "market_currency": "USD"
     },
     {
       "company_id": "co:cadence",
@@ -296,7 +297,8 @@
     },
     {
       "company_id": "co:poet_technologies",
-      "research_ticker": "POET"
+      "research_ticker": "POET",
+      "market_currency": "USD"
     },
     {
       "company_id": "co:samsung",
