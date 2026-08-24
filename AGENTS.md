@@ -15,6 +15,13 @@
 - 本機開發 agent 可以是 Claude Code 或 Codex；架構中明指 `claude.ai` custom connector 的遠端流程仍維持 Claude，不因本機開發工具切換而改名。
 - **Push 政策（2026-07-22 使用者定案）：** push 是常規動作——session 收尾（邏輯 commits 完成後）把 master push 到 origin，不需逐次人工確認。私有隔離依 `.gitignore`（`library/private/`、`.env`）；push 前 sanity check：`git ls-files library/private` 應為空。本機 daily scheduled task 只可經 `scripts/publish_daily_state.py` 發布 `pending_leads.json`＋`todo_pool.json`；不得用 unattended 廣泛 Git 命令碰其他檔。
 
+### Codex sandbox／private authority 整合契約（2026-08-25 使用者定案）
+
+- **`workspace-write` 是路徑邊界，不是「repo 內所有 OS 能力都可用」。** 一般 repo 檔案可在 sandbox 內讀寫；但命令即使只碰 repo 內路徑，只要還會呼叫 Windows identity／ACL（`whoami`、`Get-Acl`、`icacls`）、credential store、網路、child shell、`.git`，或 permission profile 對該子路徑有更窄限制，仍可能需要 outside-sandbox exact rule。`library/private/` 雖在 repo 內，開啟 authority 前會驗 owner-only ACL，所以屬 capability-sensitive path。
+- **任何 unattended routine 的 executable surface 變更都要做 sandbox impact review。** Daily、Weekly、todo 核准、publisher 或其他排程只要新增／改名 CLI、subcommand、參數前綴，或讓原命令開始讀寫 private authority／網路／OS security API，必須在**同一個 change**完成：①列出 path＋side effect＋OS/network capability；②更新 canonical skill／prompt 與 `docs/OPERATIONS.md`；③需要越界時新增最窄 `.codex/rules/*.rules` exact prefix；④更新 permission contract test，明確斷言允許項與禁止的相鄰動詞；⑤用 scheduled task 的相同 sandbox／exact command 跑一次端到端 smoke test。不能因目標檔「在 repo 裡」就省略這份 review。
+- **排錯先看 command surface，再碰 ACL 或要求重啟。** `PrivateStorageVerificationUnavailable` 表示目前執行環境無法完成驗證，不等於 ACL invalid。固定順序是：確認 exact CLI／subcommand → 查它是否出現在 rules → 比對 sandbox 內外的 verification status → 只有 status=`invalid` 才修 ACL。重啟只會重新載入**已存在**的 rule，不能補上一條根本沒寫的 rule；rule 缺漏時不得把重啟當修復。
+- **不得用 broad permission 掩蓋整合缺口。** 不放行整個 Python、PowerShell、Git、`engine_b.todo` 或 working tree；只放行能由既有人工 gate、action type 與 receipt 約束的最窄 command prefix。若無法把副作用縮到可安全 allowlist 的入口，就保留互動 approval，不加入 unattended rule。
+
 ### Codex custom-agent 委派契約（2026-08-01 使用者定案）
 
 - 專案級 `.codex/agents/luna-operator.toml` 定義 `luna_operator`：使用 `gpt-5.6-luna`／`max`／`read-only`，只接明確、重複、可逐項驗收的機械型工作。`ultra` 經 2026-08-01 實際 spawn 驗證不受 Luna runtime 支援；`max` 是目前最高可用 effort。主代理負責拆 scope、列 acceptance criteria、檢查回傳證據，並作最後判斷。

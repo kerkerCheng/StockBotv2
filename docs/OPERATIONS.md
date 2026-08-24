@@ -158,7 +158,19 @@ Sheet adapter 的標準輸出是 `ticker`、`shares`、`currency`、`market_valu
 
 Price／FX 預設 yfinance（無 API key）。非同幣 FX 缺失或方向不符一律 fail closed。
 
-Codex standalone scheduled task 會沿用 legacy `workspace-write` sandbox，因此 project permission profile 不作 Daily authority。唯一權限來源是 `.codex/rules/stockbot-automations.rules` 的十五個窄 fixed entry：harvest、Engine C ETL、Alpha purity snapshot、SEC EDGAR pq1 fetch、Beta snapshot、pending priority list、pq1 drain、catalyst watch、Alpha outcome snapshot、Research Action prepare、decision today、todo sync、已核准 work order checkpoint、state publisher、Discord publisher，第一次呼叫就用 `require_escalated` 命中各自 exact outside-sandbox rule；不先失敗再升權重補跑，也不放行任意 Python、PowerShell、Git 或 working tree。`engine_b.todo work` 只可推進已有 `dispatch_ref` 的 USER-GO work order，不授權 dispatch／resolve／reassess。修改 rules 後須重啟 Codex，讓下一個 task／排程載入新設定。
+Codex standalone scheduled task 會沿用 legacy `workspace-write` sandbox，因此 project permission profile 不作 Daily authority。唯一權限來源是 `.codex/rules/stockbot-automations.rules` 的十五個窄 fixed entry：harvest、Engine C ETL、Alpha purity snapshot、SEC EDGAR pq1 fetch、Beta snapshot、pending priority list、pq1 drain、catalyst watch、Alpha outcome snapshot、Research Action prepare、decision today、todo sync、已核准 work order checkpoint、state publisher、Discord publisher，第一次呼叫就用 `require_escalated` 命中各自 exact outside-sandbox rule；不先失敗再升權重補跑，也不放行任意 Python、PowerShell、Git 或 working tree。`engine_b.todo work` 只可推進已有 `dispatch_ref` 的 USER-GO work order，不授權 dispatch／resolve／reassess。修改 rules 後須讓 Codex 重新載入設定；但在要求重啟前先確認 exact rule **確實存在**，因為重啟不能修復漏寫的 rule。
+
+### Sandbox／private authority 排錯
+
+`workspace-write` 只保證普通 workspace path 操作；它不自動授予 Windows ACL inspection、credential、network、child process 或 `.git` 能力。`library/private/` 是 repo 內的 ignored enclave，但 `storage.relational.initialize_private_root()`／`validate_private_destination()` 會先執行 owner-only 驗證，因此開啟 Decision Store／Engine C／notification outbox 仍可能跨 capability boundary。
+
+遇到 `PrivateStorageVerificationUnavailable`／`access_blocked` 時依序檢查：
+
+1. 記下完整 interpreter、module／script、subcommand 與參數前綴；不可只寫「Python 被擋」。
+2. 用 `rg` 在 `.codex/rules/`、canonical skill 與 cron prompt 查同一個 exact command；skill 有命令而 rules 沒有，就是 integration gap。
+3. 區分 `verification.status=unavailable` 與 `invalid`：前者先查 sandbox capability，後者才代表 ACL 判準沒通過。
+4. 新增或改名 unattended command 時，同一 commit 更新 rule、skill／prompt、本文與 permission test；測試要同時斷言相鄰高權限動詞仍未放行。
+5. 用 scheduled task 相同的 `workspace-write`＋首次 `require_escalated` exact command 做 smoke test。只有 rule 已存在但載入版本仍舊時才需要重啟。
 
 Research Action prepare 的固定入口是 `.venv\Scripts\python.exe scripts\prepare_research_action.py --action-file library\leads\action_drafts\<lead>.json`。draft 目錄已 ignore；CLI 只接受該目錄下的 JSON，重跑 server-side validation 並寫 private staging，不 apply、不寫 Neo4j。`engine_b.cli list --by-priority` 與 `drain` 在 default store 讀不到 Decision／Sheet／Neo4j context 時 exit 2，不再把持股 silently 降成空集合。
 
