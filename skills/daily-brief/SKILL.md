@@ -66,8 +66,10 @@ fixed entry 包含
 `scripts\alpha_purity_snapshot.py`、
 `scripts\daily_beta_snapshot.py`、`engine_b.cli list`、`engine_b.cli drain`、
 `scripts\catalyst_watch.py`、`scripts\outcome_if_settled_today.py`、`scripts\prepare_research_action.py --action-file`、
-`decision_lab today`、`engine_b.todo sync`、`scripts\publish_daily_state.py` 與
-`scripts\publish_daily_brief.py`；十四條 rule 就是單一 authority，不是 primary＋fallback 兩套來源。
+`decision_lab today`、`engine_b.todo sync`、`engine_b.todo work`、`scripts\publish_daily_state.py` 與
+`scripts\publish_daily_brief.py`；十五條 rule 就是單一 authority，不是 primary＋fallback 兩套來源。
+`engine_b.todo work` 只 checkpoint 已由使用者 exact `go` 且已有 `dispatch_ref` 的 decision-review work order；
+它不授權 `dispatch`／`resolve`／`reassess`，也不放寬 graph admission 或 live gate。
 `query.bottleneck`、`query.coverage_gaps`、harvest health、trace backlog、todo list 與 JSON 檢查已可留在 sandbox；使用者核准後的
 apply／reassess／complete-ra／commit intake 不加入 unattended rule，仍走 type-aware 人工 gate。
 若 exact rule 未匹配、升權限被拒或命令仍出現 `access_blocked`，保留結構化 failure、讓受影響資料 fail closed，

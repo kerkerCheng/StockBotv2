@@ -24,8 +24,10 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
    Python、Git 或 working tree。fixed entry 是 `crons\harvest_leads.py`、`engine_c\etl_yfinance.py`、
    `fetchers\edgar.py`、`scripts\daily_beta_snapshot.py`、`engine_b.cli list`、`engine_b.cli drain`、
    `scripts\catalyst_watch.py`、`scripts\alpha_purity_snapshot.py`、`scripts\outcome_if_settled_today.py`、`scripts\prepare_research_action.py --action-file`、`decision_lab today`、
-   `engine_b.todo sync`、`scripts\publish_daily_state.py`、`scripts\publish_daily_brief.py`。
-   十四條 rule 是單一 authority，不是 primary＋fallback 兩套權限。若 exact rule 未匹配、升權限被拒或命令
+   `engine_b.todo sync`、`engine_b.todo work`、`scripts\publish_daily_state.py`、`scripts\publish_daily_brief.py`。
+   十五條 rule 是單一 authority，不是 primary＋fallback 兩套權限。`engine_b.todo work` 只 checkpoint 已由使用者
+   exact `go` 且已有 `dispatch_ref` 的 decision-review work order；不得用它代替 `dispatch`／`resolve`／`reassess`。
+   若 exact rule 未匹配、升權限被拒或命令
    仍回 `access_blocked`，保留 failure 並 fail closed，不得改用更寬 rule 或手動重跑。權限正確後若仍發生
    暫時性 transport error，只讓該命令既有的 bounded、idempotent retry 跑完作最後一步；不得在 routine
    層重跑整個 fixed entry、整份 Daily Brief 或已 checkpoint 的工作。retry 用盡後照樣 fail closed。
@@ -86,7 +88,9 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
    `$lead-intake`／`$source-trace`。
 5. 先組出不會因研究失敗而消失的心跳 snapshot，再 best-effort 執行
    `.venv\Scripts\python.exe -m engine_b.cli drain`（首次呼叫命中 exact rule）。每輪上限由 `config/daily_routine.json` 控制；
-   使用者已 `go` 且有 dispatch receipt 的 Decision gap work order 優先，再以剩餘 budget 處理 leads；
+   使用者已 `go` 且有 dispatch receipt 的 Decision gap work order 優先；對選中的 work order，第一次 checkpoint
+   `researching` 就以 `require_escalated` 呼叫 exact `.venv\Scripts\python.exe -m engine_b.todo work ...` rule，
+   不得先在 sandbox 製造 owner-only verification failure，再以剩餘 budget 處理 leads；
    tracked tickers 由非 retired lifecycle 與 non-terminal Decision cohorts 自動導出。對最高 priority leads 逐則
    source-trace＋extract，checkpoint `researching` → `action_prepared`。SEC 原文需要 repo fetcher 時使用
    `.venv\Scripts\python.exe fetchers\edgar.py ...` 的 exact rule；一般公開頁仍可使用 WebSearch／Browser surface。

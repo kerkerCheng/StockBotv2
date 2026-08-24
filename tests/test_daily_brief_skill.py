@@ -28,6 +28,7 @@ def test_references_batch_verbs_and_operational_commands() -> None:
         "scripts\\alpha_purity_snapshot.py",
         "-m engine_b.cli",
         "-m engine_b.todo sync",
+        "-m engine_b.todo work",
         "-m decision_lab today",
         "drain",  # pq1 priority drain
     ):
@@ -149,6 +150,8 @@ def test_decision_review_go_dispatches_gap_pq1_before_reassess() -> None:
     assert "不得立刻拿舊" in text and "bare reassess" in text
     assert "--to awaiting_approval" in text or "awaiting_approval" in text
     assert "decision:<new_decision_id>" in text
+    assert "只 checkpoint 已由使用者 exact `go`" in text
+    assert "不授權 `dispatch`／`resolve`／`reassess`" in text
 
 
 def test_daily_embeds_full_alpha_status_contract() -> None:

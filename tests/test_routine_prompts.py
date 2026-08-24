@@ -29,6 +29,7 @@ def test_daily_prompt_uses_local_authorities_and_repo_venv() -> None:
         "scripts\\prepare_research_action.py",
         "decision_lab today",
         "engine_b.todo sync",
+        "engine_b.todo work",
         "scripts\\publish_daily_state.py",
         "query.coverage_gaps",
     ):
@@ -45,6 +46,8 @@ def test_daily_prompt_uses_fixed_entries_on_first_call_and_never_replays_permiss
     assert "bounded、idempotent retry 跑完作最後一步" in text
     assert "不得在 routine" in text and "整份 Daily Brief" in text
     assert "不得改用更寬 rule 或手動重跑" in text
+    assert "已有 `dispatch_ref`" in text
+    assert "不得用它代替 `dispatch`／`resolve`／`reassess`" in text
 
 
 def test_daily_prompt_keeps_human_gates_and_batch_contract() -> None:
