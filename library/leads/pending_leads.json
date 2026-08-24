@@ -7136,12 +7136,17 @@
       "refs": {
         "campaign_focus": "primary",
         "campaign_topic": "pane3_glass_substrate",
+        "parked_reason": "trace: 取得 Intel newsroom 原文（2026-07-24），但內容為 MOU 級意向（intend to explore opportunities / will explore potential areas of cooperation），無供應品項、無金額、無時程、無 sole/first supplier 宣稱。依『寧可 park，不可污染圖』不建供應邊。",
         "research_bundle_id": "alpha_gap_round2_20260824",
         "research_mode": "full",
-        "research_run": "user_go_2026-08-24_round2"
+        "research_run": "user_go_2026-08-24_round2",
+        "trace_attempts_ref": "newsroom.intel.com/new-technologies/intel-and-lens-technology-collaborate-to-enable-advanced-semiconductor-packaging-for-the-ai-era",
+        "trace_next_trigger": "Intel 或藍思科技公告 definitive agreement、具體玻璃基板品項或量產時程",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
       },
       "source": "official:intel",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "Intel and Lens Technology official glass-substrate advanced-packaging collaboration; map investable supplier set",
       "triage": {
@@ -16828,12 +16833,17 @@
       "refs": {
         "campaign_focus": "primary",
         "campaign_topic": "pane3_tfln_platform",
+        "parked_reason": "trace: 取得官網逐字（TFLN photonic integrated circuits、專利 TFLN Chiplet 平台）。但 tier-1 fabs and OSAT partners 未具名（類別詞，依 L6 不可推出具名節點）；無客戶、無認證狀態、無資金數字、未載明公私。HyperLight 為未上市公司，本身不可投資，且無具名交叉方可建邊。",
         "research_bundle_id": "alpha_gap_20260824",
         "research_mode": "full",
-        "research_run": "user_go_2026-08-24"
+        "research_run": "user_go_2026-08-24",
+        "trace_attempts_ref": "tflnchiplet.com/public/company",
+        "trace_next_trigger": "上市公司（COHR/LITE/AVGO 等）文件點名 HyperLight 為 TFLN 供應商，或 HyperLight 公告具名 foundry／IPO／募資輪",
+        "trace_requires_user": "false",
+        "trace_status": "partial"
       },
       "source": "official:hyperlight",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "HyperLight official TFLN Chiplet platform and high-volume foundry claim; map investable suppliers and customer qualification",
       "triage": {
@@ -20639,12 +20649,17 @@
       "refs": {
         "campaign_focus": "primary",
         "campaign_topic": "pane3_wdm_laser_16ch",
+        "parked_reason": "trace: 取得 PR 逐字（16-channel O-band laser array chip、200 GHz spaced、加入 CW-WDM MSA；nano-iTLA now sampling to customers）。但 PR 日期為 2025-03-27，距今約 17 個月已陳舊；無具名客戶、無其他 MSA 成員、無量產時程。Pilot Photonics 為愛爾蘭未上市公司，本身不可投資。",
         "research_bundle_id": "alpha_gap_20260824",
         "research_mode": "full",
-        "research_run": "user_go_2026-08-24"
+        "research_run": "user_go_2026-08-24",
+        "trace_attempts_ref": "content.pilotphotonics.com/press-releases/pilot-photonics-joins-cw-wdm-msa-consortium-and-unveils-first-",
+        "trace_next_trigger": "上市 transceiver／CPO 廠點名 Pilot Photonics 為光源供應商，或 Pilot 公告 ELSFP 量產／被併購",
+        "trace_requires_user": "false",
+        "trace_status": "partial"
       },
       "source": "official:pilot_photonics",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -31729,12 +31744,20 @@
       "refs": {
         "campaign_focus": "primary",
         "campaign_topic": "pane3_rare_earth_magnets",
+        "gap": "registry 缺 co:mp_materials 與 co:general_motors（76 家中僅有 co:apple）；需先 company-onboard 才能 prepare RA。另 10-K 提及 Cessation of Shipments to China 與 DoW 公私夥伴（Series A convertible preferred），尚未追。",
+        "original_claim_status": "corrected: 線索沿用 PR 的 500M 框架，但 10-K 逐字為 Apple agreed to make prepayments in the aggregate amount of 200.0 million for the purchase of magnets。10-K 中 500.0 million 僅出現 3 次且全屬 Credit Agreement 流動性 covenant，與 Apple 無關。依 L11（自己引用的事實要套同一套追源紀律；金額與金融工具措辭本身即是 claim）不得沿用二手框架。",
+        "outcome": "客戶端資本承諾成立且為現金預付：Apple made an initial prepayment of 40.0 million in September 2025；December 2025 became entitled to an additional 32.0 million；As of December 31, 2025 classified the 72.0 million from Apple as non-current deferred revenue；had not yet recognized any revenue under this arrangement。另一客戶 GM 預付合計 150.0 million（已交付 66.9M，餘 83.1M 預計 2026 至 2027H1 完成）。結構：definitive, long-term supply agreement，磁鐵產自 Independence Facility (Fort Worth)，Mountain Pass 建商業規模回收線，shipments expected to begin in 2027，subject to achieving specified milestones。無 exclusivity／take-or-pay 字樣。",
+        "primary_url": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001801368&type=10-K (MP Materials FY2025 10-K, filed 2026-02-26)",
         "research_bundle_id": "alpha_gap_20260824",
         "research_mode": "full",
-        "research_run": "user_go_2026-08-24"
+        "research_outcome": "pq1 追源完成，未 prepare RA：需新公司 onboarding，屬 pq2 authority mutation。",
+        "research_run": "user_go_2026-08-24",
+        "trace_origin_entity": "MP Materials Corp (issuer, audited 10-K)",
+        "trace_original_date": "2026-02-26",
+        "trace_status": "original_obtained"
       },
       "source": "official:mp_materials",
-      "status": "triaged_go",
+      "status": "researching",
       "themes": {},
       "title": "MP Materials official $500M Apple long-term recycled rare-earth magnet agreement; map magnet bottleneck and investable suppliers",
       "triage": {
@@ -31946,12 +31969,20 @@
       "refs": {
         "campaign_focus": "primary",
         "campaign_topic": "pane2_axti_customer_commitment",
+        "gap": "重大反證：InP 需求成長但無法變現到美國需求錨點。逐字 — Although demand for InP wafers increased in 2025, revenue declined because of the export permit requirements announced by China on February 4, 2025；InP export permits represent the most significant challenge we currently face；We are unable to estimate when we will receive the necessary export permits to resume shipping our indium phosphide substrates to the U.S.。北美營收占比 2024 約 8% → 2025 約 2%。GaAs 對美出口至今零許可（no permits for the export of gallium arsenide to the U.S. have yet been approved）。這直接衝擊 AXTI 作為 COHR/LITE 上游 InP 基板瓶頸候選的可投資性——結構瓶頸為真，但供給路徑被監管切斷。",
+        "original_claim_status": "supported_with_material_counter_evidence",
+        "outcome": "財務核驗（Engine C 待寫入）：客戶集中度 = No customer represented more than 10% of our revenue for the years ended December 31, 2025, 2024 and 2023；Our top five customers represented 29% of our revenue for the year 2025, 30% for 2024 and 25% for 2023。營收 88.4M（-11.0M / -11.1% vs 2024 的 99.4M）。毛利率 12.7%（2024: 24.0%、2023: 17.6%）。應收帳款 One customer accounted for more than 10% as of December 31, 2025 and 2024。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1051627/000143774926008612/axti20251231_10k.htm",
         "research_bundle_id": "alpha_gap_round2_20260824",
         "research_mode": "full",
-        "research_run": "user_go_2026-08-24_round2"
+        "research_outcome": "pq1 追源完成。財務五項中的客戶集中度與毛利率已取得一手逐字，需 Engine C manual observation（pq2）；反證需回 alpha 排序與 thesis 層複查。無新 graph node/edge 提案。",
+        "research_run": "user_go_2026-08-24_round2",
+        "trace_origin_entity": "AXT Inc (issuer, audited 10-K)",
+        "trace_original_date": "2026-03-17",
+        "trace_status": "original_obtained"
       },
       "source": "official:sec_edgar",
-      "status": "triaged_go",
+      "status": "researching",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -38187,12 +38218,21 @@
       "refs": {
         "campaign_focus": "primary",
         "campaign_topic": "pane3_cxl_memory_tiering",
+        "parked_reason": "trace: 取得官方產品頁逐字（Leo A1000 / CM5082E / CM5162E / CM5162P，支援 5th Gen AMD EPYC 與 Intel Xeon Scalable，up to 2TB）。但投資關鍵原子全部未被支持：無具名客戶／hyperscaler、無競爭供應商、無產能數字，僅有 stress tested with all major xPUs 的泛稱。無客戶端資本承諾即不構成瓶頸證據。Record quarterly revenue 392.4M 屬 Engine C 時變觀測，不進圖。",
         "research_bundle_id": "alpha_gap_round2_20260824",
         "research_mode": "full",
-        "research_run": "user_go_2026-08-24_round2"
+        "research_run": "user_go_2026-08-24_round2",
+        "trace_attempts_ref": "asteralabs.com/products/leo-cxl-smart-memory-controllers/",
+        "trace_next_trigger": "ALAB 10-K/10-Q 客戶集中度揭露，或 hyperscaler／OEM 客戶端文件點名 Leo 採用",
+        "trace_requires_user": "false",
+        "trace_status": "partial",
+        "trace_trigger_entities": [
+          "ALAB"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
       },
       "source": "official:astera_labs",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "$ALAB Leo CXL smart memory controllers for AI memory expansion and pooling; verify customer adoption and competing suppliers",
       "triage": {
@@ -40835,12 +40875,21 @@
       "refs": {
         "campaign_focus": "primary",
         "campaign_topic": "pane3_power_gan",
+        "parked_reason": "trace: 取得 issuer PR 逐字（GlobeNewswire 2026-06-03）。實質內容僅為 participate in NVIDIA Partner Ceremony（2026-05-29）＋COMPUTEX 2026 showcase 展示 800V-to-6V PDB（16x GaNFast FET 650V/11mOhm DFN8x8）；無 design win、無 qualification、無供應協議、無訂單或營收數字。屬 L8 供應商自我報告，不構成瓶頸證據。",
         "research_bundle_id": "alpha_gap_round2_20260824",
         "research_mode": "full",
-        "research_run": "user_go_2026-08-24_round2"
+        "research_run": "user_go_2026-08-24_round2",
+        "trace_attempts_ref": "navitassemi.com 原頁 JS 未渲染；txtify.it 403；natlawreview 404；barchart 鏡像取得 issuer PR 逐字",
+        "trace_next_trigger": "NVDA 或 ODM 客戶端文件點名 Navitas 為 800VDC 供應商，或 NVTS 揭露具名 design win／訂單金額",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "NVTS"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
       },
       "source": "official:navitas",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "$NVTS official NVIDIA MGX ecosystem participation for 800 VDC AI infrastructure; map Power GaN bottleneck and customer qualification",
       "triage": {
