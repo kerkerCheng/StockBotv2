@@ -17968,9 +17968,20 @@
       "first_seen": "2026-07-22T15:37:21.356668+00:00",
       "lead_id": "lead_61053b6d935c61b2c3def03c953b1994",
       "published_at": "2026-04-23",
-      "refs": {},
+      "refs": {
+        "parked_reason": "去重：本 lead 的 URL 已對應圖中既有 SourceDoc lrcx_10_q_20260423（tier 1），文件本身已入圖，重跑 pq1 不會產生新 context。依 lead-intake Step 0 去重防呆處置。",
+        "source_doc": "lrcx_10_q_20260423",
+        "trace_next_trigger": "LRCX 新一季 10-Q／10-K 申報，或既有文件出現需重新抽取的新 claim 面向",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "LRCX",
+          "co:lam_research"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:LRCX",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "LRCX 10-Q filed 2026-04-23",
       "triage": {
