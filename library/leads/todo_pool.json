@@ -2676,17 +2676,18 @@
       "deferred_at": "2026-08-17T23:59:36.292020+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 167,
-      "reason": null,
+      "reason": "blockers 空、catalyst/disproof 齊全，go 無缺口可補；META 依標的純度判準屬 beta 非 alpha",
+      "receipt": null,
       "ref_id": "dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "drop",
+      "resolved_at": "2026-08-25T01:24:53.184805+00:00",
       "source": "decision_lab",
       "title": "REVIEW — co:meta",
       "type": "decision_review"
     },
     {
       "added_at": "2026-08-17T00:05:29.905984+00:00",
-      "deferred_at": "2026-08-17T23:59:36.292033+00:00",
+      "deferred_at": "2026-08-25T01:24:41.911625+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 168,
       "reason": null,
@@ -2695,7 +2696,13 @@
       "resolved_at": null,
       "source": "decision_lab",
       "title": "REVIEW — co:sivers_semiconductors",
-      "type": "decision_review"
+      "type": "decision_review",
+      "waiting_on": {
+        "reason": null,
+        "set_at": "2026-08-25T01:24:41.911625+00:00",
+        "trigger": "SIVE Q2 2026 財報（含 2023-25 重編後數字），官方確認 18:00 CET 發布；與 thesis lifecycle [10] 同一分辨點",
+        "until": "2026-08-27"
+      }
     },
     {
       "added_at": "2026-08-17T01:35:31.016351+00:00",
@@ -2890,7 +2897,11 @@
     },
     {
       "added_at": "2026-08-19T04:56:42.255659+00:00",
-      "deferred_at": "2026-08-21T00:26:24.192314+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_4e91b107001f7b3ac7f1b6a9f9fbb564",
+      "dispatch_ref": "wo_3ceaad9cb77ee30ce00b5c014c7fe255",
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-08-25T01:24:32.730346+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 181,
       "reason": null,
@@ -2906,10 +2917,11 @@
       "deferred_at": "2026-08-21T00:26:24.192331+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 182,
-      "reason": null,
+      "reason": "blockers 空；NVDA 為超大市值高覆蓋標的，研究它接近研究 beta，資訊落差低",
+      "receipt": null,
       "ref_id": "dc_c0b6f81e3507a83b857258907fafa635",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "drop",
+      "resolved_at": "2026-08-25T01:24:53.320560+00:00",
       "source": "decision_lab",
       "title": "REVIEW — co:nvidia",
       "type": "decision_review"
@@ -2971,10 +2983,11 @@
       "deferred_at": "2026-08-21T00:26:24.192348+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 187,
-      "reason": null,
+      "reason": "blockers 空；AVGO 市值 1.73 兆、45 位分析師覆蓋，依 AGENTS.md 標的純度判準屬 beta",
+      "receipt": null,
       "ref_id": "dc_718d04ef9859103e5fa07d4defa1e6b3",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "drop",
+      "resolved_at": "2026-08-25T01:24:53.455707+00:00",
       "source": "decision_lab",
       "title": "REVIEW — co:broadcom",
       "type": "decision_review"
@@ -2984,10 +2997,11 @@
       "deferred_at": "2026-08-21T00:26:24.192363+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 188,
-      "reason": null,
+      "reason": "blockers 空；POET 以 2292 萬份認股權證換 Lumilens 訂單，屬供應商付錢換訂單＝非瓶頸的既有反例",
+      "receipt": null,
       "ref_id": "dc_606a4a50609e3b708f2138bb597ffacc",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "drop",
+      "resolved_at": "2026-08-25T01:24:53.587062+00:00",
       "source": "decision_lab",
       "title": "REVIEW — co:poet_technologies",
       "type": "decision_review"
@@ -3047,7 +3061,11 @@
     },
     {
       "added_at": "2026-08-20T11:02:30.643377+00:00",
-      "deferred_at": "2026-08-22T00:09:48.274424+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_f87f24f695192e4901496350ea629b1b",
+      "dispatch_ref": "wo_5c90a0aad842d8792a63e4193ca6ae04",
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-08-25T01:24:33.418398+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 192,
       "reason": null,
@@ -3073,7 +3091,11 @@
     },
     {
       "added_at": "2026-08-20T15:36:57.789792+00:00",
-      "deferred_at": "2026-08-22T00:09:48.274456+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_1a7bdffc5ee4c80cd89da79ea90f13f5",
+      "dispatch_ref": "wo_04f0da1c5164221bffdb821491114ec4",
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-08-25T01:24:34.114081+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 194,
       "reason": null,
@@ -3175,7 +3197,7 @@
     },
     {
       "added_at": "2026-08-21T05:39:13.337745+00:00",
-      "deferred_at": "2026-08-22T00:09:48.274474+00:00",
+      "deferred_at": "2026-08-25T01:24:42.048236+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 200,
       "reason": null,
@@ -3184,7 +3206,13 @@
       "resolved_at": null,
       "source": "decision_lab",
       "title": "REVIEW — co:agility_robotics",
-      "type": "decision_review"
+      "type": "decision_review",
+      "waiting_on": {
+        "reason": null,
+        "set_at": "2026-08-25T01:24:42.048236+00:00",
+        "trigger": "Agility Robotics S-4 由 2026-07-13 機密遞交轉為公開申報並生效，首次揭露歷史財報與 300M+ committed orders 條件",
+        "until": null
+      }
     },
     {
       "added_at": "2026-08-21T06:31:47.875434+00:00",
@@ -3426,10 +3454,11 @@
       "added_at": "2026-08-23T22:49:18.493153+00:00",
       "hint": "核准 exact graph delta；Decision handoff：co:iqe。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 213,
-      "reason": null,
+      "reason": "MACOM 客戶端確認 IQE 供應協議已於 2026-08-24 intake commit c8ecebb 完成",
+      "receipt": null,
       "ref_id": "ra_eb14a18b61a4a90e8071fb8d1537f3c0",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "drop",
+      "resolved_at": "2026-08-25T01:24:53.721535+00:00",
       "source": "research_action",
       "source_cleared": {
         "at": "2026-08-23T23:38:39.540603+00:00",
@@ -3438,6 +3467,54 @@
       },
       "title": "MACOM 客戶端確認 IQE 長期供應協議與條件式 £45M 投資",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-08-25T01:25:29.606344+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 214,
+      "reason": null,
+      "ref_id": "dc_718d04ef9859103e5fa07d4defa1e6b3",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:broadcom",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-25T01:25:29.606344+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 215,
+      "reason": null,
+      "ref_id": "dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:meta",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-25T01:25:29.606344+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 216,
+      "reason": null,
+      "ref_id": "dc_c0b6f81e3507a83b857258907fafa635",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:nvidia",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-25T01:25:29.606344+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 217,
+      "reason": null,
+      "ref_id": "dc_606a4a50609e3b708f2138bb597ffacc",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:poet_technologies",
+      "type": "decision_review"
     }
   ],
   "log": [
@@ -7732,8 +7809,101 @@
       "ref_id": "dc_912a03a50135ea5e29000a0417c3f477",
       "type": "decision_review",
       "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-08-25T01:24:32.730346+00:00",
+      "attempt": 1,
+      "n": 181,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_3ceaad9cb77ee30ce00b5c014c7fe255",
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-08-25T01:24:33.418398+00:00",
+      "attempt": 1,
+      "n": 192,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_5c90a0aad842d8792a63e4193ca6ae04",
+      "ref_id": "dc_b05cc1360e4bdf2a238787c23e7b227d",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-08-25T01:24:34.114081+00:00",
+      "attempt": 1,
+      "n": 194,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_04f0da1c5164221bffdb821491114ec4",
+      "ref_id": "dc_cc46527aac12ba14191ee71c0460f3fe",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-08-25T01:24:41.911625+00:00",
+      "n": 168,
+      "reason": null,
+      "receipt": null,
+      "ref_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
+      "type": "decision_review",
+      "verb": "pending"
+    },
+    {
+      "at": "2026-08-25T01:24:42.048236+00:00",
+      "n": 200,
+      "reason": null,
+      "receipt": null,
+      "ref_id": "dc_6ae5b014dbbcd0774b45487542c9a102",
+      "type": "decision_review",
+      "verb": "pending"
+    },
+    {
+      "at": "2026-08-25T01:24:53.184805+00:00",
+      "n": 167,
+      "reason": "blockers 空、catalyst/disproof 齊全，go 無缺口可補；META 依標的純度判準屬 beta 非 alpha",
+      "receipt": null,
+      "ref_id": "dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
+      "type": "decision_review",
+      "verb": "drop"
+    },
+    {
+      "at": "2026-08-25T01:24:53.320560+00:00",
+      "n": 182,
+      "reason": "blockers 空；NVDA 為超大市值高覆蓋標的，研究它接近研究 beta，資訊落差低",
+      "receipt": null,
+      "ref_id": "dc_c0b6f81e3507a83b857258907fafa635",
+      "type": "decision_review",
+      "verb": "drop"
+    },
+    {
+      "at": "2026-08-25T01:24:53.455707+00:00",
+      "n": 187,
+      "reason": "blockers 空；AVGO 市值 1.73 兆、45 位分析師覆蓋，依 AGENTS.md 標的純度判準屬 beta",
+      "receipt": null,
+      "ref_id": "dc_718d04ef9859103e5fa07d4defa1e6b3",
+      "type": "decision_review",
+      "verb": "drop"
+    },
+    {
+      "at": "2026-08-25T01:24:53.587062+00:00",
+      "n": 188,
+      "reason": "blockers 空；POET 以 2292 萬份認股權證換 Lumilens 訂單，屬供應商付錢換訂單＝非瓶頸的既有反例",
+      "receipt": null,
+      "ref_id": "dc_606a4a50609e3b708f2138bb597ffacc",
+      "type": "decision_review",
+      "verb": "drop"
+    },
+    {
+      "at": "2026-08-25T01:24:53.721535+00:00",
+      "n": 213,
+      "reason": "MACOM 客戶端確認 IQE 供應協議已於 2026-08-24 intake commit c8ecebb 完成",
+      "receipt": null,
+      "ref_id": "ra_eb14a18b61a4a90e8071fb8d1537f3c0",
+      "type": "ra_admission",
+      "verb": "drop"
     }
   ],
-  "next_n": 214,
+  "next_n": 218,
   "schema_version": "1"
 }
