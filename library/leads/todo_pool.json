@@ -3282,17 +3282,18 @@
       "added_at": "2026-08-21T22:37:52.268912+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_9a7d6db5f7562ce63ff8579f03537a47",
-      "dispatch_receipt": "research_packet:library/private/research_notes/2026-08-25_pq1_mrvl_concentration_backlog.md｜MRVL FY2026 10-K 已逐字核對。客戶集中度取得：Distributor A 37%(FY26)/34%/24%、Direct Customer A 14%/13%/未達10%、亞洲客戶佔營收 77%。backlog 與 remaining performance obligation 在 50 萬字元全文各 0 命中＝issuer 未揭露，該 blocker 無法由 10-K 清除。Engine C 寫入與 catalyst/disproof 裁定仍待人工 gate。",
+      "dispatch_receipt": "research_packet:library/private/research_notes/2026-08-25_pq1_mrvl_concentration_backlog.md｜bounded research 完成：4 個 coverage blocker 清掉 2 個（financial_customer_concentration_manual_required 由 mo_77d38cb26e5d5009c419063f76feba05 清除、financial_backlog_manual_required 由 mo_bc5ec274f92d8ee2a87ce740f96e1131 記為 issuer 不揭露）。剩餘 catalyst_missing／disproof_missing 為 thesis 判斷，使用者 2026-08-25 定案比照 [134] AAOI 等 MRVL Q2 FY2027 財報（2026-08-28）以 guidance 設可觀測 disproof 門檻後再 reassess。另註：五軸仍為 research_assessment_missing，axis_ceiling 維持 0，binding constraint 是缺 MRVL assessment 而非缺觀測。",
       "dispatch_ref": "wo_468ecdef0047cb1a3d33d05c1c3de9fa",
-      "dispatch_status": "awaiting_approval",
-      "dispatch_updated_at": "2026-08-25T03:07:28.632417+00:00",
+      "dispatch_status": "parked",
+      "dispatch_updated_at": "2026-08-25T07:59:31.252326+00:00",
       "dispatched_at": "2026-08-22T00:10:05.468175+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 204,
-      "reason": null,
+      "reason": "pq1 parked",
+      "receipt": "research_packet:library/private/research_notes/2026-08-25_pq1_mrvl_concentration_backlog.md｜bounded research 完成：4 個 coverage blocker 清掉 2 個（financial_customer_concentration_manual_required 由 mo_77d38cb26e5d5009c419063f76feba05 清除、financial_backlog_manual_required 由 mo_bc5ec274f92d8ee2a87ce740f96e1131 記為 issuer 不揭露）。剩餘 catalyst_missing／disproof_missing 為 thesis 判斷，使用者 2026-08-25 定案比照 [134] AAOI 等 MRVL Q2 FY2027 財報（2026-08-28）以 guidance 設可觀測 disproof 門檻後再 reassess。另註：五軸仍為 research_assessment_missing，axis_ceiling 維持 0，binding constraint 是缺 MRVL assessment 而非缺觀測。",
       "ref_id": "dc_0fca807c963dc3b9888e0f83ba6d45a5",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-25T07:59:31.252326+00:00",
       "source": "decision_lab",
       "title": "REVIEW — co:marvell_technology",
       "type": "decision_review"
@@ -3479,9 +3480,10 @@
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 214,
       "reason": null,
+      "receipt": null,
       "ref_id": "dc_718d04ef9859103e5fa07d4defa1e6b3",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "drop",
+      "resolved_at": "2026-08-25T07:36:05.483858+00:00",
       "source": "decision_lab",
       "source_cleared": {
         "at": "2026-08-25T01:49:58.764262+00:00",
@@ -3496,9 +3498,10 @@
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 215,
       "reason": null,
+      "receipt": null,
       "ref_id": "dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "drop",
+      "resolved_at": "2026-08-25T07:36:05.483887+00:00",
       "source": "decision_lab",
       "source_cleared": {
         "at": "2026-08-25T01:49:58.764262+00:00",
@@ -3513,9 +3516,10 @@
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 216,
       "reason": null,
+      "receipt": null,
       "ref_id": "dc_c0b6f81e3507a83b857258907fafa635",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "drop",
+      "resolved_at": "2026-08-25T07:36:05.483905+00:00",
       "source": "decision_lab",
       "source_cleared": {
         "at": "2026-08-25T01:49:58.764262+00:00",
@@ -3530,9 +3534,10 @@
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 217,
       "reason": null,
+      "receipt": null,
       "ref_id": "dc_606a4a50609e3b708f2138bb597ffacc",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "drop",
+      "resolved_at": "2026-08-25T07:36:05.483922+00:00",
       "source": "decision_lab",
       "source_cleared": {
         "at": "2026-08-25T01:49:58.764262+00:00",
@@ -3541,6 +3546,99 @@
       },
       "title": "REVIEW — co:poet_technologies",
       "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-25T07:37:57.851137+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-01-31T00:00:00+00:00；來源=Marvell Technology, Inc. FY2026 Form 10-K, filed 2026-03-11 (CIK 0001835632), fi",
+      "n": 218,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_77d38cb26e5d5009c419063f76feba05;proposal:po_bf775ff62567578a2f9c559feca53f11",
+      "ref_id": "po_bf775ff62567578a2f9c559feca53f11",
+      "resolution": "go",
+      "resolved_at": "2026-08-25T07:49:24.262166+00:00",
+      "source": "engine_c",
+      "title": "Engine C 觀測：MRVL / customer_concentration",
+      "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-08-25T07:37:57.851137+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-01-31T00:00:00+00:00；來源=Marvell Technology, Inc. FY2026 Form 10-K, filed 2026-03-11 (CIK 0001835632), fi",
+      "n": 219,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_bc5ec274f92d8ee2a87ce740f96e1131;proposal:po_ff210c61dbfee88314b58492d1188cc5",
+      "ref_id": "po_ff210c61dbfee88314b58492d1188cc5",
+      "resolution": "go",
+      "resolved_at": "2026-08-25T07:49:32.078097+00:00",
+      "source": "engine_c",
+      "title": "Engine C 觀測：MRVL / backlog",
+      "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-08-25T07:37:57.851137+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 220,
+      "reason": null,
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:axt",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-25T07:37:57.851137+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 221,
+      "reason": null,
+      "ref_id": "dc_957bff3701ea4e46d962bfb9ff0932c8",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:coherent",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-25T07:37:57.851137+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 222,
+      "reason": null,
+      "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:iqe",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-25T07:37:57.851137+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 223,
+      "reason": null,
+      "ref_id": "dc_4d28e50810e46da7fd77ee042ee7bd1c",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:lumentum",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-25T08:00:29.959820+00:00",
+      "deferred_at": "2026-08-25T08:00:43.184089+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 224,
+      "reason": null,
+      "ref_id": "dc_0fca807c963dc3b9888e0f83ba6d45a5",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:marvell_technology",
+      "type": "decision_review",
+      "waiting_on": {
+        "reason": "使用者 2026-08-25 定案走 (b)：比照 [134] AAOI 等財報。backlog／customer_concentration 兩個 blocker 已於本日由 mo_bc5ec274f92d8ee2a87ce740f96e1131／mo_77d38cb26e5d5009c419063f76feba05 清除；剩餘 catalyst_missing／disproof_missing 需 guidance。注意 axis_ceiling 仍為 0，binding constraint 是缺 MRVL 五軸 assessment。",
+        "set_at": "2026-08-25T08:00:43.184089+00:00",
+        "trigger": "MRVL Q2 FY2027 財報（2026-08-28，yfinance calendar 確認）；以 guidance 設可觀測 disproof 門檻並補 catalyst，再 reassess",
+        "until": "2026-08-28"
+      }
     }
   ],
   "log": [
@@ -8045,8 +8143,89 @@
       "ref_id": "dc_0fca807c963dc3b9888e0f83ba6d45a5",
       "type": "decision_review",
       "verb": "pq1_awaiting_approval"
+    },
+    {
+      "at": "2026-08-25T07:36:05.483858+00:00",
+      "n": 214,
+      "reason": null,
+      "receipt": null,
+      "ref_id": "dc_718d04ef9859103e5fa07d4defa1e6b3",
+      "type": "decision_review",
+      "verb": "drop"
+    },
+    {
+      "at": "2026-08-25T07:36:05.483887+00:00",
+      "n": 215,
+      "reason": null,
+      "receipt": null,
+      "ref_id": "dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
+      "type": "decision_review",
+      "verb": "drop"
+    },
+    {
+      "at": "2026-08-25T07:36:05.483905+00:00",
+      "n": 216,
+      "reason": null,
+      "receipt": null,
+      "ref_id": "dc_c0b6f81e3507a83b857258907fafa635",
+      "type": "decision_review",
+      "verb": "drop"
+    },
+    {
+      "at": "2026-08-25T07:36:05.483922+00:00",
+      "n": 217,
+      "reason": null,
+      "receipt": null,
+      "ref_id": "dc_606a4a50609e3b708f2138bb597ffacc",
+      "type": "decision_review",
+      "verb": "drop"
+    },
+    {
+      "at": "2026-08-25T07:49:24.262166+00:00",
+      "n": 218,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_77d38cb26e5d5009c419063f76feba05;proposal:po_bf775ff62567578a2f9c559feca53f11",
+      "ref_id": "po_bf775ff62567578a2f9c559feca53f11",
+      "type": "engine_c_observation",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-25T07:49:32.078097+00:00",
+      "n": 219,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_bc5ec274f92d8ee2a87ce740f96e1131;proposal:po_ff210c61dbfee88314b58492d1188cc5",
+      "ref_id": "po_ff210c61dbfee88314b58492d1188cc5",
+      "type": "engine_c_observation",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-25T07:59:31.252326+00:00",
+      "n": 204,
+      "reason": null,
+      "receipt": "research_packet:library/private/research_notes/2026-08-25_pq1_mrvl_concentration_backlog.md｜bounded research 完成：4 個 coverage blocker 清掉 2 個（financial_customer_concentration_manual_required 由 mo_77d38cb26e5d5009c419063f76feba05 清除、financial_backlog_manual_required 由 mo_bc5ec274f92d8ee2a87ce740f96e1131 記為 issuer 不揭露）。剩餘 catalyst_missing／disproof_missing 為 thesis 判斷，使用者 2026-08-25 定案比照 [134] AAOI 等 MRVL Q2 FY2027 財報（2026-08-28）以 guidance 設可觀測 disproof 門檻後再 reassess。另註：五軸仍為 research_assessment_missing，axis_ceiling 維持 0，binding constraint 是缺 MRVL assessment 而非缺觀測。",
+      "ref_id": "dc_0fca807c963dc3b9888e0f83ba6d45a5",
+      "type": "decision_review",
+      "verb": "pq1_parked"
+    },
+    {
+      "at": "2026-08-25T07:59:31.252326+00:00",
+      "n": 204,
+      "reason": "pq1 parked",
+      "receipt": "research_packet:library/private/research_notes/2026-08-25_pq1_mrvl_concentration_backlog.md｜bounded research 完成：4 個 coverage blocker 清掉 2 個（financial_customer_concentration_manual_required 由 mo_77d38cb26e5d5009c419063f76feba05 清除、financial_backlog_manual_required 由 mo_bc5ec274f92d8ee2a87ce740f96e1131 記為 issuer 不揭露）。剩餘 catalyst_missing／disproof_missing 為 thesis 判斷，使用者 2026-08-25 定案比照 [134] AAOI 等 MRVL Q2 FY2027 財報（2026-08-28）以 guidance 設可觀測 disproof 門檻後再 reassess。另註：五軸仍為 research_assessment_missing，axis_ceiling 維持 0，binding constraint 是缺 MRVL assessment 而非缺觀測。",
+      "ref_id": "dc_0fca807c963dc3b9888e0f83ba6d45a5",
+      "type": "decision_review",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-25T08:00:43.184089+00:00",
+      "n": 224,
+      "reason": "使用者 2026-08-25 定案走 (b)：比照 [134] AAOI 等財報。backlog／customer_concentration 兩個 blocker 已於本日由 mo_bc5ec274f92d8ee2a87ce740f96e1131／mo_77d38cb26e5d5009c419063f76feba05 清除；剩餘 catalyst_missing／disproof_missing 需 guidance。注意 axis_ceiling 仍為 0，binding constraint 是缺 MRVL 五軸 assessment。",
+      "receipt": null,
+      "ref_id": "dc_0fca807c963dc3b9888e0f83ba6d45a5",
+      "type": "decision_review",
+      "verb": "pending"
     }
   ],
-  "next_n": 218,
+  "next_n": 225,
   "schema_version": "1"
 }
