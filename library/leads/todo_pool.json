@@ -3676,10 +3676,11 @@
       "added_at": "2026-08-25T13:30:44.275553+00:00",
       "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-05-28T00:00:00+00:00；來源=Micron Technology, Inc. Q3 FY2026 Form 10-Q, filed 2026-06-25 (CIK 0000723125, a",
       "n": 227,
-      "reason": null,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_4389ef69bf04ba593e273dac327bd629;proposal:po_664bdcabec4a63f236101178af1f650a",
       "ref_id": "po_664bdcabec4a63f236101178af1f650a",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-25T13:36:35.930891+00:00",
       "source": "engine_c",
       "title": "Engine C 觀測：MU / backlog",
       "type": "engine_c_observation"
@@ -3688,10 +3689,11 @@
       "added_at": "2026-08-25T13:30:44.275553+00:00",
       "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-05-28T00:00:00+00:00；來源=Micron Technology, Inc. FY2025 Form 10-K, filed 2025-10-03 (CIK 0000723125, acce",
       "n": 228,
-      "reason": null,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_a726117271bfbd32cb6821de3f112497;proposal:po_89b54dcfa022fd495eea04bfdfb205fb",
       "ref_id": "po_89b54dcfa022fd495eea04bfdfb205fb",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-25T13:36:36.723582+00:00",
       "source": "engine_c",
       "title": "Engine C 觀測：MU / customer_concentration",
       "type": "engine_c_observation"
@@ -8384,6 +8386,24 @@
       "receipt": "bounded research 未果，卡在 access control 非未嘗試。已試路徑：官方 Annual Report 2025 PDF（schaeffler.com/remotemedien/.../2025_schaeffler_annual_report_en_kj52sl.pdf）回 HTTP 403 Forbidden——依 source-trace §3 遇 anti-bot 即停止，不偽裝 UA、不偽造 Referer、不用規避快取。可得的僅為 press release 層級數字（2025 全年 order intake 約 155 億歐元，其中 BEV 20 億、hybrid 88 億；H1 2025 E-Mobility 46 億、Powertrain & Chassis 47 億），屬 tier 2 且未含客戶集中度，不足以支持 Engine C manual observation。⚠ 下一步兩條：(1) 該 PDF 在瀏覽器可正常下載，使用者提供本機副本即可標 local_only 續做；(2) 或找年報的 HTML 版／IFRS 8 分部附註單獨頁。⚠ 另 catalyst_missing 與 disproof_missing 屬 thesis 判斷，本來就不由 pq1 代填（drain 已警示 disproof 未填等於警報永遠不會響 L7）。blockers 全數未清。",
       "ref_id": "dc_912a03a50135ea5e29000a0417c3f477",
       "type": "decision_review",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-25T13:36:35.930891+00:00",
+      "n": 227,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_4389ef69bf04ba593e273dac327bd629;proposal:po_664bdcabec4a63f236101178af1f650a",
+      "ref_id": "po_664bdcabec4a63f236101178af1f650a",
+      "type": "engine_c_observation",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-25T13:36:36.723582+00:00",
+      "n": 228,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_a726117271bfbd32cb6821de3f112497;proposal:po_89b54dcfa022fd495eea04bfdfb205fb",
+      "ref_id": "po_89b54dcfa022fd495eea04bfdfb205fb",
+      "type": "engine_c_observation",
       "verb": "go"
     }
   ],
