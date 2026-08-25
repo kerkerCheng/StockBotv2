@@ -2899,15 +2899,18 @@
       "added_at": "2026-08-19T04:56:42.255659+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_4e91b107001f7b3ac7f1b6a9f9fbb564",
+      "dispatch_receipt": "superseded：dispatch 取到 2026-08-16 22:53 的舊 assessment，最新 decision 為 2026-08-17 01:36 的 ca_5ce065ff（analyzable、blockers 空）。AXTI 的 10-K 反證屬新證據，應走 reassess 而非 gap research。retire 舊 job，不關閉 probe。",
       "dispatch_ref": "wo_3ceaad9cb77ee30ce00b5c014c7fe255",
-      "dispatch_status": "queued",
+      "dispatch_status": "parked",
+      "dispatch_updated_at": "2026-08-25T01:50:54.147523+00:00",
       "dispatched_at": "2026-08-25T01:24:32.730346+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 181,
-      "reason": null,
+      "reason": "pq1 parked",
+      "receipt": "superseded：dispatch 取到 2026-08-16 22:53 的舊 assessment，最新 decision 為 2026-08-17 01:36 的 ca_5ce065ff（analyzable、blockers 空）。AXTI 的 10-K 反證屬新證據，應走 reassess 而非 gap research。retire 舊 job，不關閉 probe。",
       "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-25T01:50:54.147523+00:00",
       "source": "decision_lab",
       "title": "REVIEW — co:axt",
       "type": "decision_review"
@@ -3176,10 +3179,10 @@
       "added_at": "2026-08-21T05:39:13.337745+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_08309301779fe5f4fc97f93aafdcbfa2",
-      "dispatch_receipt": "research:daily-2026-08-25:wo_b473fcfc46342a890031663dcfef5b64",
+      "dispatch_receipt": "superseded：本 work order 綁 2026-08-15 01:29 的 assessment，cohort 最新 decision 為 2026-08-19 23:34 的 ca_f93496f0（analyzable、blockers 空、無 work order），已無 bounded gap 可補。retire 舊 job，不關閉 probe。",
       "dispatch_ref": "wo_b473fcfc46342a890031663dcfef5b64",
-      "dispatch_status": "researching",
-      "dispatch_updated_at": "2026-08-24T23:01:40.401192+00:00",
+      "dispatch_status": "parked",
+      "dispatch_updated_at": "2026-08-25T01:50:42.453261+00:00",
       "dispatched_at": "2026-08-23T02:31:15.957167+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 199,
@@ -3187,10 +3190,11 @@
       "reactivation_event": {
         "type": "decision_blocker_mode_changed"
       },
-      "reason": null,
+      "reason": "pq1 parked",
+      "receipt": "superseded：本 work order 綁 2026-08-15 01:29 的 assessment，cohort 最新 decision 為 2026-08-19 23:34 的 ca_f93496f0（analyzable、blockers 空、無 work order），已無 bounded gap 可補。retire 舊 job，不關閉 probe。",
       "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-25T01:50:42.453261+00:00",
       "source": "decision_lab",
       "title": "REVIEW — co:iqe",
       "type": "decision_review"
@@ -3238,17 +3242,18 @@
       "added_at": "2026-08-21T06:31:47.875434+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_40e187d95a2fa8fd26e111a7974e8853",
-      "dispatch_receipt": "research:daily-2026-08-25:wo_93f174f76e592cc5771befd8716b0de9",
+      "dispatch_receipt": "superseded：本 work order 綁 2026-07-22 的 assessment，其後同 cohort 已有 4 個更新的 decision，最新為 2026-08-19 07:31 的 ca_217789a0（analyzable、blockers 空、無 work order）。retire 舊 job，不關閉 probe。",
       "dispatch_ref": "wo_93f174f76e592cc5771befd8716b0de9",
-      "dispatch_status": "researching",
-      "dispatch_updated_at": "2026-08-24T23:01:45.396548+00:00",
+      "dispatch_status": "parked",
+      "dispatch_updated_at": "2026-08-25T01:50:52.776343+00:00",
       "dispatched_at": "2026-08-22T00:10:05.428668+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 202,
-      "reason": null,
+      "reason": "pq1 parked",
+      "receipt": "superseded：本 work order 綁 2026-07-22 的 assessment，其後同 cohort 已有 4 個更新的 decision，最新為 2026-08-19 07:31 的 ca_217789a0（analyzable、blockers 空、無 work order）。retire 舊 job，不關閉 probe。",
       "ref_id": "dc_957bff3701ea4e46d962bfb9ff0932c8",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-25T01:50:52.776343+00:00",
       "source": "decision_lab",
       "title": "REVIEW — co:coherent",
       "type": "decision_review"
@@ -3257,17 +3262,18 @@
       "added_at": "2026-08-21T22:37:52.268912+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_f9d25b48ca3054dfadc384f7c6ee6447",
-      "dispatch_receipt": "research:daily-2026-08-25:wo_d78836b78033d4d2d151d8fdb4819e65",
+      "dispatch_receipt": "superseded：本 work order 綁 2026-08-15 05:14 的 assessment，最新 decision 為 2026-08-21 06:54 的 ca_db1413f2（analyzable、blockers 空、無 work order）。LITE runway 研究成果另存 library/private/research_notes/2026-08-24_pq1_drain_lite_runway.md。retire 舊 job，不關閉 probe。",
       "dispatch_ref": "wo_d78836b78033d4d2d151d8fdb4819e65",
-      "dispatch_status": "researching",
-      "dispatch_updated_at": "2026-08-24T23:01:49.060450+00:00",
+      "dispatch_status": "parked",
+      "dispatch_updated_at": "2026-08-25T01:50:53.451472+00:00",
       "dispatched_at": "2026-08-22T00:10:05.450783+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 203,
-      "reason": null,
+      "reason": "pq1 parked",
+      "receipt": "superseded：本 work order 綁 2026-08-15 05:14 的 assessment，最新 decision 為 2026-08-21 06:54 的 ca_db1413f2（analyzable、blockers 空、無 work order）。LITE runway 研究成果另存 library/private/research_notes/2026-08-24_pq1_drain_lite_runway.md。retire 舊 job，不關閉 probe。",
       "ref_id": "dc_4d28e50810e46da7fd77ee042ee7bd1c",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-25T01:50:53.451472+00:00",
       "source": "decision_lab",
       "title": "REVIEW — co:lumentum",
       "type": "decision_review"
@@ -3477,6 +3483,11 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
+      "source_cleared": {
+        "at": "2026-08-25T01:49:58.764262+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
       "title": "REVIEW — co:broadcom",
       "type": "decision_review"
     },
@@ -3489,6 +3500,11 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
+      "source_cleared": {
+        "at": "2026-08-25T01:49:58.764262+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
       "title": "REVIEW — co:meta",
       "type": "decision_review"
     },
@@ -3501,6 +3517,11 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
+      "source_cleared": {
+        "at": "2026-08-25T01:49:58.764262+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
       "title": "REVIEW — co:nvidia",
       "type": "decision_review"
     },
@@ -3513,6 +3534,11 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
+      "source_cleared": {
+        "at": "2026-08-25T01:49:58.764262+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
       "title": "REVIEW — co:poet_technologies",
       "type": "decision_review"
     }
@@ -7902,6 +7928,114 @@
       "ref_id": "ra_eb14a18b61a4a90e8071fb8d1537f3c0",
       "type": "ra_admission",
       "verb": "drop"
+    },
+    {
+      "at": "2026-08-25T01:49:58.764262+00:00",
+      "n": 214,
+      "reason": "來源本輪成功執行，但不再產出此項",
+      "receipt": null,
+      "ref_id": "dc_718d04ef9859103e5fa07d4defa1e6b3",
+      "type": "decision_review",
+      "verb": "source_cleared"
+    },
+    {
+      "at": "2026-08-25T01:49:58.764262+00:00",
+      "n": 215,
+      "reason": "來源本輪成功執行，但不再產出此項",
+      "receipt": null,
+      "ref_id": "dc_00cccea9d8abc862a03f6c3a9ffd0a8c",
+      "type": "decision_review",
+      "verb": "source_cleared"
+    },
+    {
+      "at": "2026-08-25T01:49:58.764262+00:00",
+      "n": 216,
+      "reason": "來源本輪成功執行，但不再產出此項",
+      "receipt": null,
+      "ref_id": "dc_c0b6f81e3507a83b857258907fafa635",
+      "type": "decision_review",
+      "verb": "source_cleared"
+    },
+    {
+      "at": "2026-08-25T01:49:58.764262+00:00",
+      "n": 217,
+      "reason": "來源本輪成功執行，但不再產出此項",
+      "receipt": null,
+      "ref_id": "dc_606a4a50609e3b708f2138bb597ffacc",
+      "type": "decision_review",
+      "verb": "source_cleared"
+    },
+    {
+      "at": "2026-08-25T01:50:42.453261+00:00",
+      "n": 199,
+      "reason": null,
+      "receipt": "superseded：本 work order 綁 2026-08-15 01:29 的 assessment，cohort 最新 decision 為 2026-08-19 23:34 的 ca_f93496f0（analyzable、blockers 空、無 work order），已無 bounded gap 可補。retire 舊 job，不關閉 probe。",
+      "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+      "type": "decision_review",
+      "verb": "pq1_parked"
+    },
+    {
+      "at": "2026-08-25T01:50:42.453261+00:00",
+      "n": 199,
+      "reason": "pq1 parked",
+      "receipt": "superseded：本 work order 綁 2026-08-15 01:29 的 assessment，cohort 最新 decision 為 2026-08-19 23:34 的 ca_f93496f0（analyzable、blockers 空、無 work order），已無 bounded gap 可補。retire 舊 job，不關閉 probe。",
+      "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+      "type": "decision_review",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-25T01:50:52.776343+00:00",
+      "n": 202,
+      "reason": null,
+      "receipt": "superseded：本 work order 綁 2026-07-22 的 assessment，其後同 cohort 已有 4 個更新的 decision，最新為 2026-08-19 07:31 的 ca_217789a0（analyzable、blockers 空、無 work order）。retire 舊 job，不關閉 probe。",
+      "ref_id": "dc_957bff3701ea4e46d962bfb9ff0932c8",
+      "type": "decision_review",
+      "verb": "pq1_parked"
+    },
+    {
+      "at": "2026-08-25T01:50:52.776343+00:00",
+      "n": 202,
+      "reason": "pq1 parked",
+      "receipt": "superseded：本 work order 綁 2026-07-22 的 assessment，其後同 cohort 已有 4 個更新的 decision，最新為 2026-08-19 07:31 的 ca_217789a0（analyzable、blockers 空、無 work order）。retire 舊 job，不關閉 probe。",
+      "ref_id": "dc_957bff3701ea4e46d962bfb9ff0932c8",
+      "type": "decision_review",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-25T01:50:53.451472+00:00",
+      "n": 203,
+      "reason": null,
+      "receipt": "superseded：本 work order 綁 2026-08-15 05:14 的 assessment，最新 decision 為 2026-08-21 06:54 的 ca_db1413f2（analyzable、blockers 空、無 work order）。LITE runway 研究成果另存 library/private/research_notes/2026-08-24_pq1_drain_lite_runway.md。retire 舊 job，不關閉 probe。",
+      "ref_id": "dc_4d28e50810e46da7fd77ee042ee7bd1c",
+      "type": "decision_review",
+      "verb": "pq1_parked"
+    },
+    {
+      "at": "2026-08-25T01:50:53.451472+00:00",
+      "n": 203,
+      "reason": "pq1 parked",
+      "receipt": "superseded：本 work order 綁 2026-08-15 05:14 的 assessment，最新 decision 為 2026-08-21 06:54 的 ca_db1413f2（analyzable、blockers 空、無 work order）。LITE runway 研究成果另存 library/private/research_notes/2026-08-24_pq1_drain_lite_runway.md。retire 舊 job，不關閉 probe。",
+      "ref_id": "dc_4d28e50810e46da7fd77ee042ee7bd1c",
+      "type": "decision_review",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-25T01:50:54.147523+00:00",
+      "n": 181,
+      "reason": null,
+      "receipt": "superseded：dispatch 取到 2026-08-16 22:53 的舊 assessment，最新 decision 為 2026-08-17 01:36 的 ca_5ce065ff（analyzable、blockers 空）。AXTI 的 10-K 反證屬新證據，應走 reassess 而非 gap research。retire 舊 job，不關閉 probe。",
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "type": "decision_review",
+      "verb": "pq1_parked"
+    },
+    {
+      "at": "2026-08-25T01:50:54.147523+00:00",
+      "n": 181,
+      "reason": "pq1 parked",
+      "receipt": "superseded：dispatch 取到 2026-08-16 22:53 的舊 assessment，最新 decision 為 2026-08-17 01:36 的 ca_5ce065ff（analyzable、blockers 空）。AXTI 的 10-K 反證屬新證據，應走 reassess 而非 gap research。retire 舊 job，不關閉 probe。",
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "type": "decision_review",
+      "verb": "go"
     }
   ],
   "next_n": 218,
