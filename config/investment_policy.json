@@ -29,5 +29,9 @@
     "financial_freshness_days": 14,
     "financial_runway_freshness_days": 100,
     "evidence_hops": 2
+  },
+  "live_position_monitor": {
+    "return_1d_at_most": -0.04,
+    "history_sessions": 10
   }
 }

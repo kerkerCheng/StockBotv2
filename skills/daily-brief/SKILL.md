@@ -103,6 +103,13 @@ coverage 為 `partial` 時一律顯示「已知至少 X%」，不得輸出成完
 若輸出 `event_search_requests`，只對該 packet 做一次 WebSearch，列可能原因、曝險與「未經查證」；不得
 建立 lead／pq1／pq2、不得寫 Engine A／C／D authority，深入研究必須另走 lead-intake。
 
+**Alpha live 部位另有一條獨立管道：`alpha_position_events`（2026-08-25 補）。** 它由
+`decision_lab/alpha_event_monitor.py` 產出，觸發依據是「**該 cohort 有沒有 live fill**」而非曝險占比——
+beta 的 20% 集中度門檻對單筆上限 5% 的 alpha 結構上恆不觸發（L14 第 4 點的「恆滅」）。處置與
+`event_search_requests` 完全相同：一次 WebSearch、標未經查證、不建任何 authority。輸出時**必須同時給
+單日跌幅與距進場損益**，後者才是使用者實際承受的數字。`alpha_position_events` 為 `null` 代表這個 surface
+不提供該能力（如遠端受限 surface），與空 list（有部位但今天沒事）不是同一件事，不得混用。
+
 ### Step 2 — Triage 新 pending leads（依 signal-triage 判準）
 
 ```powershell
@@ -375,8 +382,9 @@ TL;DR：<取 `query.coverage_gaps`；把真正 chokepoint 研究缺口與文件�
 TL;DR：<上線標的／可量測／結案歸因常駐計數器；真實部位、錨點樣本效度與監控覆蓋>
 | 標的 | 進場 | 現價／損益 | catalyst（何時會知道） | disproof 是否觸發 | lifecycle／監控覆蓋 |
 |---|---|---|---|---|---|
-逐筆列出 `live_execution_reports` 中的部位。**進場價與 disproof 判準必須同列**，並明示 alpha live
-部位是否仍不在 `event_search_requests` 覆蓋範圍內。
+逐筆列出 `live_execution_reports` 中的部位。**進場價與 disproof 判準必須同列**。監控覆蓋一欄自
+2026-08-25 起由 `alpha_position_events` 回答：有 live fill 的部位一律在覆蓋內，該欄改記今日是否觸發
+（未觸發寫「覆蓋中／今日未觸發」，不得再寫「不在覆蓋範圍」）。
 
 四個 pane 的完整必填規則**只以 [`skills/alpha-status`](../alpha-status/SKILL.md) 為準**。Daily
 不另存判準副本，只補兩條 daily 特有規則：

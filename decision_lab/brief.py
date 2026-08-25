@@ -595,6 +595,44 @@ def _sheet_only_items(
     return result
 
 
+def _alpha_position_events(
+    store: Any,
+    *,
+    series_by_ticker: Mapping[str, Any] | None,
+) -> list[dict[str, Any]] | None:
+    """Alpha live 部位的事件 packet；surface 不提供這個能力時回 None。
+
+    ⚠ 這條路徑存在的理由見 `alpha_event_monitor` 的模組 docstring：beta 的事件監控
+    對 alpha 部位結構上恆不觸發。行情缺失、provider 失敗或未登記門檻都只降級成
+    空 list，不阻斷 brief——事件監控是加值訊號，不是 brief 的前置條件。
+    """
+
+    positions_fn = getattr(store, "open_live_positions", None)
+    if not callable(positions_fn):
+        return None
+    try:
+        from thesis.investment_policy import load_policy
+
+        from .alpha_event_monitor import alpha_event_search_requests, fetch_close_series
+
+        positions = list(positions_fn())
+        if not positions:
+            return []
+        policy = load_policy()
+        monitor = policy.get("live_position_monitor") or {}
+        series = series_by_ticker
+        if series is None:
+            series = fetch_close_series(
+                (position.get("ticker") for position in positions),
+                sessions=int(monitor.get("history_sessions") or 10),
+            )
+        return alpha_event_search_requests(
+            positions, series_by_ticker=series or {}, policy=policy
+        )
+    except Exception:  # noqa: BLE001 — 監控失敗不得讓整份 brief 失敗
+        return []
+
+
 def build_today_brief(
     store: DecisionStore,
     *,
@@ -605,6 +643,7 @@ def build_today_brief(
     current_authority_by_cohort: Mapping[str, Mapping[str, Any]] | None = None,
     provider: WorkflowDataProvider | None = None,
     registry: IdentityRegistry | None = None,
+    alpha_series_by_ticker: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """掃描 cohorts／decisions 與當前 Sheet snapshot；不寫入任何 authority。"""
 
@@ -747,6 +786,11 @@ def build_today_brief(
             counters() if callable(counters := getattr(store, "capital_expression_counters", None))
             else None
         ),
+        # Alpha live 部位的事件監控。與 `capital_expression` 同一個窄 duck-type
+        # 契約：surface 不提供就是 None，不與「有部位但沒事」的空 list 混用。
+        "alpha_position_events": _alpha_position_events(
+            store, series_by_ticker=alpha_series_by_ticker
+        ),
         "items": ranked,
     }
     assert_safe_payload(brief)
@@ -776,6 +820,24 @@ def render_today_markdown(brief: Mapping[str, Any]) -> str:
         f"- Blockers：{blockers}",
         f"- 下一個 review：{markdown_text(brief.get('next_review_at') or '尚未排定')}",
     ]
+    # Alpha live 部位事件擺在首屏 counters 之前：它講的是**已經投出去的錢正在
+    # 發生什麼**，優先於研究進展。exception-first——沒觸發就完全不出現，不佔版面。
+    for event in brief.get("alpha_position_events") or []:
+        ticker = markdown_text(event.get("ticker") or "未知標的")
+        session = markdown_text(event.get("session_date") or "最近交易日")
+        day = _pct(event.get("return_1d"))
+        since = _pct(event.get("return_since_entry"))
+        raw_weight = event.get("position_weight")
+        weight = (
+            f"{raw_weight * 100:.2f}%"
+            if isinstance(raw_weight, (int, float)) and not isinstance(raw_weight, bool)
+            else "未知"
+        )
+        lines.append(
+            f"- 🔴 持倉事件：{ticker} 於 {session} 單日 {day}"
+            f"（距進場 {since}，部位約 {weight} NAV）"
+            "　→ 請對此標的做一次 WebSearch 找可能原因，結果未經查證、不建 lead"
+        )
     counters = brief.get("capital_expression") or {}
     if counters:
         live = int(counters.get("live_range_nonzero") or 0)

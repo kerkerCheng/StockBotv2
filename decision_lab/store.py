@@ -699,6 +699,87 @@ class DecisionStore:
         ).fetchone()
         return int(row["count"])
 
+    def open_live_positions(self) -> list[dict[str, Any]]:
+        """目前仍開著的 alpha live 部位（有 fill 且 cohort 未終結），按 cohort 聚合。
+
+        判準刻意是「**這個 cohort 有沒有 live fill**」而不是曝險占比：alpha 單筆
+        上限本來就是 5%，沿用 beta 的 20% 集中度門檻等於再造一個永遠不觸發的閘門
+        （L14 第 4 點的「恆滅」）。
+
+        同一 cohort 的多筆 fill 以股數加權平均成本合併；`entry_price` 因此是持有
+        成本而非單筆成交價。終結（promoted／rejected／expired）的 epoch 不算開著——
+        `revised` 會開新 epoch，仍視為持有中。
+        """
+
+        rows = self._conn.execute(
+            """
+            SELECT f.fill_id AS fill_id, f.decision_id AS decision_id,
+                   f.shares AS shares, f.price AS price, f.currency AS currency,
+                   f.executed_at AS executed_at,
+                   d.cohort_id AS cohort_id,
+                   c.company_id AS company_id, c.research_ticker AS research_ticker,
+                   ch.selected_weight AS selected_weight
+            FROM live_execution_reports f
+            JOIN system_decisions d ON d.decision_id = f.decision_id
+            JOIN decision_cohorts c ON c.cohort_id = d.cohort_id
+            LEFT JOIN live_choices ch ON ch.choice_id = f.choice_id
+            ORDER BY f.executed_at
+            """
+        ).fetchall()
+
+        terminal = {"promoted", "rejected", "expired"}
+        open_status: dict[str, bool] = {}
+        for row in self._conn.execute(
+            """
+            SELECT cohort_id, status FROM probe_lifecycle_epochs
+            WHERE (cohort_id, epoch) IN (
+                SELECT cohort_id, MAX(epoch) FROM probe_lifecycle_epochs GROUP BY cohort_id
+            )
+            """
+        ):
+            open_status[str(row["cohort_id"])] = str(row["status"]) not in terminal
+
+        merged: dict[str, dict[str, Any]] = {}
+        for row in rows:
+            cohort_id = str(row["cohort_id"])
+            # 沒有 lifecycle epoch 的 cohort 視為仍開著：fill 存在就是持有的證據，
+            # 缺 epoch 是登記不全，不該讓部位從監控中消失（fail open 只作用於
+            # 「要不要看它」，不影響任何 authority）。
+            if not open_status.get(cohort_id, True):
+                continue
+            shares = float(row["shares"])
+            price = float(row["price"])
+            entry = merged.get(cohort_id)
+            if entry is None:
+                merged[cohort_id] = {
+                    "cohort_id": cohort_id,
+                    "company_id": row["company_id"],
+                    "ticker": row["research_ticker"],
+                    "shares": shares,
+                    "entry_price": price,
+                    "currency": str(row["currency"]),
+                    "first_executed_at": str(row["executed_at"]),
+                    "last_executed_at": str(row["executed_at"]),
+                    "fill_count": 1,
+                    "selected_weight": (
+                        float(row["selected_weight"])
+                        if row["selected_weight"] is not None
+                        else None
+                    ),
+                }
+                continue
+            total = entry["shares"] + shares
+            if total > 0:
+                entry["entry_price"] = (
+                    entry["entry_price"] * entry["shares"] + price * shares
+                ) / total
+            entry["shares"] = total
+            entry["last_executed_at"] = str(row["executed_at"])
+            entry["fill_count"] += 1
+            if row["selected_weight"] is not None:
+                entry["selected_weight"] = float(row["selected_weight"])
+        return list(merged.values())
+
     def capital_expression_counters(self) -> dict[str, Any]:
         """兩個常駐計數器：系統至今**輸出過**多少資本，以及**驗證過**多少判斷。
 

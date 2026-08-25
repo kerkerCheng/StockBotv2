@@ -42,6 +42,8 @@ _PROBE_REQUIRED_KEYS = {
 }
 _PROBE_LEVELS = ("unknown", "bounded_hypothesis", "corroborated")
 
+_LIVE_MONITOR_REQUIRED_KEYS = {"return_1d_at_most", "history_sessions"}
+
 
 class PolicyError(ValueError):
     """Raised when policy configuration is missing or unsafe."""
@@ -142,6 +144,36 @@ def _validate_probe_lane(value: Any) -> dict[str, Any]:
     return normalized
 
 
+def _validate_live_position_monitor(value: Any) -> dict[str, Any]:
+    """Alpha live 部位事件監控門檻。
+
+    ⚠ 這是**通知門檻**，不是資本閘門——它不會讓任何 supported range 歸零，也不決定
+    尺寸。門檻設錯的代價是搜尋次數過多或過少，可由 config 直接調整（與 L14 所管的
+    「未經量測的 gate 不得決定資本」是兩件事）。
+
+    `return_1d_at_most` 必須為負：一個 >= 0 的門檻會讓每個交易日都觸發，正是 L14
+    第 4 點的「恆亮」失效型態。
+    """
+
+    if not isinstance(value, Mapping):
+        raise PolicyError("live_position_monitor must be an object")
+    missing = sorted(_LIVE_MONITOR_REQUIRED_KEYS - set(value))
+    if missing:
+        raise PolicyError(
+            f"live_position_monitor missing required keys: {', '.join(missing)}"
+        )
+
+    floor = _number(value["return_1d_at_most"], "live_position_monitor.return_1d_at_most")
+    if floor >= 0:
+        raise PolicyError("live_position_monitor.return_1d_at_most must be negative")
+
+    sessions = value["history_sessions"]
+    if isinstance(sessions, bool) or not isinstance(sessions, int) or sessions < 2:
+        raise PolicyError("live_position_monitor.history_sessions must be an integer >= 2")
+
+    return {"return_1d_at_most": floor, "history_sessions": sessions}
+
+
 def validate_policy(policy: Mapping[str, Any]) -> dict[str, Any]:
     """Validate and normalize a policy mapping, failing closed on drift."""
 
@@ -202,6 +234,10 @@ def validate_policy(policy: Mapping[str, Any]) -> dict[str, Any]:
     # to the independently validated Probe lane.
     if "probe_lane" in policy:
         normalized["probe_lane"] = _validate_probe_lane(policy["probe_lane"])
+    if "live_position_monitor" in policy:
+        normalized["live_position_monitor"] = _validate_live_position_monitor(
+            policy["live_position_monitor"]
+        )
     return normalized
 
 
