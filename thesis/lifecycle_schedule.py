@@ -65,6 +65,48 @@ def catalyst_checkpoints(entry: Mapping[str, Any]) -> list[dict[str, Any]]:
     return sorted(out, key=lambda item: item["date"])
 
 
+def checkpoints_by_ticker(
+    *, lifecycle_path: Any = None, calendar_path: Any = None
+) -> dict[str, list[dict[str, Any]]]:
+    """把兩個結構化催化劑來源併成 ``ticker -> checkpoints``。
+
+    兩個來源刻意分開（2026-08-20）：``thesis/lifecycle.json`` 只涵蓋有 lane memo 的
+    thesis，``thesis/catalyst_calendar.json`` 涵蓋其餘 Engine D cohort；非 thesis 的
+    cohort **不能**塞進前者（該檔另有消費者會去找對應的 ``*_lane_memo.md``）。
+
+    ⚠ 這份對照表有一個 fail-safe 消費者：``rank_work_orders`` 用它區分「真的逾期」與
+    「``expiry`` 被設在催化劑之前的假逾期」。**查不到 ticker 時必須當成無法判定，
+    不能當成沒問題**——沒有結構化日期就測不出假逾期（L13）。
+    """
+    import json
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parent.parent
+    sources = (
+        (Path(lifecycle_path) if lifecycle_path else root / "thesis" / "lifecycle.json", None),
+        (
+            Path(calendar_path) if calendar_path else root / "thesis" / "catalyst_calendar.json",
+            "entries",
+        ),
+    )
+    out: dict[str, list[dict[str, Any]]] = {}
+    for path, key in sources:
+        if not path.is_file():
+            continue
+        raw = json.loads(path.read_text(encoding="utf-8-sig"))
+        if key is not None:
+            raw = raw.get(key) or []
+        entries = raw.values() if isinstance(raw, dict) else raw
+        for entry in entries:
+            if not isinstance(entry, Mapping):
+                continue
+            ticker = str(entry.get("ticker") or "").strip()
+            checkpoints = catalyst_checkpoints(entry)
+            if ticker and checkpoints:
+                out.setdefault(ticker, checkpoints)
+    return out
+
+
 def effective_next_check(
     entry: Mapping[str, Any], *, today: date | None = None
 ) -> tuple[date | None, str, dict[str, Any] | None]:

@@ -5,7 +5,6 @@
 """
 from __future__ import annotations
 
-import json
 import sqlite3
 import sys
 from pathlib import Path
@@ -14,46 +13,9 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from decision_lab.catalyst_watch import build_watchlist, render_markdown  # noqa: E402
-from thesis.lifecycle_schedule import catalyst_checkpoints  # noqa: E402
+from thesis.lifecycle_schedule import checkpoints_by_ticker  # noqa: E402
 
 DECISION_DB = ROOT / "library" / "private" / "decision_lab" / "decision_lab.db"
-LIFECYCLE = ROOT / "thesis" / "lifecycle.json"
-CATALYST_CALENDAR = ROOT / "thesis" / "catalyst_calendar.json"
-
-
-def _iter_entries(path, key: str | None = None):
-    """兩個來源的 entry 形狀不同，在這裡收斂成同一個迭代器。"""
-    if not path.is_file():
-        return
-    raw = json.loads(path.read_text(encoding="utf-8-sig"))
-    if key is not None:
-        raw = raw.get(key) or []
-    for entry in raw.values() if isinstance(raw, dict) else raw:
-        if isinstance(entry, dict):
-            yield entry
-
-
-def _checkpoints_by_company() -> dict[str, list]:
-    """把結構化催化劑接過來，以 ticker 對應到 cohort。
-
-    兩個來源、刻意分開（2026-08-20）：
-    - `thesis/lifecycle.json` 只涵蓋有 lane memo 的 thesis（目前 3 條）。
-    - `thesis/catalyst_calendar.json` 涵蓋其餘 Engine D cohort。
-
-    先前只讀前者，於是 11 檔裡只有 3 檔可做「`expiry` 早於催化劑」的結構化比對——
-    IQE 那次假逾期（到期日被設在催化劑之前）就是靠人眼發現的，不是被這支腳本抓到。
-    非 thesis 的 cohort **不能**塞進 lifecycle.json：該檔另有兩個消費者會把每個 entry
-    當成一條 thesis，`thesis_freshness_check` 還會去找對應的 `*_lane_memo.md`。
-    語意不同就分開存，兩邊共用同一支 `catalyst_checkpoints()` 正規化函式。
-    """
-    out: dict[str, list] = {}
-    for path, key in ((LIFECYCLE, None), (CATALYST_CALENDAR, "entries")):
-        for entry in _iter_entries(path, key):
-            ticker = str(entry.get("ticker") or "")
-            checkpoints = catalyst_checkpoints(entry)
-            if ticker and checkpoints:
-                out.setdefault(ticker, checkpoints)
-    return out
 
 
 def main() -> int:
@@ -63,7 +25,7 @@ def main() -> int:
     conn = sqlite3.connect(f"file:{DECISION_DB}?mode=ro", uri=True)
     conn.row_factory = sqlite3.Row
     try:
-        by_ticker = _checkpoints_by_company()
+        by_ticker = checkpoints_by_ticker()
         rows = build_watchlist(conn)
         # cohort 以 company_id 為鍵，lifecycle 以 ticker——在這裡對接。
         by_company = {}

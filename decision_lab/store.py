@@ -1292,9 +1292,106 @@ class DecisionStore:
             )
         return self.get_research_work_order(work_order_id)
 
-    def rank_work_orders(self, *, capacity: int = 5) -> dict[str, list[dict[str, Any]]]:
+    def _work_order_lifecycle(
+        self,
+        item: Mapping[str, Any],
+        *,
+        checkpoints_by_ticker: Mapping[str, Any],
+        today: Any = None,
+    ) -> dict[str, Any]:
+        """判斷一張 work order 現在還算不算 live 的 pq1 工作。
+
+        事發（2026-08-25）：drain 把 COHR 一張 2026-07-22 的 work order 當成 live
+        USER-GO 每輪發出。實測該 cohort 有 4 張同世代 work order（catalyst 全空、
+        expiry 全是 2026-07-25），而 COHR **現行** probe 的到期日是 2027-02-28 且
+        catalyst 已填——發出來的是被 supersede 的舊世代。同時 MRVL／SHA0.DE 看起來
+        「逾期」，實際只是 `expiry` 取了 `probe_lane.review_hours`（72 小時）的預設值
+        而 catalyst 從未填寫。同一個 `expiry` 欄位承載「該回頭看一眼」與「催化劑截止」
+        兩種語意，下游二選一必錯（L12）。
+
+        ⚠ **排除只在能證明的時候發生。** `expired` 需要結構化催化劑日期才能與
+        「`expiry` 被設在催化劑之前」的假逾期分辨；查不到 ticker 的 checkpoints 時
+        一律保留並標記，不得默默排除——那正是 `action_card` 註解記錄過的 AXT 災難
+        （expiry 比自己的催化劑早三個月，自動關會關掉一個還在跑的 thesis）。
+        """
+        from decision_lab.catalyst_watch import assess_entry
+
+        assessment_id = str(item["assessment_id"])
+        cohort_id = str(item["cohort_id"])
+        row = self._conn.execute(
+            """
+            SELECT ca.catalyst, ca.disproof, ca.expiry, dc.research_ticker
+              FROM coverage_assessments ca
+              JOIN decision_cohorts dc ON dc.cohort_id = ca.cohort_id
+             WHERE ca.assessment_id = ?
+            """,
+            (assessment_id,),
+        ).fetchone()
+        if row is None:
+            return {"state": "unknown", "withheld_reason": None, "notes": []}
+
+        # Supersede 是確定性比對，不牽涉語意判斷，因此可以無條件排除。
+        latest = self._conn.execute(
+            """
+            SELECT coverage_assessment_id FROM system_decisions
+             WHERE cohort_id = ?
+             ORDER BY effective_at DESC, decision_id DESC LIMIT 1
+            """,
+            (cohort_id,),
+        ).fetchone()
+        if latest is not None and str(latest["coverage_assessment_id"]) != assessment_id:
+            return {
+                "state": "superseded",
+                "withheld_reason": "superseded_by_newer_decision",
+                "notes": [
+                    "這張 work order 綁的 assessment 已被同 cohort 更新的 decision 取代；"
+                    "補它的 blocker 是在為一個不再生效的 context 做功。"
+                ],
+            }
+
+        ticker = str(row["research_ticker"] or "")
+        checkpoints = checkpoints_by_ticker.get(ticker) or ()
+        verdict = assess_entry(
+            {
+                "catalyst": row["catalyst"],
+                "disproof": row["disproof"],
+                "expiry": row["expiry"],
+            },
+            today=today,
+            checkpoints=checkpoints,
+        )
+        state = verdict["state"]
+        if state == "expired" and not checkpoints:
+            return {
+                "state": "expired_unverifiable",
+                "withheld_reason": None,
+                "notes": [
+                    f"`expiry` {verdict['expiry']} 已過，但 {ticker or '該 cohort'} 沒有結構化"
+                    "催化劑日期，無法分辨真逾期與「expiry 早於催化劑」的假逾期——"
+                    "依 fail-safe 保留。補法：把該 cohort 加進 thesis/catalyst_calendar.json。"
+                ],
+            }
+        if state == "expired":
+            return {
+                "state": "expired",
+                "withheld_reason": "catalyst_window_lapsed",
+                "notes": [
+                    f"催化劑 {verdict['next_catalyst']} 已過且 `expiry` {verdict['expiry']} 到期，"
+                    "屬 thesis 有效期問題，應由人決定 close 或 extend，不是繼續補 blocker。"
+                ],
+            }
+        return {"state": state, "withheld_reason": None, "notes": list(verdict["problems"])}
+
+    def rank_work_orders(
+        self,
+        *,
+        capacity: int = 5,
+        checkpoints_by_ticker: Mapping[str, Any] | None = None,
+        today: Any = None,
+    ) -> dict[str, list[dict[str, Any]]]:
         if capacity < 0:
             raise ValueError("capacity must be non-negative")
+        checkpoints_by_ticker = checkpoints_by_ticker or {}
         authorized: set[str] = set()
         for event in self._conn.execute(
             """
@@ -1307,9 +1404,11 @@ class DecisionStore:
             if isinstance(work_order_id, str) and work_order_id:
                 authorized.add(work_order_id)
         rows = []
+        withheld = []
         for row in self._conn.execute(
                 """
-                SELECT work_order_id, cohort_id, context_digest, blockers_json, expiry,
+                SELECT work_order_id, assessment_id, cohort_id, context_digest,
+                       blockers_json, expiry,
                        decision_relevance, falsifiability, information_value,
                        status, created_at
                 FROM research_work_orders
@@ -1329,8 +1428,23 @@ class DecisionStore:
             if str(item["work_order_id"]) not in authorized:
                 continue
             item["blockers"] = list(json.loads(item.pop("blockers_json"))["items"])
+            lifecycle = self._work_order_lifecycle(
+                item, checkpoints_by_ticker=checkpoints_by_ticker, today=today
+            )
+            # 任何會改變輸出的輸入都必須出現在該輸出自己的證據欄位裡（L12）：
+            # 被擋下的不是消失，而是移到 `withheld` 並帶上理由。
+            item["lifecycle_state"] = lifecycle["state"]
+            item["lifecycle_notes"] = lifecycle["notes"]
+            if lifecycle["withheld_reason"]:
+                item["withheld_reason"] = lifecycle["withheld_reason"]
+                withheld.append(item)
+                continue
             rows.append(item)
-        return {"selected": rows[:capacity], "backlog": rows[capacity:]}
+        return {
+            "selected": rows[:capacity],
+            "backlog": rows[capacity:],
+            "withheld": withheld,
+        }
 
     def _paper_exposure(
         self,

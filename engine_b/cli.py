@@ -205,6 +205,25 @@ def _cmd_register(args: argparse.Namespace) -> int:
     return 0
 
 
+def _print_withheld(withheld_jobs: list[dict]) -> None:
+    """被擋下的 work order 必須現形。
+
+    它們不是「做完了」也不是「不存在」——是需要人做別的決定（close／extend，或先
+    處理 supersede）。安靜消失會讓下一個 session 以為佇列本來就這麼短（L13）。
+    """
+    if not withheld_jobs:
+        return
+    print()
+    print(f"⚠ 另有 {len(withheld_jobs)} 件 work order 未列入本輪（不是完成，是需要別的決定）：")
+    for job in withheld_jobs:
+        print(
+            f"  [擋下] {job['work_order_id']}  cohort={job['cohort_id']}  "
+            f"理由={job['withheld_reason']}"
+        )
+        for note in job.get("lifecycle_notes") or []:
+            print(f"          {note}")
+
+
 def _cmd_drain(args: argparse.Namespace) -> int:
     """列出 pq1 接下來的 bounded jobs，供 agent 逐個研究與 checkpoint。
 
@@ -224,6 +243,7 @@ def _cmd_drain(args: argparse.Namespace) -> int:
         else routine_config.discover_tracked_tickers(config)
     )
     decision_jobs: list[dict] = []
+    withheld_jobs: list[dict] = []
     is_default_store = (
         Path(args.leads).resolve() == leads.DEFAULT_LEADS_PATH.resolve()
     )
@@ -235,9 +255,16 @@ def _cmd_drain(args: argparse.Namespace) -> int:
         try:
             from decision_lab.bootstrap import open_default_store
 
+            from thesis.lifecycle_schedule import checkpoints_by_ticker
+
             decision_store = open_default_store()
             try:
-                decision_jobs = decision_store.rank_work_orders(capacity=limit)["selected"]
+                ranked_orders = decision_store.rank_work_orders(
+                    capacity=limit,
+                    checkpoints_by_ticker=checkpoints_by_ticker(),
+                )
+                decision_jobs = ranked_orders["selected"]
+                withheld_jobs = ranked_orders["withheld"]
             finally:
                 decision_store.close()
         except Exception as exc:
@@ -272,11 +299,15 @@ def _cmd_drain(args: argparse.Namespace) -> int:
         ] + [
             {"kind": "lead", "priority": rank.label, "lead": lead}
             for rank, lead in lead_batch
+        ] + [
+            {"kind": "withheld_work_order", "work_order": job}
+            for job in withheld_jobs
         ]
         print(json.dumps(rows, ensure_ascii=False, indent=2))
         return 0
     if not decision_jobs and not lead_batch:
         print("（pq1 佇列已空——無 dispatched work order 或可研究 lead）")
+        _print_withheld(withheld_jobs)
         return 0
     print(f"pq1 drain：接下來 {len(decision_jobs) + len(lead_batch)} 件：")
     for job in decision_jobs:
@@ -285,9 +316,12 @@ def _cmd_drain(args: argparse.Namespace) -> int:
             f"cohort={job['cohort_id']}"
         )
         print(f"            blockers={','.join(job.get('blockers') or [])}")
+        for note in job.get("lifecycle_notes") or []:
+            print(f"            ⚠ {note}")
     for rank, l in lead_batch:
         print(f"  [{rank.label}] {l['lead_id']}  {l['status']:12}  {l['source']}")
         print(f"           {l.get('title') or '(無標題)'}  {l.get('url')}")
+    _print_withheld(withheld_jobs)
     return 0
 
 

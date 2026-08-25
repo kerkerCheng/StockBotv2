@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import date
 from pathlib import Path
 
 import pytest
@@ -290,6 +291,152 @@ def test_queue_capacity_preserves_backlog_and_stable_ranking(tmp_path: Path) -> 
         assert len(ranked_once["backlog"]) == 2
         assert store.table_count("research_work_orders") == 7
         assert all(result.work_order_id for result in results)
+    finally:
+        store.close()
+
+
+def _queued_work_order(store: DecisionStore, *, key: str) -> str:
+    """建一張已 dispatch 的 work order，供 lifecycle 分流測試使用。
+
+    `expiry` 用 `_assess` 的預設 2026-10-21；**不能在這裡直接塞過去的日期**——
+    `assess_coverage` 會擋掉 expiry <= evaluation_at。production 的逾期是建立當下為
+    未來、之後才走到期，因此測試改用 `rank_work_orders(today=...)` 推進時間。
+    """
+    result = _assess(
+        store,
+        _bundle(
+            store,
+            evidence={
+                "focus_company": None,
+                "subject_origin_entity": "Unknown",
+                "sources": [],
+                "causal_paths": [],
+                "counter_paths": [],
+            },
+        ),
+    )
+    store.transition_research_work_order(
+        work_order_id=result.work_order_id,
+        to_status="queued",
+        operation_key=f"test-dispatch-{key}",
+        receipt={"todo_n": 1},
+        observed_at=NOW,
+    )
+    return result.work_order_id
+
+
+def test_lapsed_expiry_without_structured_catalyst_is_kept_not_withheld(
+    tmp_path: Path,
+) -> None:
+    """沒有結構化催化劑日期時，逾期無法判真假，必須保留（fail-safe）。
+
+    反面就是 AXT 那次災難：`expiry` 被設在自己的催化劑之前，若直接當成逾期排除，
+    會關掉一個還在跑的 thesis。
+    """
+    store = _store(tmp_path)
+    try:
+        work_order_id = _queued_work_order(store, key="unverifiable")
+        ranked = store.rank_work_orders(
+            capacity=5, checkpoints_by_ticker={}, today=date(2026, 11, 1)
+        )
+
+        assert [row["work_order_id"] for row in ranked["selected"]] == [work_order_id]
+        assert ranked["withheld"] == []
+        assert ranked["selected"][0]["lifecycle_state"] == "expired_unverifiable"
+        assert any(
+            "無法分辨真逾期" in note for note in ranked["selected"][0]["lifecycle_notes"]
+        )
+    finally:
+        store.close()
+
+
+def test_lapsed_expiry_after_its_catalyst_is_withheld_with_reason(tmp_path: Path) -> None:
+    """催化劑已過、`expiry` 也到期＝真的逾期：該由人決定 close／extend，不是補 blocker。"""
+    store = _store(tmp_path)
+    try:
+        work_order_id = _queued_work_order(store, key="lapsed")
+        ranked = store.rank_work_orders(
+            capacity=5,
+            checkpoints_by_ticker={
+                "SIVE.ST": [{"date": date(2026, 10, 1), "date_confidence": "confirmed"}]
+            },
+            today=date(2026, 11, 1),
+        )
+
+        assert ranked["selected"] == []
+        assert [row["work_order_id"] for row in ranked["withheld"]] == [work_order_id]
+        assert ranked["withheld"][0]["withheld_reason"] == "catalyst_window_lapsed"
+    finally:
+        store.close()
+
+
+def test_expiry_set_before_its_own_catalyst_is_kept_as_config_broken(tmp_path: Path) -> None:
+    """`expiry` 早於催化劑是設定錯誤，不是論點失效——必須保留並標記（AXT 實例）。"""
+    store = _store(tmp_path)
+    try:
+        work_order_id = _queued_work_order(store, key="misconfigured")
+        ranked = store.rank_work_orders(
+            capacity=5,
+            checkpoints_by_ticker={
+                "SIVE.ST": [{"date": date(2026, 12, 1), "date_confidence": "confirmed"}]
+            },
+            today=date(2026, 11, 1),
+        )
+
+        assert [row["work_order_id"] for row in ranked["selected"]] == [work_order_id]
+        assert ranked["withheld"] == []
+        assert ranked["selected"][0]["lifecycle_state"] == "config_broken"
+    finally:
+        store.close()
+
+
+def test_work_order_superseded_by_newer_decision_is_withheld(tmp_path: Path) -> None:
+    """綁在舊 assessment 上的 work order 不再是 live 工作（COHR 實例）。"""
+    store = _store(tmp_path)
+    try:
+        bundle = _bundle(
+            store,
+            evidence={
+                "focus_company": None,
+                "subject_origin_entity": "Unknown",
+                "sources": [],
+                "causal_paths": [],
+                "counter_paths": [],
+            },
+        )
+        older = _assess(store, bundle, expiry="2026-10-21T00:00:00+00:00")
+        newer = _assess(store, bundle, expiry="2026-11-21T00:00:00+00:00")
+        store.transition_research_work_order(
+            work_order_id=older.work_order_id,
+            to_status="queued",
+            operation_key="test-dispatch-superseded",
+            receipt={"todo_n": 1},
+            observed_at=NOW,
+        )
+        for decision_id, assessment_id, effective_at in (
+            ("pd_older", older.assessment_id, "2026-08-01T00:00:00+00:00"),
+            ("pd_newer", newer.assessment_id, "2026-09-01T00:00:00+00:00"),
+        ):
+            store._conn.execute(
+                """
+                INSERT INTO system_decisions (
+                    decision_id, cohort_id, idempotency_key, request_digest,
+                    decision_digest, context_digest, coverage_assessment_id,
+                    policy_version, calculator_version, payload_json, effective_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, 'probe-v1', 'probe-limit-v3', '{}', ?)
+                """,
+                (
+                    decision_id, bundle.cohort_id, f"idem_{decision_id}",
+                    f"rq_{decision_id}", f"dg_{decision_id}", bundle.digest,
+                    assessment_id, effective_at,
+                ),
+            )
+        work_order_id = older.work_order_id
+        ranked = store.rank_work_orders(capacity=5, checkpoints_by_ticker={})
+
+        assert ranked["selected"] == []
+        assert [r["work_order_id"] for r in ranked["withheld"]] == [work_order_id]
+        assert ranked["withheld"][0]["withheld_reason"] == "superseded_by_newer_decision"
     finally:
         store.close()
 
