@@ -5735,11 +5735,11 @@
       "published_at": "Tue, 28 Apr 2026 10:31:00 +0000",
       "refs": {
         "original_claim_status": "confirmed_context_added",
-        "research_outcome": "三條 lead 同組事件一次研究。一手 RNS 確認：MACOM £45m 策略投資（£30m equity＋£15m non-interest bearing CLN）並同時簽 long-term supply agreements；為 IQE 第二筆客戶端供應承諾（前有 Tower Semiconductor 2026-06-15）。FY2026 guidance 由 >20% 上修至 >30%（2026-07-21 Trading Update），H1 營收至少 £64m。已建 Engine C 觀測提案 po_057a01f28269a80921e5eaada8e4f5bf（supersede mo_d3aeef5237e01b3af82a159cdb73d684）待 pq2 核准。MACOM→IQE 供應邊具入圖資格但未 prepare RA。",
+        "research_outcome": "【2026-08-25 更正】原記「MACOM→IQE 供應邊具入圖資格但未 prepare RA，需先查 registry」——實查後該顧慮不成立且結論相反：co:macom 早在 registry（MTSI/NASDAQ）與圖中，co:macom SUPPLIES_TO co:iqe 與 INVESTS_IN co:iqe 兩條邊皆已存在，本次事件的 claim 亦已入圖（iqe_macom_investment_supply_2026_05_28_cl1/cl2、macom_iqe_supply_chain_2026_04_27_cl1/cl2）。故不需要 prepare RA——不是待辦卡住，是已完成。本輪一手研究的增量有二：(1) £45m 拆為 £30m equity＋£15m non-interest bearing CLN 的逐字條款細節（圖中既有 claim 可補強，屬 claim 屬性而非新建邊）；(2) 2026-07-21 guidance 上修 >20%→>30%、H1 營收至少 £64m，屬 5 月公告後的新事件，已寫入 Engine C backlog 觀測 mo_057a01f28269a80921e5eaada8e4f5bf（pq2 [226] 已核准）。",
         "trace_attempts_ref": "library/private/research_notes/2026-08-25_pq1_iqe_macom_fundraise_guidance.md",
         "trace_origin_entity": "IQE plc (issuer RNS)",
         "trace_requires_user": "false",
-        "trace_status": "primary_source_obtained"
+        "trace_status": "original_obtained"
       },
       "source": "yahoo:iqe-l",
       "status": "parked",
@@ -8118,14 +8118,17 @@
       "published_at": "2026-08-18T17:27:07.000Z",
       "raw_text": "My $AAOI TLDR notes at Rosenblatt summit:\n\n- Expected to get paid premiums for US production of 800g/1.6T (very positive for ASP/margins).\n\n- Several LTAs on the table, but doesn't want to sign to get capacity blocked by other customers (cough cough $NVDA). \n\n- Sold out at least through second half of next year and beyond. (High demand visibility like $LITE)\n\n- Has 300-400 mW lasers already. \n\n- Expects margins to be above 40%+ once CPO comes about (probably most material for rerating). \n\nI can't see how anyone can be bearish on this company...",
       "refs": {
+        "original_claim_status": "unverifiable_no_public_record",
         "outcome": "no_prepared_ra_partial_and_existing_claims",
         "parked_reason": "新 AAOI／Sivers 綜合貼文只重複 summit 與供應短缺轉述；既有 AAOI 官方活動摘要仍未支持 US premium、數份 LTA、sold out 至 2027H2、300–400mW 或 CPO 毛利率逾 40% 等精確 atoms。",
+        "pq2_ref": "193",
         "primary_url": "https://newsroom.ao-inc.com/blog/insights-from-stefan-murry-at-the-rosenblatt-age-of-ai-summit/",
-        "research_outcome": "no_new_primary_delta",
+        "research_outcome": "內容為作者在 Rosenblatt summit 的個人筆記（\"My $AAOI TLDR notes at Rosenblatt summit\"）。該 summit 無公開錄音或逐字稿，管理層說法未進任何 SEC filing 或公司 PR，故無法逐字核對。與 pq2 [193]（Rosenblatt 報告 access）是同一道障礙，[193] 已 defer。claim 內容（US 產能溢價、LTA 未簽、sold out 至明年下半、300-400mW 雷射、CPO 後毛利 40%+）全部只有此單一二手來源，依 L8／L11 不可入圖亦不可引用。",
         "research_run": "daily:2026-08-21",
         "trace_attempts_ref": "AAOI Newsroom summit 摘要、Q1/Q2 2026 transcript／filing與今日綜合貼文；未取得完整 summit webcast 或 transcript。",
-        "trace_next_trigger": "取得 Rosenblatt summit 完整錄影／逐字稿，或 AAOI filing／法說逐項確認精確 atoms。",
+        "trace_next_trigger": "AAOI 於 10-Q／10-K／8-K 或官方 PR 揭露上述任一項；或使用者核准 [193] 的 Rosenblatt access",
         "trace_origin_entity": "Applied Optoelectronics",
+        "trace_origin_linkage": "same_access_barrier_as_pq2_193",
         "trace_requeue_consumed_entities": [
           "AAOI",
           "CO:APPLIED_OPTOELECTRONICS",
@@ -8137,7 +8140,7 @@
         "trace_requeue_trigger": "related_triaged_lead:lead_2d6a14cf1d209934f5139ed7ed78c3e4",
         "trace_requeued_at": "2026-08-24T22:36:51.372267+00:00",
         "trace_requires_user": "false",
-        "trace_status": "partial",
+        "trace_status": "isolated_tier_3",
         "trace_trigger_entities": [
           "AAOI",
           "LITE",
@@ -8150,7 +8153,7 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -8343,7 +8346,7 @@
         "trace_origin_entity": "Applied Optoelectronics, Inc. (SEC 424B5 registrant)",
         "trace_original_date": "2026-08-21",
         "trace_requires_user": "false",
-        "trace_status": "primary_source_obtained"
+        "trace_status": "original_obtained"
       },
       "source": "x:aleabitoreddit",
       "status": "parked",
@@ -10222,11 +10225,11 @@
       "published_at": "Thu, 28 May 2026 06:57:00 +0000",
       "refs": {
         "original_claim_status": "confirmed_context_added",
-        "research_outcome": "三條 lead 同組事件一次研究。一手 RNS 確認：MACOM £45m 策略投資（£30m equity＋£15m non-interest bearing CLN）並同時簽 long-term supply agreements；為 IQE 第二筆客戶端供應承諾（前有 Tower Semiconductor 2026-06-15）。FY2026 guidance 由 >20% 上修至 >30%（2026-07-21 Trading Update），H1 營收至少 £64m。已建 Engine C 觀測提案 po_057a01f28269a80921e5eaada8e4f5bf（supersede mo_d3aeef5237e01b3af82a159cdb73d684）待 pq2 核准。MACOM→IQE 供應邊具入圖資格但未 prepare RA。",
+        "research_outcome": "【2026-08-25 更正】原記「MACOM→IQE 供應邊具入圖資格但未 prepare RA，需先查 registry」——實查後該顧慮不成立且結論相反：co:macom 早在 registry（MTSI/NASDAQ）與圖中，co:macom SUPPLIES_TO co:iqe 與 INVESTS_IN co:iqe 兩條邊皆已存在，本次事件的 claim 亦已入圖（iqe_macom_investment_supply_2026_05_28_cl1/cl2、macom_iqe_supply_chain_2026_04_27_cl1/cl2）。故不需要 prepare RA——不是待辦卡住，是已完成。本輪一手研究的增量有二：(1) £45m 拆為 £30m equity＋£15m non-interest bearing CLN 的逐字條款細節（圖中既有 claim 可補強，屬 claim 屬性而非新建邊）；(2) 2026-07-21 guidance 上修 >20%→>30%、H1 營收至少 £64m，屬 5 月公告後的新事件，已寫入 Engine C backlog 觀測 mo_057a01f28269a80921e5eaada8e4f5bf（pq2 [226] 已核准）。",
         "trace_attempts_ref": "library/private/research_notes/2026-08-25_pq1_iqe_macom_fundraise_guidance.md",
         "trace_origin_entity": "IQE plc (issuer RNS)",
         "trace_requires_user": "false",
-        "trace_status": "primary_source_obtained"
+        "trace_status": "original_obtained"
       },
       "source": "yahoo:iqe-l",
       "status": "parked",
@@ -11125,9 +11128,14 @@
       ],
       "published_at": "2026-08-24T15:23:59.000Z",
       "raw_text": "$NVDA, following their $20B deal... Announces Groq3 LPX now in full production.\n\nWith $NBIS the first to adopt through Nebius token factory.\n\n- 3,400 tok/s in Artificial Analysis benchmarking running Gemma 4 31B, with 100k token context\n- 4x faster responsiveness than the nearest alternative\n\nThing that caught my attention.. was a former press release after Nvidia's $2B investment into Nebius. \n\nThat it would support their \"early adoption of Nvidia's latest generation\" architectures. \n\nGuess we're seeing that special treatment here.",
-      "refs": {},
+      "refs": {
+        "original_claim_status": "product_announcement_no_bottleneck_claim",
+        "research_outcome": "內容為 NVDA 產品全量產與 NBIS 採用的推論評論（推測 NVDA 投資帶來 early access 待遇）。不含任何供應鏈瓶頸、可替代性或客戶端資本承諾的可驗證 atom；benchmark 數字屬第三方測試非供應關係。依 AGENTS.md 主題範圍（CPO 與 humanoid 兩條主線）與 source-trace 分流表，本條不屬 source trace 缺口，不投入 pq1 預算。",
+        "trace_requires_user": "false",
+        "trace_status": "off_thesis_scope"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -12819,11 +12827,11 @@
       "published_at": "Tue, 21 Jul 2026 07:28:24 +0000",
       "refs": {
         "original_claim_status": "confirmed_context_added",
-        "research_outcome": "三條 lead 同組事件一次研究。一手 RNS 確認：MACOM £45m 策略投資（£30m equity＋£15m non-interest bearing CLN）並同時簽 long-term supply agreements；為 IQE 第二筆客戶端供應承諾（前有 Tower Semiconductor 2026-06-15）。FY2026 guidance 由 >20% 上修至 >30%（2026-07-21 Trading Update），H1 營收至少 £64m。已建 Engine C 觀測提案 po_057a01f28269a80921e5eaada8e4f5bf（supersede mo_d3aeef5237e01b3af82a159cdb73d684）待 pq2 核准。MACOM→IQE 供應邊具入圖資格但未 prepare RA。",
+        "research_outcome": "【2026-08-25 更正】原記「MACOM→IQE 供應邊具入圖資格但未 prepare RA，需先查 registry」——實查後該顧慮不成立且結論相反：co:macom 早在 registry（MTSI/NASDAQ）與圖中，co:macom SUPPLIES_TO co:iqe 與 INVESTS_IN co:iqe 兩條邊皆已存在，本次事件的 claim 亦已入圖（iqe_macom_investment_supply_2026_05_28_cl1/cl2、macom_iqe_supply_chain_2026_04_27_cl1/cl2）。故不需要 prepare RA——不是待辦卡住，是已完成。本輪一手研究的增量有二：(1) £45m 拆為 £30m equity＋£15m non-interest bearing CLN 的逐字條款細節（圖中既有 claim 可補強，屬 claim 屬性而非新建邊）；(2) 2026-07-21 guidance 上修 >20%→>30%、H1 營收至少 £64m，屬 5 月公告後的新事件，已寫入 Engine C backlog 觀測 mo_057a01f28269a80921e5eaada8e4f5bf（pq2 [226] 已核准）。",
         "trace_attempts_ref": "library/private/research_notes/2026-08-25_pq1_iqe_macom_fundraise_guidance.md",
         "trace_origin_entity": "IQE plc (issuer RNS)",
         "trace_requires_user": "false",
-        "trace_status": "primary_source_obtained"
+        "trace_status": "original_obtained"
       },
       "source": "yahoo:iqe-l",
       "status": "parked",
@@ -20398,9 +20406,21 @@
       ],
       "published_at": "2026-08-24T11:35:16.000Z",
       "raw_text": "$XPEV carves out its robotics unit and raises >$900M at $6.3B+ valuations.\n\nThis is following’s Unitree IPO, which now has a ~$35-$36B MC.\n\nThen there’s $NVDA / $AMZN backed Agility… at a $2.5B premoney valuation. Which I’d argue is actually further ahead in commercialization than Xpeng. \n\nRegardless, humanoids + physical AI sector funding is really taking off.",
-      "refs": {},
+      "refs": {
+        "gap": "Agility 歷史財報仍須等 S-4；CEO 口頭 booked orders 非已審計數字",
+        "original_claim_status": "confirmed_classification_corrected",
+        "pq2_ref": "200",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/2074973/000121390526030309/ea0303092-425_churchill11.htm",
+        "research_outcome": "Agility 一手確認（Churchill Capital Corp XI Form 425, 2026-08-21，CIK 0002074973）：CEO Peggy Johnson 逐字 $2.5B pre-money、\"probably in the fall timeframe\" 上市、\"over $300 million of booked orders\"。EDGAR 查該 CIK 的 S-4／S-4A 皆 0 筆，425 本文用未來式 Registration Statement \"will include\"——故 pq2 [200] 等待條件尚未觸發，維持 pending 正確。⚠ triage 分類更正：XPEV $900M（IDG／阿里／騰訊／高榕）、Unitree IPO、Agility SPAC 三者皆為財務投資人資本，不是客戶端資本承諾，不應與 NVDA→COHR、MACOM→IQE 同級。XPEV／Unitree 為整機廠，依 AGENTS.md humanoid 機會在零組件供應商，不建議 onboard。Unitree 市值媒體報導 $53B~$66B 分歧，未追一手故不採用。",
+        "trace_attempts_ref": "library/private/research_notes/2026-08-25_pq1_humanoid_capital_xpev_unitree_agility.md",
+        "trace_next_trigger": "Churchill Capital Corp XI（CIK 0002074973）遞交 S-4 或 S-4/A 並生效，屆時首次揭露 Agility 歷史財報；CEO 2026-08-21 於 425 具名時程為 fall timeframe",
+        "trace_origin_entity": "Churchill Capital Corp XI (SEC Form 425 filer)",
+        "trace_original_date": "2026-08-21",
+        "trace_requires_user": "false",
+        "trace_status": "primary_source_obtained"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -22291,11 +22311,14 @@
       "published_at": "2026-08-20T17:24:14.000Z",
       "raw_text": "Very positive. My opinion is that the optical sector underperformance recently from $AAOI to $SIVE has been absurd.\n\nThe demand visibility... is just way too stupidly high.\n\nAOI: “Even combined AOI, Coherent program altogether, is still very tough to meet the customer demand in the next 3 years” (2029)\n\nElazr GM: \"entire optical supply chain was facing major shortages.\" \"The shortage will continue to the next few years\"\n\nSivers CEO said the same thing about InP laser demand imbalances expected for the next 3-5 years.\n\nCan go on and on about $LITE, $MTSI and other comments.\n\nWe haven't even hit the inflection point with 1.6T, NPO, CPO scale out/up, and optics with memory (as seen with SK Hynix).\n\nYet the industry is already bottlenecked by EML/CW and all your other upstream components from PDs/TIA/DSPs, transceivers, and soon FAU + others when CPO scales… \n\nI'm personally extremely comfortable watching this all play out, but just a little confused that markets don't know how to math a year or two ahead.",
       "refs": {
+        "gap": "需 AAOI IR webcast replay 回聽才能定讞原話",
+        "original_claim_status": "quote_altered_from_source",
         "parked_reason": "這是同作者把 AAOI summit、未知 Elazr GM、Sivers CEO 與 LITE/MTSI 評論混成一則的二次轉述；既有來源支持光學需求偏緊方向，但未支持 AAOI 至 2029、Sivers 3–5 年或整條供應鏈精確短缺時程，不能形成新 graph delta。",
-        "research_outcome": "partial_same_origin_composite_no_graph_delta",
+        "research_outcome": "線索引用 AAOI「Even combined AOI, Coherent program altogether... next 3 years」並自行加註 (2029)。比對 AAOI Q2 2026 法說轉錄，Thompson Lin 實際說法為「Even combined AI, Lumentum, Coherent, Broadcom all together, it's still very tough to meet the customer demand in the next few years」——三處差異全朝更明確更有利方向偏：公司範圍由四個主體縮成兩家、next few years 變 next 3 years、原文無年份卻加註 2029。依 L11 第 1／2 點，該引述不可作為任何 claim 來源。其餘內容（Elazr GM、Sivers CEO 缺貨說法）皆供應商自報，依 L8 無法獨立佐證自己是瓶頸。⚠ 比對基礎為第三方轉錄（tier 2）非 IR replay，只能斷言線索與可得轉錄不一致，不能斷定原話版本。",
         "research_run": "daily:2026-08-21",
-        "trace_attempts_ref": "AAOI 官方 summit 摘要、LITE Q4 transcript、Sivers／POET 既有官方文件與未知 Elazr quote 搜尋；只有部分方向可交叉支持。",
+        "trace_attempts_ref": "library/private/research_notes/2026-08-25_pq1_demand_anchor_amzn_aaoi_quote.md",
         "trace_next_trigger": "取得 AAOI summit 完整 transcript、Sivers CEO 原始逐字稿與 Elazr canonical 活動原文。",
+        "trace_origin_linkage": "supplier_self_report",
         "trace_requeue_consumed_entities": [
           "CO:SIVERS_SEMICONDUCTORS",
           "SIVE"
@@ -22303,7 +22326,7 @@
         "trace_requeue_trigger": "related_triaged_lead:lead_f7b34fc90c9ed8c306133ea148a412aa",
         "trace_requeued_at": "2026-08-21T22:35:41.720555+00:00",
         "trace_requires_user": "false",
-        "trace_status": "partial",
+        "trace_status": "quote_misattributed",
         "trace_trigger_entities": [
           "AAOI",
           "LITE",
@@ -22318,7 +22341,7 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -33474,10 +33497,17 @@
       "published_at": "2026-08-12T07:54:08.000Z",
       "raw_text": "So this is just what I'm seeing with $SIVE and the CW DFB laser chokepoint right now. \n\nFrom optical earnings: \n\n1. $LITE: unexpected demand and imbalance for UHP CW lasers. \n\n- Had ability to price up ASP for lasers. \n- Scale up CPO on track for H2 2027 shipments, called out any CPO scale up delay rumors as noise. \n\nLumentum confirmed timelines (that CPO players like Sivers sold off of misleading reports from), high margins, and extreme demand for qualified CW lasers. \n\n2. $AAOI: doesn’t have enough CW laser capacity because of too much optical transceiver demand.\n\n-  Not meaningfully participating in first-gen CPO deployments, with $MTSI not looking like they're in it either but focusing on NPO. Haven't seen much with $SMTC after their HieFo acqusition. \n- Called lasers as the bottleneck within a 20-40% demand imbalance for transceivers. \n- Says customers approaching them every week asking them for supply + to move faster.\n\nAOI confirmed demand imbalances  + bottlenecks for lasers. And we got an even smaller pool for first-gen CPO players. \n\n3. Both $AAOI and $LITE claimed Chinese players were years behind for CPO lasers and far behind stated claims in qualified capacity. \n\n- $AAOI said 2-3 years+ behind with CPO lasers. \n- $LITE said they haven't seen anything like Chinese claims in terms of outputs (and no recourse if it's false). \n\nReaffirms moat for CPO related lasers, and no flooding from some shortseller claims on the optical sector.  \n\n4. $MTSI said that many customers are approaching them with urgency due to the general supply shortage of indium phosphide DFB lasers. \n\nAgain, puts Sivers in the that bottleneck, giving them likely more customer demand .\n\nAmong $COHR ($72.54B), $LITE ($66.57B), $AVGO ($2.13T): \n\nIt's very special you get one of the public 4 Western CPO leaders at a ~$1.5B MC with $SIVE.  \n\nFeels like my thesis with both:\n\n- The CW bottleneck that I predicted\n- CW laser chokepoint (where there's only a few CPO players, at least for gen-1)\n\nGot validated from earnings, now it's just waiting for the inflection points of next optical architecture shifts.",
       "refs": {
+        "gap": "first ELS module order 的買方未具名；定價權主張須以後續毛利率交叉驗證",
+        "original_claim_status": "confirmed_but_tier_not_upgradable",
         "parked_reason": "Lumentum／MACOM／AAOI 一手或正式 transcript 只支持 UHP／InP DFB laser 供需吃緊；仍沒有客戶端文件證明 Sivers 已成為合格 CW DFB 量產供應商，因此不能把產業短缺直接外推成 Sivers 訂單或 graph edge。",
-        "research_outcome": "partial_industry_shortage_no_sivers_graph_delta",
-        "trace_attempts_ref": "Lumentum Q4 FY2026 transcript；MACOM Q3 transcript；既有 AAOI filing／transcript",
-        "trace_next_trigger": "Sivers 客戶或 CPO integrator 具名確認 Sivers 為 qualified CW DFB volume supplier，或 Sivers filing 揭露付費量產",
+        "pq2_ref": "223",
+        "primary_url": "https://www.fool.com/earnings/call-transcripts/2026/08/18/lumentum-lite-q4-2026-earnings-call-transcript/",
+        "research_outcome": "LITE Q4 FY2026 法說逐字確認供需失衡與定價權（CEO Hurlston: \"We are way behind\"、\"commanding a significant price premium... against what we view as the market price\"），另揭露首筆 ELS module order（ASP 高於雷射本身、H2 CY2027 出貨）與 UHP 營收軌跡（年底約 $50M、fiscal Q3 首見三位數季度）。⚠ 全場未揭露任何客戶名稱，依 L8 仍屬 supplier self-report，LITE→UHP laser 的 evidence 無法由此升級，可行動排序位置不變。與本日 FAU 那條同一形狀：卡在客戶端不具名，非卡在無人研究。升 tier 的唯一路徑是查出 first ELS module order 的買方是誰並取得其具名文件——為目前圖中單一改動效益最大的證據缺口。Engine C 觀測候選（UHP 營收軌跡＋ELS 首單）未建提案，建議與 pq2 [223] co:lumentum 一併處理避免重複。",
+        "trace_attempts_ref": "library/private/research_notes/2026-08-25_pq1_lite_uhp_cw_laser.md",
+        "trace_next_trigger": "任一客戶在 filing／PR 中具名 Lumentum 為 ELS 或 UHP CW laser 供應商；或 LITE 後續財報揭露該產品線毛利率",
+        "trace_origin_entity": "Lumentum Holdings Inc. (Q4 FY2026 earnings call, 第三方轉錄 Motley Fool)",
+        "trace_origin_linkage": "supplier_self_report",
+        "trace_original_date": "2026-08-18",
         "trace_requeue_consumed_entities": [
           "CO:LUMENTUM",
           "LITE"
@@ -33485,7 +33515,7 @@
         "trace_requeue_trigger": "related_triaged_lead:lead_97335b4438ca7effdd04ebfa259dd39e",
         "trace_requeued_at": "2026-08-24T05:08:08.337843+00:00",
         "trace_requires_user": "false",
-        "trace_status": "partial",
+        "trace_status": "primary_source_obtained_tier2",
         "trace_trigger_entities": [
           "AAOI",
           "AVGO",
@@ -33505,7 +33535,7 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -33638,9 +33668,10 @@
       "raw_text": "Okay here's my take on $POET, since apparently people are celebrating on the subreddit that I took small positions. \n\n- I have 0 idea. ZERO. How they convinced shareholders to allow them dilute SO MUCH to the point:\n\nThey have an absurd ~$830m cash on hand now. \n\nAnd my guess is that they're close to done, since I would be in disbelief if they needed more. \n\nSo now... they have ~$830m to grow their business like M&A, and EV actually dropped really low recently (eg. $1.25B MC vs. $830m cash on hand), that I thought it was compelling to take a risk. \n\n- Annualized production capacity target is 12M optical engines/year for 2027, which is pretty absurd ramp. \n\nNeed to do more research into ASP for Poet's products, but maybe $125-$200? So at ~$150 ASP, $1.8B revenue ceiling. \n\nBut they're like inverse AAOI right now: no visible demand to fill all that capacity. Aside from Lumilens, which is now a highly valued hyperscaler supplier (probably Amazon or Microsoft), with billions in customer agreements. \n\nThe interesting thing is if Poet signed prepayment EML agreements with players like Mitsubishi, or CW agreements with Sivers behind the scenes with that balance sheet. \n\nAnd given the current bottleneck, players might use Poet as a workaround for supply procurement. \n\nBut basically, you have a super cash-rich company with a ton of capacity coming online. And they're not really disappearing anytime soon with their financials. \n\nI don't quite think it's as technically defensible compared to upstream laser chokepoints with something like $SIVE around the same valuation in terms of technical moat for CW lasers vs. OE packaging side. As you've seen recently with Celestial and Poet. \n\nBut maybe... there's a chance some hyperscaler or downstream company announces a volume agreement sometime in the future. and $POET takes off. And they do have the supply chain setup for ramp with that.  \n\nThat's the risk I ended up taking, but it's not exactly a clear as day long for me like $AAOI.",
       "refs": {
         "gap": "12M engines/year 2027 產能目標的一手出處；ASP 假設完全未驗證",
+        "original_claim_status": "not_pursued_by_user_decision",
         "parked_reason": "POET 官方財務資料支持約 US$796.3m 現金，且既有 Engine C observation 已覆蓋；X 帖的 US$830m、12m engines、ASP／客戶推算與 Sivers／AAOI 對比仍是作者模型，沒有獨立客戶文件或新 graph delta。",
         "related_research_action_id": "ra_8453b5ad4d5f6216824d15dde37bf825",
-        "research_outcome": "financial_fact_already_observed_opinion_unverified_no_graph_delta",
+        "research_outcome": "內容為 POET 稀釋與約 $830m 現金的個人評論。co:poet_technologies 的 cohort dc_606a4a50 lifecycle 已於 2026-08-25 由使用者明確 reject（le_7ce3a68d，理由含 POET 以 2292 萬份認股權證換訂單＝供應商付錢給客戶，非瓶頸形狀）。依該決定本條不投入 pq1 預算。⚠ 不是判定 claim 為假，是判定不在研究範圍內。",
         "storage_permission": "repo_full",
         "trace_attempts_ref": "POET 官方財務 filing／investor disclosure；既有 Engine C observation",
         "trace_next_trigger": "POET 官方揭露 2027 產能、ASP、具名非 Lumilens 客戶之付費量產或合約承購量",
@@ -33657,7 +33688,7 @@
         "trace_requeue_trigger": "related_triaged_lead:lead_1a75aa118ad109781c02fcd497236dda",
         "trace_requeued_at": "2026-08-24T22:36:50.439001+00:00",
         "trace_requires_user": "false",
-        "trace_status": "partial",
+        "trace_status": "out_of_scope_user_decision",
         "trace_trigger_entities": [
           "AAOI",
           "POET",
@@ -33670,7 +33701,7 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -33925,15 +33956,16 @@
       "raw_text": "Few earnings TLDRs with my favorite $AXTI and $AMZN:\n\nAmazon:\n- Raised 2026 capex to $220B vs. prior $200B (partly due to higher memory costs, which is bullish on $MU to Samsung) \n- Even at $220B, Amazon will not have enough capacity to meet all 2026 demand; Jassy expects the same in 2027.\n- Most incoming 2027 capacity is already reserved, with substantial 2028 capacity also reserved.\n\nMostly read through on upstream semis. $GOOGL, $META, $AMZN, and $MSFT all identified compute shortage. \n\nAll the narratives a few weeks earlier was \"excess compute\" from Meta and others + hyperscalers cutting back on spend... All BS. \n\nAmazon earnings was very bullish on AI semi trade. \n\nAXTI:\n\n- AXT to double InP capacity during 2026. Then double again in 2027. \n\nThis is expected to make AXT \"by far the largest indium phosphide producer in the world.\" - LFG\n\n- Q2 rev was $47.6M, the highest quarterly revenue in AXT history (InP revenue reached a record $30.7M, from DC applications.)\n- Revenue increased 77% sequentially and 164% year over year.\n- InP revenue-capacity targets: $60M per quarter exiting 2026.\n- $130M per quarter exiting 2027 \n\nThat $130m target could be hiked too since management stated they find \"whatever ways to increase that capacity expansion\"\n\n- Management said the reported backlog remains well above $100M, but that number no longer reflects all available demand.\n\n\"Customer demand continues to outpace supply, no matter how fast we add capacity.\" 800G/1.6T is driving the current cycle, while NPO/CPO extends it beyond 2027. \n\nAlso they're targeting 50%-plus gross margin: \"We should definitely be targeting a number that begins with a five.\"\n\nChina demand more than doubled, and their agreements with Casela, $COHR and $LITE did not materially drive Q2. \n\nThis is not even considering my projected massive ASP hikes yet as InP substrates get more bottlenecked. \n\nTLDR:\n\n- Amazon too much compute demands, needs capex to fufill it, so upstream semis go brrr. \n- AXT world largest InP substrate supplier, high gross margins, expansion, and supply can't keep up with demand.  \n\nBullish on demand side from Amazon + capex. Bullish on upstream optical supply chains from too much demand.",
       "refs": {
         "canonical_url": "https://ir.aboutamazon.com/news-release/news-release-details/2026/Amazon-com-Announces-Second-Quarter-Results/default.aspx",
-        "original_claim_status": "partial_mixed",
+        "original_claim_status": "confirmed",
         "parked_reason": "既有重查結果未變：AXTI 官方 Exhibit 99.1 支持 Q2 revenue、成長與 generic data-center demand，但 X 帖中的 InP US$30.7m、US$60m／US$130m capacity、backlog 與 50%+ margin target 仍缺官方 transcript／timestamp；Amazon 部分也缺可逐字核對的 US$220bn 與 2027–2028 reservation。可確認部分屬 dated financial／demand context，沒有新供應關係 edge。",
         "primary_url": "https://www.sec.gov/Archives/edgar/data/1051627/000143774926025061/ex_974537.htm",
-        "research_outcome": "dated_financial_observations_and_unverified_call_detail_no_graph_delta",
+        "research_outcome": "AMZN 2026 capex 上修 $220B（原 $200B），Jassy 逐字 \"we will still not have enough capacity to meet all the demand we have in 2026, and I believe this dynamic will also be true in 2027 too\"、\"the demand we already have for 2028 is striking\"；AWS backlog $496B。依判準第 2 項屬需求端自陳的需求錨點，方向性優於供應商缺貨宣稱。⚠ 但這是整條 AI 基建鏈的錨點，不是任何個別標的（AXTI／AAOI／LITE）的瓶頸證據，不得作此推論跳躍。未取 Amazon 10-Q 一手（tier 2），若要進 Engine C 需回 10-Q 逐字核對，故本輪不建提案。",
         "research_run": "daily_brief_2026_08_02",
-        "trace_attempts_ref": "SEC AXTI 8-K Exhibit 99.1；Amazon IR Q2 release／event listing；本輪未出現新官方 transcript",
-        "trace_next_trigger": "AXTI／Amazon 官方逐字稿、帶 timestamp webcast locator，或下一份 10-Q 出現相同 capacity／backlog／reservation 數字",
-        "trace_origin_entity": "AXT Inc.／Amazon.com",
+        "trace_attempts_ref": "library/private/research_notes/2026-08-25_pq1_demand_anchor_amzn_aaoi_quote.md",
+        "trace_next_trigger": "需要把 $220B／$496B 寫入 Engine C 時，回 Amazon 10-Q 或官方 IR 逐字核對",
+        "trace_origin_entity": "Amazon.com, Inc. Q2 2026 earnings call (第三方轉錄)",
         "trace_origin_linkage": "AXTI 2026-07-30 SEC Exhibit 99.1 + Amazon 2026-Q2 official release; earnings-call-only assertions cross-checked against AP but no official text locator",
+        "trace_original_date": "2026-07-30",
         "trace_requeue_consumed_entities": [
           "CO:LUMENTUM",
           "LITE"
@@ -33941,7 +33973,7 @@
         "trace_requeue_trigger": "related_triaged_lead:lead_97335b4438ca7effdd04ebfa259dd39e",
         "trace_requeued_at": "2026-08-24T05:08:08.337843+00:00",
         "trace_requires_user": "false",
-        "trace_status": "partial",
+        "trace_status": "confirmed_tier2_macro_anchor",
         "trace_trigger_entities": [
           "AMZN",
           "AXTI",
@@ -33962,7 +33994,7 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -36098,13 +36130,17 @@
       "published_at": "2026-07-31T08:57:11.000Z",
       "raw_text": "Now that I think of it more, $POET optical interposer piece is actually a little more material than I thought with $SIVE. \n\nOriginally the wording was \"readiness\" for EOY 2026. \n\nBut $POET upgraded that wording, by stating \"production\" with Sivers lasers projected EOY 2026. \n\nSo a volume orders from across $JBL to $POET, should hit in H1 2027. Which makes a bit of sense, since Sivers did raise an institutional oversubscribed round for future mass production.  \n\nOn a side note, can't believe it's already August and 5 months left until 2027... Which was my inflection window for glass substrates, CPO, 800v, and new architectures to ramp.",
       "refs": {
-        "gap": "POET 那家未具名 Tier 1 laser company 究竟是誰",
+        "gap": "POET 未具名其 InP 磊晶 sole-source 供應商；線索所稱升級措辭的出處未知",
+        "original_claim_status": "refuted_by_primary_source",
         "parked_reason": "今日綜合貼文只重複 Sivers 需求敘事，未帶來 POET 具名確認；一手資料仍寫 production readiness by end-2026，並未把未具名 Tier 1 laser company 證實為 Sivers，原 production 升級推論維持被反駁。",
-        "research_outcome": "contradiction_unchanged",
+        "pq2_ref": "168",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1437424/000149315226037615/ex99-2.htm",
+        "research_outcome": "線索稱 POET 把 Sivers ELS 措辭由 readiness 升級為 production、EOY 2026 量產。逐字核對三份一手後不成立：(1) 2025-09-29 POET PR 與 (2) 2025-11-06 Sivers PR 措辭逐字相同，皆為 \"production readiness targeted for the end of 2026\"，較晚那份未升級；(3) POET Q2 2026 MD&A（SEC 6-K ex99-2，2026-08-13，148,388 字元）產品表逐字為 Light Sources for AI: Prototype Q4 2026 / Production Q2 2027——比線索所稱更晚，方向相反，且全份 Sivers 出現 0 次，POET 具名的合作對象是 LITEON。線索把 Prototype Q4 2026 與 Production 混為一談。兩份 PR 皆未揭露訂單量或具名客戶，依判準第 3 項不含客戶端資本承諾。⚠ 依 L11 第 5 點僅能說已查三份文件中未出現，不能說 POET 從未如此表述。附帶：POET 風險因子自陳對 InP 磊晶供應商有 sole source 依賴（客戶端方向正確）但未具名，無法支持任何具名邊。",
         "research_run": "daily:2026-08-21",
-        "trace_attempts_ref": "POET 近五份 6-K、POET/Sivers 2025-09-29 合作公告與今日 Sivers 相關貼文；沒有具名 production 原文。",
-        "trace_next_trigger": "POET 或 Sivers 具名公告 ELS 進入 production，或 POET 揭露 Tier 1 laser company 身分。",
-        "trace_origin_entity": "POET Technologies Inc. / Sivers Semiconductors AB",
+        "trace_attempts_ref": "library/private/research_notes/2026-08-25_pq1_poet_sive_els_wording.md",
+        "trace_next_trigger": "SIVE 2026-08-27 Q2 財報對 ELS 時程與 POET 合作的描述；或 POET 具名 InP 磊晶供應商",
+        "trace_origin_entity": "POET Technologies Inc. (SEC Form 6-K exhibit, Q2 2026 MD&A)",
+        "trace_original_date": "2026-08-13",
         "trace_requeue_consumed_entities": [
           "CO:POET_TECHNOLOGIES",
           "CO:SIVERS_SEMICONDUCTORS",
@@ -36114,7 +36150,7 @@
         "trace_requeue_trigger": "related_triaged_lead:lead_f7b34fc90c9ed8c306133ea148a412aa",
         "trace_requeued_at": "2026-08-21T22:35:41.720555+00:00",
         "trace_requires_user": "false",
-        "trace_status": "contradicts",
+        "trace_status": "primary_source_contradicts_claim",
         "trace_trigger_entities": [
           "JBL",
           "POET",
@@ -36127,7 +36163,7 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -41702,11 +41738,12 @@
       "published_at": "2026-08-21T09:40:02.000Z",
       "raw_text": "Since people are having fun speculating on $SKHY CPO roadmap supply chains.\n\nI'm gonna do my own guess and say SK Hynix is evaluating Celestial/Ayar. Then doing heavy evaluation into microLEDs past first-gen deployments. \n\nBoth have been kinda working on it for awhile. \n\n- Ayar shown up in SK hynix's own website in the context of optical <-> memory links. \n- Marvell is actively working with SK Hynix in custom memory solutions (and guess who owns Celestial now). \n\nCelestial/Ayar are both also cited in SK Hynix's linked Nature Paper, which helps a bit with technical relevance: \n\n(121): Stojanovic, V. A UCIe optical I/O retimer chiplet for AI scale-up. In 2025 IEEE Hot Chips 37 Symposium (HCS) 1–22 (IEEE, 2025) \n\n- This is Ayar reference (Ayar’s teraphy optical I/O chiplet), Stojanovic is Ayar Lab's co-founder btw. \n\n(123): Winterbottom, P. Photonic interconnect for accelerated computing celestial AI photonic fabric module (cough cough Celestial)\n\nThere's more breadcrumbs out there, but wanted to keep this relatively short-form. \n\nFor more upstream beneficaries: \n\n-> I still think $SIVE is the cleanest read through since they're likely supplying to both Celestial/Ayar. \n\nThe interposer/packaging IP layer... People were speculating $POET, but Marvell probably vertically integrated players them out this year after the announcement. \n\nGiven they've had their own SiPH interposer tech/integration IP before Celestials acquisition (eg. presented a silicon-photonics interposer back in 2023)\n\n-> AMS Osram (which I don't own), seems like they're co-developing in this area given they randomly went out of their way this year to say HBM <-> optics was a TAM increase for them. \n\nTLDR: I see Ayar/Celestial as candidates for SK Hynix's CPO roadmap, then microLEDs being commercialized past gen-1 maybe 2029. (this is all speculation)\n\nJust to throw a bone to quantum dot bros, this got cited like 5 times.",
       "refs": {
+        "original_claim_status": "author_self_declared_speculation",
         "parked_reason": "Nature review 支持 CPO 技術相關性且含 SK hynix 作者，既有官方來源支持 Sivers→Ayar；但沒有 SK hynix 官方 vendor evaluation、Sivers→Celestial、AMS Osram 共研或 microLED 2029 商業化證據。",
-        "research_outcome": "technical_context_only_core_vendor_claim_unverified",
+        "research_outcome": "作者原文自陳 \"I'm gonna do my own guess and say SK Hynix is evaluating Celestial/Ayar\"——明示為個人推測，非轉述任何來源。依 source-trace「線索不是證據」，無可拆的 atom 可追，追源無標的。若日後 SK hynix 官方文件具名 Celestial／Ayar 再重啟。",
         "research_run": "daily:2026-08-22",
         "trace_attempts_ref": "Nature 2026 CPO review、Sivers／Ayar 官方合作公告與 graph_context；新增供應鏈 atoms 仍是明示 speculation。",
-        "trace_next_trigger": "SK hynix 官方 CPO roadmap、具名 vendor qualification、採購或共同開發公告。",
+        "trace_next_trigger": "SK hynix 官方文件、法說或 PR 具名 Celestial AI 或 Ayar Labs",
         "trace_requeue_consumed_entities": [
           "CO:POET_TECHNOLOGIES",
           "POET"
@@ -41714,7 +41751,7 @@
         "trace_requeue_trigger": "related_triaged_lead:lead_1a75aa118ad109781c02fcd497236dda",
         "trace_requeued_at": "2026-08-24T22:36:50.439001+00:00",
         "trace_requires_user": "false",
-        "trace_status": "partial",
+        "trace_status": "no_verifiable_atom",
         "trace_trigger_entities": [
           "POET",
           "SIVE",
@@ -41727,7 +41764,7 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
