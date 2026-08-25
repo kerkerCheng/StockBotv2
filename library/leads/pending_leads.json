@@ -7539,6 +7539,28 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1051627/000143774926020833/xslF345X06/rdgdoc.xml"
     },
+    "lead_13b62234a2ec38a45eaa9c8bedcbc6f8": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-25T03:04:58.668280+00:00",
+      "lead_id": "lead_13b62234a2ec38a45eaa9c8bedcbc6f8",
+      "published_at": null,
+      "refs": {},
+      "source": "system_decompose",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "[decompose] 垂直光柵耦合器＋微透鏡陣列層：TSMC COUPE 官方研究頁述及 embedded micro-lens array、backside metal reflector、GC/EC 插入損耗。圖中無 grating coupler 節點",
+      "triage": {
+        "decided_at": "2026-08-25T03:05:20.009219+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "TSMC 官方研究頁，一手；光柵耦合器與微透鏡層圖中無節點",
+        "tier": 1
+      },
+      "url": "https://research.tsmc.com/page/on-chip-interconnect/14.html"
+    },
     "lead_1448cac72d89476ff3c76b88f2e11381": {
       "entities": {
         "company_ids": [
@@ -12469,6 +12491,28 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2087030220213870632"
     },
+    "lead_359cb1c9e8c4f11997943e4c7f01727d": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-25T03:05:08.834252+00:00",
+      "lead_id": "lead_359cb1c9e8c4f11997943e4c7f01727d",
+      "published_at": null,
+      "refs": {},
+      "source": "system_decompose",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "[decompose] 光學耦合／主動對準層：IEEE 論文 Optical and Electrical Characterization of a Compact Universal Photonic Engine。圖中無主動對準製程節點；1152 芯耦合良率是誰的 know-how",
+      "triage": {
+        "decided_at": "2026-08-25T03:05:20.257114+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "IEEE peer-reviewed，一手；主動對準層圖中無節點",
+        "tier": 1
+      },
+      "url": "https://ieeexplore.ieee.org/document/11038201/"
+    },
     "lead_360d8205bc213c74de182069147142ca": {
       "entities": {
         "company_ids": [],
@@ -14942,6 +14986,37 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2072371706568806595"
+    },
+    "lead_464d4849949994fc18d5192a484b6c57": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-25T03:05:09.097456+00:00",
+      "lead_id": "lead_464d4849949994fc18d5192a484b6c57",
+      "published_at": null,
+      "refs": {},
+      "source": "system_decompose",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CPO",
+            "NVDA"
+          ]
+        }
+      },
+      "title": "[decompose] 光纖陣列單元 FAU 層：圖中無 FAU 節點。FOCI 3363.TWO 官方網域即為 foci-cpo.com；需一手確認是否供 NVDA／TSMC，以及 Largan 3008、Browave 3163、HST 7928 的相對地位",
+      "triage": {
+        "decided_at": "2026-08-25T03:05:20.510932+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "FOCI 官方網域；FAU 層圖中無節點，且與 8/24 撞出的 FAU lead 同一標的",
+        "tier": 2
+      },
+      "url": "https://www.foci-cpo.com/index.php?route=investor%2Fcontact"
     },
     "lead_46944fdf1d1e34e38f5a9e32bc1c3fc8": {
       "entities": {
@@ -34022,6 +34097,36 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2071977219002613768"
+    },
+    "lead_c9d297d58ac05a8f9c5e55fb433317fc": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-25T03:04:58.404703+00:00",
+      "lead_id": "lead_c9d297d58ac05a8f9c5e55fb433317fc",
+      "published_at": null,
+      "refs": {},
+      "source": "system_decompose",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CPO"
+          ]
+        }
+      },
+      "title": "[decompose] Micro-ring modulator 層：NVIDIA Quantum-X CPO 用 200Gbps MRM，圖中無此節點。誰能做 MRM、與 Broadcom 的 EML/MZM 路線互斥性為何",
+      "triage": {
+        "decided_at": "2026-08-25T03:05:19.756197+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "system-decompose 產出的未知層：MRM 是 NVIDIA CPO 對 Broadcom 的架構分歧點，圖中無節點",
+        "tier": 3
+      },
+      "url": "https://www.nvidia.com/en-us/networking/products/silicon-photonics/"
     },
     "lead_ca3427d944ab987703c0fe625915dc9b": {
       "entities": {
