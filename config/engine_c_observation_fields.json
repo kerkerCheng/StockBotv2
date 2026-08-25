@@ -36,7 +36,9 @@
       "label": "毛利率趨勢（近 4 季）",
       "gate_member": true,
       "auto_source": "financial_snapshots",
-      "authorities": ["engine_c_financial"]
+      "authorities": [
+        "engine_c_financial"
+      ]
     },
     {
       "field_name": "customer_concentration",
@@ -44,7 +46,9 @@
       "label": "客戶集中度（前三大客戶 % 收入）",
       "gate_member": true,
       "auto_source": null,
-      "authorities": ["engine_c_customer"]
+      "authorities": [
+        "engine_c_customer"
+      ]
     },
     {
       "field_name": "backlog",
@@ -52,7 +56,9 @@
       "label": "Backlog/訂單能見度",
       "gate_member": true,
       "auto_source": null,
-      "authorities": ["engine_c_backlog"]
+      "authorities": [
+        "engine_c_backlog"
+      ]
     },
     {
       "field_name": "dilution",
@@ -60,7 +66,21 @@
       "label": "稀釋分析（股數趨勢）",
       "gate_member": true,
       "auto_source": "financial_snapshots",
-      "authorities": ["engine_c_financial"]
+      "authorities": [
+        "engine_c_financial"
+      ]
+    },
+    {
+      "field_name": "equity_issuance_authorizations",
+      "category": "ownership_and_dilution",
+      "label": "已授權未發行的股權工具（ATM／shelf／可轉債額度）",
+      "gate_member": false,
+      "auto_source": null,
+      "authorities": [
+        "engine_c_financial",
+        "engine_c_manual"
+      ],
+      "why": "dilution 是自動欄位、取自已實現的 shares_outstanding 趨勢，看不到「已授權但尚未發行」的額度。兩者刻意分開（L12）：把 ATM 授權寫進 dilution 會用前瞻授權覆蓋事實股數，把它省略則會漏掉一個隨時可被行使的稀釋來源。AAOI 2026-08-21 的 424B5 授權 US$600M ATM（約當時股本 5.5%），股數當下完全未變。"
     },
     {
       "field_name": "valuation_pressure",
@@ -68,7 +88,9 @@
       "label": "估值壓力（P/E, EV/Rev, 分析師目標價）",
       "gate_member": true,
       "auto_source": "financial_snapshots",
-      "authorities": ["engine_c_valuation"]
+      "authorities": [
+        "engine_c_valuation"
+      ]
     },
     {
       "field_name": "channel_structure",
@@ -76,7 +98,10 @@
       "label": "通路結構（代理商／通路商 vs 終端客戶）",
       "gate_member": false,
       "auto_source": null,
-      "authorities": ["engine_c_customer", "engine_c_manual"],
+      "authorities": [
+        "engine_c_customer",
+        "engine_c_manual"
+      ],
       "why": "客戶集中度數字無法區分終端需求與通路集中。AAOI 的 Digicomm 佔 FY2025 營收 53.1% 但是獨家代理商，兩者投資意義完全不同。"
     },
     {
@@ -85,7 +110,10 @@
       "label": "或有流動性請求權（可退預付款、贖回權、保證）",
       "gate_member": false,
       "auto_source": null,
-      "authorities": ["engine_c_financial", "engine_c_manual"],
+      "authorities": [
+        "engine_c_financial",
+        "engine_c_manual"
+      ],
       "why": "現金與負債快照看不到或有請求權。AXT 的 PE 基金贖回權加 Coherent 可退預付款上限約 US$71.3M，足以把淨現金翻負。"
     },
     {
@@ -94,7 +122,10 @@
       "label": "Runway 輸入值（現金／總債／自由現金流 TTM）",
       "gate_member": false,
       "auto_source": "financial_snapshots",
-      "authorities": ["engine_c_financial", "engine_c_manual"],
+      "authorities": [
+        "engine_c_financial",
+        "engine_c_manual"
+      ],
       "why": "yfinance 在財報後常暫時清空 free_cash_flow_ttm，runway 因此變成 manual_required 並讓 coverage gate 歸零。decision_lab 的 derive_runway 早就接受並驗證 manual_runway（含 timestamp future／stale 檢查），卻沒有任何地方提供它——這個欄位就是那條缺掉的走廊。value 必須是 JSON 物件，含 cash_and_equivalents、total_debt、free_cash_flow_ttm 三個數值，單位與 financial_snapshots 一致（報表原幣別絕對金額），可另帶 note 說明取自哪一段一手文件；三者缺一即視為未提供，不做部分推導。"
     },
     {
@@ -103,7 +134,10 @@
       "label": "債務到期時程與 covenant 條件",
       "gate_member": false,
       "auto_source": null,
-      "authorities": ["engine_c_financial", "engine_c_manual"],
+      "authorities": [
+        "engine_c_financial",
+        "engine_c_manual"
+      ],
       "why": "total_debt 是單一數字，看不出到期集中度或最低流動性條款；此項在 AXT 與 AAOI 的 missing_data 都重複出現。"
     },
     {
@@ -112,7 +146,10 @@
       "label": "已承諾資本支出與可延後彈性",
       "gate_member": false,
       "auto_source": null,
-      "authorities": ["engine_c_financial", "engine_c_manual"],
+      "authorities": [
+        "engine_c_financial",
+        "engine_c_manual"
+      ],
       "why": "以 capex 為主的負自由現金流，runway 取決於擴產能否煞停；已簽約承諾與可自由延後的部分必須分開。"
     },
     {
@@ -121,7 +158,10 @@
       "label": "監管／許可依賴（出口管制、執照、准入）",
       "gate_member": false,
       "auto_source": null,
-      "authorities": ["engine_c_valuation", "engine_c_manual"],
+      "authorities": [
+        "engine_c_valuation",
+        "engine_c_manual"
+      ],
       "why": "單一監管路徑可否決整條營收假設。AXT 管理層自己點名 InP 出口許可時程是最大變數。"
     },
     {
@@ -130,7 +170,9 @@
       "label": "重大訴訟與審計意見旗標",
       "gate_member": false,
       "auto_source": null,
-      "authorities": ["engine_c_manual"],
+      "authorities": [
+        "engine_c_manual"
+      ],
       "why": "going concern、保留意見、restatement 這類措辭精度本身就是 claim（見 L11），需獨立欄位承載逐字一手用語。"
     }
   ]

@@ -3639,6 +3639,30 @@
         "trigger": "MRVL Q2 FY2027 財報（2026-08-28，yfinance calendar 確認）；以 guidance 設可觀測 disproof 門檻並補 catalyst，再 reassess",
         "until": "2026-08-28"
       }
+    },
+    {
+      "added_at": "2026-08-25T09:16:48.538688+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-08-21T00:00:00+00:00；來源=AAOI Form 424B5 prospectus supplement, filed 2026-08-21 (CIK 0001158114, accessi",
+      "n": 225,
+      "reason": null,
+      "ref_id": "po_0dcd47072235f1b28c835d124f0e0772",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "engine_c",
+      "title": "Engine C 觀測：AAOI / equity_issuance_authorizations",
+      "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-08-25T09:20:14.414797+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-07-21T00:00:00+00:00；來源=IQE plc FY2025 Financial Results RNS (Cardiff, 2026) https://www.iqep.com/media/",
+      "n": 226,
+      "reason": null,
+      "ref_id": "po_057a01f28269a80921e5eaada8e4f5bf",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "engine_c",
+      "title": "Engine C 觀測：IQE.L / backlog",
+      "type": "engine_c_observation"
     }
   ],
   "log": [
@@ -8226,6 +8250,6 @@
       "verb": "pending"
     }
   ],
-  "next_n": 225,
+  "next_n": 227,
   "schema_version": "1"
 }

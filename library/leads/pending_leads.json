@@ -5733,9 +5733,16 @@
       "first_seen": "2026-08-11T13:44:15.937399+00:00",
       "lead_id": "lead_04dc35fd02b79ef30f014f2810fe4a47",
       "published_at": "Tue, 28 Apr 2026 10:31:00 +0000",
-      "refs": {},
+      "refs": {
+        "original_claim_status": "confirmed_context_added",
+        "research_outcome": "三條 lead 同組事件一次研究。一手 RNS 確認：MACOM £45m 策略投資（£30m equity＋£15m non-interest bearing CLN）並同時簽 long-term supply agreements；為 IQE 第二筆客戶端供應承諾（前有 Tower Semiconductor 2026-06-15）。FY2026 guidance 由 >20% 上修至 >30%（2026-07-21 Trading Update），H1 營收至少 £64m。已建 Engine C 觀測提案 po_057a01f28269a80921e5eaada8e4f5bf（supersede mo_d3aeef5237e01b3af82a159cdb73d684）待 pq2 核准。MACOM→IQE 供應邊具入圖資格但未 prepare RA。",
+        "trace_attempts_ref": "library/private/research_notes/2026-08-25_pq1_iqe_macom_fundraise_guidance.md",
+        "trace_origin_entity": "IQE plc (issuer RNS)",
+        "trace_requires_user": "false",
+        "trace_status": "primary_source_obtained"
+      },
       "source": "yahoo:iqe-l",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "IQE shares fall 19% after £81m fundraise priced at steep discount",
       "triage": {
@@ -8326,9 +8333,20 @@
       "media": [],
       "published_at": "2026-08-24T11:00:56.000Z",
       "raw_text": "Lot of misinterpretations flying left and right around the $600m ATM. I'm still bullish on $AAOI and I have large positions (which is why I care more). \n\nWhat I've been consistent with is not being a fan of overusing ATMs/dilution for financing. I've said this before with $IREN + $POET.\n\nAnd I'll be consistent with my own positions like AOI. \n\nHowever, the reason I'm still overweight on AOI vs. the rest (looking at you Poet): \n\nIs that AOI is actually capacity constrained with high demand visibility. \n\nIn terms of timing:\n\n- AOI should have waited until completion of 1.6T qualifications (expected in the next few weeks)\n\n- Could have used other structures like convertible notes above market prices. \n\nBut they did it on the drop from $220 -> $130, and it's likely there will be short term structural overhang whenever they want to tap into it. \n\nI don't have to support every single business decision to  remain long.",
-      "refs": {},
+      "refs": {
+        "gap": "推文的 high demand visibility／產能吃緊 claim 仍無一手支持；既有 backlog 觀測記載公司不提供可依賴 backlog，方向相反",
+        "original_claim_status": "partially_confirmed_framing_corrected",
+        "pq2_ref": "134",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1158114/000110465926099685/tm2623389-1_424b5.htm",
+        "research_outcome": "一手 424B5 確認 US$600M ATM 授權（agents Raymond James／Needham），已建立 Engine C 觀測提案 po_0dcd47072235f1b28c835d124f0e0772 待 pq2 核准。修正線索框架兩點：(1) 是授權額度非已發行，shares outstanding 未變，故新增 equity_issuance_authorizations 欄位承接而不寫入自動的 dilution；(2) 以 2026-08-20 收盤 129.10 全額發行僅稀釋約 5.47%，量級小於線索語氣。線索的 capacity constrained／1.6T qualification 說法在 424B5 中 0 命中，未取得一手支持。",
+        "trace_attempts_ref": "library/private/research_notes/2026-08-25_pq1_aaoi_atm_600m.md",
+        "trace_origin_entity": "Applied Optoelectronics, Inc. (SEC 424B5 registrant)",
+        "trace_original_date": "2026-08-21",
+        "trace_requires_user": "false",
+        "trace_status": "primary_source_obtained"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "Lot of misinterpretations flying left and right around the $600m ATM. I'm still bullish on $AAOI and I have large positions (which is why I care more). What I've been consistent with is not being a fan of overusing ATMs/dilution for financing. I've said this before with $IREN + $POET. And I'll be consistent with my own positions like AOI. However, the reason I'm still overweight on AOI vs. the rest (looking at you Poet): Is that AOI is actually capacity constrained with high demand visibility. In terms of timing: - AOI should have waited until completion of 1.6T qualifications (expected in the next few weeks) - Could have used other structures like convertible notes above market prices. But they did it on the drop from $220 -> $130, and it's likely there will be short term structural overhang whenever they want to tap into it. I don't have to support every single business decision to remain long.",
       "triage": {
@@ -10202,9 +10220,16 @@
       "first_seen": "2026-08-11T13:44:15.936885+00:00",
       "lead_id": "lead_27625bd16af9f120f0ea459c102ad987",
       "published_at": "Thu, 28 May 2026 06:57:00 +0000",
-      "refs": {},
+      "refs": {
+        "original_claim_status": "confirmed_context_added",
+        "research_outcome": "三條 lead 同組事件一次研究。一手 RNS 確認：MACOM £45m 策略投資（£30m equity＋£15m non-interest bearing CLN）並同時簽 long-term supply agreements；為 IQE 第二筆客戶端供應承諾（前有 Tower Semiconductor 2026-06-15）。FY2026 guidance 由 >20% 上修至 >30%（2026-07-21 Trading Update），H1 營收至少 £64m。已建 Engine C 觀測提案 po_057a01f28269a80921e5eaada8e4f5bf（supersede mo_d3aeef5237e01b3af82a159cdb73d684）待 pq2 核准。MACOM→IQE 供應邊具入圖資格但未 prepare RA。",
+        "trace_attempts_ref": "library/private/research_notes/2026-08-25_pq1_iqe_macom_fundraise_guidance.md",
+        "trace_origin_entity": "IQE plc (issuer RNS)",
+        "trace_requires_user": "false",
+        "trace_status": "primary_source_obtained"
+      },
       "source": "yahoo:iqe-l",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "IQE completes fundraising and reports wider losses but improved trading",
       "triage": {
@@ -12792,9 +12817,16 @@
       "first_seen": "2026-08-11T13:44:15.936158+00:00",
       "lead_id": "lead_37ff6857b89331239fad429190f6f235",
       "published_at": "Tue, 21 Jul 2026 07:28:24 +0000",
-      "refs": {},
+      "refs": {
+        "original_claim_status": "confirmed_context_added",
+        "research_outcome": "三條 lead 同組事件一次研究。一手 RNS 確認：MACOM £45m 策略投資（£30m equity＋£15m non-interest bearing CLN）並同時簽 long-term supply agreements；為 IQE 第二筆客戶端供應承諾（前有 Tower Semiconductor 2026-06-15）。FY2026 guidance 由 >20% 上修至 >30%（2026-07-21 Trading Update），H1 營收至少 £64m。已建 Engine C 觀測提案 po_057a01f28269a80921e5eaada8e4f5bf（supersede mo_d3aeef5237e01b3af82a159cdb73d684）待 pq2 核准。MACOM→IQE 供應邊具入圖資格但未 prepare RA。",
+        "trace_attempts_ref": "library/private/research_notes/2026-08-25_pq1_iqe_macom_fundraise_guidance.md",
+        "trace_origin_entity": "IQE plc (issuer RNS)",
+        "trace_requires_user": "false",
+        "trace_status": "primary_source_obtained"
+      },
       "source": "yahoo:iqe-l",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "IQE raises 2026 revenue guidance on strong AI and data centre demand",
       "triage": {
@@ -13030,11 +13062,13 @@
         "gap": "NVDA FAU 供應鏈的客戶端確認缺失。tier-3 宣稱 Largan、FOCI、中國 TFC 已進入 NVDA FAU 供應鏈屬第三方轉述，依 L8 需客戶端或第三方一手印證。台股路由應走公開資訊觀測站（FOCI 3363 上櫃、Largan 3008 上市）與公司法說。另 FAU 量產時程各家說法不一：FOCI 稱 2026 Q3 開始交付 3.2T 規格，Largan 稱 sampling、量產尚需 1-2 年，需一手核對。",
         "outcome": "圖層缺口確認：Neo4j 查無任何 fiber array / FAU 節點。CPO、NPO、glass CPO、in-package optical I/O 都在，唯獨缺把光纖接到矽光子晶片的物理介面層。候選供應商 Largan 3008.TW、FOCI 3363.TWO、Browave 3163.TW、HST 7928.TW、Sunny Optical 全部不在圖中，同類僅有 co:corning。這是排序與覆蓋掃描無法產出的那種缺口，它們只能從既有節點往回看。",
         "research_outcome": "pq1 追源未果（tier 3 隔離），不入圖、不提高 evidence tier。但圖層缺口本身已確認，建議另以 system-decompose 對 CPO 組裝層由上而下拆一次。",
-        "trace_attempts_ref": "WebSearch: digitimes 2026-04-23 Largan/Sunny Optical 進軍 FAU; Morgan Stanley 估 FOCI 首年市占最高 50%; biggo/hntrbrk 二手彙整。均為 tier 3，未取得 UDN 原文，亦未取得 NVDA/TSMC 客戶端文件。",
-        "trace_status": "isolated_tier_3"
+        "trace_attempts_ref": "library/private/research_notes/2026-08-25_pq1_fau_nvda_supply_chain.md",
+        "trace_next_trigger": "Largan(3008)／FOCI(3363)／TFC 任一在 MOPS 重大訊息、法說會或 NVIDIA／Broadcom 官方文件中具名對方；或 NVIDIA 發布帶角色分工的 CPO 供應鏈說明",
+        "trace_requires_user": "false",
+        "trace_status": "awaiting_customer_named_disclosure"
       },
       "source": "x:aleabitoreddit",
-      "status": "researching",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
