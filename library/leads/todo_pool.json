@@ -3282,10 +3282,10 @@
       "added_at": "2026-08-21T22:37:52.268912+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_9a7d6db5f7562ce63ff8579f03537a47",
-      "dispatch_receipt": "research:daily-2026-08-25:wo_468ecdef0047cb1a3d33d05c1c3de9fa",
+      "dispatch_receipt": "research_packet:library/private/research_notes/2026-08-25_pq1_mrvl_concentration_backlog.md｜MRVL FY2026 10-K 已逐字核對。客戶集中度取得：Distributor A 37%(FY26)/34%/24%、Direct Customer A 14%/13%/未達10%、亞洲客戶佔營收 77%。backlog 與 remaining performance obligation 在 50 萬字元全文各 0 命中＝issuer 未揭露，該 blocker 無法由 10-K 清除。Engine C 寫入與 catalyst/disproof 裁定仍待人工 gate。",
       "dispatch_ref": "wo_468ecdef0047cb1a3d33d05c1c3de9fa",
-      "dispatch_status": "researching",
-      "dispatch_updated_at": "2026-08-24T23:01:52.670959+00:00",
+      "dispatch_status": "awaiting_approval",
+      "dispatch_updated_at": "2026-08-25T03:07:28.632417+00:00",
       "dispatched_at": "2026-08-22T00:10:05.468175+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 204,
@@ -8036,6 +8036,15 @@
       "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
       "type": "decision_review",
       "verb": "go"
+    },
+    {
+      "at": "2026-08-25T03:07:28.632417+00:00",
+      "n": 204,
+      "reason": null,
+      "receipt": "research_packet:library/private/research_notes/2026-08-25_pq1_mrvl_concentration_backlog.md｜MRVL FY2026 10-K 已逐字核對。客戶集中度取得：Distributor A 37%(FY26)/34%/24%、Direct Customer A 14%/13%/未達10%、亞洲客戶佔營收 77%。backlog 與 remaining performance obligation 在 50 萬字元全文各 0 命中＝issuer 未揭露，該 blocker 無法由 10-K 清除。Engine C 寫入與 catalyst/disproof 裁定仍待人工 gate。",
+      "ref_id": "dc_0fca807c963dc3b9888e0f83ba6d45a5",
+      "type": "decision_review",
+      "verb": "pq1_awaiting_approval"
     }
   ],
   "next_n": 218,
