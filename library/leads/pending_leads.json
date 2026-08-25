@@ -12981,9 +12981,16 @@
       ],
       "published_at": "2026-08-24T18:27:08.000Z",
       "raw_text": "I know everyone's focused on Nancy Pelosi copytraders sending $BE up 11.83%. Or Trump... \n\nBut you know what else is cool? \n\nFAU bottlenecks for CPO. \n\nI remember saying earlier this year FAU/Foci might be a future bottleneck around $TSM / $NVDA CPO roadmaps... \n\nThis was some media commentary supporting that: \n\n\"It is understood that Largan Precision (3008), FOCI (3363), and China’s TFC have entered $NVDA FAU supply chain\"\n\n\"Based on an estimated 20,000 Spectrum-X systems shipped this year, the optical engines installed in those systems would require approximately 600k-700k FAUs\" \n\nIn 2027, demand is expected to reach several million units, and existing supply chain capacity is currently unable to meet demand.\" (UDN, mandarin -> english translation is kinda off)\n\nCough cough, \"existing supply chain capacity is currently unable to meet demand\"\n\nTad early right now since mass production is expected H2 2027, but cool to read updates around this.",
-      "refs": {},
+      "refs": {
+        "claimed_origin": "UDN 聯合報系中文報導，經 X 推文轉述",
+        "gap": "NVDA FAU 供應鏈的客戶端確認缺失。tier-3 宣稱 Largan、FOCI、中國 TFC 已進入 NVDA FAU 供應鏈屬第三方轉述，依 L8 需客戶端或第三方一手印證。台股路由應走公開資訊觀測站（FOCI 3363 上櫃、Largan 3008 上市）與公司法說。另 FAU 量產時程各家說法不一：FOCI 稱 2026 Q3 開始交付 3.2T 規格，Largan 稱 sampling、量產尚需 1-2 年，需一手核對。",
+        "outcome": "圖層缺口確認：Neo4j 查無任何 fiber array / FAU 節點。CPO、NPO、glass CPO、in-package optical I/O 都在，唯獨缺把光纖接到矽光子晶片的物理介面層。候選供應商 Largan 3008.TW、FOCI 3363.TWO、Browave 3163.TW、HST 7928.TW、Sunny Optical 全部不在圖中，同類僅有 co:corning。這是排序與覆蓋掃描無法產出的那種缺口，它們只能從既有節點往回看。",
+        "research_outcome": "pq1 追源未果（tier 3 隔離），不入圖、不提高 evidence tier。但圖層缺口本身已確認，建議另以 system-decompose 對 CPO 組裝層由上而下拆一次。",
+        "trace_attempts_ref": "WebSearch: digitimes 2026-04-23 Largan/Sunny Optical 進軍 FAU; Morgan Stanley 估 FOCI 首年市占最高 50%; biggo/hntrbrk 二手彙整。均為 tier 3，未取得 UDN 原文，亦未取得 NVDA/TSMC 客戶端文件。",
+        "trace_status": "isolated_tier_3"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "researching",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -15278,9 +15285,22 @@
       "first_seen": "2026-08-24T22:33:37.784879+00:00",
       "lead_id": "lead_49085eb7b51c402c925cc29ab5e33cc6",
       "published_at": "2026-08-24",
-      "refs": {},
+      "refs": {
+        "gap": "AAOI 600M ATM 的一手文件尚未取得",
+        "parked_reason": "trace: 取得 8-K 全文（6,759 chars）。內容僅 Item 1.01 董事與高階經理人賠償協議更新（2026-08-18 董事會通過）、Item 5.02 引用同一事、Item 9.01 附件。與 harvest 期待的財務事件無關，零投資意義。⚠ 同批 X 推文提到的 600M ATM 不在本 8-K 內，屬另一份文件（prospectus supplement／424B5），需另行追源——「這份沒有」不等於「不存在」（L11 第 5 點）。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826006693/aaoi_8k.htm",
+        "trace_next_trigger": "AAOI 提交 S-3ASR／424B5 或後續 10-Q 揭露 ATM 額度與已發行金額",
+        "trace_original_date": "2026-08-24",
+        "trace_requires_user": "false",
+        "trace_status": "contradicts",
+        "trace_trigger_entities": [
+          "AAOI",
+          "co:applied_optoelectronics"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:AAOI",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "AAOI 8-K filed 2026-08-24",
       "triage": {
