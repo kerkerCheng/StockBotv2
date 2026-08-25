@@ -3644,10 +3644,11 @@
       "added_at": "2026-08-25T09:16:48.538688+00:00",
       "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-08-21T00:00:00+00:00；來源=AAOI Form 424B5 prospectus supplement, filed 2026-08-21 (CIK 0001158114, accessi",
       "n": 225,
-      "reason": null,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_236782d9633c805054f1494a4d100bb3;proposal:po_0dcd47072235f1b28c835d124f0e0772",
       "ref_id": "po_0dcd47072235f1b28c835d124f0e0772",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-25T10:22:23.004053+00:00",
       "source": "engine_c",
       "title": "Engine C 觀測：AAOI / equity_issuance_authorizations",
       "type": "engine_c_observation"
@@ -3656,10 +3657,11 @@
       "added_at": "2026-08-25T09:20:14.414797+00:00",
       "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-07-21T00:00:00+00:00；來源=IQE plc FY2025 Financial Results RNS (Cardiff, 2026) https://www.iqep.com/media/",
       "n": 226,
-      "reason": null,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_057a01f28269a80921e5eaada8e4f5bf;proposal:po_057a01f28269a80921e5eaada8e4f5bf",
       "ref_id": "po_057a01f28269a80921e5eaada8e4f5bf",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-25T10:22:23.625691+00:00",
       "source": "engine_c",
       "title": "Engine C 觀測：IQE.L / backlog",
       "type": "engine_c_observation"
@@ -8248,6 +8250,24 @@
       "ref_id": "dc_0fca807c963dc3b9888e0f83ba6d45a5",
       "type": "decision_review",
       "verb": "pending"
+    },
+    {
+      "at": "2026-08-25T10:22:23.004053+00:00",
+      "n": 225,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_236782d9633c805054f1494a4d100bb3;proposal:po_0dcd47072235f1b28c835d124f0e0772",
+      "ref_id": "po_0dcd47072235f1b28c835d124f0e0772",
+      "type": "engine_c_observation",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-25T10:22:23.625691+00:00",
+      "n": 226,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_057a01f28269a80921e5eaada8e4f5bf;proposal:po_057a01f28269a80921e5eaada8e4f5bf",
+      "ref_id": "po_057a01f28269a80921e5eaada8e4f5bf",
+      "type": "engine_c_observation",
+      "verb": "go"
     }
   ],
   "next_n": 227,
