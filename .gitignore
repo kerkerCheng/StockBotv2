@@ -26,6 +26,7 @@ config/*.json
 !config/lead_ref_keys.json
 !config/currency_units.json
 !config/lead_classification.json
+!config/lead_trace_status.json
 
 # Claude Code 本機設定（不共用）；project skills 轉接層需納入版本控制
 .claude/*

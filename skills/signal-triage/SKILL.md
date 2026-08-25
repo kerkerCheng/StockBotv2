@@ -82,7 +82,10 @@ prepared RA 入圖，不必在研究前先回答一次。判斷錯了的主要�
 **PASS 不再只是 PASS——還要回答「它有多急」。** 舊版只有 PASS／FILTER 兩格，於是
 「放行但低優先」無處可放。實測後果：agent 判定「MU 官方 SEC Form 4……**低優先**但可作
 insider／稀釋時變觀測」，那句「低優先」只能寫進自由文字 `reason`，`priority.py` 讀不到，
-於是它用 tier＋持股算出高分——**每日 5 個 pq1 slot 有 3 個被 7 週前的 Micron 內部人申報佔走**。
+於是它用 tier＋持股算出高分——**當時每輪 5 個 pq1 slot 有 3 個被 7 週前的 Micron 內部人申報佔走**
+（2026-08-21 實測值；⚠ 這是事發當時的數字，**不是現況**。每輪上限的唯一權威是
+`config/daily_routine.json` 的 `pq1.drain_limit_per_run`，查證：
+`python -c "import json;print(json.load(open('config/daily_routine.json'))['pq1']['drain_limit_per_run'])"`）。
 同一類文件在 167 筆中被判 107 次 `no_go`、36 次 `go`，也證明沒有字彙時判斷會逐次飄移。
 
 這也解掉「寧可放行」的張力：那個偏好對**二元閘門**是對的，但當放行的唯一替代是擋掉時就有害。

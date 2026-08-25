@@ -72,9 +72,27 @@ Luna reviewer：停止
 & '.venv\Scripts\python.exe' -m engine_b.cli trace-backlog          # parked 追源未果與 trigger
 & '.venv\Scripts\python.exe' -m engine_b.cli related <lead_id>      # 共用具名標的的其他 lead
 & '.venv\Scripts\python.exe' -m engine_b.cli harvest-health         # 各來源最新未恢復失敗
+& '.venv\Scripts\python.exe' -m engine_b.cli onboard-candidates --min-leads 3
 ```
 
 Leads authority 是 tracked `library/leads/pending_leads.json`；狀態機與 API 見 `engine_b/leads.py`。
+
+`drain` 每輪上限的唯一權威是 `config/daily_routine.json` 的 `pq1.drain_limit_per_run`
+（`engine_b/routine_config.py` 是唯一 loader）。**文件裡出現的任何 slot 數字都是當時快照**，
+查證：`python -c "import json;print(json.load(open('config/daily_routine.json'))['pq1']['drain_limit_per_run'])"`。
+
+`trace_status` 是封閉字彙，唯一權威是 `config/lead_trace_status.json`；
+`annotate`／`advance` 拒絕未登記值與已淘汰同義詞。**`terminal=true` 的值會離開
+`trace-backlog`**，所以寫錯不是命名問題而是行為問題——已完成的 lead 會永遠掛著，
+或真的在等的 lead 會消失。
+
+`onboard-candidates` 列出**已通過 triage 的 lead 中點名、但 registry 沒有的標的**，
+補上 pq2 六個 collector 都不負責的缺口（已有 cohort 但缺 ticker 的走
+`decision_lab.brief.identity_registration_pending`，完全沒登記的先前無任何浮現路徑）。
+cashtag 由 `entities.py` 確定性抽取；公司名寫成純文字時 regex 抓不到，
+由研究者在 `onboard_candidate_names` 標註（L15：語意由 LLM 解析，registry 判權限）。
+**它只回答「誰一直出現卻不在圖裡」，不回答該不該 onboard**——後者仍走
+`skills/company-onboard` 並由使用者決定。
 
 ### Engine D 決策
 ```powershell

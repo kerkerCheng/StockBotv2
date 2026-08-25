@@ -1,0 +1,59 @@
+{
+  "_comment": "source-trace 結果的封閉字彙。engine_b/lead_refs.py 是唯一 loader；annotate／advance 拒絕未登記值。照 config/lead_classification.json 的先例——判斷需要有地方落腳，沒有字彙時判斷會逐次飄移。",
+  "_why": "2026-08-25 實測：trace_status 原本是自由字串，資料中累積出 15 種寫法，其中 9 種是單一 session 內自創的同義詞（primary_source_obtained／primary_source_obtained_tier2／primary_source_contradicts_claim／quote_misattributed／confirmed_tier2_macro_anchor／no_verifiable_atom／off_thesis_scope／out_of_scope_user_decision／awaiting_customer_named_disclosure）。後果不是難看而是靜默失效：trace_backlog 用 terminal 值判斷一筆 lead 該不該留在 backlog，寫成未登記的同義詞不會報錯，只會讓已完成的 lead 永遠掛在 backlog、或讓真的在等的 lead 被漏掉。",
+  "_terminal_contract": "terminal=true 代表追源已結束、不需要再排回 pq1，trace_backlog 會排除它。terminal=false 代表仍在等某件事發生，必須同時具備可執行的觸發條件（trace_trigger_entities 或 trace_requires_user），否則 trace_backlog 會標成 auto_trigger_reachable=false——那不是在等，是已經死了。",
+  "version": 1,
+  "statuses": {
+    "original_obtained": {
+      "terminal": true,
+      "label": "一手取得",
+      "description": "已取得可逐字核對的一手文件，且足以支持或否證線索主張。追源結束。"
+    },
+    "tier_1_2_honest_passthrough": {
+      "terminal": true,
+      "label": "誠實降級通過",
+      "description": "只取得 tier 1-2 的次級來源（如第三方法說轉錄、財報報導），已在 receipt 中誠實標記等級。可用於研究，不可據以提高 evidence tier。"
+    },
+    "contradicts": {
+      "terminal": true,
+      "label": "一手與主張不符",
+      "description": "已取得一手，內容與線索主張牴觸——含引述失真、數字被加工、時程被前移。這是**有結論**不是未果，不需重查。"
+    },
+    "not_pursued": {
+      "terminal": true,
+      "label": "不投入研究",
+      "description": "線索無可拆的可驗證 atom（作者自陳推測）、不在主題範圍、或對應標的已由使用者明確決定不追。⚠ 這是判定不研究，不是判定主張為假。"
+    },
+    "partial": {
+      "terminal": false,
+      "label": "部分取得",
+      "description": "取得部分原文但仍缺支持該 claim 的關鍵段落。"
+    },
+    "isolated_tier_3": {
+      "terminal": false,
+      "label": "孤立三手",
+      "description": "只有孤立的三手來源（截圖、聚合新聞、無 locator 轉述），需要更好的來源才能用。"
+    },
+    "lead_only_tier_4": {
+      "terminal": false,
+      "label": "僅有線索",
+      "description": "未取得任何文件，只有線索本身。"
+    },
+    "awaiting_named_disclosure": {
+      "terminal": false,
+      "label": "等具名揭露",
+      "description": "一手已取得，但缺的正是具名——客戶端未點名供應商、供應商未點名客戶、或官方名單未說明角色。依 L8 這類缺口不能靠再讀一份供應商自述來補，只能等交易對手方的具名文件。"
+    }
+  },
+  "aliases": {
+    "primary_source_obtained": "original_obtained",
+    "primary_source_obtained_tier2": "awaiting_named_disclosure",
+    "primary_source_contradicts_claim": "contradicts",
+    "quote_misattributed": "contradicts",
+    "confirmed_tier2_macro_anchor": "tier_1_2_honest_passthrough",
+    "no_verifiable_atom": "not_pursued",
+    "off_thesis_scope": "not_pursued",
+    "out_of_scope_user_decision": "not_pursued",
+    "awaiting_customer_named_disclosure": "awaiting_named_disclosure"
+  }
+}

@@ -438,14 +438,35 @@ def _cmd_advance(args: argparse.Namespace) -> int:
 
 def _cmd_annotate(args: argparse.Namespace) -> int:
     """只補 refs，不藉 metadata 更新繞過封閉狀態機。"""
+    from engine_b.lead_refs import get_lead_ref_registry
+
     store = leads.load(args.leads)
+    specs = get_lead_ref_registry().keys
     refs = {}
     for pair in args.ref:
         key, separator, value = pair.partition("=")
         if not separator or not key.strip():
             print(f"annotate 失敗：ref 必須是非空 key=value：{pair}", file=sys.stderr)
             return 1
-        refs[key.strip()] = value
+        key = key.strip()
+        spec = specs.get(key)
+        # string_list 型的 ref 先前只能由程式內部寫入，CLI 完全設不了——
+        # 於是 registry 登記了型別、命令列卻沒有對應的表達方式。JSON 陣列優先
+        # （值本身含分號時仍可精確表達），否則以分號切。
+        if spec is not None and spec.value_type == "string_list":
+            parsed = None
+            if value.lstrip().startswith("["):
+                try:
+                    candidate = json.loads(value)
+                except json.JSONDecodeError:
+                    candidate = None
+                if isinstance(candidate, list):
+                    parsed = [str(item) for item in candidate]
+            if parsed is None:
+                parsed = [part.strip() for part in value.split(";") if part.strip()]
+            refs[key] = parsed
+            continue
+        refs[key] = value
     try:
         lead = leads.annotate_refs(store, args.lead_id, refs=refs)
     except (leads.LeadStateError, ValueError) as exc:
@@ -469,6 +490,17 @@ def _cmd_harvest_health(args: argparse.Namespace) -> int:
     store = leads.load(args.leads)
     unresolved = leads.unresolved_harvest_failures(store)
     print(json.dumps(unresolved, ensure_ascii=False, indent=2))
+    return 0
+
+
+def _cmd_onboard_candidates(args: argparse.Namespace) -> int:
+    """列出反覆出現在已 triage lead 裡、但 registry 沒有的標的。"""
+
+    store = leads.load(args.leads)
+    rows = leads.onboard_candidates(store)
+    if args.min_leads > 1:
+        rows = [row for row in rows if row["lead_count"] >= args.min_leads]
+    print(json.dumps(rows, ensure_ascii=False, indent=2))
     return 0
 
 
@@ -638,6 +670,16 @@ def build_parser() -> argparse.ArgumentParser:
         help="只列需要使用者 access／付費／優先權決策的項目",
     )
     p_trace.set_defaults(func=_cmd_trace_backlog)
+
+    p_onboard = sub.add_parser(
+        "onboard-candidates",
+        help="列出已 triage lead 中逐字點名、但 registry 沒有的標的（JSON）",
+    )
+    p_onboard.add_argument(
+        "--min-leads", type=int, default=1,
+        help="至少被幾筆不同 lead 點名才列出（預設 1）",
+    )
+    p_onboard.set_defaults(func=_cmd_onboard_candidates)
 
     p_related = sub.add_parser(
         "related",

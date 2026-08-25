@@ -110,7 +110,8 @@ target 全是同一個 0.1%，常數不帶資訊，而使用者要的是「撒�
 **需求與完整推導：[`2026-08-21-research-attention-allocation-requirements.md`](brainstorms/2026-08-21-research-attention-allocation-requirements.md)。**
 動 pq1 排序或新增 skill 前必讀該檔 §2（「答案回來會改變什麼」四級判準）與 §6（產物持久化判準）。
 
-**起點是兩個實測：**① pq1 每日 5 個 slot 有 **3 個**排的是 Micron 內部人 Form 4（7 週前、
+**起點是兩個實測（2026-08-21 當時值，⚠ 非現況；每輪上限唯一權威是
+`config/daily_routine.json` 的 `pq1.drain_limit_per_run`）：**① pq1 每輪 5 個 slot 有 **3 個**排的是 Micron 內部人 Form 4（7 週前、
 且 Micron 已明文降範圍）；90 個候選裡 Form 4 佔 36 筆。成因不是權重調錯，是**加權總分的
 補償性**——`tier 4.0 + holdings 4.0 + thesis 4.0 = 12.0`，三個各自成立的弱理由相加就壓過
 維度 3 事件。② Lane Memo 的成本不在 11 份文件，在周圍 9 個維護模組，而 Engine D 完全不讀它。

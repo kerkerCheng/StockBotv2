@@ -19,7 +19,7 @@ from typing import Any
 from urllib.parse import urlsplit, urlunsplit
 
 from access_failures import FAILURE_CLASSES
-from engine_b.lead_refs import validate_ref_updates
+from engine_b.lead_refs import get_trace_status_registry, validate_ref_updates
 
 SCHEMA_VERSION = "2"
 _SUPPORTED_SCHEMA_VERSIONS = frozenset({"1", SCHEMA_VERSION})
@@ -403,6 +403,120 @@ def requeue_for_triage(
     return lead
 
 
+#: 通過 triage 的狀態——代表「我們判斷過它值得研究」。`triaged_no_go` 與 `pending`
+#: 刻意排除：前者已被判定不值得，後者還沒被判斷過，兩者都不該推動 onboarding。
+_VETTED_STATUSES: frozenset[str] = frozenset(
+    {"triaged_go", "researching", "action_prepared", "applied", "parked"}
+)
+
+
+def onboard_candidates(store: dict[str, Any]) -> list[dict[str, Any]]:
+    """已通過 triage 的 lead 裡逐字點名、但 registry 沒有的標的。
+
+    **這裡補的是一個結構性黑洞。** pq2 的六個 collector 沒有一個負責
+    「這家公司該不該註冊」：已有 cohort 但缺可交易 ticker 的走
+    `decision_lab.brief.identity_registration_pending`；而**完全不在 registry、
+    也沒有 cohort 的公司，先前沒有任何機制會讓它浮出來**。2026-08-25 實測：
+    一條 pq1 研究點名 Largan(3008)、FOCI(3363)、TFC 三家 FAU 供應商，
+    registry 76 家裡一家都沒有，而「也許該 onboard Largan」這個判斷只活在
+    private 研究筆記裡——沒有任何路徑會讓它再次出現（L13：管子只接一頭）。
+
+    判準刻意是**確定性**的，不靠任何人記得標註：
+    `entities.extract_entities` 已經把 cashtag 與結構化 source ticker 抽成
+    `tickers`，並把能反查 registry 的放進 `company_ids`。**兩者的差集就是候選。**
+    這也表示它不會因為研究者換人或那天忘了寫就消失。
+
+    回傳按「被幾筆不同 lead 點名」排序——重複出現是確定性的注意力訊號，
+    不是誰的主觀判斷。⚠ 它只回答「誰一直出現卻不在圖裡」，
+    **不回答該不該 onboard**：那是使用者的決定，onboarding 會改 registry
+    （authority），仍走 `skills/company-onboard`。
+    """
+
+    from engine_b.entities import extract_entities
+
+    try:
+        from identity.registry import get_registry
+
+        registry = get_registry()
+        registered = {
+            str(getattr(c, "research_ticker", "") or "").upper()
+            for c in registry.companies
+        }
+        registered |= {
+            ticker.split(".", 1)[0]
+            for ticker in registered
+            if "." in ticker
+        }
+        registered.discard("")
+    except Exception:
+        # 讀不到 registry 就不猜：回空集合，而不是把每個 ticker 都報成未登記。
+        return []
+
+    seen: dict[str, dict[str, Any]] = {}
+    for lead in store["leads"].values():
+        if lead.get("status") not in _VETTED_STATUSES:
+            continue
+        # 研究中以純文字點名的公司。cashtag 抽取刻意是零幻覺的 regex（L6），
+        # 代價是抓不到「Largan Precision (3008)」這種寫法——而那正是 2026-08-25
+        # 促成本函式的實際案例。辨識公司名是語意任務，依 L15 由研究者解析、
+        # 這裡只做 deterministic 的 registry 比對，不做模糊比對也不呼叫 LLM。
+        for raw_name in (lead.get("refs") or {}).get("onboard_candidate_names") or ():
+            name = str(raw_name).strip()
+            if not name:
+                continue
+            row = seen.setdefault(
+                name,
+                {
+                    "ticker": name,
+                    "detected_by": "manual",
+                    "lead_count": 0,
+                    "lead_ids": [],
+                    "sample_title": "",
+                },
+            )
+            row["lead_count"] += 1
+            if len(row["lead_ids"]) < 5:
+                row["lead_ids"].append(lead["lead_id"])
+            if not row["sample_title"]:
+                title = " ".join(str(lead.get("title") or "").split())
+                row["sample_title"] = title[:120]
+        entities = extract_entities(
+            title=lead.get("title"),
+            raw_text=lead.get("raw_text"),
+            source=lead.get("source"),
+        )
+        # company_ids 是已反查成功的；tickers 裡剩下的就是 registry 不認得的。
+        if entities["company_ids"] and len(entities["company_ids"]) >= len(
+            entities["tickers"]
+        ):
+            continue
+        for ticker in entities["tickers"]:
+            upper = str(ticker).upper()
+            if upper in registered:
+                continue
+            if registry.company_id_for_ticker(upper):
+                continue
+            row = seen.setdefault(
+                upper,
+                {
+                    "ticker": upper,
+                    "detected_by": "cashtag",
+                    "lead_count": 0,
+                    "lead_ids": [],
+                    "sample_title": "",
+                },
+            )
+            row["lead_count"] += 1
+            if len(row["lead_ids"]) < 5:
+                row["lead_ids"].append(lead["lead_id"])
+            if not row["sample_title"]:
+                title = " ".join(str(lead.get("title") or "").split())
+                row["sample_title"] = title[:120]
+    return sorted(
+        seen.values(), key=lambda row: (-row["lead_count"], row["ticker"])
+    )
+
+
 def trace_backlog(store: dict[str, Any]) -> list[dict[str, Any]]:
     """列出 parked 的追源未果項目，避免規則書中的 backlog 變成黑洞。
 
@@ -423,7 +537,12 @@ def trace_backlog(store: dict[str, Any]) -> list[dict[str, Any]]:
         parked_reason = str(refs.get("parked_reason") or "").strip()
         if not trace_status and "trace" not in parked_reason.lower():
             continue
-        if trace_status in {"original_obtained", "tier_1_2_honest_passthrough"}:
+        # terminal 值由 config/lead_trace_status.json 決定，不寫死在這裡。
+        # 2026-08-25 之前這是硬編碼字串，而 trace_status 本身沒有字彙約束——
+        # 寫成未登記的同義詞（`primary_source_obtained`）不會報錯，只會讓已完成的
+        # lead 永遠掛在 backlog 且 auto_trigger_reachable=false。字彙一旦有行為
+        # 後果就必須被強制（L15：解析可以寬鬆，判定必須 deterministic）。
+        if get_trace_status_registry().is_terminal(trace_status):
             continue
         requires_user = str(refs.get("trace_requires_user") or "").lower() in {
             "1", "true", "yes",
@@ -618,7 +737,8 @@ def _requeue_related_trace_backlog(
         parked_reason = str(refs.get("parked_reason") or "").strip()
         if not trace_status and "trace" not in parked_reason.lower():
             continue
-        if trace_status in {"original_obtained", "tier_1_2_honest_passthrough"}:
+        # 同 trace_backlog：terminal 值只由 config/lead_trace_status.json 決定。
+        if get_trace_status_registry().is_terminal(trace_status):
             continue
         if str(refs.get("trace_requires_user") or "").lower() in {"1", "true", "yes"}:
             continue

@@ -3066,8 +3066,10 @@
       "added_at": "2026-08-20T11:02:30.643377+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_f87f24f695192e4901496350ea629b1b",
+      "dispatch_receipt": "research_packet:library/private/research_notes/2026-08-25_pq1_micron_wo_concentration_backlog.md｜MU FY2025 10-K＋Q3 FY2026 10-Q 逐字核對。清除 2/3 blocker：客戶集中度（FY2025 單一客戶 17%、FY2024 10%、2026 前九月 10%，issuer 不具名客戶亦不揭露前三大合計）與 backlog（RPO 由 2025-08-28 not material → 2026-05-28 約 5B USD，含 422M 合約負債，結構為 take-or-pay 客戶端承諾；⚠ issuer 自陳 RPO 非未來營收指標、僅計最低承諾量與最低價、排除一年內合約，故為下限）。Engine C 提案 po_89b54dcfa022fd495eea04bfdfb205fb 與 po_664bdcabec4a63f236101178af1f650a 待核准。counter_path_missing 未解——10-K 相鄰段落講的是 Micron 自身供應端依賴，方向不同不可混用；補反路徑需 Samsung/SK Hynix 側資料，與 2026-08-20 使用者定案的記憶體軸範圍可能衝突，不由 pq1 自行擴大。",
       "dispatch_ref": "wo_5c90a0aad842d8792a63e4193ca6ae04",
-      "dispatch_status": "queued",
+      "dispatch_status": "awaiting_approval",
+      "dispatch_updated_at": "2026-08-25T13:26:34.786866+00:00",
       "dispatched_at": "2026-08-25T01:24:33.418398+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 192,
@@ -8268,6 +8270,24 @@
       "ref_id": "po_057a01f28269a80921e5eaada8e4f5bf",
       "type": "engine_c_observation",
       "verb": "go"
+    },
+    {
+      "at": "2026-08-25T13:26:20.405998+00:00",
+      "n": 192,
+      "reason": null,
+      "receipt": "pq1 開工：MU FY2025 10-K＋Q3 FY2026 10-Q 取全文",
+      "ref_id": "dc_b05cc1360e4bdf2a238787c23e7b227d",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-08-25T13:26:34.786866+00:00",
+      "n": 192,
+      "reason": null,
+      "receipt": "research_packet:library/private/research_notes/2026-08-25_pq1_micron_wo_concentration_backlog.md｜MU FY2025 10-K＋Q3 FY2026 10-Q 逐字核對。清除 2/3 blocker：客戶集中度（FY2025 單一客戶 17%、FY2024 10%、2026 前九月 10%，issuer 不具名客戶亦不揭露前三大合計）與 backlog（RPO 由 2025-08-28 not material → 2026-05-28 約 5B USD，含 422M 合約負債，結構為 take-or-pay 客戶端承諾；⚠ issuer 自陳 RPO 非未來營收指標、僅計最低承諾量與最低價、排除一年內合約，故為下限）。Engine C 提案 po_89b54dcfa022fd495eea04bfdfb205fb 與 po_664bdcabec4a63f236101178af1f650a 待核准。counter_path_missing 未解——10-K 相鄰段落講的是 Micron 自身供應端依賴，方向不同不可混用；補反路徑需 Samsung/SK Hynix 側資料，與 2026-08-20 使用者定案的記憶體軸範圍可能衝突，不由 pq1 自行擴大。",
+      "ref_id": "dc_b05cc1360e4bdf2a238787c23e7b227d",
+      "type": "decision_review",
+      "verb": "pq1_awaiting_approval"
     }
   ],
   "next_n": 227,

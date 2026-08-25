@@ -11132,7 +11132,7 @@
         "original_claim_status": "product_announcement_no_bottleneck_claim",
         "research_outcome": "內容為 NVDA 產品全量產與 NBIS 採用的推論評論（推測 NVDA 投資帶來 early access 待遇）。不含任何供應鏈瓶頸、可替代性或客戶端資本承諾的可驗證 atom；benchmark 數字屬第三方測試非供應關係。依 AGENTS.md 主題範圍（CPO 與 humanoid 兩條主線）與 source-trace 分流表，本條不屬 source trace 缺口，不投入 pq1 預算。",
         "trace_requires_user": "false",
-        "trace_status": "off_thesis_scope"
+        "trace_status": "not_pursued"
       },
       "source": "x:aleabitoreddit",
       "status": "parked",
@@ -13068,12 +13068,17 @@
       "refs": {
         "claimed_origin": "UDN 聯合報系中文報導，經 X 推文轉述",
         "gap": "NVDA FAU 供應鏈的客戶端確認缺失。tier-3 宣稱 Largan、FOCI、中國 TFC 已進入 NVDA FAU 供應鏈屬第三方轉述，依 L8 需客戶端或第三方一手印證。台股路由應走公開資訊觀測站（FOCI 3363 上櫃、Largan 3008 上市）與公司法說。另 FAU 量產時程各家說法不一：FOCI 稱 2026 Q3 開始交付 3.2T 規格，Largan 稱 sampling、量產尚需 1-2 年，需一手核對。",
+        "onboard_candidate_names": [
+          "Largan Precision (3008.TW)",
+          "FOCI 上詮 (3363.TW)",
+          "TFC Communication 天孚通信"
+        ],
         "outcome": "圖層缺口確認：Neo4j 查無任何 fiber array / FAU 節點。CPO、NPO、glass CPO、in-package optical I/O 都在，唯獨缺把光纖接到矽光子晶片的物理介面層。候選供應商 Largan 3008.TW、FOCI 3363.TWO、Browave 3163.TW、HST 7928.TW、Sunny Optical 全部不在圖中，同類僅有 co:corning。這是排序與覆蓋掃描無法產出的那種缺口，它們只能從既有節點往回看。",
         "research_outcome": "pq1 追源未果（tier 3 隔離），不入圖、不提高 evidence tier。但圖層缺口本身已確認，建議另以 system-decompose 對 CPO 組裝層由上而下拆一次。",
         "trace_attempts_ref": "library/private/research_notes/2026-08-25_pq1_fau_nvda_supply_chain.md",
         "trace_next_trigger": "Largan(3008)／FOCI(3363)／TFC 任一在 MOPS 重大訊息、法說會或 NVIDIA／Broadcom 官方文件中具名對方；或 NVIDIA 發布帶角色分工的 CPO 供應鏈說明",
         "trace_requires_user": "false",
-        "trace_status": "awaiting_customer_named_disclosure"
+        "trace_status": "awaiting_named_disclosure"
       },
       "source": "x:aleabitoreddit",
       "status": "parked",
@@ -20417,7 +20422,7 @@
         "trace_origin_entity": "Churchill Capital Corp XI (SEC Form 425 filer)",
         "trace_original_date": "2026-08-21",
         "trace_requires_user": "false",
-        "trace_status": "primary_source_obtained"
+        "trace_status": "original_obtained"
       },
       "source": "x:aleabitoreddit",
       "status": "parked",
@@ -22326,7 +22331,7 @@
         "trace_requeue_trigger": "related_triaged_lead:lead_f7b34fc90c9ed8c306133ea148a412aa",
         "trace_requeued_at": "2026-08-21T22:35:41.720555+00:00",
         "trace_requires_user": "false",
-        "trace_status": "quote_misattributed",
+        "trace_status": "contradicts",
         "trace_trigger_entities": [
           "AAOI",
           "LITE",
@@ -33515,7 +33520,7 @@
         "trace_requeue_trigger": "related_triaged_lead:lead_97335b4438ca7effdd04ebfa259dd39e",
         "trace_requeued_at": "2026-08-24T05:08:08.337843+00:00",
         "trace_requires_user": "false",
-        "trace_status": "primary_source_obtained_tier2",
+        "trace_status": "awaiting_named_disclosure",
         "trace_trigger_entities": [
           "AAOI",
           "AVGO",
@@ -33688,7 +33693,7 @@
         "trace_requeue_trigger": "related_triaged_lead:lead_1a75aa118ad109781c02fcd497236dda",
         "trace_requeued_at": "2026-08-24T22:36:50.439001+00:00",
         "trace_requires_user": "false",
-        "trace_status": "out_of_scope_user_decision",
+        "trace_status": "not_pursued",
         "trace_trigger_entities": [
           "AAOI",
           "POET",
@@ -33973,7 +33978,7 @@
         "trace_requeue_trigger": "related_triaged_lead:lead_97335b4438ca7effdd04ebfa259dd39e",
         "trace_requeued_at": "2026-08-24T05:08:08.337843+00:00",
         "trace_requires_user": "false",
-        "trace_status": "confirmed_tier2_macro_anchor",
+        "trace_status": "tier_1_2_honest_passthrough",
         "trace_trigger_entities": [
           "AMZN",
           "AXTI",
@@ -36150,7 +36155,7 @@
         "trace_requeue_trigger": "related_triaged_lead:lead_f7b34fc90c9ed8c306133ea148a412aa",
         "trace_requeued_at": "2026-08-21T22:35:41.720555+00:00",
         "trace_requires_user": "false",
-        "trace_status": "primary_source_contradicts_claim",
+        "trace_status": "contradicts",
         "trace_trigger_entities": [
           "JBL",
           "POET",
@@ -41751,7 +41756,7 @@
         "trace_requeue_trigger": "related_triaged_lead:lead_1a75aa118ad109781c02fcd497236dda",
         "trace_requeued_at": "2026-08-24T22:36:50.439001+00:00",
         "trace_requires_user": "false",
-        "trace_status": "no_verifiable_atom",
+        "trace_status": "not_pursued",
         "trace_trigger_entities": [
           "POET",
           "SIVE",
