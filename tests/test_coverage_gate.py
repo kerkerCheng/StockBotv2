@@ -441,6 +441,56 @@ def test_work_order_superseded_by_newer_decision_is_withheld(tmp_path: Path) -> 
         store.close()
 
 
+def test_latest_work_order_is_none_when_newest_decision_has_no_gap(tmp_path: Path) -> None:
+    """最新 decision 已無 coverage gap 時不得往回撈舊 work order（co:axt 實例）。
+
+    原本的 INNER JOIN 會跳過沒有 work order 的較新 decision，於是 `todo dispatch`
+    發出一張早已被補完的 work order，drain 立刻擋下——按了 go 卻什麼都沒發生。
+    """
+    store = _store(tmp_path)
+    try:
+        bundle = _bundle(
+            store,
+            evidence={
+                "focus_company": None,
+                "subject_origin_entity": "Unknown",
+                "sources": [],
+                "causal_paths": [],
+                "counter_paths": [],
+            },
+        )
+        gapped = _assess(store, bundle)
+        # 較新的 decision 綁一份「已無 blocker」的 assessment，它本來就不會有 work order。
+        clean_bundle = _bundle(store)
+        clean = _assess(store, clean_bundle)
+        assert gapped.work_order_id is not None
+        assert clean.work_order_id is None
+
+        for decision_id, assessment_id, digest, effective_at in (
+            ("pd_gapped", gapped.assessment_id, bundle.digest, "2026-08-16T22:53:00+00:00"),
+            ("pd_clean", clean.assessment_id, clean_bundle.digest, "2026-08-17T01:36:00+00:00"),
+        ):
+            store._conn.execute(
+                """
+                INSERT INTO system_decisions (
+                    decision_id, cohort_id, idempotency_key, request_digest,
+                    decision_digest, context_digest, coverage_assessment_id,
+                    policy_version, calculator_version, payload_json, effective_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, 'probe-v1', 'probe-limit-v3', '{}', ?)
+                """,
+                (
+                    decision_id, bundle.cohort_id, f"idem_{decision_id}",
+                    f"rq_{decision_id}", f"dg_{decision_id}", digest,
+                    assessment_id, effective_at,
+                ),
+            )
+
+        # 舊的 INNER JOIN 會跳過 pd_clean、回傳 gapped 的 work order；LEFT JOIN 回 None。
+        assert store.latest_research_work_order(bundle.cohort_id) is None
+    finally:
+        store.close()
+
+
 def test_terminal_work_order_requires_explicit_pq2_receipt_to_redispatch(
     tmp_path: Path,
 ) -> None:

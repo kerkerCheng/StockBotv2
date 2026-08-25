@@ -346,7 +346,11 @@ def dispatch_decision_review(
         raise TodoError("全域 authority blocker 沒有 bounded cohort work order，需依 hint 修復")
     work_order = store.latest_research_work_order(cohort_id)
     if work_order is None:
-        raise TodoError(f"cohort {cohort_id} 的最新 decision 沒有 research work order")
+        raise TodoError(
+            f"cohort {cohort_id} 的最新 decision 沒有 research work order"
+            "——代表 coverage 已無 blocker，沒有 bounded gap 可補。若是因為出現新證據而"
+            "要重看，該走 reassess 產生新 decision，不是 dispatch 舊 work order。"
+        )
     if (
         str(work_order.get("status")) in {"queued", "researching", "awaiting_approval"}
         and item.get("dispatch_ref") == str(work_order["work_order_id"])

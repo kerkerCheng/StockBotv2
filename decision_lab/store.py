@@ -1171,13 +1171,25 @@ class DecisionStore:
         return result
 
     def latest_research_work_order(self, cohort_id: str) -> dict[str, Any] | None:
-        """Return the work order bound to the cohort's latest immutable decision."""
+        """Return the work order bound to the cohort's latest immutable decision.
+
+        事發（2026-08-25）：這裡原本是 INNER JOIN，於是**只會找到「有 work order 的」
+        decision**——比它更新、但因為 coverage 已無 blocker 而沒有 work order 的
+        decision 會被整個跳過，回傳一張早已被補完的舊 work order。實測 co:axt：最新
+        decision 是 2026-08-17 01:36 的 `analyzable`（blockers 空），INNER JOIN 卻回
+        2026-08-16 22:53 的 `coverage_pending`。使用者按 `go` 之後 dispatch 出一張
+        不再有缺口的 work order，drain 立刻擋下——按了鈕但什麼都沒發生（L13）。
+
+        正確語意就是 docstring 原本寫的那句：**最新那筆 decision 的 work order**。
+        最新 decision 沒有 work order 就代表沒有 coverage gap 要補，回 ``None`` 讓
+        呼叫端明講，不要往回撈舊世代。
+        """
 
         row = self._conn.execute(
             """
             SELECT wo.work_order_id, sd.decision_id
             FROM system_decisions sd
-            JOIN research_work_orders wo
+            LEFT JOIN research_work_orders wo
               ON wo.assessment_id = sd.coverage_assessment_id
             WHERE sd.cohort_id = ?
             ORDER BY sd.effective_at DESC, sd.decision_id DESC
@@ -1185,7 +1197,7 @@ class DecisionStore:
             """,
             (cohort_id,),
         ).fetchone()
-        if row is None:
+        if row is None or row["work_order_id"] is None:
             return None
         result = self.get_research_work_order(str(row["work_order_id"]))
         result["decision_id"] = str(row["decision_id"])
