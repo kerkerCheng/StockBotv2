@@ -3098,15 +3098,18 @@
       "added_at": "2026-08-20T15:36:57.789792+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_1a7bdffc5ee4c80cd89da79ea90f13f5",
+      "dispatch_receipt": "bounded research 未果，非未嘗試。已試路徑：(1) hds.co.jp/english/ir 三層導覽（consolidatedfinancialresults／achievements／achievements/segment）——頁面存在但 bookings／sales 數字以動態表格與圖表呈現，可抽文字為 0，取不到逐字數值；(2) 第三方聚合有具體數字（日產汽車佔 FY2025/3 營收 10.3%、FY2026/3 降至 10% 以下；FY2027/3 Q1 受注 241.3 億日圓 +55.7%；FY2026/3 營收 595.57 億日圓），但依 source-trace 屬 tier 2-3，不足以支持 Engine C manual observation 的 traceability 要求，不予採用。⚠ 未嘗試且應為正解的路徑：日本 issuer 的客戶集中度揭露在**有価証券報告書**，應走 EDINET（金融庁 EDGAR 對應機構）而非公司 IR 網頁；受注殘高同樣在該文件與決算短信。下輪應直接以 EDINET 檢索 6324。blockers 全數未清（counter_path_missing／financial_backlog_manual_required／financial_customer_concentration_manual_required／financial_runway_manual_required／independent_source_missing）。",
       "dispatch_ref": "wo_04f0da1c5164221bffdb821491114ec4",
-      "dispatch_status": "queued",
+      "dispatch_status": "parked",
+      "dispatch_updated_at": "2026-08-25T13:29:07.134918+00:00",
       "dispatched_at": "2026-08-25T01:24:34.114081+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 194,
-      "reason": null,
+      "reason": "pq1 parked",
+      "receipt": "bounded research 未果，非未嘗試。已試路徑：(1) hds.co.jp/english/ir 三層導覽（consolidatedfinancialresults／achievements／achievements/segment）——頁面存在但 bookings／sales 數字以動態表格與圖表呈現，可抽文字為 0，取不到逐字數值；(2) 第三方聚合有具體數字（日產汽車佔 FY2025/3 營收 10.3%、FY2026/3 降至 10% 以下；FY2027/3 Q1 受注 241.3 億日圓 +55.7%；FY2026/3 營收 595.57 億日圓），但依 source-trace 屬 tier 2-3，不足以支持 Engine C manual observation 的 traceability 要求，不予採用。⚠ 未嘗試且應為正解的路徑：日本 issuer 的客戶集中度揭露在**有価証券報告書**，應走 EDINET（金融庁 EDGAR 對應機構）而非公司 IR 網頁；受注殘高同樣在該文件與決算短信。下輪應直接以 EDINET 檢索 6324。blockers 全數未清（counter_path_missing／financial_backlog_manual_required／financial_customer_concentration_manual_required／financial_runway_manual_required／independent_source_missing）。",
       "ref_id": "dc_cc46527aac12ba14191ee71c0460f3fe",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-25T13:29:07.134918+00:00",
       "source": "decision_lab",
       "title": "REVIEW — co:harmonic_drive_systems",
       "type": "decision_review"
@@ -3444,17 +3447,18 @@
       "added_at": "2026-08-23T02:35:45.020394+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_f5d3b323f0a6a18157be84b2f7bdaba0",
-      "dispatch_receipt": "research:daily-2026-08-25:wo_63ce1bbd347fe71656beae4259f7da8a",
+      "dispatch_receipt": "bounded research 未果，卡在 access control 非未嘗試。已試路徑：官方 Annual Report 2025 PDF（schaeffler.com/remotemedien/.../2025_schaeffler_annual_report_en_kj52sl.pdf）回 HTTP 403 Forbidden——依 source-trace §3 遇 anti-bot 即停止，不偽裝 UA、不偽造 Referer、不用規避快取。可得的僅為 press release 層級數字（2025 全年 order intake 約 155 億歐元，其中 BEV 20 億、hybrid 88 億；H1 2025 E-Mobility 46 億、Powertrain & Chassis 47 億），屬 tier 2 且未含客戶集中度，不足以支持 Engine C manual observation。⚠ 下一步兩條：(1) 該 PDF 在瀏覽器可正常下載，使用者提供本機副本即可標 local_only 續做；(2) 或找年報的 HTML 版／IFRS 8 分部附註單獨頁。⚠ 另 catalyst_missing 與 disproof_missing 屬 thesis 判斷，本來就不由 pq1 代填（drain 已警示 disproof 未填等於警報永遠不會響 L7）。blockers 全數未清。",
       "dispatch_ref": "wo_63ce1bbd347fe71656beae4259f7da8a",
-      "dispatch_status": "researching",
-      "dispatch_updated_at": "2026-08-24T23:01:57.730151+00:00",
+      "dispatch_status": "parked",
+      "dispatch_updated_at": "2026-08-25T13:30:01.947897+00:00",
       "dispatched_at": "2026-08-23T23:35:55.603203+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 212,
-      "reason": null,
+      "reason": "pq1 parked",
+      "receipt": "bounded research 未果，卡在 access control 非未嘗試。已試路徑：官方 Annual Report 2025 PDF（schaeffler.com/remotemedien/.../2025_schaeffler_annual_report_en_kj52sl.pdf）回 HTTP 403 Forbidden——依 source-trace §3 遇 anti-bot 即停止，不偽裝 UA、不偽造 Referer、不用規避快取。可得的僅為 press release 層級數字（2025 全年 order intake 約 155 億歐元，其中 BEV 20 億、hybrid 88 億；H1 2025 E-Mobility 46 億、Powertrain & Chassis 47 億），屬 tier 2 且未含客戶集中度，不足以支持 Engine C manual observation。⚠ 下一步兩條：(1) 該 PDF 在瀏覽器可正常下載，使用者提供本機副本即可標 local_only 續做；(2) 或找年報的 HTML 版／IFRS 8 分部附註單獨頁。⚠ 另 catalyst_missing 與 disproof_missing 屬 thesis 判斷，本來就不由 pq1 代填（drain 已警示 disproof 未填等於警報永遠不會響 L7）。blockers 全數未清。",
       "ref_id": "dc_912a03a50135ea5e29000a0417c3f477",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-25T13:30:01.947897+00:00",
       "source": "decision_lab",
       "title": "REVIEW — co:schaeffler",
       "type": "decision_review"
@@ -3667,6 +3671,54 @@
       "source": "engine_c",
       "title": "Engine C 觀測：IQE.L / backlog",
       "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-08-25T13:30:44.275553+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-05-28T00:00:00+00:00；來源=Micron Technology, Inc. Q3 FY2026 Form 10-Q, filed 2026-06-25 (CIK 0000723125, a",
+      "n": 227,
+      "reason": null,
+      "ref_id": "po_664bdcabec4a63f236101178af1f650a",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "engine_c",
+      "title": "Engine C 觀測：MU / backlog",
+      "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-08-25T13:30:44.275553+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-05-28T00:00:00+00:00；來源=Micron Technology, Inc. FY2025 Form 10-K, filed 2025-10-03 (CIK 0000723125, acce",
+      "n": 228,
+      "reason": null,
+      "ref_id": "po_89b54dcfa022fd495eea04bfdfb205fb",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "engine_c",
+      "title": "Engine C 觀測：MU / customer_concentration",
+      "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-08-25T13:30:44.275553+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 229,
+      "reason": null,
+      "ref_id": "dc_cc46527aac12ba14191ee71c0460f3fe",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:harmonic_drive_systems",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-25T13:30:44.275553+00:00",
+      "hint": "核准 bounded gap research；完成後才 reassess",
+      "n": 230,
+      "reason": null,
+      "ref_id": "dc_912a03a50135ea5e29000a0417c3f477",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:schaeffler",
+      "type": "decision_review"
     }
   ],
   "log": [
@@ -8288,8 +8340,53 @@
       "ref_id": "dc_b05cc1360e4bdf2a238787c23e7b227d",
       "type": "decision_review",
       "verb": "pq1_awaiting_approval"
+    },
+    {
+      "at": "2026-08-25T13:29:06.212971+00:00",
+      "n": 194,
+      "reason": null,
+      "receipt": "pq1 開工：嘗試 Harmonic Drive Systems 官方 IR 取客戶集中度與受注殘高",
+      "ref_id": "dc_cc46527aac12ba14191ee71c0460f3fe",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-08-25T13:29:07.134918+00:00",
+      "n": 194,
+      "reason": null,
+      "receipt": "bounded research 未果，非未嘗試。已試路徑：(1) hds.co.jp/english/ir 三層導覽（consolidatedfinancialresults／achievements／achievements/segment）——頁面存在但 bookings／sales 數字以動態表格與圖表呈現，可抽文字為 0，取不到逐字數值；(2) 第三方聚合有具體數字（日產汽車佔 FY2025/3 營收 10.3%、FY2026/3 降至 10% 以下；FY2027/3 Q1 受注 241.3 億日圓 +55.7%；FY2026/3 營收 595.57 億日圓），但依 source-trace 屬 tier 2-3，不足以支持 Engine C manual observation 的 traceability 要求，不予採用。⚠ 未嘗試且應為正解的路徑：日本 issuer 的客戶集中度揭露在**有価証券報告書**，應走 EDINET（金融庁 EDGAR 對應機構）而非公司 IR 網頁；受注殘高同樣在該文件與決算短信。下輪應直接以 EDINET 檢索 6324。blockers 全數未清（counter_path_missing／financial_backlog_manual_required／financial_customer_concentration_manual_required／financial_runway_manual_required／independent_source_missing）。",
+      "ref_id": "dc_cc46527aac12ba14191ee71c0460f3fe",
+      "type": "decision_review",
+      "verb": "pq1_parked"
+    },
+    {
+      "at": "2026-08-25T13:29:07.134918+00:00",
+      "n": 194,
+      "reason": "pq1 parked",
+      "receipt": "bounded research 未果，非未嘗試。已試路徑：(1) hds.co.jp/english/ir 三層導覽（consolidatedfinancialresults／achievements／achievements/segment）——頁面存在但 bookings／sales 數字以動態表格與圖表呈現，可抽文字為 0，取不到逐字數值；(2) 第三方聚合有具體數字（日產汽車佔 FY2025/3 營收 10.3%、FY2026/3 降至 10% 以下；FY2027/3 Q1 受注 241.3 億日圓 +55.7%；FY2026/3 營收 595.57 億日圓），但依 source-trace 屬 tier 2-3，不足以支持 Engine C manual observation 的 traceability 要求，不予採用。⚠ 未嘗試且應為正解的路徑：日本 issuer 的客戶集中度揭露在**有価証券報告書**，應走 EDINET（金融庁 EDGAR 對應機構）而非公司 IR 網頁；受注殘高同樣在該文件與決算短信。下輪應直接以 EDINET 檢索 6324。blockers 全數未清（counter_path_missing／financial_backlog_manual_required／financial_customer_concentration_manual_required／financial_runway_manual_required／independent_source_missing）。",
+      "ref_id": "dc_cc46527aac12ba14191ee71c0460f3fe",
+      "type": "decision_review",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-25T13:30:01.947897+00:00",
+      "n": 212,
+      "reason": null,
+      "receipt": "bounded research 未果，卡在 access control 非未嘗試。已試路徑：官方 Annual Report 2025 PDF（schaeffler.com/remotemedien/.../2025_schaeffler_annual_report_en_kj52sl.pdf）回 HTTP 403 Forbidden——依 source-trace §3 遇 anti-bot 即停止，不偽裝 UA、不偽造 Referer、不用規避快取。可得的僅為 press release 層級數字（2025 全年 order intake 約 155 億歐元，其中 BEV 20 億、hybrid 88 億；H1 2025 E-Mobility 46 億、Powertrain & Chassis 47 億），屬 tier 2 且未含客戶集中度，不足以支持 Engine C manual observation。⚠ 下一步兩條：(1) 該 PDF 在瀏覽器可正常下載，使用者提供本機副本即可標 local_only 續做；(2) 或找年報的 HTML 版／IFRS 8 分部附註單獨頁。⚠ 另 catalyst_missing 與 disproof_missing 屬 thesis 判斷，本來就不由 pq1 代填（drain 已警示 disproof 未填等於警報永遠不會響 L7）。blockers 全數未清。",
+      "ref_id": "dc_912a03a50135ea5e29000a0417c3f477",
+      "type": "decision_review",
+      "verb": "pq1_parked"
+    },
+    {
+      "at": "2026-08-25T13:30:01.947897+00:00",
+      "n": 212,
+      "reason": "pq1 parked",
+      "receipt": "bounded research 未果，卡在 access control 非未嘗試。已試路徑：官方 Annual Report 2025 PDF（schaeffler.com/remotemedien/.../2025_schaeffler_annual_report_en_kj52sl.pdf）回 HTTP 403 Forbidden——依 source-trace §3 遇 anti-bot 即停止，不偽裝 UA、不偽造 Referer、不用規避快取。可得的僅為 press release 層級數字（2025 全年 order intake 約 155 億歐元，其中 BEV 20 億、hybrid 88 億；H1 2025 E-Mobility 46 億、Powertrain & Chassis 47 億），屬 tier 2 且未含客戶集中度，不足以支持 Engine C manual observation。⚠ 下一步兩條：(1) 該 PDF 在瀏覽器可正常下載，使用者提供本機副本即可標 local_only 續做；(2) 或找年報的 HTML 版／IFRS 8 分部附註單獨頁。⚠ 另 catalyst_missing 與 disproof_missing 屬 thesis 判斷，本來就不由 pq1 代填（drain 已警示 disproof 未填等於警報永遠不會響 L7）。blockers 全數未清。",
+      "ref_id": "dc_912a03a50135ea5e29000a0417c3f477",
+      "type": "decision_review",
+      "verb": "go"
     }
   ],
-  "next_n": 227,
+  "next_n": 231,
   "schema_version": "1"
 }
