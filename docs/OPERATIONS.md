@@ -63,6 +63,21 @@ Luna reviewer：停止
 
 `pending` 帶 `--until`／`--trigger` 會歸入「等事件」區，觸發前不佔決策注意力。分類判準見 `config/decision_blockers.json` 的 `resolution_mode`。
 
+**⚠ `decision_review` 有兩種成因，處置完全不同（2026-08-26 實測撞到）。** 該項的 hint 寫「核准 bounded gap
+research」，會讓人以為一律 `dispatch`，但 `dispatch` 只在**該 decision 帶 research work order**（即 coverage
+還有 blocker）時才成立；沒有 work order 時它會正確拒絕並說明。而 `resolve --verb go` 也會被拒（decision_review
+不得 bare go），於是看起來像死結——**實際上該走 `reassess`**：
+
+- **coverage 有 blocker** → `dispatch <n>` 派回 pq1 做 bounded research，完成後 `work <n> --to ...` checkpoint。
+- **coverage 無 blocker、REVIEW 來自凍結 context 過期** → 直接
+  `python -m decision_lab reassess <cohort_id> --intent <原 intent>` 產生新 decision，**下一次 `todo sync`
+  會自己把該編號結掉**，不需要任何 verb。
+
+⚠ **`--intent` 必須沿用該 cohort 上一筆 decision 的值**，不可套用別處的習慣。實測：對一個先前是 `paper`
+的 cohort 跑 `--intent research`，`paper_status` 會由 `ELIGIBLE` 退成 `DATA_NEEDED`——那不是資料變壞，
+是 `execution_intent_research_only` 這個 paper blocker，純粹由參數造成。查證：
+`select json_extract(payload_json,'$.request.execution_intent') from system_decisions where cohort_id=? order by rowid desc limit 1`。
+
 ### Leads
 ```powershell
 & '.venv\Scripts\python.exe' crons\harvest_leads.py                 # 零 token；--dry-run 只印不寫

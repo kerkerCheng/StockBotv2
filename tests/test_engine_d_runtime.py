@@ -1,10 +1,8 @@
 from __future__ import annotations
 
 import ast
-import os
-import time
-from contextlib import contextmanager
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 from decision_lab.adapters.graph import Neo4jReadOnlyQueryPort
 from decision_lab.workflow_ports import WorkflowDataProvider
@@ -487,33 +485,20 @@ def test_evidence_hops_is_policy_driven_and_bounded() -> None:
     assert 1 <= evidence_hops() <= 3
 
 
-@contextmanager
-def _local_timezone(name: str):
-    """暫時把 process 的本機時區換掉，離開時還原。
+def _tz(name: str) -> ZoneInfo:
+    """可控的時區物件，取代先前的 process 全域切換。
 
-    ⚠ `TZ` ＋ `tzset()` 只在 POSIX 有效；Windows 沒有 `time.tzset`，`.astimezone()`
-    讀的是系統時區。本專案的主要開發機是 Windows，所以這裡必須明確 skip 而不是
-    讓整份 suite 在此硬失敗（`pytest -x` 會停在這裡，後面的測試等於不存在）。
-    **skip 不等於已驗證**：這條路徑在 Windows 上沒有被測到，真正的修法是讓
-    `_safe_timestamp` 可注入時區而非依賴 process 全域狀態（已登記 ROADMAP 未排程）。
+    先前這裡是 `TZ` ＋ `time.tzset()` 的 contextmanager，而兩者只在 POSIX 有效——
+    主要開發機是 Windows，於是這兩條測試**永遠 skip**。skip 不等於已驗證：
+    date-only → 本機午夜這條路徑在唯一實際執行它的平台上沒有覆蓋，而它已經
+    實測炸過兩次（2026-08-14、08-17），且台北 06:30 的 daily routine 正落在
+    00:00–08:00 這個結構上必中的窗口內。
+
+    改成注入時區之後，測試不碰 process 全域狀態，因此在任何平台都實際執行；
+    `_safe_timestamp` 的預設行為（`local_tz=None` → `.astimezone()`）未改變。
     """
 
-    if not hasattr(time, "tzset"):
-        import pytest
-
-        pytest.skip("需要 POSIX 的 TZ/tzset；Windows 無法切換 process 本機時區")
-
-    previous = os.environ.get("TZ")
-    os.environ["TZ"] = name
-    time.tzset()
-    try:
-        yield
-    finally:
-        if previous is None:
-            os.environ.pop("TZ", None)
-        else:
-            os.environ["TZ"] = previous
-        time.tzset()
+    return ZoneInfo(name)
 
 
 def test_local_calendar_snapshot_date_is_not_pushed_into_the_future() -> None:
@@ -532,12 +517,14 @@ def test_local_calendar_snapshot_date_is_not_pushed_into_the_future() -> None:
     # 台北 2026-08-17 06:51 跑 routine：本機日曆日已跨日，UTC 還在前一天。
     evaluation_at = "2026-08-16T22:51:45+00:00"
 
+    taipei = _tz("Asia/Taipei")
+
     def normalize(snapshot_date: str) -> dict:
         return _normalize_financial(
             {
                 "status": "observed",
                 "ticker": "AXTI",
-                "as_of": _safe_timestamp(snapshot_date),
+                "as_of": _safe_timestamp(snapshot_date, local_tz=taipei),
                 "fetched_at": _safe_timestamp("2026-08-16T22:30:00+00:00"),
                 "source": "yfinance.info",
                 "cash_and_equivalents": 100.0,
@@ -548,18 +535,17 @@ def test_local_calendar_snapshot_date_is_not_pushed_into_the_future() -> None:
             evaluation_at=evaluation_at,
         )
 
-    with _local_timezone("Asia/Taipei"):
-        today = normalize("2026-08-17")
-        assert "financial_timestamp_future" not in today["blockers"]
-        assert today["status"] == "available"
+    today = normalize("2026-08-17")
+    assert "financial_timestamp_future" not in today["blockers"]
+    assert today["status"] == "available"
 
-        # 分開解釋不等於放寬：真正的未來日期仍必須 fail closed。
-        tomorrow = normalize("2026-08-18")
-        assert tomorrow["status"] == "quarantined"
-        assert tomorrow["blockers"] == ["financial_timestamp_future"]
+    # 分開解釋不等於放寬：真正的未來日期仍必須 fail closed。
+    tomorrow = normalize("2026-08-18")
+    assert tomorrow["status"] == "quarantined"
+    assert tomorrow["blockers"] == ["financial_timestamp_future"]
 
-        # 本機日 00:00 比 UTC 午夜早一個時區位移，stale 窗因此更嚴、不是更鬆。
-        assert normalize("2026-07-20")["status"] == "stale"
+    # 本機日 00:00 比 UTC 午夜早一個時區位移，stale 窗因此更嚴、不是更鬆。
+    assert normalize("2026-07-20")["status"] == "stale"
 
 
 def test_date_only_timestamp_is_symmetric_with_date_today() -> None:
@@ -567,12 +553,33 @@ def test_date_only_timestamp_is_symmetric_with_date_today() -> None:
 
     from engine_d_runtime.adapters import _safe_timestamp
 
-    with _local_timezone("UTC"):
-        assert _safe_timestamp("2026-08-17") == "2026-08-17T00:00:00+00:00"
-    with _local_timezone("Asia/Taipei"):
-        assert _safe_timestamp("2026-08-17") == "2026-08-17T00:00:00+08:00"
+    assert (
+        _safe_timestamp("2026-08-17", local_tz=_tz("UTC"))
+        == "2026-08-17T00:00:00+00:00"
+    )
+    assert (
+        _safe_timestamp("2026-08-17", local_tz=_tz("Asia/Taipei"))
+        == "2026-08-17T00:00:00+08:00"
+    )
     # 完整 timestamp 不受影響——它本來就是精確 instant。
-    with _local_timezone("Asia/Taipei"):
-        assert (
-            _safe_timestamp("2026-08-16T22:30:00+00:00") == "2026-08-16T22:30:00+00:00"
-        )
+    assert (
+        _safe_timestamp("2026-08-16T22:30:00+00:00", local_tz=_tz("Asia/Taipei"))
+        == "2026-08-16T22:30:00+00:00"
+    )
+
+
+def test_injected_timezone_matches_process_default() -> None:
+    """注入不得改變預設行為——否則測的是另一條路徑（L15：閘門要攔對東西）。
+
+    這是上面兩條測試的效力前提：它們用注入時區驗證邏輯，但 production 走的是
+    `local_tz=None`。兩者若不等價，測試通過也不代表 production 正確。
+    """
+
+    from datetime import datetime
+
+    from engine_d_runtime.adapters import _safe_timestamp
+
+    local_offset = datetime.now().astimezone().tzinfo
+    assert _safe_timestamp("2026-08-17") == _safe_timestamp(
+        "2026-08-17", local_tz=local_offset
+    )

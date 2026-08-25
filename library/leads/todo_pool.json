@@ -3600,6 +3600,11 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
+      "source_cleared": {
+        "at": "2026-08-25T16:29:08.975451+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
       "title": "REVIEW — co:coherent",
       "type": "decision_review"
     },
@@ -3612,6 +3617,11 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
+      "source_cleared": {
+        "at": "2026-08-25T16:27:38.389576+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
       "title": "REVIEW — co:iqe",
       "type": "decision_review"
     },
@@ -8405,6 +8415,24 @@
       "ref_id": "po_89b54dcfa022fd495eea04bfdfb205fb",
       "type": "engine_c_observation",
       "verb": "go"
+    },
+    {
+      "at": "2026-08-25T16:27:38.389576+00:00",
+      "n": 222,
+      "reason": "來源本輪成功執行，但不再產出此項",
+      "receipt": null,
+      "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+      "type": "decision_review",
+      "verb": "source_cleared"
+    },
+    {
+      "at": "2026-08-25T16:29:08.975451+00:00",
+      "n": 221,
+      "reason": "來源本輪成功執行，但不再產出此項",
+      "receipt": null,
+      "ref_id": "dc_957bff3701ea4e46d962bfb9ff0932c8",
+      "type": "decision_review",
+      "verb": "source_cleared"
     }
   ],
   "next_n": 231,

@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import json
 import math
-from datetime import datetime
+from datetime import datetime, tzinfo
 from functools import lru_cache
 from pathlib import Path
 from typing import Any, Callable, Mapping, Sequence
@@ -182,8 +182,16 @@ def _finite(value: Any, *, non_negative: bool = False) -> float | None:
     return result
 
 
-def _safe_timestamp(value: Any) -> str | None:
+def _safe_timestamp(value: Any, *, local_tz: tzinfo | None = None) -> str | None:
     """把 Engine C 的 timestamp 正規化成帶時區的 ISO 字串。
+
+    `local_tz` 只為了讓這條路徑**可被測試**而存在：預設 `None` 走
+    `.astimezone()`，行為與注入前完全相同。先前它只讀 process 全域時區，
+    於是測試必須靠 POSIX 的 `TZ`＋`tzset()` 切換——而主要開發機是 Windows，
+    沒有 `time.tzset`，測試只能 skip。結果是**唯一會實際執行這條路徑的平台
+    永遠不測它**，而它已經實測炸過兩次（2026-08-14、08-17）。
+    L13 的「驗收條件是產出出現在下游消費者手上」在測試上的對應：
+    一條在目標平台不執行的測試，等於沒有這條測試。
 
     ⚠ date-only 值與完整 timestamp 是兩種語意，不能同一套轉換（L12）。
     `financial_snapshots.snapshot_date` 由 `date.today()` 產生——那是**本機時區的
@@ -205,7 +213,15 @@ def _safe_timestamp(value: Any) -> str | None:
     raw = value.strip()
     try:
         if len(raw) == 10:
-            parsed = datetime.fromisoformat(raw).astimezone()
+            naive = datetime.fromisoformat(raw)
+            # naive 午夜代表「本機日曆日的最早 instant」。`.astimezone()` 與
+            # `.replace(tzinfo=...)` 對 naive 午夜等價——前者用 process 時區，
+            # 後者用注入的時區。
+            parsed = (
+                naive.replace(tzinfo=local_tz)
+                if local_tz is not None
+                else naive.astimezone()
+            )
         else:
             parsed = datetime.fromisoformat(raw.replace("Z", "+00:00"))
             if parsed.tzinfo is None:
