@@ -1530,18 +1530,24 @@ def _decision_review_hint(
 
     if ref in dispatchable:
         return "coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess"
-    # context 過期類的 blocker 靠 reassess 重新凍結就會消失；其餘要補證據。
-    stale_only = {
-        "holdings_stale",
-        "live_context_not_ready",
-        "execution_intent_paper_only",
-        "execution_intent_research_only",
-        "market_stale_since_decision",
-        "financial_stale_since_decision",
-        "fx_stale_since_decision",
-        "holdings_stale_since_decision",
-    }
-    substantive = sorted(set(str(b) for b in blockers if b) - stale_only)
+    # 哪些 blocker 真的需要人動手，唯一權威是 config/decision_blockers.json 的
+    # `resolution_mode`（`decision_lab.blockers` 是唯一 loader）。
+    #
+    # ⚠ 這裡原本手寫了一組 stale_only 清單——那是把一個已有 SSOT 的分類複製第二份，
+    # 而複製品立刻就錯了：2026-08-26 實測 [220] co:axt 的
+    # execution_fx_missing／holdings_unavailable／portfolio_leverage_unavailable
+    # 被誤報成「要補證據／研究」，但 registry 早已把它們標為 system_internal／
+    # awaiting_external，而該項實際上只要 reassess 就從 REVIEW 變成 NO ACTION。
+    # 判準與 L15 一致：分類是語意問題，但它已經被登記成 deterministic 資料，
+    # 就該去讀它，不要另外猜一份。
+    from decision_lab.blockers import describe_blocker
+
+    substantive = sorted(
+        code
+        for code in {str(b) for b in blockers if b}
+        if getattr(describe_blocker(code), "resolution_mode", "user_decision")
+        == "user_decision"
+    )
     if substantive:
         return (
             "沒有 work order，go 不成立；但 reassess 也清不掉——實質 blocker："

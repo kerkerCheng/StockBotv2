@@ -1,6 +1,6 @@
 {
   "_comment": "Blocker 字彙登記表。Blocker code 是散落在 coverage.py／sizing.py／adapters.py 產生、又被 brief／todo 消費的承重字串；本檔是它們唯一的說明權威。這是讀側分類層——只描述既有 code 的意義，不改變任何 code 的產生方式，因此不影響已凍結的 decision payload。",
-  "version": 4,
+  "version": 5,
   "_resolution_modes": {
     "user_decision": "使用者現在就能做出決定推進它。應留在決策佇列。",
     "awaiting_external": "需要世界上先發生某件事（新 filing、上市、更多文件、下一個財報）。不該持續佔用決策注意力，應轉為帶觸發條件的等待項。",
@@ -307,6 +307,14 @@
       ],
       "resolution_mode": "system_internal",
       "next_step": "portfolio risk snapshot 不可用；檢查 Sheet 與 policy 設定後重試。"
+    },
+    {
+      "code": "live_nav_missing",
+      "label": "live sizing 缺 NAV 基數",
+      "category": "execution",
+      "severity": "diagnostic",
+      "resolution_mode": "system_internal",
+      "next_step": "NAV 取自 portfolio risk snapshot，與 portfolio_leverage_unavailable 同源：修 Sheet／policy 存取即可，不需要研究。2026-08-26 補登記——它先前未登記，於是 fail-safe 判成 user_decision，讓 [220] co:axt 看起來像需要人補資料，實際上一次 reassess 就轉 NO ACTION。"
     },
     {
       "code": "paper_exposure_invalid",
