@@ -1511,9 +1511,43 @@ def _dispatchable_cohorts(items: Sequence[Mapping[str, Any]]) -> frozenset[str]:
         store.close()
 
 
-def _decision_review_hint(ref: str, dispatchable: frozenset[str]) -> str:
+def _decision_review_hint(
+    ref: str,
+    dispatchable: frozenset[str],
+    blockers: Sequence[str] = (),
+) -> str:
+    """逐項說出「這一筆現在該做什麼」。
+
+    ⚠ 只分 dispatch／reassess 兩類仍然不夠。2026-08-26 實測：[223] co:lumentum
+    沒有 work order（所以不是 dispatch），但 reassess **跑過之後仍是 REVIEW**——
+    因為它的 blocker 是 `financial_resilience_corroboration_incomplete`，
+    那要靠補證據，不是重跑一次評估。只寫「請跑 reassess」會讓人跑第二次然後
+    再問一次「那我到底要下什麼」。
+
+    所以非 dispatchable 的分支必須把 **blocker 本身**寫出來：reassess 只在
+    REVIEW 純粹來自 context 過期時有用；有實質 blocker 時，要動的是那些 blocker。
+    """
+
     if ref in dispatchable:
         return "coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess"
+    # context 過期類的 blocker 靠 reassess 重新凍結就會消失；其餘要補證據。
+    stale_only = {
+        "holdings_stale",
+        "live_context_not_ready",
+        "execution_intent_paper_only",
+        "execution_intent_research_only",
+        "market_stale_since_decision",
+        "financial_stale_since_decision",
+        "fx_stale_since_decision",
+        "holdings_stale_since_decision",
+    }
+    substantive = sorted(set(str(b) for b in blockers if b) - stale_only)
+    if substantive:
+        return (
+            "沒有 work order，go 不成立；但 reassess 也清不掉——實質 blocker："
+            + "、".join(substantive)
+            + "。要動的是這些（補證據／研究），補完才 reassess"
+        )
     return (
         "coverage 已無 blocker，REVIEW 來自凍結 context 過期——"
         "不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，"
@@ -1559,7 +1593,7 @@ def _collect_decision_rows() -> list[dict[str, Any]]:
             "type": "sheet_only_holding" if item.get("sheet_only") else "decision_review",
             "ref_id": ref,
             "title": f"{action} — {label}",
-            **({"hint": _decision_review_hint(ref, dispatchable)}
+            **({"hint": _decision_review_hint(ref, dispatchable, blockers)}
                if not item.get("sheet_only") else {}),
             "source": "decision_lab",
         }

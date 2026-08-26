@@ -1374,14 +1374,38 @@ def test_decision_review_hint_distinguishes_dispatch_from_reassess() -> None:
     from engine_b.todo import _decision_review_hint
 
     with_gap = _decision_review_hint("dc_has_work_order", frozenset({"dc_has_work_order"}))
-    without_gap = _decision_review_hint("dc_no_work_order", frozenset({"dc_has_work_order"}))
+    without_gap = _decision_review_hint(
+        "dc_no_work_order", frozenset({"dc_has_work_order"}), ["holdings_stale"]
+    )
 
     assert "dispatch" in with_gap and "pq1" in with_gap
-    # 沒有 work order 時必須明講「不是 dispatch」並指向 reassess，
-    # 否則使用者只會再下一次注定失敗的 go。
+    # 沒有 work order 且只剩 context 過期類 blocker 時，指向 reassess。
     assert "reassess" in without_gap
     assert "不是 dispatch" in without_gap
     assert with_gap != without_gap
+
+
+def test_hint_names_substantive_blockers_when_reassess_will_not_help() -> None:
+    """只分 dispatch／reassess 兩類不夠——實測 [223] co:lumentum 兩者皆不成立。
+
+    它沒有 work order（不是 dispatch），但 reassess 跑過之後仍是 REVIEW，
+    因為 blocker 是 `financial_resilience_corroboration_incomplete`——要補證據，
+    不是重跑評估。hint 只寫「請跑 reassess」會讓人跑第二次然後再問一次
+    「那我到底要下什麼」。
+    """
+
+    from engine_b.todo import _decision_review_hint
+
+    hint = _decision_review_hint(
+        "dc_x",
+        frozenset(),
+        ["financial_resilience_corroboration_incomplete", "holdings_stale"],
+    )
+
+    assert "financial_resilience_corroboration_incomplete" in hint
+    # context 過期類的不算實質 blocker，不該混進「要動的是這些」。
+    assert "holdings_stale" not in hint
+    assert "reassess 也清不掉" in hint
 
 
 def test_dispatchable_cohorts_fails_soft_without_store() -> None:

@@ -2037,7 +2037,7 @@
       "dispatch_status": "awaiting_approval",
       "dispatch_updated_at": "2026-08-13T22:54:38.005289+00:00",
       "dispatched_at": "2026-08-12T23:41:36.683430+00:00",
-      "hint": "coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
+      "hint": "沒有 work order，go 不成立；但 reassess 也清不掉——實質 blocker：execution_fx_stale_since_decision、execution_market_stale_since_decision。要動的是這些（補證據／研究），補完才 reassess",
       "n": 129,
       "reason": null,
       "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
@@ -2688,7 +2688,7 @@
     {
       "added_at": "2026-08-17T00:05:29.905984+00:00",
       "deferred_at": "2026-08-25T01:24:41.911625+00:00",
-      "hint": "coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
+      "hint": "沒有 work order，go 不成立；但 reassess 也清不掉——實質 blocker：execution_fx_stale_since_decision、execution_market_stale_since_decision。要動的是這些（補證據／研究），補完才 reassess",
       "n": 168,
       "reason": null,
       "ref_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
@@ -3581,7 +3581,7 @@
     },
     {
       "added_at": "2026-08-25T07:37:57.851137+00:00",
-      "hint": "coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
+      "hint": "沒有 work order，go 不成立；但 reassess 也清不掉——實質 blocker：execution_fx_missing、execution_market_stale_since_decision、holdings_unavailable、live_nav_missing、portfolio_leverage_unavailable。要動的是這些（補證據／研究），補完才 reassess",
       "n": 220,
       "reason": null,
       "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
@@ -3629,7 +3629,7 @@
     },
     {
       "added_at": "2026-08-25T07:37:57.851137+00:00",
-      "hint": "coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
+      "hint": "沒有 work order，go 不成立；但 reassess 也清不掉——實質 blocker：financial_resilience_corroboration_incomplete。要動的是這些（補證據／研究），補完才 reassess",
       "n": 223,
       "reason": null,
       "ref_id": "dc_4d28e50810e46da7fd77ee042ee7bd1c",
