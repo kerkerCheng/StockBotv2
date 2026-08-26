@@ -3583,10 +3583,11 @@
       "added_at": "2026-08-25T07:37:57.851137+00:00",
       "hint": "沒有 work order，go 不成立；但 reassess 也清不掉——實質 blocker：execution_fx_missing、execution_market_stale_since_decision、holdings_unavailable、live_nav_missing、portfolio_leverage_unavailable。要動的是這些（補證據／研究），補完才 reassess",
       "n": 220,
-      "reason": null,
+      "reason": "使用者 2026-08-26 確認關閉；co:axt 經 reassess 後 action 轉 NO ACTION，來源不再產出此項",
+      "receipt": null,
       "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "drop",
+      "resolved_at": "2026-08-26T05:58:01.742914+00:00",
       "source": "decision_lab",
       "source_cleared": {
         "at": "2026-08-26T03:44:04.147911+00:00",
@@ -3635,11 +3636,13 @@
     {
       "added_at": "2026-08-25T07:37:57.851137+00:00",
       "dispatch_baseline_decision_id": "pd_f28ad18b3604dd8345df7ae0c59eeced",
+      "dispatch_receipt": "research_packet:library/private/research_notes/2026-08-26_pq1_lite_financial_resilience.md｜LITE FY2026 10-K 逐字核對。🔴 主要發現：FY2026 淨損 US$6,935.1M 完全來自非現金的 loss on debt extinguishment US$7,756.6M（Q4 以約 1,060 萬股換回 2026/2028/2029 Notes 本金約 US$1,124.9M），同期營業利益為正 US$524.8M（前兩年皆為負），現金由 US$520.7M 增至 US$2,043.5M——不可把淨損讀成本業惡化。missing_data #2（FY2027 capex 指引）確認為 issuer 未揭露，同 MRVL backlog 形狀；已實現 capex FY2026 US$451.3M、capex/OCF 60.1%、FCF 仍正 US$300.1M。附帶發現可轉債現金結算請求權（本金 US$1,544.6M 目前即為可轉換狀態，vs 現金＋短投 US$2,738.4M 覆蓋 1.77x）。⚠ 該段的 going concern 為 issuer 風險因子條件句、全文僅 1 次、非審計意見亦非 material uncertainty 揭露（L11）。Engine C 提案 po_fb67c2d2ca000274bee6d87185896c70（contingent_liquidity_claims）與 po_52493ddd72366c8e3adaf5a989014690（committed_capex）待核准。⚠ missing_data #1 未完全清除：Series A 換股比例不在 10-K，需 Certificate of Designation。",
       "dispatch_ref": "assessment_gap:dc_4d28e50810e46da7fd77ee042ee7bd1c",
       "dispatch_scope": [
         "financial_resilience_corroboration_incomplete"
       ],
-      "dispatch_status": "queued",
+      "dispatch_status": "awaiting_approval",
+      "dispatch_updated_at": "2026-08-26T07:55:00.481448+00:00",
       "dispatched_at": "2026-08-26T03:57:17.293139+00:00",
       "hint": "沒有 work order，go 不成立；但 reassess 也清不掉——實質 blocker：financial_resilience_corroboration_incomplete。要動的是這些（補證據／研究），補完才 reassess",
       "n": 223,
@@ -3747,6 +3750,30 @@
       "source": "decision_lab",
       "title": "REVIEW — co:schaeffler",
       "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-26T07:55:50.032054+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-06-27T00:00:00+00:00；來源=Lumentum Holdings Inc. FY2026 Form 10-K, filed 2026-08-17 (CIK 0001633978, acces",
+      "n": 231,
+      "reason": null,
+      "ref_id": "po_52493ddd72366c8e3adaf5a989014690",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "engine_c",
+      "title": "Engine C 觀測：LITE / committed_capex",
+      "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-08-26T07:55:50.032054+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-06-27T00:00:00+00:00；來源=Lumentum Holdings Inc. FY2026 Form 10-K, filed 2026-08-17 (CIK 0001633978, acces",
+      "n": 232,
+      "reason": null,
+      "ref_id": "po_fb67c2d2ca000274bee6d87185896c70",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "engine_c",
+      "title": "Engine C 觀測：LITE / contingent_liquidity_claims",
+      "type": "engine_c_observation"
     }
   ],
   "log": [
@@ -8503,8 +8530,35 @@
       "ref_id": "dc_4d28e50810e46da7fd77ee042ee7bd1c",
       "type": "decision_review",
       "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-08-26T05:58:01.742914+00:00",
+      "n": 220,
+      "reason": "使用者 2026-08-26 確認關閉；co:axt 經 reassess 後 action 轉 NO ACTION，來源不再產出此項",
+      "receipt": null,
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "type": "decision_review",
+      "verb": "drop"
+    },
+    {
+      "at": "2026-08-26T07:54:59.699808+00:00",
+      "n": 223,
+      "reason": null,
+      "receipt": "pq1 開工：LITE FY2026 10-K（2026-08-17）取全文 589,345 字元",
+      "ref_id": "dc_4d28e50810e46da7fd77ee042ee7bd1c",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-08-26T07:55:00.481448+00:00",
+      "n": 223,
+      "reason": null,
+      "receipt": "research_packet:library/private/research_notes/2026-08-26_pq1_lite_financial_resilience.md｜LITE FY2026 10-K 逐字核對。🔴 主要發現：FY2026 淨損 US$6,935.1M 完全來自非現金的 loss on debt extinguishment US$7,756.6M（Q4 以約 1,060 萬股換回 2026/2028/2029 Notes 本金約 US$1,124.9M），同期營業利益為正 US$524.8M（前兩年皆為負），現金由 US$520.7M 增至 US$2,043.5M——不可把淨損讀成本業惡化。missing_data #2（FY2027 capex 指引）確認為 issuer 未揭露，同 MRVL backlog 形狀；已實現 capex FY2026 US$451.3M、capex/OCF 60.1%、FCF 仍正 US$300.1M。附帶發現可轉債現金結算請求權（本金 US$1,544.6M 目前即為可轉換狀態，vs 現金＋短投 US$2,738.4M 覆蓋 1.77x）。⚠ 該段的 going concern 為 issuer 風險因子條件句、全文僅 1 次、非審計意見亦非 material uncertainty 揭露（L11）。Engine C 提案 po_fb67c2d2ca000274bee6d87185896c70（contingent_liquidity_claims）與 po_52493ddd72366c8e3adaf5a989014690（committed_capex）待核准。⚠ missing_data #1 未完全清除：Series A 換股比例不在 10-K，需 Certificate of Designation。",
+      "ref_id": "dc_4d28e50810e46da7fd77ee042ee7bd1c",
+      "type": "decision_review",
+      "verb": "pq1_awaiting_approval"
     }
   ],
-  "next_n": 231,
+  "next_n": 233,
   "schema_version": "1"
 }
