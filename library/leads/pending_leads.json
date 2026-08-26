@@ -4858,6 +4858,144 @@
       "result": "ok",
       "run_at": "2026-08-25T22:33:43.028344+00:00",
       "source": "edgar:TSLA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-26T22:33:22.334997+00:00",
+      "source": "mfn:sivers-semiconductors"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-26T22:33:23.469644+00:00",
+      "source": "sivers:press"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-26T22:33:24.018644+00:00",
+      "source": "yahoo:iqe-l"
+    },
+    {
+      "new": 6,
+      "result": "ok",
+      "run_at": "2026-08-26T22:33:25.313098+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-26T22:33:27.263252+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-26T22:33:28.462401+00:00",
+      "source": "edgar:AEVA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-26T22:33:29.538087+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-26T22:33:30.369504+00:00",
+      "source": "edgar:AVGO"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-26T22:33:31.391143+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-26T22:33:32.386238+00:00",
+      "source": "edgar:CCXI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-26T22:33:33.216369+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-26T22:33:34.309827+00:00",
+      "source": "edgar:GFS"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-26T22:33:35.412812+00:00",
+      "source": "edgar:JBL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-26T22:33:36.438210+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-26T22:33:37.464034+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-26T22:33:38.290636+00:00",
+      "source": "edgar:META"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-26T22:33:39.126102+00:00",
+      "source": "edgar:MRVL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-26T22:33:40.134626+00:00",
+      "source": "edgar:MTSI"
+    },
+    {
+      "new": 2,
+      "result": "ok",
+      "run_at": "2026-08-26T22:33:40.973925+00:00",
+      "source": "edgar:MU"
+    },
+    {
+      "new": 2,
+      "result": "ok",
+      "run_at": "2026-08-26T22:33:41.811730+00:00",
+      "source": "edgar:NVDA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-26T22:33:42.799214+00:00",
+      "source": "edgar:POET"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-26T22:33:43.818383+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-26T22:33:44.653923+00:00",
+      "source": "edgar:TSLA"
     }
   ],
   "leads": {
@@ -5862,6 +6000,32 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/928876/000117891326003477/zk2635682.htm"
+    },
+    "lead_04bdc6cd80cb88df7cfdbdcb3f0bb0a8": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-26T22:33:25.308640+00:00",
+      "lead_id": "lead_04bdc6cd80cb88df7cfdbdcb3f0bb0a8",
+      "media": [],
+      "published_at": "2026-08-26T17:27:25.000Z",
+      "raw_text": "The concept of “cascading bottlenecks” is just super cool.\n\nBecause of DDR4 supply shocks and costs:\n\nLot of ODMs are redesigning downward from DDR4 -&gt; DDR3 -&gt; DDR2.\n\nBut even the legacy players themselves like Winbond are withdrawing from DDR2.\n\nMaking the bottleneck even worse",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "The concept of “cascading bottlenecks” is just super cool. Because of DDR4 supply shocks and costs: Lot of ODMs are redesigning downward from DDR4 -&gt; DDR3 -&gt; DDR2. But even the legacy players themselves like Winbond are withdrawing from DDR2. Making the bottleneck even worse",
+      "triage": {
+        "decided_at": "2026-08-26T22:37:02.569688+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "DDR4→DDR3→DDR2 redesign 與 Winbond 退出 DDR2 是具名、可否證的供需結構主張，若成立會增加或移除 memory 候選；屬 structural_fact、decision_impact=candidate_set。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2092665229880836597"
     },
     "lead_04dc35fd02b79ef30f014f2810fe4a47": {
       "entities": {
@@ -7257,6 +7421,83 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2078342936035823828"
     },
+    "lead_0f0fc6255a25848dd10cf6e205e7f427": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia",
+          "co:lumentum",
+          "co:coherent",
+          "co:applied_optoelectronics",
+          "co:macom",
+          "co:sivers_semiconductors"
+        ],
+        "tickers": [
+          "NVDA",
+          "LITE",
+          "COHR",
+          "AAOI",
+          "MTSI",
+          "SMTC",
+          "SIVE"
+        ]
+      },
+      "first_seen": "2026-08-26T22:33:25.307087+00:00",
+      "lead_id": "lead_0f0fc6255a25848dd10cf6e205e7f427",
+      "media": [
+        {
+          "cache": {
+            "bytes": 114332,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_0f0fc6255a25848dd10cf6e205e7f427/3_2092710847550537728.jpg",
+            "sha256": "68d29d5bbcdfe381971372a807712756d57e02ecfcad17a6250d459eb6c3a94c"
+          },
+          "height": 799,
+          "media_key": "3_2092710847550537728",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HQrNbZ3bQAArOPC.jpg",
+          "width": 1228
+        }
+      ],
+      "published_at": "2026-08-26T20:28:43.000Z",
+      "raw_text": "I know everyone’s watching $NVDA earnings right now…\n\nBut did you know Landmark signed a 4 year CW agreement with US customer to ensure “sufficient supply”?\n\nSo now you have:\n\n- $LITE (capacity gone)\n- $COHR (capacity gone)\n- Landmark (capacity committed)\n- $AAOI (capacity for transceivers)\n- $MTSI (not online)\n- $SMTC (limited)\n\nI remember saying earlier this year CW lasers would be the next optical shift and heavily bottlenecked by Nvidia?\n\nSo fun watching this play out, with players signing LTAs already to 2030 (signaling less availability for other players).\n\nImplications for $SIVE / Win Semi are very material as one of the few remaining CW merchant suppliers with capacity (+ CPO-grade lasers).\n\nLet’s see how they execute.",
+      "refs": {
+        "research_action_id": "ra_baf280bdb44c813bcc2980d7917efacf",
+        "research_outcome": "聯亞官方公告確認 2027–2030 CW 雷射長約；客戶未具名，禁止推導 NVIDIA 或 sole_source。"
+      },
+      "source": "x:aleabitoreddit",
+      "status": "action_prepared",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "COHR",
+            "CPO",
+            "LITE",
+            "NVDA"
+          ]
+        },
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "SIVE"
+          ]
+        }
+      },
+      "title": "I know everyone’s watching $NVDA earnings right now… But did you know Landmark signed a 4 year CW agreement with US customer to ensure “sufficient supply”? So now you have: - $LITE (capacity gone) - $COHR (capacity gone) - Landmark (capacity committed) - $AAOI (capacity for transceivers) - $MTSI (not online) - $SMTC (limited) I remember saying earlier this year CW lasers would be the next optical shift and heavily bottlenecked by Nvidia? So fun watching this play out, with players signing LTAs already to 2030 (signaling less availability for other players). Implications for $SIVE / Win Semi are very material as one of the few remaining CW merchant suppliers with capacity (+ CPO-grade lasers). Let’s see how they execute.",
+      "triage": {
+        "decided_at": "2026-08-26T22:37:00.415704+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "關聯 Landmark／CW laser／Sivers 光互連瓶頸且有四年供應協議等可查 atoms；同事件已有較強 UDN／中央社 lead，屬 structural_fact、decision_impact=confidence_only，不視為獨立佐證。",
+        "related_trace_requeues": [
+          "lead_3a4468d30e6a22eb826a8c8157682b64"
+        ],
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2092710854290764161"
+    },
     "lead_0f16352fcbf4bafcfc927a9642d68715": {
       "entities": {
         "company_ids": [
@@ -7788,6 +8029,55 @@
         "tier": 4
       },
       "url": "https://www.thearmchairtrader.com/aim-market-roundup/iqe-harvest-minerals-midwich/?.tsrc=rss"
+    },
+    "lead_15a813e6531ffe790f9e1bca78aa342a": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia"
+        ],
+        "tickers": [
+          "NVDA"
+        ]
+      },
+      "first_seen": "2026-08-26T22:33:25.304872+00:00",
+      "lead_id": "lead_15a813e6531ffe790f9e1bca78aa342a",
+      "media": [],
+      "published_at": "2026-08-26T20:58:46.000Z",
+      "raw_text": "$NVDA earnings TLDR:\n\nRevenue: $96.22B vs. ~$92.17B (beat)\nAdj. EPS: $2.22 vs. $2.09-$2.10 (beat)\nDC: $89.0B vs. ~$86.3B (beat)\nAdj. gross margin: 75% vs. 75%\n\nHyperscaler Revenue: $48.71B from $43.05B last quarter (custom ASIC growth hasn't really prevented this revenue from accelerating)\n\nFor guidance:\nRevenue: $108B vs. ~$104.2B\nAdj. gross margin: 74% vs. 75% (kinda the only soft spot)\n\nRevenue ramp has been genuinely absurd over last 4 quarters. \n-> $68.1B\n-> $81.6B\n-> $96.2B (we are here)\n-> next quarter guidance: $108B, despite assuming zero China DC compute revenue. \n\nFun thing to note is Nvidia says its commitments jumped from $119B last quarter to $279B, primarily related to procurement of memory (for next few years).. So memory goes brrr. \n\nTLDR: AI keeps on going brrr. Nvidia is clearly leading the charge and no obvious signs of demand slowing. \n\nGiven Nvidia is already a $5T+ company, I think most of the alpha comes from how Nvidia's architecture/capacity decisions impact elsewhere in the supply chain (eg. CPO, memory, 800V) nowadays.\n\nRather than simply finding mispricing in Nvidia itself.\n\nRegardless, all the fun stuff happens in the earnings call in a few min.",
+      "refs": {
+        "parked_reason": "官方 filing 與 IR 頁確認財報事件，但目前抓到的 wrapper／截斷摘錄未含推文全部數字與 279B commitments 原句。",
+        "research_outcome": "96.22B revenue 等需逐字官方 exhibits；不以 X 摘要入圖或提高 evidence tier。",
+        "trace_attempts_ref": "NVIDIA 2026-08-26 8-K／10-Q、官方 IR event page 與 quarterly-results index",
+        "trace_next_trigger": "NVIDIA 官方 Q2 FY27 earnings release／CFO commentary／transcript 可逐字索引",
+        "trace_requires_user": "false",
+        "trace_status": "partial",
+        "trace_trigger_entities": [
+          "NVDA",
+          "co:nvidia"
+        ],
+        "trace_trigger_kind": "primary_source_signal"
+      },
+      "source": "x:aleabitoreddit",
+      "status": "parked",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CPO",
+            "NVDA"
+          ]
+        }
+      },
+      "title": "$NVDA earnings TLDR: Revenue: $96.22B vs. ~$92.17B (beat) Adj. EPS: $2.22 vs. $2.09-$2.10 (beat) DC: $89.0B vs. ~$86.3B (beat) Adj. gross margin: 75% vs. 75% Hyperscaler Revenue: $48.71B from $43.05B last quarter (custom ASIC growth hasn't really prevented this revenue from accelerating) For guidance: Revenue: $108B vs. ~$104.2B Adj. gross margin: 74% vs. 75% (kinda the only soft spot) Revenue ramp has been genuinely absurd over last 4 quarters. -> $68.1B -> $81.6B -> $96.2B (we are here) -> next quarter guidance: $108B, despite assuming zero China DC compute revenue. Fun thing to note is Nvidia says its commitments jumped from $119B last quarter to $279B, primarily related to procurement of memory (for next few years).. So memory goes brrr. TLDR: AI keeps on going brrr. Nvidia is clearly leading the charge and no obvious signs of demand slowing. Given Nvidia is already a $5T+ company, I think most of the alpha comes from how Nvidia's architecture/capacity decisions impact elsewhere in the supply chain (eg. CPO, memory, 800V) nowadays. Rather than simply finding mispricing in Nvidia itself. Regardless, all the fun stuff happens in the earnings call in a few min.",
+      "triage": {
+        "decided_at": "2026-08-26T22:37:00.679108+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "NVDA 季度營收、資料中心營收、毛利與採購承諾均為可逐字回查的財務 atoms；同輪已有官方 filing，屬 financial_fact、decision_impact=confidence_only，交 pq1 對 SEC 原文。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2092718416683819292"
     },
     "lead_1662a082af8a32775df02aef43c5faa2": {
       "entities": {
@@ -10940,6 +11230,38 @@
       },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-withdraws-items-from-the-agenda-of-the-2026-annual-general-meeting-29ebe74f"
     },
+    "lead_2a763ab4030790d77094e88483d76c3c": {
+      "entities": {
+        "company_ids": [
+          "co:micron_technology"
+        ],
+        "tickers": [
+          "MU"
+        ]
+      },
+      "first_seen": "2026-08-26T22:33:40.973684+00:00",
+      "lead_id": "lead_2a763ab4030790d77094e88483d76c3c",
+      "published_at": "2026-08-26",
+      "refs": {
+        "parked_reason": "已取得 Micron 8-K；內容是 President／COO 與 CTO 職務調整，沒有供應鏈或財務原子 claim。",
+        "research_outcome": "屬治理更新，無 graph delta；Manish Bhatia 任 President/COO、Scott DeBoer 任 EVP/CTO，Sumit Sadana 轉 Senior Advisor。",
+        "trace_attempts_ref": "library/raw/mu_8_k_20260826.txt",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
+      "source": "edgar:MU",
+      "status": "parked",
+      "themes": {},
+      "title": "MU 8-K filed 2026-08-26",
+      "triage": {
+        "decided_at": "2026-08-26T22:37:00.942659+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "MU 官方 8-K metadata 可直接追到 SEC 原文；屬 financial_fact、decision_impact=confidence_only，若僅例行財報則依 L4 park，不自動入圖。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/723125/000110465926101067/tm2624017d1_8k.htm"
+    },
     "lead_2ae34ca78a2ceba577b6bc53a18f5454": {
       "entities": {
         "company_ids": [],
@@ -13238,11 +13560,27 @@
           "TFC Communication 天孚通信"
         ],
         "outcome": "圖層缺口確認：Neo4j 查無任何 fiber array / FAU 節點。CPO、NPO、glass CPO、in-package optical I/O 都在，唯獨缺把光纖接到矽光子晶片的物理介面層。候選供應商 Largan 3008.TW、FOCI 3363.TWO、Browave 3163.TW、HST 7928.TW、Sunny Optical 全部不在圖中，同類僅有 co:corning。這是排序與覆蓋掃描無法產出的那種缺口，它們只能從既有節點往回看。",
-        "research_outcome": "pq1 追源未果（tier 3 隔離），不入圖、不提高 evidence tier。但圖層缺口本身已確認，建議另以 system-decompose 對 CPO 組裝層由上而下拆一次。",
-        "trace_attempts_ref": "library/private/research_notes/2026-08-25_pq1_fau_nvda_supply_chain.md",
+        "parked_reason": "新 NVIDIA filing 是財務事件，仍未具名 Largan／FOCI／TFC 的 FAU 供應角色；缺口未被新訊號補上。",
+        "research_outcome": "維持等待交易對手具名文件，不入圖。",
+        "trace_attempts_ref": "原 2026-08-25 FAU 追源 memo＋2026-08-26 NVIDIA 8-K／10-Q 與官方 ecosystem page",
         "trace_next_trigger": "Largan(3008)／FOCI(3363)／TFC 任一在 MOPS 重大訊息、法說會或 NVIDIA／Broadcom 官方文件中具名對方；或 NVIDIA 發布帶角色分工的 CPO 供應鏈說明",
+        "trace_requeue_consumed_entities": [
+          "CO:NVIDIA",
+          "NVDA"
+        ],
+        "trace_requeue_trigger": "related_triaged_lead:lead_0f0fc6255a25848dd10cf6e205e7f427",
+        "trace_requeued_at": "2026-08-26T22:37:00.415704+00:00",
         "trace_requires_user": "false",
-        "trace_status": "awaiting_named_disclosure"
+        "trace_status": "awaiting_named_disclosure",
+        "trace_trigger_entities": [
+          "BE",
+          "NVDA",
+          "TSM",
+          "co:nvidia",
+          "co:tsmc"
+        ],
+        "trace_trigger_event_ref": "lead:lead_0f0fc6255a25848dd10cf6e205e7f427",
+        "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
       "status": "parked",
@@ -13258,26 +13596,44 @@
       },
       "title": "I know everyone's focused on Nancy Pelosi copytraders sending $BE up 11.83%. Or Trump... But you know what else is cool? FAU bottlenecks for CPO. I remember saying earlier this year FAU/Foci might be a future bottleneck around $TSM / $NVDA CPO roadmaps... This was some media commentary supporting that: \"It is understood that Largan Precision (3008), FOCI (3363), and China’s TFC have entered $NVDA FAU supply chain\" \"Based on an estimated 20,000 Spectrum-X systems shipped this year, the optical engines installed in those systems would require approximately 600k-700k FAUs\" In 2027, demand is expected to reach several million units, and existing supply chain capacity is currently unable to meet demand.\" (UDN, mandarin -> english translation is kinda off) Cough cough, \"existing supply chain capacity is currently unable to meet demand\" Tad early right now since mass production is expected H2 2027, but cool to read updates around this.",
       "triage": {
-        "classification": {
-          "classified_at": "2026-08-24T22:37:23.275402+00:00",
-          "classified_by": "semantic_v1",
-          "content_type": "structural_fact",
-          "decision_impact": "candidate_set",
-          "reason": "FAU 產能缺口與具名供應商若獲一手支持，會新增 CPO 子瓶頸與可研究供應商候選。"
-        },
-        "decided_at": "2026-08-24T22:36:52.348479+00:00",
+        "decided_at": "2026-08-26T22:37:00.415704+00:00",
         "decision": "go",
         "priority_flags": {
           "independent_source": true,
           "novelty": true
         },
-        "reason": "FAU／FOCI／Largan／NVDA CPO 與 2027 量產、需求量、產能缺口皆具體；可追 UDN 原文，可能新增 CPO 子瓶頸候選。",
-        "related_trace_requeues": [
-          "lead_afa72193be496499ef950552d9146c38",
-          "lead_b1e793c560334131dfe7c1619715784d"
-        ],
+        "reason": "新 triage PASS lead lead_0f0fc6255a25848dd10cf6e205e7f427 與 parked trace 共用具名標的 NVDA, co:nvidia（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
         "tier": 3
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-26T22:37:00.415704+00:00",
+          "superseded_reason": "新 triage PASS lead lead_0f0fc6255a25848dd10cf6e205e7f427 與 parked trace 共用具名標的 NVDA, co:nvidia（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_0f0fc6255a25848dd10cf6e205e7f427",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-08-24T22:37:23.275402+00:00",
+              "classified_by": "semantic_v1",
+              "content_type": "structural_fact",
+              "decision_impact": "candidate_set",
+              "reason": "FAU 產能缺口與具名供應商若獲一手支持，會新增 CPO 子瓶頸與可研究供應商候選。"
+            },
+            "decided_at": "2026-08-24T22:36:52.348479+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "independent_source": true,
+              "novelty": true
+            },
+            "reason": "FAU／FOCI／Largan／NVDA CPO 與 2027 量產、需求量、產能缺口皆具體；可追 UDN 原文，可能新增 CPO 子瓶頸候選。",
+            "related_trace_requeues": [
+              "lead_afa72193be496499ef950552d9146c38",
+              "lead_b1e793c560334131dfe7c1619715784d"
+            ],
+            "tier": 3
+          }
+        }
+      ],
       "url": "https://x.com/aleabitoreddit/status/2091955482613486028"
     },
     "lead_3a46a020555dc48189780ff7686f778b": {
@@ -15207,23 +15563,26 @@
       "lead_id": "lead_464d4849949994fc18d5192a484b6c57",
       "published_at": null,
       "refs": {
-        "parked_reason": "缺的正是交易對手具名角色；依 L8 等官方供應 mapping",
+        "parked_reason": "NVIDIA 仍只具名 Browave 為 silicon-photonics ecosystem partner，未揭露 FAU 角色；FOCI／Largan／HST 仍未具名。",
         "primary_url": "https://nvidianews.nvidia.com/news/nvidia-spectrum-x-co-packaged-optics-networking-switches-ai-factories/",
-        "research_outcome": "NVIDIA 官方名單確認 Browave 是 silicon-photonics ecosystem partner，但未說明 FAU 角色，也未點名 FOCI／Largan／HST；不能由名單推導供應邊，未產 RA",
-        "trace_attempts_ref": "2026-08-26：FOCI 官網逾時；NVIDIA 官方 silicon-photonics 生態名單逐字核對",
+        "research_outcome": "圖中 FAU 層缺口仍成立，但目前不能建立公司供應邊。",
+        "trace_attempts_ref": "2026-08-26 NVIDIA official ecosystem page＋2026-08-27 8-K／10-Q recheck",
         "trace_next_trigger": "NVIDIA／TSMC／MOPS 文件具名 FOCI、Largan、Browave、HST 的 FAU 供應角色",
+        "trace_requeue_trigger": "related_triaged_lead:lead_53e31d26909b973cac66af50394abd98",
+        "trace_requeued_at": "2026-08-26T22:37:01.208359+00:00",
         "trace_requires_user": "false",
         "trace_status": "awaiting_named_disclosure",
         "trace_trigger_entities": [
-          "NVDA",
-          "TSM",
-          "3363.TWO",
           "3008.TW",
           "3163.TWO",
+          "3363.TWO",
           "7928.TWO",
+          "NVDA",
+          "TSM",
           "co:nvidia",
           "co:tsmc"
         ],
+        "trace_trigger_event_ref": "lead:lead_53e31d26909b973cac66af50394abd98",
         "trace_trigger_kind": "primary_source_signal"
       },
       "source": "system_decompose",
@@ -15240,12 +15599,27 @@
       },
       "title": "[decompose] 光纖陣列單元 FAU 層：圖中無 FAU 節點。FOCI 3363.TWO 官方網域即為 foci-cpo.com；需一手確認是否供 NVDA／TSMC，以及 Largan 3008、Browave 3163、HST 7928 的相對地位",
       "triage": {
-        "decided_at": "2026-08-25T03:05:20.510932+00:00",
+        "decided_at": "2026-08-26T22:37:01.208359+00:00",
         "decision": "go",
         "priority_flags": {},
-        "reason": "FOCI 官方網域；FAU 層圖中無節點，且與 8/24 撞出的 FAU lead 同一標的",
+        "reason": "指定實體的 tier-1 一手來源 lead_53e31d26909b973cac66af50394abd98 與 parked trace 共用具名標的 NVDA, co:nvidia；事件觸發 bounded pq1 重查",
         "tier": 2
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-26T22:37:01.208359+00:00",
+          "superseded_reason": "指定實體的 tier-1 一手來源 lead_53e31d26909b973cac66af50394abd98 與 parked trace 共用具名標的 NVDA, co:nvidia；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_53e31d26909b973cac66af50394abd98",
+          "triage": {
+            "decided_at": "2026-08-25T03:05:20.510932+00:00",
+            "decision": "go",
+            "priority_flags": {},
+            "reason": "FOCI 官方網域；FAU 層圖中無節點，且與 8/24 撞出的 FAU lead 同一標的",
+            "tier": 2
+          }
+        }
+      ],
       "url": "https://www.foci-cpo.com/index.php?route=investor%2Fcontact"
     },
     "lead_46944fdf1d1e34e38f5a9e32bc1c3fc8": {
@@ -16475,6 +16849,50 @@
         "tier": 3
       },
       "url": "https://uk.advfn.com/market-news/article/16903/iqe-schedules-annual-general-meeting-and-releases-2025-annual-report-iqe?.tsrc=rss"
+    },
+    "lead_53e31d26909b973cac66af50394abd98": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia"
+        ],
+        "tickers": [
+          "NVDA"
+        ]
+      },
+      "first_seen": "2026-08-26T22:33:41.811600+00:00",
+      "lead_id": "lead_53e31d26909b973cac66af50394abd98",
+      "published_at": "2026-08-26",
+      "refs": {
+        "parked_reason": "已取得 NVIDIA 8-K wrapper，Item 2.02 指向 Q2 FY27 results 與 CFO commentary exhibits；未形成新的具名供應邊。",
+        "research_outcome": "財務事件已確認；不把未含角色分工的 filing 當 FAU mapping。",
+        "trace_attempts_ref": "library/raw/nvda_8_k_20260826.txt",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
+      "source": "edgar:NVDA",
+      "status": "parked",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "NVDA"
+          ]
+        }
+      },
+      "title": "NVDA 8-K filed 2026-08-26",
+      "triage": {
+        "decided_at": "2026-08-26T22:37:01.208359+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "NVDA 官方 8-K 為 demand-anchor 財務與承諾的一手入口；屬 financial_fact、decision_impact=candidate_set，查證後才判是否改變下游候選集合。",
+        "related_trace_requeues": [
+          "lead_464d4849949994fc18d5192a484b6c57",
+          "lead_c9d297d58ac05a8f9c5e55fb433317fc"
+        ],
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000073/nvda-20260826.htm"
     },
     "lead_53f19d8df30938f84517824490af0695": {
       "entities": {
@@ -18869,6 +19287,38 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1835632/000162828026057525/xslF345X06/wk-form4_1787014784.xml"
+    },
+    "lead_63bebdac96bfa01b58c5e28bd471df0c": {
+      "entities": {
+        "company_ids": [
+          "co:micron_technology"
+        ],
+        "tickers": [
+          "MU"
+        ]
+      },
+      "first_seen": "2026-08-26T22:33:40.973798+00:00",
+      "lead_id": "lead_63bebdac96bfa01b58c5e28bd471df0c",
+      "published_at": "2026-08-25",
+      "refs": {
+        "parked_reason": "已取得 Micron Form 4；屬 10b5-1 計畫下的內部人交易，不是 Engine A 結構證據。",
+        "research_outcome": "CEO Sanjay Mehrotra 於 2026-08-21 依 2026-01-30 採用的 Rule 10b5-1 計畫出售 39,856 股；作為帶日期觀察，不入圖。",
+        "trace_attempts_ref": "library/raw/mu_4_20260825.txt",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
+      "source": "edgar:MU",
+      "status": "parked",
+      "themes": {},
+      "title": "MU 4 filed 2026-08-25",
+      "triage": {
+        "decided_at": "2026-08-26T22:37:01.474318+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "MU 官方 Form 4 具名且可逐字核查；屬 insider_transaction、decision_impact=confidence_only，低優先彙總處理，不因持股自行升級。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/723125/000124265426000015/xslF345X06/primarydocument.xml"
     },
     "lead_63ec55c2f2d06961808063bf1f9f630a": {
       "entities": {
@@ -24076,6 +24526,60 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2082529316655763703"
     },
+    "lead_84ed61d0696f778b547f275f41d5bc57": {
+      "entities": {
+        "company_ids": [
+          "co:applied_optoelectronics"
+        ],
+        "tickers": [
+          "SMTC",
+          "AAOI"
+        ]
+      },
+      "first_seen": "2026-08-26T22:33:25.309939+00:00",
+      "lead_id": "lead_84ed61d0696f778b547f275f41d5bc57",
+      "media": [
+        {
+          "cache": {
+            "bytes": 93023,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_84ed61d0696f778b547f275f41d5bc57/3_2092404709323845632.jpg",
+            "sha256": "34e500a9be2bcd37a5c1b020ee171c17301269fa68720f43e4c91d290c0adebf"
+          },
+          "height": 565,
+          "media_key": "3_2092404709323845632",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HQm2_0GaMAAeKwc.jpg",
+          "width": 1699
+        }
+      ],
+      "published_at": "2026-08-26T00:27:44.000Z",
+      "raw_text": "All right back to $SMTC movie: \"The bottleneck go Brrr\":\n\nMy favorite quote was: \"availability currently matters more than pricing\". \n\nIn the current market for optical products. \n\n- No near-term erosion is expected on booked optical orders, which signals they're passing cost increases through fine.\n\n- I was actually curious most about Semtec's CW laser products after the HieFo takeover:\n\nSemtech expects CW-laser revenue for transceivers to begin H1 FY28. Explicitly said capacity is limited.\n\nThey still seem materially further behind compared to the laser leaders, but they're making progress for 2027 ramp. \n\n- TIA and driver solutions remain in exceptionally strong demand (confirmed from $AAOI earnings). \n\nContinues to deepen engagement across all the leading hyperscalers.  \n\n\"We are now designing to every module provider\", expected 50%+ market share for 1.6T FiberEdge (TIA + driver) by years end. \n\nVery strong statement to make about being majority market share. \n\n- 1.6T FiberEdge qualifications finishing earlier than expected (good read through for your pluggable makers eg. AOI)\n\nq: \"quick thoughts on how long into 2028 does that backlog extend?\"\n\na: The backlog for the remaining of this fiscal year, I would say for our  target is all booked. For the next year, we probably over 70% there.\n\nManagement said current capacity may not be enough for fiscal 2028, especially in the second half (great demand visibility)\n\nQ2 revenue: \n- $341.9M vs. ~$329M expected\n- adjusted EPS was $0.71 vs. $0.61\n\nQ3 guidance was most exciting:\n$410M revenue vs. ~$360M revenue\n$1.05 EPS vs. $0.73 EPS. \n\nyeah... just look at that beautiful revenue inflection Q/Q. \n\nSo gigantic beat, great read through on 1.6T ramp. I don't own Semtec, but these were amazing earnings.",
+      "refs": {
+        "onboard_candidate_names": [
+          "Semtech Corporation (SMTC)"
+        ],
+        "parked_reason": "官方頁確認法說事件；第三方法說稿支持 FY27 backlog 已訂、FY28 超過 70%、capacity seek 與 CW laser FY28 起量，但公司尚未 onboard。",
+        "research_outcome": "誠實以 tier 2 保存研究結論，不提高 evidence tier；Semtech (SMTC) 已列 onboarding 候選。",
+        "trace_attempts_ref": "Semtech 官方 Q2 FY27 conference-call notice＋第三方逐字稿／earnings reports",
+        "trace_requires_user": "false",
+        "trace_status": "tier_1_2_honest_passthrough"
+      },
+      "source": "x:aleabitoreddit",
+      "status": "parked",
+      "themes": {},
+      "title": "All right back to $SMTC movie: \"The bottleneck go Brrr\": My favorite quote was: \"availability currently matters more than pricing\". In the current market for optical products. - No near-term erosion is expected on booked optical orders, which signals they're passing cost increases through fine. - I was actually curious most about Semtec's CW laser products after the HieFo takeover: Semtech expects CW-laser revenue for transceivers to begin H1 FY28. Explicitly said capacity is limited. They still seem materially further behind compared to the laser leaders, but they're making progress for 2027 ramp. - TIA and driver solutions remain in exceptionally strong demand (confirmed from $AAOI earnings). Continues to deepen engagement across all the leading hyperscalers. \"We are now designing to every module provider\", expected 50%+ market share for 1.6T FiberEdge (TIA + driver) by years end. Very strong statement to make about being majority market share. - 1.6T FiberEdge qualifications finishing earlier than expected (good read through for your pluggable makers eg. AOI) q: \"quick thoughts on how long into 2028 does that backlog extend?\" a: The backlog for the remaining of this fiscal year, I would say for our target is all booked. For the next year, we probably over 70% there. Management said current capacity may not be enough for fiscal 2028, especially in the second half (great demand visibility) Q2 revenue: - $341.9M vs. ~$329M expected - adjusted EPS was $0.71 vs. $0.61 Q3 guidance was most exciting: $410M revenue vs. ~$360M revenue $1.05 EPS vs. $0.73 EPS. yeah... just look at that beautiful revenue inflection Q/Q. So gigantic beat, great read through on 1.6T ramp. I don't own Semtec, but these were amazing earnings.",
+      "triage": {
+        "decided_at": "2026-08-26T22:37:03.017962+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "Semtech CW laser、1.6T FiberEdge qualification／market-share／backlog 與 FY2028 capacity 均是可追 transcript 的具體 atoms；屬 structural_fact、decision_impact=candidate_set，但供應商自報不構成 sole_source 獨立佐證。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2092408620277457255"
+    },
     "lead_85718e111d4463facc284308619b8be1": {
       "entities": {
         "company_ids": [
@@ -27610,6 +28114,55 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1340652/000089924322034076/xslF345X03/doc4.xml"
     },
+    "lead_9b9d579795099de39f2ae6e50a5a5597": {
+      "entities": {
+        "company_ids": [
+          "co:sivers_semiconductors"
+        ],
+        "tickers": [
+          "SIVE"
+        ]
+      },
+      "first_seen": "2026-08-26T22:33:25.309347+00:00",
+      "lead_id": "lead_9b9d579795099de39f2ae6e50a5a5597",
+      "media": [],
+      "published_at": "2026-08-26T07:38:48.000Z",
+      "raw_text": "I love how so many people requested  $SIVE that Saxo Japan went out of their way to list it!\n\nJust goes to show how much demand there is for this laser company.\n\nSpecial shoutout to Saxo. And of course, excited for Sivers earnings + planned Nasdaq listing coming up. https://t.co/6jTQlojKdk",
+      "refs": {
+        "parked_reason": "Sivers 官方只說評估 Nasdaq dual listing；Saxo 全球可交易已確認，但找不到 Saxo Japan 因需求而特別 listing 的一手頁。",
+        "research_outcome": "上市需求敘事僅部分成立，且屬市場可得性觀察，不產 graph delta。",
+        "trace_attempts_ref": "Sivers 2026-04-16 官方 dual-listing evaluation公告、官方財務日曆、Saxo 歐洲 SIVE instrument pages",
+        "trace_next_trigger": "Saxo Japan 官方 instrument page 或 Sivers 正式 Nasdaq dual-listing announcement",
+        "trace_requires_user": "false",
+        "trace_status": "partial",
+        "trace_trigger_entities": [
+          "SIVE",
+          "co:sivers_semiconductors"
+        ],
+        "trace_trigger_kind": "primary_source_signal"
+      },
+      "source": "x:aleabitoreddit",
+      "status": "parked",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "SIVE",
+            "Sivers"
+          ]
+        }
+      },
+      "title": "I love how so many people requested $SIVE that Saxo Japan went out of their way to list it! Just goes to show how much demand there is for this laser company. Special shoutout to Saxo. And of course, excited for Sivers earnings + planned Nasdaq listing coming up. https://t.co/6jTQlojKdk",
+      "triage": {
+        "decided_at": "2026-08-26T22:37:01.751099+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "Sivers／Saxo Japan 掛牌與 Nasdaq 計畫具名可查，但社群把使用者需求解讀成投資需求屬推論；屬 sentiment、decision_impact=confidence_only，只能追官方 broker／issuer 資料。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2092517102339162263"
+    },
     "lead_9bea5f8821e22427497284c68f2551d4": {
       "entities": {
         "company_ids": [],
@@ -29566,6 +30119,48 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2072936659369517341"
+    },
+    "lead_abcad31413719cc6d9d7050a03e4100e": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia"
+        ],
+        "tickers": [
+          "NVDA"
+        ]
+      },
+      "first_seen": "2026-08-26T22:33:41.811482+00:00",
+      "lead_id": "lead_abcad31413719cc6d9d7050a03e4100e",
+      "published_at": "2026-08-26",
+      "refs": {
+        "parked_reason": "已取得 NVIDIA Q2 FY27 10-Q；本次抓取摘錄以 XBRL metadata 為主，未形成新的具名供應邊或 graph delta。",
+        "research_outcome": "財務 filing 保留供 Engine C／後續 decision 使用；不以 absence 推導 FAU 或其他供應鏈否證。",
+        "trace_attempts_ref": "library/raw/nvda_10_q_20260826.txt",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
+      "source": "edgar:NVDA",
+      "status": "parked",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "NVDA"
+          ]
+        }
+      },
+      "title": "NVDA 10-Q filed 2026-08-26",
+      "triage": {
+        "decided_at": "2026-08-26T22:37:02.034054+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "NVDA 官方 10-Q 可核對供應承諾、需求與風險，可能改變 AI 供應鏈候選集合；屬 financial_fact、decision_impact=candidate_set。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000075/nvda-20260726.htm"
     },
     "lead_ac19b6d0b592484acada292ba8525bfe": {
       "entities": {
@@ -33082,6 +33677,70 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1633978/000157333826000015/xslF345X06/form4-08222026_120853.xml"
     },
+    "lead_c26211bd7e2deab7d577ceb1f3b94f2c": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia"
+        ],
+        "tickers": [
+          "NVDA"
+        ]
+      },
+      "first_seen": "2026-08-26T22:33:25.284676+00:00",
+      "lead_id": "lead_c26211bd7e2deab7d577ceb1f3b94f2c",
+      "media": [
+        {
+          "cache": {
+            "bytes": 80290,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_c26211bd7e2deab7d577ceb1f3b94f2c/3_2092721544774684672.jpg",
+            "sha256": "38164a9306ddef7f023b41cc354179356c65963d0534f4dc2a0943dad497d686"
+          },
+          "height": 313,
+          "media_key": "3_2092721544774684672",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HQrXKEIaEAAbYR4.jpg",
+          "width": 1488
+        }
+      ],
+      "published_at": "2026-08-26T21:17:10.000Z",
+      "raw_text": "$NVDA: \"We expect to grow revenue by approximately 70% in fiscal 2028. This is a supply constrained outlook\"\n\nThat statement alone is probably more important than the entire earnings beat just now? \n\nInsane upward revision beat from +43.9% expected to 70%. \n\n\"With cloud industry backlog now greater than 2 trillion, CapEx by the top five hyperscalers is expected to reach nearly $800 Billion in 2026 and 1.3 Trillion in 2027\"\n\n$1.3 Trillion in 2027. (MS was around $1.2T June, so this is upward projection revisions)\n\nYeah the high-beta parts of the supply chain growth is going to like this.",
+      "refs": {
+        "parked_reason": "財報事件屬實，但推文的 FY28 70%、cloud backlog 與 hyperscaler capex 數字尚無可逐字核對的一手段落。",
+        "research_outcome": "保留為高價值 demand lead；未取得原文前不得進圖。",
+        "trace_attempts_ref": "NVIDIA 2026-08-26 8-K／10-Q、官方 IR event page；站內搜尋未取得 70%／2T／800B／1.3T 原句",
+        "trace_next_trigger": "NVIDIA 官方 Q2 FY27 transcript／CFO commentary公開可逐字核對 70% FY28 與供應受限原句",
+        "trace_requires_user": "false",
+        "trace_status": "partial",
+        "trace_trigger_entities": [
+          "NVDA",
+          "co:nvidia"
+        ],
+        "trace_trigger_kind": "primary_source_signal"
+      },
+      "source": "x:aleabitoreddit",
+      "status": "parked",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "NVDA"
+          ]
+        }
+      },
+      "title": "$NVDA: \"We expect to grow revenue by approximately 70% in fiscal 2028. This is a supply constrained outlook\" That statement alone is probably more important than the entire earnings beat just now? Insane upward revision beat from +43.9% expected to 70%. \"With cloud industry backlog now greater than 2 trillion, CapEx by the top five hyperscalers is expected to reach nearly $800 Billion in 2026 and 1.3 Trillion in 2027\" $1.3 Trillion in 2027. (MS was around $1.2T June, so this is upward projection revisions) Yeah the high-beta parts of the supply chain growth is going to like this.",
+      "triage": {
+        "decided_at": "2026-08-26T22:37:02.308119+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "NVDA FY2028 70% 成長與 cloud backlog／capex 具明確數字及管理層 quote，可追 earnings call／filing；屬 financial_fact、decision_impact=candidate_set。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2092723047107355133"
+    },
     "lead_c27e417db9b04ea06a227bedfb773c88": {
       "entities": {
         "company_ids": [],
@@ -33790,6 +34449,35 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2077740809022296552"
+    },
+    "lead_c5b183d5219f7bfac5daef192283e20b": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-26T17:42:50.033160+00:00",
+      "lead_id": "lead_c5b183d5219f7bfac5daef192283e20b",
+      "published_at": "2026-08-26",
+      "refs": {
+        "claimed_origin": "聯亞光電公司公告＋法說會（財務長楊吉裕具名）；經 UDN／中央社轉載",
+        "onboard_candidate_names": [
+          "AIXTRON SE（德國 MOCVD 設備商，AIXA.DE；雷射磊晶上游，registry 未登記）"
+        ],
+        "research_action_id": "ra_baf280bdb44c813bcc2980d7917efacf",
+        "research_outcome": "官方長約已 prepare；22.7 億元 capex 與 9.9 億元 AIXTRON 設備僅支持擴產意圖，不是客戶端付款。"
+      },
+      "source": "udn:cna",
+      "status": "action_prepared",
+      "themes": {},
+      "title": "AI帶旺光通訊需求 聯亞獲美客戶長約、擬投22.7億擴充產能（$3081.TWO 聯亞光電 CW 雷射；設備採購自 AIXTRON）",
+      "triage": {
+        "decided_at": "2026-08-26T17:43:04.151916+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "UDN／中央社報導，內容為公司公告與法說會具名發言（財務長楊吉裕）。核心事實：聯亞光電(3081.TWO)與美國客戶簽 4 年長約（民國116-119年＝2027-2030）、董事會通過不超過 NT$22.7 億設備投資（其中向 AIXTRON 採購約 NT$9.9 億）、過去 3 季累計公告資本支出近 NT$60 億、2027 年產能為 2026 年的 2.5 倍。⚠ 美國客戶**未具名**。聯亞做 CW 雷射，直接接上 LITE UHP CW laser 與 CPO 外部光源主線，且 co:landmark_optoelectronics 已在 registry。",
+        "tier": 3
+      },
+      "url": "https://udn.com/news/story/7240/9715655"
     },
     "lead_c7498202abd0bdcd20c035dc615bcec2": {
       "entities": {
@@ -34519,20 +35207,23 @@
         "research_outcome": "NVIDIA 一手確認 MRM silicon-photonics engine 為每波長 200Gbps PAM4，且 TSMC 協作解決量產製程；但未具名其他 MRM 供應者，也無足夠資料判定與 Broadcom EML／MZM 互斥性，未產 RA",
         "trace_attempts_ref": "2026-08-26：NVIDIA 2025-08-26 官方技術博客、產品頁與 newsroom",
         "trace_next_trigger": "NVIDIA／TSMC／合作夥伴具名 MRM 製造分工，或 Broadcom 官方文件提供 EML／MZM 路線可比規格",
+        "trace_requeue_trigger": "related_triaged_lead:lead_53e31d26909b973cac66af50394abd98",
+        "trace_requeued_at": "2026-08-26T22:37:01.208359+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
+          "AVGO",
           "NVDA",
           "TSM",
-          "AVGO",
+          "co:broadcom",
           "co:nvidia",
-          "co:tsmc",
-          "co:broadcom"
+          "co:tsmc"
         ],
+        "trace_trigger_event_ref": "lead:lead_53e31d26909b973cac66af50394abd98",
         "trace_trigger_kind": "primary_source_signal"
       },
       "source": "system_decompose",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -34544,12 +35235,27 @@
       },
       "title": "[decompose] Micro-ring modulator 層：NVIDIA Quantum-X CPO 用 200Gbps MRM，圖中無此節點。誰能做 MRM、與 Broadcom 的 EML/MZM 路線互斥性為何",
       "triage": {
-        "decided_at": "2026-08-25T03:05:19.756197+00:00",
+        "decided_at": "2026-08-26T22:37:01.208359+00:00",
         "decision": "go",
         "priority_flags": {},
-        "reason": "system-decompose 產出的未知層：MRM 是 NVIDIA CPO 對 Broadcom 的架構分歧點，圖中無節點",
+        "reason": "指定實體的 tier-1 一手來源 lead_53e31d26909b973cac66af50394abd98 與 parked trace 共用具名標的 NVDA, co:nvidia；事件觸發 bounded pq1 重查",
         "tier": 3
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-26T22:37:01.208359+00:00",
+          "superseded_reason": "指定實體的 tier-1 一手來源 lead_53e31d26909b973cac66af50394abd98 與 parked trace 共用具名標的 NVDA, co:nvidia；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_53e31d26909b973cac66af50394abd98",
+          "triage": {
+            "decided_at": "2026-08-25T03:05:19.756197+00:00",
+            "decision": "go",
+            "priority_flags": {},
+            "reason": "system-decompose 產出的未知層：MRM 是 NVIDIA CPO 對 Broadcom 的架構分歧點，圖中無節點",
+            "tier": 3
+          }
+        }
+      ],
       "url": "https://www.nvidia.com/en-us/networking/products/silicon-photonics/"
     },
     "lead_ca3427d944ab987703c0fe625915dc9b": {
@@ -43195,8 +43901,8 @@
   "schema_version": "2",
   "source_state": {
     "x:aleabitoreddit": {
-      "since_id": "2092354322432684098",
-      "updated_at": "2026-08-25T22:33:23.188663+00:00",
+      "since_id": "2092723047107355133",
+      "updated_at": "2026-08-26T22:33:25.313091+00:00",
       "user_id": "1940360837547565056"
     }
   }

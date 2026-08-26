@@ -3790,6 +3790,18 @@
       "source": "engine_c",
       "title": "Engine C 觀測：LITE / equity_issuance_authorizations",
       "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-08-26T22:51:47.228909+00:00",
+      "hint": "核准 exact graph delta；Decision handoff：co:landmark_optoelectronics。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 234,
+      "reason": null,
+      "ref_id": "ra_baf280bdb44c813bcc2980d7917efacf",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "聯亞四年 CW 雷射長約與客戶未具名邊界",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -8620,6 +8632,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 234,
+  "next_n": 235,
   "schema_version": "1"
 }
