@@ -3755,10 +3755,11 @@
       "added_at": "2026-08-26T07:55:50.032054+00:00",
       "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-06-27T00:00:00+00:00；來源=Lumentum Holdings Inc. FY2026 Form 10-K, filed 2026-08-17 (CIK 0001633978, acces",
       "n": 231,
-      "reason": null,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_c25b8390b79caecf61a34502c45d13e1;proposal:po_52493ddd72366c8e3adaf5a989014690",
       "ref_id": "po_52493ddd72366c8e3adaf5a989014690",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-26T10:52:26.338317+00:00",
       "source": "engine_c",
       "title": "Engine C 觀測：LITE / committed_capex",
       "type": "engine_c_observation"
@@ -3767,12 +3768,25 @@
       "added_at": "2026-08-26T07:55:50.032054+00:00",
       "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-06-27T00:00:00+00:00；來源=Lumentum Holdings Inc. FY2026 Form 10-K, filed 2026-08-17 (CIK 0001633978, acces",
       "n": 232,
-      "reason": null,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_73c0fb99c0f03c612ccf3844e6057b8e;proposal:po_fb67c2d2ca000274bee6d87185896c70",
       "ref_id": "po_fb67c2d2ca000274bee6d87185896c70",
+      "resolution": "go",
+      "resolved_at": "2026-08-26T10:52:26.996569+00:00",
+      "source": "engine_c",
+      "title": "Engine C 觀測：LITE / contingent_liquidity_claims",
+      "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-08-26T10:55:58.821813+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-06-27T00:00:00+00:00；來源=Lumentum Holdings Inc. Form 8-K filed 2026-03-02 (CIK 0001633978, accession 0001",
+      "n": 233,
+      "reason": null,
+      "ref_id": "po_789baa58b15adf6746f701f16b7a07c0",
       "resolution": null,
       "resolved_at": null,
       "source": "engine_c",
-      "title": "Engine C 觀測：LITE / contingent_liquidity_claims",
+      "title": "Engine C 觀測：LITE / equity_issuance_authorizations",
       "type": "engine_c_observation"
     }
   ],
@@ -8557,8 +8571,26 @@
       "ref_id": "dc_4d28e50810e46da7fd77ee042ee7bd1c",
       "type": "decision_review",
       "verb": "pq1_awaiting_approval"
+    },
+    {
+      "at": "2026-08-26T10:52:26.338317+00:00",
+      "n": 231,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_c25b8390b79caecf61a34502c45d13e1;proposal:po_52493ddd72366c8e3adaf5a989014690",
+      "ref_id": "po_52493ddd72366c8e3adaf5a989014690",
+      "type": "engine_c_observation",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-26T10:52:26.996569+00:00",
+      "n": 232,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_73c0fb99c0f03c612ccf3844e6057b8e;proposal:po_fb67c2d2ca000274bee6d87185896c70",
+      "ref_id": "po_fb67c2d2ca000274bee6d87185896c70",
+      "type": "engine_c_observation",
+      "verb": "go"
     }
   ],
-  "next_n": 233,
+  "next_n": 234,
   "schema_version": "1"
 }
