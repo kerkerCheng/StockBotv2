@@ -3636,20 +3636,21 @@
     {
       "added_at": "2026-08-25T07:37:57.851137+00:00",
       "dispatch_baseline_decision_id": "pd_f28ad18b3604dd8345df7ae0c59eeced",
-      "dispatch_receipt": "research_packet:library/private/research_notes/2026-08-26_pq1_lite_financial_resilience.md｜LITE FY2026 10-K 逐字核對。🔴 主要發現：FY2026 淨損 US$6,935.1M 完全來自非現金的 loss on debt extinguishment US$7,756.6M（Q4 以約 1,060 萬股換回 2026/2028/2029 Notes 本金約 US$1,124.9M），同期營業利益為正 US$524.8M（前兩年皆為負），現金由 US$520.7M 增至 US$2,043.5M——不可把淨損讀成本業惡化。missing_data #2（FY2027 capex 指引）確認為 issuer 未揭露，同 MRVL backlog 形狀；已實現 capex FY2026 US$451.3M、capex/OCF 60.1%、FCF 仍正 US$300.1M。附帶發現可轉債現金結算請求權（本金 US$1,544.6M 目前即為可轉換狀態，vs 現金＋短投 US$2,738.4M 覆蓋 1.77x）。⚠ 該段的 going concern 為 issuer 風險因子條件句、全文僅 1 次、非審計意見亦非 material uncertainty 揭露（L11）。Engine C 提案 po_fb67c2d2ca000274bee6d87185896c70（contingent_liquidity_claims）與 po_52493ddd72366c8e3adaf5a989014690（committed_capex）待核准。⚠ missing_data #1 未完全清除：Series A 換股比例不在 10-K，需 Certificate of Designation。",
+      "dispatch_receipt": "decision:pd_18560084eaad197c4242f44b583b9f21",
       "dispatch_ref": "assessment_gap:dc_4d28e50810e46da7fd77ee042ee7bd1c",
       "dispatch_scope": [
         "financial_resilience_corroboration_incomplete"
       ],
-      "dispatch_status": "awaiting_approval",
-      "dispatch_updated_at": "2026-08-26T07:55:00.481448+00:00",
+      "dispatch_status": "completed",
+      "dispatch_updated_at": "2026-08-26T12:43:17.508023+00:00",
       "dispatched_at": "2026-08-26T03:57:17.293139+00:00",
       "hint": "沒有 work order，go 不成立；但 reassess 也清不掉——實質 blocker：financial_resilience_corroboration_incomplete。要動的是這些（補證據／研究），補完才 reassess",
       "n": 223,
-      "reason": null,
+      "reason": "financial_resilience_corroboration_incomplete 已清除。兩項 missing_data 皆取得一手答案：(1) Series A Certificate of Designation（8-K 2026-03-02 Ex 3.1）確認 1:1 轉換、無清算優先權、稀釋 3.17%；(2) FY2027 capex 指引確認為 issuer 未揭露。更新版 assessment 見 library/private/decision_lab/assessment_lumentum_2026-08-26.json",
+      "receipt": "decision:pd_18560084eaad197c4242f44b583b9f21",
       "ref_id": "dc_4d28e50810e46da7fd77ee042ee7bd1c",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-26T12:43:17.508023+00:00",
       "source": "decision_lab",
       "title": "REVIEW — co:lumentum",
       "type": "decision_review"
@@ -3781,10 +3782,11 @@
       "added_at": "2026-08-26T10:55:58.821813+00:00",
       "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-06-27T00:00:00+00:00；來源=Lumentum Holdings Inc. Form 8-K filed 2026-03-02 (CIK 0001633978, accession 0001",
       "n": 233,
-      "reason": null,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_e2e354b77de223b93f8e8e6725b30b60;proposal:po_789baa58b15adf6746f701f16b7a07c0",
       "ref_id": "po_789baa58b15adf6746f701f16b7a07c0",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-26T12:40:43.166222+00:00",
       "source": "engine_c",
       "title": "Engine C 觀測：LITE / equity_issuance_authorizations",
       "type": "engine_c_observation"
@@ -8588,6 +8590,33 @@
       "receipt": "observation:mo_73c0fb99c0f03c612ccf3844e6057b8e;proposal:po_fb67c2d2ca000274bee6d87185896c70",
       "ref_id": "po_fb67c2d2ca000274bee6d87185896c70",
       "type": "engine_c_observation",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-26T12:40:43.166222+00:00",
+      "n": 233,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_e2e354b77de223b93f8e8e6725b30b60;proposal:po_789baa58b15adf6746f701f16b7a07c0",
+      "ref_id": "po_789baa58b15adf6746f701f16b7a07c0",
+      "type": "engine_c_observation",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-26T12:43:17.508023+00:00",
+      "n": 223,
+      "reason": "financial_resilience_corroboration_incomplete 已清除。兩項 missing_data 皆取得一手答案：(1) Series A Certificate of Designation（8-K 2026-03-02 Ex 3.1）確認 1:1 轉換、無清算優先權、稀釋 3.17%；(2) FY2027 capex 指引確認為 issuer 未揭露。更新版 assessment 見 library/private/decision_lab/assessment_lumentum_2026-08-26.json",
+      "receipt": "decision:pd_18560084eaad197c4242f44b583b9f21",
+      "ref_id": "dc_4d28e50810e46da7fd77ee042ee7bd1c",
+      "type": "decision_review",
+      "verb": "pq1_completed"
+    },
+    {
+      "at": "2026-08-26T12:43:17.508023+00:00",
+      "n": 223,
+      "reason": "financial_resilience_corroboration_incomplete 已清除。兩項 missing_data 皆取得一手答案：(1) Series A Certificate of Designation（8-K 2026-03-02 Ex 3.1）確認 1:1 轉換、無清算優先權、稀釋 3.17%；(2) FY2027 capex 指引確認為 issuer 未揭露。更新版 assessment 見 library/private/decision_lab/assessment_lumentum_2026-08-26.json",
+      "receipt": "decision:pd_18560084eaad197c4242f44b583b9f21",
+      "ref_id": "dc_4d28e50810e46da7fd77ee042ee7bd1c",
+      "type": "decision_review",
       "verb": "go"
     }
   ],
