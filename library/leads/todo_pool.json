@@ -3634,6 +3634,13 @@
     },
     {
       "added_at": "2026-08-25T07:37:57.851137+00:00",
+      "dispatch_baseline_decision_id": "pd_f28ad18b3604dd8345df7ae0c59eeced",
+      "dispatch_ref": "assessment_gap:dc_4d28e50810e46da7fd77ee042ee7bd1c",
+      "dispatch_scope": [
+        "financial_resilience_corroboration_incomplete"
+      ],
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-08-26T03:57:17.293139+00:00",
       "hint": "沒有 work order，go 不成立；但 reassess 也清不掉——實質 blocker：financial_resilience_corroboration_incomplete。要動的是這些（補證據／研究），補完才 reassess",
       "n": 223,
       "reason": null,
@@ -8487,6 +8494,15 @@
       "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
       "type": "decision_review",
       "verb": "source_cleared"
+    },
+    {
+      "at": "2026-08-26T03:57:17.293139+00:00",
+      "n": 223,
+      "reason": "go：assessment 層缺口，排入 bounded pq1；financial_resilience_corroboration_incomplete",
+      "receipt": "decision:pd_f28ad18b3604dd8345df7ae0c59eeced",
+      "ref_id": "dc_4d28e50810e46da7fd77ee042ee7bd1c",
+      "type": "decision_review",
+      "verb": "pq1_queued"
     }
   ],
   "next_n": 231,

@@ -1430,3 +1430,131 @@ def test_decision_review_hint_is_rendered_not_just_stored() -> None:
         "hint": "coverage 已無 blocker……請跑 reassess",
     })
     assert "reassess" in line
+
+
+class _FakeStore:
+    """只提供 advance_decision_review 用到的窄 surface。"""
+
+    def __init__(self, *, work_order=None, intent="paper"):
+        self._work_order = work_order
+        self._intent = intent
+        self.closed = False
+
+    def latest_research_work_order(self, cohort_id):
+        return self._work_order
+
+    def latest_decision_for_cohort(self, cohort_id):
+        return {"payload": {"request": {"execution_intent": self._intent}}}
+
+    def close(self):
+        self.closed = True
+
+
+def _decision_pool(n=1, cohort="dc_abc"):
+    return {
+        "items": [{
+            "n": n, "type": "decision_review", "ref_id": cohort,
+            "title": "REVIEW — co:x", "hint": "", "source": "decision_lab",
+            "reason": None, "resolution": None, "resolved_at": None,
+            "added_at": "2026-08-26T00:00:00+00:00",
+        }],
+        "log": [], "next_n": n + 1, "schema_version": "1",
+    }
+
+
+def test_go_dispatches_when_work_order_exists(monkeypatch) -> None:
+    """A 類：原行為不變。"""
+
+    from engine_b import todo
+
+    pool = _decision_pool()
+    store = _FakeStore(work_order={"work_order_id": "wo_1", "status": "proposed",
+                                   "decision_id": "pd_base"})
+    monkeypatch.setattr(todo, "dispatch_decision_review",
+                        lambda p, n, **kw: {"item": todo.get(p, n)})
+
+    out = todo.advance_decision_review(pool, 1, store=store)
+    assert out["outcome"] == "dispatched"
+
+
+def test_go_reassesses_when_only_context_aged(monkeypatch) -> None:
+    """B 類：先前會被拒絕，現在自動 reassess。
+
+    實測 2026-08-26：9 個 REVIEW 有 3 個屬此類（aeva／AAOI／SIVE），
+    使用者下 go 只會拿到「不得 bare go」。
+    """
+
+    from engine_b import todo
+
+    pool = _decision_pool()
+    store = _FakeStore(work_order=None, intent="paper")
+    seen = {}
+
+    def fake_reassess(_store, _provider, cohort_id, *, execution_intent):
+        seen["intent"] = execution_intent
+        return {"decision_id": "pd_new"}
+
+    monkeypatch.setattr("decision_lab.workflow.reassess", fake_reassess)
+    monkeypatch.setattr("engine_d_runtime.bootstrap.build_default_runtime_provider",
+                        lambda: object())
+    monkeypatch.setattr(todo, "_substantive_blockers", lambda cohort_id: [])
+
+    out = todo.advance_decision_review(pool, 1, store=store)
+    assert out["outcome"] == "reassessed"
+    # intent 必須沿用該 cohort 上一筆——套錯會讓 paper_status 假性退化。
+    assert seen["intent"] == "paper"
+
+
+def test_go_queues_assessment_gap_when_blockers_remain(monkeypatch) -> None:
+    """C 類：assessment 層缺口沒有 Decision Store work order，仍要能開工。"""
+
+    from engine_b import todo
+
+    pool = _decision_pool()
+    store = _FakeStore(work_order=None, intent="research")
+    monkeypatch.setattr("decision_lab.workflow.reassess",
+                        lambda *a, **k: {"decision_id": "pd_new"})
+    monkeypatch.setattr("engine_d_runtime.bootstrap.build_default_runtime_provider",
+                        lambda: object())
+    monkeypatch.setattr(todo, "_substantive_blockers",
+                        lambda cohort_id: ["financial_resilience_corroboration_incomplete"])
+
+    out = todo.advance_decision_review(pool, 1, store=store)
+    assert out["outcome"] == "queued_assessment_gap"
+    assert out["scope"] == ["financial_resilience_corroboration_incomplete"]
+    item = todo.get(pool, 1)
+    assert item["dispatch_ref"].startswith(todo.ASSESSMENT_GAP_PREFIX)
+    assert item["dispatch_status"] == "queued"
+
+
+def test_go_is_noop_when_already_in_flight() -> None:
+    """已在 pq1 的不重複派工——否則同一份研究會被排兩次。"""
+
+    from engine_b import todo
+
+    pool = _decision_pool()
+    todo.get(pool, 1)["dispatch_status"] = "researching"
+    out = todo.advance_decision_review(pool, 1, store=_FakeStore())
+    assert out["outcome"] == "already_in_flight"
+
+
+def test_work_checkpoint_accepts_assessment_gap_ref() -> None:
+    """assessment-gap dispatch 沒有 work order 可 transition，但仍必須留 receipt。"""
+
+    from engine_b import todo
+
+    pool = _decision_pool()
+    item = todo.get(pool, 1)
+    item["dispatch_status"] = "queued"
+    item["dispatch_ref"] = f"{todo.ASSESSMENT_GAP_PREFIX}dc_abc"
+
+    class _Store:
+        def transition_research_work_order(self, **kw):  # pragma: no cover
+            raise AssertionError("assessment-gap 不該去動 Decision Store work order")
+
+    out = todo.checkpoint_decision_review(
+        pool, 1, to_status="parked", receipt="research_packet:notes.md", store=_Store()
+    )
+    assert out["work_order"] is None
+    # terminal checkpoint 仍照常 resolve pq2 編號並留下 receipt。
+    assert pool["log"][-1]["receipt"] == "research_packet:notes.md"

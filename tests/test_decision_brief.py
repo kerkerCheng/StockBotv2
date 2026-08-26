@@ -328,3 +328,35 @@ def test_identity_registration_pending_surfaces_structural_blocker() -> None:
     assert rows[0]["company_id"] == "co:agility_robotics"
     assert rows[0]["registered"] is True
     assert "company_identity.json" in rows[0]["blocking_action"]
+
+
+def test_blockers_travel_with_their_resolution_mode() -> None:
+    """blocker code 必須附上「該由誰動手」，否則每個消費端都會自己再猜一份。
+
+    事發（2026-08-26，一天內兩次）：brief 只給 code 不給 mode，於是
+    `engine_b.todo` 手寫了一份 stale 清單去分類（立刻誤判 co:axt），
+    同一天口頭也把 system_internal 的 blocker 說成「bug 要解」。
+    分類本身早有 SSOT（config/decision_blockers.json 的 resolution_mode），
+    缺的只是沒跟資料一起送出來。
+    """
+
+    from decision_lab.brief import _blockers_by_mode
+
+    grouped = _blockers_by_mode([
+        "holdings_stale",                              # system_internal
+        "financial_resilience_corroboration_incomplete",  # user_decision
+    ])
+
+    assert grouped["user_decision"] == [
+        "financial_resilience_corroboration_incomplete"
+    ]
+    assert "holdings_stale" in grouped["system_internal"]
+    # 不得把三種 mode 混成一張清單——混了之後下游只能猜，而猜錯的方向
+    # 永遠是「看起來需要更多研究」。
+    assert set(grouped) <= {"user_decision", "system_internal", "awaiting_external"}
+
+
+def test_blockers_by_mode_is_empty_not_missing_when_no_blockers() -> None:
+    from decision_lab.brief import _blockers_by_mode
+
+    assert _blockers_by_mode([]) == {}

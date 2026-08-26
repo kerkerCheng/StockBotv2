@@ -63,12 +63,26 @@ Luna reviewer：停止
 
 `pending` 帶 `--until`／`--trigger` 會歸入「等事件」區，觸發前不佔決策注意力。分類判準見 `config/decision_blockers.json` 的 `resolution_mode`。
 
-**⚠ `decision_review` 有兩種成因，處置完全不同（2026-08-26 實測撞到；本機 Codex 與 Claude Code 各自獨立
-命中同一處）。** 舊 hint 一律寫「核准 bounded gap research」，把「REVIEW 來自 context 過期」誤呈現成
-「存在可 dispatch 的研究缺口」；使用者照著下 `go`，`dispatch` 拒絕（沒有 work order）、`resolve --verb go`
-也拒絕（decision_review 不得 bare go），看起來像死結。**hint 已於同日改為逐項動態判定**
-（`engine_b.todo._dispatchable_cohorts` 查該 cohort 有無 research work order），
-`todo list`／`sync` 會在每個編號下方直接印出該走哪條路。兩條路是：
+**`decision_review` 的 `go` 是全函數（2026-08-26 起）——你只要下 `go`，不必分辨它屬於哪一類。**
+`engine_b.todo.advance_decision_review` 依實際狀態自動選路；下面三條是它內部做的事，
+**列出來是為了讓輸出可讀，不是要你自己選**：
+
+| 狀態 | `go` 實際做什麼 |
+|---|---|
+| 有 research work order | dispatch 回 pq1（`outcome=dispatched`） |
+| 無 work order、無 `user_decision` blocker | 以原 intent reassess，下次 sync 自動結案（`outcome=reassessed`） |
+| 無 work order、仍有 `user_decision` blocker | 先 reassess，再以 `assessment_gap:<cohort>` 排入 pq1 並印出研究範圍（`outcome=queued_assessment_gap`） |
+
+⚠ **四個 authority gate 不受影響**：graph admission、Engine C ledger 寫入、thesis mutation、
+live 資本仍各走 `complete-*` 與 exact 人工核准。`go` 只自動化「研究要不要開始」這件可逆的事。
+
+⚠ `assessment_gap:` 的 dispatch **沒有** Decision Store work order（work order 只在
+`coverage_pending` 時建立，而 `assessment_blockers` 是 sizing 階段才算出來的），
+`checkpoint_decision_review` 會跳過 work-order transition，但 terminal 仍須 receipt。
+慣例同 `source_trace_review` 的 `lead:<id>` ref。
+
+歷史：改成全函數之前，`go` 只覆蓋第一種情況，其餘一律拒絕——實測 9 個 REVIEW 有 **4 個**
+會死在這裡（本機 Codex 與 Claude Code 各自獨立撞到）。兩條內部路徑是：
 
 - **coverage 有 blocker** → `dispatch <n>` 派回 pq1 做 bounded research，完成後 `work <n> --to ...` checkpoint。
 - **coverage 無 blocker、REVIEW 來自凍結 context 過期** → 直接

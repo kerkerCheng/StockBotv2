@@ -47,6 +47,23 @@ def _user_request(card: Mapping[str, Any]) -> str:
     return "無；依下一個 review 時間監控即可。"
 
 
+def _blockers_by_mode(blockers: Sequence[str]) -> dict[str, list[str]]:
+    """依 `resolution_mode` 分組。唯一權威是 `config/decision_blockers.json`。
+
+    只有 `user_decision` 那組真的需要人動手；`system_internal` 多半 reassess
+    就消失，`awaiting_external` 要等世界先發生事。把這三者混成一張 blocker 清單，
+    下游只能靠猜，而猜錯的方向永遠是「看起來需要更多研究」。
+    """
+
+    from .blockers import describe_blocker
+
+    grouped: dict[str, list[str]] = {}
+    for code in sorted({str(b) for b in blockers if b}):
+        mode = getattr(describe_blocker(code), "resolution_mode", "user_decision")
+        grouped.setdefault(str(mode), []).append(code)
+    return grouped
+
+
 def _decision_item(
     card: Mapping[str, Any],
     current_authority: Mapping[str, Any] | None = None,
@@ -106,6 +123,12 @@ def _decision_item(
         ),
         "evidence_delta": evidence_delta,
         "blockers": blockers,
+        # ⚠ blocker code 單獨出現時，讀者無從知道它該由誰動手，於是每個消費端都會
+        # 自己再猜一份分類——2026-08-26 一天內發生兩次（`engine_b.todo` 手寫
+        # stale 清單、以及口頭把 co:axt 的 system_internal blocker 誤判成 bug）。
+        # 分類本身早就有 SSOT（`config/decision_blockers.json` 的 resolution_mode），
+        # 缺的只是**沒有跟著資料一起送出來**。附上它，消費端就沒有動機自己猜。
+        "blockers_by_mode": _blockers_by_mode(blockers),
         "next_review_at": lifecycle.get("review_due_at"),
         "disproof_condition": card.get("disproof_condition") or "",
         # 這些軸的 authority 現在拿得到了，值得重評估（只是提示，不自動改等級）。

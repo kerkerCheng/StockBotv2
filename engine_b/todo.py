@@ -437,13 +437,20 @@ def checkpoint_decision_review(
             raise TodoError("completed receipt 不可沿用 dispatch 前的 baseline decision")
     stamp = at or _now()
     operation_key = f"todo:{n}:{to_status}:{receipt}"
-    work_order = store.transition_research_work_order(
-        work_order_id=str(item["dispatch_ref"]),
-        to_status=to_status,
-        operation_key=operation_key,
-        receipt={"todo_n": int(n), "reference": receipt, "reason": reason},
-        observed_at=stamp,
-    )
+    dispatch_ref = str(item["dispatch_ref"])
+    if dispatch_ref.startswith(ASSESSMENT_GAP_PREFIX):
+        # assessment 層缺口沒有 Decision Store work order 可 transition
+        # （work order 只在 coverage_pending 時建立）。checkpoint 仍然要 receipt，
+        # 只是狀態存在 pool 這一側——與 source_trace_review 的 `lead:` ref 同慣例。
+        work_order = None
+    else:
+        work_order = store.transition_research_work_order(
+            work_order_id=dispatch_ref,
+            to_status=to_status,
+            operation_key=operation_key,
+            receipt={"todo_n": int(n), "reference": receipt, "reason": reason},
+            observed_at=stamp,
+        )
     item["dispatch_status"] = to_status
     item["dispatch_receipt"] = receipt
     item["dispatch_updated_at"] = stamp
@@ -466,6 +473,165 @@ def checkpoint_decision_review(
             at=stamp,
         )
     return {"item": item, "work_order": work_order}
+
+
+#: 由 assessment 層缺口（非 coverage blocker）驅動的 pq1 dispatch。
+#: 沿用 `dispatch_source_trace_review` 已建立的慣例——`dispatch_ref` 不一定指向
+#: Decision Store work order（那邊指向 lead）。前綴讓 `work` 能分辨要不要去
+#: transition work order。
+ASSESSMENT_GAP_PREFIX = "assessment_gap:"
+
+
+def _prior_execution_intent(store: Any, cohort_id: str) -> str:
+    """該 cohort 上一筆 decision 用的 intent。
+
+    ⚠ 必須沿用，不可套用別處習慣：2026-08-26 實測，對先前是 `paper` 的 cohort
+    跑 `research`，`paper_status` 會由 ELIGIBLE 退成 DATA_NEEDED——那不是資料
+    變壞，是 `execution_intent_research_only` 這個 paper blocker，純由參數造成。
+    """
+
+    try:
+        decision = store.latest_decision_for_cohort(cohort_id)
+        intent = str((decision["payload"]["request"] or {}).get("execution_intent") or "")
+    except Exception:  # noqa: BLE001
+        intent = ""
+    return intent or "research"
+
+
+def _substantive_blockers(cohort_id: str) -> list[str]:
+    """該 cohort 目前**真的需要人動手**的 blocker。
+
+    唯一權威是 `config/decision_blockers.json` 的 `resolution_mode`；
+    這裡不另外猜一份（2026-08-26 手寫過一份 stale 清單，立刻就誤判了 co:axt）。
+    """
+
+    from mcp_server.decision_tools import get_decision_brief_core
+
+    try:
+        items = get_decision_brief_core().get("items") or []
+    except Exception:  # noqa: BLE001
+        return []
+    for item in items:
+        if str(item.get("cohort_id") or "") != cohort_id:
+            continue
+        # brief 已經附上分組（`_blockers_by_mode`），直接用——這裡刻意**不**再分一次組。
+        grouped = item.get("blockers_by_mode")
+        if isinstance(grouped, Mapping):
+            return sorted(str(b) for b in (grouped.get("user_decision") or []))
+        # 舊 payload（例如遠端受限 surface）沒有這個欄位時才自行分組。
+        from decision_lab.blockers import describe_blocker
+
+        return sorted(
+            code
+            for code in {str(b) for b in (item.get("blockers") or []) if b}
+            if getattr(describe_blocker(code), "resolution_mode", "user_decision")
+            == "user_decision"
+        )
+    return []
+
+
+def advance_decision_review(
+    pool: dict[str, Any],
+    n: int,
+    *,
+    store: Any,
+    at: str | None = None,
+) -> dict[str, Any]:
+    """`go` 對 decision_review 的**全函數**實作：永遠等於「是，往下走一步」。
+
+    先前 `go` 只覆蓋一種情況（已有 research work order → dispatch），其餘一律
+    拒絕，於是使用者必須自己分辨這一筆屬於哪一類、再翻譯成另一個動詞。
+    2026-08-26 實測 9 個 REVIEW 項目分三類，其中 **4 個會被 `go` 拒絕**——
+    而三類長得一模一樣（都叫 `REVIEW — co:xxx`），系統分得出來卻沒有代勞。
+
+    三個分支，對應實測分類：
+
+    - **有 work order** → dispatch 回 pq1（原行為，不變）。
+    - **無 work order、無實質 blocker** → REVIEW 只是凍結 context 自然老化，
+      reassess 重新凍結即可；下次 sync 自己結案。
+    - **無 work order、有實質 blocker** → 先 reassess（可能清掉一部分並產生
+      work order），再依結果 dispatch 或以 assessment-gap ref 排入 pq1。
+
+    ⚠ **四個 authority gate 完全不受影響**：graph admission、Engine C ledger
+    寫入、thesis mutation、live 資本仍各自走 `complete-*` 與 exact 人工核准。
+    本函式只把「研究要不要開始」這件可逆的事自動化——它本來就是 `go` 的語意。
+    """
+
+    item = get(pool, n)
+    if item["type"] != "decision_review":
+        raise TodoError(f"[{n}] 不是 decision_review")
+    if item.get("dispatch_status") in {"queued", "researching", "awaiting_approval"}:
+        return {"item": item, "outcome": "already_in_flight"}
+
+    cohort_id = str(item["ref_id"])
+    if not cohort_id.startswith("dc_"):
+        raise TodoError("全域 authority blocker 沒有 bounded cohort work order，需依 hint 修復")
+
+    if store.latest_research_work_order(cohort_id) is not None:
+        result = dispatch_decision_review(pool, n, store=store, at=at)
+        result["outcome"] = "dispatched"
+        return result
+
+    # 沒有 work order：先刷新凍結 context。這一步對兩種剩餘情況都必要，
+    # 且不改變任何 authority——decision 是 append-only，舊筆原封不動。
+    from decision_lab.workflow import reassess
+    from engine_d_runtime.bootstrap import build_default_runtime_provider
+
+    stamp = at or _now()
+    intent = _prior_execution_intent(store, cohort_id)
+    reassessed = reassess(
+        store,
+        build_default_runtime_provider(),
+        cohort_id,
+        execution_intent=intent,
+    )
+    decision_id = str(reassessed.get("decision_id") or "")
+
+    if store.latest_research_work_order(cohort_id) is not None:
+        result = dispatch_decision_review(pool, n, store=store, at=stamp)
+        result["outcome"] = "reassessed_then_dispatched"
+        result["decision_id"] = decision_id
+        return result
+
+    remaining = _substantive_blockers(cohort_id)
+    if not remaining:
+        # context 老化而已；sync 會依新 decision 自行結案，這裡不強制 resolve。
+        pool["log"].append({
+            "at": stamp,
+            "n": int(n),
+            "type": item["type"],
+            "ref_id": cohort_id,
+            "verb": "pq1_reassessed",
+            "reason": f"go：僅 context 老化，已以 intent={intent} 重新凍結",
+            "receipt": f"decision:{decision_id}",
+        })
+        return {"item": item, "outcome": "reassessed", "decision_id": decision_id}
+
+    # 仍有實質 blocker：assessment 層缺口沒有對應的 Decision Store work order
+    # （work order 只在 coverage_pending 時建立，而 assessment_blockers 是
+    # sizing 階段才算出來的）。用 assessment-gap ref 排入 pq1，完成時同樣要 receipt。
+    item["dispatch_status"] = "queued"
+    item["dispatch_ref"] = f"{ASSESSMENT_GAP_PREFIX}{cohort_id}"
+    item["dispatch_baseline_decision_id"] = decision_id
+    item["dispatched_at"] = stamp
+    item["dispatch_scope"] = remaining
+    item.pop("deferred_at", None)
+    item.pop("waiting_on", None)
+    pool["log"].append({
+        "at": stamp,
+        "n": int(n),
+        "type": item["type"],
+        "ref_id": cohort_id,
+        "verb": "pq1_queued",
+        "reason": "go：assessment 層缺口，排入 bounded pq1；" + "、".join(remaining),
+        "receipt": f"decision:{decision_id}",
+    })
+    return {
+        "item": item,
+        "outcome": "queued_assessment_gap",
+        "decision_id": decision_id,
+        "scope": remaining,
+    }
 
 
 def dispatch_source_trace_review(
@@ -1946,21 +2112,47 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.command == "resolve":
         failures = 0
-        for raw in args.numbers:
-            try:
-                resolve(
-                    pool, int(raw), args.verb,
-                    reason=args.reason, receipt=args.receipt,
-                    until=args.until, trigger=args.trigger,
-                    event_type=args.event_type,
-                )
-                suffix = ""
-                if args.verb == "pending" and (args.until or args.trigger):
-                    suffix = f"（等：{args.until or args.trigger}）"
-                print(f"✓ [{raw}] → {args.verb}{suffix}")
-            except (TodoError, ValueError) as exc:
-                failures += 1
-                print(f"✗ [{raw}]：{exc}", file=sys.stderr)
+        decision_store = None
+        try:
+            for raw in args.numbers:
+                try:
+                    # `go` 對 decision_review 是全函數：由系統決定下一步是
+                    # dispatch、reassess 還是排入 assessment-gap pq1，
+                    # 使用者不必自己分辨（見 advance_decision_review）。
+                    item = get(pool, int(raw))
+                    if (
+                        args.verb == "go"
+                        and item["type"] == "decision_review"
+                        and item.get("dispatch_status") not in {"completed", "parked"}
+                    ):
+                        if decision_store is None:
+                            from decision_lab.bootstrap import open_default_store
+
+                            decision_store = open_default_store()
+                        outcome = advance_decision_review(
+                            pool, int(raw), store=decision_store
+                        )
+                        print(f"✓ [{raw}] → go（{outcome['outcome']}）")
+                        scope = outcome.get("scope")
+                        if scope:
+                            print(f"    研究範圍：{'、'.join(scope)}")
+                        continue
+                    resolve(
+                        pool, int(raw), args.verb,
+                        reason=args.reason, receipt=args.receipt,
+                        until=args.until, trigger=args.trigger,
+                        event_type=args.event_type,
+                    )
+                    suffix = ""
+                    if args.verb == "pending" and (args.until or args.trigger):
+                        suffix = f"（等：{args.until or args.trigger}）"
+                    print(f"✓ [{raw}] → {args.verb}{suffix}")
+                except (TodoError, ValueError) as exc:
+                    failures += 1
+                    print(f"✗ [{raw}]：{exc}", file=sys.stderr)
+        finally:
+            if decision_store is not None:
+                decision_store.close()
         save(pool, args.pool)
         return 1 if failures else 0
 
