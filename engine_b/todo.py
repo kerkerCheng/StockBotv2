@@ -22,7 +22,7 @@ import tempfile
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Iterable, Mapping
+from typing import Any, Iterable, Mapping, Sequence
 
 SCHEMA_VERSION = "1"
 
@@ -33,7 +33,7 @@ DEFAULT_POOL_PATH = _ROOT / "library" / "leads" / "todo_pool.json"
 ITEM_TYPES: dict[str, str] = {
     "lead_research": "（legacy）已移回自動 pq1，不再建立新項目",
     "ra_admission": "核准入圖（apply_research_action）",
-    "decision_review": "核准補缺口研究；取得新 receipt 後 reassess",
+    "decision_review": "REVIEW 有兩種成因，逐項 hint 才是準的：有 blocker → go 派回 pq1；無 blocker → 改跑 reassess",
     "source_trace_review": "核准人工 authority 後做 bounded 追源；go 只 dispatch 回 pq1",
     "thesis_lifecycle": "本機複查 thesis 並手動更新 lifecycle.json",
     "sheet_only_holding": "評估這筆 Sheet 持股（evaluate-signal 或 onboard）",
@@ -1468,6 +1468,59 @@ def collect_from_decisions() -> list[dict[str, Any]]:
     return _fail_soft(_collect_decision_rows)
 
 
+def _dispatchable_cohorts(items: Sequence[Mapping[str, Any]]) -> frozenset[str]:
+    """哪些 cohort 的最新 decision **真的**帶得動 `dispatch`。
+
+    `REVIEW` 有兩種成因，但先前的 hint 只寫得出一種：
+    coverage 還有 blocker（有 bounded gap work order，該 `dispatch`），
+    與 coverage 已清空、REVIEW 純粹來自凍結 context 過期（沒有 work order，
+    該 `reassess`）。舊 hint 一律寫「核准 bounded gap research」，把後者誤呈現成
+    「存在可 dispatch 的研究缺口」——使用者照著下 `go`，`dispatch` 拒絕（沒有
+    work order），`resolve --verb go` 也拒絕（decision_review 不得 bare go），
+    看起來像死結。2026-08-26 由本機 Codex 與 Claude Code 各自獨立撞到同一處。
+
+    這是 L12 的形狀：一個表示（`REVIEW` ＋ 單一 hint）承載兩種語意，下游被迫二選一。
+    修法是先分開再各自給正確指示，不是放寬任一邊的判定。
+
+    讀不到 store 時回空集合——此時 hint 退回「兩種都寫」的保守版本，
+    仍然可執行，不會謊報某條路可走。
+    """
+
+    cohort_ids = [
+        str(item.get("cohort_id") or "")
+        for item in items
+        if str(item.get("cohort_id") or "").startswith("dc_")
+    ]
+    if not cohort_ids:
+        return frozenset()
+    try:
+        from decision_lab.bootstrap import open_default_store
+
+        store = open_default_store()
+    except Exception:  # noqa: BLE001 — 取不到 store 只降級 hint，不阻斷 sync
+        return frozenset()
+    try:
+        return frozenset(
+            cohort_id
+            for cohort_id in cohort_ids
+            if store.latest_research_work_order(cohort_id) is not None
+        )
+    except Exception:  # noqa: BLE001
+        return frozenset()
+    finally:
+        store.close()
+
+
+def _decision_review_hint(ref: str, dispatchable: frozenset[str]) -> str:
+    if ref in dispatchable:
+        return "coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess"
+    return (
+        "coverage 已無 blocker，REVIEW 來自凍結 context 過期——"
+        "不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，"
+        "下次 sync 會自動結案"
+    )
+
+
 def _collect_decision_rows() -> list[dict[str, Any]]:
     """需要動作的 Engine D 決策項（REVIEW／TRADE／HEDGE）→ 複查待辦。
 
@@ -1479,6 +1532,7 @@ def _collect_decision_rows() -> list[dict[str, Any]]:
     brief = get_decision_brief_core()
     rows: list[dict[str, Any]] = []
     items = brief.get("items") or []
+    dispatchable = _dispatchable_cohorts(items)
     for item in items:
         action = str(item.get("recommended_action") or "")
         if action in {"NO ACTION", ""}:
@@ -1505,7 +1559,7 @@ def _collect_decision_rows() -> list[dict[str, Any]]:
             "type": "sheet_only_holding" if item.get("sheet_only") else "decision_review",
             "ref_id": ref,
             "title": f"{action} — {label}",
-            **({"hint": "核准 bounded gap research；完成後才 reassess"}
+            **({"hint": _decision_review_hint(ref, dispatchable)}
                if not item.get("sheet_only") else {}),
             "source": "decision_lab",
         }
@@ -1638,7 +1692,14 @@ def _item_line(item: Mapping[str, Any]) -> str:
         )
     else:
         flag = "（已 defer）" if item.get("deferred_at") else ""
-    return f"  [{item['n']}] {item['title']}{flag}"
+    line = f"  [{item['n']}] {item['title']}{flag}"
+    # decision_review 的區段標題只寫得出一種成因（見 _dispatchable_cohorts）。
+    # 逐項 hint 才知道這一筆該 dispatch 還是該 reassess——不顯示等於沒有，
+    # 使用者只會看到區段標題然後下錯 verb（2026-08-26 實測）。
+    hint = str(item.get("hint") or "").strip()
+    if item.get("type") == "decision_review" and hint and not item.get("dispatch_status"):
+        line += f"\n        ↳ {hint}"
+    return line
 
 
 def _last_checkpoint(

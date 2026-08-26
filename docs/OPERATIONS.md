@@ -63,10 +63,12 @@ Luna reviewer：停止
 
 `pending` 帶 `--until`／`--trigger` 會歸入「等事件」區，觸發前不佔決策注意力。分類判準見 `config/decision_blockers.json` 的 `resolution_mode`。
 
-**⚠ `decision_review` 有兩種成因，處置完全不同（2026-08-26 實測撞到）。** 該項的 hint 寫「核准 bounded gap
-research」，會讓人以為一律 `dispatch`，但 `dispatch` 只在**該 decision 帶 research work order**（即 coverage
-還有 blocker）時才成立；沒有 work order 時它會正確拒絕並說明。而 `resolve --verb go` 也會被拒（decision_review
-不得 bare go），於是看起來像死結——**實際上該走 `reassess`**：
+**⚠ `decision_review` 有兩種成因，處置完全不同（2026-08-26 實測撞到；本機 Codex 與 Claude Code 各自獨立
+命中同一處）。** 舊 hint 一律寫「核准 bounded gap research」，把「REVIEW 來自 context 過期」誤呈現成
+「存在可 dispatch 的研究缺口」；使用者照著下 `go`，`dispatch` 拒絕（沒有 work order）、`resolve --verb go`
+也拒絕（decision_review 不得 bare go），看起來像死結。**hint 已於同日改為逐項動態判定**
+（`engine_b.todo._dispatchable_cohorts` 查該 cohort 有無 research work order），
+`todo list`／`sync` 會在每個編號下方直接印出該走哪條路。兩條路是：
 
 - **coverage 有 blocker** → `dispatch <n>` 派回 pq1 做 bounded research，完成後 `work <n> --to ...` checkpoint。
 - **coverage 無 blocker、REVIEW 來自凍結 context 過期** → 直接

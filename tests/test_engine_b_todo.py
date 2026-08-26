@@ -1041,13 +1041,17 @@ def test_collect_from_decisions_uses_company_hint_only_as_display_label(
         }],
     })
 
-    assert todo.collect_from_decisions() == [{
-        "type": "decision_review",
-        "ref_id": "dc_private",
-        "title": "REVIEW — co:agility_robotics",
-        "hint": "核准 bounded gap research；完成後才 reassess",
-        "source": "decision_lab",
-    }]
+    rows = todo.collect_from_decisions()
+    assert len(rows) == 1
+    row = rows[0]
+    assert row["type"] == "decision_review"
+    assert row["ref_id"] == "dc_private"
+    # 本測試的斷言對象是**顯示標籤**：company_id 為 unresolved 時退回 hint 值。
+    assert row["title"] == "REVIEW — co:agility_robotics"
+    assert row["source"] == "decision_lab"
+    # hint 自 2026-08-26 起依該 cohort 有無 research work order 動態決定，
+    # 不再是固定字串；其正確性由 test_decision_review_hint_* 負責，這裡只確認存在。
+    assert row["hint"]
 
 
 def test_collect_material_decision_never_derives_waiting_from_system_blockers(
@@ -1353,3 +1357,52 @@ def test_graph_receipt_rejects_a_lead_that_was_never_loaded(tmp_path) -> None:
             pool, 1, leads_path=leads_path,
             to_status="completed", receipt=f"graph:{doc_id}",
         )
+
+
+def test_decision_review_hint_distinguishes_dispatch_from_reassess() -> None:
+    """`REVIEW` 有兩種成因，hint 必須說對是哪一種。
+
+    事發（2026-08-26，本機 Codex 與 Claude Code 各自獨立撞到）：舊 hint 一律寫
+    「核准 bounded gap research」，把「coverage 已清空、REVIEW 來自凍結 context
+    過期」誤呈現成「存在可 dispatch 的研究缺口」。使用者照著下 `go`：
+    `dispatch` 拒絕（沒有 work order），`resolve --verb go` 也拒絕
+    （decision_review 不得 bare go），看起來像死結——正解其實是 `reassess`。
+
+    這是 L12：一個表示承載兩種語意，下游被迫二選一，而兩邊都是錯的。
+    """
+
+    from engine_b.todo import _decision_review_hint
+
+    with_gap = _decision_review_hint("dc_has_work_order", frozenset({"dc_has_work_order"}))
+    without_gap = _decision_review_hint("dc_no_work_order", frozenset({"dc_has_work_order"}))
+
+    assert "dispatch" in with_gap and "pq1" in with_gap
+    # 沒有 work order 時必須明講「不是 dispatch」並指向 reassess，
+    # 否則使用者只會再下一次注定失敗的 go。
+    assert "reassess" in without_gap
+    assert "不是 dispatch" in without_gap
+    assert with_gap != without_gap
+
+
+def test_dispatchable_cohorts_fails_soft_without_store() -> None:
+    """讀不到 store 只降級 hint，不得阻斷 sync，也不得謊報某條路可走。"""
+
+    from engine_b.todo import _dispatchable_cohorts
+
+    # 沒有 dc_ 前綴就不查 store，直接空集合。
+    assert _dispatchable_cohorts([{"cohort_id": "sheet:co:x"}]) == frozenset()
+    assert _dispatchable_cohorts([]) == frozenset()
+
+
+def test_decision_review_hint_is_rendered_not_just_stored() -> None:
+    """hint 存了但不顯示等於沒有——使用者只看得到區段標題然後下錯 verb。"""
+
+    from engine_b.todo import _item_line
+
+    line = _item_line({
+        "n": 220,
+        "title": "REVIEW — co:axt",
+        "type": "decision_review",
+        "hint": "coverage 已無 blocker……請跑 reassess",
+    })
+    assert "reassess" in line
