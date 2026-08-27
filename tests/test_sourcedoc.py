@@ -330,3 +330,128 @@ def test_self_report_without_sole_source_does_not_warn(tmp_path: Path) -> None:
     assert not any(
         error.startswith("WARN") and "sole_source" in error for error in errors
     )
+
+
+def test_self_reported_sole_source_survives_technode_wrapping(tmp_path: Path) -> None:
+    """把 issuer 包裝成 TechNode 不該繞過 L8。
+
+    事發（2026-08-27）：NVDA Q2 FY2027 CFO commentary 的自動抽取產出
+    `tech:ai_cloud_platform -depends_on-> tech:nvidia_ai_infrastructure` 且
+    `sole_source=true`，validate 完全靜默通過。三個原因疊在一起：
+    (a) 只認 type=="Company"；(b) 只查 src，但 depends_on 的獲益方是 dst；
+    (c) 名稱用雙向子字串比對，而 "NVIDIA AI Data Center Infrastructure" 與
+    "NVIDIA Corporation" 互相都不是對方的子字串。
+    """
+    doc = _document("doc_a", origin_entity="Supplier Corporation")
+    doc["nodes"].append(
+        {
+            "id": "tech:supplier_platform",
+            "type": "TechNode",
+            "name": "Supplier Integrated Platform",
+            "abstraction_level": "network_systems",
+            "role": None,
+            "aliases": [],
+            "attributes": {},
+            "confidence": 0.8,
+            "source_ids": ["doc_a_s1"],
+        }
+    )
+    doc["edges"].append(
+        {
+            "id": "e2",
+            "src_id": "co:customer",
+            "dst_id": "tech:supplier_platform",
+            "relation": "depends_on",
+            "attributes": {"sole_source": True},
+            "confidence": 0.7,
+            "source_ids": ["doc_a_s1"],
+        }
+    )
+    path = _write_extraction(tmp_path, doc)
+
+    errors = validate(str(path))
+
+    warnings = [e for e in errors if e.startswith("WARN") and "sole_source" in e]
+    assert len(warnings) == 1
+    assert "e2" in warnings[0]
+    assert "tech:supplier_platform" in warnings[0]
+
+
+def test_issuer_admitting_own_dependency_does_not_warn(tmp_path: Path) -> None:
+    """issuer 自承「我依賴某供應商」是不利益陳述，方向上不該觸發自報警告。
+
+    sole_source 替誰背書要看 relation 方向：supplies_to 抬高 src，depends_on 抬高 dst。
+    把兩者都當成 src 檢查，會同時漏抓真正的自吹並誤抓這種可信的自承。
+    """
+    doc = _document("doc_a", origin_entity="Customer")
+    doc["edges"].append(
+        {
+            "id": "e2",
+            "src_id": "co:customer",
+            "dst_id": "co:supplier",
+            "relation": "depends_on",
+            "attributes": {"sole_source": True},
+            "confidence": 0.7,
+            "source_ids": ["doc_a_s1"],
+        }
+    )
+    path = _write_extraction(tmp_path, doc)
+
+    errors = validate(str(path))
+
+    assert not any(e.startswith("WARN") and "sole_source" in e for e in errors)
+
+
+def test_unregistered_company_id_warns(tmp_path: Path) -> None:
+    """co:* 未在 identity registry 時必須現形，不得靜默入圖。
+
+    這道檢查同時攔兩種東西：把類別詞或未具名實體實體化成公司的抽取幻覺
+    （co:nvidia_direct_customers_csp、co:unnamed_ai_research_deployment_co），
+    以及真公司尚未 onboard。兩者的正當結局不同，所以是 WARN 而非 ERROR——
+    由人分流，validate 不代決。
+    """
+    doc = _document("doc_a")
+    doc["nodes"].append(
+        {
+            "id": "co:definitely_not_in_registry",
+            "type": "Company",
+            "name": "Direct Customers — CSPs",
+            "abstraction_level": "end_demand",
+            "role": "adjacent_silicon",
+            "aliases": [],
+            "attributes": {},
+            "confidence": 0.8,
+            "source_ids": ["doc_a_s1"],
+        }
+    )
+    path = _write_extraction(tmp_path, doc)
+
+    errors = validate(str(path))
+
+    hits = [e for e in errors if "co:definitely_not_in_registry" in e]
+    assert len(hits) == 1
+    assert hits[0].startswith("WARN")
+    assert "company_identity.json" in hits[0]
+
+
+def test_registered_company_id_does_not_warn(tmp_path: Path) -> None:
+    """registry 內的 co:* 不得觸發警告——否則這道檢查會變成恆亮的雜訊。"""
+    doc = _document("doc_a")
+    doc["nodes"].append(
+        {
+            "id": "co:nvidia",
+            "type": "Company",
+            "name": "NVIDIA Corporation",
+            "abstraction_level": "device_chip",
+            "role": "leader",
+            "aliases": ["NVIDIA"],
+            "attributes": {},
+            "confidence": 0.9,
+            "source_ids": ["doc_a_s1"],
+        }
+    )
+    path = _write_extraction(tmp_path, doc)
+
+    errors = validate(str(path))
+
+    assert not any("co:nvidia" in e and "company_identity.json" in e for e in errors)

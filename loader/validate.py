@@ -13,6 +13,7 @@ validate.py — 驗證一份中介 JSON 是否合法且自洽。
 from __future__ import annotations
 
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -30,6 +31,21 @@ VOCAB = ROOT / "schema" / "vocab.json"
 def _load(p: Path) -> dict:
     with open(p, encoding="utf-8") as f:
         return json.load(f)
+
+
+# 法人後綴不帶識別力：Coherent Corporation 與 Coherent Inc 是同一家。
+_CORP_SUFFIX = re.compile(
+    r"\b(corporation|corp|inc|incorporated|ltd|limited|llc|plc|nv|sa|ab|oyj|"
+    r"company|holdings|holding|group)\b\.?",
+    re.IGNORECASE,
+)
+
+
+def _core_tokens(name: str) -> set[str]:
+    """取名稱的核心識別 token（小寫、去法人後綴與標點、濾掉過短詞）。"""
+    s = _CORP_SUFFIX.sub(" ", name.casefold())
+    s = re.sub(r"[^\w\s]", " ", s)
+    return {t for t in s.split() if len(t) >= 3}
 
 
 def validate(doc_path: str) -> list[str]:
@@ -91,30 +107,73 @@ def validate(doc_path: str) -> list[str]:
     else:
         # G5 同質性：sole_source 只有客戶端或第三方能確認；供應商自報最高只算
         # verified_by_absence（weak），入圖前先在文件層警告。
-        origin_norm = origin.casefold().strip()
+        #
+        # 兩個曾經漏抓的形狀（2026-08-27 由 NVDA EX-99.2 實例發現）：
+        # (a) 只認 type=="Company" — 把 issuer 包裝成 TechNode（tech:nvidia_ai_infrastructure）
+        #     就能靜默通過。issuer 是誰跟節點型別無關，所以改為不限型別。
+        # (b) 只查 src — 但 sole_source 替誰背書要看 relation 方向。issuer 自承
+        #     「我依賴 B」是不利益陳述、反而可信；issuer 自稱「沒人能取代我」才需要警告。
+        # (c) 名稱比對原本用雙向子字串，對 Company 節點碰巧有效（"nvidia" 是
+        #     "nvidia corporation" 的子字串），但 issuer 一旦被包裝成描述性名稱就失效：
+        #     "NVIDIA AI Data Center Infrastructure" 與 "NVIDIA Corporation" 互相都不是
+        #     對方的子字串。改比對核心 token 的包含關係（去掉法人後綴與過短詞）。
+        origin_tokens = _core_tokens(origin)
 
-        def _is_origin_company(node: dict) -> bool:
-            names = [node.get("name") or "", *node.get("aliases", [])]
-            for name in names:
-                name_norm = name.casefold().strip()
-                if name_norm and (name_norm in origin_norm or origin_norm in name_norm):
+        def _is_origin_entity(node: dict) -> bool:
+            if not origin_tokens:
+                return False
+            for name in [node.get("name") or "", *node.get("aliases", [])]:
+                tokens = _core_tokens(name)
+                if not tokens:
+                    continue
+                if origin_tokens <= tokens or tokens <= origin_tokens:
                     return True
             return False
 
-        origin_company_ids = {
-            n["id"]
-            for n in doc.get("nodes", [])
-            if n.get("type") == "Company" and _is_origin_company(n)
+        origin_node_ids = {
+            n["id"] for n in doc.get("nodes", []) if _is_origin_entity(n)
         }
+        beneficiary_end = vocab.get("sole_source_beneficiary_end", {})
         for e in doc.get("edges", []):
             if not e.get("attributes", {}).get("sole_source"):
                 continue
-            if e["src_id"] in origin_company_ids:
+            # 未登記受益端的 relation 兩端都查（fail safe）。
+            end = beneficiary_end.get(e["relation"])
+            ends = {"src": ["src_id"], "dst": ["dst_id"]}.get(end, ["src_id", "dst_id"])
+            for key in ends:
+                if e[key] not in origin_node_ids:
+                    continue
                 errors.append(
-                    f"WARN: edge {e['id']} 的 sole_source=true 出自供應商自報"
-                    f"（origin_entity={origin} 即 src {e['src_id']}）— "
+                    f"WARN: edge {e['id']} 的 sole_source=true 由受益方自報"
+                    f"（origin_entity={origin} 即 {key[:3]} {e[key]}）— "
                     "L8 只能算 verified_by_absence（weak），需客戶端或第三方來源印證"
                 )
+                break
+
+    # ── 4b. co:* 身分解析（registry 是唯一權威）──
+    # 類別詞被實體化成公司節點（co:nvidia_direct_customers_csp）與未具名實體
+    # （co:unnamed_ai_research_deployment_co）都會在這裡現形。實測 106 份既有抽取、
+    # 202 個 co:* 節點只有 5 個未命中，且那 5 個都是真公司待 onboard —— 訊噪比夠高才留這道檢查。
+    # 這是 WARN 不是 ERROR：未命中有兩種正當結局（幻覺→刪除、真公司→onboard），
+    # 都需要人判斷，不能由 validate 代決。
+    try:
+        registry = _load(ROOT / "config" / "company_identity.json")
+        known = {c["company_id"] for c in registry.get("companies", [])}
+    except (OSError, ValueError, KeyError):
+        known = None
+        errors.append(
+            "WARN: 無法讀取 config/company_identity.json — 跳過 co:* 身分解析檢查"
+        )
+    if known is not None:
+        for n in doc.get("nodes", []):
+            nid = n["id"]
+            if not nid.startswith("co:") or nid in known:
+                continue
+            errors.append(
+                f"WARN: node {nid}（{n.get('name')}）不在 config/company_identity.json — "
+                "須明確分流：若是把類別詞或未具名實體當成公司則刪除該節點；"
+                "若是真公司則先 onboard 進 registry 再入圖。不得靜默入圖。"
+            )
 
     # ── 3. 參照完整性 ──
     def _check_sources(owner: str, sids: list[str]) -> None:

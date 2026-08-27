@@ -120,7 +120,14 @@ def test_robotics_mini_slice_is_in_all_vocab_surfaces(tmp_path: Path) -> None:
     }
     path = tmp_path / "robotics_ontology_test.json"
     path.write_text(json.dumps(extraction), encoding="utf-8")
-    assert validate(str(path)) == []
+    errors = validate(str(path))
+
+    # 本測試問的是「robotics 字彙在每個 surface 都合法嗎」，不是「這家公司存不存在」。
+    # co:example_robotics 是刻意的合成 fixture，本來就不該進 identity registry，
+    # 所以 registry 未命中的 WARN 是預期輸出，不是失敗。硬錯誤才是。
+    hard = [e for e in errors if not e.startswith("WARN")]
+    assert hard == []
+    assert all("不在 config/company_identity.json" in e for e in errors), errors
 
 
 def test_every_vocab_term_exists_in_the_json_schema_enum() -> None:

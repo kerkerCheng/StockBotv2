@@ -248,6 +248,41 @@ Do not extract the following — they are time-varying observations or out-of-sc
 
 **Product/entity naming rule:** A specific product name or model number (e.g. "ZR/ZR+ transceivers", "Tomahawk 6") may only become a node if that exact name appears verbatim in the document. If the document only mentions a product *category* (e.g. "data center interconnect transceivers", "AI switches"), extract the category as a TechNode — do NOT infer or invent a specific product name.
 
+**Company naming rule (same discipline, applied to `co:` nodes):** A `co:` node
+requires a specific, named legal entity appearing verbatim in the document. This rule
+exists because the product rule above was in place while the company case was not, and
+extractions kept turning customer *categories* into companies.
+
+Do NOT create a `co:` node for:
+- **Customer or supplier categories.** "direct customers", "indirect customers", "CSPs",
+  "hyperscalers", "AI model makers", "our suppliers", "system integrators" are categories,
+  not companies. They are almost never worth a node at all; if the category genuinely
+  carries structure, use a TechNode at the appropriate abstraction level.
+- **Deliberately unnamed entities.** If the issuer writes "one AI research and deployment
+  company", "a market-leading AI data center customer", or "某美國客戶", the identity is
+  withheld. Record the fact in a claim, keep the verbatim quote in `sources`, and do NOT
+  guess who it is — not even when the guess seems obvious, and not even when a matching
+  company already exists in the graph. "I can infer it" and "the issuer disclosed it" are
+  different claims, and only the second one belongs in a `co:` node.
+- **Business units or brands, when the registry keys on the parent.** "Google Cloud",
+  "Microsoft Azure", "Oracle Cloud Infrastructure" are units. Use the parent company node
+  and put the unit name in `aliases`.
+
+`co:` IDs are governed by `config/company_identity.json`; `loader/validate.py` warns on any
+`co:` node missing from it. A warning there means one of two things and you must say which:
+the node is a category/unnamed-entity hallucination and should be deleted, or it is a real
+company that needs onboarding into the registry first.
+
+**Unsupported-attribute rule:** `substitutability`, `sole_source`, `ramp_execution`,
+`structural_lead_time_weeks` and `ramp_difficulty_intrinsic` describe *how hard this is to
+replace* — they are not general-purpose importance scores. Emit them **only** when the
+document actually discusses replaceability, qualification of alternatives, or exclusivity.
+If the document merely establishes that a supply relationship exists, leave them absent.
+An omitted attribute is honest and can be filled later by a document that speaks to it; a
+guessed one silently becomes a bottleneck signal that no source supports. Note the
+asymmetry in how these errors surface: guessed values make a target look *more* like a
+chokepoint, which is exactly the direction that will not feel wrong on review.
+
 ---
 
 ## 9. CLAIMS (optional — use sparingly)

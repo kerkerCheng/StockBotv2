@@ -56,6 +56,15 @@
     "competes_with",
     "constrained_by"
   ],
+  "_sole_source_beneficiary_end_comment": "sole_source=true 時，這條邊在替哪一端背書。L8 的自報檢查要問的是「宣稱獨家性的人，是不是就是受益的那一方」，不是「src 是不是 origin」。supplies_to 的獨家性抬高 src（我是唯一供應商）；depends_on 的獨家性抬高 dst（沒有人能取代 B）。方向弄反會同時漏抓與誤抓：issuer 自承「我依賴 B」是不利益陳述，反而可信，不該警告。未列出的 relation 一律兩端都查（fail safe）。唯一 loader 是 loader/validate.py。新增 relation 時要順便決定它的受益端。",
+  "sole_source_beneficiary_end": {
+    "supplies_to": "src",
+    "depends_on": "dst",
+    "licenses_to": "src",
+    "is_component_of": "src",
+    "enables": "src",
+    "constrained_by": "dst"
+  },
   "qualification_status": [
     "none",
     "sampling",

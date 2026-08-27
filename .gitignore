@@ -72,6 +72,10 @@ library/raw/Nvidia_q1fy27.txt
 extractions/*
 !extractions/.gitkeep
 !extractions/*.json
+# 抽取 review 紀錄：自動抽取產出後人工移除／修正了什麼。與 .json 並列，
+# 必須跟著進 Git——否則下一個 agent 只看得到通過 validate 的成品，
+# 看不到哪些幻覺屬性被拿掉、為什麼不建某條邊。
+!extractions/*.review.md
 extractions/broadcom_q2fy26_cpo.json
 extractions/coherent_ofc_march25.json
 extractions/coherent_q2fy26_cpo.json
