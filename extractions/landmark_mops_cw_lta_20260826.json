@@ -1,0 +1,69 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "landmark_mops_cw_lta_20260826",
+    "title": "聯亞董事會通過與某美國客戶簽訂四年 CW 雷射長期供貨合約",
+    "url": "https://tw.stock.yahoo.com/news/%E8%81%AF%E4%BA%9E-%E5%85%AC%E5%91%8A%E6%9C%AC%E5%85%AC%E5%8F%B8%E8%91%A3%E4%BA%8B%E6%9C%83%E6%B1%BA%E8%AD%B0%E9%80%9A%E9%81%8E%E8%88%87%E5%AE%A2%E6%88%B6%E7%B0%BD%E8%A8%82%E9%95%B7%E6%9C%9F%E4%BE%9B%E8%B2%A8%E5%90%88%E7%B4%84-060900851.html",
+    "origin_entity": "LandMark Optoelectronics Corporation",
+    "publisher": "Taiwan MOPS via MoneyDJ/Yahoo Finance carrier",
+    "published_at": "2026-08-26",
+    "retrieved_at": "2026-08-27",
+    "source_type": "filing",
+    "evidence_tier": 1,
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "Public MOPS material announcement; retain the canonical carrier URL and only the research-relevant excerpt."
+  },
+  "sources": [
+    {
+      "id": "landmark_mops_cw_lta_20260826_s1",
+      "locator": "MOPS announcement items 2, 4 and 5",
+      "quote": "契約或承諾相對人：某美國客戶；契約起迄日期為116年至119年；客戶為確保數據中心用CW雷射產品足量供應，與公司簽訂四年長期採購合約。"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:landmark_optoelectronics",
+      "type": "Company",
+      "name": "LandMark Optoelectronics Corporation",
+      "abstraction_level": "device_chip",
+      "role": "bottleneck_supplier",
+      "aliases": ["LandMark Optoelectronics", "聯亞光電", "3081.TWO"],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": ["landmark_mops_cw_lta_20260826_s1"]
+    },
+    {
+      "id": "tech:cw_dfb_laser",
+      "type": "TechNode",
+      "name": "Continuous-wave DFB laser",
+      "abstraction_level": "device_chip",
+      "role": "bottleneck_supplier",
+      "aliases": ["CW laser", "CW雷射"],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": ["landmark_mops_cw_lta_20260826_s1"]
+    }
+  ],
+  "edges": [
+    {
+      "id": "landmark_mops_cw_lta_20260826_e1",
+      "src_id": "co:landmark_optoelectronics",
+      "dst_id": "tech:cw_dfb_laser",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.85,
+      "source_ids": ["landmark_mops_cw_lta_20260826_s1"]
+    }
+  ],
+  "claims": [
+    {
+      "id": "landmark_mops_cw_lta_20260826_cl1",
+      "statement": "LandMark Optoelectronics signed a four-year long-term purchase agreement with an unnamed U.S. customer for sufficient supply of data-center CW laser products from 2027 through 2030; the announcement does not disclose customer identity, value, minimum volume, price, exclusivity, or any NVIDIA relationship.",
+      "subject_id": "landmark_mops_cw_lta_20260826_e1",
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Downgrade if LandMark later discloses that the agreement was terminated or materially narrowed, or that the product scope or 2027-2030 term differs from this announcement.",
+      "confidence": 0.9,
+      "source_ids": ["landmark_mops_cw_lta_20260826_s1"]
+    }
+  ]
+}
