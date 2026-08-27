@@ -1,0 +1,122 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "nvda_10_q_20260826",
+    "title": "NVIDIA Q2 FY2027 Form 10-Q — 客戶集中度與 supply/capacity commitments（curated excerpt）",
+    "source_type": "filing",
+    "evidence_tier": 1,
+    "origin_entity": "NVIDIA Corporation",
+    "url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000075/nvda-20260726.htm",
+    "published_at": "2026-08-26"
+  },
+  "sources": [
+    {
+      "id": "nvda_10_q_20260826_s1",
+      "locator": "Note 7 - Supplemental Financial Statement Information",
+      "quote": "We refer to customers who purchase products directly from NVIDIA as direct customers, such as add-in board manufacturers, or AIBs, distributors, original design manufacturers, or ODMs, original equipment manufacturers, or OEMs, cloud service providers, or CSPs, AI model makers, and system integrators."
+    },
+    {
+      "id": "nvda_10_q_20260826_s2",
+      "locator": "Note 7 - Supplemental Financial Statement Information",
+      "quote": "Five direct customers accounted for 22 %, 14 %, 13 %, 11 %, and 10 % of our accounts receivable balance as of July 26, 2026."
+    },
+    {
+      "id": "nvda_10_q_20260826_s3",
+      "locator": "Note 10 - Commitments and Contingencies",
+      "quote": "Supply and capacity $ 92 $ 87 $ 88 $ 6 $ 5 $ 1 $ 279 ... increasing supply commitments from $ 119 billion last quarter to $ 279 billion as of July 26, 2026."
+    },
+    {
+      "id": "nvda_10_q_20260826_s4",
+      "locator": "Note 10 - Commitments and Contingencies",
+      "quote": "These supply commitments are for our data center infrastructure systems, primarily memory and manufacturing facilities, to produce our products for long-term demand across current and future product architectures."
+    },
+    {
+      "id": "nvda_10_q_20260826_s5",
+      "locator": "Note 10 - Commitments and Contingencies",
+      "quote": "We enter into agreements with our suppliers that allow them to procure inventory based upon our defined criteria, and in certain instances, these agreements may be cancelable, rescheduled, or adjustable for our business needs prior to placing firm orders."
+    },
+    {
+      "id": "nvda_10_q_20260826_s6",
+      "locator": "Geographic Revenue / Segment Note",
+      "quote": "Revenue by geographic region is designated based on the location of the headquarters of direct customers. United States $ 60,074 ... Taiwan 26,985 ... China (including Hong Kong) 7,880 ... Total revenue $ 96,221"
+    },
+    {
+      "id": "nvda_10_q_20260826_s7",
+      "locator": "Geographic Revenue / Segment Note — direct/indirect customer concentration",
+      "quote": "For the second quarter of fiscal year 2027, one direct customer represented 16 % of total revenue, which was primarily attributable to the Compute & Networking segment."
+    },
+    {
+      "id": "nvda_10_q_20260826_s8",
+      "locator": "Geographic Revenue / Segment Note — direct/indirect customer concentration",
+      "quote": "For the first half of fiscal year 2027, three direct customers represented 16 %, 15 %, and 13 % of total revenue, all of which was primarily attributable to the Compute & Networking segment."
+    },
+    {
+      "id": "nvda_10_q_20260826_s9",
+      "locator": "Geographic Revenue / Segment Note — indirect customer definition",
+      "quote": "We refer to indirect customers as those who purchase products through our direct customers; indirect customers include CSPs, AI clouds, AI model makers, enterprises, and public sector entities."
+    },
+    {
+      "id": "nvda_10_q_20260826_s10",
+      "locator": "MD&A — Indirect Customers",
+      "quote": "We estimate that one AI research and deployment company contributed a meaningful amount of our revenue by purchasing cloud services from our customers in the second quarter and first half of fiscal year 2027."
+    },
+    {
+      "id": "nvda_10_q_20260826_s11",
+      "locator": "Revenue by Market Platform",
+      "quote": "Revenue by Market Platform Data Center $ 89,023 ... Hyperscale 48,710 ... AI Clouds, Industrial, & Enterprise 40,313 ... Edge Computing 7,198 ... Total revenue $ 96,221"
+    },
+    {
+      "id": "nvda_10_q_20260826_s12",
+      "locator": "MD&A — Indirect Customers",
+      "quote": "Indirect customers primarily purchase our products through system integrators and distributors. We generate a significant amount of our revenue from a limited number of indirect customers, some individually representing 10% or more of our revenue."
+    },
+    {
+      "id": "nvda_10_q_20260826_s13",
+      "locator": "Note 10 - Commitments and Contingencies",
+      "quote": "Cloud service agreements 3 8 7 6 4 1 29 Data center leases not commenced — 1 1 2 1 20 25 Equity investments 18 3 2 2 — — 25 Capital expenditures 7 1 — — — — 8 Total $ 120 $ 100 $ 98 $ 16 $ 10 $ 22 $ 366"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:nvidia",
+      "type": "Company",
+      "name": "NVIDIA Corporation",
+      "abstraction_level": "device_chip",
+      "role": "leader",
+      "aliases": [
+        "NVIDIA"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "nvda_10_q_20260826_s1"
+      ]
+    }
+  ],
+  "edges": [],
+  "claims": [
+    {
+      "id": "nvda_10_q_20260826_cl1",
+      "statement": "NVIDIA disclosed that supply and capacity commitments increased from $119 billion in the prior quarter to $279 billion as of 2026-07-26, with total future commitments of $366 billion across fiscal 2027 through 2032+. The issuer describes these commitments as being for data center infrastructure systems, 'primarily memory and manufacturing facilities'. The issuer does NOT name any supplier, and does not disclose the split between memory and manufacturing, so no supplier-level or component-level (HBM vs DRAM) attribution is supported by this document.",
+      "subject_id": "co:nvidia",
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Revise if a subsequent NVIDIA filing discloses a material reduction in total supply and capacity commitments below the $279 billion level, or restates the fiscal-year phasing. 核查頻率：每季 10-Q/10-K；觸發後 48 小時內人工 review。",
+      "confidence": 0.9,
+      "source_ids": [
+        "nvda_10_q_20260826_s3",
+        "nvda_10_q_20260826_s4"
+      ]
+    },
+    {
+      "id": "nvda_10_q_20260826_cl2",
+      "statement": "NVIDIA's supply commitments are not uniformly firm: the issuer states that supplier agreements allow suppliers to procure inventory based on NVIDIA's defined criteria and 'in certain instances, these agreements may be cancelable, rescheduled, or adjustable for our business needs prior to placing firm orders.' The $279 billion figure therefore cannot be read as fully committed non-cancelable demand.",
+      "subject_id": "co:nvidia",
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Revise if NVIDIA later discloses that substantially all such commitments have converted to firm, non-cancelable purchase orders. 核查頻率：每季 10-Q/10-K；觸發後 48 小時內人工 review。",
+      "confidence": 0.9,
+      "source_ids": [
+        "nvda_10_q_20260826_s5"
+      ]
+    }
+  ]
+}

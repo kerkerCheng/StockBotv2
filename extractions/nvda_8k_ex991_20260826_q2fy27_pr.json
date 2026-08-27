@@ -1,0 +1,425 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "nvda_8k_ex991_20260826_q2fy27_pr",
+    "title": "NVIDIA Q2 FY2027 8-K EX-99.1 業績新聞稿 — Spectrum-6 CPO 出貨與 SK hynix memory 合作",
+    "source_type": "filing",
+    "evidence_tier": 1,
+    "origin_entity": "NVIDIA Corporation",
+    "url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000073/q2fy27pr.htm",
+    "published_at": "2026-08-26"
+  },
+  "sources": [
+    {
+      "id": "nvda_8k_ex991_20260826_q2fy27_pr_s1",
+      "locator": "Section A — headline metrics",
+      "quote": "Revenue of $96.2 billion, up 106% from a year ago • Data Center revenue of $89.0 billion, up 117% from a year ago"
+    },
+    {
+      "id": "nvda_8k_ex991_20260826_q2fy27_pr_s2",
+      "locator": "Section A — CEO quote",
+      "quote": "AI has reached its inflection point. It's doing useful work. Its tokens are productive and profitable. Now, compute is revenue... The AI infrastructure buildout is at full steam."
+    },
+    {
+      "id": "nvda_8k_ex991_20260826_q2fy27_pr_s3",
+      "locator": "Section A — CEO quote, Vera Rubin",
+      "quote": "Vera Rubin, now in full production, was built to power exactly this moment."
+    },
+    {
+      "id": "nvda_8k_ex991_20260826_q2fy27_pr_s4",
+      "locator": "Section B — Data Center highlights, Vera Rubin ramp",
+      "quote": "Announced the NVIDIA Vera Rubin platform is ramping into full production with racks running at partners including CoreWeave, Google Cloud, Microsoft Azure, Oracle Cloud Infrastructure and Nebius."
+    },
+    {
+      "id": "nvda_8k_ex991_20260826_q2fy27_pr_s5",
+      "locator": "Section B — Data Center highlights, Spectrum-6 CPO",
+      "quote": "Revealed that NVIDIA Spectrum™-6 switch systems — supporting both pluggable and co-packaged optics as part of the NVIDIA Vera Rubin platform — are arriving across the world's gigascale AI factories."
+    },
+    {
+      "id": "nvda_8k_ex991_20260826_q2fy27_pr_s6",
+      "locator": "Section B — Data Center highlights, SK hynix",
+      "quote": "Announced a multiyear technology partnership with SK hynix to advance next-generation memory for the global AI factory buildout."
+    },
+    {
+      "id": "nvda_8k_ex991_20260826_q2fy27_pr_s7",
+      "locator": "Section B — Data Center highlights, capital platforms",
+      "quote": "Announced strategic partnerships to establish independent compute financing platforms with Apollo, BlackRock, Blackstone, Brookfield, Goldman Sachs and KKR to mobilize over $500 billion of third-party capital for the buildout of AI infrastructure over time, subject to definitive agreements."
+    },
+    {
+      "id": "nvda_8k_ex991_20260826_q2fy27_pr_s8",
+      "locator": "Section B — Data Center highlights, Vera Rubin partners",
+      "quote": "racks running at partners including CoreWeave, Google Cloud, Microsoft Azure, Oracle Cloud Infrastructure and Nebius."
+    },
+    {
+      "id": "nvda_8k_ex991_20260826_q2fy27_pr_s9",
+      "locator": "Section B — Data Center highlights, Korea",
+      "quote": "Expanded Korea's AI factory ecosystem through strategic partnerships with SK Telecom, NAVER and Brookfield to build sovereign AI infrastructure at gigawatt scale on the NVIDIA DSX platform…"
+    },
+    {
+      "id": "nvda_8k_ex991_20260826_q2fy27_pr_s10",
+      "locator": "Section B — Data Center highlights, Groq 3 LPX",
+      "quote": "Announced that NVIDIA Groq 3 LPX, the interactive AI inference accelerator, is now in full production."
+    },
+    {
+      "id": "nvda_8k_ex991_20260826_q2fy27_pr_s11",
+      "locator": "Section B — Data Center highlights, SpaceXAI",
+      "quote": "Announced that SpaceXAI will deploy NVIDIA Vera CPUs to accelerate its next generation of agentic AI applications."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:nvidia",
+      "type": "Company",
+      "name": "NVIDIA Corporation",
+      "abstraction_level": "device_chip",
+      "role": "leader",
+      "aliases": [
+        "NVIDIA"
+      ],
+      "attributes": {},
+      "confidence": 0.95,
+      "source_ids": [
+        "nvda_8k_ex991_20260826_q2fy27_pr_s1"
+      ]
+    },
+    {
+      "id": "prod:vera_verarubin",
+      "type": "Product",
+      "name": "Vera / VeraRubin CPU Platform",
+      "abstraction_level": "network_systems",
+      "role": null,
+      "aliases": [
+        "Vera Rubin",
+        "NVIDIA Vera Rubin platform"
+      ],
+      "attributes": {},
+      "confidence": 0.95,
+      "source_ids": [
+        "nvda_8k_ex991_20260826_q2fy27_pr_s3",
+        "nvda_8k_ex991_20260826_q2fy27_pr_s4"
+      ]
+    },
+    {
+      "id": "prod:spectrum_6",
+      "type": "Product",
+      "name": "NVIDIA Spectrum-6 switch systems",
+      "abstraction_level": "network_systems",
+      "role": null,
+      "aliases": [
+        "Spectrum-6"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "nvda_8k_ex991_20260826_q2fy27_pr_s5"
+      ]
+    },
+    {
+      "id": "tech:cpo",
+      "type": "TechNode",
+      "name": "Co-Packaged Optics (CPO)",
+      "abstraction_level": "module_subsystem",
+      "role": null,
+      "aliases": [
+        "co-packaged optics"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "nvda_8k_ex991_20260826_q2fy27_pr_s5"
+      ]
+    },
+    {
+      "id": "tech:pluggable_transceiver",
+      "type": "TechNode",
+      "name": "Pluggable optical transceiver",
+      "abstraction_level": "module_subsystem",
+      "role": null,
+      "aliases": [
+        "pluggable optics",
+        "pluggable transceivers"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "nvda_8k_ex991_20260826_q2fy27_pr_s5"
+      ]
+    },
+    {
+      "id": "co:sk_hynix",
+      "type": "Company",
+      "name": "SK hynix",
+      "abstraction_level": "device_chip",
+      "role": "bottleneck_supplier",
+      "aliases": [
+        "SK Hynix"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "nvda_8k_ex991_20260826_q2fy27_pr_s6"
+      ]
+    },
+    {
+      "id": "co:coreweave",
+      "type": "Company",
+      "name": "CoreWeave",
+      "abstraction_level": "end_demand",
+      "role": "adjacent_silicon",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "nvda_8k_ex991_20260826_q2fy27_pr_s4"
+      ]
+    },
+    {
+      "id": "co:google",
+      "type": "Company",
+      "name": "Google",
+      "abstraction_level": "end_demand",
+      "role": "adjacent_silicon",
+      "aliases": [
+        "Google Cloud"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "source_ids": [
+        "nvda_8k_ex991_20260826_q2fy27_pr_s4"
+      ]
+    },
+    {
+      "id": "co:nebius",
+      "type": "Company",
+      "name": "Nebius",
+      "abstraction_level": "end_demand",
+      "role": "adjacent_silicon",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "nvda_8k_ex991_20260826_q2fy27_pr_s4"
+      ]
+    },
+    {
+      "id": "co:microsoft",
+      "type": "Company",
+      "name": "Microsoft",
+      "abstraction_level": "end_demand",
+      "role": "adjacent_silicon",
+      "aliases": [
+        "Microsoft Azure",
+        "Azure"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "source_ids": [
+        "nvda_8k_ex991_20260826_q2fy27_pr_s4"
+      ]
+    },
+    {
+      "id": "co:oracle",
+      "type": "Company",
+      "name": "Oracle",
+      "abstraction_level": "end_demand",
+      "role": "adjacent_silicon",
+      "aliases": [
+        "Oracle Cloud Infrastructure",
+        "OCI"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "source_ids": [
+        "nvda_8k_ex991_20260826_q2fy27_pr_s4"
+      ]
+    },
+    {
+      "id": "co:spacexai",
+      "type": "Company",
+      "name": "SpaceXAI",
+      "abstraction_level": "end_demand",
+      "role": "adjacent_silicon",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "nvda_8k_ex991_20260826_q2fy27_pr_s11"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "nvda_8k_ex991_20260826_q2fy27_pr_e1",
+      "src_id": "co:nvidia",
+      "dst_id": "prod:spectrum_6",
+      "relation": "develops",
+      "attributes": {},
+      "confidence": 0.95,
+      "source_ids": [
+        "nvda_8k_ex991_20260826_q2fy27_pr_s5"
+      ]
+    },
+    {
+      "id": "nvda_8k_ex991_20260826_q2fy27_pr_e2",
+      "src_id": "prod:spectrum_6",
+      "dst_id": "prod:vera_verarubin",
+      "relation": "is_component_of",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "nvda_8k_ex991_20260826_q2fy27_pr_s5"
+      ]
+    },
+    {
+      "id": "nvda_8k_ex991_20260826_q2fy27_pr_e3",
+      "src_id": "prod:spectrum_6",
+      "dst_id": "tech:cpo",
+      "relation": "depends_on",
+      "attributes": {
+        "qualification_status": "designed_in"
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "nvda_8k_ex991_20260826_q2fy27_pr_s5"
+      ]
+    },
+    {
+      "id": "nvda_8k_ex991_20260826_q2fy27_pr_e4",
+      "src_id": "prod:spectrum_6",
+      "dst_id": "tech:pluggable_transceiver",
+      "relation": "depends_on",
+      "attributes": {
+        "qualification_status": "designed_in"
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "nvda_8k_ex991_20260826_q2fy27_pr_s5"
+      ]
+    },
+    {
+      "id": "nvda_8k_ex991_20260826_q2fy27_pr_e6",
+      "src_id": "co:nvidia",
+      "dst_id": "co:sk_hynix",
+      "relation": "partnership_with",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "nvda_8k_ex991_20260826_q2fy27_pr_s6"
+      ]
+    },
+    {
+      "id": "nvda_8k_ex991_20260826_q2fy27_pr_e7",
+      "src_id": "co:coreweave",
+      "dst_id": "prod:vera_verarubin",
+      "relation": "deploys",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "nvda_8k_ex991_20260826_q2fy27_pr_s4"
+      ]
+    },
+    {
+      "id": "nvda_8k_ex991_20260826_q2fy27_pr_e8",
+      "src_id": "co:google",
+      "dst_id": "prod:vera_verarubin",
+      "relation": "deploys",
+      "attributes": {},
+      "confidence": 0.85,
+      "source_ids": [
+        "nvda_8k_ex991_20260826_q2fy27_pr_s4"
+      ]
+    },
+    {
+      "id": "nvda_8k_ex991_20260826_q2fy27_pr_e9",
+      "src_id": "co:nebius",
+      "dst_id": "prod:vera_verarubin",
+      "relation": "deploys",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "nvda_8k_ex991_20260826_q2fy27_pr_s4"
+      ]
+    },
+    {
+      "id": "nvda_8k_ex991_20260826_q2fy27_pr_e10",
+      "src_id": "co:microsoft",
+      "dst_id": "prod:vera_verarubin",
+      "relation": "deploys",
+      "attributes": {},
+      "confidence": 0.85,
+      "source_ids": [
+        "nvda_8k_ex991_20260826_q2fy27_pr_s4"
+      ]
+    },
+    {
+      "id": "nvda_8k_ex991_20260826_q2fy27_pr_e11",
+      "src_id": "co:oracle",
+      "dst_id": "prod:vera_verarubin",
+      "relation": "deploys",
+      "attributes": {},
+      "confidence": 0.85,
+      "source_ids": [
+        "nvda_8k_ex991_20260826_q2fy27_pr_s4"
+      ]
+    },
+    {
+      "id": "nvda_8k_ex991_20260826_q2fy27_pr_e12",
+      "src_id": "co:spacexai",
+      "dst_id": "prod:vera_verarubin",
+      "relation": "deploys",
+      "attributes": {},
+      "confidence": 0.85,
+      "source_ids": [
+        "nvda_8k_ex991_20260826_q2fy27_pr_s11"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "nvda_8k_ex991_20260826_q2fy27_pr_cl1",
+      "statement": "NVIDIA states that Spectrum-6 switch systems, described as supporting both pluggable and co-packaged optics as part of the NVIDIA Vera Rubin platform, are arriving across gigascale AI factories. This is issuer-side confirmation that CPO has reached shipping deployment in NVIDIA's switch line. It is simultaneously counter-evidence to any thesis that CPO is the sole viable interconnect for this generation: the same platform ships pluggable optics as a co-equal option, and the issuer states neither which is primary nor any volume split. No optical component supplier is named anywhere in this document. The pluggable alternative is recorded against the graph's existing tech:pluggable_transceiver node, which already carries a competes_with relationship to tech:cpo from prior sources; this document adds Spectrum-6 as a product that ships both.",
+      "subject_id": "nvda_8k_ex991_20260826_q2fy27_pr_e3",
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Downgrade the CPO-adoption reading if NVIDIA or its customers later disclose that Spectrum-6 gigascale deployments are predominantly pluggable, or if CPO variants slip out of volume shipment. Strengthen only when a customer-side or third-party source discloses CPO attach rate or names a CPO optical supplier. 核查頻率：每季財報與 OFC/ECOC；觸發後 48 小時內人工 review。",
+      "confidence": 0.9,
+      "source_ids": [
+        "nvda_8k_ex991_20260826_q2fy27_pr_s5"
+      ]
+    },
+    {
+      "id": "nvda_8k_ex991_20260826_q2fy27_pr_cl2",
+      "statement": "NVIDIA announced a multiyear technology partnership with SK hynix to advance next-generation memory for the global AI factory buildout. The issuer characterises this as a technology partnership, not an investment and not a supply contract, and discloses no volume, value, exclusivity or duration beyond the word multiyear. SK hynix being named does not establish that any other memory maker was excluded: absence of mention is not evidence of absence.",
+      "subject_id": "nvda_8k_ex991_20260826_q2fy27_pr_e6",
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Revise if either party discloses termination, or if the partnership is later described as carrying exclusivity that would displace other memory suppliers. 核查頻率：每季財報；觸發後 48 小時內人工 review。",
+      "confidence": 0.9,
+      "source_ids": [
+        "nvda_8k_ex991_20260826_q2fy27_pr_s6"
+      ]
+    },
+    {
+      "id": "nvda_8k_ex991_20260826_q2fy27_pr_cl3",
+      "statement": "NVIDIA announced strategic partnerships with Apollo, BlackRock, Blackstone, Brookfield, Goldman Sachs and KKR to establish independent compute financing platforms to mobilize over USD 500 billion of third-party capital for AI infrastructure buildout. The issuer explicitly qualifies this as subject to definitive agreements, so it is an announced intent rather than executed financing.",
+      "subject_id": "co:nvidia",
+      "demand_proof_level": "guided",
+      "disproof_condition": "Downgrade to speculative if definitive agreements are not disclosed within four quarters, or if the mobilized amount is later restated materially below USD 500 billion. 核查頻率：每季財報；觸發後 48 小時內人工 review。",
+      "confidence": 0.75,
+      "source_ids": [
+        "nvda_8k_ex991_20260826_q2fy27_pr_s7"
+      ]
+    },
+    {
+      "id": "nvda_8k_ex991_20260826_q2fy27_pr_cl4",
+      "statement": "NVIDIA names CoreWeave, Google Cloud, Microsoft Azure, Oracle Cloud Infrastructure and Nebius as partners running Vera Rubin racks in full production, and separately states that SpaceXAI will deploy NVIDIA Vera CPUs for agentic AI applications. These are issuer-side statements of deployment; the issuer discloses no volumes, no contract values and no exclusivity for any named partner. Note the wording difference: the five rack partners are described as already running, while SpaceXAI is described in the future tense (will deploy).",
+      "subject_id": "prod:vera_verarubin",
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Revise if any named partner discloses that it has paused, cancelled or materially reduced its Vera Rubin deployment, or if NVIDIA stops naming these partners in subsequent quarters. 核查頻率：每季財報；觸發後 48 小時內人工 review。",
+      "confidence": 0.85,
+      "source_ids": [
+        "nvda_8k_ex991_20260826_q2fy27_pr_s4",
+        "nvda_8k_ex991_20260826_q2fy27_pr_s8",
+        "nvda_8k_ex991_20260826_q2fy27_pr_s11"
+      ]
+    }
+  ]
+}
