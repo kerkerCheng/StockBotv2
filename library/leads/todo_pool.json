@@ -1187,11 +1187,6 @@
       "resolution": null,
       "resolved_at": null,
       "source": "research_action",
-      "source_cleared": {
-        "at": "2026-08-27T01:35:12.363545+00:00",
-        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
-        "source_healthy": true
-      },
       "title": "Meta Vistara CXL 記憶體擴充平台",
       "type": "ra_admission",
       "waiting_on": {
@@ -2700,11 +2695,6 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
-      "source_cleared": {
-        "at": "2026-08-27T01:35:12.363545+00:00",
-        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
-        "source_healthy": true
-      },
       "title": "REVIEW — co:sivers_semiconductors",
       "type": "decision_review",
       "waiting_on": {
@@ -3224,11 +3214,6 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
-      "source_cleared": {
-        "at": "2026-08-27T01:35:12.363545+00:00",
-        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
-        "source_healthy": true
-      },
       "title": "REVIEW — co:agility_robotics",
       "type": "decision_review",
       "waiting_on": {
@@ -3680,11 +3665,6 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
-      "source_cleared": {
-        "at": "2026-08-27T01:35:12.363545+00:00",
-        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
-        "source_healthy": true
-      },
       "title": "REVIEW — co:marvell_technology",
       "type": "decision_review",
       "waiting_on": {
@@ -3762,11 +3742,6 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
-      "source_cleared": {
-        "at": "2026-08-27T01:35:12.363545+00:00",
-        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
-        "source_healthy": true
-      },
       "title": "REVIEW — co:harmonic_drive_systems",
       "type": "decision_review"
     },
@@ -3780,11 +3755,6 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
-      "source_cleared": {
-        "at": "2026-08-27T01:35:12.363545+00:00",
-        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
-        "source_healthy": true
-      },
       "title": "REVIEW — co:schaeffler",
       "type": "decision_review"
     },
@@ -3858,6 +3828,42 @@
       "source": "manual",
       "title": "確認聯亞光電（3081.TWO）decision catalyst／disproof — 修 [234] 入圖後的 +72h 假鬧鐘",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-08-27T22:41:25.012489+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-03-31T00:00:00+00:00；來源=library/raw/hds_6324_tanshin_fy2026_20260513.txt | 6324 2026年3月期 決算短信（TDnet 2026",
+      "n": 236,
+      "reason": null,
+      "ref_id": "po_b8f9afb7bc0f348a846e90b877b6b5fb",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "engine_c",
+      "title": "Engine C 觀測：6324.T / backlog",
+      "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-08-27T22:41:25.012489+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-03-31T00:00:00+00:00；來源=library/raw/hds_6324_tanshin_fy2026_20260513.txt | 6324 2026年3月期 決算短信（TDnet 2026",
+      "n": 237,
+      "reason": null,
+      "ref_id": "po_bd21eedb1c22737e32e7250dc8181b95",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "engine_c",
+      "title": "Engine C 觀測：6324.T / customer_concentration",
+      "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-08-27T22:41:25.012489+00:00",
+      "hint": "coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "n": 238,
+      "reason": null,
+      "ref_id": "dc_f94148d8545de35cb2c5d048640b913e",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:landmark_optoelectronics",
+      "type": "decision_review"
     }
   ],
   "log": [
@@ -8777,8 +8783,92 @@
       "ref_id": "dc_cc46527aac12ba14191ee71c0460f3fe",
       "type": "decision_review",
       "verb": "pq1_awaiting_approval"
+    },
+    {
+      "at": "2026-08-27T22:41:25.012489+00:00",
+      "n": 81,
+      "prior_source_cleared": {
+        "at": "2026-08-27T01:35:12.363545+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
+      "reason": "來源再次產出此項，撤銷完成候選標記",
+      "receipt": null,
+      "ref_id": "ra_50f3ddb6cfe718afd7e2ef8b0481e686",
+      "type": "ra_admission",
+      "verb": "source_returned"
+    },
+    {
+      "at": "2026-08-27T22:41:25.012489+00:00",
+      "n": 168,
+      "prior_source_cleared": {
+        "at": "2026-08-27T01:35:12.363545+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
+      "reason": "來源再次產出此項，撤銷完成候選標記",
+      "receipt": null,
+      "ref_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
+      "type": "decision_review",
+      "verb": "source_returned"
+    },
+    {
+      "at": "2026-08-27T22:41:25.012489+00:00",
+      "n": 200,
+      "prior_source_cleared": {
+        "at": "2026-08-27T01:35:12.363545+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
+      "reason": "來源再次產出此項，撤銷完成候選標記",
+      "receipt": null,
+      "ref_id": "dc_6ae5b014dbbcd0774b45487542c9a102",
+      "type": "decision_review",
+      "verb": "source_returned"
+    },
+    {
+      "at": "2026-08-27T22:41:25.012489+00:00",
+      "n": 224,
+      "prior_source_cleared": {
+        "at": "2026-08-27T01:35:12.363545+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
+      "reason": "來源再次產出此項，撤銷完成候選標記",
+      "receipt": null,
+      "ref_id": "dc_0fca807c963dc3b9888e0f83ba6d45a5",
+      "type": "decision_review",
+      "verb": "source_returned"
+    },
+    {
+      "at": "2026-08-27T22:41:25.012489+00:00",
+      "n": 229,
+      "prior_source_cleared": {
+        "at": "2026-08-27T01:35:12.363545+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
+      "reason": "pq1 work order 尚在進行或等待 exact gate，撤銷完成候選標記",
+      "receipt": "bounded research 完成，[194] 指出的正解路徑已走通。改抓 6324 2026年3月期 決算短信（TDnet 2026-05-13，Yahoo Japan carrier 鏡像 PDF，29 頁 / 30,344 字，pypdf 抽取）。⚠ 官方 IR 頁面決算短信 PDF 為動態載入，與 [194] 當初判定「可抽文字為 0」同因；EDINET API v2 需 subscription key（未申請），故走 TDnet 正本鏡像。逐字存於 library/raw/hds_6324_tanshin_fy2026_20260513.txt。清除 2 個 blocker：(1) customer_concentration —— FY2026/3 已無單一客戶達營收 10%，issuer 逐字「日産自動車株式会社に対する販売高は…100分の10に満たないため記載しておりません」，前期日産為 5,733,870 千円 10.3%；⚠ 日本準則只揭露達 10% 者，故前三大合計%不可得，本次記錄的是上界不是精確值。(2) backlog —— 受注残高 21,873,106 千円 +13.6%、受注高 61,613,382 千円 +16.2%，含分部別（日本-減速装置 +42.4% 最強），issuer 註5 已扣除 434,546 千円受注取消額。⚠ 全文未出現 humanoid／人形機器人分類，backlog 成長不得歸因於該用途（L6 Gap 4）。Engine C 提案 po_bd21eedb1c22737e32e7250dc8181b95（customer_concentration）與 po_b8f9afb7bc0f348a846e90b877b6b5fb（backlog）待使用者核准寫入 ledger。counter_path_missing／independent_source_missing／financial_runway_manual_required 仍未清。",
+      "ref_id": "dc_cc46527aac12ba14191ee71c0460f3fe",
+      "type": "decision_review",
+      "verb": "source_returned"
+    },
+    {
+      "at": "2026-08-27T22:41:25.012489+00:00",
+      "n": 230,
+      "prior_source_cleared": {
+        "at": "2026-08-27T01:35:12.363545+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
+      "reason": "來源再次產出此項，撤銷完成候選標記",
+      "receipt": null,
+      "ref_id": "dc_912a03a50135ea5e29000a0417c3f477",
+      "type": "decision_review",
+      "verb": "source_returned"
     }
   ],
-  "next_n": 236,
+  "next_n": 239,
   "schema_version": "1"
 }
