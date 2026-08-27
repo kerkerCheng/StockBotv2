@@ -3748,7 +3748,13 @@
     },
     {
       "added_at": "2026-08-25T13:30:44.275553+00:00",
-      "deferred_at": "2026-08-25T23:43:27.800717+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_1a7bdffc5ee4c80cd89da79ea90f13f5",
+      "dispatch_receipt": "bounded research 完成，[194] 指出的正解路徑已走通。改抓 6324 2026年3月期 決算短信（TDnet 2026-05-13，Yahoo Japan carrier 鏡像 PDF，29 頁 / 30,344 字，pypdf 抽取）。⚠ 官方 IR 頁面決算短信 PDF 為動態載入，與 [194] 當初判定「可抽文字為 0」同因；EDINET API v2 需 subscription key（未申請），故走 TDnet 正本鏡像。逐字存於 library/raw/hds_6324_tanshin_fy2026_20260513.txt。清除 2 個 blocker：(1) customer_concentration —— FY2026/3 已無單一客戶達營收 10%，issuer 逐字「日産自動車株式会社に対する販売高は…100分の10に満たないため記載しておりません」，前期日産為 5,733,870 千円 10.3%；⚠ 日本準則只揭露達 10% 者，故前三大合計%不可得，本次記錄的是上界不是精確值。(2) backlog —— 受注残高 21,873,106 千円 +13.6%、受注高 61,613,382 千円 +16.2%，含分部別（日本-減速装置 +42.4% 最強），issuer 註5 已扣除 434,546 千円受注取消額。⚠ 全文未出現 humanoid／人形機器人分類，backlog 成長不得歸因於該用途（L6 Gap 4）。Engine C 提案 po_bd21eedb1c22737e32e7250dc8181b95（customer_concentration）與 po_b8f9afb7bc0f348a846e90b877b6b5fb（backlog）待使用者核准寫入 ledger。counter_path_missing／independent_source_missing／financial_runway_manual_required 仍未清。",
+      "dispatch_ref": "wo_04f0da1c5164221bffdb821491114ec4",
+      "dispatch_status": "awaiting_approval",
+      "dispatch_updated_at": "2026-08-27T17:59:26.833894+00:00",
+      "dispatched_at": "2026-08-27T17:58:38.153775+00:00",
       "hint": "coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 229,
       "reason": null,
@@ -3840,6 +3846,18 @@
       "source": "research_action",
       "title": "聯亞四年 CW 雷射長約與客戶未具名邊界",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-08-27T18:01:48.877583+00:00",
+      "hint": "TL;DR：聯亞光電（LandMark Optoelectronics，3081.TWO，台灣上櫃）2026-08-26 公告與「某美國客戶」簽訂 2027–2030 四年資料中心用 CW 雷射長期採購合約，已於 2026-08-27 經 [234] 入圖並自動建立 cohort dc_f94148d8。但 decision 沒有 catalyst 與 disproof，系統套 +72h 預設 expiry（2026-08-30，後天到期）。成因同 Harmonic [197]：入圖當下沒補，不是外部事件。\n\n圖中位置：co:axt -supplies_to-> co:landmark_optoelectronics -supplies_to-> tech:cw_dfb_laser，而 tech:cw_dfb_laser -is_component_of-> tech:cpo／tech:external_laser_source／tech:transceiver_1_6t。也就是說聯亞是 CPO／ELS／1.6T 光模組共用的雷射光源供應者，上游吃 AXT 的基板。\n\n⚠ 聯亞不是獨家：圖中同樣 supplies_to tech:cw_dfb_laser 的還有 co:lumentum、co:coherent、co:sivers_semiconductors，共 4 家。\n\n已有一手（MOPS 公告經 Yahoo carrier，tier 1，已入圖）：契約相對人「某美國客戶」、期間 116–119 年（2027–2030）、目的為「確保數據中心用 CW 雷射產品足量供應」。⚠ 公告**未揭露**客戶身分、合約金額、最低採購量、價格、獨家性，也沒有任何 NVIDIA 關聯陳述——這些邊界已寫進 claim。\n\n市場現況（Engine C 快照 2026-08-27，非一手）：股價 3,255 TWD、市值約 301 億 TWD（約 9.4 億美元）、毛利率 52.7%、營益率 46.9%、營收 TTM 33.2 億 TWD。⚠ 估值極度伸展：EV/Rev 99.4、P/E trailing 305.3、forward P/E 82.7；分析師 10 位、目標均價 3,036 已**低於**現價。現金 16.4 億 TWD、總債 3.4 億 TWD，但 FCF TTM 僅 0.50 億 TWD。⚠ 股價 8/26 收 2,960 → 8/27 收 3,255，單日 +9.97%，時點與本公告吻合。\n\nvariant perception：市場現在讀的是「拿到 AI 資料中心四年長約＝未來四年營收能見度」，並已用一天 +10%、EV/Rev 99x 定價。本 thesis 認為：在**無最低採購量、無金額、無獨家性**揭露的情況下，「長期供貨合約」在台廠實務上可能只是優先供應權而非營收保證；且同一元件圖中已有 4 家供應商。催化劑是 2027 年首季起的月營收是否出現階梯式跳升——那是這份合約唯一無法用措辭掩飾的地方。\n\n建議 catalyst：2027 年 1 月與 2 月營收公告（台股規定每月 10 日前公告前月營收，故 2027-02-10 前可見首月、2027-03-10 前可見次月）。合約自 2027 年起算，這是第一個能觀測到合約是否轉為實際出貨的時點。次要觀測點為 2026 Q3 財報（預計 2026-11-14 前），看是否揭露為此合約進行的產能擴充、預付款或客戶預付。\n\n建議 disproof（任一成立即視為 thesis 失效）：\n(1) 到 2027-06-30，2027 上半年累計營收未較 2026 同期成長 30% 以上——四年長約若不能在首個半年帶出可辨識的營收級距變化，「營收能見度」的解讀不成立；\n(2) 公司公告該合約終止、縮小範圍、或客戶行使取消權；\n(3) 到 2027-12-31，該美國客戶被揭露為非 AI／資料中心用途（如電信接取或消費性光通訊），則 CPO／AI 需求錨點不成立；\n(4) 同期間出現第二家供應商取得同一客戶的同類長約且聯亞份額被稀釋，或公司揭露該合約不含最低採購量。\n核查頻率：每月營收公告後、每季財報後；觸發後 48 小時內人工 review。\n\n建議 expiry：2026-11-30（涵蓋 2026 Q3 財報公布時點加緩衝；真正的驗證點在 2027 Q1 月營收，屆時 reassess 會重新設定）。\n\n⚠ 另有兩個未清 blocker，本項不處理：financial_backlog_manual_required 與 financial_customer_concentration_manual_required。聯亞為台股，客戶集中度與 backlog 需另走公開資訊觀測站年報／財報附註，屬另一次 bounded research。\n\ngo 授權：把上述 catalyst／disproof／expiry 用於 3081.TWO 的下一次 reassess，並同步寫入 thesis/catalyst_calendar.json。不下單、不入圖、不改 Google Sheet、不動 Engine C observation。",
+      "n": 235,
+      "reason": null,
+      "ref_id": "dc_f94148d8545de35cb2c5d048640b913e",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "確認聯亞光電（3081.TWO）decision catalyst／disproof — 修 [234] 入圖後的 +72h 假鬧鐘",
+      "type": "manual"
     }
   ],
   "log": [
@@ -8731,8 +8749,36 @@
       "ref_id": "dc_912a03a50135ea5e29000a0417c3f477",
       "type": "decision_review",
       "verb": "source_cleared"
+    },
+    {
+      "at": "2026-08-27T17:58:38.153775+00:00",
+      "attempt": 1,
+      "n": 229,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_04f0da1c5164221bffdb821491114ec4",
+      "ref_id": "dc_cc46527aac12ba14191ee71c0460f3fe",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-08-27T17:59:10.105282+00:00",
+      "n": 229,
+      "reason": null,
+      "receipt": "開始 bounded research：依 [194] park receipt 指定的正解路徑取 6324 有価証券報告書／決算短信的客戶集中度與受注残高",
+      "ref_id": "dc_cc46527aac12ba14191ee71c0460f3fe",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-08-27T17:59:26.833894+00:00",
+      "n": 229,
+      "reason": "EDINET/TDnet 路徑走通，2/5 blocker 清除，Engine C 提案待核准",
+      "receipt": "bounded research 完成，[194] 指出的正解路徑已走通。改抓 6324 2026年3月期 決算短信（TDnet 2026-05-13，Yahoo Japan carrier 鏡像 PDF，29 頁 / 30,344 字，pypdf 抽取）。⚠ 官方 IR 頁面決算短信 PDF 為動態載入，與 [194] 當初判定「可抽文字為 0」同因；EDINET API v2 需 subscription key（未申請），故走 TDnet 正本鏡像。逐字存於 library/raw/hds_6324_tanshin_fy2026_20260513.txt。清除 2 個 blocker：(1) customer_concentration —— FY2026/3 已無單一客戶達營收 10%，issuer 逐字「日産自動車株式会社に対する販売高は…100分の10に満たないため記載しておりません」，前期日産為 5,733,870 千円 10.3%；⚠ 日本準則只揭露達 10% 者，故前三大合計%不可得，本次記錄的是上界不是精確值。(2) backlog —— 受注残高 21,873,106 千円 +13.6%、受注高 61,613,382 千円 +16.2%，含分部別（日本-減速装置 +42.4% 最強），issuer 註5 已扣除 434,546 千円受注取消額。⚠ 全文未出現 humanoid／人形機器人分類，backlog 成長不得歸因於該用途（L6 Gap 4）。Engine C 提案 po_bd21eedb1c22737e32e7250dc8181b95（customer_concentration）與 po_b8f9afb7bc0f348a846e90b877b6b5fb（backlog）待使用者核准寫入 ledger。counter_path_missing／independent_source_missing／financial_runway_manual_required 仍未清。",
+      "ref_id": "dc_cc46527aac12ba14191ee71c0460f3fe",
+      "type": "decision_review",
+      "verb": "pq1_awaiting_approval"
     }
   ],
-  "next_n": 235,
+  "next_n": 236,
   "schema_version": "1"
 }
