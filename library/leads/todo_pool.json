@@ -3657,7 +3657,11 @@
     },
     {
       "added_at": "2026-08-25T08:00:29.959820+00:00",
-      "deferred_at": "2026-08-25T08:00:43.184089+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_9a7d6db5f7562ce63ff8579f03537a47",
+      "dispatch_ref": "wo_468ecdef0047cb1a3d33d05c1c3de9fa",
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-08-27T23:45:21.543347+00:00",
       "hint": "coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 224,
       "reason": null,
@@ -3666,13 +3670,7 @@
       "resolved_at": null,
       "source": "decision_lab",
       "title": "REVIEW — co:marvell_technology",
-      "type": "decision_review",
-      "waiting_on": {
-        "reason": "使用者 2026-08-25 定案走 (b)：比照 [134] AAOI 等財報。backlog／customer_concentration 兩個 blocker 已於本日由 mo_bc5ec274f92d8ee2a87ce740f96e1131／mo_77d38cb26e5d5009c419063f76feba05 清除；剩餘 catalyst_missing／disproof_missing 需 guidance。注意 axis_ceiling 仍為 0，binding constraint 是缺 MRVL 五軸 assessment。",
-        "set_at": "2026-08-25T08:00:43.184089+00:00",
-        "trigger": "MRVL Q2 FY2027 財報（2026-08-28，yfinance calendar 確認）；以 guidance 設可觀測 disproof 門檻並補 catalyst，再 reassess",
-        "until": "2026-08-28"
-      }
+      "type": "decision_review"
     },
     {
       "added_at": "2026-08-25T09:16:48.538688+00:00",
@@ -3864,6 +3862,18 @@
       "source": "decision_lab",
       "title": "REVIEW — co:landmark_optoelectronics",
       "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-27T23:46:12.161474+00:00",
+      "hint": "核准後以 `todo complete-thesis-mutation <編號>` 寫入 lifecycle.json；理由：Q2 2026 未觸發原 retire gate：2025 營收重編減少 SEK 4.314m，遠低於 memo 所列約 SEK 97m／31%，且正式報告未出現 going concern 惡化敘述；但 Q2 淨營收年減 12%、adju",
+      "n": 239,
+      "reason": null,
+      "ref_id": "tm_b498950ba7ebe4375289e9f3adaf1861",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "thesis",
+      "title": "thesis sivers：review_required → revised",
+      "type": "thesis_mutation"
     }
   ],
   "log": [
@@ -8867,8 +8877,18 @@
       "ref_id": "dc_912a03a50135ea5e29000a0417c3f477",
       "type": "decision_review",
       "verb": "source_returned"
+    },
+    {
+      "at": "2026-08-27T23:45:21.543347+00:00",
+      "attempt": 1,
+      "n": 224,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_468ecdef0047cb1a3d33d05c1c3de9fa",
+      "ref_id": "dc_0fca807c963dc3b9888e0f83ba6d45a5",
+      "type": "decision_review",
+      "verb": "pq1_queued"
     }
   ],
-  "next_n": 239,
+  "next_n": 240,
   "schema_version": "1"
 }
