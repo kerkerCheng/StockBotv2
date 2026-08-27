@@ -7461,11 +7461,13 @@
       "published_at": "2026-08-26T20:28:43.000Z",
       "raw_text": "I know everyone’s watching $NVDA earnings right now…\n\nBut did you know Landmark signed a 4 year CW agreement with US customer to ensure “sufficient supply”?\n\nSo now you have:\n\n- $LITE (capacity gone)\n- $COHR (capacity gone)\n- Landmark (capacity committed)\n- $AAOI (capacity for transceivers)\n- $MTSI (not online)\n- $SMTC (limited)\n\nI remember saying earlier this year CW lasers would be the next optical shift and heavily bottlenecked by Nvidia?\n\nSo fun watching this play out, with players signing LTAs already to 2030 (signaling less availability for other players).\n\nImplications for $SIVE / Win Semi are very material as one of the few remaining CW merchant suppliers with capacity (+ CPO-grade lasers).\n\nLet’s see how they execute.",
       "refs": {
+        "action_digest": "ad57aa79301cd0e03fd69a194317a620974e338dda11a2531228250cda9eb989",
+        "focus_company_id": "co:landmark_optoelectronics",
         "research_action_id": "ra_baf280bdb44c813bcc2980d7917efacf",
         "research_outcome": "聯亞官方公告確認 2027–2030 CW 雷射長約；客戶未具名，禁止推導 NVIDIA 或 sole_source。"
       },
       "source": "x:aleabitoreddit",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -34459,7 +34461,9 @@
       "lead_id": "lead_c5b183d5219f7bfac5daef192283e20b",
       "published_at": "2026-08-26",
       "refs": {
+        "action_digest": "ad57aa79301cd0e03fd69a194317a620974e338dda11a2531228250cda9eb989",
         "claimed_origin": "聯亞光電公司公告＋法說會（財務長楊吉裕具名）；經 UDN／中央社轉載",
+        "focus_company_id": "co:landmark_optoelectronics",
         "onboard_candidate_names": [
           "AIXTRON SE（德國 MOCVD 設備商，AIXA.DE；雷射磊晶上游，registry 未登記）"
         ],
@@ -34467,7 +34471,7 @@
         "research_outcome": "官方長約已 prepare；22.7 億元 capex 與 9.9 億元 AIXTRON 設備僅支持擴產意圖，不是客戶端付款。"
       },
       "source": "udn:cna",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {},
       "title": "AI帶旺光通訊需求 聯亞獲美客戶長約、擬投22.7億擴充產能（$3081.TWO 聯亞光電 CW 雷射；設備採購自 AIXTRON）",
       "triage": {

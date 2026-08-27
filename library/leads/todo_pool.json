@@ -1187,6 +1187,11 @@
       "resolution": null,
       "resolved_at": null,
       "source": "research_action",
+      "source_cleared": {
+        "at": "2026-08-27T01:35:12.363545+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
       "title": "Meta Vistara CXL 記憶體擴充平台",
       "type": "ra_admission",
       "waiting_on": {
@@ -2695,6 +2700,11 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
+      "source_cleared": {
+        "at": "2026-08-27T01:35:12.363545+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
       "title": "REVIEW — co:sivers_semiconductors",
       "type": "decision_review",
       "waiting_on": {
@@ -3214,6 +3224,11 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
+      "source_cleared": {
+        "at": "2026-08-27T01:35:12.363545+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
       "title": "REVIEW — co:agility_robotics",
       "type": "decision_review",
       "waiting_on": {
@@ -3665,6 +3680,11 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
+      "source_cleared": {
+        "at": "2026-08-27T01:35:12.363545+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
       "title": "REVIEW — co:marvell_technology",
       "type": "decision_review",
       "waiting_on": {
@@ -3736,6 +3756,11 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
+      "source_cleared": {
+        "at": "2026-08-27T01:35:12.363545+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
       "title": "REVIEW — co:harmonic_drive_systems",
       "type": "decision_review"
     },
@@ -3749,6 +3774,11 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
+      "source_cleared": {
+        "at": "2026-08-27T01:35:12.363545+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
       "title": "REVIEW — co:schaeffler",
       "type": "decision_review"
     },
@@ -3793,12 +3823,20 @@
     },
     {
       "added_at": "2026-08-26T22:51:47.228909+00:00",
+      "completion_authority": {
+        "action_digest": "ad57aa79301cd0e03fd69a194317a620974e338dda11a2531228250cda9eb989",
+        "cohort_id": "dc_f94148d8545de35cb2c5d048640b913e",
+        "commit": "7c73a9549136572bedeb23848898c3a4dfe4f4a7",
+        "company_id": "co:landmark_optoelectronics",
+        "verified_at": "2026-08-27T01:34:48.948235+00:00"
+      },
       "hint": "核准 exact graph delta；Decision handoff：co:landmark_optoelectronics。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 234,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_baf280bdb44c813bcc2980d7917efacf;digest:ad57aa79301cd0e03fd69a194317a620974e338dda11a2531228250cda9eb989;commit:7c73a9549136572bedeb23848898c3a4dfe4f4a7;cohort:dc_f94148d8545de35cb2c5d048640b913e",
       "ref_id": "ra_baf280bdb44c813bcc2980d7917efacf",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-27T01:34:48.948235+00:00",
       "source": "research_action",
       "title": "聯亞四年 CW 雷射長約與客戶未具名邊界",
       "type": "ra_admission"
@@ -8630,6 +8668,69 @@
       "ref_id": "dc_4d28e50810e46da7fd77ee042ee7bd1c",
       "type": "decision_review",
       "verb": "go"
+    },
+    {
+      "at": "2026-08-27T01:34:48.948235+00:00",
+      "n": 234,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_baf280bdb44c813bcc2980d7917efacf;digest:ad57aa79301cd0e03fd69a194317a620974e338dda11a2531228250cda9eb989;commit:7c73a9549136572bedeb23848898c3a4dfe4f4a7;cohort:dc_f94148d8545de35cb2c5d048640b913e",
+      "ref_id": "ra_baf280bdb44c813bcc2980d7917efacf",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-27T01:35:12.363545+00:00",
+      "n": 81,
+      "reason": "來源本輪成功執行，但不再產出此項",
+      "receipt": null,
+      "ref_id": "ra_50f3ddb6cfe718afd7e2ef8b0481e686",
+      "type": "ra_admission",
+      "verb": "source_cleared"
+    },
+    {
+      "at": "2026-08-27T01:35:12.363545+00:00",
+      "n": 168,
+      "reason": "來源本輪成功執行，但不再產出此項",
+      "receipt": null,
+      "ref_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
+      "type": "decision_review",
+      "verb": "source_cleared"
+    },
+    {
+      "at": "2026-08-27T01:35:12.363545+00:00",
+      "n": 200,
+      "reason": "來源本輪成功執行，但不再產出此項",
+      "receipt": null,
+      "ref_id": "dc_6ae5b014dbbcd0774b45487542c9a102",
+      "type": "decision_review",
+      "verb": "source_cleared"
+    },
+    {
+      "at": "2026-08-27T01:35:12.363545+00:00",
+      "n": 224,
+      "reason": "來源本輪成功執行，但不再產出此項",
+      "receipt": null,
+      "ref_id": "dc_0fca807c963dc3b9888e0f83ba6d45a5",
+      "type": "decision_review",
+      "verb": "source_cleared"
+    },
+    {
+      "at": "2026-08-27T01:35:12.363545+00:00",
+      "n": 229,
+      "reason": "來源本輪成功執行，但不再產出此項",
+      "receipt": null,
+      "ref_id": "dc_cc46527aac12ba14191ee71c0460f3fe",
+      "type": "decision_review",
+      "verb": "source_cleared"
+    },
+    {
+      "at": "2026-08-27T01:35:12.363545+00:00",
+      "n": 230,
+      "reason": "來源本輪成功執行，但不再產出此項",
+      "receipt": null,
+      "ref_id": "dc_912a03a50135ea5e29000a0417c3f477",
+      "type": "decision_review",
+      "verb": "source_cleared"
     }
   ],
   "next_n": 235,
