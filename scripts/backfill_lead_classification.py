@@ -5,6 +5,8 @@
 內部人交易應以彙總方式讀（Engine C 稀釋項），不逐筆進 pq1」，167 筆中 107 筆判 no_go）。
 
 其餘一律留 `unknown`，交給 `skills/signal-triage` 的語意分類，**不用 regex 猜**。
+active lead 若曾有合法 classification、只是 trace requeue 把它移進 history，則可
+確定性還原原 receipt；這不是重新做語意判斷。
 
 ⚠ **這不是「硬編排除 Form 4」**（`ROADMAP` 明文禁止的打地鼠）。差別在：
 - 打地鼠＝在排序器裡寫 `if "Form 4" in title: sink`。`engine_b/priority.py` **沒有任何
@@ -30,6 +32,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from engine_b import leads, priority  # noqa: E402
 
 FORM4_TITLE = re.compile(r"^[A-Z0-9.]+\s+4\s+filed\s+\d{4}-\d{2}-\d{2}\s*$")
+ACTIVE_STATUSES = leads.CLASSIFICATION_REQUIRED_STATUSES
 
 
 def is_form4(lead: dict) -> bool:
@@ -41,14 +44,41 @@ def is_form4(lead: dict) -> bool:
 def _validate(tags: dict) -> None:
     """字彙外的值一律拒絕。語意判斷可以錯，字彙不能自創——否則排序會靜默降級。"""
 
-    vocab = priority.vocabulary()
-    for axis in ("content_type", "decision_impact"):
-        value = tags.get(axis)
-        if value not in vocab[axis]["_order"]:
-            raise ValueError(f"{axis}={value!r} 不在 config/lead_classification.json 的字彙內")
-    if tags["content_type"] == "capital_commitment":
-        if tags.get("payment_direction") not in vocab["payment_direction"]["_order"]:
-            raise ValueError("capital_commitment 必須填合法的 payment_direction")
+    priority.validate_classification(tags)
+    if not str(tags.get("reason") or "").strip():
+        raise ValueError("semantic backfill 必須附 reason")
+
+
+def _restore_active_history(store: dict, *, now: str) -> int:
+    """還原 trace requeue 遺失、但 history 已有的最近合法 receipt。"""
+
+    changed = 0
+    for lead in store["leads"].values():
+        if lead.get("status") not in ACTIVE_STATUSES or priority.classification(lead):
+            continue
+        for entry in reversed(lead.get("triage_history") or []):
+            record = dict(((entry.get("triage") or {}).get("classification") or {}))
+            if not record:
+                continue
+            restored = priority.validate_classification(
+                record,
+                require_receipt=True,
+            )
+            restored["restored_at"] = now
+            restored["restored_by"] = "backfill_history_restore_v1"
+            lead.setdefault("triage", {})["classification"] = restored
+            changed += 1
+            break
+    return changed
+
+
+def _supplied_items(raw: object) -> dict[str, dict]:
+    if not isinstance(raw, dict):
+        raise ValueError("--from-json 必須是 JSON object")
+    candidate = raw.get("items") if "items" in raw else raw
+    if not isinstance(candidate, dict):
+        raise ValueError("--from-json 的 items 必須是 object")
+    return candidate
 
 
 def main() -> int:
@@ -82,22 +112,50 @@ def main() -> int:
         }
         changed += 1
 
+    restored = _restore_active_history(store, now=now)
+    changed += restored
+
     if args.from_json:
-        supplied = json.loads(Path(args.from_json).read_text(encoding="utf-8"))
+        supplied = _supplied_items(
+            json.loads(Path(args.from_json).read_text(encoding="utf-8"))
+        )
         for lead_id, tags in supplied.items():
             lead = store["leads"].get(lead_id)
             if lead is None:
                 raise KeyError(f"lead 不存在：{lead_id}")
+            if lead.get("status") not in ACTIVE_STATUSES:
+                raise ValueError(
+                    f"semantic active backfill 拒絕非 active lead：{lead_id} status={lead.get('status')}"
+                )
             _validate(tags)
+            existing = priority.classification(lead)
+            if existing:
+                comparable_keys = (
+                    "content_type", "decision_impact", "payment_direction", "reason",
+                )
+                if all(
+                    existing.get(key) == tags.get(key)
+                    for key in comparable_keys
+                ):
+                    continue
+                raise ValueError(f"拒絕覆寫既有 classification：{lead_id}")
             record = {k: v for k, v in tags.items() if not k.startswith("_")}
-            record["classified_by"] = "semantic_v1"
+            record["classified_by"] = "backfill_semantic_v1"
             record["classified_at"] = now
+            record["backfill_ref"] = Path(args.from_json).name
+            record = priority.validate_classification(record, require_receipt=True)
             lead.setdefault("triage", {})["classification"] = record
             changed += 1
 
     total = len(store["leads"])
     unclassified = sum(1 for l in store["leads"].values() if not priority.classification(l))
-    print(f"lead 總數 {total}｜本次補分類 {changed}｜仍未分類 {unclassified}")
+    active_gaps = leads.classification_gaps(store)
+    print(
+        f"lead 總數 {total}｜本次補分類 {changed}（history 還原 {restored}）｜"
+        f"仍未分類 {unclassified}｜active 缺分類 {len(active_gaps)}"
+    )
+    if active_gaps:
+        print(json.dumps({"active_gaps": active_gaps}, ensure_ascii=False, indent=2))
     print("仍未分類者由 skills/signal-triage 的語意分類處理，本腳本不猜。")
 
     if args.apply and changed:

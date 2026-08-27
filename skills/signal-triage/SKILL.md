@@ -103,6 +103,24 @@ insider／稀釋時變觀測」，那句「低優先」只能寫進自由文字 
 
 再加 `classified_by`（`triage_semantic_v1`）、`classified_at`、`reason`。
 
+本機 PASS 必須用同一條 CLI 原子寫入 triage 與 classification；不得先寫自由文字
+`reason`、再期待 drain 猜回結構化值：
+
+```powershell
+& '.venv\Scripts\python.exe' -m engine_b.cli triage <lead_id> --go --tier <1-4> `
+  --reason "<五要素判斷>" --content-type <content_type> `
+  --decision-impact <decision_impact> [--payment-direction <payment_direction>] `
+  [--classification-reason "<答案回來會改變什麼>"]
+```
+
+FILTER 不寫 classification，仍使用 `--no-go --tier ... --reason ...`。PASS 缺
+`content_type`／`decision_impact`、`capital_commitment` 缺 `payment_direction`，或任何值
+不在封閉字彙內時，CLI 必須拒絕且不得改 lead status。triage 完成後固定執行
+`engine_b.cli classification-health`；active 缺口回 exit 2。`drain` 會把缺口逐筆列為
+`withheld_unclassified_lead`，不讓 `unknown` sentinel 偷走 pq1 slot；已核准的 Decision work order
+與其他分類完整的 leads 仍可繼續。trace requeue 必須保留 lead 最近一筆合法 classification receipt，
+不能因重建 active triage 而遺失。
+
 **`decision_impact` 是判斷核心，也最容易填錯。** 問法固定：*「如果查證結果是 A，什麼會變？
 是 B 呢？」*
 

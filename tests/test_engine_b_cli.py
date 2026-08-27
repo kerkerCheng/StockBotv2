@@ -7,6 +7,16 @@ from pathlib import Path
 from engine_b import cli, leads
 
 
+PASS_CLASSIFICATION_ARGS = [
+    "--content-type", "structural_fact",
+    "--decision-impact", "ranking",
+]
+PASS_CLASSIFICATION = {
+    "content_type": "structural_fact",
+    "decision_impact": "ranking",
+}
+
+
 def _seed(path: Path) -> str:
     store = leads.empty_store()
     lead_id, _ = leads.register(store, source="edgar:COHR",
@@ -39,12 +49,44 @@ def test_triage_then_advance_round_trip(tmp_path, capsys) -> None:
     lead_id = _seed(path)
 
     assert cli.main(["--leads", str(path), "triage", lead_id,
-                     "--go", "--tier", "2", "--reason", "有新角度"]) == 0
+                     "--go", "--tier", "2", "--reason", "有新角度",
+                     *PASS_CLASSIFICATION_ARGS]) == 0
     assert cli.main(["--leads", str(path), "advance", lead_id, "researching"]) == 0
 
     store = leads.load(path)
     assert store["leads"][lead_id]["status"] == "researching"
     assert store["leads"][lead_id]["triage"]["decision"] == "go"
+    classification = store["leads"][lead_id]["triage"]["classification"]
+    assert classification["content_type"] == "structural_fact"
+    assert classification["decision_impact"] == "ranking"
+    assert classification["classified_by"] == "triage_semantic_v1"
+    assert classification["reason"] == "有新角度"
+
+
+def test_triage_pass_requires_structured_classification(tmp_path, capsys) -> None:
+    path = tmp_path / "pending_leads.json"
+    lead_id = _seed(path)
+
+    assert cli.main([
+        "--leads", str(path), "triage", lead_id,
+        "--go", "--tier", "2", "--reason", "有新角度",
+    ]) == 1
+    assert leads.load(path)["leads"][lead_id]["status"] == "pending"
+    assert "PASS 必須同時指定" in capsys.readouterr().err
+
+
+def test_capital_commitment_requires_payment_direction(tmp_path, capsys) -> None:
+    path = tmp_path / "pending_leads.json"
+    lead_id = _seed(path)
+
+    assert cli.main([
+        "--leads", str(path), "triage", lead_id,
+        "--go", "--tier", "2", "--reason", "長約",
+        "--content-type", "capital_commitment",
+        "--decision-impact", "candidate_set",
+    ]) == 1
+    assert leads.load(path)["leads"][lead_id]["status"] == "pending"
+    assert "payment_direction" in capsys.readouterr().err
 
 
 def test_illegal_advance_returns_nonzero_and_does_not_persist(tmp_path) -> None:
@@ -161,10 +203,46 @@ def test_trace_requeue_preserves_triage_receipt_and_returns_to_pq1(tmp_path) -> 
     assert lead["triage"]["priority_flags"]["user_requested"] is True
 
 
+def test_trace_requeue_restores_latest_classification_from_history() -> None:
+    """2026-08-27 XFAB 迴歸：requeue 不得把分類只留在 history。"""
+
+    store = leads.empty_store()
+    lead_id, _ = leads.register(
+        store, source="x:test", url="https://x.com/test/status/xfab"
+    )
+    leads.triage(store, lead_id, go=True, tier=4, reason="舊 active receipt")
+    leads.advance(store, lead_id, "parked", ref={
+        "trace_status": "partial",
+        "trace_requires_user": "false",
+    })
+    old_receipt = {
+        "content_type": "structural_fact",
+        "decision_impact": "candidate_set",
+        "classified_by": "semantic_v1",
+        "classified_at": "2026-08-21T00:00:00+00:00",
+        "reason": "X-FAB 可能新增 CPO 候選",
+    }
+    store["leads"][lead_id]["triage_history"] = [{
+        "status": "parked",
+        "triage": {"classification": old_receipt},
+    }]
+
+    lead = leads.requeue_trace(
+        store,
+        lead_id,
+        trigger="related_triaged_lead:lead_event",
+        reason="新一手事件觸發 bounded retry",
+    )
+
+    assert lead["triage"]["classification"] == old_receipt
+    assert leads.classification_gaps(store) == []
+
+
 def test_advance_records_ref(tmp_path) -> None:
     path = tmp_path / "pending_leads.json"
     lead_id = _seed(path)
-    cli.main(["--leads", str(path), "triage", lead_id, "--go", "--tier", "2", "--reason", "x"])
+    cli.main(["--leads", str(path), "triage", lead_id, "--go", "--tier", "2", "--reason", "x",
+              *PASS_CLASSIFICATION_ARGS])
     cli.main(["--leads", str(path), "advance", lead_id, "researching",
               "--ref", "research_action_id=ra_abc"])
 
@@ -207,7 +285,8 @@ def test_triage_stores_priority_flags(tmp_path) -> None:
     path = tmp_path / "pending_leads.json"
     lead_id = _seed(path)
     cli.main(["--leads", str(path), "triage", lead_id, "--go", "--tier", "3",
-              "--reason", "反證", "--contradiction", "--novelty"])
+              "--reason", "反證", "--contradiction", "--novelty",
+              *PASS_CLASSIFICATION_ARGS])
     tri = leads.load(path)["leads"][lead_id]["triage"]
     assert tri["priority_flags"]["contradiction"] is True
     assert tri["priority_flags"]["novelty"] is True
@@ -235,7 +314,7 @@ def test_campaign_triage_passes_selected_and_filters_rest_atomically(
     assert cli.main([
         "--leads", str(path), "triage-campaign",
         "--campaign-id", "robotics", "--go-id", selected,
-        "--novelty", "--filter-rest",
+        "--novelty", "--filter-rest", *PASS_CLASSIFICATION_ARGS,
     ]) == 0
 
     reloaded = leads.load(path)["leads"]
@@ -256,8 +335,15 @@ def test_drain_lists_triaged_go_and_researching_by_priority(tmp_path, capsys) ->
     a, _ = leads.register(store, source="edgar:AAOI", url="https://x.io/a")
     b, _ = leads.register(store, source="edgar:COHR", url="https://x.io/b")
     c, _ = leads.register(store, source="edgar:LITE", url="https://x.io/c")
-    leads.triage(store, a, go=True, tier=4, reason="弱")
-    leads.triage(store, b, go=True, tier=1, reason="強", priority_flags={"contradiction": True})
+    leads.triage(
+        store, a, go=True, tier=4, reason="弱",
+        classification={"content_type": "financial_fact", "decision_impact": "confidence_only"},
+    )
+    leads.triage(
+        store, b, go=True, tier=1, reason="強",
+        priority_flags={"contradiction": True},
+        classification=PASS_CLASSIFICATION,
+    )
     leads.triage(store, c, go=False, tier=4, reason="no")  # no-go 不該進 drain
     leads.save(store, path)
 
@@ -273,7 +359,10 @@ def test_drain_resumes_researching_leads(tmp_path, capsys) -> None:
     path = tmp_path / "pending_leads.json"
     store = leads.empty_store()
     lead_id, _ = leads.register(store, source="edgar:COHR", url="https://x.io/b")
-    leads.triage(store, lead_id, go=True, tier=1, reason="x")
+    leads.triage(
+        store, lead_id, go=True, tier=1, reason="x",
+        classification=PASS_CLASSIFICATION,
+    )
     leads.advance(store, lead_id, "researching")  # 中斷在 pq1 中途
     leads.save(store, path)
 
@@ -281,6 +370,33 @@ def test_drain_resumes_researching_leads(tmp_path, capsys) -> None:
     out = json.loads(capsys.readouterr().out.strip())
     # researching（中斷待續）仍要被 drain 撿回
     assert out[0]["lead"]["status"] == "researching"
+
+
+def test_classification_health_and_drain_withhold_active_gap(tmp_path, capsys) -> None:
+    path = tmp_path / "pending_leads.json"
+    store = leads.empty_store()
+    missing, _ = leads.register(store, source="x:test", url="https://x.io/missing")
+    ready, _ = leads.register(store, source="x:test", url="https://x.io/ready")
+    # 低階 API 保留 legacy 相容；production health／drain 必須讓缺口顯形並 withheld。
+    leads.triage(store, missing, go=True, tier=1, reason="legacy")
+    leads.triage(
+        store, ready, go=True, tier=4, reason="classified",
+        classification=PASS_CLASSIFICATION,
+    )
+    leads.save(store, path)
+
+    assert cli.main(["--leads", str(path), "classification-health"]) == 2
+    health = json.loads(capsys.readouterr().out)
+    assert health["status"] == "error"
+    assert [item["lead_id"] for item in health["items"]] == [missing]
+
+    assert cli.main([
+        "--leads", str(path), "drain", "--decision-work-orders", "skip", "--json",
+    ]) == 0
+    rows = json.loads(capsys.readouterr().out)
+    assert [row["lead"]["lead_id"] for row in rows if row["kind"] == "lead"] == [ready]
+    withheld = [row for row in rows if row["kind"] == "withheld_unclassified_lead"]
+    assert withheld[0]["health"]["lead_id"] == missing
 
 
 def test_default_drain_fails_closed_when_decision_store_is_unavailable(

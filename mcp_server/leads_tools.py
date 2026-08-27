@@ -50,6 +50,11 @@ def get_pending_leads_core(
     ]
     return {
         "counts": leads.status_counts(store),
+        "classification_health": {
+            "status": "ok" if not (gaps := leads.classification_gaps(store)) else "error",
+            "active_unclassified_count": len(gaps),
+            "items": gaps,
+        },
         "leads": items,
         "harvest_log": store.get("harvest_log", [])[-10:],
         "unresolved_harvest_failures": leads.unresolved_harvest_failures(store),
@@ -64,6 +69,10 @@ def record_lead_decision_core(
     tier: int = 4,
     reason: str = "",
     priority_flags: Mapping[str, Any] | None = None,
+    content_type: str = "",
+    decision_impact: str = "",
+    payment_direction: str = "",
+    classification_reason: str = "",
     to_status: str = "",
     ref: str | None = None,
     leads_path: Path | str | None = None,
@@ -74,7 +83,8 @@ def record_lead_decision_core(
 ) -> dict[str, Any]:
     """triage 或 advance 一則 lead，寫檔後窄 pathset commit+push。
 
-    op="triage"（用 go/tier/reason/priority_flags）｜op="advance"（用 to_status/ref）。
+    op="triage"（PASS 另需 content_type／decision_impact；capital_commitment 需
+    payment_direction）｜op="advance"（用 to_status/ref）。
     committer 可注入供測試（預設 leads_git.commit_and_push_leads）。
     """
     path = leads_path or leads.DEFAULT_LEADS_PATH
@@ -83,9 +93,27 @@ def record_lead_decision_core(
     store = load(path)
     try:
         if op == "triage":
+            classification = None
+            supplied = any((content_type, decision_impact, payment_direction, classification_reason))
+            if go:
+                if not content_type or not decision_impact:
+                    raise ValueError(
+                        "PASS 必須附 content_type 與 decision_impact"
+                    )
+                classification = {
+                    "content_type": content_type,
+                    "decision_impact": decision_impact,
+                }
+                if payment_direction:
+                    classification["payment_direction"] = payment_direction
+                if classification_reason:
+                    classification["reason"] = classification_reason
+            elif supplied:
+                raise ValueError("FILTER／no-go 不接受 classification")
             lead = leads.triage(
                 store, lead_id, go=bool(go), tier=int(tier),
                 reason=str(reason), priority_flags=dict(priority_flags or {}),
+                classification=classification,
             )
         elif op == "advance":
             refs = None

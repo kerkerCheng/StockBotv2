@@ -40,6 +40,12 @@ def test_all_privileged_daily_entries_have_narrow_outside_sandbox_rules() -> Non
     assert 'pattern=[".venv\\\\Scripts\\\\python.exe", "-m", "engine_b.todo"]' not in rules
     assert '"engine_b.todo", "dispatch"' not in rules
     assert '"engine_b.todo", "resolve"' not in rules
+    for sandbox_only_entry in (
+        '"engine_b.cli", "triage"',
+        '"engine_b.cli", "classification-health"',
+        "scripts\\backfill_lead_classification.py",
+    ):
+        assert sandbox_only_entry not in rules
     for broad_entry in (
         'pattern=["python"',
         'pattern=[".venv\\\\Scripts\\\\python.exe"]',
@@ -69,5 +75,7 @@ def test_project_memory_defines_common_sandbox_impact_review() -> None:
         "skill 有命令而 rules 沒有",
         "相鄰高權限動詞仍未放行",
         "只有 rule 已存在但載入版本仍舊時才需要重啟",
+        "Triage classification surface impact",
+        "不新增 unattended rule",
     ):
         assert token in operations

@@ -67,7 +67,7 @@ Claude／OpenAI 雲端 = LLM 本體——思考、決定何時呼叫工具
 | `get_financial_checklist` | 讀 | 查 Engine C 五項財務清單、最新客觀 analyst coverage 與當前 `policy_version` 的即時 view；不暴露 SQL、不持久化 crowding 分類 |
 | `get_decision_brief` | 讀 | 「今天需要動作嗎」——回 `decision_lab today` 的 redacted public DTO（九欄 action-first）。Decision Store 是本機 private runtime、永不進 git，這是手機／雲端看決策佇列的唯一視窗；純讀，不 freeze／不建 decision／不下單，runtime 未就緒回明確 `unavailable`、不洩私有路徑 |
 | `get_pending_leads` | 讀 | 今日 pending leads 佇列（priority 排序）＋狀態計數＋最近 harvest_log。`tracked_tickers` 算 thesis 影響度。leads 只是注意力 metadata |
-| `record_lead_decision` | **寫（窄 Git）** | triage／advance 一則 lead（go/no-go/park/researching/applied…）；寫入後本機 MCP server 對 **只有** `library/leads/pending_leads.json` scoped commit+push（cloud 每天讀到最新）。**只動注意力 metadata——不入圖、不改 evidence tier、不建 decision**；pathspec 寫死、commit 後驗證只碰此檔 |
+| `record_lead_decision` | **寫（窄 Git）** | triage／advance 一則 lead（go/no-go/park/researching/applied…）；PASS 必須連同 `content_type`／`decision_impact`（capital commitment 另含 `payment_direction`）原子寫入 classification，拒絕只藏在 reason 的分類；寫入後本機 MCP server 對 **只有** `library/leads/pending_leads.json` scoped commit+push（cloud 每天讀到最新）。**只動注意力 metadata——不入圖、不改 evidence tier、不建 decision**；pathspec 寫死、commit 後驗證只碰此檔 |
 | `get_extraction_rules` | 讀 | 回傳 `prompts/extract_system.md` + `schema/vocab.json` + `prompts/intake_protocol.md` 原文（路徑寫死）。**任何遠端抽取前必讀**——含 storage permission、conflict 與 Research Action 協定 |
 | `get_source_trace_manual` | 讀 | 回傳 `skills/source-trace/SKILL.md` 原文。手機／網頁收到推文、轉述、截圖或未驗證消息時先讀，依市場路由追原文；tier 3–4 未果只留 lead，不進抽取／寫圖 |
 | `load_extraction` | **寫** | legacy weekly/local primitive：一份文件一呼叫。驗 permission/schema/canonical hash，filesystem-first no-clobber 保存 extraction/raw，再冪等寫圖與重投影 conflicts；手機 ad hoc flow 不直接使用 |

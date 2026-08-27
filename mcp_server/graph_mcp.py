@@ -290,12 +290,17 @@ def record_lead_decision(
     contradiction: bool = False,
     novelty: bool = False,
     independent_source: bool = False,
+    content_type: str = "",
+    decision_impact: str = "",
+    payment_direction: str = "",
+    classification_reason: str = "",
     to_status: str = "",
     ref: str = "",
 ) -> str:
     """記錄一則 lead 的 triage／advance 決定，寫後由本機窄 pathset commit+push。
 
-    op="triage"（用 go／tier／reason／三個 priority flag）｜op="advance"（用
+    op="triage"（PASS 用 go／tier／reason／三個 priority flag，並必填
+    content_type／decision_impact；capital_commitment 另填 payment_direction）｜op="advance"（用
     to_status／ref，如 park、researching、applied）。寫入後本機 MCP server 把
     **只有** `library/leads/pending_leads.json` commit+push，cloud 每天讀到最新。
 
@@ -311,7 +316,13 @@ def record_lead_decision(
     return json.dumps(
         record_lead_decision_core(
             lead_id=lead_id, op=op, go=go, tier=tier, reason=reason,
-            priority_flags=flags, to_status=to_status, ref=ref,
+            priority_flags=flags,
+            content_type=content_type,
+            decision_impact=decision_impact,
+            payment_direction=payment_direction,
+            classification_reason=classification_reason,
+            to_status=to_status,
+            ref=ref,
         ),
         ensure_ascii=False, default=str, indent=2,
     )

@@ -52,6 +52,10 @@ class ClassificationVocabularyError(RuntimeError):
     """字彙檔缺失或損毀。fail closed，不猜預設值。"""
 
 
+class ClassificationValidationError(ValueError):
+    """分類資料缺欄位或使用字彙外值；不得靜默降級成 unknown。"""
+
+
 @lru_cache(maxsize=1)
 def vocabulary() -> dict[str, Any]:
     """載入封閉字彙。缺檔一律 fail closed。
@@ -85,6 +89,62 @@ def _rank_of(axis: str, value: Any, *, fallback: str = "unknown") -> int:
     if fallback in order:
         return order.index(fallback)
     return len(order)
+
+
+def validate_classification(
+    raw: Mapping[str, Any] | None,
+    *,
+    allow_unknown: bool = False,
+    require_receipt: bool = False,
+) -> dict[str, Any]:
+    """驗證並複製一筆結構化 pq1 分類。
+
+    排序器仍能讀歷史 ``unknown``，但任何新 triage／backfill 都應以
+    ``allow_unknown=False`` 寫入完整字彙。``require_receipt`` 用於檢查已落盤
+    authority，確保語意結論不只剩兩個排序欄位而沒有時間、來源與理由。
+    """
+
+    if not isinstance(raw, Mapping):
+        raise ClassificationValidationError("PASS 必須附結構化 classification")
+    record = dict(raw)
+    vocab = vocabulary()
+    for axis in ("content_type", "decision_impact"):
+        value = str(record.get(axis) or "").strip()
+        if not value:
+            raise ClassificationValidationError(f"classification 缺少 {axis}")
+        if value not in vocab[axis]["_order"]:
+            raise ClassificationValidationError(
+                f"{axis}={value!r} 不在 config/lead_classification.json 的字彙內"
+            )
+        if value == "unknown" and not allow_unknown:
+            raise ClassificationValidationError(
+                f"新 classification 不得寫入 {axis}=unknown"
+            )
+        record[axis] = value
+
+    payment_direction = str(record.get("payment_direction") or "").strip()
+    if record["content_type"] == "capital_commitment":
+        if payment_direction not in vocab["payment_direction"]["_order"]:
+            raise ClassificationValidationError(
+                "capital_commitment 必須填合法的 payment_direction"
+            )
+        record["payment_direction"] = payment_direction
+    elif payment_direction:
+        if payment_direction not in vocab["payment_direction"]["_order"]:
+            raise ClassificationValidationError(
+                f"payment_direction={payment_direction!r} 不在封閉字彙內"
+            )
+        record["payment_direction"] = payment_direction
+    else:
+        record.pop("payment_direction", None)
+
+    if require_receipt:
+        for field in ("classified_by", "classified_at", "reason"):
+            if not str(record.get(field) or "").strip():
+                raise ClassificationValidationError(
+                    f"已落盤 classification 缺少 {field} receipt"
+                )
+    return record
 
 
 def lead_tickers(lead: Mapping[str, Any]) -> frozenset[str]:

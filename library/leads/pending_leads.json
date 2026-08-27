@@ -6017,6 +6017,14 @@
       "themes": {},
       "title": "The concept of “cascading bottlenecks” is just super cool. Because of DDR4 supply shocks and costs: Lot of ODMs are redesigning downward from DDR4 -&gt; DDR3 -&gt; DDR2. But even the legacy players themselves like Winbond are withdrawing from DDR2. Making the bottleneck even worse",
       "triage": {
+        "classification": {
+          "backfill_ref": "2026-08-27_active_classification_backfill.json",
+          "classified_at": "2026-08-27T03:18:48.063011+00:00",
+          "classified_by": "backfill_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "DDR4→DDR3→DDR2 redesign 與 Winbond 退出 DDR2 若經一手來源確認，會增加或移除 legacy-memory 供應候選；原 active triage reason 已明列相同語意。"
+        },
         "decided_at": "2026-08-26T22:37:02.569688+00:00",
         "decision": "go",
         "priority_flags": {
@@ -13794,6 +13802,15 @@
       },
       "title": "For $XFAB ER transcript: Just to recap, my idea on $XFAB foundry growth opportunities stemmed from SiC for 800v and photonixfab/MTP for CPO applicability. - $XFAB: \"We are making progress in co-packaged optics\". - \"The transition to 800v... is expected to support demand for both SiC and GaN... for XFAB\" So those analysts/people that were confidently bearposting about $XFAB that they had \"0 exposure to 800V, photonics, CPO\" just turned out plainly wrong. At the time I shared my idea, industry materials showed ASE and others cited photonixfab + XFAB as an upcoming CPO player in EU. And filings showed they had exposure names like $NVTS / $POWI in general. So glad $XFAB went out to explicitly clear things up to state they were developing in CPO/800v. Okay back to the ER: - \"We continue to expect photonics volume production to start in 2028\". Company currently has three silicon photonics projects in development with key partners. I thought it would ramp sometime in H2 2027, but was probably early by a few months. - Several new data center design wins, eg. 3 new SiC design wins (consistent with general 2027 ramp as 800v deployment takes off). So once those ramp in 2027-2028, (markets tend to price things ahead of time), I'd expect $XFAB to be rerated based on growth opportunities. TLDR: - Current revenue numbers not as impressive. - $XFAB confirmed direct exposure to CPO and 800V shifts (biggest win for thesis) - 800V exposure opportunities for SiC (should be 2027) - Timeline is 2028 ramp for photonics volume production Happy exposure thesis to CPO/800V was confirmed from this ER. Might be a bit of waiting for revenue ramp.",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "X-FAB 自述 CPO 進展與 photonixfab：圖中尚無此節點，可能新增候選",
+          "restored_at": "2026-08-27T03:18:48.063011+00:00",
+          "restored_by": "backfill_history_restore_v1"
+        },
         "decided_at": "2026-08-24T07:01:43.896952+00:00",
         "decision": "go",
         "priority_flags": {
@@ -19314,6 +19331,13 @@
       "themes": {},
       "title": "MU 4 filed 2026-08-25",
       "triage": {
+        "classification": {
+          "classified_at": "2026-08-27T03:18:48.063011+00:00",
+          "classified_by": "backfill_deterministic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）"
+        },
         "decided_at": "2026-08-26T22:37:01.474318+00:00",
         "decision": "go",
         "priority_flags": {},
@@ -35239,6 +35263,14 @@
       },
       "title": "[decompose] Micro-ring modulator 層：NVIDIA Quantum-X CPO 用 200Gbps MRM，圖中無此節點。誰能做 MRM、與 Broadcom 的 EML/MZM 路線互斥性為何",
       "triage": {
+        "classification": {
+          "backfill_ref": "2026-08-27_active_classification_backfill.json",
+          "classified_at": "2026-08-27T03:18:48.063011+00:00",
+          "classified_by": "backfill_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "NVIDIA Quantum-X 的 200Gbps MRM 層目前缺供應商集合，查明 MRM 製造者及與 Broadcom EML／MZM 路線的互斥性會新增或移除 CPO 候選。"
+        },
         "decided_at": "2026-08-26T22:37:01.208359+00:00",
         "decision": "go",
         "priority_flags": {},

@@ -1,4 +1,4 @@
-# Daily Approval Brief — Codex 本機排程 Prompt（v1.6）
+# Daily Approval Brief — Codex 本機排程 Prompt（v1.7）
 
 > 現行執行端是 Codex desktop 的 standalone local scheduled task，每日台北 06:30 直接在
 > `C:\Users\Cheng\code\StockBotv2` 的 `master` working tree 執行。電腦需保持開機、Codex App
@@ -51,7 +51,11 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
      上限為 0，也必須保留。每列明示商品自身的「最新完整交易日 `YYYY-MM-DD`：1日 ±X%」；stale／
      quarantined 時改列 TWSE 等官方 reference 日期、當日漲跌與降級原因，不得把最近收盤寫成即時行情。
    - `.venv\Scripts\python.exe -m engine_b.cli list --status pending --by-priority`，再對今日新增 pending leads
-     套 `skills/signal-triage/SKILL.md`，用本機 CLI 寫回 triage。default store 的持股／瓶頸 context 任一讀取失敗
+     套 `skills/signal-triage/SKILL.md`，用本機 CLI 原子寫回 triage＋classification。PASS 命令必須帶
+     `--content-type`＋`--decision-impact`，`capital_commitment` 另帶 `--payment-direction`；不得只把分類塞進
+     `--reason` 自由文字。FILTER 不寫 classification。完成後執行
+     `.venv\Scripts\python.exe -m engine_b.cli classification-health`；非零時逐筆列出 active gap，這些 lead
+     會由 drain 標為 `withheld_unclassified_lead`，不得以 unknown 排序，也不得安靜 FILTER。default store 的持股／瓶頸 context 任一讀取失敗
      必須 exit 2、fail closed，不得以空集合繼續排序。
    - `.venv\Scripts\python.exe -m engine_b.cli trace-backlog`（顯示 parked 追源未果及下一 trigger；不把一般 backlog 全塞 pq2）
      ⚠ `auto_trigger_reachable=false` 的項目**必須逐筆列出並附 `unreachable_reason`**，不得只回報總數。

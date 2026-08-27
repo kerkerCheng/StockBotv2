@@ -20,3 +20,16 @@ def test_scoped_campaign_relaxes_only_tracked_relevance() -> None:
     assert "candidate events" in text
     assert "raw posts 的比例沒有判讀價值" in text
     assert "50–70%" in text
+
+
+def test_pass_requires_atomic_classification_and_health_gate() -> None:
+    text = SKILL.read_text(encoding="utf-8")
+    for token in (
+        "--content-type",
+        "--decision-impact",
+        "--payment-direction",
+        "classification-health",
+        "withheld_unclassified_lead",
+        "trace requeue 必須保留",
+    ):
+        assert token in text

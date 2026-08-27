@@ -15,7 +15,7 @@ import os
 import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, Mapping
 from urllib.parse import urlsplit, urlunsplit
 
 from access_failures import FAILURE_CLASSES
@@ -616,6 +616,19 @@ def requeue_trace(
     previous_flags = dict((previous or {}).get("priority_flags") or {})
     if cleaned_trigger in {"user_go", "user_requested", "access_granted"}:
         previous_flags["user_requested"] = True
+    preserved_classification = dict(
+        (previous or {}).get("classification") or {}
+    )
+    if not preserved_classification:
+        # 2026-08-27 實測：trace requeue 會把 active triage 整包重建，XFAB
+        # 原本的 candidate_set／structural_fact 因此只剩在 history，drain 顯示
+        # 未分類。分類描述的是 lead 本身，不是這次喚醒事件；重排時應沿用最近
+        # 一筆 receipt，不另做語意推論。
+        for entry in reversed(lead.get("triage_history") or []):
+            candidate = ((entry.get("triage") or {}).get("classification") or {})
+            if candidate:
+                preserved_classification = dict(candidate)
+                break
     lead["status"] = "triaged_go"
     lead["triage"] = {
         "decision": "go",
@@ -624,6 +637,13 @@ def requeue_trace(
         "decided_at": stamp,
         "priority_flags": previous_flags,
     }
+    if preserved_classification:
+        from engine_b import priority
+
+        lead["triage"]["classification"] = priority.validate_classification(
+            preserved_classification,
+            require_receipt=True,
+        )
     lead.setdefault("refs", {}).update({
         "trace_requeued_at": stamp,
         "trace_requeue_trigger": cleaned_trigger,
@@ -647,6 +667,7 @@ def triage(
     tier: int,
     reason: str,
     priority_flags: Mapping[str, Any] | None = None,
+    classification: Mapping[str, Any] | None = None,
     decided_at: str | None = None,
 ) -> dict[str, Any]:
     """對 pending lead 下 triage 判斷，轉入 triaged_go／triaged_no_go。
@@ -657,11 +678,17 @@ def triage(
     priority_flags（可選）記 signal-triage 五要素中的 boolean 訊號
     （contradiction／novelty／independent_source／user_requested），供 priority 計分用；不影響
     狀態機、不影響 evidence tier。
+
+    classification 是 PASS 當下的結構化注意力語意。production CLI 對 PASS 強制
+    必填；函式層保留 ``None`` 只為讀寫舊資料與低階測試相容，production drain 會
+    將缺分類的 active lead 明列 withheld，不再以 unknown 參與排序。
     """
     if not (1 <= int(tier) <= 4):
         raise ValueError("triage tier 必須是 1–4")
     if not (reason or "").strip():
         raise ValueError("triage 必須附 reason（含 no-go 也要記原因）")
+    if not go and classification is not None:
+        raise ValueError("FILTER／no-go 不應寫 classification")
     lead = _require(store, lead_id)
     target = "triaged_go" if go else "triaged_no_go"
     if target not in ALLOWED_TRANSITIONS[lead["status"]]:
@@ -671,15 +698,33 @@ def triage(
         for key in _PRIORITY_FLAG_KEYS
         if (priority_flags or {}).get(key)
     }
-    lead["status"] = target
     stamp = decided_at or _now()
-    lead["triage"] = {
+    classification_record: dict[str, Any] | None = None
+    if go and classification is not None:
+        from engine_b import priority
+
+        classification_record = priority.validate_classification(classification)
+        classification_record["classified_by"] = "triage_semantic_v1"
+        classification_record["classified_at"] = stamp
+        classification_record["reason"] = str(
+            classification_record.get("reason") or reason
+        ).strip()
+        classification_record = priority.validate_classification(
+            classification_record,
+            require_receipt=True,
+        )
+
+    lead["status"] = target
+    triage_record: dict[str, Any] = {
         "decision": "go" if go else "no_go",
         "tier": int(tier),
         "reason": reason.strip(),
         "decided_at": stamp,
         "priority_flags": flags,
     }
+    if classification_record is not None:
+        triage_record["classification"] = classification_record
+    lead["triage"] = triage_record
     if go:
         requeued = _requeue_related_trace_backlog(
             store,
@@ -861,3 +906,41 @@ def status_counts(store: dict[str, Any]) -> dict[str, int]:
     for lead in store["leads"].values():
         counts[lead["status"]] = counts.get(lead["status"], 0) + 1
     return counts
+
+
+CLASSIFICATION_REQUIRED_STATUSES: frozenset[str] = frozenset(
+    {"triaged_go", "researching", "action_prepared"}
+)
+
+
+def classification_gaps(store: dict[str, Any]) -> list[dict[str, Any]]:
+    """列出 active pq1 lead 的缺漏／非法 classification receipt。
+
+    ``unknown`` 仍是歷史相容 sentinel，但 active queue 不得靠它排序。這個 health
+    surface 只讀 tracked leads authority，不讀 Neo4j、Sheet 或 private runtime。
+    """
+
+    from engine_b import priority
+
+    rows: list[dict[str, Any]] = []
+    for lead_id, lead in store["leads"].items():
+        if lead.get("status") not in CLASSIFICATION_REQUIRED_STATUSES:
+            continue
+        record = priority.classification(lead)
+        issue = "missing"
+        if record:
+            try:
+                priority.validate_classification(record, require_receipt=True)
+            except priority.ClassificationValidationError as exc:
+                issue = str(exc)
+            else:
+                continue
+        title = " ".join(str(lead.get("title") or "").split())
+        rows.append({
+            "lead_id": lead_id,
+            "status": lead.get("status"),
+            "source": lead.get("source"),
+            "title": title[:200],
+            "issue": issue,
+        })
+    return sorted(rows, key=lambda row: row["lead_id"])

@@ -31,6 +31,9 @@ def test_references_batch_verbs_and_operational_commands() -> None:
         "-m engine_b.todo work",
         "-m decision_lab today",
         "drain",  # pq1 priority drain
+        "classification-health",
+        "--content-type",
+        "--decision-impact",
     ):
         assert command in text
 

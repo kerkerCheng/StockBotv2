@@ -61,6 +61,24 @@ def test_vocabulary_is_fail_closed(monkeypatch) -> None:
     priority.vocabulary.cache_clear()
 
 
+def test_classification_validation_rejects_unknown_and_incomplete_capital() -> None:
+    with pytest.raises(priority.ClassificationValidationError):
+        priority.validate_classification({
+            "content_type": "unknown",
+            "decision_impact": "ranking",
+        })
+    with pytest.raises(priority.ClassificationValidationError):
+        priority.validate_classification({
+            "content_type": "capital_commitment",
+            "decision_impact": "candidate_set",
+        })
+    with pytest.raises(priority.ClassificationValidationError):
+        priority.validate_classification({
+            "content_type": "structural_fact",
+            "decision_impact": "ranking",
+        }, require_receipt=True)
+
+
 def test_user_requested_campaign_gets_pq1_scheduling_priority() -> None:
     """使用者明確指定的 campaign 是 pq1 排程 authority（但不授權 pq2）。"""
 

@@ -98,7 +98,9 @@ live 資本仍各走 `complete-*` 與 exact 人工核准。`go` 只自動化「�
 ```powershell
 & '.venv\Scripts\python.exe' crons\harvest_leads.py                 # 零 token；--dry-run 只印不寫
 & '.venv\Scripts\python.exe' -m engine_b.cli drain                  # pq1 依 priority 的下一批
-& '.venv\Scripts\python.exe' -m engine_b.cli triage <lead_id> --go|--no-go --tier N --reason ...
+& '.venv\Scripts\python.exe' -m engine_b.cli triage <lead_id> --go --tier N --reason ... --content-type <type> --decision-impact <impact> [--payment-direction <direction>]
+& '.venv\Scripts\python.exe' -m engine_b.cli triage <lead_id> --no-go --tier N --reason ...
+& '.venv\Scripts\python.exe' -m engine_b.cli classification-health # active 缺分類回 exit 2
 & '.venv\Scripts\python.exe' -m engine_b.cli advance <lead_id> <status> [--ref k=v]
 & '.venv\Scripts\python.exe' -m engine_b.cli trace-backlog          # parked 追源未果與 trigger
 & '.venv\Scripts\python.exe' -m engine_b.cli related <lead_id>      # 共用具名標的的其他 lead
@@ -107,6 +109,11 @@ live 資本仍各走 `complete-*` 與 exact 人工核准。`go` 只自動化「�
 ```
 
 Leads authority 是 tracked `library/leads/pending_leads.json`；狀態機與 API 見 `engine_b/leads.py`。
+PASS 的 `content_type`／`decision_impact`／`payment_direction` 只認
+`config/lead_classification.json`。classification 與 triage 在同一次 atomic save 落盤；
+trace requeue 沿用最近合法 receipt。`classification-health` 只檢查 active
+`triaged_go`／`researching`／`action_prepared`；缺漏項會在 `drain` 顯示
+`withheld_unclassified_lead` 且不參與排序，但不改 evidence tier、graph admission 或任何人工 gate。
 
 `drain` 每輪上限的唯一權威是 `config/daily_routine.json` 的 `pq1.drain_limit_per_run`
 （`engine_b/routine_config.py` 是唯一 loader）。**文件裡出現的任何 slot 數字都是當時快照**，
@@ -208,6 +215,14 @@ Sheet adapter 的標準輸出是 `ticker`、`shares`、`currency`、`market_valu
 Price／FX 預設 yfinance（無 API key）。非同幣 FX 缺失或方向不符一律 fail closed。
 
 Codex standalone scheduled task 會沿用 legacy `workspace-write` sandbox，因此 project permission profile 不作 Daily authority。唯一權限來源是 `.codex/rules/stockbot-automations.rules` 的十五個窄 fixed entry：harvest、Engine C ETL、Alpha purity snapshot、SEC EDGAR pq1 fetch、Beta snapshot、pending priority list、pq1 drain、catalyst watch、Alpha outcome snapshot、Research Action prepare、decision today、todo sync、已核准 work order checkpoint、state publisher、Discord publisher，第一次呼叫就用 `require_escalated` 命中各自 exact outside-sandbox rule；不先失敗再升權重補跑，也不放行任意 Python、PowerShell、Git 或 working tree。`engine_b.todo work` 只可推進已有 `dispatch_ref` 的 USER-GO work order，不授權 dispatch／resolve／reassess。修改 rules 後須讓 Codex 重新載入設定；但在要求重啟前先確認 exact rule **確實存在**，因為重啟不能修復漏寫的 rule。
+
+**Triage classification surface impact（2026-08-27）：** `engine_b.cli triage` 新增的分類參數只會
+atomic 寫 tracked `library/leads/pending_leads.json`；`classification-health` 只讀同檔並以 exit 2
+回報 active 缺口；互動 migration `scripts/backfill_lead_classification.py --from-json ... --apply`
+也只寫同一 tracked authority。三者都不讀 credential／private authority、不呼叫 OS security API、
+不連網、不碰 `.git`，所以留在 `workspace-write` sandbox，**不新增 unattended rule**。既有
+`engine_b.cli drain` 仍只用原 fixed entry 讀 Decision／Sheet／Neo4j context；新增的
+`withheld_unclassified_lead` 是本機 validation，沒有新增 capability 或副作用。
 
 ### Sandbox／private authority 排錯
 

@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "purpose": "補齊 2026-08-27 post-drain active queue 中沒有可從 triage_history 還原的兩筆 classification；XFAB 由 backfill_history_restore_v1 確定性還原。",
+  "items": {
+    "lead_04bdc6cd80cb88df7cfdbdcb3f0bb0a8": {
+      "content_type": "structural_fact",
+      "decision_impact": "candidate_set",
+      "reason": "DDR4→DDR3→DDR2 redesign 與 Winbond 退出 DDR2 若經一手來源確認，會增加或移除 legacy-memory 供應候選；原 active triage reason 已明列相同語意。"
+    },
+    "lead_c9d297d58ac05a8f9c5e55fb433317fc": {
+      "content_type": "structural_fact",
+      "decision_impact": "candidate_set",
+      "reason": "NVIDIA Quantum-X 的 200Gbps MRM 層目前缺供應商集合，查明 MRM 製造者及與 Broadcom EML／MZM 路線的互斥性會新增或移除 CPO 候選。"
+    }
+  }
+}

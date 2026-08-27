@@ -7,7 +7,8 @@ triage 判斷，這支 CLI 負責寫入狀態機（不讓 agent 手寫 JSON 冒�
 用法:
     python -m engine_b.cli register --source weekly --url <url> --title "..."
     python -m engine_b.cli list [--status pending]
-    python -m engine_b.cli triage <lead_id> --go|--no-go --tier 3 --reason "有新角度"
+    python -m engine_b.cli triage <lead_id> --go --tier 3 --reason "有新角度" \
+        --content-type structural_fact --decision-impact ranking
     python -m engine_b.cli advance <lead_id> researching
     python -m engine_b.cli annotate <lead_id> --ref outcome=audio_obtained
     python -m engine_b.cli counts
@@ -224,6 +225,21 @@ def _print_withheld(withheld_jobs: list[dict]) -> None:
             print(f"          {note}")
 
 
+def _print_classification_gaps(gaps: list[dict]) -> None:
+    if not gaps:
+        return
+    print()
+    print(
+        f"⚠ 另有 {len(gaps)} 筆 active lead 因 classification 缺漏而 withheld；"
+        "先 backfill／重做 triage，不能以 unknown 參與排序："
+    )
+    for gap in gaps:
+        print(
+            f"  [classification-health] {gap['lead_id']}  {gap['status']}  "
+            f"理由={gap['issue']}"
+        )
+
+
 def _cmd_drain(args: argparse.Namespace) -> int:
     """列出 pq1 接下來的 bounded jobs，供 agent 逐個研究與 checkpoint。
 
@@ -273,9 +289,22 @@ def _cmd_drain(args: argparse.Namespace) -> int:
                 return 2
             print(f"警告：Decision pq1 無法讀取：{exc}", file=sys.stderr)
 
-    candidates = [
+    all_candidates = [
         l for l in store["leads"].values()
         if l["status"] in ("triaged_go", "researching")
+    ]
+    gap_by_id = {
+        row["lead_id"]: row
+        for row in leads.classification_gaps(store)
+    }
+    classification_gaps = [
+        gap_by_id[lead["lead_id"]]
+        for lead in all_candidates
+        if lead["lead_id"] in gap_by_id
+    ]
+    candidates = [
+        lead for lead in all_candidates
+        if lead["lead_id"] not in gap_by_id
     ]
     try:
         held_tickers, held_company_ids = _held(strict=is_default_store)
@@ -300,16 +329,20 @@ def _cmd_drain(args: argparse.Namespace) -> int:
             {"kind": "lead", "priority": rank.label, "lead": lead}
             for rank, lead in lead_batch
         ] + [
+            {"kind": "withheld_unclassified_lead", "health": gap}
+            for gap in classification_gaps
+        ] + [
             {"kind": "withheld_work_order", "work_order": job}
             for job in withheld_jobs
         ]
         print(json.dumps(rows, ensure_ascii=False, indent=2))
         return 0
-    if not decision_jobs and not lead_batch:
+    if not decision_jobs and not lead_batch and not classification_gaps:
         print("（pq1 佇列已空——無 dispatched work order 或可研究 lead）")
         _print_withheld(withheld_jobs)
         return 0
-    print(f"pq1 drain：接下來 {len(decision_jobs) + len(lead_batch)} 件：")
+    if decision_jobs or lead_batch:
+        print(f"pq1 drain：接下來 {len(decision_jobs) + len(lead_batch)} 件：")
     for job in decision_jobs:
         print(
             f"  [USER-GO] {job['work_order_id']}  {job['status']:12}  "
@@ -321,8 +354,28 @@ def _cmd_drain(args: argparse.Namespace) -> int:
     for rank, l in lead_batch:
         print(f"  [{rank.label}] {l['lead_id']}  {l['status']:12}  {l['source']}")
         print(f"           {l.get('title') or '(無標題)'}  {l.get('url')}")
+    _print_classification_gaps(classification_gaps)
     _print_withheld(withheld_jobs)
     return 0
+
+
+def _classification_from_args(args: argparse.Namespace, *, required: bool) -> dict | None:
+    fields = {
+        "content_type": getattr(args, "content_type", None),
+        "decision_impact": getattr(args, "decision_impact", None),
+        "payment_direction": getattr(args, "payment_direction", None),
+        "reason": getattr(args, "classification_reason", None),
+    }
+    supplied = any(value is not None for value in fields.values())
+    if not required:
+        if supplied:
+            raise ValueError("FILTER／no-go 不接受 classification 參數")
+        return None
+    if not fields["content_type"] or not fields["decision_impact"]:
+        raise ValueError(
+            "PASS 必須同時指定 --content-type 與 --decision-impact"
+        )
+    return {key: value for key, value in fields.items() if value is not None}
 
 
 def _cmd_triage(args: argparse.Namespace) -> int:
@@ -333,10 +386,12 @@ def _cmd_triage(args: argparse.Namespace) -> int:
         "independent_source": args.independent,
     }
     try:
+        classification = _classification_from_args(args, required=args.go)
         leads.triage(
             store, args.lead_id,
             go=args.go, tier=args.tier, reason=args.reason,
             priority_flags=flags,
+            classification=classification,
         )
     except (leads.LeadStateError, ValueError) as exc:
         print(f"triage 失敗：{exc}", file=sys.stderr)
@@ -379,6 +434,14 @@ def _cmd_triage_campaign(args: argparse.Namespace) -> int:
         "independent_source": args.independent,
         "user_requested": True,
     }
+    try:
+        classification = _classification_from_args(
+            args,
+            required=bool(requested),
+        )
+    except ValueError as exc:
+        print(f"campaign triage 失敗：{exc}", file=sys.stderr)
+        return 1
     for lead_id in requested:
         leads.triage(
             store,
@@ -387,6 +450,7 @@ def _cmd_triage_campaign(args: argparse.Namespace) -> int:
             tier=args.tier,
             reason=args.reason,
             priority_flags=flags,
+            classification=classification,
         )
     filtered = 0
     if args.filter_rest:
@@ -482,6 +546,19 @@ def _cmd_counts(args: argparse.Namespace) -> int:
     counts = leads.status_counts(store)
     print(json.dumps(counts, ensure_ascii=False))
     return 0
+
+
+def _cmd_classification_health(args: argparse.Namespace) -> int:
+    """active pq1 classification 必須完整；缺漏要顯形且不得進 drain。"""
+
+    store = leads.load(args.leads)
+    gaps = leads.classification_gaps(store)
+    print(json.dumps({
+        "status": "ok" if not gaps else "error",
+        "active_unclassified_count": len(gaps),
+        "items": gaps,
+    }, ensure_ascii=False, indent=2))
+    return 0 if not gaps else 2
 
 
 def _cmd_harvest_health(args: argparse.Namespace) -> int:
@@ -607,6 +684,15 @@ def build_parser() -> argparse.ArgumentParser:
     p_drain.add_argument("--json", action="store_true")
     p_drain.set_defaults(func=_cmd_drain)
 
+    vocab = priority.vocabulary()
+    content_choices = [
+        item for item in vocab["content_type"]["_order"] if item != "unknown"
+    ]
+    impact_choices = [
+        item for item in vocab["decision_impact"]["_order"] if item != "unknown"
+    ]
+    payment_choices = list(vocab["payment_direction"]["_order"])
+
     p_tri = sub.add_parser("triage", help="對 pending lead 下 go／no-go")
     p_tri.add_argument("lead_id")
     grp = p_tri.add_mutually_exclusive_group(required=True)
@@ -614,6 +700,13 @@ def build_parser() -> argparse.ArgumentParser:
     grp.add_argument("--no-go", dest="go", action="store_false")
     p_tri.add_argument("--tier", type=int, required=True, help="1–4（來源分級，非 evidence tier）")
     p_tri.add_argument("--reason", required=True)
+    p_tri.add_argument("--content-type", choices=content_choices)
+    p_tri.add_argument("--decision-impact", choices=impact_choices)
+    p_tri.add_argument("--payment-direction", choices=payment_choices)
+    p_tri.add_argument(
+        "--classification-reason",
+        help="結構化分類理由；省略時沿用 --reason",
+    )
     p_tri.add_argument("--contradiction", action="store_true", help="矛盾/反證價值（priority）")
     p_tri.add_argument("--novelty", action="store_true", help="新穎性（priority）")
     p_tri.add_argument("--independent", action="store_true", help="新 origin_entity/獨立來源（priority）")
@@ -627,6 +720,10 @@ def build_parser() -> argparse.ArgumentParser:
     p_campaign.add_argument("--go-id", action="append", default=[])
     p_campaign.add_argument("--tier", type=int, default=4)
     p_campaign.add_argument("--reason", default="具體可追查 claim，進 scoped pq1")
+    p_campaign.add_argument("--content-type", choices=content_choices)
+    p_campaign.add_argument("--decision-impact", choices=impact_choices)
+    p_campaign.add_argument("--payment-direction", choices=payment_choices)
+    p_campaign.add_argument("--classification-reason")
     p_campaign.add_argument("--contradiction", action="store_true")
     p_campaign.add_argument("--novelty", action="store_true")
     p_campaign.add_argument("--independent", action="store_true")
@@ -654,6 +751,12 @@ def build_parser() -> argparse.ArgumentParser:
 
     p_cnt = sub.add_parser("counts", help="各狀態計數（JSON）")
     p_cnt.set_defaults(func=_cmd_counts)
+
+    p_class_health = sub.add_parser(
+        "classification-health",
+        help="active pq1 classification 完整性（缺漏回 exit 2）",
+    )
+    p_class_health.set_defaults(func=_cmd_classification_health)
 
     p_health = sub.add_parser(
         "harvest-health",

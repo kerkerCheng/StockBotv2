@@ -120,15 +120,20 @@ default store 的 Google Sheet 持股或 Neo4j chokepoint context 任一不可�
 fail closed；不得把持股靜默降成空集合後仍宣稱已依完整 priority 排序。
 
 對每條**新** pending lead 套 `skills/signal-triage/SKILL.md` 五要素判準。判斷完寫回（本機用 CLI、
-雲端用 MCP `record_lead_decision`），並帶上 priority flags（供 pq1 排序）：
+雲端用 MCP `record_lead_decision`），並帶上 priority flags（供 pq1 排序）；MCP 的 PASS 亦必須傳
+`content_type`／`decision_impact`／必要的 `payment_direction`，與本機同一契約：
 
 ```powershell
-& '.venv\Scripts\python.exe' -m engine_b.cli triage <lead_id> --go   --tier 3 --reason "<要素>" [--contradiction] [--novelty] [--independent]
+& '.venv\Scripts\python.exe' -m engine_b.cli triage <lead_id> --go --tier 3 --reason "<要素>" --content-type <type> --decision-impact <impact> [--payment-direction <direction>] [--classification-reason "<分類理由>"] [--contradiction] [--novelty] [--independent]
 & '.venv\Scripts\python.exe' -m engine_b.cli triage <lead_id> --no-go --tier 4 --reason "<為何篩掉>"
+& '.venv\Scripts\python.exe' -m engine_b.cli classification-health
 ```
 
 triage 寬鬆（關聯性與可引用性是硬指標，其餘軟指標命中即 go）；no-go 也記 reason。`tier` 是來源初步
 分級，**不是** evidence tier、不影響入圖強度。priority flags（矛盾/反證、新穎、獨立來源）只供 pq1 排序。
+PASS classification 的封閉字彙與判準只認 `skills/signal-triage/SKILL.md`／
+`config/lead_classification.json`；health 非零必須在健康段逐筆列出。缺分類 lead 不進 drain 排名，
+但不得因此隱藏或自動 FILTER。
 
 ### Step 3 — pq1 drain（priority，可續跑）
 
