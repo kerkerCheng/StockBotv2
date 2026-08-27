@@ -246,6 +246,13 @@
       "execution_venue": "NASDAQ"
     },
     {
+      "company_id": "co:microsoft",
+      "research_ticker": "MSFT",
+      "market_currency": "USD",
+      "execution_currency": "USD",
+      "execution_venue": "NASDAQ"
+    },
+    {
       "company_id": "co:mips_holding",
       "research_ticker": null
     },
@@ -294,6 +301,13 @@
     {
       "company_id": "co:openlight_photonics",
       "research_ticker": null
+    },
+    {
+      "company_id": "co:oracle",
+      "research_ticker": "ORCL",
+      "market_currency": "USD",
+      "execution_currency": "USD",
+      "execution_venue": "NYSE"
     },
     {
       "company_id": "co:poet_technologies",
@@ -346,6 +360,10 @@
     {
       "company_id": "co:soitec",
       "research_ticker": "SOI.PA"
+    },
+    {
+      "company_id": "co:spacexai",
+      "research_ticker": null
     },
     {
       "company_id": "co:sumitomo_electric",
