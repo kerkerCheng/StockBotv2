@@ -1,0 +1,117 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "lmoc_3081_annual_report_fy2025_20260508",
+    "title": "聯亞光電（3081）114 年度股東會年報 — 競爭格局與自身代工定位",
+    "url": "https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=F&co_id=3081&filename=2025_3081_20260527F04.pdf",
+    "origin_entity": "LandMark Optoelectronics",
+    "publisher": "Taiwan MOPS 公開資訊觀測站電子書",
+    "published_at": "2026-05-08",
+    "retrieved_at": "2026-08-28",
+    "source_type": "filing",
+    "evidence_tier": 1,
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "Public MOPS annual report; only the research-relevant excerpt is retained alongside the canonical carrier URL."
+  },
+  "sources": [
+    {
+      "id": "lmoc_3081_annual_report_fy2025_20260508_s1",
+      "locator": "五、營運概況 — 競爭情形 — 供應來源類型一：IDM",
+      "quote": "供應來源主要可分為兩大類型：其一為大型光電整合元件製造商（IDM），例如美國 Coherent、Broadcom、Lumentum 及日本 Sumitomo Electric、Mitsubishi Electric 等。該類企業多具備完整磊晶片設計與製造能力，採垂直整合之一條龍生產模式，主要供應自有終端產品使用。惟隨全球光通訊及資料中心需求快速成長，IDM 廠商內部產能常受限，因而逐步將部分磊晶製程外包，本公司憑藉中立代工定位，與其終端產品市場並無競爭關係，反而成為其高階磊晶外包訂單之主要合作對象之一。"
+    },
+    {
+      "id": "lmoc_3081_annual_report_fy2025_20260508_s2",
+      "locator": "五、營運概況 — 競爭情形 — 供應來源類型二：專業磊晶片供應商",
+      "quote": "另一類則為專業磊晶片供應商，除本公司外，尚有英特磊(IET-KY)、英國 IQE 等。該類同業多以分子束磊晶（MBE） 技術為主，或同時涉足微波通訊元件（如 HBT、HEMT） 等非光通訊應用領域。相較之下，本公司為全球少數專注於光通訊及資料中心應用市場，且以有機金屬化學氣相沉積（MOCVD） 為核心製程技術之專業磊晶代工廠，並具備大規模量產能力。"
+    },
+    {
+      "id": "lmoc_3081_annual_report_fy2025_20260508_s3",
+      "locator": "五、營運概況 — 主要原料之供應狀況",
+      "quote": "主要原料 主要供應商 供應狀況 Substrate 基板 A01 公司(註)、A03 公司(註)、A10 公司(註) 正常 Mo-Source A04 公司(註)、A05 公司(註)、凱信 AKZO 正常 設備耗材 A06 公司(註)、A13 公司(註)、A15 公司(註) 正常 註：因供應商與本公司有營業保密約定，故以代號為之。"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:landmark_optoelectronics",
+      "type": "Company",
+      "name": "LandMark Optoelectronics Corporation",
+      "abstraction_level": "materials_substrate",
+      "role": "foundry",
+      "aliases": ["聯亞光電", "LandMark Optoelectronics", "3081.TWO"],
+      "attributes": {},
+      "confidence": 0.95,
+      "source_ids": ["lmoc_3081_annual_report_fy2025_20260508_s2"]
+    },
+    {
+      "id": "co:intelliepi",
+      "type": "Company",
+      "name": "IntelliEPI",
+      "abstraction_level": "materials_substrate",
+      "role": "foundry",
+      "aliases": ["IET-KY", "英特磊"],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": ["lmoc_3081_annual_report_fy2025_20260508_s2"]
+    },
+    {
+      "id": "co:iqe",
+      "type": "Company",
+      "name": "IQE plc",
+      "abstraction_level": "materials_substrate",
+      "role": "material_base",
+      "aliases": ["IQE"],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": ["lmoc_3081_annual_report_fy2025_20260508_s2"]
+    }
+  ],
+  "edges": [
+    {
+      "id": "lmoc_3081_annual_report_fy2025_20260508_e1",
+      "src_id": "co:landmark_optoelectronics",
+      "dst_id": "co:intelliepi",
+      "relation": "competes_with",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": ["lmoc_3081_annual_report_fy2025_20260508_s2"]
+    },
+    {
+      "id": "lmoc_3081_annual_report_fy2025_20260508_e2",
+      "src_id": "co:landmark_optoelectronics",
+      "dst_id": "co:iqe",
+      "relation": "competes_with",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": ["lmoc_3081_annual_report_fy2025_20260508_s2"]
+    }
+  ],
+  "claims": [
+    {
+      "id": "lmoc_3081_annual_report_fy2025_20260508_cl1",
+      "statement": "LandMark positions itself as a neutral outsourced epitaxy foundry for optoelectronic IDMs, naming Coherent, Broadcom, Lumentum, Sumitomo Electric and Mitsubishi Electric as that IDM class, and asserts it has no competitive overlap with their end-product markets. THIS IS A SUPPLIER SELF-DESCRIPTION AND IS NOT CORROBORATED. Three independent sources were checked on 2026-08-28 and none confirms outsourced epitaxy to LandMark: Coherent's FY2026 10-K describes in-house manufacture of lasers and names no epitaxy foundry; Lumentum's FY2026 10-K names no epitaxy supplier and its contract manufacturers are described in assembly terms; Reuters/SemiAnalysis places LandMark alongside VPEC as Taiwanese makers hit by AXT substrate delays, i.e. parallel to rather than upstream of Coherent and Lumentum. Furthermore IntelliEPI's industry table lists Coherent in the epitaxy layer itself, so for Coherent specifically the no-overlap assertion does not hold; Broadcom appears only in the IDM layer, where outsourcing remains structurally possible. Per L8 this ranks no higher than verified_by_absence.",
+      "subject_id": "co:landmark_optoelectronics",
+      "demand_proof_level": "speculative",
+      "disproof_condition": "Upgrade only if a customer-side filing or third-party source names LandMark as an epitaxy supplier to any of the listed IDMs. Downgrade further if a customer explicitly states it does not outsource epitaxy. 核查頻率：每季客戶端財報與每年年報；觸發後 48 小時內人工 review。",
+      "confidence": 0.4,
+      "source_ids": ["lmoc_3081_annual_report_fy2025_20260508_s1"]
+    },
+    {
+      "id": "lmoc_3081_annual_report_fy2025_20260508_cl2",
+      "statement": "LandMark names IntelliEPI (IET-KY) and IQE as the other specialist epitaxy suppliers, states that these peers are mainly MBE-based or also serve non-optical microwave applications, and claims to be one of very few specialist epitaxy foundries focused on optical communications and data centre applications using MOCVD as its core process. NOTE the qualifier that carries the weight: VPEC is also an MOCVD house, so the scarcity claim rests on the application focus (optical communications and data centre), not on MOCVD itself.",
+      "subject_id": "lmoc_3081_annual_report_fy2025_20260508_e1",
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Revise if VPEC, IQE or IntelliEPI discloses comparable optical-communications and data-centre focused MOCVD capacity, or if LandMark reclassifies either peer as a customer or supplier. 核查頻率：每年年報；觸發後 48 小時內人工 review。",
+      "confidence": 0.85,
+      "source_ids": ["lmoc_3081_annual_report_fy2025_20260508_s2"]
+    },
+    {
+      "id": "lmoc_3081_annual_report_fy2025_20260508_cl3",
+      "statement": "LandMark discloses that its substrate supply comes from three coded suppliers (A01, A03, A10) and its Mo-Source from A04, A05 and Kaisin AKZO, stating that supplier identities are coded due to confidentiality agreements. The coded identifiers must not be resolved to any named company. The graph's existing co:axt -> co:landmark_optoelectronics edge derives from separate sourcing (Reuters/SemiAnalysis reporting AXT permit delays hitting LandMark), not from this table.",
+      "subject_id": "co:landmark_optoelectronics",
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Revise if LandMark later names its substrate suppliers, or if the count of substrate suppliers changes materially. 核查頻率：每年年報；觸發後 48 小時內人工 review。",
+      "confidence": 0.85,
+      "source_ids": ["lmoc_3081_annual_report_fy2025_20260508_s3"]
+    }
+  ]
+}
