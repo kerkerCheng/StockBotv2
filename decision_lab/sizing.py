@@ -23,6 +23,21 @@ AXES = (
 )
 LEVELS = ("unknown", "bounded_hypothesis", "corroborated")
 
+# 每一軸對應的「該補什麼」。最弱軸是排序的瓶頸，也是提高排序的唯一路徑，所以這句話
+# 就是 pq2 項目的內容——使用者要看到的是「補 COHR 的 counter-path」，不是
+# 「REVIEW — co:coherent」那種沒有成因的文字。
+#
+# ⚠ 與 AXES 綁在一起放，是為了讓新增一軸時被強迫決定它的研究動作（同
+# schema/vocab.json 的 counter_path_relation 模式）。`tests/test_weakest_axis.py`
+# 斷言兩者的鍵完全一致。
+AXIS_RESEARCH_PROMPT: dict[str, str] = {
+    "source_reliability": "補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+    "technical_causal_link": "補 counter-path：什麼會讓這條因果鏈斷掉（第二供應源、客戶自製、技術替代）",
+    "commercial_maturity": "補客戶端商業承諾：訂單、產能協議或預付款等付錢方向的證據",
+    "financial_resilience": "補 Engine C 財務觀測：客戶集中度、backlog、runway 等人工欄位",
+    "valuation_payoff": "補估值錨點：市值、分析師覆蓋與隱含假設，回答股價已經定價了什麼",
+}
+
 
 def weakest_axis_of(axes: Mapping[str, Mapping[str, Any]]) -> str:
     """回傳證據最弱的那一軸。

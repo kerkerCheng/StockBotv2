@@ -87,6 +87,10 @@ def _decision_item(
         "decision_id": card["decision_id"],
         "company_id": _public_company(card.get("company_id")),
         "recommended_action": action,
+        # 最弱軸跟著 item 走，消費端不必自己再查一次 decision（L16）。pq2 的研究缺口
+        # 項目就是由它導出：「補哪一檔的哪一軸」比「REVIEW — co:xxx」可執行得多。
+        "weakest_axis": (card.get("weakest_link") or {}).get("axis"),
+        "weakest_missing_data": (card.get("weakest_link") or {}).get("missing_data") or [],
         "reason": card["reason"],
         "alpha_thesis_change": card.get("alpha_beta") or {"classification": "unknown"},
         "beta_portfolio_risk": {

@@ -1727,6 +1727,33 @@ def _decision_review_hint(
     )
 
 
+def _decision_review_title(
+    action: str,
+    label: str,
+    *,
+    weakest_axis: str | None,
+    sheet_only: bool = False,
+) -> str:
+    """研究缺口項目的標題：指名補哪一檔的哪一軸。
+
+    先前是 `f"{action} — {label}"`，也就是「REVIEW — co:coherent」——它說了狀態卻
+    沒說成因，使用者看到只能再點進去查一次。最弱軸就是排序的瓶頸，也是提高排序的
+    唯一路徑，所以它才是這一列該講的事。
+
+    `sheet_only` 與軸缺失時退回舊格式：那些項目本來就不是研究缺口，硬套研究措辭會
+    讓它們看起來需要補證據。
+    """
+    if sheet_only or not weakest_axis:
+        return f"{action} — {label}"
+    from decision_lab.sizing import AXIS_RESEARCH_PROMPT
+
+    prompt = AXIS_RESEARCH_PROMPT.get(weakest_axis)
+    if not prompt:
+        # 未登記的軸不猜措辭，但仍要指名它——沉默會讓新增的軸悄悄退回舊格式。
+        return f"{label}：補 {weakest_axis}"
+    return f"{label}：{prompt}"
+
+
 def _collect_decision_rows() -> list[dict[str, Any]]:
     """需要動作的 Engine D 決策項（REVIEW／TRADE／HEDGE）→ 複查待辦。
 
@@ -1764,7 +1791,12 @@ def _collect_decision_rows() -> list[dict[str, Any]]:
         row = {
             "type": "sheet_only_holding" if item.get("sheet_only") else "decision_review",
             "ref_id": ref,
-            "title": f"{action} — {label}",
+            "title": _decision_review_title(
+                action,
+                label,
+                weakest_axis=item.get("weakest_axis"),
+                sheet_only=bool(item.get("sheet_only")),
+            ),
             **({"hint": _decision_review_hint(ref, dispatchable, blockers)}
                if not item.get("sheet_only") else {}),
             "source": "decision_lab",

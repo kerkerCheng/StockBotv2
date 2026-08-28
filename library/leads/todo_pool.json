@@ -2044,7 +2044,7 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
-      "title": "REVIEW — co:applied_optoelectronics",
+      "title": "co:applied_optoelectronics：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
     },
     {
@@ -2695,7 +2695,7 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
-      "title": "REVIEW — co:sivers_semiconductors",
+      "title": "co:sivers_semiconductors：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review",
       "waiting_on": {
         "reason": null,
@@ -3078,7 +3078,7 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
-      "title": "REVIEW — co:micron_technology",
+      "title": "co:micron_technology：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
     },
     {
@@ -3214,7 +3214,7 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
-      "title": "REVIEW — co:agility_robotics",
+      "title": "co:agility_robotics：補客戶端商業承諾：訂單、產能協議或預付款等付錢方向的證據",
       "type": "decision_review",
       "waiting_on": {
         "reason": null,
@@ -3669,7 +3669,7 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
-      "title": "REVIEW — co:marvell_technology",
+      "title": "co:marvell_technology：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
     },
     {
@@ -3740,7 +3740,7 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
-      "title": "REVIEW — co:harmonic_drive_systems",
+      "title": "co:harmonic_drive_systems：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
     },
     {
@@ -3753,7 +3753,7 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
-      "title": "REVIEW — co:schaeffler",
+      "title": "co:schaeffler：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
     },
     {
@@ -3870,7 +3870,7 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
-      "title": "REVIEW — co:landmark_optoelectronics",
+      "title": "co:landmark_optoelectronics：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
     },
     {
@@ -3929,6 +3929,30 @@
       "source": "engine_c",
       "title": "Engine C 觀測：3081.TWO / backlog",
       "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-08-28T14:10:58.036032+00:00",
+      "hint": "coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
+      "n": 243,
+      "reason": null,
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:axt：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-28T14:10:58.036032+00:00",
+      "hint": "coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
+      "n": 244,
+      "reason": null,
+      "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:iqe：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
     }
   ],
   "log": [
@@ -9062,6 +9086,6 @@
       "verb": "drop"
     }
   ],
-  "next_n": 243,
+  "next_n": 245,
   "schema_version": "1"
 }
