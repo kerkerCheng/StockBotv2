@@ -20,6 +20,10 @@
       "research_ticker": null
     },
     {
+      "company_id": "co:all_space",
+      "research_ticker": null
+    },
+    {
       "company_id": "co:amd",
       "research_ticker": "AMD",
       "market_currency": "USD",
@@ -89,6 +93,10 @@
       "research_ticker": "CDNS"
     },
     {
+      "company_id": "co:casela_technologies",
+      "research_ticker": null
+    },
+    {
       "company_id": "co:celestial_ai",
       "research_ticker": null
     },
@@ -145,6 +153,11 @@
       "market_currency": "JPY",
       "execution_currency": "JPY",
       "execution_venue": "TSE"
+    },
+    {
+      "company_id": "co:hexagon",
+      "research_ticker": "HEXA-B.ST",
+      "market_currency": "SEK"
     },
     {
       "company_id": "co:hyundai_mobis",
@@ -331,6 +344,10 @@
       "market_currency": "EUR"
     },
     {
+      "company_id": "co:seminex",
+      "research_ticker": null
+    },
+    {
       "company_id": "co:shuanghuan_driveline",
       "research_ticker": "002472.SZ",
       "market_currency": "CNY",
@@ -368,6 +385,10 @@
     {
       "company_id": "co:sumitomo_electric",
       "research_ticker": "5802.T"
+    },
+    {
+      "company_id": "co:tachyon_networks",
+      "research_ticker": null
     },
     {
       "company_id": "co:tesla",
