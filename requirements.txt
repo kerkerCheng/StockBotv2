@@ -8,6 +8,10 @@ psycopg2-binary
 # Source Fetcher
 requests
 
+# 非美股 filing 多半只有 PDF：台股 MOPS 電子書年報、日股 TDnet 決算短信
+# （fetchers/mops.py）。美股 EDGAR 走 HTML 故 edgar.py 不需要這個。
+pypdf
+
 # Local-first audio transcription for source tracing. Model weights are cached
 # under ignored library/private/ on first use.
 faster-whisper==1.2.1

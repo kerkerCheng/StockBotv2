@@ -264,6 +264,41 @@ brief 不可直接用 `Get-Content | --stdin` 管線傳送；`--brief-file` 會�
 
 ---
 
+## 非美股 filing 抓取（台股 MOPS／日股 TDnet）
+
+**台股：`fetchers/mops.py`**（互動式入口，**未加入任何 unattended routine**）。
+
+```bash
+python -m fetchers.mops --co-id 3081 --list                 # 先看有哪些文件
+python -m fetchers.mops --co-id 3081 --kind annual_report   # 抓年報（預設只取最新修訂）
+python -m fetchers.mops --co-id 4971 --kind annual_report --all-revisions
+```
+
+輸出與 `edgar.py` 一致：`library/raw/{doc_id}.txt` ＋ `.meta.json`。
+年報「營運概況」含最近二年度占進（銷）貨總額 10% 以上之客戶——台股客戶集中度的一手來源。
+
+**⚠ 不要改抓公司 IR 網站。** 多數台廠年報 PDF 連結是動態載入，靜態抓取只拿得到零散附件
+（2026-08-28 實測聯亞只取得「前十大股東關係表」，一度被誤判成「可抽文字為 0」）。
+
+fetcher 已封裝的四個坑，自己刻之前先讀 `fetchers/mops.py` 的 docstring：
+① 兩段式下載（`step=9` 回的是 HTML，裡面才有帶時戳的一次性 PDF 路徑；直接猜
+`/pdf/{filename}` 一律 404）；② 列表頁是 **big5**，不設 encoding 會拿到亂碼；
+③ `--year` 是**民國查詢年度**而非資料年度，查 115 回的是 114 年度年報；
+④ 同年度可能有多份修訂（原始版 F04 ／股東會後修訂本 F11），共用 doc_id 會**靜默覆蓋**，
+預設只取最新並印出略過訊息。
+
+**日股：** 有価証券報告書走 EDINET，受注残高與決算數字走決算短信（TDnet）。
+⚠ EDINET API v2 需 subscription key（未申請）；2026-08-28 實測改抓 TDnet 決算短信正本
+即取得所需資料。尚未封裝成 fetcher。
+
+**⚠ 若日後要讓 daily／weekly 等 unattended routine 呼叫這支 fetcher**，依 AGENTS.md 的
+「Codex sandbox／private authority 整合契約」必須在**同一個 change** 內完成 sandbox impact
+review：列出 path／side effect／網路能力、新增最窄的 `.codex/rules/*.rules` exact prefix、
+更新 permission contract test、並用 scheduled task 的相同 sandbox 與 exact command 跑一次
+端到端 smoke test。目前只做互動式入口，故未動 rules。
+
+---
+
 ## MCP server
 
 本機 `mcp_server/graph_mcp.py` + Cloudflare Tunnel + connector，十二工具 surface，Git 能力僅 leads.json 一個窄例外。daily／weekly 現行排程不需要 MCP（直接在本機 repo 執行）。完整資料流與安全邊界見 [`remote-access-architecture.md`](remote-access-architecture.md)。
