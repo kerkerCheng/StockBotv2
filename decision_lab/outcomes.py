@@ -170,9 +170,7 @@ def _decision_attribution(
     if decision is None:
         return {
             "decision_id": None,
-            "system_paper_target": None,
             "paper_source_decision_id": None,
-            "latest_recommendation_target": None,
             "user_live_weight": None,
             "user_choice_decision_id": None,
             "user_choice_type": None,
@@ -208,12 +206,14 @@ def _decision_attribution(
         current_price = _positive(current_market.get("price"), "current_market.price")
         decision_price = _positive(decision_market.get("price"), "decision_market.price")
         system_return = current_price / decision_price - 1.0
+    # ⚠ 系統給的額度欄位（system_paper_target／latest_recommendation_target／
+    # system_paper_max）已移除。outcome 要回答的是「排序準不準」，那需要報酬率，
+    # 不需要系統曾經建議投多少——而那三個欄位正是本次重構要從系統終點拔掉的東西。
+    # 保留 user_live_weight 與 live_fill_*：那是**使用者實際做了什麼**的事實記錄，
+    # 不是系統的建議，且是 outcome 歸因唯一能對照「判斷對不對」與「有沒有出手」的橋。
     return {
         "decision_id": decision["decision_id"],
         "paper_source_decision_id": source_decision_id,
-        "system_paper_target": paper_state["weight"],
-        "latest_recommendation_target": sizing["paper_target"],
-        "system_paper_max": sizing["paper_max_supported_position"],
         "user_live_weight": choice["selected_weight"] if choice else None,
         "user_choice_decision_id": choice["decision_id"] if choice else None,
         "user_choice_type": choice["choice_type"] if choice else None,

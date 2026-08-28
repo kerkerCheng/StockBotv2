@@ -321,7 +321,10 @@ def test_outcome_freezes_system_vs_user_choice_and_calculator_trace(
         )
         frozen = store.get_outcome(result.outcome_id)
 
-        assert frozen["decision_attribution"]["system_paper_target"] == pytest.approx(0.0035)
+        # 系統給的額度欄位已隨資本表達層移除（R9）：outcome 回答的是「排序準不準」，
+        # 那需要報酬率，不需要系統曾建議投多少。
+        assert "system_paper_target" not in frozen["decision_attribution"]
+        # user_live_weight 保留——那是**使用者實際做了什麼**的事實，不是系統建議。
         assert frozen["decision_attribution"]["user_live_weight"] == 0.0
         assert frozen["decision_attribution"]["user_choice_type"] == "skipped"
         # 讀 policy 而非寫死版本字串：這裡要守的是「凍結值等於當時 policy 說的值」，
@@ -372,10 +375,13 @@ def test_outcome_attributes_actual_paper_book_not_latest_blocked_recommendation(
         )
         attribution = store.get_outcome(result.outcome_id)["decision_attribution"]
 
+        # 本測試守的是「歸因到真正資助的那個 decision，不是最新的被擋建議」——
+        # 由下面兩條 decision_id 斷言證明。原本另用額度數字佐證（實際 0.0035 vs
+        # 被擋 0.0），那兩個欄位已隨資本表達層移除（R9），改為斷言它們確實不見了。
         assert attribution["decision_id"] == blocked.decision_id
         assert attribution["paper_source_decision_id"] == funded.decision_id
-        assert attribution["system_paper_target"] == pytest.approx(0.0035)
-        assert attribution["latest_recommendation_target"] == 0.0
+        assert "system_paper_target" not in attribution
+        assert "latest_recommendation_target" not in attribution
     finally:
         store.close()
 
