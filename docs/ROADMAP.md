@@ -235,6 +235,12 @@ D7 的判準本身仍然有效，只是不再有這個 gate 可套用。
 
 ### 未排程
 
+**🔴 private authority 備份沒有可執行入口（2026-08-29 使用者提出，查證後升級）：**
+
+| 項目 | 為什麼 | 驗收條件 | 前置 |
+|---|---|---|---|
+| **把既有的 backup 模組接上入口，並讓「上次備份」變成會自己出現的數字** | `AGENTS.md` L10 的判準是「這筆資料今天重新取一次拿得回來嗎？拿不回來 → 只能 append」。拿不回來的目前有：`library/private/decision_lab/`（31MB，131 筆 decision＋live choice／fill）、`library/private/engine_c/`（3.3MB，append-only manual observation ledger）、以及**完全不在 repo 內的 Neo4j 圖**。⚠ 查證後的真正問題不是「還沒寫備份工具」——`decision_lab/backup.py` 早就寫好了，含 checksum、bounded rotation 與 `restore_private_backup`，但 **production 呼叫端是 0**（`grep create_private_backup` 只命中它自己與兩個測試檔）。它是 L13 的「管子只接一頭」：能力蓋好了，沒有任何人能從外面按下去。Neo4j 則連 dump 腳本都沒有。所以今天「上次備份是什麼時候」的誠實答案是**沒有備份過**。 | ①有可執行入口（CLI subcommand 或 `scripts/`），使用者一行可跑；②**daily brief 首屏出現「最後一次備份：N 天前」**——依 L14，真正的防呆是會自己出現的常駐計數器，不是要人記得的段落，而「提醒使用者手動備份」正是那種會被忘記的段落；③至少實際跑過一次 restore 到暫存位置並比對 checksum——**沒驗證過的備份不算備份**。 | 先把 `library/private/` 底下分成「拿得回來」（`models` 464MB 可重下載、`lead_media`）與「拿不回來」兩類，只備份後者 |
+
 **2026-08-29 code review 導出（U7 收尾時未修，理由各自附上）：**
 
 | 項目 | 為什麼 | 驗收條件 | 前置 |
