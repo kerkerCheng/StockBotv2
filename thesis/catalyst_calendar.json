@@ -5,6 +5,25 @@
   "_date_confidence": "confirmed=公司已公告確切日期；estimated=由歷史申報節奏或 provider 預估。依 lifecycle_schedule 的既有規則，estimated 照樣排程（提早看一次的成本遠低於錯過裁決點），但呈現時必須標明。",
   "entries": [
     {
+      "ticker": "3081.TWO",
+      "catalyst_checkpoints": [
+        {
+          "date": "2026-11-14",
+          "what": "2026 Q3 財報",
+          "decides": "是否為 2027–2030 四年 CW 雷射長約揭露產能擴充、客戶預付款或合約金額／最低採購量。公告當下這四項全部未揭露，是本 decision 的核心不確定性",
+          "date_confidence": "estimated",
+          "basis": "台股上櫃公司第三季財報法定申報期限為 11/14 前（證交法規），日期為法定上界而非公司已公告之確切日期"
+        },
+        {
+          "date": "2027-02-10",
+          "what": "2027 年 1 月營收公告",
+          "decides": "合約自 2027 年起算，這是第一個能觀測合約是否轉為實際出貨的時點——也是唯一無法用措辭掩飾的地方。對應 disproof 第 (1) 條：若 2027 上半年累計營收未較 2026 同期成長 30% 以上，「四年長約＝營收能見度」的解讀不成立",
+          "date_confidence": "estimated",
+          "basis": "台股規定每月 10 日前公告前月營收，故 2027-02-10 前可見 2027 年首月。日期為法定上界；實務上公司常提前數日公告"
+        }
+      ]
+    },
+    {
       "ticker": "6324.T",
       "catalyst_checkpoints": [
         {

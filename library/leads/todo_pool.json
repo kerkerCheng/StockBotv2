@@ -3819,10 +3819,11 @@
       "added_at": "2026-08-27T18:01:48.877583+00:00",
       "hint": "TL;DR：聯亞光電（LandMark Optoelectronics，3081.TWO，台灣上櫃）2026-08-26 公告與「某美國客戶」簽訂 2027–2030 四年資料中心用 CW 雷射長期採購合約，已於 2026-08-27 經 [234] 入圖並自動建立 cohort dc_f94148d8。但 decision 沒有 catalyst 與 disproof，系統套 +72h 預設 expiry（2026-08-30，後天到期）。成因同 Harmonic [197]：入圖當下沒補，不是外部事件。\n\n圖中位置：co:axt -supplies_to-> co:landmark_optoelectronics -supplies_to-> tech:cw_dfb_laser，而 tech:cw_dfb_laser -is_component_of-> tech:cpo／tech:external_laser_source／tech:transceiver_1_6t。也就是說聯亞是 CPO／ELS／1.6T 光模組共用的雷射光源供應者，上游吃 AXT 的基板。\n\n⚠ 聯亞不是獨家：圖中同樣 supplies_to tech:cw_dfb_laser 的還有 co:lumentum、co:coherent、co:sivers_semiconductors，共 4 家。\n\n已有一手（MOPS 公告經 Yahoo carrier，tier 1，已入圖）：契約相對人「某美國客戶」、期間 116–119 年（2027–2030）、目的為「確保數據中心用 CW 雷射產品足量供應」。⚠ 公告**未揭露**客戶身分、合約金額、最低採購量、價格、獨家性，也沒有任何 NVIDIA 關聯陳述——這些邊界已寫進 claim。\n\n市場現況（Engine C 快照 2026-08-27，非一手）：股價 3,255 TWD、市值約 301 億 TWD（約 9.4 億美元）、毛利率 52.7%、營益率 46.9%、營收 TTM 33.2 億 TWD。⚠ 估值極度伸展：EV/Rev 99.4、P/E trailing 305.3、forward P/E 82.7；分析師 10 位、目標均價 3,036 已**低於**現價。現金 16.4 億 TWD、總債 3.4 億 TWD，但 FCF TTM 僅 0.50 億 TWD。⚠ 股價 8/26 收 2,960 → 8/27 收 3,255，單日 +9.97%，時點與本公告吻合。\n\nvariant perception：市場現在讀的是「拿到 AI 資料中心四年長約＝未來四年營收能見度」，並已用一天 +10%、EV/Rev 99x 定價。本 thesis 認為：在**無最低採購量、無金額、無獨家性**揭露的情況下，「長期供貨合約」在台廠實務上可能只是優先供應權而非營收保證；且同一元件圖中已有 4 家供應商。催化劑是 2027 年首季起的月營收是否出現階梯式跳升——那是這份合約唯一無法用措辭掩飾的地方。\n\n建議 catalyst：2027 年 1 月與 2 月營收公告（台股規定每月 10 日前公告前月營收，故 2027-02-10 前可見首月、2027-03-10 前可見次月）。合約自 2027 年起算，這是第一個能觀測到合約是否轉為實際出貨的時點。次要觀測點為 2026 Q3 財報（預計 2026-11-14 前），看是否揭露為此合約進行的產能擴充、預付款或客戶預付。\n\n建議 disproof（任一成立即視為 thesis 失效）：\n(1) 到 2027-06-30，2027 上半年累計營收未較 2026 同期成長 30% 以上——四年長約若不能在首個半年帶出可辨識的營收級距變化，「營收能見度」的解讀不成立；\n(2) 公司公告該合約終止、縮小範圍、或客戶行使取消權；\n(3) 到 2027-12-31，該美國客戶被揭露為非 AI／資料中心用途（如電信接取或消費性光通訊），則 CPO／AI 需求錨點不成立；\n(4) 同期間出現第二家供應商取得同一客戶的同類長約且聯亞份額被稀釋，或公司揭露該合約不含最低採購量。\n核查頻率：每月營收公告後、每季財報後；觸發後 48 小時內人工 review。\n\n建議 expiry：2026-11-30（涵蓋 2026 Q3 財報公布時點加緩衝；真正的驗證點在 2027 Q1 月營收，屆時 reassess 會重新設定）。\n\n⚠ 另有兩個未清 blocker，本項不處理：financial_backlog_manual_required 與 financial_customer_concentration_manual_required。聯亞為台股，客戶集中度與 backlog 需另走公開資訊觀測站年報／財報附註，屬另一次 bounded research。\n\ngo 授權：把上述 catalyst／disproof／expiry 用於 3081.TWO 的下一次 reassess，並同步寫入 thesis/catalyst_calendar.json。不下單、不入圖、不改 Google Sheet、不動 Engine C observation。",
       "n": 235,
-      "reason": null,
+      "reason": "使用者 2026-08-28 核准聯亞 catalyst／disproof／expiry：catalyst=2027 年 1–2 月營收（合約自 2027 起算，唯一無法用措辭掩飾的觀測點）＋2026 Q3 財報（法定 11/14 前）；disproof 四條（營收未成長 30%／合約終止或縮小／客戶被揭露為非 AI 用途／第二供應商稀釋或無最低採購量）；expiry=2026-11-30。已寫入 thesis/catalyst_calendar.json（2 個 checkpoint，經 lifecycle_schedule 正規化驗證）並完成 reassess，新 decision pd_b898711f，catalyst_missing／disproof_missing 已從 blocker 清單消失。⚠ financial_backlog／customer_concentration_manual_required 仍在，屬另一次 bounded research",
+      "receipt": "authority:decision;ref:pd_b898711fd48b4d82069adc6311bcfb1f",
       "ref_id": "dc_f94148d8545de35cb2c5d048640b913e",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-28T00:24:24.595118+00:00",
       "source": "manual",
       "title": "確認聯亞光電（3081.TWO）decision catalyst／disproof — 修 [234] 入圖後的 +72h 假鬧鐘",
       "type": "manual"
@@ -3831,10 +3832,11 @@
       "added_at": "2026-08-27T22:41:25.012489+00:00",
       "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-03-31T00:00:00+00:00；來源=library/raw/hds_6324_tanshin_fy2026_20260513.txt | 6324 2026年3月期 決算短信（TDnet 2026",
       "n": 236,
-      "reason": null,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_8f030daa37fc19095121ea1436e4c0fe;proposal:po_b8f9afb7bc0f348a846e90b877b6b5fb",
       "ref_id": "po_b8f9afb7bc0f348a846e90b877b6b5fb",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-28T00:20:24.842807+00:00",
       "source": "engine_c",
       "title": "Engine C 觀測：6324.T / backlog",
       "type": "engine_c_observation"
@@ -3843,10 +3845,11 @@
       "added_at": "2026-08-27T22:41:25.012489+00:00",
       "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-03-31T00:00:00+00:00；來源=library/raw/hds_6324_tanshin_fy2026_20260513.txt | 6324 2026年3月期 決算短信（TDnet 2026",
       "n": 237,
-      "reason": null,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_85171e828061112865070772b9361e3c;proposal:po_bd21eedb1c22737e32e7250dc8181b95",
       "ref_id": "po_bd21eedb1c22737e32e7250dc8181b95",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-28T00:20:25.436732+00:00",
       "source": "engine_c",
       "title": "Engine C 觀測：6324.T / customer_concentration",
       "type": "engine_c_observation"
@@ -3874,6 +3877,25 @@
       "source": "thesis",
       "title": "thesis sivers：review_required → revised",
       "type": "thesis_mutation"
+    },
+    {
+      "added_at": "2026-08-28T00:25:09.190134+00:00",
+      "hint": "coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
+      "n": 240,
+      "reason": null,
+      "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "REVIEW — co:iqe",
+      "type": "decision_review",
+      "waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-08-28T00:25:09.189978+00:00",
+        "trigger": "執行面 context 缺失",
+        "until": null
+      }
     }
   ],
   "log": [
@@ -8887,8 +8909,35 @@
       "ref_id": "dc_0fca807c963dc3b9888e0f83ba6d45a5",
       "type": "decision_review",
       "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-08-28T00:20:24.842807+00:00",
+      "n": 236,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_8f030daa37fc19095121ea1436e4c0fe;proposal:po_b8f9afb7bc0f348a846e90b877b6b5fb",
+      "ref_id": "po_b8f9afb7bc0f348a846e90b877b6b5fb",
+      "type": "engine_c_observation",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-28T00:20:25.436732+00:00",
+      "n": 237,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_85171e828061112865070772b9361e3c;proposal:po_bd21eedb1c22737e32e7250dc8181b95",
+      "ref_id": "po_bd21eedb1c22737e32e7250dc8181b95",
+      "type": "engine_c_observation",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-28T00:24:24.595118+00:00",
+      "n": 235,
+      "reason": "使用者 2026-08-28 核准聯亞 catalyst／disproof／expiry：catalyst=2027 年 1–2 月營收（合約自 2027 起算，唯一無法用措辭掩飾的觀測點）＋2026 Q3 財報（法定 11/14 前）；disproof 四條（營收未成長 30%／合約終止或縮小／客戶被揭露為非 AI 用途／第二供應商稀釋或無最低採購量）；expiry=2026-11-30。已寫入 thesis/catalyst_calendar.json（2 個 checkpoint，經 lifecycle_schedule 正規化驗證）並完成 reassess，新 decision pd_b898711f，catalyst_missing／disproof_missing 已從 blocker 清單消失。⚠ financial_backlog／customer_concentration_manual_required 仍在，屬另一次 bounded research",
+      "receipt": "authority:decision;ref:pd_b898711fd48b4d82069adc6311bcfb1f",
+      "ref_id": "dc_f94148d8545de35cb2c5d048640b913e",
+      "type": "manual",
+      "verb": "go"
     }
   ],
-  "next_n": 240,
+  "next_n": 241,
   "schema_version": "1"
 }
