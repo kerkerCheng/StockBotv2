@@ -82,11 +82,15 @@ def _assert_user_sized_within_capital_caps(
     decision_effective_at: str | None = None,
     decided_at: str | None = None,
 ) -> None:
-    """`user_sized` 不比 supported_range，但三個真正的資本上限照樣硬擋。
+    """三個真正的資本上限硬擋。系統已不輸出建議尺寸，這是唯一剩下的資本護欄。
 
-    刻意**不**檢查研究完整度、五軸 ceiling 或 coverage blocker——那些是研究進度，
+    刻意**不**檢查研究完整度、五軸等級或 coverage blocker——那些是研究進度，
     不是風險判斷（D2／D3）。實測依據：72 筆 decision 裡三個資本上限一次都沒 binding 過，
-    100% 的歸零由資料與研究完整度造成。
+    100% 的歸零由資料與研究完整度造成，於是 2026-08-28（U7）把資本表達層整組移除。
+
+    ⚠ 這道檢查刻意**留下**。它擋的不是研究不足，是「這一筆會讓單一標的超過 5% NAV」
+    ——一個具體、可否證、與研究進度無關的事實。移除系統建議尺寸不等於移除真實風控
+    （L14：拆煞車前要先裝儀表板，而不是兩個一起拆）。
     """
 
     blocked = sorted(_HARD_CAP_BLOCKERS.intersection(sizing.get("live_blockers") or ()))
@@ -106,13 +110,18 @@ def _assert_user_sized_within_capital_caps(
                 " — run `decision_lab reassess` to refresh holdings and caps"
             )
 
-    # 單筆 NAV 上限取自該 decision 自己凍結的 constraint trace，不重算——point-in-time
-    # 契約要求用當時的 policy 版本，且重算需要重讀 holdings／NAV。
-    cap = None
-    for entry in sizing.get("constraint_trace") or ():
-        if entry.get("lane") == "live" and entry.get("constraint") == "single_position_cap":
-            cap = entry.get("cap_weight")
-            break
+    # 單筆 NAV 上限取自該 decision 自己凍結的值，不重算——point-in-time 契約要求用
+    # 當時的 policy 版本，且重算需要重讀 holdings／NAV。
+    #
+    # 新格式直接凍 `single_position_nav_cap`；U7 之前的 128 筆凍在 `constraint_trace`
+    # 的 `single_position_cap` 條目裡。兩者都要讀得到——Decision Store 是 append-only
+    # 的 private authority，舊 decision 不回寫（L10／KTD4）。
+    cap = sizing.get("single_position_nav_cap")
+    if cap is None:
+        for entry in sizing.get("constraint_trace") or ():
+            if entry.get("lane") == "live" and entry.get("constraint") == "single_position_cap":
+                cap = entry.get("cap_weight")
+                break
     if cap is None or not isinstance(cap, (int, float)) or isinstance(cap, bool):
         raise ValueError(
             "user_sized choice requires a frozen single_position_cap in the decision trace"
@@ -790,7 +799,9 @@ class DecisionStore:
         每天的 brief 都會說出來。
 
         - ``live_range_nonzero``：歷來 ``live_supported_range`` 上界 > 0 的 decision 數。
-          0 代表系統從未對任何標的說出「可以入場」——不論研究做得多好。
+          ⚠ **這是歷史欄位**：2026-08-28（U7）之後的 decision 不再有 supported range，
+          所以這個數字從此只會反映 U7 之前的 128 筆，不再增長。保留它是為了讓歷史可讀，
+          不是當現況指標；首屏已改用 ``eligible_cohorts``（研究完整度）。
         - ``measured_outcomes``：``outcome_envelopes`` 中 ``absolute_return`` 非 null 的
           筆數。0 代表「系統的判斷準不準」永遠無法用證據回答。
         """
@@ -851,11 +862,17 @@ class DecisionStore:
         # 以及 co:lumentum 的重複舊 cohort——**沒有一個是研究做了卻卡住的**。
         # 分母若含永遠不可能上線的東西，這個指標就會謊報「還有救得回來的標的」。
         # 無 company_id 的 cohort 一律不計；同公司多 cohort 取最新 decision。
+        # `research_status` 是 U7 之後的欄位；`paper_status` 是它 U7 之前的名字，
+        # 兩者的「研究做完整了」值分別是 READY 與 ELIGIBLE。舊 decision 不回寫，
+        # 所以兩個都要讀（KTD4）。
         latest: dict[str, tuple[str, str]] = {}
         for row in self._conn.execute(
             """
             SELECT c.company_id AS company_id, d.effective_at AS at,
-                   json_extract(d.payload_json, '$.sizing.paper_status') AS status
+                   COALESCE(
+                       json_extract(d.payload_json, '$.sizing.research_status'),
+                       json_extract(d.payload_json, '$.sizing.paper_status')
+                   ) AS status
             FROM decision_cohorts c
             JOIN system_decisions d ON d.cohort_id = c.cohort_id
             WHERE c.company_id IS NOT NULL
@@ -865,7 +882,9 @@ class DecisionStore:
             at = str(row["at"] or "")
             if company not in latest or at > latest[company][0]:
                 latest[company] = (at, str(row["status"] or ""))
-        eligible_n = sum(1 for _, status in latest.values() if status == "ELIGIBLE")
+        eligible_n = sum(
+            1 for _, status in latest.values() if status in {"READY", "ELIGIBLE"}
+        )
         # 以公司為單位是對的，但不能因此把重複 cohort 藏起來——那會讓指標變乾淨、
         # 問題變隱形（ROADMAP 的「Engine D cohort 重複」backlog 就永遠不會有人發現）。
         # 同公司多 cohort 仍必須在 brief 現形，只是不再汙染上線比率的分母。
@@ -1111,8 +1130,6 @@ class DecisionStore:
             live_blockers=live_blockers,
             paper_context_ready=paper_ready,
             live_context_ready=live_ready,
-            paper_supported_position=0.0,
-            live_supported_range=(0.0, 0.0),
             work_order_id=row["work_order_id"],
         )
 
@@ -1602,19 +1619,17 @@ class DecisionStore:
         decision_id: str,
         decision_digest: str,
         payload: Mapping[str, Any],
-        paper_event_id: str | None,
     ) -> DecisionExecutionResult:
         sizing = payload["sizing"]
+        # 舊 decision 沒有 `research_status`，但它的 `paper_status == "ELIGIBLE"` 就是
+        # 同一件事的舊名字（見 models.RESEARCH_STATUSES）。讀取端容忍舊欄位、不回寫。
+        status = sizing.get("research_status")
+        if status is None:
+            status = "READY" if sizing.get("paper_status") == "ELIGIBLE" else "INCOMPLETE"
         return DecisionExecutionResult(
             decision_id=decision_id,
             decision_digest=decision_digest,
-            paper_event_id=paper_event_id,
-            paper_funded=paper_event_id is not None,
-            paper_target=float(sizing["paper_target"]),
-            paper_max_supported_position=float(
-                sizing["paper_max_supported_position"]
-            ),
-            action=str(sizing["action"]),
+            research_status=str(status),
         )
 
     def atomic_assess_probe(
@@ -1627,11 +1642,15 @@ class DecisionStore:
         effective_at: str,
         request_payload: Mapping[str, Any],
         paper_nav: float,
-        company_id: str,
         calculator: Callable[[Mapping[str, Any]], ProbeSizingResult],
         failure_at: str | None = None,
     ) -> DecisionExecutionResult:
-        """Recompute paper capacity and commit decision/event in one transaction。"""
+        """凍結一筆 system decision。
+
+        2026-08-28（U7）起**不再建立 paper event**：paper 部位是資本表達，而系統終點
+        已改為瓶頸度排序。既有的 `paper_events`／`paper_position_projection` 是
+        append-only 歷史，保持原樣可讀，只是不再增長（KTD2：留 shadow 錨點，拔 paper 部位）。
+        """
 
         if not idempotency_key.strip():
             raise ValueError("idempotency_key is required")
@@ -1678,15 +1697,10 @@ class DecisionStore:
             if existing is not None:
                 if existing["request_digest"] != request_digest:
                     raise ValueError("idempotency key already belongs to a different request digest")
-                event = self._conn.execute(
-                    "SELECT paper_event_id FROM paper_events WHERE decision_id = ?",
-                    (existing["decision_id"],),
-                ).fetchone()
                 return self._execution_result_from_payload(
                     str(existing["decision_id"]),
                     str(existing["decision_digest"]),
                     json.loads(existing["payload_json"]),
-                    str(event["paper_event_id"]) if event is not None else None,
                 )
 
             exposure = self._paper_exposure(paper_nav=paper_nav)
@@ -1725,77 +1739,10 @@ class DecisionStore:
             if failure_at == "after_decision":
                 raise RuntimeError("injected failure after decision")
 
-            current = float(exposure["company_weights"].get(company_id, 0.0))
-            target = float(sizing.paper_target)
-            paper_event_id: str | None = None
-            if sizing.paper_status == "ELIGIBLE" and not math.isclose(
-                current, target, abs_tol=1e-12
-            ):
-                prior_event = self._conn.execute(
-                    """
-                    SELECT e.effective_at
-                    FROM paper_position_projection p
-                    JOIN paper_events e ON e.paper_event_id = p.source_event_id
-                    WHERE p.company_id = ?
-                    """,
-                    (company_id,),
-                ).fetchone()
-                if prior_event is not None and _time(
-                    effective_at, "effective_at"
-                ) <= _time(str(prior_event["effective_at"]), "prior.effective_at"):
-                    raise ValueError("paper update must follow its current source event")
-                event_payload = {
-                    "company_id": company_id,
-                    "decision_id": decision_id,
-                    "decision_digest": decision_digest,
-                    "context_digest": context_digest,
-                    "policy_version": sizing.policy_version,
-                    "calculator_version": sizing.calculator_version,
-                    "target_weight": target,
-                    "previous_weight": current,
-                    "changed_weight": target - current,
-                    "constraint_trace": sizing.constraint_trace,
-                }
-                event_json = _canonical_json(event_payload)
-                event_digest = _digest(event_json)
-                paper_event_id = "pe_" + _digest(f"{decision_id}:{event_digest}")[:32]
-                self._conn.execute(
-                    """
-                    INSERT INTO paper_events (
-                        paper_event_id, cohort_id, decision_id, event_type,
-                        payload_json, payload_digest, effective_at
-                    ) VALUES (?, ?, ?, 'target_update', ?, ?, ?)
-                    """,
-                    (
-                        paper_event_id,
-                        cohort_id,
-                        decision_id,
-                        event_json,
-                        event_digest,
-                        effective_at,
-                    ),
-                )
-                if failure_at == "after_paper_event":
-                    raise RuntimeError("injected failure after paper event")
-                self._conn.execute(
-                    """
-                    INSERT INTO paper_position_projection (
-                        company_id, weight, source_event_id
-                    ) VALUES (?, ?, ?)
-                    ON CONFLICT(company_id) DO UPDATE SET
-                        weight = excluded.weight,
-                        source_event_id = excluded.source_event_id,
-                        updated_at = datetime('now')
-                    """,
-                    (company_id, target, paper_event_id),
-                )
-                if failure_at == "after_projection":
-                    raise RuntimeError("injected failure after projection")
             return self._execution_result_from_payload(
                 decision_id,
                 decision_digest,
                 decision_payload,
-                paper_event_id,
             )
 
     def paper_position(self, company_id: str) -> float:
@@ -2045,14 +1992,16 @@ class DecisionStore:
         force_override: bool = False,
         user_sized: bool = False,
     ) -> str:
-        """記錄一筆 live 選擇。
+        """記錄一筆 live 選擇。**尺寸一律由使用者決定。**
 
-        `user_sized=True` 走 2026-08-18 定案的 alpha live 路徑：**尺寸來源是使用者，
-        不是系統**，因此不與 `live_supported_range` 比較。這不是放寬——分開之後兩邊
-        各自更嚴（L12）：`user_sized` 改為硬擋 `_HARD_CAP_BLOCKERS`＋單筆 NAV 上限，
-        而研究完整度／五軸／coverage 那些 blocker 不再參與（D2：不確定性用尺寸承擔，
-        不用 gate 禁止參與）。理由與交換條件見
-        `docs/brainstorms/2026-08-18-alpha-live-user-sized-requirements.md`。
+        2026-08-28（U7）起系統不再輸出 `live_supported_range`，所以也不再有
+        「接受／低於區間」的分類——只剩「跳過」「使用者自訂尺寸」與（歷史）「override」。
+        擋的仍然只有三個真實資本上限＋凍結快照時效，見
+        `_assert_user_sized_within_capital_caps`。
+
+        ⚠ 舊 decision 仍帶 `live_supported_range`，`system_supported_upper` 欄位
+        因此保留：既有 live_choices 的稽核值不得被改寫（L10 append-only）。新 choice
+        在該欄寫 NULL——「系統沒有給過區間」與「區間是 0」不是同一件事（L12）。
         """
 
         decided_at = _timestamp(decided_at, "decided_at")
@@ -2080,28 +2029,34 @@ class DecisionStore:
                 raise ValueError("live choice cannot predate its decision")
             payload = json.loads(decision["payload_json"])
             sizing = payload["sizing"]
-            lower, upper = sizing["live_supported_range"]
-            if user_sized:
+            # 舊 decision 才有系統區間；新的沒有。None ≠ 0（L12）。
+            legacy_range = sizing.get("live_supported_range")
+            supported_upper = (
+                float(legacy_range[1])
+                if isinstance(legacy_range, (list, tuple)) and len(legacy_range) == 2
+                else None
+            )
+            if force_override and (not reason or not reason.strip() or not approved_action_id):
+                raise ValueError("live override requires reason and approved action")
+            if selected_weight > 0 and not force_override:
+                # 系統不再有 supported range，所以每一筆非零、非 override 的選擇都是
+                # 使用者自訂尺寸，全部走同一條資本上限檢查——不再有「照系統區間接受」
+                # 這條不必檢查的捷徑。
+                #
+                # skip（0%）不檢查：它不新增曝險，卻會被凍結快照的七天時效擋下，
+                # 而「太久沒 reassess 所以不准放棄」是說不通的。
                 _assert_user_sized_within_capital_caps(
                     sizing,
                     selected_weight,
                     decision_effective_at=str(decision["effective_at"]),
                     decided_at=decided_at,
                 )
-            elif selected_weight > float(upper) + 1e-12 and not force_override:
-                raise ValueError("selected live weight exceeds supported cap")
-            if force_override and (not reason or not reason.strip() or not approved_action_id):
-                raise ValueError("live override requires reason and approved action")
             choice_type = (
-                "user_sized"
-                if user_sized
-                else "override"
+                "override"
                 if force_override
                 else "skipped"
                 if selected_weight == 0
-                else "below_range"
-                if selected_weight < float(lower)
-                else "accepted"
+                else "user_sized"
             )
             choice_id = "lc_" + _digest(
                 _canonical_json(
@@ -2127,7 +2082,7 @@ class DecisionStore:
                     choice_type,
                     reason,
                     approved_action_id,
-                    float(upper),
+                    supported_upper,
                     decided_at,
                 ),
             )
@@ -2475,12 +2430,13 @@ class DecisionStore:
                 ).fetchone()
                 if decision is None:
                     raise ValueError("paper amendment decision reference is missing")
-                maximum = float(
-                    json.loads(decision["payload_json"])["sizing"][
-                        "paper_max_supported_position"
-                    ]
+                # paper 部位已於 U7 停止新增，所以能走到這裡的一定是 U7 之前的事件，
+                # 其 decision 帶著 `paper_max_supported_position`。欄位不存在時不猜一個
+                # 上限——沒有上限可比就不比，只留 append-only 的更正紀錄。
+                maximum = json.loads(decision["payload_json"])["sizing"].get(
+                    "paper_max_supported_position"
                 )
-                if target > maximum + 1e-12:
+                if maximum is not None and target > float(maximum) + 1e-12:
                     raise ValueError("paper amendment exceeds original supported cap")
             company_id = str(original_payload["company_id"])
             current_source = self._conn.execute(

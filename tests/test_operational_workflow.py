@@ -3,7 +3,8 @@ from __future__ import annotations
 from copy import deepcopy
 from pathlib import Path
 
-from decision_lab.blocker_severity import severity_of
+from decision_lab.blocker_severity import fatal_blockers, severity_of
+from decision_lab.models import RESEARCH_STATUSES
 from decision_lab.workflow import EvaluationRequest, evaluate_signal, reassess
 from decision_lab.workflow_ports import AuthoritySnapshot, IdentityAuthority
 from tests.test_decision_context import complete_inputs
@@ -151,13 +152,16 @@ def test_partial_execution_metadata_captures_without_crash(tmp_path: Path) -> No
 
         # 2026-08-13 行為變更：execution metadata 缺失只封鎖 **live**，不再連坐 paper。
         # 缺的是執行匯率、使用者 NAV 與投組槓桿——那是「能不能真的下單」需要的東西，
-        # 一筆 0.5% 的 paper probe 不需要它們。先前 `if live_blockers: paper_max = 0`
-        # 式的無條件連坐，正是讓 2026-08-02 嚴重度分類變成 no-op 的那一行。
-        assert result["action_card"]["live"]["supported_range"] == [0.0, 0.0]
-        assert result["action_card"]["paper"]["max_supported_position"] > 0
-
-        # 但擋住 live 的理由必須看得見：會改變輸出的輸入要出現在輸出自己的證據欄位。
+        # 研究面不需要它們。先前 `if live_blockers: paper_max = 0` 式的無條件連坐，
+        # 正是讓 2026-08-02 嚴重度分類變成 no-op 的那一行。
+        #
+        # U7（2026-08-28）：兩個 lane 的**額度**已移除，但 lane blocker 的分流沒變，
+        # 所以同一個契約改由 blocker 落在哪一邊表達——執行面的缺口只准進 live_blockers。
+        sizing = store.get_decision(result["decision_id"])["payload"]["sizing"]
         for blocker in ("execution_fx_missing", "live_nav_missing", "portfolio_leverage_unavailable"):
+            assert blocker in sizing["live_blockers"]
+            assert blocker not in sizing["paper_blockers"], f"{blocker} 不得連坐研究面"
+            # 擋住 live 的理由必須看得見：會改變輸出的輸入要出現在輸出自己的證據欄位。
             assert blocker in result["action_card"]["blockers"]
     finally:
         store.close()
@@ -166,6 +170,12 @@ def test_partial_execution_metadata_captures_without_crash(tmp_path: Path) -> No
 def test_sive_signal_runs_to_auditable_card_and_retry_is_idempotent(
     tmp_path: Path,
 ) -> None:
+    """U7（2026-08-28）：同一份訊號重跑仍必須落在同一筆可稽核的 decision 上。
+
+    原測試另外斷言 `paper_events` 建了 1 筆且 card 顯示 `paper.funded`。paper 部位是
+    資本表達，已隨 U7 停止新增；**Shadow 錨點刻意留著**——它是 outcome 量測的來源。
+    這裡改成正向鎖住新契約：重跑仍冪等、Shadow 仍只有一筆、paper ledger 不再增長。
+    """
     store = _store(tmp_path)
     provider = FixtureProvider()
     try:
@@ -175,19 +185,26 @@ def test_sive_signal_runs_to_auditable_card_and_retry_is_idempotent(
         assert first["decision_id"] == retry["decision_id"]
         assert first["context_digest"] == retry["context_digest"]
         assert first["paper_event_id"] == retry["paper_event_id"]
-        assert first["paper_event_id"] is not None
-        assert store.table_count("paper_events") == 1
+        assert first["paper_event_id"] is None
+        assert store.table_count("paper_events") == 0
         assert store.table_count("shadow_observations") == 1
         assert first["action_card"]["decision_id"] == first["decision_id"]
-        assert first["action_card"]["paper"]["funded"] is True
+        assert first["action_card"]["research"]["status"] in RESEARCH_STATUSES
+        assert "paper" not in first["action_card"]
         assert "execution_intent_paper_only" in first["blockers"]
     finally:
         store.close()
 
 
-def test_raw_only_unresolved_signal_still_creates_zero_size_card_and_work_order(
+def test_raw_only_unresolved_signal_still_creates_card_and_work_order(
     tmp_path: Path,
 ) -> None:
+    """身分不明的原始訊號仍要留下可稽核的 card 與 work order，但不得被當成研究完成。
+
+    U7（2026-08-28）：原測試用「兩個 lane 的額度都是 0」表達後半句；額度已移除，
+    同一件事改由研究完整度表達——`identity_unresolved` 是研究面的資料缺口，
+    因此 `research_status` 必須是 `DATA_NEEDED`。
+    """
     store = _store(tmp_path)
     try:
         result = evaluate_signal(
@@ -199,8 +216,7 @@ def test_raw_only_unresolved_signal_still_creates_zero_size_card_and_work_order(
         assert result["status"] == "completed_with_blockers"
         assert result["identity"]["status"] == "unresolved"
         assert result["paper_event_id"] is None
-        assert result["action_card"]["paper"]["max_supported_position"] == 0
-        assert result["action_card"]["live"]["supported_range"] == [0.0, 0.0]
+        assert result["action_card"]["research"]["status"] == "DATA_NEEDED"
         assert "identity_unresolved" in result["blockers"]
         assert result["work_orders"]
         assert store.table_count("decision_cohorts") == 1
@@ -210,7 +226,7 @@ def test_raw_only_unresolved_signal_still_creates_zero_size_card_and_work_order(
         store.close()
 
 
-def test_financial_manual_required_and_stale_states_reduce_size_not_zero(
+def test_financial_manual_required_and_stale_states_are_never_fatal(
     tmp_path: Path,
 ) -> None:
     """2026-08-13：本測試先前斷言的是一個 bug 的行為，且與另一個測試互相矛盾。
@@ -222,17 +238,20 @@ def test_financial_manual_required_and_stale_states_reduce_size_not_zero(
     `if paper_blockers: paper_max = 0.0` 無條件歸零——兩條路徑各自回答，
     於是兩個相反的斷言都成立。這正是 L12 在測試層的簽名。
 
-    現在只有一套分類：核驗清單缺漏與過期都只降尺寸，blocker 仍必須現形。
+    現在只有一套分類：核驗清單缺漏與過期都只是研究不完整，blocker 仍必須現形。
 
-    ⚠ `manual` 那一格的可承受尺寸仍是 0，但**成因換了**：不再是 blocker 把 lane 打成
-    零，而是 `assessment_context_mismatch:commercial_maturity` 讓該軸被改寫成
-    `unknown` → `axis_ceiling = 0`（`sizing.py` 的 `_validate_assessment`）。
-    也就是它現在走的是信心維度而不是閘門。那條改寫本身是配線問題冒充信心不足，
-    列在 `docs/brainstorms/2026-08-13-capital-expression-direction-requirements.md`
-    §4 第 4 項；等該項落地後，這一格的期望值要改成 > 0。
+    ⚠ `manual` 那一格另有一個**與本 blocker 無關**的降級：
+    `assessment_context_mismatch:commercial_maturity` 讓該軸的實質等級被改寫成
+    `unknown`。也就是它走的是信心維度而不是閘門。那條改寫本身是配線問題冒充信心
+    不足，列在 `docs/brainstorms/2026-08-13-capital-expression-direction-requirements.md`
+    §4 第 4 項。
+
+    U7（2026-08-28）：原測試以「可承受尺寸是否 > 0」表達上述兩件事；額度已移除，
+    改用仍然存在的兩個事實表達同一組判準——blocker 的嚴重度分類，以及最弱軸的
+    `effective_level` 有沒有因它而掉到 `unknown`。
     """
     cases = (
-        # (名稱, checklist patch, 預期 blocker, 期望可承受尺寸是否 > 0)
+        # (名稱, checklist patch, 預期 blocker, 最弱軸是否被打回 unknown)
         (
             "manual",
             {
@@ -240,11 +259,11 @@ def test_financial_manual_required_and_stale_states_reduce_size_not_zero(
                 "backlog": {"status": "manual_required"},
             },
             "financial_customer_concentration_manual_required",
-            False,
+            True,
         ),
-        ("stale", None, "financial_stale", True),
+        ("stale", None, "financial_stale", False),
     )
-    for name, checklist_patch, expected, expect_positive_size in cases:
+    for name, checklist_patch, expected, expect_unknown_axis in cases:
         case_root = tmp_path / name
         case_root.mkdir()
         store = _store(case_root)
@@ -260,18 +279,23 @@ def test_financial_manual_required_and_stale_states_reduce_size_not_zero(
                 _request(raw_signal=f"case:{name}"),
             )
             assert expected in result["blockers"]
-            # research intent 不 request paper lane，因此仍不建立 paper 部位。
+            # U7 起系統一律不建立 paper 部位。
             assert result["paper_event_id"] is None
-            # 關鍵斷言：這兩個 blocker 本身不再有歸零的權力。
+            # 關鍵斷言：這兩個 blocker 本身不再有歸零／判死的權力。
             assert severity_of(expected) == "sizing"
-            size = result["action_card"]["paper"]["max_supported_position"]
-            if expect_positive_size:
-                # 過期只降尺寸，不禁止參與。
-                assert size > 0, f"{name}: 過期不該把可承受尺寸打成零"
-            else:
-                # 仍為 0，但成因是軸而非閘門（見 docstring）。
-                assert size == 0
+            assert fatal_blockers((expected,)) == ()
+
+            sizing = store.get_decision(result["decision_id"])["payload"]["sizing"]
+            weakest = sizing["axis_results"][sizing["weakest_axis"]]
+            if expect_unknown_axis:
+                # 仍被打回 unknown，但成因是軸而非閘門（見 docstring）。
+                assert weakest["effective_level"] == "unknown"
                 assert "assessment_context_mismatch:commercial_maturity" in result["blockers"]
+            else:
+                # 過期只讓證據變弱，不把整條研究判死。
+                assert weakest["effective_level"] != "unknown", (
+                    f"{name}: 過期不該把最弱軸打回 unknown"
+                )
         finally:
             store.close()
 
@@ -451,7 +475,13 @@ def test_explicit_disproof_override_still_wins_over_carried_forward_value(
         store.close()
 
 
-def test_fake_assessment_ref_cannot_fund_paper(tmp_path: Path) -> None:
+def test_fake_assessment_ref_cannot_buy_a_higher_axis_level(tmp_path: Path) -> None:
+    """引用一個不在 context 裡的來源，不得換到任何實質等級。
+
+    U7（2026-08-28）：原測試（`..._cannot_fund_paper`）用「paper 額度歸零」表達；
+    額度已移除，同一件事改由該軸的 `effective_level` 被打回 `unknown` 表達——
+    宣告的等級不算數，引用要真的成立才算（L15）。
+    """
     store = _store(tmp_path)
     assessment = _assessment()
     assessment["source_reliability"]["evidence_refs"] = ["src:not-in-context"]
@@ -464,7 +494,9 @@ def test_fake_assessment_ref_cannot_fund_paper(tmp_path: Path) -> None:
 
         assert "assessment_context_mismatch:source_reliability" in result["blockers"]
         assert result["paper_event_id"] is None
-        assert result["action_card"]["paper"]["max_supported_position"] == 0
+        sizing = store.get_decision(result["decision_id"])["payload"]["sizing"]
+        assert sizing["axis_results"]["source_reliability"]["effective_level"] == "unknown"
+        assert sizing["research_status"] != "READY"
     finally:
         store.close()
 

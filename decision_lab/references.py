@@ -89,14 +89,14 @@ def render_reference_options_markdown(payload: Mapping[str, Any]) -> str:
             lines.append(f"    authorities：{'、'.join(row['authorities'])}")
         lines.append("")
         if report:
-            if report.get("would_zero_out"):
+            if report.get("would_downgrade_to_unknown"):
                 lines.append(
-                    f"❌ 目前的 assessment 在這一軸 accepted = 0 → 會被改寫成 "
-                    f"`unknown`、ceiling 歸零（宣告的是 `{report.get('declared_level')}`）。"
+                    f"❌ 目前的 assessment 在這一軸 accepted = 0 → 實質等級會被打回 "
+                    f"`unknown`（宣告的是 `{report.get('declared_level')}`）。"
                 )
             elif report.get("accepted_refs"):
                 lines.append(
-                    f"✅ 目前有 {len(report['accepted_refs'])} 個合格引用，這一軸不歸零。"
+                    f"✅ 目前有 {len(report['accepted_refs'])} 個合格引用，這一軸的宣告等級成立。"
                 )
             for rejected in report.get("rejected_refs") or ():
                 why = rejected.get("why")

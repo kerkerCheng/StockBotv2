@@ -93,13 +93,37 @@ class CoverageResult:
     live_blockers: tuple[str, ...]
     paper_context_ready: bool
     live_context_ready: bool
-    paper_supported_position: float
-    live_supported_range: tuple[float, float]
     work_order_id: str | None
+
+
+# 研究完整度的三態，取代先前的 `paper_status`／`live_status`（ELIGIBLE／SHADOW_ONLY／
+# DATA_NEEDED）。舊字彙的 ELIGIBLE 意思是「可以配資本」，而系統已不再配資本；現在問的
+# 是「這檔的研究做到什麼程度」，答案不帶額度語意。
+#
+# ⚠ 讀取端仍會遇到帶 `paper_status` 的舊 decision（Decision Store 是 append-only 的
+# private authority，依 L10 不做破壞性 migration）。對應關係只有一條：
+# 舊 `paper_status == "ELIGIBLE"` ≙ 新 `research_status == "READY"`。
+RESEARCH_STATUSES: tuple[str, ...] = ("READY", "INCOMPLETE", "DATA_NEEDED")
+
+# Action Card 的注意力狀態，取代 U7 之前的四動作（`NO_ACTION`／`REVIEW`／`TRADE`／
+# `HEDGE`）。`TRADE` 與 `HEDGE` 是資本動作，系統既不給尺寸也不連 broker，說出這兩個詞
+# 等於宣稱一個它做不到的授權；它們原本的兩個情境（已接受 live 但未回報成交、投組曝險
+# 超限）本質都是「請人看一下」，併入 `REVIEW`。
+#
+# 只剩兩態是刻意的：卡片唯一還能誠實回答的問題是「今天要不要看這一檔」。
+ATTENTION_STATES: tuple[str, ...] = ("MONITOR", "REVIEW")
 
 
 @dataclass(frozen=True)
 class ProbeSizingResult:
+    """五軸評估的結果：最弱軸、逐軸等級與 blocker。**不含任何資本欄位。**
+
+    2026-08-28 起 `axis_ceiling`／`paper_target`／`live_supported_range`／
+    `constraint_trace` 已移除——系統終點是瓶頸度排序，不是額度。留下的
+    `live_current_position` 與 `single_position_nav_cap` 不是系統給的建議尺寸，
+    是使用者手動記錄 live 選擇時的既有部位與政策參考線。
+    """
+
     cohort_id: str
     context_digest: str
     policy_version: str
@@ -107,32 +131,20 @@ class ProbeSizingResult:
     calculator_version: str
     identity_registry_version: int
     weakest_axis: str
-    axis_ceiling: float
     axis_results: Mapping[str, Mapping[str, Any]]
     assessment_blockers: tuple[str, ...]
-    paper_status: str
-    paper_target: float
-    paper_max_supported_position: float
-    paper_current_position: float
+    research_status: str
     paper_blockers: tuple[str, ...]
-    live_status: str
-    live_supported_range: tuple[float, float]
-    live_supported_shares: tuple[float, float] | None
-    live_current_position: float
     live_blockers: tuple[str, ...]
-    constraint_trace: tuple[Mapping[str, Any], ...]
-    action: str
+    live_current_position: float
+    single_position_nav_cap: float
 
 
 @dataclass(frozen=True)
 class DecisionExecutionResult:
     decision_id: str
     decision_digest: str
-    paper_event_id: str | None
-    paper_funded: bool
-    paper_target: float
-    paper_max_supported_position: float
-    action: str
+    research_status: str
 
 
 @dataclass(frozen=True)

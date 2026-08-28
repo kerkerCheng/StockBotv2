@@ -263,6 +263,10 @@ def test_every_consumer_applies_the_same_severity_classification(
     整個 core_blockers 決定要不要 REVIEW。於是放寬在下游被完整抵銷：supported range
     仍是 0，card 仍叫使用者「去把研究做完」，而那份分類看起來是生效的。
     這個測試鎖住「所有消費者共用同一份分類」。
+
+    U7（2026-08-28）：消費者二原本斷言 `paper_max_supported_position > 0`。資本欄位
+    已移除，但那條斷言問的事沒變——「研究不完整不得把這一檔判成不可用」。新世界裡
+    同一件事由 `research_status` 表達：非致命 blocker 不得讓它掉出 `READY`。
     """
 
     store = _store(tmp_path)
@@ -275,8 +279,8 @@ def test_every_consumer_applies_the_same_severity_classification(
         assert coverage.paper_context_ready is True
         assert coverage.live_context_ready is True
 
-        # 消費者二：sizing 不把資本歸零——這是整條鏈唯一真正重要的輸出。
-        assert decision.paper_max_supported_position > 0
+        # 消費者二：研究完整度不因「功課還沒做完」被降級——這是整條鏈唯一真正重要的輸出。
+        assert decision.research_status == "READY"
 
         # 消費者三：card 不因研究不完整就強制 REVIEW／叫人補研究。
         card = build_action_card(store, decision.decision_id, as_of=NOW)
@@ -302,7 +306,7 @@ def test_one_fatal_blocker_still_forces_research_completion(tmp_path: Path) -> N
 
         assert coverage.paper_context_ready is False
         card = build_action_card(store, decision.decision_id, as_of=NOW)
-        assert card["action"] == "REVIEW"
+        assert card["attention"] == "REVIEW"
         assert card["scope"]["single_name"] == "complete_research_work_order"
         assert "disproof_missing" in card["blockers"]
         # 致命的那個不得被歸進「不阻擋」那一欄。

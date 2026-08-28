@@ -6,6 +6,7 @@ import json
 import pytest
 
 from thesis.investment_policy import (
+    POLICY_PATH,
     PolicyError,
     calculate_position_limit,
     holding_action,
@@ -130,31 +131,39 @@ def test_repository_policy_has_versioned_probe_lane_defaults() -> None:
     probe = load_policy()["probe_lane"]
 
     assert probe["paper_nav"] == 100.0
-    assert probe["single_probe_nav_cap"] == 0.005
-    assert probe["probe_book_nav_cap"] == 0.02
     assert probe["review_hours"] == 72
-    assert probe["axis_ceilings"] == {
-        "unknown": 0.0,
-        "bounded_hypothesis": 0.002,
-        "corroborated": 0.005,
-    }
     assert probe["rubric_version"]
     assert probe["calculator_version"]
+
+
+def test_probe_lane_no_longer_carries_capital_expression_keys() -> None:
+    """U7 把 alpha 的資本表達層整組移除，這四個鍵不得偷偷長回來。
+
+    ⚠ 刻意讀 raw JSON，不讀 `load_policy()`：`_validate_probe_lane` 只挑已知鍵做
+    normalize，加回設定檔的鍵根本不會出現在回傳值裡——斷言正規化結果等於斷言一個
+    恆真命題。要驗的是「真的被加回來時會變的那個東西」。
+    """
+
+    raw = json.loads(POLICY_PATH.read_text(encoding="utf-8"))
+    removed = {
+        "single_probe_nav_cap",
+        "probe_book_nav_cap",
+        "axis_ceilings",
+        "live_adv_fraction_cap",
+    }
+
+    assert removed.isdisjoint(raw["probe_lane"])
+    # 對照組：真實風控不在移除之列，單筆 5% NAV 上限仍是 top-level 的 SSOT。
+    assert raw["single_position_nav_cap"] == 0.05
 
 
 @pytest.mark.parametrize(
     "probe_override",
     [
         {"review_hours": 96},
-        {"single_probe_nav_cap": 0.03},
-        {
-            "axis_ceilings": {
-                "unknown": 0.0,
-                "bounded_hypothesis": 0.006,
-                "corroborated": 0.005,
-            }
-        },
-        {"live_adv_fraction_cap": 0.0},
+        {"paper_nav": 0.0},
+        {"rubric_version": ""},
+        {"evidence_hops": -1},
     ],
 )
 def test_invalid_probe_lane_fails_closed_without_changing_formal_policy(

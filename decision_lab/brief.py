@@ -52,15 +52,7 @@ def _public_company(company_id: Any) -> str:
 
 
 def _user_request(card: Mapping[str, Any]) -> str:
-    action = str(card["action"])
-    live = card.get("live") or {}
-    if action == "TRADE" and live.get("user_choice") is None:
-        return "請明確選擇接受、縮小或 skip；系統不會自動下單。"
-    if action == "TRADE":
-        return "請在手動下單後回報 fill；系統不會推定成交。"
-    if action == "HEDGE":
-        return "請決定降低或對沖哪一項投組曝險；資料不足時不輸出單位數。"
-    if action == "REVIEW":
+    if str(card.get("attention")) == "REVIEW":
         return str(card.get("next_action") or "請完成 blocker 所列核查後再 reassess。")
     return "無；依下一個 review 時間監控即可。"
 
@@ -87,24 +79,26 @@ def _decision_item(
     current_authority: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     lifecycle = card.get("lifecycle") or {}
-    action = "NO ACTION" if card["action"] == "NO_ACTION" else card["action"]
+    attention = str(card["attention"])
     current_authority = current_authority or {}
     blockers = sorted(
         set(card.get("blockers") or [])
         | set(current_authority.get("blockers") or [])
     )
     if current_authority.get("blockers"):
-        action = "REVIEW"
-    # 閉環：因果結構有新證據（material）而 probe 目前無其他動作 → 提醒 reassess。
+        attention = "REVIEW"
+    # 閉環：因果結構有新證據（material）而 probe 目前沒有其他理由被看 → 提醒 reassess。
     evidence_delta = str(current_authority.get("evidence_delta") or "none")
     material_evidence = evidence_delta == "material"
-    if material_evidence and action == "NO ACTION":
-        action = "REVIEW"
+    if material_evidence and attention == "MONITOR":
+        attention = "REVIEW"
     item = {
         "cohort_id": card.get("cohort_id"),
         "decision_id": card["decision_id"],
         "company_id": _public_company(card.get("company_id")),
-        "recommended_action": action,
+        # `attention` 取代 U7 之前的 `recommended_action`（NO ACTION／REVIEW／TRADE／
+        # HEDGE）。系統不再建議動作，只回答「今天要不要看這一檔」。
+        "attention": attention,
         # 最弱軸跟著 item 走，消費端不必自己再查一次 decision（L16）。pq2 的研究缺口
         # 項目就是由它導出：「補哪一檔的哪一軸」比「REVIEW — co:xxx」可執行得多。
         "weakest_axis": (card.get("weakest_link") or {}).get("axis"),
@@ -120,9 +114,6 @@ def _decision_item(
             "security_return": current_authority.get("security_return"),
             "fx_return": current_authority.get("fx_return"),
         },
-        "supported_sizing_range": (card.get("live") or {}).get(
-            "supported_range", [0.0, 0.0]
-        ),
         # 兩個時刻不是同一件事，先前把它們寫成同一個欄位，等於把最重要的那段藏起來。
         #
         # `performance_since_tracked` 錨在 **Shadow inception**——訊號第一次進來的
@@ -170,9 +161,9 @@ def _decision_item(
         ),
     }
     if current_authority.get("blockers"):
-        item["reason"] = "目前 authority snapshot 不完整或失效，需先 REVIEW，不能沿用舊 sizing。"
+        item["reason"] = "目前 authority snapshot 不完整或失效，需先複查，不能沿用舊評估。"
     elif material_evidence:
-        item["reason"] = "自上次決策後出現觸及 thesis 因果結構的新證據；建議 reassess 看 sizing/thesis 是否改變。"
+        item["reason"] = "自上次決策後出現觸及 thesis 因果結構的新證據；建議 reassess 看最弱軸／thesis 是否改變。"
     return item
 
 
@@ -454,11 +445,10 @@ def _pending_item(summary: Mapping[str, Any]) -> dict[str, Any]:
         "cohort_id": summary["cohort_id"],
         "decision_id": None,
         "company_id": _public_company(summary.get("company_id")),
-        "recommended_action": "REVIEW",
+        "attention": "REVIEW",
         "reason": "Signal 已保存，但尚未形成可稽核的 system decision。",
         "alpha_thesis_change": {"classification": "unknown", "thesis_changed": False},
         "beta_portfolio_risk": {"portfolio_action": "none", "classification": "unknown"},
-        "supported_sizing_range": [0.0, 0.0],
         "blockers": ["decision_missing"],
         "next_review_at": summary.get("review_due_at"),
         "disproof_condition": "",
@@ -583,11 +573,11 @@ def _sheet_only_items(
         seen.add(identity)
 
         # 已由別的機制負責的持股仍要在 brief 現形，但不是 alpha 待辦：改用
-        # NO ACTION，統一待辦池才不會每天替它們配一個新 pq2 編號。
+        # MONITOR，統一待辦池才不會每天替它們配一個新 pq2 編號。
         sleeve = beta_aliases.get(ticker)
         ignore_reason = ignored.get(ticker)
         if sleeve:
-            action = "NO ACTION"
+            attention = "MONITOR"
             coverage = "beta_policy"
             reason = (
                 f"由 beta policy 涵蓋（sleeve={sleeve}），"
@@ -599,19 +589,19 @@ def _sheet_only_items(
             blockers = []
             request = "無；如需 single-name thesis 再另行 evaluate-signal 建 cohort。"
         elif ignore_reason:
-            action = "NO ACTION"
+            attention = "MONITOR"
             coverage = "user_ignored"
             reason = f"使用者指定不做 alpha 研究：{ignore_reason}"
             portfolio_action = "user_ignored_holding"
             blockers = []
             request = "無；要恢復追蹤請移除 config/holdings_coverage.json 的該筆登記。"
         else:
-            action = "REVIEW"
+            attention = "REVIEW"
             coverage = "uncovered"
             reason = "Google Sheet 有 live 持股，但 Engine D 尚無對應 cohort／decision。"
             portfolio_action = "review_uncovered_holding"
             blockers = ["sheet_only_holding", "decision_missing"]
-            request = "請先 evaluate-signal／onboard；未完成前不提供 live sizing。"
+            request = "請先 evaluate-signal／onboard，讓這檔進入瓶頸排序。"
 
         result.append(
             {
@@ -621,7 +611,7 @@ def _sheet_only_items(
                 "ticker": ticker,
                 "sheet_only": True,
                 "coverage": coverage,
-                "recommended_action": action,
+                "attention": attention,
                 "reason": reason,
                 "alpha_thesis_change": {
                     "classification": "unknown",
@@ -631,7 +621,6 @@ def _sheet_only_items(
                     "portfolio_action": portfolio_action,
                     "classification": "unknown",
                 },
-                "supported_sizing_range": [0.0, 0.0],
                 "blockers": blockers,
                 "next_review_at": None,
                 "disproof_condition": "",
@@ -777,11 +766,11 @@ def build_today_brief(
     ranked = sorted(items, key=_evidence_gap_order)
     for position, item in enumerate(ranked, 1):
         item["index"] = position  # 穩定編號，供對話式批次核准引用（plan R5）
-    recommended = ranked[0]["recommended_action"] if ranked else "NO ACTION"
+    attention = ranked[0]["attention"] if ranked else "MONITOR"
     if ranked:
         reason = ranked[0]["reason"]
     elif holdings_status not in {"available", "confirmed", "confirmed_empty"}:
-        recommended = "REVIEW"
+        attention = "REVIEW"
         reason = "Google Sheet current holdings 無法讀取；無法完成今日投組覆蓋檢查。"
     else:
         reason = "沒有 active Signal cohort、paper/live exception 或待回報交易。"
@@ -805,14 +794,11 @@ def build_today_brief(
         # 系統終點：瓶頸排序在前、NAV 比例在後。兩者都是注入的（見 docstring）。
         "ranking": dict(ranking) if ranking else None,
         "nav_exposure": dict(nav_exposure) if nav_exposure else None,
-        "action_needed": recommended != "NO ACTION",
-        "recommended_action": recommended,
+        "action_needed": attention != "MONITOR",
+        "attention": attention,
         "reason": reason,
         "alpha_thesis_changes": [item["alpha_thesis_change"] for item in ranked],
         "beta_portfolio_risk": [item["beta_portfolio_risk"] for item in ranked],
-        "supported_sizing_range": [
-            item["supported_sizing_range"] for item in ranked
-        ],
         "blockers": blockers,
         "next_review_at": min(review_times) if review_times else None,
         # 結構性阻塞：研究做再多也解不開，只有補 registry ticker 能解。
@@ -845,6 +831,48 @@ def build_today_brief(
     }
     assert_safe_payload(brief)
     return brief
+
+
+def ranking_annotations(
+    store: DecisionStore, *, as_of: str
+) -> dict[str, dict[str, str]]:
+    """排序表每列要標的最弱軸與 disproof，以 `co:*` 為鍵。
+
+    住在這裡而不是 `ranking_view`：它只需要 Decision Store，而 `ranking_view` 是純轉換層。
+    排序本身來自 Engine A（需要 Neo4j），由更外層合起來——見
+    `engine_d_runtime.adapters.fetch_ranking_view`。
+
+    查不到就不放這個鍵。`build_ranking_view` 對缺項留 `None`，那和「確實沒有 disproof」
+    是不同的訊號，不得用空字串把兩者壓成同一個（L12）。
+    """
+
+    weakest: dict[str, str] = {}
+    disproofs: dict[str, str] = {}
+    for summary in store.list_operational_cohorts(as_of=as_of):
+        company = str(summary.get("company_id") or "")
+        decision_id = summary.get("latest_decision_id")
+        if not company or decision_id is None:
+            continue
+        try:
+            payload = store.get_decision(str(decision_id))["payload"]
+        except (KeyError, TypeError, ValueError):
+            continue
+        sizing = payload.get("sizing") or {}
+        axis = sizing.get("weakest_axis")
+        if axis and company not in weakest:
+            weakest[company] = str(axis)
+        coverage_id = str(
+            (payload.get("request", {}).get("coverage") or {}).get("assessment_id") or ""
+        )
+        if not coverage_id or company in disproofs:
+            continue
+        try:
+            condition = str(store.get_coverage_metadata(coverage_id)["disproof"] or "")
+        except (KeyError, TypeError, ValueError):
+            continue
+        if condition.strip():
+            disproofs[company] = condition.strip()
+    return {"weakest_axes": weakest, "disproofs": disproofs}
 
 
 def _pct(value: Any) -> str:
@@ -959,7 +987,7 @@ def render_today_markdown(brief: Mapping[str, Any]) -> str:
     lines += [
         f"# 今天需要動作嗎？{'是' if brief['action_needed'] else '否'}",
         "",
-        f"- 建議動作：{markdown_text(brief['recommended_action'])}",
+        f"- 注意力：{'需要複查' if brief['attention'] == 'REVIEW' else '監控中'}",
         f"- 原因：{markdown_text(brief['reason'])}",
         f"- Blockers：{blockers}",
         f"- 下一個 review：{markdown_text(brief.get('next_review_at') or '尚未排定')}",
@@ -1046,12 +1074,12 @@ def render_today_markdown(brief: Mapping[str, Any]) -> str:
             if str(label) in {"", "unresolved"} and item.get("ticker"):
                 label = item["ticker"]
             company = markdown_text(label)
-            action = markdown_text(item.get("recommended_action") or "")
+            attention = "需要複查" if item.get("attention") == "REVIEW" else "監控中"
             perf = _pct(item.get("performance_since_tracked"))
             since_decision = _pct(item.get("performance_since_decision"))
             delta = markdown_text(item.get("evidence_delta") or "none")
             lines.append(
-                f"- [{idx}] {action} — {company}｜自追蹤 {perf}"
+                f"- [{idx}] {attention} — {company}｜自追蹤 {perf}"
                 f"（決策後 {since_decision}）｜證據 {delta}"
             )
             resp = markdown_text(item.get("user_response_needed") or "")

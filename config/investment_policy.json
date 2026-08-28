@@ -1,5 +1,5 @@
 {
-  "policy_version": "2026-07-29.2",
+  "policy_version": "2026-08-28.1",
   "single_position_nav_cap": 0.05,
   "minimum_open_conviction": 3,
   "conviction_coefficients": {
@@ -12,17 +12,9 @@
   "minimum_holding_days": 90,
   "probe_lane": {
     "rubric_version": "confidence-envelope-v1",
-    "calculator_version": "probe-limit-v3",
+    "calculator_version": "ranking-terminus-v1",
     "paper_nav": 100.0,
-    "single_probe_nav_cap": 0.005,
-    "probe_book_nav_cap": 0.02,
     "review_hours": 72,
-    "axis_ceilings": {
-      "unknown": 0.0,
-      "bounded_hypothesis": 0.002,
-      "corroborated": 0.005
-    },
-    "live_adv_fraction_cap": 0.01,
     "market_freshness_sessions": 2,
     "fx_freshness_sessions": 2,
     "holdings_freshness_days": 7,

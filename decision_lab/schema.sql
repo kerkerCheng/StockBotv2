@@ -56,16 +56,18 @@ CREATE TABLE IF NOT EXISTS system_decisions (
     UNIQUE (decision_id, decision_digest)
 );
 
--- `choice_type` 的前四種全部是**相對於系統區間**定義的（接受／低於下緣／略過／覆寫），
--- 字彙裡沒有「系統對尺寸沒有意見、由使用者自己定」這個選項。2026-08-15 的 Alpha 呈現
--- 契約定案「系統不呈現尺寸、買多少由使用者決定」之後，這個缺口讓每一筆真實下單都被迫
--- 走 `override`——設計成例外的路徑變成唯一的路徑（L12：一個欄位兩種語意）。
--- `user_sized` 是把那兩種語意分開後的第五種；分開之後兩邊各自更嚴，見
--- `store.record_live_choice` 的 HARD_CAP 檢查。
+-- ⚠ **現行字彙只有三種：`user_sized`（非零）、`skipped`（0%）、`override`（例外，需
+-- approved action）。** `accepted` 與 `below_range` 留在 CHECK 裡**只為了讀得回舊資料**
+-- ——它們相對於「系統區間」定義，而系統自 2026-08-28（U7）起不再產生任何區間。
+-- 寫入端（`store.record_live_choice`）已不會再產生這兩個值；Decision Store 是
+-- append-only 的 private authority，既有列不回寫（L10）。
 --
--- `system_supported_upper` 保存下單當時系統自己的區間上界。它**不是** gate（user_sized
--- 不與它比較），而是歸因資料：讓記分板日後能回答「使用者比系統的數字多下了多少、
--- 結果如何」。缺它就等於把系統的意見丟掉，之後永遠無法比較人與系統。
+-- 歷史：這五個值原本前四種都以系統區間為錨，於是「系統對尺寸沒有意見」沒有位置，
+-- 每一筆真實下單被迫走 `override`——設計成例外的路徑變成唯一的路徑（L12）。
+-- `user_sized` 是把那兩種語意分開後加的；U7 之後它成為常態路徑。
+--
+-- `system_supported_upper` 保存下單當時系統自己的區間上界。新 choice 一律寫 NULL
+-- （系統沒有給過區間，與「區間是 0」不是同一件事）；U7 之前的列保留原值作為歸因資料。
 CREATE TABLE IF NOT EXISTS live_choices (
     choice_id          TEXT PRIMARY KEY,
     decision_id        TEXT NOT NULL REFERENCES system_decisions(decision_id),

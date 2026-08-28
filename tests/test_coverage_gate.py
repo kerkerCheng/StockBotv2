@@ -82,7 +82,13 @@ def _assess(store: DecisionStore, bundle, **overrides):
     return assess_coverage(store, bundle, **kwargs)
 
 
-def test_empty_graph_stays_shadow_only_and_gets_bounded_work_order(tmp_path: Path) -> None:
+def test_empty_graph_stays_pending_and_gets_bounded_work_order(tmp_path: Path) -> None:
+    """圖裡沒有這家公司時，coverage 必須留在 pending 並開一張有界的 work order。
+
+    U7（2026-08-28）：原測試另外斷言 `paper_supported_position == 0`／
+    `live_supported_range == (0, 0)`，那兩個欄位已隨資本表達層從 `CoverageResult`
+    移除——coverage 現在只回答「context 齊不齊」，不回答「能配多少」。
+    """
     store = _store(tmp_path)
     try:
         bundle = _bundle(
@@ -98,8 +104,7 @@ def test_empty_graph_stays_shadow_only_and_gets_bounded_work_order(tmp_path: Pat
         result = _assess(store, bundle)
 
         assert result.status == "coverage_pending"
-        assert result.paper_supported_position == 0.0
-        assert result.live_supported_range == (0.0, 0.0)
+        assert result.paper_context_ready is False
         assert result.work_order_id is not None
         assert "graph_company_missing" in result.blockers
         assert store.table_count("research_work_orders") == 1
@@ -189,17 +194,15 @@ def test_live_stale_does_not_destroy_paper_research_analyzability(tmp_path: Path
 def test_stale_financial_snapshot_reduces_size_without_closing_the_paper_lane(
     tmp_path: Path,
 ) -> None:
-    """2026-08-13 行為變更：`financial_stale` 由「關閉 paper lane」改為「只降尺寸」。
+    """2026-08-13 行為變更：`financial_stale` 由「關閉 paper lane」改為只降強度。
 
     理由與 `market_stale` 同一條：**過期不等於錯**，而 `financial_resilience` 軸的
-    authority 就是 Engine C——資料過期時該軸的證據自然變弱，`axis_ceiling` 會反映
-    它。再讓 blocker 關閉整個 lane 是同一件事罰兩次（D2：不確定性用尺寸承擔，
-    不用 gate 禁止參與）。
+    authority 就是 Engine C——資料過期時該軸的證據自然變弱，該軸的 `effective_level`
+    會反映它（U7 之前是由 `axis_ceiling` 反映）。再讓 blocker 關閉整個 lane 是同一件
+    事罰兩次（D2：不確定性用強度承擔，不用 gate 禁止參與）。
 
-    ⚠ 這條的相反意見值得記著：paper ledger 的用途是累積反事實戰績，用過期資料寫進去
-    會讓「系統當時相信什麼」失真。目前靠 context bundle 凍結 `as_of` 保持誠實——
-    紀錄裡看得到用的是哪一天的財務。若日後發現 paper 戰績因此失真，這裡是第一個
-    該回頭改的地方。
+    ⚠ 這條的相反意見值得記著：用過期資料形成的判斷會讓「系統當時相信什麼」失真。
+    目前靠 context bundle 凍結 `as_of` 保持誠實——紀錄裡看得到用的是哪一天的財務。
 
     blocker 本身仍必須出現在 `paper_blockers`：會改變輸出的輸入要出現在輸出自己的
     證據欄位（L12 的相鄰判準）。

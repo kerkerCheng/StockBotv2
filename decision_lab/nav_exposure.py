@@ -101,11 +101,15 @@ def build_nav_exposure(
             "blockers": ["holdings_nav_missing"] if rows else ["holdings_unavailable"],
         }
 
-    positions: list[dict[str, Any]] = []
     cash_value = 0.0
     buckets: defaultdict[str, float] = defaultdict(float)
     grouped: defaultdict[str, float] = defaultdict(float)
     group_map = dict(groups or {})
+    # ⚠ 以 **ticker** 彙總，不是一列一個 Sheet row。同一檔常分散在多個帳戶，
+    # 逐列輸出時**沒有任何一列顯示真實曝險**——實測 LON:VWRA 會拆成 21.7% 與 4.4%
+    # 兩列，而真實部位是 26.1%。這一區唯一的用途是讓人一眼看出失衡，拆開等於讓它
+    # 答不出自己要回答的問題。`lots` 保留來源列數，資訊不因彙總而消失。
+    merged: dict[str, dict[str, Any]] = {}
 
     for row in rows:
         value = _value(row)
@@ -114,16 +118,26 @@ def build_nav_exposure(
             cash_value += value
             continue
         ticker = str(row.get("ticker") or row.get("symbol") or "").strip()
-        pct = value / nav
-        positions.append(
-            {
+        entry = merged.get(ticker)
+        if entry is None:
+            merged[ticker] = {
                 "ticker": ticker,
                 "bucket": _bucket_label(row),
                 "market_value_base": value,
-                "nav_pct": pct,
+                "lots": 1,
             }
-        )
-        grouped[group_map.get(ticker, UNGROUPED)] += pct
+        else:
+            entry["market_value_base"] += value
+            entry["lots"] += 1
+            if entry["bucket"] != _bucket_label(row):
+                # 同一檔在不同帳戶被歸到不同 bucket 是真實狀態，不猜哪個才對。
+                entry["bucket"] = "多重分類"
+
+    positions: list[dict[str, Any]] = []
+    for entry in merged.values():
+        entry["nav_pct"] = entry["market_value_base"] / nav
+        grouped[group_map.get(entry["ticker"], UNGROUPED)] += entry["nav_pct"]
+        positions.append(entry)
 
     positions.sort(key=lambda p: p["nav_pct"], reverse=True)
 

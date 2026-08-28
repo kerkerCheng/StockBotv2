@@ -51,7 +51,8 @@ def test_new_causal_evidence_is_material_and_flags_reassess(tmp_path: Path) -> N
         brief = build_today_brief(store, as_of=NOW, current_holdings=_HOLDINGS, provider=provider)
         item = _item(brief)
         assert item["evidence_delta"] == "material"
-        assert item["recommended_action"] == "REVIEW"
+        # U7：item 的 `recommended_action` 改為 `attention`（MONITOR／REVIEW）。
+        assert item["attention"] == "REVIEW"
         assert "reassess" in item["user_response_needed"]
     finally:
         store.close()

@@ -1,8 +1,17 @@
-"""五軸 Confidence Envelope 與 paper/live 分離的 Probe sizing。"""
+"""五軸 Confidence Envelope：算出最弱軸與研究完整度。**不產生任何額度。**
+
+2026-08-28（U7）之前，本模組同時做兩件事：驗證五軸證據、以及把最弱軸的等級換算成
+`axis_ceiling` → `paper_target`／`live_supported_range`。後者已整組移除——系統終點是
+`query/bottleneck.py` 的瓶頸度排序，不是資本額度。
+
+⚠ 模組名、`calculate_probe_limits` 與 `ProbeSizingResult` 刻意保留舊名：decision payload
+的 `"sizing"` key 必須留給既有 128 筆歷史 decision（Decision Store 是 append-only 的
+private authority，依 L10 不做破壞性 migration）。只改一半的名字會讓同一件事有兩套詞彙，
+比一個略舊的名字更難讀。
+"""
 from __future__ import annotations
 
 import math
-from copy import deepcopy
 from typing import Any, Mapping, Sequence
 
 from identity.registry import IdentityRegistry, get_registry
@@ -45,15 +54,11 @@ def weakest_axis_of(axes: Mapping[str, Mapping[str, Any]]) -> str:
     以 `effective_level` 次序為主鍵，同階時退到 `AXES` 的宣告次序
     （`source_reliability` 優先）。
 
-    先前這裡用 `axes[axis]["ceiling"]` 當主鍵。ceiling 即將被移除——最弱軸的角色
-    從「資本上限的決定者」變成「該補哪一項證據」的指標，不該再依賴資本欄位。
-
-    ⚠ 不能改用宣告的 `level`：實測（2026-08-28）發現 ceiling 攜帶了 level 沒有的
-    資訊。`_validate_assessment` 在 `fatal_axis_blocker`（例如 evidence_missing）時
-    把 ceiling 打成 0 卻**不動 level**，所以一個宣告 corroborated 但引用不成立的軸，
-    ceiling 是 0 而 level 仍是 corroborated。用 raw level 排序會漏掉它，
-    `test_probe_sizing.py::...[missing_ref]` 立刻紅。`effective_level` 就是把那個
-    隱含資訊顯性化的欄位。
+    ⚠ 不能改用宣告的 `level`：`_validate_assessment` 在 `fatal_axis_blocker`
+    （例如 evidence_missing）時把該軸判為失效卻**不動 level**，所以一個宣告
+    corroborated 但引用不成立的軸，raw level 仍是 corroborated。用 raw level 排序
+    會漏掉它，`test_probe_sizing.py::...[missing_ref]` 立刻紅。`effective_level`
+    就是把那個隱含資訊顯性化的欄位。
     """
     def rank(axis: str) -> tuple[int, int]:
         level = str(axes[axis].get("effective_level") or axes[axis]["level"])
@@ -208,15 +213,14 @@ def diagnose_assessment_references(
             "accepted_refs": tuple(accepted),
             "rejected_refs": tuple(context_only),
             "accepts_authorities": tuple(sorted(wanted)),
-            # 這一軸會不會被改寫成 unknown → ceiling 0。
-            "would_zero_out": not accepted and raw.get("level") != "unknown",
+            # 這一軸的實質等級會不會被打回 unknown（宣告的等級不算數）。
+            "would_downgrade_to_unknown": not accepted and raw.get("level") != "unknown",
         }
     return report
 
 
 def _validate_assessment(
     assessment: Mapping[str, Any],
-    ceilings: Mapping[str, float],
     reference_index: Mapping[str, Any],
 ) -> tuple[dict[str, dict[str, Any]], tuple[str, ...]]:
     if not isinstance(assessment, Mapping) or set(assessment) != set(AXES):
@@ -275,26 +279,19 @@ def _validate_assessment(
         if level == "corroborated" and missing_data:
             blockers.append(f"{axis}_corroboration_incomplete")
         context_mismatch = f"assessment_context_mismatch:{axis}" in blockers
-        # 單調性：宣告較高信心不得拿到比宣告較低信心更少的額度。
-        # 先前 `corroborated + missing_data` → ceiling 0，比誠實降級成
-        # bounded_hypothesis（同一批待補項，0.002）**更差**——於是評估者學會迴避那個
-        # 組合（實測 72 筆出現 0 次），規則在暗中形塑了評估行為。現在 missing_data
-        # 只把 corroborated 壓回下一階，不再歸零。
+        # 單調性：宣告較高信心不得被判得比宣告較低信心更弱。
+        # 先前 `corroborated + missing_data` 直接打成失效，比誠實降級成
+        # bounded_hypothesis **更差**——於是評估者學會迴避那個組合（實測 72 筆出現
+        # 0 次），規則在暗中形塑了評估行為。現在 missing_data 只把 corroborated
+        # 壓回下一階，不打成 unknown。
         fatal_axis_blocker = any(
             blocker.startswith(f"{axis}_") and not blocker.endswith("_corroboration_incomplete")
             for blocker in blockers
         )
-        if context_mismatch or fatal_axis_blocker:
-            effective_ceiling = 0.0
-        elif f"{axis}_corroboration_incomplete" in blockers:
-            effective_ceiling = min(ceilings[level], _level_floor(level, ceilings))
-        else:
-            effective_ceiling = ceilings[level]
         # 實質等級：宣告的 level 打上「證據引用是否真的成立」之後的結果。
-        # ⚠ 這不等於上面那個 `level` 欄位——後者只在 context_mismatch 時降為 unknown，
-        # 而 fatal_axis_blocker（例如 evidence_missing）會讓 ceiling 歸零卻**不動 level**。
-        # 最弱軸過去靠 ceiling 排序才隱含吃到這個資訊；ceiling 即將移除，所以把它
-        # 顯性化成一個不依賴資本欄位的等級。
+        # ⚠ 這不等於下面那個 `level` 欄位——後者只在 context_mismatch 時降為 unknown，
+        # 而 fatal_axis_blocker（例如 evidence_missing）會讓該軸失效卻**不動 level**。
+        # 最弱軸的排序只看 effective_level（見 weakest_axis_of）。
         if context_mismatch or fatal_axis_blocker:
             effective_level = "unknown"
         elif f"{axis}_corroboration_incomplete" in blockers:
@@ -307,7 +304,6 @@ def _validate_assessment(
             "evidence_refs": refs,
             "reason": reason.strip() if isinstance(reason, str) else "",
             "missing_data": missing_data,
-            "ceiling": effective_ceiling,
         }
         if resolutions:
             normalized[axis]["reference_resolutions"] = resolutions
@@ -317,49 +313,6 @@ def _validate_assessment(
             if context_only:
                 normalized[axis]["context_only_refs"] = tuple(context_only)
     return normalized, tuple(sorted(set(blockers)))
-
-
-def _constraint(
-    lane: str,
-    name: str,
-    cap: float,
-    authority: str,
-    *,
-    status: str = "available",
-    detail: str | None = None,
-) -> dict[str, Any]:
-    item: dict[str, Any] = {
-        "lane": lane,
-        "constraint": name,
-        "cap_weight": max(0.0, float(cap)),
-        "authority": authority,
-        "status": status,
-        "binding": False,
-    }
-    if detail:
-        item["detail"] = detail
-    return item
-
-
-def _mark_binding(
-    trace: list[dict[str, Any]], lane: str, maximum: float
-) -> tuple[Mapping[str, Any], ...]:
-    for item in trace:
-        if item["lane"] == lane and math.isclose(
-            item["cap_weight"], maximum, rel_tol=1e-12, abs_tol=1e-12
-        ):
-            item["binding"] = True
-    return tuple(deepcopy(trace))
-
-
-def _lane_max(trace: Sequence[Mapping[str, Any]], lane: str) -> float:
-    caps = [float(item["cap_weight"]) for item in trace if item["lane"] == lane]
-    return min(caps) if caps else 0.0
-
-
-def _level_floor(level: str, ceilings: Mapping[str, float]) -> float:
-    index = LEVELS.index(level)
-    return 0.0 if index == 0 else ceilings[LEVELS[index - 1]]
 
 
 def _live_portfolio(
@@ -405,7 +358,13 @@ def calculate_probe_limits(
     registry: IdentityRegistry | None = None,
     paper_exposure_override: Mapping[str, Any] | None = None,
 ) -> ProbeSizingResult:
-    """Pure calculation；不保存 decision，也不建立 paper event。"""
+    """Pure calculation：驗證五軸、找出最弱軸、彙整 blocker。不保存 decision。
+
+    2026-08-28 起不再輸出 `axis_ceiling`／`paper_target`／`live_supported_range`／
+    `constraint_trace`。唯一留下的兩個數字（`live_current_position`、
+    `single_position_nav_cap`）是使用者手動記錄 live 選擇時的既有部位與政策參考線，
+    不是系統建議的尺寸。
+    """
 
     if coverage.cohort_id != bundle.cohort_id or coverage.context_digest != bundle.digest:
         raise AssessmentError("coverage and context bundle do not match")
@@ -420,88 +379,23 @@ def calculate_probe_limits(
     reference_index = payload.get("reference_index")
     if not isinstance(reference_index, Mapping):
         reference_index = {}
-    axes, assessment_blockers = _validate_assessment(
-        assessment,
-        probe["axis_ceilings"],
-        reference_index,
-    )
+    axes, assessment_blockers = _validate_assessment(assessment, reference_index)
     weakest_axis = weakest_axis_of(axes)
-    weakest_level = str(axes[weakest_axis]["level"])
-    axis_ceiling = float(axes[weakest_axis]["ceiling"])
     identity = payload["identity"]
     company_id = str(identity.get("company_id") or "")
     execution_symbol = str(identity.get("execution_symbol") or "")
     research_ticker = str(identity.get("research_ticker") or "")
-    trace: list[dict[str, Any]] = []
 
-    # 研究不完整不歸零，只讓 axis_ceiling 生效——用尺寸承擔不確定性，而不是
-    # 用 gate 禁止參與。只有 fatal blocker（分類與理由見 blocker_severity）才把
-    # 資本打成零。
-    coverage_cap = (
-        0.0 if fatal_blockers(coverage.blockers) else probe["single_probe_nav_cap"]
-    )
-    for lane in ("paper", "live"):
-        trace.extend(
-            [
-                _constraint(lane, "weakest_axis", axis_ceiling, probe["rubric_version"]),
-                _constraint(
-                    lane,
-                    "single_probe_cap",
-                    probe["single_probe_nav_cap"],
-                    current_policy["policy_version"],
-                ),
-                _constraint(
-                    lane,
-                    "coverage_gate",
-                    coverage_cap,
-                    coverage.assessment_id,
-                    status="available" if coverage_cap else "blocked",
-                ),
-            ]
-        )
-
+    # `paper_blockers` 與 `live_blockers` 保留原名與原 lane 分類（`blocker_severity`
+    # 與 `config/decision_blockers.json` 都以它們為鍵），但語意已與資本無關：前者是
+    # **研究資料**是否齊全（行情／FX／財務），後者是**執行面**是否齊全（持股／
+    # execution 行情）。兩者都不再換算成任何額度。
     paper = paper_exposure_override or payload["paper_exposure"]
     paper_blockers = list(coverage.paper_blockers)
     if identity.get("status") != "resolved" or not company_id:
         paper_blockers.append("identity_unresolved")
     if not coverage.paper_context_ready or paper.get("status") != "available":
         paper_blockers.extend(paper.get("blockers") or ["paper_context_not_ready"])
-        trace.append(_constraint("paper", "paper_context", 0.0, bundle.digest, status="blocked"))
-    else:
-        trace.append(
-            _constraint(
-                "paper",
-                "paper_context",
-                probe["single_probe_nav_cap"],
-                bundle.digest,
-            )
-        )
-    paper_company_weights = paper.get("company_weights") or {}
-    paper_current = _finite(paper_company_weights.get(company_id, 0.0), non_negative=True)
-    paper_total = _finite(paper.get("total_weight"), non_negative=True)
-    if paper_current is None or paper_total is None:
-        paper_blockers.append("paper_exposure_invalid")
-        paper_current = 0.0
-        trace.append(_constraint("paper", "probe_book_remaining", 0.0, "paper_ledger", status="quarantined"))
-    else:
-        trace.append(
-            _constraint(
-                "paper",
-                "probe_book_remaining",
-                paper_current + max(0.0, probe["probe_book_nav_cap"] - paper_total),
-                "paper_ledger+investment_policy",
-            )
-        )
-    paper_max = _lane_max(trace, "paper")
-    # 只有對 paper 致命的 blocker 才歸零。先前是 `if paper_blockers:`——不分嚴重度
-    # 無條件歸零，於是 2026-08-02 建立的分類完全沒套用到真正 binding 的這一行
-    # （實測 paper_lane_blockers binding 59/72）。
-    paper_fatal = fatal_blockers(paper_blockers, lane="paper")
-    if paper_fatal:
-        trace.append(_constraint("paper", "paper_lane_blockers", 0.0, bundle.digest, status="blocked"))
-        paper_max = 0.0
-    paper_floor = min(_level_floor(weakest_level, probe["axis_ceilings"]), paper_max)
-    paper_target = paper_max if paper_current > paper_max else (paper_floor + paper_max) / 2.0
 
     live_blockers = list(coverage.live_blockers)
     if identity.get("status") != "resolved" or not company_id:
@@ -519,15 +413,8 @@ def calculate_probe_limits(
         research_ticker=research_ticker,
     )
     live_blockers.extend(portfolio_blockers)
-    trace.append(
-        _constraint(
-            "live",
-            "single_position_cap",
-            current_policy["single_position_nav_cap"],
-            current_policy["policy_version"],
-        )
-    )
-    if live_current >= float(current_policy["single_position_nav_cap"]):
+    single_position_nav_cap = float(current_policy["single_position_nav_cap"])
+    if live_current >= single_position_nav_cap:
         live_blockers.append("single_position_nav_cap_reached")
     try:
         if live_nav <= 0:
@@ -555,72 +442,30 @@ def calculate_probe_limits(
         live_blockers.extend(execution_market.get("blockers") or ["execution_market_missing"])
     if execution_fx.get("status") != "available":
         live_blockers.extend(execution_fx.get("blockers") or ["execution_fx_missing"])
-    adv = _finite(execution_market.get("adv20"), non_negative=True)
-    price = _finite(execution_market.get("price"), non_negative=True)
-    fx_rate = _finite(execution_fx.get("rate"), non_negative=True)
-    if live_nav > 0 and adv is not None and price and fx_rate:
-        additional_liquidity_weight = (
-            adv * probe["live_adv_fraction_cap"] * price * fx_rate / live_nav
-        )
-        trace.append(
-            _constraint(
-                "live",
-                "execution_adv_1pct",
-                live_current + additional_liquidity_weight,
-                "execution_market+execution_fx",
-            )
-        )
-    else:
-        trace.append(
-            _constraint(
-                "live",
-                "execution_adv_1pct",
-                0.0,
-                "execution_market+execution_fx",
-                status="missing",
-            )
-        )
-    # 同 paper：只有對 live 致命的才歸零（先前 live_lane_blockers binding 71/72，
-    # 主因是 diagnostic 級的 execution_intent_research_only 與 holdings_unconfirmed）。
-    live_fatal = fatal_blockers(live_blockers, lane="live")
-    if live_fatal:
-        trace.append(_constraint("live", "live_lane_blockers", 0.0, bundle.digest, status="blocked"))
-    live_max = _lane_max(trace, "live")
-    live_floor = min(_level_floor(weakest_level, probe["axis_ceilings"]), live_max)
-    live_range = (live_floor, live_max) if not live_fatal else (0.0, 0.0)
-    if live_range[1] > 0 and live_nav > 0 and price and fx_rate:
-        live_shares = (
-            live_range[0] * live_nav / (price * fx_rate),
-            live_range[1] * live_nav / (price * fx_rate),
-        )
-    else:
-        live_shares = None
 
-    trace_tuple = _mark_binding(trace, "paper", paper_max)
-    trace = [dict(item) for item in trace_tuple]
-    trace_tuple = _mark_binding(trace, "live", live_range[1])
+    # 研究完整度三態。判準與舊 `paper_status` 的 ELIGIBLE 一一對應，只是不再經過
+    # 資本換算：舊的 `paper_max > 0` 需要 axis_ceiling > 0（⟺ 最弱軸的 effective_level
+    # 不是 unknown）且 coverage 無致命 blocker，兩個條件原樣保留；被拿掉的
+    # `probe_book_remaining` 是純資本額度。
+    #
+    # ⚠ **已知的名實落差，刻意留著等量測。** 第一條是 `if paper_blockers`，不分嚴重度，
+    # 而 `coverage.apply_execution_intent` 會把 diagnostic 級的
+    # `execution_intent_research_only`／`_paper_only` 塞進 `paper_blockers`——於是任何
+    # `research` intent 的評估恆為 `DATA_NEEDED`，與研究本身完整與否無關。
+    # 這是 U7 之前 `paper_status` 就有的行為，改名之後才變刺眼。
+    # 正確的判準應該是 `fatal_blockers(paper_blockers, lane="paper")`，但改它會直接抬高
+    # daily brief 的「上線標的 N/M」計數器——那是**放閘**，依 L14 必須先量測再動，
+    # 不能夾帶在一次移除重構裡。要動就另案，並先記下改動前後的筆數差。
     if paper_blockers:
-        paper_status = "DATA_NEEDED"
-    elif paper_max <= 0:
-        paper_status = "SHADOW_ONLY"
+        research_status = "DATA_NEEDED"
+    elif (
+        fatal_blockers(coverage.blockers)
+        or str(axes[weakest_axis]["effective_level"]) == "unknown"
+    ):
+        research_status = "INCOMPLETE"
     else:
-        paper_status = "ELIGIBLE"
-    if live_blockers:
-        live_status = "DATA_NEEDED"
-    elif live_range[1] <= 0:
-        live_status = "SHADOW_ONLY"
-    else:
-        live_status = "ELIGIBLE"
-    if paper_status == "DATA_NEEDED":
-        action = "DATA_NEEDED"
-    elif paper_max <= 0:
-        action = "SHADOW_ONLY"
-    elif paper_current > paper_max:
-        action = "REDUCE_PAPER"
-    elif paper_target > paper_current:
-        action = "FUND_PAPER"
-    else:
-        action = "HOLD_PAPER"
+        research_status = "READY"
+
     return ProbeSizingResult(
         cohort_id=bundle.cohort_id,
         context_digest=bundle.digest,
@@ -629,19 +474,11 @@ def calculate_probe_limits(
         calculator_version=probe["calculator_version"],
         identity_registry_version=registry.version,
         weakest_axis=weakest_axis,
-        axis_ceiling=axis_ceiling,
         axis_results=axes,
         assessment_blockers=assessment_blockers,
-        paper_status=paper_status,
-        paper_target=paper_target,
-        paper_max_supported_position=paper_max,
-        paper_current_position=paper_current,
+        research_status=research_status,
         paper_blockers=tuple(sorted(set(paper_blockers))),
-        live_status=live_status,
-        live_supported_range=live_range,
-        live_supported_shares=live_shares,
-        live_current_position=live_current,
         live_blockers=tuple(sorted(set(live_blockers))),
-        constraint_trace=trace_tuple,
-        action=action,
+        live_current_position=live_current,
+        single_position_nav_cap=single_position_nav_cap,
     )

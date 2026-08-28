@@ -3,7 +3,7 @@
 這份分類刻意住在一個不依賴 store／coverage 的模組裡，因為它有多個消費者，
 而它們分屬不同層：
 
-- ``sizing.calculate_probe_limits``：決定 ``coverage_cap`` 與**兩個 lane 的歸零**。
+- ``sizing.calculate_probe_limits``：決定 ``research_status``（研究完整度三態）。
 - ``coverage.assess_coverage`` 與 ``coverage.apply_execution_intent``：決定 lane 的
   ``context_ready``。
 - ``store.get_coverage_result``：從持久化狀態重建同一個 ``context_ready``。
@@ -154,7 +154,7 @@ def fatal_blockers(
 
 
 def sizing_blockers(blockers: Sequence[str] | Iterable[str]) -> tuple[str, ...]:
-    """研究／資料不完整：不歸零，只讓 axis_ceiling 生效。"""
+    """研究／資料不完整：不阻擋，只讓最弱軸落到較低等級、影響排序。"""
     return tuple(b for b in blockers if severity_of(b) == SIZING)
 
 

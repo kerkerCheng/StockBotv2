@@ -43,11 +43,12 @@ class _FakeStore:
 class _FakeProvider:
     def current_holdings(self, *, evaluation_at):
         del evaluation_at
-        # confirmed-empty Sheet：可讀取、零列 → 乾淨 NO ACTION 基準。
+        # confirmed-empty Sheet：可讀取、零列 → 乾淨的 MONITOR 基準。
         return {"status": "available", "rows": []}
 
 
-_VALID_ACTIONS = {"NO ACTION", "REVIEW", "TRADE", "HEDGE"}
+# U7：四動作字彙已由兩態 `attention` 取代（見 decision_lab.models.ATTENTION_STATES）。
+_VALID_ATTENTION = {"MONITOR", "REVIEW"}
 
 
 def test_core_passes_through_redacted_public_dto() -> None:
@@ -58,19 +59,20 @@ def test_core_passes_through_redacted_public_dto() -> None:
         provider_factory=lambda: _FakeProvider(),
     )
 
-    # 空 cohort → NO ACTION，但仍具九欄 action-first 契約。
-    assert result["recommended_action"] == "NO ACTION"
+    # 空 cohort → MONITOR，但仍具 attention-first 的欄位契約。
+    assert result["attention"] == "MONITOR"
     assert result["action_needed"] is False
     for field in (
         "reason",
         "alpha_thesis_changes",
         "beta_portfolio_risk",
-        "supported_sizing_range",
         "blockers",
         "next_review_at",
         "user_response_needed",
     ):
         assert field in result
+    # `supported_sizing_range` 隨資本表達層於 U7 移除；遠端 surface 不得再看到它。
+    assert "supported_sizing_range" not in result
     assert store.closed is True
 
 
@@ -110,7 +112,7 @@ def test_provider_unavailable_still_produces_brief() -> None:
     )
 
     # provider 壞掉不該讓整份 brief 失敗——holdings 缺失是狀態，不是 crash。
-    assert result.get("recommended_action") in _VALID_ACTIONS
+    assert result.get("attention") in _VALID_ATTENTION
     assert store.closed is True
 
 
@@ -118,10 +120,10 @@ def test_graph_mcp_wrapper_serializes_core_result(monkeypatch) -> None:
     monkeypatch.setattr(
         graph_mcp,
         "get_decision_brief_core",
-        lambda: {"recommended_action": "REVIEW", "action_needed": True, "items": []},
+        lambda: {"attention": "REVIEW", "action_needed": True, "items": []},
     )
 
     result = json.loads(graph_mcp.get_decision_brief())
 
-    assert result["recommended_action"] == "REVIEW"
+    assert result["attention"] == "REVIEW"
     assert result["action_needed"] is True

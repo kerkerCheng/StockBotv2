@@ -1728,7 +1728,6 @@ def _decision_review_hint(
 
 
 def _decision_review_title(
-    action: str,
     label: str,
     *,
     weakest_axis: str | None,
@@ -1740,11 +1739,11 @@ def _decision_review_title(
     沒說成因，使用者看到只能再點進去查一次。最弱軸就是排序的瓶頸，也是提高排序的
     唯一路徑，所以它才是這一列該講的事。
 
-    `sheet_only` 與軸缺失時退回舊格式：那些項目本來就不是研究缺口，硬套研究措辭會
-    讓它們看起來需要補證據。
+    `sheet_only` 與軸缺失時退回「複查」措辭：那些項目本來就不是研究缺口，硬套研究
+    措辭會讓它們看起來需要補證據。
     """
     if sheet_only or not weakest_axis:
-        return f"{action} — {label}"
+        return f"複查 — {label}"
     from decision_lab.sizing import AXIS_RESEARCH_PROMPT
 
     prompt = AXIS_RESEARCH_PROMPT.get(weakest_axis)
@@ -1755,7 +1754,7 @@ def _decision_review_title(
 
 
 def _collect_decision_rows() -> list[dict[str, Any]]:
-    """需要動作的 Engine D 決策項（REVIEW／TRADE／HEDGE）→ 複查待辦。
+    """需要使用者注意的 Engine D 決策項（`attention == "REVIEW"`）→ 複查待辦。
 
     需要本機 private Decision Store 與外部 authority；失敗會往上拋，由呼叫端
     決定是 fail-soft 還是記錄成「來源不健康」。
@@ -1767,8 +1766,9 @@ def _collect_decision_rows() -> list[dict[str, Any]]:
     items = brief.get("items") or []
     dispatchable = _dispatchable_cohorts(items)
     for item in items:
-        action = str(item.get("recommended_action") or "")
-        if action in {"NO ACTION", ""}:
+        # U7 之前是 `recommended_action not in {"NO ACTION", ""}`；四動作已移除，
+        # 現在唯一的判準是這一檔今天要不要人看（見 decision_lab.models.ATTENTION_STATES）。
+        if str(item.get("attention") or "") != "REVIEW":
             continue
         ref = str(item.get("cohort_id") or item.get("decision_id") or "")
         company = str(item.get("company_id") or "unknown")
@@ -1792,7 +1792,6 @@ def _collect_decision_rows() -> list[dict[str, Any]]:
             "type": "sheet_only_holding" if item.get("sheet_only") else "decision_review",
             "ref_id": ref,
             "title": _decision_review_title(
-                action,
                 label,
                 weakest_axis=item.get("weakest_axis"),
                 sheet_only=bool(item.get("sheet_only")),
@@ -1832,14 +1831,13 @@ def _collect_decision_rows() -> list[dict[str, Any]]:
     # cohort item（例如 Google Sheet holdings 完全讀不到）。這仍是需要使用者
     # 處理的 pq2，不能因 items=[] 就從統一待辦池消失。
     if brief.get("action_needed") and not items:
-        action = str(brief.get("recommended_action") or "REVIEW")
         blockers = sorted(str(b) for b in (brief.get("blockers") or []) if b)
         reason = str(brief.get("reason") or "Engine D 全域狀態需要複查")
-        ref = "global:" + ("|".join(blockers) or action.lower())
+        ref = "global:" + ("|".join(blockers) or "review")
         rows.append({
             "type": "decision_review",
             "ref_id": ref,
-            "title": f"{action} — {reason}",
+            "title": f"複查 — {reason}",
             "hint": "修復全域 authority blocker 後重跑 decision_lab today",
             "source": "decision_lab",
         })

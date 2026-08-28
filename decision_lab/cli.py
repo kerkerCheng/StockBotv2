@@ -11,7 +11,7 @@ from typing import Any, Mapping, TextIO
 
 from .action_card import RedactionError, assert_safe_payload, build_action_card, render_markdown
 from .bootstrap import open_default_store
-from .brief import build_today_brief, render_today_markdown
+from .brief import build_today_brief, ranking_annotations, render_today_markdown
 from .execution import (
     ExecutionError,
     assess_probe,
@@ -104,7 +104,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     today = subcommands.add_parser(
         "today",
-        help="純讀回答今天是否需要 NO ACTION／REVIEW／TRADE／HEDGE。",
+        help="純讀輸出瓶頸排序、NAV 比例，以及哪些標的今天需要複查。",
     )
     today.add_argument("--as-of")
     today.add_argument("--format", choices=("json", "markdown"), default="markdown")
@@ -115,7 +115,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     references.add_argument("target_id", help="decision_id 或 cohort_id")
     references.add_argument(
-        "--assessment", help="一併診斷這份 assessment 的引用會不會讓某軸歸零。"
+        "--assessment", help="一併診斷這份 assessment 的引用會不會讓某軸落回 unknown。"
     )
     references.add_argument("--format", choices=("json", "markdown"), default="markdown")
 
@@ -125,7 +125,7 @@ def build_parser() -> argparse.ArgumentParser:
     card.add_argument("--format", choices=("json", "markdown"), default="json")
 
     choice = subcommands.add_parser(
-        "record-choice", help="明確記錄接受、縮小、skip 或 override 的 live 選擇。"
+        "record-choice", help="明確記錄使用者自訂尺寸、skip 或 override 的 live 選擇。"
     )
     choice.add_argument("decision_id")
     choice.add_argument("--selected-weight", required=True, type=float)
@@ -137,8 +137,8 @@ def build_parser() -> argparse.ArgumentParser:
         "--user-sized",
         action="store_true",
         help=(
-            "尺寸由使用者決定，不與系統 live_supported_range 比較（--reason 必填）。"
-            "5%% 單筆上限與 ETF 槓桿 cap 仍硬擋。"
+            "明確標記這筆尺寸由使用者決定（--reason 必填）。系統本來就不給建議尺寸；"
+            "5%% 單筆上限與 ETF 槓桿 cap 對所有非零選擇一律硬擋。"
         ),
     )
     choice.add_argument("--format", choices=("json", "markdown"), default="json")
@@ -218,6 +218,19 @@ def _provider(current: WorkflowDataProvider | None) -> WorkflowDataProvider:
     from engine_d_runtime.bootstrap import build_default_runtime_provider
 
     return build_default_runtime_provider()
+
+
+def _optional(builder: Any) -> dict[str, Any] | None:
+    """取一份可缺席的首屏區塊。取不到就 `None`——不是空結果。
+
+    ⚠ 這裡吞例外是刻意的，但吞掉的只有「這一區拿不到」，不是「這一區是空的」。
+    brief 對 `None` 渲染「未提供」、對空結果渲染「沒有候選」，兩者不可互換（L12）。
+    """
+
+    try:
+        return builder()
+    except Exception:  # noqa: BLE001 — 缺一區不阻斷整份 brief
+        return None
 
 
 def _render(
@@ -354,11 +367,29 @@ def run(
                 )
             except Exception:
                 holdings = {"status": "unavailable"}
+            # 首屏是瓶頸排序在前、NAV 比例在後。兩者都需要 `decision_lab` 不得 import
+            # 的 authority（Neo4j／Google Sheet），所以在這一層取好再注入。
+            # 兩者各自 fail-soft：缺席時 brief 照常渲染並明說「未提供」，不是「沒有候選」。
+            from engine_d_runtime.adapters import (
+                fetch_nav_exposure,
+                fetch_ranking_view,
+            )
+
+            annotations = ranking_annotations(store, as_of=evaluation_at)
+            ranking = _optional(
+                lambda: fetch_ranking_view(
+                    weakest_axes=annotations["weakest_axes"],
+                    disproofs=annotations["disproofs"],
+                )
+            )
+            nav_exposure = _optional(fetch_nav_exposure)
             brief = build_today_brief(
                 store,
                 as_of=evaluation_at,
                 current_holdings=holdings,
                 provider=runtime,
+                ranking=ranking,
+                nav_exposure=nav_exposure,
             )
             _render(
                 brief,

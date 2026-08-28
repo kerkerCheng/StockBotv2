@@ -2,6 +2,10 @@
 
 先前是 `REVIEW — co:coherent`——說了狀態卻沒說成因。最弱軸是排序的瓶頸，也是提高
 排序的唯一路徑，所以它才是這一列該講的事（R14）。
+
+U7（2026-08-28）：`_decision_review_title` 不再收 `action` 參數。四動作
+（NO ACTION／REVIEW／TRADE／HEDGE）隨資本表達層移除，退回格式的措辭改為固定的
+「複查 — <label>」。本檔的判準沒變：**有軸就講軸，沒軸就不硬套研究措辭。**
 """
 from __future__ import annotations
 
@@ -16,18 +20,17 @@ def test_every_axis_has_a_research_prompt() -> None:
 
 
 def test_title_names_the_company_and_the_axis_action() -> None:
-    title = _decision_review_title(
-        "REVIEW", "co:coherent", weakest_axis="technical_causal_link"
-    )
+    title = _decision_review_title("co:coherent", weakest_axis="technical_causal_link")
 
     assert title.startswith("co:coherent：")
     assert "counter-path" in title
-    assert "REVIEW" not in title
+    # 有軸時不得退回只講狀態的措辭。
+    assert not title.startswith("複查")
 
 
 def test_each_axis_produces_a_distinct_action() -> None:
     titles = {
-        axis: _decision_review_title("REVIEW", "co:x", weakest_axis=axis)
+        axis: _decision_review_title("co:x", weakest_axis=axis)
         for axis in AXES
     }
 
@@ -36,23 +39,23 @@ def test_each_axis_produces_a_distinct_action() -> None:
     assert "Engine C" in titles["financial_resilience"]
 
 
-def test_missing_axis_falls_back_to_the_old_shape() -> None:
+def test_missing_axis_falls_back_to_the_plain_review_shape() -> None:
     """軸缺失時不硬套研究措辭——那會讓非研究缺口看起來需要補證據。"""
-    assert _decision_review_title("REVIEW", "co:x", weakest_axis=None) == "REVIEW — co:x"
+    assert _decision_review_title("co:x", weakest_axis=None) == "複查 — co:x"
 
 
-def test_sheet_only_items_keep_the_old_shape() -> None:
+def test_sheet_only_items_keep_the_plain_review_shape() -> None:
     """Sheet-only 持股不是研究缺口。"""
     title = _decision_review_title(
-        "REVIEW", "ticker:ABC", weakest_axis="source_reliability", sheet_only=True
+        "ticker:ABC", weakest_axis="source_reliability", sheet_only=True
     )
 
-    assert title == "REVIEW — ticker:ABC"
+    assert title == "複查 — ticker:ABC"
 
 
 def test_unregistered_axis_is_still_named() -> None:
     """未登記的軸不猜措辭，但仍要指名——沉默會讓新軸悄悄退回舊格式。"""
-    title = _decision_review_title("REVIEW", "co:x", weakest_axis="future_axis")
+    title = _decision_review_title("co:x", weakest_axis="future_axis")
 
     assert "future_axis" in title
-    assert title != "REVIEW — co:x"
+    assert title != "複查 — co:x"

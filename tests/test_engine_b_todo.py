@@ -361,7 +361,8 @@ def test_source_that_stops_producing_a_row_marks_it_as_done_candidate() -> None:
     """來源成功執行但不再產出該項＝很可能已完成，移出決策注意力。
 
     事發（2026-08-05）：[85] 與 [84] 在同一個 session 內先後變成殘留項。sync 只
-    走訪 incoming，而 collect_from_decisions 會跳過 NO ACTION 的 decision，所以
+    走訪 incoming，而 collect_from_decisions 會跳過不需要人看（U7 起是 `MONITOR`，
+    先前寫作 NO ACTION）的 decision，所以
     項目一旦「做完」，它的來源 row 就消失、再也沒有任何分支碰得到它——項目越
     接近完成，池子越無法反映它。
     """
@@ -893,9 +894,10 @@ def test_load_missing_returns_empty_pool(tmp_path) -> None:
 def test_collect_from_decisions_keeps_global_blocker_without_items(monkeypatch) -> None:
     from mcp_server import decision_tools
 
+    # U7：brief 頂層的 `recommended_action` 已改為 `attention`，全域項標題固定寫「複查」。
     monkeypatch.setattr(decision_tools, "get_decision_brief_core", lambda: {
         "action_needed": True,
-        "recommended_action": "REVIEW",
+        "attention": "REVIEW",
         "reason": "Google Sheet current holdings 無法讀取。",
         "blockers": ["holdings_unavailable"],
         "items": [],
@@ -904,7 +906,7 @@ def test_collect_from_decisions_keeps_global_blocker_without_items(monkeypatch) 
     assert todo.collect_from_decisions() == [{
         "type": "decision_review",
         "ref_id": "global:holdings_unavailable",
-        "title": "REVIEW — Google Sheet current holdings 無法讀取。",
+        "title": "複查 — Google Sheet current holdings 無法讀取。",
         "hint": "修復全域 authority blocker 後重跑 decision_lab today",
         "source": "decision_lab",
     }]
@@ -994,7 +996,7 @@ def test_collect_from_decisions_keeps_sheet_only_items_without_cohort(
                 "decision_id": None,
                 "company_id": "co:nvidia",
                 "ticker": "NVDA",
-                "recommended_action": "REVIEW",
+                "attention": "REVIEW",
                 "sheet_only": True,
             },
             {
@@ -1002,7 +1004,7 @@ def test_collect_from_decisions_keeps_sheet_only_items_without_cohort(
                 "decision_id": None,
                 "company_id": "unresolved",
                 "ticker": "QQQ",
-                "recommended_action": "REVIEW",
+                "attention": "REVIEW",
                 "sheet_only": True,
             },
         ],
@@ -1012,13 +1014,13 @@ def test_collect_from_decisions_keeps_sheet_only_items_without_cohort(
         {
             "type": "sheet_only_holding",
             "ref_id": "sheet:co:nvidia",
-            "title": "REVIEW — co:nvidia",
+            "title": "複查 — co:nvidia",
             "source": "decision_lab",
         },
         {
             "type": "sheet_only_holding",
             "ref_id": "sheet:ticker:QQQ",
-            "title": "REVIEW — QQQ",
+            "title": "複查 — QQQ",
             "source": "decision_lab",
         },
     ]
@@ -1037,7 +1039,7 @@ def test_collect_from_decisions_uses_company_hint_only_as_display_label(
             "company_id": "unresolved",
             "company_id_hint": "co:agility_robotics",
             "ticker": None,
-            "recommended_action": "REVIEW",
+            "attention": "REVIEW",
         }],
     })
 
@@ -1047,7 +1049,8 @@ def test_collect_from_decisions_uses_company_hint_only_as_display_label(
     assert row["type"] == "decision_review"
     assert row["ref_id"] == "dc_private"
     # 本測試的斷言對象是**顯示標籤**：company_id 為 unresolved 時退回 hint 值。
-    assert row["title"] == "REVIEW — co:agility_robotics"
+    # U7 起沒有 weakest_axis 的項目一律寫「複查 — <label>」，不再冠上動作字樣。
+    assert row["title"] == "複查 — co:agility_robotics"
     assert row["source"] == "decision_lab"
     # hint 自 2026-08-26 起依該 cohort 有無 research work order 動態決定，
     # 不再是固定字串；其正確性由 test_decision_review_hint_* 負責，這裡只確認存在。
@@ -1065,7 +1068,7 @@ def test_collect_material_decision_never_derives_waiting_from_system_blockers(
             "cohort_id": "dc_axt",
             "decision_id": "pd_axt",
             "company_id": "co:axt",
-            "recommended_action": "REVIEW",
+            "attention": "REVIEW",
             "evidence_delta": "material",
             "blockers": ["market_stale_since_decision"],
         }],
@@ -1089,7 +1092,7 @@ def test_collect_marks_pure_system_internal_decision_for_retirement(
             "cohort_id": "dc_meta",
             "decision_id": "pd_meta",
             "company_id": "co:meta",
-            "recommended_action": "REVIEW",
+            "attention": "REVIEW",
             "evidence_delta": "none",
             "blockers": [
                 "execution_fx_stale_since_decision",
@@ -1501,7 +1504,7 @@ def test_go_reassesses_when_only_context_aged(monkeypatch) -> None:
 
     out = todo.advance_decision_review(pool, 1, store=store)
     assert out["outcome"] == "reassessed"
-    # intent 必須沿用該 cohort 上一筆——套錯會讓 paper_status 假性退化。
+    # intent 必須沿用該 cohort 上一筆——套錯會讓 research_status 假性退化。
     assert seen["intent"] == "paper"
 
 

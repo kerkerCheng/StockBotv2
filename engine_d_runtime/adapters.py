@@ -71,6 +71,55 @@ def fetch_nav_exposure(
     return build_nav_exposure(rows, groups=groups)
 
 
+def fetch_ranking_view(
+    *,
+    weakest_axes: Mapping[str, str] | None = None,
+    disproofs: Mapping[str, str] | None = None,
+    limit: int = 10,
+) -> dict[str, Any] | None:
+    """從 Neo4j 讀 assertion 並產生瓶頸排序視圖；讀不到就回 `None`。
+
+    取數住在這一層而不是 `decision_lab.ranking_view`：後者是純轉換層，不得 import
+    Neo4j driver（架構邊界由 `test_decision_lab_does_not_import_concrete_current_state_
+    authorities` 守著）。
+
+    ⚠ 失敗回 `None` 而不是空排序。`brief` 對 `None` 渲染的是「本次未提供排序資料」，
+    對空排序渲染的是「沒有候選」——那是兩件完全不同的事，壓成同一個訊號正是 L12
+    的形狀。這裡不吞成空 dict。
+    """
+
+    import os
+
+    from decision_lab.ranking_view import build_ranking_view
+    from query.bottleneck import fetch_assertions, rank_bottlenecks
+
+    password = os.environ.get("NEO4J_PASSWORD")
+    if not password:
+        _LOG.warning("ranking view unavailable: NEO4J_PASSWORD is not set")
+        return None
+    try:
+        from neo4j import GraphDatabase
+
+        driver = GraphDatabase.driver(
+            os.environ.get("NEO4J_URI", "bolt://localhost:7687"),
+            auth=(os.environ.get("NEO4J_USER", "neo4j"), password),
+        )
+        try:
+            with driver.session() as session:
+                rows = fetch_assertions(session)
+        finally:
+            driver.close()
+    except Exception as exc:  # noqa: BLE001 — 排序缺席只降級，不阻斷 brief
+        _LOG.warning("ranking view fetch failed: %s", exc, exc_info=True)
+        return None
+    return build_ranking_view(
+        rank_bottlenecks(rows, get_registry()),
+        weakest_axes=weakest_axes,
+        disproofs=disproofs,
+        limit=limit,
+    )
+
+
 _LOG = logging.getLogger(__name__)
 
 _VOCAB_PATH = Path(__file__).resolve().parent.parent / "schema" / "vocab.json"

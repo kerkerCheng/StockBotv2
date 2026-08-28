@@ -712,8 +712,8 @@ def reassess(
     delta = _context_delta(
         old_bundle.payload,
         new_bundle.payload,
-        old_action=str(old_card["action"]),
-        new_action=str(new_card["action"]),
+        old_action=str(old_card["attention"]),
+        new_action=str(new_card["attention"]),
     )
     store.append_event(
         cohort_id=str(result["cohort_id"]),

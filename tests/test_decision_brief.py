@@ -21,16 +21,29 @@ def _new_store(tmp_path: Path, name: str):
     return _store(root)
 
 
-@pytest.mark.parametrize("expected", ["NO ACTION", "REVIEW", "TRADE", "HEDGE"])
-def test_today_brief_emits_all_action_classes_with_nine_field_contract(
-    tmp_path: Path, expected: str
+# U7：四動作（NO ACTION／REVIEW／TRADE／HEDGE）已被兩態 `attention` 取代，所以
+# 這裡改成參數化「情境 → 注意力」，而不是參數化動作名。三個情境刻意保留原本的
+# 三種 setup——它們是真實會發生的狀態，改變的只是系統對它們的**說法**：
+#   明確 skip           → MONITOR（舊 NO ACTION）
+#   已記錄 live 但未成交 → REVIEW（舊 TRADE；系統不下單，只能請人回報）
+#   投組曝險超限        → REVIEW（舊 HEDGE；系統不給尺寸，只能請人看一眼）
+@pytest.mark.parametrize(
+    ("scenario", "expected_attention"),
+    [
+        ("explicit_skip", "MONITOR"),
+        ("live_choice_pending_fill", "REVIEW"),
+        ("portfolio_over_cap", "REVIEW"),
+    ],
+)
+def test_today_brief_covers_each_attention_scenario_with_field_contract(
+    tmp_path: Path, scenario: str, expected_attention: str
 ) -> None:
-    store = _new_store(tmp_path, expected.replace(" ", "_").lower())
+    store = _new_store(tmp_path, scenario)
     try:
-        decision = _decision(store, key=f"brief-{expected}")
+        decision = _decision(store, key=f"brief-{scenario}")
         cohort_id = store.get_decision(decision.decision_id)["cohort_id"]
         portfolio = {}
-        if expected == "NO ACTION":
+        if scenario == "explicit_skip":
             record_live_choice(
                 store,
                 decision.decision_id,
@@ -38,7 +51,7 @@ def test_today_brief_emits_all_action_classes_with_nine_field_contract(
                 decided_at="2026-07-21T12:10:00+00:00",
                 explicit=True,
             )
-        elif expected == "TRADE":
+        elif scenario == "live_choice_pending_fill":
             prepared = prepare_managed_action(
                 store,
                 action_type="live_override",
@@ -54,7 +67,7 @@ def test_today_brief_emits_all_action_classes_with_nine_field_contract(
                 native_approved=True,
                 decided_at="2026-07-21T12:10:00+00:00",
             )
-        elif expected == "HEDGE":
+        elif scenario == "portfolio_over_cap":
             portfolio[cohort_id] = {
                 "status": "over_cap",
                 "factor": "photonics",
@@ -82,18 +95,19 @@ def test_today_brief_emits_all_action_classes_with_nine_field_contract(
             for table in before
         }
 
-        assert brief["recommended_action"] == expected
-        assert brief["action_needed"] is (expected != "NO ACTION")
+        assert brief["attention"] == expected_attention
+        assert brief["action_needed"] is (expected_attention != "MONITOR")
+        # `supported_sizing_range` 已隨資本表達層於 U7 移除，不再是欄位契約的一部分。
         for field in (
             "reason",
             "alpha_thesis_changes",
             "beta_portfolio_risk",
-            "supported_sizing_range",
             "blockers",
             "next_review_at",
             "user_response_needed",
         ):
             assert field in brief
+        assert "supported_sizing_range" not in brief
         assert before == after
         assert "今天需要動作嗎？" in render_today_markdown(brief)
     finally:
@@ -120,11 +134,13 @@ def test_today_finds_sheet_only_holding_without_creating_a_cohort(tmp_path: Path
             },
         )
 
-        assert brief["recommended_action"] == "REVIEW"
+        assert brief["attention"] == "REVIEW"
         assert "sheet_only_holding" in brief["blockers"]
         assert brief["items"][0]["ticker"] == "LEGACY"
         assert brief["items"][0]["sheet_only"] is True
-        assert brief["items"][0]["supported_sizing_range"] == [0.0, 0.0]
+        # 原本這裡還斷言 supported_sizing_range == [0, 0]；該欄位於 U7 隨資本
+        # 表達層移除——sheet-only 持股要的是「有沒有人負責」，不是額度。
+        assert "supported_sizing_range" not in brief["items"][0]
         assert store.table_count("decision_cohorts") == before
     finally:
         store.close()
@@ -154,10 +170,10 @@ def test_beta_covered_holding_is_visible_but_not_an_alpha_todo(tmp_path: Path) -
         assert item["ticker"] == "QQQ"
         assert item["sheet_only"] is True
         assert item["coverage"] == "beta_policy"
-        # NO ACTION 是 collect_from_decisions 用來跳過 pq2 的唯一判準。
-        assert item["recommended_action"] == "NO ACTION"
+        # MONITOR 是 collect_from_decisions 用來跳過 pq2 的唯一判準
+        #（U7 之前是 `recommended_action != "NO ACTION"`）。
+        assert item["attention"] == "MONITOR"
         assert item["blockers"] == []
-        assert item["supported_sizing_range"] == [0.0, 0.0]
         # 覆蓋事實不得冒泡成全域 blocker 噪音。
         assert "alpha_cohort_absent" not in brief["blockers"]
         assert "sheet_only_holding" not in brief["blockers"]
@@ -186,7 +202,7 @@ def test_user_ignored_holding_is_not_an_alpha_todo(tmp_path: Path) -> None:
 
         item = brief["items"][0]
         assert item["coverage"] == "user_ignored"
-        assert item["recommended_action"] == "NO ACTION"
+        assert item["attention"] == "MONITOR"
         assert item["blockers"] == []
         # registry 無對應時，markdown 仍要顯示 ticker 而非 unresolved。
         assert "TYO:7803" in render_today_markdown(brief)
@@ -216,8 +232,10 @@ def test_uncovered_holding_still_demands_review(tmp_path: Path) -> None:
 
         item = brief["items"][0]
         assert item["coverage"] == "uncovered"
-        assert item["recommended_action"] == "REVIEW"
+        assert item["attention"] == "REVIEW"
         assert "sheet_only_holding" in item["blockers"]
+        # U7：要求的動作改成「讓這檔進入瓶頸排序」，不再是配額度。
+        assert "瓶頸排序" in item["user_response_needed"]
     finally:
         store.close()
 
@@ -248,7 +266,7 @@ def test_today_does_not_treat_beta_only_move_as_disproof(tmp_path: Path) -> None
             },
         )
 
-        assert brief["recommended_action"] == "NO ACTION"
+        assert brief["attention"] == "MONITOR"
         assert brief["alpha_thesis_changes"][0]["classification"] == "beta"
         assert brief["alpha_thesis_changes"][0]["thesis_changed"] is False
     finally:
@@ -283,7 +301,10 @@ def test_today_reads_current_market_fx_without_deriving_legacy_factor_hedge(
             provider=provider,
         )
 
-        assert brief["recommended_action"] == "REVIEW"
+        # 純價格／匯率變動不產生注意力，也不得被推導成 legacy 的 factor hedge。
+        # （U7 之前這裡是 REVIEW，但那個 REVIEW 來自 live lane 的資料缺口分支，
+        # 與本測試要鎖的「不得從行情推導動作」無關；lane 移除後正確答案是 MONITOR。）
+        assert brief["attention"] == "MONITOR"
         risk = brief["beta_portfolio_risk"][0]
         assert risk["portfolio_action"] == "none"
         assert risk["security_return"] == pytest.approx(0.1)
@@ -360,3 +381,50 @@ def test_blockers_by_mode_is_empty_not_missing_when_no_blockers() -> None:
     from decision_lab.brief import _blockers_by_mode
 
     assert _blockers_by_mode([]) == {}
+
+
+def test_today_markdown_has_no_four_action_or_sizing_vocabulary(tmp_path: Path) -> None:
+    """U7 驗收條件：首屏 markdown 不得再出現四動作字樣或部位百分比欄位名。
+
+    這兩類字樣代表兩種宣稱：`TRADE`／`HEDGE` 宣稱一個系統做不到的授權（不給尺寸、
+    不連 broker）；`supported_range`／`axis_ceiling`／`paper_target` 是已移除的資本
+    欄位，若還出現在字串裡，代表某處又自己算了一份尺寸。
+    """
+    from tests.test_action_card import (
+        FORBIDDEN_ACTION_WORDS,
+        FORBIDDEN_SIZING_FIELDS,
+    )
+
+    store = _store(tmp_path)
+    try:
+        decision = _decision(store, key="brief-vocab")
+        cohort_id = store.get_decision(decision.decision_id)["cohort_id"]
+        brief = build_today_brief(
+            store,
+            as_of=NOW,
+            current_holdings={
+                "status": "available",
+                "rows": [
+                    {
+                        "ticker": "SOMETHING_NEW",
+                        "shares": 10.0,
+                        "currency": "USD",
+                        "market_value_base": 500.0,
+                    }
+                ],
+            },
+            portfolio_context_by_cohort={
+                cohort_id: {"status": "over_cap", "factor": "photonics"}
+            },
+        )
+        out = render_today_markdown(brief)
+
+        for word in FORBIDDEN_ACTION_WORDS:
+            assert word not in out, f"首屏仍含四動作字樣：{word}"
+        for field in FORBIDDEN_SIZING_FIELDS:
+            assert field not in out, f"首屏仍含資本欄位名：{field}"
+        # 取代它們的兩個中文狀態必須真的在（否則上面的斷言可能只是因為沒渲染項目）。
+        assert "注意力：需要複查" in out
+        assert "需要複查 —" in out
+    finally:
+        store.close()

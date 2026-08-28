@@ -94,41 +94,40 @@ def _run_sive(store: DecisionStore) -> tuple[dict, object, object, object]:
     return fixture, captured, bundle, decision
 
 
-def test_sive_signal_funds_bounded_paper_but_never_auto_adds_live(
+def test_sive_signal_produces_a_research_verdict_but_never_auto_adds_live(
     tmp_path: Path,
 ) -> None:
+    """完整 e2e：Signal → Shadow → context → coverage → decision → Action Card。
+
+    U7（2026-08-28）之前，本測試的終點是「資助了多少 paper、live 區間多寬」。
+    資本表達層已移除，終點改成研究判斷本身：最弱軸是哪一軸、研究完整度到哪、
+    以及 live 仍然 100% 由使用者手動決定（系統既不給尺寸也不連 broker）。
+    """
+
     store, _, _ = _store(tmp_path)
     try:
         fixture, captured, _, decision = _run_sive(store)
-        card = build_action_card(store, decision.decision_id)
+        card = build_action_card(store, decision.decision_id, as_of=fixture["evaluation_at"])
 
         assert captured.company_id == "co:sivers_semiconductors"
         assert captured.research_ticker == "SIVE.ST"
         assert captured.execution_symbol == "FRA:2DG"
         assert store.get_shadow(captured.cohort_id).price == pytest.approx(2.5)
         assert store.get_probe(captured.cohort_id).evidence_admission_status == "lead_only"
-        assert decision.paper_funded is True
-        assert decision.paper_target == pytest.approx(0.001)
+        assert decision.research_status == "READY"
         assert card["weakest_link"]["axis"] == "commercial_maturity"
         assert any(
             "production order" in item
             for item in card["weakest_link"]["missing_data"]
         )
-        assert card["paper"]["funded"] is True
-        assert card["live"]["status"] == "DATA_NEEDED"
-        assert card["live"]["supported_shares"] is None
+        assert card["research"] == {"status": "READY", "data_stale": False}
+        # live 區塊只剩「使用者做了什麼」——沒有 status、也沒有 supported range／shares。
+        assert card["live"] == {"user_choice": None, "fill_reported": False}
+        assert store.table_count("paper_events") == 0
         assert store.table_count("live_choices") == 0
         assert store.table_count("live_execution_reports") == 0
 
         complete = deepcopy(fixture)
-        complete["context"]["paper_exposure"].update(
-            {
-                "total_weight": decision.paper_target,
-                "company_weights": {
-                    "co:sivers_semiconductors": decision.paper_target
-                },
-            }
-        )
         live_bundle = _freeze_fixture_context(
             store, complete, captured.cohort_id, with_execution=True
         )
@@ -137,15 +136,13 @@ def test_sive_signal_funds_bounded_paper_but_never_auto_adds_live(
             live_bundle, live_coverage, fixture["assessment"]
         )
 
-        assert live_sizing.live_status == "ELIGIBLE"
-        assert live_sizing.live_supported_shares is not None
+        # 補上 execution 行情／FX 之後 live lane 沒有任何缺口，但系統仍不產生任何
+        # live 選擇——「條件齊全」與「可以下單」在 U7 之後徹底脫鉤。
+        assert live_sizing.research_status == "READY"
+        assert live_sizing.live_blockers == ()
+        # 這兩個數字不是建議尺寸，是使用者手動記錄 live 選擇時的既有部位與政策參考線。
         assert live_sizing.live_current_position == pytest.approx(0.003)
-        assert live_sizing.live_supported_range[1] == pytest.approx(0.002)
-        assert any(
-            item["constraint"] == "execution_adv_1pct"
-            and item["authority"] == "execution_market+execution_fx"
-            for item in live_sizing.constraint_trace
-        )
+        assert live_sizing.single_position_nav_cap == pytest.approx(0.05)
         assert store.table_count("live_choices") == 0
     finally:
         store.close()
@@ -173,20 +170,25 @@ def test_empty_graph_company_stays_shadow_only_with_bounded_research_work(
             effective_at=fixture["evaluation_at"],
         )
         frozen = store.get_decision(decision.decision_id)["payload"]["sizing"]
-        card = build_action_card(store, decision.decision_id)
+        card = build_action_card(
+            store, decision.decision_id, as_of=fixture["evaluation_at"]
+        )
 
         assert store.count_shadows(captured.cohort_id) == 1
         assert coverage.status == "coverage_pending"
         assert coverage.work_order_id is not None
         assert "graph_company_missing" in coverage.blockers
         assert "causal_path_missing" in coverage.blockers
-        assert decision.paper_funded is False
-        assert frozen["paper_max_supported_position"] == 0.0
-        assert frozen["live_supported_range"] == [0.0, 0.0]
+        # U7 之前這裡斷言額度歸零（paper_max 0、live 區間 [0,0]）；同一件事現在由
+        # 研究完整度表達，而缺口本身仍然要有一張 bounded work order 可以派工。
+        assert decision.research_status == "DATA_NEEDED"
+        assert frozen["research_status"] == "DATA_NEEDED"
+        assert frozen["assessment_blockers"]
         assert store.table_count("paper_events") == 0
         assert store.table_count("research_work_orders") == 1
-        assert card["action"] == "REVIEW"
-        assert card["live"]["supported_shares"] is None
+        assert card["attention"] == "REVIEW"
+        assert card["research"]["status"] == "DATA_NEEDED"
+        assert card["live"] == {"user_choice": None, "fill_reported": False}
     finally:
         store.close()
 

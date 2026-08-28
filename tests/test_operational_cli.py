@@ -6,6 +6,7 @@ from pathlib import Path
 
 from decision_lab.cli import run
 from decision_lab.execution import apply_live_override, prepare_managed_action
+from decision_lab.models import ATTENTION_STATES
 from tests.test_action_card import _decision
 from tests.test_decision_execution import _store
 from tests.test_operational_workflow import FixtureProvider, NOW
@@ -94,7 +95,8 @@ def test_cli_today_is_directly_executable_and_safe(tmp_path: Path) -> None:
         brief = json.loads(stdout.getvalue())
 
         assert code == 0
-        assert brief["recommended_action"] in {"NO ACTION", "REVIEW", "TRADE", "HEDGE"}
+        # U7：頂層 `recommended_action`（四動作）改為兩態 `attention`。
+        assert brief["attention"] in ATTENTION_STATES
         assert "action_needed" in brief
         assert str(store.path) not in stdout.getvalue()
     finally:

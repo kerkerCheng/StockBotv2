@@ -7,7 +7,7 @@ import pytest
 
 from decision_lab.context import build_context_bundle, holdings_snapshot_digest
 from decision_lab.models import CoverageResult
-from decision_lab.sizing import AXES, AssessmentError, calculate_probe_limits
+from decision_lab.sizing import AXES, LEVELS, AssessmentError, calculate_probe_limits
 from decision_lab.store import DecisionStore
 from storage.relational import initialize_private_root
 from tests.test_decision_context import NOW, complete_inputs
@@ -90,15 +90,18 @@ def _coverage(bundle, *, paper=True, live=True) -> CoverageResult:
         live_blockers=() if live else ("holdings_unconfirmed",),
         paper_context_ready=paper,
         live_context_ready=live,
-        paper_supported_position=0.0,
-        live_supported_range=(0.0, 0.0),
         work_order_id=None,
     )
 
 
-def test_multiple_positive_events_do_not_add_and_weakest_axis_caps_position(
+def test_multiple_positive_events_do_not_add_and_weakest_axis_governs(
     tmp_path: Path,
 ) -> None:
+    """多附幾個正面引用不會讓那一軸變強，整筆評估仍由最弱軸代表。
+
+    U7 之前這個契約是用額度表達的（最弱軸 → `axis_ceiling` → `paper_target`）；
+    額度移除後判準沒變，只是改由 `weakest_axis` 與 `effective_level` 直接表達。
+    """
     store = _store(tmp_path)
     try:
         bundle = _bundle(store)
@@ -112,10 +115,15 @@ def test_multiple_positive_events_do_not_add_and_weakest_axis_caps_position(
         result = calculate_probe_limits(bundle, _coverage(bundle), assessment)
 
         assert result.weakest_axis == "commercial_maturity"
-        assert result.axis_ceiling == 0.002
-        assert result.paper_max_supported_position == 0.002
-        assert result.paper_target == 0.001
-        assert result.axis_results["technical_causal_link"]["ceiling"] == 0.005
+        assert result.axis_results["commercial_maturity"]["effective_level"] == (
+            "bounded_hypothesis"
+        )
+        # 三個引用沒有讓這一軸升到 corroborated 之上——等級不會累加。
+        assert result.axis_results["technical_causal_link"]["effective_level"] == (
+            "corroborated"
+        )
+        # 額度欄位已隨資本表達層移除，不得悄悄長回來。
+        assert "ceiling" not in result.axis_results["technical_causal_link"]
     finally:
         store.close()
 
@@ -137,9 +145,10 @@ def test_unknown_or_unreferenced_required_axis_fails_closed(
 
         result = calculate_probe_limits(bundle, _coverage(bundle), assessment)
 
-        assert result.paper_max_supported_position == 0.0
-        assert result.live_supported_range == (0.0, 0.0)
-        assert result.action == "SHADOW_ONLY"
+        # 舊契約是「額度歸零＋action=SHADOW_ONLY」；U7 之後同一件事由研究完整度
+        # 表達——最弱軸實質等級 unknown ⟹ 研究還沒到 READY。
+        assert result.axis_results[result.weakest_axis]["effective_level"] == "unknown"
+        assert result.research_status == "INCOMPLETE"
         assert result.assessment_blockers
     finally:
         store.close()
@@ -165,8 +174,7 @@ def test_cross_context_or_wrong_authority_ref_fails_closed(
 
         assert result.axis_results[axis]["level"] == "unknown"
         assert f"assessment_context_mismatch:{axis}" in result.assessment_blockers
-        assert result.paper_max_supported_position == 0.0
-        assert result.live_supported_range == (0.0, 0.0)
+        assert result.research_status == "INCOMPLETE"
     finally:
         store.close()
 
@@ -179,6 +187,10 @@ def test_fatal_coverage_gap_cannot_be_overridden_by_high_axis_levels(
     原版只把 status 設成 coverage_pending 而讓 blockers 留空，但真實流程裡
     status 是由 blockers 推導出來的，這個組合不會出現。改用真實的致命
     blocker，守的契約不變。
+
+    U7 之後這個契約由 `research_status` 表達：致命 coverage blocker 讓研究狀態
+    退回 INCOMPLETE。原本斷言的 `constraint_trace` 的 `coverage_gate` 項目隨
+    `constraint_trace` 一起移除——那是額度的推導軌跡，不再存在。
     """
     store = _store(tmp_path)
     try:
@@ -194,23 +206,24 @@ def test_fatal_coverage_gap_cannot_be_overridden_by_high_axis_levels(
 
         result = calculate_probe_limits(bundle, pending, _assessment())
 
-        assert result.paper_max_supported_position == 0.0
-        assert result.live_supported_range == (0.0, 0.0)
-        assert any(
-            item["constraint"] == "coverage_gate" and item["cap_weight"] == 0.0
-            for item in result.constraint_trace
+        # 五軸全部 corroborated，仍不得判成 READY。
+        assert all(
+            axis["effective_level"] == "corroborated"
+            for axis in result.axis_results.values()
         )
+        assert result.research_status == "INCOMPLETE"
     finally:
         store.close()
 
 
-def test_incomplete_research_reduces_size_instead_of_zeroing_it(
+def test_non_fatal_coverage_gaps_do_not_downgrade_research_status(
     tmp_path: Path,
 ) -> None:
-    """功課沒做完只降尺寸，不禁止參與。
+    """功課沒做完不等於研究不可用——非致命的 coverage gap 不得把狀態打下來。
 
-    等到每一項 coverage 都補齊，alpha 通常已被市場定價完畢；用尺寸承擔
-    不確定性，而不是用 gate 把部位打成零。
+    原本的說法是「只降尺寸，不禁止參與」；U7 移除尺寸後，這條契約剩下的、
+    也是唯一還可測的那一半是：`sizing` 級 blocker 不會讓 `research_status`
+    掉出 READY，只有致命 blocker 才會（見上一個測試）。
     """
     store = _store(tmp_path)
     try:
@@ -230,45 +243,27 @@ def test_incomplete_research_reduces_size_instead_of_zeroing_it(
 
         result = calculate_probe_limits(bundle, pending, _assessment())
 
-        assert result.paper_max_supported_position > 0.0
-        assert not any(
-            item["constraint"] == "coverage_gate" and item["cap_weight"] == 0.0
-            for item in result.constraint_trace
-        )
+        assert result.research_status == "READY"
     finally:
         store.close()
 
 
-def test_paper_book_remaining_can_bind_below_axis_ceiling(
+# 2026-08-28（U7）刪除 `test_paper_book_remaining_can_bind_below_axis_ceiling`：
+# 它唯一斷言的是 probe book 剩餘額度會綁在 axis ceiling 之下，而
+# `single_probe_nav_cap`／`probe_book_nav_cap`／`constraint_trace` 已隨資本表達層
+# 一起移除，系統不再由五軸換算任何額度。
+
+
+def test_live_current_position_sums_every_listing_of_the_same_company(
     tmp_path: Path,
 ) -> None:
-    store = _store(tmp_path)
-    inputs = complete_inputs()
-    inputs["paper_exposure"] = {
-        "nav": 100.0,
-        "total_weight": 0.019,
-        "company_weights": {},
-    }
-    try:
-        bundle = _bundle(store, inputs=inputs)
+    """同一家公司的多個掛牌要合併成一個既有部位。
 
-        result = calculate_probe_limits(bundle, _coverage(bundle), _assessment())
-
-        assert result.axis_ceiling == 0.005
-        assert result.paper_max_supported_position == pytest.approx(0.001)
-        binding = {
-            item["constraint"]
-            for item in result.constraint_trace
-            if item["lane"] == "paper" and item["binding"]
-        }
-        assert "probe_book_remaining" in binding
-    finally:
-        store.close()
-
-
-def test_paper_and_live_use_separate_nav_factor_and_execution_liquidity(
-    tmp_path: Path,
-) -> None:
+    原測試名為「paper 與 live 使用不同的 NAV 分母與執行流動性」，但 paper 端的
+    NAV 分母與 live 端的 ADV／FX 換算都只服務額度計算，已於 U7 移除；留下的是
+    `live_current_position`——它不是建議尺寸，是使用者手動記錄 live 選擇時的
+    既有部位。
+    """
     store = _store(tmp_path)
     inputs = complete_inputs(
         rows=[
@@ -318,16 +313,11 @@ def test_paper_and_live_use_separate_nav_factor_and_execution_liquidity(
 
         result = calculate_probe_limits(bundle, _coverage(bundle), _assessment())
 
-        assert result.paper_max_supported_position == 0.005
+        # FRA:2DG 10 + SIVE.ST 20，同屬 co:sivers_semiconductors，除以 NAV 10,000。
         assert result.live_current_position == pytest.approx(0.003)
-        # 1% * 100 ADV = 1 股；10 EUR * 1.2 = USD 12，僅增加 0.12% NAV。
-        assert result.live_supported_range[1] == pytest.approx(0.0042)
-        assert result.live_supported_shares[1] == pytest.approx(3.5)
-        assert any(
-            item["lane"] == "live" and item["constraint"] == "execution_adv_1pct"
-            and item["binding"]
-            for item in result.constraint_trace
-        )
+        # execution context 齊備時不得留下缺料 blocker。
+        assert "execution_market_missing" not in result.live_blockers
+        assert "execution_fx_missing" not in result.live_blockers
     finally:
         store.close()
 
@@ -395,7 +385,8 @@ def test_unmapped_non_cash_holding_no_longer_creates_mapping_blocker(tmp_path: P
         store.close()
 
 
-def test_single_position_cap_hard_blocks_live_range(tmp_path: Path) -> None:
+def test_single_position_cap_surfaces_as_live_blocker(tmp_path: Path) -> None:
+    """單筆 5% NAV 上限是真實風控，U7 不動它——只是改由 live blocker 現形。"""
     store = _store(tmp_path)
     inputs = complete_inputs(
         rows=[
@@ -413,13 +404,13 @@ def test_single_position_cap_hard_blocks_live_range(tmp_path: Path) -> None:
         bundle = _bundle(store, inputs=inputs)
         result = calculate_probe_limits(bundle, _coverage(bundle), _assessment())
 
-        assert result.live_supported_range == (0.0, 0.0)
+        assert result.live_current_position >= result.single_position_nav_cap
         assert "single_position_nav_cap_reached" in result.live_blockers
     finally:
         store.close()
 
 
-def test_portfolio_etf_leverage_cap_hard_blocks_alpha_live_range(tmp_path: Path) -> None:
+def test_portfolio_etf_leverage_cap_surfaces_as_live_blocker(tmp_path: Path) -> None:
     from decision_lab.beta_policy import load_beta_policy
 
     # TQQQ 是 3x：持有金額取兩個 cap 各自所需的較大者再加一，確保兩者都越界。
@@ -453,7 +444,6 @@ def test_portfolio_etf_leverage_cap_hard_blocks_alpha_live_range(tmp_path: Path)
         bundle = _bundle(store, inputs=inputs)
         result = calculate_probe_limits(bundle, _coverage(bundle), _assessment())
 
-        assert result.live_supported_range == (0.0, 0.0)
         assert "etf_leverage_nominal_cap_reached" in result.live_blockers
         assert "etf_leverage_effective_cap_reached" in result.live_blockers
     finally:
@@ -471,9 +461,9 @@ def test_research_listing_market_data_cannot_substitute_for_execution_listing_ad
 
         result = calculate_probe_limits(bundle, _coverage(bundle), _assessment())
 
-        assert result.paper_max_supported_position == 0.005
-        assert result.live_status == "DATA_NEEDED"
-        assert result.live_supported_range == (0.0, 0.0)
+        # 研究面資料齊備（研究掛牌 SIVE.ST 的行情在 context 裡），但那份行情不能
+        # 冒充執行掛牌的流動性——執行面仍必須留下缺料 blocker。
+        assert result.research_status == "READY"
         assert "execution_market_missing" in result.live_blockers
     finally:
         store.close()
@@ -513,8 +503,6 @@ def test_live_fx_must_translate_execution_currency_into_holdings_base(
         )
         result = calculate_probe_limits(bundle, _coverage(bundle), _assessment())
 
-        assert result.live_status == "DATA_NEEDED"
-        assert result.live_supported_shares is None
         assert "execution_fx_pair_mismatch" in result.live_blockers
     finally:
         store.close()
@@ -635,7 +623,7 @@ def test_zero_valid_refs_still_fails_closed(tmp_path: Path) -> None:
 
         assert result.axis_results["valuation_payoff"]["level"] == "unknown"
         assert "assessment_context_mismatch:valuation_payoff" in result.assessment_blockers
-        assert result.paper_max_supported_position == 0.0
+        assert result.research_status == "INCOMPLETE"
     finally:
         store.close()
 
@@ -643,17 +631,19 @@ def test_zero_valid_refs_still_fails_closed(tmp_path: Path) -> None:
 def test_declaring_corroborated_never_yields_less_than_bounded_hypothesis(
     tmp_path: Path,
 ) -> None:
-    """單調性：宣告較高信心不得拿到比宣告較低信心更少的額度。
+    """單調性：宣告較高信心不得被判得比宣告較低信心更弱。
 
     先前 `corroborated + missing_data` → ceiling 0，比誠實降級成
     `bounded_hypothesis`（同一批待補項，0.002）**更差**。後果是評估者學會迴避那個
     組合——73 筆歷史決策中該組合出現 **0 次**，規則在暗中形塑了評估行為。
     也因為出現 0 次，這條修正無法用歷史資料驗證，只能由本測試鎖住。
+
+    U7 之後額度不存在，但同一條單調性仍活在 `effective_level`：
+    `corroborated + missing_data` 只被壓回下一階，不打成 unknown。
     """
     store = _store(tmp_path)
     try:
         bundle = _bundle(store)
-        ceilings = load_policy()["probe_lane"]["axis_ceilings"]
 
         honest = _assessment()
         honest["valuation_payoff"]["missing_data"] = ["downside case 未建"]
@@ -664,14 +654,13 @@ def test_declaring_corroborated_never_yields_less_than_bounded_hypothesis(
         conservative["valuation_payoff"]["missing_data"] = ["downside case 未建"]
         declared_low = calculate_probe_limits(bundle, _coverage(bundle), conservative)
 
-        high_ceiling = declared_high.axis_results["valuation_payoff"]["ceiling"]
-        low_ceiling = declared_low.axis_results["valuation_payoff"]["ceiling"]
-        assert high_ceiling == ceilings["bounded_hypothesis"]
-        assert high_ceiling >= low_ceiling, "宣告 corroborated 不得比宣告 bounded_hypothesis 更差"
-        assert (
-            declared_high.paper_max_supported_position
-            >= declared_low.paper_max_supported_position
-        )
+        high_level = declared_high.axis_results["valuation_payoff"]["effective_level"]
+        low_level = declared_low.axis_results["valuation_payoff"]["effective_level"]
+        assert high_level == "bounded_hypothesis"
+        assert LEVELS.index(high_level) >= LEVELS.index(
+            low_level
+        ), "宣告 corroborated 不得比宣告 bounded_hypothesis 更差"
+        assert declared_high.research_status == declared_low.research_status
     finally:
         store.close()
 
@@ -724,7 +713,9 @@ def test_diagnose_reports_why_each_ref_was_rejected() -> None:
 
     report = diagnose_assessment_references(assessment, index)["commercial_maturity"]
 
-    assert report["would_zero_out"] is True
+    # U7 改名：`would_zero_out` 講的是額度歸零，而額度已不存在；同一件事現在的
+    # 名字是「這一軸的實質等級會被打回 unknown」。
+    assert report["would_downgrade_to_unknown"] is True
     assert report["accepted_refs"] == ()
     reasons = {row["reference"]: row["why"] for row in report["rejected_refs"]}
     assert reasons["LITE 10-Q, filed 2026-05-06"] == "unresolved"
@@ -756,5 +747,5 @@ def test_diagnose_marks_axis_safe_when_one_ref_qualifies() -> None:
 
     report = diagnose_assessment_references(assessment, index)["commercial_maturity"]
 
-    assert report["would_zero_out"] is False
+    assert report["would_downgrade_to_unknown"] is False
     assert report["accepted_refs"] == ("LITE 10-Q Note 17",)

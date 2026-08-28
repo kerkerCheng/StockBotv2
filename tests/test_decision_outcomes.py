@@ -331,36 +331,50 @@ def test_outcome_freezes_system_vs_user_choice_and_calculator_trace(
         # 不是某個特定版本號。寫死會讓每次 calculator 語意變更都被迫改測試，
         # 而那正是 2026-08-14 差點漏掉的事（改了 sizing 語意卻沒 bump 版本）。
         assert frozen["calculator_version"] == load_policy()["probe_lane"]["calculator_version"]
-        assert frozen["constraint_trace"]
+        # `constraint_trace`（資本上限鏈）已隨 U7 移除；事後檢討要問的是「當時這檔卡在
+        # 哪一軸、研究做到什麼程度」，不是「當時額度被誰擋住」。
+        assert "constraint_trace" not in frozen
+        assert frozen["weakest_axis"] == "source_reliability"
+        assert frozen["research_status"] == "READY"
     finally:
         store.close()
 
 
-def test_outcome_attributes_actual_paper_book_not_latest_blocked_recommendation(
+def test_outcome_attributes_the_latest_decision_and_has_no_paper_book_left(
     tmp_path: Path,
 ) -> None:
+    """U7 之後 outcome 只歸因到「當時最新的那筆研究判斷」。
+
+    原本這裡守的是「歸因到真正**資助**的那個 decision，不是最新的被擋建議」——
+    那個區別由 paper book（`paper_position_state`）撐起來，而 paper 部位已隨資本
+    表達層移除，`atomic_assess_probe` 不再寫任何 paper event。於是
+    `paper_source_decision_id` 對新 decision 恆為 None，欄位保留只為了讀得回 U7
+    之前的歷史（L10 append-only）。
+    """
+
     store = _store(tmp_path)
     try:
         bundle, coverage = _bundle(store, "outcome-book")
-        funded = assess_probe(
+        ready = assess_probe(
             store,
             bundle,
             coverage,
             _assessment(),
-            idempotency_key="outcome:funded",
+            idempotency_key="outcome:ready",
             effective_at="2026-07-21T12:00:00+00:00",
         )
-        blocked = assess_probe(
+        incomplete = assess_probe(
             store,
             bundle,
             coverage,
             _assessment(commercial="unknown"),
-            idempotency_key="outcome:blocked",
+            idempotency_key="outcome:incomplete",
             effective_at="2026-07-22T12:00:00+00:00",
         )
-        assert funded.paper_funded is True
-        assert blocked.paper_funded is False
-        assert store.paper_position("co:sivers_semiconductors") == pytest.approx(0.0035)
+        assert ready.research_status == "READY"
+        assert incomplete.research_status == "INCOMPLETE"
+        assert store.paper_position("co:sivers_semiconductors") == 0.0
+        assert store.table_count("paper_events") == 0
 
         result = close_probe(
             store,
@@ -373,15 +387,18 @@ def test_outcome_attributes_actual_paper_book_not_latest_blocked_recommendation(
             evidence_refs=["fixture://review"],
             effective_at="2026-10-21T12:00:00+00:00",
         )
-        attribution = store.get_outcome(result.outcome_id)["decision_attribution"]
+        outcome = store.get_outcome(result.outcome_id)
+        attribution = outcome["decision_attribution"]
 
-        # 本測試守的是「歸因到真正資助的那個 decision，不是最新的被擋建議」——
-        # 由下面兩條 decision_id 斷言證明。原本另用額度數字佐證（實際 0.0035 vs
-        # 被擋 0.0），那兩個欄位已隨資本表達層移除（R9），改為斷言它們確實不見了。
-        assert attribution["decision_id"] == blocked.decision_id
-        assert attribution["paper_source_decision_id"] == funded.decision_id
+        assert attribution["decision_id"] == incomplete.decision_id
+        assert attribution["paper_source_decision_id"] is None
+        # 系統額度欄位確實不見了，不是改名躲起來。
         assert "system_paper_target" not in attribution
         assert "latest_recommendation_target" not in attribution
+        assert "system_paper_max" not in attribution
+        # 取而代之凍下來的是「當時卡在哪一軸、研究做到什麼程度」。
+        assert outcome["weakest_axis"] == "commercial_maturity"
+        assert outcome["research_status"] == "INCOMPLETE"
     finally:
         store.close()
 

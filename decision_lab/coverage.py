@@ -146,8 +146,6 @@ def assess_coverage(
             live_blockers=live_blockers,
             paper_context_ready=False,
             live_context_ready=False,
-            paper_supported_position=0.0,
-            live_supported_range=(0.0, 0.0),
             work_order_id=None,
         ),
         execution_intent,
@@ -187,7 +185,5 @@ def assess_coverage(
             not fatal_blockers(tuple(sorted(set(blockers))))
             and not fatal_blockers(live_blockers, lane="live")
         ),
-        paper_supported_position=0.0,
-        live_supported_range=(0.0, 0.0),
         work_order_id=stored["work_order_id"],
     )

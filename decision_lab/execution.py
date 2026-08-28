@@ -47,7 +47,7 @@ def assess_probe(
     execution_intent: str = "live",
     _failure_at: str | None = None,
 ) -> DecisionExecutionResult:
-    """Atomically persist a system decision and any eligible paper target。"""
+    """Atomically persist a system decision。U7 起不再產生 paper target。"""
 
     effective_at = _utc_timestamp(effective_at)
     try:
@@ -75,7 +75,6 @@ def assess_probe(
     if not isinstance(probe, Mapping):
         raise ExecutionError("investment policy has no Probe lane")
     registry = registry or get_registry()
-    company_id = str(bundle.payload.get("identity", {}).get("company_id") or "")
     request_payload = {
         "cohort_id": bundle.cohort_id,
         "context_digest": bundle.digest,
@@ -106,7 +105,6 @@ def assess_probe(
             effective_at=effective_at,
             request_payload=request_payload,
             paper_nav=float(probe["paper_nav"]),
-            company_id=company_id,
             calculator=calculator,
             failure_at=_failure_at,
         )

@@ -111,6 +111,51 @@ def test_correlation_groups_fall_back_to_ungrouped() -> None:
     assert result["groups"]["未分組"] == pytest.approx(0.45)
 
 
+def test_same_ticker_in_several_accounts_is_merged_into_one_exposure() -> None:
+    """同一檔分散在多個帳戶時必須合併——否則沒有任何一列顯示真實曝險。
+
+    這一區唯一的用途是讓人一眼看出失衡。逐 Sheet row 輸出時（2026-08-28 實測）
+    LON:VWRA 會拆成 21.7% 與 4.4% 兩列，而真實部位是 26.1%——使用者要自己在心裡
+    做加法才看得到最大的那一筆，那正好是這份輸出該替他做的事。
+
+    `lots` 保留來源列數：合併不得讓「這檔散在兩個帳戶」這個事實消失。
+    """
+    # 刻意讓合併**翻轉排名**：兩列各 0.20／0.12 都小於 COHR 的 0.30，合併後 0.32 才是
+    # 最大部位。不合併時最上面那一列會是錯的答案，而使用者正是照最上面那一列在看失衡。
+    rows = [
+        _row("VWRA", "大盤", 200.0),
+        _row("VWRA", "大盤", 120.0),
+        _row("COHR", "CORE", 300.0),
+        _row("USD", "CASH", 380.0),
+    ]
+
+    result = build_nav_exposure(rows)
+    by_ticker = {p["ticker"]: p for p in result["positions"]}
+
+    assert [p["ticker"] for p in result["positions"]] == ["VWRA", "COHR"]
+    assert by_ticker["VWRA"]["nav_pct"] == pytest.approx(0.32)
+    assert by_ticker["VWRA"]["lots"] == 2
+    assert by_ticker["COHR"]["lots"] == 1
+    # 分組佔比同樣以合併後的曝險計算，否則相關性提醒會低估集中度。
+    assert result["groups"]["未分組"] == pytest.approx(0.62)
+
+
+def test_merged_position_marks_conflicting_buckets_instead_of_picking_one() -> None:
+    """同一檔在不同帳戶被歸到不同 bucket 是真實狀態，不猜哪個才對。"""
+    rows = [
+        _row("VWRA", "大盤", 200.0),
+        _row("VWRA", "觀察", 60.0),
+        _row("USD", "CASH", 740.0),
+    ]
+
+    result = build_nav_exposure(rows)
+
+    assert result["positions"][0]["bucket"] == "多重分類"
+    # bucket 分布仍逐列累計——它回答的是「錢分在哪些類別」，不是「這檔屬於哪一類」。
+    assert result["buckets"]["大盤"] == pytest.approx(0.20)
+    assert result["buckets"]["觀察"] == pytest.approx(0.06)
+
+
 def test_output_carries_no_threshold_or_warning_fields() -> None:
     """R13 零門檻：這個模組是呈現，不是閘門。
 

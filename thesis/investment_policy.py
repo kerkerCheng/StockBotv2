@@ -24,15 +24,16 @@ _REQUIRED_KEYS = {
     "minimum_holding_days",
 }
 
+# ⚠ `single_probe_nav_cap`／`probe_book_nav_cap`／`axis_ceilings`／
+# `live_adv_fraction_cap` 已於 2026-08-28（U7）移除：那四個是 alpha 的資本表達，
+# 而系統終點已改為瓶頸度排序，不再由五軸換算任何額度。
+# 真實風控留在別處且未變——單筆 5% NAV 上限仍在本檔 top level，
+# ETF 槓桿 cap 仍在 `config/beta_policy.json`。
 _PROBE_REQUIRED_KEYS = {
     "rubric_version",
     "calculator_version",
     "paper_nav",
-    "single_probe_nav_cap",
-    "probe_book_nav_cap",
     "review_hours",
-    "axis_ceilings",
-    "live_adv_fraction_cap",
     "market_freshness_sessions",
     "fx_freshness_sessions",
     "holdings_freshness_days",
@@ -40,7 +41,6 @@ _PROBE_REQUIRED_KEYS = {
     "financial_runway_freshness_days",
     "evidence_hops",
 }
-_PROBE_LEVELS = ("unknown", "bounded_hypothesis", "corroborated")
 
 _LIVE_MONITOR_REQUIRED_KEYS = {"return_1d_at_most", "history_sessions"}
 
@@ -86,11 +86,6 @@ def _validate_probe_lane(value: Any) -> dict[str, Any]:
     if missing:
         raise PolicyError(f"probe_lane missing required keys: {', '.join(missing)}")
 
-    single_cap = _ratio(value["single_probe_nav_cap"], "probe_lane.single_probe_nav_cap")
-    book_cap = _ratio(value["probe_book_nav_cap"], "probe_lane.probe_book_nav_cap")
-    if single_cap > book_cap:
-        raise PolicyError("probe single-position cap cannot exceed probe book cap")
-
     review_hours = value["review_hours"]
     if (
         isinstance(review_hours, bool)
@@ -99,38 +94,13 @@ def _validate_probe_lane(value: Any) -> dict[str, Any]:
     ):
         raise PolicyError("probe_lane.review_hours must be an integer from 48 to 72")
 
-    raw_ceilings = value["axis_ceilings"]
-    if not isinstance(raw_ceilings, Mapping) or set(raw_ceilings) != set(_PROBE_LEVELS):
-        raise PolicyError("probe_lane.axis_ceilings must define exactly the three rubric levels")
-    ceilings = {
-        level: _ratio(
-            raw_ceilings[level],
-            f"probe_lane.axis_ceilings.{level}",
-            allow_zero=True,
-        )
-        for level in _PROBE_LEVELS
-    }
-    if ceilings["unknown"] != 0.0:
-        raise PolicyError("probe unknown ceiling must be zero")
-    ordered = [ceilings[level] for level in _PROBE_LEVELS]
-    if ordered != sorted(ordered) or len(set(ordered)) != len(ordered):
-        raise PolicyError("probe axis ceilings must increase strictly by rubric level")
-    if ceilings["corroborated"] > single_cap:
-        raise PolicyError("probe corroborated ceiling cannot exceed single-position cap")
-
     normalized = {
         "rubric_version": _version(value["rubric_version"], "probe_lane.rubric_version"),
         "calculator_version": _version(
             value["calculator_version"], "probe_lane.calculator_version"
         ),
         "paper_nav": _positive_number(value["paper_nav"], "probe_lane.paper_nav"),
-        "single_probe_nav_cap": single_cap,
-        "probe_book_nav_cap": book_cap,
         "review_hours": review_hours,
-        "axis_ceilings": ceilings,
-        "live_adv_fraction_cap": _ratio(
-            value["live_adv_fraction_cap"], "probe_lane.live_adv_fraction_cap"
-        ),
     }
     for field in (
         "market_freshness_sessions",

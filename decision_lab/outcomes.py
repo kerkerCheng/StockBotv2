@@ -264,7 +264,10 @@ def close_probe(
         },
         "calculator_version": sizing.get("calculator_version"),
         "policy_version": sizing.get("policy_version"),
-        "constraint_trace": sizing.get("constraint_trace", []),
+        # `constraint_trace` 是資本上限鏈，已隨 U7 移除。改記最弱軸與研究完整度——
+        # 事後檢討要問的是「當時這檔卡在哪一軸」，不是「當時額度被誰擋住」。
+        "weakest_axis": sizing.get("weakest_axis"),
+        "research_status": sizing.get("research_status") or sizing.get("paper_status"),
     }
     try:
         return store.close_lifecycle_with_outcome(

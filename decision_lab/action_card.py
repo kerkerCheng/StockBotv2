@@ -225,7 +225,6 @@ def build_action_card(
     context = store.get_context_bundle(decision["context_digest"]).payload
     authority_company_id = str(context["identity"].get("company_id") or "")
     company_id = authority_company_id or "unresolved"
-    paper_position = store.paper_position_state(authority_company_id)
     live_choice = store.latest_live_choice(decision_id)
     live_fill = store.latest_live_fill(decision_id)
     if (
@@ -253,19 +252,21 @@ def build_action_card(
         alpha_beta["classification"] = "alpha"
         alpha_beta["thesis_changed"] = True
     portfolio_status = str((portfolio_context or {}).get("status") or "ok")
-    live_status = str(sizing["live_status"])
-    paper_status = str(sizing["paper_status"])
+    # 舊 decision 用 `paper_status`（ELIGIBLE／SHADOW_ONLY／DATA_NEEDED）表達同一件事；
+    # 讀取端容忍舊欄位、不回寫（L10／KTD4）。
+    research_status = str(
+        sizing.get("research_status")
+        or ("READY" if sizing.get("paper_status") == "ELIGIBLE" else "INCOMPLETE")
+    )
     freshness, current_paper_blockers, current_live_blockers = _runtime_freshness(
         context, card_as_of
     )
+    data_stale = bool(
+        (current_paper_blockers and paper_requested)
+        or (current_live_blockers and live_requested)
+    )
     if current_paper_blockers and paper_requested:
-        paper_status = "DATA_NEEDED"
-    if current_live_blockers and live_requested:
-        live_status = "DATA_NEEDED"
-    if not paper_requested:
-        paper_status = "NOT_REQUESTED"
-    if not live_requested:
-        live_status = "NOT_REQUESTED"
+        research_status = "DATA_NEEDED"
     coverage_blockers = tuple(
         (payload.get("request", {}).get("coverage") or {}).get("blockers", [])
     )
@@ -277,8 +278,8 @@ def build_action_card(
     # REVIEW，等於把 sizing 已經放行的資本又在展示層擋掉一次——同一份清單被兩個
     # 子系統套了兩套嚴重度政策，而使用者只看得到嚴格的那一套。
     # 判準沿用 coverage 的分類：只有致命 coverage blocker 與 assessment blocker
-    # 才強制 REVIEW。assessment blocker 一律算致命，因為任何一軸失效都會讓
-    # axis_ceiling 取 min 後歸零，此時「研究不完整」的描述並不成立。
+    # 才強制 REVIEW。assessment blocker 一律算致命，因為任何一軸失效都會讓最弱軸
+    # 落到 unknown，此時「研究不完整」的描述並不成立。
     research_incomplete_blockers = sorted(
         set(coverage_blockers) - set(fatal_blockers(coverage_blockers))
     )
@@ -287,7 +288,7 @@ def build_action_card(
     )
 
     if disproof_triggered:
-        action = "REVIEW"
+        attention = "REVIEW"
         urgency = "within_48h"
         if portfolio_status == "over_cap":
             factor = str((portfolio_context or {}).get("factor") or "unknown_factor")
@@ -298,28 +299,28 @@ def build_action_card(
         reason = "可證偽條件已被標記觸發，需要在 48 小時內重新審查。"
         next_action = "核對觸發證據；同時執行必要的投組降險，再決定 rejected 或 revised。"
     elif lifecycle.status in {"rejected", "expired"}:
-        action = "REVIEW"
+        attention = "REVIEW"
         urgency = "prompt"
         portfolio_action = "none"
         single_name_action = "terminal_unwind_review"
-        reason = f"Probe 已進入 terminal 狀態 {lifecycle.status}，不得沿用舊建議新增部位。"
-        next_action = "檢查 paper/live 殘餘部位並決定減碼、出場或僅保留歷史紀錄。"
+        reason = f"Probe 已進入 terminal 狀態 {lifecycle.status}，這份研究判斷不再成立。"
+        next_action = "檢查是否有對應的 live 持股，決定出場或僅保留歷史紀錄。"
     elif lifecycle.status == "promoted":
-        action = "REVIEW"
+        attention = "REVIEW"
         urgency = "next_review"
         portfolio_action = "none"
         single_name_action = "handoff_to_formal_lane"
-        reason = "Probe 已升格；舊 Probe sizing 不再授權新交易。"
-        next_action = "使用 formal Watchlist／Underwrite 規則重新產生部位建議。"
+        reason = "Probe 已升格；這份 Probe 研究判斷已交棒。"
+        next_action = "使用 formal Watchlist／Underwrite 規則重新評估。"
     elif revised_decision_stale:
-        action = "REVIEW"
+        attention = "REVIEW"
         urgency = "prompt"
         portfolio_action = "none"
         single_name_action = "reassess_revised_epoch"
-        reason = "Thesis 已 revised；舊 epoch 的 decision 不再授權新交易。"
-        next_action = "在新 epoch 重新 freeze context、coverage 與 sizing。"
+        reason = "Thesis 已 revised；舊 epoch 的 decision 不再代表目前判斷。"
+        next_action = "在新 epoch 重新 freeze context、coverage 與五軸評估。"
     elif expiry_lapsed:
-        action = "REVIEW"
+        attention = "REVIEW"
         urgency = "prompt"
         portfolio_action = "none"
         single_name_action = "expiry_lapsed_close_or_extend"
@@ -329,24 +330,25 @@ def build_action_card(
             "延期前先確認 expiry 不早於催化劑本身。"
         )
     elif blocking_core_blockers:
-        action = "REVIEW"
+        attention = "REVIEW"
         urgency = "next_review"
         portfolio_action = "none"
         single_name_action = "complete_research_work_order"
         reason = "研究 coverage 或 Confidence assessment 尚未完整。"
         next_action = "補齊 blockers 指向的 evidence／研究欄位後執行 reassess。"
-    elif (current_paper_blockers and paper_requested) or (
-        current_live_blockers and live_requested
-    ):
-        action = "REVIEW"
+    elif data_stale:
+        attention = "REVIEW"
         urgency = "data_refresh"
         portfolio_action = "none"
         single_name_action = "refresh_and_reassess"
         reason = "凍結決策的必要市場、財務或持倉資料已過期。"
         next_action = "重新 freeze context 並 assess；舊 card 只保留歷史用途。"
     elif portfolio_status == "over_cap":
+        # U7 之前這裡是 `HEDGE`。系統不給尺寸也不連 broker，說「HEDGE」等於宣稱一個
+        # 它做不到的授權；真正能做的只有請人看一眼，所以併入 REVIEW，
+        # 而「要降低哪一項曝險」留在 `scope.portfolio` 裡不丟失。
         factor = str((portfolio_context or {}).get("factor") or "unknown_factor")
-        action = "HEDGE"
+        attention = "REVIEW"
         urgency = "prompt"
         portfolio_action = f"reduce_or_hedge:{factor}"
         single_name_action = "hold_pending_portfolio_action"
@@ -356,65 +358,35 @@ def build_action_card(
         )
         next_action = f"決定要降低或對沖 {factor} 曝險；資料不足時不輸出單位數。"
     elif live_fill is not None:
-        action = "NO_ACTION"
+        attention = "MONITOR"
         urgency = "routine"
         portfolio_action = "none"
         single_name_action = "monitor_confirmed_live_execution"
         reason = "使用者已回報 live 成交；目前只監控 thesis、風險與資料例外。"
         next_action = "確認 Google Sheet 持股已更新，並依 review calendar 追蹤。"
     elif live_choice is not None and live_choice["choice_type"] == "skipped":
-        action = "NO_ACTION"
+        attention = "MONITOR"
         urgency = "routine"
         portfolio_action = "none"
         single_name_action = "respect_explicit_skip"
-        reason = "使用者已明確選擇 0% live；system paper 仍獨立保留作 counterfactual。"
+        reason = "使用者已明確選擇 0% live。"
         next_action = "除非 evidence 或風險狀態改變，維持 skip 並等下一個 review 點。"
     elif live_choice is not None and float(live_choice["selected_weight"]) > 0:
-        action = "TRADE"
+        attention = "REVIEW"
         urgency = "awaiting_manual_execution"
         portfolio_action = "none"
-        single_name_action = "execute_confirmed_live_choice"
-        reason = "使用者已明確接受 live 配置，但尚未回報手動成交。"
+        single_name_action = "report_manual_fill"
+        reason = "使用者已記錄 live 配置，但尚未回報手動成交。"
         next_action = "手動下單後回報 execution reference；系統不會連接 broker。"
-    elif (
-        live_status == "ELIGIBLE"
-        and float(sizing["live_current_position"])
-        > float(sizing["live_supported_range"][1]) + 1e-12
-    ):
-        action = "REVIEW"
-        urgency = "prompt"
-        portfolio_action = "none"
-        single_name_action = "reduce_to_supported_range"
-        reason = "目前 live 部位高於研究所支持的上限。"
-        next_action = "檢視減碼或保留 override 的理由；系統不會自動下單。"
-    elif (
-        live_status == "ELIGIBLE"
-        and float(sizing["live_supported_range"][0]) - 1e-12
-        <= float(sizing["live_current_position"])
-        <= float(sizing["live_supported_range"][1]) + 1e-12
-    ):
-        action = "NO_ACTION"
-        urgency = "routine"
-        portfolio_action = "none"
-        single_name_action = "hold_within_supported_range"
-        reason = "目前 live 部位已在研究支持區間內。"
-        next_action = "維持部位並依 catalyst／expiry 日曆追蹤。"
-    elif live_status == "ELIGIBLE":
-        action = "TRADE"
-        urgency = "user_decision"
-        portfolio_action = "none"
-        single_name_action = "accept_skip_or_size_below_supported_range"
-        reason = "研究與 live lane 資料完整；是否手動下單仍需使用者明確決定。"
-        next_action = "選擇接受、低配或跳過；下單後回報成交 reference。"
-    elif paper_status == "DATA_NEEDED" or live_status == "DATA_NEEDED":
-        action = "REVIEW"
+    elif research_status == "DATA_NEEDED":
+        attention = "REVIEW"
         urgency = "next_review"
         portfolio_action = "none"
         single_name_action = "supply_missing_data"
-        reason = "至少一個 lane 的必要輸入不完整；paper 與 live 權限分開保留。"
-        next_action = "補齊 blockers 中的 point-in-time 資料後重新 assess。"
+        reason = "研究所需的 point-in-time 輸入不完整。"
+        next_action = "補齊 blockers 中的資料後重新 assess。"
     else:
-        action = "NO_ACTION"
+        attention = "MONITOR"
         urgency = "routine"
         portfolio_action = "none"
         single_name_action = "hold_or_shadow"
@@ -434,16 +406,13 @@ def build_action_card(
             for reference in result.get("evidence_refs", [])
         }
     )
-    live_shares = sizing.get("live_supported_shares")
-    if live_status != "ELIGIBLE":
-        live_shares = None
-    # core_blockers（assessment ∪ coverage）正是把 action 判成 REVIEW 的原因，
+    # core_blockers（assessment ∪ coverage）正是把 attention 判成 REVIEW 的原因，
     # 必須出現在 card 自己的 blockers 裡。先前只放 assessment_blockers，於是
     # coverage blocker（如 financial_runway_manual_required）會驅動 REVIEW 卻不
     # 現身，下游只看得到 lane blocker，導致待辦池推導出「重新 reassess 即可」
     # 這種與真正缺口無關的等待理由。
     # 研究不完整的 blocker 不再驅動 REVIEW，但仍必須留在 blockers 裡——它們透過
-    # axis_ceiling 影響尺寸，是「會改變輸出的輸入」，另以 research_incomplete_blockers
+    # 最弱軸影響排序，是「會改變輸出的輸入」，另以 research_incomplete_blockers
     # 標明它們沒有阻擋，否則下游只會看到一份混在一起的清單而無法分辨。
     blockers = sorted(
         set(core_blockers)
@@ -459,7 +428,9 @@ def build_action_card(
         "as_of": card_as_of,
         "company_id": company_id,
         "execution_intent": execution_intent,
-        "action": action,
+        # `attention` 取代 U7 之前的 `action`（NO_ACTION／REVIEW／TRADE／HEDGE）。
+        # 見 models.ATTENTION_STATES。
+        "attention": attention,
         "urgency": urgency,
         "scope": {
             "single_name": single_name_action,
@@ -484,19 +455,13 @@ def build_action_card(
             "reason": axis_result["reason"],
             "missing_data": axis_result["missing_data"],
         },
-        "paper": {
-            "status": paper_status,
-            "funded": float(paper_position["weight"]) > 0,
-            "event_id": paper_position["source_event_id"],
-            "current_position": paper_position["weight"],
-            "target": sizing["paper_target"],
-            "max_supported_position": sizing["paper_max_supported_position"],
+        # 研究完整度，取代 U7 之前的 paper／live 兩個資本 lane。
+        "research": {
+            "status": research_status,
+            "data_stale": data_stale,
         },
+        # live 只剩「使用者做了什麼」——系統不判定資格，也不給區間。
         "live": {
-            "status": live_status,
-            "supported_range": sizing["live_supported_range"],
-            "supported_shares": live_shares,
-            "approval_required": live_status == "ELIGIBLE" and live_choice is None,
             "user_choice": live_choice,
             "fill_reported": live_fill is not None,
         },
@@ -515,31 +480,27 @@ def build_action_card(
 def render_markdown(card: Mapping[str, Any]) -> str:
     assert_safe_payload(card)
     weakest = card["weakest_link"]
-    paper = card["paper"]
-    live = card["live"]
+    research = card["research"]
     blockers = ", ".join(markdown_text(item) for item in card["blockers"]) if card["blockers"] else "無"
     incomplete = card.get("research_incomplete_blockers") or []
     incomplete_line = (
         ", ".join(markdown_text(item) for item in incomplete) if incomplete else "無"
     )
+    heading = "需要複查" if card["attention"] == "REVIEW" else "監控中"
     return "\n".join(
         [
-            f"# {markdown_text(card['action'])} — {markdown_text(card['company_id'])} ({markdown_text(card['urgency'])})",
+            f"# {markdown_text(heading)} — {markdown_text(card['company_id'])} ({markdown_text(card['urgency'])})",
             "",
             f"- 理由：{markdown_text(card['reason'])}",
             f"- Alpha / Beta：{markdown_text(card['alpha_beta']['classification'])}",
             f"- Disproof condition：{markdown_text(card.get('disproof_condition') or '未提供')}",
             f"- Weakest link：{markdown_text(weakest['axis'])} / {markdown_text(weakest['level'])} — {markdown_text(weakest['reason'])}",
             f"- Intent：{markdown_text(card.get('execution_intent', 'live'))}",
-            # Alpha 呈現契約（2026-08-15）：不對人輸出建議尺寸。
-            # 那個數字來自從未被 outcome 驗證的 axis_ceiling，且實測 6 個 ELIGIBLE
-            # cohort 全是同一個 0.1%——常數不帶資訊，卻讓人以為系統在給建議。
-            # 數值仍完整保留在 JSON（稽核與 outcome 量測要用），只是不再當行動指引呈現。
-            f"- Paper 記分板：{markdown_text(paper['status'])}"
-            f"（模擬部位持續累積，供 outcome 量測；不是建議部位）",
+            f"- 研究完整度：{markdown_text(research['status'])}",
+            # 系統終點是瓶頸度排序，不是額度：買多少由使用者在買入前自行判斷。
             "- Live：人工決定——系統不輸出建議尺寸",
             f"- Blockers：{blockers}",
-            f"- 研究不完整（不阻擋，只縮小尺寸）：{incomplete_line}",
+            f"- 研究不完整（不阻擋，只影響排序）：{incomplete_line}",
             "",
             f"## 下一步\n{markdown_text(card['next_action'])}",
         ]

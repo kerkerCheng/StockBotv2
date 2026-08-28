@@ -1,4 +1,4 @@
-"""Live lane 必須在 production 形狀下真的走得到 ELIGIBLE。
+"""Live lane 必須在 production 形狀下真的走得通。
 
 2026-08-08 紅隊：`holdings_confirmations`、`live_choices`、`live_execution_reports`、
 `prepared_actions` 在真實 store 全是 0 筆——整個 live 半邊從未被執行過。既有 e2e
@@ -10,8 +10,15 @@ research_ticker、execution_currency 等於 holdings base_currency，因此 exec
 走 deepcopy 複用、execution_fx 直接是 None。那條分支才是真的要用時會先跑到的路徑，
 卻沒有測試鎖住它。
 
-本測試不驗證投資判斷，只驗證「這條路通不通」——不要在真的想下單那天，才第一次發現
-它壞在哪。
+⚠ U7（2026-08-28）改寫：原測試問的是「系統會不會把 live 判成 `ELIGIBLE` 並給出
+supported range」。系統已不再判定 live 資格、也不再輸出區間——尺寸一律由使用者決定。
+本檔想防的東西沒變（**不要在真的想下單那天，才第一次發現它壞在哪**），所以判準改成
+真正走得通才成立的兩件事：
+
+1. 一筆非零的 live 選擇可以被 `record_live_choice` 成功記下，並留下 `user_sized` 稽核；
+2. 缺持股確認等情況會誠實留在 `live_blockers` 裡，而不是安靜消失或連坐研究面。
+
+本測試不驗證投資判斷。
 """
 from __future__ import annotations
 
@@ -22,6 +29,7 @@ import pytest
 
 from decision_lab.context import build_context_bundle, holdings_snapshot_digest
 from decision_lab.coverage import assess_coverage
+from decision_lab.execution import ExecutionError, assess_probe, record_live_choice
 from decision_lab.sizing import calculate_probe_limits
 from tests.test_decision_context import NOW, complete_inputs
 from tests.test_decision_execution import _store
@@ -62,8 +70,8 @@ def _same_symbol_payload() -> dict:
             | {
                 "ticker": identity["research_ticker"],
                 "currency": "USD",
-                # production 的 adapters.current_holdings 會帶這欄；sizing 用它算
-                # 目前曝險，缺了就 holdings_market_value_missing。
+                # production 的 adapters.current_holdings 會帶這欄；缺了就
+                # holdings_market_value_missing。
                 "market_value_base": 1000.0,
             }
             for row in payload["holdings"]["rows"]
@@ -82,17 +90,16 @@ def _same_symbol_payload() -> dict:
     return payload
 
 
-def test_same_symbol_same_currency_live_lane_reaches_eligible(tmp_path: Path) -> None:
-    store = _store(tmp_path)
-    try:
-        payload = _same_symbol_payload()
-        identity = payload["identity"]
+def _live_decision(store, payload: dict, *, key: str, confirm_holdings: bool):
+    """把 same-symbol payload 一路跑到一筆已凍結的 system decision。"""
 
-        cohort_id = store.ensure_cohort(
-            dedupe_key="live-lane-reachable",
-            company_id=identity["company_id"],
-            research_ticker=identity["research_ticker"],
-        ).cohort_id
+    identity = payload["identity"]
+    cohort_id = store.ensure_cohort(
+        dedupe_key=key,
+        company_id=identity["company_id"],
+        research_ticker=identity["research_ticker"],
+    ).cohort_id
+    if confirm_holdings:
         # 持倉確認是使用者的聲明，是 live 唯一無法由系統自行滿足的前置條件。
         store.record_holdings_confirmation(
             # 有 nav_base／base_currency 時 digest 必須帶進去，否則確認的是另一個快照。
@@ -110,88 +117,125 @@ def test_same_symbol_same_currency_live_lane_reaches_eligible(tmp_path: Path) ->
             ),
             confirmed_at="2026-07-21T09:00:00+00:00",
         )
-        bundle = build_context_bundle(
-            store,
-            cohort_id=cohort_id,
-            evaluation_at=NOW,
-            policy_version=load_policy()["policy_version"],
-            **payload,
-        )
-
-        assert bundle.payload["holdings"]["status"] == "confirmed"
-        assert bundle.payload["execution_market"]["status"] == "available"
-
-        coverage = assess_coverage(
-            store,
-            bundle,
-            catalyst="next filing",
-            disproof="commercial evidence fails",
-            expiry="2026-08-21T00:00:00+00:00",
-            decision_relevance=8,
-            falsifiability=8,
-            information_value=7,
-            execution_intent="live",
-        )
-        assert coverage.live_context_ready is True
-
-        sizing = calculate_probe_limits(bundle, coverage, _assessment())
-
-        assert sizing.live_status == "ELIGIBLE"
-        assert sizing.live_supported_range[1] > 0
-        assert sizing.live_supported_shares is not None
-        # live 仍不得自動成立：supported range 是可評估上限，不是已核准部位。
-        assert sizing.live_blockers == ()
-    finally:
-        store.close()
+    bundle = build_context_bundle(
+        store,
+        cohort_id=cohort_id,
+        evaluation_at=NOW,
+        policy_version=load_policy()["policy_version"],
+        **payload,
+    )
+    coverage = assess_coverage(
+        store,
+        bundle,
+        catalyst="next filing",
+        disproof="commercial evidence fails",
+        expiry="2026-08-21T00:00:00+00:00",
+        decision_relevance=8,
+        falsifiability=8,
+        information_value=7,
+        execution_intent="live",
+    )
+    return bundle, coverage
 
 
-def test_missing_holdings_confirmation_is_the_only_thing_between_us_and_live(
-    tmp_path: Path,
-) -> None:
-    """同一組輸入，只差使用者未確認持倉 → live 必須關閉且 range 歸零。
+def test_user_sized_live_choice_is_recordable_end_to_end(tmp_path: Path) -> None:
+    """非零 live 選擇必須真的記得下來——這是 live 這條路唯一還會被走的一步。
 
-    這鎖住「live 是被人工 gate 擋住，不是被資料缺口擋住」——兩者在輸出上長得像，
-    但前者等你一句話，後者等系統修東西。
+    系統不再判定 live 資格，所以「走得通」的定義變成：使用者說一個尺寸，它能被寫成
+    可稽核的 `live_choices` 列，且真實資本護欄（5% 單筆上限）仍然生效。
     """
 
     store = _store(tmp_path)
     try:
         payload = _same_symbol_payload()
-        identity = payload["identity"]
-        cohort_id = store.ensure_cohort(
-            dedupe_key="live-lane-unconfirmed",
-            company_id=identity["company_id"],
-            research_ticker=identity["research_ticker"],
-        ).cohort_id
-        bundle = build_context_bundle(
+        bundle, coverage = _live_decision(
+            store, payload, key="live-lane-reachable", confirm_holdings=True
+        )
+
+        assert bundle.payload["holdings"]["status"] == "confirmed"
+        assert bundle.payload["execution_market"]["status"] == "available"
+        assert coverage.live_context_ready is True
+
+        sizing = calculate_probe_limits(bundle, coverage, _assessment())
+        # 執行面沒有缺口——這正是 2026-08-08 想確認的那條分支真的接得上。
+        assert sizing.live_blockers == ()
+        assert sizing.single_position_nav_cap == pytest.approx(0.05)
+
+        decision = assess_probe(
             store,
-            cohort_id=cohort_id,
-            evaluation_at=NOW,
-            policy_version=load_policy()["policy_version"],
-            **payload,
+            bundle,
+            coverage,
+            _assessment(),
+            idempotency_key="live-lane-reachable",
+            effective_at=NOW,
+            execution_intent="live",
+        )
+
+        choice_id = record_live_choice(
+            store,
+            decision.decision_id,
+            selected_weight=0.01,
+            decided_at="2026-07-21T13:00:00+00:00",
+            explicit=True,
+            user_sized=True,
+            reason="使用者自行決定的探索部位",
+        )
+
+        assert choice_id.startswith("lc_")
+        recorded = store.latest_live_choice(decision.decision_id)
+        assert recorded["choice_type"] == "user_sized"
+        assert float(recorded["selected_weight"]) == pytest.approx(0.01)
+        # 「系統沒有給過區間」與「區間是 0」不是同一件事（L12）：新 choice 在稽核欄
+        # 寫 NULL，不得補一個 0 冒充「系統說上限是 0」。
+        stored_upper = store._conn.execute(
+            "SELECT system_supported_upper FROM live_choices WHERE choice_id = ?",
+            (choice_id,),
+        ).fetchone()["system_supported_upper"]
+        assert stored_upper is None
+
+        # 真正的資本護欄沒有跟著資本表達層一起被拆掉：已持有 1% ＋ 再買 4.5%
+        # 會超過 5% 單筆上限，必須硬擋。
+        with pytest.raises(ExecutionError, match="single position cap"):
+            record_live_choice(
+                store,
+                decision.decision_id,
+                selected_weight=0.045,
+                decided_at="2026-07-21T14:00:00+00:00",
+                explicit=True,
+                user_sized=True,
+                reason="刻意超過單筆上限",
+            )
+    finally:
+        store.close()
+
+
+def test_missing_holdings_confirmation_stays_a_visible_live_blocker(
+    tmp_path: Path,
+) -> None:
+    """同一組輸入，只差使用者未確認持倉 → live 必須關閉且理由現形。
+
+    這鎖住「live 是被人工 gate 擋住，不是被資料缺口擋住」——兩者在輸出上長得像，
+    但前者等你一句話，後者等系統修東西。
+
+    U7：原測試用 `live_status == "DATA_NEEDED"` ＋ `live_supported_range == (0, 0)`
+    表達；系統不再判定 live 資格，同一件事改由 blocker 自己現形表達。
+    """
+
+    store = _store(tmp_path)
+    try:
+        payload = _same_symbol_payload()
+        bundle, coverage = _live_decision(
+            store, payload, key="live-lane-unconfirmed", confirm_holdings=False
         )
 
         assert bundle.payload["holdings"]["status"] == "unconfirmed"
         assert "holdings_unconfirmed" in bundle.payload["holdings"]["blockers"]
+        assert coverage.live_context_ready is False
 
-        coverage = assess_coverage(
-            store,
-            bundle,
-            catalyst="next filing",
-            disproof="commercial evidence fails",
-            expiry="2026-08-21T00:00:00+00:00",
-            decision_relevance=8,
-            falsifiability=8,
-            information_value=7,
-            execution_intent="live",
-        )
         sizing = calculate_probe_limits(bundle, coverage, _assessment())
 
-        assert coverage.live_context_ready is False
-        assert sizing.live_status == "DATA_NEEDED"
-        assert sizing.live_supported_range == (0.0, 0.0)
         assert "holdings_unconfirmed" in sizing.live_blockers
-        # paper 不受持倉確認影響——它是模擬帳本，不需要真實持倉真相。
-        assert sizing.paper_max_supported_position > 0
+        # 研究面不受持倉確認影響——它問的是證據，不是我的試算表。
+        assert "holdings_unconfirmed" not in sizing.paper_blockers
     finally:
         store.close()
