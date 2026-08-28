@@ -933,9 +933,20 @@ def _render_ranking(ranking: Mapping[str, Any] | None) -> list[str]:
 
 
 def _render_nav_exposure(nav: Mapping[str, Any] | None) -> list[str]:
-    """持股 NAV 比例——排序之後。純呈現，不判斷失衡。"""
-    if not nav:
-        return []
+    """持股 NAV 比例——排序之後。純呈現，不判斷失衡。
+
+    ⚠ `None`（未注入）不得讓整區靜默消失。先前 `return []` 會讓「呼叫端沒給」與
+    「這個人沒有持股」在畫面上完全同形——而使用者看這一區就是為了看曝險集中在哪，
+    整區不見時他不會知道自己少看了什麼。排序區對 `None` 早就明說「未提供」，
+    這裡沿用同一個處置。
+    """
+    if nav is None:
+        return [
+            "# 持股 NAV 比例",
+            "",
+            "⚠ 本次未提供持股資料（未注入 nav_exposure）——不是「沒有持股」。",
+            "",
+        ]
     if nav.get("status") != "available":
         failure = nav.get("failure")
         detail = f"（{markdown_text(failure)}）" if failure else ""

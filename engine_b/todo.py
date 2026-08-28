@@ -486,8 +486,9 @@ def _prior_execution_intent(store: Any, cohort_id: str) -> str:
     """該 cohort 上一筆 decision 用的 intent。
 
     ⚠ 必須沿用，不可套用別處習慣：2026-08-26 實測，對先前是 `paper` 的 cohort
-    跑 `research`，`paper_status` 會由 ELIGIBLE 退成 DATA_NEEDED——那不是資料
-    變壞，是 `execution_intent_research_only` 這個 paper blocker，純由參數造成。
+    跑 `research`，研究完整度會由 READY 退成 DATA_NEEDED——那不是資料變壞，
+    是 `execution_intent_research_only` 這個 paper blocker，純由參數造成。
+    （該欄位 U7 之前叫 `paper_status`、值是 ELIGIBLE；語意與這個陷阱都沒變。）
     """
 
     try:

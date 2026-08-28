@@ -91,6 +91,21 @@ def test_nav_unavailable_is_not_zero_exposure() -> None:
     assert "零曝險" in text
 
 
+def test_absent_nav_says_so_instead_of_vanishing() -> None:
+    """NAV 未注入時仍渲染區塊並說明原因——與排序區同一個處置。
+
+    先前 `_render_nav_exposure(None)` 回空 list，於是「呼叫端沒給持股」與「這個人
+    沒有持股」在畫面上完全同形，整區靜默消失。排序區早就有這條斷言
+    （`test_absent_ranking_says_so_instead_of_vanishing`），NAV 沒有——**那個不對稱
+    就是缺陷本身**，所以這條測試刻意寫成它的鏡像。
+    """
+    text = "\n".join(_render_nav_exposure(None))
+
+    assert "持股 NAV 比例" in text
+    assert "未提供" in text
+    assert "沒有持股" in text
+
+
 def test_first_screen_order_is_ranking_then_nav() -> None:
     """R1：排序在前、NAV 在後。"""
     combined = "\n".join(_render_ranking(RANKING) + _render_nav_exposure(NAV))
