@@ -17,7 +17,7 @@ description: >
 **每天一份 action-first brief；routine 先把 PASS 線索研究成 prepared RA，使用者只核准完整 pq2。**
 
 系統做便宜的 harvest／triage，再依 priority 自動 drain pq1 到 prepared；人工判斷要不要入圖。
-無事時 brief 是一行 `NO ACTION`。三道閘門永不自動：graph
+無事時 brief 是一行 `MONITOR`。三道閘門永不自動：graph
 admission 必經核准 exact 對象、深挖由 priority 排序但入圖仍核准、live 資本永遠人工。
 
 > **介面是對話，不用 GitHub UI。** 現行排程是 Codex desktop local scheduled task；本機 Claude Code
@@ -177,11 +177,13 @@ decision receipt 結案：
 & '.venv\Scripts\python.exe' -m engine_b.todo work <todo_n> --to completed --receipt decision:<new_decision_id>
 ```
 
-**`--intent paper` 是預設（2026-08-08 使用者定案）。** paper 是模擬帳本：不碰真錢、不寫
-Google Sheet、不建立 live permission，live 仍 100% 人工。改用 paper intent 的理由是
-`research` intent **從不 request paper lane**，於是連 coverage 全乾淨的標的也永遠 range 0——
-實測 9 個 cohort 全是 research intent，paper ledger 從未被寫過。而一個從不被寫入的模擬帳本
-是純成本、零效益：它讓「系統的判斷準不準」永遠無法用證據回答，也就無從決定系統該留該砍。
+**`--intent paper` 是預設（2026-08-08 使用者定案；2026-08-28 語意改變）。** intent 不再產生
+任何模擬部位——資本表達層已整組移除。它現在只決定**要求哪些 lane 的資料完整度**，進而影響
+`research_status`（`READY`／`INCOMPLETE`／`DATA_NEEDED`）；`research` intent 會把 paper lane
+標成 not requested，於是研究再完整也拿不到 `READY`。
+
+「系統的判斷準不準」由等權重報酬回答，錨點是 Shadow observation（只有價格與時點，不含部位），
+與 intent 無關。
 
 只有在**明確不想留下模擬部位**時才用 `--intent research`（例如 thesis 正處於使用者設定的
 hold 期間）。
@@ -306,7 +308,8 @@ Pane 2 顯示純結構排序與最值得補證據的標的。第四支只讀 Eng
 其實是編的」提醒，比沒有提醒危險。報表末尾必須顯示「N/M 檔有結構化催化劑日期」——
 其餘檔的 `expiry 早於催化劑` 錯誤測不到，**沒抓到問題不等於沒有問題**（L13）。
 
-第一支回今日 `NO ACTION / REVIEW / TRADE / HEDGE`，每個 probe 附**自追蹤變化%**與**evidence_delta**
+第一支回今日的瓶頸排序與注意力狀態（`MONITOR`／`REVIEW`，四動作已於 2026-08-28 移除），
+每個 probe 附**自追蹤變化%**與**evidence_delta**
 （material=有觸及 thesis 因果結構的新證據 → 建議 reassess；peripheral=只多週邊 source；none=無變或
 純價格波動）。再讀 `thesis/lifecycle.json` 列到期需複查的 thesis。純讀，不建 decision。
 
@@ -321,7 +324,7 @@ Pane 2 顯示純結構排序與最值得補證據的標的。第四支只讀 Eng
 `library/leads/todo_pool.json` 是回覆編號的唯一 authority：項目首次進池時取得編號，直到 resolve 才釋放；
 **不得依當日排序、section 或模型輸出重新編號**。用池內原編號把決策佇列／等 apply 的 RA／
 到期 thesis／有 material evidence-delta 的 probe 組成 brief，每項附明確指令。無事就一行
-`NO ACTION ＋日期`。
+`MONITOR ＋日期`。
 
 ### 待核准項目的內容密度
 
@@ -368,7 +371,7 @@ park：社群 CPO 推論 → 一手來源未支持，不產空 RA
 
 ### Pane 1 — 現在要投哪一檔
 TL;DR：<直接回答「今天要不要加碼、加哪一檔」；不得只列清單不給首選>
-排序來源：`query/bottleneck.py` 的 `rank_bottlenecks()`（唯一權威；不得用 axis_ceiling／paper target／ELIGIBLE 數量代替）
+排序來源：`query/bottleneck.py` 的 `rank_bottlenecks()`（唯一權威；`research_status` 是研究完整度，不得拿來排序）
 相關性提醒：<本清單集中在哪個主題；列 N 檔不等於 N 個獨立機會，全買是同一賭注下 N 次>
 判斷性質：研究判斷，非回測或統計勝率；尺寸一律不給，由使用者決定
 | # | 標的 | 卡在哪（瓶頸邊） | 替代難度 | 證據強度 | 需求錨點／距需求端 | 現在的判斷 | disproof 狀態 |
@@ -396,7 +399,7 @@ TL;DR：<上線標的／可量測／結案歸因常駐計數器；真實部位�
 不另存判準副本，只補兩條 daily 特有規則：
 
 - 已持有部位必須列 disproof 狀態；`None` 或 lifecycle `expired` 要當成缺口提出。
-- 四個 pane **不得因今天無新事件或 `NO ACTION` 而省略**；先完整放進 Daily，之後由使用者看過
+- 四個 pane **不得因今天無新事件或全部 `MONITOR` 而省略**；先完整放進 Daily，之後由使用者看過
   實際成品再決定裁切哪一段。規則同 Beta 主力表。
 
 ## 追蹤中的外部事件（無 pq2 編號）
@@ -567,6 +570,6 @@ intake 的 fallback；遠端永遠不得取代本機 decision／lifecycle author
 ## 已知會壞的地方（v0，撞到回頭修）
 
 - priority 權重是拍腦袋 v0；用真實流量調（可重算所以能迭代）。
-- 初期流量稀，brief 常一行 NO ACTION——來源清單問題，非管線問題。
+- 初期流量稀，brief 常一行 `MONITOR`——來源清單問題，非管線問題。
 - RSS feed 只曝露最新數篇；長期不開 session 舊文掉出視窗。
 - evidence-delta 的 causal-path 精度可能太吵或太鈍，用真實入圖撞。

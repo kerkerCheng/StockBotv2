@@ -169,7 +169,8 @@ def test_daily_embeds_full_alpha_status_contract() -> None:
         "query.coverage_gaps",
         "scripts\\outcome_if_settled_today.py",
         "scripts\\alpha_purity_snapshot.py",
-        "不得因今天無新事件或 `NO ACTION` 而省略",
+        # U7 後注意力狀態只剩 MONITOR／REVIEW；規則不變，只是措辭跟著字彙改。
+        "不得因今天無新事件或全部 `MONITOR` 而省略",
     ):
         assert token in text
     assert "只出**可行動排序**" not in text

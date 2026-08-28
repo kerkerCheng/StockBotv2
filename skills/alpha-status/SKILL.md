@@ -93,10 +93,11 @@ SQL 繞過。真正的 `private_storage_boundary_rejected` 才是 storage bounda
 
 ### ⛔ 不得用來拒絕排序的理由
 
-- **`outcome 0/8` 不算理由。** 不出手就沒有 outcome，沒 outcome 就不敢排序，是死循環。
-  L14 要求的是不得讓未量測機制**決定資本尺寸**，不是不得表達研究判斷。
+- **「outcome 還沒驗證」不算理由，不論當下比值是多少。** 不出手就沒有 outcome，沒 outcome
+  就不敢排序，是死循環。L14 要求的是不得讓未量測機制**決定資本尺寸**，不是不得表達研究判斷。
 - 若確實無法排序，**必須指出缺哪一項具體證據**，不得以「證據不足」概括。
-- **尺寸仍然不給**，`axis_ceiling`／paper target／ELIGIBLE 數量都不是選股判準。
+- **尺寸仍然不給**——系統自 2026-08-28 起根本不產生尺寸（`axis_ceiling`／paper target 已移除）。
+  `research_status` 是研究完整度，不是選股判準，也不得拿來排序。
 
 ---
 

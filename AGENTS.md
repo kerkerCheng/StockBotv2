@@ -48,7 +48,7 @@
 
 **Engine A/B/C 研究輸入 + Engine D 決策責任 → 有根據且可控的投資決策。**
 
-使用者提出公司、thesis 或外部 Signal → 研究 agent 結合 Engine A 的因果／證據 context、Engine B 的線索與 Engine C 的財務／市場狀態 → Engine D（Decision Lab）凍結決策當下實際使用的 context，產生可稽核的 `NO ACTION / REVIEW / TRADE / HEDGE` 與受支持部位區間。使用者保留最終接受、縮小、覆寫與手動下單權力。本機單人自用，使用者會寫 Python、碰過 API。
+使用者提出公司、thesis 或外部 Signal → 研究 agent 結合 Engine A 的因果／證據 context、Engine B 的線索與 Engine C 的財務／市場狀態 → Engine D（Decision Lab）凍結決策當下實際使用的 context，產生可稽核的**瓶頸度排序**（以股票為單位、附最弱軸與 disproof）與「今天要不要複查」的注意力標記。**系統不給部位尺寸**——買多少、什麼時候買由使用者在買入前自行判斷，並自行手動下單。本機單人自用，使用者會寫 Python、碰過 API。
 
 ---
 
@@ -59,7 +59,7 @@
 | **Engine A** | 供應鏈、物理／關係瓶頸、claim 與 provenance | Neo4j | Signal queue、部位、價格時序、交易決策 |
 | **Engine B** | 外部 Signal discovery／intake 與研究注意力排序 | 來源登記與 pending lead／Research Action | 提高 evidence tier、自動投資、graph admission bypass |
 | **Engine C** | 財務、估值、市場與其他帶時戳 observation | SQLite／Postgres private runtime | thesis、持股真相、最終部位決策 |
-| **Engine D** | Decision & Accountability Engine（Decision Lab）：Shadow、Coverage、Confidence、paper/live permission、Action Card、outcome | Private Decision Store；paper events 是模擬帳本真相 | 寫 Engine A、複製 Engine C current truth、取代 Google Sheet、broker routing |
+| **Engine D** | Decision & Accountability Engine（Decision Lab）：Shadow、Coverage、五軸 Confidence、瓶頸排序、NAV 比例呈現、outcome | Private Decision Store | 寫 Engine A、複製 Engine C current truth、取代 Google Sheet、broker routing、**任何部位尺寸** |
 
 ### Skill 層（Claude Code / Codex 共用操作介面）
 權威內容存在 `skills/` 目錄，每個 skill 是告訴研究 agent「如何使用記憶層」的操作手冊；兩端的自動發現路徑由上方轉接層提供。
@@ -71,10 +71,10 @@
 
 ### 決策層（Engine D — Decision & Accountability Engine／Decision Lab）
 
-- **責任：** 將 Engine A/B/C、versioned policy 與 Google Sheet holdings 轉成可稽核的資本許可與下一步行動；保存 Signal cohort、Shadow、Coverage、Confidence Envelope、system decision、paper event、明確的 live choice/fill、lifecycle 與 outcome attribution。
+- **責任：** 將 Engine A/B/C、versioned policy 與 Google Sheet holdings 轉成可稽核的**瓶頸度排序與研究缺口**；保存 Signal cohort、Shadow、Coverage、五軸 Confidence、system decision、明確的 live choice/fill、lifecycle 與 outcome attribution。
 - **Point-in-time contract：** 「凍結 Engine A」一律指**凍結該次決策實際使用的 Engine A context slice**，不是 snapshot／dump 整張 Neo4j。Engine D 將該 slice 與財務、價格、FX、持股、policy 的 as-of values／refs／versions 組成 content-addressed context bundle；舊 decision 永遠引用原 digest，不因 A/B/C 後續更新而改寫。
-- **資本邊界：** eligible paper 可與 system decision 原子寫入；live 只輸出 supported range，必須由使用者明確接受、手動下單並回報，Google Sheet 仍是 live inventory 唯一權威。
-- **Runtime：** Decision／paper facts 存於 ignored `library/private/decision_lab/`；第一筆真實事件後只允許 backup／restore與 append-only correction，不做破壞性 reset。
+- **資本邊界（2026-08-28 定案）：** Engine D **不產生任何部位尺寸**。live choice 的尺寸來源一律是使用者，系統只負責記錄，並在記錄時硬擋三個真實資本上限（5% 單筆 NAV、ETF 槓桿 nominal／effective）＋凍結快照七天時效。手動下單與回報仍由使用者執行，Google Sheet 仍是 live inventory 唯一權威。
+- **Runtime：** Decision facts 存於 ignored `library/private/decision_lab/`；第一筆真實事件後只允許 backup／restore與 append-only correction，不做破壞性 reset。U7 之前的 `paper_events`／`live_supported_range`／`axis_ceiling` 欄位仍在歷史紀錄中可讀，但不再增長也不回寫。
 
 ### 記憶層（持久知識庫）
 - **Neo4j 知識圖譜（引擎A）：** 供應鏈結構、技術關係、來源可追溯的主張。Property graph，不是 tree。
@@ -173,7 +173,7 @@ Decision gap jobs 優先占用同一個 daily pq1 budget。若研究結果需要
 
 ### Sheet 持股覆蓋分類
 
-`sheet_only_holding` 只針對**真正沒有任何機制負責**的持股。`decision_lab/brief.py` 的 `_sheet_only_items` 依 Sheet ticker 分三類：beta policy 涵蓋（`coverage=beta_policy`）、使用者明確不研究（`coverage=user_ignored`，登記於 `config/holdings_coverage.json`）、其餘 `coverage=uncovered`。前兩類判 `NO ACTION` ＋空 blockers，仍在 daily brief 現形但不占 pq2 編號。
+`sheet_only_holding` 只針對**真正沒有任何機制負責**的持股。`decision_lab/brief.py` 的 `_sheet_only_items` 依 Sheet ticker 分三類：beta policy 涵蓋（`coverage=beta_policy`）、使用者明確不研究（`coverage=user_ignored`，登記於 `config/holdings_coverage.json`）、其餘 `coverage=uncovered`。前兩類判 `MONITOR` ＋空 blockers，仍在 daily brief 現形但不占 pq2 編號。
 
 **`todo drop` 對這類項目無效**——它只清當次編號，sync 會依 Sheet 持股＋無 cohort 重新推導並配新編號（2026-07-29 實測 [18]-[33] → [46]-[60]）；要真正解除必須改覆蓋分類或建 cohort。覆蓋設定檔讀取失敗一律 fail safe 退回 `REVIEW`。beta universe 的 SSOT 只有 `config/beta_policy.json`。
 
@@ -199,7 +199,7 @@ Decision gap jobs 優先占用同一個 daily pq1 budget。若研究結果需要
 
 **退休貸款資本目標（2026-07-28 使用者定案）：** 使用者約 30 歲、退休目標約 60 歲；可長抱至到期的貸款資本以約 30 年後 `retirement_net_terminal_wealth` 最大化為方向，不以降低中途回撤為第一目標。契約為利息按月支付、期間不攤還本金、到期一次還本、允許投資用途。broad unlevered beta 是主要候選；daily 3x 可投資但維持衛星定位，exact review 必須扣除借款成本與到期本金比較退休淨終值，**月息若需靠賣出 beta 支付則該 tranche 不成立**。
 
-### Alpha 呈現契約（2026-08-15 使用者定案）
+### Alpha 呈現契約（2026-08-15 使用者定案；2026-08-28 資本表達層已整組移除）
 
 **alpha 對使用者的輸出是「候選＋事件追蹤」，不是部位尺寸。** 系統只負責兩件使用者自己做不動的事：
 **哪些標的值得看**、以及**它們有什麼新事件**；買多少、什麼時候買由使用者決定。
@@ -215,13 +215,34 @@ Decision gap jobs 優先占用同一個 daily pq1 budget。若研究結果需要
 > （「產出若無法讓人分辨做了什麼與沒做，它就不算產出」），那部分與 outcome 筆數無關。使用者的原話是「繞了這麼久只得到我很早就看到的幾間公司、都等於 0.2%，
 我會不知道我到底做了什麼」——**產出若無法讓人分辨做了什麼與沒做，它就不算產出**。
 
-**paper lane 繼續運作，但定位改變：它是記分板，不是建議。** 0.1% 模擬部位是 outcome 量測的
-唯一資料來源，砍掉就永遠無法回答「系統判斷準不準」。brief 不得再把 paper target 或
-live supported range 當成行動指引呈現，但也不得停止累積它們。
+**⚠ 2026-08-28 更新：本契約當時只做了一半，剩下的另一半已完成。** 2026-08-15 的版本留下
+「paper lane 繼續運作，它是記分板不是建議」——但 `supported_range` 仍在輸出、`axis_ceiling`
+仍在決定資本。實測（2026-08-28）21 個 operational cohort 有 20 個 `live_supported_range`
+是 `[0,0]`，而排序第一名 COHR 的三個資本風控**沒有一個 binding**，唯一 binding 的是
+`weakest_axis` 的 0.002——一個從未被驗證的機制在決定資本，正是 L14 明文禁止的事。
+
+**因此 alpha 的資本表達層已整組移除：** `live_supported_range`、`axis_ceiling`、
+`paper_target`、probe cap 與四動作（`NO_ACTION`／`REVIEW`／`TRADE`／`HEDGE`）都不再產生。
+系統終點是**瓶頸度排序**，注意力狀態只剩 `MONITOR`／`REVIEW`（今天要不要看這一檔）。
+五軸保留，角色由「決定資本上限」改為「決定排序與指出最弱軸」。
+
+**outcome 量測改為等權重報酬追蹤：** 只記「哪天推薦了這檔、當時股價、之後報酬率」，
+不含部位大小或 NAV 佔比；比較基準是等權重，回答「排序前段的標的後續報酬是否優於後段」。
+價格錨點仍由 Shadow observation 提供（它只有價格與時點，不含部位）。
 
 **真正的風控完全不變：** 5% 單筆上限、ETF 槓桿 nominal／effective cap、總曝險 cap 全部保留
 （numeric SSOT 仍是 `config/investment_policy.json` 與 `config/beta_policy.json`）。
-live choice／fill 仍然 100% 人工，系統不連 broker。
+拿掉的是**憑空的建議尺寸**，不是煞車——`record_live_choice` 對每一筆非零 live 選擇仍硬擋
+那三個上限與凍結快照七天時效。live choice／fill 仍然 100% 人工，系統不連 broker。
+
+> **查證（別相信這段文字，跑一次）：**
+> `python -c "import json;p=json.load(open('config/investment_policy.json'));print('probe_lane keys:', sorted(p['probe_lane']));print('single_position_nav_cap:', p['single_position_nav_cap'])"`
+> `probe_lane` 不該再有 `axis_ceilings`／`probe_book_nav_cap`／`single_probe_nav_cap`／
+> `live_adv_fraction_cap`；`single_position_nav_cap` 應仍是 0.05。
+
+**反向新增的 NAV 比例呈現（純呈現、零門檻）：** 從 Google Sheet 讀持股，輸出各標的佔 NAV
+百分比、bucket 分布與相關性分組。**不判斷好壞、不告警、不阻擋任何動作**——失衡由使用者
+看數字自行判斷。5% 單筆上限在這裡只作參考線，不進入 gate 判定。
 
 #### 「哪些標的值得看」的判準與交付要求（2026-08-19 使用者定案）
 
@@ -254,8 +275,9 @@ agent 以「outcome 0/8 未驗證」拒絕推薦）。
 判別法：**這個指標會隨我們多讀一份文件而單調上升嗎？** 會 → 它測的是研究量。
 客戶端資本承諾不會（離散事件，要嘛發生要嘛沒有），供應商計數會。
 
-**唯一排序權威是 `query/bottleneck.py` 的 `rank_bottlenecks()`**，不得另建平行排序，
-也不得用 `axis_ceiling`、paper target 或 ELIGIBLE 數量代替——那些是資本閘門，不是選股判準。
+**唯一排序權威是 `query/bottleneck.py` 的 `rank_bottlenecks()`**，不得另建平行排序。
+（`axis_ceiling` 與 paper target 曾被誤當排序代理，它們是資本閘門不是選股判準，已於
+2026-08-28 移除；`research_status` 是研究完整度，也不得拿來排序。）
 它輸出**兩份排序，用途不同、不可互換**：
 - `rows`（可行動）：`evidence` 優先於 `substitutability`，回答「**現在能投什麼**」——
   證據不夠強的邊不能拿來下注。

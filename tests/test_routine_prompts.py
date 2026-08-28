@@ -136,7 +136,8 @@ def test_daily_prompt_requires_complete_alpha_status_heartbeat() -> None:
         "### Pane 2 — 該去補誰的證據",
         "### Pane 3 — 哪裡還是空白",
         "### Pane 4 — 部位與問責",
-        "即使 NO ACTION 或無新事件也不得省略",
+        # U7 後注意力狀態只剩 MONITOR／REVIEW；規則不變，只是措辭跟著字彙改。
+        "即使全部 `MONITOR` 或無新事件也不得省略",
     ):
         assert token in text
 

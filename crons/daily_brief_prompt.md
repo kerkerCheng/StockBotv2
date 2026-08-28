@@ -108,9 +108,10 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
    `drain` 本身只列 bounded jobs，不執行研究；brief 必須分開寫出本輪已研究、因 cap／同分 tie-break 延後、
    以及尚未 harvest／triage 的 lead，並在延後項目附 score、排序理由與 `first_seen`，不可只說「沒看到」。
    Decision work order 必須 checkpoint researching；若純唯讀研究即可補齊，產 assessment 後才跑
-   `--intent paper` reassess，並以新 decision receipt 結案。paper 是模擬帳本（不碰真錢、不寫 Sheet、
-   不建 live permission）；`research` intent 從不 request paper lane，用它等於讓 paper ledger 永遠是空的，
-   而空帳本無法回答「系統準不準」。只有標的正處於使用者設定的 hold 期間才改回 `--intent research`。
+   `--intent paper` reassess，並以新 decision receipt 結案。intent 不再產生任何模擬部位（2026-08-28
+   資本表達層已移除）；它現在只決定要不要要求該 lane 的資料完整度，進而影響 `research_status`。
+   「系統準不準」改由等權重報酬回答，錨點是 Shadow observation，與 intent 無關。
+   只有標的正處於使用者設定的 hold 期間才改回 `--intent research`。
    `--disproof` 必填且必須可觀測、有門檻、有日期（L7 另需核查頻率與觸發後 48h 動作）；它由 agent 起草，
    但必須隨 packet 進 pq2 由使用者確認，不得自我核准。`--expiry` 由催化劑的預期時點決定（催化劑日 ＋1～2 週），
    **不得早於催化劑本身**。若需入圖、Engine C manual observation、thesis
@@ -181,7 +182,7 @@ go 授權：<bounded research／exact graph admission／manual observation／the
 <`query.coverage_gaps`；分開真正 chokepoint 研究缺口與抽取產生的產品名詞，只把前者轉成研究題目>
 ### Pane 4 — 部位與問責
 <上線標的／可量測／結案歸因計數器、真實 fill／現價／損益／epoch／disproof、錨點樣本效度與 alpha live 監控覆蓋缺口>
-<四個 pane 每列都標答案會改變 `候選集合`／`排序`／`出場條件`／`只是信心`；即使 NO ACTION 或無新事件也不得省略。>
+<四個 pane 每列都標答案會改變 `候選集合`／`排序`／`出場條件`／`只是信心`；即使全部 `MONITOR` 或無新事件也不得省略。>
 
 ## Beta capital observation（無 pq2 編號）
 TL;DR：<約 30 年後 retirement_net_terminal_wealth 目標；今日哪些標的可人工評估；最重要的動態風控 warning>
@@ -195,7 +196,7 @@ TL;DR：<約 30 年後 retirement_net_terminal_wealth 目標；今日哪些標�
 <本次 harvest、Engine C、beta technical、Neo4j、Sheet 的失敗或缺口；無則寫正常>
 
 ## 無事項目
-<NO ACTION 類別>
+<`MONITOR` 類別——今天不需要複查，依 review 日曆追蹤即可>
 
 回覆：`<編號…> go｜drop｜pending`（例：`13 17 go 10 16 pending`）
 ```
@@ -205,5 +206,5 @@ Codex desktop 若支援 inline mobile visualization，Beta 區依「自有現金
 內部 `nominal_weight` 顯示為「槓桿 ETF 資金占比」，乘上 2x／3x 的 `effective_weight` 顯示為
 「換算槓桿曝險」。Issuer look-through coverage 為 partial 時顯示「已知至少 X%」。不得用未解釋的斜線並列兩個 cash view。
 
-即使無新事項，也輸出 `NO ACTION + 日期` 心跳。Daily brief 不另存 report；稽核由 todo log、leads
+即使無新事項，也輸出 `MONITOR + 日期` 心跳。Daily brief 不另存 report；稽核由 todo log、leads
 狀態機、Decision Store 與窄 state commit 承擔。

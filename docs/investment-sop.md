@@ -14,11 +14,11 @@
 
 1. 通過輕量 Probe Gate 後，立即保存 Signal 與零資本的 Shadow Observation。
 2. Coverage Gate 檢查 identity、可追溯來源、claim-to-economics path、counter-path、財務／價格 baseline、catalyst、disproof 與 expiry。資料不足仍保留 Probe，但只產生有界的 Minimum Viable Research Packet 工作單。
-3. Coverage 通過後，以五軸 Confidence Envelope 找出 weakest link，分開計算 `paper_target` 與 `live_supported_range`。不同題材不能線性相加抵銷缺失的必要環節。
-4. Eligible paper 由 Decision Store 在 system decision 同一 transaction 內建立；live 必須由使用者明確選擇、手動下單，成交後再回報。Google Sheet 仍是 live inventory 唯一權威。
-5. 第一眼只讀 Action Card：`NO ACTION / REVIEW / TRADE / HEDGE`、urgency、alpha/beta context、weakest link、兩個 lane、blockers 與下一步。`NO ACTION` 是正式結果，不為了每日輸出製造交易。
+3. Coverage 通過後，以五軸 Confidence Envelope 找出 weakest link——它同時是這一檔的研究缺口與提高排序的唯一路徑。**不換算成任何額度**（2026-08-28 起資本表達層已整組移除）。不同題材不能線性相加抵銷缺失的必要環節。
+4. 排序由 `query/bottleneck.py` 的 `rank_bottlenecks()` 產生，以股票為單位輸出；live 必須由使用者自行決定尺寸、手動下單，成交後再回報。Google Sheet 仍是 live inventory 唯一權威。
+5. 第一眼只讀 Action Card：注意力狀態（`MONITOR` / `REVIEW`）、urgency、alpha/beta context、weakest link、研究完整度、blockers 與下一步。`MONITOR` 是正式結果，不為了每日輸出製造交易。
 
-Probe 是研究探針，不等於模擬投資；Shadow 是零資本觀測，paper 是使用可配置虛擬 NAV 的 funded simulation，live 才是使用者實際持股。Probe lane 不會降低下方 Formal Position 的升格條件。
+Probe 是研究探針，不等於模擬投資；Shadow 是零資本觀測，提供等權重報酬量測的價格錨點；live 才是使用者實際持股。Probe lane 不會降低下方 Formal Position 的升格條件。
 
 ---
 
