@@ -216,7 +216,13 @@ def _normalize_holdings(
 ) -> dict[str, Any]:
     upstream = payload.get("status")
     if upstream in {"malformed", "missing", "unavailable"}:
-        return {"status": upstream, "blockers": [f"holdings_{upstream}"]}
+        frozen = {"status": upstream, "blockers": [f"holdings_{upstream}"]}
+        # upstream 若標了失敗原因（例外類型），一併凍進 context——否則 decision 只留下
+        # 一個 holdings_unavailable，讀的人無從分辨「Sheet 打不通」與「真的沒持股」。
+        failure = payload.get("failure")
+        if isinstance(failure, str) and failure:
+            frozen["failure"] = failure
+        return frozen
     rows = payload.get("rows")
     if not isinstance(rows, list):
         return {"status": "malformed", "blockers": ["holdings_malformed"]}

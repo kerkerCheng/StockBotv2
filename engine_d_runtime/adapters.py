@@ -6,6 +6,7 @@ package；``decision_lab`` 只依賴 ``workflow_ports`` 的 normalized contract�
 from __future__ import annotations
 
 import json
+import logging
 import math
 from datetime import datetime, tzinfo
 from functools import lru_cache
@@ -37,6 +38,8 @@ FxFetcher = Callable[[str, str], Mapping[str, Any]]
 def _fetch_operational_portfolio() -> Sequence[Mapping[str, Any]]:
     return fetch_portfolio(strict_operational=True)
 
+
+_LOG = logging.getLogger(__name__)
 
 _VOCAB_PATH = Path(__file__).resolve().parent.parent / "schema" / "vocab.json"
 
@@ -801,8 +804,21 @@ class DefaultRuntimeProvider:
     def current_holdings(self, *, evaluation_at: str) -> Mapping[str, Any]:
         try:
             raw_rows = list(self._holdings_fetcher())
-        except Exception:
-            return {"status": "unavailable", "rows": [], "blockers": ["holdings_unavailable"]}
+        except Exception as exc:
+            # 持股來自 Google Sheet API，瞬時失敗（token refresh、網路抖動、rate limit）
+            # 是常態。fail closed 正確，但原因不能丟：holdings 一 unavailable 就連鎖出
+            # live_nav_missing／portfolio_leverage_unavailable／live_context_not_ready，
+            # 看起來像四項資料各自缺失，實際是同一次呼叫失敗（2026-08-28 實測）。
+            # 只放例外類型；訊息可能含憑證路徑，僅進 log。
+            _LOG.warning(
+                "holdings fetch failed at %s: %s", evaluation_at, exc, exc_info=True
+            )
+            return {
+                "status": "unavailable",
+                "rows": [],
+                "blockers": ["holdings_unavailable"],
+                "failure": type(exc).__name__,
+            }
         if not raw_rows:
             return {
                 "status": "available",
