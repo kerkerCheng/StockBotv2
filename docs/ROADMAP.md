@@ -47,9 +47,29 @@ brainstorm；範圍大到需要驗收條件才開 plan。brainstorm 用 frontmat
 | 2026-08-19 | 「`live_choices`／`live_execution_reports` 仍為 0 筆，live 這條路徑**從未被走過**」——並據此對使用者斷言 | **直接引用本檔自己的文字**，而該句寫於 2026-08-15 之前、當時為真。錯誤不在推理而在**根本沒推理**：把自家文件當成 current-state truth 引用，正是 L11 判準 2 說的「對外部 claim 嚴、對自家文件鬆」。使用者前一天才走完全鏈，且系統完整記錄了 choice 與 fill | `select count(*) from live_choices` → **1**。已改為附查證命令，並新增 `AGENTS.md`「現況數字會過期，判準不會」小節 |
 | 2026-08-19 | 「`commercial_maturity` 積壓缺的是**有人去讀年報附註**」 | 本檔原條目這樣寫，聽起來完全合理（IQE 正是這樣解掉的），差點就照做去讀年報 | 逐一看 7 個積壓的 `missing_data` → 6 個是 `research_assessment_missing`（**連 assessment 都沒有**，且五軸 reason 一字不差），AVGO 甚至早就有那兩筆觀測；第 7 個 Agility 未上市、沒有年報可讀。**靠讀年報能下降的是 0 個** |
 
+| 2026-08-28 | 「COHR 首次 live reassess 失敗的根因是 `--as-of` 沒給，讓 `_snapshot()` 的 `except Exception` 把整份 snapshot 塌成 unavailable」 | 第一次不給 as-of 失敗、六分鐘後給了就成功，時間相關性極強；而 `_snapshot()` 確實有吞例外的 `except Exception`，形狀完美吻合 L12「一表兩義」 | 修好 `snapshot_failure` marker 後**不給 as-of 再跑一次**——marker 沒出現、blockers 為空。真正的根因在 `adapters.py::current_holdings` 的另一處吞例外（Sheet 瞬時失敗） |
+| 2026-08-28 | 「首次 live reassess 必失敗，因為 `_confirm_holdings_if_requested` 要求 `status=='available'` 才寫 confirmation，形成時序死結」 | `holdings_confirmations` 當天只有兩筆，恰好對應第二、三次成功的跑，第一次沒有；上一筆 confirmation 已隔十天 | `grep -n "holdings_unavailable" engine_d_runtime/adapters.py` → 它**只由 adapter 的 `except Exception` 產生**，與 confirmation 邏輯無關。第一次的 blocker 正是那個 code |
+| 2026-08-28 | 「`co:lumentum` 有兩個 cohort，而 `duplicate_cohort_companies` 回空集合是漏掉了這個形狀」 | `list_operational_cohorts` 明明回了兩個 LITE，檢查卻說沒有重複——看起來就是檢查有洞 | `sed -n '869,876p' decision_lab/store.py` → 註解逐字記著 2026-08-15 已檢查過**這個確切案例**：舊 probe 早已 `expired`，`close` 會拒絕再結一次，故該檢查只算「同時有多個 active probe」。回空集合是正確行為 |
+| 2026-08-28 | 「U2 把 `weakest_axis` 從 ceiling 排序改成 level 排序是**零行為變化**的純重構」 | `config/investment_policy.json` 的 `axis_ceilings` 確實是 level 到 ceiling 的嚴格單調映射（0.0 / 0.002 / 0.005），推論同 level 必定同 ceiling | 改完直接 `pytest tests/test_probe_sizing.py` → `[missing_ref]` 立刻紅。`_validate_assessment` 在 `fatal_axis_blocker` 時把 ceiling 打成 0 卻**不動 level**，所以 ceiling 攜帶了 level 沒有的資訊 |
+
 ⚠ **這一節自己的 disproof：** 若之後仍發生「診斷已落地才被推翻」，代表它沒生效，
 不要靠加字補救——那正是 L14 批評的「要人讀的段落」。屆時該做的是把否證步驟綁進
 會自己執行的東西（測試、hook、或 commit 前的檢查），而不是把這張表寫得更長。
+
+**上面那條 disproof 已於 2026-08-28 觸發**（九天後，同一形狀，四筆）。依它自己的要求，
+這裡不再加判準，只記一個**可行動的分野**——四筆裡兩筆被機制抓到、兩筆靠運氣：
+
+| 錯誤診斷 | 怎麼被發現 | 存活時間 |
+|---|---|---|
+| U2「零行為變化」 | characterization 測試紅了 | 約 3 分鐘 |
+| 「as-of 是根因」 | 自己剛加的 `snapshot_failure` marker，回頭一驗即推翻 | 約 10 分鐘 |
+| holdings confirmation 時序 | 恰好又多查了一層 `adapters.py` | 直到下一輪 |
+| `co:lumentum` 檢查有漏 | 恰好去讀了那段註解 | 直到下一輪 |
+
+**有可執行檢查的診斷活不過幾分鐘；沒有的全靠當下願不願意多查一步。**
+所以下一步不是寫得更清楚，是**把診斷寫成一條會紅的檢查再落地**——U2 那次如果只在
+commit message 寫「這是純重構」，錯誤會原封不動進 master；因為寫成了測試，它三分鐘後
+就自己打臉。這條本身也可否證：若之後出現「有測試卻仍讓錯誤診斷落地」，這個分野就不成立。
 
 ---
 
