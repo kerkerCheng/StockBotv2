@@ -179,8 +179,12 @@ decision receipt 結案：
 
 **`--intent paper` 是預設（2026-08-08 使用者定案；2026-08-28 語意改變）。** intent 不再產生
 任何模擬部位——資本表達層已整組移除。它現在只決定**要求哪些 lane 的資料完整度**，進而影響
-`research_status`（`READY`／`INCOMPLETE`／`DATA_NEEDED`）；`research` intent 會把 paper lane
-標成 not requested，於是研究再完整也拿不到 `READY`。
+`research_status`（`READY`／`INCOMPLETE`／`DATA_NEEDED`）。
+
+⚠ intent **不會**壓低研究完整度。`execution_intent_research_only` 這類碼在
+`config/decision_blockers.json` 是 `diagnostic` 級，自 2026-08-29 起不再有改判權
+（判準改用 `fatal_blockers`），所以 `research` intent 一樣可以是 `READY`。
+維持 `--intent paper` 為預設是為了讓同一 cohort 的評估條件不因呼叫端習慣而跳動。
 
 「系統的判斷準不準」由等權重報酬回答，錨點是 Shadow observation（只有價格與時點，不含部位），
 與 intent 無關。

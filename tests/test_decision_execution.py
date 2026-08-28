@@ -497,6 +497,76 @@ def test_live_choice_and_fill_require_explicit_user_facts_and_do_not_rewrite_sys
         store.close()
 
 
+def _measurable_holdings_inputs() -> dict:
+    """持股可量測的 fixture：有 `nav_base`，且非現金列都帶 `market_value_base`。
+
+    ⚠ 預設的 `complete_inputs()` 的 holdings **沒有 `nav_base`**，於是
+    `_live_portfolio` 回 `live_nav_missing` ＋ `live_current_position = 0.0`。
+    2026-08-29 code review 發現：下面那條「非零 live 選擇仍受單筆上限硬擋」的測試
+    先前跑的正是那條路徑——它宣稱驗證了總量上限，實際上是在一個**上限根本管不到
+    總量**的狀態下驗的（已持有多少量不到，就只剩單次買入量被檢查）。
+    fixture 必須先讓部位量得到，那些斷言才有意義。
+
+    只放一列現金：NAV 有了、量測成立，而 `live_current_position` 仍是 0，
+    「剛好等於單筆上限可以、超過不行」的邊界才落在乾淨的位置。
+    """
+
+    payload = deepcopy(complete_inputs())
+    payload["holdings"]["rows"] = [
+        {
+            "ticker": "USD",
+            "currency": "USD",
+            "shares": 100000.0,
+            "is_cash": True,
+            "market_value_base": 100000.0,
+        }
+    ]
+    payload["holdings"].update({"nav_base": 100000.0, "base_currency": "USD"})
+    return payload
+
+
+def test_unmeasurable_position_fails_closed_instead_of_assuming_zero(
+    tmp_path: Path,
+) -> None:
+    """持股量不到時不得放行——`0.0` 與「量不到」不是同一件事（L12）。
+
+    `_live_portfolio` 在 NAV 讀不到時回 `live_current_position = 0.0` ＋
+    `live_nav_missing`，而後者是 diagnostic 級、不擋任何東西。若照單全收，單筆 5%
+    **總量**上限會靜默退化成**單次買入**上限：已持有 4.5% 的標的還能再記一筆 5%。
+
+    U7 之前這條路被 `live_supported_range` 擋住（NAV 缺席時上界為 0，任何非零選擇
+    都被拒）；移除額度層時把那道副作用一起拆掉了，這條測試是補回來的剎車。
+    """
+
+    store = _store(tmp_path)
+    try:
+        bundle, coverage = _bundle(store, "unmeasurable")
+        decision = assess_probe(
+            store, bundle, coverage, _assessment(),
+            idempotency_key="assess:unmeasurable", effective_at=NOW,
+        )
+        sizing = store.get_decision(decision.decision_id)["payload"]["sizing"]
+        # 前提：這個 fixture 的持股確實量不到，且該碼本身不是 fatal（所以擋它的
+        # 只能是這道新檢查，不是既有的 blocker 機制）。
+        assert "live_nav_missing" in sizing["live_blockers"]
+        assert not fatal_blockers(("live_nav_missing",), lane="live")
+
+        with pytest.raises(ExecutionError, match="unmeasurable"):
+            record_live_choice(
+                store, decision.decision_id, selected_weight=0.01,
+                decided_at=NOW, explicit=True, user_sized=True, reason="量不到也想買",
+            )
+
+        # skip（0%）不新增曝險，仍然可以記錄——否則「量不到」會連放棄都不准。
+        skip_id = record_live_choice(
+            store, decision.decision_id, selected_weight=0.0,
+            decided_at=NOW, explicit=True,
+        )
+        assert skip_id
+    finally:
+        store.close()
+
+
 def test_every_nonzero_live_choice_is_user_sized_and_still_hits_capital_caps(
     tmp_path: Path,
 ) -> None:
@@ -510,7 +580,9 @@ def test_every_nonzero_live_choice_is_user_sized_and_still_hits_capital_caps(
 
     store = _store(tmp_path)
     try:
-        bundle, coverage = _bundle(store, "user-sized")
+        bundle, coverage = _bundle(
+            store, "user-sized", inputs=_measurable_holdings_inputs()
+        )
         decision = assess_probe(
             store, bundle, coverage, _assessment(),
             idempotency_key="assess:user-sized", effective_at=NOW,
@@ -518,6 +590,8 @@ def test_every_nonzero_live_choice_is_user_sized_and_still_hits_capital_caps(
         sizing = store.get_decision(decision.decision_id)["payload"]["sizing"]
         single_position_cap = float(sizing["single_position_nav_cap"])
         chosen = single_position_cap / 2.0
+        # 上限管的是總量，所以測試的前提是部位真的量得到（見 _measurable_holdings_inputs）。
+        assert "live_nav_missing" not in sizing["live_blockers"]
 
         # 研究完整度／lane blocker 不得否決使用者的尺寸——那些是研究進度，不是風險
         # 判斷（D2／D3）。這一筆若被擋，就代表 gate 又在用研究進度否決資本。
@@ -551,10 +625,19 @@ def test_every_nonzero_live_choice_is_user_sized_and_still_hits_capital_caps(
         # 同一欄，見 `test_legacy_capital_expression_decision_stays_readable`。
         assert row["system_supported_upper"] is None
 
-        # 沒有 `user_sized` 旗標也一樣：非零選擇一律走同一道檢查、記成 user_sized。
+        # 沒有 `user_sized` 旗標也一樣：非零選擇一律走同一道檢查、記成 user_sized，
+        # **也一樣必須給理由**。reason 綁在實際結果上，不綁旗標——否則不帶旗標就能
+        # 記下一筆沒有任何依據的 `user_sized`，而系統既然不再給尺寸，那句理由就是
+        # 這筆決策僅存的可稽核依據。
+        with pytest.raises(ExecutionError, match="requires an explicit reason"):
+            record_live_choice(
+                store, decision.decision_id, selected_weight=chosen,
+                decided_at="2026-07-21T12:05:00+00:00", explicit=True,
+            )
         implicit_id = record_live_choice(
             store, decision.decision_id, selected_weight=chosen,
             decided_at="2026-07-21T12:05:00+00:00", explicit=True,
+            reason="不帶旗標，但同樣要說明依據",
         )
         assert store._conn.execute(
             "SELECT choice_type FROM live_choices WHERE choice_id = ?", (implicit_id,)
@@ -924,7 +1007,13 @@ def test_legacy_capital_expression_decision_stays_readable(tmp_path: Path) -> No
 
     store = _store(tmp_path)
     try:
-        bundle, coverage = _bundle(store, "legacy-shape")
+        # 用可量測的持股：這條測試要驗的是「舊欄位讀得回來」，不是「持股讀不到」。
+        # 兩者混在一起時，先擋下來的會是不可量測（見
+        # `test_unmeasurable_position_fails_closed_instead_of_assuming_zero`），
+        # 舊欄位那段就永遠測不到。
+        bundle, coverage = _bundle(
+            store, "legacy-shape", inputs=_measurable_holdings_inputs()
+        )
         current = assess_probe(
             store, bundle, coverage, _assessment(),
             idempotency_key="assess:legacy-shape", effective_at=NOW,
@@ -933,12 +1022,15 @@ def test_legacy_capital_expression_decision_stays_readable(tmp_path: Path) -> No
         legacy_sizing = store.get_decision(legacy_id)["payload"]["sizing"]
         assert legacy_sizing["paper_status"] == "ELIGIBLE"
 
-        # 1) 計數器：`live_range_nonzero` 是歷史欄位，只有舊 decision 會貢獻；
-        #    `eligible_cohorts` 對舊 decision 退回讀 `paper_status == "ELIGIBLE"`。
+        # 1) 計數器：`live_range_nonzero` 是歷史欄位，只有舊 decision 會貢獻。
+        #    舊 `ELIGIBLE` 由新判準以外的規則產生，所以**分開數**——把它加進
+        #    `eligible_cohorts` 等於讓計數器中途換定義，換定義造成的跳升會被讀成
+        #    研究進展（2026-08-29 code review）。
         counters = store.capital_expression_counters()
         assert counters["decisions"] == 2
         assert counters["live_range_nonzero"] == 1
-        assert counters["eligible_cohorts"] == 1
+        assert counters["eligible_cohorts"] == 0
+        assert counters["legacy_eligible_cohorts"] == 1
         assert counters["total_cohorts"] == 1
 
         # 2) Action Card：舊 payload 沒有 `research_status`，讀取端由 `paper_status`

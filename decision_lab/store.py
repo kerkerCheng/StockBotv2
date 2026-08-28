@@ -31,6 +31,7 @@ from .models import (
     ProbeRecord,
     ProbeSizingResult,
     ShadowBaseline,
+    research_status_of,
 )
 from .redaction import sensitive_payload_path
 
@@ -129,6 +130,24 @@ def _assert_user_sized_within_capital_caps(
 
     # ⚠ 上限管的是**部位總量**，不是單次買入量。首版只比 `selected_weight`，於是已持有
     # 4% 的標的還能再買 5%。`live_current_position` 就在同一份 sizing 裡，沒有理由不看。
+    #
+    # ⚠⚠ 但「持有 0%」與「量不到持有多少」不是同一件事（L12）。`_live_portfolio` 在
+    # NAV 讀不到時回 `0.0` ＋ `live_nav_missing`，而後者是 diagnostic 級、不擋任何東西
+    # ——於是這條總量上限會**靜默退化成單次買入上限**：持有 4.5% 的標的還能再記 5%。
+    # U7 之前這條路被 supported_range 擋住（NAV 缺席時上界為 0，任何非零選擇都被拒），
+    # 移除額度層時把那道副作用一起拆掉了。這裡改成 fail closed：量不到就不放行。
+    unmeasurable = sorted(
+        b
+        for b in (sizing.get("live_blockers") or ())
+        if b == "live_nav_missing" or str(b).startswith("holdings_market_value_missing")
+    )
+    if unmeasurable:
+        raise ValueError(
+            "cannot enforce the single-position cap: current position is unmeasurable "
+            f"({', '.join(unmeasurable)}) — run `decision_lab reassess --confirm-holdings` "
+            "to refresh holdings before recording a live choice"
+        )
+
     current = sizing.get("live_current_position")
     held = float(current) if isinstance(current, (int, float)) and not isinstance(current, bool) else 0.0
     total = held + selected_weight
@@ -882,9 +901,12 @@ class DecisionStore:
             at = str(row["at"] or "")
             if company not in latest or at > latest[company][0]:
                 latest[company] = (at, str(row["status"] or ""))
-        eligible_n = sum(
-            1 for _, status in latest.values() if status in {"READY", "ELIGIBLE"}
-        )
+        # ⚠ 新舊判準分開數，不要合成一個數字。`READY` 由 U7 之後的嚴重度判準產生，
+        # `ELIGIBLE` 由 U7 之前的資本判準產生——把兩者加起來，等於讓計數器在中途換定義，
+        # 而換定義造成的跳升會被讀成研究進展（同 2026-08-15 那次「分母混合當前狀態與
+        # 歷史軌跡」的壞指標形狀）。合計只在渲染時明講「另有 K 檔為 U7 前判準」。
+        eligible_n = sum(1 for _, status in latest.values() if status == "READY")
+        legacy_eligible_n = sum(1 for _, status in latest.values() if status == "ELIGIBLE")
         # 以公司為單位是對的，但不能因此把重複 cohort 藏起來——那會讓指標變乾淨、
         # 問題變隱形（ROADMAP 的「Engine D cohort 重複」backlog 就永遠不會有人發現）。
         # 同公司多 cohort 仍必須在 brief 現形，只是不再汙染上線比率的分母。
@@ -934,6 +956,8 @@ class DecisionStore:
             # 上線標的數：使用者實際要盯的廣度指標（ROADMAP 新 workstream 第一條）。
             # 分母是「有 identity 的公司數」，不含無 company_id 的殘骸與重複 cohort。
             "eligible_cohorts": eligible_n,
+            # U7 之前判準的殘量，分開呈現。它只會隨 reassess 遞減，不會增加。
+            "legacy_eligible_cohorts": legacy_eligible_n,
             "total_cohorts": len(latest),
             # 不進分母，但必須現形，否則修好指標等於把缺陷藏起來。
             "duplicate_cohort_companies": duplicates,
@@ -1620,16 +1644,11 @@ class DecisionStore:
         decision_digest: str,
         payload: Mapping[str, Any],
     ) -> DecisionExecutionResult:
-        sizing = payload["sizing"]
-        # 舊 decision 沒有 `research_status`，但它的 `paper_status == "ELIGIBLE"` 就是
-        # 同一件事的舊名字（見 models.RESEARCH_STATUSES）。讀取端容忍舊欄位、不回寫。
-        status = sizing.get("research_status")
-        if status is None:
-            status = "READY" if sizing.get("paper_status") == "ELIGIBLE" else "INCOMPLETE"
         return DecisionExecutionResult(
             decision_id=decision_id,
             decision_digest=decision_digest,
-            research_status=str(status),
+            # 舊欄位的還原只有一個入口，見 models.research_status_of。
+            research_status=research_status_of(payload["sizing"]),
         )
 
     def atomic_assess_probe(
@@ -2011,8 +2030,15 @@ class DecisionStore:
             raise ValueError("confirmation_ref must be non-empty when provided")
         if user_sized and force_override:
             raise ValueError("user_sized and force_override are mutually exclusive")
-        if user_sized and (not reason or not reason.strip()):
-            raise ValueError("user_sized choice requires an explicit reason")
+        # reason 綁在**實際結果**上，不綁旗標。U7 之後每一筆非零、非 override 的選擇
+        # 都會被記成 `user_sized`，但檢查若仍看 `user_sized` 旗標，不帶旗標就能記下一筆
+        # 沒有理由的 `user_sized`——欄位說「使用者決定的尺寸」，卻沒有任何一句說明是
+        # 依據什麼決定的。系統既然不再給尺寸，那句理由就是這筆決策僅存的可稽核依據。
+        if selected_weight > 0 and not force_override and not (reason or "").strip():
+            raise ValueError(
+                "a non-zero live choice requires an explicit reason: the system no longer "
+                "proposes any size, so the reason is the only record of what the size was based on"
+            )
         with immediate_transaction(self._conn):
             decision = self._conn.execute(
                 """

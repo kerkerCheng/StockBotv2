@@ -8,6 +8,7 @@ from typing import Any, Mapping, Sequence
 
 from .adapters.market import sessions_between
 from .blocker_severity import fatal_blockers
+from .models import research_status_of
 from .redaction import sensitive_payload_path
 from .store import DecisionStore
 
@@ -253,11 +254,8 @@ def build_action_card(
         alpha_beta["thesis_changed"] = True
     portfolio_status = str((portfolio_context or {}).get("status") or "ok")
     # 舊 decision 用 `paper_status`（ELIGIBLE／SHADOW_ONLY／DATA_NEEDED）表達同一件事；
-    # 讀取端容忍舊欄位、不回寫（L10／KTD4）。
-    research_status = str(
-        sizing.get("research_status")
-        or ("READY" if sizing.get("paper_status") == "ELIGIBLE" else "INCOMPLETE")
-    )
+    # 還原只有一個入口（L16），見 models.research_status_of。
+    research_status = research_status_of(sizing)
     freshness, current_paper_blockers, current_live_blockers = _runtime_freshness(
         context, card_as_of
     )
@@ -329,6 +327,17 @@ def build_action_card(
             "決定 close_probe（expired）或以新催化劑時點 reassess 延期；"
             "延期前先確認 expiry 不早於催化劑本身。"
         )
+    elif "single_position_nav_cap_reached" in set(sizing.get("live_blockers") or ()):
+        # 硬事實，不是研究進度：這一檔已經吃滿單筆 NAV 上限。U7 之前它由
+        # `live_current_position > supported_range[1]` 那條分支現形；區間移除後，
+        # `core_blockers` 只含 assessment ∪ coverage，於是**唯一一個真實資本上限
+        # 觸頂的情況變成完全不出聲**。它必須自己有一條分支。
+        attention = "REVIEW"
+        urgency = "prompt"
+        portfolio_action = "none"
+        single_name_action = "reduce_or_justify_over_cap"
+        reason = "目前 live 部位已達單筆 NAV 上限。"
+        next_action = "檢視減碼或明確記錄保留的理由；系統不會自動下單。"
     elif blocking_core_blockers:
         attention = "REVIEW"
         urgency = "next_review"
@@ -452,6 +461,11 @@ def build_action_card(
         "weakest_link": {
             "axis": axis,
             "level": axis_result["level"],
+            # ⚠ `level` 是**宣告**等級，`effective_level` 是引用成立與否之後的實質等級。
+            # `weakest_axis_of` 的 docstring 明文警告過只看 `level` 會漏掉
+            # fatal_axis_blocker 的軸（宣告 corroborated、實質 unknown）——而首屏的
+            # 排序鍵正是讀 `level`，等於在同一個坑上再踩一次。兩個都輸出，消費端才有得選。
+            "effective_level": axis_result.get("effective_level", axis_result["level"]),
             "reason": axis_result["reason"],
             "missing_data": axis_result["missing_data"],
         },

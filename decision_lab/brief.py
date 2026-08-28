@@ -21,10 +21,15 @@ def _evidence_gap_order(item: Mapping[str, Any]) -> tuple[int, int, str, str]:
     現在問的是「哪一檔最需要補證據」，答案就是最弱軸的等級。
 
     未知等級排最前：寧可多看一眼，也不要讓一個算不出等級的項目沉到底部。
+
+    ⚠ 讀 `weakest_effective_level`，不是宣告的 `weakest_level`。`weakest_axis_of` 的
+    docstring 明文記過這個坑：`_validate_assessment` 在 fatal_axis_blocker 時讓該軸
+    失效卻**不動宣告 level**，所以一個「宣告 corroborated、引用不成立」的軸用 raw
+    level 排序會被排到最後面——而它其實是最該先看的。
     """
     from .sizing import AXES, LEVELS
 
-    level = str(item.get("weakest_level") or "")
+    level = str(item.get("weakest_effective_level") or item.get("weakest_level") or "")
     axis = str(item.get("weakest_axis") or "")
     return (
         LEVELS.index(level) if level in LEVELS else -1,
@@ -103,6 +108,8 @@ def _decision_item(
         # 項目就是由它導出：「補哪一檔的哪一軸」比「REVIEW — co:xxx」可執行得多。
         "weakest_axis": (card.get("weakest_link") or {}).get("axis"),
         "weakest_level": (card.get("weakest_link") or {}).get("level"),
+        # 宣告等級與實質等級都跟著 item 走，消費端不必自己再查 decision（L16）。
+        "weakest_effective_level": (card.get("weakest_link") or {}).get("effective_level"),
         "weakest_missing_data": (card.get("weakest_link") or {}).get("missing_data") or [],
         "reason": card["reason"],
         "alpha_thesis_change": card.get("alpha_beta") or {"classification": "unknown"},
@@ -766,8 +773,16 @@ def build_today_brief(
     ranked = sorted(items, key=_evidence_gap_order)
     for position, item in enumerate(ranked, 1):
         item["index"] = position  # 穩定編號，供對話式批次核准引用（plan R5）
-    attention = ranked[0]["attention"] if ranked else "MONITOR"
-    if ranked:
+    # ⚠ 對**整份清單**聚合，不是取 `ranked[0]`。`ranked` 的排序鍵是最弱軸等級
+    # （「先看誰」），與「今天要不要動作」完全無關——實測 2026-08-29：26 個項目裡
+    # 12 個 REVIEW，而排在第一的是一檔 beta policy 涵蓋的 Sheet 持股（MONITOR），
+    # 於是首屏印出「今天需要動作嗎？否」，把 48 小時 disproof 項一起蓋掉。
+    # 展示順序與注意力是兩個問題，不該共用同一個表示（L12）。
+    first_review = next((i for i in ranked if i["attention"] == "REVIEW"), None)
+    attention = "REVIEW" if first_review is not None else "MONITOR"
+    if first_review is not None:
+        reason = first_review["reason"]
+    elif ranked:
         reason = ranked[0]["reason"]
     elif holdings_status not in {"available", "confirmed", "confirmed_empty"}:
         attention = "REVIEW"
@@ -853,18 +868,25 @@ def ranking_annotations(
         decision_id = summary.get("latest_decision_id")
         if not company or decision_id is None:
             continue
+        # 已結案的 probe 不代表這家公司現在的狀態；它的最弱軸會是一段凍結的歷史。
+        if str(summary.get("lifecycle_status") or "") in TERMINAL_LIFECYCLE_STATUSES:
+            continue
         try:
             payload = store.get_decision(str(decision_id))["payload"]
         except (KeyError, TypeError, ValueError):
             continue
+        # ⚠ last-wins，不是 first-wins。`list_operational_cohorts` 由舊到新，先前用
+        # `company not in weakest` 等於同公司多 cohort 時取**最舊**的那個——它的最弱軸
+        # 可能已經被補掉了。store.py 對「同公司多 cohort 取最新 decision」早有明文約定
+        # （ROADMAP 記載 co:lumentum 正是這個形狀），這裡沿用同一條。
         sizing = payload.get("sizing") or {}
         axis = sizing.get("weakest_axis")
-        if axis and company not in weakest:
+        if axis:
             weakest[company] = str(axis)
         coverage_id = str(
             (payload.get("request", {}).get("coverage") or {}).get("assessment_id") or ""
         )
-        if not coverage_id or company in disproofs:
+        if not coverage_id:
             continue
         try:
             condition = str(store.get_coverage_metadata(coverage_id)["disproof"] or "")
@@ -1042,11 +1064,15 @@ def render_today_markdown(brief: Mapping[str, Any]) -> str:
         # 且它的分母數的是歷來 decision，同一標的每 reassess 一次就 +1。
         # 單位是「有 identity 的公司」不是 cohort：無 company_id 的殘骸與同公司的
         # 重複 cohort 都不計，否則分母會謊報「還有救得回來的標的」。
+        legacy_eligible = int(counters.get("legacy_eligible_cohorts") or 0)
         line = (
             f"- 研究進展：上線標的 {eligible}/{total_cohorts} 檔"
             f"｜可量測 {measurable}/{anchored} 檔"
         )
-        if eligible == 0 and total_cohorts:
+        # 舊判準的殘量分開講，不加進上面那個數字——合起來會讓「換判準」看起來像「有進展」。
+        if legacy_eligible:
+            line += f"（另有 {legacy_eligible} 檔仍為 U7 前判準，reassess 後才會重算）"
+        if eligible == 0 and total_cohorts and not legacy_eligible:
             line += "　⚠ 目前沒有任何可評估標的"
         lines.append(line)
         # 提醒各自一行：主行是狀態、子行是待處理項。串在同一行會長到手機讀不完，

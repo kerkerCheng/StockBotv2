@@ -105,6 +105,33 @@ class CoverageResult:
 # 舊 `paper_status == "ELIGIBLE"` ≙ 新 `research_status == "READY"`。
 RESEARCH_STATUSES: tuple[str, ...] = ("READY", "INCOMPLETE", "DATA_NEEDED")
 
+# 舊 `paper_status` 的三個值到新三態的完整對應。
+#
+# ⚠ 這張表必須是**三對三**。首版只特判了 `ELIGIBLE`、其餘一律 `INCOMPLETE`，於是
+# 131 筆歷史 decision 裡的 **85 筆 `DATA_NEEDED` 被靜默改寫成 `INCOMPLETE`**——而兩者
+# 在新契約下的下一步不同（`INCOMPLETE` 要人去補研究，`DATA_NEEDED` 只要重抓資料），
+# 且 `DATA_NEEDED` 會驅動 Action Card 的 REVIEW 分支、`INCOMPLETE` 不會。少一個 case
+# 等於讓那 85 筆安靜退出待辦。`SHADOW_ONLY` 的語意是「資料齊但研究不足」＝ INCOMPLETE。
+_LEGACY_PAPER_STATUS: dict[str, str] = {
+    "ELIGIBLE": "READY",
+    "SHADOW_ONLY": "INCOMPLETE",
+    "DATA_NEEDED": "DATA_NEEDED",
+}
+
+
+def research_status_of(sizing: Mapping[str, Any]) -> str:
+    """從 decision payload 的 `sizing` 取研究完整度，容忍 U7 之前的舊欄位。
+
+    唯一的還原入口。先前 `action_card` 與 `store` 各寫一份，兩份都只特判 `ELIGIBLE`
+    ——同一個分類在兩處被重造，正是 L16 要防的形狀，而重造品立刻開始偏離。
+    """
+
+    declared = sizing.get("research_status")
+    if isinstance(declared, str) and declared in RESEARCH_STATUSES:
+        return declared
+    legacy = sizing.get("paper_status")
+    return _LEGACY_PAPER_STATUS.get(str(legacy), "INCOMPLETE")
+
 # Action Card 的注意力狀態，取代 U7 之前的四動作（`NO_ACTION`／`REVIEW`／`TRADE`／
 # `HEDGE`）。`TRADE` 與 `HEDGE` 是資本動作，系統既不給尺寸也不連 broker，說出這兩個詞
 # 等於宣稱一個它做不到的授權；它們原本的兩個情境（已接受 live 但未回報成交、投組曝險

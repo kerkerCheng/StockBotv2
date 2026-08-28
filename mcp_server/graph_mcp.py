@@ -246,9 +246,9 @@ def get_financial_checklist(ticker: str) -> str:
 def get_decision_brief() -> str:
     """今日 Engine D 決策摘要（純讀，遠端唯一的決策佇列視窗）。
 
-    回傳 `decision_lab today` 的 redacted public DTO：每筆需要動作的
-    cohort／decision 附 `NO ACTION / REVIEW / TRADE / HEDGE`、reason、
-    supported range、blockers 與 next review。純讀——不 freeze context、
+    回傳 `decision_lab today` 的 redacted public DTO：每筆 cohort／decision 附
+    `attention`（`MONITOR`／`REVIEW`）、最弱軸、reason、blockers 與 next review。
+    **系統不輸出任何部位尺寸**——買多少由使用者自行決定。純讀——不 freeze context、
     不建 decision、不寫任何 authority、不下單。
 
     Decision Store 是本機 private runtime，永不進 git；本工具是手機／雲端

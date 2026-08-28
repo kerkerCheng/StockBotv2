@@ -429,11 +429,16 @@ def run(
                 confirmation_ref=args.confirmation_ref,
                 user_sized=args.user_sized,
             )
+            # ⚠ 回報**實際持久化的** choice_type，不是旗標。U7 之後 store 對每一筆
+            # 非零、非 override 的選擇一律寫 `user_sized`，所以「不帶旗標就回報
+            # `system`」會說出一個系統已經不再做的事（系統不給尺寸）——輸出與 authority
+            # 相反，比不輸出更糟。
+            recorded = store.latest_live_choice(args.decision_id) or {}
             payload = {
                 "status": "recorded",
                 "choice_id": choice_id,
                 "decision_id": args.decision_id,
-                "sizing_source": "user" if args.user_sized else "system",
+                "choice_type": recorded.get("choice_type"),
             }
             _render(
                 payload,

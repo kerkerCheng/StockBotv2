@@ -113,6 +113,33 @@ def test_first_screen_order_is_ranking_then_nav() -> None:
     assert combined.index("瓶頸排序") < combined.index("持股 NAV 比例")
 
 
+def test_evidence_gap_order_reads_effective_level_not_declared_level() -> None:
+    """排序讀實質等級。宣告 corroborated 但引用不成立的軸最該先看，不是最後看。
+
+    `weakest_axis_of` 的 docstring 明文記過這個坑：`_validate_assessment` 在
+    fatal_axis_blocker 時讓該軸失效卻不動宣告 `level`。首屏排序原本讀 `level`，
+    等於在同一個坑上再踩一次。
+    """
+    items = [
+        {
+            "weakest_level": "corroborated",
+            "weakest_effective_level": "unknown",
+            "weakest_axis": "source_reliability",
+            "company_id": "co:broken_ref",
+        },
+        {
+            "weakest_level": "bounded_hypothesis",
+            "weakest_effective_level": "bounded_hypothesis",
+            "weakest_axis": "source_reliability",
+            "company_id": "co:honest",
+        },
+    ]
+
+    ordered = sorted(items, key=_evidence_gap_order)
+
+    assert [i["company_id"] for i in ordered] == ["co:broken_ref", "co:honest"]
+
+
 def test_items_sort_by_evidence_gap_not_capital_action() -> None:
     """排序鍵改為「誰最需要補證據」，不再是四動作的資本語意。"""
     items = [

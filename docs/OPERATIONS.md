@@ -89,9 +89,11 @@ live 資本仍各走 `complete-*` 與 exact 人工核准。`go` 只自動化「�
   `python -m decision_lab reassess <cohort_id> --intent <原 intent>` 產生新 decision，**下一次 `todo sync`
   會自己把該編號結掉**，不需要任何 verb。
 
-⚠ **`--intent` 必須沿用該 cohort 上一筆 decision 的值**，不可套用別處的習慣。實測：對一個先前是 `paper`
-的 cohort 跑 `--intent research`，`paper_status` 會由 `ELIGIBLE` 退成 `DATA_NEEDED`——那不是資料變壞，
-是 `execution_intent_research_only` 這個 paper blocker，純粹由參數造成。查證：
+⚠ **`--intent` 沿用該 cohort 上一筆 decision 的值**，讓評估條件不因呼叫端習慣而跳動。
+（原本還有一個更強的理由：對先前是 `paper` 的 cohort 跑 `--intent research` 會讓研究完整度
+由 `READY` 退成 `DATA_NEEDED`，純由參數造成。**那個陷阱已於 2026-08-29 從源頭修掉**——
+`sizing.py` 改用嚴重度分類，diagnostic 級的 `execution_intent_research_only` 不再有改判權。）
+查證：
 `select json_extract(payload_json,'$.request.execution_intent') from system_decisions where cohort_id=? order by rowid desc limit 1`。
 
 ### Leads

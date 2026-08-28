@@ -181,6 +181,59 @@ def test_beta_covered_holding_is_visible_but_not_an_alpha_todo(tmp_path: Path) -
         store.close()
 
 
+def test_action_needed_aggregates_the_whole_list_not_just_the_first_item(
+    tmp_path: Path,
+) -> None:
+    """清單裡只要有一個 REVIEW，首屏就必須說「是」。
+
+    2026-08-29 實測的 bug：`attention` 取 `ranked[0]`，而 `ranked` 的排序鍵是**最弱軸
+    等級**（「先看誰」），與注意力無關。於是排第一的 beta 涵蓋持股（MONITOR）會把
+    後面 12 個 REVIEW 全部蓋掉，首屏印出「今天需要動作嗎？否」。
+
+    這個 bug 能在 1093 passed 底下隱形，是因為每個 attention 情境測試都只有單一
+    項目——**混合清單本身就是缺的那個 case**，所以這條測試刻意排兩個不同狀態。
+    QQQ 由 beta policy 涵蓋（MONITOR）、未涵蓋的持股是 REVIEW，兩者排序鍵相同，
+    穩定排序會保留列出順序，因此 MONITOR 確實排在前面。
+    """
+    store = _store(tmp_path)
+    try:
+        brief = build_today_brief(
+            store,
+            as_of=NOW,
+            current_holdings={
+                "status": "available",
+                "rows": [
+                    {
+                        "ticker": "QQQ",
+                        "shares": 87.0,
+                        "currency": "USD",
+                        "market_value_base": 58767.63,
+                    },
+                    {
+                        "ticker": "ZZZZ",
+                        "shares": 10.0,
+                        "currency": "USD",
+                        "market_value_base": 1234.0,
+                    },
+                ],
+            },
+        )
+
+        attentions = [item["attention"] for item in brief["items"]]
+        assert "MONITOR" in attentions and "REVIEW" in attentions
+        # 這一行是 bug 的前提：排第一的是 MONITOR。若排序日後改變，這條會紅，
+        # 那是有用的訊號——代表下面那個斷言不再測到原本要防的東西。
+        assert attentions[0] == "MONITOR"
+        assert brief["attention"] == "REVIEW"
+        assert brief["action_needed"] is True
+        # reason 也要取自真正需要複查的那一項，不是排第一的那項。
+        assert brief["reason"] == next(
+            i["reason"] for i in brief["items"] if i["attention"] == "REVIEW"
+        )
+    finally:
+        store.close()
+
+
 def test_user_ignored_holding_is_not_an_alpha_todo(tmp_path: Path) -> None:
     store = _store(tmp_path)
     try:
