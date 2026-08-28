@@ -62,12 +62,13 @@ permission profile 當成 scheduled primary path。下列連外命令**第一次
 outside-sandbox rule**，
 不是先製造可預期的 `access_blocked` 再以升權重重跑；不得放行整個 PowerShell、Python、Git 或 working tree。
 fixed entry 包含
-`crons\harvest_leads.py`、`engine_c\etl_yfinance.py`、`fetchers\edgar.py`、
+`crons\harvest_leads.py`、`engine_c\etl_yfinance.py`、`fetchers\edgar.py`、`fetchers\mops.py`、
 `scripts\alpha_purity_snapshot.py`、
 `scripts\daily_beta_snapshot.py`、`engine_b.cli list`、`engine_b.cli drain`、
 `scripts\catalyst_watch.py`、`scripts\outcome_if_settled_today.py`、`scripts\prepare_research_action.py --action-file`、
 `decision_lab today`、`engine_b.todo sync`、`engine_b.todo work`、`scripts\publish_daily_state.py` 與
-`scripts\publish_daily_brief.py`；十五條 rule 就是單一 authority，不是 primary＋fallback 兩套來源。
+`scripts\publish_daily_brief.py`；十六條 rule 就是單一 authority，不是 primary＋fallback 兩套來源。
+⚠ `fetchers/` 不是整包放行：只有 `edgar.py` 與 `mops.py` 在列，`gsheets.py` 帶 Google 憑證故排除。
 `engine_b.todo work` 只 checkpoint 已由使用者 exact `go` 且已有 `dispatch_ref` 的 decision-review work order；
 它不授權 `dispatch`／`resolve`／`reassess`，也不放寬 graph admission 或 live gate。
 `query.bottleneck`、`query.coverage_gaps`、harvest health、trace backlog、todo list 與 JSON 檢查已可留在 sandbox；使用者核准後的
@@ -228,7 +229,7 @@ prepare 前先把「graph delta 涵蓋哪些公司」與「完成後唯一要建
 
 這支 CLI 只接受該 draft 目錄、重跑既有 extraction／storage／permission validation 並寫 owner-only private
 staging；不 apply、不寫 Neo4j、不建 Decision／live permission。只有回 `status=ready` 才可把 lead checkpoint
-成 `action_prepared`。SEC 原文若需 repo fetcher，使用 `fetchers\edgar.py` exact rule；其他公開頁可走
+成 `action_prepared`。SEC 原文若需 repo fetcher，使用 `fetchers\edgar.py` exact rule；台股原文用 `fetchers\mops.py` exact rule；其他公開頁可走
 WebSearch／Browser，兩者是 shell rules 之外的獨立權限 surface。
 
 每輪 drain 後另列不會被一般 queue 自動撿回的 trace backlog：

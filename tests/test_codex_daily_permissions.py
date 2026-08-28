@@ -17,12 +17,13 @@ def test_project_does_not_define_an_ignored_permission_profile() -> None:
 
 def test_all_privileged_daily_entries_have_narrow_outside_sandbox_rules() -> None:
     rules = RULES.read_text(encoding="utf-8")
-    assert rules.count("prefix_rule(") == 15
+    assert rules.count("prefix_rule(") == 16
     for fixed_entry in (
         "crons\\\\harvest_leads.py",
         "engine_c\\\\etl_yfinance.py",
         "scripts\\\\alpha_purity_snapshot.py",
         "fetchers\\\\edgar.py",
+        "fetchers\\\\mops.py",
         "scripts\\\\daily_beta_snapshot.py",
         '"-m", "engine_b.cli", "list"',
         '"-m", "engine_b.cli", "drain"',
@@ -54,6 +55,27 @@ def test_all_privileged_daily_entries_have_narrow_outside_sandbox_rules() -> Non
     ):
         assert broad_entry not in rules
     assert "stockbot-daily" not in rules
+
+
+def test_fetchers_directory_is_not_broadly_allowed() -> None:
+    """fetchers/ 只放行兩支公開文件下載器，不是整包。
+
+    edgar.py 與 mops.py 都是「從公開來源抓指定文件到本機 raw store」，無憑證、
+    不碰 identity/ACL、不寫 private authority。同目錄的 gsheets.py 則使用 Google
+    service account 憑證，屬 credential-bearing surface——放行整個 fetchers 目錄
+    會把它一併帶進去，那正是 AGENTS.md 說的「用 broad permission 掩蓋整合缺口」。
+    """
+    rules = RULES.read_text(encoding="utf-8")
+
+    assert "fetchers\\\\edgar.py" in rules
+    assert "fetchers\\\\mops.py" in rules
+
+    for credential_bearing in (
+        "fetchers\\\\gsheets.py",
+        'pattern=[".venv\\\\Scripts\\\\python.exe", "fetchers"]',
+        'pattern=[".venv\\\\Scripts\\\\python.exe", "-m", "fetchers"]',
+    ):
+        assert credential_bearing not in rules
 
 
 def test_project_memory_defines_common_sandbox_impact_review() -> None:

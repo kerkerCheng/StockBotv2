@@ -1,6 +1,10 @@
-# Codex standalone scheduled task 會沿用 workspace-write sandbox；以下十五個 fixed entry
+# Codex standalone scheduled task 會沿用 workspace-write sandbox；以下十六個 fixed entry
 # 是 Daily 唯一的 outside-sandbox 權限來源。首次呼叫就使用 exact rule，不先失敗再重跑；
 # 不放行任意 Python、PowerShell、shell、Git 或 working tree。
+#
+# ⚠ fetchers 目錄**不是**整包放行：只有 edgar.py 與 mops.py 兩支公開文件下載器在列。
+# 同目錄的 gsheets.py 會使用 Google service account 憑證，屬 credential-bearing surface，
+# 刻意不放行；要動它必須另做 impact review。
 prefix_rule(
     pattern=[".venv\\Scripts\\python.exe", "crons\\harvest_leads.py"],
     decision="allow",
@@ -23,6 +27,12 @@ prefix_rule(
     pattern=[".venv\\Scripts\\python.exe", "fetchers\\edgar.py"],
     decision="allow",
     justification="Daily pq1 source-trace 只從 SEC EDGAR 下載指定 ticker／form 的公開原始文件到本機 raw store。",
+)
+
+prefix_rule(
+    pattern=[".venv\\Scripts\\python.exe", "fetchers\\mops.py"],
+    decision="allow",
+    justification="Daily pq1 source-trace 的台股對應項：只從公開資訊觀測站（doc.twse.com.tw）下載指定代號的公開年報／財報到本機 raw store，與 edgar.py 同構。無憑證、不碰 Windows identity／ACL、不寫 private authority、不觸 .git。台股 issuer 的客戶集中度只在 MOPS 年報揭露，公司 IR 網頁為動態載入抓不到。",
 )
 
 prefix_rule(

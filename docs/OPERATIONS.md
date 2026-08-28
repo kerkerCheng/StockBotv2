@@ -214,7 +214,7 @@ Sheet adapter 的標準輸出是 `ticker`、`shares`、`currency`、`market_valu
 
 Price／FX 預設 yfinance（無 API key）。非同幣 FX 缺失或方向不符一律 fail closed。
 
-Codex standalone scheduled task 會沿用 legacy `workspace-write` sandbox，因此 project permission profile 不作 Daily authority。唯一權限來源是 `.codex/rules/stockbot-automations.rules` 的十五個窄 fixed entry：harvest、Engine C ETL、Alpha purity snapshot、SEC EDGAR pq1 fetch、Beta snapshot、pending priority list、pq1 drain、catalyst watch、Alpha outcome snapshot、Research Action prepare、decision today、todo sync、已核准 work order checkpoint、state publisher、Discord publisher，第一次呼叫就用 `require_escalated` 命中各自 exact outside-sandbox rule；不先失敗再升權重補跑，也不放行任意 Python、PowerShell、Git 或 working tree。`engine_b.todo work` 只可推進已有 `dispatch_ref` 的 USER-GO work order，不授權 dispatch／resolve／reassess。修改 rules 後須讓 Codex 重新載入設定；但在要求重啟前先確認 exact rule **確實存在**，因為重啟不能修復漏寫的 rule。
+Codex standalone scheduled task 會沿用 legacy `workspace-write` sandbox，因此 project permission profile 不作 Daily authority。唯一權限來源是 `.codex/rules/stockbot-automations.rules` 的十六個窄 fixed entry：harvest、Engine C ETL、Alpha purity snapshot、SEC EDGAR pq1 fetch、MOPS 台股 pq1 fetch、Beta snapshot、pending priority list、pq1 drain、catalyst watch、Alpha outcome snapshot、Research Action prepare、decision today、todo sync、已核准 work order checkpoint、state publisher、Discord publisher，第一次呼叫就用 `require_escalated` 命中各自 exact outside-sandbox rule；不先失敗再升權重補跑，也不放行任意 Python、PowerShell、Git 或 working tree。`engine_b.todo work` 只可推進已有 `dispatch_ref` 的 USER-GO work order，不授權 dispatch／resolve／reassess。修改 rules 後須讓 Codex 重新載入設定；但在要求重啟前先確認 exact rule **確實存在**，因為重啟不能修復漏寫的 rule。
 
 **Triage classification surface impact（2026-08-27）：** `engine_b.cli triage` 新增的分類參數只會
 atomic 寫 tracked `library/leads/pending_leads.json`；`classification-health` 只讀同檔並以 exit 2
@@ -291,11 +291,15 @@ fetcher 已封裝的四個坑，自己刻之前先讀 `fetchers/mops.py` 的 doc
 ⚠ EDINET API v2 需 subscription key（未申請）；2026-08-28 實測改抓 TDnet 決算短信正本
 即取得所需資料。尚未封裝成 fetcher。
 
-**⚠ 若日後要讓 daily／weekly 等 unattended routine 呼叫這支 fetcher**，依 AGENTS.md 的
-「Codex sandbox／private authority 整合契約」必須在**同一個 change** 內完成 sandbox impact
-review：列出 path／side effect／網路能力、新增最窄的 `.codex/rules/*.rules` exact prefix、
-更新 permission contract test、並用 scheduled task 的相同 sandbox 與 exact command 跑一次
-端到端 smoke test。目前只做互動式入口，故未動 rules。
+**已納入 Daily（2026-08-28 完成 sandbox impact review）。** `fetchers\mops.py` 是第十六個
+fixed entry，與 `edgar.py` 同構：無憑證、不碰 Windows identity／ACL、不寫 private authority、
+不觸 `.git`，只把公開文件下載到 `library/raw/`。Daily pq1 遇到台股標的時直接以
+`require_escalated` 命中該 exact rule。
+
+**⚠ `fetchers/` 不是整包放行。** 只有 `edgar.py` 與 `mops.py` 兩支公開文件下載器在列；
+同目錄的 `gsheets.py` 使用 Google service account 憑證，屬 credential-bearing surface，
+刻意排除。`tests/test_codex_daily_permissions.py::test_fetchers_directory_is_not_broadly_allowed`
+會擋下把整個目錄或 `-m fetchers` 放行的寫法。要動 `gsheets.py` 必須另做一次 impact review。
 
 ---
 

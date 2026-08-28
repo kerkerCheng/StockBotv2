@@ -22,10 +22,10 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
    `.codex/rules/stockbot-automations.rules` 的窄 fixed entry。下列連外命令第一次呼叫就用
    `require_escalated` 命中 exact outside-sandbox rule，不得先在 sandbox 製造可預期失敗再升權重重跑，也不得放行整個 PowerShell、
    Python、Git 或 working tree。fixed entry 是 `crons\harvest_leads.py`、`engine_c\etl_yfinance.py`、
-   `fetchers\edgar.py`、`scripts\daily_beta_snapshot.py`、`engine_b.cli list`、`engine_b.cli drain`、
+   `fetchers\edgar.py`、`fetchers\mops.py`、`scripts\daily_beta_snapshot.py`、`engine_b.cli list`、`engine_b.cli drain`、
    `scripts\catalyst_watch.py`、`scripts\alpha_purity_snapshot.py`、`scripts\outcome_if_settled_today.py`、`scripts\prepare_research_action.py --action-file`、`decision_lab today`、
    `engine_b.todo sync`、`engine_b.todo work`、`scripts\publish_daily_state.py`、`scripts\publish_daily_brief.py`。
-   十五條 rule 是單一 authority，不是 primary＋fallback 兩套權限。`engine_b.todo work` 只 checkpoint 已由使用者
+   十六條 rule 是單一 authority，不是 primary＋fallback 兩套權限。`engine_b.todo work` 只 checkpoint 已由使用者
    exact `go` 且已有 `dispatch_ref` 的 decision-review work order；不得用它代替 `dispatch`／`resolve`／`reassess`。
    若 exact rule 未匹配、升權限被拒或命令
    仍回 `access_blocked`，保留 failure 並 fail closed，不得改用更寬 rule 或手動重跑。權限正確後若仍發生
@@ -97,7 +97,7 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
    不得先在 sandbox 製造 owner-only verification failure，再以剩餘 budget 處理 leads；
    tracked tickers 由非 retired lifecycle 與 non-terminal Decision cohorts 自動導出。對最高 priority leads 逐則
    source-trace＋extract，checkpoint `researching` → `action_prepared`。SEC 原文需要 repo fetcher 時使用
-   `.venv\Scripts\python.exe fetchers\edgar.py ...` 的 exact rule；一般公開頁仍可使用 WebSearch／Browser surface。
+   `.venv\Scripts\python.exe fetchers\edgar.py ...` 的 exact rule；**台股原文改用 `.venv\Scripts\python.exe fetchers\mops.py --co-id <代號> --kind annual_report`**（公司 IR 網頁是動態載入抓不到，客戶集中度只在 MOPS 年報揭露）；一般公開頁仍可使用 WebSearch／Browser surface。
    有可核准 graph delta 才把 request JSON 寫到 ignored `library/leads/action_drafts/<lead>.json`，再執行
    `.venv\Scripts\python.exe scripts\prepare_research_action.py --action-file library\leads\action_drafts\<lead>.json`；
    這一步只凍結 private staging，不 apply、不寫 Neo4j。prepare 成功後才 checkpoint `action_prepared`；
