@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import logging
 from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta, timezone
 from typing import Any, Mapping
@@ -21,6 +22,8 @@ from .sizing import AXES
 from .store import DecisionStore
 from .workflow_ports import AuthoritySnapshot, IdentityAuthority, WorkflowDataProvider
 
+
+_LOG = logging.getLogger(__name__)
 
 _INTENTS = {"research", "paper", "live"}
 
@@ -172,7 +175,14 @@ def _unknown_assessment() -> dict[str, dict[str, Any]]:
     }
 
 
-def _unavailable_snapshot(identity: IdentityAuthority) -> AuthoritySnapshot:
+def _unavailable_snapshot(
+    identity: IdentityAuthority, *, failure: str | None = None
+) -> AuthoritySnapshot:
+    """整份 snapshot 不可用時的 fail-closed 佔位。
+
+    `failure` 帶的是**例外類型名**（例如 `HttpError`、`TimeoutError`），不是訊息本文——
+    訊息可能含憑證路徑或 token 片段，只寫進 log，不進 decision payload。
+    """
     company_id = identity.company_id
     return AuthoritySnapshot(
         identity=identity,
@@ -198,6 +208,10 @@ def _unavailable_snapshot(identity: IdentityAuthority) -> AuthoritySnapshot:
             "market": "unavailable",
             "fx": "unavailable",
             "holdings": "unavailable",
+            # 沒有 failure 就不寫這個 key：它的存在本身就代表「這批 unavailable 是同一次
+            # 取得失敗的投影」，而不是各自獨立缺資料。少了它，下游只看到五個互不相關的
+            # blocker，會把一次 provider 例外誤讀成研究不足（2026-08-28 實測）。
+            **({"snapshot_failure": failure} if failure else {}),
         },
     )
 
@@ -209,10 +223,23 @@ def _snapshot(
 ) -> AuthoritySnapshot:
     try:
         snapshot = provider.snapshot(identity=identity, evaluation_at=evaluation_at)
-    except Exception:
-        return _unavailable_snapshot(identity)
+    except Exception as exc:
+        # fail closed，但不要靜默：訊息進 log、類型進 payload。
+        _LOG.warning(
+            "authority snapshot failed for %s at %s: %s",
+            identity.company_id or "unresolved",
+            evaluation_at,
+            exc,
+            exc_info=True,
+        )
+        return _unavailable_snapshot(identity, failure=type(exc).__name__)
     if not isinstance(snapshot, AuthoritySnapshot):
-        return _unavailable_snapshot(identity)
+        _LOG.warning(
+            "authority provider returned %s for %s, expected AuthoritySnapshot",
+            type(snapshot).__name__,
+            identity.company_id or "unresolved",
+        )
+        return _unavailable_snapshot(identity, failure="InvalidSnapshotType")
     return snapshot
 
 
