@@ -1,0 +1,133 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "vpec_2455_annual_report_fy2025_20260508",
+    "title": "全新光電（VPEC，2455）114 年度股東會年報 — 化合物半導體產業結構與競爭情形",
+    "url": "https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=F&co_id=2455&filename=2025_2455_20260529F04.pdf",
+    "origin_entity": "Visual Photonics Epitaxy",
+    "publisher": "Taiwan MOPS 公開資訊觀測站電子書",
+    "published_at": "2026-05-08",
+    "retrieved_at": "2026-08-28",
+    "source_type": "filing",
+    "evidence_tier": 1,
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "Public MOPS annual report; only the research-relevant excerpt is retained alongside the canonical carrier URL."
+  },
+  "sources": [
+    {
+      "id": "vpec_2455_annual_report_fy2025_20260508_s1",
+      "locator": "五、營運概況 — 競爭情形 — 光電子元件",
+      "quote": "本公司光電子產品採用 MOCVD 機台製作磊晶層，在國外競爭者主要為英商 IQE；國內主要競爭者為聯亞光電。"
+    },
+    {
+      "id": "vpec_2455_annual_report_fy2025_20260508_s2",
+      "locator": "五、營運概況 — 競爭情形 — 微電子元件",
+      "quote": "本公司主要產品為異質接面雙載子電晶體(HBT)磊晶片，在國外競爭者主要為英商 IQE(2013 年 1 月 IQE 取得 Kopin 之 MOCVD 磊晶部門)及日商 Hitachi Cable；國內主要競爭者為台灣高平(原為美商 Kopin 之台灣子公司，亦隨 IQE 之購併交易併入 IQE 旗下)。"
+    },
+    {
+      "id": "vpec_2455_annual_report_fy2025_20260508_s3",
+      "locator": "五、營運概況 — 產業結構（年報標註 Source: Yole）",
+      "quote": "產業別 國內投入廠商 國外投入廠商 磊晶 全新光電、台灣高平磊晶(IQE)、聯亞光電等 IQE、InteliEpi (英特磊)、Picogiga (Soitec)、Sumika 等 晶圓代工 穩懋、宏捷、聯穎等 GCS、廈門三安、福聯等 IDM 廠 全訊 Skyworks、Qorvo、Broadcom 等"
+    },
+    {
+      "id": "vpec_2455_annual_report_fy2025_20260508_s4",
+      "locator": "五、營運概況 — 產業上、中、下游之關聯性",
+      "quote": "生產一顆砷化鎵 IC，製程依序是拉晶(基板製造)，其次是磊晶，再其次就進入 IC 生產的流程，最後是封裝與測試。化合物半導體與元素(矽)半導體最大的不同點，就在於化合物半導體的磊晶過程比較複雜，所以才形成了單獨的磊晶事業，而矽的磊晶步驟則多在晶圓廠中進行。由於元件特性多半於磊晶階段決定，因此磊晶是供應鏈中相當重要的一環攸關客戶端產品良率、特性與品質。"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:vpec",
+      "type": "Company",
+      "name": "VPEC",
+      "abstraction_level": "materials_substrate",
+      "role": "foundry",
+      "aliases": ["Visual Photonics Epitaxy", "全新光電", "2455.TW"],
+      "attributes": {},
+      "confidence": 0.95,
+      "source_ids": ["vpec_2455_annual_report_fy2025_20260508_s1"]
+    },
+    {
+      "id": "co:landmark_optoelectronics",
+      "type": "Company",
+      "name": "LandMark Optoelectronics Corporation",
+      "abstraction_level": "device_chip",
+      "role": "bottleneck_supplier",
+      "aliases": ["聯亞光電", "3081.TWO"],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": ["vpec_2455_annual_report_fy2025_20260508_s1"]
+    },
+    {
+      "id": "co:iqe",
+      "type": "Company",
+      "name": "IQE plc",
+      "abstraction_level": "materials_substrate",
+      "role": "material_base",
+      "aliases": ["IQE", "台灣高平磊晶"],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": ["vpec_2455_annual_report_fy2025_20260508_s1"]
+    },
+    {
+      "id": "co:intelliepi",
+      "type": "Company",
+      "name": "IntelliEPI",
+      "abstraction_level": "materials_substrate",
+      "role": "foundry",
+      "aliases": ["IET-KY", "英特磊", "InteliEpi", "IntelliEPI Inc. (Cayman)", "4971.TWO"],
+      "attributes": {},
+      "confidence": 0.85,
+      "source_ids": ["vpec_2455_annual_report_fy2025_20260508_s3"]
+    }
+  ],
+  "edges": [
+    {
+      "id": "vpec_2455_annual_report_fy2025_20260508_e1",
+      "src_id": "co:vpec",
+      "dst_id": "co:landmark_optoelectronics",
+      "relation": "competes_with",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": ["vpec_2455_annual_report_fy2025_20260508_s1"]
+    },
+    {
+      "id": "vpec_2455_annual_report_fy2025_20260508_e2",
+      "src_id": "co:vpec",
+      "dst_id": "co:iqe",
+      "relation": "competes_with",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": ["vpec_2455_annual_report_fy2025_20260508_s1", "vpec_2455_annual_report_fy2025_20260508_s2"]
+    }
+  ],
+  "claims": [
+    {
+      "id": "vpec_2455_annual_report_fy2025_20260508_cl1",
+      "statement": "VPEC states that for its optoelectronic products, which use MOCVD to grow the epitaxial layer, its principal domestic competitor is LandMark Optoelectronics and its principal foreign competitor is IQE. This is a competitor-side statement placing VPEC and LandMark at the same layer of the supply chain, made by a party with no incentive to overstate a rival's position.",
+      "subject_id": "vpec_2455_annual_report_fy2025_20260508_e1",
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Revise if VPEC later reclassifies LandMark as a customer or supplier rather than a competitor, or if either company discloses a supply relationship between them. 核查頻率：每年年報；觸發後 48 小時內人工 review。",
+      "confidence": 0.9,
+      "source_ids": ["vpec_2455_annual_report_fy2025_20260508_s1"]
+    },
+    {
+      "id": "vpec_2455_annual_report_fy2025_20260508_cl2",
+      "statement": "VPEC reproduces a Yole-sourced industry structure table that places epitaxy as a distinct layer, listing VPEC, IQE Taiwan and LandMark Optoelectronics as domestic epitaxy players and IQE, IntelliEPI, Picogiga (Soitec) and Sumika as foreign ones, with wafer foundry and IDM as separate downstream layers. The process order given is crystal growth (substrate) then epitaxy then IC fabrication then packaging and test. NOTE: the table is attributed to Yole in the annual report, so it is third-party research reproduced by VPEC rather than VPEC's own primary assertion.",
+      "subject_id": "co:vpec",
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Revise if a later Yole or equivalent third-party structure places these companies in different layers, or if any listed company is shown to operate across layers in a way that makes the single-layer assignment misleading. 核查頻率：每年年報；觸發後 48 小時內人工 review。",
+      "confidence": 0.85,
+      "source_ids": ["vpec_2455_annual_report_fy2025_20260508_s3", "vpec_2455_annual_report_fy2025_20260508_s4"]
+    },
+    {
+      "id": "vpec_2455_annual_report_fy2025_20260508_cl3",
+      "statement": "The Yole-sourced structure table reproduced by VPEC lists InteliEpi (IntelliEPI) among the foreign epitaxy players, alongside IQE, Picogiga (Soitec) and Sumika. This places IntelliEPI at the same supply-chain layer as VPEC, IQE and LandMark, sourced from a party other than IntelliEPI itself.",
+      "subject_id": "co:intelliepi",
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Revise if a later edition of this structure table moves IntelliEPI to a different layer, or if IntelliEPI is shown to operate primarily outside epitaxy. 核查頻率：每年年報；觸發後 48 小時內人工 review。",
+      "confidence": 0.8,
+      "source_ids": ["vpec_2455_annual_report_fy2025_20260508_s3"]
+    }
+  ]
+}

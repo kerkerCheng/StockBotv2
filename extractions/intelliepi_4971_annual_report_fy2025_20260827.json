@@ -1,0 +1,127 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "intelliepi_4971_annual_report_fy2025_20260827",
+    "title": "英特磊（IntelliEPI / IET-KY，4971）114 年度股東會年報（股東會後修訂本） — 光通訊產業分層與 MBE 競爭情形",
+    "url": "https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=F&co_id=4971&filename=2025_4971_20260623F11.pdf",
+    "origin_entity": "IntelliEPI",
+    "publisher": "Taiwan MOPS 公開資訊觀測站電子書",
+    "published_at": "2026-08-27",
+    "retrieved_at": "2026-08-28",
+    "source_type": "filing",
+    "evidence_tier": 1,
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "Public MOPS annual report; only the research-relevant excerpt is retained alongside the canonical carrier URL."
+  },
+  "sources": [
+    {
+      "id": "intelliepi_4971_annual_report_fy2025_20260827_s1",
+      "locator": "五、營運概況 — 競爭情形 (1)",
+      "quote": "本公司主要產品之ㄧ為砷化鎵 pHEMT 磊晶片，以 pHEMT 而言，在國外競爭者主要為英商 IQE 及日商 Hitachi Cable；國內競爭者為全新光電，其中，除 IQE外，Hitachi Cable及全新光電皆為 MOCVD廠商，其主要產品為 HBT晶片，在pHEMT量產能力與經驗上顯然不同於本公司。"
+    },
+    {
+      "id": "intelliepi_4971_annual_report_fy2025_20260827_s2",
+      "locator": "五、營運概況 — 競爭情形 (2)",
+      "quote": "以磷化銦為基礎的 HBT/HEMT/APD (InP-based HBT/HEMT/APD) 以及紅外線光偵檢器(IR Detector)，由於 MOCVD 缺乏超薄層厚度控制、磊晶層高界面解析度(abrupt interface)、高摻雜濃度控制等磊晶成長之關鍵硬體能力，這些產品只能仰賴 MBE 技術才能達到要求的技術規格。"
+    },
+    {
+      "id": "intelliepi_4971_annual_report_fy2025_20260827_s3",
+      "locator": "五、營運概況 — 產業上、中、下游之關聯性 — 光通訊產業分層",
+      "quote": "產業別 產品項目 / 製程技術 國內投入廠商 國外投入廠商 磊晶 LD/MOCVD LD/MBE PD/ MOCVD PD/ MBE 全新光電、晶電、聯亞、華力捷等 IntelliEPI、IQE、Coherent 等 晶圓代工 VCSEL (4”, 6”) PIN (2”) APD (2”) 穩懋、宏捷科、華星光、光環、鼎元、聯穎、索爾思等 Accelink、GCS 等 封裝 封裝測試 光環、華星光、光紅建聖、聯均等 Accelink 模組 收發器(Transceiver) 索爾思、眾達光電 Neophotonics、Oplink、Innolight IDM 廠 Module (從設計、製造、到封裝測試都自行完成) 光環 Broadcom、Coherent"
+    },
+    {
+      "id": "intelliepi_4971_annual_report_fy2025_20260827_s4",
+      "locator": "五、營運概況 — 競爭情形 (2) 續",
+      "quote": "以磷化銦為基礎的 HBT 而言，本公司已與主要客戶簽訂長期獨家供應合約，透過此合約世界上最大的磷化銦整合元件製造代工公司 (IDM)將與本公司獨家合作，拓展這些產品如高頻偵測儀器的技術領域與應用。"
+    },
+    {
+      "id": "intelliepi_4971_annual_report_fy2025_20260827_s5",
+      "locator": "五、營運概況 — 競爭情形 (3)",
+      "quote": "砷化鎵面射型雷射 VCSEL 使用於行動裝置，本公司為唯一一家使用量產型 MBE 機台成功開出面射型雷射 VCSEL 量產技術，擁有高均勻性與低殘留應力等優越性，其他同業如IQE、全新光電及Sumika 均使用 MOCVD 生產面射型雷射 VCSEL。"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:intelliepi",
+      "type": "Company",
+      "name": "IntelliEPI",
+      "abstraction_level": "materials_substrate",
+      "role": "foundry",
+      "aliases": ["IET-KY", "英特磊", "InteliEpi", "IntelliEPI Inc. (Cayman)", "4971.TWO"],
+      "attributes": {},
+      "confidence": 0.95,
+      "source_ids": ["intelliepi_4971_annual_report_fy2025_20260827_s1"]
+    },
+    {
+      "id": "co:vpec",
+      "type": "Company",
+      "name": "VPEC",
+      "abstraction_level": "materials_substrate",
+      "role": "foundry",
+      "aliases": ["Visual Photonics Epitaxy", "全新光電", "2455.TW"],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": ["intelliepi_4971_annual_report_fy2025_20260827_s1"]
+    },
+    {
+      "id": "co:iqe",
+      "type": "Company",
+      "name": "IQE plc",
+      "abstraction_level": "materials_substrate",
+      "role": "material_base",
+      "aliases": ["IQE"],
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": ["intelliepi_4971_annual_report_fy2025_20260827_s1"]
+    }
+  ],
+  "edges": [
+    {
+      "id": "intelliepi_4971_annual_report_fy2025_20260827_e1",
+      "src_id": "co:intelliepi",
+      "dst_id": "co:vpec",
+      "relation": "competes_with",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": ["intelliepi_4971_annual_report_fy2025_20260827_s1"]
+    },
+    {
+      "id": "intelliepi_4971_annual_report_fy2025_20260827_e2",
+      "src_id": "co:intelliepi",
+      "dst_id": "co:iqe",
+      "relation": "competes_with",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": ["intelliepi_4971_annual_report_fy2025_20260827_s1", "intelliepi_4971_annual_report_fy2025_20260827_s5"]
+    }
+  ],
+  "claims": [
+    {
+      "id": "intelliepi_4971_annual_report_fy2025_20260827_cl1",
+      "statement": "IntelliEPI's optical-communications industry structure table lists Coherent in BOTH the epitaxy layer (alongside IntelliEPI and IQE, foreign players) and the IDM layer (alongside Broadcom). Domestic epitaxy players are listed as VPEC, Epistar, LandMark and Forefront. This reconciles two sources that otherwise appear to conflict: Coherent's FY2026 10-K describes itself as vertically integrated and manufacturing lasers in-house, while LandMark's FY2025 annual report describes itself as an outsourced epitaxy partner for IDMs with no competitive overlap with their end markets. Both can hold, but the conclusion must be split by counterparty: for Coherent, LandMark is a same-layer competitor rather than an upstream supplier; Broadcom appears only in the IDM layer, so outsourced epitaxy remains structurally possible there.",
+      "subject_id": "co:intelliepi",
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Revise if a later edition of this table, or an equivalent third-party industry map, stops placing Coherent in the epitaxy layer, or if Coherent discloses that it has exited in-house epitaxy. 核查頻率：每年年報；觸發後 48 小時內人工 review。",
+      "confidence": 0.85,
+      "source_ids": ["intelliepi_4971_annual_report_fy2025_20260827_s3"]
+    },
+    {
+      "id": "intelliepi_4971_annual_report_fy2025_20260827_cl2",
+      "statement": "IntelliEPI asserts that InP-based HBT/HEMT/APD devices and IR detectors can only be produced with MBE, because MOCVD lacks the ultra-thin layer thickness control, abrupt interface resolution and high doping concentration control required. If correct, this is a process-level constraint separating MBE and MOCVD epitaxy houses into non-substitutable pools for these specific device types, rather than a single undifferentiated epitaxy layer. NOTE: this is a supplier-side claim about the limits of a rival process; it has not been corroborated by a customer or third party.",
+      "subject_id": "co:intelliepi",
+      "demand_proof_level": "guided",
+      "disproof_condition": "Downgrade if any MOCVD house (IQE, VPEC or LandMark) ships qualified InP-based APD or IR detector epitaxy in volume, or if a customer discloses dual-sourcing such devices across MBE and MOCVD suppliers. 核查頻率：每年年報與同業產品發表；觸發後 48 小時內人工 review。",
+      "confidence": 0.6,
+      "source_ids": ["intelliepi_4971_annual_report_fy2025_20260827_s2", "intelliepi_4971_annual_report_fy2025_20260827_s5"]
+    },
+    {
+      "id": "intelliepi_4971_annual_report_fy2025_20260827_cl3",
+      "statement": "IntelliEPI states it has signed a long-term exclusive supply agreement for InP-based HBT with what it describes as the world's largest InP integrated device manufacturer, but does not name that counterparty and discloses no value, volume or term. The identity must not be inferred. Per L8 this is a supplier self-report of its own exclusivity and can rank no higher than verified_by_absence until a customer-side or third-party source confirms it.",
+      "subject_id": "co:intelliepi",
+      "demand_proof_level": "speculative",
+      "disproof_condition": "Upgrade only if a customer-side filing or third-party source names the counterparty and confirms exclusivity; revise if IntelliEPI later discloses termination or non-exclusivity. 核查頻率：每年年報；觸發後 48 小時內人工 review。",
+      "confidence": 0.5,
+      "source_ids": ["intelliepi_4971_annual_report_fy2025_20260827_s4"]
+    }
+  ]
+}

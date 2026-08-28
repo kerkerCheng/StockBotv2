@@ -173,6 +173,11 @@
       "research_ticker": "INTC"
     },
     {
+      "company_id": "co:intelliepi",
+      "research_ticker": "4971.TWO",
+      "market_currency": "TWD"
+    },
+    {
       "company_id": "co:iqe",
       "research_ticker": "IQE.L",
       "market_currency": "GBp"
@@ -428,7 +433,8 @@
     },
     {
       "company_id": "co:vpec",
-      "research_ticker": "2455.TW"
+      "research_ticker": "2455.TW",
+      "market_currency": "TWD"
     },
     {
       "company_id": "co:win_semiconductor",
