@@ -118,6 +118,11 @@
       "resolution": null,
       "resolved_at": null,
       "source": "lifecycle",
+      "source_cleared": {
+        "at": "2026-08-28T01:05:00.377637+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
       "title": "thesis sivers：review_required",
       "type": "thesis_lifecycle",
       "waiting_on": {
@@ -3856,6 +3861,13 @@
     },
     {
       "added_at": "2026-08-27T22:41:25.012489+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_b898711fd48b4d82069adc6311bcfb1f",
+      "dispatch_receipt": "bounded research 完成。走 MOPS 電子書取得 114 年度（2025）股東會年報 2025_3081_20260527F04.pdf（99 頁 / 90,323 字，pypdf 抽取），逐字存於 library/raw/lmoc_3081_annual_report_fy2025_20260508.txt。⚠ 公司官網年報頁為動態載入（只抓得到前十大股東關係表），與聯亞先前追源受阻同因。(1) customer_concentration 清除：114 年度 C06 25.76%／C09 21.01%／C03 13.33%／C10 10.40%，前四大合計 70.50%，銷貨淨額 2,202,822 千元年增 82.3%；C09 由 0.35% 暴增至 21.01%（約 110 倍）、C10 由 0.02% 至 10.40%。issuer 逐字歸因「114 年度數據中心相關產品出貨成長」。⚠ 客戶為代號揭露（營業保密約定），不得對應 2026-08-26 公告的某美國客戶或任何具名公司（L6 Gap 4）。(2) backlog 未能清除為真值：台灣年報揭露準則不要求在手訂單金額，全文「在手訂單」「未交貨」「接單」各 0 命中——屬準則結構性缺席，非未查獲（L11 第 5 點）；已改填替代指標（營收年增 82.3%＋四年長約＋員工 331→397→450）並註明非 backlog 本身。Engine C 提案 po_a7f7ea5ed73c8077e928bdf5f13bb714（customer_concentration）與 po_bf218a6f9df48bafe590b1036959af41（backlog 替代指標）待核准。⚠ 另有一項需另案處理：年報 issuer 自述為 Coherent／Broadcom／Lumentum／Sumitomo／Mitsubishi 等 IDM 的上游磊晶代工，「與其終端產品市場並無競爭關係」，同業為 IQE 與英特磊。圖中聯亞與 Lumentum／Coherent 同掛 supplies_to tech:cw_dfb_laser，形狀上像同層競爭者，若採信 issuer 自述則層級關係需修正；惟屬當事人陳述（L8），未經客戶端印證，本次不改圖，須另走 RA 與人工核准。",
+      "dispatch_ref": "wo_54269808bdf7e3f194165d34f5173cb1",
+      "dispatch_status": "awaiting_approval",
+      "dispatch_updated_at": "2026-08-28T01:04:17.869220+00:00",
+      "dispatched_at": "2026-08-28T00:58:22.992992+00:00",
       "hint": "coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 238,
       "reason": null,
@@ -3870,10 +3882,11 @@
       "added_at": "2026-08-27T23:46:12.161474+00:00",
       "hint": "核准後以 `todo complete-thesis-mutation <編號>` 寫入 lifecycle.json；理由：Q2 2026 未觸發原 retire gate：2025 營收重編減少 SEK 4.314m，遠低於 memo 所列約 SEK 97m／31%，且正式報告未出現 going concern 惡化敘述；但 Q2 淨營收年減 12%、adju",
       "n": 239,
-      "reason": null,
+      "reason": "使用者核准後寫入 thesis lifecycle",
+      "receipt": "thesis:sivers:revised;proposal:tm_b498950ba7ebe4375289e9f3adaf1861",
       "ref_id": "tm_b498950ba7ebe4375289e9f3adaf1861",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-28T00:57:23.846457+00:00",
       "source": "thesis",
       "title": "thesis sivers：review_required → revised",
       "type": "thesis_mutation"
@@ -3887,6 +3900,11 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
+      "source_cleared": {
+        "at": "2026-08-28T01:05:00.377637+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
       "title": "REVIEW — co:iqe",
       "type": "decision_review",
       "waiting_on": {
@@ -3896,6 +3914,30 @@
         "trigger": "執行面 context 缺失",
         "until": null
       }
+    },
+    {
+      "added_at": "2026-08-28T01:05:00.377637+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2025-12-31T00:00:00+00:00；來源=library/raw/lmoc_3081_annual_report_fy2025_20260508.txt | 聯亞 3081 114 年度股東會年報（MO",
+      "n": 241,
+      "reason": null,
+      "ref_id": "po_a7f7ea5ed73c8077e928bdf5f13bb714",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "engine_c",
+      "title": "Engine C 觀測：3081.TWO / customer_concentration",
+      "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-08-28T01:05:00.377637+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2025-12-31T00:00:00+00:00；來源=library/raw/lmoc_3081_annual_report_fy2025_20260508.txt | 聯亞 3081 114 年度股東會年報（MO",
+      "n": 242,
+      "reason": null,
+      "ref_id": "po_bf218a6f9df48bafe590b1036959af41",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "engine_c",
+      "title": "Engine C 觀測：3081.TWO / backlog",
+      "type": "engine_c_observation"
     }
   ],
   "log": [
@@ -8936,8 +8978,63 @@
       "ref_id": "dc_f94148d8545de35cb2c5d048640b913e",
       "type": "manual",
       "verb": "go"
+    },
+    {
+      "at": "2026-08-28T00:57:23.846457+00:00",
+      "n": 239,
+      "reason": "使用者核准後寫入 thesis lifecycle",
+      "receipt": "thesis:sivers:revised;proposal:tm_b498950ba7ebe4375289e9f3adaf1861",
+      "ref_id": "tm_b498950ba7ebe4375289e9f3adaf1861",
+      "type": "thesis_mutation",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-28T00:58:22.992992+00:00",
+      "attempt": 1,
+      "n": 238,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_54269808bdf7e3f194165d34f5173cb1",
+      "ref_id": "dc_f94148d8545de35cb2c5d048640b913e",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-08-28T01:04:17.152523+00:00",
+      "n": 238,
+      "reason": null,
+      "receipt": "開始 bounded research：走公開資訊觀測站取聯亞 3081 年報之客戶集中度與訂單能見度",
+      "ref_id": "dc_f94148d8545de35cb2c5d048640b913e",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-08-28T01:04:17.869220+00:00",
+      "n": 238,
+      "reason": "MOPS 年報路徑走通；客戶集中度清除，backlog 因揭露準則不存在改填替代指標",
+      "receipt": "bounded research 完成。走 MOPS 電子書取得 114 年度（2025）股東會年報 2025_3081_20260527F04.pdf（99 頁 / 90,323 字，pypdf 抽取），逐字存於 library/raw/lmoc_3081_annual_report_fy2025_20260508.txt。⚠ 公司官網年報頁為動態載入（只抓得到前十大股東關係表），與聯亞先前追源受阻同因。(1) customer_concentration 清除：114 年度 C06 25.76%／C09 21.01%／C03 13.33%／C10 10.40%，前四大合計 70.50%，銷貨淨額 2,202,822 千元年增 82.3%；C09 由 0.35% 暴增至 21.01%（約 110 倍）、C10 由 0.02% 至 10.40%。issuer 逐字歸因「114 年度數據中心相關產品出貨成長」。⚠ 客戶為代號揭露（營業保密約定），不得對應 2026-08-26 公告的某美國客戶或任何具名公司（L6 Gap 4）。(2) backlog 未能清除為真值：台灣年報揭露準則不要求在手訂單金額，全文「在手訂單」「未交貨」「接單」各 0 命中——屬準則結構性缺席，非未查獲（L11 第 5 點）；已改填替代指標（營收年增 82.3%＋四年長約＋員工 331→397→450）並註明非 backlog 本身。Engine C 提案 po_a7f7ea5ed73c8077e928bdf5f13bb714（customer_concentration）與 po_bf218a6f9df48bafe590b1036959af41（backlog 替代指標）待核准。⚠ 另有一項需另案處理：年報 issuer 自述為 Coherent／Broadcom／Lumentum／Sumitomo／Mitsubishi 等 IDM 的上游磊晶代工，「與其終端產品市場並無競爭關係」，同業為 IQE 與英特磊。圖中聯亞與 Lumentum／Coherent 同掛 supplies_to tech:cw_dfb_laser，形狀上像同層競爭者，若採信 issuer 自述則層級關係需修正；惟屬當事人陳述（L8），未經客戶端印證，本次不改圖，須另走 RA 與人工核准。",
+      "ref_id": "dc_f94148d8545de35cb2c5d048640b913e",
+      "type": "decision_review",
+      "verb": "pq1_awaiting_approval"
+    },
+    {
+      "at": "2026-08-28T01:05:00.377637+00:00",
+      "n": 10,
+      "reason": "來源本輪成功執行，但不再產出此項",
+      "receipt": null,
+      "ref_id": "sivers",
+      "type": "thesis_lifecycle",
+      "verb": "source_cleared"
+    },
+    {
+      "at": "2026-08-28T01:05:00.377637+00:00",
+      "n": 240,
+      "reason": "來源本輪成功執行，但不再產出此項",
+      "receipt": null,
+      "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+      "type": "decision_review",
+      "verb": "source_cleared"
     }
   ],
-  "next_n": 241,
+  "next_n": 243,
   "schema_version": "1"
 }
