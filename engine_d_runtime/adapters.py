@@ -39,6 +39,38 @@ def _fetch_operational_portfolio() -> Sequence[Mapping[str, Any]]:
     return fetch_portfolio(strict_operational=True)
 
 
+def fetch_nav_exposure(
+    *,
+    groups: Mapping[str, str] | None = None,
+    holdings_fetcher: Callable[[], Sequence[Mapping[str, Any]]] | None = None,
+) -> dict[str, Any]:
+    """從 Google Sheet 讀持股並算出 NAV 比例呈現。
+
+    取數住在這一層而不是 `decision_lab.nav_exposure`：後者是純轉換層，不得 import
+    `fetchers`（架構邊界由 test_decision_lab_does_not_import_concrete_current_state_
+    authorities 守著）。
+
+    ⚠ 用 raw 層的 `fetch_portfolio`，不是 `current_holdings` 的正規化輸出——正規化
+    只拿 `bucket` 判斷是否為現金列，判完就丟掉，而 bucket 分布正是 NAV 呈現要的東西。
+    """
+    from decision_lab.nav_exposure import build_nav_exposure
+
+    fetcher = holdings_fetcher or _fetch_operational_portfolio
+    try:
+        rows = list(fetcher())
+    except Exception as exc:
+        _LOG.warning("nav exposure holdings fetch failed: %s", exc, exc_info=True)
+        return build_nav_exposure(
+            None,
+            upstream={
+                "status": "unavailable",
+                "blockers": ["holdings_unavailable"],
+                "failure": type(exc).__name__,
+            },
+        )
+    return build_nav_exposure(rows, groups=groups)
+
+
 _LOG = logging.getLogger(__name__)
 
 _VOCAB_PATH = Path(__file__).resolve().parent.parent / "schema" / "vocab.json"

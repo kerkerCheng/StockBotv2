@@ -22,6 +22,31 @@ AXES = (
     "valuation_payoff",
 )
 LEVELS = ("unknown", "bounded_hypothesis", "corroborated")
+
+
+def weakest_axis_of(axes: Mapping[str, Mapping[str, Any]]) -> str:
+    """回傳證據最弱的那一軸。
+
+    以 `effective_level` 次序為主鍵，同階時退到 `AXES` 的宣告次序
+    （`source_reliability` 優先）。
+
+    先前這裡用 `axes[axis]["ceiling"]` 當主鍵。ceiling 即將被移除——最弱軸的角色
+    從「資本上限的決定者」變成「該補哪一項證據」的指標，不該再依賴資本欄位。
+
+    ⚠ 不能改用宣告的 `level`：實測（2026-08-28）發現 ceiling 攜帶了 level 沒有的
+    資訊。`_validate_assessment` 在 `fatal_axis_blocker`（例如 evidence_missing）時
+    把 ceiling 打成 0 卻**不動 level**，所以一個宣告 corroborated 但引用不成立的軸，
+    ceiling 是 0 而 level 仍是 corroborated。用 raw level 排序會漏掉它，
+    `test_probe_sizing.py::...[missing_ref]` 立刻紅。`effective_level` 就是把那個
+    隱含資訊顯性化的欄位。
+    """
+    def rank(axis: str) -> tuple[int, int]:
+        level = str(axes[axis].get("effective_level") or axes[axis]["level"])
+        # 未登記的等級視為最弱：寧可多提醒一次，也不要讓拼錯的值看起來佐證完整。
+        order = LEVELS.index(level) if level in LEVELS else -1
+        return (order, AXES.index(axis))
+
+    return min(AXES, key=rank)
 AXIS_REFERENCE_AUTHORITIES = {
     "source_reliability": frozenset(
         {"graph_source_assertion", "source_trace"}
@@ -250,8 +275,20 @@ def _validate_assessment(
             effective_ceiling = min(ceilings[level], _level_floor(level, ceilings))
         else:
             effective_ceiling = ceilings[level]
+        # 實質等級：宣告的 level 打上「證據引用是否真的成立」之後的結果。
+        # ⚠ 這不等於上面那個 `level` 欄位——後者只在 context_mismatch 時降為 unknown，
+        # 而 fatal_axis_blocker（例如 evidence_missing）會讓 ceiling 歸零卻**不動 level**。
+        # 最弱軸過去靠 ceiling 排序才隱含吃到這個資訊；ceiling 即將移除，所以把它
+        # 顯性化成一個不依賴資本欄位的等級。
+        if context_mismatch or fatal_axis_blocker:
+            effective_level = "unknown"
+        elif f"{axis}_corroboration_incomplete" in blockers:
+            effective_level = LEVELS[max(0, LEVELS.index(level) - 1)]
+        else:
+            effective_level = level
         normalized[axis] = {
             "level": "unknown" if context_mismatch else level,
+            "effective_level": effective_level,
             "evidence_refs": refs,
             "reason": reason.strip() if isinstance(reason, str) else "",
             "missing_data": missing_data,
@@ -373,7 +410,7 @@ def calculate_probe_limits(
         probe["axis_ceilings"],
         reference_index,
     )
-    weakest_axis = min(AXES, key=lambda axis: (axes[axis]["ceiling"], AXES.index(axis)))
+    weakest_axis = weakest_axis_of(axes)
     weakest_level = str(axes[weakest_axis]["level"])
     axis_ceiling = float(axes[weakest_axis]["ceiling"])
     identity = payload["identity"]

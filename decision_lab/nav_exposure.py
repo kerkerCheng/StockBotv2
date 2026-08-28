@@ -141,19 +141,7 @@ def build_nav_exposure(
     }
 
 
-def fetch_nav_exposure(*, groups: Mapping[str, str] | None = None) -> dict[str, Any]:
-    """從 Google Sheet 讀持股並算出 NAV 呈現。取得失敗時 fail closed 並帶出原因。"""
-    from fetchers.gsheets import fetch_portfolio
-
-    try:
-        rows = list(fetch_portfolio(strict_operational=True))
-    except Exception as exc:
-        return build_nav_exposure(
-            None,
-            upstream={
-                "status": "unavailable",
-                "blockers": ["holdings_unavailable"],
-                "failure": type(exc).__name__,
-            },
-        )
-    return build_nav_exposure(rows, groups=groups)
+# ⚠ 取數不在這一層。`decision_lab` 不得 import `fetchers`／`engine_c`／`neo4j`
+# （`tests/test_engine_d_runtime.py::test_decision_lab_does_not_import_concrete_
+# current_state_authorities` 守這條線）：這一層只做純轉換，持股列由呼叫端注入。
+# 實際從 Google Sheet 取數的入口在 `engine_d_runtime.adapters.fetch_nav_exposure`。
