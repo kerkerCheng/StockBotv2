@@ -1,65 +1,79 @@
 {
   "axt_inp": {
-    "status": "active",
-    "memo": "thesis/axt_inp_v1_lane_memo.md",
-    "ticker": "AXTI",
-    "last_checked": "2026-08-04",
-    "next_check": "2026-11-15",
-    "check_interval_days": 90,
-    "note": "2026-08-02 首建 → 2026-08-03 紅隊後改寫 v3 → 2026-08-04 disproof 第 6 條觸發後 revise 為 v4，依 L7 由 review_required 回到 active（thesis 修正後成立，disproof 條件已更新）。v4 核心論點：InP 需求為真且首次由 AXT 以外來源確認（JX 官方公告稱持續收到客戶因設備擴充而來的大幅增產要求），但 AXT 並非結構性受益者——供給側在 2028 年前將大幅擴張：JX 四年最多 1,200 億日圓、產能拉到 FY2025 的 7-10 倍（官方新聞稿，已入圖 jx_metals_inp_capacity_pr_2026_06_16）；住友 180 億日圓、FY2028 達 FY2024 的 3.1 倍（tier 3 轉述日經，待追一手）。JX 投資額約為住友的 6.7 倍。最關鍵且市場未討論的一點是時序：AXT 三份長約全簽在 JX 2026-06-16 公告之後（Coherent 6/25 生效、Lumentum 7/26 簽署），可能是供需反轉前的防禦性鎖客而非議價權；但合約談判週期通常數月，因果無法從公開資料判定。方向由偏多轉為謹慎偏空。評分維持 26/30 PASS，最弱環節仍為可信度 3/5——v4 的核心供給側證據全部落在 AXT 的 context slice 之外，因圖中缺 AXT↔JX 的 competes_with 邊（住友有、JX 沒有），補該邊是提升可信度最直接的一步。ASP 追源兩輪均未果，週期／結構之爭未裁決。裁決點：2026 Q3 財報毛利率（是否維持 44%+、是否揭露 ASP）＋ Q3 10-Q 的 Lumentum 合約 exhibit（定價機制與交付條款）。任一 disproof 觸發須 48h 內人工決策。",
-    "revised_at": "2026-08-04",
-    "prior_disproof_trigger": "第 7 節第 6 條（Sumitomo 或 JX Advanced Metals 宣布 InP 擴產）已觸發，且是兩家同時、規模遠大於預期。JX 金屬 2026-06-16 官方新聞稿（tier 1，非當事人自報）逐字：『今後4か年にわたり最大1,200億円の設備投資を実施する方針を決定』、『これまで公表した投資と合わせて生産能力を2025年度比で7～10倍に引き上げる予定』，地點為磯原工場加新設常陸那珂據點，資金來自 2026-05 發行的可轉債。住友電工另於 2026-07 上修擴產計畫至 180 億日圓、FY2028 產能達 FY2024 的 3.1 倍（TrendForce 轉述日經，tier 3 待追一手）。此事實實質反駁 v3 對 AXT『增量產能關鍵來源』的定位——兩個競爭者都在大規模投入增量產能，且 JX 的投資額約為住友的 6.7 倍。時序另有一層未探討的解讀：AXT 的 Coherent（2026-06-25）與 Lumentum（2026-07-26）長約，都簽在 JX 6/16 公告之後，六年期合約可能是供需反轉前的防禦性鎖客而非議價權展現。依 L7 須於 48 小時內人工決策：revise（納入供給側擴張後重估）或 retire。",
     "catalyst_checkpoints": [
       {
+        "basis": "Q1 期末 2026-03-31 → 法說 2026-04-30（+30 天）；Q3 期末 2026-09-30 同節奏推估",
         "date": "2026-10-30",
-        "what": "2026 Q3 財報／法說會",
-        "decides": "毛利率是否維持 44%+、是否揭露 ASP 與 InP 分項——週期 vs 結構之爭的裁決點",
         "date_confidence": "estimated",
-        "basis": "Q1 期末 2026-03-31 → 法說 2026-04-30（+30 天）；Q3 期末 2026-09-30 同節奏推估"
+        "decides": "毛利率是否維持 44%+、是否揭露 ASP 與 InP 分項——週期 vs 結構之爭的裁決點",
+        "what": "2026 Q3 財報／法說會"
       },
       {
+        "basis": "Q1 10-Q 於期末後 44 天（2026-05-14）申報；Q3 同節奏推估",
         "date": "2026-11-13",
-        "what": "2026 Q3 Form 10-Q（Lumentum 合約 exhibit）",
-        "decides": "定價機制與交付條款——同時裁決『防禦性鎖客 vs 議價權』與『交付是否涉美國關境』",
         "date_confidence": "estimated",
-        "basis": "Q1 10-Q 於期末後 44 天（2026-05-14）申報；Q3 同節奏推估"
+        "decides": "定價機制與交付條款——同時裁決『防禦性鎖客 vs 議價權』與『交付是否涉美國關境』",
+        "what": "2026 Q3 Form 10-Q（Lumentum 合約 exhibit）"
       }
-    ]
+    ],
+    "check_interval_days": 90,
+    "last_checked": "2026-08-04",
+    "memo": "thesis/axt_inp_v1_lane_memo.md",
+    "next_check": "2026-11-15",
+    "note": "2026-08-02 首建 → 2026-08-03 紅隊後改寫 v3 → 2026-08-04 disproof 第 6 條觸發後 revise 為 v4，依 L7 由 review_required 回到 active（thesis 修正後成立，disproof 條件已更新）。v4 核心論點：InP 需求為真且首次由 AXT 以外來源確認（JX 官方公告稱持續收到客戶因設備擴充而來的大幅增產要求），但 AXT 並非結構性受益者——供給側在 2028 年前將大幅擴張：JX 四年最多 1,200 億日圓、產能拉到 FY2025 的 7-10 倍（官方新聞稿，已入圖 jx_metals_inp_capacity_pr_2026_06_16）；住友 180 億日圓、FY2028 達 FY2024 的 3.1 倍（tier 3 轉述日經，待追一手）。JX 投資額約為住友的 6.7 倍。最關鍵且市場未討論的一點是時序：AXT 三份長約全簽在 JX 2026-06-16 公告之後（Coherent 6/25 生效、Lumentum 7/26 簽署），可能是供需反轉前的防禦性鎖客而非議價權；但合約談判週期通常數月，因果無法從公開資料判定。方向由偏多轉為謹慎偏空。評分維持 26/30 PASS，最弱環節仍為可信度 3/5——v4 的核心供給側證據全部落在 AXT 的 context slice 之外，因圖中缺 AXT↔JX 的 competes_with 邊（住友有、JX 沒有），補該邊是提升可信度最直接的一步。ASP 追源兩輪均未果，週期／結構之爭未裁決。裁決點：2026 Q3 財報毛利率（是否維持 44%+、是否揭露 ASP）＋ Q3 10-Q 的 Lumentum 合約 exhibit（定價機制與交付條款）。任一 disproof 觸發須 48h 內人工決策。",
+    "prior_disproof_trigger": "第 7 節第 6 條（Sumitomo 或 JX Advanced Metals 宣布 InP 擴產）已觸發，且是兩家同時、規模遠大於預期。JX 金屬 2026-06-16 官方新聞稿（tier 1，非當事人自報）逐字：『今後4か年にわたり最大1,200億円の設備投資を実施する方針を決定』、『これまで公表した投資と合わせて生産能力を2025年度比で7～10倍に引き上げる予定』，地點為磯原工場加新設常陸那珂據點，資金來自 2026-05 發行的可轉債。住友電工另於 2026-07 上修擴產計畫至 180 億日圓、FY2028 產能達 FY2024 的 3.1 倍（TrendForce 轉述日經，tier 3 待追一手）。此事實實質反駁 v3 對 AXT『增量產能關鍵來源』的定位——兩個競爭者都在大規模投入增量產能，且 JX 的投資額約為住友的 6.7 倍。時序另有一層未探討的解讀：AXT 的 Coherent（2026-06-25）與 Lumentum（2026-07-26）長約，都簽在 JX 6/16 公告之後，六年期合約可能是供需反轉前的防禦性鎖客而非議價權展現。依 L7 須於 48 小時內人工決策：revise（納入供給側擴張後重估）或 retire。",
+    "revised_at": "2026-08-04",
+    "status": "active",
+    "ticker": "AXTI"
   },
   "coherent_cpo": {
-    "status": "active",
-    "memo": "thesis/coherent_cpo_v2_lane_memo.md",
-    "ticker": "COHR",
-    "last_checked": "2026-07-17",
-    "next_check": "2026-10-15",
-    "check_interval_days": 90,
-    "note": "memo 於 2026-07-17 conflict-resolved 重生成（commit 6ec70c7）；12 月另有六吋 InP 產能倍增檢核點",
     "catalyst_checkpoints": [
       {
+        "basis": "memo note 只寫「12 月」，未給確切日；取月初以免錯過",
         "date": "2026-12-01",
-        "what": "六吋 InP 產能倍增檢核點",
-        "decides": "產能倍增是否如期——memo header 既有檢核點",
         "date_confidence": "estimated",
-        "basis": "memo note 只寫「12 月」，未給確切日；取月初以免錯過"
+        "decides": "產能倍增是否如期——memo header 既有檢核點",
+        "what": "六吋 InP 產能倍增檢核點"
       }
-    ]
+    ],
+    "check_interval_days": 90,
+    "last_checked": "2026-07-17",
+    "memo": "thesis/coherent_cpo_v2_lane_memo.md",
+    "next_check": "2026-10-15",
+    "note": "memo 於 2026-07-17 conflict-resolved 重生成（commit 6ec70c7）；12 月另有六吋 InP 產能倍增檢核點",
+    "status": "active",
+    "ticker": "COHR"
   },
   "sivers": {
-    "status": "review_required",
-    "memo": "thesis/sivers_v3_lane_memo.md",
-    "ticker": "SIVE.ST",
-    "last_checked": "2026-07-26",
-    "next_check": "2026-08-27",
-    "check_interval_days": 30,
-    "note": "L7 review 已於 2026-07-12 人工決議：持有至 2026-08-27 Q2+財報重編分辨點；觸發任一核查點須 48h 內人工決策（詳見 memo header 與 GitHub Issue #2）。2026-07-19 memo 更新為 v3：客戶邊補獨立來源、Marvell 直接邊更正為間接鏈並反映 POET/Celestial 通道 2026-04 切斷。仍 review_required — 核心財務/光子 claim 全押在 source_under_audit 的 FY2025 年報（Ningi 指控），evidence_gate 未過。2026-07-20 source-trace 追源（docs/reports/sive-ningi-audit-trace-2026-07-20.md）：定位 Ningi 一手報告（2026-06-01）；逐字核 AR PDF 確認為公司自揭 material going-concern uncertainty（非審計保留意見，L11）、2023–25 PCAOB 重編已發生（淨損 186.5M→222.6M SEK）；另證實董事會出走、雙重監管/洩密調查、SEK 600M 增資（以成長為名未提 going-concern）、公司迄今無反駁。2026-07-26 依使用者 [10] go 再複查官方資料：SEK 700M 定向增發 12,280,701 股、Bootstrap $12M 可轉債全數轉為 22,847,044 股，流動性改善但稀釋顯著；7/21 insider 交易為 CEO +70k、董事長 -275k 等混合訊號；Q2 仍定於 8/27。技術合作路徑尚未被推翻，且原 retire 條件要求的 qualified audit opinion 尚未出現，因此維持 review_required 至 8/27、不升格也不新增 live 資本；8/27 仍為 retire/revise 分辨點。",
     "catalyst_checkpoints": [
       {
+        "basis": "公司公告 Q2 定於 2026-08-27",
         "date": "2026-08-27",
-        "what": "Q2 財報（含 2023–25 重編後數字）",
-        "decides": "Ningi 指控的 retire/revise 分辨點；credibility hold 能否解除",
         "date_confidence": "confirmed",
-        "basis": "公司公告 Q2 定於 2026-08-27"
+        "decides": "Ningi 指控的 retire/revise 分辨點；credibility hold 能否解除",
+        "what": "Q2 財報（含 2023–25 重編後數字）"
       }
-    ]
+    ],
+    "check_interval_days": 30,
+    "last_checked": "2026-08-28",
+    "memo": "thesis/sivers_v3_lane_memo.md",
+    "mutations": [
+      {
+        "at": "2026-08-28T00:57:23.838893+00:00",
+        "author": "codex-daily-brief",
+        "evidence_refs": [
+          "https://mb.cision.com/Main/11695/4388331/4236264.pdf",
+          "https://www.sivers-semiconductors.com/press/sivers-semiconductors-reports-q2-2026-results-as-product-growth-record-pipeline-and-customer-ramps-position-company-for-growth-acceleration/"
+        ],
+        "from": "review_required",
+        "proposal_id": "tm_b498950ba7ebe4375289e9f3adaf1861",
+        "rationale": "Q2 2026 未觸發原 retire gate：2025 營收重編減少 SEK 4.314m，遠低於 memo 所列約 SEK 97m／31%，且正式報告未出現 going concern 惡化敘述；但 Q2 淨營收年減 12%、adjusted EBITDA 降至 -SEK 35.5m、營運現金流 -SEK 70.0m，Jabil qualification／production ramp 延至 2027，USD 1.2bn pipeline 又明示為 non-binding，故應重寫時間線、資金風險與 disproof 條件而非沿用或直接 retire。",
+        "to": "revised"
+      }
+    ],
+    "next_check": "2026-09-27",
+    "note": "L7 review 已於 2026-07-12 人工決議：持有至 2026-08-27 Q2+財報重編分辨點；觸發任一核查點須 48h 內人工決策（詳見 memo header 與 GitHub Issue #2）。2026-07-19 memo 更新為 v3：客戶邊補獨立來源、Marvell 直接邊更正為間接鏈並反映 POET/Celestial 通道 2026-04 切斷。仍 review_required — 核心財務/光子 claim 全押在 source_under_audit 的 FY2025 年報（Ningi 指控），evidence_gate 未過。2026-07-20 source-trace 追源（docs/reports/sive-ningi-audit-trace-2026-07-20.md）：定位 Ningi 一手報告（2026-06-01）；逐字核 AR PDF 確認為公司自揭 material going-concern uncertainty（非審計保留意見，L11）、2023–25 PCAOB 重編已發生（淨損 186.5M→222.6M SEK）；另證實董事會出走、雙重監管/洩密調查、SEK 600M 增資（以成長為名未提 going-concern）、公司迄今無反駁。2026-07-26 依使用者 [10] go 再複查官方資料：SEK 700M 定向增發 12,280,701 股、Bootstrap $12M 可轉債全數轉為 22,847,044 股，流動性改善但稀釋顯著；7/21 insider 交易為 CEO +70k、董事長 -275k 等混合訊號；Q2 仍定於 8/27。技術合作路徑尚未被推翻，且原 retire 條件要求的 qualified audit opinion 尚未出現，因此維持 review_required 至 8/27、不升格也不新增 live 資本；8/27 仍為 retire/revise 分辨點。",
+    "status": "revised",
+    "ticker": "SIVE.ST"
   }
 }
