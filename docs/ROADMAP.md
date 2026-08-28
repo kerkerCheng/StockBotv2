@@ -120,7 +120,25 @@ commit message 寫「這是純重構」，錯誤會原封不動進 master；因�
 > 沒有驗收條件的不准進佇列（`AGENTS.md` L14 第 1 條）。動工前先看驗收條件，
 > 做完後回頭比對，再把實測 before → after 記進「已交付」。
 
-### 進行中
+### 進行中（2026-08-29 使用者定序）
+
+三條，依使用者指定順序。每條動工前先量 baseline——沒有 before 就沒有辦法說有沒有進展（L14）。
+
+| | 做什麼 | 為什麼 | 驗收（哪個數字會變） | 前置 |
+|---|---|---|---|---|
+| **A** | **移除 compound-engineering（ce）** | 使用者定案。ce 的 `ce-plan`／`ce-work`／`ce-brainstorm` 與本 repo 既有的 `skills/` ＋ `AGENTS.md` 工作流重疊，等於同一件事兩套詞彙。實測足跡：repo 內幾乎沒有（唯一殘留是 2026-07-10 的 `.claude/worktrees/swirling-cuddling-puddle`，無未合併 commit），plugin 本體在使用者全域 `~/.claude/plugins/`。 | `git worktree list` 只剩主樹；harness 不再載入 ce skill。⚠ **`docs/plans/` 與 `docs/brainstorms/` 一律保留**——它們是交付與需求推導的歷史，不隨工具移除而刪。 | 無 |
+| **B** | **Daily 架構重整＋beta 減量（可大修）** | 使用者定案。beta 區目前是 daily 最長的一段（主力逐檔表＋燈號＋pace＋貸款區塊），而 2026-08-01 已實測 beta **訊號 0 勝 3 敗**、有證據的只有 baseline 定投——呈現成本與證據價值不成比例。⚠ 減量不等於刪除行情心跳：`AGENTS.md`「行情表是每日心跳」仍然生效，要減的是**訊號衍生的敘述**，不是最新交易日與 1 日漲跌。 | ①單次 daily 的輸出長度與 token 用量下降，且 **pq2 項目數不減少**（先量 baseline，否則分不出「變精簡」與「漏掉東西」）；②「研究完整但不在瓶頸排序內」的標的數 → 0（見下方 C-1）。 | 先量現行 daily 的 token 與輸出長度 |
+| **C** | **把 pq1 drain 乾淨** | session start 顯示 **95 條 `triaged_go` 待深挖**；每輪上限是 `config/daily_routine.json` 的 `pq1.drain_limit_per_run`（吞吐 cap，非每日 quota），積壓不會自己消。排序問題已於 3a 修掉（改字典序），所以現在消化的順序是對的。 | `triaged_go` 待深挖數由現值降到單輪可消化。**動工前記下現值**（`python -m engine_b.cli pending` 或 daily brief 首行）。 | 3a 已完成 |
+
+**C-1（B 的子項，2026-08-29 code review 導出）：研究完整的 cohort 會同時掉出待辦池與排序表。**
+`research_status` 改用嚴重度判準後，Micron／Harmonic Drive／Schaeffler 三筆 reassess 後會變
+`READY` → 首屏 `MONITOR` → 不進 pq2；而它們是工業標的，`rank_bottlenecks` 的
+`substitutability >= 4` 過濾又讓它們不在瓶頸排序裡。**兩邊都不在＝研究做完整之後標的反而消失。**
+兩個方向：把「`READY` 且尚無 live choice」重新納入 pq2 收集（會回到待辦編號），或在首屏加一段
+「研究完整但不在瓶頸排序內」的常駐清單（只呈現、不催辦）。後者較符合「不給尺寸、只給候選」的契約。
+刻意不在 review 收尾時半修——它是首屏結構問題，屬 B 的範圍。
+
+---
 
 **資本表達層 workstream 已於 2026-08-15 結案。** 原目標「把 Engine D 從永遠不下注變成
 小注但有意義」已達成：live 非零 **0/72 → 9/89**（現行骨架 9/16）、ELIGIBLE cohort **0 → 8**。
@@ -216,6 +234,19 @@ actuator 是已在圖中被標為關鍵零組件、卻完全沒有供給側的�
 D7 的判準本身仍然有效，只是不再有這個 gate 可套用。
 
 ### 未排程
+
+**2026-08-29 code review 導出（U7 收尾時未修，理由各自附上）：**
+
+| 項目 | 為什麼 | 驗收條件 | 前置 |
+|---|---|---|---|
+| **`paper_exposure_invalid` 已無產生端，paper ledger 的數值健全性從此不被檢查** | U7 移除 paper 部位後，唯一會產生這個 blocker 的程式碼一併消失，但它仍登記在 `config/decision_blockers.json` 且標 fatal——一個永遠不會亮的 fatal blocker 是死規則，讀者會以為那項健全性有人在管 | 該碼從 registry 移除，或恢復一個真的會觸發它的檢查。**先確認哪一個才對**：paper ledger 已凍結為歷史，可能根本不需要檢查 | 無 |
+| **`paper_portfolio/ledger.py` 失去存在理由** | `atomic_assess_probe` 永久停止寫 `paper_events` 後，這個模組在本 diff 之前就已是 test-only | 刪除後全套測試仍綠，或明確記錄它為何要留 | A（ce 移除）之後一併清 |
+| **`outcomes.py::system_paper_return` 的價格錨點同欄兩義** | 有 legacy paper event 的 cohort 錨在舊 decision、沒有的錨在當前 decision；`AGENTS.md` 敘述的錨點則是 Shadow observation。三者不一致（L12 形狀） | 錨點來源收斂成一個，或在欄位名上把兩種錨點分開 | 無 |
+| **`nav_exposure._nav_base` 只取第一列的 `nav_base`** | 多帳戶／多幣別 Sheet 會全部按第一列的 NAV 計算佔比，而 NAV 呈現的整個用途就是看佔比 | 給定兩列不同 `nav_base` 的持股時，行為是明確的（取和、或 fail closed），不是靜默取第一個 | 無 |
+| **三條新路徑的例外分支零覆蓋** | `cli._optional`、`adapters.fetch_ranking_view`、`store.complete_paper_amendment` 的 `.get()` 容錯都沒有測試會真的觸發 | 各補一條會 raise 的測試；`complete_paper_amendment` 需用直接 INSERT 造 legacy paper event | 無 |
+| **`fetch_ranking_view` 的轉換階段不在 try 之外** | `rank_bottlenecks()`／`build_ranking_view()` 在 try/except 之外，docstring 承諾的「讀不到回 None」對轉換例外不成立，目前只靠 `cli._optional` 兜住 | 轉換例外也回 None，或把承諾改寫成實際行為 | 無 |
+
+**其餘未排程：**
 
 | 項目 | 為什麼 | 驗收條件 | 前置 |
 |---|---|---|---|
@@ -334,28 +365,34 @@ D7 的判準本身仍然有效，只是不再有這個 gate 可套用。
 - 唯一剩餘的**貸款提款時間表**由使用者明確暫緩；目前不預期這麼早手動投入貸款，
   未來若重啟再核准 exact 日期／金額／標的／tranche。glide path 公式亦延後，現況資源尚不構成綁定。
 
-出自 [`2026-08-13-capital-expression-direction-requirements.md`](brainstorms/2026-08-13-capital-expression-direction-requirements.md)
-— **要動資本層先讀這份，它取代 `confidence-axes` §7 的順序判準**：
+出自 [`2026-08-13-capital-expression-direction-requirements.md`](brainstorms/2026-08-13-capital-expression-direction-requirements.md)：
 
-- **方向已定案（D1–D7）**：研究是手段不是目的；不確定性用尺寸承擔不用 gate 禁止參與；
-  診斷與閘門分離（49 個 blocker 全留當診斷，只有講得出因果機制的能歸零）；證據標準
-  校準到個人投資者可達成的補救；alpha 需要 baseline（beta 已有 `baseline_pace`，
-  alpha 從未 port）；**gate 本身也不得未經量測就享有默認信任**；先量測後放閘。
-- **§2 凍結了 2026-08-13 的 baseline 數字**，未來 audit 拿它做 diff 而非做判斷。
-  關鍵三項：`live_supported_range` 非零 **0/72**、`axis_ceiling` 從未達 0.005、
-  已量測 outcome **0/8**。
-- **§4 的六步含可證偽驗收條件**，第 1 項（補跑 7 個 cohort 的 outcome 量測）必須先做。
-- ⚠ **§6 的防呆不可省略**：daily brief 需增加兩個常駐計數器，否則本檔會變成第五份
-  被堆積的正確診斷（同一結論已被正確寫下四次，見該檔 §0）。
+> ⚠ **2026-08-28 起本檔只剩歷史價值，不再是可執行指引。** 它整份是在推導「怎麼把資本
+> 表達調對」，而 U7 的結論是**整層拿掉**——`live_supported_range`／`axis_ceiling`／
+> `paper_target`／probe cap 都不再產生。§2 凍結的三個 baseline 數字（非零 live 0/72、
+> `axis_ceiling` 從未達 0.005、已量測 outcome 0/8）與 §4 的六步，指涉的欄位已不存在。
+> **D1–D7 的方向判準仍然有效**（見下），失效的是它們的實作對象。
+
+- **仍然有效的方向（D1–D7）**：研究是手段不是目的；不確定性用尺寸承擔不用 gate 禁止參與；
+  診斷與閘門分離（blocker 全留當診斷，只有講得出因果機制的能歸零）；證據標準
+  校準到個人投資者可達成的補救；**gate 本身也不得未經量測就享有默認信任**；先量測後放閘。
+  ——2026-08-29 那次 `research_status` 改判準（`if paper_blockers:` → `fatal_blockers`）
+  就是 D3 的直接應用，且照 D7 先量測（3/21 改判）才動手。
+- **已失效**：§2 的三個 baseline 數字與 §4 的六步（指涉的欄位已隨 U7 移除）；
+  「alpha 需要 baseline 尺寸」這條方向被使用者以另一種方式結掉了——**改成不給尺寸**。
+- **§6 的防呆仍然成立但對象已換**：daily brief 的常駐計數器還在，只是量的不再是資本
+  （`live_range_nonzero` 已凍結為歷史欄位），而是研究廣度與可量測數。
 
 出自 [`2026-08-02-confidence-axes-restructure-requirements.md`](brainstorms/2026-08-02-confidence-axes-restructure-requirements.md)：
 
 - **Confidence 五軸重構為三類（否決／信心／賠率）** — 現行五軸全在問「證據多強」，
   高度相關又取 min，等於最弱那份文件決定一切；且完全沒有賠率維度，系統只能用
   「不參與」表達不確定性。提議拆成二元否決類、序數信心類、連續賠率類。
-- 該檔的**最小改動已於 2026-08-02 交付**：coverage blocker 依嚴重度分成「致命（仍歸零）」
-  與「研究不完整（只降尺寸）」，讓 `axis_ceiling` 得以生效。動軸結構前先跑一兩週看樣本
-  品質——若變成可評估的標的其實不值得看，問題在 pq1 選題而不在 gate。
+- 該檔的**最小改動已於 2026-08-02 交付**：coverage blocker 依嚴重度分成「致命」與
+  「研究不完整」。⚠ 該次交付的目的是「讓 `axis_ceiling` 得以生效」，而 `axis_ceiling`
+  已隨 U7 移除；**那套嚴重度分類本身仍然是活的**，現在決定的是 `research_status` 三態。
+  動軸結構前先跑一兩週看樣本品質——若變成可評估的標的其實不值得看，問題在 pq1 選題
+  而不在 gate。
 - 動工前必讀該檔第 6 節：`closed-vocabulary-registry.md` 仍把五軸列為「刻意凍結」，
   但那個理由已因 `rubric_version` 版本化而失效，需一併更新登記表。
 
