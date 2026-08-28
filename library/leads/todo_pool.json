@@ -113,10 +113,11 @@
       "deferred_at": "2026-07-30T15:33:49.723540+00:00",
       "hint": "本機複查 thesis 並手動更新 lifecycle.json",
       "n": 10,
-      "reason": null,
+      "reason": "完成候選標記經逐項驗證屬實：[10] sivers thesis 已於 2026-08-28 由 [239] 寫入 revised（lifecycle.json status=revised、next_check=2026-09-27）；[240] IQE 已由 reassess 產出 NO_ACTION decision pd_534e911d，coverage 無 blocker、REVIEW 成因（凍結 context 過期）已消除。與 2026-08-27 那批被 sync 自行撤銷的標記不同，本次兩項皆有 underlying receipt 支持",
+      "receipt": null,
       "ref_id": "sivers",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "drop",
+      "resolved_at": "2026-08-28T01:21:01.351010+00:00",
       "source": "lifecycle",
       "source_cleared": {
         "at": "2026-08-28T01:05:00.377637+00:00",
@@ -124,13 +125,7 @@
         "source_healthy": true
       },
       "title": "thesis sivers：review_required",
-      "type": "thesis_lifecycle",
-      "waiting_on": {
-        "reason": "L7 review 已決議持有至分辨點",
-        "set_at": "2026-07-30T15:33:49.723540+00:00",
-        "trigger": "SIVE Q2+ 財報重編分辨點",
-        "until": "2026-08-27"
-      }
+      "type": "thesis_lifecycle"
     },
     {
       "added_at": "2026-07-25T09:09:40.441273+00:00",
@@ -3895,10 +3890,11 @@
       "added_at": "2026-08-28T00:25:09.190134+00:00",
       "hint": "coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
       "n": 240,
-      "reason": null,
+      "reason": "完成候選標記經逐項驗證屬實：[10] sivers thesis 已於 2026-08-28 由 [239] 寫入 revised（lifecycle.json status=revised、next_check=2026-09-27）；[240] IQE 已由 reassess 產出 NO_ACTION decision pd_534e911d，coverage 無 blocker、REVIEW 成因（凍結 context 過期）已消除。與 2026-08-27 那批被 sync 自行撤銷的標記不同，本次兩項皆有 underlying receipt 支持",
+      "receipt": null,
       "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "drop",
+      "resolved_at": "2026-08-28T01:21:01.351064+00:00",
       "source": "decision_lab",
       "source_cleared": {
         "at": "2026-08-28T01:05:00.377637+00:00",
@@ -3906,23 +3902,17 @@
         "source_healthy": true
       },
       "title": "REVIEW — co:iqe",
-      "type": "decision_review",
-      "waiting_on": {
-        "derived_from_blockers": true,
-        "reason": "所有 blocker 都不需要使用者決定",
-        "set_at": "2026-08-28T00:25:09.189978+00:00",
-        "trigger": "執行面 context 缺失",
-        "until": null
-      }
+      "type": "decision_review"
     },
     {
       "added_at": "2026-08-28T01:05:00.377637+00:00",
       "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2025-12-31T00:00:00+00:00；來源=library/raw/lmoc_3081_annual_report_fy2025_20260508.txt | 聯亞 3081 114 年度股東會年報（MO",
       "n": 241,
-      "reason": null,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_086ed43cdb79e5ef3d9837aceae2186e;proposal:po_a7f7ea5ed73c8077e928bdf5f13bb714",
       "ref_id": "po_a7f7ea5ed73c8077e928bdf5f13bb714",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-28T01:20:15.698162+00:00",
       "source": "engine_c",
       "title": "Engine C 觀測：3081.TWO / customer_concentration",
       "type": "engine_c_observation"
@@ -3931,10 +3921,11 @@
       "added_at": "2026-08-28T01:05:00.377637+00:00",
       "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2025-12-31T00:00:00+00:00；來源=library/raw/lmoc_3081_annual_report_fy2025_20260508.txt | 聯亞 3081 114 年度股東會年報（MO",
       "n": 242,
-      "reason": null,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_61ad13bae13cf4980939f2227f2f136f;proposal:po_bf218a6f9df48bafe590b1036959af41",
       "ref_id": "po_bf218a6f9df48bafe590b1036959af41",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-28T01:20:16.316004+00:00",
       "source": "engine_c",
       "title": "Engine C 觀測：3081.TWO / backlog",
       "type": "engine_c_observation"
@@ -9033,6 +9024,42 @@
       "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
       "type": "decision_review",
       "verb": "source_cleared"
+    },
+    {
+      "at": "2026-08-28T01:20:15.698162+00:00",
+      "n": 241,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_086ed43cdb79e5ef3d9837aceae2186e;proposal:po_a7f7ea5ed73c8077e928bdf5f13bb714",
+      "ref_id": "po_a7f7ea5ed73c8077e928bdf5f13bb714",
+      "type": "engine_c_observation",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-28T01:20:16.316004+00:00",
+      "n": 242,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_61ad13bae13cf4980939f2227f2f136f;proposal:po_bf218a6f9df48bafe590b1036959af41",
+      "ref_id": "po_bf218a6f9df48bafe590b1036959af41",
+      "type": "engine_c_observation",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-28T01:21:01.351010+00:00",
+      "n": 10,
+      "reason": "完成候選標記經逐項驗證屬實：[10] sivers thesis 已於 2026-08-28 由 [239] 寫入 revised（lifecycle.json status=revised、next_check=2026-09-27）；[240] IQE 已由 reassess 產出 NO_ACTION decision pd_534e911d，coverage 無 blocker、REVIEW 成因（凍結 context 過期）已消除。與 2026-08-27 那批被 sync 自行撤銷的標記不同，本次兩項皆有 underlying receipt 支持",
+      "receipt": null,
+      "ref_id": "sivers",
+      "type": "thesis_lifecycle",
+      "verb": "drop"
+    },
+    {
+      "at": "2026-08-28T01:21:01.351064+00:00",
+      "n": 240,
+      "reason": "完成候選標記經逐項驗證屬實：[10] sivers thesis 已於 2026-08-28 由 [239] 寫入 revised（lifecycle.json status=revised、next_check=2026-09-27）；[240] IQE 已由 reassess 產出 NO_ACTION decision pd_534e911d，coverage 無 blocker、REVIEW 成因（凍結 context 過期）已消除。與 2026-08-27 那批被 sync 自行撤銷的標記不同，本次兩項皆有 underlying receipt 支持",
+      "receipt": null,
+      "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+      "type": "decision_review",
+      "verb": "drop"
     }
   ],
   "next_n": 243,

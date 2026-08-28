@@ -28,6 +28,39 @@ co:axt 或任何具名公司（L6 Gap 4）。
 ⚠ 惟此為 issuer 自我定位陳述（L8：當事人陳述），未經客戶端或第三方印證，
 本檔不據此改圖；如需修正關係應另走 Research Action 並取得人工核准。
 
+── 客戶端／第三方查證結果（2026-08-28，結論：不改圖）────────────────────
+依 L8 對上述 issuer 自述做獨立來源查證，三份獨立來源皆**未印證**「IDM 把磊晶外包給聯亞」：
+
+1. **Coherent FY2026 10-K**（library/raw/cohr_10_k_20260814_inp_vertical_integration.txt）：
+   自述為 "vertically integrated manufacturing company"，"Our vertically integrated technology
+   platform includes the in-house design and manufacture of transceivers and many of their
+   critical components, including lasers"，並持續擴 6 吋 InP 產能。
+   ⚠ 用詞是 "many of"（不是 all），技術上留有外包空間，但**全篇未具名任何磊晶代工廠**。
+   方向偏向否證聯亞為其主要磊晶來源。
+
+2. **Lumentum FY2026 10-K**（library/raw/lite_10_k_fy2026_20260817.txt）：
+   "We use a combination of our own wafer fabrication facilities, or wafer fabs... as well as
+   third-party contract manufacturers"，且 "significant contract manufacturing partners are
+   located primarily in Thailand, Taiwan, Malaysia and the Philippines"——**台灣被具名**，屬弱支持。
+   ⚠ 但 contract manufacturer 在光通訊語境通常指組裝／封測（EMS），與 epitaxial foundry
+   不是同一件事，且 "our own wafer fabs" 已涵蓋晶圓製造。措辭差異不得代換（L11）。
+   原料段（Sources and Availability of Raw Materials）僅泛稱 "various suppliers and contract
+   manufacturers"，未具名任何磊晶供應商。
+
+3. **Reuters／SemiAnalysis**（library/raw/reuters_inp_export_controls_2026_06_11.txt，tier 2-3）：
+   把聯亞與 VPEC（英特磊）並列為 "Taiwanese optical products makers"，描述兩者
+   "faced InP substrate disruptions from AXT permit delays"；同段說 "Coherent, mainly supplied
+   by AXT, and Lumentum, mainly supplied by Sumitomo and JX Advanced Metals"。
+   ⚠ 即第三方把聯亞放在與 Coherent／Lumentum **平行**的 InP 基板消費端，而非其供應端。
+   同時佐證聯亞年報自述的同業判斷（VPEC／英特磊）正確。
+
+**結論：**（a）聯亞的代工定位自述維持 L8 的 verified_by_absence（weak），不足以改圖；
+（b）三份來源都沒有**直接討論**「IDM 磊晶外包」這個具體問題，所以這是「未獲印證」
+而非「已被否證」——兩者是不同的 claim（L11 第 5 點），日後若出現客戶端具名文件可重啟；
+（c）圖中既有的 co:axt -supplies_to-> co:landmark_optoelectronics 獲 Reuters 獨立佐證，維持不變。
+⚠ 附帶發現的覆蓋缺口：**VPEC（英特磊，IET-KY）經 issuer 年報與 Reuters 兩處具名為同業，
+但不在圖中亦不在 identity registry**——需要時應另走 company-onboard。
+
 [C] 主要原料之供應狀況
 
 (三)主要原料之供應狀況 主要原料 主要供應商 供應狀況 Substrate 基板 A01 公司(註)、A03 公司(註)、A10 公司(註) 正常 Mo-Source A04 公司(註)、A05 公司(註)、凱信 AKZO 正常 設備耗材 A06 公司(註)、A13 公司(註)、A15 公司(註) 正常
