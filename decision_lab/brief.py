@@ -13,7 +13,25 @@ from .store import DecisionStore
 from .workflow_ports import WorkflowDataProvider
 
 
-_ACTION_PRIORITY = {"NO ACTION": 0, "TRADE": 1, "HEDGE": 2, "REVIEW": 3}
+def _evidence_gap_order(item: Mapping[str, Any]) -> tuple[int, int, str, str]:
+    """首屏排序鍵：證據最弱的排前面。
+
+    先前用 `_ACTION_PRIORITY = {"NO ACTION": 0, "TRADE": 1, "HEDGE": 2, "REVIEW": 3}`
+    ——那是資本語意的排序（要不要交易），而系統終點已經改成瓶頸排序、不給額度。
+    現在問的是「哪一檔最需要補證據」，答案就是最弱軸的等級。
+
+    未知等級排最前：寧可多看一眼，也不要讓一個算不出等級的項目沉到底部。
+    """
+    from .sizing import AXES, LEVELS
+
+    level = str(item.get("weakest_level") or "")
+    axis = str(item.get("weakest_axis") or "")
+    return (
+        LEVELS.index(level) if level in LEVELS else -1,
+        AXES.index(axis) if axis in AXES else -1,
+        str(item.get("company_id") or ""),
+        str(item.get("cohort_id") or ""),
+    )
 # 已結案的 probe 不再進今日待辦；`revised` 刻意不在內（新 epoch 需 reassess）。
 # 字彙集中在 models，避免 workflow／brief 兩處各自複製而漂移。
 _TERMINAL_LIFECYCLE = TERMINAL_LIFECYCLE_STATUSES
@@ -90,6 +108,7 @@ def _decision_item(
         # 最弱軸跟著 item 走，消費端不必自己再查一次 decision（L16）。pq2 的研究缺口
         # 項目就是由它導出：「補哪一檔的哪一軸」比「REVIEW — co:xxx」可執行得多。
         "weakest_axis": (card.get("weakest_link") or {}).get("axis"),
+        "weakest_level": (card.get("weakest_link") or {}).get("level"),
         "weakest_missing_data": (card.get("weakest_link") or {}).get("missing_data") or [],
         "reason": card["reason"],
         "alpha_thesis_change": card.get("alpha_beta") or {"classification": "unknown"},
@@ -671,8 +690,16 @@ def build_today_brief(
     provider: WorkflowDataProvider | None = None,
     registry: IdentityRegistry | None = None,
     alpha_series_by_ticker: Mapping[str, Any] | None = None,
+    ranking: Mapping[str, Any] | None = None,
+    nav_exposure: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """掃描 cohorts／decisions 與當前 Sheet snapshot；不寫入任何 authority。"""
+    """掃描 cohorts／decisions 與當前 Sheet snapshot；不寫入任何 authority。
+
+    `ranking`（`ranking_view.build_ranking_view` 的輸出）與 `nav_exposure`
+    （`nav_exposure.build_nav_exposure` 的輸出）由呼叫端注入——前者需要 Neo4j、
+    後者需要 Google Sheet，而這一層不得 import 任何一個。兩者缺席時首屏照常渲染，
+    只是少了那兩區；不得因此讓整份 brief 失敗。
+    """
 
     _time(as_of, "as_of")
     assert_safe_payload(current_holdings or {})
@@ -747,14 +774,7 @@ def build_today_brief(
             blockers.add(f"holdings_{holdings_status}")
             item["blockers"] = sorted(blockers)
 
-    ranked = sorted(
-        items,
-        key=lambda item: (
-            -_ACTION_PRIORITY[str(item["recommended_action"])],
-            str(item.get("company_id") or ""),
-            str(item.get("cohort_id") or ""),
-        ),
-    )
+    ranked = sorted(items, key=_evidence_gap_order)
     for position, item in enumerate(ranked, 1):
         item["index"] = position  # 穩定編號，供對話式批次核准引用（plan R5）
     recommended = ranked[0]["recommended_action"] if ranked else "NO ACTION"
@@ -782,6 +802,9 @@ def build_today_brief(
     brief = {
         "schema_version": "engine-d-today-v1",
         "as_of": as_of,
+        # 系統終點：瓶頸排序在前、NAV 比例在後。兩者都是注入的（見 docstring）。
+        "ranking": dict(ranking) if ranking else None,
+        "nav_exposure": dict(nav_exposure) if nav_exposure else None,
         "action_needed": recommended != "NO ACTION",
         "recommended_action": recommended,
         "reason": reason,
@@ -830,6 +853,97 @@ def _pct(value: Any) -> str:
     return f"{value * 100:+.1f}%"
 
 
+def _render_ranking(ranking: Mapping[str, Any] | None) -> list[str]:
+    """瓶頸排序區——首屏第一塊。
+
+    兩份排序並列且各自帶用途說明：它們回答不同問題、不可互換，並排放才看得出差異
+    （可行動第 1 名與純結構第 1 名通常不同）。
+    """
+    if not ranking:
+        return [
+            "# 瓶頸排序",
+            "",
+            "⚠ 本次未提供排序資料（未注入 ranking）——不是「沒有候選」。",
+            "",
+        ]
+    lines = ["# 瓶頸排序", ""]
+    for key, label_key, total_key in (
+        ("actionable", "actionable_purpose", "actionable_total"),
+        ("structural", "structural_purpose", "structural_total"),
+    ):
+        rows = ranking.get(key) or []
+        lines.append(f"## {markdown_text(ranking.get(label_key) or key)}")
+        lines.append("")
+        if not rows:
+            lines += ["（無候選）", ""]
+            continue
+        lines.append("| # | 標的 | 卡在哪 | 替代難度 | 證據 | 最弱軸 |")
+        lines.append("|---|---|---|---|---|---|")
+        for row in rows:
+            ticker = markdown_text(row.get("ticker") or row.get("company_id") or "?")
+            anchor_note = "" if not row.get("no_demand_anchor") else " 🔴無需求錨點"
+            lines.append(
+                f"| {row.get('rank')} | {ticker}{anchor_note} "
+                f"| {markdown_text(row.get('bottleneck') or '')} "
+                f"| {row.get('substitutability') or '—'}"
+                f"{'｜sole_source' if row.get('sole_source') else ''} "
+                f"| {markdown_text(row.get('evidence') or '')} "
+                f"| {markdown_text(row.get('weakest_axis') or '—')} |"
+            )
+        total = ranking.get(total_key)
+        if isinstance(total, int) and total > len(rows):
+            lines.append("")
+            lines.append(f"（共 {total} 個候選，此處顯示前 {len(rows)}）")
+        lines.append("")
+    note = ranking.get("judgment_note")
+    if note:
+        lines += [f"⚠ {markdown_text(note)}", ""]
+    for caveat in ranking.get("caveats") or []:
+        lines.append(f"- {markdown_text(caveat)}")
+    lines.append("")
+    return lines
+
+
+def _render_nav_exposure(nav: Mapping[str, Any] | None) -> list[str]:
+    """持股 NAV 比例——排序之後。純呈現，不判斷失衡。"""
+    if not nav:
+        return []
+    if nav.get("status") != "available":
+        failure = nav.get("failure")
+        detail = f"（{markdown_text(failure)}）" if failure else ""
+        return [
+            "# 持股 NAV 比例",
+            "",
+            f"⚠ 持股讀不到{detail}——這不是「零曝險」。",
+            "",
+        ]
+    lines = ["# 持股 NAV 比例", ""]
+    lines.append("| 標的 | bucket | 佔 NAV |")
+    lines.append("|---|---|---|")
+    for position in nav.get("positions") or []:
+        lines.append(
+            f"| {markdown_text(position.get('ticker') or '?')} "
+            f"| {markdown_text(position.get('bucket') or '')} "
+            f"| {_pct(position.get('nav_pct'))} |"
+        )
+    lines.append("")
+    buckets = nav.get("buckets") or {}
+    if buckets:
+        parts = "、".join(
+            f"{markdown_text(name)} {_pct(share)}"
+            for name, share in sorted(buckets.items(), key=lambda kv: -kv[1])
+        )
+        lines += [f"- bucket 分布：{parts}", ""]
+    groups = nav.get("groups") or {}
+    if groups:
+        parts = "、".join(
+            f"{markdown_text(name)} {_pct(share)}"
+            for name, share in sorted(groups.items(), key=lambda kv: -kv[1])
+        )
+        lines += [f"- 相關性分組：{parts}", ""]
+    return lines
+
+
 def render_today_markdown(brief: Mapping[str, Any]) -> str:
     """由同一 public DTO 產生 Markdown；不接觸 private payload。
 
@@ -839,7 +953,10 @@ def render_today_markdown(brief: Mapping[str, Any]) -> str:
 
     assert_safe_payload(brief)
     blockers = "、".join(markdown_text(item) for item in brief.get("blockers") or []) or "無"
-    lines = [
+    # 首屏是瓶頸排序——系統的終點是「哪些標的值得看」，不是「今天要不要動作」。
+    lines = _render_ranking(brief.get("ranking"))
+    lines += _render_nav_exposure(brief.get("nav_exposure"))
+    lines += [
         f"# 今天需要動作嗎？{'是' if brief['action_needed'] else '否'}",
         "",
         f"- 建議動作：{markdown_text(brief['recommended_action'])}",
