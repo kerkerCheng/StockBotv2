@@ -181,13 +181,18 @@ def test_empty_graph_company_stays_shadow_only_with_bounded_research_work(
         assert "causal_path_missing" in coverage.blockers
         # U7 之前這裡斷言額度歸零（paper_max 0、live 區間 [0,0]）；同一件事現在由
         # 研究完整度表達，而缺口本身仍然要有一張 bounded work order 可以派工。
-        assert decision.research_status == "DATA_NEEDED"
-        assert frozen["research_status"] == "DATA_NEEDED"
+        #
+        # 2026-08-29：判準改用嚴重度分類後，這個 cohort 的verdict 由 `DATA_NEEDED`
+        # 變成 `INCOMPLETE`，而那是**更準確**的答案——空圖缺的是因果鏈與圖中公司
+        # （`causal_path_missing` 是 fatal coverage blocker），不是行情或 FX 抓不到。
+        # 兩者的下一步不同：`INCOMPLETE` 要人去補研究，`DATA_NEEDED` 只要重抓資料。
+        assert decision.research_status == "INCOMPLETE"
+        assert frozen["research_status"] == "INCOMPLETE"
         assert frozen["assessment_blockers"]
         assert store.table_count("paper_events") == 0
         assert store.table_count("research_work_orders") == 1
         assert card["attention"] == "REVIEW"
-        assert card["research"]["status"] == "DATA_NEEDED"
+        assert card["research"]["status"] == "INCOMPLETE"
         assert card["live"] == {"user_choice": None, "fill_reported": False}
     finally:
         store.close()

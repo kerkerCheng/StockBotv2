@@ -443,20 +443,26 @@ def calculate_probe_limits(
     if execution_fx.get("status") != "available":
         live_blockers.extend(execution_fx.get("blockers") or ["execution_fx_missing"])
 
-    # 研究完整度三態。判準與舊 `paper_status` 的 ELIGIBLE 一一對應，只是不再經過
+    # 研究完整度三態。第二、三條沿用舊 `paper_status` 的 ELIGIBLE 判準，只是不再經過
     # 資本換算：舊的 `paper_max > 0` 需要 axis_ceiling > 0（⟺ 最弱軸的 effective_level
     # 不是 unknown）且 coverage 無致命 blocker，兩個條件原樣保留；被拿掉的
     # `probe_book_remaining` 是純資本額度。
     #
-    # ⚠ **已知的名實落差，刻意留著等量測。** 第一條是 `if paper_blockers`，不分嚴重度，
-    # 而 `coverage.apply_execution_intent` 會把 diagnostic 級的
+    # 第一條**改用嚴重度分類**（2026-08-29 使用者核准）。舊碼是 `if paper_blockers`，
+    # 不分嚴重度，而 `coverage.apply_execution_intent` 會把 diagnostic 級的
     # `execution_intent_research_only`／`_paper_only` 塞進 `paper_blockers`——於是任何
-    # `research` intent 的評估恆為 `DATA_NEEDED`，與研究本身完整與否無關。
-    # 這是 U7 之前 `paper_status` 就有的行為，改名之後才變刺眼。
-    # 正確的判準應該是 `fatal_blockers(paper_blockers, lane="paper")`，但改它會直接抬高
-    # daily brief 的「上線標的 N/M」計數器——那是**放閘**，依 L14 必須先量測再動，
-    # 不能夾帶在一次移除重構裡。要動就另案，並先記下改動前後的筆數差。
-    if paper_blockers:
+    # `research` intent 的評估恆為 `DATA_NEEDED`，與研究本身完整與否無關。欄位叫
+    # 「研究完整度」卻在回答「這次請求有沒有要 paper lane」，是 L12 的一表兩義。
+    #
+    # 嚴重度分類本來就有 SSOT（`config/decision_blockers.json`），只是沒被送到這裡用
+    # ——L16 的形狀。三個 intent／context blocker 在該檔皆為 `diagnostic` ＋
+    # `system_internal`；`market_missing`／`fx_missing` 仍是 `fatal`，照舊 DATA_NEEDED。
+    #
+    # 放閘前的量測（L14）：對當時 21 個 operational cohort 的最新 decision 套用新判準，
+    # **3 筆改判**（co:micron_technology、co:harmonic_drive_systems、co:schaeffler），
+    # 三筆的 paper_blockers 都只含 intent／context 這類參數造成的碼；其餘 18 筆不變，
+    # 仍為 DATA_NEEDED 的都帶著 fatal 的 market/fx/identity 缺料。
+    if fatal_blockers(paper_blockers, lane="paper"):
         research_status = "DATA_NEEDED"
     elif (
         fatal_blockers(coverage.blockers)

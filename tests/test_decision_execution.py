@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 
 from decision_lab.action_card import build_action_card
+from decision_lab.blocker_severity import fatal_blockers
 from decision_lab.context import build_context_bundle, holdings_digest
 from decision_lab.coverage import assess_coverage
 from decision_lab.execution import (
@@ -197,13 +198,19 @@ def test_pending_coverage_persists_missing_catalyst_and_disproof_as_blockers(
         store.close()
 
 
-def test_research_intent_is_in_assessment_request_and_blocks_the_paper_lane(
+def test_research_intent_is_recorded_without_faking_missing_research_data(
     tmp_path: Path,
 ) -> None:
-    """`execution_intent` 進入凍結 request，並在 paper lane 留下對應 blocker。
+    """`execution_intent` 進入凍結 request 並留下 blocker，但**不得**汙染研究完整度。
 
-    U7 之後 `paper_blockers` 的語意是「研究資料齊不齊」而不是「能不能配資本」，
-    所以斷言改看 `research_status`：有 paper blocker ⇒ `DATA_NEEDED`。
+    2026-08-29：先前這條測試斷言 research intent ⇒ `DATA_NEEDED`，也就是把
+    「這次請求沒要 paper lane」講成「研究資料缺」——同一個欄位兩種語意（L12）。
+    `execution_intent_research_only` 在 `config/decision_blockers.json` 是
+    `diagnostic` ＋ `system_internal`，它本來就不該讓任何東西歸零；判準沒去用那份
+    分類才是 bug（L16）。
+
+    blocker 仍必須留在 `paper_blockers` 裡供稽核——會改變輸出的輸入要現形，
+    只是它不再有改判研究完整度的權力。
     """
 
     store = _store(tmp_path)
@@ -220,11 +227,15 @@ def test_research_intent_is_in_assessment_request_and_blocks_the_paper_lane(
         )
 
         decision = store.get_decision(result.decision_id)
-        assert result.research_status == "DATA_NEEDED"
+        sizing = decision["payload"]["sizing"]
         assert decision["payload"]["request"]["execution_intent"] == "research"
-        assert "execution_intent_research_only" in decision["payload"]["sizing"][
-            "paper_blockers"
-        ]
+        assert "execution_intent_research_only" in sizing["paper_blockers"]
+        # 光是換 intent 不會讓研究看起來變差。
+        assert result.research_status != "DATA_NEEDED"
+        # 而真正缺料的 blocker（fatal）仍然會判 DATA_NEEDED——分開之後兩邊都更嚴。
+        assert fatal_blockers(
+            ("market_missing",) + tuple(sizing["paper_blockers"]), lane="paper"
+        )
     finally:
         store.close()
 
@@ -386,8 +397,14 @@ def test_forged_coverage_cannot_bypass_stored_pending_gate(tmp_path: Path) -> No
         )
 
         # 偽造的 coverage 不算數：store 重讀 authoritative coverage，於是 pending 的
-        # `catalyst_missing` 仍然落進 paper lane，研究完整度誠實降級。
-        assert result.research_status == "DATA_NEEDED"
+        # `catalyst_missing` 仍然落進凍結的 paper lane——即使傳進來的 coverage 宣稱
+        # `paper_blockers=()`。這一行才是防偽造的直接證據。
+        #
+        # 2026-08-29：先前這裡斷言 `research_status == "DATA_NEEDED"`，那是間接代理，
+        # 而且在嚴重度分類被正確套用後就不再成立——`catalyst_missing` 是 `sizing` 級、
+        # 不歸零。用代理量測防偽造，會在代理的判準改變時給出與偽造無關的紅燈。
+        sizing = store.get_decision(result.decision_id)["payload"]["sizing"]
+        assert "catalyst_missing" in sizing["paper_blockers"]
         assert store.table_count("system_decisions") == 1
         assert store.table_count("paper_events") == 0
     finally:
