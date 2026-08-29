@@ -1,0 +1,163 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Downgrade if NVIDIA changes the stated per-wavelength specification, removes MRM from the product architecture, or production silicon fails to meet the stated performance.",
+      "id": "nvidia_tsmc_mrm_cpo_2025_08_26_cl1",
+      "source_ids": [
+        "nvidia_tsmc_mrm_cpo_2025_08_26_s1"
+      ],
+      "statement": "NVIDIA describes its Micro Ring Modulator silicon photonics engine as directly modulating 200Gbps PAM4 per wavelength for CPO.",
+      "subject_id": "tech:micro_ring_modulator"
+    },
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "guided",
+      "disproof_condition": "Downgrade if TSMC or NVIDIA reports unresolved yield or thermal barriers, abandons the MRM process, or no production deployment materializes.",
+      "id": "nvidia_tsmc_mrm_cpo_2025_08_26_cl2",
+      "source_ids": [
+        "nvidia_tsmc_mrm_cpo_2025_08_26_s2",
+        "nvidia_tsmc_mrm_cpo_2025_08_26_s3"
+      ],
+      "statement": "NVIDIA reports that collaboration with TSMC addressed MRM fabrication control, thermal sensitivity and high-speed modulation consistency at production scale, achieving reliable and repeatable performance.",
+      "subject_id": "tech:micro_ring_modulator"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:micro_ring_modulator",
+      "id": "e1",
+      "relation": "develops",
+      "source_ids": [
+        "nvidia_tsmc_mrm_cpo_2025_08_26_s1"
+      ],
+      "src_id": "co:nvidia"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "co:tsmc",
+      "id": "e2",
+      "relation": "partnership_with",
+      "source_ids": [
+        "nvidia_tsmc_mrm_cpo_2025_08_26_s2",
+        "nvidia_tsmc_mrm_cpo_2025_08_26_s3"
+      ],
+      "src_id": "co:nvidia"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:cpo",
+      "id": "e3",
+      "relation": "is_component_of",
+      "source_ids": [
+        "nvidia_tsmc_mrm_cpo_2025_08_26_s1"
+      ],
+      "src_id": "tech:micro_ring_modulator"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "end_demand",
+      "aliases": [
+        "NVDA",
+        "NVIDIA Corporation"
+      ],
+      "attributes": {},
+      "confidence": 0.75,
+      "id": "co:nvidia",
+      "name": "NVIDIA",
+      "role": null,
+      "source_ids": [
+        "nvidia_tsmc_mrm_cpo_2025_08_26_s1",
+        "nvidia_tsmc_mrm_cpo_2025_08_26_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [
+        "Taiwan Semiconductor Manufacturing Company",
+        "TSM",
+        "2330.TW"
+      ],
+      "attributes": {},
+      "confidence": 0.75,
+      "id": "co:tsmc",
+      "name": "TSMC",
+      "role": "foundry",
+      "source_ids": [
+        "nvidia_tsmc_mrm_cpo_2025_08_26_s2",
+        "nvidia_tsmc_mrm_cpo_2025_08_26_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "MRM",
+        "microring modulator"
+      ],
+      "attributes": {},
+      "confidence": 0.75,
+      "id": "tech:micro_ring_modulator",
+      "name": "Micro Ring Modulator",
+      "role": null,
+      "source_ids": [
+        "nvidia_tsmc_mrm_cpo_2025_08_26_s1",
+        "nvidia_tsmc_mrm_cpo_2025_08_26_s2"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "CPO"
+      ],
+      "attributes": {},
+      "confidence": 0.75,
+      "id": "tech:cpo",
+      "name": "Co-Packaged Optics",
+      "role": null,
+      "source_ids": [
+        "nvidia_tsmc_mrm_cpo_2025_08_26_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "nvidia_tsmc_mrm_cpo_2025_08_26",
+    "evidence_tier": 2,
+    "origin_entity": "NVIDIA Corporation",
+    "permission_basis": "Public NVIDIA technical blog; retain the canonical URL and only research-relevant excerpts.",
+    "published_at": "2025-08-26",
+    "publisher": "NVIDIA Technical Blog",
+    "retrieved_at": "2026-08-30",
+    "source_type": "industry_report",
+    "storage_permission": "repo_excerpt",
+    "title": "How Industry Collaboration Fosters NVIDIA Co-Packaged Optics",
+    "url": "https://developer.nvidia.com/blog/how-industry-collaboration-fosters-nvidia-co-packaged-optics/"
+  },
+  "sources": [
+    {
+      "id": "nvidia_tsmc_mrm_cpo_2025_08_26_s1",
+      "locator": "How TSMC helped solve Micro Ring Modulator problems, paragraph 1",
+      "quote": "Engineered for direct 200Gbps PAM4 modulation per wavelength, the Micro Ring Modulator achieves an ultra-low density footprint."
+    },
+    {
+      "id": "nvidia_tsmc_mrm_cpo_2025_08_26_s2",
+      "locator": "How TSMC helped solve Micro Ring Modulator problems, paragraph 2",
+      "quote": "Deep collaboration with TSMC has helped NVIDIA solve—at production scale—some of the longstanding manufacturing problems associated with Micro Ring Modulators."
+    },
+    {
+      "id": "nvidia_tsmc_mrm_cpo_2025_08_26_s3",
+      "locator": "How TSMC helped solve Micro Ring Modulator problems, paragraph 2",
+      "quote": "NVIDIA and TSMC have achieved reliable, repeatable performance"
+    }
+  ]
+}

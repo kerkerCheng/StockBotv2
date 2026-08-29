@@ -1,0 +1,4 @@
+Source URL: https://developer.nvidia.com/blog/how-industry-collaboration-fosters-nvidia-co-packaged-optics/
+
+Excerpt:
+NVIDIA describes a direct 200Gbps-PAM4-per-wavelength Micro Ring Modulator engine and credits TSMC collaboration with solving fabrication control, thermal sensitivity and high-speed-modulation consistency at production scale.
