@@ -284,6 +284,24 @@ D7 的判準本身仍然有效，只是不再有這個 gate 可套用。
 
 **🔴 private authority 備份沒有可執行入口（2026-08-29 使用者提出，查證後升級）：**
 
+> ⚠ **已實測：現有的 Google service account 金鑰無法用來備份到 Drive，不要再試。**
+> 三步驗證（2026-08-29）：①同一把 `GSHEETS_SERVICE_ACCOUNT_JSON` 能取得 `drive.file`
+> scope 憑證；②Drive API 可呼叫（代表已在 `my-project-stockbot` 專案啟用）；
+> ③實際 `files.create` 回 **403 `storageQuotaExceeded`**，訊息是
+> 「Service Accounts do not have storage quota」——`storageQuota.limit` 為 `0`。
+> Google 官方給的兩條出路（共用雲端硬碟、domain-wide delegation）**都需要 Workspace**，
+> 個人 Gmail 不適用。
+>
+> 唯一適用個人帳號的是**改用 OAuth user credentials**：同專案建 Desktop app OAuth
+> client ID、跑一次瀏覽器授權、存 refresh token，檔案由使用者帳號擁有並吃 15GB 配額。
+> ⚠ **consent screen 若停在 Testing 模式，refresh token 7 天過期**，備份會在第 8 天
+> 安靜停掉而沒有任何訊號——這正是「最後一次備份 N 天前」計數器從「好有」變成
+> 「必須有」的原因。
+>
+> **先決定要不要 Drive**：備份量約 35MB（Decision Store 31MB ＋ engine_c 3.3MB ＋
+> 很小的 Neo4j dump）。本機第二顆磁碟／外接碟**不需要任何認證、沒有 token 過期問題**，
+> 但沒有異地保護。Drive 的唯一好處是異地；代價是上面那個會安靜失效的 token。
+
 | 項目 | 為什麼 | 驗收條件 | 前置 |
 |---|---|---|---|
 | **把既有的 backup 模組接上入口，並讓「上次備份」變成會自己出現的數字** | `AGENTS.md` L10 的判準是「這筆資料今天重新取一次拿得回來嗎？拿不回來 → 只能 append」。拿不回來的目前有：`library/private/decision_lab/`（31MB，131 筆 decision＋live choice／fill）、`library/private/engine_c/`（3.3MB，append-only manual observation ledger）、以及**完全不在 repo 內的 Neo4j 圖**。⚠ 查證後的真正問題不是「還沒寫備份工具」——`decision_lab/backup.py` 早就寫好了，含 checksum、bounded rotation 與 `restore_private_backup`，但 **production 呼叫端是 0**（`grep create_private_backup` 只命中它自己與兩個測試檔）。它是 L13 的「管子只接一頭」：能力蓋好了，沒有任何人能從外面按下去。Neo4j 則連 dump 腳本都沒有。所以今天「上次備份是什麼時候」的誠實答案是**沒有備份過**。 | ①有可執行入口（CLI subcommand 或 `scripts/`），使用者一行可跑；②**daily brief 首屏出現「最後一次備份：N 天前」**——依 L14，真正的防呆是會自己出現的常駐計數器，不是要人記得的段落，而「提醒使用者手動備份」正是那種會被忘記的段落；③至少實際跑過一次 restore 到暫存位置並比對 checksum——**沒驗證過的備份不算備份**。 | 先把 `library/private/` 底下分成「拿得回來」（`models` 464MB 可重下載、`lead_media`）與「拿不回來」兩類，只備份後者 |
