@@ -1,0 +1,4 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1835632/000183563226000025/mrvl-20260801.htm
+
+Excerpt:
+Marvell 10-Q (Q2 FY2027): On March 31, 2026 NVIDIA purchased 2.0M shares of Marvell Series A Convertible Preferred for $2.0 billion cash, convertible into ~21.8M common shares at ~$91.84, alongside a strategic partnership connecting Marvell custom XPUs and scale-up networking with NVIDIA's AI infrastructure ecosystem. The same filing discloses customer warrants (FY2025: 4.2M shares at $87.77; FY2026: $55.4M fair value) vesting on customer revenue milestones and recognized as a reduction to revenue.

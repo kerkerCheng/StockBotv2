@@ -1,0 +1,145 @@
+{
+  "claims": [
+    {
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Downgrade if NVIDIA disposes of or converts-and-sells the Series A Preferred position, or if subsequent filings show the strategic partnership terminated or materially narrowed.",
+      "id": "mrvl_10q_nvidia_preferred_2026_08_28_cl1",
+      "source_ids": [
+        "mrvl_10q_nvidia_preferred_2026_08_28_s1",
+        "mrvl_10q_nvidia_preferred_2026_08_28_s3"
+      ],
+      "statement": "NVIDIA completed a $2.0 billion cash purchase of 2.0 million shares of Marvell Series A Convertible Preferred Stock on March 31, 2026, initially convertible into a maximum of approximately 21.8 million common shares at approximately $91.84 per share.",
+      "subject_id": "co:marvell_technology"
+    },
+    {
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Downgrade if either party announces termination or material narrowing of the partnership, or if custom XPU / scale-up networking products fail to reach production under the partnership scope.",
+      "id": "mrvl_10q_nvidia_preferred_2026_08_28_cl2",
+      "source_ids": [
+        "mrvl_10q_nvidia_preferred_2026_08_28_s2"
+      ],
+      "statement": "Marvell and NVIDIA announced a strategic partnership in Q1 FY2027 to connect Marvell custom XPUs and compatible scale-up networking with NVIDIA's AI infrastructure ecosystem.",
+      "subject_id": "co:marvell_technology"
+    },
+    {
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Reassess if amended warrant terms create binding minimum purchases or the warrants are cancelled; the claim describes incentive direction, not program economics.",
+      "id": "mrvl_10q_nvidia_preferred_2026_08_28_cl3",
+      "source_ids": [
+        "mrvl_10q_nvidia_preferred_2026_08_28_s4",
+        "mrvl_10q_nvidia_preferred_2026_08_28_s5",
+        "mrvl_10q_nvidia_preferred_2026_08_28_s6"
+      ],
+      "statement": "Marvell separately grants warrants to customers (Fiscal 2025: up to 4.2 million shares at $87.77; Fiscal 2026: total grant-date fair value $55.4 million, none vested as of August 1, 2026) that vest on the customer's revenue milestones and are recognized as a reduction to revenue — a supplier-pays-customer incentive direction that coexists with, and must not be conflated with, NVIDIA's customer-side capital commitment.",
+      "subject_id": "co:marvell_technology"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "co:marvell_technology",
+      "id": "e1",
+      "relation": "invests_in",
+      "source_ids": [
+        "mrvl_10q_nvidia_preferred_2026_08_28_s1",
+        "mrvl_10q_nvidia_preferred_2026_08_28_s3"
+      ],
+      "src_id": "co:nvidia"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "co:nvidia",
+      "id": "e2",
+      "relation": "partnership_with",
+      "source_ids": [
+        "mrvl_10q_nvidia_preferred_2026_08_28_s2"
+      ],
+      "src_id": "co:marvell_technology"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "Marvell",
+        "MRVL"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:marvell_technology",
+      "name": "Marvell Technology",
+      "role": "adjacent_silicon",
+      "source_ids": [
+        "mrvl_10q_nvidia_preferred_2026_08_28_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "end_demand",
+      "aliases": [
+        "NVDA",
+        "NVIDIA Corporation"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:nvidia",
+      "name": "NVIDIA",
+      "role": null,
+      "source_ids": [
+        "mrvl_10q_nvidia_preferred_2026_08_28_s1"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mrvl_10q_nvidia_preferred_2026_08_28",
+    "evidence_tier": 1,
+    "origin_entity": "Marvell Technology, Inc.",
+    "permission_basis": "Official public SEC filing; retain the canonical URL and only research-relevant excerpts.",
+    "published_at": "2026-08-28",
+    "publisher": "SEC EDGAR",
+    "retrieved_at": "2026-08-29",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Marvell 10-Q (Q2 FY2027) — NVIDIA $2.0B Series A Preferred investment and strategic partnership",
+    "url": "https://www.sec.gov/Archives/edgar/data/1835632/000183563226000025/mrvl-20260801.htm"
+  },
+  "sources": [
+    {
+      "id": "mrvl_10q_nvidia_preferred_2026_08_28_s1",
+      "locator": "Note 10 Stockholders' Equity, Series A Preferred issuance",
+      "quote": "On March 31, 2026, the Company completed the issuance and sale of 2.0 million shares of Series A Convertible Preferred Stock, par value $0.002 per share (the “Series A Preferred Stock”), to NVIDIA Corporation (“NVIDIA”), for an aggregate purchase price of $2.0 billion."
+    },
+    {
+      "id": "mrvl_10q_nvidia_preferred_2026_08_28_s2",
+      "locator": "MD&A, strategic partnership",
+      "quote": "During the first quarter of fiscal 2027, Marvell and NVIDIA Corporation (“NVIDIA”) announced a strategic partnership to connect our custom XPUs and compatible scale-up networking with NVIDIA’s AI infrastructure ecosystem."
+    },
+    {
+      "id": "mrvl_10q_nvidia_preferred_2026_08_28_s3",
+      "locator": "Note 10, conversion terms",
+      "quote": "Each share of Series A Preferred Stock has a stated value of $1,000 and is initially convertible, at the option of the holder, into shares of the Company’s common stock at an initial conversion price of approximately $91.84 per share into an aggregate maximum of approximately 21.8 million shares of common stock"
+    },
+    {
+      "id": "mrvl_10q_nvidia_preferred_2026_08_28_s4",
+      "locator": "Revenue note, customer warrant (Fiscal 2025)",
+      "quote": "the Company issued a warrant to a customer for the purchase of up to 4.2 million shares (“Fiscal 2025 Warrant Shares”) of the Company’s common stock at an exercise price of $87.77 per share"
+    },
+    {
+      "id": "mrvl_10q_nvidia_preferred_2026_08_28_s5",
+      "locator": "Revenue note, customer warrant vesting mechanics",
+      "quote": "The Fiscal 2025 Warrant Shares vest primarily based on the customer’s achievement of qualifying product revenue milestones and are recognized as a reduction to revenue as qualifying revenues ar"
+    },
+    {
+      "id": "mrvl_10q_nvidia_preferred_2026_08_28_s6",
+      "locator": "Revenue note, Fiscal 2026 warrant fair value",
+      "quote": "The grant date fair value of the warrant was determined to be $53.02 per share and a total fair value of $55.4 million using the Black-Scholes option pricing model. None of the Fiscal 2026 Warrant Shares have vested as of August 1, 2026."
+    }
+  ]
+}
