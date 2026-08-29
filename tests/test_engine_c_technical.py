@@ -10,12 +10,12 @@ import pytest
 from decision_lab.beta_policy import load_beta_policy, unique_technical_targets
 from engine_c.etl_technical import refresh_technical_observations
 from engine_c.technical import (
+    _METRIC_COLUMNS,
     append_technical_observation,
     build_technical_observation,
     ensure_technical_schema,
     latest_technical_status,
     recent_technical_observations,
-    technical_observation_session_count,
     unavailable_observation,
 )
 from engine_c.technical import _row_to_observation
@@ -59,15 +59,43 @@ def test_indicator_builder_emits_complete_finite_observation() -> None:
 
     assert result["data_status"] == "observed"
     assert result["session_count"] == 300
-    assert result["rsi_14"] == pytest.approx(100.0)
     assert result["drawdown_252"] == pytest.approx(0.0)
+    # 單調上漲序列的最新收盤就是 52 週高點，區間位置＝1.0
+    assert result["range_percentile_252"] == pytest.approx(1.0)
     assert 0 < result["return_1d"] < result["return_5d"] < result["return_20d"]
     assert result["sma_20"] < result["close_adjusted"]
     assert result["distance_sma_200"] > 0
-    assert result["sma_50_slope_5"] > 0
-    assert result["macd_line"] > 0
     assert result["series_digest"]
     assert result["blockers"] == []
+
+
+def test_momentum_indicators_are_gone_from_the_observation_payload() -> None:
+    """RSI／MACD／sma_50_slope_5 於 2026-08-29 隨 beta 技術訊號移除，不再計算也不再寫入。
+
+    只是「不顯示」不夠——它們必須離開輸出路徑，否則下次很容易被換個名字接回來。
+    """
+    result = _observation()
+
+    for column in ("rsi_14", "macd_line", "macd_signal", "macd_histogram", "macd_histogram_slope", "sma_50_slope_5"):
+        assert column not in result, column
+        assert column not in _METRIC_COLUMNS, column
+    assert "range_percentile_252" in _METRIC_COLUMNS
+
+
+def test_range_percentile_places_the_close_inside_its_own_52_week_band() -> None:
+    """相對水位的主要欄位：0.0＝52 週低點、1.0＝52 週高點，純位置無動能。"""
+    rising = _observation(300)
+    falling = build_technical_observation(
+        benchmark_key="down",
+        provider_symbol="DOWN",
+        rows=_rows(300, start=200.0, step=-0.2),
+        fetched_at=FETCHED,
+        source="fixture://down",
+    )
+
+    assert rising["range_percentile_252"] == pytest.approx(1.0)
+    assert falling["range_percentile_252"] == pytest.approx(0.0)
+    assert falling["drawdown_252"] < 0
 
 
 def test_short_history_and_forming_row_fail_closed_without_hiding_partial_metrics() -> None:
@@ -90,11 +118,11 @@ def test_short_history_and_forming_row_fail_closed_without_hiding_partial_metric
 
     assert result["data_status"] == "insufficient_history"
     assert result["session_count"] == 251
-    assert result["rsi_14"] is not None
     assert result["return_1d"] is not None
     assert result["return_5d"] is not None
     assert result["return_20d"] is not None
     assert result["drawdown_252"] is None
+    assert result["range_percentile_252"] is None
     assert result["blockers"] == ["technical_history_insufficient_252_sessions"]
     assert "forming_session_excluded" in result["warnings"]
 
@@ -130,18 +158,18 @@ def test_append_is_idempotent_and_recent_query_deduplicates_session() -> None:
     append_technical_observation(conn, newer)
     assert conn.execute("SELECT COUNT(*) FROM technical_observations").fetchone()[0] == 2
     assert len(recent_technical_observations(conn, "qqq")) == 1
-    assert technical_observation_session_count(conn, "qqq") == 1
     assert latest_technical_status(conn, "qqq")["fetched_at"] == newer["fetched_at"]
 
     next_session = dict(first)
     next_session["session_date"] = "2026-07-29"
     next_session["fetched_at"] = "2026-07-29T01:00:00+00:00"
     append_technical_observation(conn, next_session)
-    assert technical_observation_session_count(conn, "qqq") == 2
+    assert len(recent_technical_observations(conn, "qqq")) == 2
     conn.close()
 
 
-def test_sqlite_schema_upgrade_adds_return_columns_non_destructively() -> None:
+def test_sqlite_schema_upgrade_adds_missing_metric_columns_non_destructively() -> None:
+    """舊庫缺欄位就地 ALTER 補上；append-only ledger 不做破壞性重建。"""
     conn = sqlite3.connect(":memory:")
     conn.execute(
         "CREATE TABLE technical_observations (benchmark_key TEXT, session_date TEXT, fetched_at TEXT)"
@@ -152,11 +180,12 @@ def test_sqlite_schema_upgrade_adds_return_columns_non_destructively() -> None:
     columns = {
         row[1] for row in conn.execute("PRAGMA table_info(technical_observations)").fetchall()
     }
-    assert {"return_1d", "return_5d", "return_20d"} <= columns
+    assert set(_METRIC_COLUMNS) <= columns
+    assert {"return_1d", "return_5d", "return_20d", "range_percentile_252"} <= columns
     conn.close()
 
 
-def test_refresh_fetches_signal_and_instrument_price_series_once() -> None:
+def test_refresh_fetches_every_distinct_price_series_once() -> None:
     policy = load_beta_policy()
     calls: list[tuple[str, str]] = []
 
@@ -254,28 +283,10 @@ def test_postgres_decimal_and_date_rows_normalize_to_public_scalars() -> None:
         "session_date": datetime(2026, 7, 27, tzinfo=timezone.utc).date(),
         "session_count": 300,
         "data_status": "observed",
-        **{key: Decimal("1.25") for key in (
-            "close_raw",
-            "close_adjusted",
-            "return_1d",
-            "return_5d",
-            "return_20d",
-            "drawdown_252",
-            "rsi_14",
-            "macd_line",
-            "macd_signal",
-            "macd_histogram",
-            "macd_histogram_slope",
-            "sma_20",
-            "sma_50",
-            "sma_200",
-            "distance_sma_20",
-            "distance_sma_50",
-            "distance_sma_200",
-            "sma_50_slope_5",
-            "realized_vol_20",
-            "realized_vol_60",
-        )},
+        **{key: Decimal("1.25") for key in _METRIC_COLUMNS},
+        # legacy 動能欄位仍可能出現在舊庫的 SELECT * 結果裡，必須被安靜忽略
+        "rsi_14": Decimal("55.0"),
+        "macd_histogram": Decimal("0.1"),
         "source": "fixture://qqq",
         "series_digest": "a" * 64,
         "fetched_at": datetime(2026, 7, 28, tzinfo=timezone.utc),
@@ -288,5 +299,7 @@ def test_postgres_decimal_and_date_rows_normalize_to_public_scalars() -> None:
 
     assert normalized["session_date"] == "2026-07-27"
     assert normalized["fetched_at"] == "2026-07-28T00:00:00+00:00"
-    assert normalized["rsi_14"] == 1.25
     assert normalized["return_20d"] == 1.25
+    assert normalized["range_percentile_252"] == 1.25
+    assert "rsi_14" not in normalized
+    assert "macd_histogram" not in normalized

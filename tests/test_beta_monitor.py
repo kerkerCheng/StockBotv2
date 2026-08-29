@@ -1,14 +1,26 @@
-"""Engine D beta monitor separates timing from hard contribution capacity。"""
+"""Engine D beta 監控：目標配置差距、行情心跳與相對水位，全程不含技術訊號。
+
+⚠ 本檔在 2026-08-29 大幅改寫。原本斷言三態系統動作（CONTRIBUTE REVIEW／HOLD／
+PAUSE CONTRIBUTION）、pace 節奏、RSI／MACD tier 與例行提醒節奏的測試已一併刪除，
+理由是它們唯一斷言的行為隨技術訊號機制移除；被刪的每一個都在下方留了說明。
+斷言仍存在行為（行情心跳、槓桿 cap、資本呈現）的測試改用新欄位，原意圖保留。
+"""
 from __future__ import annotations
 
-from copy import deepcopy
+import json
 
 import pytest
 
-from decision_lab.beta_monitor import build_beta_monitor, render_beta_monitor_markdown, signal_state
+from decision_lab.beta_monitor import (
+    build_allocation_gap,
+    build_beta_monitor,
+    render_beta_monitor_markdown,
+    water_level,
+)
 from decision_lab.beta_policy import (
     instrument_price_key,
     load_beta_policy,
+    load_target_allocation,
     unique_technical_targets,
 )
 
@@ -20,10 +32,8 @@ def _observation(
     key: str,
     *,
     drawdown: float = -0.25,
-    rsi: float = 35.0,
-    histogram_slope: float = 0.1,
+    percentile: float = 0.35,
     distance_200: float = 0.02,
-    slope_50: float = 0.01,
 ):
     return {
         "benchmark_key": key,
@@ -33,14 +43,11 @@ def _observation(
         "return_1d": -0.01,
         "return_5d": -0.03,
         "return_20d": -0.08,
-        "rsi_14": rsi,
         "drawdown_252": drawdown,
-        "macd_histogram": -0.2,
-        "macd_histogram_slope": histogram_slope,
+        "range_percentile_252": percentile,
         "distance_sma_20": -0.03,
         "distance_sma_50": -0.05,
         "distance_sma_200": distance_200,
-        "sma_50_slope_5": slope_50,
         "realized_vol_20": 0.3,
         "realized_vol_60": 0.25,
         "blockers": [],
@@ -110,81 +117,160 @@ def _capital_rows(*, credit_limit: str = "1000", drawn_amount: str = "0") -> lis
     ]
 
 
-def test_signal_state_uses_macd_and_ma_as_pace_guard_not_extra_votes() -> None:
-    policy = load_beta_policy()
-
-    bullish = signal_state(_observation("qqq"), policy)
-    bearish = signal_state(
-        _observation("qqq", histogram_slope=0.1, distance_200=-0.1, slope_50=-0.02),
-        policy,
-    )
-
-    assert bullish["tier"] == "deep"
-    assert bullish["pace"] == 0.5
-    assert bearish["tier"] == "deep"
-    assert bearish["pace"] == 0.25
-
-
-def test_stretched_above_sma200_downgrades_pace_even_on_a_real_drawdown() -> None:
-    """回撤 tier 只看「跌了多少」，看不出「跌之前漲了多少」。
-
-    2026-07-31 實況：SOXX 距高點 -23%、RSI 42.5，看似便宜，但仍在 200 日均線
-    上方 +25.7%——它跌得多是因為先漲得更多。以 30 年累積為目標時，買在趨勢
-    之上不該與買在趨勢附近同速。
-    """
-    policy = load_beta_policy()
-    threshold = policy["signal"]["stretched_above_sma200"]
-    base = dict(
-        benchmark_key="soxx",
-        data_status="observed",
-        drawdown_252=-0.23,
-        rsi_14=42.5,
-        macd_histogram_slope=0.1,
-        sma_50_slope_5=-0.003,
-        blockers=[],
-    )
-
-    stretched = signal_state({**base, "distance_sma_200": threshold + 0.05}, policy)
-    near_trend = signal_state({**base, "distance_sma_200": 0.03}, policy)
-
-    assert stretched["tier"] == near_trend["tier"], "只降 pace，不改 tier 判定"
-    assert stretched["stretched_above_sma200"] is True
-    assert near_trend["stretched_above_sma200"] is False
-    # guard 作用在訊號自算的 pace 上
-    assert stretched["signal_pace_raw"] < near_trend["signal_pace_raw"]
-    assert stretched["pace"] in policy["signal"]["allowed_paces"]
-    # 但它壓不到 baseline 以下：baseline 有實測證據（gate 現金投入輸定投 8.5%），
-    # stretched guard 是未驗證的推論——未驗證的機制不得覆蓋有證據的下限。
-    baseline = policy["signal"]["baseline_pace"]
-    assert stretched["pace"] >= baseline
-    assert stretched["pace_source"] == "baseline"
-
-
-def test_ranges_share_one_frozen_deployable_cash_budget() -> None:
-    policy = load_beta_policy()
-    observations = _observations(policy)
-    histories = {key: [value] for key, value in observations.items()}
-
-    report = build_beta_monitor(
+def _report(**kwargs):
+    policy = kwargs.pop("policy", None) or load_beta_policy()
+    observations = kwargs.pop("observations", None) or _observations(policy)
+    return build_beta_monitor(
         observations_by_benchmark=observations,
-        history_by_benchmark=histories,
-        holdings_rows=_holdings(cash=10.0),
-        capital_authority_rows=_capital_rows(),
+        history_by_benchmark=kwargs.pop(
+            "histories", {key: [value] for key, value in observations.items()}
+        ),
+        holdings_rows=kwargs.pop("holdings_rows", _holdings(cash=10.0)),
+        capital_authority_rows=kwargs.pop("capital_authority_rows", _capital_rows()),
         as_of=NOW,
         policy=policy,
+        **kwargs,
     )
 
-    reviews = [item for item in report["items"] if item["action"] == "CONTRIBUTE REVIEW"]
-    assert report["portfolio"]["deployable_cash_base"] == pytest.approx(9.0)
-    assert sum(item["supported_order_range_base"][1] for item in reviews) <= 9.0
-    assert report["portfolio"]["allocated_review_base"] == pytest.approx(
-        sum(item["supported_order_range_base"][1] for item in reviews)
+
+# ── 拔除訊號後的回歸防線 ───────────────────────────────────────────────────────
+
+
+def test_output_contains_no_action_states_pace_or_momentum_indicators() -> None:
+    """三態動作、節奏百分比與任何動能指標都不得再出現在輸出裡。
+
+    2026-08-01 三次回測全部失敗，2026-08-29 定案整組拔掉。RSI 以「相對水位」
+    之名放回來等於把測過失敗的東西換名字重來，所以連欄位名都不許出現。
+    """
+    report = _report()
+    payload = json.dumps(report, ensure_ascii=False, default=str)
+    rendered = render_beta_monitor_markdown(report, risk_view="full")
+
+    for banned in ("CONTRIBUTE REVIEW", "PAUSE CONTRIBUTION", "HOLD", "節奏", "RSI", "MACD"):
+        assert banned not in payload, banned
+        assert banned not in rendered, banned
+
+    def _keys(value) -> set[str]:
+        if isinstance(value, dict):
+            found = {str(key).casefold() for key in value}
+            for child in value.values():
+                found |= _keys(child)
+            return found
+        if isinstance(value, list):
+            return {name for child in value for name in _keys(child)}
+        return set()
+
+    banned_tokens = {"rsi", "macd", "momentum", "tier", "pace", "signal"}
+    for key in _keys(report):
+        assert not banned_tokens & set(key.split("_")), f"{key} 仍帶動能／訊號語意"
+
+
+def test_water_level_is_position_only_and_never_produces_a_ranking() -> None:
+    """相對水位只有位置欄位，且高水位不是「該等」的訊號。"""
+    level = water_level(_observation("qqq", drawdown=-0.02, percentile=0.95, distance_200=0.26))
+
+    assert set(level) == {
+        "status",
+        "range_percentile_52w",
+        "pct_from_52w_high",
+        "pct_from_sma200",
+        "interpretation",
+    }
+    assert level["range_percentile_52w"] == pytest.approx(0.95)
+    assert level["pct_from_52w_high"] == pytest.approx(-0.02)
+    assert level["pct_from_sma200"] == pytest.approx(0.26)
+    assert level["interpretation"] == "position_only_no_momentum_not_a_timing_signal"
+
+
+def test_water_level_is_none_when_the_series_is_degraded_not_zero() -> None:
+    """行情降級時水位是 None，不是 0——0 會被誤讀成「在 52 週低點」。"""
+    for status in ("insufficient_history", "unavailable", "quarantined", "stale"):
+        level = water_level({"data_status": status, "blockers": []})
+        assert level["status"] == status
+        assert level["range_percentile_52w"] is None
+        assert level["pct_from_52w_high"] is None
+
+
+# ── 保留行為：行情心跳 ────────────────────────────────────────────────────────
+
+
+def test_every_instrument_keeps_its_daily_heartbeat_even_with_no_contribution() -> None:
+    """行情表是每日心跳：每檔都必須有最新完整交易日與 1 日漲跌，一列都不省略。"""
+    report = _report()
+
+    assert len(report["items"]) == 14
+    for item in report["items"]:
+        assert item["heartbeat"]["session_date"] == "2026-07-27"
+        assert item["heartbeat"]["return_1d"] == pytest.approx(-0.01)
+
+    rendered = render_beta_monitor_markdown(report)
+    assert "## 主力 ETF／權值（每日心跳，不受今日是否投入影響）" in rendered
+    assert "最新完整交易日 2026-07-27：1日 -1.0%｜5日 -3.0%｜20日 -8.0%" in rendered
+    for ticker in ("QQQ", "TQQQ", "LON:VWRA", "SOXX", "00631L.TW", "2330.TW", "00981A.TW"):
+        assert any(line.startswith(f"| {ticker} |") for line in rendered.splitlines()), ticker
+
+
+def test_leveraged_product_uses_its_own_price_series_not_the_benchmark() -> None:
+    """TQQQ 的心跳與水位必須來自 TQQQ 自身序列，不得冒用 QQQ。"""
+    policy = load_beta_policy()
+    observations = _observations(policy)
+    tqqq_price_key = instrument_price_key(
+        next(item for item in policy["instruments"] if item["ticker"] == "TQQQ")
     )
-    assert report["capital_scope"] == "shared_cash_pool"
-    assert report["policy_mode"] == "paper_observation"
+    assert tqqq_price_key != "qqq"
+    observations[tqqq_price_key] = {
+        **observations[tqqq_price_key],
+        "return_1d": -0.03,
+        "return_5d": -0.09,
+        "return_20d": -0.20,
+        "drawdown_252": -0.40,
+        "range_percentile_252": 0.12,
+        "distance_sma_200": -0.18,
+    }
+
+    report = _report(policy=policy, observations=observations)
+    tqqq = next(item for item in report["items"] if item["ticker"] == "TQQQ")
+    qqq = next(item for item in report["items"] if item["ticker"] == "QQQ")
+
+    assert tqqq["price_series_key"] == tqqq_price_key
+    assert tqqq["price_symbol"] == "TQQQ"
+    assert tqqq["heartbeat"]["return_1d"] == pytest.approx(-0.03)
+    assert tqqq["water_level"]["range_percentile_52w"] == pytest.approx(0.12)
+    assert qqq["water_level"]["range_percentile_52w"] == pytest.approx(0.35)
+
+    rendered = render_beta_monitor_markdown(report)
+    tqqq_row = next(line for line in rendered.splitlines() if line.startswith("| TQQQ |"))
+    assert "最新完整交易日 2026-07-27：1日 -3.0%｜5日 -9.0%｜20日 -20.0%" in tqqq_row
+    assert "52週區間位置 12%" in tqqq_row
+
+
+def test_stale_price_series_degrades_that_row_without_hiding_it() -> None:
+    """過期／歷史不足只降級該列並說明原因，不得讓它從心跳表消失。"""
+    policy = load_beta_policy()
+    observations = _observations(policy)
+    observations["dram"] = {
+        "data_status": "insufficient_history",
+        "fetched_at": NOW,
+        "blockers": ["technical_history_insufficient_252_sessions"],
+    }
+    observations["soxx"] = {**observations["soxx"], "fetched_at": "2026-07-01T00:00:00+00:00"}
+
+    report = _report(policy=policy, observations=observations)
+
+    dram = next(item for item in report["items"] if item["ticker"] == "DRAM")
+    soxx = next(item for item in report["items"] if item["ticker"] == "SOXX")
+    assert dram["price_status"] == "insufficient_history"
+    assert "technical_history_insufficient_252_sessions" in dram["blockers"]
+    assert soxx["price_status"] == "stale"
+    assert soxx["water_level"]["range_percentile_52w"] is None
+    assert report["status"] == "degraded"
+    rendered = render_beta_monitor_markdown(report)
+    assert any(line.startswith("| SOXX |") for line in rendered.splitlines())
+    assert "行情資料過期" in rendered
 
 
 def test_twse_reference_is_rendered_without_becoming_adjusted_indicator() -> None:
+    """TWSE 官方列只作最新交易日校驗，不混入 adjusted-close 序列。"""
     policy = load_beta_policy()
     observations = _observations(policy)
     observations["tw50"]["_twse_reference"] = {
@@ -195,50 +281,133 @@ def test_twse_reference_is_rendered_without_becoming_adjusted_indicator() -> Non
         "change_pct": 0.1,
         "source": "fixture://twse",
     }
-    histories = {key: [value] for key, value in observations.items()}
 
-    report = build_beta_monitor(
-        observations_by_benchmark=observations,
-        history_by_benchmark=histories,
-        holdings_rows=_holdings(cash=10.0),
-        capital_authority_rows=_capital_rows(),
-        as_of=NOW,
-        policy=policy,
-    )
+    report = _report(policy=policy, observations=observations)
 
     tw50 = next(item for item in report["items"] if item["ticker"] == "0050.TW")
-    assert tw50["indicator"]["twse_session_date"] == "2026-07-31"
-    assert tw50["indicator"]["twse_change_pct"] == 0.1
+    assert tw50["heartbeat"]["twse_session_date"] == "2026-07-31"
+    assert tw50["heartbeat"]["twse_change_pct"] == 0.1
+    assert "TWSE 官方 2026-07-31 +10.0%" in render_beta_monitor_markdown(report)
+
+
+# ── 新增行為：目標配置差距 ────────────────────────────────────────────────────
+
+
+def _gap(rows, *, policy=None, target=None):
+    from decision_lab.portfolio_risk import build_portfolio_components
+
+    policy = policy or load_beta_policy()
+    portfolio = build_portfolio_components(rows, policy)
+    return build_allocation_gap(
+        portfolio=dict(portfolio) | {"status": portfolio["status"]},
+        policy=policy,
+        target_policy=target or load_target_allocation(),
+    )
+
+
+def test_allocation_gap_uses_invested_non_cash_and_treats_band_as_on_target() -> None:
+    """分母是已投入的非現金部位；落在 band 內視為到位、沒有偏好。"""
+    target = load_target_allocation()
+    core_target = target["sleeves"]["beta_core"]["target"]
+    band = target["sleeves"]["beta_core"]["band"]
+    # 非現金 80：VWRA 落在 beta_core 目標的 band 內，其餘丟給 alpha 殘量。
+    core_value = round(80.0 * core_target, 4)
+    rows = [
+        {"ticker": "CASH", "bucket": "cash", "market_value_base": 20.0, "nav_base": 100.0, "base_currency": "USD"},
+        {"ticker": "LON:VWRA", "bucket": "大盤", "market_value_base": core_value, "nav_base": 100.0, "base_currency": "USD"},
+        {"ticker": "UNMAPPED", "bucket": "觀察", "market_value_base": 80.0 - core_value, "nav_base": 100.0, "base_currency": "USD"},
+    ]
+
+    gap = _gap(rows, target=target)
+    by_sleeve = {item["sleeve"]: item for item in gap["sleeves"]}
+
+    assert gap["status"] == "available"
+    assert gap["basis"] == "invested_non_cash"
+    assert gap["invested_non_cash_base"] == pytest.approx(80.0)
+    assert by_sleeve["beta_core"]["actual"] == pytest.approx(core_target)
+    assert by_sleeve["beta_core"]["gap"] == pytest.approx(0.0)
+    assert by_sleeve["beta_core"]["state"] == "on_target"
+    # 剛好落在 band 邊界仍算到位
+    shifted = _gap(
+        [
+            rows[0],
+            {**rows[1], "market_value_base": round(80.0 * (core_target - band), 4)},
+            {**rows[2], "market_value_base": round(80.0 * (1 - core_target + band), 4)},
+        ],
+        target=target,
+    )
+    assert {item["sleeve"]: item for item in shifted["sleeves"]}["beta_core"]["state"] == "on_target"
+    # 空手的 sleeve 必然低於目標
+    assert by_sleeve["beta_leverage"]["actual"] == pytest.approx(0.0)
+    assert by_sleeve["beta_leverage"]["state"] == "below_band"
+    # 只給差距，不給金額也不排名
+    assert "suggested_amount" not in by_sleeve["beta_core"]
+    assert "rank" not in by_sleeve["beta_core"]
+
+
+def test_allocation_gap_flags_an_overweight_sleeve() -> None:
+    """超出 band 才標示，並指向「新資金避開」，不是要人賣出。"""
+    target = load_target_allocation()
+    rows = [
+        {"ticker": "CASH", "bucket": "cash", "market_value_base": 20.0, "nav_base": 100.0, "base_currency": "USD"},
+        {"ticker": "2330.TW", "bucket": "個股", "market_value_base": 40.0, "nav_base": 100.0, "base_currency": "USD"},
+        {"ticker": "LON:VWRA", "bucket": "大盤", "market_value_base": 40.0, "nav_base": 100.0, "base_currency": "USD"},
+    ]
+
+    gap = _gap(rows, target=target)
+    by_sleeve = {item["sleeve"]: item for item in gap["sleeves"]}
+
+    assert by_sleeve["large_cap_tilt"]["actual"] == pytest.approx(0.5)
+    assert by_sleeve["large_cap_tilt"]["state"] == "above_band"
+    assert by_sleeve["large_cap_tilt"]["gap"] > 0
+    assert gap["rebalancing"]["method"] == "new_money_only"
+
+
+def test_alpha_sleeve_is_marked_unknown_rather_than_zero_when_holdings_are_missing() -> None:
+    """算不到就標算不到。0% 會把新資金推向一個根本沒算過的格子（L12：None ≠ 0）。"""
+    gap = _gap(None)
+    by_sleeve = {item["sleeve"]: item for item in gap["sleeves"]}
+
+    assert gap["status"] == "unavailable"
+    assert gap["unavailable_reason"] == "holdings_unavailable"
+    for entry in gap["sleeves"]:
+        assert entry["actual"] is None, entry["sleeve"]
+        assert entry["state"] == "unknown", entry["sleeve"]
+    assert by_sleeve["alpha"]["actual_source"] == "residual_non_beta_holdings"
+    assert by_sleeve["alpha"]["unavailable_reason"] == "holdings_unavailable"
+
+
+def test_allocation_gap_and_correlation_warnings_always_render() -> None:
+    """兩條相關性警告每天都要講一次，不因為每天一樣就省略。"""
+    report = _report()
     rendered = render_beta_monitor_markdown(report)
-    assert "TWSE 官方 2026-07-31 +10.0%" in rendered
+
+    assert "## 目標配置差距（決定「這次投哪一檔」的錨點）" in rendered
+    assert "已投入的非現金部位" in rendered
+    assert "alpha 與 beta 是同一個賭注" in rendered
+    assert "TSMC look-through" in rendered
+    warnings = report["allocation_gap"]["correlation_warnings"]
+    assert len(warnings) == 2
+    for warning in warnings:
+        assert warning["detail"] in rendered
+
+
+# ── 保留行為：資本呈現與槓桿／曝險 cap ─────────────────────────────────────────
 
 
 def test_shared_cash_pool_subtracts_only_floor_and_never_uses_credit() -> None:
-    policy = load_beta_policy()
-    observations = _observations(policy)
-    histories = {key: [value] for key, value in observations.items()}
-
-    report = build_beta_monitor(
-        observations_by_benchmark=observations,
-        history_by_benchmark=histories,
-        holdings_rows=_holdings(cash=10.0),
-        capital_authority_rows=_capital_rows(),
-        as_of=NOW,
-        policy=policy,
-    )
-    larger_credit = build_beta_monitor(
-        observations_by_benchmark=observations,
-        history_by_benchmark=histories,
-        holdings_rows=_holdings(cash=10.0),
-        capital_authority_rows=_capital_rows(credit_limit="999999"),
-        as_of=NOW,
-        policy=policy,
-    )
+    report = _report()
+    larger_credit = _report(capital_authority_rows=_capital_rows(credit_limit="999999"))
 
     assert report["portfolio"]["deployable_cash_base"] == pytest.approx(9.0)
+    # 可投入區間就是可部署現金本身，不再被任何單輪預算或訊號縮小。
+    assert report["self_funded_supported_range"] == [0.0, pytest.approx(9.0)]
     assert report["self_funded_supported_range"] == larger_credit["self_funded_supported_range"]
     assert report["contingent_credit_available"]["undrawn_amount_base"] == 1000.0
     assert report["loan_funded_supported_range"]["status"] == "manual_review_required"
+    assert report["capital_scope"] == "shared_cash_pool"
+    assert report["policy_mode"] == "paper_observation"
+
     rendered = render_beta_monitor_markdown(report)
     assert "共同現金池計算" in rendered
     assert "cash floor" in rendered
@@ -247,56 +416,36 @@ def test_shared_cash_pool_subtracts_only_floor_and_never_uses_credit() -> None:
 
 
 def test_missing_cash_floor_authority_fails_shared_cash_closed() -> None:
-    policy = load_beta_policy()
-    observations = _observations(policy)
-    histories = {key: [value] for key, value in observations.items()}
-
-    report = build_beta_monitor(
-        observations_by_benchmark=observations,
-        history_by_benchmark=histories,
-        holdings_rows=_holdings(cash=10.0),
-        capital_authority_rows=None,
-        as_of=NOW,
-        policy=policy,
-    )
+    report = _report(capital_authority_rows=None)
 
     assert report["self_funded_supported_range"] == [0.0, 0.0]
     assert "capital_authority_unavailable" in report["blockers"]
     rendered = render_beta_monitor_markdown(report)
     assert "自有現金可部署" in rendered
     assert "cash floor 未知" in rendered
-    assert "LON:VWRA — observed｜" not in rendered
 
 
-def test_leverage_effective_cap_binds_even_when_signal_is_extreme() -> None:
+def test_leverage_effective_cap_zeroes_the_self_funded_range() -> None:
+    """槓桿 cap 是真實歸零風險，與訊號無關，拔訊號後必須完全保留。"""
     policy = load_beta_policy()
-    observations = _observations(policy, drawdown=-0.5, rsi=15.0)
-    histories = {key: [value] for key, value in observations.items()}
     # TQQQ 是 3x：持有量取自 policy 的 effective cap，確保必然越界。
     # 依 policy 推導而非寫死數字，改 cap 時測試不會腐爛。
     cap = policy["risk"]["leveraged_effective_cap"]
     nav = 100.0
-    tqqq_nominal = round(nav * cap / 3.0 + 1.0, 4)  # 超過 cap 的最小整量
-    report = build_beta_monitor(
-        observations_by_benchmark=observations,
-        history_by_benchmark=histories,
-        holdings_rows=_holdings(cash=nav - tqqq_nominal, tqqq=tqqq_nominal),
-        as_of=NOW,
+    tqqq_nominal = round(nav * cap / 3.0 + 1.0, 4)
+
+    report = _report(
         policy=policy,
+        holdings_rows=_holdings(cash=nav - tqqq_nominal, tqqq=tqqq_nominal),
+        capital_authority_rows=_capital_rows(),
     )
 
-    tqqq = next(item for item in report["items"] if item["ticker"] == "TQQQ")
-    assert tqqq["signal_pace"] == 1.0
-    assert tqqq["action"] == "PAUSE CONTRIBUTION"
-    assert tqqq["supported_order_range_base"] == [0.0, 0.0]
-    assert "etf_leverage_effective_cap_reached" in tqqq["blockers"]
     assert "etf_leverage_effective_cap_reached" in report["risk_snapshot"]["hard_blocks"]
+    assert "etf_leverage_effective_cap_reached" in report["blockers"]
+    assert report["self_funded_supported_range"] == [0.0, 0.0]
 
 
-def test_alpha_total_is_warning_only_and_does_not_consume_beta_capacity() -> None:
-    policy = load_beta_policy()
-    observations = _observations(policy)
-    histories = {key: [value] for key, value in observations.items()}
+def test_alpha_total_is_warning_only_and_never_a_hard_block() -> None:
     rows = _holdings(
         cash=35.0,
         other=[
@@ -310,141 +459,15 @@ def test_alpha_total_is_warning_only_and_does_not_consume_beta_capacity() -> Non
         ],
     )
 
-    report = build_beta_monitor(
-        observations_by_benchmark=observations,
-        history_by_benchmark=histories,
-        holdings_rows=rows,
-        capital_authority_rows=_capital_rows(),
-        as_of=NOW,
-        policy=policy,
-    )
+    report = _report(holdings_rows=rows)
+
     assert report["risk_snapshot"]["alpha_total_weight"] == pytest.approx(0.65)
     assert "alpha_total_warning" in report["warnings"]
-    assert any(item["supported_order_range_base"][1] > 0 for item in report["items"])
+    assert report["risk_snapshot"]["hard_blocks"] == []
+    assert report["self_funded_supported_range"][1] > 0
 
 
-def test_missing_sheet_or_partial_technical_data_returns_zero_ranges() -> None:
-    policy = load_beta_policy()
-    observations = _observations(policy)
-    observations["dram"] = {
-        "data_status": "insufficient_history",
-        "fetched_at": NOW,
-        "blockers": ["technical_history_insufficient_252_sessions"],
-    }
-
-    no_sheet = build_beta_monitor(
-        observations_by_benchmark=observations,
-        history_by_benchmark={},
-        holdings_rows=None,
-        as_of=NOW,
-        policy=policy,
-    )
-    with_sheet = build_beta_monitor(
-        observations_by_benchmark=observations,
-        history_by_benchmark={key: [value] for key, value in observations.items()},
-        holdings_rows=_holdings(),
-        as_of=NOW,
-        policy=policy,
-    )
-
-    assert no_sheet["status"] == "degraded"
-    assert all(item["supported_order_range_base"] == [0.0, 0.0] for item in no_sheet["items"])
-    dram = next(item for item in with_sheet["items"] if item["ticker"] == "DRAM")
-    assert dram["action"] == "PAUSE CONTRIBUTION"
-    assert "technical_history_insufficient_252_sessions" in dram["blockers"]
-
-
-def test_same_signal_respects_repeat_cadence() -> None:
-    policy = load_beta_policy()
-    observation = _observation("qqq")
-    observations = _observations(policy)
-    histories = {key: [value] for key, value in observations.items()}
-    histories["qqq"] = [deepcopy(observation) for _ in range(2)]
-
-    report = build_beta_monitor(
-        observations_by_benchmark=observations,
-        history_by_benchmark=histories,
-        holdings_rows=_holdings(cash=20.0),
-        capital_authority_rows=_capital_rows(),
-        as_of=NOW,
-        policy=policy,
-    )
-
-    qqq = next(item for item in report["items"] if item["ticker"] == "QQQ")
-    tqqq = next(item for item in report["items"] if item["ticker"] == "TQQQ")
-    assert qqq["review_cadence"]["reason"] == "cooldown"
-    assert qqq["action"] == "HOLD"
-    assert tqqq["action"] == "HOLD"
-
-
-def test_self_funded_routine_reminder_uses_full_session_count_not_signal() -> None:
-    policy = load_beta_policy()
-    observations = _observations(
-        policy,
-        drawdown=-0.02,
-        rsi=62.0,
-        histogram_slope=-0.1,
-        distance_200=0.08,
-        slope_50=0.01,
-    )
-    histories = {key: [value] for key, value in observations.items()}
-    due_counts = {key: 21 for key in observations}
-    cooldown_counts = {key: 22 for key in observations}
-
-    due = build_beta_monitor(
-        observations_by_benchmark=observations,
-        history_by_benchmark=histories,
-        holdings_rows=_holdings(cash=20.0),
-        capital_authority_rows=_capital_rows(),
-        as_of=NOW,
-        policy=policy,
-        session_counts_by_benchmark=due_counts,
-    )
-    cooldown = build_beta_monitor(
-        observations_by_benchmark=observations,
-        history_by_benchmark=histories,
-        holdings_rows=_holdings(cash=20.0),
-        capital_authority_rows=_capital_rows(),
-        as_of=NOW,
-        policy=policy,
-        session_counts_by_benchmark=cooldown_counts,
-    )
-
-    assert due["routine_reminder"] == {
-        "cadence_sessions": 5,
-        "due": True,
-        "due_tickers": [item["ticker"] for item in due["items"]],
-        "sessions_until_next": 0,
-        "scope": "self_funded_cash_only",
-        "loan_included": False,
-    }
-    assert any(item["action"] == "CONTRIBUTE REVIEW" for item in due["items"])
-    assert cooldown["routine_reminder"]["due"] is False
-    assert cooldown["routine_reminder"]["sessions_until_next"] == 4
-    assert all(item["action"] != "CONTRIBUTE REVIEW" for item in cooldown["items"])
-    qqq = next(item for item in cooldown["items"] if item["ticker"] == "QQQ")
-    assert qqq["routine_schedule"]["sessions_until_next"] == 4
-    assert qqq["signal_add_on"]["incremental_pace"] == 0.0
-    assert qqq["capital_constraints"]["status"] == "not_open_today"
-    assert qqq["capital_constraints"]["hard_blockers"] == []
-    assert "routine_review_cooldown" in qqq["blockers"]
-    rendered = render_beta_monitor_markdown(due)
-    assert "每 5 個完整交易日一次的自有現金評估本期已到" in rendered
-    assert "貸款不在本提醒內" in rendered
-    cooldown_rendered = render_beta_monitor_markdown(cooldown, risk_view="full")
-    assert "| 每檔 TL;DR（自身價格） | 相對結論 | 個別例外／上限 |" in cooldown_rendered
-    assert "今天不用啟動投入評估" in cooldown_rendered
-    assert "今日不比較（尚未到投入評估日）" in cooldown_rendered
-    cooldown_qqq_row = next(
-        line for line in cooldown_rendered.splitlines() if line.startswith("| QQQ |")
-    )
-    assert "最新完整交易日 2026-07-27：1日 -1.0%" in cooldown_qqq_row
-
-
-def test_known_tsmc_concentration_warns_without_pausing_additions() -> None:
-    policy = load_beta_policy()
-    observations = _observations(policy)
-    histories = {key: [value] for key, value in observations.items()}
+def test_known_tsmc_concentration_warns_without_blocking() -> None:
     rows = _holdings(
         cash=50.0,
         other=[
@@ -458,40 +481,19 @@ def test_known_tsmc_concentration_warns_without_pausing_additions() -> None:
         ],
     )
 
-    report = build_beta_monitor(
-        observations_by_benchmark=observations,
-        history_by_benchmark=histories,
-        holdings_rows=rows,
-        capital_authority_rows=_capital_rows(),
-        as_of=NOW,
-        policy=policy,
-    )
+    report = _report(holdings_rows=rows)
 
-    taiwan = [
-        item
-        for item in report["items"]
-        if item["ticker"] in {"0050.TW", "006208.TW", "00631L.TW", "2330.TW"}
-    ]
-    assert any(item["supported_order_range_base"][1] > 0 for item in taiwan)
     exposure = report["risk_snapshot"]["issuer_exposures"]["TSMC"]
     assert exposure["total_weight"] == pytest.approx(0.36)
     assert exposure["direct_weight"] == pytest.approx(0.36)
     assert "issuer_concentration_warning:TSMC" in report["warnings"]
+    assert report["self_funded_supported_range"][1] > 0
     rendered = render_beta_monitor_markdown(report, risk_view="full")
     assert "TSMC：總曝險 已知至少 36.0%" in rendered
 
 
 def test_drawn_debt_is_separate_from_etf_leverage_and_combined() -> None:
-    policy = load_beta_policy()
-    observations = _observations(policy)
-    report = build_beta_monitor(
-        observations_by_benchmark=observations,
-        history_by_benchmark={key: [value] for key, value in observations.items()},
-        holdings_rows=_holdings(),
-        capital_authority_rows=_capital_rows(drawn_amount="20"),
-        as_of=NOW,
-        policy=policy,
-    )
+    report = _report(capital_authority_rows=_capital_rows(drawn_amount="20"))
 
     risk = report["risk_snapshot"]
     assert risk["etf_leverage"]["effective_weight"] == 0.0
@@ -501,99 +503,26 @@ def test_drawn_debt_is_separate_from_etf_leverage_and_combined() -> None:
 
 
 def test_markdown_is_aggregate_and_preserves_human_boundary() -> None:
-    policy = load_beta_policy()
-    observations = _observations(policy)
-    report = build_beta_monitor(
-        observations_by_benchmark=observations,
-        history_by_benchmark={key: [value] for key, value in observations.items()},
-        holdings_rows=_holdings(),
-        capital_authority_rows=_capital_rows(),
-        as_of=NOW,
-        policy=policy,
-    )
-
+    report = _report()
     rendered = render_beta_monitor_markdown(report)
 
     assert "自有現金可部署" in rendered
-    assert "本輪可評估上限" in rendered
     assert "未動用貸款額度" in rendered
     assert "共同現金池計算" in rendered
     assert "不預扣 alpha reserve" in rendered
     assert "Sheet／household" not in rendered
     assert "## TL;DR" in rendered
     assert "退休淨終值" in rendered
-    assert "技術訊號只決定新增的時點與節奏" in rendered
     assert "月息不得依賴被迫賣出 beta" in rendered
-    assert "節奏 " in rendered
-    assert "最新完整交易日 2026-07-27：1日 -1.0%｜5日 -3.0%｜20日 -8.0%" in rendered
-    assert "今天是否投入" in rendered
-    assert "相對比較" in rendered
-    assert "## 主力 ETF／權值" in rendered
     assert rendered.index("QQQ") < rendered.index("TQQQ")
     assert "不代表已核准、已提款、已下單或已寫回" in rendered
-    for raw in (
-        "manual_review_required",
-        "campaign_budget",
-        "technical_history_insufficient_252_sessions",
-    ):
+    for raw in ("campaign_budget", "technical_history_insufficient_252_sessions", "shares"):
         assert raw not in rendered
-    assert "shares" not in rendered
-
-
-def test_leveraged_product_uses_underlying_signal_but_own_price_tldr() -> None:
-    policy = load_beta_policy()
-    observations = _observations(policy)
-    tqqq_policy = next(
-        item for item in policy["instruments"] if item["ticker"] == "TQQQ"
-    )
-    tqqq_price_key = instrument_price_key(tqqq_policy)
-    observations[tqqq_price_key] = {
-        **observations[tqqq_price_key],
-        "return_1d": -0.03,
-        "return_5d": -0.09,
-        "return_20d": -0.20,
-        "rsi_14": 28.0,
-        "drawdown_252": -0.40,
-    }
-    report = build_beta_monitor(
-        observations_by_benchmark=observations,
-        history_by_benchmark={key: [value] for key, value in observations.items()},
-        holdings_rows=_holdings(),
-        capital_authority_rows=_capital_rows(),
-        as_of=NOW,
-        policy=policy,
-    )
-
-    tqqq = next(item for item in report["items"] if item["ticker"] == "TQQQ")
-    assert tqqq["signal_benchmark"] == "QQQ"
-    assert tqqq["price_symbol"] == "TQQQ"
-    assert tqqq["indicator"]["return_1d"] == pytest.approx(-0.03)
-    assert tqqq["indicator"]["return_20d"] == pytest.approx(-0.20)
-    rendered = render_beta_monitor_markdown(report)
-    tqqq_row = next(line for line in rendered.splitlines() if line.startswith("| TQQQ |"))
-    assert "最新完整交易日 2026-07-27：1日 -3.0%｜5日 -9.0%｜20日 -20.0%" in tqqq_row
-    assert "節奏訊號看 QQQ" in tqqq_row
 
 
 def test_daily_risk_view_is_silent_without_change_but_weekly_full_is_explicit() -> None:
-    policy = load_beta_policy()
-    observations = _observations(policy)
-    history = {key: [value] for key, value in observations.items()}
-    first = build_beta_monitor(
-        observations_by_benchmark=observations,
-        history_by_benchmark=history,
-        holdings_rows=_holdings(),
-        as_of=NOW,
-        policy=policy,
-    )
-    second = build_beta_monitor(
-        observations_by_benchmark=observations,
-        history_by_benchmark=history,
-        holdings_rows=_holdings(),
-        as_of=NOW,
-        policy=policy,
-        previous_risk_snapshot=first["risk_snapshot"],
-    )
+    first = _report()
+    second = _report(previous_risk_snapshot=first["risk_snapshot"])
 
     daily = render_beta_monitor_markdown(second)
     weekly = render_beta_monitor_markdown(second, risk_view="full")
@@ -604,41 +533,19 @@ def test_daily_risk_view_is_silent_without_change_but_weekly_full_is_explicit() 
     assert "槓桿 ETF 資金占比" in weekly
     assert "換算槓桿曝險" in weekly
     assert "名目槓桿" not in weekly
-    assert "科技 effective proxy" not in weekly
 
 
-def test_baseline_pace_floors_contribution_regardless_of_signal() -> None:
-    """訊號不得 gate 掉例行投入。
-
-    2026-08-01 實測：以訊號 gate 自有現金投入，終值輸給無腦定投 8.5%
-    （QQQ 91.5%、SOXX 91.9%）——市場多數時間在漲，等回檔等於在上漲期間抱現金。
-    因此 baseline 是有證據的機制，訊號只能往上加。
-    """
-    policy = load_beta_policy()
-    baseline = policy["signal"]["baseline_pace"]
-    # 完全不觸發任何 tier 的平靜多頭
-    calm = signal_state(
-        {
-            "benchmark_key": "qqq",
-            "data_status": "observed",
-            "drawdown_252": -0.02,
-            "rsi_14": 62.0,
-            "macd_histogram_slope": -0.1,
-            "distance_sma_200": 0.08,
-            "sma_50_slope_5": 0.01,
-            "blockers": [],
-        },
-        policy,
-    )
-    assert calm["tier"] == "none", "此情境本來就不該觸發訊號"
-    assert calm["signal_pace_raw"] == 0.0
-    assert calm["pace"] == baseline, "訊號歸零時仍須維持例行投入"
-    assert calm["pace_source"] == "baseline"
-
-
-def test_baseline_does_not_fabricate_contribution_when_data_is_missing() -> None:
-    """資料不足時仍誠實歸零——baseline 不是「無論如何都投」。"""
-    policy = load_beta_policy()
-    for status in ("insufficient_history", "unavailable", "quarantined"):
-        state = signal_state({"data_status": status, "blockers": []}, policy)
-        assert state["pace"] == 0.0, status
+# ── 2026-08-29 隨技術訊號一併刪除的測試（不留空殼，只留刪除理由） ─────────────
+#
+# - test_signal_state_uses_macd_and_ma_as_pace_guard_not_extra_votes
+# - test_stretched_above_sma200_downgrades_pace_even_on_a_real_drawdown
+# - test_baseline_pace_floors_contribution_regardless_of_signal
+# - test_baseline_does_not_fabricate_contribution_when_data_is_missing
+# - test_same_signal_respects_repeat_cadence
+# - test_self_funded_routine_reminder_uses_full_session_count_not_signal
+# - test_ranges_share_one_frozen_deployable_cash_budget
+#     這七個唯一斷言的都是 signal_state／pace／tier／例行提醒節奏／單輪 campaign
+#     budget 切分——機制本身已於 2026-08-29 移除，測試沒有可斷言的行為留下。
+#     其中「資料不足時誠實歸零」與「共用一份可部署現金」兩個意圖仍在，分別由
+#     test_water_level_is_none_when_the_series_is_degraded_not_zero 與
+#     test_shared_cash_pool_subtracts_only_floor_and_never_uses_credit 承接。

@@ -1,4 +1,4 @@
-"""Fixed local Daily entry: refresh Engine C technicals and render Engine D beta monitor。"""
+"""固定的本機 Daily 入口：更新 Engine C 行情，再輸出 Engine D beta 配置監控。"""
 from __future__ import annotations
 
 import argparse
@@ -26,11 +26,7 @@ from decision_lab.portfolio_risk import append_risk_snapshot, read_latest_risk_s
 from engine_c.db import get_conn
 from engine_c.etl_technical import refresh_technical_observations
 from engine_c.market_data import get_fx_snapshot
-from engine_c.technical import (
-    latest_technical_status,
-    recent_technical_observations,
-    technical_observation_session_count,
-)
+from engine_c.technical import latest_technical_status, recent_technical_observations
 from fetchers.gsheets import fetch_capital_authority, fetch_portfolio
 
 
@@ -96,7 +92,6 @@ def run(
                 }
         observations: dict[str, Mapping[str, Any] | None] = {}
         histories: dict[str, Sequence[Mapping[str, Any]]] = {}
-        session_counts: dict[str, int] = {}
         twse_reference_by_key = {
             str(item.get("benchmark_key")): item.get("twse_reference")
             for item in refresh.get("items") or []
@@ -116,7 +111,6 @@ def run(
                     "blockers": ["technical_refresh_failed"],
                 }
                 histories[key] = []
-                session_counts[key] = technical_observation_session_count(connection, key)
                 continue
             observation = latest_technical_status(connection, key)
             reference = twse_reference_by_key.get(key)
@@ -125,7 +119,6 @@ def run(
                 observation["_twse_reference"] = dict(reference)
             observations[key] = observation
             histories[key] = recent_technical_observations(connection, key, limit=20)
-            session_counts[key] = technical_observation_session_count(connection, key)
         try:
             holdings = list(holdings_fetcher())
         except Exception:
@@ -145,7 +138,6 @@ def run(
             as_of=as_of,
             policy=resolved_policy,
             previous_risk_snapshot=previous_risk,
-            session_counts_by_benchmark=session_counts,
         )
         recorded = False
         if not args.no_record_risk:

@@ -1,4 +1,4 @@
-"""The scheduled beta entry is narrow, degraded-safe and public-output only。"""
+"""排程 beta 入口維持窄面、降級安全，且只輸出公開內容。"""
 from __future__ import annotations
 
 import io
@@ -38,18 +38,13 @@ def _observed(key: str, symbol: str):
         "return_5d": -0.03,
         "return_20d": -0.08,
         "drawdown_252": -0.25,
-        "rsi_14": 35.0,
-        "macd_line": -1.0,
-        "macd_signal": -1.1,
-        "macd_histogram": 0.1,
-        "macd_histogram_slope": 0.05,
+        "range_percentile_252": 0.4,
         "sma_20": 102.0,
         "sma_50": 105.0,
         "sma_200": 98.0,
         "distance_sma_20": -0.02,
         "distance_sma_50": -0.05,
         "distance_sma_200": 0.02,
-        "sma_50_slope_5": 0.01,
         "realized_vol_20": 0.3,
         "realized_vol_60": 0.25,
         "source": f"fixture://{key}",
@@ -148,6 +143,13 @@ def test_fixed_entry_runs_refresh_and_outputs_public_json() -> None:
     assert "contingent_credit_available" in payload
     assert payload["loan_funded_supported_range"]["status"] == "manual_review_required"
     assert len(payload["items"]) == 14
+    # 目標配置差距是新的首屏錨點；行情心跳每檔都要有
+    assert payload["allocation_gap"]["basis"] == "invested_non_cash"
+    assert len(payload["allocation_gap"]["correlation_warnings"]) == 2
+    for item in payload["items"]:
+        assert item["heartbeat"]["session_date"] == "2026-07-27"
+        assert item["heartbeat"]["return_1d"] is not None
+        assert "range_percentile_52w" in item["water_level"]
     assert "shares" not in output.getvalue()
     assert "private" not in output.getvalue()
     holder.conn.close()
@@ -174,6 +176,10 @@ def test_sheet_failure_keeps_technical_health_but_zeroes_ranges() -> None:
     assert code == 0
     assert payload["status"] == "degraded"
     assert "holdings_unavailable" in payload["blockers"]
-    assert all(item["supported_order_range_base"] == [0.0, 0.0] for item in payload["items"])
+    # 持股讀不到時資本歸零，配置差距誠實標成算不到（不是 0%），但行情心跳仍在
+    assert payload["self_funded_supported_range"] == [0.0, 0.0]
+    assert payload["allocation_gap"]["status"] == "unavailable"
+    assert all(entry["actual"] is None for entry in payload["allocation_gap"]["sleeves"])
+    assert all(item["heartbeat"]["session_date"] == "2026-07-27" for item in payload["items"])
     assert "secret path" not in output.getvalue()
     holder.conn.close()

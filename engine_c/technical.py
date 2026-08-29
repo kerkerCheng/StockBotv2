@@ -14,6 +14,11 @@ from .twse import twse_code
 
 
 _STATUS = {"observed", "insufficient_history", "unavailable", "quarantined"}
+# 2026-08-29：RSI／MACD／sma_50_slope_5 隨 beta 技術訊號一併移除，不再計算也不再寫入。
+# 它們是動能指標，量的是「最近漲跌的單邊程度」，與「現在站在自己區間的哪裡」可以
+# 完全脫鉤（高檔橫盤 RSI 回到 50、崩 40% 後急彈 RSI 可以到 70）；而 RSI 正是
+# 2026-08-01 三次回測失敗的那個輸入，以「相對水位」之名放回來等於換名字重來。
+# 舊資料表仍保留那幾個欄位（見 ensure_technical_schema 的 legacy 說明），新列一律 NULL。
 _METRIC_COLUMNS = (
     "close_raw",
     "close_adjusted",
@@ -21,18 +26,13 @@ _METRIC_COLUMNS = (
     "return_5d",
     "return_20d",
     "drawdown_252",
-    "rsi_14",
-    "macd_line",
-    "macd_signal",
-    "macd_histogram",
-    "macd_histogram_slope",
+    "range_percentile_252",
     "sma_20",
     "sma_50",
     "sma_200",
     "distance_sma_20",
     "distance_sma_50",
     "distance_sma_200",
-    "sma_50_slope_5",
     "realized_vol_20",
     "realized_vol_60",
 )
@@ -83,57 +83,23 @@ def _sma(values: Sequence[float], period: int) -> float | None:
     return sum(values[-period:]) / period
 
 
-def _ema_series(values: Sequence[float], period: int) -> list[float | None]:
-    result: list[float | None] = [None] * len(values)
-    if len(values) < period:
-        return result
-    seed = sum(values[:period]) / period
-    result[period - 1] = seed
-    alpha = 2.0 / (period + 1.0)
-    previous = seed
-    for index in range(period, len(values)):
-        previous = alpha * values[index] + (1.0 - alpha) * previous
-        result[index] = previous
-    return result
+def _range_percentile(values: Sequence[float], sessions: int) -> float | None:
+    """回傳最新收盤在近 N 個交易日區間中的位置：0.0＝區間低點、1.0＝區間高點。
 
+    這是純位置指標，不含任何動能成分。⚠ 長期上漲的標的多數時間會落在 0.8–1.0，
+    那是正確資訊，不是「該等回檔」的訊號——2026-07-31 回測結論是等回檔才投入
+    對 30 年終值是負貢獻。因此它只供人閱讀，不參與任何排序或建議。
+    """
 
-def _rsi_wilder(values: Sequence[float], period: int = 14) -> float | None:
-    if len(values) <= period:
+    if len(values) < sessions:
         return None
-    deltas = [values[index] - values[index - 1] for index in range(1, len(values))]
-    gains = [max(delta, 0.0) for delta in deltas]
-    losses = [max(-delta, 0.0) for delta in deltas]
-    avg_gain = sum(gains[:period]) / period
-    avg_loss = sum(losses[:period]) / period
-    for gain, loss in zip(gains[period:], losses[period:]):
-        avg_gain = ((period - 1) * avg_gain + gain) / period
-        avg_loss = ((period - 1) * avg_loss + loss) / period
-    if avg_loss == 0:
-        return 100.0 if avg_gain > 0 else 50.0
-    relative_strength = avg_gain / avg_loss
-    return 100.0 - (100.0 / (1.0 + relative_strength))
-
-
-def _macd(values: Sequence[float]) -> tuple[float | None, float | None, float | None, float | None]:
-    ema_12 = _ema_series(values, 12)
-    ema_26 = _ema_series(values, 26)
-    macd_values: list[float] = []
-    for fast, slow in zip(ema_12, ema_26):
-        if fast is not None and slow is not None:
-            macd_values.append(fast - slow)
-    signal_values = _ema_series(macd_values, 9)
-    histograms: list[float] = []
-    latest_line: float | None = None
-    latest_signal: float | None = None
-    for line, signal in zip(macd_values, signal_values):
-        if signal is not None:
-            latest_line = line
-            latest_signal = signal
-            histograms.append(line - signal)
-    if latest_line is None or latest_signal is None or not histograms:
-        return None, None, None, None
-    slope = histograms[-1] - histograms[-2] if len(histograms) >= 2 else None
-    return latest_line, latest_signal, histograms[-1], slope
+    window = values[-sessions:]
+    high = max(window)
+    low = min(window)
+    # 完全持平的區間同時是自己的高點與低點；與 drawdown_252 一致地視為在高點。
+    if high <= low:
+        return 1.0
+    return (values[-1] - low) / (high - low)
 
 
 def _realized_vol(values: Sequence[float], sessions: int) -> float | None:
@@ -314,29 +280,18 @@ def build_technical_observation(
     base["return_1d"] = _period_return(adjusted_values, 1)
     base["return_5d"] = _period_return(adjusted_values, 5)
     base["return_20d"] = _period_return(adjusted_values, 20)
-    base["rsi_14"] = _rsi_wilder(adjusted_values)
-    (
-        base["macd_line"],
-        base["macd_signal"],
-        base["macd_histogram"],
-        base["macd_histogram_slope"],
-    ) = _macd(adjusted_values)
     for period in (20, 50, 200):
         average = _sma(adjusted_values, period)
         base[f"sma_{period}"] = average
         base[f"distance_sma_{period}"] = (
             adjusted_values[-1] / average - 1.0 if average is not None else None
         )
-    if len(adjusted_values) >= 55:
-        prior_sma_50 = sum(adjusted_values[-55:-5]) / 50.0
-        current_sma_50 = base["sma_50"]
-        if current_sma_50 is not None and prior_sma_50 > 0:
-            base["sma_50_slope_5"] = current_sma_50 / prior_sma_50 - 1.0
     base["realized_vol_20"] = _realized_vol(adjusted_values, 20)
     base["realized_vol_60"] = _realized_vol(adjusted_values, 60)
     if len(adjusted_values) >= 252:
         high = max(adjusted_values[-252:])
         base["drawdown_252"] = adjusted_values[-1] / high - 1.0
+        base["range_percentile_252"] = _range_percentile(adjusted_values, 252)
 
     if len(adjusted_values) < 252:
         base["blockers"] = ["technical_history_insufficient_252_sessions"]
@@ -432,7 +387,11 @@ def fetch_technical_observation(
 
 
 def ensure_technical_schema(conn) -> None:
-    """Non-destructively ensure SQLite technical ledger schema。"""
+    """Non-destructively ensure SQLite technical ledger schema。
+
+    ⚠ rsi_14／macd_*／sma_50_slope_5 是 2026-08-29 之前的 legacy 欄位：新列不再寫入，
+    但既有列保留歷史值，因此不從表定義移除（append-only，不做破壞性重建）。
+    """
 
     conn.executescript(
         """
@@ -451,6 +410,7 @@ def ensure_technical_schema(conn) -> None:
             return_5d REAL,
             return_20d REAL,
             drawdown_252 REAL,
+            range_percentile_252 REAL,
             rsi_14 REAL,
             macd_line REAL,
             macd_signal REAL,
@@ -482,7 +442,8 @@ def ensure_technical_schema(conn) -> None:
     existing_columns = {
         str(row[1]) for row in conn.execute("PRAGMA table_info(technical_observations)")
     }
-    for column in ("return_1d", "return_5d", "return_20d"):
+    # 舊庫缺欄位時就地補上（ADD COLUMN 是非破壞性的），避免既有 ledger 需要重建。
+    for column in _METRIC_COLUMNS:
         if column not in existing_columns:
             conn.execute(f"ALTER TABLE technical_observations ADD COLUMN {column} REAL")
 
@@ -600,7 +561,7 @@ def _row_to_observation(row: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def recent_technical_observations(conn, benchmark_key: str, *, limit: int = 10) -> list[dict[str, Any]]:
-    """Return latest distinct observed sessions for signal transition checks。"""
+    """回傳最近的 distinct observed sessions，供事件監控比對前一個交易日的報酬。"""
 
     if limit < 1:
         raise ValueError("limit must be positive")
@@ -637,34 +598,8 @@ def recent_technical_observations(conn, benchmark_key: str, *, limit: int = 10) 
     return result
 
 
-def technical_observation_session_count(conn, benchmark_key: str) -> int:
-    """回傳已保存的 distinct observed sessions，供固定例行提醒定錨。
-
-    不能用「最近 N 筆」的 list 長度做 modulo：history window 填滿後長度不再
-    增加，固定提醒會永久停住。這個 count 只讀 append-only TechnicalObservation。
-    """
-
-    key = benchmark_key.strip().casefold()
-    try:
-        from engine_c.db import DB_TYPE
-    except ImportError:
-        DB_TYPE = "sqlite"
-    if DB_TYPE == "postgres":
-        with conn.cursor() as cursor:
-            cursor.execute(
-                "SELECT COUNT(DISTINCT session_date) FROM technical_observations "
-                "WHERE benchmark_key = %s AND data_status = 'observed'",
-                (key,),
-            )
-            row = cursor.fetchone()
-    else:
-        ensure_technical_schema(conn)
-        row = conn.execute(
-            "SELECT COUNT(DISTINCT session_date) FROM technical_observations "
-            "WHERE benchmark_key = ? AND data_status = 'observed'",
-            (key,),
-        ).fetchone()
-    return int(row[0] if row else 0)
+# technical_observation_session_count() 於 2026-08-29 隨技術訊號一併移除：
+# 它唯一的消費者是「每 5 個完整交易日提醒一次」的例行投入節奏，該機制已拔除。
 
 
 def latest_technical_status(conn, benchmark_key: str) -> dict[str, Any] | None:
@@ -707,7 +642,6 @@ __all__ = [
     "fetch_technical_observation",
     "latest_technical_status",
     "recent_technical_observations",
-    "technical_observation_session_count",
     "reconcile_twse_freshness",
     "unavailable_observation",
 ]

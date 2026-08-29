@@ -8,6 +8,9 @@ from typing import Any, Mapping
 
 
 DEFAULT_POLICY_PATH = Path(__file__).resolve().parents[1] / "config" / "beta_policy.json"
+DEFAULT_TARGET_ALLOCATION_PATH = (
+    Path(__file__).resolve().parents[1] / "config" / "target_allocation.json"
+)
 _SLEEVES = {
     "beta_core",
     "beta_tilt",
@@ -15,10 +18,18 @@ _SLEEVES = {
     "beta_leverage",
     "large_cap_tilt",
 }
+# 目標配置多出來的那一格：它在 beta_policy 裡沒有任何 instrument，實際佔比只能由
+# 「非現金持股扣掉所有 beta instrument」的殘量導出。名字不寫死在計算裡，
+# 由這兩份設定的 sleeve 集合相減得到（見 beta_monitor.build_allocation_gap）。
+_TARGET_ONLY_SLEEVES = {"alpha"}
 
 
 class BetaPolicyError(ValueError):
     """Policy malformed or internally inconsistent。"""
+
+
+class TargetAllocationError(ValueError):
+    """目標配置設定缺漏或內部不一致。"""
 
 
 def _finite_fraction(value: Any, field: str, *, positive: bool = False) -> float:
@@ -56,14 +67,13 @@ def validate_beta_policy(source: Mapping[str, Any]) -> dict[str, Any]:
         "mode",
         "capital_scope",
         "capital",
-        "signal",
+        "market_data",
         "risk",
-        "campaign_budget_fraction_by_sleeve",
         "instruments",
     }
     if set(source) != required:
         raise BetaPolicyError("beta policy top-level fields do not match schema")
-    if source.get("schema_version") != "beta-policy-v2":
+    if source.get("schema_version") != "beta-policy-v3":
         raise BetaPolicyError("unsupported beta policy schema")
     if source.get("mode") != "paper_observation":
         raise BetaPolicyError("v1 beta policy must remain paper_observation")
@@ -93,92 +103,14 @@ def validate_beta_policy(source: Mapping[str, Any]) -> dict[str, Any]:
     if isinstance(fx_age, bool) or not isinstance(fx_age, int) or not 24 <= fx_age <= 168:
         raise BetaPolicyError("fx_max_age_hours must be 24..168")
 
-    signal = source.get("signal")
-    if not isinstance(signal, Mapping) or set(signal) != {
-        "allowed_paces",
-        "baseline_pace",
-        "max_refresh_age_hours",
-        "repeat_after_sessions",
-        "stretched_above_sma200",
-        "tiers",
-    }:
-        raise BetaPolicyError("signal policy fields do not match schema")
-    # 距 200 日均線超過此值時降一級 pace。回撤 tier 只看「跌了多少」，看不出
-    # 「跌之前漲了多少」——標的可能距高點 -23% 卻仍在長期趨勢上方 +26%。
-    stretched = signal.get("stretched_above_sma200")
-    if (
-        isinstance(stretched, bool)
-        or not isinstance(stretched, (int, float))
-        or not 0.0 < float(stretched) <= 1.0
-    ):
-        raise BetaPolicyError("stretched_above_sma200 must be within (0, 1]")
-    paces = signal.get("allowed_paces")
-    if not isinstance(paces, list) or sorted(paces) != [0.0, 0.25, 0.5, 1.0]:
-        raise BetaPolicyError("allowed_paces must be the closed v1 set")
-    # 不受訊號影響的投入下限。2026-08-01 實測：以訊號 gate 自有現金投入，
-    # 終值輸給無腦定投 8.5%（QQQ 91.5%、SOXX 91.9%）——市場多數時間在漲，
-    # 等回檔等於在上漲期間抱現金。baseline 保證例行投入不被訊號擋掉。
-    baseline = signal.get("baseline_pace")
-    if isinstance(baseline, bool) or baseline not in set(paces):
-        raise BetaPolicyError("baseline_pace must be one of allowed_paces")
-    repeat = signal.get("repeat_after_sessions")
-    if isinstance(repeat, bool) or not isinstance(repeat, int) or repeat < 1:
-        raise BetaPolicyError("repeat_after_sessions must be a positive integer")
-    max_age = signal.get("max_refresh_age_hours")
+    # 行情鮮度是「這份價格還能不能拿來顯示」的資料品質門檻，與已於 2026-08-29
+    # 移除的技術訊號無關，因此獨立成 market_data，不再寄生在 signal 區塊下。
+    market_data = source.get("market_data")
+    if not isinstance(market_data, Mapping) or set(market_data) != {"max_refresh_age_hours"}:
+        raise BetaPolicyError("market_data policy fields do not match schema")
+    max_age = market_data.get("max_refresh_age_hours")
     if isinstance(max_age, bool) or not isinstance(max_age, int) or not 24 <= max_age <= 168:
         raise BetaPolicyError("max_refresh_age_hours must be 24..168")
-    tiers = signal.get("tiers")
-    if not isinstance(tiers, list) or [item.get("name") for item in tiers if isinstance(item, Mapping)] != [
-        "pullback",
-        "deep",
-        "capitulation",
-    ]:
-        raise BetaPolicyError("signal tiers must be pullback/deep/capitulation")
-    normalized_tiers: list[dict[str, Any]] = []
-    for position, item in enumerate(tiers):
-        if not isinstance(item, Mapping) or set(item) != {
-            "name",
-            "drawdown_at_most",
-            "rsi_at_most",
-            "base_pace",
-            "turning_pace",
-        }:
-            raise BetaPolicyError("signal tier fields do not match schema")
-        drawdown = item.get("drawdown_at_most")
-        rsi = item.get("rsi_at_most")
-        if (
-            isinstance(drawdown, bool)
-            or not isinstance(drawdown, (int, float))
-            or not math.isfinite(float(drawdown))
-            or not -1 < float(drawdown) < 0
-            or isinstance(rsi, bool)
-            or not isinstance(rsi, (int, float))
-            or not math.isfinite(float(rsi))
-            or not 0 < float(rsi) < 100
-        ):
-            raise BetaPolicyError("signal tier thresholds are invalid")
-        base_pace = float(item.get("base_pace"))
-        turning_pace = float(item.get("turning_pace"))
-        if base_pace not in paces or turning_pace not in paces or turning_pace < base_pace:
-            raise BetaPolicyError("signal tier pace is invalid")
-        normalized_tiers.append(
-            {
-                "name": item["name"],
-                "drawdown_at_most": float(drawdown),
-                "rsi_at_most": float(rsi),
-                "base_pace": base_pace,
-                "turning_pace": turning_pace,
-            }
-        )
-    if not (
-        normalized_tiers[0]["drawdown_at_most"]
-        > normalized_tiers[1]["drawdown_at_most"]
-        > normalized_tiers[2]["drawdown_at_most"]
-        and normalized_tiers[0]["rsi_at_most"]
-        > normalized_tiers[1]["rsi_at_most"]
-        > normalized_tiers[2]["rsi_at_most"]
-    ):
-        raise BetaPolicyError("signal tiers must become stricter with depth")
 
     risk = source.get("risk")
     risk_scalar_keys = {
@@ -240,14 +172,6 @@ def validate_beta_policy(source: Mapping[str, Any]) -> dict[str, Any]:
             positive=True,
         ),
         "return_1d_at_most": float(return_floor),
-    }
-
-    campaign = source.get("campaign_budget_fraction_by_sleeve")
-    if not isinstance(campaign, Mapping) or set(campaign) != _SLEEVES:
-        raise BetaPolicyError("campaign budget must cover each v1 sleeve exactly")
-    normalized_campaign = {
-        key: _finite_fraction(value, f"campaign:{key}", positive=True)
-        for key, value in campaign.items()
     }
 
     instruments = source.get("instruments")
@@ -331,7 +255,7 @@ def validate_beta_policy(source: Mapping[str, Any]) -> dict[str, Any]:
         )
 
     return {
-        "schema_version": "beta-policy-v2",
+        "schema_version": "beta-policy-v3",
         "policy_version": str(source["policy_version"]),
         "mode": "paper_observation",
         "capital_scope": "shared_cash_pool",
@@ -340,16 +264,8 @@ def validate_beta_policy(source: Mapping[str, Any]) -> dict[str, Any]:
             "authority_max_age_days": authority_age,
             "fx_max_age_hours": fx_age,
         },
-        "signal": {
-            "allowed_paces": [0.0, 0.25, 0.5, 1.0],
-            "max_refresh_age_hours": max_age,
-            "repeat_after_sessions": repeat,
-            "baseline_pace": float(baseline),
-            "stretched_above_sma200": float(stretched),
-            "tiers": normalized_tiers,
-        },
+        "market_data": {"max_refresh_age_hours": max_age},
         "risk": normalized_risk,
-        "campaign_budget_fraction_by_sleeve": normalized_campaign,
         "instruments": sorted(normalized_instruments, key=lambda item: item["priority"]),
     }
 
@@ -359,6 +275,108 @@ def load_beta_policy(path: str | Path = DEFAULT_POLICY_PATH) -> dict[str, Any]:
     if not isinstance(value, dict):
         raise BetaPolicyError("beta policy must be a JSON object")
     return validate_beta_policy(value)
+
+
+def _public_keys(source: Mapping[str, Any]) -> set[str]:
+    """忽略 `_` 開頭的說明欄位（設定檔裡的長註解），只驗真正的資料欄位。"""
+
+    return {str(key) for key in source if not str(key).startswith("_")}
+
+
+def validate_target_allocation(source: Mapping[str, Any]) -> dict[str, Any]:
+    """驗證目標配置設定；缺格、比例不合 1.0 或缺相關性警告一律 fail closed。"""
+
+    if _public_keys(source) != {
+        "schema_version",
+        "policy_version",
+        "investor_profile",
+        "basis",
+        "sleeves",
+        "correlation_warnings",
+        "rebalancing",
+    }:
+        raise TargetAllocationError("target allocation top-level fields do not match schema")
+    if source.get("schema_version") != "target-allocation-v1":
+        raise TargetAllocationError("unsupported target allocation schema")
+    if not isinstance(source.get("policy_version"), str) or not str(source["policy_version"]).strip():
+        raise TargetAllocationError("policy_version must be non-empty text")
+    # 分母只有一種：已投入的非現金部位。現金屬 cash floor authority，不佔比例。
+    if source.get("basis") != "invested_non_cash":
+        raise TargetAllocationError("target allocation basis must be invested_non_cash")
+    if not isinstance(source.get("investor_profile"), Mapping):
+        raise TargetAllocationError("investor_profile must be an object")
+
+    sleeves = source.get("sleeves")
+    if not isinstance(sleeves, Mapping):
+        raise TargetAllocationError("sleeves must be an object")
+    expected = _SLEEVES | _TARGET_ONLY_SLEEVES
+    if _public_keys(sleeves) != expected:
+        # 新增 beta sleeve 卻沒補目標比例時，這裡就會擋下來，而不是安靜地
+        # 讓那一格永遠算成 0%（那正是會催人多買的方向）。
+        raise TargetAllocationError("target allocation must cover each sleeve exactly")
+    normalized_sleeves: dict[str, dict[str, Any]] = {}
+    for name in sorted(expected):
+        spec = sleeves.get(name)
+        if not isinstance(spec, Mapping) or not {"target", "band", "role"} <= _public_keys(spec):
+            raise TargetAllocationError(f"sleeve {name} fields do not match schema")
+        target = _finite_fraction(spec.get("target"), f"sleeve_target:{name}")
+        band = _finite_fraction(spec.get("band"), f"sleeve_band:{name}", positive=True)
+        normalized_sleeves[name] = {
+            "target": target,
+            "band": band,
+            "role": _text(spec.get("role"), f"sleeve_role:{name}"),
+        }
+    total = sum(item["target"] for item in normalized_sleeves.values())
+    if not math.isclose(total, 1.0, rel_tol=0.0, abs_tol=1e-9):
+        raise TargetAllocationError("sleeve targets must sum to 1.0")
+
+    warnings = source.get("correlation_warnings")
+    if not isinstance(warnings, list) or not warnings:
+        raise TargetAllocationError("correlation_warnings must be a non-empty list")
+    normalized_warnings: list[dict[str, str]] = []
+    for item in warnings:
+        if not isinstance(item, Mapping) or _public_keys(item) != {"name", "detail", "surface_in"}:
+            raise TargetAllocationError("correlation warning fields do not match schema")
+        normalized_warnings.append(
+            {
+                "name": _text(item.get("name"), "correlation warning name"),
+                "detail": _text(item.get("detail"), "correlation warning detail"),
+                "surface_in": _text(item.get("surface_in"), "correlation warning surface_in"),
+            }
+        )
+
+    rebalancing = source.get("rebalancing")
+    if not isinstance(rebalancing, Mapping) or not {"method", "loan_tranche_excluded"} <= _public_keys(
+        rebalancing
+    ):
+        raise TargetAllocationError("rebalancing fields do not match schema")
+    if rebalancing.get("method") != "new_money_only":
+        raise TargetAllocationError("rebalancing method must remain new_money_only")
+    if rebalancing.get("loan_tranche_excluded") is not True:
+        raise TargetAllocationError("loan tranches must stay outside automatic rebalancing")
+
+    return {
+        "schema_version": "target-allocation-v1",
+        "policy_version": str(source["policy_version"]),
+        # 只作記錄；本檔的計算不讀它，但保留以便驗證過的視圖可以再驗一次。
+        "investor_profile": dict(source["investor_profile"]),
+        "basis": "invested_non_cash",
+        "sleeves": normalized_sleeves,
+        "correlation_warnings": normalized_warnings,
+        "rebalancing": {
+            "method": "new_money_only",
+            "loan_tranche_excluded": True,
+        },
+    }
+
+
+def load_target_allocation(
+    path: str | Path = DEFAULT_TARGET_ALLOCATION_PATH,
+) -> dict[str, Any]:
+    value = json.loads(Path(path).read_text(encoding="utf-8"))
+    if not isinstance(value, dict):
+        raise TargetAllocationError("target allocation must be a JSON object")
+    return validate_target_allocation(value)
 
 
 def unique_benchmarks(policy: Mapping[str, Any]) -> list[dict[str, str]]:
@@ -378,11 +396,11 @@ def unique_benchmarks(policy: Mapping[str, Any]) -> list[dict[str, str]]:
 
 
 def instrument_price_key(instrument: Mapping[str, Any]) -> str:
-    """Return the Engine C series key used for the instrument's own price display。
+    """回傳該標的「自身價格」在 Engine C 的序列 key。
 
-    Leveraged and overlapping products may intentionally use an unlevered benchmark
-    for signal timing.  Their own return／RSI／drawdown must still come from their
-    provider symbol, never from that signal benchmark.
+    槓桿與重疊商品（TQQQ／00631L／006208）在設定裡共用一個 benchmark 分組，
+    但它們的行情心跳與相對水位一律取自 provider_symbol 自己的序列，
+    絕不冒用 QQQ／0050 的價格表現。
     """
 
     provider_symbol = str(instrument["provider_symbol"]).upper()
@@ -393,7 +411,7 @@ def instrument_price_key(instrument: Mapping[str, Any]) -> str:
 
 
 def unique_technical_targets(policy: Mapping[str, Any]) -> list[dict[str, str]]:
-    """Return signal benchmarks plus distinct instrument-price series targets。"""
+    """回傳 benchmark 分組序列，加上每檔自身價格序列（去重後的抓取清單）。"""
 
     result = {
         str(target["benchmark_key"]): dict(target)
@@ -414,9 +432,13 @@ def unique_technical_targets(policy: Mapping[str, Any]) -> list[dict[str, str]]:
 __all__ = [
     "BetaPolicyError",
     "DEFAULT_POLICY_PATH",
+    "DEFAULT_TARGET_ALLOCATION_PATH",
+    "TargetAllocationError",
     "instrument_price_key",
     "load_beta_policy",
+    "load_target_allocation",
     "unique_benchmarks",
     "unique_technical_targets",
     "validate_beta_policy",
+    "validate_target_allocation",
 ]

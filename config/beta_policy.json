@@ -1,6 +1,6 @@
 {
-  "schema_version": "beta-policy-v2",
-  "policy_version": "2026-08-01.2",
+  "schema_version": "beta-policy-v3",
+  "policy_version": "2026-08-29.1",
   "mode": "paper_observation",
   "capital_scope": "shared_cash_pool",
   "capital": {
@@ -8,35 +8,8 @@
     "authority_max_age_days": 90,
     "fx_max_age_hours": 96
   },
-  "signal": {
-    "allowed_paces": [0.0, 0.25, 0.5, 1.0],
-    "baseline_pace": 0.25,
-    "stretched_above_sma200": 0.2,
-    "max_refresh_age_hours": 96,
-    "repeat_after_sessions": 5,
-    "tiers": [
-      {
-        "name": "pullback",
-        "drawdown_at_most": -0.1,
-        "rsi_at_most": 45.0,
-        "base_pace": 0.25,
-        "turning_pace": 0.25
-      },
-      {
-        "name": "deep",
-        "drawdown_at_most": -0.2,
-        "rsi_at_most": 40.0,
-        "base_pace": 0.25,
-        "turning_pace": 0.5
-      },
-      {
-        "name": "capitulation",
-        "drawdown_at_most": -0.3,
-        "rsi_at_most": 35.0,
-        "base_pace": 0.5,
-        "turning_pace": 1.0
-      }
-    ]
+  "market_data": {
+    "max_refresh_age_hours": 96
   },
   "risk": {
     "leveraged_nominal_warning": 0.125,
@@ -57,13 +30,6 @@
       "concentrated_issuer_threshold": 0.2,
       "return_1d_at_most": -0.04
     }
-  },
-  "campaign_budget_fraction_by_sleeve": {
-    "beta_core": 0.05,
-    "beta_tilt": 0.03,
-    "beta_tilt_active": 0.02,
-    "beta_leverage": 0.015,
-    "large_cap_tilt": 0.01
   },
   "instruments": [
     {

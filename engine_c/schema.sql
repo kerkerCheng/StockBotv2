@@ -109,6 +109,9 @@ CREATE TABLE IF NOT EXISTS technical_observations (
     return_5d NUMERIC(18,10),
     return_20d NUMERIC(18,10),
     drawdown_252 NUMERIC(18,10),
+    range_percentile_252 NUMERIC(18,10),
+    -- rsi_14 / macd_* / sma_50_slope_5 是 2026-08-29 之前的 legacy 動能欄位：
+    -- 隨 beta 技術訊號移除後新列不再寫入，既有列保留歷史值故不刪欄。
     rsi_14 NUMERIC(18,10),
     macd_line NUMERIC(24,10),
     macd_signal NUMERIC(24,10),
