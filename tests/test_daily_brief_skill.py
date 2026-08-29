@@ -73,15 +73,30 @@ def test_states_gates_and_human_boundaries() -> None:
     assert "loan_funded_supported_range=manual_review_required" in text
     assert "spreadsheets.readonly" in text
     assert "retirement_net_terminal_wealth" in text
-    assert "technical 只決定新增 timing／pace" in text
+    # 2026-08-29 訊號拔除（commit 6aa31de）：舊契約是「technical 只決定新增 timing／pace」，
+    # 新契約是水位只呈現、不參與排序，且 beta 不回答「今天該不該投」。
+    assert "beta 不回答「今天該不該投」" in text
+    assert "只呈現、不參與排序、不換算金額" in text
+    assert "不得用 RSI／MACD 等動能指標表達" in text
+    assert "不是該等\n回檔的訊號" in text or "不是該等回檔的訊號" in text
+    assert "config/target_allocation.json" in text
+    assert "band 是容忍區間" in text or "容忍區間內視為到位" in text
+    assert "貸款 tranche 不適用配置建議" in text
+    # ⚠ 禁的是「當成現行欄位／動作使用」，不是提到這些詞——skill 刻意留著一段移除紀錄，
+    # 那段本身是防回填的剎車。
+    for banned in ("本輪可評估上限：", "CONTRIBUTE REVIEW", "PAUSE CONTRIBUTION",
+                   "節奏 25%", "🟢 `可評估`"):
+        assert banned not in text, f"daily-brief skill 不得再描述已拔除的訊號機制：{banned}"
+    assert "訊號整組已於 2026-08-29 移除" in text
     assert "自有現金可部署" in text
-    assert "本輪可評估上限" in text
     assert "未動用貸款額度" in text
     assert "槓桿 ETF 資金占比" in text
     assert "換算槓桿曝險" in text
-    assert "節奏 25%" in text
-    for light in ("🟢", "🟡", "⚪", "🔴"):
+    assert "已投入的非現金部位" in text
+    # 燈號只表達行情資料狀態；🟡 與 `可評估／冷卻` 舊語意已廢止。
+    for light in ("🟢 `行情正常`", "🔴 `資料不足`", "⚪ `歷史不足`"):
         assert light in text
+    assert "🟡 與舊語意" in text
 
 
 def test_requires_subject_complete_pq2_explanations() -> None:

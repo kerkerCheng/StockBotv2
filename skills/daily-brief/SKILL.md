@@ -41,20 +41,25 @@ admission 必經核准 exact 對象、深挖由 priority 排序但入圖仍核�
 ```
 
 第一支抓 X＋RSS＋EDGAR watch 新項，以 `since_id`／URL-hash 去重；第二支刷新 Engine C financial snapshots。
-第四支對固定 ETF／權值股 universe 刷新 Engine C TechnicalObservation，再由 Engine D 產
-`HOLD / PAUSE CONTRIBUTION / CONTRIBUTE REVIEW`。Runtime／JSON 只保留一條
+第四支對固定 ETF／權值股 universe 刷新 Engine C TechnicalObservation，再由 Engine D 產**目標配置差距
+＋相對水位**。**beta 不回答「今天該不該投」**，只回答兩件事：各 sleeve 距目標配置多遠、每檔在什麼水位。
+Runtime／JSON 只保留一條
 `self_funded_supported_range`：共同可投資現金池固定等於 `Portfolio CASH − cash floor`，cash floor 以上
-全部可供 Alpha 與 Beta 使用。不得再推導 5% operating reserve、3% alpha reserve、planned outflows，
-也不得恢復 Sheet／household 雙 cash view。Alpha／Beta 如何分配由各自 campaign budget、Decision sizing、
-單筆上限與風控另外決定，不能用 cash reserve 偷渡固定 sleeve 比例。
+全部可供 Alpha 與 Beta 使用；2026-08-29 起它就是**可部署現金本身**，不再乘任何 pace 或單輪比例。
+不得再推導 5% operating reserve、3% alpha reserve、planned outflows，
+也不得恢復 Sheet／household 雙 cash view。Alpha／Beta 如何分配由 `config/target_allocation.json` 的目標配置
+比例、Decision sizing、單筆上限與風控另外決定，不能用 cash reserve 偷渡固定 sleeve 比例。
 `Capital Authority` 以 `spreadsheets.readonly` 只讀 `cash_floor` 與 `credit_facility`；cash floor 缺失、stale 或 FX
 錯誤時，單一 self-funded range fail closed 歸零。`contingent_credit_available` 只顯示為「未動用貸款額度」，
-另列已借款與估計利息，明標不算自有現金、未納入本輪上限；
-`loan_funded_supported_range=manual_review_required`。Portfolio cash 仍是自有 cash 唯一 authority，undrawn
-credit 不進 NAV／cash／allocation。technical／capital telemetry 不進 pq1，recommendation
+另列已借款與估計利息，明標不算自有現金；
+`loan_funded_supported_range=manual_review_required`，且**貸款 tranche 不適用配置建議**，仍走 Capital
+Authority 的逐次 explicit manual review。Portfolio cash 仍是自有 cash 唯一 authority，undrawn
+credit 不進 NAV／cash／allocation。行情／capital telemetry 不進 pq1，recommendation
 不推定 choice／fill，也不推定 draw，且不寫 Google Sheet。fetch／parse 失敗各記 harvest_log；
-自有現金 baseline 每 5 個完整交易日固定主動提醒一次，週期由 Engine C 全部 distinct observed sessions
-定錨，不綁 RSI／MACD／tier；資料不足仍歸零。貸款不在例行提醒內，提款時間表留待另案人工核准。
+訊號整組已於 2026-08-29 移除（commit `6aa31de`）——三態動作、RSI／MACD／tier、`signal.baseline_pace`、
+單輪 campaign budget 百分比與「每 5 個完整交易日主動提醒一次」的節奏都不得復刻，改名成
+「熱度」「節奏」再放回排序或尺寸同樣禁止。查證：
+`python -c "import json;print(sorted(json.load(open('config/beta_policy.json'))))"` 不應出現 `signal`。
 **解析失敗 ≠ 無新文**。每筆失敗必須保存 `failure_class`；最新一次仍失敗的來源由
 `harvest-health` 持續顯示。Codex standalone scheduled task 會沿用 legacy `workspace-write` sandbox，
 因此 Daily 的唯一權限來源是 `.codex/rules/stockbot-automations.rules` 的窄 fixed entry；不得再用 project
@@ -80,22 +85,23 @@ apply／reassess／complete-ra／commit intake 不加入 unattended rule，仍�
 mutation。retry 用盡後照樣保存 failure 並 fail closed。
 `harvest-health`、queue list／count、JSON 檢查等純本機唯讀命令維持 sandbox。
 `insufficient_history`／`unavailable`／`stale`
-也必須在健康段落明示並讓受影響的
-technical 或 self-funded range 歸零。Windows 本機與
+也必須在健康段落明示，並讓受影響那一列的相對水位標為不可信而非靜默消失；
+**單檔行情降級不歸零共用 self-funded range**（已無逐檔區間），只有資本 authority 失效或硬擋才歸零。Windows 本機與
 scheduled task 一律使用 repo `.venv`，不要依賴父 shell 是否剛好 activate。
-Engine C 同一筆 observation 保存 adjusted-close 的 1／5／20-session return；Engine D 必須分開保存
-signal benchmark 與商品自身價格序列。TQQQ／00631L 等可使用未槓桿 benchmark 決定 timing／pace，但人類
-看到的 return、RSI、drawdown 與均線熱度必須來自該商品自身 provider symbol。Engine D 再把這些資料組成 Mobile-friendly
-燈號。燈號必須配 `可評估／冷卻／觀察／資料不足` 文字與明確系統動作，且不構成 live permission。
-每個商品的 1 日漲跌前必須明列商品自身的最新完整交易日 `YYYY-MM-DD`；即使今日不用啟動投入評估、
-本輪可評估上限為 0 或所有標的都是 `HOLD`，主力逐檔行情表仍是每日心跳，不得省略或濃縮成狀態句。
+Engine C 同一筆 observation 保存 adjusted-close 的 1／5／20-session return；Engine D 呈現的行情心跳與
+相對水位**一律取自該商品自身 provider symbol**：TQQQ 不得冒用 QQQ（2026-08-29 實測水位 69% vs 85%），
+00631L／006208 不得冒用 0050。這條原本規範訊號基準，訊號拔除後改規範水位。Engine D 再把這些資料組成
+Mobile-friendly 燈號。**燈號只表達行情資料狀態，不表達投入建議**，必須配 `行情正常／資料不足／歷史不足`
+文字，且不構成 live permission。
+每個商品的 1 日漲跌前必須明列商品自身的最新完整交易日 `YYYY-MM-DD`；即使所有 sleeve 都「到位
+（區間內、無偏好）」、今天沒有任何配置缺口，主力逐檔行情表仍是每日心跳，不得省略或濃縮成狀態句。
 `stale`／`quarantined` 時改列官方 reference 日期與當日漲跌並附降級原因，不得把最近收盤誤稱即時今日行情。
-燈號與文字不得在 agent 摘要時省略：🟢 `可評估`、🟡 `冷卻／排序中`、⚪ `觀察`、🔴 `資料不足／暫停新增`。
-動作對照固定為：`CONTRIBUTE REVIEW`＝可新增評估（不是買進）；`HOLD`＝維持／等待；
-`PAUSE CONTRIBUTION`＝暫停新增。若使用者只看到顏色而看不到動作文字，視為 brief 缺欄。
+燈號與文字不得在 agent 摘要時省略：🟢 `行情正常`、🔴 `資料不足`、⚪ `歷史不足`。
+🟡 與舊語意 `可評估／冷卻／排序中／觀察／暫停新增` 已於 2026-08-29 廢止，不得回填；
+若使用者只看到顏色而看不到狀態文字，視為 brief 缺欄。
 內部 `etf_leverage.nominal_weight` 的人類標籤固定為「槓桿 ETF 資金占比」；乘上 2x／3x 後的
-`effective_weight` 才稱「換算槓桿曝險」，不得再輸出模糊的「名目槓桿」。`pace=0.25` 顯示為
-「節奏 25%」，並解釋它是該 sleeve 完整 campaign budget 的四分之一，不是 NAV／現金／持倉的 25%。
+`effective_weight` 才稱「換算槓桿曝險」，不得再輸出模糊的「名目槓桿」。目標配置比例顯示為
+「目標 40.0%｜容忍區間 ±5.0%」，並解釋分母是**已投入的非現金部位**，不是 NAV／現金／單輪預算。
 Portfolio risk 另以 ignored append-only JSONL 保存 aggregate snapshot：Daily 只顯示門檻跨越／狀態翻轉，
 Weekly 才用 `--risk-view full --no-record-risk` 顯示完整快照。硬擋包含 ETF nominal／effective 槓桿 cap、
 總曝險 cap、callable debt cap 與 investment policy 的 5% 單筆上限；issuer concentration 與 alpha 總量只警告。
@@ -442,25 +448,38 @@ TL;DR：<上線標的／可量測／結案歸因常駐計數器；真實部位�
   brief」是同一個病：**做了正確的工作，但產出沒有消費端**（L13）。
 
 ## Beta capital observation（無 pq2 編號）
-TL;DR：最大化約 30 年後 `retirement_net_terminal_wealth`；technical 只決定新增 timing／pace；列今日可人工評估標的與最重要的動態風控 warning
-今天是否投入：<先直接回答今天是否應啟動人工投入評估>
-例行提醒：<每 5 個完整交易日一次；本期是否到期；只涵蓋自有現金，貸款不在提醒內；只在此處列一次>
-自有現金可部署：<Portfolio CASH − cash floor；Alpha／Beta 共用>
-本輪可評估上限：<同一主路徑經 technical 節奏與 risk caps 後的 ceiling；不是下單金額>
-未動用貸款額度：<amount／已借款／估計利息／terms status；明標不算自有現金、未納入本輪上限>
-貸款投入：不在例行提醒內；提款時間表未建立，仍為 manual_review_required
-相對比較：<有無相對加碼證據；若全部只有 baseline，明說沒有證據可排首選>
-| 標的 | 系統動作 | 每檔 TL;DR（商品自身價格） | 相對結論 | 個別例外／上限 |
+TL;DR：最大化約 30 年後 `retirement_net_terminal_wealth`；**本報告不判斷「今天該不該投」、不給金額或時間表**，只回答各 sleeve 距目標配置多遠與每檔在什麼水位；列最重要的動態風控 warning
+自有現金可部署：<Portfolio CASH − cash floor；Alpha／Beta 共用；它就是可部署現金本身，不再乘任何 pace>
+未動用貸款額度：<amount／已借款／估計利息／terms status；明標不算自有現金>
+貸款投入：**貸款 tranche 不適用配置建議**；提款時間表未建立，仍為 manual_review_required
+
+### 目標配置差距（決定「這次投哪一檔」的錨點）
+分母：已投入的非現金部位（不含現金；cash floor 是另一個 authority，不佔本表比例）。
+再平衡只用新投入的錢往低於目標的格子補，不賣出；落在容忍區間內視為到位、沒有偏好。
+本表只給差距，不給金額、不排名、不產生尺寸——要投多少由使用者決定。
+| Sleeve | 角色 | 目標 | 容忍區間 | 實際 | 差距 | 狀態 |
+|---|---|---|---|---|---|---|
+| beta_core（全球廣度錨） | … | 40.0% | ±5.0% | 28.1% | -11.9% | 低於目標區間 |
+| beta_tilt（科技／區域傾斜） | … | 25.0% | ±5.0% | 32.7% | +7.7% | 高於目標區間 |
+收尾一行點名「低於目標、新資金可優先補：…；高於目標、新資金避開：…」。
+
+### 相關性警告（每天都要講一次，不因每天一樣而省略）
+- **alpha 與 beta 是同一個賭注**：alpha 全在 AI 光互連，`beta_tilt` 是 QQQ／SOXX／台股半導體；兩個 sleeve 的目標比例分開寫不代表風險獨立。
+- **TSMC look-through 約 28%**（2330 直接持有 ＋ 0050／006208／00631L 內含），高於 `issuer_concentration_warning` 0.25；系統算不出精確值，`issuer_loads` 覆蓋恆為 partial。
+
+| 標的 | 行情狀態 | 行情心跳（自身價格） | 相對水位（自身價格） | 所屬 sleeve 配置狀態 |
 |---|---|---|---|---|
-評估日期、可部署現金與投組 hard caps 在表格上方只列一次。每列只保留商品自身的 RSI／1／5／20 日變化／
-距高點／趨勢、相對比較結論，以及真正會因標的不同而變化的 freshness、單輪預算、槓桿容量與重疊排序。
-每列的 1 日變化必須寫成「最新完整交易日 `YYYY-MM-DD`：1日 ±X%」，不能因今天不是投入評估日而省略；
+可部署現金、投組 hard caps 與兩條相關性警告在表格上方只列一次，不在每檔重複。
+行情心跳必須寫成「最新完整交易日 `YYYY-MM-DD`：1日 ±X%」再加 5／20 日，**不能因今天沒有配置缺口而省略**；
 資料 stale／quarantined 時則顯示官方 reference 日期、當日漲跌與降級原因。
-若 signal benchmark 與商品不同，TL;DR 必須明寫（例如「自身價格看 TQQQ；節奏訊號看 QQQ」）。所有 pace
-仍是該 sleeve 單輪 campaign budget 比例，不是 NAV 比例。
-| QQQ | HOLD | 🟡 自身 RSI 43.2；… | 今日不比較（尚未到投入評估日） | 無；共用條件見上方 |
-| SOXX | CONTRIBUTE REVIEW | 🟢 自身 RSI 42.5；… | 例行候選；沒有相對加碼證據 | 本檔人工評估上限 … |
-| TQQQ | CONTRIBUTE REVIEW | 🟢 TQQQ 自身漲跌／RSI；節奏訊號看 QQQ | 回檔觀察優先；Signal 尚未驗證 | 槓桿容量 … |
+相對水位只用位置指標——52 週區間位置（主要）、距 52 週高點、距 SMA200，全部取自商品自身價格序列；
+**只呈現、不參與排序、不換算金額**，並固定寫明「長期上漲的標的多數時間落在高位是正確資訊，不是該等
+回檔的訊號」（2026-07-31 回測：等回檔才投入對 30 年終值是負貢獻）。**不得用 RSI／MACD 等動能指標表達
+水位**——RSI 量的是最近漲跌的單邊程度，與「站在自己區間哪裡」可以完全脫鉤，且它正是 2026-08-01 測失敗
+的輸入，以「水位」之名放回來是換名字重來。
+| QQQ | 🟢 行情正常 | 最新完整交易日 2026-08-28：1日 -0.6%｜5日 +0.4%｜20日 +4.1% | 52週區間位置 85%｜距52週高點 -3.9%｜距200日均線 +9.5% | beta_tilt：高於目標區間 |
+| TQQQ | 🟢 行情正常 | 最新完整交易日 2026-08-28：1日 -2.0%｜… | 52週區間位置 69%（自身序列，未冒用 QQQ 的 85%）｜… | beta_leverage：到位（區間內、無偏好） |
+| 00631L.TW | 🔴 資料不足（TWSE 官方行情較新，本列暫時隔離） | 最新完整交易日 2026-08-27：…；TWSE 官方 2026-08-28 +1.0% | …（降級，水位不可信） | beta_leverage：到位（區間內、無偏好） |
 
 ## 低優先（摺疊）
 EDGAR Form 4 ×55、較舊 filing——預設摺疊只列數量（要看再展開）
@@ -473,13 +492,17 @@ paper 無異動｜live 無 pending fill｜...
 ```
 
 pq2／lead priority **不使用顏色維度**（顏色曾混淆 triage 與優先度），一律使用明確指令字串。Beta
-technical 區可用配有文字的燈號表達 deterministic state，但不得只靠顏色，也不得把 `可評估` 寫成 `買進`。
-Beta 必須使用上述表格，每個 ticker 一列；不能再用一長串 bullet 堆 raw 數字。首屏先回答今天是否啟動投入評估，表格才比較商品。TL;DR 至少回答「商品自身現在在什麼水位、這是趨勢還是回檔、訊號基準是什麼、是否有個別例外」。RSI 區間只是一致的解讀標籤，不改變 `config/beta_policy.json` 的 numeric gate，也不構成 live permission。
-`NO ACTION`／非投入評估日也不得刪除主力表；「今天是否投入」只控制 capital discussion 與 ceiling，
+行情區可用配有文字的燈號表達 deterministic state，但不得只靠顏色，也不得把 `行情正常` 讀成 `可買進`——
+燈號講的是**資料狀態**，不是投入建議。
+Beta 必須使用上述兩張表格（目標配置差距、主力逐檔），每個 ticker 一列；不能再用一長串 bullet 堆 raw 數字。
+首屏先出目標配置差距與兩條相關性警告，逐檔表才比較商品。每列至少回答「這檔在自己 52 週區間的哪裡、
+所屬 sleeve 距目標多遠」。**相對水位不改變 `config/beta_policy.json` 的 numeric gate、不參與排序、不構成
+live permission。**
+沒有任何配置缺口、全部 sleeve 到位時也不得刪除主力表；配置差距只控制 capital discussion，
 不控制行情是否顯示。
-Codex desktop 若支援 inline mobile visualization，Beta 區依「自有現金可部署／本輪可評估上限／未動用貸款
-額度 → 風險燈號 → 標的燈號」層級呈現；不支援的 executor 必須輸出相同層級的 Markdown，不能因此退化成
-raw field names 或省略燈號。
+Codex desktop 若支援 inline mobile visualization，Beta 區依「自有現金可部署／未動用貸款額度 →
+目標配置差距 → 相關性警告 → 風險燈號 → 標的行情狀態」層級呈現；不支援的 executor 必須輸出相同層級的
+Markdown，不能因此退化成 raw field names 或省略燈號。
 主力首屏依序顯示 `QQQ`、`TQQQ`、`LON:VWRA`、`SOXX`、`00631L.TW`、`2330.TW`、`00981A.TW`；
 個股與其他標的縮成 exception-first 摘要。Form 4 與較舊 filing 一律進
 「低優先（摺疊）」只列數量——冷啟動 EDGAR seed 偏 Form 4，別淹沒新訊號。
@@ -539,9 +562,10 @@ apply／publish 並自動建立（或沿用）Decision Shadow：
 record-fill）不在批次動詞集合**——永遠本機明確 flags，不得由 recommendation 推定 choice、choice 推定
 fill。系統不連 broker。
 
-Beta 的 `CONTRIBUTE REVIEW` 只是一個當日人工 capital discussion prompt，不因出現在 brief 就取得 pq2
-approval、loan draw、choice 或 fill 語意。貸款路徑在沒有 exact draw／instrument／tranche 核准前不得輸出自動金額。
-固定例行提醒亦同：它只以自有現金 baseline 提醒使用者評估，不包含或暗示貸款提款。
+Beta 的「低於目標、新資金可優先補」只是一個人工 capital discussion prompt，不因出現在 brief 就取得 pq2
+approval、loan draw、choice 或 fill 語意，也不產生任何金額或部位尺寸。貸款路徑在沒有 exact draw／
+instrument／tranche 核准前不得輸出自動金額；**貸款 tranche 不適用配置建議**，仍走 Capital Authority
+的逐次 explicit manual review。
 
 ### Step 7 — 收尾同步
 

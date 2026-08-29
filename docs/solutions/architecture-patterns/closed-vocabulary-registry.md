@@ -60,7 +60,8 @@ tags:
 | Blocker 說明與分類 | `config/decision_blockers.json` | 加 exact code 或 prefix；`decision_lab/blockers.py` 是唯一 loader |
 | Authority token（證據來自哪個引擎、哪個軸能引用） | `config/authority_tokens.json` | 加一項並指定 `owner`；`identity/authority_tokens.py` 是唯一 loader，Engine C 與 Decision Lab 共用 |
 | Engine B lead `refs` 鍵名 | `config/lead_ref_keys.json` | 加一項並說明用途與 value type；`engine_b/lead_refs.py` 是唯一 loader，`annotate`／`advance` 拒絕未登記鍵 |
-| 投資／beta 政策數值、持股覆蓋分類、daily routine 參數、信號來源 | `config/investment_policy.json`、`config/beta_policy.json`、`config/holdings_coverage.json`、`config/daily_routine.json`、`config/signal_sources.json` | 各自為該領域的 numeric／設定 SSOT |
+| 投資／beta 政策數值、持股覆蓋分類、daily routine 參數、信號來源 | `config/investment_policy.json`、`config/beta_policy.json`、`config/holdings_coverage.json`、`config/daily_routine.json`、`config/signal_sources.json` | 各自為該領域的 numeric／設定 SSOT。⚠ `config/signal_sources.json` 指的是 **Engine B 的 lead 來源登記**，與已移除的 beta 技術訊號無關，不要因為名字有 signal 就以為它也該拔 |
+| Beta sleeve 目標配置比例 | `config/target_allocation.json` | 加／改一個 sleeve 的 `target`／`band`；`decision_lab/beta_policy.py` 是唯一 loader。⚠ 它是**錨點不是 gate**：`band` 只是容忍區間，不歸零任何東西、不產生部位尺寸；真實風控仍只在 `config/beta_policy.json`（槓桿 cap）與 `config/investment_policy.json`（5% 單筆上限）。查證：`python -c "import json;d=json.load(open('config/target_allocation.json'));print(d['basis'], sorted(d['sleeves']))"` |
 
 > ⚠ `config/*.json` 在 `.gitignore` 中**預設被忽略**（該目錄放 Google service account 憑證），靠白名單開例外。新增 config 檔一定要補 `!config/<name>.json`，否則 fresh clone 與另一個 agent 會缺檔而整個功能靜默失效——本機因為檔案在，測試還會全綠。2026-07-30 一天內踩到兩次。`tests/test_config_tracking.py` 是這道剎車。
 
@@ -81,10 +82,27 @@ tags:
 
 | 字彙 | 位置 | 會觸發它的具體事實 |
 |---|---|---|
-| 技術指標欄位 | `engine_c/technical.py` 的 `_METRIC_COLUMNS` | 想看相對強弱（vs QQQ）、ATR、Bollinger。同時是 DB 欄位，需配 migration |
+| 技術指標欄位 | `engine_c/technical.py` 的 `_METRIC_COLUMNS` | 想看相對強弱（vs QQQ）、ATR、Bollinger。同時是 DB 欄位，需配 migration。⚠ 2026-08-29 起這裡只放**位置指標**（`range_percentile_252`、`drawdown_252`、`distance_sma_*`）；動能指標已移除，新增前先讀下方註記 |
 | 高風險屬性 | `thesis/evidence_manifest.py` 的 `HIGH_RISK_ATTRIBUTES` | 學到新的危險屬性型態時（L11 那類體悟） |
 | edge 衝突處理動作 | `loader/edge_resolution.py` 的 `ALLOWED_ACTIONS` | 需要「scope 切分」「移到 dated observation」時 |
+
 > authority token 曾在此區。2026-07-31 已收斂為單一權威 `config/authority_tokens.json`——先前判斷「`decision_lab` 不得反向依賴 Engine C 所以無法合併」是過度套用分層規則：該規則擋的是依賴 Engine C 的 runtime authority，而 `decision_lab` 本來就直接讀 `config/`（beta_policy、decision_blockers、holdings_coverage、signal_sources）。改讀中立 loader 後三份副本剩一份，漂移不再可能發生。
+
+### 已移除（不是「可以擴充」，是不得回填）
+
+| 字彙 | 原位置 | 移除日期／commit | 為什麼 |
+|---|---|---|---|
+| Beta 三態系統動作 `CONTRIBUTE REVIEW`／`HOLD`／`PAUSE CONTRIBUTION` | `decision_lab/beta_monitor.py` | 2026-08-29 `6aa31de` | beta 不再回答「今天該不該投」，只回答距目標多遠與在什麼水位 |
+| `signal` 整區：`tiers`（含 `rsi_at_most` 45／40／35）、`baseline_pace`、`allowed_paces`、`repeat_after_sessions`、`stretched_above_sma200` | `config/beta_policy.json` | 2026-08-29 `6aa31de` | 2026-08-01 三次回測 0 勝 3 敗（見 `AGENTS.md`「技術訊號的地位」）。拔的是**已被量測為有害**的東西，不是精簡 |
+| `campaign_budget_fraction_by_sleeve` 與「本輪可評估上限」概念 | `config/beta_policy.json`、`decision_lab/beta_monitor.py` | 2026-08-29 `6aa31de` | `self_funded_supported_range` 已重新定義為可部署現金本身，不再乘 pace |
+| RSI／MACD／`sma_50_slope` | `engine_c/technical.py` 的 `_METRIC_COLUMNS` | 2026-08-29 `6aa31de` | 從計算與寫入徹底移出，不是只停止顯示 |
+
+⚠ **這一區與「可自由擴充」的差別是方向性的：** 上面那些不是「暫時沒用到」，是**測過而且輸了**。
+把它們改名成「熱度」「節奏」「水位」再放回排序或尺寸，等於換名字重來一次同一個實驗——
+`AGENTS.md` L14 第 2 點（gate 本身也要被驗證）與「相對水位只呈現、不參與排序」是同一條線。
+位置指標（52 週區間位置、距高點、距 SMA200）之所以留著，正是因為它**不決定任何金額也不排序**；
+一旦有人拿它排序，它就變回訊號。
+查證：`python -c "import json;print(sorted(json.load(open('config/beta_policy.json'))))"` 不應出現 `signal`。
 
 ## 兩個實用訊號
 

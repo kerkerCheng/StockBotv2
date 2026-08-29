@@ -199,9 +199,11 @@ Decision gap jobs 優先占用同一個 daily pq1 budget。若研究結果需要
 
 ### 資本與風控
 
-**Numeric SSOT：** `config/investment_policy.json` 與 `config/beta_policy.json`。只有 **ETF 槓桿 cap 與 5% 單筆上限**會把 live supported range 歸零，其餘曝險只記錄／警告。使用者仍可走 prepared `live_override` 留下 exact action ＋ reason receipt；系統不自動下單。
+**Numeric SSOT：** `config/investment_policy.json` 與 `config/beta_policy.json`（目標配置比例另在 `config/target_allocation.json`，它是錨點不是 gate）。只有 **ETF 槓桿 cap 與 5% 單筆上限**是硬擋，其餘曝險只記錄／警告。使用者仍可走 prepared `live_override` 留下 exact action ＋ reason receipt；系統不自動下單。
 
-**共同可投資現金池只有一條：** `Portfolio CASH − cash floor`，供 Alpha／Beta 共用。不扣 operating reserve、alpha reserve 或 planned outflows，沒有 Sheet／household 雙 range。Alpha／Beta 如何分配由各自 campaign budget、Decision sizing、單筆上限與風控決定，**cash floor 不承擔 sleeve allocation**。cash floor authority 失效時 fail closed，不回退到百分比 reserve。
+⚠ 這句原本寫的是「把 **live supported range** 歸零」。`live_supported_range` 已隨 U7 移除（見「Alpha 呈現契約」），但**硬擋本身仍在**——`store.record_live_choice` 對每一筆非零 live 選擇仍擋這三碼，外加凍結快照七天時效與「部位量不到就 fail closed」。移除的是系統給的建議區間，不是煞車。
+
+**共同可投資現金池只有一條：** `Portfolio CASH − cash floor`，供 Alpha／Beta 共用。不扣 operating reserve、alpha reserve 或 planned outflows，沒有 Sheet／household 雙 range。Alpha／Beta 如何分配由 `config/target_allocation.json` 的目標配置比例、Decision sizing、單筆上限與風控決定，**cash floor 不承擔 sleeve allocation**。cash floor authority 失效時 fail closed，不回退到百分比 reserve。
 
 **兩個槓桿指標不得混用：** `nominal_weight` 是「投入槓桿 ETF 的資金占 NAV」（12.5%／20% warning/cap）；`effective_weight` 是乘上 2x／3x 後的「換算槓桿曝險」（30%／40% warning/cap）。面向使用者不得把前者寫成模糊的「名目槓桿」。數值仍只以 `config/beta_policy.json` 為 SSOT；本段是人類可讀鏡像。
 
@@ -313,31 +315,39 @@ agent 以「outcome 0/8 未驗證」拒絕推薦）。
 **進場靠判斷，出場靠 disproof。** 反證的用途是決定何時承認判斷錯了，不是進場的前置條件；
 把兩者混用會產生「永遠不出手、只累積反證」的無效產出。
 
-### Beta 呈現契約（2026-07-30 使用者定案）
+### Beta 呈現契約（2026-07-30 使用者定案；2026-08-29 拔除訊號後改寫）
 
-底層與首屏都只保存一條 `self_funded_supported_range`。自有現金可部署固定顯示 `Portfolio CASH − cash floor`，並明說 cash floor 以上為 Alpha／Beta 共用。另獨立顯示「未動用貸款額度／已借款／估計利息」，明標貸款不算自有現金。**不得用未解釋的斜線或 raw field name。**
+**Beta 不再回答「今天該不該投」，只回答兩件事：各 sleeve 距目標配置多遠、每檔現在在什麼水位。** 使用者的實際行為是定期投入而非擇時，每次真正要決定的只有「這次投哪一檔」。訊號整組移除的實測依據見下一節；呈現層**不得以任何名義復刻擇時語言**（今天是否投入、本輪上限、節奏、可評估／暫停新增）。
 
-燈號固定配文字：🟢可評估、🟡冷卻／排序中、⚪觀察、🔴資料不足／暫停新增。Beta 區先用三行 TL;DR 說明目標、今日可人工評估標的與已觸發風控；technical signal 只決定新增 timing／pace，**不因一般回檔自動賣出**。
+底層與首屏仍只保存一條 `self_funded_supported_range`，但它已重新定義為**可部署現金本身**（`Portfolio CASH − cash floor`），不再乘任何 pace 或單輪比例；只有槓桿／總曝險硬擋或資本 authority 失效才會讓它歸零。自有現金可部署固定顯示 `Portfolio CASH − cash floor`，並明說 cash floor 以上為 Alpha／Beta 共用。另獨立顯示「未動用貸款額度／已借款／估計利息」，明標貸款不算自有現金。**不得用未解釋的斜線或 raw field name。**
 
-首屏先直接回答「今天是否要啟動投入評估」、全局例行日期與本輪共同上限；這些條件不在每檔重複。標的表只負責比較：**商品自身價格 TL;DR**、**相對結論**與**個別例外／上限**。若全部只有同一 baseline 且沒有經驗證的相對優勢，必須明說「沒有證據可排首選」，不得硬造排名。評估日期、可部署現金與投組 hard caps 是全局條件；只有商品資料 freshness、單輪預算、槓桿容量與重疊商品排序會造成個別差異。pace 百分比仍必須標為該 sleeve 單輪 campaign budget 的比例。
+**目標配置比例的 SSOT 只有 `config/target_allocation.json`：** sleeve 層級六格，分母是**已投入的非現金部位**（不含現金；cash floor 是另一個 authority），`band` 是**容忍區間不是 gate**——落在區間內即視為到位、沒有偏好。**再平衡只用新投入的錢往低於目標的格子補，不賣出**；此表只給差距，**不給金額、不排名、不產生部位尺寸**。查證：`python -c "import json;d=json.load(open('config/target_allocation.json'));print(d['basis'], sorted(d['sleeves']))"`。**貸款 tranche 不適用配置建議**，仍走「Capital Authority」既有的逐次 explicit manual review。
 
-槓桿／重疊商品必須拆開**訊號基準**與**自身價格序列**：例如 TQQQ 可繼續用 QQQ 判斷新增 timing／pace，但 1／5／20 日漲跌、RSI、距高點與均線熱度必須使用 TQQQ 自身行情；00631L／006208 同理，不得把 0050 的價格表現冒充商品自身表現。
+**相對水位只用位置指標：** 52 週區間位置（主要）、距 52 週高點、距 SMA200，全部取自商品**自身**價格序列。它**只呈現、不參與排序、不換算金額**，且必須寫明「長期上漲的標的多數時間落在高位是正確資訊，不是該等回檔的訊號」——2026-07-31 回測顯示等回檔才投入對 30 年終值是負貢獻。**不得用動能指標表達水位**：RSI 量的是最近漲跌的單邊程度，與「站在自己區間哪裡」可以完全脫鉤，而且它正是 2026-08-01 測失敗的輸入，以「水位」之名放回來是換名字重來。
 
-**行情表是每日心跳，不受今日是否投入影響（2026-08-05 使用者定案）：** 即使今天不用啟動投入評估、所有標的都是 `HOLD`／`NO ACTION`，或本輪可評估上限為 0，主力逐檔表仍不得省略。每列必須明示商品自身的「最新完整交易日 `YYYY-MM-DD`＋1 日漲跌」；不能只寫沒有日期的「1 日」，也不能把最近收盤誤稱即時今日行情。`stale`／`quarantined` 時改列官方 reference 的日期與當日漲跌並附降級原因，不得因非操作日把行情濃縮成一行狀態摘要。
+**燈號只表達行情資料狀態，不表達投入建議**，固定配文字：🟢行情正常、🔴資料不足（含 TWSE 官方較新而暫時隔離）、⚪歷史不足。**舊語意（🟢可評估／🟡冷卻／排序中／⚪觀察／🔴暫停新增）已於 2026-08-29 廢止，不得回填。**
 
-### 技術訊號的地位（2026-08-01 實測後定案）
+標的表只負責三欄比較：**行情心跳（自身價格）**、**相對水位（自身價格）**與**所屬 sleeve 配置狀態**。可部署現金、投組 hard caps 與兩條相關性警告是全局條件，不在每檔重複。
 
-**訊號不得 gate 自有現金投入。** `config/beta_policy.json` 的 `signal.baseline_pace` 是不受訊號影響的例行投入下限，訊號只能在其上加碼。
+**兩條相關性警告每天都要講一次，不因每天一樣而省略：**（a）**alpha 與 beta 是同一個賭注**——alpha 目前全在 AI 光互連、`beta_tilt` 是 QQQ／SOXX／台股半導體，兩個 sleeve 的目標比例分開寫**不代表**它們是兩個獨立風險來源；（b）**TSMC look-through 約 28%**（2330 直接持有 ＋ 0050／006208／00631L 內含權重），高於 `issuer_concentration_warning` 0.25，且系統算不出精確值——`issuer_loads` 覆蓋恆為 `partial`。
 
-**例行提醒與貸款分離（2026-08-01）：** 自有現金 baseline 每 5 個完整交易日主動提醒一次；週期以 Engine C append-only `TechnicalObservation` 的 distinct session count 定錨，不跟 RSI／MACD／tier 變化走。提醒只是人工評估 prompt，不是下單許可。貸款不在例行提醒內；提款時間表、金額、標的與 tranche 留待未來另案人工核准。
+槓桿／重疊商品必須使用**自身價格序列**：TQQQ 的水位不得冒用 QQQ（2026-08-29 實測 69% vs 85%），00631L／006208 同理不得冒用 0050。這條原本規範訊號基準，訊號拔除後改規範水位。
 
-三次實測全部失敗：以訊號 gate 現金投入使終值**輸給無腦定投 8.5%**（QQQ 91.5%、SOXX 91.9%）；訊號調節借款提取**無可測得效果**；訊號決定投給哪個標的**輸給固定單押最佳標的 22%**，且三分之一時間買進 CAGR 僅 7.2% 的弱標的——「買跌最深的」會系統性把錢導向長期較弱的資產。`stretched_above_sma200` 同為未實測的推論。
+**真實風控完全不變：** ETF 槓桿 nominal／effective cap、總曝險 cap 與 5% 單筆上限全部保留，numeric SSOT 仍是 `config/beta_policy.json` 與 `config/investment_policy.json`；`config/target_allocation.json` 不歸零任何東西、不阻擋任何動作。
 
-因此：**未驗證的訊號機制不得覆蓋有證據的 baseline**；呈現須寫「例行投入 / 節奏 X%」而非自相矛盾的「未觸發 / 節奏 X%」。但 baseline 不等於「無論如何都投」——資料不足／stale／quarantined 時仍誠實歸零。
+**行情表是每日心跳，不受今日是否投入影響（2026-08-05 使用者定案；2026-08-29 措辭跟著字彙更新）：** 即使所有 sleeve 都「到位（區間內、無偏好）」、今天沒有任何配置缺口，主力逐檔表仍不得省略。每列必須明示商品自身的「最新完整交易日 `YYYY-MM-DD`＋1 日漲跌」；不能只寫沒有日期的「1 日」，也不能把最近收盤誤稱即時今日行情。`stale`／`quarantined` 時改列官方 reference 的日期與當日漲跌並附降級原因，不得因非操作日把行情濃縮成一行狀態摘要。
 
-**台股 technical freshness（2026-08-01）：** `.TW` 的最新交易日先用 TWSE 官方 `STOCK_DAY_ALL` OpenAPI 校驗；Yahoo session 落後、官方代碼缺列或 TWSE freshness 無法取得時，該標的 technical signal 必須 `quarantined`／supported range 歸零。TWSE 的未還權 OHLC 只作最新日期與當日漲跌 reference，不得直接混入 Yahoo adjusted-close 長期序列；完整還權歷史另需明確的資料源與調整規則。
+### 技術訊號的地位（2026-08-01 實測後定案；2026-08-29 整組移除）
 
-**須區分量測與訊號：** 總曝險倍數、歸零門檻、追繳門檻、利息覆蓋屬**量測**，有價值且應強化（本輪所有決策翻轉皆由此而來）；RSI／MACD／tier／pace 屬**訊號**，三次受測皆未通過。完整證據與未實作項見 [`docs/brainstorms/2026-07-31-leverage-glide-path-requirements.md`](docs/brainstorms/2026-07-31-leverage-glide-path-requirements.md)。
+**實測記錄（歷史，不因後續移除而改寫）：** 三次實測全部失敗——以訊號 gate 現金投入使終值**輸給無腦定投 8.5%**（QQQ 91.5%、SOXX 91.9%）；訊號調節借款提取**無可測得效果**；訊號決定投給哪個標的**輸給固定單押最佳標的 22%**，且三分之一時間買進 CAGR 僅 7.2% 的弱標的——「買跌最深的」會系統性把錢導向長期較弱的資產。`stretched_above_sma200` 同為未實測的推論。完整證據與未實作項見 [`docs/brainstorms/2026-07-31-leverage-glide-path-requirements.md`](docs/brainstorms/2026-07-31-leverage-glide-path-requirements.md)。**這段是拔除的依據，任何改寫都不得刪減它。**
+
+**因此：訊號機制已於 2026-08-29 整組移除（commit `6aa31de`），不是降級使用。** 移除清單：三態系統動作 `CONTRIBUTE REVIEW`／`HOLD`／`PAUSE CONTRIBUTION`、RSI／MACD／`sma_50_slope`／tier、`signal.baseline_pace`／`allowed_paces`／`repeat_after_sessions`／`stretched_above_sma200`、`campaign_budget_fraction_by_sleeve` 與單輪 campaign budget 百分比、每檔 `supported_order_range`／`binding_constraints`、「本輪可評估上限」這個概念，以及「自有現金 baseline 每 5 個完整交易日主動提醒一次」的例行提醒節奏。**這些字彙不得以任何名義回到文件或輸出**——包括改名成「熱度」「節奏」，或借用「水位」之名讓動能指標重新參與排序／尺寸（水位本身合法，前提是它只呈現）。查證：`python -c "import json;print(sorted(json.load(open('config/beta_policy.json'))))"` 不應出現 `signal`（現為 capital／capital_scope／instruments／market_data／mode／policy_version／risk／schema_version）。
+
+拔的依據是「已被量測為有害」，不只是「太長」——這是 L14 第 2 點（gate 本身也要被驗證）的直接執行。取代它的是**目標配置比例 ＋ 相對水位**，見上一節。
+
+**須區分量測、訊號與脈絡：** 總曝險倍數、歸零門檻、追繳門檻、利息覆蓋屬**量測**，有價值且應強化（本輪所有決策翻轉皆由此而來）；RSI／MACD／tier／pace 屬**訊號**，三次受測皆未通過，現已移除。位置指標（52 週區間位置、距 52 週高點、距 SMA200）是**呈現用的脈絡**——既不是量測也不是訊號，它不決定任何金額、不參與任何排序；**一旦有人拿它排序或調整尺寸，它就變回訊號**，適用同一條實測紀律。
+
+**台股 technical freshness（2026-08-01，仍生效）：** `.TW` 的最新交易日先用 TWSE 官方 `STOCK_DAY_ALL` OpenAPI 校驗；Yahoo session 落後、官方代碼缺列或 TWSE freshness 無法取得時，該標的行情必須 `quarantined`，改列官方 reference 的日期與當日漲跌並附降級原因。⚠ 2026-08-29 起**單檔行情降級不再歸零任何 supported range**（已無逐檔區間，共用區間只由資本 authority 與硬擋決定）；降級的後果是那一列的水位不可信、必須現形，不是靜默消失。TWSE 的未還權 OHLC 只作最新日期與當日漲跌 reference，不得直接混入 Yahoo adjusted-close 長期序列；完整還權歷史另需明確的資料源與調整規則。
 
 ### 事件監控
 

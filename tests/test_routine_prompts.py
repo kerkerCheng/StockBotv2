@@ -63,8 +63,9 @@ def test_daily_prompt_keeps_human_gates_and_batch_contract() -> None:
     assert "engine_b.todo dispatch" in text
     assert "bare reassess" in text
     assert "新 decision receipt" in text
-    assert "beta technical" in text
-    assert "supported range 歸零" in text
+    assert "beta 行情" in text
+    # 2026-08-29：已無逐檔 supported range，單檔行情降級不得再被寫成「該商品 range 歸零」。
+    assert "單檔行情降級**不歸零**共用 supported range" in text
     assert "self_funded_supported_range" in text
     assert "Portfolio CASH − cash floor" in text
     assert "Alpha／Beta 共用" in text
@@ -84,13 +85,27 @@ def test_daily_prompt_keeps_human_gates_and_batch_contract() -> None:
     assert "event_search_requests" in text
     assert "不註冊 lead" in text
     assert "自有現金可部署" in text
-    assert "本輪可評估上限" in text
+    # 2026-08-29 訊號拔除：beta 不再回答「今天該不該投」，只回答距目標多遠與在什麼水位。
+    assert "目標配置差距" in text
+    assert "config/target_allocation.json" in text
+    assert "band 是容忍區間不是 gate" in text
+    assert "只呈現、不參與排序、不換算金額" in text
+    assert "不得用 RSI／MACD 等動能指標表達水位" in text
+    assert "不是該等回檔的訊號" in text
+    assert "貸款 tranche 不適用配置建議" in text
+    for banned in ("本輪可評估上限", "CONTRIBUTE REVIEW", "PAUSE CONTRIBUTION",
+                   "baseline_pace", "campaign budget", "節奏"):
+        assert banned not in text, f"daily prompt 不得再描述已拔除的訊號機制：{banned}"
     assert "未動用貸款額度" in text
     assert "槓桿 ETF 資金占比" in text
     assert "換算槓桿曝險" in text
     assert "不得用未解釋的斜線" in text
-    for light in ("🟢", "🟡", "⚪", "🔴"):
+    # 燈號只表達行情資料狀態；🟡 與舊語意已於 2026-08-29 廢止，且該廢止必須寫在 prompt 裡
+    # 當剎車——只是刪掉舊燈號不會阻止下一個 session 把它加回來。
+    for light in ("🟢行情正常", "🔴資料不足", "⚪歷史不足"):
         assert light in text
+    assert "燈號只表達資料狀態、不表達投入建議" in text
+    assert "等舊語意已於 2026-08-29 廢止，不得回填" in text
 
 
 def test_daily_prompt_requires_subject_complete_pq2_items() -> None:
@@ -122,13 +137,20 @@ def test_daily_brief_preserves_beta_market_heartbeat_and_canonical_output() -> N
         text = path.read_text(encoding="utf-8")
         assert "最新完整交易日" in text
         assert "1 日" in text or "1日" in text
-        assert "本輪可評估上限" in text
+        # 心跳的觸發條件跟著字彙改：從「非投入日／ceiling=0」改成「沒有配置缺口」，
+        # 但「不得省略」這條剎車本身不變。
+        assert "52 週區間位置" in text or "52週區間位置" in text
+        # ⚠ 禁的是「當成現行欄位使用」，不是提到這個詞——三份文件都刻意留著移除紀錄，
+        # 那正是防止它被重新加回來的剎車（見 AGENTS.md「技術訊號的地位」移除清單）。
+        assert "本輪可評估上限：" not in text
+        # 舊燈號語意必須被明文廢止，而不是安靜消失——安靜消失擋不住下次回填。
+        assert "廢止" in text and "2026-08-29" in text
         assert "canonical Markdown" in text or "Canonical Brief" in text
     daily = DAILY.read_text(encoding="utf-8")
     skill = (ROOT / "skills" / "daily-brief" / "SKILL.md").read_text(encoding="utf-8")
-    assert "主力表在非投入日、全 HOLD／NO ACTION 或 ceiling=0 時仍強制保留" in daily
+    assert "主力表在沒有任何配置缺口、全部 sleeve 到位時仍強制保留" in daily
     assert "task 最終回覆必須原樣輸出" in daily
-    assert "`NO ACTION`／非投入評估日也不得刪除主力表" in skill
+    assert "沒有任何配置缺口、全部 sleeve 到位時也不得刪除主力表" in skill
     assert "不得在取得 delivery receipt 後另產生" in skill
 
 

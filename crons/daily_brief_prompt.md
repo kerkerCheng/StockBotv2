@@ -38,17 +38,18 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
    - `.venv\Scripts\python.exe engine_c\etl_yfinance.py`（35 檔 Engine C daily snapshot）
    - `.venv\Scripts\python.exe scripts\daily_beta_snapshot.py --format markdown --risk-view changes`（固定 ETF／權值股 technical refresh
      ＋ Engine D 單一 shared cash pool beta monitor；JSON 只保留 `self_funded_supported_range`，計算固定為
-     `Portfolio CASH − cash floor`。cash floor 以上由 Alpha／Beta 共用，sleeve 分配另由 campaign budget、
+     `Portfolio CASH − cash floor`，且 2026-08-29 起它就是**可部署現金本身**、不再乘任何 pace 或單輪比例。
+     cash floor 以上由 Alpha／Beta 共用，sleeve 分配另由 `config/target_allocation.json` 的目標配置比例、
      Decision sizing、單筆上限與風控決定；不得推導 operating／alpha reserve、planned outflows 或雙 cash view。
      Engine C 保存 adjusted-close 1／5／20-session return；`contingent_credit_available` 顯示未動用額度、
      已借款與估計利息但不算自有現金，`loan_funded_supported_range` 固定人工 review；只呈現、不推定
-     draw／choice／fill）。自有現金 baseline 每 5 個完整交易日固定提醒一次，以 Engine C distinct observed
-     session count 定錨、不綁 technical signal；貸款不在例行提醒內，提款時間表留待另案人工核准。
+     draw／choice／fill）。**beta 不回答「今天該不該投」**，只回答各 sleeve 距目標配置多遠、每檔在什麼水位；
+     訊號（三態動作／RSI／MACD／tier／pace／每 5 個交易日的例行提醒）已於 2026-08-29 整組移除，不得復刻。
      台股 `.TW` 的最新交易日另由 TWSE 官方 `STOCK_DAY_ALL` OpenAPI 校驗；
-     Yahoo 落後、TWSE 代碼缺列或 freshness 校驗不可用時，該標的 technical signal／supported range 必須
-     fail closed。TWSE 未還權 OHLC 只作最新日期與當日漲跌 reference，不混入 adjusted-close 長期序列。
-     主力逐檔表是每日心跳：即使今天不用啟動投入評估、所有標的都是 `HOLD`／`NO ACTION`，或本輪可評估
-     上限為 0，也必須保留。每列明示商品自身的「最新完整交易日 `YYYY-MM-DD`：1日 ±X%」；stale／
+     Yahoo 落後、TWSE 代碼缺列或 freshness 校驗不可用時，該標的行情必須 fail closed 標 `quarantined`
+     並現形，不得靜默消失。TWSE 未還權 OHLC 只作最新日期與當日漲跌 reference，不混入 adjusted-close 長期序列。
+     主力逐檔表是每日心跳：即使所有 sleeve 都「到位（區間內、無偏好）」、今天沒有任何配置缺口，
+     也必須保留。每列明示商品自身的「最新完整交易日 `YYYY-MM-DD`：1日 ±X%」；stale／
      quarantined 時改列 TWSE 等官方 reference 日期、當日漲跌與降級原因，不得把最近收盤寫成即時行情。
    - `.venv\Scripts\python.exe -m engine_b.cli list --status pending --by-priority`，再對今日新增 pending leads
      套 `skills/signal-triage/SKILL.md`，用本機 CLI 原子寫回 triage＋classification。PASS 命令必須帶
@@ -77,8 +78,9 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
    或命令遭 sandbox／proxy／本機網路權限阻擋，保留 `access_blocked` 並讓受影響資料 fail closed，
    不得以第二套 network rule、較寬 prefix 或手動 replay 事後補跑，也不得寫成「零筆新資料」或 `no_result`。
    同一來源後續成功才算 recovered（後續新一輪成功才算，不得把當次 blocked 寫成零筆）；本輪研究追源可另依 `$source-trace` 嘗試一條已在 profile 內的官方替代路徑。
-   beta technical 的 `insufficient_history`／
-   `unavailable`／`stale` 也必須列在健康段落，該商品 supported range 歸零但不阻斷其他商品。Capital Authority
+   beta 行情的 `insufficient_history`／
+   `unavailable`／`stale` 也必須列在健康段落，該商品的相對水位標為不可信但不阻斷其他商品；
+   單檔行情降級**不歸零**共用 supported range。Capital Authority
    的 cash floor 缺失／stale／FX 錯誤時，單一 self-funded range fail closed 歸零；不得回退到百分比 reserve
    或另一條 cash path。
    routine 的 Google Sheet credential scope 維持 `spreadsheets.readonly`，不得建立或修改 tab／cell。單一來源失敗不
@@ -194,12 +196,12 @@ Asia/Taipei 當日；沒有日期的 brief 視為未完成輸出（多份 brief 
 <四個 pane 每列都標答案會改變 `候選集合`／`排序`／`出場條件`／`只是信心`；即使全部 `MONITOR` 或無新事件也不得省略。>
 
 ## Beta capital observation（無 pq2 編號）
-TL;DR：<約 30 年後 retirement_net_terminal_wealth 目標；今日哪些標的可人工評估；最重要的動態風控 warning>
-例行提醒：<每 5 個完整交易日一次；本期是否到期；只涵蓋自有現金，貸款不在提醒內>
-自有現金可部署：<Portfolio CASH − cash floor；Alpha／Beta 共用>
-本輪可評估上限：<同一主路徑經 technical 節奏與 risk caps 後的 ceiling；不是下單金額>
-未動用貸款額度：<另列已借款與估計利息；明標不算自有現金、未納入本輪上限；不在例行提醒內，貸款投入仍 manual_review_required>
-<先直接回答「今天是否應啟動人工投入評估」，再列一次全局例行日期、自有現金與投組 hard caps。表格逐列比較主力 QQQ／TQQQ／LON:VWRA／SOXX／00631L.TW／2330.TW／00981A.TW；欄位固定為「標的｜系統動作｜每檔 TL;DR（商品自身價格）｜相對結論｜個別例外／上限」。主力表在非投入日、全 HOLD／NO ACTION 或 ceiling=0 時仍強制保留。若全部只有 baseline，明說沒有證據可排首選。個別欄只放 freshness、單輪預算、槓桿容量與重疊排序等確實因商品而異的條件。pace 仍須說明是該 sleeve 單輪 campaign budget 比例。系統動作只能用 `CONTRIBUTE REVIEW`（可新增評估，不是買進）、`HOLD`（維持／等待）、`PAUSE CONTRIBUTION`（暫停新增）。每列 TL;DR 必須包含 🟢可評估／🟡冷卻／⚪觀察／🔴資料不足文字燈號、商品自身 RSI、「最新完整交易日 YYYY-MM-DD：1日 ±X%」與 5／20 日漲跌、距高點或趨勢／回檔；signal benchmark 與商品不同時須明寫，例如 TQQQ 自身價格但節奏訊號看 QQQ。stale／quarantined 時改列官方 reference 日期、當日漲跌與降級原因。不得只列 raw 數字；個股與其他仍可縮成摘要，但每檔保留一列焦點>
+TL;DR：<約 30 年後 retirement_net_terminal_wealth 目標；本報告不判斷「今天該不該投」、不給金額或時間表，只回答各 sleeve 距目標多遠與每檔在什麼水位；最重要的動態風控 warning>
+自有現金可部署：<Portfolio CASH − cash floor；Alpha／Beta 共用；它就是可部署現金本身，不再乘任何 pace>
+未動用貸款額度：<另列已借款與估計利息；明標不算自有現金；貸款 tranche 不適用配置建議，仍 manual_review_required>
+<先出「目標配置差距」表（讀 `config/target_allocation.json`）：欄位固定為「Sleeve｜角色｜目標｜容忍區間｜實際｜差距｜狀態」，分母是已投入的非現金部位，band 是容忍區間不是 gate，落在區間內即「到位（區間內、無偏好）」。收尾一行點名「低於目標、新資金可優先補」與「高於目標、新資金避開」。只給差距，不給金額、不排名、不產生尺寸；再平衡只用新投入的錢補低格，不賣出。
+接著兩條相關性警告每天都要講一次，不因每天一樣而省略：(a) alpha 與 beta 是同一個賭注（alpha 全在 AI 光互連，beta_tilt 是 QQQ／SOXX／台股半導體，比例分開寫不代表風險獨立）；(b) TSMC look-through 約 28%，高於 `issuer_concentration_warning` 0.25，且 `issuer_loads` 覆蓋恆為 partial 故算不出精確值。
+最後是主力逐檔表，逐列比較 QQQ／TQQQ／LON:VWRA／SOXX／00631L.TW／2330.TW／00981A.TW；欄位固定為「標的｜行情狀態｜行情心跳（自身價格）｜相對水位（自身價格）｜所屬 sleeve 配置狀態」。主力表在沒有任何配置缺口、全部 sleeve 到位時仍強制保留。行情狀態燈號只表達資料狀態、不表達投入建議，固定配文字 🟢行情正常／🔴資料不足／⚪歷史不足；🟡 與「可評估／冷卻／暫停新增」等舊語意已於 2026-08-29 廢止，不得回填。行情心跳必須寫「最新完整交易日 YYYY-MM-DD：1日 ±X%」再加 5／20 日；相對水位只用位置指標——52 週區間位置（主要）、距 52 週高點、距 SMA200，全部取自商品自身價格序列（TQQQ 不得冒用 QQQ、00631L／006208 不得冒用 0050）。水位只呈現、不參與排序、不換算金額，並固定寫明「長期上漲的標的多數時間落在高位是正確資訊，不是該等回檔的訊號」。不得用 RSI／MACD 等動能指標表達水位。stale／quarantined 時改列官方 reference 日期、當日漲跌與降級原因。不得只列 raw 數字；個股與其他仍可縮成摘要，但每檔保留一列焦點>
 
 ## 健康／資料降級
 <本次 harvest、Engine C、beta technical、Neo4j、Sheet 的失敗或缺口；無則寫正常>
@@ -210,8 +212,8 @@ TL;DR：<約 30 年後 retirement_net_terminal_wealth 目標；今日哪些標�
 回覆：`<編號…> go｜drop｜pending`（例：`13 17 go 10 16 pending`）
 ```
 
-Codex desktop 若支援 inline mobile visualization，Beta 區依「自有現金可部署／本輪可評估上限／未動用
-貸款額度 → 風險燈號 → 標的燈號」層級呈現；不支援時輸出等價 Markdown。不得輸出模糊的「名目槓桿」：
+Codex desktop 若支援 inline mobile visualization，Beta 區依「自有現金可部署／未動用貸款額度 →
+目標配置差距 → 相關性警告 → 風險燈號 → 標的行情狀態」層級呈現；不支援時輸出等價 Markdown。不得輸出模糊的「名目槓桿」：
 內部 `nominal_weight` 顯示為「槓桿 ETF 資金占比」，乘上 2x／3x 的 `effective_weight` 顯示為
 「換算槓桿曝險」。Issuer look-through coverage 為 partial 時顯示「已知至少 X%」。不得用未解釋的斜線並列兩個 cash view。
 
