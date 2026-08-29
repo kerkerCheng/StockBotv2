@@ -1,0 +1,121 @@
+{
+  "schema_version": "target-allocation-v1",
+  "policy_version": "2026-08-29.1",
+  "_comment": [
+    "目標配置比例——每次決定「這次投哪一檔」的錨點。2026-08-29 使用者定案。",
+    "",
+    "為什麼需要它：使用者的實際行為是定期投入（大筆約半年一次走貸款額度，其餘零星），",
+    "不是擇時。每次要決定的只有一件事——投哪一檔。而 2026-08-01 三次回測已證明，",
+    "用訊號決定投哪一檔輸給固定單押最佳標的 22%，且三分之一時間把錢導向長期較弱的資產。",
+    "",
+    "⚠ 這份檔案存在的唯一理由是把建議錨住。沒有目標比例時，「看哪檔在低水位就多投」",
+    "就是那個輸掉 22% 的機制，把 RSI 換成 LLM 不會讓它變好。有目標時，相對水位只決定",
+    "『補哪一檔比較接近目標』（再平衡，界線來自目標）；沒目標時它就是『誰跌深買誰』（擇時）。",
+    "",
+    "⚠ 比例刻意粗（sleeve 層級，不到個股）。它不需要精確——它需要存在。",
+    "band 是容忍區間，不是 gate：落在區間內就沒有偏好，超出區間才影響下一筆投哪裡。",
+    "本檔不歸零任何東西、不阻擋任何動作，也不產生部位尺寸。真實風控仍只在",
+    "`config/beta_policy.json`（槓桿 cap）與 `config/investment_policy.json`（5% 單筆上限）。"
+  ],
+
+  "investor_profile": {
+    "age": 30,
+    "horizon_years": 30,
+    "objective": "retirement_net_terminal_wealth_max",
+    "anchor": "broad_global_equity",
+    "tech_exposure_stance": "accepted_large",
+    "alpha_role": "excess_return_on_top_of_broad_market_base",
+    "_note": [
+      "⚠ 年齡與期限支持高股票比重與容忍大回撤——但**長期限解決的是波動風險，",
+      "不解決單一產業／單一發行人風險**。兩者不可混用。這也是 anchor 訂成",
+      "broad_global_equity 而不是科技指數的原因：科技曝險是刻意接受的傾斜，",
+      "不是錨點本身。"
+    ]
+  },
+
+  "basis": "invested_non_cash",
+  "_basis_note": [
+    "比例的分母是**已投入的非現金部位**，不含現金。cash floor 是另一個 authority",
+    "（私人 Google Sheet 的 cash_floor record），不由本檔決定，也不佔本檔比例。"
+  ],
+
+  "sleeves": {
+    "beta_core": {
+      "target": 0.40,
+      "band": 0.05,
+      "role": "全球廣度錨——投資組合的重心，其餘部位都是相對它的傾斜",
+      "instruments_note": "目前只有 LON:VWRA 屬此。0050／006208 雖是大盤指數但 58% 是台積電，歸 beta_tilt。"
+    },
+    "beta_tilt": {
+      "target": 0.25,
+      "band": 0.05,
+      "role": "科技／區域 beta 傾斜（QQQ、SOXX、0050、006208）——刻意接受的產業集中"
+    },
+    "beta_tilt_active": {
+      "target": 0.03,
+      "band": 0.02,
+      "role": "主動型 beta（DRAM、00981A）——規模刻意小，未經驗證的主動選擇不配大額"
+    },
+    "beta_leverage": {
+      "target": 0.10,
+      "band": 0.03,
+      "role": "槓桿 ETF（TQQQ、00631L），30 年期限下的衛星部位",
+      "_note": [
+        "⚠ 這裡是**名目**佔比（投入槓桿 ETF 的資金占 NAV），不是換算槓桿曝險。",
+        "0.10 刻意壓在 beta_policy 的 leveraged_nominal_warning（0.125）之下，",
+        "讓目標本身不會把人推向警戒線。真正的硬擋仍在 beta_policy，不在這裡。"
+      ]
+    },
+    "large_cap_tilt": {
+      "target": 0.12,
+      "band": 0.04,
+      "role": "單一大型股（2330、GOOGL、MU、NVDA、TSLA）",
+      "_note": [
+        "⚠ 這一格是目前偏離最大的：2026-08-29 實測約 23.6%，其中 2330 單一檔就 18%。",
+        "把台積電的 look-through 一起算（0050 58.7%、006208 57.4%、00631L 58.7%），",
+        "TSMC 合計曝險約 28%，已超過 beta_policy 的 issuer_concentration_warning（0.25）。",
+        "目標訂 0.12 是要讓新資金往別處走，**不是要你賣**——再平衡靠新投入，不靠賣出。"
+      ]
+    },
+    "alpha": {
+      "target": 0.10,
+      "band": 0.05,
+      "role": "瓶頸研究驅動的衛星部位，在大盤基礎上追求超額報酬",
+      "_note": [
+        "⚠ 這是 **sleeve 層級的風險預算，不是個股尺寸**。Alpha 呈現契約（AGENTS.md）",
+        "明訂系統不對個股輸出部位尺寸——選哪一檔仍只看 `query/bottleneck.py` 的瓶頸排序，",
+        "買多少由使用者自行決定。本格只回答『alpha 整體大約佔多少』，且是使用者自己寫下的",
+        "風險預算，不是系統算出來的建議（KTD5：資本語意不得從另一個門回來）。"
+      ]
+    }
+  },
+
+  "correlation_warnings": [
+    {
+      "name": "alpha 與 beta 是同一個賭注",
+      "detail": "alpha 目前全在 AI 光互連，beta_tilt 是 QQQ／SOXX／台股半導體。兩個 sleeve 的目標比例分開寫，不代表它們是兩個獨立的風險來源。AGENTS.md 只說過 alpha 內部『列 N 檔不等於 N 個獨立機會』，跨 sleeve 這句從來沒有人講。",
+      "surface_in": "每次配置建議都必須講一次，不得因為它每天一樣就省略"
+    },
+    {
+      "name": "TSMC look-through",
+      "detail": "2330 直接持有 ＋ 0050／006208／00631L 的 TSMC 權重，合計約 28%（2026-08-29 實測），高於 issuer_concentration_warning 0.25。系統目前算不出精確值，因為 issuer_loads 覆蓋恆為 partial。",
+      "surface_in": "配置建議提到 large_cap_tilt 或台股標的時"
+    }
+  ],
+
+  "rebalancing": {
+    "method": "new_money_only",
+    "_note": [
+      "只用新投入的錢往低於目標的格子補，不賣出。理由是使用者的實際行為就是定期投入，",
+      "而賣出會產生稅務與摩擦成本，對 30 年終值是負貢獻。",
+      "落在 band 內時視為到位，沒有偏好——此時投哪一檔由使用者自己決定即可。"
+    ],
+    "loan_tranche_excluded": true,
+    "_loan_note": [
+      "⚠ 貸款 tranche **不適用**本檔的自動建議。半年一次的大筆借款投入仍走 AGENTS.md",
+      "『Capital Authority』的 explicit manual review：每次提款、標的與 tranche 都要人核准，",
+      "『高信心』不構成 machine permission，月息若需靠賣出 beta 支付則該 tranche 不成立。",
+      "本檔的比例可以當作那次人工 review 的輸入，但不能代替它。"
+    ]
+  }
+}
