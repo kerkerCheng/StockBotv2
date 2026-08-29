@@ -13253,10 +13253,12 @@
       "lead_id": "lead_3453d7487a96340cfae68508e7ad4a72",
       "published_at": "2026-08-28",
       "refs": {
+        "action_digest": "b431b013fbc3c9b6304f0facc754ed30a2ab78ccc308cac01a5ab1eef3f805a4",
+        "focus_company_id": "co:marvell_technology",
         "research_action_id": "ra_c7c693cf6f3f8daff0dd1c94f1abb2ba"
       },
       "source": "edgar:MRVL",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {},
       "title": "MRVL 10-Q filed 2026-08-28",
       "triage": {

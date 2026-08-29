@@ -2695,6 +2695,11 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
+      "source_cleared": {
+        "at": "2026-08-29T00:57:34.844787+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
       "title": "co:sivers_semiconductors：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review",
       "waiting_on": {
@@ -3934,6 +3939,7 @@
     },
     {
       "added_at": "2026-08-28T14:10:58.036032+00:00",
+      "deferred_at": "2026-08-29T00:43:09.977618+00:00",
       "hint": "coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
       "n": 243,
       "reason": null,
@@ -3958,12 +3964,20 @@
     },
     {
       "added_at": "2026-08-29T00:18:29.965735+00:00",
+      "completion_authority": {
+        "action_digest": "b431b013fbc3c9b6304f0facc754ed30a2ab78ccc308cac01a5ab1eef3f805a4",
+        "cohort_id": "dc_0fca807c963dc3b9888e0f83ba6d45a5",
+        "commit": "ba1fba5f3f771599f6d6e75574102688125f0ece",
+        "company_id": "co:marvell_technology",
+        "verified_at": "2026-08-29T00:42:43.977626+00:00"
+      },
       "hint": "核准 exact graph delta；Decision handoff：co:marvell_technology。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 245,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_c7c693cf6f3f8daff0dd1c94f1abb2ba;digest:b431b013fbc3c9b6304f0facc754ed30a2ab78ccc308cac01a5ab1eef3f805a4;commit:ba1fba5f3f771599f6d6e75574102688125f0ece;cohort:dc_0fca807c963dc3b9888e0f83ba6d45a5",
       "ref_id": "ra_c7c693cf6f3f8daff0dd1c94f1abb2ba",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-29T00:42:43.977626+00:00",
       "source": "research_action",
       "title": "NVIDIA 20 億美元入股 Marvell（Series A Preferred）＋ custom XPU 戰略合作",
       "type": "ra_admission"
@@ -3972,10 +3986,11 @@
       "added_at": "2026-08-29T00:18:29.965735+00:00",
       "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-08-01T00:00:00+00:00；來源=sec:MRVL 10-Q filed 2026-08-28 (mrvl-20260801.htm), library/raw/mrvl_10_q_202608",
       "n": 246,
-      "reason": null,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_26c2c774deb630de0a7c5fb973767ef2;proposal:po_1298d5ac031da4ac79626a99f3702a6b",
       "ref_id": "po_1298d5ac031da4ac79626a99f3702a6b",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-29T00:42:57.316712+00:00",
       "source": "engine_c",
       "title": "Engine C 觀測：MRVL / backlog",
       "type": "engine_c_observation"
@@ -3984,12 +3999,25 @@
       "added_at": "2026-08-29T00:18:29.965735+00:00",
       "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-08-01T00:00:00+00:00；來源=sec:MRVL 10-Q filed 2026-08-28 (mrvl-20260801.htm), library/raw/mrvl_10_q_202608",
       "n": 247,
-      "reason": null,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_d230503314ca57e8f833059605d92b45;proposal:po_d01417b6669a67c651b357b1fa0652bb",
       "ref_id": "po_d01417b6669a67c651b357b1fa0652bb",
+      "resolution": "go",
+      "resolved_at": "2026-08-29T00:42:57.909558+00:00",
+      "source": "engine_c",
+      "title": "Engine C 觀測：MRVL / customer_concentration",
+      "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-08-29T00:57:34.844787+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-08-27T00:00:00+00:00；來源=Sivers Interim Report Q2 2026 (2026-08-27), library/raw/sive_q2_2026_interim_rep",
+      "n": 248,
+      "reason": null,
+      "ref_id": "po_06f06cc129394bad7f90774e8a77112a",
       "resolution": null,
       "resolved_at": null,
       "source": "engine_c",
-      "title": "Engine C 觀測：MRVL / customer_concentration",
+      "title": "Engine C 觀測：SIVE.ST / dilution",
       "type": "engine_c_observation"
     }
   ],
@@ -9140,8 +9168,53 @@
       "ref_id": "dc_0fca807c963dc3b9888e0f83ba6d45a5",
       "type": "decision_review",
       "verb": "pq1_awaiting_approval"
+    },
+    {
+      "at": "2026-08-29T00:42:43.977626+00:00",
+      "n": 245,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_c7c693cf6f3f8daff0dd1c94f1abb2ba;digest:b431b013fbc3c9b6304f0facc754ed30a2ab78ccc308cac01a5ab1eef3f805a4;commit:ba1fba5f3f771599f6d6e75574102688125f0ece;cohort:dc_0fca807c963dc3b9888e0f83ba6d45a5",
+      "ref_id": "ra_c7c693cf6f3f8daff0dd1c94f1abb2ba",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-29T00:42:57.316712+00:00",
+      "n": 246,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_26c2c774deb630de0a7c5fb973767ef2;proposal:po_1298d5ac031da4ac79626a99f3702a6b",
+      "ref_id": "po_1298d5ac031da4ac79626a99f3702a6b",
+      "type": "engine_c_observation",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-29T00:42:57.909558+00:00",
+      "n": 247,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_d230503314ca57e8f833059605d92b45;proposal:po_d01417b6669a67c651b357b1fa0652bb",
+      "ref_id": "po_d01417b6669a67c651b357b1fa0652bb",
+      "type": "engine_c_observation",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-29T00:43:09.977618+00:00",
+      "n": 243,
+      "reason": null,
+      "receipt": null,
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "type": "decision_review",
+      "verb": "pending"
+    },
+    {
+      "at": "2026-08-29T00:57:34.844787+00:00",
+      "n": 168,
+      "reason": "來源本輪成功執行，但不再產出此項",
+      "receipt": null,
+      "ref_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
+      "type": "decision_review",
+      "verb": "source_cleared"
     }
   ],
-  "next_n": 248,
+  "next_n": 249,
   "schema_version": "1"
 }
