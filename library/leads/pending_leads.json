@@ -9720,9 +9720,17 @@
       "first_seen": "2026-08-29T09:17:07.984680+00:00",
       "lead_id": "lead_1c805d1c401d5ede0572182a5bfcbbea",
       "published_at": "2026-08-29",
-      "refs": {},
+      "refs": {
+        "parked_reason": "識別確定：Accton＝智邦科技（2345.TW），全球白牌交換機大廠。角色（Moore 江國忠報告，tier 3 單一 origin）：『AI switches 主要供應商、800G 快速放量』——但這是 pluggable 世代的 switch ODM 地位；是否承接 CPO switch 系統組裝（與 Foxconn/Fabrinet 分工）未獲任何一手。四維度純度警示：智邦市值大、法人覆蓋廣，AI switch 是其主業但研究它接近研究 beta（同 AVGO 形狀）；除非 CPO 組裝角色被具名證實，alpha 優先度低。",
+        "primary_url": "https://finance.biggo.com/news/18d4225c-e1a8-4df5-9217-e88dc0929a91",
+        "research_outcome": "identity_confirmed_cpo_role_unverified_purity_concern",
+        "research_run": "session:2026-08-29-tw-cpo-drain",
+        "trace_next_trigger": "智邦法說或 NVIDIA 側具名其 CPO switch 組裝角色",
+        "trace_requires_user": "false",
+        "trace_status": "partial"
+      },
       "source": "decompose:nvda-cpo-switch-2026-08-29",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -33413,9 +33421,20 @@
       "first_seen": "2026-08-29T09:17:07.961613+00:00",
       "lead_id": "lead_af3d60cc842a4d14bea3c53b299771f4",
       "published_at": "2026-08-29",
-      "refs": {},
+      "refs": {
+        "onboard_candidate_names": [
+          "FOCI 上詮精密光學 (TWSE: 3363)"
+        ],
+        "parked_reason": "識別已確定性驗證：FOCI＝上詮精密光學（3363.TW）。角色（多個 tier-3 台媒／研究部落格一致）：TSMC COUPE 的 FAU（Fiber Array Unit）光纖陣列——負責 fiber-to-chip 對準與接合，被稱為 CPO 封裝中最貴、最慢、良率最難的一步；產品線 ReLFACon FAU LPO/CPO（1.6T），產線驗證排 3Q26。⚠ 多來源稱『TSMC 獨家 FAU 供應商』——sole_source 形狀的主張，依 L8 需客戶端或第三方印證，TSMC 慣例不點名供應商，驗證路徑只剩上詮自家年報客戶集中度＋法說。四維度初評：瓶頸地位（coupling 介面）＋需求錨點（COUPE→NVIDIA/Broadcom 雙陣營）＋純度（小市值、FAU 主業）都強，客戶資本承諾未知。強烈建議 onboard（走 MOPS co-id 3363 年報）。",
+        "primary_url": "https://vocus.cc/article/6992da59fd89780001cbb745",
+        "research_outcome": "identity_confirmed_role_tier3_strong_onboard_candidate",
+        "research_run": "session:2026-08-29-tw-cpo-drain",
+        "trace_next_trigger": "MOPS 3363 年報／法說取得一手：客戶集中度、FAU 產能與獨家性佐證",
+        "trace_requires_user": "false",
+        "trace_status": "partial"
+      },
       "source": "decompose:nvda-cpo-switch-2026-08-29",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -45212,9 +45231,20 @@
       "first_seen": "2026-08-29T09:17:07.984937+00:00",
       "lead_id": "lead_f169462653573e002ee5aa0f194466d0",
       "published_at": "2026-08-29",
-      "refs": {},
+      "refs": {
+        "onboard_candidate_names": [
+          "LuxNet 華星光通 (TPEx: 4979)"
+        ],
+        "parked_reason": "識別已確定性驗證：LuxNet＝華星光通科技（4979.TWO），MOPS 官方文件（497920251222E001.pdf，2025-12-22 法說簡報）確認英文名 LuxNet Corporation——BigGo 的『下游光收發元件』與台媒的『CW laser chiplet 供應商』描述並存，後者對 alpha 鏈更重要：若屬實則是 Sivers CW DFB 的台系平行供應者。tier-3 媒體稱 2026 產能倍增、『輝達包產能』（未驗證）。與 LandMark 聯亞（3081，已在圖）的上下游關係（聯亞磊晶→華星光晶粒？）媒體並列但未逐字證實。⚠ 注意『光環』（3234.TWO）是另一家公司，媒體標題三家並列勿混。一手可追：MOPS 已有法說簡報 PDF。建議 onboard 評估（次於上詮）。",
+        "primary_url": "https://mopsov.twse.com.tw/nas/STR/497920251222E001.pdf",
+        "research_outcome": "identity_confirmed_mops_primary_available_cw_laser_parallel_supplier",
+        "research_run": "session:2026-08-29-tw-cpo-drain",
+        "trace_next_trigger": "逐字核對 MOPS 法說簡報：CW laser 產品線、產能數字、具名客戶；聯亞供應關係求一手",
+        "trace_requires_user": "false",
+        "trace_status": "partial"
+      },
       "source": "decompose:nvda-cpo-switch-2026-08-29",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
