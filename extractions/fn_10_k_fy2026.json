@@ -1,0 +1,102 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "fn_10_k_20260818",
+    "title": "Fabrinet FY2026 Form 10-K (fiscal year ended June 26, 2026)",
+    "source_type": "filing",
+    "evidence_tier": 1,
+    "origin_entity": "Fabrinet",
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "Official public SEC filing; canonical URL retained, research-relevant excerpts stored in library/raw.",
+    "url": "https://www.sec.gov/Archives/edgar/data/1408710/000140871026000028/fn-20260626.htm",
+    "publisher": "SEC EDGAR",
+    "published_at": "2026-08-18",
+    "retrieved_at": "2026-08-29"
+  },
+  "sources": [
+    {
+      "id": "fn_10_k_20260818_s1",
+      "locator": "Part I Item 1 Business — Customers, Sales and Marketing",
+      "quote": "During fiscal year 2026, Cisco Systems, Inc., NVIDIA Corporation, Nokia Corporation and Amazon.com, Inc. contributed 19.9%, 16.3%, 10.7% and 10.5%, respectively, of our revenues. During fiscal year 2025, NVIDIA Corporation and Cisco Systems, Inc. contributed 27.6% and 18.2%, respectively, of our revenues."
+    },
+    {
+      "id": "fn_10_k_20260818_s2",
+      "locator": "Part I Item 1 Business — Customers, Sales and Marketing (qualification)",
+      "quote": "The production of optical devices is characterized by a lengthy qualification process. In particular, the qualification and field testing of the products that we produce for our customers may take three to six months or longer to complete."
+    },
+    {
+      "id": "fn_10_k_20260818_s3",
+      "locator": "Part I Item 1 Business — Overview",
+      "quote": "We provide advanced optical packaging and precision optical, electro-mechanical and electronic manufacturing services to original equipment manufacturers (“OEMs”) of complex products such as optical communication components, modules and sub-systems, industrial lasers, automotive components, medical devices and sensors. We offer a broad range of advanced optical and electro-mechanical capabilities across the entire manufacturing process, including process design and engineering, supply chain management, manufacturing, complex printed circuit board assembly, advanced packaging, integration, final assembly and testing."
+    },
+    {
+      "id": "fn_10_k_20260818_s4",
+      "locator": "Part I Item 1A Risk Factors — customer concentration",
+      "quote": "Such customers together accounted for 57.4%, 45.8% and 48.5% of our revenues during the respective periods."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:fabrinet",
+      "type": "Company",
+      "name": "Fabrinet",
+      "aliases": ["FN", "Fabrinet (NYSE: FN)"],
+      "role": null,
+      "abstraction_level": "module_subsystem",
+      "confidence": 0.9,
+      "source_ids": ["fn_10_k_20260818_s3"],
+      "attributes": {}
+    },
+    {
+      "id": "co:nvidia",
+      "type": "Company",
+      "name": "NVIDIA",
+      "aliases": ["NVDA", "NVIDIA Corporation"],
+      "role": null,
+      "abstraction_level": "end_demand",
+      "confidence": 0.9,
+      "source_ids": ["fn_10_k_20260818_s1"],
+      "attributes": {}
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:fabrinet",
+      "relation": "supplies_to",
+      "dst_id": "co:nvidia",
+      "confidence": 0.85,
+      "source_ids": ["fn_10_k_20260818_s1"],
+      "attributes": {}
+    }
+  ],
+  "claims": [
+    {
+      "id": "fn_10_k_20260818_cl1",
+      "statement": "Fabrinet's FY2026 (ended June 26, 2026) revenue concentration: four customers each contributed 10%+ of revenues — Cisco Systems 19.9%, NVIDIA Corporation 16.3%, Nokia 10.7% and Amazon.com 10.5% (10%+ customers together 57.4% of revenues); in FY2025 NVIDIA contributed 27.6% and Cisco 18.2%.",
+      "subject_id": "co:fabrinet",
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "source_ids": ["fn_10_k_20260818_s1", "fn_10_k_20260818_s4"],
+      "disproof_condition": "Correct if subsequent filings restate these percentages; reassess concentration risk if any 10%+ customer share shifts by more than 5pp in the next 10-K."
+    },
+    {
+      "id": "fn_10_k_20260818_cl2",
+      "statement": "Fabrinet states that qualification and field testing of the optical products it produces for customers may take three to six months or longer to complete — a structural switching-cost / qualification-cycle disclosure for the optical manufacturing services layer.",
+      "subject_id": "co:fabrinet",
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "source_ids": ["fn_10_k_20260818_s2"],
+      "disproof_condition": "Downgrade if later disclosures or customer-side evidence show qualification cycles materially shorter, or that customers routinely dual-source the same assembly with negligible switching cost."
+    },
+    {
+      "id": "fn_10_k_20260818_cl3",
+      "statement": "Fabrinet provides advanced optical packaging and precision optical, electro-mechanical and electronic manufacturing services to OEMs, spanning process design, supply chain management, complex PCBA, advanced packaging, integration, final assembly and testing.",
+      "subject_id": "co:fabrinet",
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "source_ids": ["fn_10_k_20260818_s3"],
+      "disproof_condition": "Correct if the business scope materially changes in subsequent filings (segment exits or divestitures)."
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+Fabrinet (FN) Q4 FY2026 Earnings Call — 2026-08-24
+Source: The Motley Fool transcript (third-party transcription; tier 2 — issuer webcast replay is the tier-1 upgrade path)
+URL: https://www.fool.com/earnings/call-transcripts/2026/08/24/fabrinet-fn-q4-2026-earnings-call-transcript/
+Storage: repo_excerpt — research-relevant quotes only, not the full transcript.
+
+=== CPO / NPO (CEO Seamus Grady) ===
+
+"NPO represents a more near term opportunity than CPO from what we have seen with our customers."
+
+"We are working on CPO today with a handful of customers, and we are already building devices all albeit not yet at full scale volumes."
+
+=== Data center demand (CEO Seamus Grady) ===
+
+"We are very pleased with our data center performance in Q4 and we are optimistic that we would see sequential growth in the first quarter, both with long standing customers, like the 1 you mentioned, and newer customers."
+
+=== Customer concentration (fiscal year 2026, per call) ===
+
+"Cisco accounted for 20% of total fiscal year revenue"
+"NVIDIA represented 16%"
+"Nokia and Amazon each contributed 11%"
+
+=== DCI scale (CFO Csaba Sverha) ===
+
+"DCI business reached the close to $1 billion run rate...our DCI business was equivalent to our historical datacom business."
+
+=== Reported results (Q4 FY2026, per call coverage) ===
+Record Q4 revenue $1.316 billion (+45% YoY); non-GAAP EPS $4.10; data center revenue +68% YoY, now 51% of total revenue.

@@ -9712,6 +9712,43 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2079953508904964575"
     },
+    "lead_1c805d1c401d5ede0572182a5bfcbbea": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-29T09:17:07.984680+00:00",
+      "lead_id": "lead_1c805d1c401d5ede0572182a5bfcbbea",
+      "published_at": "2026-08-29",
+      "refs": {},
+      "source": "decompose:nvda-cpo-switch-2026-08-29",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CPO"
+          ]
+        }
+      },
+      "title": "Accton 智邦在 NVIDIA CPO switch 供應鏈的角色：BigGo 引 TSMC 法說＋LightCounting 列為下游——確認是否為 CPO switch 系統組裝／ODM、與 Foxconn/Fabrinet 的分工",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-29T09:17:07.984899+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "decompose 衍生之台系 CPO 供應鏈候選"
+        },
+        "decided_at": "2026-08-29T09:17:07.984899+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "tier-3 聚合（BigGo）但引用 TSMC 法說與 LightCounting 兩個可追上游來源；台系 CPO 供應鏈與既有 alpha 鏈直接相關，具名公司可追。識別未確認前不入 registry（L15）。",
+        "tier": 3
+      },
+      "url": "https://finance.biggo.com/news/18d4225c-e1a8-4df5-9217-e88dc0929a91?decompose=accton"
+    },
     "lead_1cc0a6e4bca5cf0f85d002cb4dde875a": {
       "entities": {
         "company_ids": [
@@ -33368,6 +33405,43 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1493594/000149359426000036/mtsi-20260806.htm"
     },
+    "lead_af3d60cc842a4d14bea3c53b299771f4": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-29T09:17:07.961613+00:00",
+      "lead_id": "lead_af3d60cc842a4d14bea3c53b299771f4",
+      "published_at": "2026-08-29",
+      "refs": {},
+      "source": "decompose:nvda-cpo-switch-2026-08-29",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CPO"
+          ]
+        }
+      },
+      "title": "FOCI（上詮？識別待確認）在 TSMC CPO 供應鏈的角色：BigGo 引 TSMC 法說（07-16）＋LightCounting 列其為中游 fiber 連接供應商——確認公司識別、上市狀態、CPO 具體產品與客戶",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-29T09:17:07.981992+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "decompose 衍生之台系 CPO 供應鏈候選"
+        },
+        "decided_at": "2026-08-29T09:17:07.981992+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "tier-3 聚合（BigGo）但引用 TSMC 法說與 LightCounting 兩個可追上游來源；台系 CPO 供應鏈與既有 alpha 鏈直接相關，具名公司可追。識別未確認前不入 registry（L15）。",
+        "tier": 3
+      },
+      "url": "https://finance.biggo.com/news/18d4225c-e1a8-4df5-9217-e88dc0929a91?decompose=foci"
+    },
     "lead_af57fda547a71e40dc0b6a4eb5b3ddf2": {
       "entities": {
         "company_ids": [
@@ -45129,6 +45203,43 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1709048/000162828026049740/xslF345X06/wk-form4_1785173635.xml"
+    },
+    "lead_f169462653573e002ee5aa0f194466d0": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-29T09:17:07.984937+00:00",
+      "lead_id": "lead_f169462653573e002ee5aa0f194466d0",
+      "published_at": "2026-08-29",
+      "refs": {},
+      "source": "decompose:nvda-cpo-switch-2026-08-29",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CPO"
+          ]
+        }
+      },
+      "title": "LuxNet 光環在 CPO 供應鏈的角色：BigGo 列為下游雷射元件供應商——確認產品（雷射晶片？）、與 LandMark 聯亞（已在圖）的上下游關係",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-29T09:17:07.985075+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "decompose 衍生之台系 CPO 供應鏈候選"
+        },
+        "decided_at": "2026-08-29T09:17:07.985075+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "tier-3 聚合（BigGo）但引用 TSMC 法說與 LightCounting 兩個可追上游來源；台系 CPO 供應鏈與既有 alpha 鏈直接相關，具名公司可追。識別未確認前不入 registry（L15）。",
+        "tier": 3
+      },
+      "url": "https://finance.biggo.com/news/18d4225c-e1a8-4df5-9217-e88dc0929a91?decompose=luxnet"
     },
     "lead_f1b02f22ff8bbd9fe54d886a7da65f9e": {
       "entities": {

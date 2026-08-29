@@ -130,6 +130,13 @@
       "research_ticker": "ENA.V"
     },
     {
+      "company_id": "co:fabrinet",
+      "research_ticker": "FN",
+      "market_currency": "USD",
+      "execution_currency": "USD",
+      "execution_venue": "NYSE"
+    },
+    {
       "company_id": "co:globalfoundries",
       "research_ticker": "GFS",
       "market_currency": "USD",

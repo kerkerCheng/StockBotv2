@@ -1,0 +1,83 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "nvidia_photonics_pr_2025_03_18",
+    "title": "NVIDIA Announces Spectrum-X Photonics, Co-Packaged Optics Networking Switches (GTC 2025-03-18) — Fabrinet addendum",
+    "source_type": "news",
+    "evidence_tier": 1,
+    "origin_entity": "NVIDIA",
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "Official public NVIDIA press release; canonical URL retained, only research-relevant excerpts stored.",
+    "url": "https://nvidianews.nvidia.com/news/nvidia-spectrum-x-co-packaged-optics-networking-switches-ai-factories",
+    "publisher": "NVIDIA Newsroom",
+    "published_at": "2025-03-18",
+    "retrieved_at": "2026-08-29"
+  },
+  "sources": [
+    {
+      "id": "nvidia_photonics_pr_2025_03_18_s3",
+      "locator": "A Networked Ecosystem paragraph",
+      "quote": "NVIDIA’s silicon photonics ecosystem includes TSMC, Browave, Coherent, Corning Incorporated, Fabrinet, Foxconn, Lumentum, SENKO, SPIL, Sumitomo Electric Industries and TFC Communication."
+    },
+    {
+      "id": "nvidia_photonics_pr_2025_03_18_s4",
+      "locator": "closing ecosystem paragraph before Availability",
+      "quote": "NVIDIA photonics will drive massive growth for a new wave of state-of-the-art AI factories, alongside pluggable optical transceiver technologies supported by industry leaders including Coherent, Eoptolink, Fabrinet and Innolight."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:fabrinet",
+      "type": "Company",
+      "name": "Fabrinet",
+      "aliases": ["FN"],
+      "role": null,
+      "abstraction_level": "module_subsystem",
+      "confidence": 0.85,
+      "source_ids": ["nvidia_photonics_pr_2025_03_18_s3"],
+      "attributes": {}
+    },
+    {
+      "id": "co:nvidia",
+      "type": "Company",
+      "name": "NVIDIA",
+      "aliases": ["NVDA", "NVIDIA Corporation"],
+      "role": null,
+      "abstraction_level": "end_demand",
+      "confidence": 0.9,
+      "source_ids": ["nvidia_photonics_pr_2025_03_18_s3"],
+      "attributes": {}
+    }
+  ],
+  "edges": [
+    {
+      "id": "e3",
+      "src_id": "co:fabrinet",
+      "relation": "partnership_with",
+      "dst_id": "co:nvidia",
+      "confidence": 0.8,
+      "source_ids": ["nvidia_photonics_pr_2025_03_18_s3"],
+      "attributes": {}
+    }
+  ],
+  "claims": [
+    {
+      "id": "nvidia_photonics_pr_2025_03_18_cl3",
+      "statement": "NVIDIA (customer side) publicly named Fabrinet as a member of its silicon photonics ecosystem for the Spectrum-X/Quantum-X co-packaged optics platforms, alongside TSMC, Browave, Coherent, Corning, Foxconn, Lumentum, SENKO, SPIL, Sumitomo Electric and TFC Communication.",
+      "subject_id": "co:fabrinet",
+      "confidence": 0.85,
+      "demand_proof_level": "confirmed",
+      "source_ids": ["nvidia_photonics_pr_2025_03_18_s3"],
+      "disproof_condition": "Downgrade if NVIDIA's subsequent ecosystem disclosures drop Fabrinet, or if the CPO supply chain is later disclosed without Fabrinet participation."
+    },
+    {
+      "id": "nvidia_photonics_pr_2025_03_18_cl4",
+      "statement": "NVIDIA (customer side) named Fabrinet among the pluggable optical transceiver industry leaders (with Coherent, Eoptolink and Innolight) supporting its AI-factory buildout alongside NVIDIA photonics.",
+      "subject_id": "co:fabrinet",
+      "confidence": 0.85,
+      "demand_proof_level": "confirmed",
+      "source_ids": ["nvidia_photonics_pr_2025_03_18_s4"],
+      "disproof_condition": "Downgrade if later NVIDIA disclosures exclude Fabrinet from named transceiver suppliers."
+    }
+  ]
+}

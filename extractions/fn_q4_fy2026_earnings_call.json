@@ -1,0 +1,83 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "fn_q4_fy2026_earnings_call_2026_08_24",
+    "title": "Fabrinet Q4 FY2026 earnings call (2026-08-24) — CPO/NPO commentary (third-party transcript)",
+    "source_type": "transcript",
+    "evidence_tier": 2,
+    "origin_entity": "Fabrinet",
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "Limited research-relevant quotes from a publicly available third-party transcript; tier-1 upgrade path is the issuer webcast replay.",
+    "url": "https://www.fool.com/earnings/call-transcripts/2026/08/24/fabrinet-fn-q4-2026-earnings-call-transcript/",
+    "publisher": "The Motley Fool",
+    "published_at": "2026-08-24",
+    "retrieved_at": "2026-08-29"
+  },
+  "sources": [
+    {
+      "id": "fn_q4_fy2026_earnings_call_2026_08_24_s1",
+      "locator": "CEO Seamus Grady, Q&A on CPO",
+      "quote": "We are working on CPO today with a handful of customers, and we are already building devices all albeit not yet at full scale volumes."
+    },
+    {
+      "id": "fn_q4_fy2026_earnings_call_2026_08_24_s2",
+      "locator": "CEO Seamus Grady, Q&A on NPO vs CPO",
+      "quote": "NPO represents a more near term opportunity than CPO from what we have seen with our customers."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:fabrinet",
+      "type": "Company",
+      "name": "Fabrinet",
+      "aliases": ["FN"],
+      "role": null,
+      "abstraction_level": "module_subsystem",
+      "confidence": 0.85,
+      "source_ids": ["fn_q4_fy2026_earnings_call_2026_08_24_s1"],
+      "attributes": {}
+    },
+    {
+      "id": "tech:cpo",
+      "type": "TechNode",
+      "name": "Co-Packaged Optics (CPO)",
+      "aliases": [],
+      "role": null,
+      "abstraction_level": "module_subsystem",
+      "confidence": 0.85,
+      "source_ids": ["fn_q4_fy2026_earnings_call_2026_08_24_s1"],
+      "attributes": {}
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:fabrinet",
+      "relation": "supplies_to",
+      "dst_id": "tech:cpo",
+      "confidence": 0.75,
+      "source_ids": ["fn_q4_fy2026_earnings_call_2026_08_24_s1"],
+      "attributes": {}
+    }
+  ],
+  "claims": [
+    {
+      "id": "fn_q4_fy2026_earnings_call_2026_08_24_cl1",
+      "statement": "Fabrinet CEO states the company is working on CPO with a handful of customers and is already building CPO devices, though not yet at full-scale volumes (as of the Q4 FY2026 call, 2026-08-24); customers are not named.",
+      "subject_id": "co:fabrinet",
+      "confidence": 0.85,
+      "demand_proof_level": "confirmed",
+      "source_ids": ["fn_q4_fy2026_earnings_call_2026_08_24_s1"],
+      "disproof_condition": "Downgrade if subsequent calls walk back CPO build activity, or if no CPO volume ramp is disclosed within two fiscal years."
+    },
+    {
+      "id": "fn_q4_fy2026_earnings_call_2026_08_24_cl2",
+      "statement": "Fabrinet CEO characterizes NPO (near-packaged optics) as a nearer-term opportunity than CPO based on what the company sees from its customers.",
+      "subject_id": "co:fabrinet",
+      "confidence": 0.8,
+      "demand_proof_level": "guided",
+      "source_ids": ["fn_q4_fy2026_earnings_call_2026_08_24_s2"],
+      "disproof_condition": "Reassess if CPO volume orders arrive before NPO at Fabrinet, or if the company reverses this characterization in later calls."
+    }
+  ]
+}
