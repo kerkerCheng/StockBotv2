@@ -9601,6 +9601,7 @@
       "entities": {
         "company_ids": [
           "co:meta",
+          "co:microsoft",
           "co:amd",
           "co:nvidia",
           "co:iren",
@@ -10762,7 +10763,9 @@
     },
     "lead_235d37b504db425667f762559b98cb4c": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:oracle"
+        ],
         "tickers": [
           "ORCL",
           "SPCX"
@@ -14570,6 +14573,7 @@
           "co:aeva",
           "co:poet_technologies",
           "co:marvell_technology",
+          "co:fabrinet",
           "co:applied_optoelectronics"
         ],
         "tickers": [
@@ -15072,6 +15076,7 @@
           "co:meta",
           "co:intel",
           "co:amd",
+          "co:oracle",
           "co:churchill_capital_xi"
         ],
         "tickers": [
@@ -16853,7 +16858,13 @@
         "research_run": "session:2026-08-29-decompose-drain",
         "trace_next_trigger": "NVIDIA/Fabrinet/Foxconn 任一方具名揭露 CPO switch OSA／系統組裝分工",
         "trace_requires_user": "false",
-        "trace_status": "awaiting_named_disclosure"
+        "trace_status": "awaiting_named_disclosure",
+        "trace_trigger_entities": [
+          "FN",
+          "co:fabrinet",
+          "NVDA",
+          "co:nvidia"
+        ]
       },
       "source": "decompose:nvda-cpo-switch-2026-08-29",
       "status": "parked",
@@ -17940,6 +17951,43 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2077212864948162871"
     },
+    "lead_5365613adf1bce24257876e3dab03eea": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-29T20:06:39.186451+00:00",
+      "lead_id": "lead_5365613adf1bce24257876e3dab03eea",
+      "published_at": null,
+      "refs": {},
+      "source": "weekly:cpo",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CPO"
+          ]
+        }
+      },
+      "title": "ASMPT 以 sub-micron／high-throughput bonding 工具支援 CPO 可規模化製造",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-29T20:06:47.816718+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "查證若有客戶採用與量產 qualification，ASMPT 會進 CPO 製造設備候選集合；若只是展會展示，則維持工具候選而不提升排序。"
+        },
+        "decided_at": "2026-08-29T20:06:47.816718+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "PASS：ASMPT 8/24 官方頁具名 CPO、sub-micron precision bonding、high-throughput photonics bonding 與 multi-chip assembly，關聯性與可引用性均通過；ASMPT／該工具鏈在既有 leads 與 identity registry 中未出現，能新增 CPO active-alignment／assembly 候選集合。這只是供應商自報與 ECOC 展示預告，未證明客戶 qualification、採購或量產占有率。",
+        "tier": 1
+      },
+      "url": "https://semi.asmpt.com/en/news-center/press-releases/asmpt-showcases-ap-innovations-for-ai-and-hpc-at-ectc-2027/"
+    },
     "lead_5375b136184e9c82b86c3636f439008a": {
       "entities": {
         "company_ids": [],
@@ -18880,7 +18928,15 @@
         "research_run": "session:2026-08-29-decompose-drain",
         "trace_next_trigger": "Broadcom 官方 datasheet／TSMC 法說或技術文件逐字確認 TH6-Davisson 使用 COUPE 及其調變器類型",
         "trace_requires_user": "false",
-        "trace_status": "partial"
+        "trace_status": "partial",
+        "trace_trigger_entities": [
+          "AVGO",
+          "co:broadcom",
+          "TSM",
+          "co:tsmc",
+          "NVDA",
+          "co:nvidia"
+        ]
       },
       "source": "decompose:nvda-cpo-switch-2026-08-29",
       "status": "parked",
@@ -21723,6 +21779,7 @@
         "company_ids": [
           "co:meta",
           "co:google",
+          "co:microsoft",
           "co:nvidia"
         ],
         "tickers": [
@@ -27791,7 +27848,8 @@
       "entities": {
         "company_ids": [
           "co:nebius",
-          "co:meta"
+          "co:meta",
+          "co:microsoft"
         ],
         "tickers": [
           "NBIS",
@@ -29229,7 +29287,11 @@
         "research_run": "session:2026-08-29-decompose-drain",
         "trace_next_trigger": "ASE/SPIL 法說具名 CPO 封裝營收或 TSMC 揭露 SoIC-photonics 產能分配",
         "trace_requires_user": "false",
-        "trace_status": "partial"
+        "trace_status": "partial",
+        "trace_trigger_entities": [
+          "TSM",
+          "co:tsmc"
+        ]
       },
       "source": "decompose:nvda-cpo-switch-2026-08-29",
       "status": "parked",
@@ -29312,7 +29374,15 @@
         "research_run": "session:2026-08-29-decompose-drain",
         "trace_next_trigger": "TFC（300394.SZ）或 Browave（3163.TW）法說／公告具名揭露 NVIDIA CPO 供應內容與量",
         "trace_requires_user": "false",
-        "trace_status": "partial"
+        "trace_status": "partial",
+        "trace_trigger_entities": [
+          "GLW",
+          "co:corning",
+          "5802.T",
+          "co:sumitomo_electric",
+          "NVDA",
+          "co:nvidia"
+        ]
       },
       "source": "decompose:nvda-cpo-switch-2026-08-29",
       "status": "parked",
@@ -29700,6 +29770,7 @@
       "entities": {
         "company_ids": [
           "co:tesla",
+          "co:microsoft",
           "co:nvidia",
           "co:apple"
         ],
@@ -33431,7 +33502,11 @@
         "research_run": "session:2026-08-29-tw-cpo-drain",
         "trace_next_trigger": "MOPS 3363 年報／法說取得一手：客戶集中度、FAU 產能與獨家性佐證",
         "trace_requires_user": "false",
-        "trace_status": "partial"
+        "trace_status": "partial",
+        "trace_trigger_entities": [
+          "3363.TWO",
+          "co:foci"
+        ]
       },
       "source": "decompose:nvda-cpo-switch-2026-08-29",
       "status": "parked",
@@ -38108,6 +38183,7 @@
           "co:micron_technology",
           "co:google",
           "co:meta",
+          "co:microsoft",
           "co:coherent",
           "co:lumentum"
         ],
@@ -39442,6 +39518,7 @@
       "entities": {
         "company_ids": [
           "co:google",
+          "co:microsoft",
           "co:meta"
         ],
         "tickers": [
@@ -41125,7 +41202,8 @@
     "lead_d95d26c1e9be71f3422d0b4d10ee6ad8": {
       "entities": {
         "company_ids": [
-          "co:meta"
+          "co:meta",
+          "co:oracle"
         ],
         "tickers": [
           "META",
@@ -41266,7 +41344,13 @@
         "research_run": "session:2026-08-29-decompose-drain",
         "trace_next_trigger": "Fabrinet 具名 CPO 客戶或 NVIDIA 揭露組裝分工；Q1 FY2027 call（約 2026-11）",
         "trace_requires_user": "false",
-        "trace_status": "partial"
+        "trace_status": "partial",
+        "trace_trigger_entities": [
+          "FN",
+          "co:fabrinet",
+          "NVDA",
+          "co:nvidia"
+        ]
       },
       "source": "decompose:nvda-cpo-switch-2026-08-29",
       "status": "parked",
@@ -41858,6 +41942,7 @@
       "entities": {
         "company_ids": [
           "co:apple",
+          "co:microsoft",
           "co:meta"
         ],
         "tickers": [
@@ -43530,7 +43615,9 @@
     },
     "lead_e7d012889c91027f839151169ba60e6d": {
       "entities": {
-        "company_ids": [],
+        "company_ids": [
+          "co:microsoft"
+        ],
         "tickers": [
           "MSFT"
         ]
@@ -45241,7 +45328,11 @@
         "research_run": "session:2026-08-29-tw-cpo-drain",
         "trace_next_trigger": "逐字核對 MOPS 法說簡報：CW laser 產品線、產能數字、具名客戶；聯亞供應關係求一手",
         "trace_requires_user": "false",
-        "trace_status": "partial"
+        "trace_status": "partial",
+        "trace_trigger_entities": [
+          "4979.TWO",
+          "co:luxnet"
+        ]
       },
       "source": "decompose:nvda-cpo-switch-2026-08-29",
       "status": "parked",
@@ -46983,6 +47074,7 @@
           "co:sandisk",
           "co:coreweave",
           "co:nvidia",
+          "co:microsoft",
           "co:tsmc",
           "co:marvell_technology",
           "co:applied_materials",
