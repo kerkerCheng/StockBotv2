@@ -8425,9 +8425,17 @@
       "first_seen": "2026-08-29T07:59:24.021452+00:00",
       "lead_id": "lead_1446a653c191897aeddb8b84419e4456",
       "published_at": "2026-08-29",
-      "refs": {},
+      "refs": {
+        "parked_reason": "液冷層研究已有結論：Q3450-LD 官方文件（NVIDIA Docs）確認 UDQ4 快接頭＋48V DC busbar、與 GB300 NVL72 同一基礎設施模型；NVIDIA 開放 blind-mate manifold／busbar 規格給多家（Boyd、CoolIT、Vertiv 等）。多供應商＋開放規格＝競爭層非瓶頸；Boyd/CoolIT 未上市、Vertiv（VRT）大市值廣覆蓋。不建議投入更多研究。",
+        "primary_url": "https://docs.nvidia.com/networking/display/xdrswitchesum/q3450-ld-liquid-cooling-system",
+        "research_outcome": "not_a_chokepoint_multiple_suppliers_open_spec",
+        "research_run": "session:2026-08-29-decompose-drain",
+        "trace_next_trigger": "若後續出現 CPO 專用冷板單一供應商認證或熱管理成為披露的良率瓶頸再重開",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
       "source": "decompose:nvda-cpo-switch-2026-08-29",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -16790,9 +16798,20 @@
       "first_seen": "2026-08-29T07:59:24.020677+00:00",
       "lead_id": "lead_484d659a31cbf1e25a837210e9fb0622",
       "published_at": "2026-08-29",
-      "refs": {},
+      "refs": {
+        "onboard_candidate_names": [
+          "Fabrinet (NYSE: FN)"
+        ],
+        "parked_reason": "OSA 組裝方研究：NVIDIA tier-1 blog 具名 11 家（TSMC、SPIL、Lumentum、Sumitomo、Coherent、Browave、Corning、Senko、TFC、Foxconn、Fabrinet）合作 COUPE 製程與 system-level assembly，但未指定誰做 OSA。Fabrinet CEO（Q4 FY2026 call，tier 2 transcript）逐字：『We are working on CPO today with a handful of customers, and we are already building devices albeit not yet at full scale volumes』——是 CPO 組裝最強候選但客戶未具名。依 L8/L6 不推斷對應。",
+        "primary_url": "https://developer.nvidia.com/blog/a-new-era-in-data-center-networking-with-nvidia-silicon-photonics-based-network-switching/",
+        "research_outcome": "assembly_partner_unnamed_fabrinet_strongest_candidate_tier2",
+        "research_run": "session:2026-08-29-decompose-drain",
+        "trace_next_trigger": "NVIDIA/Fabrinet/Foxconn 任一方具名揭露 CPO switch OSA／系統組裝分工",
+        "trace_requires_user": "false",
+        "trace_status": "awaiting_named_disclosure"
+      },
       "source": "decompose:nvda-cpo-switch-2026-08-29",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "OSA 光學次組件層：Quantum-X 每台 6 個 socket-based hermetically-sealed OSA（各 4.8T×2、3 個 COUPE optical engine）——誰設計／組裝 OSA？一手未點名＝未知層",
       "triage": {
@@ -18185,9 +18204,17 @@
       "first_seen": "2026-08-29T07:59:24.020993+00:00",
       "lead_id": "lead_55bd36e6cab9fdd81f0668215af10431",
       "published_at": "2026-08-29",
-      "refs": {},
+      "refs": {
+        "parked_reason": "連接器層研究：NVIDIA tier-1 blog 具名 Senko 於 11 家合作名單。tier-3 產業報導：SENKO MPC（Metallic PIC Connector，2022 併購 CudoForm 精密金屬沖壓）被 NVIDIA 與 Marvell CPO 展示採用；主要競爭者 US Conec（2024-03 專利訴訟、已和解）；≥2 家能做。SENKO 與 US Conec 皆未上市——此層瓶頸性存在但無直接可投標的；間接曝險路徑待研究（母集團／授權）。",
+        "primary_url": "https://patents.google.com/patent/US12379555",
+        "research_outcome": "chokepoint_real_but_players_private_no_direct_ticker",
+        "research_run": "session:2026-08-29-decompose-drain",
+        "trace_next_trigger": "SENKO/US Conec 出現上市母體、被上市公司併購，或第三家 connector 供應商進入 CPO 供應鏈",
+        "trace_requires_user": "false",
+        "trace_status": "partial"
+      },
       "source": "decompose:nvda-cpo-switch-2026-08-29",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "可拆卸光連接器層：Spectrum-X 用 detachable optical connector 支撐自動化量產；SENKO 具名於 NVIDIA PR 生態系（連接器商、未上市？）——connector 幾家能做、qualification 週期？",
       "triage": {
@@ -18801,9 +18828,17 @@
       "first_seen": "2026-08-29T07:59:23.997550+00:00",
       "lead_id": "lead_5838056904d872aa236cff2a570d1e11",
       "published_at": "2026-08-29",
-      "refs": {},
+      "refs": {
+        "parked_reason": "MRM 層研究：NVIDIA MRM 200G PAM4/λ＋TSMC COUPE 為 tier-1 事實（官方 blog）。新發現：Broadcom TH6-Davisson（BCM78919，102.4T、64×1.6TbE、16 個 6.4T DR optical engine、Condor 3nm SerDes、可插拔雷射模組、2025-10 出貨）據 ServeTheHome 亦使用 TSMC COUPE——若獲一手確認，TSMC COUPE 即為 NVIDIA＋Broadcom 兩大 CPO 陣營的共同製程瓶頸，比單一 MRM 路線之爭更重要。Broadcom 的調變器類型（MRM vs MZM）仍未獲一手確認。",
+        "primary_url": "https://www.servethehome.com/broadcom-tomahawk-6-davisson-102-4t-switch-with-co-packaged-optics-shipping/",
+        "research_outcome": "coupe_cross_camp_chokepoint_hypothesis_tier3_pending_primary",
+        "research_run": "session:2026-08-29-decompose-drain",
+        "trace_next_trigger": "Broadcom 官方 datasheet／TSMC 法說或技術文件逐字確認 TH6-Davisson 使用 COUPE 及其調變器類型",
+        "trace_requires_user": "false",
+        "trace_status": "partial"
+      },
       "source": "decompose:nvda-cpo-switch-2026-08-29",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "MRM modulator 技術層：誰能量產 200G PAM4/λ micro-ring modulator？MRM vs TFLN vs MZM 路線替代性（NVIDIA×TSMC COUPE 已量產；圖有 TFLN 節點、無 MRM 節點）",
       "triage": {
@@ -29139,9 +29174,20 @@
       "first_seen": "2026-08-29T07:59:24.022037+00:00",
       "lead_id": "lead_94dbcea8239b2f3feb6bffeefbbade53",
       "published_at": "2026-08-29",
-      "refs": {},
+      "refs": {
+        "onboard_candidate_names": [
+          "ASE Technology 日月光 (TWSE: 3711 / NYSE: ASX)"
+        ],
+        "parked_reason": "SoIC/OSAT 層研究：tier-1——TSMC CEO 於 NVIDIA PR 逐字提及 TSMC-SoIC 3D chip stacking；SPIL 具名於 NVIDIA blog 11 家合作名單。tier-3——量產報導點名 ASE（SPIL 母公司，3711.TW/NYSE ASX）在供應鏈。OSAT 分工細節（SPIL 做什麼、產能、第二供應商存在與否）未獲一手。與 Broadcom 亦用 COUPE 的假設合併看：TSMC（製程）＋ASE/SPIL（OSAT）可能是 CPO 封裝的雙層集中。",
+        "primary_url": "https://nvidianews.nvidia.com/news/nvidia-spectrum-x-co-packaged-optics-networking-switches-ai-factories",
+        "research_outcome": "tsmc_soic_tier1_spil_named_role_details_pending",
+        "research_run": "session:2026-08-29-decompose-drain",
+        "trace_next_trigger": "ASE/SPIL 法說具名 CPO 封裝營收或 TSMC 揭露 SoIC-photonics 產能分配",
+        "trace_requires_user": "false",
+        "trace_status": "partial"
+      },
       "source": "decompose:nvda-cpo-switch-2026-08-29",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -29210,9 +29256,21 @@
       "first_seen": "2026-08-29T07:59:24.021220+00:00",
       "lead_id": "lead_95b0d3624dfaf66bc5022912310661c4",
       "published_at": "2026-08-29",
-      "refs": {},
+      "refs": {
+        "onboard_candidate_names": [
+          "TFC Communication 天孚通信 (SZSE: 300394)",
+          "Browave 波若威 (TWSE: 3163)"
+        ],
+        "parked_reason": "光纖層研究：NVIDIA tier-1 確認每 engine 2 條 laser input fiber＋PM fiber 存在＋Browave/Corning/Sumitomo/TFC 具名合作。tier-3 報導（Dan Nystedt 等）：Spectrum-X CPO 已進入量產、TFC Communication（300394.SZ 天孚通信）供 ELS→PIC 的 PM 光纖組件與前面板連接、Browave（3163.TW 波若威）在台系供應鏈名單。TFC/Browave 皆上市且市值遠小於 Corning/Sumitomo——標的純度潛力高，但具體分工需一手（公司公告／法說）確認。",
+        "primary_url": "https://developer.nvidia.com/blog/how-industry-collaboration-fosters-nvidia-co-packaged-optics/",
+        "research_outcome": "two_listed_smallcap_candidates_role_attribution_tier3",
+        "research_run": "session:2026-08-29-decompose-drain",
+        "trace_next_trigger": "TFC（300394.SZ）或 Browave（3163.TW）法說／公告具名揭露 NVIDIA CPO 供應內容與量",
+        "trace_requires_user": "false",
+        "trace_status": "partial"
+      },
       "source": "decompose:nvda-cpo-switch-2026-08-29",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -36041,9 +36099,21 @@
       "first_seen": "2026-08-29T07:59:24.021629+00:00",
       "lead_id": "lead_bc427a52cef3692d38154ba5ff5ea9b3",
       "published_at": "2026-08-29",
-      "refs": {},
+      "refs": {
+        "onboard_candidate_names": [
+          "FormFactor (NASDAQ: FORM)",
+          "Advantest (TSE: 6857)"
+        ],
+        "parked_reason": "光子測試層研究已有具名答案（tier-1 官方 PR，2024-11-07）：FormFactor×Advantest 戰略合作開發 SiPh/CPO 高量產晶圓級測試 cell——FormFactor Velox/Pharos/OptoVue 光學探測＋Advantest V93000/SmarTest 8、九軸奈米精度自動對準。FormFactor 自稱服務『over 100 of the world's leading SiPh device manufacturers』（L8 自報）。兩家皆上市（FORM、6857.T）；此層是 CPO 良率經濟學的 picks-and-shovels，值得 onboard 評估。",
+        "primary_url": "https://www.formfactor.com/press-release/formfactor-and-advantest-partner-on-silicon-photonics-wafer-level-test-cell-to-enable-high-volume-manufacturing/",
+        "research_outcome": "named_duopoly_partnership_tier1_listed_picks_and_shovels",
+        "research_run": "session:2026-08-29-decompose-drain",
+        "trace_next_trigger": "FormFactor/Advantest 財報揭露 SiPh 測試營收分項或 CPO 客戶量產訂單",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
       "source": "decompose:nvda-cpo-switch-2026-08-29",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -41093,9 +41163,20 @@
       "first_seen": "2026-08-29T07:59:24.021856+00:00",
       "lead_id": "lead_dabef2b4657350217cdd112112606b35",
       "published_at": "2026-08-29",
-      "refs": {},
+      "refs": {
+        "onboard_candidate_names": [
+          "Fabrinet (NYSE: FN)"
+        ],
+        "parked_reason": "系統組裝層研究：Fabrinet Q4 FY2026 call（2026-08-24，tier 2 transcript）逐字：『We are working on CPO today with a handful of customers, and we are already building devices albeit not yet at full scale volumes』＋『NPO represents a more near term opportunity than CPO』；FY2026 集中度 Cisco 20%／NVIDIA 16%／Nokia 11%／Amazon 11%、data center 營收 +68% 占 51%。NVIDIA tier-1 具名 Foxconn＋Fabrinet 於合作名單；tier-3 報導量產名單含 Foxconn。CPO 客戶具體是誰未具名。Fabrinet 是本次拆解最強的可投組裝標的。",
+        "primary_url": "https://www.fool.com/earnings/call-transcripts/2026/08/24/fabrinet-fn-q4-2026-earnings-call-transcript/",
+        "research_outcome": "fabrinet_cpo_build_confirmed_tier2_customers_unnamed",
+        "research_run": "session:2026-08-29-decompose-drain",
+        "trace_next_trigger": "Fabrinet 具名 CPO 客戶或 NVIDIA 揭露組裝分工；Q1 FY2027 call（約 2026-11）",
+        "trace_requires_user": "false",
+        "trace_status": "partial"
+      },
       "source": "decompose:nvda-cpo-switch-2026-08-29",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
