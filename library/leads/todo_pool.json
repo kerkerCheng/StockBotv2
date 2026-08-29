@@ -3659,8 +3659,10 @@
       "added_at": "2026-08-25T08:00:29.959820+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_9a7d6db5f7562ce63ff8579f03537a47",
+      "dispatch_receipt": "bounded research 完成。MRVL 10-Q（filed 2026-08-28，全文 344,103 chars）逐字核對，筆記：library/private/research_notes/2026-08-29_pq1_marvell_wo_independent_source.md。independent_source 找到客戶端資本承諾：NVIDIA 2026-03-31 以 USD 2.0B 現金購入 Series A Convertible Preferred（轉換價約91.84、最多21.8M股），配 Q1 FY2027 custom XPU+scale-up networking 戰略合作；已凍結 ra_c7c693cf6f3f8daff0dd1c94f1abb2ba（digest b431b013fbc3c9b6304f0facc754ed30a2ab78ccc308cac01a5ab1eef3f805a4，focus=co:marvell_technology）等 pq2 核准。⚠ 同 10-Q 揭露反方向 customer warrants（FY2025 4.2M股@87.77；FY2026 FV 55.4M）供應商付客戶並存，cl3 已明記防混淆。清除 2 blocker：customer_concentration（Distributor A 44%、四客戶 72% gross AR、FY2026 前十大 82%）提案 po_d01417b6669a67c651b357b1fa0652bb；backlog 屬揭露結構性缺席（practical expedient、RPO 0 命中）提案 po_1298d5ac031da4ac79626a99f3702a6b。catalyst/disproof 草案已寫入筆記待使用者確認（Q3 FY2027 財報約 2026-12 上旬；disproof 三條件含 NVIDIA 處分持股）。另案發現：MRVL 已完成收購 Celestial AI（2026-02-02）與 XConn（2026-02-10）。",
       "dispatch_ref": "wo_468ecdef0047cb1a3d33d05c1c3de9fa",
-      "dispatch_status": "queued",
+      "dispatch_status": "awaiting_approval",
+      "dispatch_updated_at": "2026-08-29T00:15:49.844655+00:00",
       "dispatched_at": "2026-08-27T23:45:21.543347+00:00",
       "hint": "coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 224,
@@ -3953,6 +3955,42 @@
       "source": "decision_lab",
       "title": "co:iqe：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-29T00:18:29.965735+00:00",
+      "hint": "核准 exact graph delta；Decision handoff：co:marvell_technology。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 245,
+      "reason": null,
+      "ref_id": "ra_c7c693cf6f3f8daff0dd1c94f1abb2ba",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "NVIDIA 20 億美元入股 Marvell（Series A Preferred）＋ custom XPU 戰略合作",
+      "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-08-29T00:18:29.965735+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-08-01T00:00:00+00:00；來源=sec:MRVL 10-Q filed 2026-08-28 (mrvl-20260801.htm), library/raw/mrvl_10_q_202608",
+      "n": 246,
+      "reason": null,
+      "ref_id": "po_1298d5ac031da4ac79626a99f3702a6b",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "engine_c",
+      "title": "Engine C 觀測：MRVL / backlog",
+      "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-08-29T00:18:29.965735+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-08-01T00:00:00+00:00；來源=sec:MRVL 10-Q filed 2026-08-28 (mrvl-20260801.htm), library/raw/mrvl_10_q_202608",
+      "n": 247,
+      "reason": null,
+      "ref_id": "po_d01417b6669a67c651b357b1fa0652bb",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "engine_c",
+      "title": "Engine C 觀測：MRVL / customer_concentration",
+      "type": "engine_c_observation"
     }
   ],
   "log": [
@@ -9084,8 +9122,26 @@
       "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
       "type": "decision_review",
       "verb": "drop"
+    },
+    {
+      "at": "2026-08-29T00:10:35.186693+00:00",
+      "n": 224,
+      "reason": null,
+      "receipt": "pq1_start:lead_3453d7487a96340cfae68508e7ad4a72;doc:MRVL 10-Q 2026-08-28 mrvl-20260801.htm",
+      "ref_id": "dc_0fca807c963dc3b9888e0f83ba6d45a5",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-08-29T00:15:49.844655+00:00",
+      "n": 224,
+      "reason": null,
+      "receipt": "bounded research 完成。MRVL 10-Q（filed 2026-08-28，全文 344,103 chars）逐字核對，筆記：library/private/research_notes/2026-08-29_pq1_marvell_wo_independent_source.md。independent_source 找到客戶端資本承諾：NVIDIA 2026-03-31 以 USD 2.0B 現金購入 Series A Convertible Preferred（轉換價約91.84、最多21.8M股），配 Q1 FY2027 custom XPU+scale-up networking 戰略合作；已凍結 ra_c7c693cf6f3f8daff0dd1c94f1abb2ba（digest b431b013fbc3c9b6304f0facc754ed30a2ab78ccc308cac01a5ab1eef3f805a4，focus=co:marvell_technology）等 pq2 核准。⚠ 同 10-Q 揭露反方向 customer warrants（FY2025 4.2M股@87.77；FY2026 FV 55.4M）供應商付客戶並存，cl3 已明記防混淆。清除 2 blocker：customer_concentration（Distributor A 44%、四客戶 72% gross AR、FY2026 前十大 82%）提案 po_d01417b6669a67c651b357b1fa0652bb；backlog 屬揭露結構性缺席（practical expedient、RPO 0 命中）提案 po_1298d5ac031da4ac79626a99f3702a6b。catalyst/disproof 草案已寫入筆記待使用者確認（Q3 FY2027 財報約 2026-12 上旬；disproof 三條件含 NVIDIA 處分持股）。另案發現：MRVL 已完成收購 Celestial AI（2026-02-02）與 XConn（2026-02-10）。",
+      "ref_id": "dc_0fca807c963dc3b9888e0f83ba6d45a5",
+      "type": "decision_review",
+      "verb": "pq1_awaiting_approval"
     }
   ],
-  "next_n": 245,
+  "next_n": 248,
   "schema_version": "1"
 }
