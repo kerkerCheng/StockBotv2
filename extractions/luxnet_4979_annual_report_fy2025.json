@@ -1,0 +1,116 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mops_4979_annual_report_2025",
+    "title": "華星光通科技（LuxNet, 4979.TWO）114 年度股東會年報（2025 財年）",
+    "source_type": "filing",
+    "evidence_tier": 1,
+    "origin_entity": "LuxNet (華星光通科技)",
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "MOPS 公開資訊觀測站公開文件；保留 canonical 來源與研究必要摘錄，全文存 library/raw。",
+    "url": "https://mopsov.twse.com.tw/nas/STR/2025_4979_annual_report.pdf",
+    "publisher": "MOPS 公開資訊觀測站",
+    "published_at": "2026-05-31",
+    "retrieved_at": "2026-08-29"
+  },
+  "sources": [
+    {
+      "id": "mops_4979_annual_report_2025_s1",
+      "locator": "營運概況——主要銷貨客戶名單（p.94 附近）",
+      "quote": "1 LC01082 3,177,581 92.08 無 LC01082 3,797,512 86.61 無 2 - - - - LC20188 453,150 10.33 無 其他 273,462 7.92 其他 134,184 3.06 銷貨淨額 3,451,043 100.00 銷貨淨額 4,384,846 100.00"
+    },
+    {
+      "id": "mops_4979_annual_report_2025_s2",
+      "locator": "致股東報告書／營運概況——CW DFB 開發",
+      "quote": "因應 AI 伺服器及雲端運算資料中心應用所需高速光通訊元件的需求，本公司自 2019 年即與策略合作夥伴共同開發 CW DFB Laser 晶粒的研發及量產，目前也已獲得數家主要客戶之肯定與採用，力求逐漸將主力產品延伸至高端產品如 100mW CW DFB 及 100G/200GEML-DFB。"
+    },
+    {
+      "id": "mops_4979_annual_report_2025_s3",
+      "locator": "研究發展狀況",
+      "quote": "本司開發之產品主要應用於 AI 數據中心，傳輸距離主要介於500m-80km。已完成 800G ZR 模塊以及 70mW CW LD，應用於 DC/DCI 資料傳輸，光接收元件則有 PD 類產品。目前開發重點為 800G/1.6T 應用之 70/100mW CW LD 以及共同封裝光學元件(CPO)及矽光子(silicon photonics)應用技術。"
+    },
+    {
+      "id": "mops_4979_annual_report_2025_s4",
+      "locator": "主要產品種類與商品項目",
+      "quote": "主要產品種類 114度 營業收入 營業比重 光通訊主動元件及模組 3,786,274 86.35 晶粒 484,378 11.05 其他 114,194 2.60 合計 4,384,846 100,00 ... 因應雲端運算資料中心需求，建立 OEM/ODM 一站式代工服務，100G~1.6T 光引擎及 CoC 封裝，與客戶深度合作開發。"
+    },
+    {
+      "id": "mops_4979_annual_report_2025_s5",
+      "locator": "營運概況——主要進貨供應商",
+      "quote": "LV22 1309 1,720,502 74.20 無 LV221309 2,182,255 73.63 無 2 3 其他 598,141 25.80 其他 781,673 26.37 進貨淨額 2,318,643 100.00 進貨淨額 2,963,928 100.00"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:luxnet",
+      "type": "Company",
+      "name": "LuxNet",
+      "aliases": ["華星光", "華星光通", "華星光通科技", "4979.TWO", "LuxNet Corporation"],
+      "role": null,
+      "abstraction_level": "device_chip",
+      "confidence": 0.9,
+      "source_ids": ["mops_4979_annual_report_2025_s2"],
+      "attributes": {}
+    },
+    {
+      "id": "tech:cw_dfb_laser",
+      "type": "TechNode",
+      "name": "Continuous-wave DFB laser",
+      "aliases": ["CW DFB laser", "CW DFB Laser 晶粒"],
+      "role": null,
+      "abstraction_level": "device_chip",
+      "confidence": 0.85,
+      "source_ids": ["mops_4979_annual_report_2025_s2"],
+      "attributes": {}
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:luxnet",
+      "relation": "supplies_to",
+      "dst_id": "tech:cw_dfb_laser",
+      "confidence": 0.8,
+      "source_ids": ["mops_4979_annual_report_2025_s2"],
+      "attributes": {}
+    }
+  ],
+  "claims": [
+    {
+      "id": "mops_4979_annual_report_2025_cl1",
+      "statement": "LuxNet（華星光通）的單一「LC01082」客戶占 113 年度（2024）銷貨淨額 92.08%（NT$3,177,581 千）、114 年度（2025）86.61%（NT$3,797,512 千）；114 年度另有「LC20188」占 10.33%。客戶以代號揭露、標示與發行人無關係，不得對應到任何具名公司。",
+      "subject_id": "co:luxnet",
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "source_ids": ["mops_4979_annual_report_2025_s1"],
+      "disproof_condition": "後續年報顯示 LC01082 占比降至 50% 以下或客戶結構重組時更新；若客戶身分被任一方具名揭露，另立新 claim。"
+    },
+    {
+      "id": "mops_4979_annual_report_2025_cl2",
+      "statement": "LuxNet 自 2019 年起與一家未具名策略合作夥伴共同開發 CW DFB laser 晶粒並已量產，自稱已獲數家主要客戶採用，正將產品延伸至 100mW CW DFB 與 100G/200G EML-DFB——issuer 自報、合作夥伴與客戶皆未具名（L8：不得作為瓶頸性獨立佐證）。",
+      "subject_id": "co:luxnet",
+      "confidence": 0.8,
+      "demand_proof_level": "guided",
+      "source_ids": ["mops_4979_annual_report_2025_s2"],
+      "disproof_condition": "若後續揭露顯示 CW DFB 晶粒量產中止、策略合作終止，或客戶端文件顯示採用其他供應商取代，降評。"
+    },
+    {
+      "id": "mops_4979_annual_report_2025_cl3",
+      "statement": "LuxNet 目前研發重點為 800G/1.6T 應用之 70/100mW CW LD、CPO 與矽光子應用技術；已完成 800G ZR 模組與 70mW CW LD。114 年度營收 NT$4,384,846 千，其中主動元件及模組占 86.35%、晶粒占 11.05%；並提供 100G~1.6T 光引擎及 CoC 封裝之 OEM/ODM 一站式代工。",
+      "subject_id": "co:luxnet",
+      "confidence": 0.85,
+      "demand_proof_level": "guided",
+      "source_ids": ["mops_4979_annual_report_2025_s3", "mops_4979_annual_report_2025_s4"],
+      "disproof_condition": "後續年報／法說顯示 CPO/矽光子開發中止或 CW LD 未進入 800G/1.6T 量產供應鏈時降評。"
+    },
+    {
+      "id": "mops_4979_annual_report_2025_cl4",
+      "statement": "LuxNet 的單一「LV221309」供應商占 113 年度進貨淨額 74.20%、114 年度 73.63%——上游採購高度集中於一家代號供應商（磊晶來源推測合理但未具名，不得對應）。",
+      "subject_id": "co:luxnet",
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "source_ids": ["mops_4979_annual_report_2025_s5"],
+      "disproof_condition": "後續年報顯示供應商分散（單一供應商 <50%）或供應商身分具名揭露時更新。"
+    }
+  ]
+}

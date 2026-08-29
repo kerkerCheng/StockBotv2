@@ -137,6 +137,11 @@
       "execution_venue": "NYSE"
     },
     {
+      "company_id": "co:foci",
+      "research_ticker": "3363.TWO",
+      "market_currency": "TWD"
+    },
+    {
       "company_id": "co:globalfoundries",
       "research_ticker": "GFS",
       "market_currency": "USD",
@@ -244,6 +249,11 @@
     {
       "company_id": "co:lumilens",
       "research_ticker": null
+    },
+    {
+      "company_id": "co:luxnet",
+      "research_ticker": "4979.TWO",
+      "market_currency": "TWD"
     },
     {
       "company_id": "co:macom",

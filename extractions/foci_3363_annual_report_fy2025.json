@@ -1,0 +1,102 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mops_3363_annual_report_2025",
+    "title": "上詮精密光學（FOCI, 3363.TWO）114 年度股東會年報（2025 財年）",
+    "source_type": "filing",
+    "evidence_tier": 1,
+    "origin_entity": "FOCI (上詮精密光學)",
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "MOPS 公開資訊觀測站公開文件；保留 canonical 來源與研究必要摘錄，全文存 library/raw。",
+    "url": "https://mopsov.twse.com.tw/nas/STR/2025_3363_20260528F04.pdf",
+    "publisher": "MOPS 公開資訊觀測站",
+    "published_at": "2026-05-07",
+    "retrieved_at": "2026-08-29"
+  },
+  "sources": [
+    {
+      "id": "mops_3363_annual_report_2025_s1",
+      "locator": "營運概況——最近二年度任一年度中曾占銷貨總額百分之十以上之客戶（p.77 附近）",
+      "quote": "1 C 公司 1,327,446 70.16 無 C 公司 975,971 71.56 無 － 其他 564,548 29.84 - 其他 387,906 28.44 - － 銷貨淨額 1,891,994 100.00 - 銷貨淨額 1,363,877 100.00"
+    },
+    {
+      "id": "mops_3363_annual_report_2025_s2",
+      "locator": "募資計畫——預計可能產生之效益（p.64 附近）",
+      "quote": "本公司本次計畫新臺幣 1,538,000 仟元係用於購置機器設備，用以擴充產能支應公司未來生產及營運所需。購置之機器設備主係用於建置矽光光纖陣列元件(FAU)之高精密自動化生產線，其主要設備包含 FAU 生產機台、量測、光檢及其他測試機台。本公司長期目標係成為 CPO 光纖陣列元件之主要及重要供應商，並致力於提供光纖陣列元件、封裝及測試之一站式解決方案"
+    },
+    {
+      "id": "mops_3363_annual_report_2025_s3",
+      "locator": "主要商品項目與營業比重",
+      "quote": "矽光封裝 (SiPh package)及 Co-Packaged Optics 等相關 FAU 元件與服務。 2. 主要產品及其營業比重 單位：新台幣仟元；% 年度 項目 114 年度 113 年度 金額 % 金額 % 銷貨 收入 光纖跳接線 1,192,173 63.01 1,050,200 77.00 光纖耦合產品 51,296 2.71 68,819 5.05 光纖連結器 181,220 9.58 56,911 4.17 其他光纖被動元件 99,399 5.25 88,247 6.47 微光學光纖元件 49,865 2.64 44,434 3.26 其他 313,715 16.58 44,736 3.28"
+    },
+    {
+      "id": "mops_3363_annual_report_2025_s4",
+      "locator": "財務績效——最近二年度經營結果情形分析（p.82 附近）",
+      "quote": "營 業 收 入 淨 額 1,891,994 1,363,877 528,117 38.72% 營業成本 1,537,079 1,184,721 352,358 29.74% 營業毛利 354,915 179,156 175,759 98.10% 營業費用 354,427 272,532 81,895 30.05% 營業利益 ( 損失 ) 488 (93,376) 93,864 (100.52%)"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:foci",
+      "type": "Company",
+      "name": "FOCI",
+      "aliases": ["上詮", "上詮精密光學", "3363.TWO", "Foci Fiber Optic Communications"],
+      "role": null,
+      "abstraction_level": "module_subsystem",
+      "confidence": 0.9,
+      "source_ids": ["mops_3363_annual_report_2025_s3"],
+      "attributes": {}
+    },
+    {
+      "id": "tech:fiber_attach_unit",
+      "type": "TechNode",
+      "name": "Fiber Attach Unit",
+      "aliases": ["FAU", "Fiber Array Unit", "光纖陣列元件"],
+      "role": null,
+      "abstraction_level": "module_subsystem",
+      "confidence": 0.85,
+      "source_ids": ["mops_3363_annual_report_2025_s2"],
+      "attributes": {}
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:foci",
+      "relation": "supplies_to",
+      "dst_id": "tech:fiber_attach_unit",
+      "confidence": 0.8,
+      "source_ids": ["mops_3363_annual_report_2025_s2", "mops_3363_annual_report_2025_s3"],
+      "attributes": {}
+    }
+  ],
+  "claims": [
+    {
+      "id": "mops_3363_annual_report_2025_cl1",
+      "statement": "FOCI（上詮）的單一「C 公司」客戶占 114 年度（2025）銷貨淨額 70.16%（NT$1,327,446 千）、113 年度 71.56%；客戶依營業保密約定以代號揭露、標示與發行人無關係，不得對應到任何具名公司。",
+      "subject_id": "co:foci",
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "source_ids": ["mops_3363_annual_report_2025_s1"],
+      "disproof_condition": "後續年報揭露 C 公司占比大幅下降（<50%）或出現新的 10% 以上客戶結構變化時更新；若 C 公司身分被任一方具名揭露，另立新 claim 不改寫本筆。"
+    },
+    {
+      "id": "mops_3363_annual_report_2025_cl2",
+      "statement": "FOCI 於 2026-02-06 完成募資的 NT$3,160,000 千現金增資中，NT$1,538,000 千用於建置矽光光纖陣列元件（FAU）高精密自動化生產線（FAU 生產機台、量測、光檢與測試機台）；公司明文長期目標為「成為 CPO 光纖陣列元件之主要及重要供應商」並提供 FAU 元件、封裝及測試一站式解決方案——issuer 自報的產能承諾與策略定位（L8）。",
+      "subject_id": "co:foci",
+      "confidence": 0.85,
+      "demand_proof_level": "guided",
+      "source_ids": ["mops_3363_annual_report_2025_s2"],
+      "disproof_condition": "若 116 年報顯示 FAU 產線資本支出執行率大幅落後、募資用途變更，或 CPO FAU 營收未於 2027 年前成為可辨識營收來源，降評。"
+    },
+    {
+      "id": "mops_3363_annual_report_2025_cl3",
+      "statement": "FOCI 114 年度營收 NT$1,891,994 千（yoy +38.72%）、營業毛利 +98.10%、營業利益由 -93,376 千轉正至 488 千；產品組合中「其他」類別由 3.28% 跳升至 16.58%（NT$313,715 千），公司商品項目明列矽光封裝（SiPh package）及 Co-Packaged Optics 相關 FAU 元件與服務。",
+      "subject_id": "co:foci",
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "source_ids": ["mops_3363_annual_report_2025_s3", "mops_3363_annual_report_2025_s4"],
+      "disproof_condition": "後續財報顯示毛利率回落或 FAU/SiPh 相關營收類別停止成長時更新。"
+    }
+  ]
+}
