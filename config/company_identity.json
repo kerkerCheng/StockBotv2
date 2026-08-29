@@ -247,7 +247,10 @@
     },
     {
       "company_id": "co:marvell_technology",
-      "research_ticker": "MRVL"
+      "research_ticker": "MRVL",
+      "market_currency": "USD",
+      "execution_currency": "USD",
+      "execution_venue": "NASDAQ"
     },
     {
       "company_id": "co:meta",

@@ -2690,10 +2690,11 @@
       "deferred_at": "2026-08-25T01:24:41.911625+00:00",
       "hint": "coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
       "n": 168,
-      "reason": null,
+      "reason": "等待條件（SIVE Q2 財報）已發生且研究完成：Note 6 重編僅 SEK 4.3M（≈FY2025 營收 1.4%），未觸發 Ningi 級門檻；無 going concern；reassess 已產生新 decision（REVIEW→MONITOR）並凍結使用者確認的新 disproof。source_cleared 完成候選確認結案。",
+      "receipt": "decision:pd_48ffb841bff65b3bacaf4ba68ea409af;notes:library/private/research_notes/2026-08-29_pq1_sivers_q2_report.md",
       "ref_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "drop",
+      "resolved_at": "2026-08-29T01:11:23.852338+00:00",
       "source": "decision_lab",
       "source_cleared": {
         "at": "2026-08-29T00:57:34.844787+00:00",
@@ -2701,13 +2702,7 @@
         "source_healthy": true
       },
       "title": "co:sivers_semiconductors：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
-      "type": "decision_review",
-      "waiting_on": {
-        "reason": null,
-        "set_at": "2026-08-25T01:24:41.911625+00:00",
-        "trigger": "SIVE Q2 2026 財報（含 2023-25 重編後數字），官方確認 18:00 CET 發布；與 thesis lifecycle [10] 同一分辨點",
-        "until": "2026-08-27"
-      }
+      "type": "decision_review"
     },
     {
       "added_at": "2026-08-17T01:35:31.016351+00:00",
@@ -3664,17 +3659,18 @@
       "added_at": "2026-08-25T08:00:29.959820+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_9a7d6db5f7562ce63ff8579f03537a47",
-      "dispatch_receipt": "bounded research 完成。MRVL 10-Q（filed 2026-08-28，全文 344,103 chars）逐字核對，筆記：library/private/research_notes/2026-08-29_pq1_marvell_wo_independent_source.md。independent_source 找到客戶端資本承諾：NVIDIA 2026-03-31 以 USD 2.0B 現金購入 Series A Convertible Preferred（轉換價約91.84、最多21.8M股），配 Q1 FY2027 custom XPU+scale-up networking 戰略合作；已凍結 ra_c7c693cf6f3f8daff0dd1c94f1abb2ba（digest b431b013fbc3c9b6304f0facc754ed30a2ab78ccc308cac01a5ab1eef3f805a4，focus=co:marvell_technology）等 pq2 核准。⚠ 同 10-Q 揭露反方向 customer warrants（FY2025 4.2M股@87.77；FY2026 FV 55.4M）供應商付客戶並存，cl3 已明記防混淆。清除 2 blocker：customer_concentration（Distributor A 44%、四客戶 72% gross AR、FY2026 前十大 82%）提案 po_d01417b6669a67c651b357b1fa0652bb；backlog 屬揭露結構性缺席（practical expedient、RPO 0 命中）提案 po_1298d5ac031da4ac79626a99f3702a6b。catalyst/disproof 草案已寫入筆記待使用者確認（Q3 FY2027 財報約 2026-12 上旬；disproof 三條件含 NVIDIA 處分持股）。另案發現：MRVL 已完成收購 Celestial AI（2026-02-02）與 XConn（2026-02-10）。",
+      "dispatch_receipt": "decision:pd_47e093c8e89a9c8b931af6643389eb09",
       "dispatch_ref": "wo_468ecdef0047cb1a3d33d05c1c3de9fa",
-      "dispatch_status": "awaiting_approval",
-      "dispatch_updated_at": "2026-08-29T00:15:49.844655+00:00",
+      "dispatch_status": "completed",
+      "dispatch_updated_at": "2026-08-29T01:09:28.638886+00:00",
       "dispatched_at": "2026-08-27T23:45:21.543347+00:00",
       "hint": "coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 224,
-      "reason": null,
+      "reason": "pq1 completed",
+      "receipt": "decision:pd_47e093c8e89a9c8b931af6643389eb09",
       "ref_id": "dc_0fca807c963dc3b9888e0f83ba6d45a5",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-29T01:09:28.638886+00:00",
       "source": "decision_lab",
       "title": "co:marvell_technology：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
@@ -4012,13 +4008,26 @@
       "added_at": "2026-08-29T00:57:34.844787+00:00",
       "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-08-27T00:00:00+00:00；來源=Sivers Interim Report Q2 2026 (2026-08-27), library/raw/sive_q2_2026_interim_rep",
       "n": 248,
-      "reason": null,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_cb1c91fd226d87d40c39ba3d441678e5;proposal:po_06f06cc129394bad7f90774e8a77112a",
       "ref_id": "po_06f06cc129394bad7f90774e8a77112a",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-29T01:06:07.073322+00:00",
       "source": "engine_c",
       "title": "Engine C 觀測：SIVE.ST / dilution",
       "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-08-29T01:10:04.654512+00:00",
+      "hint": "沒有 work order，go 不成立；但 reassess 也清不掉——實質 blocker：valuation_payoff_unknown。要動的是這些（補證據／研究），補完才 reassess",
+      "n": 249,
+      "reason": null,
+      "ref_id": "dc_0fca807c963dc3b9888e0f83ba6d45a5",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:marvell_technology：補估值錨點：市值、分析師覆蓋與隱含假設，回答股價已經定價了什麼",
+      "type": "decision_review"
     }
   ],
   "log": [
@@ -9213,8 +9222,44 @@
       "ref_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
       "type": "decision_review",
       "verb": "source_cleared"
+    },
+    {
+      "at": "2026-08-29T01:06:07.073322+00:00",
+      "n": 248,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_cb1c91fd226d87d40c39ba3d441678e5;proposal:po_06f06cc129394bad7f90774e8a77112a",
+      "ref_id": "po_06f06cc129394bad7f90774e8a77112a",
+      "type": "engine_c_observation",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-29T01:09:28.638886+00:00",
+      "n": 224,
+      "reason": null,
+      "receipt": "decision:pd_47e093c8e89a9c8b931af6643389eb09",
+      "ref_id": "dc_0fca807c963dc3b9888e0f83ba6d45a5",
+      "type": "decision_review",
+      "verb": "pq1_completed"
+    },
+    {
+      "at": "2026-08-29T01:09:28.638886+00:00",
+      "n": 224,
+      "reason": "pq1 completed",
+      "receipt": "decision:pd_47e093c8e89a9c8b931af6643389eb09",
+      "ref_id": "dc_0fca807c963dc3b9888e0f83ba6d45a5",
+      "type": "decision_review",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-29T01:11:23.852338+00:00",
+      "n": 168,
+      "reason": "等待條件（SIVE Q2 財報）已發生且研究完成：Note 6 重編僅 SEK 4.3M（≈FY2025 營收 1.4%），未觸發 Ningi 級門檻；無 going concern；reassess 已產生新 decision（REVIEW→MONITOR）並凍結使用者確認的新 disproof。source_cleared 完成候選確認結案。",
+      "receipt": "decision:pd_48ffb841bff65b3bacaf4ba68ea409af;notes:library/private/research_notes/2026-08-29_pq1_sivers_q2_report.md",
+      "ref_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
+      "type": "decision_review",
+      "verb": "drop"
     }
   ],
-  "next_n": 249,
+  "next_n": 250,
   "schema_version": "1"
 }
