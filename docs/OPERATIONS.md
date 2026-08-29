@@ -31,6 +31,34 @@ Codex local scheduled task
 
 兩者刻意錯開，且都不替使用者寫 thesis 結論、入圖或建立 live facts。
 
+### 自主研究迴圈（2026-08-29 建立；互動 session 內由使用者觸發）
+
+**Trigger：** 使用者說「跑自主研究迴圈」（單輪）或「/loop 自主研究」（連續、agent 自排程、
+使用者隨時打斷）。**不設 cron、不進無人值守排程**——它與 daily／weekly 共用 working tree，
+必須由互動 session 承載才能遵守 single-writer 契約。
+
+**每輪固定形狀：** 從題源挑一題 → bounded research → 留 receipt（park／prepared RA／
+Engine C 提案）→ 報告本輪產出與下一題。**所有 authority mutation 照常停在 pq2**：
+迴圈只堆 packet，不 apply、不 complete、不改 lifecycle、不動 registry（onboard 亦打包成
+`ra_admission` 等 `go`，見 `AGENTS.md`「Onboard 也走 pq2」）。
+
+**題源優先序（確定性，不自創）：**
+1. 使用者點名的題（含 decompose 積壓題——選題永遠是使用者的）
+2. `trace-backlog` 觸發條件已命中的 parked lead
+3. 瓶頸排序 `structural_rows` 前段的證據缺口（self_reported → 客戶端印證）
+4. L8 不足公司的第三 origin 狩獵（`_check_source_diversity` < 3 者）
+5. `coverage_gaps` 的 🔴 未知供應層
+6. 缺五軸 assessment 的 cohort（如 `research_assessment_missing` 者）
+7. `single_origin_report` 單源 claim 補強
+
+**紅線：** ①台北 04:00（週日 weekly）與 06:30（daily）前後 30 分鐘內不動 working tree，
+排程結束後先讀 `git status --short` 再續跑；②pq2 未核准積壓 ≥10 項時暫停產新 packet、
+只做 park 級研究；③每輪必留 receipt，違反 = 該輪視為未發生。
+
+**成績單（L14——迴圈的存在必須讓這些數字動）：** prepared RA 數、L8 達 3/3 的公司數、
+`substitutability` 覆蓋率（`query.bottleneck` caveat 行）、🔴 未知層帶供應商邊數、
+單源 claim 數。連續多輪零產出＝題源枯竭，停迴圈並回報，不空轉。
+
 ---
 
 ## 常用指令

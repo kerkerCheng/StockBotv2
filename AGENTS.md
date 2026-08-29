@@ -155,6 +155,8 @@ agent 差點照做，實測後發現 7 個積壓沒有一個是讀年報能解�
 
 編號首次進池後直到 resolve 才釋放；狀態存 tracked `library/leads/todo_pool.json`，append-only `log` 保留核准與 migration 稽核。
 
+**Onboard 也走 pq2（2026-08-29 使用者定案）：** 使用者對系統的核准介面收斂為**唯一一種——pq2 編號＋`go`**。新公司 onboard 不再是獨立的對話流程審批：發現方（自主迴圈、routine 或互動研究）把 registry 增列與首批 extraction 打包成 prepared RA 取 `ra_admission` 編號，packet 內必含 L8 來源清單（origin_entity 多樣性現況）與 registry 條目內容；`go` 授權＝「registry 加該公司＋apply 該 RA 入圖」，不含 thesis／live。互動 session 可當場 sync 取號並立刻 `go`，不必等 daily——統一的是**核准的載體**，不是核准的時機。`skills/company-onboard` 的文件發現與 L8 判準照舊，只有最後的核准動作改由 pq2 承載。
+
 **「等你決定」與「等事件」分離（2026-07-30）：** 池子同時裝著兩種性質不同的東西，混在一起會讓訊噪比降到約 1:1（歷來 76 個編號有 31 個被 drop）。`config/decision_blockers.json` 的 `resolution_mode` 是分類判準：`user_decision`／`awaiting_external`／`system_internal`。保守規則——**只要有一個 blocker 需要人決定，整個項目就留在決策佇列**，寧可多問也不要安靜藏起來。使用者亦可用 `pending --until/--trigger` 明確指定等待條件，優先於自動推導。
 
 **人工判讀不等於外部事件（2026-08-15 使用者定案）：** 若現有公開資料已可開始 bounded research、source-trace、assessment 或 manual observation proposal，`go` 的決定是「是否啟動這份研究」，所以項目必須留在 `user_decision`；不能因 next step 含「人工填入／人工判讀」就藏進 `awaiting_external`。只有世界必須先產生新 filing、掛牌或到達既定日期才屬 `awaiting_external`。純 `system_internal`（例如 frozen market／FX context 的自然老化）不建立 pq2；既有誤分類項由 sync 留下 deterministic retirement audit 後結案。Graph admission、Engine C observation 寫入、thesis mutation 與 live gate 仍各自另取 exact 人工核准，研究 `go` 不會跨越它們。
