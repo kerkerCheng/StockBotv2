@@ -42,6 +42,37 @@ ITEM_TYPES: dict[str, str] = {
     "manual": "依 hint 執行",
 }
 
+# 每個 pq2 類型的 `go` 究竟授權什麼、以及**最相鄰的哪一步不在授權內**。
+#
+# ⚠ 「不含」欄不是修辭。`AGENTS.md` 反覆寫過同一件事（研究 `go` 不代表入圖、
+# 入圖 `go` 不代表 thesis mutation、任何 `go` 都不代表 live），但那些句子散在政策檔裡，
+# 每個消費端都得自己回想一次——而回想錯的方向永遠是「以為授權比較寬」。
+# 分類有 SSOT 就要跟著資料走到需要它的地方（L16）：掛在 item 上，brief 就不必記得。
+#
+# 鍵必須與 `ITEM_TYPES` 完全一致，由 `tests/test_engine_b_todo.py` 斷言——
+# 新增一個類型時會被強迫決定它的授權邊界，而不是預設繼承某個較寬的。
+GO_AUTHORIZATION: dict[str, tuple[str, str]] = {
+    "lead_research": ("（legacy）不再建立新項目", "任何 authority mutation"),
+    "ra_admission": ("exact graph admission（apply_research_action）", "thesis mutation 與 live"),
+    "decision_review": ("bounded research（派回 pq1）", "入圖、Engine C 寫入與 live"),
+    "source_trace_review": ("bounded 追源（dispatch 回 pq1）", "提高 evidence tier 與入圖"),
+    "thesis_lifecycle": ("本機複查該 thesis", "自動改 lifecycle 或入圖"),
+    "sheet_only_holding": ("evaluate-signal／onboard 建 cohort", "任何部位動作"),
+    "engine_c_observation": ("寫入 Engine C append-only ledger", "入圖與 thesis mutation"),
+    "thesis_mutation": ("該筆 thesis lifecycle 變更", "入圖與 live"),
+    "manual": ("依 hint 執行的 exact 動作", "hint 未載明的任何動作"),
+}
+
+
+def go_authorization(item_type: str) -> dict[str, str]:
+    """回傳這個類型的 `go` 授權邊界，供決策行的「go = …，不含 …」使用。"""
+
+    authorizes, excludes = GO_AUTHORIZATION.get(
+        item_type, ("依 hint 執行的 exact 動作", "hint 未載明的任何動作")
+    )
+    return {"go_authorizes": authorizes, "go_excludes": excludes}
+
+
 VERBS = ("go", "drop", "pending")
 
 _SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
@@ -1852,6 +1883,18 @@ def collect_all(*, include_decisions: bool = True) -> list[dict[str, Any]]:
     return collect_all_with_health(include_decisions=include_decisions).rows
 
 
+def _attach_go_authorization(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """把授權邊界掛到每一列，讓 collector 不必各自記得（L16）。
+
+    掛在這裡而不是各個 collector：新增 collector 時不會有人記得補這兩個欄位，
+    而漏掉時的預設會是「沒有邊界」——最危險的那個方向。
+    """
+
+    for row in rows:
+        row.update(go_authorization(str(row.get("type") or "")))
+    return rows
+
+
 # 哪個 collector 負責哪些 pq2 類型。只有來源健康時，「該類型的 item 沒出現在
 # incoming」才可解讀成「它完成了」；`manual` 沒有 collector，永遠不自動標記。
 SOURCE_ITEM_TYPES: dict[str, frozenset[str]] = {
@@ -1913,7 +1956,9 @@ def collect_all_with_health(*, include_decisions: bool = True) -> SourceCollecti
             continue
         rows += collected
         healthy.add(name)
-    return SourceCollection(rows=rows, healthy=frozenset(healthy))
+    return SourceCollection(
+        rows=_attach_go_authorization(rows), healthy=frozenset(healthy)
+    )
 
 
 # ── CLI ────────────────────────────────────────────────────────────────────

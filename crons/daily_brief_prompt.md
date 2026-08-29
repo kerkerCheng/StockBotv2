@@ -151,9 +151,15 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
 
 只用 `library/leads/todo_pool.json` 的既有穩定編號；不得依 section 或當日排序重新編號。
 
-每個 active pq2 item 不得只列短標題或 `co:*` ID。先給一句 TL;DR，再寫完整公司／ticker、誰供應誰、
-產品／材料／技術、事件成熟度、投資意義、證據與反證邊界，以及 `go` 實際授權的 action type。
-queued／researching／awaiting_approval 改列狀態更新，不重複要求 `go`。
+每個 active pq2 item 的**第一行必須是決策行**：一行寫完「做什麼 — 為什麼是現在 ｜ go 授權什麼，
+不含什麼」，使用者不展開下面也能決定要不要展開。⚠ 內容密度不減——決策行是**改閱讀順序**，不是
+刪內容：先給一句 TL;DR，再寫完整公司／ticker、誰供應誰、產品／材料／技術、事件成熟度、投資意義、
+證據與反證邊界，以及 `go` 實際授權的 action type，全部原樣收在決策行下面。
+不得只列短標題或 `co:*` ID。queued／researching／awaiting_approval 改列狀態更新，不重複要求 `go`。
+
+決策行的「不含」欄不是修辭：`go` 一律只授權該項自己的 action type，最相鄰的下一步
+（研究 `go` 不含入圖、入圖 `go` 不含 thesis mutation、任何 `go` 都不含 live）必須逐項寫出來，
+否則使用者要靠記憶區分授權邊界。
 
 輸出第一行**必須**是帶執行日期的標題 `# Daily Brief YYYY-MM-DD (Asia/Taipei)`，日期取本機
 Asia/Taipei 當日；沒有日期的 brief 視為未完成輸出（多份 brief 並排時要能一眼分辨是哪一天）。
@@ -162,11 +168,14 @@ Asia/Taipei 當日；沒有日期的 brief 視為未完成輸出（多份 brief 
 # Daily Brief <YYYY-MM-DD> (Asia/Taipei)
 
 ## 需要你動作
-[N] <type> — <完整公司／ticker 與主題>
-TL;DR：<誰、對誰、做了什麼>
-成熟度／投資意義：<announcement／sampling／qualification／capacity／volume／revenue>
-證據邊界：<一手來源、反證、不能推論什麼>
-go 授權：<bounded research／exact graph admission／manual observation／thesis review>
+[N] <動詞＋主詞：這次 go 會讓誰去做什麼> — <為什麼是現在，一個子句> ｜ go = <action type>，不含 <最相鄰但未授權的動作>
+    TL;DR：<誰、對誰、做了什麼>
+    公司／ticker：<完整名稱與代碼，不得只給 co:* ID>
+    成熟度／投資意義：<announcement／sampling／qualification／capacity／volume／revenue>
+    證據邊界：<一手來源、反證、不能推論什麼>
+
+<決策行範例——一行即可決定要不要展開：>
+[14] 補 COHR 的 counter-path 證據 — 最弱軸 technical_causal_link，counter_paths 為空 ｜ go = bounded research，不含入圖
 
 ## 新 leads（依 priority）
 <僅列 pq1 進度／失敗；raw lead 不占 pq2 編號。每筆 `parked` 必須列完整主詞／ticker、`parked_reason`、

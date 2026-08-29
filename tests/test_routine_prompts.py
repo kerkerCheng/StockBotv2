@@ -96,7 +96,11 @@ def test_daily_prompt_keeps_human_gates_and_batch_contract() -> None:
 def test_daily_prompt_requires_subject_complete_pq2_items() -> None:
     text = DAILY.read_text(encoding="utf-8")
     for token in (
-        "每個 active pq2 item 不得只列短標題",
+        # 決策行（2026-08-29）：第一行就要能決定要不要展開。
+        "第一行必須是決策行",
+        "不含 <最相鄰但未授權的動作>",
+        # 密度欄位一項都不減——決策行改的是閱讀順序，不是刪內容。
+        "不得只列短標題",
         "誰供應誰",
         "事件成熟度",
         "證據與反證邊界",

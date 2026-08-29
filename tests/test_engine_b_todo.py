@@ -1561,3 +1561,32 @@ def test_work_checkpoint_accepts_assessment_gap_ref() -> None:
     assert out["work_order"] is None
     # terminal checkpoint 仍照常 resolve pq2 編號並留下 receipt。
     assert pool["log"][-1]["receipt"] == "research_packet:notes.md"
+
+
+def test_every_item_type_declares_its_go_authorization_boundary() -> None:
+    """每個 pq2 類型都必須明講 `go` 授權什麼、不含什麼。
+
+    `AGENTS.md` 反覆寫過同一件事（研究 `go` 不代表入圖、入圖 `go` 不代表 thesis
+    mutation、任何 `go` 都不代表 live），但那些句子散在政策檔裡，每個消費端都得
+    自己回想一次——而回想錯的方向永遠是「以為授權比較寬」。分類有 SSOT 就要跟著
+    資料走到需要它的地方（L16）。
+
+    鍵一致是這條的重點：新增類型時會被強迫決定它的授權邊界，而不是靜默繼承
+    某個較寬的預設。
+    """
+    assert set(todo.ITEM_TYPES) == set(todo.GO_AUTHORIZATION)
+    for item_type, (authorizes, excludes) in todo.GO_AUTHORIZATION.items():
+        assert authorizes.strip(), item_type
+        assert excludes.strip(), item_type
+
+
+def test_collected_rows_carry_the_go_boundary_so_consumers_need_not_recall_it() -> None:
+    """授權邊界掛在 row 上，brief 不必自己查——漏掉時的預設是「沒有邊界」。"""
+    rows = todo._attach_go_authorization(
+        [{"type": "decision_review"}, {"type": "ra_admission"}]
+    )
+
+    assert rows[0]["go_authorizes"].startswith("bounded research")
+    assert "入圖" in rows[0]["go_excludes"]
+    assert "graph admission" in rows[1]["go_authorizes"]
+    assert "live" in rows[1]["go_excludes"]
