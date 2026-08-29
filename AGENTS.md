@@ -155,6 +155,25 @@ agent 差點照做，實測後發現 7 個積壓沒有一個是讀年報能解�
 
 編號首次進池後直到 resolve 才釋放；狀態存 tracked `library/leads/todo_pool.json`，append-only `log` 保留核准與 migration 稽核。
 
+**建議只由 pool ground truth 導出＋必過 L14（2026-08-30 使用者定案）：** 任何 agent／routine
+對 pq2 編號給處置建議前，適用三條硬規則。事發：2026-08-30 weekly 對八個編號建議 `drop`，
+聲稱「來源已停止產出」——實測 `source_cleared` 是 **0/8**，其中兩項是等事件、一項是使用者
+明示 defer；同晨 daily 又對其中三項建議 `go`，兩份排程直接互相矛盾。
+1. **推薦 `go` 前必須答得出「go 會讓哪個數字變」**（L14）。receipt 已判定 bounded research
+   解不了的（需使用者 scope 決策、需世界先發生某事），不得推薦 `go`——改建議
+   `pending --trigger`，或把真正要的 scope 問題直接問出來。「go 了沒用」的每一次
+   都是這條沒守。
+2. **推薦 `drop` 前必須查 pool ground truth**（`source_cleared` 實值＋`waiting_on`＋
+   `deferred_at`），並附查證命令。collector 仍會重新推導的項目 drop 只會換號重生
+   （`sheet_only` [18]-[33]→[46]-[60] 先例）——這種項目的正確建議是修 collector 端分類，
+   不是叫使用者 drop。
+3. **分工：weekly 只發現、不處置。** 週報對 pq2 至多列「疑似 stale——待互動 session 以
+   ground truth 驗證」，不得輸出 go／drop 清單；處置建議只由讀得到 pool 現值的
+   daily／互動 session 給出。
+**收尾建議摘要是義務：** 每個研究段落、daily／weekly 報告與較長的互動回覆，結尾必附
+「建議摘要」——`go`／`drop`／`pending`／不動各列編號＋一句理由，讓使用者不回讀全文
+即可下一行批次指令。
+
 **Onboard 也走 pq2（2026-08-29 使用者定案）：** 使用者對系統的核准介面收斂為**唯一一種——pq2 編號＋`go`**。新公司 onboard 不再是獨立的對話流程審批：發現方（自主迴圈、routine 或互動研究）把 registry 增列與首批 extraction 打包成 prepared RA 取 `ra_admission` 編號，packet 內必含 L8 來源清單（origin_entity 多樣性現況）與 registry 條目內容；`go` 授權＝「registry 加該公司＋apply 該 RA 入圖」，不含 thesis／live。互動 session 可當場 sync 取號並立刻 `go`，不必等 daily——統一的是**核准的載體**，不是核准的時機。`skills/company-onboard` 的文件發現與 L8 判準照舊，只有最後的核准動作改由 pq2 承載。
 
 **「等你決定」與「等事件」分離（2026-07-30）：** 池子同時裝著兩種性質不同的東西，混在一起會讓訊噪比降到約 1:1（歷來 76 個編號有 31 個被 drop）。`config/decision_blockers.json` 的 `resolution_mode` 是分類判準：`user_decision`／`awaiting_external`／`system_internal`。保守規則——**只要有一個 blocker 需要人決定，整個項目就留在決策佇列**，寧可多問也不要安靜藏起來。使用者亦可用 `pending --until/--trigger` 明確指定等待條件，優先於自動推導。

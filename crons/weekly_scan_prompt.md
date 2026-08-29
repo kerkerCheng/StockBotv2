@@ -83,3 +83,9 @@ tree 或 Git guard 使安全提交不成立，就保留檔案、回報原因，�
 - 不確定就標示不確定；找不到值得說的事也要輸出 sparse-week 心跳。
 - 不追源、不抽取、不入圖、不改 lifecycle 結論、不替使用者填真實持倉。
 - Weekly 只把真正需決定的大事送 pq2；健康維護先自動修，證據缺口保留為明確 blocker。
+- **Weekly 只發現、不處置（2026-08-30 使用者定案，AGENTS.md「建議只由 pool ground truth
+  導出」）：不得對 pq2 編號輸出 `go`／`drop` 建議清單。** 疑似 stale 的編號至多列成
+  「待互動 session 驗證」並附 ground-truth 查證命令（`source_cleared`／`waiting_on`／
+  `deferred_at` 實值）；宣稱「來源已停止產出」前必須實際讀 pool JSON，不得由「本輪 sync
+  新增 0」推斷。事發：2026-08-30 weekly 對八個編號建議 drop，實測 source_cleared 0/8，
+  其中兩項等事件、一項使用者明示 defer，與同晨 daily 的 go 建議直接矛盾。

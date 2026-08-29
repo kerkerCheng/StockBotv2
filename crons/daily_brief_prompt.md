@@ -209,6 +209,12 @@ TL;DR：<約 30 年後 retirement_net_terminal_wealth 目標；本報告不判�
 ## 無事項目
 <`MONITOR` 類別——今天不需要複查，依 review 日曆追蹤即可>
 
+## 建議摘要（收尾必附；AGENTS.md「建議只由 pool ground truth 導出」）
+<go／drop／pending／不動 各一行，列編號＋每個編號一句理由。推薦 go 前必須答得出
+「go 會讓哪個數字變」（L14）——receipt 已判定 bounded research 解不了的不得列入 go，
+改列 pending＋trigger 或把 scope 問題直接問出來；推薦 drop 前必須讀 pool 實值
+（source_cleared／waiting_on／deferred_at），collector 仍會重新推導的不得建議 drop。>
+
 回覆：`<編號…> go｜drop｜pending`（例：`13 17 go 10 16 pending`）
 ```
 
