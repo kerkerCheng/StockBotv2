@@ -25000,7 +25000,7 @@
         "trace_status": "original_obtained"
       },
       "source": "edgar:TSEM",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {},
       "title": "TSEM 6-K filed 2026-08-11",
       "triage": {
