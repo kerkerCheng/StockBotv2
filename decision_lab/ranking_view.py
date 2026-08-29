@@ -106,6 +106,16 @@ def build_ranking_view(
         "structural": _build(structural_rows),
         "structural_total": len(structural_rows),
         "structural_purpose": STRUCTURAL_PURPOSE,
+        # 截斷前的完整候選公司集合。「在不在排序內」必須對整份候選比對，
+        # 不能對只帶前 limit 名的 rows 比——否則排 11 名之後的公司會被誤判成
+        # 「不在排序」（C-1 常駐清單的消費端踩過的坑）。
+        "company_ids": sorted(
+            {
+                str(row.get("company_id") or "")
+                for row in (*actionable_rows, *structural_rows)
+                if row.get("company_id")
+            }
+        ),
         "judgment_note": JUDGMENT_NOTE,
         "caveats": _caveats(ranking.get("coverage") or {}),
     }

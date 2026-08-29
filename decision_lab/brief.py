@@ -157,6 +157,10 @@ def _decision_item(
         # 缺這些 Engine C 人工觀測 ⇒ commercial_maturity 恆 unknown ⇒ 部位恆為 0。
         # 它們是硬性前置條件，不是選填清單項，必須在撞牆前就看得見。
         "missing_observations": list(current_authority.get("missing_observations") or []),
+        # 研究完整度與 live 選擇跟著 item 走（L16）：C-1 的「研究完整但不在瓶頸排序內」
+        # 常駐清單靠這兩個欄位計算，消費端不必回頭再查 card。
+        "research_status": str((card.get("research") or {}).get("status") or ""),
+        "live_user_choice": bool((card.get("live") or {}).get("user_choice")),
         "probe_expiry": card.get("probe_expiry"),
         "expiry_lapsed": bool(card.get("expiry_lapsed")),
         "user_response_needed": (
@@ -803,11 +807,40 @@ def build_today_brief(
             else set()
         )
     )
+    # C-1（ROADMAP 2026-08-29）：研究完整（READY）且尚無 live choice 的 cohort，
+    # 若同時不在瓶頸排序（substitutability 過濾會排除工業標的），就會兩邊都不在——
+    # 「研究做完整之後標的反而消失」。這份常駐清單只呈現、不催辦、不建 pq2 編號。
+    # ranking 未注入時為 None（無法比對，不與「沒有這類標的」的空 list 混用；L12）。
+    if ranking:
+        # 優先用截斷前的完整候選集合（ranking_view.company_ids）；舊 DTO 沒有這個
+        # 欄位時退回 rows——此時只帶前 limit 名，排在其後的公司會被誤判成
+        # 「不在排序」，寧可標示保守也不猜。
+        _ranked_company_ids = set(ranking.get("company_ids") or []) or {
+            str(row.get("company_id") or "")
+            for key in ("actionable", "structural")
+            for row in (ranking.get(key) or [])
+        }
+        ready_not_ranked: list[dict[str, Any]] | None = [
+            {
+                "company_id": item["company_id"],
+                "weakest_axis": item.get("weakest_axis"),
+                "attention": item["attention"],
+            }
+            for item in ranked
+            if item.get("research_status") == "READY"
+            and not item.get("live_user_choice")
+            and item["company_id"] != "unresolved"
+            and item["company_id"] not in _ranked_company_ids
+        ]
+    else:
+        ready_not_ranked = None
+
     brief = {
         "schema_version": "engine-d-today-v1",
         "as_of": as_of,
         # 系統終點：瓶頸排序在前、NAV 比例在後。兩者都是注入的（見 docstring）。
         "ranking": dict(ranking) if ranking else None,
+        "ready_not_ranked": ready_not_ranked,
         "nav_exposure": dict(nav_exposure) if nav_exposure else None,
         "action_needed": attention != "MONITOR",
         "attention": attention,
@@ -954,6 +987,30 @@ def _render_ranking(ranking: Mapping[str, Any] | None) -> list[str]:
     return lines
 
 
+def _render_ready_not_ranked(rows: list[Any] | None) -> list[str]:
+    """C-1 常駐清單：研究完整但不在瓶頸排序內——只呈現，不催辦。
+
+    `None`（ranking 未注入、無法比對）時整區不渲染：成因已由排序區的
+    「未提供排序資料」警告現形，這裡再印一次是重複噪音。空 list 仍要渲染
+    「（無）」——常駐計數器的意義就是讓 0 也自己出現（L14）。
+    """
+    if rows is None:
+        return []
+    lines = ["## 研究完整但不在瓶頸排序內（常駐；只呈現，不催辦）", ""]
+    if not rows:
+        lines += ["（無）", ""]
+        return lines
+    for row in rows:
+        axis = markdown_text(row.get("weakest_axis") or "—")
+        lines.append(
+            f"- {markdown_text(row.get('company_id') or '?')}（最弱軸：{axis}）"
+            "——它的邊不在 substitutability≥4 的候選內（未填值或低替代難度），"
+            "研究已完整，等事件即可；若認為它該進排序，該補的是邊上的 substitutability"
+        )
+    lines.append("")
+    return lines
+
+
 def _render_nav_exposure(nav: Mapping[str, Any] | None) -> list[str]:
     """持股 NAV 比例——排序之後。純呈現，不判斷失衡。
 
@@ -1016,6 +1073,7 @@ def render_today_markdown(brief: Mapping[str, Any]) -> str:
     blockers = "、".join(markdown_text(item) for item in brief.get("blockers") or []) or "無"
     # 首屏是瓶頸排序——系統的終點是「哪些標的值得看」，不是「今天要不要動作」。
     lines = _render_ranking(brief.get("ranking"))
+    lines += _render_ready_not_ranked(brief.get("ready_not_ranked"))
     lines += _render_nav_exposure(brief.get("nav_exposure"))
     lines += [
         f"# 今天需要動作嗎？{'是' if brief['action_needed'] else '否'}",

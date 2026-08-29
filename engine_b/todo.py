@@ -1977,12 +1977,20 @@ def _item_line(item: Mapping[str, Any]) -> str:
         )
     else:
         flag = "（已 defer）" if item.get("deferred_at") else ""
+    # 決策行（AGENTS.md 2026-08-29 定案）：第一行就要能決定要不要展開——
+    # 做什麼（title）＋ go 授權什麼／不含什麼（GO_AUTHORIZATION，L16：分類跟著資料走）。
+    # 已 dispatch 的項目不吃 go，不重複授權邊界。
     line = f"  [{item['n']}] {item['title']}{flag}"
+    if not item.get("dispatch_status"):
+        scope = go_authorization(str(item.get("type") or ""))
+        line += f"\n        ↳ go＝{scope['go_authorizes']}；不含{scope['go_excludes']}"
     # decision_review 的區段標題只寫得出一種成因（見 _dispatchable_cohorts）。
     # 逐項 hint 才知道這一筆該 dispatch 還是該 reassess——不顯示等於沒有，
     # 使用者只會看到區段標題然後下錯 verb（2026-08-26 實測）。
+    # 其他類型的 hint 是密度契約的內容（TL;DR），先前在 CLI 完全不顯示＝資訊遺失；
+    # 決策行契約是改閱讀順序不減密度，故一併收在決策行下面。
     hint = str(item.get("hint") or "").strip()
-    if item.get("type") == "decision_review" and hint and not item.get("dispatch_status"):
+    if hint and not item.get("dispatch_status"):
         line += f"\n        ↳ {hint}"
     return line
 

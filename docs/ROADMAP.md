@@ -130,7 +130,7 @@ commit message 寫「這是純重構」，錯誤會原封不動進 master；因�
 |---|---|---|---|---|
 | ~~**A**~~ | ~~移除 compound-engineering（ce）~~ | ✅ **2026-08-29 完成**，見「已交付」。 | — | — |
 | **B** | **Daily 架構重整＋beta 減量（可大修）** | 使用者定案。beta 區目前是 daily 最長的一段（主力逐檔表＋燈號＋pace＋貸款區塊），而 2026-08-01 已實測 beta **訊號 0 勝 3 敗**、有證據的只有 baseline 定投——呈現成本與證據價值不成比例。⚠ 減量不等於刪除行情心跳：`AGENTS.md`「行情表是每日心跳」仍然生效，要減的是**訊號衍生的敘述**，不是最新交易日與 1 日漲跌。 | ①單次 daily 的輸出長度與 token 用量下降，且 **pq2 項目數不減少**（先量 baseline，否則分不出「變精簡」與「漏掉東西」）；②「研究完整但不在瓶頸排序內」的標的數 → 0（見下方 C-1）。 | 先量現行 daily 的 token 與輸出長度 |
-| **C** | **把 pq1 drain 乾淨** | session start 顯示 **95 條 `triaged_go` 待深挖**；每輪上限是 `config/daily_routine.json` 的 `pq1.drain_limit_per_run`（吞吐 cap，非每日 quota），積壓不會自己消。排序問題已於 3a 修掉（改字典序），所以現在消化的順序是對的。 | `triaged_go` 待深挖數由現值降到單輪可消化。**動工前記下現值**（`python -m engine_b.cli pending` 或 daily brief 首行）。 | 3a 已完成 |
+| ~~**C**~~ | ~~把 pq1 drain 乾淨~~ | ✅ **2026-08-29 完成**：110 條 `triaged_go`（66 Form 4＋11 filing＋11 Sivers/IQE＋22 X）逐條追源處置至 **0**，同日 decompose 產出的 11 條新題亦全數研究完畢再歸零（commit `c03743b`→`3acf18e`）。查證：`python -m engine_b.cli counts` 的 `triaged_go`。 | 110 → 0（兩次） | — |
 
 #### B 的範圍（2026-08-29 使用者細化）
 
@@ -165,7 +165,10 @@ commit message 寫「這是純重構」，錯誤會原封不動進 master；因�
   「高信心」不構成 machine permission，月息若需靠賣出 beta 支付則該 tranche 不成立。
   零星隨意投入才適用 LLM 比例建議。
 
-**B-2 alpha：pq2 每項太長，看不到重點。**
+**B-2 alpha：pq2 每項太長，看不到重點。** ✅ **2026-08-29 落地**：`engine_b/todo.py` 的
+`GO_AUTHORIZATION`（先前只有登記表、消費端 0——L13）已接進 `_item_line`，每個決策項第一行
+之後緊跟「go＝授權；不含排除」，hint（密度內容）收在其下並擴及所有類型（先前僅
+decision_review 顯示＝其他類型的 TL;DR 在 CLI 完全遺失）。C-1 亦同日落地（見下）。
 
 使用者可接受術語，問題是**掃不到**。⚠ 這不是「2026-07-30 內容密度契約寫錯了」——那份契約
 是為了修相反的毛病（項目只有 `co:*` ID，使用者無法還原主詞）。現在感受到的是它的代價：
@@ -186,6 +189,13 @@ commit message 寫「這是純重構」，錯誤會原封不動進 master；因�
 兩個方向：把「`READY` 且尚無 live choice」重新納入 pq2 收集（會回到待辦編號），或在首屏加一段
 「研究完整但不在瓶頸排序內」的常駐清單（只呈現、不催辦）。後者較符合「不給尺寸、只給候選」的契約。
 刻意不在 review 收尾時半修——它是首屏結構問題，屬 B 的範圍。
+✅ **2026-08-29 落地（採常駐清單方向）**：brief item 新增 `research_status`／`live_user_choice`
+（L16 跟著資料走）、DTO 新增 `ready_not_ranked`（ranking 未注入時為 None，不與空 list 混用），
+首屏排序區後渲染「研究完整但不在瓶頸排序內（常駐；只呈現，不催辦）」。
+⚠ 實作時踩到並修掉一個誤報源：ranking DTO 的 rows 只帶前 `limit` 名，直接比對會把
+排 11 名之後的公司誤判成「不在排序」——`ranking_view` 已加截斷前的完整 `company_ids` 集合。
+首跑實測清單=co:iqe、co:sivers（兩者的邊未填 substitutability，非工業標的過濾——
+說明文字如實指出「該補的是邊上的 substitutability」）。
 
 ---
 
@@ -210,7 +220,7 @@ target 全是同一個 0.1%，常數不帶資訊，而使用者要的是「撒�
 |---|---|---|---|
 | **3a** | `config/lead_classification.json` ＋ `signal-triage` 分類 ＋ `priority.py` 改字典序 ＋ 90 則 backfill | **pq1 前 5 名裡「只是信心／無內容」筆數：3 → 0** | ✅ 2026-08-22 完成（見「已交付」） |
 | **3b** | `skills/alpha-status/SKILL.md`（純消費，四 pane；**一個數字都不自己重算**，否則是改自己的考卷） | 能一句話回答「現在加碼哪一檔」，三類缺口各自現形 | ✅ 2026-08-22 完成。首跑即給出明確首選（COHR）並讓三類缺口現形；同輪查出 `daily-brief` 自 08-19 維護的**第二份三維度判準**已就地過期，改為委派 alpha-status（「清單會腐壞」實例） |
-| **3c** | `skills/system-decompose/SKILL.md`——使用者可隨時呼叫，週掃只執行積壓題＋提名候選（**不可讓無人值守排程自己選題**，它只能從圖裡挑＝原地繞回） | 首次拆解**未知層 Z ≥ 1**，且最終長出 ≥1 條有供應商的邊。⚠ Z=0 的正確結論是「拆得太粗」，不是「覆蓋完整」 | 🟡 2026-08-25 首次實跑（commit `6f93dff`）：拆 NVIDIA Quantum-X Photonics Q3450-LD，17 層，**Z=5**——驗收前半達標，此機制非裝飾品。五個未知層有四個集中在「光怎麼進出晶片」（MRM、垂直光柵耦合器、FAU、主動對準），已註冊 4 題各帶一手錨點。**後半（長出 ≥1 條有供應商的邊）仍未達成**——4 題尚未研究，圖中仍是 0 條新邊 |
+| **3c** | `skills/system-decompose/SKILL.md`——使用者可隨時呼叫，週掃只執行積壓題＋提名候選（**不可讓無人值守排程自己選題**，它只能從圖裡挑＝原地繞回） | 首次拆解**未知層 Z ≥ 1**，且最終長出 ≥1 條有供應商的邊。⚠ Z=0 的正確結論是「拆得太粗」，不是「覆蓋完整」 | ✅ **2026-08-29 兩項驗收皆達成**。08-25 首跑 Z=5（commit `6f93dff`）；08-29 第二跑（使用者選題 NVIDIA CPO switch）Z=8，衍生研究＋onboard 後長出**兩條有供應商的邊**：`co:foci → tech:fiber_attach_unit`（上詮，FAU 層 1→2 家）與 `co:luxnet → tech:cw_dfb_laser`（華星光，CW DFB 台系量產者），另 Fabrinet 三邊入圖（commit `3acf18e`）。機制證實能產出「圖裡原本沒有的名字」 |
 | **2** | epoch 錨點：cohort／epoch 兩個都留，epoch 錨點**不得事後回填**；補 COHR epoch 2 的 08-18 錨點 | 未來 outcome 的正確性。**不會讓 0/8 變 1/8，別記成進展** | 未開始 |
 
 ### 主題範圍（2026-08-20 使用者定案）
