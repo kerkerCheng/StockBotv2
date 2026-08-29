@@ -4053,10 +4053,11 @@
       "added_at": "2026-08-29T06:40:44.906295+00:00",
       "hint": "核准後以 `todo complete-thesis-mutation <編號>` 寫入 lifecycle.json；理由：v4 lane memo 已依 2026-08-28 revise 決議完成改寫（thesis/sivers_v4_lane_memo.md，evidence sidecar 通過驗證）：重編結果 -SEK 4.314M 證偽 Ningi ",
       "n": 251,
-      "reason": null,
+      "reason": "使用者核准後寫入 thesis lifecycle",
+      "receipt": "thesis:sivers:active;proposal:tm_fbcf9bfeb1d5a1442e3dad1fe6c4b090",
       "ref_id": "tm_fbcf9bfeb1d5a1442e3dad1fe6c4b090",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-29T07:50:37.985306+00:00",
       "source": "thesis",
       "title": "thesis sivers：revised → active",
       "type": "thesis_mutation"
@@ -9310,6 +9311,15 @@
       "receipt": "action:ra_5ad4db87304fa31e61183fbb062b9cec;digest:baa8751ce26708a52b25704b8845a57642d20b516efd08146bd7fce516b9e7e7;commit:90bb87937bec005aedbebc55b34517eea71f7473;cohort:dc_2bd6137c75808ec4f28541111927d588",
       "ref_id": "ra_5ad4db87304fa31e61183fbb062b9cec",
       "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-29T07:50:37.985306+00:00",
+      "n": 251,
+      "reason": "使用者核准後寫入 thesis lifecycle",
+      "receipt": "thesis:sivers:active;proposal:tm_fbcf9bfeb1d5a1442e3dad1fe6c4b090",
+      "ref_id": "tm_fbcf9bfeb1d5a1442e3dad1fe6c4b090",
+      "type": "thesis_mutation",
       "verb": "go"
     }
   ],

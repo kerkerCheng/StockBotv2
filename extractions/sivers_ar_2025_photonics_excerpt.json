@@ -17,8 +17,8 @@
   "sources": [
     {
       "id": "sivers_ar_2025_photonics_excerpt_s10",
-      "locator": "原始 extraction 未保存於 repo（2026-07-16 入圖，未 commit）；結構由圖反向重建，quote 遺失無法復原，raw 全文見 library/raw/sivers_ar_2025_photonics_excerpt.txt",
-      "quote": null
+      "locator": "2025 Annual Report PDF p.10 CEO letter；quote 於 2026-08-29 由官方 PDF（Sivers_annualreport_2025_2.pdf）pypdf 重抽後以 claim 錨定回填並去連字號換行，原 2026-07-16 extraction 對應遺失（見原 locator 註記）",
+      "quote": "Scale-up drives the demand for high-performance, energy-efficient optical interconnects that can replace copper over short distances. This is where Sivers advanced DWDM laser arrays coupled with Co-Packaged silicon photonics chiplets become strategically critical."
     },
     {
       "id": "sivers_ar_2025_photonics_excerpt_s11",
@@ -27,8 +27,8 @@
     },
     {
       "id": "sivers_ar_2025_photonics_excerpt_s12",
-      "locator": "原始 extraction 未保存於 repo（2026-07-16 入圖，未 commit）；結構由圖反向重建，quote 遺失無法復原，raw 全文見 library/raw/sivers_ar_2025_photonics_excerpt.txt",
-      "quote": null
+      "locator": "2025 Annual Report PDF p.10 CEO letter；quote 於 2026-08-29 由官方 PDF（Sivers_annualreport_2025_2.pdf）pypdf 重抽後以 claim 錨定回填並去連字號換行，原 2026-07-16 extraction 對應遺失（見原 locator 註記）",
+      "quote": "The collaboration positions both companies to address the rapidly growing AI optical connectivity market, with prototypes will be demonstrated to customers in the first half of 2026 and production readiness targeted by year-end 2026."
     },
     {
       "id": "sivers_ar_2025_photonics_excerpt_s13",
@@ -47,8 +47,8 @@
     },
     {
       "id": "sivers_ar_2025_photonics_excerpt_s16",
-      "locator": "原始 extraction 未保存於 repo（2026-07-16 入圖，未 commit）；結構由圖反向重建，quote 遺失無法復原，raw 全文見 library/raw/sivers_ar_2025_photonics_excerpt.txt",
-      "quote": null
+      "locator": "2025 Annual Report PDF p.10 CEO letter；quote 於 2026-08-29 由官方 PDF（Sivers_annualreport_2025_2.pdf）pypdf 重抽後以 claim 錨定回填並去連字號換行，原 2026-07-16 extraction 對應遺失（見原 locator 註記）",
+      "quote": "As these trials progress, we expect a subset of these customers to commit to production plans with Sivers lasers in 2027 and beyond."
     },
     {
       "id": "sivers_ar_2025_photonics_excerpt_s19",
@@ -77,8 +77,8 @@
     },
     {
       "id": "sivers_ar_2025_photonics_excerpt_s5",
-      "locator": "原始 extraction 未保存於 repo（2026-07-16 入圖，未 commit）；結構由圖反向重建，quote 遺失無法復原，raw 全文見 library/raw/sivers_ar_2025_photonics_excerpt.txt",
-      "quote": null
+      "locator": "2025 Annual Report PDF p.10 CEO letter；quote 於 2026-08-29 由官方 PDF（Sivers_annualreport_2025_2.pdf）pypdf 重抽後以 claim 錨定回填並去連字號換行，原 2026-07-16 extraction 對應遺失（見原 locator 註記）",
+      "quote": "In April 2025, Sivers announced a strategic partnership with O-Net Technologies to produce high-performance external laser sources, a critical component for next-generation Co-Packaged Optics (CPO) in switches, network interface cards, delivering significantly lower power consumption compared with traditional pluggable transceivers."
     },
     {
       "id": "sivers_ar_2025_photonics_excerpt_s6",
@@ -92,13 +92,13 @@
     },
     {
       "id": "sivers_ar_2025_photonics_excerpt_s8",
-      "locator": "原始 extraction 未保存於 repo（2026-07-16 入圖，未 commit）；結構由圖反向重建，quote 遺失無法復原，raw 全文見 library/raw/sivers_ar_2025_photonics_excerpt.txt",
-      "quote": null
+      "locator": "2025 Annual Report PDF p.10 CEO letter；quote 於 2026-08-29 由官方 PDF（Sivers_annualreport_2025_2.pdf）pypdf 重抽後以 claim 錨定回填並去連字號換行，原 2026-07-16 extraction 對應遺失（見原 locator 註記）",
+      "quote": "Discussions with hyperscalers and pluggable transceiver vendors suggest a CW laser supply shortage in the next few years as the industry transitions from 800G to 1.6T and eventually to 3.2T bandwidths."
     },
     {
       "id": "sivers_ar_2025_photonics_excerpt_s9",
-      "locator": "原始 extraction 未保存於 repo（2026-07-16 入圖，未 commit）；結構由圖反向重建，quote 遺失無法復原，raw 全文見 library/raw/sivers_ar_2025_photonics_excerpt.txt",
-      "quote": null
+      "locator": "2025 Annual Report PDF p.10 CEO letter；quote 於 2026-08-29 由官方 PDF（Sivers_annualreport_2025_2.pdf）pypdf 重抽後以 claim 錨定回填並去連字號換行，原 2026-07-16 extraction 對應遺失（見原 locator 註記）",
+      "quote": "We currently have strong traction and interest sampling our CW DFB lasers to several pluggable transceiver manufacturers world-wide."
     }
   ],
   "nodes": [

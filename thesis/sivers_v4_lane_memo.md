@@ -1,4 +1,4 @@
-<!-- output_type: [Research Note] | ticker: SIVE.ST | checklist_pass: True | l9_pass: False | evidence_manifest_pass: False | evidence_gate_pass: False -->
+<!-- output_type: [Watchlist Candidate] | ticker: SIVE.ST | checklist_pass: True | l9_pass: True | evidence_manifest_pass: True | evidence_gate_pass: True -->
 
 # Directional Lane Memo — Sivers Semiconductors (SIVE.ST) v4
 
@@ -69,16 +69,3 @@
 - **Jabil 1.6T qualification 進度**（每季）。
 - **競品動態**：Lumentum CW DFB 產能／客戶、POET Blazar 具名客戶採用 [E16]。
 - **現金消耗率**（每季）：以 H1 節奏推算 runway，825M 募資約可支撐至 2028；若消耗加速須提前重估。
-
-## Evidence Manifest Errors
-本稿無法驗證引用鏈，因此只能保存為 Research Note。
-- E4: source_id has no verbatim quote: sivers_ar_2025_photonics_excerpt_s8
-- E5: source_id has no verbatim quote: sivers_ar_2025_photonics_excerpt_s10
-- E6: source_id has no verbatim quote: sivers_ar_2025_photonics_excerpt_s9
-- E6: source_id has no verbatim quote: sivers_ar_2025_photonics_excerpt_s16
-- E7: source_id has no verbatim quote: sivers_ar_2025_photonics_excerpt_s5
-- E7: source_id has no verbatim quote: sivers_ar_2025_photonics_excerpt_s12
-
-## Evidence Gate Notes
-
-本報告因上述 evidence gate 未通過，維持 Research Note。
