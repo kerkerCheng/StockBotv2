@@ -1,0 +1,94 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mops_4979_annual_report_2025",
+    "title": "華星光通科技（LuxNet, 4979.TWO）114 年度股東會年報——CW DFB substitutability addendum（自主研究迴圈第 1 輪）",
+    "source_type": "filing",
+    "evidence_tier": 1,
+    "origin_entity": "LuxNet (華星光通科技)",
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "MOPS 公開資訊觀測站公開文件；保留 canonical 來源與研究必要摘錄，全文存 library/raw。",
+    "url": "https://mopsov.twse.com.tw/nas/STR/2025_4979_annual_report.pdf",
+    "publisher": "MOPS 公開資訊觀測站",
+    "published_at": "2026-05-31",
+    "retrieved_at": "2026-08-29"
+  },
+  "sources": [
+    {
+      "id": "mops_4979_annual_report_2025_s2",
+      "locator": "致股東報告書／營運概況——CW DFB 開發",
+      "quote": "因應 AI 伺服器及雲端運算資料中心應用所需高速光通訊元件的需求，本公司自 2019 年即與策略合作夥伴共同開發 CW DFB Laser 晶粒的研發及量產，目前也已獲得數家主要客戶之肯定與採用，力求逐漸將主力產品延伸至高端產品如 100mW CW DFB 及 100G/200GEML-DFB。"
+    },
+    {
+      "id": "mops_4979_annual_report_2025_s4",
+      "locator": "主要產品種類與商品項目",
+      "quote": "主要產品種類 114度 營業收入 營業比重 光通訊主動元件及模組 3,786,274 86.35 晶粒 484,378 11.05 其他 114,194 2.60 合計 4,384,846 100,00 ... 因應雲端運算資料中心需求，建立 OEM/ODM 一站式代工服務，100G~1.6T 光引擎及 CoC 封裝，與客戶深度合作開發。"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:sivers_semiconductors",
+      "type": "Company",
+      "name": "Sivers Semiconductors",
+      "aliases": ["SIVE.ST", "Sivers"],
+      "role": null,
+      "abstraction_level": "device_chip",
+      "confidence": 0.85,
+      "source_ids": ["mops_4979_annual_report_2025_s2"],
+      "attributes": {}
+    },
+    {
+      "id": "co:luxnet",
+      "type": "Company",
+      "name": "LuxNet",
+      "aliases": ["華星光通", "4979.TWO"],
+      "role": null,
+      "abstraction_level": "device_chip",
+      "confidence": 0.9,
+      "source_ids": ["mops_4979_annual_report_2025_s2"],
+      "attributes": {}
+    },
+    {
+      "id": "tech:cw_dfb_laser",
+      "type": "TechNode",
+      "name": "Continuous-wave DFB laser",
+      "aliases": ["CW DFB laser"],
+      "role": null,
+      "abstraction_level": "device_chip",
+      "confidence": 0.85,
+      "source_ids": ["mops_4979_annual_report_2025_s2"],
+      "attributes": {}
+    }
+  ],
+  "edges": [
+    {
+      "id": "e2",
+      "src_id": "co:sivers_semiconductors",
+      "relation": "supplies_to",
+      "dst_id": "tech:cw_dfb_laser",
+      "confidence": 0.7,
+      "source_ids": ["mops_4979_annual_report_2025_s2"],
+      "attributes": {"substitutability": 2}
+    },
+    {
+      "id": "e3",
+      "src_id": "co:luxnet",
+      "relation": "supplies_to",
+      "dst_id": "tech:cw_dfb_laser",
+      "confidence": 0.7,
+      "source_ids": ["mops_4979_annual_report_2025_s2"],
+      "attributes": {"substitutability": 2}
+    }
+  ],
+  "claims": [
+    {
+      "id": "mops_4979_annual_report_2025_cl5",
+      "statement": "CW DFB laser die 供應層存在多家並存的量產／準量產供應者（LuxNet 自 2019 年量產且已獲數家主要客戶採用，為既有大廠之外的追加產能）；對 pre-ramp 或挑戰者地位的單一供應商，此層的 substitutability 判為 2/5——多家可替代，但受光學元件 3-6 個月以上 qualification 週期的切換摩擦保護，不至於 1/5。此為研究判斷，非統計量測。",
+      "subject_id": "co:sivers_semiconductors",
+      "confidence": 0.7,
+      "demand_proof_level": "guided",
+      "source_ids": ["mops_4979_annual_report_2025_s2", "mops_4979_annual_report_2025_s4"],
+      "disproof_condition": "若 800G/1.6T 世代出現規格分化使合格供應者集合縮小（如 100mW 高功率或 narrow-spec 良率門檻導致客戶端只認證 1-2 家），上修 sub 值並重評；若 Sivers 取得具名量產客戶，其邊的 sub 判斷須單獨重評。"
+    }
+  ]
+}

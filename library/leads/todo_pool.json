@@ -4124,6 +4124,18 @@
       "source": "decision_lab",
       "title": "co:micron_technology：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-29T14:10:18.727516+00:00",
+      "hint": "go＝執行 python -m loader.load_to_neo4j extractions/cw_dfb_substitutability_addendum_2026_08_29.json（已通過 validate；對 sivers→cw_dfb 與 luxnet→cw_dfb 兩邊寫入 substitutability=2＋一條判斷 claim 附 disproof）。依據：圖中五家 CW DFB 供應者並存（Lumentum/Coherent/Sivers/聯亞/LuxNet）、LuxNet 2019 起量產（年報一手）、Sivers 仍 sampling、光學 qualification 3-6 月+（Fabrinet 10-K）。不含：其他三家的 sub 值（各自證據齊備再判）、任何 thesis/live 動作。誠實後果：SIVE 仍不進瓶頸排序（2<4），C-1 清單持續顯示它——缺席從此有據可查。L8：錨點文件為 LuxNet 年報，對『Sivers 可替代』屬競爭者側證據非 Sivers 自報；judgment 推理跨三個獨立 origin。",
+      "n": 256,
+      "reason": null,
+      "ref_id": "extraction=extractions/cw_dfb_substitutability_addendum_2026_08_29.json",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "CW DFB 供應邊 substitutability 補值：Sivers 與 LuxNet 各判 2/5（多家可替代、qualification 摩擦防 1/5）——SIVE 排序缺席將被確認為正確",
+      "type": "manual"
     }
   ],
   "log": [
@@ -9464,6 +9476,6 @@
       "verb": "drop"
     }
   ],
-  "next_n": 256,
+  "next_n": 257,
   "schema_version": "1"
 }
