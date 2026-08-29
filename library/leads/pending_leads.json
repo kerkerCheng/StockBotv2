@@ -8417,6 +8417,43 @@
       },
       "url": "https://research.tsmc.com/page/on-chip-interconnect/14.html"
     },
+    "lead_1446a653c191897aeddb8b84419e4456": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-29T07:59:24.021452+00:00",
+      "lead_id": "lead_1446a653c191897aeddb8b84419e4456",
+      "published_at": "2026-08-29",
+      "refs": {},
+      "source": "decompose:nvda-cpo-switch-2026-08-29",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CPO"
+          ]
+        }
+      },
+      "title": "CPO switch 液冷層：Q3450 液冷冷板同時冷卻 switch core 與光模組——誰供應資料中心級 CPO 液冷？一手未點名＝完全空白（圖中只有 TEC）",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-29T07:59:24.021598+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "decompose 產出之未知層研究題目"
+        },
+        "decided_at": "2026-08-29T07:59:24.021598+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "NVIDIA 官方文件多處強調液冷設計但未點名供應商；圖中冷卻層只有 tech:tec（元件級 TEC，Coherent），機櫃／switch 級液冷是未知層。",
+        "tier": 2
+      },
+      "url": "https://developer.nvidia.com/blog/how-industry-collaboration-fosters-nvidia-co-packaged-optics/?decompose=cooling"
+    },
     "lead_1448cac72d89476ff3c76b88f2e11381": {
       "entities": {
         "company_ids": [
@@ -16745,6 +16782,35 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2086157318065168490"
     },
+    "lead_484d659a31cbf1e25a837210e9fb0622": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-29T07:59:24.020677+00:00",
+      "lead_id": "lead_484d659a31cbf1e25a837210e9fb0622",
+      "published_at": "2026-08-29",
+      "refs": {},
+      "source": "decompose:nvda-cpo-switch-2026-08-29",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "OSA 光學次組件層：Quantum-X 每台 6 個 socket-based hermetically-sealed OSA（各 4.8T×2、3 個 COUPE optical engine）——誰設計／組裝 OSA？一手未點名＝未知層",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-29T07:59:24.020926+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "decompose 產出之未知層研究題目"
+        },
+        "decided_at": "2026-08-29T07:59:24.020926+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "NVIDIA blog 逐字描述 OSA 結構但未點名組裝方；ecosystem 名單（Fabrinet 等）未指定分工，依 L6 Gap4 不得推斷。圖中無 OSA 節點。",
+        "tier": 2
+      },
+      "url": "https://developer.nvidia.com/blog/how-industry-collaboration-fosters-nvidia-co-packaged-optics/?decompose=osa"
+    },
     "lead_486e4bcc8003167a6997376455b5a2c9": {
       "entities": {
         "company_ids": [
@@ -18111,6 +18177,35 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2072925550608523738"
     },
+    "lead_55bd36e6cab9fdd81f0668215af10431": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-29T07:59:24.020993+00:00",
+      "lead_id": "lead_55bd36e6cab9fdd81f0668215af10431",
+      "published_at": "2026-08-29",
+      "refs": {},
+      "source": "decompose:nvda-cpo-switch-2026-08-29",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "可拆卸光連接器層：Spectrum-X 用 detachable optical connector 支撐自動化量產；SENKO 具名於 NVIDIA PR 生態系（連接器商、未上市？）——connector 幾家能做、qualification 週期？",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-29T07:59:24.021186+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "decompose 產出之未知層研究題目"
+        },
+        "decided_at": "2026-08-29T07:59:24.021186+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "NVIDIA PR（2025-03-18）具名 SENKO；blog 明寫 detachable optical connector 是 mass-manufacturing 關鍵。圖中無 connector 層節點。",
+        "tier": 1
+      },
+      "url": "https://nvidianews.nvidia.com/news/nvidia-spectrum-x-co-packaged-optics-networking-switches-ai-factories?decompose=connector"
+    },
     "lead_55cab39b615fdf8874be6ca518e6618e": {
       "entities": {
         "company_ids": [],
@@ -18697,6 +18792,35 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2074782041909195014"
+    },
+    "lead_5838056904d872aa236cff2a570d1e11": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-29T07:59:23.997550+00:00",
+      "lead_id": "lead_5838056904d872aa236cff2a570d1e11",
+      "published_at": "2026-08-29",
+      "refs": {},
+      "source": "decompose:nvda-cpo-switch-2026-08-29",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "MRM modulator 技術層：誰能量產 200G PAM4/λ micro-ring modulator？MRM vs TFLN vs MZM 路線替代性（NVIDIA×TSMC COUPE 已量產；圖有 TFLN 節點、無 MRM 節點）",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-29T07:59:24.017745+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "decompose 產出之未知層研究題目"
+        },
+        "decided_at": "2026-08-29T07:59:24.017745+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "NVIDIA 官方技術 blog（2025-08-26）逐字：MRM 矽光子引擎 200Gbps PAM4/波長、TSMC 合作解決量產（fabrication control／thermal sensitivity）。圖中 modulator 技術層只有 TFLN——modulator 路線之爭是 CPO stack 的候選集合缺口。",
+        "tier": 2
+      },
+      "url": "https://developer.nvidia.com/blog/how-industry-collaboration-fosters-nvidia-co-packaged-optics/?decompose=mrm"
     },
     "lead_586d4451effd3b1206f2076b29aab69a": {
       "entities": {
@@ -29007,6 +29131,43 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2093230562261823905"
     },
+    "lead_94dbcea8239b2f3feb6bffeefbbade53": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-29T07:59:24.022037+00:00",
+      "lead_id": "lead_94dbcea8239b2f3feb6bffeefbbade53",
+      "published_at": "2026-08-29",
+      "refs": {},
+      "source": "decompose:nvda-cpo-switch-2026-08-29",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CPO"
+          ]
+        }
+      },
+      "title": "SoIC 3D 堆疊／OSAT 層：TSMC SoIC（CMOS-on-photonics micron 級堆疊）＋SPIL 具名於生態系——CPO 封裝的 OSAT 集中度與替代性？",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-29T07:59:24.022199+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "decompose 產出之未知層研究題目"
+        },
+        "decided_at": "2026-08-29T07:59:24.022199+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "TSMC CEO 於 PR 逐字提及 SoIC 3D chip stacking；SPIL 具名但不在圖。圖 tech:advanced_packaging 的供應商是 Tower/AMAT（別條脈絡），NVIDIA CPO 封裝鏈未建模。",
+        "tier": 1
+      },
+      "url": "https://nvidianews.nvidia.com/news/nvidia-spectrum-x-co-packaged-optics-networking-switches-ai-factories?decompose=soic"
+    },
     "lead_9560cb7de6f030c75af6b74251114924": {
       "entities": {
         "company_ids": [
@@ -29040,6 +29201,43 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2078259660784910661"
+    },
+    "lead_95b0d3624dfaf66bc5022912310661c4": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-29T07:59:24.021220+00:00",
+      "lead_id": "lead_95b0d3624dfaf66bc5022912310661c4",
+      "published_at": "2026-08-29",
+      "refs": {},
+      "source": "decompose:nvda-cpo-switch-2026-08-29",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CPO"
+          ]
+        }
+      },
+      "title": "CPO 光纖層：laser input fiber（每 engine 2 條）＋內部 fiber routing；Corning／Sumitomo Electric／TFC Communication／Browave 具名於 NVIDIA 生態系——分工與集中度？",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-29T07:59:24.021420+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "decompose 產出之未知層研究題目"
+        },
+        "decided_at": "2026-08-29T07:59:24.021420+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "NVIDIA PR 具名四家 fiber/光元件商但未指定分工；圖有 tech:pm_fiber/fiber_attach_unit（Coherent 鏈）但無 NVIDIA CPO 光纖供應鏈。TFC/Browave 不在 registry。",
+        "tier": 1
+      },
+      "url": "https://nvidianews.nvidia.com/news/nvidia-spectrum-x-co-packaged-optics-networking-switches-ai-factories?decompose=fiber"
     },
     "lead_95daa27b4775895e2bec873b7b829bd5": {
       "entities": {
@@ -35835,6 +36033,43 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1045810/000119764726000005/xslF345X06/wk-form4_1783371701.xml"
     },
+    "lead_bc427a52cef3692d38154ba5ff5ea9b3": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-29T07:59:24.021629+00:00",
+      "lead_id": "lead_bc427a52cef3692d38154ba5ff5ea9b3",
+      "published_at": "2026-08-29",
+      "refs": {},
+      "source": "decompose:nvda-cpo-switch-2026-08-29",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CPO"
+          ]
+        }
+      },
+      "title": "光子晶圓級測試／KGD 層：CPO 把光學整合進 switch 封裝後，photonics wafer test／known-good-die 決定良率經濟學——誰做光子測試？一手未點名＝未知層",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-29T07:59:24.021809+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "decompose 產出之未知層研究題目"
+        },
+        "decided_at": "2026-08-29T07:59:24.021809+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "拆解推導層（tier 4 成分：層的存在由封裝經濟學推出，NVIDIA 一手未著墨）；圖中無 photonics test 節點。co:aehr_test_systems 在 registry 但其 CPO 測試角色未經一手驗證，不得推斷。",
+        "tier": 2
+      },
+      "url": "https://developer.nvidia.com/blog/how-industry-collaboration-fosters-nvidia-co-packaged-optics/?decompose=test"
+    },
     "lead_bda14e2251939500ac89e6a7d487cc25": {
       "entities": {
         "company_ids": [
@@ -40849,6 +41084,43 @@
         "tier": 2
       },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-rapporterar-resultat-for-q2-2026-tillvaxt-i-produktforsaljning-rekordstor-pipeline-och-kunder-som-skalar-upp-positionerar-bolaget-for-accelererad-tillvaxt-866b28e6"
+    },
+    "lead_dabef2b4657350217cdd112112606b35": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-29T07:59:24.021856+00:00",
+      "lead_id": "lead_dabef2b4657350217cdd112112606b35",
+      "published_at": "2026-08-29",
+      "refs": {},
+      "source": "decompose:nvda-cpo-switch-2026-08-29",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CPO"
+          ]
+        }
+      },
+      "title": "CPO 系統組裝 ODM 層：Fabrinet／Foxconn 具名於 NVIDIA 生態系但分工未揭露；兩家皆不在圖——CPO switch 組裝集中度？",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-29T07:59:24.022003+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "decompose 產出之未知層研究題目"
+        },
+        "decided_at": "2026-08-29T07:59:24.022003+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "NVIDIA PR 具名 Fabrinet/Foxconn；系統組裝層在圖中完全缺席，Fabrinet（光模組 EMS 龍頭）不在 registry。",
+        "tier": 1
+      },
+      "url": "https://nvidianews.nvidia.com/news/nvidia-spectrum-x-co-packaged-optics-networking-switches-ai-factories?decompose=odm"
     },
     "lead_dae04385f45136615df2ad59e89981e4": {
       "entities": {
