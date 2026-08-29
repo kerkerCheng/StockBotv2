@@ -1,0 +1,4 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/928876/000117891326004009/zk2635926.htm
+
+Excerpt:
+OpenLight and Tower Semiconductor Expand PH18DA Photonics Ecosystem to Accelerate Photonic IC Development — OpenLight's PDK is now available on Cadence's EDA tools, enabling PIC development on Tower's PH18DA InP-on-silicon photonics platform (SANTA BARBARA, Calif., and MIGDAL HAEMEK, Israel, August 11, 2026)

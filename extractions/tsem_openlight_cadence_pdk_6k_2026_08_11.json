@@ -1,0 +1,155 @@
+{
+  "claims": [
+    {
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Downgrade if the PDK is withdrawn from the Cadence photonics portfolio, the OpenLight-Tower partnership is terminated, or subsequent disclosures show no customer designs using the PDK within two years.",
+      "id": "tsem_openlight_cadence_pdk_6k_2026_08_11_cl1",
+      "source_ids": [
+        "tsem_openlight_cadence_pdk_6k_2026_08_11_s1",
+        "tsem_openlight_cadence_pdk_6k_2026_08_11_s4"
+      ],
+      "statement": "OpenLight's photonic Process Design Kit for Tower Semiconductor's PH18DA InP-on-silicon photonics platform became available in Cadence's EDA tools, announced 2026-08-11 via joint press release furnished in Tower's SEC 6-K.",
+      "subject_id": "co:tower_semiconductor"
+    },
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "guided",
+      "disproof_condition": "Downgrade if PH18DA fails customer qualification for NPO/CPO applications, no 400G/1.6T laser-integrated PIC tape-outs materialize on the platform, or Tower repositions PH18DA away from CPO.",
+      "id": "tsem_openlight_cadence_pdk_6k_2026_08_11_cl2",
+      "source_ids": [
+        "tsem_openlight_cadence_pdk_6k_2026_08_11_s2",
+        "tsem_openlight_cadence_pdk_6k_2026_08_11_s3"
+      ],
+      "statement": "Tower positions the PH18DA platform with the Cadence-integrated PDK as enabling development of 400G and 1.6T laser-integrated PICs with co-optimized PIC and EIC designs for next-generation NPO/CPO solutions; PH18DA monolithically integrates lasers, modulators and amplifiers in a single PIC.",
+      "subject_id": "co:tower_semiconductor"
+    },
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Correct if later authoritative disclosures restate the round size or total funding.",
+      "id": "tsem_openlight_cadence_pdk_6k_2026_08_11_cl3",
+      "source_ids": [
+        "tsem_openlight_cadence_pdk_6k_2026_08_11_s5"
+      ],
+      "statement": "OpenLight completed a $50 million Series A-1 funding round, bringing total funding to $84 million (self-reported in the joint press release boilerplate).",
+      "subject_id": "co:openlight_photonics"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "co:cadence",
+      "id": "e1",
+      "relation": "partnership_with",
+      "source_ids": [
+        "tsem_openlight_cadence_pdk_6k_2026_08_11_s1",
+        "tsem_openlight_cadence_pdk_6k_2026_08_11_s4"
+      ],
+      "src_id": "co:openlight_photonics"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "co:tower_semiconductor",
+      "id": "e2",
+      "relation": "partnership_with",
+      "source_ids": [
+        "tsem_openlight_cadence_pdk_6k_2026_08_11_s1",
+        "tsem_openlight_cadence_pdk_6k_2026_08_11_s3"
+      ],
+      "src_id": "co:openlight_photonics"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [
+        "Tower",
+        "TSEM"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:tower_semiconductor",
+      "name": "Tower Semiconductor",
+      "role": "foundry",
+      "source_ids": [
+        "tsem_openlight_cadence_pdk_6k_2026_08_11_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "OpenLight Photonics"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:openlight_photonics",
+      "name": "OpenLight",
+      "role": "disruptor",
+      "source_ids": [
+        "tsem_openlight_cadence_pdk_6k_2026_08_11_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "Cadence Design Systems",
+        "CDNS"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:cadence",
+      "name": "Cadence",
+      "role": "adjacent_silicon",
+      "source_ids": [
+        "tsem_openlight_cadence_pdk_6k_2026_08_11_s1"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "tsem_openlight_cadence_pdk_6k_2026_08_11",
+    "evidence_tier": 1,
+    "origin_entity": "Tower Semiconductor / OpenLight (joint press release)",
+    "permission_basis": "Official public SEC filing (6-K with furnished joint press release); canonical URL retained, only research-relevant excerpts stored.",
+    "published_at": "2026-08-11",
+    "publisher": "SEC EDGAR",
+    "retrieved_at": "2026-08-29",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Tower Semiconductor 6-K — OpenLight PDK available in Cadence EDA tools for PH18DA InP-on-silicon platform",
+    "url": "https://www.sec.gov/Archives/edgar/data/928876/000117891326004009/zk2635926.htm"
+  },
+  "sources": [
+    {
+      "id": "tsem_openlight_cadence_pdk_6k_2026_08_11_s1",
+      "locator": "press release lede",
+      "quote": "today announced the availability of OpenLight’s photonic Process Design Kit (PDK) for Tower Semiconductor’s PH18DA indium phosphide (InP)-on-silicon photonics platform in Cadence’s electronic design automation (EDA) tools."
+    },
+    {
+      "id": "tsem_openlight_cadence_pdk_6k_2026_08_11_s2",
+      "locator": "Tower VP Samir Chaudhry quote",
+      "quote": "This approach enables customers to streamline development of 400G and 1.6T laser-integrated photonic integrated circuits, while achieving co-optimized PIC and EIC designs for improved performance, power efficiency, and scalability necessary for next-generation near- and co-packaged optics (NPO/CPO) solutions."
+    },
+    {
+      "id": "tsem_openlight_cadence_pdk_6k_2026_08_11_s3",
+      "locator": "platform description paragraph",
+      "quote": "Designs created using OpenLight‘s PDK support fabrication on Tower’s PH18DA InP-on-silicon photonics platform, which enables the integration of active photonic components - including lasers, modulators, and amplifiers - into a single monolithic PIC."
+    },
+    {
+      "id": "tsem_openlight_cadence_pdk_6k_2026_08_11_s4",
+      "locator": "Cadence Gilles Lamant quote",
+      "quote": "Adding the OpenLight PDK PH18DA manufactured by Tower Semiconductor to the rich portfolio of photonics processes supported by the Cadence Photonics ecosystem is a key milestone because it marks the introduction of integrated active devices for high-performance, co-optimized electro-optical designs"
+    },
+    {
+      "id": "tsem_openlight_cadence_pdk_6k_2026_08_11_s5",
+      "locator": "About OpenLight",
+      "quote": "The company’s recent $50 million Series A-1 funding round, bringing total funding to $84 million, reflects growing commercial momentum and accelerating customer adoption across next-generation photonics applications."
+    }
+  ]
+}
