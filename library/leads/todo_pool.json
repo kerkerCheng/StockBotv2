@@ -1187,11 +1187,6 @@
       "resolution": null,
       "resolved_at": null,
       "source": "research_action",
-      "source_cleared": {
-        "at": "2026-08-29T20:18:41.500543+00:00",
-        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
-        "source_healthy": true
-      },
       "title": "Meta Vistara CXL 記憶體擴充平台",
       "type": "ra_admission",
       "waiting_on": {
@@ -3220,11 +3215,6 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
-      "source_cleared": {
-        "at": "2026-08-29T20:18:41.500543+00:00",
-        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
-        "source_healthy": true
-      },
       "title": "co:agility_robotics：補客戶端商業承諾：訂單、產能協議或預付款等付錢方向的證據",
       "type": "decision_review",
       "waiting_on": {
@@ -3768,11 +3758,6 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
-      "source_cleared": {
-        "at": "2026-08-29T20:18:41.500543+00:00",
-        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
-        "source_healthy": true
-      },
       "title": "co:schaeffler：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
     },
@@ -4056,11 +4041,6 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
-      "source_cleared": {
-        "at": "2026-08-29T20:18:41.500543+00:00",
-        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
-        "source_healthy": true
-      },
       "title": "co:marvell_technology：補估值錨點：市值、分析師覆蓋與隱含假設，回答股價已經定價了什麼",
       "type": "decision_review"
     },
@@ -4106,11 +4086,6 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
-      "source_cleared": {
-        "at": "2026-08-29T20:18:41.500543+00:00",
-        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
-        "source_healthy": true
-      },
       "title": "co:tower_semiconductor：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
     },
@@ -4123,11 +4098,6 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
-      "source_cleared": {
-        "at": "2026-08-29T20:18:41.500543+00:00",
-        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
-        "source_healthy": true
-      },
       "title": "co:harmonic_drive_systems：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
     },
@@ -4140,11 +4110,6 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
-      "source_cleared": {
-        "at": "2026-08-29T20:18:41.500543+00:00",
-        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
-        "source_healthy": true
-      },
       "title": "co:landmark_optoelectronics：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
     },
@@ -4157,11 +4122,6 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
-      "source_cleared": {
-        "at": "2026-08-29T20:18:41.500543+00:00",
-        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
-        "source_healthy": true
-      },
       "title": "co:micron_technology：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
     },
@@ -4176,6 +4136,18 @@
       "source": "manual",
       "title": "CW DFB 供應邊 substitutability 補值：Sivers 與 LuxNet 各判 2/5（多家可替代、qualification 摩擦防 1/5）——SIVE 排序缺席將被確認為正確",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-08-29T22:53:28.791688+00:00",
+      "hint": "核准 exact graph delta；Decision handoff：co:nvidia。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 257,
+      "reason": null,
+      "ref_id": "ra_629129d8cc213086921c07c14ba701e9",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "NVIDIA／TSMC Micro Ring Modulator 的量產尺度製程協作",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -9586,8 +9558,120 @@
       "ref_id": "dc_b05cc1360e4bdf2a238787c23e7b227d",
       "type": "decision_review",
       "verb": "source_cleared"
+    },
+    {
+      "at": "2026-08-29T22:41:51.842128+00:00",
+      "n": 81,
+      "prior_source_cleared": {
+        "at": "2026-08-29T20:18:41.500543+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
+      "reason": "來源再次產出此項，撤銷完成候選標記",
+      "receipt": null,
+      "ref_id": "ra_50f3ddb6cfe718afd7e2ef8b0481e686",
+      "type": "ra_admission",
+      "verb": "source_returned"
+    },
+    {
+      "at": "2026-08-29T22:41:51.842128+00:00",
+      "n": 200,
+      "prior_source_cleared": {
+        "at": "2026-08-29T20:18:41.500543+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
+      "reason": "來源再次產出此項，撤銷完成候選標記",
+      "receipt": null,
+      "ref_id": "dc_6ae5b014dbbcd0774b45487542c9a102",
+      "type": "decision_review",
+      "verb": "source_returned"
+    },
+    {
+      "at": "2026-08-29T22:41:51.842128+00:00",
+      "n": 230,
+      "prior_source_cleared": {
+        "at": "2026-08-29T20:18:41.500543+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
+      "reason": "來源再次產出此項，撤銷完成候選標記",
+      "receipt": null,
+      "ref_id": "dc_912a03a50135ea5e29000a0417c3f477",
+      "type": "decision_review",
+      "verb": "source_returned"
+    },
+    {
+      "at": "2026-08-29T22:41:51.842128+00:00",
+      "n": 249,
+      "prior_source_cleared": {
+        "at": "2026-08-29T20:18:41.500543+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
+      "reason": "來源再次產出此項，撤銷完成候選標記",
+      "receipt": null,
+      "ref_id": "dc_0fca807c963dc3b9888e0f83ba6d45a5",
+      "type": "decision_review",
+      "verb": "source_returned"
+    },
+    {
+      "at": "2026-08-29T22:41:51.842128+00:00",
+      "n": 252,
+      "prior_source_cleared": {
+        "at": "2026-08-29T20:18:41.500543+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
+      "reason": "來源再次產出此項，撤銷完成候選標記",
+      "receipt": null,
+      "ref_id": "dc_2bd6137c75808ec4f28541111927d588",
+      "type": "decision_review",
+      "verb": "source_returned"
+    },
+    {
+      "at": "2026-08-29T22:41:51.842128+00:00",
+      "n": 253,
+      "prior_source_cleared": {
+        "at": "2026-08-29T20:18:41.500543+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
+      "reason": "來源再次產出此項，撤銷完成候選標記",
+      "receipt": null,
+      "ref_id": "dc_cc46527aac12ba14191ee71c0460f3fe",
+      "type": "decision_review",
+      "verb": "source_returned"
+    },
+    {
+      "at": "2026-08-29T22:41:51.842128+00:00",
+      "n": 254,
+      "prior_source_cleared": {
+        "at": "2026-08-29T20:18:41.500543+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
+      "reason": "來源再次產出此項，撤銷完成候選標記",
+      "receipt": null,
+      "ref_id": "dc_f94148d8545de35cb2c5d048640b913e",
+      "type": "decision_review",
+      "verb": "source_returned"
+    },
+    {
+      "at": "2026-08-29T22:41:51.842128+00:00",
+      "n": 255,
+      "prior_source_cleared": {
+        "at": "2026-08-29T20:18:41.500543+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
+      "reason": "來源再次產出此項，撤銷完成候選標記",
+      "receipt": null,
+      "ref_id": "dc_b05cc1360e4bdf2a238787c23e7b227d",
+      "type": "decision_review",
+      "verb": "source_returned"
     }
   ],
-  "next_n": 257,
+  "next_n": 258,
   "schema_version": "1"
 }

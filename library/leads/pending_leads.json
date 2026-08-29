@@ -5272,6 +5272,144 @@
       "result": "ok",
       "run_at": "2026-08-29T00:06:34.708083+00:00",
       "source": "edgar:TSLA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-29T22:33:49.231878+00:00",
+      "source": "mfn:sivers-semiconductors"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-29T22:33:50.313356+00:00",
+      "source": "sivers:press"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-29T22:33:50.944625+00:00",
+      "source": "yahoo:iqe-l"
+    },
+    {
+      "new": 6,
+      "result": "ok",
+      "run_at": "2026-08-29T22:33:52.116015+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-29T22:33:53.771900+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-29T22:33:54.467972+00:00",
+      "source": "edgar:AEVA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-29T22:33:55.174850+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-29T22:33:55.685803+00:00",
+      "source": "edgar:AVGO"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-29T22:33:56.366456+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-29T22:33:57.071054+00:00",
+      "source": "edgar:CCXI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-29T22:33:57.742828+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-29T22:33:58.413466+00:00",
+      "source": "edgar:GFS"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-29T22:33:59.098363+00:00",
+      "source": "edgar:JBL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-29T22:33:59.765400+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-29T22:34:00.448215+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-29T22:34:01.127476+00:00",
+      "source": "edgar:META"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-29T22:34:01.633209+00:00",
+      "source": "edgar:MRVL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-29T22:34:02.329250+00:00",
+      "source": "edgar:MTSI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-29T22:34:02.831238+00:00",
+      "source": "edgar:MU"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-29T22:34:03.536442+00:00",
+      "source": "edgar:NVDA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-29T22:34:04.209276+00:00",
+      "source": "edgar:POET"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-29T22:34:04.882837+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-29T22:34:05.389165+00:00",
+      "source": "edgar:TSLA"
     }
   ],
   "leads": {
@@ -9726,9 +9864,17 @@
         "primary_url": "https://finance.biggo.com/news/18d4225c-e1a8-4df5-9217-e88dc0929a91",
         "research_outcome": "identity_confirmed_cpo_role_unverified_purity_concern",
         "research_run": "session:2026-08-29-tw-cpo-drain",
+        "trace_attempts_ref": "2026-08-30：已確認智邦 2345.TW 識別；以 NVIDIA／TSMC 一手新文件作可執行 trigger，避免未登記智邦 ticker 永遠沉底",
         "trace_next_trigger": "智邦法說或 NVIDIA 側具名其 CPO switch 組裝角色",
         "trace_requires_user": "false",
-        "trace_status": "partial"
+        "trace_status": "partial",
+        "trace_trigger_entities": [
+          "NVDA",
+          "TSM",
+          "co:nvidia",
+          "co:tsmc"
+        ],
+        "trace_trigger_kind": "primary_source_signal"
       },
       "source": "decompose:nvda-cpo-switch-2026-08-29",
       "status": "parked",
@@ -17781,6 +17927,97 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2074226270125383744"
     },
+    "lead_4fc2da14b0d039e4d27e517c136de5e9": {
+      "entities": {
+        "company_ids": [
+          "co:sivers_semiconductors",
+          "co:broadcom",
+          "co:lumentum",
+          "co:coherent",
+          "co:applied_optoelectronics"
+        ],
+        "tickers": [
+          "SIVE",
+          "AVGO",
+          "LITE",
+          "COHR",
+          "AAOI"
+        ]
+      },
+      "first_seen": "2026-08-29T22:33:52.111127+00:00",
+      "lead_id": "lead_4fc2da14b0d039e4d27e517c136de5e9",
+      "media": [],
+      "published_at": "2026-08-29T10:51:36.000Z",
+      "raw_text": "If I had to be critical of $SIVE earnings:\n\n1. Management underweighted the two disclosures that matter most.\n\n-> 6 pluggable engagements \n-> Foundry capacity (during an industry bottleneck)\n\nThat's the most important part of the call and should have been the focus to provide economic scale of them. But we got 2-3 sentences about it.  \n\nAnd it shouldn't take an Anime avatar on X to talk most about the implications of those. \n\n2. CFO needs retraining or bring on a new one.\n\nThe lawyer like answers were infuriating to listen to as a shareholder. Even I got pissed off with this statement:\n\n\"we will evaluate the timing and decide whether the conditions are right to move forward at that particular time.\" \n\nIt should be a 100% given by now they file for dual listing to escape hostile Swedish markets. \n\nShareholders didn't fund a future growth type company to hear lawyer-like answers. \n\nAgain, this was probably one of the worst answers the CFO could have gave and there needs to be firm commitment along with faster timelines. \n\n3. $70M should have gone toward M&A and dual listing. \n\n-> Brutally honestly speaking, it's a waste of capital to focus on hybrid manufacturing at this stage and I was disappointed to hear this during this timeframe.  \n\nIt's eventually needed but with 2 foundry suppliers \n\n-> You have a ton of new capital and large marketcap. \n\nUse it to pull $AVGO style acquisitions of Cloud Light style IP for pluggables or optical engines. \n\nLumilens went from 0 -> $5.5B in 2 years and now with hyperscaler engagements. \n\nSivers should expand out of the laser chokepoint as fast as possible and not stay just a component vendor. \n\nAnd most of all, who cares about competing with customers? If a customer says: \"if you do pluggables, we'll go with other players for lasers\"\n\nwho?? $LITE / $COHR / $AAOI reroutes their lasers to internal usage. Lot of your Asian players already allocated. \n\nAbuse the current bottleneck as much as possible because there's almost no qualified choices left.\n\nAnd I'm certain all the partners are trying to vertically integrate upward toward the laser level too and compete.  \n\nIf there was a new OE/pluggable accusation attempted during the Q2 time frame, things would have been a lot different. \n\n_\n\nTLDR: \n\n$SIVE should aim to be the next $LITE and blitzscale like a Silicon Valley company.\n\nUse that $70m capital to move faster H2, and at the bare minimum finish readiness then. And expect NASDAQ listing to be finished H1 2027. \n\nNot \"evaluation\" at that timeframe. \n\nAnd use the capital + equity to expand downward into optical engines/ELS/optical transceivers using your equity valuation, and buy a Celestial/Ayar/Cloud Lite type startup. \n\nAs for the wording of the call, markets care about economic value of the foundry allocation + 6 pluggable players, not other business segments.\n\n$SIVE has been extremely conservative to date, but \n they need to speed up and communicate to forward looking US/Int shareholders. \n\nNot geared toward local Swedish audiences who care about Q2/TTM revenue. \n\nOtherwise they'll be treated like an Asian component supplier and eventually be valued like an EU one.",
+      "refs": {
+        "parked_reason": "已取得可核對文件，但缺具名 pluggable 客戶與訂單經濟規模；本輪沒有唯一的新 canonical edge",
+        "primary_url": "https://www.sivers-semiconductors.com/press/sivers-semiconductors-publishes-interim-report-for-the-second-quarter-2026/",
+        "research_outcome": "營運 atoms 有公司文件／tier-2 transcript 支持；批評與 M&A 建議屬作者意見，不建立圖譜事實",
+        "trace_attempts_ref": "2026-08-30：核對 Sivers Q2 2026 interim report 與第三方法說逐字稿；確認 pluggable engagements、Jabil 2027 ramp、hybrid foundry model 與 H1 2027 dual-listing readiness，但 M&A／70M 資本用途是作者處方",
+        "trace_next_trigger": "Sivers 正式申請 dual listing、具名 acquisition 或具名 pluggable customer/order",
+        "trace_requires_user": "false",
+        "trace_status": "partial",
+        "trace_trigger_entities": [
+          "AAOI",
+          "AVGO",
+          "COHR",
+          "LITE",
+          "SIVE",
+          "co:applied_optoelectronics",
+          "co:broadcom",
+          "co:coherent",
+          "co:lumentum",
+          "co:sivers_semiconductors"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
+      "source": "x:aleabitoreddit",
+      "status": "parked",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "AVGO",
+            "COHR",
+            "LITE"
+          ]
+        },
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "ELS",
+            "SIVE",
+            "Sivers"
+          ]
+        }
+      },
+      "title": "If I had to be critical of $SIVE earnings: 1. Management underweighted the two disclosures that matter most. -> 6 pluggable engagements -> Foundry capacity (during an industry bottleneck) That's the most important part of the call and should have been the focus to provide economic scale of them. But we got 2-3 sentences about it. And it shouldn't take an Anime avatar on X to talk most about the implications of those. 2. CFO needs retraining or bring on a new one. The lawyer like answers were infuriating to listen to as a shareholder. Even I got pissed off with this statement: \"we will evaluate the timing and decide whether the conditions are right to move forward at that particular time.\" It should be a 100% given by now they file for dual listing to escape hostile Swedish markets. Shareholders didn't fund a future growth type company to hear lawyer-like answers. Again, this was probably one of the worst answers the CFO could have gave and there needs to be firm commitment along with faster timelines. 3. $70M should have gone toward M&A and dual listing. -> Brutally honestly speaking, it's a waste of capital to focus on hybrid manufacturing at this stage and I was disappointed to hear this during this timeframe. It's eventually needed but with 2 foundry suppliers -> You have a ton of new capital and large marketcap. Use it to pull $AVGO style acquisitions of Cloud Light style IP for pluggables or optical engines. Lumilens went from 0 -> $5.5B in 2 years and now with hyperscaler engagements. Sivers should expand out of the laser chokepoint as fast as possible and not stay just a component vendor. And most of all, who cares about competing with customers? If a customer says: \"if you do pluggables, we'll go with other players for lasers\" who?? $LITE / $COHR / $AAOI reroutes their lasers to internal usage. Lot of your Asian players already allocated. Abuse the current bottleneck as much as possible because there's almost no qualified choices left. And I'm certain all the partners are trying to vertically integrate upward toward the laser level too and compete. If there was a new OE/pluggable accusation attempted during the Q2 time frame, things would have been a lot different. _ TLDR: $SIVE should aim to be the next $LITE and blitzscale like a Silicon Valley company. Use that $70m capital to move faster H2, and at the bare minimum finish readiness then. And expect NASDAQ listing to be finished H1 2027. Not \"evaluation\" at that timeframe. And use the capital + equity to expand downward into optical engines/ELS/optical transceivers using your equity valuation, and buy a Celestial/Ayar/Cloud Lite type startup. As for the wording of the call, markets care about economic value of the foundry allocation + 6 pluggable players, not other business segments. $SIVE has been extremely conservative to date, but they need to speed up and communicate to forward looking US/Int shareholders. Not geared toward local Swedish audiences who care about Q2/TTM revenue. Otherwise they'll be treated like an Asian component supplier and eventually be valued like an EU one.",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-29T22:37:30.869492+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "ranking",
+          "reason": "foundry allocation 與 pluggable engagement 的經濟規模若成立會改變 Sivers 瓶頸排序；若法說不支持則不變"
+        },
+        "decided_at": "2026-08-29T22:37:30.869492+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "關聯 Sivers 已追蹤瓶頸，含 6 個 pluggable engagements、2 個 foundry allocation、70M 資本用途與上市時程等可追查主張；需追回法說逐字稿，驗證後可能改變 Sivers 排序。",
+        "related_trace_requeues": [
+          "lead_5838056904d872aa236cff2a570d1e11",
+          "lead_7618e9fd1456b4c522995c5b8a31eb2e",
+          "lead_99f94c80ce33a20f1a9c49da2f2e1667",
+          "lead_c7498202abd0bdcd20c035dc615bcec2"
+        ],
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2093652781928448279"
+    },
     "lead_5105c989c73d16226293c3dd5da999ec": {
       "entities": {
         "company_ids": [
@@ -17959,9 +18196,27 @@
       "first_seen": "2026-08-29T20:06:39.186451+00:00",
       "lead_id": "lead_5365613adf1bce24257876e3dab03eea",
       "published_at": null,
-      "refs": {},
+      "refs": {
+        "onboard_candidate_names": [
+          "ASMPT"
+        ],
+        "parked_reason": "官方頁足以確認產品與技術方向，但只有單一供應商 origin_entity，未達 company-onboard L8 多樣性，也不能推成量產採用或瓶頸排序",
+        "primary_url": "https://semi.asmpt.com/en/news-center/press-releases/asmpt-showcases-ap-innovations-for-ai-and-hpc-at-ectc-2027/",
+        "research_outcome": "供應商自報證實工具能力與 CPO 應用方向；缺客戶端 qualification，且 ASMPT 尚未 onboard，未產 Research Action",
+        "trace_attempts_ref": "2026-08-30：逐字核對 ASMPT 2026-08-24 ECOC 2026 官方頁，確認 AMICRA NANO／NOVA／MEGA 工具與 CPO scalable manufacturing 自述；未見客戶採用或量產 qualification",
+        "trace_next_trigger": "ASMPT 客戶端文件、訂單或量產 qualification 具名揭露",
+        "trace_requires_user": "false",
+        "trace_status": "partial",
+        "trace_trigger_entities": [
+          "NVDA",
+          "TSM",
+          "co:nvidia",
+          "co:tsmc"
+        ],
+        "trace_trigger_kind": "primary_source_signal"
+      },
       "source": "weekly:cpo",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -18302,9 +18557,17 @@
         "primary_url": "https://patents.google.com/patent/US12379555",
         "research_outcome": "chokepoint_real_but_players_private_no_direct_ticker",
         "research_run": "session:2026-08-29-decompose-drain",
+        "trace_attempts_ref": "2026-08-30：SENKO／US Conec 皆未上市；以 NVIDIA／Marvell 一手 CPO connector 文件作可執行 trigger",
         "trace_next_trigger": "SENKO/US Conec 出現上市母體、被上市公司併購，或第三家 connector 供應商進入 CPO 供應鏈",
         "trace_requires_user": "false",
-        "trace_status": "partial"
+        "trace_status": "partial",
+        "trace_trigger_entities": [
+          "MRVL",
+          "NVDA",
+          "co:marvell",
+          "co:nvidia"
+        ],
+        "trace_trigger_kind": "primary_source_signal"
       },
       "source": "decompose:nvda-cpo-switch-2026-08-29",
       "status": "parked",
@@ -18922,24 +19185,35 @@
       "lead_id": "lead_5838056904d872aa236cff2a570d1e11",
       "published_at": "2026-08-29",
       "refs": {
+        "action_digest": "ec0d1ff8b7336331ad131107dd680e954f3ba8c6338e927904d48d5898d4375b",
+        "focus_company_id": "co:nvidia",
         "parked_reason": "MRM 層研究：NVIDIA MRM 200G PAM4/λ＋TSMC COUPE 為 tier-1 事實（官方 blog）。新發現：Broadcom TH6-Davisson（BCM78919，102.4T、64×1.6TbE、16 個 6.4T DR optical engine、Condor 3nm SerDes、可插拔雷射模組、2025-10 出貨）據 ServeTheHome 亦使用 TSMC COUPE——若獲一手確認，TSMC COUPE 即為 NVIDIA＋Broadcom 兩大 CPO 陣營的共同製程瓶頸，比單一 MRM 路線之爭更重要。Broadcom 的調變器類型（MRM vs MZM）仍未獲一手確認。",
         "primary_url": "https://www.servethehome.com/broadcom-tomahawk-6-davisson-102-4t-switch-with-co-packaged-optics-shipping/",
+        "research_action_id": "ra_629129d8cc213086921c07c14ba701e9",
         "research_outcome": "coupe_cross_camp_chokepoint_hypothesis_tier3_pending_primary",
         "research_run": "session:2026-08-29-decompose-drain",
         "trace_next_trigger": "Broadcom 官方 datasheet／TSMC 法說或技術文件逐字確認 TH6-Davisson 使用 COUPE 及其調變器類型",
+        "trace_requeue_consumed_entities": [
+          "AVGO",
+          "CO:BROADCOM"
+        ],
+        "trace_requeue_trigger": "related_triaged_lead:lead_4fc2da14b0d039e4d27e517c136de5e9",
+        "trace_requeued_at": "2026-08-29T22:37:30.869492+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
           "AVGO",
-          "co:broadcom",
-          "TSM",
-          "co:tsmc",
           "NVDA",
-          "co:nvidia"
-        ]
+          "TSM",
+          "co:broadcom",
+          "co:nvidia",
+          "co:tsmc"
+        ],
+        "trace_trigger_event_ref": "lead:lead_4fc2da14b0d039e4d27e517c136de5e9",
+        "trace_trigger_kind": "related_entity_signal"
       },
       "source": "decompose:nvda-cpo-switch-2026-08-29",
-      "status": "parked",
+      "status": "action_prepared",
       "themes": {},
       "title": "MRM modulator 技術層：誰能量產 200G PAM4/λ micro-ring modulator？MRM vs TFLN vs MZM 路線替代性（NVIDIA×TSMC COUPE 已量產；圖有 TFLN 節點、無 MRM 節點）",
       "triage": {
@@ -18950,12 +19224,34 @@
           "decision_impact": "candidate_set",
           "reason": "decompose 產出之未知層研究題目"
         },
-        "decided_at": "2026-08-29T07:59:24.017745+00:00",
+        "decided_at": "2026-08-29T22:37:30.869492+00:00",
         "decision": "go",
         "priority_flags": {},
-        "reason": "NVIDIA 官方技術 blog（2025-08-26）逐字：MRM 矽光子引擎 200Gbps PAM4/波長、TSMC 合作解決量產（fabrication control／thermal sensitivity）。圖中 modulator 技術層只有 TFLN——modulator 路線之爭是 CPO stack 的候選集合缺口。",
+        "reason": "新 triage PASS lead lead_4fc2da14b0d039e4d27e517c136de5e9 與 parked trace 共用具名標的 AVGO, co:broadcom（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
         "tier": 2
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-29T22:37:30.869492+00:00",
+          "superseded_reason": "新 triage PASS lead lead_4fc2da14b0d039e4d27e517c136de5e9 與 parked trace 共用具名標的 AVGO, co:broadcom（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_4fc2da14b0d039e4d27e517c136de5e9",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-08-29T07:59:24.017745+00:00",
+              "classified_by": "triage_semantic_v1",
+              "content_type": "structural_fact",
+              "decision_impact": "candidate_set",
+              "reason": "decompose 產出之未知層研究題目"
+            },
+            "decided_at": "2026-08-29T07:59:24.017745+00:00",
+            "decision": "go",
+            "priority_flags": {},
+            "reason": "NVIDIA 官方技術 blog（2025-08-26）逐字：MRM 矽光子引擎 200Gbps PAM4/波長、TSMC 合作解決量產（fabrication control／thermal sensitivity）。圖中 modulator 技術層只有 TFLN——modulator 路線之爭是 CPO stack 的候選集合缺口。",
+            "tier": 2
+          }
+        }
+      ],
       "url": "https://developer.nvidia.com/blog/how-industry-collaboration-fosters-nvidia-co-packaged-optics/?decompose=mrm"
     },
     "lead_586d4451effd3b1206f2076b29aab69a": {
@@ -22588,6 +22884,55 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2072301677211009426"
     },
+    "lead_6d97ce23a4e09bc9504362e64d1b31eb": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-29T22:33:52.102510+00:00",
+      "lead_id": "lead_6d97ce23a4e09bc9504362e64d1b31eb",
+      "media": [],
+      "published_at": "2026-08-29T20:57:07.000Z",
+      "raw_text": "Yep, ESMT (3006) has exposure to multiple legacy memory segments.\n\nHas a portfolio of: SLC/SPI NAND, NOR Flash, DDR2/DDR3, MCP/eMCP, so all the fun legacy stuff.\n\nIf you want to look at broader industry price hikes coming up that ESMT has exposure to:  \n\n1. SLC NAND: ~120-170% for H2 2026.\n2. DDR2: ~35-40% for Q3 2026.\n3. DDR4: +30–40% Q3 (with DDR3 tightening)\n4. NOR +60–65%+ for H2 (high density)\n5. MCP/eMCP: maybe ~+15–25% QoQ for ESMT from my own estimate\n\nFor official breakdown:\n\nDDR2 + DDR3: ~45% of revenue\nDDR4/other DRAM ~ 10% of revenue\neMCP/MCP ≈30%\nAnalog + other ≈15%\n\nRegardless, duration/hikes is the key: \n\n-> \"none of the major global SLC NAND suppliers plan to add new production capacity in the near term.\"\n-> TrendForce specifically expects depleted inventories to make SLC NAND even tighter in Q4.\n-> Winbond withdrawing DDR2, would make inventory even tighter (and they're doing allocations into 2029-2030)\n-> ESMT management said the market's main problem was supply, not demand; the company's foundry allocations covered only roughly 60–70% of customer orders\n-> Nanya: \"memory shortages could last through the end of 2027, with supply and demand still tight in 2028\"\n->Nanya explicitly said capacity constraints could cause shortages across DDR5, LPDDR5, DDR4, LPDDR4 and DDR3. \n-> ESMT included eMCP among the products receiving order-transfer benefits as mature node resources were being pulled elsewhere\n______\n\nIf I had to state my thoughts again:\n\nI think ESMT's ~1.9x July annualized run-rate P/E could compress further, despite factoring in PSMC's 45% wafer hike due to further legacy memory price hikes. \n\nIndustry commentary supports durability throughout 2027. \n\nCherry on top is if we start seeing LTAs and visibility into 2029-2030 (but not factored in). \n\nI think markets either don't know about this, are mispricing duration, or overestimating PSMC's wafer hike effects. \n\nMaybe playing duoQ with Rank 1 Challenger \"ESMT\" in LoL classic... Is more fun than playing with hardstuck \"Micron\" in League?",
+      "refs": {
+        "onboard_candidate_names": [
+          "Elite Semiconductor Microelectronics Technology - ESMT"
+        ],
+        "parked_reason": "不能用 ESMT 單一自報替代 L8 多來源 onboarding，也不能把貼文估算與轉述當一手事實；保留等待後續公開 filing",
+        "primary_url": "https://mops.twse.com.tw/",
+        "research_outcome": "一手年報只部分支持 legacy-memory 曝險與產能預約；社群貼文的精確數字仍未獲原始文件支持，且公司尚未 onboard",
+        "trace_attempts_ref": "2026-08-30：抓取並逐字查核 ESMT 2025 年報（MOPS）；確認 DRAM、NOR／NAND、KGD、MCP 產品線、2025H2 近滿載與 capacity reservation，但未支持貼文精確營收占比、PSMC 身分、漲幅或 2027 持續期",
+        "trace_next_trigger": "ESMT 2026 Q3／Q4 財報或法說具名揭露產品組合、晶圓供應方與 allocation",
+        "trace_requires_user": "false",
+        "trace_status": "partial",
+        "trace_trigger_entities": [
+          "MU",
+          "co:micron_technology"
+        ],
+        "trace_trigger_kind": "primary_source_signal"
+      },
+      "source": "x:aleabitoreddit",
+      "status": "parked",
+      "themes": {},
+      "title": "Yep, ESMT (3006) has exposure to multiple legacy memory segments. Has a portfolio of: SLC/SPI NAND, NOR Flash, DDR2/DDR3, MCP/eMCP, so all the fun legacy stuff. If you want to look at broader industry price hikes coming up that ESMT has exposure to: 1. SLC NAND: ~120-170% for H2 2026. 2. DDR2: ~35-40% for Q3 2026. 3. DDR4: +30–40% Q3 (with DDR3 tightening) 4. NOR +60–65%+ for H2 (high density) 5. MCP/eMCP: maybe ~+15–25% QoQ for ESMT from my own estimate For official breakdown: DDR2 + DDR3: ~45% of revenue DDR4/other DRAM ~ 10% of revenue eMCP/MCP ≈30% Analog + other ≈15% Regardless, duration/hikes is the key: -> \"none of the major global SLC NAND suppliers plan to add new production capacity in the near term.\" -> TrendForce specifically expects depleted inventories to make SLC NAND even tighter in Q4. -> Winbond withdrawing DDR2, would make inventory even tighter (and they're doing allocations into 2029-2030) -> ESMT management said the market's main problem was supply, not demand; the company's foundry allocations covered only roughly 60–70% of customer orders -> Nanya: \"memory shortages could last through the end of 2027, with supply and demand still tight in 2028\" ->Nanya explicitly said capacity constraints could cause shortages across DDR5, LPDDR5, DDR4, LPDDR4 and DDR3. -> ESMT included eMCP among the products receiving order-transfer benefits as mature node resources were being pulled elsewhere ______ If I had to state my thoughts again: I think ESMT's ~1.9x July annualized run-rate P/E could compress further, despite factoring in PSMC's 45% wafer hike due to further legacy memory price hikes. Industry commentary supports durability throughout 2027. Cherry on top is if we start seeing LTAs and visibility into 2029-2030 (but not factored in). I think markets either don't know about this, are mispricing duration, or overestimating PSMC's wafer hike effects. Maybe playing duoQ with Rank 1 Challenger \"ESMT\" in LoL classic... Is more fun than playing with hardstuck \"Micron\" in League?",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-29T22:37:34.696001+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "若產品曝險與供需持續性獲一手支持，ESMT 可能進候選集合；若否則不納入"
+        },
+        "decided_at": "2026-08-29T22:37:34.696001+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "具名 ESMT、PSMC、Nanya 與 SLC NAND、DDR2/3/4、NOR、MCP/eMCP，附價格漲幅、營收組成與 allocation 比例；可追回公司或 TrendForce 原文，答案可能新增 legacy memory 候選。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2093805166655143988"
+    },
     "lead_6e6000e197e77903a63354c48ebe2d2c": {
       "entities": {
         "company_ids": [
@@ -23585,10 +23930,18 @@
       "published_at": "2026-08-27T21:24:26.000Z",
       "raw_text": "Nah, $SIVE is the most unusual $1B photonics company I've ever seen. \n\nJust for AI DCs alone:\n\n- Reference laser for $GFS SCALE (CPO/NPO/pluggable)\n- 7 pluggable engagements disclosed, with $JBL as primary ramp (with H1 2027 timeline)\n- ELS path with O-Net\n- ELS path with $POET \n- Lasers to Ayar for CPO I/O (now in $NVDA nvlink ecosystem)\n- Lasers for $AEVA (which now has NPO agreements with optical engine providers for hyperscalers)\n- Celestial/Lightmatter/Lightelligence (likely customers in 2023/2024)\n- InP lasers on TFLN with Lightium\n\nThen it has 2 substantial allocations for CW DFB laser capacity during an industry shortage. \n\nAs well as one of the few CPO-grade laser suppliers out in the industry. \n\nLet me know what other player around this range has so many ongoing qualifications, a large TAM, and in photonics. \n\n$SIVE is the #1 for me in terms of MC relative to qualifications paths across the industry.",
       "refs": {
-        "parked_reason": "作者對 SIVE 的綜合描述。可核對部分：GFS 合作（已在圖／既有 PR 處理）、Q2 數字（見 Q2 PR）。『reference laser for GFS SCALE』的具體綁定與『7 個 AI DC 專案』等計數屬作者整理，書面一手未逐字出現該表述；須等 Sivers 或 GFS 具名技術文件。",
-        "primary_url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-reports-q2-2026-results-as-product-growth-record-pipeline-and-customer-ramps-position-company-for-growth-acceleration-6543505f",
+        "parked_reason": "同一 Q2 事件的複合清單包含已知事實與作者推論；缺交易對手方來源，不可整包入圖",
+        "primary_url": "https://www.sivers-semiconductors.com/press/sivers-semiconductors-publishes-interim-report-for-the-second-quarter-2026/",
+        "research_outcome": "部分事實可核對，具名客戶與供應關係仍是推論；不提高 evidence tier，不產新 RA",
         "research_run": "session:2026-08-29-pq1-full-drain",
-        "trace_next_trigger": "Sivers/GFS 具名技術文件明寫 SCALE 平台 reference laser 角色",
+        "trace_attempts_ref": "2026-08-30：以 Sivers Q2 2026 interim report 與法說逐字稿重查清單；僅部分營運 atoms 可支持，客戶歸因與估值推論未獲交易對手文件支持",
+        "trace_next_trigger": "Sivers 客戶端具名 design win、production order 或 foundry partner 揭露",
+        "trace_requeue_consumed_entities": [
+          "CO:SIVERS_SEMICONDUCTORS",
+          "SIVE"
+        ],
+        "trace_requeue_trigger": "related_triaged_lead:lead_4fc2da14b0d039e4d27e517c136de5e9",
+        "trace_requeued_at": "2026-08-29T22:37:30.869492+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
@@ -23605,6 +23958,7 @@
           "co:poet_technologies",
           "co:sivers_semiconductors"
         ],
+        "trace_trigger_event_ref": "lead:lead_4fc2da14b0d039e4d27e517c136de5e9",
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
@@ -23645,14 +23999,38 @@
           "decision_impact": "ranking",
           "reason": "查證合作與 qualification 路徑可能改變 Sivers 在光互連候選排序。"
         },
-        "decided_at": "2026-08-27T22:37:17.195844+00:00",
+        "decided_at": "2026-08-29T22:37:30.869492+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true
         },
-        "reason": "關聯 Sivers 與 CPO／ELS／pluggable；含具名合作方與 qualification 路徑，可逐項追源；社群作者自陳估值結論不當證據。",
+        "reason": "新 triage PASS lead lead_4fc2da14b0d039e4d27e517c136de5e9 與 parked trace 共用具名標的 SIVE, co:sivers_semiconductors（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
         "tier": 4
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-29T22:37:30.869492+00:00",
+          "superseded_reason": "新 triage PASS lead lead_4fc2da14b0d039e4d27e517c136de5e9 與 parked trace 共用具名標的 SIVE, co:sivers_semiconductors（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_4fc2da14b0d039e4d27e517c136de5e9",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-08-27T22:37:17.195844+00:00",
+              "classified_by": "triage_semantic_v1",
+              "content_type": "structural_fact",
+              "decision_impact": "ranking",
+              "reason": "查證合作與 qualification 路徑可能改變 Sivers 在光互連候選排序。"
+            },
+            "decided_at": "2026-08-27T22:37:17.195844+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true
+            },
+            "reason": "關聯 Sivers 與 CPO／ELS／pluggable；含具名合作方與 qualification 路徑，可逐項追源；社群作者自陳估值結論不當證據。",
+            "tier": 4
+          }
+        }
+      ],
       "url": "https://x.com/aleabitoreddit/status/2093087267594314182"
     },
     "lead_762d8753ad5c0a8fd5a14a5ccbad9d83": {
@@ -24667,6 +25045,62 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2087249406638862506"
     },
+    "lead_7c9f419a1a526d715c593d40ef76f37f": {
+      "entities": {
+        "company_ids": [
+          "co:micron_technology"
+        ],
+        "tickers": [
+          "MU",
+          "RDDT"
+        ]
+      },
+      "first_seen": "2026-08-29T22:33:52.106884+00:00",
+      "lead_id": "lead_7c9f419a1a526d715c593d40ef76f37f",
+      "media": [
+        {
+          "cache": {
+            "bytes": 102946,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_7c9f419a1a526d715c593d40ef76f37f/3_2093760136401883136.jpg",
+            "sha256": "34442a2c4934bb181e7e846d42ec889ff0a219742cf6142da19cf0d431cb0d1c"
+          },
+          "height": 1901,
+          "media_key": "3_2093760136401883136",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HQ6HwDcbkAAuqYK.jpg",
+          "width": 1590
+        },
+        {
+          "cache": {
+            "bytes": 82673,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_7c9f419a1a526d715c593d40ef76f37f/3_2093760219977531392.jpg",
+            "sha256": "32c2d4e98459b40595a53241b5b9c0d8502702a8fc0fc3ad4f935f70333beec8"
+          },
+          "height": 1129,
+          "media_key": "3_2093760219977531392",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HQ6H06yawAAw07-.jpg",
+          "width": 1294
+        }
+      ],
+      "published_at": "2026-08-29T17:59:37.000Z",
+      "raw_text": "$MU: goes from $133B -&gt; $1T+ in a year.\n\n$RDDT after a 2-month correction: \"Garbage stock\" https://t.co/HlIXwJ7ZdB",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "$MU: goes from $133B -&gt; $1T+ in a year. $RDDT after a 2-month correction: \"Garbage stock\" https://t.co/HlIXwJ7ZdB",
+      "triage": {
+        "decided_at": "2026-08-29T22:37:31.813929+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "只有 MU 市值漲幅與 RDDT 價格情緒對比，沒有可拆成供應鏈、財務或出場條件的可核查新 claim。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2093760498072485919"
+    },
     "lead_7cbdb434089074c62db83a4858cddc11": {
       "entities": {
         "company_ids": [],
@@ -25142,6 +25576,52 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2072636916173066624"
     },
+    "lead_7e6a2179392f9771fae6dd744021833b": {
+      "entities": {
+        "company_ids": [
+          "co:sivers_semiconductors",
+          "co:globalfoundries"
+        ],
+        "tickers": [
+          "SIVE",
+          "GFS"
+        ]
+      },
+      "first_seen": "2026-08-29T22:33:52.108430+00:00",
+      "lead_id": "lead_7e6a2179392f9771fae6dd744021833b",
+      "media": [],
+      "published_at": "2026-08-29T12:33:46.000Z",
+      "raw_text": "Yes. I genuinely don't have a clue why $SIVE still focuses on local Swedish markets for communication/private fundraising. \n\nOver the US. \n\nThe questions you get from Swedish heavy audiences include:\n\n- Leading questions like how would you \"stop the bleeding\" \n- \"Why can't you disclosure your private customers\"\n- Why focus on transceivers (it's obvious)\n- Implications for non-photonics orders\n\nSo 1/3rd of the time, the CEO needs to be defending leading/accusatory questions around what \"opportunity pipeline means\" \n\nUS analysts would have pressed:\n\n- Economic implications from 2 foundry allocations during a bottleneck + ASP hike/operating leverage  \n- Around much capacity revenue would those allocations lead to (half of AOI calls are around those from US analysts) \n- $GFS NPO/CPO/pluggable scale implications and downstream end customers opportunities  \n- Ayar / CPO player 2028 ramp (that happened to raise $500m+) or other products like ELS production with O-net and TAM opportunities there.   \n- How big those 6 new pluggable players were, rather than asking \"why can't you disclosure them\"  \n- Clarifying CFO legalposts around listing timeline and M&A TAM expansion opportunities\n\nSo investors can get a sense of future growth for 2027-2028.\n\nInstead, the way leading questions are framed/answers, the entire calls were focused around current financials (which US investors don't care about), non-photonic implications, or skepticism of wording.\n\nRather than exciting US investors about economic implications from their time in a CW laser bottleneck. \n\nThe more time $SIVE spends in Swedish markets, the more they will be valued as such.",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CPO"
+          ]
+        },
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "ELS",
+            "SIVE"
+          ]
+        }
+      },
+      "title": "Yes. I genuinely don't have a clue why $SIVE still focuses on local Swedish markets for communication/private fundraising. Over the US. The questions you get from Swedish heavy audiences include: - Leading questions like how would you \"stop the bleeding\" - \"Why can't you disclosure your private customers\" - Why focus on transceivers (it's obvious) - Implications for non-photonics orders So 1/3rd of the time, the CEO needs to be defending leading/accusatory questions around what \"opportunity pipeline means\" US analysts would have pressed: - Economic implications from 2 foundry allocations during a bottleneck + ASP hike/operating leverage - Around much capacity revenue would those allocations lead to (half of AOI calls are around those from US analysts) - $GFS NPO/CPO/pluggable scale implications and downstream end customers opportunities - Ayar / CPO player 2028 ramp (that happened to raise $500m+) or other products like ELS production with O-net and TAM opportunities there. - How big those 6 new pluggable players were, rather than asking \"why can't you disclosure them\" - Clarifying CFO legalposts around listing timeline and M&A TAM expansion opportunities So investors can get a sense of future growth for 2027-2028. Instead, the way leading questions are framed/answers, the entire calls were focused around current financials (which US investors don't care about), non-photonic implications, or skepticism of wording. Rather than exciting US investors about economic implications from their time in a CW laser bottleneck. The more time $SIVE spends in Swedish markets, the more they will be valued as such.",
+      "triage": {
+        "decided_at": "2026-08-29T22:37:32.783911+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "與同批 Sivers 法說評論屬同一事件重複轉述；2 個 foundry allocation 與 6 個 pluggable players 已由代表性 lead 進 pq1，本則沒有新增獨立 atomic claim。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2093678493335011831"
+    },
     "lead_7e6f1178ba5944f08d3c40007f219e72": {
       "entities": {
         "company_ids": [
@@ -25491,6 +25971,69 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2074218760593195010"
+    },
+    "lead_7f7cc2f42ad124758ecc16b42fea1d53": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "AMKR",
+          "KLIC"
+        ]
+      },
+      "first_seen": "2026-08-29T22:33:52.107173+00:00",
+      "lead_id": "lead_7f7cc2f42ad124758ecc16b42fea1d53",
+      "media": [
+        {
+          "cache": {
+            "bytes": 166472,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_7f7cc2f42ad124758ecc16b42fea1d53/3_2093710532348121088.jpg",
+            "sha256": "87a8ef63ced2272868b7839b127b20e9a5d7235a5e1b582b99eef1728321c3ae"
+          },
+          "height": 1029,
+          "media_key": "3_2093710532348121088",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HQ5aot8akAAzTkW.jpg",
+          "width": 1787
+        }
+      ],
+      "published_at": "2026-08-29T14:48:53.000Z",
+      "raw_text": "Missed this mention earlier but IC design insiders reveal that OSAT providers have already warned clients:\n\n\"traditional packaging capacity could face a deficit exceeding 20% by 2027\" (eg. $AMKR, ethereum:0x041ff0e49f6f774e7dc7bd10ee4a14c00b1d80b2, Powertech as potential beneficaries)\n\nWith: \"wire bonding equipment\" emerging as the primary bottleneck (ASMPT, $KLIC)\n\n-> influx of AI server shipments has triggered a spike in demand for mature chips\n-> existing mature packaging capacity at OSATs is being rapidly absorbed\n-> securing early access to traditional packaging capacity is now becoming a challenge \n\nCascading bottleneck patterns are occurring across memory (eg. DDR2, DDR3) and now packaging capacity I guess.",
+      "refs": {
+        "parked_reason": "線索引述匿名 IC design insiders，找不到可逐字核對的原始文件；K&S 與 Amkor 官方資料不等於該精確缺口主張",
+        "primary_url": "https://ir.amkor.com/news-releases/news-release-details/amkor-technology-reports-financial-results-second-quarter-2026",
+        "research_outcome": "一手只能支持需求與產品分類，不能支持社群貼文的 20% 缺口與 primary bottleneck 排名",
+        "trace_attempts_ref": "2026-08-30：查找 Amkor Q2 2026 官方結果與 K&S 2026 官方結果／產品公告；確認 wirebond 仍屬 Amkor mainstream 產品、K&S 一般半導體與 memory 需求強，但未找到 2027 傳統封裝缺口超過 20% 或 wire bonding 為首要瓶頸的具名原文",
+        "trace_next_trigger": "AMKR、KLIC、ASE 或 IC design 公司正式法說／filing 逐字揭露 2027 traditional packaging capacity deficit",
+        "trace_requires_user": "false",
+        "trace_status": "isolated_tier_3",
+        "trace_trigger_entities": [
+          "AMKR",
+          "KLIC"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
+      "source": "x:aleabitoreddit",
+      "status": "parked",
+      "themes": {},
+      "title": "Missed this mention earlier but IC design insiders reveal that OSAT providers have already warned clients: \"traditional packaging capacity could face a deficit exceeding 20% by 2027\" (eg. $AMKR, ethereum:0x041ff0e49f6f774e7dc7bd10ee4a14c00b1d80b2, Powertech as potential beneficaries) With: \"wire bonding equipment\" emerging as the primary bottleneck (ASMPT, $KLIC) -> influx of AI server shipments has triggered a spike in demand for mature chips -> existing mature packaging capacity at OSATs is being rapidly absorbed -> securing early access to traditional packaging capacity is now becoming a challenge Cascading bottleneck patterns are occurring across memory (eg. DDR2, DDR3) and now packaging capacity I guess.",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-29T22:37:35.661253+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "若傳統封裝缺口與 wire bonding 瓶頸獲一手支持，可能新增 OSAT 或設備候選；若無原文則不納入"
+        },
+        "decided_at": "2026-08-29T22:37:35.661253+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "具名 2027 traditional packaging deficit 20%、wire bonding equipment bottleneck 與 AMKR、Powertech、ASMPT、KLIC 潛在受益者；可追 IC 設計或 OSAT 一手來源，答案可能擴張候選集合。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2093712497949950242"
     },
     "lead_800fb456828b63727b76094378540c82": {
       "entities": {
@@ -30176,12 +30719,24 @@
       "published_at": "2026-08-27T19:15:45.000Z",
       "raw_text": "$SIVE ER transcript just dropped, TLDR:\n\n- 6 NEW pluggable players working with Sivers now.\n\nProbably the biggest news of the entire ER next to new foundry allocations. \n\n\"3 are in alpha sample evaluation stage\" and another 3 in technical engagement / supply assessment stage.\"\n\nAnd now it makes more sense why their $1.2B revenue pipeline ballooned (since this was a bigger leap than Jabil). \n\n- Initial production orders with $JBL expected in the first half of 2027, with the production ramp planned second half of 2027\n\nLFG, Jabil is a massive hyperscaler supplier and finally got clear timelines on revenue from volume ramp.\n\n- \"new foundry partner who has brought on tremendous capacity that is available now\"\n\nThis is what I wanted to hear. Apparently they've been in the works for this for awhile since it's \"available now\", and THIS IS VERY MATERIAL. \n\nCW lasers are in a massive shortage and $SIVE brought on new supply outside of Win Semi (also de-risks).\n\nAs you hear with other qualified CW players (anything they make gets sold), so as Sivers partners finishes their qualifications, I'm expecting the same.\n\n- \"long-term capacity model where one-third of manufacturing capacity will be internal, while two-thirds will come from our foundry partners\"\n\nLukewarm on this, it makes sense they need to be vertically integrated like $AAOI / $LITE eventually but implies more capex (better after NASDAQ listing).\n\nAs you see with ESMT + DDR2 bottlenecks, the operating income they get from just securing wafers during shortages and doing fabless models is incredible. \n\nAnd it would make more sense to fund this with cashflow down the road.\n\n- NASDAQ listing ongoing. CFO gave a very lawyer like answer, but on track as usual.\n\n- \"We do not see production capacity as a bottleneck at this point in time\"\n\nThis is very meaningful since with their new foundry partners, implies $SIVE is coming online with a very material CW laser supply to a bottlenecked market.\n\nTLDR:\n- NEW substantial FOUNDRY ALLOCATION! (very, very material during CW laser shortage)\n- 6 new pluggable players outside of $JBL \n- Clear revenue ramp timelines from Jabil\n\nHeavy focus on pluggables -> NPO -> CPO seems like the progression.  Only lukewarm piece was building up internal capacity but it's long term positive.  \n\nAnyway, very happy after reading the transcript aside from potential capex prioritizing laser capacity (which is fine too during an industry shortage) over IP acquisition.\n\nThe 6 new pluggable players + substantial wafer allocation \"available now\" is a pretty insane disclosure.",
       "refs": {
-        "parked_reason": "已取得 SIVE Q2 2026 官方 PR 全文：書面 PR 無『6 家新 pluggable 客戶』字句——該說法只可能出自 ER webcast，須回聽 replay 逐字核對且客戶未具名（L8＋awaiting named disclosure 雙重限制）。PR 可核對部分：產品營收 +18%、pipeline $1.2B、Jabil 1.6T 合作與 GFS 矽光子合作（皆已由個別 PR 處理）。『新 foundry』說法同樣不在書面 PR。",
-        "primary_url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-reports-q2-2026-results-as-product-growth-record-pipeline-and-customer-ramps-position-company-for-growth-acceleration-6543505f",
+        "parked_reason": "來源已誠實降級通過；不把未具名 engagement 推成 supplies_to，也不因容量 available now 推成 qualification 或出貨",
+        "primary_url": "https://www.sivers-semiconductors.com/press/sivers-semiconductors-publishes-interim-report-for-the-second-quarter-2026/",
+        "research_outcome": "原始公司報告支持大方向，exact 6 engagements 來自 tier-2 transcript；均屬 dated commercial observation，沒有新的唯一 canonical edge",
         "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_attempts_ref": "2026-08-30：取得 Sivers Q2 2026 interim report 並與第三方法說逐字稿對讀；Jabil 時程、foundry capacity、長期 1:2 internal-partner model 與 dual-listing readiness 均有 locator",
         "trace_next_trigger": "Q2 webcast replay 逐字核對，或 Sivers 具名披露 pluggable 客戶",
+        "trace_requeue_consumed_entities": [
+          "AAOI",
+          "CO:APPLIED_OPTOELECTRONICS",
+          "CO:LUMENTUM",
+          "CO:SIVERS_SEMICONDUCTORS",
+          "LITE",
+          "SIVE"
+        ],
+        "trace_requeue_trigger": "related_triaged_lead:lead_4fc2da14b0d039e4d27e517c136de5e9",
+        "trace_requeued_at": "2026-08-29T22:37:30.869492+00:00",
         "trace_requires_user": "false",
-        "trace_status": "partial",
+        "trace_status": "tier_1_2_honest_passthrough",
         "trace_trigger_entities": [
           "AAOI",
           "JBL",
@@ -30192,6 +30747,7 @@
           "co:lumentum",
           "co:sivers_semiconductors"
         ],
+        "trace_trigger_event_ref": "lead:lead_4fc2da14b0d039e4d27e517c136de5e9",
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
@@ -30230,14 +30786,38 @@
           "decision_impact": "ranking",
           "reason": "新客戶階段與產能來源若獲一手支持會改變 Sivers 排序。"
         },
-        "decided_at": "2026-08-27T22:37:17.456322+00:00",
+        "decided_at": "2026-08-29T22:37:30.869492+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true
         },
-        "reason": "關聯 Sivers Q2 earnings transcript；含六家 pluggable engagement、Jabil ramp、foundry capacity 等可逐字核查 atoms；先追回正式 transcript。",
+        "reason": "新 triage PASS lead lead_4fc2da14b0d039e4d27e517c136de5e9 與 parked trace 共用具名標的 AAOI, LITE, SIVE, co:applied_optoelectronics, co:lumentum, co:sivers_semiconductors（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
         "tier": 4
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-29T22:37:30.869492+00:00",
+          "superseded_reason": "新 triage PASS lead lead_4fc2da14b0d039e4d27e517c136de5e9 與 parked trace 共用具名標的 AAOI, LITE, SIVE, co:applied_optoelectronics, co:lumentum, co:sivers_semiconductors（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_4fc2da14b0d039e4d27e517c136de5e9",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-08-27T22:37:17.456322+00:00",
+              "classified_by": "triage_semantic_v1",
+              "content_type": "structural_fact",
+              "decision_impact": "ranking",
+              "reason": "新客戶階段與產能來源若獲一手支持會改變 Sivers 排序。"
+            },
+            "decided_at": "2026-08-27T22:37:17.456322+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true
+            },
+            "reason": "關聯 Sivers Q2 earnings transcript；含六家 pluggable engagement、Jabil ramp、foundry capacity 等可逐字核查 atoms；先追回正式 transcript。",
+            "tier": 4
+          }
+        }
+      ],
       "url": "https://x.com/aleabitoreddit/status/2093054882282651723"
     },
     "lead_9a2ffd7e7870046120ddfd0a757c77a5": {
@@ -37678,30 +38258,34 @@
       "refs": {
         "gap": "first ELS module order 的買方未具名；定價權主張須以後續毛利率交叉驗證",
         "original_claim_status": "confirmed_but_tier_not_upgradable",
-        "parked_reason": "維持前次 receipt 結論：LITE/AAOI 需求與雷射瓶頸有一手/tier-2 支持；由產業短缺推到 Sivers 新客戶需求仍是作者推論；既有圖已涵蓋 Sivers CW DFB 關係。本輪 Q2 PR 亦未新增具名 CW DFB 客戶。無新 RA。",
+        "parked_reason": "產業級證據不能替代 Sivers 的 transaction-specific linkage；維持等待具名揭露，未產新 RA",
         "pq2_ref": "223",
-        "primary_url": "https://www.fool.com/earnings/call-transcripts/2026/08/18/lumentum-lite-q4-2026-earnings-call-transcript/",
-        "research_outcome": "LITE／AAOI 的需求與雷射瓶頸有一手／tier-2 支持，但由產業短缺推到 Sivers 新客戶需求仍是推論；既有圖已涵蓋 Sivers CW DFB 關係，未產新 RA",
+        "primary_url": "https://www.sivers-semiconductors.com/press/sivers-semiconductors-publishes-interim-report-for-the-second-quarter-2026/",
+        "research_outcome": "CW DFB 供需緊張維持既有結論；沒有新增具名 Sivers 客戶、qualification 或唯一供應證據",
         "research_run": "session:2026-08-29-pq1-full-drain",
-        "trace_attempts_ref": "2026-08-26：Lumentum 官方 FY26 Q4 結果、AAOI 官方 Q2 結果與 tier-2 法說逐字稿、Sivers 圖譜既有 context",
+        "trace_attempts_ref": "2026-08-30：重核既有 Lumentum／AAOI／MACOM 法說與 Sivers Q2 文件；產業短缺有一手／tier-2 支持，但 Sivers 因此取得需求仍為作者推論",
         "trace_next_trigger": "Sivers 具名 CW DFB 客戶或客戶端文件點名 Sivers",
         "trace_origin_entity": "Lumentum Holdings Inc. (Q4 FY2026 earnings call, 第三方轉錄 Motley Fool)",
         "trace_origin_linkage": "supplier_self_report",
         "trace_original_date": "2026-08-18",
         "trace_requeue_consumed_entities": [
           "AAOI",
+          "AVGO",
           "CO:APPLIED_OPTOELECTRONICS",
+          "CO:BROADCOM",
+          "CO:COHERENT",
           "CO:LUMENTUM",
           "CO:MACOM",
           "CO:SIVERS_SEMICONDUCTORS",
+          "COHR",
           "LITE",
           "MTSI",
           "SIVE"
         ],
-        "trace_requeue_trigger": "related_triaged_lead:lead_68bb437cf03c35a2406f3f29618fe53a",
-        "trace_requeued_at": "2026-08-27T22:37:17.723047+00:00",
+        "trace_requeue_trigger": "related_triaged_lead:lead_4fc2da14b0d039e4d27e517c136de5e9",
+        "trace_requeued_at": "2026-08-29T22:37:30.869492+00:00",
         "trace_requires_user": "false",
-        "trace_status": "partial",
+        "trace_status": "awaiting_named_disclosure",
         "trace_trigger_entities": [
           "AAOI",
           "AVGO",
@@ -37717,7 +38301,7 @@
           "co:macom",
           "co:sivers_semiconductors"
         ],
-        "trace_trigger_event_ref": "lead:lead_68bb437cf03c35a2406f3f29618fe53a",
+        "trace_trigger_event_ref": "lead:lead_4fc2da14b0d039e4d27e517c136de5e9",
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
@@ -37752,12 +38336,12 @@
           "decision_impact": "ranking",
           "reason": "LITE／AAOI 法說指 CW DFB 雷射供需失衡與中國落後：強化既有 chokepoint 排序"
         },
-        "decided_at": "2026-08-27T22:37:17.723047+00:00",
+        "decided_at": "2026-08-29T22:37:30.869492+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true
         },
-        "reason": "指定實體的 tier-1 一手來源 lead_68bb437cf03c35a2406f3f29618fe53a 與 parked trace 共用具名標的 LITE, co:lumentum；事件觸發 bounded pq1 重查",
+        "reason": "新 triage PASS lead lead_4fc2da14b0d039e4d27e517c136de5e9 與 parked trace 共用具名標的 AVGO, COHR, co:broadcom, co:coherent（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
         "tier": 4
       },
       "triage_history": [
@@ -37810,6 +38394,28 @@
               "novelty": true
             },
             "reason": "新 triage PASS lead lead_a07801789266b6f00778f14c353cd9fb 與 parked trace 共用具名標的 AAOI, MTSI, SIVE, co:applied_optoelectronics, co:macom, co:sivers_semiconductors（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+            "tier": 4
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-29T22:37:30.869492+00:00",
+          "superseded_reason": "新 triage PASS lead lead_4fc2da14b0d039e4d27e517c136de5e9 與 parked trace 共用具名標的 AVGO, COHR, co:broadcom, co:coherent（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_4fc2da14b0d039e4d27e517c136de5e9",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-08-21T16:05:59.208377+00:00",
+              "classified_by": "semantic_v1",
+              "content_type": "structural_fact",
+              "decision_impact": "ranking",
+              "reason": "LITE／AAOI 法說指 CW DFB 雷射供需失衡與中國落後：強化既有 chokepoint 排序"
+            },
+            "decided_at": "2026-08-27T22:37:17.723047+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true
+            },
+            "reason": "指定實體的 tier-1 一手來源 lead_68bb437cf03c35a2406f3f29618fe53a 與 parked trace 共用具名標的 LITE, co:lumentum；事件觸發 bounded pq1 重查",
             "tier": 4
           }
         }
@@ -40797,6 +41403,44 @@
         "tier": 4
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1493594/000090445426000317/xslF345X06/edgar.xml"
+    },
+    "lead_d62d76e61d9b1f389de35f5c8f68f4f8": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia",
+          "co:micron_technology"
+        ],
+        "tickers": [
+          "NVDA",
+          "MU"
+        ]
+      },
+      "first_seen": "2026-08-29T22:33:52.080982+00:00",
+      "lead_id": "lead_d62d76e61d9b1f389de35f5c8f68f4f8",
+      "media": [],
+      "published_at": "2026-08-29T21:20:22.000Z",
+      "raw_text": "Okay just to simplify this:\n\nThere is a guy who eats a lot called $NVDA. Nvidia only wants to buy high-priced potatos off the farmers.\n\nA potato farmer $MU, that was selling carrots... now shifted farmland to potatos. \n\nNvidia caused a great potato famine cause they can eat a lot. So everyone else who farmed carrots like SK Hynix and Samsung moved their farmland capacity to grow potato. \n\nBut... people still need to eat. And carrots are a healthy part of their everyday diet..\n\nNow there's no more carrots aside from a player like \"ESMT\", the legacy carrot farmer. \n\nSo now, because everyone buys carrots off ESMT, there's a shortage and the price goes up.\n\nSo ESMT needs more carrot seeds (from PSMC). But PSMC is running low on carrot seeds to grow the carrots. \n\nSo PSMC charges ESMT more for the seeds.\n\nBut the price ESMT sells the carrots at are much higher than what PSMC hikes the carrod seed price. \n\nnow... ESMT is making enough from selling carrots that it traded 1.9x P/E off July's earnings. \n\nCan ESMT keep selling these carrots through 2027?\n\nAll the other farmers thinks so since it's both hard + low incentive to migrate their valuable potato farms back to carrot farms.",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "NVDA"
+          ]
+        }
+      },
+      "title": "Okay just to simplify this: There is a guy who eats a lot called $NVDA. Nvidia only wants to buy high-priced potatos off the farmers. A potato farmer $MU, that was selling carrots... now shifted farmland to potatos. Nvidia caused a great potato famine cause they can eat a lot. So everyone else who farmed carrots like SK Hynix and Samsung moved their farmland capacity to grow potato. But... people still need to eat. And carrots are a healthy part of their everyday diet.. Now there's no more carrots aside from a player like \"ESMT\", the legacy carrot farmer. So now, because everyone buys carrots off ESMT, there's a shortage and the price goes up. So ESMT needs more carrot seeds (from PSMC). But PSMC is running low on carrot seeds to grow the carrots. So PSMC charges ESMT more for the seeds. But the price ESMT sells the carrots at are much higher than what PSMC hikes the carrod seed price. now... ESMT is making enough from selling carrots that it traded 1.9x P/E off July's earnings. Can ESMT keep selling these carrots through 2027? All the other farmers thinks so since it's both hard + low incentive to migrate their valuable potato farms back to carrot farms.",
+      "triage": {
+        "decided_at": "2026-08-29T22:37:33.753395+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "是同批 ESMT legacy memory thesis 的比喻式摘要；具體產品、價格與來源線索已由更完整的代表性 lead 進 pq1，本則不另占研究 slot。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2093811019823132903"
     },
     "lead_d63109271e1043f807fa19be3bbd69c5": {
       "entities": {
@@ -47854,8 +48498,8 @@
   "schema_version": "2",
   "source_state": {
     "x:aleabitoreddit": {
-      "since_id": "2093281270063337833",
-      "updated_at": "2026-08-29T00:06:22.138314+00:00",
+      "since_id": "2093811019823132903",
+      "updated_at": "2026-08-29T22:33:52.116008+00:00",
       "user_id": "1940360837547565056"
     }
   }
