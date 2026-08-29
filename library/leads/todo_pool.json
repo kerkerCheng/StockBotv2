@@ -4028,6 +4028,18 @@
       "source": "decision_lab",
       "title": "co:marvell_technology：補估值錨點：市值、分析師覆蓋與隱含假設，回答股價已經定價了什麼",
       "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-29T05:55:45.961712+00:00",
+      "hint": "核准 exact graph delta；Decision handoff：co:tower_semiconductor。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 250,
+      "reason": null,
+      "ref_id": "ra_5ad4db87304fa31e61183fbb062b9cec",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "Tower×OpenLight PH18DA 光子平台 PDK 上架 Cadence EDA（設計生態系擴張）",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -9260,6 +9272,6 @@
       "verb": "drop"
     }
   ],
-  "next_n": 250,
+  "next_n": 251,
   "schema_version": "1"
 }

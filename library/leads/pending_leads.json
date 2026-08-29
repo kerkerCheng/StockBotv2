@@ -5620,9 +5620,19 @@
       "first_seen": "2026-08-11T13:07:53.107714+00:00",
       "lead_id": "lead_011ada7ebedc8c7a3ab6ccafa182101e",
       "published_at": "Fri, 03 Jul 2026 16:30:00 +0000",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 MFN 一手 PR（2026-07-03）：Bootstrap Europe 行使轉換權，將 $12M 可轉債全額本金轉為 22,847,044 新股（以債權抵繳），股數 332,234,273→355,081,317、稀釋約 6.4%、股本增至 SEK 177,540,658.50。屬資本結構 dated observation，無供應鏈 graph delta；應由 sivers thesis 複查一併消化（稀釋 vs 減債）。",
+        "primary_url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-lender-bootstrap-europe-exercises-conversion-right-under-existing-convertible-loan-314f3dcb",
+        "research_outcome": "engine_c_capital_structure_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "同標的後續出現具名客戶／供應協議、產能執行證據或財報結構性揭露",
+        "trace_origin_entity": "MFN/Sivers Semiconductors",
+        "trace_original_date": "2026-07-03",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
       "source": "mfn:sivers-semiconductors",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -5663,9 +5673,24 @@
       "first_seen": "2026-08-19T22:32:08.068471+00:00",
       "lead_id": "lead_018171ed92846e0a0f14f1c1a20e6c07",
       "published_at": "2026-08-18",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（META 2026-08-18 當日 12 份）：Powell Dina H.（President and Vice Chairman）：稅務代扣、選擇權/RSU 行使；White Dana（director）：選擇權/RSU 行使；Arnold John Douglas（director）：選擇權/RSU 行使；Elkann John（director）：稅務代扣、選擇權/RSU 行使；LI SUSAN J（Chief Financial Officer）：出售 2,127 股、稅務代扣、選擇權/RSU 行使、轉換；Anderson Aaron（Chief Accounting Officer）：稅務代扣、選擇權/RSU 行使；Cox Christopher K（Chief Product Officer）：稅務代扣、選擇權/RSU 行使；Collison Patrick（director）：選擇權/RSU 行使；Bosworth Andrew（Chief Technology Officer）：稅務代扣、選擇權/RSU 行使；Mahoney Curtis J.（Chief Legal Officer）：稅務代扣、選擇權/RSU 行使；Songhurst Charles（director）：稅務代扣、選擇權/RSU 行使；Olivan Javier（Chief Operating Officer）：稅務代扣、選擇權/RSU 行使。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1326801/000095010326012611/ownership.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/META",
+        "trace_original_date": "2026-08-18",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "META",
+          "co:meta"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:META",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "META 4 filed 2026-08-18",
       "triage": {
@@ -6490,9 +6515,14 @@
       ],
       "published_at": "2026-08-08T17:52:29.000Z",
       "raw_text": "Yes, I'm still bullish on memory like $MU / Samsung.\n\nAs I said earlier, markets tend to rotate from bottleneck to bottleneck.\n\nThis week it looks $AXTI to $LITE in the photonics sector is the focus again. \n\nThe thing is... the primary thing that changed are the stock prices, followed by some narratives + updates sprinkled in here and there.\n\nFor photonics:\n\n> We already knew $COHR / $LITE lasers were completely sold out for the next 2 years during July's drop. \n\n> We knew about demand imbalance from $AAOI from last quarter's earnings calls.\n\nNothing deteriorated fundamentally during July's crash, other than listed price after liquidations. \n\nYet tons of people called $AAOI a \"scam\" when it dropped to $75, or $AXTI a \"scam\" on its drop to $35... \n\nBut are bullish again at $140 or $80, when the transciver/InP substrate bottleneck hasn't changed at all, but maybe even got worse... (eg. draft for US ban on new china optical transceivers, scale up demand projections)\n\nFor Memory:\n\nI'm witnessing a lot of retail capitulation, but the same people I'm seeing were mega bullish after $MU signed 16 SCAs and gave exceptional projections a month ago. \n\nOr were celebrating Samsung having the highest operating profit in the world.\n\nThere's updates here and there eg. Rubin Ultra with memory optimizations (which Nvidia strives for every generation), with prices no longer being hiked way above expectations to the extreme. \n\nBut the operating income relative to MC is just absurd around current prices, especially memory becomes structural. \n\nAnd the demand imbalance should be even worse next year.  \n\nPeople tend to capitulate and follow narratives when a sector drops (eg. Helium/LNG back in Iran war), even if the bottleneck or fundamental situation hasn't really changed much (eg. $SPCX Elon earnings call reiterating memory tightness). \n\nI can't tell others what to to do: \n\nBut $AAOI at $140 and $AAOI at $75 are the same company.\n\nSamsung at a $1.5T MC and Samsung at a $980B MC are the same company. \n\nJust valuations and narratives (often noise) change, and markets rotate from sector to sector.",
-      "refs": {},
+      "refs": {
+        "parked_reason": "作者輪動觀點（memory→InP substrate 板塊輪動），屬市場情緒評論；點名標的（MU/AXTI/LITE/COHR/AAOI）皆已追蹤，無新可驗證 atom。",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_requires_user": "false",
+        "trace_status": "not_pursued"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -7097,9 +7127,24 @@
       "first_seen": "2026-08-22T22:33:07.354703+00:00",
       "lead_id": "lead_093b321c79c6e73e6c2aa73e787c4ef0",
       "published_at": "2026-08-21",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（LITE 2026-08-21 當日 5 份）：Wupen Yuen（PRESIDENT, GLOBAL BUS. UNITS）：出售 2,000 股、稅務代扣；Retort Vincent（SEE REMARKS）：出售 2,483 股、稅務代扣；Kim Jae（SVP, GENERAL COUNSEL）：出售 1,904 股、稅務代扣；HURLSTON MICHAEL E.（President and CEO）：稅務代扣；Ali Wajid（EVP & CHIEF FINANCIAL OFFICER）：稅務代扣。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1633978/000148955026000004/form4-08222026_120847.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/LITE",
+        "trace_original_date": "2026-08-21",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "LITE",
+          "co:lumentum"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:LITE",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -7665,9 +7710,19 @@
       "first_seen": "2026-08-20T22:33:31.653717+00:00",
       "lead_id": "lead_0e0197f7c6c42939f7b285e7485f8aa7",
       "published_at": "Thu, 20 Aug 2026 05:00:00 +0000",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已核對官方 PR（2026-08-20）：Q2 2026 報告簡報邀請，webcast 改於美股盤後時段（inderes 平台），Q2 報告日 2026-08-27。純 IR 排程公告。",
+        "primary_url": "https://mfn.se/cis/a/sivers-semiconductors/invitation-to-presentation-of-sivers-semiconductors-q2-2026-report-e04eed67",
+        "research_outcome": "scheduling_announcement_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "同標的後續出現具名客戶／供應協議、產能執行證據或財報結構性揭露",
+        "trace_origin_entity": "MFN/Sivers Semiconductors",
+        "trace_original_date": "2026-08-20",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
       "source": "sivers:press",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -8202,9 +8257,14 @@
       "media": [],
       "published_at": "2026-08-27T05:46:04.000Z",
       "raw_text": "I've always been bullish on memory with $MU / Samsung / solana:SKHYhSjuRWHgikq8eRKbtBbpABgJSkd7ytQV14i9EQ3 for the 2026-2027 period.  \n\nSame opinion, even after $NVDA call. \n\nAnd I've been fervently defending how high end memory demand is structural + OP for operating income (especially during Iran tensions around LNG/Helium). \n\nNvidia earnings just reaffirms what we know about extreme demand since commitments went from $119B -> $279B largely driven by memory procurement. \n\nNvidia's CFO also said: \"We are experiencing extreme pricing conditions in memory.\"\n\nAs for what I've done, H1 2026 I was extremely overweight in memory: \n\nWith $MU, $SNDK, Phison, $SIMO, Nanya, Macronix, Winbond, and $EWY / SK Hynix (HBM/DRAM + NAND + legacy DRAM/NAND + controllers + NOR Flash).\n\nI trimmed down those positions aside from Samsung/SK Hynix longs, since I do believe many have been rerated (eg. Micron $300 -> $1000+ already).\n\nI think the largest price discovery period has played out, but just a waiting game for the operating income to catch up (esp u samsung)\n\nAnd I used that period to go overweight on photonics. \n\nBut I do believe we're seeing a relatively newer cascade down into the \"legacy legacy\" memory like DDR2/DDR3 with the \"legacy\" players like Winbond leaving some of those segments.  \n\nWhere the price hikes finally hit the 40-60% Q/Q mark, which reminds me of the extreme $SNDK days, across  DDR2/DDR3.  \n\nWhich is why I started up positions in ESMT (1.9x P/E from July annualized) and Etron. \n\nMaybe we'll see a price discovery moment further down the legacy memory stack (could be wrong), but that's the area I've focused on recently.",
-      "refs": {},
+      "refs": {
+        "parked_reason": "作者對 memory 2026-2027 的多頭立場重申，無新事件或可追文件；含 solana 地址雜訊。",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_requires_user": "false",
+        "trace_status": "not_pursued"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -9135,9 +9195,24 @@
       "first_seen": "2026-08-20T22:33:35.191383+00:00",
       "lead_id": "lead_1a70d988b953b5e01a4dab9ceb97184b",
       "published_at": "2026-08-20",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（AAOI 2026-08-20 當日 1 份）：Yeh Shu-Hua (Joshua)（*** See Remarks）：出售 6,000 股。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826006634/ownership.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/AAOI",
+        "trace_original_date": "2026-08-20",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "AAOI",
+          "co:applied_optoelectronics"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:AAOI",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "AAOI 4 filed 2026-08-20",
       "triage": {
@@ -9624,9 +9699,14 @@
       ],
       "published_at": "2026-08-15T02:46:31.000Z",
       "raw_text": "US Government urges $AAPL not to buy Chinese memory chips. \n\n$MU, $SKHY, and Samsung are happy to hear this...\n\nHilariously enough, CXMT/YMTC is price hiking too, so it's not exactly \"cheap Chinese memory that floods the market\". \n\nApple once upon a time actually had extreme supplier leverage before the AI boom.",
-      "refs": {},
+      "refs": {
+        "parked_reason": "美國政府勸阻 Apple 採購中國記憶體屬政策新聞，非本圖供應鏈瓶頸 atom；CXMT/YMTC 漲價說法為未具來源轉述。無 graph 落點，不投入追源。",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_requires_user": "false",
+        "trace_status": "not_pursued"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "US Government urges $AAPL not to buy Chinese memory chips. $MU, $SKHY, and Samsung are happy to hear this... Hilariously enough, CXMT/YMTC is price hiking too, so it's not exactly \"cheap Chinese memory that floods the market\". Apple once upon a time actually had extreme supplier leverage before the AI boom.",
       "triage": {
@@ -9928,9 +10008,24 @@
       "first_seen": "2026-08-29T00:06:29.380626+00:00",
       "lead_id": "lead_1d8d945b9039f2a610e9b35e2ca21e51",
       "published_at": "2026-08-27",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（LITE 2026-08-27 當日 11 份）：HURLSTON MICHAEL E.（President and CEO）：出售 548 股、RSU/股權授與；HURLSTON MICHAEL E.（President and CEO）：RSU/股權授與；Wupen Yuen（PRESIDENT, GLOBAL BUS. UNITS）：出售 500 股、RSU/股權授與；Retort Vincent（SEE REMARKS）：出售 38,663 股；Kim Jae（SVP, GENERAL COUNSEL）：出售 12,000 股、RSU/股權授與；Chang Eric（SEE REMARKS）：RSU/股權授與；Ali Wajid（EVP & CHIEF FINANCIAL OFFICER）：RSU/股權授與；Wupen Yuen（PRESIDENT, GLOBAL BUS. UNITS）：RSU/股權授與；Retort Vincent（SEE REMARKS）：RSU/股權授與；Kim Jae（SVP, GENERAL COUNSEL）：RSU/股權授與；Ali Wajid（EVP & CHIEF FINANCIAL OFFICER）：RSU/股權授與。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1633978/000157333826000017/form4-08282026_010801.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/LITE",
+        "trace_original_date": "2026-08-27",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "LITE",
+          "co:lumentum"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:LITE",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -10074,9 +10169,24 @@
       "first_seen": "2026-08-27T22:34:52.737976+00:00",
       "lead_id": "lead_1f7757ebab570135cb422c11d725089a",
       "published_at": "2026-08-27",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 8-K 原文：董事 Sohail Ahmed 與 Michael Cannon 宣布 2026-11-02 退休、董事會 12 席縮至 10 席；純治理事項，無 graph delta。",
+        "primary_url": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0000707549&type=8-K",
+        "research_outcome": "routine_governance_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "同標的後續 filing 出現結構性供應鏈／資本承諾揭露",
+        "trace_origin_entity": "SEC/Lam Research",
+        "trace_original_date": "2026-08-27",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "LRCX",
+          "co:lam_research"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:LRCX",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "LRCX 8-K filed 2026-08-27",
       "triage": {
@@ -10626,9 +10736,14 @@
       ],
       "published_at": "2026-08-13T11:43:50.000Z",
       "raw_text": "In IPO news… Vantage Data Centers is exploring going public at an enormous $100B valuation. \n\nIf you’re not familiar, $ORCL is their anchor tenant for Stargate (OpenAI end user), and Vantage develops/operates hyperscaler DCs.\n\nAnthropic IPO is also expected, with investors expecting $2T valuation, eclipsing $SPCX per FT.\n\nYeah… idk about Anthropic valuations. Jim Cramer defending that valuation is never a good sign. \n\nOn a side note, Opus 5 is probably the worst consumer LLM I’ve used to date, it’s like a 5 IQ LLM operating off terrible data retrieval. With a Fable-like God complex on top.\n\nEnterprise is probably having a better time though. \n\nUnitree IPO is also expected this month and priced it at a $9B valuation. Which is a positive tailwind for Unitree for the humanoid sectors. \n\nNot really an AI name but SHEIN is going public as soon as the 19th this month.\n\nGo ask any girl you know and they’re probably familiar with this platform.",
-      "refs": {},
+      "refs": {
+        "parked_reason": "Vantage Data Centers 探索 $100B IPO 為二手報導（ORCL anchor tenant 說法未追源）；資料中心開發商不在現行 AI 光互連瓶頸圖範圍。",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_requires_user": "false",
+        "trace_status": "not_pursued"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "robotics": {
           "counter_only": false,
@@ -11358,9 +11473,24 @@
       "first_seen": "2026-08-22T22:33:07.354899+00:00",
       "lead_id": "lead_2936b00bd007bf4ae531dd71f460f703",
       "published_at": "2026-08-21",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（LITE 2026-08-21 當日 5 份）：Wupen Yuen（PRESIDENT, GLOBAL BUS. UNITS）：出售 2,000 股、稅務代扣；Retort Vincent（SEE REMARKS）：出售 2,483 股、稅務代扣；Kim Jae（SVP, GENERAL COUNSEL）：出售 1,904 股、稅務代扣；HURLSTON MICHAEL E.（President and CEO）：稅務代扣；Ali Wajid（EVP & CHIEF FINANCIAL OFFICER）：稅務代扣。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1633978/000148955026000004/form4-08222026_120847.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/LITE",
+        "trace_original_date": "2026-08-21",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "LITE",
+          "co:lumentum"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:LITE",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -11436,9 +11566,19 @@
       "first_seen": "2026-08-11T13:07:53.107626+00:00",
       "lead_id": "lead_299f984635431d6b8702ba9406cbf8e8",
       "published_at": "Thu, 09 Jul 2026 05:00:00 +0000",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 MFN 一手 PR（2026-07-09）：財報行事曆更新——Q2 2026 延至 08-27、Q3 11-26、Q4 02-25，明文原因是為 US dual-listing 目標準備 PCAOB 審計要求、強化財務報告流程。排程公告；PCAOB uplift 脈絡與 Ningi audit credibility hold 相關，應由 sivers thesis 複查消化。",
+        "primary_url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-updates-financial-reporting-calendar-c1f73551",
+        "research_outcome": "scheduling_announcement_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "同標的後續出現具名客戶／供應協議、產能執行證據或財報結構性揭露",
+        "trace_origin_entity": "MFN/Sivers Semiconductors",
+        "trace_original_date": "2026-07-09",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
       "source": "mfn:sivers-semiconductors",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -11946,9 +12086,24 @@
       "first_seen": "2026-08-27T22:34:50.632696+00:00",
       "lead_id": "lead_2c2802d82ab3e6d9b79d7ed634486844",
       "published_at": "2026-08-27",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 6-K 原文：GFS 於 2026-08-21 與 JPMorgan 簽訂 15 億美元五年期無擔保循環信貸（SOFR+1.000–1.625%、槓桿比率上限 4.00x），同日終止 2019 年 10 億美元舊額度（終止時零餘額）。資產負債表融資事件，屬 Engine C 時變觀測，無供應鏈 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000129/gf-igrcfxclosing6xkdraft82.htm",
+        "research_outcome": "engine_c_financing_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "同標的後續 filing 出現結構性供應鏈／資本承諾揭露",
+        "trace_origin_entity": "SEC/GlobalFoundries",
+        "trace_original_date": "2026-08-27",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "GFS",
+          "co:globalfoundries"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:GFS",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "GFS 6-K filed 2026-08-27",
       "triage": {
@@ -13497,9 +13652,24 @@
       "first_seen": "2026-08-29T00:06:29.380792+00:00",
       "lead_id": "lead_352cd6ba63852138f52f3644ad2c0bf5",
       "published_at": "2026-08-27",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（LITE 2026-08-27 當日 11 份）：HURLSTON MICHAEL E.（President and CEO）：出售 548 股、RSU/股權授與；HURLSTON MICHAEL E.（President and CEO）：RSU/股權授與；Wupen Yuen（PRESIDENT, GLOBAL BUS. UNITS）：出售 500 股、RSU/股權授與；Retort Vincent（SEE REMARKS）：出售 38,663 股；Kim Jae（SVP, GENERAL COUNSEL）：出售 12,000 股、RSU/股權授與；Chang Eric（SEE REMARKS）：RSU/股權授與；Ali Wajid（EVP & CHIEF FINANCIAL OFFICER）：RSU/股權授與；Wupen Yuen（PRESIDENT, GLOBAL BUS. UNITS）：RSU/股權授與；Retort Vincent（SEE REMARKS）：RSU/股權授與；Kim Jae（SVP, GENERAL COUNSEL）：RSU/股權授與；Ali Wajid（EVP & CHIEF FINANCIAL OFFICER）：RSU/股權授與。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1633978/000157333826000017/form4-08282026_010801.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/LITE",
+        "trace_original_date": "2026-08-27",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "LITE",
+          "co:lumentum"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:LITE",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -13677,9 +13847,19 @@
       "first_seen": "2026-08-13T22:33:16.905395+00:00",
       "lead_id": "lead_360d8205bc213c74de182069147142ca",
       "published_at": "Thu, 13 Aug 2026 05:00:00 +0000",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對官方 PR（2026-08-13）：Q2 股價由 SEK 10.71 漲至 63.15，依瑞典會計準則須重估股權激勵的雇主社會稅負債，Q2 認列 42.9 MSEK 非現金費用；不影響營運現金流。屬 Engine C 財務時變觀測，無 graph delta。",
+        "primary_url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-strong-share-price-appreciation-drives-revaluation-of-social-tax-liability-in-q2-2026-ce62dbe9",
+        "research_outcome": "engine_c_financial_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "同標的後續出現具名客戶／供應協議、產能執行證據或財報結構性揭露",
+        "trace_origin_entity": "MFN/Sivers Semiconductors",
+        "trace_original_date": "2026-08-13",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
       "source": "sivers:press",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "Strong Share Price Appreciation Drives Revaluation of Social Tax Liability in Q2 2026",
       "triage": {
@@ -13798,9 +13978,24 @@
       "first_seen": "2026-08-20T22:33:44.426779+00:00",
       "lead_id": "lead_371966aa5c74144595758b25ae702179",
       "published_at": "2026-07-17",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（MU 2026-07-17 當日 1 份）：ALLEN SCOTT R.（CVP, Chief Accounting Officer）：稅務代扣。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/723125/000165214926000004/primarydocument.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/MU",
+        "trace_original_date": "2026-07-17",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "MU",
+          "co:micron_technology"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:MU",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "MU 4 filed 2026-07-17",
       "triage": {
@@ -14396,9 +14591,10 @@
       "published_at": "2026-07-31T08:25:39.000Z",
       "raw_text": "For $XFAB ER transcript:  \n\nJust to recap, my idea on $XFAB foundry growth opportunities stemmed from SiC for 800v and photonixfab/MTP for CPO applicability.   \n\n- $XFAB: \"We are making progress in co-packaged optics\".  \n\n- \"The transition to 800v... is expected to support demand for both SiC and GaN... for XFAB\"  \n\nSo those analysts/people that were confidently bearposting about $XFAB that they had \"0 exposure to 800V, photonics, CPO\" just turned out plainly wrong. \n\nAt the time I shared my idea, industry materials showed ASE and others cited photonixfab + XFAB as an upcoming CPO player in EU. And filings showed they had exposure names like $NVTS / $POWI in general. \n\nSo glad $XFAB went out to explicitly clear things up to state they were developing in CPO/800v.   \n\nOkay back to the ER:  \n\n- \"We continue to expect photonics volume production to start in 2028\".  Company currently has three silicon photonics projects in development with key partners.   \n\nI thought it would ramp sometime in H2 2027, but was probably early by a few months. \n\n- Several new data center design wins, eg. 3 new SiC design wins (consistent with general 2027 ramp as 800v deployment takes off).  \n\nSo once those ramp in 2027-2028, (markets tend to price things ahead of time), I'd expect $XFAB to be rerated based on growth opportunities.   \n\nTLDR:  \n- Current revenue numbers not as impressive.\n- $XFAB confirmed direct exposure to CPO and 800V shifts (biggest win for thesis) \n- 800V exposure opportunities for SiC (should be 2027)\n-  Timeline is 2028 ramp for photonics volume production  \n\nHappy exposure thesis to CPO/800V was confirmed from this ER. Might be a bit of waiting for revenue ramp.",
       "refs": {
-        "parked_reason": "company_onboarding_source_review_required",
+        "parked_reason": "Requeue 後複查：XFAB ER transcript 的 SiC 800V 與 photonixfab/MTP CPO 適用性說法维持前次 partial receipt；本輪無新一手（XFAB 未有新揭露、photonixfab 未具名 CPO 客戶）。",
+        "research_run": "session:2026-08-29-pq1-full-drain",
         "trace_attempts_ref": "official_XFAB_Q4_2025_investor_presentation_and_2025_annual_report",
-        "trace_next_trigger": "customer_or_partner_officially_confirms_XFAB_photonics_role_and_source_diversity_review",
+        "trace_next_trigger": "X-FAB 具名 photonics/CPO 客戶或產能揭露",
         "trace_requeue_consumed_entities": [
           "NVTS"
         ],
@@ -14416,7 +14612,7 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -14651,9 +14847,24 @@
       "first_seen": "2026-07-30T22:38:48.776604+00:00",
       "lead_id": "lead_3db17a26b013cc15fab10c297fbd02bc",
       "published_at": "2026-07-30",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（GFS 2026-07-30 當日 9 份）：OBEID CARLOS ANTOINE（director）：RSU/股權授與、稅務代扣；KERKO DAVID M（director）：RSU/股權授與；LAZAR JACK R（director）：RSU/股權授與；Antaki Marc（director）：RSU/股權授與、稅務代扣；Halawa Samer（director）：RSU/股權授與；Dorchak Glenda（director）：RSU/股權授與；Yerramilli - Rao Bobby Satyadev（director）：RSU/股權授與；Languille Camilla（director）：RSU/股權授與；MOORTHY GANESH（director）：RSU/股權授與。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000190/wk-form4_1785439283.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/GFS",
+        "trace_original_date": "2026-07-30",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "GFS",
+          "co:globalfoundries"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:GFS",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "GFS 4 filed 2026-07-30",
       "triage": {
@@ -15120,9 +15331,24 @@
       "first_seen": "2026-08-24T22:33:53.498699+00:00",
       "lead_id": "lead_3ed9a47f9e24928f8a6e5ec4de850d1d",
       "published_at": "2026-08-24",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（NVDA 2026-08-24 當日 1 份）：Puri Ajay K（EVP, Worldwide Field Ops）申報 2026-08-24 退休生效、不再受 Section 16 規範，無任何交易；屬治理類 dated observation。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1045810/000134784226000015/wk-form4_1787607122.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/NVDA",
+        "trace_original_date": "2026-08-24",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "NVDA",
+          "co:nvidia"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:NVDA",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -15302,9 +15528,24 @@
       "first_seen": "2026-08-21T22:32:50.813160+00:00",
       "lead_id": "lead_413e8aec4f160aae1e90619952b472a2",
       "published_at": "2026-08-20",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（AEVA 2026-08-20 當日 1 份）：Sinha Saurabh（Chief Financial Officer）：出售 70,000 股。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1789029/000119312526359631/ownership.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/AEVA",
+        "trace_original_date": "2026-08-20",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "AEVA",
+          "co:aeva"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:AEVA",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "AEVA 4 filed 2026-08-20",
       "triage": {
@@ -16433,9 +16674,24 @@
       "first_seen": "2026-07-31T22:40:30.491424+00:00",
       "lead_id": "lead_477d6e1322452cf1c85480334f567405",
       "published_at": "2026-07-31",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（GFS 2026-07-31 當日 8 份）：Yerramilli - Rao Bobby Satyadev（director）：無交易；Antaki Marc（director）：稅務代扣；OBEID CARLOS ANTOINE（director）：稅務代扣；LAZAR JACK R（director）：無交易；Dorchak Glenda（director）：無交易；Azar Samak L（Chief Legal Officer）：出售 335 股；Languille Camilla（director）：稅務代扣；KERKO DAVID M（director）：無交易。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000206/wk-form4_1785530603.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/GFS",
+        "trace_original_date": "2026-07-31",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "GFS",
+          "co:globalfoundries"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:GFS",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "GFS 4 filed 2026-07-31",
       "triage": {
@@ -17244,9 +17500,24 @@
       "first_seen": "2026-08-29T00:06:29.380540+00:00",
       "lead_id": "lead_4e7209f20ae3951d218afe470fbf58d6",
       "published_at": "2026-08-27",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（LITE 2026-08-27 當日 11 份）：HURLSTON MICHAEL E.（President and CEO）：出售 548 股、RSU/股權授與；HURLSTON MICHAEL E.（President and CEO）：RSU/股權授與；Wupen Yuen（PRESIDENT, GLOBAL BUS. UNITS）：出售 500 股、RSU/股權授與；Retort Vincent（SEE REMARKS）：出售 38,663 股；Kim Jae（SVP, GENERAL COUNSEL）：出售 12,000 股、RSU/股權授與；Chang Eric（SEE REMARKS）：RSU/股權授與；Ali Wajid（EVP & CHIEF FINANCIAL OFFICER）：RSU/股權授與；Wupen Yuen（PRESIDENT, GLOBAL BUS. UNITS）：RSU/股權授與；Retort Vincent（SEE REMARKS）：RSU/股權授與；Kim Jae（SVP, GENERAL COUNSEL）：RSU/股權授與；Ali Wajid（EVP & CHIEF FINANCIAL OFFICER）：RSU/股權授與。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1633978/000157333826000017/form4-08282026_010801.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/LITE",
+        "trace_original_date": "2026-08-27",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "LITE",
+          "co:lumentum"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:LITE",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -17381,9 +17652,24 @@
       "first_seen": "2026-08-29T00:06:29.380133+00:00",
       "lead_id": "lead_5105c989c73d16226293c3dd5da999ec",
       "published_at": "2026-08-27",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（LITE 2026-08-27 當日 11 份）：HURLSTON MICHAEL E.（President and CEO）：出售 548 股、RSU/股權授與；HURLSTON MICHAEL E.（President and CEO）：RSU/股權授與；Wupen Yuen（PRESIDENT, GLOBAL BUS. UNITS）：出售 500 股、RSU/股權授與；Retort Vincent（SEE REMARKS）：出售 38,663 股；Kim Jae（SVP, GENERAL COUNSEL）：出售 12,000 股、RSU/股權授與；Chang Eric（SEE REMARKS）：RSU/股權授與；Ali Wajid（EVP & CHIEF FINANCIAL OFFICER）：RSU/股權授與；Wupen Yuen（PRESIDENT, GLOBAL BUS. UNITS）：RSU/股權授與；Retort Vincent（SEE REMARKS）：RSU/股權授與；Kim Jae（SVP, GENERAL COUNSEL）：RSU/股權授與；Ali Wajid（EVP & CHIEF FINANCIAL OFFICER）：RSU/股權授與。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1633978/000157333826000017/form4-08282026_010801.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/LITE",
+        "trace_original_date": "2026-08-27",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "LITE",
+          "co:lumentum"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:LITE",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -17422,9 +17708,24 @@
       "first_seen": "2026-07-31T22:40:30.491377+00:00",
       "lead_id": "lead_5134606e6235f2b112f74185eca6f514",
       "published_at": "2026-07-31",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（GFS 2026-07-31 當日 8 份）：Yerramilli - Rao Bobby Satyadev（director）：無交易；Antaki Marc（director）：稅務代扣；OBEID CARLOS ANTOINE（director）：稅務代扣；LAZAR JACK R（director）：無交易；Dorchak Glenda（director）：無交易；Azar Samak L（Chief Legal Officer）：出售 335 股；Languille Camilla（director）：稅務代扣；KERKO DAVID M（director）：無交易。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000206/wk-form4_1785530603.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/GFS",
+        "trace_original_date": "2026-07-31",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "GFS",
+          "co:globalfoundries"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:GFS",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "GFS 4 filed 2026-07-31",
       "triage": {
@@ -17555,9 +17856,19 @@
       "first_seen": "2026-08-11T13:44:15.936778+00:00",
       "lead_id": "lead_537a5fe78ab0995f1ca8fb14b42018b6",
       "published_at": "Wed, 03 Jun 2026 07:37:21 +0000",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已由 Yahoo 聚合觸發器追回 RNS 一手（2026-06-03，Investegate 鏡像全文）：公布 2026 AGM 通知（06-30 於 Peel Hunt 倫敦辦公室、全案投票採 poll）與 2025 Annual Report 上網。治理／排程公告本身無 graph delta；2025 年報全文是 IQE thesis（pq2 [109]）財務核驗的一手素材，屬另一個 bounded 研究工作。",
+        "primary_url": "https://www.investegate.co.uk/announcement/rns/iqe--iqe/notice-of-agm-and-annual-report/9598428",
+        "research_outcome": "routine_governance_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "同標的後續出現具名客戶／供應協議、產能執行證據或財報結構性揭露",
+        "trace_origin_entity": "RNS/IQE plc",
+        "trace_original_date": "2026-06-03",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
       "source": "yahoo:iqe-l",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "IQE Schedules Annual General Meeting and Releases 2025 Annual Report (IQE)",
       "triage": {
@@ -18125,9 +18436,14 @@
       "media": [],
       "published_at": "2026-08-20T09:45:17.000Z",
       "raw_text": "I'm glad the leverage bros moved from AI stocks back to Hyerliquid and biotech like $MRNA, so maybe we'll see a faster recovery. \n\nAside from that just some TLDR stuff:\n\n- $EWY up, primarily from SK Hynix buybacks (they're just too profitable), and Samsung Foundry roughly ~10-15% price hikes. \n\n- $SKHY unveils CPO roadmap?? Apparently they're doing something with photonic interposer that links to memory, so I gotta look a bit deeper into this\n\nProbably going to be more TAM expansion, more supply chain beneficiaries (eg. lasers, PICs, packaging) off this.\n\n- $YMTC pursuing IPO next quarter following CMXT's successful IPO. \n\nThe Chinese IPO market is just going brrr from Unitree to memory makers. \n\nUS needs to do something similar rather than IPOing companies at trillion dollar valuations already. \n\n- Tyntek limit up there's now order visibility through 2028, given photodiode demand imbalance for photonics. \n\nElazr GM did say the entire optical supply chain was facing major shortages... I'll probably look more at high-end PD bottlenecks next.\n\n- MS forecasts a 50% Q/Q price increase for DDR4 for Q3, and 10%+ increase for Q4 2026. (Nanya/2408, Windbond/2344, should be happy). \n\n- China reportedly delays clearance from germanium, quartz-based materials, and neodymium magnets To taiwan. \n\nSo I'll probably have some fun looking into supply chains disruptions there over cup noodles.\n\n- High-end PCB drill shortage (still ongoing), Kawei (5498) said AI DCs, servers and optical communications are driving demand for PCBs, HDI and package substrates, while tungsten prices are rising. \n\nThough the world's five largest drill manufacturers are aggressively expanding capacity, supply remains far below overall market demand\n\nJust stuff I found interesting recently, obviously $MRNA stuff is too.",
-      "refs": {},
+      "refs": {
+        "parked_reason": "槓桿資金輪動與 biotech 的市場情緒評論，無可驗證供應鏈 atom。",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_requires_user": "false",
+        "trace_status": "not_pursued"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -19459,9 +19775,19 @@
       "first_seen": "2026-08-13T22:33:16.905007+00:00",
       "lead_id": "lead_6129876cd9d82706d294e7d5b03aa8cf",
       "published_at": "Thu, 13 Aug 2026 15:00:00 +0000",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對官方 PR（2026-08-13）：Bootstrap 行使全部認股權（2025-05-15 董事會決議、EGM 2025-06-09 核准之債務融資配套），以 SEK 4.53 認購 1,659,015 新股、公司獲約 SEK 7.5M，股數 355,081,317→356,740,332。資本結構 dated observation，無 graph delta。",
+        "primary_url": "https://mfn.se/cis/a/sivers-semiconductors/bootstrap-exercises-warrants-in-sivers-semiconductors-bb8a1506",
+        "research_outcome": "engine_c_capital_structure_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "同標的後續出現具名客戶／供應協議、產能執行證據或財報結構性揭露",
+        "trace_origin_entity": "Sivers Semiconductors",
+        "trace_original_date": "2026-08-13",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
       "source": "sivers:press",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -19995,9 +20321,24 @@
       "first_seen": "2026-08-21T22:32:58.442790+00:00",
       "lead_id": "lead_63b835be28af06ea59e52b18fb66b1f1",
       "published_at": "2026-08-17",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（MRVL 2026-08-17 當日 2 份）：MURPHY MATTHEW J（Chairman of the Board and CEO）：出售 7,500 股；Scarpulla Justin（SVP, Chief Accounting Officer）：稅務代扣、選擇權/RSU 行使。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1835632/000162828026057525/wk-form4_1787014784.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/MRVL",
+        "trace_original_date": "2026-08-17",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "MRVL",
+          "co:marvell_technology"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:MRVL",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "MRVL 4 filed 2026-08-17",
       "triage": {
@@ -20467,9 +20808,14 @@
       ],
       "published_at": "2026-08-17T14:16:27.000Z",
       "raw_text": "It's official, Unitree the 8000x+ retail oversubscribed humanoid company in China.\n\nIs expected to go public in 2 days! So the 19th. \n\nOpening is implied to be around ~$41.66B MC per derivatives, around +363.3% above its ~$9B IPO valuation. \n\nFun times for humanoids this week. https://t.co/yav4oRs2bO",
-      "refs": {},
+      "refs": {
+        "parked_reason": "Unitree（688836）IPO 事件評論（超額認購／開盤預期），屬市場時變觀測；人形機器人 stack 的系統性研究由使用者驅動的 system-decompose 決定，不由單則 IPO 推文觸發。",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_requires_user": "false",
+        "trace_status": "not_pursued"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "robotics": {
           "counter_only": false,
@@ -20645,9 +20991,24 @@
       "first_seen": "2026-08-21T22:32:58.443082+00:00",
       "lead_id": "lead_6648e5f5705f5070f8c3dba5cec65f10",
       "published_at": "2026-07-16",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（MRVL 2026-07-16 當日 5 份）：Bharathi Sandeep（President, Data Center Group）：出售 9,013 股、稅務代扣、選擇權/RSU 行使；Casper Mark（EVP & Chief Legal Officer）：稅務代扣、選擇權/RSU 行使；Koopmans Chris（President and COO）：稅務代扣、選擇權/RSU 行使；Scarpulla Justin（SVP, Chief Accounting Officer）：稅務代扣、選擇權/RSU 行使；MURPHY MATTHEW J（Chairman of the Board and CEO）：出售 7,500 股、稅務代扣、選擇權/RSU 行使。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1835632/000162828026048556/wk-form4_1784252922.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/MRVL",
+        "trace_original_date": "2026-07-16",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "MRVL",
+          "co:marvell_technology"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:MRVL",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "MRVL 4 filed 2026-07-16",
       "triage": {
@@ -20881,9 +21242,24 @@
       "first_seen": "2026-07-30T22:38:48.776623+00:00",
       "lead_id": "lead_68b6a66c25484dc609df16fa560aee98",
       "published_at": "2026-07-30",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（GFS 2026-07-30 當日 9 份）：OBEID CARLOS ANTOINE（director）：RSU/股權授與、稅務代扣；KERKO DAVID M（director）：RSU/股權授與；LAZAR JACK R（director）：RSU/股權授與；Antaki Marc（director）：RSU/股權授與、稅務代扣；Halawa Samer（director）：RSU/股權授與；Dorchak Glenda（director）：RSU/股權授與；Yerramilli - Rao Bobby Satyadev（director）：RSU/股權授與；Languille Camilla（director）：RSU/股權授與；MOORTHY GANESH（director）：RSU/股權授與。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000190/wk-form4_1785439283.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/GFS",
+        "trace_original_date": "2026-07-30",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "GFS",
+          "co:globalfoundries"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:GFS",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "GFS 4 filed 2026-07-30",
       "triage": {
@@ -20914,9 +21290,24 @@
       "first_seen": "2026-08-27T22:34:52.031224+00:00",
       "lead_id": "lead_68bb437cf03c35a2406f3f29618fe53a",
       "published_at": "2026-08-26",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（LITE 2026-08-26 當日 1 份）：Wupen Yuen（PRESIDENT, GLOBAL BUS. UNITS）：出售 1,500 股。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1633978/000148955026000005/form4-08262026_110800.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/LITE",
+        "trace_original_date": "2026-08-26",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "LITE",
+          "co:lumentum"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:LITE",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -21159,8 +21550,9 @@
       "raw_text": "As a earnings recap: $AMZN, $META, $GOOGL, and $MSFT guided a 2026 combined capex forecast to ~$720-$745 Billion.\n\nUp from $695-$725B Billion previously.\n\nAmazon: $220B\nGoogle: $195B-$205B\nMeta: $130B-$145B\nMicrosoft: $175B\n\nWe've already seen significant deleveraging and retail/institutional margin liquidations (maybe it continues for more time, who knows). \n\nBut medium-long term, I'm not quite sure how anyone can be bearish the upstream semis or neoclouds. \n\nGiven each hyperscaler has flagged either compute shortages, rising cloud demand + pricing power, or increased spending for chips/networking.  \n\nMy \"bottleneck\" thesis with many of these upstream semi supply chains is that when trillions in capital flows into things from InP substrates or memory (which were both treated as cheap commodities) or even energy. \n\nLot of these current AI names that were treated as useless before in telecom cycles or even toilet sellers. \n\nGets rerated when their inflection period hits and capex flows into their balance sheets. \n\nAs seen with $NVDA GPUs past few years, memory this year, CPUs/MLCCs next few years, CPO in 2027, Glass Substrates in 2027, 800V in 2027, and so on.",
       "refs": {
         "gap": "Amazon／Meta／Microsoft 各自最新 capex 指引的一手出處",
-        "parked_reason": "同屬 Engine C 時變觀測；且合計值為二手彙整，不得當一手事實",
+        "parked_reason": "Requeue 後複查：四大 CSP 2026 capex 合計 $720-745B 為推文自行加總，前次已核 Alphabet 部分與一手相符、合計數未逐家驗證；capex guidance 屬時變財務訊號（Engine C 範疇），本輪無需重複驗證。維持 partial。",
         "research_outcome": "Alphabet 部分與一手相符；四家合計 7,200–7,450 億美元為推文自行加總，未逐家驗證",
+        "research_run": "session:2026-08-29-pq1-full-drain",
         "trace_attempts_ref": "僅逐一核對 Alphabet 一手指引；其餘三家合計數字未逐家回一手 filing",
         "trace_origin_entity": "Alphabet / Amazon / Meta / Microsoft",
         "trace_requeue_trigger": "related_triaged_lead:lead_018171ed92846e0a0f14f1c1a20e6c07",
@@ -21177,7 +21569,7 @@
         "trace_trigger_kind": "primary_source_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -21421,9 +21813,24 @@
       "first_seen": "2026-07-31T22:40:30.491466+00:00",
       "lead_id": "lead_6baf3ec25835e624b5763ea8212236e2",
       "published_at": "2026-07-31",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（GFS 2026-07-31 當日 8 份）：Yerramilli - Rao Bobby Satyadev（director）：無交易；Antaki Marc（director）：稅務代扣；OBEID CARLOS ANTOINE（director）：稅務代扣；LAZAR JACK R（director）：無交易；Dorchak Glenda（director）：無交易；Azar Samak L（Chief Legal Officer）：出售 335 股；Languille Camilla（director）：稅務代扣；KERKO DAVID M（director）：無交易。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000206/wk-form4_1785530603.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/GFS",
+        "trace_original_date": "2026-07-31",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "GFS",
+          "co:globalfoundries"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:GFS",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "GFS 4 filed 2026-07-31",
       "triage": {
@@ -21517,9 +21924,24 @@
       "first_seen": "2026-08-07T22:33:34.092392+00:00",
       "lead_id": "lead_6cc7c974eab84a76ef68831129f474e3",
       "published_at": "2026-08-07",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 10-K 完整原文（389,637 chars）：主要客戶為 Micron、Samsung、SK hynix、TSMC（記憶體 capex 曝險為主）；非美營收約 93%、中國營收 34%（FY24 為 42%）。皆為已知結構與時變財務，對 AI 光互連瓶頸鏈無新 graph delta；LRCX 屬廣覆蓋大市值設備商（研究純度接近 beta）。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/707549/000070754926000113/",
+        "research_outcome": "engine_c_financial_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "同標的後續 filing 出現結構性供應鏈／資本承諾揭露",
+        "trace_origin_entity": "SEC/Lam Research",
+        "trace_original_date": "2026-08-07",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "LRCX",
+          "co:lam_research"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:LRCX",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "LRCX 10-K filed 2026-08-07",
       "triage": {
@@ -21600,9 +22022,24 @@
       "first_seen": "2026-08-06T22:32:20.613960+00:00",
       "lead_id": "lead_6d5296dc7864f7b685e4fdf26490b23e",
       "published_at": "2026-08-06",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（LRCX 2026-08-06 當日 1 份）：Harter Ava（Chief Legal Officer）：稅務代扣。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/707549/000164241526000010/wk-form4_1786030738.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/LRCX",
+        "trace_original_date": "2026-08-06",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "LRCX",
+          "co:lam_research"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:LRCX",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "LRCX 4 filed 2026-08-06",
       "triage": {
@@ -22518,9 +22955,24 @@
       "first_seen": "2026-08-19T22:32:08.068732+00:00",
       "lead_id": "lead_729d8ae123c2ddb5398ec37a4b8864f4",
       "published_at": "2026-08-18",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（META 2026-08-18 當日 12 份）：Powell Dina H.（President and Vice Chairman）：稅務代扣、選擇權/RSU 行使；White Dana（director）：選擇權/RSU 行使；Arnold John Douglas（director）：選擇權/RSU 行使；Elkann John（director）：稅務代扣、選擇權/RSU 行使；LI SUSAN J（Chief Financial Officer）：出售 2,127 股、稅務代扣、選擇權/RSU 行使、轉換；Anderson Aaron（Chief Accounting Officer）：稅務代扣、選擇權/RSU 行使；Cox Christopher K（Chief Product Officer）：稅務代扣、選擇權/RSU 行使；Collison Patrick（director）：選擇權/RSU 行使；Bosworth Andrew（Chief Technology Officer）：稅務代扣、選擇權/RSU 行使；Mahoney Curtis J.（Chief Legal Officer）：稅務代扣、選擇權/RSU 行使；Songhurst Charles（director）：稅務代扣、選擇權/RSU 行使；Olivan Javier（Chief Operating Officer）：稅務代扣、選擇權/RSU 行使。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1326801/000095010326012611/ownership.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/META",
+        "trace_original_date": "2026-08-18",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "META",
+          "co:meta"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:META",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "META 4 filed 2026-08-18",
       "triage": {
@@ -22871,9 +23323,31 @@
       "media": [],
       "published_at": "2026-08-27T21:24:26.000Z",
       "raw_text": "Nah, $SIVE is the most unusual $1B photonics company I've ever seen. \n\nJust for AI DCs alone:\n\n- Reference laser for $GFS SCALE (CPO/NPO/pluggable)\n- 7 pluggable engagements disclosed, with $JBL as primary ramp (with H1 2027 timeline)\n- ELS path with O-Net\n- ELS path with $POET \n- Lasers to Ayar for CPO I/O (now in $NVDA nvlink ecosystem)\n- Lasers for $AEVA (which now has NPO agreements with optical engine providers for hyperscalers)\n- Celestial/Lightmatter/Lightelligence (likely customers in 2023/2024)\n- InP lasers on TFLN with Lightium\n\nThen it has 2 substantial allocations for CW DFB laser capacity during an industry shortage. \n\nAs well as one of the few CPO-grade laser suppliers out in the industry. \n\nLet me know what other player around this range has so many ongoing qualifications, a large TAM, and in photonics. \n\n$SIVE is the #1 for me in terms of MC relative to qualifications paths across the industry.",
-      "refs": {},
+      "refs": {
+        "parked_reason": "作者對 SIVE 的綜合描述。可核對部分：GFS 合作（已在圖／既有 PR 處理）、Q2 數字（見 Q2 PR）。『reference laser for GFS SCALE』的具體綁定與『7 個 AI DC 專案』等計數屬作者整理，書面一手未逐字出現該表述；須等 Sivers 或 GFS 具名技術文件。",
+        "primary_url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-reports-q2-2026-results-as-product-growth-record-pipeline-and-customer-ramps-position-company-for-growth-acceleration-6543505f",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "Sivers/GFS 具名技術文件明寫 SCALE 平台 reference laser 角色",
+        "trace_requires_user": "false",
+        "trace_status": "partial",
+        "trace_trigger_entities": [
+          "AEVA",
+          "GFS",
+          "JBL",
+          "NVDA",
+          "POET",
+          "SIVE",
+          "co:aeva",
+          "co:globalfoundries",
+          "co:jabil",
+          "co:nvidia",
+          "co:poet_technologies",
+          "co:sivers_semiconductors"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -23001,9 +23475,14 @@
       ],
       "published_at": "2026-08-18T16:10:36.000Z",
       "raw_text": "I'm getting Vietnam flashbacks to the launch of OpenAi. \n\nWhere with every model, it just keeps getting better... but now with hunanoids. \n\nUnitree has claimed that their humanoids:\n\n- Can now run faster than Usain Bolt.\n- Can now jump higher than any human. \n\nAnd with their IPO tomorrow, it seems like China is leading the hardware race.",
-      "refs": {},
+      "refs": {
+        "parked_reason": "Unitree 進步速度與 OpenAI 類比，作者敘事評論，無可驗證 atom。",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_requires_user": "false",
+        "trace_status": "not_pursued"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "I'm getting Vietnam flashbacks to the launch of OpenAi. Where with every model, it just keeps getting better... but now with hunanoids. Unitree has claimed that their humanoids: - Can now run faster than Usain Bolt. - Can now jump higher than any human. And with their IPO tomorrow, it seems like China is leading the hardware race.",
       "triage": {
@@ -23086,9 +23565,24 @@
       "first_seen": "2026-07-30T22:38:48.776591+00:00",
       "lead_id": "lead_77fcb309c1c680e74f05d7e23fc66b30",
       "published_at": "2026-07-30",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（GFS 2026-07-30 當日 9 份）：OBEID CARLOS ANTOINE（director）：RSU/股權授與、稅務代扣；KERKO DAVID M（director）：RSU/股權授與；LAZAR JACK R（director）：RSU/股權授與；Antaki Marc（director）：RSU/股權授與、稅務代扣；Halawa Samer（director）：RSU/股權授與；Dorchak Glenda（director）：RSU/股權授與；Yerramilli - Rao Bobby Satyadev（director）：RSU/股權授與；Languille Camilla（director）：RSU/股權授與；MOORTHY GANESH（director）：RSU/股權授與。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000190/wk-form4_1785439283.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/GFS",
+        "trace_original_date": "2026-07-30",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "GFS",
+          "co:globalfoundries"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:GFS",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "GFS 4 filed 2026-07-30",
       "triage": {
@@ -23802,9 +24296,24 @@
       "first_seen": "2026-08-19T22:32:08.068937+00:00",
       "lead_id": "lead_7be0827a837c14570d33adbc9cb6f25b",
       "published_at": "2026-08-18",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（META 2026-08-18 當日 12 份）：Powell Dina H.（President and Vice Chairman）：稅務代扣、選擇權/RSU 行使；White Dana（director）：選擇權/RSU 行使；Arnold John Douglas（director）：選擇權/RSU 行使；Elkann John（director）：稅務代扣、選擇權/RSU 行使；LI SUSAN J（Chief Financial Officer）：出售 2,127 股、稅務代扣、選擇權/RSU 行使、轉換；Anderson Aaron（Chief Accounting Officer）：稅務代扣、選擇權/RSU 行使；Cox Christopher K（Chief Product Officer）：稅務代扣、選擇權/RSU 行使；Collison Patrick（director）：選擇權/RSU 行使；Bosworth Andrew（Chief Technology Officer）：稅務代扣、選擇權/RSU 行使；Mahoney Curtis J.（Chief Legal Officer）：稅務代扣、選擇權/RSU 行使；Songhurst Charles（director）：稅務代扣、選擇權/RSU 行使；Olivan Javier（Chief Operating Officer）：稅務代扣、選擇權/RSU 行使。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1326801/000095010326012611/ownership.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/META",
+        "trace_original_date": "2026-08-18",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "META",
+          "co:meta"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:META",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "META 4 filed 2026-08-18",
       "triage": {
@@ -24290,9 +24799,24 @@
       "first_seen": "2026-08-27T22:34:47.403564+00:00",
       "lead_id": "lead_7daf5468fbf69d8f8cd8eced18bd6704",
       "published_at": "2026-08-27",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（AMAT 2026-08-27 當日 1 份）：Hill Brice（SVP, CFO）：出售 7,500 股。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026059277/wk-form4_1787864517.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/AMAT",
+        "trace_original_date": "2026-08-27",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "AMAT",
+          "co:applied_materials"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:AMAT",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "AMAT 4 filed 2026-08-27",
       "triage": {
@@ -24467,9 +24991,16 @@
       "first_seen": "2026-08-15T01:47:08.542356+00:00",
       "lead_id": "lead_7ecf9784b09432248115ffd46a98387d",
       "published_at": "2026-08-11",
-      "refs": {},
+      "refs": {
+        "action_digest": "baa8751ce26708a52b25704b8845a57642d20b516efd08146bd7fce516b9e7e7",
+        "focus_company_id": "co:tower_semiconductor",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/928876/000117891326004009/zk2635926.htm",
+        "research_action_id": "ra_5ad4db87304fa31e61183fbb062b9cec",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_status": "original_obtained"
+      },
       "source": "edgar:TSEM",
-      "status": "triaged_go",
+      "status": "action_prepared",
       "themes": {},
       "title": "TSEM 6-K filed 2026-08-11",
       "triage": {
@@ -24922,13 +25453,13 @@
         "campaign_window_end": "2026-07-29T13:46:25Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
         "gap": "InP 基板 ASP 漲幅缺乏任何可逐字核對的一手來源。這是分辨 axt_inp thesis「週期 vs 結構」的關鍵缺口，目前無法由公開資料填補；最可能的解答來源是 AXT 自己在 Q3 財報揭露 ASP 貢獻，或下游公司揭露基板成本上升。",
-        "parked_reason": "Nomura ASP 百分比仍只有社群轉述，未取得可逐字核對的報告；AXTI／IQE 發行人資料不足以重建 exact price hikes",
+        "parked_reason": "Requeue 後複查（trigger: related lead b630）：Nomura InP substrate ASP 報告 canonical 原文仍未合法取得，AXTI/IQE 發行人資料仍不足以重建 exact ASP 漲幅；b630 內容（SKHY/SNDK/NVDA 陳述）與 ASP 數字無直接印證關係。維持 isolated_tier_3。最可能解答來源不變：AXT Q3 財報 ASP 揭露或下游成本揭露。",
         "primary_url": "https://x.com/aleabitoreddit/status/2074007618046345249",
         "research_mode": "delta_only",
         "research_outcome": "isolated_broker_note_no_ra",
-        "research_run": "daily:2026-08-28",
-        "trace_attempts_ref": "Nomura 報告公開搜尋、AXTI 與 IQE 官方材料查找；未取得 canonical note",
-        "trace_next_trigger": "canonical Nomura 報告、合法可核對 excerpt，或供應商直接揭露 exact ASP",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_attempts_ref": "2026-08-29 復查：Nomura 公開搜尋無 canonical；MFN/RNS/EDGAR 均無可核對 excerpt",
+        "trace_next_trigger": "canonical Nomura 報告、AXT Q3 財報 ASP 貢獻揭露、或下游公司揭露基板成本上升",
         "trace_requeue_consumed_entities": [
           "AXTI",
           "CO:AXT",
@@ -24952,7 +25483,7 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -25453,9 +25984,14 @@
       ],
       "published_at": "2026-08-19T02:51:57.000Z",
       "raw_text": "Unitree (688836) is now public.\n\nAnd is valued at ~$53.3B, after rising +492.18%\n\nWe finally have a major public company benchmark for humanoids.\n\nFor reference, Agility (backed by $NVDA, $AMZN) via $CCXI is expected to go public at $2.5B premoney valuation Q4. \n\n$TSLA is $1T+, but Optimus is wrapped inside a much larger company.\n\nBut I think Unitree showed that the demand for pure play humanoid players is much larger… than people expected in public markets.",
-      "refs": {},
+      "refs": {
+        "parked_reason": "Unitree 上市首日估值 ~$53.3B（+492%）為可查市場數據，屬時變估值觀測（Engine C 範疇），無供應鏈 graph delta；人形機器人鏈深挖屬使用者決策。",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_requires_user": "false",
+        "trace_status": "not_pursued"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -25509,9 +26045,24 @@
       "first_seen": "2026-07-30T22:38:48.776531+00:00",
       "lead_id": "lead_830c264f2672720822ce495e715d1893",
       "published_at": "2026-07-30",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（GFS 2026-07-30 當日 9 份）：OBEID CARLOS ANTOINE（director）：RSU/股權授與、稅務代扣；KERKO DAVID M（director）：RSU/股權授與；LAZAR JACK R（director）：RSU/股權授與；Antaki Marc（director）：RSU/股權授與、稅務代扣；Halawa Samer（director）：RSU/股權授與；Dorchak Glenda（director）：RSU/股權授與；Yerramilli - Rao Bobby Satyadev（director）：RSU/股權授與；Languille Camilla（director）：RSU/股權授與；MOORTHY GANESH（director）：RSU/股權授與。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000190/wk-form4_1785439283.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/GFS",
+        "trace_original_date": "2026-07-30",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "GFS",
+          "co:globalfoundries"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:GFS",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "GFS 4 filed 2026-07-30",
       "triage": {
@@ -25572,9 +26123,24 @@
       "first_seen": "2026-07-31T22:40:30.491638+00:00",
       "lead_id": "lead_8449bc608af931881de4f3306385d5ab",
       "published_at": "2026-07-31",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（GFS 2026-07-31 當日 8 份）：Yerramilli - Rao Bobby Satyadev（director）：無交易；Antaki Marc（director）：稅務代扣；OBEID CARLOS ANTOINE（director）：稅務代扣；LAZAR JACK R（director）：無交易；Dorchak Glenda（director）：無交易；Azar Samak L（Chief Legal Officer）：出售 335 股；Languille Camilla（director）：稅務代扣；KERKO DAVID M（director）：無交易。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000206/wk-form4_1785530603.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/GFS",
+        "trace_original_date": "2026-07-31",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "GFS",
+          "co:globalfoundries"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:GFS",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "GFS 4 filed 2026-07-31",
       "triage": {
@@ -26206,9 +26772,24 @@
       "first_seen": "2026-08-19T22:32:08.068578+00:00",
       "lead_id": "lead_8601e0f81517fd0e7852fb7642d66762",
       "published_at": "2026-08-18",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（META 2026-08-18 當日 12 份）：Powell Dina H.（President and Vice Chairman）：稅務代扣、選擇權/RSU 行使；White Dana（director）：選擇權/RSU 行使；Arnold John Douglas（director）：選擇權/RSU 行使；Elkann John（director）：稅務代扣、選擇權/RSU 行使；LI SUSAN J（Chief Financial Officer）：出售 2,127 股、稅務代扣、選擇權/RSU 行使、轉換；Anderson Aaron（Chief Accounting Officer）：稅務代扣、選擇權/RSU 行使；Cox Christopher K（Chief Product Officer）：稅務代扣、選擇權/RSU 行使；Collison Patrick（director）：選擇權/RSU 行使；Bosworth Andrew（Chief Technology Officer）：稅務代扣、選擇權/RSU 行使；Mahoney Curtis J.（Chief Legal Officer）：稅務代扣、選擇權/RSU 行使；Songhurst Charles（director）：稅務代扣、選擇權/RSU 行使；Olivan Javier（Chief Operating Officer）：稅務代扣、選擇權/RSU 行使。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1326801/000095010326012611/ownership.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/META",
+        "trace_original_date": "2026-08-18",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "META",
+          "co:meta"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:META",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "META 4 filed 2026-08-18",
       "triage": {
@@ -26237,9 +26818,19 @@
       "first_seen": "2026-08-11T13:07:53.108582+00:00",
       "lead_id": "lead_8610653924d5d66801d50a14f07414ce",
       "published_at": "Tue, 30 Jun 2026 15:31:00 +0000",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 MFN 一手 PR（2026-06-30 意向＋2026-07-01 結果）：定向增發經加速簿記（Pareto Securities）以 SEK 57/股 發行 12,280,701 股、募得約 SEK 7 億（高於原公告的約 6 億）。資金用途明寫：擴充 InP 雷射與光放大器製造產能（AI 資料中心＋車用 LIDAR）、擴編 field 資源與 R&D。屬資本結構事件（Engine C），產能擴充目前是 issuer 自報意向（L8），執行證據出現前不入圖；為 sivers thesis 複查的關鍵 decision evidence。",
+        "primary_url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-has-resolved-on-a-directed-share-issue-of-shares-amounting-to-approximately-sek-700-million-a4130eba",
+        "research_outcome": "engine_c_capital_structure_observation_capacity_intent_self_reported",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "同標的後續出現具名客戶／供應協議、產能執行證據或財報結構性揭露",
+        "trace_origin_entity": "MFN/Sivers Semiconductors",
+        "trace_original_date": "2026-07-01",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
       "source": "mfn:sivers-semiconductors",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -26470,9 +27061,24 @@
       "first_seen": "2026-08-15T01:47:08.542660+00:00",
       "lead_id": "lead_879357d1fbd502906cad7f7d156e294c",
       "published_at": "2026-07-06",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 6-K 原文（zk2635649.htm）：2026-07-02 年度股東會投票結果，各議案通過；純治理例行事項，無供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0000928876&type=6-K",
+        "research_outcome": "routine_governance_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "同標的後續 filing 出現結構性供應鏈／資本承諾揭露",
+        "trace_origin_entity": "SEC/Tower Semiconductor",
+        "trace_original_date": "2026-07-06",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "TSEM",
+          "co:tower_semiconductor"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:TSEM",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "TSEM 6-K filed 2026-07-06",
       "triage": {
@@ -26604,9 +27210,24 @@
       "first_seen": "2026-08-15T01:47:08.542592+00:00",
       "lead_id": "lead_88516b16c6038533278d8eb0fd9b41b8",
       "published_at": "2026-07-07",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 6-K 原文（zk2635656.htm）：宣布 2026-07-07 發布 Q2 2026 財報與法說時程；純排程公告，無實質內容。財報本身屬 Engine C 時變觀測。",
+        "primary_url": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0000928876&type=6-K",
+        "research_outcome": "scheduling_announcement_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "同標的後續 filing 出現結構性供應鏈／資本承諾揭露",
+        "trace_origin_entity": "SEC/Tower Semiconductor",
+        "trace_original_date": "2026-07-07",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "TSEM",
+          "co:tower_semiconductor"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:TSEM",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "TSEM 6-K filed 2026-07-07",
       "triage": {
@@ -26673,9 +27294,24 @@
       "first_seen": "2026-08-20T22:33:44.426924+00:00",
       "lead_id": "lead_88b3a120303773b02ca9264309234c0e",
       "published_at": "2026-07-02",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（MU 2026-07-02 當日 3 份）：Dugle Lynn A：出售 1,300 股、贈與；SWAN ROBERT HOLMES：RSU/股權授與；Liu Teyin M：RSU/股權授與。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/723125/000145336826000001/primarydocument.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/MU",
+        "trace_original_date": "2026-07-02",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "MU",
+          "co:micron_technology"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:MU",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "MU 4 filed 2026-07-02",
       "triage": {
@@ -26736,9 +27372,24 @@
       "first_seen": "2026-08-15T01:47:06.623191+00:00",
       "lead_id": "lead_88ede4d485350da6e978f2f242a3efeb",
       "published_at": "2026-08-06",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 10-Q 完整原文（137,784 chars）：FQ3 Data Center 營收 137.6M（yoy +81%，來自 75.8M），九個月 321.5M vs 213.3M；無 >10% 單一客戶國別以外的集中度揭露；ENGIN-IC 收購為 2024-11 舊事（$14.4M、GaAs/GaN MMIC 設計，前期已揭露）。全屬 Engine C 時變財務觀測，無新供應鏈 graph delta。",
+        "primary_url": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001493594&type=10-Q",
+        "research_outcome": "engine_c_financial_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "同標的後續 filing 出現結構性供應鏈／資本承諾揭露",
+        "trace_origin_entity": "SEC/MACOM",
+        "trace_original_date": "2026-08-06",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "MTSI",
+          "co:macom"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:MTSI",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "MTSI 10-Q filed 2026-08-06",
       "triage": {
@@ -26777,11 +27428,11 @@
       "published_at": "2026-08-11T21:09:43.000Z",
       "raw_text": "Insane earnings today for the AI theme with $CRWV, $SMCI, and $LITE. \n\nCoreweave: Absurd ~$104B+ backlog, which doesn't include $25B+ of new customer agreements added in early Q3. \n\nCompute demand read through for Neoclouds is enormous (For Nebius, Iren and others)\n\nSupermicro:  Absurd $65-72B in revenue guidance, adding $60B+ in new orders... \n\nAI DC buildout read through is just enormous. \n\nLumentum: $808M -> $1.01B -> $1.25B revenue ramp, with operating margins growing quarter after quarter. \n\nPhotonics players just keeps printing. \n\nTLDR: Every layer of the AI buildout goes brrrrr, and it's showing up in earnings.",
       "refs": {
-        "parked_reason": "部分數字取得一手，但 CoreWeave 精確數字仍缺正式文件；沒有新的結構性 graph delta",
+        "parked_reason": "Requeue 後複查：前次 receipt 已核 SMCI 65-72B 指引與 LITE 808M→1.25B；CoreWeave $104B backlog 一手仍只見近 $100B、$104B＋$25B 未核實。均屬時變財務訊號，未產 RA。維持 partial。",
         "research_outcome": "SMCI 65–72B 指引／逾 60B 新訂單及 LITE 808M→1.01B→1.25B 已核實；CoreWeave 一手只見近 100B，104B＋25B 未核實，且均屬時變財務訊號，未產 RA",
-        "research_run": "daily:2026-08-21",
+        "research_run": "session:2026-08-29-pq1-full-drain",
         "trace_attempts_ref": "2026-08-26：SMCI 2026-08-11 官方結果、Lumentum FY26 Q4 官方結果、CoreWeave 官方 Q1 backlog 公告",
-        "trace_next_trigger": "CoreWeave 下一份正式結果或 8-K 逐字確認 104B backlog 與 25B 新協議",
+        "trace_next_trigger": "CoreWeave 下一季 10-Q backlog 揭露",
         "trace_requeue_consumed_entities": [
           "CO:LUMENTUM",
           "LITE"
@@ -26798,10 +27449,10 @@
           "co:lumentum"
         ],
         "trace_trigger_event_ref": "lead:lead_68bb437cf03c35a2406f3f29618fe53a",
-        "trace_trigger_kind": "primary_source_signal"
+        "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -27155,9 +27806,17 @@
       ],
       "published_at": "2026-08-27T01:42:25.000Z",
       "raw_text": "I wanted exposure to DDR2/DDR3 bottleneck ongoing and found ESMT (3006). \n\nA $2.5B MC fabless company with PSMC wafer allocation (esp. focused on DDR2). \n\nLast month's net income was: $109.5M (July month), which annualized is $1.31B net profit (1.9x runrate P/E). \n\nIf we look at net profit throughout the months tracking legacy DRAM price hikes:\n\nJan 2026: ~$16M (est)\nFeb 2026: ~$17M\nMar 2026: ~$31M (est)\nApril 2026: ~$58M\nMay 2026: ~$60M (est)\nJune 2026: ~$67M (est)\nJul 2026: ~$110M\n(Estimated months are inferred from reported quarterly totals. July is company reported)\n\nThis earnings progression reminds me of $SNDK style price hikes + earnings inflection (esp. the report released this month). \n\nAnd I do expect DDR2/DDR3 capacity to remain constrained throughout 2027 (with legacy players like Winbond withdrawing from certain lines too like DDR2).\n\nIt's not quite all inventory liquidation like the other peers. Sure lower cost inventory helped, but the primary driver seems to be the widening spread between wafer costs/supply and legacy dram ASPs?\n\nTheir balance sheet is extremely solid as well:\n\n- Cash on hand: ~$395.9M net cash\n- $249.6M inventory, $146.3M receivables\n\nAnd the net income progression... is before further legacy DRAM hikes expected in Q3. \n\n*disclosure own positions, NFA\n\nIt's always a bit daunting being early without much commentary around the idea. Wondering if anyone can stress test this thesis?\n\nSince a company that grew monthly net income from $16M -> $100m this year alone (July Annualized would be 1.9x P/E). \n\nAnd benefits from another projected wave of DDR2/DDR3 hikes this quarter... maybe like 35-40% for DDR2 lines per Trendforce, and DDR3 likely continuing to rise. \n\nDo markets just not know about this bottleneck/company or am I missing something from my research?",
-      "refs": {},
+      "refs": {
+        "onboard_candidate_names": [
+          "ESMT (Elite Semiconductor Memory Technology, TWSE 3006)"
+        ],
+        "parked_reason": "作者發掘 ESMT（鈺創子公司？3006.TW，$2.5B 市值 fabless、稱有 PSMC 晶圓配額、專注 DDR2/DDR3 長尾）——具名公司＋可查 claim，但屬新產業方向（legacy memory 長尾），是否 onboard 由使用者決定（company-onboard 為使用者驅動）。已標註 onboard candidate。",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_requires_user": "false",
+        "trace_status": "not_pursued"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "I wanted exposure to DDR2/DDR3 bottleneck ongoing and found ESMT (3006). A $2.5B MC fabless company with PSMC wafer allocation (esp. focused on DDR2). Last month's net income was: $109.5M (July month), which annualized is $1.31B net profit (1.9x runrate P/E). If we look at net profit throughout the months tracking legacy DRAM price hikes: Jan 2026: ~$16M (est) Feb 2026: ~$17M Mar 2026: ~$31M (est) April 2026: ~$58M May 2026: ~$60M (est) June 2026: ~$67M (est) Jul 2026: ~$110M (Estimated months are inferred from reported quarterly totals. July is company reported) This earnings progression reminds me of $SNDK style price hikes + earnings inflection (esp. the report released this month). And I do expect DDR2/DDR3 capacity to remain constrained throughout 2027 (with legacy players like Winbond withdrawing from certain lines too like DDR2). It's not quite all inventory liquidation like the other peers. Sure lower cost inventory helped, but the primary driver seems to be the widening spread between wafer costs/supply and legacy dram ASPs? Their balance sheet is extremely solid as well: - Cash on hand: ~$395.9M net cash - $249.6M inventory, $146.3M receivables And the net income progression... is before further legacy DRAM hikes expected in Q3. *disclosure own positions, NFA It's always a bit daunting being early without much commentary around the idea. Wondering if anyone can stress test this thesis? Since a company that grew monthly net income from $16M -> $100m this year alone (July Annualized would be 1.9x P/E). And benefits from another projected wave of DDR2/DDR3 hikes this quarter... maybe like 35-40% for DDR2 lines per Trendforce, and DDR3 likely continuing to rise. Do markets just not know about this bottleneck/company or am I missing something from my research?",
       "triage": {
@@ -27265,9 +27924,24 @@
       "first_seen": "2026-08-19T22:32:08.069002+00:00",
       "lead_id": "lead_8bfed96650ca8c5d643ae26ee43c0af7",
       "published_at": "2026-08-18",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（META 2026-08-18 當日 12 份）：Powell Dina H.（President and Vice Chairman）：稅務代扣、選擇權/RSU 行使；White Dana（director）：選擇權/RSU 行使；Arnold John Douglas（director）：選擇權/RSU 行使；Elkann John（director）：稅務代扣、選擇權/RSU 行使；LI SUSAN J（Chief Financial Officer）：出售 2,127 股、稅務代扣、選擇權/RSU 行使、轉換；Anderson Aaron（Chief Accounting Officer）：稅務代扣、選擇權/RSU 行使；Cox Christopher K（Chief Product Officer）：稅務代扣、選擇權/RSU 行使；Collison Patrick（director）：選擇權/RSU 行使；Bosworth Andrew（Chief Technology Officer）：稅務代扣、選擇權/RSU 行使；Mahoney Curtis J.（Chief Legal Officer）：稅務代扣、選擇權/RSU 行使；Songhurst Charles（director）：稅務代扣、選擇權/RSU 行使；Olivan Javier（Chief Operating Officer）：稅務代扣、選擇權/RSU 行使。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1326801/000095010326012611/ownership.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/META",
+        "trace_original_date": "2026-08-18",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "META",
+          "co:meta"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:META",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "META 4 filed 2026-08-18",
       "triage": {
@@ -28127,9 +28801,24 @@
       "first_seen": "2026-08-29T00:06:32.268715+00:00",
       "lead_id": "lead_942c7773612e0a65939f173fb684615b",
       "published_at": "2026-08-28",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（MU 2026-08-28 當日 1 份）：Bjorlin Alexis：出售 25 股。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/723125/000179875726000007/primarydocument.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/MU",
+        "trace_original_date": "2026-08-28",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "MU",
+          "co:micron_technology"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:MU",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "MU 4 filed 2026-08-28",
       "triage": {
@@ -28190,9 +28879,24 @@
       "first_seen": "2026-08-29T00:06:29.380705+00:00",
       "lead_id": "lead_94b4dcbbb235ed37fb71eab54aafd0aa",
       "published_at": "2026-08-27",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（LITE 2026-08-27 當日 11 份）：HURLSTON MICHAEL E.（President and CEO）：出售 548 股、RSU/股權授與；HURLSTON MICHAEL E.（President and CEO）：RSU/股權授與；Wupen Yuen（PRESIDENT, GLOBAL BUS. UNITS）：出售 500 股、RSU/股權授與；Retort Vincent（SEE REMARKS）：出售 38,663 股；Kim Jae（SVP, GENERAL COUNSEL）：出售 12,000 股、RSU/股權授與；Chang Eric（SEE REMARKS）：RSU/股權授與；Ali Wajid（EVP & CHIEF FINANCIAL OFFICER）：RSU/股權授與；Wupen Yuen（PRESIDENT, GLOBAL BUS. UNITS）：RSU/股權授與；Retort Vincent（SEE REMARKS）：RSU/股權授與；Kim Jae（SVP, GENERAL COUNSEL）：RSU/股權授與；Ali Wajid（EVP & CHIEF FINANCIAL OFFICER）：RSU/股權授與。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1633978/000157333826000017/form4-08282026_010801.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/LITE",
+        "trace_original_date": "2026-08-27",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "LITE",
+          "co:lumentum"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:LITE",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -28247,9 +28951,14 @@
       "media": [],
       "published_at": "2026-08-28T06:53:51.000Z",
       "raw_text": "Here's the angle I'm looking at $SIVE at: \n\nCompanies/CSPs have been going out of their way way to lock up any qualified CW laser capacity for optical transceivers. \n\nSo now, Sivers is coming into the industry with:\n\n- Large capacity from Win Semi\n- \"tremendous capacity that is available now\" from a new foundry (likely qualifications since 2024) since it's engaged \"for a while\"\n\nAnd what excited me from this earnings was the \"6 pluggable/module\" engagements (which is an enormous amount).\n\nThe nuance I'm reading is: \n\n- $COHR said it sees no near term ability to sell InP lasers externally because internal transceiver demand consumes all available\n- $AAOI said the same about consuming laser capacity internally (wasn't a major merchant supplier before though).\n- $LITE has been bottlenecked and been buying lasers off the open market \n\nYour previous merchant players rerouted laser capacity internally. \n\nSo a lot of the bigger names (eg. Eoptolink/Innolight as just a random example) are probably looking to source more lasers. \n\nAnd that kinda matches the quote \"capable of very rapid qualification and ramp\" (which would not match Series B startup)...\n\nLot of people are asking why aren't there LTAs to 2030 then? \n\n-> You can't just randomly escape the qualification process that established players have already completed. \n\nWhy aren't the customers disclosed?\n\nAnd as seen with the $MRVL + $POET engagement, you can't just disclose the vendors you're working with.\n\nBut the \"$1.2B opportunity pipeline\" almost doubled  relative to the jump of $JBL + $GFS. So it's signals that the new pluggable engagements might be pretty substantial relative to Jabil. \n\nSo if $SIVE comes along with enormous amounts of  CW DFB laser capacity during a supply shortage...\n\nThe  industry conditions have changed in a major way that increases conversion rates of engagements. \n\nAnd with the sheer size from all your ~est. customers jabil, globalfoundries, poet, aeva, lightium, ayar, (maybe lightmatter, celestial, lightelligence), 6 other pluggable players, and others. \n\nI think Sivers is going to cook after connecting the dots.",
-      "refs": {},
+      "refs": {
+        "parked_reason": "作者對 CSP 鎖定 CW 雷射產能的 thesis 推斷（『Companies/CSPs going out of their way to lock up qualified CW laser capacity』為作者綜合判斷，無單一可追新文件）；底層可驗證組件（LITE/COHR 產能、Sivers CW DFB 關係、GFS 合作）已在圖或已由既有 receipt 涵蓋。無新 atom 可追。",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_requires_user": "false",
+        "trace_status": "not_pursued"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -28807,9 +29516,24 @@
       "first_seen": "2026-08-27T22:34:47.403694+00:00",
       "lead_id": "lead_98d430a549ccdef60e969effc3ab63fe",
       "published_at": "2026-08-27",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 8-K 原文：董事會選任 Akash Palkhiwala 進董事會與 Audit Committee（標準非執行董事酬勞）；純治理事項，無 graph delta。",
+        "primary_url": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0000006951&type=8-K",
+        "research_outcome": "routine_governance_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "同標的後續 filing 出現結構性供應鏈／資本承諾揭露",
+        "trace_origin_entity": "SEC/Applied Materials",
+        "trace_original_date": "2026-08-27",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "AMAT",
+          "co:applied_materials"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:AMAT",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "AMAT 8-K filed 2026-08-27",
       "triage": {
@@ -29079,9 +29803,27 @@
       ],
       "published_at": "2026-08-27T19:15:45.000Z",
       "raw_text": "$SIVE ER transcript just dropped, TLDR:\n\n- 6 NEW pluggable players working with Sivers now.\n\nProbably the biggest news of the entire ER next to new foundry allocations. \n\n\"3 are in alpha sample evaluation stage\" and another 3 in technical engagement / supply assessment stage.\"\n\nAnd now it makes more sense why their $1.2B revenue pipeline ballooned (since this was a bigger leap than Jabil). \n\n- Initial production orders with $JBL expected in the first half of 2027, with the production ramp planned second half of 2027\n\nLFG, Jabil is a massive hyperscaler supplier and finally got clear timelines on revenue from volume ramp.\n\n- \"new foundry partner who has brought on tremendous capacity that is available now\"\n\nThis is what I wanted to hear. Apparently they've been in the works for this for awhile since it's \"available now\", and THIS IS VERY MATERIAL. \n\nCW lasers are in a massive shortage and $SIVE brought on new supply outside of Win Semi (also de-risks).\n\nAs you hear with other qualified CW players (anything they make gets sold), so as Sivers partners finishes their qualifications, I'm expecting the same.\n\n- \"long-term capacity model where one-third of manufacturing capacity will be internal, while two-thirds will come from our foundry partners\"\n\nLukewarm on this, it makes sense they need to be vertically integrated like $AAOI / $LITE eventually but implies more capex (better after NASDAQ listing).\n\nAs you see with ESMT + DDR2 bottlenecks, the operating income they get from just securing wafers during shortages and doing fabless models is incredible. \n\nAnd it would make more sense to fund this with cashflow down the road.\n\n- NASDAQ listing ongoing. CFO gave a very lawyer like answer, but on track as usual.\n\n- \"We do not see production capacity as a bottleneck at this point in time\"\n\nThis is very meaningful since with their new foundry partners, implies $SIVE is coming online with a very material CW laser supply to a bottlenecked market.\n\nTLDR:\n- NEW substantial FOUNDRY ALLOCATION! (very, very material during CW laser shortage)\n- 6 new pluggable players outside of $JBL \n- Clear revenue ramp timelines from Jabil\n\nHeavy focus on pluggables -> NPO -> CPO seems like the progression.  Only lukewarm piece was building up internal capacity but it's long term positive.  \n\nAnyway, very happy after reading the transcript aside from potential capex prioritizing laser capacity (which is fine too during an industry shortage) over IP acquisition.\n\nThe 6 new pluggable players + substantial wafer allocation \"available now\" is a pretty insane disclosure.",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已取得 SIVE Q2 2026 官方 PR 全文：書面 PR 無『6 家新 pluggable 客戶』字句——該說法只可能出自 ER webcast，須回聽 replay 逐字核對且客戶未具名（L8＋awaiting named disclosure 雙重限制）。PR 可核對部分：產品營收 +18%、pipeline $1.2B、Jabil 1.6T 合作與 GFS 矽光子合作（皆已由個別 PR 處理）。『新 foundry』說法同樣不在書面 PR。",
+        "primary_url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-reports-q2-2026-results-as-product-growth-record-pipeline-and-customer-ramps-position-company-for-growth-acceleration-6543505f",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "Q2 webcast replay 逐字核對，或 Sivers 具名披露 pluggable 客戶",
+        "trace_requires_user": "false",
+        "trace_status": "partial",
+        "trace_trigger_entities": [
+          "AAOI",
+          "JBL",
+          "LITE",
+          "SIVE",
+          "co:applied_optoelectronics",
+          "co:jabil",
+          "co:lumentum",
+          "co:sivers_semiconductors"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -29418,9 +30160,24 @@
       "first_seen": "2026-08-21T22:32:58.442866+00:00",
       "lead_id": "lead_9b21f27f0d9e2c46c3382657635587de",
       "published_at": "2026-08-17",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（MRVL 2026-08-17 當日 2 份）：MURPHY MATTHEW J（Chairman of the Board and CEO）：出售 7,500 股；Scarpulla Justin（SVP, Chief Accounting Officer）：稅務代扣、選擇權/RSU 行使。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1835632/000162828026057525/wk-form4_1787014784.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/MRVL",
+        "trace_original_date": "2026-08-17",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "MRVL",
+          "co:marvell_technology"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:MRVL",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "MRVL 4 filed 2026-08-17",
       "triage": {
@@ -29753,9 +30510,24 @@
       "first_seen": "2026-08-10T22:32:48.229018+00:00",
       "lead_id": "lead_9c8e74dbe151399b2cc489614cd0b44f",
       "published_at": "2026-08-10",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（GFS 2026-08-10 當日 1 份）：Azar Samak L（Chief Legal Officer）：出售 335 股。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1709048/000162828026055095/wk-form4_1786383131.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/GFS",
+        "trace_original_date": "2026-08-10",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "GFS",
+          "co:globalfoundries"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:GFS",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "GFS 4 filed 2026-08-10",
       "triage": {
@@ -29868,9 +30640,24 @@
       "first_seen": "2026-08-29T00:06:29.380258+00:00",
       "lead_id": "lead_9d94ea7e84e76c027a3bfe373e8a32bd",
       "published_at": "2026-08-27",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（LITE 2026-08-27 當日 11 份）：HURLSTON MICHAEL E.（President and CEO）：出售 548 股、RSU/股權授與；HURLSTON MICHAEL E.（President and CEO）：RSU/股權授與；Wupen Yuen（PRESIDENT, GLOBAL BUS. UNITS）：出售 500 股、RSU/股權授與；Retort Vincent（SEE REMARKS）：出售 38,663 股；Kim Jae（SVP, GENERAL COUNSEL）：出售 12,000 股、RSU/股權授與；Chang Eric（SEE REMARKS）：RSU/股權授與；Ali Wajid（EVP & CHIEF FINANCIAL OFFICER）：RSU/股權授與；Wupen Yuen（PRESIDENT, GLOBAL BUS. UNITS）：RSU/股權授與；Retort Vincent（SEE REMARKS）：RSU/股權授與；Kim Jae（SVP, GENERAL COUNSEL）：RSU/股權授與；Ali Wajid（EVP & CHIEF FINANCIAL OFFICER）：RSU/股權授與。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1633978/000157333826000017/form4-08282026_010801.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/LITE",
+        "trace_original_date": "2026-08-27",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "LITE",
+          "co:lumentum"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:LITE",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -29909,9 +30696,24 @@
       "first_seen": "2026-08-19T22:32:08.773854+00:00",
       "lead_id": "lead_9f9ed402e43168da878626a812f3a150",
       "published_at": "2026-08-19",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（MTSI 2026-08-19 當日 1 份）：Kober John（Senior VP and CFO）：出售 7,389 股。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1493594/000090445426000468/edgar.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/MTSI",
+        "trace_original_date": "2026-08-19",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "MTSI",
+          "co:macom"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:MTSI",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "MTSI 4 filed 2026-08-19",
       "triage": {
@@ -30021,10 +30823,10 @@
       "published_at": "2026-08-25T09:46:32.000Z",
       "raw_text": "Lot of people were wondering about $SIVE earnings in 2 days. \n\nWhat I'm watching out for: \n\n1. I'm hoping for more visibility on photonics co-development/qualifications/contracts. \n\n-> $AAOI stated multiple customers approaching them for CPO lasers (but had to turn them away)\n-> $MTSI stated many customers approaching them for CW capacity (but doesn't come online until H2 2027)\n\nSo read through for a company serving as $GFS reference laser, $JBL for pluggables (ex. intel siph), to Ayar for CPO.\n\nAnd in a merchant position:\n-> with independent CW DFB supply (with Win semi)\n-> CPO-grade lasers. \n\nIs incredibly positive for more customers approaching Sivers.  \n\n2. Ongoing developments turning into volume\n\n-> I'm most excited about $JBL, which would probably be the main revenue ramp in H1 2027. \n-> $AEVA is likely much smaller in comparison, but should be a contributor H2 2026. \n-> Ayar and optical I/O players already stated 2028 for HVM, so not really expecting much there. \n-> Co-developments from their other pluggable players (from last ER) turning into qualifications -> volume).\n\nAside from that:\n\n3. NASDAQ listing \n\n-> We already got timelines for that \"next few quarters\", so it's not really a focus to narrow that down further. Always nice to get an update. \n\n4. Financials\n\n-> Again, current financials aren't a focus for qualification-cycle players. Just a heads up, there's some one-time accounting this quarter, which affects things optically. \n\nMain thing is volume ramps for future quarters. \n\n-> revenue pipeline increase\n-> any early volume contracts signed\n\nBalance sheet concerns should be cleared now given their recent $70m fundraising + bootstrap dilution overhang gone. \n\nBonus cookies: \n-> Any information about allocations secured \"eg. we have substantial CW capacity secured -> would be extremely high signal given current shortages. \n\n-> Reiterate demand that AOI, Macom, Lumentum, Coherent stated. \"eg. any capacity we get would be filled from demand\"\n\n$AAOI had their massive $30 -> $220 rally after they stated like $471M expected capacity in 2027, and reiterated that into revenue guidance. (but then had a lot of ATMs) \n\nAn ambitious bull case + full capacity revenue statement for future timelines like H1 2028 for Sivers would be nice, but not expected. \n\nA further re-rating would help for M&A with a Cloud Light type acquisition for revenue acceleration in future earnings. \n\nObviously Sivers has other volume ramps, but I think photonics is what the market is primarily underwriting.\n\nRegardless, excited for what's up and coming.",
       "refs": {
-        "parked_reason": "Q2 官方稿已出，但未在公開稿具名新增 pluggable 客戶、foundry allocation 或 Jabil H1 2027 ramp；pre-earnings watchlist 只部分命中",
-        "primary_url": "https://www.sivers-semiconductors.com/press/sivers-semiconductors-reports-q2-2026-results-as-product-growth-record-pipeline-and-customer-ramps-position-company-for-growth-acceleration/",
+        "parked_reason": "本推文為 Q2 財報前的期望清單，Q2 官方 PR（2026-08-27）已發布並取得全文，期望項目已被實際結果取代；photonics co-development 可見度等問題由 sivers thesis 複查依 Q2 實際內容評估。前次 partial receipt 保留於 log。",
+        "primary_url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-reports-q2-2026-results-as-product-growth-record-pipeline-and-customer-ramps-position-company-for-growth-acceleration-6543505f",
         "research_outcome": "q2_arrived_specific_social_expectations_unverified",
-        "research_run": "daily:2026-08-28",
+        "research_run": "session:2026-08-29-pq1-full-drain",
         "trace_attempts_ref": "Sivers Q2 發行人稿逐項核對 pre-earnings checklist",
         "trace_next_trigger": "等正式 interim PDF 或法說逐字稿補 customer qualification 與 allocation",
         "trace_requeue_consumed_entities": [
@@ -30040,7 +30842,7 @@
         "trace_requeue_trigger": "related_triaged_lead:lead_94c3d27bd4834699b29cb922ecc073b6",
         "trace_requeued_at": "2026-08-29T00:08:22.783611+00:00",
         "trace_requires_user": "false",
-        "trace_status": "partial",
+        "trace_status": "original_obtained",
         "trace_trigger_entities": [
           "AAOI",
           "AEVA",
@@ -30059,7 +30861,7 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -31609,9 +32411,19 @@
       "first_seen": "2026-08-12T22:33:27.411183+00:00",
       "lead_id": "lead_aaaf36c7e86f136c9a3530debbb00d3f",
       "published_at": "Wed, 12 Aug 2026 07:23:01 +0000",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已由 Yahoo 聚合觸發器追回 RNS 一手（2026-08-12，Investegate 鏡像全文）：H1 2026（至 06-30）未審核期中報告將於 2026-09-07 週一發布、當日 09:00 webcast。純排程公告；09-07 結果是 IQE thesis 的下一個 evidence 事件。",
+        "primary_url": "https://www.investegate.co.uk/announcement/rns/iqe--iqe/iqe-plc-notice-of-results/9716758",
+        "research_outcome": "scheduling_announcement_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "同標的後續出現具名客戶／供應協議、產能執行證據或財報結構性揭露",
+        "trace_origin_entity": "RNS/IQE plc",
+        "trace_original_date": "2026-08-12",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
       "source": "yahoo:iqe-l",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "IQE Sets 7 September Date for H1 2026 Results as Semiconductor Demand Comes Into Focus",
       "triage": {
@@ -31798,9 +32610,24 @@
       "first_seen": "2026-08-20T22:33:43.050433+00:00",
       "lead_id": "lead_ac19b6d0b592484acada292ba8525bfe",
       "published_at": "2026-08-20",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（META 2026-08-20 當日 3 份）：Mahoney Curtis J.（Chief Legal Officer）：出售 1,559 股；LI SUSAN J（Chief Financial Officer）：出售 9,196 股；Bosworth Andrew（Chief Technology Officer）：出售 7,848 股。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1326801/000095010326012729/ownership.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/META",
+        "trace_original_date": "2026-08-20",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "META",
+          "co:meta"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:META",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "META 4 filed 2026-08-20",
       "triage": {
@@ -32199,9 +33026,24 @@
       "first_seen": "2026-07-31T22:40:30.491509+00:00",
       "lead_id": "lead_ae452fe9b53575a3b5e5096268aae023",
       "published_at": "2026-07-31",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（GFS 2026-07-31 當日 8 份）：Yerramilli - Rao Bobby Satyadev（director）：無交易；Antaki Marc（director）：稅務代扣；OBEID CARLOS ANTOINE（director）：稅務代扣；LAZAR JACK R（director）：無交易；Dorchak Glenda（director）：無交易；Azar Samak L（Chief Legal Officer）：出售 335 股；Languille Camilla（director）：稅務代扣；KERKO DAVID M（director）：無交易。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000206/wk-form4_1785530603.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/GFS",
+        "trace_original_date": "2026-07-31",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "GFS",
+          "co:globalfoundries"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:GFS",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "GFS 4 filed 2026-07-31",
       "triage": {
@@ -32232,9 +33074,24 @@
       "first_seen": "2026-08-15T01:47:06.623356+00:00",
       "lead_id": "lead_aef8632559fcf57c9fd942cd333e5a85",
       "published_at": "2026-08-06",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 8-K 原文：Item 2.02 發布 FQ3 2026（至 2026-07-03）財報 press release（Exhibit 99.1）；財務內容以同日 10-Q 為準（見該 lead 處置），8-K 本體無獨立 graph delta。",
+        "primary_url": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001493594&type=8-K",
+        "research_outcome": "earnings_release_pointer_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "同標的後續 filing 出現結構性供應鏈／資本承諾揭露",
+        "trace_origin_entity": "SEC/MACOM",
+        "trace_original_date": "2026-08-06",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "MTSI",
+          "co:macom"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:MTSI",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "MTSI 8-K filed 2026-08-06",
       "triage": {
@@ -32468,9 +33325,24 @@
       "first_seen": "2026-08-20T22:33:44.426851+00:00",
       "lead_id": "lead_aff70803a3fe9d0ccd973dfae74d3eea",
       "published_at": "2026-07-06",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（MU 2026-07-06 當日 1 份）：ARNZEN APRIL S（EVP and Chief People Officer）：出售 40,000 股。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/723125/000163206326000003/primarydocument.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/MU",
+        "trace_original_date": "2026-07-06",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "MU",
+          "co:micron_technology"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:MU",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "MU 4 filed 2026-07-06",
       "triage": {
@@ -33067,9 +33939,24 @@
       "first_seen": "2026-08-21T22:32:58.443225+00:00",
       "lead_id": "lead_b1fc52cd3e937e21181f87e95daf0377",
       "published_at": "2026-07-16",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（MRVL 2026-07-16 當日 5 份）：Bharathi Sandeep（President, Data Center Group）：出售 9,013 股、稅務代扣、選擇權/RSU 行使；Casper Mark（EVP & Chief Legal Officer）：稅務代扣、選擇權/RSU 行使；Koopmans Chris（President and COO）：稅務代扣、選擇權/RSU 行使；Scarpulla Justin（SVP, Chief Accounting Officer）：稅務代扣、選擇權/RSU 行使；MURPHY MATTHEW J（Chairman of the Board and CEO）：出售 7,500 股、稅務代扣、選擇權/RSU 行使。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1835632/000162828026048556/wk-form4_1784252922.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/MRVL",
+        "trace_original_date": "2026-07-16",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "MRVL",
+          "co:marvell_technology"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:MRVL",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "MRVL 4 filed 2026-07-16",
       "triage": {
@@ -33525,9 +34412,19 @@
       "first_seen": "2026-08-11T13:07:53.112337+00:00",
       "lead_id": "lead_b438b59a16bf43f336d2b594fe606849",
       "published_at": "Wed, 15 Apr 2026 22:40:00 +0000",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 MFN 一手 PR（2026-04-16）：Sivers 評估於 Nasdaq New York 雙重上市（保留瑞典註冊地），並為此對 2024/2025 合併財報做 PCAOB 標準 audit uplift；明文可能調整項含期間收入重分配、存貨價值與股權激勵費用，公司自評不重大，將反映於 2025 年報（04-27 發布）。屬公司結構評估事件；audit uplift／重編脈絡與 Ningi audit credibility hold 直接相關，必須由 sivers thesis 複查消化，不單獨入圖。",
+        "primary_url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-ab-evaluates-a-potential-dual-listing-of-its-shares-on-the-nasdaq-new-york-69346db5",
+        "research_outcome": "corporate_structure_evaluation_decision_evidence_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "同標的後續出現具名客戶／供應協議、產能執行證據或財報結構性揭露",
+        "trace_origin_entity": "MFN/Sivers Semiconductors",
+        "trace_original_date": "2026-04-16",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
       "source": "mfn:sivers-semiconductors",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -33860,9 +34757,14 @@
       ],
       "published_at": "2026-08-28T08:20:47.000Z",
       "raw_text": "所以… 回到存储这边我们现在有：\n\n$SKHY CEO 表示: “我们预计[存储]短缺将持续到 2030 年底”\n\n$SNDK 表示: “我们看到直到 2030 年，NAND 都存在结构性的巨大需求”非 GAAP 毛利率将维持在约 80%.\n\n$NVDA 表示 供应承诺从 1,190 亿美元增加到 2,790 亿美元，主要由存储采购推动…与此同时, 存储定价处于“极端”水平 而且还在继续上涨.\n\nWinbond 正在与多家客户就延伸至 2029-2030 年的配额展开讨论.\n\n我之前就说过, 存储需求看起来是结构性的, 而现在从传统 DRAM 到 HBM，需求可见度已经延伸到了未来数年..\n\n所以我确实认为, 整个板块的远期 p/e 倍数都有进一步上升的机会.",
-      "refs": {},
+      "refs": {
+        "parked_reason": "SKHY『短缺到 2030』、SNDK『NAND 結構性需求＋~80% 毛利率』、NVDA 供應承諾增加皆為公開財報/法說陳述的中文彙總，屬時變財務訊號，無 graph delta。本 lead 已完成其 related-entity trigger 功能（喚醒 Nomura ASP lead）。",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_requires_user": "false",
+        "trace_status": "not_pursued"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -34021,9 +34923,24 @@
       "first_seen": "2026-07-31T22:40:30.491295+00:00",
       "lead_id": "lead_b6f806984f680a042a3abd3bb409b9ac",
       "published_at": "2026-07-31",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（GFS 2026-07-31 當日 8 份）：Yerramilli - Rao Bobby Satyadev（director）：無交易；Antaki Marc（director）：稅務代扣；OBEID CARLOS ANTOINE（director）：稅務代扣；LAZAR JACK R（director）：無交易；Dorchak Glenda（director）：無交易；Azar Samak L（Chief Legal Officer）：出售 335 股；Languille Camilla（director）：稅務代扣；KERKO DAVID M（director）：無交易。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000206/wk-form4_1785530603.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/GFS",
+        "trace_original_date": "2026-07-31",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "GFS",
+          "co:globalfoundries"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:GFS",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "GFS 4 filed 2026-07-31",
       "triage": {
@@ -34179,9 +35096,24 @@
       "first_seen": "2026-08-19T22:32:08.068872+00:00",
       "lead_id": "lead_b7686de3a17a6d33ca7b3691b3a2fb44",
       "published_at": "2026-08-18",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（META 2026-08-18 當日 12 份）：Powell Dina H.（President and Vice Chairman）：稅務代扣、選擇權/RSU 行使；White Dana（director）：選擇權/RSU 行使；Arnold John Douglas（director）：選擇權/RSU 行使；Elkann John（director）：稅務代扣、選擇權/RSU 行使；LI SUSAN J（Chief Financial Officer）：出售 2,127 股、稅務代扣、選擇權/RSU 行使、轉換；Anderson Aaron（Chief Accounting Officer）：稅務代扣、選擇權/RSU 行使；Cox Christopher K（Chief Product Officer）：稅務代扣、選擇權/RSU 行使；Collison Patrick（director）：選擇權/RSU 行使；Bosworth Andrew（Chief Technology Officer）：稅務代扣、選擇權/RSU 行使；Mahoney Curtis J.（Chief Legal Officer）：稅務代扣、選擇權/RSU 行使；Songhurst Charles（director）：稅務代扣、選擇權/RSU 行使；Olivan Javier（Chief Operating Officer）：稅務代扣、選擇權/RSU 行使。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1326801/000095010326012611/ownership.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/META",
+        "trace_original_date": "2026-08-18",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "META",
+          "co:meta"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:META",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "META 4 filed 2026-08-18",
       "triage": {
@@ -34214,9 +35146,24 @@
       "first_seen": "2026-08-20T22:33:36.722560+00:00",
       "lead_id": "lead_b79863ea7b63f7fac47abf4b4c244d8a",
       "published_at": "2026-08-20",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 10-Q 完整原文（227,717 chars）：BIS 出口管制和解 2.53 億美元屬已揭露舊事且已於 FQ2 付清（含暫緩的 denial order，三年後可豁免）；其餘為時變財務與地理分布。客戶集中於中國／台灣／韓國為已知結構。無新供應鏈 graph delta。",
+        "primary_url": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0000006951&type=10-Q",
+        "research_outcome": "engine_c_financial_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "同標的後續 filing 出現結構性供應鏈／資本承諾揭露",
+        "trace_origin_entity": "SEC/Applied Materials",
+        "trace_original_date": "2026-08-20",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "AMAT",
+          "co:applied_materials"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:AMAT",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "AMAT 10-Q filed 2026-08-20",
       "triage": {
@@ -34354,9 +35301,24 @@
       "first_seen": "2026-08-04T22:34:57.366117+00:00",
       "lead_id": "lead_b92a4885b62b1c782ea0ceae85125983",
       "published_at": "2026-08-04",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（GFS 2026-08-04 當日 1 份）：Pedersen Gregory Johnson（Chief Accounting Officer）：稅務代扣。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000213/wk-form4_1785864305.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/GFS",
+        "trace_original_date": "2026-08-04",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "GFS",
+          "co:globalfoundries"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:GFS",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "GFS 4 filed 2026-08-04",
       "triage": {
@@ -35117,9 +36079,24 @@
       "first_seen": "2026-08-24T22:33:45.106170+00:00",
       "lead_id": "lead_be91fa7b4a0cc45b6f4d624445483836",
       "published_at": "2026-08-24",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（GFS 2026-08-24 當日 1 份）：Azar Samak L（Chief Legal Officer）：出售 335 股。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000221/wk-form4_1787593048.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/GFS",
+        "trace_original_date": "2026-08-24",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "GFS",
+          "co:globalfoundries"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:GFS",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "GFS 4 filed 2026-08-24",
       "triage": {
@@ -35352,9 +36329,24 @@
       "first_seen": "2026-08-22T22:33:07.354974+00:00",
       "lead_id": "lead_c25320aec473f73ca6c5f1b830e6ba27",
       "published_at": "2026-08-21",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（LITE 2026-08-21 當日 5 份）：Wupen Yuen（PRESIDENT, GLOBAL BUS. UNITS）：出售 2,000 股、稅務代扣；Retort Vincent（SEE REMARKS）：出售 2,483 股、稅務代扣；Kim Jae（SVP, GENERAL COUNSEL）：出售 1,904 股、稅務代扣；HURLSTON MICHAEL E.（President and CEO）：稅務代扣；Ali Wajid（EVP & CHIEF FINANCIAL OFFICER）：稅務代扣。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1633978/000148955026000004/form4-08222026_120847.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/LITE",
+        "trace_original_date": "2026-08-21",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "LITE",
+          "co:lumentum"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:LITE",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -36213,12 +37205,13 @@
       "refs": {
         "gap": "first ELS module order 的買方未具名；定價權主張須以後續毛利率交叉驗證",
         "original_claim_status": "confirmed_but_tier_not_upgradable",
-        "parked_reason": "缺客戶端具名文件把產業瓶頸連到 Sivers 的 qualification 或採購承諾",
+        "parked_reason": "維持前次 receipt 結論：LITE/AAOI 需求與雷射瓶頸有一手/tier-2 支持；由產業短缺推到 Sivers 新客戶需求仍是作者推論；既有圖已涵蓋 Sivers CW DFB 關係。本輪 Q2 PR 亦未新增具名 CW DFB 客戶。無新 RA。",
         "pq2_ref": "223",
         "primary_url": "https://www.fool.com/earnings/call-transcripts/2026/08/18/lumentum-lite-q4-2026-earnings-call-transcript/",
         "research_outcome": "LITE／AAOI 的需求與雷射瓶頸有一手／tier-2 支持，但由產業短缺推到 Sivers 新客戶需求仍是推論；既有圖已涵蓋 Sivers CW DFB 關係，未產新 RA",
+        "research_run": "session:2026-08-29-pq1-full-drain",
         "trace_attempts_ref": "2026-08-26：Lumentum 官方 FY26 Q4 結果、AAOI 官方 Q2 結果與 tier-2 法說逐字稿、Sivers 圖譜既有 context",
-        "trace_next_trigger": "2026-08-27 Sivers Q2 或客戶端文件具名確認其 CW DFB qualification／capacity allocation",
+        "trace_next_trigger": "Sivers 具名 CW DFB 客戶或客戶端文件點名 Sivers",
         "trace_origin_entity": "Lumentum Holdings Inc. (Q4 FY2026 earnings call, 第三方轉錄 Motley Fool)",
         "trace_origin_linkage": "supplier_self_report",
         "trace_original_date": "2026-08-18",
@@ -36252,10 +37245,10 @@
           "co:sivers_semiconductors"
         ],
         "trace_trigger_event_ref": "lead:lead_68bb437cf03c35a2406f3f29618fe53a",
-        "trace_trigger_kind": "primary_source_signal"
+        "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -36548,9 +37541,19 @@
       "first_seen": "2026-08-11T13:07:53.109992+00:00",
       "lead_id": "lead_c7cd227d4b3deb2abab969bdee986d0d",
       "published_at": "Fri, 29 May 2026 05:00:00 +0000",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 MFN 一手 PR（2026-05-29）：Q1 2026 淨銷售 SEK 61.9M（yoy -22%，受美國政府關門／國防預算延遲與匯率影響）、調整後 EBITDA -13.8M、營運現金流 -49.2M、每股權益 2.99；opportunity pipeline YTD +77% 至 $799M。屬 Engine C 財務時變觀測；pipeline 是 issuer 自報前瞻指標（L8），不入圖。",
+        "primary_url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-ab-publ-publishes-interim-report-q1-january-march-2026-a14cb894",
+        "research_outcome": "engine_c_financial_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "同標的後續出現具名客戶／供應協議、產能執行證據或財報結構性揭露",
+        "trace_origin_entity": "MFN/Sivers Semiconductors",
+        "trace_original_date": "2026-05-29",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
       "source": "mfn:sivers-semiconductors",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -36664,9 +37667,24 @@
       "first_seen": "2026-08-21T22:32:58.442939+00:00",
       "lead_id": "lead_c8cd04bab33205258807ea5513031487",
       "published_at": "2026-08-03",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（MRVL 2026-08-03 當日 1 份）：Koopmans Chris（President and COO）：出售 10,000 股。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1835632/000162828026051905/wk-form4_1785789180.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/MRVL",
+        "trace_original_date": "2026-08-03",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "MRVL",
+          "co:marvell_technology"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:MRVL",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "MRVL 4 filed 2026-08-03",
       "triage": {
@@ -37339,9 +38357,24 @@
       "first_seen": "2026-07-30T22:38:48.776567+00:00",
       "lead_id": "lead_cacb967c193853afdf372069a7b2e9f9",
       "published_at": "2026-07-30",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（GFS 2026-07-30 當日 9 份）：OBEID CARLOS ANTOINE（director）：RSU/股權授與、稅務代扣；KERKO DAVID M（director）：RSU/股權授與；LAZAR JACK R（director）：RSU/股權授與；Antaki Marc（director）：RSU/股權授與、稅務代扣；Halawa Samer（director）：RSU/股權授與；Dorchak Glenda（director）：RSU/股權授與；Yerramilli - Rao Bobby Satyadev（director）：RSU/股權授與；Languille Camilla（director）：RSU/股權授與；MOORTHY GANESH（director）：RSU/股權授與。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000190/wk-form4_1785439283.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/GFS",
+        "trace_original_date": "2026-07-30",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "GFS",
+          "co:globalfoundries"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:GFS",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "GFS 4 filed 2026-07-30",
       "triage": {
@@ -37755,9 +38788,24 @@
       "first_seen": "2026-08-20T22:33:44.426629+00:00",
       "lead_id": "lead_cd76b656370ae7a291e5de116bf5a679",
       "published_at": "2026-07-28",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（MU 2026-07-28 當日 2 份）：MEHROTRA SANJAY（President and CEO）：出售 8,715 股；MEHROTRA SANJAY（President and CEO）：出售 31,285 股。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/723125/000124265426000014/primarydocument.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/MU",
+        "trace_original_date": "2026-07-28",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "MU",
+          "co:micron_technology"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:MU",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "MU 4 filed 2026-07-28",
       "triage": {
@@ -38036,9 +39084,24 @@
       "first_seen": "2026-08-15T01:47:08.542248+00:00",
       "lead_id": "lead_cf99032c1efe3a6feab880c2e9d0bb14",
       "published_at": "2026-08-12",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 6-K 原文（zk2635939.htm）：宣布參加 8–9 月投資人會議；純 IR 排程公告，無 graph delta。",
+        "primary_url": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0000928876&type=6-K",
+        "research_outcome": "scheduling_announcement_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "同標的後續 filing 出現結構性供應鏈／資本承諾揭露",
+        "trace_origin_entity": "SEC/Tower Semiconductor",
+        "trace_original_date": "2026-08-12",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "TSEM",
+          "co:tower_semiconductor"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:TSEM",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "TSEM 6-K filed 2026-08-12",
       "triage": {
@@ -38071,9 +39134,24 @@
       "first_seen": "2026-08-20T22:33:44.427070+00:00",
       "lead_id": "lead_d01847b89ecc06c127da2643a6518bb6",
       "published_at": "2026-07-02",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（MU 2026-07-02 當日 3 份）：Dugle Lynn A：出售 1,300 股、贈與；SWAN ROBERT HOLMES：RSU/股權授與；Liu Teyin M：RSU/股權授與。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/723125/000145336826000001/primarydocument.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/MU",
+        "trace_original_date": "2026-07-02",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "MU",
+          "co:micron_technology"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:MU",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "MU 4 filed 2026-07-02",
       "triage": {
@@ -39131,9 +40209,24 @@
       "first_seen": "2026-08-29T00:06:27.986372+00:00",
       "lead_id": "lead_d56b464aec0b15d2ab5cd6f4d836fc6f",
       "published_at": "2026-08-28",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（GFS 2026-08-28 當日 1 份）：Azar Samak L（Chief Legal Officer）：出售 335 股。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000227/wk-form4_1787949262.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/GFS",
+        "trace_original_date": "2026-08-28",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "GFS",
+          "co:globalfoundries"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:GFS",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "GFS 4 filed 2026-08-28",
       "triage": {
@@ -39360,9 +40453,19 @@
       "first_seen": "2026-08-11T13:44:15.937499+00:00",
       "lead_id": "lead_d704186deecf318bbe9a73fa936e6fca",
       "published_at": "Tue, 28 Apr 2026 06:57:00 +0000",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已由 Proactive 聚合觸發器追回 RNS 一手（2026-04-28，Investegate 鏡像全文）：Placing＋RetailBook 以 19.8p 發行 55,555,555＋10,101,010 股、募 £13M；與 MACOM 投資及既有可轉債持有人再投資合計 £81M fundraising，條件含 05-15 股東會決議與 MACOM 通過英國 NSI 及義大利 FDI 審查、無承銷。MACOM £45M 投資＋供應協議已入圖（iqe_macom_investment_supply_2026_05_28）；本 placing 屬資本結構 dated observation，無新 graph delta。",
+        "primary_url": "https://www.investegate.co.uk/announcement/rns/iqe--iqe/results-of-placing-and-retail-offer/9540490",
+        "research_outcome": "engine_c_capital_structure_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "同標的後續出現具名客戶／供應協議、產能執行證據或財報結構性揭露",
+        "trace_origin_entity": "RNS/IQE plc",
+        "trace_original_date": "2026-04-28",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
       "source": "yahoo:iqe-l",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "IQE seals £13m equity raise as it works to complete larger funding package",
       "triage": {
@@ -39789,9 +40892,24 @@
       "first_seen": "2026-08-29T00:06:29.380431+00:00",
       "lead_id": "lead_daed54b63799e4c4821e4eaca55bc4ae",
       "published_at": "2026-08-27",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（LITE 2026-08-27 當日 11 份）：HURLSTON MICHAEL E.（President and CEO）：出售 548 股、RSU/股權授與；HURLSTON MICHAEL E.（President and CEO）：RSU/股權授與；Wupen Yuen（PRESIDENT, GLOBAL BUS. UNITS）：出售 500 股、RSU/股權授與；Retort Vincent（SEE REMARKS）：出售 38,663 股；Kim Jae（SVP, GENERAL COUNSEL）：出售 12,000 股、RSU/股權授與；Chang Eric（SEE REMARKS）：RSU/股權授與；Ali Wajid（EVP & CHIEF FINANCIAL OFFICER）：RSU/股權授與；Wupen Yuen（PRESIDENT, GLOBAL BUS. UNITS）：RSU/股權授與；Retort Vincent（SEE REMARKS）：RSU/股權授與；Kim Jae（SVP, GENERAL COUNSEL）：RSU/股權授與；Ali Wajid（EVP & CHIEF FINANCIAL OFFICER）：RSU/股權授與。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1633978/000157333826000017/form4-08282026_010801.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/LITE",
+        "trace_original_date": "2026-08-27",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "LITE",
+          "co:lumentum"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:LITE",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -40071,9 +41189,14 @@
       ],
       "published_at": "2026-08-04T02:34:48.000Z",
       "raw_text": "SK Hynix, $MU , and Samsung have sold out of 2027 capacity for DRAM/HBM.\n\n$SNDK, Samsung, Micron current annual NAND capacity has been sold out, with Kioxia and SK Hynix expected to finalize allocations by August 2026. \n\n- Customers are being allocated only 60–70% of the volumes they initially requested\n\n- industry insiders pointed out that 2027 will enter the most severe moment of memory shortage\n\n- Allocation amounts are mostly decided, but final shipment pricing will be determined closer to delivery \n\nSource: Digitimes, citing industry sources. \n\nHard to see those memory \"oversupply\" claims in early-mid 2027 when they're all sold out of capacity already.",
-      "refs": {},
+      "refs": {
+        "parked_reason": "DRAM/HBM 2027 產能售罄、NAND 年產能售罄為財報季管理層說法的二手彙總，屬時變市場狀態（Engine C 範疇），無結構性 graph delta；不逐條追源。",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_requires_user": "false",
+        "trace_status": "not_pursued"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "SK Hynix, $MU , and Samsung have sold out of 2027 capacity for DRAM/HBM. $SNDK, Samsung, Micron current annual NAND capacity has been sold out, with Kioxia and SK Hynix expected to finalize allocations by August 2026. - Customers are being allocated only 60–70% of the volumes they initially requested - industry insiders pointed out that 2027 will enter the most severe moment of memory shortage - Allocation amounts are mostly decided, but final shipment pricing will be determined closer to delivery Source: Digitimes, citing industry sources. Hard to see those memory \"oversupply\" claims in early-mid 2027 when they're all sold out of capacity already.",
       "triage": {
@@ -40743,9 +41866,24 @@
       "first_seen": "2026-08-19T22:32:08.068805+00:00",
       "lead_id": "lead_e11b0bf0e840788d964f0fd8e75b40b9",
       "published_at": "2026-08-18",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（META 2026-08-18 當日 12 份）：Powell Dina H.（President and Vice Chairman）：稅務代扣、選擇權/RSU 行使；White Dana（director）：選擇權/RSU 行使；Arnold John Douglas（director）：選擇權/RSU 行使；Elkann John（director）：稅務代扣、選擇權/RSU 行使；LI SUSAN J（Chief Financial Officer）：出售 2,127 股、稅務代扣、選擇權/RSU 行使、轉換；Anderson Aaron（Chief Accounting Officer）：稅務代扣、選擇權/RSU 行使；Cox Christopher K（Chief Product Officer）：稅務代扣、選擇權/RSU 行使；Collison Patrick（director）：選擇權/RSU 行使；Bosworth Andrew（Chief Technology Officer）：稅務代扣、選擇權/RSU 行使；Mahoney Curtis J.（Chief Legal Officer）：稅務代扣、選擇權/RSU 行使；Songhurst Charles（director）：稅務代扣、選擇權/RSU 行使；Olivan Javier（Chief Operating Officer）：稅務代扣、選擇權/RSU 行使。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1326801/000095010326012611/ownership.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/META",
+        "trace_original_date": "2026-08-18",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "META",
+          "co:meta"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:META",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "META 4 filed 2026-08-18",
       "triage": {
@@ -41008,9 +42146,24 @@
       "first_seen": "2026-08-20T22:33:44.426511+00:00",
       "lead_id": "lead_e28829cbe06215f29a34c994db872362",
       "published_at": "2026-07-28",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（MU 2026-07-28 當日 2 份）：MEHROTRA SANJAY（President and CEO）：出售 8,715 股；MEHROTRA SANJAY（President and CEO）：出售 31,285 股。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/723125/000124265426000014/primarydocument.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/MU",
+        "trace_original_date": "2026-07-28",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "MU",
+          "co:micron_technology"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:MU",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "MU 4 filed 2026-07-28",
       "triage": {
@@ -41041,9 +42194,24 @@
       "first_seen": "2026-08-20T22:33:44.426706+00:00",
       "lead_id": "lead_e2f0b3abb687d9fcc8a9667cf04091e0",
       "published_at": "2026-07-27",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（MU 2026-07-27 當日 1 份）：ALLEN SCOTT R.（CVP, Chief Accounting Officer）：出售 879 股。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/723125/000165214926000005/primarydocument.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/MU",
+        "trace_original_date": "2026-07-27",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "MU",
+          "co:micron_technology"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:MU",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "MU 4 filed 2026-07-27",
       "triage": {
@@ -41274,9 +42442,24 @@
       "first_seen": "2026-08-20T22:33:40.338402+00:00",
       "lead_id": "lead_e530c84ac4d95741430cd21a813d8942",
       "published_at": "2026-08-20",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（GFS 2026-08-20 當日 1 份）：Raman Pradheepa（Chief People Officer）：出售 6,760 股。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1709048/000162828026058190/wk-form4_1787243591.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/GFS",
+        "trace_original_date": "2026-08-20",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "GFS",
+          "co:globalfoundries"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:GFS",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "GFS 4 filed 2026-08-20",
       "triage": {
@@ -41403,9 +42586,24 @@
       "first_seen": "2026-08-19T22:32:08.068648+00:00",
       "lead_id": "lead_e5c642239fefa5ac4b912d2d10a5c866",
       "published_at": "2026-08-18",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（META 2026-08-18 當日 12 份）：Powell Dina H.（President and Vice Chairman）：稅務代扣、選擇權/RSU 行使；White Dana（director）：選擇權/RSU 行使；Arnold John Douglas（director）：選擇權/RSU 行使；Elkann John（director）：稅務代扣、選擇權/RSU 行使；LI SUSAN J（Chief Financial Officer）：出售 2,127 股、稅務代扣、選擇權/RSU 行使、轉換；Anderson Aaron（Chief Accounting Officer）：稅務代扣、選擇權/RSU 行使；Cox Christopher K（Chief Product Officer）：稅務代扣、選擇權/RSU 行使；Collison Patrick（director）：選擇權/RSU 行使；Bosworth Andrew（Chief Technology Officer）：稅務代扣、選擇權/RSU 行使；Mahoney Curtis J.（Chief Legal Officer）：稅務代扣、選擇權/RSU 行使；Songhurst Charles（director）：稅務代扣、選擇權/RSU 行使；Olivan Javier（Chief Operating Officer）：稅務代扣、選擇權/RSU 行使。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1326801/000095010326012611/ownership.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/META",
+        "trace_original_date": "2026-08-18",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "META",
+          "co:meta"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:META",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "META 4 filed 2026-08-18",
       "triage": {
@@ -41972,9 +43170,24 @@
       "first_seen": "2026-08-29T00:06:29.380341+00:00",
       "lead_id": "lead_e81f027f56717723558a60ab41113825",
       "published_at": "2026-08-27",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（LITE 2026-08-27 當日 11 份）：HURLSTON MICHAEL E.（President and CEO）：出售 548 股、RSU/股權授與；HURLSTON MICHAEL E.（President and CEO）：RSU/股權授與；Wupen Yuen（PRESIDENT, GLOBAL BUS. UNITS）：出售 500 股、RSU/股權授與；Retort Vincent（SEE REMARKS）：出售 38,663 股；Kim Jae（SVP, GENERAL COUNSEL）：出售 12,000 股、RSU/股權授與；Chang Eric（SEE REMARKS）：RSU/股權授與；Ali Wajid（EVP & CHIEF FINANCIAL OFFICER）：RSU/股權授與；Wupen Yuen（PRESIDENT, GLOBAL BUS. UNITS）：RSU/股權授與；Retort Vincent（SEE REMARKS）：RSU/股權授與；Kim Jae（SVP, GENERAL COUNSEL）：RSU/股權授與；Ali Wajid（EVP & CHIEF FINANCIAL OFFICER）：RSU/股權授與。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1633978/000157333826000017/form4-08282026_010801.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/LITE",
+        "trace_original_date": "2026-08-27",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "LITE",
+          "co:lumentum"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:LITE",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -42436,9 +43649,24 @@
       "first_seen": "2026-08-22T22:33:07.355047+00:00",
       "lead_id": "lead_e909b67f1150431797982719ffce53e2",
       "published_at": "2026-08-21",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（LITE 2026-08-21 當日 5 份）：Wupen Yuen（PRESIDENT, GLOBAL BUS. UNITS）：出售 2,000 股、稅務代扣；Retort Vincent（SEE REMARKS）：出售 2,483 股、稅務代扣；Kim Jae（SVP, GENERAL COUNSEL）：出售 1,904 股、稅務代扣；HURLSTON MICHAEL E.（President and CEO）：稅務代扣；Ali Wajid（EVP & CHIEF FINANCIAL OFFICER）：稅務代扣。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1633978/000148955026000004/form4-08222026_120847.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/LITE",
+        "trace_original_date": "2026-08-21",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "LITE",
+          "co:lumentum"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:LITE",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -43045,9 +44273,24 @@
       "first_seen": "2026-08-20T22:33:44.426994+00:00",
       "lead_id": "lead_ef07c7dde73076d407bd4afa24b0e05c",
       "published_at": "2026-07-02",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（MU 2026-07-02 當日 3 份）：Dugle Lynn A：出售 1,300 股、贈與；SWAN ROBERT HOLMES：RSU/股權授與；Liu Teyin M：RSU/股權授與。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/723125/000145336826000001/primarydocument.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/MU",
+        "trace_original_date": "2026-07-02",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "MU",
+          "co:micron_technology"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:MU",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "MU 4 filed 2026-07-02",
       "triage": {
@@ -43546,9 +44789,24 @@
       "first_seen": "2026-08-21T22:32:58.443154+00:00",
       "lead_id": "lead_f1b02f22ff8bbd9fe54d886a7da65f9e",
       "published_at": "2026-07-16",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（MRVL 2026-07-16 當日 5 份）：Bharathi Sandeep（President, Data Center Group）：出售 9,013 股、稅務代扣、選擇權/RSU 行使；Casper Mark（EVP & Chief Legal Officer）：稅務代扣、選擇權/RSU 行使；Koopmans Chris（President and COO）：稅務代扣、選擇權/RSU 行使；Scarpulla Justin（SVP, Chief Accounting Officer）：稅務代扣、選擇權/RSU 行使；MURPHY MATTHEW J（Chairman of the Board and CEO）：出售 7,500 股、稅務代扣、選擇權/RSU 行使。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1835632/000162828026048556/wk-form4_1784252922.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/MRVL",
+        "trace_original_date": "2026-07-16",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "MRVL",
+          "co:marvell_technology"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:MRVL",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "MRVL 4 filed 2026-07-16",
       "triage": {
@@ -43836,9 +45094,24 @@
       "first_seen": "2026-08-21T22:32:57.766443+00:00",
       "lead_id": "lead_f3d1d9e1cb09216d66e7b894cdaec4d3",
       "published_at": "2026-08-20",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（META 2026-08-20 當日 3 份）：Mahoney Curtis J.（Chief Legal Officer）：出售 1,559 股；LI SUSAN J（Chief Financial Officer）：出售 9,196 股；Bosworth Andrew（Chief Technology Officer）：出售 7,848 股。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1326801/000095010326012729/ownership.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/META",
+        "trace_original_date": "2026-08-20",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "META",
+          "co:meta"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:META",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "META 4 filed 2026-08-20",
       "triage": {
@@ -44263,10 +45536,10 @@
       "published_at": "2026-08-27T16:35:34.000Z",
       "raw_text": "$SIVE earnings just got released:\n\n$1.2 billion revenue opportunity pipeline growth up 268% from December (incredible growth). \n\nLast ER: $799M (this was a surprise, likely linked to Jabil)\n\nJuly 2026: ~$1.2B (hinting more either more customer engagements than what's announced or larger volume ramps within programs). \n\n\"Sivers continued to reallocate resources from NRE projects toward product ramp preparation. \n\nSivers expects the impact of this transition to become visible in Q4 2026 and accelerate through 2027 as multiple programs progress toward volume production.\"\n\nMakes sense on timelines. \n\nCurrent financials reflect a qualification-stage player before volume ramp: \n\n- $5.64M in revenue (reducing NRE activity, shifting to volume ramps soon) \n-$3.72M in adjusted EBITDA (what to look at given one-off charges, eg. social security accounting expense)\n\nKey thing to look at is earnings call in 30 minutes, very excited so far.",
       "refs": {
-        "parked_reason": "社群列出的 1.2B pipeline、Q4 2026 起 ramp 與財務數字可由官方 Q2 稿支持；Jabil 歸因與法說增量仍未由一手全文確認",
-        "primary_url": "https://www.sivers-semiconductors.com/press/sivers-semiconductors-reports-q2-2026-results-as-product-growth-record-pipeline-and-customer-ramps-position-company-for-growth-acceleration/",
+        "parked_reason": "推文數字已逐字核對 SIVE Q2 2026 官方 PR（2026-08-27）：pipeline USD 1.2B、較 2025 年底 +268%（上季 $799M）屬實；同 PR：淨銷售 SEK 53.8M（yoy -12%）、產品營收 +13%（匯率調整 +18%）、調整後 EBITDA -35.5M（含 42.9M 非現金社會稅）。全屬 Engine C 時變財務觀測；pipeline 是 issuer 自報前瞻指標（L8）。無新 graph delta；供 sivers thesis 複查消化。",
+        "primary_url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-reports-q2-2026-results-as-product-growth-record-pipeline-and-customer-ramps-position-company-for-growth-acceleration-6543505f",
         "research_outcome": "partial_primary_support_social_inference_unverified",
-        "research_run": "daily:2026-08-28",
+        "research_run": "session:2026-08-29-pq1-full-drain",
         "trace_attempts_ref": "Sivers Q2 發行人稿逐項對照社群貼文",
         "trace_next_trigger": "等官方 Q2 interim PDF 或法說逐字稿提供具名客戶／program 分解",
         "trace_requeue_consumed_entities": [
@@ -44276,7 +45549,7 @@
         "trace_requeue_trigger": "related_triaged_lead:lead_94c3d27bd4834699b29cb922ecc073b6",
         "trace_requeued_at": "2026-08-29T00:08:22.783611+00:00",
         "trace_requires_user": "false",
-        "trace_status": "partial",
+        "trace_status": "original_obtained",
         "trace_trigger_entities": [
           "SIVE",
           "co:sivers_semiconductors"
@@ -44285,7 +45558,7 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -44574,9 +45847,24 @@
       "first_seen": "2026-08-12T22:33:40.399548+00:00",
       "lead_id": "lead_f7021b526cbad34684b3c5580e8fdea7",
       "published_at": "2026-08-12",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（TSEM 2026-08-12 當日 1 份）：CEO Russell Ellwanger 出售 RSU 來源股份合計 181,535 股（加權均價 243.32–263.78 美元、於 TASE 以 NIS 執行）；規模大但屬內部人出售 dated observation。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/928876/000197640826000719/primary_doc.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/TSEM",
+        "trace_original_date": "2026-08-12",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "TSEM",
+          "co:tower_semiconductor"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:TSEM",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "TSEM 4 filed 2026-08-12",
       "triage": {
@@ -44607,9 +45895,24 @@
       "first_seen": "2026-08-22T22:33:07.354819+00:00",
       "lead_id": "lead_f710bb61150f7c468ba01f39952edf1e",
       "published_at": "2026-08-21",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（LITE 2026-08-21 當日 5 份）：Wupen Yuen（PRESIDENT, GLOBAL BUS. UNITS）：出售 2,000 股、稅務代扣；Retort Vincent（SEE REMARKS）：出售 2,483 股、稅務代扣；Kim Jae（SVP, GENERAL COUNSEL）：出售 1,904 股、稅務代扣；HURLSTON MICHAEL E.（President and CEO）：稅務代扣；Ali Wajid（EVP & CHIEF FINANCIAL OFFICER）：稅務代扣。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1633978/000148955026000004/form4-08222026_120847.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/LITE",
+        "trace_original_date": "2026-08-21",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "LITE",
+          "co:lumentum"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:LITE",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -45144,9 +46447,24 @@
       "first_seen": "2026-08-21T22:32:58.443011+00:00",
       "lead_id": "lead_f97a2c6b2da5a8c2e46dd17a6c441ccd",
       "published_at": "2026-07-16",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（MRVL 2026-07-16 當日 5 份）：Bharathi Sandeep（President, Data Center Group）：出售 9,013 股、稅務代扣、選擇權/RSU 行使；Casper Mark（EVP & Chief Legal Officer）：稅務代扣、選擇權/RSU 行使；Koopmans Chris（President and COO）：稅務代扣、選擇權/RSU 行使；Scarpulla Justin（SVP, Chief Accounting Officer）：稅務代扣、選擇權/RSU 行使；MURPHY MATTHEW J（Chairman of the Board and CEO）：出售 7,500 股、稅務代扣、選擇權/RSU 行使。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1835632/000162828026048556/wk-form4_1784252922.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/MRVL",
+        "trace_original_date": "2026-07-16",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "MRVL",
+          "co:marvell_technology"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:MRVL",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "MRVL 4 filed 2026-07-16",
       "triage": {
@@ -45197,9 +46515,14 @@
       "media": [],
       "published_at": "2026-08-16T04:50:40.000Z",
       "raw_text": "Just some TLDRs of stuff I found interesting: \n\n- $SNDK 80% adjusted gross margins projections through 2030, ~75% operating margins and ~50% adjusted FCF margins from investor day. \n\nLTAs already 2/3rd of 2028 output. Minimum contracted revenue reaches $93B (MC is currently ~$239B)... Hard to be a cyclical stock when your revenue/targets are expected to continue 4Y later into 2030.\n\n- $CRWV signs contracts for 6Y old $NVDA A100 GPUs through 2029. \n\nFor Neoclouds like Nebius/Iren, this is positive, since it's a counterargument for eg. Burry depreciation short thesis\n\n- conventional DRAM gross margins eg. Micron is estimated to reach an unprecedented 95% by 2027, surpassing HBM GMs per UBS\n\nread through for legacy/standard dram players like Nanya/Winbond should go brrrr if projections  are correct. \n\n- Anthropic reportedly achieved 14x+ YoY growth and roughly 2.4x sequential revenue growth q2 to >$11.5B,. estimating growth to $190–200B in 2028r evenue numbers.\n\nYour frontier labs keep growing at stupidly fast paces, it would be worrisome if they didnt. \n\n- $NVDA reportedly in talks to invest $3B in SB Energy (Softbank subsidiary), creates a >$500B compute financing push with Apollo, BlackRock, Blackstone, Brookfield, Goldman, and others. $NVDA Feynman reportedly moves to TSMC A16 + SoIC + custom HBM + CPO in H2 2028\n\nJust more nvidia news every day\n\n- $MSFT Maia 300 discussed $TSM capacity for >300k units in 2027, with expansion to 1m+. Unveils as soon as September. \n\nLikely $MRVL should be more happy from this news. For what's happening right now:\n\n- maybe GUC for Microsoft current ASIC ramp. \n- For the Amazon party, stuff like Alchip (I do own shares), likely is ramping now with $AMZN ASIC program H2 2026...\n\nSo might be a good idea to look at hyperscaler ASIC ramp timelines + their beneficiaries. \n\n- $TSM VP of Advanced Packaging stated \"the industry is likely to face not only memory shortages but also tight ABF substrate supply over the next few years\"... \n\nEmphasis on few years for memory + ABF substrates for bottlenecks. \n\nEven upstream abf substrate equipment providers are happy, eg. Eternal Precision which uses vacuum lamination equipment stated orders surged, their plants have been running at full capacity, and 20%+ price hikes. \n\n- $AMAT expects advanced packaging revenue to grow >70% in 2026, versus prior >50%, and said customer discussions now extend all the way to 2030\n\n(not too familiar with this company, but found their growth rate from 2025 Q4 $6.8B ->$7.01B -> 7.91B -> $9.12B -> $10.25B Q4 2026 projections pretty interesting)\n\n- Google said at OCP APAC said conventional 48V is running out of headroom. $NVDA detailed an 800VDC MGX-compatible rack H2 2026 (timeline, Delta / Lite-On beneficaries)\n\n- Aside from $SNDK, Nanya LTAs cover 50% of capacity. CXMT signed multi-year DRAM agreements last month, so entire memory industry seems to be following same playbook as ur big 3. \n\n- Probe cards remain a bottleneck, MPI(6223) said their probe card capacity remains fully utilized because demand exceeds supply. \n\nAlready covered the CW laser bottleneck with $AAOI, $SIVE, and $LITE earlier this week, but that's another fun one.\n\n- some MLCC/component lead times have hit 36 weeks per Nichidenbo.\n\nYour Samsung Electro-Mechanics, Taiyo Yuden, Murata, players should be very happy to hear this. \n\nTLDR: AI supply chains go brrr.",
-      "refs": {},
+      "refs": {
+        "parked_reason": "多主題 TLDR 彙總（SNDK 利潤率預測等），皆屬時變財務訊號或作者整理，無單一可追的結構性 atom。",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_requires_user": "false",
+        "trace_status": "not_pursued"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -45287,9 +46610,24 @@
       "first_seen": "2026-08-21T22:32:57.766330+00:00",
       "lead_id": "lead_fa51013e283073a404520da8dbb0cd90",
       "published_at": "2026-08-20",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（META 2026-08-20 當日 3 份）：Mahoney Curtis J.（Chief Legal Officer）：出售 1,559 股；LI SUSAN J（Chief Financial Officer）：出售 9,196 股；Bosworth Andrew（Chief Technology Officer）：出售 7,848 股。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1326801/000095010326012729/ownership.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/META",
+        "trace_original_date": "2026-08-20",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "META",
+          "co:meta"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:META",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "META 4 filed 2026-08-20",
       "triage": {
@@ -45320,9 +46658,24 @@
       "first_seen": "2026-07-30T22:38:48.776579+00:00",
       "lead_id": "lead_fabcb44c5a4191a580c4d959fd22de5e",
       "published_at": "2026-07-30",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（GFS 2026-07-30 當日 9 份）：OBEID CARLOS ANTOINE（director）：RSU/股權授與、稅務代扣；KERKO DAVID M（director）：RSU/股權授與；LAZAR JACK R（director）：RSU/股權授與；Antaki Marc（director）：RSU/股權授與、稅務代扣；Halawa Samer（director）：RSU/股權授與；Dorchak Glenda（director）：RSU/股權授與；Yerramilli - Rao Bobby Satyadev（director）：RSU/股權授與；Languille Camilla（director）：RSU/股權授與；MOORTHY GANESH（director）：RSU/股權授與。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000190/wk-form4_1785439283.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/GFS",
+        "trace_original_date": "2026-07-30",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "GFS",
+          "co:globalfoundries"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:GFS",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "GFS 4 filed 2026-07-30",
       "triage": {
@@ -45432,9 +46785,24 @@
       "first_seen": "2026-08-21T22:32:59.874636+00:00",
       "lead_id": "lead_fbc7f9da43d7ef918aa4f4349a73d15a",
       "published_at": "2026-08-20",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已逐字核對 SEC 原始 Form 4（MU 2026-08-20 當日 1 份）：Sadana Sumit（EVP and Chief Business Officer）：出售 15,000 股。全屬例行內部人薪酬／出售類 dated observation，無公開市場買入、無 10% owner 申報，不形成供應鏈或產品 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/723125/000131107926000003/primarydocument.xml",
+        "research_outcome": "engine_c_dated_ownership_observation_no_graph_delta",
+        "research_run": "session:2026-08-29-pq1-full-drain",
+        "trace_next_trigger": "後續 Form 4 出現公開市場買入、10% owner 申報或非例行集中買賣",
+        "trace_origin_entity": "SEC/MU",
+        "trace_original_date": "2026-08-20",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained",
+        "trace_trigger_entities": [
+          "MU",
+          "co:micron_technology"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:MU",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "MU 4 filed 2026-08-20",
       "triage": {
