@@ -1,0 +1,93 @@
+{
+  "claims": [
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "若 Apple 後續縮減/取消承諾（10-K 自陳有此風險）或 2027 出貨里程碑跳票，承諾兌現度下修。",
+      "id": "apple_newsroom_mp_magnets_2025_07_15_cl1",
+      "source_ids": [
+        "apple_newsroom_mp_magnets_2025_07_15_s1",
+        "apple_newsroom_mp_magnets_2025_07_15_s2",
+        "apple_newsroom_mp_magnets_2025_07_15_s3"
+      ],
+      "statement": "買方自家文件印證：Apple 承諾 $500M 購買 MP Materials Fort Worth Independence 廠的美製稀土磁體（multiyear deal），並共建 Mountain Pass 回收產線——與 MP 10-K 的 $200.0M 預付款（不同口徑：預付 vs 總承諾）構成雙向印證。Apple 裝置磁體已近全數使用 100% 回收稀土。",
+      "subject_id": "co:mp_materials"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "mat:rare_earth_magnets",
+      "id": "aapl1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "apple_newsroom_mp_magnets_2025_07_15_s1"
+      ],
+      "src_id": "co:mp_materials"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "MP"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:mp_materials",
+      "name": "MP Materials",
+      "role": null,
+      "source_ids": [
+        "apple_newsroom_mp_magnets_2025_07_15_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "NdFeB"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:rare_earth_magnets",
+      "name": "Rare earth magnets (neodymium, samarium-cobalt)",
+      "role": null,
+      "source_ids": [
+        "apple_newsroom_mp_magnets_2025_07_15_s1"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "apple_newsroom_mp_magnets_2025_07_15",
+    "evidence_tier": 2,
+    "origin_entity": "Apple",
+    "permission_basis": "Public Apple newsroom; quotes only.",
+    "published_at": "2025-07-15",
+    "publisher": "Apple Newsroom",
+    "retrieved_at": "2026-08-30",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Apple Newsroom: Apple expands U.S. supply chain with $500 million commitment",
+    "url": "https://www.apple.com/newsroom/2025/07/apple-expands-us-supply-chain-with-500-million-usd-commitment/"
+  },
+  "sources": [
+    {
+      "id": "apple_newsroom_mp_magnets_2025_07_15_s1",
+      "locator": "commitment statement",
+      "quote": "Apple has committed $500 million to buying American-made rare earth magnets developed at MP Materials' flagship Independence facility in Fort Worth, Texas."
+    },
+    {
+      "id": "apple_newsroom_mp_magnets_2025_07_15_s2",
+      "locator": "recycled content",
+      "quote": "Today, nearly all magnets across Apple devices are made with 100 percent recycled rare earth elements."
+    },
+    {
+      "id": "apple_newsroom_mp_magnets_2025_07_15_s3",
+      "locator": "recycling line",
+      "quote": "The two companies will also work together to establish a cutting-edge rare earth recycling line in Mountain Pass, California."
+    }
+  ]
+}
