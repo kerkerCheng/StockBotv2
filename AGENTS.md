@@ -189,6 +189,11 @@ packet（新 pq2 編號）或誠實 park 為止**，不得 dispatch 完就停。
 構成授權管道；收尾建議摘要只得引用編號，不得出現「口頭指示即可」類措辭。理由：使用者的
 核准介面收斂為唯一一種（編號＋`go`），終局 cohort 被收集端正確排除不是例外的藉口——
 收集端不鑄的號，提案端自己鑄。
+**使用者主動指示＝已授權（2026-08-30 補）：** 使用者口頭／文字請求的工作，鑄號只為稽核
+（受理時即以 `go` resolve，receipt 註明使用者指示語境），**不得回頭再請求一次 `go`**——
+重複要核准是介面失敗。`go` 請求流程只適用於**系統主動提案**的項目。四個 authority gate
+（graph admission、Engine C 寫入、thesis mutation、live）不因此放寬：使用者指示的研究
+產出若要入圖，admission 編號照鑄照問——那是新的決策點，不是重複請求。
 
 **Onboard 也走 pq2（2026-08-29 使用者定案）：** 使用者對系統的核准介面收斂為**唯一一種——pq2 編號＋`go`**。新公司 onboard 不再是獨立的對話流程審批：發現方（自主迴圈、routine 或互動研究）把 registry 增列與首批 extraction 打包成 prepared RA 取 `ra_admission` 編號，packet 內必含 L8 來源清單（origin_entity 多樣性現況）與 registry 條目內容；`go` 授權＝「registry 加該公司＋apply 該 RA 入圖」，不含 thesis／live。互動 session 可當場 sync 取號並立刻 `go`，不必等 daily——統一的是**核准的載體**，不是核准的時機。`skills/company-onboard` 的文件發現與 L8 判準照舊，只有最後的核准動作改由 pq2 承載。
 

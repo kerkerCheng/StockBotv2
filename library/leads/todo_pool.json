@@ -4346,12 +4346,20 @@
     },
     {
       "added_at": "2026-08-30T07:21:33.865312+00:00",
+      "completion_authority": {
+        "action_digest": "9d61de0326783fab7cefd438d5de56b42fcfdfb31a90e24c1dee4056e4f5ddec",
+        "cohort_id": "dc_29ef9f7194dc996c9b7eb62a9b21afc6",
+        "commit": "40992c5e23d584bcf2b8bbf9609cadc4da905af0",
+        "company_id": "co:tsmc",
+        "verified_at": "2026-08-30T07:32:03.960180+00:00"
+      },
       "hint": "核准 exact graph delta；Decision handoff：co:tsmc。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 268,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_e3f54350ca7a8f24424c3771a8b31860;digest:9d61de0326783fab7cefd438d5de56b42fcfdfb31a90e24c1dee4056e4f5ddec;commit:40992c5e23d584bcf2b8bbf9609cadc4da905af0;cohort:dc_29ef9f7194dc996c9b7eb62a9b21afc6",
       "ref_id": "ra_e3f54350ca7a8f24424c3771a8b31860",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-30T07:32:03.960180+00:00",
       "source": "research_action",
       "title": "Broadcom TH6-Davisson 官方確認採用 TSMC COUPE——跨陣營製程瓶頸 tier-1 落地",
       "type": "ra_admission"
@@ -10244,6 +10252,15 @@
       "receipt": "decision:pd_1bdeb0d86a91c568157e5cc659ea6145",
       "ref_id": "dc_2bd6137c75808ec4f28541111927d588",
       "type": "decision_review",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-30T07:32:03.960180+00:00",
+      "n": 268,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_e3f54350ca7a8f24424c3771a8b31860;digest:9d61de0326783fab7cefd438d5de56b42fcfdfb31a90e24c1dee4056e4f5ddec;commit:40992c5e23d584bcf2b8bbf9609cadc4da905af0;cohort:dc_29ef9f7194dc996c9b7eb62a9b21afc6",
+      "ref_id": "ra_e3f54350ca7a8f24424c3771a8b31860",
+      "type": "ra_admission",
       "verb": "go"
     }
   ],
