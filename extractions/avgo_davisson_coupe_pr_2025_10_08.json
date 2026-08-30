@@ -1,0 +1,175 @@
+{
+  "claims": [
+    {
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Downgrade if Broadcom's fourth-generation CPO moves off COUPE to another photonics process, or if either camp qualifies a second photonics foundry platform at volume.",
+      "id": "avgo_davisson_coupe_pr_2025_10_08_cl1",
+      "source_ids": [
+        "avgo_davisson_coupe_pr_2025_10_08_s1"
+      ],
+      "statement": "Broadcom (customer side) publicly named TSMC COUPE as the optical-engine technology heterogeneously integrated in its shipping TH6-Davisson CPO switch — combined with NVIDIA's Quantum-X/Spectrum-X use of COUPE, TSMC's COUPE process now serves both major CPO switch camps, a cross-camp process-level concentration one hop below the demand anchors.",
+      "subject_id": "co:tsmc"
+    },
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Downgrade if shipment claims are contradicted by customer-side deployment evidence or the product is recalled/respun.",
+      "id": "avgo_davisson_coupe_pr_2025_10_08_cl2",
+      "source_ids": [
+        "avgo_davisson_coupe_pr_2025_10_08_s2",
+        "avgo_davisson_coupe_pr_2025_10_08_s3"
+      ],
+      "statement": "TH6-Davisson (BCM78919) is shipping as of 2025-10-08: 102.4 Tbps via 16 Davisson DR optical engines (6.4T each) at 200 Gbps per link, with field-replaceable ELSFP laser modules — Broadcom's third-generation CPO switch, doubling TH5-Bailly line rate (issuer self-reported shipping/performance claims).",
+      "subject_id": "co:broadcom"
+    },
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "guided",
+      "disproof_condition": "Revise if future generations integrate lasers on-package (removing the pluggable socket), or if one supplier wins exclusive ELSFP qualification at either camp.",
+      "id": "avgo_davisson_coupe_pr_2025_10_08_cl3",
+      "source_ids": [
+        "avgo_davisson_coupe_pr_2025_10_08_s3"
+      ],
+      "statement": "Both CPO camps externalize lasers as field-replaceable pluggable modules (Broadcom: ELSFP; NVIDIA: front-panel ELS OSFP) — the laser socket is architecturally standardized and replaceable by design, which shapes substitutability for laser-module suppliers (a competitive socket, not a designed-in monopoly).",
+      "subject_id": "co:broadcom"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "tech:coupe",
+      "id": "e1",
+      "relation": "depends_on",
+      "source_ids": [
+        "avgo_davisson_coupe_pr_2025_10_08_s1"
+      ],
+      "src_id": "co:broadcom"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "prod:th6_davisson",
+      "id": "e2",
+      "relation": "develops",
+      "source_ids": [
+        "avgo_davisson_coupe_pr_2025_10_08_s2"
+      ],
+      "src_id": "co:broadcom"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "tech:coupe",
+      "id": "e3",
+      "relation": "supplies_to",
+      "source_ids": [
+        "avgo_davisson_coupe_pr_2025_10_08_s1"
+      ],
+      "src_id": "co:tsmc"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "AVGO"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:broadcom",
+      "name": "Broadcom",
+      "role": null,
+      "source_ids": [
+        "avgo_davisson_coupe_pr_2025_10_08_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [
+        "台積電",
+        "2330.TW",
+        "TSM"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:tsmc",
+      "name": "TSMC",
+      "role": null,
+      "source_ids": [
+        "avgo_davisson_coupe_pr_2025_10_08_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [
+        "TSMC COUPE"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:coupe",
+      "name": "Compact Universal Photonic Engine (COUPE)",
+      "role": null,
+      "source_ids": [
+        "avgo_davisson_coupe_pr_2025_10_08_s1"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "TH6-Davisson",
+        "BCM78919"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "prod:th6_davisson",
+      "name": "Tomahawk 6 – Davisson (BCM78919)",
+      "role": null,
+      "source_ids": [
+        "avgo_davisson_coupe_pr_2025_10_08_s2",
+        "avgo_davisson_coupe_pr_2025_10_08_s3"
+      ],
+      "type": "Product"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "avgo_davisson_coupe_pr_2025_10_08",
+    "evidence_tier": 1,
+    "origin_entity": "Broadcom",
+    "permission_basis": "Official public press release; canonical URL retained.",
+    "published_at": "2025-10-08",
+    "publisher": "GlobeNewswire / Broadcom",
+    "retrieved_at": "2026-08-30",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Broadcom Announces Tomahawk 6 – Davisson, the Industry's First 102.4-Tbps Ethernet Switch with Co-Packaged Optics",
+    "url": "https://www.globenewswire.com/news-release/2025/10/08/3163429/19933/en/Broadcom-Announces-Tomahawk-6-Davisson-the-Industry-s-First-102-4-Tbps-Ethernet-Switch-with-Co-Packaged-Optics.html"
+  },
+  "sources": [
+    {
+      "id": "avgo_davisson_coupe_pr_2025_10_08_s1",
+      "locator": "World-Class Energy Efficiency paragraph",
+      "quote": "By heterogeneously integrating TSMC Compact Universal Photonic Engine (TSMC COUPE™) technology-based optical engines with advanced substrate-level multi-chip packaging, the switch dramatically reduces the need for signal conditioning and minimizes trace loss and reflections."
+    },
+    {
+      "id": "avgo_davisson_coupe_pr_2025_10_08_s2",
+      "locator": "lede",
+      "quote": "Broadcom Inc. (NASDAQ: AVGO) today announced that it is now shipping Tomahawk® 6 – Davisson (TH6-Davisson), the company's third-generation Co-Packaged Optics (CPO) Ethernet switch."
+    },
+    {
+      "id": "avgo_davisson_coupe_pr_2025_10_08_s3",
+      "locator": "Product Highlights",
+      "quote": "102.4 Tbps Switching Capacity 16 x 6.4 Tbps Davisson DR Optical Engines 200 Gbps per link bandwidth Field-Replaceable ELSFP Laser Modules"
+    },
+    {
+      "id": "avgo_davisson_coupe_pr_2025_10_08_s4",
+      "locator": "CPO Roadmap paragraph",
+      "quote": "Broadcom is now developing its fourth-generation CPO solution. The new generation will double per-channel bandwidth to 400 Gbps while achieving greater levels of energy efficiency"
+    }
+  ]
+}

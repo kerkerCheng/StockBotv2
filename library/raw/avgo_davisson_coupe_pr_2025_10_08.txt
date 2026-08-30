@@ -1,0 +1,4 @@
+Source URL: https://www.globenewswire.com/news-release/2025/10/08/3163429/19933/en/Broadcom-Announces-Tomahawk-6-Davisson-the-Industry-s-First-102-4-Tbps-Ethernet-Switch-with-Co-Packaged-Optics.html
+
+Excerpt:
+By heterogeneously integrating TSMC Compact Universal Photonic Engine (TSMC COUPE™) technology-based optical engines with advanced substrate-level multi-chip packaging... 102.4 Tbps Switching Capacity, 16 x 6.4 Tbps Davisson DR Optical Engines, 200 Gbps per link, Field-Replaceable ELSFP Laser Modules (Broadcom PR 2025-10-08)
