@@ -4858,6 +4858,30 @@
       "source": "research_action",
       "title": "FAS 第三方分析：DoD×MP 合約量化＋壟斷批判——MP 第三 origin（獨立政策機構）",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-08-30T16:00:56.413073+00:00",
+      "hint": "四維度 shape 好：瓶頸地位（疑似 COUPE 兩代獨家微透鏡，尚為三手轉述）＋需求錨（NVIDIA/TSMC CPO 鏈）＋純度待驗（HIMX 主業 display driver IC，WLO 占比要查 10-K）｜ go＝bounded 研究 HIMX 20-F/財報驗 WLO 分部占比與客戶集中，產出 onboard RA 回 pq2 另取號；不含入圖",
+      "n": 301,
+      "reason": null,
+      "ref_id": "manual:301",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "Himax（HIMX）onboard 研究：COUPE 微透鏡/WLO 疑似獨家供應商——Hunterbrook 專利鏈指認、市值中型、WLO 是駆動 IC 外的一塊業務（純度待查）",
+      "type": "manual"
+    },
+    {
+      "added_at": "2026-08-30T16:01:38.014777+00:00",
+      "hint": "核准 exact graph delta；Decision handoff：co:foci。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 302,
+      "reason": null,
+      "ref_id": "ra_975fdb3ef2f72e04fd99548aed280957",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "Hunterbrook 專利鏈調查：FOCI 整合 Himax 光學元件成 COUPE FAU＋22 通道專利吻合——FOCI 第三 origin",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -11023,6 +11047,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 301,
+  "next_n": 303,
   "schema_version": "1"
 }
