@@ -4367,6 +4367,42 @@
       "source": "decision_lab",
       "title": "co:tower_semiconductor：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-30T07:28:17.813226+00:00",
+      "hint": "go＝依 ROADMAP 該項修正後設計實作 schema/vocab、bottleneck.py EVIDENCE_RANK 與既有邊分級 backfill；驗收=至少一條邊排名改變（Tower $290M 預付、上詮已完成募資應落 costly 級）。不含：改 L8 判準本身、改 graph admission gate、任何 thesis/live。",
+      "n": 270,
+      "reason": null,
+      "ref_id": "manual:270",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "evidence 分級重構實作：五級階梯（客戶端具名＞雙方聯合＞自報但難偽造＞敘述性自報＞tier-3 轉述）＋ EVIDENCE_RANK/排序消費＋既有邊 backfill",
+      "type": "manual"
+    },
+    {
+      "added_at": "2026-08-30T07:28:17.985632+00:00",
+      "hint": "go（大項）＝bounded research 產出 sub 判斷 packet（同 [256] 形狀：judgment＋disproof＋逐字錨），入圖另取 ra_admission/manual 編號。驗收=Tower 進入瓶頸排序候選或有據缺席。不含：直接改圖、thesis mutation。",
+      "n": 271,
+      "reason": null,
+      "ref_id": "manual:271",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "Tower 鏈 substitutability 補值研究：IQE→Tower InP epiwafer（最低採購承諾佐證）與 Tower→PH18DA 等邊的 sub 判斷 packet",
+      "type": "manual"
+    },
+    {
+      "added_at": "2026-08-30T07:28:18.163306+00:00",
+      "hint": "go（大項）＝對 co:broadcom 與 co:poet_technologies 各跑 evaluate-signal 建新 cohort → 五軸 assessment → reassess；AVGO 是純結構第 1、證據落差是唯一缺口。不含：舊 rejected cohort 回寫、入圖、live。",
+      "n": 272,
+      "reason": null,
+      "ref_id": "manual:272",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "AVGO/POET 重建 cohort＋五軸 assessment：原 cohort 已 rejected（終局不回寫），以 evaluate-signal 建新 cohort 後補 assessment",
+      "type": "manual"
     }
   ],
   "log": [
@@ -10211,6 +10247,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 270,
+  "next_n": 273,
   "schema_version": "1"
 }

@@ -182,6 +182,14 @@ packet（新 pq2 編號）或誠實 park 為止**，不得 dispatch 完就停。
 可直接複製的批次指令**（如 `252 253 256 257 go 255 pending`），使用者不回讀全文
 即可複製回覆（2026-08-30 使用者定案）。
 
+**授權載體唯一＝pq2 編號（2026-08-30 使用者定案，取代所有口頭授權）：** 任何需要使用者
+核准的事——研究工程（大項）、終局 cohort 的重建（`evaluate-signal` 建新 cohort）、機制／
+判準實作、sub 補值這類 graph-write 研究——**一律先以 `todo add` 鑄成 `manual` 型 pq2 編號
+再請求核准**；hint 必須寫成決策行（`go`＝exact 動作；不含＝相鄰排除）。口頭「可以做」不
+構成授權管道；收尾建議摘要只得引用編號，不得出現「口頭指示即可」類措辭。理由：使用者的
+核准介面收斂為唯一一種（編號＋`go`），終局 cohort 被收集端正確排除不是例外的藉口——
+收集端不鑄的號，提案端自己鑄。
+
 **Onboard 也走 pq2（2026-08-29 使用者定案）：** 使用者對系統的核准介面收斂為**唯一一種——pq2 編號＋`go`**。新公司 onboard 不再是獨立的對話流程審批：發現方（自主迴圈、routine 或互動研究）把 registry 增列與首批 extraction 打包成 prepared RA 取 `ra_admission` 編號，packet 內必含 L8 來源清單（origin_entity 多樣性現況）與 registry 條目內容；`go` 授權＝「registry 加該公司＋apply 該 RA 入圖」，不含 thesis／live。互動 session 可當場 sync 取號並立刻 `go`，不必等 daily——統一的是**核准的載體**，不是核准的時機。`skills/company-onboard` 的文件發現與 L8 判準照舊，只有最後的核准動作改由 pq2 承載。
 
 **「等你決定」與「等事件」分離（2026-07-30）：** 池子同時裝著兩種性質不同的東西，混在一起會讓訊噪比降到約 1:1（歷來 76 個編號有 31 個被 drop）。`config/decision_blockers.json` 的 `resolution_mode` 是分類判準：`user_decision`／`awaiting_external`／`system_internal`。保守規則——**只要有一個 blocker 需要人決定，整個項目就留在決策佇列**，寧可多問也不要安靜藏起來。使用者亦可用 `pending --until/--trigger` 明確指定等待條件，優先於自動推導。
