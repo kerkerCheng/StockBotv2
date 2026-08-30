@@ -1,0 +1,4 @@
+Source URL: https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001801368&type=10-K
+
+Excerpt:
+the DoW has guaranteed that the 10X Facility will generate at least $140 million of EBITDA... Apple agreed to make prepayments in the aggregate amount of $200.0 million for the purchase of magnets (MP FY2025 10-K, filed 2026-02-26)

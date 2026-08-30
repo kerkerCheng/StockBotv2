@@ -1,0 +1,118 @@
+{
+  "claims": [
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "若 DoW 協議被政治/預算翻轉、Apple 或 GM 長約取消或大幅縮減、或 10X 建設重大延宕，承諾密度敘事失效。",
+      "id": "mp_10_k_20260226_cl1",
+      "source_ids": [
+        "mp_10_k_20260226_s1",
+        "mp_10_k_20260226_s2",
+        "mp_10_k_20260226_s3",
+        "mp_10_k_20260226_s4"
+      ],
+      "statement": "MP Materials 的磁體業務有三重對手方資本承諾（FY2025 10-K 審計揭露）：DoW 提供 NdPr $110/kg 價格地板＋10X Facility 至少 $140M EBITDA 保證＋全量磁體收購權；Apple 預付合計 $200.0M 購買磁體；GM 最終 $50.0M 預付已收、磁體前驅體 2025Q1 起出貨——依四維度第 3 條全部是『對方掏錢綁供應商』方向，是機器人/EV 磁材鏈上最強的客戶端承諾密度。",
+      "subject_id": "co:mp_materials"
+    },
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "guided",
+      "disproof_condition": "若中國出口政策鬆動使價格長期低於 $110 地板（政府補差成常態）或 10X 產能過剩，供給稀缺性敘事下修。",
+      "id": "mp_10_k_20260226_cl2",
+      "source_ids": [
+        "mp_10_k_20260226_s5",
+        "mp_10_k_20260226_s2"
+      ],
+      "statement": "MP 是美國 mine-to-magnet 一體化擴張中的供給端：Independence 磁體廠擴建＋第二座 10X 磁體廠＋Mountain Pass HREE 重稀土精煉——對照中國掌控的 NdFeB 供應結構（Next Financial 記載的市占軌跡在圖），MP 是 ex-China 磁材鏈的核心純 play。",
+      "subject_id": "co:mp_materials"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "mat:rare_earth_magnets",
+      "id": "mp1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mp_10_k_20260226_s2",
+        "mp_10_k_20260226_s5"
+      ],
+      "src_id": "co:mp_materials"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "MP"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:mp_materials",
+      "name": "MP Materials",
+      "role": null,
+      "source_ids": [
+        "mp_10_k_20260226_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "NdFeB",
+        "NdPr magnets"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:rare_earth_magnets",
+      "name": "Rare earth magnets (neodymium, samarium-cobalt)",
+      "role": null,
+      "source_ids": [
+        "mp_10_k_20260226_s2"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mp_10_k_20260226",
+    "evidence_tier": 1,
+    "origin_entity": "MP Materials",
+    "permission_basis": "SEC EDGAR public filing.",
+    "published_at": "2026-02-26",
+    "publisher": "SEC EDGAR",
+    "retrieved_at": "2026-08-30",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "MP Materials Corp. FY2025 Form 10-K (filed 2026-02-26)",
+    "url": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001801368&type=10-K"
+  },
+  "sources": [
+    {
+      "id": "mp_10_k_20260226_s1",
+      "locator": "Price Protection Agreement",
+      "quote": "the Company entered into the Price Protection Agreement, which provides a price floor of $110 per kilogram (“kg”) for NdPr products stockpiled, sold to internal affiliates, or sold to third parties."
+    },
+    {
+      "id": "mp_10_k_20260226_s2",
+      "locator": "DoW Offtake guarantee",
+      "quote": "the DoW has guaranteed that the 10X Facility will generate at least $140 million of EBITDA (as defined in the DoW Offtake Agreement, and subject to annual escalation) and has the right to purchase all of the magnets produced at the 10X Facility (which may instead be commercially syndicated)."
+    },
+    {
+      "id": "mp_10_k_20260226_s3",
+      "locator": "Apple supply agreement",
+      "quote": "Entered into a long-term supply agreement with Apple Inc. (NASDAQ: AAPL) (“Apple”), for magnet production at Independence and the development and installation of scaled recycling capabilities at Mountain Pass, whereby Apple agreed to make prepayments in the aggregate amount of $200.0 million for the purchase of magnets;"
+    },
+    {
+      "id": "mp_10_k_20260226_s4",
+      "locator": "GM prepayment",
+      "quote": "Received the final $50.0 million prepayment for magnetic precursor products pursuant to the long-term supply agreement with General Motors Company (NYSE: GM) (“GM”);"
+    },
+    {
+      "id": "mp_10_k_20260226_s5",
+      "locator": "10X Facility construction",
+      "quote": "the Company will expand its Independence Facility, construct a second domestic magnet manufacturing facility (the “10X Facility”) and extend its heavy rare earth elements (“HREE”) refining capability at Mountain Pass."
+    }
+  ]
+}
