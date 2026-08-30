@@ -10241,9 +10241,17 @@
       "first_seen": "2026-08-30T07:21:57.668177+00:00",
       "lead_id": "lead_1d85eafbfe0bd9a69efc298d24259be3",
       "published_at": "2026-08-30",
-      "refs": {},
+      "refs": {
+        "parked_reason": "調變器研究（tier-3 多源一致：IEEE Spectrum/irrationalanalysis/tspa OFC50）：Broadcom Bailly＝Mach-Zehnder（成熟路線、與 pluggable 基建互通），NVIDIA＝Micro Ring——兩陣營在同一 COUPE 平台上走不同調變器。結構意義：TSMC 兩頭賺（強化 [268]），路線之爭下沉至元件層（MRM 熱敏/密度 vs MZM 面積/成熟）。Davisson（gen3）是否維持 MZM 未獲件級確認。",
+        "primary_url": "https://spectrum.ieee.org/co-packaged-optics",
+        "research_outcome": "mzm_vs_mrm_camp_split_on_shared_coupe_tier3",
+        "research_run": "session:2026-08-30-loop2-r4",
+        "trace_next_trigger": "Davisson datasheet/OFC 論文件級確認 gen3 調變器",
+        "trace_requires_user": "false",
+        "trace_status": "partial"
+      },
       "source": "decompose:avgo-davisson-2026-08-30",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -11132,9 +11140,17 @@
       "first_seen": "2026-08-30T07:21:57.626484+00:00",
       "lead_id": "lead_23ed2dd8e137c0a94e7a2411fdebc7ec",
       "published_at": "2026-08-30",
-      "refs": {},
+      "refs": {
+        "parked_reason": "ELSFP 綁定研究：Cignal AI（獨立產研，2026-04-01 更 07-28）逐字——「Lumentum announced its largest purchase order ever for the ELSFPs that drive CPO, and Coherent announced a PO for its high-power laser for the same application」；AAOI 法說：ELSFP 現量產有限、2027 底 40 萬件/月目標、ELS 毛利 55-65%。三家供應者格局成形（LITE 史上最大 PO／COHR 高功率 PO／AAOI 產能爬坡）；Broadcom 端具名綁定仍缺（ELSFP 為標準座、多源競爭符合 [268] cl3 判斷）。Cignal 另示警「no products shipping in volume yet」。",
+        "primary_url": "https://cignal.ai/2026/04/cpo-and-elsfp-1q26-update/",
+        "research_outcome": "three_supplier_landscape_tier3_corroborated_no_exclusive_binding",
+        "research_run": "session:2026-08-30-loop2-r4",
+        "trace_next_trigger": "LITE/COHR/AAOI 任一具名 Broadcom 或量產出貨數字",
+        "trace_requires_user": "false",
+        "trace_status": "partial"
+      },
       "source": "decompose:avgo-davisson-2026-08-30",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -29378,9 +29394,17 @@
       "first_seen": "2026-08-30T06:12:14.343825+00:00",
       "lead_id": "lead_905b49498f1e740b063317c65b214410",
       "published_at": "2026-08-30",
-      "refs": {},
+      "refs": {
+        "parked_reason": "runway 刷新研究完成：TDnet 取得 Q1 FY2027 短信全文（140120260804507706.pdf），現金及び預金 22,074 百萬／借款合計 12,246 百萬（BS 日 2026-06-30）、Q1 純益黒字轉換＋全年經常上修 32%；supersede 提案 [274] 待核准寫入。",
+        "primary_url": "https://www.release.tdnet.info/inbs/140120260804507706.pdf",
+        "research_outcome": "q1_tanshin_obtained_supersede_proposal_minted",
+        "research_run": "session:2026-08-30-loop2-r4",
+        "trace_next_trigger": "[274] 核准後 HDS reassess 驗證 financial_runway_stale 消失",
+        "trace_requires_user": "false",
+        "trace_status": "partial"
+      },
       "source": "loop:runway-refresh",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "HDS 6324 runway 觀測刷新：以 2027年3月期 Q1 決算短信（2026-08 上旬發布、資產負債表日 2026-06-30）更新 runway_inputs——現行觀測 as_of 2026-05-13 已超 100 天鮮度窗（financial_runway_stale 屬正確降級非 bug）；⚠ as_of 應填資產負債表日非申報日",
       "triage": {
@@ -45226,9 +45250,17 @@
       "first_seen": "2026-08-30T07:21:57.667911+00:00",
       "lead_id": "lead_ec5da7de15f538edef3b6b1d4c062632",
       "published_at": "2026-08-30",
-      "refs": {},
+      "refs": {
+        "parked_reason": "OSAT 研究（tier-3 產業媒體 NextPlatform/photoncap 一致）：Davisson 封裝＝TSMC＋SPIL（SPIL 為 Bailly 世代 FOWLP 傳承、現轉 COUPE）；Corning 供光纖 harness/cable assemblies；系統組裝＝Micas Networks/Celestica/Nexthop.ai（Bailly 夥伴推定延續）。兩次 decompose 的 SPIL 假設獲具名支撐；issuer 端確認仍缺。",
+        "primary_url": "https://www.nextplatform.com/2025/10/17/the-third-time-will-be-the-charm-for-broadcom-switch-co-packaged-optics/",
+        "research_outcome": "tsmc_spil_packaging_named_tier3_celestica_micas_assembly",
+        "research_run": "session:2026-08-30-loop2-r4",
+        "trace_next_trigger": "ASE/SPIL 法說具名 CPO 封裝營收或 Broadcom 官方供應鏈揭露",
+        "trace_requires_user": "false",
+        "trace_status": "partial"
+      },
       "source": "decompose:avgo-davisson-2026-08-30",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
