@@ -4380,10 +4380,11 @@
       "added_at": "2026-08-30T07:28:17.813226+00:00",
       "hint": "go＝依 ROADMAP 該項修正後設計實作 schema/vocab、bottleneck.py EVIDENCE_RANK 與既有邊分級 backfill；驗收=至少一條邊排名改變（Tower $290M 預付、上詮已完成募資應落 costly 級）。不含：改 L8 判準本身、改 graph admission gate、任何 thesis/live。",
       "n": 270,
-      "reason": null,
+      "reason": "五級分級實作＋測試＋實跑驗收：至少四條邊排名改變（AXT×2↑、POET↑、AVGO↓）",
+      "receipt": "authority:git;ref:1bbb0b6beaa8055f7ce669e4c65d604afbfeb35f",
       "ref_id": "manual:270",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-30T07:56:57.906643+00:00",
       "source": "manual",
       "title": "evidence 分級重構實作：五級階梯（客戶端具名＞雙方聯合＞自報但難偽造＞敘述性自報＞tier-3 轉述）＋ EVIDENCE_RANK/排序消費＋既有邊 backfill",
       "type": "manual"
@@ -4404,10 +4405,11 @@
       "added_at": "2026-08-30T07:28:18.163306+00:00",
       "hint": "go（大項）＝對 co:broadcom 與 co:poet_technologies 各跑 evaluate-signal 建新 cohort → 五軸 assessment → reassess；AVGO 是純結構第 1、證據落差是唯一缺口。不含：舊 rejected cohort 回寫、入圖、live。",
       "n": 272,
-      "reason": null,
+      "reason": "AVGO/POET 新 cohort 重建＋五軸 assessment＋catalyst/disproof 完成（AVGO READY；POET 五軸 bounded）",
+      "receipt": "authority:decision_store;ref:pd_310c01af0e4cc81a7f19b54fa57f7d64+POET_new",
       "ref_id": "manual:272",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-30T07:59:25.442392+00:00",
       "source": "manual",
       "title": "AVGO/POET 重建 cohort＋五軸 assessment：原 cohort 已 rejected（終局不回寫），以 evaluate-signal 建新 cohort 後補 assessment",
       "type": "manual"
@@ -10273,6 +10275,24 @@
       "receipt": "action:ra_e3f54350ca7a8f24424c3771a8b31860;digest:9d61de0326783fab7cefd438d5de56b42fcfdfb31a90e24c1dee4056e4f5ddec;commit:40992c5e23d584bcf2b8bbf9609cadc4da905af0;cohort:dc_29ef9f7194dc996c9b7eb62a9b21afc6",
       "ref_id": "ra_e3f54350ca7a8f24424c3771a8b31860",
       "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-30T07:56:57.906643+00:00",
+      "n": 270,
+      "reason": "五級分級實作＋測試＋實跑驗收：至少四條邊排名改變（AXT×2↑、POET↑、AVGO↓）",
+      "receipt": "authority:git;ref:1bbb0b6beaa8055f7ce669e4c65d604afbfeb35f",
+      "ref_id": "manual:270",
+      "type": "manual",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-30T07:59:25.442392+00:00",
+      "n": 272,
+      "reason": "AVGO/POET 新 cohort 重建＋五軸 assessment＋catalyst/disproof 完成（AVGO READY；POET 五軸 bounded）",
+      "receipt": "authority:decision_store;ref:pd_310c01af0e4cc81a7f19b54fa57f7d64+POET_new",
+      "ref_id": "manual:272",
+      "type": "manual",
       "verb": "go"
     }
   ],
