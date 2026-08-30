@@ -4793,15 +4793,47 @@
     },
     {
       "added_at": "2026-08-30T13:51:21.300121+00:00",
+      "completion_authority": {
+        "action_digest": "c8bb9489c67ce0ffa6207edcb75775a3fd33a40906b634e65ec8796145cc9035",
+        "cohort_id": "dc_21d81aa11dd2fe85c747b1c759fd01ed",
+        "commit": "ad1885c5eab207a74188c55dd2cf8dd7ee69c14d",
+        "company_id": "co:mp_materials",
+        "verified_at": "2026-08-30T15:02:04.574672+00:00"
+      },
       "hint": "核准 exact graph delta；Decision handoff：co:mp_materials。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 296,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_2117cbdbc9ed47097d8c50f315435f31;digest:c8bb9489c67ce0ffa6207edcb75775a3fd33a40906b634e65ec8796145cc9035;commit:ad1885c5eab207a74188c55dd2cf8dd7ee69c14d;cohort:dc_21d81aa11dd2fe85c747b1c759fd01ed",
       "ref_id": "ra_2117cbdbc9ed47097d8c50f315435f31",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-30T15:02:04.574672+00:00",
       "source": "research_action",
       "title": "MP Materials（NYSE: MP）onboard：機器人鏈材料層反路徑——DoW 價格地板＋Apple $200M＋GM 預付款三重對手方資本承諾",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-08-30T15:04:43.518545+00:00",
+      "hint": "核准 exact graph delta；Decision handoff：co:mp_materials。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 297,
+      "reason": null,
+      "ref_id": "ra_979571e2f1bbf2022225b3eb08e9f623",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "Apple 對手方原文：$500M 承諾購買 MP Materials 美製稀土磁體——MP 的客戶端資本承諾獲買方自家 PR 印證",
+      "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-08-30T15:04:43.518545+00:00",
+      "hint": "coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "n": 298,
+      "reason": null,
+      "ref_id": "dc_21d81aa11dd2fe85c747b1c759fd01ed",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:mp_materials：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
     }
   ],
   "log": [
@@ -10956,8 +10988,17 @@
       "ref_id": "manual:288",
       "type": "manual",
       "verb": "go"
+    },
+    {
+      "at": "2026-08-30T15:02:04.574672+00:00",
+      "n": 296,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_2117cbdbc9ed47097d8c50f315435f31;digest:c8bb9489c67ce0ffa6207edcb75775a3fd33a40906b634e65ec8796145cc9035;commit:ad1885c5eab207a74188c55dd2cf8dd7ee69c14d;cohort:dc_21d81aa11dd2fe85c747b1c759fd01ed",
+      "ref_id": "ra_2117cbdbc9ed47097d8c50f315435f31",
+      "type": "ra_admission",
+      "verb": "go"
     }
   ],
-  "next_n": 297,
+  "next_n": 299,
   "schema_version": "1"
 }
