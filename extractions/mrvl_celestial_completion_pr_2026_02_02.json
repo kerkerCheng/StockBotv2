@@ -1,0 +1,111 @@
+{
+  "claims": [
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "guided",
+      "disproof_condition": "若 scale-up 標準戰（NVLink Fusion/UALink）將 Photonic Fabric 排除在主流 rack 架構外、或整合失敗致人才流失，收購的增量 TAM 敘事失效。",
+      "id": "mrvl_celestial_completion_pr_2026_02_02_cl1",
+      "source_ids": [
+        "mrvl_celestial_completion_pr_2026_02_02_s1",
+        "mrvl_celestial_completion_pr_2026_02_02_s2"
+      ],
+      "statement": "Marvell 於 2026-02-02 完成收購 Celestial AI；Photonic Fabric™（scale-up 光互連平台）正式歸入 Marvell。Marvell 自稱此舉使其成為 scale-up interconnect 市場的技術領導者並增加『completely incremental』新 TAM——當事人商業宣稱，效能數字（25x/10x vs CPO）仍為 Celestial 單方。",
+      "subject_id": "co:marvell_technology"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "tech:photonic_fabric",
+      "id": "e1",
+      "relation": "develops",
+      "source_ids": [
+        "mrvl_celestial_completion_pr_2026_02_02_s1"
+      ],
+      "src_id": "co:celestial_ai"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:photonic_fabric",
+      "id": "e2",
+      "relation": "develops",
+      "source_ids": [
+        "mrvl_celestial_completion_pr_2026_02_02_s1"
+      ],
+      "src_id": "co:marvell_technology"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "MRVL"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:marvell_technology",
+      "name": "Marvell Technology",
+      "role": null,
+      "source_ids": [
+        "mrvl_celestial_completion_pr_2026_02_02_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:celestial_ai",
+      "name": "Celestial AI",
+      "role": null,
+      "source_ids": [
+        "mrvl_celestial_completion_pr_2026_02_02_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Photonic Fabric™"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:photonic_fabric",
+      "name": "Photonic Fabric",
+      "role": null,
+      "source_ids": [
+        "mrvl_celestial_completion_pr_2026_02_02_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mrvl_celestial_completion_pr_2026_02_02",
+    "evidence_tier": 1,
+    "origin_entity": "Marvell Technology",
+    "permission_basis": "Public IR press release; quotes only.",
+    "published_at": "2026-02-02",
+    "publisher": "Marvell Investor Relations",
+    "retrieved_at": "2026-08-30",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Marvell PR: Marvell Completes Acquisition of Celestial AI",
+    "url": "https://investor.marvell.com/news-events/press-releases/detail/1005/marvell-completes-acquisition-of-celestial-ai"
+  },
+  "sources": [
+    {
+      "id": "mrvl_celestial_completion_pr_2026_02_02_s1",
+      "locator": "paragraph 1",
+      "quote": "Marvell Technology, Inc. (NASDAQ: MRVL), a leader in data infrastructure semiconductor solutions, today announced that it has completed its previously announced acquisition of Celestial AI, a pioneer in optical interconnect technology for scale-up connectivity. Celestial AI brings its Photonic Fabric™ optical interconnect technology, designed to support high-bandwidth, low-latency connectivity across large-scale AI deployments."
+    },
+    {
+      "id": "mrvl_celestial_completion_pr_2026_02_02_s2",
+      "locator": "paragraph 2",
+      "quote": "This positions the combined company to be a technology leader in the emerging scale-up interconnect market, adding a significant and completely incremental new total addressable market (TAM)."
+    }
+  ]
+}

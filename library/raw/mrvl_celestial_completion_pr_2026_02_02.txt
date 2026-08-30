@@ -1,0 +1,4 @@
+Source URL: https://investor.marvell.com/news-events/press-releases/detail/1005/marvell-completes-acquisition-of-celestial-ai
+
+Excerpt:
+Celestial AI brings its Photonic Fabric™ optical interconnect technology, designed to support high-bandwidth, low-latency connectivity across large-scale AI deployments. (Marvell IR, 2026-02-02)
