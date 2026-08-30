@@ -52,8 +52,13 @@ Engine C 提案）→ 報告本輪產出與下一題。**所有 authority mutati
 7. `single_origin_report` 單源 claim 補強
 
 **紅線：** ①台北 04:00（週日 weekly）與 06:30（daily）前後 30 分鐘內不動 working tree，
-排程結束後先讀 `git status --short` 再續跑；②pq2 未核准積壓 ≥10 項時暫停產新 packet、
-只做 park 級研究；③每輪必留 receipt，違反 = 該輪視為未發生。
+排程結束後先讀 `git status --short` 再續跑；②每輪必留 receipt，違反 = 該輪視為未發生。
+
+**節奏（2026-08-30 使用者定案：做到底、gate 事後批次審）：** 迴圈**不因 gate 而閒置**——
+撞到 authority gate 就鑄號堆進待審清單、立刻切下一題，直到題源枯竭或額度考量才停；
+每輪收尾的建議摘要必須**彙總所有累積未審編號**成單一批次指令，供使用者一次事後審。
+先前「積壓 ≥10 暫停產 packet」紅線由此取代。四個 authority gate 本身不放寬——
+堆著等審不等於先斬後奏。
 
 **成績單（L14——迴圈的存在必須讓這些數字動）：** prepared RA 數、L8 達 3/3 的公司數、
 `substitutability` 覆蓋率（`query.bottleneck` caveat 行）、🔴 未知層帶供應商邊數、

@@ -229,3 +229,38 @@ def test_structural_rows_ignore_evidence_and_expose_research_gap() -> None:
         assert (result["structural_rows"][0]["substitutability"] or 0) >= (
             result["rows"][0]["substitutability"] or 0
         )
+
+
+def test_evidence_five_level_costly_and_joint() -> None:
+    """[270] 五級分級：filing 自報升 costly、聯合公告複合 origin 升 counterparty_joint。
+
+    設計動機（2026-08-30 使用者定案）：三級制過度懲罰自報——已收預付款／審計客戶%
+    這類金流事實與敘述性自報不同級；聯合公告先前整級掉到 needs_review。
+    """
+    reg = _FakeRegistry()
+    # 自報＋出自 filing → costly
+    assert (
+        classify_evidence(
+            "co:coherent", ["Coherent"], reg, filing_origins={"Coherent"}
+        )
+        == "self_reported_costly"
+    )
+    # 自報＋非 filing 維持最低級
+    assert classify_evidence("co:coherent", ["Coherent"], reg) == "self_reported"
+    # 聯合公告：單串含 subject 與另一家 registry 公司 → counterparty_joint
+    assert (
+        classify_evidence(
+            "co:coherent", ["Coherent / NVIDIA (joint announcement)"], reg
+        )
+        == "counterparty_joint"
+    )
+    # 外部印證仍最高：同時有他公司單獨 origin 時勝過 joint 與 costly
+    assert (
+        classify_evidence(
+            "co:coherent",
+            ["NVIDIA", "Coherent / NVIDIA (joint announcement)"],
+            reg,
+            filing_origins={"Coherent"},
+        )
+        == "externally_corroborated"
+    )

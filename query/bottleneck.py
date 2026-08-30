@@ -35,6 +35,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from collections import defaultdict
 from dataclasses import dataclass, field
 from typing import Any, Iterable, Mapping
@@ -66,9 +67,24 @@ DEMAND_ANCHORS = frozenset(
     }
 )
 
-EVIDENCE_RANK = {"externally_corroborated": 2, "needs_review": 1, "self_reported": 0}
+# 五級（2026-08-30，使用者核准 [270]）。設計動機：三級制**過度懲罰自報**——客戶端印證
+# 常與重定價事件同日到達（COHR 實測 Shadow 42.76 → 印證日 68+），等印證＝系統性遲到；
+# 而「已收預付款」「審計客戶%」這類自報的金流／審計事實難以偽造，不該與敘述性自報同級。
+# `self_reported_costly` 用「出自 filing（審計／法律責任文件）」當確定性 proxy：
+# filing 裡也有行銷語，但法律責任使其系統性更貴——proxy 的限制明講，不假裝是語意判斷。
+# `counterparty_joint`：聯合公告的複合 origin（"IQE plc / Tower Semiconductor"）單一字串
+# 解析必然失敗，先前整級掉到 needs_review——雙方具名的公告證據力僅次於純客戶端，修正之。
+EVIDENCE_RANK = {
+    "externally_corroborated": 4,
+    "counterparty_joint": 3,
+    "self_reported_costly": 2,
+    "needs_review": 1,
+    "self_reported": 0,
+}
 EVIDENCE_LABEL = {
     "externally_corroborated": "外部印證",
+    "counterparty_joint": "雙方聯合",
+    "self_reported_costly": "自報·filing",
     "needs_review": "待判定",
     "self_reported": "供應商自報",
 }
@@ -121,19 +137,61 @@ def company_id_for_origin(origin: str | None, registry) -> str | None:
     return hits.pop() if len(hits) == 1 else None
 
 
-def classify_evidence(subject: str, origins: Iterable[str | None], registry) -> str:
-    """三分，不是二分。
+def _origin_mentions(origin: str, registry) -> set[str]:
+    """origin 字串中被具名的 registry 公司集合（word-boundary、名稱長度 ≥4 防誤中）。
+
+    供聯合公告偵測用：複合 origin（"IQE plc / Tower Semiconductor (joint announcement)"）
+    無法整串解析成單一公司，但其中的具名仍是確定性可比對的。
+    """
+    text = str(origin)
+    hits: set[str] = set()
+    for company in registry.companies:
+        names = [str(getattr(company, "name", "") or "")]
+        names += [str(a) for a in (getattr(company, "aliases", None) or ())]
+        for name in names:
+            if len(name) < 4:
+                continue
+            if re.search(r"(?<!\w)" + re.escape(name) + r"(?!\w)", text, re.IGNORECASE):
+                hits.add(company.company_id)
+                break
+    return hits
+
+
+def classify_evidence(
+    subject: str,
+    origins: Iterable[str | None],
+    registry,
+    filing_origins: frozenset | set = frozenset(),
+) -> str:
+    """五分，取各 origin 所能支持的最高等級。
 
     `None` 同時可能是「真的第三方媒體」（schema §7 接受）與「沒解析出來的子公司／別名」
-    （不接受）——兩者結論相反，不得壓成一個布林（L12）。
+    （不接受）——兩者結論相反，不得壓成一個布林（L12）。解析失敗的 origin 再過一道
+    聯合公告偵測（字串內具名 ≥2 家 registry 公司且含 subject 以外者）才落 needs_review。
+    `filing_origins`：來自 source_type=='filing' 文件的 origin 集合（costly proxy）。
     """
     seen = {o for o in origins if o}
     resolved = {o: company_id_for_origin(o, registry) for o in seen}
-    if any(cid and cid != subject for cid in resolved.values()):
-        return "externally_corroborated"
-    if any(cid is None for cid in resolved.values()):
-        return "needs_review"
-    return "self_reported"
+    best = "self_reported"
+
+    def _lift(level: str) -> None:
+        nonlocal best
+        if EVIDENCE_RANK[level] > EVIDENCE_RANK[best]:
+            best = level
+
+    for origin, cid in resolved.items():
+        if cid and cid != subject:
+            _lift("externally_corroborated")
+        elif cid is None:
+            mentions = _origin_mentions(origin, registry)
+            if len(mentions) >= 2 and (mentions - {subject}):
+                _lift("counterparty_joint")
+            else:
+                _lift("needs_review")
+        else:  # cid == subject：自報
+            if origin in filing_origins:
+                _lift("self_reported_costly")
+    return best
 
 
 @dataclass
@@ -149,6 +207,7 @@ class CanonicalEdge:
     confidence: float = 0.0
     documents: int = 0
     origins: set = field(default_factory=set)
+    filing_origins: set = field(default_factory=set)
     evidence: str = "self_reported"
 
 
@@ -190,6 +249,8 @@ def collapse_assertions(rows: Iterable[Mapping[str, Any]]) -> dict[tuple, Canoni
         edge.confidence = max(edge.confidence, conf)
         if row.get("origin"):
             edge.origins.add(str(row["origin"]))
+            if str(row.get("source_type") or "") == "filing":
+                edge.filing_origins.add(str(row["origin"]))
 
         sub = attrs.get("substitutability")
         _take(key, edge, "substitutability",
@@ -279,7 +340,9 @@ def rank_bottlenecks(
     canonical = collapse_assertions(rows)
     edges = list(canonical.values())
     for edge in edges:
-        edge.evidence = classify_evidence(edge.src, edge.origins, registry)
+        edge.evidence = classify_evidence(
+            edge.src, edge.origins, registry, filing_origins=edge.filing_origins
+        )
 
     upward = build_upward_index(edges)
     scored = []
@@ -387,7 +450,7 @@ def fetch_assertions(session) -> list[dict[str, Any]]:
         OPTIONAL MATCH (d:SourceDoc {id: e.source_doc_id})
         RETURN e.src_id AS src, e.relation AS relation, e.dst_id AS dst,
                e.attributes AS attributes, e.confidence AS confidence,
-               d.origin_entity AS origin
+               d.origin_entity AS origin, d.source_type AS source_type
         """
     ).data()
 
