@@ -1,0 +1,94 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "guided",
+      "disproof_condition": "若 CHIPS 最終協議未簽署或撥付大幅縮水、或擴產里程碑跳票，政府背書的權重下修。",
+      "id": "semitoday_cohr_chips_2026_06_17_cl1",
+      "source_ids": [
+        "semitoday_cohr_chips_2026_06_17_s1",
+        "semitoday_cohr_chips_2026_06_17_s2",
+        "semitoday_cohr_chips_2026_06_17_s3"
+      ],
+      "statement": "COHR Sherman 6 吋 InP 廠獲政府端 costly commitment：CHIPS Act LOI 最高 $50M 直接資助（美國商務部，指定用途為 6 吋 InP 產能擴張）＋德州 TSIF/Sherman EDC 先期約 $20M；擴建目標為廠房翻倍、晶圓產能翻四倍。與 NVIDIA $2B（買方）合看，該廠同時有買方與政府雙重外部資本背書；LOI 非已撥付，附里程碑條件。",
+      "subject_id": "co:coherent"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:inp_6inch_fab",
+      "id": "e1",
+      "relation": "depends_on",
+      "source_ids": [
+        "semitoday_cohr_chips_2026_06_17_s1",
+        "semitoday_cohr_chips_2026_06_17_s2"
+      ],
+      "src_id": "co:coherent"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "COHR"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:coherent",
+      "name": "Coherent",
+      "role": null,
+      "source_ids": [
+        "semitoday_cohr_chips_2026_06_17_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [
+        "6-inch indium phosphide fab"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:inp_6inch_fab",
+      "name": "6-inch InP Fab",
+      "role": null,
+      "source_ids": [
+        "semitoday_cohr_chips_2026_06_17_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "semitoday_cohr_chips_2026_06_17",
+    "evidence_tier": 3,
+    "origin_entity": "Semiconductor Today",
+    "permission_basis": "Public trade press; quotes only.",
+    "published_at": "2026-06-17",
+    "publisher": "Semiconductor Today",
+    "retrieved_at": "2026-08-30",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Semiconductor Today: Coherent to receive $50m US CHIPS Act funding to expand Sherman 6-inch InP fab",
+    "url": "https://www.semiconductor-today.com/news_items/2026/jun/coherent-170626.shtml"
+  },
+  "sources": [
+    {
+      "id": "semitoday_cohr_chips_2026_06_17_s1",
+      "locator": "CHIPS LOI",
+      "quote": "Coherent Corp of Saxonburg, PA, USA has signed a letter of intent to receive up to $50m in direct funding under the CHIPS and Science Act from the US Department of Commerce to expand its 6-inch indium phosphide (InP) photonic device manufacturing facility in Sherman, Texas."
+    },
+    {
+      "id": "semitoday_cohr_chips_2026_06_17_s2",
+      "locator": "capacity",
+      "quote": "The expansion will double manufacturing production space and quadruple wafer production capacity, significantly increasing domestic US-based production of critical AI-enabling technologies."
+    },
+    {
+      "id": "semitoday_cohr_chips_2026_06_17_s3",
+      "locator": "prior state support",
+      "quote": "The CHIPS award builds on about $20m in support previously provided through the Texas Semiconductor Innovation Fund and the Sherman Economic Development Corporation."
+    }
+  ]
+}
