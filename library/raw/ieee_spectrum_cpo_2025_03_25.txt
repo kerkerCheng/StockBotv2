@@ -1,0 +1,4 @@
+Source URL: https://spectrum.ieee.org/co-packaged-optics
+
+Excerpt:
+Microring modulators are far more compact... Broadcom chose the more established Mach-Zehnder modulators for its Bailly CPO switch... a staggering 10 percent of the total GPU compute power (IEEE Spectrum, 2025-03-25, Samuel K. Moore)

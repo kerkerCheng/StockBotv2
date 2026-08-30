@@ -1,0 +1,124 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "guided",
+      "disproof_condition": "若任一陣營後續世代改採對方調變器路線（收斂），路線分歧的結構意義失效。",
+      "id": "ieee_spectrum_cpo_2025_03_25_cl1",
+      "source_ids": [
+        "ieee_spectrum_cpo_2025_03_25_s1",
+        "ieee_spectrum_cpo_2025_03_25_s2"
+      ],
+      "statement": "IEEE Spectrum（獨立專業媒體）描述 NVIDIA 的 MRM 路線（環形波導、遠比雙路徑緊湊）並確認 Broadcom 為 Bailly 選擇更標準化的 Mach-Zehnder——兩大 CPO 陣營的調變器路線分歧獲非當事人來源記載。",
+      "subject_id": "co:nvidia"
+    },
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "guided",
+      "disproof_condition": "若後續量測顯示 pluggable 功耗占比遠低於 10%、或 LPO 以更低成本達成同級省電，CPO 的功耗論據弱化。",
+      "id": "ieee_spectrum_cpo_2025_03_25_cl2",
+      "source_ids": [
+        "ieee_spectrum_cpo_2025_03_25_s3",
+        "ieee_spectrum_cpo_2025_03_25_s4"
+      ],
+      "statement": "IEEE Spectrum 引述：pluggable optics 消耗 AI 資料中心 GPU 總算力的 10%（CPO 需求的量化根源）；Micas 的 CPO 系統對標準 pluggable 系統省電 40%——Micas 作為 CPO 系統商獲獨立來源具名。",
+      "subject_id": "co:nvidia"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:micro_ring_modulator",
+      "id": "e1",
+      "relation": "develops",
+      "source_ids": [
+        "ieee_spectrum_cpo_2025_03_25_s1"
+      ],
+      "src_id": "co:nvidia"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "end_demand",
+      "aliases": [
+        "NVDA"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:nvidia",
+      "name": "NVIDIA",
+      "role": null,
+      "source_ids": [
+        "ieee_spectrum_cpo_2025_03_25_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "AVGO"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:broadcom",
+      "name": "Broadcom",
+      "role": null,
+      "source_ids": [
+        "ieee_spectrum_cpo_2025_03_25_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "MRM"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:micro_ring_modulator",
+      "name": "Micro Ring Modulator",
+      "role": null,
+      "source_ids": [
+        "ieee_spectrum_cpo_2025_03_25_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "ieee_spectrum_cpo_2025_03_25",
+    "evidence_tier": 3,
+    "origin_entity": "IEEE Spectrum",
+    "permission_basis": "Public professional press; quotes only.",
+    "published_at": "2025-03-25",
+    "publisher": "IEEE Spectrum",
+    "retrieved_at": "2026-08-30",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "IEEE Spectrum: Could Nvidia's Revolutionary Optical Switch Transform AI Data Centers Forever?",
+    "url": "https://spectrum.ieee.org/co-packaged-optics"
+  },
+  "sources": [
+    {
+      "id": "ieee_spectrum_cpo_2025_03_25_s1",
+      "locator": "MRM description",
+      "quote": "Microring modulators are far more compact. Instead of splitting the light along two parallel paths, a ring-shaped waveguide hangs off the side of the light's main path."
+    },
+    {
+      "id": "ieee_spectrum_cpo_2025_03_25_s2",
+      "locator": "Broadcom contrast",
+      "quote": "Broadcom chose the more established Mach-Zehnder modulators for its Bailly CPO switch, in part because it is a more standardized technology."
+    },
+    {
+      "id": "ieee_spectrum_cpo_2025_03_25_s3",
+      "locator": "pluggable power stat",
+      "quote": "a staggering 10 percent of the total GPU compute power"
+    },
+    {
+      "id": "ieee_spectrum_cpo_2025_03_25_s4",
+      "locator": "Micas system savings",
+      "quote": "40 percent power savings versus systems populated with standard pluggable transceivers"
+    }
+  ]
+}
