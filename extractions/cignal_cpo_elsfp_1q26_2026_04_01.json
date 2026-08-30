@@ -1,0 +1,151 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "guided",
+      "disproof_condition": "若後續財報未見對應營收兌現、或 PO 被取消/縮減揭露，下修。",
+      "id": "cignal_cpo_elsfp_1q26_2026_04_01_cl1",
+      "source_ids": [
+        "cignal_cpo_elsfp_1q26_2026_04_01_s1"
+      ],
+      "statement": "Cignal AI（獨立產研）記載：Lumentum 宣布其史上最大的 ELSFP 採購單、Coherent 宣布同應用（CPO）高功率雷射 PO——CPO 光源的客戶端資本承諾由第三方來源轉述確認，交易對手未具名。",
+      "subject_id": "co:lumentum"
+    },
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "guided",
+      "disproof_condition": "若 Cignal 後續季度更新確認 volume 出貨開始，本 caveat 失效轉為兌現證據。",
+      "id": "cignal_cpo_elsfp_1q26_2026_04_01_cl2",
+      "source_ids": [
+        "cignal_cpo_elsfp_1q26_2026_04_01_s3",
+        "cignal_cpo_elsfp_1q26_2026_04_01_s4"
+      ],
+      "statement": "Cignal AI 判斷：市場噪音很多但 CPO 產品『尚無 volume 出貨』（1Q26 更新至 2026-07-28）；LITE 與 COHR 皆預期 2027 出貨 scale-up 網路硬體——量產拐點在前方而非已發生，與供應商『now shipping』敘述的差異必須保留。",
+      "subject_id": "co:coherent"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:els_pluggable_module",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "cignal_cpo_elsfp_1q26_2026_04_01_s1",
+        "cignal_cpo_elsfp_1q26_2026_04_01_s3"
+      ],
+      "src_id": "co:lumentum"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:uhp_laser",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "cignal_cpo_elsfp_1q26_2026_04_01_s1"
+      ],
+      "src_id": "co:coherent"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "LITE"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:lumentum",
+      "name": "Lumentum",
+      "role": null,
+      "source_ids": [
+        "cignal_cpo_elsfp_1q26_2026_04_01_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "COHR"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:coherent",
+      "name": "Coherent",
+      "role": null,
+      "source_ids": [
+        "cignal_cpo_elsfp_1q26_2026_04_01_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "ELSFP"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:els_pluggable_module",
+      "name": "Pluggable turnkey ELS module",
+      "role": null,
+      "source_ids": [
+        "cignal_cpo_elsfp_1q26_2026_04_01_s1"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "UHP laser",
+        "high-power laser"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:uhp_laser",
+      "name": "Ultra-high-power laser",
+      "role": null,
+      "source_ids": [
+        "cignal_cpo_elsfp_1q26_2026_04_01_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "cignal_cpo_elsfp_1q26_2026_04_01",
+    "evidence_tier": 3,
+    "origin_entity": "Cignal AI",
+    "permission_basis": "Public summary page quotes only.",
+    "published_at": "2026-04-01",
+    "publisher": "Cignal AI",
+    "retrieved_at": "2026-08-30",
+    "source_type": "industry_report",
+    "storage_permission": "repo_excerpt",
+    "title": "Cignal AI: CPO and ELSFP – 1Q26 Update",
+    "url": "https://cignal.ai/2026/04/cpo-and-elsfp-1q26-update/"
+  },
+  "sources": [
+    {
+      "id": "cignal_cpo_elsfp_1q26_2026_04_01_s1",
+      "locator": "supplier PO paragraph",
+      "quote": "Lumentum announced its largest purchase order ever for the ELSFPs that drive CPO, and Coherent announced a PO for its high-power laser for the same application."
+    },
+    {
+      "id": "cignal_cpo_elsfp_1q26_2026_04_01_s2",
+      "locator": "deployment timeline",
+      "quote": "TSMC's Coupe process has jumpstarted efforts by Nvidia and Broadcom to have 200G/lane CPO platforms deployed by the end of 2026."
+    },
+    {
+      "id": "cignal_cpo_elsfp_1q26_2026_04_01_s3",
+      "locator": "scale-up shipment expectation",
+      "quote": "Both Lumentum and Coherent recently stated that they expect to ship into hardware designed for the scale-up network by 2027."
+    },
+    {
+      "id": "cignal_cpo_elsfp_1q26_2026_04_01_s4",
+      "locator": "volume caveat",
+      "quote": "All told, there is a lot of noise in the market, but no products shipping in volume yet."
+    }
+  ]
+}
