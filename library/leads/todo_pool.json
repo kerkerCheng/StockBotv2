@@ -4625,6 +4625,18 @@
       "source": "manual",
       "title": "LITE→UHP laser sole_source 降級為 weak：全 origin 僅 Lumentum 自報（L8 第 3 條）＋客戶端反證（NVIDIA PR 明文 nonexclusive、同日對 COHR 對稱 $2B、Cignal 記載 COHR 同應用 PO）",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-08-30T12:28:29.760619+00:00",
+      "hint": "核准 exact graph delta；Decision handoff：co:coherent。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 287,
+      "reason": null,
+      "ref_id": "ra_795893219e40efd4c3314d7388416a77",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "NVIDIA 客戶端記載：COHR Sherman 6 吋 InP 擴廠動土＋『Coherent 供應交換器前面板的外部雷射模組』直述",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -10605,6 +10617,6 @@
       "verb": "pq1_awaiting_approval"
     }
   ],
-  "next_n": 287,
+  "next_n": 288,
   "schema_version": "1"
 }
