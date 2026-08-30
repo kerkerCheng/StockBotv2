@@ -1,0 +1,95 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "guided",
+      "disproof_condition": "若 TSMC 導入第二家 FAU 供應商、或專利中的 22 通道配置在量產版 COUPE 改變，專利鏈推論失效。",
+      "id": "hntrbrk_himax_coupe_2026_03_12_cl1",
+      "source_ids": [
+        "hntrbrk_himax_coupe_2026_03_12_s1",
+        "hntrbrk_himax_coupe_2026_03_12_s2",
+        "hntrbrk_himax_coupe_2026_03_12_s3"
+      ],
+      "statement": "Hunterbrook 專利鏈調查（四件專利：兩 Himax、一 FOCI、一 TSMC）：FOCI 具名為將 Himax 微透鏡/稜鏡/V-groove 整合成 COUPE FAU 的整合者；TSMC 檢測專利明繪 22 通道與 Himax/FOCI 專利吻合（作者自評 speculative）。『Himax 為 COUPE 兩代獨家微透鏡供應商』是 Hunterbrook→DigiTimes→未具名 TF 分析師的三手轉述，不得當獨立確認。",
+      "subject_id": "co:foci"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:fiber_attach_unit",
+      "id": "hb1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "hntrbrk_himax_coupe_2026_03_12_s1"
+      ],
+      "src_id": "co:foci"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "上詮",
+        "3363.TWO"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:foci",
+      "name": "FOCI Fiber Optic Communications",
+      "role": null,
+      "source_ids": [
+        "hntrbrk_himax_coupe_2026_03_12_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "FAU",
+        "ReLFACon"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:fiber_attach_unit",
+      "name": "Fiber Attach Unit",
+      "role": null,
+      "source_ids": [
+        "hntrbrk_himax_coupe_2026_03_12_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "hntrbrk_himax_coupe_2026_03_12",
+    "evidence_tier": 3,
+    "origin_entity": "Hunterbrook Media",
+    "permission_basis": "Public investigative newsletter; quotes only.",
+    "published_at": "2026-03-12",
+    "publisher": "Hunterbrook Media",
+    "retrieved_at": "2026-08-30",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Hunterbrook: Himax — Stealth Supplier for NVIDIA's Optics Revolution",
+    "url": "https://newsletter.hntrbrk.com/p/himax-stealth-supplier-for-nvidias"
+  },
+  "sources": [
+    {
+      "id": "hntrbrk_himax_coupe_2026_03_12_s1",
+      "locator": "FAU integration",
+      "quote": "Himax's array of microlenses and prisms and V-groove baseplates are then integrated into a finished fiber array unit (FAU) by a Taiwanese manufacturer Fiber Optic Communications (TPEX: 3363)"
+    },
+    {
+      "id": "hntrbrk_himax_coupe_2026_03_12_s2",
+      "locator": "sole microlens attribution",
+      "quote": "Digitimes cited TF analysts — without naming them — as confirming Himax as the sole microlens array supplier for COUPE's first and second generations."
+    },
+    {
+      "id": "hntrbrk_himax_coupe_2026_03_12_s3",
+      "locator": "22-channel patent",
+      "quote": "TSMC's inspection schematic explicitly depicts 22 channels, labeled 'ch1' through 'ch22.'"
+    }
+  ]
+}
