@@ -155,6 +155,13 @@ agent 差點照做，實測後發現 7 個積壓沒有一個是讀年報能解�
 
 編號首次進池後直到 resolve 才釋放；狀態存 tracked `library/leads/todo_pool.json`，append-only `log` 保留核准與 migration 稽核。
 
+**`go` 的語意＝推進到下一個人工 gate（2026-08-30 使用者定案）：** 使用者的 `go` 不是
+「把這題排進佇列」，是「授權你往下走，直到撞上我下一個需要授權的 gate」。排入 pq1、
+checkpoint、reassess 都只是路上的簿記；**互動 session 收到 go 就在當次把研究做到產出
+packet（新 pq2 編號）或誠實 park 為止**，不得 dispatch 完就停。無人值守排程受 budget cap
+約束可以只做一段，但未完成的必須留在佇列由下一個執行者接續（provider-neutral），
+不得把「已排入」回報成「已推進」（L13：驗收是產出出現在下游手上）。
+
 **建議只由 pool ground truth 導出＋必過 L14（2026-08-30 使用者定案）：** 任何 agent／routine
 對 pq2 編號給處置建議前，適用三條硬規則。事發：2026-08-30 weekly 對八個編號建議 `drop`，
 聲稱「來源已停止產出」——實測 `source_cleared` 是 **0/8**，其中兩項是等事件、一項是使用者
