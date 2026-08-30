@@ -4034,7 +4034,7 @@
     },
     {
       "added_at": "2026-08-29T01:10:04.654512+00:00",
-      "hint": "沒有 work order，go 不成立；但 reassess 也清不掉——實質 blocker：valuation_payoff_unknown。要動的是這些（補證據／研究），補完才 reassess",
+      "hint": "go（大項）＝reassess 後以 assessment_gap 排入 pq1，研究範圍：valuation_payoff_unknown。產出為 assessment／研究包，完成後 reassess 以新 decision receipt 結案",
       "n": 249,
       "reason": null,
       "ref_id": "dc_0fca807c963dc3b9888e0f83ba6d45a5",
@@ -4118,7 +4118,7 @@
     },
     {
       "added_at": "2026-08-29T08:10:17.546596+00:00",
-      "hint": "沒有 work order，go 不成立；但 reassess 也清不掉——實質 blocker：commercial_maturity_unknown、source_reliability_unknown、valuation_payoff_unknown。要動的是這些（補證據／研究），補完才 reassess",
+      "hint": "go（大項）＝reassess 後以 assessment_gap 排入 pq1，研究範圍：commercial_maturity_unknown、source_reliability_unknown、valuation_payoff_unknown。產出為 assessment／研究包，完成後 reassess 以新 decision receipt 結案",
       "n": 254,
       "reason": null,
       "ref_id": "dc_f94148d8545de35cb2c5d048640b913e",

@@ -1750,10 +1750,15 @@ def _decision_review_hint(
         == "user_decision"
     )
     if substantive:
+        # ⚠ 這裡曾寫「沒有 work order，go 不成立」——與 dispatch 實作直接矛盾：
+        # `todo dispatch` 對無 work order 的項目會 reassess 刷新 context，仍有實質
+        # blocker 就以 assessment_gap ref 排入 pq1 並附研究範圍（outcome=
+        # queued_assessment_gap）。使用者的介面就是一個 go（2026-08-30 定案）；
+        # 「大項」只是研究範圍較大，不是另一個動詞。
         return (
-            "沒有 work order，go 不成立；但 reassess 也清不掉——實質 blocker："
+            "go（大項）＝reassess 後以 assessment_gap 排入 pq1，研究範圍："
             + "、".join(substantive)
-            + "。要動的是這些（補證據／研究），補完才 reassess"
+            + "。產出為 assessment／研究包，完成後 reassess 以新 decision receipt 結案"
         )
     return (
         "coverage 已無 blocker，REVIEW 來自凍結 context 過期——"

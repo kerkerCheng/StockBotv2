@@ -1406,9 +1406,14 @@ def test_hint_names_substantive_blockers_when_reassess_will_not_help() -> None:
     )
 
     assert "financial_resilience_corroboration_incomplete" in hint
-    # context 過期類的不算實質 blocker，不該混進「要動的是這些」。
+    # context 過期類的不算實質 blocker，不該混進研究範圍。
     assert "holdings_stale" not in hint
-    assert "reassess 也清不掉" in hint
+    # 2026-08-30 使用者定案：介面只有一個 go。無 work order 的項目 go＝
+    # dispatch 的 assessment_gap 路徑（reassess 後排入 pq1），hint 必須說得出
+    # 這條路，不得再寫「go 不成立」。
+    assert "go（大項）" in hint
+    assert "assessment_gap" in hint
+    assert "go 不成立" not in hint
 
 
 def test_dispatchable_cohorts_fails_soft_without_store() -> None:
