@@ -5410,6 +5410,156 @@
       "result": "ok",
       "run_at": "2026-08-29T22:34:05.389165+00:00",
       "source": "edgar:TSLA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-30T22:32:37.393563+00:00",
+      "source": "mfn:sivers-semiconductors"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-30T22:32:38.485483+00:00",
+      "source": "sivers:press"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-30T22:32:39.251156+00:00",
+      "source": "yahoo:iqe-l"
+    },
+    {
+      "new": 6,
+      "result": "ok",
+      "run_at": "2026-08-30T22:32:40.089487+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-30T22:32:41.682681+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-30T22:32:42.360264+00:00",
+      "source": "edgar:AEVA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-30T22:32:43.039194+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-30T22:32:43.541848+00:00",
+      "source": "edgar:AVGO"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-30T22:32:44.249960+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-30T22:32:45.040419+00:00",
+      "source": "edgar:CCXI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-30T22:32:45.559370+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-30T22:32:46.282593+00:00",
+      "source": "edgar:GFS"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-30T22:32:47.181808+00:00",
+      "source": "edgar:JBL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-30T22:32:47.869652+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-30T22:32:48.548621+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-30T22:32:49.077219+00:00",
+      "source": "edgar:META"
+    },
+    {
+      "new": 8,
+      "result": "ok",
+      "run_at": "2026-08-30T22:32:49.749026+00:00",
+      "source": "edgar:MP"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-30T22:32:50.257193+00:00",
+      "source": "edgar:MRVL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-30T22:32:51.029888+00:00",
+      "source": "edgar:MTSI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-30T22:32:51.535966+00:00",
+      "source": "edgar:MU"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-30T22:32:52.038369+00:00",
+      "source": "edgar:NVDA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-30T22:32:52.722592+00:00",
+      "source": "edgar:POET"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-30T22:32:53.486631+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-30T22:32:53.990383+00:00",
+      "source": "edgar:TSLA"
+    },
+    {
+      "new": 8,
+      "result": "ok",
+      "run_at": "2026-08-30T22:32:54.746720+00:00",
+      "source": "edgar:TSM"
     }
   ],
   "leads": {
@@ -5550,6 +5700,82 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2084422873423519844"
+    },
+    "lead_004478d161be47a5f8d9323bccfc8573": {
+      "entities": {
+        "company_ids": [
+          "co:tsmc"
+        ],
+        "tickers": [
+          "TSM"
+        ]
+      },
+      "first_seen": "2026-08-30T22:32:54.746192+00:00",
+      "lead_id": "lead_004478d161be47a5f8d9323bccfc8573",
+      "published_at": "2026-08-20",
+      "refs": {},
+      "source": "edgar:TSM",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "TSM 4 filed 2026-08-20",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-30T22:35:38.109712+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "查證結果只補 insider 或稀釋脈絡，不改候選集合與瓶頸排序"
+        },
+        "decided_at": "2026-08-30T22:35:38.109712+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "SEC Form 4 是可逐字核對的一手內部人交易；保留為低優先時變觀測，但不因 issuer 或 tier 1 提高決策影響",
+        "related_trace_requeues": [
+          "lead_13b62234a2ec38a45eaa9c8bedcbc6f8",
+          "lead_1c805d1c401d5ede0572182a5bfcbbea",
+          "lead_359cb1c9e8c4f11997943e4c7f01727d",
+          "lead_3a4468d30e6a22eb826a8c8157682b64",
+          "lead_464d4849949994fc18d5192a484b6c57",
+          "lead_5365613adf1bce24257876e3dab03eea",
+          "lead_94dbcea8239b2f3feb6bffeefbbade53",
+          "lead_c9d297d58ac05a8f9c5e55fb433317fc"
+        ],
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1046179/000104617926000543/xslF345X06/wk-form4_1787226096.xml"
+    },
+    "lead_00455a9158ae8480fd0bf34f03a1bc7d": {
+      "entities": {
+        "company_ids": [
+          "co:tsmc"
+        ],
+        "tickers": [
+          "TSM"
+        ]
+      },
+      "first_seen": "2026-08-30T22:32:54.746581+00:00",
+      "lead_id": "lead_00455a9158ae8480fd0bf34f03a1bc7d",
+      "published_at": "2026-08-10",
+      "refs": {},
+      "source": "edgar:TSM",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "TSM 4 filed 2026-08-10",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-30T22:35:39.068090+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "查證結果只補 insider 或稀釋脈絡，不改候選集合與瓶頸排序"
+        },
+        "decided_at": "2026-08-30T22:35:39.068090+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "SEC Form 4 是可逐字核對的一手內部人交易；保留為低優先時變觀測，但不因 issuer 或 tier 1 提高決策影響",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1046179/000104617926000532/xslF345X06/wk-form4_1786363225.xml"
     },
     "lead_006b8786fd4026bcec4e8314540e8130": {
       "entities": {
@@ -8529,17 +8755,20 @@
       "lead_id": "lead_13b62234a2ec38a45eaa9c8bedcbc6f8",
       "published_at": null,
       "refs": {
-        "parked_reason": "系統層已確認但公司 mapping 與微透鏡 atom 不足；等待具名一手",
+        "parked_reason": "物理層存在獲一手支持，供應商 mapping 仍空白；研究地圖不等於知識入圖。",
         "primary_url": "https://research.tsmc.com/page/on-chip-interconnect/14.html",
-        "research_outcome": "官方頁支持 COUPE 使用 grating／edge coupler 與 EIC-PIC 整合，但目前可擷取原文未支持 lead 所稱 embedded micro-lens array，也未給可投資供應商；屬研究地圖缺層，未產 RA",
-        "trace_attempts_ref": "2026-08-26：TSMC COUPE 官方研究頁逐段核對",
+        "research_outcome": "無新 graph delta；維持 partial，等待 TSMC 或合作方具名製造／供應角色。",
+        "trace_attempts_ref": "2026-08-31：重查 TSMC COUPE 官方研究頁與 NVIDIA 技術 blog；GC/EC、EIC-PIC 與 wafer-level micro-lens 架構可確認，但沒有外部 grating/microlens 供應商。",
         "trace_next_trigger": "TSMC 或共同作者公開可核對文件具名 embedded micro-lens array 與製造／供應角色",
+        "trace_requeue_trigger": "related_triaged_lead:lead_004478d161be47a5f8d9323bccfc8573",
+        "trace_requeued_at": "2026-08-30T22:35:38.109712+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
           "TSM",
           "co:tsmc"
         ],
+        "trace_trigger_event_ref": "lead:lead_004478d161be47a5f8d9323bccfc8573",
         "trace_trigger_kind": "primary_source_signal"
       },
       "source": "system_decompose",
@@ -8547,12 +8776,35 @@
       "themes": {},
       "title": "[decompose] 垂直光柵耦合器＋微透鏡陣列層：TSMC COUPE 官方研究頁述及 embedded micro-lens array、backside metal reflector、GC/EC 插入損耗。圖中無 grating coupler 節點",
       "triage": {
-        "decided_at": "2026-08-25T03:05:20.009219+00:00",
+        "classification": {
+          "backfill_ref": "2026-08-31_active_classification_backfill.json",
+          "classified_at": "2026-08-30T22:37:12.935023+00:00",
+          "classified_by": "backfill_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "system-decompose 已有 TSMC COUPE 官方研究頁；答案會新增或排除 grating coupler／micro-lens 供應商候選"
+        },
+        "decided_at": "2026-08-30T22:35:38.109712+00:00",
         "decision": "go",
         "priority_flags": {},
-        "reason": "TSMC 官方研究頁，一手；光柵耦合器與微透鏡層圖中無節點",
+        "reason": "指定實體的 tier-1 一手來源 lead_004478d161be47a5f8d9323bccfc8573 與 parked trace 共用具名標的 TSM, co:tsmc；事件觸發 bounded pq1 重查",
         "tier": 1
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-30T22:35:38.109712+00:00",
+          "superseded_reason": "指定實體的 tier-1 一手來源 lead_004478d161be47a5f8d9323bccfc8573 與 parked trace 共用具名標的 TSM, co:tsmc；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_004478d161be47a5f8d9323bccfc8573",
+          "triage": {
+            "decided_at": "2026-08-25T03:05:20.009219+00:00",
+            "decision": "go",
+            "priority_flags": {},
+            "reason": "TSMC 官方研究頁，一手；光柵耦合器與微透鏡層圖中無節點",
+            "tier": 1
+          }
+        }
+      ],
       "url": "https://research.tsmc.com/page/on-chip-interconnect/14.html"
     },
     "lead_1446a653c191897aeddb8b84419e4456": {
@@ -8718,6 +8970,39 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2092718416683819292"
+    },
+    "lead_1609bc2f7219c606bfd788882fef693d": {
+      "entities": {
+        "company_ids": [
+          "co:mp_materials"
+        ],
+        "tickers": [
+          "MP"
+        ]
+      },
+      "first_seen": "2026-08-30T22:32:49.748503+00:00",
+      "lead_id": "lead_1609bc2f7219c606bfd788882fef693d",
+      "published_at": "2026-08-06",
+      "refs": {},
+      "source": "edgar:MP",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "MP 8-K filed 2026-08-06",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-30T22:35:47.807814+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "confidence_only",
+          "reason": "若只是季度附件或治理事項只補信心；不先假定會改候選排序"
+        },
+        "decided_at": "2026-08-30T22:35:47.807814+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "MP Materials 官方 8-K 可核對具體營運或公司事件；先列低優先財務事實，pq1 追回附件後再判斷是否有唯一 graph delta",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1801368/000180136826000047/mp-20260806.htm"
     },
     "lead_1662a082af8a32775df02aef43c5faa2": {
       "entities": {
@@ -9860,12 +10145,14 @@
       "lead_id": "lead_1c805d1c401d5ede0572182a5bfcbbea",
       "published_at": "2026-08-29",
       "refs": {
-        "parked_reason": "識別確定：Accton＝智邦科技（2345.TW），全球白牌交換機大廠。角色（Moore 江國忠報告，tier 3 單一 origin）：『AI switches 主要供應商、800G 快速放量』——但這是 pluggable 世代的 switch ODM 地位；是否承接 CPO switch 系統組裝（與 Foxconn/Fabrinet 分工）未獲任何一手。四維度純度警示：智邦市值大、法人覆蓋廣，AI switch 是其主業但研究它接近研究 beta（同 AVGO 形狀）；除非 CPO 組裝角色被具名證實，alpha 優先度低。",
+        "parked_reason": "智邦一般 switch ODM 能力可核對，NVIDIA CPO 系統組裝角色仍是第三方推定；新 trigger 無清除。",
         "primary_url": "https://finance.biggo.com/news/18d4225c-e1a8-4df5-9217-e88dc0929a91",
-        "research_outcome": "identity_confirmed_cpo_role_unverified_purity_concern",
+        "research_outcome": "無新 graph delta；維持等待 Accton 或 NVIDIA 一手具名。",
         "research_run": "session:2026-08-29-tw-cpo-drain",
-        "trace_attempts_ref": "2026-08-30：已確認智邦 2345.TW 識別；以 NVIDIA／TSMC 一手新文件作可執行 trigger，避免未登記智邦 ticker 永遠沉底",
+        "trace_attempts_ref": "2026-08-31：重查 Accton 官方 CPO／102.4T switch 資料與 NVIDIA 官方合作文件；可確認智邦具 CPO-ready ODM 能力，但沒有 NVIDIA CPO switch 指派。",
         "trace_next_trigger": "智邦法說或 NVIDIA 側具名其 CPO switch 組裝角色",
+        "trace_requeue_trigger": "related_triaged_lead:lead_004478d161be47a5f8d9323bccfc8573",
+        "trace_requeued_at": "2026-08-30T22:35:38.109712+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
@@ -9874,6 +10161,7 @@
           "co:nvidia",
           "co:tsmc"
         ],
+        "trace_trigger_event_ref": "lead:lead_004478d161be47a5f8d9323bccfc8573",
         "trace_trigger_kind": "primary_source_signal"
       },
       "source": "decompose:nvda-cpo-switch-2026-08-29",
@@ -9896,12 +10184,34 @@
           "decision_impact": "candidate_set",
           "reason": "decompose 衍生之台系 CPO 供應鏈候選"
         },
-        "decided_at": "2026-08-29T09:17:07.984899+00:00",
+        "decided_at": "2026-08-30T22:35:38.109712+00:00",
         "decision": "go",
         "priority_flags": {},
-        "reason": "tier-3 聚合（BigGo）但引用 TSMC 法說與 LightCounting 兩個可追上游來源；台系 CPO 供應鏈與既有 alpha 鏈直接相關，具名公司可追。識別未確認前不入 registry（L15）。",
+        "reason": "指定實體的 tier-1 一手來源 lead_004478d161be47a5f8d9323bccfc8573 與 parked trace 共用具名標的 TSM, co:tsmc；事件觸發 bounded pq1 重查",
         "tier": 3
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-30T22:35:38.109712+00:00",
+          "superseded_reason": "指定實體的 tier-1 一手來源 lead_004478d161be47a5f8d9323bccfc8573 與 parked trace 共用具名標的 TSM, co:tsmc；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_004478d161be47a5f8d9323bccfc8573",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-08-29T09:17:07.984899+00:00",
+              "classified_by": "triage_semantic_v1",
+              "content_type": "structural_fact",
+              "decision_impact": "candidate_set",
+              "reason": "decompose 衍生之台系 CPO 供應鏈候選"
+            },
+            "decided_at": "2026-08-29T09:17:07.984899+00:00",
+            "decision": "go",
+            "priority_flags": {},
+            "reason": "tier-3 聚合（BigGo）但引用 TSMC 法說與 LightCounting 兩個可追上游來源；台系 CPO 供應鏈與既有 alpha 鏈直接相關，具名公司可追。識別未確認前不入 registry（L15）。",
+            "tier": 3
+          }
+        }
+      ],
       "url": "https://finance.biggo.com/news/18d4225c-e1a8-4df5-9217-e88dc0929a91?decompose=accton"
     },
     "lead_1cc0a6e4bca5cf0f85d002cb4dde875a": {
@@ -10248,7 +10558,12 @@
         "research_run": "session:2026-08-30-loop2-r4",
         "trace_next_trigger": "Davisson datasheet/OFC 論文件級確認 gen3 調變器",
         "trace_requires_user": "false",
-        "trace_status": "partial"
+        "trace_status": "partial",
+        "trace_trigger_entities": [
+          "AVGO",
+          "co:broadcom"
+        ],
+        "trace_trigger_kind": "primary_source_signal"
       },
       "source": "decompose:avgo-davisson-2026-08-30",
       "status": "parked",
@@ -10333,6 +10648,54 @@
         "tier": 2
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1633978/000166489826000005/xslF345X06/form4-08282026_010847.xml"
+    },
+    "lead_1dfc66d3488e70d972e80bff8772e8ff": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-30T22:32:40.073579+00:00",
+      "lead_id": "lead_1dfc66d3488e70d972e80bff8772e8ff",
+      "media": [
+        {
+          "cache": {
+            "bytes": 76405,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_1dfc66d3488e70d972e80bff8772e8ff/3_2094076428841291776.jpg",
+            "sha256": "86c153a9e1263696b3c7273ac1d9f5792454450827b9f2cdea6ac662344d5113"
+          },
+          "height": 427,
+          "media_key": "3_2094076428841291776",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HQ-nasmakAAxt-0.jpg",
+          "width": 1385
+        }
+      ],
+      "published_at": "2026-08-30T15:24:18.000Z",
+      "raw_text": "The more I look at ESMT, the more excited I get researching legacy memory themes. \n\nSo looked through H1 sellside models...\n\nFrom March ESMT reports:\nHuanan: DDR3 4Gb ASP +50% QoQ in Q2\nFubon: cited roughly +40% Q2 DRAM pricing\n\nBy August... Huanan was citing ESMT Q2 ASP growth of: \n+105–113% Q/Q blended. \n\nSaying DDR3 pricing had come in substantially better than expected. \n\nSo legacy memory pricing translated into much more operating leverage at ESMT. \n\nAbout PSMC wafer cost hikes: Huanan estimated manufacturing costs could rise ~100% in 2H26, but customers remained highly willing to accept the pass-through\n\nIf we look at July net income was roughly $109M...  way above the earnings levels the earlier models were built around.\n\nIf I had to give a TLDR \"consensus\" of reports\n\n1. DDR3/DDR2 supply remains structurally tight as competitors move capacity toward higher-value memory.\n2. Concord saw no conditions supporting a price reversal during 2026.\n3. Concord expected contract-price increases to cover higher foundry costs.\n4. Huanan later found that customer willingness to accept those cost increases was stronger than expected.\n\nFun thing I read from Huanan was DDR3 is used in products such as IP cameras and HDDs where the memory component is a relatively small part of the customer's total BOM. \n\nSo even very large legacy DRAM price hike may only add a few dollars to the finished product's BOM... and for many customers, paying a few extra dollars would be more economical than redesigning + requalifying (but this flows materially into ESMT's net income)\n\nAnyway, just excited about this idea (*disclosure I have positions)\n\nTLDR:\n-> Huanan updated ESMT blended Q2 ASP to +105-113% Q/Q\n-> Given July's blowout net income (putting ESMT at 1.9x p/e annualized RR), implications for the future are exciting if inelasticity continues + ESMT has the ability to hike further due to low % of finished product BOM cost. \n-> Indication customers were still willing to accept pass through for PSMC wafer hikes.",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "The more I look at ESMT, the more excited I get researching legacy memory themes. So looked through H1 sellside models... From March ESMT reports: Huanan: DDR3 4Gb ASP +50% QoQ in Q2 Fubon: cited roughly +40% Q2 DRAM pricing By August... Huanan was citing ESMT Q2 ASP growth of: +105–113% Q/Q blended. Saying DDR3 pricing had come in substantially better than expected. So legacy memory pricing translated into much more operating leverage at ESMT. About PSMC wafer cost hikes: Huanan estimated manufacturing costs could rise ~100% in 2H26, but customers remained highly willing to accept the pass-through If we look at July net income was roughly $109M... way above the earnings levels the earlier models were built around. If I had to give a TLDR \"consensus\" of reports 1. DDR3/DDR2 supply remains structurally tight as competitors move capacity toward higher-value memory. 2. Concord saw no conditions supporting a price reversal during 2026. 3. Concord expected contract-price increases to cover higher foundry costs. 4. Huanan later found that customer willingness to accept those cost increases was stronger than expected. Fun thing I read from Huanan was DDR3 is used in products such as IP cameras and HDDs where the memory component is a relatively small part of the customer's total BOM. So even very large legacy DRAM price hike may only add a few dollars to the finished product's BOM... and for many customers, paying a few extra dollars would be more economical than redesigning + requalifying (but this flows materially into ESMT's net income) Anyway, just excited about this idea (*disclosure I have positions) TLDR: -> Huanan updated ESMT blended Q2 ASP to +105-113% Q/Q -> Given July's blowout net income (putting ESMT at 1.9x p/e annualized RR), implications for the future are exciting if inelasticity continues + ESMT has the ability to hike further due to low % of finished product BOM cost. -> Indication customers were still willing to accept pass through for PSMC wafer hikes.",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-30T22:35:36.164130+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "candidate_set",
+          "reason": "查證供需與成本轉嫁後可能新增 ESMT 候選；否證則排除作者年化推論"
+        },
+        "decided_at": "2026-08-30T22:35:36.164130+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true,
+          "novelty": true
+        },
+        "reason": "ESMT DDR3 ASP、PSMC wafer 成本、客戶 pass-through 與 July 淨利皆有具體數字，可追回台灣券商或 MOPS；結果可能讓 ESMT 進入 legacy DRAM 候選集合",
+        "tier": 3
+      },
+      "url": "https://x.com/aleabitoreddit/status/2094083798204047577"
     },
     "lead_1f55ec9eae7d1e4a1b68fa245ed1ee7f": {
       "entities": {
@@ -10438,6 +10801,73 @@
         }
       ],
       "url": "https://x.com/aleabitoreddit/status/2073704784398528599"
+    },
+    "lead_1f5a72a9cba09c5fd62dbe8771534c95": {
+      "entities": {
+        "company_ids": [
+          "co:applied_optoelectronics",
+          "co:lumentum",
+          "co:coherent"
+        ],
+        "tickers": [
+          "AAON",
+          "NVT",
+          "MOD",
+          "IESC",
+          "MTRS",
+          "JCI",
+          "HPS.A",
+          "PRY.MI",
+          "CRDO",
+          "AAOI",
+          "LITE",
+          "COHR"
+        ]
+      },
+      "first_seen": "2026-08-30T22:32:40.077921+00:00",
+      "lead_id": "lead_1f5a72a9cba09c5fd62dbe8771534c95",
+      "media": [],
+      "published_at": "2026-08-30T11:40:04.000Z",
+      "raw_text": "Just some random ideas from Elon’s post:\n\n$AAON - Chillers / liquid cooling\n$NVT - Cooling\n$MOD - Chillers / Cooling\n$IESC - Wiring\n$MTRS - chillers\n$JCI - chillers\n$HPS.A - Transformers (disclosure I own positions in this)\n$PRY.MI - networking/wiring(fiber)\n$CRDO / $AAOI (same) / $LITE / $COHR - networking\n\nSince Elon Musk cited:\n\n- transformers\n- wiring\n- liquid cooling\n- massive chillers + complex networking\n\nAs the point of failure for AI compute buildout. \n\nWhich is “harder than finding power”",
+      "refs": {
+        "original_claim_status": "unverified_speculation",
+        "parked_reason": "這是把一般資料中心施工瓶頸映射到多檔股票的候選腦暴，沒有可驗證的公司供應關係或事件 atom；不投入 graph extraction。",
+        "research_outcome": "未產 Research Action；不把推測性的受惠股清單當證據。",
+        "trace_attempts_ref": "2026-08-31：搜尋 X 原文與逐字片語，只取得作者貼文鏡像，未取得可核對的 Elon 原帖；個股對應皆是作者的隨機想法，沒有公司端文件。",
+        "trace_requires_user": "false",
+        "trace_status": "not_pursued"
+      },
+      "source": "x:aleabitoreddit",
+      "status": "parked",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "COHR",
+            "LITE"
+          ]
+        }
+      },
+      "title": "Just some random ideas from Elon’s post: $AAON - Chillers / liquid cooling $NVT - Cooling $MOD - Chillers / Cooling $IESC - Wiring $MTRS - chillers $JCI - chillers $HPS.A - Transformers (disclosure I own positions in this) $PRY.MI - networking/wiring(fiber) $CRDO / $AAOI (same) / $LITE / $COHR - networking Since Elon Musk cited: - transformers - wiring - liquid cooling - massive chillers + complex networking As the point of failure for AI compute buildout. Which is “harder than finding power”",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-30T22:35:34.217677+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "查證後可能新增 cooling、wiring、transformer chokepoint 候選；失敗則不改既有排序"
+        },
+        "decided_at": "2026-08-30T22:35:34.217677+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true,
+          "novelty": true
+        },
+        "reason": "列出 AI 資料中心變壓器、配線、液冷、chiller 與網路候選公司，並指向 Musk 原貼的具體失效點；可追回原文並改變候選集合",
+        "tier": 3
+      },
+      "url": "https://x.com/aleabitoreddit/status/2094027369648681284"
     },
     "lead_1f7757ebab570135cb422c11d725089a": {
       "entities": {
@@ -10636,6 +11066,39 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2080754547757391897"
+    },
+    "lead_205302343ca540edd1f67f8a1eac0031": {
+      "entities": {
+        "company_ids": [
+          "co:tsmc"
+        ],
+        "tickers": [
+          "TSM"
+        ]
+      },
+      "first_seen": "2026-08-30T22:32:54.746273+00:00",
+      "lead_id": "lead_205302343ca540edd1f67f8a1eac0031",
+      "published_at": "2026-08-14",
+      "refs": {},
+      "source": "edgar:TSM",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "TSM 6-K filed 2026-08-14",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-30T22:35:49.754505+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "confidence_only",
+          "reason": "附件核對前不假定改變瓶頸排序；若僅例行揭露則只補信心"
+        },
+        "decided_at": "2026-08-30T22:35:49.754505+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "TSM 官方 6-K 是可逐字核對的一手文件；附件內容尚待 pq1 追源，先作低優先財務事實",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1046179/000104617926000541/tsm-fsx20260814x6k.htm"
     },
     "lead_2061d895e6e162c47132019a07869d92": {
       "entities": {
@@ -10888,6 +11351,39 @@
         }
       ],
       "url": "https://x.com/aleabitoreddit/status/2085711500875116887"
+    },
+    "lead_2289f6b883f6e081b3e5795289a54fac": {
+      "entities": {
+        "company_ids": [
+          "co:tsmc"
+        ],
+        "tickers": [
+          "TSM"
+        ]
+      },
+      "first_seen": "2026-08-30T22:32:54.746656+00:00",
+      "lead_id": "lead_2289f6b883f6e081b3e5795289a54fac",
+      "published_at": "2026-08-10",
+      "refs": {},
+      "source": "edgar:TSM",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "TSM 4 filed 2026-08-10",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-30T22:35:40.045044+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "查證結果只補 insider 或稀釋脈絡，不改候選集合與瓶頸排序"
+        },
+        "decided_at": "2026-08-30T22:35:40.045044+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "SEC Form 4 是可逐字核對的一手內部人交易；保留為低優先時變觀測，但不因 issuer 或 tier 1 提高決策影響",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1046179/000104617926000531/xslF345X06/wk-form4_1786363218.xml"
     },
     "lead_22950673806c7136d6516716900c4a79": {
       "entities": {
@@ -11147,7 +11643,18 @@
         "research_run": "session:2026-08-30-loop2-r4",
         "trace_next_trigger": "LITE/COHR/AAOI 任一具名 Broadcom 或量產出貨數字",
         "trace_requires_user": "false",
-        "trace_status": "partial"
+        "trace_status": "partial",
+        "trace_trigger_entities": [
+          "AAOI",
+          "AVGO",
+          "COHR",
+          "LITE",
+          "co:applied_optoelectronics",
+          "co:broadcom",
+          "co:coherent",
+          "co:lumentum"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
       },
       "source": "decompose:avgo-davisson-2026-08-30",
       "status": "parked",
@@ -13649,6 +14156,49 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/928876/000197640826000651/xslF345X06/primary_doc.xml"
     },
+    "lead_33ee86d7a2c5f997576b00bba3ca357e": {
+      "entities": {
+        "company_ids": [
+          "co:tsmc"
+        ],
+        "tickers": [
+          "TSM"
+        ]
+      },
+      "first_seen": "2026-08-30T22:32:54.746352+00:00",
+      "lead_id": "lead_33ee86d7a2c5f997576b00bba3ca357e",
+      "published_at": "2026-08-11",
+      "refs": {
+        "original_claim_status": "confirmed_off_thesis_graph_scope",
+        "parked_reason": "一手文件確認 Sony Semiconductor Solutions 與 TSMC 的熊本影像感測 JV、2029 生產時程與雙方出資；這是公司／資本事件，不是目前 AI optics/CPO 瓶頸圖的供應關係增量。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1046179/000104617926000539/sonysemiconductorsolutions.htm",
+        "research_outcome": "追源完成但未產 Research Action；不把 JV 出資推成 sole_source、qualification 或現行供應量。",
+        "trace_attempts_ref": "2026-08-31：逐字核對 TSMC 6-K、TSMC board release 與 Sony 官方發布。",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
+      "source": "edgar:TSM",
+      "status": "parked",
+      "themes": {},
+      "title": "TSM 6-K filed 2026-08-11",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-30T22:35:50.749012+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "若官方文件建立新供應或合作關係會改候選集合；若只是例行公告則降為無 graph delta"
+        },
+        "decided_at": "2026-08-30T22:35:50.749012+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "TSM 6-K 附件名稱指向 Sony Semiconductor Solutions，具名關係可能新增 foundry 或客戶結構；需逐字追回官方附件",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1046179/000104617926000539/sonysemiconductorsolutions.htm"
+    },
     "lead_33f49001378b51073f41b05958b0da6a": {
       "entities": {
         "company_ids": [
@@ -14143,16 +14693,19 @@
       "lead_id": "lead_359cb1c9e8c4f11997943e4c7f01727d",
       "published_at": null,
       "refs": {
-        "parked_reason": "原始論文正文存取受阻；保留為 system-decompose 研究地圖，不把摘要當 evidence",
-        "research_outcome": "取得論文 metadata，但無法合法逐字核對 1152 芯耦合良率與主動對準段落；沒有具名公司 focus，未產 RA",
-        "trace_attempts_ref": "2026-08-26：IEEE document 11038201 頁面受 JS／機器人阻擋；另查 TSMC COUPE 官方研究頁只提供相鄰背景",
+        "parked_reason": "可確認 COUPE wafer-level characterization 與 micro-lens 降低對準敏感度的架構方向，無法支持 lead 所稱 1152 芯良率或特定 know-how owner。",
+        "research_outcome": "無新 RA；維持 partial，等待作者 manuscript 或具名製程供應商。",
+        "trace_attempts_ref": "2026-08-31：取得 IEEE metadata／摘要與 NVIDIA wafer-level micro-lens 技術說明；完整 manuscript 仍不可逐字取得，且沒有第三方 active-alignment vendor 具名。",
         "trace_next_trigger": "IEEE／作者公開 manuscript 或 institution repository 可逐字核對 1152-fiber coupling 與 active-alignment yield",
+        "trace_requeue_trigger": "related_triaged_lead:lead_004478d161be47a5f8d9323bccfc8573",
+        "trace_requeued_at": "2026-08-30T22:35:38.109712+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
           "TSM",
           "co:tsmc"
         ],
+        "trace_trigger_event_ref": "lead:lead_004478d161be47a5f8d9323bccfc8573",
         "trace_trigger_kind": "primary_source_signal"
       },
       "source": "system_decompose",
@@ -14160,12 +14713,35 @@
       "themes": {},
       "title": "[decompose] 光學耦合／主動對準層：IEEE 論文 Optical and Electrical Characterization of a Compact Universal Photonic Engine。圖中無主動對準製程節點；1152 芯耦合良率是誰的 know-how",
       "triage": {
-        "decided_at": "2026-08-25T03:05:20.257114+00:00",
+        "classification": {
+          "backfill_ref": "2026-08-31_active_classification_backfill.json",
+          "classified_at": "2026-08-30T22:37:12.935023+00:00",
+          "classified_by": "backfill_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "system-decompose 已有 IEEE photonic engine 論文；答案會新增或排除 active-alignment／光學耦合供應商候選"
+        },
+        "decided_at": "2026-08-30T22:35:38.109712+00:00",
         "decision": "go",
         "priority_flags": {},
-        "reason": "IEEE peer-reviewed，一手；主動對準層圖中無節點",
+        "reason": "指定實體的 tier-1 一手來源 lead_004478d161be47a5f8d9323bccfc8573 與 parked trace 共用具名標的 TSM, co:tsmc；事件觸發 bounded pq1 重查",
         "tier": 1
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-30T22:35:38.109712+00:00",
+          "superseded_reason": "指定實體的 tier-1 一手來源 lead_004478d161be47a5f8d9323bccfc8573 與 parked trace 共用具名標的 TSM, co:tsmc；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_004478d161be47a5f8d9323bccfc8573",
+          "triage": {
+            "decided_at": "2026-08-25T03:05:20.257114+00:00",
+            "decision": "go",
+            "priority_flags": {},
+            "reason": "IEEE peer-reviewed，一手；主動對準層圖中無節點",
+            "tier": 1
+          }
+        }
+      ],
       "url": "https://ieeexplore.ieee.org/document/11038201/"
     },
     "lead_360d8205bc213c74de182069147142ca": {
@@ -14294,6 +14870,39 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2074109998544846954"
+    },
+    "lead_36a8bd9ccadf6314b3b0763af5730dc5": {
+      "entities": {
+        "company_ids": [
+          "co:mp_materials"
+        ],
+        "tickers": [
+          "MP"
+        ]
+      },
+      "first_seen": "2026-08-30T22:32:49.748812+00:00",
+      "lead_id": "lead_36a8bd9ccadf6314b3b0763af5730dc5",
+      "published_at": "2026-06-15",
+      "refs": {},
+      "source": "edgar:MP",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "MP 4 filed 2026-06-15",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-30T22:35:41.989198+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "查證結果只補 insider 或稀釋脈絡，不改候選集合與瓶頸排序"
+        },
+        "decided_at": "2026-08-30T22:35:41.989198+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "SEC Form 4 是可逐字核對的一手內部人交易；保留為低優先時變觀測，但不因 issuer 或 tier 1 提高決策影響",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1801368/000149544926000006/xslF345X06/wk-form4_1781568045.xml"
     },
     "lead_371966aa5c74144595758b25ae702179": {
       "entities": {
@@ -14721,16 +15330,18 @@
           "TFC Communication 天孚通信"
         ],
         "outcome": "圖層缺口確認：Neo4j 查無任何 fiber array / FAU 節點。CPO、NPO、glass CPO、in-package optical I/O 都在，唯獨缺把光纖接到矽光子晶片的物理介面層。候選供應商 Largan 3008.TW、FOCI 3363.TWO、Browave 3163.TW、HST 7928.TW、Sunny Optical 全部不在圖中，同類僅有 co:corning。這是排序與覆蓋掃描無法產出的那種缺口，它們只能從既有節點往回看。",
-        "parked_reason": "新 NVIDIA filing 是財務事件，仍未具名 Largan／FOCI／TFC 的 FAU 供應角色；缺口未被新訊號補上。",
-        "research_outcome": "維持等待交易對手具名文件，不入圖。",
-        "trace_attempts_ref": "原 2026-08-25 FAU 追源 memo＋2026-08-26 NVIDIA 8-K／10-Q 與官方 ecosystem page",
+        "parked_reason": "FOCI 的 FAU 能力與量產準備有 issuer 一手，UDN 所稱 NVIDIA 供應角色、需求量與供不應求仍是 tier-3；依 L8 不入圖。",
+        "research_outcome": "無新 RA；維持 awaiting_named_disclosure，[302] 的第三方專利鏈 RA 為另一個已備妥 admission gate。",
+        "trace_attempts_ref": "2026-08-31：核對 UDN 轉述、FOCI 2025 年報與 NVIDIA 官方 CPO 文件；FOCI 可支持 FAU 自動化線、精密對準與 CPO 應用，仍無 NVIDIA/TSMC 客戶具名與 60–70 萬需求一手。",
         "trace_next_trigger": "Largan(3008)／FOCI(3363)／TFC 任一在 MOPS 重大訊息、法說會或 NVIDIA／Broadcom 官方文件中具名對方；或 NVIDIA 發布帶角色分工的 CPO 供應鏈說明",
         "trace_requeue_consumed_entities": [
           "CO:NVIDIA",
-          "NVDA"
+          "CO:TSMC",
+          "NVDA",
+          "TSM"
         ],
-        "trace_requeue_trigger": "related_triaged_lead:lead_0f0fc6255a25848dd10cf6e205e7f427",
-        "trace_requeued_at": "2026-08-26T22:37:00.415704+00:00",
+        "trace_requeue_trigger": "related_triaged_lead:lead_004478d161be47a5f8d9323bccfc8573",
+        "trace_requeued_at": "2026-08-30T22:35:38.109712+00:00",
         "trace_requires_user": "false",
         "trace_status": "awaiting_named_disclosure",
         "trace_trigger_entities": [
@@ -14740,7 +15351,7 @@
           "co:nvidia",
           "co:tsmc"
         ],
-        "trace_trigger_event_ref": "lead:lead_0f0fc6255a25848dd10cf6e205e7f427",
+        "trace_trigger_event_ref": "lead:lead_004478d161be47a5f8d9323bccfc8573",
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
@@ -14757,13 +15368,20 @@
       },
       "title": "I know everyone's focused on Nancy Pelosi copytraders sending $BE up 11.83%. Or Trump... But you know what else is cool? FAU bottlenecks for CPO. I remember saying earlier this year FAU/Foci might be a future bottleneck around $TSM / $NVDA CPO roadmaps... This was some media commentary supporting that: \"It is understood that Largan Precision (3008), FOCI (3363), and China’s TFC have entered $NVDA FAU supply chain\" \"Based on an estimated 20,000 Spectrum-X systems shipped this year, the optical engines installed in those systems would require approximately 600k-700k FAUs\" In 2027, demand is expected to reach several million units, and existing supply chain capacity is currently unable to meet demand.\" (UDN, mandarin -> english translation is kinda off) Cough cough, \"existing supply chain capacity is currently unable to meet demand\" Tad early right now since mass production is expected H2 2027, but cool to read updates around this.",
       "triage": {
-        "decided_at": "2026-08-26T22:37:00.415704+00:00",
+        "classification": {
+          "classified_at": "2026-08-24T22:37:23.275402+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "FAU 產能缺口與具名供應商若獲一手支持，會新增 CPO 子瓶頸與可研究供應商候選。"
+        },
+        "decided_at": "2026-08-30T22:35:38.109712+00:00",
         "decision": "go",
         "priority_flags": {
           "independent_source": true,
           "novelty": true
         },
-        "reason": "新 triage PASS lead lead_0f0fc6255a25848dd10cf6e205e7f427 與 parked trace 共用具名標的 NVDA, co:nvidia（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+        "reason": "新 triage PASS lead lead_004478d161be47a5f8d9323bccfc8573 與 parked trace 共用具名標的 TSM, co:tsmc（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
         "tier": 3
       },
       "triage_history": [
@@ -14791,6 +15409,22 @@
               "lead_afa72193be496499ef950552d9146c38",
               "lead_b1e793c560334131dfe7c1619715784d"
             ],
+            "tier": 3
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-30T22:35:38.109712+00:00",
+          "superseded_reason": "新 triage PASS lead lead_004478d161be47a5f8d9323bccfc8573 與 parked trace 共用具名標的 TSM, co:tsmc（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_004478d161be47a5f8d9323bccfc8573",
+          "triage": {
+            "decided_at": "2026-08-26T22:37:00.415704+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "independent_source": true,
+              "novelty": true
+            },
+            "reason": "新 triage PASS lead lead_0f0fc6255a25848dd10cf6e205e7f427 與 parked trace 共用具名標的 NVDA, co:nvidia（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
             "tier": 3
           }
         }
@@ -16781,13 +17415,13 @@
       "lead_id": "lead_464d4849949994fc18d5192a484b6c57",
       "published_at": null,
       "refs": {
-        "parked_reason": "NVIDIA 仍只具名 Browave 為 silicon-photonics ecosystem partner，未揭露 FAU 角色；FOCI／Largan／HST 仍未具名。",
+        "parked_reason": "FAU 仍是圖中真實缺層，但可投公司對應未獲交易對手一手；維持 awaiting_named_disclosure。",
         "primary_url": "https://nvidianews.nvidia.com/news/nvidia-spectrum-x-co-packaged-optics-networking-switches-ai-factories/",
-        "research_outcome": "圖中 FAU 層缺口仍成立，但目前不能建立公司供應邊。",
-        "trace_attempts_ref": "2026-08-26 NVIDIA official ecosystem page＋2026-08-27 8-K／10-Q recheck",
+        "research_outcome": "無新 graph delta；[302] 僅提供第三方專利鏈 origin，仍需 admission gate。",
+        "trace_attempts_ref": "2026-08-31：重查 FOCI 年報、NVIDIA 官方 CPO PR／技術 blog；FOCI 的 FAU 技術可確認，NVIDIA/TSMC 客戶映射與 Largan/Browave/HST 相對角色仍未具名。",
         "trace_next_trigger": "NVIDIA／TSMC／MOPS 文件具名 FOCI、Largan、Browave、HST 的 FAU 供應角色",
-        "trace_requeue_trigger": "related_triaged_lead:lead_53e31d26909b973cac66af50394abd98",
-        "trace_requeued_at": "2026-08-26T22:37:01.208359+00:00",
+        "trace_requeue_trigger": "related_triaged_lead:lead_004478d161be47a5f8d9323bccfc8573",
+        "trace_requeued_at": "2026-08-30T22:35:38.109712+00:00",
         "trace_requires_user": "false",
         "trace_status": "awaiting_named_disclosure",
         "trace_trigger_entities": [
@@ -16800,7 +17434,7 @@
           "co:nvidia",
           "co:tsmc"
         ],
-        "trace_trigger_event_ref": "lead:lead_53e31d26909b973cac66af50394abd98",
+        "trace_trigger_event_ref": "lead:lead_004478d161be47a5f8d9323bccfc8573",
         "trace_trigger_kind": "primary_source_signal"
       },
       "source": "system_decompose",
@@ -16817,10 +17451,18 @@
       },
       "title": "[decompose] 光纖陣列單元 FAU 層：圖中無 FAU 節點。FOCI 3363.TWO 官方網域即為 foci-cpo.com；需一手確認是否供 NVDA／TSMC，以及 Largan 3008、Browave 3163、HST 7928 的相對地位",
       "triage": {
-        "decided_at": "2026-08-26T22:37:01.208359+00:00",
+        "classification": {
+          "backfill_ref": "2026-08-31_active_classification_backfill.json",
+          "classified_at": "2026-08-30T22:37:12.935023+00:00",
+          "classified_by": "backfill_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "system-decompose 已具名 FOCI、Largan、Browave、HST；答案會新增或排除 FAU 層供應商候選"
+        },
+        "decided_at": "2026-08-30T22:35:38.109712+00:00",
         "decision": "go",
         "priority_flags": {},
-        "reason": "指定實體的 tier-1 一手來源 lead_53e31d26909b973cac66af50394abd98 與 parked trace 共用具名標的 NVDA, co:nvidia；事件觸發 bounded pq1 重查",
+        "reason": "指定實體的 tier-1 一手來源 lead_004478d161be47a5f8d9323bccfc8573 與 parked trace 共用具名標的 TSM, co:tsmc；事件觸發 bounded pq1 重查",
         "tier": 2
       },
       "triage_history": [
@@ -16834,6 +17476,19 @@
             "decision": "go",
             "priority_flags": {},
             "reason": "FOCI 官方網域；FAU 層圖中無節點，且與 8/24 撞出的 FAU lead 同一標的",
+            "tier": 2
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-30T22:35:38.109712+00:00",
+          "superseded_reason": "指定實體的 tier-1 一手來源 lead_004478d161be47a5f8d9323bccfc8573 與 parked trace 共用具名標的 TSM, co:tsmc；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_004478d161be47a5f8d9323bccfc8573",
+          "triage": {
+            "decided_at": "2026-08-26T22:37:01.208359+00:00",
+            "decision": "go",
+            "priority_flags": {},
+            "reason": "指定實體的 tier-1 一手來源 lead_53e31d26909b973cac66af50394abd98 與 parked trace 共用具名標的 NVDA, co:nvidia；事件觸發 bounded pq1 重查",
             "tier": 2
           }
         }
@@ -17088,19 +17743,28 @@
         "onboard_candidate_names": [
           "Fabrinet (NYSE: FN)"
         ],
-        "parked_reason": "OSA 組裝方研究：NVIDIA tier-1 blog 具名 11 家（TSMC、SPIL、Lumentum、Sumitomo、Coherent、Browave、Corning、Senko、TFC、Foxconn、Fabrinet）合作 COUPE 製程與 system-level assembly，但未指定誰做 OSA。Fabrinet CEO（Q4 FY2026 call，tier 2 transcript）逐字：『We are working on CPO today with a handful of customers, and we are already building devices albeit not yet at full scale volumes』——是 CPO 組裝最強候選但客戶未具名。依 L8/L6 不推斷對應。",
+        "parked_reason": "架構 atom 已由一手支持，但供應商角色仍未具名；Fabrinet 只是最強候選，依 L8 不推斷對應。",
         "primary_url": "https://developer.nvidia.com/blog/a-new-era-in-data-center-networking-with-nvidia-silicon-photonics-based-network-switching/",
-        "research_outcome": "assembly_partner_unnamed_fabrinet_strongest_candidate_tier2",
+        "research_outcome": "無新 graph delta；維持 awaiting_named_disclosure。",
         "research_run": "session:2026-08-29-decompose-drain",
+        "trace_attempts_ref": "2026-08-31：NVIDIA 官方技術 blog 確認 Quantum-X 每晶片 6 個密封 socket OSA、各含 3 個 COUPE engine；仍未指名 OSA 設計或組裝方。",
         "trace_next_trigger": "NVIDIA/Fabrinet/Foxconn 任一方具名揭露 CPO switch OSA／系統組裝分工",
+        "trace_requeue_consumed_entities": [
+          "CO:NVIDIA",
+          "NVDA"
+        ],
+        "trace_requeue_trigger": "related_triaged_lead:lead_d2495f0ff605f6790af86147ac148842",
+        "trace_requeued_at": "2026-08-30T22:35:33.235111+00:00",
         "trace_requires_user": "false",
         "trace_status": "awaiting_named_disclosure",
         "trace_trigger_entities": [
           "FN",
-          "co:fabrinet",
           "NVDA",
+          "co:fabrinet",
           "co:nvidia"
-        ]
+        ],
+        "trace_trigger_event_ref": "lead:lead_d2495f0ff605f6790af86147ac148842",
+        "trace_trigger_kind": "related_entity_signal"
       },
       "source": "decompose:nvda-cpo-switch-2026-08-29",
       "status": "parked",
@@ -17114,12 +17778,34 @@
           "decision_impact": "candidate_set",
           "reason": "decompose 產出之未知層研究題目"
         },
-        "decided_at": "2026-08-29T07:59:24.020926+00:00",
+        "decided_at": "2026-08-30T22:35:33.235111+00:00",
         "decision": "go",
         "priority_flags": {},
-        "reason": "NVIDIA blog 逐字描述 OSA 結構但未點名組裝方；ecosystem 名單（Fabrinet 等）未指定分工，依 L6 Gap4 不得推斷。圖中無 OSA 節點。",
+        "reason": "新 triage PASS lead lead_d2495f0ff605f6790af86147ac148842 與 parked trace 共用具名標的 NVDA, co:nvidia（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
         "tier": 2
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-30T22:35:33.235111+00:00",
+          "superseded_reason": "新 triage PASS lead lead_d2495f0ff605f6790af86147ac148842 與 parked trace 共用具名標的 NVDA, co:nvidia（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_d2495f0ff605f6790af86147ac148842",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-08-29T07:59:24.020926+00:00",
+              "classified_by": "triage_semantic_v1",
+              "content_type": "structural_fact",
+              "decision_impact": "candidate_set",
+              "reason": "decompose 產出之未知層研究題目"
+            },
+            "decided_at": "2026-08-29T07:59:24.020926+00:00",
+            "decision": "go",
+            "priority_flags": {},
+            "reason": "NVIDIA blog 逐字描述 OSA 結構但未點名組裝方；ecosystem 名單（Fabrinet 等）未指定分工，依 L6 Gap4 不得推斷。圖中無 OSA 節點。",
+            "tier": 2
+          }
+        }
+      ],
       "url": "https://developer.nvidia.com/blog/how-industry-collaboration-fosters-nvidia-co-packaged-optics/?decompose=osa"
     },
     "lead_486e4bcc8003167a6997376455b5a2c9": {
@@ -17794,6 +18480,39 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2082896789880119590"
     },
+    "lead_4e01f16dd69b10649a4960ad46f3ef7b": {
+      "entities": {
+        "company_ids": [
+          "co:mp_materials"
+        ],
+        "tickers": [
+          "MP"
+        ]
+      },
+      "first_seen": "2026-08-30T22:32:49.748885+00:00",
+      "lead_id": "lead_4e01f16dd69b10649a4960ad46f3ef7b",
+      "published_at": "2026-06-15",
+      "refs": {},
+      "source": "edgar:MP",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "MP 4 filed 2026-06-15",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-30T22:35:42.964574+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "查證結果只補 insider 或稀釋脈絡，不改候選集合與瓶頸排序"
+        },
+        "decided_at": "2026-08-30T22:35:42.964574+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "SEC Form 4 是可逐字核對的一手內部人交易；保留為低優先時變觀測，但不因 issuer 或 tier 1 提高決策影響",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1801368/000135670226000004/xslF345X06/wk-form4_1781567929.xml"
+    },
     "lead_4e0f84a6d779f0506d91b111aeeabe31": {
       "entities": {
         "company_ids": [
@@ -18045,6 +18764,16 @@
         "research_outcome": "營運 atoms 有公司文件／tier-2 transcript 支持；批評與 M&A 建議屬作者意見，不建立圖譜事實",
         "trace_attempts_ref": "2026-08-30：核對 Sivers Q2 2026 interim report 與第三方法說逐字稿；確認 pluggable engagements、Jabil 2027 ramp、hybrid foundry model 與 H1 2027 dual-listing readiness，但 M&A／70M 資本用途是作者處方",
         "trace_next_trigger": "Sivers 正式申請 dual listing、具名 acquisition 或具名 pluggable customer/order",
+        "trace_requeue_consumed_entities": [
+          "CO:COHERENT",
+          "CO:LUMENTUM",
+          "CO:SIVERS_SEMICONDUCTORS",
+          "COHR",
+          "LITE",
+          "SIVE"
+        ],
+        "trace_requeue_trigger": "related_triaged_lead:lead_d2495f0ff605f6790af86147ac148842",
+        "trace_requeued_at": "2026-08-30T22:35:33.235111+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
@@ -18059,10 +18788,11 @@
           "co:lumentum",
           "co:sivers_semiconductors"
         ],
+        "trace_trigger_event_ref": "lead:lead_d2495f0ff605f6790af86147ac148842",
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -18092,20 +18822,44 @@
           "decision_impact": "ranking",
           "reason": "foundry allocation 與 pluggable engagement 的經濟規模若成立會改變 Sivers 瓶頸排序；若法說不支持則不變"
         },
-        "decided_at": "2026-08-29T22:37:30.869492+00:00",
+        "decided_at": "2026-08-30T22:35:33.235111+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true
         },
-        "reason": "關聯 Sivers 已追蹤瓶頸，含 6 個 pluggable engagements、2 個 foundry allocation、70M 資本用途與上市時程等可追查主張；需追回法說逐字稿，驗證後可能改變 Sivers 排序。",
-        "related_trace_requeues": [
-          "lead_5838056904d872aa236cff2a570d1e11",
-          "lead_7618e9fd1456b4c522995c5b8a31eb2e",
-          "lead_99f94c80ce33a20f1a9c49da2f2e1667",
-          "lead_c7498202abd0bdcd20c035dc615bcec2"
-        ],
+        "reason": "新 triage PASS lead lead_d2495f0ff605f6790af86147ac148842 與 parked trace 共用具名標的 COHR, LITE, SIVE, co:coherent, co:lumentum, co:sivers_semiconductors（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
         "tier": 4
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-30T22:35:33.235111+00:00",
+          "superseded_reason": "新 triage PASS lead lead_d2495f0ff605f6790af86147ac148842 與 parked trace 共用具名標的 COHR, LITE, SIVE, co:coherent, co:lumentum, co:sivers_semiconductors（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_d2495f0ff605f6790af86147ac148842",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-08-29T22:37:30.869492+00:00",
+              "classified_by": "triage_semantic_v1",
+              "content_type": "structural_fact",
+              "decision_impact": "ranking",
+              "reason": "foundry allocation 與 pluggable engagement 的經濟規模若成立會改變 Sivers 瓶頸排序；若法說不支持則不變"
+            },
+            "decided_at": "2026-08-29T22:37:30.869492+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true
+            },
+            "reason": "關聯 Sivers 已追蹤瓶頸，含 6 個 pluggable engagements、2 個 foundry allocation、70M 資本用途與上市時程等可追查主張；需追回法說逐字稿，驗證後可能改變 Sivers 排序。",
+            "related_trace_requeues": [
+              "lead_5838056904d872aa236cff2a570d1e11",
+              "lead_7618e9fd1456b4c522995c5b8a31eb2e",
+              "lead_99f94c80ce33a20f1a9c49da2f2e1667",
+              "lead_c7498202abd0bdcd20c035dc615bcec2"
+            ],
+            "tier": 4
+          }
+        }
+      ],
       "url": "https://x.com/aleabitoreddit/status/2093652781928448279"
     },
     "lead_5105c989c73d16226293c3dd5da999ec": {
@@ -18163,6 +18917,39 @@
         "tier": 2
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1633978/000157333826000017/xslF345X06/form4-08282026_010801.xml"
+    },
+    "lead_51262d0814ea1b61ea98ccdc976793d8": {
+      "entities": {
+        "company_ids": [
+          "co:mp_materials"
+        ],
+        "tickers": [
+          "MP"
+        ]
+      },
+      "first_seen": "2026-08-30T22:32:49.748383+00:00",
+      "lead_id": "lead_51262d0814ea1b61ea98ccdc976793d8",
+      "published_at": "2026-08-07",
+      "refs": {},
+      "source": "edgar:MP",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "MP 10-Q filed 2026-08-07",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-30T22:35:48.782771+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "confidence_only",
+          "reason": "季度數字用於核驗既有判斷；除非追回新結構事件，否則不改候選集合或排序"
+        },
+        "decided_at": "2026-08-30T22:35:48.782771+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "MP Materials 官方 10-Q 含可逐字核對的財務與產能資訊；對既有標的先作低優先核驗，不因一手來源本身提高排序",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1801368/000180136826000048/mp-20260630.htm"
     },
     "lead_5134606e6235f2b112f74185eca6f514": {
       "entities": {
@@ -18290,11 +19077,13 @@
         "onboard_candidate_names": [
           "ASMPT"
         ],
-        "parked_reason": "官方頁足以確認產品與技術方向，但只有單一供應商 origin_entity，未達 company-onboard L8 多樣性，也不能推成量產採用或瓶頸排序",
+        "parked_reason": "供應商自報工具能力成立，仍缺獨立客戶 qualification 與 ASMPT graph identity；新 trigger 無清除。",
         "primary_url": "https://semi.asmpt.com/en/news-center/press-releases/asmpt-showcases-ap-innovations-for-ai-and-hpc-at-ectc-2027/",
-        "research_outcome": "供應商自報證實工具能力與 CPO 應用方向；缺客戶端 qualification，且 ASMPT 尚未 onboard，未產 Research Action",
-        "trace_attempts_ref": "2026-08-30：逐字核對 ASMPT 2026-08-24 ECOC 2026 官方頁，確認 AMICRA NANO／NOVA／MEGA 工具與 CPO scalable manufacturing 自述；未見客戶採用或量產 qualification",
+        "research_outcome": "無新 RA；維持 partial，等待客戶端訂單或量產 qualification。",
+        "trace_attempts_ref": "2026-08-31：重查 ASMPT 官方 SiPh/PIC bonder 與活動頁；一般 sub-micron placement、高吞吐工具能力可確認，但 lead 所指 ECTC 2027 頁尚無客戶 qualification 或量產採用證據。",
         "trace_next_trigger": "ASMPT 客戶端文件、訂單或量產 qualification 具名揭露",
+        "trace_requeue_trigger": "related_triaged_lead:lead_004478d161be47a5f8d9323bccfc8573",
+        "trace_requeued_at": "2026-08-30T22:35:38.109712+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
@@ -18303,6 +19092,7 @@
           "co:nvidia",
           "co:tsmc"
         ],
+        "trace_trigger_event_ref": "lead:lead_004478d161be47a5f8d9323bccfc8573",
         "trace_trigger_kind": "primary_source_signal"
       },
       "source": "weekly:cpo",
@@ -18325,12 +19115,34 @@
           "decision_impact": "candidate_set",
           "reason": "查證若有客戶採用與量產 qualification，ASMPT 會進 CPO 製造設備候選集合；若只是展會展示，則維持工具候選而不提升排序。"
         },
-        "decided_at": "2026-08-29T20:06:47.816718+00:00",
+        "decided_at": "2026-08-30T22:35:38.109712+00:00",
         "decision": "go",
         "priority_flags": {},
-        "reason": "PASS：ASMPT 8/24 官方頁具名 CPO、sub-micron precision bonding、high-throughput photonics bonding 與 multi-chip assembly，關聯性與可引用性均通過；ASMPT／該工具鏈在既有 leads 與 identity registry 中未出現，能新增 CPO active-alignment／assembly 候選集合。這只是供應商自報與 ECOC 展示預告，未證明客戶 qualification、採購或量產占有率。",
+        "reason": "指定實體的 tier-1 一手來源 lead_004478d161be47a5f8d9323bccfc8573 與 parked trace 共用具名標的 TSM, co:tsmc；事件觸發 bounded pq1 重查",
         "tier": 1
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-30T22:35:38.109712+00:00",
+          "superseded_reason": "指定實體的 tier-1 一手來源 lead_004478d161be47a5f8d9323bccfc8573 與 parked trace 共用具名標的 TSM, co:tsmc；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_004478d161be47a5f8d9323bccfc8573",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-08-29T20:06:47.816718+00:00",
+              "classified_by": "triage_semantic_v1",
+              "content_type": "structural_fact",
+              "decision_impact": "candidate_set",
+              "reason": "查證若有客戶採用與量產 qualification，ASMPT 會進 CPO 製造設備候選集合；若只是展會展示，則維持工具候選而不提升排序。"
+            },
+            "decided_at": "2026-08-29T20:06:47.816718+00:00",
+            "decision": "go",
+            "priority_flags": {},
+            "reason": "PASS：ASMPT 8/24 官方頁具名 CPO、sub-micron precision bonding、high-throughput photonics bonding 與 multi-chip assembly，關聯性與可引用性均通過；ASMPT／該工具鏈在既有 leads 與 identity registry 中未出現，能新增 CPO active-alignment／assembly 候選集合。這只是供應商自報與 ECOC 展示預告，未證明客戶 qualification、採購或量產占有率。",
+            "tier": 1
+          }
+        }
+      ],
       "url": "https://semi.asmpt.com/en/news-center/press-releases/asmpt-showcases-ap-innovations-for-ai-and-hpc-at-ectc-2027/"
     },
     "lead_5375b136184e9c82b86c3636f439008a": {
@@ -20368,6 +21180,39 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026044048/xslF345X06/wk-form4_1781734174.xml"
+    },
+    "lead_609f70123c19f56604512c8c62be6eb6": {
+      "entities": {
+        "company_ids": [
+          "co:mp_materials"
+        ],
+        "tickers": [
+          "MP"
+        ]
+      },
+      "first_seen": "2026-08-30T22:32:49.748662+00:00",
+      "lead_id": "lead_609f70123c19f56604512c8c62be6eb6",
+      "published_at": "2026-06-15",
+      "refs": {},
+      "source": "edgar:MP",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "MP 4 filed 2026-06-15",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-30T22:35:43.938729+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "查證結果只補 insider 或稀釋脈絡，不改候選集合與瓶頸排序"
+        },
+        "decided_at": "2026-08-30T22:35:43.938729+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "SEC Form 4 是可逐字核對的一手內部人交易；保留為低優先時變觀測，但不因 issuer 或 tier 1 提高決策影響",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1801368/000180136826000041/xslF345X06/wk-form4_1781568190.xml"
     },
     "lead_61053b6d935c61b2c3def03c953b1994": {
       "entities": {
@@ -24027,11 +24872,21 @@
         "trace_attempts_ref": "2026-08-30：以 Sivers Q2 2026 interim report 與法說逐字稿重查清單；僅部分營運 atoms 可支持，客戶歸因與估值推論未獲交易對手文件支持",
         "trace_next_trigger": "Sivers 客戶端具名 design win、production order 或 foundry partner 揭露",
         "trace_requeue_consumed_entities": [
+          "AEVA",
+          "CO:AEVA",
+          "CO:GLOBALFOUNDRIES",
+          "CO:JABIL",
+          "CO:NVIDIA",
+          "CO:POET_TECHNOLOGIES",
           "CO:SIVERS_SEMICONDUCTORS",
+          "GFS",
+          "JBL",
+          "NVDA",
+          "POET",
           "SIVE"
         ],
-        "trace_requeue_trigger": "related_triaged_lead:lead_4fc2da14b0d039e4d27e517c136de5e9",
-        "trace_requeued_at": "2026-08-29T22:37:30.869492+00:00",
+        "trace_requeue_trigger": "related_triaged_lead:lead_d2495f0ff605f6790af86147ac148842",
+        "trace_requeued_at": "2026-08-30T22:35:33.235111+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
@@ -24048,11 +24903,11 @@
           "co:poet_technologies",
           "co:sivers_semiconductors"
         ],
-        "trace_trigger_event_ref": "lead:lead_4fc2da14b0d039e4d27e517c136de5e9",
+        "trace_trigger_event_ref": "lead:lead_d2495f0ff605f6790af86147ac148842",
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -24089,12 +24944,12 @@
           "decision_impact": "ranking",
           "reason": "查證合作與 qualification 路徑可能改變 Sivers 在光互連候選排序。"
         },
-        "decided_at": "2026-08-29T22:37:30.869492+00:00",
+        "decided_at": "2026-08-30T22:35:33.235111+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true
         },
-        "reason": "新 triage PASS lead lead_4fc2da14b0d039e4d27e517c136de5e9 與 parked trace 共用具名標的 SIVE, co:sivers_semiconductors（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+        "reason": "新 triage PASS lead lead_d2495f0ff605f6790af86147ac148842 與 parked trace 共用具名標的 AEVA, GFS, JBL, NVDA, POET, co:aeva, co:globalfoundries, co:jabil, co:nvidia, co:poet_technologies（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
         "tier": 4
       },
       "triage_history": [
@@ -24117,6 +24972,28 @@
               "novelty": true
             },
             "reason": "關聯 Sivers 與 CPO／ELS／pluggable；含具名合作方與 qualification 路徑，可逐項追源；社群作者自陳估值結論不當證據。",
+            "tier": 4
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-30T22:35:33.235111+00:00",
+          "superseded_reason": "新 triage PASS lead lead_d2495f0ff605f6790af86147ac148842 與 parked trace 共用具名標的 AEVA, GFS, JBL, NVDA, POET, co:aeva, co:globalfoundries, co:jabil, co:nvidia, co:poet_technologies（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_d2495f0ff605f6790af86147ac148842",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-08-27T22:37:17.195844+00:00",
+              "classified_by": "triage_semantic_v1",
+              "content_type": "structural_fact",
+              "decision_impact": "ranking",
+              "reason": "查證合作與 qualification 路徑可能改變 Sivers 在光互連候選排序。"
+            },
+            "decided_at": "2026-08-29T22:37:30.869492+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true
+            },
+            "reason": "新 triage PASS lead lead_4fc2da14b0d039e4d27e517c136de5e9 與 parked trace 共用具名標的 SIVE, co:sivers_semiconductors（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
             "tier": 4
           }
         }
@@ -25851,6 +26728,39 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/928876/000117891326004009/zk2635926.htm"
+    },
+    "lead_7f15a5aa15464587e916e17c059086ee": {
+      "entities": {
+        "company_ids": [
+          "co:tsmc"
+        ],
+        "tickers": [
+          "TSM"
+        ]
+      },
+      "first_seen": "2026-08-30T22:32:54.746430+00:00",
+      "lead_id": "lead_7f15a5aa15464587e916e17c059086ee",
+      "published_at": "2026-08-11",
+      "refs": {},
+      "source": "edgar:TSM",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "TSM 6-K filed 2026-08-11",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-30T22:35:51.730124+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "confidence_only",
+          "reason": "無論內容是否成立，預期只補治理或財務脈絡，不改瓶頸候選排序"
+        },
+        "decided_at": "2026-08-30T22:35:51.730124+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "TSM 官方 6-K board 公告可逐字核對，但從 metadata 看偏治理或例行事項；先列低優先財務事實等待附件確認",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1046179/000104617926000536/tsm-boardx20260811.htm"
     },
     "lead_7f66b743a034c41f6388aa800f333e62": {
       "entities": {
@@ -29399,9 +30309,10 @@
         "primary_url": "https://www.release.tdnet.info/inbs/140120260804507706.pdf",
         "research_outcome": "q1_tanshin_obtained_supersede_proposal_minted",
         "research_run": "session:2026-08-30-loop2-r4",
+        "trace_attempts_ref": "TDNET_HDS_Q1_FY2027_original_obtained",
         "trace_next_trigger": "[274] 核准後 HDS reassess 驗證 financial_runway_stale 消失",
         "trace_requires_user": "false",
-        "trace_status": "partial"
+        "trace_status": "original_obtained"
       },
       "source": "loop:runway-refresh",
       "status": "parked",
@@ -29951,17 +30862,26 @@
         "onboard_candidate_names": [
           "ASE Technology 日月光 (TWSE: 3711 / NYSE: ASX)"
         ],
-        "parked_reason": "SoIC/OSAT 層研究：tier-1——TSMC CEO 於 NVIDIA PR 逐字提及 TSMC-SoIC 3D chip stacking；SPIL 具名於 NVIDIA blog 11 家合作名單。tier-3——量產報導點名 ASE（SPIL 母公司，3711.TW/NYSE ASX）在供應鏈。OSAT 分工細節（SPIL 做什麼、產能、第二供應商存在與否）未獲一手。與 Broadcom 亦用 COUPE 的假設合併看：TSMC（製程）＋ASE/SPIL（OSAT）可能是 CPO 封裝的雙層集中。",
+        "parked_reason": "新 trigger 未補 SPIL 的 CPO OSAT 角色與替代性；維持 partial。",
         "primary_url": "https://nvidianews.nvidia.com/news/nvidia-spectrum-x-co-packaged-optics-networking-switches-ai-factories",
-        "research_outcome": "tsmc_soic_tier1_spil_named_role_details_pending",
+        "research_outcome": "無新 graph delta；等待 ASE/SPIL 或客戶端具名文件。",
         "research_run": "session:2026-08-29-decompose-drain",
+        "trace_attempts_ref": "2026-08-31：重查 NVIDIA 官方 PR／技術 blog；TSMC SoIC 角色仍明確，SPIL 仍只出現在合作名單，沒有封裝分工、產能或第二供應商揭露。",
         "trace_next_trigger": "ASE/SPIL 法說具名 CPO 封裝營收或 TSMC 揭露 SoIC-photonics 產能分配",
+        "trace_requeue_consumed_entities": [
+          "CO:TSMC",
+          "TSM"
+        ],
+        "trace_requeue_trigger": "related_triaged_lead:lead_004478d161be47a5f8d9323bccfc8573",
+        "trace_requeued_at": "2026-08-30T22:35:38.109712+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
           "TSM",
           "co:tsmc"
-        ]
+        ],
+        "trace_trigger_event_ref": "lead:lead_004478d161be47a5f8d9323bccfc8573",
+        "trace_trigger_kind": "related_entity_signal"
       },
       "source": "decompose:nvda-cpo-switch-2026-08-29",
       "status": "parked",
@@ -29983,12 +30903,34 @@
           "decision_impact": "candidate_set",
           "reason": "decompose 產出之未知層研究題目"
         },
-        "decided_at": "2026-08-29T07:59:24.022199+00:00",
+        "decided_at": "2026-08-30T22:35:38.109712+00:00",
         "decision": "go",
         "priority_flags": {},
-        "reason": "TSMC CEO 於 PR 逐字提及 SoIC 3D chip stacking；SPIL 具名但不在圖。圖 tech:advanced_packaging 的供應商是 Tower/AMAT（別條脈絡），NVIDIA CPO 封裝鏈未建模。",
+        "reason": "新 triage PASS lead lead_004478d161be47a5f8d9323bccfc8573 與 parked trace 共用具名標的 TSM, co:tsmc（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
         "tier": 1
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-30T22:35:38.109712+00:00",
+          "superseded_reason": "新 triage PASS lead lead_004478d161be47a5f8d9323bccfc8573 與 parked trace 共用具名標的 TSM, co:tsmc（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_004478d161be47a5f8d9323bccfc8573",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-08-29T07:59:24.022199+00:00",
+              "classified_by": "triage_semantic_v1",
+              "content_type": "structural_fact",
+              "decision_impact": "candidate_set",
+              "reason": "decompose 產出之未知層研究題目"
+            },
+            "decided_at": "2026-08-29T07:59:24.022199+00:00",
+            "decision": "go",
+            "priority_flags": {},
+            "reason": "TSMC CEO 於 PR 逐字提及 SoIC 3D chip stacking；SPIL 具名但不在圖。圖 tech:advanced_packaging 的供應商是 Tower/AMAT（別條脈絡），NVIDIA CPO 封裝鏈未建模。",
+            "tier": 1
+          }
+        }
+      ],
       "url": "https://nvidianews.nvidia.com/news/nvidia-spectrum-x-co-packaged-optics-networking-switches-ai-factories?decompose=soic"
     },
     "lead_9560cb7de6f030c75af6b74251114924": {
@@ -30038,21 +30980,30 @@
           "TFC Communication 天孚通信 (SZSE: 300394)",
           "Browave 波若威 (TWSE: 3163)"
         ],
-        "parked_reason": "光纖層研究：NVIDIA tier-1 確認每 engine 2 條 laser input fiber＋PM fiber 存在＋Browave/Corning/Sumitomo/TFC 具名合作。tier-3 報導（Dan Nystedt 等）：Spectrum-X CPO 已進入量產、TFC Communication（300394.SZ 天孚通信）供 ELS→PIC 的 PM 光纖組件與前面板連接、Browave（3163.TW 波若威）在台系供應鏈名單。TFC/Browave 皆上市且市值遠小於 Corning/Sumitomo——標的純度潛力高，但具體分工需一手（公司公告／法說）確認。",
+        "parked_reason": "新 trigger 只重複生態系名單與光纖架構，沒有把公司對應到 fiber 子層；維持 partial。",
         "primary_url": "https://developer.nvidia.com/blog/how-industry-collaboration-fosters-nvidia-co-packaged-optics/",
-        "research_outcome": "two_listed_smallcap_candidates_role_attribution_tier3",
+        "research_outcome": "無新 graph delta；等待供應商或 NVIDIA 具名角色與量。",
         "research_run": "session:2026-08-29-decompose-drain",
+        "trace_attempts_ref": "2026-08-31：重查 NVIDIA 官方 PR／技術 blog；確認 laser input fiber 與合作名單，仍沒有 Browave、Corning、Sumitomo、TFC 的角色或集中度拆分。",
         "trace_next_trigger": "TFC（300394.SZ）或 Browave（3163.TW）法說／公告具名揭露 NVIDIA CPO 供應內容與量",
+        "trace_requeue_consumed_entities": [
+          "CO:NVIDIA",
+          "NVDA"
+        ],
+        "trace_requeue_trigger": "related_triaged_lead:lead_d2495f0ff605f6790af86147ac148842",
+        "trace_requeued_at": "2026-08-30T22:35:33.235111+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
-          "GLW",
-          "co:corning",
           "5802.T",
-          "co:sumitomo_electric",
+          "GLW",
           "NVDA",
-          "co:nvidia"
-        ]
+          "co:corning",
+          "co:nvidia",
+          "co:sumitomo_electric"
+        ],
+        "trace_trigger_event_ref": "lead:lead_d2495f0ff605f6790af86147ac148842",
+        "trace_trigger_kind": "related_entity_signal"
       },
       "source": "decompose:nvda-cpo-switch-2026-08-29",
       "status": "parked",
@@ -30074,12 +31025,34 @@
           "decision_impact": "candidate_set",
           "reason": "decompose 產出之未知層研究題目"
         },
-        "decided_at": "2026-08-29T07:59:24.021420+00:00",
+        "decided_at": "2026-08-30T22:35:33.235111+00:00",
         "decision": "go",
         "priority_flags": {},
-        "reason": "NVIDIA PR 具名四家 fiber/光元件商但未指定分工；圖有 tech:pm_fiber/fiber_attach_unit（Coherent 鏈）但無 NVIDIA CPO 光纖供應鏈。TFC/Browave 不在 registry。",
+        "reason": "新 triage PASS lead lead_d2495f0ff605f6790af86147ac148842 與 parked trace 共用具名標的 NVDA, co:nvidia（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
         "tier": 1
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-30T22:35:33.235111+00:00",
+          "superseded_reason": "新 triage PASS lead lead_d2495f0ff605f6790af86147ac148842 與 parked trace 共用具名標的 NVDA, co:nvidia（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_d2495f0ff605f6790af86147ac148842",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-08-29T07:59:24.021420+00:00",
+              "classified_by": "triage_semantic_v1",
+              "content_type": "structural_fact",
+              "decision_impact": "candidate_set",
+              "reason": "decompose 產出之未知層研究題目"
+            },
+            "decided_at": "2026-08-29T07:59:24.021420+00:00",
+            "decision": "go",
+            "priority_flags": {},
+            "reason": "NVIDIA PR 具名四家 fiber/光元件商但未指定分工；圖有 tech:pm_fiber/fiber_attach_unit（Coherent 鏈）但無 NVIDIA CPO 光纖供應鏈。TFC/Browave 不在 registry。",
+            "tier": 1
+          }
+        }
+      ],
       "url": "https://nvidianews.nvidia.com/news/nvidia-spectrum-x-co-packaged-optics-networking-switches-ai-factories?decompose=fiber"
     },
     "lead_95daa27b4775895e2bec873b7b829bd5": {
@@ -30435,6 +31408,39 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1789029/000119312526352272/xslF345X06/ownership.xml"
+    },
+    "lead_97954aa904e68a28cf7d1c3b1013490c": {
+      "entities": {
+        "company_ids": [
+          "co:mp_materials"
+        ],
+        "tickers": [
+          "MP"
+        ]
+      },
+      "first_seen": "2026-08-30T22:32:49.748586+00:00",
+      "lead_id": "lead_97954aa904e68a28cf7d1c3b1013490c",
+      "published_at": "2026-06-30",
+      "refs": {},
+      "source": "edgar:MP",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "MP 4 filed 2026-06-30",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-30T22:35:44.893013+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "查證結果只補 insider 或稀釋脈絡，不改候選集合與瓶頸排序"
+        },
+        "decided_at": "2026-08-30T22:35:44.893013+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "SEC Form 4 是可逐字核對的一手內部人交易；保留為低優先時變觀測，但不因 issuer 或 tier 1 提高決策影響",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1801368/000180136826000043/xslF345X06/wk-form4_1782865877.xml"
     },
     "lead_97d627b017131ff39599b413b00c2e15": {
       "entities": {
@@ -32574,6 +33580,39 @@
       ],
       "url": "https://x.com/aleabitoreddit/status/2079479755481776221"
     },
+    "lead_a5075a9225a62c249813b5448694c0ca": {
+      "entities": {
+        "company_ids": [
+          "co:tsmc"
+        ],
+        "tickers": [
+          "TSM"
+        ]
+      },
+      "first_seen": "2026-08-30T22:32:54.746075+00:00",
+      "lead_id": "lead_a5075a9225a62c249813b5448694c0ca",
+      "published_at": "2026-08-25",
+      "refs": {},
+      "source": "edgar:TSM",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "TSM 6-K filed 2026-08-25",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-30T22:35:52.706863+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "confidence_only",
+          "reason": "月度揭露只補需求與營運脈絡，不直接改瓶頸候選集合或排序"
+        },
+        "decided_at": "2026-08-30T22:35:52.706863+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "TSM month-end 6-K 為官方可核對時變揭露；屬財務事實，保留低優先核驗",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1046179/000104617926000545/tsm-monthend6kx20260825.htm"
+    },
     "lead_a511a38010b8006f462a2298f84d4a84": {
       "entities": {
         "company_ids": [],
@@ -32611,6 +33650,39 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2093281270063337833"
+    },
+    "lead_a52cee932734843529cb1f1804edb815": {
+      "entities": {
+        "company_ids": [
+          "co:tsmc"
+        ],
+        "tickers": [
+          "TSM"
+        ]
+      },
+      "first_seen": "2026-08-30T22:32:54.746507+00:00",
+      "lead_id": "lead_a52cee932734843529cb1f1804edb815",
+      "published_at": "2026-08-10",
+      "refs": {},
+      "source": "edgar:TSM",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "TSM 4 filed 2026-08-10",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-30T22:35:41.030942+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "查證結果只補 insider 或稀釋脈絡，不改候選集合與瓶頸排序"
+        },
+        "decided_at": "2026-08-30T22:35:41.030942+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "SEC Form 4 是可逐字核對的一手內部人交易；保留為低優先時變觀測，但不因 issuer 或 tier 1 提高決策影響",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1046179/000104617926000533/xslF345X06/wk-form4_1786363233.xml"
     },
     "lead_a53867cc19e44995d9ee1ef2fb2c8fbd": {
       "entities": {
@@ -37393,6 +38465,39 @@
       },
       "url": "https://investors.mpmaterials.com/investor-news/news-details/2025/MP-Materials-and-Apple-Announce-500-Million-Partnership-to-Produce-Recycled-Rare-Earth-Magnets-in-the-United-States/default.aspx"
     },
+    "lead_bf2575dffd26407d059d9d6e0c958513": {
+      "entities": {
+        "company_ids": [
+          "co:mp_materials"
+        ],
+        "tickers": [
+          "MP"
+        ]
+      },
+      "first_seen": "2026-08-30T22:32:49.748959+00:00",
+      "lead_id": "lead_bf2575dffd26407d059d9d6e0c958513",
+      "published_at": "2026-06-10",
+      "refs": {},
+      "source": "edgar:MP",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "MP 4 filed 2026-06-10",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-30T22:35:45.867297+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "查證結果只補 insider 或稀釋脈絡，不改候選集合與瓶頸排序"
+        },
+        "decided_at": "2026-08-30T22:35:45.867297+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "SEC Form 4 是可逐字核對的一手內部人交易；保留為低優先時變觀測，但不因 issuer 或 tier 1 提高決策影響",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1801368/000103160926000002/xslF345X06/wk-form4_1781139040.xml"
+    },
     "lead_c01e5a312817d1ae6c629b4005a773c3": {
       "entities": {
         "company_ids": [],
@@ -37794,6 +38899,52 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2090714894874050824"
+    },
+    "lead_c33c90b2734c2ed1e43b022b5d22dac0": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia"
+        ],
+        "tickers": [
+          "NVDA"
+        ]
+      },
+      "first_seen": "2026-08-30T22:32:40.079088+00:00",
+      "lead_id": "lead_c33c90b2734c2ed1e43b022b5d22dac0",
+      "media": [],
+      "published_at": "2026-08-30T11:07:29.000Z",
+      "raw_text": "FYI to the AI bears: $NVDA projects $1.3T of hyperscaler spend for 2027.\n\nUp from ~$800B in 2026, alongside ~70% revenue growth despite remaining capacity constrained… far above prior Street expectations of ~45%.\n\nThat capex flows across the AI supply chain… from memory and networking to foundries. Especially through the new bottlenecks/chokepoints that didn’t benefit from older generations.\n\nWe’re like 2 hours into the party where people started off drinking Sapporo draft beer.\n\nSomeone spiked Situational’s drinks and we had to pause the party for 30 min.\n\nBut now it’s back on with tequila shots on the table.\n\nI think the real party is about to begin.",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "NVDA"
+          ]
+        }
+      },
+      "title": "FYI to the AI bears: $NVDA projects $1.3T of hyperscaler spend for 2027. Up from ~$800B in 2026, alongside ~70% revenue growth despite remaining capacity constrained… far above prior Street expectations of ~45%. That capex flows across the AI supply chain… from memory and networking to foundries. Especially through the new bottlenecks/chokepoints that didn’t benefit from older generations. We’re like 2 hours into the party where people started off drinking Sapporo draft beer. Someone spiked Situational’s drinks and we had to pause the party for 30 min. But now it’s back on with tequila shots on the table. I think the real party is about to begin.",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-30T22:35:35.197074+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "ranking",
+          "reason": "一手指引成立會提高 AI 供應鏈需求錨點；若只是二手誤引則不應進圖"
+        },
+        "decided_at": "2026-08-30T22:35:35.197074+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true,
+          "novelty": true
+        },
+        "reason": "NVDA 2027 hyperscaler capex 1.3T、2026約800B、營收成長約70%與 capacity constrained 均為具體可追查數字；若一手成立會更新需求錨點與排序",
+        "tier": 3
+      },
+      "url": "https://x.com/aleabitoreddit/status/2094019167527776711"
     },
     "lead_c394d7ed036ed5058fd9921311790325": {
       "entities": {
@@ -38296,6 +39447,93 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/820318/000089914026000476/xslF345X06/form4.xml"
     },
+    "lead_c539cdc2b4e187f93984163ef923fcd7": {
+      "entities": {
+        "company_ids": [
+          "co:axt",
+          "co:nebius",
+          "co:aehr_test_systems",
+          "co:micron_technology",
+          "co:intel",
+          "co:marvell_technology",
+          "co:lumentum",
+          "co:iqe",
+          "co:soitec",
+          "co:tower_semiconductor",
+          "co:coherent",
+          "co:sivers_semiconductors",
+          "co:churchill_capital_xi",
+          "co:x_fab",
+          "co:jabil"
+        ],
+        "tickers": [
+          "AXTI",
+          "NBIS",
+          "AEHR",
+          "MU",
+          "INTC",
+          "EWY",
+          "MRVL",
+          "LITE",
+          "RPI",
+          "IQE",
+          "SOI",
+          "TSEM",
+          "ARM",
+          "COHR",
+          "LPKF",
+          "SIVE",
+          "CCXI",
+          "XFAB",
+          "JBL",
+          "MXL"
+        ]
+      },
+      "first_seen": "2026-08-30T22:32:40.085027+00:00",
+      "lead_id": "lead_c539cdc2b4e187f93984163ef923fcd7",
+      "media": [],
+      "published_at": "2026-08-30T06:24:05.000Z",
+      "raw_text": "It’s been a little disappointing to see a pattern with some people I've interacted with on X:\n\n- try to engage with the same audience, then quickly move toward aggressively monetizing it   \n\n- get upset when I choose not to participate in or amplify paid groups\n\n- throw out personal or illogical attacks and try to reframe that as simply disagreeing over fundamentals\n\nWhen I first joined X, a lot of finance content revolved around watches/private jets + options, paywalled communities promising the \"secrets of Wall Street,\" and squiggly-line charts.\n\nOne of the things I've wanted to do differently is publish my research and reasoning openly, for everyone.\n\nI think this definitely resonated with folks given my follower growth.    \n\nBut of course, this growth can also create friction with people whose business models rely on using X to funnel audiences into paid services or expensive paywalls.\n\nMy subscription has been $1 for months and will stay at the minimum, despite claims at the beginning I would raise it to $100. \n\nAll of my core theses are published on the main timeline for free. I could put substantially more behind a paywall. I just don't want to. \n\nI just prefer sharing the ideas openly and letting everyone decide for themselves.\n\nMany ideas have worked out well: $AXTI, $NBIS, $AEHR, $MU, $INTC, $EWY, $MRVL, $LITE, $RPI, $IQE, $SOI, $TSEM, $ARM, $COHR, and a lot more. \n\nOthers ran into unexpected industry delays, like $LPKF with glass substrates and Auros with hybrid bonding.\n\nSome are still playing out into 2027/2028, including $SIVE, Foci, Shunsin, $CCXI, $XFAB and the broader CPO/humanoid themes.\n\nSome are brand new like Etron/ESMT for DDR2/DDR3.\n\nAnd many like $JBL to Murata to $MXL, I just share for fun to see if the idea is right. \n\nNot every idea will be right. That's part of research.\n\nBut I'd much rather have an X where people openly publish the thesis and reasoning so everyone can learn from it. \n\nThan one where information increasingly disappears behind $100 paywalls or becomes diluted with engagement-bait noise. \n\nHopefully I can help create a new culture on X rather than amplify the old one.",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "COHR",
+            "CPO",
+            "LITE"
+          ]
+        },
+        "robotics": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CCXI",
+            "JBL",
+            "humanoid"
+          ]
+        },
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "SIVE"
+          ]
+        }
+      },
+      "title": "It’s been a little disappointing to see a pattern with some people I've interacted with on X: - try to engage with the same audience, then quickly move toward aggressively monetizing it - get upset when I choose not to participate in or amplify paid groups - throw out personal or illogical attacks and try to reframe that as simply disagreeing over fundamentals When I first joined X, a lot of finance content revolved around watches/private jets + options, paywalled communities promising the \"secrets of Wall Street,\" and squiggly-line charts. One of the things I've wanted to do differently is publish my research and reasoning openly, for everyone. I think this definitely resonated with folks given my follower growth. But of course, this growth can also create friction with people whose business models rely on using X to funnel audiences into paid services or expensive paywalls. My subscription has been $1 for months and will stay at the minimum, despite claims at the beginning I would raise it to $100. All of my core theses are published on the main timeline for free. I could put substantially more behind a paywall. I just don't want to. I just prefer sharing the ideas openly and letting everyone decide for themselves. Many ideas have worked out well: $AXTI, $NBIS, $AEHR, $MU, $INTC, $EWY, $MRVL, $LITE, $RPI, $IQE, $SOI, $TSEM, $ARM, $COHR, and a lot more. Others ran into unexpected industry delays, like $LPKF with glass substrates and Auros with hybrid bonding. Some are still playing out into 2027/2028, including $SIVE, Foci, Shunsin, $CCXI, $XFAB and the broader CPO/humanoid themes. Some are brand new like Etron/ESMT for DDR2/DDR3. And many like $JBL to Murata to $MXL, I just share for fun to see if the idea is right. Not every idea will be right. That's part of research. But I'd much rather have an X where people openly publish the thesis and reasoning so everyone can learn from it. Than one where information increasingly disappears behind $100 paywalls or becomes diluted with engagement-bait noise. Hopefully I can help create a new culture on X rather than amplify the old one.",
+      "triage": {
+        "decided_at": "2026-08-30T22:35:32.256304+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "內容是作者分享研究文化與歷史選股清單，沒有可拆成新事件並逐字追源的具體 claim；關聯性雖有，但可引用性不足",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2093947848580858123"
+    },
     "lead_c56124b706fa43d5ee03a44016c276b0": {
       "entities": {
         "company_ids": [],
@@ -38356,6 +39594,39 @@
         "tier": 3
       },
       "url": "https://udn.com/news/story/7240/9715655"
+    },
+    "lead_c6254c77c2e1789ddbd6ab10c985733b": {
+      "entities": {
+        "company_ids": [
+          "co:mp_materials"
+        ],
+        "tickers": [
+          "MP"
+        ]
+      },
+      "first_seen": "2026-08-30T22:32:49.748738+00:00",
+      "lead_id": "lead_c6254c77c2e1789ddbd6ab10c985733b",
+      "published_at": "2026-06-15",
+      "refs": {},
+      "source": "edgar:MP",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "MP 4 filed 2026-06-15",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-30T22:35:46.841076+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "查證結果只補 insider 或稀釋脈絡，不改候選集合與瓶頸排序"
+        },
+        "decided_at": "2026-08-30T22:35:46.841076+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "SEC Form 4 是可逐字核對的一手內部人交易；保留為低優先時變觀測，但不因 issuer 或 tier 1 提高決策影響",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1801368/000103160926000004/xslF345X06/wk-form4_1781568136.xml"
     },
     "lead_c7498202abd0bdcd20c035dc615bcec2": {
       "entities": {
@@ -39161,8 +40432,8 @@
         "research_run": "daily:2026-08-28",
         "trace_attempts_ref": "NVIDIA CPO 技術博客、GTC 資料與 Broadcom 公開頁面搜尋",
         "trace_next_trigger": "NVIDIA、TSMC 或 Broadcom 一手文件揭露 MRM 製造 owner 或可比架構",
-        "trace_requeue_trigger": "related_triaged_lead:lead_53e31d26909b973cac66af50394abd98",
-        "trace_requeued_at": "2026-08-26T22:37:01.208359+00:00",
+        "trace_requeue_trigger": "related_triaged_lead:lead_004478d161be47a5f8d9323bccfc8573",
+        "trace_requeued_at": "2026-08-30T22:35:38.109712+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
@@ -39173,11 +40444,11 @@
           "co:nvidia",
           "co:tsmc"
         ],
-        "trace_trigger_event_ref": "lead:lead_53e31d26909b973cac66af50394abd98",
+        "trace_trigger_event_ref": "lead:lead_004478d161be47a5f8d9323bccfc8573",
         "trace_trigger_kind": "primary_source_signal"
       },
       "source": "system_decompose",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -39197,10 +40468,10 @@
           "decision_impact": "candidate_set",
           "reason": "NVIDIA Quantum-X 的 200Gbps MRM 層目前缺供應商集合，查明 MRM 製造者及與 Broadcom EML／MZM 路線的互斥性會新增或移除 CPO 候選。"
         },
-        "decided_at": "2026-08-26T22:37:01.208359+00:00",
+        "decided_at": "2026-08-30T22:35:38.109712+00:00",
         "decision": "go",
         "priority_flags": {},
-        "reason": "指定實體的 tier-1 一手來源 lead_53e31d26909b973cac66af50394abd98 與 parked trace 共用具名標的 NVDA, co:nvidia；事件觸發 bounded pq1 重查",
+        "reason": "指定實體的 tier-1 一手來源 lead_004478d161be47a5f8d9323bccfc8573 與 parked trace 共用具名標的 TSM, co:tsmc；事件觸發 bounded pq1 重查",
         "tier": 3
       },
       "triage_history": [
@@ -39214,6 +40485,27 @@
             "decision": "go",
             "priority_flags": {},
             "reason": "system-decompose 產出的未知層：MRM 是 NVIDIA CPO 對 Broadcom 的架構分歧點，圖中無節點",
+            "tier": 3
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-30T22:35:38.109712+00:00",
+          "superseded_reason": "指定實體的 tier-1 一手來源 lead_004478d161be47a5f8d9323bccfc8573 與 parked trace 共用具名標的 TSM, co:tsmc；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_004478d161be47a5f8d9323bccfc8573",
+          "triage": {
+            "classification": {
+              "backfill_ref": "2026-08-27_active_classification_backfill.json",
+              "classified_at": "2026-08-27T03:18:48.063011+00:00",
+              "classified_by": "backfill_semantic_v1",
+              "content_type": "structural_fact",
+              "decision_impact": "candidate_set",
+              "reason": "NVIDIA Quantum-X 的 200Gbps MRM 層目前缺供應商集合，查明 MRM 製造者及與 Broadcom EML／MZM 路線的互斥性會新增或移除 CPO 候選。"
+            },
+            "decided_at": "2026-08-26T22:37:01.208359+00:00",
+            "decision": "go",
+            "priority_flags": {},
+            "reason": "指定實體的 tier-1 一手來源 lead_53e31d26909b973cac66af50394abd98 與 parked trace 共用具名標的 NVDA, co:nvidia；事件觸發 bounded pq1 重查",
             "tier": 3
           }
         }
@@ -40931,6 +42223,99 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2072741541404406008"
     },
+    "lead_d2495f0ff605f6790af86147ac148842": {
+      "entities": {
+        "company_ids": [
+          "co:sivers_semiconductors",
+          "co:jabil",
+          "co:globalfoundries",
+          "co:amd",
+          "co:poet_technologies",
+          "co:aeva",
+          "co:nvidia",
+          "co:marvell_technology",
+          "co:apple",
+          "co:lumentum",
+          "co:coherent"
+        ],
+        "tickers": [
+          "SIVE",
+          "JBL",
+          "GFS",
+          "AMD",
+          "POET",
+          "AEVA",
+          "NVDA",
+          "MRVL",
+          "AAPL",
+          "LITE",
+          "COHR"
+        ]
+      },
+      "first_seen": "2026-08-30T22:32:40.080531+00:00",
+      "lead_id": "lead_d2495f0ff605f6790af86147ac148842",
+      "media": [],
+      "published_at": "2026-08-30T09:04:08.000Z",
+      "raw_text": "Just my final recap on thoughts + fundamentals of $SIVE from ER: \n\nPluggables (1.6T Ramp) for 2027:\n\n- $JBL (1.6T LRO, confirmed) Orders H1 2027, Ramp H2 2027\n-> -> Likely multiple hyperscaler customers\n\n- 3 pluggable makers (evaluation)\n- 3 pluggable makers (supply assessment)\n\nReference Design for likely H2 2027–28+:\n\n- $GFS (Globalfoundries) SCALE (confirmed))\n-> -> Likely $AMD and other hyperscalers as CPO customers\n\nExternal Light Sources / Optical Engines for 2027:\n\n- $POET (confirmed)\n-> -> Lumilens / hyperscaler end users\n\n- O-Net (confirmed)\n-> -> Massive ODM/OEM for Hyperscalers + Asia\n\n- Likely $AEVA (mapping)\n-> -> supplying to OE -> hyperscalers / lidar\n\n- SemiNex (confirmed)\n\nOptical I/O for 2028:\n\n- Ayar Labs (confirmed)\n-> -> Likely $AMD, ALchip, and hyperscaler ASIC program end users + $NVDA NVLink\n\n- $MRVL Celestial (potential customer from 2023-2024 disclosures)\n- Lightmatter (potential customer from 2023-2024 disclosures)\n- Lightelligence (potential customer from 2023-2024 disclosures)\n\nThen potentially $AAPL for 2028 for next-generation wearable updates and other programs from TFLN with Lightium.\n\nIn terms of capacity allocations:\n- Win Semi\n- 1 other foundry (with tremendous allocations)\n\nduring an InP CW DFB laser shortage. \n\nThese are all on-going developments/qualifications since Sivers is targeting next-generation SiPH + CW with 1.6T and CPO for 2027-2028.  \n\nEspecially as Goldman Sachs models the CPO opportunity going from effectively near-zero today to ~$91B TAM by 2028. \n\nHowever my criticisms were:  \n\n=> Main focus was not on communicating economic scale of 2027-2028 optical ramps to Western audiences. \n=> Legal vagueposts around NASDAQ listing should be dropped, and clear direction should be set + executed faster on. \n=>Too much focus was put on defending smaller current revenue/TTM revenue/pipeline conversion (allspace, Tachyon.) relative to future qualifications/partner size/capacity/potential. \n\n$SIVE needs to position themselves as a forward looking, global hypergrowth optical company supplying lasers to hyperscaler programs. \n\nAnd not let the narrative get dominated by backward looking metrics. \n\nAnd as Morgan Stanley put it... \"Key [CPO] participants include … $LITE, $COHR, and Sivers laser supply\". \n\nI'm personally a happy $SIVE shareholder for high-beta exposure to the next 2027-2028 optical shift with 1.6T/CPO.",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "COHR",
+            "CPO",
+            "CW DFB laser",
+            "InP",
+            "LITE",
+            "NVDA"
+          ]
+        },
+        "robotics": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "JBL"
+          ]
+        },
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "SIVE",
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Just my final recap on thoughts + fundamentals of $SIVE from ER: Pluggables (1.6T Ramp) for 2027: - $JBL (1.6T LRO, confirmed) Orders H1 2027, Ramp H2 2027 -> -> Likely multiple hyperscaler customers - 3 pluggable makers (evaluation) - 3 pluggable makers (supply assessment) Reference Design for likely H2 2027–28+: - $GFS (Globalfoundries) SCALE (confirmed)) -> -> Likely $AMD and other hyperscalers as CPO customers External Light Sources / Optical Engines for 2027: - $POET (confirmed) -> -> Lumilens / hyperscaler end users - O-Net (confirmed) -> -> Massive ODM/OEM for Hyperscalers + Asia - Likely $AEVA (mapping) -> -> supplying to OE -> hyperscalers / lidar - SemiNex (confirmed) Optical I/O for 2028: - Ayar Labs (confirmed) -> -> Likely $AMD, ALchip, and hyperscaler ASIC program end users + $NVDA NVLink - $MRVL Celestial (potential customer from 2023-2024 disclosures) - Lightmatter (potential customer from 2023-2024 disclosures) - Lightelligence (potential customer from 2023-2024 disclosures) Then potentially $AAPL for 2028 for next-generation wearable updates and other programs from TFLN with Lightium. In terms of capacity allocations: - Win Semi - 1 other foundry (with tremendous allocations) during an InP CW DFB laser shortage. These are all on-going developments/qualifications since Sivers is targeting next-generation SiPH + CW with 1.6T and CPO for 2027-2028. Especially as Goldman Sachs models the CPO opportunity going from effectively near-zero today to ~$91B TAM by 2028. However my criticisms were: => Main focus was not on communicating economic scale of 2027-2028 optical ramps to Western audiences. => Legal vagueposts around NASDAQ listing should be dropped, and clear direction should be set + executed faster on. =>Too much focus was put on defending smaller current revenue/TTM revenue/pipeline conversion (allspace, Tachyon.) relative to future qualifications/partner size/capacity/potential. $SIVE needs to position themselves as a forward looking, global hypergrowth optical company supplying lasers to hyperscaler programs. And not let the narrative get dominated by backward looking metrics. And as Morgan Stanley put it... \"Key [CPO] participants include … $LITE, $COHR, and Sivers laser supply\". I'm personally a happy $SIVE shareholder for high-beta exposure to the next 2027-2028 optical shift with 1.6T/CPO.",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-30T22:35:33.235111+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "ranking",
+          "reason": "若客戶與量產時程獲一手確認會改變 Sivers 排序；若否則只降級作者推論"
+        },
+        "decided_at": "2026-08-30T22:35:33.235111+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true,
+          "novelty": true
+        },
+        "reason": "Sivers 2027至2028 雷射客戶、qualification 與 capacity 配置主張具名且可追源；可能改變 Sivers 瓶頸排序，但多數仍是作者 mapping，須追回公司與客戶一手文件",
+        "related_trace_requeues": [
+          "lead_484d659a31cbf1e25a837210e9fb0622",
+          "lead_4fc2da14b0d039e4d27e517c136de5e9",
+          "lead_7618e9fd1456b4c522995c5b8a31eb2e",
+          "lead_95b0d3624dfaf66bc5022912310661c4",
+          "lead_dabef2b4657350217cdd112112606b35"
+        ],
+        "tier": 3
+      },
+      "url": "https://x.com/aleabitoreddit/status/2093988125144207710"
+    },
     "lead_d27d7ed2236215408d3ea9b5edacccfe": {
       "content_updated_at": "2026-07-29T13:46:50.528637+00:00",
       "entities": {
@@ -42109,19 +43494,28 @@
         "onboard_candidate_names": [
           "Fabrinet (NYSE: FN)"
         ],
-        "parked_reason": "系統組裝層研究：Fabrinet Q4 FY2026 call（2026-08-24，tier 2 transcript）逐字：『We are working on CPO today with a handful of customers, and we are already building devices albeit not yet at full scale volumes』＋『NPO represents a more near term opportunity than CPO』；FY2026 集中度 Cisco 20%／NVIDIA 16%／Nokia 11%／Amazon 11%、data center 營收 +68% 占 51%。NVIDIA tier-1 具名 Foxconn＋Fabrinet 於合作名單；tier-3 報導量產名單含 Foxconn。CPO 客戶具體是誰未具名。Fabrinet 是本次拆解最強的可投組裝標的。",
+        "parked_reason": "新 trigger 沒帶來分工揭露；Fabrinet 已確認建置 CPO device、Foxconn 已在 NVIDIA 生態系，但客戶與層級仍未具名，維持 partial。",
         "primary_url": "https://www.fool.com/earnings/call-transcripts/2026/08/24/fabrinet-fn-q4-2026-earnings-call-transcript/",
-        "research_outcome": "fabrinet_cpo_build_confirmed_tier2_customers_unnamed",
+        "research_outcome": "無新 graph delta；維持等待交易對手具名文件。",
         "research_run": "session:2026-08-29-decompose-drain",
+        "trace_attempts_ref": "2026-08-31：重查 NVIDIA 官方 CPO PR／技術 blog 與 Fabrinet 既有 FY2026 call；合作名單仍未指定 Fabrinet/Foxconn 的 OSA 或 switch ODM 分工。",
         "trace_next_trigger": "Fabrinet 具名 CPO 客戶或 NVIDIA 揭露組裝分工；Q1 FY2027 call（約 2026-11）",
+        "trace_requeue_consumed_entities": [
+          "CO:NVIDIA",
+          "NVDA"
+        ],
+        "trace_requeue_trigger": "related_triaged_lead:lead_d2495f0ff605f6790af86147ac148842",
+        "trace_requeued_at": "2026-08-30T22:35:33.235111+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
           "FN",
-          "co:fabrinet",
           "NVDA",
+          "co:fabrinet",
           "co:nvidia"
-        ]
+        ],
+        "trace_trigger_event_ref": "lead:lead_d2495f0ff605f6790af86147ac148842",
+        "trace_trigger_kind": "related_entity_signal"
       },
       "source": "decompose:nvda-cpo-switch-2026-08-29",
       "status": "parked",
@@ -42143,12 +43537,34 @@
           "decision_impact": "candidate_set",
           "reason": "decompose 產出之未知層研究題目"
         },
-        "decided_at": "2026-08-29T07:59:24.022003+00:00",
+        "decided_at": "2026-08-30T22:35:33.235111+00:00",
         "decision": "go",
         "priority_flags": {},
-        "reason": "NVIDIA PR 具名 Fabrinet/Foxconn；系統組裝層在圖中完全缺席，Fabrinet（光模組 EMS 龍頭）不在 registry。",
+        "reason": "新 triage PASS lead lead_d2495f0ff605f6790af86147ac148842 與 parked trace 共用具名標的 NVDA, co:nvidia（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
         "tier": 1
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-30T22:35:33.235111+00:00",
+          "superseded_reason": "新 triage PASS lead lead_d2495f0ff605f6790af86147ac148842 與 parked trace 共用具名標的 NVDA, co:nvidia（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_d2495f0ff605f6790af86147ac148842",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-08-29T07:59:24.022003+00:00",
+              "classified_by": "triage_semantic_v1",
+              "content_type": "structural_fact",
+              "decision_impact": "candidate_set",
+              "reason": "decompose 產出之未知層研究題目"
+            },
+            "decided_at": "2026-08-29T07:59:24.022003+00:00",
+            "decision": "go",
+            "priority_flags": {},
+            "reason": "NVIDIA PR 具名 Fabrinet/Foxconn；系統組裝層在圖中完全缺席，Fabrinet（光模組 EMS 龍頭）不在 registry。",
+            "tier": 1
+          }
+        }
+      ],
       "url": "https://nvidianews.nvidia.com/news/nvidia-spectrum-x-co-packaged-optics-networking-switches-ai-factories?decompose=odm"
     },
     "lead_dae04385f45136615df2ad59e89981e4": {
@@ -45257,7 +46673,12 @@
         "research_run": "session:2026-08-30-loop2-r4",
         "trace_next_trigger": "ASE/SPIL 法說具名 CPO 封裝營收或 Broadcom 官方供應鏈揭露",
         "trace_requires_user": "false",
-        "trace_status": "partial"
+        "trace_status": "partial",
+        "trace_trigger_entities": [
+          "AVGO",
+          "co:broadcom"
+        ],
+        "trace_trigger_kind": "primary_source_signal"
       },
       "source": "decompose:avgo-davisson-2026-08-30",
       "status": "parked",
@@ -48096,6 +49517,60 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000187/xslF345X06/wk-form4_1785439264.xml"
     },
+    "lead_fad3bbcede6832c3af712aed8711fc28": {
+      "entities": {
+        "company_ids": [
+          "co:sk_hynix",
+          "co:microsoft"
+        ],
+        "tickers": [
+          "EWY",
+          "SKHY",
+          "MSFT"
+        ]
+      },
+      "first_seen": "2026-08-30T22:32:40.052919+00:00",
+      "lead_id": "lead_fad3bbcede6832c3af712aed8711fc28",
+      "media": [
+        {
+          "cache": {
+            "bytes": 116849,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_fad3bbcede6832c3af712aed8711fc28/3_2094129373532311552.jpg",
+            "sha256": "3b205b75eea25b1906772d5a4deb7347508bfedab4560cf14d59da8f283182f4"
+          },
+          "height": 905,
+          "media_key": "3_2094129373532311552",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HQ_Xke8a0AA4VwK.jpg",
+          "width": 1563
+        }
+      ],
+      "published_at": "2026-08-30T18:27:51.000Z",
+      "raw_text": "I'm going to miss the days of Korean retail reacting heavily to $EWY / Samsung / $SKHY daily volatility.\n\nNew piece: \"Korean day traders flee leveraged chip ETFs as regulatory curbs bite\"\n\n- Trading value in ETFs designed to deliver 2x daily returns of Samsung / SK Hynix has fallen to just 4% of its June peak\n\n- The requirement follows earlier measures, including a higher minimum deposit, aimed at cooling speculative activity\n\n- And then came the final boss... A 5 day trading course where:\n\n\"Investors must download a Windows-only program  and spend at least one hour each day trading with virtual funds\"\n\n$MSFT Windows wiped out the Korean retail.",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "I'm going to miss the days of Korean retail reacting heavily to $EWY / Samsung / $SKHY daily volatility. New piece: \"Korean day traders flee leveraged chip ETFs as regulatory curbs bite\" - Trading value in ETFs designed to deliver 2x daily returns of Samsung / SK Hynix has fallen to just 4% of its June peak - The requirement follows earlier measures, including a higher minimum deposit, aimed at cooling speculative activity - And then came the final boss... A 5 day trading course where: \"Investors must download a Windows-only program and spend at least one hour each day trading with virtual funds\" $MSFT Windows wiped out the Korean retail.",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-30T22:35:37.136365+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "sentiment",
+          "decision_impact": "confidence_only",
+          "reason": "無論規則是否證實，都只補市場情緒脈絡，不改候選集合與排序"
+        },
+        "decided_at": "2026-08-30T22:35:37.136365+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true
+        },
+        "reason": "韓國槓桿晶片 ETF 交易量降至六月高峰4%與監管課程要求可追查，但只影響短期市場參與者情緒，不改半導體候選集合或瓶頸排序",
+        "tier": 3
+      },
+      "url": "https://x.com/aleabitoreddit/status/2094129989071536351"
+    },
     "lead_faf36ea9a80a99c8c47a0c1aeb58fed0": {
       "entities": {
         "company_ids": [],
@@ -48670,8 +50145,8 @@
   "schema_version": "2",
   "source_state": {
     "x:aleabitoreddit": {
-      "since_id": "2093811019823132903",
-      "updated_at": "2026-08-29T22:33:52.116008+00:00",
+      "since_id": "2094129989071536351",
+      "updated_at": "2026-08-30T22:32:40.089477+00:00",
       "user_id": "1940360837547565056"
     }
   }
