@@ -29296,6 +29296,35 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2080462582335619169"
     },
+    "lead_905b49498f1e740b063317c65b214410": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-30T06:12:14.343825+00:00",
+      "lead_id": "lead_905b49498f1e740b063317c65b214410",
+      "published_at": "2026-08-30",
+      "refs": {},
+      "source": "loop:runway-refresh",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "HDS 6324 runway 觀測刷新：以 2027年3月期 Q1 決算短信（2026-08 上旬發布、資產負債表日 2026-06-30）更新 runway_inputs——現行觀測 as_of 2026-05-13 已超 100 天鮮度窗（financial_runway_stale 屬正確降級非 bug）；⚠ as_of 應填資產負債表日非申報日",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-30T06:12:14.370870+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "confidence_only",
+          "reason": "runway 鮮度窗刷新"
+        },
+        "decided_at": "2026-08-30T06:12:14.370870+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "TDnet 一手決算短信；例行觀測刷新，數字會變（financial_runway_stale→self_funding）；supersede mo_63de2bdf",
+        "tier": 1
+      },
+      "url": "https://www.release.tdnet.info/inbs/I_list_001_6324.html?loop=runway-refresh-q1fy2027"
+    },
     "lead_90c5dcc2d514c7ed4342bd2acdad08f7": {
       "entities": {
         "company_ids": [

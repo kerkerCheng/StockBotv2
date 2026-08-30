@@ -342,6 +342,15 @@ Testing 模式 token 過期兩個判準保留在 `docs/OPERATIONS.md`「Private 
 
 **看起來像缺口但不是——請勿「修正」：**
 
+- **人工 runway 觀測寫入後 `financial_runway_manual_required` 仍亮，多半是 100 天鮮度窗，不要去改窗。**
+  2026-08-30 全鏈實測（6324.T）：ledger 有觀測、`get_probe_financial_baseline` 正確附
+  `manual_runway`、`derive_runway` 單測回 `self_funding`——blocker 來自
+  `context._normalize_financial` 的 `runway_freshness_days=100`（觀測 as_of 距評估日 109 天，
+  同時亮 `financial_runway_stale`，在截斷的 blocker 清單裡容易漏看）。這個窗是刻意對齊
+  財報節奏的設計（見該處註解），**正解是用最新一季財報刷新觀測**（已登記 pq1 lead），
+  不是放寬窗。⚠ 紀律：runway 觀測的 `as_of` 應填**資產負債表日**，不是申報日。
+
+
 - **5 個 cohort 的最新 `expiry` 仍是 `+72h` 預設值，不要去清。**
   2026-08-19 全庫掃描：16 個 cohort 中有 5 個（4 個無 ticker 的歷史 cohort ＋ LITE 的舊
   重複 cohort `dc_ebaf2286`）最新 assessment 的 expiry ＝ `created_at + 72h`，是
