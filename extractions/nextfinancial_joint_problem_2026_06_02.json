@@ -1,0 +1,204 @@
+{
+  "claims": [
+    {
+      "confidence": 0.65,
+      "demand_proof_level": "guided",
+      "disproof_condition": "若綠的/雙環年報一手數據顯示份額增長停滯或退出海外市場、或 HDS 揭露對中系客戶份額回升，反路徑威脅下修。",
+      "id": "nextfinancial_joint_problem_2026_06_02_cl1",
+      "source_ids": [
+        "nextfinancial_joint_problem_2026_06_02_s1",
+        "nextfinancial_joint_problem_2026_06_02_s2",
+        "nextfinancial_joint_problem_2026_06_02_s3"
+      ],
+      "statement": "中國本土廠商在諧波減速機市場的份額由 2022 年約 15% 升至 2024Q1 約 38%（Next Financial 轉述）；具名挑戰者為 Leaderdrive（據稱佔全球諧波銷量逾三分之一）、Shuanghuan、Zhongda Leader——HDS 諧波段（2023 約 85%）的替代威脅有量化軌跡且與人形需求同步成長。",
+      "subject_id": "co:harmonic_drive_systems"
+    },
+    {
+      "confidence": 0.65,
+      "demand_proof_level": "guided",
+      "disproof_condition": "若 Nabtesco 推出諧波產品線或 HDS 進入 RV 段，互補判斷失效改列直接競爭。",
+      "id": "nextfinancial_joint_problem_2026_06_02_cl2",
+      "source_ids": [
+        "nextfinancial_joint_problem_2026_06_02_s3"
+      ],
+      "statement": "Nabtesco（RV 減速機約 60% 份額）與 HDS（諧波）分屬大關節/小關節互補段，替代性有限——HDS 的 counter-path 主軸是中國諧波廠而非 Nabtesco；惟 humanoid 若使大關節轉向輕量化諧波，Nabtesco 可能進入替代者集合（開放問題）。",
+      "subject_id": "co:harmonic_drive_systems"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.65,
+      "dst_id": "co:harmonic_drive_systems",
+      "id": "e1",
+      "relation": "competes_with",
+      "source_ids": [
+        "nextfinancial_joint_problem_2026_06_02_s1",
+        "nextfinancial_joint_problem_2026_06_02_s2"
+      ],
+      "src_id": "co:leaderdrive"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.6,
+      "dst_id": "co:harmonic_drive_systems",
+      "id": "e2",
+      "relation": "competes_with",
+      "source_ids": [
+        "nextfinancial_joint_problem_2026_06_02_s2"
+      ],
+      "src_id": "co:shuanghuan_driveline"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.65,
+      "dst_id": "tech:strain_wave_gear",
+      "id": "e3",
+      "relation": "supplies_to",
+      "source_ids": [
+        "nextfinancial_joint_problem_2026_06_02_s2"
+      ],
+      "src_id": "co:leaderdrive"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:rv_reducer",
+      "id": "e4",
+      "relation": "supplies_to",
+      "source_ids": [
+        "nextfinancial_joint_problem_2026_06_02_s3"
+      ],
+      "src_id": "co:nabtesco"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "robot_subsystem",
+      "aliases": [
+        "6324.T",
+        "HDS"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:harmonic_drive_systems",
+      "name": "Harmonic Drive Systems",
+      "role": null,
+      "source_ids": [
+        "nextfinancial_joint_problem_2026_06_02_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "robot_subsystem",
+      "aliases": [
+        "綠的諧波",
+        "绿的谐波",
+        "688017.SS"
+      ],
+      "attributes": {},
+      "confidence": 0.75,
+      "id": "co:leaderdrive",
+      "name": "Leaderdrive",
+      "role": null,
+      "source_ids": [
+        "nextfinancial_joint_problem_2026_06_02_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "robot_subsystem",
+      "aliases": [
+        "雙環傳動",
+        "双环传动",
+        "002472.SZ"
+      ],
+      "attributes": {},
+      "confidence": 0.75,
+      "id": "co:shuanghuan_driveline",
+      "name": "Shuanghuan Driveline",
+      "role": null,
+      "source_ids": [
+        "nextfinancial_joint_problem_2026_06_02_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "robot_subsystem",
+      "aliases": [
+        "6268.T"
+      ],
+      "attributes": {},
+      "confidence": 0.8,
+      "id": "co:nabtesco",
+      "name": "Nabtesco",
+      "role": null,
+      "source_ids": [
+        "nextfinancial_joint_problem_2026_06_02_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "robot_subsystem",
+      "aliases": [
+        "harmonic reducer",
+        "諧波減速機"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:strain_wave_gear",
+      "name": "Strain Wave Gear",
+      "role": null,
+      "source_ids": [
+        "nextfinancial_joint_problem_2026_06_02_s3"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "robot_subsystem",
+      "aliases": [
+        "RV 減速機"
+      ],
+      "attributes": {},
+      "confidence": 0.8,
+      "id": "tech:rv_reducer",
+      "name": "RV Cycloidal Reducer",
+      "role": null,
+      "source_ids": [
+        "nextfinancial_joint_problem_2026_06_02_s3"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "nextfinancial_joint_problem_2026_06_02",
+    "evidence_tier": 3,
+    "origin_entity": "Next Financial (Substack)",
+    "permission_basis": "Public newsletter; quotes only.",
+    "published_at": "2026-06-02",
+    "publisher": "Substack",
+    "retrieved_at": "2026-08-30",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Next Financial: The Joint Problem — Who Owns the Most Expensive Part of a Humanoid Robot",
+    "url": "https://nextfinancial.substack.com/p/the-joint-problem-who-owns-the-most"
+  },
+  "sources": [
+    {
+      "id": "nextfinancial_joint_problem_2026_06_02_s1",
+      "locator": "Chinese share trajectory",
+      "quote": "The share of the harmonic-reducer market held by domestic Chinese producers went from about 15% in 2022 to about 38% by the first quarter of 2024."
+    },
+    {
+      "id": "nextfinancial_joint_problem_2026_06_02_s2",
+      "locator": "named challengers",
+      "quote": "Key players include Leaderdrive (绿的谐波), Shuanghuan Driveline (双环传动), and Zhongda Leader (中大力德), with Leaderdrive reportedly capturing over one-third of global harmonic-reducer sales."
+    },
+    {
+      "id": "nextfinancial_joint_problem_2026_06_02_s3",
+      "locator": "market structure",
+      "quote": "Harmonic Drive Systems controls the strain-wave segment (cited around 85% in 2023), while Nabtesco dominates RV reducers (~60% market share)."
+    }
+  ]
+}
