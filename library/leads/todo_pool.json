@@ -4127,20 +4127,23 @@
     {
       "added_at": "2026-08-29T08:10:17.546596+00:00",
       "dispatch_baseline_decision_id": "pd_e1079bb3647771f1f8b729e1cd331773",
+      "dispatch_receipt": "decision:pd_bb0df963b0f2eddb506e84eac0b5b40f",
       "dispatch_ref": "assessment_gap:dc_f94148d8545de35cb2c5d048640b913e",
       "dispatch_scope": [
         "commercial_maturity_unknown",
         "source_reliability_unknown",
         "valuation_payoff_unknown"
       ],
-      "dispatch_status": "queued",
+      "dispatch_status": "completed",
+      "dispatch_updated_at": "2026-08-30T04:26:43.319661+00:00",
       "dispatched_at": "2026-08-30T04:24:10.119747+00:00",
       "hint": "go（大項）＝reassess 後以 assessment_gap 排入 pq1，研究範圍：commercial_maturity_unknown、source_reliability_unknown、valuation_payoff_unknown。產出為 assessment／研究包，完成後 reassess 以新 decision receipt 結案",
       "n": 254,
-      "reason": null,
+      "reason": "五軸 assessment 完成：commercial_maturity/source_reliability 升 bounded（觀測+多 origin），剩 valuation_payoff——且根因現形為 market_missing（3081.TWO 未入行情 authority，cohort 已建、明日 ETL tracked 派生可望自清）",
+      "receipt": "decision:pd_bb0df963b0f2eddb506e84eac0b5b40f",
       "ref_id": "dc_f94148d8545de35cb2c5d048640b913e",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-30T04:26:43.319661+00:00",
       "source": "decision_lab",
       "title": "co:landmark_optoelectronics：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
@@ -4256,6 +4259,42 @@
       "resolved_at": null,
       "source": "decision_lab",
       "title": "co:tower_semiconductor：補客戶端商業承諾：訂單、產能協議或預付款等付錢方向的證據",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-30T04:27:19.725609+00:00",
+      "hint": "coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "n": 262,
+      "reason": null,
+      "ref_id": "dc_cc46527aac12ba14191ee71c0460f3fe",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:harmonic_drive_systems：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-30T04:27:19.725609+00:00",
+      "hint": "go（大項）＝reassess 後以 assessment_gap 排入 pq1，研究範圍：commercial_maturity_unknown、source_reliability_unknown、valuation_payoff_unknown。產出為 assessment／研究包，完成後 reassess 以新 decision receipt 結案",
+      "n": 263,
+      "reason": null,
+      "ref_id": "dc_b05cc1360e4bdf2a238787c23e7b227d",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:micron_technology：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-30T04:27:19.725609+00:00",
+      "hint": "go（大項）＝reassess 後以 assessment_gap 排入 pq1，研究範圍：valuation_payoff_unknown。產出為 assessment／研究包，完成後 reassess 以新 decision receipt 結案",
+      "n": 264,
+      "reason": null,
+      "ref_id": "dc_f94148d8545de35cb2c5d048640b913e",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:landmark_optoelectronics：補估值錨點：市值、分析師覆蓋與隱含假設，回答股價已經定價了什麼",
       "type": "decision_review"
     }
   ],
@@ -9982,8 +10021,26 @@
       "ref_id": "dc_2bd6137c75808ec4f28541111927d588",
       "type": "decision_review",
       "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-08-30T04:26:43.319661+00:00",
+      "n": 254,
+      "reason": "五軸 assessment 完成：commercial_maturity/source_reliability 升 bounded（觀測+多 origin），剩 valuation_payoff——且根因現形為 market_missing（3081.TWO 未入行情 authority，cohort 已建、明日 ETL tracked 派生可望自清）",
+      "receipt": "decision:pd_bb0df963b0f2eddb506e84eac0b5b40f",
+      "ref_id": "dc_f94148d8545de35cb2c5d048640b913e",
+      "type": "decision_review",
+      "verb": "pq1_completed"
+    },
+    {
+      "at": "2026-08-30T04:26:43.319661+00:00",
+      "n": 254,
+      "reason": "五軸 assessment 完成：commercial_maturity/source_reliability 升 bounded（觀測+多 origin），剩 valuation_payoff——且根因現形為 market_missing（3081.TWO 未入行情 authority，cohort 已建、明日 ETL tracked 派生可望自清）",
+      "receipt": "decision:pd_bb0df963b0f2eddb506e84eac0b5b40f",
+      "ref_id": "dc_f94148d8545de35cb2c5d048640b913e",
+      "type": "decision_review",
+      "verb": "go"
     }
   ],
-  "next_n": 262,
+  "next_n": 265,
   "schema_version": "1"
 }
