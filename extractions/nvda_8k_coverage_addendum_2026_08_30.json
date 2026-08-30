@@ -49,7 +49,7 @@
  ],
  "edges": [
   {
-   "id": "e1",
+   "id": "cov6_1",
    "src_id": "co:nvidia",
    "relation": "develops",
    "dst_id": "prod:lpx",

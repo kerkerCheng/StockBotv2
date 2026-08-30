@@ -88,7 +88,7 @@
  ],
  "edges": [
   {
-   "id": "e1",
+   "id": "cov9_1",
    "src_id": "co:applied_materials",
    "relation": "supplies_to",
    "dst_id": "tech:dram_production",
@@ -99,7 +99,7 @@
    "attributes": {}
   },
   {
-   "id": "e2",
+   "id": "cov9_2",
    "src_id": "co:applied_materials",
    "relation": "supplies_to",
    "dst_id": "tech:nand_production",
@@ -110,7 +110,7 @@
    "attributes": {}
   },
   {
-   "id": "e3",
+   "id": "cov9_3",
    "src_id": "co:applied_materials",
    "relation": "supplies_to",
    "dst_id": "tech:advanced_packaging_integration",

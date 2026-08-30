@@ -101,7 +101,7 @@
  ],
  "edges": [
   {
-   "id": "e1",
+   "id": "cov0_1",
    "src_id": "co:broadcom",
    "relation": "develops",
    "dst_id": "prod:tomahawk6",
@@ -112,7 +112,7 @@
    "attributes": {}
   },
   {
-   "id": "e2",
+   "id": "cov0_2",
    "src_id": "co:broadcom",
    "relation": "develops",
    "dst_id": "prod:jericho3",
@@ -123,7 +123,7 @@
    "attributes": {}
   },
   {
-   "id": "e3",
+   "id": "cov0_3",
    "src_id": "co:broadcom",
    "relation": "develops",
    "dst_id": "prod:jericho4",
@@ -134,7 +134,7 @@
    "attributes": {}
   },
   {
-   "id": "e4",
+   "id": "cov0_4",
    "src_id": "co:broadcom",
    "relation": "supplies_to",
    "dst_id": "tech:dsp_1p6t",

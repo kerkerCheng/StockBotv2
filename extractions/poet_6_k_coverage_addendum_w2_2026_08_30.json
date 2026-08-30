@@ -51,7 +51,7 @@
  ],
  "edges": [
   {
-   "id": "e1",
+   "id": "cov8_1",
    "src_id": "co:poet_technologies",
    "relation": "supplies_to",
    "dst_id": "tech:light_source_chip_to_chip",

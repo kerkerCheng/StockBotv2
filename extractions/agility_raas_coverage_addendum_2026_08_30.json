@@ -52,7 +52,7 @@
  ],
  "edges": [
   {
-   "id": "e1",
+   "id": "cov12_1",
    "src_id": "co:agility_robotics",
    "relation": "supplies_to",
    "dst_id": "tech:robotics_as_a_service",

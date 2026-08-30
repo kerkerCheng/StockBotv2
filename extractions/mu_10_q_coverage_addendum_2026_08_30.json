@@ -52,7 +52,7 @@
  ],
  "edges": [
   {
-   "id": "e1",
+   "id": "cov13_1",
    "src_id": "co:micron_technology",
    "relation": "supplies_to",
    "dst_id": "tech:dram_technology",

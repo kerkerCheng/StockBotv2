@@ -65,7 +65,7 @@
  ],
  "edges": [
   {
-   "id": "e1",
+   "id": "cov10_1",
    "src_id": "co:lam_research",
    "relation": "supplies_to",
    "dst_id": "tech:3d_scaling",
@@ -76,7 +76,7 @@
    "attributes": {}
   },
   {
-   "id": "e2",
+   "id": "cov10_2",
    "src_id": "co:lam_research",
    "relation": "supplies_to",
    "dst_id": "tech:advanced_packaging_integration",

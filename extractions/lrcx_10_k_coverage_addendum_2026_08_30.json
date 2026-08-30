@@ -96,7 +96,7 @@
  ],
  "edges": [
   {
-   "id": "e1",
+   "id": "cov1_1",
    "src_id": "co:lam_research",
    "relation": "develops",
    "dst_id": "prod:reliant",
@@ -107,7 +107,7 @@
    "attributes": {}
   },
   {
-   "id": "e2",
+   "id": "cov1_2",
    "src_id": "co:lam_research",
    "relation": "develops",
    "dst_id": "prod:sabre_family",
@@ -118,7 +118,7 @@
    "attributes": {}
   },
   {
-   "id": "e3",
+   "id": "cov1_3",
    "src_id": "co:lam_research",
    "relation": "develops",
    "dst_id": "prod:altus_family",
@@ -129,7 +129,7 @@
    "attributes": {}
   },
   {
-   "id": "e4",
+   "id": "cov1_4",
    "src_id": "co:lam_research",
    "relation": "develops",
    "dst_id": "prod:vector_family",

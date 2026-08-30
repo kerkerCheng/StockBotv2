@@ -59,7 +59,7 @@
  ],
  "edges": [
   {
-   "id": "e1",
+   "id": "cov14_1",
    "src_id": "co:lumentum",
    "relation": "supplies_to",
    "dst_id": "tech:uhp_laser",

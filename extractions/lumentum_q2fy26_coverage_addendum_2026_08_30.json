@@ -68,7 +68,7 @@
  ],
  "edges": [
   {
-   "id": "e1",
+   "id": "cov5_1",
    "src_id": "co:lumentum",
    "relation": "supplies_to",
    "dst_id": "tech:optical_scale_up",
@@ -79,7 +79,7 @@
    "attributes": {}
   },
   {
-   "id": "e2",
+   "id": "cov5_2",
    "src_id": "co:lumentum",
    "relation": "supplies_to",
    "dst_id": "tech:scale_across",

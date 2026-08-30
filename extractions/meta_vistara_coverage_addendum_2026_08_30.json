@@ -54,7 +54,7 @@
  ],
  "edges": [
   {
-   "id": "e1",
+   "id": "cov7_1",
    "src_id": "co:meta",
    "relation": "develops",
    "dst_id": "tech:cxl_memory_tiering",

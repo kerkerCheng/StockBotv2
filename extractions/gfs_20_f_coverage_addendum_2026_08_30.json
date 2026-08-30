@@ -83,7 +83,7 @@
  ],
  "edges": [
   {
-   "id": "e1",
+   "id": "cov4_1",
    "src_id": "co:globalfoundries",
    "relation": "supplies_to",
    "dst_id": "tech:fd_soi",
@@ -94,7 +94,7 @@
    "attributes": {}
   },
   {
-   "id": "e2",
+   "id": "cov4_2",
    "src_id": "co:globalfoundries",
    "relation": "supplies_to",
    "dst_id": "tech:rf_soi",
@@ -105,7 +105,7 @@
    "attributes": {}
   },
   {
-   "id": "e3",
+   "id": "cov4_3",
    "src_id": "co:globalfoundries",
    "relation": "supplies_to",
    "dst_id": "tech:power_gan",

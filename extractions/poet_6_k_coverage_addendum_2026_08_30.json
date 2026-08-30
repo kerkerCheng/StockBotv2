@@ -51,7 +51,7 @@
  ],
  "edges": [
   {
-   "id": "e1",
+   "id": "cov2_1",
    "src_id": "co:poet_technologies",
    "relation": "develops",
    "dst_id": "prod:optical_interposer",

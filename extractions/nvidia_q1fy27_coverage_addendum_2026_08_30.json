@@ -57,7 +57,7 @@
  ],
  "edges": [
   {
-   "id": "e1",
+   "id": "cov11_1",
    "src_id": "co:nvidia",
    "relation": "supplies_to",
    "dst_id": "tech:acie_segment",
