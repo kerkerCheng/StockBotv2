@@ -4613,6 +4613,18 @@
       "source": "manual",
       "title": "coverage_gaps 補邊 addendum 第三波：AMAT→DRAM/NAND 製程＋先進封裝、LRCX→3D scaling＋先進封裝、NVDA→ACIE、Agility→RaaS、MU→DRAM 技術共 9 條邊",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-08-30T12:00:11.524871+00:00",
+      "hint": "可行動排序的關鍵輸入修正——LITE→uhp_laser 是 sub=5＋sole_source 的結構榜首邊，但 sole_source 全靠自報且買方行為證明雙源 ｜ go＝loader 載入降級 addendum＋projection（sole_source_evidence_quality=weak＋反證 claim）；不含刪邊、不含 thesis mutation",
+      "n": 286,
+      "reason": null,
+      "ref_id": "extractions/lite_uhp_sole_source_downgrade_addendum_2026_08_30.json",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "LITE→UHP laser sole_source 降級為 weak：全 origin 僅 Lumentum 自報（L8 第 3 條）＋客戶端反證（NVIDIA PR 明文 nonexclusive、同日對 COHR 對稱 $2B、Cignal 記載 COHR 同應用 PO）",
+      "type": "manual"
     }
   ],
   "log": [
@@ -10593,6 +10605,6 @@
       "verb": "pq1_awaiting_approval"
     }
   ],
-  "next_n": 286,
+  "next_n": 287,
   "schema_version": "1"
 }

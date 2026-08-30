@@ -1,0 +1,89 @@
+{
+ "schema_version": "0.1",
+ "source_doc": {
+  "doc_id": "nvda_lumentum_partnership_pr_2026_03_02",
+  "title": "NVIDIA PR: NVIDIA Announces Strategic Partnership With Lumentum to Develop State-of-the-Art Optics Technology——LITE→UHP laser sole_source 降級 addendum（自主研究迴圈第 8 輪）",
+  "url": "https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-Announces-Strategic-Partnership-With-Lumentum-to-Develop-State-of-the-Art-Optics-Technology/default.aspx",
+  "origin_entity": "NVIDIA",
+  "publisher": "NVIDIA Investor Relations",
+  "published_at": "2026-03-02",
+  "retrieved_at": "2026-08-30",
+  "storage_permission": "repo_excerpt",
+  "permission_basis": "Corporate press release intended for public distribution; brief quotations stored in library/raw and this extraction.",
+  "source_type": "news",
+  "evidence_tier": 2
+ },
+ "sources": [
+  {
+   "id": "nvda_lumentum_partnership_pr_2026_03_02_s1",
+   "locator": "PR body, investment paragraph",
+   "quote": "NVIDIA is investing $2 billion in Lumentum to support R&D, future capacity and operations as the company builds out its U.S.-based manufacturing capabilities in a new fab."
+  },
+  {
+   "id": "nvda_lumentum_partnership_pr_2026_03_02_s2",
+   "locator": "PR body, agreement terms paragraph",
+   "quote": "The nonexclusive agreement includes an NVIDIA multibillion purchase commitment and future capacity access rights for advanced laser components."
+  }
+ ],
+ "nodes": [
+  {
+   "id": "co:lumentum",
+   "type": "Company",
+   "name": "Lumentum",
+   "aliases": [
+    "LITE"
+   ],
+   "role": null,
+   "abstraction_level": "device_chip",
+   "confidence": 0.85,
+   "source_ids": [
+    "nvda_lumentum_partnership_pr_2026_03_02_s1"
+   ],
+   "attributes": {}
+  },
+  {
+   "id": "tech:uhp_laser",
+   "type": "TechNode",
+   "name": "Ultra-high-power laser",
+   "aliases": [
+    "UHP laser"
+   ],
+   "role": null,
+   "abstraction_level": "device_chip",
+   "confidence": 0.85,
+   "source_ids": [
+    "nvda_lumentum_partnership_pr_2026_03_02_s2"
+   ],
+   "attributes": {}
+  }
+ ],
+ "edges": [
+  {
+   "id": "e1",
+   "src_id": "co:lumentum",
+   "relation": "supplies_to",
+   "dst_id": "tech:uhp_laser",
+   "confidence": 0.8,
+   "source_ids": [
+    "nvda_lumentum_partnership_pr_2026_03_02_s2"
+   ],
+   "attributes": {
+    "sole_source_evidence_quality": "weak"
+   }
+  }
+ ],
+ "claims": [
+  {
+   "id": "nvda_lumentum_partnership_pr_2026_03_02_cl_sole",
+   "statement": "LITE→UHP laser 的 sole_source=True 應視為 weak：①該邊全部 origin 僅 Lumentum 自家文件（L8 第 3 條機械觸發——供應商自稱 sole_source 無客戶端/第三方印證）；②客戶端反證——NVIDIA 對 Lumentum 的協議由 NVIDIA 自家 PR 明文為 nonexclusive，且 NVIDIA 同日（2026-03-02）對 Coherent 作成對稱的 $2B 投資＋採購承諾（nvda_coherent_partnership_pr_2026_03_02 在圖），Cignal AI 另記載 Coherent 同應用高功率雷射 PO——買方行為是刻意雙源，不是獨供。",
+   "subject_id": "co:lumentum",
+   "confidence": 0.8,
+   "demand_proof_level": "guided",
+   "source_ids": [
+    "nvda_lumentum_partnership_pr_2026_03_02_s1",
+    "nvda_lumentum_partnership_pr_2026_03_02_s2"
+   ],
+   "disproof_condition": "若客戶端文件（NVIDIA filing/PR）明示 UHP 外部光源獨供 Lumentum、或 Coherent 高功率雷射 PO 被取消且無其他供應商，恢復 sole_source 強度。"
+  }
+ ]
+}
