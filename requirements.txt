@@ -20,6 +20,9 @@ faster-whisper==1.2.1
 google-auth
 google-auth-httplib2
 google-api-python-client
+# Drive 備份用 OAuth user credentials（scripts/backup_private.py auth）；
+# service account 已實測無 storage quota，個人帳號只能走這條。
+google-auth-oauthlib
 
 # Graph MCP server. Stable v1 only; v2 is a deliberate breaking migration.
 mcp>=1.28,<2

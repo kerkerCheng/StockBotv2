@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
@@ -875,10 +875,57 @@ def build_today_brief(
         "alpha_position_events": _alpha_position_events(
             store, series_by_ticker=alpha_series_by_ticker
         ),
+        # 備份計數器：private authority「最後一次備份 N 天前」必須自己出現在首屏
+        # （L14——靠人記得跑 scripts/backup_private.py 的段落就是會被忘記的段落）。
+        # None 只代表這個 surface 沒有 private root，不與「從未備份」混用（L12）。
+        "backup_status": _backup_status_payload(),
         "items": ranked,
     }
     assert_safe_payload(brief)
     return brief
+
+
+def _backup_status_payload(
+    now: datetime | None = None, private_root: Path | None = None
+) -> dict[str, Any] | None:
+    """讀 `scripts/backup_private.py` 寫的 status 檔，轉成首屏計數器 payload。
+
+    回傳值三分（L12——別把不同語意壓進同一訊號）：
+    - ``None``：這個 surface 沒有 private root，renderer 整行略過；
+    - ``{"status": "never"}``：有 private root 但從未備份；
+    - ``{"status": "invalid"}``：status 檔存在但無法解讀——視同沒有備份現形，
+      不得因為讀不到就安靜消失（那正是備份「安靜停掉」的形狀）。
+    """
+    if private_root is None:
+        private_root = Path(__file__).resolve().parent.parent / "library" / "private"
+    if not private_root.is_dir():
+        return None
+    status_path = private_root / "backups" / "last_backup.json"
+    if not status_path.is_file():
+        return {"status": "never"}
+    try:
+        raw = json.loads(status_path.read_text(encoding="utf-8"))
+        created = datetime.fromisoformat(
+            str(raw["created_at"]).replace("Z", "+00:00")
+        )
+    except (OSError, ValueError, KeyError, TypeError):
+        return {"status": "invalid"}
+    if created.tzinfo is None:
+        created = created.replace(tzinfo=timezone.utc)
+    current = now or datetime.now(timezone.utc)
+    drive = raw.get("drive") if isinstance(raw.get("drive"), dict) else {}
+    verification = (
+        raw.get("restore_verification")
+        if isinstance(raw.get("restore_verification"), dict)
+        else {}
+    )
+    return {
+        "status": "ok",
+        "age_days": max(0, (current - created).days),
+        "backup_id": str(raw.get("backup_id") or ""),
+        "drive_status": str((drive or {}).get("status") or "unknown"),
+        "restore_verified": bool((verification or {}).get("verified_at")),
+    }
 
 
 def ranking_annotations(
@@ -1157,6 +1204,31 @@ def render_today_markdown(brief: Mapping[str, Any]) -> str:
             lines.append(
                 f"  - ℹ 報酬可量測但尚無結案歸因（outcome_envelopes {measured}/{outcomes}）；"
                 "跑 `scripts/outcome_if_settled_today.py` 看目前表現"
+            )
+    # 備份計數器：與 capital_expression 各自獨立呈現——surface 沒給就整行略過，
+    # 「從未備份」與「狀態檔壞掉」都必須現形，不得靜默（L12／L14）。
+    backup = brief.get("backup_status")
+    if backup:
+        backup_state = str(backup.get("status") or "")
+        if backup_state == "never":
+            lines.append(
+                "- 🔴 最後一次備份：從未備份——跑 `python scripts/backup_private.py run`"
+            )
+        elif backup_state == "invalid":
+            lines.append(
+                "- 🔴 最後一次備份：狀態檔無法解讀（library/private/backups/"
+                "last_backup.json），視同沒有備份處理"
+            )
+        else:
+            age = int(backup.get("age_days") or 0)
+            drive_status = str(backup.get("drive_status") or "unknown")
+            notes = [
+                "Drive ✓" if drive_status == "uploaded" else f"Drive 🔴 {markdown_text(drive_status)}",
+                "restore 已驗證" if backup.get("restore_verified") else "restore 🔴 未驗證",
+            ]
+            marker = "🔴 " if age > 7 or drive_status != "uploaded" else ""
+            lines.append(
+                f"- {marker}最後一次備份：{age} 天前（{'，'.join(notes)}）"
             )
     items = brief.get("items") or []
     if items:

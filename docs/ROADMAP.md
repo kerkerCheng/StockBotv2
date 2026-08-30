@@ -82,6 +82,7 @@ commit message 寫「這是純重構」，錯誤會原封不動進 master；因�
 
 | 完成日 | 項目 | 歷史 plan |
 |--------|------|-----------|
+| 2026-08-30 | **Private authority 備份接上入口＋Drive 異地＋常駐計數器（原未排程唯一 🔴）** — before：`decision_lab/backup.py` 蓋好但 production 呼叫端 **0**（L13「管子只接一頭」）、Neo4j 連 dump 腳本都沒有，「上次備份是什麼時候」的誠實答案是**沒有備份過**。after：`scripts/backup_private.py` 統一入口（`auth`／`run`／`upload`／`verify-restore`／`status`），首跑實測：decision_lab＋engine_c SQLite 一致性快照、Neo4j 邏輯匯出 **1,151 nodes／1,419 rels**（counts 自我驗證）、其餘不可回復檔案 **289 檔** 打包 files.zip（排除 `models/` 可重下載、`lead_media/`、OAuth 金鑰）、上傳使用者 Drive `StockBotv2-backups`（本機 rotation 3 份／雲端 8 份）。**restore 已實際驗證**：restore 到暫存位置，manifest 全 checksum＋SQLite integrity＋逐表筆數＋zip CRC 全過——三條驗收（①一行可跑入口②brief 首屏「最後一次備份：N 天前」③實跑 restore 比對 checksum）全數達成。計數器三分語意（L12）：surface 無 private root＝略過、從未備份／狀態檔壞掉／超過 7 天／Drive 未上傳＝🔴 現形；refresh token 若因 consent screen Testing 模式 7 天過期，以 `auth_expired` 現形而非安靜停掉。⚠ **Drive 憑證是 OAuth user credentials，service account 死路不要再試**（2026-08-29 實測 403 storageQuotaExceeded，個人帳號無官方出路）。查證：`python scripts/backup_private.py status`；brief 首屏應有「最後一次備份」行。操作程序見 `docs/OPERATIONS.md`「Private authority 備份」 | — |
 | 2026-08-29 | **移除 compound-engineering（workstream A）** — ce 的 `ce-plan`／`ce-work`／`ce-brainstorm` 與本 repo 既有的 `skills/` ＋ `AGENTS.md` 工作流重疊，同一件事兩套詞彙。**repo 側**：移除 2026-07-10 遺留的 `.claude/worktrees/swirling-cuddling-puddle` 與其分支（刪前驗證 `master..` 獨有 commit **0 筆**、worktree 乾淨），`git worktree list` 現在只剩主樹。**全域側**：從 `~/.claude/settings.json`（`enabledPlugins` ＋ `extraKnownMarketplaces`）、`installed_plugins.json`、`known_marketplaces.json` 三處移除登記，並刪除 27MB 的 `cache/` 與 `marketplaces/` 目錄；另兩個 plugin（last30days、karpathy-skills）完好。**還原資訊**：三個設定檔已備份於 `~/.claude/backups/ce-removal-20260829-132102/`，來源 `EveryInc/compound-engineering-plugin` v3.19.0 sha `e745e966`。⚠ **`docs/plans/`（8 份帶 `artifact_contract: ce-unified-plan/v1` frontmatter）與 `docs/brainstorms/` 一律保留**——它們是交付與需求推導的歷史，不隨工具移除而刪；那段 frontmatter 從此沒有消費者，屬無害殘留。查證：`git worktree list` 應只有一列；`grep -rl compound-engineering ~/.claude/settings.json ~/.claude/plugins/*.json` 應無命中 | — |
 | 2026-08-29 | **beta 訊號拔除的文件同步（B-1 收尾）** — 程式已於 `6aa31de` 拔掉訊號，但 `AGENTS.md`／`crons/daily_brief_prompt.md`／`skills/daily-brief/SKILL.md` 仍在描述**已不存在的行為**：三態動作、RSI／MACD／tier、`signal.baseline_pace`、單輪 campaign budget 百分比、「本輪可評估上限」、「每 5 個完整交易日主動提醒一次」、以及 🟢可評估／🟡冷卻的舊燈號語意。這是 L13 的鏡像——不是「管子只接一頭」，而是**管子換了但說明書沒換**，下一個 session 會照著說明書把已被量測為有害的機制講回來。改寫三份文件的 beta 契約成「目標配置比例（`config/target_allocation.json`，band 是容忍區間不是 gate）＋相對水位（只呈現、不排序、不換算金額）」，燈號改為只表達行情資料狀態。⚠ **2026-08-01 三次回測失敗的實測記錄完整保留**——它是拔除的依據，只改「因此我們這樣用訊號」的結論段。順帶修掉一條已成假的敘述：文件寫「單檔行情 stale／quarantined 時該商品 supported range 歸零」，但已無逐檔區間，實測 00631L／00981A／0050／006208 四檔隔離時 `self_funded_supported_range` 仍為 USD 30,710。**文件契約測試不是刪斷言而是換 token**（刪掉等於失去剎車）：`technical 只決定新增 timing／pace` → `只呈現、不參與排序、不換算金額`＋`不得用 RSI／MACD 等動能指標表達`；`本輪可評估上限` → `目標配置差距`＋`config/target_allocation.json`＋`貸款 tranche 不適用配置建議`；燈號斷言 🟢🟡⚪🔴 → 🟢行情正常／🔴資料不足／⚪歷史不足，並新增「舊語意必須明文廢止」的正向斷言。負向斷言刻意只禁**當成現行欄位使用的形式**（`本輪可評估上限：`、`節奏 25%`），不禁詞本身——三份文件都刻意留著移除紀錄，那段紀錄正是防回填的剎車。查證：`python -c "import json;print(sorted(json.load(open('config/beta_policy.json'))))"` 不應出現 `signal` | — |
 | 2026-08-29 | **`research_status` 改用嚴重度 SSOT，不再把「這次沒要 paper lane」講成「研究資料缺」** — 事發：U7 把 `paper_status` 改名為 `research_status`（研究完整度）時忠實沿用了舊判準 `if paper_blockers:`，不分嚴重度。但 `coverage.apply_execution_intent` 會把 diagnostic 級的 `execution_intent_research_only` 塞進 `paper_blockers`，於是**任何 `research` intent 的評估恆為 `DATA_NEEDED`**，與研究本身完不完整無關——一個欄位兩種語意（L12），而且是在改名成「研究完整度」之後才變刺眼。嚴重度分類本來就有 SSOT（`config/decision_blockers.json`：三個 intent／context blocker 皆 `diagnostic` ＋ `system_internal`，`market_missing`／`fx_missing` 為 `fatal`），只是沒被送到判準那裡用（L16）。改為 `fatal_blockers(paper_blockers, lane="paper")`。⚠ **這是放閘，所以先量測（L14）**：對 21 個 operational cohort 的最新 decision 套用新判準，**3 筆改判**（co:micron_technology、co:harmonic_drive_systems、co:schaeffler），三筆的 `paper_blockers` 都只含參數造成的碼；其餘 18 筆不變，仍為 `DATA_NEEDED` 的都帶著 fatal 的 market／fx／identity 缺料。既有 decision 依 append-only 不回寫，改判要等各自 reassess。順帶把兩條用間接代理量測的測試改成直接斷言（防偽造那條改看凍結的 `paper_blockers` 是否含 `catalyst_missing`；空圖那條的 verdict 由 `DATA_NEEDED` 變 `INCOMPLETE`，而後者更準確——缺的是因果鏈不是行情）。查證：`python -c "from decision_lab.blocker_severity import is_fatal; print(is_fatal('execution_intent_research_only', lane='paper'))"` 應為 `False` | — |
@@ -294,29 +295,8 @@ D7 的判準本身仍然有效，只是不再有這個 gate 可套用。
 
 ### 未排程
 
-**🔴 private authority 備份沒有可執行入口（2026-08-29 使用者提出，查證後升級）：**
-
-> ⚠ **已實測：現有的 Google service account 金鑰無法用來備份到 Drive，不要再試。**
-> 三步驗證（2026-08-29）：①同一把 `GSHEETS_SERVICE_ACCOUNT_JSON` 能取得 `drive.file`
-> scope 憑證；②Drive API 可呼叫（代表已在 `my-project-stockbot` 專案啟用）；
-> ③實際 `files.create` 回 **403 `storageQuotaExceeded`**，訊息是
-> 「Service Accounts do not have storage quota」——`storageQuota.limit` 為 `0`。
-> Google 官方給的兩條出路（共用雲端硬碟、domain-wide delegation）**都需要 Workspace**，
-> 個人 Gmail 不適用。
->
-> 唯一適用個人帳號的是**改用 OAuth user credentials**：同專案建 Desktop app OAuth
-> client ID、跑一次瀏覽器授權、存 refresh token，檔案由使用者帳號擁有並吃 15GB 配額。
-> ⚠ **consent screen 若停在 Testing 模式，refresh token 7 天過期**，備份會在第 8 天
-> 安靜停掉而沒有任何訊號——這正是「最後一次備份 N 天前」計數器從「好有」變成
-> 「必須有」的原因。
->
-> **先決定要不要 Drive**：備份量約 35MB（Decision Store 31MB ＋ engine_c 3.3MB ＋
-> 很小的 Neo4j dump）。本機第二顆磁碟／外接碟**不需要任何認證、沒有 token 過期問題**，
-> 但沒有異地保護。Drive 的唯一好處是異地；代價是上面那個會安靜失效的 token。
-
-| 項目 | 為什麼 | 驗收條件 | 前置 |
-|---|---|---|---|
-| **把既有的 backup 模組接上入口，並讓「上次備份」變成會自己出現的數字** | `AGENTS.md` L10 的判準是「這筆資料今天重新取一次拿得回來嗎？拿不回來 → 只能 append」。拿不回來的目前有：`library/private/decision_lab/`（31MB，131 筆 decision＋live choice／fill）、`library/private/engine_c/`（3.3MB，append-only manual observation ledger）、以及**完全不在 repo 內的 Neo4j 圖**。⚠ 查證後的真正問題不是「還沒寫備份工具」——`decision_lab/backup.py` 早就寫好了，含 checksum、bounded rotation 與 `restore_private_backup`，但 **production 呼叫端是 0**（`grep create_private_backup` 只命中它自己與兩個測試檔）。它是 L13 的「管子只接一頭」：能力蓋好了，沒有任何人能從外面按下去。Neo4j 則連 dump 腳本都沒有。所以今天「上次備份是什麼時候」的誠實答案是**沒有備份過**。 | ①有可執行入口（CLI subcommand 或 `scripts/`），使用者一行可跑；②**daily brief 首屏出現「最後一次備份：N 天前」**——依 L14，真正的防呆是會自己出現的常駐計數器，不是要人記得的段落，而「提醒使用者手動備份」正是那種會被忘記的段落；③至少實際跑過一次 restore 到暫存位置並比對 checksum——**沒驗證過的備份不算備份**。 | 先把 `library/private/` 底下分成「拿得回來」（`models` 464MB 可重下載、`lead_media`）與「拿不回來」兩類，只備份後者 |
+**private authority 備份已於 2026-08-30 交付**（見「已交付」表；service account 死路與
+Testing 模式 token 過期兩個判準保留在 `docs/OPERATIONS.md`「Private authority 備份」）。
 
 **2026-08-29 code review 導出（U7 收尾時未修，理由各自附上）：**
 

@@ -91,6 +91,31 @@ Luna reviewer：停止
 
 `pending` 帶 `--until`／`--trigger` 會歸入「等事件」區，觸發前不佔決策注意力。分類判準見 `config/decision_blockers.json` 的 `resolution_mode`。
 
+### Private authority 備份（本機＋Google Drive 異地）
+
+```powershell
+python scripts/backup_private.py run             # 完整備份：SQLite 快照＋Neo4j 匯出＋files.zip＋Drive 上傳
+python scripts/backup_private.py run --no-drive  # 只做本機備份
+python scripts/backup_private.py verify-restore  # restore 到暫存＋checksum／integrity 驗證
+python scripts/backup_private.py upload          # auth 修好後補上傳最新一份本機備份
+python scripts/backup_private.py status          # 印出 last_backup.json
+python scripts/backup_private.py auth            # 一次性 OAuth 瀏覽器授權（換 client 或 token 失效時重跑）
+```
+
+- **備份對象**是「今天重新取一次拿不回來」的三塊（L10 判準）：Decision Store、Engine C
+  authority（`runtime_pointer.json` 指向）、Neo4j 全圖邏輯匯出；其餘 private 檔案打包
+  `files.zip`。排除 `models/`（可重下載）、`lead_media/`、`gdrive_oauth/`（金鑰不出境）。
+- **本機**留 `library/private/backups/`（rotation 3 份，manifest 全 checksum）；**Drive**
+  留 `StockBotv2-backups` 資料夾（rotation 8 份，超出移垃圾桶 30 天可救）。
+- **Drive 憑證是 OAuth user credentials**：`library/private/gdrive_oauth/client_secret.json`
+  （Cloud Console `my-project-stockbot` 的 Desktop client）＋`token.json`（`auth` 產生）。
+  ⚠ **service account 走不通，不要再試**——2026-08-29 實測 `files.create` 回 403
+  「Service Accounts do not have storage quota」，兩條官方出路都要 Workspace。
+- ⚠ **consent screen 停在 Testing 模式時 refresh token 7 天過期**；過期不會安靜壞掉，
+  brief 首屏計數器會亮 `auth_expired` 🔴，重跑 `auth` 即恢復。發布 Production 後 token 長效。
+- 「最後一次備份：N 天前」常駐在 daily brief 首屏（資料源 `backups/last_backup.json`）；
+  從未備份、狀態檔壞掉、超過 7 天、Drive 未上傳都會 🔴 現形。
+
 **`decision_review` 的 `go` 是全函數（2026-08-26 起）——你只要下 `go`，不必分辨它屬於哪一類。**
 `engine_b.todo.advance_decision_review` 依實際狀態自動選路；下面三條是它內部做的事，
 **列出來是為了讓輸出可讀，不是要你自己選**：
