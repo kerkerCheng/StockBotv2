@@ -1,0 +1,149 @@
+{
+ "schema_version": "0.1",
+ "source_doc": {
+  "doc_id": "Broadcom_q2fy26_cpo",
+  "title": "Broadcom Q2 FY2026 Earnings Call — CPO/AI ASIC Segment——coverage-gap edges addendum（自主研究迴圈第 5 輪）",
+  "url": "https://www.fool.com/earnings/call-transcripts/2026/06/03/broadcom-avgo-q2-2026-earnings-transcript/",
+  "source_type": "transcript",
+  "evidence_tier": 1,
+  "origin_entity": "Broadcom",
+  "storage_permission": "local_only",
+  "permission_basis": "The source is a Motley Fool earnings transcript. Motley Fool's terms permit one intact personal, non-commercial copy but prohibit other storing, posting, and abstracts without prior written permission; source-derived raw and extraction artifacts therefore stay out of Git.",
+  "retrieved_at": "2026-08-30"
+ },
+ "sources": [
+  {
+   "id": "Broadcom_q2fy26_cpo_s1",
+   "locator": "CEO prepared remarks, CPO section",
+   "quote": "And in CPOs, which is co-packaged optics, 1.6T DSPs, CW and EML lasers, we are the de facto standard in the industry to extend AI clusters across data centers."
+  },
+  {
+   "id": "Broadcom_q2fy26_cpo_s2",
+   "locator": "CEO prepared remarks, CPO section",
+   "quote": "We remain the industry leader with our Jericho 3 and Jericho 4 fabric solutions. And enabling the world's largest deployments of multiple hyperscalers."
+  },
+  {
+   "id": "Broadcom_q2fy26_cpo_s11",
+   "locator": "Industry Glossary / CEO prepared remarks",
+   "quote": "Tomahawk 6: Broadcom's current generation 100-terabit Ethernet switch leveraged for AI cluster and data center build-outs."
+  }
+ ],
+ "nodes": [
+  {
+   "id": "co:broadcom",
+   "type": "Company",
+   "name": "Broadcom",
+   "aliases": [
+    "AVGO"
+   ],
+   "role": null,
+   "abstraction_level": "device_chip",
+   "confidence": 0.85,
+   "source_ids": [
+    "Broadcom_q2fy26_cpo_s1"
+   ],
+   "attributes": {}
+  },
+  {
+   "id": "prod:tomahawk6",
+   "type": "Product",
+   "name": "Tomahawk 6",
+   "aliases": [
+    "TH6"
+   ],
+   "role": null,
+   "abstraction_level": "device_chip",
+   "confidence": 0.85,
+   "source_ids": [
+    "Broadcom_q2fy26_cpo_s11"
+   ],
+   "attributes": {}
+  },
+  {
+   "id": "prod:jericho3",
+   "type": "Product",
+   "name": "Jericho 3",
+   "aliases": [],
+   "role": null,
+   "abstraction_level": "device_chip",
+   "confidence": 0.85,
+   "source_ids": [
+    "Broadcom_q2fy26_cpo_s2"
+   ],
+   "attributes": {}
+  },
+  {
+   "id": "prod:jericho4",
+   "type": "Product",
+   "name": "Jericho 4",
+   "aliases": [],
+   "role": null,
+   "abstraction_level": "device_chip",
+   "confidence": 0.85,
+   "source_ids": [
+    "Broadcom_q2fy26_cpo_s2"
+   ],
+   "attributes": {}
+  },
+  {
+   "id": "tech:dsp_1p6t",
+   "type": "TechNode",
+   "name": "1.6T DSP",
+   "aliases": [],
+   "role": null,
+   "abstraction_level": "device_chip",
+   "confidence": 0.85,
+   "source_ids": [
+    "Broadcom_q2fy26_cpo_s1"
+   ],
+   "attributes": {}
+  }
+ ],
+ "edges": [
+  {
+   "id": "e1",
+   "src_id": "co:broadcom",
+   "relation": "develops",
+   "dst_id": "prod:tomahawk6",
+   "confidence": 0.85,
+   "source_ids": [
+    "Broadcom_q2fy26_cpo_s11"
+   ],
+   "attributes": {}
+  },
+  {
+   "id": "e2",
+   "src_id": "co:broadcom",
+   "relation": "develops",
+   "dst_id": "prod:jericho3",
+   "confidence": 0.85,
+   "source_ids": [
+    "Broadcom_q2fy26_cpo_s2"
+   ],
+   "attributes": {}
+  },
+  {
+   "id": "e3",
+   "src_id": "co:broadcom",
+   "relation": "develops",
+   "dst_id": "prod:jericho4",
+   "confidence": 0.85,
+   "source_ids": [
+    "Broadcom_q2fy26_cpo_s2"
+   ],
+   "attributes": {}
+  },
+  {
+   "id": "e4",
+   "src_id": "co:broadcom",
+   "relation": "supplies_to",
+   "dst_id": "tech:dsp_1p6t",
+   "confidence": 0.8,
+   "source_ids": [
+    "Broadcom_q2fy26_cpo_s1"
+   ],
+   "attributes": {}
+  }
+ ],
+ "claims": []
+}

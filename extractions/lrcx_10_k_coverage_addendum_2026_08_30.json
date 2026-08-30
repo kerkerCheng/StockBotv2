@@ -1,0 +1,144 @@
+{
+ "schema_version": "0.1",
+ "source_doc": {
+  "doc_id": "lrcx_10_k_20250811",
+  "title": "Lam Research FY2025 Form 10-K — deposition/etch/clean for leading & non-leading edge, DRAM/NAND demand, CSBG non-leading refurbished products, China exposure——coverage-gap edges addendum（自主研究迴圈第 5 輪）",
+  "source_type": "filing",
+  "evidence_tier": 1,
+  "origin_entity": "Lam Research Corporation",
+  "url": "https://www.sec.gov/Archives/edgar/data/707549/000070754925000075/lrcx-20250629.htm",
+  "published_at": "2025-08-11",
+  "storage_permission": "repo_full",
+  "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+  "publisher": "SEC EDGAR",
+  "retrieved_at": "2026-08-30"
+ },
+ "sources": [
+  {
+   "id": "lrcx_10_k_20250811_s2",
+   "locator": "10-K Business section, chars 38300-40300",
+   "quote": "within CSBG, our Reliant® product line offers new and refurbished non-leading edge products in deposition, etch and clean markets for those applications that do not require the most advanced wafer processing capability."
+  },
+  {
+   "id": "lrcx_10_k_20250811_s3",
+   "locator": "10-K Business section, chars 38300-40300",
+   "quote": "Products Market   Process/Application   Technology   Products Deposition Metal Films Electrochemical Deposition (\"ECD\") (Copper & Other) SABRE® family  Chemical Vapor Deposition (\"CVD\") Atomic Layer Deposition (\"ALD\") (Tungsten & Molybdenum) ALTUS® family  Dielectric Films Plasma-enhanced CVD (\"PECVD\") ALD  Gapfill High-Density Plasma CVD (\"HDP-CVD\") VECTOR® family Striker® family SPEED® family Etch Conductor Etch Reactive Ion Etc"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "co:lam_research",
+   "type": "Company",
+   "name": "Lam Research Corporation",
+   "aliases": [
+    "LRCX"
+   ],
+   "role": null,
+   "abstraction_level": "equipment_epitaxy",
+   "confidence": 0.85,
+   "source_ids": [
+    "lrcx_10_k_20250811_s2"
+   ],
+   "attributes": {}
+  },
+  {
+   "id": "prod:reliant",
+   "type": "Product",
+   "name": "Reliant non-leading-edge equipment product line",
+   "aliases": [],
+   "role": null,
+   "abstraction_level": "equipment_epitaxy",
+   "confidence": 0.85,
+   "source_ids": [
+    "lrcx_10_k_20250811_s2"
+   ],
+   "attributes": {}
+  },
+  {
+   "id": "prod:sabre_family",
+   "type": "Product",
+   "name": "SABRE family (ECD deposition)",
+   "aliases": [],
+   "role": null,
+   "abstraction_level": "equipment_epitaxy",
+   "confidence": 0.85,
+   "source_ids": [
+    "lrcx_10_k_20250811_s3"
+   ],
+   "attributes": {}
+  },
+  {
+   "id": "prod:altus_family",
+   "type": "Product",
+   "name": "ALTUS family (CVD/ALD tungsten & molybdenum)",
+   "aliases": [],
+   "role": null,
+   "abstraction_level": "equipment_epitaxy",
+   "confidence": 0.85,
+   "source_ids": [
+    "lrcx_10_k_20250811_s3"
+   ],
+   "attributes": {}
+  },
+  {
+   "id": "prod:vector_family",
+   "type": "Product",
+   "name": "VECTOR family (PECVD/ALD dielectric)",
+   "aliases": [],
+   "role": null,
+   "abstraction_level": "equipment_epitaxy",
+   "confidence": 0.85,
+   "source_ids": [
+    "lrcx_10_k_20250811_s3"
+   ],
+   "attributes": {}
+  }
+ ],
+ "edges": [
+  {
+   "id": "e1",
+   "src_id": "co:lam_research",
+   "relation": "develops",
+   "dst_id": "prod:reliant",
+   "confidence": 0.85,
+   "source_ids": [
+    "lrcx_10_k_20250811_s2"
+   ],
+   "attributes": {}
+  },
+  {
+   "id": "e2",
+   "src_id": "co:lam_research",
+   "relation": "develops",
+   "dst_id": "prod:sabre_family",
+   "confidence": 0.85,
+   "source_ids": [
+    "lrcx_10_k_20250811_s3"
+   ],
+   "attributes": {}
+  },
+  {
+   "id": "e3",
+   "src_id": "co:lam_research",
+   "relation": "develops",
+   "dst_id": "prod:altus_family",
+   "confidence": 0.85,
+   "source_ids": [
+    "lrcx_10_k_20250811_s3"
+   ],
+   "attributes": {}
+  },
+  {
+   "id": "e4",
+   "src_id": "co:lam_research",
+   "relation": "develops",
+   "dst_id": "prod:vector_family",
+   "confidence": 0.85,
+   "source_ids": [
+    "lrcx_10_k_20250811_s3"
+   ],
+   "attributes": {}
+  }
+ ],
+ "claims": []
+}

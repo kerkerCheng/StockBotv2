@@ -1,0 +1,66 @@
+{
+ "schema_version": "0.1",
+ "source_doc": {
+  "doc_id": "poet_6_k_20260514",
+  "evidence_tier": 2,
+  "origin_entity": "POET Technologies",
+  "permission_basis": "美國 SEC EDGAR 公開 filing（Form 6-K Exhibit 99.1），政府公開登記文件，可全文保存。",
+  "published_at": "2026-05-14",
+  "source_type": "filing",
+  "storage_permission": "repo_full",
+  "title": "POET Technologies Q1 2026 Results (6-K Ex-99.1, 2026-05-14)——coverage-gap edges addendum（自主研究迴圈第 5 輪）",
+  "url": "https://www.sec.gov/Archives/edgar/data/1410172/000121390026043870/exh_991.htm",
+  "retrieved_at": "2026-08-30"
+ },
+ "sources": [
+  {
+   "id": "poet_6_k_20260514_s8",
+   "locator": "About POET Technologies Inc.",
+   "quote": "POET's photonic integration solutions are based on the POET Optical Interposer™, a novel, patented platform that allows the seamless integration of electronic and photonic devices into a single chip using advanced wafer-level semiconductor manufacturing techniques."
+  }
+ ],
+ "nodes": [
+  {
+   "id": "co:poet_technologies",
+   "type": "Company",
+   "name": "POET Technologies Inc.",
+   "aliases": [
+    "POET"
+   ],
+   "role": null,
+   "abstraction_level": "module_subsystem",
+   "confidence": 0.85,
+   "source_ids": [
+    "poet_6_k_20260514_s8"
+   ],
+   "attributes": {}
+  },
+  {
+   "id": "prod:optical_interposer",
+   "type": "Product",
+   "name": "POET Optical Interposer™",
+   "aliases": [],
+   "role": null,
+   "abstraction_level": "device_chip",
+   "confidence": 0.85,
+   "source_ids": [
+    "poet_6_k_20260514_s8"
+   ],
+   "attributes": {}
+  }
+ ],
+ "edges": [
+  {
+   "id": "e1",
+   "src_id": "co:poet_technologies",
+   "relation": "develops",
+   "dst_id": "prod:optical_interposer",
+   "confidence": 0.85,
+   "source_ids": [
+    "poet_6_k_20260514_s8"
+   ],
+   "attributes": {}
+  }
+ ],
+ "claims": []
+}
