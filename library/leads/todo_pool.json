@@ -4565,6 +4565,18 @@
       "source": "research_action",
       "title": "Cignal AI 第三方記載：LITE 史上最大 ELSFP 採購單＋COHR 高功率雷射 PO——CPO 光源需求的獨立印證",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-08-30T10:05:40.867565+00:00",
+      "hint": "核准 exact graph delta；Decision handoff：co:foci。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 282,
+      "reason": null,
+      "ref_id": "ra_a207a618ec9118d9389c7f336637e352",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "L8 第三 origin 補強：DigiTimes 記載 FOCI FAU 自動化量產時程＋optics.org 記載 Fabrinet×NVIDIA 集中度軌跡",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -10545,6 +10557,6 @@
       "verb": "pq1_awaiting_approval"
     }
   ],
-  "next_n": 282,
+  "next_n": 283,
   "schema_version": "1"
 }
