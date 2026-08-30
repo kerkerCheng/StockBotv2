@@ -480,6 +480,13 @@
     {
       "company_id": "co:zhongji_innolight",
       "research_ticker": "300308.SZ"
+    },
+    {
+      "company_id": "co:mp_materials",
+      "research_ticker": "MP",
+      "market_currency": "USD",
+      "execution_currency": "USD",
+      "execution_venue": "NYSE"
     }
   ]
 }

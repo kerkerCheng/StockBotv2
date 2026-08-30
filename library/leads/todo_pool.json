@@ -4683,9 +4683,10 @@
       "hint": "機器人鏈（HDS/Schaeffler/Agility cohort）目前缺材料層 counter-path——mat:rare_earth_magnets 是真空白，中國廠商市占結構與 HDS 諧波威脅同構 ｜ go＝bounded 研究兩家 10-K/年報＋產能與客戶承諾，產出 onboard RA（registry 增列＋首批 extraction）回 pq2 另取 ra_admission 號；不含入圖、不含 thesis、不含 live",
       "n": 288,
       "reason": null,
+      "receipt": "authority:manual;ref:ra_2117cbdbc9ed47097d8c50f315435f31",
       "ref_id": "manual:288",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-30T13:51:21.642892+00:00",
       "source": "manual",
       "title": "稀土磁材反路徑 onboard 研究：MP Materials（MP）＋Lynas（LYC.AX）——人形機器人執行器的材料瓶頸（每台 2-3kg NdFeB、EV 的 2-3 倍），中國掌控供應下的 ex-China 純 play",
       "type": "manual"
@@ -4789,6 +4790,18 @@
       "source": "decision_lab",
       "title": "co:poet_technologies：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-30T13:51:21.300121+00:00",
+      "hint": "核准 exact graph delta；Decision handoff：co:mp_materials。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 296,
+      "reason": null,
+      "ref_id": "ra_2117cbdbc9ed47097d8c50f315435f31",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "MP Materials（NYSE: MP）onboard：機器人鏈材料層反路徑——DoW 價格地板＋Apple $200M＋GM 預付款三重對手方資本承諾",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -10934,8 +10947,17 @@
       "ref_id": "dc_b05cc1360e4bdf2a238787c23e7b227d",
       "type": "decision_review",
       "verb": "event_reactivated"
+    },
+    {
+      "at": "2026-08-30T13:51:21.642892+00:00",
+      "n": 288,
+      "reason": null,
+      "receipt": "authority:manual;ref:ra_2117cbdbc9ed47097d8c50f315435f31",
+      "ref_id": "manual:288",
+      "type": "manual",
+      "verb": "go"
     }
   ],
-  "next_n": 296,
+  "next_n": 297,
   "schema_version": "1"
 }
