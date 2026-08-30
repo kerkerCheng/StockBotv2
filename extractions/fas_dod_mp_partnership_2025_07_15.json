@@ -1,0 +1,99 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "guided",
+      "disproof_condition": "若 NdPr 市價升破 $110（地板失去意義、補貼歸零轉純市場）或國會/新政府修改合約條款，本分析的補貼依賴敘事失效。",
+      "id": "fas_dod_mp_partnership_2025_07_15_cl1",
+      "source_ids": [
+        "fas_dod_mp_partnership_2025_07_15_s1",
+        "fas_dod_mp_partnership_2025_07_15_s2",
+        "fas_dod_mp_partnership_2025_07_15_s3",
+        "fas_dod_mp_partnership_2025_07_15_s4"
+      ],
+      "statement": "FAS（獨立政策機構）量化 DoD×MP 合約：$110/kg 價格地板≈當時市價（$60/kg）近兩倍、以現價估 DoD 年付約 $300M；10X 擴產 7,000 MT/年獲 100% offtake（首 10 年）；$400M Series A＋warrant 至 15% 成最大股東。反證同源：無競標程序、可能固化國內 NdPr 壟斷——MP 現金流近半屬政策補貼性質，政策翻轉風險集中。",
+      "subject_id": "co:mp_materials"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "mat:rare_earth_magnets",
+      "id": "fas1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "fas_dod_mp_partnership_2025_07_15_s3"
+      ],
+      "src_id": "co:mp_materials"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "MP"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:mp_materials",
+      "name": "MP Materials",
+      "role": null,
+      "source_ids": [
+        "fas_dod_mp_partnership_2025_07_15_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "NdFeB"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "mat:rare_earth_magnets",
+      "name": "Rare earth magnets (neodymium, samarium-cobalt)",
+      "role": null,
+      "source_ids": [
+        "fas_dod_mp_partnership_2025_07_15_s3"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "fas_dod_mp_partnership_2025_07_15",
+    "evidence_tier": 3,
+    "origin_entity": "Federation of American Scientists",
+    "permission_basis": "Public policy analysis; quotes only.",
+    "published_at": "2025-07-15",
+    "publisher": "Federation of American Scientists",
+    "retrieved_at": "2026-08-30",
+    "source_type": "industry_report",
+    "storage_permission": "repo_excerpt",
+    "title": "FAS: Unpacking the DoD and MP Materials Critical Minerals Partnership",
+    "url": "https://fas.org/publication/unpacking-dod-and-mp-partnership/"
+  },
+  "sources": [
+    {
+      "id": "fas_dod_mp_partnership_2025_07_15_s1",
+      "locator": "price floor",
+      "quote": "DoD will guarantee a price floor of $110/kg for NdPr, nearly double the current market price, over 10 years."
+    },
+    {
+      "id": "fas_dod_mp_partnership_2025_07_15_s2",
+      "locator": "annual cost estimate",
+      "quote": "At the current market price of $60/kg, this would cost DoD roughly $300 million/year."
+    },
+    {
+      "id": "fas_dod_mp_partnership_2025_07_15_s3",
+      "locator": "offtake",
+      "quote": "DoD is also providing a 100% offtake commitment for the 7,000 MT/year of expanded magnet manufacturing capacity over the first 10 years."
+    },
+    {
+      "id": "fas_dod_mp_partnership_2025_07_15_s4",
+      "locator": "monopoly critique",
+      "quote": "There was no known competitive bidding process for this funding opportunity."
+    }
+  ]
+}
