@@ -4661,6 +4661,18 @@
       "source": "research_action",
       "title": "Marvell 完成收購 Celestial AI（2026-02-02）：Photonic Fabric 正式入 MRVL——關掉 tech:photonic_fabric 覆蓋缺口",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-08-30T13:00:11.323850+00:00",
+      "hint": "核准 exact graph delta；Decision handoff：co:coherent。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 290,
+      "reason": null,
+      "ref_id": "ra_5264de83341f40fc4dc890962e6bf9be",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "政府資金印證 COHR Sherman 6 吋 InP 廠：CHIPS Act 最高 $50M＋德州先期約 $20M——非當事人 costly commitment",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -10641,6 +10653,6 @@
       "verb": "pq1_awaiting_approval"
     }
   ],
-  "next_n": 290,
+  "next_n": 291,
   "schema_version": "1"
 }
