@@ -4254,8 +4254,10 @@
       "added_at": "2026-08-30T00:01:36.893829+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_f3deb3f2d11ea6da30a9bbef4c18bf33",
+      "dispatch_receipt": "manual_todo:266+267",
       "dispatch_ref": "wo_f47841d52269d8a0a28679dd487440f8",
-      "dispatch_status": "queued",
+      "dispatch_status": "awaiting_approval",
+      "dispatch_updated_at": "2026-08-30T05:53:07.311911+00:00",
       "dispatched_at": "2026-08-30T04:24:49.888553+00:00",
       "hint": "coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 261,
@@ -4314,6 +4316,30 @@
       "source": "decision_lab",
       "title": "co:nvidia：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-30T05:52:55.307597+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-05-13T00:00:00+00:00；來源=Tower Semiconductor 6-K 2026-05-13（zk2635309.htm，已入圖 tower_sipho_contracts_6k_20",
+      "n": 266,
+      "reason": null,
+      "ref_id": "po_a00fb4c6963bf25362f2bed036a64ced",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "engine_c",
+      "title": "Engine C 觀測：TSEM / backlog",
+      "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-08-30T05:52:55.307597+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-04-30T00:00:00+00:00；來源=Tower Semiconductor FY2025 Form 20-F（filed 2026-04-30，accession 見 library/raw/ts",
+      "n": 267,
+      "reason": null,
+      "ref_id": "po_d55a4bfe92921f6bd7ec2b39346fe9c2",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "engine_c",
+      "title": "Engine C 觀測：TSEM / customer_concentration",
+      "type": "engine_c_observation"
     }
   ],
   "log": [
@@ -10102,8 +10128,26 @@
       "ref_id": "dc_fdab434d1fad67666c57a6eefd379337",
       "type": "decision_review",
       "verb": "go"
+    },
+    {
+      "at": "2026-08-30T05:52:56.193998+00:00",
+      "n": 261,
+      "reason": null,
+      "receipt": "session:loop-r4",
+      "ref_id": "dc_2bd6137c75808ec4f28541111927d588",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-08-30T05:53:07.311911+00:00",
+      "n": 261,
+      "reason": "兩筆客戶端承諾觀測已備：backlog=SiPho $1.3B+$290M 預付（take-or-pay 方向）、customer_concentration=FY2025 六大客戶各 4-7% 無 10% 客戶；[266][267] go 後 reassess 結案",
+      "receipt": "manual_todo:266+267",
+      "ref_id": "dc_2bd6137c75808ec4f28541111927d588",
+      "type": "decision_review",
+      "verb": "pq1_awaiting_approval"
     }
   ],
-  "next_n": 266,
+  "next_n": 268,
   "schema_version": "1"
 }
