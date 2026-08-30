@@ -4237,7 +4237,7 @@
       "dispatch_ref": "wo_e2148b2b0943e57909c4bcd4fd8e1109",
       "dispatch_status": "queued",
       "dispatched_at": "2026-08-30T04:24:49.123190+00:00",
-      "hint": "coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "hint": "go（大項）＝reassess 後以 assessment_gap 排入 pq1，研究範圍：source_reliability_corroboration_incomplete。產出為 assessment／研究包，完成後 reassess 以新 decision receipt 結案",
       "n": 260,
       "reason": null,
       "ref_id": "dc_fdab434d1fad67666c57a6eefd379337",
