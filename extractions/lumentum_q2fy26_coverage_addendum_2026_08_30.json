@@ -1,0 +1,94 @@
+{
+ "schema_version": "0.1",
+ "source_doc": {
+  "doc_id": "lumentum_q2fy26_cpo",
+  "title": "Lumentum Q2 FY2026 Earnings Call — ELS/CPO/UHP Laser Segment——coverage-gap edges addendum wave 2（自主研究迴圈第 6 輪）",
+  "url": "https://www.fool.com/earnings/call-transcripts/2026/02/03/lumentum-lite-q2-2026-earnings-call-transcript/",
+  "source_type": "transcript",
+  "evidence_tier": 1,
+  "origin_entity": "Lumentum",
+  "storage_permission": "local_only",
+  "permission_basis": "The source is a Motley Fool earnings transcript. Motley Fool's terms permit one intact personal, non-commercial copy but prohibit other storing, posting, and abstracts without prior written permission; source-derived raw and extraction artifacts therefore stay out of Git.",
+  "retrieved_at": "2026-08-30"
+ },
+ "sources": [
+  {
+   "id": "lumentum_q2fy26_cpo_s2",
+   "locator": "Passage 1 — CEO prepared remarks",
+   "quote": "Three previously identified growth catalysts were reiterated: cloud transceivers, optical circuit switches (OCS), and co-packaged optics (CPO)... A fourth driver was newly introduced: optical scale-up."
+  },
+  {
+   "id": "lumentum_q2fy26_cpo_s28",
+   "locator": "Passage 7 — Components breadth: CW lasers, scale-across, pump lasers",
+   "quote": "pump lasers hit a record with revenue up over 90% YoY, supporting long-haul, subsea, and new scale-across architectures."
+  }
+ ],
+ "nodes": [
+  {
+   "id": "co:lumentum",
+   "type": "Company",
+   "name": "Lumentum",
+   "aliases": [
+    "LITE"
+   ],
+   "role": null,
+   "abstraction_level": "device_chip",
+   "confidence": 0.8,
+   "source_ids": [
+    "lumentum_q2fy26_cpo_s2"
+   ],
+   "attributes": {}
+  },
+  {
+   "id": "tech:optical_scale_up",
+   "type": "TechNode",
+   "name": "Optical scale-up interconnect",
+   "aliases": [],
+   "role": null,
+   "abstraction_level": "network_systems",
+   "confidence": 0.8,
+   "source_ids": [
+    "lumentum_q2fy26_cpo_s2"
+   ],
+   "attributes": {}
+  },
+  {
+   "id": "tech:scale_across",
+   "type": "TechNode",
+   "name": "Scale-across optical interconnect",
+   "aliases": [],
+   "role": null,
+   "abstraction_level": "network_systems",
+   "confidence": 0.8,
+   "source_ids": [
+    "lumentum_q2fy26_cpo_s28"
+   ],
+   "attributes": {}
+  }
+ ],
+ "edges": [
+  {
+   "id": "e1",
+   "src_id": "co:lumentum",
+   "relation": "supplies_to",
+   "dst_id": "tech:optical_scale_up",
+   "confidence": 0.7,
+   "source_ids": [
+    "lumentum_q2fy26_cpo_s2"
+   ],
+   "attributes": {}
+  },
+  {
+   "id": "e2",
+   "src_id": "co:lumentum",
+   "relation": "supplies_to",
+   "dst_id": "tech:scale_across",
+   "confidence": 0.7,
+   "source_ids": [
+    "lumentum_q2fy26_cpo_s28"
+   ],
+   "attributes": {}
+  }
+ ],
+ "claims": []
+}

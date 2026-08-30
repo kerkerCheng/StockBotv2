@@ -4589,6 +4589,18 @@
       "source": "manual",
       "title": "coverage_gaps 補邊 addendum：AVGO 產品線（TH6/Jericho3/4/1.6T DSP）＋LRCX 四產品家族＋POET Optical Interposer 共 9 條 develops/supplies_to 邊",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-08-30T11:02:50.767597+00:00",
+      "hint": "再關 10 個紅色 coverage gap——逐字全在圖內既有文件（CPO 封裝論文 tier2/GFS 20-F/LITE 法說/NVDA 8-K/Meta ISCA/POET 6-K），純補邊零新來源 ｜ go＝直接 loader 載入六份 addendum＋edge_resolution project；不含 thesis mutation、不含新文件入庫",
+      "n": 284,
+      "reason": null,
+      "ref_id": "extractions/cpo_paper_coverage_addendum_2026_08_30.json;extractions/gfs_20_f_coverage_addendum_2026_08_30.json;extractions/lumentum_q2fy26_coverage_addendum_2026_08_30.json;extractions/nvda_8k_coverage_addendum_2026_08_30.json;extractions/meta_vistara_coverage_addendum_2026_08_30.json;extractions/poet_6_k_coverage_addendum_w2_2026_08_30.json",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "coverage_gaps 補邊 addendum 第二波：TSMC/Samsung→矽中介層、Corning/Intel→玻璃基板、GFS→FD-SOI/RF-SOI/GaN、LITE→scale-up/scale-across、NVDA→LPX、Meta→CXL、POET→chip-to-chip 光源共 12 條邊",
+      "type": "manual"
     }
   ],
   "log": [
@@ -10569,6 +10581,6 @@
       "verb": "pq1_awaiting_approval"
     }
   ],
-  "next_n": 284,
+  "next_n": 285,
   "schema_version": "1"
 }

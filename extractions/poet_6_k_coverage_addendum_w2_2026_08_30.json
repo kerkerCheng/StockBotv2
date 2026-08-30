@@ -1,0 +1,66 @@
+{
+ "schema_version": "0.1",
+ "source_doc": {
+  "doc_id": "poet_6_k_20260514",
+  "evidence_tier": 2,
+  "origin_entity": "POET Technologies",
+  "permission_basis": "美國 SEC EDGAR 公開 filing（Form 6-K Exhibit 99.1），政府公開登記文件，可全文保存。",
+  "published_at": "2026-05-14",
+  "source_type": "filing",
+  "storage_permission": "repo_full",
+  "title": "POET Technologies Q1 2026 Results (6-K Ex-99.1, 2026-05-14)——coverage-gap edges addendum wave 2（自主研究迴圈第 6 輪）",
+  "url": "https://www.sec.gov/Archives/edgar/data/1410172/000121390026043870/exh_991.htm",
+  "retrieved_at": "2026-08-30"
+ },
+ "sources": [
+  {
+   "id": "poet_6_k_20260514_s9",
+   "locator": "About POET Technologies Inc.",
+   "quote": "In addition to providing high-speed (800G, 1.6T and above) optical engines and optical modules for AI clusters and hyperscale data centers, POET has designed and produced novel light source products for chip-to-chip data communication within and between AI servers."
+  }
+ ],
+ "nodes": [
+  {
+   "id": "co:poet_technologies",
+   "type": "Company",
+   "name": "POET Technologies Inc.",
+   "aliases": [
+    "POET"
+   ],
+   "role": null,
+   "abstraction_level": "module_subsystem",
+   "confidence": 0.8,
+   "source_ids": [
+    "poet_6_k_20260514_s9"
+   ],
+   "attributes": {}
+  },
+  {
+   "id": "tech:light_source_chip_to_chip",
+   "type": "TechNode",
+   "name": "Light source for chip-to-chip data communication",
+   "aliases": [],
+   "role": null,
+   "abstraction_level": "device_chip",
+   "confidence": 0.8,
+   "source_ids": [
+    "poet_6_k_20260514_s9"
+   ],
+   "attributes": {}
+  }
+ ],
+ "edges": [
+  {
+   "id": "e1",
+   "src_id": "co:poet_technologies",
+   "relation": "supplies_to",
+   "dst_id": "tech:light_source_chip_to_chip",
+   "confidence": 0.7,
+   "source_ids": [
+    "poet_6_k_20260514_s9"
+   ],
+   "attributes": {}
+  }
+ ],
+ "claims": []
+}

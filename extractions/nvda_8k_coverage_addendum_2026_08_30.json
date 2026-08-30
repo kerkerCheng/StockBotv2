@@ -1,0 +1,64 @@
+{
+ "schema_version": "0.1",
+ "source_doc": {
+  "doc_id": "nvda_8k_ex991_20260826_q2fy27_pr",
+  "title": "NVIDIA Q2 FY2027 8-K EX-99.1 業績新聞稿 — Spectrum-6 CPO 出貨與 SK hynix memory 合作——coverage-gap edges addendum wave 2（自主研究迴圈第 6 輪）",
+  "source_type": "filing",
+  "evidence_tier": 1,
+  "origin_entity": "NVIDIA Corporation",
+  "url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000073/q2fy27pr.htm",
+  "published_at": "2026-08-26",
+  "retrieved_at": "2026-08-30"
+ },
+ "sources": [
+  {
+   "id": "nvda_8k_ex991_20260826_q2fy27_pr_s10",
+   "locator": "Section B — Data Center highlights, Groq 3 LPX",
+   "quote": "Announced that NVIDIA Groq 3 LPX, the interactive AI inference accelerator, is now in full production."
+  }
+ ],
+ "nodes": [
+  {
+   "id": "co:nvidia",
+   "type": "Company",
+   "name": "NVIDIA",
+   "aliases": [
+    "NVDA"
+   ],
+   "role": null,
+   "abstraction_level": "end_demand",
+   "confidence": 0.8,
+   "source_ids": [
+    "nvda_8k_ex991_20260826_q2fy27_pr_s10"
+   ],
+   "attributes": {}
+  },
+  {
+   "id": "prod:lpx",
+   "type": "Product",
+   "name": "LPX SRAM-based AI Accelerator",
+   "aliases": [],
+   "role": null,
+   "abstraction_level": "device_chip",
+   "confidence": 0.8,
+   "source_ids": [
+    "nvda_8k_ex991_20260826_q2fy27_pr_s10"
+   ],
+   "attributes": {}
+  }
+ ],
+ "edges": [
+  {
+   "id": "e1",
+   "src_id": "co:nvidia",
+   "relation": "develops",
+   "dst_id": "prod:lpx",
+   "confidence": 0.85,
+   "source_ids": [
+    "nvda_8k_ex991_20260826_q2fy27_pr_s10"
+   ],
+   "attributes": {}
+  }
+ ],
+ "claims": []
+}

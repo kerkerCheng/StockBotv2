@@ -1,0 +1,69 @@
+{
+ "schema_version": "0.1",
+ "source_doc": {
+  "doc_id": "meta_vistara_isca_2026",
+  "evidence_tier": 1,
+  "origin_entity": "Meta Platforms",
+  "permission_basis": "Canonical paper is publicly downloadable without login; retain its URL and only short, attributed research excerpts rather than the PDF.",
+  "published_at": "2026-06-29",
+  "publisher": "ISCA 2026",
+  "retrieved_at": "2026-08-30",
+  "source_type": "paper",
+  "storage_permission": "repo_excerpt",
+  "title": "Vistara: Making CXL Real—Full Path from ASIC Design and OS Support to Hyperscale Deployment——coverage-gap edges addendum wave 2（自主研究迴圈第 6 輪）",
+  "url": "https://aisystemcodesign.github.io/papers/isca26/vistara_camera_ready.pdf"
+ },
+ "sources": [
+  {
+   "id": "meta_vistara_isca_2026_s1",
+   "locator": "PDF p.1, Introduction, lines 73–75",
+   "quote": "we design an in-house CXL ASIC, Vistara"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "co:meta",
+   "type": "Company",
+   "name": "Meta",
+   "aliases": [
+    "META"
+   ],
+   "role": null,
+   "abstraction_level": "end_demand",
+   "confidence": 0.8,
+   "source_ids": [
+    "meta_vistara_isca_2026_s1"
+   ],
+   "attributes": {}
+  },
+  {
+   "id": "tech:cxl_memory_tiering",
+   "type": "TechNode",
+   "name": "CXL memory tiering",
+   "aliases": [
+    "CXL"
+   ],
+   "role": null,
+   "abstraction_level": "module_subsystem",
+   "confidence": 0.8,
+   "source_ids": [
+    "meta_vistara_isca_2026_s1"
+   ],
+   "attributes": {}
+  }
+ ],
+ "edges": [
+  {
+   "id": "e1",
+   "src_id": "co:meta",
+   "relation": "develops",
+   "dst_id": "tech:cxl_memory_tiering",
+   "confidence": 0.85,
+   "source_ids": [
+    "meta_vistara_isca_2026_s1"
+   ],
+   "attributes": {}
+  }
+ ],
+ "claims": []
+}

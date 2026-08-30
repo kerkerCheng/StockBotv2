@@ -1,0 +1,170 @@
+{
+ "schema_version": "0.1",
+ "source_doc": {
+  "doc_id": "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era",
+  "title": "Electronic Chip Package and CPO Technology for Modern AI Era (Academic Paper)——coverage-gap edges addendum wave 2（自主研究迴圈第 6 輪）",
+  "url": "https://www.mdpi.com/2072-666X/16/4/431",
+  "source_type": "paper",
+  "evidence_tier": 2,
+  "origin_entity": "Third-party Research",
+  "storage_permission": "repo_full",
+  "permission_basis": "Micromachines publishes the article open access under Creative Commons Attribution 4.0. The repository copy retains the article title, journal attribution, source URL, and CC BY 4.0 license reference.",
+  "retrieved_at": "2026-08-30"
+ },
+ "sources": [
+  {
+   "id": "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s6",
+   "locator": "Advanced Packaging Technology, 2.5D section",
+   "quote": "TSMC's Chip-on-Wafer-on-Substrate (CoWoS)… Multiple dies with different functions are interconnected by RDLs and TSVs in the silicon interposer, enabling ultra-high-density, high-performance packaging. This is particularly suitable for AI and supercomputing applications."
+  },
+  {
+   "id": "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s7",
+   "locator": "Advanced Packaging Technology, 2.5D section",
+   "quote": "Samsung's Interposer Cube 4 (I-Cube4) is an advanced 2.5D silicon interposer packaging technology that utilizes stacking to integrate multiple components, such as memory and logic chips, into a compact and high-performance package."
+  },
+  {
+   "id": "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s11",
+   "locator": "Advanced Packaging Technology, 2.5D CPO section",
+   "quote": "Another example is glass substrate CPO designed by Corning, USA… The PIC is connected to optical fibers by the glass waveguides fabricated with ion exchange (IOX) technology."
+  },
+  {
+   "id": "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s15",
+   "locator": "Advanced Packaging Technology, 3D CPO section",
+   "quote": "For 3D glass CPO integration, Intel has announced it for the next generation of high-power processors… Intel is on the path to delivering 1 trillion transistors on a package by 2030, and its ongoing innovation in advanced packaging including glass substrates will help achieve this goal."
+  }
+ ],
+ "nodes": [
+  {
+   "id": "co:tsmc",
+   "type": "Company",
+   "name": "TSMC",
+   "aliases": [
+    "2330.TW",
+    "TSM"
+   ],
+   "role": null,
+   "abstraction_level": "foundry_packaging",
+   "confidence": 0.8,
+   "source_ids": [
+    "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s6"
+   ],
+   "attributes": {}
+  },
+  {
+   "id": "co:samsung",
+   "type": "Company",
+   "name": "Samsung",
+   "aliases": [],
+   "role": null,
+   "abstraction_level": "device_chip",
+   "confidence": 0.8,
+   "source_ids": [
+    "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s7"
+   ],
+   "attributes": {}
+  },
+  {
+   "id": "co:corning",
+   "type": "Company",
+   "name": "Corning",
+   "aliases": [
+    "GLW"
+   ],
+   "role": null,
+   "abstraction_level": "materials_substrate",
+   "confidence": 0.8,
+   "source_ids": [
+    "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s11"
+   ],
+   "attributes": {}
+  },
+  {
+   "id": "co:intel",
+   "type": "Company",
+   "name": "Intel",
+   "aliases": [
+    "INTC"
+   ],
+   "role": null,
+   "abstraction_level": "foundry_packaging",
+   "confidence": 0.8,
+   "source_ids": [
+    "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s15"
+   ],
+   "attributes": {}
+  },
+  {
+   "id": "mat:silicon_interposer",
+   "type": "Material",
+   "name": "Silicon Interposer",
+   "aliases": [],
+   "role": null,
+   "abstraction_level": "materials_substrate",
+   "confidence": 0.8,
+   "source_ids": [
+    "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s6"
+   ],
+   "attributes": {}
+  },
+  {
+   "id": "mat:glass_substrate",
+   "type": "Material",
+   "name": "Glass Substrate",
+   "aliases": [],
+   "role": null,
+   "abstraction_level": "materials_substrate",
+   "confidence": 0.8,
+   "source_ids": [
+    "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s11"
+   ],
+   "attributes": {}
+  }
+ ],
+ "edges": [
+  {
+   "id": "e1",
+   "src_id": "co:tsmc",
+   "relation": "supplies_to",
+   "dst_id": "mat:silicon_interposer",
+   "confidence": 0.75,
+   "source_ids": [
+    "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s6"
+   ],
+   "attributes": {}
+  },
+  {
+   "id": "e2",
+   "src_id": "co:samsung",
+   "relation": "supplies_to",
+   "dst_id": "mat:silicon_interposer",
+   "confidence": 0.75,
+   "source_ids": [
+    "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s7"
+   ],
+   "attributes": {}
+  },
+  {
+   "id": "e3",
+   "src_id": "co:corning",
+   "relation": "develops",
+   "dst_id": "mat:glass_substrate",
+   "confidence": 0.75,
+   "source_ids": [
+    "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s11"
+   ],
+   "attributes": {}
+  },
+  {
+   "id": "e4",
+   "src_id": "co:intel",
+   "relation": "develops",
+   "dst_id": "mat:glass_substrate",
+   "confidence": 0.75,
+   "source_ids": [
+    "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era_s15"
+   ],
+   "attributes": {}
+  }
+ ],
+ "claims": []
+}

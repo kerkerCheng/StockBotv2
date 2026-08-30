@@ -1,0 +1,120 @@
+{
+ "schema_version": "0.1",
+ "source_doc": {
+  "doc_id": "gfs_20_f_20260227",
+  "title": "GlobalFoundries FY2025 Form 20-F — foundry customer perspective: capex/capacity plans, single-sourced design awards & LTAs, essential-chip (mature-node) capacity expansion under CHIPS Act, dependence on limited number of equipment suppliers with 12-month+ lead times——coverage-gap edges addendum wave 2（自主研究迴圈第 6 輪）",
+  "source_type": "filing",
+  "evidence_tier": 1,
+  "origin_entity": "GlobalFoundries",
+  "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000022/gfs-20251231.htm",
+  "published_at": "2026-02-27",
+  "storage_permission": "repo_full",
+  "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+  "publisher": "SEC EDGAR",
+  "retrieved_at": "2026-08-30"
+ },
+ "sources": [
+  {
+   "id": "gfs_20_f_20260227_s24",
+   "locator": "Business Overview — Technology Solutions, chars 282000-297800",
+   "quote": "Our core technologies such as FinFET, FD-SOI (\"FDX\"), RF-SOI, SiGe, RF GaN, BCD and high-voltage BCD, power GaN and silicon photonics deliver the performance, efficiency and integration needed to support next-generation applications."
+  }
+ ],
+ "nodes": [
+  {
+   "id": "co:globalfoundries",
+   "type": "Company",
+   "name": "GlobalFoundries",
+   "aliases": [
+    "GFS"
+   ],
+   "role": null,
+   "abstraction_level": "foundry_packaging",
+   "confidence": 0.8,
+   "source_ids": [
+    "gfs_20_f_20260227_s24"
+   ],
+   "attributes": {}
+  },
+  {
+   "id": "tech:fd_soi",
+   "type": "TechNode",
+   "name": "Fully Depleted Silicon-on-Insulator",
+   "aliases": [
+    "FD-SOI",
+    "FDX"
+   ],
+   "role": null,
+   "abstraction_level": "device_chip",
+   "confidence": 0.8,
+   "source_ids": [
+    "gfs_20_f_20260227_s24"
+   ],
+   "attributes": {}
+  },
+  {
+   "id": "tech:rf_soi",
+   "type": "TechNode",
+   "name": "RF Silicon-on-Insulator",
+   "aliases": [
+    "RF-SOI"
+   ],
+   "role": null,
+   "abstraction_level": "device_chip",
+   "confidence": 0.8,
+   "source_ids": [
+    "gfs_20_f_20260227_s24"
+   ],
+   "attributes": {}
+  },
+  {
+   "id": "tech:power_gan",
+   "type": "TechNode",
+   "name": "Power Gallium Nitride (Power GaN)",
+   "aliases": [],
+   "role": null,
+   "abstraction_level": "device_chip",
+   "confidence": 0.8,
+   "source_ids": [
+    "gfs_20_f_20260227_s24"
+   ],
+   "attributes": {}
+  }
+ ],
+ "edges": [
+  {
+   "id": "e1",
+   "src_id": "co:globalfoundries",
+   "relation": "supplies_to",
+   "dst_id": "tech:fd_soi",
+   "confidence": 0.75,
+   "source_ids": [
+    "gfs_20_f_20260227_s24"
+   ],
+   "attributes": {}
+  },
+  {
+   "id": "e2",
+   "src_id": "co:globalfoundries",
+   "relation": "supplies_to",
+   "dst_id": "tech:rf_soi",
+   "confidence": 0.75,
+   "source_ids": [
+    "gfs_20_f_20260227_s24"
+   ],
+   "attributes": {}
+  },
+  {
+   "id": "e3",
+   "src_id": "co:globalfoundries",
+   "relation": "supplies_to",
+   "dst_id": "tech:power_gan",
+   "confidence": 0.75,
+   "source_ids": [
+    "gfs_20_f_20260227_s24"
+   ],
+   "attributes": {}
+  }
+ ],
+ "claims": []
+}
