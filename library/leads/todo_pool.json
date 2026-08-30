@@ -4272,6 +4272,11 @@
     },
     {
       "added_at": "2026-08-30T04:27:19.725609+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_57e2625d3ce6f046353a16f0f0dd1c43",
+      "dispatch_ref": "wo_734f04d7bfa7c40d78520b8ccea7d0fe",
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-08-30T08:54:47.989890+00:00",
       "hint": "coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 262,
       "reason": null,
@@ -4284,6 +4289,15 @@
     },
     {
       "added_at": "2026-08-30T04:27:19.725609+00:00",
+      "dispatch_baseline_decision_id": "pd_fbb643303d5a52997ff6bd16070b63b7",
+      "dispatch_ref": "assessment_gap:dc_b05cc1360e4bdf2a238787c23e7b227d",
+      "dispatch_scope": [
+        "commercial_maturity_unknown",
+        "source_reliability_unknown",
+        "valuation_payoff_unknown"
+      ],
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-08-30T08:54:48.738241+00:00",
       "hint": "go（大項）＝reassess 後以 assessment_gap 排入 pq1，研究範圍：commercial_maturity_unknown、source_reliability_unknown、valuation_payoff_unknown。產出為 assessment／研究包，完成後 reassess 以新 decision receipt 結案",
       "n": 263,
       "reason": null,
@@ -4308,6 +4322,13 @@
     },
     {
       "added_at": "2026-08-30T05:25:09.755357+00:00",
+      "dispatch_baseline_decision_id": "pd_b79f8ae7df78a5d51283010911957a7b",
+      "dispatch_ref": "assessment_gap:dc_fdab434d1fad67666c57a6eefd379337",
+      "dispatch_scope": [
+        "source_reliability_corroboration_incomplete"
+      ],
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-08-30T08:55:31.352774+00:00",
       "hint": "go（大項）＝reassess 後以 assessment_gap 排入 pq1，研究範圍：source_reliability_corroboration_incomplete。產出為 assessment／研究包，完成後 reassess 以新 decision receipt 結案",
       "n": 265,
       "reason": null,
@@ -4418,10 +4439,11 @@
       "added_at": "2026-08-30T07:33:50.353041+00:00",
       "hint": "go＝執行 python -m loader.load_to_neo4j extractions/iqe_tower_epiwafer_sub_addendum_2026_08_30.json 與 extractions/tower_marvell_pic_sub_addendum_2026_08_30.json（皆已 validate）＋ edge_resolution project。效果：Tower 進入瓶頸排序候選（兩邊 sub=4≥過濾線）。各附 disproof（第二供應商 qualify 即下修）。不含：其他 Tower 邊、thesis/live。載入後 Tower reassess 更新排序並 resolve [271]。",
       "n": 273,
-      "reason": null,
+      "reason": "兩份 addendum 已載入＋projection；IQE→Tower 與 Tower→Marvell sub=4 生效",
+      "receipt": "authority:neo4j_graph;ref:iqe_tower_e_sub1+tower_marvell_e_sub1",
       "ref_id": "manual:273",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-30T08:54:16.475844+00:00",
       "source": "manual",
       "title": "Tower 鏈 sub 補值入圖：IQE→Tower（sub=4，雙向契約鎖定）＋Tower→Marvell（sub=4，5M 量產＋相位偏振複雜度）——[271] 授權研究的產出",
       "type": "manual"
@@ -4430,10 +4452,11 @@
       "added_at": "2026-08-30T08:28:24.953849+00:00",
       "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-06-30T00:00:00+00:00；來源=HDS 6324 2027年3月期 Q1 決算短信（TDnet 2026-08-07，140120260804507706.pdf 全文抽取）。單位 JPY 百",
       "n": 274,
-      "reason": null,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_2c8f967965cd593bf4deea1a664a210a;proposal:po_2c8f967965cd593bf4deea1a664a210a",
       "ref_id": "po_2c8f967965cd593bf4deea1a664a210a",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-30T08:54:17.092882+00:00",
       "source": "engine_c",
       "title": "Engine C 觀測：6324.T / runway_inputs",
       "type": "engine_c_observation"
@@ -10337,6 +10360,52 @@
       "ref_id": "manual:272",
       "type": "manual",
       "verb": "go"
+    },
+    {
+      "at": "2026-08-30T08:54:16.475844+00:00",
+      "n": 273,
+      "reason": "兩份 addendum 已載入＋projection；IQE→Tower 與 Tower→Marvell sub=4 生效",
+      "receipt": "authority:neo4j_graph;ref:iqe_tower_e_sub1+tower_marvell_e_sub1",
+      "ref_id": "manual:273",
+      "type": "manual",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-30T08:54:17.092882+00:00",
+      "n": 274,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_2c8f967965cd593bf4deea1a664a210a;proposal:po_2c8f967965cd593bf4deea1a664a210a",
+      "ref_id": "po_2c8f967965cd593bf4deea1a664a210a",
+      "type": "engine_c_observation",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-30T08:54:47.989890+00:00",
+      "attempt": 1,
+      "n": 262,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_734f04d7bfa7c40d78520b8ccea7d0fe",
+      "ref_id": "dc_cc46527aac12ba14191ee71c0460f3fe",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-08-30T08:54:48.738241+00:00",
+      "n": 263,
+      "reason": "go：assessment 層缺口，排入 bounded pq1；commercial_maturity_unknown、source_reliability_unknown、valuation_payoff_unknown",
+      "receipt": "decision:pd_fbb643303d5a52997ff6bd16070b63b7",
+      "ref_id": "dc_b05cc1360e4bdf2a238787c23e7b227d",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-08-30T08:55:31.352774+00:00",
+      "n": 265,
+      "reason": "go：assessment 層缺口，排入 bounded pq1；source_reliability_corroboration_incomplete",
+      "receipt": "decision:pd_b79f8ae7df78a5d51283010911957a7b",
+      "ref_id": "dc_fdab434d1fad67666c57a6eefd379337",
+      "type": "decision_review",
+      "verb": "pq1_queued"
     }
   ],
   "next_n": 277,
