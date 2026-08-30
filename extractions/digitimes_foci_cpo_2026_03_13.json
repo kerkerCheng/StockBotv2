@@ -1,0 +1,83 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "guided",
+      "disproof_condition": "若 2H26 未見 1.6T/3.2T FAU 量產出貨（後續財報/媒體），時程宣稱下修。",
+      "id": "digitimes_foci_cpo_2026_03_13_cl1",
+      "source_ids": [
+        "digitimes_foci_cpo_2026_03_13_s1"
+      ],
+      "statement": "DigiTimes（獨立產業媒體）記載：FOCI 正部署高精度自動化 FAU 產線以加速 CPO 產品生產，計畫 2026 下半年量產 1.6T 與 3.2T FAU——量產時程與自動化投資獲非當事人來源確認。",
+      "subject_id": "co:foci"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:fiber_attach_unit",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "digitimes_foci_cpo_2026_03_13_s1"
+      ],
+      "src_id": "co:foci"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "上詮",
+        "3363.TWO"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:foci",
+      "name": "FOCI Fiber Optic Communications",
+      "role": null,
+      "source_ids": [
+        "digitimes_foci_cpo_2026_03_13_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "FAU",
+        "fiber array unit"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:fiber_attach_unit",
+      "name": "Fiber Attach Unit",
+      "role": null,
+      "source_ids": [
+        "digitimes_foci_cpo_2026_03_13_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "digitimes_foci_cpo_2026_03_13",
+    "evidence_tier": 3,
+    "origin_entity": "DigiTimes",
+    "permission_basis": "Public portion of trade press; quote only.",
+    "published_at": "2026-03-13",
+    "publisher": "DigiTimes",
+    "retrieved_at": "2026-08-30",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "DigiTimes: FOCI targets CPO with automated lines, eyes revenue surge in 3 years",
+    "url": "https://www.digitimes.com/news/a20260312PD211/2026-foci-cpo-production-revenue-optics.html"
+  },
+  "sources": [
+    {
+      "id": "digitimes_foci_cpo_2026_03_13_s1",
+      "locator": "lead paragraph (public)",
+      "quote": "FOCI is deploying high-precision automated production lines for fiber array units to accelerate the production of co-packaged optics products and plans to mass-produce 1.6T and 3.2T FAUs in the second half of 2026."
+    }
+  ]
+}

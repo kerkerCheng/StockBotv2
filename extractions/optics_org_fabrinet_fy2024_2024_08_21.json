@@ -1,0 +1,94 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "guided",
+      "disproof_condition": "若 FN 後續年報顯示 NVIDIA 集中度大幅回落或 800G 被替代產品線超越，軌跡敘事失效。",
+      "id": "optics_org_fabrinet_fy2024_2024_08_21_cl1",
+      "source_ids": [
+        "optics_org_fabrinet_fy2024_2024_08_21_s1",
+        "optics_org_fabrinet_fy2024_2024_08_21_s2",
+        "optics_org_fabrinet_fy2024_2024_08_21_s3"
+      ],
+      "statement": "optics.org（獨立光電產業媒體）記載 Fabrinet 對 NVIDIA 的營收集中度軌跡：FY2023 約 12.5%（$330M）→ FY2024 35%（逾 $1B）；800G AI 產品是 datacom 最大營收貢獻。⚠ 數字衍生自 FN 自家揭露——本文件增加 origin 多樣性但依 L11 不構成 FN×NVDA 關係的獨立佐證（對手方佐證另見 NVIDIA photonics PR）。",
+      "subject_id": "co:fabrinet"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "co:nvidia",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "optics_org_fabrinet_fy2024_2024_08_21_s1",
+        "optics_org_fabrinet_fy2024_2024_08_21_s2"
+      ],
+      "src_id": "co:fabrinet"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "FN"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:fabrinet",
+      "name": "Fabrinet",
+      "role": null,
+      "source_ids": [
+        "optics_org_fabrinet_fy2024_2024_08_21_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "end_demand",
+      "aliases": [
+        "NVDA"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:nvidia",
+      "name": "NVIDIA",
+      "role": null,
+      "source_ids": [
+        "optics_org_fabrinet_fy2024_2024_08_21_s1"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "optics_org_fabrinet_fy2024_2024_08_21",
+    "evidence_tier": 3,
+    "origin_entity": "optics.org",
+    "permission_basis": "Public trade press; quotes only.",
+    "published_at": "2024-08-21",
+    "publisher": "optics.org",
+    "retrieved_at": "2026-08-30",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "optics.org: Fabrinet hits all-time high after 'remarkable' year",
+    "url": "https://optics.org/news/15/8/34"
+  },
+  "sources": [
+    {
+      "id": "optics_org_fabrinet_fy2024_2024_08_21_s1",
+      "locator": "customer concentration",
+      "quote": "Nvidia accounting for 35 per cent of Fabrinet's sales revenues in the latest fiscal year—equivalent to just over $1 billion"
+    },
+    {
+      "id": "optics_org_fabrinet_fy2024_2024_08_21_s2",
+      "locator": "concentration trajectory",
+      "quote": "That figure rose from 12.5 per cent, or approximately $330 million, in the prior year"
+    },
+    {
+      "id": "optics_org_fabrinet_fy2024_2024_08_21_s3",
+      "locator": "datacom mix",
+      "quote": "In datacom, 800 Gb/s products for AI and related applications remain the biggest revenue contributor."
+    }
+  ]
+}
