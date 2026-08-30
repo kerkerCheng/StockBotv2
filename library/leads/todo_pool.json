@@ -4343,6 +4343,30 @@
       "source": "engine_c",
       "title": "Engine C 觀測：TSEM / customer_concentration",
       "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-08-30T07:21:33.865312+00:00",
+      "hint": "核准 exact graph delta；Decision handoff：co:tsmc。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 268,
+      "reason": null,
+      "ref_id": "ra_e3f54350ca7a8f24424c3771a8b31860",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "Broadcom TH6-Davisson 官方確認採用 TSMC COUPE——跨陣營製程瓶頸 tier-1 落地",
+      "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-08-30T07:21:33.865312+00:00",
+      "hint": "go（大項）＝reassess 後以 assessment_gap 排入 pq1，研究範圍：source_reliability_corroboration_incomplete。產出為 assessment／研究包，完成後 reassess 以新 decision receipt 結案",
+      "n": 269,
+      "reason": null,
+      "ref_id": "dc_2bd6137c75808ec4f28541111927d588",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:tower_semiconductor：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
     }
   ],
   "log": [
@@ -10187,6 +10211,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 268,
+  "next_n": 270,
   "schema_version": "1"
 }

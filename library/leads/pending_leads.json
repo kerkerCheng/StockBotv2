@@ -10233,6 +10233,43 @@
       },
       "url": "https://www.thearmchairtrader.com/aim-market-roundup/mercantile-ports-iqe-empire-metals/?.tsrc=rss"
     },
+    "lead_1d85eafbfe0bd9a69efc298d24259be3": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-30T07:21:57.668177+00:00",
+      "lead_id": "lead_1d85eafbfe0bd9a69efc298d24259be3",
+      "published_at": "2026-08-30",
+      "refs": {},
+      "source": "decompose:avgo-davisson-2026-08-30",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CPO"
+          ]
+        }
+      },
+      "title": "Broadcom CPO 調變器類型：COUPE 已 tier-1 確認但 PR 未揭露 modulator（MRM/MZM/其他）——原 parked lead 剩餘半個 trigger；找 OFC/Hot Chips 論文或 datasheet",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-30T07:21:57.668377+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "decompose 未知層"
+        },
+        "decided_at": "2026-08-30T07:21:57.668377+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "Davisson decompose 衍生；一手 PR 錨定、缺口具體",
+        "tier": 1
+      },
+      "url": "https://www.globenewswire.com/news-release/2025/10/08/3163429/19933/en/Broadcom-Announces-Tomahawk-6-Davisson-the-Industry-s-First-102-4-Tbps-Ethernet-Switch-with-Co-Packaged-Optics.html?decompose=modulator"
+    },
     "lead_1d8d945b9039f2a610e9b35e2ca21e51": {
       "entities": {
         "company_ids": [
@@ -11086,6 +11123,43 @@
         "tier": 1
       },
       "url": "https://www.iqep.com/media/press-releases/2026/iqe-and-tower-semiconductor-announce-multi-year-inp-epiwafer-supply-agreement/"
+    },
+    "lead_23ed2dd8e137c0a94e7a2411fdebc7ec": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-30T07:21:57.626484+00:00",
+      "lead_id": "lead_23ed2dd8e137c0a94e7a2411fdebc7ec",
+      "published_at": "2026-08-30",
+      "refs": {},
+      "source": "decompose:avgo-davisson-2026-08-30",
+      "status": "triaged_go",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "ELS"
+          ]
+        }
+      },
+      "title": "ELSFP 雷射模組供應商綁定：Davisson 用 Field-Replaceable ELSFP（官方 PR 具名形制未具名供應商）——圖中 Lumentum（els_pluggable_module）與 AAOI（ELSFP 產能 claim）為候選，找客戶端/訂單證據綁定 Broadcom 生態",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-30T07:21:57.657044+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "decompose 未知層"
+        },
+        "decided_at": "2026-08-30T07:21:57.657044+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "Davisson decompose 衍生；一手 PR 錨定、缺口具體",
+        "tier": 1
+      },
+      "url": "https://www.globenewswire.com/news-release/2025/10/08/3163429/19933/en/Broadcom-Announces-Tomahawk-6-Davisson-the-Industry-s-First-102-4-Tbps-Ethernet-Switch-with-Co-Packaged-Optics.html?decompose=elsfp"
     },
     "lead_24275206bfbcff3a5904bde1187763f8": {
       "entities": {
@@ -45143,6 +45217,43 @@
         "tier": 4
       },
       "url": "https://www.sec.gov/Archives/edgar/data/898293/000122520826004910/xslF345X06/doc4.xml"
+    },
+    "lead_ec5da7de15f538edef3b6b1d4c062632": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-30T07:21:57.667911+00:00",
+      "lead_id": "lead_ec5da7de15f538edef3b6b1d4c062632",
+      "published_at": "2026-08-30",
+      "refs": {},
+      "source": "decompose:avgo-davisson-2026-08-30",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CPO"
+          ]
+        }
+      },
+      "title": "Davisson advanced substrate-level multi-chip packaging 的 OSAT：與 NVIDIA 拆解的 SPIL/ASE 未知層同題合併——兩陣營 CPO 封裝是否同源集中",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-30T07:21:57.668136+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "decompose 未知層"
+        },
+        "decided_at": "2026-08-30T07:21:57.668136+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "Davisson decompose 衍生；一手 PR 錨定、缺口具體",
+        "tier": 1
+      },
+      "url": "https://www.globenewswire.com/news-release/2025/10/08/3163429/19933/en/Broadcom-Announces-Tomahawk-6-Davisson-the-Industry-s-First-102-4-Tbps-Ethernet-Switch-with-Co-Packaged-Optics.html?decompose=osat"
     },
     "lead_ecaab49dd6acfe4163a0128d2f522cb8": {
       "entities": {
