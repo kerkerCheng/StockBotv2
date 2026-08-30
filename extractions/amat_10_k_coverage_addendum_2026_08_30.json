@@ -1,0 +1,125 @@
+{
+ "schema_version": "0.1",
+ "source_doc": {
+  "doc_id": "amat_10_k_20251212",
+  "title": "Applied Materials FY2025 Form 10-K — Semiconductor Systems segments: foundry/logic leading vs non-leading edge (ICAPS: IoT/comms/auto/power/sensors), DRAM, NAND; backlog; China export exposure——coverage-gap edges addendum wave 3（自主研究迴圈第 7 輪）",
+  "source_type": "filing",
+  "evidence_tier": 1,
+  "origin_entity": "Applied Materials",
+  "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828025056742/amat-20251026.htm",
+  "published_at": "2025-12-12",
+  "storage_permission": "repo_full",
+  "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+  "publisher": "SEC EDGAR",
+  "retrieved_at": "2026-08-30"
+ },
+ "sources": [
+  {
+   "id": "amat_10_k_20251212_s1",
+   "locator": "chars 46700-50100, Business: segments & markets",
+   "quote": "Our Semiconductor Systems sales are to customers that serve the following markets: foundry, logic and other; dynamic random access memory (DRAM); and flash memory (NAND)."
+  },
+  {
+   "id": "amat_10_k_20251212_s5",
+   "locator": "chars 46700-50100, Business: advanced packaging",
+   "quote": "Our advanced packaging systems use our materials engineering expertise to allow customers to connect multiple chips together through heterogeneous integration, enabling them to advance the technology roadmap beyond a single chip."
+  },
+  {
+   "id": "amat_10_k_20251212_s14",
+   "locator": "chars 163600-166600, MD&A: NAND spend driver",
+   "quote": "Memory customers' spending in fiscal 2025 was higher due to increased customer investments in NAND fabrication equipment upgrades."
+  }
+ ],
+ "nodes": [
+  {
+   "id": "co:applied_materials",
+   "type": "Company",
+   "name": "Applied Materials",
+   "aliases": [
+    "AMAT"
+   ],
+   "role": null,
+   "abstraction_level": "equipment_epitaxy",
+   "confidence": 0.8,
+   "source_ids": [
+    "amat_10_k_20251212_s1"
+   ],
+   "attributes": {}
+  },
+  {
+   "id": "tech:dram_production",
+   "type": "TechNode",
+   "name": "DRAM wafer fabrication",
+   "aliases": [],
+   "role": null,
+   "abstraction_level": "foundry_packaging",
+   "confidence": 0.8,
+   "source_ids": [
+    "amat_10_k_20251212_s1"
+   ],
+   "attributes": {}
+  },
+  {
+   "id": "tech:nand_production",
+   "type": "TechNode",
+   "name": "NAND / non-volatile memory wafer fabrication",
+   "aliases": [],
+   "role": null,
+   "abstraction_level": "foundry_packaging",
+   "confidence": 0.8,
+   "source_ids": [
+    "amat_10_k_20251212_s14"
+   ],
+   "attributes": {}
+  },
+  {
+   "id": "tech:advanced_packaging_integration",
+   "type": "TechNode",
+   "name": "Advanced packaging chip integration",
+   "aliases": [],
+   "role": null,
+   "abstraction_level": "foundry_packaging",
+   "confidence": 0.8,
+   "source_ids": [
+    "amat_10_k_20251212_s5"
+   ],
+   "attributes": {}
+  }
+ ],
+ "edges": [
+  {
+   "id": "e1",
+   "src_id": "co:applied_materials",
+   "relation": "supplies_to",
+   "dst_id": "tech:dram_production",
+   "confidence": 0.8,
+   "source_ids": [
+    "amat_10_k_20251212_s1"
+   ],
+   "attributes": {}
+  },
+  {
+   "id": "e2",
+   "src_id": "co:applied_materials",
+   "relation": "supplies_to",
+   "dst_id": "tech:nand_production",
+   "confidence": 0.8,
+   "source_ids": [
+    "amat_10_k_20251212_s14"
+   ],
+   "attributes": {}
+  },
+  {
+   "id": "e3",
+   "src_id": "co:applied_materials",
+   "relation": "supplies_to",
+   "dst_id": "tech:advanced_packaging_integration",
+   "confidence": 0.8,
+   "source_ids": [
+    "amat_10_k_20251212_s5"
+   ],
+   "attributes": {}
+  }
+ ],
+ "claims": []
+}

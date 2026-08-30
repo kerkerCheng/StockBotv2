@@ -4601,6 +4601,18 @@
       "source": "manual",
       "title": "coverage_gaps 補邊 addendum 第二波：TSMC/Samsung→矽中介層、Corning/Intel→玻璃基板、GFS→FD-SOI/RF-SOI/GaN、LITE→scale-up/scale-across、NVDA→LPX、Meta→CXL、POET→chip-to-chip 光源共 12 條邊",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-08-30T11:30:33.717466+00:00",
+      "hint": "再關 7 個紅色 coverage gap——逐字全在圖內既有文件（AMAT 10-K/LRCX 10-Q/NVDA Q1FY27/Agility SEC 簡報/MU 10-Q），純補邊零新來源 ｜ go＝直接 loader 載入五份 addendum＋edge_resolution project；不含 thesis mutation、不含新文件入庫",
+      "n": 285,
+      "reason": null,
+      "ref_id": "extractions/amat_10_k_coverage_addendum_2026_08_30.json;extractions/lrcx_10_q_coverage_addendum_2026_08_30.json;extractions/nvidia_q1fy27_coverage_addendum_2026_08_30.json;extractions/agility_raas_coverage_addendum_2026_08_30.json;extractions/mu_10_q_coverage_addendum_2026_08_30.json",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "coverage_gaps 補邊 addendum 第三波：AMAT→DRAM/NAND 製程＋先進封裝、LRCX→3D scaling＋先進封裝、NVDA→ACIE、Agility→RaaS、MU→DRAM 技術共 9 條邊",
+      "type": "manual"
     }
   ],
   "log": [
@@ -10581,6 +10593,6 @@
       "verb": "pq1_awaiting_approval"
     }
   ],
-  "next_n": 285,
+  "next_n": 286,
   "schema_version": "1"
 }

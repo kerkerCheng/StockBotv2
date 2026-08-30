@@ -1,0 +1,73 @@
+{
+ "schema_version": "0.1",
+ "source_doc": {
+  "doc_id": "Nvidia_q1fy27",
+  "title": "NVIDIA Q1 FY2027 Earnings Call — CPO/Networking Segment——coverage-gap edges addendum wave 3（自主研究迴圈第 7 輪）",
+  "url": "https://www.fool.com/earnings/call-transcripts/2026/05/20/nvidia-nvda-q1-2027-earnings-transcript/",
+  "source_type": "transcript",
+  "evidence_tier": 1,
+  "origin_entity": "NVIDIA",
+  "storage_permission": "local_only",
+  "permission_basis": "The source is a Motley Fool earnings transcript. Motley Fool's terms permit one intact personal, non-commercial copy but prohibit other storing, posting, and abstracts without prior written permission; source-derived raw and extraction artifacts therefore stay out of Git.",
+  "retrieved_at": "2026-08-30"
+ },
+ "sources": [
+  {
+   "id": "Nvidia_q1fy27_s2",
+   "locator": "CEO prepared remarks, para 2",
+   "quote": "Hyperscale at $38 billion was approximately 50% of data center revenue and increased 12% quarter over quarter. ACIE revenue was $37 billion and grew 31% quarter over quarter including AI cloud revenue that more than tripled year over year."
+  },
+  {
+   "id": "Nvidia_q1fy27_s16",
+   "locator": "CEO prepared remarks, glossary",
+   "quote": "ACIE: Stands for AI Cloud, Industrial, and Enterprise—a newly defined NVIDIA data center subsegment capturing AI-specialized, non-hyperscale deployments including sovereign, industrial, and regional AI infrastructure."
+  }
+ ],
+ "nodes": [
+  {
+   "id": "co:nvidia",
+   "type": "Company",
+   "name": "NVIDIA",
+   "aliases": [
+    "NVDA"
+   ],
+   "role": null,
+   "abstraction_level": "end_demand",
+   "confidence": 0.8,
+   "source_ids": [
+    "Nvidia_q1fy27_s16"
+   ],
+   "attributes": {}
+  },
+  {
+   "id": "tech:acie_segment",
+   "type": "TechNode",
+   "name": "ACIE — AI Cloud, Industrial, and Enterprise",
+   "aliases": [
+    "ACIE"
+   ],
+   "role": null,
+   "abstraction_level": "end_demand",
+   "confidence": 0.8,
+   "source_ids": [
+    "Nvidia_q1fy27_s16"
+   ],
+   "attributes": {}
+  }
+ ],
+ "edges": [
+  {
+   "id": "e1",
+   "src_id": "co:nvidia",
+   "relation": "supplies_to",
+   "dst_id": "tech:acie_segment",
+   "confidence": 0.85,
+   "source_ids": [
+    "Nvidia_q1fy27_s2",
+    "Nvidia_q1fy27_s16"
+   ],
+   "attributes": {}
+  }
+ ],
+ "claims": []
+}

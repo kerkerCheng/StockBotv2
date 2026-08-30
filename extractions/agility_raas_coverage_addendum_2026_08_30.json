@@ -1,0 +1,67 @@
+{
+ "schema_version": "0.1",
+ "source_doc": {
+  "doc_id": "agility_robotics_sec_investor_presentation_2026_06",
+  "evidence_tier": 1,
+  "origin_entity": "Agility Robotics",
+  "permission_basis": "官方公開文件；只保存 canonical URL 與研究所需的有限逐字節錄，不重製完整頁面或 PDF。",
+  "published_at": "2026-06-24",
+  "publisher": "Agility Robotics",
+  "retrieved_at": "2026-08-30",
+  "source_type": "ir_deck",
+  "storage_permission": "repo_excerpt",
+  "title": "Agility Robotics Investor Presentation — June 2026——coverage-gap edges addendum wave 3（自主研究迴圈第 7 輪）",
+  "url": "https://www.sec.gov/Archives/edgar/data/2074973/000121390026071287/ea029548401ex99-2.htm"
+ },
+ "sources": [
+  {
+   "id": "agility_robotics_sec_investor_presentation_2026_06_s4",
+   "locator": "Exhibit 99.2, slide 6, note 1",
+   "quote": "relates to 1,000 Digit v5 robots with three-year term RaaS contract, which includes warrants issued to purchaser vesting proportionately to robots deployed; figures are not a measure of current period revenue."
+  }
+ ],
+ "nodes": [
+  {
+   "id": "co:agility_robotics",
+   "type": "Company",
+   "name": "Agility Robotics",
+   "aliases": [],
+   "role": null,
+   "abstraction_level": "robot_system",
+   "confidence": 0.8,
+   "source_ids": [
+    "agility_robotics_sec_investor_presentation_2026_06_s4"
+   ],
+   "attributes": {}
+  },
+  {
+   "id": "tech:robotics_as_a_service",
+   "type": "TechNode",
+   "name": "Robotics-as-a-Service",
+   "aliases": [
+    "RaaS"
+   ],
+   "role": null,
+   "abstraction_level": "deployment_workflow",
+   "confidence": 0.8,
+   "source_ids": [
+    "agility_robotics_sec_investor_presentation_2026_06_s4"
+   ],
+   "attributes": {}
+  }
+ ],
+ "edges": [
+  {
+   "id": "e1",
+   "src_id": "co:agility_robotics",
+   "relation": "supplies_to",
+   "dst_id": "tech:robotics_as_a_service",
+   "confidence": 0.85,
+   "source_ids": [
+    "agility_robotics_sec_investor_presentation_2026_06_s4"
+   ],
+   "attributes": {}
+  }
+ ],
+ "claims": []
+}

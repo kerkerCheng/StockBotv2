@@ -1,0 +1,67 @@
+{
+ "schema_version": "0.1",
+ "source_doc": {
+  "doc_id": "mu_10_q_q3fy2026_20260625",
+  "evidence_tier": 1,
+  "origin_entity": "Micron Technology, Inc.",
+  "permission_basis": "U.S. SEC EDGAR filing, public domain government record.",
+  "published_at": "2026-06-25",
+  "publisher": "U.S. Securities and Exchange Commission (EDGAR)",
+  "retrieved_at": "2026-08-30",
+  "source_type": "filing",
+  "storage_permission": "repo_full",
+  "title": "Micron Technology Q3 FY2026 Form 10-Q (quarterly period ended May 28, 2026)——coverage-gap edges addendum wave 3（自主研究迴圈第 7 輪）",
+  "url": "https://www.sec.gov/Archives/edgar/data/723125/000072312526000015/mu-20260528.htm"
+ },
+ "sources": [
+  {
+   "id": "mu_10_q_q3fy2026_20260625_s1",
+   "locator": "Item 2, Business overview — product descriptions (DRAM)",
+   "quote": "DRAM products include High-Bandwidth Memory (“HBM”), which is a 3D stacked DRAM architecture that utilizes through-silicon via (“TSV”) connections for more efficient communication giving it the ability to achieve a higher bandwidth while consuming less power compared to other memory types."
+  }
+ ],
+ "nodes": [
+  {
+   "id": "co:micron_technology",
+   "type": "Company",
+   "name": "Micron Technology",
+   "aliases": [
+    "MU"
+   ],
+   "role": null,
+   "abstraction_level": "device_chip",
+   "confidence": 0.8,
+   "source_ids": [
+    "mu_10_q_q3fy2026_20260625_s1"
+   ],
+   "attributes": {}
+  },
+  {
+   "id": "tech:dram_technology",
+   "type": "TechNode",
+   "name": "DRAM Technology / Memory Fab",
+   "aliases": [],
+   "role": null,
+   "abstraction_level": "foundry_packaging",
+   "confidence": 0.8,
+   "source_ids": [
+    "mu_10_q_q3fy2026_20260625_s1"
+   ],
+   "attributes": {}
+  }
+ ],
+ "edges": [
+  {
+   "id": "e1",
+   "src_id": "co:micron_technology",
+   "relation": "supplies_to",
+   "dst_id": "tech:dram_technology",
+   "confidence": 0.85,
+   "source_ids": [
+    "mu_10_q_q3fy2026_20260625_s1"
+   ],
+   "attributes": {}
+  }
+ ],
+ "claims": []
+}

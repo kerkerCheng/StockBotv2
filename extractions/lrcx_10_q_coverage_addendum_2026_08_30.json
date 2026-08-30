@@ -1,0 +1,91 @@
+{
+ "schema_version": "0.1",
+ "source_doc": {
+  "doc_id": "lrcx_10_q_20260423",
+  "title": "Lam Research Q3 FY2026 Form 10-Q — results by segment, non-leading edge, DRAM, China export controls, capex——coverage-gap edges addendum wave 3（自主研究迴圈第 7 輪）",
+  "source_type": "filing",
+  "evidence_tier": 1,
+  "origin_entity": "Lam Research Corporation",
+  "url": "https://www.sec.gov/Archives/edgar/data/707549/000070754926000022/lrcx-20260329.htm",
+  "published_at": "2026-04-23",
+  "storage_permission": "repo_full",
+  "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+  "publisher": "SEC EDGAR",
+  "retrieved_at": "2026-08-30"
+ },
+ "sources": [
+  {
+   "id": "lrcx_10_q_20260423_s9",
+   "locator": "MD&A executive summary, chars 63900-72400",
+   "quote": "technology inflections in our industry, including 3D device scaling, multiple patterning, process flow, and advanced packaging chip integration, will drive sustainable growth and lead to an increase in the served available market for our products and services in the deposition, etch, and clean businesses."
+  }
+ ],
+ "nodes": [
+  {
+   "id": "co:lam_research",
+   "type": "Company",
+   "name": "Lam Research Corporation",
+   "aliases": [
+    "LRCX"
+   ],
+   "role": null,
+   "abstraction_level": "equipment_epitaxy",
+   "confidence": 0.8,
+   "source_ids": [
+    "lrcx_10_q_20260423_s9"
+   ],
+   "attributes": {}
+  },
+  {
+   "id": "tech:3d_scaling",
+   "type": "TechNode",
+   "name": "3D device scaling / vertical scaling",
+   "aliases": [],
+   "role": null,
+   "abstraction_level": "foundry_packaging",
+   "confidence": 0.8,
+   "source_ids": [
+    "lrcx_10_q_20260423_s9"
+   ],
+   "attributes": {}
+  },
+  {
+   "id": "tech:advanced_packaging_integration",
+   "type": "TechNode",
+   "name": "Advanced packaging chip integration",
+   "aliases": [],
+   "role": null,
+   "abstraction_level": "foundry_packaging",
+   "confidence": 0.8,
+   "source_ids": [
+    "lrcx_10_q_20260423_s9"
+   ],
+   "attributes": {}
+  }
+ ],
+ "edges": [
+  {
+   "id": "e1",
+   "src_id": "co:lam_research",
+   "relation": "supplies_to",
+   "dst_id": "tech:3d_scaling",
+   "confidence": 0.75,
+   "source_ids": [
+    "lrcx_10_q_20260423_s9"
+   ],
+   "attributes": {}
+  },
+  {
+   "id": "e2",
+   "src_id": "co:lam_research",
+   "relation": "supplies_to",
+   "dst_id": "tech:advanced_packaging_integration",
+   "confidence": 0.75,
+   "source_ids": [
+    "lrcx_10_q_20260423_s9"
+   ],
+   "attributes": {}
+  }
+ ],
+ "claims": []
+}
