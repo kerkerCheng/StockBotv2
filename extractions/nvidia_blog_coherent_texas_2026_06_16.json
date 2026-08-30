@@ -1,0 +1,169 @@
+{
+  "claims": [
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "若後續 NVIDIA 平台改版將 ELS 改為自製或改單一供應他家，供應關係下修。",
+      "id": "nvidia_blog_coherent_texas_2026_06_16_cl1",
+      "source_ids": [
+        "nvidia_blog_coherent_texas_2026_06_16_s1"
+      ],
+      "statement": "NVIDIA 客戶端直述：Coherent 供應其 CPO 交換器前面板的外部雷射模組——COHR→ELS 供應關係獲對手方文件印證（非排他，與 NVIDIA 對 LITE 的 nonexclusive 協議並存）。",
+      "subject_id": "co:coherent"
+    },
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "guided",
+      "disproof_condition": "若擴廠延宕或產能軌跡未兌現（後續財報/媒體），InP 供給敘事下修。",
+      "id": "nvidia_blog_coherent_texas_2026_06_16_cl2",
+      "source_ids": [
+        "nvidia_blog_coherent_texas_2026_06_16_s2",
+        "nvidia_blog_coherent_texas_2026_06_16_s3",
+        "nvidia_blog_coherent_texas_2026_06_16_s4",
+        "nvidia_blog_coherent_texas_2026_06_16_s5"
+      ],
+      "statement": "NVIDIA 報導 Sherman 擴廠動土（2026-06-16）：6 吋 InP 產線（『world's first』為 NVIDIA 轉述 Coherent 自稱，措辭保留）、一年內產能翻四倍、$2B 投資與多十億採購承諾同文重申——COHR 的 InP 6 吋 fab 依賴獲客戶端文件記載。",
+      "subject_id": "co:coherent"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:external_laser_source",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "nvidia_blog_coherent_texas_2026_06_16_s1"
+      ],
+      "src_id": "co:coherent"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "co:nvidia",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "nvidia_blog_coherent_texas_2026_06_16_s1"
+      ],
+      "src_id": "co:coherent"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:inp_6inch_fab",
+      "id": "e3",
+      "relation": "depends_on",
+      "source_ids": [
+        "nvidia_blog_coherent_texas_2026_06_16_s2",
+        "nvidia_blog_coherent_texas_2026_06_16_s3"
+      ],
+      "src_id": "co:coherent"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "COHR"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:coherent",
+      "name": "Coherent",
+      "role": null,
+      "source_ids": [
+        "nvidia_blog_coherent_texas_2026_06_16_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "end_demand",
+      "aliases": [
+        "NVDA"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:nvidia",
+      "name": "NVIDIA",
+      "role": null,
+      "source_ids": [
+        "nvidia_blog_coherent_texas_2026_06_16_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "ELS",
+        "external laser module"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:external_laser_source",
+      "name": "External Laser Source",
+      "role": null,
+      "source_ids": [
+        "nvidia_blog_coherent_texas_2026_06_16_s1"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [
+        "6-inch indium phosphide fab"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:inp_6inch_fab",
+      "name": "6-inch InP Fab",
+      "role": null,
+      "source_ids": [
+        "nvidia_blog_coherent_texas_2026_06_16_s2"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "nvidia_blog_coherent_texas_2026_06_16",
+    "evidence_tier": 2,
+    "origin_entity": "NVIDIA",
+    "permission_basis": "Public NVIDIA newsroom; quotes only.",
+    "published_at": "2026-06-16",
+    "publisher": "NVIDIA Newsroom",
+    "retrieved_at": "2026-08-30",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "NVIDIA Blog: Coherent Breaks Ground on Expanded Texas Facility, Scaling AI's Optical Backbone",
+    "url": "https://blogs.nvidia.com/blog/coherent-texas-ai-optical/"
+  },
+  "sources": [
+    {
+      "id": "nvidia_blog_coherent_texas_2026_06_16_s1",
+      "locator": "ELS supply statement",
+      "quote": "Coherent supplies the external laser module that plugs into the switch's front plate."
+    },
+    {
+      "id": "nvidia_blog_coherent_texas_2026_06_16_s2",
+      "locator": "6-inch InP fab",
+      "quote": "runs what it calls the world's first 6-inch indium phosphide fab."
+    },
+    {
+      "id": "nvidia_blog_coherent_texas_2026_06_16_s3",
+      "locator": "Sherman line status",
+      "quote": "after 50 years, the most advanced 6-inch indium phosphide line in the world is right here in Sherman."
+    },
+    {
+      "id": "nvidia_blog_coherent_texas_2026_06_16_s4",
+      "locator": "capacity trajectory",
+      "quote": "in one year, they've quadrupled it, a measure of the demand for accelerated computing."
+    },
+    {
+      "id": "nvidia_blog_coherent_texas_2026_06_16_s5",
+      "locator": "groundbreaking",
+      "quote": "Coherent broke ground today on an expanded manufacturing building in Sherman, Texas."
+    }
+  ]
+}

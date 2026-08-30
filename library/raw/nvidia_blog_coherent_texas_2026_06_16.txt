@@ -1,0 +1,4 @@
+Source URL: https://blogs.nvidia.com/blog/coherent-texas-ai-optical/
+
+Excerpt:
+Coherent supplies the external laser module that plugs into the switch's front plate... after 50 years, the most advanced 6-inch indium phosphide line in the world is right here in Sherman (NVIDIA Newsroom, 2026-06-16)
