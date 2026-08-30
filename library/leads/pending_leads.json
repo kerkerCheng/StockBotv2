@@ -19213,7 +19213,7 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "decompose:nvda-cpo-switch-2026-08-29",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {},
       "title": "MRM modulator 技術層：誰能量產 200G PAM4/λ micro-ring modulator？MRM vs TFLN vs MZM 路線替代性（NVIDIA×TSMC COUPE 已量產；圖有 TFLN 節點、無 MRM 節點）",
       "triage": {

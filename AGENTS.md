@@ -171,8 +171,9 @@ agent 差點照做，實測後發現 7 個積壓沒有一個是讀年報能解�
    ground truth 驗證」，不得輸出 go／drop 清單；處置建議只由讀得到 pool 現值的
    daily／互動 session 給出。
 **收尾建議摘要是義務：** 每個研究段落、daily／weekly 報告與較長的互動回覆，結尾必附
-「建議摘要」——`go`／`drop`／`pending`／不動各列編號＋一句理由，讓使用者不回讀全文
-即可下一行批次指令。
+「建議摘要」——`go`／`drop`／`pending`／不動各列編號＋一句理由，**最後一行單獨給
+可直接複製的批次指令**（如 `252 253 256 257 go 255 pending`），使用者不回讀全文
+即可複製回覆（2026-08-30 使用者定案）。
 
 **Onboard 也走 pq2（2026-08-29 使用者定案）：** 使用者對系統的核准介面收斂為**唯一一種——pq2 編號＋`go`**。新公司 onboard 不再是獨立的對話流程審批：發現方（自主迴圈、routine 或互動研究）把 registry 增列與首批 extraction 打包成 prepared RA 取 `ra_admission` 編號，packet 內必含 L8 來源清單（origin_entity 多樣性現況）與 registry 條目內容；`go` 授權＝「registry 加該公司＋apply 該 RA 入圖」，不含 thesis／live。互動 session 可當場 sync 取號並立刻 `go`，不必等 daily——統一的是**核准的載體**，不是核准的時機。`skills/company-onboard` 的文件發現與 L8 判準照舊，只有最後的核准動作改由 pq2 承載。
 

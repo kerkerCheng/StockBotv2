@@ -1,0 +1,89 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mu_10_k_fy2025_20251003",
+    "title": "Micron FY2025 Form 10-K — Competitive Conditions addendum（Micron 反路徑，[255] 授權研究）",
+    "source_type": "filing",
+    "evidence_tier": 1,
+    "origin_entity": "Micron Technology",
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "Official public SEC filing; canonical URL retained, research-relevant excerpts stored in library/raw.",
+    "url": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0000723125&type=10-K",
+    "publisher": "SEC EDGAR",
+    "published_at": "2025-10-03",
+    "retrieved_at": "2026-08-30"
+  },
+  "sources": [
+    {
+      "id": "mu_10_k_fy2025_20251003_s1",
+      "locator": "Part I Item 1 Business — Competitive Conditions",
+      "quote": "We face intense competition in the semiconductor memory and storage markets from a number of companies, including Samsung Electronics Co., Ltd.; SK hynix Inc.; Kioxia Holdings Corporation; Sandisk Corporation; ChangXin Memory Technologies, Inc. (“CXMT”); and Yangtze Memory Technologies Co., Ltd. (“YMTC”)."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:micron_technology",
+      "type": "Company",
+      "name": "Micron Technology",
+      "aliases": ["MU", "Micron"],
+      "role": null,
+      "abstraction_level": "device_chip",
+      "confidence": 0.9,
+      "source_ids": ["mu_10_k_fy2025_20251003_s1"],
+      "attributes": {}
+    },
+    {
+      "id": "co:sk_hynix",
+      "type": "Company",
+      "name": "SK hynix",
+      "aliases": ["SK hynix Inc.", "000660.KS"],
+      "role": null,
+      "abstraction_level": "device_chip",
+      "confidence": 0.9,
+      "source_ids": ["mu_10_k_fy2025_20251003_s1"],
+      "attributes": {}
+    },
+    {
+      "id": "co:samsung",
+      "type": "Company",
+      "name": "Samsung",
+      "aliases": ["Samsung Electronics Co., Ltd."],
+      "role": null,
+      "abstraction_level": "device_chip",
+      "confidence": 0.9,
+      "source_ids": ["mu_10_k_fy2025_20251003_s1"],
+      "attributes": {}
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_cmp1",
+      "src_id": "co:sk_hynix",
+      "relation": "competes_with",
+      "dst_id": "co:micron_technology",
+      "confidence": 0.9,
+      "source_ids": ["mu_10_k_fy2025_20251003_s1"],
+      "attributes": {}
+    },
+    {
+      "id": "e_cmp2",
+      "src_id": "co:samsung",
+      "relation": "competes_with",
+      "dst_id": "co:micron_technology",
+      "confidence": 0.9,
+      "source_ids": ["mu_10_k_fy2025_20251003_s1"],
+      "attributes": {}
+    }
+  ],
+  "claims": [
+    {
+      "id": "mu_10_k_fy2025_20251003_cl3",
+      "statement": "Micron identifies Samsung Electronics and SK hynix (among others) as competitors in semiconductor memory and storage — issuer-side self-declaration of intense competition, which is an admissible counter-path anchor because it is a statement against interest.",
+      "subject_id": "co:micron_technology",
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "source_ids": ["mu_10_k_fy2025_20251003_s1"],
+      "disproof_condition": "Update if subsequent 10-K filings materially change the named competitor set for memory and storage."
+    }
+  ]
+}

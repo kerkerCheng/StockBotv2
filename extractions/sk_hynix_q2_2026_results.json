@@ -1,0 +1,67 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "sk_hynix_q2_2026_results",
+    "title": "SK hynix Announces 2Q26 Financial Results（官方 newsroom，Micron 反路徑的替代供給規模證據）",
+    "source_type": "news",
+    "evidence_tier": 1,
+    "origin_entity": "SK hynix",
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "Official public SK hynix newsroom press release; canonical URL retained, only research-relevant excerpts stored.",
+    "url": "https://news.skhynix.com/en/q2-2026-business-results/",
+    "publisher": "SK hynix Newsroom",
+    "published_at": "2026-07-23",
+    "retrieved_at": "2026-08-30"
+  },
+  "sources": [
+    {
+      "id": "sk_hynix_q2_2026_results_s1",
+      "locator": "financial results headline figures",
+      "quote": "79.3187 trillion won in revenues, 60.5426 trillion won in operating profit (with an operating margin of 76%)"
+    },
+    {
+      "id": "sk_hynix_q2_2026_results_s2",
+      "locator": "HBM4 production paragraph",
+      "quote": "The company began mass shipments of HBM4 in the second quarter and will ramp up production in the second half of the year."
+    },
+    {
+      "id": "sk_hynix_q2_2026_results_s3",
+      "locator": "long-term agreements paragraph",
+      "quote": "The company has finalized Long-Term Agreements (LTAs) with around 10 customers, including key strategic partners"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:sk_hynix",
+      "type": "Company",
+      "name": "SK hynix",
+      "aliases": ["SK hynix Inc.", "000660.KS", "SKHY"],
+      "role": null,
+      "abstraction_level": "device_chip",
+      "confidence": 0.9,
+      "source_ids": ["sk_hynix_q2_2026_results_s2"],
+      "attributes": {}
+    }
+  ],
+  "edges": [],
+  "claims": [
+    {
+      "id": "sk_hynix_q2_2026_results_cl1",
+      "statement": "SK hynix began mass shipments of HBM4 in Q2 2026 with production ramp planned for H2 2026, and reported record 2Q26 results (KRW 79.3187T revenue, KRW 60.5426T operating profit, 76% operating margin) — the HBM alternative to Micron is real, shipping at scale, and highly profitable.",
+      "subject_id": "co:sk_hynix",
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "source_ids": ["sk_hynix_q2_2026_results_s1", "sk_hynix_q2_2026_results_s2"],
+      "disproof_condition": "Downgrade if HBM4 ramp is delayed/recalled in later quarters or reported HBM shipment mix falls materially."
+    },
+    {
+      "id": "sk_hynix_q2_2026_results_cl2",
+      "statement": "SK hynix has finalized Long-Term Agreements with around 10 customers including key strategic partners — customer-side lock-in on the competing HBM supply path, which bounds how much share is contestable by Micron in the LTA window (and vice versa).",
+      "subject_id": "co:sk_hynix",
+      "confidence": 0.85,
+      "demand_proof_level": "confirmed",
+      "source_ids": ["sk_hynix_q2_2026_results_s3"],
+      "disproof_condition": "Update if LTA count/coverage is restated, or if disclosed LTA terms turn out to be non-binding framework agreements."
+    }
+  ]
+}
