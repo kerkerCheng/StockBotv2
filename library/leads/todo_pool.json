@@ -4553,6 +4553,18 @@
       "source": "research_action",
       "title": "HDS 反路徑入圖：中國諧波挑戰者（Leaderdrive/雙環）市占 15%→38%＋Nabtesco 互補定位",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-08-30T09:36:14.365284+00:00",
+      "hint": "核准 exact graph delta；Decision handoff：co:lumentum。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 281,
+      "reason": null,
+      "ref_id": "ra_6822236f5e9065ddab7a81b28333ea4c",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "Cignal AI 第三方記載：LITE 史上最大 ELSFP 採購單＋COHR 高功率雷射 PO——CPO 光源需求的獨立印證",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -10533,6 +10545,6 @@
       "verb": "pq1_awaiting_approval"
     }
   ],
-  "next_n": 281,
+  "next_n": 282,
   "schema_version": "1"
 }
