@@ -4035,18 +4035,21 @@
     {
       "added_at": "2026-08-29T01:10:04.654512+00:00",
       "dispatch_baseline_decision_id": "pd_2812054ab36a89b5aef5180de3fc69e2",
+      "dispatch_receipt": "decision:pd_b173b3285bd7960c2885c0b48674a7dc",
       "dispatch_ref": "assessment_gap:dc_0fca807c963dc3b9888e0f83ba6d45a5",
       "dispatch_scope": [
         "valuation_payoff_unknown"
       ],
-      "dispatch_status": "queued",
+      "dispatch_status": "completed",
+      "dispatch_updated_at": "2026-08-30T04:54:28.491125+00:00",
       "dispatched_at": "2026-08-30T04:23:31.244349+00:00",
       "hint": "go（大項）＝reassess 後以 assessment_gap 排入 pq1，研究範圍：valuation_payoff_unknown。產出為 assessment／研究包，完成後 reassess 以新 decision receipt 結案",
       "n": 249,
-      "reason": null,
+      "reason": "估值錨完成：EV/S 20.7x、41 位覆蓋、目標價高於現價 29%——已定價 custom silicon ramp、純度接近 beta；research_status 升 READY、attention=MONITOR",
+      "receipt": "decision:pd_b173b3285bd7960c2885c0b48674a7dc",
       "ref_id": "dc_0fca807c963dc3b9888e0f83ba6d45a5",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-30T04:54:28.491125+00:00",
       "source": "decision_lab",
       "title": "co:marvell_technology：補估值錨點：市值、分析師覆蓋與隱含假設，回答股價已經定價了什麼",
       "type": "decision_review"
@@ -10037,6 +10040,24 @@
       "reason": "五軸 assessment 完成：commercial_maturity/source_reliability 升 bounded（觀測+多 origin），剩 valuation_payoff——且根因現形為 market_missing（3081.TWO 未入行情 authority，cohort 已建、明日 ETL tracked 派生可望自清）",
       "receipt": "decision:pd_bb0df963b0f2eddb506e84eac0b5b40f",
       "ref_id": "dc_f94148d8545de35cb2c5d048640b913e",
+      "type": "decision_review",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-30T04:54:28.491125+00:00",
+      "n": 249,
+      "reason": "估值錨完成：EV/S 20.7x、41 位覆蓋、目標價高於現價 29%——已定價 custom silicon ramp、純度接近 beta；research_status 升 READY、attention=MONITOR",
+      "receipt": "decision:pd_b173b3285bd7960c2885c0b48674a7dc",
+      "ref_id": "dc_0fca807c963dc3b9888e0f83ba6d45a5",
+      "type": "decision_review",
+      "verb": "pq1_completed"
+    },
+    {
+      "at": "2026-08-30T04:54:28.491125+00:00",
+      "n": 249,
+      "reason": "估值錨完成：EV/S 20.7x、41 位覆蓋、目標價高於現價 29%——已定價 custom silicon ramp、純度接近 beta；research_status 升 READY、attention=MONITOR",
+      "receipt": "decision:pd_b173b3285bd7960c2885c0b48674a7dc",
+      "ref_id": "dc_0fca807c963dc3b9888e0f83ba6d45a5",
       "type": "decision_review",
       "verb": "go"
     }
