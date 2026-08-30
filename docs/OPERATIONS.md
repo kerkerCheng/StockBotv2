@@ -252,6 +252,19 @@ cashtag 由 `entities.py` 確定性抽取；公司名寫成純文字時 regex �
 & '.venv\Scripts\python.exe' scripts\sync_agent_skills.py --check   # 交接前驗證兩端無漂移
 ```
 
+### Addendum extraction 的 edge id 陷阱（2026-08-30 實測）
+
+**Addendum（重用既有 doc_id 的補充 extraction）裡的 edge id 絕不可重用 `e1`、`e2` 這類原檔已用的 id。**
+EdgeAssertion 的全域 id＝`doc_id + edge id`——同名會 MERGE 覆寫原檔的 assertion，讓原本的
+canonical 邊失去 assertion backing，`loader.edge_resolution project` 會以
+`relationships_without_assertions` fail closed（2026-08-30 一次撞出 21 條 orphan）。
+
+- 規則：addendum 的 edge id 用檔案唯一前綴（如 `cov3_1`、`sole1`）。
+- 修復程序（如已撞上）：①把 addendum 的 edge id 改唯一；②重載**原始** extraction 檔還原被覆寫的
+  assertion；③重載修正後的 addendum；④重跑 `python -m loader.edge_resolution project`。
+- 同理 source id：addendum 引用原檔 source（如 `..._s1`）是刻意共用、安全；但**新增** quote 時
+  source id 也要避開原檔已用的編號。
+
 ---
 
 ## 環境變數
