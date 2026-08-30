@@ -4290,20 +4290,23 @@
     {
       "added_at": "2026-08-30T04:27:19.725609+00:00",
       "dispatch_baseline_decision_id": "pd_fbb643303d5a52997ff6bd16070b63b7",
+      "dispatch_receipt": "decision:pd_88dd515f9b57213025bcdc16fb9f73be",
       "dispatch_ref": "assessment_gap:dc_b05cc1360e4bdf2a238787c23e7b227d",
       "dispatch_scope": [
         "commercial_maturity_unknown",
         "source_reliability_unknown",
         "valuation_payoff_unknown"
       ],
-      "dispatch_status": "queued",
+      "dispatch_status": "completed",
+      "dispatch_updated_at": "2026-08-30T08:57:59.811788+00:00",
       "dispatched_at": "2026-08-30T08:54:48.738241+00:00",
       "hint": "go（大項）＝reassess 後以 assessment_gap 排入 pq1，研究範圍：commercial_maturity_unknown、source_reliability_unknown、valuation_payoff_unknown。產出為 assessment／研究包，完成後 reassess 以新 decision receipt 結案",
       "n": 263,
-      "reason": null,
+      "reason": "MU 五軸完成（買賣競三側一手的因果鏈、forward 6x 週期頂定價判讀）",
+      "receipt": "decision:pd_88dd515f9b57213025bcdc16fb9f73be",
       "ref_id": "dc_b05cc1360e4bdf2a238787c23e7b227d",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-30T08:57:59.811788+00:00",
       "source": "decision_lab",
       "title": "co:micron_technology：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
@@ -4323,11 +4326,13 @@
     {
       "added_at": "2026-08-30T05:25:09.755357+00:00",
       "dispatch_baseline_decision_id": "pd_b79f8ae7df78a5d51283010911957a7b",
+      "dispatch_receipt": "manual_todo:277",
       "dispatch_ref": "assessment_gap:dc_fdab434d1fad67666c57a6eefd379337",
       "dispatch_scope": [
         "source_reliability_corroboration_incomplete"
       ],
-      "dispatch_status": "queued",
+      "dispatch_status": "awaiting_approval",
+      "dispatch_updated_at": "2026-08-30T09:00:11.132754+00:00",
       "dispatched_at": "2026-08-30T08:55:31.352774+00:00",
       "hint": "go（大項）＝reassess 後以 assessment_gap 排入 pq1，研究範圍：source_reliability_corroboration_incomplete。產出為 assessment／研究包，完成後 reassess 以新 decision receipt 結案",
       "n": 265,
@@ -4489,6 +4494,49 @@
         "reason": "所有 blocker 都不需要使用者決定",
         "set_at": "2026-08-30T08:28:24.953714+00:00",
         "trigger": "執行面 context 缺失／技術指標觀測問題",
+        "until": null
+      }
+    },
+    {
+      "added_at": "2026-08-30T09:00:00.875798+00:00",
+      "hint": "核准 exact graph delta；Decision handoff：co:nvidia。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 277,
+      "reason": null,
+      "ref_id": "ra_107fb27c8102240a8e3120995a22f7e4",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "IEEE Spectrum 獨立報導：NVIDIA MRM 路線第三方描述＋pluggable 佔 GPU 算力 10% 的需求側統計",
+      "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-08-30T09:00:00.875798+00:00",
+      "hint": "coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
+      "n": 278,
+      "reason": null,
+      "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:iqe：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-30T09:00:00.875798+00:00",
+      "hint": "coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
+      "n": 279,
+      "reason": null,
+      "ref_id": "dc_b05cc1360e4bdf2a238787c23e7b227d",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:micron_technology：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review",
+      "waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-08-30T09:00:00.875691+00:00",
+        "trigger": "技術指標觀測問題",
         "until": null
       }
     }
@@ -10406,8 +10454,53 @@
       "ref_id": "dc_fdab434d1fad67666c57a6eefd379337",
       "type": "decision_review",
       "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-08-30T08:57:58.375228+00:00",
+      "n": 263,
+      "reason": null,
+      "receipt": "session:loop3-r1",
+      "ref_id": "dc_b05cc1360e4bdf2a238787c23e7b227d",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-08-30T08:57:59.811788+00:00",
+      "n": 263,
+      "reason": "MU 五軸完成（買賣競三側一手的因果鏈、forward 6x 週期頂定價判讀）",
+      "receipt": "decision:pd_88dd515f9b57213025bcdc16fb9f73be",
+      "ref_id": "dc_b05cc1360e4bdf2a238787c23e7b227d",
+      "type": "decision_review",
+      "verb": "pq1_completed"
+    },
+    {
+      "at": "2026-08-30T08:57:59.811788+00:00",
+      "n": 263,
+      "reason": "MU 五軸完成（買賣競三側一手的因果鏈、forward 6x 週期頂定價判讀）",
+      "receipt": "decision:pd_88dd515f9b57213025bcdc16fb9f73be",
+      "ref_id": "dc_b05cc1360e4bdf2a238787c23e7b227d",
+      "type": "decision_review",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-30T09:00:01.781888+00:00",
+      "n": 265,
+      "reason": null,
+      "receipt": "session:loop3-r2",
+      "ref_id": "dc_fdab434d1fad67666c57a6eefd379337",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-08-30T09:00:11.132754+00:00",
+      "n": 265,
+      "reason": "獨立來源 packet 已備（IEEE Spectrum：MRM 第三方描述＋10% GPU 算力統計＋Micas 具名）；[277] go 入圖後更新 NVDA assessment 清 missing_data",
+      "receipt": "manual_todo:277",
+      "ref_id": "dc_fdab434d1fad67666c57a6eefd379337",
+      "type": "decision_review",
+      "verb": "pq1_awaiting_approval"
     }
   ],
-  "next_n": 277,
+  "next_n": 280,
   "schema_version": "1"
 }
