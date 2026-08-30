@@ -1,0 +1,94 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "guided",
+      "disproof_condition": "若 NVLink Fusion 實質排除第三方 PF 晶片、或 16Tbps 規格量產跳票，卡位敘事下修。",
+      "id": "counterpoint_mrvl_celestial_2025_12_22_cl1",
+      "source_ids": [
+        "counterpoint_mrvl_celestial_2025_12_22_s1",
+        "counterpoint_mrvl_celestial_2025_12_22_s2",
+        "counterpoint_mrvl_celestial_2025_12_22_s3"
+      ],
+      "statement": "Counterpoint（獨立產研）評 Marvell×Celestial：Photonic Fabric 是業界首個單 chiplet 16Tbps 的 scale-up 光學方案；Marvell 三生態卡位（UALink、E-SUN/UEC、NVLink Fusion）使其不押單一標準。『2x 銅互連能效』Counterpoint 明標為 Celestial 自稱——本 claim 保留該 attribution。",
+      "subject_id": "co:marvell_technology"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:photonic_fabric",
+      "id": "cp1",
+      "relation": "develops",
+      "source_ids": [
+        "counterpoint_mrvl_celestial_2025_12_22_s1",
+        "counterpoint_mrvl_celestial_2025_12_22_s2"
+      ],
+      "src_id": "co:marvell_technology"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "MRVL"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:marvell_technology",
+      "name": "Marvell Technology",
+      "role": null,
+      "source_ids": [
+        "counterpoint_mrvl_celestial_2025_12_22_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Photonic Fabric™"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:photonic_fabric",
+      "name": "Photonic Fabric",
+      "role": null,
+      "source_ids": [
+        "counterpoint_mrvl_celestial_2025_12_22_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "counterpoint_mrvl_celestial_2025_12_22",
+    "evidence_tier": 3,
+    "origin_entity": "Counterpoint Research",
+    "permission_basis": "Public research insight; quotes only.",
+    "published_at": "2025-12-22",
+    "publisher": "Counterpoint Research",
+    "retrieved_at": "2026-08-31",
+    "source_type": "industry_report",
+    "storage_permission": "repo_excerpt",
+    "title": "Counterpoint Research: Celestial AI Acquisition Perfectly Positions Marvell For Upcoming Multi-Rack Scale-Up Boom",
+    "url": "https://counterpointresearch.com/en/insights/Celestial-AI-Acquisition-Perfectly-Positions-Marvell-For-Upcoming-Multi-Rack-Scale-Up-Boom"
+  },
+  "sources": [
+    {
+      "id": "counterpoint_mrvl_celestial_2025_12_22_s1",
+      "locator": "16Tbps chiplet",
+      "quote": "This is the industry's first scale-up optical solution providing an unprecedented 16Tbps of bandwidth in a single chiplet."
+    },
+    {
+      "id": "counterpoint_mrvl_celestial_2025_12_22_s2",
+      "locator": "ecosystem positioning",
+      "quote": "Marvell is uniquely positioned to benefit from three ecosystem plays: the open-source UALink and Ethernet-based E-SUN/UEC ecosystems as well as Nvidia's proprietary NVLink ecosystem via its participation in the NVLink Fusion initiative."
+    },
+    {
+      "id": "counterpoint_mrvl_celestial_2025_12_22_s3",
+      "locator": "efficiency attribution",
+      "quote": "Celestial AI claims that its solution provides more than twice the power efficiency of copper interconnects, but with significantly higher bandwidth and far longer reach."
+    }
+  ]
+}

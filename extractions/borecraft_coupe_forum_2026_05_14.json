@@ -1,0 +1,88 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "guided",
+      "disproof_condition": "若 LuxNet 後續財報未見 CW 雷射/矽光營收成形，角色描述下修。",
+      "id": "borecraft_coupe_forum_2026_05_14_cl1",
+      "source_ids": [
+        "borecraft_coupe_forum_2026_05_14_s1",
+        "borecraft_coupe_forum_2026_05_14_s2"
+      ],
+      "statement": "Borecraft（具名獨立作者）記載：LuxNet 與 TrueLight 正為矽光路徑擴產 800G 光學與 CW 雷射——LuxNet 的 CW 雷射角色獲自家年報之外首個第三方 origin。同文載 UMC 授權 imec iSiPP300（risk production 2026-27），矽光代工第二源浮現。",
+      "subject_id": "co:luxnet"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:cw_dfb_laser",
+      "id": "bc1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "borecraft_coupe_forum_2026_05_14_s1"
+      ],
+      "src_id": "co:luxnet"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "華星光",
+        "4979.TWO"
+      ],
+      "attributes": {},
+      "confidence": 0.8,
+      "id": "co:luxnet",
+      "name": "LuxNet",
+      "role": null,
+      "source_ids": [
+        "borecraft_coupe_forum_2026_05_14_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "CW laser"
+      ],
+      "attributes": {},
+      "confidence": 0.8,
+      "id": "tech:cw_dfb_laser",
+      "name": "CW DFB Laser",
+      "role": null,
+      "source_ids": [
+        "borecraft_coupe_forum_2026_05_14_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "borecraft_coupe_forum_2026_05_14",
+    "evidence_tier": 3,
+    "origin_entity": "Borecraft (NewMaxx)",
+    "permission_basis": "Public analyst blog; quotes only.",
+    "published_at": "2026-05-14",
+    "publisher": "Borecraft",
+    "retrieved_at": "2026-08-31",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Borecraft: TSMC's COUPE is the keyword from the 2026 Technology Forum",
+    "url": "https://borecraft.com/2026/05/14/tsmcs-coupe-is-the-keyword-from-the-2026-technology-forum/"
+  },
+  "sources": [
+    {
+      "id": "borecraft_coupe_forum_2026_05_14_s1",
+      "locator": "LuxNet role",
+      "quote": "LuxNet (4979.TWO) and TrueLight are scaling 800G optics and CW lasers for the silicon-photonics path."
+    },
+    {
+      "id": "borecraft_coupe_forum_2026_05_14_s2",
+      "locator": "UMC photonics",
+      "quote": "UMC (UMC) licensed imec's iSiPP300 photonics process with risk production penciled in for 2026-2027."
+    }
+  ]
+}
