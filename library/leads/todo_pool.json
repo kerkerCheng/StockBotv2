@@ -4411,6 +4411,18 @@
       "source": "manual",
       "title": "AVGO/POET 重建 cohort＋五軸 assessment：原 cohort 已 rejected（終局不回寫），以 evaluate-signal 建新 cohort 後補 assessment",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-08-30T07:33:50.353041+00:00",
+      "hint": "go＝執行 python -m loader.load_to_neo4j extractions/iqe_tower_epiwafer_sub_addendum_2026_08_30.json 與 extractions/tower_marvell_pic_sub_addendum_2026_08_30.json（皆已 validate）＋ edge_resolution project。效果：Tower 進入瓶頸排序候選（兩邊 sub=4≥過濾線）。各附 disproof（第二供應商 qualify 即下修）。不含：其他 Tower 邊、thesis/live。載入後 Tower reassess 更新排序並 resolve [271]。",
+      "n": 273,
+      "reason": null,
+      "ref_id": "manual:273",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "Tower 鏈 sub 補值入圖：IQE→Tower（sub=4，雙向契約鎖定）＋Tower→Marvell（sub=4，5M 量產＋相位偏振複雜度）——[271] 授權研究的產出",
+      "type": "manual"
     }
   ],
   "log": [
@@ -10264,6 +10276,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 273,
+  "next_n": 274,
   "schema_version": "1"
 }

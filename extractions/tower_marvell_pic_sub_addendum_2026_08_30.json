@@ -1,0 +1,74 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "tower_marvell_coherent_pic_6k_2026_06_18",
+    "title": "Tower×Marvell coherent PIC 量產——substitutability addendum（[271] 授權研究）",
+    "source_type": "filing",
+    "evidence_tier": 1,
+    "origin_entity": "Tower Semiconductor",
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "Official public SEC filing; canonical URL retained, excerpts only.",
+    "url": "https://www.sec.gov/Archives/edgar/data/0000928876/000117891326003242/zk2635572.htm",
+    "publisher": "SEC EDGAR",
+    "published_at": "2026-06-18",
+    "retrieved_at": "2026-08-30"
+  },
+  "sources": [
+    {
+      "id": "tower_marvell_coherent_pic_6k_2026_06_18_s1",
+      "locator": "shipment milestone paragraph",
+      "quote": "The company, in partnership with Marvell Technology, has shipped over five million coherent photonic integrated circuits (PICs) to"
+    },
+    {
+      "id": "tower_marvell_coherent_pic_6k_2026_06_18_s2",
+      "locator": "complexity paragraph",
+      "quote": "Coherent PICs are complex because they must control the phase and polarization of light, not just the amplitude. The design and pr"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:tower_semiconductor",
+      "type": "Company",
+      "name": "Tower Semiconductor",
+      "aliases": ["TSEM", "Tower"],
+      "role": "foundry",
+      "abstraction_level": "foundry_packaging",
+      "confidence": 0.9,
+      "source_ids": ["tower_marvell_coherent_pic_6k_2026_06_18_s1"],
+      "attributes": {}
+    },
+    {
+      "id": "co:marvell_technology",
+      "type": "Company",
+      "name": "Marvell Technology",
+      "aliases": ["MRVL", "Marvell"],
+      "role": "adjacent_silicon",
+      "abstraction_level": "device_chip",
+      "confidence": 0.9,
+      "source_ids": ["tower_marvell_coherent_pic_6k_2026_06_18_s1"],
+      "attributes": {}
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_sub1",
+      "src_id": "co:tower_semiconductor",
+      "relation": "supplies_to",
+      "dst_id": "co:marvell_technology",
+      "confidence": 0.8,
+      "source_ids": ["tower_marvell_coherent_pic_6k_2026_06_18_s1", "tower_marvell_coherent_pic_6k_2026_06_18_s2"],
+      "attributes": {"substitutability": 4}
+    }
+  ],
+  "claims": [
+    {
+      "id": "tower_marvell_coherent_pic_6k_2026_06_18_cl4",
+      "statement": "Tower 作為 Marvell coherent PIC foundry 的 substitutability 判 4/5（研究判斷）：逾五百萬顆量產出貨證明 qualified-at-volume，coherent PIC 須同時控制相位與偏振、設計製程綁定深，切換 foundry 需完整 requalification（光學元件慣例 3-6 個月以上）；不判 5 因 GlobalFoundries 亦有矽光子平台、Marvell 具自建能力，長期替代路徑存在。",
+      "subject_id": "co:tower_semiconductor",
+      "confidence": 0.8,
+      "demand_proof_level": "guided",
+      "source_ids": ["tower_marvell_coherent_pic_6k_2026_06_18_s1", "tower_marvell_coherent_pic_6k_2026_06_18_s2"],
+      "disproof_condition": "若 Marvell 將 coherent PIC 移往其他 foundry／自建、或累計出貨揭露停止成長，下修；若後續揭露顯示 Marvell 該產線無平行來源且合約鎖定多年，上修至 5。"
+    }
+  ]
+}

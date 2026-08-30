@@ -1,0 +1,69 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "iqe_tower_inp_epiwafer_agreement_2026_06_15",
+    "title": "IQE×Tower InP epiwafer 多年協議——substitutability addendum（[271] 授權研究）",
+    "source_type": "news",
+    "evidence_tier": 1,
+    "origin_entity": "IQE plc / Tower Semiconductor (joint announcement)",
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "Official public joint press release; canonical URL retained, excerpts only.",
+    "url": "https://www.iqep.com/media/press-releases/2026/iqe-and-tower-semiconductor-announce-multi-year-agreement",
+    "publisher": "IQE plc",
+    "published_at": "2026-06-15",
+    "retrieved_at": "2026-08-30"
+  },
+  "sources": [
+    {
+      "id": "iqe_tower_inp_epiwafer_agreement_2026_06_15_s2",
+      "locator": "agreement terms paragraph",
+      "quote": "The agreement provides for a minimum purchase commitment by Tower in the first year, a reciprocal supply commitment from IQE, and minimum volume commitments thereafter."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:iqe",
+      "type": "Company",
+      "name": "IQE plc",
+      "aliases": ["IQE", "IQE.L"],
+      "role": null,
+      "abstraction_level": "materials_substrate",
+      "confidence": 0.9,
+      "source_ids": ["iqe_tower_inp_epiwafer_agreement_2026_06_15_s2"],
+      "attributes": {}
+    },
+    {
+      "id": "co:tower_semiconductor",
+      "type": "Company",
+      "name": "Tower Semiconductor",
+      "aliases": ["TSEM", "Tower"],
+      "role": "foundry",
+      "abstraction_level": "foundry_packaging",
+      "confidence": 0.9,
+      "source_ids": ["iqe_tower_inp_epiwafer_agreement_2026_06_15_s2"],
+      "attributes": {}
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_sub1",
+      "src_id": "co:iqe",
+      "relation": "supplies_to",
+      "dst_id": "co:tower_semiconductor",
+      "confidence": 0.8,
+      "source_ids": ["iqe_tower_inp_epiwafer_agreement_2026_06_15_s2"],
+      "attributes": {"substitutability": 4}
+    }
+  ],
+  "claims": [
+    {
+      "id": "iqe_tower_inp_epiwafer_agreement_2026_06_15_cl4",
+      "statement": "IQE 對 Tower 的 InP epiwafer 供應 substitutability 判 4/5（研究判斷）：雙向契約鎖定（Tower 首年最低採購＋IQE 對等供應承諾＋後續最低量）疊在已 qualified 的 200G/lane 量產程式上，協議窗內替換需重新 qualification 且違約成本高；不判 5 因 InP 磊晶存在替代供應者（聯亞、VPEC、IntelliEPI、Sumitomo）且原協議 disproof 已明示『Tower qualifies an alternative InP epiwafer supplier』為可能事件。",
+      "subject_id": "co:iqe",
+      "confidence": 0.8,
+      "demand_proof_level": "guided",
+      "source_ids": ["iqe_tower_inp_epiwafer_agreement_2026_06_15_s2"],
+      "disproof_condition": "若 Tower 為同一 200Gb/lane 程式 qualify 第二家磊晶供應商、協議終止或最低量承諾被放棄，下修至 2-3；若後續揭露顯示 IQE 為該程式唯一合格來源且無平行認證，上修至 5。"
+    }
+  ]
+}
