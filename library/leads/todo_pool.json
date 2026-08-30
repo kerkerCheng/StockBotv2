@@ -4637,6 +4637,30 @@
       "source": "research_action",
       "title": "NVIDIA 客戶端記載：COHR Sherman 6 吋 InP 擴廠動土＋『Coherent 供應交換器前面板的外部雷射模組』直述",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-08-30T12:56:38.462818+00:00",
+      "hint": "機器人鏈（HDS/Schaeffler/Agility cohort）目前缺材料層 counter-path——mat:rare_earth_magnets 是真空白，中國廠商市占結構與 HDS 諧波威脅同構 ｜ go＝bounded 研究兩家 10-K/年報＋產能與客戶承諾，產出 onboard RA（registry 增列＋首批 extraction）回 pq2 另取 ra_admission 號；不含入圖、不含 thesis、不含 live",
+      "n": 288,
+      "reason": null,
+      "ref_id": "manual:288",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "稀土磁材反路徑 onboard 研究：MP Materials（MP）＋Lynas（LYC.AX）——人形機器人執行器的材料瓶頸（每台 2-3kg NdFeB、EV 的 2-3 倍），中國掌控供應下的 ex-China 純 play",
+      "type": "manual"
+    },
+    {
+      "added_at": "2026-08-30T12:58:14.185483+00:00",
+      "hint": "核准 exact graph delta；Decision handoff：co:marvell_technology。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 289,
+      "reason": null,
+      "ref_id": "ra_b3c8833d8b38c25d7dd7f9077c947778",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "Marvell 完成收購 Celestial AI（2026-02-02）：Photonic Fabric 正式入 MRVL——關掉 tech:photonic_fabric 覆蓋缺口",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -10617,6 +10641,6 @@
       "verb": "pq1_awaiting_approval"
     }
   ],
-  "next_n": 288,
+  "next_n": 290,
   "schema_version": "1"
 }
