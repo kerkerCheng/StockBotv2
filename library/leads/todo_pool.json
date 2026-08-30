@@ -4234,15 +4234,18 @@
       "added_at": "2026-08-29T23:59:19.880516+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_057cc4ca9929ab8ddfef2c82894e010e",
+      "dispatch_receipt": "decision:pd_96d8290d4aee924c3bfafd59da088eba",
       "dispatch_ref": "wo_e2148b2b0943e57909c4bcd4fd8e1109",
-      "dispatch_status": "queued",
+      "dispatch_status": "completed",
+      "dispatch_updated_at": "2026-08-30T05:24:34.112980+00:00",
       "dispatched_at": "2026-08-30T04:24:49.123190+00:00",
       "hint": "go（大項）＝reassess 後以 assessment_gap 排入 pq1，研究範圍：source_reliability_corroboration_incomplete。產出為 assessment／研究包，完成後 reassess 以新 decision receipt 結案",
       "n": 260,
-      "reason": null,
+      "reason": "五軸 assessment＋catalyst/disproof 完成，READY",
+      "receipt": "decision:pd_96d8290d4aee924c3bfafd59da088eba",
       "ref_id": "dc_fdab434d1fad67666c57a6eefd379337",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-30T05:24:34.112980+00:00",
       "source": "decision_lab",
       "title": "co:nvidia：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
@@ -4298,6 +4301,18 @@
       "resolved_at": null,
       "source": "decision_lab",
       "title": "co:landmark_optoelectronics：補估值錨點：市值、分析師覆蓋與隱含假設，回答股價已經定價了什麼",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-30T05:25:09.755357+00:00",
+      "hint": "go（大項）＝reassess 後以 assessment_gap 排入 pq1，研究範圍：source_reliability_corroboration_incomplete。產出為 assessment／研究包，完成後 reassess 以新 decision receipt 結案",
+      "n": 265,
+      "reason": null,
+      "ref_id": "dc_fdab434d1fad67666c57a6eefd379337",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:nvidia：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
     }
   ],
@@ -10060,8 +10075,35 @@
       "ref_id": "dc_0fca807c963dc3b9888e0f83ba6d45a5",
       "type": "decision_review",
       "verb": "go"
+    },
+    {
+      "at": "2026-08-30T05:24:33.364542+00:00",
+      "n": 260,
+      "reason": null,
+      "receipt": "session:loop-r4",
+      "ref_id": "dc_fdab434d1fad67666c57a6eefd379337",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-08-30T05:24:34.112980+00:00",
+      "n": 260,
+      "reason": "五軸 assessment＋catalyst/disproof 完成，READY",
+      "receipt": "decision:pd_96d8290d4aee924c3bfafd59da088eba",
+      "ref_id": "dc_fdab434d1fad67666c57a6eefd379337",
+      "type": "decision_review",
+      "verb": "pq1_completed"
+    },
+    {
+      "at": "2026-08-30T05:24:34.112980+00:00",
+      "n": 260,
+      "reason": "五軸 assessment＋catalyst/disproof 完成，READY",
+      "receipt": "decision:pd_96d8290d4aee924c3bfafd59da088eba",
+      "ref_id": "dc_fdab434d1fad67666c57a6eefd379337",
+      "type": "decision_review",
+      "verb": "go"
     }
   ],
-  "next_n": 265,
+  "next_n": 266,
   "schema_version": "1"
 }
