@@ -4274,17 +4274,18 @@
       "added_at": "2026-08-30T04:27:19.725609+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_57e2625d3ce6f046353a16f0f0dd1c43",
-      "dispatch_receipt": "manual_todo:280",
+      "dispatch_receipt": "decision:pd_ad9a9c2ac7e3e0da22654dbec7f40aa7",
       "dispatch_ref": "wo_734f04d7bfa7c40d78520b8ccea7d0fe",
-      "dispatch_status": "awaiting_approval",
-      "dispatch_updated_at": "2026-08-30T09:04:44.771091+00:00",
+      "dispatch_status": "completed",
+      "dispatch_updated_at": "2026-08-30T13:42:38.502274+00:00",
       "dispatched_at": "2026-08-30T08:54:47.989890+00:00",
       "hint": "coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 262,
-      "reason": null,
+      "reason": "pq1 completed",
+      "receipt": "decision:pd_ad9a9c2ac7e3e0da22654dbec7f40aa7",
       "ref_id": "dc_cc46527aac12ba14191ee71c0460f3fe",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-30T13:42:38.502274+00:00",
       "source": "decision_lab",
       "title": "co:harmonic_drive_systems：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
@@ -4328,20 +4329,21 @@
     {
       "added_at": "2026-08-30T05:25:09.755357+00:00",
       "dispatch_baseline_decision_id": "pd_b79f8ae7df78a5d51283010911957a7b",
-      "dispatch_receipt": "manual_todo:277",
+      "dispatch_receipt": "decision:pd_9f9d74f43b7e55130bc9270cfbdcae03",
       "dispatch_ref": "assessment_gap:dc_fdab434d1fad67666c57a6eefd379337",
       "dispatch_scope": [
         "source_reliability_corroboration_incomplete"
       ],
-      "dispatch_status": "awaiting_approval",
-      "dispatch_updated_at": "2026-08-30T09:00:11.132754+00:00",
+      "dispatch_status": "completed",
+      "dispatch_updated_at": "2026-08-30T13:42:39.260579+00:00",
       "dispatched_at": "2026-08-30T08:55:31.352774+00:00",
       "hint": "go（大項）＝reassess 後以 assessment_gap 排入 pq1，研究範圍：source_reliability_corroboration_incomplete。產出為 assessment／研究包，完成後 reassess 以新 decision receipt 結案",
       "n": 265,
-      "reason": null,
+      "reason": "pq1 completed",
+      "receipt": "decision:pd_9f9d74f43b7e55130bc9270cfbdcae03",
       "ref_id": "dc_fdab434d1fad67666c57a6eefd379337",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-30T13:42:39.260579+00:00",
       "source": "decision_lab",
       "title": "co:nvidia：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
@@ -4484,29 +4486,34 @@
       "added_at": "2026-08-30T08:28:24.953849+00:00",
       "hint": "coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
       "n": 276,
+      "reactivated_at": "2026-08-30T13:43:26.064880+00:00",
+      "reactivation_event": {
+        "type": "decision_blocker_mode_changed"
+      },
       "reason": null,
       "ref_id": "dc_67f5e1588990f432e8e0ccce5711e62e",
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
       "title": "co:broadcom：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
-      "type": "decision_review",
-      "waiting_on": {
-        "derived_from_blockers": true,
-        "reason": "所有 blocker 都不需要使用者決定",
-        "set_at": "2026-08-30T08:28:24.953714+00:00",
-        "trigger": "執行面 context 缺失／技術指標觀測問題",
-        "until": null
-      }
+      "type": "decision_review"
     },
     {
       "added_at": "2026-08-30T09:00:00.875798+00:00",
+      "completion_authority": {
+        "action_digest": "ef5ccd1d874aa2992365de42e6a640998318ecf4a98866243962cd2b8f2f0439",
+        "cohort_id": "dc_fdab434d1fad67666c57a6eefd379337",
+        "commit": "189b9b6058d54d251333f0dee1344932502be2bf",
+        "company_id": "co:nvidia",
+        "verified_at": "2026-08-30T13:33:37.827846+00:00"
+      },
       "hint": "核准 exact graph delta；Decision handoff：co:nvidia。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 277,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_107fb27c8102240a8e3120995a22f7e4;digest:ef5ccd1d874aa2992365de42e6a640998318ecf4a98866243962cd2b8f2f0439;commit:189b9b6058d54d251333f0dee1344932502be2bf;cohort:dc_fdab434d1fad67666c57a6eefd379337",
       "ref_id": "ra_107fb27c8102240a8e3120995a22f7e4",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-30T13:33:37.827846+00:00",
       "source": "research_action",
       "title": "IEEE Spectrum 獨立報導：NVIDIA MRM 路線第三方描述＋pluggable 佔 GPU 算力 10% 的需求側統計",
       "type": "ra_admission"
@@ -4527,53 +4534,74 @@
       "added_at": "2026-08-30T09:00:00.875798+00:00",
       "hint": "coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
       "n": 279,
+      "reactivated_at": "2026-08-30T13:43:26.064880+00:00",
+      "reactivation_event": {
+        "type": "decision_blocker_mode_changed"
+      },
       "reason": null,
       "ref_id": "dc_b05cc1360e4bdf2a238787c23e7b227d",
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
       "title": "co:micron_technology：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
-      "type": "decision_review",
-      "waiting_on": {
-        "derived_from_blockers": true,
-        "reason": "所有 blocker 都不需要使用者決定",
-        "set_at": "2026-08-30T09:00:00.875691+00:00",
-        "trigger": "技術指標觀測問題",
-        "until": null
-      }
+      "type": "decision_review"
     },
     {
       "added_at": "2026-08-30T09:03:48.249782+00:00",
+      "completion_authority": {
+        "action_digest": "58eddaccc4e543f91c577c6313c3f7c242c09c37b50711ae3172ad1ea5d57a73",
+        "cohort_id": "dc_cc46527aac12ba14191ee71c0460f3fe",
+        "commit": "2c7b16220fe7a62b40c8f96f8e5bf7460e3b7c4b",
+        "company_id": "co:harmonic_drive_systems",
+        "verified_at": "2026-08-30T13:33:39.210938+00:00"
+      },
       "hint": "核准 exact graph delta；Decision handoff：co:harmonic_drive_systems。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 280,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_194fa7a7838945631199883231cd40f9;digest:58eddaccc4e543f91c577c6313c3f7c242c09c37b50711ae3172ad1ea5d57a73;commit:2c7b16220fe7a62b40c8f96f8e5bf7460e3b7c4b;cohort:dc_cc46527aac12ba14191ee71c0460f3fe",
       "ref_id": "ra_194fa7a7838945631199883231cd40f9",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-30T13:33:39.210938+00:00",
       "source": "research_action",
       "title": "HDS 反路徑入圖：中國諧波挑戰者（Leaderdrive/雙環）市占 15%→38%＋Nabtesco 互補定位",
       "type": "ra_admission"
     },
     {
       "added_at": "2026-08-30T09:36:14.365284+00:00",
+      "completion_authority": {
+        "action_digest": "036cc15fcb406510f612a4b8486cc1ee2d3018780cbdf41e0127f778d509612b",
+        "cohort_id": "dc_4d28e50810e46da7fd77ee042ee7bd1c",
+        "commit": "79d3c797b48546c6c47f7eefd6134492ac25bf78",
+        "company_id": "co:lumentum",
+        "verified_at": "2026-08-30T13:33:40.576733+00:00"
+      },
       "hint": "核准 exact graph delta；Decision handoff：co:lumentum。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 281,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_6822236f5e9065ddab7a81b28333ea4c;digest:036cc15fcb406510f612a4b8486cc1ee2d3018780cbdf41e0127f778d509612b;commit:79d3c797b48546c6c47f7eefd6134492ac25bf78;cohort:dc_4d28e50810e46da7fd77ee042ee7bd1c",
       "ref_id": "ra_6822236f5e9065ddab7a81b28333ea4c",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-30T13:33:40.576733+00:00",
       "source": "research_action",
       "title": "Cignal AI 第三方記載：LITE 史上最大 ELSFP 採購單＋COHR 高功率雷射 PO——CPO 光源需求的獨立印證",
       "type": "ra_admission"
     },
     {
       "added_at": "2026-08-30T10:05:40.867565+00:00",
+      "completion_authority": {
+        "action_digest": "b62a2b568f524a0084474eb65083d40be5e77c66d058cb74e573ac192375bc14",
+        "cohort_id": "dc_6b92df56a6d186eb7464479dfb9c48c3",
+        "commit": "cd7e57861fdc44b54fdbbe78b51ad7b7700f1941",
+        "company_id": "co:foci",
+        "verified_at": "2026-08-30T13:33:41.961225+00:00"
+      },
       "hint": "核准 exact graph delta；Decision handoff：co:foci。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 282,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_a207a618ec9118d9389c7f336637e352;digest:b62a2b568f524a0084474eb65083d40be5e77c66d058cb74e573ac192375bc14;commit:cd7e57861fdc44b54fdbbe78b51ad7b7700f1941;cohort:dc_6b92df56a6d186eb7464479dfb9c48c3",
       "ref_id": "ra_a207a618ec9118d9389c7f336637e352",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-30T13:33:41.961225+00:00",
       "source": "research_action",
       "title": "L8 第三 origin 補強：DigiTimes 記載 FOCI FAU 自動化量產時程＋optics.org 記載 Fabrinet×NVIDIA 集中度軌跡",
       "type": "ra_admission"
@@ -4583,9 +4611,10 @@
       "hint": "入圖 9 個紅色 coverage gap 的供應商邊——逐字全在圖內既有文件（Broadcom Q2FY26 法說/LRCX 10-K/POET 6-K），純補邊零新來源 ｜ go＝直接 loader 載入三份 addendum＋edge_resolution project；不含 thesis mutation、不含新文件入庫",
       "n": 283,
       "reason": null,
+      "receipt": "authority:graph_admission;ref:edge_resolution_projected_2026-08-30",
       "ref_id": "extractions/broadcom_q2fy26_cpo_coverage_addendum_2026_08_30.json;extractions/lrcx_10_k_coverage_addendum_2026_08_30.json;extractions/poet_6_k_coverage_addendum_2026_08_30.json",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-30T13:39:52.960939+00:00",
       "source": "manual",
       "title": "coverage_gaps 補邊 addendum：AVGO 產品線（TH6/Jericho3/4/1.6T DSP）＋LRCX 四產品家族＋POET Optical Interposer 共 9 條 develops/supplies_to 邊",
       "type": "manual"
@@ -4595,9 +4624,10 @@
       "hint": "再關 10 個紅色 coverage gap——逐字全在圖內既有文件（CPO 封裝論文 tier2/GFS 20-F/LITE 法說/NVDA 8-K/Meta ISCA/POET 6-K），純補邊零新來源 ｜ go＝直接 loader 載入六份 addendum＋edge_resolution project；不含 thesis mutation、不含新文件入庫",
       "n": 284,
       "reason": null,
+      "receipt": "authority:graph_admission;ref:edge_resolution_projected_2026-08-30",
       "ref_id": "extractions/cpo_paper_coverage_addendum_2026_08_30.json;extractions/gfs_20_f_coverage_addendum_2026_08_30.json;extractions/lumentum_q2fy26_coverage_addendum_2026_08_30.json;extractions/nvda_8k_coverage_addendum_2026_08_30.json;extractions/meta_vistara_coverage_addendum_2026_08_30.json;extractions/poet_6_k_coverage_addendum_w2_2026_08_30.json",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-30T13:39:53.112802+00:00",
       "source": "manual",
       "title": "coverage_gaps 補邊 addendum 第二波：TSMC/Samsung→矽中介層、Corning/Intel→玻璃基板、GFS→FD-SOI/RF-SOI/GaN、LITE→scale-up/scale-across、NVDA→LPX、Meta→CXL、POET→chip-to-chip 光源共 12 條邊",
       "type": "manual"
@@ -4607,9 +4637,10 @@
       "hint": "再關 7 個紅色 coverage gap——逐字全在圖內既有文件（AMAT 10-K/LRCX 10-Q/NVDA Q1FY27/Agility SEC 簡報/MU 10-Q），純補邊零新來源 ｜ go＝直接 loader 載入五份 addendum＋edge_resolution project；不含 thesis mutation、不含新文件入庫",
       "n": 285,
       "reason": null,
+      "receipt": "authority:graph_admission;ref:edge_resolution_projected_2026-08-30",
       "ref_id": "extractions/amat_10_k_coverage_addendum_2026_08_30.json;extractions/lrcx_10_q_coverage_addendum_2026_08_30.json;extractions/nvidia_q1fy27_coverage_addendum_2026_08_30.json;extractions/agility_raas_coverage_addendum_2026_08_30.json;extractions/mu_10_q_coverage_addendum_2026_08_30.json",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-30T13:39:53.284628+00:00",
       "source": "manual",
       "title": "coverage_gaps 補邊 addendum 第三波：AMAT→DRAM/NAND 製程＋先進封裝、LRCX→3D scaling＋先進封裝、NVDA→ACIE、Agility→RaaS、MU→DRAM 技術共 9 條邊",
       "type": "manual"
@@ -4619,21 +4650,30 @@
       "hint": "可行動排序的關鍵輸入修正——LITE→uhp_laser 是 sub=5＋sole_source 的結構榜首邊，但 sole_source 全靠自報且買方行為證明雙源 ｜ go＝loader 載入降級 addendum＋projection（sole_source_evidence_quality=weak＋反證 claim）；不含刪邊、不含 thesis mutation",
       "n": 286,
       "reason": null,
+      "receipt": "authority:graph_admission;ref:edge_resolution_projected_2026-08-30",
       "ref_id": "extractions/lite_uhp_sole_source_downgrade_addendum_2026_08_30.json",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-30T13:39:53.457114+00:00",
       "source": "manual",
       "title": "LITE→UHP laser sole_source 降級為 weak：全 origin 僅 Lumentum 自報（L8 第 3 條）＋客戶端反證（NVIDIA PR 明文 nonexclusive、同日對 COHR 對稱 $2B、Cignal 記載 COHR 同應用 PO）",
       "type": "manual"
     },
     {
       "added_at": "2026-08-30T12:28:29.760619+00:00",
+      "completion_authority": {
+        "action_digest": "d83af29b0a550e684bd51ae07362dba25c7067c8c754fb8c75216cb65f09e29c",
+        "cohort_id": "dc_957bff3701ea4e46d962bfb9ff0932c8",
+        "commit": "3e628569f6a932ead049643bca231fbf5b0817fb",
+        "company_id": "co:coherent",
+        "verified_at": "2026-08-30T13:33:48.416206+00:00"
+      },
       "hint": "核准 exact graph delta；Decision handoff：co:coherent。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 287,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_795893219e40efd4c3314d7388416a77;digest:d83af29b0a550e684bd51ae07362dba25c7067c8c754fb8c75216cb65f09e29c;commit:3e628569f6a932ead049643bca231fbf5b0817fb;cohort:dc_957bff3701ea4e46d962bfb9ff0932c8",
       "ref_id": "ra_795893219e40efd4c3314d7388416a77",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-30T13:33:48.416206+00:00",
       "source": "research_action",
       "title": "NVIDIA 客戶端記載：COHR Sherman 6 吋 InP 擴廠動土＋『Coherent 供應交換器前面板的外部雷射模組』直述",
       "type": "ra_admission"
@@ -4652,27 +4692,103 @@
     },
     {
       "added_at": "2026-08-30T12:58:14.185483+00:00",
+      "completion_authority": {
+        "action_digest": "c499b59e9956bfb21feb88bc1935132b8859e9dedfebc4954f6dccf61af7236a",
+        "cohort_id": "dc_0fca807c963dc3b9888e0f83ba6d45a5",
+        "commit": "bfd4a18c65c3e3ac179216df34cd2e66fb4454e2",
+        "company_id": "co:marvell_technology",
+        "verified_at": "2026-08-30T13:33:49.790031+00:00"
+      },
       "hint": "核准 exact graph delta；Decision handoff：co:marvell_technology。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 289,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_b3c8833d8b38c25d7dd7f9077c947778;digest:c499b59e9956bfb21feb88bc1935132b8859e9dedfebc4954f6dccf61af7236a;commit:bfd4a18c65c3e3ac179216df34cd2e66fb4454e2;cohort:dc_0fca807c963dc3b9888e0f83ba6d45a5",
       "ref_id": "ra_b3c8833d8b38c25d7dd7f9077c947778",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-30T13:33:49.790031+00:00",
       "source": "research_action",
       "title": "Marvell 完成收購 Celestial AI（2026-02-02）：Photonic Fabric 正式入 MRVL——關掉 tech:photonic_fabric 覆蓋缺口",
       "type": "ra_admission"
     },
     {
       "added_at": "2026-08-30T13:00:11.323850+00:00",
+      "completion_authority": {
+        "action_digest": "624d223159a7bf741ba7bc025239e3dcab1be903913714e2d3fc1736272c7238",
+        "cohort_id": "dc_957bff3701ea4e46d962bfb9ff0932c8",
+        "commit": "945ec59afe42f185fb24b53459cd6ed790d233d3",
+        "company_id": "co:coherent",
+        "verified_at": "2026-08-30T13:33:51.185086+00:00"
+      },
       "hint": "核准 exact graph delta；Decision handoff：co:coherent。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 290,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_5264de83341f40fc4dc890962e6bf9be;digest:624d223159a7bf741ba7bc025239e3dcab1be903913714e2d3fc1736272c7238;commit:945ec59afe42f185fb24b53459cd6ed790d233d3;cohort:dc_957bff3701ea4e46d962bfb9ff0932c8",
       "ref_id": "ra_5264de83341f40fc4dc890962e6bf9be",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-30T13:33:51.185086+00:00",
       "source": "research_action",
       "title": "政府資金印證 COHR Sherman 6 吋 InP 廠：CHIPS Act 最高 $50M＋德州先期約 $20M——非當事人 costly commitment",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-08-30T13:43:26.064880+00:00",
+      "hint": "coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "n": 291,
+      "reason": null,
+      "ref_id": "dc_6b92df56a6d186eb7464479dfb9c48c3",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:foci：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-30T13:43:26.064880+00:00",
+      "hint": "go（大項）＝reassess 後以 assessment_gap 排入 pq1，研究範圍：commercial_maturity_unknown、source_reliability_unknown、valuation_payoff_unknown。產出為 assessment／研究包，完成後 reassess 以新 decision receipt 結案",
+      "n": 292,
+      "reason": null,
+      "ref_id": "dc_cc46527aac12ba14191ee71c0460f3fe",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:harmonic_drive_systems：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-30T13:43:26.064880+00:00",
+      "hint": "coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
+      "n": 293,
+      "reason": null,
+      "ref_id": "dc_0fca807c963dc3b9888e0f83ba6d45a5",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:marvell_technology：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-30T13:43:26.064880+00:00",
+      "hint": "go（大項）＝reassess 後以 assessment_gap 排入 pq1，研究範圍：source_reliability_corroboration_incomplete。產出為 assessment／研究包，完成後 reassess 以新 decision receipt 結案",
+      "n": 294,
+      "reason": null,
+      "ref_id": "dc_fdab434d1fad67666c57a6eefd379337",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:nvidia：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-30T13:43:26.064880+00:00",
+      "hint": "coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
+      "n": 295,
+      "reason": null,
+      "ref_id": "dc_9d464eeb94b7b0108104db1774bbbdd4",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:poet_technologies：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
     }
   ],
   "log": [
@@ -10651,8 +10767,175 @@
       "ref_id": "dc_cc46527aac12ba14191ee71c0460f3fe",
       "type": "decision_review",
       "verb": "pq1_awaiting_approval"
+    },
+    {
+      "at": "2026-08-30T13:33:37.827846+00:00",
+      "n": 277,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_107fb27c8102240a8e3120995a22f7e4;digest:ef5ccd1d874aa2992365de42e6a640998318ecf4a98866243962cd2b8f2f0439;commit:189b9b6058d54d251333f0dee1344932502be2bf;cohort:dc_fdab434d1fad67666c57a6eefd379337",
+      "ref_id": "ra_107fb27c8102240a8e3120995a22f7e4",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-30T13:33:39.210938+00:00",
+      "n": 280,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_194fa7a7838945631199883231cd40f9;digest:58eddaccc4e543f91c577c6313c3f7c242c09c37b50711ae3172ad1ea5d57a73;commit:2c7b16220fe7a62b40c8f96f8e5bf7460e3b7c4b;cohort:dc_cc46527aac12ba14191ee71c0460f3fe",
+      "ref_id": "ra_194fa7a7838945631199883231cd40f9",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-30T13:33:40.576733+00:00",
+      "n": 281,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_6822236f5e9065ddab7a81b28333ea4c;digest:036cc15fcb406510f612a4b8486cc1ee2d3018780cbdf41e0127f778d509612b;commit:79d3c797b48546c6c47f7eefd6134492ac25bf78;cohort:dc_4d28e50810e46da7fd77ee042ee7bd1c",
+      "ref_id": "ra_6822236f5e9065ddab7a81b28333ea4c",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-30T13:33:41.961225+00:00",
+      "n": 282,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_a207a618ec9118d9389c7f336637e352;digest:b62a2b568f524a0084474eb65083d40be5e77c66d058cb74e573ac192375bc14;commit:cd7e57861fdc44b54fdbbe78b51ad7b7700f1941;cohort:dc_6b92df56a6d186eb7464479dfb9c48c3",
+      "ref_id": "ra_a207a618ec9118d9389c7f336637e352",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-30T13:33:48.416206+00:00",
+      "n": 287,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_795893219e40efd4c3314d7388416a77;digest:d83af29b0a550e684bd51ae07362dba25c7067c8c754fb8c75216cb65f09e29c;commit:3e628569f6a932ead049643bca231fbf5b0817fb;cohort:dc_957bff3701ea4e46d962bfb9ff0932c8",
+      "ref_id": "ra_795893219e40efd4c3314d7388416a77",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-30T13:33:49.790031+00:00",
+      "n": 289,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_b3c8833d8b38c25d7dd7f9077c947778;digest:c499b59e9956bfb21feb88bc1935132b8859e9dedfebc4954f6dccf61af7236a;commit:bfd4a18c65c3e3ac179216df34cd2e66fb4454e2;cohort:dc_0fca807c963dc3b9888e0f83ba6d45a5",
+      "ref_id": "ra_b3c8833d8b38c25d7dd7f9077c947778",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-30T13:33:51.185086+00:00",
+      "n": 290,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_5264de83341f40fc4dc890962e6bf9be;digest:624d223159a7bf741ba7bc025239e3dcab1be903913714e2d3fc1736272c7238;commit:945ec59afe42f185fb24b53459cd6ed790d233d3;cohort:dc_957bff3701ea4e46d962bfb9ff0932c8",
+      "ref_id": "ra_5264de83341f40fc4dc890962e6bf9be",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-30T13:39:52.960939+00:00",
+      "n": 283,
+      "reason": null,
+      "receipt": "authority:graph_admission;ref:edge_resolution_projected_2026-08-30",
+      "ref_id": "extractions/broadcom_q2fy26_cpo_coverage_addendum_2026_08_30.json;extractions/lrcx_10_k_coverage_addendum_2026_08_30.json;extractions/poet_6_k_coverage_addendum_2026_08_30.json",
+      "type": "manual",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-30T13:39:53.112802+00:00",
+      "n": 284,
+      "reason": null,
+      "receipt": "authority:graph_admission;ref:edge_resolution_projected_2026-08-30",
+      "ref_id": "extractions/cpo_paper_coverage_addendum_2026_08_30.json;extractions/gfs_20_f_coverage_addendum_2026_08_30.json;extractions/lumentum_q2fy26_coverage_addendum_2026_08_30.json;extractions/nvda_8k_coverage_addendum_2026_08_30.json;extractions/meta_vistara_coverage_addendum_2026_08_30.json;extractions/poet_6_k_coverage_addendum_w2_2026_08_30.json",
+      "type": "manual",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-30T13:39:53.284628+00:00",
+      "n": 285,
+      "reason": null,
+      "receipt": "authority:graph_admission;ref:edge_resolution_projected_2026-08-30",
+      "ref_id": "extractions/amat_10_k_coverage_addendum_2026_08_30.json;extractions/lrcx_10_q_coverage_addendum_2026_08_30.json;extractions/nvidia_q1fy27_coverage_addendum_2026_08_30.json;extractions/agility_raas_coverage_addendum_2026_08_30.json;extractions/mu_10_q_coverage_addendum_2026_08_30.json",
+      "type": "manual",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-30T13:39:53.457114+00:00",
+      "n": 286,
+      "reason": null,
+      "receipt": "authority:graph_admission;ref:edge_resolution_projected_2026-08-30",
+      "ref_id": "extractions/lite_uhp_sole_source_downgrade_addendum_2026_08_30.json",
+      "type": "manual",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-30T13:42:38.502274+00:00",
+      "n": 262,
+      "reason": null,
+      "receipt": "decision:pd_ad9a9c2ac7e3e0da22654dbec7f40aa7",
+      "ref_id": "dc_cc46527aac12ba14191ee71c0460f3fe",
+      "type": "decision_review",
+      "verb": "pq1_completed"
+    },
+    {
+      "at": "2026-08-30T13:42:38.502274+00:00",
+      "n": 262,
+      "reason": "pq1 completed",
+      "receipt": "decision:pd_ad9a9c2ac7e3e0da22654dbec7f40aa7",
+      "ref_id": "dc_cc46527aac12ba14191ee71c0460f3fe",
+      "type": "decision_review",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-30T13:42:39.260579+00:00",
+      "n": 265,
+      "reason": null,
+      "receipt": "decision:pd_9f9d74f43b7e55130bc9270cfbdcae03",
+      "ref_id": "dc_fdab434d1fad67666c57a6eefd379337",
+      "type": "decision_review",
+      "verb": "pq1_completed"
+    },
+    {
+      "at": "2026-08-30T13:42:39.260579+00:00",
+      "n": 265,
+      "reason": "pq1 completed",
+      "receipt": "decision:pd_9f9d74f43b7e55130bc9270cfbdcae03",
+      "ref_id": "dc_fdab434d1fad67666c57a6eefd379337",
+      "type": "decision_review",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-30T13:43:26.064880+00:00",
+      "n": 276,
+      "prior_waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-08-30T08:28:24.953714+00:00",
+        "trigger": "執行面 context 缺失／技術指標觀測問題",
+        "until": null
+      },
+      "reason": "blocker 已不再全屬等待事件，恢復人工複查",
+      "receipt": null,
+      "ref_id": "dc_67f5e1588990f432e8e0ccce5711e62e",
+      "type": "decision_review",
+      "verb": "event_reactivated"
+    },
+    {
+      "at": "2026-08-30T13:43:26.064880+00:00",
+      "n": 279,
+      "prior_waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-08-30T09:00:00.875691+00:00",
+        "trigger": "技術指標觀測問題",
+        "until": null
+      },
+      "reason": "blocker 已不再全屬等待事件，恢復人工複查",
+      "receipt": null,
+      "ref_id": "dc_b05cc1360e4bdf2a238787c23e7b227d",
+      "type": "decision_review",
+      "verb": "event_reactivated"
     }
   ],
-  "next_n": 291,
+  "next_n": 296,
   "schema_version": "1"
 }
