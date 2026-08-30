@@ -4882,6 +4882,18 @@
       "source": "research_action",
       "title": "Hunterbrook 專利鏈調查：FOCI 整合 Himax 光學元件成 COUPE FAU＋22 通道專利吻合——FOCI 第三 origin",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-08-30T16:30:18.187734+00:00",
+      "hint": "核准 exact graph delta；Decision handoff：co:marvell_technology。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 303,
+      "reason": null,
+      "ref_id": "ra_acd8d79be61a02c7bb9e76ee0b6752ab",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "第三 origin 補強×2：Counterpoint 記載 MRVL Photonic Fabric 16Tbps 與三生態卡位＋borecraft 記載 LuxNet CW 雷射角色",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -11047,6 +11059,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 303,
+  "next_n": 304,
   "schema_version": "1"
 }
