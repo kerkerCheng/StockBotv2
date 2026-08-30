@@ -4274,8 +4274,10 @@
       "added_at": "2026-08-30T04:27:19.725609+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_57e2625d3ce6f046353a16f0f0dd1c43",
+      "dispatch_receipt": "manual_todo:280",
       "dispatch_ref": "wo_734f04d7bfa7c40d78520b8ccea7d0fe",
-      "dispatch_status": "queued",
+      "dispatch_status": "awaiting_approval",
+      "dispatch_updated_at": "2026-08-30T09:04:44.771091+00:00",
       "dispatched_at": "2026-08-30T08:54:47.989890+00:00",
       "hint": "coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 262,
@@ -4539,6 +4541,18 @@
         "trigger": "技術指標觀測問題",
         "until": null
       }
+    },
+    {
+      "added_at": "2026-08-30T09:03:48.249782+00:00",
+      "hint": "核准 exact graph delta；Decision handoff：co:harmonic_drive_systems。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 280,
+      "reason": null,
+      "ref_id": "ra_194fa7a7838945631199883231cd40f9",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "HDS 反路徑入圖：中國諧波挑戰者（Leaderdrive/雙環）市占 15%→38%＋Nabtesco 互補定位",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -10499,8 +10513,26 @@
       "ref_id": "dc_fdab434d1fad67666c57a6eefd379337",
       "type": "decision_review",
       "verb": "pq1_awaiting_approval"
+    },
+    {
+      "at": "2026-08-30T09:04:35.387498+00:00",
+      "n": 262,
+      "reason": null,
+      "receipt": "session:loop3-r3",
+      "ref_id": "dc_cc46527aac12ba14191ee71c0460f3fe",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-08-30T09:04:44.771091+00:00",
+      "n": 262,
+      "reason": "反路徑 packet [280] 已備：中國諧波挑戰者量化軌跡＋Nabtesco 互補判定＋兩家 registry-only 公司首次建圖",
+      "receipt": "manual_todo:280",
+      "ref_id": "dc_cc46527aac12ba14191ee71c0460f3fe",
+      "type": "decision_review",
+      "verb": "pq1_awaiting_approval"
     }
   ],
-  "next_n": 280,
+  "next_n": 281,
   "schema_version": "1"
 }
