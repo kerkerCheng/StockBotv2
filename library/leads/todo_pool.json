@@ -4789,18 +4789,21 @@
     {
       "added_at": "2026-08-30T13:43:26.064880+00:00",
       "dispatch_baseline_decision_id": "pd_54e0323c47b253589b22c4bbc9d39db9",
+      "dispatch_receipt": "decision:pd_2ef79b95c7fe81efbf6620480b05d424",
       "dispatch_ref": "assessment_gap:dc_fdab434d1fad67666c57a6eefd379337",
       "dispatch_scope": [
         "source_reliability_corroboration_incomplete"
       ],
-      "dispatch_status": "queued",
+      "dispatch_status": "completed",
+      "dispatch_updated_at": "2026-08-31T02:11:59.864514+00:00",
       "dispatched_at": "2026-08-31T00:01:02.797613+00:00",
       "hint": "go（大項）＝reassess 後以 assessment_gap 排入 pq1，研究範圍：source_reliability_corroboration_incomplete。產出為 assessment／研究包，完成後 reassess 以新 decision receipt 結案",
       "n": 294,
-      "reason": null,
+      "reason": "pq1 completed",
+      "receipt": "decision:pd_2ef79b95c7fe81efbf6620480b05d424",
       "ref_id": "dc_fdab434d1fad67666c57a6eefd379337",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-31T02:11:59.864514+00:00",
       "source": "decision_lab",
       "title": "co:nvidia：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
@@ -11300,6 +11303,33 @@
       "receipt": "authority:manual;ref:user_approval_2026-08-31_event_watch",
       "ref_id": "manual:306",
       "type": "manual",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-31T02:11:17.036144+00:00",
+      "n": 294,
+      "reason": null,
+      "receipt": "session:queue-r1",
+      "ref_id": "dc_fdab434d1fad67666c57a6eefd379337",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-08-31T02:11:59.864514+00:00",
+      "n": 294,
+      "reason": null,
+      "receipt": "decision:pd_2ef79b95c7fe81efbf6620480b05d424",
+      "ref_id": "dc_fdab434d1fad67666c57a6eefd379337",
+      "type": "decision_review",
+      "verb": "pq1_completed"
+    },
+    {
+      "at": "2026-08-31T02:11:59.864514+00:00",
+      "n": 294,
+      "reason": "pq1 completed",
+      "receipt": "decision:pd_2ef79b95c7fe81efbf6620480b05d424",
+      "ref_id": "dc_fdab434d1fad67666c57a6eefd379337",
+      "type": "decision_review",
       "verb": "go"
     }
   ],
