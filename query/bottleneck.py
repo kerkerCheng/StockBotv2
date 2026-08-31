@@ -58,7 +58,15 @@ MIN_SUBSTITUTABILITY = 4
 #
 # 判準（使用者 2026-08-18）：「要是真的市場有在投資的點，不然一個沒人用的技術的瓶頸，
 # 好像也沒用。」所以錨點必須是**有人在花錢買的終端需求**，不是任何上游節點。
-DEMAND_ANCHORS = frozenset(
+# ⚠ 這裡只是 config 讀不到時的最後防線，**不是 SSOT**。真正的白名單是
+# `config/sector_anchors.json` 的所有 anchors（[323]，2026-08-31）。
+#
+# 事發：白名單原本硬編在這裡（4 個，全屬 AI 光互連），而 config 宣告了 12 個分屬五個
+# 產業——**交集只有 2 個**。後果是產業分組永遠只長得出光互連：其他產業的邊走不到任何
+# 被認可的錨，一律落入「🔴 無需求錨」並被標成「資金不在鏈上、非候選」。實測 GF 那 6 條
+# 成熟製程晶片的邊就是這樣被誤判的——車用／工業 MCU 當然有人花錢買。
+# 同一個分類有兩份且已偏離（L16）；SSOT 收斂到 config 後，新增產業只改 config。
+_ANCHOR_FALLBACK = frozenset(
     {
         "tech:ai_compute_buildout",
         "tech:ai_switch",
@@ -66,6 +74,28 @@ DEMAND_ANCHORS = frozenset(
         "tech:optical_scale_up",
     }
 )
+
+
+def load_demand_anchors(path: str = "config/sector_anchors.json") -> frozenset[str]:
+    """需求錨白名單（SSOT：config/sector_anchors.json 的所有 anchors）。
+
+    判準不變（使用者 2026-08-18）：錨必須是**有人在花錢買的終端需求**，不是任何上游
+    節點。新增產業＝在 config 加一組錨，不改演算法。
+    """
+    try:
+        with open(path, encoding="utf-8") as handle:
+            data = json.load(handle)
+    except (OSError, json.JSONDecodeError):
+        return _ANCHOR_FALLBACK
+    anchors = {
+        str(anchor)
+        for anchor_list in (data.get("sectors") or {}).values()
+        for anchor in anchor_list
+    }
+    return frozenset(anchors) or _ANCHOR_FALLBACK
+
+
+DEMAND_ANCHORS = load_demand_anchors()
 
 # 五級（2026-08-30，使用者核准 [270]）。設計動機：三級制**過度懲罰自報**——客戶端印證
 # 常與重定價事件同日到達（COHR 實測 Shadow 42.76 → 印證日 68+），等印證＝系統性遲到；
@@ -298,7 +328,7 @@ def build_upward_index(edges: Iterable[CanonicalEdge]) -> dict[str, set[str]]:
 def demand_chain(
     target: str,
     upward: Mapping[str, set[str]],
-    anchors: Iterable[str] = DEMAND_ANCHORS,
+    anchors: Iterable[str] | None = None,
     max_depth: int = 8,
 ) -> list[str] | None:
     """從瓶頸標的往上走到**明確登記的需求錨點**，回傳最短的一條鏈；走不到回 None。
@@ -309,7 +339,9 @@ def demand_chain(
     **走不到就是走不到，回 None。** 依使用者判準，連不到有人花錢的地方的瓶頸，
     不該被當成投資標的看待——這裡不得用「最接近的節點」充數。
     """
-    anchor_set = set(anchors)
+    # ⚠ 不用預設參數綁定（`anchors=DEMAND_ANCHORS`）：那會在函式定義時就凍結當時的值，
+    # config 之後怎麼改都讀不到。同一個陷阱在 event_watch.load_watches 也踩過。
+    anchor_set = set(anchors) if anchors is not None else set(load_demand_anchors())
     if target in anchor_set:
         return [target]
     queue: list[tuple[str, list[str]]] = [(target, [target])]
