@@ -1,0 +1,90 @@
+{
+ "schema_version": "0.1",
+ "source_doc": {
+  "doc_id": "tsem_openlight_cadence_pdk_6k_2026_08_11",
+  "evidence_tier": 1,
+  "origin_entity": "Tower Semiconductor / OpenLight (joint press release)",
+  "permission_basis": "Official public SEC filing (6-K with furnished joint press release); canonical URL retained, only research-relevant excerpts stored.",
+  "published_at": "2026-08-11",
+  "publisher": "SEC EDGAR",
+  "retrieved_at": "2026-08-31",
+  "source_type": "filing",
+  "storage_permission": "repo_excerpt",
+  "title": "Tower Semiconductor 6-K — OpenLight PDK available in Cadence EDA tools for PH18DA InP-on-silicon platform——Tower→PH18DA substitutability 判斷 addendum（[271]）",
+  "url": "https://www.sec.gov/Archives/edgar/data/928876/000117891326004009/zk2635926.htm"
+ },
+ "sources": [
+  {
+   "id": "tsem_openlight_cadence_pdk_6k_2026_08_11_s1",
+   "locator": "press release lede",
+   "quote": "today announced the availability of OpenLight’s photonic Process Design Kit (PDK) for Tower Semiconductor’s PH18DA indium phosphide (InP)-on-silicon photonics platform in Cadence’s electronic design automation (EDA) tools."
+  },
+  {
+   "id": "tsem_openlight_cadence_pdk_6k_2026_08_11_s3",
+   "locator": "platform description paragraph",
+   "quote": "Designs created using OpenLight‘s PDK support fabrication on Tower’s PH18DA InP-on-silicon photonics platform, which enables the integration of active photonic components - including lasers, modulators, and amplifiers - into a single monolithic PIC."
+  }
+ ],
+ "nodes": [
+  {
+   "id": "co:tower_semiconductor",
+   "type": "Company",
+   "name": "Tower Semiconductor",
+   "aliases": [
+    "TSEM"
+   ],
+   "role": null,
+   "abstraction_level": "foundry_packaging",
+   "confidence": 0.85,
+   "source_ids": [
+    "tsem_openlight_cadence_pdk_6k_2026_08_11_s1"
+   ],
+   "attributes": {}
+  },
+  {
+   "id": "prod:ph18da",
+   "type": "Product",
+   "name": "PH18DA InP-on-Silicon Photonics Platform",
+   "aliases": [
+    "PH18DA"
+   ],
+   "role": null,
+   "abstraction_level": "foundry_packaging",
+   "confidence": 0.85,
+   "source_ids": [
+    "tsem_openlight_cadence_pdk_6k_2026_08_11_s1"
+   ],
+   "attributes": {}
+  }
+ ],
+ "edges": [
+  {
+   "id": "sub271_1",
+   "src_id": "co:tower_semiconductor",
+   "relation": "supplies_to",
+   "dst_id": "prod:ph18da",
+   "confidence": 0.8,
+   "source_ids": [
+    "tsem_openlight_cadence_pdk_6k_2026_08_11_s1",
+    "tsem_openlight_cadence_pdk_6k_2026_08_11_s3"
+   ],
+   "attributes": {
+    "substitutability": 4
+   }
+  }
+ ],
+ "claims": [
+  {
+   "id": "tsem_openlight_cadence_pdk_6k_2026_08_11_cl_sub271",
+   "statement": "Tower→PH18DA substitutability 判斷（[271] packet，研究判斷非量測）：sub=4。理由：以 OpenLight PDK＋Cadence 流程在 PH18DA 上完成設計的 PIC 是製程鎖定的——換代工廠＝重設計＋重驗證（異質 III-V on silicon 平台無 drop-in 替代）；不評 5 因設計鎖定前存在平台級替代（UMC 已授權 imec iSiPP300 risk production 2026-27、GF 有矽光平台），競爭在 design-win 階段而非量產階段。",
+   "subject_id": "co:tower_semiconductor",
+   "confidence": 0.75,
+   "demand_proof_level": "guided",
+   "source_ids": [
+    "tsem_openlight_cadence_pdk_6k_2026_08_11_s1",
+    "tsem_openlight_cadence_pdk_6k_2026_08_11_s3"
+   ],
+   "disproof_condition": "若 UMC/GF 平台展示同級雷射整合（InP-on-Si active integration）且有客戶跨平台移植成功案例，sub 降至 3。"
+  }
+ ]
+}

@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "hypotheses": [
+    {
+      "hypothesis_id": "hy_0001_2026-08-31",
+      "created_at": "2026-08-31T04:49:10.492784+00:00",
+      "expires": "2026-11-30",
+      "status": "active",
+      "source_handle": "@x_screenshot_axti_shortage",
+      "lead_id": "lead_2061d895e6e162c",
+      "statement": "InP 基板嚴重短缺觸發史上最大漲價；供應商明言有錢也買不到（截圖轉述，原報告未得）——若真，AXT 對 InP 基板的邊應為 sub=5＋sole_source 級稀缺",
+      "edges": [
+        {
+          "src_id": "co:axt",
+          "relation": "supplies_to",
+          "dst_id": "mat:inp_substrate",
+          "attributes": {
+            "substitutability": 5,
+            "sole_source": true
+          }
+        }
+      ],
+      "facts": [
+        {
+          "text": "InP substrate ASP 大幅上調（2in 起）",
+          "check_ref": "AXTI 下季財報 ASP/毛利率",
+          "entities": [
+            "AXTI"
+          ]
+        }
+      ],
+      "skeleton_ref": "",
+      "watch_id": "",
+      "note": "B 類（Nomura/報價單截圖）；平行驗證路徑=AXTI 財報 ASP",
+      "verified_by": null
+    },
+    {
+      "hypothesis_id": "hy_0002_2026-08-31",
+      "created_at": "2026-08-31T04:49:10.492808+00:00",
+      "expires": "2026-11-30",
+      "status": "active",
+      "source_handle": "@x_screenshot_ms_cpo",
+      "lead_id": "lead_b1e793c56033413",
+      "statement": "Morgan Stanley CPO note 將 SIVE 與 COHR/LITE 並列 laser supply 關鍵參與者（截圖，原報告未得）——若真，SIVE 應有對 ELS 的結構性邊",
+      "edges": [
+        {
+          "src_id": "co:sivers_semiconductors",
+          "relation": "supplies_to",
+          "dst_id": "tech:external_laser_source",
+          "attributes": {
+            "substitutability": 4
+          }
+        }
+      ],
+      "facts": [
+        {
+          "text": "SIVE 獲 CPO 相關 laser 訂單/設計案",
+          "check_ref": "SIVE 官方公告（已在 harvest watch）",
+          "entities": [
+            "SIVE"
+          ]
+        }
+      ],
+      "skeleton_ref": "",
+      "watch_id": "",
+      "note": "B 類（sell-side note 截圖）；平行驗證=SIVE 公告 harvest（T0 已覆蓋）",
+      "verified_by": null
+    }
+  ],
+  "source_credibility": {}
+}

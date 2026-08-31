@@ -4444,9 +4444,10 @@
       "hint": "go（大項）＝bounded research 產出 sub 判斷 packet（同 [256] 形狀：judgment＋disproof＋逐字錨），入圖另取 ra_admission/manual 編號。驗收=Tower 進入瓶頸排序候選或有據缺席。不含：直接改圖、thesis mutation。",
       "n": 271,
       "reason": null,
+      "receipt": "authority:manual;ref:tower_ph18da_sub_addendum_2026_08_31",
       "ref_id": "manual:271",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-31T04:48:35.788709+00:00",
       "source": "manual",
       "title": "Tower 鏈 substitutability 補值研究：IQE→Tower InP epiwafer（最低採購承諾佐證）與 Tower→PH18DA 等邊的 sub 判斷 packet",
       "type": "manual"
@@ -5239,6 +5240,18 @@
       "source": "research_action",
       "title": "PH18DA 首批量產訂單：NewPhotonics 具名採用 OpenLight×Tower 平台（800G/1.6T）——Tower 鏈成熟度躍遷",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-08-31T04:48:35.627604+00:00",
+      "hint": "[271] 授權產出的 sub 判斷 packet ｜ go＝loader 載入 addendum＋edge_resolution project；不含 thesis mutation",
+      "n": 319,
+      "reason": null,
+      "ref_id": "extractions/tower_ph18da_sub_addendum_2026_08_31.json",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "Tower→PH18DA sub=4 判斷 addendum 入圖（[271] packet）：平台鎖定→sub 4、design-win 階段競爭為 disproof 軸",
+      "type": "manual"
     }
   ],
   "log": [
@@ -11874,8 +11887,17 @@
       "ref_id": "dc_2bd6137c75808ec4f28541111927d588",
       "type": "decision_review",
       "verb": "pq1_awaiting_approval"
+    },
+    {
+      "at": "2026-08-31T04:48:35.788709+00:00",
+      "n": 271,
+      "reason": null,
+      "receipt": "authority:manual;ref:tower_ph18da_sub_addendum_2026_08_31",
+      "ref_id": "manual:271",
+      "type": "manual",
+      "verb": "go"
     }
   ],
-  "next_n": 319,
+  "next_n": 320,
   "schema_version": "1"
 }
