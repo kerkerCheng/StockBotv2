@@ -5602,26 +5602,42 @@
     },
     {
       "added_at": "2026-08-31T13:52:09.597563+00:00",
+      "completion_authority": {
+        "action_digest": "302f27a4b24d5fe7f635015cb7d96cc8bc36aa3d7dcd13368af980c4ac4ba2f9",
+        "cohort_id": "dc_912a03a50135ea5e29000a0417c3f477",
+        "commit": "d07b5d27c59c11ba810cb25dee31104da37a60b0",
+        "company_id": "co:schaeffler",
+        "verified_at": "2026-08-31T14:09:30.307494+00:00"
+      },
       "graph_impact": "+8 節點、6 邊、4 claims｜來源：Power & Motion（獨立產業媒體，非 Schaeffler 自家發布）（tier 3）、Humanoid（機器人開發商，即採購方自家公告——客戶端文件）（tier 2）、all-about-industries（獨立產業媒體，報導 CES 2026 發表）（tier 3）",
       "hint": "核准 exact graph delta；Decision handoff：co:schaeffler。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 339,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_353d5e662ef996de0a8f0f649e599819;digest:302f27a4b24d5fe7f635015cb7d96cc8bc36aa3d7dcd13368af980c4ac4ba2f9;commit:d07b5d27c59c11ba810cb25dee31104da37a60b0;cohort:dc_912a03a50135ea5e29000a0417c3f477",
       "ref_id": "ra_353d5e662ef996de0a8f0f649e599819",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-31T14:09:30.307494+00:00",
       "source": "research_action",
       "title": "Schaeffler 站在 Tesla 架構正在遷入的那一層（滾柱絲槓）＋首份客戶端具名——但那是互惠交易",
       "type": "ra_admission"
     },
     {
       "added_at": "2026-08-31T13:58:08.727965+00:00",
+      "completion_authority": {
+        "action_digest": "f9e0acb83cad2fe0ff0f743557706a4e006595227e7e97e1b45d3c16c48e5209",
+        "cohort_id": "dc_21d81aa11dd2fe85c747b1c759fd01ed",
+        "commit": "673dcb7a10f6b58132c1e9cc17168fd5b718de6a",
+        "company_id": "co:mp_materials",
+        "verified_at": "2026-08-31T14:09:31.612232+00:00"
+      },
       "graph_impact": "+7 節點、4 邊、3 claims｜來源：Rare Earth Exchanges（獨立產業媒體，非磁材廠也非礦商）（tier 3）、Niron Magnetics（公司自家新聞稿）（tier 2）、Niron Magnetics（公司自家新聞稿；但引述的投資方為汽車 OEM＝需求端）（tier 2）",
       "hint": "核准 exact graph delta；Decision handoff：co:mp_materials。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 340,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_51dd311adb87e5968825bab8a059b6b8;digest:f9e0acb83cad2fe0ff0f743557706a4e006595227e7e97e1b45d3c16c48e5209;commit:673dcb7a10f6b58132c1e9cc17168fd5b718de6a;cohort:dc_21d81aa11dd2fe85c747b1c759fd01ed",
       "ref_id": "ra_51dd311adb87e5968825bab8a059b6b8",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-31T14:09:31.612232+00:00",
       "source": "research_action",
       "title": "[338] 稀土不可替代邊界＝磁體厚度，不是應用類別——而我們追的那一格正被工程解掉",
       "type": "ra_admission"
@@ -12639,6 +12655,24 @@
       "receipt": "authority:decompose;ref:decompose:optimus-actuator-2026-08-31",
       "ref_id": "decompose_magnet_motor",
       "type": "manual",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-31T14:09:30.307494+00:00",
+      "n": 339,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_353d5e662ef996de0a8f0f649e599819;digest:302f27a4b24d5fe7f635015cb7d96cc8bc36aa3d7dcd13368af980c4ac4ba2f9;commit:d07b5d27c59c11ba810cb25dee31104da37a60b0;cohort:dc_912a03a50135ea5e29000a0417c3f477",
+      "ref_id": "ra_353d5e662ef996de0a8f0f649e599819",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-31T14:09:31.612232+00:00",
+      "n": 340,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_51dd311adb87e5968825bab8a059b6b8;digest:f9e0acb83cad2fe0ff0f743557706a4e006595227e7e97e1b45d3c16c48e5209;commit:673dcb7a10f6b58132c1e9cc17168fd5b718de6a;cohort:dc_21d81aa11dd2fe85c747b1c759fd01ed",
+      "ref_id": "ra_51dd311adb87e5968825bab8a059b6b8",
+      "type": "ra_admission",
       "verb": "go"
     }
   ],

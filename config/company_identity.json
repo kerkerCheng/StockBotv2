@@ -130,6 +130,10 @@
       "research_ticker": "ENA.V"
     },
     {
+      "company_id": "co:ewellix",
+      "research_ticker": null
+    },
+    {
       "company_id": "co:fabrinet",
       "research_ticker": "FN",
       "market_currency": "USD",
@@ -170,6 +174,17 @@
       "company_id": "co:hexagon",
       "research_ticker": "HEXA-B.ST",
       "market_currency": "SEK"
+    },
+    {
+      "company_id": "co:himax",
+      "research_ticker": "HIMX",
+      "market_currency": "USD",
+      "execution_currency": "USD",
+      "execution_venue": "NASDAQ"
+    },
+    {
+      "company_id": "co:humanoid",
+      "research_ticker": null
     },
     {
       "company_id": "co:hyundai_mobis",
@@ -259,6 +274,13 @@
       "market_currency": "TWD"
     },
     {
+      "company_id": "co:lynas",
+      "research_ticker": "LYC.AX",
+      "market_currency": "AUD",
+      "execution_currency": "AUD",
+      "execution_venue": "ASX"
+    },
+    {
       "company_id": "co:macom",
       "research_ticker": "MTSI",
       "market_currency": "USD",
@@ -298,6 +320,13 @@
       "research_ticker": null
     },
     {
+      "company_id": "co:mp_materials",
+      "research_ticker": "MP",
+      "market_currency": "USD",
+      "execution_currency": "USD",
+      "execution_venue": "NYSE"
+    },
+    {
       "company_id": "co:nabtesco",
       "research_ticker": "6268.T",
       "market_currency": "JPY",
@@ -325,6 +354,10 @@
       "market_currency": "JPY",
       "execution_currency": "JPY",
       "execution_venue": "TSE"
+    },
+    {
+      "company_id": "co:niron_magnetics",
+      "research_ticker": null
     },
     {
       "company_id": "co:nvidia",
@@ -483,27 +516,6 @@
     {
       "company_id": "co:zhongji_innolight",
       "research_ticker": "300308.SZ"
-    },
-    {
-      "company_id": "co:mp_materials",
-      "research_ticker": "MP",
-      "market_currency": "USD",
-      "execution_currency": "USD",
-      "execution_venue": "NYSE"
-    },
-    {
-      "company_id": "co:lynas",
-      "research_ticker": "LYC.AX",
-      "market_currency": "AUD",
-      "execution_currency": "AUD",
-      "execution_venue": "ASX"
-    },
-    {
-      "company_id": "co:himax",
-      "research_ticker": "HIMX",
-      "market_currency": "USD",
-      "execution_currency": "USD",
-      "execution_venue": "NASDAQ"
     }
   ]
 }
