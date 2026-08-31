@@ -30,7 +30,34 @@ pq1 工單（Schaeffler、NVIDIA、奇景、Lynas、上詮）從頭到尾沒被�
 
 ---
 
-## Step 0 — 先讀狀態，不依賴對話記憶
+## Step 0 — 先避讓排程，再讀狀態
+
+**本 skill 是長時間、連續寫入的操作，而本機排程寫的是同一組檔。**
+`AGENTS.md`：「同一 working tree 只讓一個 agent 寫入……**排程與互動 session 也算兩個
+writer，不能重疊**。」重疊時最危險的不是報錯，是**靜默的 lost update**——daily 剛
+harvest 進來的 lead 被本 skill 用舊狀態覆蓋掉，沒有任何東西會叫。
+
+```powershell
+& '.venv\Scripts\python.exe' scripts\writer_guard.py check --minutes <預計時長>
+```
+
+**exit 2 就不要開始。** 三種不安全：現在落在 daily 避讓窗內、**這段 run 會跨進窗內**
+（起跑時安全不代表跑到一半安全，而跑到一半撞上最難收拾）、working tree 不乾淨
+（可能有另一個 writer 在跑，或上一輪沒收乾淨）。
+
+把回傳的 `head` 記下來，之後每個里程碑用它比對：
+
+```powershell
+& '.venv\Scripts\python.exe' scripts\writer_guard.py verify --since <開跑時的 HEAD>
+```
+
+exit 2 代表期間排程側提交過共用檔——**立刻重讀 `todo_pool.json`／`pending_leads.json`
+再繼續，不得沿用記憶中的狀態**。
+
+⚠ **這是單向避讓不是互斥鎖**：只有互動側會檢查。真正的雙向鎖要動 daily 的 sandbox
+allowlist（見 ROADMAP）。單向仍然有效，因為 daily 有界且時間可預測——讓開就不會撞。
+
+接著讀狀態：
 
 ```powershell
 git status --short
@@ -140,6 +167,10 @@ Samsung／SKH 側」）。這種問題 park 成 pq2 並繼續下一條，收尾�
 ① 所有 in-flight lead 都 checkpoint 在合法狀態（不留 `researching` 懸空）；
 ② commit ＋ push；③ 回覆裡寫明「已清 N／剩 M」與下一條要做什麼。
 續跑的 session 從 Step 0 重讀狀態接手。
+
+⚠ **撞到避讓窗也是中斷，處置完全相同。** 跑到一半 `writer_guard verify` 回 exit 2，
+或時間逼近 daily 窗，一律照中斷程序收乾淨後停——**不要「再做完這一條就好」**：
+留一個 `researching` 懸空的 lead 給排程去撞，正是本 guard 要防的事。
 
 ---
 

@@ -1,5 +1,23 @@
 {
   "schema_version": "1",
+  "schedule": {
+    "_doc": [
+      "本機排程的時間窗，給**互動 session 用來避讓**，不是給排程器讀的",
+      "（實際觸發仍在 OS task scheduler）。",
+      "事發 2026-08-31：`AGENTS.md` 早就寫著「排程與互動 session 也算兩個 writer，",
+      "不能重疊」，但 06:30 這個時間只存在於散文與排程器設定裡，程式看不到，",
+      "所以程式也不可能自己避開——保護完全靠人記得（L14：真正的防呆要會自己出現）。",
+      "兩邊寫的是同一組檔：pending_leads.json／todo_pool.json／event_watches.json ＋ git。",
+      "⚠ 這是**單向避讓**不是互斥鎖：只有互動側會檢查。真正的雙向鎖需要動 daily 的",
+      "sandbox allowlist（見 ROADMAP）。單向仍然有效，因為 daily 有界且時間可預測。"
+    ],
+    "timezone": "Asia/Taipei",
+    "daily_local_time": "06:30",
+    "weekly_local_time": "04:00",
+    "weekly_weekday": "sunday",
+    "expected_duration_minutes": 60,
+    "guard_margin_minutes": 15
+  },
   "pq1": {
     "drain_limit_per_run": 12,
     "tracked_ticker_sources": {

@@ -315,6 +315,11 @@ D7 的判準本身仍然有效，只是不再有這個 gate 可套用。
 
 ### 未排程
 
+| 項目 | 為什麼還沒做 | 驗收條件 | 先做什麼 |
+|---|---|---|---|
+| **排程與互動 session 的互斥仍是單向避讓，不是鎖** | 2026-08-31 建了 `scripts/writer_guard.py`，但**只有互動側會呼叫**：daily 那側要加同樣檢查必須動 `.codex/rules/stockbot-automations.rules` 的 16 條 exact allowlist（新增命令＝sandbox impact review，見 `AGENTS.md` 該契約）。目前靠「daily 有界且時間可預測、互動側讓開」成立，**但 daily 若延遲或超時就失效**。repo 內原本 `filelock`／`flock`／pidfile 全部 0 命中，所以這是從無到單向，不是從單向到雙向 | 兩側都在寫 `library/leads/*.json` 前取得同一個 advisory lock；lock 需 stale-tolerant（崩潰的 session 不得永久卡住）。baseline：目前互動側 exit 2 可擋、排程側 0 檢查 | 先量測 daily 實際執行時長分布——`expected_duration_minutes=60` 目前是拍腦袋值，窗開太寬會讓互動 session 無謂等待，開太窄則保護失效 |
+
+
 **private authority 備份已於 2026-08-30 交付**（見「已交付」表；service account 死路與
 Testing 模式 token 過期兩個判準保留在 `docs/OPERATIONS.md`「Private authority 備份」）。
 
