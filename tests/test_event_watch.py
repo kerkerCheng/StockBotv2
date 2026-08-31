@@ -101,3 +101,26 @@ def test_counters_shape():
     c = ew.counters(data)
     assert c["active"] == 2 and c["t1_date"] == 1 and c["t0_passive"] == 1
     assert c["t2_pollable"] == 1
+
+
+def test_wake_target_exactly_one_of_pq2_or_hypothesis():
+    data = _fresh()
+    with pytest.raises(ew.EventWatchError):
+        ew.add_watch(data, kind="date", wake_pq2=1, expires="2027-01-01",
+                     until="2026-09-01", hypothesis_ref="hy_x")
+    with pytest.raises(ew.EventWatchError):
+        ew.add_watch(data, kind="date", expires="2027-01-01", until="2026-09-01")
+    w = ew.add_watch(
+        data, kind="fact_verification", expires="2027-01-01",
+        entities=["AXTI"], fact="ASP 上調", hypothesis_ref="hy_0001",
+    )
+    assert w["wake_pq2"] is None and w["hypothesis_ref"] == "hy_0001"
+    # 觸發後 woken_by 帶 hypothesis_ref＋fact
+    w["created_at"] = "2026-09-01T00:00:00+00:00"
+    leads = {"l1": _lead(entities=[], decided="2026-09-02T00:00:00+00:00")}
+    leads["l1"]["entities"]["tickers"] = ["AXTI"]
+    fired = ew.check_watches(data, leads=leads, today=date(2026, 9, 2))
+    assert fired and fired[0]["woken_by"]["hypothesis_ref"] == "hy_0001"
+    assert fired[0]["woken_by"]["fact"] == "ASP 上調"
+    ew.consume_fired(data, w["watch_id"])
+    assert data["watches"][0]["status"] == "consumed"

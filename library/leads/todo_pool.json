@@ -4407,21 +4407,22 @@
     {
       "added_at": "2026-08-30T07:21:33.865312+00:00",
       "dispatch_baseline_decision_id": "pd_dc19bb776e402a8df67ab26de274a81d",
-      "dispatch_receipt": "manual_todo:318",
+      "dispatch_receipt": "decision:pd_913e71b7d2cdfc9a8777ccc939ada3b9",
       "dispatch_ref": "assessment_gap:dc_2bd6137c75808ec4f28541111927d588",
       "dispatch_scope": [
         "source_reliability_corroboration_incomplete"
       ],
-      "dispatch_status": "awaiting_approval",
-      "dispatch_updated_at": "2026-08-31T04:47:33.733128+00:00",
+      "dispatch_status": "completed",
+      "dispatch_updated_at": "2026-08-31T05:00:26.999540+00:00",
       "dispatched_at": "2026-08-31T04:42:24.786309+00:00",
       "hint": "當前 missing_data：終端客戶（hyperscaler／switch OEM）具名採用 PH18DA 平台產品的揭露——現有印證止於供應鏈中游（共 1 項）｜go（大項）＝reassess 後以 assessment_gap 排入 pq1，研究範圍：source_reliability_corroboration_incomplete。產出為 assessment／研究包，完成後 reassess 以新 decision receipt 結案",
       "n": 269,
-      "reason": null,
+      "reason": "pq1 completed",
+      "receipt": "decision:pd_913e71b7d2cdfc9a8777ccc939ada3b9",
       "ref_id": "dc_2bd6137c75808ec4f28541111927d588",
       "residual_digest": "bea37d97728d5b67",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-31T05:00:26.999540+00:00",
       "source": "decision_lab",
       "title": "co:tower_semiconductor：殘餘缺口——終端客戶（hyperscaler／switch OEM）具名採用 PH18DA 平台產品的揭露——現有印證止於供應鏈中游",
       "type": "decision_review"
@@ -5209,10 +5210,11 @@
       "added_at": "2026-08-31T04:42:07.944868+00:00",
       "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2025-12-31T00:00:00+00:00；來源=MP Materials FY2025 10-K (filed 2026-02-26, CIK 0001801368) Recent Developments ",
       "n": 316,
-      "reason": null,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_6336c54344760780da9f9ce0ed7c4812;proposal:po_cd33827a1dd5f8c23162747498aebd48",
       "ref_id": "po_cd33827a1dd5f8c23162747498aebd48",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-31T04:59:51.054547+00:00",
       "source": "engine_c",
       "title": "Engine C 觀測：MP / backlog",
       "type": "engine_c_observation"
@@ -5231,12 +5233,20 @@
     },
     {
       "added_at": "2026-08-31T04:47:23.448903+00:00",
+      "completion_authority": {
+        "action_digest": "d499cf4237bc761439512dcd0a8e5019ee69344256054c9522559b0a364a5ad8",
+        "cohort_id": "dc_2bd6137c75808ec4f28541111927d588",
+        "commit": "40f8d59505d33fea30ca50e02af491625801c4b8",
+        "company_id": "co:tower_semiconductor",
+        "verified_at": "2026-08-31T05:00:17.857608+00:00"
+      },
       "hint": "核准 exact graph delta；Decision handoff：co:tower_semiconductor。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 318,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_3e866766b851d73ab327ffe985981988;digest:d499cf4237bc761439512dcd0a8e5019ee69344256054c9522559b0a364a5ad8;commit:40f8d59505d33fea30ca50e02af491625801c4b8;cohort:dc_2bd6137c75808ec4f28541111927d588",
       "ref_id": "ra_3e866766b851d73ab327ffe985981988",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-31T05:00:17.857608+00:00",
       "source": "research_action",
       "title": "PH18DA 首批量產訂單：NewPhotonics 具名採用 OpenLight×Tower 平台（800G/1.6T）——Tower 鏈成熟度躍遷",
       "type": "ra_admission"
@@ -5246,9 +5256,10 @@
       "hint": "[271] 授權產出的 sub 判斷 packet ｜ go＝loader 載入 addendum＋edge_resolution project；不含 thesis mutation",
       "n": 319,
       "reason": null,
+      "receipt": "authority:graph_admission;ref:tower_ph18da_sub_projected_2026-08-31",
       "ref_id": "extractions/tower_ph18da_sub_addendum_2026_08_31.json",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-31T05:00:19.180310+00:00",
       "source": "manual",
       "title": "Tower→PH18DA sub=4 判斷 addendum 入圖（[271] packet）：平台鎖定→sub 4、design-win 階段競爭為 disproof 軸",
       "type": "manual"
@@ -11895,6 +11906,51 @@
       "receipt": "authority:manual;ref:tower_ph18da_sub_addendum_2026_08_31",
       "ref_id": "manual:271",
       "type": "manual",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-31T04:59:51.054547+00:00",
+      "n": 316,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_6336c54344760780da9f9ce0ed7c4812;proposal:po_cd33827a1dd5f8c23162747498aebd48",
+      "ref_id": "po_cd33827a1dd5f8c23162747498aebd48",
+      "type": "engine_c_observation",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-31T05:00:17.857608+00:00",
+      "n": 318,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_3e866766b851d73ab327ffe985981988;digest:d499cf4237bc761439512dcd0a8e5019ee69344256054c9522559b0a364a5ad8;commit:40f8d59505d33fea30ca50e02af491625801c4b8;cohort:dc_2bd6137c75808ec4f28541111927d588",
+      "ref_id": "ra_3e866766b851d73ab327ffe985981988",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-31T05:00:19.180310+00:00",
+      "n": 319,
+      "reason": null,
+      "receipt": "authority:graph_admission;ref:tower_ph18da_sub_projected_2026-08-31",
+      "ref_id": "extractions/tower_ph18da_sub_addendum_2026_08_31.json",
+      "type": "manual",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-31T05:00:26.999540+00:00",
+      "n": 269,
+      "reason": null,
+      "receipt": "decision:pd_913e71b7d2cdfc9a8777ccc939ada3b9",
+      "ref_id": "dc_2bd6137c75808ec4f28541111927d588",
+      "type": "decision_review",
+      "verb": "pq1_completed"
+    },
+    {
+      "at": "2026-08-31T05:00:26.999540+00:00",
+      "n": 269,
+      "reason": "pq1 completed",
+      "receipt": "decision:pd_913e71b7d2cdfc9a8777ccc939ada3b9",
+      "ref_id": "dc_2bd6137c75808ec4f28541111927d588",
+      "type": "decision_review",
       "verb": "go"
     }
   ],

@@ -1374,6 +1374,12 @@ def _check_event_watches(pool: dict[str, Any], *, stamp: str) -> tuple[int, dict
         fired = event_watch.check_watches(data, leads=leads)
         woken = 0
         for watch in fired:
+            if not watch.get("wake_pq2"):
+                # 假設型 fact-check 到點：沒有 pq2 可翻醒——停在 fired 現形於
+                # 計數器（fired_unconsumed），agent 對照＋verify 後以
+                # `event_watch consume` 收掉。刻意不自動 consume：對照是研究
+                # 動作，收據要留在假設層。
+                continue
             n = int(watch["wake_pq2"])
             item = next(
                 (it for it in pool["items"]

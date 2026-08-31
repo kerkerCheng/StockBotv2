@@ -80,7 +80,7 @@ def add_watch(
     data: dict[str, Any],
     *,
     kind: str,
-    wake_pq2: int,
+    wake_pq2: int | None = None,
     expires: str,
     until: str | None = None,
     entities: Iterable[str] = (),
@@ -101,6 +101,10 @@ def add_watch(
         raise EventWatchError("kind=fact_verification 必須帶 fact 與 entities")
     if not expires:
         raise EventWatchError("expires 必填——無限期等待會腐爛成事實（brainstorm 硬邊界）")
+    # 喚醒目標二選一（2026-08-31 小改）：pq2 編號（翻醒 waiting 項）或假設 id
+    # （fact-check 到點——觸發後停在 fired 現形，agent 對照＋verify 後 consume）。
+    if bool(wake_pq2) == bool(hypothesis_ref):
+        raise EventWatchError("wake_pq2 與 hypothesis_ref 必須恰好擇一")
     watch = {
         "watch_id": f"ew_{len(data['watches']) + 1:04d}_{_today().isoformat()}",
         "created_at": _now(),
@@ -110,7 +114,7 @@ def add_watch(
         "entities": sorted({str(e).strip() for e in entities if str(e).strip()}),
         "fact": fact,
         "fact_check_ref": fact_check_ref,
-        "wake_pq2": int(wake_pq2),
+        "wake_pq2": int(wake_pq2) if wake_pq2 else None,
         "hypothesis_ref": hypothesis_ref,
         "poll": {
             "eligible": bool(poll_eligible),
@@ -283,9 +287,13 @@ def _render_watch(watch: Mapping[str, Any]) -> str:
         "fact_verification": f"對照 {watch.get('fact', '')[:50]}",
     }[kind]
     poll = "｜可輪詢" if (watch.get("poll") or {}).get("eligible") else ""
+    target = (
+        f"pq2 [{watch['wake_pq2']}]" if watch.get("wake_pq2")
+        else f"假設 {watch.get('hypothesis_ref')}"
+    )
     return (
         f"  {watch['watch_id']} [{watch['status']}] {kind}：{detail}"
-        f" → 喚醒 pq2 [{watch['wake_pq2']}]{poll}（expires {watch['expires']}）"
+        f" → 喚醒 {target}{poll}（expires {watch['expires']}）"
     )
 
 
@@ -296,16 +304,19 @@ def main(argv: list[str] | None = None) -> int:
     sub = parser.add_subparsers(dest="cmd", required=True)
     sub.add_parser("list")
     sub.add_parser("counters")
+    consume = sub.add_parser("consume", help="假設對照完成後收掉 fired watch")
+    consume.add_argument("watch_id")
     sweep = sub.add_parser("sweep", help="列出本輪 T2 該查的 watch（agent 拿去 WebSearch）")
     sweep.add_argument("--mark-checked", action="store_true")
     add = sub.add_parser("add")
     add.add_argument("--kind", required=True, choices=sorted(WATCH_KINDS))
-    add.add_argument("--wake-pq2", required=True, type=int)
+    add.add_argument("--wake-pq2", type=int)
     add.add_argument("--expires", required=True)
     add.add_argument("--until")
     add.add_argument("--entities", default="")
     add.add_argument("--fact", default="")
     add.add_argument("--fact-check-ref", default="")
+    add.add_argument("--wake-hypothesis", default="", help="假設 id（與 --wake-pq2 擇一）")
     add.add_argument("--poll", action="store_true")
     add.add_argument("--query-hint", default="")
     add.add_argument("--note", default="")
@@ -316,6 +327,11 @@ def main(argv: list[str] | None = None) -> int:
         for watch in data["watches"]:
             print(_render_watch(watch))
         print(json.dumps(counters(data), ensure_ascii=False))
+        return 0
+    if args.cmd == "consume":
+        consume_fired(data, args.watch_id)
+        save_watches(data)
+        print(f"✓ 已收 {args.watch_id}")
         return 0
     if args.cmd == "counters":
         print(json.dumps(counters(data), ensure_ascii=False))
@@ -345,12 +361,17 @@ def main(argv: list[str] | None = None) -> int:
             entities=[e for e in args.entities.split(",") if e.strip()],
             fact=args.fact,
             fact_check_ref=args.fact_check_ref,
+            hypothesis_ref=args.wake_hypothesis,
             poll_eligible=args.poll,
             poll_query_hint=args.query_hint,
             note=args.note,
         )
         save_watches(data)
-        print(f"✓ 已建 watch {watch['watch_id']} → pq2 [{watch['wake_pq2']}]")
+        target = (
+            f"pq2 [{watch['wake_pq2']}]" if watch.get('wake_pq2')
+            else f"假設 {watch.get('hypothesis_ref')}"
+        )
+        print(f"✓ 已建 watch {watch['watch_id']} → {target}")
         return 0
     return 1
 

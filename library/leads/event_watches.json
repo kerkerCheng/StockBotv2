@@ -62,6 +62,53 @@
       "note": "S-4 由機密遞交轉公開並生效；Agility 無 ticker，T0 靠 co: id、T2 輪詢補",
       "status": "active",
       "woken_by": null
+    },
+    {
+      "watch_id": "ew_0004_2026-08-31",
+      "created_at": "2026-08-31T05:01:13.478707+00:00",
+      "expires": "2026-12-31",
+      "kind": "fact_verification",
+      "until": null,
+      "entities": [
+        "AXTI",
+        "co:axt"
+      ],
+      "fact": "InP substrate ASP 大幅上調（截圖稱史上最大漲價）——對照 AXTI 下季財報 ASP/毛利率方向",
+      "fact_check_ref": "engine_c:AXTI:gross_margin_trend",
+      "wake_pq2": null,
+      "hypothesis_ref": "hy_0001_2026-08-31",
+      "poll": {
+        "eligible": true,
+        "last_checked": null,
+        "query_hint": "AXTI AXT indium phosphide substrate price increase ASP earnings"
+      },
+      "note": "",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0005_2026-08-31",
+      "created_at": "2026-08-31T05:02:25.740867+00:00",
+      "expires": "2027-06-30",
+      "kind": "fact_verification",
+      "until": null,
+      "entities": [
+        "AAOI",
+        "COHR",
+        "LITE"
+      ],
+      "fact": "中國光模組禁令由草案轉正式規則",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "hy_0005_2026-08-31",
+      "poll": {
+        "eligible": true,
+        "last_checked": null,
+        "query_hint": "US ban Chinese optical transceivers rule Federal Register Innolight Eoptolink"
+      },
+      "note": "",
+      "status": "active",
+      "woken_by": null
     }
   ]
 }

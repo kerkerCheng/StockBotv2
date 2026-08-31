@@ -65,6 +65,93 @@
       "watch_id": "",
       "note": "B 類（sell-side note 截圖）；平行驗證=SIVE 公告 harvest（T0 已覆蓋）",
       "verified_by": null
+    },
+    {
+      "hypothesis_id": "hy_0003_2026-08-31",
+      "created_at": "2026-08-31T05:02:25.631839+00:00",
+      "expires": "2026-12-31",
+      "status": "active",
+      "source_handle": "@x_screenshot_nomura_inp",
+      "lead_id": "lead_8088f665e358a7744d9",
+      "statement": "Nomura 報告（截圖）：InP 基板/磊晶 ASP 全面大漲——2in 基板 +42-76%、3in 基板 +78%、2in EML epi +50-75%、3in CW epi +40%+；AXTI/IQE 列 leading players；中國域內價較低",
+      "edges": [
+        {
+          "src_id": "co:iqe",
+          "relation": "supplies_to",
+          "dst_id": "tech:inp_epiwafer",
+          "attributes": {
+            "substitutability": 4
+          }
+        }
+      ],
+      "facts": [
+        {
+          "text": "2in InP 基板 ASP +42-76%",
+          "check_ref": "AXTI 財報 ASP/毛利率",
+          "entities": [
+            "AXTI"
+          ]
+        },
+        {
+          "text": "3in CW epiwafer ASP +40%+",
+          "check_ref": "IQE 財報 ASP/毛利率（H1 2026-09-07）",
+          "entities": [
+            "IQE"
+          ]
+        }
+      ],
+      "skeleton_ref": "",
+      "watch_id": "",
+      "note": "B 類（Nomura 截圖）；與 hy_0001 同族但不同轉述帳號——分開記 credibility；平行驗證＝兩家財報",
+      "verified_by": null
+    },
+    {
+      "hypothesis_id": "hy_0004_2026-08-31",
+      "created_at": "2026-08-31T05:02:25.631854+00:00",
+      "expires": "2026-12-31",
+      "status": "active",
+      "source_handle": "@x_screenshot_aaoi_summit",
+      "lead_id": "lead_1940958c3136e0a33b4",
+      "statement": "AAOI Rosenblatt summit 轉述：美國產 800G/1.6T 可收溢價（ASP/毛利正向）；產能至少售罄至下半年；多份 LTA 在桌上但刻意不簽以免產能被綁",
+      "edges": [],
+      "facts": [
+        {
+          "text": "AAOI 產能售罄至 2H、美國產線溢價",
+          "check_ref": "AAOI Q3 財報 ASP/毛利/產能利用（[134] watch 同源）",
+          "entities": [
+            "AAOI"
+          ]
+        }
+      ],
+      "skeleton_ref": "",
+      "watch_id": "",
+      "note": "B 類（summit 轉述）；平行驗證＝AAOI 財報（ew_0002 已 watch AAOI guidance，同事件雙檢）",
+      "verified_by": null
+    },
+    {
+      "hypothesis_id": "hy_0005_2026-08-31",
+      "created_at": "2026-08-31T05:02:25.631864+00:00",
+      "expires": "2027-06-30",
+      "status": "active",
+      "source_handle": "@x_screenshot_policy_ban",
+      "lead_id": "lead_7f66b743a034c41f638",
+      "statement": "Trump 政府草擬禁止新中國光收發模組與 DC 設備（打擊 Innolight/Eoptolink）——若成真為西方光鏈（AAOI/SIVE/LITE/COHR）全面利多",
+      "edges": [],
+      "facts": [
+        {
+          "text": "禁令由草案轉為正式規則（Federal Register）",
+          "check_ref": "官方公告/一手政策文件",
+          "entities": [
+            "AAOI",
+            "LITE",
+            "COHR"
+          ]
+        }
+      ],
+      "skeleton_ref": "",
+      "watch_id": "",
+      "note": "C 類（政策傳聞）；無邊可疊（需求側事件非供應結構）——事件驗證型，poll 追蹤",
+      "verified_by": null
     }
   ],
   "source_credibility": {}
