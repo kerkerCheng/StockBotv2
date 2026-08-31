@@ -8726,11 +8726,13 @@
         "research_outcome": "與 lead_1dfc66d3 同主題同來源,合併處置;估值異常旗標留待使用者 scope 決定(onboard 或放行)",
         "trace_attempts_ref": "估值原子(1.9x 年化 P/E、淨現金3.959億美元、存貨2.496億美元)出自同一 X 帳號自算,基於7月自結年化——月自結年化 P/E 是作者建構非市場慣例;未經一手核對",
         "trace_next_trigger": "同 lead_1dfc66d3:使用者 onboard 決定或 3006 Q3 財報",
+        "trace_requeue_trigger": "user_go",
+        "trace_requeued_at": "2026-08-31T23:46:46.924954+00:00",
         "trace_requires_user": "true",
         "trace_status": "isolated_tier_3"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {},
       "title": "ESMT (3006) is 1.9x P/E ratio off July's earnings annualized. Latest net income was: $109M net income/July, which is ~$1.3B annualized. With ~$395.9M net cash and with $249.6M in inventory. The market cap less net cash and inventory is equivalent to: ~17 months of July earnings. Where monetizing that inventory benefits from rising memory prices. Their ASP hike expectations were +105–113% Q/Q last quarter from other analyst notes. DDR2/DDR3, NOR Flash, SLC NAND, prices are expected to keep rising H2. The main question is duration, but I personally think legacy DRAM/NAND shortages tightens throughout 2027. Others might disagree. Other analysts like Huanan argue that PSMC wafer hikes are largely pass through (we'll find out H2). Most people are finding companies with ~20 forward P/E ending 2028 to be attractive... But 1.9x current runrate P/E seems like an anomaly to me personally. That's my take on the company/legacy memory theme, I'll let others/markets decide if that's undervalued.",
       "triage": {
@@ -8741,14 +8743,39 @@
           "decision_impact": "candidate_set",
           "reason": "查證為真則 legacy memory 主題候選清單多一個名字（3006 未入圖）"
         },
-        "decided_at": "2026-08-31T05:31:33.841816+00:00",
+        "decided_at": "2026-08-31T23:46:46.924954+00:00",
         "decision": "go",
         "priority_flags": {
-          "novelty": true
+          "novelty": true,
+          "user_requested": true
         },
-        "reason": "aleabitoreddit（已登記來源）legacy memory 主題：ESMT 晶豪科（3006.TWO）P/E 1.9x（7月年化）、net cash 395.9M、存貨 249.6M、ASP 前季預期 +105-113% QoQ。關聯性：legacy DRAM/NAND 短缺主題與 MU take-or-pay 同鏈；可引用性：數字具體可由 MOPS 月營收與財報核對；新穎性：3006 不在圖中",
+        "reason": "使用者核准 exact source_trace_review；排入 bounded pq1，尚未接受 claim 或核准入圖",
         "tier": 3
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-08-31T23:46:46.924954+00:00",
+          "superseded_reason": "使用者核准 exact source_trace_review；排入 bounded pq1，尚未接受 claim 或核准入圖",
+          "trace_trigger": "user_go",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-08-31T05:31:33.841816+00:00",
+              "classified_by": "triage_semantic_v1",
+              "content_type": "financial_fact",
+              "decision_impact": "candidate_set",
+              "reason": "查證為真則 legacy memory 主題候選清單多一個名字（3006 未入圖）"
+            },
+            "decided_at": "2026-08-31T05:31:33.841816+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true
+            },
+            "reason": "aleabitoreddit（已登記來源）legacy memory 主題：ESMT 晶豪科（3006.TWO）P/E 1.9x（7月年化）、net cash 395.9M、存貨 249.6M、ASP 前季預期 +105-113% QoQ。關聯性：legacy DRAM/NAND 短缺主題與 MU take-or-pay 同鏈；可引用性：數字具體可由 MOPS 月營收與財報核對；新穎性：3006 不在圖中",
+            "tier": 3
+          }
+        }
+      ],
       "url": "https://x.com/aleabitoreddit/status/2094281116421370213"
     },
     "lead_0f0fc6255a25848dd10cf6e205e7f427": {
@@ -38505,7 +38532,7 @@
         "trace_status": "tier_1_2_honest_passthrough"
       },
       "source": "x:aleabitoreddit",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {},
       "title": "Remember my $SOI thesis anon? Soitec interview commentary today: - 80% of capacity reservation agreements expected within 1-2 weeks, with more than 10 in total. - $200M Photonics-SOI revenue now described as \"absolutely a floor\" $TSM also sees SiPH going mainstream in 2027 with market share topping 50%+ of the optical transceiver market If you hold a monopoly-like position over a chokepoint: (UBS estimates Soitec has 95% share of the market for substrates underpinning silicon photonics chips) Revenue usually flows through you.",
       "triage": {
@@ -42204,6 +42231,8 @@
       "lead_id": "lead_c9d297d58ac05a8f9c5e55fb433317fc",
       "published_at": null,
       "refs": {
+        "action_digest": "e29ccd82a43d6bb22e3e92da271a1684c8f94bbde20e8e0ea2f29238bd327cf9",
+        "focus_company_id": "co:tsmc",
         "parked_reason": "NVIDIA 官方確認自研 MRM engine 每波長 200Gbps PAM4 與 TSMC 協作，但仍未具名 MRM 製造分工，也無 Broadcom EML／MZM 互斥比較",
         "primary_url": "https://developer.nvidia.com/blog/how-industry-collaboration-fosters-nvidia-co-packaged-optics/",
         "research_action_id": "ra_1285703d121c7f310d571737c5e711ca",
@@ -42227,7 +42256,7 @@
         "trace_trigger_kind": "primary_source_signal"
       },
       "source": "system_decompose",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -44126,10 +44155,12 @@
       "published_at": "2026-08-30T09:04:08.000Z",
       "raw_text": "Just my final recap on thoughts + fundamentals of $SIVE from ER: \n\nPluggables (1.6T Ramp) for 2027:\n\n- $JBL (1.6T LRO, confirmed) Orders H1 2027, Ramp H2 2027\n-> -> Likely multiple hyperscaler customers\n\n- 3 pluggable makers (evaluation)\n- 3 pluggable makers (supply assessment)\n\nReference Design for likely H2 2027–28+:\n\n- $GFS (Globalfoundries) SCALE (confirmed))\n-> -> Likely $AMD and other hyperscalers as CPO customers\n\nExternal Light Sources / Optical Engines for 2027:\n\n- $POET (confirmed)\n-> -> Lumilens / hyperscaler end users\n\n- O-Net (confirmed)\n-> -> Massive ODM/OEM for Hyperscalers + Asia\n\n- Likely $AEVA (mapping)\n-> -> supplying to OE -> hyperscalers / lidar\n\n- SemiNex (confirmed)\n\nOptical I/O for 2028:\n\n- Ayar Labs (confirmed)\n-> -> Likely $AMD, ALchip, and hyperscaler ASIC program end users + $NVDA NVLink\n\n- $MRVL Celestial (potential customer from 2023-2024 disclosures)\n- Lightmatter (potential customer from 2023-2024 disclosures)\n- Lightelligence (potential customer from 2023-2024 disclosures)\n\nThen potentially $AAPL for 2028 for next-generation wearable updates and other programs from TFLN with Lightium.\n\nIn terms of capacity allocations:\n- Win Semi\n- 1 other foundry (with tremendous allocations)\n\nduring an InP CW DFB laser shortage. \n\nThese are all on-going developments/qualifications since Sivers is targeting next-generation SiPH + CW with 1.6T and CPO for 2027-2028.  \n\nEspecially as Goldman Sachs models the CPO opportunity going from effectively near-zero today to ~$91B TAM by 2028. \n\nHowever my criticisms were:  \n\n=> Main focus was not on communicating economic scale of 2027-2028 optical ramps to Western audiences. \n=> Legal vagueposts around NASDAQ listing should be dropped, and clear direction should be set + executed faster on. \n=>Too much focus was put on defending smaller current revenue/TTM revenue/pipeline conversion (allspace, Tachyon.) relative to future qualifications/partner size/capacity/potential. \n\n$SIVE needs to position themselves as a forward looking, global hypergrowth optical company supplying lasers to hyperscaler programs. \n\nAnd not let the narrative get dominated by backward looking metrics. \n\nAnd as Morgan Stanley put it... \"Key [CPO] participants include … $LITE, $COHR, and Sivers laser supply\". \n\nI'm personally a happy $SIVE shareholder for high-beta exposure to the next 2027-2028 optical shift with 1.6T/CPO.",
       "refs": {
+        "action_digest": "8e8e62ef06fa7a3d35a5a73abb8d0099c21ae944d103eee380453feaadcdce72",
+        "focus_company_id": "co:sivers_semiconductors",
         "research_action_id": "ra_3e7b4e99a344118fc87a6f2c89436aac"
       },
       "source": "x:aleabitoreddit",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {
         "cpo": {
           "counter_only": false,
