@@ -217,6 +217,26 @@ packet（新 pq2 編號）或誠實 park 為止**，不得 dispatch 完就停。
 （研究 `go` 不含入圖、入圖 `go` 不含 thesis mutation、任何 `go` 都不含 live）必須逐項寫出來——
 否則使用者要靠記憶區分授權邊界，而那正是這些 gate 存在的理由。
 
+**面向使用者的措辭層：內部識別符不是給使用者讀的（2026-08-31 使用者定案）：** 這是同一個
+張力的第三次調整，方向一致、不是推翻前兩次——07-30 修的是「只給 `co:axt` 無法還原主詞」，
+08-29 修的是「要讀完四段才知道要不要動作」，本次修的是**術語密度本身**。使用者的原話：
+「我可能 care 這次核准建立了哪兩個公司之間的哪種關係，但他是怎麼在圖裡用什麼 property
+表達，其實我不是很在意。」
+
+1. **中文優先，首次出現附原始 label。** 圖節點（`tech:uhp_laser` → 超高功率雷射
+   `tech:uhp_laser`）、證據等級（`externally_corroborated` → 客戶端印證）、blocker code
+   （`research_assessment_missing` → 缺獨立來源）、項目類型（`ra_admission` → 入圖核准）
+   一律先講人話。附 label 是為了讓使用者能把字串貼回來查圖，不是為了嚴謹。
+2. **三樣必須留，其餘可省：** pq2 編號（唯一核准介面）、公司全名＋ticker、
+   `go` 授權什麼／不含什麼。前兩者是使用者的操作把手，第三者是四個 authority gate 的界線——
+   省掉它，使用者就得靠記憶區分「核准入圖」與「核准下單」。
+3. **待辦區塊依建議處置分三段**（建議 `go`／建議 `drop`／不用動），不依項目類型分。
+   類型是系統的分類軸，處置才是使用者的決策軸。
+4. **內部機制名稱不出現在使用者可讀區**：`action_digest`、`focus_company_id`、`cohort_id`、
+   `work order`、`consumed marker` 等留在 receipt 與 log，不進 brief 正文。
+
+判準：**問「使用者讀到這個詞，要做的決定會不同嗎？」** 不會 → 它是實作細節，收進 receipt。
+
 **提醒去重：** lifecycle SessionStart hook 只提醒尚未進池的新到期項目；已存在的 `thesis_lifecycle`（含 deferred）由 Daily Brief 顯示，hook 必須靜默。新提醒只走 `additionalContext` 呈現一次。
 
 ### Decision gap dispatch

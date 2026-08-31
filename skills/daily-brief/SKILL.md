@@ -366,6 +366,15 @@ K claims＋來源與 tier）；其他類型由撰寫者一句話回答「核准�
 `標籤讀法：前段＝答案回來會改什麼（出場條件>候選集合>排序>只是信心），後段＝材料是什麼（資本承諾/結構事實/財務事實/內部人/情緒）`。
 字彙 SSOT 仍是 `config/lead_classification.json`，圖例措辭與其 label 同步。
 
+**區塊依處置分，不依類型分（2026-08-31 使用者定案）：** 三段固定為「建議 go／建議 drop／
+不用動」；`ra_admission`／`decision_review`／`source_trace_review` 這些是系統的分類軸，
+不再拿來當使用者可見的段落標題。同一段內若有多種類型，用每項自己的「授權範圍」行區分。
+
+**措辭層依 `AGENTS.md`「面向使用者的措辭層」：** 中文優先＋首次附原始 label；
+`co:*`／`tech:*`／證據等級／blocker code／類型代號一律先講人話；
+`action_digest`／`focus_company_id`／`cohort_id`／work order id 不進正文，留在 receipt。
+必留三樣：編號、公司全名＋ticker、`go` 授權什麼／不含什麼。
+
 stable pq2 編號後不得只貼短標題或 `co:*` ID。決策行之下，每一個需要使用者決定的 item 至少包含：
 
 1. 一段一句話 TL;DR，直接寫清楚「誰、對誰、做了什麼」。
@@ -388,17 +397,20 @@ stable pq2 編號後不得只貼短標題或 `co:*` ID。決策行之下，每�
 # Daily Brief <YYYY-MM-DD> (Asia/Taipei)
 
 ## 需要你動作
-[1] REVIEW — Coherent（COHR）供應鏈缺口
-TL;DR：<完整主詞＋關係＋事件>
-成熟度／投資意義：<為何現在需要判斷>
-證據邊界：<來源＋不能推論什麼>
-go 授權：<bounded research／exact authority mutation>
 
-[2] RA admission — AXT（AXTI）→ Coherent（COHR）6 吋 InP substrate
-TL;DR：<誰供應誰、產品與技術用途>
-成熟度／投資意義：<agreement／qualification／volume／revenue 邊界>
-證據邊界：<一手來源與反證>
-go 授權：exact graph delta＋已揭露的 Decision handoff
+### 建議 go（N 項）
+[2] AXT（AXTI）— 兩個客戶掏錢綁產能
+<一到兩句話：誰對誰做了什麼，用人話，數字要在>
+核准後：<圖／authority 多了什麼，一句話>
+授權範圍：只是入圖。不含建立投資論點，不含下單。
+細節：<成熟度｜一手來源｜缺什麼｜反證邊界，一行內用｜分隔>
+
+### 建議 drop（N 項）
+[278][293][295] IQE／Marvell／POET 補佐證 — <為何可關；為何不會換號重生>
+
+### 不用動（N 項）
+等事件 N 項｜研究進行中 N 項｜等你有空再決定 N 項
+<逐項一行：編號＋主詞＋在等什麼>
 ...
 
 ## pq1 研究進度（無 pq2 編號）
@@ -416,10 +428,15 @@ TL;DR：<直接回答「今天要不要加碼、加哪一檔」；不得只列�
 排序來源：`query/bottleneck.py` 的 `rank_bottlenecks()`（唯一權威；`research_status` 是研究完整度，不得拿來排序）
 相關性提醒：<本清單集中在哪個主題；列 N 檔不等於 N 個獨立機會，全買是同一賭注下 N 次>
 判斷性質：研究判斷，非回測或統計勝率；尺寸一律不給，由使用者決定
-| # | 標的 | 卡在哪（瓶頸邊） | 替代難度 | 證據強度 | 需求錨點／距需求端 | 現在的判斷 | disproof 狀態 |
+| # | 標的 | 卡在哪（瓶頸邊） | 替代難度 | 證據強度 | 需求錨點／距需求端 | 現在的判斷 | 出場條件狀態 |
 |---|---|---|---|---|---|---|---|
-| 1 | Coherent（COHR） | supplies_to → co:nvidia | 5/5｜sole_source | 外部印證（客戶端出資） | tech:ai_switch／2 跳 | 首選；已持有可加碼 | 已綁定，Q1 FY2027 檢查毛利率 40.2% |
-| 2 | … | … | … | 供應商自報（L8 弱） | … | 觀察；等客戶端印證 | 未綁定 → 該補 |
+| 1 | Coherent（COHR） | 供貨給 NVIDIA | 5/5｜獨家供應 | 客戶端印證（客戶出資） | AI 交換器／2 跳 | 首選；已持有可加碼 | 已綁定，Q1 FY2027 檢查毛利率 40.2% |
+| 2 | Lumentum（LITE） | 超高功率雷射 `tech:uhp_laser` | 5/5｜獨家供應 | 供應商自報（L8 弱） | 同上鏈／3 跳 | 觀察；等客戶端印證 | 未綁定 → 該補 |
+
+表格措辭：**節點寫中文，首次出現附原始 label**（如「超高功率雷射 `tech:uhp_laser`」），
+讓使用者能把 label 貼回來查圖；同一份 brief 內重複出現可只寫中文。
+`supplies_to`／`depends_on` 寫成「供貨給 X」／「依賴 X」；`sole_source` 寫「獨家供應」；
+`externally_corroborated`／`self_reported` 寫「客戶端印證」／「供應商自報」。
 
 ### Pane 2 — 該去補誰的證據
 TL;DR：<取同一次 `rank_bottlenecks()` 的 `structural_rows`；指出與 Pane 1 排名差異最大的標的>
