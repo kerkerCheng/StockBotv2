@@ -1877,6 +1877,60 @@
       "note": "[321] 收尾稽核補上：五個假設中唯一沒有喚醒條件的一個；其對應追源線索（9715784d）同時是停滯 10 筆之一，同一個等待漏了兩層",
       "status": "active",
       "woken_by": null
+    },
+    {
+      "watch_id": "ew_0058_2026-08-31",
+      "created_at": "2026-08-31T10:17:01.584775+00:00",
+      "expires": "2026-12-29",
+      "kind": "related_entity_signal",
+      "until": null,
+      "entities": [
+        "LYC.AX",
+        "MP",
+        "co:lynas",
+        "co:mp_materials"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_cbd50ac57aa511c2d6c4e531b759f7a7",
+      "consumed_entities": [],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "取得 USGS Mineral Commodity Summaries 2026「Rare Earths (Heavy)」逐字（本輪兩個 pubs.usgs.gov PDF URL 皆回 HTTP 403，是取不到不是不存在），或 Lynas 季報／客戶端具名文件確認「中國以外唯一商業級分離 Dy/Tb 生產者」"
+      },
+      "note": "park 時自動建立；trace_status=partial",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0059_2026-08-31",
+      "created_at": "2026-08-31T10:17:01.869217+00:00",
+      "expires": "2026-12-29",
+      "kind": "related_entity_signal",
+      "until": null,
+      "entities": [
+        "LYC.AX",
+        "MP",
+        "co:lynas",
+        "co:mp_materials"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_3238fc77ac974944b52a2916205b98a6",
+      "consumed_entities": [],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "與 lead_cbd50ac5 同一個 trigger：取得 USGS MCS 2026「Rare Earths (Heavy)」逐字，或 Noveon／USA Rare Earth／VAC 任一方的一手產能揭露"
+      },
+      "note": "park 時自動建立；trace_status=partial",
+      "status": "active",
+      "woken_by": null
     }
   ]
 }

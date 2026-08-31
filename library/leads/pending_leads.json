@@ -14484,9 +14484,22 @@
       "first_seen": "2026-08-31T09:51:20.800078+00:00",
       "lead_id": "lead_3238fc77ac974944b52a2916205b98a6",
       "published_at": null,
-      "refs": {},
+      "refs": {
+        "parked_reason": "研究方向已確認、一手未到位。本輪佐證了原線索的預期：美國 NdFeB 磁材不是獨家（Noveon 已量產、USA Rare Earth 2026 首條商業線、Vacuumschmelze e-VAC 2025 底出貨），MP 的差異化是唯一 mine-to-magnet 全整合而非磁材獨家，sub 應為 3 而非 5。但支撐這個值的仍是二手報導；且它與 Lynas 那條同屬「稀土的瓶頸在哪一層」同一個問題，拆開入圖會產生兩個互相矛盾的部分答案，故一併等 USGS 一手。",
+        "trace_attempts_ref": "2026-08-31：IEEE Spectrum 美國磁材製造報導（線索既有）；USGS MCS 2026 兩份 PDF 皆 403",
+        "trace_next_trigger": "與 lead_cbd50ac5 同一個 trigger：取得 USGS MCS 2026「Rare Earths (Heavy)」逐字，或 Noveon／USA Rare Earth／VAC 任一方的一手產能揭露",
+        "trace_requires_user": "false",
+        "trace_status": "partial",
+        "trace_trigger_entities": [
+          "MP",
+          "co:mp_materials",
+          "LYC.AX",
+          "co:lynas"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "directed:sub_backfill",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "[定向補 sub｜稀土] MP Materials 的反證：美國 NdFeB 磁材有多家——Noveon Magnetics（首家且唯一已量產，回收料）、USA Rare Earth（2026 奧克拉荷馬首條商業線）、Vacuumschmelze e-VAC（2025 底首批出貨）。MP 的差異化是唯一 mine-to-magnet 全整合，非磁材獨家。預期 sub 3-4 非 5——這是誠實答案不是失敗",
       "triage": {
@@ -15727,9 +15740,12 @@
       "first_seen": "2026-08-31T09:51:33.835436+00:00",
       "lead_id": "lead_39841af82ef4211a19116d249331dd5d",
       "published_at": null,
-      "refs": {},
+      "refs": {
+        "focus_company_id": "co:harmonic_drive_systems",
+        "research_action_id": "ra_dab0b729552df8aac774e7bb458807d5"
+      },
       "source": "directed:sub_backfill",
-      "status": "triaged_go",
+      "status": "action_prepared",
       "themes": {},
       "title": "[定向補 sub｜機器人] 諧波減速器替代性：RV 與諧波是不同技術非簡單互換（RV 承載大可局部翻修、諧波輕量高精度但柔輪易疲勞需整組更換）。⚠ 本輪搜尋方向偏了——找到的是『諧波 vs RV 技術比較』，但邊 co:harmonic_drive_systems→tech:strain_wave_gear 要問的是『換掉這家供應商多難』。下一輪該找：諧波減速器的其他供應商（Nidec-Shimpo、綠的諧波 Leaderdrive 等）與人形廠商的選型/合格化說法",
       "triage": {
@@ -38237,10 +38253,12 @@
       "published_at": "2026-08-31T05:35:30.000Z",
       "raw_text": "$TSM Vice President of Advanced Packaging:\n\n\"Foundries can scale up the optical engine, but the real bottlenecks to large scale deployment lie elsewhere...\n\nIncluding lasers, optical fiber, fiber-optic connectors, and test\" (UDN)\n\nJust some bucket ideas: \n\nLasers: $LITE, $SIVE, $COHR, LandMark (3081), LuxNet, Sumitomo, Furukawa\nOptical fiber / FAU: Foci, Browave, $GLW, Sumitomo\nFiber Optic / CPO Connectors: BizLink, $GLW , Fujikura, Nextronics, COXOC\nCPO testing: MPI (6223), Advantest, $FORM, Msscorps, $KEYS, Chroma\n\n(disclosure: exposure to theme above, individual names not named by TSMC)\n\nThere are others I like as well, such as ShunSin, which now has explicit TSMC COUPE exposure but probably belongs under a different category like packaging/integration.\n\neg. \"Foxconn unit ShunSin confirms TSMC COUPE partnership\"\n\nI don't think there's anything too new vs. H1, aside from ongoing news (eg. FAU looks like there will have a demand imbalance in 2027, from a report last week). \n\nBut it's helpful to reiterate overall beneficiaries from time to time...",
       "refs": {
+        "action_digest": "d30a292fd62f133d79a5d11bf3eecbd2c22a101594e9cabd24acebab2cf35279",
+        "focus_company_id": "co:tsmc",
         "research_action_id": "ra_72acb5f31641b9a34473321fcaca57e6"
       },
       "source": "x:aleabitoreddit",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -42008,9 +42026,22 @@
       "first_seen": "2026-08-31T09:51:20.497888+00:00",
       "lead_id": "lead_cbd50ac57aa511c2d6c4e531b759f7a7",
       "published_at": null,
-      "refs": {},
+      "refs": {
+        "parked_reason": "圖的層級錯了，不是缺證據：Lynas 產的是分離重稀土「氧化物」，圖中的邊卻是 supplies_to mat:rare_earth_magnets（磁材）。在錯的層上填 substitutability 只會生出一個看起來有值、實際問錯問題的邊。正解是新增「中國以外的分離重稀土氧化物（Dy/Tb）」這一層，但要宣稱近獨家地位需要 USGS 一手支撐。",
+        "trace_attempts_ref": "2026-08-31：Lynas 官網逐字（自報，依 L8 不可作獨家佐證）；metaltechnews 2026-03 重稀土擴產報導；USGS MCS 2026 rare-earths 與 rare-earths-heavy 兩份 PDF 皆回 403；搜尋摘要稱美國重稀土 100% 進口依賴且無持續商業級產出，但摘要不等於一手逐字（L11）",
+        "trace_next_trigger": "取得 USGS Mineral Commodity Summaries 2026「Rare Earths (Heavy)」逐字（本輪兩個 pubs.usgs.gov PDF URL 皆回 HTTP 403，是取不到不是不存在），或 Lynas 季報／客戶端具名文件確認「中國以外唯一商業級分離 Dy/Tb 生產者」",
+        "trace_requires_user": "false",
+        "trace_status": "partial",
+        "trace_trigger_entities": [
+          "LYC.AX",
+          "co:lynas",
+          "MP",
+          "co:mp_materials"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "directed:sub_backfill",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "[定向補 sub｜稀土] Lynas 官網逐字：the world's only commercial producer of separated light and heavy rare earth oxides outside of China。2025 Q1 commissioned Dy 分離、6 月 Tb，年產能上看 1500t 重稀土；中國對 Dy/Tb 有出口管制。⚠ 待解語意：Lynas 供的是氧化物，圖中邊卻是 supplies_to mat:rare_earth_magnets（磁材）——先確認該邊原始 claim 再定 sub。⚠ L8：官網＝自報，sole_source 需 USGS 或客戶端印證才可升級",
       "triage": {
@@ -46724,9 +46755,9 @@
         "claimed_origin": "Rosenblatt Securities channel checks 報告",
         "parked_reason": "轉述 Rosenblatt 賣方 channel check，原始報告為付費研究、公開管道不可得，屬 tier 3 隔離。⚠ 依 L8 不得以轉述當獨立佐證：貼文自陳 Rosenblatt 曾誤判 AMD 為 AAOI 首個 CPO 客戶（AAOI 已否認將出現在第一代 CPO），該來源本身即有已知誤判紀錄。其中『中國 CPO laser 落後 2-3 年』一項，貼文稱已由 AAOI 財報逐字印證——若要入圖應直接引用 AAOI 一手法說逐字，而非經由此轉述。requires_user=true：是否付費取得原始報告需使用者明確決定與 exact 金額核准。",
         "research_outcome": "paywalled_sellside_note_not_obtainable",
-        "trace_attempts_ref": "券商報告原文屬付費 sell-side research，未取得；未授權任何採購",
+        "trace_attempts_ref": "2026-08-31 使用者對 pq2 [193] 回 drop（先前已 defer 10 天）。drop 僅釋放編號，collector 隨即以 [331] 換號重生；依 AGENTS.md「這種項目的正確處置是修收集端分類，不是叫使用者 drop」，改記為 terminal not_pursued 以停止重新推導。⚠ 這不是判定該報告無價值，是判定「目前不投入付費取得」。可逆：日後若決定訂閱，改回非 terminal trace_status 即可重新排入。",
         "trace_cost_authorized": "false",
-        "trace_next_trigger": "取得 Rosenblatt 原始 channel check 報告（付費研究，需使用者決定是否購買或以合法途徑取得）",
+        "trace_next_trigger": "使用者主動表示願意評估付費訂閱時再重啟；系統不再主動詢問。AAOI 相關的兩條停滯追源仍有各自獨立的 filing trigger，不依賴本項。",
         "trace_requeue_consumed_entities": [
           "AAOI",
           "CO:APPLIED_OPTOELECTRONICS",
@@ -46735,8 +46766,8 @@
         ],
         "trace_requeue_trigger": "related_triaged_lead:lead_1940958c3136e0a33b4e0856b7b05d82",
         "trace_requeued_at": "2026-08-18T23:05:45.408019+00:00",
-        "trace_requires_user": "true",
-        "trace_status": "isolated_tier_3",
+        "trace_requires_user": "false",
+        "trace_status": "not_pursued",
         "trace_trigger_entities": [
           "AAOI",
           "AMD",

@@ -3088,9 +3088,10 @@
       "hint": "go 只排入 bounded pq1；不接受 claim、不入圖。若需付費，另核准 exact 金額／方案。",
       "n": 193,
       "reason": null,
+      "receipt": null,
       "ref_id": "lead_e766f19b8dc748d744d0b4cc6dc21071",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "drop",
+      "resolved_at": "2026-08-31T11:17:39.658294+00:00",
       "source": "source_trace",
       "title": "追原報告／來源 access — I usually make fun of sellside, but Rosenblatt has pretty goated channel checks on optical names, and their reports are one of the few I like talking about. $AAOI, $LITE, $SIVE, and the laser party...",
       "type": "source_trace_review"
@@ -3750,7 +3751,11 @@
     },
     {
       "added_at": "2026-08-25T13:30:44.275553+00:00",
-      "deferred_at": "2026-08-25T23:43:27.800753+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_f5d3b323f0a6a18157be84b2f7bdaba0",
+      "dispatch_ref": "wo_63ce1bbd347fe71656beae4259f7da8a",
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-08-31T11:17:34.623419+00:00",
       "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 230,
       "reason": null,
@@ -4494,6 +4499,7 @@
     },
     {
       "added_at": "2026-08-30T08:28:24.953849+00:00",
+      "deferred_at": "2026-08-31T11:17:39.658378+00:00",
       "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 275,
       "reason": null,
@@ -4508,7 +4514,7 @@
       "added_at": "2026-08-30T08:28:24.953849+00:00",
       "hint": "當前 missing_data：TH5/TH6 CPO 的具名部署客戶（hyperscaler 側揭露，結構上可能長期不可得）；Davisson 調變器類型第三方驗證（pq1 題進行中）（共 2 項）｜coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
       "n": 276,
-      "reactivated_at": "2026-08-30T13:43:26.064880+00:00",
+      "reactivated_at": "2026-08-31T11:29:12.846318+00:00",
       "reactivation_event": {
         "type": "decision_blocker_mode_changed"
       },
@@ -4522,7 +4528,7 @@
       "waiting_on": {
         "derived_from_blockers": true,
         "reason": "所有 blocker 都不需要使用者決定",
-        "set_at": "2026-08-31T02:45:27.304218+00:00",
+        "set_at": "2026-08-31T11:31:47.757152+00:00",
         "trigger": "執行面 context 缺失／技術指標觀測問題",
         "until": null
       }
@@ -5234,6 +5240,11 @@
     },
     {
       "added_at": "2026-08-31T04:42:07.944868+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_b3c36b9fabbe75af93c097a1c0baad0b",
+      "dispatch_ref": "wo_9536b23d5a05ec71ff103e593ade6861",
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-08-31T11:17:33.916382+00:00",
       "hint": "當前 missing_data：TSMC 對 FAU 供應商的任何具名陳述（法說/文件）；『獨供兩代』的可稽核逐字（CW 專利分析文或 FOCI 法說）（共 2 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 317,
       "reason": null,
@@ -5366,9 +5377,10 @@
       "hint": "當前 missing_data：客戶端具名：Coherent/Lumentum/Broadcom 任一方文件點名聯亞為磊晶供應商；四年 CW laser 長約交易對手方的具名或第三方獨立佐證（共 2 項）｜coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
       "n": 326,
       "reason": null,
+      "receipt": null,
       "ref_id": "dc_f94148d8545de35cb2c5d048640b913e",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "drop",
+      "resolved_at": "2026-08-31T11:17:39.658333+00:00",
       "source": "decision_lab",
       "source_cleared": {
         "at": "2026-08-31T10:55:34.559437+00:00",
@@ -5383,9 +5395,10 @@
       "hint": "當前 missing_data：counter_thesis_path（共 1 項）｜coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
       "n": 327,
       "reason": null,
+      "receipt": null,
       "ref_id": "dc_957bff3701ea4e46d962bfb9ff0932c8",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "drop",
+      "resolved_at": "2026-08-31T11:17:39.658358+00:00",
       "source": "decision_lab",
       "source_cleared": {
         "at": "2026-08-31T10:55:34.559437+00:00",
@@ -5397,16 +5410,134 @@
     },
     {
       "added_at": "2026-08-31T10:55:34.559437+00:00",
+      "completion_authority": {
+        "action_digest": "d30a292fd62f133d79a5d11bf3eecbd2c22a101594e9cabd24acebab2cf35279",
+        "cohort_id": "dc_29ef9f7194dc996c9b7eb62a9b21afc6",
+        "commit": "bb74b705d13f10db9d17169600473ad29f554f3b",
+        "company_id": "co:tsmc",
+        "verified_at": "2026-08-31T11:17:25.992576+00:00"
+      },
       "graph_impact": "+5 節點、4 邊、2 claims｜來源：TechNews 科技新報（轉述台積電徐國晉於 SEMI／矽光子產業協會「矽光子國際論壇」之公開演講；未取得官方逐字稿）（tier 3）",
       "hint": "核准 exact graph delta；Decision handoff：co:tsmc。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 328,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_72acb5f31641b9a34473321fcaca57e6;digest:d30a292fd62f133d79a5d11bf3eecbd2c22a101594e9cabd24acebab2cf35279;commit:bb74b705d13f10db9d17169600473ad29f554f3b;cohort:dc_29ef9f7194dc996c9b7eb62a9b21afc6",
       "ref_id": "ra_72acb5f31641b9a34473321fcaca57e6",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-31T11:17:25.992576+00:00",
       "source": "research_action",
       "title": "TSMC 整合端公開指認 CPO 四大瓶頸：雷射／光纖／光纖連接器／全堆疊測試（SEMI 矽光子國際論壇 2026-08-31）",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-08-31T11:28:20.744761+00:00",
+      "hint": "實測：22 個追蹤標的有 6 個（Schaeffler、上詮、MP、台積電、奇景、Lynas）catalyst 與 disproof 皆為空字串，且 expiry 恰好等於建立時間 +72 小時＝config/investment_policy.json 的 probe_lane.review_hours 預設值。後果：每 3 天產生一次沒有內容的到期提醒，正是 L7 說的「貼了一個永遠不會響的火警警報」的反面——它會響，但響了不知道要看什麼。go＝實作 exact 修法（二選一或並行：①evaluate-signal 缺 disproof 時 fail closed 拒絕建 cohort；②新建 cohort 若無明確 catalyst 日期則不套 72 小時預設，改標為「未設定期限」不進到期倒數）。這會讓 catalyst_watch 的『設定不完整』從 6 停止成長——可驗證。不含改任何既有 cohort 的內容，不含入圖、不含 live。",
+      "n": 329,
+      "reason": null,
+      "ref_id": "catalyst_disproof_default_expiry",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "修掉「假到期鬧鐘」：evaluate-signal 允許不填證偽條件就建 cohort，並靜默套用 72 小時預設到期",
+      "type": "manual"
+    },
+    {
+      "added_at": "2026-08-31T11:29:12.846318+00:00",
+      "graph_impact": "+2 節點、1 邊、1 claims｜來源：Next Financial (Substack)（tier 3）",
+      "hint": "核准 exact graph delta；Decision handoff：co:harmonic_drive_systems。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 330,
+      "reason": null,
+      "ref_id": "ra_dab0b729552df8aac774e7bb458807d5",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "[325] 機器人組定向補 sub：諧波減速器替代難度＝2（非瓶頸）——Tesla 已驗證第二供應商",
+      "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-08-31T11:29:12.846318+00:00",
+      "hint": "go 只排入 bounded pq1；不接受 claim、不入圖。若需付費，另核准 exact 金額／方案。",
+      "n": 331,
+      "reason": null,
+      "ref_id": "lead_e766f19b8dc748d744d0b4cc6dc21071",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "source_trace",
+      "source_cleared": {
+        "at": "2026-08-31T11:31:47.757388+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
+      "title": "追原報告／來源 access — I usually make fun of sellside, but Rosenblatt has pretty goated channel checks on optical names, and their reports are one of the few I like talking about. $AAOI, $LITE, $SIVE, and the laser party...",
+      "type": "source_trace_review"
+    },
+    {
+      "added_at": "2026-08-31T11:29:12.846318+00:00",
+      "hint": "當前 missing_data：ELS／UHP CPO 客戶端的 qualification、採購量與交付確認；OCS 三家客戶的獨立訂單／部署佐證；initial ELS order 的金額、數量與可取消條款（共 4 項）｜coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
+      "n": 332,
+      "reason": null,
+      "ref_id": "dc_4d28e50810e46da7fd77ee042ee7bd1c",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "source_cleared": {
+        "at": "2026-08-31T11:31:47.757388+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
+      "title": "co:lumentum：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-31T11:29:12.846318+00:00",
+      "hint": "當前 missing_data：NVIDIA 自家 10-Q 對 Series A Preferred 投資的揭露逐字核對（externally_cor；Distributor A（44% 營收）不具名，終端需求被通路遮蔽，無法取得客戶端佐證（共 2 項）｜coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
+      "n": 333,
+      "reason": null,
+      "ref_id": "dc_0fca807c963dc3b9888e0f83ba6d45a5",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "source_cleared": {
+        "at": "2026-08-31T11:31:47.757388+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
+      "title": "co:marvell_technology：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-31T11:29:12.846318+00:00",
+      "hint": "當前 missing_data：Lumilens 訂單的實際出貨與收款驗證（PO ≠ 營收）；Marvell 保密爭議的後續（訴訟或和解揭露）（共 2 項）｜coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
+      "n": 334,
+      "reason": null,
+      "ref_id": "dc_9d464eeb94b7b0108104db1774bbbdd4",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "source_cleared": {
+        "at": "2026-08-31T11:31:47.757388+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
+      "title": "co:poet_technologies：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-31T11:29:12.846318+00:00",
+      "hint": "當前 missing_data：counter_thesis_path（共 1 項）｜coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
+      "n": 335,
+      "reason": null,
+      "ref_id": "dc_957bff3701ea4e46d962bfb9ff0932c8",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "source_cleared": {
+        "at": "2026-08-31T11:31:47.757388+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
+      "title": "co:coherent：補 counter-path：什麼會讓這條因果鏈斷掉（第二供應源、客戶自製、技術替代）",
+      "type": "decision_review"
     }
   ],
   "log": [
@@ -12206,8 +12337,134 @@
       "ref_id": "dc_957bff3701ea4e46d962bfb9ff0932c8",
       "type": "decision_review",
       "verb": "source_cleared"
+    },
+    {
+      "at": "2026-08-31T11:17:25.992576+00:00",
+      "n": 328,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_72acb5f31641b9a34473321fcaca57e6;digest:d30a292fd62f133d79a5d11bf3eecbd2c22a101594e9cabd24acebab2cf35279;commit:bb74b705d13f10db9d17169600473ad29f554f3b;cohort:dc_29ef9f7194dc996c9b7eb62a9b21afc6",
+      "ref_id": "ra_72acb5f31641b9a34473321fcaca57e6",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-31T11:17:33.916382+00:00",
+      "attempt": 1,
+      "n": 317,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_9536b23d5a05ec71ff103e593ade6861",
+      "ref_id": "dc_6b92df56a6d186eb7464479dfb9c48c3",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-08-31T11:17:34.623419+00:00",
+      "attempt": 1,
+      "n": 230,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_63ce1bbd347fe71656beae4259f7da8a",
+      "ref_id": "dc_912a03a50135ea5e29000a0417c3f477",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-08-31T11:17:39.658294+00:00",
+      "n": 193,
+      "reason": null,
+      "receipt": null,
+      "ref_id": "lead_e766f19b8dc748d744d0b4cc6dc21071",
+      "type": "source_trace_review",
+      "verb": "drop"
+    },
+    {
+      "at": "2026-08-31T11:17:39.658333+00:00",
+      "n": 326,
+      "reason": null,
+      "receipt": null,
+      "ref_id": "dc_f94148d8545de35cb2c5d048640b913e",
+      "type": "decision_review",
+      "verb": "drop"
+    },
+    {
+      "at": "2026-08-31T11:17:39.658358+00:00",
+      "n": 327,
+      "reason": null,
+      "receipt": null,
+      "ref_id": "dc_957bff3701ea4e46d962bfb9ff0932c8",
+      "type": "decision_review",
+      "verb": "drop"
+    },
+    {
+      "at": "2026-08-31T11:17:39.658378+00:00",
+      "n": 275,
+      "reason": null,
+      "receipt": null,
+      "ref_id": "dc_29ef9f7194dc996c9b7eb62a9b21afc6",
+      "type": "decision_review",
+      "verb": "pending"
+    },
+    {
+      "at": "2026-08-31T11:29:12.846318+00:00",
+      "n": 276,
+      "prior_waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-08-31T02:45:27.304218+00:00",
+        "trigger": "執行面 context 缺失／技術指標觀測問題",
+        "until": null
+      },
+      "reason": "blocker 已不再全屬等待事件，恢復人工複查",
+      "receipt": null,
+      "ref_id": "dc_67f5e1588990f432e8e0ccce5711e62e",
+      "type": "decision_review",
+      "verb": "event_reactivated"
+    },
+    {
+      "at": "2026-08-31T11:31:47.757388+00:00",
+      "n": 331,
+      "reason": "來源本輪成功執行，但不再產出此項",
+      "receipt": null,
+      "ref_id": "lead_e766f19b8dc748d744d0b4cc6dc21071",
+      "type": "source_trace_review",
+      "verb": "source_cleared"
+    },
+    {
+      "at": "2026-08-31T11:31:47.757388+00:00",
+      "n": 332,
+      "reason": "來源本輪成功執行，但不再產出此項",
+      "receipt": null,
+      "ref_id": "dc_4d28e50810e46da7fd77ee042ee7bd1c",
+      "type": "decision_review",
+      "verb": "source_cleared"
+    },
+    {
+      "at": "2026-08-31T11:31:47.757388+00:00",
+      "n": 333,
+      "reason": "來源本輪成功執行，但不再產出此項",
+      "receipt": null,
+      "ref_id": "dc_0fca807c963dc3b9888e0f83ba6d45a5",
+      "type": "decision_review",
+      "verb": "source_cleared"
+    },
+    {
+      "at": "2026-08-31T11:31:47.757388+00:00",
+      "n": 334,
+      "reason": "來源本輪成功執行，但不再產出此項",
+      "receipt": null,
+      "ref_id": "dc_9d464eeb94b7b0108104db1774bbbdd4",
+      "type": "decision_review",
+      "verb": "source_cleared"
+    },
+    {
+      "at": "2026-08-31T11:31:47.757388+00:00",
+      "n": 335,
+      "reason": "來源本輪成功執行，但不再產出此項",
+      "receipt": null,
+      "ref_id": "dc_957bff3701ea4e46d962bfb9ff0932c8",
+      "type": "decision_review",
+      "verb": "source_cleared"
     }
   ],
-  "next_n": 329,
+  "next_n": 336,
   "schema_version": "1"
 }
