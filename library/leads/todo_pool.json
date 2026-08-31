@@ -4496,7 +4496,14 @@
       "resolved_at": null,
       "source": "decision_lab",
       "title": "co:broadcom：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
-      "type": "decision_review"
+      "type": "decision_review",
+      "waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-08-31T02:45:27.304218+00:00",
+        "trigger": "執行面 context 缺失／技術指標觀測問題",
+        "until": null
+      }
     },
     {
       "added_at": "2026-08-30T09:00:00.875798+00:00",
@@ -4527,6 +4534,11 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
+      "source_cleared": {
+        "at": "2026-08-31T02:45:27.304373+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
       "title": "co:iqe：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
     },
@@ -4544,7 +4556,14 @@
       "resolved_at": null,
       "source": "decision_lab",
       "title": "co:micron_technology：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
-      "type": "decision_review"
+      "type": "decision_review",
+      "waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-08-31T02:45:27.304261+00:00",
+        "trigger": "技術指標觀測問題",
+        "until": null
+      }
     },
     {
       "added_at": "2026-08-30T09:03:48.249782+00:00",
@@ -5020,10 +5039,11 @@
       "added_at": "2026-08-31T02:18:35.642701+00:00",
       "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2025-12-31T00:00:00+00:00；來源=MOPS 3363 114年度股東會年報「占銷貨總額百分之十以上之客戶名稱及其銷貨金額與比例」節（library/raw/mops_3363_annual_re",
       "n": 307,
-      "reason": null,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_a2cc88e85943a2d2e319a81caa0bcbd3;proposal:po_59c0b1bffcab8e92a300aa7302f7b8fe",
       "ref_id": "po_59c0b1bffcab8e92a300aa7302f7b8fe",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-31T02:40:46.610381+00:00",
       "source": "engine_c",
       "title": "Engine C 觀測：3363.TWO / customer_concentration",
       "type": "engine_c_observation"
@@ -5042,12 +5062,20 @@
     },
     {
       "added_at": "2026-08-31T02:33:17.973418+00:00",
+      "completion_authority": {
+        "action_digest": "429a954469649ebfe508829af9fc6b331d12eeb16ff1ea917f3d2581301e784b",
+        "cohort_id": "dc_48446dbceb85d4b785634e3c4ca5d669",
+        "commit": "22a6e40a0ed8169b557ab31d88700b0d5a3dc565",
+        "company_id": "co:lynas",
+        "verified_at": "2026-08-31T02:41:15.969311+00:00"
+      },
       "hint": "核准 exact graph delta；Decision handoff：co:lynas。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 309,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_fe7ec565ef1e07cea2abdaa00aa13f82;digest:429a954469649ebfe508829af9fc6b331d12eeb16ff1ea917f3d2581301e784b;commit:22a6e40a0ed8169b557ab31d88700b0d5a3dc565;cohort:dc_48446dbceb85d4b785634e3c4ca5d669",
       "ref_id": "ra_fe7ec565ef1e07cea2abdaa00aa13f82",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-31T02:41:15.969311+00:00",
       "source": "research_action",
       "title": "Lynas（ASX: LYC）onboard：唯一 ex-China 輕＋重稀土分離商——Dy/Tb 量產＋DoW Seadrift 合約＋A$750M 增資",
       "type": "ra_admission"
@@ -5078,15 +5106,47 @@
     },
     {
       "added_at": "2026-08-31T02:37:59.296650+00:00",
+      "completion_authority": {
+        "action_digest": "6978509e57c5bc32d5701031c83a631735930680111f6e3ae4b00bbf09bd9e27",
+        "cohort_id": "dc_7bd7922b16d32044b3f75d2edb19342d",
+        "commit": "ead424c5a13456473b02a6e4bb0ad999acfe7a94",
+        "company_id": "co:himax",
+        "verified_at": "2026-08-31T02:41:21.721426+00:00"
+      },
       "hint": "核准 exact graph delta；Decision handoff：co:himax。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 312,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_8fde4978b32b86919d7aa5e9ade93532;digest:6978509e57c5bc32d5701031c83a631735930680111f6e3ae4b00bbf09bd9e27;commit:ead424c5a13456473b02a6e4bb0ad999acfe7a94;cohort:dc_7bd7922b16d32044b3f75d2edb19342d",
       "ref_id": "ra_8fde4978b32b86919d7aa5e9ade93532",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-31T02:41:21.721426+00:00",
       "source": "research_action",
       "title": "Himax（HIMX）onboard：20-F 一手證實 FOCI×WLO×CPO 夥伴關係——Hunterbrook 專利鏈推測升級為當事人揭露",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-08-31T02:45:27.304373+00:00",
+      "hint": "coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "n": 313,
+      "reason": null,
+      "ref_id": "dc_7bd7922b16d32044b3f75d2edb19342d",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:himax：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-31T02:45:27.304373+00:00",
+      "hint": "coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "n": 314,
+      "reason": null,
+      "ref_id": "dc_48446dbceb85d4b785634e3c4ca5d669",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:lynas：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
     }
   ],
   "log": [
@@ -11513,8 +11573,71 @@
       "ref_id": "manual:301",
       "type": "manual",
       "verb": "go"
+    },
+    {
+      "at": "2026-08-31T02:40:46.610381+00:00",
+      "n": 307,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_a2cc88e85943a2d2e319a81caa0bcbd3;proposal:po_59c0b1bffcab8e92a300aa7302f7b8fe",
+      "ref_id": "po_59c0b1bffcab8e92a300aa7302f7b8fe",
+      "type": "engine_c_observation",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-31T02:41:15.969311+00:00",
+      "n": 309,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_fe7ec565ef1e07cea2abdaa00aa13f82;digest:429a954469649ebfe508829af9fc6b331d12eeb16ff1ea917f3d2581301e784b;commit:22a6e40a0ed8169b557ab31d88700b0d5a3dc565;cohort:dc_48446dbceb85d4b785634e3c4ca5d669",
+      "ref_id": "ra_fe7ec565ef1e07cea2abdaa00aa13f82",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-31T02:41:21.721426+00:00",
+      "n": 312,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_8fde4978b32b86919d7aa5e9ade93532;digest:6978509e57c5bc32d5701031c83a631735930680111f6e3ae4b00bbf09bd9e27;commit:ead424c5a13456473b02a6e4bb0ad999acfe7a94;cohort:dc_7bd7922b16d32044b3f75d2edb19342d",
+      "ref_id": "ra_8fde4978b32b86919d7aa5e9ade93532",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-31T02:41:51.964906+00:00",
+      "n": 276,
+      "reason": "go：僅 context 老化，已以 intent=research 重新凍結",
+      "receipt": "decision:pd_513d099ab77fa94b6c431c0e12644a6f",
+      "ref_id": "dc_67f5e1588990f432e8e0ccce5711e62e",
+      "type": "decision_review",
+      "verb": "pq1_reassessed"
+    },
+    {
+      "at": "2026-08-31T02:42:47.637096+00:00",
+      "n": 278,
+      "reason": "go：僅 context 老化，已以 intent=research 重新凍結",
+      "receipt": "decision:pd_36f2b35c169ec3fd8b573731bac67909",
+      "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+      "type": "decision_review",
+      "verb": "pq1_reassessed"
+    },
+    {
+      "at": "2026-08-31T02:43:44.248410+00:00",
+      "n": 279,
+      "reason": "go：僅 context 老化，已以 intent=research 重新凍結",
+      "receipt": "decision:pd_077a38d3a980c4756c1dfd808ed7307f",
+      "ref_id": "dc_b05cc1360e4bdf2a238787c23e7b227d",
+      "type": "decision_review",
+      "verb": "pq1_reassessed"
+    },
+    {
+      "at": "2026-08-31T02:45:27.304373+00:00",
+      "n": 278,
+      "reason": "來源本輪成功執行，但不再產出此項",
+      "receipt": null,
+      "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+      "type": "decision_review",
+      "verb": "source_cleared"
     }
   ],
-  "next_n": 313,
+  "next_n": 315,
   "schema_version": "1"
 }
