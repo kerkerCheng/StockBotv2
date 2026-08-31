@@ -4,7 +4,11 @@
 > 它當作真的，但現在是不是就直接 park，我們的圖也用不到，基本上也找不到文件就石沉大海。
 > 但如果我們放一個特殊的邊，假設訊息為真，我們能得到什麼？這部分該怎麼做才能追到更前段
 > 的 alpha，我基本上是相信推文的截圖不是改圖的。」
-> 狀態：**方向討論，未成為政策**——四個 authority gate 與 evidence tier 紀律不因此放寬。
+> 狀態更新（2026-08-31，[315]）：✅ **本體已實作**——`engine_b/hypotheses.py`（圖外隔離儲存
+> ＋expires＋帳號級 credibility）＋`bottleneck --what-if`（純結構 diff）＋`fact_verification`
+> watch＋source-trace park 接線；歷史回跑完成（12 條→5 假設/2 entity 旗標/5 跳過）。
+> **未做**：A 類預寫 RA 骨架的落地自動比對。四個 authority gate 與 evidence tier 紀律不變。
+> 落點：`docs/OPERATIONS.md`「截圖假設層」節。
 
 ## 現況與痛點
 

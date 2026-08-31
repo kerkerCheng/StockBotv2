@@ -5,6 +5,11 @@
 > token 少的時候調低照樣運作，不會卡住。
 > 整併對象：trigger audit 的 F1-F3（[`docs/reports/trigger_audit_2026-08-31.md`](../reports/trigger_audit_2026-08-31.md)）
 > ＋截圖 brainstorm 的 `fact_verification`。
+>
+> ✅ **已實作（2026-08-31，[306]＋[315]）**：registry＋三 kind＋T0/T1 sync 喚醒＋T2 sweep
+> （K 旋鈕）＋計數器＋喚醒目標二選一（pq2｜hypothesis）＋consume CLI；無人值守 sweep 已過
+> sandbox review 放行。落點：`engine_b/event_watch.py`、`config/event_watch.json`、
+> `docs/OPERATIONS.md`「Event Watch」節。**刻意不做**：trace 引擎搬家。本檔轉為設計依據存檔。
 
 ## 為什麼要模組化
 
