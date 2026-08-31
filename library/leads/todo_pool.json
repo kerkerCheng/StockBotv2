@@ -5322,6 +5322,18 @@
       "source": "manual",
       "title": "只止血：14 筆已死追源線索的誠實處置（不動架構）",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-08-31T08:31:58.299504+00:00",
+      "hint": "go＝把 DEMAND_ANCHORS 改由 config/sector_anchors.json 導出（現在程式硬編 4 個、config 宣告 12 個，交集僅 2）；不含填 substitutability、不含入圖、不含 live。實測影響：有錨候選 24→30、『無需求錨』組 6→0 並歸位到成熟／特殊製程、可行動排序第 5 名由 COHR 變 Soitec。⚠ 這會改變投資排序，故請你決定：GF 做的成熟製程晶片（車用/工業 MCU）算不算『市場有在花錢的需求錨』",
+      "n": 323,
+      "reason": null,
+      "ref_id": "manual:323",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "需求錨白名單漏 10 個錨：成熟製程 6 條被誤標『資金不在鏈上、非候選』",
+      "type": "manual"
     }
   ],
   "log": [
@@ -12087,6 +12099,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 323,
+  "next_n": 324,
   "schema_version": "1"
 }
