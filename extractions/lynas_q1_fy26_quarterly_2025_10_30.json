@@ -1,0 +1,106 @@
+{
+  "claims": [
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "guided",
+      "disproof_condition": "若 Seadrift 因許可問題實質延宕/取消、或中國出口鬆動使分離氧化物價格長期低迷、或第二家 ex-China 重稀土分離商投產，唯一性溢價失效。",
+      "id": "lynas_q1_fy26_quarterly_2025_10_30_cl1",
+      "source_ids": [
+        "lynas_q1_fy26_quarterly_2025_10_30_s1",
+        "lynas_q1_fy26_quarterly_2025_10_30_s2",
+        "lynas_q1_fy26_quarterly_2025_10_30_s3",
+        "lynas_q1_fy26_quarterly_2025_10_30_s4",
+        "lynas_q1_fy26_quarterly_2025_10_30_s5"
+      ],
+      "statement": "Lynas 自報為唯一中國以外的輕＋重稀土氧化物商業分離商（法定揭露措辭，兩處重申）；與美國戰爭部有 Seadrift 重稀土廠支出型合約；A$750M 機構配售完成後 Q1 FY26 現金 A$1,060.0M。反證同文：Seadrift 有廢水許可問題（自述已有替代解法）、offtake『no certainty』——戰略地位真實但商業兌現（獲利、offtake、Seadrift 完工）全部在前方。",
+      "subject_id": "co:lynas"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "mat:rare_earth_magnets",
+      "id": "lyn1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "lynas_q1_fy26_quarterly_2025_10_30_s1"
+      ],
+      "src_id": "co:lynas"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "LYC.AX",
+        "Lynas"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:lynas",
+      "name": "Lynas Rare Earths",
+      "role": null,
+      "source_ids": [
+        "lynas_q1_fy26_quarterly_2025_10_30_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "NdFeB"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "mat:rare_earth_magnets",
+      "name": "Rare earth magnets (neodymium, samarium-cobalt)",
+      "role": null,
+      "source_ids": [
+        "lynas_q1_fy26_quarterly_2025_10_30_s1"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "lynas_q1_fy26_quarterly_2025_10_30",
+    "evidence_tier": 1,
+    "origin_entity": "Lynas Rare Earths",
+    "permission_basis": "ASX public announcement; quotes only.",
+    "published_at": "2025-10-30",
+    "publisher": "ASX",
+    "retrieved_at": "2026-08-31",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Lynas Rare Earths Quarterly Report for the period ended 30 September 2025 (ASX, 2025-10-30)",
+    "url": "https://announcements.asx.com.au/asxpdf/20251030/pdf/06r89kkr64drjj.pdf"
+  },
+  "sources": [
+    {
+      "id": "lynas_q1_fy26_quarterly_2025_10_30_s1",
+      "locator": "strategic position",
+      "quote": "the importance of Lynas as the only outside China commercial producer of separated Light and Heavy Rare Earth oxides."
+    },
+    {
+      "id": "lynas_q1_fy26_quarterly_2025_10_30_s2",
+      "locator": "DoW contract",
+      "quote": "Lynas has an expenditure-based contract with the U.S. Department of War (DoW) for the construction of a Heavy Rare Earths processing facility at Seadrift, Texas."
+    },
+    {
+      "id": "lynas_q1_fy26_quarterly_2025_10_30_s3",
+      "locator": "equity raising",
+      "quote": "The equity raising, which comprised a $750 million institutional placement and a Share Purchase Plan for retail shareholders, further strengthens our Balance Sheet, enabling Lynas to pursue a strong growth agenda."
+    },
+    {
+      "id": "lynas_q1_fy26_quarterly_2025_10_30_s4",
+      "locator": "Seadrift permitting",
+      "quote": "Following the identification of a permitting issue related to wastewater management which affects the Seadrift site, an alternative pathway was identified to resolve the wastewater management challenges."
+    },
+    {
+      "id": "lynas_q1_fy26_quarterly_2025_10_30_s5",
+      "locator": "offtake caveat",
+      "quote": "While there can be no certainty that offtake agreements will be agreed, any offtake agreements will need to be on commercial terms acceptable to Lynas, having regard to Lynas’ important strategic position as the only outside China commercial producer of separated Light and Heavy Rare Earth oxides"
+    }
+  ]
+}

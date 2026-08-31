@@ -1,0 +1,94 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "guided",
+      "disproof_condition": "若 Dy/Tb 產線爬坡失敗（後續季報產量未拆分成長）或品質不獲磁體廠合格認證，重稀土敘事下修。",
+      "id": "miningweekly_lynas_terbium_2025_06_18_cl1",
+      "source_ids": [
+        "miningweekly_lynas_terbium_2025_06_18_s1",
+        "miningweekly_lynas_terbium_2025_06_18_s2",
+        "miningweekly_lynas_terbium_2025_06_18_s3"
+      ],
+      "statement": "Mining Weekly（獨立產業媒體）記載 CEO 具名聲明：Tb 氧化物 2025-06 於 Lynas Malaysia 首產、Dy 氧化物 2025-05 於新重稀土產線首產；原料來自西澳 Mt Weld 礦——重稀土（高溫磁體必要摻雜物）的 ex-China 供給從零到一，此為 MP 不具備的能力段。",
+      "subject_id": "co:lynas"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "mat:rare_earth_magnets",
+      "id": "lyn2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "miningweekly_lynas_terbium_2025_06_18_s1",
+        "miningweekly_lynas_terbium_2025_06_18_s2"
+      ],
+      "src_id": "co:lynas"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "LYC.AX"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:lynas",
+      "name": "Lynas Rare Earths",
+      "role": null,
+      "source_ids": [
+        "miningweekly_lynas_terbium_2025_06_18_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "NdFeB"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "mat:rare_earth_magnets",
+      "name": "Rare earth magnets (neodymium, samarium-cobalt)",
+      "role": null,
+      "source_ids": [
+        "miningweekly_lynas_terbium_2025_06_18_s2"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "miningweekly_lynas_terbium_2025_06_18",
+    "evidence_tier": 3,
+    "origin_entity": "Mining Weekly",
+    "permission_basis": "Public trade press; quotes only.",
+    "published_at": "2025-06-18",
+    "publisher": "Mining Weekly",
+    "retrieved_at": "2026-08-31",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Mining Weekly: Lynas adds terbium oxide to heavy rare earths portfolio",
+    "url": "https://www.miningweekly.com/article/lynas-adds-terbium-oxide-to-heavy-rare-earths-portfolio-2025-06-18"
+  },
+  "sources": [
+    {
+      "id": "miningweekly_lynas_terbium_2025_06_18_s1",
+      "locator": "Tb first production",
+      "quote": "Lynas is delighted to have achieved first production of terbium oxide at the Lynas Malaysia advanced materials plant"
+    },
+    {
+      "id": "miningweekly_lynas_terbium_2025_06_18_s2",
+      "locator": "Dy first production",
+      "quote": "dysprosium oxide, which was first produced on our new heavy rare earths production line in May"
+    },
+    {
+      "id": "miningweekly_lynas_terbium_2025_06_18_s3",
+      "locator": "Mt Weld feedstock",
+      "quote": "The feedstock for both terbium and dysprosium production is sourced from the company's Mt Weld deposit in Western Australia"
+    }
+  ]
+}
