@@ -3753,15 +3753,18 @@
       "added_at": "2026-08-25T13:30:44.275553+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_f5d3b323f0a6a18157be84b2f7bdaba0",
+      "dispatch_receipt": "decision:pd_f557308434860ae6e5d7e5da4b64cf37",
       "dispatch_ref": "wo_63ce1bbd347fe71656beae4259f7da8a",
-      "dispatch_status": "queued",
+      "dispatch_status": "completed",
+      "dispatch_updated_at": "2026-08-31T14:50:15.051667+00:00",
       "dispatched_at": "2026-08-31T11:17:34.623419+00:00",
       "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 230,
-      "reason": null,
+      "reason": "pq1 completed",
+      "receipt": "decision:pd_f557308434860ae6e5d7e5da4b64cf37",
       "ref_id": "dc_912a03a50135ea5e29000a0417c3f477",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-31T14:50:15.051667+00:00",
       "source": "decision_lab",
       "title": "co:schaeffler：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
@@ -12703,6 +12706,33 @@
       "receipt": "action:ra_79a18c7c1f5931acb372a71f64f8b153;digest:2fdb389df11d162f256381af99e0d4ebf80e514ae4a429e0a7f4b057fb49221e;commit:1c487c394e95c7cfca2ba07ccfdaa669c4b59d6a;cohort:dc_912a03a50135ea5e29000a0417c3f477",
       "ref_id": "ra_79a18c7c1f5931acb372a71f64f8b153",
       "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-31T14:47:04.638307+00:00",
+      "n": 230,
+      "reason": null,
+      "receipt": "research:ra_353d5e662ef996de0a8f0f649e599819+ra_79a18c7c1f5931acb372a71f64f8b153",
+      "ref_id": "dc_912a03a50135ea5e29000a0417c3f477",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-08-31T14:50:15.051667+00:00",
+      "n": 230,
+      "reason": null,
+      "receipt": "decision:pd_f557308434860ae6e5d7e5da4b64cf37",
+      "ref_id": "dc_912a03a50135ea5e29000a0417c3f477",
+      "type": "decision_review",
+      "verb": "pq1_completed"
+    },
+    {
+      "at": "2026-08-31T14:50:15.051667+00:00",
+      "n": 230,
+      "reason": "pq1 completed",
+      "receipt": "decision:pd_f557308434860ae6e5d7e5da4b64cf37",
+      "ref_id": "dc_912a03a50135ea5e29000a0417c3f477",
+      "type": "decision_review",
       "verb": "go"
     }
   ],
