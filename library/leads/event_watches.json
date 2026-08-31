@@ -109,6 +109,52 @@
       "note": "",
       "status": "active",
       "woken_by": null
+    },
+    {
+      "watch_id": "ew_0006_2026-08-31",
+      "created_at": "2026-08-31T05:17:38.658373+00:00",
+      "expires": "2026-12-31",
+      "kind": "fact_verification",
+      "until": null,
+      "entities": [
+        "IQE",
+        "co:iqe"
+      ],
+      "fact": "3in CW epiwafer ASP +40%+（Nomura 截圖）——對照 IQE H1 業績（2026-09-07）ASP/毛利方向",
+      "fact_check_ref": "IQE H1 2026 results RNS",
+      "wake_pq2": null,
+      "hypothesis_ref": "hy_0003_2026-08-31",
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": ""
+      },
+      "note": "",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0007_2026-08-31",
+      "created_at": "2026-08-31T05:17:38.803241+00:00",
+      "expires": "2026-12-31",
+      "kind": "fact_verification",
+      "until": null,
+      "entities": [
+        "AAOI",
+        "co:applied_optoelectronics"
+      ],
+      "fact": "AAOI 產能售罄至 2H＋美國產線溢價（summit 截圖）——對照 Q3 財報 ASP/毛利/產能陳述",
+      "fact_check_ref": "AAOI Q3 2026 10-Q/法說",
+      "wake_pq2": null,
+      "hypothesis_ref": "hy_0004_2026-08-31",
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": ""
+      },
+      "note": "",
+      "status": "active",
+      "woken_by": null
     }
   ]
 }
