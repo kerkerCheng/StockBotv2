@@ -5313,10 +5313,11 @@
       "added_at": "2026-08-31T06:26:18.107377+00:00",
       "hint": "go＝逐筆分三類處理（4 筆無可等內容→結案；3 筆真在等特定事實→升級成 fact watch，含補 hy_0002 缺的那個 watch；7 筆補正確觸發設定或改為需人工決定）；不含合併架構、不含入圖、不含 live。驗收：同上 14→0，但機制不變，未來仍會再生",
       "n": 322,
-      "reason": null,
+      "reason": "[321] 已根治：14 筆處置由架構層涵蓋（到期機制取代逐筆止血）",
+      "receipt": null,
       "ref_id": "manual:322",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "drop",
+      "resolved_at": "2026-08-31T07:57:14.914562+00:00",
       "source": "manual",
       "title": "只止血：14 筆已死追源線索的誠實處置（不動架構）",
       "type": "manual"
@@ -12064,6 +12065,15 @@
       "receipt": null,
       "ref_id": "dc_9d464eeb94b7b0108104db1774bbbdd4",
       "type": "decision_review",
+      "verb": "drop"
+    },
+    {
+      "at": "2026-08-31T07:57:14.914562+00:00",
+      "n": 322,
+      "reason": "[321] 已根治：14 筆處置由架構層涵蓋（到期機制取代逐筆止血）",
+      "receipt": null,
+      "ref_id": "manual:322",
+      "type": "manual",
       "verb": "drop"
     }
   ],
