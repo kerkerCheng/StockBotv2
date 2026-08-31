@@ -84,11 +84,12 @@ SQL 繞過。真正的 `private_storage_boundary_rejected` 才是 storage bounda
 
 ### 措辭：節點與代碼寫中文，首次附原始 label（2026-08-31 使用者定案）
 
-四個 pane 面向使用者時，`tech:*`／`mat:*`／`co:*`、關係動詞與證據等級一律先講人話，
-首次出現以反引號附原始 label 供查圖：「超高功率雷射 `tech:uhp_laser`」「供貨給 NVIDIA」
-「客戶端印證」「供應商自報」「獨家供應」。同一份輸出內重複出現可只寫中文。
-Pane 3 的研究題目同理——寫「誰供應薄膜鈮酸鋰平台 `tech:tfln_platform`」，
-不寫裸 label。判準見 `AGENTS.md`「面向使用者的措辭層」。
+判準是**望文生義還是要查表**，不是「內不內部」：`co:axt`／`co:coherent` 本身就是公司名，
+**留著不翻**；含縮寫或長蛇形命名的才翻，並於首次出現以反引號附原始 label 供查圖——
+「超高功率雷射 `tech:uhp_laser`」「磷化銦基板 `mat:inp_substrate`」「客戶端印證」
+「供應商自報」「獨家供應」；關係動詞寫「供貨給 NVIDIA」／「依賴 X」。
+同一份輸出內重複出現可只寫中文。Pane 3 的研究題目同理——寫「誰供應薄膜鈮酸鋰平台
+`tech:tfln_platform`」，不寫裸 label。完整判準見 `AGENTS.md`「面向使用者的措辭層」。
 
 ### 三個必附，缺一即未完成
 

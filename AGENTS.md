@@ -223,15 +223,26 @@ packet（新 pq2 編號）或誠實 park 為止**，不得 dispatch 完就停。
 「我可能 care 這次核准建立了哪兩個公司之間的哪種關係，但他是怎麼在圖裡用什麼 property
 表達，其實我不是很在意。」
 
-1. **中文優先，首次出現附原始 label。** 圖節點（`tech:uhp_laser` → 超高功率雷射
-   `tech:uhp_laser`）、證據等級（`externally_corroborated` → 客戶端印證）、blocker code
-   （`research_assessment_missing` → 缺獨立來源）、項目類型（`ra_admission` → 入圖核准）
-   一律先講人話。附 label 是為了讓使用者能把字串貼回來查圖，不是為了嚴謹。
+1. **判準是「望文生義還是要查表」，不是「內不內部」（2026-08-31 使用者補充）。**
+   使用者原話：「`co:axt` 這類內部 ID 好像也可以留著……但太長或比較艱澀的 label，
+   我偏好直接能看懂的。」所以 `co:axt`／`co:coherent` 本身就是公司名，**留著**，
+   翻譯反而多一層轉換；真正要翻的是含縮寫或長蛇形命名的：
+   `tech:uhp_laser` → 超高功率雷射、`mat:inp_substrate` → 磷化銦基板、
+   `externally_corroborated` → 客戶端印證、`self_reported_costly` → 供應商自報、
+   `research_assessment_missing` → 缺獨立來源、`ra_admission` → 入圖核准。
+   翻譯後首次出現以反引號附原始 label，讓使用者能貼回來查圖。
 2. **三樣必須留，其餘可省：** pq2 編號（唯一核准介面）、公司全名＋ticker、
    `go` 授權什麼／不含什麼。前兩者是使用者的操作把手，第三者是四個 authority gate 的界線——
    省掉它，使用者就得靠記憶區分「核准入圖」與「核准下單」。
-3. **待辦區塊依建議處置分三段**（建議 `go`／建議 `drop`／不用動），不依項目類型分。
-   類型是系統的分類軸，處置才是使用者的決策軸。
+3. **待辦分段軸是「現在能不能決定」，不是項目類型，也不是「上次有沒有說晚點」
+   （2026-08-31 使用者發現）。** 四段固定：建議 `go`／建議 `drop`／**你之前說晚點再決定的**／
+   不用動（等事件＋進行中）。
+   ⚠ **`deferred_at` 只影響排序，不影響可見性。** 分段依據是 `waiting_on` 是否為空：
+   為空＝你隨時可以決定，**必須逐項現形並附已等待天數**；有值＝世界要先發生某事，
+   才可摺疊成一行。事發：2026-08-31 brief 把 [193]（付費報告 access，已 defer 10 天）
+   與 [230]（已 defer 6 天）跟「等事件」混在同一段摺疊，使用者當場指出
+   「這個不應該被藏起來」——兩者 `waiting_on` 都是空的，是欠著的決定不是等待中的事件。
+   附天數是為了讓拖延自己現形（L14：防呆要會自己出現，不是要人記得）。
 4. **內部機制名稱不出現在使用者可讀區**：`action_digest`、`focus_company_id`、`cohort_id`、
    `work order`、`consumed marker` 等留在 receipt 與 log，不進 brief 正文。
 

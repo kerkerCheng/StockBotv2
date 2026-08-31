@@ -366,13 +366,21 @@ K claims＋來源與 tier）；其他類型由撰寫者一句話回答「核准�
 `標籤讀法：前段＝答案回來會改什麼（出場條件>候選集合>排序>只是信心），後段＝材料是什麼（資本承諾/結構事實/財務事實/內部人/情緒）`。
 字彙 SSOT 仍是 `config/lead_classification.json`，圖例措辭與其 label 同步。
 
-**區塊依處置分，不依類型分（2026-08-31 使用者定案）：** 三段固定為「建議 go／建議 drop／
-不用動」；`ra_admission`／`decision_review`／`source_trace_review` 這些是系統的分類軸，
-不再拿來當使用者可見的段落標題。同一段內若有多種類型，用每項自己的「授權範圍」行區分。
+**區塊依「現在能不能決定」分，不依類型分（2026-08-31 使用者定案）：** 四段固定為
+「建議 go／建議 drop／你之前說晚點再決定的／不用動」；`ra_admission`／`decision_review`／
+`source_trace_review` 這些是系統的分類軸，不再拿來當使用者可見的段落標題。同一段內
+若有多種類型，用每項自己的「授權範圍」行區分。
 
-**措辭層依 `AGENTS.md`「面向使用者的措辭層」：** 中文優先＋首次附原始 label；
-`co:*`／`tech:*`／證據等級／blocker code／類型代號一律先講人話；
-`action_digest`／`focus_company_id`／`cohort_id`／work order id 不進正文，留在 receipt。
+⚠ **第三段不得摺疊，也不得併進「不用動」。** 分段依據是 `waiting_on` 是否為空——
+為空代表使用者隨時可以決定（只是上次說晚點），必須逐項現形並**附已等待天數**；
+`waiting_on` 有值才是真的在等外部事件，那種才可摺疊。`deferred_at` 只影響排序位置，
+不影響可見性。判準與事發見 `AGENTS.md`「面向使用者的措辭層」第 3 點。
+
+**措辭層依 `AGENTS.md`「面向使用者的措辭層」：** 判準是「望文生義還是要查表」——
+`co:axt`／`co:coherent` 這類本身就是公司名的**留著不翻**；含縮寫或長蛇形命名的
+（`tech:uhp_laser`、`externally_corroborated`、`research_assessment_missing`、
+`ra_admission`）翻中文並首次附原始 label。`action_digest`／`focus_company_id`／
+`cohort_id`／work order id 不進正文，留在 receipt。
 必留三樣：編號、公司全名＋ticker、`go` 授權什麼／不含什麼。
 
 stable pq2 編號後不得只貼短標題或 `co:*` ID。決策行之下，每一個需要使用者決定的 item 至少包含：
@@ -408,9 +416,15 @@ stable pq2 編號後不得只貼短標題或 `co:*` ID。決策行之下，每�
 ### 建議 drop（N 項）
 [278][293][295] IQE／Marvell／POET 補佐證 — <為何可關；為何不會換號重生>
 
+### 你之前說晚點再決定的（N 項）— 不得摺疊
+[193] Rosenblatt 券商報告 access — 已等 10 天｜要你決定買不買（付費）
+[230] Schaeffler 補佐證 — 已等 6 天｜要你決定要不要現在研究
+<`waiting_on` 為空＝隨時可決定。逐項列，附已等待天數；deferred_at 只讓它排在
+建議 go 之後，不讓它消失>
+
 ### 不用動（N 項）
-等事件 N 項｜研究進行中 N 項｜等你有空再決定 N 項
-<逐項一行：編號＋主詞＋在等什麼>
+等事件 N 項｜研究進行中 N 項
+<只有 `waiting_on` 有值（世界要先發生某事）或系統正在跑的才進這段，可摺疊成一行>
 ...
 
 ## pq1 研究進度（無 pq2 編號）
