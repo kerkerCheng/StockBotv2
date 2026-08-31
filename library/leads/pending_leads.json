@@ -18387,6 +18387,22 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2074776109074583565"
     },
+    "lead_4c082f76c0248f18981da5873d049f71": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-31T05:13:57.517945+00:00",
+      "lead_id": "lead_4c082f76c0248f18981da5873d049f71",
+      "published_at": "2026-08-05",
+      "refs": {},
+      "source": "event_watch:t2_sweep",
+      "status": "pending",
+      "themes": {},
+      "title": "T2 sweep 命中：FCC 草擬禁新中國光模組（Innolight+Eoptolink 佔 800G+ 逾 60%）；擬年內發布、2026 稍晚生效——hy_0005 禁令假設由傳聞升為多家證實的 FCC 草案",
+      "triage": null,
+      "url": "https://cignal.ai/2026/08/fcc-ban-on-new-chinese-optical-modules/"
+    },
     "lead_4cfd1607064be4fe2b8f26a49e3458f8": {
       "entities": {
         "company_ids": [
@@ -37866,6 +37882,32 @@
         }
       ],
       "url": "https://x.com/aleabitoreddit/status/2080031508656746874"
+    },
+    "lead_bae3d59e761ce13a08d11b6da1b4afbe": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-31T05:13:57.182485+00:00",
+      "lead_id": "lead_bae3d59e761ce13a08d11b6da1b4afbe",
+      "published_at": "2026-08-17",
+      "refs": {},
+      "source": "event_watch:t2_sweep",
+      "status": "pending",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "COHR",
+            "InP",
+            "LITE"
+          ]
+        }
+      },
+      "title": "T2 sweep 命中：COHR 預付 AXT 最高 $22.3M 擴 6 吋 InP（北京廠 2026-28）＋LITE $87M 五年產能保留——客戶端資本承諾，一手應在 COHR/AXTI 8-K 可免費追",
+      "triage": null,
+      "url": "https://247wallst.com/investing/2026/08/17/axt-soars-again-on-monday-to-lead-optics-stocks-coherent-and-lumentum-rally-on-indium-phosphide-price-hikes/"
     },
     "lead_baf13ca0773a70940d289449b2d3d3e6": {
       "entities": {
