@@ -5682,10 +5682,11 @@
       "added_at": "2026-08-31T15:42:59.383301+00:00",
       "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2025-12-31T00:00:00+00:00；來源=HIMX 20-F FY2025 (filed 2026-03-27, SEC EDGAR)，Item 4.B Business Overview—Custom",
       "n": 343,
-      "reason": null,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_c7f51788222bc85d067057fd29ccf748;proposal:po_0d4e78cedfceec725f5bf940d45cc074",
       "ref_id": "po_0d4e78cedfceec725f5bf940d45cc074",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-31T16:02:55.474610+00:00",
       "source": "engine_c",
       "title": "Engine C 觀測：HIMX / backlog",
       "type": "engine_c_observation"
@@ -5694,10 +5695,11 @@
       "added_at": "2026-08-31T15:42:59.383301+00:00",
       "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2025-12-31T00:00:00+00:00；來源=HIMX 20-F FY2025 (filed 2026-03-27, SEC EDGAR)，Item 4.B Business Overview—Custom",
       "n": 344,
-      "reason": null,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_4661a4cb527d3796da80930ce62f2a7b;proposal:po_1461e1b82c465d6b5ba15a73654d857c",
       "ref_id": "po_1461e1b82c465d6b5ba15a73654d857c",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-31T16:02:54.840011+00:00",
       "source": "engine_c",
       "title": "Engine C 觀測：HIMX / customer_concentration",
       "type": "engine_c_observation"
@@ -12769,6 +12771,24 @@
       "receipt": "decision:pd_f557308434860ae6e5d7e5da4b64cf37",
       "ref_id": "dc_912a03a50135ea5e29000a0417c3f477",
       "type": "decision_review",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-31T16:02:54.840011+00:00",
+      "n": 344,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_4661a4cb527d3796da80930ce62f2a7b;proposal:po_1461e1b82c465d6b5ba15a73654d857c",
+      "ref_id": "po_1461e1b82c465d6b5ba15a73654d857c",
+      "type": "engine_c_observation",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-31T16:02:55.474610+00:00",
+      "n": 343,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_c7f51788222bc85d067057fd29ccf748;proposal:po_0d4e78cedfceec725f5bf940d45cc074",
+      "ref_id": "po_0d4e78cedfceec725f5bf940d45cc074",
+      "type": "engine_c_observation",
       "verb": "go"
     }
   ],
