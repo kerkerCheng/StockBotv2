@@ -42,6 +42,8 @@ _PROBE_REQUIRED_KEYS = {
     "evidence_hops",
 }
 
+_SHADOW_REQUIRED_KEYS = {"tracking_expiry_days"}
+
 _LIVE_MONITOR_REQUIRED_KEYS = {"return_1d_at_most", "history_sessions"}
 
 
@@ -112,6 +114,26 @@ def _validate_probe_lane(value: Any) -> dict[str, Any]:
     ):
         normalized[field] = _positive_number(value[field], f"probe_lane.{field}")
     return normalized
+
+
+def _validate_shadow_lane(value: Any) -> dict[str, Any]:
+    """入圖後自動追蹤 cohort 的到期期限。
+
+    ⚠ 這**不是**資本閘門，也不是複查節奏。它只回答「沒人替這家公司寫出 thesis 的話，
+    多久後回頭問還要不要追」。與 `probe_lane.review_hours`（一個 probe 多久複查一次）
+    是兩個不同的時鐘，2026-08-31 之前兩者被併在一起用（L12），詳見 config 內 `_doc`。
+    """
+
+    if not isinstance(value, Mapping):
+        raise PolicyError("shadow_lane must be an object")
+    missing = sorted(_SHADOW_REQUIRED_KEYS - set(value))
+    if missing:
+        raise PolicyError(f"shadow_lane missing required keys: {', '.join(missing)}")
+
+    days = value["tracking_expiry_days"]
+    if isinstance(days, bool) or not isinstance(days, int) or days < 7:
+        raise PolicyError("shadow_lane.tracking_expiry_days must be an integer >= 7")
+    return {"tracking_expiry_days": days}
 
 
 def _validate_live_position_monitor(value: Any) -> dict[str, Any]:
@@ -204,6 +226,13 @@ def validate_policy(policy: Mapping[str, Any]) -> dict[str, Any]:
     # to the independently validated Probe lane.
     if "probe_lane" in policy:
         normalized["probe_lane"] = _validate_probe_lane(policy["probe_lane"])
+    if "shadow_lane" in policy:
+        normalized["shadow_lane"] = _validate_shadow_lane(policy["shadow_lane"])
+    # ⚠ 這裡刻意**不加**「tracking_expiry_days*24 > review_hours」的交叉檢查。
+    # 寫過一版，然後發現它永遠不可能觸發：`review_hours` 上限 72（3 天），而
+    # `tracking_expiry_days` 下限 7（168 小時），兩個範圍不相交。那種恆滅的檢查
+    # 正是 L14 第 4 點列的無效 gate——看起來在保護什麼，實際零鑑別力。
+    # 兩個時鐘的分離由各自的邊界保證，不需要第三個永遠為真的斷言。
     if "live_position_monitor" in policy:
         normalized["live_position_monitor"] = _validate_live_position_monitor(
             policy["live_position_monitor"]

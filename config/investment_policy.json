@@ -22,6 +22,19 @@
     "financial_runway_freshness_days": 100,
     "evidence_hops": 2
   },
+  "shadow_lane": {
+    "_doc": [
+      "入圖後自動建立的追蹤 cohort（ensure_shadow_for_company）專用的到期期限。",
+      "它與 probe_lane.review_hours 是兩個不同的時鐘，不得共用：",
+      "review_hours=72 是『一個 probe 多久該複查一次』的作業節奏；",
+      "tracking_expiry_days 是『沒人替這家公司寫出 thesis 的話，多久後回頭問還要不要追』。",
+      "事發 2026-08-31：兩者先前共用 72 小時，於是每家新入圖公司都在三天後拿到一個沒有",
+      "催化劑也沒有證偽條件的到期提醒——警報會響，但響了不知道要看什麼（L7 的反面）。",
+      "實測當時 22 個追蹤標的有 6 個處於此狀態，全庫 30 個 cohort 有 24 個由這條路徑建立。",
+      "90 天＝一個財報揭露週期：真正的下一個新事實最早在那時出現。"
+    ],
+    "tracking_expiry_days": 90
+  },
   "live_position_monitor": {
     "return_1d_at_most": -0.04,
     "history_sessions": 10

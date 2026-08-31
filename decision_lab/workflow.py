@@ -157,6 +157,25 @@ def _default_expiry(evaluation_at: str, policy: Mapping[str, Any]) -> str:
     return (_time(evaluation_at, "evaluation_at") + timedelta(hours=review_hours)).isoformat()
 
 
+def _shadow_expiry(evaluation_at: str, policy: Mapping[str, Any]) -> str:
+    """入圖後自動追蹤 cohort 的到期期限——**不得**沿用 probe 的複查節奏。
+
+    這兩個是不同的時鐘（L12：一個表示承載兩種語意）：
+    `probe_lane.review_hours` 問「一個 probe 多久該複查一次」，
+    `shadow_lane.tracking_expiry_days` 問「沒人替這家公司寫出 thesis 的話，
+    多久後回頭問還要不要追」。
+
+    事發（2026-08-31）：`ensure_shadow_for_company` 不帶 expiry，於是落到
+    `_default_expiry` 的 72 小時。後果是每家新入圖公司三天後就拿到一個**沒有催化劑、
+    沒有證偽條件**的到期提醒——L7 說「欄位有填但沒有後續流程等於警報永遠不會響」，
+    這是它的反面且更吵：警報會響，但響了不知道要看什麼。實測 22 個追蹤標的有 6 個
+    如此，且全庫 30 個 cohort 有 24 個由這條路徑建立。
+    """
+
+    days = float(policy["shadow_lane"]["tracking_expiry_days"])
+    return (_time(evaluation_at, "evaluation_at") + timedelta(days=days)).isoformat()
+
+
 def _source_uri(request: EvaluationRequest) -> str:
     if request.source_url:
         return request.source_url
@@ -584,6 +603,10 @@ def ensure_shadow_for_company(
             company_id_hint=company_id,
             execution_intent="research",
             as_of=now,
+            # 明確給 shadow 專屬期限，不要落到 `_default_expiry` 的 probe 複查節奏。
+            # 這條路徑沒有催化劑也沒有證偽條件（它就是「還沒有 thesis」的狀態），
+            # 三天後到期只會產生一個講不出要看什麼的假警報。
+            expiry=_shadow_expiry(now, load_policy()),
         ),
     )
     return {
