@@ -40,6 +40,11 @@ SHARED_PATHS = (
     "library/leads/event_watches.json",
 )
 
+# 從 publisher 匯入而非各寫一份：兩邊分開維護時，改了一邊而忘了另一邊不會有任何
+# 東西報錯——guard 只會安靜地停止辨認排程（L16：分類要跟著資料走，不要重造）。
+sys.path.insert(0, str(ROOT))
+from scripts.publish_daily_state import COMMIT_SUBJECT as _PUBLISHER_SUBJECT  # noqa: E402
+
 
 def _load_schedule() -> dict:
     raw = json.loads(CONFIG.read_text(encoding="utf-8-sig"))
@@ -119,8 +124,12 @@ def cmd_verify(args: argparse.Namespace) -> int:
         )
         for line in filter(None, log.splitlines()):
             sha, _, subject = line.partition("\x1f")
-            # 排程的 state publisher 用固定 subject；互動 session 的 commit 由呼叫端自己認得。
-            if subject.startswith("chore(daily)"):
+            # ⚠ 必須比對**完整** subject，不能只看 `chore(daily):` 前綴。
+            # 2026-08-31 實測：互動 session 也用這個房規慣例寫 pool sync
+            # （"chore(daily): sync pool after [230] 結案…"），只比 prefix 會把自己的
+            # commit 判成排程——L12 的形狀：一個訊號承載兩種語意。
+            # 會誤報的 guard 一週內就會被忽略，那比沒有 guard 更糟。
+            if subject == _PUBLISHER_SUBJECT:
                 foreign.append(f"{sha[:7]} {subject}")
 
     payload = {

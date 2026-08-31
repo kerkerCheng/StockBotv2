@@ -18,6 +18,10 @@ STATE_PATHS = (
     "library/leads/todo_pool.json",
 )
 COMMIT_PREFIX = "chore(daily):"
+# 本 publisher 提交時的**完整** subject。`writer_guard` 靠它辨認「這筆共用檔變更
+# 是排程做的」——必須是完整字串而不是 prefix：互動 session 也會用 `chore(daily):`
+# 這個房規慣例寫 pool sync，只比對 prefix 會把自己的 commit 判成排程（2026-08-31 實測）。
+COMMIT_SUBJECT = f"{COMMIT_PREFIX} sync local approval state"
 
 
 def _git(root: Path, *args: str, timeout: int = 30) -> tuple[int, str]:
@@ -90,7 +94,7 @@ def publish_daily_state(root: Path | str = ROOT) -> dict[str, Any]:
             repo,
             "commit",
             "-m",
-            f"{COMMIT_PREFIX} sync local approval state",
+            COMMIT_SUBJECT,
             "--",
             *STATE_PATHS,
         )
