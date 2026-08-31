@@ -4957,6 +4957,18 @@
       "source": "research_action",
       "title": "第三 origin 補強×2：Counterpoint 記載 MRVL Photonic Fabric 16Tbps 與三生態卡位＋borecraft 記載 LuxNet CW 雷射角色",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-08-31T00:09:37.392483+00:00",
+      "hint": "使用者指示語境：核准項要一句話講重點與圖影響、排序標籤要圖例、產業別與無源截圖兩題進 brainstorm；受理即 resolve（鑄號只為稽核）",
+      "n": 304,
+      "reason": null,
+      "ref_id": "manual:304",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "Daily brief 修訂＋兩份 brainstorm（使用者 2026-08-31 指示）：圖影響一句話、pq1 標籤圖例、產業別分排序與截圖假設層方向文件",
+      "type": "manual"
     }
   ],
   "log": [
@@ -11222,6 +11234,6 @@
       "verb": "source_cleared"
     }
   ],
-  "next_n": 304,
+  "next_n": 305,
   "schema_version": "1"
 }

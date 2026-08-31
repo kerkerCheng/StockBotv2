@@ -1197,6 +1197,9 @@ def sync(
         )
         if len(pool["items"]) > before:
             added += 1
+        # 圖影響一句話跟著項目走（L16）；collector 沒算出來就維持缺席。
+        if row.get("graph_impact"):
+            item["graph_impact"] = str(row["graph_impact"])
 
         incoming_waiting = row.get("waiting_on")
         event_link = row.get("event_link")
@@ -1464,6 +1467,37 @@ def collect_from_research_actions() -> list[dict[str, Any]]:
     return _fail_soft(_collect_research_action_rows)
 
 
+def _ra_graph_impact(payload: Mapping[str, Any]) -> str:
+    """一句話回答「核准這個 RA 對圖的影響是什麼」（2026-08-31 使用者要求）。
+
+    從凍結 payload 的 extraction_json 數 nodes／edges／claims 並列 origin＋tier。
+    解析失敗回空字串（fail-soft：影響行缺席，密度契約其餘不變）。
+    """
+
+    try:
+        n_nodes = n_edges = n_claims = 0
+        origins: list[str] = []
+        for doc in payload.get("documents") or []:
+            raw = doc.get("extraction_json")
+            ex = json.loads(raw) if isinstance(raw, str) else (raw or {})
+            n_nodes += len(ex.get("nodes") or [])
+            n_edges += len(ex.get("edges") or [])
+            n_claims += len(ex.get("claims") or [])
+            src = ex.get("source_doc") or {}
+            origin = str(src.get("origin_entity") or "").strip()
+            tier = src.get("evidence_tier")
+            if origin:
+                origins.append(f"{origin}（tier {tier}）" if tier else origin)
+        if not (n_nodes or n_edges or n_claims):
+            return ""
+        parts = [f"+{n_nodes} 節點、{n_edges} 邊、{n_claims} claims"]
+        if origins:
+            parts.append("來源：" + "、".join(dict.fromkeys(origins)))
+        return "｜".join(parts)
+    except Exception:
+        return ""
+
+
 def _collect_research_action_rows() -> list[dict[str, Any]]:
     """等核准入圖的 Research Action → 經典 pq2。"""
     from mcp_server.research_actions import iter_actions
@@ -1522,13 +1556,17 @@ def _collect_research_action_rows() -> list[dict[str, Any]]:
                 or (action.get("review") or {}).get("title")
                 or "Research Action"
             )
-            rows.append({
+            row: dict[str, Any] = {
                 "type": "ra_admission",
                 "ref_id": action_id,
                 "title": str(title),
                 "hint": handoff_hint,
                 "source": "research_action",
-            })
+            }
+            impact = _ra_graph_impact(action.get("payload") or {})
+            if impact:
+                row["graph_impact"] = impact
+            rows.append(row)
     return [r for r in rows if r["ref_id"]]
 
 
@@ -1989,6 +2027,11 @@ def _item_line(item: Mapping[str, Any]) -> str:
     if not item.get("dispatch_status"):
         scope = go_authorization(str(item.get("type") or ""))
         line += f"\n        ↳ go＝{scope['go_authorizes']}；不含{scope['go_excludes']}"
+        # 圖影響一句話（2026-08-31 使用者要求）：核准了什麼、對圖加了什麼，
+        # 不展開密度欄位也能決定。sync 時由凍結 payload 計算（L16：跟著資料走）。
+        impact = str(item.get("graph_impact") or "").strip()
+        if impact:
+            line += f"\n        ↳ 圖影響：{impact}"
     # decision_review 的區段標題只寫得出一種成因（見 _dispatchable_cohorts）。
     # 逐項 hint 才知道這一筆該 dispatch 還是該 reassess——不顯示等於沒有，
     # 使用者只會看到區段標題然後下錯 verb（2026-08-26 實測）。
