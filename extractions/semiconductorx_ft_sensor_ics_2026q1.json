@@ -1,0 +1,121 @@
+{
+  "claims": [
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "guided",
+      "disproof_condition": "若 2027 年底前任一商用 IC 供應商（Bosch Sensortec、ST、或中國 MEMS 廠）公開啟動 FT 感測 IC 專案並取得人形客戶 design-win，則「無商用方案」的描述失效，該層的 ramp_difficulty 應下修。核查頻率：每半年；觸發後 48 小時內人工 review。",
+      "id": "semiconductorx_ft_sensor_ics_2026q1_cl1",
+      "source_ids": [
+        "semiconductorx_ft_sensor_ics_2026q1_s1",
+        "semiconductorx_ft_sensor_ics_2026q1_s2",
+        "semiconductorx_ft_sensor_ics_2026q1_s3"
+      ],
+      "statement": "人形機器人的力／力矩感測層截至 2026 年第一季**沒有任何商用 IC 供應商啟動專案**（no program has started from a merchant IC supplier as of Q1 2026），產業因此持續依賴客製化微型應變規總成。每台以靈巧操作為目標的人形平台需 2–6 顆 FT 感測器。",
+      "subject_id": "tech:force_torque_sensor"
+    },
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "guided",
+      "disproof_condition": "若取得任一人形廠商一手文件顯示 FT 感測器供應商更換在一年內完成，則 structural_lead_time_weeks 應大幅下修。核查頻率：每年；觸發後 48 小時內 review。",
+      "id": "semiconductorx_ft_sensor_ics_2026q1_cl2",
+      "source_ids": [
+        "semiconductorx_ft_sensor_ics_2026q1_s4",
+        "semiconductorx_ft_sensor_ics_2026q1_s1"
+      ],
+      "statement": "該層的**合格週期為 3–7 年**（3-7 years from program start to production-qualified device）。這是本圖少數有明確合格週期的層之一，且它示範了「難替代」與「換掉要多久」是兩件事：這一層的可替代性不高（多家具名商用供應商，且 Tesla、Figure AI、1X 三家主要客戶皆自行設計），但一旦選定，更換需要數年——**低替代難度 ＋ 長合格週期**。",
+      "subject_id": "tech:force_torque_sensor"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {
+        "structural_lead_time_weeks": 156,
+        "substitutability": 3
+      },
+      "confidence": 0.8,
+      "dst_id": "comp:humanoid_precision_actuators",
+      "id": "e1",
+      "relation": "is_component_of",
+      "source_ids": [
+        "semiconductorx_ft_sensor_ics_2026q1_s3"
+      ],
+      "src_id": "tech:force_torque_sensor"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "robot_subsystem",
+      "aliases": [
+        "force-torque sensor",
+        "FT sensor",
+        "六軸力感測器",
+        "力矩感測器"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 4
+      },
+      "confidence": 0.85,
+      "id": "tech:force_torque_sensor",
+      "name": "力／力矩感測器（FT sensor，人形關節與腕踝）",
+      "source_ids": [
+        "semiconductorx_ft_sensor_ics_2026q1_s1",
+        "semiconductorx_ft_sensor_ics_2026q1_s3"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "robot_subsystem",
+      "aliases": [
+        "precision actuators",
+        "series elastic actuators",
+        "quasi-direct-drive motors",
+        "precision reducers"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "comp:humanoid_precision_actuators",
+      "name": "Humanoid precision actuators (series elastic / quasi-direct-drive / precision reducers)",
+      "role": "robot_component_supplier",
+      "source_ids": [
+        "semiconductorx_ft_sensor_ics_2026q1_s3"
+      ],
+      "type": "Product"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "semiconductorx_ft_sensor_ics_2026q1",
+    "evidence_tier": 3,
+    "origin_entity": "SemiconductorX（獨立半導體供應鏈分析，非感測器廠也非機器人商）",
+    "permission_basis": "第三方產業分析；保留 canonical URL 與研究必要短引述。",
+    "published_at": "2026-01-01",
+    "publisher": "SemiconductorX",
+    "retrieved_at": "2026-08-31",
+    "source_type": "industry_report",
+    "storage_permission": "repo_excerpt",
+    "title": "Force-Torque Sensor ICs — Humanoid Robot Wrist and Ankle Force Sensing",
+    "url": "https://semiconductorx.com/force-torque-sensor-ics.html"
+  },
+  "sources": [
+    {
+      "id": "semiconductorx_ft_sensor_ics_2026q1_s1",
+      "locator": "Development Horizon / Outlook 2026-2030",
+      "quote": "no program has started from a merchant IC supplier as of Q1 2026"
+    },
+    {
+      "id": "semiconductorx_ft_sensor_ics_2026q1_s2",
+      "locator": "Outlook 2026-2030",
+      "quote": "continued dependence on custom miniaturized strain gauge assemblies"
+    },
+    {
+      "id": "semiconductorx_ft_sensor_ics_2026q1_s3",
+      "locator": "導言——每台用量",
+      "quote": "Every current-generation humanoid platform targeting dexterous manipulation...requires 2-6 FT sensors per robot"
+    },
+    {
+      "id": "semiconductorx_ft_sensor_ics_2026q1_s4",
+      "locator": "開發／合格週期",
+      "quote": "3-7 years from program start to production-qualified device"
+    }
+  ]
+}

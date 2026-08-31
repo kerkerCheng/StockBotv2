@@ -1,0 +1,4 @@
+Source URL: https://semiconductorx.com/force-torque-sensor-ics.html
+
+Excerpt:
+No program has started from a merchant IC supplier as of Q1 2026; continued dependence on custom miniaturized strain gauge assemblies. Every current-generation humanoid platform targeting dexterous manipulation requires 2-6 FT sensors per robot. 3-7 years from program start to production-qualified device.
