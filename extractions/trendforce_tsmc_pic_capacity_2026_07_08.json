@@ -1,0 +1,172 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "guided",
+      "disproof_condition": "Downgrade if MRM mass production slips beyond 2026 (no shipping product by 1H27) or if reliability/yield reports contradict the pre-ramp BER claim.",
+      "id": "trendforce_tsmc_pic_capacity_2026_07_08_cl1",
+      "source_ids": [
+        "trendforce_tsmc_pic_capacity_2026_07_08_s1",
+        "trendforce_tsmc_pic_capacity_2026_07_08_s2"
+      ],
+      "statement": "TSMC's 200Gbps micro-ring modulator (MRM) built on the COUPE platform is scheduled to enter mass production later in 2026, with bit error rate below 1E-08 under process-controlled conditions reported ahead of ramp (third-party industry-media report citing Economic Daily News; production yield per se remains undisclosed by TSMC).",
+      "subject_id": "co:tsmc"
+    },
+    {
+      "confidence": 0.5,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "Downgrade if capacity expansion is cancelled or materially delayed (e.g. 4Q26 capacity still near 2Q26 level), or if named customers publicly move CPO volume to another photonics foundry.",
+      "id": "trendforce_tsmc_pic_capacity_2026_07_08_cl2",
+      "source_ids": [
+        "trendforce_tsmc_pic_capacity_2026_07_08_s3",
+        "trendforce_tsmc_pic_capacity_2026_07_08_s4",
+        "trendforce_tsmc_pic_capacity_2026_07_08_s5"
+      ],
+      "statement": "Institutional-investor estimates (via Commercial Times, relayed by TrendForce) quantify TSMC PIC/COUPE capacity ramp from ~500 wafers/month to 10,000 by 2Q26, 15,000 by 4Q26 and at least 25,000 by 2028, with NVIDIA, Broadcom and AMD as likely primary volume customers in 2026-2027 — a forward estimate of production scale, not measured shipments.",
+      "subject_id": "co:tsmc"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.6,
+      "dst_id": "tech:coupe",
+      "id": "e1",
+      "relation": "is_component_of",
+      "source_ids": [
+        "trendforce_tsmc_pic_capacity_2026_07_08_s1"
+      ],
+      "src_id": "tech:mrm_200g"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.6,
+      "dst_id": "tech:mrm_200g",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "trendforce_tsmc_pic_capacity_2026_07_08_s1",
+        "trendforce_tsmc_pic_capacity_2026_07_08_s3"
+      ],
+      "src_id": "co:tsmc"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.5,
+      "dst_id": "tech:mrm_200g",
+      "id": "e3",
+      "relation": "depends_on",
+      "source_ids": [
+        "trendforce_tsmc_pic_capacity_2026_07_08_s5"
+      ],
+      "src_id": "co:nvidia"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [
+        "台積電",
+        "2330.TW",
+        "TSM"
+      ],
+      "attributes": {},
+      "confidence": 0.6,
+      "id": "co:tsmc",
+      "name": "TSMC",
+      "role": null,
+      "source_ids": [
+        "trendforce_tsmc_pic_capacity_2026_07_08_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "NVDA"
+      ],
+      "attributes": {},
+      "confidence": 0.6,
+      "id": "co:nvidia",
+      "name": "NVIDIA",
+      "role": null,
+      "source_ids": [
+        "trendforce_tsmc_pic_capacity_2026_07_08_s5"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [
+        "TSMC COUPE"
+      ],
+      "attributes": {},
+      "confidence": 0.6,
+      "id": "tech:coupe",
+      "name": "Compact Universal Photonic Engine (COUPE)",
+      "role": null,
+      "source_ids": [
+        "trendforce_tsmc_pic_capacity_2026_07_08_s1"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "MRM",
+        "micro-ring modulator"
+      ],
+      "attributes": {},
+      "confidence": 0.6,
+      "id": "tech:mrm_200g",
+      "name": "200G Micro-Ring Modulator (MRM)",
+      "role": null,
+      "source_ids": [
+        "trendforce_tsmc_pic_capacity_2026_07_08_s1",
+        "trendforce_tsmc_pic_capacity_2026_07_08_s2"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "trendforce_tsmc_pic_capacity_2026_07_08",
+    "evidence_tier": 2,
+    "origin_entity": "TrendForce",
+    "permission_basis": "Public TrendForce news article; canonical URL retained.",
+    "published_at": "2026-07-08",
+    "publisher": "TrendForce",
+    "retrieved_at": "2026-09-01",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "TSMC PIC Capacity Seen Surging to 25K Wafers/Month by 2028; NVIDIA, Broadcom Eyed as Early COUPE Customers",
+    "url": "https://www.trendforce.com/news/2026/07/08/news-tsmc-pic-capacity-seen-surging-to-25k-wafersmonth-by-2028-nvidia-broadcom-eyed-as-early-coupe-customers/"
+  },
+  "sources": [
+    {
+      "id": "trendforce_tsmc_pic_capacity_2026_07_08_s1",
+      "locator": "MRM production status paragraph (citing Economic Daily News)",
+      "quote": "200Gbps micro-ring modulator (MRM) based on its COUPE platform is scheduled to enter mass production later in 2026"
+    },
+    {
+      "id": "trendforce_tsmc_pic_capacity_2026_07_08_s2",
+      "locator": "MRM production status paragraph (citing Economic Daily News)",
+      "quote": "achieved a bit error rate below 1E-08 under process-controlled conditions"
+    },
+    {
+      "id": "trendforce_tsmc_pic_capacity_2026_07_08_s3",
+      "locator": "Capacity paragraph (citing Commercial Times / institutional investors)",
+      "quote": "500 wafers per month to 10,000 wafers by the second quarter of 2026"
+    },
+    {
+      "id": "trendforce_tsmc_pic_capacity_2026_07_08_s4",
+      "locator": "Capacity paragraph (citing Commercial Times / institutional investors)",
+      "quote": "reach at least 25,000 wafers per month by 2028"
+    },
+    {
+      "id": "trendforce_tsmc_pic_capacity_2026_07_08_s5",
+      "locator": "Early customers paragraph",
+      "quote": "the primary customers for volume production on TSMC's COUPE platform in 2026–2027 are likely to be NVIDIA, Broadcom, and AMD"
+    }
+  ]
+}

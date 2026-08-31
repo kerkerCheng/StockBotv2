@@ -1,0 +1,4 @@
+Source URL: https://www.trendforce.com/news/2026/07/08/news-tsmc-pic-capacity-seen-surging-to-25k-wafersmonth-by-2028-nvidia-broadcom-eyed-as-early-coupe-customers/
+
+Excerpt:
+200Gbps micro-ring modulator (MRM) based on its COUPE platform is scheduled to enter mass production later in 2026 ... achieved a bit error rate below 1E-08 under process-controlled conditions ... 500 wafers per month to 10,000 wafers by the second quarter of 2026 ... reach at least 25,000 wafers per month by 2028 ... the primary customers for volume production on TSMC's COUPE platform in 2026-2027 are likely to be NVIDIA, Broadcom, and AMD (TrendForce 2026-07-08)
