@@ -597,6 +597,14 @@ def render_by_sector(result: Mapping[str, Any], *, top_n: int = 3) -> str:
         lines.append(f"> ⚠ {note}")
     if grouped["correlation_notes"]:
         lines.append("")
+    # 空產業組要現形（prompt 契約）：configured 但零列的組是 sub 覆蓋缺口，不是省略對象。
+    configured = list((load_sector_map().get("sectors") or {}).keys())
+    empty = [s for s in configured if s not in grouped["sectors"]]
+    if empty:
+        lines.append(
+            "🔴 **空產業組（sub 覆蓋未及，研究缺口）**：" + "、".join(empty)
+        )
+        lines.append("")
     for sector, buckets in sorted(
         grouped["sectors"].items(), key=lambda kv: -len(kv[1]["rows"])
     ):
