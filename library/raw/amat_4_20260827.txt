@@ -1,0 +1,91 @@
+SEC FORM 
+ 4 
+ .FormData {color: blue; background-color: white; font-size: small; font-family: Times, serif;}
+ .FormDataC {color: blue; background-color: white; font-size: small; font-family: Times, serif; text-align: center;}
+ .FormDataR {color: blue; background-color: white; font-size: small; font-family: Times, serif; text-align: right;}
+ .SmallFormData {color: blue; background-color: white; font-size: x-small; font-family: Times, serif;}
+ .FootnoteData {color: green; background-color: white; font-size: x-small; font-family: Times, serif;}
+ .FormNumText {font-size: small; font-weight: bold; font-family: arial, helvetica, sans-serif;}
+ .FormAttention {font-size: medium; font-weight: bold; font-family: helvetica;}
+ .FormText {font-size: small; font-weight: normal; font-family: arial, helvetica, sans-serif; text-align: left;}
+ .FormTextR {font-size: small; font-weight: normal; font-family: arial, helvetica, sans-serif; text-align: right;}
+ .FormTextC {font-size: small; font-weight: normal; font-family: arial, helvetica, sans-serif; text-align: center;}
+ .FormEMText {font-size: medium; font-style: italic; font-weight: normal; font-family: arial, helvetica, sans-serif;}
+ .FormULText {font-size: medium; text-decoration: underline; font-weight: normal; font-family: arial, helvetica, sans-serif;}
+ .SmallFormText {font-size: xx-small; font-family: arial, helvetica, sans-serif; text-align: left;}
+ .SmallFormTextR {font-size: xx-small; font-family: arial, helvetica, sans-serif; text-align: right;}
+ .SmallFormTextC {font-size: xx-small; font-family: arial, helvetica, sans-serif; text-align: center;}
+ .MedSmallFormText {font-size: x-small; font-family: arial, helvetica, sans-serif; text-align: left;}
+ .FormTitle {font-size: medium; font-family: arial, helvetica, sans-serif; font-weight: bold;}
+ .FormTitle1 {font-size: small; font-family: arial, helvetica, sans-serif; font-weight: bold; border-top: black thick solid;}
+ .FormTitle2 {font-size: small; font-family: arial, helvetica, sans-serif; font-weight: bold;}
+ .FormTitle3 {font-size: small; font-family: arial, helvetica, sans-serif; font-weight: bold; padding-top: 2em; padding-bottom: 1em;}
+ .SectionTitle {font-size: small; text-align: left; font-family: arial, helvetica, sans-serif; 
+ font-weight: bold; border-top: gray thin solid; border-bottom: gray thin solid;}
+ .FormName {font-size: large; font-family: arial, helvetica, sans-serif; font-weight: bold;}
+ .CheckBox {text-align: center; width: 5px; cell-spacing: 0; padding: 0 3 0 3; border-width: thin; border-style: solid; border-color: black:}
+ body {background: white;}
+ SEC Form 4 
+ FORM 4 UNITED STATES SECURITIES AND EXCHANGE COMMISSION Washington, D.C. 20549 STATEMENT OF CHANGES IN BENEFICIAL OWNERSHIP Filed pursuant to Section 16(a) of the Securities Exchange Act of 1934 or Section 30(h) of the Investment Company Act of 1940 OMB APPROVAL OMB Number: 3235-0287 Estimated average burden hours per response: 0.5    Check this box if no longer subject to Section 16. Form 4 or Form 5 obligations may continue. 
+ See 
+
+ Instruction 1(b).    Check this box to indicate that a transaction was made pursuant to a contract, instruction or written plan for the purchase or sale of equity securities of the issuer that is intended to satisfy the affirmative defense conditions of Rule 10b5-1(c). See Instruction 10. 1. Name and Address of Reporting Person * Hill Brice (Last) (First) (Middle) C/O APPLIED MATERIALS, INC. 3050 BOWERS AV, M/S 1268, P.O. BOX 58039 (Street) SANTA CLARA 
+ CALIFORNIA
+ 95052-8039 (City) (State) (Zip) UNITED STATES (Country) 2. Issuer Name and Ticker or Trading Symbol
+ APPLIED MATERIALS INC /DE 
+ [ AMAT ]
+ 5. Relationship of Reporting Person(s) to Issuer
+ (Check all applicable) Director 10% Owner X Officer (give title below) Other (specify below) SVP, CFO 2a. Foreign Trading Symbol
+ 3. Date of Earliest Transaction
+ (Month/Day/Year) 08/25/2026 6. Individual or Joint/Group Filing (Check Applicable Line)
+ X Form filed by One Reporting Person Form filed by More than One Reporting Person 4. If Amendment, Date of Original Filed
+ (Month/Day/Year) Table I - Non-Derivative Securities Acquired, Disposed of, or Beneficially Owned 1. Title of Security (Instr. 
+ 3)
+ 2. Transaction Date
+ (Month/Day/Year) 2A. Deemed Execution Date, if any
+ (Month/Day/Year) 3. Transaction Code (Instr. 
+ 8)
+ 4. Securities Acquired (A) or Disposed Of (D) (Instr. 
+ 3, 4 and 5)
+ 5. 
+ Amount of Securities Beneficially Owned Following Reported Transaction(s) (Instr. 
+ 3 and 4)
+ 6. Ownership Form: Direct (D) or Indirect (I) (Instr. 
+ 4)
+ 7. Nature of Indirect Beneficial Ownership (Instr. 
+ 4)
+ Code V Amount (A) or (D) Price Common Stock 08/25/2026 S 7,500 D $ 479.2501 128,613 (1) D Table II - Derivative Securities Acquired, Disposed of, or Beneficially Owned (e.g., puts, calls, warrants, options, convertible securities) 1. Title of Derivative Security (Instr. 
+ 3)
+ 2. Conversion or Exercise Price of Derivative Security
+ 3. Transaction Date
+ (Month/Day/Year) 3A. Deemed Execution Date, if any
+ (Month/Day/Year) 4. Transaction Code (Instr. 
+ 8)
+ 5. 
+ Number of Derivative Securities Acquired (A) or Disposed of (D) (Instr. 
+ 3, 4 and 5)
+ 6. Date Exercisable and Expiration Date 
+ (Month/Day/Year) 7. Title and Amount of Securities Underlying Derivative Security (Instr. 
+ 3 and 4)
+ 8. Price of Derivative Security (Instr. 
+ 5)
+ 9. 
+ Number of derivative Securities Beneficially Owned Following Reported Transaction(s) (Instr. 
+ 4)
+ 10. Ownership Form: Direct (D) or Indirect (I) (Instr. 
+ 4)
+ 11. Nature of Indirect Beneficial Ownership (Instr. 
+ 4)
+ Code V (A) (D) Date Exercisable Expiration Date Title Amount or Number of Shares Explanation of Responses: 1. Number of shares includes 85,503 performance share units and restricted stock units previously reported that in the future will be converted on a one-for-one basis into shares of Applied Materials, Inc. common stock upon vesting, which vesting is scheduled to occur as follows: (a) 33,272 restricted stock units are scheduled to vest in installments in December of 2026 through 2028, and (b) 52,231 performance share units are scheduled to vest in installments in December of 2026 through 2028, which number of shares is the target amount, and the actual number of shares that may vest ranges from 0% to 200% of the target amount, depending on achievement of specified performance goals (all vesting is subject to continued employment through each applicable vesting date). Remarks: /s/ Brendan Christian, Attorney-in-Fact 08/27/2026 ** Signature of Reporting Person Date Reminder: Report on a separate line for each class of securities beneficially owned directly or indirectly. * If the form is filed by more than one reporting person, 
+ see 
+
+ Instruction 
+ 4
+
+ (b)(v). ** Intentional misstatements or omissions of facts constitute Federal Criminal Violations 
+ See 
+
+ 18 U.S.C. 1001 and 15 U.S.C. 78ff(a). Note: File three copies of this Form, one of which must be manually signed. If space is insufficient, 
+ see 
+
+ Instruction 6 for procedure. Persons who respond to the collection of information contained in this form are not required to respond unless the form displays a currently valid OMB Number. * Form 4: SEC 1474 (03-26)

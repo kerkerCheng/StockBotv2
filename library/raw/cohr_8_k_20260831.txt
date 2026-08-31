@@ -1,0 +1,185 @@
+8-K 
+ 
+ 
+ false 0000820318 0000820318 2026-08-27 2026-08-27 &#160; &#160; UNITED STATES SECURITIES AND EXCHANGE COMMISSION Washington, D.C. 20549 &#160; &#160; FORM 8-K &#160; &#160; CURRENT REPORT Pursuant to Section 13 or 15(d) of the Securities Exchange Act of 1934 Date of Report (Date of earliest event reported): August 27, 2026 &#160; &#160; Coherent Corp. (Exact name of registrant as specified in its charter) &#160; &#160; &#160; 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ Pennsylvania 
+ &#160; 
+ 001-39375 
+ &#160; 
+ 25-1214948 
+ 
+ (State or Other Jurisdiction of Incorporation) 
+ &#160; 
+ (Commission File Number) 
+ &#160; 
+ (I.R.S. Employer Identification No.) 375 Saxonburg Boulevard Saxonburg , Pennsylvania 16056 (Address of Principal Executive Offices) (Zip Code) (724) 352-4455 (Registrant&#8217;s telephone number, including area code) Not Applicable (Former name or former address, if changed since last report) &#160; &#160; Check the appropriate box below if the Form 8-K filing is intended to simultaneously satisfy the filing obligation of the registrant under any of the following provisions: &#160; 
+ 
+ 
+ &#160; 
+ &#9744; 
+ Written communications pursuant to Rule 425 under the Securities Act (17 CFR 230.425) &#160; 
+ 
+ 
+ &#160; 
+ &#9744; 
+ Soliciting material pursuant to Rule 14a-12 under the Exchange Act (17 CFR 240.14a-12) &#160; 
+ 
+ 
+ &#160; 
+ &#9744; 
+ Pre-commencement communications pursuant to Rule 14d-2(b) under the Exchange Act (17 CFR 240.14d-2(b)) &#160; 
+ 
+ 
+ &#160; 
+ &#9744; 
+ Pre-commencement communications pursuant to Rule 13e-4(c) under the Exchange Act (17 CFR 240.13e-4(c)) Securities registered pursuant to Section&#160;12(b) of the Act: &#160; 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ Title of each class 
+ &#160; 
+ Trading Symbol(s) 
+ &#160; 
+ Name of each exchange on which registered 
+ 
+ Common Stock, no par value 
+ &#160; 
+ COHR 
+ &#160; 
+ New York Stock Exchange Indicate by check mark whether the registrant is an emerging growth company as defined in Rule 405 of the Securities Act of 1933 (&#167;230.405 of this chapter) or Rule 12b-2 of the Securities Exchange Act of 1934 (&#167;240.12b-2 of this chapter). Emerging growth company &#9744; If an emerging growth company, indicate by check mark if the registrant has elected not to use the extended transition period for complying with any new or revised financial accounting standards provided pursuant to Section&#160;13(a) of the Exchange Act. &#9744; &#160; &#160; &#160; 
+
+ 
+ 
+
+ 
+
+ 
+ 
+ Item&#8201;5.02. 
+ Departure of Directors or Certain Officers; Election of Directors; Appointment of Certain Officers; Compensatory Arrangements of Certain Officers. The information set forth in Item 8.01 of this Current Report on Form 8-K under the headings &#8220;Performance Stock Units&#8221;, &#8220;Shareholder-Aligned Award Design&#8221;, and &#8220;Shareholder-Aligned Termination Provisions&#8221; is incorporated by reference into this Item&#160;5.02. &#160; 
+ 
+ 
+ Item&#8201;8.01. 
+ Other Events. Performance Stock Units On August&#160;27, 2026 (the &#8220;Grant Date&#8221;), the Compensation and Human Capital Committee (the &#8220;Committee&#8221;) of the Board of Directors of Coherent Corp. approved special incentive awards for key members of its leadership team, including James R. Anderson, the Company&#8217;s Chief Executive Officer, with a target value of $50&#160;million, Sherri Luther, the Company&#8217;s Chief Financial Officer, with a target value of $15&#160;million, Julie Eng, Chief Technology Officer and Executive Vice President, Optical Components, with a target value of $15&#160;million, Rob Beard, Chief Strategy and Legal Affairs Officer, with a target value of $15&#160;million, and Jeffrey Place, Chief Supply Chain Officer, with a target value of $5&#160;million (collectively the &#8220;Awards&#8221;). The Awards consist entirely of performance stock units (&#8220;PSUs&#8221;), with vesting tied to the achievement of significant share price growth milestones, satisfaction of a relative total shareholder return hurdle and a continued service requirement through 2030. The Awards were granted pursuant to and under the Coherent Corp. Omnibus Incentive Plan, as amended and restated. Advancing Coherent&#8217;s Transformative Growth and Shareholder Value Creation Under Mr.&#160;Anderson&#8217;s leadership and with the support of the executive team, the Company has delivered substantial shareholder value and strengthened its strategic and competitive position as an influential technology leader. Since Mr.&#160;Anderson became the Company&#8217;s CEO in June 2024, Coherent has delivered over 300% in total shareholder returns and achieved record revenue in the recently completed fiscal year 2026. Together with the executive team, Mr.&#160;Anderson has successfully repositioned the Company&#8217;s portfolio toward its highest-growth opportunities, advancing a differentiated pipeline of innovative technologies and establishing ambitious long-term objectives. The Committee believes retaining Mr.&#160;Anderson and the current executive leadership team through this stage of technology investment, capacity expansion, customer engagement and operational execution is paramount to sustaining Coherent&#8217;s strategic momentum and capitalizing on opportunities presented by the next generation of AI and computing infrastructure. Following a deliberate process carried out in tandem with its annual executive compensation cycle, the Committee determined that these Awards, which are not a part of the Company&#8217;s regular compensation program, were necessary to retain this executive team and incentivize continued execution through our next phase of accelerated growth. Shareholder-Aligned Award Design Consistent with the Committee&#8217;s objective of aligning pay outcomes with long-term value creation and sustained shareholder returns, the Awards are 100% performance-based and may be earned based on the achievement of pre-set Company stock price hurdles during the four-year period beginning on the Grant Date (the &#8220;Performance Period&#8221;), measured over 60 consecutive calendar days, provided that, for each tranche earned, the Company&#8217;s total shareholder return (&#8220;TSR&#8221;) is above the 50 th percentile relative to the S&amp;P Composite 1500 &#8211; Electronic Equipment, Instruments&#160;&amp; Components Index. No portion of the Awards can be earned if these absolute and relative stock price performance hurdles are not met simultaneously, i.e., a tranche will only vest if rTSR is above median when a price hurdle is met. The applicable stock price milestones correspond to the specified compound annual stock price growth rates (&#8220;CAGR&#8221;) in the Company&#8217;s stock price as specified below. In approving the Awards and establishing the stock price milestones, the Committee took into consideration that Coherent&#8217;s stock is currently trading near all-time high stock prices with significant volatility, as well as market data provided by its independent compensation consultant regarding CAGRs used for comparable awards of similar magnitude. The Committee set the milestones on the rigorous end of those observed, consistent with the highly ambitious strategic objectives set for the Company&#8217;s growth and the associated magnitude of Coherent&#8217;s long-term shareholder value creation potential during the next four-year period. &#160; 
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+ 
+ 
+ &#160; 
+ &#160; 
+ &#160; 
+ 
+ CAGR 
+ &#160;&#160; 
+ Stock Price Hurdles (consecutive 60-day calendar average) 
+ &#160;&#160; 
+ % of Target PSUs Earned 
+
+ 
+ 10% 
+ &#160;&#160; 
+ $454.43 
+ &#160;&#160; 
+ 50% 
+ 
+ 15% 
+ &#160;&#160; 
+ $542.86 
+ &#160;&#160; 
+ 100% 
+ 
+ 20% 
+ &#160;&#160; 
+ $643.61 
+ &#160;&#160; 
+ 150% 
+ 
+ 25% 
+ &#160;&#160; 
+ $757.77 
+ &#160;&#160; 
+ 200% 
+ 
+ 
+
+ 
+ 
+
+ 
+ The Awards may be earned at any time during the Performance Period upon achievement of the applicable performance hurdles and rTSR requirement, with no interpolation between hurdles, except in a change-in-control event, as further described below. However, no portion of the award will vest until the conclusion of the four-year Performance Period. Further, any PSUs that vest are subject to an additional one-year holding period following the Performance Period, and therefore will not be tradable by the recipients until five years following the date of grant. Shareholder-Aligned Termination Provisions Upon a termination of employment by the Company without cause, other than in connection with a qualifying change-in-control, PSUs corresponding to milestones already achieved will vest at the end of the four-year performance period and be subject to the one-year holding period. PSUs corresponding to milestones not yet achieved are forfeited in full, including in the event of an executive&#8217;s death or disability, as set forth in the applicable award agreement. Voluntary termination, other than in connection with a qualifying change-in-control, and termination for cause will result in forfeiture of the Award. Upon a change-in-control, the Performance Period ends and milestone achievement is measured using the per share consideration payable in the transaction, with linear interpolation applied. Earned PSUs on that basis will convert into time-based awards that continue to vest over the remainder of the vesting period, subject to double-trigger acceleration upon a qualifying termination of employment by the Company without cause or by the executive for good reason during the applicable change-in-control protection period. Additionally, in that case the holding period is eliminated. The foregoing description of the Awards is qualified in its entirety by reference to the full text of the applicable form of award agreement, which will be filed as an exhibit to the Company&#8217;s next periodic report and is incorporated herein by reference. Forward-Looking Statements This Current Report on Form 8-K contains forward-looking statements relating to future events and expectations that are based on certain assumptions and contingencies. The forward-looking statements are made pursuant to the safe harbor provisions of the U.S. Private Securities Litigation Reform Act of 1995. The forward-looking statements in this Current Report involve risks and uncertainties, which could cause actual results, performance or trends to differ materially from those expressed in the forward-looking statements herein or in previous disclosures. Forward-looking statements are also identified by words such as &#8220;expects,&#8221; &#8220;anticipates,&#8221; &#8220;intends,&#8221; &#8220;believes,&#8221; &#8220;plans,&#8221; &#8220;projects&#8221; or similar expressions. The Company believes that all forward-looking statements made in this Current Report have a reasonable basis, but there can be no assurance that management&#8217;s expectations, beliefs or projections as expressed in the forward-looking statements will actually occur or prove to be correct. Factors that could cause actual results to differ materially from those discussed in the forward-looking statements herein include, but are not limited to: (i)&#160;the failure of any one or more of the assumptions stated above to prove to be correct; (ii)&#160;the risks that the Company&#8217;s stock price will not trade in line with industrial technology leaders or its peers; (iii)&#160;the risks that the Company&#8217;s relative total shareholder return will not meet the required thresholds; (iv)&#160;the risks that key members of the Company&#8217;s leadership team may not remain with the Company notwithstanding the Awards; and (v)&#160;the risks relating to forward-looking statements and other &#8220;Risk Factors&#8221; discussed in the Company&#8217;s Annual Report on Form 10-K for the fiscal year ended June&#160;30, 2026, and additional risk factors that may be identified from time to time in future filings of the Company. The Company disclaims any obligation to update information contained in these forward-looking statements whether as a result of new information, future events or developments, or otherwise. &#160; 
+ 
+
+ 
+ 
+
+ 
+ SIGNATURE Pursuant to the requirements of the Securities Exchange Act of 1934, the registrant has duly caused this report to be signed on its behalf by the undersigned hereunto duly authorized. &#160; 
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+ &#160; 
+ Coherent Corp. 
+ 
+ 
+ 
+ 
+ 
+ 
+ Date: August 31, 2026 
+ &#160; 
+ 
+ &#160; 
+ By: 
+ &#160; 
+ /s/ Rob Beard 
+ 
+ 
+ &#160; 
+ 
+ &#160; 
+ 
+ &#160; 
+ Rob Beard 
+ 
+ 
+ &#160; 
+ 
+ &#160; 
+ 
+ &#160; 
+ Chief Strategy and Legal Affairs Officer

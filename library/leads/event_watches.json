@@ -107,8 +107,18 @@
         "query_hint": "US ban Chinese optical transceivers rule Federal Register Innolight Eoptolink"
       },
       "note": "",
-      "status": "active",
-      "woken_by": null
+      "status": "fired",
+      "woken_by": {
+        "kind": "fact_verification",
+        "lead_id": "lead_624d76a113c73f726163ed9b578521cb",
+        "shared_entities": [
+          "COHR"
+        ],
+        "at": "2026-08-31T22:39:01.539284+00:00",
+        "fact": "中國光模組禁令由草案轉正式規則",
+        "fact_check_ref": "",
+        "hypothesis_ref": "hy_0005_2026-08-31"
+      }
     },
     {
       "watch_id": "ew_0006_2026-08-31",
@@ -1875,8 +1885,19 @@
         "query_hint": "Morgan Stanley CPO note Sivers Coherent Lumentum laser supply key participants"
       },
       "note": "[321] 收尾稽核補上：五個假設中唯一沒有喚醒條件的一個；其對應追源線索（9715784d）同時是停滯 10 筆之一，同一個等待漏了兩層",
-      "status": "active",
-      "woken_by": null
+      "status": "fired",
+      "woken_by": {
+        "kind": "fact_verification",
+        "lead_id": "lead_624d76a113c73f726163ed9b578521cb",
+        "shared_entities": [
+          "COHR",
+          "co:coherent"
+        ],
+        "at": "2026-08-31T22:39:01.539388+00:00",
+        "fact": "Morgan Stanley CPO note 將 Sivers 與 COHR/LITE 並列 laser supply 關鍵參與者",
+        "fact_check_ref": "",
+        "hypothesis_ref": "hy_0002_2026-08-31"
+      }
     },
     {
       "watch_id": "ew_0058_2026-08-31",
@@ -1929,6 +1950,30 @@
         "query_hint": "與 lead_cbd50ac5 同一個 trigger：取得 USGS MCS 2026「Rare Earths (Heavy)」逐字，或 Noveon／USA Rare Earth／VAC 任一方的一手產能揭露"
       },
       "note": "park 時自動建立；trace_status=partial",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0060_2026-08-31",
+      "created_at": "2026-08-31T13:43:20.537470+00:00",
+      "expires": "2026-12-29",
+      "kind": "related_entity_signal",
+      "until": null,
+      "entities": [
+        "edgar:TSLA"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_ff3a752c826025fae06da1015db608b2",
+      "consumed_entities": [],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "Tesla filing/法說具名 actuator 供應商,或拓普/三花/臥龍在自家公告(非媒體)揭露 Tesla 機器人訂單"
+      },
+      "note": "park 時自動建立；trace_status=isolated_tier_3",
       "status": "active",
       "woken_by": null
     }
