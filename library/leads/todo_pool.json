@@ -5296,6 +5296,30 @@
       "source": "research_action",
       "title": "AXT 雙客戶資本承諾：Coherent 預付 $22.29M 綁 6 吋 InP 產能（3 年）＋Lumentum $87M 押金保留產能至 2031——客戶端掏錢的真瓶頸訊號",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-08-31T06:26:17.953320+00:00",
+      "hint": "go＝實作合併（加第三種喚醒目標 wake_lead、50 筆遷移、修 auto_trigger_reachable 的兩義欄位、分層計數器、報告段落改寫、測試）；不含改變任何 evidence tier、不含入圖、不含 live。驗收：已死但顯示可喚醒的筆數 14→0，且新 park 的線索必帶到期日。與下一項二選一，做這項則該項免",
+      "n": 321,
+      "reason": null,
+      "ref_id": "manual:321",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "統一 waiting 入口：把追源 backlog 併入 Event Watch（根治——追源繼承到期機制，14 筆已死結構性歸零）",
+      "type": "manual"
+    },
+    {
+      "added_at": "2026-08-31T06:26:18.107377+00:00",
+      "hint": "go＝逐筆分三類處理（4 筆無可等內容→結案；3 筆真在等特定事實→升級成 fact watch，含補 hy_0002 缺的那個 watch；7 筆補正確觸發設定或改為需人工決定）；不含合併架構、不含入圖、不含 live。驗收：同上 14→0，但機制不變，未來仍會再生",
+      "n": 322,
+      "reason": null,
+      "ref_id": "manual:322",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "只止血：14 筆已死追源線索的誠實處置（不動架構）",
+      "type": "manual"
     }
   ],
   "log": [
@@ -12043,6 +12067,6 @@
       "verb": "drop"
     }
   ],
-  "next_n": 321,
+  "next_n": 323,
   "schema_version": "1"
 }
