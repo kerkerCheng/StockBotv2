@@ -1,0 +1,4 @@
+Source URL: https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001342338&type=20-F
+
+Excerpt:
+In June 2024, Himax, in partnership with FOCI, a world leader in silicon photonics connector, unveiled an industry-leading co-packaged optics (CPO) technology, leveraging Himax WLO technology. (HIMX FY2025 20-F)

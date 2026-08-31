@@ -1,0 +1,143 @@
+{
+  "claims": [
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "guided",
+      "disproof_condition": "若後續 filing 顯示 CPO 合作終止、或 TSMC/FOCI 導入第二家 WLO 供應商，夥伴關係的獨占推論失效。",
+      "id": "himx_20_f_20260327_cl1",
+      "source_ids": [
+        "himx_20_f_20260327_s1",
+        "himx_20_f_20260327_s2"
+      ],
+      "statement": "HIMX FY2025 20-F 一手證實：2024-06 與 FOCI（filing 稱其為 silicon photonics connector 世界領導者）合作發表 CPO 技術、leveraging Himax WLO——Hunterbrook 專利鏈推測的 FOCI×Himax 關係獲當事人揭露升級。另與『leading global customer and partner』推進多世代 CPO 架構（未具名，不推定身份）。",
+      "subject_id": "co:himax"
+    },
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "guided",
+      "disproof_condition": "若 HIMX 開始拆分揭露 WLO/光學分部營收且占比顯著（>10%），純度判斷需上修重評。",
+      "id": "himx_20_f_20260327_cl2",
+      "source_ids": [
+        "himx_20_f_20260327_s3",
+        "himx_20_f_20260327_s4",
+        "himx_20_f_20260327_s5"
+      ],
+      "statement": "HIMX 純度驗證（四維度第 4 項）：WLO/CPO 營收未拆分揭露，主業為 display driver IC；客戶集中（前兩大 >33%、前十大 71.3%、customer A 24.0% 連三年降）屬 driver IC 客戶結構，不得誤讀為 CPO 綁定。$2.38B 市值、forward P/E 10.5、2 位分析師＝市場按週期 driver IC 定價、CPO 期權幾乎零入價。",
+      "subject_id": "co:himax"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "co:foci",
+      "id": "hx1",
+      "relation": "partnership_with",
+      "source_ids": [
+        "himx_20_f_20260327_s1"
+      ],
+      "src_id": "co:himax"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:cpo",
+      "id": "hx2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "himx_20_f_20260327_s1",
+        "himx_20_f_20260327_s2"
+      ],
+      "src_id": "co:himax"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "HIMX"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:himax",
+      "name": "Himax Technologies",
+      "role": null,
+      "source_ids": [
+        "himx_20_f_20260327_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "上詮",
+        "3363.TWO"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:foci",
+      "name": "FOCI Fiber Optic Communications",
+      "role": null,
+      "source_ids": [
+        "himx_20_f_20260327_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "CPO"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:cpo",
+      "name": "Co-Packaged Optics",
+      "role": null,
+      "source_ids": [
+        "himx_20_f_20260327_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "himx_20_f_20260327",
+    "evidence_tier": 1,
+    "origin_entity": "Himax Technologies",
+    "permission_basis": "SEC EDGAR public filing; quotes only.",
+    "published_at": "2026-03-27",
+    "publisher": "SEC EDGAR",
+    "retrieved_at": "2026-08-31",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Himax Technologies FY2025 Form 20-F (filed 2026-03-27)",
+    "url": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001342338&type=20-F"
+  },
+  "sources": [
+    {
+      "id": "himx_20_f_20260327_s1",
+      "locator": "CPO partnership",
+      "quote": "In June 2024, Himax, in partnership with FOCI, a world leader in silicon photonics connector, unveiled an industry-leading co-packaged optics (CPO) technology, leveraging Himax WLO technology."
+    },
+    {
+      "id": "himx_20_f_20260327_s2",
+      "locator": "leading customer collaboration",
+      "quote": "In addition, we are actively advancing multiple future generations of high-speed optical transmission technologies and advanced CPO architectures in collaboration with the leading global customer and partner to meet the explosive bandwidth demands of HPC and AI applications."
+    },
+    {
+      "id": "himx_20_f_20260327_s3",
+      "locator": "non-driver tech list",
+      "quote": "Our non-driver technologies cover Timing controller (TCON), LCoS microdisplay, CMOS image sensor, wafer level optics (“WLO”), 3D sensing and WiseEye ultralow power AI sensing, etc."
+    },
+    {
+      "id": "himx_20_f_20260327_s4",
+      "locator": "customer concentration",
+      "quote": "Our two largest customers together accounted for over 33% of our revenues in 2025."
+    },
+    {
+      "id": "himx_20_f_20260327_s5",
+      "locator": "ten largest",
+      "quote": "ten largest customers together accounted for approximately 74.1%, 73.6% and 71.3% of our revenues in 2023, 2024 and 2025, respectively."
+    }
+  ]
+}
