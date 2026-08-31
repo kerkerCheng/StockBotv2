@@ -5665,6 +5665,18 @@
       "source": "research_action",
       "title": "[337] 人形力矩感測層：本圖第二條有合格週期的邊——低替代難度＋3–7 年合格週期",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-08-31T14:52:18.093481+00:00",
+      "hint": "當前 missing_data：engine_c_customer：SHA0.DE 客戶集中度（前三大客戶占營收%）——需 Engine C 人工觀測寫；engine_c_backlog：SHA0.DE 訂單能見度／backlog——需 Engine C 人工觀測寫入；humanoid／robotics 營收分項揭露（判斷純度的唯一途徑；公司目前不揭露）（共 3 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "n": 342,
+      "reason": null,
+      "ref_id": "dc_912a03a50135ea5e29000a0417c3f477",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:schaeffler：補客戶端商業承諾：訂單、產能協議或預付款等付錢方向的證據",
+      "type": "decision_review"
     }
   ],
   "log": [
@@ -12736,6 +12748,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 342,
+  "next_n": 343,
   "schema_version": "1"
 }
