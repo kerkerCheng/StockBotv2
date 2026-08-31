@@ -155,6 +155,1430 @@
       "note": "",
       "status": "active",
       "woken_by": null
+    },
+    {
+      "watch_id": "ew_0008_2026-08-31",
+      "created_at": "2026-08-17T00:00:00+00:00",
+      "expires": "2026-12-15",
+      "kind": "related_entity_signal",
+      "until": null,
+      "entities": [
+        "TSEM",
+        "co:tower_semiconductor"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_03e036c05aea97310171ca07772eb352",
+      "consumed_entities": [],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "取得並解析6-K_exhibits或Tower官方Q2報告"
+      },
+      "note": "[321] 由 trace backlog 遷移；trace_status=partial",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0009_2026-08-31",
+      "created_at": "2026-08-16T00:00:00+00:00",
+      "expires": "2026-12-14",
+      "kind": "related_entity_signal",
+      "until": null,
+      "entities": [
+        "AAOI",
+        "AMZN",
+        "SIVE",
+        "co:applied_optoelectronics"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_075cb52a7fffdf3550210fc2a5f6fb8b",
+      "consumed_entities": [
+        "AAOI",
+        "AMZN",
+        "CO:APPLIED_OPTOELECTRONICS",
+        "CO:SIVERS_SEMICONDUCTORS",
+        "SIVE"
+      ],
+      "poll": {
+        "eligible": true,
+        "last_checked": null,
+        "query_hint": "取得 canonical Rosenblatt／B. Riley note，或 AAOI／Broadcom 官方量化 MRC／RNG 對 optical unit demand 的影響"
+      },
+      "note": "[321] 由 trace backlog 遷移；trace_status=partial",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0010_2026-08-31",
+      "created_at": "2026-08-30T00:00:00+00:00",
+      "expires": "2026-12-28",
+      "kind": "entity_filing_signal",
+      "until": null,
+      "entities": [
+        "TSM",
+        "co:tsmc"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_13b62234a2ec38a45eaa9c8bedcbc6f8",
+      "consumed_entities": [],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "TSMC 或共同作者公開可核對文件具名 embedded micro-lens array 與製造／供應角色"
+      },
+      "note": "[321] 由 trace backlog 遷移；trace_status=partial",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0011_2026-08-31",
+      "created_at": "2026-08-26T00:00:00+00:00",
+      "expires": "2026-12-24",
+      "kind": "entity_filing_signal",
+      "until": null,
+      "entities": [
+        "NVDA",
+        "co:nvidia"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_15a813e6531ffe790f9e1bca78aa342a",
+      "consumed_entities": [],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "NVIDIA 官方 Q2 FY27 earnings release／CFO commentary／transcript 可逐字索引"
+      },
+      "note": "[321] 由 trace backlog 遷移；trace_status=partial",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0012_2026-08-31",
+      "created_at": "2026-08-24T00:00:00+00:00",
+      "expires": "2026-12-22",
+      "kind": "related_entity_signal",
+      "until": null,
+      "entities": [
+        "AAOI",
+        "LITE",
+        "NVDA",
+        "co:applied_optoelectronics",
+        "co:lumentum",
+        "co:nvidia"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_1940958c3136e0a33b4e0856b7b05d82",
+      "consumed_entities": [
+        "AAOI",
+        "CO:APPLIED_OPTOELECTRONICS",
+        "CO:LUMENTUM",
+        "CO:NVIDIA",
+        "LITE",
+        "NVDA"
+      ],
+      "poll": {
+        "eligible": true,
+        "last_checked": null,
+        "query_hint": "AAOI 於 10-Q／10-K／8-K 或官方 PR 揭露上述任一項；或使用者核准 [193] 的 Rosenblatt access"
+      },
+      "note": "[321] 由 trace backlog 遷移；trace_status=isolated_tier_3",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0013_2026-08-31",
+      "created_at": "2026-08-30T00:00:00+00:00",
+      "expires": "2026-12-28",
+      "kind": "entity_filing_signal",
+      "until": null,
+      "entities": [
+        "NVDA",
+        "TSM",
+        "co:nvidia",
+        "co:tsmc"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_1c805d1c401d5ede0572182a5bfcbbea",
+      "consumed_entities": [],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "智邦法說或 NVIDIA 側具名其 CPO switch 組裝角色"
+      },
+      "note": "[321] 由 trace backlog 遷移；trace_status=partial",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0014_2026-08-31",
+      "created_at": "2026-08-30T00:00:00+00:00",
+      "expires": "2026-12-28",
+      "kind": "entity_filing_signal",
+      "until": null,
+      "entities": [
+        "AVGO",
+        "co:broadcom"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_1d85eafbfe0bd9a69efc298d24259be3",
+      "consumed_entities": [],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "Davisson datasheet/OFC 論文件級確認 gen3 調變器"
+      },
+      "note": "[321] 由 trace backlog 遷移；trace_status=partial",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0015_2026-08-31",
+      "created_at": "2026-08-24T00:00:00+00:00",
+      "expires": "2026-12-22",
+      "kind": "related_entity_signal",
+      "until": null,
+      "entities": [
+        "IREN",
+        "SHAZ",
+        "co:iren"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_1f55ec9eae7d1e4a1b68fa245ed1ee7f",
+      "consumed_entities": [
+        "CO:IREN",
+        "IREN"
+      ],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "Anthropic 或 Australian Government 公布 tender、capacity 與 contract value 原文。"
+      },
+      "note": "[321] 由 trace backlog 遷移；trace_status=isolated_tier_3",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0016_2026-08-31",
+      "created_at": "2026-08-19T00:00:00+00:00",
+      "expires": "2026-12-17",
+      "kind": "related_entity_signal",
+      "until": null,
+      "entities": [
+        "AXTI",
+        "IQE",
+        "co:axt",
+        "co:iqe"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_2061d895e6e162c47132019a07869d92",
+      "consumed_entities": [
+        "AXTI",
+        "CO:AXT"
+      ],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "AXT／IQE／VPEC／LandMark／IET 官方揭露 InP substrate 或 epiwafer 漲價、交期或供應限制，或取得原始產業文章"
+      },
+      "note": "[321] 由 trace backlog 遷移；trace_status=isolated_tier_3",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0017_2026-08-31",
+      "created_at": "2026-08-24T00:00:00+00:00",
+      "expires": "2026-12-22",
+      "kind": "entity_filing_signal",
+      "until": null,
+      "entities": [
+        "AAOI",
+        "MTSI",
+        "MXL",
+        "SMTC",
+        "co:applied_optoelectronics",
+        "co:macom"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_20eb32acaf78ffb751ee07966e185534",
+      "consumed_entities": [
+        "AAOI",
+        "CO:APPLIED_OPTOELECTRONICS"
+      ],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "AAOI Q3 正式結果與指引，核對 Q4 500M+ 及 2027 產能／營收換算"
+      },
+      "note": "[321] 由 trace backlog 遷移；trace_status=partial",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0018_2026-08-31",
+      "created_at": "2026-08-30T00:00:00+00:00",
+      "expires": "2026-12-28",
+      "kind": "related_entity_signal",
+      "until": null,
+      "entities": [
+        "AAOI",
+        "AVGO",
+        "COHR",
+        "LITE",
+        "co:applied_optoelectronics",
+        "co:broadcom",
+        "co:coherent",
+        "co:lumentum"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_23ed2dd8e137c0a94e7a2411fdebc7ec",
+      "consumed_entities": [],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "LITE/COHR/AAOI 任一具名 Broadcom 或量產出貨數字"
+      },
+      "note": "[321] 由 trace backlog 遷移；trace_status=partial",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0019_2026-08-31",
+      "created_at": "2026-08-15T00:00:00+00:00",
+      "expires": "2026-12-13",
+      "kind": "related_entity_signal",
+      "until": null,
+      "entities": [
+        "TSEM",
+        "co:tower_semiconductor"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_242c5b23ddc83fa9820d7d35f0fc91d9",
+      "consumed_entities": [],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "obtain_TSEM_6K_20260804_Exhibit_99_1_or_official_Q2_release"
+      },
+      "note": "[321] 由 trace backlog 遷移；trace_status=partial",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0020_2026-08-31",
+      "created_at": "2026-08-14T00:00:00+00:00",
+      "expires": "2026-12-12",
+      "kind": "related_entity_signal",
+      "until": null,
+      "entities": [
+        "NVDA",
+        "co:nvidia"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_2f5aebfb7785c12a8fb2fe665f8a26ff",
+      "consumed_entities": [
+        "CO:NVIDIA",
+        "NVDA"
+      ],
+      "poll": {
+        "eligible": true,
+        "last_checked": null,
+        "query_hint": "NVDA 8-K 或 10-Q 揭露對 OpenAI／資料中心融資的擔保或承諾；或 OpenAI／SoftBank 側的正式公告"
+      },
+      "note": "[321] 由 trace backlog 遷移；trace_status=isolated_tier_3",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0021_2026-08-31",
+      "created_at": "2026-08-27T00:00:00+00:00",
+      "expires": "2026-12-25",
+      "kind": "related_entity_signal",
+      "until": null,
+      "entities": [
+        "MU",
+        "SIMO",
+        "SNDK",
+        "co:micron_technology",
+        "co:sandisk"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_346c43a02c97ab876fd90f6845f10629",
+      "consumed_entities": [
+        "CO:MICRON_TECHNOLOGY",
+        "CO:SANDISK",
+        "MU",
+        "SIMO",
+        "SNDK"
+      ],
+      "poll": {
+        "eligible": true,
+        "last_checked": null,
+        "query_hint": "canonical UBS／Morgan Stanley note，或 Micron 官方披露 exact total project investment"
+      },
+      "note": "[321] 由 trace backlog 遷移；trace_status=partial",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0022_2026-08-31",
+      "created_at": "2026-08-30T00:00:00+00:00",
+      "expires": "2026-12-28",
+      "kind": "entity_filing_signal",
+      "until": null,
+      "entities": [
+        "TSM",
+        "co:tsmc"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_359cb1c9e8c4f11997943e4c7f01727d",
+      "consumed_entities": [],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "IEEE／作者公開 manuscript 或 institution repository 可逐字核對 1152-fiber coupling 與 active-alignment yield"
+      },
+      "note": "[321] 由 trace backlog 遷移；trace_status=partial",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0023_2026-08-31",
+      "created_at": "2026-08-30T00:00:00+00:00",
+      "expires": "2026-12-28",
+      "kind": "related_entity_signal",
+      "until": null,
+      "entities": [
+        "BE",
+        "NVDA",
+        "TSM",
+        "co:nvidia",
+        "co:tsmc"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_3a4468d30e6a22eb826a8c8157682b64",
+      "consumed_entities": [
+        "CO:NVIDIA",
+        "CO:TSMC",
+        "NVDA",
+        "TSM"
+      ],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "Largan(3008)／FOCI(3363)／TFC 任一在 MOPS 重大訊息、法說會或 NVIDIA／Broadcom 官方文件中具名對方；或 NVIDIA 發布帶角色分工的 CPO 供應鏈說明"
+      },
+      "note": "[321] 由 trace backlog 遷移；trace_status=awaiting_named_disclosure",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0024_2026-08-31",
+      "created_at": "2026-08-24T00:00:00+00:00",
+      "expires": "2026-12-22",
+      "kind": "related_entity_signal",
+      "until": null,
+      "entities": [
+        "NVTS",
+        "POWI",
+        "XFAB",
+        "co:x_fab"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_3a7c4e5db3ecc1c420c1464fb73ac3c2",
+      "consumed_entities": [
+        "NVTS"
+      ],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "X-FAB 具名 photonics/CPO 客戶或產能揭露"
+      },
+      "note": "[321] 由 trace backlog 遷移；trace_status=partial",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0025_2026-08-31",
+      "created_at": "2026-08-30T00:00:00+00:00",
+      "expires": "2026-12-28",
+      "kind": "entity_filing_signal",
+      "until": null,
+      "entities": [
+        "3008.TW",
+        "3163.TWO",
+        "3363.TWO",
+        "7928.TWO",
+        "NVDA",
+        "TSM",
+        "co:nvidia",
+        "co:tsmc"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_464d4849949994fc18d5192a484b6c57",
+      "consumed_entities": [],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "NVIDIA／TSMC／MOPS 文件具名 FOCI、Largan、Browave、HST 的 FAU 供應角色"
+      },
+      "note": "[321] 由 trace backlog 遷移；trace_status=awaiting_named_disclosure",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0026_2026-08-31",
+      "created_at": "2026-08-30T00:00:00+00:00",
+      "expires": "2026-12-28",
+      "kind": "related_entity_signal",
+      "until": null,
+      "entities": [
+        "FN",
+        "NVDA",
+        "co:fabrinet",
+        "co:nvidia"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_484d659a31cbf1e25a837210e9fb0622",
+      "consumed_entities": [
+        "CO:NVIDIA",
+        "NVDA"
+      ],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "NVIDIA/Fabrinet/Foxconn 任一方具名揭露 CPO switch OSA／系統組裝分工"
+      },
+      "note": "[321] 由 trace backlog 遷移；trace_status=awaiting_named_disclosure",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0027_2026-08-31",
+      "created_at": "2026-08-31T00:00:00+00:00",
+      "expires": "2026-12-29",
+      "kind": "related_entity_signal",
+      "until": null,
+      "entities": [
+        "co:coherent,co:lumentum,edgar:AAOI"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_4c082f76c0248f18981da5873d049f71",
+      "consumed_entities": [],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "FCC 正式發布擬議規則（Reuters 稱目標 2026 年內生效）；或 COHR/LITE/AAOI filings 揭露禁令影響"
+      },
+      "note": "[321] 由 trace backlog 遷移；trace_status=partial",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0028_2026-08-31",
+      "created_at": "2026-08-30T00:00:00+00:00",
+      "expires": "2026-12-28",
+      "kind": "entity_filing_signal",
+      "until": null,
+      "entities": [
+        "NVDA",
+        "TSM",
+        "co:nvidia",
+        "co:tsmc"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_5365613adf1bce24257876e3dab03eea",
+      "consumed_entities": [],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "ASMPT 客戶端文件、訂單或量產 qualification 具名揭露"
+      },
+      "note": "[321] 由 trace backlog 遷移；trace_status=partial",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0029_2026-08-31",
+      "created_at": "2026-08-29T00:00:00+00:00",
+      "expires": "2026-12-27",
+      "kind": "entity_filing_signal",
+      "until": null,
+      "entities": [
+        "MRVL",
+        "NVDA",
+        "co:marvell",
+        "co:nvidia"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_55bd36e6cab9fdd81f0668215af10431",
+      "consumed_entities": [],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "SENKO/US Conec 出現上市母體、被上市公司併購，或第三家 connector 供應商進入 CPO 供應鏈"
+      },
+      "note": "[321] 由 trace backlog 遷移；trace_status=partial",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0030_2026-08-31",
+      "created_at": "2026-08-19T00:00:00+00:00",
+      "expires": "2026-12-17",
+      "kind": "entity_filing_signal",
+      "until": null,
+      "entities": [
+        "AMZN",
+        "GOOGL",
+        "META",
+        "MSFT"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_6a56acb8a4aa5260483a3b14600db949",
+      "consumed_entities": [],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": ""
+      },
+      "note": "[321] 由 trace backlog 遷移；trace_status=partial",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0031_2026-08-31",
+      "created_at": "2026-08-29T00:00:00+00:00",
+      "expires": "2026-12-27",
+      "kind": "entity_filing_signal",
+      "until": null,
+      "entities": [
+        "MU",
+        "co:micron_technology"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_6d97ce23a4e09bc9504362e64d1b31eb",
+      "consumed_entities": [],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "ESMT 2026 Q3／Q4 財報或法說具名揭露產品組合、晶圓供應方與 allocation"
+      },
+      "note": "[321] 由 trace backlog 遷移；trace_status=partial",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0032_2026-08-31",
+      "created_at": "2026-08-20T00:00:00+00:00",
+      "expires": "2026-12-18",
+      "kind": "related_entity_signal",
+      "until": null,
+      "entities": [
+        "AAOI",
+        "LITE",
+        "SIVE",
+        "co:applied_optoelectronics",
+        "co:lumentum",
+        "co:sivers_semiconductors"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_7f66b743a034c41f6388aa800f333e62",
+      "consumed_entities": [
+        "AAOI",
+        "CO:APPLIED_OPTOELECTRONICS",
+        "CO:LUMENTUM",
+        "CO:SIVERS_SEMICONDUCTORS",
+        "LITE",
+        "SIVE"
+      ],
+      "poll": {
+        "eligible": true,
+        "last_checked": null,
+        "query_hint": "FCC 正式發布 NPRM／Report and Order，或把中國光模組廠列入 Covered List。"
+      },
+      "note": "[321] 由 trace backlog 遷移；trace_status=isolated_tier_3",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0033_2026-08-31",
+      "created_at": "2026-08-29T00:00:00+00:00",
+      "expires": "2026-12-27",
+      "kind": "related_entity_signal",
+      "until": null,
+      "entities": [
+        "AMKR",
+        "KLIC"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_7f7cc2f42ad124758ecc16b42fea1d53",
+      "consumed_entities": [],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "AMKR、KLIC、ASE 或 IC design 公司正式法說／filing 逐字揭露 2027 traditional packaging capacity deficit"
+      },
+      "note": "[321] 由 trace backlog 遷移；trace_status=isolated_tier_3",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0034_2026-08-31",
+      "created_at": "2026-08-29T00:00:00+00:00",
+      "expires": "2026-12-27",
+      "kind": "related_entity_signal",
+      "until": null,
+      "entities": [
+        "AXTI",
+        "IQE",
+        "SNDK",
+        "co:axt",
+        "co:iqe",
+        "co:sandisk"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_8088f665e358a7744d9b6bc1646bccbf",
+      "consumed_entities": [
+        "AXTI",
+        "CO:AXT",
+        "CO:SANDISK",
+        "IQE",
+        "SNDK"
+      ],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "canonical Nomura 報告、AXT Q3 財報 ASP 貢獻揭露、或下游公司揭露基板成本上升"
+      },
+      "note": "[321] 由 trace backlog 遷移；trace_status=isolated_tier_3",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0035_2026-08-31",
+      "created_at": "2026-08-11T00:00:00+00:00",
+      "expires": "2026-12-09",
+      "kind": "entity_filing_signal",
+      "until": null,
+      "entities": [
+        "AMD",
+        "INTC"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_857582308bdff8e00dd648d213f7d679",
+      "consumed_entities": [],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "Intel／AMD／中國客戶 filing 或 IR 具名揭露 CPU 產品、對手方、期限與量；或取得 exact TrendForce AMD／CW LTA 原文"
+      },
+      "note": "[321] 由 trace backlog 遷移；trace_status=partial",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0036_2026-08-31",
+      "created_at": "2026-08-20T00:00:00+00:00",
+      "expires": "2026-12-18",
+      "kind": "related_entity_signal",
+      "until": null,
+      "entities": [
+        "AAOI",
+        "LITE",
+        "MTSI",
+        "co:applied_optoelectronics",
+        "co:lumentum",
+        "co:macom"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_85a70a23ae1002dabdedefb41b9bf721",
+      "consumed_entities": [
+        "AAOI",
+        "CO:APPLIED_OPTOELECTRONICS",
+        "CO:LUMENTUM",
+        "CO:MACOM",
+        "LITE",
+        "MTSI"
+      ],
+      "poll": {
+        "eligible": true,
+        "last_checked": null,
+        "query_hint": "取得 canonical investor-conference agenda／錄影／逐字稿，或 issuer 一手量化供應缺口與時程。"
+      },
+      "note": "[321] 由 trace backlog 遷移；trace_status=partial",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0037_2026-08-31",
+      "created_at": "2026-08-27T00:00:00+00:00",
+      "expires": "2026-12-25",
+      "kind": "related_entity_signal",
+      "until": null,
+      "entities": [
+        "CRWV",
+        "LITE",
+        "SMCI",
+        "co:coreweave",
+        "co:lumentum"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_891dfebbd908d822ef6f4a55e1e465c0",
+      "consumed_entities": [
+        "CO:LUMENTUM",
+        "LITE"
+      ],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "CoreWeave 下一季 10-Q backlog 揭露"
+      },
+      "note": "[321] 由 trace backlog 遷移；trace_status=partial",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0038_2026-08-31",
+      "created_at": "2026-08-30T00:00:00+00:00",
+      "expires": "2026-12-28",
+      "kind": "related_entity_signal",
+      "until": null,
+      "entities": [
+        "TSM",
+        "co:tsmc"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_94dbcea8239b2f3feb6bffeefbbade53",
+      "consumed_entities": [
+        "CO:TSMC",
+        "TSM"
+      ],
+      "poll": {
+        "eligible": true,
+        "last_checked": null,
+        "query_hint": "ASE/SPIL 法說具名 CPO 封裝營收或 TSMC 揭露 SoIC-photonics 產能分配"
+      },
+      "note": "[321] 由 trace backlog 遷移；trace_status=partial",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0039_2026-08-31",
+      "created_at": "2026-08-30T00:00:00+00:00",
+      "expires": "2026-12-28",
+      "kind": "related_entity_signal",
+      "until": null,
+      "entities": [
+        "5802.T",
+        "GLW",
+        "NVDA",
+        "co:corning",
+        "co:nvidia",
+        "co:sumitomo_electric"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_95b0d3624dfaf66bc5022912310661c4",
+      "consumed_entities": [
+        "CO:NVIDIA",
+        "NVDA"
+      ],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "TFC（300394.SZ）或 Browave（3163.TW）法說／公告具名揭露 NVIDIA CPO 供應內容與量"
+      },
+      "note": "[321] 由 trace backlog 遷移；trace_status=partial",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0040_2026-08-31",
+      "created_at": "2026-08-04T00:00:00+00:00",
+      "expires": "2026-12-02",
+      "kind": "entity_filing_signal",
+      "until": null,
+      "entities": [
+        "300308.SZ"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_96e4ba8b7c960f7b40a3953b101bca75",
+      "consumed_entities": [],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "中際旭創(300308.SZ)年報/交易所公告/互動易揭露 Thailand TeraHop 實際出貨量、良率與占總出貨比例(目前來源疑似同源轉述同一份 IR record,未獨立佐證)"
+      },
+      "note": "[321] 由 trace backlog 遷移；trace_status=isolated_tier_3",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0041_2026-08-31",
+      "created_at": "2026-07-29T00:00:00+00:00",
+      "expires": "2026-11-26",
+      "kind": "entity_filing_signal",
+      "until": null,
+      "entities": [
+        "LPK"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_9b2aad2219b0e2ff47232047db467bfa",
+      "consumed_entities": [],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "LPKF first-party 70% source、GlaSSEM 具名設備訂單／qualification，或完成 Samsung Electro-Mechanics／Sumitomo Chemical／Dongwoo／LPKF identity onboarding"
+      },
+      "note": "[321] 由 trace backlog 遷移；trace_status=partial",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0042_2026-08-31",
+      "created_at": "2026-08-26T00:00:00+00:00",
+      "expires": "2026-12-24",
+      "kind": "entity_filing_signal",
+      "until": null,
+      "entities": [
+        "SIVE",
+        "co:sivers_semiconductors"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_9b9d579795099de39f2ae6e50a5a5597",
+      "consumed_entities": [],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "Saxo Japan 官方 instrument page 或 Sivers 正式 Nasdaq dual-listing announcement"
+      },
+      "note": "[321] 由 trace backlog 遷移；trace_status=partial",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0043_2026-08-31",
+      "created_at": "2026-08-15T00:00:00+00:00",
+      "expires": "2026-12-13",
+      "kind": "related_entity_signal",
+      "until": null,
+      "entities": [
+        "AEVA"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_a9decd56cd086ff593d6e307c0508b48",
+      "consumed_entities": [
+        "AEVA"
+      ],
+      "poll": {
+        "eligible": true,
+        "last_checked": null,
+        "query_hint": "作者公開原始 dataset／方法論，或具名公司 filing 揭露可逐筆核對的 physical-AI／world-model 融資事件"
+      },
+      "note": "[321] 由 trace backlog 遷移；trace_status=lead_only_tier_4",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0044_2026-08-31",
+      "created_at": "2026-08-29T00:00:00+00:00",
+      "expires": "2026-12-27",
+      "kind": "related_entity_signal",
+      "until": null,
+      "entities": [
+        "3363.TWO",
+        "co:foci"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_af3d60cc842a4d14bea3c53b299771f4",
+      "consumed_entities": [],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "MOPS 3363 年報／法說取得一手：客戶集中度、FAU 產能與獨家性佐證"
+      },
+      "note": "[321] 由 trace backlog 遷移；trace_status=partial",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0045_2026-08-31",
+      "created_at": "2026-08-24T00:00:00+00:00",
+      "expires": "2026-12-22",
+      "kind": "related_entity_signal",
+      "until": null,
+      "entities": [
+        "ASX",
+        "BE",
+        "META",
+        "co:meta"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_afa72193be496499ef950552d9146c38",
+      "consumed_entities": [
+        "BE",
+        "CO:META",
+        "META"
+      ],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "各 atom 出現 issuer／客戶／監管或 canonical 券商原文時分開註冊，不再把混合貼文當單一證據。"
+      },
+      "note": "[321] 由 trace backlog 遷移；trace_status=partial",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0046_2026-08-31",
+      "created_at": "2026-08-24T00:00:00+00:00",
+      "expires": "2026-12-22",
+      "kind": "related_entity_signal",
+      "until": null,
+      "entities": [
+        "COHR",
+        "GFS",
+        "LITE",
+        "SIVE",
+        "TSEM",
+        "TSM",
+        "co:coherent",
+        "co:globalfoundries",
+        "co:lumentum",
+        "co:sivers_semiconductors",
+        "co:tower_semiconductor",
+        "co:tsmc"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_b1e793c560334131dfe7c1619715784d",
+      "consumed_entities": [
+        "CO:COHERENT",
+        "CO:GLOBALFOUNDRIES",
+        "CO:LUMENTUM",
+        "CO:SIVERS_SEMICONDUCTORS",
+        "CO:TOWER_SEMICONDUCTOR",
+        "CO:TSMC",
+        "COHR",
+        "GFS",
+        "LITE",
+        "SIVE",
+        "TSEM",
+        "TSM"
+      ],
+      "poll": {
+        "eligible": true,
+        "last_checked": null,
+        "query_hint": "取得 Morgan Stanley canonical note，或名單中的 issuer 一手披露具名客戶／供應關係。"
+      },
+      "note": "[321] 由 trace backlog 遷移；trace_status=isolated_tier_3",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0047_2026-08-31",
+      "created_at": "2026-08-14T00:00:00+00:00",
+      "expires": "2026-12-12",
+      "kind": "entity_filing_signal",
+      "until": null,
+      "entities": [
+        "LPK"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_b8f9702c8ecfe86f412b0bee7f882128",
+      "consumed_entities": [],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "Samsung Electro-Mechanics 官方 transcript／PDF 或 SKC／Absolics 官方 validation／mass-production 時程披露"
+      },
+      "note": "[321] 由 trace backlog 遷移；trace_status=partial",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0048_2026-08-31",
+      "created_at": "2026-08-26T00:00:00+00:00",
+      "expires": "2026-12-24",
+      "kind": "entity_filing_signal",
+      "until": null,
+      "entities": [
+        "NVDA",
+        "co:nvidia"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_c26211bd7e2deab7d577ceb1f3b94f2c",
+      "consumed_entities": [],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "NVIDIA 官方 Q2 FY27 transcript／CFO commentary公開可逐字核對 70% FY28 與供應受限原句"
+      },
+      "note": "[321] 由 trace backlog 遷移；trace_status=partial",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0049_2026-08-31",
+      "created_at": "2026-08-29T00:00:00+00:00",
+      "expires": "2026-12-27",
+      "kind": "related_entity_signal",
+      "until": null,
+      "entities": [
+        "AAOI",
+        "AVGO",
+        "COHR",
+        "LITE",
+        "MTSI",
+        "SIVE",
+        "SMTC",
+        "co:applied_optoelectronics",
+        "co:broadcom",
+        "co:coherent",
+        "co:lumentum",
+        "co:macom",
+        "co:sivers_semiconductors"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_c7498202abd0bdcd20c035dc615bcec2",
+      "consumed_entities": [
+        "AAOI",
+        "AVGO",
+        "CO:APPLIED_OPTOELECTRONICS",
+        "CO:BROADCOM",
+        "CO:COHERENT",
+        "CO:LUMENTUM",
+        "CO:MACOM",
+        "CO:SIVERS_SEMICONDUCTORS",
+        "COHR",
+        "LITE",
+        "MTSI",
+        "SIVE"
+      ],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "Sivers 具名 CW DFB 客戶或客戶端文件點名 Sivers"
+      },
+      "note": "[321] 由 trace backlog 遷移；trace_status=awaiting_named_disclosure",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0050_2026-08-31",
+      "created_at": "2026-08-21T00:00:00+00:00",
+      "expires": "2026-12-19",
+      "kind": "related_entity_signal",
+      "until": null,
+      "entities": [
+        "META",
+        "co:meta"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_d36507e875209c42b224d82b9ac1a247",
+      "consumed_entities": [
+        "CO:META",
+        "META"
+      ],
+      "poll": {
+        "eligible": true,
+        "last_checked": null,
+        "query_hint": "Meta 官方具名揭露 excess compute 出售、對手方與容量，或取得 Wells Fargo canonical note。"
+      },
+      "note": "[321] 由 trace backlog 遷移；trace_status=isolated_tier_3",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0051_2026-08-31",
+      "created_at": "2026-08-30T00:00:00+00:00",
+      "expires": "2026-12-28",
+      "kind": "related_entity_signal",
+      "until": null,
+      "entities": [
+        "FN",
+        "NVDA",
+        "co:fabrinet",
+        "co:nvidia"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_dabef2b4657350217cdd112112606b35",
+      "consumed_entities": [
+        "CO:NVIDIA",
+        "NVDA"
+      ],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "Fabrinet 具名 CPO 客戶或 NVIDIA 揭露組裝分工；Q1 FY2027 call（約 2026-11）"
+      },
+      "note": "[321] 由 trace backlog 遷移；trace_status=partial",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0052_2026-08-31",
+      "created_at": "2026-08-24T00:00:00+00:00",
+      "expires": "2026-12-22",
+      "kind": "related_entity_signal",
+      "until": null,
+      "entities": [
+        "ALAB"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_e84068655e3db45b0a81a9b5a1a0d546",
+      "consumed_entities": [],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "ALAB 10-K/10-Q 客戶集中度揭露，或 hyperscaler／OEM 客戶端文件點名 Leo 採用"
+      },
+      "note": "[321] 由 trace backlog 遷移；trace_status=partial",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0053_2026-08-31",
+      "created_at": "2026-08-24T00:00:00+00:00",
+      "expires": "2026-12-22",
+      "kind": "related_entity_signal",
+      "until": null,
+      "entities": [
+        "IREN",
+        "META",
+        "NBIS",
+        "SPCX",
+        "co:iren",
+        "co:meta",
+        "co:nebius"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_e87032df984f0fa40a6bd12a7130b39a",
+      "consumed_entities": [
+        "CO:IREN",
+        "CO:META",
+        "IREN",
+        "META"
+      ],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "Meta 或 Anthropic 公告 definitive compute lease，或 filing 揭露對手方、期限、capacity 與 revenue commitment。"
+      },
+      "note": "[321] 由 trace backlog 遷移；trace_status=partial",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0054_2026-08-31",
+      "created_at": "2026-08-30T00:00:00+00:00",
+      "expires": "2026-12-28",
+      "kind": "entity_filing_signal",
+      "until": null,
+      "entities": [
+        "AVGO",
+        "co:broadcom"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_ec5da7de15f538edef3b6b1d4c062632",
+      "consumed_entities": [],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "ASE/SPIL 法說具名 CPO 封裝營收或 Broadcom 官方供應鏈揭露"
+      },
+      "note": "[321] 由 trace backlog 遷移；trace_status=partial",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0055_2026-08-31",
+      "created_at": "2026-08-29T00:00:00+00:00",
+      "expires": "2026-12-27",
+      "kind": "related_entity_signal",
+      "until": null,
+      "entities": [
+        "4979.TWO",
+        "co:luxnet"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_f169462653573e002ee5aa0f194466d0",
+      "consumed_entities": [],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "逐字核對 MOPS 法說簡報：CW laser 產品線、產能數字、具名客戶；聯亞供應關係求一手"
+      },
+      "note": "[321] 由 trace backlog 遷移；trace_status=partial",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0056_2026-08-31",
+      "created_at": "2026-07-25T00:00:00+00:00",
+      "expires": "2026-11-22",
+      "kind": "entity_filing_signal",
+      "until": null,
+      "entities": [
+        "TTMI",
+        "VSH"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_ffdc392c947397e9a649b634ed41f0c8",
+      "consumed_entities": [],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "canonical_digitimes_article_or_supplier_lead_time_disclosure"
+      },
+      "note": "[321] 由 trace backlog 遷移；trace_status=isolated_tier_3",
+      "status": "active",
+      "woken_by": null
     }
   ]
 }

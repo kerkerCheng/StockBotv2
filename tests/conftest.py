@@ -51,6 +51,22 @@ def _ensure_usable_temproot() -> None:
 _ensure_usable_temproot()
 
 
+@pytest.fixture(autouse=True)
+def _isolate_event_watch_registry(tmp_path_factory, monkeypatch):
+    """把 Event Watch registry 導向暫存檔。
+
+    [321] 起 `leads.advance(..., "parked")` 會自動建立 watch（park 的當下就給它
+    到期日，否則新線索又變回沒人管的等待）。那條路徑寫的是固定的
+    `library/leads/event_watches.json`——若不隔離，任何 park 相關測試都會污染
+    真實 registry。autouse 是刻意的：忘記隔離不會有錯誤訊息，只會靜默寫進真檔。
+    """
+    from engine_b import event_watch as ew
+
+    target = tmp_path_factory.mktemp("event_watch") / "event_watches.json"
+    monkeypatch.setattr(ew, "WATCHES_PATH", target)
+    return target
+
+
 @pytest.fixture
 def tmp_git_repo(tmp_path: Path) -> Path:
     """Create an isolated Git repository with a deterministic identity."""

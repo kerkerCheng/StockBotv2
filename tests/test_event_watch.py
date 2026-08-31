@@ -103,11 +103,15 @@ def test_counters_shape():
     assert c["t2_pollable"] == 1
 
 
-def test_wake_target_exactly_one_of_pq2_or_hypothesis():
+def test_wake_target_exactly_one_of_three():
     data = _fresh()
     with pytest.raises(ew.EventWatchError):
         ew.add_watch(data, kind="date", wake_pq2=1, expires="2027-01-01",
                      until="2026-09-01", hypothesis_ref="hy_x")
+    with pytest.raises(ew.EventWatchError):
+        # 三選一：lead 與 pq2 同時給也不行
+        ew.add_watch(data, kind="date", wake_pq2=1, expires="2027-01-01",
+                     until="2026-09-01", wake_lead="lead_x")
     with pytest.raises(ew.EventWatchError):
         ew.add_watch(data, kind="date", expires="2027-01-01", until="2026-09-01")
     w = ew.add_watch(
@@ -124,3 +128,80 @@ def test_wake_target_exactly_one_of_pq2_or_hypothesis():
     assert fired[0]["woken_by"]["fact"] == "ASP 上調"
     ew.consume_fired(data, w["watch_id"])
     assert data["watches"][0]["status"] == "consumed"
+
+
+# --- [321] trace 引擎併入：related_entity_signal ＋ wake_lead ---
+
+
+def test_related_entity_signal_fires_on_any_tier_unlike_filing_signal():
+    """related_entity_signal 等的是「同一標的有新動靜」，不限一手來源。"""
+    data = _fresh()
+    w = ew.add_watch(
+        data, kind="related_entity_signal", wake_lead="lead_parked",
+        expires="2027-01-01", entities=["co:coherent"],
+        created_at="2026-09-01T00:00:00+00:00",
+    )
+    leads = {"l1": _lead(tier=3, entities=["co:coherent"])}
+    fired = ew.check_watches(data, leads=leads, today=date(2026, 9, 2))
+    assert len(fired) == 1
+    assert fired[0]["woken_by"]["wake_lead"] == "lead_parked"
+    # 觸發後標的進 consumed——同一檔的第二則轉述不再重排 pq1
+    assert w["consumed_entities"] == ["CO:COHERENT"]
+
+
+def test_consumed_entities_block_repeat_but_expires_still_surfaces():
+    """核心修法：標的用完只是停滯，不是死亡——到期仍會現形。"""
+    data = _fresh()
+    ew.add_watch(
+        data, kind="related_entity_signal", wake_lead="lead_x",
+        expires="2026-12-01", entities=["co:nvidia"],
+        consumed_entities=["CO:NVIDIA"],
+        created_at="2026-09-01T00:00:00+00:00",
+    )
+    # 標的已消化 → 被動層不再觸發
+    leads = {"l1": _lead(entities=["co:nvidia"])}
+    assert ew.check_watches(data, leads=leads, today=date(2026, 9, 2)) == []
+    # 但它有名字、有計數器（[321] 前這個狀態沒有名字，靜默沉底）
+    assert ew.is_stalled(data["watches"][0]) is True
+    assert ew.counters(data)["stalled"] == 1
+    # 到期後強制現形，不會無聲躺著
+    ew.check_watches(data, leads=leads, today=date(2026, 12, 2))
+    assert data["watches"][0]["status"] == "expired"
+
+
+def test_new_entity_still_wakes_stalled_related_watch():
+    """只擋同一標的的第二次，不擋新標的。"""
+    data = _fresh()
+    ew.add_watch(
+        data, kind="related_entity_signal", wake_lead="lead_x",
+        expires="2027-01-01", entities=["co:nvidia", "co:coherent"],
+        consumed_entities=["CO:NVIDIA"],
+        created_at="2026-09-01T00:00:00+00:00",
+    )
+    leads = {"l1": _lead(tier=3, entities=["co:coherent"])}
+    fired = ew.check_watches(data, leads=leads, today=date(2026, 9, 2))
+    assert fired and fired[0]["woken_by"]["shared_entities"] == ["co:coherent"]
+
+
+def test_reactivate_keeps_lead_watch_waiting():
+    """lead 型喚醒後回 active 續等——那份原文可能要等好幾輪才出現。"""
+    data = _fresh()
+    w = ew.add_watch(
+        data, kind="related_entity_signal", wake_lead="lead_x",
+        expires="2027-01-01", entities=["co:axt"],
+        created_at="2026-09-01T00:00:00+00:00",
+    )
+    ew.check_watches(data, leads={"l1": _lead(tier=3, entities=["co:axt"])},
+                     today=date(2026, 9, 2))
+    assert w["status"] == "fired"
+    ew.reactivate(data, w["watch_id"])
+    assert w["status"] == "active"
+    assert w["consumed_entities"] == ["CO:AXT"]
+
+
+def test_primary_source_tier_has_single_ssot():
+    """[321]：tier-1 判準不得再各寫一份（L16）。"""
+    from engine_b import lead_refs, leads as leads_mod
+
+    assert ew.PRIMARY_SOURCE_TIER is lead_refs.PRIMARY_SOURCE_TIER
+    assert leads_mod.PRIMARY_SOURCE_TIER is lead_refs.PRIMARY_SOURCE_TIER

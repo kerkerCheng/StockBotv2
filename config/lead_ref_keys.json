@@ -249,6 +249,10 @@
         "value_type": "string",
         "description": "最近一次觸發 trace 重排的 lead／event receipt"
       },
+      "trace_trigger_watch_ref": {
+        "value_type": "string",
+        "description": "判定該次喚醒的 Event Watch id（[321] 起等待條件的 authority）"
+      },
       "trace_trigger_kind": {
         "value_type": "string",
         "description": "機器可執行的 trace 觸發類型，例如 related_entity_signal"

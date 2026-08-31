@@ -485,6 +485,12 @@ TL;DR：<上線標的／可量測／結案歸因常駐計數器；真實部位�
 - 只列 `trace_status=original_obtained` 或 `partial` **且**有 `trace_next_trigger` 的項目——
   那代表「一手已追過、在等世界產生新事實」，不是研究失敗。
 - `trace_requires_user=true` 的**不放這裡**，它們該走 `source_trace_review` 取 pq2 編號。
+- **每列必須寫 `wake_state` 與到期日（2026-08-31 [321]）。** 等待狀態的唯一 authority 是
+  Event Watch registry，四種值講人話：`watching`＝有事件在等、`stalled`＝具名標的都觸發過
+  一輪了（被動層短期不會再醒，靠到期或主動輪詢救）、`expired`＝等待到期該重新決定、
+  `unwatched`＝**沒有任何機制在等它**（唯一真正的黑洞，必須當場處置）。
+  `stalled`／`expired`／`unwatched` 用 `engine_b.cli trace-backlog --needs-attention` 一次撈出，
+  它們**不得只列在表格裡就算數**——這三種等下去不會有事發生。
 - ⚠ **本段不得因為「今天沒有新進展」而省略。** 這正是它存在的理由：
   2026-08-20 使用者問「追蹤 X 這麼久，humanoid 的 lead 為何圖裡都沒有」，而 CCXI 那條
   其實被處理得很好——9 筆 filing 逐一取得一手、逐字比對（`agility 0 次、robotics 0 次`）、

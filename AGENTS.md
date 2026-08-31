@@ -266,6 +266,23 @@ Decision gap jobs 優先占用同一個 daily pq1 budget。若研究結果需要
 
 `parked` 不等同「註記後遺忘」。pq1 每次因 `isolated_tier_3`／截圖／paywall 未果而 park 時，必須留下 `trace_status`、`trace_attempts_ref`、`trace_next_trigger` 與 `trace_requires_user`。
 
+**等待條件的唯一 registry 是 Event Watch（2026-08-31 [321] 定案）：** 追源 backlog 已併入
+`library/leads/event_watches.json`，與待辦等待、假設對照共用同一個引擎、同一組計數器。
+線索 park 的當下自動建 watch 並取得**到期日**（`config/event_watch.json` 的 `trace_ttl_days`，
+預設 120 天＝一個財報週期＋緩衝）。
+
+⚠ 併入的理由不是整齊。原本 consumed-marker（防同一標的重複喚醒、保護 pq1 預算）**沒有
+到期兜底**，標的用完即靜默沉底——實測 50 筆有 10 筆已不可能再被喚醒，而
+`auto_trigger_reachable` 對它們全回 `true`：那個欄位只答「有沒有標的可比對」，卻被讀成
+「還會不會醒」（L12 一個表示兩種語意）。原設計刻意把搬家排最後並註明「那端現況健康、
+收益最低」，**而「現況健康」從未被驗證過**——L14 的又一次實例，寫在自家設計文件裡的
+假設同樣要跑命令否證。
+
+現況改用 `wake_state` 四態：`watching`（有事件在等）／`stalled`（具名標的已全部觸發過
+一輪，被動層短期不會再醒，靠到期或主動輪詢救）／`expired`（到期，該決定續等或放棄）／
+`unwatched`（沒有任何機制在等它，唯一真正的黑洞）。**後三者用
+`engine_b.cli trace-backlog --needs-attention` 撈出並逐筆處置——它們等下去不會有事發生。**
+
 一般 scheduled／event-triggered 重查仍屬 pq1，不占 pq2；只有需要使用者提供合法 access、核准付費或明確改變研究優先權時，`todo sync` 才建立 `source_trace_review`。該類型的 `go` 只把 exact lead dispatch 回 pq1，**不代表相信截圖、提高 evidence tier 或 graph admission**；取得原文並 prepare 後，入圖仍是另一個 `ra_admission` pq2。任何新訂閱／購買必須另列 exact 金額與方案。
 
 **Lead 之間的關聯鍵（2026-07-30；2026-08-02 補 executable linkage）：** URL hash 只認同一篇文章。跨文章的關聯靠 `engine_b/entities.py` 的具名標的做**確定性**比對（cashtag、`edgar:<TICKER>`、registry 反查的 `co:*`）。主題相關但無共同 ticker 的仍靠語意。`trace_next_trigger` 保留給人讀；機器改用 `trace_trigger_kind=related_entity_signal`＋`trace_trigger_entities`。同標的的新 lead 通過 triage 後，會把不需人工 access／付費的 parked trace 排回 bounded pq1，留下 triggering lead receipt；不提高 evidence tier、不授權入圖。Decision `waiting_on` 只有明確綁定 `event_type=decision_evidence_delta` 時，才由同 cohort 的 material evidence receipt 喚醒原 stable pq2 編號；不猜測其他自然語言 trigger，只恢復人工複查，不自動 dispatch。

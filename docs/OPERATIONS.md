@@ -254,9 +254,27 @@ cashtag 由 `entities.py` 確定性抽取；公司名寫成純文字時 regex �
 
 ### Event Watch（等待事件統一 registry，2026-08-31）
 
-所有「以後要回來看」的 pq2 等待條件住 `library/leads/event_watches.json`
+所有「以後要回來看」的等待條件住 `library/leads/event_watches.json`
 （模組 `engine_b/event_watch.py`，設計見
-`docs/brainstorms/2026-08-31-event-watch-module-requirements.md`）：
+`docs/brainstorms/2026-08-31-event-watch-module-requirements.md`）。
+**2026-08-31（[321]）起追源 backlog 也在裡面**——等待只有一個入口，三種去處：
+待辦編號（`wake_pq2`）、假設對照（`hypothesis_ref`）、追源線索排回 pq1（`wake_lead`）。
+
+追源線索在 `advance(..., "parked")` 當下由 `ensure_trace_watch()` 自動建 watch 並取得
+到期日（預設 120 天＝一個財報週期＋緩衝，`config/event_watch.json` 的 `trace_ttl_days`
+可調）。查「被動層救不了、需要人動手」的：
+
+```powershell
+& '.venv\Scripts\python.exe' -m engine_b.cli trace-backlog --needs-attention
+```
+
+`wake_state` 四種：`watching`（有事件在等）／`stalled`（具名標的已全部觸發過一輪，
+靠到期或主動輪詢救）／`expired`（到期，該決定續等或放棄）／`unwatched`（沒有任何
+機制在等它，唯一真正的黑洞）。
+
+⚠ **測試必須隔離 registry。** `leads.advance(..., "parked")` 會寫真實 registry，
+而寫錯不會報錯、只會靜默污染（實作當天就先中了一次：用假 lead 觸發了 3 個真 watch）。
+`tests/conftest.py` 有 autouse fixture 把 `WATCHES_PATH` 導向暫存檔；新增測試不要繞過它。
 
 ```powershell
 & '.venv\Scripts\python.exe' -m engine_b.event_watch list        # 全部 watch＋計數器

@@ -19,7 +19,12 @@ from typing import Any, Mapping
 from urllib.parse import urlsplit, urlunsplit
 
 from access_failures import FAILURE_CLASSES
-from engine_b.lead_refs import get_trace_status_registry, validate_ref_updates
+from engine_b.lead_refs import (
+    PRIMARY_SOURCE_TIER,
+    get_trace_status_registry,
+    is_primary_source,
+    validate_ref_updates,
+)
 
 SCHEMA_VERSION = "2"
 _SUPPORTED_SCHEMA_VERSIONS = frozenset({"1", SCHEMA_VERSION})
@@ -328,6 +333,33 @@ def advance(
         lead["triage"] = None
     if cleaned_ref:
         lead["refs"].update(cleaned_ref)
+
+    # [321] 入口端：park 成追源等待的當下就建 Event Watch，讓它有到期日。
+    # 沒有這一步，遷移只修好存量，新 park 的立刻變回沒人管的等待（L13）。
+    if to_status == "parked":
+        refs = lead.get("refs") or {}
+        trace_status = str(refs.get("trace_status") or "").strip()
+        parked_reason = str(refs.get("parked_reason") or "").strip()
+        has_trace = bool(trace_status) or "trace" in parked_reason.lower()
+        requires_user = str(refs.get("trace_requires_user") or "").lower() in {
+            "1", "true", "yes",
+        }
+        if (
+            has_trace
+            and not requires_user
+            and not get_trace_status_registry().is_terminal(trace_status)
+        ):
+            from engine_b import event_watch as ew
+
+            ew.ensure_trace_watch(
+                lead_id,
+                kind=str(refs.get("trace_trigger_kind") or "related_entity_signal"),
+                entities=refs.get("trace_trigger_entities") or (),
+                query_hint=str(refs.get("trace_next_trigger") or ""),
+                note=f"park 時自動建立；trace_status={trace_status or 'unstructured'}",
+                consumed_entities=refs.get("trace_requeue_consumed_entities") or (),
+                created_at=(lead.get("triage") or {}).get("decided_at"),
+            )
     return lead
 
 
@@ -527,6 +559,19 @@ def trace_backlog(store: dict[str, Any]) -> list[dict[str, Any]]:
     """
 
     from engine_b.entities import lead_entities
+    from engine_b import event_watch as ew_mod
+
+    # 等待狀態的單一 authority（[321]）：每筆 backlog 的「還會不會醒」只由這裡回答。
+    watch_data = ew_mod.load_watches()
+    watch_by_lead: dict[str, dict[str, Any]] = {}
+    for watch in watch_data.get("watches", []):
+        lead_ref = str(watch.get("wake_lead") or "")
+        if not lead_ref or watch.get("status") == "consumed":
+            continue
+        # 同一 lead 若有多筆（重建過），以最新的為準。
+        current = watch_by_lead.get(lead_ref)
+        if current is None or str(watch.get("created_at")) >= str(current.get("created_at")):
+            watch_by_lead[lead_ref] = watch
 
     rows: list[dict[str, Any]] = []
     for lead in store["leads"].values():
@@ -549,14 +594,34 @@ def trace_backlog(store: dict[str, Any]) -> list[dict[str, Any]]:
         }
         full_title = " ".join(str(lead.get("title") or "").split())
         short_title = full_title[:197] + "..." if len(full_title) > 200 else full_title
-        # 自動觸發是否**有可能**發生。requires_user 的走 pq2 由人決定，本來就不靠自動
-        # 觸發；但既不需人工 authority、又沒有任何具名標的可比對的項目，任何
-        # related_entity_signal／primary_source_signal 都永遠不會命中——它不是在等，
-        # 是已經死了，只是沒人知道。標出來才不會變成安靜沉底的黑洞。
         trigger_entities = set(refs.get("trace_trigger_entities") or ())
         if not trigger_entities and refs.get("trace_next_trigger"):
             trigger_entities = lead_entities(lead)
-        auto_reachable = requires_user or bool(trigger_entities)
+
+        # [321]：等待狀態的 authority 是 Event Watch registry，不再由本函式推導。
+        # 舊 `auto_trigger_reachable` 只答「有沒有標的可比對」，卻被讀成「還會不會醒」——
+        # 實測 10 筆標的已全數消化的 lead 一律回 true，安靜沉底（L12）。
+        watch = watch_by_lead.get(lead["lead_id"])
+        if requires_user:
+            wake_state, reason = "pq2_manual", None
+        elif watch is None:
+            wake_state, reason = "unwatched", (
+                "沒有對應的 Event Watch：不會被任何事件喚醒，也沒有到期日會讓它現形。"
+                "需建立 watch 或改設 trace_requires_user"
+            )
+        elif watch.get("status") == "expired":
+            wake_state, reason = "expired", (
+                f"等待已到期（{watch.get('expires')}）——請決定續等、改主動輪詢或放棄"
+            )
+        elif ew_mod.is_stalled(watch):
+            wake_state, reason = "stalled", (
+                f"具名標的已全部觸發過一輪，被動層短期不會再醒；"
+                f"由到期日 {watch.get('expires')} 兜底現形"
+                + ("，或由主動輪詢提前撈回" if (watch.get("poll") or {}).get("eligible") else "")
+            )
+        else:
+            wake_state, reason = "watching", None
+
         rows.append({
             "lead_id": lead["lead_id"],
             "title": short_title,
@@ -566,11 +631,14 @@ def trace_backlog(store: dict[str, Any]) -> list[dict[str, Any]]:
             "attempts_ref": refs.get("trace_attempts_ref"),
             "requires_user": requires_user,
             "lane": "pq2_manual_authority" if requires_user else "event_or_scheduled_pq1",
-            "auto_trigger_reachable": auto_reachable,
-            "unreachable_reason": (
-                None if auto_reachable
-                else "無具名標的可比對：兩種 trace_trigger_kind 都不會命中，需人工重排或改設 trace_requires_user"
-            ),
+            "wake_state": wake_state,
+            "wake_state_reason": reason,
+            "watch_id": watch.get("watch_id") if watch else None,
+            "expires": watch.get("expires") if watch else None,
+            "poll_eligible": bool((watch.get("poll") or {}).get("eligible")) if watch else False,
+            # 相容欄位：語意收斂為「這筆現在還會不會被喚醒」，不再是「有沒有標的」。
+            "auto_trigger_reachable": wake_state in {"pq2_manual", "watching"},
+            "unreachable_reason": reason,
             "review_title": refs.get("trace_review_title"),
             "review_hint": refs.get("trace_review_hint"),
         })
@@ -743,16 +811,9 @@ def triage(
 # 「有一類等待條件目前無法被既有 kind 正確表達」，而不是放寬既有 kind。
 TRACE_TRIGGER_KINDS = frozenset({"related_entity_signal", "primary_source_signal"})
 
-# triage 的 tier 是來源初步分級（tier1 ＝ SEC filing／法定揭露等一手文件），
-# 不是 evidence tier，也不影響入圖強度。
-PRIMARY_SOURCE_TIER = 1
-
-
-def _is_primary_source(lead: Mapping[str, Any]) -> bool:
-    try:
-        return int(((lead.get("triage") or {}).get("tier"))) <= PRIMARY_SOURCE_TIER
-    except (TypeError, ValueError):
-        return False
+# tier 判準的 SSOT 在 lead_refs（event_watch 也用同一份）。[321] 之前這裡與
+# event_watch.py 各有一份字面值，L16 的教科書案例。
+_is_primary_source = is_primary_source
 
 
 def _requeue_related_trace_backlog(
@@ -763,20 +824,78 @@ def _requeue_related_trace_backlog(
 ) -> list[str]:
     """新 triage PASS lead 以具名標的喚醒相關 trace backlog。
 
-    只處理不需要人工 access／付費的 parked trace；自然語言
-    ``trace_next_trigger`` 是人類說明，機器判斷只靠共用 ticker／company_id。
+    [321] 起這只是 Event Watch 的**相容轉接層**：真正的等待條件住在
+    `library/leads/event_watches.json`，由 `event_watch.check_watches` 判定。
+    保留本函式是為了讓 triage 流程的自動化程度不變（PASS 當下就把相關 parked
+    lead 排回 pq1），呼叫端不必改。
+
+    舊路徑（掃 parked leads 的 refs 自行比對）只在 registry 尚未涵蓋該 lead 時
+    作為 fallback——遷移完成後應為空集合，若持續非空代表有 lead 沒建 watch。
     """
 
     from engine_b.entities import lead_entities
+    from engine_b import event_watch as ew
 
     event_lead = _require(store, event_lead_id)
     event_entities = lead_entities(event_lead)
     if not event_entities:
         return []
+
     requeued: list[str] = []
+    # --- 主路徑：Event Watch registry ---
+    watch_data = ew.load_watches()
+    covered: set[str] = {
+        str(w.get("wake_lead"))
+        for w in watch_data.get("watches", [])
+        if w.get("wake_lead")
+    }
+    if covered:
+        fired = ew.check_watches(
+            watch_data,
+            leads={event_lead_id: event_lead},
+        )
+        touched = False
+        for watch in fired:
+            lead_id = watch.get("wake_lead")
+            if not lead_id or lead_id not in store["leads"]:
+                continue
+            candidate = store["leads"][lead_id]
+            if candidate.get("status") != "parked":
+                ew.reactivate(watch_data, watch["watch_id"])
+                touched = True
+                continue
+            shared = watch.get("woken_by", {}).get("shared_entities") or []
+            requeue_trace(
+                store,
+                lead_id,
+                trigger=f"related_triaged_lead:{event_lead_id}",
+                reason=(
+                    f"Event Watch {watch['watch_id']} 觸發：新 triage PASS lead "
+                    f"{event_lead_id} 與等待中的追源共用具名標的 {', '.join(shared)}"
+                    "；事件觸發 bounded pq1 重查"
+                ),
+                requeued_at=event_at,
+            )
+            # 稽核欄位：哪個事件把它叫醒的、由哪個 watch 判定。消化標記已移進 watch，
+            # 但「誰觸發的」仍留在 lead 上——它是這筆 lead 的歷史，不是等待條件。
+            candidate.setdefault("refs", {}).update({
+                "trace_trigger_event_ref": f"lead:{event_lead_id}",
+                "trace_trigger_watch_ref": watch["watch_id"],
+            })
+            # lead 型 watch 重查未果時等待條件依然成立，回 active 續等；
+            # 標的已進 consumed，到期由 expires 收斂。
+            ew.reactivate(watch_data, watch["watch_id"])
+            touched = True
+            requeued.append(lead_id)
+        if touched or fired:
+            ew.save_watches(watch_data)
+
+    # --- fallback：registry 尚未涵蓋的舊 lead（遷移後應為空） ---
     for candidate_id, candidate in list(store["leads"].items()):
         if candidate_id == event_lead_id or candidate.get("status") != "parked":
             continue
+        if candidate_id in covered:
+            continue  # 已由 registry 判定過，不得再走舊路徑重複喚醒
         refs = candidate.get("refs") or {}
         trace_status = str(refs.get("trace_status") or "").strip()
         parked_reason = str(refs.get("parked_reason") or "").strip()

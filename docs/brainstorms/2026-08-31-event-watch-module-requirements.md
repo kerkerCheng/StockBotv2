@@ -9,7 +9,17 @@
 > ✅ **已實作（2026-08-31，[306]＋[315]）**：registry＋三 kind＋T0/T1 sync 喚醒＋T2 sweep
 > （K 旋鈕）＋計數器＋喚醒目標二選一（pq2｜hypothesis）＋consume CLI；無人值守 sweep 已過
 > sandbox review 放行。落點：`engine_b/event_watch.py`、`config/event_watch.json`、
-> `docs/OPERATIONS.md`「Event Watch」節。**刻意不做**：trace 引擎搬家。本檔轉為設計依據存檔。
+> `docs/OPERATIONS.md`「Event Watch」節。
+>
+> ✅ **§動工切法 4（trace 引擎搬家）亦已完成（2026-08-31，[321]）。** 原本寫「刻意不做——
+> 那端現況健康，搬遷風險最高、收益最低」；**「現況健康」從未被驗證**。實測：50 筆非 terminal
+> backlog 有 10 筆已不可能再被喚醒（具名標的全被 consumed-marker 消化），而
+> `auto_trigger_reachable` 對它們全回 `true`。搬家的真正收益因此不是整齊，是**讓 trace 繼承
+> `expires`**——原本 consumed-marker 沒有到期兜底，用完即靜默沉底。
+> 新增 kind `related_entity_signal`、喚醒目標第三種 `wake_lead`、`is_stalled()` 與
+> `stalled` 計數器、`ensure_trace_watch()`（park 當下就建 watch，接住入口端）。
+> `primary_source_signal` 併入 `entity_filing_signal`（判準本就相同），
+> `PRIMARY_SOURCE_TIER` 收斂到 `engine_b/lead_refs.py` 單一 SSOT。
 
 ## 為什麼要模組化
 

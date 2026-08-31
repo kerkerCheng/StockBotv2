@@ -181,7 +181,12 @@ def test_related_triaged_lead_requeues_machine_linked_trace_backlog() -> None:
         url="https://x.com/old/status/trace",
         title="Waiting for $AXTI primary source",
     )
-    leads.triage(store, parked_id, go=True, tier=4, reason="需要追原文")
+    # 等待從 park 那一刻起算（[321]）：park 當下就已存在的舊 lead 不該立刻觸發重查，
+    # 因為 park 的決定已經考慮過當時的資訊。故時間軸必須真實：先 park，後有新事件。
+    leads.triage(
+        store, parked_id, go=True, tier=4, reason="需要追原文",
+        decided_at="2026-08-01T00:00:00+00:00",
+    )
     leads.advance(store, parked_id, "parked", ref={
         "parked_reason": "目前只有 tier 3 轉述",
         "trace_status": "isolated_tier_3",
@@ -494,7 +499,12 @@ def test_requeue_consumed_marker_stops_same_entity_waking_lead_repeatedly() -> N
         url="https://x.com/old/status/macro",
         title="$AXTI and $LITE macro roundup",
     )
-    leads.triage(store, parked_id, go=True, tier=4, reason="需要追原文")
+    # 等待從 park 那一刻起算（[321]）：park 當下就已存在的舊 lead 不該立刻觸發重查，
+    # 因為 park 的決定已經考慮過當時的資訊。故時間軸必須真實：先 park，後有新事件。
+    leads.triage(
+        store, parked_id, go=True, tier=4, reason="需要追原文",
+        decided_at="2026-08-01T00:00:00+00:00",
+    )
     leads.advance(store, parked_id, "parked", ref={
         "parked_reason": "只有 tier 3 轉述",
         "trace_status": "isolated_tier_3",
@@ -509,8 +519,14 @@ def test_requeue_consumed_marker_stops_same_entity_waking_lead_repeatedly() -> N
     # 第一次 AXTI 觸發 → 喚醒
     _fire("edgar:AXTI", "https://sec.gov/axt/1", "AXTI 8-K", "2026-08-02T00:00:00+00:00")
     assert store["leads"][parked_id]["status"] == "triaged_go"
-    consumed = store["leads"][parked_id]["refs"]["trace_requeue_consumed_entities"]
-    assert "AXTI" in consumed
+    # [321]：消化標記住在 Event Watch，不再於 lead refs 留第二份——
+    # 兩份會偏離，而偏離不會報錯（L16）。
+    from engine_b import event_watch as ew
+
+    watch = next(
+        w for w in ew.load_watches()["watches"] if w.get("wake_lead") == parked_id
+    )
+    assert "AXTI" in watch["consumed_entities"]
 
     # 重新 park 後，同一個 AXTI 再來一次 → 不得再喚醒
     leads.advance(store, parked_id, "parked", ref={
@@ -544,7 +560,10 @@ def test_primary_source_signal_only_wakes_on_tier1_documents() -> None:
         url="https://x.com/old/status/memo",
         title="$META internal memo 轉述",
     )
-    leads.triage(store, parked_id, go=True, tier=4, reason="需要 memo 原文")
+    leads.triage(
+        store, parked_id, go=True, tier=4, reason="需要 memo 原文",
+        decided_at="2026-08-01T00:00:00+00:00",
+    )
     leads.advance(store, parked_id, "parked", ref={
         "parked_reason": "只有二手轉述，未見 memo 原文",
         "trace_status": "partial",
@@ -621,10 +640,19 @@ def test_trace_backlog_flags_entries_no_trigger_can_ever_reach() -> None:
     )
 
     rows = {row["lead_id"]: row for row in leads.trace_backlog(store)}
+    # [321]：等待狀態由 Event Watch registry 回答。有具名標的的在 park 當下
+    # 就自動建 watch，因此是 watching（且拿到到期日）。
+    assert rows[reachable]["wake_state"] == "watching"
     assert rows[reachable]["auto_trigger_reachable"] is True
     assert rows[reachable]["unreachable_reason"] is None
+    assert rows[reachable]["expires"], "watch 必須帶到期日，無限期等待會腐爛成事實"
+
+    # 無具名標的 → 建不出觸發條件，是唯一真正的黑洞，必須現形。
+    assert rows[unreachable]["wake_state"] == "unwatched"
     assert rows[unreachable]["auto_trigger_reachable"] is False
-    assert "無具名標的" in rows[unreachable]["unreachable_reason"]
+    assert "沒有對應的 Event Watch" in rows[unreachable]["unreachable_reason"]
+
+    assert rows[manual]["wake_state"] == "pq2_manual"
     assert rows[manual]["auto_trigger_reachable"] is True, (
         "requires_user 走 pq2 人工授權，不該被標成不可達"
     )

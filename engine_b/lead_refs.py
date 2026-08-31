@@ -20,6 +20,23 @@ _DEFAULT_REGISTRY_PATH = _ROOT / "config" / "lead_ref_keys.json"
 _TRACE_STATUS_PATH = _ROOT / "config" / "lead_trace_status.json"
 _VALUE_TYPES = frozenset({"string", "string_list"})
 
+# triage 的 tier 是來源初步分級（tier-1 ＝ SEC filing／法定揭露等一手文件），
+# 不是 evidence tier，也不影響入圖強度。
+#
+# 住在這裡是因為 leads 與 event_watch 都要用它，而兩者互相依賴會循環 import。
+# [321] 之前它在 engine_b/leads.py 與 engine_b/event_watch.py **各有一份字面值**，
+# 後者的註解還寫著「沿用 leads.PRIMARY_SOURCE_TIER 的語意」——知道在複製，
+# 複製的卻是值而不是引用（L16：分類要有單一 SSOT，且要跟著資料走到消費端）。
+PRIMARY_SOURCE_TIER = 1
+
+
+def is_primary_source(lead: Mapping[str, Any]) -> bool:
+    """triage 來源分級是否為一手（tier ≤ 1）。兩個等待引擎共用同一份判斷。"""
+    try:
+        return int((lead.get("triage") or {}).get("tier")) <= PRIMARY_SOURCE_TIER
+    except (TypeError, ValueError):
+        return False
+
 
 class LeadRefError(ValueError):
     """未登記的 ref key、錯誤 value type 或 registry 格式錯誤。"""
@@ -230,11 +247,13 @@ def validate_ref_updates(updates: Mapping[str, Any]) -> dict[str, Any]:
 
 
 __all__ = [
+    "PRIMARY_SOURCE_TIER",
     "LeadRefError",
     "LeadRefRegistry",
     "LeadRefSpec",
     "TraceStatusRegistry",
     "get_lead_ref_registry",
     "get_trace_status_registry",
+    "is_primary_source",
     "validate_ref_updates",
 ]

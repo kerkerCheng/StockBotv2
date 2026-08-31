@@ -590,6 +590,12 @@ def _cmd_trace_backlog(args: argparse.Namespace) -> int:
     rows = leads.trace_backlog(store)
     if args.manual_only:
         rows = [row for row in rows if row["requires_user"]]
+    if getattr(args, "needs_attention", False):
+        # 這三種被動層都救不了：等下去不會有事發生，需要人決定或主動去查。
+        rows = [
+            row for row in rows
+            if row["wake_state"] in {"stalled", "expired", "unwatched"}
+        ]
     # 帶上具名標的，讓「新 lead 是否與某個 parked 有關」可以確定性比對，
     # 而不是每次都靠讀 next_trigger 自由文字用語意判斷。
     for row in rows:
@@ -771,6 +777,10 @@ def build_parser() -> argparse.ArgumentParser:
     p_trace.add_argument(
         "--manual-only", action="store_true",
         help="只列需要使用者 access／付費／優先權決策的項目",
+    )
+    p_trace.add_argument(
+        "--needs-attention", action="store_true",
+        help="只列被動層救不了的：stalled（標的已消化完）／expired（等待到期）／unwatched（無人在等）",
     )
     p_trace.set_defaults(func=_cmd_trace_backlog)
 

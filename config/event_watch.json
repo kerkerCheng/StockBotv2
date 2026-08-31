@@ -3,9 +3,15 @@
     "Event Watch T2 主動輪詢的力度旋鈕（docs/brainstorms/2026-08-31-event-watch-module-requirements.md）。",
     "sweep_budget_per_run＝每輪 sweep 最多給出幾個 watch 讓 agent 做 WebSearch；",
     "調 0 或 enabled=false ＝退回 T0（被動）＋T1（日期）純零成本運作，系統不會卡。",
-    "min_recheck_days＝同一 watch 兩次主動查詢的最小間隔天數。"
+    "min_recheck_days＝同一 watch 兩次主動查詢的最小間隔天數。",
+    "trace_ttl_days＝追源線索 park 時自動建立的 watch 的存活天數（[321]）。",
+    "預設 120＝一個財報週期 90 天＋緩衝：最常見的等待是『下一份季報會不會揭露』，",
+    "等滿一輪還沒出現就該讓人重新決定續等／改輪詢／放棄，而不是無聲續等。",
+    "這個到期日是 trace 併入 registry 的核心收益——consumed-marker 防的是重複喚醒，",
+    "但它沒有兜底，用完即靜默沉底（實測 10/50 已不可能再醒卻仍顯示可喚醒）。"
   ],
   "enabled": true,
   "sweep_budget_per_run": 2,
-  "min_recheck_days": 3
+  "min_recheck_days": 3,
+  "trace_ttl_days": 120
 }

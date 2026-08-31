@@ -163,12 +163,21 @@ def test_trace_backlog_keeps_legacy_parked_trace_visible(tmp_path, capsys) -> No
         "attempts_ref": None,
         "requires_user": False,
         "lane": "event_or_scheduled_pq1",
-        # 這筆正是「有入口沒出口」的樣本：不需人工 authority，卻也沒有任何具名標的可
-        # 比對，兩種 trace_trigger_kind 都永遠不會命中。它看起來在等事件，實際已經死了。
+        # 這筆正是「有入口沒出口」的樣本：不需人工 authority，也沒有任何 Event Watch
+        # 在等它。[321] 起等待狀態的 authority 是 registry——沒有 watch 就沒有到期日
+        # 會讓它現形，這是四種 wake_state 裡唯一真正的黑洞。
+        "wake_state": "unwatched",
+        "wake_state_reason": (
+            "沒有對應的 Event Watch：不會被任何事件喚醒，也沒有到期日會讓它現形。"
+            "需建立 watch 或改設 trace_requires_user"
+        ),
+        "watch_id": None,
+        "expires": None,
+        "poll_eligible": False,
         "auto_trigger_reachable": False,
         "unreachable_reason": (
-            "無具名標的可比對：兩種 trace_trigger_kind 都不會命中，"
-            "需人工重排或改設 trace_requires_user"
+            "沒有對應的 Event Watch：不會被任何事件喚醒，也沒有到期日會讓它現形。"
+            "需建立 watch 或改設 trace_requires_user"
         ),
         "review_title": None,
         "review_hint": None,
