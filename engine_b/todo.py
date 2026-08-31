@@ -1554,8 +1554,14 @@ def collect_from_research_actions() -> list[dict[str, Any]]:
 def _ra_graph_impact(payload: Mapping[str, Any]) -> str:
     """一句話回答「核准這個 RA 對圖的影響是什麼」（2026-08-31 使用者要求）。
 
-    從凍結 payload 的 extraction_json 數 nodes／edges／claims 並列 origin＋tier。
+    從凍結 payload 數 nodes／edges／claims 並列 origin＋tier。
     解析失敗回空字串（fail-soft：影響行缺席，密度契約其餘不變）。
+
+    ⚠ 兩個 key 都要認：draft（`library/leads/action_drafts/*.json`）用字串
+    `extraction_json`，但 prepare 凍結後正規化成 dict `extraction`。本函式原本只讀前者，
+    於是對**所有真實 RA** 都回空字串——2026-08-31 上線當天實測 328 個池內項目
+    `graph_impact` 出現 0 次。這是 L13「管子只接了一頭」：機制寫好了，但讀的欄位
+    不是消費端手上那份資料。
     """
 
     try:
@@ -1563,6 +1569,8 @@ def _ra_graph_impact(payload: Mapping[str, Any]) -> str:
         origins: list[str] = []
         for doc in payload.get("documents") or []:
             raw = doc.get("extraction_json")
+            if raw is None:
+                raw = doc.get("extraction")
             ex = json.loads(raw) if isinstance(raw, str) else (raw or {})
             n_nodes += len(ex.get("nodes") or [])
             n_edges += len(ex.get("edges") or [])

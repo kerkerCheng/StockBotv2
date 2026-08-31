@@ -1595,3 +1595,30 @@ def test_collected_rows_carry_the_go_boundary_so_consumers_need_not_recall_it() 
     assert "入圖" in rows[0]["go_excludes"]
     assert "graph admission" in rows[1]["go_authorizes"]
     assert "live" in rows[1]["go_excludes"]
+
+
+def test_graph_impact_reads_the_frozen_payload_not_only_the_draft() -> None:
+    """圖影響一句話必須認 prepare 凍結後的 `extraction`，不只 draft 的 `extraction_json`。
+
+    事發（2026-08-31，上線當天）：`_ra_graph_impact` 只讀字串欄位 `extraction_json`，
+    但那是 `library/leads/action_drafts/*.json` 的 draft 格式；`prepare_research_action`
+    凍結後會正規化成 dict 欄位 `extraction`。於是它對**每一個真實 RA** 都回空字串——
+    實測池內 328 個項目 `graph_impact` 出現 0 次，使用者從來沒看過這行。
+
+    這是 L13：機制回傳「成功」（fail-soft 回空字串不報錯），但產出從未出現在下游手上。
+    驗收條件因此寫成「凍結格式也數得出來」，不是「函式不拋例外」。
+    """
+    extraction = {
+        "source_doc": {"origin_entity": "Example Co", "evidence_tier": 3},
+        "nodes": [{"id": "co:a"}, {"id": "co:b"}],
+        "edges": [{"id": "e1"}],
+        "claims": [{"id": "cl1"}],
+    }
+
+    frozen = {"documents": [{"doc_id": "d", "extraction": extraction}]}
+    draft = {"documents": [{"doc_id": "d", "extraction_json": json.dumps(extraction)}]}
+
+    expected = "+2 節點、1 邊、1 claims｜來源：Example Co（tier 3）"
+    assert todo._ra_graph_impact(frozen) == expected
+    assert todo._ra_graph_impact(draft) == expected
+    assert todo._ra_graph_impact({"documents": [{"doc_id": "d"}]}) == ""
