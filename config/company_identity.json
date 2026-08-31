@@ -218,7 +218,10 @@
     },
     {
       "company_id": "co:landmark_optoelectronics",
-      "research_ticker": "3081.TWO"
+      "research_ticker": "3081.TWO",
+      "market_currency": "TWD",
+      "execution_currency": "TWD",
+      "execution_venue": "TPEx"
     },
     {
       "company_id": "co:leaderdrive",
