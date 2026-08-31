@@ -5248,15 +5248,18 @@
       "added_at": "2026-08-31T04:42:07.944868+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_b3c36b9fabbe75af93c097a1c0baad0b",
+      "dispatch_receipt": "decision:pd_acc6aa1db9c9a717ce63b198ac4d0466",
       "dispatch_ref": "wo_9536b23d5a05ec71ff103e593ade6861",
-      "dispatch_status": "queued",
+      "dispatch_status": "completed",
+      "dispatch_updated_at": "2026-08-31T16:09:16.831724+00:00",
       "dispatched_at": "2026-08-31T11:17:33.916382+00:00",
       "hint": "當前 missing_data：TSMC 對 FAU 供應商的任何具名陳述（法說/文件）；『獨供兩代』的可稽核逐字（CW 專利分析文或 FOCI 法說）（共 2 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 317,
-      "reason": null,
+      "reason": "pq1 completed",
+      "receipt": "decision:pd_acc6aa1db9c9a717ce63b198ac4d0466",
       "ref_id": "dc_6b92df56a6d186eb7464479dfb9c48c3",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-31T16:09:16.831724+00:00",
       "source": "decision_lab",
       "title": "co:foci：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
@@ -5706,6 +5709,30 @@
       "source": "engine_c",
       "title": "Engine C 觀測：HIMX / customer_concentration",
       "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-08-31T16:10:08.944664+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2025-12-31T00:00:00+00:00；來源=MOPS 3363 上詮光電 114 年度股東會年報（library/raw/mops_3363_annual_report_2025.txt，全文 192,1",
+      "n": 345,
+      "reason": null,
+      "ref_id": "po_6b3514d7de5009ae55227270c0759b40",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "engine_c",
+      "title": "Engine C 觀測：3363.TWO / backlog",
+      "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-08-31T16:10:08.944664+00:00",
+      "hint": "當前 missing_data：上詮法說會對『獨供兩代』的可稽核逐字（年報未揭露，替代 TSMC 具名的主要路徑）；客戶端（Coherent／Lumentum／Broadcom）filing 對 FAU 供應商的具名；⚠ TSMC 具名已改判為結構性可能不可得——不建議再投入 pq1 預算於此路徑（共 3 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "n": 346,
+      "reason": null,
+      "ref_id": "dc_6b92df56a6d186eb7464479dfb9c48c3",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:foci：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
     }
   ],
   "log": [
@@ -12820,8 +12847,35 @@
       "ref_id": "dc_7bd7922b16d32044b3f75d2edb19342d",
       "type": "decision_review",
       "verb": "go"
+    },
+    {
+      "at": "2026-08-31T16:08:09.137611+00:00",
+      "n": 317,
+      "reason": null,
+      "receipt": "research:technews_tsmc_siph_forum_2026_08_31+counterpath:viks_no_long_term_moat",
+      "ref_id": "dc_6b92df56a6d186eb7464479dfb9c48c3",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-08-31T16:09:16.831724+00:00",
+      "n": 317,
+      "reason": null,
+      "receipt": "decision:pd_acc6aa1db9c9a717ce63b198ac4d0466",
+      "ref_id": "dc_6b92df56a6d186eb7464479dfb9c48c3",
+      "type": "decision_review",
+      "verb": "pq1_completed"
+    },
+    {
+      "at": "2026-08-31T16:09:16.831724+00:00",
+      "n": 317,
+      "reason": "pq1 completed",
+      "receipt": "decision:pd_acc6aa1db9c9a717ce63b198ac4d0466",
+      "ref_id": "dc_6b92df56a6d186eb7464479dfb9c48c3",
+      "type": "decision_review",
+      "verb": "go"
     }
   ],
-  "next_n": 345,
+  "next_n": 347,
   "schema_version": "1"
 }
