@@ -1,0 +1,19 @@
+{
+  "_doc": [
+    "產業別分排序（--by-sector）的錨→產業對照（docs/brainstorms/2026-08-31-industry-sector-ranking-requirements.md A 案）。",
+    "分組解決可視性不解決可比性：分數不可跨組比較（證據密度不同）。",
+    "未映射的 demand anchor 自動以錨 id 自成一組（不靜默丟失）；無錨列「🔴 無需求錨」組——那是該補研究的訊號。",
+    "correlation_notes 是分組呈現時必附的需求錨重疊警告（N 產業 ≠ N 個獨立賭注）。"
+  ],
+  "sectors": {
+    "AI 光互連／CPO": ["tech:ai_switch", "tech:optical_scale_up", "tech:scale_across"],
+    "記憶體": ["tech:hbm", "tech:dram_technology", "tech:dram_production"],
+    "機器人": ["tech:humanoid_robot_systems", "tech:robotic_actuator", "tech:logistics_tote_transfer"],
+    "稀土磁材": ["mat:rare_earth_magnets"],
+    "成熟／特殊製程": ["tech:essential_chips_mature_node", "tech:non_leading_edge_fab"]
+  },
+  "correlation_notes": [
+    "AI 光互連與記憶體共享同一個 AI capex 需求錨——兩組同漲同跌的機率遠高於獨立假設。",
+    "機器人與稀土磁材共享人形放量假設——挑戰者與材料商押的是同一件事。"
+  ]
+}

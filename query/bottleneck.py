@@ -543,7 +543,85 @@ def render_markdown(result: Mapping[str, Any]) -> str:
     return "\n".join(out)
 
 
+def load_sector_map(path: str = "config/sector_anchors.json") -> dict[str, Any]:
+    """錨→產業對照（SSOT：config/sector_anchors.json）。讀不到時 fail-soft 空表——
+    所有錨落到自成一組，分組仍可用只是粗。"""
+
+    try:
+        with open(path, encoding="utf-8") as handle:
+            return json.load(handle)
+    except (OSError, json.JSONDecodeError):
+        return {"sectors": {}, "correlation_notes": []}
+
+
+def group_rows_by_sector(
+    result: Mapping[str, Any], sector_map: Mapping[str, Any] | None = None
+) -> dict[str, Any]:
+    """把 rank_bottlenecks 的兩份排序依 demand anchor 聚成產業組（A 案）。
+
+    分組解決**可視性**不解決可比性：各組內維持原有排序，組與組之間的分數
+    不可比較（證據密度不同）。未映射的錨自成一組（不靜默丟失）；無錨列
+    「🔴 無需求錨」——那是該補研究的訊號，不是雜訊。
+    """
+
+    sector_map = sector_map or load_sector_map()
+    anchor_to_sector: dict[str, str] = {}
+    for sector, anchors in (sector_map.get("sectors") or {}).items():
+        for anchor in anchors:
+            anchor_to_sector[str(anchor)] = str(sector)
+
+    def bucket(row: Mapping[str, Any]) -> str:
+        anchor = row.get("demand_anchor")
+        if not anchor:
+            return "🔴 無需求錨"
+        return anchor_to_sector.get(str(anchor), f"（未映射錨）{anchor}")
+
+    grouped: dict[str, dict[str, list]] = {}
+    for key in ("rows", "structural_rows"):
+        for row in result.get(key) or ():
+            grouped.setdefault(bucket(row), {"rows": [], "structural_rows": []})[
+                key
+            ].append(dict(row))
+    return {
+        "sectors": grouped,
+        "correlation_notes": list(sector_map.get("correlation_notes") or ()),
+    }
+
+
+def render_by_sector(result: Mapping[str, Any], *, top_n: int = 3) -> str:
+    """分組呈現：每產業各自 top-N（可行動）＋純結構第一名。"""
+
+    grouped = group_rows_by_sector(result)
+    lines = ["# 瓶頸排序（產業別分組——解決可視性，分數不可跨組比較）", ""]
+    for note in grouped["correlation_notes"]:
+        lines.append(f"> ⚠ {note}")
+    if grouped["correlation_notes"]:
+        lines.append("")
+    for sector, buckets in sorted(
+        grouped["sectors"].items(), key=lambda kv: -len(kv[1]["rows"])
+    ):
+        lines.append(f"## {sector}（可行動 {len(buckets['rows'])} 條）")
+        for row in buckets["rows"][:top_n]:
+            sole = "｜sole_source" if row.get("sole_source") else ""
+            lines.append(
+                f"- {row['company_id']}（{row.get('ticker') or '—'}）"
+                f" {row['relation']} → `{row['bottleneck']}`"
+                f"｜sub {row.get('substitutability')}{sole}"
+                f"｜{row.get('evidence')}"
+            )
+        structural = buckets["structural_rows"]
+        if structural:
+            top = structural[0]
+            lines.append(
+                f"  ↳ 純結構第一（該去補證據的）：{top['company_id']}"
+                f" → `{top['bottleneck']}`"
+            )
+        lines.append("")
+    return "\n".join(lines)
+
+
 def main() -> int:
+    import argparse
     import sys
     import warnings
     from pathlib import Path
@@ -554,6 +632,14 @@ def main() -> int:
     from neo4j import GraphDatabase
 
     from identity.registry import get_registry
+
+    parser = argparse.ArgumentParser(description="瓶頸鏈排序")
+    parser.add_argument(
+        "--by-sector", action="store_true",
+        help="產業別分組呈現（demand anchor 聚類；預設輸出不受影響）",
+    )
+    parser.add_argument("--top-n", type=int, default=3)
+    args = parser.parse_args()
 
     load_dotenv()
     password = os.environ.get("NEO4J_PASSWORD")
@@ -569,7 +655,11 @@ def main() -> int:
             rows = fetch_assertions(session)
     finally:
         driver.close()
-    print(render_markdown(rank_bottlenecks(rows, get_registry())))
+    result = rank_bottlenecks(rows, get_registry())
+    if args.by_sector:
+        print(render_by_sector(result, top_n=args.top_n))
+    else:
+        print(render_markdown(result))
     return 0
 
 
