@@ -4896,9 +4896,10 @@
       "hint": "MP 已 onboard（[296]），Lynas 是磁材鏈唯一另一家 ex-China 上市純 play；其重稀土（Dy/Tb）能力是 MP 沒有的段 ｜ go＝bounded 研究 ASX 年報＋DoD Seadrift 合約，產出 onboard RA 回 pq2 另取 ra_admission 號；不含入圖、不含 thesis",
       "n": 299,
       "reason": null,
+      "receipt": "authority:manual;ref:ra_fe7ec565ef1e07cea2abdaa00aa13f82",
       "ref_id": "manual:299",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-31T02:33:26.028607+00:00",
       "source": "manual",
       "title": "Lynas Rare Earths（LYC.AX）onboard 研究：第二家 ex-China 稀土純 play——豪洲礦＋馬來西亞分離＋美國 Seadrift 重稀土廠（DoD 資助），與 MP 構成磁材鏈雙源",
       "type": "manual"
@@ -5036,6 +5037,42 @@
       "resolved_at": null,
       "source": "decision_lab",
       "title": "co:nvidia：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-31T02:33:17.973418+00:00",
+      "hint": "核准 exact graph delta；Decision handoff：co:lynas。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 309,
+      "reason": null,
+      "ref_id": "ra_fe7ec565ef1e07cea2abdaa00aa13f82",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "Lynas（ASX: LYC）onboard：唯一 ex-China 輕＋重稀土分離商——Dy/Tb 量產＋DoW Seadrift 合約＋A$750M 增資",
+      "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-08-31T02:33:17.973418+00:00",
+      "hint": "coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "n": 310,
+      "reason": null,
+      "ref_id": "dc_6b92df56a6d186eb7464479dfb9c48c3",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:foci：補客戶端商業承諾：訂單、產能協議或預付款等付錢方向的證據",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-31T02:33:17.973418+00:00",
+      "hint": "coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "n": 311,
+      "reason": null,
+      "ref_id": "dc_21d81aa11dd2fe85c747b1c759fd01ed",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:mp_materials：補客戶端商業承諾：訂單、產能協議或預付款等付錢方向的證據",
       "type": "decision_review"
     }
   ],
@@ -11445,8 +11482,17 @@
       "ref_id": "dc_21d81aa11dd2fe85c747b1c759fd01ed",
       "type": "decision_review",
       "verb": "go"
+    },
+    {
+      "at": "2026-08-31T02:33:26.028607+00:00",
+      "n": 299,
+      "reason": null,
+      "receipt": "authority:manual;ref:ra_fe7ec565ef1e07cea2abdaa00aa13f82",
+      "ref_id": "manual:299",
+      "type": "manual",
+      "verb": "go"
     }
   ],
-  "next_n": 309,
+  "next_n": 312,
   "schema_version": "1"
 }

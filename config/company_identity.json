@@ -487,6 +487,13 @@
       "market_currency": "USD",
       "execution_currency": "USD",
       "execution_venue": "NYSE"
+    },
+    {
+      "company_id": "co:lynas",
+      "research_ticker": "LYC.AX",
+      "market_currency": "AUD",
+      "execution_currency": "AUD",
+      "execution_venue": "ASX"
     }
   ]
 }
