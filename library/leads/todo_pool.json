@@ -4875,15 +4875,18 @@
       "added_at": "2026-08-30T15:04:43.518545+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_9605734821681fa5f38ba51d08fa763a",
+      "dispatch_receipt": "decision:pd_85f1aa694458d713f358da174984d274",
       "dispatch_ref": "wo_ed69a60518fee7109623c1d8d50be7b9",
-      "dispatch_status": "queued",
+      "dispatch_status": "completed",
+      "dispatch_updated_at": "2026-08-31T02:20:46.405930+00:00",
       "dispatched_at": "2026-08-31T00:34:48.910190+00:00",
       "hint": "coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 298,
-      "reason": null,
+      "reason": "pq1 completed",
+      "receipt": "decision:pd_85f1aa694458d713f358da174984d274",
       "ref_id": "dc_21d81aa11dd2fe85c747b1c759fd01ed",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-31T02:20:46.405930+00:00",
       "source": "decision_lab",
       "title": "co:mp_materials：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
@@ -11413,6 +11416,33 @@
       "reason": "pq1 completed",
       "receipt": "decision:pd_ad303bd0b73efcf212cd2e70b7a4423a",
       "ref_id": "dc_6b92df56a6d186eb7464479dfb9c48c3",
+      "type": "decision_review",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-31T02:19:43.652091+00:00",
+      "n": 298,
+      "reason": null,
+      "receipt": "session:queue-r4",
+      "ref_id": "dc_21d81aa11dd2fe85c747b1c759fd01ed",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-08-31T02:20:46.405930+00:00",
+      "n": 298,
+      "reason": null,
+      "receipt": "decision:pd_85f1aa694458d713f358da174984d274",
+      "ref_id": "dc_21d81aa11dd2fe85c747b1c759fd01ed",
+      "type": "decision_review",
+      "verb": "pq1_completed"
+    },
+    {
+      "at": "2026-08-31T02:20:46.405930+00:00",
+      "n": 298,
+      "reason": "pq1 completed",
+      "receipt": "decision:pd_85f1aa694458d713f358da174984d274",
+      "ref_id": "dc_21d81aa11dd2fe85c747b1c759fd01ed",
       "type": "decision_review",
       "verb": "go"
     }
