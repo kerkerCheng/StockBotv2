@@ -12008,31 +12008,25 @@
       "lead_id": "lead_23ed2dd8e137c0a94e7a2411fdebc7ec",
       "published_at": "2026-08-30",
       "refs": {
-        "parked_reason": "ELSFP 綁定研究：Cignal AI（獨立產研，2026-04-01 更 07-28）逐字——「Lumentum announced its largest purchase order ever for the ELSFPs that drive CPO, and Coherent announced a PO for its high-power laser for the same application」；AAOI 法說：ELSFP 現量產有限、2027 底 40 萬件/月目標、ELS 毛利 55-65%。三家供應者格局成形（LITE 史上最大 PO／COHR 高功率 PO／AAOI 產能爬坡）；Broadcom 端具名綁定仍缺（ELSFP 為標準座、多源競爭符合 [268] cl3 判斷）。Cignal 另示警「no products shipping in volume yet」。",
+        "parked_reason": "Davisson ELSFP 供應商綁定結構性未公開:供應端 PO 證據已到位(Lumentum 首張 ELS module PO 交付 2H CY2027+Cignal 稱 largest ELSFP PO ever)但雙方都不具名;等交易對手方具名文件(L8:不能靠再讀供應商自述補具名)",
         "primary_url": "https://cignal.ai/2026/04/cpo-and-elsfp-1q26-update/",
         "research_outcome": "three_supplier_landscape_tier3_corroborated_no_exclusive_binding",
         "research_run": "session:2026-08-30-loop2-r4",
-        "trace_next_trigger": "LITE/COHR/AAOI 任一具名 Broadcom 或量產出貨數字",
+        "trace_attempts_ref": "Cignal AI 1Q26 CPO/ELSFP update(paywall,可見部分:Lumentum largest ELSFP PO ever+Coherent high-power laser PO,買方名在牆後);Lumentum Q4 FY26 earnings call 2026-08-18 逐字:We received its first external line source or ELS module purchase for delivery in the second half of calendar 2027,全場無 Broadcom/Davisson/客戶具名",
+        "trace_next_trigger": "Broadcom 或 ELSFP 供應商任一方具名對手(filing/PR/法說),或使用者授權 Cignal 付費取得",
         "trace_requeue_trigger": "related_triaged_lead:lead_b7fb056592186e1d35d8da16f3b7c0b7",
         "trace_requeued_at": "2026-08-31T10:44:09.687187+00:00",
         "trace_requires_user": "false",
-        "trace_status": "partial",
+        "trace_status": "awaiting_named_disclosure",
         "trace_trigger_entities": [
-          "AAOI",
-          "AVGO",
-          "COHR",
-          "LITE",
-          "co:applied_optoelectronics",
-          "co:broadcom",
-          "co:coherent",
-          "co:lumentum"
+          "edgar:AVGO,edgar:LITE,edgar:COHR,edgar:AAOI"
         ],
         "trace_trigger_event_ref": "lead:lead_b7fb056592186e1d35d8da16f3b7c0b7",
         "trace_trigger_kind": "related_entity_signal",
         "trace_trigger_watch_ref": "ew_0018_2026-08-31"
       },
       "source": "decompose:avgo-davisson-2026-08-30",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "sivers": {
           "counter_only": false,
