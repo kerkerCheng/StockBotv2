@@ -5360,6 +5360,53 @@
       "source": "manual",
       "title": "定向補 sub：長出稀土磁材與機器人兩個產業群（使用者指示）",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-08-31T10:47:21.401936+00:00",
+      "hint": "當前 missing_data：客戶端具名：Coherent/Lumentum/Broadcom 任一方文件點名聯亞為磊晶供應商；四年 CW laser 長約交易對手方的具名或第三方獨立佐證（共 2 項）｜coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
+      "n": 326,
+      "reason": null,
+      "ref_id": "dc_f94148d8545de35cb2c5d048640b913e",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "source_cleared": {
+        "at": "2026-08-31T10:55:34.559437+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
+      "title": "co:landmark_optoelectronics：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-31T10:47:21.401936+00:00",
+      "hint": "當前 missing_data：counter_thesis_path（共 1 項）｜coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
+      "n": 327,
+      "reason": null,
+      "ref_id": "dc_957bff3701ea4e46d962bfb9ff0932c8",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "source_cleared": {
+        "at": "2026-08-31T10:55:34.559437+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
+      "title": "co:coherent：補 counter-path：什麼會讓這條因果鏈斷掉（第二供應源、客戶自製、技術替代）",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-31T10:55:34.559437+00:00",
+      "graph_impact": "+5 節點、4 邊、2 claims｜來源：TechNews 科技新報（轉述台積電徐國晉於 SEMI／矽光子產業協會「矽光子國際論壇」之公開演講；未取得官方逐字稿）（tier 3）",
+      "hint": "核准 exact graph delta；Decision handoff：co:tsmc。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 328,
+      "reason": null,
+      "ref_id": "ra_72acb5f31641b9a34473321fcaca57e6",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "TSMC 整合端公開指認 CPO 四大瓶頸：雷射／光纖／光纖連接器／全堆疊測試（SEMI 矽光子國際論壇 2026-08-31）",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -12141,8 +12188,26 @@
       "ref_id": "manual:323",
       "type": "manual",
       "verb": "go"
+    },
+    {
+      "at": "2026-08-31T10:55:34.559437+00:00",
+      "n": 326,
+      "reason": "來源本輪成功執行，但不再產出此項",
+      "receipt": null,
+      "ref_id": "dc_f94148d8545de35cb2c5d048640b913e",
+      "type": "decision_review",
+      "verb": "source_cleared"
+    },
+    {
+      "at": "2026-08-31T10:55:34.559437+00:00",
+      "n": 327,
+      "reason": "來源本輪成功執行，但不再產出此項",
+      "receipt": null,
+      "ref_id": "dc_957bff3701ea4e46d962bfb9ff0932c8",
+      "type": "decision_review",
+      "verb": "source_cleared"
     }
   ],
-  "next_n": 326,
+  "next_n": 329,
   "schema_version": "1"
 }
