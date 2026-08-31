@@ -1,0 +1,82 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "guided",
+      "disproof_condition": "Downgrade if the engagement count shrinks or none of the six converts to a named order by mid-2027.",
+      "id": "sive_q2_2026_earnings_call_2026_08_27_cl1",
+      "source_ids": [
+        "sive_q2_2026_earnings_call_2026_08_27_s1"
+      ],
+      "statement": "Beyond the named Jabil collaboration, Sivers management states six additional pluggable-maker engagements: three in alpha sample evaluation and three in technical engagement and supply assessment — issuer self-reported pipeline breadth, no counterparties named, no orders attached.",
+      "subject_id": "co:sivers_semiconductors"
+    },
+    {
+      "confidence": 0.65,
+      "demand_proof_level": "guided",
+      "disproof_condition": "Replace with named-edge claim once the foundry partner is disclosed by either party; downgrade if capacity claims are walked back.",
+      "id": "sive_q2_2026_earnings_call_2026_08_27_cl2",
+      "source_ids": [
+        "sive_q2_2026_earnings_call_2026_08_27_s3",
+        "sive_q2_2026_earnings_call_2026_08_27_s4"
+      ],
+      "statement": "Sivers states a new foundry partner has brought 'tremendous capacity' on board, with a long-term manufacturing model of one-third internal / two-thirds foundry — the foundry partner is NOT named in the call or PR; social-media attribution of this capacity to WIN Semiconductors is author inference with no public basis and is deliberately not recorded here.",
+      "subject_id": "co:sivers_semiconductors"
+    }
+  ],
+  "edges": [],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "SIVE.ST",
+        "Sivers"
+      ],
+      "attributes": {},
+      "confidence": 0.8,
+      "id": "co:sivers_semiconductors",
+      "name": "Sivers Semiconductors",
+      "role": null,
+      "source_ids": [
+        "sive_q2_2026_earnings_call_2026_08_27_s1"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "sive_q2_2026_earnings_call_2026_08_27",
+    "evidence_tier": 2,
+    "origin_entity": "Sivers Semiconductors",
+    "permission_basis": "Public earnings call statements; short excerpts with URL.",
+    "published_at": "2026-08-27",
+    "publisher": "Investing.com",
+    "retrieved_at": "2026-09-01",
+    "source_type": "transcript",
+    "storage_permission": "repo_excerpt",
+    "title": "Sivers Semiconductors Q2 2026 earnings call (management statements, via Investing.com transcript)",
+    "url": "https://www.investing.com/news/transcripts/earnings-call-transcript-sivers-semiconductors-posts-q2-2026-revenue-drop-93CH-4880013"
+  },
+  "sources": [
+    {
+      "id": "sive_q2_2026_earnings_call_2026_08_27_s1",
+      "locator": "pluggable engagements",
+      "quote": "Three are in alpha sample evaluation stage and another three in technical engagement and supply assessment stage."
+    },
+    {
+      "id": "sive_q2_2026_earnings_call_2026_08_27_s2",
+      "locator": "Jabil timeline",
+      "quote": "Beta builds in Q4 2026, followed by customer qual cycles. Initial production orders are expected in the first half of 2027, with the production ramp planned second half of 2027."
+    },
+    {
+      "id": "sive_q2_2026_earnings_call_2026_08_27_s3",
+      "locator": "foundry capacity",
+      "quote": "Our new partner has brought on board tremendous capacity for us"
+    },
+    {
+      "id": "sive_q2_2026_earnings_call_2026_08_27_s4",
+      "locator": "manufacturing model",
+      "quote": "one-third of manufacturing capacity will be internal, while two-thirds will come from our foundry partners"
+    }
+  ]
+}
