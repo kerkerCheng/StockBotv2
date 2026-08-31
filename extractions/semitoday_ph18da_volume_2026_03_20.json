@@ -1,0 +1,153 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "guided",
+      "disproof_condition": "若後續 Tower 財報 SiPho 分項未見對應量產營收兌現、或 NewPhotonics 訂單取消揭露，躍遷敘事下修。",
+      "id": "semitoday_ph18da_volume_2026_03_20_cl1",
+      "source_ids": [
+        "semitoday_ph18da_volume_2026_03_20_s1",
+        "semitoday_ph18da_volume_2026_03_20_s2",
+        "semitoday_ph18da_volume_2026_03_20_s3",
+        "semitoday_ph18da_volume_2026_03_20_s4"
+      ],
+      "statement": "PH18DA 成熟度躍遷（Semiconductor Today 記載三方具名聲明）：OpenLight 在 Tower PH18DA 平台獲首批量產訂單，客戶 NewPhotonics 以其部署 800G/1.6T 雷射整合 PIC（AI 資料中心網路）——Tower 鏈從生態系宣示進入 volume production。量級未揭露；終端 hyperscaler 仍未具名（NewPhotonics 為 PIC 商，鏈的最後一跳仍空白）。",
+      "subject_id": "co:tower_semiconductor"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {
+        "qualification_status": "designed_in"
+      },
+      "confidence": 0.8,
+      "dst_id": "prod:ph18da",
+      "id": "ph1",
+      "relation": "depends_on",
+      "source_ids": [
+        "semitoday_ph18da_volume_2026_03_20_s1",
+        "semitoday_ph18da_volume_2026_03_20_s3"
+      ],
+      "src_id": "co:newphotonics"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "prod:ph18da",
+      "id": "ph2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "semitoday_ph18da_volume_2026_03_20_s4"
+      ],
+      "src_id": "co:tower_semiconductor"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "co:newphotonics",
+      "id": "ph3",
+      "relation": "supplies_to",
+      "source_ids": [
+        "semitoday_ph18da_volume_2026_03_20_s1",
+        "semitoday_ph18da_volume_2026_03_20_s3"
+      ],
+      "src_id": "co:openlight"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [
+        "TSEM"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:tower_semiconductor",
+      "name": "Tower Semiconductor",
+      "role": null,
+      "source_ids": [
+        "semitoday_ph18da_volume_2026_03_20_s4"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "OpenLight"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:openlight",
+      "name": "OpenLight Photonics",
+      "role": null,
+      "source_ids": [
+        "semitoday_ph18da_volume_2026_03_20_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.8,
+      "id": "co:newphotonics",
+      "name": "NewPhotonics",
+      "role": null,
+      "source_ids": [
+        "semitoday_ph18da_volume_2026_03_20_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [
+        "PH18DA"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "prod:ph18da",
+      "name": "PH18DA InP-on-Silicon Photonics Platform",
+      "role": null,
+      "source_ids": [
+        "semitoday_ph18da_volume_2026_03_20_s1"
+      ],
+      "type": "Product"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "semitoday_ph18da_volume_2026_03_20",
+    "evidence_tier": 3,
+    "origin_entity": "Semiconductor Today",
+    "permission_basis": "Public trade press; quotes only.",
+    "published_at": "2026-03-20",
+    "publisher": "Semiconductor Today",
+    "retrieved_at": "2026-08-31",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Semiconductor Today: OpenLight receives first volume production orders on Tower's PH18DA InP-on-silicon photonic platform",
+    "url": "https://www.semiconductor-today.com/news_items/2026/mar/openlight-tower-200326.shtml"
+  },
+  "sources": [
+    {
+      "id": "semitoday_ph18da_volume_2026_03_20_s1",
+      "locator": "OpenLight CEO milestone",
+      "quote": "Reaching our first customer orders in volume production with PH18DA is a defining milestone for OpenLight and a clear validation of our heterogeneous III-V on silicon platform."
+    },
+    {
+      "id": "semitoday_ph18da_volume_2026_03_20_s2",
+      "locator": "application readiness",
+      "quote": "This achievement demonstrates that our technology is ready for production and capable of supporting real customer products at 800G and 1.6T for AI data-center networks."
+    },
+    {
+      "id": "semitoday_ph18da_volume_2026_03_20_s3",
+      "locator": "NewPhotonics statement",
+      "quote": "The OpenLight platform enables us to deploy highly integrated photonic ICs built for volume, performance and scale demands in a single solution."
+    },
+    {
+      "id": "semitoday_ph18da_volume_2026_03_20_s4",
+      "locator": "Tower process maturity",
+      "quote": "The first orders for volume production demonstrate the maturity of the process and its readiness to support advanced optical platforms at production scale."
+    }
+  ]
+}
