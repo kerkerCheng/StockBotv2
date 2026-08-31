@@ -6025,9 +6025,13 @@
       "first_seen": "2026-08-30T22:32:54.746192+00:00",
       "lead_id": "lead_004478d161be47a5f8d9323bccfc8573",
       "published_at": "2026-08-20",
-      "refs": {},
+      "refs": {
+        "parked_reason": "內部人申報非本系統研究對象;terminal not_pursued",
+        "research_outcome": "例行 Form 4 內部人申報:不在系統主題範圍——技術/擇時訊號已於 2026-08-29 整組移除,內部人交易訊號從未在 scope;無結構供應鏈 atom 可抽",
+        "trace_status": "not_pursued"
+      },
       "source": "edgar:TSM",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "TSM 4 filed 2026-08-20",
       "triage": {
@@ -6068,9 +6072,13 @@
       "first_seen": "2026-08-30T22:32:54.746581+00:00",
       "lead_id": "lead_00455a9158ae8480fd0bf34f03a1bc7d",
       "published_at": "2026-08-10",
-      "refs": {},
+      "refs": {
+        "parked_reason": "內部人申報非本系統研究對象;terminal not_pursued",
+        "research_outcome": "例行 Form 4 內部人申報:不在系統主題範圍——技術/擇時訊號已於 2026-08-29 整組移除,內部人交易訊號從未在 scope;無結構供應鏈 atom 可抽",
+        "trace_status": "not_pursued"
+      },
       "source": "edgar:TSM",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "TSM 4 filed 2026-08-10",
       "triage": {
@@ -9361,9 +9369,14 @@
       "first_seen": "2026-08-30T22:32:49.748503+00:00",
       "lead_id": "lead_1609bc2f7219c606bfd788882fef693d",
       "published_at": "2026-08-06",
-      "refs": {},
+      "refs": {
+        "parked_reason": "例行季報 cover;terminal",
+        "research_outcome": "例行財報 8-K;MP 客戶承諾素材已在 [316] 觀測提案,無新結構 atom",
+        "trace_attempts_ref": "8-K 本體已抓(library/raw/mp_8_k_20260806.txt):Q2 財報 PR cover,Item 2.02 例行",
+        "trace_status": "original_obtained"
+      },
       "source": "edgar:MP",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "MP 8-K filed 2026-08-06",
       "triage": {
@@ -11464,9 +11477,14 @@
       "first_seen": "2026-08-30T22:32:54.746273+00:00",
       "lead_id": "lead_205302343ca540edd1f67f8a1eac0031",
       "published_at": "2026-08-14",
-      "refs": {},
+      "refs": {
+        "parked_reason": "例行揭露 terminal;無結構事實",
+        "research_outcome": "例行公司/財務揭露,無 CPO/供應鏈結構 atom;財務時變歸 Engine C",
+        "trace_attempts_ref": "6-K 08-14 財務報表 cover(tsm_6_k_20260814.txt):例行",
+        "trace_status": "original_obtained"
+      },
       "source": "edgar:TSM",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "TSM 6-K filed 2026-08-14",
       "triage": {
@@ -11749,9 +11767,13 @@
       "first_seen": "2026-08-30T22:32:54.746656+00:00",
       "lead_id": "lead_2289f6b883f6e081b3e5795289a54fac",
       "published_at": "2026-08-10",
-      "refs": {},
+      "refs": {
+        "parked_reason": "內部人申報非本系統研究對象;terminal not_pursued",
+        "research_outcome": "例行 Form 4 內部人申報:不在系統主題範圍——技術/擇時訊號已於 2026-08-29 整組移除,內部人交易訊號從未在 scope;無結構供應鏈 atom 可抽",
+        "trace_status": "not_pursued"
+      },
       "source": "edgar:TSM",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "TSM 4 filed 2026-08-10",
       "triage": {
@@ -15332,9 +15354,13 @@
       "first_seen": "2026-08-30T22:32:49.748812+00:00",
       "lead_id": "lead_36a8bd9ccadf6314b3b0763af5730dc5",
       "published_at": "2026-06-15",
-      "refs": {},
+      "refs": {
+        "parked_reason": "內部人申報非本系統研究對象;terminal not_pursued",
+        "research_outcome": "例行 Form 4 內部人申報:不在系統主題範圍——技術/擇時訊號已於 2026-08-29 整組移除,內部人交易訊號從未在 scope;無結構供應鏈 atom 可抽",
+        "trace_status": "not_pursued"
+      },
       "source": "edgar:MP",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "MP 4 filed 2026-06-15",
       "triage": {
@@ -19092,9 +19118,13 @@
       "first_seen": "2026-08-30T22:32:49.748885+00:00",
       "lead_id": "lead_4e01f16dd69b10649a4960ad46f3ef7b",
       "published_at": "2026-06-15",
-      "refs": {},
+      "refs": {
+        "parked_reason": "內部人申報非本系統研究對象;terminal not_pursued",
+        "research_outcome": "例行 Form 4 內部人申報:不在系統主題範圍——技術/擇時訊號已於 2026-08-29 整組移除,內部人交易訊號從未在 scope;無結構供應鏈 atom 可抽",
+        "trace_status": "not_pursued"
+      },
       "source": "edgar:MP",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "MP 4 filed 2026-06-15",
       "triage": {
@@ -19531,9 +19561,14 @@
       "first_seen": "2026-08-30T22:32:49.748383+00:00",
       "lead_id": "lead_51262d0814ea1b61ea98ccdc976793d8",
       "published_at": "2026-08-07",
-      "refs": {},
+      "refs": {
+        "parked_reason": "素材已由 [316] 提案涵蓋;10-Q 入庫備用,terminal",
+        "research_outcome": "無新客戶承諾;[316] 核准後 reassess 可引本 10-Q 為最新 backlog/customer 素材",
+        "trace_attempts_ref": "10-Q 全文已抓(library/raw/mp_10_q_20260807.txt,234k chars):DoW 定約+Apple+GM 組合與 10-K 一致;新進度=10X Facility 動工(construction has commenced)、HREE Tb/Dy 首產預期 2H2026、DoW 承諾延伸至 samarium 分離+chlor-alkali 重啓",
+        "trace_status": "original_obtained"
+      },
       "source": "edgar:MP",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "MP 10-Q filed 2026-08-07",
       "triage": {
@@ -27447,9 +27482,14 @@
       "first_seen": "2026-08-30T22:32:54.746430+00:00",
       "lead_id": "lead_7f15a5aa15464587e916e17c059086ee",
       "published_at": "2026-08-11",
-      "refs": {},
+      "refs": {
+        "parked_reason": "例行揭露 terminal;無結構事實",
+        "research_outcome": "例行公司/財務揭露,無 CPO/供應鏈結構 atom;財務時變歸 Engine C",
+        "trace_attempts_ref": "6-K 08-11 董事會決議(tsm_6_k_20260811.txt):Q2 財報核准+NT$7 股利+US$29,442.5M 季度資本撥款(advanced tech/packaging/fab,例行季度節奏)+Sony 影像感測器 JV(≤282B 日圓,非 CPO 線)",
+        "trace_status": "original_obtained"
+      },
       "source": "edgar:TSM",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "TSM 6-K filed 2026-08-11",
       "triage": {
@@ -34145,9 +34185,14 @@
       "first_seen": "2026-08-31T05:27:05.235344+00:00",
       "lead_id": "lead_a426ad19ef39ad20e97f4116e6b660e3",
       "published_at": "2026-08-06",
-      "refs": {},
+      "refs": {
+        "parked_reason": "Q2 財報例行揭露;結構缺口不因此改變,[313] receipts 已涵蓋",
+        "research_outcome": "例行季報 PR;財務時變歸 Engine C,Himax cohort 已 READY+catalyst watch,不重複研究",
+        "trace_attempts_ref": "6-K 本體已抓(library/raw/himx_6_k_20260806.txt):cover only,正文為 Exhibit 99.1 Q2 財報 PR;Himax CPO/WLO 營收分項缺口為結構性(20-F 與現行揭露皆無),[313] 今日已判,Q2 PR 不改變",
+        "trace_status": "original_obtained"
+      },
       "source": "edgar:HIMX",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "HIMX 6-K filed 2026-08-06",
       "triage": {
@@ -34352,9 +34397,14 @@
       "first_seen": "2026-08-30T22:32:54.746075+00:00",
       "lead_id": "lead_a5075a9225a62c249813b5448694c0ca",
       "published_at": "2026-08-25",
-      "refs": {},
+      "refs": {
+        "parked_reason": "例行揭露 terminal;無結構事實",
+        "research_outcome": "例行公司/財務揭露,無 CPO/供應鏈結構 atom;財務時變歸 Engine C",
+        "trace_attempts_ref": "6-K 08-25 month-end:月營收例行",
+        "trace_status": "original_obtained"
+      },
       "source": "edgar:TSM",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "TSM 6-K filed 2026-08-25",
       "triage": {
@@ -38064,9 +38114,14 @@
       "first_seen": "2026-08-31T05:27:05.235213+00:00",
       "lead_id": "lead_b70448fbdb09a920d299afae967148ca",
       "published_at": "2026-08-12",
-      "refs": {},
+      "refs": {
+        "parked_reason": "例行 AGM 決議,terminal",
+        "research_outcome": "例行股東會決議,無可抽 atom",
+        "trace_attempts_ref": "6-K 已抓(library/raw/himx_6_k_20260812.txt):AGM 決議,無供應鏈/財務結構 atom",
+        "trace_status": "original_obtained"
+      },
       "source": "edgar:HIMX",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "HIMX 6-K filed 2026-08-12",
       "triage": {
