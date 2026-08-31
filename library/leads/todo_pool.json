@@ -5085,19 +5085,22 @@
     {
       "added_at": "2026-08-31T02:18:35.642701+00:00",
       "dispatch_baseline_decision_id": "pd_b7f1d9fae03dada22e0dedbc0ea2c8b5",
+      "dispatch_receipt": "decision:pd_d11b5ca740393409387c85ba6cdbb652",
       "dispatch_ref": "assessment_gap:dc_fdab434d1fad67666c57a6eefd379337",
       "dispatch_scope": [
         "source_reliability_corroboration_incomplete"
       ],
-      "dispatch_status": "queued",
+      "dispatch_status": "completed",
+      "dispatch_updated_at": "2026-08-31T16:23:00.317697+00:00",
       "dispatched_at": "2026-08-31T04:37:20.938227+00:00",
       "hint": "當前 missing_data：MRM 量產良率/出貨規模的第三方量化（IEEE Spectrum 為技術描述非量產驗證）（共 1 項）｜go（大項）＝reassess 後以 assessment_gap 排入 pq1，研究範圍：source_reliability_corroboration_incomplete。產出為 assessment／研究包，完成後 reassess 以新 decision receipt 結案",
       "n": 308,
-      "reason": null,
+      "reason": "第三方量產量化已補(TrendForce 產能爬坡+FII 出貨目標);良率改判結構性不可得;出貨實測驗證點 3Q26 財報季",
+      "receipt": "decision:pd_d11b5ca740393409387c85ba6cdbb652",
       "ref_id": "dc_fdab434d1fad67666c57a6eefd379337",
       "residual_digest": "66611bd88647d5bc",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-31T16:23:00.317697+00:00",
       "source": "decision_lab",
       "title": "co:nvidia：殘餘缺口——MRM 量產良率/出貨規模的第三方量化（IEEE Spectrum 為技術描述非量產驗證）",
       "type": "decision_review"
@@ -5203,11 +5206,11 @@
     },
     {
       "added_at": "2026-08-31T02:45:27.304373+00:00",
-      "dispatch_attempt": 1,
-      "dispatch_baseline_decision_id": "pd_ae7e2839891a5792d4fbbaebde63f2db",
-      "dispatch_ref": "wo_64b6b6ebace3e2b25d6b32c9eb9c849c",
+      "dispatch_attempt": 2,
+      "dispatch_baseline_decision_id": "pd_5ebd5b05db7a6058087fc66b5be8e2b5",
+      "dispatch_ref": "wo_9b764804f4ae09b33859b29a9c6a9a64",
       "dispatch_status": "queued",
-      "dispatched_at": "2026-08-31T06:10:16.264206+00:00",
+      "dispatched_at": "2026-08-31T16:18:20.273563+00:00",
       "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 314,
       "reason": null,
@@ -5714,10 +5717,11 @@
       "added_at": "2026-08-31T16:10:08.944664+00:00",
       "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2025-12-31T00:00:00+00:00；來源=MOPS 3363 上詮光電 114 年度股東會年報（library/raw/mops_3363_annual_report_2025.txt，全文 192,1",
       "n": 345,
-      "reason": null,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_89b8bcb367ce38d0a77f274bb28e91f5;proposal:po_6b3514d7de5009ae55227270c0759b40",
       "ref_id": "po_6b3514d7de5009ae55227270c0759b40",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-31T16:17:14.624576+00:00",
       "source": "engine_c",
       "title": "Engine C 觀測：3363.TWO / backlog",
       "type": "engine_c_observation"
@@ -12872,6 +12876,43 @@
       "reason": "pq1 completed",
       "receipt": "decision:pd_acc6aa1db9c9a717ce63b198ac4d0466",
       "ref_id": "dc_6b92df56a6d186eb7464479dfb9c48c3",
+      "type": "decision_review",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-31T16:17:14.624576+00:00",
+      "n": 345,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_89b8bcb367ce38d0a77f274bb28e91f5;proposal:po_6b3514d7de5009ae55227270c0759b40",
+      "ref_id": "po_6b3514d7de5009ae55227270c0759b40",
+      "type": "engine_c_observation",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-31T16:18:20.273563+00:00",
+      "attempt": 2,
+      "n": 314,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_9b764804f4ae09b33859b29a9c6a9a64",
+      "ref_id": "dc_48446dbceb85d4b785634e3c4ca5d669",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-08-31T16:23:00.317697+00:00",
+      "n": 308,
+      "reason": "第三方量產量化已補(TrendForce 產能爬坡+FII 出貨目標);良率改判結構性不可得;出貨實測驗證點 3Q26 財報季",
+      "receipt": "decision:pd_d11b5ca740393409387c85ba6cdbb652",
+      "ref_id": "dc_fdab434d1fad67666c57a6eefd379337",
+      "type": "decision_review",
+      "verb": "pq1_completed"
+    },
+    {
+      "at": "2026-08-31T16:23:00.317697+00:00",
+      "n": 308,
+      "reason": "第三方量產量化已補(TrendForce 產能爬坡+FII 出貨目標);良率改判結構性不可得;出貨實測驗證點 3Q26 財報季",
+      "receipt": "decision:pd_d11b5ca740393409387c85ba6cdbb652",
+      "ref_id": "dc_fdab434d1fad67666c57a6eefd379337",
       "type": "decision_review",
       "verb": "go"
     }
