@@ -1579,6 +1579,35 @@
       "note": "[321] 由 trace backlog 遷移；trace_status=isolated_tier_3",
       "status": "active",
       "woken_by": null
+    },
+    {
+      "watch_id": "ew_0057_2026-08-31",
+      "created_at": "2026-08-31T08:18:37.946035+00:00",
+      "expires": "2027-06-30",
+      "kind": "fact_verification",
+      "until": null,
+      "entities": [
+        "COHR",
+        "LITE",
+        "SIVE",
+        "co:coherent",
+        "co:lumentum",
+        "co:sivers_semiconductors"
+      ],
+      "fact": "Morgan Stanley CPO note 將 Sivers 與 COHR/LITE 並列 laser supply 關鍵參與者",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "hy_0002_2026-08-31",
+      "wake_lead": "",
+      "consumed_entities": [],
+      "poll": {
+        "eligible": true,
+        "last_checked": null,
+        "query_hint": "Morgan Stanley CPO note Sivers Coherent Lumentum laser supply key participants"
+      },
+      "note": "[321] 收尾稽核補上：五個假設中唯一沒有喚醒條件的一個；其對應追源線索（9715784d）同時是停滯 10 筆之一，同一個等待漏了兩層",
+      "status": "active",
+      "woken_by": null
     }
   ]
 }

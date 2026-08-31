@@ -248,23 +248,27 @@ WebSearch／Browser，兩者是 shell rules 之外的獨立權限 surface。
 
 ```powershell
 & '.venv\Scripts\python.exe' -m engine_b.cli trace-backlog
+& '.venv\Scripts\python.exe' -m engine_b.cli trace-backlog --needs-attention   # 被動層救不了的
 ```
 
 一般 event／scheduled trigger 仍回 pq1；只有 `trace_requires_user=true` 才由 `todo sync` 建立
 `source_trace_review`。其 `go` 只 dispatch exact lead 回 pq1，不接受 claim、不提高 tier，也不授權付費。
-`trace_next_trigger` 只做人類說明；可執行 linkage 使用 `trace_trigger_kind`＋`trace_trigger_entities`，
-kind 目前有兩種：`related_entity_signal`（任何共用具名標的的新 lead）與 `primary_source_signal`
-（只有該標的的 tier-1 一手來源才算）。同標的新 lead 通過 triage 時會留下 triggering lead receipt 並重排
-不需人工 authority 的 exact parked trace；沒有共同具名 ticker／company_id 時不得靠語意自動喚醒。
-`related_entity_signal` 以 `trace_requeue_consumed_entities` 記錄已消化標的，同一標的只喚醒一次——
-park 的理由不會因為「又一則提到同一檔的貼文」而改變。
 
-**`auto_trigger_reachable=false` 必須逐筆列出並附 `unreachable_reason`，不得只回報總數。** 那代表它
-既不需人工 authority、又沒有任何具名標的可比對，兩種 kind 都永遠不會命中——看起來在等事件，實際上
-沒有任何機制會讓它前進。只有三種誠實處置，擇一並寫明理由：(a) 主體其實已登記但沒填進機器欄位 →
-補 `trace_trigger_entities`；(b) 根本沒有可追的 claim（原文即該貼文本身）→ 改
-`trace_status=original_obtained` 豁免重排；(c) 真的需要人工 access／付費／改優先權 → 設
-`trace_requires_user=true` 進 pq2。**不得原樣留著**——那是安靜沉底，漏掉時沒有人會發現。
+**等待條件的判定與喚醒一律由 Event Watch registry 負責（[321]）**，`leads.py` 沒有第二套引擎。
+線索 park 當下自動建 watch 並取得到期日；`trace_next_trigger` 只做人類說明，機器比對用
+watch 的 `entities`。`trace_trigger_kind` 仍是 lead 上的寫入端字彙（擋拼字錯誤），但**行為由
+`event_watch.WATCH_KINDS` 決定**——`primary_source_signal` 建 watch 時映射到
+`entity_filing_signal`（判準相同：tier-1 ＋ 具名標的交集）。消化標記住在 watch 的
+`consumed_entities`，不再於 lead refs 留第二份。
+
+**`wake_state` 必須逐筆列出，`stalled`／`expired`／`unwatched` 三種必須當場處置。** 它們代表
+被動層救不了——等下去不會有事發生：
+- `stalled`：具名標的都觸發過一輪了。靠到期日兜底或開主動輪詢（`poll.eligible`）撈回。
+- `expired`：等待到期。決定續等（延長）、改主動輪詢、或放棄（改 terminal `trace_status`）。
+- `unwatched`：**沒有任何機制在等它**，唯一真正的黑洞。三種誠實處置擇一：(a) 主體已登記但
+  沒填進機器欄位 → 補 `trace_trigger_entities` 後重建 watch；(b) 根本沒有可追的 claim
+  （原文即該貼文本身）→ 改 terminal `trace_status` 豁免重排；(c) 真的需要人工 access／付費／
+  改優先權 → 設 `trace_requires_user=true` 進 pq2。**不得原樣留著。**
 
 brief 的 pq1 進度不得只寫「park」或只列數量。每一筆本輪處理的 `parked` lead 至少列：完整主詞／ticker、
 `parked_reason`（自然語言）、`trace_status`、`trace_next_trigger`、`trace_requires_user`，以及「是否產生
@@ -398,6 +402,9 @@ stable pq2 編號後不得只貼短標題或 `co:*` ID。決策行之下，每�
 第一行固定是 `# Daily Brief YYYY-MM-DD (Asia/Taipei)`（Asia/Taipei 當日），讓不同天的 brief 可分辨。
 **首屏第二行固定是 watch 計數器**（2026-08-31 定案，L14 常駐計數器）：照抄 `todo sync` 摘要的
 「watch N 筆（T1 a／T0 b／可輪詢 c，本輪喚醒 w）」；「等事件」區有項目卻無對應 watch 的逐項點名。
+⚠ **[321] 起 registry 同時涵蓋追源，計數器必須加報「停滯 s」**——那是「看起來在等、但被動層
+不會再醒」的筆數，是這個機制唯一會安靜失效的地方，必須常駐可見（L14：防呆要自己出現）。
+`derived_from_blockers` 的等待項不需要 watch（每次 sync 重新推導），不算缺口。
 **Pane 1 末尾附 `query.bottleneck --by-sector` 的每產業 top-3**（含開頭兩條需求錨重疊警告）；
 分組解決可視性、分數不可跨組比較，單一排序仍是唯一權威；空產業組與「🔴 無需求錨」要現形。
 

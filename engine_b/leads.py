@@ -806,9 +806,10 @@ def triage(
     return lead
 
 
-# 機器可執行的 trace 觸發類型（封閉字彙）。自然語言 `trace_next_trigger` 只給人讀，
-# 不參與判斷——讓機器讀懂它會把語意猜測帶回自動化路徑。新增一種 kind 就是在承認
-# 「有一類等待條件目前無法被既有 kind 正確表達」，而不是放寬既有 kind。
+# 寫入端仍接受的 trace 觸發類型（`trace_trigger_kind` ref 的合法值）。
+# ⚠ 判斷不在這裡：[321] 起等待條件由 Event Watch 判定，`primary_source_signal`
+# 在建 watch 時映射到 `entity_filing_signal`（判準本就相同）。這個集合只用來擋
+# 寫入端的拼字錯誤，不再有喚醒行為——kind 的行為 SSOT 是 `event_watch.WATCH_KINDS`。
 TRACE_TRIGGER_KINDS = frozenset({"related_entity_signal", "primary_source_signal"})
 
 # tier 判準的 SSOT 在 lead_refs（event_watch 也用同一份）。[321] 之前這裡與
@@ -890,89 +891,9 @@ def _requeue_related_trace_backlog(
         if touched or fired:
             ew.save_watches(watch_data)
 
-    # --- fallback：registry 尚未涵蓋的舊 lead（遷移後應為空） ---
-    for candidate_id, candidate in list(store["leads"].items()):
-        if candidate_id == event_lead_id or candidate.get("status") != "parked":
-            continue
-        if candidate_id in covered:
-            continue  # 已由 registry 判定過，不得再走舊路徑重複喚醒
-        refs = candidate.get("refs") or {}
-        trace_status = str(refs.get("trace_status") or "").strip()
-        parked_reason = str(refs.get("parked_reason") or "").strip()
-        if not trace_status and "trace" not in parked_reason.lower():
-            continue
-        # 同 trace_backlog：terminal 值只由 config/lead_trace_status.json 決定。
-        if get_trace_status_registry().is_terminal(trace_status):
-            continue
-        if str(refs.get("trace_requires_user") or "").lower() in {"1", "true", "yes"}:
-            continue
-        trigger_kind = str(refs.get("trace_trigger_kind") or "").strip()
-        if trigger_kind and trigger_kind not in TRACE_TRIGGER_KINDS:
-            continue
-        # 舊 backlog 沒有 kind 時沿用預設，才不會因為缺欄位而永遠沉底。
-        resolved_kind = trigger_kind or "related_entity_signal"
-        # 新格式直接讀 frozen trigger entities；舊 backlog 若只有自然語言 trigger，
-        # 以 lead 自身確定性 entities 做 lazy migration，避免永遠沉底。
-        trigger_entities = set(refs.get("trace_trigger_entities") or ())
-        if not trigger_entities and refs.get("trace_next_trigger"):
-            trigger_entities = lead_entities(candidate)
-        shared = sorted(event_entities & trigger_entities)
-        if not shared:
-            continue
-        # `primary_source_signal`：只有指定實體的 tier-1 一手來源才算觸發。
-        # 這是為了讓「等某方未來的具名揭露」（Meta internal memo、Intel／AMD 具名客戶、
-        # Xinhua 原文）有地方住——它們等的是**特定實體發布特定類型文件**，不是「該實體
-        # 被人提到」。用 related_entity_signal 表達會被任何一則推文觸發，於是每次都
-        # 得到「trigger 沒帶來新東西」。仍然完全確定性：只看 triage 的來源分級，不猜語意。
-        if resolved_kind == "primary_source_signal" and not _is_primary_source(event_lead):
-            continue
-        # Consumed-marker：同一個標的已經觸發過一次自動重排就不再重複。
-        # 沒有這道閘門時，只要 parked lead 的任一標的持續有新聞，它就會被無限喚醒——
-        # 而 park 的理由（缺某份特定文件、內容不屬圖譜材料）不會因為「又一則提到同一
-        # 檔的貼文」而改變，於是每次重查都得到同一個「trigger 沒帶來新東西」。
-        # 2026-08-12 實測：當日 5 個 pq1 slot 全部被這類重排吃光，0 筆 prepared RA，
-        # 同時把 tier-1 的 Lumentum 8-K 擠出預算。
-        # 只擋「同一標的的第二次」，不擋新標的：真正出現新的具名關聯時仍會喚醒。
-        # consumed-marker 只適用於 related_entity_signal：同一檔的第二則轉述不會帶來
-        # 新事證。primary_source_signal 相反——每一份新的一手文件本身就是新事件
-        # （下一季的 10-Q 可能正好含有等待中的揭露），故不以標的消化。重複觸發由
-        # 「每個 event lead 只會觸發一次」自然界定。
-        consumed = {
-            str(item).strip().upper()
-            for item in (refs.get("trace_requeue_consumed_entities") or ())
-            if str(item).strip()
-        }
-        if resolved_kind == "primary_source_signal":
-            novel = shared
-        else:
-            novel = [item for item in shared if item.strip().upper() not in consumed]
-        if not novel:
-            continue
-        requeue_trace(
-            store,
-            candidate_id,
-            trigger=f"related_triaged_lead:{event_lead_id}",
-            reason=(
-                f"{'指定實體的 tier-1 一手來源' if resolved_kind == 'primary_source_signal' else '新 triage PASS lead'} "
-                f"{event_lead_id} 與 parked trace 共用具名標的 {', '.join(novel)}"
-                f"{'' if resolved_kind == 'primary_source_signal' else '（首次觸發；其餘共用標的已消化）'}"
-                "；事件觸發 bounded pq1 重查"
-            ),
-            requeued_at=event_at,
-        )
-        # 保留原 kind：primary_source_signal 若被覆寫回 related_entity_signal，
-        # 下一則推文就又能觸發它，等於這道限縮只生效一次。
-        updates = {
-            "trace_trigger_kind": resolved_kind,
-            "trace_trigger_entities": sorted(trigger_entities),
-            "trace_trigger_event_ref": f"lead:{event_lead_id}",
-        }
-        if resolved_kind == "related_entity_signal":
-            updates["trace_requeue_consumed_entities"] = sorted(
-                consumed | {item.strip().upper() for item in shared}
-            )
-        candidate.setdefault("refs", {}).update(updates)
-        requeued.append(candidate_id)
+    # 沒有 fallback 路徑。[321] 遷移後實測「未被 registry 涵蓋的 backlog」為 0 筆，
+    # 留一份平行實作只會讓兩邊再度偏離（L16：重造品會開始偏離，而偏離不報錯）。
+    # 未涵蓋的 lead 由 trace_backlog 以 wake_state=unwatched 現形，交人處置。
     return sorted(requeued)
 
 

@@ -466,7 +466,11 @@ def main(argv: list[str] | None = None) -> int:
     add.add_argument("--entities", default="")
     add.add_argument("--fact", default="")
     add.add_argument("--fact-check-ref", default="")
-    add.add_argument("--wake-hypothesis", default="", help="假設 id（與 --wake-pq2 擇一）")
+    add.add_argument("--wake-hypothesis", default="", help="假設 id（三個 wake 目標擇一）")
+    add.add_argument(
+        "--wake-lead", default="",
+        help="追源線索 id（三個 wake 目標擇一）；一般由 park 自動建立，手動用於補漏",
+    )
     add.add_argument("--poll", action="store_true")
     add.add_argument("--query-hint", default="")
     add.add_argument("--note", default="")
@@ -512,15 +516,18 @@ def main(argv: list[str] | None = None) -> int:
             fact=args.fact,
             fact_check_ref=args.fact_check_ref,
             hypothesis_ref=args.wake_hypothesis,
+            wake_lead=args.wake_lead,
             poll_eligible=args.poll,
             poll_query_hint=args.query_hint,
             note=args.note,
         )
         save_watches(data)
-        target = (
-            f"pq2 [{watch['wake_pq2']}]" if watch.get('wake_pq2')
-            else f"假設 {watch.get('hypothesis_ref')}"
-        )
+        if watch.get("wake_pq2"):
+            target = f"pq2 [{watch['wake_pq2']}]"
+        elif watch.get("hypothesis_ref"):
+            target = f"假設 {watch['hypothesis_ref']}"
+        else:
+            target = f"追源線索 {watch.get('wake_lead')}"
         print(f"✓ 已建 watch {watch['watch_id']} → {target}")
         return 0
     return 1
