@@ -79,6 +79,58 @@ alpha 最前段）以「等到有可追源版本」為代價被延後，而很�
 無平行路徑」，`source_trace_review` 給使用者的就不再是模糊的「要不要付費」，而是
 「這個源過去 N 次高影響、平行驗證失敗率 M%，年費 $X」——不付仍是預設，但拒絕變得有據。
 
+## 三類處理方法詳述（2026-08-31 使用者要求）
+
+### A 類——官方文件的截圖（原檔會免費出現，只是晚）
+
+**判別特徵**：截圖內容指向 filing／PR／法說材料——有公司具名、文件型版面、可推斷的發布管道。
+
+**流程**：
+1. Triage 判 A → 立刻從截圖可讀文字**預寫 RA 骨架**：claim、edge、disproof_condition
+   先結構化好，標 `provisional`，存假設層（不入圖）。
+2. 掛 watch：美股 EDGAR（現行 harvest 已有）、台股 MOPS、公司 IR——trigger＝該公司
+   新文件落地。
+3. 原檔落地 → pq1 自動把骨架 claim 逐條對照原文：**命中**→ 骨架的佔位文字替換成
+   原文逐字、tier 依原檔定級 → prepare RA → pq2（從「發現原檔→讀→抽取→prepare」
+   數小時壓到分鐘級）；**未命中**（原檔沒講截圖說的事）→ 這本身是訊號：截圖斷章或
+   造假，記入來源 credibility。
+4. 等待期間 what-if 可先回答「若真排序變不變」。
+
+### B 類——付費研究的截圖（原檔永遠拿不到）
+
+**核心**：截圖 claim 拆成 atomic facts，每個 fact 標平行驗證路徑，分三個子路：
+
+- **B1 現在就免費可查**：fact 的上游一手是公司揭露／政府統計／免費摘要頁
+  → 直接轉 bounded pq1 研究題（不是 park）。例：截圖稱「TrendForce：SK hynix HBM
+  市占 53%」→ MU/SKH/Samsung 的財報與法說各有出貨陳述可三角，TrendForce 本身不需要。
+- **B2 未來事件可驗**：fact 是可對照的數字或預測（「Q3 訂單暴增」「下季毛利跳升」）
+  → 掛 **fact-check trigger**：結構化 `{fact, 對照欄位（哪家財報的哪個數字）, 預期時窗,
+  方向}`；對應財報／揭露落地時 pq1 自動對照。**命中**→ 該 fact 以「已由 filing 證實」
+  身份用正式來源入圖（**入圖的是 filing，永遠不是截圖**），來源 credibility +1；
+  **未命中**→ credibility −1、假設歸檔。驗證免費，只是要等。
+- **B3 純觀點**（評級、目標價、定性判斷）：跑一次 what-if——高影響→轉 B1 型
+  「找平行證據」題或入 weekly topic；低影響→ park＋到期歸檔，沉底是正確結果。
+
+### C 類——匿名爆料／供應鏈傳聞（無原檔概念）
+
+只有兩個誠實用途：
+1. **Entity discovery**：點名了未 onboard 的公司／技術——這價值與真偽無關，
+   現行 entity linkage 已做一半，補的是「新實體→onboard 候選」的顯式輸出。
+2. **事件驗證**：同 B2 的 fact-check trigger，但 what-if 門檻更高才值得掛
+   （tier 更低、雜訊更多），時窗更寬；預設 park。
+
+**C 類的長期機制是帳號級 credibility**：claim 級無法驗，但帳號可以——某匿名帳號的
+fact-check 連續命中，它就從 C 爬向「準 B」；連續失敗則其後續 lead 自動降權。
+這是唯一能系統性從最髒的前段擠出 alpha 的路，而它完全建立在 B2 的 trigger 記錄上。
+
+### 共用底座與動工順序
+
+共用三件：假設層儲存（facts＋trigger＋到期＋per-source credibility ledger）、
+what-if 查詢入口、`fact_verification` trigger 型別。
+**動工順序：①B2 fact-check trigger**（最便宜、複用既有 waiting 機制、A/C 都踩在它上面）
+→ **②A 類骨架＋watch 對照** → **③what-if 排序 diff** → C 的帳號 credibility 隨 ①
+的記錄自然長出。
+
 ## 開放問題
 
 - overlay 的量測：追蹤「what-if 判高影響 → 後來原檔到手」的命中率，才知道這機制
