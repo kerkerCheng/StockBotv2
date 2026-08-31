@@ -4963,9 +4963,10 @@
       "hint": "使用者指示語境：核准項要一句話講重點與圖影響、排序標籤要圖例、產業別與無源截圖兩題進 brainstorm；受理即 resolve（鑄號只為稽核）",
       "n": 304,
       "reason": null,
+      "receipt": "authority:manual;ref:commit_brief_revision_2026-08-31",
       "ref_id": "manual:304",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-31T00:09:44.529665+00:00",
       "source": "manual",
       "title": "Daily brief 修訂＋兩份 brainstorm（使用者 2026-08-31 指示）：圖影響一句話、pq1 標籤圖例、產業別分排序與截圖假設層方向文件",
       "type": "manual"
@@ -11232,6 +11233,15 @@
       "ref_id": "dc_9d464eeb94b7b0108104db1774bbbdd4",
       "type": "decision_review",
       "verb": "source_cleared"
+    },
+    {
+      "at": "2026-08-31T00:09:44.529665+00:00",
+      "n": 304,
+      "reason": null,
+      "receipt": "authority:manual;ref:commit_brief_revision_2026-08-31",
+      "ref_id": "manual:304",
+      "type": "manual",
+      "verb": "go"
     }
   ],
   "next_n": 305,
