@@ -1,0 +1,123 @@
+{
+  "claims": [
+    {
+      "confidence": 0.9,
+      "demand_proof_level": "guided",
+      "disproof_condition": "若該有條件承諾未轉為實際撥款、Sartell 廠未於 2027 年底投產、或年產出顯著低於 1,500 噸，則無稀土路線的替代威脅時程應延後。核查頻率：每半年；觸發後 48 小時內人工 review。",
+      "id": "niron_dow_osc_150m_2026_08_07_cl1",
+      "source_ids": [
+        "niron_dow_osc_150m_2026_08_07_s1",
+        "niron_dow_osc_150m_2026_08_07_s2"
+      ],
+      "statement": "美國國防部 Office of Strategic Capital 對 Niron Magnetics 提供**有條件**、最高 1.5 億美元、20 年期的直接貸款，用於明尼蘇達州 Sartell 的 287,000 平方英尺廠房，年產能上看 1,500 噸無稀土永磁，預計 2027 年投產、第二廠 2028 動工。⚠ 該融資仍附條件（盡職調查完成、取得指定最低股權），**不是已撥款**。⚠⚠ 這與 [336] 所載 USGS 記錄的『DoW 對加州 Mountain Pass 稀土生產商 1.5 億美元直接貸款』是**兩筆不同的融資**（地點：MN vs CA；性質：無稀土磁材 vs 重稀土分離），金額相同極易混淆，不得合併敘述。",
+      "subject_id": "co:niron_magnetics"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "mat:iron_nitride_magnet",
+      "id": "e1",
+      "relation": "develops",
+      "source_ids": [
+        "niron_dow_osc_150m_2026_08_07_s2"
+      ],
+      "src_id": "co:niron_magnetics"
+    },
+    {
+      "attributes": {
+        "qualification_status": "none"
+      },
+      "confidence": 0.8,
+      "dst_id": "mat:rare_earth_magnets",
+      "id": "e2",
+      "relation": "competes_with",
+      "source_ids": [
+        "niron_dow_osc_150m_2026_08_07_s2",
+        "niron_dow_osc_150m_2026_08_07_s3"
+      ],
+      "src_id": "mat:iron_nitride_magnet"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Niron"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:niron_magnetics",
+      "name": "Niron Magnetics",
+      "role": "disruptor",
+      "source_ids": [
+        "niron_dow_osc_150m_2026_08_07_s1",
+        "niron_dow_osc_150m_2026_08_07_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "iron nitride magnet",
+        "Clean Earth Magnet",
+        "Fe16N2"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "mat:iron_nitride_magnet",
+      "name": "鐵氮化物永磁（無稀土）",
+      "role": "material_base",
+      "source_ids": [
+        "niron_dow_osc_150m_2026_08_07_s2"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "NdFeB"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:rare_earth_magnets",
+      "name": "Rare earth magnets (neodymium, samarium-cobalt)",
+      "source_ids": [
+        "niron_dow_osc_150m_2026_08_07_s2"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "niron_dow_osc_150m_2026_08_07",
+    "evidence_tier": 2,
+    "origin_entity": "Niron Magnetics（公司自家新聞稿）",
+    "permission_basis": "公司公開新聞稿；保留 canonical URL 與研究必要短引述。",
+    "published_at": "2026-08-07",
+    "publisher": "PR Newswire",
+    "retrieved_at": "2026-08-31",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Niron Magnetics Receives Conditional $150 Million Department of War Commitment",
+    "url": "https://www.prnewswire.com/news-releases/niron-magnetics-receives-conditional-150-million-department-of-war-commitment-302846367.html"
+  },
+  "sources": [
+    {
+      "id": "niron_dow_osc_150m_2026_08_07_s1",
+      "locator": "貸款條件",
+      "quote": "conditional commitment from the Department of War's Office of Strategic Capital (OSC) for a direct loan of up to $150 million with a 20-year term"
+    },
+    {
+      "id": "niron_dow_osc_150m_2026_08_07_s2",
+      "locator": "廠址與產能",
+      "quote": "287,000-square-foot Sartell, Minnesota ... produce up to 1,500 tons of rare-earth-free permanent magnets annually"
+    },
+    {
+      "id": "niron_dow_osc_150m_2026_08_07_s3",
+      "locator": "CEO 具名引述",
+      "quote": "This conditional commitment recognizes the importance of Niron's rare-earth-free approach."
+    }
+  ]
+}

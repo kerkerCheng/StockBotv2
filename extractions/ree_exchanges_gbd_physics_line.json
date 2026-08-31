@@ -1,0 +1,96 @@
+{
+  "claims": [
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "guided",
+      "disproof_condition": "若取得磁材廠或 OEM 一手技術文件顯示人形／EV 級距磁體仍無法以 GBD 達成所需高溫矯頑力、或 GBD 對該厚度級距的良率／成本不可行，則「薄磁體這格已被工程解掉」的判斷失效，重稀土在該鏈上的替代難度應上修。核查頻率：每年 USGS MCS 與主要磁材廠技術揭露；觸發後 48 小時內人工 review。",
+      "id": "ree_exchanges_gbd_physics_line_cl1",
+      "source_ids": [
+        "ree_exchanges_gbd_physics_line_s1",
+        "ree_exchanges_gbd_physics_line_s2",
+        "ree_exchanges_gbd_physics_line_s3"
+      ],
+      "statement": "重稀土「不可替代」的邊界由**磁體厚度**畫出，不是由應用類別畫出：晶界擴散（GBD）對電動車用的**較薄磁體特別有效**，但對大型風機與部分國防系統的**較厚磁體越來越困難**。GBD 降低重稀土用量強度，但**不消除**對 dysprosium、terbium 與先進磁材製造技術的需求；即使磁材廠效率提升，世界仍將持續需要重稀土供應。⚠ 對本圖的直接意涵：人形機器人關節馬達的磁體屬**薄磁體級距**（與 EV 同側），是 GBD 有效的那一格——換言之，我們正在追的那條鏈上，重稀土強度正被工程降低。",
+      "subject_id": "tech:grain_boundary_diffusion"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "mat:rare_earth_magnets",
+      "id": "e1",
+      "relation": "enables",
+      "source_ids": [
+        "ree_exchanges_gbd_physics_line_s1",
+        "ree_exchanges_gbd_physics_line_s2"
+      ],
+      "src_id": "tech:grain_boundary_diffusion"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "grain boundary diffusion",
+        "GBD",
+        "GBDP",
+        "晶界擴散"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:grain_boundary_diffusion",
+      "name": "晶界擴散（grain boundary diffusion, GBD）",
+      "source_ids": [
+        "ree_exchanges_gbd_physics_line_s1",
+        "ree_exchanges_gbd_physics_line_s2"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "NdFeB"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:rare_earth_magnets",
+      "name": "Rare earth magnets (neodymium, samarium-cobalt)",
+      "source_ids": [
+        "ree_exchanges_gbd_physics_line_s2"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "ree_exchanges_gbd_physics_line",
+    "evidence_tier": 3,
+    "origin_entity": "Rare Earth Exchanges（獨立產業媒體，非磁材廠也非礦商）",
+    "permission_basis": "第三方產業媒體；保留 canonical URL 與研究必要短引述。",
+    "published_at": "2026-01-01",
+    "publisher": "Rare Earth Exchanges",
+    "retrieved_at": "2026-08-31",
+    "source_type": "industry_report",
+    "storage_permission": "repo_excerpt",
+    "title": "Grain Boundary Diffusion Improves Heavy Rare Earth Efficiency — But Physics Still Draws the Line",
+    "url": "https://rareearthexchanges.com/news/grain-boundary-diffusion-improves-heavy-rare-earth-efficiency-but-physics-still-draws-the-line/"
+  },
+  "sources": [
+    {
+      "id": "ree_exchanges_gbd_physics_line_s1",
+      "locator": "厚度限制",
+      "quote": "grain boundary diffusion is especially effective for relatively thin magnets used in electric vehicles but becomes increasingly challenging for thicker magnets used in large wind turbines and certain defense systems"
+    },
+    {
+      "id": "ree_exchanges_gbd_physics_line_s2",
+      "locator": "結論——不消除需求",
+      "quote": "Grain boundary diffusion reduces heavy rare earth intensity. It does not eliminate the need for dysprosium, terbium, or advanced magnet manufacturing expertise."
+    },
+    {
+      "id": "ree_exchanges_gbd_physics_line_s3",
+      "locator": "供應面結論",
+      "quote": "the world will continue to need heavy rare earth supply even as magnet manufacturers become more efficient"
+    }
+  ]
+}

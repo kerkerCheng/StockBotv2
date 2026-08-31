@@ -1,0 +1,95 @@
+{
+  "claims": [
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "若 GM 或 Stellantis 出脫其 Niron 持股、或公開表示回歸稀土磁材路線，則「需求端資本正在資助替代品」的判斷失效。核查頻率：每年；觸發後 48 小時內人工 review。",
+      "id": "niron_33m_gm_stellantis_2023_11_08_cl1",
+      "source_ids": [
+        "niron_33m_gm_stellantis_2023_11_08_s1",
+        "niron_33m_gm_stellantis_2023_11_08_s2",
+        "niron_33m_gm_stellantis_2023_11_08_s3"
+      ],
+      "statement": "**客戶端資本流向的是替代品，不是既有稀土供應商**：2023-11-08 Niron Magnetics 取得 3,300 萬美元追加融資，新投資方為汽車 OEM 的創投臂 GM Ventures 與 Stellantis Ventures，另有 SMSC 與明尼蘇達大學等既有在地投資人。GM Ventures 總裁具名表示此投資「brings our rich history in specialized magnet innovation full circle」。⚠ 該新聞稿**未揭露各投資方個別金額**，不得引用任何逐家拆分數字。投資標的技術為 Clean Earth Magnet®，基於鐵氮化物，**不含稀土與其他關鍵材料**。",
+      "subject_id": "co:niron_magnetics"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "mat:iron_nitride_magnet",
+      "id": "e1",
+      "relation": "develops",
+      "source_ids": [
+        "niron_33m_gm_stellantis_2023_11_08_s3"
+      ],
+      "src_id": "co:niron_magnetics"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Niron"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:niron_magnetics",
+      "name": "Niron Magnetics",
+      "role": "disruptor",
+      "source_ids": [
+        "niron_33m_gm_stellantis_2023_11_08_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "iron nitride magnet",
+        "Clean Earth Magnet",
+        "Fe16N2"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "mat:iron_nitride_magnet",
+      "name": "鐵氮化物永磁（無稀土）",
+      "role": "material_base",
+      "source_ids": [
+        "niron_33m_gm_stellantis_2023_11_08_s3"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "niron_33m_gm_stellantis_2023_11_08",
+    "evidence_tier": 2,
+    "origin_entity": "Niron Magnetics（公司自家新聞稿；但引述的投資方為汽車 OEM＝需求端）",
+    "permission_basis": "公司公開新聞稿；保留 canonical URL 與研究必要短引述。",
+    "published_at": "2023-11-08",
+    "publisher": "Niron Magnetics",
+    "retrieved_at": "2026-08-31",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Niron Magnetics Secures $33M from Leading Automotive Manufacturers",
+    "url": "https://nironmagnetics.com/niron-magnetics-secures-33m-from-leading-automotive-manufacturers-to-meet-growing-demand-for-rare-earth-free-magnets/"
+  },
+  "sources": [
+    {
+      "id": "niron_33m_gm_stellantis_2023_11_08_s1",
+      "locator": "投資方名單",
+      "quote": "$33 million in additional funding, with new investments from leading automotive manufacturers, GM Ventures and Stellantis Ventures, and previous local investors, Shakopee Mdewakanton Sioux Community (SMSC) and the University of Minnesota (UMN), amongst other investors."
+    },
+    {
+      "id": "niron_33m_gm_stellantis_2023_11_08_s2",
+      "locator": "GM Ventures 總裁具名引述",
+      "quote": "GM Ventures' investment in Niron's Magnetics brings our rich history in specialized magnet innovation full circle."
+    },
+    {
+      "id": "niron_33m_gm_stellantis_2023_11_08_s3",
+      "locator": "技術描述",
+      "quote": "Niron's proprietary Clean Earth Magnet® technology based on Iron Nitride enables magnets that possess inherently high magnetization, are free of rare earths and other critical materials"
+    }
+  ]
+}
