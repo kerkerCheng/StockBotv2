@@ -88,6 +88,7 @@ def add_watch(
     fact_check_ref: str = "",
     poll_eligible: bool = False,
     poll_query_hint: str = "",
+    hypothesis_ref: str = "",
     note: str = "",
 ) -> dict[str, Any]:
     if kind not in WATCH_KINDS:
@@ -110,6 +111,7 @@ def add_watch(
         "fact": fact,
         "fact_check_ref": fact_check_ref,
         "wake_pq2": int(wake_pq2),
+        "hypothesis_ref": hypothesis_ref,
         "poll": {
             "eligible": bool(poll_eligible),
             "last_checked": None,
@@ -185,12 +187,21 @@ def check_watches(
                 shared = sorted(targets & lead_entities(lead))
                 if shared:
                     watch["status"] = "fired"
-                    watch["woken_by"] = {
+                    woken: dict[str, Any] = {
                         "kind": kind,
                         "lead_id": lead_id,
                         "shared_entities": shared,
                         "at": _now(),
                     }
+                    # fact_verification 喚醒必帶對照欄位——醒來的人（agent）要直接
+                    # 拿 fact 去對觸發 lead 的一手數字，不必回頭翻 watch（L16：
+                    # 分類跟著資料走到消費端）。
+                    if kind == "fact_verification":
+                        woken["fact"] = watch.get("fact")
+                        woken["fact_check_ref"] = watch.get("fact_check_ref")
+                    if watch.get("hypothesis_ref"):
+                        woken["hypothesis_ref"] = watch["hypothesis_ref"]
+                    watch["woken_by"] = woken
                     fired.append(dict(watch))
                     break
     return fired

@@ -278,6 +278,7 @@ prepared RA」（通常為否）。`original_obtained` 也要說明「已取得�
 & '.venv\Scripts\python.exe' -m decision_lab today --format markdown
 & '.venv\Scripts\python.exe' scripts\catalyst_watch.py
 & '.venv\Scripts\python.exe' -m query.bottleneck
+& '.venv\Scripts\python.exe' -m query.bottleneck --by-sector   # Pane 1 末尾產業別分組（2026-08-31）
 & '.venv\Scripts\python.exe' scripts\alpha_purity_snapshot.py --format markdown --tickers <Pane 1 前段候選 tickers>
 & '.venv\Scripts\python.exe' -m query.coverage_gaps
 & '.venv\Scripts\python.exe' scripts\outcome_if_settled_today.py
@@ -378,6 +379,10 @@ stable pq2 編號後不得只貼短標題或 `co:*` ID。決策行之下，每�
 改寫為狀態更新，不再要求使用者重複 `go`。
 
 第一行固定是 `# Daily Brief YYYY-MM-DD (Asia/Taipei)`（Asia/Taipei 當日），讓不同天的 brief 可分辨。
+**首屏第二行固定是 watch 計數器**（2026-08-31 定案，L14 常駐計數器）：照抄 `todo sync` 摘要的
+「watch N 筆（T1 a／T0 b／可輪詢 c，本輪喚醒 w）」；「等事件」區有項目卻無對應 watch 的逐項點名。
+**Pane 1 末尾附 `query.bottleneck --by-sector` 的每產業 top-3**（含開頭兩條需求錨重疊警告）；
+分組解決可視性、分數不可跨組比較，單一排序仍是唯一權威；空產業組與「🔴 無需求錨」要現形。
 
 ```
 # Daily Brief <YYYY-MM-DD> (Asia/Taipei)

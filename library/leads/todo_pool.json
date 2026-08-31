@@ -5147,6 +5147,19 @@
       "source": "decision_lab",
       "title": "co:lynas：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-31T03:49:10.299021+00:00",
+      "hint": "使用者指示語境：三個 brainstorm 先都做完再修 collector；受理即 resolve ｜ 驗收：--what-if 能輸出排序 diff、brief prompt 強制計數器與分組 pane、假設可鏈 watch 且喚醒帶 fact",
+      "n": 315,
+      "reason": null,
+      "receipt": "authority:manual;ref:user_instruction_2026-08-31_finish_brainstorms",
+      "ref_id": "manual:315",
+      "resolution": "go",
+      "resolved_at": "2026-08-31T03:49:21.503256+00:00",
+      "source": "manual",
+      "title": "三 brainstorm 收尾（使用者 2026-08-31 指示）：①brief 首屏 watch 計數器＋--by-sector 版面接入；②截圖假設層本體（hypotheses store＋what-if 排序 diff＋RA 骨架欄位＋來源 credibility）；③fact_verification 喚醒帶對照欄位",
+      "type": "manual"
     }
   ],
   "log": [
@@ -11636,8 +11649,17 @@
       "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
       "type": "decision_review",
       "verb": "source_cleared"
+    },
+    {
+      "at": "2026-08-31T03:49:21.503256+00:00",
+      "n": 315,
+      "reason": null,
+      "receipt": "authority:manual;ref:user_instruction_2026-08-31_finish_brainstorms",
+      "ref_id": "manual:315",
+      "type": "manual",
+      "verb": "go"
     }
   ],
-  "next_n": 315,
+  "next_n": 316,
   "schema_version": "1"
 }

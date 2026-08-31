@@ -273,6 +273,27 @@ cashtag 由 `entities.py` 確定性抽取；公司名寫成純文字時 regex �
 - 給 pq2 項設等待時：能結構化的一律建 watch（散文 `--trigger` 只給人讀）；
   `expires` 必填，過期自動歸檔留稽核。
 
+### 截圖假設層（hypothesis overlay，2026-08-31）
+
+追不到原檔的 lead（B/C 類，見截圖 brainstorm）不再只是 park——結構化成假設，
+物理隔離於圖外（`library/leads/hypotheses.json`，模組 `engine_b/hypotheses.py`）：
+
+```powershell
+& '.venv\Scripts\python.exe' -m engine_b.hypotheses list
+& '.venv\Scripts\python.exe' -m engine_b.hypotheses add <payload.json>    # 欄位見 add_hypothesis docstring
+& '.venv\Scripts\python.exe' -m engine_b.hypotheses verify <hy_id> --outcome hit|miss --receipt "doc:<一手 doc_id>"
+& '.venv\Scripts\python.exe' -m query.bottleneck --what-if               # 全部 active 假設疊加，輸出純結構排序 diff
+& '.venv\Scripts\python.exe' -m query.bottleneck --what-if hy_0001_...   # 指定假設
+```
+
+- **唯一消費入口是 `--what-if`**：只比純結構排序（「若為真」問的是真值不是證據）；
+  名次有動＝值得追平行證據（B1 免費一手／B2 fact-check watch），沒動＝安心 park。
+- 假設**永不**進 evidence 分級、L8 計數、assessment refs、預設排序；入圖唯一路徑仍是
+  一手 admission。`verify --outcome` 同步記帳號級 credibility（`source_credibility`
+  ledger）——匿名帳號連續命中會浮出來，連續失敗自動降權。
+- watch 可用 `--hypothesis-ref` 級欄位鏈假設（fact_verification 喚醒時 woken_by 自帶
+  fact＋hypothesis_ref，醒來直接對照，不必回頭翻）。
+
 ### Addendum extraction 的 edge id 陷阱（2026-08-30 實測）
 
 **Addendum（重用既有 doc_id 的補充 extraction）裡的 edge id 絕不可重用 `e1`、`e2` 這類原檔已用的 id。**

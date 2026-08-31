@@ -117,6 +117,13 @@ Referer；不得使用外洩鏡像、共用登入或規避限制的代理／快�
 只找到報告標題、作者、日期或 canonical URL 時，寫進 `attempts_ref`，但不另創 trace status，
 也不提高 evidence tier。
 
+**`isolated_tier_3`／`lead_only_tier_4` park 前多做一步（2026-08-31 定案）：** 若截圖/轉述
+含可結構化的具體主張（誰供應誰、誰付錢給誰），park 時同步建假設
+（`python -m engine_b.hypotheses add`，見 `docs/OPERATIONS.md`「截圖假設層」）＋跑一次
+`query.bottleneck --what-if`：**純結構名次有動的**才升高追平行證據的優先權（可掛
+fact_verification watch）；沒動的照常 park——沉底從此是計算結果不是黑洞。假設永不入圖、
+永不參與 evidence 分級；入圖唯一路徑仍是本 skill 的一手取得流程。
+
 取得 tier 3 報告只解決可核對性；tier 3 仍維持 tier 3，不因「找到原報告」升級。
 
 ## 最小紀錄

@@ -175,6 +175,9 @@ Asia/Taipei 當日；沒有日期的 brief 視為未完成輸出（多份 brief 
 
 ```text
 # Daily Brief <YYYY-MM-DD> (Asia/Taipei)
+<首屏固定第二行＝watch 計數器（2026-08-31 定案，L14 常駐計數器）：把 `todo sync` 摘要的
+「watch N 筆（T1 a／T0 b／可輪詢 c，本輪喚醒 w）」原樣照抄；「等事件」區有項目卻沒有對應
+watch 的要逐項點名——那是回到純靠人記得的狀態，必須現形。>
 
 ## 需要你動作
 [N] <動詞＋主詞：這次 go 會讓誰去做什麼> — <為什麼是現在，一個子句> ｜ go = <action type>，不含 <最相鄰但未授權的動作>
@@ -194,6 +197,9 @@ Asia/Taipei 當日；沒有日期的 brief 視為未完成輸出（多份 brief 
 ## Alpha 現況（完整四 pane｜無 pq2 編號）
 ### Pane 1 — 現在要投哪一檔
 <`rank_bottlenecks().rows` 的有序清單、明確首選、四維度、相關性警告、每檔 disproof；明標研究判斷且不給尺寸>
+<末尾附產業別分組（2026-08-31 定案）：`python -m query.bottleneck --by-sector` 的每產業 top-3
+＋開頭兩條需求錨重疊警告原樣照印；分組解決可視性、分數不可跨組比較，單一排序仍是唯一權威；
+「🔴 無需求錨」與空產業組（如記憶體/機器人/稀土——sub 覆蓋未及）要現形，那是研究缺口不是省略對象。>
 ### Pane 2 — 該去補誰的證據
 <同一次輸出的 `structural_rows`；點出與 Pane 1 的排名差異及最高 ROI 補證據題目>
 ### Pane 3 — 哪裡還是空白

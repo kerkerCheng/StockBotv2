@@ -620,6 +620,50 @@ def render_by_sector(result: Mapping[str, Any], *, top_n: int = 3) -> str:
     return "\n".join(lines)
 
 
+def render_what_if(
+    baseline: Mapping[str, Any], overlaid: Mapping[str, Any],
+    hypothesis_rows: list, *, top_n: int = 10,
+) -> str:
+    """what-if 排序 diff：**只比純結構排序**（structural_rows，evidence-blind）。
+
+    「若為真」問的是陳述的真值，不是證據狀態——所以用不看證據的那份排序。
+    可行動排序刻意不比：假設永不參與 evidence 分級，讓它進可行動排序等於
+    讓未驗證陳述假裝有證據（硬邊界）。輸出必標「若為真」。
+    """
+
+    def positions(result: Mapping[str, Any]) -> dict[tuple, int]:
+        return {
+            (r["company_id"], r["bottleneck"]): i + 1
+            for i, r in enumerate(result.get("structural_rows") or ())
+        }
+
+    before, after = positions(baseline), positions(overlaid)
+    lines = [
+        "# What-if 排序 diff（純結構、若為真——不是證據判斷，不進任何預設輸出）",
+        "",
+        f"疊加假設邊 {len(hypothesis_rows)} 條（origin 固定 `(hypothesis)`）。",
+        "",
+    ]
+    moved = []
+    for key, pos_after in list(after.items())[:max(top_n * 3, 30)]:
+        pos_before = before.get(key)
+        if pos_before is None:
+            moved.append((key, "（新進結構排序）", pos_after))
+        elif pos_before != pos_after:
+            moved.append((key, f"#{pos_before}→", pos_after))
+    moved.sort(key=lambda item: item[2])
+    if not moved:
+        lines.append("**結構排序無變化**——若為真也不改變任何相對位置；安心 park，不值得花力氣追平行證據。")
+    else:
+        lines.append("| 標的→瓶頸 | 變化 | 疊加後名次 |")
+        lines.append("|---|---|---|")
+        for (company, bottleneck), delta, pos in moved[:top_n]:
+            lines.append(f"| {company} → `{bottleneck}` | {delta} | #{pos} |")
+        lines.append("")
+        lines.append("名次有動＝值得投入平行驗證（B1 免費一手／B2 fact-check trigger）；入圖仍走原檔 admission。")
+    return "\n".join(lines)
+
+
 def main() -> int:
     import argparse
     import sys
@@ -637,6 +681,11 @@ def main() -> int:
     parser.add_argument(
         "--by-sector", action="store_true",
         help="產業別分組呈現（demand anchor 聚類；預設輸出不受影響）",
+    )
+    parser.add_argument(
+        "--what-if", metavar="HYP_ID", nargs="*", default=None,
+        help="疊加截圖假設層（engine_b/hypotheses.py）輸出純結構排序 diff；"
+             "不帶 id＝全部 active 假設。永不影響預設輸出。",
     )
     parser.add_argument("--top-n", type=int, default=3)
     args = parser.parse_args()
@@ -656,7 +705,16 @@ def main() -> int:
     finally:
         driver.close()
     result = rank_bottlenecks(rows, get_registry())
-    if args.by_sector:
+    if args.what_if is not None:
+        from engine_b.hypotheses import load_store, overlay_assertions
+
+        hyp_rows = overlay_assertions(load_store(), hypothesis_ids=args.what_if or None)
+        if not hyp_rows:
+            print("（沒有 active 假設可疊加；先用 python -m engine_b.hypotheses add 建立）")
+            return 0
+        overlaid = rank_bottlenecks(list(rows) + hyp_rows, get_registry())
+        print(render_what_if(result, overlaid, hyp_rows, top_n=max(args.top_n, 10)))
+    elif args.by_sector:
         print(render_by_sector(result, top_n=args.top_n))
     else:
         print(render_markdown(result))
