@@ -14294,6 +14294,22 @@
       },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/forandring-av-det-totala-antalet-aktier-och-roster-i-sivers-semiconductors-ab-a02b82e0"
     },
+    "lead_3238fc77ac974944b52a2916205b98a6": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-31T09:51:20.800078+00:00",
+      "lead_id": "lead_3238fc77ac974944b52a2916205b98a6",
+      "published_at": null,
+      "refs": {},
+      "source": "directed:sub_backfill",
+      "status": "pending",
+      "themes": {},
+      "title": "[定向補 sub｜稀土] MP Materials 的反證：美國 NdFeB 磁材有多家——Noveon Magnetics（首家且唯一已量產，回收料）、USA Rare Earth（2026 奧克拉荷馬首條商業線）、Vacuumschmelze e-VAC（2025 底首批出貨）。MP 的差異化是唯一 mine-to-magnet 全整合，非磁材獨家。預期 sub 3-4 非 5——這是誠實答案不是失敗",
+      "triage": null,
+      "url": "https://spectrum.ieee.org/advanced-magnet-manufacturing-in-us"
+    },
     "lead_32467138b3832782d89c940740dff50c": {
       "entities": {
         "company_ids": [
@@ -15441,6 +15457,22 @@
         "tier": 4
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1730168/000110465926078348/xslF345X06/tm2619044-1_4seq1.xml"
+    },
+    "lead_39841af82ef4211a19116d249331dd5d": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-31T09:51:33.835436+00:00",
+      "lead_id": "lead_39841af82ef4211a19116d249331dd5d",
+      "published_at": null,
+      "refs": {},
+      "source": "directed:sub_backfill",
+      "status": "pending",
+      "themes": {},
+      "title": "[定向補 sub｜機器人] 諧波減速器替代性：RV 與諧波是不同技術非簡單互換（RV 承載大可局部翻修、諧波輕量高精度但柔輪易疲勞需整組更換）。⚠ 本輪搜尋方向偏了——找到的是『諧波 vs RV 技術比較』，但邊 co:harmonic_drive_systems→tech:strain_wave_gear 要問的是『換掉這家供應商多難』。下一輪該找：諧波減速器的其他供應商（Nidec-Shimpo、綠的諧波 Leaderdrive 等）與人形廠商的選型/合格化說法",
+      "triage": null,
+      "url": "https://www.evsint.com/industrial-robot-reducers-harmonic-cycloidal-rv-comparison-2026/"
     },
     "lead_39a7564998ac959ad2c54d7815b905e7": {
       "entities": {
@@ -41485,6 +41517,22 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2075613235756294559"
+    },
+    "lead_cbd50ac57aa511c2d6c4e531b759f7a7": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-31T09:51:20.497888+00:00",
+      "lead_id": "lead_cbd50ac57aa511c2d6c4e531b759f7a7",
+      "published_at": null,
+      "refs": {},
+      "source": "directed:sub_backfill",
+      "status": "pending",
+      "themes": {},
+      "title": "[定向補 sub｜稀土] Lynas 官網逐字：the world's only commercial producer of separated light and heavy rare earth oxides outside of China。2025 Q1 commissioned Dy 分離、6 月 Tb，年產能上看 1500t 重稀土；中國對 Dy/Tb 有出口管制。⚠ 待解語意：Lynas 供的是氧化物，圖中邊卻是 supplies_to mat:rare_earth_magnets（磁材）——先確認該邊原始 claim 再定 sub。⚠ L8：官網＝自報，sole_source 需 USGS 或客戶端印證才可升級",
+      "triage": null,
+      "url": "https://lynasrareearths.com/about-us/"
     },
     "lead_cc4797205853458be513a748c01e2735": {
       "entities": {
