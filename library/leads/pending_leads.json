@@ -20532,6 +20532,37 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/2074973/000121390026075480/ea0296510-8k_church11.htm"
     },
+    "lead_578a75c89f86cfe077ad863907d6a968": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-31T13:43:19.356416+00:00",
+      "lead_id": "lead_578a75c89f86cfe077ad863907d6a968",
+      "published_at": null,
+      "refs": {},
+      "source": "decompose:optimus-actuator-2026-08-31",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "[decompose D1｜人形] 行星滾柱絲槓：Tesla Gen2/3 腿與軀幹已由諧波 QDD 改用 PRS，業界跟進；供應商基礎窄、兩家瑞士廠曾合佔全球過半、替代選項有限——誰供應它？幾家能做、合格週期多長？",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-31T13:43:19.772653+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "圖裡根本沒有這個節點，卻是 Tesla 架構遷移的目的地——答案會讓機器人候選清單多出名字"
+        },
+        "decided_at": "2026-08-31T13:43:19.772653+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "Optimus 由上而下拆解產出的未知層：圖中完全沒有滾柱絲槓節點，而它正是 Tesla 從諧波改道的去處",
+        "tier": 4
+      },
+      "url": "https://www.fastcompany.com/91314612/this-tiny-screw-is-powering-the-humanoid-robot-revolution?decompose=roller_screw"
+    },
     "lead_57b0e813137d118eb731240242616f32": {
       "entities": {
         "company_ids": [],
@@ -36086,6 +36117,37 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826005740/xslF345X06/ownership.xml"
     },
+    "lead_af9543aabdbd8df5757720768fadd127": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-31T13:43:21.589342+00:00",
+      "lead_id": "lead_af9543aabdbd8df5757720768fadd127",
+      "published_at": null,
+      "refs": {},
+      "source": "decompose:optimus-actuator-2026-08-31",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "[decompose D1｜人形] 關節力矩感測器：高減速比致動器因齒箱摩擦無法用電流估測，必須專用應變規；截至 2026 Q1 無任何商用 IC 供應方案啟動，2028 前持續依賴客製應變規總成＋專屬訊號調理——誰在做？",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-31T13:43:21.995640+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "『無商用方案、依賴客製』本身就是集中度訊號——答案會讓候選清單多出名字"
+        },
+        "decided_at": "2026-08-31T13:43:21.995640+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "Optimus 由上而下拆解產出的未知層：圖中無力矩感測器節點，而它是高減速比架構的必要件",
+        "tier": 4
+      },
+      "url": "https://semiconductorx.com/force-torque-sensor-ics.html?decompose=torque_sensor"
+    },
     "lead_afa72193be496499ef950552d9146c38": {
       "entities": {
         "company_ids": [
@@ -39280,6 +39342,37 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2076808331453415674"
+    },
+    "lead_be62fed212a48f1f701fe2e6bece2e11": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-31T13:43:20.863850+00:00",
+      "lead_id": "lead_be62fed212a48f1f701fe2e6bece2e11",
+      "published_at": null,
+      "refs": {},
+      "source": "decompose:optimus-actuator-2026-08-31",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "[decompose D2｜稀土] 晶界擴散（GBD）Tb/Dy 製程：NdFeB 需 Hcj≥1600 kA/m 才耐 120-150°C 繞組溫度；GBD 0.5wt% Tb 可達 Hcj≈2000 kA/m、延伸至 180°C——這就是 USGS 說『輕稀土可替代』所不能替代的那一格。誰能做 GBD？用量與溫度上限的取捨為何？",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-31T13:43:21.273640+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "決定稀土 sub 該維持 3 還是在特定 scope 上修——答案會改變稀土鏈的候選集合與排序"
+        },
+        "decided_at": "2026-08-31T13:43:21.273640+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "回答 [336] USGS 反證留下的核心問題：重稀土不可替代的邊界在哪",
+        "tier": 4
+      },
+      "url": "https://eureka.patsnap.com/materials/ndfeb-robotics-material?decompose=gbd_tb"
     },
     "lead_be91fa7b4a0cc45b6f4d624445483836": {
       "entities": {
@@ -51074,6 +51167,45 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2074587024959709419"
+    },
+    "lead_ff3a752c826025fae06da1015db608b2": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-31T13:43:20.098688+00:00",
+      "lead_id": "lead_ff3a752c826025fae06da1015db608b2",
+      "published_at": null,
+      "refs": {},
+      "source": "decompose:optimus-actuator-2026-08-31",
+      "status": "triaged_go",
+      "themes": {
+        "robotics": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Optimus"
+          ]
+        }
+      },
+      "title": "[decompose D1｜人形] 無框力矩馬達：Optimus 旋轉關節＝無框力矩馬達＋諧波＋力矩感測器＋編碼器＋軸承；圖中只有減速器那一層有公司——誰供應馬達本體？",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-31T13:43:20.537470+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "補上馬達層，稀土與機器人兩條鏈才接得起來——答案會讓兩個空產業組都多出名字"
+        },
+        "decided_at": "2026-08-31T13:43:20.537470+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "Optimus 由上而下拆解產出的未知層：馬達是 NdFeB 磁材真正的落點，圖中該層不存在，稀土因此無處掛 sub",
+        "tier": 4
+      },
+      "url": "https://www.honest-hls.com/humanoid-robot-frameless-torque-coreless-motors?decompose=frameless_motor"
     },
     "lead_ffa5bc2151dea963a2b5f704afeb3880": {
       "entities": {

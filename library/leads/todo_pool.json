@@ -5578,10 +5578,11 @@
       "added_at": "2026-08-31T13:35:09.797639+00:00",
       "hint": "為什麼是這題：圖裡 actuator 這層有兩個互不相連的節點（comp:humanoid_precision_actuators 與 tech:robotic_actuator），且**零家供應商公司掛在上面**；所有供應商（Harmonic Drive、Leaderdrive、Nabtesco）都掛在下一層的減速器，而減速器已實測 sub=2（Tesla 已驗證第二來源）。更關鍵的是 mat:rare_earth_magnets 目前直接掛在 actuator 上，**跳過了馬達**——馬達才是磁材真正的落點，那一層不存在，稀土就沒有地方掛 sub。預期產出：無框高扭矩密度馬達、行星滾柱絲槓（線性關節）、力矩感測器／編碼器、驅動器功率電子等圖裡沒有的層，以及各層的實際供應商。go＝執行一次 system-decompose 產出研究地圖；**不含入圖**（找到的層要另走 ra_admission）、不含 thesis、不含 live。",
       "n": 337,
-      "reason": null,
+      "reason": "decompose 已執行：Tesla Optimus 關節致動器模組，拆出 11 層，未知層 Z=7；4 個研究題目已註冊進 pq1",
+      "receipt": "authority:decompose;ref:decompose:optimus-actuator-2026-08-31",
       "ref_id": "decompose_humanoid_actuator",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-31T13:43:32.738609+00:00",
       "source": "manual",
       "title": "decompose D1：人形機器人「關節致動器模組」由上而下拆層（對象由你指定 Tesla Optimus／Figure 03／Agility Digit）",
       "type": "manual"
@@ -5590,10 +5591,11 @@
       "added_at": "2026-08-31T13:35:09.970678+00:00",
       "hint": "為什麼是這題：USGS MCS 2026（今日已入圖 [336]）自己寫「Light rare earths can substitute for heavy rare earths in several applications」——這是整個稀土 thesis 最大的反證，也是本圖把 sub 判 3 而非 5 的依據。那麼**不能替代的是哪一格？**通說是高溫矯頑力（牽引／關節馬達），但我們沒有一手證據。預期產出：Dy/Tb 在磁材中的功能邊界、哪些應用可用輕稀土替代、無重稀土磁材路線（Niron 等）目前到哪、以及誰真的卡住。這題是 D1 的下一層，可與 D1 合併執行也可分開。go＝執行一次 system-decompose 產出研究地圖；不含入圖、不含 thesis、不含 live。",
       "n": 338,
-      "reason": null,
+      "reason": "decompose 已執行（與 [337] 合併，同一條致動器→馬達→磁材鏈）：不可替代邊界定位在晶界擴散 Tb/Dy，題目已註冊進 pq1",
+      "receipt": "authority:decompose;ref:decompose:optimus-actuator-2026-08-31",
       "ref_id": "decompose_magnet_motor",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-31T13:43:32.920752+00:00",
       "source": "manual",
       "title": "decompose D2：稀土永磁馬達的「高溫矯頑力不可替代邊界」由上而下拆層（對象由你指定 EV 牽引馬達／人形關節馬達）",
       "type": "manual"
@@ -12593,6 +12595,24 @@
       "receipt": "action:ra_09837781ccff7db053aabfe5e886f9f8;digest:e1d7014f4790e54410599b36781bd35ba954dd0ffe66cfe0cc881d07f648e224;commit:250724d48d43b280cfefaf7e7790973822979ebe;cohort:dc_21d81aa11dd2fe85c747b1c759fd01ed",
       "ref_id": "ra_09837781ccff7db053aabfe5e886f9f8",
       "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-31T13:43:32.738609+00:00",
+      "n": 337,
+      "reason": "decompose 已執行：Tesla Optimus 關節致動器模組，拆出 11 層，未知層 Z=7；4 個研究題目已註冊進 pq1",
+      "receipt": "authority:decompose;ref:decompose:optimus-actuator-2026-08-31",
+      "ref_id": "decompose_humanoid_actuator",
+      "type": "manual",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-31T13:43:32.920752+00:00",
+      "n": 338,
+      "reason": "decompose 已執行（與 [337] 合併，同一條致動器→馬達→磁材鏈）：不可替代邊界定位在晶界擴散 Tb/Dy，題目已註冊進 pq1",
+      "receipt": "authority:decompose;ref:decompose:optimus-actuator-2026-08-31",
+      "ref_id": "decompose_magnet_motor",
+      "type": "manual",
       "verb": "go"
     }
   ],
