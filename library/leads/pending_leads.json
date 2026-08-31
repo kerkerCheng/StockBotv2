@@ -36129,9 +36129,12 @@
       "first_seen": "2026-08-31T13:43:21.589342+00:00",
       "lead_id": "lead_af9543aabdbd8df5757720768fadd127",
       "published_at": null,
-      "refs": {},
+      "refs": {
+        "focus_company_id": "co:schaeffler",
+        "research_action_id": "ra_79a18c7c1f5931acb372a71f64f8b153"
+      },
       "source": "decompose:optimus-actuator-2026-08-31",
-      "status": "triaged_go",
+      "status": "action_prepared",
       "themes": {},
       "title": "[decompose D1｜人形] 關節力矩感測器：高減速比致動器因齒箱摩擦無法用電流估測，必須專用應變規；截至 2026 Q1 無任何商用 IC 供應方案啟動，2028 前持續依賴客製應變規總成＋專屬訊號調理——誰在做？",
       "triage": {

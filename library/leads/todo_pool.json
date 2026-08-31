@@ -5641,6 +5641,19 @@
       "source": "research_action",
       "title": "[338] 稀土不可替代邊界＝磁體厚度，不是應用類別——而我們追的那一格正被工程解掉",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-08-31T14:13:09.435781+00:00",
+      "graph_impact": "+2 節點、1 邊、2 claims｜來源：SemiconductorX（獨立半導體供應鏈分析，非感測器廠也非機器人商）（tier 3）",
+      "hint": "核准 exact graph delta；Decision handoff：co:schaeffler。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 341,
+      "reason": null,
+      "ref_id": "ra_79a18c7c1f5931acb372a71f64f8b153",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "[337] 人形力矩感測層：本圖第二條有合格週期的邊——低替代難度＋3–7 年合格週期",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -12676,6 +12689,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 341,
+  "next_n": 342,
   "schema_version": "1"
 }
