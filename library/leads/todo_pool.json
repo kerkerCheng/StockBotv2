@@ -5348,6 +5348,18 @@
       "source": "manual",
       "title": "產業歸屬的『最短路徑取一個錨』假設：擴錨後 18/30 條會變成跨產業任意歸屬",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-08-31T09:48:26.272024+00:00",
+      "hint": "使用者 2026-08-31 明確指示『手動把稀土跟機器人的族群長出來，看一陣子多族群的系統表現』——受理即 go，不重複請求核准。工作：對 MP/Lynas 與 Harmonic Drive 等邊定向尋找討論『替代難度』的一手文件（非僅供應關係），抽取後 prepare RA。⚠ 入圖仍是另一個 ra_admission 編號，本項不含 graph admission、不含 thesis mutation、不含 live",
+      "n": 325,
+      "reason": null,
+      "ref_id": "manual:325",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "定向補 sub：長出稀土磁材與機器人兩個產業群（使用者指示）",
+      "type": "manual"
     }
   ],
   "log": [
@@ -12131,6 +12143,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 325,
+  "next_n": 326,
   "schema_version": "1"
 }
