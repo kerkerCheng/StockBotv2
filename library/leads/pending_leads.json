@@ -15741,11 +15741,12 @@
       "lead_id": "lead_39841af82ef4211a19116d249331dd5d",
       "published_at": null,
       "refs": {
+        "action_digest": "a68ac485a2f2717bec1f49f473396a3a188b7348e45bbc3f9bb13e4a35749254",
         "focus_company_id": "co:harmonic_drive_systems",
         "research_action_id": "ra_dab0b729552df8aac774e7bb458807d5"
       },
       "source": "directed:sub_backfill",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {},
       "title": "[定向補 sub｜機器人] 諧波減速器替代性：RV 與諧波是不同技術非簡單互換（RV 承載大可局部翻修、諧波輕量高精度但柔輪易疲勞需整組更換）。⚠ 本輪搜尋方向偏了——找到的是『諧波 vs RV 技術比較』，但邊 co:harmonic_drive_systems→tech:strain_wave_gear 要問的是『換掉這家供應商多難』。下一輪該找：諧波減速器的其他供應商（Nidec-Shimpo、綠的諧波 Leaderdrive 等）與人形廠商的選型/合格化說法",
       "triage": {
