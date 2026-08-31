@@ -1,0 +1,192 @@
+{
+  "claims": [
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "guided",
+      "disproof_condition": "若取得官方逐字稿或 TSMC 正式資料顯示該四項並非其所述瓶頸、或 TSMC 後續公開表示上述任一環節產能已可滿足需求，則降級；若僅該媒體單一轉述且其他與會轉述互相矛盾，降為 inferred。",
+      "id": "technews_tsmc_siph_forum_2026_08_31_cl1",
+      "source_ids": [
+        "technews_tsmc_siph_forum_2026_08_31_s1",
+        "technews_tsmc_siph_forum_2026_08_31_s2"
+      ],
+      "statement": "TSMC 先進封裝技術發展副總經理徐國晉於 2026-08-31 SEMI／矽光子產業協會「矽光子國際論壇」公開表示，矽光子大規模部署的真正瓶頸不在光引擎製造本身，而在供應鏈其他環節：雷射、光纖、光纖連接器與完整的全堆疊測試。此為整合／代工端（非雷射或光纖供應商本身）對該四層瓶頸地位的外部陳述。⚠ 徐國晉未點名任何具體供應商公司。",
+      "subject_id": "tech:cpo"
+    },
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "guided",
+      "disproof_condition": "若 2026 下半年結束仍無任何 CPO 產品進入量產出貨、或 TSMC 後續改口稱光引擎良率／產能為限制，則此自述能力陳述失效。",
+      "id": "technews_tsmc_siph_forum_2026_08_31_cl2",
+      "source_ids": [
+        "technews_tsmc_siph_forum_2026_08_31_s1",
+        "technews_tsmc_siph_forum_2026_08_31_s4"
+      ],
+      "statement": "同一場合中，TSMC 方面表示晶圓代工體系已具備光引擎（optical engine）的大規模製造能力，並稱 CPO 將於 2026 下半年進入量產。這是對「光引擎本身是瓶頸」此一敘事的反向證據——來源為代工方自述其自身能力，依 L8 屬自我報告，不得作為光引擎層不具瓶頸性的獨立佐證。",
+      "subject_id": "co:tsmc"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:external_laser_source",
+      "id": "e1",
+      "relation": "constrained_by",
+      "source_ids": [
+        "technews_tsmc_siph_forum_2026_08_31_s1"
+      ],
+      "src_id": "tech:cpo"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:fiber_attach_unit",
+      "id": "e2",
+      "relation": "constrained_by",
+      "source_ids": [
+        "technews_tsmc_siph_forum_2026_08_31_s1"
+      ],
+      "src_id": "tech:cpo"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:cpo_full_stack_test",
+      "id": "e3",
+      "relation": "constrained_by",
+      "source_ids": [
+        "technews_tsmc_siph_forum_2026_08_31_s1"
+      ],
+      "src_id": "tech:cpo"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:cpo",
+      "id": "e4",
+      "relation": "supplies_to",
+      "source_ids": [
+        "technews_tsmc_siph_forum_2026_08_31_s1",
+        "technews_tsmc_siph_forum_2026_08_31_s4"
+      ],
+      "src_id": "co:tsmc"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [
+        "2330.TW",
+        "TSM"
+      ],
+      "attributes": {
+        "ticker": "TSM"
+      },
+      "confidence": 0.95,
+      "id": "co:tsmc",
+      "name": "TSMC",
+      "role": "foundry",
+      "source_ids": [
+        "technews_tsmc_siph_forum_2026_08_31_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "CPO"
+      ],
+      "attributes": {},
+      "confidence": 0.95,
+      "id": "tech:cpo",
+      "name": "Co-Packaged Optics",
+      "source_ids": [
+        "technews_tsmc_siph_forum_2026_08_31_s1"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "ELS"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 5
+      },
+      "confidence": 0.9,
+      "id": "tech:external_laser_source",
+      "name": "External Laser Source",
+      "source_ids": [
+        "technews_tsmc_siph_forum_2026_08_31_s1"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "FAU",
+        "ReLFACon"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:fiber_attach_unit",
+      "name": "Fiber Attach Unit",
+      "source_ids": [
+        "technews_tsmc_siph_forum_2026_08_31_s1"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "test_yield",
+      "aliases": [
+        "full-stack test",
+        "CPO test",
+        "全堆疊測試"
+      ],
+      "attributes": {},
+      "confidence": 0.8,
+      "id": "tech:cpo_full_stack_test",
+      "name": "CPO 全堆疊測試（full-stack test）",
+      "source_ids": [
+        "technews_tsmc_siph_forum_2026_08_31_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "technews_tsmc_siph_forum_2026_08_31",
+    "evidence_tier": 3,
+    "origin_entity": "TechNews 科技新報（轉述台積電徐國晉於 SEMI／矽光子產業協會「矽光子國際論壇」之公開演講；未取得官方逐字稿）",
+    "permission_basis": "第三方新聞媒體版權內容；保留 canonical URL，僅存研究必要短引述。",
+    "published_at": "2026-08-31",
+    "publisher": "TechNews 科技新報",
+    "retrieved_at": "2026-08-31",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "台積電徐國晉於 SEMI 矽光子國際論壇：矽光子將成光收發器主流，量產瓶頸在雷射／光纖／連接器／全堆疊測試",
+    "url": "https://technews.tw/2026/08/31/semi-tsmc-silicon-photonics-global-summit"
+  },
+  "sources": [
+    {
+      "id": "technews_tsmc_siph_forum_2026_08_31_s1",
+      "locator": "瓶頸段落",
+      "quote": "真正大規模部署的瓶頸，其實位於供應鏈的其他環節，包括雷射、光纖、光纖連接器及完整的全堆疊測試"
+    },
+    {
+      "id": "technews_tsmc_siph_forum_2026_08_31_s2",
+      "locator": "講者職稱",
+      "quote": "台積電先進封裝技術發展副總經理徐國晉"
+    },
+    {
+      "id": "technews_tsmc_siph_forum_2026_08_31_s3",
+      "locator": "市場與量產時程",
+      "quote": "預計2027年將掌握超過50%市占"
+    },
+    {
+      "id": "technews_tsmc_siph_forum_2026_08_31_s4",
+      "locator": "CPO 量產時程",
+      "quote": "CPO將於下半年進入量產"
+    }
+  ]
+}

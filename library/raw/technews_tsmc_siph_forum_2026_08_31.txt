@@ -1,0 +1,4 @@
+Source URL: https://technews.tw/2026/08/31/semi-tsmc-silicon-photonics-global-summit
+
+Excerpt:
+台積電先進封裝技術發展副總經理徐國晉於 SEMI 與矽光子產業協會合辦之「矽光子國際論壇」指出，真正大規模部署的瓶頸，其實位於供應鏈的其他環節，包括雷射、光纖、光纖連接器及完整的全堆疊測試。（2026-08-31）
