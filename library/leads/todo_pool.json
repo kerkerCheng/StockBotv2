@@ -4751,20 +4751,23 @@
     {
       "added_at": "2026-08-30T13:43:26.064880+00:00",
       "dispatch_baseline_decision_id": "pd_665289d3f50ab2987333dcd4646c49a6",
+      "dispatch_receipt": "decision:pd_092bcbe47bad20e365898ee6f992086d",
       "dispatch_ref": "assessment_gap:dc_cc46527aac12ba14191ee71c0460f3fe",
       "dispatch_scope": [
         "commercial_maturity_unknown",
         "source_reliability_unknown",
         "valuation_payoff_unknown"
       ],
-      "dispatch_status": "queued",
+      "dispatch_status": "completed",
+      "dispatch_updated_at": "2026-08-31T02:16:23.167619+00:00",
       "dispatched_at": "2026-08-30T23:59:30.036759+00:00",
       "hint": "go（大項）＝reassess 後以 assessment_gap 排入 pq1，研究範圍：commercial_maturity_unknown、source_reliability_unknown、valuation_payoff_unknown。產出為 assessment／研究包，完成後 reassess 以新 decision receipt 結案",
       "n": 292,
-      "reason": null,
+      "reason": "pq1 completed",
+      "receipt": "decision:pd_092bcbe47bad20e365898ee6f992086d",
       "ref_id": "dc_cc46527aac12ba14191ee71c0460f3fe",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-31T02:16:23.167619+00:00",
       "source": "decision_lab",
       "title": "co:harmonic_drive_systems：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
@@ -11329,6 +11332,33 @@
       "reason": "pq1 completed",
       "receipt": "decision:pd_2ef79b95c7fe81efbf6620480b05d424",
       "ref_id": "dc_fdab434d1fad67666c57a6eefd379337",
+      "type": "decision_review",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-31T02:15:13.572633+00:00",
+      "n": 292,
+      "reason": null,
+      "receipt": "session:queue-r2",
+      "ref_id": "dc_cc46527aac12ba14191ee71c0460f3fe",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-08-31T02:16:23.167619+00:00",
+      "n": 292,
+      "reason": null,
+      "receipt": "decision:pd_092bcbe47bad20e365898ee6f992086d",
+      "ref_id": "dc_cc46527aac12ba14191ee71c0460f3fe",
+      "type": "decision_review",
+      "verb": "pq1_completed"
+    },
+    {
+      "at": "2026-08-31T02:16:23.167619+00:00",
+      "n": 292,
+      "reason": "pq1 completed",
+      "receipt": "decision:pd_092bcbe47bad20e365898ee6f992086d",
+      "ref_id": "dc_cc46527aac12ba14191ee71c0460f3fe",
       "type": "decision_review",
       "verb": "go"
     }
