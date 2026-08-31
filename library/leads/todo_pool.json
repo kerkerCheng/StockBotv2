@@ -5599,6 +5599,32 @@
       "source": "manual",
       "title": "decompose D2：稀土永磁馬達的「高溫矯頑力不可替代邊界」由上而下拆層（對象由你指定 EV 牽引馬達／人形關節馬達）",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-08-31T13:52:09.597563+00:00",
+      "graph_impact": "+8 節點、6 邊、4 claims｜來源：Power & Motion（獨立產業媒體，非 Schaeffler 自家發布）（tier 3）、Humanoid（機器人開發商，即採購方自家公告——客戶端文件）（tier 2）、all-about-industries（獨立產業媒體，報導 CES 2026 發表）（tier 3）",
+      "hint": "核准 exact graph delta；Decision handoff：co:schaeffler。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 339,
+      "reason": null,
+      "ref_id": "ra_353d5e662ef996de0a8f0f649e599819",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "Schaeffler 站在 Tesla 架構正在遷入的那一層（滾柱絲槓）＋首份客戶端具名——但那是互惠交易",
+      "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-08-31T13:58:08.727965+00:00",
+      "graph_impact": "+7 節點、4 邊、3 claims｜來源：Rare Earth Exchanges（獨立產業媒體，非磁材廠也非礦商）（tier 3）、Niron Magnetics（公司自家新聞稿）（tier 2）、Niron Magnetics（公司自家新聞稿；但引述的投資方為汽車 OEM＝需求端）（tier 2）",
+      "hint": "核准 exact graph delta；Decision handoff：co:mp_materials。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 340,
+      "reason": null,
+      "ref_id": "ra_51dd311adb87e5968825bab8a059b6b8",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "[338] 稀土不可替代邊界＝磁體厚度，不是應用類別——而我們追的那一格正被工程解掉",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -12616,6 +12642,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 339,
+  "next_n": 341,
   "schema_version": "1"
 }

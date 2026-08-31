@@ -20540,9 +20540,12 @@
       "first_seen": "2026-08-31T13:43:19.356416+00:00",
       "lead_id": "lead_578a75c89f86cfe077ad863907d6a968",
       "published_at": null,
-      "refs": {},
+      "refs": {
+        "focus_company_id": "co:schaeffler",
+        "research_action_id": "ra_353d5e662ef996de0a8f0f649e599819"
+      },
       "source": "decompose:optimus-actuator-2026-08-31",
-      "status": "triaged_go",
+      "status": "action_prepared",
       "themes": {},
       "title": "[decompose D1｜人形] 行星滾柱絲槓：Tesla Gen2/3 腿與軀幹已由諧波 QDD 改用 PRS，業界跟進；供應商基礎窄、兩家瑞士廠曾合佔全球過半、替代選項有限——誰供應它？幾家能做、合格週期多長？",
       "triage": {
@@ -39351,9 +39354,12 @@
       "first_seen": "2026-08-31T13:43:20.863850+00:00",
       "lead_id": "lead_be62fed212a48f1f701fe2e6bece2e11",
       "published_at": null,
-      "refs": {},
+      "refs": {
+        "focus_company_id": "co:mp_materials",
+        "research_action_id": "ra_51dd311adb87e5968825bab8a059b6b8"
+      },
       "source": "decompose:optimus-actuator-2026-08-31",
-      "status": "triaged_go",
+      "status": "action_prepared",
       "themes": {},
       "title": "[decompose D2｜稀土] 晶界擴散（GBD）Tb/Dy 製程：NdFeB 需 Hcj≥1600 kA/m 才耐 120-150°C 繞組溫度；GBD 0.5wt% Tb 可達 Hcj≈2000 kA/m、延伸至 180°C——這就是 USGS 說『輕稀土可替代』所不能替代的那一格。誰能做 GBD？用量與溫度上限的取捨為何？",
       "triage": {
