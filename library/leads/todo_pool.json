@@ -5185,15 +5185,18 @@
       "added_at": "2026-08-31T02:45:27.304373+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_86aad23459e108afccebb8abc9f5ca3f",
+      "dispatch_receipt": "decision:pd_c90a383db1b8e69f4648d997ba54a4c0",
       "dispatch_ref": "wo_571456f00886259141abbee324b481ca",
-      "dispatch_status": "queued",
+      "dispatch_status": "completed",
+      "dispatch_updated_at": "2026-08-31T16:06:58.330192+00:00",
       "dispatched_at": "2026-08-31T06:10:15.554065+00:00",
       "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 313,
-      "reason": null,
+      "reason": "pq1 completed",
+      "receipt": "decision:pd_c90a383db1b8e69f4648d997ba54a4c0",
       "ref_id": "dc_7bd7922b16d32044b3f75d2edb19342d",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-31T16:06:58.330192+00:00",
       "source": "decision_lab",
       "title": "co:himax：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
@@ -12789,6 +12792,33 @@
       "receipt": "observation:mo_c7f51788222bc85d067057fd29ccf748;proposal:po_0d4e78cedfceec725f5bf940d45cc074",
       "ref_id": "po_0d4e78cedfceec725f5bf940d45cc074",
       "type": "engine_c_observation",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-31T16:06:27.140197+00:00",
+      "n": 313,
+      "reason": null,
+      "receipt": "research:himx_20_f_20260327+observations:mo_4661a4cb527d3796da80930ce62f2a7b",
+      "ref_id": "dc_7bd7922b16d32044b3f75d2edb19342d",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-08-31T16:06:58.330192+00:00",
+      "n": 313,
+      "reason": null,
+      "receipt": "decision:pd_c90a383db1b8e69f4648d997ba54a4c0",
+      "ref_id": "dc_7bd7922b16d32044b3f75d2edb19342d",
+      "type": "decision_review",
+      "verb": "pq1_completed"
+    },
+    {
+      "at": "2026-08-31T16:06:58.330192+00:00",
+      "n": 313,
+      "reason": "pq1 completed",
+      "receipt": "decision:pd_c90a383db1b8e69f4648d997ba54a4c0",
+      "ref_id": "dc_7bd7922b16d32044b3f75d2edb19342d",
+      "type": "decision_review",
       "verb": "go"
     }
   ],
