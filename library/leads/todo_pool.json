@@ -5644,13 +5644,21 @@
     },
     {
       "added_at": "2026-08-31T14:13:09.435781+00:00",
+      "completion_authority": {
+        "action_digest": "2fdb389df11d162f256381af99e0d4ebf80e514ae4a429e0a7f4b057fb49221e",
+        "cohort_id": "dc_912a03a50135ea5e29000a0417c3f477",
+        "commit": "1c487c394e95c7cfca2ba07ccfdaa669c4b59d6a",
+        "company_id": "co:schaeffler",
+        "verified_at": "2026-08-31T14:44:12.478894+00:00"
+      },
       "graph_impact": "+2 節點、1 邊、2 claims｜來源：SemiconductorX（獨立半導體供應鏈分析，非感測器廠也非機器人商）（tier 3）",
       "hint": "核准 exact graph delta；Decision handoff：co:schaeffler。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 341,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_79a18c7c1f5931acb372a71f64f8b153;digest:2fdb389df11d162f256381af99e0d4ebf80e514ae4a429e0a7f4b057fb49221e;commit:1c487c394e95c7cfca2ba07ccfdaa669c4b59d6a;cohort:dc_912a03a50135ea5e29000a0417c3f477",
       "ref_id": "ra_79a18c7c1f5931acb372a71f64f8b153",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-31T14:44:12.478894+00:00",
       "source": "research_action",
       "title": "[337] 人形力矩感測層：本圖第二條有合格週期的邊——低替代難度＋3–7 年合格週期",
       "type": "ra_admission"
@@ -12685,6 +12693,15 @@
       "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
       "receipt": "action:ra_51dd311adb87e5968825bab8a059b6b8;digest:f9e0acb83cad2fe0ff0f743557706a4e006595227e7e97e1b45d3c16c48e5209;commit:673dcb7a10f6b58132c1e9cc17168fd5b718de6a;cohort:dc_21d81aa11dd2fe85c747b1c759fd01ed",
       "ref_id": "ra_51dd311adb87e5968825bab8a059b6b8",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-31T14:44:12.478894+00:00",
+      "n": 341,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_79a18c7c1f5931acb372a71f64f8b153;digest:2fdb389df11d162f256381af99e0d4ebf80e514ae4a429e0a7f4b057fb49221e;commit:1c487c394e95c7cfca2ba07ccfdaa669c4b59d6a;cohort:dc_912a03a50135ea5e29000a0417c3f477",
+      "ref_id": "ra_79a18c7c1f5931acb372a71f64f8b153",
       "type": "ra_admission",
       "verb": "go"
     }
