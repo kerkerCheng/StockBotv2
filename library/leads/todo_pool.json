@@ -4733,6 +4733,11 @@
     },
     {
       "added_at": "2026-08-30T13:43:26.064880+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_1bff14ca9e2853bf5c2ad2bc98a6a051",
+      "dispatch_ref": "wo_600366f6288254a1fcb1952e2590715a",
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-08-30T23:59:29.297689+00:00",
       "hint": "coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 291,
       "reason": null,
@@ -4745,6 +4750,15 @@
     },
     {
       "added_at": "2026-08-30T13:43:26.064880+00:00",
+      "dispatch_baseline_decision_id": "pd_665289d3f50ab2987333dcd4646c49a6",
+      "dispatch_ref": "assessment_gap:dc_cc46527aac12ba14191ee71c0460f3fe",
+      "dispatch_scope": [
+        "commercial_maturity_unknown",
+        "source_reliability_unknown",
+        "valuation_payoff_unknown"
+      ],
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-08-30T23:59:30.036759+00:00",
       "hint": "go（大項）＝reassess 後以 assessment_gap 排入 pq1，研究範圍：commercial_maturity_unknown、source_reliability_unknown、valuation_payoff_unknown。產出為 assessment／研究包，完成後 reassess 以新 decision receipt 結案",
       "n": 292,
       "reason": null,
@@ -4764,11 +4778,23 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
+      "source_cleared": {
+        "at": "2026-08-31T00:03:35.323472+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
       "title": "co:marvell_technology：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
     },
     {
       "added_at": "2026-08-30T13:43:26.064880+00:00",
+      "dispatch_baseline_decision_id": "pd_54e0323c47b253589b22c4bbc9d39db9",
+      "dispatch_ref": "assessment_gap:dc_fdab434d1fad67666c57a6eefd379337",
+      "dispatch_scope": [
+        "source_reliability_corroboration_incomplete"
+      ],
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-08-31T00:01:02.797613+00:00",
       "hint": "go（大項）＝reassess 後以 assessment_gap 排入 pq1，研究範圍：source_reliability_corroboration_incomplete。產出為 assessment／研究包，完成後 reassess 以新 decision receipt 結案",
       "n": 294,
       "reason": null,
@@ -4788,6 +4814,11 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
+      "source_cleared": {
+        "at": "2026-08-31T00:03:35.323472+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
       "title": "co:poet_technologies：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
     },
@@ -4813,12 +4844,20 @@
     },
     {
       "added_at": "2026-08-30T15:04:43.518545+00:00",
+      "completion_authority": {
+        "action_digest": "55cffb61a2d4e63d125e87df24956ba45f12c6615b4421ac8b75e35dfe6a6830",
+        "cohort_id": "dc_21d81aa11dd2fe85c747b1c759fd01ed",
+        "commit": "4dbad0542dc6e27a106172b5cb0dc048a33d1fac",
+        "company_id": "co:mp_materials",
+        "verified_at": "2026-08-30T23:58:26.499798+00:00"
+      },
       "hint": "核准 exact graph delta；Decision handoff：co:mp_materials。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 297,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_979571e2f1bbf2022225b3eb08e9f623;digest:55cffb61a2d4e63d125e87df24956ba45f12c6615b4421ac8b75e35dfe6a6830;commit:4dbad0542dc6e27a106172b5cb0dc048a33d1fac;cohort:dc_21d81aa11dd2fe85c747b1c759fd01ed",
       "ref_id": "ra_979571e2f1bbf2022225b3eb08e9f623",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-30T23:58:26.499798+00:00",
       "source": "research_action",
       "title": "Apple 對手方原文：$500M 承諾購買 MP Materials 美製稀土磁體——MP 的客戶端資本承諾獲買方自家 PR 印證",
       "type": "ra_admission"
@@ -4849,12 +4888,20 @@
     },
     {
       "added_at": "2026-08-30T15:33:12.885275+00:00",
+      "completion_authority": {
+        "action_digest": "e80e3f93401f5ce640529cd800701048cd34c2fcb81eb579ba4eabf227273360",
+        "cohort_id": "dc_21d81aa11dd2fe85c747b1c759fd01ed",
+        "commit": "eabaee33741cd5ae846ddc33e3d1209c21bf9fd1",
+        "company_id": "co:mp_materials",
+        "verified_at": "2026-08-30T23:58:27.966146+00:00"
+      },
       "hint": "核准 exact graph delta；Decision handoff：co:mp_materials。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 300,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_21a61110388b4b892ddd36a6920e73c8;digest:e80e3f93401f5ce640529cd800701048cd34c2fcb81eb579ba4eabf227273360;commit:eabaee33741cd5ae846ddc33e3d1209c21bf9fd1;cohort:dc_21d81aa11dd2fe85c747b1c759fd01ed",
       "ref_id": "ra_21a61110388b4b892ddd36a6920e73c8",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-30T23:58:27.966146+00:00",
       "source": "research_action",
       "title": "FAS 第三方分析：DoD×MP 合約量化＋壟斷批判——MP 第三 origin（獨立政策機構）",
       "type": "ra_admission"
@@ -4873,24 +4920,40 @@
     },
     {
       "added_at": "2026-08-30T16:01:38.014777+00:00",
+      "completion_authority": {
+        "action_digest": "beace5c1c41772d90078454e0cbc1af16a454db1d92f9766fca00f6d9e667921",
+        "cohort_id": "dc_6b92df56a6d186eb7464479dfb9c48c3",
+        "commit": "71a2f1479c2fafb2f8b47b7ae8e94195292b8411",
+        "company_id": "co:foci",
+        "verified_at": "2026-08-30T23:58:29.390019+00:00"
+      },
       "hint": "核准 exact graph delta；Decision handoff：co:foci。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 302,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_975fdb3ef2f72e04fd99548aed280957;digest:beace5c1c41772d90078454e0cbc1af16a454db1d92f9766fca00f6d9e667921;commit:71a2f1479c2fafb2f8b47b7ae8e94195292b8411;cohort:dc_6b92df56a6d186eb7464479dfb9c48c3",
       "ref_id": "ra_975fdb3ef2f72e04fd99548aed280957",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-30T23:58:29.390019+00:00",
       "source": "research_action",
       "title": "Hunterbrook 專利鏈調查：FOCI 整合 Himax 光學元件成 COUPE FAU＋22 通道專利吻合——FOCI 第三 origin",
       "type": "ra_admission"
     },
     {
       "added_at": "2026-08-30T16:30:18.187734+00:00",
+      "completion_authority": {
+        "action_digest": "7781be3c9f24b0f31ba34251845146cdc8be5f2c547687f5191207a1c2e26959",
+        "cohort_id": "dc_0fca807c963dc3b9888e0f83ba6d45a5",
+        "commit": "7d4701ed976744fa6107d417b0b39389e468158a",
+        "company_id": "co:marvell_technology",
+        "verified_at": "2026-08-30T23:58:30.832287+00:00"
+      },
       "hint": "核准 exact graph delta；Decision handoff：co:marvell_technology。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 303,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_acd8d79be61a02c7bb9e76ee0b6752ab;digest:7781be3c9f24b0f31ba34251845146cdc8be5f2c547687f5191207a1c2e26959;commit:7d4701ed976744fa6107d417b0b39389e468158a;cohort:dc_0fca807c963dc3b9888e0f83ba6d45a5",
       "ref_id": "ra_acd8d79be61a02c7bb9e76ee0b6752ab",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-30T23:58:30.832287+00:00",
       "source": "research_action",
       "title": "第三 origin 補強×2：Counterpoint 記載 MRVL Photonic Fabric 16Tbps 與三生態卡位＋borecraft 記載 LuxNet CW 雷射角色",
       "type": "ra_admission"
@@ -11057,6 +11120,106 @@
       "ref_id": "ra_2117cbdbc9ed47097d8c50f315435f31",
       "type": "ra_admission",
       "verb": "go"
+    },
+    {
+      "at": "2026-08-30T23:58:26.499798+00:00",
+      "n": 297,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_979571e2f1bbf2022225b3eb08e9f623;digest:55cffb61a2d4e63d125e87df24956ba45f12c6615b4421ac8b75e35dfe6a6830;commit:4dbad0542dc6e27a106172b5cb0dc048a33d1fac;cohort:dc_21d81aa11dd2fe85c747b1c759fd01ed",
+      "ref_id": "ra_979571e2f1bbf2022225b3eb08e9f623",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-30T23:58:27.966146+00:00",
+      "n": 300,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_21a61110388b4b892ddd36a6920e73c8;digest:e80e3f93401f5ce640529cd800701048cd34c2fcb81eb579ba4eabf227273360;commit:eabaee33741cd5ae846ddc33e3d1209c21bf9fd1;cohort:dc_21d81aa11dd2fe85c747b1c759fd01ed",
+      "ref_id": "ra_21a61110388b4b892ddd36a6920e73c8",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-30T23:58:29.390019+00:00",
+      "n": 302,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_975fdb3ef2f72e04fd99548aed280957;digest:beace5c1c41772d90078454e0cbc1af16a454db1d92f9766fca00f6d9e667921;commit:71a2f1479c2fafb2f8b47b7ae8e94195292b8411;cohort:dc_6b92df56a6d186eb7464479dfb9c48c3",
+      "ref_id": "ra_975fdb3ef2f72e04fd99548aed280957",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-30T23:58:30.832287+00:00",
+      "n": 303,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_acd8d79be61a02c7bb9e76ee0b6752ab;digest:7781be3c9f24b0f31ba34251845146cdc8be5f2c547687f5191207a1c2e26959;commit:7d4701ed976744fa6107d417b0b39389e468158a;cohort:dc_0fca807c963dc3b9888e0f83ba6d45a5",
+      "ref_id": "ra_acd8d79be61a02c7bb9e76ee0b6752ab",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-30T23:59:29.297689+00:00",
+      "attempt": 1,
+      "n": 291,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_600366f6288254a1fcb1952e2590715a",
+      "ref_id": "dc_6b92df56a6d186eb7464479dfb9c48c3",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-08-30T23:59:30.036759+00:00",
+      "n": 292,
+      "reason": "go：assessment 層缺口，排入 bounded pq1；commercial_maturity_unknown、source_reliability_unknown、valuation_payoff_unknown",
+      "receipt": "decision:pd_665289d3f50ab2987333dcd4646c49a6",
+      "ref_id": "dc_cc46527aac12ba14191ee71c0460f3fe",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-08-31T00:00:15.783160+00:00",
+      "n": 293,
+      "reason": "go：僅 context 老化，已以 intent=research 重新凍結",
+      "receipt": "decision:pd_b63dc26b6942a4e709a8e592017b3af6",
+      "ref_id": "dc_0fca807c963dc3b9888e0f83ba6d45a5",
+      "type": "decision_review",
+      "verb": "pq1_reassessed"
+    },
+    {
+      "at": "2026-08-31T00:01:02.797613+00:00",
+      "n": 294,
+      "reason": "go：assessment 層缺口，排入 bounded pq1；source_reliability_corroboration_incomplete",
+      "receipt": "decision:pd_54e0323c47b253589b22c4bbc9d39db9",
+      "ref_id": "dc_fdab434d1fad67666c57a6eefd379337",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-08-31T00:01:49.202629+00:00",
+      "n": 295,
+      "reason": "go：僅 context 老化，已以 intent=research 重新凍結",
+      "receipt": "decision:pd_27b8d3a9118a7109baee97e83264d207",
+      "ref_id": "dc_9d464eeb94b7b0108104db1774bbbdd4",
+      "type": "decision_review",
+      "verb": "pq1_reassessed"
+    },
+    {
+      "at": "2026-08-31T00:03:35.323472+00:00",
+      "n": 293,
+      "reason": "來源本輪成功執行，但不再產出此項",
+      "receipt": null,
+      "ref_id": "dc_0fca807c963dc3b9888e0f83ba6d45a5",
+      "type": "decision_review",
+      "verb": "source_cleared"
+    },
+    {
+      "at": "2026-08-31T00:03:35.323472+00:00",
+      "n": 295,
+      "reason": "來源本輪成功執行，但不再產出此項",
+      "receipt": null,
+      "ref_id": "dc_9d464eeb94b7b0108104db1774bbbdd4",
+      "type": "decision_review",
+      "verb": "source_cleared"
     }
   ],
   "next_n": 304,
