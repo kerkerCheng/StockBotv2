@@ -5682,8 +5682,10 @@
       "added_at": "2026-08-31T14:52:18.093481+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_f557308434860ae6e5d7e5da4b64cf37",
+      "dispatch_receipt": "decision:pd_60d4cf6a12991b602cbb9cb5815d83f8;manual_todo:355",
       "dispatch_ref": "wo_f5b5f7a73ebdb30cce0eb8f99c9bf071",
-      "dispatch_status": "queued",
+      "dispatch_status": "awaiting_approval",
+      "dispatch_updated_at": "2026-08-31T23:56:00.167289+00:00",
       "dispatched_at": "2026-08-31T23:46:46.862290+00:00",
       "hint": "當前 missing_data：engine_c_customer：SHA0.DE 客戶集中度（前三大客戶占營收%）——需 Engine C 人工觀測寫；engine_c_backlog：SHA0.DE 訂單能見度／backlog——需 Engine C 人工觀測寫入；humanoid／robotics 營收分項揭露（判斷純度的唯一途徑；公司目前不揭露）（共 3 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 342,
@@ -5869,6 +5871,54 @@
       "source": "research_action",
       "title": "Soitec 多年期晶圓供應／產能保留合約——客戶訂金屬實，但客戶、份額與營收底線仍未核實",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-08-31T23:54:29.624234+00:00",
+      "hint": "go 只排入 bounded pq1；不接受 claim、不入圖。若需付費，另核准 exact 金額／方案。",
+      "n": 354,
+      "reason": null,
+      "ref_id": "lead_1dfc66d3488e70d972e80bff8772e8ff",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "source_trace",
+      "title": "追原報告／來源 access — The more I look at ESMT, the more excited I get researching legacy memory themes. So looked through H1 sellside models... From March ESMT reports: Huanan: DDR3 4Gb ASP +50% QoQ in Q2 Fubon: cited r...",
+      "type": "source_trace_review"
+    },
+    {
+      "added_at": "2026-08-31T23:54:29.624234+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2025-12-31T00:00:00+00:00；來源=Schaeffler FY2025 results release via EQS News (official wire), https://www.eqs-",
+      "n": 355,
+      "reason": null,
+      "ref_id": "po_9f901c2a1d43d7ef871ff0b56b3cfdf6",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "engine_c",
+      "title": "Engine C 觀測：SHA0.DE / backlog",
+      "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-08-31T23:54:29.624234+00:00",
+      "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "n": 356,
+      "reason": null,
+      "ref_id": "dc_6e429d67c7b9e925a1b25874e9dcefd9",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:soitec：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-31T23:54:29.624234+00:00",
+      "hint": "當前 missing_data：JARE 公告（ASX 2026-03-10）與 Sojitz 客戶端公告（2025-10-30）尚未入圖——升級本軸 ；美國政府 US$96M binding LOI offtake（2026-03-16）僅二手轉述（rare-earth-（共 2 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "n": 357,
+      "reason": null,
+      "ref_id": "dc_48446dbceb85d4b785634e3c4ca5d669",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:lynas：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
     }
   ],
   "log": [
@@ -13192,8 +13242,44 @@
       "ref_id": "dc_48446dbceb85d4b785634e3c4ca5d669",
       "type": "decision_review",
       "verb": "go"
+    },
+    {
+      "at": "2026-08-31T23:51:16.904978+00:00",
+      "n": 342,
+      "reason": null,
+      "receipt": "wo:wo_f5b5f7a73ebdb30cce0eb8f99c9bf071",
+      "ref_id": "dc_912a03a50135ea5e29000a0417c3f477",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-08-31T23:55:26.587465+00:00",
+      "n": 342,
+      "reason": "PLACEHOLDER",
+      "receipt": "decision:PLACEHOLDER;manual_todo:355",
+      "ref_id": "dc_912a03a50135ea5e29000a0417c3f477",
+      "type": "decision_review",
+      "verb": "pq1_awaiting_approval"
+    },
+    {
+      "at": "2026-08-31T23:55:59.453351+00:00",
+      "n": 342,
+      "reason": null,
+      "receipt": "wo:wo_f5b5f7a73ebdb30cce0eb8f99c9bf071;fix:placeholder-receipt",
+      "ref_id": "dc_912a03a50135ea5e29000a0417c3f477",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-08-31T23:56:00.167289+00:00",
+      "n": 342,
+      "reason": "bounded research 完成:FY2025 order intake 15.5B歐元(傳動)+四家具名人形夥伴(無付款方向)+2035 純度目標10%;backlog 觀測 [355] 已備,核准寫入後 reassess 清 CM;年報全文遭 403,customer_concentration 待替代路徑",
+      "receipt": "decision:pd_60d4cf6a12991b602cbb9cb5815d83f8;manual_todo:355",
+      "ref_id": "dc_912a03a50135ea5e29000a0417c3f477",
+      "type": "decision_review",
+      "verb": "pq1_awaiting_approval"
     }
   ],
-  "next_n": 354,
+  "next_n": 358,
   "schema_version": "1"
 }
