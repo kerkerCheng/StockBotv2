@@ -42028,7 +42028,9 @@
       "lead_id": "lead_cbd50ac57aa511c2d6c4e531b759f7a7",
       "published_at": null,
       "refs": {
+        "focus_company_id": "co:mp_materials",
         "parked_reason": "圖的層級錯了，不是缺證據：Lynas 產的是分離重稀土「氧化物」，圖中的邊卻是 supplies_to mat:rare_earth_magnets（磁材）。在錯的層上填 substitutability 只會生出一個看起來有值、實際問錯問題的邊。正解是新增「中國以外的分離重稀土氧化物（Dy/Tb）」這一層，但要宣稱近獨家地位需要 USGS 一手支撐。",
+        "research_action_id": "ra_09837781ccff7db053aabfe5e886f9f8",
         "trace_attempts_ref": "2026-08-31：Lynas 官網逐字（自報，依 L8 不可作獨家佐證）；metaltechnews 2026-03 重稀土擴產報導；USGS MCS 2026 rare-earths 與 rare-earths-heavy 兩份 PDF 皆回 403；搜尋摘要稱美國重稀土 100% 進口依賴且無持續商業級產出，但摘要不等於一手逐字（L11）",
         "trace_next_trigger": "取得 USGS Mineral Commodity Summaries 2026「Rare Earths (Heavy)」逐字（本輪兩個 pubs.usgs.gov PDF URL 皆回 HTTP 403，是取不到不是不存在），或 Lynas 季報／客戶端具名文件確認「中國以外唯一商業級分離 Dy/Tb 生產者」",
         "trace_requires_user": "false",
@@ -42042,24 +42044,25 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "directed:sub_backfill",
-      "status": "parked",
+      "status": "action_prepared",
       "themes": {},
       "title": "[定向補 sub｜稀土] Lynas 官網逐字：the world's only commercial producer of separated light and heavy rare earth oxides outside of China。2025 Q1 commissioned Dy 分離、6 月 Tb，年產能上看 1500t 重稀土；中國對 Dy/Tb 有出口管制。⚠ 待解語意：Lynas 供的是氧化物，圖中邊卻是 supplies_to mat:rare_earth_magnets（磁材）——先確認該邊原始 claim 再定 sub。⚠ L8：官網＝自報，sole_source 需 USGS 或客戶端印證才可升級",
       "triage": {
         "classification": {
-          "classified_at": "2026-08-31T10:17:01.584775+00:00",
+          "classified_at": "2026-08-31T13:27:57.826226+00:00",
           "classified_by": "triage_semantic_v1",
           "content_type": "structural_fact",
           "decision_impact": "candidate_set",
-          "reason": "填上 sub 會讓稀土磁材產業群從 0 條長出來＝候選清單多出名字"
+          "reason": "填上 sub 讓稀土產業群長出來＝候選清單多出名字；同時 USGS 的 Substitutes 段落是反向證據，會把 sub 壓在 3"
         },
-        "decided_at": "2026-08-31T10:17:01.584775+00:00",
+        "decided_at": "2026-08-31T13:27:57.826226+00:00",
         "decision": "go",
         "priority_flags": {
+          "independent_source": true,
           "novelty": true
         },
-        "reason": "[325] 使用者指示的定向補 sub。Lynas 官網逐字 sole-outside-China 已取得；缺的是該邊語意確認（氧化物 vs 磁材）與第三方（USGS 等）印證",
-        "tier": 2
+        "reason": "un-park：使用者提供 USGS MCS 2026 Rare Earths (Heavy) 一手 PDF，原 park 理由（PDF 403 取不到）已解除。tier 由 2 升為 1——來源改為美國政府第三方統計，非供應商自報。",
+        "tier": 1
       },
       "url": "https://lynasrareearths.com/about-us/"
     },

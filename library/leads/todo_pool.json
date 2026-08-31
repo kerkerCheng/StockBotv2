@@ -5552,6 +5552,19 @@
       },
       "title": "co:coherent：補 counter-path：什麼會讓這條因果鏈斷掉（第二供應源、客戶自製、技術替代）",
       "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-31T13:29:16.807074+00:00",
+      "graph_impact": "+3 節點、2 邊、5 claims｜來源：U.S. Geological Survey (美國政府第三方統計，非任何生產商)（tier 1）",
+      "hint": "核准 exact graph delta；Decision handoff：co:mp_materials。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 336,
+      "reason": null,
+      "ref_id": "ra_09837781ccff7db053aabfe5e886f9f8",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "[325] 稀土組定向補 sub：瓶頸不在磁材，在「中國以外的分離重稀土」——USGS MCS 2026（tier 1 政府一手）",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -12542,6 +12555,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 336,
+  "next_n": 337,
   "schema_version": "1"
 }
