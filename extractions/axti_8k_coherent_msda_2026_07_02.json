@@ -1,0 +1,106 @@
+{
+  "claims": [
+    {
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "AXT 2026Q2 10-Q exhibit 協議全文與 8-K 摘要實質不符；或協議提前終止揭露；或 COHR 端 filings（10-K/10-Q purchase commitments 附註）持續未見對應 prepayment/purchase obligation（下一次 COHR 季報為檢查點）。",
+      "id": "axti_8k_coherent_msda_2026_07_02_cl1",
+      "source_ids": [
+        "axti_8k_coherent_msda_2026_07_02_s1",
+        "axti_8k_coherent_msda_2026_07_02_s2",
+        "axti_8k_coherent_msda_2026_07_02_s3",
+        "axti_8k_coherent_msda_2026_07_02_s4"
+      ],
+      "statement": "Coherent 以 US$22,288,500 預付款綁定 AXT 6 吋 InP 基板產能（客戶端資本承諾）：Master Development and Supply Agreement 生效 2026-06-25、初始 3 年；AXT 承諾北京廠 2026-2028 擴產與產能交付（Capacity Commitment），預付按約定單價逐步抵貨款。退出結構雙向：COHR 未達最低訂購量→剩餘預付不可退且 AXT 可終止；AXT 連續 6 個月未達產能承諾→COHR 可終止取回未用預付。承諾量之外的額外產能，AXT 同意以同條款優先供 COHR——對其他 InP 基板買家為潛在排擠條款。",
+      "subject_id": "axc1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "co:coherent",
+      "id": "axc1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "axti_8k_coherent_msda_2026_07_02_s1",
+        "axti_8k_coherent_msda_2026_07_02_s2"
+      ],
+      "src_id": "co:axt"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "AXTI",
+        "AXT-Tongmei"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:axt",
+      "name": "AXT, Inc.",
+      "role": null,
+      "source_ids": [
+        "axti_8k_coherent_msda_2026_07_02_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "COHR"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:coherent",
+      "name": "Coherent Corp",
+      "role": null,
+      "source_ids": [
+        "axti_8k_coherent_msda_2026_07_02_s1"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "axti_8k_coherent_msda_2026_07_02",
+    "evidence_tier": 1,
+    "origin_entity": "AXT, Inc.",
+    "permission_basis": "US SEC public filing; quotes with full local copy.",
+    "published_at": "2026-07-02",
+    "publisher": "SEC EDGAR",
+    "retrieved_at": "2026-08-31",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "AXT 8-K (Item 1.01): Master Development and Supply Agreement with Coherent Corp — 6-inch InP wafer substrates",
+    "url": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001051627&type=8-K&dateb=&owner=include&count=10"
+  },
+  "sources": [
+    {
+      "id": "axti_8k_coherent_msda_2026_07_02_s1",
+      "locator": "Item 1.01 agreement scope",
+      "quote": "On June 26, 2026, AXT-Tongmei, Inc., a Delaware corporation (\"AXT-Tongmei\") and a subsidiary of AXT, Inc. ... entered into a Master Development and Supply Agreement (the \"Agreement\") with Coherent Corp, a Pennsylvania Corporation (\"Coherent\"), effective as of June 25, 2026 (the \"Effective Date\"). The Agreement establishes the terms for the mass development and supply of certain agreed-upon specifications for 6-inch indium phosphide (\"InP\") wafer substrates (the \"Products\") from AXT to Coherent for an initial term of three (3) years from the Effective Date."
+    },
+    {
+      "id": "axti_8k_coherent_msda_2026_07_02_s2",
+      "locator": "Item 1.01 prepayment & capacity commitment",
+      "quote": "Under the Agreement, AXT has agreed to increase its manufacturing capacity of the Products at its Beijing, China facility in 2026 through 2028 and has committed to the delivery of an agreed upon Product capacity to Coherent (the \"Capacity Commitment\") for a prepayment of US$22,288,500 (the \"Prepayment\") from Coherent to AXT."
+    },
+    {
+      "id": "axti_8k_coherent_msda_2026_07_02_s3",
+      "locator": "Item 1.01 refund/termination terms",
+      "quote": "The Prepayment is refundable to Coherent at its sole option if the Prepayment has not been fully applied upon the expiration or termination of the Agreement. However, if Coherent fails to meet its minimum order quantity requirement, the remaining unused portion of the Prepayment shall be nonrefundable and AXT has the right to terminate the Agreement. Subject to any mutually agreed changes, Coherent has the right to terminate the Agreement if AXT fails to meet the Capacity Commitment for more than six (6) successive calendar months, and is entitled to a refund of the unused Prepayment."
+    },
+    {
+      "id": "axti_8k_coherent_msda_2026_07_02_s4",
+      "locator": "Item 1.01 additional capacity right",
+      "quote": "To the extent there is additional capacity beyond the committed quantity, AXT has agreed to offer such additional capacity at the same terms to Coherent."
+    },
+    {
+      "id": "axti_8k_coherent_msda_2026_07_02_s5",
+      "locator": "Item 1.01 full text reference",
+      "quote": "The foregoing description does not purport to be complete and is qualified in its entirety by reference to the full text of the Agreement, which will be filed as an exhibit to the Registrant's quarterly report on Form 10-Q for the period ended June 30, 2026."
+    }
+  ]
+}

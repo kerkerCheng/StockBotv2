@@ -1,0 +1,106 @@
+{
+  "claims": [
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "第一筆 $43.5M 押金未依約支付（AXT 後續財報現金流量表/合約負債科目為檢查點）；或協議終止揭露；或 LITE 端 FY2026 10-K purchase commitments 附註持續未見對應金額。第二筆押金 2028 條款『另定』——若 2028 年底前未落實，承諾規模減半。",
+      "id": "axt_pr_lumentum_lta_2026_07_30_cl1",
+      "source_ids": [
+        "axt_pr_lumentum_lta_2026_07_30_s1",
+        "axt_pr_lumentum_lta_2026_07_30_s2",
+        "axt_pr_lumentum_lta_2026_07_30_s3",
+        "axt_pr_lumentum_lta_2026_07_30_s5"
+      ],
+      "statement": "Lumentum 以兩筆各 $43,500,000 押金（合計 $87M）換 AXT InP 基板最低年產能保留至 2031-12-31（客戶端資本承諾）：第一筆於簽約後 30 個工作日內支付、第二筆時點與條款於 2028 年內另定；押金作為出貨抵扣額度直至用罄。與 COHR 協議（生效 2026-06-25）相隔約一個月——兩家主要 InP 雷射/光元件廠先後掏錢綁同一家基板供應商產能。",
+      "subject_id": "axl1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "co:lumentum",
+      "id": "axl1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "axt_pr_lumentum_lta_2026_07_30_s2",
+        "axt_pr_lumentum_lta_2026_07_30_s3"
+      ],
+      "src_id": "co:axt"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "AXTI"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:axt",
+      "name": "AXT, Inc.",
+      "role": null,
+      "source_ids": [
+        "axt_pr_lumentum_lta_2026_07_30_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "LITE",
+        "Lumentum Operations LLC"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:lumentum",
+      "name": "Lumentum",
+      "role": null,
+      "source_ids": [
+        "axt_pr_lumentum_lta_2026_07_30_s2"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "axt_pr_lumentum_lta_2026_07_30",
+    "evidence_tier": 1,
+    "origin_entity": "AXT, Inc.",
+    "permission_basis": "Issuer official press release; quotes only.",
+    "published_at": "2026-07-30",
+    "publisher": "AXT, Inc. Investor Relations",
+    "retrieved_at": "2026-08-31",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "AXT press release: Long-Term Supplier Agreement with Lumentum — InP wafer substrates through 2031",
+    "url": "https://investors.axt.com/Investors/news/news-details/2026/AXT-Inc--Announces-Long-Term-Supplier-Agreement-with-Lumentum/default.aspx"
+  },
+  "sources": [
+    {
+      "id": "axt_pr_lumentum_lta_2026_07_30_s1",
+      "locator": "agreement term",
+      "quote": "a period beginning upon entry into the agreement, running through December 31st, 2031"
+    },
+    {
+      "id": "axt_pr_lumentum_lta_2026_07_30_s2",
+      "locator": "deposit structure",
+      "quote": "Lumentum has agreed to pay AXT an initial deposit of $43,500,000, due within thirty business days after entry into the agreement, and a second deposit of $43,500,000, with the timing and terms surrounding payment to be subsequently determined during calendar year 2028"
+    },
+    {
+      "id": "axt_pr_lumentum_lta_2026_07_30_s3",
+      "locator": "capacity reservation",
+      "quote": "reserve a minimum annual commitment of indium phosphide by Lumentum"
+    },
+    {
+      "id": "axt_pr_lumentum_lta_2026_07_30_s4",
+      "locator": "CEO statement",
+      "quote": "We are very pleased to announce an agreement with Lumentum and to be a key supplier to their indium phosphide requirements over the coming years"
+    },
+    {
+      "id": "axt_pr_lumentum_lta_2026_07_30_s5",
+      "locator": "deposit application",
+      "quote": "The deposits shall be applied as shipment credits towards the purchase of the products, until such deposit is exhausted"
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+Source URL: https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001051627&type=8-K&dateb=&owner=include&count=10
+
+Excerpt:
+Master Development and Supply Agreement with Coherent Corp, effective June 25, 2026; 6-inch InP wafer substrates; 3-year initial term; Beijing capacity expansion 2026-2028; prepayment US$22,288,500 (AXT 8-K filed 2026-07-02, Item 1.01)
