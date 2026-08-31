@@ -21864,9 +21864,13 @@
       "first_seen": "2026-08-30T22:32:49.748662+00:00",
       "lead_id": "lead_609f70123c19f56604512c8c62be6eb6",
       "published_at": "2026-06-15",
-      "refs": {},
+      "refs": {
+        "parked_reason": "內部人申報非研究對象;terminal not_pursued",
+        "research_outcome": "例行 Form 4 內部人申報:不在系統主題範圍,無結構 atom",
+        "trace_status": "not_pursued"
+      },
       "source": "edgar:MP",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "MP 4 filed 2026-06-15",
       "triage": {
@@ -25821,9 +25825,13 @@
       "media": [],
       "published_at": "2026-08-31T09:17:47.000Z",
       "raw_text": "Imagine Celestial ($MRVL acquisition) was public. \n\nThe valuation would probably be astronomical in US markets (if I had to guess, $6-10B)\n\nBecause 2028 revenue projections were $500m (q4 annualized runrate), 2029 revenue projections were $1B.\n\nAnd because Celestial is a core part of hyperscaler CPO programs. \n\nCelestial's 2026 Q2 earnings would have been:\n\n- Close to $0 revenue (Marvell said \"revenue and earnings since the acquisition were not material\")\n-  Losing -$12.5M/quarter ($50M/year)\n\nWould people who knew what they were talking about looking at qualification cycle players say...\n\n1. based on Celestial's Q2 P/S numbers and because it was losing -$12.5M a quarter... That it's a worthless meme stock? \n\nOr \n\n2. with CPO hyperscaler opportunities for 2028, it should be valued at $6-10B? \n\nAnd I think that's a core cultural disagreement between US / EU cultures + markets. \n\nIf you knew how to evaluate qualification cycle players, which number actually matters? I'd argue overwhelmingly the latter.",
-      "refs": {},
+      "refs": {
+        "parked_reason": "意見串,事實部分已入圖;terminal",
+        "research_outcome": "估值文化評論;唯一可核原子(MRVL 稱 Celestial 收購後 revenue and earnings not material)已由圖中 mrvl_10q_nvidia_preferred_2026_08_28 涵蓋;qualification-cycle 估值論點無可否證 atom",
+        "trace_status": "not_pursued"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -32188,9 +32196,13 @@
       "first_seen": "2026-08-30T22:32:49.748586+00:00",
       "lead_id": "lead_97954aa904e68a28cf7d1c3b1013490c",
       "published_at": "2026-06-30",
-      "refs": {},
+      "refs": {
+        "parked_reason": "內部人申報非研究對象;terminal not_pursued",
+        "research_outcome": "例行 Form 4 內部人申報:不在系統主題範圍,無結構 atom",
+        "trace_status": "not_pursued"
+      },
       "source": "edgar:MP",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "MP 4 filed 2026-06-30",
       "triage": {
@@ -34473,9 +34485,13 @@
       "first_seen": "2026-08-30T22:32:54.746507+00:00",
       "lead_id": "lead_a52cee932734843529cb1f1804edb815",
       "published_at": "2026-08-10",
-      "refs": {},
+      "refs": {
+        "parked_reason": "內部人申報非研究對象;terminal not_pursued",
+        "research_outcome": "例行 Form 4 內部人申報:不在系統主題範圍,無結構 atom",
+        "trace_status": "not_pursued"
+      },
       "source": "edgar:TSM",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "TSM 4 filed 2026-08-10",
       "triage": {
@@ -39624,9 +39640,13 @@
       "first_seen": "2026-08-30T22:32:49.748959+00:00",
       "lead_id": "lead_bf2575dffd26407d059d9d6e0c958513",
       "published_at": "2026-06-10",
-      "refs": {},
+      "refs": {
+        "parked_reason": "內部人申報非研究對象;terminal not_pursued",
+        "research_outcome": "例行 Form 4 內部人申報:不在系統主題範圍,無結構 atom",
+        "trace_status": "not_pursued"
+      },
       "source": "edgar:MP",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "MP 4 filed 2026-06-10",
       "triage": {
@@ -40760,9 +40780,13 @@
       "first_seen": "2026-08-30T22:32:49.748738+00:00",
       "lead_id": "lead_c6254c77c2e1789ddbd6ab10c985733b",
       "published_at": "2026-06-15",
-      "refs": {},
+      "refs": {
+        "parked_reason": "內部人申報非研究對象;terminal not_pursued",
+        "research_outcome": "例行 Form 4 內部人申報:不在系統主題範圍,無結構 atom",
+        "trace_status": "not_pursued"
+      },
       "source": "edgar:MP",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "MP 4 filed 2026-06-15",
       "triage": {
@@ -50830,9 +50854,13 @@
       ],
       "published_at": "2026-08-30T18:27:51.000Z",
       "raw_text": "I'm going to miss the days of Korean retail reacting heavily to $EWY / Samsung / $SKHY daily volatility.\n\nNew piece: \"Korean day traders flee leveraged chip ETFs as regulatory curbs bite\"\n\n- Trading value in ETFs designed to deliver 2x daily returns of Samsung / SK Hynix has fallen to just 4% of its June peak\n\n- The requirement follows earlier measures, including a higher minimum deposit, aimed at cooling speculative activity\n\n- And then came the final boss... A 5 day trading course where:\n\n\"Investors must download a Windows-only program  and spend at least one hour each day trading with virtual funds\"\n\n$MSFT Windows wiped out the Korean retail.",
-      "refs": {},
+      "refs": {
+        "parked_reason": "主題外情緒;terminal not_pursued",
+        "research_outcome": "韓國散戶槓桿 ETF 管制報導轉述:市場結構情緒,非供應鏈研究對象,亦不影響本投組 beta 商品(韓國監管不及於美/台上市 ETF)",
+        "trace_status": "not_pursued"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "I'm going to miss the days of Korean retail reacting heavily to $EWY / Samsung / $SKHY daily volatility. New piece: \"Korean day traders flee leveraged chip ETFs as regulatory curbs bite\" - Trading value in ETFs designed to deliver 2x daily returns of Samsung / SK Hynix has fallen to just 4% of its June peak - The requirement follows earlier measures, including a higher minimum deposit, aimed at cooling speculative activity - And then came the final boss... A 5 day trading course where: \"Investors must download a Windows-only program and spend at least one hour each day trading with virtual funds\" $MSFT Windows wiped out the Korean retail.",
       "triage": {
