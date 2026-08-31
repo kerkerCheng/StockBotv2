@@ -5872,6 +5872,162 @@
       "result": "ok",
       "run_at": "2026-08-31T10:42:12.477753+00:00",
       "source": "edgar:TSM"
+    },
+    {
+      "new": 2,
+      "result": "ok",
+      "run_at": "2026-08-31T22:35:49.663958+00:00",
+      "source": "mfn:sivers-semiconductors"
+    },
+    {
+      "new": 2,
+      "result": "ok",
+      "run_at": "2026-08-31T22:35:50.812169+00:00",
+      "source": "sivers:press"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-31T22:35:51.644964+00:00",
+      "source": "yahoo:iqe-l"
+    },
+    {
+      "new": 5,
+      "result": "ok",
+      "run_at": "2026-08-31T22:35:52.815146+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-31T22:35:54.463941+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-31T22:35:55.156548+00:00",
+      "source": "edgar:AEVA"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-08-31T22:35:55.856062+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-31T22:35:56.355147+00:00",
+      "source": "edgar:AVGO"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-31T22:35:57.052604+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-31T22:35:57.743816+00:00",
+      "source": "edgar:CCXI"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-08-31T22:35:58.252459+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-31T22:35:58.941640+00:00",
+      "source": "edgar:GFS"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-31T22:35:59.674505+00:00",
+      "source": "edgar:HIMX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-31T22:36:00.366828+00:00",
+      "source": "edgar:JBL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-31T22:36:01.042078+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-31T22:36:01.740444+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-31T22:36:02.245029+00:00",
+      "source": "edgar:META"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-31T22:36:02.923428+00:00",
+      "source": "edgar:MP"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-31T22:36:03.424415+00:00",
+      "source": "edgar:MRVL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-31T22:36:04.228905+00:00",
+      "source": "edgar:MTSI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-31T22:36:04.730716+00:00",
+      "source": "edgar:MU"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-31T22:36:05.232503+00:00",
+      "source": "edgar:NVDA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-31T22:36:05.904297+00:00",
+      "source": "edgar:POET"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-31T22:36:06.622748+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-31T22:36:07.122627+00:00",
+      "source": "edgar:TSLA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-31T22:36:07.807554+00:00",
+      "source": "edgar:TSM"
     }
   ],
   "leads": {
@@ -6200,6 +6356,36 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2077409813496250522"
+    },
+    "lead_00879a339a10d048ede240b80b12abe9": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-31T22:35:49.644704+00:00",
+      "lead_id": "lead_00879a339a10d048ede240b80b12abe9",
+      "published_at": "Mon, 31 Aug 2026 16:00:00 +0000",
+      "refs": {},
+      "source": "mfn:sivers-semiconductors",
+      "status": "triaged_no_go",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Förändring av det totala antalet aktier och röster i Sivers Semiconductors AB",
+      "triage": {
+        "decided_at": "2026-08-31T22:39:02.436633+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "Sivers 同一股數／表決權事件的 MFN 瑞典文鏡像，已由官方英文代表版本 lead_9ff4718 保留。",
+        "tier": 4
+      },
+      "url": "https://mfn.se/cis/a/sivers-semiconductors/forandring-av-det-totala-antalet-aktier-och-roster-i-sivers-semiconductors-ab-fbe83059"
     },
     "lead_0105a33e36381612a823b981ec5e7bc6": {
       "content_updated_at": "2026-07-29T13:46:53.634187+00:00",
@@ -11755,6 +11941,53 @@
       ],
       "url": "https://x.com/aleabitoreddit/status/2085711500875116887"
     },
+    "lead_21318ca44887fa50365855c23987fdf0": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia",
+          "co:marvell_technology",
+          "co:broadcom",
+          "co:nebius",
+          "co:coreweave",
+          "co:amd"
+        ],
+        "tickers": [
+          "NVDA",
+          "MRVL",
+          "AVGO",
+          "NBIS",
+          "CRWV",
+          "AMD"
+        ]
+      },
+      "first_seen": "2026-08-31T22:35:52.812003+00:00",
+      "lead_id": "lead_21318ca44887fa50365855c23987fdf0",
+      "media": [],
+      "published_at": "2026-08-31T13:26:03.000Z",
+      "raw_text": "Yep, with $NVDA investing $3.5B into Mediatek.\n\nIt does feel like Nvidia is playing kingmaker with the next generation of ASIC winners like $MRVL / Mediatek, with a second order effect of eroding $AVGO position.\n\nPlaybook feels similar to what they did with Neoclouds like $NBIS and $CRWV (vs. hyperscaler cloud programs)\n\nHelp create the next leaders, then make them both financially and strategically aligned with Nvidia.\n\nI do think it’s brilliant, but moves like this might push $AMD, $AVGO, and certain hyperscalers closer together.\n\nRegardless this move cements Nvidia’s strategic position in inference (where hyperscaler ASICs were a former long-term bear case).",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "AVGO",
+            "NVDA"
+          ]
+        }
+      },
+      "title": "Yep, with $NVDA investing $3.5B into Mediatek. It does feel like Nvidia is playing kingmaker with the next generation of ASIC winners like $MRVL / Mediatek, with a second order effect of eroding $AVGO position. Playbook feels similar to what they did with Neoclouds like $NBIS and $CRWV (vs. hyperscaler cloud programs) Help create the next leaders, then make them both financially and strategically aligned with Nvidia. I do think it’s brilliant, but moves like this might push $AMD, $AVGO, and certain hyperscalers closer together. Regardless this move cements Nvidia’s strategic position in inference (where hyperscaler ASICs were a former long-term bear case).",
+      "triage": {
+        "decided_at": "2026-08-31T22:39:01.257076+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "同一 NVIDIA／MediaTek USD 3.5B 事件的後續評論，核心可查 claim 已由代表貼文 lead_3a62af9 保留；其餘為作者對 ASIC 競爭的推論。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2094416430032896428"
+    },
     "lead_2289f6b883f6e081b3e5795289a54fac": {
       "entities": {
         "company_ids": [
@@ -14096,6 +14329,45 @@
       ],
       "url": "https://x.com/aleabitoreddit/status/2081548360818004299"
     },
+    "lead_2f83d089cad7de9e022b2f08f4e566fd": {
+      "entities": {
+        "company_ids": [
+          "co:nebius",
+          "co:nvidia"
+        ],
+        "tickers": [
+          "NBIS",
+          "NVDA",
+          "SMCI"
+        ]
+      },
+      "first_seen": "2026-08-31T22:35:52.808727+00:00",
+      "lead_id": "lead_2f83d089cad7de9e022b2f08f4e566fd",
+      "media": [],
+      "published_at": "2026-08-31T18:28:51.000Z",
+      "raw_text": "Macro has clearly cut high beta AI valuations over the past few months. But I try to stay focused on fundamentals.\n\nIf you're curious about my take though:\n\nWe're seeing record visibility with\n- memory (2031), photonics (2029-2030), etc LTAs\n-  $NBIS, solana:5aQcoaSyy7fnhvpRHasBUAMH2nL5tTjVrmFw6BeGmoon, etc. massive demand imbalance for compute despite capex spend. \n- combined with record projections ( $NVDA 70% growth 2027, $SMCI $60B+ new server orders, etc). \n\nvs. \n\nuncomfortable macro where:\n- Warsh said the Fed has \"more work to do\" if underlying inflation isn't clearly returning to 2%.\n- July PCE came in at 3.7% Y/Y\n- July jobs report payrolls fell by 23k with unemployment at 4.1%\n-10Y Treasury high/ 30Y highest since 2007\n- Iran tensions continuing\n- Japan Yen weakened to 160/ 2 rate hikes in Korea\n\nAnd with rate 40/60 in favor of 25BPS near-term hikes. \n\nThere's definitely implications on financing + too many third/fourth order effects for me to personally map. \n\nI'm not a macro expert but my take is: \n\nThe AI buildout will continue w/ $1.3T+ capex poured upstream expected next year, flowing through many bottlenecks and chokepoints. \n\nWhile markets chopped off forward valuations and rotated toward currently profitable/defensive companies. \n\nI don't know what's going to happen, especially since rate hike odds are almost a coinflip, and Trump posts can change sentiment overnight. \n\nAs long as I don't see indicators of hyperscalers cutting capex or demand wavering. \n\nI'm staying long despite macro volatility, since I want ownership of the names controlling the future of the AI buildout. \n\nAnd if there's any indicators of better macro climates, high beta are typically the fastest to recover.",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "NVDA"
+          ]
+        }
+      },
+      "title": "Macro has clearly cut high beta AI valuations over the past few months. But I try to stay focused on fundamentals. If you're curious about my take though: We're seeing record visibility with - memory (2031), photonics (2029-2030), etc LTAs - $NBIS, solana:5aQcoaSyy7fnhvpRHasBUAMH2nL5tTjVrmFw6BeGmoon, etc. massive demand imbalance for compute despite capex spend. - combined with record projections ( $NVDA 70% growth 2027, $SMCI $60B+ new server orders, etc). vs. uncomfortable macro where: - Warsh said the Fed has \"more work to do\" if underlying inflation isn't clearly returning to 2%. - July PCE came in at 3.7% Y/Y - July jobs report payrolls fell by 23k with unemployment at 4.1% -10Y Treasury high/ 30Y highest since 2007 - Iran tensions continuing - Japan Yen weakened to 160/ 2 rate hikes in Korea And with rate 40/60 in favor of 25BPS near-term hikes. There's definitely implications on financing + too many third/fourth order effects for me to personally map. I'm not a macro expert but my take is: The AI buildout will continue w/ $1.3T+ capex poured upstream expected next year, flowing through many bottlenecks and chokepoints. While markets chopped off forward valuations and rotated toward currently profitable/defensive companies. I don't know what's going to happen, especially since rate hike odds are almost a coinflip, and Trump posts can change sentiment overnight. As long as I don't see indicators of hyperscalers cutting capex or demand wavering. I'm staying long despite macro volatility, since I want ownership of the names controlling the future of the AI buildout. And if there's any indicators of better macro climates, high beta are typically the fastest to recover.",
+      "triage": {
+        "decided_at": "2026-08-31T22:39:03.587736+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "宏觀與多標的敘事混合，核心是持有立場與市場情緒；沒有單一可界定、可驗證且會改變現有候選集合的 atomic claim。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2094492628758999451"
+    },
     "lead_2fa783489f20d8c0b75d4e6d9a28ac09": {
       "entities": {
         "company_ids": [
@@ -16094,6 +16366,81 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2074046947434860971"
+    },
+    "lead_3a62af9298034747d292b0f6aac4e8f1": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia",
+          "co:marvell_technology",
+          "co:broadcom"
+        ],
+        "tickers": [
+          "NVDA",
+          "MRVL",
+          "AVGO"
+        ]
+      },
+      "first_seen": "2026-08-31T22:35:52.813488+00:00",
+      "lead_id": "lead_3a62af9298034747d292b0f6aac4e8f1",
+      "media": [
+        {
+          "cache": {
+            "bytes": 148025,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_3a62af9298034747d292b0f6aac4e8f1/3_2094404305109573632.jpg",
+            "sha256": "7a223183e7518e96557dd47797be43f78ca05e8ec305c4a25ea05b42f955fa36"
+          },
+          "height": 1661,
+          "media_key": "3_2094404305109573632",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HRDRnm4a4AAUopZ.jpg",
+          "width": 2351
+        }
+      ],
+      "published_at": "2026-08-31T12:43:13.000Z",
+      "raw_text": "Today, $NVDA has announced a $3.5B investment into Mediatek. \n\nIt appears Nvidia is \"networking\" itself into the broader ASIC ecosystem, from $MRVL to MediaTek.\n\nAnd have future ecosystems aligned with Nvidia standards. (maybe to fend off $AVGO as well) https://t.co/okdGKS51U3",
+      "refs": {
+        "onboard_candidate_names": [
+          "MediaTek (2454.TW)"
+        ],
+        "parked_reason": "已取得 NVIDIA 一手公告；MediaTek 尚未進 company registry，先列 onboard 候選。此筆沒有可安全掛到既有公司邊的 durable graph delta。",
+        "primary_url": "https://nvidianews.nvidia.com/news/nvidia-and-mediatek-deepen-long-standing-partnership-to-build-ai-edge-to-cloud-computing-platforms",
+        "research_outcome": "NVIDIA 官方公告證實以 35 億美元可轉債投資 MediaTek，並擴大 NVLink Fusion 合作；未揭露轉換條件，亦不支持對 Broadcom 蠶食的作者推論。",
+        "trace_origin_entity": "NVIDIA / MediaTek",
+        "trace_original_date": "2026-08-31",
+        "trace_status": "original_obtained"
+      },
+      "source": "x:aleabitoreddit",
+      "status": "parked",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "AVGO",
+            "NVDA"
+          ]
+        }
+      },
+      "title": "Today, $NVDA has announced a $3.5B investment into Mediatek. It appears Nvidia is \"networking\" itself into the broader ASIC ecosystem, from $MRVL to MediaTek. And have future ecosystems aligned with Nvidia standards. (maybe to fend off $AVGO as well) https://t.co/okdGKS51U3",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-31T22:39:00.965239+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "capital_commitment",
+          "decision_impact": "candidate_set",
+          "payment_direction": "unclear",
+          "reason": "若投資與合作範圍成立，MediaTek 可能進入 ASIC 候選集合；若否則不變。"
+        },
+        "decided_at": "2026-08-31T22:39:00.965239+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "關聯 NVDA／MRVL／AVGO，含具體 USD 3.5B 投資與 MediaTek 名稱，可追官方公告；屬同事件代表貼文。",
+        "tier": 3
+      },
+      "url": "https://x.com/aleabitoreddit/status/2094405648293482965"
     },
     "lead_3a7c4e5db3ecc1c420c1464fb73ac3c2": {
       "entities": {
@@ -18231,6 +18578,46 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2071743355684626656"
+    },
+    "lead_477cf1e67aaee3d331ec78212fdce7c5": {
+      "entities": {
+        "company_ids": [
+          "co:applied_materials"
+        ],
+        "tickers": [
+          "AMAT"
+        ]
+      },
+      "first_seen": "2026-08-31T22:35:55.855885+00:00",
+      "lead_id": "lead_477cf1e67aaee3d331ec78212fdce7c5",
+      "published_at": "2026-08-31",
+      "refs": {
+        "parked_reason": "一手文件已取得；屬例行董事薪酬，無 graph delta，也不形成 insider-sale 訊號。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026059643/xslF345X06/wk-form4_1788213119.xml",
+        "research_outcome": "Form 4 為董事 Akash Palkhiwala 初始授予 279 份 RSU，價格 0 美元、2027-03-01 歸屬並遞延至終止服務；不是市場賣出。",
+        "trace_origin_entity": "Applied Materials, Inc.",
+        "trace_original_date": "2026-08-31",
+        "trace_status": "original_obtained"
+      },
+      "source": "edgar:AMAT",
+      "status": "parked",
+      "themes": {},
+      "title": "AMAT 4 filed 2026-08-31",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-31T22:39:03.297397+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "查證只補 AMAT 內部人交易脈絡，不改候選集合或瓶頸排序。"
+        },
+        "decided_at": "2026-08-31T22:39:03.297397+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "AMAT 官方 Form 4，具體 issuer／form／date 可逐字核對；低優先放行作 insider／稀釋時變觀測，不推定圖 delta。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026059643/xslF345X06/wk-form4_1788213119.xml"
     },
     "lead_477d6e1322452cf1c85480334f567405": {
       "entities": {
@@ -22250,6 +22637,54 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2076763334930812936"
+    },
+    "lead_624d76a113c73f726163ed9b578521cb": {
+      "entities": {
+        "company_ids": [
+          "co:coherent"
+        ],
+        "tickers": [
+          "COHR"
+        ]
+      },
+      "first_seen": "2026-08-31T22:35:58.252275+00:00",
+      "lead_id": "lead_624d76a113c73f726163ed9b578521cb",
+      "published_at": "2026-08-31",
+      "refs": {
+        "parked_reason": "一手文件已取得；屬治理與薪酬觀測，無 durable graph delta，未建立 Research Action。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/820318/000119312526375462/d110649d8k.htm",
+        "research_outcome": "8-K 揭露五名高階主管特別績效 RSU；股價門檻與相對 TSR、四年歸屬及持有期均可核對。這是治理／薪酬時變事件，不是供應鏈 graph delta，也不能單獨解釋當日跌幅。",
+        "trace_origin_entity": "Coherent Corp.",
+        "trace_original_date": "2026-08-31",
+        "trace_status": "original_obtained"
+      },
+      "source": "edgar:COHR",
+      "status": "parked",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "COHR"
+          ]
+        }
+      },
+      "title": "COHR 8-K filed 2026-08-31",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-31T22:39:01.537382+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "confidence_only",
+          "reason": "查證後多半只補既有 COHR 判斷的確定度；若內含材料事件，pq1 可再誠實升級。"
+        },
+        "decided_at": "2026-08-31T22:39:01.537382+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "COHR 官方 8-K，具體 issuer／form／日期與可逐字追查原文；內容未知故寬鬆放行，優先度不因持股身分灌高。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/820318/000119312526375462/d110649d8k.htm"
     },
     "lead_6268798ca02bbb8e42404bce03b467ff": {
       "entities": {
@@ -32583,6 +33018,36 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2086988264448409739"
     },
+    "lead_9990c41097017db4b21f59092d0073fb": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-31T22:35:50.811966+00:00",
+      "lead_id": "lead_9990c41097017db4b21f59092d0073fb",
+      "published_at": "Mon, 31 Aug 2026 16:00:00 +0000",
+      "refs": {},
+      "source": "sivers:press",
+      "status": "triaged_no_go",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Förändring av det totala antalet aktier och röster i Sivers Semiconductors AB",
+      "triage": {
+        "decided_at": "2026-08-31T22:39:02.726898+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "Sivers 同一股數／表決權事件的官方瑞典文重複頁，已由官方英文代表版本 lead_9ff4718 保留。",
+        "tier": 4
+      },
+      "url": "https://www.sivers-semiconductors.com/press/forandring-av-det-totala-antalet-aktier-och-roster-i-sivers-semiconductors-ab-12/"
+    },
     "lead_99f94c80ce33a20f1a9c49da2f2e1667": {
       "entities": {
         "company_ids": [
@@ -33627,6 +34092,50 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2075228811315343460"
+    },
+    "lead_9ff47187a7986c5636483309cc29ea8f": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-31T22:35:50.811802+00:00",
+      "lead_id": "lead_9ff47187a7986c5636483309cc29ea8f",
+      "published_at": "Mon, 31 Aug 2026 16:00:00 +0000",
+      "refs": {
+        "parked_reason": "一手文件已取得；屬時變股本／融資觀測，無 durable graph delta。",
+        "primary_url": "https://www.sivers-semiconductors.com/press/change-in-the-total-number-of-shares-and-votes-in-sivers-semiconductors-ab-12/",
+        "research_outcome": "官方公告證實 1,659,015 份 warrant 以每股 SEK 4.53 行使，總股數與表決權升至 356,740,332；屬已知債務融資後續稀釋。",
+        "trace_origin_entity": "Sivers Semiconductors AB",
+        "trace_original_date": "2026-08-31",
+        "trace_status": "original_obtained"
+      },
+      "source": "sivers:press",
+      "status": "parked",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Change in the Total Number of Shares and Votes in Sivers Semiconductors AB",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-31T22:39:02.135398+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "confidence_only",
+          "reason": "答案只更新稀釋與股本事實的確定度，不直接改候選集合或排序。"
+        },
+        "decided_at": "2026-08-31T22:39:02.135398+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "Sivers 官方英文 press release，具體股數與表決權變動可逐字核對；四個同事件來源只保留此代表版本。",
+        "tier": 1
+      },
+      "url": "https://www.sivers-semiconductors.com/press/change-in-the-total-number-of-shares-and-votes-in-sivers-semiconductors-ab-12/"
     },
     "lead_9ff86c00d2d3b0d1bcfedc009510393f": {
       "entities": {
@@ -37956,6 +38465,68 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2093252439973777674"
     },
+    "lead_b67b0d9fbfb4b86238e0c981e752b7c5": {
+      "entities": {
+        "company_ids": [
+          "co:soitec",
+          "co:tsmc"
+        ],
+        "tickers": [
+          "SOI",
+          "TSM"
+        ]
+      },
+      "first_seen": "2026-08-31T22:35:52.814149+00:00",
+      "lead_id": "lead_b67b0d9fbfb4b86238e0c981e752b7c5",
+      "media": [
+        {
+          "cache": {
+            "bytes": 137875,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_b67b0d9fbfb4b86238e0c981e752b7c5/3_2094378162075656192.jpg",
+            "sha256": "f55b305f498c2044047b66edae2cb8aef2f82e3acf785491dbdeb8185696e609"
+          },
+          "height": 1106,
+          "media_key": "3_2094378162075656192",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HRC514fa4AAISlk.jpg",
+          "width": 2169
+        }
+      ],
+      "published_at": "2026-08-31T10:56:00.000Z",
+      "raw_text": "Remember my $SOI thesis anon? Soitec interview commentary today:\n\n- 80% of capacity reservation agreements expected within 1-2 weeks, with more than 10 in total. \n\n-  $200M Photonics-SOI revenue now described as \"absolutely a floor\"\n\n$TSM also sees SiPH going mainstream in 2027 with market share topping 50%+ of the optical transceiver market\n\nIf you hold a monopoly-like position over a chokepoint:\n(UBS estimates Soitec has 95% share of the market for substrates underpinning silicon photonics chips)\n\nRevenue usually flows through you.",
+      "refs": {
+        "action_digest": "f27258f6699f38ed458b6709abae485e9d162c4afe0ce91ca089eecbb2f67274",
+        "focus_company_id": "co:soitec",
+        "primary_url": "https://www.boursorama.com/bourse/actualites/soitec-conclut-des-contrats-pluriannuels-avec-ses-clients-alors-que-la-demande-en-plaquettes-pour-l-ia-explose-dc7e183c930d3855f05e3b45986f3169",
+        "research_action_id": "ra_0bfedcf53d4c47001064cb00de130071",
+        "research_outcome": "已 prepare 一筆公司層級 claim：超過十名客戶簽多年期晶圓供應／產能保留合約並支付可沒收訂金；不建立未具名 customer edge，排除 2 億美元底線與 95% 市占率。",
+        "source_doc": "reuters_soitec_capacity_reservations_2026_08_31",
+        "trace_status": "tier_1_2_honest_passthrough"
+      },
+      "source": "x:aleabitoreddit",
+      "status": "action_prepared",
+      "themes": {},
+      "title": "Remember my $SOI thesis anon? Soitec interview commentary today: - 80% of capacity reservation agreements expected within 1-2 weeks, with more than 10 in total. - $200M Photonics-SOI revenue now described as \"absolutely a floor\" $TSM also sees SiPH going mainstream in 2027 with market share topping 50%+ of the optical transceiver market If you hold a monopoly-like position over a chokepoint: (UBS estimates Soitec has 95% share of the market for substrates underpinning silicon photonics chips) Revenue usually flows through you.",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-31T22:39:01.817268+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "capital_commitment",
+          "decision_impact": "candidate_set",
+          "payment_direction": "unclear",
+          "reason": "若客戶承諾與市占得到一手支持，Soitec 可進入矽光子瓶頸候選集合；若否則維持空白。"
+        },
+        "decided_at": "2026-08-31T22:39:01.817268+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "關聯 SOI／TSM／SiPH，含 80% 產能保留協議、超過 10 份、USD 200M floor、95% substrate share 等可追查數字；社群轉述需追回訪談與 UBS 原文。",
+        "tier": 3
+      },
+      "url": "https://x.com/aleabitoreddit/status/2094378666927239596"
+    },
     "lead_b6c4615d9d72866db4490807ec73045a": {
       "entities": {
         "company_ids": [],
@@ -39664,6 +40235,36 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1801368/000103160926000002/xslF345X06/wk-form4_1781139040.xml"
+    },
+    "lead_bf66ce5553e130d518ac8d78dd947353": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-31T22:35:49.663339+00:00",
+      "lead_id": "lead_bf66ce5553e130d518ac8d78dd947353",
+      "published_at": "Mon, 31 Aug 2026 16:00:00 +0000",
+      "refs": {},
+      "source": "mfn:sivers-semiconductors",
+      "status": "triaged_no_go",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Change in the Total Number of Shares and Votes in Sivers Semiconductors AB",
+      "triage": {
+        "decided_at": "2026-08-31T22:39:03.009541+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "Sivers 同一股數／表決權事件的 MFN 英文鏡像，已由官方英文代表版本 lead_9ff4718 保留。",
+        "tier": 4
+      },
+      "url": "https://mfn.se/cis/a/sivers-semiconductors/change-in-the-total-number-of-shares-and-votes-in-sivers-semiconductors-ab-b249e12d"
     },
     "lead_c01e5a312817d1ae6c629b4005a773c3": {
       "entities": {
@@ -42548,6 +43149,47 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/723125/000124265426000013/xslF345X06/primarydocument.xml"
+    },
+    "lead_cdb0ccfa2a76b719f80a59946d95a573": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "QQQ"
+        ]
+      },
+      "first_seen": "2026-08-31T22:35:52.808108+00:00",
+      "lead_id": "lead_cdb0ccfa2a76b719f80a59946d95a573",
+      "media": [
+        {
+          "cache": {
+            "bytes": 86121,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_cdb0ccfa2a76b719f80a59946d95a573/13_2094515156776886272.jpg",
+            "sha256": "0603d3ea2797229ef0ed2520ec4e956be278275ece2c36f36ad377c447dc0e52"
+          },
+          "duration_ms": 12864,
+          "height": 720,
+          "media_key": "13_2094515156776886272",
+          "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2094515156776886272/img/GJLqUP8OfWHrGdaR.jpg",
+          "type": "video",
+          "width": 1280
+        }
+      ],
+      "published_at": "2026-08-31T20:01:46.000Z",
+      "raw_text": "Interesting to see $QQQ spike when Trump gave a comment on potential rate hikes:\n\nAnswer: \"Trump: No, I have a lot of respect for him, and he'll do what he has to do.\n\nI think our interest rates are too high.\" https://t.co/vKwUWbUfHx",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "Interesting to see $QQQ spike when Trump gave a comment on potential rate hikes: Answer: \"Trump: No, I have a lot of respect for him, and he'll do what he has to do. I think our interest rates are too high.\" https://t.co/vKwUWbUfHx",
+      "triage": {
+        "decided_at": "2026-08-31T22:39:03.872062+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "只有 QQQ 對政治人物利率評論的短線價格反應，屬市場情緒；Beta 擇時訊號已移除，且不形成可持久化研究 claim。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2094516012557427002"
     },
     "lead_cdd584e252b586185333a12973d7d69f": {
       "entities": {
@@ -51505,8 +52147,8 @@
   "schema_version": "2",
   "source_state": {
     "x:aleabitoreddit": {
-      "since_id": "2094365307876040857",
-      "updated_at": "2026-08-31T10:41:56.688032+00:00",
+      "since_id": "2094516012557427002",
+      "updated_at": "2026-08-31T22:35:52.815138+00:00",
       "user_id": "1940360837547565056"
     }
   }

@@ -5824,6 +5824,19 @@
       "source": "source_trace",
       "title": "追原報告／來源 access — The more I look at ESMT, the more excited I get researching legacy memory themes. So looked through H1 sellside models... From March ESMT reports: Huanan: DDR3 4Gb ASP +50% QoQ in Q2 Fubon: cited r...",
       "type": "source_trace_review"
+    },
+    {
+      "added_at": "2026-08-31T22:54:05.476505+00:00",
+      "graph_impact": "+1 節點、0 邊、1 claims｜來源：Soitec management (Reuters interview)（tier 2）",
+      "hint": "核准 exact graph delta；Decision handoff：co:soitec。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 353,
+      "reason": null,
+      "ref_id": "ra_0bfedcf53d4c47001064cb00de130071",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "Soitec 多年期晶圓供應／產能保留合約——客戶訂金屬實，但客戶、份額與營收底線仍未核實",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -13040,6 +13053,6 @@
       "verb": "source_cleared"
     }
   ],
-  "next_n": 353,
+  "next_n": 354,
   "schema_version": "1"
 }
