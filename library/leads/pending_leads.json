@@ -31660,11 +31660,11 @@
           "TFC Communication 天孚通信 (SZSE: 300394)",
           "Browave 波若威 (TWSE: 3163)"
         ],
-        "parked_reason": "新 trigger 只重複生態系名單與光纖架構，沒有把公司對應到 fiber 子層；維持 partial。",
+        "parked_reason": "一手已回答:該層多供應商(五家)非瓶頸,無入圖必要;terminal(original_obtained),不需重查",
         "primary_url": "https://developer.nvidia.com/blog/how-industry-collaboration-fosters-nvidia-co-packaged-optics/",
-        "research_outcome": "無新 graph delta；等待供應商或 NVIDIA 具名角色與量。",
+        "research_outcome": "否定結果:光纖/連接器層由客戶端(NVIDIA)具名五家分攤,非 sole_source、替代性高,不是瓶頸候選;不值得為此層 onboard 五家公司。若未來單一子角色(如 FAU)出現獨供證據再開新 lead",
         "research_run": "session:2026-08-29-decompose-drain",
-        "trace_attempts_ref": "2026-08-31：重查 NVIDIA 官方 PR／技術 blog；確認 laser input fiber 與合作名單，仍沒有 Browave、Corning、Sumitomo、TFC 的角色或集中度拆分。",
+        "trace_attempts_ref": "NVIDIA developer blog(客戶端一手,逐字已核):fiber/connector 層=Browave+Corning+Senko+TFC Communication+Coherent 五家(原句:Industry experts with optical connectors and fiber assemblies for linking the ELS lasers with polarization, maintaining fibers into the silicon photonics engine);ELS assembly/alignment/test=Lumentum+Sumitomo+Coherent 三家;SPIL=CPO MCM 封裝;Foxconn+Fabrinet=系統組裝",
         "trace_next_trigger": "TFC（300394.SZ）或 Browave（3163.TW）法說／公告具名揭露 NVIDIA CPO 供應內容與量",
         "trace_requeue_consumed_entities": [
           "CO:NVIDIA",
@@ -31673,7 +31673,7 @@
         "trace_requeue_trigger": "related_triaged_lead:lead_b7fb056592186e1d35d8da16f3b7c0b7",
         "trace_requeued_at": "2026-08-31T10:44:09.687187+00:00",
         "trace_requires_user": "false",
-        "trace_status": "partial",
+        "trace_status": "original_obtained",
         "trace_trigger_entities": [
           "5802.T",
           "GLW",
@@ -31687,7 +31687,7 @@
         "trace_trigger_watch_ref": "ew_0039_2026-08-31"
       },
       "source": "decompose:nvda-cpo-switch-2026-08-29",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -41489,6 +41489,7 @@
       "refs": {
         "parked_reason": "NVIDIA 官方確認自研 MRM engine 每波長 200Gbps PAM4 與 TSMC 協作，但仍未具名 MRM 製造分工，也無 Broadcom EML／MZM 互斥比較",
         "primary_url": "https://developer.nvidia.com/blog/how-industry-collaboration-fosters-nvidia-co-packaged-optics/",
+        "research_action_id": "ra_1285703d121c7f310d571737c5e711ca",
         "research_outcome": "architecture_confirmed_supplier_set_unknown_no_ra",
         "research_run": "daily:2026-08-28",
         "trace_attempts_ref": "NVIDIA CPO 技術博客、GTC 資料與 Broadcom 公開頁面搜尋",
@@ -41509,7 +41510,7 @@
         "trace_trigger_kind": "primary_source_signal"
       },
       "source": "system_decompose",
-      "status": "researching",
+      "status": "action_prepared",
       "themes": {
         "cpo": {
           "counter_only": false,

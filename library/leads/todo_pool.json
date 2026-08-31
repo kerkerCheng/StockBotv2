@@ -5213,14 +5213,14 @@
       "dispatch_status": "awaiting_approval",
       "dispatch_updated_at": "2026-08-31T16:32:26.391984+00:00",
       "dispatched_at": "2026-08-31T16:18:20.273563+00:00",
-      "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "hint": "當前 missing_data：backlog 觀測提案 [347]（po_00af4ef0efa9dfe5f5a62412d02bb0a6）核准與寫入；customer_concentration：日本／JARE 佔營收比重（FY26 全年報告可查，尚未核對）（共 2 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 314,
       "reason": null,
       "ref_id": "dc_48446dbceb85d4b785634e3c4ca5d669",
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
-      "title": "co:lynas：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "title": "co:lynas：補客戶端商業承諾：訂單、產能協議或預付款等付錢方向的證據",
       "type": "decision_review"
     },
     {
@@ -5769,6 +5769,19 @@
       "source": "decision_lab",
       "title": "co:nvidia：殘餘缺口——MRM 良率數字改判結構性不可得:TSMC 不揭露 wafer/die 良率,公開唯一量化是 BER<1E-08(process-contr",
       "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-31T16:41:37.837663+00:00",
+      "graph_impact": "+4 節點、3 邊、2 claims｜來源：TrendForce（tier 2）",
+      "hint": "核准 exact graph delta；Decision handoff：co:tsmc。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 349,
+      "reason": null,
+      "ref_id": "ra_1285703d121c7f310d571737c5e711ca",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "MRM 層補節點——TSMC COUPE 200G MRM 排定 2026 下半量產（decompose 懸缺層落地）",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -12976,6 +12989,6 @@
       "verb": "pq1_awaiting_approval"
     }
   ],
-  "next_n": 349,
+  "next_n": 350,
   "schema_version": "1"
 }
