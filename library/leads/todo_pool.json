@@ -5208,8 +5208,10 @@
       "added_at": "2026-08-31T02:45:27.304373+00:00",
       "dispatch_attempt": 2,
       "dispatch_baseline_decision_id": "pd_5ebd5b05db7a6058087fc66b5be8e2b5",
+      "dispatch_receipt": "decision:pd_acc2c1319f9cfa627df4f38ee95e7f79;manual_todo:347",
       "dispatch_ref": "wo_9b764804f4ae09b33859b29a9c6a9a64",
-      "dispatch_status": "queued",
+      "dispatch_status": "awaiting_approval",
+      "dispatch_updated_at": "2026-08-31T16:32:26.391984+00:00",
       "dispatched_at": "2026-08-31T16:18:20.273563+00:00",
       "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 314,
@@ -5735,7 +5737,37 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
+      "source_cleared": {
+        "at": "2026-08-31T16:29:32.145069+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
       "title": "co:foci：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-31T16:29:32.145069+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-03-10T00:00:00+00:00；來源=Lynas Rare Earths Ltd ASX announcement 2026-03-10 ENHANCED JARE AGREEMENT FOR JA",
+      "n": 347,
+      "reason": null,
+      "ref_id": "po_00af4ef0efa9dfe5f5a62412d02bb0a6",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "engine_c",
+      "title": "Engine C 觀測：LYC.AX / backlog",
+      "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-08-31T16:29:32.145069+00:00",
+      "hint": "當前 missing_data：MRM 良率數字改判結構性不可得:TSMC 不揭露 wafer/die 良率,公開唯一量化是 BER<1E-08(pro（共 1 項）｜go（大項）＝reassess 後以 assessment_gap 排入 pq1，研究範圍：source_reliability_corroboration_incomplete。產出為 assessment／研究包，完成後 reassess 以新 decision receipt 結案",
+      "n": 348,
+      "reason": null,
+      "ref_id": "dc_fdab434d1fad67666c57a6eefd379337",
+      "residual_digest": "1fcca31737d35b06",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:nvidia：殘餘缺口——MRM 良率數字改判結構性不可得:TSMC 不揭露 wafer/die 良率,公開唯一量化是 BER<1E-08(process-contr",
       "type": "decision_review"
     }
   ],
@@ -12915,8 +12947,35 @@
       "ref_id": "dc_fdab434d1fad67666c57a6eefd379337",
       "type": "decision_review",
       "verb": "go"
+    },
+    {
+      "at": "2026-08-31T16:29:32.145069+00:00",
+      "n": 346,
+      "reason": "來源本輪成功執行，但不再產出此項",
+      "receipt": null,
+      "ref_id": "dc_6b92df56a6d186eb7464479dfb9c48c3",
+      "type": "decision_review",
+      "verb": "source_cleared"
+    },
+    {
+      "at": "2026-08-31T16:32:25.668310+00:00",
+      "n": 314,
+      "reason": null,
+      "receipt": "wo:wo_9b764804f4ae09b33859b29a9c6a9a64",
+      "ref_id": "dc_48446dbceb85d4b785634e3c4ca5d669",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-08-31T16:32:26.391984+00:00",
+      "n": 314,
+      "reason": "bounded research 完成:JARE firm offtake(至2038/5000tpa NdPr/floor US$110/50% HRE)+Sojitz 客戶端進口公告已逐字核對;backlog 觀測提案 [347] 已備,核准寫入後 reassess 即清 CM",
+      "receipt": "decision:pd_acc2c1319f9cfa627df4f38ee95e7f79;manual_todo:347",
+      "ref_id": "dc_48446dbceb85d4b785634e3c4ca5d669",
+      "type": "decision_review",
+      "verb": "pq1_awaiting_approval"
     }
   ],
-  "next_n": 347,
+  "next_n": 349,
   "schema_version": "1"
 }
