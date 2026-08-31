@@ -35115,9 +35115,14 @@
       "first_seen": "2026-08-31T05:27:05.235763+00:00",
       "lead_id": "lead_a9de791efdbd4c8c5571536f5d62d81e",
       "published_at": "2026-03-27",
-      "refs": {},
+      "refs": {
+        "parked_reason": "文件已入庫並被 [313] 消費;terminal,不需重查",
+        "research_outcome": "已由 [313] 工單全額消費,無殘餘工作",
+        "trace_attempts_ref": "20-F 原文已在 library/raw/himx_20_f_20260327.txt,[313] Himax 工單已消費;關鍵否定發現已記入 assessment_himax_2026-09-01:20-F FY2025 未揭露 COUPE/WLO 供應關係,僅 2024 年與 FOCI 的 CPO 技術合作陳述",
+        "trace_status": "original_obtained"
+      },
       "source": "edgar:HIMX",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "HIMX 20-F filed 2026-03-27",
       "triage": {
@@ -40001,9 +40006,15 @@
       "media": [],
       "published_at": "2026-08-30T11:07:29.000Z",
       "raw_text": "FYI to the AI bears: $NVDA projects $1.3T of hyperscaler spend for 2027.\n\nUp from ~$800B in 2026, alongside ~70% revenue growth despite remaining capacity constrained… far above prior Street expectations of ~45%.\n\nThat capex flows across the AI supply chain… from memory and networking to foundries. Especially through the new bottlenecks/chokepoints that didn’t benefit from older generations.\n\nWe’re like 2 hours into the party where people started off drinking Sapporo draft beer.\n\nSomeone spiked Situational’s drinks and we had to pause the party for 30 min.\n\nBut now it’s back on with tequila shots on the table.\n\nI think the real party is about to begin.",
-      "refs": {},
+      "refs": {
+        "parked_reason": "已由圖中既有 Q2 FY27 來源涵蓋;推文數字核實無失真,純信心強化不入圖",
+        "research_outcome": "需求錨量化更新,無新結構事實;圖中 NVDA Q2 FY27 來源已涵蓋同一場法說,不重複入圖",
+        "trace_attempts_ref": "推文數字對上 NVDA Q2 FY27 法說(2026-08-26)逐字:cloud industry backlog now greater than $2 trillion + top5 hyperscaler capex nearly $800B(2026)/$1.3T(2027);來源文件 nvda_8k_ex991/ex992 已入圖",
+        "trace_original_url": "https://www.fool.com/earnings/call-transcripts/2026/08/31/nvidia-nvda-q2-2027-earnings-call-transcript/",
+        "trace_status": "tier_1_2_honest_passthrough"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
