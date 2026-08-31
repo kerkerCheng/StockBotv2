@@ -1,0 +1,61 @@
+{
+  "claims": [
+    {
+      "confidence": 0.72,
+      "demand_proof_level": "guided",
+      "disproof_condition": "Downgrade if executed agreements do not appear in subsequent statutory filings as backlog, contract liabilities or disclosed capacity reservations; upgrade only after a named customer or statutory filing corroborates the commitment.",
+      "id": "reuters_soitec_capacity_reservations_2026_08_31_cl1",
+      "source_ids": [
+        "reuters_soitec_capacity_reservations_2026_08_31_s1",
+        "reuters_soitec_capacity_reservations_2026_08_31_s2"
+      ],
+      "statement": "Soitec management states that the company is entering more than ten multi-year wafer-supply and capacity-reservation agreements. Customers pay deposits in installments; deposits are refundable if contracted volumes are met and forfeited otherwise. This is customer-to-Soitec costly commitment, but all counterparties remain unnamed and the statement is not customer-corroborated.",
+      "subject_id": "co:soitec"
+    }
+  ],
+  "edges": [],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "SOI.PA",
+        "Soitec S.A."
+      ],
+      "attributes": {},
+      "confidence": 0.8,
+      "id": "co:soitec",
+      "name": "Soitec",
+      "role": null,
+      "source_ids": [
+        "reuters_soitec_capacity_reservations_2026_08_31_s1"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "reuters_soitec_capacity_reservations_2026_08_31",
+    "evidence_tier": 2,
+    "origin_entity": "Soitec management (Reuters interview)",
+    "permission_basis": "Public Reuters interview; canonical URL and short excerpts retained.",
+    "published_at": "2026-08-31",
+    "publisher": "Reuters / Boursorama",
+    "retrieved_at": "2026-09-01",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Soitec signs multi-year customer contracts as AI wafer demand surges",
+    "url": "https://www.boursorama.com/bourse/actualites/soitec-conclut-des-contrats-pluriannuels-avec-ses-clients-alors-que-la-demande-en-plaquettes-pour-l-ia-explose-dc7e183c930d3855f05e3b45986f3169"
+  },
+  "sources": [
+    {
+      "id": "reuters_soitec_capacity_reservations_2026_08_31_s1",
+      "locator": "CEO interview — contract count and form",
+      "quote": "more than 10 multi-year wafer supply and capacity reservation agreements"
+    },
+    {
+      "id": "reuters_soitec_capacity_reservations_2026_08_31_s2",
+      "locator": "CEO interview — deposit mechanism",
+      "quote": "deposits in several installments"
+    }
+  ]
+}
