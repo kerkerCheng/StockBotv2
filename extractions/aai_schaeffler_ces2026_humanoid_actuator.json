@@ -1,0 +1,90 @@
+{
+  "claims": [
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "guided",
+      "disproof_condition": "若該致動器至 2027 年底未取得任何具名客戶量產採用、或後續揭露顯示關鍵元件（馬達磁材、編碼器）外購而非自製，則「全自製整合致動器」的定位陳述失效。核查頻率：每季與各大展會後；觸發後 48 小時內人工 review。",
+      "id": "aai_schaeffler_ces2026_humanoid_actuator_cl1",
+      "source_ids": [
+        "aai_schaeffler_ces2026_humanoid_actuator_s1",
+        "aai_schaeffler_ces2026_humanoid_actuator_s2"
+      ],
+      "statement": "Schaeffler 於 CES 2026 發表人形機器人整合致動器，單一模組整合「two-stage planetary gearbox, an electric motor, as well as encoders and controllers」，扭矩 60–250 Nm，強調 back-drivability 與熱穩定，並宣稱所有元件來自自家開發與生產。⚠ 此產品用的是**兩級行星齒輪箱，不是諧波減速器也不是滾柱絲槓**——與 Ewellix 的線性滾柱絲槓產品線是不同路線，不得合併敘述。垂直整合宣稱為 Schaeffler 自報。",
+      "subject_id": "co:schaeffler"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "prod:schaeffler_humanoid_actuator_ces2026",
+      "id": "e1",
+      "relation": "develops",
+      "source_ids": [
+        "aai_schaeffler_ces2026_humanoid_actuator_s1",
+        "aai_schaeffler_ces2026_humanoid_actuator_s2"
+      ],
+      "src_id": "co:schaeffler"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "robot_subsystem",
+      "aliases": [
+        "Schaeffler AG"
+      ],
+      "attributes": {
+        "ticker": "SHA0.DE"
+      },
+      "confidence": 0.9,
+      "id": "co:schaeffler",
+      "name": "Schaeffler",
+      "role": "robot_component_supplier",
+      "source_ids": [
+        "aai_schaeffler_ces2026_humanoid_actuator_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "robot_subsystem",
+      "aliases": [
+        "Schaeffler humanoid actuator"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "prod:schaeffler_humanoid_actuator_ces2026",
+      "name": "Schaeffler 人形機器人整合致動器（CES 2026，60–250 Nm）",
+      "role": "robot_component_supplier",
+      "source_ids": [
+        "aai_schaeffler_ces2026_humanoid_actuator_s1"
+      ],
+      "type": "Product"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "aai_schaeffler_ces2026_humanoid_actuator",
+    "evidence_tier": 3,
+    "origin_entity": "all-about-industries（獨立產業媒體，報導 CES 2026 發表）",
+    "permission_basis": "第三方產業媒體；保留 canonical URL 與研究必要短引述。",
+    "published_at": "2026-01-09",
+    "publisher": "all-about-industries",
+    "retrieved_at": "2026-08-31",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Schaeffler Presents A Compact Actuator for Humanoids With Gearbox, Motor, Encoder, And Controller",
+    "url": "https://www.all-about-industries.com/schaeffler-presents-compact-actuator-for-humanoids-with-gearbox-motor-encoder-and-controller-a-44c8648032998885d9ebd2bca635fb19/"
+  },
+  "sources": [
+    {
+      "id": "aai_schaeffler_ces2026_humanoid_actuator_s1",
+      "locator": "致動器組成",
+      "quote": "a two-stage planetary gearbox, an electric motor, as well as encoders and controllers"
+    },
+    {
+      "id": "aai_schaeffler_ces2026_humanoid_actuator_s2",
+      "locator": "垂直整合宣稱",
+      "quote": "its own development and production"
+    }
+  ]
+}

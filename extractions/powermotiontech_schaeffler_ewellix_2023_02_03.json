@@ -1,0 +1,125 @@
+{
+  "claims": [
+    {
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "若 Schaeffler 出售或分拆 Ewellix 線性事業、或後續財報顯示滾柱絲槓業務未隨人形機器人需求成長，則「Schaeffler 在該層有結構位置」的推論減弱。核查頻率：每季財報；觸發後 48 小時內人工 review。",
+      "id": "powermotiontech_schaeffler_ewellix_2023_02_03_cl1",
+      "source_ids": [
+        "powermotiontech_schaeffler_ewellix_2023_02_03_s1",
+        "powermotiontech_schaeffler_ewellix_2023_02_03_s2",
+        "powermotiontech_schaeffler_ewellix_2023_02_03_s3"
+      ],
+      "statement": "Schaeffler 於 2023-01-03 完成對 Ewellix Group 的收購（2022-07 宣布，股權交易）。Ewellix 的機電工業致動器、升降柱與**滾柱絲槓**用於機器人、醫療技術等領域；Schaeffler 工業自動化負責人具名表示目標是成為「global leaders in linear motion and electromechanical actuation」。這使 Schaeffler 直接位於滾柱絲槓這一層。",
+      "subject_id": "co:schaeffler"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "co:ewellix",
+      "id": "e1",
+      "relation": "acquired",
+      "source_ids": [
+        "powermotiontech_schaeffler_ewellix_2023_02_03_s1",
+        "powermotiontech_schaeffler_ewellix_2023_02_03_s2"
+      ],
+      "src_id": "co:schaeffler"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:planetary_roller_screw",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "powermotiontech_schaeffler_ewellix_2023_02_03_s1"
+      ],
+      "src_id": "co:ewellix"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "robot_subsystem",
+      "aliases": [
+        "Schaeffler AG"
+      ],
+      "attributes": {
+        "ticker": "SHA0.DE"
+      },
+      "confidence": 0.9,
+      "id": "co:schaeffler",
+      "name": "Schaeffler",
+      "role": "robot_component_supplier",
+      "source_ids": [
+        "powermotiontech_schaeffler_ewellix_2023_02_03_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "robot_subsystem",
+      "aliases": [
+        "Ewellix Group",
+        "Ewellix AB"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:ewellix",
+      "name": "Ewellix",
+      "role": "robot_component_supplier",
+      "source_ids": [
+        "powermotiontech_schaeffler_ewellix_2023_02_03_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "robot_subsystem",
+      "aliases": [
+        "planetary roller screw",
+        "PRS",
+        "roller screw",
+        "滾柱絲槓"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:planetary_roller_screw",
+      "name": "行星滾柱絲槓（planetary roller screw）",
+      "source_ids": [
+        "powermotiontech_schaeffler_ewellix_2023_02_03_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "powermotiontech_schaeffler_ewellix_2023_02_03",
+    "evidence_tier": 3,
+    "origin_entity": "Power & Motion（獨立產業媒體，非 Schaeffler 自家發布）",
+    "permission_basis": "第三方產業媒體；保留 canonical URL 與研究必要短引述。",
+    "published_at": "2023-02-03",
+    "publisher": "Power & Motion",
+    "retrieved_at": "2026-08-31",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "This Week in Power & Motion: Schaeffler Completes Ewellix Acquisition",
+    "url": "https://www.powermotiontech.com/news/article/21259306/this-week-in-power-motion-schaeffler-completes-ewellix-acquisition"
+  },
+  "sources": [
+    {
+      "id": "powermotiontech_schaeffler_ewellix_2023_02_03_s1",
+      "locator": "Ewellix 產品與應用領域",
+      "quote": "Ewellix electromechanical industrial actuators, lifting columns and roller screws are used in sectors such as robotics, medical technology"
+    },
+    {
+      "id": "powermotiontech_schaeffler_ewellix_2023_02_03_s2",
+      "locator": "Schaeffler 高管具名引述（Ralf Moseberg, Head of Industrial Automation）",
+      "quote": "global leaders in linear motion and electromechanical actuation"
+    },
+    {
+      "id": "powermotiontech_schaeffler_ewellix_2023_02_03_s3",
+      "locator": "Schaeffler 高管具名引述（Dr. Stefan Spindler, CEO Schaeffler Industrial）",
+      "quote": "This is particularly true in the high-growth areas of electromechanics, efficiency optimization, automation, and robotics"
+    }
+  ]
+}

@@ -1,0 +1,155 @@
+{
+  "claims": [
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "若 Humanoid 公告終止或縮減該 preferred supplier 安排、實際採購份額低於 50%、或至 2027 年底德國兩站點的初期部署（2026-12～2027-06）未發生，則此客戶端印證失效。核查頻率：每季；觸發後 48 小時內人工 review。",
+      "id": "thehumanoid_schaeffler_supply_deal_2026_cl1",
+      "source_ids": [
+        "thehumanoid_schaeffler_supply_deal_2026_s1",
+        "thehumanoid_schaeffler_supply_deal_2026_s2"
+      ],
+      "statement": "客戶端具名：機器人開發商 Humanoid 在自家公告中指定 Schaeffler 為 preferred supplier，涵蓋其輪式平台**逾 50% 的關節致動器需求、至 2031 年**，五年供貨期內為七位數（≥100 萬）顆致動器。這是本圖 Schaeffler 首份非自報的客戶端文件。",
+      "subject_id": "co:schaeffler"
+    },
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "若後續揭露顯示兩側交易金額顯著不對等（例如致動器供貨額遠大於機器人採購額），或出現第三方客戶以相同條件指定 Schaeffler，則可重新評估為單向客戶承諾並上修證據等級。核查頻率：每季財報與新客戶公告；觸發後 48 小時內人工 review。",
+      "id": "thehumanoid_schaeffler_supply_deal_2026_cl2",
+      "source_ids": [
+        "thehumanoid_schaeffler_supply_deal_2026_s3",
+        "thehumanoid_schaeffler_supply_deal_2026_s4"
+      ],
+      "statement": "⚠ 這是**互惠交易，不是單向客戶資本承諾**：同一份協議中 Schaeffler 反過來是採購方——Humanoid 提供機器人系統與端到端部署服務，Schaeffler 將於 2032 年前在其全球廠區部署四位數台輪式機器人。公告中**未揭露任何股權、認股權證、預付款或資本轉移**。因此 payment_direction 判為 unclear 而非 customer_to_supplier——雙方互為對方客戶時，任一方的具名都不構成獨立的瓶頸佐證（POET 以認股權證換訂單一案的同型推廣）。",
+      "subject_id": "co:schaeffler"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {
+        "qualification_status": "designed_in"
+      },
+      "confidence": 0.85,
+      "dst_id": "co:humanoid",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "thehumanoid_schaeffler_supply_deal_2026_s1",
+        "thehumanoid_schaeffler_supply_deal_2026_s2"
+      ],
+      "src_id": "co:schaeffler"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "comp:humanoid_precision_actuators",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "thehumanoid_schaeffler_supply_deal_2026_s1"
+      ],
+      "src_id": "co:schaeffler"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "co:schaeffler",
+      "id": "e3",
+      "relation": "supplies_to",
+      "source_ids": [
+        "thehumanoid_schaeffler_supply_deal_2026_s3",
+        "thehumanoid_schaeffler_supply_deal_2026_s4"
+      ],
+      "src_id": "co:humanoid"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "robot_subsystem",
+      "aliases": [
+        "Schaeffler AG"
+      ],
+      "attributes": {
+        "ticker": "SHA0.DE"
+      },
+      "confidence": 0.9,
+      "id": "co:schaeffler",
+      "name": "Schaeffler",
+      "role": "robot_component_supplier",
+      "source_ids": [
+        "thehumanoid_schaeffler_supply_deal_2026_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "robot_system",
+      "aliases": [
+        "thehumanoid.ai"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:humanoid",
+      "name": "Humanoid",
+      "role": "robot_oem",
+      "source_ids": [
+        "thehumanoid_schaeffler_supply_deal_2026_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "robot_subsystem",
+      "aliases": [
+        "precision actuators",
+        "series elastic actuators",
+        "quasi-direct-drive motors",
+        "precision reducers"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "comp:humanoid_precision_actuators",
+      "name": "Humanoid precision actuators (series elastic / quasi-direct-drive / precision reducers)",
+      "role": "robot_component_supplier",
+      "source_ids": [
+        "thehumanoid_schaeffler_supply_deal_2026_s1"
+      ],
+      "type": "Product"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "thehumanoid_schaeffler_supply_deal_2026",
+    "evidence_tier": 2,
+    "origin_entity": "Humanoid（機器人開發商，即採購方自家公告——客戶端文件）",
+    "permission_basis": "交易對手方公開新聞稿；保留 canonical URL 與研究必要短引述。",
+    "published_at": "2026-01-01",
+    "publisher": "Humanoid",
+    "retrieved_at": "2026-08-31",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Humanoid Secures Landmark Deal with Schaeffler to Deploy Thousands of Humanoid Robots",
+    "url": "https://thehumanoid.ai/humanoid-secures-landmark-deal-with-schaeffler-to-deploy-thousands-of-humanoid-robots/"
+  },
+  "sources": [
+    {
+      "id": "thehumanoid_schaeffler_supply_deal_2026_s1",
+      "locator": "preferred supplier 條款",
+      "quote": "Schaeffler will become Humanoid's preferred supplier, covering more than 50% of the company's demand for joint actuators for its wheeled-based platforms through 2031"
+    },
+    {
+      "id": "thehumanoid_schaeffler_supply_deal_2026_s2",
+      "locator": "供貨規模",
+      "quote": "seven-digit number of actuators"
+    },
+    {
+      "id": "thehumanoid_schaeffler_supply_deal_2026_s3",
+      "locator": "反向義務——Schaeffler 同時是採購方",
+      "quote": "Humanoid provides the robotic systems together with the related services required for end-to-end deployment and operation"
+    },
+    {
+      "id": "thehumanoid_schaeffler_supply_deal_2026_s4",
+      "locator": "部署規模與時程",
+      "quote": "four-digit number of wheeled units across Schaeffler's global facilities by 2032"
+    }
+  ]
+}

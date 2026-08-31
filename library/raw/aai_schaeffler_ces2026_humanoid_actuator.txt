@@ -1,0 +1,4 @@
+Source URL: https://www.all-about-industries.com/schaeffler-presents-compact-actuator-for-humanoids-with-gearbox-motor-encoder-and-controller-a-44c8648032998885d9ebd2bca635fb19/
+
+Excerpt:
+The actuator combines a two-stage planetary gearbox, an electric motor, as well as encoders and controllers in one integrated unit; torque range 60 to 250 Nm. Presented at CES 2026. (all-about-industries, 2026-01-09)
