@@ -5263,6 +5263,18 @@
       "source": "manual",
       "title": "Tower→PH18DA sub=4 判斷 addendum 入圖（[271] packet）：平台鎖定→sub 4、design-win 階段競爭為 disproof 軸",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-08-31T05:47:37.304587+00:00",
+      "hint": "核准 exact graph delta；Decision handoff：co:axt。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 320,
+      "reason": null,
+      "ref_id": "ra_c218098e1ebd648b33920531d929c6c7",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "AXT 雙客戶資本承諾：Coherent 預付 $22.29M 綁 6 吋 InP 產能（3 年）＋Lumentum $87M 押金保留產能至 2031——客戶端掏錢的真瓶頸訊號",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -11954,6 +11966,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 320,
+  "next_n": 321,
   "schema_version": "1"
 }

@@ -5560,6 +5560,162 @@
       "result": "ok",
       "run_at": "2026-08-30T22:32:54.746720+00:00",
       "source": "edgar:TSM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-31T05:26:55.961249+00:00",
+      "source": "mfn:sivers-semiconductors"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-31T05:26:57.153066+00:00",
+      "source": "sivers:press"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-31T05:26:57.838341+00:00",
+      "source": "yahoo:iqe-l"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-08-31T05:26:58.080902+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-31T05:26:59.726538+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-31T05:27:00.419333+00:00",
+      "source": "edgar:AEVA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-31T05:27:01.113439+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-31T05:27:01.626744+00:00",
+      "source": "edgar:AVGO"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-31T05:27:02.327192+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-31T05:27:03.000848+00:00",
+      "source": "edgar:CCXI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-31T05:27:03.795611+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-31T05:27:04.493047+00:00",
+      "source": "edgar:GFS"
+    },
+    {
+      "new": 8,
+      "result": "ok",
+      "run_at": "2026-08-31T05:27:05.235916+00:00",
+      "source": "edgar:HIMX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-31T05:27:05.932246+00:00",
+      "source": "edgar:JBL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-31T05:27:06.630405+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-31T05:27:07.326599+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-31T05:27:08.012395+00:00",
+      "source": "edgar:META"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-31T05:27:08.703550+00:00",
+      "source": "edgar:MP"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-31T05:27:09.244190+00:00",
+      "source": "edgar:MRVL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-31T05:27:09.977272+00:00",
+      "source": "edgar:MTSI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-31T05:27:10.483104+00:00",
+      "source": "edgar:MU"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-31T05:27:11.017900+00:00",
+      "source": "edgar:NVDA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-31T05:27:11.709191+00:00",
+      "source": "edgar:POET"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-31T05:27:12.417797+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-31T05:27:12.964635+00:00",
+      "source": "edgar:TSLA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-08-31T05:27:13.693420+00:00",
+      "source": "edgar:TSM"
     }
   ],
   "leads": {
@@ -6792,6 +6948,32 @@
         "tier": 3
       },
       "url": "https://www.proactiveinvestors.co.uk/companies/news/1091312/iqe-shares-fall-19-after-81m-fundraise-priced-at-steep-discount-1091312.html?.tsrc=rss"
+    },
+    "lead_04e8454c97fb63285ace44dfa133837f": {
+      "entities": {
+        "company_ids": [
+          "co:himax"
+        ],
+        "tickers": [
+          "HIMX"
+        ]
+      },
+      "first_seen": "2026-08-31T05:27:05.235680+00:00",
+      "lead_id": "lead_04e8454c97fb63285ace44dfa133837f",
+      "published_at": "2026-05-07",
+      "refs": {},
+      "source": "edgar:HIMX",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "HIMX 6-K filed 2026-05-07",
+      "triage": {
+        "decided_at": "2026-08-31T05:31:50.393008+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "HIMX 6-K 2026-05-07（Q1 2026 財報時點）：冷啟動舊 filing，已被 Q2 財報時間覆蓋",
+        "tier": 2
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1342338/000117184326003097/f6k_050726.htm"
     },
     "lead_061fe889e9090fd14b4711fafda3fafe": {
       "entities": {
@@ -8178,6 +8360,39 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2078342936035823828"
+    },
+    "lead_0e8667f7227314b6492fe56c8b0f2fcd": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-08-31T05:26:58.059272+00:00",
+      "lead_id": "lead_0e8667f7227314b6492fe56c8b0f2fcd",
+      "media": [],
+      "published_at": "2026-08-31T04:28:22.000Z",
+      "raw_text": "ESMT (3006) is 1.9x P/E ratio off July's earnings annualized. \n\nLatest net income was: $109M net income/July, which is ~$1.3B annualized. With ~$395.9M net cash and with $249.6M in inventory.\n\nThe market cap less net cash and inventory is equivalent to: \n\n~17 months of July earnings.\n\nWhere monetizing that inventory benefits from rising memory prices. \n\nTheir ASP hike expectations were +105–113% Q/Q last quarter from other analyst notes. \n\nDDR2/DDR3, NOR Flash, SLC NAND, prices are expected to keep rising H2. \n\nThe main question is duration, but I personally think legacy DRAM/NAND shortages tightens throughout 2027. Others might disagree. \n\nOther analysts like Huanan argue that PSMC wafer hikes are largely pass through (we'll find out H2). \n\nMost people are finding companies with ~20 forward P/E ending 2028 to be attractive...\n\nBut 1.9x current runrate P/E seems like an anomaly to me personally. \n\nThat's my take on the company/legacy memory theme, I'll let others/markets decide if that's undervalued.",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "researching",
+      "themes": {},
+      "title": "ESMT (3006) is 1.9x P/E ratio off July's earnings annualized. Latest net income was: $109M net income/July, which is ~$1.3B annualized. With ~$395.9M net cash and with $249.6M in inventory. The market cap less net cash and inventory is equivalent to: ~17 months of July earnings. Where monetizing that inventory benefits from rising memory prices. Their ASP hike expectations were +105–113% Q/Q last quarter from other analyst notes. DDR2/DDR3, NOR Flash, SLC NAND, prices are expected to keep rising H2. The main question is duration, but I personally think legacy DRAM/NAND shortages tightens throughout 2027. Others might disagree. Other analysts like Huanan argue that PSMC wafer hikes are largely pass through (we'll find out H2). Most people are finding companies with ~20 forward P/E ending 2028 to be attractive... But 1.9x current runrate P/E seems like an anomaly to me personally. That's my take on the company/legacy memory theme, I'll let others/markets decide if that's undervalued.",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-31T05:31:33.841816+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "candidate_set",
+          "reason": "查證為真則 legacy memory 主題候選清單多一個名字（3006 未入圖）"
+        },
+        "decided_at": "2026-08-31T05:31:33.841816+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "aleabitoreddit（已登記來源）legacy memory 主題：ESMT 晶豪科（3006.TWO）P/E 1.9x（7月年化）、net cash 395.9M、存貨 249.6M、ASP 前季預期 +105-113% QoQ。關聯性：legacy DRAM/NAND 短缺主題與 MU take-or-pay 同鏈；可引用性：數字具體可由 MOPS 月營收與財報核對；新穎性：3006 不在圖中",
+        "tier": 3
+      },
+      "url": "https://x.com/aleabitoreddit/status/2094281116421370213"
     },
     "lead_0f0fc6255a25848dd10cf6e205e7f427": {
       "entities": {
@@ -10675,7 +10890,7 @@
       "raw_text": "The more I look at ESMT, the more excited I get researching legacy memory themes. \n\nSo looked through H1 sellside models...\n\nFrom March ESMT reports:\nHuanan: DDR3 4Gb ASP +50% QoQ in Q2\nFubon: cited roughly +40% Q2 DRAM pricing\n\nBy August... Huanan was citing ESMT Q2 ASP growth of: \n+105–113% Q/Q blended. \n\nSaying DDR3 pricing had come in substantially better than expected. \n\nSo legacy memory pricing translated into much more operating leverage at ESMT. \n\nAbout PSMC wafer cost hikes: Huanan estimated manufacturing costs could rise ~100% in 2H26, but customers remained highly willing to accept the pass-through\n\nIf we look at July net income was roughly $109M...  way above the earnings levels the earlier models were built around.\n\nIf I had to give a TLDR \"consensus\" of reports\n\n1. DDR3/DDR2 supply remains structurally tight as competitors move capacity toward higher-value memory.\n2. Concord saw no conditions supporting a price reversal during 2026.\n3. Concord expected contract-price increases to cover higher foundry costs.\n4. Huanan later found that customer willingness to accept those cost increases was stronger than expected.\n\nFun thing I read from Huanan was DDR3 is used in products such as IP cameras and HDDs where the memory component is a relatively small part of the customer's total BOM. \n\nSo even very large legacy DRAM price hike may only add a few dollars to the finished product's BOM... and for many customers, paying a few extra dollars would be more economical than redesigning + requalifying (but this flows materially into ESMT's net income)\n\nAnyway, just excited about this idea (*disclosure I have positions)\n\nTLDR:\n-> Huanan updated ESMT blended Q2 ASP to +105-113% Q/Q\n-> Given July's blowout net income (putting ESMT at 1.9x p/e annualized RR), implications for the future are exciting if inelasticity continues + ESMT has the ability to hike further due to low % of finished product BOM cost. \n-> Indication customers were still willing to accept pass through for PSMC wafer hikes.",
       "refs": {},
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "researching",
       "themes": {},
       "title": "The more I look at ESMT, the more excited I get researching legacy memory themes. So looked through H1 sellside models... From March ESMT reports: Huanan: DDR3 4Gb ASP +50% QoQ in Q2 Fubon: cited roughly +40% Q2 DRAM pricing By August... Huanan was citing ESMT Q2 ASP growth of: +105–113% Q/Q blended. Saying DDR3 pricing had come in substantially better than expected. So legacy memory pricing translated into much more operating leverage at ESMT. About PSMC wafer cost hikes: Huanan estimated manufacturing costs could rise ~100% in 2H26, but customers remained highly willing to accept the pass-through If we look at July net income was roughly $109M... way above the earnings levels the earlier models were built around. If I had to give a TLDR \"consensus\" of reports 1. DDR3/DDR2 supply remains structurally tight as competitors move capacity toward higher-value memory. 2. Concord saw no conditions supporting a price reversal during 2026. 3. Concord expected contract-price increases to cover higher foundry costs. 4. Huanan later found that customer willingness to accept those cost increases was stronger than expected. Fun thing I read from Huanan was DDR3 is used in products such as IP cameras and HDDs where the memory component is a relatively small part of the customer's total BOM. So even very large legacy DRAM price hike may only add a few dollars to the finished product's BOM... and for many customers, paying a few extra dollars would be more economical than redesigning + requalifying (but this flows materially into ESMT's net income) Anyway, just excited about this idea (*disclosure I have positions) TLDR: -> Huanan updated ESMT blended Q2 ASP to +105-113% Q/Q -> Given July's blowout net income (putting ESMT at 1.9x p/e annualized RR), implications for the future are exciting if inelasticity continues + ESMT has the ability to hike further due to low % of finished product BOM cost. -> Indication customers were still willing to accept pass through for PSMC wafer hikes.",
       "triage": {
@@ -18395,12 +18610,38 @@
       "first_seen": "2026-08-31T05:13:57.517945+00:00",
       "lead_id": "lead_4c082f76c0248f18981da5873d049f71",
       "published_at": "2026-08-05",
-      "refs": {},
+      "refs": {
+        "parked_reason": "FCC 禁令仍為 Reuters 報導的草案階段（2026-08-04），FCC 正式文本（NPRM/R&O）不存在——無可入圖的唯一 graph delta；Innolight 34%/中系 60% 市占屬時變市場結構觀測（tier 3 產業分析）不進圖。hy_0005 禁令假設 credibility 由傳聞升為多源證實草案",
+        "trace_attempts_ref": "cignal.ai 追至 Reuters 2026-08-04（Caixin/Tom's Hardware/Network World 多家二手一致引用）；FCC 官方文件未發布",
+        "trace_next_trigger": "FCC 正式發布擬議規則（Reuters 稱目標 2026 年內生效）；或 COHR/LITE/AAOI filings 揭露禁令影響",
+        "trace_requires_user": "false",
+        "trace_status": "partial",
+        "trace_trigger_entities": [
+          "co:coherent,co:lumentum,edgar:AAOI"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "event_watch:t2_sweep",
-      "status": "pending",
+      "status": "parked",
       "themes": {},
       "title": "T2 sweep 命中：FCC 草擬禁新中國光模組（Innolight+Eoptolink 佔 800G+ 逾 60%）；擬年內發布、2026 稍晚生效——hy_0005 禁令假設由傳聞升為多家證實的 FCC 草案",
-      "triage": null,
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-31T05:31:14.575101+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "ranking",
+          "reason": "禁令若成，美系光模組供應商替代中系 60% 市占，光模組鏈排序重排"
+        },
+        "decided_at": "2026-08-31T05:31:14.575101+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true,
+          "novelty": true
+        },
+        "reason": "T2 sweep 命中：FCC 草擬禁新中國光模組（Innolight+Eoptolink 佔 800G+ 逾 60%），擬年內發布、2026 稍晚生效——hy_0005 禁令假設由傳聞升為多家證實草案。關聯性：直接影響 COHR/LITE/AAOI 競爭結構；可引用性：市占數字與時程具體",
+        "tier": 3
+      },
       "url": "https://cignal.ai/2026/08/fcc-ban-on-new-chinese-optical-modules/"
     },
     "lead_4cfd1607064be4fe2b8f26a49e3458f8": {
@@ -24729,6 +24970,32 @@
         }
       ],
       "url": "https://x.com/aleabitoreddit/status/2078914447180263438"
+    },
+    "lead_75079e941495ca5c5c5b0ae145ea90ee": {
+      "entities": {
+        "company_ids": [
+          "co:himax"
+        ],
+        "tickers": [
+          "HIMX"
+        ]
+      },
+      "first_seen": "2026-08-31T05:27:05.235516+00:00",
+      "lead_id": "lead_75079e941495ca5c5c5b0ae145ea90ee",
+      "published_at": "2026-06-12",
+      "refs": {},
+      "source": "edgar:HIMX",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "HIMX 6-K filed 2026-06-12",
+      "triage": {
+        "decided_at": "2026-08-31T05:31:50.966597+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "HIMX 6-K 2026-06-12：冷啟動舊 filing（財報間公告，多為股利/例行）；onboard 研究（8 月底）已掃過近期重大公告，未見此日期有結構事件",
+        "tier": 2
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1342338/000117184326004076/f6k_061226.htm"
     },
     "lead_7542d1fbe0f10b6a3b60b28c3851444e": {
       "entities": {
@@ -33422,6 +33689,39 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1633978/000160799026000001/xslF345X06/form4-07172026_120732.xml"
     },
+    "lead_a426ad19ef39ad20e97f4116e6b660e3": {
+      "entities": {
+        "company_ids": [
+          "co:himax"
+        ],
+        "tickers": [
+          "HIMX"
+        ]
+      },
+      "first_seen": "2026-08-31T05:27:05.235344+00:00",
+      "lead_id": "lead_a426ad19ef39ad20e97f4116e6b660e3",
+      "published_at": "2026-08-06",
+      "refs": {},
+      "source": "edgar:HIMX",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "HIMX 6-K filed 2026-08-06",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-31T05:31:34.386522+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "confidence_only",
+          "reason": "例行季報大概率只加信心；若含 CPO/WLO 放量敘述再升級處理"
+        },
+        "decided_at": "2026-08-31T05:31:34.386522+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "HIMX 6-K 2026-08-06：時點對應 Q2 2026 財報。HIMX 已有 cohort；最新季度數字與可能的 WLO/CPO 進展敘述值得一讀",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1342338/000117184326005288/f6k_080626.htm"
+    },
     "lead_a440efe914fc9272a997fa97c3694a0d": {
       "entities": {
         "company_ids": [
@@ -34358,6 +34658,39 @@
         }
       ],
       "url": "https://x.com/aleabitoreddit/status/2079622706572804368"
+    },
+    "lead_a9de791efdbd4c8c5571536f5d62d81e": {
+      "entities": {
+        "company_ids": [
+          "co:himax"
+        ],
+        "tickers": [
+          "HIMX"
+        ]
+      },
+      "first_seen": "2026-08-31T05:27:05.235763+00:00",
+      "lead_id": "lead_a9de791efdbd4c8c5571536f5d62d81e",
+      "published_at": "2026-03-27",
+      "refs": {},
+      "source": "edgar:HIMX",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "HIMX 20-F filed 2026-03-27",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-31T05:31:34.113190+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "confidence_only",
+          "reason": "核心 FOCI×WLO×CPO 關係已入圖；補抽只加信心與財務核驗清單覆蓋，不改候選與排序"
+        },
+        "decided_at": "2026-08-31T05:31:34.113190+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "HIMX 20-F FY2025：SEC 一手。HIMX 已 onboard 入圖（FOCI×WLO×CPO 關係即以本文件為一手），剩餘價值在客戶集中度/稀釋/backlog 等財務核驗清單段落與 CPO 以外業務結構",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1342338/000110465926035507/himx-20251231x20f.htm"
     },
     "lead_a9decd56cd086ff593d6e307c0508b48": {
       "entities": {
@@ -37178,6 +37511,39 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000206/xslF345X06/wk-form4_1785530603.xml"
     },
+    "lead_b70448fbdb09a920d299afae967148ca": {
+      "entities": {
+        "company_ids": [
+          "co:himax"
+        ],
+        "tickers": [
+          "HIMX"
+        ]
+      },
+      "first_seen": "2026-08-31T05:27:05.235213+00:00",
+      "lead_id": "lead_b70448fbdb09a920d299afae967148ca",
+      "published_at": "2026-08-12",
+      "refs": {},
+      "source": "edgar:HIMX",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "HIMX 6-K filed 2026-08-12",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-31T05:31:34.680440+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "confidence_only",
+          "reason": "內容未知，保守分類；若查證發現結構性事件（CPO 產能/客戶）則屬 ranking 級"
+        },
+        "decided_at": "2026-08-31T05:31:34.680440+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "HIMX 6-K 2026-08-12：Q2 財報後一週的追加公告，內容未知；HIMX 已有 cohort，近期公告可能含 CPO/WLO 或公司行動",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1342338/000117184326005436/f6k_081226.htm"
+    },
     "lead_b72df36ba871db77a524b7178d3b4944": {
       "entities": {
         "company_ids": [
@@ -37891,9 +38257,11 @@
       "first_seen": "2026-08-31T05:13:57.182485+00:00",
       "lead_id": "lead_bae3d59e761ce13a08d11b6da1b4afbe",
       "published_at": "2026-08-17",
-      "refs": {},
+      "refs": {
+        "research_action_id": "ra_c218098e1ebd648b33920531d929c6c7"
+      },
       "source": "event_watch:t2_sweep",
-      "status": "pending",
+      "status": "action_prepared",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -37906,7 +38274,24 @@
         }
       },
       "title": "T2 sweep 命中：COHR 預付 AXT 最高 $22.3M 擴 6 吋 InP（北京廠 2026-28）＋LITE $87M 五年產能保留——客戶端資本承諾，一手應在 COHR/AXTI 8-K 可免費追",
-      "triage": null,
+      "triage": {
+        "classification": {
+          "classified_at": "2026-08-31T05:31:14.290139+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "capital_commitment",
+          "decision_impact": "ranking",
+          "payment_direction": "customer_to_supplier",
+          "reason": "客戶掏錢綁供應商＝真瓶頸訊號；查證為真則 AXT 在 InP 鏈瓶頸排序上移"
+        },
+        "decided_at": "2026-08-31T05:31:14.290139+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true,
+          "novelty": true
+        },
+        "reason": "T2 sweep 命中：COHR 預付 AXT 最高 22.3M 美元擴北京 6 吋 InP（2026-28）＋LITE 87M 美元五年產能保留。關聯性：AXTI/COHR/LITE 全部已追蹤；可引用性：金額/年限/產線具體；獨立性：客戶端行動非 AXT 自報，L8 高價值；一手可在 COHR/AXTI 8-K 免費追",
+        "tier": 3
+      },
       "url": "https://247wallst.com/investing/2026/08/17/axt-soars-again-on-monday-to-lead-optics-stocks-coherent-and-lumentum-rally-on-indium-phosphide-price-hikes/"
     },
     "lead_baf13ca0773a70940d289449b2d3d3e6": {
@@ -40490,7 +40875,7 @@
         "trace_trigger_kind": "primary_source_signal"
       },
       "source": "system_decompose",
-      "status": "triaged_go",
+      "status": "researching",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -42880,6 +43265,32 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000227/xslF345X06/wk-form4_1787949262.xml"
     },
+    "lead_d5cdc2de416d8ec6c979742bcd570708": {
+      "entities": {
+        "company_ids": [
+          "co:himax"
+        ],
+        "tickers": [
+          "HIMX"
+        ]
+      },
+      "first_seen": "2026-08-31T05:27:05.235845+00:00",
+      "lead_id": "lead_d5cdc2de416d8ec6c979742bcd570708",
+      "published_at": "2026-02-12",
+      "refs": {},
+      "source": "edgar:HIMX",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "HIMX 6-K filed 2026-02-12",
+      "triage": {
+        "decided_at": "2026-08-31T05:31:50.118089+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "HIMX 6-K 2026-02-12（Q4 2025 財報時點）：EDGAR watch 冷啟動舊 filing。財務數字已被後續 Q1/Q2 財報與 Engine C 快照時間覆蓋，逐筆 pq1 無增量",
+        "tier": 2
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1342338/000117184326000763/f6k_021226.htm"
+    },
     "lead_d5d2b65e1c4d593c77075d2d499b7144": {
       "entities": {
         "company_ids": [
@@ -44308,6 +44719,32 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2077406548012466390"
+    },
+    "lead_df6fc939b25f3b14e1fbb4d1b3e32731": {
+      "entities": {
+        "company_ids": [
+          "co:himax"
+        ],
+        "tickers": [
+          "HIMX"
+        ]
+      },
+      "first_seen": "2026-08-31T05:27:05.235433+00:00",
+      "lead_id": "lead_df6fc939b25f3b14e1fbb4d1b3e32731",
+      "published_at": "2026-07-01",
+      "refs": {},
+      "source": "edgar:HIMX",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "HIMX 6-K filed 2026-07-01",
+      "triage": {
+        "decided_at": "2026-08-31T05:31:51.245522+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "HIMX 6-K 2026-07-01：冷啟動舊 filing（財報間公告），同上——onboard 已掃近期公告未見結構事件",
+        "tier": 2
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1342338/000117184326004416/f6k_070126.htm"
     },
     "lead_df8768dd263a4c8dd999f11abe902c8c": {
       "entities": {
@@ -46492,6 +46929,32 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2081581943142167034"
+    },
+    "lead_ea08e69759d09645010dd6d10b092b10": {
+      "entities": {
+        "company_ids": [
+          "co:himax"
+        ],
+        "tickers": [
+          "HIMX"
+        ]
+      },
+      "first_seen": "2026-08-31T05:27:05.235598+00:00",
+      "lead_id": "lead_ea08e69759d09645010dd6d10b092b10",
+      "published_at": "2026-05-07",
+      "refs": {},
+      "source": "edgar:HIMX",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "HIMX 6-K filed 2026-05-07",
+      "triage": {
+        "decided_at": "2026-08-31T05:31:50.682646+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "HIMX 6-K 2026-05-07 同日第二份（大概率財報附件/新聞稿）：冷啟動舊 filing，同上時間覆蓋",
+        "tier": 2
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1342338/000117184326003108/f6k_050726.htm"
     },
     "lead_ea9347e48fbc93a2e8839be63e24f862": {
       "entities": {
@@ -50187,8 +50650,8 @@
   "schema_version": "2",
   "source_state": {
     "x:aleabitoreddit": {
-      "since_id": "2094129989071536351",
-      "updated_at": "2026-08-30T22:32:40.089477+00:00",
+      "since_id": "2094281116421370213",
+      "updated_at": "2026-08-31T05:26:58.080888+00:00",
       "user_id": "1940360837547565056"
     }
   }
