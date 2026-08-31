@@ -1,0 +1,94 @@
+{
+  "claims": [
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "guided",
+      "disproof_condition": "若取得 Tesla、Figure 或 UBTECH 的一手文件顯示 Leaderdrive 僅通過樣品驗證而未進入量產採購、或該合格化其後被撤銷，且 HDS 在人形機器人專用規格（高扭矩密度／柔輪壽命）上無第二來源，則替代難度應上修至 4 以上並重新評估瓶頸地位。核查頻率：每季，及每次主要人形機器人廠商發表會後；觸發後 48 小時內人工 review。",
+      "id": "nextfinancial_joint_problem_2026_06_02_substitutability_cl1",
+      "source_ids": [
+        "nextfinancial_joint_problem_2026_06_02_substitutability_s1",
+        "nextfinancial_joint_problem_2026_06_02_substitutability_s2"
+      ],
+      "statement": "諧波減速器這一層對 Harmonic Drive Systems 的替代難度低（substitutability=2，非瓶頸）。判準來自需求端而非供應端：Leaderdrive（綠的諧波）已通過 Tesla 的供應商驗證，並被描述為 Tesla 墨西哥廠的獨家減速器供應商，同時據稱已佔全球諧波市場逾三分之一。客戶完成第二來源合格化，是對 sole_source 最直接的否證。⚠ 反向並存：既有入庫文件記載 HDS 在 2023 年諧波段仍約 85% 份額——本判斷是「可被替代」而非「已被取代」。",
+      "subject_id": "co:harmonic_drive_systems"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {
+        "sole_source": false,
+        "substitutability": 2
+      },
+      "confidence": 0.8,
+      "dst_id": "tech:strain_wave_gear",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "nextfinancial_joint_problem_2026_06_02_substitutability_s1",
+        "nextfinancial_joint_problem_2026_06_02_substitutability_s2"
+      ],
+      "src_id": "co:harmonic_drive_systems"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "robot_subsystem",
+      "aliases": [
+        "HDS",
+        "6324.T"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:harmonic_drive_systems",
+      "name": "Harmonic Drive Systems",
+      "role": "robot_component_supplier",
+      "source_ids": [
+        "nextfinancial_joint_problem_2026_06_02_substitutability_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "robot_subsystem",
+      "aliases": [
+        "harmonic drive",
+        "harmonic reducer",
+        "諧波減速器"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:strain_wave_gear",
+      "name": "Strain Wave Gear",
+      "source_ids": [
+        "nextfinancial_joint_problem_2026_06_02_substitutability_s2"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "nextfinancial_joint_problem_2026_06_02_substitutability",
+    "evidence_tier": 3,
+    "origin_entity": "Next Financial (Substack)",
+    "permission_basis": "第三方訂閱電子報；保留 canonical URL，僅存研究必要短引述。",
+    "published_at": "2026-06-02",
+    "publisher": "Next Financial",
+    "retrieved_at": "2026-08-31",
+    "section": "substitutability",
+    "source_type": "industry_report",
+    "storage_permission": "repo_excerpt",
+    "title": "The Joint Problem（替代難度段）：Leaderdrive 通過 Tesla 供應商驗證",
+    "url": "https://nextfinancial.substack.com/p/the-joint-problem-who-owns-the-most"
+  },
+  "sources": [
+    {
+      "id": "nextfinancial_joint_problem_2026_06_02_substitutability_s1",
+      "locator": "Leaderdrive bullet — customer-side qualification",
+      "quote": "which has passed Tesla's supplier validation. One source describes it as the sole reducer supplier to Tesla's Mexico facility"
+    },
+    {
+      "id": "nextfinancial_joint_problem_2026_06_02_substitutability_s2",
+      "locator": "Leaderdrive bullet — scale",
+      "quote": "a Chinese strain-wave specialist that has gone from a domestic upstart to, by some accounts, more than a third of the global harmonic market"
+    }
+  ]
+}
