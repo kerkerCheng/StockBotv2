@@ -1187,6 +1187,11 @@
       "resolution": null,
       "resolved_at": null,
       "source": "research_action",
+      "source_cleared": {
+        "at": "2026-08-31T16:50:24.985736+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
       "title": "Meta Vistara CXL 記憶體擴充平台",
       "type": "ra_admission",
       "waiting_on": {
@@ -5782,6 +5787,43 @@
       "source": "research_action",
       "title": "MRM 層補節點——TSMC COUPE 200G MRM 排定 2026 下半量產（decompose 懸缺層落地）",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-08-31T16:50:24.985736+00:00",
+      "graph_impact": "+2 節點、0 邊、4 claims｜來源：Sivers Semiconductors（tier 1）、Sivers Semiconductors（tier 2）",
+      "hint": "核准 exact graph delta；Decision handoff：co:sivers_semiconductors。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 350,
+      "reason": null,
+      "ref_id": "ra_3e7b4e99a344118fc87a6f2c89436aac",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "SIVE Q2 2026——Jabil 1.6T 時程、6 家 pluggable engagement、SemiNex 3.4M、未具名代工產能",
+      "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-08-31T16:50:24.985736+00:00",
+      "hint": "go 只排入 bounded pq1；不接受 claim、不入圖。若需付費，另核准 exact 金額／方案。",
+      "n": 351,
+      "reason": null,
+      "ref_id": "lead_0e8667f7227314b6492fe56c8b0f2fcd",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "source_trace",
+      "title": "追原報告／來源 access — ESMT (3006) is 1.9x P/E ratio off July's earnings annualized. Latest net income was: $109M net income/July, which is ~$1.3B annualized. With ~$395.9M net cash and with $249.6M in inventory. The mar...",
+      "type": "source_trace_review"
+    },
+    {
+      "added_at": "2026-08-31T16:50:24.985736+00:00",
+      "hint": "go 只排入 bounded pq1；不接受 claim、不入圖。若需付費，另核准 exact 金額／方案。",
+      "n": 352,
+      "reason": null,
+      "ref_id": "lead_1dfc66d3488e70d972e80bff8772e8ff",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "source_trace",
+      "title": "追原報告／來源 access — The more I look at ESMT, the more excited I get researching legacy memory themes. So looked through H1 sellside models... From March ESMT reports: Huanan: DDR3 4Gb ASP +50% QoQ in Q2 Fubon: cited r...",
+      "type": "source_trace_review"
     }
   ],
   "log": [
@@ -12987,8 +13029,17 @@
       "ref_id": "dc_48446dbceb85d4b785634e3c4ca5d669",
       "type": "decision_review",
       "verb": "pq1_awaiting_approval"
+    },
+    {
+      "at": "2026-08-31T16:50:24.985736+00:00",
+      "n": 81,
+      "reason": "來源本輪成功執行，但不再產出此項",
+      "receipt": null,
+      "ref_id": "ra_50f3ddb6cfe718afd7e2ef8b0481e686",
+      "type": "ra_admission",
+      "verb": "source_cleared"
     }
   ],
-  "next_n": 350,
+  "next_n": 353,
   "schema_version": "1"
 }

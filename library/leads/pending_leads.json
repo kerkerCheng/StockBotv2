@@ -15708,9 +15708,19 @@
       ],
       "published_at": "2026-08-31T10:02:55.000Z",
       "raw_text": "“Memory is a bubble.”Explain this then, KOSPI bears:\n\nSamsung has reportedly reserved ~70% of its memory production capacity through 2031 via LTAs with $NVDA, $MSFT, and $GOOGL as main counterparties.\n\nFive years of demand visibility… https://t.co/GUGWTkXkMc",
-      "refs": {},
+      "refs": {
+        "original_claim_status": "部分失真:推文把 aims 60-70% 寫成 reserved ~70%、through 2031 是 rolling 5yr 推導、主要對手方寫 NVDA/MSFT/GOOGL 但 sedaily 名單無 NVDA",
+        "parked_reason": "已追至官方法說轉述並修正推文失真;Samsung 不在 registry,記憶體軸擴張屬 scope 決定,收尾摘要問使用者",
+        "research_outcome": "記憶體層客戶端資本承諾結構成立(預付款綁約約1/4),但主體 Samsung 不在 registry;是否把記憶體軸擴到 Samsung/SKH 側是使用者 scope 決定;若擴,本 lead 的 sedaily 轉述+法說 transcript 是首批文件",
+        "trace_attempts_ref": "sedaily 逐字:aims to supply 60 to 70 percent of total production capacity through LTAs(rolling five-year);has already completed contracts with the five major global data center operators(AWS/Microsoft/Google Cloud/Meta/Oracle 為媒體預期名單)+additional negotiations with five customers in the AI sector;預付款=LTA contracts that include advance payment conditions account for about a quarter of the total,且 attached advance payments to strengthen the binding force",
+        "trace_next_trigger": "使用者決定記憶體軸 scope;或 Samsung LTA 出現在客戶端 filing(MSFT/GOOGL/ORCL 10-K purchase obligations)可從客戶側印證",
+        "trace_origin_entity": "Samsung Electronics(Q2 2026 earnings call 2026-07-30,經 Seoul Economic Daily 英文版轉述)",
+        "trace_original_url": "https://en.sedaily.com/finance/2026/07/30/samsung-to-supply-70-percent-of-memory-under-long-term",
+        "trace_requires_user": "true",
+        "trace_status": "tier_1_2_honest_passthrough"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -19349,10 +19359,11 @@
       "published_at": "2026-08-29T10:51:36.000Z",
       "raw_text": "If I had to be critical of $SIVE earnings:\n\n1. Management underweighted the two disclosures that matter most.\n\n-> 6 pluggable engagements \n-> Foundry capacity (during an industry bottleneck)\n\nThat's the most important part of the call and should have been the focus to provide economic scale of them. But we got 2-3 sentences about it.  \n\nAnd it shouldn't take an Anime avatar on X to talk most about the implications of those. \n\n2. CFO needs retraining or bring on a new one.\n\nThe lawyer like answers were infuriating to listen to as a shareholder. Even I got pissed off with this statement:\n\n\"we will evaluate the timing and decide whether the conditions are right to move forward at that particular time.\" \n\nIt should be a 100% given by now they file for dual listing to escape hostile Swedish markets. \n\nShareholders didn't fund a future growth type company to hear lawyer-like answers. \n\nAgain, this was probably one of the worst answers the CFO could have gave and there needs to be firm commitment along with faster timelines. \n\n3. $70M should have gone toward M&A and dual listing. \n\n-> Brutally honestly speaking, it's a waste of capital to focus on hybrid manufacturing at this stage and I was disappointed to hear this during this timeframe.  \n\nIt's eventually needed but with 2 foundry suppliers \n\n-> You have a ton of new capital and large marketcap. \n\nUse it to pull $AVGO style acquisitions of Cloud Light style IP for pluggables or optical engines. \n\nLumilens went from 0 -> $5.5B in 2 years and now with hyperscaler engagements. \n\nSivers should expand out of the laser chokepoint as fast as possible and not stay just a component vendor. \n\nAnd most of all, who cares about competing with customers? If a customer says: \"if you do pluggables, we'll go with other players for lasers\"\n\nwho?? $LITE / $COHR / $AAOI reroutes their lasers to internal usage. Lot of your Asian players already allocated. \n\nAbuse the current bottleneck as much as possible because there's almost no qualified choices left.\n\nAnd I'm certain all the partners are trying to vertically integrate upward toward the laser level too and compete.  \n\nIf there was a new OE/pluggable accusation attempted during the Q2 time frame, things would have been a lot different. \n\n_\n\nTLDR: \n\n$SIVE should aim to be the next $LITE and blitzscale like a Silicon Valley company.\n\nUse that $70m capital to move faster H2, and at the bare minimum finish readiness then. And expect NASDAQ listing to be finished H1 2027. \n\nNot \"evaluation\" at that timeframe. \n\nAnd use the capital + equity to expand downward into optical engines/ELS/optical transceivers using your equity valuation, and buy a Celestial/Ayar/Cloud Lite type startup. \n\nAs for the wording of the call, markets care about economic value of the foundry allocation + 6 pluggable players, not other business segments.\n\n$SIVE has been extremely conservative to date, but \n they need to speed up and communicate to forward looking US/Int shareholders. \n\nNot geared toward local Swedish audiences who care about Q2/TTM revenue. \n\nOtherwise they'll be treated like an Asian component supplier and eventually be valued like an EU one.",
       "refs": {
-        "parked_reason": "已取得可核對文件，但缺具名 pluggable 客戶與訂單經濟規模；本輪沒有唯一的新 canonical edge",
+        "parked_reason": "意見串,無獨立新原子;事實部分併入 SIVE Q2 RA",
         "primary_url": "https://www.sivers-semiconductors.com/press/sivers-semiconductors-publishes-interim-report-for-the-second-quarter-2026/",
+        "related_research_action_id": "ra_3e7b4e99a344118fc87a6f2c89436aac",
         "research_outcome": "營運 atoms 有公司文件／tier-2 transcript 支持；批評與 M&A 建議屬作者意見，不建立圖譜事實",
-        "trace_attempts_ref": "2026-08-30：核對 Sivers Q2 2026 interim report 與第三方法說逐字稿；確認 pluggable engagements、Jabil 2027 ramp、hybrid foundry model 與 H1 2027 dual-listing readiness，但 M&A／70M 資本用途是作者處方",
+        "trace_attempts_ref": "作者意見串;可核原子(6家 engagement/Nasdaq evaluation/70M hybrid manufacturing)已由 ra_3e7b4e99a344118fc87a6f2c89436aac 之 PR+transcript 覆蓋",
         "trace_next_trigger": "Sivers 正式申請 dual listing、具名 acquisition 或具名 pluggable customer/order",
         "trace_requeue_consumed_entities": [
           "CO:COHERENT",
@@ -19365,7 +19376,7 @@
         "trace_requeue_trigger": "related_triaged_lead:lead_d2495f0ff605f6790af86147ac148842",
         "trace_requeued_at": "2026-08-30T22:35:33.235111+00:00",
         "trace_requires_user": "false",
-        "trace_status": "partial",
+        "trace_status": "tier_1_2_honest_passthrough",
         "trace_trigger_entities": [
           "AAOI",
           "AVGO",
@@ -19382,7 +19393,7 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -25516,11 +25527,12 @@
       "published_at": "2026-08-27T21:24:26.000Z",
       "raw_text": "Nah, $SIVE is the most unusual $1B photonics company I've ever seen. \n\nJust for AI DCs alone:\n\n- Reference laser for $GFS SCALE (CPO/NPO/pluggable)\n- 7 pluggable engagements disclosed, with $JBL as primary ramp (with H1 2027 timeline)\n- ELS path with O-Net\n- ELS path with $POET \n- Lasers to Ayar for CPO I/O (now in $NVDA nvlink ecosystem)\n- Lasers for $AEVA (which now has NPO agreements with optical engine providers for hyperscalers)\n- Celestial/Lightmatter/Lightelligence (likely customers in 2023/2024)\n- InP lasers on TFLN with Lightium\n\nThen it has 2 substantial allocations for CW DFB laser capacity during an industry shortage. \n\nAs well as one of the few CPO-grade laser suppliers out in the industry. \n\nLet me know what other player around this range has so many ongoing qualifications, a large TAM, and in photonics. \n\n$SIVE is the #1 for me in terms of MC relative to qualifications paths across the industry.",
       "refs": {
-        "parked_reason": "同一 Q2 事件的複合清單包含已知事實與作者推論；缺交易對手方來源，不可整包入圖",
+        "parked_reason": "清單多為作者映射;可核部分併入 SIVE Q2 RA,Win Semi 傳言已在 RA 中明確標記無公開依據",
         "primary_url": "https://www.sivers-semiconductors.com/press/sivers-semiconductors-publishes-interim-report-for-the-second-quarter-2026/",
+        "related_research_action_id": "ra_3e7b4e99a344118fc87a6f2c89436aac",
         "research_outcome": "部分事實可核對，具名客戶與供應關係仍是推論；不提高 evidence tier，不產新 RA",
         "research_run": "session:2026-08-29-pq1-full-drain",
-        "trace_attempts_ref": "2026-08-30：以 Sivers Q2 2026 interim report 與法說逐字稿重查清單；僅部分營運 atoms 可支持，客戶歸因與估值推論未獲交易對手文件支持",
+        "trace_attempts_ref": "清單串;Jabil/SemiNex/GFS/6家 engagement 已核並入 RA;Win Semi 具名產能與 POET/O-Net/AEVA/Celestial 等映射不在 Q2 公開文件——作者自行綜合,依 Gap 4 不入圖",
         "trace_next_trigger": "Sivers 客戶端具名 design win、production order 或 foundry partner 揭露",
         "trace_requeue_consumed_entities": [
           "AEVA",
@@ -25539,7 +25551,7 @@
         "trace_requeue_trigger": "related_triaged_lead:lead_d2495f0ff605f6790af86147ac148842",
         "trace_requeued_at": "2026-08-30T22:35:33.235111+00:00",
         "trace_requires_user": "false",
-        "trace_status": "partial",
+        "trace_status": "tier_1_2_honest_passthrough",
         "trace_trigger_entities": [
           "AEVA",
           "GFS",
@@ -25558,7 +25570,7 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -43381,9 +43393,11 @@
       "media": [],
       "published_at": "2026-08-30T09:04:08.000Z",
       "raw_text": "Just my final recap on thoughts + fundamentals of $SIVE from ER: \n\nPluggables (1.6T Ramp) for 2027:\n\n- $JBL (1.6T LRO, confirmed) Orders H1 2027, Ramp H2 2027\n-> -> Likely multiple hyperscaler customers\n\n- 3 pluggable makers (evaluation)\n- 3 pluggable makers (supply assessment)\n\nReference Design for likely H2 2027–28+:\n\n- $GFS (Globalfoundries) SCALE (confirmed))\n-> -> Likely $AMD and other hyperscalers as CPO customers\n\nExternal Light Sources / Optical Engines for 2027:\n\n- $POET (confirmed)\n-> -> Lumilens / hyperscaler end users\n\n- O-Net (confirmed)\n-> -> Massive ODM/OEM for Hyperscalers + Asia\n\n- Likely $AEVA (mapping)\n-> -> supplying to OE -> hyperscalers / lidar\n\n- SemiNex (confirmed)\n\nOptical I/O for 2028:\n\n- Ayar Labs (confirmed)\n-> -> Likely $AMD, ALchip, and hyperscaler ASIC program end users + $NVDA NVLink\n\n- $MRVL Celestial (potential customer from 2023-2024 disclosures)\n- Lightmatter (potential customer from 2023-2024 disclosures)\n- Lightelligence (potential customer from 2023-2024 disclosures)\n\nThen potentially $AAPL for 2028 for next-generation wearable updates and other programs from TFLN with Lightium.\n\nIn terms of capacity allocations:\n- Win Semi\n- 1 other foundry (with tremendous allocations)\n\nduring an InP CW DFB laser shortage. \n\nThese are all on-going developments/qualifications since Sivers is targeting next-generation SiPH + CW with 1.6T and CPO for 2027-2028.  \n\nEspecially as Goldman Sachs models the CPO opportunity going from effectively near-zero today to ~$91B TAM by 2028. \n\nHowever my criticisms were:  \n\n=> Main focus was not on communicating economic scale of 2027-2028 optical ramps to Western audiences. \n=> Legal vagueposts around NASDAQ listing should be dropped, and clear direction should be set + executed faster on. \n=>Too much focus was put on defending smaller current revenue/TTM revenue/pipeline conversion (allspace, Tachyon.) relative to future qualifications/partner size/capacity/potential. \n\n$SIVE needs to position themselves as a forward looking, global hypergrowth optical company supplying lasers to hyperscaler programs. \n\nAnd not let the narrative get dominated by backward looking metrics. \n\nAnd as Morgan Stanley put it... \"Key [CPO] participants include … $LITE, $COHR, and Sivers laser supply\". \n\nI'm personally a happy $SIVE shareholder for high-beta exposure to the next 2027-2028 optical shift with 1.6T/CPO.",
-      "refs": {},
+      "refs": {
+        "research_action_id": "ra_3e7b4e99a344118fc87a6f2c89436aac"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "action_prepared",
       "themes": {
         "cpo": {
           "counter_only": false,
