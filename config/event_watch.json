@@ -1,0 +1,11 @@
+{
+  "_doc": [
+    "Event Watch T2 主動輪詢的力度旋鈕（docs/brainstorms/2026-08-31-event-watch-module-requirements.md）。",
+    "sweep_budget_per_run＝每輪 sweep 最多給出幾個 watch 讓 agent 做 WebSearch；",
+    "調 0 或 enabled=false ＝退回 T0（被動）＋T1（日期）純零成本運作，系統不會卡。",
+    "min_recheck_days＝同一 watch 兩次主動查詢的最小間隔天數。"
+  ],
+  "enabled": true,
+  "sweep_budget_per_run": 2,
+  "min_recheck_days": 3
+}

@@ -1315,6 +1315,8 @@ def sync(
         pool, seen_keys, healthy_sources, stamp=stamp
     )
 
+    watch_woken, watch_counts = _check_event_watches(pool, stamp=stamp)
+
     return {
         "added": added,
         "reactivated": reactivated,
@@ -1322,8 +1324,58 @@ def sync(
         "source_cleared": cleared,
         "source_returned": uncleared,
         "system_internal_retired": system_internal_retired,
+        "watch_woken": watch_woken,
+        "watch_counters": watch_counts,
         "active": len(active_items(pool)),
     }
+
+
+def _check_event_watches(pool: dict[str, Any], *, stamp: str) -> tuple[int, dict]:
+    """Event Watch T0＋T1 檢查（fail-soft）：fired watch 把對應 pq2 項的
+    waiting_on 翻回「等你決定」。喚醒是簿記，不自動 go（見 engine_b/event_watch.py）。"""
+
+    try:
+        from engine_b import event_watch
+        from engine_b.leads import load as load_leads
+
+        data = event_watch.load_watches()
+        if not data["watches"]:
+            return 0, {}
+        try:
+            leads = load_leads()["leads"]
+        except Exception:
+            leads = {}
+        fired = event_watch.check_watches(data, leads=leads)
+        woken = 0
+        for watch in fired:
+            n = int(watch["wake_pq2"])
+            item = next(
+                (it for it in pool["items"]
+                 if it["n"] == n and not it.get("resolved_at")),
+                None,
+            )
+            if item is not None and (item.get("waiting_on") or item.get("deferred_at")):
+                prior = dict(item.get("waiting_on") or {})
+                item.pop("waiting_on", None)
+                item.pop("deferred_at", None)
+                item["watch_wake"] = watch.get("woken_by")
+                pool["log"].append({
+                    "at": stamp,
+                    "n": n,
+                    "type": item["type"],
+                    "ref_id": item["ref_id"],
+                    "verb": "watch_wake",
+                    "reason": f"event watch {watch['watch_id']} 觸發（{watch['kind']}）",
+                    "receipt": json.dumps(watch.get("woken_by") or {}, ensure_ascii=False),
+                    "prior_waiting_on": prior,
+                })
+                woken += 1
+            event_watch.consume_fired(data, watch["watch_id"])
+        event_watch.save_watches(data)
+        return woken, event_watch.counters(data)
+    except Exception:
+        # watch 檢查失敗不阻斷 sync；缺席時計數器不出現即是訊號。
+        return 0, {}
 
 
 def _mark_source_cleared(
@@ -2241,7 +2293,19 @@ def main(argv: list[str] | None = None) -> int:
                              ensure_ascii=False, indent=2))
         else:
             migration = f"；移回 pq1 {retired}" if retired else ""
-            print(f"（新增 {result['added']}，目前 {result['active']} 項待辦{migration}）\n")
+            wc = result.get("watch_counters") or {}
+            watch_line = ""
+            if wc:
+                watch_line = (
+                    f"；watch {wc.get('active', 0)} 筆"
+                    f"（T1 {wc.get('t1_date', 0)}／T0 {wc.get('t0_passive', 0)}"
+                    f"／可輪詢 {wc.get('t2_pollable', 0)}"
+                    f"，本輪喚醒 {result.get('watch_woken', 0)}）"
+                )
+            print(
+                f"（新增 {result['added']}，目前 {result['active']} 項待辦"
+                f"{migration}{watch_line}）\n"
+            )
             print(_render(pool))
         return 0
 

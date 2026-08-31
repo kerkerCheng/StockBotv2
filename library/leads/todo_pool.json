@@ -4988,6 +4988,19 @@
       "source": "manual",
       "title": "產業別分排序原型：query/bottleneck.py 加 --by-sector（demand anchor 聚類，A 案），不動預設輸出；brief 版面每產業 top-3",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-08-31T01:59:36.493023+00:00",
+      "hint": "使用者 2026-08-31 核准方向並指示直接做完；受理即 resolve ｜ 驗收：waiting 3 項機器可達 0→3、sweep_budget 調 0 時系統照常運作、計數器出現在 sync 輸出",
+      "n": 306,
+      "reason": null,
+      "receipt": "authority:manual;ref:user_approval_2026-08-31_event_watch",
+      "ref_id": "manual:306",
+      "resolution": "go",
+      "resolved_at": "2026-08-31T01:59:36.676104+00:00",
+      "source": "manual",
+      "title": "Event Watch 模組 W1-W3：watch registry＋T1 until 比對＋T0 entity_filing_signal/fact_verification 接 pq2＋T2 sweep（K 可調）＋常駐計數器＋遷移現有 3 個 waiting 項",
+      "type": "manual"
     }
   ],
   "log": [
@@ -11279,8 +11292,17 @@
       "ref_id": "manual:305",
       "type": "manual",
       "verb": "go"
+    },
+    {
+      "at": "2026-08-31T01:59:36.676104+00:00",
+      "n": 306,
+      "reason": null,
+      "receipt": "authority:manual;ref:user_approval_2026-08-31_event_watch",
+      "ref_id": "manual:306",
+      "type": "manual",
+      "verb": "go"
     }
   ],
-  "next_n": 306,
+  "next_n": 307,
   "schema_version": "1"
 }

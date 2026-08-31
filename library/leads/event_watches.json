@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "watches": [
+    {
+      "watch_id": "ew_0001_2026-08-31",
+      "created_at": "2026-08-31T02:02:02.051838+00:00",
+      "expires": "2026-09-15",
+      "kind": "date",
+      "until": "2026-09-01",
+      "entities": [],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": 81,
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": ""
+      },
+      "note": "Meta Vistara 舊 RA 到期 drop（原 waiting until；RA expires_at 為主，本 watch 是 T1 保險）",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0002_2026-08-31",
+      "created_at": "2026-08-31T02:02:02.173656+00:00",
+      "expires": "2026-12-31",
+      "kind": "fact_verification",
+      "until": null,
+      "entities": [
+        "AAOI",
+        "co:applied_optoelectronics"
+      ],
+      "fact": "AAOI Q3 2026 財報 guidance 公布後，以 Q4 營收下緣設定可觀測 disproof 門檻",
+      "fact_check_ref": "engine_c:AAOI:revenue_guidance",
+      "wake_pq2": 134,
+      "poll": {
+        "eligible": true,
+        "last_checked": null,
+        "query_hint": "AAOI Applied Optoelectronics Q3 2026 earnings guidance Q4 revenue outlook"
+      },
+      "note": "",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0003_2026-08-31",
+      "created_at": "2026-08-31T02:02:02.319316+00:00",
+      "expires": "2027-03-31",
+      "kind": "entity_filing_signal",
+      "until": null,
+      "entities": [
+        "co:agility_robotics"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": 200,
+      "poll": {
+        "eligible": true,
+        "last_checked": null,
+        "query_hint": "Agility Robotics S-4 registration statement effective SEC IPO"
+      },
+      "note": "S-4 由機密遞交轉公開並生效；Agility 無 ticker，T0 靠 co: id、T2 輪詢補",
+      "status": "active",
+      "woken_by": null
+    }
+  ]
+}

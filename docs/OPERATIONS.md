@@ -252,6 +252,27 @@ cashtag 由 `entities.py` 確定性抽取；公司名寫成純文字時 regex �
 & '.venv\Scripts\python.exe' scripts\sync_agent_skills.py --check   # 交接前驗證兩端無漂移
 ```
 
+### Event Watch（等待事件統一 registry，2026-08-31）
+
+所有「以後要回來看」的 pq2 等待條件住 `library/leads/event_watches.json`
+（模組 `engine_b/event_watch.py`，設計見
+`docs/brainstorms/2026-08-31-event-watch-module-requirements.md`）：
+
+```powershell
+& '.venv\Scripts\python.exe' -m engine_b.event_watch list        # 全部 watch＋計數器
+& '.venv\Scripts\python.exe' -m engine_b.event_watch sweep       # 本輪 T2 該查的 K 個（agent 拿 query hint 去 WebSearch）
+& '.venv\Scripts\python.exe' -m engine_b.event_watch sweep --mark-checked   # 查完標記
+& '.venv\Scripts\python.exe' -m engine_b.event_watch add --kind entity_filing_signal --wake-pq2 <N> --expires YYYY-MM-DD --entities "co:x,TICK" [--poll --query-hint "..."]
+```
+
+- T0（新 tier-1 PASS lead 比對具名標的）與 T1（until 日期）在每次 `todo sync` 自動檢查；
+  fired watch 把 pq2 項的 waiting_on 翻回「等你決定」＋`watch_wake` 稽核，**不自動 go**。
+- T2 力度旋鈕在 `config/event_watch.json`（`sweep_budget_per_run` 調 0＝退回純被動，
+  系統照常運作）。互動 session／自主迴圈可直接 sweep；**無人值守排程要跑 sweep 前
+  必須先做 sandbox impact review（unattended WebSearch surface），目前未放行**。
+- 給 pq2 項設等待時：能結構化的一律建 watch（散文 `--trigger` 只給人讀）；
+  `expires` 必填，過期自動歸檔留稽核。
+
 ### Addendum extraction 的 edge id 陷阱（2026-08-30 實測）
 
 **Addendum（重用既有 doc_id 的補充 extraction）裡的 edge id 絕不可重用 `e1`、`e2` 這類原檔已用的 id。**
