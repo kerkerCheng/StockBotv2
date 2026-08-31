@@ -35,7 +35,7 @@
       "wake_pq2": 134,
       "poll": {
         "eligible": true,
-        "last_checked": null,
+        "last_checked": "2026-08-31",
         "query_hint": "AAOI Applied Optoelectronics Q3 2026 earnings guidance Q4 revenue outlook"
       },
       "note": "",
@@ -56,7 +56,7 @@
       "wake_pq2": 200,
       "poll": {
         "eligible": true,
-        "last_checked": null,
+        "last_checked": "2026-08-31",
         "query_hint": "Agility Robotics S-4 registration statement effective SEC IPO"
       },
       "note": "S-4 由機密遞交轉公開並生效；Agility 無 ticker，T0 靠 co: id、T2 輪詢補",

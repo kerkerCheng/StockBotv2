@@ -101,3 +101,29 @@ def test_project_memory_defines_common_sandbox_impact_review() -> None:
         "不新增 unattended rule",
     ):
         assert token in operations
+
+
+def test_event_watch_sweep_is_in_sandbox_not_escalated() -> None:
+    """Event Watch T2 sweep 的 sandbox impact review 結論（2026-08-31）。
+
+    `python -m engine_b.event_watch sweep [--mark-checked]` 只讀
+    config/event_watch.json 與 library/leads/event_watches.json、寫後者
+    （同目錄 tempfile 原子替換）——無網路、無憑證、無 identity/ACL、
+    無 private authority，完全在 workspace-write sandbox 內，**不需**
+    outside-sandbox rule。WebSearch 部分由 daily agent 既有能力執行
+    （同事件監控先例），受 config `sweep_budget_per_run` cap 約束。
+
+    本測試鎖兩件事：①rules 檔**不得**出現 event_watch 條目——它不需要
+    escalation，未來有人順手放寬就是 broad permission 掩蓋整合缺口；
+    ②daily prompt 必須帶 sweep 步驟與 cap 紀律。
+    """
+    rules = RULES.read_text(encoding="utf-8")
+    assert "event_watch" not in rules
+
+    prompt = (ROOT / "crons" / "daily_brief_prompt.md").read_text(encoding="utf-8")
+    for token in (
+        "event_watch sweep",
+        "sweep_budget_per_run",
+        "--mark-checked",
+    ):
+        assert token in prompt

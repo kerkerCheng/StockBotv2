@@ -268,8 +268,17 @@ cashtag 由 `entities.py` 確定性抽取；公司名寫成純文字時 regex �
 - T0（新 tier-1 PASS lead 比對具名標的）與 T1（until 日期）在每次 `todo sync` 自動檢查；
   fired watch 把 pq2 項的 waiting_on 翻回「等你決定」＋`watch_wake` 稽核，**不自動 go**。
 - T2 力度旋鈕在 `config/event_watch.json`（`sweep_budget_per_run` 調 0＝退回純被動，
-  系統照常運作）。互動 session／自主迴圈可直接 sweep；**無人值守排程要跑 sweep 前
-  必須先做 sandbox impact review（unattended WebSearch surface），目前未放行**。
+  系統照常運作）。互動 session／自主迴圈可直接 sweep。
+- **無人值守 sweep 已於 2026-08-31 完成 sandbox impact review 並放行**：
+  ①命令 surface：`python -m engine_b.event_watch sweep [--mark-checked]`——讀
+  `config/event_watch.json`＋`library/leads/event_watches.json`、寫後者（同目錄
+  tempfile 原子替換）；無網路、無憑證、無 identity/ACL、無 private authority、無 `.git`
+  ——**完全在 workspace-write sandbox 內，不需（也不得新增）outside-sandbox rule**；
+  ②WebSearch 由 daily agent 既有能力執行（同事件監控先例），每輪 ≤`sweep_budget_per_run`
+  次、每 watch 一次；③命中只 register lead 交下輪 triage，不直接喚醒 pq2、不寫 authority；
+  ④contract test：`tests/test_codex_daily_permissions.py::test_event_watch_sweep_is_in_sandbox_not_escalated`
+  鎖「rules 不得出現 event_watch」與「daily prompt 必帶 sweep 步驟與 cap」；
+  ⑤smoke：以 PowerShell exact 命令實跑 sweep＋`--mark-checked` 驗證 `last_checked` 落檔。
 - 給 pq2 項設等待時：能結構化的一律建 watch（散文 `--trigger` 只給人讀）；
   `expires` 必填，過期自動歸檔留稽核。
 

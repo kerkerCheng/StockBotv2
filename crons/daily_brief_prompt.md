@@ -74,6 +74,13 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
    - `.venv\Scripts\python.exe scripts\outcome_if_settled_today.py`（Alpha Pane 4；唯讀真實 fill、最新已收盤價與報酬，不 close 或寫 authority）
    - `.venv\Scripts\python.exe -m engine_b.todo sync`
    - `.venv\Scripts\python.exe -m engine_b.todo list`
+   - `.venv\Scripts\python.exe -m engine_b.event_watch sweep`（T2 主動輪詢，2026-08-31 sandbox review 後放行：
+     命令只讀寫 repo 內 watch registry、無網路無憑證，在 workspace-write sandbox 內、不需 escalation。
+     對回傳的每個 watch（上限由 `config/event_watch.json` 的 `sweep_budget_per_run` 決定，現值即 cap）
+     用 query hint 執行**一次** WebSearch；命中＝找到 watch 等的事件的可引用來源→依 lead-intake 慣例
+     register lead（下輪 triage 處理），**不直接喚醒 pq2、不寫任何 authority**；查完（無論命中）跑
+     `.venv\Scripts\python.exe -m engine_b.event_watch sweep --mark-checked` 標記。搜尋失敗 fail-soft
+     記入健康段，不阻斷 brief；budget=0 或 config 缺席時本步驟整段跳過。）
 4. 任何來源失敗都要誠實列出 `fetch_failed`／`parse_failed` 與結構化 `failure_class`；若 exact rule 未匹配，
    或命令遭 sandbox／proxy／本機網路權限阻擋，保留 `access_blocked` 並讓受影響資料 fail closed，
    不得以第二套 network rule、較寬 prefix 或手動 replay 事後補跑，也不得寫成「零筆新資料」或 `no_result`。

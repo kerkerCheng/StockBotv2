@@ -1144,6 +1144,7 @@ def sync(
     reactivated = 0
     refreshed = 0
     system_internal_retired = 0
+    churn_suppressed = 0
     stamp = at or _now()
     incoming = list(incoming)
     seen_keys = {_key(str(row["type"]), str(row["ref_id"])) for row in incoming}
@@ -1185,6 +1186,28 @@ def sync(
             continue
         if str(row["type"]) == "ra_admission" and _dropped_before(pool, row):
             continue
+        # churn 修法第二半（2026-08-31）：corroboration 殘餘類項目以**內容**當復活判準。
+        # resolve 過且 residual_digest 相同＝研究已交付、殘餘未變——不重生新號；
+        # digest 變了＝真的有新缺口，照常鑄號（標題會講新缺口）。
+        if row.get("residual_digest"):
+            key = _key(str(row["type"]), str(row["ref_id"]))
+            active_same = any(
+                _key(it["type"], it["ref_id"]) == key and not it.get("resolved_at")
+                for it in pool["items"]
+            )
+            if not active_same:
+                last_resolved = next(
+                    (
+                        it for it in reversed(pool["items"])
+                        if _key(it["type"], it["ref_id"]) == key and it.get("resolved_at")
+                    ),
+                    None,
+                )
+                if last_resolved is not None and (
+                    last_resolved.get("residual_digest") == row["residual_digest"]
+                ):
+                    churn_suppressed += 1
+                    continue
         before = len(pool["items"])
         item = upsert(
             pool,
@@ -1200,6 +1223,8 @@ def sync(
         # 圖影響一句話跟著項目走（L16）；collector 沒算出來就維持缺席。
         if row.get("graph_impact"):
             item["graph_impact"] = str(row["graph_impact"])
+        if row.get("residual_digest"):
+            item["residual_digest"] = str(row["residual_digest"])
 
         incoming_waiting = row.get("waiting_on")
         event_link = row.get("event_link")
@@ -1326,6 +1351,7 @@ def sync(
         "system_internal_retired": system_internal_retired,
         "watch_woken": watch_woken,
         "watch_counters": watch_counts,
+        "churn_suppressed": churn_suppressed,
         "active": len(active_items(pool)),
     }
 
@@ -1883,6 +1909,44 @@ def _decision_review_title(
     return f"{label}：{prompt}"
 
 
+def _residual_digest(user_codes: Iterable[str], missing_data: Iterable[str]) -> str:
+    """corroboration 殘餘缺口的 content key。
+
+    churn 的機械成因（2026-08-31 定案）：誠實 assessment 永遠列 missing_data →
+    `corroborated + missing_data` 依規則掛 `{axis}_corroboration_incomplete` →
+    收集端用固定軸文案鑄同標題新號（[294]→[308]）。使用者看到的是「go 了又重生」，
+    實際上缺口每輪都在變小，只是標題不說。修法＝以**殘餘內容**當 key：內容沒變的
+    不因 resolve 而復活；內容變了才鑄新號，且標題直接講新缺口。
+    """
+
+    import hashlib
+
+    payload = json.dumps(
+        [sorted(str(c) for c in user_codes), sorted(str(m) for m in missing_data)],
+        ensure_ascii=False,
+    )
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()[:16]
+
+
+def _corroboration_only_user_codes(blockers: Any) -> list[str] | None:
+    """若使用者要決定的 blocker **全部**是 `_corroboration_incomplete` 類（誠實殘餘），
+    回傳那些 code；否則 None（有真缺口，照舊 cohort-keyed 行為）。"""
+
+    codes = [str(b) for b in blockers if isinstance(b, str)]
+    if not codes:
+        return None
+    try:
+        from decision_lab.blockers import get_blocker_registry
+
+        grouped = get_blocker_registry().classify(codes)
+    except Exception:
+        return None
+    user_codes = list(grouped.get("user_decision") or ())
+    if user_codes and all(c.endswith("_corroboration_incomplete") for c in user_codes):
+        return user_codes
+    return None
+
+
 def _collect_decision_rows() -> list[dict[str, Any]]:
     """需要使用者注意的 Engine D 決策項（`attention == "REVIEW"`）→ 複查待辦。
 
@@ -1918,18 +1982,39 @@ def _collect_decision_rows() -> list[dict[str, Any]]:
         label = company if company not in {"", "unknown", "unresolved"} else (
             company_hint or ticker or "unknown"
         )
+        missing = [
+            str(m) for m in (item.get("weakest_missing_data") or []) if str(m).strip()
+        ]
+        title = _decision_review_title(
+            label,
+            weakest_axis=item.get("weakest_axis"),
+            sheet_only=bool(item.get("sheet_only")),
+        )
+        hint = (
+            _decision_review_hint(ref, dispatchable, blockers)
+            if not item.get("sheet_only") else ""
+        )
+        corroboration_codes = (
+            None if item.get("sheet_only")
+            else _corroboration_only_user_codes(blockers)
+        )
+        if corroboration_codes:
+            # 誠實殘餘類：標題直接講**當前**缺口，不用固定軸文案——使用者才看得出
+            # [308] 問的其實是新問題，不是 [294] 重生（churn 修法第一半）。
+            first = missing[0] if missing else "（missing_data 未列明）"
+            title = f"{label}：殘餘缺口——{first[:70]}"
+        if missing and hint:
+            hint = "當前 missing_data：" + "；".join(m[:60] for m in missing[:3]) + \
+                f"（共 {len(missing)} 項）｜" + hint
         row = {
             "type": "sheet_only_holding" if item.get("sheet_only") else "decision_review",
             "ref_id": ref,
-            "title": _decision_review_title(
-                label,
-                weakest_axis=item.get("weakest_axis"),
-                sheet_only=bool(item.get("sheet_only")),
-            ),
-            **({"hint": _decision_review_hint(ref, dispatchable, blockers)}
-               if not item.get("sheet_only") else {}),
+            "title": title,
+            **({"hint": hint} if hint else {}),
             "source": "decision_lab",
         }
+        if corroboration_codes:
+            row["residual_digest"] = _residual_digest(corroboration_codes, missing)
         if not item.get("sheet_only") and item.get("evidence_delta"):
             row["event_link"] = {
                 "type": "decision_evidence_delta",
