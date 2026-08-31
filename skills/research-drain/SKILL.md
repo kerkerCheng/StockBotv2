@@ -98,6 +98,41 @@ git status --short
 
 ---
 
+## Step 1.5 — 工單：寫 assessment **之前**先查該軸接受什麼
+
+```powershell
+& '.venv\Scripts\python.exe' -m decision_lab references <cohort_id> [--assessment <file>]
+```
+
+**這一步不是可選的。** 每個信心軸只接受特定 authority，寫錯了會得到
+`assessment_context_mismatch`——而那個碼看起來像「證據不足」，實際上是「引用對不上」，
+兩者的處置完全相反。
+
+它會直接告訴你三件事：
+- 每軸**接受哪些 authority**（例：`financial_resilience` 只吃 `engine_c_financial`／
+  `engine_c_manual`，**不收 `market`**；`valuation_payoff` 只吃 `engine_c_valuation`／
+  `fx`／`market`，**不收 `engine_c_financial`**）
+- 這份 frozen context 裡**有哪些 key 可以引用**（整串複製，字面必須完全一致）
+- 帶 `--assessment` 時逐條標出哪個 ref 不合格、為什麼
+
+⚠ **最重要的是它會分辨兩種完全不同的失敗：**
+
+| 工具說什麼 | 意義 | 處置 |
+|---|---|---|
+| `✗ 解析不到任何 key` | 引用寫錯（常見：把散文當 ref） | 改成 index 裡的 key |
+| `✗ authority 是 X，這一軸不接受` | 引用了對的東西給錯的軸 | 換一個該軸吃的 ref |
+| **`這一軸沒有任何合格引用`** | **上游根本沒產出該 authority** | **改引用救不了**——需要補上游資料，多半是 Engine C 人工觀測（使用者 gate） |
+
+第三種是研究做不完的：2026-08-31 實測 Schaeffler／Himax／Lynas 三個 cohort 的
+`commercial_maturity` 全部零合格引用，因為它只吃 `engine_c_backlog`／`engine_c_customer`，
+而那兩筆是財務核驗清單上的人工待填項。**這種軸誠實留 `unknown` 並把缺口寫進
+`missing_data`，不得硬塞其他 ref**——那就是讓引用去尋找能通過的權威（L15 的
+authority laundering）。
+
+**效率提示：** 同一個 authority 缺口常跨多個 cohort。逐張工單各撞一次是浪費——
+先把幾張的 `references` 一起查完，把同類缺口打包成一批 Engine C 觀測提案給使用者
+一次核准，比逐張跑有效得多。
+
 ## Step 2 — 每一條的終局只有兩種，沒有第三種
 
 | 終局 | 條件 | 動作 |

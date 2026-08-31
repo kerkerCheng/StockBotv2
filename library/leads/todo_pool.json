@@ -5677,6 +5677,30 @@
       "source": "decision_lab",
       "title": "co:schaeffler：補客戶端商業承諾：訂單、產能協議或預付款等付錢方向的證據",
       "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-31T15:42:59.383301+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2025-12-31T00:00:00+00:00；來源=HIMX 20-F FY2025 (filed 2026-03-27, SEC EDGAR)，Item 4.B Business Overview—Custom",
+      "n": 343,
+      "reason": null,
+      "ref_id": "po_0d4e78cedfceec725f5bf940d45cc074",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "engine_c",
+      "title": "Engine C 觀測：HIMX / backlog",
+      "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-08-31T15:42:59.383301+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2025-12-31T00:00:00+00:00；來源=HIMX 20-F FY2025 (filed 2026-03-27, SEC EDGAR)，Item 4.B Business Overview—Custom",
+      "n": 344,
+      "reason": null,
+      "ref_id": "po_1461e1b82c465d6b5ba15a73654d857c",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "engine_c",
+      "title": "Engine C 觀測：HIMX / customer_concentration",
+      "type": "engine_c_observation"
     }
   ],
   "log": [
@@ -12748,6 +12772,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 343,
+  "next_n": 345,
   "schema_version": "1"
 }
