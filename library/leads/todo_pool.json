@@ -4975,6 +4975,19 @@
       "source": "manual",
       "title": "Daily brief 修訂＋兩份 brainstorm（使用者 2026-08-31 指示）：圖影響一句話、pq1 標籤圖例、產業別分排序與截圖假設層方向文件",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-08-31T00:41:29.897031+00:00",
+      "hint": "使用者 2026-08-31 口頭核准方向（『沒討論空間 應該還好』）；受理即 resolve，工作排入開發佇列 ｜ 交付驗收：--by-sector 輸出分組排序＋需求錨重疊警告，預設輸出零變化",
+      "n": 305,
+      "reason": null,
+      "receipt": "authority:manual;ref:user_approval_2026-08-31_sector_ranking",
+      "ref_id": "manual:305",
+      "resolution": "go",
+      "resolved_at": "2026-08-31T00:41:35.925757+00:00",
+      "source": "manual",
+      "title": "產業別分排序原型：query/bottleneck.py 加 --by-sector（demand anchor 聚類，A 案），不動預設輸出；brief 版面每產業 top-3",
+      "type": "manual"
     }
   ],
   "log": [
@@ -11257,8 +11270,17 @@
       "ref_id": "dc_21d81aa11dd2fe85c747b1c759fd01ed",
       "type": "decision_review",
       "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-08-31T00:41:35.925757+00:00",
+      "n": 305,
+      "reason": null,
+      "receipt": "authority:manual;ref:user_approval_2026-08-31_sector_ranking",
+      "ref_id": "manual:305",
+      "type": "manual",
+      "verb": "go"
     }
   ],
-  "next_n": 305,
+  "next_n": 306,
   "schema_version": "1"
 }
