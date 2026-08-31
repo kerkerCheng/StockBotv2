@@ -5301,10 +5301,11 @@
       "added_at": "2026-08-31T06:26:17.953320+00:00",
       "hint": "go＝實作合併（加第三種喚醒目標 wake_lead、50 筆遷移、修 auto_trigger_reachable 的兩義欄位、分層計數器、報告段落改寫、測試）；不含改變任何 evidence tier、不含入圖、不含 live。驗收：已死但顯示可喚醒的筆數 14→0，且新 park 的線索必帶到期日。與下一項二選一，做這項則該項免",
       "n": 321,
-      "reason": null,
+      "reason": "驗收：stalled 卻宣稱可喚醒 →0；50 筆 backlog 全數取得到期日；新 park 自動建 watch（FCC→ew_0027 exp 2026-12-29）；1140 tests pass",
+      "receipt": "authority:code_change;ref:e413da3",
       "ref_id": "manual:321",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-31T07:57:41.565244+00:00",
       "source": "manual",
       "title": "統一 waiting 入口：把追源 backlog 併入 Event Watch（根治——追源繼承到期機制，14 筆已死結構性歸零）",
       "type": "manual"
@@ -12075,6 +12076,15 @@
       "ref_id": "manual:322",
       "type": "manual",
       "verb": "drop"
+    },
+    {
+      "at": "2026-08-31T07:57:41.565244+00:00",
+      "n": 321,
+      "reason": "驗收：stalled 卻宣稱可喚醒 →0；50 筆 backlog 全數取得到期日；新 park 自動建 watch（FCC→ew_0027 exp 2026-12-29）；1140 tests pass",
+      "receipt": "authority:code_change;ref:e413da3",
+      "ref_id": "manual:321",
+      "type": "manual",
+      "verb": "go"
     }
   ],
   "next_n": 323,
