@@ -132,7 +132,7 @@
       "hypothesis_id": "hy_0005_2026-08-31",
       "created_at": "2026-08-31T05:02:25.631864+00:00",
       "expires": "2027-06-30",
-      "status": "active",
+      "status": "verified",
       "source_handle": "@x_screenshot_policy_ban",
       "lead_id": "lead_7f66b743a034c41f638",
       "statement": "Trump 政府草擬禁止新中國光收發模組與 DC 設備（打擊 Innolight/Eoptolink）——若成真為西方光鏈（AAOI/SIVE/LITE/COHR）全面利多",
@@ -151,8 +151,17 @@
       "skeleton_ref": "",
       "watch_id": "",
       "note": "C 類（政策傳聞）；無邊可疊（需求側事件非供應結構）——事件驗證型，poll 追蹤",
-      "verified_by": null
+      "verified_by": {
+        "outcome": "hit",
+        "receipt": "lead_4c082f76 pq1 追源：Reuters 2026-08-04（Caixin/Tom's Hardware/Network World 多家一致）證實 FCC preparing measure banning US imports of new Chinese optical transceiver modules，擬年內發布；正式文本未出（lead parked 等 FCC 發布）。受益股當日反應：LITE +7%/COHR +11%/AAOI +18%",
+        "at": "2026-08-31T05:44:49.488823+00:00"
+      }
     }
   ],
-  "source_credibility": {}
+  "source_credibility": {
+    "@x_screenshot_policy_ban": {
+      "hits": 1,
+      "misses": 0
+    }
+  }
 }

@@ -1,0 +1,147 @@
+axti20260629_8k.htm 
+ 
+ 
+ 
+ 
+ 
+ false 
+ 0001051627 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 0001051627 
+ 
+ 
+ 2026-06-17 
+ 2026-06-17 
+ 
+ 
+
+ 
+ 
+ 
+
+ &#160; 
+ UNITED STATES 
+ SECURITIES AND EXCHANGE COMMISSION 
+ Washington, D.C. 20549 
+ &#160; 
+ FORM &#160; 8-K 
+ 
+ &#160; 
+ CURRENT REPORT 
+ 
+ &#160; 
+ Pursuant to Section &#160; 13 or 15(d) &#160; of the Securities Exchange Act of 1934 
+ 
+ &#160; 
+ Date of Report (Date of earliest event reported ):&#160; July 8, 2026 
+ 
+ &#160; 
+ AXT, INC. 
+ 
+ (Exact name of registrant as specified in its charter) 
+ &#160; 
+ &#160; 
+ 
+ &#160; Delaware &#160; 000-24085 &#160; 94-3031310 &#160; 
+ 
+ &#160; (State or other jurisdiction of incorporation) &#160; (Commission File Number) &#160; (IRS Employer Identification No.) &#160; 
+ 
+ 
+ &#160; 
+ 4281 Technology Drive 
+ 
+ Fremont ,&#160; California &#160; 94538 
+ 
+ (Address of principal executive offices) (Zip Code) 
+ &#160; 
+ Registrant&#8217;s telephone number, including area code: ( 510 )&#160; 438-4700 
+ 
+ &#160; 
+ Not Applicable 
+ (Former name or former address, if changed since last report) 
+ &#160; 
+ Check the appropriate box below if the Form&#160;8-K filing is intended to simultaneously satisfy the filing obligation of the registrant under any of the following provisions (see General Instruction A.2. below): 
+ &#160; 
+ 
+ &#9744; Written communications pursuant to Rule&#160;425 under the Securities Act (17 CFR 230.425) 
+ 
+ 
+ &#160; 
+ 
+ &#9744; Soliciting material pursuant to Rule&#160;14a-12 under the Exchange Act (17 CFR 240.14a-12) 
+ 
+ 
+ &#160; 
+ 
+ &#9744; Pre-commencement communications pursuant to Rule&#160;14d-2(b)&#160;under the Exchange Act (17 CFR 240.14d-2(b)) 
+ 
+ 
+ &#160; 
+ 
+ &#9744; Pre-commencement communications pursuant to Rule&#160;13e-4(c)&#160;under the Exchange Act (17 CFR 240.13e-4(c)) 
+ 
+ 
+ &#160; 
+ Indicate by check mark whether the registrant is an emerging growth company as defined in Rule 405 of the Securities Act of 1933 (&#167;230.405 of this chapter) or Rule 12b-2 of the Securities Exchange Act of 1934 (&#167;240.12b-2 of this chapter). 
+ &#160; 
+ Emerging growth company&#160; &#9744; 
+ 
+ &#160; 
+ If an emerging growth company, indicate by check mark if the registrant has elected not to use the extended transition period for complying with any new or revised financial accounting standards provided pursuant to Section 13(a) of the Exchange Act.&#160;&#9744; 
+ &#160; 
+ Securities registered pursuant to Section 12(b) of the Act: 
+ &#160; 
+ 
+ Title &#160; of &#160; each &#160; class: &#160; Trading &#160; Symbol &#160; Name &#160; of &#160; each &#160; exchange &#160; on &#160; which &#160; registered: 
+ 
+ Common Stock , $0.001 par value &#160; AXTI &#160; The&#160; NASDAQ &#160;Stock Market LLC 
+ 
+ 
+ &#160; 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ Item 2.04 Triggering Events That Accelerate or Increase a Direct Financial Obligation or an Obligation under an Off-Balance Sheet Arrangement. 
+ 
+ &#160; 
+ On June 26, 2026, Beijing Tongmei Xtal Technology Co., Ltd. (&#8220;Tongmei&#8221;), a majority controlled subsidiary of AXT, Inc. (the &#8220;Company&#8221;), notified the Shanghai Stock Exchange that it was withdrawing its application for an initial public offering (&#8220;IPO&#8221;) on the exchange&#8217;s STAR Market (the &#8220;STAR Market&#8221;), and o n July 8, 2026 the Shanghai Stock Exchange published the acceptance of the withdrawal. AXT and Tongmei will transfer their dedicated resources and efforts towards a listing on the Hong Kong Stock Exchange where its listing application will emphasize its updated business plan focusing on the&#160;development of the Company's indium phosphide ("InP ")&#160; business to address the growing demand for InP substrates used in high-speed optical data transmission and artificial intelligence data center applications.&#160;Tongmei&#8217;s listing application on the STAR Market in 2021, which has been pending since that time, emphasized Tongmei&#8217;s gallium arsenide (&#8220;GaAs&#8221;) semiconductor wafer substrates and other products for micro-LEDs. Given the increase in demand for its InP wafer substrates used for high-speed optical data transmission in data centers employing artificial intelligence, the Company believes that the Hong Kong Stock Exchange is an attractive market to list Tongmei&#8217;s shares permitting a broader potential base of institutional and retail investors in its anticipated IPO. 
+ &#160; 
+ In connection with its listing application on the STAR Market, Tongmei raised an aggregate of RMB 324,404,508 (approximately US$49 million) from eleven (11) private equity funds in China. Pursuant to the agreements with these private equity funds, Tongmei&#8217;s withdrawal of the listing application gives rise to a redemption right: each fund has the right, but not the obligation, to require the Company or Tongmei to redeem its investment, and the Company or Tongmei has the right, but not the obligation, to redeem each fund&#8217;s investment, in each case for a price equal to the original amount invested, without interest or any other return.&#160;Because the redemption price is fixed in RMB, the U.S. dollar amount payable will vary with the RMB/USD exchange rate.&#160;Tongmei and the Company are in discussions with each fund to determine whether it wishes to continue its investment as Tongmei advances toward an application for a Hong Kong Stock Exchange listing, or to have its investment redeemed in whole or in part.&#160;The Company has sufficient funds to redeem the fund's investments in full should full redemption be required. 
+ &#160; 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ SIGNATURES 
+ 
+ &#160; 
+ Pursuant to the requirements of the Securities Exchange Act of 1934, the registrant has duly caused this report to be signed on its behalf by the undersigned hereunto duly authorized. 
+ &#160; 
+ 
+ &#160; AXT, INC. 
+ 
+ &#160; &#160; &#160; 
+ 
+ &#160; By:&#160; /s/&#160;Gary L. Fischer 
+ 
+ Da te: July 8, 20 26 &#160; Gary L. Fischer 
+ 
+ &#160; &#160; Chief Financial Officer and Corporate Secretary 
+ 
+ 
+ &#160; 
+ &#160;

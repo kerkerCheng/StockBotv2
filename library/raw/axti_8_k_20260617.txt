@@ -1,0 +1,389 @@
+axti20260615_8k.htm 
+
+ 
+ 
+ 
+ 
+ 
+ false 
+ 0001051627 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 0001051627 
+ 
+ 
+ 2026-06-11 
+ 2026-06-11 
+ 
+ 
+
+ 
+ 
+ 
+
+ &#160; 
+
+ UNITED STATES 
+
+ SECURITIES AND EXCHANGE COMMISSION 
+
+ Washington, D.C. 20549 
+
+ &#160; 
+
+ FORM &#160; 8-K 
+
+ &#160; 
+
+ CURRENT REPORT 
+
+ &#160; 
+
+ Pursuant to Section &#160; 13 or 15(d) &#160; of the Securities Exchange Act of 1934 
+
+ &#160; 
+
+ Date of Report (Date of earliest event reported):&#160; June 11, 2026 
+
+ &#160; 
+
+ AXT, INC. 
+
+ (Exact name of registrant as specified in its charter) 
+
+ &#160; 
+
+ &#160; 
+
+ 
+
+ 
+ &#160; 
+ 
+ Delaware 
+ 
+ &#160; 
+ 
+ 000-24085 
+ 
+ &#160; 
+ 
+ 94-3031310 
+ 
+ &#160; 
+ 
+ 
+ &#160; 
+ 
+ (State or other jurisdiction 
+ of incorporation) 
+ 
+ &#160; 
+ 
+ (Commission File Number) 
+ 
+ &#160; 
+ 
+ (IRS Employer 
+ Identification No.) 
+ 
+ &#160; 
+ 
+
+ 
+
+ &#160; 
+
+ 4281 Technology Drive 
+
+ Fremont ,&#160; California &#160; 94538 
+
+ (Address of principal executive offices) (Zip Code) 
+
+ &#160; 
+
+ Registrant&#8217;s telephone number, including area code: ( 510 )&#160; 438-4700 
+
+ &#160; 
+
+ Not Applicable 
+
+ (Former name or former address, if changed since last report) 
+
+ &#160; 
+
+ Check the appropriate box below if the Form&#160;8-K filing is intended to simultaneously satisfy the filing obligation of the registrant under any of the following provisions (see General Instruction A.2. below): 
+
+ &#160; 
+
+ 
+
+ 
+ 
+ &#9744; 
+ 
+ 
+ Written communications pursuant to Rule&#160;425 under the Securities Act (17 CFR 230.425) 
+ 
+ 
+
+ 
+
+ &#160; 
+
+ 
+
+ 
+ 
+ &#9744; 
+ 
+ 
+ Soliciting material pursuant to Rule&#160;14a-12 under the Exchange Act (17 CFR 240.14a-12) 
+ 
+ 
+
+ 
+
+ &#160; 
+
+ 
+
+ 
+ 
+ &#9744; 
+ 
+ 
+ Pre-commencement communications pursuant to Rule&#160;14d-2(b)&#160;under the Exchange Act (17 CFR 240.14d-2(b)) 
+ 
+ 
+
+ 
+
+ &#160; 
+
+ 
+
+ 
+ 
+ &#9744; 
+ 
+ 
+ Pre-commencement communications pursuant to Rule&#160;13e-4(c)&#160;under the Exchange Act (17 CFR 240.13e-4(c)) 
+ 
+ 
+
+ 
+
+ &#160; 
+
+ Indicate by check mark whether the registrant is an emerging growth company as defined in Rule 405 of the Securities Act of 1933 (&#167;230.405 of this chapter) or Rule 12b-2 of the Securities Exchange Act of 1934 (&#167;240.12b-2 of this chapter). 
+
+ &#160; 
+
+ Emerging growth company&#160; &#9744; 
+
+ &#160; 
+
+ If an emerging growth company, indicate by check mark if the registrant has elected not to use the extended transition period for complying with any new or revised financial accounting standards provided pursuant to Section 13(a) of the Exchange Act.&#160;&#9744; 
+
+ &#160; 
+
+ Securities registered pursuant to Section 12(b) of the Act: 
+
+ &#160; 
+
+ 
+
+ 
+ 
+ Title &#160; of &#160; each &#160; class: 
+ 
+ &#160; 
+ 
+ Trading &#160; Symbol 
+ 
+ &#160; 
+ 
+ Name &#160; of &#160; each &#160; exchange &#160; on &#160; which &#160; registered: 
+ 
+ 
+ 
+ 
+ Common Stock , $0.001 par value 
+ 
+ &#160; 
+ 
+ AXTI 
+ 
+ &#160; 
+ 
+ The&#160; NASDAQ &#160;Stock Market LLC 
+ 
+ 
+
+ 
+
+ &#160; 
+
+ 
+ 
+ 
+ &#160; 
+ 
+ 
+
+ 
+ 
+ 
+ &#160; 
+ 
+ 
+ 
+
+ &#160; 
+
+ Item 1.01 Entry into a Material Definitive Agreement. 
+
+ &#160; 
+
+ On June 11, 2026, Beijing Tongmei Xtal Technology Co., Ltd. (&#8220;Tongmei&#8221;), the subsidiary of AXT, Inc., a Delaware corporation, entered into a Long-term Supply Agreement (the &#8220;Agreement&#8221;) with Nanjing Casela Technologies Corporation, Ltd. (&#8220;Casela&#8221;).&#160;The Agreement establishes an arrangement under which Tongmei reserves production capacity and raw-material allocation for, and grants supply priority to, Casela in exchange for Caela&#8217;s binding commitment to purchase a fixed aggregate quantity of indium phosphide (&#8220;InP&#8221;) wafer substrates from Tongmei during the period from January 1, 2027 through December 31, 2027. 
+
+ &#160; 
+
+ During the year 2027, Casela is committed to purchase an agreed upon quantity of InP substrate wafers for a total price of RMB 173,000,000 (approximately US&#160;$25.4 million), to be delivered on a monthly schedule. Casela is required to pay 50% of the total purchase price as a prepayment within 15 business days after entry into the Agreement, with the remaining 50% due on or before December 31, 2026. Casela is required to purchase at least 80% of the fixed aggregate quantity of InP wafer substrates and if purchases fall below 80%, Casela must pay a cancellation fee for the unpurchased quantity. 
+
+ &#160; 
+
+ To the extent Casela&#8217;s demand during the term exceeds the committed quantity, Tongmei has agreed, subject to available capacity and on terms no less favorable than those offered to similarly situated customers, to prioritize Casela&#8217;s excess demand. The pricing and other terms applicable to any such excess supplies will be set forth in a supplemental agreement. 
+
+ &#160; 
+
+ Order cancellation, Casela's failure to take possession of goods made available for delivery, payment delinquency exceeding 30 days or failure to reach the 80% purchase threshold each constitute a fundamental breach, upon which Tongmei may, in its sole discretion, terminate the Agreement and retain all amounts previously paid by Caseal. 
+
+ &#160; 
+
+ The Agreement contains customary provisions regarding delivery-schedule changes, pricing, product warranty, remedies for breach and dispute resolution. 
+
+ &#160; 
+
+ The foregoing description does not purport to be complete and is qualified in its entirety by reference to the full text of the Long-term Supply Agreement, an English translation of which will be filed as an exhibit to our quarterly report on Form 10-Q for the period ended June 30, 2026. 
+
+ &#160; 
+
+ &#160; 
+
+ Item 9.01 Financial Statements and Exhibits. 
+
+ &#160; 
+
+ (d) Exhibits. 
+
+ &#160; 
+
+ 
+
+ 
+ 
+ Exhibit No. 
+ 
+ &#160; 
+ 
+ Description 
+ 
+ 
+ 
+ &#160; 
+ &#160; 
+ &#160; 
+ 
+ 
+ 
+ &#160; 
+ 
+ &#160; 
+ 
+ &#160; 
+ 
+ 
+ 
+ 
+ 104 
+ 
+ &#160; 
+ 
+ Cover Page Interactive Data File (formatted as inline XBRL) 
+ 
+ 
+
+ 
+
+ &#160; 
+
+ 
+ &#160; 
+
+ 
+ &#160; 
+ 
+
+ &#160; 
+
+ SIGNATURES 
+
+ &#160; 
+
+ Pursuant to the requirements of the Securities Exchange Act of 1934, the registrant has duly caused this report to be signed on its behalf by the undersigned hereunto duly authorized. 
+
+ &#160; 
+
+ 
+
+ 
+ &#160; 
+ 
+ AXT, INC. 
+ 
+ 
+ 
+ &#160; 
+ &#160; 
+ &#160; 
+ 
+ 
+ &#160; 
+ 
+ By:&#160; 
+ 
+ /s/&#160;Gary L. Fischer 
+ 
+ 
+ 
+ Date: June 17, 2026 
+ 
+ &#160; 
+ 
+ Gary L. Fischer 
+ 
+ 
+ 
+ &#160; 
+ &#160; 
+ 
+ Chief Financial Officer and Corporate Secretary 
+ 
+ 
+
+ 
+
+ &#160; 
+
+ 
+ 
+ 
+ &#160;

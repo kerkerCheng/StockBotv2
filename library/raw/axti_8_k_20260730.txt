@@ -1,4 +1,4 @@
-axti20260729_8k.htm 
+axti20260609_8k.htm 
  
  
  
@@ -17,16 +17,14 @@ axti20260729_8k.htm
  0001051627 
  
  
- 2026-07-26 
- 2026-07-26 
+ 2026-07-30 
+ 2026-07-30 
  
  
 
  
  
  
-
- --12-31 
 
  &#160; 
 
@@ -36,6 +34,9 @@ axti20260729_8k.htm
 
  Washington, D.C. 20549 
 
+ &#160; 
+
+ 
  &#160; 
 
  FORM &#160; 8-K 
@@ -50,7 +51,7 @@ axti20260729_8k.htm
 
  &#160; 
 
- Date of Report (Date of earliest event reported):&#160; July 26, 2026 
+ Date of Report (Date of earliest event reported): July 30, 2026 
 
  &#160; 
 
@@ -61,14 +62,10 @@ axti20260729_8k.htm
  &#160; 
 
  
+ &#160; 
 
  
- &#160; 
- &#160; 
- &#160; 
- &#160; 
- &#160; 
- 
+
  
  
  Delaware 
@@ -98,18 +95,20 @@ axti20260729_8k.htm
 
  
 
+ &#160; 
+
  
  &#160; 
 
  4281 Technology Drive 
 
- Fremont ,&#160; California &#160; 94538 
+ Fremont , California 94538 
 
  (Address of principal executive offices) (Zip Code) 
 
  &#160; 
 
- Registrant&#8217;s telephone number, including area code: ( 510 )&#160; 438-4700 
+ Registrant&#8217;s telephone number, including area code: ( 510 ) 438-4700 
 
  &#160; 
 
@@ -136,6 +135,18 @@ axti20260729_8k.htm
  &#160; 
 
  &#9744; Pre-commencement communications pursuant to Rule&#160;13e&#8209;4(c)&#160;under the Exchange Act (17 CFR 240.13e&#8209;4(c)) 
+
+ &#160; 
+
+ Indicate by check mark whether the registrant is an emerging growth company as defined in Rule 405 of the Securities Act of 1933 (&#167;230.405 of this chapter) or Rule 12b-2 of the Securities Exchange Act of 1934 (&#167;240.12b-2 of this chapter). 
+
+ &#160; 
+
+ Emerging growth company &#9744; 
+
+ &#160; 
+
+ If an emerging growth company, indicate by check mark if the registrant has elected not to use the extended transition period for complying with any new or revised financial accounting standards provided pursuant to Section 13(a) of the Exchange Act. &#9744; 
 
  &#160; 
 
@@ -168,7 +179,7 @@ axti20260729_8k.htm
  
  &#160; 
  
- The&#160; NASDAQ &#160;Stock Market LLC 
+ The NASDAQ Stock Market LLC 
  
  
 
@@ -176,15 +187,90 @@ axti20260729_8k.htm
 
  &#160; 
 
- Indicate by check mark whether the registrant is an emerging growth company as defined in Rule 405 of the Securities Act of 1933 (&#167;230.405 of this chapter) or Rule 12b-2 of the Securities Exchange Act of 1934 (&#167;240.12b-2 of this chapter). 
+ 
+ 
+ 
+ &#160; 
+ 
+ 
+
+ 
+ 
+ 
+ &#160; 
+ 
+ 
+ 
 
  &#160; 
 
- Emerging growth company&#160; &#9744; 
+ 
+
+ 
+ 
+ Item &#160;2.02 
+ 
+ 
+ Results of Operations and Financial Condition 
+ 
+ 
+
+ 
 
  &#160; 
 
- If an emerging growth company, indicate by check mark if the registrant has elected not to use the extended transition period for complying with any new or revised financial accounting standards provided pursuant to Section 13(a) of the Exchange Act. &#9744; 
+ On July 30, 2026, AXT,&#160;Inc. issued a press release announcing its financial results for the&#160;quarter ended June 30, 2026.&#160;A copy of the Company&#8217;s press release, announcing the results, is attached hereto as Exhibit&#160;99.1 and incorporated herein by reference. 
+
+ &#160; 
+
+ The information in Exhibit&#160;99.1 hereto discussing the Company&#8217;s results of operations and financial condition for the quarter ended June 30, 2026, is being &#8220;furnished&#8221; in accordance with General Instruction B.2 of Form&#160;8&#8209;K and shall not be deemed to be &#8220;filed&#8221; for purposes of Section&#160;18 of the Securities Exchange Act of 1934, as amended (the &#8220;Exchange Act&#8221;), or otherwise subject to the liabilities of that section, or Sections 11 and 12(a)(2)&#160;of the Securities Act of 1933, as amended.&#160;The information contained herein and in the accompanying exhibit shall not be incorporated by reference into any filing of the Registrant, whether made before or after the date hereof, regardless of any general incorporation language in such filing, unless expressly incorporated by specific reference to such filing. 
+
+ &#160; 
+
+ &#160; 
+
+ 
+
+ 
+ 
+ Item &#160;9.01 
+ 
+ 
+ Financial Statements and Exhibits 
+ 
+ 
+
+ 
+
+ &#160; 
+
+ 
+
+ 
+ 
+ (d) 
+ 
+ 
+ Exhibits 
+ 
+ 
+
+ 
+
+ &#160; 
+
+ 
+
+ 
+ 
+ 99.1 
+ 
+ 
+ Press release dated July 30, 2026, regarding the financial results of AXT, Inc. for the quarter ended June 30, 2026. 
+ 
+ 
+
+ 
 
  &#160; 
 
@@ -197,29 +283,7 @@ axti20260729_8k.htm
 
  &#160; 
 
- Item 3.03. Material Modification to Rights of Security Holders. 
-
- &#160; 
-
- The information set forth under Item 5.03 below is incorporated by reference in this Item 3.03. 
-
- &#160; 
-
- Item 5.03. Amendments to Articles of Incorporation or Bylaws; Change in Fiscal Year. 
-
- &#160; 
-
- On July 26, 2026, the Board of Directors (the &#8220;Board&#8221;) of AXT, Inc. (the &#8220;Company&#8221;) adopted and approved an amendment (the &#8220;Amendment&#8221;) to the Company&#8217;s Second Amended and Restated Bylaws, effective immediately, pursuant to which Section 1.4 thereof was amended to reduce the quorum required for meetings of shareholders from a majority to thirty-three and one-third percent of all shares of stock entitled to vote at the meeting. 
-
- &#160; 
-
- The foregoing description of the Amendment does not purport to be complete and is qualified in its entirety by reference to the full text of the Amendment, which is filed as Exhibit 3.1 to this Current Report on Form 8-K and incorporated herein by reference. 
-
- &#160; 
-
- Item 9.01. Financial Statements and Exhibits. 
-
- (d) Exhibits. 
+ EXHIBIT &#160; INDEX 
 
  &#160; 
 
@@ -227,7 +291,8 @@ axti20260729_8k.htm
 
  
  
- Exhibit No. 
+ Exhibit 
+ Number 
  
  &#160; 
  
@@ -235,12 +300,17 @@ axti20260729_8k.htm
  
  
  
+ &#160; 
+ &#160; 
+ &#160; 
  
- 3.1 
+ 
+ 
+ 99.1 
  
  &#160; 
  
- Certificate of Amendment to the Second Amended and Restated Bylaws of AXT, Inc., 
+ Press release dated July 30, 2026, regarding the financial results of AXT,&#160;Inc. for the quarter ended June 30, 2026. 
  
  
  
@@ -278,15 +348,8 @@ axti20260729_8k.htm
 
  
  &#160; 
- &#160; 
- &#160; 
- &#160; 
  
- 
- &#160; 
- &#160; 
- 
- AXT, INC. 
+ AXT, &#160; INC. 
  
  
  
@@ -295,8 +358,13 @@ axti20260729_8k.htm
  &#160; 
  
  
+ &#160; 
+ &#160; 
+ &#160; 
  
- Date: July 29, 2026 
+ 
+ 
+ Date: July 30, 2026 
  
  
  By: 
@@ -304,21 +372,23 @@ axti20260729_8k.htm
  
  /s/ Gary L. Fischer 
  
- &#160; 
  
  
  &#160; 
  &#160; 
  
  Gary L. Fischer 
-
+ 
+ 
+ 
+ &#160; 
+ &#160; 
+ 
  Chief Financial Officer and Corporate Secretary 
  
  
 
  
-
- &#160; 
 
  &#160; 
 
