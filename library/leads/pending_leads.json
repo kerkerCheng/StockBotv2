@@ -38258,10 +38258,12 @@
       "lead_id": "lead_bae3d59e761ce13a08d11b6da1b4afbe",
       "published_at": "2026-08-17",
       "refs": {
+        "action_digest": "7f2fdb324ee3882c59ebfbee246ddbed4c2a28c1f77badd891826d7b8d44bc15",
+        "focus_company_id": "co:axt",
         "research_action_id": "ra_c218098e1ebd648b33920531d929c6c7"
       },
       "source": "event_watch:t2_sweep",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {
         "cpo": {
           "counter_only": false,

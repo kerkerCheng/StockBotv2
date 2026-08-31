@@ -4552,9 +4552,10 @@
       "hint": "coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
       "n": 278,
       "reason": null,
+      "receipt": null,
       "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "drop",
+      "resolved_at": "2026-08-31T06:10:25.415170+00:00",
       "source": "decision_lab",
       "source_cleared": {
         "at": "2026-08-31T02:45:27.304373+00:00",
@@ -4821,9 +4822,10 @@
       "hint": "coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
       "n": 293,
       "reason": null,
+      "receipt": null,
       "ref_id": "dc_0fca807c963dc3b9888e0f83ba6d45a5",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "drop",
+      "resolved_at": "2026-08-31T06:10:25.415223+00:00",
       "source": "decision_lab",
       "source_cleared": {
         "at": "2026-08-31T00:03:35.323472+00:00",
@@ -4860,9 +4862,10 @@
       "hint": "coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
       "n": 295,
       "reason": null,
+      "receipt": null,
       "ref_id": "dc_9d464eeb94b7b0108104db1774bbbdd4",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "drop",
+      "resolved_at": "2026-08-31T06:10:25.415247+00:00",
       "source": "decision_lab",
       "source_cleared": {
         "at": "2026-08-31T00:03:35.323472+00:00",
@@ -5171,6 +5174,11 @@
     },
     {
       "added_at": "2026-08-31T02:45:27.304373+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_86aad23459e108afccebb8abc9f5ca3f",
+      "dispatch_ref": "wo_571456f00886259141abbee324b481ca",
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-08-31T06:10:15.554065+00:00",
       "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 313,
       "reason": null,
@@ -5183,6 +5191,11 @@
     },
     {
       "added_at": "2026-08-31T02:45:27.304373+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_ae7e2839891a5792d4fbbaebde63f2db",
+      "dispatch_ref": "wo_64b6b6ebace3e2b25d6b32c9eb9c849c",
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-08-31T06:10:16.264206+00:00",
       "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 314,
       "reason": null,
@@ -5266,12 +5279,20 @@
     },
     {
       "added_at": "2026-08-31T05:47:37.304587+00:00",
+      "completion_authority": {
+        "action_digest": "7f2fdb324ee3882c59ebfbee246ddbed4c2a28c1f77badd891826d7b8d44bc15",
+        "cohort_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+        "commit": "d10bd365812bbd6c63871081c26536c2871b7d72",
+        "company_id": "co:axt",
+        "verified_at": "2026-08-31T06:10:07.905925+00:00"
+      },
       "hint": "核准 exact graph delta；Decision handoff：co:axt。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 320,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_c218098e1ebd648b33920531d929c6c7;digest:7f2fdb324ee3882c59ebfbee246ddbed4c2a28c1f77badd891826d7b8d44bc15;commit:d10bd365812bbd6c63871081c26536c2871b7d72;cohort:dc_ab4aa345d1c85b0f3c365a0ec71dad13",
       "ref_id": "ra_c218098e1ebd648b33920531d929c6c7",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-31T06:10:07.905925+00:00",
       "source": "research_action",
       "title": "AXT 雙客戶資本承諾：Coherent 預付 $22.29M 綁 6 吋 InP 產能（3 年）＋Lumentum $87M 押金保留產能至 2031——客戶端掏錢的真瓶頸訊號",
       "type": "ra_admission"
@@ -11964,6 +11985,62 @@
       "ref_id": "dc_2bd6137c75808ec4f28541111927d588",
       "type": "decision_review",
       "verb": "go"
+    },
+    {
+      "at": "2026-08-31T06:10:07.905925+00:00",
+      "n": 320,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_c218098e1ebd648b33920531d929c6c7;digest:7f2fdb324ee3882c59ebfbee246ddbed4c2a28c1f77badd891826d7b8d44bc15;commit:d10bd365812bbd6c63871081c26536c2871b7d72;cohort:dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "ref_id": "ra_c218098e1ebd648b33920531d929c6c7",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-08-31T06:10:15.554065+00:00",
+      "attempt": 1,
+      "n": 313,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_571456f00886259141abbee324b481ca",
+      "ref_id": "dc_7bd7922b16d32044b3f75d2edb19342d",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-08-31T06:10:16.264206+00:00",
+      "attempt": 1,
+      "n": 314,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_64b6b6ebace3e2b25d6b32c9eb9c849c",
+      "ref_id": "dc_48446dbceb85d4b785634e3c4ca5d669",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-08-31T06:10:25.415170+00:00",
+      "n": 278,
+      "reason": null,
+      "receipt": null,
+      "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+      "type": "decision_review",
+      "verb": "drop"
+    },
+    {
+      "at": "2026-08-31T06:10:25.415223+00:00",
+      "n": 293,
+      "reason": null,
+      "receipt": null,
+      "ref_id": "dc_0fca807c963dc3b9888e0f83ba6d45a5",
+      "type": "decision_review",
+      "verb": "drop"
+    },
+    {
+      "at": "2026-08-31T06:10:25.415247+00:00",
+      "n": 295,
+      "reason": null,
+      "receipt": null,
+      "ref_id": "dc_9d464eeb94b7b0108104db1774bbbdd4",
+      "type": "decision_review",
+      "verb": "drop"
     }
   ],
   "next_n": 321,
