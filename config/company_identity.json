@@ -494,6 +494,13 @@
       "market_currency": "AUD",
       "execution_currency": "AUD",
       "execution_venue": "ASX"
+    },
+    {
+      "company_id": "co:himax",
+      "research_ticker": "HIMX",
+      "market_currency": "USD",
+      "execution_currency": "USD",
+      "execution_venue": "NASDAQ"
     }
   ]
 }

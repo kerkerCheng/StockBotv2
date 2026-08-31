@@ -4929,9 +4929,10 @@
       "hint": "四維度 shape 好：瓶頸地位（疑似 COUPE 兩代獨家微透鏡，尚為三手轉述）＋需求錨（NVIDIA/TSMC CPO 鏈）＋純度待驗（HIMX 主業 display driver IC，WLO 占比要查 10-K）｜ go＝bounded 研究 HIMX 20-F/財報驗 WLO 分部占比與客戶集中，產出 onboard RA 回 pq2 另取號；不含入圖",
       "n": 301,
       "reason": null,
+      "receipt": "authority:manual;ref:ra_8fde4978b32b86919d7aa5e9ade93532",
       "ref_id": "manual:301",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-31T02:38:09.041944+00:00",
       "source": "manual",
       "title": "Himax（HIMX）onboard 研究：COUPE 微透鏡/WLO 疑似獨家供應商——Hunterbrook 專利鏈指認、市值中型、WLO 是駆動 IC 外的一塊業務（純度待查）",
       "type": "manual"
@@ -5074,6 +5075,18 @@
       "source": "decision_lab",
       "title": "co:mp_materials：補客戶端商業承諾：訂單、產能協議或預付款等付錢方向的證據",
       "type": "decision_review"
+    },
+    {
+      "added_at": "2026-08-31T02:37:59.296650+00:00",
+      "hint": "核准 exact graph delta；Decision handoff：co:himax。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 312,
+      "reason": null,
+      "ref_id": "ra_8fde4978b32b86919d7aa5e9ade93532",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "Himax（HIMX）onboard：20-F 一手證實 FOCI×WLO×CPO 夥伴關係——Hunterbrook 專利鏈推測升級為當事人揭露",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -11491,8 +11504,17 @@
       "ref_id": "manual:299",
       "type": "manual",
       "verb": "go"
+    },
+    {
+      "at": "2026-08-31T02:38:09.041944+00:00",
+      "n": 301,
+      "reason": null,
+      "receipt": "authority:manual;ref:ra_8fde4978b32b86919d7aa5e9ade93532",
+      "ref_id": "manual:301",
+      "type": "manual",
+      "verb": "go"
     }
   ],
-  "next_n": 312,
+  "next_n": 313,
   "schema_version": "1"
 }
