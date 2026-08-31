@@ -42028,6 +42028,7 @@
       "lead_id": "lead_cbd50ac57aa511c2d6c4e531b759f7a7",
       "published_at": null,
       "refs": {
+        "action_digest": "e1d7014f4790e54410599b36781bd35ba954dd0ffe66cfe0cc881d07f648e224",
         "focus_company_id": "co:mp_materials",
         "parked_reason": "圖的層級錯了，不是缺證據：Lynas 產的是分離重稀土「氧化物」，圖中的邊卻是 supplies_to mat:rare_earth_magnets（磁材）。在錯的層上填 substitutability 只會生出一個看起來有值、實際問錯問題的邊。正解是新增「中國以外的分離重稀土氧化物（Dy/Tb）」這一層，但要宣稱近獨家地位需要 USGS 一手支撐。",
         "research_action_id": "ra_09837781ccff7db053aabfe5e886f9f8",
@@ -42044,7 +42045,7 @@
         "trace_trigger_kind": "related_entity_signal"
       },
       "source": "directed:sub_backfill",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {},
       "title": "[定向補 sub｜稀土] Lynas 官網逐字：the world's only commercial producer of separated light and heavy rare earth oxides outside of China。2025 Q1 commissioned Dy 分離、6 月 Tb，年產能上看 1500t 重稀土；中國對 Dy/Tb 有出口管制。⚠ 待解語意：Lynas 供的是氧化物，圖中邊卻是 supplies_to mat:rare_earth_magnets（磁材）——先確認該邊原始 claim 再定 sub。⚠ L8：官網＝自報，sole_source 需 USGS 或客戶端印證才可升級",
       "triage": {
