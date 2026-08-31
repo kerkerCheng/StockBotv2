@@ -637,6 +637,19 @@ def render_by_sector(result: Mapping[str, Any], *, top_n: int = 3) -> str:
             "🔴 **空產業組（sub 覆蓋未及，研究缺口）**：" + "、".join(empty)
         )
         lines.append("")
+    # 「🔴 無需求錨」是**該不該建新產業群**的唯一訊號，必須附解讀：
+    # 一條 sub>=4 的邊代表「這個瓶頸換掉很難」，走不到任何錨代表「但我們不知道它服務誰」。
+    # 兩者同時成立時只有三種可能，都需要人動手，不會自己消失：
+    # ⚠ [323] 把 DEMAND_ANCHORS 收斂到 config 之後，原本的「（未映射錨）」偵測恆為空
+    # （錨就是從 config 讀的，不可能不在 config 裡），本組因此是僅存的新群訊號。
+    if "🔴 無需求錨" in grouped["sectors"]:
+        lines.append(
+            "> 🔴 **無需求錨組的讀法**：這些邊「難替代」但「不知服務誰」。三種可能："
+            "①需求端在圖裡但缺中間的邊 → 補邊；②它服務的市場還沒登記成錨 → "
+            "在 `config/sector_anchors.json` 補錨（**可能要開新產業群**）；"
+            "③真的沒有終端需求 → 不是投資標的。**不得預設是第③種**。"
+        )
+        lines.append("")
     for sector, buckets in sorted(
         grouped["sectors"].items(), key=lambda kv: -len(kv[1]["rows"])
     ):
