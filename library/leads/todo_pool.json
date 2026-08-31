@@ -4735,15 +4735,18 @@
       "added_at": "2026-08-30T13:43:26.064880+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_1bff14ca9e2853bf5c2ad2bc98a6a051",
+      "dispatch_receipt": "decision:pd_ad303bd0b73efcf212cd2e70b7a4423a",
       "dispatch_ref": "wo_600366f6288254a1fcb1952e2590715a",
-      "dispatch_status": "queued",
+      "dispatch_status": "completed",
+      "dispatch_updated_at": "2026-08-31T02:19:29.171963+00:00",
       "dispatched_at": "2026-08-30T23:59:29.297689+00:00",
       "hint": "coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 291,
-      "reason": null,
+      "reason": "pq1 completed",
+      "receipt": "decision:pd_ad303bd0b73efcf212cd2e70b7a4423a",
       "ref_id": "dc_6b92df56a6d186eb7464479dfb9c48c3",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-08-31T02:19:29.171963+00:00",
       "source": "decision_lab",
       "title": "co:foci：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
@@ -5007,6 +5010,30 @@
       "source": "manual",
       "title": "Event Watch 模組 W1-W3：watch registry＋T1 until 比對＋T0 entity_filing_signal/fact_verification 接 pq2＋T2 sweep（K 可調）＋常駐計數器＋遷移現有 3 個 waiting 項",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-08-31T02:18:35.642701+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2025-12-31T00:00:00+00:00；來源=MOPS 3363 114年度股東會年報「占銷貨總額百分之十以上之客戶名稱及其銷貨金額與比例」節（library/raw/mops_3363_annual_re",
+      "n": 307,
+      "reason": null,
+      "ref_id": "po_59c0b1bffcab8e92a300aa7302f7b8fe",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "engine_c",
+      "title": "Engine C 觀測：3363.TWO / customer_concentration",
+      "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-08-31T02:18:35.642701+00:00",
+      "hint": "go（大項）＝reassess 後以 assessment_gap 排入 pq1，研究範圍：source_reliability_corroboration_incomplete。產出為 assessment／研究包，完成後 reassess 以新 decision receipt 結案",
+      "n": 308,
+      "reason": null,
+      "ref_id": "dc_fdab434d1fad67666c57a6eefd379337",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:nvidia：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
     }
   ],
   "log": [
@@ -11361,8 +11388,35 @@
       "ref_id": "dc_cc46527aac12ba14191ee71c0460f3fe",
       "type": "decision_review",
       "verb": "go"
+    },
+    {
+      "at": "2026-08-31T02:16:26.339159+00:00",
+      "n": 291,
+      "reason": null,
+      "receipt": "session:queue-r3",
+      "ref_id": "dc_6b92df56a6d186eb7464479dfb9c48c3",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-08-31T02:19:29.171963+00:00",
+      "n": 291,
+      "reason": null,
+      "receipt": "decision:pd_ad303bd0b73efcf212cd2e70b7a4423a",
+      "ref_id": "dc_6b92df56a6d186eb7464479dfb9c48c3",
+      "type": "decision_review",
+      "verb": "pq1_completed"
+    },
+    {
+      "at": "2026-08-31T02:19:29.171963+00:00",
+      "n": 291,
+      "reason": "pq1 completed",
+      "receipt": "decision:pd_ad303bd0b73efcf212cd2e70b7a4423a",
+      "ref_id": "dc_6b92df56a6d186eb7464479dfb9c48c3",
+      "type": "decision_review",
+      "verb": "go"
     }
   ],
-  "next_n": 307,
+  "next_n": 309,
   "schema_version": "1"
 }
