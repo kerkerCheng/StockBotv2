@@ -1,0 +1,196 @@
+{
+  "claims": [
+    {
+      "confidence": 0.95,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "若 USGS Mineral Commodity Summaries 後續年度將重稀土淨進口依賴度下修至 100% 以下，或 terbium／lutetium 的中國來源占比顯著下降，則此集中度判斷失效。核查頻率：每年 2 月USGS MCS 發布後；觸發後 48 小時內人工 review。",
+      "id": "usgs_mcs2026_rare_earths_heavy_cl1",
+      "source_ids": [
+        "usgs_mcs2026_rare_earths_heavy_s1",
+        "usgs_mcs2026_rare_earths_heavy_s3"
+      ],
+      "statement": "美國對重稀土（terbium、dysprosium、holmium、erbium、thulium、ytterbium、lutetium）化合物與金屬的淨進口依賴度連續五年（2021–2025）為 100%。進口來源上 terbium、holmium、lutetium 各 100% 來自中國，ytterbium 86% 來自中國。⚠ USGS 該表**未單列 dysprosium 的進口來源**，不得推定其亦為 100% 中國。",
+      "subject_id": "mat:separated_heavy_reo"
+    },
+    {
+      "confidence": 0.95,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "若後續 USGS MCS 記載任一美國業者達成持續商業級重稀土產量，則此層的瓶頸敘事鬆動，應下修 ramp_difficulty 與 concentration。核查頻率：每年 USGS MCS；觸發後 48 小時內 review。",
+      "id": "usgs_mcs2026_rare_earths_heavy_cl2",
+      "source_ids": [
+        "usgs_mcs2026_rare_earths_heavy_s2"
+      ],
+      "statement": "2025 年美國境內至少五家公司在發展商業級重稀土處理與精煉產能、至少一家已就特定重稀土化合物建立商業級產能，數家生產了小規模的重稀土化合物與金屬，**但無人達到持續的商業級產量**（USGS 原文 none produced sustained commercial-scale quantities）。這是「產能公告≠ 產出」的第三方佐證。",
+      "subject_id": "mat:separated_heavy_reo"
+    },
+    {
+      "confidence": 0.95,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "若中國全面撤銷 2025 年 4 月管制、或恢復 10 月的全重稀土管制，此時序描述即過期需重寫。核查頻率：每季與每年 USGS MCS；觸發後 48 小時內 review。",
+      "id": "usgs_mcs2026_rare_earths_heavy_cl3",
+      "source_ids": [
+        "usgs_mcs2026_rare_earths_heavy_s4"
+      ],
+      "statement": "中國出口管制時序（USGS 記載）：2025 年 4 月對 terbium、dysprosium、lutetium 等的金屬、氧化物、合金與化合物加嚴管制；10 月初擴大至全部重稀土元素；11 月將 10 月那次擴大**暫停一年**；截至 2025 年 12 月，4 月的管制仍有效，但中國已開始對特定出口商核發一般出口許可。⚠ 這是**雙向**訊息：管制仍在但已鬆動，不得只引用加嚴段而略去暫停與發照段。",
+      "subject_id": "mat:separated_heavy_reo"
+    },
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "若該筆 1.5 億美元貸款被撤銷、未動用或經證實對象並非 MP Materials，則此資本承諾佐證失效；若分離廠於 2028 年底前未產出可辨識的重稀土分離產品，則『資本承諾轉為產能』的推論失效。核查頻率：每季財報與每年 USGS MCS；觸發後 48 小時內人工 review。",
+      "id": "usgs_mcs2026_rare_earths_heavy_cl4",
+      "source_ids": [
+        "usgs_mcs2026_rare_earths_heavy_s5"
+      ],
+      "statement": "2025 年 8 月，美國國防部（U.S. Department of War）向加州 Mountain Pass 的一家稀土生產商提供 1.5 億美元**直接貸款**，用於興建重稀土分離廠。這是需求／政策端往供應端的資本承諾（payment_direction = customer_to_supplier），非供應商自報。⚠ USGS 原文只寫「a rare-earths producer in Mountain Pass, CA」，**未具名公司**；本圖依既有 MP Materials 10-K（已入庫）所載其營運 Mountain Pass 設施作 registry 級聯結，該聯結本身不由 USGS 背書。",
+      "subject_id": "co:mp_materials"
+    },
+    {
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "若取得磁材製造商或 OEM 的一手文件顯示高溫牽引馬達等特定應用中輕稀土無法替代 Dy／Tb，則應針對該應用細分 scope 並上修 substitutability。核查頻率：每年 USGS MCS 與主要磁材廠技術揭露；觸發後 48 小時內 review。",
+      "id": "usgs_mcs2026_rare_earths_heavy_cl5",
+      "source_ids": [
+        "usgs_mcs2026_rare_earths_heavy_s6"
+      ],
+      "statement": "反證（第三方，方向與瓶頸敘事相反）：USGS 明載重稀土「Substitutes are available for some applications but are generally less effective」，且「Light rare earths can substitute for heavy rare earths in several applications」。因此重稀土在應用層**存在替代路徑**，本圖據此把稀土磁材對分離重稀土的 substitutability 判為 3 而非 5——供應集中度高（100% 進口依賴）與技術上不可替代是**兩件事**，不得混為一談。",
+      "subject_id": "mat:separated_heavy_reo"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {
+        "sole_source": false,
+        "substitutability": 3
+      },
+      "confidence": 0.8,
+      "dst_id": "mat:separated_heavy_reo",
+      "id": "e1",
+      "relation": "depends_on",
+      "source_ids": [
+        "usgs_mcs2026_rare_earths_heavy_s6",
+        "usgs_mcs2026_rare_earths_heavy_s7"
+      ],
+      "src_id": "mat:rare_earth_magnets"
+    },
+    {
+      "attributes": {
+        "qualification_status": "none"
+      },
+      "confidence": 0.7,
+      "dst_id": "mat:separated_heavy_reo",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "usgs_mcs2026_rare_earths_heavy_s5",
+        "usgs_mcs2026_rare_earths_heavy_s2"
+      ],
+      "src_id": "co:mp_materials"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "separated heavy rare-earth oxide",
+        "HREO",
+        "dysprosium oxide",
+        "terbium oxide"
+      ],
+      "attributes": {
+        "concentration_score": 5,
+        "ramp_difficulty_intrinsic": 4
+      },
+      "confidence": 0.9,
+      "id": "mat:separated_heavy_reo",
+      "name": "分離重稀土氧化物（Dy／Tb 等）",
+      "role": "material_base",
+      "source_ids": [
+        "usgs_mcs2026_rare_earths_heavy_s1",
+        "usgs_mcs2026_rare_earths_heavy_s2"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "NdFeB"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:rare_earth_magnets",
+      "name": "Rare earth magnets (neodymium, samarium-cobalt)",
+      "source_ids": [
+        "usgs_mcs2026_rare_earths_heavy_s7"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "MP"
+      ],
+      "attributes": {
+        "ticker": "MP"
+      },
+      "confidence": 0.9,
+      "id": "co:mp_materials",
+      "name": "MP Materials",
+      "source_ids": [
+        "usgs_mcs2026_rare_earths_heavy_s5"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "usgs_mcs2026_rare_earths_heavy",
+    "evidence_tier": 1,
+    "origin_entity": "U.S. Geological Survey (美國政府第三方統計，非任何生產商)",
+    "permission_basis": "美國聯邦政府出版品，公有領域；保留 canonical URL 與研究必要引述。",
+    "published_at": "2026-02-01",
+    "publisher": "U.S. Geological Survey",
+    "retrieved_at": "2026-08-31",
+    "source_type": "industry_report",
+    "storage_permission": "repo_excerpt",
+    "title": "USGS Mineral Commodity Summaries 2026 — Rare Earths (Heavy)",
+    "url": "https://pubs.usgs.gov/periodicals/mcs2026/mcs2026-rare-earths-heavy.pdf"
+  },
+  "sources": [
+    {
+      "id": "usgs_mcs2026_rare_earths_heavy_s1",
+      "locator": "Salient Statistics — Net import reliance",
+      "quote": "Net import reliance as a percentage of apparent consumption, compounds and metals: 100 100 100 100 100"
+    },
+    {
+      "id": "usgs_mcs2026_rare_earths_heavy_s2",
+      "locator": "Domestic Production and Use",
+      "quote": "At least five companies were developing commercial-scale heavy-rare-earth processing and refining capacity and at least one company developed commercial-scale capacity for a specific heavy-rare-earth compound; several produced small-scale quantities of heavy-rare-earth compounds and metals in 2025, although none produced sustained commercial-scale quantities."
+    },
+    {
+      "id": "usgs_mcs2026_rare_earths_heavy_s3",
+      "locator": "Import Sources (2021–24)",
+      "quote": "Terbium compounds and metals: China, 100%. Holmium compounds and metals: China, 100%. Erbium compounds and metals: Germany, 51%; China, 40%; and Netherlands, 9%. Ytterbium compounds and metals: China, 86%; Germany, 4%; Chile, 4%; Republic of Korea, 3%; and other, 3%. Lutetium compounds and metals: China, 100%."
+    },
+    {
+      "id": "usgs_mcs2026_rare_earths_heavy_s4",
+      "locator": "Events, Trends, and Issues — export controls",
+      "quote": "In April 2025, China tightened its export controls on rare-earth elements, adding specific controls on metals, oxides, alloys, and compounds of terbium, dysprosium, lutetium, and other rare earths. In early October, China expanded its rare-earth export controls to include all heavy-rare-earth elements. However, in November, China suspended the early October export controls for 1 year. As of December 2025, the April export controls remained in effect, although China began to issue general export licenses to selected exporters."
+    },
+    {
+      "id": "usgs_mcs2026_rare_earths_heavy_s5",
+      "locator": "Events, Trends, and Issues — DOW loan",
+      "quote": "In August, the U.S. Department of War (DOW) provided a rare-earths producer in Mountain Pass, CA, with a $150 million direct loan to construct a heavy-rare-earths separation facility."
+    },
+    {
+      "id": "usgs_mcs2026_rare_earths_heavy_s6",
+      "locator": "Substitutes",
+      "quote": "Substitutes are available for some applications but are generally less effective. Light rare earths can substitute for heavy rare earths in several applications."
+    },
+    {
+      "id": "usgs_mcs2026_rare_earths_heavy_s7",
+      "locator": "Domestic Production and Use — applications",
+      "quote": "Heavy rare earths were used in a variety of applications, including catalysts for petroleum refining, fiber optics, high-strength magnets, industrial and medical lasers, and medical and scientific equipment such as portable X-rays."
+    }
+  ]
+}
