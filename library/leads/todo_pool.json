@@ -6045,10 +6045,11 @@
       "added_at": "2026-09-01T05:29:05.388941+00:00",
       "hint": "go＝啟動 system-decompose 拆解 NdFeB 磁材製程 stack(選題權在使用者,本項即選題核准);產出是研究地圖+pq1 研究題,不含入圖、不含 onboard;GBD 相關公司 onboard 屆時另鑄 ra_admission 編號。不 go 則 drop,不影響既有稀土群工作",
       "n": 365,
-      "reason": null,
+      "reason": "decompose 完成:NdFeB 燒結磁石(EV 級)stack 拆解——一手來源 Shin-Etsu 製程頁(tier2)/Proterial 新聞稿與 USPTO 專利(tier1-2)/USGS(已入圖);拆出 10 層,✅3 🟡1(GBD 節點在缺供應商)🔴4(金屬還原/合金鑄片/GBD專利授權/HRE-free 威脅層);4 題已註冊 pq1 triaged_go。關鍵發現:Proterial HRE-free 磁石(Br 1.40T/HcJ 1671kA/m)已出樣,是重稀土需求鏈 disproof 路徑",
+      "receipt": "authority:pq1_leads_registered;ref:lead_637ff273+lead_ff04ef06+lead_0a6d2fcd+lead_6c6eeb4f",
       "ref_id": "manual:365",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-01T05:39:46.513062+00:00",
       "source": "manual",
       "title": "decompose 提案:拆解 NdFeB 磁材製程 stack(晶界擴散 GBD 層——誰擁有量產 GBD、是製程瓶頸還是普及技術)",
       "type": "manual"
@@ -13672,6 +13673,15 @@
       "receipt": "action:ra_e89f06e0a1311dbbf5ac87aa381ad7e5;digest:03591a4e50b02ff535820540e51215902912bd86c8d9aa0cf6f4560b558efabb;commit:ffbf6287aaa153be724de5d9b7edacfb97a0c624;cohort:dc_db19d3b490013f4cc464b2aab37b0bc8",
       "ref_id": "ra_e89f06e0a1311dbbf5ac87aa381ad7e5",
       "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-01T05:39:46.513062+00:00",
+      "n": 365,
+      "reason": "decompose 完成:NdFeB 燒結磁石(EV 級)stack 拆解——一手來源 Shin-Etsu 製程頁(tier2)/Proterial 新聞稿與 USPTO 專利(tier1-2)/USGS(已入圖);拆出 10 層,✅3 🟡1(GBD 節點在缺供應商)🔴4(金屬還原/合金鑄片/GBD專利授權/HRE-free 威脅層);4 題已註冊 pq1 triaged_go。關鍵發現:Proterial HRE-free 磁石(Br 1.40T/HcJ 1671kA/m)已出樣,是重稀土需求鏈 disproof 路徑",
+      "receipt": "authority:pq1_leads_registered;ref:lead_637ff273+lead_ff04ef06+lead_0a6d2fcd+lead_6c6eeb4f",
+      "ref_id": "manual:365",
+      "type": "manual",
       "verb": "go"
     }
   ],

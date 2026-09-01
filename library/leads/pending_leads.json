@@ -8287,6 +8287,37 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2073079326862672205"
     },
+    "lead_0a6d2fcd63b317a590a3fdcd7d39cb5b": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-01T05:39:08.170799+00:00",
+      "lead_id": "lead_0a6d2fcd63b317a590a3fdcd7d39cb5b",
+      "published_at": null,
+      "refs": {},
+      "source": "decompose:ndfeb-gbd-2026-09-01",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "[decompose D4|NdFeB] 金屬還原/合金鑄片層:圖中無節點。Shin-Etsu 製程頁確認熔煉→粉碎→磁場成型→燒結→時效步驟,但 NdPr 氧化物→金屬還原與 strip casting 誰做(尤其 ex-China)完全未知。MP 10-K 是否揭露 metal/alloy 產能?建節點+找供應商",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-01T05:39:33.105220+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "金屬還原/合金鑄片是圖中未知層,答案改變候選集合"
+        },
+        "decided_at": "2026-09-01T05:39:33.105220+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "decompose:ndfeb-gbd-2026-09-01 結構研究題;使用者 [365] go 核准選題;pq1 bounded research,入圖另走 ra_admission",
+        "tier": 2
+      },
+      "url": "https://www.shinetsu-rare-earth-magnet.jp/e/masspro/sintering_p.html?decompose=metal_alloy_layer"
+    },
     "lead_0b7003b19b8d7254df26ac43d844dc95": {
       "entities": {
         "company_ids": [],
@@ -22971,6 +23002,37 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2072733748261720186"
     },
+    "lead_637ff27363713403fe64357400ecd082": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-01T05:39:07.583172+00:00",
+      "lead_id": "lead_637ff27363713403fe64357400ecd082",
+      "published_at": null,
+      "refs": {},
+      "source": "decompose:ndfeb-gbd-2026-09-01",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "[decompose D4|NdFeB] HRE-free 磁石威脅層:Proterial 2025-07 新聞稿(逐字已取):NMX-F1SH-HF Br=1.40T/HcJ>=1671kA/m 已出 pre-production 樣品,NMX-G1NH-HF 2026-04 量產廠備妥——無重稀土磁石達 EV 規格是 mat:separated_heavy_reo 需求鏈(Lynas/MP 重稀土軸)的直接 disproof 路徑。入圖評估+建 disproof watch",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-01T05:39:32.815088+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "exit_condition",
+          "reason": "HRE-free 磁石達 EV 規格威脅重稀土需求鏈——Lynas/MP 重稀土軸的 disproof watch"
+        },
+        "decided_at": "2026-09-01T05:39:32.815088+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "decompose:ndfeb-gbd-2026-09-01 結構研究題;使用者 [365] go 核准選題;pq1 bounded research,入圖另走 ra_admission",
+        "tier": 2
+      },
+      "url": "https://www.proterial.com/e/press/2025/n0722b.html?decompose=hre_free_threat"
+    },
     "lead_63b835be28af06ea59e52b18fb66b1f1": {
       "entities": {
         "company_ids": [
@@ -24608,6 +24670,37 @@
         "tier": 4
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1730168/000173016826000068/xslF345X06/wk-form4_1783723427.xml"
+    },
+    "lead_6c6eeb4f55149bc2857322229673e5b8": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-01T05:39:08.476201+00:00",
+      "lead_id": "lead_6c6eeb4f55149bc2857322229673e5b8",
+      "published_at": null,
+      "refs": {},
+      "source": "decompose:ndfeb-gbd-2026-09-01",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "[decompose D4|NdFeB] GBD 專利/授權層:Proterial(前 Hitachi Metals)持 GBD 設備與製程專利(US8375891/8262808/8157926 具名)。中國磁材廠量產 GBD 是取得授權還是繞開?授權結構決定 GBD 是壁壘還是普及技術——這正是使用者的原始問題",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-01T05:39:32.283736+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "ranking",
+          "reason": "GBD 專利授權結構決定它是壁壘還是普及技術,直接影響 sub 判值"
+        },
+        "decided_at": "2026-09-01T05:39:32.283736+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "decompose:ndfeb-gbd-2026-09-01 結構研究題;使用者 [365] go 核准選題;pq1 bounded research,入圖另走 ra_admission",
+        "tier": 2
+      },
+      "url": "https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/8375891?decompose=gbd_patents"
     },
     "lead_6cc7c974eab84a76ef68831129f474e3": {
       "entities": {
@@ -52117,6 +52210,37 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2074587024959709419"
+    },
+    "lead_ff04ef06e63412c3fc568279cc63e53a": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-01T05:39:07.874160+00:00",
+      "lead_id": "lead_ff04ef06e63412c3fc568279cc63e53a",
+      "published_at": null,
+      "refs": {},
+      "source": "decompose:ndfeb-gbd-2026-09-01",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "[decompose D4|NdFeB] GBD 量產層:tech:grain_boundary_diffusion 零供應商。Proterial DDMagic(Dy 氣相沉積擴散)官方自稱 industry leader+USPTO 專利具名(US8375891 vacuum vapor processing 等);JL MAG/Shin-Etsu/TDK 量產聲明待一手核對——誰量產 GBD、專利授權結構為何?連供應商邊",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-01T05:39:32.549122+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "GBD 量產者連上 tech:grain_boundary_diffusion,補稀土群供應結構"
+        },
+        "decided_at": "2026-09-01T05:39:32.549122+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "decompose:ndfeb-gbd-2026-09-01 結構研究題;使用者 [365] go 核准選題;pq1 bounded research,入圖另走 ra_admission",
+        "tier": 2
+      },
+      "url": "https://us.proterial.com/infrastructure-energy/clean-energy-technology/neomax-series-nd-fe-b-sintered-magnets/index.php?decompose=gbd_producers"
     },
     "lead_ff3a752c826025fae06da1015db608b2": {
       "entities": {
