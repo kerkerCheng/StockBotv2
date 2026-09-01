@@ -6524,8 +6524,10 @@
       "added_at": "2026-09-01T11:06:17.935917+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_e761c4c827da4956711035f0a1d79345",
+      "dispatch_receipt": "action:ra_4164b0e29ac79a64ddc58a1d9d2760ce",
       "dispatch_ref": "wo_ca2b3b19a0a25440b27316fe69b81149",
-      "dispatch_status": "queued",
+      "dispatch_status": "awaiting_approval",
+      "dispatch_updated_at": "2026-09-01T13:43:31.242190+00:00",
       "dispatched_at": "2026-09-01T13:20:30.604801+00:00",
       "hint": "當前 missing_data：customer_concentration：日本／JARE 佔營收比重（FY26 全年報告可查，尚未核對）；美國政府 US$96M binding LOI 的一手 ASX 公告核對（共 2 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 390,
@@ -6633,6 +6635,79 @@
       "source": "engine_c",
       "title": "Engine C 觀測：6680.HK / customer_concentration",
       "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-09-01T13:44:29.878804+00:00",
+      "graph_impact": "+2 節點、0 邊、2 claims｜來源：Lynas Rare Earths（受監管揭露;對手方=美國 Department of War）（tier 1）",
+      "hint": "核准 exact graph delta；Decision handoff：co:lynas。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 396,
+      "reason": null,
+      "ref_id": "ra_4164b0e29ac79a64ddc58a1d9d2760ce",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "Lynas 美國政府 LOI 一手化——第二個主權客戶承諾(US$96M/4年/US$110 地板)+Seadrift 廠不確定",
+      "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-09-01T13:44:29.878804+00:00",
+      "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "n": 397,
+      "reason": null,
+      "ref_id": "dc_a51839bbf1429618556cf8bc265398c4",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:google：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-01T13:44:29.878804+00:00",
+      "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "n": 398,
+      "reason": null,
+      "ref_id": "dc_32872cf6a80c5f273b9b4c55a57ff229",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:jl_mag：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-01T13:44:29.878804+00:00",
+      "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "n": 399,
+      "reason": null,
+      "ref_id": "dc_db19d3b490013f4cc464b2aab37b0bc8",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:nabtesco：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-01T13:44:29.878804+00:00",
+      "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "n": 400,
+      "reason": null,
+      "ref_id": "dc_6e429d67c7b9e925a1b25874e9dcefd9",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:soitec：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-01T13:44:29.878804+00:00",
+      "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "n": 401,
+      "reason": null,
+      "ref_id": "dc_b8fb35bfe958d2e6ca4b3f60e623a576",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:proterial：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
     }
   ],
   "log": [
@@ -14696,8 +14771,26 @@
       "ref_id": "dc_912a03a50135ea5e29000a0417c3f477",
       "type": "decision_review",
       "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-09-01T13:43:19.463490+00:00",
+      "n": 390,
+      "reason": null,
+      "receipt": "wo:wo_ca2b3b19a0a25440b27316fe69b81149",
+      "ref_id": "dc_48446dbceb85d4b785634e3c4ca5d669",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-09-01T13:43:31.242190+00:00",
+      "n": 390,
+      "reason": "US DoW LOI 一手化+Seadrift 不確定入包;JARE 佔營收比重(FY26 年報)留下段",
+      "receipt": "action:ra_4164b0e29ac79a64ddc58a1d9d2760ce",
+      "ref_id": "dc_48446dbceb85d4b785634e3c4ca5d669",
+      "type": "decision_review",
+      "verb": "pq1_awaiting_approval"
     }
   ],
-  "next_n": 396,
+  "next_n": 402,
   "schema_version": "1"
 }
