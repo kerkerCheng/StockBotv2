@@ -17,8 +17,11 @@
         "query_hint": ""
       },
       "note": "Meta Vistara 舊 RA 到期 drop（原 waiting until；RA expires_at 為主，本 watch 是 T1 保險）",
-      "status": "active",
-      "woken_by": null
+      "status": "consumed",
+      "woken_by": {
+        "kind": "date",
+        "at": "2026-09-01T01:05:24.282608+00:00"
+      }
     },
     {
       "watch_id": "ew_0002_2026-08-31",
