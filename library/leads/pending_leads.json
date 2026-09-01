@@ -8295,9 +8295,11 @@
       "first_seen": "2026-09-01T05:39:08.170799+00:00",
       "lead_id": "lead_0a6d2fcd63b317a590a3fdcd7d39cb5b",
       "published_at": null,
-      "refs": {},
+      "refs": {
+        "research_action_id": "ra_9f877cfd6d4d36c2bf22b00dca6e7286"
+      },
       "source": "decompose:ndfeb-gbd-2026-09-01",
-      "status": "triaged_go",
+      "status": "action_prepared",
       "themes": {},
       "title": "[decompose D4|NdFeB] 金屬還原/合金鑄片層:圖中無節點。Shin-Etsu 製程頁確認熔煉→粉碎→磁場成型→燒結→時效步驟,但 NdPr 氧化物→金屬還原與 strip casting 誰做(尤其 ex-China)完全未知。MP 10-K 是否揭露 metal/alloy 產能?建節點+找供應商",
       "triage": {
@@ -24681,9 +24683,14 @@
       "first_seen": "2026-09-01T05:39:08.476201+00:00",
       "lead_id": "lead_6c6eeb4f55149bc2857322229673e5b8",
       "published_at": null,
-      "refs": {},
+      "refs": {
+        "parked_reason": "GBD 量產普及已由 RA(ra_c382f01a)雙邊一手證實;但專利授權結構(中國廠是取得授權還是繞開)未核實——USPTO 搜尋結果具名 Hitachi Metals 為 US8375891/8262808/8157926 assignee 但未逐字核對,授權/訴訟揭露無公開一手",
+        "trace_attempts_ref": "USPTO 專利號經搜尋結果具名(未逐字);JL MAG 2022 HKEX 年報與 Proterial 官網皆未揭露 GBD 授權關係;2013 Hitachi Metals 對中國八廠的授權是成分專利非 GBD 專利(記憶推論,tier 4 未核)",
+        "trace_next_trigger": "Proterial 對中國磁材廠的 GBD 專利訴訟/授權公告;JL MAG 年報或招股書揭露專利授權費;或任一磁材廠 filing 提及 GBD license",
+        "trace_status": "partial"
+      },
       "source": "decompose:ndfeb-gbd-2026-09-01",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "[decompose D4|NdFeB] GBD 專利/授權層:Proterial(前 Hitachi Metals)持 GBD 設備與製程專利(US8375891/8262808/8157926 具名)。中國磁材廠量產 GBD 是取得授權還是繞開?授權結構決定 GBD 是壁壘還是普及技術——這正是使用者的原始問題",
       "triage": {
@@ -52221,9 +52228,11 @@
       "first_seen": "2026-09-01T05:39:07.874160+00:00",
       "lead_id": "lead_ff04ef06e63412c3fc568279cc63e53a",
       "published_at": null,
-      "refs": {},
+      "refs": {
+        "research_action_id": "ra_c382f01ab6312073d0c2269cc2e84586"
+      },
       "source": "decompose:ndfeb-gbd-2026-09-01",
-      "status": "triaged_go",
+      "status": "action_prepared",
       "themes": {},
       "title": "[decompose D4|NdFeB] GBD 量產層:tech:grain_boundary_diffusion 零供應商。Proterial DDMagic(Dy 氣相沉積擴散)官方自稱 industry leader+USPTO 專利具名(US8375891 vacuum vapor processing 等);JL MAG/Shin-Etsu/TDK 量產聲明待一手核對——誰量產 GBD、專利授權結構為何?連供應商邊",
       "triage": {

@@ -6174,6 +6174,32 @@
       "source": "manual",
       "title": "decompose 提案:拆解 CPO scale-up stack(skill 指定首選目標——scale_up_cpo/tfln_platform/wdm_laser_16ch/serdes 等 8 個殘骸層,骨架已在、供應商全空)",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-09-01T06:16:36.193566+00:00",
+      "graph_impact": "+3 節點、2 邊、1 claims｜來源：MP Materials（tier 1）",
+      "hint": "核准 exact graph delta；Decision handoff：co:mp_materials。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 374,
+      "reason": null,
+      "ref_id": "ra_9f877cfd6d4d36c2bf22b00dca6e7286",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "NdFeB 金屬還原/合金鑄片層落圖——MP Independence 電解還原+鑄片能力（10-Q 一手）,美國域內判 4/5",
+      "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-09-01T06:16:36.193566+00:00",
+      "graph_impact": "+7 節點、4 邊、2 claims｜來源：JL MAG Rare-Earth（tier 1）、Proterial（tier 2）",
+      "hint": "核准 exact graph delta；Decision handoff：co:jl_mag。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 375,
+      "reason": null,
+      "ref_id": "ra_c382f01ab6312073d0c2269cc2e84586",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "GBD 量產層補供應商——JL MAG(HKEX 年報)＋Proterial 連上晶界擴散節點;GBD 判普及技術非壁壘（含 co:jl_mag onboard）",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -13734,6 +13760,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 374,
+  "next_n": 376,
   "schema_version": "1"
 }

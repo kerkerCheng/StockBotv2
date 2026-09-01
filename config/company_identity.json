@@ -221,6 +221,13 @@
       "research_ticker": "JBL"
     },
     {
+      "company_id": "co:jl_mag",
+      "research_ticker": "6680.HK",
+      "market_currency": "HKD",
+      "execution_currency": "HKD",
+      "execution_venue": "HKEX"
+    },
+    {
       "company_id": "co:jx_advanced_metals",
       "research_ticker": "5016.T"
     },
