@@ -1,0 +1,91 @@
+{
+  "claims": [
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Downgrade share basis if Nabtesco's own disclosures revise the estimate materially downward, or if a third-party audited share study contradicts ~60%; substitutability moves per the existing edge-claim's conditions (OEM qualification lock-in evidence raises it, entrant design-ins lower it).",
+      "id": "nabtesco_official_precision_gears_cl1",
+      "source_ids": [
+        "nabtesco_official_precision_gears_s1",
+        "nabtesco_official_precision_gears_s2"
+      ],
+      "statement": "Nabtesco itself states approximately 60% (Nabtesco's estimate) global share of precision reduction gears for medium-size-to-large industrial robot joints — agreeing with the independent Next Financial estimate already in this graph ('generally credited with around 60%'). Two distinct origins (supplier self-report + independent newsletter) now corroborate the RV-reducer share figure; the number's honesty markers are preserved (it is Nabtesco's own estimate, not audited share data). The sub=3 judgment is unchanged: share concentration is corroborated, but Chinese entrant validation (Shuanghuan at Optimus/Unitree) is also already in graph.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {
+        "substitutability": 3
+      },
+      "confidence": 0.85,
+      "dst_id": "tech:rv_reducer",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "nabtesco_official_precision_gears_s1"
+      ],
+      "src_id": "co:nabtesco"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "robot_subsystem",
+      "aliases": [
+        "6268.T"
+      ],
+      "attributes": {
+        "ticker": "6268.T"
+      },
+      "confidence": 0.8,
+      "id": "co:nabtesco",
+      "name": "Nabtesco",
+      "role": null,
+      "source_ids": [
+        "nabtesco_official_precision_gears_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "robot_subsystem",
+      "aliases": [
+        "RV 減速機"
+      ],
+      "attributes": {},
+      "confidence": 0.8,
+      "id": "tech:rv_reducer",
+      "name": "RV Cycloidal Reducer",
+      "role": null,
+      "source_ids": [
+        "nabtesco_official_precision_gears_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "nabtesco_official_precision_gears",
+    "evidence_tier": 2,
+    "origin_entity": "Nabtesco",
+    "permission_basis": "Public vendor page; URL and short excerpts.",
+    "published_at": null,
+    "publisher": "Nabtesco Corporation",
+    "retrieved_at": "2026-09-01",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Nabtesco official — Precision Reduction Gears (market share statement)",
+    "url": "https://www.nabtesco.com/en/products/robot/"
+  },
+  "sources": [
+    {
+      "id": "nabtesco_official_precision_gears_s1",
+      "locator": "Product page — market share",
+      "quote": "We have an approximately 60% (Nabtesco's estimate) share of the global market for precision reduction gears when it comes to the joints of medium-size to large industrial robots."
+    },
+    {
+      "id": "nabtesco_official_precision_gears_s2",
+      "locator": "Product page — function",
+      "quote": "The reduction gears serve to provide excellent acceleration capabilities, smooth motion, low backlash, and accurate positioning precision, leading to enhanced robot controllability."
+    }
+  ]
+}
