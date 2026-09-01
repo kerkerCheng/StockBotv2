@@ -6297,6 +6297,19 @@
       "source": "research_action",
       "title": "CPO 測試層補供應商——Aehr FOX-XP 矽光晶圓級 burn-in(自報訂單),清 cpo_full_stack_test 零供應商",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-09-01T07:40:25.729441+00:00",
+      "hint": "使用者 2026-09-01 指示記錄：LON:VWRA 170 股 @ 194.16 USD，成交額 USD 33,007.20，券商富邦，資金來源 75 萬台幣貸款額度＋30 萬現金，依 2026-09-01 目標配置差距補 beta_core。go＝留稽核 receipt；不含 Sheet 寫入（唯讀憑證，由使用者自行更新）、不含任何後續交易授權",
+      "n": 381,
+      "reason": "使用者 2026-09-01 回報成交並指示記錄：LON:VWRA 買入 170 股 @ USD 194.16（成交額 USD 33,007.20，券商富邦）。資金：75 萬 TWD 貸款＋30 萬 TWD 現金；脈絡：beta_core 28.2% vs 目標 40%，全額補 beta_core，盲點審查確認不上調科技傾斜。Sheet 持股更新由使用者自行執行（系統唯讀）。",
+      "receipt": "authority:manual;ref:user_fill_report_2026-09-01_vwra_170sh_194.16usd_fubon",
+      "ref_id": "beta_fill_vwra_20260901",
+      "resolution": "go",
+      "resolved_at": "2026-09-01T07:41:16.441662+00:00",
+      "source": "manual",
+      "title": "Beta fill 紀錄：買入 VWRA 170 股 @ USD 194.16（富邦）",
+      "type": "manual"
     }
   ],
   "log": [
@@ -13909,8 +13922,17 @@
       "ref_id": "ra_f3a3ec91513f1db2193c6569e531a5e7",
       "type": "ra_admission",
       "verb": "go"
+    },
+    {
+      "at": "2026-09-01T07:41:16.441662+00:00",
+      "n": 381,
+      "reason": "使用者 2026-09-01 回報成交並指示記錄：LON:VWRA 買入 170 股 @ USD 194.16（成交額 USD 33,007.20，券商富邦）。資金：75 萬 TWD 貸款＋30 萬 TWD 現金；脈絡：beta_core 28.2% vs 目標 40%，全額補 beta_core，盲點審查確認不上調科技傾斜。Sheet 持股更新由使用者自行執行（系統唯讀）。",
+      "receipt": "authority:manual;ref:user_fill_report_2026-09-01_vwra_170sh_194.16usd_fubon",
+      "ref_id": "beta_fill_vwra_20260901",
+      "type": "manual",
+      "verb": "go"
     }
   ],
-  "next_n": 381,
+  "next_n": 382,
   "schema_version": "1"
 }
