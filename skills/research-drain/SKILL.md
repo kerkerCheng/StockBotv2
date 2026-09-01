@@ -76,8 +76,12 @@ git status --short
 
 **順序不是自由心證，三段固定：**
 
-1. **`pq1 進行中` 的工單（`dispatch_status` 為 queued／researching）** — 使用者早就 `go` 過了，
-   放著不動是本 skill 要修的那個 bug。**永遠排第一，不論它們看起來多無聊。**
+1. **所有「使用者已授權、還沒做完」的項目** — 放著不動是本 skill 要修的那個 bug。
+   **永遠排第一，不論它們看起來多無聊。** 包含兩類，同級處理：
+   - **`pq1 進行中` 的工單**（`dispatch_status` 為 queued／researching）
+   - **`manual` 型已授權項**（`todo list` 的 manual 段，hint 註明使用者指示者）——
+     ⚠ 2026-09-01 實測：[325] 授權後一天沒被排入，因為當時本段只寫了工單。
+     **佇列定義漏掉的授權項不會自己出現**（L16 的形狀：分類存在，沒送到消費端手上）。
 2. **`triaged_go` 線索** — 順序**只認 `engine_b.cli drain` 的輸出**。
    ⚠ 不得另建排序：`engine_b/priority.py` 是 pq1 排序的唯一權威，
    「我覺得這條比較有趣」正是它要防的東西。
@@ -138,7 +142,13 @@ authority laundering）。
 | 終局 | 條件 | 動作 |
 |---|---|---|
 | **產出入圖包** | 有可核准的 graph delta | `prepare_research_action.py` → `advance action_prepared` → 取得 pq2 編號 |
-| **誠實 park** | 追源未果／被一手否定／只屬 Engine C 時變觀測／沒有唯一 focus | `advance parked` ＋ 完整 trace refs |
+| **產出 onboard 包** | 標的不在 registry，但四維初判（瓶頸地位／需求錨／客戶端資本承諾／純度）值得入圖 | 打包 registry 條目＋首批 extraction＋L8 來源清單成 ra_admission packet 取號（`AGENTS.md`「Onboard 也走 pq2」）——**不要 park 成開放式 scope 問題** |
+| **誠實 park** | 追源未果／被一手否定／只屬 Engine C 時變觀測／沒有唯一 focus／四維初判不過 | `advance parked` ＋ 完整 trace refs |
+
+**onboard 包與 park 的分界是四維初判，不是「要不要多問使用者」。** 2026-09-01 實測：ESMT、
+Samsung 兩例都 park 成 scope 問題丟回給使用者，但契約早就允許發現方直接打包取號——
+使用者的核准介面是編號＋`go`，開放式問題反而是介面失敗。初判不過（如 ESMT 無客戶端
+資本承諾）就誠實 park 並寫明哪一維不過；初判過就打包，讓使用者對 exact packet 決定。
 
 **不得為了讓每條都有產出而製造空 Research Action。** park 必須附
 `parked_reason`、`trace_status`（封閉字彙）、`trace_next_trigger`、`trace_requires_user`。
@@ -259,6 +269,10 @@ Samsung／SKH 側」）。這種問題 park 成 pq2 並繼續下一條，收尾�
 依 `AGENTS.md` 的收尾義務，最後一則回覆必須有：
 
 - **建議摘要表**：每個新編號＋建議動詞＋一句理由
+- **「建議下一個 decompose 題目」固定一行**：pane 3（覆蓋缺口）只會減不會增——
+  `coverage_gaps` 只能從既有節點往回看，新層唯一產生器是 `system-decompose` 且選題權
+  在使用者。本 skill 每輪收尾**提案一個題目**（從 🔴 真瓶頸類或既有拆解殘骸推導），
+  使用者順手回一行就補貨；**系統只提案、不自行開題**，decompose gate 不因此放寬
 - **最後一行單獨給可複製的批次指令**（如 `341 342 343 go 344 drop`）
 - **本輪的否定結果**：哪些研究做完後結論是「不是瓶頸」——這一段不得省略，
   它是這個 skill 最容易被誤讀成「沒產出」的部分
@@ -269,6 +283,22 @@ Samsung／SKH 側」）。這種問題 park 成 pq2 並繼續下一條，收尾�
   這三種的下一步完全不同（前者不必再跑，後者該換新 session）。
 
 ---
+
+## Loop 模式（2026-09-01 使用者定案：無主動偏好時的單一研究入口）
+
+使用者以 `/loop` 連續執行本 skill 時，語意如下：
+
+- **節流閥是兩個外部節奏，不是執行速度**：①daily harvest 一天補一批線索；
+  ②pane 的可見成長發生在使用者 `go` 的瞬間——loop 產出的是等核准的 packets，
+  核准一批、pane 長一批。**不要為了「這輪要有產出」而降低終局品質**（灌 RA、
+  硬塞引用都是 L14/L15 違規）。
+- **每輪醒來＝一次完整 Step 0**：writer_guard check、重讀 counts／todo list／drain。
+  佇列有工作（新 harvest、使用者剛核准、manual 授權項）→ 全速 drain 到清空；
+  佇列空 → 誠實 noop，等下一批，**不自行開題**（decompose 選題權在使用者）。
+- **避讓窗與中斷語意照舊**（Step 5／5.5）：撞 daily 窗、guard exit 2、降級訊號，
+  一律邊界收乾淨後停；loop 的下一輪從 Step 0 重讀接手，不依賴上一輪記憶。
+- **建議醒頻**：清空狀態下 20–30 分鐘一次即可（噪音來源只有 harvest 與使用者核准）；
+  連續 noop 時拉長。每輪收尾摘要照 Step 6 出，含 decompose 題目提案行。
 
 ## 與其他 skill 的分工
 
