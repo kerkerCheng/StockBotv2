@@ -155,7 +155,9 @@ def _column_letter(index: int) -> str:
     return chr(ord("A") + index)
 
 
-def locate_portfolio_cells(requests: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def locate_portfolio_cells(
+    requests: list[dict[str, Any]], *, sheet: str | None = None
+) -> list[dict[str, Any]]:
     """依「欄名 + 列比對條件」定位儲存格，回傳 A1 位址與目前值。
 
     **絕不使用欄位位置索引** —— 使用者會調整欄序（2026-08-01 實際發生過），
@@ -163,17 +165,22 @@ def locate_portfolio_cells(requests: list[dict[str, Any]]) -> list[dict[str, Any
     定位，不用列號。
 
     request 格式：``{"match": {"ticker": "QQQ"}, "column": "shares"}``
+
+    `sheet` 預設 Portfolio；Capital Authority 等其他分頁的人工記帳寫入
+    可指定分頁名，回傳的 A1 位址已含分頁前綴，`write_portfolio_cells`
+    不需要知道分頁。
     """
+    sheet_name = sheet or SHEET_NAME
     service = _get_service()
     rows = (
         service.spreadsheets()
         .values()
-        .get(spreadsheetId=SPREADSHEET_ID, range=f"{SHEET_NAME}!A:Z")
+        .get(spreadsheetId=SPREADSHEET_ID, range=f"{sheet_name}!A:Z")
         .execute()
         .get("values", [])
     )
     if not rows:
-        raise ValueError("Portfolio 工作表是空的")
+        raise ValueError(f"{sheet_name} 工作表是空的")
     headers = [h.strip().lower() for h in rows[0]]
     located: list[dict[str, Any]] = []
     for request in requests:
@@ -198,7 +205,7 @@ def locate_portfolio_cells(requests: list[dict[str, Any]]) -> list[dict[str, Any
         row_number, padded = hits[0]
         located.append(
             {
-                "a1": f"{SHEET_NAME}!{_column_letter(col_index)}{row_number}",
+                "a1": f"{sheet_name}!{_column_letter(col_index)}{row_number}",
                 "column": column,
                 "match": match,
                 "current": padded[col_index],
