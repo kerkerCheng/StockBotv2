@@ -6310,6 +6310,19 @@
       "source": "manual",
       "title": "Beta fill 紀錄：買入 VWRA 170 股 @ USD 194.16（富邦）",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-09-01T07:49:51.652366+00:00",
+      "graph_impact": "+2 節點、1 邊、1 claims｜來源：HyperLight（tier 2）",
+      "hint": "核准 exact graph delta；Decision handoff：co:hyperlight。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 382,
+      "reason": null,
+      "ref_id": "ra_c2070ac0dbfb7fbb85efe72bd0eadf8e",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "TFLN 平台層補供應商——HyperLight 自報量產(含 co:hyperlight 私人 onboard),清 tfln_platform 零供應商",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -13933,6 +13946,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 382,
+  "next_n": 383,
   "schema_version": "1"
 }

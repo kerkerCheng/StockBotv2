@@ -187,6 +187,10 @@
       "research_ticker": null
     },
     {
+      "company_id": "co:hyperlight",
+      "research_ticker": null
+    },
+    {
       "company_id": "co:hyundai_mobis",
       "research_ticker": "012330.KS",
       "market_currency": "KRW"
