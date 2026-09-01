@@ -1,0 +1,67 @@
+{
+  "claims": [
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "guided",
+      "disproof_condition": "Downgrade if FY27 Photonics-SOI revenue fails to grow materially versus the >$100m FY26 base (watch FY27 half-year results), or if CPO qualification volumes do not convert to production orders within two fiscal halves.",
+      "id": "soitec_fy26_results_2026_05_27_cl1",
+      "source_ids": [
+        "soitec_fy26_results_2026_05_27_s1",
+        "soitec_fy26_results_2026_05_27_s2",
+        "soitec_fy26_results_2026_05_27_s3"
+      ],
+      "statement": "Soitec's official FY26 results quantify the Photonics-SOI business at above $100m revenue with volumes already shipping for CPO industry qualifications ahead of the ramp. This upgrades the August capacity-reservation narrative from a Reuters interview to the company's regulated financial communication, and quantifies the segment. Still supplier self-report: no customer is named anywhere, so external corroboration remains missing — the upgrade path stays a named customer or statutory contract-liabilities disclosure tied to the reservation deposits.",
+      "subject_id": "co:soitec"
+    }
+  ],
+  "edges": [],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "SOI.PA",
+        "Soitec S.A."
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:soitec",
+      "name": "Soitec",
+      "role": null,
+      "source_ids": [
+        "soitec_fy26_results_2026_05_27_s1"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "soitec_fy26_results_2026_05_27",
+    "evidence_tier": 2,
+    "origin_entity": "Soitec",
+    "permission_basis": "Public official PR; URL and short excerpts.",
+    "published_at": "2026-05-27",
+    "publisher": "Soitec",
+    "retrieved_at": "2026-09-01",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Soitec Reports Fiscal 2026 Full-Year Results (official PR)",
+    "url": "https://www.soitec.com/home/group/newsroom/press-releases/content/2026/05/27/soitec-reports-fiscal-2026-full-year-results"
+  },
+  "sources": [
+    {
+      "id": "soitec_fy26_results_2026_05_27_s1",
+      "locator": "Headlines — Photonics-SOI revenue",
+      "quote": "Strong momentum in Photonics-SOI, a powerful growth driver addressing surging AI data center demand, with revenue above $100m in FY26"
+    },
+    {
+      "id": "soitec_fy26_results_2026_05_27_s2",
+      "locator": "Q4'26 commentary — CPO qualifications",
+      "quote": "AI commercial momentum remains strong, driven by increasing Photonics-SOI penetration in high-speed pluggable transceivers and growing volumes shipped for co-packaged optics (CPOs) industry qualifications, in preparation for the upcoming ramp-up."
+    },
+    {
+      "id": "soitec_fy26_results_2026_05_27_s3",
+      "locator": "Segment commentary — position",
+      "quote": "Soitec’s ability to deliver high-end and differentiated products to AI infrastructure value chain supports the Group’s strong position in pluggable transceivers and growing traction from co-packaged optics architectures."
+    }
+  ]
+}
