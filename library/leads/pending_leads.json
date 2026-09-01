@@ -12631,6 +12631,45 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/928876/000197640826000632/xslF345X06/primary_doc.xml"
     },
+    "lead_248c9fd8eac30fc5dd67e40437863b68": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-01T06:22:50.355719+00:00",
+      "lead_id": "lead_248c9fd8eac30fc5dd67e40437863b68",
+      "published_at": null,
+      "refs": {},
+      "source": "decompose:cpo-quantum-x-2026-09-01",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CPO"
+          ]
+        }
+      },
+      "title": "[decompose D5|CPO] 矽光子引擎層:tech:silicon_photonics_chiplet 零供應商。NVIDIA 一手具名 TSMC(TSMC-SoIC 3D 堆疊)於矽光生態;圖中已有 COUPE/MRM 相關 doc——連 TSMC 供應邊清缺口,並確認 merchant 替代(GlobalFoundries/Tower)有無具名證據",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-01T06:23:05.586915+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "TSMC 矽光引擎邊清 silicon_photonics_chiplet 零供應商缺口"
+        },
+        "decided_at": "2026-09-01T06:23:05.586915+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "decompose:cpo-quantum-x-2026-09-01 結構研究題;使用者 [373] go 核准選題;pq1 bounded research,入圖另走 ra_admission",
+        "tier": 2
+      },
+      "url": "https://nvidianews.nvidia.com/news/nvidia-spectrum-x-co-packaged-optics-networking-switches-ai-factories?decompose=sipho_engine"
+    },
     "lead_24ad40de03ac5f87c78d9e043845b309": {
       "entities": {
         "company_ids": [
@@ -19588,6 +19627,45 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2082896789880119590"
+    },
+    "lead_4d44b6a39ca426804f4afacf3250b60e": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-01T06:22:50.652203+00:00",
+      "lead_id": "lead_4d44b6a39ca426804f4afacf3250b60e",
+      "published_at": null,
+      "refs": {},
+      "source": "decompose:cpo-quantum-x-2026-09-01",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CPO"
+          ]
+        }
+      },
+      "title": "[decompose D5|CPO] scale-out CPO 實體錨定:tech:scale_out_cpo 零供應商。Quantum-X Photonics(144x800G InfiniBand,200G SerDes,液冷,4x fewer lasers/3.5x 能效)是該層第一個量產實體——NVIDIA develops 邊+規格 claim 入圖;tech:serdes 200G 世代同步錨定",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-01T06:23:05.319163+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "Quantum-X 是 scale-out CPO 首個量產實體,錨定該層與 200G SerDes"
+        },
+        "decided_at": "2026-09-01T06:23:05.319163+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "decompose:cpo-quantum-x-2026-09-01 結構研究題;使用者 [373] go 核准選題;pq1 bounded research,入圖另走 ra_admission",
+        "tier": 2
+      },
+      "url": "https://nvidianews.nvidia.com/news/nvidia-spectrum-x-co-packaged-optics-networking-switches-ai-factories?decompose=scale_out_anchor"
     },
     "lead_4e01f16dd69b10649a4960ad46f3ef7b": {
       "entities": {
@@ -30776,6 +30854,45 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2072765527764971642"
+    },
+    "lead_89da6904d80c967511e99b7ce08c1f05": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-01T06:22:50.062832+00:00",
+      "lead_id": "lead_89da6904d80c967511e99b7ce08c1f05",
+      "published_at": null,
+      "refs": {},
+      "source": "decompose:cpo-quantum-x-2026-09-01",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CPO"
+          ]
+        }
+      },
+      "title": "[decompose D5|CPO] CPO 封裝組裝層:圖中無節點(未知層)。NVIDIA 一手具名 SPIL(OSAT,日月光子公司)與 Foxconn/Fabrinet 系統組裝——CPO 交換機的 3D 封裝(TSMC-SoIC)與系統級組裝誰做、幾家能做?建節點+邊",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-01T06:23:06.132292+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "CPO 封裝組裝層是圖中未知層,SPIL/Fabrinet 具名,答案改變候選集合"
+        },
+        "decided_at": "2026-09-01T06:23:06.132292+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "decompose:cpo-quantum-x-2026-09-01 結構研究題;使用者 [373] go 核准選題;pq1 bounded research,入圖另走 ra_admission",
+        "tier": 2
+      },
+      "url": "https://nvidianews.nvidia.com/news/nvidia-spectrum-x-co-packaged-optics-networking-switches-ai-factories?decompose=cpo_packaging"
     },
     "lead_89f2cee24a796d94b33e85d1dd5e0b04": {
       "entities": {
@@ -45616,6 +45733,45 @@
         "tier": 2
       },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-rapporterar-resultat-for-q2-2026-tillvaxt-i-produktforsaljning-rekordstor-pipeline-och-kunder-som-skalar-upp-positionerar-bolaget-for-accelererad-tillvaxt-866b28e6"
+    },
+    "lead_da949bb488299f294ed32453a126cfb8": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-01T06:22:49.762645+00:00",
+      "lead_id": "lead_da949bb488299f294ed32453a126cfb8",
+      "published_at": null,
+      "refs": {},
+      "source": "decompose:cpo-quantum-x-2026-09-01",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CPO"
+          ]
+        }
+      },
+      "title": "[decompose D5|CPO] 光纖耦合/連接器層:圖中無節點(未知層)。NVIDIA 一手具名 SENKO/Corning/Sumitomo Electric/Browave/TFC Communication 於矽光生態——CPO 的 fiber attach 是新瓶頸候選層(每交換機數千纖)。建節點+供應商邊;Browave(3163.TW)/TFC(300394.SZ) 上市可投",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-01T06:23:05.860869+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "CPO 光纖耦合層是圖中未知層,具名供應商含兩家上市標的,答案改變候選集合"
+        },
+        "decided_at": "2026-09-01T06:23:05.860869+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "decompose:cpo-quantum-x-2026-09-01 結構研究題;使用者 [373] go 核准選題;pq1 bounded research,入圖另走 ra_admission",
+        "tier": 2
+      },
+      "url": "https://nvidianews.nvidia.com/news/nvidia-spectrum-x-co-packaged-optics-networking-switches-ai-factories?decompose=fiber_attach"
     },
     "lead_dabef2b4657350217cdd112112606b35": {
       "entities": {

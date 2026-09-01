@@ -6175,10 +6175,11 @@
       "added_at": "2026-09-01T05:44:14.587022+00:00",
       "hint": "go＝啟動 system-decompose 收斂 CPO stack 拆解殘骸(選題核准);產出研究地圖+pq1 題,不含入圖與 onboard。drop＝不拆,殘骸留在 coverage_gaps",
       "n": 373,
-      "reason": null,
+      "reason": "decompose 完成:NVIDIA Quantum-X Photonics CPO 交換機拆解——一手 NVIDIA 發布稿(生態夥伴逐字具名清單+144x800G/200G SerDes/4x fewer lasers 規格)。收斂:8 個殘骸層中 4 個有進展(fiber attach/封裝組裝兩個全新未知層+矽光引擎/scale-out 錨定),4 個誠實留未知(TFLN/16ch WDM laser/full-stack test/scale-up CPO——一手無供應商陳述);4 題已註冊 pq1 triaged_go",
+      "receipt": "authority:pq1_leads_registered;ref:lead_da949bb4+lead_89da6904+lead_248c9fd8+lead_4d44b6a3",
       "ref_id": "manual:373",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-01T06:23:06.355433+00:00",
       "source": "manual",
       "title": "decompose 提案:拆解 CPO scale-up stack(skill 指定首選目標——scale_up_cpo/tfln_platform/wdm_laser_16ch/serdes 等 8 個殘骸層,骨架已在、供應商全空)",
       "type": "manual"
@@ -13808,6 +13809,15 @@
       "receipt": "action:ra_c382f01ab6312073d0c2269cc2e84586;digest:a0342022136bf33bf1756848a1343b5040c4b18bda16ae514896d2158b5a5a7e;commit:e700db212a2317e628dbb5322f3968183389f9d9;cohort:dc_32872cf6a80c5f273b9b4c55a57ff229",
       "ref_id": "ra_c382f01ab6312073d0c2269cc2e84586",
       "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-01T06:23:06.355433+00:00",
+      "n": 373,
+      "reason": "decompose 完成:NVIDIA Quantum-X Photonics CPO 交換機拆解——一手 NVIDIA 發布稿(生態夥伴逐字具名清單+144x800G/200G SerDes/4x fewer lasers 規格)。收斂:8 個殘骸層中 4 個有進展(fiber attach/封裝組裝兩個全新未知層+矽光引擎/scale-out 錨定),4 個誠實留未知(TFLN/16ch WDM laser/full-stack test/scale-up CPO——一手無供應商陳述);4 題已註冊 pq1 triaged_go",
+      "receipt": "authority:pq1_leads_registered;ref:lead_da949bb4+lead_89da6904+lead_248c9fd8+lead_4d44b6a3",
+      "ref_id": "manual:373",
+      "type": "manual",
       "verb": "go"
     }
   ],
