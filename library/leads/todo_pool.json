@@ -5912,6 +5912,11 @@
     },
     {
       "added_at": "2026-08-31T23:54:29.624234+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_9122e42205dbf3240e26c3db87882782",
+      "dispatch_ref": "wo_6ae5ff6ec80e0a2120a4ccafcbfe8b58",
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-09-01T09:10:38.767634+00:00",
       "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 356,
       "reason": null,
@@ -5924,6 +5929,11 @@
     },
     {
       "added_at": "2026-08-31T23:54:29.624234+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_4994dfb0d003bc0cd08a2ab6079c1495",
+      "dispatch_ref": "wo_99c06efe1286d7abc8031829dd366102",
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-09-01T09:10:35.289471+00:00",
       "hint": "當前 missing_data：JARE 公告（ASX 2026-03-10）與 Sojitz 客戶端公告（2025-10-30）尚未入圖——升級本軸 ；美國政府 US$96M binding LOI offtake（2026-03-16）僅二手轉述（rare-earth-（共 2 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 357,
       "reason": null,
@@ -5989,6 +5999,7 @@
     },
     {
       "added_at": "2026-09-01T01:37:52.092320+00:00",
+      "deferred_at": "2026-09-01T09:10:34.584186+00:00",
       "hint": "當前 missing_data：MRM/COUPE 量產爬坡的實測出貨（3Q26 財報季 FII/Fabrinet 驗證點；與 NVIDIA cohor（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 362,
       "reason": null,
@@ -5997,7 +6008,13 @@
       "resolved_at": null,
       "source": "decision_lab",
       "title": "co:tsmc：補 counter-path：什麼會讓這條因果鏈斷掉（第二供應源、客戶自製、技術替代）",
-      "type": "decision_review"
+      "type": "decision_review",
+      "waiting_on": {
+        "reason": "missing_data 是世界要先發生的事件,非 bounded research 可解",
+        "set_at": "2026-09-01T09:10:34.584186+00:00",
+        "trigger": "3Q26 財報季 FII/Fabrinet 出貨驗證點(MRM/COUPE 量產爬坡實測)",
+        "until": null
+      }
     },
     {
       "added_at": "2026-09-01T01:53:21.246693+00:00",
@@ -6116,6 +6133,11 @@
     },
     {
       "added_at": "2026-09-01T05:29:56.872153+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_b59d99bfd9f5ad3b0699e32270844233",
+      "dispatch_ref": "wo_44c090a1412248ef8b719ed2c38046ef",
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-09-01T09:10:38.069767+00:00",
       "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 369,
       "reason": null,
@@ -6149,6 +6171,11 @@
     },
     {
       "added_at": "2026-09-01T05:43:30.794350+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_4c50eab5fc28acb84461c05c90e5210a",
+      "dispatch_ref": "wo_b03a1b2a7712ad7a13b3a7e1eedab340",
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-09-01T09:10:35.985886+00:00",
       "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 371,
       "reason": null,
@@ -6247,6 +6274,11 @@
     },
     {
       "added_at": "2026-09-01T06:49:25.643616+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_f596bc961659927a63fb559245ee8ec8",
+      "dispatch_ref": "wo_93229762fdbd2b196b8debc98aee1f97",
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-09-01T09:10:36.681662+00:00",
       "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 377,
       "reason": null,
@@ -6259,6 +6291,11 @@
     },
     {
       "added_at": "2026-09-01T06:49:25.643616+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_325ba91f7bc50ce2d5d3a23daf42871f",
+      "dispatch_ref": "wo_f69bab7ff2587a9129ae248af3174c07",
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-09-01T09:10:37.378309+00:00",
       "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 378,
       "reason": null,
@@ -6292,13 +6329,21 @@
     },
     {
       "added_at": "2026-09-01T07:26:12.631202+00:00",
+      "completion_authority": {
+        "action_digest": "24e5ba2774b8fd930e376b21f4585f57c6bbeec2d69a239160139e159ee79b49",
+        "cohort_id": "dc_fef9e03e5e6935e7428620f7eab793ba",
+        "commit": "2109c0e2fa0cb31239336c4171588bffe6fb07fc",
+        "company_id": "co:aehr_test_systems",
+        "verified_at": "2026-09-01T09:10:24.175723+00:00"
+      },
       "graph_impact": "+2 節點、1 邊、1 claims｜來源：Aehr Test Systems（tier 2）",
       "hint": "核准 exact graph delta；Decision handoff：co:aehr_test_systems。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 380,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_ea319962c14ad1d436f87217b024bb4f;digest:24e5ba2774b8fd930e376b21f4585f57c6bbeec2d69a239160139e159ee79b49;commit:2109c0e2fa0cb31239336c4171588bffe6fb07fc;cohort:dc_fef9e03e5e6935e7428620f7eab793ba",
       "ref_id": "ra_ea319962c14ad1d436f87217b024bb4f",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-01T09:10:24.175723+00:00",
       "source": "research_action",
       "title": "CPO 測試層補供應商——Aehr FOX-XP 矽光晶圓級 burn-in(自報訂單),清 cpo_full_stack_test 零供應商",
       "type": "ra_admission"
@@ -6318,13 +6363,21 @@
     },
     {
       "added_at": "2026-09-01T07:49:51.652366+00:00",
+      "completion_authority": {
+        "action_digest": "cfd2600c76979fac4bebf2b70e1fb3dc8ac864b2cebf3e5ac0693901ed1a3c9e",
+        "cohort_id": "dc_0e9a6405f4acf3ad3aa89347d532ac22",
+        "commit": "3808986d85884ba7607eccbbc5ac529dae504c78",
+        "company_id": "co:hyperlight",
+        "verified_at": "2026-09-01T09:10:30.419199+00:00"
+      },
       "graph_impact": "+2 節點、1 邊、1 claims｜來源：HyperLight（tier 2）",
       "hint": "核准 exact graph delta；Decision handoff：co:hyperlight。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 382,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_c2070ac0dbfb7fbb85efe72bd0eadf8e;digest:cfd2600c76979fac4bebf2b70e1fb3dc8ac864b2cebf3e5ac0693901ed1a3c9e;commit:3808986d85884ba7607eccbbc5ac529dae504c78;cohort:dc_0e9a6405f4acf3ad3aa89347d532ac22",
       "ref_id": "ra_c2070ac0dbfb7fbb85efe72bd0eadf8e",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-01T09:10:30.419199+00:00",
       "source": "research_action",
       "title": "TFLN 平台層補供應商——HyperLight 自報量產(含 co:hyperlight 私人 onboard),清 tfln_platform 零供應商",
       "type": "ra_admission"
@@ -13970,6 +14023,93 @@
       "ref_id": "dc_cc46527aac12ba14191ee71c0460f3fe",
       "type": "decision_review",
       "verb": "source_cleared"
+    },
+    {
+      "at": "2026-09-01T09:10:24.175723+00:00",
+      "n": 380,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_ea319962c14ad1d436f87217b024bb4f;digest:24e5ba2774b8fd930e376b21f4585f57c6bbeec2d69a239160139e159ee79b49;commit:2109c0e2fa0cb31239336c4171588bffe6fb07fc;cohort:dc_fef9e03e5e6935e7428620f7eab793ba",
+      "ref_id": "ra_ea319962c14ad1d436f87217b024bb4f",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-01T09:10:30.419199+00:00",
+      "n": 382,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_c2070ac0dbfb7fbb85efe72bd0eadf8e;digest:cfd2600c76979fac4bebf2b70e1fb3dc8ac864b2cebf3e5ac0693901ed1a3c9e;commit:3808986d85884ba7607eccbbc5ac529dae504c78;cohort:dc_0e9a6405f4acf3ad3aa89347d532ac22",
+      "ref_id": "ra_c2070ac0dbfb7fbb85efe72bd0eadf8e",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-01T09:10:34.584186+00:00",
+      "n": 362,
+      "reason": "missing_data 是世界要先發生的事件,非 bounded research 可解",
+      "receipt": null,
+      "ref_id": "dc_29ef9f7194dc996c9b7eb62a9b21afc6",
+      "type": "decision_review",
+      "verb": "pending"
+    },
+    {
+      "at": "2026-09-01T09:10:35.289471+00:00",
+      "attempt": 1,
+      "n": 357,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_99c06efe1286d7abc8031829dd366102",
+      "ref_id": "dc_48446dbceb85d4b785634e3c4ca5d669",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-09-01T09:10:35.985886+00:00",
+      "attempt": 1,
+      "n": 371,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_b03a1b2a7712ad7a13b3a7e1eedab340",
+      "ref_id": "dc_db19d3b490013f4cc464b2aab37b0bc8",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-09-01T09:10:36.681662+00:00",
+      "attempt": 1,
+      "n": 377,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_93229762fdbd2b196b8debc98aee1f97",
+      "ref_id": "dc_32872cf6a80c5f273b9b4c55a57ff229",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-09-01T09:10:37.378309+00:00",
+      "attempt": 1,
+      "n": 378,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_f69bab7ff2587a9129ae248af3174c07",
+      "ref_id": "dc_b8fb35bfe958d2e6ca4b3f60e623a576",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-09-01T09:10:38.069767+00:00",
+      "attempt": 1,
+      "n": 369,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_44c090a1412248ef8b719ed2c38046ef",
+      "ref_id": "dc_a51839bbf1429618556cf8bc265398c4",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-09-01T09:10:38.767634+00:00",
+      "attempt": 1,
+      "n": 356,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_6ae5ff6ec80e0a2120a4ccafcbfe8b58",
+      "ref_id": "dc_6e429d67c7b9e925a1b25874e9dcefd9",
+      "type": "decision_review",
+      "verb": "pq1_queued"
     }
   ],
   "next_n": 384,
