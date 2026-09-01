@@ -5386,10 +5386,11 @@
       "added_at": "2026-08-31T09:48:26.272024+00:00",
       "hint": "使用者 2026-08-31 明確指示『手動把稀土跟機器人的族群長出來，看一陣子多族群的系統表現』——受理即 go，不重複請求核准。工作：對 MP/Lynas 與 Harmonic Drive 等邊定向尋找討論『替代難度』的一手文件（非僅供應關係），抽取後 prepare RA。⚠ 入圖仍是另一個 ra_admission 編號，本項不含 graph admission、不含 thesis mutation、不含 live",
       "n": 325,
-      "reason": null,
+      "reason": "使用者 2026-08-31 指示受理即 go；研究完成：MP/Lynas/Nabtesco 三條供應邊 sub 判值與逐字證據已打包成 prepared RA（[360][361] 為對應 ra_admission gate）",
+      "receipt": "authority:research_action_prepared;ref:ra_9a8419e6ff52f2c414d3d928504bc491+ra_032b64cc05094380e9046696c91142be",
       "ref_id": "manual:325",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-01T01:38:24.566396+00:00",
       "source": "manual",
       "title": "定向補 sub：長出稀土磁材與機器人兩個產業群（使用者指示）",
       "type": "manual"
@@ -5952,6 +5953,44 @@
       "resolved_at": null,
       "source": "decision_lab",
       "title": "co:schaeffler：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-01T01:37:52.092320+00:00",
+      "graph_impact": "+3 節點、2 邊、1 claims｜來源：Next Financial (Substack)（tier 3）",
+      "hint": "核准 exact graph delta；Decision handoff：co:nabtesco。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 360,
+      "reason": null,
+      "ref_id": "ra_032b64cc05094380e9046696c91142be",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "機器人減速機供應邊補替代難度——Nabtesco RV 減速機判 3/5，並補雙環傳動供應邊",
+      "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-09-01T01:37:52.092320+00:00",
+      "graph_impact": "+6 節點、2 邊、4 claims｜來源：U.S. Geological Survey (美國政府第三方統計，非任何生產商)（tier 1）、Federation of American Scientists（tier 3）、Lynas Rare Earths（tier 1）、Mining Weekly（tier 3）",
+      "hint": "核准 exact graph delta；Decision handoff：co:mp_materials。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 361,
+      "reason": null,
+      "ref_id": "ra_9a8419e6ff52f2c414d3d928504bc491",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "稀土磁材供應邊補替代難度——MP（美國域內）與 Lynas（中國以外）各判 4/5",
+      "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-09-01T01:37:52.092320+00:00",
+      "hint": "當前 missing_data：MRM/COUPE 量產爬坡的實測出貨（3Q26 財報季 FII/Fabrinet 驗證點；與 NVIDIA cohor（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "n": 362,
+      "reason": null,
+      "ref_id": "dc_29ef9f7194dc996c9b7eb62a9b21afc6",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:tsmc：補 counter-path：什麼會讓這條因果鏈斷掉（第二供應源、客戶自製、技術替代）",
       "type": "decision_review"
     }
   ],
@@ -13394,8 +13433,17 @@
       "ref_id": "dc_29ef9f7194dc996c9b7eb62a9b21afc6",
       "type": "decision_review",
       "verb": "go"
+    },
+    {
+      "at": "2026-09-01T01:38:24.566396+00:00",
+      "n": 325,
+      "reason": "使用者 2026-08-31 指示受理即 go；研究完成：MP/Lynas/Nabtesco 三條供應邊 sub 判值與逐字證據已打包成 prepared RA（[360][361] 為對應 ra_admission gate）",
+      "receipt": "authority:research_action_prepared;ref:ra_9a8419e6ff52f2c414d3d928504bc491+ra_032b64cc05094380e9046696c91142be",
+      "ref_id": "manual:325",
+      "type": "manual",
+      "verb": "go"
     }
   ],
-  "next_n": 360,
+  "next_n": 363,
   "schema_version": "1"
 }
