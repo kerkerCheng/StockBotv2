@@ -6231,10 +6231,11 @@
       "graph_impact": "+11 節點、9 邊、3 claims｜來源：NVIDIA（tier 2）",
       "hint": "核准 exact graph delta；Decision handoff：co:nvidia。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 376,
-      "reason": null,
+      "reason": "凍結 payload 撞同 URL 無 section 驗證(nvidia_photonics_pr_2025_03_18 母文件已存在),無法 resume;內容不變的 v2 已重新 prepare(母文件 backfill+節錄補 section),由新編號承載核准",
+      "receipt": null,
       "ref_id": "ra_2081f7886d5606bbc108f1cf7190acef",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "drop",
+      "resolved_at": "2026-09-01T07:14:08.682806+00:00",
       "source": "research_action",
       "title": "CPO stack 殘骸收斂——Quantum-X 實體錨定 scale-out CPO,新增光纖耦合與封裝組裝兩層,TSMC COUPE 邊落地",
       "type": "ra_admission"
@@ -6262,6 +6263,19 @@
       "source": "decision_lab",
       "title": "co:proterial：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-01T07:15:08.169474+00:00",
+      "graph_impact": "+11 節點、9 邊、3 claims｜來源：NVIDIA（tier 2）",
+      "hint": "核准 exact graph delta；Decision handoff：co:nvidia。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 379,
+      "reason": null,
+      "ref_id": "ra_f3a3ec91513f1db2193c6569e531a5e7",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "CPO stack 殘骸收斂——Quantum-X 實體錨定 scale-out CPO,新增光纖耦合與封裝組裝兩層,TSMC COUPE 邊落地",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -13856,8 +13870,17 @@
       "ref_id": "manual:373",
       "type": "manual",
       "verb": "go"
+    },
+    {
+      "at": "2026-09-01T07:14:08.682806+00:00",
+      "n": 376,
+      "reason": "凍結 payload 撞同 URL 無 section 驗證(nvidia_photonics_pr_2025_03_18 母文件已存在),無法 resume;內容不變的 v2 已重新 prepare(母文件 backfill+節錄補 section),由新編號承載核准",
+      "receipt": null,
+      "ref_id": "ra_2081f7886d5606bbc108f1cf7190acef",
+      "type": "ra_admission",
+      "verb": "drop"
     }
   ],
-  "next_n": 379,
+  "next_n": 380,
   "schema_version": "1"
 }
