@@ -6162,6 +6162,18 @@
       "source": "decision_lab",
       "title": "co:harmonic_drive_systems：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-01T05:44:14.587022+00:00",
+      "hint": "go＝啟動 system-decompose 收斂 CPO stack 拆解殘骸(選題核准);產出研究地圖+pq1 題,不含入圖與 onboard。drop＝不拆,殘骸留在 coverage_gaps",
+      "n": 373,
+      "reason": null,
+      "ref_id": "manual:373",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "decompose 提案:拆解 CPO scale-up stack(skill 指定首選目標——scale_up_cpo/tfln_platform/wdm_laser_16ch/serdes 等 8 個殘骸層,骨架已在、供應商全空)",
+      "type": "manual"
     }
   ],
   "log": [
@@ -13722,6 +13734,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 373,
+  "next_n": 374,
   "schema_version": "1"
 }
