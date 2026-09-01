@@ -1,0 +1,100 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Downgrade if photonics/CPO disappears from served-market language in future filings, or if concentration re-spikes above 90% (single-customer dependency risk returns); upgrade only with customer naming or segment revenue split.",
+      "id": "aehr_10_k_20260727_sipho_cl1",
+      "source_ids": [
+        "aehr_10_k_20260727_sipho_s1",
+        "aehr_10_k_20260727_sipho_s2",
+        "aehr_10_k_20260727_sipho_s3"
+      ],
+      "statement": "Aehr's audited FY2026 10-K names Co-Package Optics (CPO) and silicon photonics for data center infrastructure among its served markets — upgrading the [380] site-headline evidence to statutory-filing grade. Customer concentration is high but diversifying: top-five customers 93% (FY24) → 77% (FY25) → 70% (FY26), with FY2026's three largest at ~26%/14%/11% and none else above 10%. Customers remain unnamed (10-K practice); which of them is the silicon photonics buyer is not disclosed.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:cpo_full_stack_test",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "aehr_10_k_20260727_sipho_s1",
+        "aehr_10_k_20260727_sipho_s2"
+      ],
+      "src_id": "co:aehr_test_systems"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "test_yield",
+      "aliases": [
+        "AEHR",
+        "FOX-XP"
+      ],
+      "attributes": {
+        "ticker": "AEHR"
+      },
+      "confidence": 0.85,
+      "id": "co:aehr_test_systems",
+      "name": "Aehr Test Systems",
+      "role": null,
+      "source_ids": [
+        "aehr_10_k_20260727_sipho_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "test_yield",
+      "aliases": [
+        "full-stack test",
+        "CPO test",
+        "全堆疊測試"
+      ],
+      "attributes": {},
+      "confidence": 0.8,
+      "id": "tech:cpo_full_stack_test",
+      "name": "CPO 全堆疊測試（full-stack test）",
+      "role": null,
+      "source_ids": [
+        "aehr_10_k_20260727_sipho_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "aehr_10_k_20260727_sipho",
+    "evidence_tier": 1,
+    "origin_entity": "Aehr Test Systems",
+    "permission_basis": "Public SEC EDGAR filing; URL and short excerpts.",
+    "published_at": "2026-07-27",
+    "publisher": "SEC EDGAR",
+    "retrieved_at": "2026-09-01",
+    "section": "sipho_and_concentration",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Aehr Test Systems FY2026 10-K — silicon photonics/CPO market and customer concentration",
+    "url": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001040470&type=10-K"
+  },
+  "sources": [
+    {
+      "id": "aehr_10_k_20260727_sipho_s1",
+      "locator": "Item 1 Business — served markets",
+      "quote": "silicon photonics for data center infrastructure, Co-Package Optics (CPO) and worldwide 5G infrastructure"
+    },
+    {
+      "id": "aehr_10_k_20260727_sipho_s2",
+      "locator": "Item 1 Business — CPO roadmap context",
+      "quote": "Silicon photonics integrated circuits are also expanding into optical chip-to-chip communication, with multiple companies announcing roadmaps for co-packaged photonics integrated with microprocessors, graphics processors, and chipsets for computing and artificial intelligence applications."
+    },
+    {
+      "id": "aehr_10_k_20260727_sipho_s3",
+      "locator": "Customer concentration disclosure",
+      "quote": "Sales to our five largest customers accounted for approximately 70%, 77%, and 93% of our net sales in fiscal 2026, 2025, and 2024, respectively. During fiscal 2026, three customers accounted for approximately 26%, 14% and 11% of our net sales."
+    }
+  ]
+}

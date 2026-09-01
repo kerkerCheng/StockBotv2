@@ -1,0 +1,4 @@
+Source URL: https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001040470&type=10-K
+
+Excerpt:
+silicon photonics for data center infrastructure, Co-Package Optics (CPO) and worldwide 5G infrastructure... Sales to our five largest customers accounted for approximately 70%, 77%, and 93% of our net sales in fiscal 2026, 2025, and 2024, respectively. During fiscal 2026, three customers accounted for approximately 26%, 14% and 11% of our net sales. (Aehr FY2026 10-K, filed 2026-07-27)
