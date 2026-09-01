@@ -5834,15 +5834,18 @@
     },
     {
       "added_at": "2026-08-31T16:50:24.985736+00:00",
+      "dispatch_receipt": "trace:original_obtained",
       "dispatch_ref": "lead:lead_0e8667f7227314b6492fe56c8b0f2fcd",
-      "dispatch_status": "queued",
+      "dispatch_status": "parked",
+      "dispatch_updated_at": "2026-09-01T01:44:24.533319+00:00",
       "dispatched_at": "2026-08-31T23:46:46.924954+00:00",
       "hint": "go 只排入 bounded pq1；不接受 claim、不入圖。若需付費，另核准 exact 金額／方案。",
       "n": 351,
-      "reason": null,
+      "reason": "bounded 追源完成:核心原子經 TWSE 官方 API 一手核實(7月營收 NT$67.85億 +491% YoY;H1 稅後淨利 NT$79.7億、GM 61.4%);7月自結 NT$34.9億(單月EPS 11.61)經多家媒體確認存在;1.9x P/E 為作者年化自構、算術成立。四維第3維(客戶端資本承諾)不過→不 onboard。付費賣方報告另屬 [354]",
+      "receipt": "trace:original_obtained",
       "ref_id": "lead_0e8667f7227314b6492fe56c8b0f2fcd",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-01T01:44:24.533319+00:00",
       "source": "source_trace",
       "title": "追原報告／來源 access — ESMT (3006) is 1.9x P/E ratio off July's earnings annualized. Latest net income was: $109M net income/July, which is ~$1.3B annualized. With ~$395.9M net cash and with $249.6M in inventory. The mar...",
       "type": "source_trace_review"
@@ -13441,6 +13444,24 @@
       "receipt": "authority:research_action_prepared;ref:ra_9a8419e6ff52f2c414d3d928504bc491+ra_032b64cc05094380e9046696c91142be",
       "ref_id": "manual:325",
       "type": "manual",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-01T01:44:24.533319+00:00",
+      "n": 351,
+      "reason": "bounded 追源完成:核心原子經 TWSE 官方 API 一手核實(7月營收 NT$67.85億 +491% YoY;H1 稅後淨利 NT$79.7億、GM 61.4%);7月自結 NT$34.9億(單月EPS 11.61)經多家媒體確認存在;1.9x P/E 為作者年化自構、算術成立。四維第3維(客戶端資本承諾)不過→不 onboard。付費賣方報告另屬 [354]",
+      "receipt": "trace:original_obtained",
+      "ref_id": "lead_0e8667f7227314b6492fe56c8b0f2fcd",
+      "type": "source_trace_review",
+      "verb": "pq1_parked"
+    },
+    {
+      "at": "2026-09-01T01:44:24.533319+00:00",
+      "n": 351,
+      "reason": "bounded 追源完成:核心原子經 TWSE 官方 API 一手核實(7月營收 NT$67.85億 +491% YoY;H1 稅後淨利 NT$79.7億、GM 61.4%);7月自結 NT$34.9億(單月EPS 11.61)經多家媒體確認存在;1.9x P/E 為作者年化自構、算術成立。四維第3維(客戶端資本承諾)不過→不 onboard。付費賣方報告另屬 [354]",
+      "receipt": "trace:original_obtained",
+      "ref_id": "lead_0e8667f7227314b6492fe56c8b0f2fcd",
+      "type": "source_trace_review",
       "verb": "go"
     }
   ],

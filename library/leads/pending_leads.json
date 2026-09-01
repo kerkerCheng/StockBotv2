@@ -8722,17 +8722,17 @@
       "published_at": "2026-08-31T04:28:22.000Z",
       "raw_text": "ESMT (3006) is 1.9x P/E ratio off July's earnings annualized. \n\nLatest net income was: $109M net income/July, which is ~$1.3B annualized. With ~$395.9M net cash and with $249.6M in inventory.\n\nThe market cap less net cash and inventory is equivalent to: \n\n~17 months of July earnings.\n\nWhere monetizing that inventory benefits from rising memory prices. \n\nTheir ASP hike expectations were +105–113% Q/Q last quarter from other analyst notes. \n\nDDR2/DDR3, NOR Flash, SLC NAND, prices are expected to keep rising H2. \n\nThe main question is duration, but I personally think legacy DRAM/NAND shortages tightens throughout 2027. Others might disagree. \n\nOther analysts like Huanan argue that PSMC wafer hikes are largely pass through (we'll find out H2). \n\nMost people are finding companies with ~20 forward P/E ending 2028 to be attractive...\n\nBut 1.9x current runrate P/E seems like an anomaly to me personally. \n\nThat's my take on the company/legacy memory theme, I'll let others/markets decide if that's undervalued.",
       "refs": {
-        "parked_reason": "同主題合併 park;見 lead_1dfc66d3",
-        "research_outcome": "與 lead_1dfc66d3 同主題同來源,合併處置;估值異常旗標留待使用者 scope 決定(onboard 或放行)",
-        "trace_attempts_ref": "估值原子(1.9x 年化 P/E、淨現金3.959億美元、存貨2.496億美元)出自同一 X 帳號自算,基於7月自結年化——月自結年化 P/E 是作者建構非市場慣例;未經一手核對",
-        "trace_next_trigger": "同 lead_1dfc66d3:使用者 onboard 決定或 3006 Q3 財報",
+        "parked_reason": "追源完成且數字屬實,但四維初判第 3 維(客戶端資本承諾)不過:ESMT 無已揭露的 take-or-pay/預付款/產能綁定,是 legacy memory 價格週期受益者非瓶頸供應商;不打包 onboard。賣方 ASP 預估屬 [354] 付費 gate,由使用者另決",
+        "research_outcome": "推文核心原子經官方一手核實為真;估值異常存在但屬週期性盈餘爆發,非結構瓶頸;維持不 onboard,與前次 ESMT 判定一致",
+        "trace_attempts_ref": "TWSE OpenAPI t187ap05_L 一手核實 7 月營收 NT$67.85 億(+491% YoY/+40% MoM);t187ap14_L/t187ap06_L_ci 一手核實 H1 稅後淨利 NT$79.7 億、GM 61.4%、EPS 27.58;7 月自結稅後淨利 NT$34.9 億(單月 EPS 11.61)為公司自結公告、多家媒體(ETtoday/YesMedia)獨立轉述確認存在,幣值與推文 USD 109M 相符;1.9x P/E 是作者年化單月自結的自構指標,算術成立但非市場慣例;淨現金/存貨明細需 Q2 財報 line item,未逐字核",
+        "trace_next_trigger": "3006 Q3 財報(自結與審計數字落差驗證點)或任何 ESMT 客戶端資本承諾揭露",
         "trace_requeue_trigger": "user_go",
         "trace_requeued_at": "2026-08-31T23:46:46.924954+00:00",
         "trace_requires_user": "true",
-        "trace_status": "isolated_tier_3"
+        "trace_status": "original_obtained"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "ESMT (3006) is 1.9x P/E ratio off July's earnings annualized. Latest net income was: $109M net income/July, which is ~$1.3B annualized. With ~$395.9M net cash and with $249.6M in inventory. The market cap less net cash and inventory is equivalent to: ~17 months of July earnings. Where monetizing that inventory benefits from rising memory prices. Their ASP hike expectations were +105–113% Q/Q last quarter from other analyst notes. DDR2/DDR3, NOR Flash, SLC NAND, prices are expected to keep rising H2. The main question is duration, but I personally think legacy DRAM/NAND shortages tightens throughout 2027. Others might disagree. Other analysts like Huanan argue that PSMC wafer hikes are largely pass through (we'll find out H2). Most people are finding companies with ~20 forward P/E ending 2028 to be attractive... But 1.9x current runrate P/E seems like an anomaly to me personally. That's my take on the company/legacy memory theme, I'll let others/markets decide if that's undervalued.",
       "triage": {
