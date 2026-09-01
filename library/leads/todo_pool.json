@@ -6399,10 +6399,11 @@
       "added_at": "2026-09-01T07:50:19.413505+00:00",
       "hint": "go＝啟動 system-decompose 拆解 Unitree G1(選題核准);產出研究地圖+pq1 題,不含入圖與 onboard。drop＝不拆",
       "n": 383,
-      "reason": null,
+      "reason": "decompose 完成:Unitree G1(一手官方規格頁逐字)——23-43 DOF/PMSM 關節馬達/Dex3-1 三指手/US$13.5K;拆 7 層:✅3(致動器/減速機tech/磁材鏈已在圖)、🔴2 新未知層(靈巧手觸覺陣列/感測套件)、未知2(減速方案/FT感測器供應商官方皆不具名——誠實標未知不猜);3 題已註冊 pq1 triaged_go",
+      "receipt": "authority:pq1_leads_registered;ref:lead_42f589d3+lead_861daa2e+lead_441728fb",
       "ref_id": "manual:383",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-01T13:09:27.509738+00:00",
       "source": "manual",
       "title": "decompose 提案:拆解 Unitree G1 人形機器人(機器人群次層——FT 感測器/靈巧手/電池動力層,tech:force_torque_sensor 🔴 的原生系統)",
       "type": "manual"
@@ -14436,6 +14437,15 @@
       "ref_id": "dc_32872cf6a80c5f273b9b4c55a57ff229",
       "type": "decision_review",
       "verb": "pq1_awaiting_approval"
+    },
+    {
+      "at": "2026-09-01T13:09:27.509738+00:00",
+      "n": 383,
+      "reason": "decompose 完成:Unitree G1(一手官方規格頁逐字)——23-43 DOF/PMSM 關節馬達/Dex3-1 三指手/US$13.5K;拆 7 層:✅3(致動器/減速機tech/磁材鏈已在圖)、🔴2 新未知層(靈巧手觸覺陣列/感測套件)、未知2(減速方案/FT感測器供應商官方皆不具名——誠實標未知不猜);3 題已註冊 pq1 triaged_go",
+      "receipt": "authority:pq1_leads_registered;ref:lead_42f589d3+lead_861daa2e+lead_441728fb",
+      "ref_id": "manual:383",
+      "type": "manual",
+      "verb": "go"
     }
   ],
   "next_n": 396,

@@ -17774,6 +17774,37 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2074381029146837207"
     },
+    "lead_42f589d3ca6c7cf96f8fe5354a816fd8": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-01T13:09:09.952169+00:00",
+      "lead_id": "lead_42f589d3ca6c7cf96f8fe5354a816fd8",
+      "published_at": null,
+      "refs": {},
+      "source": "decompose:unitree-g1-2026-09-01",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "[decompose D6|G1] 減速機方案層:G1 官方規格只寫 PMSM 關節馬達(膝 90/120N.m)與全關節中空走線,減速方案(諧波/行星/自研)完全未揭露。圖中 Next Financial 已稱雙環傳動 supplies Unitree——用 teardown/雙環年報驗證 G1 減速機供應鏈,連機器人群",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-01T13:09:27.283353+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "G1 減速機方案未揭露,teardown/供應商年報可驗;連既有雙環/HDS 邊"
+        },
+        "decided_at": "2026-09-01T13:09:27.283353+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "decompose:unitree-g1-2026-09-01 結構研究題;使用者 [383] go 核准選題;pq1 bounded research",
+        "tier": 2
+      },
+      "url": "https://www.unitree.com/g1?decompose=reducer_scheme"
+    },
     "lead_435289261da3b093b9ed384b989c839c": {
       "content_updated_at": "2026-07-29T13:46:51.988873+00:00",
       "entities": {
@@ -17928,6 +17959,37 @@
         "tier": 4
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1493594/000090445426000328/xslF345X06/edgar.xml"
+    },
+    "lead_441728fb0dd26789a677971d375b4a31": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-01T13:09:10.553025+00:00",
+      "lead_id": "lead_441728fb0dd26789a677971d375b4a31",
+      "published_at": null,
+      "refs": {},
+      "source": "decompose:unitree-g1-2026-09-01",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "[decompose D6|G1] 感測套件層:官方頁只寫 Depth Camera+3D LiDAR 不具名品牌——G1 感測供應商(LiDAR/深度相機)需 teardown 或採購揭露;人形量產放大時感測 BOM 誰受益?",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-01T13:09:26.743444+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "感測套件供應商未具名,teardown 可解;候選集合擴充"
+        },
+        "decided_at": "2026-09-01T13:09:26.743444+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "decompose:unitree-g1-2026-09-01 結構研究題;使用者 [383] go 核准選題;pq1 bounded research",
+        "tier": 2
+      },
+      "url": "https://www.unitree.com/g1?decompose=sensing_suite"
     },
     "lead_442d7e50dfb28699c68236c766e1134b": {
       "entities": {
@@ -30168,6 +30230,37 @@
         "tier": 1
       },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-announces-intention-to-carry-out-a-directed-share-issue-of-approximately-sek-600-million-0cd572e0"
+    },
+    "lead_861daa2e0023d608dfb6a0c8b8bc45fc": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-01T13:09:10.253921+00:00",
+      "lead_id": "lead_861daa2e0023d608dfb6a0c8b8bc45fc",
+      "published_at": null,
+      "refs": {},
+      "source": "decompose:unitree-g1-2026-09-01",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "[decompose D6|G1] 靈巧手/觸覺感測層:圖中無節點(未知層)。Dex3-1 三指手(3+2+2 主動自由度)自研+optional tactile sensor arrays——人形觸覺陣列誰做、幾家能做?建節點+找供應商",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-01T13:09:27.014819+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "觸覺感測是圖中未知層,人形放量的新 BOM 候選"
+        },
+        "decided_at": "2026-09-01T13:09:27.014819+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "decompose:unitree-g1-2026-09-01 結構研究題;使用者 [383] go 核准選題;pq1 bounded research",
+        "tier": 2
+      },
+      "url": "https://www.unitree.com/g1?decompose=dexterous_tactile"
     },
     "lead_864af233628b47098921eadea8a7e7f0": {
       "entities": {
