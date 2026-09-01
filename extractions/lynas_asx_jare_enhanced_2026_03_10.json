@@ -1,0 +1,109 @@
+{
+  "claims": [
+    {
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Downgrade if the agreement is terminated/renegotiated below firm volumes, if JARE fails to take delivery at floor terms in subsequent quarterlies, or if HRE-free magnet adoption (Proterial NMX-HF watch already in graph) erodes the HRE half of the commitment's value.",
+      "id": "lynas_asx_jare_enhanced_2026_03_10_cl1",
+      "source_ids": [
+        "lynas_asx_jare_enhanced_2026_03_10_s1",
+        "lynas_asx_jare_enhanced_2026_03_10_s2",
+        "lynas_asx_jare_enhanced_2026_03_10_s3",
+        "lynas_asx_jare_enhanced_2026_03_10_s4"
+      ],
+      "statement": "Customer-side capital commitment for Lynas is now contractual and regulated-disclosure grade: JARE (JOGMEC+Sojitz SPV) firmly commits to purchase 5,000 tonnes NdPr per annum plus 50% of ALL Lynas HRE oxide output, with a US$110/kg NdPr floor price, upside sharing above US$150/kg, agreement to 2038, and an existing long-term senior loan facility. Money flows customer→supplier (financing + firm offtake with floor) — the strongest form of the four-dimension test's third axis. This upgrades the Lynas ex-China positioning from supplier self-report to counterparty-bound commitment.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {
+        "substitutability": 4
+      },
+      "confidence": 0.85,
+      "dst_id": "mat:rare_earth_magnets",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "lynas_asx_jare_enhanced_2026_03_10_s1",
+        "lynas_asx_jare_enhanced_2026_03_10_s2"
+      ],
+      "src_id": "co:lynas"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "LYC.AX"
+      ],
+      "attributes": {
+        "ticker": "LYC.AX"
+      },
+      "confidence": 0.9,
+      "id": "co:lynas",
+      "name": "Lynas Rare Earths",
+      "role": null,
+      "source_ids": [
+        "lynas_asx_jare_enhanced_2026_03_10_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "NdFeB"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:rare_earth_magnets",
+      "name": "Rare earth magnets (neodymium, samarium-cobalt)",
+      "role": null,
+      "source_ids": [
+        "lynas_asx_jare_enhanced_2026_03_10_s2"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "lynas_asx_jare_enhanced_2026_03_10",
+    "evidence_tier": 1,
+    "origin_entity": "Lynas Rare Earths（受監管揭露之雙邊契約條款；對手方 JARE=JOGMEC+Sojitz SPV）",
+    "permission_basis": "Public ASX filing; URL and short excerpts.",
+    "published_at": "2026-03-10",
+    "publisher": "ASX",
+    "retrieved_at": "2026-09-01",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Lynas ASX announcement — Enhanced JARE Agreement for Japanese Industry",
+    "url": "https://announcements.asx.com.au/asxpdf/20260310/pdf/06x8fmmzvw1fm1.pdf"
+  },
+  "sources": [
+    {
+      "id": "lynas_asx_jare_enhanced_2026_03_10_s1",
+      "locator": "Announcement — NdPr firm offtake",
+      "quote": "JARE will provide a firm commitment to purchase 5,000 tonnes NdPr per annum for Japanese industry with an agreed market-linked floor price"
+    },
+    {
+      "id": "lynas_asx_jare_enhanced_2026_03_10_s2",
+      "locator": "Announcement — HRE firm offtake",
+      "quote": "75% of all HRE oxides produced by Lynas will be made available to Japanese industry, with a firm commitment from JARE to purchase the equivalent of 50% of all HRE oxides produced by Lynas for Japanese industry"
+    },
+    {
+      "id": "lynas_asx_jare_enhanced_2026_03_10_s3",
+      "locator": "Announcement — floor price and upside sharing",
+      "quote": "Lynas and JARE have agreed a market-based offtake price with a price floor of US$110/kg NdPr for sales to Japanese industry and an upside sharing arrangement. Where Lynas’ achieved price is above US$150/kg NdPr, an amount equal to 30% of the upside above US$150/kg NdPr, capped at a maximum of US$10 million each calendar year, will be paid to JARE."
+    },
+    {
+      "id": "lynas_asx_jare_enhanced_2026_03_10_s4",
+      "locator": "Footnote — JARE identity and loan facility",
+      "quote": "JARE is a special purpose company established by Japan Organization for Metals and Energy Security (JOGMEC) and Sojitz Corporation. Lynas and JARE are parties to a long term senior loan facility."
+    },
+    {
+      "id": "lynas_asx_jare_enhanced_2026_03_10_s5",
+      "locator": "Announcement — term and volume ceiling",
+      "quote": "Lynas will provide up to 7,200 tonnes per annum of NdPr to Japanese industry to 2038"
+    }
+  ]
+}

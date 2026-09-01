@@ -1,0 +1,110 @@
+{
+  "claims": [
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Downgrade if imports stop or Sojitz diversifies its Dy/Tb sourcing away from Lynas (watch Sojitz announcements and Lynas quarterly HRE sales volumes).",
+      "id": "sojitz_hre_import_2025_10_30_cl1",
+      "source_ids": [
+        "sojitz_hre_import_2025_10_30_s1",
+        "sojitz_hre_import_2025_10_30_s2",
+        "sojitz_hre_import_2025_10_30_s3",
+        "sojitz_hre_import_2025_10_30_s4"
+      ],
+      "statement": "Customer-side (Sojitz, independent origin) confirms execution — not just agreement: heavy rare earths produced by Lynas are now physically imported into Japan (first ex-China Australia-ore/Malaysia-separated route), under a Dy/Tb supply agreement dating to March 2023, with Sojitz having previously financed Lynas via loan and equity. This externally corroborates the Lynas heavy-REO supply position with a counterparty document (L8-strong direction).",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {
+        "qualification_status": "qualified"
+      },
+      "confidence": 0.85,
+      "dst_id": "mat:separated_heavy_reo",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "sojitz_hre_import_2025_10_30_s1",
+        "sojitz_hre_import_2025_10_30_s2"
+      ],
+      "src_id": "co:lynas"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "LYC.AX"
+      ],
+      "attributes": {
+        "ticker": "LYC.AX"
+      },
+      "confidence": 0.9,
+      "id": "co:lynas",
+      "name": "Lynas Rare Earths",
+      "role": null,
+      "source_ids": [
+        "sojitz_hre_import_2025_10_30_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "separated heavy rare-earth oxide",
+        "HREO",
+        "dysprosium oxide",
+        "terbium oxide"
+      ],
+      "attributes": {
+        "concentration_score": 5,
+        "ramp_difficulty_intrinsic": 4
+      },
+      "confidence": 0.9,
+      "id": "mat:separated_heavy_reo",
+      "name": "分離重稀土氧化物（Dy／Tb 等）",
+      "role": null,
+      "source_ids": [
+        "sojitz_hre_import_2025_10_30_s1"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "sojitz_hre_import_2025_10_30",
+    "evidence_tier": 2,
+    "origin_entity": "Sojitz Corporation（客戶端）",
+    "permission_basis": "Public Sojitz press release; URL and short excerpts.",
+    "published_at": "2025-10-30",
+    "publisher": "Sojitz Corporation",
+    "retrieved_at": "2026-09-01",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Sojitz — Begins Import of Heavy Rare Earths from Australia",
+    "url": "https://www.sojitz.com/en/news/article/topics-20251030.html"
+  },
+  "sources": [
+    {
+      "id": "sojitz_hre_import_2025_10_30_s1",
+      "locator": "Press release — import begins",
+      "quote": "Sojitz has begun the import of heavy rare earths (HREs) produced by Australia-based Lynas Rare Earths Ltd into Japan."
+    },
+    {
+      "id": "sojitz_hre_import_2025_10_30_s2",
+      "locator": "Press release — 2023 supply agreement",
+      "quote": "In March 2023, Sojitz entered into an agreement with Lynas to secure a supply of dysprosium and terbium, two HREs used in the production of neodymium permanent magnets."
+    },
+    {
+      "id": "sojitz_hre_import_2025_10_30_s3",
+      "locator": "Press release — prior financing",
+      "quote": "Sojitz has previously provided financing to Lynas through loan and equity investment."
+    },
+    {
+      "id": "sojitz_hre_import_2025_10_30_s4",
+      "locator": "Press release — first ex-China route",
+      "quote": "This initiative marks the first import of rare earth products made using ore sourced from Australia that is separated and refined in Malaysia."
+    }
+  ]
+}
