@@ -1,0 +1,123 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "Lower substitutability when another US/allied merchant NdPr metal or NdFeB alloy-flake producer reaches commercial scale (watch e-VAC US plant scope, USA Rare Earth, and any DoW-funded alloy capacity); this layer's scarcity claim is time-stamped to the Q2 2026 10-Q.",
+      "id": "mp_10_q_20260807_metal_alloy_cl1",
+      "source_ids": [
+        "mp_10_q_20260807_metal_alloy_s1",
+        "mp_10_q_20260807_metal_alloy_s2"
+      ],
+      "statement": "The metal-reduction and alloy layer (NdPr oxide → NdPr metal via electrowinning; strip casting → NdFeB alloy flake) exists in the US at MP's Independence Facility, commissioned late 2024 (electrowinning) and 2025 (strip casting), making Independence a fully integrated metal, alloy, and magnet plant. For US-domiciled sourcing this layer's substitutability is judged 4/5: MP self-reports the only integrated US mine-to-magnet chain and no other US merchant NdFeB alloy-flake producer is evidenced in this RA; globally the layer is China-dominated. Honest gap: ex-China merchant alloy suppliers (e.g., European or Japanese alloy makers) were not surveyed here — the 4/5 is scoped to US domestic integration, mirroring the [366] MP magnet-edge scope.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {
+        "substitutability": 4
+      },
+      "confidence": 0.85,
+      "dst_id": "tech:ndfeb_metal_alloy",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mp_10_q_20260807_metal_alloy_s1",
+        "mp_10_q_20260807_metal_alloy_s2"
+      ],
+      "src_id": "co:mp_materials"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "mat:rare_earth_magnets",
+      "id": "e2",
+      "relation": "enables",
+      "source_ids": [
+        "mp_10_q_20260807_metal_alloy_s1"
+      ],
+      "src_id": "tech:ndfeb_metal_alloy"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "MP"
+      ],
+      "attributes": {
+        "ticker": "MP"
+      },
+      "confidence": 0.9,
+      "id": "co:mp_materials",
+      "name": "MP Materials",
+      "role": null,
+      "source_ids": [
+        "mp_10_q_20260807_metal_alloy_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "NdPr metal reduction",
+        "strip casting",
+        "NdFeB alloy flake"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 3
+      },
+      "confidence": 0.85,
+      "id": "tech:ndfeb_metal_alloy",
+      "name": "NdPr 金屬還原與 NdFeB 合金鑄片（electrowinning + strip casting）",
+      "role": null,
+      "source_ids": [
+        "mp_10_q_20260807_metal_alloy_s1"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "NdFeB"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:rare_earth_magnets",
+      "name": "Rare earth magnets (neodymium, samarium-cobalt)",
+      "role": null,
+      "source_ids": [
+        "mp_10_q_20260807_metal_alloy_s1"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mp_10_q_20260807_metal_alloy",
+    "evidence_tier": 1,
+    "origin_entity": "MP Materials",
+    "permission_basis": "Public SEC EDGAR filing; URL and short excerpts.",
+    "published_at": "2026-08-07",
+    "publisher": "SEC EDGAR",
+    "retrieved_at": "2026-09-01",
+    "section": "metal_alloy",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "MP Materials Q2 2026 10-Q — metal/alloy capability excerpts",
+    "url": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001801368&type=10-Q"
+  },
+  "sources": [
+    {
+      "id": "mp_10_q_20260807_metal_alloy_s1",
+      "locator": "MD&A — Independence capabilities",
+      "quote": "In late 2024, we commissioned electrowinning capabilities at the Independence Facility to produce NdPr metal from NdPr oxide. Additionally, in 2025, we added strip casting capabilities to produce NdFeB alloy flake, a key precursor product that is utilized as the material feedstock for magnet manufacturing."
+    },
+    {
+      "id": "mp_10_q_20260807_metal_alloy_s2",
+      "locator": "Business — Magnetics segment",
+      "quote": "the Independence Facility, a fully integrated metal, alloy, and magnet manufacturing plant"
+    }
+  ]
+}

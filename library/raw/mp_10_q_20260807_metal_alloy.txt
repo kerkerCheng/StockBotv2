@@ -1,0 +1,4 @@
+Source URL: https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001801368&type=10-Q
+
+Excerpt:
+In late 2024, we commissioned electrowinning capabilities at the Independence Facility to produce NdPr metal from NdPr oxide. Additionally, in 2025, we added strip casting capabilities to produce NdFeB alloy flake, a key precursor product that is utilized as the material feedstock for magnet manufacturing... the Independence Facility, a fully integrated metal, alloy, and magnet manufacturing plant. (MP Materials Q2 2026 10-Q, filed 2026-08-07)
