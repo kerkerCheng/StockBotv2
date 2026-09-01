@@ -1,0 +1,233 @@
+{
+  "claims": [
+    {
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Reverse if Google publicly procures commercial OCS at scale for TPU/datacenter interconnect (e.g., a vendor filing or Google disclosure naming an external OCS supplier for Apollo/TPU pods) — TPU demand growth exceeding internal Palomar manufacturing capacity is the concrete path to watch.",
+      "id": "google_apollo_ocs_2022_cl1",
+      "source_ids": [
+        "google_apollo_ocs_2022_s1",
+        "google_apollo_ocs_2022_s2",
+        "google_apollo_ocs_2022_s6"
+      ],
+      "statement": "Google's production OCS layer (Apollo) is home-grown: Palomar was internally developed after a vendor-based OCS was abandoned for reliability/quality at scale, and Apollo has been the backbone of all Google datacenter networks for nearly a decade. Customer-side consequence: the largest known hyperscale OCS deployment is NOT addressable commercial vendor demand; Lumentum/Coherent OCS positioning (supplier self-report in this graph) cannot count Google's core Apollo layer as demand anchor without customer-side naming.",
+      "subject_id": "tech:ocs"
+    },
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "Lower substitutability judgment if a non-MEMS OCS technology (e.g., wavelength switching) reaches production-scale port counts at datacenter cost; the supplier-layer unknown resolves only via named disclosure (foundry/vendor filing or teardown naming the MEMS fab).",
+      "id": "google_apollo_ocs_2022_cl2",
+      "source_ids": [
+        "google_apollo_ocs_2022_s4",
+        "google_apollo_ocs_2022_s5"
+      ],
+      "statement": "3D MEMS mirror arrays are the switching core of datacenter-scale OCS: per Google's own technology comparison, MEMS demonstrated the most promise at required port counts and acceptable cost (alternatives: piezo, robotic patch panels, guided wave — each worse on scale, speed or cost), and the chip is fabricated in a silicon wafer process. Substitutability judged 4/5 at the technology-layer. Google does NOT disclose who fabricates its MEMS chips — the supplier layer below this node is publicly unnamed.",
+      "subject_id": "e3"
+    },
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Downgrade the dependency if future TPU interconnect generations drop circulator-based bidirectional links (e.g., move to separate fibers or co-packaged optics without circulators); the supplier question resolves only via named disclosure.",
+      "id": "google_apollo_ocs_2022_cl3",
+      "source_ids": [
+        "google_apollo_ocs_2022_s8",
+        "google_apollo_ocs_2022_s3"
+      ],
+      "statement": "Optical circulators are a structural dependency of the Apollo/TPU interconnect: they realize bidirectional links through the OCS, effectively doubling OCS radix (halving required ports and cables). Google states it developed the circulators together with the OCS and WDM transceivers; no merchant circulator manufacturer is named in the primary documents, so whether volume circulator supply is captive or merchant remains unknown.",
+      "subject_id": "e4"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.95,
+      "dst_id": "prod:palomar_ocs",
+      "id": "e1",
+      "relation": "develops",
+      "source_ids": [
+        "google_apollo_ocs_2022_s1",
+        "google_apollo_ocs_2022_s2"
+      ],
+      "src_id": "co:google"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "tech:mems_mirror_array",
+      "id": "e2",
+      "relation": "depends_on",
+      "source_ids": [
+        "google_apollo_ocs_2022_s7"
+      ],
+      "src_id": "prod:palomar_ocs"
+    },
+    {
+      "attributes": {
+        "substitutability": 4
+      },
+      "confidence": 0.85,
+      "dst_id": "tech:ocs",
+      "id": "e3",
+      "relation": "is_component_of",
+      "source_ids": [
+        "google_apollo_ocs_2022_s4",
+        "google_apollo_ocs_2022_s5"
+      ],
+      "src_id": "tech:mems_mirror_array"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "tech:ocs",
+      "id": "e4",
+      "relation": "enables",
+      "source_ids": [
+        "google_apollo_ocs_2022_s8",
+        "google_apollo_ocs_2022_s3"
+      ],
+      "src_id": "tech:optical_circulator"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "end_demand",
+      "aliases": [
+        "Google Cloud"
+      ],
+      "attributes": {
+        "ticker": "GOOGL"
+      },
+      "confidence": 0.9,
+      "id": "co:google",
+      "name": "Google",
+      "role": null,
+      "source_ids": [
+        "google_apollo_ocs_2022_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "Palomar"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "prod:palomar_ocs",
+      "name": "Google Palomar OCS",
+      "role": null,
+      "source_ids": [
+        "google_apollo_ocs_2022_s1",
+        "google_apollo_ocs_2022_s2"
+      ],
+      "type": "Product"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "MEMS OCS core",
+        "MEMS mirror array"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:mems_mirror_array",
+      "name": "3D MEMS mirror array (OCS optical core)",
+      "role": null,
+      "source_ids": [
+        "google_apollo_ocs_2022_s4",
+        "google_apollo_ocs_2022_s7"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "circulator"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:optical_circulator",
+      "name": "Optical circulator (bidirectional OCS links)",
+      "role": null,
+      "source_ids": [
+        "google_apollo_ocs_2022_s3",
+        "google_apollo_ocs_2022_s8"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "OCS"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 4
+      },
+      "confidence": 0.9,
+      "id": "tech:ocs",
+      "name": "Optical Circuit Switching (OCS)",
+      "role": null,
+      "source_ids": [
+        "google_apollo_ocs_2022_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "google_apollo_ocs_2022",
+    "evidence_tier": 1,
+    "origin_entity": "Google (Apollo/Palomar 團隊自著論文)",
+    "permission_basis": "Public arXiv preprint; URL and short excerpts only.",
+    "published_at": "2022-08-22",
+    "publisher": "arXiv",
+    "retrieved_at": "2026-09-01",
+    "source_type": "paper",
+    "storage_permission": "repo_excerpt",
+    "title": "Mission Apollo: Landing Optical Circuit Switching at Datacenter Scale (Google, 2022)",
+    "url": "https://arxiv.org/abs/2208.10041"
+  },
+  "sources": [
+    {
+      "id": "google_apollo_ocs_2022_s1",
+      "locator": "Abstract — platform composition",
+      "quote": "The Apollo OCS platform consists of a home-grown, internally developed OCS (Palomar), circulators, and customized wavelength-division-multiplexed (WDM) optical transceiver technology supporting bidirectional links through the OCS and circulators."
+    },
+    {
+      "id": "google_apollo_ocs_2022_s2",
+      "locator": "Section 4.1 Palomar OCS — vendor history",
+      "quote": "For the first several years of deployment, a vendor-based OCS solution was adopted in the Apollo layer. However, due to the difficulties in maintaining reliability and quality of this solution at scale, the decision was made to internally develop an OCS system."
+    },
+    {
+      "id": "google_apollo_ocs_2022_s3",
+      "locator": "Section 4 Hardware Components of Apollo",
+      "quote": "We developed three critical hardware components, the OCS, WDM transceivers, and optical circulators, to realize a cost-effective, large-scale optical switching layer."
+    },
+    {
+      "id": "google_apollo_ocs_2022_s4",
+      "locator": "Section 3 — OCS technology comparison",
+      "quote": "In terms of scaling to the large number of port counts required for datacenter applications at acceptable costs, MEMS-based systems had demonstrated the most promise, with the realization of systems achieving greater than 1000x1000 interconnectivity"
+    },
+    {
+      "id": "google_apollo_ocs_2022_s5",
+      "locator": "Section 3 — MEMS cost basis",
+      "quote": "the underlying chip technology is inherently inexpensive due to fabrication within a silicon wafer process"
+    },
+    {
+      "id": "google_apollo_ocs_2022_s6",
+      "locator": "Abstract — production status",
+      "quote": "Apollo serves as the backbone of all of our datacenter networks, having been in production for nearly a decade"
+    },
+    {
+      "id": "google_apollo_ocs_2022_s7",
+      "locator": "Design principles — Palomar/MEMS",
+      "quote": "Palomar design emphasizes manufacturability, serviceability, and reliability. Image processing of a single camera image for Micro-Electro-Mechanical Systems (MEMS) mirror control greatly simplifies manufacturing."
+    },
+    {
+      "id": "google_apollo_ocs_2022_s8",
+      "locator": "Abstract — circulator role",
+      "quote": "we employ circulators to realize bidirectional links through the OCS, effectively doubling the OCS radix"
+    }
+  ]
+}

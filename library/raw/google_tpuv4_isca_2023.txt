@@ -1,0 +1,4 @@
+Source URL: https://arxiv.org/abs/2304.01433
+
+Excerpt:
+OCSes and underlying optical components are <5% of system cost and <3% of system power. The resulting Google Palomar OCS is based on 3D Micro-Electro-Mechanical Systems (MEMS) mirrors that switch in milliseconds. They employ circulators to send light both ways in a fiber, halving the number of required ports and cables. The Palomar OCS is 136x136 (128 ports plus 8 spares for link testing and repairs). (TPU v4 paper, ISCA 2023)

@@ -1,0 +1,66 @@
+{
+  "claims": [
+    {
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Downgrade if later TPU generations abandon OCS-based interconnect or if disclosed cost share rises materially (indicating the layer stopped being cheap leverage).",
+      "id": "google_tpuv4_isca_2023_cl1",
+      "source_ids": [
+        "google_tpuv4_isca_2023_s1"
+      ],
+      "statement": "Per Google's own TPU v4 paper, OCSes and underlying optical components are <5% of system cost and <3% of system power, while enabling 4x larger supercomputer scale, topology reconfiguration and availability gains — an asymmetric cost-to-leverage bottleneck layer in TPU interconnect.",
+      "subject_id": "tech:ocs"
+    }
+  ],
+  "edges": [],
+  "nodes": [
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "OCS"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 4
+      },
+      "confidence": 0.9,
+      "id": "tech:ocs",
+      "name": "Optical Circuit Switching (OCS)",
+      "role": null,
+      "source_ids": [
+        "google_tpuv4_isca_2023_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "google_tpuv4_isca_2023",
+    "evidence_tier": 1,
+    "origin_entity": "Google (TPU/Palomar 團隊自著論文)",
+    "permission_basis": "Public arXiv preprint; URL and short excerpts only.",
+    "published_at": "2023-04-04",
+    "publisher": "arXiv / ISCA 2023",
+    "retrieved_at": "2026-09-01",
+    "source_type": "paper",
+    "storage_permission": "repo_excerpt",
+    "title": "TPU v4: An Optically Reconfigurable Supercomputer for Machine Learning (Jouppi et al., ISCA 2023)",
+    "url": "https://arxiv.org/abs/2304.01433"
+  },
+  "sources": [
+    {
+      "id": "google_tpuv4_isca_2023_s1",
+      "locator": "Abstract",
+      "quote": "OCSes and underlying optical components are <5% of system cost and <3% of system power."
+    },
+    {
+      "id": "google_tpuv4_isca_2023_s2",
+      "locator": "Section 2.1 Optical Circuit Switching",
+      "quote": "The resulting Google Palomar OCS is based on 3D Micro-Electro-Mechanical Systems (MEMS) mirrors that switch in milliseconds. They employ circulators to send light both ways in a fiber, halving the number of required ports and cables."
+    },
+    {
+      "id": "google_tpuv4_isca_2023_s3",
+      "locator": "Section 2.1 — Palomar port count",
+      "quote": "The Palomar OCS is 136x136 (128 ports plus 8 spares for link testing and repairs)"
+    }
+  ]
+}

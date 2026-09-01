@@ -1,0 +1,4 @@
+Source URL: https://arxiv.org/abs/2208.10041
+
+Excerpt:
+The Apollo OCS platform consists of a home-grown, internally developed OCS (Palomar), circulators, and customized wavelength-division-multiplexed (WDM) optical transceiver technology... For the first several years of deployment, a vendor-based OCS solution was adopted in the Apollo layer. However, due to the difficulties in maintaining reliability and quality of this solution at scale, the decision was made to internally develop an OCS system. (Mission Apollo, 2022)
