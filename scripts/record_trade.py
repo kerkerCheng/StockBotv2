@@ -75,7 +75,11 @@ def build_parser() -> argparse.ArgumentParser:
     ap.add_argument("--executed-at", required=True, help="成交時間（ISO-8601，含時區）")
     ap.add_argument("--broker", default="IB", help="Sheet 的 broker 欄值")
     ap.add_argument("--currency", default="USD")
-    ap.add_argument("--cash-column", default="cash_usd", help="要扣款／入帳的現金欄名")
+    ap.add_argument(
+        "--cash-column",
+        default="cash_usd",
+        help="要扣款／入帳的現金欄名；傳 none 表示金流不經 Sheet 現金列（如台幣交割戶未入帳），只改股數與成本",
+    )
     ap.add_argument("--account-ref", default="", help="遮蔽後的帳號，如 U****1599")
     ap.add_argument("--note", default="", help="券商通知逐字內容，供稽核")
     ap.add_argument("--apply", action="store_true", help="實際寫入；省略則只顯示 diff")
@@ -95,17 +99,23 @@ def main(argv: list[str] | None = None) -> int:
     gross = round(args.shares * args.price, 2)
     signed_shares = args.shares if args.side == "buy" else -args.shares
 
-    cells = locate_portfolio_cells(
-        [
-            {"match": {"symbol": args.symbol}, "column": "shares"},
-            {"match": {"symbol": args.symbol}, "column": "avg_cost"},
-            {"match": {"broker": args.broker, "bucket": "CASH"}, "column": args.cash_column},
-        ]
-    )
-    shares_cell, cost_cell, cash_cell = cells
+    # 同一檔可能分屬多個券商（如 LON:VWRA 同時在 IB 與 FUBON），
+    # 持股列必須用 symbol＋broker 一起定位，否則兩列即歧義中止。
+    skip_cash = args.cash_column.strip().lower() in ("", "none")
+    requests = [
+        {"match": {"symbol": args.symbol, "broker": args.broker}, "column": "shares"},
+        {"match": {"symbol": args.symbol, "broker": args.broker}, "column": "avg_cost"},
+    ]
+    if not skip_cash:
+        requests.append(
+            {"match": {"broker": args.broker, "bucket": "CASH"}, "column": args.cash_column}
+        )
+    cells = locate_portfolio_cells(requests)
+    shares_cell, cost_cell = cells[0], cells[1]
+    cash_cell = None if skip_cash else cells[2]
     old_shares = _number(shares_cell["current"])
     old_cost = _number(cost_cell["current"])
-    old_cash = _number(cash_cell["current"])
+    old_cash = 0.0 if skip_cash else _number(cash_cell["current"])
 
     new_shares = old_shares + signed_shares
     if new_shares < 0:
@@ -135,11 +145,14 @@ def main(argv: list[str] | None = None) -> int:
     print(f"成交：{args.side.upper()} {args.shares:g} {args.symbol} @ {args.price} "
           f"{args.currency}　總額 {gross:,.2f}")
     print(f"trade_id：{trade_id}")
-    print("\n將變更的儲存格（僅此三格，其餘欄位不動）：")
+    print(f"\n將變更的儲存格（僅此{'兩' if skip_cash else '三'}格，其餘欄位不動）：")
     print(f"  {shares_cell['a1']:<16} shares          {old_shares:g} → {new_shares:g}")
     print(f"  {cost_cell['a1']:<16} avg_cost        {old_cost} → {new_cost}"
           f"   ← 由本腳本計算，非通知逐字值")
-    print(f"  {cash_cell['a1']:<16} {args.cash_column:<15} {old_cash:,.2f} → {new_cash:,.2f}")
+    if skip_cash:
+        print("  （現金列不改：--cash-column none，金流不經 Sheet 現金列，由使用者另行更新）")
+    else:
+        print(f"  {cash_cell['a1']:<16} {args.cash_column:<15} {old_cash:,.2f} → {new_cash:,.2f}")
 
     if _already_recorded(trade_id):
         print("\n⚠ 這筆成交已在 trade_log.jsonl 中；重複執行不會再寫事件紀錄。")
@@ -171,13 +184,13 @@ def main(argv: list[str] | None = None) -> int:
         print("  若這筆你已手動改過 Sheet，改用 --log-only 只記事件、不重複計算。")
         return 0
 
-    result = write_portfolio_cells(
-        [
-            {"a1": shares_cell["a1"], "expected": shares_cell["current"], "value": new_shares},
-            {"a1": cost_cell["a1"], "expected": cost_cell["current"], "value": new_cost},
-            {"a1": cash_cell["a1"], "expected": cash_cell["current"], "value": new_cash},
-        ]
-    )
+    writes = [
+        {"a1": shares_cell["a1"], "expected": shares_cell["current"], "value": new_shares},
+        {"a1": cost_cell["a1"], "expected": cost_cell["current"], "value": new_cost},
+    ]
+    if not skip_cash:
+        writes.append({"a1": cash_cell["a1"], "expected": cash_cell["current"], "value": new_cash})
+    result = write_portfolio_cells(writes)
     if not _already_recorded(trade_id):
         _append_trade(
             {
