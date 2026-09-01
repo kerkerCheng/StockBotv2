@@ -6225,6 +6225,43 @@
       "source": "research_action",
       "title": "GBD 量產層補供應商——JL MAG(HKEX 年報)＋Proterial 連上晶界擴散節點;GBD 判普及技術非壁壘（含 co:jl_mag onboard）",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-09-01T06:49:25.643616+00:00",
+      "graph_impact": "+11 節點、9 邊、3 claims｜來源：NVIDIA（tier 2）",
+      "hint": "核准 exact graph delta；Decision handoff：co:nvidia。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 376,
+      "reason": null,
+      "ref_id": "ra_2081f7886d5606bbc108f1cf7190acef",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "CPO stack 殘骸收斂——Quantum-X 實體錨定 scale-out CPO,新增光纖耦合與封裝組裝兩層,TSMC COUPE 邊落地",
+      "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-09-01T06:49:25.643616+00:00",
+      "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "n": 377,
+      "reason": null,
+      "ref_id": "dc_32872cf6a80c5f273b9b4c55a57ff229",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:jl_mag：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-01T06:49:25.643616+00:00",
+      "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "n": 378,
+      "reason": null,
+      "ref_id": "dc_b8fb35bfe958d2e6ca4b3f60e623a576",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:proterial：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
     }
   ],
   "log": [
@@ -13821,6 +13858,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 376,
+  "next_n": 379,
   "schema_version": "1"
 }

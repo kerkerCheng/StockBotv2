@@ -12639,9 +12639,13 @@
       "first_seen": "2026-09-01T06:22:50.355719+00:00",
       "lead_id": "lead_248c9fd8eac30fc5dd67e40437863b68",
       "published_at": null,
-      "refs": {},
+      "refs": {
+        "action_digest": "d0584f38648efee2a1d62de9f0626aeeb88a0e1bef477ac3b8e13c3124b1cd61",
+        "focus_company_id": "co:nvidia",
+        "research_action_id": "ra_2081f7886d5606bbc108f1cf7190acef"
+      },
       "source": "decompose:cpo-quantum-x-2026-09-01",
-      "status": "triaged_go",
+      "status": "action_prepared",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -19636,9 +19640,13 @@
       "first_seen": "2026-09-01T06:22:50.652203+00:00",
       "lead_id": "lead_4d44b6a39ca426804f4afacf3250b60e",
       "published_at": null,
-      "refs": {},
+      "refs": {
+        "action_digest": "d0584f38648efee2a1d62de9f0626aeeb88a0e1bef477ac3b8e13c3124b1cd61",
+        "focus_company_id": "co:nvidia",
+        "research_action_id": "ra_2081f7886d5606bbc108f1cf7190acef"
+      },
       "source": "decompose:cpo-quantum-x-2026-09-01",
-      "status": "triaged_go",
+      "status": "action_prepared",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -30863,9 +30871,13 @@
       "first_seen": "2026-09-01T06:22:50.062832+00:00",
       "lead_id": "lead_89da6904d80c967511e99b7ce08c1f05",
       "published_at": null,
-      "refs": {},
+      "refs": {
+        "action_digest": "d0584f38648efee2a1d62de9f0626aeeb88a0e1bef477ac3b8e13c3124b1cd61",
+        "focus_company_id": "co:nvidia",
+        "research_action_id": "ra_2081f7886d5606bbc108f1cf7190acef"
+      },
       "source": "decompose:cpo-quantum-x-2026-09-01",
-      "status": "triaged_go",
+      "status": "action_prepared",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -45742,9 +45754,13 @@
       "first_seen": "2026-09-01T06:22:49.762645+00:00",
       "lead_id": "lead_da949bb488299f294ed32453a126cfb8",
       "published_at": null,
-      "refs": {},
+      "refs": {
+        "action_digest": "d0584f38648efee2a1d62de9f0626aeeb88a0e1bef477ac3b8e13c3124b1cd61",
+        "focus_company_id": "co:nvidia",
+        "research_action_id": "ra_2081f7886d5606bbc108f1cf7190acef"
+      },
       "source": "decompose:cpo-quantum-x-2026-09-01",
-      "status": "triaged_go",
+      "status": "action_prepared",
       "themes": {
         "cpo": {
           "counter_only": false,
