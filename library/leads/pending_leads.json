@@ -12645,7 +12645,7 @@
         "research_action_id": "ra_f3a3ec91513f1db2193c6569e531a5e7"
       },
       "source": "decompose:cpo-quantum-x-2026-09-01",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -19646,7 +19646,7 @@
         "research_action_id": "ra_f3a3ec91513f1db2193c6569e531a5e7"
       },
       "source": "decompose:cpo-quantum-x-2026-09-01",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -30877,7 +30877,7 @@
         "research_action_id": "ra_f3a3ec91513f1db2193c6569e531a5e7"
       },
       "source": "decompose:cpo-quantum-x-2026-09-01",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -45760,7 +45760,7 @@
         "research_action_id": "ra_f3a3ec91513f1db2193c6569e531a5e7"
       },
       "source": "decompose:cpo-quantum-x-2026-09-01",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {
         "cpo": {
           "counter_only": false,

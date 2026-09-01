@@ -6266,13 +6266,21 @@
     },
     {
       "added_at": "2026-09-01T07:15:08.169474+00:00",
+      "completion_authority": {
+        "action_digest": "49430c0e670e45d5685b710a4a324b09f770f79a491d2f62079cb4d040872aac",
+        "cohort_id": "dc_fdab434d1fad67666c57a6eefd379337",
+        "commit": "3351ed7333c685ba0570b922637cb729efe9a9ef",
+        "company_id": "co:nvidia",
+        "verified_at": "2026-09-01T07:21:01.282705+00:00"
+      },
       "graph_impact": "+11 節點、9 邊、3 claims｜來源：NVIDIA（tier 2）",
       "hint": "核准 exact graph delta；Decision handoff：co:nvidia。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 379,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_f3a3ec91513f1db2193c6569e531a5e7;digest:49430c0e670e45d5685b710a4a324b09f770f79a491d2f62079cb4d040872aac;commit:3351ed7333c685ba0570b922637cb729efe9a9ef;cohort:dc_fdab434d1fad67666c57a6eefd379337",
       "ref_id": "ra_f3a3ec91513f1db2193c6569e531a5e7",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-01T07:21:01.282705+00:00",
       "source": "research_action",
       "title": "CPO stack 殘骸收斂——Quantum-X 實體錨定 scale-out CPO,新增光纖耦合與封裝組裝兩層,TSMC COUPE 邊落地",
       "type": "ra_admission"
@@ -13879,6 +13887,15 @@
       "ref_id": "ra_2081f7886d5606bbc108f1cf7190acef",
       "type": "ra_admission",
       "verb": "drop"
+    },
+    {
+      "at": "2026-09-01T07:21:01.282705+00:00",
+      "n": 379,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_f3a3ec91513f1db2193c6569e531a5e7;digest:49430c0e670e45d5685b710a4a324b09f770f79a491d2f62079cb4d040872aac;commit:3351ed7333c685ba0570b922637cb729efe9a9ef;cohort:dc_fdab434d1fad67666c57a6eefd379337",
+      "ref_id": "ra_f3a3ec91513f1db2193c6569e531a5e7",
+      "type": "ra_admission",
+      "verb": "go"
     }
   ],
   "next_n": 380,
