@@ -1,0 +1,106 @@
+{
+  "claims": [
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Update with each new annual report: concentration shifts materially, or a named customer relationship (Tesla/BYD) is disclosed as terminated; upgrade the capital-commitment axis only when prepayment/long-term binding volume terms appear in a filing (either side).",
+      "id": "jlmag_ar2022_hkex_customers_cl1",
+      "source_ids": [
+        "jlmag_ar2022_hkex_customers_s1",
+        "jlmag_ar2022_hkex_customers_s2",
+        "jlmag_ar2022_hkex_customers_s3",
+        "jlmag_ar2022_hkex_customers_s4"
+      ],
+      "statement": "JL MAG's statutory AR discloses audited-grade customer structure: largest customer ~12.71% of revenue, top five ~47.88% (moderate concentration, no single dominant buyer); NEV drive-motor magnet global share ~28% (company calculation on CleanTechnica volume data); named customers include BYD, Tesla, Bosch Group, Midea, Gree, Mitsubishi Electric, plus 8 of top-10 VFAC compressor makers and 4 of top-5 wind turbine makers. Customer-conferred supplier awards (BYD-Fudi 'Excellent Supplier' 2021, UAES 'Outstanding Supplier') provide weak customer-side corroboration. Still origin JL MAG (self-report in filing); no take-or-pay/prepayment terms disclosed — capital-commitment axis remains unfilled.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "mat:rare_earth_magnets",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "jlmag_ar2022_hkex_customers_s1",
+        "jlmag_ar2022_hkex_customers_s2"
+      ],
+      "src_id": "co:jl_mag"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "6680.HK",
+        "300748.SZ",
+        "金力永磁",
+        "JLMAG"
+      ],
+      "attributes": {
+        "ticker": "6680.HK"
+      },
+      "confidence": 0.85,
+      "id": "co:jl_mag",
+      "name": "JL MAG Rare-Earth（金力永磁）",
+      "role": null,
+      "source_ids": [
+        "jlmag_ar2022_hkex_customers_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "NdFeB"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:rare_earth_magnets",
+      "name": "Rare earth magnets (neodymium, samarium-cobalt)",
+      "role": null,
+      "source_ids": [
+        "jlmag_ar2022_hkex_customers_s2"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "jlmag_ar2022_hkex_customers",
+    "evidence_tier": 1,
+    "origin_entity": "JL MAG Rare-Earth",
+    "permission_basis": "Public HKEX filing; URL and short excerpts.",
+    "published_at": "2023-03-31",
+    "publisher": "HKEX",
+    "retrieved_at": "2026-09-01",
+    "section": "customers_and_share",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "JL MAG 2022 Annual Report (HKEX) — customers, concentration and NEV share",
+    "url": "https://www1.hkexnews.hk/listedco/listconews/sehk/2023/0331/2023033100951.pdf"
+  },
+  "sources": [
+    {
+      "id": "jlmag_ar2022_hkex_customers_s1",
+      "locator": "Major Customers and Suppliers",
+      "quote": "During the Reporting Period, the Company’s largest customer accounted for approximately 12.71% of the Company’s total revenue. The total revenue from the Company’s five largest customers accounted for approximately 47.88% of the Company’s revenue."
+    },
+    {
+      "id": "jlmag_ar2022_hkex_customers_s2",
+      "locator": "MD&A — NEV share",
+      "quote": "the global market share of the Company was about 28%. As a leading supplier of magnetic steel for drive motors in the global NEV industry, the Company’s products have been used by eight of the world’s top ten NEV manufacturers. The Company is the magnetic steel supplier of BYD, Tesla and other NEV drive motors."
+    },
+    {
+      "id": "jlmag_ar2022_hkex_customers_s3",
+      "locator": "MD&A — customer awards",
+      "quote": "In the April 2022, the Company was awarded the 2021 “Excellent Supplier” by BYD-Fudi Power Co., Ltd; in September 2022, the Company received the “Outstanding Supplier” award from the United Automotive Electronic Systems Co., Ltd. (UAES) again"
+    },
+    {
+      "id": "jlmag_ar2022_hkex_customers_s4",
+      "locator": "Highlight — customer breadth",
+      "quote": "In 2022, eight of the top ten VFAC compressor manufacturers are the customers of the Company In 2022, four of the top five wind turbine generators manufacturers worldwide are the customers of the Company"
+    }
+  ]
+}
