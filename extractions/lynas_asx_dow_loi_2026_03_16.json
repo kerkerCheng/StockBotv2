@@ -1,0 +1,99 @@
+{
+  "claims": [
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Downgrade if the definitive agreement fails to close within two quarters of the LOI, or if terms are renegotiated below the US$110 floor.",
+      "id": "lynas_asx_dow_loi_2026_03_16_cl1",
+      "source_ids": [
+        "lynas_asx_dow_loi_2026_03_16_s1",
+        "lynas_asx_dow_loi_2026_03_16_s2"
+      ],
+      "statement": "The previously second-hand US$96M atom is now primary: a binding Letter of Intent between Lynas USA LLC and the US Department of War allocates ~US$96M over four years to purchase Light and Heavy Rare Earth oxides from Lynas at a US$110/kg NdPr floor — a SECOND sovereign customer commitment (US joins Japan's JARE), money flowing customer→supplier with a floor. Honest limits: LOI precedes the definitive agreement, and US$96M/4yr is small relative to JARE's firm volumes.",
+      "subject_id": "co:lynas"
+    },
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Reverse if Seadrift construction is subsequently confirmed to proceed (Lynas/DoW announcement), or if MP's DoW-funded heavy separation at Mountain Pass reaches production first — either re-opens the US-domiciled heavy-REO path.",
+      "id": "lynas_asx_dow_loi_2026_03_16_cl2",
+      "source_ids": [
+        "lynas_asx_dow_loi_2026_03_16_s3"
+      ],
+      "statement": "The Seadrift, Texas Heavy Rare Earth processing facility is under 'significant uncertainty as to whether the construction...would proceed' — the LOI replaced the facility-construction agreement with direct procurement. Two-sided consequence: (a) the main US-domiciled heavy-REO separation expansion path has weakened, extending ex-China heavy-REO scarcity (near-term SUPPORT for the sub=4 judgments on Lynas/MP edges, whose disproof conditions cited Seadrift ramp as a trigger — that trigger is now less likely); (b) honest negative for Lynas's US expansion narrative.",
+      "subject_id": "mat:separated_heavy_reo"
+    }
+  ],
+  "edges": [],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "LYC.AX"
+      ],
+      "attributes": {
+        "ticker": "LYC.AX"
+      },
+      "confidence": 0.9,
+      "id": "co:lynas",
+      "name": "Lynas Rare Earths",
+      "role": null,
+      "source_ids": [
+        "lynas_asx_dow_loi_2026_03_16_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "separated heavy rare-earth oxide",
+        "HREO",
+        "dysprosium oxide",
+        "terbium oxide"
+      ],
+      "attributes": {
+        "concentration_score": 5,
+        "ramp_difficulty_intrinsic": 4
+      },
+      "confidence": 0.9,
+      "id": "mat:separated_heavy_reo",
+      "name": "分離重稀土氧化物（Dy／Tb 等）",
+      "role": null,
+      "source_ids": [
+        "lynas_asx_dow_loi_2026_03_16_s3"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "lynas_asx_dow_loi_2026_03_16",
+    "evidence_tier": 1,
+    "origin_entity": "Lynas Rare Earths（受監管揭露;對手方=美國 Department of War）",
+    "permission_basis": "Public ASX announcement; URL and short excerpts.",
+    "published_at": "2026-03-16",
+    "publisher": "ASX",
+    "retrieved_at": "2026-09-01",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Lynas ASX announcement — Lynas and US DoW sign Letter of Intent for rare earth supply",
+    "url": "https://wcsecure.weblink.com.au/pdf/LYC/03068512.pdf"
+  },
+  "sources": [
+    {
+      "id": "lynas_asx_dow_loi_2026_03_16_s1",
+      "locator": "Announcement — LOI terms",
+      "quote": "the signing of a binding Letter of Intent between wholly owned subsidiary Lynas USA LLC and the United States Department of War (DoW) to finalise a rare earth oxide supply agreement. Under this arrangement, approximately US$96 million will be allocated by the DoW to the purchase of Light and Heavy Rare Earth oxide products from Lynas. The floor price for supply of NdPr oxide will be US$110/kg."
+    },
+    {
+      "id": "lynas_asx_dow_loi_2026_03_16_s2",
+      "locator": "Announcement — term",
+      "quote": "The products will be supplied by Lynas to the DoW over a four year period."
+    },
+    {
+      "id": "lynas_asx_dow_loi_2026_03_16_s3",
+      "locator": "Announcement — Seadrift modification",
+      "quote": "This offtake agreement follows the mutual decision to modify the original agreement between Lynas and the DoW based on significant uncertainty as to whether the construction of the Heavy Rare Earth processing facility at Seadrift, Texas would proceed."
+    }
+  ]
+}
