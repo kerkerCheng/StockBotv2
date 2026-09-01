@@ -1,0 +1,71 @@
+{
+  "claims": [
+    {
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Downgrade if future USGS MCS editions show materially diversified US import sources (China share well below 50%) or effective substitutes reaching commercial adoption in magnet applications.",
+      "id": "usgs_mcs2026_rare_earths_cl1",
+      "source_ids": [
+        "usgs_mcs2026_rare_earths_s2",
+        "usgs_mcs2026_rare_earths_s3",
+        "usgs_mcs2026_rare_earths_s4"
+      ],
+      "statement": "USGS 2026: US rare-earth compound/metal imports came 71% from China (2021-24); substitutes for rare earths are available for many applications but generally less effective; China imposed export controls on key magnet elements (Tb, Dy, Sm, Gd) in April 2025. This is the structural backdrop that makes non-China rare-earth supply relationships hard to substitute.",
+      "subject_id": "mat:rare_earth_magnets"
+    }
+  ],
+  "edges": [],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "NdFeB"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:rare_earth_magnets",
+      "name": "Rare earth magnets (neodymium, samarium-cobalt)",
+      "role": null,
+      "source_ids": [
+        "usgs_mcs2026_rare_earths_s3"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "usgs_mcs2026_rare_earths",
+    "evidence_tier": 1,
+    "origin_entity": "U.S. Geological Survey (美國政府第三方統計，非任何生產商)",
+    "permission_basis": "US government public-domain publication.",
+    "published_at": "2026-02-01",
+    "publisher": "U.S. Geological Survey",
+    "retrieved_at": "2026-09-01",
+    "source_type": "industry_report",
+    "storage_permission": "repo_excerpt",
+    "title": "USGS Mineral Commodity Summaries 2026 — Rare Earths",
+    "url": "https://pubs.usgs.gov/periodicals/mcs2026/mcs2026-rare-earths.pdf"
+  },
+  "sources": [
+    {
+      "id": "usgs_mcs2026_rare_earths_s1",
+      "locator": "Domestic Production and Use",
+      "quote": "Bastnaesite was mined as a primary product in Mountain Pass, CA."
+    },
+    {
+      "id": "usgs_mcs2026_rare_earths_s2",
+      "locator": "Import Sources (2021-24)",
+      "quote": "Rare-earth compounds and metals: China, 71%; Malaysia, 13%; Japan, 5%; Estonia, 5%; and other, 6%."
+    },
+    {
+      "id": "usgs_mcs2026_rare_earths_s3",
+      "locator": "Substitutes",
+      "quote": "Substitutes are available for many applications but generally are less effective."
+    },
+    {
+      "id": "usgs_mcs2026_rare_earths_s4",
+      "locator": "Events, Trends, and Issues",
+      "quote": "In April 2025, China tightened its export controls on rare-earth elements, adding specific controls on alloys, compounds, metals, and oxides of samarium, gadolinium, terbium, dysprosium, lutetium, scandium, and yttrium."
+    }
+  ]
+}

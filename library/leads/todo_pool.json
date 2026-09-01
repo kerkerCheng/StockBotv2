@@ -5888,10 +5888,11 @@
       "added_at": "2026-08-31T23:54:29.624234+00:00",
       "hint": "go 只排入 bounded pq1；不接受 claim、不入圖。若需付費，另核准 exact 金額／方案。",
       "n": 354,
-      "reason": null,
+      "reason": "使用者 drop:[351] 已用 TWSE 官方一手核實公開面原子;ESMT 四維第3維不過不 onboard,付費賣方報告系統面無承接點",
+      "receipt": null,
       "ref_id": "lead_1dfc66d3488e70d972e80bff8772e8ff",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "drop",
+      "resolved_at": "2026-09-01T05:26:29.189536+00:00",
       "source": "source_trace",
       "title": "追原報告／來源 access — The more I look at ESMT, the more excited I get researching legacy memory themes. So looked through H1 sellside models... From March ESMT reports: Huanan: DDR3 4Gb ASP +50% QoQ in Q2 Fubon: cited r...",
       "type": "source_trace_review"
@@ -5963,10 +5964,11 @@
       "graph_impact": "+3 節點、2 邊、1 claims｜來源：Next Financial (Substack)（tier 3）",
       "hint": "核准 exact graph delta；Decision handoff：co:nabtesco。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 360,
-      "reason": null,
+      "reason": "凍結 payload 缺 source_doc.section 撞同 URL 多段驗證,無法 resume;內容不變的 v2 包已重新 prepare(section 補齊+排除已入圖 USGS),由新編號承載核准",
+      "receipt": null,
       "ref_id": "ra_032b64cc05094380e9046696c91142be",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "drop",
+      "resolved_at": "2026-09-01T05:28:55.785855+00:00",
       "source": "research_action",
       "title": "機器人減速機供應邊補替代難度——Nabtesco RV 減速機判 3/5，並補雙環傳動供應邊",
       "type": "ra_admission"
@@ -5976,10 +5978,11 @@
       "graph_impact": "+6 節點、2 邊、4 claims｜來源：U.S. Geological Survey (美國政府第三方統計，非任何生產商)（tier 1）、Federation of American Scientists（tier 3）、Lynas Rare Earths（tier 1）、Mining Weekly（tier 3）",
       "hint": "核准 exact graph delta；Decision handoff：co:mp_materials。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 361,
-      "reason": null,
+      "reason": "凍結 payload 缺 source_doc.section 撞同 URL 多段驗證,無法 resume;內容不變的 v2 包已重新 prepare(section 補齊+排除已入圖 USGS),由新編號承載核准",
+      "receipt": null,
       "ref_id": "ra_9a8419e6ff52f2c414d3d928504bc491",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "drop",
+      "resolved_at": "2026-09-01T05:28:55.785928+00:00",
       "source": "research_action",
       "title": "稀土磁材供應邊補替代難度——MP（美國域內）與 Lynas（中國以外）各判 4/5",
       "type": "ra_admission"
@@ -5998,29 +6001,113 @@
     },
     {
       "added_at": "2026-09-01T01:53:21.246693+00:00",
+      "completion_authority": {
+        "action_digest": "82e6604d58d14f4fe7b1dea587cbe9701648b2c6a1ab058f65feb3b076ca5133",
+        "cohort_id": "dc_a51839bbf1429618556cf8bc265398c4",
+        "commit": "30c2385f097c84977717248913649d7151004acb",
+        "company_id": "co:google",
+        "verified_at": "2026-09-01T05:26:50.085319+00:00"
+      },
       "graph_impact": "+6 節點、4 邊、4 claims｜來源：Google (TPU/Palomar 團隊自著論文)（tier 1）、Google (Apollo/Palomar 團隊自著論文)（tier 1）",
       "hint": "核准 exact graph delta；Decision handoff：co:google。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 363,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_ef824697819900205016d1580220ad38;digest:82e6604d58d14f4fe7b1dea587cbe9701648b2c6a1ab058f65feb3b076ca5133;commit:30c2385f097c84977717248913649d7151004acb;cohort:dc_a51839bbf1429618556cf8bc265398c4",
       "ref_id": "ra_ef824697819900205016d1580220ad38",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-01T05:26:50.085319+00:00",
       "source": "research_action",
       "title": "TPU 光互連 OCS 層拆解落圖——Google 量產 OCS 是自製(Palomar),補 MEMS 鏡陣列與光循環器兩個缺失層",
       "type": "ra_admission"
     },
     {
       "added_at": "2026-09-01T05:16:17.578034+00:00",
+      "completion_authority": {
+        "action_digest": "1612f6d889e12d5fd5c96e77e2cf0e6cbc0857ee5efb8380705dd15d73b6a2ef",
+        "cohort_id": "dc_4d28e50810e46da7fd77ee042ee7bd1c",
+        "commit": "bb0577711d2831f4715646468679e8197bbb89c1",
+        "company_id": "co:lumentum",
+        "verified_at": "2026-09-01T05:27:04.421120+00:00"
+      },
       "graph_impact": "+4 節點、1 邊、2 claims｜來源：Lumentum（tier 1）、Coherent（tier 1）",
       "hint": "核准 exact graph delta；Decision handoff：co:lumentum。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 364,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_8e8f98f3f7f3111a596d3f645e0b017c;digest:1612f6d889e12d5fd5c96e77e2cf0e6cbc0857ee5efb8380705dd15d73b6a2ef;commit:bb0577711d2831f4715646468679e8197bbb89c1;cohort:dc_4d28e50810e46da7fd77ee042ee7bd1c",
       "ref_id": "ra_8e8f98f3f7f3111a596d3f645e0b017c",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-01T05:27:04.421120+00:00",
       "source": "research_action",
       "title": "WSS 覆蓋缺口補邊(Lumentum 10-K 自報)＋Coherent OCS 液晶技術資料點",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-09-01T05:29:05.388941+00:00",
+      "hint": "go＝啟動 system-decompose 拆解 NdFeB 磁材製程 stack(選題權在使用者,本項即選題核准);產出是研究地圖+pq1 研究題,不含入圖、不含 onboard;GBD 相關公司 onboard 屆時另鑄 ra_admission 編號。不 go 則 drop,不影響既有稀土群工作",
+      "n": 365,
+      "reason": null,
+      "ref_id": "manual:365",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "decompose 提案:拆解 NdFeB 磁材製程 stack(晶界擴散 GBD 層——誰擁有量產 GBD、是製程瓶頸還是普及技術)",
+      "type": "manual"
+    },
+    {
+      "added_at": "2026-09-01T05:29:56.872153+00:00",
+      "graph_impact": "+5 節點、2 邊、3 claims｜來源：Federation of American Scientists（tier 3）、Lynas Rare Earths（tier 1）、Mining Weekly（tier 3）",
+      "hint": "核准 exact graph delta；Decision handoff：co:mp_materials。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 366,
+      "reason": null,
+      "ref_id": "ra_a068c704dafdae02f714c11663f724db",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "稀土磁材供應邊補替代難度——MP（美國域內）與 Lynas（中國以外）各判 4/5",
+      "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-09-01T05:29:56.872153+00:00",
+      "graph_impact": "+3 節點、2 邊、1 claims｜來源：Next Financial (Substack)（tier 3）",
+      "hint": "核准 exact graph delta；Decision handoff：co:nabtesco。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 367,
+      "reason": null,
+      "ref_id": "ra_e89f06e0a1311dbbf5ac87aa381ad7e5",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "機器人減速機供應邊補替代難度——Nabtesco RV 減速機判 3/5，並補雙環傳動供應邊",
+      "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-09-01T05:29:56.872153+00:00",
+      "hint": "go 只排入 bounded pq1；不接受 claim、不入圖。若需付費，另核准 exact 金額／方案。",
+      "n": 368,
+      "reason": "collector 端已修正:lead_1dfc66d3 trace_status 改 terminal not_pursued+trace_requires_user=false(使用者 drop [354] 的正確落地),不會再重新推導",
+      "receipt": null,
+      "ref_id": "lead_1dfc66d3488e70d972e80bff8772e8ff",
+      "resolution": "drop",
+      "resolved_at": "2026-09-01T05:31:47.754997+00:00",
+      "source": "source_trace",
+      "source_cleared": {
+        "at": "2026-09-01T05:31:31.464517+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
+      "title": "追原報告／來源 access — The more I look at ESMT, the more excited I get researching legacy memory themes. So looked through H1 sellside models... From March ESMT reports: Huanan: DDR3 4Gb ASP +50% QoQ in Q2 Fubon: cited r...",
+      "type": "source_trace_review"
+    },
+    {
+      "added_at": "2026-09-01T05:29:56.872153+00:00",
+      "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "n": 369,
+      "reason": null,
+      "ref_id": "dc_a51839bbf1429618556cf8bc265398c4",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:google：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
     }
   ],
   "log": [
@@ -13489,8 +13576,71 @@
       "ref_id": "lead_0e8667f7227314b6492fe56c8b0f2fcd",
       "type": "source_trace_review",
       "verb": "go"
+    },
+    {
+      "at": "2026-09-01T05:26:29.189536+00:00",
+      "n": 354,
+      "reason": "使用者 drop:[351] 已用 TWSE 官方一手核實公開面原子;ESMT 四維第3維不過不 onboard,付費賣方報告系統面無承接點",
+      "receipt": null,
+      "ref_id": "lead_1dfc66d3488e70d972e80bff8772e8ff",
+      "type": "source_trace_review",
+      "verb": "drop"
+    },
+    {
+      "at": "2026-09-01T05:26:50.085319+00:00",
+      "n": 363,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_ef824697819900205016d1580220ad38;digest:82e6604d58d14f4fe7b1dea587cbe9701648b2c6a1ab058f65feb3b076ca5133;commit:30c2385f097c84977717248913649d7151004acb;cohort:dc_a51839bbf1429618556cf8bc265398c4",
+      "ref_id": "ra_ef824697819900205016d1580220ad38",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-01T05:27:04.421120+00:00",
+      "n": 364,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_8e8f98f3f7f3111a596d3f645e0b017c;digest:1612f6d889e12d5fd5c96e77e2cf0e6cbc0857ee5efb8380705dd15d73b6a2ef;commit:bb0577711d2831f4715646468679e8197bbb89c1;cohort:dc_4d28e50810e46da7fd77ee042ee7bd1c",
+      "ref_id": "ra_8e8f98f3f7f3111a596d3f645e0b017c",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-01T05:28:55.785855+00:00",
+      "n": 360,
+      "reason": "凍結 payload 缺 source_doc.section 撞同 URL 多段驗證,無法 resume;內容不變的 v2 包已重新 prepare(section 補齊+排除已入圖 USGS),由新編號承載核准",
+      "receipt": null,
+      "ref_id": "ra_032b64cc05094380e9046696c91142be",
+      "type": "ra_admission",
+      "verb": "drop"
+    },
+    {
+      "at": "2026-09-01T05:28:55.785928+00:00",
+      "n": 361,
+      "reason": "凍結 payload 缺 source_doc.section 撞同 URL 多段驗證,無法 resume;內容不變的 v2 包已重新 prepare(section 補齊+排除已入圖 USGS),由新編號承載核准",
+      "receipt": null,
+      "ref_id": "ra_9a8419e6ff52f2c414d3d928504bc491",
+      "type": "ra_admission",
+      "verb": "drop"
+    },
+    {
+      "at": "2026-09-01T05:31:31.464517+00:00",
+      "n": 368,
+      "reason": "來源本輪成功執行，但不再產出此項",
+      "receipt": null,
+      "ref_id": "lead_1dfc66d3488e70d972e80bff8772e8ff",
+      "type": "source_trace_review",
+      "verb": "source_cleared"
+    },
+    {
+      "at": "2026-09-01T05:31:47.754997+00:00",
+      "n": 368,
+      "reason": "collector 端已修正:lead_1dfc66d3 trace_status 改 terminal not_pursued+trace_requires_user=false(使用者 drop [354] 的正確落地),不會再重新推導",
+      "receipt": null,
+      "ref_id": "lead_1dfc66d3488e70d972e80bff8772e8ff",
+      "type": "source_trace_review",
+      "verb": "drop"
     }
   ],
-  "next_n": 365,
+  "next_n": 370,
   "schema_version": "1"
 }

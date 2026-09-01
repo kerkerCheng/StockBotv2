@@ -317,6 +317,7 @@ D7 的判準本身仍然有效，只是不再有這個 gate 可套用。
 
 | 項目 | 為什麼還沒做 | 驗收條件 | 先做什麼 |
 |---|---|---|---|
+| **`prepare_research_action` 應在 prepare 時擋「同 URL 無 section」的 curated 文件** | 2026-09-01 實測：兩個已核准的 RA（原 [360][361]）apply 時才撞 loader 的 `DuplicateUrlError`（curated 節錄文件與母文件同 URL、payload 凍結無法補 `section`），只能重新 prepare＋重新請求核准——把 loader 端 gate 提前到 prepare 端可在核准前就發現。同輪還 backfill 了三個舊母文件的 null section（fas_dod／lynas_q1_fy26／miningweekly） | prepare 一個同 URL 且缺 section 的 draft 會被 rejected 並指出缺哪個欄位；既有通過案例（nextfinancial 雙 section）仍通過 | 無 |
 | **排程與互動 session 的互斥仍是單向避讓，不是鎖** | 2026-08-31 建了 `scripts/writer_guard.py`，但**只有互動側會呼叫**：daily 那側要加同樣檢查必須動 `.codex/rules/stockbot-automations.rules` 的 16 條 exact allowlist（新增命令＝sandbox impact review，見 `AGENTS.md` 該契約）。目前靠「daily 有界且時間可預測、互動側讓開」成立，**但 daily 若延遲或超時就失效**。repo 內原本 `filelock`／`flock`／pidfile 全部 0 命中，所以這是從無到單向，不是從單向到雙向 | 兩側都在寫 `library/leads/*.json` 前取得同一個 advisory lock；lock 需 stale-tolerant（崩潰的 session 不得永久卡住）。baseline：目前互動側 exit 2 可擋、排程側 0 檢查 | 先量測 daily 實際執行時長分布——`expected_duration_minutes=60` 目前是拍腦袋值，窗開太寬會讓互動 session 無謂等待，開太窄則保護失效 |
 
 

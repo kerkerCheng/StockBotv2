@@ -11312,12 +11312,12 @@
       "published_at": "2026-08-30T15:24:18.000Z",
       "raw_text": "The more I look at ESMT, the more excited I get researching legacy memory themes. \n\nSo looked through H1 sellside models...\n\nFrom March ESMT reports:\nHuanan: DDR3 4Gb ASP +50% QoQ in Q2\nFubon: cited roughly +40% Q2 DRAM pricing\n\nBy August... Huanan was citing ESMT Q2 ASP growth of: \n+105–113% Q/Q blended. \n\nSaying DDR3 pricing had come in substantially better than expected. \n\nSo legacy memory pricing translated into much more operating leverage at ESMT. \n\nAbout PSMC wafer cost hikes: Huanan estimated manufacturing costs could rise ~100% in 2H26, but customers remained highly willing to accept the pass-through\n\nIf we look at July net income was roughly $109M...  way above the earnings levels the earlier models were built around.\n\nIf I had to give a TLDR \"consensus\" of reports\n\n1. DDR3/DDR2 supply remains structurally tight as competitors move capacity toward higher-value memory.\n2. Concord saw no conditions supporting a price reversal during 2026.\n3. Concord expected contract-price increases to cover higher foundry costs.\n4. Huanan later found that customer willingness to accept those cost increases was stronger than expected.\n\nFun thing I read from Huanan was DDR3 is used in products such as IP cameras and HDDs where the memory component is a relatively small part of the customer's total BOM. \n\nSo even very large legacy DRAM price hike may only add a few dollars to the finished product's BOM... and for many customers, paying a few extra dollars would be more economical than redesigning + requalifying (but this flows materially into ESMT's net income)\n\nAnyway, just excited about this idea (*disclosure I have positions)\n\nTLDR:\n-> Huanan updated ESMT blended Q2 ASP to +105-113% Q/Q\n-> Given July's blowout net income (putting ESMT at 1.9x p/e annualized RR), implications for the future are exciting if inelasticity continues + ESMT has the ability to hike further due to low % of finished product BOM cost. \n-> Indication customers were still willing to accept pass through for PSMC wafer hikes.",
       "refs": {
-        "parked_reason": "賣方數字 paywall 不可核+標的不在 registry;onboard 是 scope 決定,已列收尾摘要問使用者",
+        "parked_reason": "使用者 2026-09-01 drop [354]:公開面原子已由 [351] 以 TWSE 官方一手核實,ESMT 四維第3維(客戶端資本承諾)不過不 onboard,付費賣方報告無系統承接點——明確決定不追,terminal",
         "research_outcome": "ESMT(晶豪科3006.TW)不在 registry;瓶頸四維初判:無客戶端資本承諾證據(判準3不過),受益型 price-taker 非瓶頸持有者,結構緊缺在產業層(產能移往高值記憶體)非 ESMT 專屬。是否 onboard 屬使用者 scope 決定",
         "trace_attempts_ref": "核心數字鏈:華南/富邦/康和賣方報告(paywall)經 X @aleabitoreddit 轉述(作者自陳持倉):DDR3 ASP +105-113% QoQ、7月自結淨利約1.09億美元、PSMC 晶圓成本2H26漲約100%可轉嫁。MOPS fetcher 僅涵年報/財報,月自結不在自動管道;可人工核對路徑=MOPS 重大訊息 3006 月自結+Q3 財報",
         "trace_next_trigger": "使用者決定 onboard ESMT/legacy memory 主題,或 3006 Q3 財報公布可一手核對獲利爆發",
-        "trace_requires_user": "true",
-        "trace_status": "isolated_tier_3"
+        "trace_requires_user": "false",
+        "trace_status": "not_pursued"
       },
       "source": "x:aleabitoreddit",
       "status": "parked",
