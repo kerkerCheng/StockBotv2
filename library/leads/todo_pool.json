@@ -6323,6 +6323,18 @@
       "source": "research_action",
       "title": "TFLN 平台層補供應商——HyperLight 自報量產(含 co:hyperlight 私人 onboard),清 tfln_platform 零供應商",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-09-01T07:50:19.413505+00:00",
+      "hint": "go＝啟動 system-decompose 拆解 Unitree G1(選題核准);產出研究地圖+pq1 題,不含入圖與 onboard。drop＝不拆",
+      "n": 383,
+      "reason": null,
+      "ref_id": "manual:383",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "decompose 提案:拆解 Unitree G1 人形機器人(機器人群次層——FT 感測器/靈巧手/電池動力層,tech:force_torque_sensor 🔴 的原生系統)",
+      "type": "manual"
     }
   ],
   "log": [
@@ -13946,6 +13958,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 383,
+  "next_n": 384,
   "schema_version": "1"
 }
