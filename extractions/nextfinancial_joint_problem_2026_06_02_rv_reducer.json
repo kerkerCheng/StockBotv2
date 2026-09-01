@@ -1,0 +1,123 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "Raise substitutability if customer-side evidence shows industrial robot OEMs (Fanuc/ABB/KUKA/Yaskawa) unable to qualify non-Nabtesco RV reducers over a multi-year window; lower it if Shuanghuan or another entrant wins a documented medium-to-large industrial joint design-in at a major robot OEM.",
+      "id": "nextfinancial_joint_problem_2026_06_02_rv_reducer_cl1",
+      "source_ids": [
+        "nextfinancial_joint_problem_2026_06_02_rv_reducer_s1",
+        "nextfinancial_joint_problem_2026_06_02_rv_reducer_s2"
+      ],
+      "statement": "Nabtesco is credited with ~60% of the RV-reducer market for medium-to-large industrial robot joints (third-party estimate), but Zhejiang Shuanghuan Driveline has moved into RV reducers and already supplies Optimus and Unitree — a validated Chinese alternative in the adjacent humanoid segment. Substitutability judged 3/5: dominant share but replacement paths demonstrably exist and are being exercised.",
+      "subject_id": "e_sub1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {
+        "substitutability": 3
+      },
+      "confidence": 0.75,
+      "dst_id": "tech:rv_reducer",
+      "id": "e_sub1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "nextfinancial_joint_problem_2026_06_02_rv_reducer_s1",
+        "nextfinancial_joint_problem_2026_06_02_rv_reducer_s2"
+      ],
+      "src_id": "co:nabtesco"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.6,
+      "dst_id": "tech:rv_reducer",
+      "id": "e_sub2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "nextfinancial_joint_problem_2026_06_02_rv_reducer_s2"
+      ],
+      "src_id": "co:shuanghuan_driveline"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "robot_subsystem",
+      "aliases": [
+        "6268.T"
+      ],
+      "attributes": {
+        "ticker": "6268.T"
+      },
+      "confidence": 0.8,
+      "id": "co:nabtesco",
+      "name": "Nabtesco",
+      "role": null,
+      "source_ids": [
+        "nextfinancial_joint_problem_2026_06_02_rv_reducer_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "robot_subsystem",
+      "aliases": [
+        "RV 減速機"
+      ],
+      "attributes": {},
+      "confidence": 0.8,
+      "id": "tech:rv_reducer",
+      "name": "RV Cycloidal Reducer",
+      "role": null,
+      "source_ids": [
+        "nextfinancial_joint_problem_2026_06_02_rv_reducer_s1"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "robot_subsystem",
+      "aliases": [
+        "雙環傳動",
+        "双环传动",
+        "002472.SZ"
+      ],
+      "attributes": {
+        "ticker": "002472.SZ"
+      },
+      "confidence": 0.75,
+      "id": "co:shuanghuan_driveline",
+      "name": "Shuanghuan Driveline",
+      "role": null,
+      "source_ids": [
+        "nextfinancial_joint_problem_2026_06_02_rv_reducer_s2"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "nextfinancial_joint_problem_2026_06_02_rv_reducer",
+    "evidence_tier": 3,
+    "origin_entity": "Next Financial (Substack)",
+    "permission_basis": "Public Substack article; URL and short excerpts only.",
+    "published_at": "2026-06-02",
+    "publisher": "Substack",
+    "retrieved_at": "2026-09-01",
+    "section": "rv_reducer_share",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "The Joint Problem — RV reducer market share excerpts",
+    "url": "https://nextfinancial.substack.com/p/the-joint-problem-who-owns-the-most"
+  },
+  "sources": [
+    {
+      "id": "nextfinancial_joint_problem_2026_06_02_rv_reducer_s1",
+      "locator": "Article body — RV reducer share",
+      "quote": "Nabtesco is generally credited with around 60% of the RV-reducer market for medium-to-large industrial robot joints."
+    },
+    {
+      "id": "nextfinancial_joint_problem_2026_06_02_rv_reducer_s2",
+      "locator": "Article body — Chinese entrants",
+      "quote": "Zhejiang Shuanghuan Driveline (双环传动) — an automotive-gear maker that moved into both RV and harmonic reducers, supplies Optimus and Unitree"
+    }
+  ]
+}
