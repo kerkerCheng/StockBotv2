@@ -1,0 +1,152 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "guided",
+      "disproof_condition": "威脅成立方向：任一 EV OEM 具名採用 HRE-free 磁石於牽引馬達（設計中標／量產聲明）→ 重稀土需求軸下修。威脅不成立方向：HRE-free 磁石在高溫矯頑力驗證失敗、僅停留樣品階段超過兩個財報週期、或僅用於非牽引應用 → 重稀土鏈維持。每季核對 Proterial 進展與 Lynas Dy/Tb 出貨量。",
+      "id": "proterial_hre_free_magnet_2025_07_22_cl1",
+      "source_ids": [
+        "proterial_hre_free_magnet_2025_07_22_s1",
+        "proterial_hre_free_magnet_2025_07_22_s2",
+        "proterial_hre_free_magnet_2025_07_22_s3",
+        "proterial_hre_free_magnet_2025_07_22_s4"
+      ],
+      "statement": "Proterial has heavy-rare-earth-free sintered NdFeB magnets at pre-production sample stage: NMX-F1SH-HF (Br = 1.40 T, HcJ ≥ 1671 kA/m, samples shipping) and NMX-G1NH-HF (Br = 1.42 T, HcJ ≥ 1830 kA/m, mass-production plant ready for pre-production samples April 2026), positioned for EV driving motors requiring high torque and heat resistance. If these qualify at EV OEMs and ramp, demand for separated heavy rare-earth oxides (Dy/Tb) in the largest magnet application weakens structurally — this is a standing disproof path for heavy-REO-bottleneck positioning (Lynas ex-China heavy REO axis, MP heavy separation build-out). Vendor self-report: performance numbers are Proterial's own; no EV OEM qualification win is named.",
+      "subject_id": "mat:separated_heavy_reo"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "prod:proterial_nmx_hf",
+      "id": "e1",
+      "relation": "develops",
+      "source_ids": [
+        "proterial_hre_free_magnet_2025_07_22_s1",
+        "proterial_hre_free_magnet_2025_07_22_s2"
+      ],
+      "src_id": "co:proterial"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "mat:rare_earth_magnets",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "proterial_hre_free_magnet_2025_07_22_s3"
+      ],
+      "src_id": "co:proterial"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Hitachi Metals",
+        "NEOMAX",
+        "Proterial Ltd"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:proterial",
+      "name": "Proterial (前 Hitachi Metals)",
+      "role": null,
+      "source_ids": [
+        "proterial_hre_free_magnet_2025_07_22_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "NMX-F1SH-HF",
+        "NMX-G1NH-HF"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "prod:proterial_nmx_hf",
+      "name": "Proterial NMX-HF 無重稀土 NdFeB 磁石系列",
+      "role": null,
+      "source_ids": [
+        "proterial_hre_free_magnet_2025_07_22_s1",
+        "proterial_hre_free_magnet_2025_07_22_s2"
+      ],
+      "type": "Product"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "NdFeB"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:rare_earth_magnets",
+      "name": "Rare earth magnets (neodymium, samarium-cobalt)",
+      "role": null,
+      "source_ids": [
+        "proterial_hre_free_magnet_2025_07_22_s3"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "separated heavy rare-earth oxide",
+        "HREO",
+        "dysprosium oxide",
+        "terbium oxide"
+      ],
+      "attributes": {
+        "concentration_score": 5,
+        "ramp_difficulty_intrinsic": 4
+      },
+      "confidence": 0.9,
+      "id": "mat:separated_heavy_reo",
+      "name": "分離重稀土氧化物（Dy／Tb 等）",
+      "role": null,
+      "source_ids": [
+        "proterial_hre_free_magnet_2025_07_22_s1"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "proterial_hre_free_magnet_2025_07_22",
+    "evidence_tier": 2,
+    "origin_entity": "Proterial",
+    "permission_basis": "Public press release; URL and short excerpts only.",
+    "published_at": "2025-07-22",
+    "publisher": "Proterial, Ltd.",
+    "retrieved_at": "2026-09-01",
+    "section": "hre_free_magnet",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Proterial Develops High-Performance Heavy-Rare-Earth-Free Neodymium Sintered Magnet for Electric Vehicle Driving Motors",
+    "url": "https://www.proterial.com/e/press/2025/n0722b.html"
+  },
+  "sources": [
+    {
+      "id": "proterial_hre_free_magnet_2025_07_22_s1",
+      "locator": "Press release — NMX-G1NH-HF positioning",
+      "quote": "NMX-G1NH-HF material is a heavy-rare-earth-free material that can be used even for driving motors requiring high torque and heat resistance."
+    },
+    {
+      "id": "proterial_hre_free_magnet_2025_07_22_s2",
+      "locator": "Press release — NMX-F1SH-HF properties",
+      "quote": "The NMX-F1SH-HF material has magnetic properties with Br = 1.40 T and HcJ ≥ 1671 kA/m, permitting applications for driving motors as well as electric power steering and compressors."
+    },
+    {
+      "id": "proterial_hre_free_magnet_2025_07_22_s3",
+      "locator": "Press release — production status F1SH-HF",
+      "quote": "Proterial's mass production plant has already started providing pre-production samples."
+    },
+    {
+      "id": "proterial_hre_free_magnet_2025_07_22_s4",
+      "locator": "Press release — production timeline G1NH-HF",
+      "quote": "In April 2026, the mass-production plant will be ready to respond to requests for pre-production samples."
+    }
+  ]
+}
