@@ -6028,6 +6028,174 @@
       "result": "ok",
       "run_at": "2026-08-31T22:36:07.807554+00:00",
       "source": "edgar:TSM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-01T22:32:41.408259+00:00",
+      "source": "mfn:sivers-semiconductors"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-01T22:33:03.104283+00:00",
+      "source": "sivers:press"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-01T22:33:03.806674+00:00",
+      "source": "yahoo:iqe-l"
+    },
+    {
+      "new": 5,
+      "result": "ok",
+      "run_at": "2026-09-01T22:33:05.418476+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-09-01T22:33:07.179232+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 8,
+      "result": "ok",
+      "run_at": "2026-09-01T22:33:07.890245+00:00",
+      "source": "edgar:AEHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-01T22:33:08.588324+00:00",
+      "source": "edgar:AEVA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-01T22:33:09.292913+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-01T22:33:09.805231+00:00",
+      "source": "edgar:AVGO"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-01T22:33:10.512403+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-01T22:33:11.231556+00:00",
+      "source": "edgar:CCXI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-01T22:33:11.937369+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-01T22:33:12.665149+00:00",
+      "source": "edgar:GFS"
+    },
+    {
+      "new": 8,
+      "result": "ok",
+      "run_at": "2026-09-01T22:33:13.394037+00:00",
+      "source": "edgar:GOOGL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-01T22:33:14.122215+00:00",
+      "source": "edgar:HIMX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-01T22:33:14.812591+00:00",
+      "source": "edgar:JBL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-01T22:33:15.497451+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-09-01T22:33:16.210484+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-01T22:33:16.714230+00:00",
+      "source": "edgar:META"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-01T22:33:17.410780+00:00",
+      "source": "edgar:MP"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-01T22:33:17.911563+00:00",
+      "source": "edgar:MRVL"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-09-01T22:33:18.603597+00:00",
+      "source": "edgar:MTSI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-01T22:33:19.299330+00:00",
+      "source": "edgar:MU"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-01T22:33:19.807328+00:00",
+      "source": "edgar:NVDA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-01T22:33:20.512155+00:00",
+      "source": "edgar:POET"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-01T22:33:21.253866+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-01T22:33:21.758677+00:00",
+      "source": "edgar:TSLA"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-09-01T22:33:22.462146+00:00",
+      "source": "edgar:TSM"
     }
   ],
   "leads": {
@@ -8633,6 +8801,39 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2086730782425727183"
     },
+    "lead_0d984353ea605a89e6cf74cf941eac0f": {
+      "entities": {
+        "company_ids": [
+          "co:aehr_test_systems"
+        ],
+        "tickers": [
+          "AEHR"
+        ]
+      },
+      "first_seen": "2026-09-01T22:33:07.890021+00:00",
+      "lead_id": "lead_0d984353ea605a89e6cf74cf941eac0f",
+      "published_at": "2026-08-14",
+      "refs": {},
+      "source": "edgar:AEHR",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "AEHR 4 filed 2026-08-14",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-01T22:36:15.121622+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "交易結果不改供應鏈候選或瓶頸排序，只補充內部人觀測。"
+        },
+        "decided_at": "2026-09-01T22:36:15.121622+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "AEHR 官方 Form 4 有具名發行人、日期與可逐字核對交易欄；屬低優先內部人時變觀測。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1040470/000104047026000253/xslF345X06/primary_01.xml"
+    },
     "lead_0e0197f7c6c42939f7b285e7485f8aa7": {
       "entities": {
         "company_ids": [],
@@ -9234,6 +9435,39 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1437424/000117184326004397/f6k_063026.htm"
+    },
+    "lead_12d182c33d678a3ec14ef956dd80765a": {
+      "entities": {
+        "company_ids": [
+          "co:aehr_test_systems"
+        ],
+        "tickers": [
+          "AEHR"
+        ]
+      },
+      "first_seen": "2026-09-01T22:33:07.890100+00:00",
+      "lead_id": "lead_12d182c33d678a3ec14ef956dd80765a",
+      "published_at": "2026-08-13",
+      "refs": {},
+      "source": "edgar:AEHR",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "AEHR 4 filed 2026-08-13",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-01T22:36:15.418481+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "交易結果不改供應鏈候選或瓶頸排序，只補充內部人觀測。"
+        },
+        "decided_at": "2026-09-01T22:36:15.418481+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "AEHR 官方 Form 4 有具名發行人、日期與可逐字核對交易欄；屬低優先內部人時變觀測。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1040470/000104047026000251/xslF345X06/primary_01.xml"
     },
     "lead_12e45d3439ad1cdbc752dde904447629": {
       "entities": {
@@ -10319,6 +10553,39 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1633978/000157046526000004/xslF345X06/form4-08192026_120815.xml"
+    },
+    "lead_19c2d0ce3f563d028b0eefa4ff300ede": {
+      "entities": {
+        "company_ids": [
+          "co:macom"
+        ],
+        "tickers": [
+          "MTSI"
+        ]
+      },
+      "first_seen": "2026-09-01T22:33:18.603418+00:00",
+      "lead_id": "lead_19c2d0ce3f563d028b0eefa4ff300ede",
+      "published_at": "2026-09-01",
+      "refs": {},
+      "source": "edgar:MTSI",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "MTSI 4 filed 2026-09-01",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-01T22:36:15.703233+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "交易結果不改供應鏈候選或瓶頸排序，只補充內部人觀測。"
+        },
+        "decided_at": "2026-09-01T22:36:15.703233+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "MTSI 官方 Form 4 有具名發行人、日期與可逐字核對交易欄；屬低優先內部人時變觀測。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1493594/000090445426000476/xslF345X06/edgar.xml"
     },
     "lead_1a70d988b953b5e01a4dab9ceb97184b": {
       "entities": {
@@ -12878,6 +13145,126 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1318605/000110465926055079/xslF345X06/tm2613330-1_4seq1.xml"
     },
+    "lead_26bd4214b4b0434765071f14a7a955e4": {
+      "entities": {
+        "company_ids": [
+          "co:google",
+          "co:nvidia",
+          "co:schaeffler",
+          "co:marvell_technology",
+          "co:apple",
+          "co:soitec",
+          "co:amd",
+          "co:axt",
+          "co:broadcom",
+          "co:intel",
+          "co:sk_hynix"
+        ],
+        "tickers": [
+          "GOOGL",
+          "NVDA",
+          "SPCX",
+          "CAPA",
+          "SHA0.DE",
+          "CXMT",
+          "MRVL",
+          "AAPL",
+          "SOI",
+          "STM",
+          "AMD",
+          "AXTI",
+          "AVGO",
+          "INTC",
+          "SKHY",
+          "AMZN"
+        ]
+      },
+      "first_seen": "2026-09-01T22:33:05.409583+00:00",
+      "lead_id": "lead_26bd4214b4b0434765071f14a7a955e4",
+      "media": [],
+      "published_at": "2026-09-01T08:30:14.000Z",
+      "raw_text": "Just some TLDR news I found interesting:\n\n1. $GOOGL (missed this) also invested in Mediatek alongside $NVDA for their $3.9B raise. \n\nGoogle/Nvidia are goats with investments you look at $SPCX to Anthropic. \n\n2. Samsung Electro-Mechanics discloses $778.9M MLCC deal / $CAPA (new MLCC ETF) also gives exposure now for folks without Korea/Japan/Taiwan market access.\n\nBut thing is more accelerators x MLCCs per accelerator might indicate a more future extreme bottleneck than people expect. \n\n3. China channel checks state: planetary roller screws, 6D force sensors, and dexterous hands resist domestic substitution.\n\nThen planetary roller screw as the top with lowest domestic substitution rate. eg. $SHA0.DE for planetary. Just interesting to hear moats I guess. \n\n4. Samsung reportedly has ~70% of memory production capacity committed through 2031 / commodity DRAM has also fallen into short supply - Seoul Economic Daily. TrendForce expects server DRAM contract prices to rise 13-18% QoQ in 3Q26\n\nSK Hynix also publicly stated the memory shortage lasts through 2030. \n\n5. $CXMT has begun producing HBM3E in small quantities and reportedly claimed mass production of LPDDR6.  Implications are even more positive for legacy DRAM shortages. \n\n6. Cisco at SEMICON Taiwan said CPO is ready for mass deployment; pluggable modules will remain the market mainstay.\n\n$MRVL also said customers are actively planning scale-up optics deployments as early as 2027\n\n7. Wingtech -> bought Nexperia -> Netherlands effectively removed Wingtech’s control -> Wingtech is fighting back through Chinese courts.\n\nBut Nexperia got $300m of their assets frozen. \n\nMore geopolitical drama of course, always entertaining. $AAPl also explicitly accused OpenAI of destroying crucial evidence... (for more fun)\n\n8. Not much description around ASP hikes regarding SOI substrates $SOI, but they now have 10+ customers involved with LTAs, $200m revenue described as a \"floor\", comments about customers more concerned about obtaining wafers than where they are manufactured. \n\nSo basically moving into capacity reservation now stages as silicon photonics takes off in 2027. \n\n9. Some channel checks put lead times for high power MOSFETs and large area TVS diodes as high as ~52 weeks. ($STM also reportedly implemented its 3rd 2026 price increase on August 23)\n\n10. Traditional packaging capacity could face a deficit exceeding 20% by 2027\" with \"wire bonding equipment\" emerging as the primary bottleneck\", covered this earlier this week with beneficiaries like  \n\n11. Claims that all six major ABF suppliers are booked for 2026, with 12-14 month lead times and some suppliers auctioning remaining capacity; $NVDA, $AMD and hyperscalers locking ABF capacity through 2028 and pushing suppliers to plan 2029–30 expansions.\n\nNames like Kinsus (3189), Unimicron (3037), Nan Ya PCB (8046), Ibiden (4062), etc are all probably happy. \n\n12. CCL leading laminated board products increased by another 10%-20%, 7th price hike this year (eg. Kingboard). Industry estimates put the HVLP4 copper-foil shortage at ~48% in 2026 / 43% in 2027, while Low-Dk/T-Glass lead times have stretched beyond 30 weeks. \n\n13. \"(GaAs) substrate materials and gallium epitaxial source materials are also facing another round of price increases in the third quarter of 2026, reportedly 5 to 6 times higher than at the early stage of the restrictions.\"\n\n\"China has recently eased some substrate export controls\" but there's a \"severe InP substrate shortage\" per digitimes. Just some $AXTI related updates\n\n14. $AMD and $AVGO reportedly booked most of Powertech's planned FOPLP capacity ahead of mid-2027 mass production\n\n15. $INTC considering $INTC foundry for HBM4E base dies. But $SKHY responded directly that \"some of the content is different from the facts\". \n\n16.  \"OpenAI Hoarding Tens Of Thousands Of $AAPL Mac mini and Mac Studio\" for reinforcement learning. Anthropic has been renting mac mini units from $AMZN as well. Kinda sad Tim Cook retired, but dude had a goated run. \n\nJust random interesting notes",
+      "refs": {
+        "gap": "Google 共同投資、Soitec 10+ LTA/$200m floor、Intel HBM4E base die、ABF/HVLP4/lead-time 等多數 atoms 仍未核實",
+        "onboard_candidate_names": [
+          "MediaTek Inc. (2454.TW)",
+          "Samsung Electro-Mechanics (009150.KS)"
+        ],
+        "parked_reason": "多原子社群彙整只部分取得，不能整篇當證據",
+        "research_outcome": "確認 NVIDIA 投資 MediaTek 35 億美元 convertible bonds、MediaTek 採 NVLink Fusion；確認 Samsung EM 2027 年 MLCC 合約 KRW 1.0722 兆；SK hynix 只確認 HBM4E 已送樣，未確認 Intel 傳聞",
+        "storage_permission": "repo_excerpt",
+        "trace_attempts_ref": "查 MediaTek、Samsung Electro-Mechanics、Soitec、SK hynix 官方站；取得 MediaTek/NVIDIA 與 Samsung MLCC 一手，未取得其餘 channel-check 原文",
+        "trace_next_trigger": "相關公司正式 filing、IR 或交易對手具名公告支持尚未核實 atoms",
+        "trace_origin_entity": "MediaTek; Samsung Electro-Mechanics; SK hynix",
+        "trace_origin_linkage": "不同發行人一手，但只各自支持摘要中的個別 atoms",
+        "trace_original_date": "2026-08-31/2026-09-01",
+        "trace_requires_user": "false",
+        "trace_status": "partial",
+        "trace_trigger_entities": [
+          "AAPL",
+          "AMD",
+          "AMZN",
+          "AVGO",
+          "AXTI",
+          "CAPA",
+          "CXMT",
+          "GOOGL",
+          "INTC",
+          "MRVL",
+          "NVDA",
+          "SHA0.DE",
+          "SKHY",
+          "SOI",
+          "SPCX",
+          "STM",
+          "co:amd",
+          "co:apple",
+          "co:axt",
+          "co:broadcom",
+          "co:google",
+          "co:intel",
+          "co:marvell_technology",
+          "co:nvidia",
+          "co:schaeffler",
+          "co:sk_hynix",
+          "co:soitec"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
+      "source": "x:aleabitoreddit",
+      "status": "parked",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "AVGO",
+            "CPO",
+            "InP",
+            "NVDA"
+          ]
+        }
+      },
+      "title": "Just some TLDR news I found interesting: 1. $GOOGL (missed this) also invested in Mediatek alongside $NVDA for their $3.9B raise. Google/Nvidia are goats with investments you look at $SPCX to Anthropic. 2. Samsung Electro-Mechanics discloses $778.9M MLCC deal / $CAPA (new MLCC ETF) also gives exposure now for folks without Korea/Japan/Taiwan market access. But thing is more accelerators x MLCCs per accelerator might indicate a more future extreme bottleneck than people expect. 3. China channel checks state: planetary roller screws, 6D force sensors, and dexterous hands resist domestic substitution. Then planetary roller screw as the top with lowest domestic substitution rate. eg. $SHA0.DE for planetary. Just interesting to hear moats I guess. 4. Samsung reportedly has ~70% of memory production capacity committed through 2031 / commodity DRAM has also fallen into short supply - Seoul Economic Daily. TrendForce expects server DRAM contract prices to rise 13-18% QoQ in 3Q26 SK Hynix also publicly stated the memory shortage lasts through 2030. 5. $CXMT has begun producing HBM3E in small quantities and reportedly claimed mass production of LPDDR6. Implications are even more positive for legacy DRAM shortages. 6. Cisco at SEMICON Taiwan said CPO is ready for mass deployment; pluggable modules will remain the market mainstay. $MRVL also said customers are actively planning scale-up optics deployments as early as 2027 7. Wingtech -> bought Nexperia -> Netherlands effectively removed Wingtech’s control -> Wingtech is fighting back through Chinese courts. But Nexperia got $300m of their assets frozen. More geopolitical drama of course, always entertaining. $AAPl also explicitly accused OpenAI of destroying crucial evidence... (for more fun) 8. Not much description around ASP hikes regarding SOI substrates $SOI, but they now have 10+ customers involved with LTAs, $200m revenue described as a \"floor\", comments about customers more concerned about obtaining wafers than where they are manufactured. So basically moving into capacity reservation now stages as silicon photonics takes off in 2027. 9. Some channel checks put lead times for high power MOSFETs and large area TVS diodes as high as ~52 weeks. ($STM also reportedly implemented its 3rd 2026 price increase on August 23) 10. Traditional packaging capacity could face a deficit exceeding 20% by 2027\" with \"wire bonding equipment\" emerging as the primary bottleneck\", covered this earlier this week with beneficiaries like 11. Claims that all six major ABF suppliers are booked for 2026, with 12-14 month lead times and some suppliers auctioning remaining capacity; $NVDA, $AMD and hyperscalers locking ABF capacity through 2028 and pushing suppliers to plan 2029–30 expansions. Names like Kinsus (3189), Unimicron (3037), Nan Ya PCB (8046), Ibiden (4062), etc are all probably happy. 12. CCL leading laminated board products increased by another 10%-20%, 7th price hike this year (eg. Kingboard). Industry estimates put the HVLP4 copper-foil shortage at ~48% in 2026 / 43% in 2027, while Low-Dk/T-Glass lead times have stretched beyond 30 weeks. 13. \"(GaAs) substrate materials and gallium epitaxial source materials are also facing another round of price increases in the third quarter of 2026, reportedly 5 to 6 times higher than at the early stage of the restrictions.\" \"China has recently eased some substrate export controls\" but there's a \"severe InP substrate shortage\" per digitimes. Just some $AXTI related updates 14. $AMD and $AVGO reportedly booked most of Powertech's planned FOPLP capacity ahead of mid-2027 mass production 15. $INTC considering $INTC foundry for HBM4E base dies. But $SKHY responded directly that \"some of the content is different from the facts\". 16. \"OpenAI Hoarding Tens Of Thousands Of $AAPL Mac mini and Mac Studio\" for reinforcement learning. Anthropic has been renting mac mini units from $AMZN as well. Kinda sad Tim Cook retired, but dude had a goated run. Just random interesting notes",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-01T22:36:11.594012+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "查證不同 atoms 可能新增或排除候選，會改變候選集合。"
+        },
+        "decided_at": "2026-09-01T22:36:11.594012+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "contradiction": true,
+          "novelty": true
+        },
+        "reason": "具名公司、供應鏈動作與數字可追查；多項主張可能新增候選並含 SK Hynix 反證，但目前只是社群彙整，需逐條追原文。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2094704372831920324"
+    },
     "lead_26ed9096f88f869e77178205b74682d7": {
       "entities": {
         "company_ids": [],
@@ -15035,6 +15422,83 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2076266613675069628"
     },
+    "lead_32faf58f33abcefc29e0abe4308a4a6e": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "AA"
+        ]
+      },
+      "first_seen": "2026-09-01T22:33:05.388636+00:00",
+      "lead_id": "lead_32faf58f33abcefc29e0abe4308a4a6e",
+      "media": [
+        {
+          "cache": {
+            "bytes": 95586,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_32faf58f33abcefc29e0abe4308a4a6e/3_2094854523311501312.jpg",
+            "sha256": "73e403cc7e12a4a61093a3b4457a2162b5b127f49c75827b2ec11438fe447bdf"
+          },
+          "height": 1051,
+          "media_key": "3_2094854523311501312",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HRJrFwYaMAAU0B7.jpg",
+          "width": 1251
+        },
+        {
+          "cache": {
+            "bytes": 167540,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_32faf58f33abcefc29e0abe4308a4a6e/3_2094854523315699712.jpg",
+            "sha256": "5512cd89d15290ee63711eb6a1146176def726025c61586e87731cfe5d850f18"
+          },
+          "height": 1020,
+          "media_key": "3_2094854523315699712",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HRJrFwZaQAAHAjk.jpg",
+          "width": 1213
+        }
+      ],
+      "published_at": "2026-09-01T18:26:55.000Z",
+      "raw_text": "US Department of War announces $174M financing for securing Gallium Supply Chains. Beneficiaries are:\n\n- $AA (Alcoa Corp) for Gallium production at its refinery.\n\n- Sojitz (2768) as the Japanese JV offtake partner\n\nGood to see US critical minerals supply chains investments. https://t.co/fyi203MH2B",
+      "refs": {
+        "onboard_candidate_names": [
+          "Alcoa Corporation (AA)",
+          "Sojitz Corporation (2768.T)"
+        ],
+        "parked_reason": "追源完成；一手成立但本輪沒有可合法直接入圖的既有 company delta",
+        "primary_url": "https://www.war.gov/News/Releases/Release/Article/4587183/department-of-war-announces-174-million-investment-to-secure-gallium-supply-cha/",
+        "research_outcome": "一手支持融資、Alcoa 營運與 Sojitz 參與；新公司尚未通過 onboard/L8，未產 RA",
+        "storage_permission": "repo_excerpt",
+        "trace_attempts_ref": "官方 release：估計 1.74 億美元 equity financing；Alcoa Wagerup 新鎵廠；Sojitz 與日澳政府參與；100 公噸/年",
+        "trace_origin_entity": "U.S. Department of War",
+        "trace_original_date": "2026-08-31",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
+      "source": "x:aleabitoreddit",
+      "status": "parked",
+      "themes": {},
+      "title": "US Department of War announces $174M financing for securing Gallium Supply Chains. Beneficiaries are: - $AA (Alcoa Corp) for Gallium production at its refinery. - Sojitz (2768) as the Japanese JV offtake partner Good to see US critical minerals supply chains investments. https://t.co/fyi203MH2B",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-01T22:36:15.991964+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "capital_commitment",
+          "decision_impact": "candidate_set",
+          "payment_direction": "customer_to_supplier",
+          "reason": "政府資本承諾可能把 Alcoa／Sojitz 納入鎵供應候選，會改變候選集合。"
+        },
+        "decided_at": "2026-09-01T22:36:15.991964+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "美國政府 1.74 億美元鎵供應鏈融資、Alcoa 與 Sojitz 均具名可追；若官方公告成立，會新增鎵供應候選。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2094854529967862140"
+    },
     "lead_330dd99ad380ce1a207e4fb53c046f03": {
       "entities": {
         "company_ids": [
@@ -15782,6 +16246,39 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2074109998544846954"
+    },
+    "lead_365f503ef06a76b13750113789c7c200": {
+      "entities": {
+        "company_ids": [
+          "co:aehr_test_systems"
+        ],
+        "tickers": [
+          "AEHR"
+        ]
+      },
+      "first_seen": "2026-09-01T22:33:07.889692+00:00",
+      "lead_id": "lead_365f503ef06a76b13750113789c7c200",
+      "published_at": "2026-08-18",
+      "refs": {},
+      "source": "edgar:AEHR",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "AEHR 4 filed 2026-08-18",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-01T22:36:16.284636+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "交易結果不改供應鏈候選或瓶頸排序，只補充內部人觀測。"
+        },
+        "decided_at": "2026-09-01T22:36:16.284636+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "AEHR 官方 Form 4 有具名發行人、日期與可逐字核對交易欄；屬低優先內部人時變觀測。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1040470/000104047026000261/xslF345X06/primary_01.xml"
     },
     "lead_36a8bd9ccadf6314b3b0763af5730dc5": {
       "entities": {
@@ -17973,7 +18470,11 @@
       "refs": {
         "parked_reason": "G1 感測套件(Depth Camera+3D LiDAR)官方不具名品牌;社群普遍稱 Livox MID-360+RealSense 但無可逐字引用的一手(Gap 4 不猜);teardown/採購揭露是唯一路徑",
         "trace_next_trigger": "G1 teardown 具名 LiDAR/相機供應商;或 Livox(大疆系)/RealSense 端公告人形設計中標",
-        "trace_status": "lead_only_tier_4"
+        "trace_status": "lead_only_tier_4",
+        "trace_trigger_entities": [
+          "co:unitree"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
       },
       "source": "decompose:unitree-g1-2026-09-01",
       "status": "parked",
@@ -18390,6 +18891,49 @@
         }
       ],
       "url": "https://x.com/aleabitoreddit/status/2074581698604593367"
+    },
+    "lead_4529c66f2414f1fa331f8567836c589b": {
+      "entities": {
+        "company_ids": [
+          "co:google"
+        ],
+        "tickers": [
+          "GOOGL"
+        ]
+      },
+      "first_seen": "2026-09-01T22:33:13.393636+00:00",
+      "lead_id": "lead_4529c66f2414f1fa331f8567836c589b",
+      "published_at": "2026-08-27",
+      "refs": {
+        "parked_reason": "一手取得；無 graph delta",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1652044/000119312526371794/xslF345X06/ownership.xml",
+        "research_outcome": "confidence-only，不改候選或瓶頸排序",
+        "storage_permission": "repo_excerpt",
+        "trace_attempts_ref": "官方 Form 4 Table I 已核對；例行 GSU vest/tax withholding 類內部人異動",
+        "trace_origin_entity": "SEC / Alphabet Form 4",
+        "trace_original_date": "2026-08-27",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
+      "source": "edgar:GOOGL",
+      "status": "parked",
+      "themes": {},
+      "title": "GOOGL 4 filed 2026-08-27",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-01T22:36:12.479320+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "交易結果不改供應鏈候選或瓶頸排序，只補充內部人觀測。"
+        },
+        "decided_at": "2026-09-01T22:36:12.479320+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "GOOGL 官方 Form 4 有具名發行人、日期與可逐字核對交易欄；屬低優先內部人時變觀測。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1652044/000119312526371794/xslF345X06/ownership.xml"
     },
     "lead_45471772e76a5682418cca948152f7da": {
       "entities": {
@@ -19730,6 +20274,49 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2082896789880119590"
     },
+    "lead_4d21e06576a6d6980f00dd52d5d42212": {
+      "entities": {
+        "company_ids": [
+          "co:google"
+        ],
+        "tickers": [
+          "GOOGL"
+        ]
+      },
+      "first_seen": "2026-09-01T22:33:13.393886+00:00",
+      "lead_id": "lead_4d21e06576a6d6980f00dd52d5d42212",
+      "published_at": "2026-08-27",
+      "refs": {
+        "parked_reason": "一手取得；無 graph delta",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1652044/000119312526371778/xslF345X06/ownership.xml",
+        "research_outcome": "例行 vest/tax withholding，confidence-only，不改排序",
+        "storage_permission": "repo_excerpt",
+        "trace_attempts_ref": "Form 4 Table I：CAO Marsida Saraci 多筆 GSU vest 與 tax withholding，價格 $344.59",
+        "trace_origin_entity": "SEC / Alphabet Form 4",
+        "trace_original_date": "2026-08-27",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
+      "source": "edgar:GOOGL",
+      "status": "parked",
+      "themes": {},
+      "title": "GOOGL 4 filed 2026-08-27",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-01T22:36:12.774225+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "交易結果不改供應鏈候選或瓶頸排序，只補充內部人觀測。"
+        },
+        "decided_at": "2026-09-01T22:36:12.774225+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "GOOGL 官方 Form 4 有具名發行人、日期與可逐字核對交易欄；屬低優先內部人時變觀測。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1652044/000119312526371778/xslF345X06/ownership.xml"
+    },
     "lead_4d44b6a39ca426804f4afacf3250b60e": {
       "entities": {
         "company_ids": [],
@@ -19880,6 +20467,39 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2076030743655109063"
+    },
+    "lead_4e16633643902ae216814d3373f5f051": {
+      "entities": {
+        "company_ids": [
+          "co:aehr_test_systems"
+        ],
+        "tickers": [
+          "AEHR"
+        ]
+      },
+      "first_seen": "2026-09-01T22:33:07.889570+00:00",
+      "lead_id": "lead_4e16633643902ae216814d3373f5f051",
+      "published_at": "2026-09-01",
+      "refs": {},
+      "source": "edgar:AEHR",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "AEHR 4 filed 2026-09-01",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-01T22:36:16.594018+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "交易結果不改供應鏈候選或瓶頸排序，只補充內部人觀測。"
+        },
+        "decided_at": "2026-09-01T22:36:16.594018+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "AEHR 官方 Form 4 有具名發行人、日期與可逐字核對交易欄；屬低優先內部人時變觀測。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1040470/000104047026000263/xslF345X06/primary_01.xml"
     },
     "lead_4e7209f20ae3951d218afe470fbf58d6": {
       "entities": {
@@ -23899,6 +24519,83 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/820318/000119312526187297/d107137d8k.htm"
     },
+    "lead_66075f8a2712979c5c1403d078d5c37e": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia"
+        ],
+        "tickers": [
+          "NVDA",
+          "HUT"
+        ]
+      },
+      "first_seen": "2026-09-01T22:33:05.417836+00:00",
+      "lead_id": "lead_66075f8a2712979c5c1403d078d5c37e",
+      "media": [
+        {
+          "cache": {
+            "bytes": 88882,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_66075f8a2712979c5c1403d078d5c37e/3_2094584001889783809.jpg",
+            "sha256": "3cedacb60c5f98341675c915ca7699e3e9189bb4d5273e362d0746749ca562ed"
+          },
+          "height": 581,
+          "media_key": "3_2094584001889783809",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HRF1DVjbUAE7HUv.jpg",
+          "width": 1628
+        }
+      ],
+      "published_at": "2026-09-01T00:37:28.000Z",
+      "raw_text": "Anthropic signs a $35B AI compute deal with $NVDA backed Lambda.\n\n$HUT / DC, with Lambda / GPUs. \n\nFrontier model demand is rapidly outpacing the ecosystem's ability to build capacity.\n\nIt also looks like Anthropic is securing more compute... Which neocloud/colo player is next? https://t.co/49yvFKjr49",
+      "refs": {
+        "claimed_origin": "Wall Street Journal report relayed by social post",
+        "gap": "缺 Anthropic、Lambda 或交易對手方一手文件與合約期間/容量細節",
+        "parked_reason": "孤立 tier 3 轉述且無一手；假設 overlay 不改排序",
+        "research_outcome": "建立 hy_0006_2026-09-02；指定 what-if 顯示純結構排序無變化，安心低優先 park",
+        "storage_permission": "unknown",
+        "trace_attempts_ref": "查 Anthropic 與 Lambda 官方 newsroom、IR/press release；未見雙方具名 350 億美元合約；社群外只見同源轉述",
+        "trace_next_trigger": "Anthropic、Lambda、NVIDIA 或 Hut 8 正式公告具名算力合約",
+        "trace_requires_user": "false",
+        "trace_status": "isolated_tier_3",
+        "trace_trigger_entities": [
+          "HUT",
+          "NVDA",
+          "co:nvidia"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
+      "source": "x:aleabitoreddit",
+      "status": "parked",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "NVDA"
+          ]
+        }
+      },
+      "title": "Anthropic signs a $35B AI compute deal with $NVDA backed Lambda. $HUT / DC, with Lambda / GPUs. Frontier model demand is rapidly outpacing the ecosystem's ability to build capacity. It also looks like Anthropic is securing more compute... Which neocloud/colo player is next? https://t.co/49yvFKjr49",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-01T22:36:13.076858+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "capital_commitment",
+          "decision_impact": "candidate_set",
+          "payment_direction": "customer_to_supplier",
+          "reason": "客戶鎖定算力供應方的承諾可新增或排除 neocloud 候選，會改變候選集合。"
+        },
+        "decided_at": "2026-09-01T22:36:13.076858+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "Anthropic、Lambda、NVIDIA 與 350 億美元 compute deal 均具名且可追；若官方文件成立，會新增 neocloud／colo 需求錨候選。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2094585395224981709"
+    },
     "lead_6635c6a04ee2823324fcb2047f811704": {
       "entities": {
         "company_ids": [],
@@ -23976,6 +24673,39 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1835632/000162828026048548/xslF345X06/wk-form4_1784242458.xml"
+    },
+    "lead_6678b4ba3bd0df6b4d66efbeca398782": {
+      "entities": {
+        "company_ids": [
+          "co:lam_research"
+        ],
+        "tickers": [
+          "LRCX"
+        ]
+      },
+      "first_seen": "2026-09-01T22:33:16.210305+00:00",
+      "lead_id": "lead_6678b4ba3bd0df6b4d66efbeca398782",
+      "published_at": "2026-09-01",
+      "refs": {},
+      "source": "edgar:LRCX",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "LRCX 4 filed 2026-09-01",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-01T22:36:16.882293+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "交易結果不改供應鏈候選或瓶頸排序，只補充內部人觀測。"
+        },
+        "decided_at": "2026-09-01T22:36:16.882293+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "LRCX 官方 Form 4 有具名發行人、日期與可逐字核對交易欄；屬低優先內部人時變觀測。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/707549/000164241526000012/xslF345X06/wk-form4_1788278890.xml"
     },
     "lead_669171e6758425b95e752efea7c6c2a7": {
       "entities": {
@@ -24066,6 +24796,39 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2074525146736738396"
+    },
+    "lead_676999f1ba2da90ecb2f7be44ea2733f": {
+      "entities": {
+        "company_ids": [
+          "co:aehr_test_systems"
+        ],
+        "tickers": [
+          "AEHR"
+        ]
+      },
+      "first_seen": "2026-09-01T22:33:07.889864+00:00",
+      "lead_id": "lead_676999f1ba2da90ecb2f7be44ea2733f",
+      "published_at": "2026-08-14",
+      "refs": {},
+      "source": "edgar:AEHR",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "AEHR 4 filed 2026-08-14",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-01T22:36:17.173582+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "交易結果不改供應鏈候選或瓶頸排序，只補充內部人觀測。"
+        },
+        "decided_at": "2026-09-01T22:36:17.173582+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "AEHR 官方 Form 4 有具名發行人、日期與可逐字核對交易欄；屬低優先內部人時變觀測。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1040470/000104047026000257/xslF345X06/primary_01.xml"
     },
     "lead_67a6151431a9274ed74eb80e60d6a622": {
       "entities": {
@@ -24875,7 +25638,11 @@
         "parked_reason": "GBD 量產普及已由 RA(ra_c382f01a)雙邊一手證實;但專利授權結構(中國廠是取得授權還是繞開)未核實——USPTO 搜尋結果具名 Hitachi Metals 為 US8375891/8262808/8157926 assignee 但未逐字核對,授權/訴訟揭露無公開一手",
         "trace_attempts_ref": "USPTO 專利號經搜尋結果具名(未逐字);JL MAG 2022 HKEX 年報與 Proterial 官網皆未揭露 GBD 授權關係;2013 Hitachi Metals 對中國八廠的授權是成分專利非 GBD 專利(記憶推論,tier 4 未核)",
         "trace_next_trigger": "Proterial 對中國磁材廠的 GBD 專利訴訟/授權公告;JL MAG 年報或招股書揭露專利授權費;或任一磁材廠 filing 提及 GBD license",
-        "trace_status": "partial"
+        "trace_status": "partial",
+        "trace_trigger_entities": [
+          "co:proterial"
+        ],
+        "trace_trigger_kind": "entity_filing_signal"
       },
       "source": "decompose:ndfeb-gbd-2026-09-01",
       "status": "parked",
@@ -26775,6 +27542,51 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000186/xslF345X06/wk-form4_1785439258.xml"
+    },
+    "lead_784638384b09744c90b7efc253f62704": {
+      "entities": {
+        "company_ids": [
+          "co:applied_optoelectronics"
+        ],
+        "tickers": [
+          "AAOI"
+        ]
+      },
+      "first_seen": "2026-09-01T22:33:07.179049+00:00",
+      "lead_id": "lead_784638384b09744c90b7efc253f62704",
+      "published_at": "2026-09-01",
+      "refs": {
+        "parked_reason": "一手取得；未產 graph RA",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826006862/aaoi_8k.htm",
+        "research_outcome": "支持 AAOI 製造/倉儲擴張與長期租賃承諾；屬公司財務/產能觀測，不直接構成新 canonical edge",
+        "storage_permission": "repo_excerpt",
+        "trace_attempts_ref": "SEC 8-K Item 1.01/2.03：租賃 Houston Buildings 4/5，合計約 1.094m 平方呎、約 16 個月完工、10 年期；合併購買選擇權約 $146.57m",
+        "trace_origin_entity": "Applied Optoelectronics",
+        "trace_original_date": "2026-09-01",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
+      "source": "edgar:AAOI",
+      "status": "parked",
+      "themes": {},
+      "title": "AAOI 8-K filed 2026-09-01",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-01T22:36:17.649348+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "confidence_only",
+          "reason": "只從 filing metadata 尚不能證明會改候選或排序，先列為只補信心。"
+        },
+        "decided_at": "2026-09-01T22:36:17.649348+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "AAOI 官方 8-K 有具名發行人、日期與可逐字核對文件；內容尚待讀取，先按時變財務事件低優先放行。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826006862/aaoi_8k.htm"
     },
     "lead_78a436583f2713170fa633740dc21af2": {
       "entities": {
@@ -29299,6 +30111,50 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2090510568474231045"
     },
+    "lead_82369d2e693c44a6d79ae2109ef93155": {
+      "entities": {
+        "company_ids": [
+          "co:axt",
+          "co:iren"
+        ],
+        "tickers": [
+          "AXTI",
+          "IREN"
+        ]
+      },
+      "first_seen": "2026-09-01T22:33:05.408624+00:00",
+      "lead_id": "lead_82369d2e693c44a6d79ae2109ef93155",
+      "media": [
+        {
+          "cache": {
+            "bytes": 82514,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_82369d2e693c44a6d79ae2109ef93155/3_2094831977556013056.jpg",
+            "sha256": "568aa878abce1aa85cc5c09ccd822ef90daaa7469337d17210258b71569d8845"
+          },
+          "height": 1062,
+          "media_key": "3_2094831977556013056",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HRJWla5a8AAqa0m.jpg",
+          "width": 1260
+        }
+      ],
+      "published_at": "2026-09-01T16:57:19.000Z",
+      "raw_text": "After seeing everything from $AXTI to $IREN get nuked… I’m starting to believe in the:\n\n“September is the worst month of the year” myth. https://t.co/sck3Y0pOg2",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "After seeing everything from $AXTI to $IREN get nuked… I’m starting to believe in the: “September is the worst month of the year” myth. https://t.co/sck3Y0pOg2",
+      "triage": {
+        "decided_at": "2026-09-01T22:36:11.886276+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "只有九月季節性價格情緒與個股跌幅感想，沒有可逐字驗證的供應鏈、公司事件或財務 atom。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2094831983306440746"
+    },
     "lead_82588db79284b466e46edffff6c0a878": {
       "entities": {
         "company_ids": [],
@@ -30248,7 +31104,11 @@
       "refs": {
         "parked_reason": "靈巧手/觸覺陣列層:Dex3-1 自研+optional tactile sensor arrays(官方規格),但觸覺陣列供應商在官方拆裝手冊與公開一手中皆未具名;人形觸覺陣列 merchant 版圖(如 Xela/壓阻陣列廠)需 teardown 或供應商具名公告",
         "trace_next_trigger": "G1/Dex3 teardown 具名觸覺陣列供應商;或任一觸覺感測廠公告人形客戶",
-        "trace_status": "lead_only_tier_4"
+        "trace_status": "lead_only_tier_4",
+        "trace_trigger_entities": [
+          "co:unitree"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
       },
       "source": "decompose:unitree-g1-2026-09-01",
       "status": "parked",
@@ -30511,6 +31371,49 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/928876/000117891326003419/zk2635649.htm"
+    },
+    "lead_87e42a055ae88243e091c31d1dcabb83": {
+      "entities": {
+        "company_ids": [
+          "co:google"
+        ],
+        "tickers": [
+          "GOOGL"
+        ]
+      },
+      "first_seen": "2026-09-01T22:33:13.393556+00:00",
+      "lead_id": "lead_87e42a055ae88243e091c31d1dcabb83",
+      "published_at": "2026-08-27",
+      "refs": {
+        "parked_reason": "一手取得；無 graph delta",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1652044/000119312526371797/xslF345X06/ownership.xml",
+        "research_outcome": "例行 vest/tax withholding，confidence-only，不改排序",
+        "storage_permission": "repo_excerpt",
+        "trace_attempts_ref": "Form 4 Table I：CEO Sundar Pichai GSU vest 3,669 股、稅款扣繳 3,703 股，價格 $344.59",
+        "trace_origin_entity": "SEC / Alphabet Form 4",
+        "trace_original_date": "2026-08-27",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
+      "source": "edgar:GOOGL",
+      "status": "parked",
+      "themes": {},
+      "title": "GOOGL 4 filed 2026-08-27",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-01T22:36:13.368115+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "交易結果不改供應鏈候選或瓶頸排序，只補充內部人觀測。"
+        },
+        "decided_at": "2026-09-01T22:36:13.368115+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "GOOGL 官方 Form 4 有具名發行人、日期與可逐字核對交易欄；屬低優先內部人時變觀測。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1652044/000119312526371797/xslF345X06/ownership.xml"
     },
     "lead_8830680ca1a27e2cd82df03ef10ce133": {
       "entities": {
@@ -31623,6 +32526,80 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1789029/000119312526324440/xslF345X06/ownership.xml"
     },
+    "lead_8dd4d56f7e99ca94983ea9de53b817be": {
+      "entities": {
+        "company_ids": [
+          "co:applied_optoelectronics"
+        ],
+        "tickers": [
+          "GPRO",
+          "AAOI"
+        ]
+      },
+      "first_seen": "2026-09-01T22:33:05.409090+00:00",
+      "lead_id": "lead_8dd4d56f7e99ca94983ea9de53b817be",
+      "media": [
+        {
+          "cache": {
+            "bytes": 58377,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_8dd4d56f7e99ca94983ea9de53b817be/3_2094785890841407488.jpg",
+            "sha256": "e19728e01df481cb3368e7b481c79d28f7fc6bd3a744b0f8be211c75b18ef72a"
+          },
+          "height": 978,
+          "media_key": "3_2094785890841407488",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HRIsq0gaMAAlMms.jpg",
+          "width": 1465
+        }
+      ],
+      "published_at": "2026-09-01T13:55:24.000Z",
+      "raw_text": "What... $GPRO is up 79.17% after planning to merge with a photonics company \"Starman Optical\"\n\nTo build US 800G/1.6T optical transceivers for AI data centers.\n\nGoPro trying to compete with $AAOI was definitely not on my radar. https://t.co/5z2XXHaxvs",
+      "refs": {
+        "gap": "800G／1.6T 產品規格未獲一手支持，交易仍待股東與監管核准",
+        "onboard_candidate_names": [
+          "GoPro, Inc. (GPRO)",
+          "Starman Optical, Inc."
+        ],
+        "parked_reason": "部分取得；等 proxy、交易完成文件或具名產品規格",
+        "primary_url": "https://investor.gopro.com/press-releases/press-release-details/2026/GOPRO-ENTERS-INTO-DEFINITIVE-AGREEMENT-TO-MERGE-WITH-STARMAN-OPTICAL-INC-/default.aspx",
+        "research_outcome": "合併與 optical transceiver 方向成立；社群貼文的速率規格未驗證；新公司未 onboard，未產 RA",
+        "storage_permission": "repo_excerpt",
+        "trace_attempts_ref": "官方聯合 release 支持 definitive merger、Starman 美國製 optical transceivers、AI infrastructure；未出現 800G 或 1.6T",
+        "trace_next_trigger": "GoPro proxy、交易 closing 或 Starman 公布具名 800G／1.6T transceiver 規格",
+        "trace_origin_entity": "GoPro and Starman Optical",
+        "trace_original_date": "2026-09-01",
+        "trace_requires_user": "false",
+        "trace_status": "partial",
+        "trace_trigger_entities": [
+          "AAOI",
+          "GPRO",
+          "co:applied_optoelectronics"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
+      "source": "x:aleabitoreddit",
+      "status": "parked",
+      "themes": {},
+      "title": "What... $GPRO is up 79.17% after planning to merge with a photonics company \"Starman Optical\" To build US 800G/1.6T optical transceivers for AI data centers. GoPro trying to compete with $AAOI was definitely not on my radar. https://t.co/5z2XXHaxvs",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-01T22:36:17.946500+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "合併若成立會新增一個可投資光通訊候選，會改變候選集合。"
+        },
+        "decided_at": "2026-09-01T22:36:17.946500+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "GoPro、Starman Optical、800G／1.6T transceiver 與合併動作均具名可追；若正式交易文件成立，會新增 optical transceiver 候選。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2094786201605808566"
+    },
     "lead_8e16834b3c423735ad20eb6f6be7d63b": {
       "entities": {
         "company_ids": [
@@ -32193,6 +33170,39 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/2074973/000121390026086928/ea0301196-8k_church11.htm"
+    },
+    "lead_920158c2057b7526b2b474dc099d0403": {
+      "entities": {
+        "company_ids": [
+          "co:aehr_test_systems"
+        ],
+        "tickers": [
+          "AEHR"
+        ]
+      },
+      "first_seen": "2026-09-01T22:33:07.889943+00:00",
+      "lead_id": "lead_920158c2057b7526b2b474dc099d0403",
+      "published_at": "2026-08-14",
+      "refs": {},
+      "source": "edgar:AEHR",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "AEHR 4 filed 2026-08-14",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-01T22:36:18.247872+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "交易結果不改供應鏈候選或瓶頸排序，只補充內部人觀測。"
+        },
+        "decided_at": "2026-09-01T22:36:18.247872+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "AEHR 官方 Form 4 有具名發行人、日期與可逐字核對交易欄；屬低優先內部人時變觀測。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1040470/000104047026000255/xslF345X06/primary_01.xml"
     },
     "lead_928514b80dea6644f199f48c0803092d": {
       "entities": {
@@ -37099,6 +38109,49 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1493594/000149359426000036/mtsi-20260806.htm"
     },
+    "lead_af124c74ac88dd983fb49fbb650e4d27": {
+      "entities": {
+        "company_ids": [
+          "co:google"
+        ],
+        "tickers": [
+          "GOOGL"
+        ]
+      },
+      "first_seen": "2026-09-01T22:33:13.393967+00:00",
+      "lead_id": "lead_af124c74ac88dd983fb49fbb650e4d27",
+      "published_at": "2026-08-11",
+      "refs": {
+        "parked_reason": "一手取得；無 graph delta",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1652044/000119312526345383/xslF345X06/ownership.xml",
+        "research_outcome": "贈與/轉換，confidence-only，不改排序",
+        "storage_permission": "repo_excerpt",
+        "trace_attempts_ref": "Form 4 Table I：Sergey Brin 轉換並贈與 673,200 股 Class A 與贈與同量 Class C，屬 $0 非市場交易",
+        "trace_origin_entity": "SEC / Alphabet Form 4",
+        "trace_original_date": "2026-08-11",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
+      "source": "edgar:GOOGL",
+      "status": "parked",
+      "themes": {},
+      "title": "GOOGL 4 filed 2026-08-11",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-01T22:36:13.656795+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "交易結果不改供應鏈候選或瓶頸排序，只補充內部人觀測。"
+        },
+        "decided_at": "2026-09-01T22:36:13.656795+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "GOOGL 官方 Form 4 有具名發行人、日期與可逐字核對交易欄；屬低優先內部人時變觀測。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1652044/000119312526345383/xslF345X06/ownership.xml"
+    },
     "lead_af3d60cc842a4d14bea3c53b299771f4": {
       "entities": {
         "company_ids": [],
@@ -38989,6 +40042,49 @@
         "tier": 3
       },
       "url": "https://x.com/aleabitoreddit/status/2094378666927239596"
+    },
+    "lead_b6bb90eec89726b178b323ca06e2c91e": {
+      "entities": {
+        "company_ids": [
+          "co:google"
+        ],
+        "tickers": [
+          "GOOGL"
+        ]
+      },
+      "first_seen": "2026-09-01T22:33:13.393350+00:00",
+      "lead_id": "lead_b6bb90eec89726b178b323ca06e2c91e",
+      "published_at": "2026-08-31",
+      "refs": {
+        "parked_reason": "一手取得；無 graph delta",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1652044/000119312526377149/xslF345X06/ownership.xml",
+        "research_outcome": "例行 insider transaction，confidence-only，不改排序",
+        "storage_permission": "repo_excerpt",
+        "trace_attempts_ref": "Form 4 Table I：Director Frances Arnold 依 10b5-1 plan 於 8/28 賣出 82 股 Class C，價格 $337.71",
+        "trace_origin_entity": "SEC / Alphabet Form 4",
+        "trace_original_date": "2026-08-31",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
+      "source": "edgar:GOOGL",
+      "status": "parked",
+      "themes": {},
+      "title": "GOOGL 4 filed 2026-08-31",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-01T22:36:13.948610+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "交易結果不改供應鏈候選或瓶頸排序，只補充內部人觀測。"
+        },
+        "decided_at": "2026-09-01T22:36:13.948610+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "GOOGL 官方 Form 4 有具名發行人、日期與可逐字核對交易欄；屬低優先內部人時變觀測。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1652044/000119312526377149/xslF345X06/ownership.xml"
     },
     "lead_b6c4615d9d72866db4490807ec73045a": {
       "entities": {
@@ -42645,6 +43741,49 @@
       },
       "url": "https://www.sivers-semiconductors.com/press/sivers-semiconductors-langivare-bootstrap-europe-pakallar-konvertering-av-befintligt-konvertibelt-lan/"
     },
+    "lead_c93976f79382e9133f3822cf66aee71b": {
+      "entities": {
+        "company_ids": [
+          "co:tsmc"
+        ],
+        "tickers": [
+          "TSM"
+        ]
+      },
+      "first_seen": "2026-09-01T22:33:22.461965+00:00",
+      "lead_id": "lead_c93976f79382e9133f3822cf66aee71b",
+      "published_at": "2026-09-01",
+      "refs": {
+        "parked_reason": "一手取得；confidence-only filing 已讀畢",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1046179/000104617926000552/tsm-dividendadjustmentx202.htm",
+        "research_outcome": "純時變股利微調，不改瓶頸排序或 thesis，未產 RA",
+        "storage_permission": "repo_excerpt",
+        "trace_attempts_ref": "SEC 6-K：2026 Q1 現金股利因限制型股票收回微調為每股 NT$7.00000137，10/8 支付",
+        "trace_origin_entity": "TSMC",
+        "trace_original_date": "2026-09-01",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
+      "source": "edgar:TSM",
+      "status": "parked",
+      "themes": {},
+      "title": "TSM 6-K filed 2026-09-01",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-01T22:36:12.176793+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "confidence_only",
+          "reason": "無論股利調整細節如何，不改候選集合或瓶頸排序，主要只補充信心。"
+        },
+        "decided_at": "2026-09-01T22:36:12.176793+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "TSM 官方 6-K 具明確 filing 日期與文件，可逐字核對；標題顯示股利調整，屬時變財務事件，預期只補充信心。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1046179/000104617926000552/tsm-dividendadjustmentx202.htm"
+    },
     "lead_c95925a7449580e24cce7512ebad08b4": {
       "entities": {
         "company_ids": [
@@ -43630,6 +44769,49 @@
         "tier": 4
       },
       "url": "https://www.sivers-semiconductors.com/press/change-in-the-total-number-of-shares-and-votes-in-sivers-semiconductors-ab-11/"
+    },
+    "lead_cd5eb60049242d32d1ed09dc91180487": {
+      "entities": {
+        "company_ids": [
+          "co:google"
+        ],
+        "tickers": [
+          "GOOGL"
+        ]
+      },
+      "first_seen": "2026-09-01T22:33:13.393724+00:00",
+      "lead_id": "lead_cd5eb60049242d32d1ed09dc91180487",
+      "published_at": "2026-08-27",
+      "refs": {
+        "parked_reason": "一手取得；無 graph delta",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1652044/000119312526371788/xslF345X06/ownership.xml",
+        "research_outcome": "confidence-only，不改候選或瓶頸排序",
+        "storage_permission": "repo_excerpt",
+        "trace_attempts_ref": "官方 Form 4 Table I 已核對；例行 GSU vest/tax withholding 類內部人異動",
+        "trace_origin_entity": "SEC / Alphabet Form 4",
+        "trace_original_date": "2026-08-27",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
+      "source": "edgar:GOOGL",
+      "status": "parked",
+      "themes": {},
+      "title": "GOOGL 4 filed 2026-08-27",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-01T22:36:14.257273+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "交易結果不改供應鏈候選或瓶頸排序，只補充內部人觀測。"
+        },
+        "decided_at": "2026-09-01T22:36:14.257273+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "GOOGL 官方 Form 4 有具名發行人、日期與可逐字核對交易欄；屬低優先內部人時變觀測。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1652044/000119312526371788/xslF345X06/ownership.xml"
     },
     "lead_cd76b656370ae7a291e5de116bf5a679": {
       "entities": {
@@ -45782,6 +46964,39 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2073486870315745406"
     },
+    "lead_d8e34e4fabf6ae479209f60608ecd48b": {
+      "entities": {
+        "company_ids": [
+          "co:aehr_test_systems"
+        ],
+        "tickers": [
+          "AEHR"
+        ]
+      },
+      "first_seen": "2026-09-01T22:33:07.890177+00:00",
+      "lead_id": "lead_d8e34e4fabf6ae479209f60608ecd48b",
+      "published_at": "2026-08-13",
+      "refs": {},
+      "source": "edgar:AEHR",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "AEHR 4 filed 2026-08-13",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-01T22:36:18.538646+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "交易結果不改供應鏈候選或瓶頸排序，只補充內部人觀測。"
+        },
+        "decided_at": "2026-09-01T22:36:18.538646+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "AEHR 官方 Form 4 有具名發行人、日期與可逐字核對交易欄；屬低優先內部人時變觀測。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1040470/000104047026000249/xslF345X06/primary_01.xml"
+    },
     "lead_d95d26c1e9be71f3422d0b4d10ee6ad8": {
       "entities": {
         "company_ids": [
@@ -47001,6 +48216,39 @@
         "tier": 4
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1318605/000162828026049213/tsla-20260722.htm"
+    },
+    "lead_e0e2b31dddb62a3a1f5b4b75b9e2283e": {
+      "entities": {
+        "company_ids": [
+          "co:google"
+        ],
+        "tickers": [
+          "GOOGL"
+        ]
+      },
+      "first_seen": "2026-09-01T22:33:13.393806+00:00",
+      "lead_id": "lead_e0e2b31dddb62a3a1f5b4b75b9e2283e",
+      "published_at": "2026-08-27",
+      "refs": {},
+      "source": "edgar:GOOGL",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "GOOGL 4 filed 2026-08-27",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-01T22:36:14.542960+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "交易結果不改供應鏈候選或瓶頸排序，只補充內部人觀測。"
+        },
+        "decided_at": "2026-09-01T22:36:14.542960+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "GOOGL 官方 Form 4 有具名發行人、日期與可逐字核對交易欄；屬低優先內部人時變觀測。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1652044/000119312526371785/xslF345X06/ownership.xml"
     },
     "lead_e0e737fc24bb3ae8e114a32c5ff423ce": {
       "entities": {
@@ -48816,7 +50064,16 @@
         "parked_reason": "結構已由 Google 一手論文確立並入 RA(ra_ef824697819900205016d1580220ad38 涵蓋 OCS/MEMS/circulator 層);但『誰供應 Google ICI 光模組』在客戶端一手(TPU v4/Apollo 論文皆未具名 vendor)與 SemiAnalysis 免費段皆缺具名。依 L8 此缺口只能等交易對手方具名文件",
         "trace_attempts_ref": "Apollo 論文:WDM transceivers 為 Google 客製共同設計、四代(40/100/200/400GbE),製造夥伴僅致謝詞泛稱 industry/vendor partners;SemiAnalysis TPUv7 免費段有 48 OCS/13,824 ports 規模數字(tier-3)但無模組供應商具名",
         "trace_next_trigger": "任一光模組廠(Coherent/Innolight/Eoptolink/Fabrinet 等)財報或 filing 具名 Google ICI/OSFP 訂單;或 teardown/供應鏈報告具名;或 Google 揭露模組採購",
-        "trace_status": "awaiting_named_disclosure"
+        "trace_status": "awaiting_named_disclosure",
+        "trace_trigger_entities": [
+          "GOOGL",
+          "COHR",
+          "LITE",
+          "co:google",
+          "co:coherent",
+          "co:lumentum"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
       },
       "source": "decompose:tpu-ironwood-2026-09-01",
       "status": "parked",
@@ -49915,6 +51172,39 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2077437150715666900"
+    },
+    "lead_f0daf2ddb446375c532977e1b5830701": {
+      "entities": {
+        "company_ids": [
+          "co:google"
+        ],
+        "tickers": [
+          "GOOGL"
+        ]
+      },
+      "first_seen": "2026-09-01T22:33:13.393471+00:00",
+      "lead_id": "lead_f0daf2ddb446375c532977e1b5830701",
+      "published_at": "2026-08-27",
+      "refs": {},
+      "source": "edgar:GOOGL",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "GOOGL 4 filed 2026-08-27",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-01T22:36:14.832992+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "交易結果不改供應鏈候選或瓶頸排序，只補充內部人觀測。"
+        },
+        "decided_at": "2026-09-01T22:36:14.832992+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "GOOGL 官方 Form 4 有具名發行人、日期與可逐字核對交易欄；屬低優先內部人時變觀測。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1652044/000119312526371799/xslF345X06/ownership.xml"
     },
     "lead_f0ee13549fb9a8fbd348f8282b221680": {
       "entities": {
@@ -52559,6 +53849,39 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2074587024959709419"
     },
+    "lead_fef083d0d0a5733547cfea3cc87fe310": {
+      "entities": {
+        "company_ids": [
+          "co:aehr_test_systems"
+        ],
+        "tickers": [
+          "AEHR"
+        ]
+      },
+      "first_seen": "2026-09-01T22:33:07.889780+00:00",
+      "lead_id": "lead_fef083d0d0a5733547cfea3cc87fe310",
+      "published_at": "2026-08-14",
+      "refs": {},
+      "source": "edgar:AEHR",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "AEHR 4 filed 2026-08-14",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-01T22:36:18.843207+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "交易結果不改供應鏈候選或瓶頸排序，只補充內部人觀測。"
+        },
+        "decided_at": "2026-09-01T22:36:18.843207+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "AEHR 官方 Form 4 有具名發行人、日期與可逐字核對交易欄；屬低優先內部人時變觀測。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1040470/000104047026000259/xslF345X06/primary_01.xml"
+    },
     "lead_ff04ef06e63412c3fc568279cc63e53a": {
       "entities": {
         "company_ids": [],
@@ -52802,8 +54125,8 @@
   "schema_version": "2",
   "source_state": {
     "x:aleabitoreddit": {
-      "since_id": "2094516012557427002",
-      "updated_at": "2026-08-31T22:35:52.815138+00:00",
+      "since_id": "2094854529967862140",
+      "updated_at": "2026-09-01T22:33:05.418469+00:00",
       "user_id": "1940360837547565056"
     }
   }
