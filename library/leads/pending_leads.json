@@ -23010,9 +23010,11 @@
       "first_seen": "2026-09-01T05:39:07.583172+00:00",
       "lead_id": "lead_637ff27363713403fe64357400ecd082",
       "published_at": null,
-      "refs": {},
+      "refs": {
+        "research_action_id": "ra_f5924018b84527a0a3bd0038435d1463"
+      },
       "source": "decompose:ndfeb-gbd-2026-09-01",
-      "status": "triaged_go",
+      "status": "action_prepared",
       "themes": {},
       "title": "[decompose D4|NdFeB] HRE-free 磁石威脅層:Proterial 2025-07 新聞稿(逐字已取):NMX-F1SH-HF Br=1.40T/HcJ>=1671kA/m 已出 pre-production 樣品,NMX-G1NH-HF 2026-04 量產廠備妥——無重稀土磁石達 EV 規格是 mat:separated_heavy_reo 需求鏈(Lynas/MP 重稀土軸)的直接 disproof 路徑。入圖評估+建 disproof watch",
       "triage": {

@@ -6125,6 +6125,43 @@
       "source": "decision_lab",
       "title": "co:google：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-01T05:43:30.794350+00:00",
+      "graph_impact": "+4 節點、2 邊、1 claims｜來源：Proterial（tier 2）",
+      "hint": "核准 exact graph delta；Decision handoff：co:proterial。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 370,
+      "reason": null,
+      "ref_id": "ra_f5924018b84527a0a3bd0038435d1463",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "Proterial 無重稀土磁石威脅層入圖——重稀土需求鏈的 disproof watch（含 co:proterial onboard）",
+      "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-09-01T05:43:30.794350+00:00",
+      "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "n": 371,
+      "reason": null,
+      "ref_id": "dc_db19d3b490013f4cc464b2aab37b0bc8",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:nabtesco：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-01T05:43:30.794350+00:00",
+      "hint": "當前 missing_data：諧波市占的第二獨立來源（產業報告或客戶側陳述）；綠的諧波/雙環年報一手（A 股取得路徑未建）（共 2 項）｜coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
+      "n": 372,
+      "reason": null,
+      "ref_id": "dc_cc46527aac12ba14191ee71c0460f3fe",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:harmonic_drive_systems：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
     }
   ],
   "log": [
@@ -13685,6 +13722,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 370,
+  "next_n": 373,
   "schema_version": "1"
 }

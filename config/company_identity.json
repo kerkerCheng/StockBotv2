@@ -389,6 +389,10 @@
       "market_currency": "USD"
     },
     {
+      "company_id": "co:proterial",
+      "research_ticker": null
+    },
+    {
       "company_id": "co:samsung",
       "research_ticker": "005930.KS"
     },
