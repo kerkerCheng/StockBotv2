@@ -1,0 +1,90 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "guided",
+      "disproof_condition": "Downgrade if Proterial's HRE-saving output is shown to be pilot-scale only or discontinued in future disclosures.",
+      "id": "proterial_jp_neomax_hre_saving_cl1",
+      "source_ids": [
+        "proterial_jp_neomax_hre_saving_s1",
+        "proterial_jp_neomax_hre_saving_s2"
+      ],
+      "statement": "Proterial (NEOMAX inventor lineage, ex-Hitachi Metals) states it has succeeded in developing and mass-producing heavy-rare-earth-saving NdFeB material (minimizing Dy/Tb), with DDMagic Dy vapor deposition and diffusion as its named technology. Vendor self-report; corroborates that GBD-class HRE-saving production is commercialized in Japan as well as China.",
+      "subject_id": "co:proterial"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "mat:rare_earth_magnets",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "proterial_jp_neomax_hre_saving_s2"
+      ],
+      "src_id": "co:proterial"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Hitachi Metals",
+        "NEOMAX",
+        "Proterial Ltd"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:proterial",
+      "name": "Proterial (前 Hitachi Metals)",
+      "role": null,
+      "source_ids": [
+        "proterial_jp_neomax_hre_saving_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "NdFeB"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:rare_earth_magnets",
+      "name": "Rare earth magnets (neodymium, samarium-cobalt)",
+      "role": null,
+      "source_ids": [
+        "proterial_jp_neomax_hre_saving_s2"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "proterial_jp_neomax_hre_saving",
+    "evidence_tier": 2,
+    "origin_entity": "Proterial",
+    "permission_basis": "Public vendor page; URL and short excerpts.",
+    "published_at": null,
+    "publisher": "Proterial, Ltd.",
+    "retrieved_at": "2026-09-01",
+    "section": "hre_saving_mass_production",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Proterial — Nd-Fe-B Magnets NEOMAX (heavy rare earth-saving mass production)",
+    "url": "https://www.proterial.com/e/products/magnetic/neomax.html"
+  },
+  "sources": [
+    {
+      "id": "proterial_jp_neomax_hre_saving_s1",
+      "locator": "Product page — mass production statement",
+      "quote": "We have succeeded in developing and mass-producing the high-performance, heavy rare earth-saving material, which minimizes the amount of heavy rare earth elements added, such as dysprosium (Dy) and terbium (Tb)."
+    },
+    {
+      "id": "proterial_jp_neomax_hre_saving_s2",
+      "locator": "Product page — NEOMAX pioneer statement",
+      "quote": "We were the pioneers to develop and mass-produce NEOMAX®, a rare earth sintered magnet whose main components are neodymium (Nd), iron (Fe), and boron (B)."
+    }
+  ]
+}

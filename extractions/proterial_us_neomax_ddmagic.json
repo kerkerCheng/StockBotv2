@@ -1,0 +1,75 @@
+{
+  "claims": [],
+  "edges": [
+    {
+      "attributes": {
+        "substitutability": 2
+      },
+      "confidence": 0.8,
+      "dst_id": "tech:grain_boundary_diffusion",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "proterial_us_neomax_ddmagic_s1"
+      ],
+      "src_id": "co:proterial"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Hitachi Metals",
+        "NEOMAX",
+        "Proterial Ltd"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:proterial",
+      "name": "Proterial (前 Hitachi Metals)",
+      "role": null,
+      "source_ids": [
+        "proterial_us_neomax_ddmagic_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "GBD",
+        "grain boundary diffusion"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:grain_boundary_diffusion",
+      "name": "晶界擴散（grain boundary diffusion, GBD）",
+      "role": null,
+      "source_ids": [
+        "proterial_us_neomax_ddmagic_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "proterial_us_neomax_ddmagic",
+    "evidence_tier": 2,
+    "origin_entity": "Proterial",
+    "permission_basis": "Public vendor page; URL and short excerpts.",
+    "published_at": null,
+    "publisher": "Proterial America, Ltd.",
+    "retrieved_at": "2026-09-01",
+    "section": "ddmagic_positioning",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Proterial America — NEOMAX Series Nd-Fe-B Sintered Magnets (DDMagic)",
+    "url": "https://us.proterial.com/infrastructure-energy/clean-energy-technology/neomax-series-nd-fe-b-sintered-magnets/index.php"
+  },
+  "sources": [
+    {
+      "id": "proterial_us_neomax_ddmagic_s1",
+      "locator": "Product page — positioning",
+      "quote": "Proterial America is the industry leader in terms of stable quality, high-performance technology to curb the use of rare elements (DDMagic™ Dy vapor deposition and diffusion technology)"
+    }
+  ]
+}

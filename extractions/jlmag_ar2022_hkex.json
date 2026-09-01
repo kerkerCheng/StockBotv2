@@ -1,0 +1,121 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "Raise substitutability if patent enforcement or licensing disclosures show GBD legally concentrated (e.g., litigation forcing Chinese makers to license or exit); lower further if additional makers disclose scaled GBD output. Patent-licensing structure is unverified in this RA — tracked separately.",
+      "id": "jlmag_ar2022_hkex_cl1",
+      "source_ids": [
+        "jlmag_ar2022_hkex_s1",
+        "jlmag_ar2022_hkex_s2"
+      ],
+      "statement": "JL MAG mass-produces and sells grain-boundary-diffusion NdFeB magnets at scale in China (2022: GBD product production and sales volume increased significantly, historical highs, leading position in NEV/VFAC/wind segments — self-reported HKEX filing). Together with Proterial's mass-production of heavy-rare-earth-saving material in Japan, GBD is a diffused production technology among top-tier magnet makers on both sides, NOT a single-company bottleneck; substitutability of any one GBD producer judged 2/5. The scarce layer remains upstream separated heavy REO (Dy/Tb) feedstock, not the diffusion process itself.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {
+        "substitutability": 2
+      },
+      "confidence": 0.85,
+      "dst_id": "tech:grain_boundary_diffusion",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "jlmag_ar2022_hkex_s1"
+      ],
+      "src_id": "co:jl_mag"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "mat:rare_earth_magnets",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "jlmag_ar2022_hkex_s1"
+      ],
+      "src_id": "co:jl_mag"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "6680.HK",
+        "300748.SZ",
+        "金力永磁",
+        "JLMAG"
+      ],
+      "attributes": {
+        "ticker": "6680.HK"
+      },
+      "confidence": 0.85,
+      "id": "co:jl_mag",
+      "name": "JL MAG Rare-Earth（金力永磁）",
+      "role": null,
+      "source_ids": [
+        "jlmag_ar2022_hkex_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "GBD",
+        "grain boundary diffusion"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:grain_boundary_diffusion",
+      "name": "晶界擴散（grain boundary diffusion, GBD）",
+      "role": null,
+      "source_ids": [
+        "jlmag_ar2022_hkex_s2"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "NdFeB"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:rare_earth_magnets",
+      "name": "Rare earth magnets (neodymium, samarium-cobalt)",
+      "role": null,
+      "source_ids": [
+        "jlmag_ar2022_hkex_s1"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "jlmag_ar2022_hkex",
+    "evidence_tier": 1,
+    "origin_entity": "JL MAG Rare-Earth",
+    "permission_basis": "Public HKEX filing; URL and short excerpts.",
+    "published_at": "2023-03-31",
+    "publisher": "HKEX",
+    "retrieved_at": "2026-09-01",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "JL MAG Rare-Earth Co., Ltd. 2022 Annual Report (HKEX)",
+    "url": "https://www1.hkexnews.hk/listedco/listconews/sehk/2023/0331/2023033100951.pdf"
+  },
+  "sources": [
+    {
+      "id": "jlmag_ar2022_hkex_s1",
+      "locator": "Management discussion — 2022 operations",
+      "quote": "The production and sales volume of high-performance REPM products of the Company both recorded a historical high. In particular, the production and sales volume of grain boundary diffusion products increased significantly, and its leading position in market segments such as NEVs, energy-saving VFACs and wind power generation was further consolidated."
+    },
+    {
+      "id": "jlmag_ar2022_hkex_s2",
+      "locator": "Definitions — GBD technology",
+      "quote": "technology that allows the Dysprosium or Terbium to penetrate into the magnet through its grain boundary when the heat treatment temperature is higher than the melting point of Nd-rich phase"
+    }
+  ]
+}
