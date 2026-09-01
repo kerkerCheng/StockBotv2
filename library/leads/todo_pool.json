@@ -6285,8 +6285,10 @@
       "added_at": "2026-09-01T06:49:25.643616+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_f596bc961659927a63fb559245ee8ec8",
+      "dispatch_receipt": "action:ra_5c3fc1f5dd957ab5c324132ba3d4f70a",
       "dispatch_ref": "wo_93229762fdbd2b196b8debc98aee1f97",
-      "dispatch_status": "queued",
+      "dispatch_status": "awaiting_approval",
+      "dispatch_updated_at": "2026-09-01T12:40:53.534287+00:00",
       "dispatched_at": "2026-09-01T09:10:36.681662+00:00",
       "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 377,
@@ -6539,6 +6541,31 @@
       "source": "research_action",
       "title": "Proterial HRE-free 獨立批判性評估入圖——耐溫等級不足 EV 牽引(M vs H/SH),威脅近期不成立",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-09-01T12:41:48.853228+00:00",
+      "graph_impact": "+2 節點、1 邊、1 claims｜來源：JL MAG Rare-Earth（tier 1）",
+      "hint": "核准 exact graph delta；Decision handoff：co:jl_mag。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 394,
+      "reason": null,
+      "ref_id": "ra_5c3fc1f5dd957ab5c324132ba3d4f70a",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "JL MAG 客戶結構落圖——法定揭露集中度(12.71%/47.88%)+具名客戶(BYD/Tesla/Bosch)+客戶端獎項",
+      "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-09-01T12:41:48.853228+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2023-03-31T00:00:00+00:00；來源=JL MAG 2022 Annual Report(HKEX 2023033100951.pdf)Major Customers and Suppliers 章",
+      "n": 395,
+      "reason": null,
+      "ref_id": "po_a087f8c29bd4bde5dfc6e2914ff008a9",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "engine_c",
+      "title": "Engine C 觀測：6680.HK / customer_concentration",
+      "type": "engine_c_observation"
     }
   ],
   "log": [
@@ -14391,8 +14418,26 @@
       "ref_id": "dc_b8fb35bfe958d2e6ca4b3f60e623a576",
       "type": "decision_review",
       "verb": "pq1_awaiting_approval"
+    },
+    {
+      "at": "2026-09-01T12:40:52.828259+00:00",
+      "n": 377,
+      "reason": null,
+      "receipt": "wo:wo_93229762fdbd2b196b8debc98aee1f97",
+      "ref_id": "dc_32872cf6a80c5f273b9b4c55a57ff229",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-09-01T12:40:53.534287+00:00",
+      "n": 377,
+      "reason": "AR2022 客戶章節入包+customer_concentration 觀測提案 po_a087f8c2 已備",
+      "receipt": "action:ra_5c3fc1f5dd957ab5c324132ba3d4f70a",
+      "ref_id": "dc_32872cf6a80c5f273b9b4c55a57ff229",
+      "type": "decision_review",
+      "verb": "pq1_awaiting_approval"
     }
   ],
-  "next_n": 394,
+  "next_n": 396,
   "schema_version": "1"
 }
