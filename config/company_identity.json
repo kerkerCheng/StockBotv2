@@ -437,7 +437,8 @@
     },
     {
       "company_id": "co:soitec",
-      "research_ticker": "SOI.PA"
+      "research_ticker": "SOI.PA",
+      "market_currency": "EUR"
     },
     {
       "company_id": "co:spacexai",
@@ -481,7 +482,8 @@
     },
     {
       "company_id": "co:tsmc",
-      "research_ticker": "TSM"
+      "research_ticker": "TSM",
+      "market_currency": "USD"
     },
     {
       "company_id": "co:umc",
