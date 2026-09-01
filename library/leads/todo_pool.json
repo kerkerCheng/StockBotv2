@@ -6302,8 +6302,10 @@
       "added_at": "2026-09-01T06:49:25.643616+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_325ba91f7bc50ce2d5d3a23daf42871f",
+      "dispatch_receipt": "action:ra_4e4cf65ee5b139166f56de01cce65a71",
       "dispatch_ref": "wo_f69bab7ff2587a9129ae248af3174c07",
-      "dispatch_status": "queued",
+      "dispatch_status": "awaiting_approval",
+      "dispatch_updated_at": "2026-09-01T12:16:55.614495+00:00",
       "dispatched_at": "2026-09-01T09:10:37.378309+00:00",
       "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 378,
@@ -6523,6 +6525,19 @@
       "resolved_at": null,
       "source": "research_action",
       "title": "Nabtesco RV 市占第二 origin 入圖——官方自報 60%(Nabtesco's estimate)與獨立通訊數字一致",
+      "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-09-01T12:17:48.884939+00:00",
+      "graph_impact": "+2 節點、0 邊、1 claims｜來源：Rare Earth Exchanges（獨立產業媒體,非 Proterial）（tier 3）",
+      "hint": "核准 exact graph delta；Decision handoff：co:proterial。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 393,
+      "reason": null,
+      "ref_id": "ra_4e4cf65ee5b139166f56de01cce65a71",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "Proterial HRE-free 獨立批判性評估入圖——耐溫等級不足 EV 牽引(M vs H/SH),威脅近期不成立",
       "type": "ra_admission"
     }
   ],
@@ -14358,8 +14373,26 @@
       "ref_id": "dc_db19d3b490013f4cc464b2aab37b0bc8",
       "type": "decision_review",
       "verb": "pq1_awaiting_approval"
+    },
+    {
+      "at": "2026-09-01T12:16:43.838120+00:00",
+      "n": 378,
+      "reason": null,
+      "receipt": "wo:wo_f69bab7ff2587a9129ae248af3174c07",
+      "ref_id": "dc_b8fb35bfe958d2e6ca4b3f60e623a576",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-09-01T12:16:55.614495+00:00",
+      "n": 378,
+      "reason": "REE Exchanges 獨立批判評估入包——耐溫等級反證+專利態勢;HRE-free 威脅近期不成立",
+      "receipt": "action:ra_4e4cf65ee5b139166f56de01cce65a71",
+      "ref_id": "dc_b8fb35bfe958d2e6ca4b3f60e623a576",
+      "type": "decision_review",
+      "verb": "pq1_awaiting_approval"
     }
   ],
-  "next_n": 393,
+  "next_n": 394,
   "schema_version": "1"
 }
