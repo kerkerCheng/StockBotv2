@@ -4502,7 +4502,13 @@
     },
     {
       "added_at": "2026-08-30T08:28:24.953849+00:00",
-      "deferred_at": "2026-08-31T11:17:39.658378+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_21e4eb29c290cbb9f50225378e8a55f9",
+      "dispatch_receipt": "decision:pd_d03141b9a1c530fba7f93dff98cb05a5;manual_todo:358",
+      "dispatch_ref": "wo_07bbf5bfa10fdb08df8221ad3c54c5ac",
+      "dispatch_status": "awaiting_approval",
+      "dispatch_updated_at": "2026-09-01T01:06:14.564580+00:00",
+      "dispatched_at": "2026-09-01T01:02:09.084235+00:00",
       "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 275,
       "reason": null,
@@ -5920,6 +5926,30 @@
       "resolved_at": null,
       "source": "decision_lab",
       "title": "co:lynas：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-01T01:05:24.243791+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2025-12-31T00:00:00+00:00；來源=TSMC FY2025 Form 20-F, filed 2026-04-16, CIK 0001046179, Risk Factors customer c",
+      "n": 358,
+      "reason": null,
+      "ref_id": "po_09bd1aeeb2ea5f69da2bef8f92699b79",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "engine_c",
+      "title": "Engine C 觀測：TSM / customer_concentration",
+      "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-09-01T01:05:24.243791+00:00",
+      "hint": "當前 missing_data：四家具名人形夥伴中任一家的付款方向證據（訂單金額、產能協議或預付款）——partnership 具名已有，缺的是誰付錢給；Schaeffler 官方一手（收購新聞稿、2026-02-05 humanoid IR 簡報）——schaeffler（共 2 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "n": 359,
+      "reason": null,
+      "ref_id": "dc_912a03a50135ea5e29000a0417c3f477",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:schaeffler：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
     }
   ],
@@ -13307,8 +13337,36 @@
       "ref_id": "dc_912a03a50135ea5e29000a0417c3f477",
       "type": "decision_review",
       "verb": "go"
+    },
+    {
+      "at": "2026-09-01T01:02:09.084235+00:00",
+      "attempt": 1,
+      "n": 275,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_07bbf5bfa10fdb08df8221ad3c54c5ac",
+      "ref_id": "dc_29ef9f7194dc996c9b7eb62a9b21afc6",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-09-01T01:02:15.865189+00:00",
+      "n": 275,
+      "reason": null,
+      "receipt": "wo:wo_07bbf5bfa10fdb08df8221ad3c54c5ac",
+      "ref_id": "dc_29ef9f7194dc996c9b7eb62a9b21afc6",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-09-01T01:06:14.564580+00:00",
+      "n": 275,
+      "reason": "五軸 assessment 建立(原缺口 research_assessment_missing 已清):sr/tc corroborated(Broadcom+NVIDIA 雙客戶端具名);[358] 客戶集中度觀測已備(20-F 逐字:前十大78%/最大19%/第二大17%);valuation 卡在 Engine C 無 TSM 行情序列(ETL universe 缺,已記 ROADMAP)",
+      "receipt": "decision:pd_d03141b9a1c530fba7f93dff98cb05a5;manual_todo:358",
+      "ref_id": "dc_29ef9f7194dc996c9b7eb62a9b21afc6",
+      "type": "decision_review",
+      "verb": "pq1_awaiting_approval"
     }
   ],
-  "next_n": 358,
+  "next_n": 360,
   "schema_version": "1"
 }
