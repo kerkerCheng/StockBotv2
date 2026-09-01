@@ -6456,8 +6456,10 @@
       "added_at": "2026-09-01T10:36:48.970317+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_8e58ce58b427883480fbbe6aeb6a6397",
+      "dispatch_receipt": "action:ra_fa15a72351f3a180e943f42813358389",
       "dispatch_ref": "wo_7cc753a9a3cbfa844a5e1d8e85205e82",
-      "dispatch_status": "queued",
+      "dispatch_status": "awaiting_approval",
+      "dispatch_updated_at": "2026-09-01T14:07:28.311791+00:00",
       "dispatched_at": "2026-09-01T13:20:29.206847+00:00",
       "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 386,
@@ -6708,6 +6710,31 @@
       "source": "decision_lab",
       "title": "co:proterial：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-01T14:08:30.744602+00:00",
+      "graph_impact": "+2 節點、1 邊、1 claims｜來源：Aehr Test Systems（tier 1）",
+      "hint": "核准 exact graph delta；Decision handoff：co:aehr_test_systems。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 402,
+      "reason": null,
+      "ref_id": "ra_fa15a72351f3a180e943f42813358389",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "Aehr 10-K 升級——CPO 逐字入審計文件+客戶集中度趨勢(93%→77%→70%)",
+      "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-09-01T14:08:30.744602+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-07-27T00:00:00+00:00；來源=Aehr FY2026 10-K(filed 2026-07-27)customer concentration 揭露",
+      "n": 403,
+      "reason": null,
+      "ref_id": "po_f9b817b91a15a56e4c167e6c548d6d77",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "engine_c",
+      "title": "Engine C 觀測：AEHR / customer_concentration",
+      "type": "engine_c_observation"
     }
   ],
   "log": [
@@ -14789,8 +14816,26 @@
       "ref_id": "dc_48446dbceb85d4b785634e3c4ca5d669",
       "type": "decision_review",
       "verb": "pq1_awaiting_approval"
+    },
+    {
+      "at": "2026-09-01T14:07:27.603206+00:00",
+      "n": 386,
+      "reason": null,
+      "receipt": "wo:wo_7cc753a9a3cbfa844a5e1d8e85205e82",
+      "ref_id": "dc_fef9e03e5e6935e7428620f7eab793ba",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-09-01T14:07:28.311791+00:00",
+      "n": 386,
+      "reason": "10-K 升級(CPO 逐字+集中度趨勢)入包;獨立 origin 公開不可得誠實記錄",
+      "receipt": "action:ra_fa15a72351f3a180e943f42813358389",
+      "ref_id": "dc_fef9e03e5e6935e7428620f7eab793ba",
+      "type": "decision_review",
+      "verb": "pq1_awaiting_approval"
     }
   ],
-  "next_n": 402,
+  "next_n": 404,
   "schema_version": "1"
 }
