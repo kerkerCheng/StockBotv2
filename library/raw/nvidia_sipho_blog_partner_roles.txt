@@ -1,0 +1,4 @@
+Source URL: https://developer.nvidia.com/blog/a-new-era-in-data-center-networking-with-nvidia-silicon-photonics-based-network-switching/
+
+Excerpt:
+The TSMC silicon photonics Compact Universal Photonic Engine (COUPE) process integrates electronic integrated circuits (EIC) with silicon photonic integrated circuits (PIC) using the 3D chip-on-wafer and chip-stacking packaging technologies... SPIL is well-known for packaging complex integrated assemblies including wafer bumping, wafer sort, assembly, and testing for the NVIDIA CPO multi-chip module... [Browave, Corning, Senko, TFC Communication, and Coherent] Industry experts with optical connectors and fiber assemblies for linking the ELS lasers with polarization, maintaining fibers into the silicon photonics engine... [Foxconn and Fabrinet] These partners provide expertise in system-level CPO assembly and testing... (NVIDIA Technical Blog)

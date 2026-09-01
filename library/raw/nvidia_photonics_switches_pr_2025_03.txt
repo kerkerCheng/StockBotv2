@@ -1,0 +1,4 @@
+Source URL: https://nvidianews.nvidia.com/news/nvidia-spectrum-x-co-packaged-optics-networking-switches-ai-factories
+
+Excerpt:
+NVIDIA's silicon photonics ecosystem includes TSMC, Browave, Coherent, Corning Incorporated, Fabrinet, Foxconn, Lumentum, SENKO, SPIL, Sumitomo Electric Industries and TFC Communication. NVIDIA Quantum-X Photonics switches provide 144 ports of 800Gb/s InfiniBand based on 200Gb/s SerDes and use a liquid-cooled design... They integrate optics innovations with 4x fewer lasers to deliver 3.5x more power efficiency... (NVIDIA press release, 2025-03-18)

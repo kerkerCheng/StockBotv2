@@ -1,0 +1,155 @@
+{
+  "claims": [
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Downgrade if CPO switch shipments stall (watch Coherent/Lumentum/Fabrinet datacom segment disclosures and NVIDIA availability updates) or if pluggable optics roadmaps (1.6T/3.2T) erode the claimed efficiency gap.",
+      "id": "nvidia_photonics_switches_pr_2025_03_cl1",
+      "source_ids": [
+        "nvidia_photonics_switches_pr_2025_03_s2",
+        "nvidia_photonics_switches_pr_2025_03_s3",
+        "nvidia_photonics_switches_pr_2025_03_s4"
+      ],
+      "statement": "Quantum-X Photonics (144x800G InfiniBand, 200G SerDes, liquid-cooled) and Spectrum-X Photonics (up to 400Tb/s) are the first announced production instances of scale-out CPO switching, claiming 4x fewer lasers and 3.5x power efficiency vs pluggable optics. This anchors tech:scale_out_cpo to a shipping physical system and time-stamps the 200G SerDes generation. Vendor self-report on performance multipliers.",
+      "subject_id": "tech:scale_out_cpo"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.95,
+      "dst_id": "prod:quantum_x_photonics",
+      "id": "e1",
+      "relation": "develops",
+      "source_ids": [
+        "nvidia_photonics_switches_pr_2025_03_s2",
+        "nvidia_photonics_switches_pr_2025_03_s4"
+      ],
+      "src_id": "co:nvidia"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "tech:serdes",
+      "id": "e2",
+      "relation": "depends_on",
+      "source_ids": [
+        "nvidia_photonics_switches_pr_2025_03_s2"
+      ],
+      "src_id": "prod:quantum_x_photonics"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:scale_out_cpo",
+      "id": "e3",
+      "relation": "enables",
+      "source_ids": [
+        "nvidia_photonics_switches_pr_2025_03_s2",
+        "nvidia_photonics_switches_pr_2025_03_s3"
+      ],
+      "src_id": "prod:quantum_x_photonics"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "NVDA"
+      ],
+      "attributes": {
+        "ticker": "NVDA"
+      },
+      "confidence": 0.95,
+      "id": "co:nvidia",
+      "name": "NVIDIA",
+      "role": null,
+      "source_ids": [
+        "nvidia_photonics_switches_pr_2025_03_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "Quantum-X Photonics",
+        "Spectrum-X Photonics"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "prod:quantum_x_photonics",
+      "name": "NVIDIA Quantum-X Photonics CPO 交換機",
+      "role": null,
+      "source_ids": [
+        "nvidia_photonics_switches_pr_2025_03_s2",
+        "nvidia_photonics_switches_pr_2025_03_s4"
+      ],
+      "type": "Product"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:scale_out_cpo",
+      "name": "Scale-out CPO",
+      "role": null,
+      "source_ids": [
+        "nvidia_photonics_switches_pr_2025_03_s2"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "Serializer/Deserializer"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:serdes",
+      "name": "SerDes",
+      "role": null,
+      "source_ids": [
+        "nvidia_photonics_switches_pr_2025_03_s2"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "nvidia_photonics_switches_pr_2025_03",
+    "evidence_tier": 2,
+    "origin_entity": "NVIDIA",
+    "permission_basis": "Public press release; URL and short excerpts.",
+    "published_at": "2025-03-18",
+    "publisher": "NVIDIA Newsroom",
+    "retrieved_at": "2026-09-01",
+    "section": "ecosystem_and_specs",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "NVIDIA Announces Spectrum-X Photonics, Co-Packaged Optics Networking Switches",
+    "url": "https://nvidianews.nvidia.com/news/nvidia-spectrum-x-co-packaged-optics-networking-switches-ai-factories"
+  },
+  "sources": [
+    {
+      "id": "nvidia_photonics_switches_pr_2025_03_s1",
+      "locator": "Press release — ecosystem list",
+      "quote": "NVIDIA's silicon photonics ecosystem includes TSMC, Browave, Coherent, Corning Incorporated, Fabrinet, Foxconn, Lumentum, SENKO, SPIL, Sumitomo Electric Industries and TFC Communication."
+    },
+    {
+      "id": "nvidia_photonics_switches_pr_2025_03_s2",
+      "locator": "Press release — Quantum-X specs",
+      "quote": "NVIDIA Quantum-X Photonics switches provide 144 ports of 800Gb/s InfiniBand based on 200Gb/s SerDes and use a liquid-cooled design to efficiently cool the onboard silicon photonics."
+    },
+    {
+      "id": "nvidia_photonics_switches_pr_2025_03_s3",
+      "locator": "Press release — efficiency claims",
+      "quote": "They integrate optics innovations with 4x fewer lasers to deliver 3.5x more power efficiency, 63x greater signal integrity, 10x better network resiliency at scale and 1.3x faster deployment compared with traditional methods."
+    },
+    {
+      "id": "nvidia_photonics_switches_pr_2025_03_s4",
+      "locator": "Press release — Spectrum-X specs",
+      "quote": "NVIDIA Spectrum-X Photonics switches include multiple configurations, including 128 ports of 800Gb/s or 512 ports of 200Gb/s, delivering 100Tb/s total bandwidth, as well as 512 ports of 800Gb/s or 2,048 ports of 200Gb/s, for a total throughput of 400Tb/s."
+    }
+  ]
+}

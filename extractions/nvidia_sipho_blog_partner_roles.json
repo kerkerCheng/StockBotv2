@@ -1,0 +1,262 @@
+{
+  "claims": [
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Revisit if NVIDIA's partner list changes materially in later CPO generations (companies added/dropped), or if detachable-fiber architecture is replaced (e.g., fully sealed fiber, removing the connector layer's value).",
+      "id": "nvidia_sipho_blog_partner_roles_cl1",
+      "source_ids": [
+        "nvidia_sipho_blog_partner_roles_s2",
+        "nvidia_sipho_blog_partner_roles_s3",
+        "nvidia_sipho_blog_partner_roles_s4"
+      ],
+      "statement": "NVIDIA's CPO switch stack has two layers previously absent from this graph, both with customer-side (NVIDIA) role attribution: (a) fiber attach — optical connectors and fiber assemblies linking front-panel ELS via polarization-maintaining fiber into the silicon photonics engine; named experts (blog header): Browave, Corning, Senko, TFC Communication, Coherent — Browave (3163.TW) and TFC Communication (300394.SZ) are listed pure-plays and onboard candidates pending four-dimension screening; (b) CPO packaging/assembly — SPIL packages the NVIDIA CPO multi-chip module (wafer bumping, sort, assembly, test); Foxconn and Fabrinet do system-level CPO assembly and chassis integration. SENKO is private; SPIL is an OSAT (ASE group per background, unverified here).",
+      "subject_id": "tech:cpo_fiber_attach"
+    },
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Lower substitutability if NVIDIA names a second silicon photonics foundry (e.g., GlobalFoundries) for a shipping CPO product; raise only with evidence competitors failed qualification.",
+      "id": "nvidia_sipho_blog_partner_roles_cl2",
+      "source_ids": [
+        "nvidia_sipho_blog_partner_roles_s1"
+      ],
+      "statement": "TSMC's COUPE process (EIC+PIC integration via 3D chip-on-wafer stacking) is the named silicon photonics engine process for NVIDIA's CPO switches. Substitutability judged 4/5 for this relation: customer-side naming by NVIDIA plus no other foundry named in the ecosystem; not 5 because merchant silicon photonics foundries exist (unnamed here) and NVIDIA could dual-source future generations.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {
+        "substitutability": 4
+      },
+      "confidence": 0.9,
+      "dst_id": "tech:silicon_photonics_chiplet",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "nvidia_sipho_blog_partner_roles_s1"
+      ],
+      "src_id": "co:tsmc"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:cpo_fiber_attach",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "nvidia_sipho_blog_partner_roles_s3"
+      ],
+      "src_id": "co:coherent"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:cpo_packaging_assembly",
+      "id": "e3",
+      "relation": "supplies_to",
+      "source_ids": [
+        "nvidia_sipho_blog_partner_roles_s4"
+      ],
+      "src_id": "co:fabrinet"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:scale_out_cpo",
+      "id": "e4",
+      "relation": "is_component_of",
+      "source_ids": [
+        "nvidia_sipho_blog_partner_roles_s3"
+      ],
+      "src_id": "tech:cpo_fiber_attach"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:scale_out_cpo",
+      "id": "e5",
+      "relation": "enables",
+      "source_ids": [
+        "nvidia_sipho_blog_partner_roles_s2",
+        "nvidia_sipho_blog_partner_roles_s4"
+      ],
+      "src_id": "tech:cpo_packaging_assembly"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:silicon_photonics_chiplet",
+      "id": "e6",
+      "relation": "depends_on",
+      "source_ids": [
+        "nvidia_sipho_blog_partner_roles_s1"
+      ],
+      "src_id": "tech:scale_out_cpo"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [
+        "台積電",
+        "2330.TW",
+        "TSM"
+      ],
+      "attributes": {
+        "ticker": "TSM"
+      },
+      "confidence": 0.95,
+      "id": "co:tsmc",
+      "name": "TSMC",
+      "role": null,
+      "source_ids": [
+        "nvidia_sipho_blog_partner_roles_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "COHR"
+      ],
+      "attributes": {
+        "ticker": "COHR"
+      },
+      "confidence": 0.9,
+      "id": "co:coherent",
+      "name": "Coherent Corp",
+      "role": null,
+      "source_ids": [
+        "nvidia_sipho_blog_partner_roles_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "FN"
+      ],
+      "attributes": {
+        "ticker": "FN"
+      },
+      "confidence": 0.9,
+      "id": "co:fabrinet",
+      "name": "Fabrinet",
+      "role": null,
+      "source_ids": [
+        "nvidia_sipho_blog_partner_roles_s4"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "Co-Packaged silicon photonics chiplets"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:silicon_photonics_chiplet",
+      "name": "Silicon photonics chiplet",
+      "role": null,
+      "source_ids": [
+        "nvidia_sipho_blog_partner_roles_s1"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:scale_out_cpo",
+      "name": "Scale-out CPO",
+      "role": null,
+      "source_ids": [
+        "nvidia_sipho_blog_partner_roles_s3"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "fiber attach",
+        "CPO optical connectors",
+        "fiber assemblies"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:cpo_fiber_attach",
+      "name": "CPO 光纖耦合／連接器層（fiber attach）",
+      "role": null,
+      "source_ids": [
+        "nvidia_sipho_blog_partner_roles_s3"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [
+        "CPO packaging",
+        "CPO multi-chip module assembly"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:cpo_packaging_assembly",
+      "name": "CPO 封裝與系統組裝（MCM packaging + system assembly）",
+      "role": null,
+      "source_ids": [
+        "nvidia_sipho_blog_partner_roles_s2",
+        "nvidia_sipho_blog_partner_roles_s4"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "nvidia_sipho_blog_partner_roles",
+    "evidence_tier": 2,
+    "origin_entity": "NVIDIA",
+    "permission_basis": "Public NVIDIA technical blog; URL and short excerpts.",
+    "published_at": null,
+    "publisher": "NVIDIA Technical Blog",
+    "retrieved_at": "2026-09-01",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "A New Era in Data Center Networking with NVIDIA Silicon Photonics-based Network Switching (partner roles)",
+    "url": "https://developer.nvidia.com/blog/a-new-era-in-data-center-networking-with-nvidia-silicon-photonics-based-network-switching/"
+  },
+  "sources": [
+    {
+      "id": "nvidia_sipho_blog_partner_roles_s1",
+      "locator": "Partner section — TSMC entry",
+      "quote": "The TSMC silicon photonics Compact Universal Photonic Engine (COUPE) process integrates electronic integrated circuits (EIC) with silicon photonic integrated circuits (PIC) using the 3D chip-on-wafer and chip-stacking packaging technologies."
+    },
+    {
+      "id": "nvidia_sipho_blog_partner_roles_s2",
+      "locator": "Partner section — SPIL entry",
+      "quote": "SPIL is well-known for packaging complex integrated assemblies including wafer bumping, wafer sort, assembly, and testing for the NVIDIA CPO multi-chip module."
+    },
+    {
+      "id": "nvidia_sipho_blog_partner_roles_s3",
+      "locator": "Partner section — header 'Browave, Corning, Senko, TFC Communication, and Coherent' 之下的角色句",
+      "quote": "Industry experts with optical connectors and fiber assemblies for linking the ELS lasers with polarization, maintaining fibers into the silicon photonics engine, and data output to the front panel."
+    },
+    {
+      "id": "nvidia_sipho_blog_partner_roles_s4",
+      "locator": "Partner section — header 'Foxconn and Fabrinet' 之下的角色句",
+      "quote": "These partners provide expertise in system-level CPO assembly and testing, as well as in integrating switch-CPO assemblies and sub-assemblies into the switch system chassis."
+    },
+    {
+      "id": "nvidia_sipho_blog_partner_roles_s5",
+      "locator": "Partner section — header 'Lumentum, Sumitomo, and Coherent' 之下的角色句",
+      "quote": "These vendors provide ELS assembly, optical alignment, and test with the silicon photonics engine."
+    },
+    {
+      "id": "nvidia_sipho_blog_partner_roles_s6",
+      "locator": "Architecture — ELS placement",
+      "quote": "Lasers reside on front-panel external laser source pluggable OSFP modules, enabling quick diagnosis and replacement while the switch core remains sealed."
+    }
+  ]
+}
