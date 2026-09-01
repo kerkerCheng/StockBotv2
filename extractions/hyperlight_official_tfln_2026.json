@@ -1,0 +1,100 @@
+{
+  "claims": [
+    {
+      "confidence": 0.65,
+      "demand_proof_level": "guided",
+      "disproof_condition": "Upgrade when a named customer or module maker discloses TFLN-based product shipments; downgrade if next-gen CPO/transceiver sockets standardize on silicon MRM or InP EML without TFLN adoption (watch OFC announcements and NVIDIA/module-maker BOM disclosures).",
+      "id": "hyperlight_official_tfln_2026_cl1",
+      "source_ids": [
+        "hyperlight_official_tfln_2026_s1",
+        "hyperlight_official_tfln_2026_s2",
+        "hyperlight_official_tfln_2026_s3"
+      ],
+      "statement": "HyperLight self-reports a patented TFLN Chiplet platform in volume manufacturing for scale-up and scale-out (datacenter/AI) applications, with modulator performance up to 145 GHz bandwidth and 448 Gbps per lane. This gives tech:tfln_platform its first supplier edge. Honesty: supplier self-report with no named customer; TFLN competes with silicon MRM (TSMC COUPE path already in graph) for next-gen modulators — TFLN winning sockets is NOT evidenced; substrate upstream (TFLN wafers, e.g., unnamed here) remains a separate unknown layer.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:tfln_platform",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "hyperlight_official_tfln_2026_s1",
+        "hyperlight_official_tfln_2026_s2"
+      ],
+      "src_id": "co:hyperlight"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "HyperLight Corporation"
+      ],
+      "attributes": {},
+      "confidence": 0.8,
+      "id": "co:hyperlight",
+      "name": "HyperLight",
+      "role": null,
+      "source_ids": [
+        "hyperlight_official_tfln_2026_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "TFLN",
+        "Thin-Film Lithium Niobate platform"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:tfln_platform",
+      "name": "Thin-Film Lithium Niobate (TFLN) photonic platform",
+      "role": null,
+      "source_ids": [
+        "hyperlight_official_tfln_2026_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "hyperlight_official_tfln_2026",
+    "evidence_tier": 2,
+    "origin_entity": "HyperLight",
+    "permission_basis": "Public vendor site; URL and short excerpts.",
+    "published_at": null,
+    "publisher": "HyperLight Corporation",
+    "retrieved_at": "2026-09-01",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "HyperLight official site — TFLN Chiplet platform and volume manufacturing",
+    "url": "https://hyperlightcorp.com/"
+  },
+  "sources": [
+    {
+      "id": "hyperlight_official_tfln_2026_s1",
+      "locator": "Site — platform statement",
+      "quote": "Turbocharge your optics with HyperLight's patented high-performance TFLN Chiplet platform"
+    },
+    {
+      "id": "hyperlight_official_tfln_2026_s2",
+      "locator": "Site — manufacturing statement",
+      "quote": "Volume manufacturing for standalone and integrated PICs optimized for scale-up and scale-out applications"
+    },
+    {
+      "id": "hyperlight_official_tfln_2026_s3",
+      "locator": "Site — performance claims",
+      "quote": "up to 145 GHz bandwidth, ultra-low Vπ and low insertion loss"
+    },
+    {
+      "id": "hyperlight_official_tfln_2026_s4",
+      "locator": "Site — per-lane rate",
+      "quote": "448 Gbps per lane and beyond"
+    }
+  ]
+}

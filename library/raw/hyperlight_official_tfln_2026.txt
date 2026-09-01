@@ -1,0 +1,4 @@
+Source URL: https://hyperlightcorp.com/
+
+Excerpt:
+Turbocharge your optics with HyperLight's patented high-performance TFLN Chiplet platform... Volume manufacturing for standalone and integrated PICs optimized for scale-up and scale-out applications... up to 145 GHz bandwidth, ultra-low Vpi and low insertion loss... 448 Gbps per lane and beyond (hyperlightcorp.com, retrieved 2026-09-01)
