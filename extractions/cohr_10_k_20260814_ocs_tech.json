@@ -1,0 +1,79 @@
+{
+  "claims": [
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Downgrade if Coherent's liquid-crystal OCS fails to reach sustained commercial shipment (watch segment disclosures), or if the product family is discontinued in future filings.",
+      "id": "cohr_10_k_20260814_ocs_tech_cl1",
+      "source_ids": [
+        "cohr_10_k_20260814_ocs_tech_s1",
+        "cohr_10_k_20260814_ocs_tech_s2"
+      ],
+      "statement": "Coherent's OCS product family for AI/ML and hyperscale datacenters is based on digital liquid-crystal technology (per its own FY2026 10-K) — a commercializing non-MEMS OCS switching technology. Relevance: (a) it is a live alternative to 3D MEMS mirror arrays at the OCS technology layer, consistent with judging MEMS substitutability 4/5 rather than 5/5; (b) vendor OCS (Coherent liquid-crystal, Lumentum) is technologically distinct from Google's in-house MEMS-based Palomar, so vendor OCS wins and Google's captive deployment are separate demand pools.",
+      "subject_id": "tech:ocs"
+    }
+  ],
+  "edges": [],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "COHR"
+      ],
+      "attributes": {
+        "ticker": "COHR"
+      },
+      "confidence": 0.9,
+      "id": "co:coherent",
+      "name": "Coherent Corp",
+      "role": null,
+      "source_ids": [
+        "cohr_10_k_20260814_ocs_tech_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "OCS"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 4
+      },
+      "confidence": 0.9,
+      "id": "tech:ocs",
+      "name": "Optical Circuit Switching (OCS)",
+      "role": null,
+      "source_ids": [
+        "cohr_10_k_20260814_ocs_tech_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "cohr_10_k_20260814_ocs_tech",
+    "evidence_tier": 1,
+    "origin_entity": "Coherent",
+    "permission_basis": "Public SEC EDGAR filing; URL and short excerpts only.",
+    "published_at": "2026-08-14",
+    "publisher": "SEC EDGAR",
+    "retrieved_at": "2026-09-01",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Coherent Corp FY2026 10-K",
+    "url": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0000820318&type=10-K"
+  },
+  "sources": [
+    {
+      "id": "cohr_10_k_20260814_ocs_tech_s1",
+      "locator": "Item 1 Business — R&D/product roadmap table, OCS row",
+      "quote": "Develop the OCS product family for AI/ML and hyperscale datacenters based on our digital liquid-crystal technology."
+    },
+    {
+      "id": "cohr_10_k_20260814_ocs_tech_s2",
+      "locator": "MD&A — R&D investment discussion",
+      "quote": "These investments support both near and long-term revenue growth initiatives, namely in Transceivers and CPO, as well as new high margin, high value systems such as OCS and Multi-rail solutions"
+    }
+  ]
+}

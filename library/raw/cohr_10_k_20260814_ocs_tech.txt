@@ -1,0 +1,4 @@
+Source URL: https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0000820318&type=10-K
+
+Excerpt:
+Optical circuit switch (OCS): Develop the OCS product family for AI/ML and hyperscale datacenters based on our digital liquid-crystal technology... These investments support both near and long-term revenue growth initiatives, namely in Transceivers and CPO, as well as new high margin, high value systems such as OCS and Multi-rail solutions. (Coherent FY2026 10-K, filed 2026-08-14)

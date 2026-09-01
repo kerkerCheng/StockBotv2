@@ -1,0 +1,91 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "Remove or downgrade if Lumentum divests/exits the ROADM/WSS product line or reclassifies it as immaterial in future filings; upgrade substitutability only with third-party or customer-side share evidence.",
+      "id": "lite_10_k_20260817_wss_cl1",
+      "source_ids": [
+        "lite_10_k_20260817_wss_s1",
+        "lite_10_k_20260817_wss_s2"
+      ],
+      "statement": "Lumentum's FY2026 10-K names wavelength-selective switches among the agile optical network technologies it addresses and lists ROADMs (whose switching engine is the WSS) in its offered optical transport product range. Supplier self-report from a statutory filing; the 10-K contains no market share or substitutability discussion, so no substitutability value is set on this edge — share data requires a third-party source.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:wss",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "lite_10_k_20260817_wss_s1",
+        "lite_10_k_20260817_wss_s2"
+      ],
+      "src_id": "co:lumentum"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "LITE",
+        "Lumentum Operations LLC"
+      ],
+      "attributes": {
+        "ticker": "LITE"
+      },
+      "confidence": 0.9,
+      "id": "co:lumentum",
+      "name": "Lumentum",
+      "role": null,
+      "source_ids": [
+        "lite_10_k_20260817_wss_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "WSS"
+      ],
+      "attributes": {},
+      "confidence": 0.75,
+      "id": "tech:wss",
+      "name": "Wavelength Selective Switch",
+      "role": null,
+      "source_ids": [
+        "lite_10_k_20260817_wss_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "lite_10_k_20260817_wss",
+    "evidence_tier": 1,
+    "origin_entity": "Lumentum",
+    "permission_basis": "Public SEC EDGAR filing; URL and short excerpts only.",
+    "published_at": "2026-08-17",
+    "publisher": "SEC EDGAR",
+    "retrieved_at": "2026-09-01",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Lumentum Holdings FY2026 10-K",
+    "url": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001633978&type=10-K"
+  },
+  "sources": [
+    {
+      "id": "lite_10_k_20260817_wss_s1",
+      "locator": "Item 1 Business — market context",
+      "quote": "Technologies like Reconfigurable Optical Add-Drop Multiplexers (“ROADMs”), wavelength-selective switches, and tunable transmission products facilitate remote capacity adjustments."
+    },
+    {
+      "id": "lite_10_k_20260817_wss_s2",
+      "locator": "Item 1 Business — product offering",
+      "quote": "For optical transport applications, we offer a broad range of products, including ROADMs, optical amplifiers, and optical channel monitors to efficiently switch, route, and condition optical signals."
+    }
+  ]
+}

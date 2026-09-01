@@ -1,0 +1,4 @@
+Source URL: https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001633978&type=10-K
+
+Excerpt:
+Technologies like Reconfigurable Optical Add-Drop Multiplexers (ROADMs), wavelength-selective switches, and tunable transmission products facilitate remote capacity adjustments... For optical transport applications, we offer a broad range of products, including ROADMs, optical amplifiers, and optical channel monitors to efficiently switch, route, and condition optical signals. (Lumentum FY2026 10-K, filed 2026-08-17)
