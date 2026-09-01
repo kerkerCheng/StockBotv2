@@ -6168,6 +6168,11 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
+      "source_cleared": {
+        "at": "2026-09-01T08:52:46.105007+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
       "title": "co:harmonic_drive_systems：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
     },
@@ -13956,6 +13961,15 @@
       "ref_id": "beta_fill_vwra_20260901",
       "type": "manual",
       "verb": "go"
+    },
+    {
+      "at": "2026-09-01T08:52:46.105007+00:00",
+      "n": 372,
+      "reason": "來源本輪成功執行，但不再產出此項",
+      "receipt": null,
+      "ref_id": "dc_cc46527aac12ba14191ee71c0460f3fe",
+      "type": "decision_review",
+      "verb": "source_cleared"
     }
   ],
   "next_n": 384,
