@@ -1,0 +1,133 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Downgrade if the partnership produces no production announcements within two fiscal halves, or if UMC's disclosures never mention TFLN capacity; upgrade when UMC/Wavetek disclose TFLN volumes or a module maker names the platform in a shipping product.",
+      "id": "evertiq_hyperlight_umc_wavetek_2026_cl1",
+      "source_ids": [
+        "evertiq_hyperlight_umc_wavetek_2026_s1",
+        "evertiq_hyperlight_umc_wavetek_2026_s2",
+        "evertiq_hyperlight_umc_wavetek_2026_s3",
+        "evertiq_hyperlight_umc_wavetek_2026_s4"
+      ],
+      "statement": "TFLN's high-volume path now has a partner-side counterparty: UMC (listed foundry) and its subsidiary Wavetek committed foundry manufacturing of HyperLight's TFLN Chiplet platform on 6-inch and 8-inch wafers, with UMC's SVP publicly endorsing TFLN for next-generation datacenter bandwidth — upgrading the HyperLight cohort from self-report-only to partner-corroborated (a major listed company staking capacity and name). Scope covers CPO within the platform. Limits: joint press release carried by trade press (tier 3); no volume/revenue commitments disclosed; qualification stage, not shipping scale.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {
+        "qualification_status": "qualifying"
+      },
+      "confidence": 0.75,
+      "dst_id": "tech:tfln_platform",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "evertiq_hyperlight_umc_wavetek_2026_s1",
+        "evertiq_hyperlight_umc_wavetek_2026_s3"
+      ],
+      "src_id": "co:umc"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "co:hyperlight",
+      "id": "e2",
+      "relation": "partnership_with",
+      "source_ids": [
+        "evertiq_hyperlight_umc_wavetek_2026_s1"
+      ],
+      "src_id": "co:umc"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "HyperLight Corporation"
+      ],
+      "attributes": {},
+      "confidence": 0.8,
+      "id": "co:hyperlight",
+      "name": "HyperLight",
+      "role": null,
+      "source_ids": [
+        "evertiq_hyperlight_umc_wavetek_2026_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [
+        "UMC",
+        "2303.TW",
+        "聯電"
+      ],
+      "attributes": {
+        "ticker": "UMC"
+      },
+      "confidence": 0.85,
+      "id": "co:umc",
+      "name": "United Microelectronics Corporation (UMC)",
+      "role": null,
+      "source_ids": [
+        "evertiq_hyperlight_umc_wavetek_2026_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "TFLN",
+        "Thin-Film Lithium Niobate platform"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:tfln_platform",
+      "name": "Thin-Film Lithium Niobate (TFLN) photonic platform",
+      "role": null,
+      "source_ids": [
+        "evertiq_hyperlight_umc_wavetek_2026_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "evertiq_hyperlight_umc_wavetek_2026",
+    "evidence_tier": 3,
+    "origin_entity": "Evertiq（轉載 HyperLight/UMC/Wavetek 聯合新聞稿,含 UMC 高管具名引述）",
+    "permission_basis": "Public trade press; URL and short excerpts.",
+    "published_at": "2026-05-04",
+    "publisher": "Evertiq",
+    "retrieved_at": "2026-09-01",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Evertiq — HyperLight, UMC, Wavetek to bolster TFLN production (joint release carrier)",
+    "url": "https://evertiq.com/news/2026-05-04-hyperlight-umc-wavetek-to-bolster-tfln-production"
+  },
+  "sources": [
+    {
+      "id": "evertiq_hyperlight_umc_wavetek_2026_s1",
+      "locator": "Article — partnership statement",
+      "quote": "US-based HyperLight Corporation, Taiwan's United Microelectronics Corporation (UMC) and Wavetek Microelectronics Corporation, a wholly owned subsidiary of UMC, have announced a strategic manufacturing partnership for high-volume foundry production of HyperLight's TFLN (thin-film lithium niobate) Chiplet Platform on both 6-inch and 8-inch wafers."
+    },
+    {
+      "id": "evertiq_hyperlight_umc_wavetek_2026_s2",
+      "locator": "Article — roles",
+      "quote": "HyperLight serves as the platform architect, while UMC and Wavetek provide the high-volume foundry manufacturing infrastructure required for global deployment."
+    },
+    {
+      "id": "evertiq_hyperlight_umc_wavetek_2026_s3",
+      "locator": "Article — UMC 8-inch commitment",
+      "quote": "UMC is bringing to the partnership its 8-inch production capability and expertise to support the scale required for AI infrastructure growth."
+    },
+    {
+      "id": "evertiq_hyperlight_umc_wavetek_2026_s4",
+      "locator": "Article — UMC SVP quote",
+      "quote": "TFLN is emerging as a promising material to deliver the bandwidth requirements for next-generation data center connectivity."
+    }
+  ]
+}
