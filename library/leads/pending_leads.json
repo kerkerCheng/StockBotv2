@@ -11253,6 +11253,38 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1633978/000166489826000005/xslF345X06/form4-08282026_010847.xml"
     },
+    "lead_1deb20d98ab9585882a57b307d940f6c": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-01T01:14:48.425255+00:00",
+      "lead_id": "lead_1deb20d98ab9585882a57b307d940f6c",
+      "published_at": "2026-09-01",
+      "refs": {},
+      "source": "decompose:tpu-ironwood-2026-09-01",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "[decompose D3|TPU] OCS 供應結構:TPU v4 論文確認 OCS 動態重構拓撲+光元件<5%系統成本;圖中 tech:ocs 僅 Lumentum 供應商自報一條邊——Google 量產 OCS(Palomar)是自製還是外購?找 Google 客戶端文件印證 Lumentum OCS 或確認自製排擠商用",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-01T01:15:06.021151+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "TPU 第三需求錨的光互連層;答案改變候選集合"
+        },
+        "decided_at": "2026-09-01T01:15:06.021151+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true,
+          "novelty": true
+        },
+        "reason": "decompose 產出的結構研究題(使用者選題 TPU Ironwood);層存在性 tier1-2 已核,供應商未知即題目",
+        "tier": 3
+      },
+      "url": "https://arxiv.org/abs/2304.01433?decompose=ocs_supply"
+    },
     "lead_1dfc66d3488e70d972e80bff8772e8ff": {
       "entities": {
         "company_ids": [],
@@ -23329,6 +23361,38 @@
         "tier": 4
       },
       "url": "https://www.sivers-semiconductors.com/press/update-on-expiry-of-lock-up-undertaking-and-insider-transactions-in-sivers-semiconductors/"
+    },
+    "lead_64d1bb19c9eea1fcaf7580e0ffa5d843": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-01T01:14:49.331076+00:00",
+      "lead_id": "lead_64d1bb19c9eea1fcaf7580e0ffa5d843",
+      "published_at": "2026-09-01",
+      "refs": {},
+      "source": "decompose:tpu-ironwood-2026-09-01",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "[decompose D3|TPU] MEMS 鏡陣列層:Palomar OCS 的 MEMS 上游(Apollo 論文待抽)——圖中無 MEMS 節點。誰做 OCS 級 MEMS 鏡陣列、換掉要多久?",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-01T01:15:06.879433+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "TPU 第三需求錨的光互連層;答案改變候選集合"
+        },
+        "decided_at": "2026-09-01T01:15:06.879433+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true,
+          "novelty": true
+        },
+        "reason": "decompose 產出的結構研究題(使用者選題 TPU Ironwood);層存在性 tier1-2 已核,供應商未知即題目",
+        "tier": 3
+      },
+      "url": "https://arxiv.org/abs/2208.10041?decompose=mems"
     },
     "lead_653b2da7843a6e6e52e432b66f37e379": {
       "entities": {
@@ -43063,6 +43127,38 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826006272/xslF345X06/ownership.xml"
     },
+    "lead_ccdc37ad3e3655d907064b8f3eeefde1": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-01T01:14:48.724689+00:00",
+      "lead_id": "lead_ccdc37ad3e3655d907064b8f3eeefde1",
+      "published_at": "2026-09-01",
+      "refs": {},
+      "source": "decompose:tpu-ironwood-2026-09-01",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "[decompose D3|TPU] 光循環器層:TPU ICI 單纖雙向依賴 optical circulator(v4 論文全文待逐字核對)——圖中無此節點。誰量產資料中心級 circulator、幾家能做?建節點+找供應商",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-01T01:15:06.305989+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "TPU 第三需求錨的光互連層;答案改變候選集合"
+        },
+        "decided_at": "2026-09-01T01:15:06.305989+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true,
+          "novelty": true
+        },
+        "reason": "decompose 產出的結構研究題(使用者選題 TPU Ironwood);層存在性 tier1-2 已核,供應商未知即題目",
+        "tier": 3
+      },
+      "url": "https://arxiv.org/pdf/2304.01433?decompose=circulator"
+    },
     "lead_ccea00c05e700362c98c32fdb21178f3": {
       "entities": {
         "company_ids": [],
@@ -48260,6 +48356,47 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2075590371531493729"
+    },
+    "lead_e8c68c83ef5c3ee9b929bdc0d15a055d": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-01T01:14:49.029472+00:00",
+      "lead_id": "lead_e8c68c83ef5c3ee9b929bdc0d15a055d",
+      "published_at": "2026-09-01",
+      "refs": {},
+      "source": "decompose:tpu-ironwood-2026-09-01",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "AVGO",
+            "NVDA"
+          ]
+        }
+      },
+      "title": "[decompose D3|TPU] ICI 光收發模組層:Ironwood 每 chip 4 OSFP、144 cube 超級pod 需 48 OCS+13,824 光埠(tier-2 待核)——Google 客製 ICI 光模組誰供應?圖中 transceiver 生態全是 NVDA/AVGO 陣營,第三需求錨的模組供應鏈空白",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-01T01:15:06.596110+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "TPU 第三需求錨的光互連層;答案改變候選集合"
+        },
+        "decided_at": "2026-09-01T01:15:06.596110+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true,
+          "novelty": true
+        },
+        "reason": "decompose 產出的結構研究題(使用者選題 TPU Ironwood);層存在性 tier1-2 已核,供應商未知即題目",
+        "tier": 3
+      },
+      "url": "https://newsletter.semianalysis.com/p/tpuv7-google-takes-a-swing-at-the?decompose=ici_optics"
     },
     "lead_e8cef605c60f6b36ad82feb2849600e4": {
       "entities": {
