@@ -1,0 +1,99 @@
+{
+  "claims": [
+    {
+      "confidence": 0.65,
+      "demand_proof_level": "guided",
+      "disproof_condition": "Downgrade if photonics orders stop recurring in Aehr filings (10-K segment/backlog) or the unnamed customers are revealed to be non-CPO applications; upgrade only when a customer is named or a teardown/filing ties FOX-XP capacity to a specific CPO program.",
+      "id": "aehr_official_sipho_test_2026_cl1",
+      "source_ids": [
+        "aehr_official_sipho_test_2026_s1",
+        "aehr_official_sipho_test_2026_s2",
+        "aehr_official_sipho_test_2026_s3"
+      ],
+      "statement": "Aehr Test Systems supplies wafer-level burn-in/stabilization systems (FOX-XP) for silicon photonics ICs targeting the hyperscale datacenter optical interconnect market, with a lead customer in production and follow-on orders plus a second major customer win — per Aehr's own announcements. Scope honesty: wafer-level burn-in is one stage of the CPO test stack, not full-stack module-level test; customers are unnamed (supplier self-report, L8), so which CPO program consumes this capacity is unverified.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:cpo_full_stack_test",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "aehr_official_sipho_test_2026_s1",
+        "aehr_official_sipho_test_2026_s2"
+      ],
+      "src_id": "co:aehr_test_systems"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "test_yield",
+      "aliases": [
+        "AEHR",
+        "FOX-XP"
+      ],
+      "attributes": {
+        "ticker": "AEHR"
+      },
+      "confidence": 0.85,
+      "id": "co:aehr_test_systems",
+      "name": "Aehr Test Systems",
+      "role": null,
+      "source_ids": [
+        "aehr_official_sipho_test_2026_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "test_yield",
+      "aliases": [
+        "full-stack test",
+        "CPO test",
+        "全堆疊測試"
+      ],
+      "attributes": {},
+      "confidence": 0.8,
+      "id": "tech:cpo_full_stack_test",
+      "name": "CPO 全堆疊測試（full-stack test）",
+      "role": null,
+      "source_ids": [
+        "aehr_official_sipho_test_2026_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "aehr_official_sipho_test_2026",
+    "evidence_tier": 2,
+    "origin_entity": "Aehr Test Systems",
+    "permission_basis": "Public vendor site; URL and short excerpts.",
+    "published_at": null,
+    "publisher": "Aehr Test Systems",
+    "retrieved_at": "2026-09-01",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Aehr Test Systems official site — silicon photonics wafer-level burn-in announcements",
+    "url": "https://www.aehr.com/"
+  },
+  "sources": [
+    {
+      "id": "aehr_official_sipho_test_2026_s1",
+      "locator": "Site headline — new customer win",
+      "quote": "Aehr Wins Major New Silicon Photonics Customer with High-Power FOX-XP Wafer-Level Burn-In System for Hyperscale Data Center Optical Interconnect Market"
+    },
+    {
+      "id": "aehr_official_sipho_test_2026_s2",
+      "locator": "Site headline — follow-on production order",
+      "quote": "Aehr Receives Follow-On Production Order from Lead Silicon Photonics Customer for Fully Automated FOX-XP Wafer-Level Burn-In System"
+    },
+    {
+      "id": "aehr_official_sipho_test_2026_s3",
+      "locator": "Site headline — production wafer-level burn-in",
+      "quote": "Aehr Receives Order for FOX-XP System for Production Wafer Level Burn-in of Next Generation Silicon Photonics Integrated Circuits"
+    }
+  ]
+}
