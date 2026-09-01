@@ -9441,6 +9441,36 @@
       ],
       "url": "https://research.tsmc.com/page/on-chip-interconnect/14.html"
     },
+    "lead_141576aaba2fb04163bd858103ae852c": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-01T07:24:35.914641+00:00",
+      "lead_id": "lead_141576aaba2fb04163bd858103ae852c",
+      "published_at": null,
+      "refs": {},
+      "source": "decompose:cpo-quantum-x-2026-09-01",
+      "status": "triaged_no_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CPO"
+          ]
+        }
+      },
+      "title": "[watch|CPO] Browave 波若威(3163.TW)onboard 追蹤:NVIDIA fiber attach 具名 expert,四維初判第3維(客戶資本承諾)不過——7月營收 NT$2.1億 +28.7% YoY 無放量跡象。等訂單公告或營收加速",
+      "triage": {
+        "decided_at": "2026-09-01T07:24:45.108780+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "四維初判第3維(客戶端資本承諾)不過:NVIDIA 具名是資格非資本;7月營收 +28.7% YoY 無 CPO 放量跡象。park 追蹤,不進 pq1",
+        "tier": 2
+      },
+      "url": "https://www.tpex.org.tw/openapi/v1/mopsfin_t187ap05_O?co=3163&note=browave-watch"
+    },
     "lead_1446a653c191897aeddb8b84419e4456": {
       "entities": {
         "company_ids": [],
@@ -40025,6 +40055,36 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2072008436292948376"
+    },
+    "lead_bc061c29aff623d91be246bea42aae6d": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-01T07:24:36.214698+00:00",
+      "lead_id": "lead_bc061c29aff623d91be246bea42aae6d",
+      "published_at": null,
+      "refs": {},
+      "source": "decompose:cpo-quantum-x-2026-09-01",
+      "status": "triaged_no_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CPO"
+          ]
+        }
+      },
+      "title": "[watch|CPO] TFC 天孚通信(300394.SZ)onboard 追蹤:NVIDIA fiber attach 具名 expert,A股無廉價官方 API,初判資料受限;第3維(客戶資本承諾)未證。等具名訂單/客戶資本承諾揭露",
+      "triage": {
+        "decided_at": "2026-09-01T07:24:45.377824+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "四維初判第3維未證且 A 股一手資料受限;NVIDIA 具名是資格非資本。park 追蹤,不進 pq1",
+        "tier": 2
+      },
+      "url": "https://www.szse.cn/certificate/individual/index.html?code=300394&note=tfc-watch"
     },
     "lead_bc3c3f6b30ce00bd5a2292f3f580f961": {
       "entities": {

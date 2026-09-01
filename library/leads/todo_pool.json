@@ -6284,6 +6284,19 @@
       "source": "research_action",
       "title": "CPO stack 殘骸收斂——Quantum-X 實體錨定 scale-out CPO,新增光纖耦合與封裝組裝兩層,TSMC COUPE 邊落地",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-09-01T07:26:12.631202+00:00",
+      "graph_impact": "+2 節點、1 邊、1 claims｜來源：Aehr Test Systems（tier 2）",
+      "hint": "核准 exact graph delta；Decision handoff：co:aehr_test_systems。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 380,
+      "reason": null,
+      "ref_id": "ra_ea319962c14ad1d436f87217b024bb4f",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "CPO 測試層補供應商——Aehr FOX-XP 矽光晶圓級 burn-in(自報訂單),清 cpo_full_stack_test 零供應商",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -13898,6 +13911,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 380,
+  "next_n": 381,
   "schema_version": "1"
 }
