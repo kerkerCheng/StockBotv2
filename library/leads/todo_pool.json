@@ -6055,26 +6055,42 @@
     },
     {
       "added_at": "2026-09-01T05:29:56.872153+00:00",
+      "completion_authority": {
+        "action_digest": "3b7134111e1bcbdaaeee924934688052e10e0431daa413a6db066e0e73cd9e9d",
+        "cohort_id": "dc_21d81aa11dd2fe85c747b1c759fd01ed",
+        "commit": "4446eda3df00187c70f8009f82f63bb8c59289b1",
+        "company_id": "co:mp_materials",
+        "verified_at": "2026-09-01T05:35:51.767209+00:00"
+      },
       "graph_impact": "+5 節點、2 邊、3 claims｜來源：Federation of American Scientists（tier 3）、Lynas Rare Earths（tier 1）、Mining Weekly（tier 3）",
       "hint": "核准 exact graph delta；Decision handoff：co:mp_materials。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 366,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_a068c704dafdae02f714c11663f724db;digest:3b7134111e1bcbdaaeee924934688052e10e0431daa413a6db066e0e73cd9e9d;commit:4446eda3df00187c70f8009f82f63bb8c59289b1;cohort:dc_21d81aa11dd2fe85c747b1c759fd01ed",
       "ref_id": "ra_a068c704dafdae02f714c11663f724db",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-01T05:35:51.767209+00:00",
       "source": "research_action",
       "title": "稀土磁材供應邊補替代難度——MP（美國域內）與 Lynas（中國以外）各判 4/5",
       "type": "ra_admission"
     },
     {
       "added_at": "2026-09-01T05:29:56.872153+00:00",
+      "completion_authority": {
+        "action_digest": "03591a4e50b02ff535820540e51215902912bd86c8d9aa0cf6f4560b558efabb",
+        "cohort_id": "dc_db19d3b490013f4cc464b2aab37b0bc8",
+        "commit": "ffbf6287aaa153be724de5d9b7edacfb97a0c624",
+        "company_id": "co:nabtesco",
+        "verified_at": "2026-09-01T05:35:53.027208+00:00"
+      },
       "graph_impact": "+3 節點、2 邊、1 claims｜來源：Next Financial (Substack)（tier 3）",
       "hint": "核准 exact graph delta；Decision handoff：co:nabtesco。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 367,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_e89f06e0a1311dbbf5ac87aa381ad7e5;digest:03591a4e50b02ff535820540e51215902912bd86c8d9aa0cf6f4560b558efabb;commit:ffbf6287aaa153be724de5d9b7edacfb97a0c624;cohort:dc_db19d3b490013f4cc464b2aab37b0bc8",
       "ref_id": "ra_e89f06e0a1311dbbf5ac87aa381ad7e5",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-01T05:35:53.027208+00:00",
       "source": "research_action",
       "title": "機器人減速機供應邊補替代難度——Nabtesco RV 減速機判 3/5，並補雙環傳動供應邊",
       "type": "ra_admission"
@@ -13639,6 +13655,24 @@
       "ref_id": "lead_1dfc66d3488e70d972e80bff8772e8ff",
       "type": "source_trace_review",
       "verb": "drop"
+    },
+    {
+      "at": "2026-09-01T05:35:51.767209+00:00",
+      "n": 366,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_a068c704dafdae02f714c11663f724db;digest:3b7134111e1bcbdaaeee924934688052e10e0431daa413a6db066e0e73cd9e9d;commit:4446eda3df00187c70f8009f82f63bb8c59289b1;cohort:dc_21d81aa11dd2fe85c747b1c759fd01ed",
+      "ref_id": "ra_a068c704dafdae02f714c11663f724db",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-01T05:35:53.027208+00:00",
+      "n": 367,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_e89f06e0a1311dbbf5ac87aa381ad7e5;digest:03591a4e50b02ff535820540e51215902912bd86c8d9aa0cf6f4560b558efabb;commit:ffbf6287aaa153be724de5d9b7edacfb97a0c624;cohort:dc_db19d3b490013f4cc464b2aab37b0bc8",
+      "ref_id": "ra_e89f06e0a1311dbbf5ac87aa381ad7e5",
+      "type": "ra_admission",
+      "verb": "go"
     }
   ],
   "next_n": 370,
