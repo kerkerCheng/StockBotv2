@@ -6475,8 +6475,10 @@
       "added_at": "2026-09-01T10:36:48.970317+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_9bcb313317504070ab9b325aa62a97d4",
+      "dispatch_receipt": "action:ra_d2944b9a739b677ac65e1eb06a77d52a",
       "dispatch_ref": "wo_4dc1e96244caa414ae3cfc48906ae926",
-      "dispatch_status": "queued",
+      "dispatch_status": "awaiting_approval",
+      "dispatch_updated_at": "2026-09-01T14:32:33.968350+00:00",
       "dispatched_at": "2026-09-01T13:20:29.906479+00:00",
       "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 387,
@@ -6735,6 +6737,19 @@
       "source": "engine_c",
       "title": "Engine C 觀測：AEHR / customer_concentration",
       "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-09-01T14:33:30.764479+00:00",
+      "graph_impact": "+3 節點、2 邊、1 claims｜來源：Evertiq（轉載 HyperLight/UMC/Wavetek 聯合新聞稿,含 UMC 高管具名引述）（tier 3）",
+      "hint": "核准 exact graph delta；Decision handoff：co:hyperlight。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 404,
+      "reason": null,
+      "ref_id": "ra_d2944b9a739b677ac65e1eb06a77d52a",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "TFLN 量產路徑獲夥伴端印證——UMC/Wavetek 6+8 吋代工合作,HyperLight cohort 脫離純自報",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -14834,8 +14849,26 @@
       "ref_id": "dc_fef9e03e5e6935e7428620f7eab793ba",
       "type": "decision_review",
       "verb": "pq1_awaiting_approval"
+    },
+    {
+      "at": "2026-09-01T14:32:23.063277+00:00",
+      "n": 387,
+      "reason": null,
+      "receipt": "wo:wo_4dc1e96244caa414ae3cfc48906ae926",
+      "ref_id": "dc_0e9a6405f4acf3ad3aa89347d532ac22",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-09-01T14:32:33.968350+00:00",
+      "n": 387,
+      "reason": "UMC/Wavetek 夥伴端印證入包——TFLN cohort 脫離純自報",
+      "receipt": "action:ra_d2944b9a739b677ac65e1eb06a77d52a",
+      "ref_id": "dc_0e9a6405f4acf3ad3aa89347d532ac22",
+      "type": "decision_review",
+      "verb": "pq1_awaiting_approval"
     }
   ],
-  "next_n": 404,
+  "next_n": 405,
   "schema_version": "1"
 }
