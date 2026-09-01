@@ -6829,6 +6829,19 @@
       "source": "decision_lab",
       "title": "co:lynas：補客戶端商業承諾：訂單、產能協議或預付款等付錢方向的證據",
       "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-01T15:35:23.916248+00:00",
+      "graph_impact": "+3 節點、2 邊、1 claims｜來源：Harper Adams University 研究團隊（獨立學術第三方,非 Unitree 非減速器供應商）（tier 2）",
+      "hint": "核准 exact graph delta；Decision handoff：co:unitree。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 409,
+      "reason": null,
+      "ref_id": "ra_d9a15aa2a92393eea0053fdfdd29635b",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "G1 減速機方案實錘——學術第三方:每關節 BLDC+諧波減速器(含 co:unitree onboard),接上 strain wave 層",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -15056,6 +15069,6 @@
       "verb": "pq1_awaiting_approval"
     }
   ],
-  "next_n": 409,
+  "next_n": 410,
   "schema_version": "1"
 }

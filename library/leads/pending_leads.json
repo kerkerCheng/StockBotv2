@@ -17782,9 +17782,11 @@
       "first_seen": "2026-09-01T13:09:09.952169+00:00",
       "lead_id": "lead_42f589d3ca6c7cf96f8fe5354a816fd8",
       "published_at": null,
-      "refs": {},
+      "refs": {
+        "research_action_id": "ra_d9a15aa2a92393eea0053fdfdd29635b"
+      },
       "source": "decompose:unitree-g1-2026-09-01",
-      "status": "triaged_go",
+      "status": "action_prepared",
       "themes": {},
       "title": "[decompose D6|G1] 減速機方案層:G1 官方規格只寫 PMSM 關節馬達(膝 90/120N.m)與全關節中空走線,減速方案(諧波/行星/自研)完全未揭露。圖中 Next Financial 已稱雙環傳動 supplies Unitree——用 teardown/雙環年報驗證 G1 減速機供應鏈,連機器人群",
       "triage": {
@@ -17968,9 +17970,13 @@
       "first_seen": "2026-09-01T13:09:10.553025+00:00",
       "lead_id": "lead_441728fb0dd26789a677971d375b4a31",
       "published_at": null,
-      "refs": {},
+      "refs": {
+        "parked_reason": "G1 感測套件(Depth Camera+3D LiDAR)官方不具名品牌;社群普遍稱 Livox MID-360+RealSense 但無可逐字引用的一手(Gap 4 不猜);teardown/採購揭露是唯一路徑",
+        "trace_next_trigger": "G1 teardown 具名 LiDAR/相機供應商;或 Livox(大疆系)/RealSense 端公告人形設計中標",
+        "trace_status": "lead_only_tier_4"
+      },
       "source": "decompose:unitree-g1-2026-09-01",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "[decompose D6|G1] 感測套件層:官方頁只寫 Depth Camera+3D LiDAR 不具名品牌——G1 感測供應商(LiDAR/深度相機)需 teardown 或採購揭露;人形量產放大時感測 BOM 誰受益?",
       "triage": {
@@ -30239,9 +30245,13 @@
       "first_seen": "2026-09-01T13:09:10.253921+00:00",
       "lead_id": "lead_861daa2e0023d608dfb6a0c8b8bc45fc",
       "published_at": null,
-      "refs": {},
+      "refs": {
+        "parked_reason": "靈巧手/觸覺陣列層:Dex3-1 自研+optional tactile sensor arrays(官方規格),但觸覺陣列供應商在官方拆裝手冊與公開一手中皆未具名;人形觸覺陣列 merchant 版圖(如 Xela/壓阻陣列廠)需 teardown 或供應商具名公告",
+        "trace_next_trigger": "G1/Dex3 teardown 具名觸覺陣列供應商;或任一觸覺感測廠公告人形客戶",
+        "trace_status": "lead_only_tier_4"
+      },
       "source": "decompose:unitree-g1-2026-09-01",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "[decompose D6|G1] 靈巧手/觸覺感測層:圖中無節點(未知層)。Dex3-1 三指手(3+2+2 主動自由度)自研+optional tactile sensor arrays——人形觸覺陣列誰做、幾家能做?建節點+找供應商",
       "triage": {

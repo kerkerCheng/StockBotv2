@@ -505,6 +505,10 @@
       "research_ticker": "UMC"
     },
     {
+      "company_id": "co:unitree",
+      "research_ticker": null
+    },
+    {
       "company_id": "co:vpec",
       "research_ticker": "2455.TW",
       "market_currency": "TWD"
