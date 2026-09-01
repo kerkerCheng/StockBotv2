@@ -1,0 +1,89 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Reverse this near-term-safe reading if Proterial's NMX-G1NH-HF (spec'd for 'high torque and heat resistance' per its own PR) or any competitor demonstrates H/SH-grade thermal performance in independent or OEM qualification testing — that would re-arm the HRE-demand threat at full strength.",
+      "id": "ree_exchanges_proterial_hre_free_critique_cl1",
+      "source_ids": [
+        "ree_exchanges_proterial_hre_free_critique_s1",
+        "ree_exchanges_proterial_hre_free_critique_s2",
+        "ree_exchanges_proterial_hre_free_critique_s3"
+      ],
+      "statement": "Independent industry assessment (Rare Earth Exchanges, expert Aminul Mehedi) challenges the near-term EV-traction viability of Proterial's HRE-free magnets: at best M grade (~100°C) versus the H grade (120°C) minimum and SH grade (150°C) ideal that EV/wind/A&D applications require — 'more of a scientific milestone than a commercial solution' pending independent testing. Consequence for the heavy-REO axis: the HRE-free threat to Dy/Tb demand is NOT imminent at disclosed specs, which near-term SUPPORTS the Lynas/MP heavy-REO positioning while the [370] disproof watch stays armed. Also noted: Proterial's 600+ global patent filings signal the HRE-free/GBD battleground may be IP litigation — relevant to the parked GBD patent-structure question.",
+      "subject_id": "mat:separated_heavy_reo"
+    }
+  ],
+  "edges": [],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Hitachi Metals",
+        "NEOMAX",
+        "Proterial Ltd"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:proterial",
+      "name": "Proterial (前 Hitachi Metals)",
+      "role": null,
+      "source_ids": [
+        "ree_exchanges_proterial_hre_free_critique_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "separated heavy rare-earth oxide",
+        "HREO",
+        "dysprosium oxide",
+        "terbium oxide"
+      ],
+      "attributes": {
+        "concentration_score": 5,
+        "ramp_difficulty_intrinsic": 4
+      },
+      "confidence": 0.9,
+      "id": "mat:separated_heavy_reo",
+      "name": "分離重稀土氧化物（Dy／Tb 等）",
+      "role": null,
+      "source_ids": [
+        "ree_exchanges_proterial_hre_free_critique_s1"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "ree_exchanges_proterial_hre_free_critique",
+    "evidence_tier": 3,
+    "origin_entity": "Rare Earth Exchanges（獨立產業媒體,非 Proterial）",
+    "permission_basis": "Public industry analysis; URL and short excerpts.",
+    "published_at": null,
+    "publisher": "Rare Earth Exchanges",
+    "retrieved_at": "2026-09-01",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Rare Earth Exchanges — Proterial's Heavy Rare Earth-Free Magnet Claim: Breakthrough or Litigation Trap?",
+    "url": "https://rareearthexchanges.com/news/proterials-heavy-rare-earth-free-magnet-claim-breakthrough-or-litigation-trap/"
+  },
+  "sources": [
+    {
+      "id": "ree_exchanges_proterial_hre_free_critique_s1",
+      "locator": "Expert assessment — thermal grade",
+      "quote": "Their heavy RE-free magnets are at best M grade, whereas EVs, wind turbine generators, and A&D applications need a bare minimum H grade (120 °C) and ideally SH grade (150 °C)."
+    },
+    {
+      "id": "ree_exchanges_proterial_hre_free_critique_s2",
+      "locator": "Author assessment — commercial readiness",
+      "quote": "Until independent testing confirms they can match or beat the performance of today's industry-standard magnets...the breakthrough remains more of a scientific milestone than a commercial solution."
+    },
+    {
+      "id": "ree_exchanges_proterial_hre_free_critique_s3",
+      "locator": "Patent posture",
+      "quote": "the company's patent-heavy posture—over 600 global filings, 200+ in Japan—suggests the next battlefield in rare earths may not be geology, but intellectual property litigation."
+    }
+  ]
+}
