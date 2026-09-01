@@ -5967,8 +5967,10 @@
       "added_at": "2026-09-01T01:05:24.243791+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_0b3df70f5111eef0866e1a8a350dbf99",
+      "dispatch_receipt": "action:ra_3d594f2ba7d0cb23c36a7656e43a2307",
       "dispatch_ref": "wo_60364930c16f95733296cfd3efaf152f",
-      "dispatch_status": "queued",
+      "dispatch_status": "awaiting_approval",
+      "dispatch_updated_at": "2026-09-01T15:05:11.478720+00:00",
       "dispatched_at": "2026-09-01T13:20:31.318710+00:00",
       "hint": "當前 missing_data：四家具名人形夥伴中任一家的付款方向證據（訂單金額、產能協議或預付款）——partnership 具名已有，缺的是誰付錢給；Schaeffler 官方一手（收購新聞稿、2026-02-05 humanoid IR 簡報）——schaeffler（共 2 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 359,
@@ -6778,6 +6780,55 @@
       "source": "research_action",
       "title": "TFLN 量產路徑獲夥伴端印證——UMC/Wavetek 6+8 吋代工合作,HyperLight cohort 脫離純自報",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-09-01T15:06:12.743064+00:00",
+      "graph_impact": "+4 節點、1 邊、1 claims｜來源：Schaeffler（tier 2）、Humanoid（客戶端）（tier 2）",
+      "hint": "核准 exact graph delta；Decision handoff：co:schaeffler。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 405,
+      "reason": null,
+      "ref_id": "ra_3d594f2ba7d0cb23c36a7656e43a2307",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "Schaeffler×Humanoid 綁定條款落圖——客戶端 5 年 >50% 份額承諾(七位數 actuator),互惠結構誠實標記",
+      "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-09-01T15:06:12.743064+00:00",
+      "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "n": 406,
+      "reason": null,
+      "ref_id": "dc_fef9e03e5e6935e7428620f7eab793ba",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:aehr_test_systems：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-01T15:06:12.743064+00:00",
+      "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "n": 407,
+      "reason": null,
+      "ref_id": "dc_0e9a6405f4acf3ad3aa89347d532ac22",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:hyperlight：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-01T15:06:12.743064+00:00",
+      "hint": "當前 missing_data：customer_concentration：日本／JARE 佔營收比重（FY26 全年報告可查，尚未核對）；美國政府 US$96M binding LOI 的一手 ASX 公告核對（共 2 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "n": 408,
+      "reason": null,
+      "ref_id": "dc_48446dbceb85d4b785634e3c4ca5d669",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:lynas：補客戶端商業承諾：訂單、產能協議或預付款等付錢方向的證據",
+      "type": "decision_review"
     }
   ],
   "log": [
@@ -14985,8 +15036,26 @@
       "ref_id": "dc_0e9a6405f4acf3ad3aa89347d532ac22",
       "type": "decision_review",
       "verb": "go"
+    },
+    {
+      "at": "2026-09-01T15:05:00.097753+00:00",
+      "n": 359,
+      "reason": null,
+      "receipt": "wo:wo_60364930c16f95733296cfd3efaf152f",
+      "ref_id": "dc_912a03a50135ea5e29000a0417c3f477",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-09-01T15:05:11.478720+00:00",
+      "n": 359,
+      "reason": "客戶端綁定條款(5年/>50%/七位數)+互惠 RaaS 結構誠實標記入包",
+      "receipt": "action:ra_3d594f2ba7d0cb23c36a7656e43a2307",
+      "ref_id": "dc_912a03a50135ea5e29000a0417c3f477",
+      "type": "decision_review",
+      "verb": "pq1_awaiting_approval"
     }
   ],
-  "next_n": 405,
+  "next_n": 409,
   "schema_version": "1"
 }
