@@ -11261,9 +11261,11 @@
       "first_seen": "2026-09-01T01:14:48.425255+00:00",
       "lead_id": "lead_1deb20d98ab9585882a57b307d940f6c",
       "published_at": "2026-09-01",
-      "refs": {},
+      "refs": {
+        "research_action_id": "ra_ef824697819900205016d1580220ad38"
+      },
       "source": "decompose:tpu-ironwood-2026-09-01",
-      "status": "triaged_go",
+      "status": "action_prepared",
       "themes": {},
       "title": "[decompose D3|TPU] OCS 供應結構:TPU v4 論文確認 OCS 動態重構拓撲+光元件<5%系統成本;圖中 tech:ocs 僅 Lumentum 供應商自報一條邊——Google 量產 OCS(Palomar)是自製還是外購?找 Google 客戶端文件印證 Lumentum OCS 或確認自製排擠商用",
       "triage": {
@@ -23370,9 +23372,11 @@
       "first_seen": "2026-09-01T01:14:49.331076+00:00",
       "lead_id": "lead_64d1bb19c9eea1fcaf7580e0ffa5d843",
       "published_at": "2026-09-01",
-      "refs": {},
+      "refs": {
+        "research_action_id": "ra_ef824697819900205016d1580220ad38"
+      },
       "source": "decompose:tpu-ironwood-2026-09-01",
-      "status": "triaged_go",
+      "status": "action_prepared",
       "themes": {},
       "title": "[decompose D3|TPU] MEMS 鏡陣列層:Palomar OCS 的 MEMS 上游(Apollo 論文待抽)——圖中無 MEMS 節點。誰做 OCS 級 MEMS 鏡陣列、換掉要多久?",
       "triage": {
@@ -43135,9 +43139,11 @@
       "first_seen": "2026-09-01T01:14:48.724689+00:00",
       "lead_id": "lead_ccdc37ad3e3655d907064b8f3eeefde1",
       "published_at": "2026-09-01",
-      "refs": {},
+      "refs": {
+        "research_action_id": "ra_ef824697819900205016d1580220ad38"
+      },
       "source": "decompose:tpu-ironwood-2026-09-01",
-      "status": "triaged_go",
+      "status": "action_prepared",
       "themes": {},
       "title": "[decompose D3|TPU] 光循環器層:TPU ICI 單纖雙向依賴 optical circulator(v4 論文全文待逐字核對)——圖中無此節點。誰量產資料中心級 circulator、幾家能做?建節點+找供應商",
       "triage": {
@@ -48365,9 +48371,14 @@
       "first_seen": "2026-09-01T01:14:49.029472+00:00",
       "lead_id": "lead_e8c68c83ef5c3ee9b929bdc0d15a055d",
       "published_at": "2026-09-01",
-      "refs": {},
+      "refs": {
+        "parked_reason": "結構已由 Google 一手論文確立並入 RA(ra_ef824697819900205016d1580220ad38 涵蓋 OCS/MEMS/circulator 層);但『誰供應 Google ICI 光模組』在客戶端一手(TPU v4/Apollo 論文皆未具名 vendor)與 SemiAnalysis 免費段皆缺具名。依 L8 此缺口只能等交易對手方具名文件",
+        "trace_attempts_ref": "Apollo 論文:WDM transceivers 為 Google 客製共同設計、四代(40/100/200/400GbE),製造夥伴僅致謝詞泛稱 industry/vendor partners;SemiAnalysis TPUv7 免費段有 48 OCS/13,824 ports 規模數字(tier-3)但無模組供應商具名",
+        "trace_next_trigger": "任一光模組廠(Coherent/Innolight/Eoptolink/Fabrinet 等)財報或 filing 具名 Google ICI/OSFP 訂單;或 teardown/供應鏈報告具名;或 Google 揭露模組採購",
+        "trace_status": "awaiting_named_disclosure"
+      },
       "source": "decompose:tpu-ironwood-2026-09-01",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
