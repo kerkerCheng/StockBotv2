@@ -5931,17 +5931,18 @@
       "added_at": "2026-08-31T23:54:29.624234+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_4994dfb0d003bc0cd08a2ab6079c1495",
-      "dispatch_receipt": "action:ra_088315b395450faf7e10a29e44e8cd7e",
+      "dispatch_receipt": "decision:pd_e761c4c827da4956711035f0a1d79345",
       "dispatch_ref": "wo_99c06efe1286d7abc8031829dd366102",
-      "dispatch_status": "awaiting_approval",
-      "dispatch_updated_at": "2026-09-01T10:36:59.771950+00:00",
+      "dispatch_status": "completed",
+      "dispatch_updated_at": "2026-09-01T10:42:03.042567+00:00",
       "dispatched_at": "2026-09-01T09:10:35.289471+00:00",
       "hint": "當前 missing_data：JARE 公告（ASX 2026-03-10）與 Sojitz 客戶端公告（2025-10-30）尚未入圖——升級本軸 ；美國政府 US$96M binding LOI offtake（2026-03-16）僅二手轉述（rare-earth-（共 2 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 357,
-      "reason": null,
+      "reason": "JARE/Sojitz 客戶端一手入圖([385] applied)+backlog 觀測寫入(mo_e2014c1e)後 reassess;CM 留 bounded_hypothesis 理由誠實(單一買方集團/customer_concentration 未量化——年報前三大客戶% 是下一個缺口)",
+      "receipt": "decision:pd_e761c4c827da4956711035f0a1d79345",
       "ref_id": "dc_48446dbceb85d4b785634e3c4ca5d669",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-01T10:42:03.042567+00:00",
       "source": "decision_lab",
       "title": "co:lynas：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
@@ -6400,23 +6401,32 @@
       "added_at": "2026-09-01T10:35:51.385016+00:00",
       "hint": "go＝把該筆客戶承諾寫入 Engine C manual observation ledger(authority=engine_c_customer),寫入後 reassess dc_48446 清 CM blocker;不含入圖(另由 ra_admission 承載)、不含 thesis mutation",
       "n": 384,
-      "reason": null,
+      "reason": "使用者 385 384 go 批次核准的 exact 寫入;proposal po_5207c0b5 經 [388] complete-observation 落 ledger",
+      "receipt": "authority:engine_c_observation;ref:po_5207c0b5c65e3e75205518db7c04b05e",
       "ref_id": "manual:384",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-01T10:40:50.946306+00:00",
       "source": "manual",
       "title": "Engine C 觀測寫入提案(Lynas 客戶承諾):JARE firm offtake 5,000t NdPr/年+50% HRE+US\\$110/kg 地板價至 2038(ASX 2026-03-10 一手)",
       "type": "manual"
     },
     {
       "added_at": "2026-09-01T10:36:48.970317+00:00",
+      "completion_authority": {
+        "action_digest": "32f5256fe7c370cced29b445f8fa1b8d77f8f5211b1f341dfed881f5b5ce91a0",
+        "cohort_id": "dc_48446dbceb85d4b785634e3c4ca5d669",
+        "commit": "dbed1c5dd0adb3ba140c9c9ae005c1ad6631267c",
+        "company_id": "co:lynas",
+        "verified_at": "2026-09-01T10:38:26.775037+00:00"
+      },
       "graph_impact": "+4 節點、2 邊、2 claims｜來源：Lynas Rare Earths（受監管揭露之雙邊契約條款；對手方 JARE=JOGMEC+Sojitz SPV）（tier 1）、Sojitz Corporation（客戶端）（tier 2）",
       "hint": "核准 exact graph delta；Decision handoff：co:lynas。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 385,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_088315b395450faf7e10a29e44e8cd7e;digest:32f5256fe7c370cced29b445f8fa1b8d77f8f5211b1f341dfed881f5b5ce91a0;commit:dbed1c5dd0adb3ba140c9c9ae005c1ad6631267c;cohort:dc_48446dbceb85d4b785634e3c4ca5d669",
       "ref_id": "ra_088315b395450faf7e10a29e44e8cd7e",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-01T10:38:26.775037+00:00",
       "source": "research_action",
       "title": "Lynas 客戶端資本承諾落圖——JARE firm offtake(5,000t NdPr/50% HRE/US$110 地板價)+Sojitz 實際進口執行",
       "type": "ra_admission"
@@ -6444,6 +6454,19 @@
       "source": "decision_lab",
       "title": "co:hyperlight：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-01T10:40:41.453580+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-03-10T00:00:00+00:00；來源=ASX 公告 2026-03-10 Enhanced JARE Agreement(06x8fmmzvw1fm1.pdf)+Sojitz 官方新聞稿 2025-",
+      "n": 388,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_e2014c1e4de771c672ab8856e9c27fa4;proposal:po_5207c0b5c65e3e75205518db7c04b05e",
+      "ref_id": "po_5207c0b5c65e3e75205518db7c04b05e",
+      "resolution": "go",
+      "resolved_at": "2026-09-01T10:40:50.787946+00:00",
+      "source": "engine_c",
+      "title": "Engine C 觀測：LYC.AX / backlog",
+      "type": "engine_c_observation"
     }
   ],
   "log": [
@@ -14179,8 +14202,53 @@
       "ref_id": "dc_48446dbceb85d4b785634e3c4ca5d669",
       "type": "decision_review",
       "verb": "pq1_awaiting_approval"
+    },
+    {
+      "at": "2026-09-01T10:38:26.775037+00:00",
+      "n": 385,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_088315b395450faf7e10a29e44e8cd7e;digest:32f5256fe7c370cced29b445f8fa1b8d77f8f5211b1f341dfed881f5b5ce91a0;commit:dbed1c5dd0adb3ba140c9c9ae005c1ad6631267c;cohort:dc_48446dbceb85d4b785634e3c4ca5d669",
+      "ref_id": "ra_088315b395450faf7e10a29e44e8cd7e",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-01T10:40:50.787946+00:00",
+      "n": 388,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_e2014c1e4de771c672ab8856e9c27fa4;proposal:po_5207c0b5c65e3e75205518db7c04b05e",
+      "ref_id": "po_5207c0b5c65e3e75205518db7c04b05e",
+      "type": "engine_c_observation",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-01T10:40:50.946306+00:00",
+      "n": 384,
+      "reason": "使用者 385 384 go 批次核准的 exact 寫入;proposal po_5207c0b5 經 [388] complete-observation 落 ledger",
+      "receipt": "authority:engine_c_observation;ref:po_5207c0b5c65e3e75205518db7c04b05e",
+      "ref_id": "manual:384",
+      "type": "manual",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-01T10:42:03.042567+00:00",
+      "n": 357,
+      "reason": "JARE/Sojitz 客戶端一手入圖([385] applied)+backlog 觀測寫入(mo_e2014c1e)後 reassess;CM 留 bounded_hypothesis 理由誠實(單一買方集團/customer_concentration 未量化——年報前三大客戶% 是下一個缺口)",
+      "receipt": "decision:pd_e761c4c827da4956711035f0a1d79345",
+      "ref_id": "dc_48446dbceb85d4b785634e3c4ca5d669",
+      "type": "decision_review",
+      "verb": "pq1_completed"
+    },
+    {
+      "at": "2026-09-01T10:42:03.042567+00:00",
+      "n": 357,
+      "reason": "JARE/Sojitz 客戶端一手入圖([385] applied)+backlog 觀測寫入(mo_e2014c1e)後 reassess;CM 留 bounded_hypothesis 理由誠實(單一買方集團/customer_concentration 未量化——年報前三大客戶% 是下一個缺口)",
+      "receipt": "decision:pd_e761c4c827da4956711035f0a1d79345",
+      "ref_id": "dc_48446dbceb85d4b785634e3c4ca5d669",
+      "type": "decision_review",
+      "verb": "go"
     }
   ],
-  "next_n": 388,
+  "next_n": 389,
   "schema_version": "1"
 }
