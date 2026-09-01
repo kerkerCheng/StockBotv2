@@ -5914,8 +5914,10 @@
       "added_at": "2026-08-31T23:54:29.624234+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_9122e42205dbf3240e26c3db87882782",
+      "dispatch_receipt": "action:ra_dbe9710681d96f1ed481224c75c5e4b3",
       "dispatch_ref": "wo_6ae5ff6ec80e0a2120a4ccafcbfe8b58",
-      "dispatch_status": "queued",
+      "dispatch_status": "awaiting_approval",
+      "dispatch_updated_at": "2026-09-01T11:05:21.603062+00:00",
       "dispatched_at": "2026-09-01T09:10:38.767634+00:00",
       "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 356,
@@ -6467,6 +6469,31 @@
       "source": "engine_c",
       "title": "Engine C 觀測：LYC.AX / backlog",
       "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-09-01T11:06:17.935917+00:00",
+      "graph_impact": "+1 節點、0 邊、1 claims｜來源：Soitec（tier 2）",
+      "hint": "核准 exact graph delta；Decision handoff：co:soitec。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 389,
+      "reason": null,
+      "ref_id": "ra_dbe9710681d96f1ed481224c75c5e4b3",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "Soitec Photonics-SOI 財務量化入圖——FY26 官方業績:營收 >$100M、CPO 認證量已出貨",
+      "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-09-01T11:06:17.935917+00:00",
+      "hint": "當前 missing_data：customer_concentration：日本／JARE 佔營收比重（FY26 全年報告可查，尚未核對）；美國政府 US$96M binding LOI 的一手 ASX 公告核對（共 2 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "n": 390,
+      "reason": null,
+      "ref_id": "dc_48446dbceb85d4b785634e3c4ca5d669",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:lynas：補客戶端商業承諾：訂單、產能協議或預付款等付錢方向的證據",
+      "type": "decision_review"
     }
   ],
   "log": [
@@ -14247,8 +14274,26 @@
       "ref_id": "dc_48446dbceb85d4b785634e3c4ca5d669",
       "type": "decision_review",
       "verb": "go"
+    },
+    {
+      "at": "2026-09-01T11:05:10.068847+00:00",
+      "n": 356,
+      "reason": null,
+      "receipt": "wo:wo_6ae5ff6ec80e0a2120a4ccafcbfe8b58",
+      "ref_id": "dc_6e429d67c7b9e925a1b25874e9dcefd9",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-09-01T11:05:21.603062+00:00",
+      "n": 356,
+      "reason": "FY26 官方業績量化 Photonics-SOI(>USD100M)+CPO 認證出貨;客戶具名/URD contract liabilities 公開不可得,升級路徑寫入 claim",
+      "receipt": "action:ra_dbe9710681d96f1ed481224c75c5e4b3",
+      "ref_id": "dc_6e429d67c7b9e925a1b25874e9dcefd9",
+      "type": "decision_review",
+      "verb": "pq1_awaiting_approval"
     }
   ],
-  "next_n": 389,
+  "next_n": 391,
   "schema_version": "1"
 }
