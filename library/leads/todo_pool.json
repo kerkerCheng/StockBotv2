@@ -6008,6 +6008,19 @@
       "source": "research_action",
       "title": "TPU 光互連 OCS 層拆解落圖——Google 量產 OCS 是自製(Palomar),補 MEMS 鏡陣列與光循環器兩個缺失層",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-09-01T05:16:17.578034+00:00",
+      "graph_impact": "+4 節點、1 邊、2 claims｜來源：Lumentum（tier 1）、Coherent（tier 1）",
+      "hint": "核准 exact graph delta；Decision handoff：co:lumentum。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 364,
+      "reason": null,
+      "ref_id": "ra_8e8f98f3f7f3111a596d3f645e0b017c",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "WSS 覆蓋缺口補邊(Lumentum 10-K 自報)＋Coherent OCS 液晶技術資料點",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -13478,6 +13491,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 364,
+  "next_n": 365,
   "schema_version": "1"
 }
