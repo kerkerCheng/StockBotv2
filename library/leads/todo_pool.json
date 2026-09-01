@@ -6180,8 +6180,10 @@
       "added_at": "2026-09-01T05:43:30.794350+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_4c50eab5fc28acb84461c05c90e5210a",
+      "dispatch_receipt": "action:ra_b00f2b9a792a02a984c2ee6ffbad76f7",
       "dispatch_ref": "wo_b03a1b2a7712ad7a13b3a7e1eedab340",
-      "dispatch_status": "queued",
+      "dispatch_status": "awaiting_approval",
+      "dispatch_updated_at": "2026-09-01T11:52:47.592574+00:00",
       "dispatched_at": "2026-09-01T09:10:35.985886+00:00",
       "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 371,
@@ -6508,6 +6510,19 @@
       "resolved_at": null,
       "source": "research_action",
       "title": "商用 OCS 需求實體化入圖——Lumentum 8-K:OCS backlog >$400M+CPO 數億美元訂單(Google cohort 的獨立來源/反向極)",
+      "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-09-01T11:53:42.744000+00:00",
+      "graph_impact": "+2 節點、1 邊、1 claims｜來源：Nabtesco（tier 2）",
+      "hint": "核准 exact graph delta；Decision handoff：co:nabtesco。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 392,
+      "reason": null,
+      "ref_id": "ra_b00f2b9a792a02a984c2ee6ffbad76f7",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "Nabtesco RV 市占第二 origin 入圖——官方自報 60%(Nabtesco's estimate)與獨立通訊數字一致",
       "type": "ra_admission"
     }
   ],
@@ -14325,8 +14340,26 @@
       "ref_id": "dc_a51839bbf1429618556cf8bc265398c4",
       "type": "decision_review",
       "verb": "pq1_awaiting_approval"
+    },
+    {
+      "at": "2026-09-01T11:52:37.164771+00:00",
+      "n": 371,
+      "reason": null,
+      "receipt": "wo:wo_b03a1b2a7712ad7a13b3a7e1eedab340",
+      "ref_id": "dc_db19d3b490013f4cc464b2aab37b0bc8",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-09-01T11:52:47.592574+00:00",
+      "n": 371,
+      "reason": "官方自報 60%(estimate)+既有 Next Financial 第三方一致——雙 origin 印證",
+      "receipt": "action:ra_b00f2b9a792a02a984c2ee6ffbad76f7",
+      "ref_id": "dc_db19d3b490013f4cc464b2aab37b0bc8",
+      "type": "decision_review",
+      "verb": "pq1_awaiting_approval"
     }
   ],
-  "next_n": 392,
+  "next_n": 393,
   "schema_version": "1"
 }
