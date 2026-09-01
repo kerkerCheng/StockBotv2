@@ -1,0 +1,90 @@
+{
+  "claims": [
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Re-scope the Google captive-only claim if a customer-named disclosure (vendor filing, Google statement, or teardown) ties vendor OCS shipments to Google's Apollo/TPU infrastructure; downgrade vendor OCS momentum if backlog stops growing or converts poorly in subsequent quarters.",
+      "id": "lite_q2fy26_8k_ocs_backlog_cl1",
+      "source_ids": [
+        "lite_q2fy26_8k_ocs_backlog_s1"
+      ],
+      "statement": "Commercial (vendor) OCS demand is now material at SEC-filing grade: Lumentum's OCS backlog exceeds $400 million on extraordinary customer demand, and it received an incremental multi-hundred-million-dollar CPO order deliverable 1H CY2027 — customers unnamed. Relevance to the Google/Palomar cohort: this is the concrete disproof path of the in-house-only scoping materializing — third-party analyses attribute the bulk of 2026 external OCS procurement to Google, but no vendor filing names Google, so that attribution stays tier-3 unverified. If a named disclosure ties these backlogs to Google, the captive-vs-merchant OCS demand-pool separation must be re-scoped.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {
+        "qualification_status": "qualified",
+        "ramp_execution": 3,
+        "substitutability": 4
+      },
+      "confidence": 0.85,
+      "dst_id": "tech:ocs",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "lite_q2fy26_8k_ocs_backlog_s1"
+      ],
+      "src_id": "co:lumentum"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "LITE",
+        "Lumentum Operations LLC"
+      ],
+      "attributes": {
+        "ticker": "LITE"
+      },
+      "confidence": 0.9,
+      "id": "co:lumentum",
+      "name": "Lumentum",
+      "role": null,
+      "source_ids": [
+        "lite_q2fy26_8k_ocs_backlog_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "OCS"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 4
+      },
+      "confidence": 0.9,
+      "id": "tech:ocs",
+      "name": "Optical Circuit Switching (OCS)",
+      "role": null,
+      "source_ids": [
+        "lite_q2fy26_8k_ocs_backlog_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "lite_q2fy26_8k_ocs_backlog",
+    "evidence_tier": 1,
+    "origin_entity": "Lumentum",
+    "permission_basis": "Public SEC EDGAR filing; URL and short excerpts.",
+    "published_at": "2026-02-03",
+    "publisher": "SEC EDGAR",
+    "retrieved_at": "2026-09-01",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Lumentum Q2 FY2026 earnings release (8-K ex-99.1) — OCS backlog and CPO order",
+    "url": "https://www.sec.gov/Archives/edgar/data/1633978/000162828026005005/lite_ex991xq2fy26.htm"
+  },
+  "sources": [
+    {
+      "id": "lite_q2fy26_8k_ocs_backlog_s1",
+      "locator": "CEO quote — OCS/CPO opportunities",
+      "quote": "Our forward guidance calls for over 85 percent year-over-year revenue growth, yet we are only at the starting line for two substantial opportunities: optical circuit switches (OCS) and co-packaged optics (CPO). In OCS, we are scaling rapidly to meet extraordinary customer demand that has already driven our backlog well beyond $400 million. In CPO, we received an incremental multi-hundred-million-dollar order, deliverable in first half calendar 2027."
+    }
+  ]
+}
