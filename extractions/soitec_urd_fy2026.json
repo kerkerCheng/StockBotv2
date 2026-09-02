@@ -1,0 +1,63 @@
+{
+  "claims": [
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "guided",
+      "disproof_condition": "Downgrade if FY27 interim statutory reporting shows no growth in contract liabilities/customer advances despite the >10 reservation agreements described in August 2026, or if reserved volumes are cancelled/refunded; upgrade when any customer is named in a statutory filing (either side) or customer-side disclosure ties a reservation to Soitec.",
+      "id": "soitec_urd_fy2026_cl1",
+      "source_ids": [
+        "soitec_urd_fy2026_s1",
+        "soitec_urd_fy2026_s2"
+      ],
+      "statement": "Soitec's audited FY26 Universal Registration Document statutorily corroborates the capacity-reservation program: multi-year capacity reservation and volume commitment agreements signed with customers represent up to €1.1 billion in future sales at contracted prices (note 9.1, as of March 31, 2026), and non-current contract liabilities of €50.3m include €9,958k customer advances under multi-year sales contracts plus €40,330k related deferred income (note 8.14). This upgrades the August 2026 Reuters interview narrative to a regulated, audited disclosure and satisfies the 'statutory filing corroborates' half of the prior upgrade path. Limits: all counterparties remain unnamed; €1.1bn is a volume-commitment ceiling, not backlog or cash received; the customer-advance balance is slightly down year-on-year, so deposits from the agreements described in August 2026 are not yet visible on this balance sheet.",
+      "subject_id": "co:soitec"
+    }
+  ],
+  "edges": [],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "SOI.PA",
+        "Soitec S.A."
+      ],
+      "attributes": {
+        "ticker": "SOI.PA"
+      },
+      "confidence": 0.9,
+      "id": "co:soitec",
+      "name": "Soitec",
+      "role": null,
+      "source_ids": [
+        "soitec_urd_fy2026_s1"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "soitec_urd_fy2026",
+    "evidence_tier": 1,
+    "origin_entity": "Soitec（發行人法定年度文件,經審計財報）",
+    "permission_basis": "Public regulated filing (AMF); URL and short excerpts, full PDF local.",
+    "published_at": "2026-06-10",
+    "publisher": "Soitec",
+    "retrieved_at": "2026-09-02",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Soitec 2025-2026 Universal Registration Document (AMF filed 2026-06-10, English courtesy translation)",
+    "url": "https://www.soitec.com/docs/default-source/agm-documents/2026/en/soitec---2025-2026-urd---va.pdf"
+  },
+  "sources": [
+    {
+      "id": "soitec_urd_fy2026_s1",
+      "locator": "Note 9.1 Commitments — Other trade obligations (printed p.279)",
+      "quote": "The Group has also signed various multi-year capacity reservation and volume commitment agreements with certain customers. These agreements represent a commitment for customers to purchase, and for the Group to supply, the allocated volumes as planned, which could represent up to €1.1 billion in future sales, based on the prices set out in these agreements."
+    },
+    {
+      "id": "soitec_urd_fy2026_s2",
+      "locator": "Note 8.14 Provisions, other non-current liabilities (printed p.275)",
+      "quote": "Contract liabilities include: customer advances obtained under multi-year sales contracts amounting to €9,958 thousand (versus €11,200 thousand in the previous fiscal year); and deferred income of €40,330 thousand relating to contract liabilities under multi-year sales contracts, recognized as and when control of the goods and services concerned is transferred."
+    }
+  ]
+}
