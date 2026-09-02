@@ -156,6 +156,36 @@
         "receipt": "lead_4c082f76 pq1 追源：Reuters 2026-08-04（Caixin/Tom's Hardware/Network World 多家一致）證實 FCC preparing measure banning US imports of new Chinese optical transceiver modules，擬年內發布；正式文本未出（lead parked 等 FCC 發布）。受益股當日反應：LITE +7%/COHR +11%/AAOI +18%",
         "at": "2026-08-31T05:44:49.488823+00:00"
       }
+    },
+    {
+      "hypothesis_id": "hy_0006_2026-09-02",
+      "created_at": "2026-09-01T22:46:58.475393+00:00",
+      "expires": "2026-12-31",
+      "status": "active",
+      "source_handle": "aleabitoreddit",
+      "lead_id": "lead_66075f8a2712979c5c1403d078d5c37e",
+      "statement": "Anthropic 與 Lambda 簽訂價值 350 億美元的 AI 算力供應合約。",
+      "edges": [
+        {
+          "src_id": "co:lambda_labs",
+          "relation": "supplies_to",
+          "dst_id": "co:anthropic",
+          "attributes": {
+            "contract_value_usd": 35000000000,
+            "product": "AI compute capacity"
+          }
+        }
+      ],
+      "facts": [
+        {
+          "claim": "Anthropic signs a $35B AI compute deal with Lambda",
+          "claimed_origin": "Wall Street Journal report relayed by social post"
+        }
+      ],
+      "skeleton_ref": "",
+      "watch_id": "",
+      "note": "截至 2026-09-02 未找到 Anthropic 或 Lambda 一手公告；僅供 what-if 排序，永不入圖。",
+      "verified_by": null
     }
   ],
   "source_credibility": {

@@ -42,8 +42,18 @@
         "query_hint": "AAOI Applied Optoelectronics Q3 2026 earnings guidance Q4 revenue outlook"
       },
       "note": "",
-      "status": "active",
-      "woken_by": null
+      "status": "fired",
+      "woken_by": {
+        "kind": "fact_verification",
+        "lead_id": "lead_784638384b09744c90b7efc253f62704",
+        "shared_entities": [
+          "AAOI",
+          "co:applied_optoelectronics"
+        ],
+        "at": "2026-09-01T22:36:17.651757+00:00",
+        "fact": "AAOI Q3 2026 財報 guidance 公布後，以 Q4 營收下緣設定可觀測 disproof 門檻",
+        "fact_check_ref": "engine_c:AAOI:revenue_guidance"
+      }
     },
     {
       "watch_id": "ew_0003_2026-08-31",
@@ -166,8 +176,19 @@
         "query_hint": ""
       },
       "note": "",
-      "status": "active",
-      "woken_by": null
+      "status": "fired",
+      "woken_by": {
+        "kind": "fact_verification",
+        "lead_id": "lead_784638384b09744c90b7efc253f62704",
+        "shared_entities": [
+          "AAOI",
+          "co:applied_optoelectronics"
+        ],
+        "at": "2026-09-01T22:36:17.651790+00:00",
+        "fact": "AAOI 產能售罄至 2H＋美國產線溢價（summit 截圖）——對照 Q3 財報 ASP/毛利/產能陳述",
+        "fact_check_ref": "AAOI Q3 2026 10-Q/法說",
+        "hypothesis_ref": "hy_0004_2026-08-31"
+      }
     },
     {
       "watch_id": "ew_0008_2026-08-31",
@@ -1975,6 +1996,221 @@
         "eligible": false,
         "last_checked": null,
         "query_hint": "Tesla filing/法說具名 actuator 供應商,或拓普/三花/臥龍在自家公告(非媒體)揭露 Tesla 機器人訂單"
+      },
+      "note": "park 時自動建立；trace_status=isolated_tier_3",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0061_2026-09-01",
+      "created_at": "2026-09-01T22:37:37.378488+00:00",
+      "expires": "2026-12-31",
+      "kind": "related_entity_signal",
+      "until": null,
+      "entities": [
+        "COHR",
+        "GOOGL",
+        "LITE",
+        "co:coherent",
+        "co:google",
+        "co:lumentum"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_e8c68c83ef5c3ee9b929bdc0d15a055d",
+      "consumed_entities": [],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "Google ICI／TPU OSFP 光收發模組供應商具名披露"
+      },
+      "note": "2026-09-02 Daily 修復 unwatched trace；只喚醒 pq1，不提高 tier、不入圖",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0062_2026-09-01",
+      "created_at": "2026-09-01T22:38:16.503391+00:00",
+      "expires": "2026-12-31",
+      "kind": "related_entity_signal",
+      "until": null,
+      "entities": [
+        "co:unitree"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_441728fb0dd26789a677971d375b4a31",
+      "consumed_entities": [],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "Unitree G1 teardown 具名 LiDAR 或深度相機供應商"
+      },
+      "note": "2026-09-02 Daily 修復 unwatched trace；只喚醒 pq1，不提高 tier、不入圖",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0063_2026-09-01",
+      "created_at": "2026-09-01T22:38:16.904581+00:00",
+      "expires": "2026-12-31",
+      "kind": "related_entity_signal",
+      "until": null,
+      "entities": [
+        "co:unitree"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_861daa2e0023d608dfb6a0c8b8bc45fc",
+      "consumed_entities": [],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "Unitree Dex3 teardown 具名觸覺感測陣列供應商"
+      },
+      "note": "2026-09-02 Daily 修復 unwatched trace；只喚醒 pq1，不提高 tier、不入圖",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0064_2026-09-01",
+      "created_at": "2026-09-01T22:38:17.313455+00:00",
+      "expires": "2026-12-31",
+      "kind": "entity_filing_signal",
+      "until": null,
+      "entities": [
+        "co:proterial"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_6c6eeb4f55149bc2857322229673e5b8",
+      "consumed_entities": [],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "Proterial GBD 專利授權或訴訟一手揭露"
+      },
+      "note": "2026-09-02 Daily 修復 unwatched trace；只喚醒 pq1，不提高 tier、不入圖",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0065_2026-09-01",
+      "created_at": "2026-09-01T22:36:17.946500+00:00",
+      "expires": "2026-12-30",
+      "kind": "related_entity_signal",
+      "until": null,
+      "entities": [
+        "AAOI",
+        "GPRO",
+        "co:applied_optoelectronics"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_8dd4d56f7e99ca94983ea9de53b817be",
+      "consumed_entities": [],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "GoPro proxy、交易 closing 或 Starman 公布具名 800G／1.6T transceiver 規格"
+      },
+      "note": "park 時自動建立；trace_status=partial",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0066_2026-09-01",
+      "created_at": "2026-09-01T22:36:11.594012+00:00",
+      "expires": "2026-12-30",
+      "kind": "related_entity_signal",
+      "until": null,
+      "entities": [
+        "AAPL",
+        "AMD",
+        "AMZN",
+        "AVGO",
+        "AXTI",
+        "CAPA",
+        "CXMT",
+        "GOOGL",
+        "INTC",
+        "MRVL",
+        "NVDA",
+        "SHA0.DE",
+        "SKHY",
+        "SOI",
+        "SPCX",
+        "STM",
+        "co:amd",
+        "co:apple",
+        "co:axt",
+        "co:broadcom",
+        "co:google",
+        "co:intel",
+        "co:marvell_technology",
+        "co:nvidia",
+        "co:schaeffler",
+        "co:sk_hynix",
+        "co:soitec"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_26bd4214b4b0434765071f14a7a955e4",
+      "consumed_entities": [
+        "CO:GOOGLE",
+        "GOOGL"
+      ],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "相關公司正式 filing、IR 或交易對手具名公告支持尚未核實 atoms"
+      },
+      "note": "park 時自動建立；trace_status=partial",
+      "status": "fired",
+      "woken_by": {
+        "kind": "related_entity_signal",
+        "lead_id": "lead_4529c66f2414f1fa331f8567836c589b",
+        "shared_entities": [
+          "GOOGL",
+          "co:google"
+        ],
+        "at": "2026-09-01T22:50:24.710969+00:00",
+        "wake_lead": "lead_26bd4214b4b0434765071f14a7a955e4"
+      }
+    },
+    {
+      "watch_id": "ew_0067_2026-09-01",
+      "created_at": "2026-09-01T22:36:13.076858+00:00",
+      "expires": "2026-12-30",
+      "kind": "related_entity_signal",
+      "until": null,
+      "entities": [
+        "HUT",
+        "NVDA",
+        "co:nvidia"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_66075f8a2712979c5c1403d078d5c37e",
+      "consumed_entities": [],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "Anthropic、Lambda、NVIDIA 或 Hut 8 正式公告具名算力合約"
       },
       "note": "park 時自動建立；trace_status=isolated_tier_3",
       "status": "active",
