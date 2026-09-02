@@ -1,0 +1,104 @@
+{
+  "claims": [
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Downgrade if Meta's CPO evaluation ends without fleet adoption (subsequent OCP/engineering disclosures choosing pluggables/other vendors), or if reliability claims fail to replicate at fleet scale; upgrade when the canonical ECOC 2025 paper full text is obtained, or Meta/another hyperscaler announces volume CPO deployment with Broadcom.",
+      "id": "meta_bailly_ecoc2025_via_nextplatform_cl1",
+      "source_ids": [
+        "meta_bailly_ecoc2025_via_nextplatform_s1",
+        "meta_bailly_ecoc2025_via_nextplatform_s2",
+        "meta_bailly_ecoc2025_via_nextplatform_s3",
+        "meta_bailly_ecoc2025_via_nextplatform_s4"
+      ],
+      "statement": "Customer-side corroboration for Broadcom's CPO position: Meta researchers' own ECOC 2025 paper reports operating 15 Bailly 51.2T CPO switches past 1 million device hours with zero link flaps — self-described as the highest system-level device hours reported for CPO — with lower-bound optical-link MTBF sufficient for a 24K GPU AI cluster at >90% training efficiency, and 65% lower power per 100G lane versus retimed pluggables. This is the hyperscaler customer naming and quantifying Broadcom's CPO in production-representative operation, upgrading an edge previously supported only by Broadcom self-report. Limits: 15-switch trial scale, not fleet deployment; Meta's concurrently announced Minipack3N is non-CPO (Spectrum-4), so CPO remains in evaluation not standard; quotes carried by trade press — canonical ECOC paper full text not yet public (upgrade trigger).",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:cpo",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "meta_bailly_ecoc2025_via_nextplatform_s1",
+        "meta_bailly_ecoc2025_via_nextplatform_s2",
+        "meta_bailly_ecoc2025_via_nextplatform_s3"
+      ],
+      "src_id": "co:broadcom"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "AVGO"
+      ],
+      "attributes": {
+        "ticker": "AVGO"
+      },
+      "confidence": 0.9,
+      "id": "co:broadcom",
+      "name": "Broadcom",
+      "role": null,
+      "source_ids": [
+        "meta_bailly_ecoc2025_via_nextplatform_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "co-packaged optics",
+        "共封裝光學"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:cpo",
+      "name": "Co-Packaged Optics (CPO)",
+      "role": null,
+      "source_ids": [
+        "meta_bailly_ecoc2025_via_nextplatform_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "meta_bailly_ecoc2025_via_nextplatform",
+    "evidence_tier": 2,
+    "origin_entity": "Meta（客戶端自著論文,NextPlatform 逐字轉載;canonical=ECOC 2025 presentation 167）",
+    "permission_basis": "Public trade press quoting conference paper; URL and short excerpts.",
+    "published_at": "2025-10-17",
+    "publisher": "The Next Platform",
+    "retrieved_at": "2026-09-03",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Meta ECOC 2025 Bailly CPO deployment paper (verbatim via The Next Platform, 2025-10-17)",
+    "url": "https://www.nextplatform.com/connect/2025/10/17/the-third-time-will-be-the-charm-for-broadcom-switch-co-packaged-optics/1635588"
+  },
+  "sources": [
+    {
+      "id": "meta_bailly_ecoc2025_via_nextplatform_s1",
+      "locator": "Article — Meta paper quote, reliability",
+      "quote": "Over the first 1 million device hours with the Bailly switches...there were zero link flaps observed."
+    },
+    {
+      "id": "meta_bailly_ecoc2025_via_nextplatform_s2",
+      "locator": "Article — Meta paper quote, record",
+      "quote": "To the best of our knowledge, this is the highest device hours reported for CPO technology operation at the system level."
+    },
+    {
+      "id": "meta_bailly_ecoc2025_via_nextplatform_s3",
+      "locator": "Article — Meta paper quote, MTBF",
+      "quote": "The demonstrated lower bound mean time between failures of (MTBFs) of optical links can readily support a 24K GPU AI cluster with >90 percent training efficiency without interconnect failures being the bottleneck."
+    },
+    {
+      "id": "meta_bailly_ecoc2025_via_nextplatform_s4",
+      "locator": "Article — power",
+      "quote": "the Bailly CPO switch optics delivered 65 percent lower power per 100 Gb/sec lane compared to retimed pluggable optical models."
+    }
+  ]
+}

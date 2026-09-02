@@ -1,0 +1,4 @@
+Source URL: https://www.nextplatform.com/connect/2025/10/17/the-third-time-will-be-the-charm-for-broadcom-switch-co-packaged-optics/1635588
+
+Excerpt:
+Over the first 1 million device hours with the Bailly switches...there were zero link flaps observed... the highest device hours reported for CPO technology operation at the system level... can readily support a 24K GPU AI cluster with >90 percent training efficiency... 65 percent lower power per 100 Gb/sec lane. (Meta ECOC 2025 paper via The Next Platform, 2025-10-17)
