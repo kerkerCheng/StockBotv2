@@ -7512,6 +7512,19 @@
       "source": "research_action",
       "title": "光循環器層獲首個具名供應商——Coherent 官方 PR:垂直整合 circulator 技術+bi-di adaptor 產品;同組 PR 補 Coherent 300x300 LCoS OCS 邊",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-09-02T16:14:13.223705+00:00",
+      "graph_impact": "+3 節點、2 邊、1 claims｜來源：Marvell/Lumentum（雙發行人聯合官方新聞稿,Marvell IR 頁載）（tier 2）",
+      "hint": "核准 exact graph delta；Decision handoff：co:lumentum。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 451,
+      "reason": null,
+      "ref_id": "ra_829d84d8bd4085a33d2e49d2be86da11",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "Scale-up 光互連層補供應商——Marvell×Lumentum OFC 2026 官方 PR:R300 OCS+光學 DSP 直攻 AI scale-up;同時釐清 scale-up CPO 與 OCS 是兩條路線",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -16428,6 +16441,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 451,
+  "next_n": 452,
   "schema_version": "1"
 }
