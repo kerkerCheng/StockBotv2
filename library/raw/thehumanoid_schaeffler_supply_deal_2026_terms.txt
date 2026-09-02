@@ -1,0 +1,4 @@
+Source URL: https://thehumanoid.ai/humanoid-secures-landmark-deal-with-schaeffler-to-deploy-thousands-of-humanoid-robots/
+
+Excerpt:
+Humanoid has also signed a 5-year supply agreement with Schaeffler for supply of actuators. Under this agreement, Schaeffler will become Humanoid's preferred supplier, covering more than 50% of the company's demand for joint actuators for its wheeled-based platforms through 2031... seven-digit number of actuators... The agreement is structured around a Robot-as-a-Service (RaaS) model... four-digit number of wheeled units across Schaeffler's global facilities by 2032. (Humanoid, 2026-05-13)

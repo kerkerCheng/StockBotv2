@@ -1,0 +1,70 @@
+{
+  "claims": [],
+  "edges": [],
+  "nodes": [
+    {
+      "abstraction_level": "robot_subsystem",
+      "aliases": [
+        "SHA0.DE",
+        "Schaeffler AG"
+      ],
+      "attributes": {
+        "ticker": "SHA0.DE"
+      },
+      "confidence": 0.9,
+      "id": "co:schaeffler",
+      "name": "Schaeffler",
+      "role": null,
+      "source_ids": [
+        "schaeffler_humanoid_partnership_pr_2026_01_13_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "robot_system",
+      "aliases": [
+        "Humanoid Ltd"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:humanoid",
+      "name": "Humanoid",
+      "role": null,
+      "source_ids": [
+        "schaeffler_humanoid_partnership_pr_2026_01_13_s2"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "schaeffler_humanoid_partnership_pr_2026_01_13",
+    "evidence_tier": 2,
+    "origin_entity": "Schaeffler",
+    "permission_basis": "Public press release; URL and short excerpts.",
+    "published_at": "2026-01-13",
+    "publisher": "Schaeffler Group",
+    "retrieved_at": "2026-09-01",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Schaeffler IR release — Schaeffler and Humanoid enter strategic technology partnership",
+    "url": "https://www.schaeffler.com/en/media/press-releases/press-releases-detail.jsp?id=88159810"
+  },
+  "sources": [
+    {
+      "id": "schaeffler_humanoid_partnership_pr_2026_01_13_s1",
+      "locator": "PR — supplier position",
+      "quote": "Schaeffler is becoming the preferred supplier of actuators for wheeled systems."
+    },
+    {
+      "id": "schaeffler_humanoid_partnership_pr_2026_01_13_s2",
+      "locator": "PR — reciprocal robot integration",
+      "quote": "Schaeffler is planning to integrate several hundred humanoids into its global production network over the next five years to further increase the automation and efficiency of its production processes."
+    },
+    {
+      "id": "schaeffler_humanoid_partnership_pr_2026_01_13_s3",
+      "locator": "PR — scope",
+      "quote": "The collaboration will focus on the development and supply of key components, including innovative actuators used in both wheeled-base and bipedal (two-legged) humanoids."
+    }
+  ]
+}

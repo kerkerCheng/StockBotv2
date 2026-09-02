@@ -1,0 +1,107 @@
+{
+  "claims": [
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Lower if the agreement is terminated/renegotiated below the 50% share, or if Humanoid's platform volumes fail to materialize (watch first Germany go-lives by end-2026 and cumulative deployments vs the four-digit 2032 target); upgrade to clean customer commitment only if prepayment/equity or non-reciprocal terms are disclosed.",
+      "id": "thehumanoid_schaeffler_supply_deal_2026_terms_cl1",
+      "source_ids": [
+        "thehumanoid_schaeffler_supply_deal_2026_terms_s1",
+        "thehumanoid_schaeffler_supply_deal_2026_terms_s2",
+        "thehumanoid_schaeffler_supply_deal_2026_terms_s3",
+        "thehumanoid_schaeffler_supply_deal_2026_terms_s4"
+      ],
+      "statement": "Customer-side binding terms now quantify the Schaeffler→Humanoid actuator relationship: 5-year agreement, Schaeffler as preferred supplier covering MORE THAN 50% of Humanoid's joint-actuator demand for wheeled platforms through 2031, expected seven-digit actuator volumes. Substitutability judged 3/5: a binding majority-share commitment is a real lock, but the remaining <50% stays open and the term is finite. ⚠ Reciprocity honestly flagged: the same deal has Schaeffler deploying a four-digit number of Humanoid robots under a RaaS model (Schaeffler pays Humanoid for robot services) — both parties are each other's customers with no equity/prepayment disclosed, so per this graph's payment-direction discipline the commitment is NOT counted as clean customer-to-supplier capital commitment (POET rule); it is a strong reciprocal design-in.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {
+        "qualification_status": "designed_in",
+        "substitutability": 3
+      },
+      "confidence": 0.9,
+      "dst_id": "co:humanoid",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "thehumanoid_schaeffler_supply_deal_2026_terms_s1",
+        "thehumanoid_schaeffler_supply_deal_2026_terms_s2"
+      ],
+      "src_id": "co:schaeffler"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "robot_subsystem",
+      "aliases": [
+        "SHA0.DE",
+        "Schaeffler AG"
+      ],
+      "attributes": {
+        "ticker": "SHA0.DE"
+      },
+      "confidence": 0.9,
+      "id": "co:schaeffler",
+      "name": "Schaeffler",
+      "role": null,
+      "source_ids": [
+        "thehumanoid_schaeffler_supply_deal_2026_terms_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "robot_system",
+      "aliases": [
+        "Humanoid Ltd"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:humanoid",
+      "name": "Humanoid",
+      "role": null,
+      "source_ids": [
+        "thehumanoid_schaeffler_supply_deal_2026_terms_s1"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "thehumanoid_schaeffler_supply_deal_2026_terms",
+    "evidence_tier": 2,
+    "origin_entity": "Humanoid（客戶端）",
+    "permission_basis": "Public company announcement; URL and short excerpts.",
+    "published_at": "2026-05-13",
+    "publisher": "Humanoid",
+    "retrieved_at": "2026-09-01",
+    "section": "supply_terms",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Humanoid announcement — landmark deal with Schaeffler (supply terms excerpts)",
+    "url": "https://thehumanoid.ai/humanoid-secures-landmark-deal-with-schaeffler-to-deploy-thousands-of-humanoid-robots/"
+  },
+  "sources": [
+    {
+      "id": "thehumanoid_schaeffler_supply_deal_2026_terms_s1",
+      "locator": "Announcement — actuator supply agreement",
+      "quote": "Humanoid has also signed a 5-year supply agreement with Schaeffler for supply of actuators. Under this agreement, Schaeffler will become Humanoid's preferred supplier, covering more than 50% of the company's demand for joint actuators for its wheeled-based platforms through 2031."
+    },
+    {
+      "id": "thehumanoid_schaeffler_supply_deal_2026_terms_s2",
+      "locator": "Announcement — volume expectation",
+      "quote": "This partnership is expected to translate into the supply of a seven-digit number of actuators."
+    },
+    {
+      "id": "thehumanoid_schaeffler_supply_deal_2026_terms_s3",
+      "locator": "Announcement — deployment and RaaS structure",
+      "quote": "The agreement is structured around a Robot-as-a-Service (RaaS) model. Under this model, Humanoid provides the robotic systems together with the related services required for end-to-end deployment and operation."
+    },
+    {
+      "id": "thehumanoid_schaeffler_supply_deal_2026_terms_s4",
+      "locator": "Announcement — deployment scale",
+      "quote": "It targets deployment of a four-digit number of wheeled units across Schaeffler's global facilities by 2032."
+    }
+  ]
+}
