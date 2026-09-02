@@ -27188,9 +27188,12 @@
       "first_seen": "2026-09-02T11:47:08.530785+00:00",
       "lead_id": "lead_74a5f43620c6f4853615b2c0b475c953",
       "published_at": null,
-      "refs": {},
+      "refs": {
+        "research_action_id": "ra_47c9a8f24ece42269ce3c0233bdcb2d2",
+        "trace_status": "partial"
+      },
       "source": "coverage-gap-2026-09-02",
-      "status": "triaged_go",
+      "status": "action_prepared",
       "themes": {},
       "title": "[decompose 殘骸|TPU] tech:optical_circulator 零供應商——誰量產資料中心級光循環器(TPU ICI 單纖雙向依賴)?具名供應商+量產規模+替代性初判",
       "triage": {
