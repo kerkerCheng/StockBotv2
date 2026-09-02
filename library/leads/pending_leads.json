@@ -18280,10 +18280,12 @@
       "lead_id": "lead_42f589d3ca6c7cf96f8fe5354a816fd8",
       "published_at": null,
       "refs": {
+        "action_digest": "b830cf0c4b246e70ba6a27a891596e703413066df2eb9a99969136dcd20a6714",
+        "focus_company_id": "co:unitree",
         "research_action_id": "ra_d9a15aa2a92393eea0053fdfdd29635b"
       },
       "source": "decompose:unitree-g1-2026-09-01",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {},
       "title": "[decompose D6|G1] 減速機方案層:G1 官方規格只寫 PMSM 關節馬達(膝 90/120N.m)與全關節中空走線,減速方案(諧波/行星/自研)完全未揭露。圖中 Next Financial 已稱雙環傳動 supplies Unitree——用 teardown/雙環年報驗證 G1 減速機供應鏈,連機器人群",
       "triage": {

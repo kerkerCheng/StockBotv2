@@ -6859,13 +6859,21 @@
     },
     {
       "added_at": "2026-09-01T15:35:23.916248+00:00",
+      "completion_authority": {
+        "action_digest": "b830cf0c4b246e70ba6a27a891596e703413066df2eb9a99969136dcd20a6714",
+        "cohort_id": "dc_1322bfc1c743fa746b76e280c1b27b28",
+        "commit": "9a41c23d2ad87b48f396fb74a310276edb723555",
+        "company_id": "co:unitree",
+        "verified_at": "2026-09-02T00:47:49.394119+00:00"
+      },
       "graph_impact": "+3 節點、2 邊、1 claims｜來源：Harper Adams University 研究團隊（獨立學術第三方,非 Unitree 非減速器供應商）（tier 2）",
       "hint": "核准 exact graph delta；Decision handoff：co:unitree。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 409,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_d9a15aa2a92393eea0053fdfdd29635b;digest:b830cf0c4b246e70ba6a27a891596e703413066df2eb9a99969136dcd20a6714;commit:9a41c23d2ad87b48f396fb74a310276edb723555;cohort:dc_1322bfc1c743fa746b76e280c1b27b28",
       "ref_id": "ra_d9a15aa2a92393eea0053fdfdd29635b",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-02T00:47:49.394119+00:00",
       "source": "research_action",
       "title": "G1 減速機方案實錘——學術第三方:每關節 BLDC+諧波減速器(含 co:unitree onboard),接上 strain wave 層",
       "type": "ra_admission"
@@ -15159,6 +15167,15 @@
       "ref_id": "dc_0e9a6405f4acf3ad3aa89347d532ac22",
       "type": "decision_review",
       "verb": "pending"
+    },
+    {
+      "at": "2026-09-02T00:47:49.394119+00:00",
+      "n": 409,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_d9a15aa2a92393eea0053fdfdd29635b;digest:b830cf0c4b246e70ba6a27a891596e703413066df2eb9a99969136dcd20a6714;commit:9a41c23d2ad87b48f396fb74a310276edb723555;cohort:dc_1322bfc1c743fa746b76e280c1b27b28",
+      "ref_id": "ra_d9a15aa2a92393eea0053fdfdd29635b",
+      "type": "ra_admission",
+      "verb": "go"
     }
   ],
   "next_n": 410,
