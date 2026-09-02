@@ -13680,11 +13680,13 @@
       "lead_id": "lead_29a90e4ebae256652f94c26a5acc6980",
       "published_at": null,
       "refs": {
+        "action_digest": "cfba09b959548b6092ca529b0373f43ce034c43cc7ae9af83f17835e774fb2a3",
+        "focus_company_id": "co:coherent",
         "research_action_id": "ra_925a4741740c9e3e527a455430544220",
         "trace_status": "partial"
       },
       "source": "decompose-palomar-ocs-2026-09-02",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {},
       "title": "[decompose|Palomar OCS] 2D 光纖準直器陣列層(NxN fiber array+2D lens array,每台兩組)——OCS 光路入口;與 FAU/Largan/FOCI parked lead 同族。誰做?圖中無此節點",
       "triage": {
@@ -15475,11 +15477,13 @@
       "lead_id": "lead_32512d1557af2b2c44950ba8edbff600",
       "published_at": null,
       "refs": {
+        "action_digest": "e3b8c1857ded753a817f676ed43d36d12c7be88cddb9045b98c90a4a929a8967",
+        "focus_company_id": "co:coherent",
         "research_action_id": "ra_93d828e3d06f8be197a1bbcc041831ee",
         "trace_status": "partial"
       },
       "source": "decompose-palomar-ocs-2026-09-02",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {},
       "title": "[decompose|Palomar OCS] 磁光石榴石(Garnet)Faraday rotator 材料層——circulator 心臟;Apollo 論文逐字:歷史上 C-band EDFA 小量市場,Google 放量到 O-band 資料中心規模。誰長晶/誰供應?圖中無此節點",
       "triage": {
@@ -16878,6 +16882,44 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2079502019933732884"
+    },
+    "lead_3a42f692ec4e0421323aca7bbfd2538e": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-02T13:14:03.162333+00:00",
+      "lead_id": "lead_3a42f692ec4e0421323aca7bbfd2538e",
+      "published_at": null,
+      "refs": {},
+      "source": "bottleneck-run-2026-09-02",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "AVGO",
+            "CPO"
+          ]
+        }
+      },
+      "title": "[排序缺口] AVGO CPO 邊客戶端證據——純結構第 2 但 needs_review;找客戶端/第三方文件(hyperscaler 具名採用 Bailly/Davisson CPO)升級 evidence",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-02T13:14:14.609084+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "ranking",
+          "reason": "單跑瓶頸輸出點名:AVGO CPO 純結構第2但 needs_review;bounded research 找客戶端印證"
+        },
+        "decided_at": "2026-09-02T13:14:14.609084+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "單跑瓶頸輸出點名:AVGO CPO 純結構第2但 needs_review;bounded research 找客戶端印證",
+        "tier": 2
+      },
+      "url": "https://investors.broadcom.com/?gap=avgo_cpo_customer_evidence"
     },
     "lead_3a4468d30e6a22eb826a8c8157682b64": {
       "entities": {

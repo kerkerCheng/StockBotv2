@@ -371,6 +371,13 @@
       "research_ticker": null
     },
     {
+      "company_id": "co:novanta",
+      "research_ticker": "NOVT",
+      "market_currency": "USD",
+      "execution_currency": "USD",
+      "execution_venue": "NASDAQ"
+    },
+    {
       "company_id": "co:nvidia",
       "research_ticker": "NVDA",
       "market_currency": "USD"

@@ -7410,26 +7410,42 @@
     },
     {
       "added_at": "2026-09-02T12:52:43.700977+00:00",
+      "completion_authority": {
+        "action_digest": "cfba09b959548b6092ca529b0373f43ce034c43cc7ae9af83f17835e774fb2a3",
+        "cohort_id": "dc_957bff3701ea4e46d962bfb9ff0932c8",
+        "commit": "f90aa27018b19ca5eb06e45744a71837f0d5f44b",
+        "company_id": "co:coherent",
+        "verified_at": "2026-09-02T13:01:58.910074+00:00"
+      },
       "graph_impact": "+3 節點、1 邊、2 claims｜來源：Coherent（發行人新聞稿,經 gurufocus 轉載,原稿 403）（tier 3）、Telescent（機器人配線系統商,OCS 競品側技術評論——利益相關,只採工程量化句）（tier 3）",
       "hint": "核准 exact graph delta；Decision handoff：co:coherent。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 444,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_925a4741740c9e3e527a455430544220;digest:cfba09b959548b6092ca529b0373f43ce034c43cc7ae9af83f17835e774fb2a3;commit:f90aa27018b19ca5eb06e45744a71837f0d5f44b;cohort:dc_957bff3701ea4e46d962bfb9ff0932c8",
       "ref_id": "ra_925a4741740c9e3e527a455430544220",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-02T13:01:58.910074+00:00",
       "source": "research_action",
       "title": "OCS 準直器陣列層落圖——Palomar 拆解新層獲雙源:Coherent 2025-03 產品化 2D Collimator Array+Telescent 直指其為大埠數 OCS 的產能瓶頸",
       "type": "ra_admission"
     },
     {
       "added_at": "2026-09-02T12:55:43.358387+00:00",
+      "completion_authority": {
+        "action_digest": "e3b8c1857ded753a817f676ed43d36d12c7be88cddb9045b98c90a4a929a8967",
+        "cohort_id": "dc_957bff3701ea4e46d962bfb9ff0932c8",
+        "commit": "9cae0b6b622b253c8bc2a0e6ab4dbafdf5ded4ee",
+        "company_id": "co:coherent",
+        "verified_at": "2026-09-02T13:02:00.337634+00:00"
+      },
       "graph_impact": "+2 節點、1 邊、1 claims｜來源：Coherent（供應商官方產品 datasheet）（tier 2）",
       "hint": "核准 exact graph delta；Decision handoff：co:coherent。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 445,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_93d828e3d06f8be197a1bbcc041831ee;digest:e3b8c1857ded753a817f676ed43d36d12c7be88cddb9045b98c90a4a929a8967;commit:9cae0b6b622b253c8bc2a0e6ab4dbafdf5ded4ee;cohort:dc_957bff3701ea4e46d962bfb9ff0932c8",
       "ref_id": "ra_93d828e3d06f8be197a1bbcc041831ee",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-02T13:02:00.337634+00:00",
       "source": "research_action",
       "title": "磁光石榴石 Faraday rotator 材料層落圖——Coherent 官方 datasheet 證實 LPE BIG 厚膜產品線(1290-1610nm 含 O-band),circulator 心臟材料首個具名供應商",
       "type": "ra_admission"
@@ -7438,12 +7454,50 @@
       "added_at": "2026-09-02T12:57:55.110778+00:00",
       "hint": "go＝①registry 加 co:novanta(research_ticker=NOVT/USD/NASDAQ);②prepare+apply library/leads/action_drafts/novanta_ft_sensor_2026_09_02_action.json(ATI 官方 humanoid 頁,力矩感測+frameless 馬達+編碼器);效果:🔴 tech:force_torque_sensor 層獲首個具名供應商。不含 thesis/live。L8 現況:單一 origin(供應商自報),零客戶具名;[341] 既有評估該層替代難度低多供應商——首個入圖不代表瓶頸持有者,純度低(Novanta 多元化)",
       "n": 446,
-      "reason": null,
+      "reason": "批次核准 2026-09-02;registry 已加 co:novanta(NOVT)+RA apply 完成(digest 2ba64cc9...db145),intake commit 見 git log",
+      "receipt": "authority:graph_admission;ref:ra_d112a68a31b01dc852b86975907aff68",
       "ref_id": "lead:lead_5087a6570af0c525743b6f2d96e17d9a",
+      "resolution": "go",
+      "resolved_at": "2026-09-02T13:02:12.826416+00:00",
+      "source": "manual",
+      "title": "Novanta(NOVT)onboard 核准——registry 增列+ATI 力矩感測器首批 extraction 入圖(draft 已備)",
+      "type": "manual"
+    },
+    {
+      "added_at": "2026-09-02T13:13:26.913100+00:00",
+      "graph_impact": "+2 節點、1 邊、1 claims｜來源：Lumentum（客戶端法定年報,審計級）（tier 1）",
+      "hint": "核准 exact graph delta；Decision handoff：co:lumentum。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 447,
+      "reason": null,
+      "ref_id": "ra_4337ac140b3fc12a53c5c22331b694ac",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "LITE→InP 基板邊升級——FY2026 10-K 法定風險揭露:sole source 依賴+advance payments 鎖單+中國出口限制波及 substrate 供應鏈(客戶端審計級文件)",
+      "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-09-02T13:14:02.807625+00:00",
+      "hint": "go＝授權逐邊研究+打包 RA(每邊附替代性論證與來源);不含直接改圖——RA 仍逐包核准。背景:單跑瓶頸輸出指出機器人族群邊無 substitutability 值,在排序中隱形(L12:沒填值比弱值危險);對象=諧波減速器/RV/行星滾柱絲槓/力矩感測/磁材等機器人群現有邊",
+      "n": 448,
+      "reason": null,
+      "ref_id": "manual:448",
       "resolution": null,
       "resolved_at": null,
       "source": "manual",
-      "title": "Novanta(NOVT)onboard 核准——registry 增列+ATI 力矩感測器首批 extraction 入圖(draft 已備)",
+      "title": "人形族群邊 substitutability 補值核准——機器人群邊逐條 bounded research 定值後以 RA 入圖,補完族群才進瓶頸排序",
+      "type": "manual"
+    },
+    {
+      "added_at": "2026-09-02T13:14:02.967715+00:00",
+      "hint": "go＝授權產出合併 proposal(依 evidence-conflict/graph 維護流程,L10 早期正確性優先);不含直接改圖。理由:同義節點讓 coverage_gaps 虛報缺口、供應商邊分裂在兩個節點上;合併前逐對確認語意(scale-up CPO vs scale-up network 可能是不同層,不可硬併)",
+      "n": 449,
+      "reason": null,
+      "ref_id": "manual:449",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "🔴 同義節點合併核准——候選:tech:nand_technology↔tech:nand_flash;tech:in_package_optical_io↔tech:chip_to_chip_optical;tech:scale_up_cpo↔tech:scale_up_network 界線釐清",
       "type": "manual"
     }
   ],
@@ -16332,8 +16386,35 @@
       "ref_id": "manual:443",
       "type": "manual",
       "verb": "go"
+    },
+    {
+      "at": "2026-09-02T13:01:58.910074+00:00",
+      "n": 444,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_925a4741740c9e3e527a455430544220;digest:cfba09b959548b6092ca529b0373f43ce034c43cc7ae9af83f17835e774fb2a3;commit:f90aa27018b19ca5eb06e45744a71837f0d5f44b;cohort:dc_957bff3701ea4e46d962bfb9ff0932c8",
+      "ref_id": "ra_925a4741740c9e3e527a455430544220",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-02T13:02:00.337634+00:00",
+      "n": 445,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_93d828e3d06f8be197a1bbcc041831ee;digest:e3b8c1857ded753a817f676ed43d36d12c7be88cddb9045b98c90a4a929a8967;commit:9cae0b6b622b253c8bc2a0e6ab4dbafdf5ded4ee;cohort:dc_957bff3701ea4e46d962bfb9ff0932c8",
+      "ref_id": "ra_93d828e3d06f8be197a1bbcc041831ee",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-02T13:02:12.826416+00:00",
+      "n": 446,
+      "reason": "批次核准 2026-09-02;registry 已加 co:novanta(NOVT)+RA apply 完成(digest 2ba64cc9...db145),intake commit 見 git log",
+      "receipt": "authority:graph_admission;ref:ra_d112a68a31b01dc852b86975907aff68",
+      "ref_id": "lead:lead_5087a6570af0c525743b6f2d96e17d9a",
+      "type": "manual",
+      "verb": "go"
     }
   ],
-  "next_n": 447,
+  "next_n": 450,
   "schema_version": "1"
 }
