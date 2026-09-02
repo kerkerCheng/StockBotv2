@@ -40817,10 +40817,12 @@
       "lead_id": "lead_b9a99326c91984ac91904b8e71effa57",
       "published_at": null,
       "refs": {
+        "action_digest": "ecd09c6b507b01534db26eefcac90910cb355fe60a214ecada94cc14f9c70f9d",
+        "focus_company_id": "co:schaeffler",
         "research_action_id": "ra_88274fb8d4d1645552e0aa1b38a5b663"
       },
       "source": "pane1-sector-gap-2026-09-02",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {
         "robotics": {
           "counter_only": false,

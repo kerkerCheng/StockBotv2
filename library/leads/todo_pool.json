@@ -6880,13 +6880,21 @@
     },
     {
       "added_at": "2026-09-02T01:16:51.472047+00:00",
+      "completion_authority": {
+        "action_digest": "ecd09c6b507b01534db26eefcac90910cb355fe60a214ecada94cc14f9c70f9d",
+        "cohort_id": "dc_912a03a50135ea5e29000a0417c3f477",
+        "commit": "140777010c2aff22e2109a994598a17671ede2aa",
+        "company_id": "co:schaeffler",
+        "verified_at": "2026-09-02T01:32:30.071215+00:00"
+      },
       "graph_impact": "+6 節點、4 邊、1 claims｜來源：SVRC Research（獨立第三方產業報告）（tier 3）、Schaeffler（tier 2）",
       "hint": "核准 exact graph delta；Decision handoff：co:schaeffler。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 410,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_88274fb8d4d1645552e0aa1b38a5b663;digest:ecd09c6b507b01534db26eefcac90910cb355fe60a214ecada94cc14f9c70f9d;commit:140777010c2aff22e2109a994598a17671ede2aa;cohort:dc_912a03a50135ea5e29000a0417c3f477",
       "ref_id": "ra_88274fb8d4d1645552e0aa1b38a5b663",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-02T01:32:30.071215+00:00",
       "source": "research_action",
       "title": "機器人群接上需求錨——減速器→精密致動器→人形系統三條組成邊,pane1 分段補上缺席的機器人段",
       "type": "ra_admission"
@@ -15223,6 +15231,15 @@
       "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
       "receipt": "action:ra_d9a15aa2a92393eea0053fdfdd29635b;digest:b830cf0c4b246e70ba6a27a891596e703413066df2eb9a99969136dcd20a6714;commit:9a41c23d2ad87b48f396fb74a310276edb723555;cohort:dc_1322bfc1c743fa746b76e280c1b27b28",
       "ref_id": "ra_d9a15aa2a92393eea0053fdfdd29635b",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-02T01:32:30.071215+00:00",
+      "n": 410,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_88274fb8d4d1645552e0aa1b38a5b663;digest:ecd09c6b507b01534db26eefcac90910cb355fe60a214ecada94cc14f9c70f9d;commit:140777010c2aff22e2109a994598a17671ede2aa;cohort:dc_912a03a50135ea5e29000a0417c3f477",
+      "ref_id": "ra_88274fb8d4d1645552e0aa1b38a5b663",
       "type": "ra_admission",
       "verb": "go"
     }
