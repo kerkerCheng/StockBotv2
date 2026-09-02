@@ -27689,9 +27689,14 @@
       "first_seen": "2026-09-02T12:24:28.560419+00:00",
       "lead_id": "lead_77539b327d06e48a3073ec7c8c2569c8",
       "published_at": null,
-      "refs": {},
+      "refs": {
+        "parked_reason": "MEMS 代工層追源未果:Google/Lumentum 兩側一手皆不揭露 MEMS 鏡陣列代工;唯一具體說法(Silex Microsystems 代工 Lumentum MEMS 予 Google+Plan Optik 玻璃晶圓,Glass-on-Silicon 8 吋)出自單一 tier-3 substack(latentvalue),不可入圖;DCD 深度報導 403 未取",
+        "trace_next_trigger": "Silex/賽微電子(Sai MicroElectronics)或 Plan Optik 官方文件具名 OCS/MEMS 鏡陣列客戶;或 Lumentum/Google 揭露 MEMS 製造來源",
+        "trace_requires_user": "false",
+        "trace_status": "isolated_tier_3"
+      },
       "source": "decompose-palomar-ocs-2026-09-02",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "[decompose|Palomar OCS] MEMS 代工層——Google 自研 2D MEMS 鏡陣列由哪家 MEMS foundry 製造?136x136 duplex 已部署數萬台;tech:mems_mirror_array 有節點但零供應商",
       "triage": {
