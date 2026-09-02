@@ -1,0 +1,4 @@
+Source URL: https://www.roboticscenter.ai/state-of-robotics-2026-united-states
+
+Excerpt:
+actuator dependency (series elastic actuators, quasi-direct-drive motors, precision reducers overwhelmingly sourced from Japan, Germany, China) as structural vulnerabilities for the US humanoid sector (SVRC State of Robotics 2026, Challenges section)

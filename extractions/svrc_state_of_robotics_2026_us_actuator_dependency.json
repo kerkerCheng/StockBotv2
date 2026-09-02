@@ -1,0 +1,137 @@
+{
+  "claims": [
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Revisit if humanoid designs shift away from precision-reducer-based actuators at scale (e.g., direct-drive or hydraulic dominance in shipping humanoids), which would weaken the reducer→humanoid chain.",
+      "id": "svrc_state_of_robotics_2026_us_actuator_dependency_cl1",
+      "source_ids": [
+        "svrc_state_of_robotics_2026_us_actuator_dependency_s1"
+      ],
+      "statement": "Third-party industry framing ties the chain together: precision reducers (strain wave / RV) are constituents of the humanoid precision-actuator dependency, and that actuator dependency is a structural vulnerability of the humanoid sector — i.e., reducer suppliers chain to the humanoid demand anchor. Graph effect: the robotics group's supplier edges (Nabtesco, HDS, Shuanghuan, Schaeffler) now reach tech:humanoid_robot_systems and appear in the sector-segmented bottleneck ranking. These are category-composition edges (no substitutability values — those live on the supplier edges).",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:humanoid_robot_systems",
+      "id": "e1",
+      "relation": "is_component_of",
+      "source_ids": [
+        "svrc_state_of_robotics_2026_us_actuator_dependency_s1"
+      ],
+      "src_id": "comp:humanoid_precision_actuators"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "comp:humanoid_precision_actuators",
+      "id": "e2",
+      "relation": "is_component_of",
+      "source_ids": [
+        "svrc_state_of_robotics_2026_us_actuator_dependency_s1"
+      ],
+      "src_id": "tech:strain_wave_gear"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "comp:humanoid_precision_actuators",
+      "id": "e3",
+      "relation": "is_component_of",
+      "source_ids": [
+        "svrc_state_of_robotics_2026_us_actuator_dependency_s1"
+      ],
+      "src_id": "tech:rv_reducer"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "robot_subsystem",
+      "aliases": [
+        "precision actuators",
+        "series elastic actuators",
+        "quasi-direct-drive motors",
+        "precision reducers"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "comp:humanoid_precision_actuators",
+      "name": "Humanoid precision actuators (series elastic / quasi-direct-drive / precision reducers)",
+      "role": null,
+      "source_ids": [
+        "svrc_state_of_robotics_2026_us_actuator_dependency_s1"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "robot_system",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.8,
+      "id": "tech:humanoid_robot_systems",
+      "name": "Humanoid robot systems",
+      "role": null,
+      "source_ids": [
+        "svrc_state_of_robotics_2026_us_actuator_dependency_s1"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "robot_subsystem",
+      "aliases": [
+        "harmonic drive",
+        "諧波減速機",
+        "strain wave gearing"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:strain_wave_gear",
+      "name": "Strain Wave Gear（諧波減速器）",
+      "role": null,
+      "source_ids": [
+        "svrc_state_of_robotics_2026_us_actuator_dependency_s1"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "robot_subsystem",
+      "aliases": [
+        "RV 減速機"
+      ],
+      "attributes": {},
+      "confidence": 0.8,
+      "id": "tech:rv_reducer",
+      "name": "RV Cycloidal Reducer",
+      "role": null,
+      "source_ids": [
+        "svrc_state_of_robotics_2026_us_actuator_dependency_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "svrc_state_of_robotics_2026_us_actuator_dependency",
+    "evidence_tier": 3,
+    "origin_entity": "SVRC Research（獨立第三方產業報告）",
+    "permission_basis": "Public industry report; URL and short excerpts.",
+    "published_at": "2026-04-01",
+    "publisher": "SVRC Research",
+    "retrieved_at": "2026-09-02",
+    "section": "actuator_dependency",
+    "source_type": "industry_report",
+    "storage_permission": "repo_excerpt",
+    "title": "SVRC State of Robotics 2026 (US) — actuator dependency excerpts",
+    "url": "https://www.roboticscenter.ai/state-of-robotics-2026-united-states"
+  },
+  "sources": [
+    {
+      "id": "svrc_state_of_robotics_2026_us_actuator_dependency_s1",
+      "locator": "Challenges section — actuator dependency",
+      "quote": "actuator dependency (series elastic actuators, quasi-direct-drive motors, precision reducers overwhelmingly sourced from Japan, Germany, China) as structural vulnerabilities for the US humanoid sector"
+    }
+  ]
+}

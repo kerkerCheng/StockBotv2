@@ -1,0 +1,71 @@
+{
+  "claims": [],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:humanoid_robot_systems",
+      "id": "e1",
+      "relation": "is_component_of",
+      "source_ids": [
+        "schaeffler_humanoid_partnership_pr_2026_01_13_actuator_role_s1"
+      ],
+      "src_id": "comp:humanoid_precision_actuators"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "robot_subsystem",
+      "aliases": [
+        "precision actuators",
+        "series elastic actuators",
+        "quasi-direct-drive motors",
+        "precision reducers"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "comp:humanoid_precision_actuators",
+      "name": "Humanoid precision actuators (series elastic / quasi-direct-drive / precision reducers)",
+      "role": null,
+      "source_ids": [
+        "schaeffler_humanoid_partnership_pr_2026_01_13_actuator_role_s1"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "robot_system",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.8,
+      "id": "tech:humanoid_robot_systems",
+      "name": "Humanoid robot systems",
+      "role": null,
+      "source_ids": [
+        "schaeffler_humanoid_partnership_pr_2026_01_13_actuator_role_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "schaeffler_humanoid_partnership_pr_2026_01_13_actuator_role",
+    "evidence_tier": 2,
+    "origin_entity": "Schaeffler",
+    "permission_basis": "Public press release; URL and short excerpts.",
+    "published_at": "2026-01-13",
+    "publisher": "Schaeffler Group",
+    "retrieved_at": "2026-09-02",
+    "section": "actuator_role",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Schaeffler PR — actuators in humanoids (role excerpt)",
+    "url": "https://www.schaeffler.com/en/media/press-releases/press-releases-detail.jsp?id=88159810"
+  },
+  "sources": [
+    {
+      "id": "schaeffler_humanoid_partnership_pr_2026_01_13_actuator_role_s1",
+      "locator": "PR — component scope",
+      "quote": "The collaboration will focus on the development and supply of key components, including innovative actuators used in both wheeled-base and bipedal (two-legged) humanoids."
+    }
+  ]
+}
