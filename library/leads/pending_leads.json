@@ -31415,9 +31415,14 @@
       "first_seen": "2026-09-02T02:23:30.642645+00:00",
       "lead_id": "lead_87b40ffa1137339e1365cedb3642bc95",
       "published_at": null,
-      "refs": {},
+      "refs": {
+        "parked_reason": "四維初判不過:①瓶頸地位——THK 主力 ball screw/LM 導軌在人形關節正被行星滾柱絲槓取代(Tesla Optimus/Figure/Agility/1X 皆用 roller screw,Morgan Stanley 2025-02 判 roller screw 將占多數),THK 無公開 roller screw 佈局;②客戶資本承諾——無任何人形製造商具名採用 THK;③LM 導軌約 50% 市占說法未找到一手(官網與公開 IR 無市占陳述),不入圖",
+        "trace_next_trigger": "THK 法說/有報揭露人形相關受注或 roller screw 產品線;或任一人形製造商具名採用 THK 線性件",
+        "trace_requires_user": "false",
+        "trace_status": "awaiting_named_disclosure"
+      },
       "source": "alignment-audit-2026-09-02",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "[對齊|機器人] THK(6481.T)registry 已登記但圖中零內容——LM 導軌/線性滑軌全球約過半市占的傳統說法待核,人形關節線性件供給側;首批 extraction 研究",
       "triage": {
