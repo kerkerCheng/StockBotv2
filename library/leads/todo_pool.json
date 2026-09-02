@@ -6708,8 +6708,10 @@
       "added_at": "2026-09-01T13:44:29.878804+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_51bf9d0be65f1aeeff6a456e3310f967",
+      "dispatch_receipt": "manual_todo:419;raw:library/raw/nabtesco_6268_tanshin_q2_fy2026_20260731.pdf",
       "dispatch_ref": "wo_805163e4cfe24608ba55ac78b068588e",
-      "dispatch_status": "queued",
+      "dispatch_status": "awaiting_approval",
+      "dispatch_updated_at": "2026-09-02T10:57:50.533187+00:00",
       "dispatched_at": "2026-09-02T07:50:55.457725+00:00",
       "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 399,
@@ -7041,6 +7043,18 @@
       "resolved_at": null,
       "source": "manual",
       "title": "Google [397] backlog 觀測寫入核准——Alphabet 10-Q Q2 2026 revenue backlog $519.5B(Cloud $513.9B)落 Engine C",
+      "type": "manual"
+    },
+    {
+      "added_at": "2026-09-02T10:57:36.409252+00:00",
+      "hint": "go＝把以下觀測寫入 Engine C manual ledger(backlog,co:nabtesco)；不含入圖、不含 thesis mutation。內容(TDnet 140120260731505000,2026-07-31 IFRS 中間短信,一手;單位 JPY 百萬,已存 library/raw/nabtesco_6268_tanshin_q2_fy2026_20260731.pdf):①コンポーネントソリューション(含精密減速機)H1 2026 受注 47,990(+26.0%)/売上 45,521(+23.6%)/営業利益 4,841(+160.8%);②segment 受注残高 22,135(2026-06-30,前年 17,828);③驅動因素逐字:中國・韓國車廠產業用機器人+一般產業——短信全文無 humanoid 字樣,人形營收貢獻仍為零揭露(純度警示);④customer_concentration:中間短信無主な相手先揭露,待 FY2026 有報",
+      "n": 419,
+      "reason": null,
+      "ref_id": "wo:wo_805163e4cfe24608ba55ac78b068588e",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "Nabtesco [399] backlog/segment 觀測寫入核准——Q2 FY2026 決算短信精密減速機所屬 segment 受注/残高落 Engine C",
       "type": "manual"
     }
   ],
@@ -15492,8 +15506,26 @@
       "ref_id": "dc_a51839bbf1429618556cf8bc265398c4",
       "type": "decision_review",
       "verb": "pq1_awaiting_approval"
+    },
+    {
+      "at": "2026-09-02T10:55:42.027745+00:00",
+      "n": 399,
+      "reason": "research-drain 開工",
+      "receipt": "wo:wo_805163e4cfe24608ba55ac78b068588e",
+      "ref_id": "dc_db19d3b490013f4cc464b2aab37b0bc8",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-09-02T10:57:50.533187+00:00",
+      "n": 399,
+      "reason": "bounded research 完成:①RV 60% 市占的發行人官方陳述已在圖(雙 origin,無新增);②客戶端具名(FANUC/Yaskawa/Estun 文件點名 Nabtesco)公開來源未果——Estun/双環 A 股年報是已知路徑但取得管道未建(與 [412] 同缺口);③CM 軸上游補齊:Q2 FY2026 短信 segment 受注/残高一手已取,觀測提案 [419] 等核准;④短信無 humanoid 揭露,人形純度=0 是誠實現況",
+      "receipt": "manual_todo:419;raw:library/raw/nabtesco_6268_tanshin_q2_fy2026_20260731.pdf",
+      "ref_id": "dc_db19d3b490013f4cc464b2aab37b0bc8",
+      "type": "decision_review",
+      "verb": "pq1_awaiting_approval"
     }
   ],
-  "next_n": 419,
+  "next_n": 420,
   "schema_version": "1"
 }
