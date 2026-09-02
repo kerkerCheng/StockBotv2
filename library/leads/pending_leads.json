@@ -38417,9 +38417,12 @@
       "first_seen": "2026-09-02T11:47:08.831093+00:00",
       "lead_id": "lead_aea66c177e553e6b8da4bef0da9f4d25",
       "published_at": null,
-      "refs": {},
+      "refs": {
+        "research_action_id": "ra_cb937794408a4232e01c56a643c7b713",
+        "trace_status": "partial"
+      },
       "source": "coverage-gap-2026-09-02",
-      "status": "triaged_go",
+      "status": "action_prepared",
       "themes": {
         "cpo": {
           "counter_only": false,
