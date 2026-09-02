@@ -6979,15 +6979,18 @@
       "added_at": "2026-09-02T01:16:51.472047+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_78e747c4bcf1f99b0b205cd78f907218",
+      "dispatch_receipt": "decision:pd_bbf7da3cbada857a6a83769613b22bb4",
       "dispatch_ref": "wo_810e8da66a56cf820e8ceb5f8204ae91",
-      "dispatch_status": "queued",
+      "dispatch_status": "completed",
+      "dispatch_updated_at": "2026-09-02T11:09:44.527379+00:00",
       "dispatched_at": "2026-09-02T07:50:55.622465+00:00",
       "hint": "當前 missing_data：四家具名人形夥伴中任一家的付款方向證據（訂單金額、產能協議或預付款）——partnership 具名已有，缺的是誰付錢給；Schaeffler 官方一手（收購新聞稿、2026-02-05 humanoid IR 簡報）——schaeffler（共 2 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 413,
-      "reason": null,
+      "reason": "reassess 完成:凍結 context 已過期([405][410] 於凍結後 apply),新 decision 吸收 Humanoid 客戶端條款(互惠紀律折價)+FY2025 EQS 四夥伴具名;判監控中,CM 手動缺口降為非阻擋;今日獨立重驗 Humanoid 對手方公告逐字一致(7 位數 actuator/>50% 份額/至 2031);Schaeffler 官網本輪仍 403(取不到不是不存在)",
+      "receipt": "decision:pd_bbf7da3cbada857a6a83769613b22bb4",
       "ref_id": "dc_912a03a50135ea5e29000a0417c3f477",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-02T11:09:44.527379+00:00",
       "source": "decision_lab",
       "title": "co:schaeffler：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
@@ -7126,6 +7129,18 @@
       "source": "manual",
       "title": "Unitree [411] registry 更新核准——宇樹 2026-08-19 科創板上市(688836.SS),identity_unresolved 可解",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-09-02T11:10:42.811312+00:00",
+      "hint": "當前 missing_data：四家具名人形夥伴中任一家的付款方向證據（訂單金額、產能協議或預付款）——partnership 具名已有，缺的是誰付錢給；Schaeffler 官方一手（收購新聞稿、2026-02-05 humanoid IR 簡報）——schaeffler（共 2 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "n": 425,
+      "reason": null,
+      "ref_id": "dc_912a03a50135ea5e29000a0417c3f477",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:schaeffler：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
     }
   ],
   "log": [
@@ -15675,8 +15690,35 @@
       "ref_id": "dc_1322bfc1c743fa746b76e280c1b27b28",
       "type": "decision_review",
       "verb": "pq1_awaiting_approval"
+    },
+    {
+      "at": "2026-09-02T11:07:34.168143+00:00",
+      "n": 413,
+      "reason": "research-drain 開工",
+      "receipt": "wo:wo_810e8da66a56cf820e8ceb5f8204ae91",
+      "ref_id": "dc_912a03a50135ea5e29000a0417c3f477",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-09-02T11:09:44.527379+00:00",
+      "n": 413,
+      "reason": "reassess 完成:凍結 context 已過期([405][410] 於凍結後 apply),新 decision 吸收 Humanoid 客戶端條款(互惠紀律折價)+FY2025 EQS 四夥伴具名;判監控中,CM 手動缺口降為非阻擋;今日獨立重驗 Humanoid 對手方公告逐字一致(7 位數 actuator/>50% 份額/至 2031);Schaeffler 官網本輪仍 403(取不到不是不存在)",
+      "receipt": "decision:pd_bbf7da3cbada857a6a83769613b22bb4",
+      "ref_id": "dc_912a03a50135ea5e29000a0417c3f477",
+      "type": "decision_review",
+      "verb": "pq1_completed"
+    },
+    {
+      "at": "2026-09-02T11:09:44.527379+00:00",
+      "n": 413,
+      "reason": "reassess 完成:凍結 context 已過期([405][410] 於凍結後 apply),新 decision 吸收 Humanoid 客戶端條款(互惠紀律折價)+FY2025 EQS 四夥伴具名;判監控中,CM 手動缺口降為非阻擋;今日獨立重驗 Humanoid 對手方公告逐字一致(7 位數 actuator/>50% 份額/至 2031);Schaeffler 官網本輪仍 403(取不到不是不存在)",
+      "receipt": "decision:pd_bbf7da3cbada857a6a83769613b22bb4",
+      "ref_id": "dc_912a03a50135ea5e29000a0417c3f477",
+      "type": "decision_review",
+      "verb": "go"
     }
   ],
-  "next_n": 425,
+  "next_n": 426,
   "schema_version": "1"
 }
