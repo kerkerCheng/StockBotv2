@@ -369,6 +369,67 @@ def _render(results: list[dict], unavailable: list[dict], has_bench: bool) -> No
     if unavailable:
         print(f"另有 {len(unavailable)} 個 cohort 的 Shadow 是 `unavailable`，無錨點可計算。")
 
+    # 等權重聚合（2026-09-02 ROADMAP 交付）：AGENTS outcome 契約的量測基準——
+    # 「推薦籃子」以每檔等權計，回答排序整體有沒有跑贏。錨點日各異，
+    # 這是跨持有期的粗聚合，明標不是回測；前段 vs 後段對照需排序歷史快照
+    #（本腳本已開始 append，見 _append_ranking_snapshot），累積後才能算。
+    abs_returns = [
+        row["absolute_return"] for row in results
+        if row.get("absolute_return") is not None
+    ]
+    excess_returns = [
+        row.get(f"excess_{PRIMARY_BENCHMARK}") for row in results
+        if row.get(f"excess_{PRIMARY_BENCHMARK}") is not None
+    ]
+    if abs_returns:
+        ew_abs = sum(abs_returns) / len(abs_returns)
+        line = f"\n**等權重聚合（{len(abs_returns)} 檔）：絕對 {_pct(ew_abs)}"
+        if excess_returns:
+            ew_ex = sum(excess_returns) / len(excess_returns)
+            line += f"｜超額({PRIMARY_BENCHMARK}) {_pct(ew_ex)}"
+        line += "**——各檔錨點日不同，粗聚合非回測；前/後段對照待排序快照累積"
+        print(line)
+
+    _append_ranking_snapshot()
+
+
+def _append_ranking_snapshot() -> None:
+    """append 當日 actionable 排序順序到 jsonl——前/後段對照的史料從今天開始累積。
+
+    best-effort：排序取不到（無 Neo4j 等）就靜默略過，不影響唯讀報告本體。
+    同一天重跑只留第一筆（append-only、日期去重）。
+    """
+    import json as _json
+
+    out = Path("library/private/decision_lab/ranking_order_snapshots.jsonl")
+    today = date.today().isoformat()
+    try:
+        if out.exists():
+            for raw in out.read_text(encoding="utf-8").splitlines():
+                try:
+                    if _json.loads(raw).get("date") == today:
+                        return
+                except ValueError:
+                    continue
+        from engine_d_runtime.adapters import fetch_ranking_view
+
+        view = fetch_ranking_view(limit=50)
+        if not view:
+            return
+        order = [
+            e.get("company_id")
+            for e in view.get("actionable") or []
+            if e.get("company_id")
+        ]
+        if not order:
+            return
+        out.parent.mkdir(parents=True, exist_ok=True)
+        with out.open("a", encoding="utf-8") as fh:
+            fh.write(_json.dumps({"date": today, "actionable_order": order}) + "\n")
+        print(f"\n（排序快照已 append：{len(order)} 檔 → {out.name}）")
+    except Exception:  # noqa: BLE001 — 快照缺一天不影響報告
+        pass
+
     _render_live_lane(results, _live_fills())
     _render_chase_check(results)
 
