@@ -510,7 +510,10 @@
     },
     {
       "company_id": "co:unitree",
-      "research_ticker": null
+      "research_ticker": "688836.SS",
+      "market_currency": "CNY",
+      "execution_currency": "CNY",
+      "execution_venue": "SSE"
     },
     {
       "company_id": "co:vpec",
