@@ -1,0 +1,4 @@
+Source URL: https://www.coherent.com/resources/datasheet/optics/magneto-optic-lpe-garnet-faraday-rotator-crystals-ds.pdf
+
+Excerpt:
+Bismuth-doped rare-earth iron garnet (BIG) thick films are the principal Faraday rotator materials for non-reciprocal passive optical devices in telecommunications applications... incorporated into a host of other non-reciprocal devices including isolators, circulators and switches... BIG Thick Film single crystals are grown by Liquid Phase Epitaxy... FLL Low Loss across 1290-1610 nm. (Coherent datasheet)

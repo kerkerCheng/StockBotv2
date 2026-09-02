@@ -1,0 +1,102 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "guided",
+      "disproof_condition": "Downgrade if the garnet product line is discontinued or if circulator architectures move away from garnet-based Faraday rotation; upgrade when any circulator maker or hyperscaler names its garnet source, or industry disclosure quantifies the O-band garnet supply base.",
+      "id": "cohr_lpe_garnet_faraday_ds_2026_cl1",
+      "source_ids": [
+        "cohr_lpe_garnet_faraday_ds_2026_s1",
+        "cohr_lpe_garnet_faraday_ds_2026_s2",
+        "cohr_lpe_garnet_faraday_ds_2026_s3"
+      ],
+      "statement": "Coherent officially productizes LPE-grown bismuth-doped rare-earth iron garnet (BIG) thick films — the 'principal Faraday rotator materials' for isolators, circulators and switches — with the FLL series covering 1290-1610 nm, i.e. including the O-band where Google's Apollo program re-engineered circulators for datacenter-scale bidirectional OCS links. This gives the newly added garnet material layer its first named supplier, and together with the 2D collimator array launch makes Coherent a named supplier at two upstream layers of the same OCS optical path. Limits: vendor datasheet (self-report); multi-supplier crystal market (Japanese growers not yet researched); no volume, share or customer data; Google's actual garnet sourcing undisclosed; negligible COHR revenue share.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {
+        "qualification_status": "qualifying",
+        "sole_source": false
+      },
+      "confidence": 0.8,
+      "dst_id": "tech:garnet_faraday_rotator",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "cohr_lpe_garnet_faraday_ds_2026_s1",
+        "cohr_lpe_garnet_faraday_ds_2026_s3"
+      ],
+      "src_id": "co:coherent"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "COHR"
+      ],
+      "attributes": {
+        "ticker": "COHR"
+      },
+      "confidence": 0.9,
+      "id": "co:coherent",
+      "name": "Coherent Corp",
+      "role": null,
+      "source_ids": [
+        "cohr_lpe_garnet_faraday_ds_2026_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "BIG thick film",
+        "bismuth iron garnet",
+        "Faraday rotator garnet",
+        "磁光石榴石"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:garnet_faraday_rotator",
+      "name": "磁光石榴石 Faraday Rotator（BIG 厚膜,circulator/isolator 心臟材料）",
+      "role": null,
+      "source_ids": [
+        "cohr_lpe_garnet_faraday_ds_2026_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "cohr_lpe_garnet_faraday_ds_2026",
+    "evidence_tier": 2,
+    "origin_entity": "Coherent（供應商官方產品 datasheet）",
+    "permission_basis": "Public datasheet; URL and short excerpts, full PDF local.",
+    "published_at": null,
+    "publisher": "Coherent",
+    "retrieved_at": "2026-09-02",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Coherent — Magneto-Optic Faraday Rotator Garnet Crystals datasheet (LPE BIG thick films)",
+    "url": "https://www.coherent.com/resources/datasheet/optics/magneto-optic-lpe-garnet-faraday-rotator-crystals-ds.pdf"
+  },
+  "sources": [
+    {
+      "id": "cohr_lpe_garnet_faraday_ds_2026_s1",
+      "locator": "Datasheet p.1 — material role",
+      "quote": "Bismuth-doped rare-earth iron garnet (BIG) thick films are the principal Faraday rotator materials for non-reciprocal passive optical devices in telecommunications applications."
+    },
+    {
+      "id": "cohr_lpe_garnet_faraday_ds_2026_s2",
+      "locator": "Datasheet p.1 — devices and growth",
+      "quote": "Faraday rotators can be made into polarization dependent and independent isolators as well as incorporated into a host of other non-reciprocal devices including isolators, circulators and switches. ... BIG Thick Film single crystals are grown by Liquid Phase Epitaxy"
+    },
+    {
+      "id": "cohr_lpe_garnet_faraday_ds_2026_s3",
+      "locator": "Datasheet p.1 — product series",
+      "quote": "FLL Low Loss across 1290-1610 nm"
+    }
+  ]
+}
