@@ -6746,15 +6746,18 @@
       "added_at": "2026-09-01T13:44:29.878804+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_1273ddf3c3544711257c8cc23f4e629e",
+      "dispatch_receipt": "wo:wo_395ca7a7ce49a0f91f5bd35730644d0a;trace:proterial_hre_free_customer_naming_none_20260902",
       "dispatch_ref": "wo_395ca7a7ce49a0f91f5bd35730644d0a",
-      "dispatch_status": "queued",
+      "dispatch_status": "parked",
+      "dispatch_updated_at": "2026-09-02T10:59:00.039944+00:00",
       "dispatched_at": "2026-09-02T07:50:55.490278+00:00",
       "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 401,
-      "reason": null,
+      "reason": "bounded research 誠實未果:①客戶端採用零揭露——Proterial 官方 PR(2025-07-22)自證仍在 pre-production sample 階段(2026-04 起可供樣),HRE-free 磁石至今是供應商自報+USPTO 專利,無 OEM 具名採用;trigger=任一 OEM/客戶具名採用或 Proterial 揭露量產訂單。②財務五軸結構性不可得——Bain 私有化未上市,registry research_ticker=null(L9 明確標記),非研究可解。③本 cohort 投資意義是間接的:HRE-free 是重稀土需求鏈(Lynas/MP HRE 溢價)的 disproof 路徑,證據價值在圖不在標的",
+      "receipt": "wo:wo_395ca7a7ce49a0f91f5bd35730644d0a;trace:proterial_hre_free_customer_naming_none_20260902",
       "ref_id": "dc_b8fb35bfe958d2e6ca4b3f60e623a576",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-02T10:59:00.039944+00:00",
       "source": "decision_lab",
       "title": "co:proterial：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
@@ -15524,6 +15527,33 @@
       "ref_id": "dc_db19d3b490013f4cc464b2aab37b0bc8",
       "type": "decision_review",
       "verb": "pq1_awaiting_approval"
+    },
+    {
+      "at": "2026-09-02T10:58:13.531610+00:00",
+      "n": 401,
+      "reason": "research-drain 開工",
+      "receipt": "wo:wo_395ca7a7ce49a0f91f5bd35730644d0a",
+      "ref_id": "dc_b8fb35bfe958d2e6ca4b3f60e623a576",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-09-02T10:59:00.039944+00:00",
+      "n": 401,
+      "reason": "bounded research 誠實未果:①客戶端採用零揭露——Proterial 官方 PR(2025-07-22)自證仍在 pre-production sample 階段(2026-04 起可供樣),HRE-free 磁石至今是供應商自報+USPTO 專利,無 OEM 具名採用;trigger=任一 OEM/客戶具名採用或 Proterial 揭露量產訂單。②財務五軸結構性不可得——Bain 私有化未上市,registry research_ticker=null(L9 明確標記),非研究可解。③本 cohort 投資意義是間接的:HRE-free 是重稀土需求鏈(Lynas/MP HRE 溢價)的 disproof 路徑,證據價值在圖不在標的",
+      "receipt": "wo:wo_395ca7a7ce49a0f91f5bd35730644d0a;trace:proterial_hre_free_customer_naming_none_20260902",
+      "ref_id": "dc_b8fb35bfe958d2e6ca4b3f60e623a576",
+      "type": "decision_review",
+      "verb": "pq1_parked"
+    },
+    {
+      "at": "2026-09-02T10:59:00.039944+00:00",
+      "n": 401,
+      "reason": "bounded research 誠實未果:①客戶端採用零揭露——Proterial 官方 PR(2025-07-22)自證仍在 pre-production sample 階段(2026-04 起可供樣),HRE-free 磁石至今是供應商自報+USPTO 專利,無 OEM 具名採用;trigger=任一 OEM/客戶具名採用或 Proterial 揭露量產訂單。②財務五軸結構性不可得——Bain 私有化未上市,registry research_ticker=null(L9 明確標記),非研究可解。③本 cohort 投資意義是間接的:HRE-free 是重稀土需求鏈(Lynas/MP HRE 溢價)的 disproof 路徑,證據價值在圖不在標的",
+      "receipt": "wo:wo_395ca7a7ce49a0f91f5bd35730644d0a;trace:proterial_hre_free_customer_naming_none_20260902",
+      "ref_id": "dc_b8fb35bfe958d2e6ca4b3f60e623a576",
+      "type": "decision_review",
+      "verb": "go"
     }
   ],
   "next_n": 420,
