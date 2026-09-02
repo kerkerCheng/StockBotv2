@@ -835,6 +835,51 @@ def _apply_response(record: dict, *, replayed: bool = False) -> dict:
     return result
 
 
+def _sync_source_leads_after_apply(record: Mapping[str, Any]) -> None:
+    """apply 成功後把 digest／focus 回寫到綁定的 leads 並推進 applied。
+
+    L16 交付（2026-09-02）：complete-ra 要求 applied lead 帶 `action_digest` 與
+    `focus_company_id`，但這兩個值一直只在 apply 端手上——每次都要人手動
+    annotate＋advance，漏一次就撞「applied lead 的 action_digest 缺失」。
+    分類（digest/focus）從此跟著資料走到消費端。best-effort：leads 檔異常不
+    回滾 apply（graph 寫入已 durable），失敗留給既有的手動路徑。
+    """
+    try:
+        from engine_b import leads as leads_mod
+
+        action_id = str(record.get("action_id") or "")
+        digest = str(record.get("action_digest") or "")
+        payload = record.get("payload") or {}
+        focus = str(
+            payload.get("focus_company_id") or record.get("focus_company_id") or ""
+        )
+        if not action_id or not digest:
+            return
+        store = leads_mod.load()
+        touched = False
+        for lead in store["leads"].values():
+            refs = lead.get("refs") or {}
+            if str(refs.get("research_action_id") or "") != action_id:
+                continue
+            if lead.get("status") != "action_prepared":
+                continue
+            leads_mod.annotate_refs(
+                store,
+                lead["lead_id"],
+                refs={
+                    "action_digest": digest,
+                    **({"focus_company_id": focus} if focus else {}),
+                },
+            )
+            leads_mod.advance(store, lead["lead_id"], "applied")
+            touched = True
+        if touched:
+            leads_mod.save(store)
+    except Exception as exc:  # noqa: BLE001 — 回寫失敗不動搖 durable apply
+        _write_log = logging.getLogger(__name__)
+        _write_log.warning("lead sync after apply failed: %s", exc, exc_info=True)
+
+
 def _apply_research_action_impl(
     action_id: str,
     action_digest: str,
@@ -1051,6 +1096,7 @@ def _apply_research_action_impl(
             }
             record = research_actions.compact_applied_payload(record)
             record = research_actions.save_action(record, root=root)
+            _sync_source_leads_after_apply(record)
             return _apply_response(record)
     except research_actions.ActionBusyError:
         return {
