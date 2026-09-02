@@ -1,0 +1,4 @@
+Source URL: https://www.sivers-semiconductors.com/press/sivers-semiconductors-16-wavelength-wdm-laser-demonstration-with-ayar-labs-set-to-light-up-ecoc-2024/
+
+Excerpt:
+Sivers Semiconductors' 16-wavelength DFB laser array integrated into Ayar Labs' SuperNova... the industry's first CW-WDM MSA compliant 16-wavelength light source... 'Sivers Semiconductors has been a key partner in our journey to bring high-bandwidth, low-latency optical I/O to market at scale.' (Sivers PR, 2024-09-19)

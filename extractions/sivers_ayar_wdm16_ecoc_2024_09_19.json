@@ -1,0 +1,109 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "guided",
+      "disproof_condition": "Downgrade if Ayar Labs switches laser suppliers or SuperNova fails to reach production adoption within two fiscal years; upgrade when volume supply is disclosed (Sivers order announcements tied to Ayar/CPO, or a system OEM names the Sivers-powered light source in a shipping product).",
+      "id": "sivers_ayar_wdm16_ecoc_2024_09_19_cl1",
+      "source_ids": [
+        "sivers_ayar_wdm16_ecoc_2024_09_19_s1",
+        "sivers_ayar_wdm16_ecoc_2024_09_19_s2",
+        "sivers_ayar_wdm16_ecoc_2024_09_19_s3",
+        "sivers_ayar_wdm16_ecoc_2024_09_19_s4"
+      ],
+      "statement": "Sivers Semiconductors supplies the 16-wavelength DFB laser array inside Ayar Labs' SuperNova — the industry's first CW-WDM MSA compliant 16-wavelength light source (16 Tbps, ECOC 2024 demo) — giving the graph's 16ch-WDM-laser chokepoint its first named supplier. Crucially, the naming is bidirectional in the joint release: Ayar Labs' CTO calls Sivers 'a key partner in our journey to bring high-bandwidth, low-latency optical I/O to market at scale' — a partner-side public commitment of the kind the Sivers cohort has lacked (per HyperLight/UMC precedent, joint-release partner quotes constitute a materially distinct origin). Limits: demo-stage, not volume production; Ayar Labs is private (no statutory cross-check); other 16ch candidates (quantum-dot combs, other DFB vendors) not yet researched; distinct from Sivers' CW DFB shortage narrative — do not conflate.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {
+        "qualification_status": "qualifying",
+        "sole_source": false
+      },
+      "confidence": 0.8,
+      "dst_id": "tech:wdm_laser_16ch",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "sivers_ayar_wdm16_ecoc_2024_09_19_s1",
+        "sivers_ayar_wdm16_ecoc_2024_09_19_s2"
+      ],
+      "src_id": "co:sivers_semiconductors"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "SIVE.ST",
+        "SIVE",
+        "Sivers Photonics"
+      ],
+      "attributes": {
+        "ticker": "SIVE.ST"
+      },
+      "confidence": 0.9,
+      "id": "co:sivers_semiconductors",
+      "name": "Sivers Semiconductors",
+      "role": null,
+      "source_ids": [
+        "sivers_ayar_wdm16_ecoc_2024_09_19_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "16ch WDM laser",
+        "CW-WDM MSA 16-wavelength",
+        "16 波長雷射陣列"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:wdm_laser_16ch",
+      "name": "16-wavelength WDM laser array",
+      "role": null,
+      "source_ids": [
+        "sivers_ayar_wdm16_ecoc_2024_09_19_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "sivers_ayar_wdm16_ecoc_2024_09_19",
+    "evidence_tier": 2,
+    "origin_entity": "Sivers Semiconductors（官方 PR,內含 Ayar Labs CTO 具名引述——聯合發布,夥伴端 origin 實質互異）",
+    "permission_basis": "Public press release; URL and short excerpts.",
+    "published_at": "2024-09-19",
+    "publisher": "Sivers Semiconductors",
+    "retrieved_at": "2026-09-03",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Sivers Semiconductors 16-wavelength WDM laser demonstration with Ayar Labs set to light up ECOC 2024 (official PR)",
+    "url": "https://www.sivers-semiconductors.com/press/sivers-semiconductors-16-wavelength-wdm-laser-demonstration-with-ayar-labs-set-to-light-up-ecoc-2024/"
+  },
+  "sources": [
+    {
+      "id": "sivers_ayar_wdm16_ecoc_2024_09_19_s1",
+      "locator": "PR — demonstration",
+      "quote": "Sivers Semiconductors' 16-wavelength distributed feedback (DFB) laser array integrated into Ayar Labs' SuperNova multi-wavelength light source... the industry's first CW-WDM MSA compliant 16-wavelength light source."
+    },
+    {
+      "id": "sivers_ayar_wdm16_ecoc_2024_09_19_s2",
+      "locator": "PR — Ayar Labs CTO quote (partner side)",
+      "quote": "Sivers Semiconductors has been a key partner in our journey to bring high-bandwidth, low-latency optical I/O to market at scale."
+    },
+    {
+      "id": "sivers_ayar_wdm16_ecoc_2024_09_19_s3",
+      "locator": "PR — Sivers MD quote",
+      "quote": "We continue to deliver industry leading Laser Arrays from our InP100 platform."
+    },
+    {
+      "id": "sivers_ayar_wdm16_ecoc_2024_09_19_s4",
+      "locator": "PR — Ayar Labs CTO on combination",
+      "quote": "This demonstration of our second-generation SuperNova light source combined with Sivers' 16-wavelength laser array highlights the significant progress we've made together."
+    }
+  ]
+}
