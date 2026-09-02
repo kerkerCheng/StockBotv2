@@ -112,12 +112,16 @@ def fetch_ranking_view(
     except Exception as exc:  # noqa: BLE001 — 排序缺席只降級，不阻斷 brief
         _LOG.warning("ranking view fetch failed: %s", exc, exc_info=True)
         return None
-    return build_ranking_view(
-        rank_bottlenecks(rows, get_registry()),
-        weakest_axes=weakest_axes,
-        disproofs=disproofs,
-        limit=limit,
-    )
+    try:
+        return build_ranking_view(
+            rank_bottlenecks(rows, get_registry()),
+            weakest_axes=weakest_axes,
+            disproofs=disproofs,
+            limit=limit,
+        )
+    except Exception as exc:  # noqa: BLE001 — docstring 承諾「讀不到回 None」，轉換例外同樣適用
+        _LOG.warning("ranking view transform failed: %s", exc, exc_info=True)
+        return None
 
 
 _LOG = logging.getLogger(__name__)

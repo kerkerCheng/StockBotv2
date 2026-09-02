@@ -1,4 +1,11 @@
-"""Append-only prospective paper-portfolio ledger and deterministic replay."""
+"""Append-only prospective paper-portfolio ledger and deterministic replay.
+
+⚠ 存廢判定（2026-09-02，ROADMAP code-review 項結案）：paper lane 已凍結後本模組
+不再有生產路徑，但**刻意保留**——`replay_decision_store_events` 是 e2e 測試
+（tests/test_decision_lab_e2e.py）對 Decision Store paper projection 的**獨立重放
+驗證器**：同一段事件史用第二套實作重算一次，兩邊不一致即測試失敗。刪掉它，
+frozen paper 歷史的數值健全性就只剩單一實作自己說了算。
+"""
 from __future__ import annotations
 
 import argparse

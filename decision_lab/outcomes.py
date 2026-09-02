@@ -191,21 +191,29 @@ def _decision_attribution(
     choice, fill = store.latest_live_facts_for_cohort(
         str(decision["cohort_id"]), as_of=effective_at
     )
+    # 錨點收斂（2026-09-02，L12）：本欄位過去同欄兩義——有 legacy paper event 的
+    # cohort 錨在 paper 起始 decision 的凍結價，沒有的錨在「當前 decision 自己」的
+    # 凍結價（後者對剛評估的 decision 恆近零，是無意義的數字）。現在只保留前一種
+    # 語意：**自 paper 起始 decision 凍結價以來的報酬**；無 paper 歷史即 None。
+    # Shadow 錨定的報酬走 market attribution 的 absolute_return，兩者從此不混。
     system_return: float | None = None
-    paper_context = (
-        store.get_context_bundle(source_decision["context_digest"]).payload
-        if source_decision is not None
-        else context
-    )
-    decision_market = paper_context.get("market") or {}
-    if (
-        current_market.get("status") == "observed"
-        and decision_market.get("status") == "available"
-        and current_market.get("currency") == decision_market.get("currency")
-    ):
-        current_price = _positive(current_market.get("price"), "current_market.price")
-        decision_price = _positive(decision_market.get("price"), "decision_market.price")
-        system_return = current_price / decision_price - 1.0
+    if source_decision is not None:
+        paper_context = store.get_context_bundle(
+            source_decision["context_digest"]
+        ).payload
+        decision_market = paper_context.get("market") or {}
+        if (
+            current_market.get("status") == "observed"
+            and decision_market.get("status") == "available"
+            and current_market.get("currency") == decision_market.get("currency")
+        ):
+            current_price = _positive(
+                current_market.get("price"), "current_market.price"
+            )
+            decision_price = _positive(
+                decision_market.get("price"), "decision_market.price"
+            )
+            system_return = current_price / decision_price - 1.0
     # ⚠ 系統給的額度欄位（system_paper_target／latest_recommendation_target／
     # system_paper_max）已移除。outcome 要回答的是「排序準不準」，那需要報酬率，
     # 不需要系統曾經建議投多少——而那三個欄位正是本次重構要從系統終點拔掉的東西。

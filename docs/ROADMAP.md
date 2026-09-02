@@ -318,7 +318,7 @@ D7 的判準本身仍然有效，只是不再有這個 gate 可套用。
 | 項目 | 為什麼還沒做 | 驗收條件 | 先做什麼 |
 |---|---|---|---|
 | **✅已交付 2026-09-02：alpha pane1 按族群（sector）分段呈現瓶頸排序**（commit 70200ed；e2e 三群現形,機器人群缺席=接邊研究題已進 pq1） | 2026-09-02 使用者發現：預期每個族群有自己的瓶頸排名，實際 pane1 是單一全域混排。資料層其實齊了——`config/sector_anchors.json` 已定義五個族群（[323] 交付），`rank_bottlenecks()` 每列都帶 `demand_anchor`——但呈現層沒用它分組，是 L16 形狀（SSOT 在、沒送到消費端）。排序權威不變（仍是 `rank_bottlenecks` 的兩份排序），只改呈現：按 demand_anchor 所屬 sector 分段，各段內保持原排序鍵 | pane1 輸出按五個 sector 分段，各段有自己的第一名；跨段仍可看全域序（段標附全域名次）；`sector_anchors.json` 新增族群時 pane1 自動長出新段 | 無（純呈現層改動） |
-| **`prepare_research_action` 應在 prepare 時擋「同 URL 無 section」的 curated 文件** | 2026-09-01 實測：兩個已核准的 RA（原 [360][361]）apply 時才撞 loader 的 `DuplicateUrlError`（curated 節錄文件與母文件同 URL、payload 凍結無法補 `section`），只能重新 prepare＋重新請求核准——把 loader 端 gate 提前到 prepare 端可在核准前就發現。同輪還 backfill 了三個舊母文件的 null section（fas_dod／lynas_q1_fy26／miningweekly） | prepare 一個同 URL 且缺 section 的 draft 會被 rejected 並指出缺哪個欄位；既有通過案例（nextfinancial 雙 section）仍通過 | 無 |
+| **✅已交付 2026-09-02：`prepare_research_action` 在 prepare 時擋「同 URL 無 section」**（graph_mcp `_prepare_extraction_impl` 重用 loader `check_duplicate_url`；三個驗收例實測：缺 section 拒＋指出原因、母 doc 缺 section 拒、nextfinancial 互異 section 放行；Neo4j 不可用時降級由 apply 端兜底） | 2026-09-01 實測：兩個已核准的 RA（原 [360][361]）apply 時才撞 loader 的 `DuplicateUrlError`（curated 節錄文件與母文件同 URL、payload 凍結無法補 `section`），只能重新 prepare＋重新請求核准——把 loader 端 gate 提前到 prepare 端可在核准前就發現。同輪還 backfill 了三個舊母文件的 null section（fas_dod／lynas_q1_fy26／miningweekly） | prepare 一個同 URL 且缺 section 的 draft 會被 rejected 並指出缺哪個欄位；既有通過案例（nextfinancial 雙 section）仍通過 | 無 |
 | **排程與互動 session 的互斥仍是單向避讓，不是鎖** | 2026-08-31 建了 `scripts/writer_guard.py`，但**只有互動側會呼叫**：daily 那側要加同樣檢查必須動 `.codex/rules/stockbot-automations.rules` 的 16 條 exact allowlist（新增命令＝sandbox impact review，見 `AGENTS.md` 該契約）。目前靠「daily 有界且時間可預測、互動側讓開」成立，**但 daily 若延遲或超時就失效**。repo 內原本 `filelock`／`flock`／pidfile 全部 0 命中，所以這是從無到單向，不是從單向到雙向 | 兩側都在寫 `library/leads/*.json` 前取得同一個 advisory lock；lock 需 stale-tolerant（崩潰的 session 不得永久卡住）。baseline：目前互動側 exit 2 可擋、排程側 0 檢查 | 先量測 daily 實際執行時長分布——`expected_duration_minutes=60` 目前是拍腦袋值，窗開太寬會讓互動 session 無謂等待，開太窄則保護失效 |
 
 
@@ -329,12 +329,12 @@ Testing 模式 token 過期兩個判準保留在 `docs/OPERATIONS.md`「Private 
 
 | 項目 | 為什麼 | 驗收條件 | 前置 |
 |---|---|---|---|
-| **`paper_exposure_invalid` 已無產生端，paper ledger 的數值健全性從此不被檢查** | U7 移除 paper 部位後，唯一會產生這個 blocker 的程式碼一併消失，但它仍登記在 `config/decision_blockers.json` 且標 fatal——一個永遠不會亮的 fatal blocker 是死規則，讀者會以為那項健全性有人在管 | 該碼從 registry 移除，或恢復一個真的會觸發它的檢查。**先確認哪一個才對**：paper ledger 已凍結為歷史，可能根本不需要檢查 | 無 |
-| **`paper_portfolio/ledger.py` 失去存在理由** | `atomic_assess_probe` 永久停止寫 `paper_events` 後，這個模組在本 diff 之前就已是 test-only | 刪除後全套測試仍綠，或明確記錄它為何要留 | A（ce 移除）之後一併清 |
-| **`outcomes.py::system_paper_return` 的價格錨點同欄兩義** | 有 legacy paper event 的 cohort 錨在舊 decision、沒有的錨在當前 decision；`AGENTS.md` 敘述的錨點則是 Shadow observation。三者不一致（L12 形狀） | 錨點來源收斂成一個，或在欄位名上把兩種錨點分開 | 無 |
-| **`nav_exposure._nav_base` 只取第一列的 `nav_base`** | 多帳戶／多幣別 Sheet 會全部按第一列的 NAV 計算佔比，而 NAV 呈現的整個用途就是看佔比 | 給定兩列不同 `nav_base` 的持股時，行為是明確的（取和、或 fail closed），不是靜默取第一個 | 無 |
-| **三條新路徑的例外分支零覆蓋** | `cli._optional`、`adapters.fetch_ranking_view`、`store.complete_paper_amendment` 的 `.get()` 容錯都沒有測試會真的觸發 | 各補一條會 raise 的測試；`complete_paper_amendment` 需用直接 INSERT 造 legacy paper event | 無 |
-| **`fetch_ranking_view` 的轉換階段不在 try 之外** | `rank_bottlenecks()`／`build_ranking_view()` 在 try/except 之外，docstring 承諾的「讀不到回 None」對轉換例外不成立，目前只靠 `cli._optional` 兜住 | 轉換例外也回 None，或把承諾改寫成實際行為 | 無 |
+| **✅已結案 2026-09-02（前提被否證，無需變更）：`paper_exposure_invalid`** 產生端仍活著——`workflow._paper_exposure` 每次 freeze 都呼叫 `store.paper_exposure_snapshot`，invalid 時由 `context.py:671` 觸發。否證命令：`grep -n paper_exposure_invalid decision_lab/context.py`（L11-6：能套進 lesson 只代表值得查，不代表已經查過） | U7 移除 paper 部位後，唯一會產生這個 blocker 的程式碼一併消失，但它仍登記在 `config/decision_blockers.json` 且標 fatal——一個永遠不會亮的 fatal blocker 是死規則，讀者會以為那項健全性有人在管 | 該碼從 registry 移除，或恢復一個真的會觸發它的檢查。**先確認哪一個才對**：paper ledger 已凍結為歷史，可能根本不需要檢查 | 無 |
+| **✅已結案 2026-09-02（保留＋記錄理由）：`paper_portfolio/ledger.py`**——`replay_decision_store_events` 是 e2e（test_decision_lab_e2e）對 store paper projection 的獨立重放驗證器，理由已寫進模組 docstring | `atomic_assess_probe` 永久停止寫 `paper_events` 後，這個模組在本 diff 之前就已是 test-only | 刪除後全套測試仍綠，或明確記錄它為何要留 | A（ce 移除）之後一併清 |
+| **✅已交付 2026-09-02：`system_paper_return` 錨點收斂**——只在真有 paper 起始 decision 時計算（自其凍結價以來的報酬），無 paper 歷史即 None；Shadow 錨定報酬走 market attribution 的 absolute_return，兩者不再混 | 有 legacy paper event 的 cohort 錨在舊 decision、沒有的錨在當前 decision；`AGENTS.md` 敘述的錨點則是 Shadow observation。三者不一致（L12 形狀） | 錨點來源收斂成一個，或在欄位名上把兩種錨點分開 | 無 |
+| **✅已交付 2026-09-02：`_nav_base` 多列互異正值時 fail closed 回 None**（上游渲染「未提供 NAV」現形，不給錯分母） | 多帳戶／多幣別 Sheet 會全部按第一列的 NAV 計算佔比，而 NAV 呈現的整個用途就是看佔比 | 給定兩列不同 `nav_base` 的持股時，行為是明確的（取和、或 fail closed），不是靜默取第一個 | 無 |
+| **✅已交付 2026-09-02：例外分支測試**（tests/test_optional_branches.py×3）；`store.complete_paper_amendment` 已不存在於 codebase，該子項過時註銷 | `cli._optional`、`adapters.fetch_ranking_view`、`store.complete_paper_amendment` 的 `.get()` 容錯都沒有測試會真的觸發 | 各補一條會 raise 的測試；`complete_paper_amendment` 需用直接 INSERT 造 legacy paper event | 無 |
+| **✅已交付 2026-09-02：`fetch_ranking_view` 轉換段納入同語意 try**（轉換例外也回 None＋warning，docstring 承諾成立） | `rank_bottlenecks()`／`build_ranking_view()` 在 try/except 之外，docstring 承諾的「讀不到回 None」對轉換例外不成立，目前只靠 `cli._optional` 兜住 | 轉換例外也回 None，或把承諾改寫成實際行為 | 無 |
 
 **其餘未排程：**
 

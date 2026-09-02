@@ -64,7 +64,13 @@ from mcp.types import ToolAnnotations
 
 from query.graph_context import build_context
 from loader.validate import validate as validate_extraction
-from loader.load_to_neo4j import edge_key, evidence_id, load as load_to_graph
+from loader.load_to_neo4j import (
+    DuplicateUrlError,
+    check_duplicate_url,
+    edge_key,
+    evidence_id,
+    load as load_to_graph,
+)
 from loader.edge_resolution import project_edge_keys
 from mcp_server.intake import (
     MAX_EXTRACTION_CHARS,
@@ -480,6 +486,30 @@ def _prepare_extraction_impl(
             "error": "驗證未通過",
             "problems": hard_errors,
         }
+
+    # 同 URL 多段驗證提前到 prepare（2026-09-02 ROADMAP 交付）：loader 的
+    # DuplicateUrlError 原本在 apply 才炸，而 payload 已凍結、只能重 prepare＋
+    # 重新請求核准（2026-09-01～02 實測連踩三次：原 [360][361]、[376]、[394]）。
+    # 這裡用 loader 同一套判準先擋；Neo4j 不可用時降級放行——apply 端仍是最終防線，
+    # prepare 不因需要圖連線而阻斷離線流程。
+    try:
+        dup_driver = _driver()
+        try:
+            with dup_driver.session() as dup_session:
+                check_duplicate_url(doc.get("source_doc") or {}, dup_session)
+        finally:
+            dup_driver.close()
+    except DuplicateUrlError as exc:
+        return {
+            "status": "rejected",
+            "doc_id": doc_id,
+            "error": (
+                "同 URL 多段驗證未通過（prepare 端先擋，免得核准後 apply 才發現）："
+                f"{exc}"
+            ),
+        }
+    except Exception:  # noqa: BLE001 — 圖連線不可用時降級，apply 端仍會擋
+        pass
 
     raw_payload = {
         key: value

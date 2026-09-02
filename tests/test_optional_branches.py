@@ -1,0 +1,60 @@
+"""ROADMAP code-review 項（2026-08-29）：例外分支要有會真的觸發的測試。
+
+`cli._optional` 與 `adapters.fetch_ranking_view` 的「拿不到 → None」承諾，
+此前只有正常路徑覆蓋——吞例外的分支從未被真的觸發過。
+（原清單第三項 `store.complete_paper_amendment` 已不存在於 codebase，2026-09-02 查證。）
+"""
+from __future__ import annotations
+
+import pytest
+
+from decision_lab.cli import _optional
+
+
+def test_optional_swallows_exception_to_none() -> None:
+    def boom() -> dict:
+        raise RuntimeError("builder exploded")
+
+    assert _optional(boom) is None
+
+
+def test_optional_passes_through_result() -> None:
+    assert _optional(lambda: {"x": 1}) == {"x": 1}
+
+
+def test_fetch_ranking_view_transform_exception_returns_none(monkeypatch) -> None:
+    """docstring 承諾「讀不到回 None」——轉換段（rank/build）的例外同樣適用。"""
+    import query.bottleneck as bottleneck
+    from engine_d_runtime import adapters
+
+    class _FakeSession:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return False
+
+    class _FakeDriver:
+        def session(self):
+            return _FakeSession()
+
+        def close(self):
+            pass
+
+    class _FakeGraphDatabase:
+        @staticmethod
+        def driver(*args, **kwargs):
+            return _FakeDriver()
+
+    monkeypatch.setenv("NEO4J_PASSWORD", "x")
+    import neo4j
+
+    monkeypatch.setattr(neo4j, "GraphDatabase", _FakeGraphDatabase)
+    monkeypatch.setattr(bottleneck, "fetch_assertions", lambda session: [])
+
+    def raise_transform(*args, **kwargs):
+        raise ValueError("transform exploded")
+
+    monkeypatch.setattr(bottleneck, "rank_bottlenecks", raise_transform)
+
+    assert adapters.fetch_ranking_view() is None

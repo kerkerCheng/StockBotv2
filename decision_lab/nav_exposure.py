@@ -48,6 +48,10 @@ def _value(row: Mapping[str, Any]) -> float:
 
 
 def _nav_base(rows: Sequence[Mapping[str, Any]]) -> float | None:
+    """取 NAV 基底。多列出現**互異**的正值 nav_base 時 fail closed 回 None——
+    NAV 呈現的整個用途就是看佔比，靜默取第一列會把多帳戶／多幣別 Sheet 的
+    佔比全部算在錯的分母上；None 會讓上游以「未提供 NAV」現形，而不是給錯數字。"""
+    seen: set[float] = set()
     for row in rows:
         raw = row.get("nav_base")
         if raw in (None, ""):
@@ -57,8 +61,10 @@ def _nav_base(rows: Sequence[Mapping[str, Any]]) -> float | None:
         except (TypeError, ValueError):
             continue
         if nav > 0:
-            return nav
-    return None
+            seen.add(nav)
+    if len(seen) > 1:
+        return None
+    return next(iter(seen), None)
 
 
 def build_nav_exposure(
