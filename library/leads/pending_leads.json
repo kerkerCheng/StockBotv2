@@ -20559,6 +20559,37 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1633978/000157046526000007/xslF345X06/form4-08282026_010820.xml"
     },
+    "lead_4e7d95b05120fd1cc2d581e3d6142b25": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-02T02:23:30.353290+00:00",
+      "lead_id": "lead_4e7d95b05120fd1cc2d581e3d6142b25",
+      "published_at": null,
+      "refs": {},
+      "source": "alignment-audit-2026-09-02",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "[對齊|機器人] Nidec(6594.T)registry 已登記但圖中零內容——全球馬達龍頭+諧波減速器(Nidec-Shimpo/Drive Technology),機器人群供給側缺這一家;首批 extraction 研究",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-02T02:23:41.319090+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "Nidec 馬達+諧波,機器人群供給側空缺"
+        },
+        "decided_at": "2026-09-02T02:23:41.319090+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "對齊稽核發現:registry 已登記但圖中零內容;機器人群供給側補洞",
+        "tier": 2
+      },
+      "url": "https://www.nidec.com/en/product/search/category/B101/?align=robotics_group"
+    },
     "lead_4eb41f582cae2cf14b51c88326c53a48": {
       "entities": {
         "company_ids": [],
@@ -31373,6 +31404,37 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/928876/000117891326003419/zk2635649.htm"
+    },
+    "lead_87b40ffa1137339e1365cedb3642bc95": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-02T02:23:30.642645+00:00",
+      "lead_id": "lead_87b40ffa1137339e1365cedb3642bc95",
+      "published_at": null,
+      "refs": {},
+      "source": "alignment-audit-2026-09-02",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "[對齊|機器人] THK(6481.T)registry 已登記但圖中零內容——LM 導軌/線性滑軌全球約過半市占的傳統說法待核,人形關節線性件供給側;首批 extraction 研究",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-02T02:23:41.588645+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "THK 線性導軌,人形關節線性件層"
+        },
+        "decided_at": "2026-09-02T02:23:41.588645+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "對齊稽核發現:registry 已登記但圖中零內容;機器人群供給側補洞",
+        "tier": 2
+      },
+      "url": "https://www.thk.com/?q=eng/node/124&align=robotics_group"
     },
     "lead_87e42a055ae88243e091c31d1dcabb83": {
       "entities": {
