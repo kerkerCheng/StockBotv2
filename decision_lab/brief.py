@@ -903,10 +903,39 @@ def build_today_brief(
         # （L14——靠人記得跑 scripts/backup_private.py 的段落就是會被忘記的段落）。
         # None 只代表這個 surface 沒有 private root，不與「從未備份」混用（L12）。
         "backup_status": _backup_status_payload(),
+        # 排序品質計數器（2026-09-02）：讀 outcome_if_settled_today 落的狀態檔，
+        # 不在 brief 生成時重打行情 API。None＝從未量測（檔不存在），現形於缺席。
+        "outcome_aggregate": _outcome_aggregate_payload(),
         "items": ranked,
     }
     assert_safe_payload(brief)
     return brief
+
+
+def _outcome_aggregate_payload(private_root: Path | None = None) -> dict[str, Any] | None:
+    """讀 `scripts/outcome_if_settled_today.py` 落的等權聚合狀態檔（2026-09-02）。
+
+    None＝檔不存在或壞掉——renderer 顯示「未量測」提示，不靜默。"""
+    if private_root is None:
+        private_root = Path(__file__).resolve().parent.parent / "library" / "private"
+    path = private_root / "decision_lab" / "outcome_aggregate.json"
+    if not path.is_file():
+        return None
+    try:
+        raw = json.loads(path.read_text(encoding="utf-8"))
+        return {
+            "date": str(raw["date"]),
+            "n": int(raw["n"]),
+            "equal_weight_absolute": float(raw["equal_weight_absolute"]),
+            "equal_weight_excess": (
+                float(raw["equal_weight_excess"])
+                if raw.get("equal_weight_excess") is not None
+                else None
+            ),
+            "benchmark": str(raw.get("benchmark") or ""),
+        }
+    except (OSError, ValueError, KeyError, TypeError):
+        return None
 
 
 def _backup_status_payload(
@@ -1279,6 +1308,25 @@ def render_today_markdown(brief: Mapping[str, Any]) -> str:
                 f"（圖 {alignment.get('graph_companies')}／registry "
                 f"{alignment.get('registry_companies')}）"
             )
+    # 排序品質計數器（2026-09-02）：等權聚合是排序準不準的裁判數字（L14 常駐）。
+    agg = brief.get("outcome_aggregate")
+    if agg:
+        ex = agg.get("equal_weight_excess")
+        ex_txt = (
+            f"｜超額({markdown_text(agg.get('benchmark') or '?')}) {ex:+.1%}"
+            if isinstance(ex, (int, float))
+            else ""
+        )
+        lines.append(
+            f"- 排序品質：推薦籃等權 {agg.get('n')} 檔 絕對 "
+            f"{agg.get('equal_weight_absolute'):+.1%}{ex_txt}"
+            f"（量測日 {markdown_text(agg.get('date') or '?')}；粗聚合非回測，"
+            "前/後段對照待快照累積）"
+        )
+    elif "outcome_aggregate" in brief:
+        lines.append(
+            "- 排序品質：尚無量測——跑 `scripts/outcome_if_settled_today.py` 產生"
+        )
     # 備份計數器：與 capital_expression 各自獨立呈現——surface 沒給就整行略過，
     # 「從未備份」與「狀態檔壞掉」都必須現形，不得靜默（L12／L14）。
     backup = brief.get("backup_status")

@@ -389,8 +389,37 @@ def _render(results: list[dict], unavailable: list[dict], has_bench: bool) -> No
             line += f"｜超額({PRIMARY_BENCHMARK}) {_pct(ew_ex)}"
         line += "**——各檔錨點日不同，粗聚合非回測；前/後段對照待排序快照累積"
         print(line)
+        _persist_aggregate(
+            n=len(abs_returns),
+            ew_abs=ew_abs,
+            ew_excess=(sum(excess_returns) / len(excess_returns)) if excess_returns else None,
+        )
 
     _append_ranking_snapshot()
+
+
+def _persist_aggregate(*, n: int, ew_abs: float, ew_excess: float | None) -> None:
+    """把最新聚合值落成狀態檔——brief 首屏讀這裡，不重打行情 API（2026-09-02 前置）。"""
+    import json as _json
+
+    out = Path("library/private/decision_lab/outcome_aggregate.json")
+    try:
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(
+            _json.dumps(
+                {
+                    "date": date.today().isoformat(),
+                    "n": n,
+                    "equal_weight_absolute": ew_abs,
+                    "equal_weight_excess": ew_excess,
+                    "benchmark": PRIMARY_BENCHMARK,
+                },
+                ensure_ascii=False,
+            ),
+            encoding="utf-8",
+        )
+    except OSError:
+        pass
 
 
 def _append_ranking_snapshot() -> None:
