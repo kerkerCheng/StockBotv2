@@ -126,5 +126,8 @@ def test_variant_perception_roundtrip_and_supersede(tmp_path) -> None:
         )
         assert store.latest_variant_perception(cid)["variant_perception"] == "v2"
         assert store.latest_variant_perception("dc_nonexistent") is None
+        by_co = store.latest_variant_perception_for_company("co:nvidia")
+        assert by_co is not None and by_co["variant_perception"] == "v2"
+        assert store.latest_variant_perception_for_company("co:absent") is None
     finally:
         store.close()

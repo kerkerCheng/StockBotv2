@@ -214,6 +214,37 @@ def _build_market_context(ticker: str | None) -> str:
         return f"## 市場定價數據\n⚠ 取得失敗：{e}\n"
 
 
+def _build_variant_perception_context(company_id: str | None) -> str:
+    """從 Decision cohort 讀已寫定的 variant perception（2026-09-02 cohort 是終點）。
+
+    memo 是渲染視圖：thesis 差異點的家在 cohort，這裡只帶出、不代寫。
+    讀不到（無 private root、無 cohort、未寫）都如實現形，不擋 memo 生成。"""
+    if not company_id:
+        return ""
+    try:
+        from decision_lab.bootstrap import open_default_store
+
+        store = open_default_store()
+        try:
+            vp = store.latest_variant_perception_for_company(company_id)
+        finally:
+            store.close()
+    except Exception as e:
+        return f"## Variant Perception（cohort thesis）\n⚠ 讀取失敗：{e}\n"
+    if vp is None:
+        return (
+            "## Variant Perception（cohort thesis）\n"
+            "⚠ 該公司所有 cohort 均未寫 variant perception——memo 的差異點段落"
+            "只能由市場數據現推，寫定請用 "
+            f"`decision_lab variant-perception <cohort> --text …`（company_id={company_id}）\n"
+        )
+    return (
+        "## Variant Perception（cohort thesis——已寫定的權威版本，memo 必須以此為準）\n"
+        f"- cohort：`{vp['cohort_id']}`（寫入 {vp['created_at']}）\n"
+        f"- {vp['variant_perception']}\n"
+    )
+
+
 def _parse_envelope(raw_text: str) -> tuple[dict | None, str | None]:
     """Parse provider-independent JSON, tolerating only an outer code fence."""
 
@@ -332,6 +363,7 @@ def generate(
     resolved_ticker = _resolve_ticker(ticker, company_id)
     gate_ctx, gate_pass = _build_gate_context(resolved_ticker, override_gate, override_reason)
     market_ctx = _build_market_context(resolved_ticker)
+    vp_ctx = _build_variant_perception_context(company_id)
 
     # L9 pre-condition gate (CLAUDE.md L9): must pass before "investment" label
     l9_ctx = ""
@@ -372,9 +404,12 @@ def generate(
 
 {market_ctx}
 
+{vp_ctx}
+
 請只輸出 system prompt 指定的 JSON envelope，不要加 code fence、前言或解釋。
 確保 Variant Perception 段落有具體的「市場現在信 X，本 thesis 認為 Y，催化劑 Z」，
-並引用上方市場定價數據中的具體數字。每個重要論點必須用 `[E#]` 指向
+並引用上方市場定價數據中的具體數字。若上方已提供 cohort thesis 的權威版本，
+Variant Perception 段落必須以它為基礎渲染（可補市場數字，不得改寫方向）。每個重要論點必須用 `[E#]` 指向
 evidence_items；所有 ID 必須逐字取自 Evidence Inventory。"""
 
     if envelope_path is not None:

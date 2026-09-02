@@ -1087,6 +1087,29 @@ class DecisionStore:
         ).fetchone()
         return dict(row) if row is not None else None
 
+    def latest_variant_perception_for_company(
+        self, company_id: str
+    ) -> dict[str, Any] | None:
+        """跨該公司所有 cohort 取最新未被 supersede 的 variant perception。
+
+        Lane Memo 的入口是 company_id 不是 cohort_id（2026-09-02 cohort 是終點——
+        memo 是渲染視圖，thesis 的家在 cohort），所以這裡替視圖做反查。"""
+        row = self._conn.execute(
+            """
+            SELECT t.thesis_id, t.cohort_id, t.variant_perception, t.created_at
+            FROM cohort_thesis t
+            JOIN decision_cohorts c ON c.cohort_id = t.cohort_id
+            WHERE c.company_id = ?
+              AND NOT EXISTS (
+                SELECT 1 FROM cohort_thesis n WHERE n.supersedes_id = t.thesis_id
+              )
+            ORDER BY t.created_at DESC, t.thesis_id DESC
+            LIMIT 1
+            """,
+            (company_id,),
+        ).fetchone()
+        return dict(row) if row is not None else None
+
     def latest_holdings_confirmation(self, sheet_digest: str) -> dict[str, Any] | None:
         row = self._conn.execute(
             """

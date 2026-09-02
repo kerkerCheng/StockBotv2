@@ -460,6 +460,14 @@ def run(
                 "note": "引用已預填、判斷留白；填完 reason/level 後用 "
                 "`decision_lab references <cohort> --assessment <out>` 驗證再 reassess。",
             }
+            # variant perception 提醒（2026-09-02 cohort 是終點）：assessment 是研究
+            # 收尾動作，順帶點名 thesis 差異點還沒寫的 cohort——只提示不阻擋。
+            vp_reader = getattr(store, "latest_variant_perception", None)
+            if callable(vp_reader) and vp_reader(bundle.cohort_id) is None:
+                summary["variant_perception"] = (
+                    "未寫——收尾前補一句「市場隱含 X／本 thesis 認為 Y／催化劑 Z」："
+                    f"decision_lab variant-perception {bundle.cohort_id} --text …"
+                )
             print(json.dumps(summary, ensure_ascii=False, indent=2), file=stdout)
         elif args.command == "variant-perception":
             if args.text:
