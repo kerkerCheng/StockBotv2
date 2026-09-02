@@ -6687,6 +6687,11 @@
     },
     {
       "added_at": "2026-09-01T13:44:29.878804+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_c49ad9a8820654fd8e9cbc9abc660f0e",
+      "dispatch_ref": "wo_7b8e7b06c0ff531faa099666bb9b1f53",
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-09-02T07:50:55.422644+00:00",
       "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 398,
       "reason": null,
@@ -6699,6 +6704,11 @@
     },
     {
       "added_at": "2026-09-01T13:44:29.878804+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_51bf9d0be65f1aeeff6a456e3310f967",
+      "dispatch_ref": "wo_805163e4cfe24608ba55ac78b068588e",
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-09-02T07:50:55.457725+00:00",
       "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 399,
       "reason": null,
@@ -6728,6 +6738,11 @@
     },
     {
       "added_at": "2026-09-01T13:44:29.878804+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_1273ddf3c3544711257c8cc23f4e629e",
+      "dispatch_ref": "wo_395ca7a7ce49a0f91f5bd35730644d0a",
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-09-02T07:50:55.490278+00:00",
       "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 401,
       "reason": null,
@@ -6816,6 +6831,11 @@
     },
     {
       "added_at": "2026-09-01T15:06:12.743064+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_749996b9d3effd934c2a9fcd78e20394",
+      "dispatch_ref": "wo_b9657bd62ad50324742536cbd0f2fe25",
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-09-02T07:50:55.523561+00:00",
       "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 406,
       "reason": null,
@@ -6847,6 +6867,11 @@
     },
     {
       "added_at": "2026-09-01T15:06:12.743064+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_b55d1c8ba0d4112f58e3904075158b5e",
+      "dispatch_ref": "wo_8196a23834dd3f0b24d9ad3edadd28dc",
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-09-02T07:50:55.556588+00:00",
       "hint": "當前 missing_data：customer_concentration：日本／JARE 佔營收比重（FY26 全年報告可查，尚未核對）；美國政府 US$96M binding LOI 的一手 ASX 公告核對（共 2 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 408,
       "reason": null,
@@ -6901,6 +6926,11 @@
     },
     {
       "added_at": "2026-09-02T01:16:51.472047+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_ee5cacfbc732d3318d068c30e1914fc9",
+      "dispatch_ref": "wo_2b81081163982ecc8cf45a3f96a039fb",
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-09-02T07:50:55.589237+00:00",
       "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 411,
       "reason": null,
@@ -6920,11 +6950,21 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
+      "source_cleared": {
+        "at": "2026-09-02T07:53:06.101445+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
       "title": "co:harmonic_drive_systems：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
     },
     {
       "added_at": "2026-09-02T01:16:51.472047+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_78e747c4bcf1f99b0b205cd78f907218",
+      "dispatch_ref": "wo_810e8da66a56cf820e8ceb5f8204ae91",
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-09-02T07:50:55.622465+00:00",
       "hint": "當前 missing_data：四家具名人形夥伴中任一家的付款方向證據（訂單金額、產能協議或預付款）——partnership 具名已有，缺的是誰付錢給；Schaeffler 官方一手（收購新聞稿、2026-02-05 humanoid IR 簡報）——schaeffler（共 2 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 413,
       "reason": null,
@@ -15242,6 +15282,85 @@
       "ref_id": "ra_88274fb8d4d1645552e0aa1b38a5b663",
       "type": "ra_admission",
       "verb": "go"
+    },
+    {
+      "at": "2026-09-02T07:50:55.422644+00:00",
+      "attempt": 1,
+      "n": 398,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_7b8e7b06c0ff531faa099666bb9b1f53",
+      "ref_id": "dc_32872cf6a80c5f273b9b4c55a57ff229",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-09-02T07:50:55.457725+00:00",
+      "attempt": 1,
+      "n": 399,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_805163e4cfe24608ba55ac78b068588e",
+      "ref_id": "dc_db19d3b490013f4cc464b2aab37b0bc8",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-09-02T07:50:55.490278+00:00",
+      "attempt": 1,
+      "n": 401,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_395ca7a7ce49a0f91f5bd35730644d0a",
+      "ref_id": "dc_b8fb35bfe958d2e6ca4b3f60e623a576",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-09-02T07:50:55.523561+00:00",
+      "attempt": 1,
+      "n": 406,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_b9657bd62ad50324742536cbd0f2fe25",
+      "ref_id": "dc_fef9e03e5e6935e7428620f7eab793ba",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-09-02T07:50:55.556588+00:00",
+      "attempt": 1,
+      "n": 408,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_8196a23834dd3f0b24d9ad3edadd28dc",
+      "ref_id": "dc_48446dbceb85d4b785634e3c4ca5d669",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-09-02T07:50:55.589237+00:00",
+      "attempt": 1,
+      "n": 411,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_2b81081163982ecc8cf45a3f96a039fb",
+      "ref_id": "dc_1322bfc1c743fa746b76e280c1b27b28",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-09-02T07:50:55.622465+00:00",
+      "attempt": 1,
+      "n": 413,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_810e8da66a56cf820e8ceb5f8204ae91",
+      "ref_id": "dc_912a03a50135ea5e29000a0417c3f477",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-09-02T07:53:06.101445+00:00",
+      "n": 412,
+      "reason": "來源本輪成功執行，但不再產出此項",
+      "receipt": null,
+      "ref_id": "dc_cc46527aac12ba14191ee71c0460f3fe",
+      "type": "decision_review",
+      "verb": "source_cleared"
     }
   ],
   "next_n": 414,
