@@ -1391,12 +1391,15 @@ def render_today_markdown(brief: Mapping[str, Any]) -> str:
     # ── live 入口 ──────────────────────────────────────────────────────────
     # 2026-08-18 紅隊審查 B8：`record-choice --user-sized` 蓋好了，但**沒有任何入口**
     # ——brief 不提、todo pool 不提、Action Card 不提，它是一個使用者必須自己記得的
-    # CLI。`live_choices` 至今 0 筆，與「沒有這條路徑」在結果上不可區分（D13）。
-    # 這一段把「要記得」變成「看得到」。
+    # CLI。這一段把「要記得」變成「看得到」。
     #
     # ⚠ 這**不是**行動指引，不違反 Alpha 呈現契約：指令裡的 `--selected-weight` 刻意
     # 留空給使用者填，brief 不提供任何建議尺寸；系統也不判斷現在該不該買。
     # 它只解決一件事：真的決定要買的時候，有地方可以記錄，記分板才可能有資料。
+    #
+    # ⚠ live 筆數必須動態取（2026-09-02 修正）：原版把 08-18 當時的實測值「0 筆」
+    # 寫死在字串裡，使用者走完第一筆 choice→fill 後 footer 仍喊 0，與 outcome
+    # surface 直接矛盾——「現況數字會過期，判準不會」的程式版。
     actionable = [
         item
         for item in items
@@ -1404,12 +1407,20 @@ def render_today_markdown(brief: Mapping[str, Any]) -> str:
         and str(item.get("company_id") or "") not in {"", "unresolved"}
     ]
     if actionable:
+        capital = brief.get("capital_expression") or {}
+        n_choices = capital.get("live_choices")
+        n_fills = capital.get("live_fills")
+        scoreboard = (
+            f"——目前 `live_choices` {n_choices} 筆／fill {n_fills} 筆"
+            if isinstance(n_choices, int) and isinstance(n_fills, int)
+            else ""
+        )
         lines += [
             "",
             "## 若你今天決定進場／加碼（指令，不是建議）",
             "",
             "尺寸由你決定；系統不建議金額，也不判斷時點。記錄下來只為了讓「判斷準不準」"
-            "日後能用證據回答——目前 `live_choices` 仍是 0 筆，這個問題還無法回答。",
+            f"日後能用證據回答{scoreboard}。",
             "",
         ]
         for item in actionable[:8]:

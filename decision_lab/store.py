@@ -944,6 +944,15 @@ class DecisionStore:
             " JOIN decision_cohorts c ON c.cohort_id = s.cohort_id"
             " WHERE c.company_id IS NOT NULL"
         ).fetchone()
+        # live 路徑計數（2026-09-02）：brief 的 live 入口段落此前把「至今 0 筆」寫死在
+        # render 字串裡（2026-08-18 當時實測值），使用者走完第一筆 choice→fill 後
+        # footer 仍喊 0——「現況數字會過期，判準不會」的程式版違規。改由這裡動態取。
+        live_choice_n = self._conn.execute(
+            "SELECT COUNT(*) AS n FROM live_choices"
+        ).fetchone()
+        live_fill_n = self._conn.execute(
+            "SELECT COUNT(*) AS n FROM live_execution_reports"
+        ).fetchone()
         return {
             "decisions": decisions,
             "live_range_nonzero": live_nonzero,
@@ -971,6 +980,8 @@ class DecisionStore:
             "calculator_version": current_calculator,
             "decisions_current_calculator": current_decisions,
             "live_range_nonzero_current": current_live_nonzero,
+            "live_choices": int(live_choice_n["n"] or 0),
+            "live_fills": int(live_fill_n["n"] or 0),
         }
 
     def get_probe(self, cohort_id: str) -> ProbeRecord:

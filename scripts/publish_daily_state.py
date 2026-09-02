@@ -1,7 +1,16 @@
-"""安全發布本機 daily routine 的兩個 tracked state files。
+"""安全發布本機 daily routine 的四個 tracked state files。
 
-排程只准提交 pending leads 與穩定 pq2 編號池；不吃外部 path 參數、不碰使用者
-已 staged 的內容，也不會把其他未推送的 master commits 一併推上去。
+排程只准提交 pending leads、穩定 pq2 編號池、event watch registry 與假設對照；
+不吃外部 path 參數、不碰使用者已 staged 的內容，也不會把其他未推送的 master
+commits 一併推上去。
+
+2026-09-02 pathset 由二擴四（sandbox impact review 同 change 完成）：daily 會更新
+watch 喚醒／mark-checked 與假設對照，但先前只能留本機未提交，等互動 session 順手
+commit——兩個 writer 的變更混在同一份 diff，正是 writer lock 要防的形狀在 Git 層
+的殘留。擴充不新增命令、不新增 OS／網路能力（同一條 `.codex/rules` exact entry、
+同目錄 tracked 檔案、同一組 git 動作）；guard 全部沿用（pathset 白名單、branch、
+private-tracked、ahead-commit 檢查自動涵蓋新路徑）。契約斷言見
+`tests/test_daily_state_publisher.py`。
 """
 from __future__ import annotations
 
@@ -18,6 +27,8 @@ ROOT = Path(__file__).resolve().parent.parent
 STATE_PATHS = (
     "library/leads/pending_leads.json",
     "library/leads/todo_pool.json",
+    "library/leads/event_watches.json",
+    "library/leads/hypotheses.json",
 )
 COMMIT_PREFIX = "chore(daily):"
 # 本 publisher 提交時的**完整** subject。`writer_guard` 靠它辨認「這筆共用檔變更

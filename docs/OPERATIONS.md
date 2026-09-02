@@ -23,7 +23,7 @@ Codex local scheduled task
   → brief
 ```
 
-排程收尾只跑 `scripts/publish_daily_state.py`（窄 state publisher，只發布 `pending_leads.json` ＋ `todo_pool.json`，不得用 unattended 廣泛 Git 命令碰其他檔）。
+排程收尾只跑 `scripts/publish_daily_state.py`（窄 state publisher，只發布四個 leads state 檔：`pending_leads.json`＋`todo_pool.json`＋`event_watches.json`＋`hypotheses.json`——2026-09-02 由二擴四，impact review 結論見腳本 docstring；不得用 unattended 廣泛 Git 命令碰其他檔）。
 
 ### Writer lock（雙向互斥，2026-09-02）
 
