@@ -6943,8 +6943,10 @@
       "added_at": "2026-09-02T01:16:51.472047+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_ee5cacfbc732d3318d068c30e1914fc9",
+      "dispatch_receipt": "manual_todo:424",
       "dispatch_ref": "wo_2b81081163982ecc8cf45a3f96a039fb",
-      "dispatch_status": "queued",
+      "dispatch_status": "awaiting_approval",
+      "dispatch_updated_at": "2026-09-02T11:06:58.864081+00:00",
       "dispatched_at": "2026-09-02T07:50:55.589237+00:00",
       "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 411,
@@ -7111,6 +7113,18 @@
       "resolved_at": null,
       "source": "manual",
       "title": "Aehr [406] backlog 觀測寫入核准——FY2026 10-K backlog $80.6M(前年 $15.2M,5.3x)落 Engine C",
+      "type": "manual"
+    },
+    {
+      "added_at": "2026-09-02T11:06:58.150099+00:00",
+      "hint": "go＝把 config/company_identity.json 的 co:unitree 補上 research_ticker=688836.SS(market_currency=CNY)；不含入圖、不含 Engine C 手動寫入、不含 thesis。效果:identity_unresolved blocker 解除,Engine C ETL 可開始抓行情/財務,下次 reassess 時 financial/valuation 軸有上游。背景:宇樹科技-W 於 2026-08-19 上市(發行價 CNY 150.80,首日開盤 +629%);IPO 招股書(SSE 公開)含客戶集中度與 2025 營收——建議 go 後另派 pq1 抓招股書一手抽取,現有二手轉述(2025 營收/份額)不入 authority",
+      "n": 424,
+      "reason": null,
+      "ref_id": "wo:wo_2b81081163982ecc8cf45a3f96a039fb",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "Unitree [411] registry 更新核准——宇樹 2026-08-19 科創板上市(688836.SS),identity_unresolved 可解",
       "type": "manual"
     }
   ],
@@ -15643,8 +15657,26 @@
       "ref_id": "dc_fef9e03e5e6935e7428620f7eab793ba",
       "type": "decision_review",
       "verb": "pq1_awaiting_approval"
+    },
+    {
+      "at": "2026-09-02T11:06:04.394760+00:00",
+      "n": 411,
+      "reason": "research-drain 開工",
+      "receipt": "wo:wo_2b81081163982ecc8cf45a3f96a039fb",
+      "ref_id": "dc_1322bfc1c743fa746b76e280c1b27b28",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-09-02T11:06:58.864081+00:00",
+      "n": 411,
+      "reason": "bounded research 完成:結構性 blocker 已解鎖——宇樹 2026-08-19 科創板上市(688836.SS),registry 更新提案 [424] 等核准;核准後 identity/financial/market 軸全部有上游,招股書一手另派 pq1;二手財務數字(2025 營收 335% 增長等)刻意不入 authority,等招股書逐字",
+      "receipt": "manual_todo:424",
+      "ref_id": "dc_1322bfc1c743fa746b76e280c1b27b28",
+      "type": "decision_review",
+      "verb": "pq1_awaiting_approval"
     }
   ],
-  "next_n": 424,
+  "next_n": 425,
   "schema_version": "1"
 }
