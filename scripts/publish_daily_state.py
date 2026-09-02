@@ -7,7 +7,9 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import subprocess
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -126,6 +128,18 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="發布本機 daily routine 的窄 state pathset")
     parser.parse_args()
     result = publish_daily_state()
+    # Writer lock 收尾（ROADMAP #2）：publisher 是 daily 的最後一個共用檔寫入者，
+    # 無論 publish 成敗都釋放——失敗的輪次不該繼續佔鎖到 TTL。owner 不符時
+    # release 是 no-op（不拆別人的鎖）。
+    try:
+        sys.path.insert(0, str(ROOT))
+        from engine_b.writer_lock import SCHEDULED_OWNER, release
+
+        result["writer_lock_released"] = release(
+            os.environ.get("STOCKBOT_WRITER_OWNER") or SCHEDULED_OWNER
+        )
+    except Exception:
+        result["writer_lock_released"] = None
     print(json.dumps(result, ensure_ascii=False))
     return 0 if result["status"] in {"no_change", "pushed"} else 1
 

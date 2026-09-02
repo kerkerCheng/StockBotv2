@@ -34,6 +34,11 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
    `harvest-health`、queue list／count、JSON 檢查等純本機唯讀命令維持 sandbox。
 3. 依序執行：
    - `.venv\Scripts\python.exe crons\harvest_leads.py`（X＋EDGAR；以 `since_id`／URL hash 去重）
+     ⚠ **writer lock（2026-09-02）：** harvest 開跑會 acquire 排程側 writer lock
+     （`library/leads/.writer_lock.json`，嵌在既有命令內、非新 entry）。若 exit 3 且 stderr 出現
+     `writer_lock_held`＝互動 session 正在寫共用檔——**整輪 Daily 立即中止並保留該結構化 failure**，
+     不得跳過 harvest 繼續執行後續會寫 `pending_leads.json`／`todo_pool.json` 的命令（那會繞過鎖）。
+     鎖有 90 分鐘 TTL，過期自動可接手；收尾的 `publish_daily_state.py` 會釋放。
    - `.venv\Scripts\python.exe -m engine_b.cli harvest-health`（列出最新仍未恢復的來源失敗）
    - `.venv\Scripts\python.exe engine_c\etl_yfinance.py`（35 檔 Engine C daily snapshot）
    - `.venv\Scripts\python.exe scripts\daily_beta_snapshot.py --format markdown --risk-view changes`（固定 ETF／權值股 technical refresh

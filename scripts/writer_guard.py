@@ -43,6 +43,14 @@ SHARED_PATHS = (
 # 從 publisher 匯入而非各寫一份：兩邊分開維護時，改了一邊而忘了另一邊不會有任何
 # 東西報錯——guard 只會安靜地停止辨認排程（L16：分類要跟著資料走，不要重造）。
 sys.path.insert(0, str(ROOT))
+from engine_b.writer_lock import (  # noqa: E402
+    INTERACTIVE_OWNER,
+    WriterLockHeld,
+    acquire as _lock_acquire,
+    holder as _lock_holder,
+    is_stale as _lock_is_stale,
+    release as _lock_release,
+)
 from scripts.publish_daily_state import COMMIT_SUBJECT as _PUBLISHER_SUBJECT  # noqa: E402
 
 
@@ -100,6 +108,17 @@ def cmd_check(args: argparse.Namespace) -> int:
             "working tree 不乾淨——另一個 writer 可能正在進行中，或上一輪沒收乾淨"
         )
 
+    # Writer lock（ROADMAP #2）：時間窗防不了延遲開跑（2026-08-29 實測排程 08:21
+    # 才收尾），鎖補上這一塊——排程 harvest 一開跑就 acquire(scheduled)，
+    # 不管幾點開的跑，check 都看得到。
+    lock = _lock_holder()
+    if lock is not None and not _lock_is_stale(lock):
+        if lock.get("owner") != INTERACTIVE_OWNER:
+            reasons.append(
+                f"writer lock 由 {lock.get('owner')!r} 持有中"
+                f"（purpose={lock.get('purpose')!r}，expires_at={lock.get('expires_at')}）"
+            )
+
     payload = {
         "safe": not reasons,
         "now_local": now.isoformat(),
@@ -107,6 +126,7 @@ def cmd_check(args: argparse.Namespace) -> int:
         "daily_window": [start.isoformat(), end.isoformat()],
         "planned_minutes": args.minutes,
         "head": _git("rev-parse", "HEAD"),
+        "writer_lock": lock,
         "reasons": reasons,
     }
     print(json.dumps(payload, ensure_ascii=False, indent=2))
@@ -149,6 +169,31 @@ def cmd_verify(args: argparse.Namespace) -> int:
     return 0 if payload["clean"] else 2
 
 
+def cmd_acquire(args: argparse.Namespace) -> int:
+    """互動 session 取得 writer lock（排程 harvest 撞到會 fail closed 讓開）。"""
+    try:
+        lock = _lock_acquire(
+            INTERACTIVE_OWNER,
+            ttl_minutes=args.minutes,
+            purpose=args.purpose or "interactive write phase",
+        )
+    except WriterLockHeld as exc:
+        print(
+            json.dumps(
+                {"acquired": False, "holder": exc.holder}, ensure_ascii=False, indent=2
+            )
+        )
+        return 2
+    print(json.dumps({"acquired": True, "lock": lock}, ensure_ascii=False, indent=2))
+    return 0
+
+
+def cmd_release(args: argparse.Namespace) -> int:
+    released = _lock_release(INTERACTIVE_OWNER)
+    print(json.dumps({"released": released}, ensure_ascii=False))
+    return 0 if released else 2
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
@@ -165,6 +210,14 @@ def main(argv: list[str] | None = None) -> int:
     verify = sub.add_parser("verify", help="期間有沒有別的 writer 動過共用檔")
     verify.add_argument("--since", required=True, help="開跑時的 HEAD sha")
     verify.set_defaults(func=cmd_verify)
+
+    acq = sub.add_parser("acquire", help="互動 session 取得 writer lock")
+    acq.add_argument("--minutes", type=float, default=90, help="TTL（分鐘）")
+    acq.add_argument("--purpose", help="要做什麼（現形在對方的 fail closed 訊息裡）")
+    acq.set_defaults(func=cmd_acquire)
+
+    rel = sub.add_parser("release", help="釋放互動 session 的 writer lock")
+    rel.set_defaults(func=cmd_release)
 
     args = parser.parse_args(argv)
     return int(args.func(args))

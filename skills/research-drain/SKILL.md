@@ -42,9 +42,21 @@ harvest 進來的 lead 被本 skill 用舊狀態覆蓋掉，沒有任何東西�
 & '.venv\Scripts\python.exe' scripts\writer_guard.py check --minutes <預計時長>
 ```
 
-**exit 2 就不要開始。** 三種不安全：現在落在 daily 避讓窗內、**這段 run 會跨進窗內**
+**exit 2 就不要開始。** 四種不安全：現在落在 daily 避讓窗內、**這段 run 會跨進窗內**
 （起跑時安全不代表跑到一半安全，而跑到一半撞上最難收拾）、working tree 不乾淨
-（可能有另一個 writer 在跑，或上一輪沒收乾淨）。
+（可能有另一個 writer 在跑，或上一輪沒收乾淨）、**writer lock 被排程持有**
+（鎖補上時間窗防不了的延遲開跑——2026-08-29 排程 08:21 才收尾的那種）。
+
+check 通過後**取鎖再開跑**（2026-09-02 起雙向互斥：排程 harvest 撞到會自己 fail closed 讓開）；
+收尾（含中斷收尾）release：
+
+```powershell
+& '.venv\Scripts\python.exe' scripts\writer_guard.py acquire --minutes <預計時長> --purpose "research-drain"
+# …工作…
+& '.venv\Scripts\python.exe' scripts\writer_guard.py release
+```
+
+鎖有 TTL，session 崩潰最多卡排程一個 TTL；loop 模式每輪醒來重新 acquire（同 owner 是續期）。
 
 把回傳的 `head` 記下來，之後每個里程碑用它比對：
 

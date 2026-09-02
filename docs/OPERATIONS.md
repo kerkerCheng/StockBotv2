@@ -25,6 +25,27 @@ Codex local scheduled task
 
 排程收尾只跑 `scripts/publish_daily_state.py`（窄 state publisher，只發布 `pending_leads.json` ＋ `todo_pool.json`，不得用 unattended 廣泛 Git 命令碰其他檔）。
 
+### Writer lock（雙向互斥，2026-09-02）
+
+同一 working tree 的排程與互動 session 靠 `library/leads/.writer_lock.json`
+（gitignored，`engine_b/writer_lock.py`）互斥，取代原本只有互動側的時間窗單向避讓：
+
+- **排程側**：`crons/harvest_leads.py` 一般 harvest 開跑 acquire `scheduled`（TTL 90 分，
+  依 2026-09-02 量測 daily 中位 19 分／p90 30 分／最長 43 分取兩倍餘裕）；
+  `scripts/publish_daily_state.py` 收尾 release（結果附 `writer_lock_released`）。
+  互動 session 持鎖時 harvest exit 3＋stderr `writer_lock_held`，**整輪 Daily 中止**
+  （見 `crons/daily_brief_prompt.md`），不得跳過 harvest 續跑會寫共用檔的命令。
+- **互動側**：長時間寫入前 `python scripts/writer_guard.py acquire --minutes N --purpose "…"`，
+  收尾 `release`；`check` 同時看排程時間窗與鎖（鎖補上時間窗防不了的延遲開跑——
+  2026-08-29 排程 08:21 才收尾的那種）。互動手跑 harvest 時用
+  `STOCKBOT_WRITER_OWNER=interactive` 表明身分，避免與自己持有的鎖互撞。
+- **stale-tolerant**：鎖過期或損毀即可被接手（新鎖記 `superseded` 供稽核）；
+  崩潰的 session 最多卡別人一個 TTL。不得手動拆別人的**未過期**鎖。
+- **Sandbox impact review 結論（2026-09-02）：** 鎖檔是 repo 內一般檔案（workspace-write
+  已涵蓋），無 identity／ACL／網路／credential 副作用；未新增 CLI 命令、未動
+  `.codex/rules` 16 條 allowlist——acquire／release 嵌在既有 fixed entry
+  （harvest／state publisher）內部。契約斷言見 `tests/test_writer_lock.py`。
+
 **Routine 分工：**
 - daily（`crons/daily_brief_prompt.md`）＝harvest ＋ ETL ＋ beta monitor ＋ triage ＋ today ＋ 統一 pq2 brief
 - weekly（`crons/weekly_scan_prompt.md`，台北週日 04:00）＝topic discovery ＋ 完整本機健康審查 ＋ 唯讀 lifecycle，報告留 `docs/reports/`

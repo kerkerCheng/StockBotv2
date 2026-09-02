@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import sys
 from datetime import datetime, timedelta, timezone
@@ -697,6 +698,33 @@ def main() -> int:
             leads.save(store, args.leads)
         print(json.dumps(receipt, ensure_ascii=False, sort_keys=True))
         return 0
+
+    # Writer lock（ROADMAP #2，2026-09-02）：一般 harvest 是 daily 的第一個共用檔
+    # 寫入者——在這裡 acquire（owner 預設 scheduled，互動 session 手跑時可用
+    # STOCKBOT_WRITER_OWNER=interactive 表明身分），publisher 收尾 release。
+    # 另一個 owner 持鎖時 fail closed：留下結構化 failure，不覆寫、不等待——
+    # 依 daily retry 契約，未完成的輪次由下一輪或人工接續。
+    # refresh／backfill 是互動工具、dry-run 不寫檔，皆不取鎖。
+    if not args.dry_run:
+        from engine_b.writer_lock import SCHEDULED_OWNER, WriterLockHeld, acquire
+
+        lock_owner = os.environ.get("STOCKBOT_WRITER_OWNER") or SCHEDULED_OWNER
+        try:
+            acquire(lock_owner, purpose="daily harvest → state publisher")
+        except WriterLockHeld as exc:
+            print(
+                json.dumps(
+                    {
+                        "status": "writer_lock_held",
+                        "holder": exc.holder,
+                        "hint": "另一個 writer 持有 lock——本輪 fail closed，"
+                        "等鎖釋放或 TTL 過期後再跑",
+                    },
+                    ensure_ascii=False,
+                ),
+                file=sys.stderr,
+            )
+            return 3
 
     before = len(store["leads"])
     run(config, store)
