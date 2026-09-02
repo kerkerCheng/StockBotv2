@@ -20835,6 +20835,35 @@
       ],
       "url": "https://x.com/aleabitoreddit/status/2093652781928448279"
     },
+    "lead_5087a6570af0c525743b6f2d96e17d9a": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-02T11:47:09.440753+00:00",
+      "lead_id": "lead_5087a6570af0c525743b6f2d96e17d9a",
+      "published_at": null,
+      "refs": {},
+      "source": "coverage-gap-2026-09-02",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "[decompose 殘骸|人形] tech:force_torque_sensor 零供應商——人形關節/腕踝力矩感測器具名供應商(ATI/Sintokogio/坤維?)+合格週期 3-7 年說法一手化",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-02T11:47:24.841161+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "coverage_gaps 🔴 decompose 殘骸,零供應商層;bounded research 具名供應商+初判"
+        },
+        "decided_at": "2026-09-02T11:47:24.841161+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "coverage_gaps 🔴 decompose 殘骸,零供應商層;bounded research 具名供應商+初判",
+        "tier": 2
+      },
+      "url": "https://www.schaeffler.com/en/technology-innovation/technology/humanoid-robots/?gap=force_torque_sensor"
+    },
     "lead_5105c989c73d16226293c3dd5da999ec": {
       "entities": {
         "company_ids": [
@@ -27039,6 +27068,35 @@
       ],
       "url": "https://x.com/aleabitoreddit/status/2078914447180263438"
     },
+    "lead_74a5f43620c6f4853615b2c0b475c953": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-02T11:47:08.530785+00:00",
+      "lead_id": "lead_74a5f43620c6f4853615b2c0b475c953",
+      "published_at": null,
+      "refs": {},
+      "source": "coverage-gap-2026-09-02",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "[decompose 殘骸|TPU] tech:optical_circulator 零供應商——誰量產資料中心級光循環器(TPU ICI 單纖雙向依賴)?具名供應商+量產規模+替代性初判",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-02T11:47:23.998786+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "coverage_gaps 🔴 decompose 殘骸,零供應商層;bounded research 具名供應商+初判"
+        },
+        "decided_at": "2026-09-02T11:47:23.998786+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "coverage_gaps 🔴 decompose 殘骸,零供應商層;bounded research 具名供應商+初判",
+        "tier": 2
+      },
+      "url": "https://nvidianews.nvidia.com/news/nvidia-spectrum-x-co-packaged-optics-networking-switches-ai-factories?gap=optical_circulator"
+    },
     "lead_75079e941495ca5c5c5b0ae145ea90ee": {
       "entities": {
         "company_ids": [
@@ -30058,6 +30116,43 @@
         "tier": 4
       },
       "url": "https://finance.yahoo.com/markets/stocks/articles/why-applied-materials-amat-stock-191026429.html?.tsrc=rss"
+    },
+    "lead_8149c92cdb302200ffb332ee061d3bba": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-02T11:47:09.133621+00:00",
+      "lead_id": "lead_8149c92cdb302200ffb332ee061d3bba",
+      "published_at": null,
+      "refs": {},
+      "source": "coverage-gap-2026-09-02",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CPO"
+          ]
+        }
+      },
+      "title": "[decompose 殘骸|CPO] tech:scale_up_cpo 零供應商——scale-up(GPU 間)CPO 誰在做?與 scale-out CPO 的供應商集合是否不同?",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-02T11:47:24.559496+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "coverage_gaps 🔴 decompose 殘骸,零供應商層;bounded research 具名供應商+初判"
+        },
+        "decided_at": "2026-09-02T11:47:24.559496+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "coverage_gaps 🔴 decompose 殘骸,零供應商層;bounded research 具名供應商+初判",
+        "tier": 2
+      },
+      "url": "https://nvidianews.nvidia.com/news/nvidia-spectrum-x-co-packaged-optics-networking-switches-ai-factories?gap=scale_up_cpo"
     },
     "lead_81ba31cd1de380267a03be48750212c2": {
       "entities": {
@@ -38161,6 +38256,43 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000202/xslF345X06/wk-form4_1785530570.xml"
+    },
+    "lead_aea66c177e553e6b8da4bef0da9f4d25": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-02T11:47:08.831093+00:00",
+      "lead_id": "lead_aea66c177e553e6b8da4bef0da9f4d25",
+      "published_at": null,
+      "refs": {},
+      "source": "coverage-gap-2026-09-02",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CPO"
+          ]
+        }
+      },
+      "title": "[decompose 殘骸|CPO] tech:wdm_laser_16ch 零供應商——16 波長 WDM 雷射陣列誰做?(NVIDIA CPO 一手無供應商陳述,殘骸層)",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-02T11:47:24.280609+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "coverage_gaps 🔴 decompose 殘骸,零供應商層;bounded research 具名供應商+初判"
+        },
+        "decided_at": "2026-09-02T11:47:24.280609+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "coverage_gaps 🔴 decompose 殘骸,零供應商層;bounded research 具名供應商+初判",
+        "tier": 2
+      },
+      "url": "https://nvidianews.nvidia.com/news/nvidia-spectrum-x-co-packaged-optics-networking-switches-ai-factories?gap=wdm_laser_16ch"
     },
     "lead_aef8632559fcf57c9fd942cd333e5a85": {
       "entities": {
