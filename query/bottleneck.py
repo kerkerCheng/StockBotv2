@@ -28,8 +28,11 @@
 ## 已知限制（隨輸出常駐，不得只寫在文件裡）
 
 - `substitutability` 覆蓋率僅 22%（91/423 assertion）；排名必然偏向已被抽取過的邊。
-- `structural_lead_time_weeks` 實質為空（17 筆有欄位、僅 1 個真值）。
-  「難替代」與「換掉要多久」是兩件事，**本排名不含後者**。
+- `structural_lead_time_weeks` 實質為空。**語意已限定為 qualification lead time**
+  （換供應商合格週期，2026-09-02 定案）：交貨週期另住 `delivery_lead_time_weeks`，
+  不得混入——當年唯一的「真值」（GF 52 週）就是交貨週期誤標，已改標。
+  qualification 數字財報極少揭露（多在法說 Q&A），常年近空是誠實狀態，
+  不是待填欄。「難替代」與「換掉要多久」是兩件事，**本排名不含後者**。
 """
 from __future__ import annotations
 

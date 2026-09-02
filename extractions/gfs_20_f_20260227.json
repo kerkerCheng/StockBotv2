@@ -1,17 +1,753 @@
 {
+  "claims": [
+    {
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "If a competing foundry qualifies an equivalent process node enabling drop-in migration without redesign, or if a major GF customer successfully transfers a single-sourced product to a competitor.",
+      "id": "gfs_20_f_20260227_cl1",
+      "source_ids": [
+        "gfs_20_f_20260227_s2",
+        "gfs_20_f_20260227_s3"
+      ],
+      "statement": "GlobalFoundries defines single-sourced products as those that can only be manufactured with GF technology and cannot be manufactured elsewhere without significant customer redesigns, making them strategically sticky.",
+      "subject_id": "co:globalfoundries"
+    },
+    {
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "If equipment supplier lead times normalize to below 6 months, or if new equipment entrants reduce concentration and increase available supply.",
+      "id": "gfs_20_f_20260227_cl2",
+      "source_ids": [
+        "gfs_20_f_20260227_s14",
+        "gfs_20_f_20260227_s15"
+      ],
+      "statement": "GF's semiconductor manufacturing equipment suppliers operate with delivery lead times of 12 months or more, creating a structural bottleneck for capacity expansion.",
+      "subject_id": "tech:semicon_manuf_equipment"
+    },
+    {
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "If GF publicly identifies qualified secondary or tertiary suppliers for all sole-sourced inputs, or if no raw material shortages materially impact GF operations over the next 12 months.",
+      "id": "gfs_20_f_20260227_cl3",
+      "source_ids": [
+        "gfs_20_f_20260227_s12"
+      ],
+      "statement": "GF procures some of its raw materials from sole-sourced suppliers for inputs that are significant to production operations and not easily substituted.",
+      "subject_id": "co:globalfoundries"
+    },
+    {
+      "confidence": 0.9,
+      "demand_proof_level": "guided",
+      "disproof_condition": "If GF does not receive expected government funding, or if the investment plan is materially reduced or cancelled.",
+      "id": "gfs_20_f_20260227_cl4",
+      "source_ids": [
+        "gfs_20_f_20260227_s6",
+        "gfs_20_f_20260227_s7"
+      ],
+      "statement": "GF plans to invest more than $16 billion over 10+ years across Fab 8 and Fab 9 in the US, contingent on government funding under the CHIPS Act.",
+      "subject_id": "co:globalfoundries"
+    },
+    {
+      "confidence": 0.9,
+      "demand_proof_level": "guided",
+      "disproof_condition": "If Chinese foundry capacity expansion stalls due to export controls, funding shortfalls, or demand growth outpaces supply at mature nodes.",
+      "id": "gfs_20_f_20260227_cl5",
+      "source_ids": [
+        "gfs_20_f_20260227_s11"
+      ],
+      "statement": "China's domestic foundry capacity at mature nodes (28nm+) is expected to grow faster than demand, leading to industry-wide overcapacity risk that threatens GF's pricing and market share.",
+      "subject_id": "tech:essential_chips_mature_node"
+    },
+    {
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "If GF discloses a different supplier as its largest silicon wafer partner, or if the LTA with Soitec is terminated.",
+      "id": "gfs_20_f_20260227_cl6",
+      "source_ids": [
+        "gfs_20_f_20260227_s20"
+      ],
+      "statement": "Soitec is the largest silicon wafer supplier to GlobalFoundries under a long-term agreement.",
+      "subject_id": "gfs_20_f_20260227_e7"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {
+        "qualification_status": "qualified",
+        "ramp_execution": 3,
+        "sole_source": false,
+        "structural_lead_time_weeks": null,
+        "substitutability": 4
+      },
+      "confidence": 0.9,
+      "dst_id": "tech:essential_chips_mature_node",
+      "id": "gfs_20_f_20260227_e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "gfs_20_f_20260227_s2",
+        "gfs_20_f_20260227_s3"
+      ],
+      "src_id": "co:globalfoundries"
+    },
+    {
+      "attributes": {
+        "qualification_status": "qualified",
+        "ramp_execution": 3,
+        "sole_source": false,
+        "structural_lead_time_weeks": null,
+        "substitutability": 3
+      },
+      "confidence": 0.9,
+      "dst_id": "tech:silicon_photonics",
+      "id": "gfs_20_f_20260227_e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "gfs_20_f_20260227_s19"
+      ],
+      "src_id": "co:globalfoundries"
+    },
+    {
+      "attributes": {
+        "qualification_status": "qualified",
+        "ramp_execution": 3,
+        "sole_source": false,
+        "structural_lead_time_weeks": null,
+        "substitutability": 3
+      },
+      "confidence": 0.9,
+      "dst_id": "tech:rf_gan",
+      "id": "gfs_20_f_20260227_e3",
+      "relation": "supplies_to",
+      "source_ids": [
+        "gfs_20_f_20260227_s24"
+      ],
+      "src_id": "co:globalfoundries"
+    },
+    {
+      "attributes": {
+        "qualification_status": "qualifying",
+        "ramp_execution": null,
+        "sole_source": false,
+        "structural_lead_time_weeks": null,
+        "substitutability": null
+      },
+      "confidence": 0.9,
+      "dst_id": "tech:advanced_packaging_gf",
+      "id": "gfs_20_f_20260227_e4",
+      "relation": "supplies_to",
+      "source_ids": [
+        "gfs_20_f_20260227_s9"
+      ],
+      "src_id": "co:globalfoundries"
+    },
+    {
+      "attributes": {
+        "qualification_status": "none",
+        "ramp_execution": null,
+        "sole_source": false,
+        "structural_lead_time_weeks": 52,
+        "substitutability": 4
+      },
+      "confidence": 0.9,
+      "dst_id": "tech:semicon_manuf_equipment",
+      "id": "gfs_20_f_20260227_e5",
+      "relation": "depends_on",
+      "source_ids": [
+        "gfs_20_f_20260227_s14",
+        "gfs_20_f_20260227_s15"
+      ],
+      "src_id": "co:globalfoundries"
+    },
+    {
+      "attributes": {
+        "qualification_status": "qualified",
+        "ramp_execution": null,
+        "sole_source": false,
+        "structural_lead_time_weeks": null,
+        "substitutability": 5
+      },
+      "confidence": 0.9,
+      "dst_id": "mat:silicon_wafer",
+      "id": "gfs_20_f_20260227_e6",
+      "relation": "depends_on",
+      "source_ids": [
+        "gfs_20_f_20260227_s13",
+        "gfs_20_f_20260227_s20"
+      ],
+      "src_id": "co:globalfoundries"
+    },
+    {
+      "attributes": {
+        "qualification_status": "qualified",
+        "ramp_execution": null,
+        "sole_source": false,
+        "structural_lead_time_weeks": null,
+        "substitutability": 4
+      },
+      "confidence": 0.9,
+      "dst_id": "co:globalfoundries",
+      "id": "gfs_20_f_20260227_e7",
+      "relation": "supplies_to",
+      "source_ids": [
+        "gfs_20_f_20260227_s20"
+      ],
+      "src_id": "co:soitec"
+    },
+    {
+      "attributes": {
+        "qualification_status": "qualifying",
+        "ramp_execution": null,
+        "sole_source": false,
+        "structural_lead_time_weeks": null,
+        "substitutability": 4
+      },
+      "confidence": 0.9,
+      "dst_id": "mat:gallium_nitride",
+      "id": "gfs_20_f_20260227_e8",
+      "relation": "depends_on",
+      "source_ids": [
+        "gfs_20_f_20260227_s26"
+      ],
+      "src_id": "co:globalfoundries"
+    },
+    {
+      "attributes": {
+        "qualification_status": "none",
+        "ramp_execution": null,
+        "sole_source": false,
+        "structural_lead_time_weeks": null,
+        "substitutability": 4
+      },
+      "confidence": 0.9,
+      "dst_id": "mat:rare_earth_metals",
+      "id": "gfs_20_f_20260227_e9",
+      "relation": "depends_on",
+      "source_ids": [
+        "gfs_20_f_20260227_s25"
+      ],
+      "src_id": "co:globalfoundries"
+    },
+    {
+      "attributes": {
+        "qualification_status": "qualified",
+        "ramp_execution": null,
+        "sole_source": false,
+        "structural_lead_time_weeks": null,
+        "substitutability": 3
+      },
+      "confidence": 0.9,
+      "dst_id": "mat:photoresist",
+      "id": "gfs_20_f_20260227_e10",
+      "relation": "depends_on",
+      "source_ids": [
+        "gfs_20_f_20260227_s13"
+      ],
+      "src_id": "co:globalfoundries"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "co:tsmc",
+      "id": "gfs_20_f_20260227_e11",
+      "relation": "competes_with",
+      "source_ids": [
+        "gfs_20_f_20260227_s5"
+      ],
+      "src_id": "co:globalfoundries"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "co:samsung",
+      "id": "gfs_20_f_20260227_e12",
+      "relation": "competes_with",
+      "source_ids": [
+        "gfs_20_f_20260227_s5"
+      ],
+      "src_id": "co:globalfoundries"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "co:intel",
+      "id": "gfs_20_f_20260227_e13",
+      "relation": "competes_with",
+      "source_ids": [
+        "gfs_20_f_20260227_s5"
+      ],
+      "src_id": "co:globalfoundries"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "co:umc",
+      "id": "gfs_20_f_20260227_e14",
+      "relation": "competes_with",
+      "source_ids": [
+        "gfs_20_f_20260227_s5"
+      ],
+      "src_id": "co:globalfoundries"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "co:texas_instruments",
+      "id": "gfs_20_f_20260227_e15",
+      "relation": "competes_with",
+      "source_ids": [
+        "gfs_20_f_20260227_s5"
+      ],
+      "src_id": "co:globalfoundries"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:essential_chips_mature_node",
+      "id": "gfs_20_f_20260227_e16",
+      "relation": "enables",
+      "source_ids": [
+        "gfs_20_f_20260227_s23"
+      ],
+      "src_id": "tech:ai_compute_buildout"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:silicon_photonics",
+      "id": "gfs_20_f_20260227_e17",
+      "relation": "enables",
+      "source_ids": [
+        "gfs_20_f_20260227_s23",
+        "gfs_20_f_20260227_s27"
+      ],
+      "src_id": "tech:ai_compute_buildout"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "co:globalfoundries",
+      "id": "gfs_20_f_20260227_e18",
+      "relation": "enables",
+      "source_ids": [
+        "gfs_20_f_20260227_s7",
+        "gfs_20_f_20260227_s8"
+      ],
+      "src_id": "std:chips_science_act"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "co:mips_holding",
+      "id": "gfs_20_f_20260227_e19",
+      "relation": "invests_in",
+      "source_ids": [
+        "gfs_20_f_20260227_s22"
+      ],
+      "src_id": "co:globalfoundries"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "co:globalfoundries",
+      "id": "gfs_20_f_20260227_e20",
+      "relation": "enables",
+      "source_ids": [
+        "gfs_20_f_20260227_s14"
+      ],
+      "src_id": "tech:semicon_manuf_equipment"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "tech:essential_chips_mature_node",
+      "id": "gfs_20_f_20260227_e21",
+      "relation": "is_component_of",
+      "source_ids": [
+        "gfs_20_f_20260227_s20"
+      ],
+      "src_id": "mat:silicon_wafer"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [
+        "GF",
+        "GLOBALFOUNDRIES Inc."
+      ],
+      "attributes": {
+        "concentration_score": null,
+        "intrinsic_cycle_time_weeks": null,
+        "ramp_difficulty_intrinsic": 4
+      },
+      "confidence": 0.9,
+      "id": "co:globalfoundries",
+      "name": "GlobalFoundries",
+      "role": "foundry",
+      "source_ids": [
+        "gfs_20_f_20260227_s18"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [
+        "Taiwan Semiconductor Manufacturing Company"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:tsmc",
+      "name": "TSMC",
+      "role": "foundry",
+      "source_ids": [
+        "gfs_20_f_20260227_s5"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:samsung",
+      "name": "Samsung",
+      "role": "foundry",
+      "source_ids": [
+        "gfs_20_f_20260227_s5"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:intel",
+      "name": "Intel",
+      "role": "foundry",
+      "source_ids": [
+        "gfs_20_f_20260227_s5"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [
+        "TI"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:texas_instruments",
+      "name": "Texas Instruments",
+      "role": "adjacent_silicon",
+      "source_ids": [
+        "gfs_20_f_20260227_s5"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [
+        "United Microelectronics Corporation"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:umc",
+      "name": "UMC",
+      "role": "foundry",
+      "source_ids": [
+        "gfs_20_f_20260227_s5"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [],
+      "attributes": {
+        "concentration_score": null,
+        "intrinsic_cycle_time_weeks": null,
+        "ramp_difficulty_intrinsic": null
+      },
+      "confidence": 0.9,
+      "id": "co:soitec",
+      "name": "Soitec",
+      "role": "bottleneck_supplier",
+      "source_ids": [
+        "gfs_20_f_20260227_s20"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "MIPS"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:mips_holding",
+      "name": "MIPS Holding, Inc.",
+      "role": "adjacent_silicon",
+      "source_ids": [
+        "gfs_20_f_20260227_s22"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "end_demand",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:ai_compute_buildout",
+      "name": "AI training/inference cluster buildout",
+      "role": null,
+      "source_ids": [
+        "gfs_20_f_20260227_s23"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "mature node",
+        "essential chip technology"
+      ],
+      "attributes": {
+        "concentration_score": null,
+        "intrinsic_cycle_time_weeks": null,
+        "ramp_difficulty_intrinsic": 2
+      },
+      "confidence": 0.9,
+      "id": "tech:essential_chips_mature_node",
+      "name": "Essential chips at mature nodes (28nm and larger)",
+      "role": null,
+      "source_ids": [
+        "gfs_20_f_20260227_s8"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "SiPh"
+      ],
+      "attributes": {
+        "concentration_score": null,
+        "intrinsic_cycle_time_weeks": null,
+        "ramp_difficulty_intrinsic": 4
+      },
+      "confidence": 0.9,
+      "id": "tech:silicon_photonics",
+      "name": "Silicon Photonics",
+      "role": null,
+      "source_ids": [
+        "gfs_20_f_20260227_s19"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "RF GaN"
+      ],
+      "attributes": {
+        "concentration_score": null,
+        "intrinsic_cycle_time_weeks": null,
+        "ramp_difficulty_intrinsic": 4
+      },
+      "confidence": 0.9,
+      "id": "tech:rf_gan",
+      "name": "RF Gallium Nitride (RF GaN)",
+      "role": null,
+      "source_ids": [
+        "gfs_20_f_20260227_s24"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "Power GaN"
+      ],
+      "attributes": {
+        "concentration_score": null,
+        "intrinsic_cycle_time_weeks": null,
+        "ramp_difficulty_intrinsic": 4
+      },
+      "confidence": 0.9,
+      "id": "tech:power_gan",
+      "name": "Power Gallium Nitride (Power GaN)",
+      "role": null,
+      "source_ids": [
+        "gfs_20_f_20260227_s26"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "RF-SOI"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:rf_soi",
+      "name": "RF Silicon-on-Insulator",
+      "role": null,
+      "source_ids": [
+        "gfs_20_f_20260227_s24"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "FD-SOI",
+        "FDX"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:fd_soi",
+      "name": "Fully Depleted Silicon-on-Insulator",
+      "role": null,
+      "source_ids": [
+        "gfs_20_f_20260227_s24"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [],
+      "attributes": {
+        "concentration_score": null,
+        "intrinsic_cycle_time_weeks": null,
+        "ramp_difficulty_intrinsic": 3
+      },
+      "confidence": 0.9,
+      "id": "tech:advanced_packaging_gf",
+      "name": "Advanced Packaging and Testing (GF Fab 8)",
+      "role": null,
+      "source_ids": [
+        "gfs_20_f_20260227_s9"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [],
+      "attributes": {
+        "concentration_score": 4,
+        "intrinsic_cycle_time_weeks": 52,
+        "ramp_difficulty_intrinsic": 4
+      },
+      "confidence": 0.9,
+      "id": "tech:semicon_manuf_equipment",
+      "name": "Semiconductor Manufacturing Equipment",
+      "role": null,
+      "source_ids": [
+        "gfs_20_f_20260227_s14",
+        "gfs_20_f_20260227_s15"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [],
+      "attributes": {
+        "concentration_score": null,
+        "intrinsic_cycle_time_weeks": null,
+        "ramp_difficulty_intrinsic": 2
+      },
+      "confidence": 0.9,
+      "id": "mat:silicon_wafer",
+      "name": "Silicon Wafer",
+      "role": null,
+      "source_ids": [
+        "gfs_20_f_20260227_s13",
+        "gfs_20_f_20260227_s20"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "GaN"
+      ],
+      "attributes": {
+        "concentration_score": null,
+        "intrinsic_cycle_time_weeks": null,
+        "ramp_difficulty_intrinsic": 4
+      },
+      "confidence": 0.9,
+      "id": "mat:gallium_nitride",
+      "name": "Gallium Nitride (GaN)",
+      "role": null,
+      "source_ids": [
+        "gfs_20_f_20260227_s26"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [],
+      "attributes": {
+        "concentration_score": null,
+        "intrinsic_cycle_time_weeks": null,
+        "ramp_difficulty_intrinsic": 4
+      },
+      "confidence": 0.9,
+      "id": "mat:rare_earth_metals",
+      "name": "Rare Earth Metals",
+      "role": null,
+      "source_ids": [
+        "gfs_20_f_20260227_s25"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [],
+      "attributes": {
+        "concentration_score": null,
+        "intrinsic_cycle_time_weeks": null,
+        "ramp_difficulty_intrinsic": 2
+      },
+      "confidence": 0.9,
+      "id": "mat:photoresist",
+      "name": "Photoresist",
+      "role": null,
+      "source_ids": [
+        "gfs_20_f_20260227_s13"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [
+        "CHIPS Act"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "std:chips_science_act",
+      "name": "CHIPS and Science Act (U.S. 2022)",
+      "role": null,
+      "source_ids": [
+        "gfs_20_f_20260227_s7"
+      ],
+      "type": "Standard"
+    }
+  ],
   "schema_version": "0.1",
   "source_doc": {
     "doc_id": "gfs_20_f_20260227",
-    "title": "GlobalFoundries FY2025 Form 20-F — foundry customer perspective: capex/capacity plans, single-sourced design awards & LTAs, essential-chip (mature-node) capacity expansion under CHIPS Act, dependence on limited number of equipment suppliers with 12-month+ lead times",
-    "source_type": "filing",
     "evidence_tier": 1,
     "origin_entity": "GlobalFoundries",
-    "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000022/gfs-20251231.htm",
-    "published_at": "2026-02-27",
-    "storage_permission": "repo_full",
     "permission_basis": "SEC filing is a U.S. public record with no republication restriction; full raw text and extraction may be committed.",
+    "published_at": "2026-02-27",
     "publisher": "SEC EDGAR",
-    "retrieved_at": "2026-07-19"
+    "retrieved_at": "2026-07-19",
+    "source_type": "filing",
+    "storage_permission": "repo_full",
+    "title": "GlobalFoundries FY2025 Form 20-F — foundry customer perspective: capex/capacity plans, single-sourced design awards & LTAs, essential-chip (mature-node) capacity expansion under CHIPS Act, dependence on limited number of equipment suppliers with 12-month+ lead times",
+    "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000022/gfs-20251231.htm"
   },
   "sources": [
     {
@@ -148,742 +884,6 @@
       "id": "gfs_20_f_20260227_s27",
       "locator": "Business Overview — End Markets, chars 282000-297800",
       "quote": "Communications, Infrastructure & Data Center... Key devices—such as RF front-end components, transceivers, timing ICs, and optical modulators—require high linearity, low noise, power efficiency, and thermal stability."
-    }
-  ],
-  "nodes": [
-    {
-      "id": "co:globalfoundries",
-      "type": "Company",
-      "name": "GlobalFoundries",
-      "abstraction_level": "foundry_packaging",
-      "role": "foundry",
-      "aliases": [
-        "GF",
-        "GLOBALFOUNDRIES Inc."
-      ],
-      "attributes": {
-        "ramp_difficulty_intrinsic": 4,
-        "concentration_score": null,
-        "intrinsic_cycle_time_weeks": null
-      },
-      "confidence": 0.9,
-      "source_ids": [
-        "gfs_20_f_20260227_s18"
-      ]
-    },
-    {
-      "id": "co:tsmc",
-      "type": "Company",
-      "name": "TSMC",
-      "abstraction_level": "foundry_packaging",
-      "role": "foundry",
-      "aliases": [
-        "Taiwan Semiconductor Manufacturing Company"
-      ],
-      "attributes": {},
-      "confidence": 0.9,
-      "source_ids": [
-        "gfs_20_f_20260227_s5"
-      ]
-    },
-    {
-      "id": "co:samsung",
-      "type": "Company",
-      "name": "Samsung",
-      "abstraction_level": "foundry_packaging",
-      "role": "foundry",
-      "aliases": [],
-      "attributes": {},
-      "confidence": 0.9,
-      "source_ids": [
-        "gfs_20_f_20260227_s5"
-      ]
-    },
-    {
-      "id": "co:intel",
-      "type": "Company",
-      "name": "Intel",
-      "abstraction_level": "foundry_packaging",
-      "role": "foundry",
-      "aliases": [],
-      "attributes": {},
-      "confidence": 0.9,
-      "source_ids": [
-        "gfs_20_f_20260227_s5"
-      ]
-    },
-    {
-      "id": "co:texas_instruments",
-      "type": "Company",
-      "name": "Texas Instruments",
-      "abstraction_level": "foundry_packaging",
-      "role": "adjacent_silicon",
-      "aliases": [
-        "TI"
-      ],
-      "attributes": {},
-      "confidence": 0.9,
-      "source_ids": [
-        "gfs_20_f_20260227_s5"
-      ]
-    },
-    {
-      "id": "co:umc",
-      "type": "Company",
-      "name": "UMC",
-      "abstraction_level": "foundry_packaging",
-      "role": "foundry",
-      "aliases": [
-        "United Microelectronics Corporation"
-      ],
-      "attributes": {},
-      "confidence": 0.9,
-      "source_ids": [
-        "gfs_20_f_20260227_s5"
-      ]
-    },
-    {
-      "id": "co:soitec",
-      "type": "Company",
-      "name": "Soitec",
-      "abstraction_level": "materials_substrate",
-      "role": "bottleneck_supplier",
-      "aliases": [],
-      "attributes": {
-        "ramp_difficulty_intrinsic": null,
-        "concentration_score": null,
-        "intrinsic_cycle_time_weeks": null
-      },
-      "confidence": 0.9,
-      "source_ids": [
-        "gfs_20_f_20260227_s20"
-      ]
-    },
-    {
-      "id": "co:mips_holding",
-      "type": "Company",
-      "name": "MIPS Holding, Inc.",
-      "abstraction_level": "device_chip",
-      "role": "adjacent_silicon",
-      "aliases": [
-        "MIPS"
-      ],
-      "attributes": {},
-      "confidence": 0.9,
-      "source_ids": [
-        "gfs_20_f_20260227_s22"
-      ]
-    },
-    {
-      "id": "tech:ai_compute_buildout",
-      "type": "TechNode",
-      "name": "AI training/inference cluster buildout",
-      "abstraction_level": "end_demand",
-      "role": null,
-      "aliases": [],
-      "attributes": {},
-      "confidence": 0.9,
-      "source_ids": [
-        "gfs_20_f_20260227_s23"
-      ]
-    },
-    {
-      "id": "tech:essential_chips_mature_node",
-      "type": "TechNode",
-      "name": "Essential chips at mature nodes (28nm and larger)",
-      "abstraction_level": "device_chip",
-      "role": null,
-      "aliases": [
-        "mature node",
-        "essential chip technology"
-      ],
-      "attributes": {
-        "ramp_difficulty_intrinsic": 2,
-        "concentration_score": null,
-        "intrinsic_cycle_time_weeks": null
-      },
-      "confidence": 0.9,
-      "source_ids": [
-        "gfs_20_f_20260227_s8"
-      ]
-    },
-    {
-      "id": "tech:silicon_photonics",
-      "type": "TechNode",
-      "name": "Silicon Photonics",
-      "abstraction_level": "device_chip",
-      "role": null,
-      "aliases": [
-        "SiPh"
-      ],
-      "attributes": {
-        "ramp_difficulty_intrinsic": 4,
-        "concentration_score": null,
-        "intrinsic_cycle_time_weeks": null
-      },
-      "confidence": 0.9,
-      "source_ids": [
-        "gfs_20_f_20260227_s19"
-      ]
-    },
-    {
-      "id": "tech:rf_gan",
-      "type": "TechNode",
-      "name": "RF Gallium Nitride (RF GaN)",
-      "abstraction_level": "device_chip",
-      "role": null,
-      "aliases": [
-        "RF GaN"
-      ],
-      "attributes": {
-        "ramp_difficulty_intrinsic": 4,
-        "concentration_score": null,
-        "intrinsic_cycle_time_weeks": null
-      },
-      "confidence": 0.9,
-      "source_ids": [
-        "gfs_20_f_20260227_s24"
-      ]
-    },
-    {
-      "id": "tech:power_gan",
-      "type": "TechNode",
-      "name": "Power Gallium Nitride (Power GaN)",
-      "abstraction_level": "device_chip",
-      "role": null,
-      "aliases": [
-        "Power GaN"
-      ],
-      "attributes": {
-        "ramp_difficulty_intrinsic": 4,
-        "concentration_score": null,
-        "intrinsic_cycle_time_weeks": null
-      },
-      "confidence": 0.9,
-      "source_ids": [
-        "gfs_20_f_20260227_s26"
-      ]
-    },
-    {
-      "id": "tech:rf_soi",
-      "type": "TechNode",
-      "name": "RF Silicon-on-Insulator",
-      "abstraction_level": "device_chip",
-      "role": null,
-      "aliases": [
-        "RF-SOI"
-      ],
-      "attributes": {},
-      "confidence": 0.9,
-      "source_ids": [
-        "gfs_20_f_20260227_s24"
-      ]
-    },
-    {
-      "id": "tech:fd_soi",
-      "type": "TechNode",
-      "name": "Fully Depleted Silicon-on-Insulator",
-      "abstraction_level": "device_chip",
-      "role": null,
-      "aliases": [
-        "FD-SOI",
-        "FDX"
-      ],
-      "attributes": {},
-      "confidence": 0.9,
-      "source_ids": [
-        "gfs_20_f_20260227_s24"
-      ]
-    },
-    {
-      "id": "tech:advanced_packaging_gf",
-      "type": "TechNode",
-      "name": "Advanced Packaging and Testing (GF Fab 8)",
-      "abstraction_level": "foundry_packaging",
-      "role": null,
-      "aliases": [],
-      "attributes": {
-        "ramp_difficulty_intrinsic": 3,
-        "concentration_score": null,
-        "intrinsic_cycle_time_weeks": null
-      },
-      "confidence": 0.9,
-      "source_ids": [
-        "gfs_20_f_20260227_s9"
-      ]
-    },
-    {
-      "id": "tech:semicon_manuf_equipment",
-      "type": "TechNode",
-      "name": "Semiconductor Manufacturing Equipment",
-      "abstraction_level": "equipment_epitaxy",
-      "role": null,
-      "aliases": [],
-      "attributes": {
-        "ramp_difficulty_intrinsic": 4,
-        "concentration_score": 4,
-        "intrinsic_cycle_time_weeks": 52
-      },
-      "confidence": 0.9,
-      "source_ids": [
-        "gfs_20_f_20260227_s14",
-        "gfs_20_f_20260227_s15"
-      ]
-    },
-    {
-      "id": "mat:silicon_wafer",
-      "type": "Material",
-      "name": "Silicon Wafer",
-      "abstraction_level": "materials_substrate",
-      "role": null,
-      "aliases": [],
-      "attributes": {
-        "ramp_difficulty_intrinsic": 2,
-        "concentration_score": null,
-        "intrinsic_cycle_time_weeks": null
-      },
-      "confidence": 0.9,
-      "source_ids": [
-        "gfs_20_f_20260227_s13",
-        "gfs_20_f_20260227_s20"
-      ]
-    },
-    {
-      "id": "mat:gallium_nitride",
-      "type": "Material",
-      "name": "Gallium Nitride (GaN)",
-      "abstraction_level": "materials_substrate",
-      "role": null,
-      "aliases": [
-        "GaN"
-      ],
-      "attributes": {
-        "ramp_difficulty_intrinsic": 4,
-        "concentration_score": null,
-        "intrinsic_cycle_time_weeks": null
-      },
-      "confidence": 0.9,
-      "source_ids": [
-        "gfs_20_f_20260227_s26"
-      ]
-    },
-    {
-      "id": "mat:rare_earth_metals",
-      "type": "Material",
-      "name": "Rare Earth Metals",
-      "abstraction_level": "materials_substrate",
-      "role": null,
-      "aliases": [],
-      "attributes": {
-        "ramp_difficulty_intrinsic": 4,
-        "concentration_score": null,
-        "intrinsic_cycle_time_weeks": null
-      },
-      "confidence": 0.9,
-      "source_ids": [
-        "gfs_20_f_20260227_s25"
-      ]
-    },
-    {
-      "id": "mat:photoresist",
-      "type": "Material",
-      "name": "Photoresist",
-      "abstraction_level": "materials_substrate",
-      "role": null,
-      "aliases": [],
-      "attributes": {
-        "ramp_difficulty_intrinsic": 2,
-        "concentration_score": null,
-        "intrinsic_cycle_time_weeks": null
-      },
-      "confidence": 0.9,
-      "source_ids": [
-        "gfs_20_f_20260227_s13"
-      ]
-    },
-    {
-      "id": "std:chips_science_act",
-      "type": "Standard",
-      "name": "CHIPS and Science Act (U.S. 2022)",
-      "abstraction_level": "foundry_packaging",
-      "role": null,
-      "aliases": [
-        "CHIPS Act"
-      ],
-      "attributes": {},
-      "confidence": 0.9,
-      "source_ids": [
-        "gfs_20_f_20260227_s7"
-      ]
-    }
-  ],
-  "edges": [
-    {
-      "id": "gfs_20_f_20260227_e1",
-      "src_id": "co:globalfoundries",
-      "dst_id": "tech:essential_chips_mature_node",
-      "relation": "supplies_to",
-      "attributes": {
-        "qualification_status": "qualified",
-        "substitutability": 4,
-        "sole_source": false,
-        "structural_lead_time_weeks": null,
-        "ramp_execution": 3
-      },
-      "confidence": 0.9,
-      "source_ids": [
-        "gfs_20_f_20260227_s2",
-        "gfs_20_f_20260227_s3"
-      ]
-    },
-    {
-      "id": "gfs_20_f_20260227_e2",
-      "src_id": "co:globalfoundries",
-      "dst_id": "tech:silicon_photonics",
-      "relation": "supplies_to",
-      "attributes": {
-        "qualification_status": "qualified",
-        "substitutability": 3,
-        "sole_source": false,
-        "structural_lead_time_weeks": null,
-        "ramp_execution": 3
-      },
-      "confidence": 0.9,
-      "source_ids": [
-        "gfs_20_f_20260227_s19"
-      ]
-    },
-    {
-      "id": "gfs_20_f_20260227_e3",
-      "src_id": "co:globalfoundries",
-      "dst_id": "tech:rf_gan",
-      "relation": "supplies_to",
-      "attributes": {
-        "qualification_status": "qualified",
-        "substitutability": 3,
-        "sole_source": false,
-        "structural_lead_time_weeks": null,
-        "ramp_execution": 3
-      },
-      "confidence": 0.9,
-      "source_ids": [
-        "gfs_20_f_20260227_s24"
-      ]
-    },
-    {
-      "id": "gfs_20_f_20260227_e4",
-      "src_id": "co:globalfoundries",
-      "dst_id": "tech:advanced_packaging_gf",
-      "relation": "supplies_to",
-      "attributes": {
-        "qualification_status": "qualifying",
-        "substitutability": null,
-        "sole_source": false,
-        "structural_lead_time_weeks": null,
-        "ramp_execution": null
-      },
-      "confidence": 0.9,
-      "source_ids": [
-        "gfs_20_f_20260227_s9"
-      ]
-    },
-    {
-      "id": "gfs_20_f_20260227_e5",
-      "src_id": "co:globalfoundries",
-      "dst_id": "tech:semicon_manuf_equipment",
-      "relation": "depends_on",
-      "attributes": {
-        "substitutability": 4,
-        "sole_source": false,
-        "structural_lead_time_weeks": 52,
-        "qualification_status": "none",
-        "ramp_execution": null
-      },
-      "confidence": 0.9,
-      "source_ids": [
-        "gfs_20_f_20260227_s14",
-        "gfs_20_f_20260227_s15"
-      ]
-    },
-    {
-      "id": "gfs_20_f_20260227_e6",
-      "src_id": "co:globalfoundries",
-      "dst_id": "mat:silicon_wafer",
-      "relation": "depends_on",
-      "attributes": {
-        "substitutability": 5,
-        "sole_source": false,
-        "structural_lead_time_weeks": null,
-        "qualification_status": "qualified",
-        "ramp_execution": null
-      },
-      "confidence": 0.9,
-      "source_ids": [
-        "gfs_20_f_20260227_s13",
-        "gfs_20_f_20260227_s20"
-      ]
-    },
-    {
-      "id": "gfs_20_f_20260227_e7",
-      "src_id": "co:soitec",
-      "dst_id": "co:globalfoundries",
-      "relation": "supplies_to",
-      "attributes": {
-        "qualification_status": "qualified",
-        "substitutability": 4,
-        "sole_source": false,
-        "structural_lead_time_weeks": null,
-        "ramp_execution": null
-      },
-      "confidence": 0.9,
-      "source_ids": [
-        "gfs_20_f_20260227_s20"
-      ]
-    },
-    {
-      "id": "gfs_20_f_20260227_e8",
-      "src_id": "co:globalfoundries",
-      "dst_id": "mat:gallium_nitride",
-      "relation": "depends_on",
-      "attributes": {
-        "substitutability": 4,
-        "sole_source": false,
-        "structural_lead_time_weeks": null,
-        "qualification_status": "qualifying",
-        "ramp_execution": null
-      },
-      "confidence": 0.9,
-      "source_ids": [
-        "gfs_20_f_20260227_s26"
-      ]
-    },
-    {
-      "id": "gfs_20_f_20260227_e9",
-      "src_id": "co:globalfoundries",
-      "dst_id": "mat:rare_earth_metals",
-      "relation": "depends_on",
-      "attributes": {
-        "substitutability": 4,
-        "sole_source": false,
-        "structural_lead_time_weeks": null,
-        "qualification_status": "none",
-        "ramp_execution": null
-      },
-      "confidence": 0.9,
-      "source_ids": [
-        "gfs_20_f_20260227_s25"
-      ]
-    },
-    {
-      "id": "gfs_20_f_20260227_e10",
-      "src_id": "co:globalfoundries",
-      "dst_id": "mat:photoresist",
-      "relation": "depends_on",
-      "attributes": {
-        "substitutability": 3,
-        "sole_source": false,
-        "structural_lead_time_weeks": null,
-        "qualification_status": "qualified",
-        "ramp_execution": null
-      },
-      "confidence": 0.9,
-      "source_ids": [
-        "gfs_20_f_20260227_s13"
-      ]
-    },
-    {
-      "id": "gfs_20_f_20260227_e11",
-      "src_id": "co:globalfoundries",
-      "dst_id": "co:tsmc",
-      "relation": "competes_with",
-      "attributes": {},
-      "confidence": 0.9,
-      "source_ids": [
-        "gfs_20_f_20260227_s5"
-      ]
-    },
-    {
-      "id": "gfs_20_f_20260227_e12",
-      "src_id": "co:globalfoundries",
-      "dst_id": "co:samsung",
-      "relation": "competes_with",
-      "attributes": {},
-      "confidence": 0.9,
-      "source_ids": [
-        "gfs_20_f_20260227_s5"
-      ]
-    },
-    {
-      "id": "gfs_20_f_20260227_e13",
-      "src_id": "co:globalfoundries",
-      "dst_id": "co:intel",
-      "relation": "competes_with",
-      "attributes": {},
-      "confidence": 0.9,
-      "source_ids": [
-        "gfs_20_f_20260227_s5"
-      ]
-    },
-    {
-      "id": "gfs_20_f_20260227_e14",
-      "src_id": "co:globalfoundries",
-      "dst_id": "co:umc",
-      "relation": "competes_with",
-      "attributes": {},
-      "confidence": 0.9,
-      "source_ids": [
-        "gfs_20_f_20260227_s5"
-      ]
-    },
-    {
-      "id": "gfs_20_f_20260227_e15",
-      "src_id": "co:globalfoundries",
-      "dst_id": "co:texas_instruments",
-      "relation": "competes_with",
-      "attributes": {},
-      "confidence": 0.9,
-      "source_ids": [
-        "gfs_20_f_20260227_s5"
-      ]
-    },
-    {
-      "id": "gfs_20_f_20260227_e16",
-      "src_id": "tech:ai_compute_buildout",
-      "dst_id": "tech:essential_chips_mature_node",
-      "relation": "enables",
-      "attributes": {},
-      "confidence": 0.75,
-      "source_ids": [
-        "gfs_20_f_20260227_s23"
-      ]
-    },
-    {
-      "id": "gfs_20_f_20260227_e17",
-      "src_id": "tech:ai_compute_buildout",
-      "dst_id": "tech:silicon_photonics",
-      "relation": "enables",
-      "attributes": {},
-      "confidence": 0.75,
-      "source_ids": [
-        "gfs_20_f_20260227_s23",
-        "gfs_20_f_20260227_s27"
-      ]
-    },
-    {
-      "id": "gfs_20_f_20260227_e18",
-      "src_id": "std:chips_science_act",
-      "dst_id": "co:globalfoundries",
-      "relation": "enables",
-      "attributes": {},
-      "confidence": 0.9,
-      "source_ids": [
-        "gfs_20_f_20260227_s7",
-        "gfs_20_f_20260227_s8"
-      ]
-    },
-    {
-      "id": "gfs_20_f_20260227_e19",
-      "src_id": "co:globalfoundries",
-      "dst_id": "co:mips_holding",
-      "relation": "invests_in",
-      "attributes": {},
-      "confidence": 0.9,
-      "source_ids": [
-        "gfs_20_f_20260227_s22"
-      ]
-    },
-    {
-      "id": "gfs_20_f_20260227_e20",
-      "src_id": "tech:semicon_manuf_equipment",
-      "dst_id": "co:globalfoundries",
-      "relation": "enables",
-      "attributes": {},
-      "confidence": 0.9,
-      "source_ids": [
-        "gfs_20_f_20260227_s14"
-      ]
-    },
-    {
-      "id": "gfs_20_f_20260227_e21",
-      "src_id": "mat:silicon_wafer",
-      "dst_id": "tech:essential_chips_mature_node",
-      "relation": "is_component_of",
-      "attributes": {},
-      "confidence": 0.9,
-      "source_ids": [
-        "gfs_20_f_20260227_s20"
-      ]
-    }
-  ],
-  "claims": [
-    {
-      "id": "gfs_20_f_20260227_cl1",
-      "statement": "GlobalFoundries defines single-sourced products as those that can only be manufactured with GF technology and cannot be manufactured elsewhere without significant customer redesigns, making them strategically sticky.",
-      "subject_id": "co:globalfoundries",
-      "demand_proof_level": "confirmed",
-      "disproof_condition": "If a competing foundry qualifies an equivalent process node enabling drop-in migration without redesign, or if a major GF customer successfully transfers a single-sourced product to a competitor.",
-      "confidence": 0.9,
-      "source_ids": [
-        "gfs_20_f_20260227_s2",
-        "gfs_20_f_20260227_s3"
-      ]
-    },
-    {
-      "id": "gfs_20_f_20260227_cl2",
-      "statement": "GF's semiconductor manufacturing equipment suppliers operate with delivery lead times of 12 months or more, creating a structural bottleneck for capacity expansion.",
-      "subject_id": "tech:semicon_manuf_equipment",
-      "demand_proof_level": "confirmed",
-      "disproof_condition": "If equipment supplier lead times normalize to below 6 months, or if new equipment entrants reduce concentration and increase available supply.",
-      "confidence": 0.9,
-      "source_ids": [
-        "gfs_20_f_20260227_s14",
-        "gfs_20_f_20260227_s15"
-      ]
-    },
-    {
-      "id": "gfs_20_f_20260227_cl3",
-      "statement": "GF procures some of its raw materials from sole-sourced suppliers for inputs that are significant to production operations and not easily substituted.",
-      "subject_id": "co:globalfoundries",
-      "demand_proof_level": "confirmed",
-      "disproof_condition": "If GF publicly identifies qualified secondary or tertiary suppliers for all sole-sourced inputs, or if no raw material shortages materially impact GF operations over the next 12 months.",
-      "confidence": 0.9,
-      "source_ids": [
-        "gfs_20_f_20260227_s12"
-      ]
-    },
-    {
-      "id": "gfs_20_f_20260227_cl4",
-      "statement": "GF plans to invest more than $16 billion over 10+ years across Fab 8 and Fab 9 in the US, contingent on government funding under the CHIPS Act.",
-      "subject_id": "co:globalfoundries",
-      "demand_proof_level": "guided",
-      "disproof_condition": "If GF does not receive expected government funding, or if the investment plan is materially reduced or cancelled.",
-      "confidence": 0.9,
-      "source_ids": [
-        "gfs_20_f_20260227_s6",
-        "gfs_20_f_20260227_s7"
-      ]
-    },
-    {
-      "id": "gfs_20_f_20260227_cl5",
-      "statement": "China's domestic foundry capacity at mature nodes (28nm+) is expected to grow faster than demand, leading to industry-wide overcapacity risk that threatens GF's pricing and market share.",
-      "subject_id": "tech:essential_chips_mature_node",
-      "demand_proof_level": "guided",
-      "disproof_condition": "If Chinese foundry capacity expansion stalls due to export controls, funding shortfalls, or demand growth outpaces supply at mature nodes.",
-      "confidence": 0.9,
-      "source_ids": [
-        "gfs_20_f_20260227_s11"
-      ]
-    },
-    {
-      "id": "gfs_20_f_20260227_cl6",
-      "statement": "Soitec is the largest silicon wafer supplier to GlobalFoundries under a long-term agreement.",
-      "subject_id": "gfs_20_f_20260227_e7",
-      "demand_proof_level": "confirmed",
-      "disproof_condition": "If GF discloses a different supplier as its largest silicon wafer partner, or if the LTA with Soitec is terminated.",
-      "confidence": 0.9,
-      "source_ids": [
-        "gfs_20_f_20260227_s20"
-      ]
     }
   ]
 }

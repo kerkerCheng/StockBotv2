@@ -137,8 +137,18 @@ Ask three questions before placing any attribute:
 `supplies_to` and `depends_on` edges may carry:
 - `substitutability`: int 1-5 (5 = sole-source / irreplaceable for THIS buyer)
 - `sole_source`: bool
-- `structural_lead_time_weeks`: int | null — the slow-changing normal lead time for
-  this specific supplier/buyer relationship
+- `structural_lead_time_weeks`: int | null — **qualification lead time only**: how many
+  weeks it takes the buyer to qualify a REPLACEMENT supplier for this relationship
+  (the "how long to switch away" number that makes substitutability actionable).
+  ⚠ Do NOT put delivery lead times here. "Lead times for delivery can be as long as
+  twelve months" is a shipping/queue statement — it belongs in
+  `delivery_lead_time_weeks`, not here. Conflating the two broke the field once
+  (2026-09-02: the only populated value graph-wide was a delivery figure).
+  Qualification time rarely appears in filings (usually only in earnings-call Q&A);
+  leaving this null is the normal, honest outcome.
+- `delivery_lead_time_weeks`: int | null — order-to-delivery lead time for this
+  relationship (queue/shipping). Slow-moving structural statements only; a spot
+  shortage quote is a dated observation, not this field.
 - `qualification_status`: see vocab above
 - `ramp_execution`: int 1-5 — THIS supplier's actual execution capability (distinct
   from the intrinsic difficulty of the category)
