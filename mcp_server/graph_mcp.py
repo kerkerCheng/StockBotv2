@@ -487,6 +487,34 @@ def _prepare_extraction_impl(
             "problems": hard_errors,
         }
 
+    # 公司 registry fail-closed（2026-09-02 對齊 enforcement ①）：validate 對未登記
+    # co:* 刻意只 WARN（typo vs 未 onboard 由人分流）——但 openlight 實測證明 WARN
+    # 沒人讀。prepare 是核准前最後一站：onboard 契約本來就要求 registry 條目隨包
+    # staged（co:proterial／co:jl_mag 先例），這裡把慣例變 enforcement。
+    _reg_path = Path(__file__).resolve().parent.parent / "config" / "company_identity.json"
+    _registry_ids = {
+        str(c.get("company_id"))
+        for c in json.loads(_reg_path.read_text(encoding="utf-8")).get("companies") or []
+    }
+    _unregistered = sorted(
+        {
+            str(n.get("id"))
+            for n in doc.get("nodes") or []
+            if str(n.get("id") or "").startswith("co:")
+            and str(n.get("id")) not in _registry_ids
+        }
+    )
+    if _unregistered:
+        return {
+            "status": "rejected",
+            "doc_id": doc_id,
+            "error": (
+                f"公司未登記 registry：{_unregistered}——join-key 契約要求先補 "
+                "`config/company_identity.json` 條目（private 公司用 research_ticker null，"
+                "見 co:proterial 先例）再 prepare；onboard 包的 registry 條目隨包 staged"
+            ),
+        }
+
     # 同 URL 多段驗證提前到 prepare（2026-09-02 ROADMAP 交付）：loader 的
     # DuplicateUrlError 原本在 apply 才炸，而 payload 已凍結、只能重 prepare＋
     # 重新請求核准（2026-09-01～02 實測連踩三次：原 [360][361]、[376]、[394]）。
