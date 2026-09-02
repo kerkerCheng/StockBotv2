@@ -40816,9 +40816,11 @@
       "first_seen": "2026-09-02T00:51:31.880073+00:00",
       "lead_id": "lead_b9a99326c91984ac91904b8e71effa57",
       "published_at": null,
-      "refs": {},
+      "refs": {
+        "research_action_id": "ra_88274fb8d4d1645552e0aa1b38a5b663"
+      },
       "source": "pane1-sector-gap-2026-09-02",
-      "status": "triaged_go",
+      "status": "action_prepared",
       "themes": {
         "robotics": {
           "counter_only": false,

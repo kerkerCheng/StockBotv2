@@ -6877,6 +6877,55 @@
       "source": "research_action",
       "title": "G1 減速機方案實錘——學術第三方:每關節 BLDC+諧波減速器(含 co:unitree onboard),接上 strain wave 層",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-09-02T01:16:51.472047+00:00",
+      "graph_impact": "+6 節點、4 邊、1 claims｜來源：SVRC Research（獨立第三方產業報告）（tier 3）、Schaeffler（tier 2）",
+      "hint": "核准 exact graph delta；Decision handoff：co:schaeffler。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 410,
+      "reason": null,
+      "ref_id": "ra_88274fb8d4d1645552e0aa1b38a5b663",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "機器人群接上需求錨——減速器→精密致動器→人形系統三條組成邊,pane1 分段補上缺席的機器人段",
+      "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-09-02T01:16:51.472047+00:00",
+      "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "n": 411,
+      "reason": null,
+      "ref_id": "dc_1322bfc1c743fa746b76e280c1b27b28",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:unitree：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-02T01:16:51.472047+00:00",
+      "hint": "當前 missing_data：諧波市占的第二獨立來源（產業報告或客戶側陳述）；綠的諧波/雙環年報一手（A 股取得路徑未建）（共 2 項）｜coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
+      "n": 412,
+      "reason": null,
+      "ref_id": "dc_cc46527aac12ba14191ee71c0460f3fe",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:harmonic_drive_systems：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-02T01:16:51.472047+00:00",
+      "hint": "當前 missing_data：四家具名人形夥伴中任一家的付款方向證據（訂單金額、產能協議或預付款）——partnership 具名已有，缺的是誰付錢給；Schaeffler 官方一手（收購新聞稿、2026-02-05 humanoid IR 簡報）——schaeffler（共 2 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "n": 413,
+      "reason": null,
+      "ref_id": "dc_912a03a50135ea5e29000a0417c3f477",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:schaeffler：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
     }
   ],
   "log": [
@@ -15178,6 +15227,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 410,
+  "next_n": 414,
   "schema_version": "1"
 }
