@@ -15474,9 +15474,12 @@
       "first_seen": "2026-09-02T12:24:27.960964+00:00",
       "lead_id": "lead_32512d1557af2b2c44950ba8edbff600",
       "published_at": null,
-      "refs": {},
+      "refs": {
+        "research_action_id": "ra_93d828e3d06f8be197a1bbcc041831ee",
+        "trace_status": "partial"
+      },
       "source": "decompose-palomar-ocs-2026-09-02",
-      "status": "triaged_go",
+      "status": "action_prepared",
       "themes": {},
       "title": "[decompose|Palomar OCS] 磁光石榴石(Garnet)Faraday rotator 材料層——circulator 心臟;Apollo 論文逐字:歷史上 C-band EDFA 小量市場,Google 放量到 O-band 資料中心規模。誰長晶/誰供應?圖中無此節點",
       "triage": {

@@ -7420,6 +7420,19 @@
       "source": "research_action",
       "title": "OCS 準直器陣列層落圖——Palomar 拆解新層獲雙源:Coherent 2025-03 產品化 2D Collimator Array+Telescent 直指其為大埠數 OCS 的產能瓶頸",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-09-02T12:55:43.358387+00:00",
+      "graph_impact": "+2 節點、1 邊、1 claims｜來源：Coherent（供應商官方產品 datasheet）（tier 2）",
+      "hint": "核准 exact graph delta；Decision handoff：co:coherent。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 445,
+      "reason": null,
+      "ref_id": "ra_93d828e3d06f8be197a1bbcc041831ee",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "磁光石榴石 Faraday rotator 材料層落圖——Coherent 官方 datasheet 證實 LPE BIG 厚膜產品線(1290-1610nm 含 O-band),circulator 心臟材料首個具名供應商",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -16309,6 +16322,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 445,
+  "next_n": 446,
   "schema_version": "1"
 }
