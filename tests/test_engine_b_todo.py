@@ -876,6 +876,31 @@ def test_decision_review_cannot_complete_with_baseline_decision() -> None:
     assert result["item"]["receipt"] == "decision:pd_new"
 
 
+def test_bare_decision_id_rejected_before_work_order_mutation() -> None:
+    """ROADMAP 2026-09-02 清項（2026-08-19 [166] 實測）：裸 `pd_*` receipt 曾通過前半段
+    驗證、先寫入 work order transition，才被 resolve 端拒絕——pool 與 work order 脫鉤，
+    且重試撞 completed->completed 死鎖。修法：格式驗證先於任何副作用。"""
+    pool = _pool_with({"type": "decision_review", "ref_id": "dc_1", "title": "REVIEW"})
+    store = _WorkOrderStore()
+    todo.dispatch_decision_review(pool, 1, store=store, at="2026-07-27T00:00:00+00:00")
+    transitions_before = len(store.transitions)
+
+    with pytest.raises(todo.TodoError, match="decision:pd_"):
+        todo.checkpoint_decision_review(
+            pool, 1, store=store, to_status="completed",
+            receipt="pd_new", at="2026-07-27T01:00:00+00:00",
+        )
+
+    # work order 完全未被觸碰，pool 項目也還活著——可用正確格式重試。
+    assert len(store.transitions) == transitions_before
+    assert not pool["items"][0].get("resolved_at")
+    result = todo.checkpoint_decision_review(
+        pool, 1, store=store, to_status="completed",
+        receipt="decision:pd_new", at="2026-07-27T01:00:00+00:00",
+    )
+    assert result["item"]["resolved_at"]
+
+
 def test_save_load_round_trip(tmp_path) -> None:
     path = tmp_path / "sub" / "todo_pool.json"
     pool = _pool_with({"type": "manual", "ref_id": "m", "title": "手動項"})

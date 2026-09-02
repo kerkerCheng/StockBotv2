@@ -96,6 +96,30 @@ def test_identity_alignment_pure_diff() -> None:
     assert out["registry_companies"] == 3
 
 
+def test_holdings_failure_classification_is_three_state() -> None:
+    """ROADMAP 2026-09-02 清項：空持股／網路／憑證不得壓成同一個 unavailable。"""
+    from engine_d_runtime.adapters import classify_holdings_failure
+
+    class RefreshError(Exception):
+        pass
+
+    RefreshError.__module__ = "google.auth.exceptions"
+    assert classify_holdings_failure(RefreshError("expired")) == "credentials"
+    assert classify_holdings_failure(TimeoutError("t/o")) == "transport"
+    assert classify_holdings_failure(ConnectionError("no egress")) == "transport"
+    assert classify_holdings_failure(ValueError("weird")) == "unknown"
+
+    class _Resp:
+        status = 403
+
+    class HttpError(Exception):
+        resp = _Resp()
+
+    assert classify_holdings_failure(HttpError()) == "credentials"
+    _Resp.status = 503
+    assert classify_holdings_failure(HttpError()) == "transport"
+
+
 def test_variant_perception_roundtrip_and_supersede(tmp_path) -> None:
     """cohort thesis(2026-09-02):append-only、supersede 後只回最新。"""
     from decision_lab.store import DecisionStore
@@ -119,6 +143,27 @@ def test_variant_perception_roundtrip_and_supersede(tmp_path) -> None:
             if hasattr(cohort, "cohort_id")
             else cohort["cohort_id"]
         )
+        import io
+        from contextlib import redirect_stderr
+
+        err = io.StringIO()
+        with redirect_stderr(err):
+            store.ensure_cohort(
+                dedupe_key="vp-test-claim-keyed",
+                company_id="co:nvidia",
+                research_ticker="NVDA",
+            )
+        assert "同公司既有 cohort" in err.getvalue()
+        # 重複讀取既有 cohort 不再吵（只在新建時警告一次）。
+        err2 = io.StringIO()
+        with redirect_stderr(err2):
+            store.ensure_cohort(
+                dedupe_key="vp-test-claim-keyed",
+                company_id="co:nvidia",
+                research_ticker="NVDA",
+            )
+        assert err2.getvalue() == ""
+
         t1 = store.record_variant_perception(cid, variant_perception="v1")
         assert store.latest_variant_perception(cid)["variant_perception"] == "v1"
         store.record_variant_perception(

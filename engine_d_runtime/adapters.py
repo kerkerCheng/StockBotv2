@@ -66,9 +66,43 @@ def fetch_nav_exposure(
                 "status": "unavailable",
                 "blockers": ["holdings_unavailable"],
                 "failure": type(exc).__name__,
+                "failure_kind": classify_holdings_failure(exc),
             },
         )
     return build_nav_exposure(rows, groups=groups)
+
+
+def classify_holdings_failure(exc: BaseException) -> str:
+    """持股讀取失敗的確定性分類（ROADMAP 2026-09-02 清項；L12——別把三種語意壓平）。
+
+    「Sheet 真的沒持股」「網路讀不到」「憑證失效」原本全收斂成同一個
+    `holdings_unavailable`，2026-08-17 花數步才確定是沙箱無 egress 而非設定問題。
+    空持股已由 `status=available`＋空 rows 區分；這裡再把失敗拆成：
+
+    - ``credentials``：token／service account 問題——重試無用，要人修憑證；
+    - ``transport``：網路／provider 瞬時失敗——bounded retry 或下輪自癒；
+    - ``unknown``：其餘——進 log 查 exception 全文。
+
+    分類只看 exception 型別與模組（deterministic，L15：權限與診斷不交給猜測）。
+    """
+    name = type(exc).__name__
+    module = getattr(type(exc), "__module__", "") or ""
+    if name == "HttpError":  # googleapiclient：4xx 授權類 vs 5xx transport
+        status = getattr(getattr(exc, "resp", None), "status", None)
+        try:
+            return "credentials" if int(status) in (401, 403) else "transport"
+        except (TypeError, ValueError):
+            return "transport"
+    if "auth" in module or name in {
+        "RefreshError", "DefaultCredentialsError", "GoogleAuthError",
+        "MalformedError", "MutualTLSChannelError",
+    }:
+        return "credentials"
+    if isinstance(exc, (ConnectionError, TimeoutError, OSError)) or name in {
+        "TransportError", "ServerNotFoundError", "URLError", "SSLError",
+    }:
+        return "transport"
+    return "unknown"
 
 
 def compute_identity_alignment(
@@ -959,6 +993,8 @@ class DefaultRuntimeProvider:
                 "rows": [],
                 "blockers": ["holdings_unavailable"],
                 "failure": type(exc).__name__,
+                # 三態診斷：credentials（修憑證）／transport（重試可癒）／unknown。
+                "failure_kind": classify_holdings_failure(exc),
             }
         if not raw_rows:
             return {

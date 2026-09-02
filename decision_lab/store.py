@@ -6,6 +6,7 @@ import json
 import math
 import os
 import sqlite3
+import sys
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -301,6 +302,9 @@ class DecisionStore:
             raise ValueError("dedupe_key is required")
         cohort_id = "dc_" + _digest(dedupe_key)[:32]
         with immediate_transaction(self._conn):
+            already = self._conn.execute(
+                "SELECT 1 FROM decision_cohorts WHERE dedupe_key = ?", (dedupe_key,)
+            ).fetchone()
             self._conn.execute(
                 """
                 INSERT OR IGNORE INTO decision_cohorts (
@@ -319,6 +323,26 @@ class DecisionStore:
         assert row is not None
         if row["company_id"] != company_id or row["research_ticker"] != research_ticker:
             raise ValueError("dedupe_key already belongs to a different identity")
+        # 同公司重複 cohort 偵測（ROADMAP 2026-09-02 清項；2026-07-30 [74]/[75] 實例）：
+        # claim-keyed 與 company-keyed 兩把 dedupe_key 會替同一家公司開兩個 cohort。
+        # 只在**新建**時警告（append-only、不回溯清理，重複讀取不重複吵）；
+        # 警告不阻擋——建第二個 cohort 有正當情境（如舊 cohort 已 terminal）。
+        if already is None and company_id:
+            siblings = [
+                str(r["cohort_id"])
+                for r in self._conn.execute(
+                    "SELECT cohort_id FROM decision_cohorts"
+                    " WHERE company_id = ? AND cohort_id != ?",
+                    (company_id, cohort_id),
+                )
+            ]
+            if siblings:
+                print(
+                    f"⚠ 同公司既有 cohort：{company_id} 已有 {siblings}——"
+                    "確認不是 claim-keyed/company-keyed 重複再繼續"
+                    "（Decision Store append-only，建了不回收）",
+                    file=sys.stderr,
+                )
         return CohortRecord(**dict(row))
 
     def bind_cohort_identity(

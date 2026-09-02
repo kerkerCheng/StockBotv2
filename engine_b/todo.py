@@ -457,6 +457,16 @@ def checkpoint_decision_review(
     if item["type"] != "decision_review" or not item.get("dispatch_ref"):
         raise TodoError(f"[{n}] 尚未 dispatch decision-review pq1")
     if to_status == "completed":
+        # ⚠ 格式驗證必須先於任何副作用（ROADMAP 2026-09-02 清項；2026-08-19 [166] 實測）：
+        # 裸 `pd_*` 經 removeprefix 是 no-op，能通過 get_decision 並**先寫入** work order
+        # transition，之後 resolve 端的 `_validate_go_receipt` 才要求 `decision:` 前綴
+        # → 拋錯 → pool 不存檔，但 work order 已 completed，且重試撞
+        # 「completed -> completed」死鎖。同一個 receipt 字串不得被兩套規則解讀（L12）。
+        if not receipt.startswith("decision:"):
+            raise TodoError(
+                f"completed receipt 必須是 `decision:pd_*` 完整格式，收到：{receipt!r}"
+                "（resolve 端同一判準；裸 id 會造成 pool 與 work order 脫鉤）"
+            )
         decision_id = receipt.removeprefix("decision:")
         try:
             decision = store.get_decision(decision_id)
