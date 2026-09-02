@@ -1,0 +1,4 @@
+Source URL: https://www.telescent.com/blog/2024/12/16/the-weak-link-in-large-port-count-optical-circuit-switches-for-data-center-automation-fiber-collimator-arrays
+
+Excerpt:
+These arrays are not made in volume today to address hyperscale data center volume demands... To minimize loss collimators must align fibers to an angular tolerance of <1 milliradian... Scaling collimator arrays while maintaining low insertion loss and high precision significantly increases production costs. (Telescent blog, 2024-12-16)

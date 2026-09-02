@@ -1,0 +1,88 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "guided",
+      "disproof_condition": "Downgrade if the product line disappears from Coherent's OCS/datacom portfolio or no design win is ever disclosed within two fiscal years; upgrade when any OCS maker or hyperscaler is named as a customer, or Coherent discloses collimator-array volumes/revenue.",
+      "id": "cohr_2d_collimator_array_pr_2025_03_17_cl1",
+      "source_ids": [
+        "cohr_2d_collimator_array_pr_2025_03_17_s1"
+      ],
+      "statement": "Coherent productized a 2D Collimator Array for optical circuit switches (announced 2025-03-17, shown at OFC 2025): an optical assembly integrating a 2D lens array and a 2D fiber array — exactly the layer the Apollo paper defines as the Palomar OCS optical-path entrance. This makes Coherent the first named at-scale public supplier of this layer in the graph. Limits: product launch only, no named customer, no volume/revenue disclosure; PR retrieved via tier-3 carrier because primary wire pages were inaccessible.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {
+        "qualification_status": "qualifying",
+        "sole_source": false
+      },
+      "confidence": 0.75,
+      "dst_id": "tech:fiber_collimator_array",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "cohr_2d_collimator_array_pr_2025_03_17_s1"
+      ],
+      "src_id": "co:coherent"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "COHR"
+      ],
+      "attributes": {
+        "ticker": "COHR"
+      },
+      "confidence": 0.9,
+      "id": "co:coherent",
+      "name": "Coherent Corp",
+      "role": null,
+      "source_ids": [
+        "cohr_2d_collimator_array_pr_2025_03_17_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "2D collimator array",
+        "fiber collimator array",
+        "準直器陣列"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:fiber_collimator_array",
+      "name": "2D Fiber Collimator Array（OCS 光路入口:NxN 光纖陣列+2D 透鏡陣列）",
+      "role": null,
+      "source_ids": [
+        "cohr_2d_collimator_array_pr_2025_03_17_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "cohr_2d_collimator_array_pr_2025_03_17",
+    "evidence_tier": 3,
+    "origin_entity": "Coherent（發行人新聞稿,經 gurufocus 轉載,原稿 403）",
+    "permission_basis": "Public press release; URL and short excerpts.",
+    "published_at": "2025-03-17",
+    "publisher": "GlobeNewswire",
+    "retrieved_at": "2026-09-02",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Coherent Introduces 2D Collimator Array for Optical Circuit Switches (PR via carrier)",
+    "url": "https://www.globenewswire.com/news-release/2025/03/17/3044108/11543/en/Coherent-Introduces-2D-Collimator-Array-for-Optical-Circuit-Switches.html"
+  },
+  "sources": [
+    {
+      "id": "cohr_2d_collimator_array_pr_2025_03_17_s1",
+      "locator": "PR body (gurufocus carrier)",
+      "quote": "an advanced optical assembly designed for optical circuit switches (OCS)... integrates a 2D lens array and a 2D fiber array"
+    }
+  ]
+}

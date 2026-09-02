@@ -1,0 +1,68 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "guided",
+      "disproof_condition": "Downgrade if volume production of 2D collimator arrays is demonstrated broadly (multiple suppliers disclosing hyperscale-volume shipments), or if OCS architectures shift away from free-space collimator-based designs; upgrade when an OCS maker discloses collimator sourcing constraints or capacity reservations for this component.",
+      "id": "telescent_collimator_weak_link_2024_12_16_cl1",
+      "source_ids": [
+        "telescent_collimator_weak_link_2024_12_16_s1",
+        "telescent_collimator_weak_link_2024_12_16_s2",
+        "telescent_collimator_weak_link_2024_12_16_s3"
+      ],
+      "statement": "A third-party industry source (Telescent, a competing robotic-patch-panel vendor — interest-conflicted, engineering statements only) characterizes fiber collimator arrays as the scaling weak link of large-port-count OCS: sub-milliradian angular tolerance required, production costs rise sharply with scale, and the arrays 'are not made in volume today to address hyperscale data center volume demands'. Combined with Google's Apollo paper (two arrays per Palomar OCS, tens of thousands of units deployed) this frames a small-supplier-base layer facing hyperscale demand growth. Limits: source is a competitor promoting an alternative architecture; no supplier market-share data exists; supplier count in this graph reflects research depth, not world supply.",
+      "subject_id": "tech:fiber_collimator_array"
+    }
+  ],
+  "edges": [],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "2D collimator array",
+        "fiber collimator array",
+        "準直器陣列"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:fiber_collimator_array",
+      "name": "2D Fiber Collimator Array（OCS 光路入口:NxN 光纖陣列+2D 透鏡陣列）",
+      "role": null,
+      "source_ids": [
+        "telescent_collimator_weak_link_2024_12_16_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "telescent_collimator_weak_link_2024_12_16",
+    "evidence_tier": 3,
+    "origin_entity": "Telescent（機器人配線系統商,OCS 競品側技術評論——利益相關,只採工程量化句）",
+    "permission_basis": "Public vendor blog; URL and short excerpts.",
+    "published_at": "2024-12-16",
+    "publisher": "Telescent",
+    "retrieved_at": "2026-09-02",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Telescent — The Weak Link in Large-Port-Count Optical Circuit Switches: Fiber Collimator Arrays",
+    "url": "https://www.telescent.com/blog/2024/12/16/the-weak-link-in-large-port-count-optical-circuit-switches-for-data-center-automation-fiber-collimator-arrays"
+  },
+  "sources": [
+    {
+      "id": "telescent_collimator_weak_link_2024_12_16_s1",
+      "locator": "Blog — volume statement",
+      "quote": "These arrays are not made in volume today to address hyperscale data center volume demands."
+    },
+    {
+      "id": "telescent_collimator_weak_link_2024_12_16_s2",
+      "locator": "Blog — precision requirement",
+      "quote": "To minimize loss collimators must align fibers to an angular tolerance of <1 milliradian during the free-space propagation volume."
+    },
+    {
+      "id": "telescent_collimator_weak_link_2024_12_16_s3",
+      "locator": "Blog — cost scaling",
+      "quote": "Scaling collimator arrays while maintaining low insertion loss and high precision significantly increases production costs."
+    }
+  ]
+}
