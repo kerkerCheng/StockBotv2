@@ -424,15 +424,27 @@
       "wake_pq2": null,
       "hypothesis_ref": "",
       "wake_lead": "lead_1d85eafbfe0bd9a69efc298d24259be3",
-      "consumed_entities": [],
+      "consumed_entities": [
+        "AVGO",
+        "CO:BROADCOM"
+      ],
       "poll": {
         "eligible": false,
         "last_checked": null,
         "query_hint": "Davisson datasheet/OFC 論文件級確認 gen3 調變器"
       },
       "note": "[321] 由 trace backlog 遷移；trace_status=partial",
-      "status": "active",
-      "woken_by": null
+      "status": "fired",
+      "woken_by": {
+        "kind": "entity_filing_signal",
+        "lead_id": "lead_ea2fd285d490a695264e1452765ecc28",
+        "shared_entities": [
+          "AVGO",
+          "co:broadcom"
+        ],
+        "at": "2026-09-02T22:44:00.200434+00:00",
+        "wake_lead": "lead_1d85eafbfe0bd9a69efc298d24259be3"
+      }
     },
     {
       "watch_id": "ew_0015_2026-08-31",
@@ -659,7 +671,7 @@
       ],
       "poll": {
         "eligible": true,
-        "last_checked": null,
+        "last_checked": "2026-09-02",
         "query_hint": "NVDA 8-K 或 10-Q 揭露對 OpenAI／資料中心融資的擔保或承諾；或 OpenAI／SoftBank 側的正式公告"
       },
       "note": "[321] 由 trace backlog 遷移；trace_status=isolated_tier_3",
@@ -974,15 +986,28 @@
       "wake_pq2": null,
       "hypothesis_ref": "",
       "wake_lead": "lead_55bd36e6cab9fdd81f0668215af10431",
-      "consumed_entities": [],
+      "consumed_entities": [
+        "CO:NVIDIA",
+        "MRVL",
+        "NVDA"
+      ],
       "poll": {
         "eligible": false,
         "last_checked": null,
         "query_hint": "SENKO/US Conec 出現上市母體、被上市公司併購，或第三家 connector 供應商進入 CPO 供應鏈"
       },
       "note": "[321] 由 trace backlog 遷移；trace_status=partial",
-      "status": "active",
-      "woken_by": null
+      "status": "fired",
+      "woken_by": {
+        "kind": "entity_filing_signal",
+        "lead_id": "lead_1900dc8a3a9795331553496fc7b83dc4",
+        "shared_entities": [
+          "NVDA",
+          "co:nvidia"
+        ],
+        "at": "2026-09-02T22:44:00.202325+00:00",
+        "wake_lead": "lead_55bd36e6cab9fdd81f0668215af10431"
+      }
     },
     {
       "watch_id": "ew_0030_2026-08-31",
@@ -1431,7 +1456,7 @@
       ],
       "poll": {
         "eligible": true,
-        "last_checked": null,
+        "last_checked": "2026-09-02",
         "query_hint": "作者公開原始 dataset／方法論，或具名公司 filing 揭露可逐筆核對的 physical-AI／world-model 融資事件"
       },
       "note": "[321] 由 trace backlog 遷移；trace_status=lead_only_tier_4",
@@ -1823,15 +1848,27 @@
       "wake_pq2": null,
       "hypothesis_ref": "",
       "wake_lead": "lead_ec5da7de15f538edef3b6b1d4c062632",
-      "consumed_entities": [],
+      "consumed_entities": [
+        "AVGO",
+        "CO:BROADCOM"
+      ],
       "poll": {
         "eligible": false,
         "last_checked": null,
         "query_hint": "ASE/SPIL 法說具名 CPO 封裝營收或 Broadcom 官方供應鏈揭露"
       },
       "note": "[321] 由 trace backlog 遷移；trace_status=partial",
-      "status": "active",
-      "woken_by": null
+      "status": "fired",
+      "woken_by": {
+        "kind": "entity_filing_signal",
+        "lead_id": "lead_ea2fd285d490a695264e1452765ecc28",
+        "shared_entities": [
+          "AVGO",
+          "co:broadcom"
+        ],
+        "at": "2026-09-02T22:44:00.209888+00:00",
+        "wake_lead": "lead_ec5da7de15f538edef3b6b1d4c062632"
+      }
     },
     {
       "watch_id": "ew_0055_2026-08-31",
@@ -2020,7 +2057,12 @@
       "wake_pq2": null,
       "hypothesis_ref": "",
       "wake_lead": "lead_e8c68c83ef5c3ee9b929bdc0d15a055d",
-      "consumed_entities": [],
+      "consumed_entities": [
+        "CO:COHERENT",
+        "CO:LUMENTUM",
+        "COHR",
+        "LITE"
+      ],
       "poll": {
         "eligible": false,
         "last_checked": null,
@@ -2028,7 +2070,18 @@
       },
       "note": "2026-09-02 Daily 修復 unwatched trace；只喚醒 pq1，不提高 tier、不入圖",
       "status": "active",
-      "woken_by": null
+      "woken_by": {
+        "kind": "related_entity_signal",
+        "lead_id": "lead_c6b2150d6ec2db0bf22b046dbe4ddb5d",
+        "shared_entities": [
+          "COHR",
+          "LITE",
+          "co:coherent",
+          "co:lumentum"
+        ],
+        "at": "2026-09-02T22:35:28.300285+00:00",
+        "wake_lead": "lead_e8c68c83ef5c3ee9b929bdc0d15a055d"
+      }
     },
     {
       "watch_id": "ew_0062_2026-09-01",
@@ -2118,15 +2171,27 @@
       "wake_pq2": null,
       "hypothesis_ref": "",
       "wake_lead": "lead_8dd4d56f7e99ca94983ea9de53b817be",
-      "consumed_entities": [],
+      "consumed_entities": [
+        "AAOI",
+        "CO:APPLIED_OPTOELECTRONICS",
+        "GPRO"
+      ],
       "poll": {
         "eligible": false,
         "last_checked": null,
         "query_hint": "GoPro proxy、交易 closing 或 Starman 公布具名 800G／1.6T transceiver 規格"
       },
       "note": "park 時自動建立；trace_status=partial",
-      "status": "active",
-      "woken_by": null
+      "status": "fired",
+      "woken_by": {
+        "kind": "related_entity_signal",
+        "lead_id": "lead_8dd4d56f7e99ca94983ea9de53b817be",
+        "shared_entities": [
+          "GPRO"
+        ],
+        "at": "2026-09-02T22:44:00.213276+00:00",
+        "wake_lead": "lead_8dd4d56f7e99ca94983ea9de53b817be"
+      }
     },
     {
       "watch_id": "ew_0066_2026-09-01",
@@ -2206,15 +2271,152 @@
       "wake_pq2": null,
       "hypothesis_ref": "",
       "wake_lead": "lead_66075f8a2712979c5c1403d078d5c37e",
-      "consumed_entities": [],
+      "consumed_entities": [
+        "CO:NVIDIA",
+        "HUT",
+        "NVDA"
+      ],
       "poll": {
         "eligible": false,
         "last_checked": null,
         "query_hint": "Anthropic、Lambda、NVIDIA 或 Hut 8 正式公告具名算力合約"
       },
       "note": "park 時自動建立；trace_status=isolated_tier_3",
+      "status": "fired",
+      "woken_by": {
+        "kind": "related_entity_signal",
+        "lead_id": "lead_66075f8a2712979c5c1403d078d5c37e",
+        "shared_entities": [
+          "HUT"
+        ],
+        "at": "2026-09-02T22:44:00.213410+00:00",
+        "wake_lead": "lead_66075f8a2712979c5c1403d078d5c37e"
+      }
+    },
+    {
+      "watch_id": "ew_0068_2026-09-02",
+      "created_at": "2026-09-02T22:40:49.149535+00:00",
+      "expires": "2027-01-01",
+      "kind": "fact_verification",
+      "until": null,
+      "entities": [
+        "GOOGL",
+        "LITE",
+        "PlanOptik",
+        "Silex",
+        "co:google",
+        "co:lumentum"
+      ],
+      "fact": "Google Palomar OCS 2D MEMS 鏡陣列的具名代工來源",
+      "fact_check_ref": "https://arxiv.org/abs/2208.10041",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_77539b327d06e48a3073ec7c8c2569c8",
+      "consumed_entities": [],
+      "poll": {
+        "eligible": true,
+        "last_checked": null,
+        "query_hint": "Google Palomar OCS MEMS mirror array foundry Silex Plan Optik manufacturing supplier"
+      },
+      "note": "補 2026-09-03 Daily 的 unwatched 黑洞；一手具名才重開研究，不提高 evidence tier",
       "status": "active",
       "woken_by": null
+    },
+    {
+      "watch_id": "ew_0069_2026-09-02",
+      "created_at": "2026-09-02T22:40:50.317890+00:00",
+      "expires": "2027-01-01",
+      "kind": "fact_verification",
+      "until": null,
+      "entities": [
+        "6481.T",
+        "THK"
+      ],
+      "fact": "THK 是否有 humanoid roller screw 產品或具名客戶採用",
+      "fact_check_ref": "https://www.thk.com/",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_87b40ffa1137339e1365cedb3642bc95",
+      "consumed_entities": [],
+      "poll": {
+        "eligible": true,
+        "last_checked": null,
+        "query_hint": "THK humanoid roller screw customer adoption investor relations 2026"
+      },
+      "note": "補 2026-09-03 Daily 的 unwatched 黑洞；等 issuer 或客戶一手具名，不提高 evidence tier",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0070_2026-09-02",
+      "created_at": "2026-09-02T22:35:29.642537+00:00",
+      "expires": "2026-12-31",
+      "kind": "related_entity_signal",
+      "until": null,
+      "entities": [
+        "AVGO"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_f13d5ec04d05bf49cd1a3e9424983e3f",
+      "consumed_entities": [
+        "AVGO"
+      ],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "Broadcom 發布 Q3 FY2026 conference-call transcript 或 filing 明列 FY27／FY28 AI revenue guidance"
+      },
+      "note": "park 時自動建立；trace_status=partial",
+      "status": "fired",
+      "woken_by": {
+        "kind": "related_entity_signal",
+        "lead_id": "lead_ea2fd285d490a695264e1452765ecc28",
+        "shared_entities": [
+          "AVGO"
+        ],
+        "at": "2026-09-02T22:54:06.248080+00:00",
+        "wake_lead": "lead_f13d5ec04d05bf49cd1a3e9424983e3f"
+      }
+    },
+    {
+      "watch_id": "ew_0071_2026-09-02",
+      "created_at": "2026-09-02T22:36:01.700223+00:00",
+      "expires": "2026-12-31",
+      "kind": "related_entity_signal",
+      "until": null,
+      "entities": [
+        "NVDA",
+        "co:nvidia"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_a600d0a88beebed42f157188799b7083",
+      "consumed_entities": [
+        "CO:NVIDIA",
+        "NVDA"
+      ],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "NVIDIA IR、SEC filing 或公開 conference transcript 明列 unconstrained growth 與 inference／training mix"
+      },
+      "note": "park 時自動建立；trace_status=partial",
+      "status": "fired",
+      "woken_by": {
+        "kind": "related_entity_signal",
+        "lead_id": "lead_1900dc8a3a9795331553496fc7b83dc4",
+        "shared_entities": [
+          "NVDA",
+          "co:nvidia"
+        ],
+        "at": "2026-09-02T22:54:06.248132+00:00",
+        "wake_lead": "lead_a600d0a88beebed42f157188799b7083"
+      }
     }
   ]
 }
