@@ -6844,8 +6844,10 @@
       "added_at": "2026-09-01T15:06:12.743064+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_749996b9d3effd934c2a9fcd78e20394",
+      "dispatch_receipt": "manual_todo:423;edgar:0001654954-26-006919",
       "dispatch_ref": "wo_b9657bd62ad50324742536cbd0f2fe25",
-      "dispatch_status": "queued",
+      "dispatch_status": "awaiting_approval",
+      "dispatch_updated_at": "2026-09-02T11:05:49.125655+00:00",
       "dispatched_at": "2026-09-02T07:50:55.523561+00:00",
       "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 406,
@@ -7097,6 +7099,18 @@
       "resolved_at": null,
       "source": "manual",
       "title": "JL MAG [398] customer/supplier concentration 觀測寫入核准——2025 年報審計級數字落 Engine C",
+      "type": "manual"
+    },
+    {
+      "added_at": "2026-09-02T11:05:37.532602+00:00",
+      "hint": "go＝把以下觀測寫入 Engine C manual ledger(backlog+customer_concentration,co:aehr_test_systems)；不含入圖(10-K CPO/集中度 claim 已由 [402] 入圖)、不含 thesis mutation。內容(FY2026 10-K,filed 2026-07-27,EDGAR 0001654954-26-006919,審計級一手):①backlog $80.6M as of 2026-05-29(前年 $15.2M)——確認 PO、12 個月內排程出貨口徑;②前五大客戶 70% 營收(FY25 77%/FY24 93%),FY26 三客戶各 26%/14%/11%;③mix 轉移:EV/power semi 營收占比 17%(FY25 41%/FY24 92%),AI/photonics 取代 SiC 成主驅動;④wafer-level 產品線 63%/package-level 37%",
+      "n": 423,
+      "reason": null,
+      "ref_id": "wo:wo_b9657bd62ad50324742536cbd0f2fe25",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "Aehr [406] backlog 觀測寫入核准——FY2026 10-K backlog $80.6M(前年 $15.2M,5.3x)落 Engine C",
       "type": "manual"
     }
   ],
@@ -15611,8 +15625,26 @@
       "ref_id": "dc_32872cf6a80c5f273b9b4c55a57ff229",
       "type": "decision_review",
       "verb": "pq1_awaiting_approval"
+    },
+    {
+      "at": "2026-09-02T11:04:12.484326+00:00",
+      "n": 406,
+      "reason": "research-drain 開工",
+      "receipt": "wo:wo_b9657bd62ad50324742536cbd0f2fe25",
+      "ref_id": "dc_fef9e03e5e6935e7428620f7eab793ba",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-09-02T11:05:49.125655+00:00",
+      "n": 406,
+      "reason": "bounded research 完成:①10-K CPO/客戶集中度 claim 已在圖([402] 先前入圖),無重複入圖;②backlog $80.6M(5.3x YoY)一手取得,觀測提案 [423] 等核准——這正是 financial_backlog_manual_required blocker 的解;③客戶具名兩側皆無(lead customer/second major customer 匿名慣例),reassess 時 catalyst 建議綁 FQ1 FY27 結果(2026-10)backlog 轉換率,disproof 綁 backlog 縮回或取消",
+      "receipt": "manual_todo:423;edgar:0001654954-26-006919",
+      "ref_id": "dc_fef9e03e5e6935e7428620f7eab793ba",
+      "type": "decision_review",
+      "verb": "pq1_awaiting_approval"
     }
   ],
-  "next_n": 423,
+  "next_n": 424,
   "schema_version": "1"
 }
