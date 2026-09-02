@@ -1,0 +1,77 @@
+{
+  "claims": [
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "guided",
+      "disproof_condition": "Downgrade if humanoid rotor deliveries disappear from subsequent statutory reporting or remain sub-scale (no revenue split disclosed) through FY2026 annual report; upgrade when any humanoid customer is named by either side, or when the robot/servo revenue line is separately disclosed at scale in statutory filings.",
+      "id": "jlmag_ar2025_hkex_cl1",
+      "source_ids": [
+        "jlmag_ar2025_hkex_s1",
+        "jlmag_ar2025_hkex_s2",
+        "jlmag_ar2025_hkex_s3",
+        "jlmag_ar2025_hkex_s4"
+      ],
+      "statement": "JL MAG's audited 2025 Annual Report elevates humanoid robot motor rotors to a named final-product category alongside NdFeB PMs and magnetic components, states that small batches have already been delivered to internationally renowned technology companies (unnamed), and discloses a Hong Kong R&D center dedicated to downstream humanoid-rotor customers. Customer structure stays moderately concentrated (largest 14.32%, top five 45.08% of FY2025 revenue vs 12.71%/47.88% in FY2022), while supplier concentration is extreme (largest supplier 69.13% of procurement) — a material upstream risk attached to the same rare-earth chain the company benefits from. Limits: humanoid customers unnamed and delivery value undisclosed; all statements are issuer self-report in a statutory filing.",
+      "subject_id": "co:jl_mag"
+    }
+  ],
+  "edges": [],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "6680.HK",
+        "300748.SZ",
+        "金力永磁",
+        "JLMAG"
+      ],
+      "attributes": {
+        "ticker": "6680.HK"
+      },
+      "confidence": 0.85,
+      "id": "co:jl_mag",
+      "name": "JL MAG Rare-Earth（金力永磁）",
+      "role": null,
+      "source_ids": [
+        "jlmag_ar2025_hkex_s2"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "jlmag_ar2025_hkex",
+    "evidence_tier": 1,
+    "origin_entity": "JL MAG（發行人法定年報,審計級）",
+    "permission_basis": "Public HKEX filing; URL and short excerpts, full PDF local.",
+    "published_at": "2026-03-25",
+    "publisher": "HKEX news",
+    "retrieved_at": "2026-09-02",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "JL MAG Rare-Earth Co., Ltd. 2025 Annual Report (HKEX, published 2026-03-25)",
+    "url": "https://www.hkexnews.hk/listedco/listconews/sehk/2026/0325/2026032502301.pdf"
+  },
+  "sources": [
+    {
+      "id": "jlmag_ar2025_hkex_s1",
+      "locator": "Report of the Board of Directors §26 Major Customers and Suppliers (printed p.155)",
+      "quote": "During the Reporting Period, the Company's largest customer accounted for approximately 14.32% of the Company's total revenue. The total revenue from the Company's five largest customers accounted for approximately 45.08% of the Company's revenue."
+    },
+    {
+      "id": "jlmag_ar2025_hkex_s2",
+      "locator": "§1.1 Core Business (printed p.28-29)",
+      "quote": "The Company is a high-tech enterprise engaging in the R&D, production and sales of high-performance NdFeB PMs, magnetic components, humanoid robot motor rotors and rare earth recycling... The Company is actively expanding its presence in the robotics sector. On one hand, it is collaborating with internationally renowned technology companies on the R&D and capacity building for humanoid robot motor rotors, with small batches of products already delivered."
+    },
+    {
+      "id": "jlmag_ar2025_hkex_s3",
+      "locator": "§1.1 production base / R&D (printed p.32)",
+      "quote": "The Company has established an R&D center in Hong Kong, China, to meet the future needs of downstream customers in the field of humanoid robot motor rotors."
+    },
+    {
+      "id": "jlmag_ar2025_hkex_s4",
+      "locator": "Report of the Board of Directors §26 (printed p.156)",
+      "quote": "During the Reporting Period, the Company's largest supplier accounted for approximately 69.13% of the Company's total amount of procurement. The Company's five largest suppliers accounted for approximately 80.08% of the Company's total amount of procurement."
+    }
+  ]
+}
