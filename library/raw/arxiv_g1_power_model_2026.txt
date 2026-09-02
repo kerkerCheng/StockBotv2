@@ -1,0 +1,4 @@
+Source URL: https://arxiv.org/abs/2606.15915
+
+Excerpt:
+The Unitree G1 left arm has seven degrees of freedom: shoulder pitch/roll/yaw, elbow, and wrist roll/pitch/yaw (SDK motor indices 15-21). Each joint is driven by a BLDC motor paired with a harmonic-drive reducer... Harmonic drives are not back-drivable. (arXiv 2606.15915, Harper Adams University)

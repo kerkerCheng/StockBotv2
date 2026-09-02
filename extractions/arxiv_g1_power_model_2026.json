@@ -1,0 +1,117 @@
+{
+  "claims": [
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Update if later G1 revisions or leg joints are shown to use different gearing (paper covers the arm only — leg actuators may differ, e.g., planetary for high-torque knees), or if a physical teardown names the harmonic-drive maker (would convert the supplier unknown into an edge).",
+      "id": "arxiv_g1_power_model_2026_cl1",
+      "source_ids": [
+        "arxiv_g1_power_model_2026_s1",
+        "arxiv_g1_power_model_2026_s2"
+      ],
+      "statement": "Independent academic teardown-level evidence: every joint of the Unitree G1 arm (7 DOF, SDK indices 15-21) is a BLDC motor paired with a harmonic-drive reducer — resolving the reducer-scheme unknown from the G1 decompose with a third-party origin (Unitree's official specs do not disclose gearing). This ties the G1, a flagship low-cost humanoid, to the strain-wave-gear layer where HDS (sub=2), Leaderdrive and Shuanghuan already sit, and is consistent with the third-party report that Shuanghuan supplies Unitree — though WHICH maker's harmonic drives are inside the G1 remains unnamed in any primary source.",
+      "subject_id": "e2"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "prod:unitree_g1",
+      "id": "e1",
+      "relation": "develops",
+      "source_ids": [
+        "arxiv_g1_power_model_2026_s1"
+      ],
+      "src_id": "co:unitree"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:strain_wave_gear",
+      "id": "e2",
+      "relation": "depends_on",
+      "source_ids": [
+        "arxiv_g1_power_model_2026_s1"
+      ],
+      "src_id": "prod:unitree_g1"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "robot_system",
+      "aliases": [
+        "Unitree",
+        "宇樹"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:unitree",
+      "name": "Unitree Robotics（宇樹科技）",
+      "role": null,
+      "source_ids": [
+        "arxiv_g1_power_model_2026_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "robot_system",
+      "aliases": [
+        "G1",
+        "Unitree G1"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "prod:unitree_g1",
+      "name": "Unitree G1 人形機器人",
+      "role": null,
+      "source_ids": [
+        "arxiv_g1_power_model_2026_s1"
+      ],
+      "type": "Product"
+    },
+    {
+      "abstraction_level": "robot_subsystem",
+      "aliases": [
+        "harmonic drive",
+        "諧波減速機",
+        "strain wave gearing"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:strain_wave_gear",
+      "name": "Strain Wave Gear（諧波減速器）",
+      "role": null,
+      "source_ids": [
+        "arxiv_g1_power_model_2026_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "arxiv_g1_power_model_2026",
+    "evidence_tier": 2,
+    "origin_entity": "Harper Adams University 研究團隊（獨立學術第三方,非 Unitree 非減速器供應商）",
+    "permission_basis": "Public arXiv preprint; URL and short excerpts.",
+    "published_at": null,
+    "publisher": "arXiv",
+    "retrieved_at": "2026-09-01",
+    "source_type": "paper",
+    "storage_permission": "repo_excerpt",
+    "title": "Identification of a Physics-Based Electrical Power Consumption Model for the Unitree G1 Humanoid Arm (arXiv 2606.15915)",
+    "url": "https://arxiv.org/abs/2606.15915"
+  },
+  "sources": [
+    {
+      "id": "arxiv_g1_power_model_2026_s1",
+      "locator": "System description — G1 left arm",
+      "quote": "The Unitree G1 left arm has seven degrees of freedom: shoulder pitch/roll/yaw, elbow, and wrist roll/pitch/yaw (SDK motor indices 15–21). Each joint is driven by a BLDC motor paired with a harmonic-drive reducer."
+    },
+    {
+      "id": "arxiv_g1_power_model_2026_s2",
+      "locator": "Model discussion — harmonic drive property",
+      "quote": "Harmonic drives are not back-drivable; during deceleration the gear efficiency is ηg,i (not 1/ηg,i), making the model asymmetric."
+    }
+  ]
+}
