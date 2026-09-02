@@ -96,6 +96,64 @@ def test_identity_alignment_pure_diff() -> None:
     assert out["registry_companies"] == 3
 
 
+def test_reopen_epoch_records_anchor_and_rejects_hindsight(tmp_path) -> None:
+    """workstream #2（2026-09-02）：新 epoch 的量測錨在 reopen 當下記錄；
+    as_of 晚於 effective_at 的錨是事後挑價，拒絕。"""
+    from decision_lab.store import DecisionStore
+    from storage.relational import initialize_private_root
+
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    private_root = repo / "library" / "private"
+    initialize_private_root(private_root, repo_root=repo)
+    store = DecisionStore.open(
+        private_root / "decision_lab" / "decision_lab.db",
+        private_root=private_root,
+        repo_root=repo,
+    )
+    try:
+        cohort = store.ensure_cohort(
+            dedupe_key="epoch-anchor-test", company_id="co:nvidia", research_ticker="NVDA"
+        )
+        cid = cohort.cohort_id if hasattr(cohort, "cohort_id") else cohort["cohort_id"]
+        store._conn.execute(
+            "INSERT INTO probe_lifecycle_epochs (cohort_id, epoch, status, started_at)"
+            " VALUES (?, 1, 'expired', '2026-08-01T00:00:00+00:00')",
+            (cid,),
+        )
+        store._conn.commit()
+
+        with pytest.raises(ValueError, match="不得晚於"):
+            store.reopen_lifecycle_epoch(
+                cohort_id=cid, reason="r", effective_at="2026-09-01T00:00:00+00:00",
+                anchor={
+                    "price": 100.0, "currency": "USD",
+                    "as_of": "2026-09-02T00:00:00+00:00", "source": "x",
+                },
+            )
+
+        result = store.reopen_lifecycle_epoch(
+            cohort_id=cid, reason="r", effective_at="2026-09-01T00:00:00+00:00",
+            anchor={
+                "price": 100.0, "currency": "USD",
+                "as_of": "2026-08-31T00:00:00+00:00", "source": "live_fill:lf_x",
+            },
+        )
+        assert result.epoch == 2
+        events = store.list_events(cid, event_type="epoch_anchor")
+        assert len(events) == 1
+        import json as _json
+
+        row = store._conn.execute(
+            "SELECT payload_json FROM decision_events WHERE event_id = ?",
+            (events[0].event_id,),
+        ).fetchone()
+        payload = _json.loads(row["payload_json"])
+        assert payload["epoch"] == 2 and payload["price"] == 100.0
+    finally:
+        store.close()
+
+
 def test_holdings_failure_classification_is_three_state() -> None:
     """ROADMAP 2026-09-02 清項：空持股／網路／憑證不得壓成同一個 unavailable。"""
     from engine_d_runtime.adapters import classify_holdings_failure

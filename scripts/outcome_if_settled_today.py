@@ -125,7 +125,36 @@ def _load_shadows() -> list[dict]:
              ORDER BY s.created_at
             """
         ).fetchall()
-    return [dict(r) for r in rows]
+        # epoch 錨點 overlay（workstream #2，2026-09-02）：cohort 重開 epoch 後，
+        # 量測起點應是重開當下的錨（reopen 時以 epoch_anchor event 記錄），
+        # 不是 epoch 1 的 shadow——否則「重開後的判斷準不準」與舊判斷混在同一數字。
+        # shadow 本體不覆寫（append-only）；這裡只在讀取端 overlay 最新一筆。
+        anchors: dict[str, dict] = {}
+        for row in conn.execute(
+            """
+            SELECT cohort_id, payload_json FROM decision_events
+             WHERE event_type = 'epoch_anchor' ORDER BY observed_at
+            """
+        ):
+            try:
+                payload = json.loads(row["payload_json"])
+                anchors[str(row["cohort_id"])] = {
+                    "price": float(payload["price"]),
+                    "currency": str(payload["currency"]),
+                    "as_of": str(payload["as_of"]),
+                    "epoch": payload.get("epoch"),
+                }
+            except (ValueError, TypeError, KeyError):
+                continue
+    shadows = [dict(r) for r in rows]
+    for shadow in shadows:
+        overlay = anchors.get(str(shadow["cohort_id"]))
+        if overlay and shadow["status"] == "observed":
+            shadow.update(
+                price=overlay["price"], currency=overlay["currency"],
+                as_of=overlay["as_of"], anchor_epoch=overlay["epoch"],
+            )
+    return shadows
 
 
 def _market_quote_unit(company_id: str | None, ticker: str | None) -> str | None:

@@ -2784,6 +2784,7 @@ class DecisionStore:
         cohort_id: str,
         reason: str,
         effective_at: str,
+        anchor: Mapping[str, Any] | None = None,
     ) -> LifecycleResult:
         """為已 terminal 的 cohort 開新 epoch，讓它能再次被結案並產出 outcome。
 
@@ -2806,6 +2807,27 @@ class DecisionStore:
         effective_at = _timestamp(effective_at, "effective_at")
         if not reason.strip():
             raise ValueError("reopen 必須附 reason")
+        # epoch 錨點（ROADMAP workstream #2，2026-09-02）：新 epoch 的報酬量測起點。
+        # 沒有它，outcome 只能沿用 epoch 1 的 shadow 錨——「重開後的判斷準不準」會與
+        # 舊判斷混在同一個數字裡。錨點必須在 reopen 當下提供（hindsight 防線：
+        # `as_of` 不得晚於 effective_at，事後挑一個有利價格回填正是 backfill_shadow
+        # 擋掉的那件事）；不提供則以 stderr 現形，不靜默。
+        if anchor is not None:
+            for field in ("price", "currency", "as_of", "source"):
+                if anchor.get(field) in (None, ""):
+                    raise ValueError(f"epoch anchor 缺 {field}")
+            anchor_as_of = _timestamp(str(anchor["as_of"]), "anchor.as_of")
+            if datetime.fromisoformat(anchor_as_of) > datetime.fromisoformat(effective_at):
+                raise ValueError(
+                    "epoch anchor 的 as_of 不得晚於 effective_at——"
+                    "錨點是重開當下已知的價格，不是事後挑的"
+                )
+        else:
+            print(
+                f"⚠ {cohort_id} 新 epoch 未附錨點——outcome 將沿用舊 shadow 錨，"
+                "量測會跨 epoch 混合（可另以 epoch_anchor event 補當時收據價）",
+                file=sys.stderr,
+            )
         with immediate_transaction(self._conn):
             current = self._conn.execute(
                 """
@@ -2867,7 +2889,22 @@ class DecisionStore:
                 """,
                 (cohort_id,),
             )
-            return LifecycleResult(cohort_id, next_epoch, "active", None, event_id)
+        if anchor is not None:
+            # append-only：錨點以事件保存（shadow 是每 cohort 單錨、屬 epoch 1 起點，
+            # 不覆寫）；outcome 端以最新 epoch_anchor overlay。
+            self.append_event(
+                cohort_id=cohort_id,
+                event_type="epoch_anchor",
+                payload={
+                    "epoch": next_epoch,
+                    "price": float(anchor["price"]),
+                    "currency": str(anchor["currency"]),
+                    "as_of": str(anchor["as_of"]),
+                    "source": str(anchor["source"]),
+                },
+                observed_at=effective_at,
+            )
+        return LifecycleResult(cohort_id, next_epoch, "active", None, event_id)
 
     @staticmethod
     def _outcome_result(payload: Mapping[str, Any]) -> OutcomeResult:
