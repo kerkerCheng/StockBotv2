@@ -1,0 +1,4 @@
+Source URL: https://novanta.com/robotics-automation/application/humanoid/
+
+Excerpt:
+Our multi-axis force/torque sensors provide the sensitivity needed for compliant grasping, collision detection, and adaptive manipulation... Our frameless motors and miniature encoders deliver high torque in low-profile packages... freeing valuable space in knees, elbows, and wrists. (novanta.com humanoid application page)

@@ -1,0 +1,102 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "guided",
+      "disproof_condition": "Downgrade if humanoid makers standardize on integrated joint torque sensing (no discrete F/T sensor) or Chinese suppliers commoditize the layer without Novanta wins; upgrade when any humanoid maker names ATI/Novanta sensors, or Novanta discloses humanoid-related orders/revenue split.",
+      "id": "novanta_humanoid_ft_2026_cl1",
+      "source_ids": [
+        "novanta_humanoid_ft_2026_s1",
+        "novanta_humanoid_ft_2026_s2",
+        "novanta_humanoid_ft_2026_s3"
+      ],
+      "statement": "Novanta (NOVT), via ATI Industrial Automation, officially markets multi-axis force/torque sensors for humanoid robots (compliant grasping, collision detection, adaptive manipulation), plus frameless motors, miniature encoders and servo drives positioned for knee/elbow/wrist integration — giving the graph's force-torque-sensor chokepoint its first named supplier. Limits: vendor self-report application page; no humanoid maker named as customer; prior assessment of this layer notes low substitutability barriers and a multi-supplier market (Sintokogio, SCHUNK, Chinese entrants), so first-named does not mean bottleneck-holder; Novanta humanoid revenue not disclosed (low purity).",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {
+        "qualification_status": "qualifying",
+        "sole_source": false
+      },
+      "confidence": 0.75,
+      "dst_id": "tech:force_torque_sensor",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "novanta_humanoid_ft_2026_s1"
+      ],
+      "src_id": "co:novanta"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "NOVT",
+        "ATI Industrial Automation",
+        "Novanta Inc"
+      ],
+      "attributes": {
+        "ticker": "NOVT"
+      },
+      "confidence": 0.85,
+      "id": "co:novanta",
+      "name": "Novanta（ATI Industrial Automation 母公司）",
+      "role": null,
+      "source_ids": [
+        "novanta_humanoid_ft_2026_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "robot_subsystem",
+      "aliases": [
+        "force torque sensor",
+        "F/T sensor",
+        "六軸力感測器"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:force_torque_sensor",
+      "name": "力／力矩感測器（FT sensor，人形關節與腕踝）",
+      "role": null,
+      "source_ids": [
+        "novanta_humanoid_ft_2026_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "novanta_humanoid_ft_2026",
+    "evidence_tier": 2,
+    "origin_entity": "Novanta/ATI（供應商官方應用頁）",
+    "permission_basis": "Public vendor page; URL and short excerpts.",
+    "published_at": null,
+    "publisher": "Novanta",
+    "retrieved_at": "2026-09-02",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Novanta — Humanoid application page (ATI force/torque sensors, motors, encoders)",
+    "url": "https://novanta.com/robotics-automation/application/humanoid/"
+  },
+  "sources": [
+    {
+      "id": "novanta_humanoid_ft_2026_s1",
+      "locator": "Humanoid page — F/T sensors",
+      "quote": "Our multi-axis force/torque sensors provide the sensitivity needed for compliant grasping, collision detection, and adaptive manipulation."
+    },
+    {
+      "id": "novanta_humanoid_ft_2026_s2",
+      "locator": "Humanoid page — motors/encoders",
+      "quote": "Our frameless motors and miniature encoders deliver high torque in low-profile packages."
+    },
+    {
+      "id": "novanta_humanoid_ft_2026_s3",
+      "locator": "Humanoid page — integration",
+      "quote": "freeing valuable space in knees, elbows, and wrists"
+    }
+  ]
+}
