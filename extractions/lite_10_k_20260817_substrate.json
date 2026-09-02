@@ -1,0 +1,109 @@
+{
+  "claims": [
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "guided",
+      "disproof_condition": "Downgrade if future filings drop the substrate-chain and sole-source language (dependency resolved via second sources), or if InP substrate supply normalizes (pricing/lead-time reversion disclosed by suppliers); upgrade when Lumentum names substrate suppliers or quantifies advance payments to them, or a supplier names Lumentum as committed customer.",
+      "id": "lite_10_k_20260817_substrate_cl1",
+      "source_ids": [
+        "lite_10_k_20260817_substrate_s1",
+        "lite_10_k_20260817_substrate_s2",
+        "lite_10_k_20260817_substrate_s3",
+        "lite_10_k_20260817_substrate_s4"
+      ],
+      "statement": "Lumentum's audited FY2026 10-K provides the first statutory customer-side document for its substrate dependency: some suppliers are sole sources for certain materials; Lumentum has made advance payments to secure orders (customer-to-supplier costly commitment) while honestly disclosing it lacks long-term agreements with many suppliers; and China's export restrictions to Japan 'affected our substrate supply chain globally'. This upgrades the LITE→InP-substrate edge from transcript/news evidence to statutory filing grade. Honest limit: the 10-K never names indium phosphide substrates specifically — InP-specificity still rests on existing earnings-call and Reuters assertions; advance-payment counterparties and amounts are undisclosed.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {
+        "sole_source": false
+      },
+      "confidence": 0.8,
+      "dst_id": "mat:inp_substrate",
+      "id": "e1",
+      "relation": "depends_on",
+      "source_ids": [
+        "lite_10_k_20260817_substrate_s1",
+        "lite_10_k_20260817_substrate_s2",
+        "lite_10_k_20260817_substrate_s3",
+        "lite_10_k_20260817_substrate_s4"
+      ],
+      "src_id": "co:lumentum"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "LITE",
+        "Lumentum Holdings"
+      ],
+      "attributes": {
+        "ticker": "LITE"
+      },
+      "confidence": 0.9,
+      "id": "co:lumentum",
+      "name": "Lumentum",
+      "role": null,
+      "source_ids": [
+        "lite_10_k_20260817_substrate_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "InP wafer"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 5
+      },
+      "confidence": 0.9,
+      "id": "mat:inp_substrate",
+      "name": "Indium Phosphide (InP) substrate",
+      "role": null,
+      "source_ids": [
+        "lite_10_k_20260817_substrate_s3"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "lite_10_k_20260817_substrate",
+    "evidence_tier": 1,
+    "origin_entity": "Lumentum（客戶端法定年報,審計級）",
+    "permission_basis": "Public SEC filing; URL and short excerpts.",
+    "published_at": "2026-08-17",
+    "publisher": "SEC EDGAR",
+    "retrieved_at": "2026-09-02",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Lumentum Holdings FY2026 Form 10-K (filed 2026-08-17)",
+    "url": "https://www.sec.gov/Archives/edgar/data/1633978/000162828026057358/lite-20260627.htm"
+  },
+  "sources": [
+    {
+      "id": "lite_10_k_20260817_substrate_s1",
+      "locator": "Risk Factors — supplier dependency",
+      "quote": "We purchase raw materials, packages and components from a limited number of suppliers, who are often small and specialized. Additionally, some of our suppliers are our sole sources for certain materials, equipment and components."
+    },
+    {
+      "id": "lite_10_k_20260817_substrate_s2",
+      "locator": "Risk Factors — advance payments",
+      "quote": "While we have entered into advanced payments to secure orders from some of these suppliers, we have not entered into long-term agreements with many of these suppliers."
+    },
+    {
+      "id": "lite_10_k_20260817_substrate_s3",
+      "locator": "Risk Factors — trade restrictions",
+      "quote": "Similarly, China restricted exports to Japan, which affected our substrate supply chain globally."
+    },
+    {
+      "id": "lite_10_k_20260817_substrate_s4",
+      "locator": "Item 1 — Sources and Availability of Raw Materials",
+      "quote": "Although our intention is to establish at least two sources of supply for materials whenever possible, for certain components we have sole or limited source supply arrangements."
+    }
+  ]
+}
