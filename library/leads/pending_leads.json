@@ -8813,9 +8813,13 @@
       "first_seen": "2026-09-01T22:33:07.890021+00:00",
       "lead_id": "lead_0d984353ea605a89e6cf74cf941eac0f",
       "published_at": "2026-08-14",
-      "refs": {},
+      "refs": {
+        "outcome": "Form 4 已解析:Salamone 賣 9,672 股 @127.5-128。屬 AEHR 內部人 2026-08-13~09-01 集體賣出 cluster(5 名內部人市場賣出合計約 7.5 萬股 @127-144,時點在 FY26 10-K backlog 5.3x 公布後強勢段)。信心類時變資訊,不入圖;已計入 [406]/[423] 研究脈絡",
+        "parked_reason": "insider Form 4 信心類,無 graph delta;cluster 訊號已記錄",
+        "trace_status": "partial"
+      },
       "source": "edgar:AEHR",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "AEHR 4 filed 2026-08-14",
       "triage": {
@@ -9448,9 +9452,13 @@
       "first_seen": "2026-09-01T22:33:07.890100+00:00",
       "lead_id": "lead_12d182c33d678a3ec14ef956dd80765a",
       "published_at": "2026-08-13",
-      "refs": {},
+      "refs": {
+        "outcome": "Form 4 已解析:CEO Erickson 賣 40,000 股 @130.8-132.3(約 $5.2M)。屬 AEHR 內部人 2026-08-13~09-01 集體賣出 cluster(5 名內部人市場賣出合計約 7.5 萬股 @127-144,時點在 FY26 10-K backlog 5.3x 公布後強勢段)。信心類時變資訊,不入圖;已計入 [406]/[423] 研究脈絡",
+        "parked_reason": "insider Form 4 信心類,無 graph delta;cluster 訊號已記錄",
+        "trace_status": "partial"
+      },
       "source": "edgar:AEHR",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "AEHR 4 filed 2026-08-13",
       "triage": {
@@ -10566,9 +10574,13 @@
       "first_seen": "2026-09-01T22:33:18.603418+00:00",
       "lead_id": "lead_19c2d0ce3f563d028b0eefa4ff300ede",
       "published_at": "2026-09-01",
-      "refs": {},
+      "refs": {
+        "outcome": "Form 4 已解析:MTSI COO Dennehy 賣 252 股 @275.20,量微例行",
+        "parked_reason": "insider Form 4 信心類例行交易,無 graph delta",
+        "trace_status": "partial"
+      },
       "source": "edgar:MTSI",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "MTSI 4 filed 2026-09-01",
       "triage": {
@@ -16259,9 +16271,13 @@
       "first_seen": "2026-09-01T22:33:07.889692+00:00",
       "lead_id": "lead_365f503ef06a76b13750113789c7c200",
       "published_at": "2026-08-18",
-      "refs": {},
+      "refs": {
+        "outcome": "Form 4 已解析:Rogers 賣 5,994 股 @134-143.77。屬 AEHR 內部人 2026-08-13~09-01 集體賣出 cluster(5 名內部人市場賣出合計約 7.5 萬股 @127-144,時點在 FY26 10-K backlog 5.3x 公布後強勢段)。信心類時變資訊,不入圖;已計入 [406]/[423] 研究脈絡",
+        "parked_reason": "insider Form 4 信心類,無 graph delta;cluster 訊號已記錄",
+        "trace_status": "partial"
+      },
       "source": "edgar:AEHR",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "AEHR 4 filed 2026-08-18",
       "triage": {
@@ -20482,9 +20498,13 @@
       "first_seen": "2026-09-01T22:33:07.889570+00:00",
       "lead_id": "lead_4e16633643902ae216814d3373f5f051",
       "published_at": "2026-09-01",
-      "refs": {},
+      "refs": {
+        "outcome": "Form 4 已解析:Siu F code 496 股 @76.59(稅務代扣,非市場賣出)。屬 AEHR 內部人 2026-08-13~09-01 集體賣出 cluster(5 名內部人市場賣出合計約 7.5 萬股 @127-144,時點在 FY26 10-K backlog 5.3x 公布後強勢段)。信心類時變資訊,不入圖;已計入 [406]/[423] 研究脈絡",
+        "parked_reason": "insider Form 4 信心類,無 graph delta;cluster 訊號已記錄",
+        "trace_status": "partial"
+      },
       "source": "edgar:AEHR",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "AEHR 4 filed 2026-09-01",
       "triage": {
@@ -24721,9 +24741,13 @@
       "first_seen": "2026-09-01T22:33:16.210305+00:00",
       "lead_id": "lead_6678b4ba3bd0df6b4d66efbeca398782",
       "published_at": "2026-09-01",
-      "refs": {},
+      "refs": {
+        "outcome": "Form 4 已解析:LRCX CLO Harter 賣 5,000 股 @302.46,例行",
+        "parked_reason": "insider Form 4 信心類例行交易,無 graph delta",
+        "trace_status": "partial"
+      },
       "source": "edgar:LRCX",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "LRCX 4 filed 2026-09-01",
       "triage": {
@@ -24844,9 +24868,13 @@
       "first_seen": "2026-09-01T22:33:07.889864+00:00",
       "lead_id": "lead_676999f1ba2da90ecb2f7be44ea2733f",
       "published_at": "2026-08-14",
-      "refs": {},
+      "refs": {
+        "outcome": "Form 4 已解析:Slayen 賣 5,700 股 @133.03。屬 AEHR 內部人 2026-08-13~09-01 集體賣出 cluster(5 名內部人市場賣出合計約 7.5 萬股 @127-144,時點在 FY26 10-K backlog 5.3x 公布後強勢段)。信心類時變資訊,不入圖;已計入 [406]/[423] 研究脈絡",
+        "parked_reason": "insider Form 4 信心類,無 graph delta;cluster 訊號已記錄",
+        "trace_status": "partial"
+      },
       "source": "edgar:AEHR",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "AEHR 4 filed 2026-08-14",
       "triage": {
@@ -33254,9 +33282,13 @@
       "first_seen": "2026-09-01T22:33:07.889943+00:00",
       "lead_id": "lead_920158c2057b7526b2b474dc099d0403",
       "published_at": "2026-08-14",
-      "refs": {},
+      "refs": {
+        "outcome": "Form 4 已解析:創辦人 Posedel 賣 5,973 股 @140。屬 AEHR 內部人 2026-08-13~09-01 集體賣出 cluster(5 名內部人市場賣出合計約 7.5 萬股 @127-144,時點在 FY26 10-K backlog 5.3x 公布後強勢段)。信心類時變資訊,不入圖;已計入 [406]/[423] 研究脈絡",
+        "parked_reason": "insider Form 4 信心類,無 graph delta;cluster 訊號已記錄",
+        "trace_status": "partial"
+      },
       "source": "edgar:AEHR",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "AEHR 4 filed 2026-08-14",
       "triage": {
@@ -47091,9 +47123,13 @@
       "first_seen": "2026-09-01T22:33:07.890177+00:00",
       "lead_id": "lead_d8e34e4fabf6ae479209f60608ecd48b",
       "published_at": "2026-08-13",
-      "refs": {},
+      "refs": {
+        "outcome": "Form 4 已解析:創辦人 Posedel 賣 8,413 股 @130。屬 AEHR 內部人 2026-08-13~09-01 集體賣出 cluster(5 名內部人市場賣出合計約 7.5 萬股 @127-144,時點在 FY26 10-K backlog 5.3x 公布後強勢段)。信心類時變資訊,不入圖;已計入 [406]/[423] 研究脈絡",
+        "parked_reason": "insider Form 4 信心類,無 graph delta;cluster 訊號已記錄",
+        "trace_status": "partial"
+      },
       "source": "edgar:AEHR",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "AEHR 4 filed 2026-08-13",
       "triage": {
@@ -48344,9 +48380,13 @@
       "first_seen": "2026-09-01T22:33:13.393806+00:00",
       "lead_id": "lead_e0e2b31dddb62a3a1f5b4b75b9e2283e",
       "published_at": "2026-08-27",
-      "refs": {},
+      "refs": {
+        "outcome": "Form 4 已解析:GOOGL CFO Ashkenazi:C/F code RSU 轉換+稅務代扣 @344.59,例行,零訊號",
+        "parked_reason": "insider Form 4 信心類例行交易,無 graph delta",
+        "trace_status": "partial"
+      },
       "source": "edgar:GOOGL",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "GOOGL 4 filed 2026-08-27",
       "triage": {
@@ -51300,9 +51340,13 @@
       "first_seen": "2026-09-01T22:33:13.393471+00:00",
       "lead_id": "lead_f0daf2ddb446375c532977e1b5830701",
       "published_at": "2026-08-27",
-      "refs": {},
+      "refs": {
+        "outcome": "Form 4 已解析:GOOGL Kent Walker:C/F code RSU 轉換+稅務代扣 @344.59,例行,零訊號",
+        "parked_reason": "insider Form 4 信心類例行交易,無 graph delta",
+        "trace_status": "partial"
+      },
       "source": "edgar:GOOGL",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "GOOGL 4 filed 2026-08-27",
       "triage": {
@@ -53976,9 +54020,13 @@
       "first_seen": "2026-09-01T22:33:07.889780+00:00",
       "lead_id": "lead_fef083d0d0a5733547cfea3cc87fe310",
       "published_at": "2026-08-14",
-      "refs": {},
+      "refs": {
+        "outcome": "Form 4 已解析:Engineer G code 500 股(贈與,非市場賣出)。屬 AEHR 內部人 2026-08-13~09-01 集體賣出 cluster(5 名內部人市場賣出合計約 7.5 萬股 @127-144,時點在 FY26 10-K backlog 5.3x 公布後強勢段)。信心類時變資訊,不入圖;已計入 [406]/[423] 研究脈絡",
+        "parked_reason": "insider Form 4 信心類,無 graph delta;cluster 訊號已記錄",
+        "trace_status": "partial"
+      },
       "source": "edgar:AEHR",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "AEHR 4 filed 2026-08-14",
       "triage": {
