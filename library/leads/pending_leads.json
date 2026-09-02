@@ -40808,6 +40808,46 @@
       },
       "url": "https://www.proactiveinvestors.co.uk/companies/news/1091435/iqe-s-macom-deal-and-link-to-nvidia-are-exciting-but-shares-downgraded-after-surge-1091435.html?.tsrc=rss"
     },
+    "lead_b9a99326c91984ac91904b8e71effa57": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-02T00:51:31.880073+00:00",
+      "lead_id": "lead_b9a99326c91984ac91904b8e71effa57",
+      "published_at": null,
+      "refs": {},
+      "source": "pane1-sector-gap-2026-09-02",
+      "status": "triaged_go",
+      "themes": {
+        "robotics": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "actuator",
+            "humanoid"
+          ]
+        }
+      },
+      "title": "[接邊|機器人] pane1 分段上線後實測:機器人群整群缺席——rv_reducer/strain_wave_gear/humanoid_precision_actuators 的鏈沒接到 robot anchors(tech:robotic_actuator/humanoid_robot_systems 皆 🟡)。找一手支撐接邊(元件→致動器→人形系統),RA 補鏈讓機器人群進 pane1",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-02T00:51:43.934139+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "ranking",
+          "reason": "接上 robot anchor 鏈後機器人群才會出現在 pane1 分段"
+        },
+        "decided_at": "2026-09-02T00:51:43.934139+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "pane1 分段實測發現機器人群缺席;接邊讓族群進排序,使用者 pane1 指示的直接延伸",
+        "tier": 2
+      },
+      "url": "https://www.schaeffler.com/en/technology-innovation/technology/humanoid-robots/?wiring=robot_anchor_chain"
+    },
     "lead_ba4073c079bac993eaafc74feb7c6df3": {
       "entities": {
         "company_ids": [
