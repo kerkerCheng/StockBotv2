@@ -6869,8 +6869,10 @@
       "added_at": "2026-09-01T15:06:12.743064+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_b55d1c8ba0d4112f58e3904075158b5e",
+      "dispatch_receipt": "manual_todo:414;raw:library/raw/lynas_asx_dow_loi_20260316.pdf;raw:library/raw/lynas_appendix4e_annual_report_fy2026.pdf",
       "dispatch_ref": "wo_8196a23834dd3f0b24d9ad3edadd28dc",
-      "dispatch_status": "queued",
+      "dispatch_status": "awaiting_approval",
+      "dispatch_updated_at": "2026-09-02T10:44:58.457760+00:00",
       "dispatched_at": "2026-09-02T07:50:55.556588+00:00",
       "hint": "當前 missing_data：customer_concentration：日本／JARE 佔營收比重（FY26 全年報告可查，尚未核對）；美國政府 US$96M binding LOI 的一手 ASX 公告核對（共 2 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 408,
@@ -6974,6 +6976,18 @@
       "source": "decision_lab",
       "title": "co:schaeffler：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-02T10:44:48.907296+00:00",
+      "hint": "go＝把以下觀測寫入 Engine C manual ledger(customer_concentration,co:lynas)；不含入圖、不含 thesis mutation。內容:①FY26 Appendix 4E(2026-08-26,審計級一手,library/raw/lynas_appendix4e_annual_report_fy2026.pdf)單一 reportable segment(p92)、無 AASB 8 major customer 揭露(全文 grep 0 命中)、credit risk 註明文 no material concentrations(p121);②量錨:JARE 更新 12 年協議 firm offtake 5,000 tpa NdPr vs FY26 NdPr 產量 7,260t≈69% 產量已承諾日本(推導值,明標);HRE oxides firm offtake 50%;③DoW binding LOI US\\/4年(2026-03-16 ASX 一手,library/raw/lynas_asx_dow_loi_20260316.pdf)≈年化 US\\,對 FY26 營收 A\\.9M 占比約 4%(推導值)",
+      "n": 414,
+      "reason": null,
+      "ref_id": "wo:wo_8196a23834dd3f0b24d9ad3edadd28dc",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "Lynas [408] customer_concentration 觀測寫入核准——FY26 年報已核對:占營收比重結構性不揭露,改記質性+量錨",
+      "type": "manual"
     }
   ],
   "log": [
@@ -15361,8 +15375,26 @@
       "ref_id": "dc_cc46527aac12ba14191ee71c0460f3fe",
       "type": "decision_review",
       "verb": "source_cleared"
+    },
+    {
+      "at": "2026-09-02T07:54:34.340724+00:00",
+      "n": 408,
+      "reason": "research-drain 開工：FY2026 年報客戶集中度＋US LOI 一手核對",
+      "receipt": "wo:wo_8196a23834dd3f0b24d9ad3edadd28dc",
+      "ref_id": "dc_48446dbceb85d4b785634e3c4ca5d669",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-09-02T10:44:58.457760+00:00",
+      "n": 408,
+      "reason": "bounded research 完成:DoW LOI 一手核對通過(binding LOI,US\\/4yr,NdPr floor US\\/kg,definitive agreement 未簽);FY26 年報客戶占比結構性不揭露(單一 segment+無重大信用集中),觀測提案已鑄 [414] 等核准寫入",
+      "receipt": "manual_todo:414;raw:library/raw/lynas_asx_dow_loi_20260316.pdf;raw:library/raw/lynas_appendix4e_annual_report_fy2026.pdf",
+      "ref_id": "dc_48446dbceb85d4b785634e3c4ca5d669",
+      "type": "decision_review",
+      "verb": "pq1_awaiting_approval"
     }
   ],
-  "next_n": 414,
+  "next_n": 415,
   "schema_version": "1"
 }
