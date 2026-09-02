@@ -529,14 +529,26 @@ outbound-only 送到 Discord private Forum channel。**三條判準：**
 - `sole_source` 需客戶端或第三方印證；供應商自稱 → `verified_by_absence`（weak，≤0.5）
 - `consensus_coverage` / 股價 / 財務數字 → 不進圖，進引擎 C（SQLite）
 
-### 報告產出三級模板
-1. **Directional Lane Memo**(先給方向):一句 thesis → 需求驅動 → stack 摘要 → 主瓶頸 → 最強證據 → 什麼會推翻它 → 接下來盯什麼 → **variant perception(市場現在信 X,本 thesis 認為 Y,催化劑 Z)**
-   - Lane Memo 是方向備忘,**不是可操作的投資建議**。財務核驗清單(5 項)是升格到 Watchlist 的 gate,不是 Lane Memo 的 gate。
-   - `variant perception` 是**必填欄**,不是選填。缺這一段的 Lane Memo 不能升格(無論其他分數多高)。
-   - **Variant perception 的正確操作定義:「當前股價/估值隱含的假設是 X,本 thesis 認為真實情況會是 Y,催化劑 Z 會讓市場重新定價。」** 重點是股價說什麼,不是「多數人信什麼」——市場可以一半信 X、一半信 Y,但若股價仍以 X 的假設定價,信 Y 且 Y 對就有 alpha。可從 forward P/E / EV/Sales / 分析師共識估值推斷股價的隱含假設。
-2. **Watchlist**(thesis 成立後才給名字):每檔附 role / 為何重要 / 已確認 / 待驗證 / 主風險
-   - **升格條件(全部滿足才能升格):**(a) Lane Memo 評分通過失敗閾值;(b) variant perception 已明確寫出;(c) 財務核驗清單 5 項完成(客戶集中度 / 毛利率趨勢 / backlog / 稀釋 / 估值壓力)。
-3. **Underwrite Sheet**(單一標的深挖)
+### 報告產出:cohort 是終點,三級模板已除役(2026-09-02 使用者定案)
+
+**Decision cohort 就是研究的終點層級——Watchlist／Underwrite 不再是後續的「升格」關卡。**
+實測依據:升格標記在生產碼中**沒有任何下游消費端**(排序、五軸、MONITOR/REVIEW、live gate、
+daily brief 全都不讀它;查證:`grep -ri watchlist --include=*.py` 排除 catalyst_watch 的同名
+監控清單後,只剩 checklist 輸出字串與 memo 生成器自身)。原三級模板是 Engine D 之前的框架,
+其中兩塊有價值的內容各有去處:
+
+1. **variant perception 收編進 cohort(thesis 欄位)**——原 Lane Memo 的必填欄,也是唯一
+   在現行管線中無家的 alpha 論證。操作定義不變:**「當前股價/估值隱含的假設是 X,本 thesis
+   認為真實情況會是 Y,催化劑 Z 會讓市場重新定價。」** 重點是股價說什麼,不是「多數人信
+   什麼」——市場可以一半信 X、一半信 Y,但若股價仍以 X 定價,信 Y 且 Y 對就有 alpha。
+   可從 forward P/E / EV/Sales / 分析師共識推斷隱含假設。寫一次,由 daily brief 的 REVIEW
+   項與 action card 每日帶出(落地實作見 ROADMAP)。
+2. **財務核驗清單(5 項)保留**——客戶集中度/毛利率趨勢/backlog/稀釋/估值壓力。
+   它已是五軸 CM/financial 的實質證據標準與 Engine C 觀測的欄位來源;角色從「升格 gate」
+   改為「**出手前必看查核**」,內容與 `engine_c/checklist.py` 一鍵查詢不變。
+3. **Lane Memo 降級為隨叫隨到的視圖**——`thesis/generate_lane_memo.py` 保留;想要一頁式
+   綜合(自讀或對外講述 thesis)時從圖＋cohort＋variant perception **渲染**產出。
+   它是輸出格式,不是流程的一站,也不 gate 任何東西。
 
 每份 thesis/claim 必帶 `disproof_condition`(可證偽是一等公民)。thesis 生命週期:`active` → 定期核查 disproof 條件 → 條件觸發 → 強制 review → `retired` 或 `revised`。欄位存在不等於流程存在;disproof 條件觸發時必須有明確的下一步動作(見 L7)。
 
