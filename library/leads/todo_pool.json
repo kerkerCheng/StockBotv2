@@ -7405,15 +7405,18 @@
       "added_at": "2026-09-02T12:21:10.148214+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_213d9a0f9f3281ab0078b33d9c8f8035",
+      "dispatch_receipt": "decision:pd_cfa49aab64f9ebb430749ae37f796c46",
       "dispatch_ref": "wo_3d462759d1740499518dd377db73b4a2",
-      "dispatch_status": "queued",
+      "dispatch_status": "completed",
+      "dispatch_updated_at": "2026-09-02T23:48:37.843719+00:00",
       "dispatched_at": "2026-09-02T23:39:28.594706+00:00",
       "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 441,
-      "reason": null,
+      "reason": "五軸 assessment 完成(SR corroborated/TCL corroborated/CM+FR+VP bounded)+disproof 四條+catalyst+expiry 2027-06-30;殘餘 corroboration 缺口=客戶具名,已在 missing_data 現形",
+      "receipt": "decision:pd_cfa49aab64f9ebb430749ae37f796c46",
       "ref_id": "dc_6e429d67c7b9e925a1b25874e9dcefd9",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-02T23:48:37.843719+00:00",
       "source": "decision_lab",
       "title": "co:soitec：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
@@ -16715,6 +16718,33 @@
       "receipt": "authority:pq1_dispatch;ref:lead_a5e0447bc74691a10b93a1e4dc1ff4b2",
       "ref_id": "manual:449",
       "type": "manual",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-02T23:46:41.228842+00:00",
+      "n": 441,
+      "reason": "assessment 撰寫開工",
+      "receipt": "wo:wo_3d462759d1740499518dd377db73b4a2",
+      "ref_id": "dc_6e429d67c7b9e925a1b25874e9dcefd9",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-09-02T23:48:37.843719+00:00",
+      "n": 441,
+      "reason": "五軸 assessment 完成(SR corroborated/TCL corroborated/CM+FR+VP bounded)+disproof 四條+catalyst+expiry 2027-06-30;殘餘 corroboration 缺口=客戶具名,已在 missing_data 現形",
+      "receipt": "decision:pd_cfa49aab64f9ebb430749ae37f796c46",
+      "ref_id": "dc_6e429d67c7b9e925a1b25874e9dcefd9",
+      "type": "decision_review",
+      "verb": "pq1_completed"
+    },
+    {
+      "at": "2026-09-02T23:48:37.843719+00:00",
+      "n": 441,
+      "reason": "五軸 assessment 完成(SR corroborated/TCL corroborated/CM+FR+VP bounded)+disproof 四條+catalyst+expiry 2027-06-30;殘餘 corroboration 缺口=客戶具名,已在 missing_data 現形",
+      "receipt": "decision:pd_cfa49aab64f9ebb430749ae37f796c46",
+      "ref_id": "dc_6e429d67c7b9e925a1b25874e9dcefd9",
+      "type": "decision_review",
       "verb": "go"
     }
   ],
