@@ -119,6 +119,17 @@ def build_parser() -> argparse.ArgumentParser:
     )
     references.add_argument("--format", choices=("json", "markdown"), default="markdown")
 
+    scaffold = subcommands.add_parser(
+        "assessment-scaffold",
+        help="從 frozen context 的 reference_index 產出五軸 assessment 骨架——"
+        "引用預填、判斷留白（level=unknown）。",
+    )
+    scaffold.add_argument("target_id", help="decision_id 或 cohort_id")
+    scaffold.add_argument(
+        "--out",
+        help="輸出路徑；預設 library/private/decision_lab/assessment_scaffold_<cohort>.json",
+    )
+
     card = subcommands.add_parser("card", help="純讀既有 decision 的 Action Card。")
     card.add_argument("decision_id")
     card.add_argument("--as-of")
@@ -409,6 +420,36 @@ def run(
                 stdout=stdout,
                 markdown_renderer=render_reference_options_markdown,
             )
+        elif args.command == "assessment-scaffold":
+            from pathlib import Path as _Path
+
+            from .references import _resolve_context, build_assessment_scaffold
+
+            _decision, bundle = _resolve_context(store, args.target_id)
+            scaffold_payload = build_assessment_scaffold(
+                bundle.payload.get("reference_index") or {}
+            )
+            out_path = _Path(
+                args.out
+                or f"library/private/decision_lab/assessment_scaffold_{bundle.cohort_id}.json"
+            )
+            out_path.parent.mkdir(parents=True, exist_ok=True)
+            out_path.write_text(
+                json.dumps(scaffold_payload, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+            summary = {
+                "out": str(out_path),
+                "cohort_id": bundle.cohort_id,
+                "context_digest": bundle.digest,
+                "axes": {
+                    axis: len(body.get("evidence_refs") or [])
+                    for axis, body in scaffold_payload.items()
+                },
+                "note": "引用已預填、判斷留白；填完 reason/level 後用 "
+                "`decision_lab references <cohort> --assessment <out>` 驗證再 reassess。",
+            }
+            print(json.dumps(summary, ensure_ascii=False, indent=2), file=stdout)
         elif args.command == "card":
             card = build_action_card(store, args.decision_id, as_of=args.as_of)
             _render(

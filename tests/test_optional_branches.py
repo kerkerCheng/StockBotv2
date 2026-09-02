@@ -58,3 +58,26 @@ def test_fetch_ranking_view_transform_exception_returns_none(monkeypatch) -> Non
     monkeypatch.setattr(bottleneck, "rank_bottlenecks", raise_transform)
 
     assert adapters.fetch_ranking_view() is None
+
+
+def test_assessment_scaffold_prefills_refs_and_leaves_judgment_blank() -> None:
+    """ROADMAP 2026-09-02：骨架抄引用、不代寫判斷（level 恆 unknown、reason 是佔位）。"""
+    from decision_lab.references import (
+        SCAFFOLD_NO_AUTHORITY_NOTE,
+        SCAFFOLD_REASON_PLACEHOLDER,
+        build_assessment_scaffold,
+    )
+
+    scaffold = build_assessment_scaffold({})
+    assert set(scaffold) == {
+        "source_reliability",
+        "technical_causal_link",
+        "commercial_maturity",
+        "financial_resilience",
+        "valuation_payoff",
+    }
+    for body in scaffold.values():
+        assert body["level"] == "unknown"
+        assert body["reason"] == SCAFFOLD_REASON_PLACEHOLDER
+        assert body["evidence_refs"] == []
+        assert body["missing_data"] == [SCAFFOLD_NO_AUTHORITY_NOTE]

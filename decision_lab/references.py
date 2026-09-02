@@ -60,6 +60,33 @@ def build_reference_options(
     return result
 
 
+SCAFFOLD_REASON_PLACEHOLDER = "（研究者填：這個等級的判斷理由——骨架只抄引用，不代寫判斷）"
+SCAFFOLD_NO_AUTHORITY_NOTE = (
+    "（上游無該 authority——改引用救不了，需補上游資料；誠實留 unknown，見 references 輸出）"
+)
+
+
+def build_assessment_scaffold(index: Mapping[str, Any]) -> dict[str, Any]:
+    """從 reference_index 產出五軸 assessment 骨架（2026-09-02 ROADMAP 交付）。
+
+    動機：每張補證工單的終點都是五軸 assessment，而 `references` 已算出每軸的
+    合格引用，人卻要手抄進 JSON——抄錯一個字就 `assessment_context_mismatch`。
+    骨架把「抄引用」自動化，**判斷欄位刻意留白**：level=unknown、reason 是
+    placeholder——生成器不代寫研究判斷（L15：LLM 可以解析與提議，不可以授權；
+    這裡連提議都不做，只消除格式歧義）。
+    """
+    scaffold: dict[str, Any] = {}
+    for axis, rows in describe_axis_references(index).items():
+        refs = [str(row["reference"]) for row in rows]
+        scaffold[axis] = {
+            "level": "unknown",
+            "evidence_refs": refs,
+            "reason": SCAFFOLD_REASON_PLACEHOLDER,
+            "missing_data": [] if refs else [SCAFFOLD_NO_AUTHORITY_NOTE],
+        }
+    return scaffold
+
+
 def render_reference_options_markdown(payload: Mapping[str, Any]) -> str:
     lines = [
         f"# 可用引用 — {payload.get('cohort_id')}",
