@@ -6672,8 +6672,10 @@
       "added_at": "2026-09-01T13:44:29.878804+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_64e6414ecf3ac09634bbef9f538b8577",
+      "dispatch_receipt": "manual_todo:418;edgar:0001652044-26-000071",
       "dispatch_ref": "wo_bb8d879295f059a0c15f55d91db87055",
-      "dispatch_status": "queued",
+      "dispatch_status": "awaiting_approval",
+      "dispatch_updated_at": "2026-09-02T10:55:17.554735+00:00",
       "dispatched_at": "2026-09-02T00:41:56.811577+00:00",
       "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 397,
@@ -7014,6 +7016,31 @@
       "resolved_at": null,
       "source": "manual",
       "title": "Soitec [400] backlog/customer 觀測寫入核准——URD FY26 法定量承諾與 contract liabilities 落 Engine C",
+      "type": "manual"
+    },
+    {
+      "added_at": "2026-09-02T10:54:48.544989+00:00",
+      "hint": "go＝把以下觀測寫入 Engine C manual ledger(backlog,co:google)；不含入圖、不含 thesis mutation。內容:①Alphabet 10-Q Q2 2026(filed 2026-07-23,EDGAR 0001652044-26-000071,審計級一手):as of 2026-06-30 remaining performance obligations(revenue backlog)\\.5B,其中 Google Cloud \\.9B;>50% 預計未來 24 個月認列;②customer_concentration:10-Q 無單一客戶集中揭露(廣告+雲收入分散),記 not_material。附註:cohort 的 valuation_payoff 軸缺 GOOGL market history——registry 已有 research_ticker=GOOGL,待下次 Engine C ETL 後 reassess 應自動補上,仍缺再開發項處理",
+      "n": 417,
+      "reason": "編號作廢:標題與 hint 被 shell 變數插值吃掉數字,以 418 重鑄",
+      "receipt": null,
+      "ref_id": "wo:wo_bb8d879295f059a0c15f55d91db87055",
+      "resolution": "drop",
+      "resolved_at": "2026-09-02T10:55:07.010191+00:00",
+      "source": "manual",
+      "title": "Google [397] backlog 觀測寫入核准——Alphabet 10-Q Q2 2026 revenue backlog \\.5B(Cloud \\.9B)落 Engine C",
+      "type": "manual"
+    },
+    {
+      "added_at": "2026-09-02T10:55:07.167799+00:00",
+      "hint": "go＝把以下觀測寫入 Engine C manual ledger(backlog,co:google)；不含入圖、不含 thesis mutation。內容:①Alphabet 10-Q Q2 2026(filed 2026-07-23,EDGAR 0001652044-26-000071,審計級一手):as of 2026-06-30 remaining performance obligations(revenue backlog)$519.5B,其中 Google Cloud $513.9B;>50% 預計未來 24 個月認列;②customer_concentration:10-Q 無單一客戶集中揭露(廣告+雲收入分散),記 not_material。附註:cohort 的 valuation_payoff 軸缺 GOOGL market history——registry 已有 research_ticker=GOOGL,待下次 Engine C ETL 後 reassess 應自動補上,仍缺再開發項處理",
+      "n": 418,
+      "reason": null,
+      "ref_id": "wo:wo_bb8d879295f059a0c15f55d91db87055",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "Google [397] backlog 觀測寫入核准——Alphabet 10-Q Q2 2026 revenue backlog $519.5B(Cloud $513.9B)落 Engine C",
       "type": "manual"
     }
   ],
@@ -15438,8 +15465,35 @@
       "ref_id": "dc_6e429d67c7b9e925a1b25874e9dcefd9",
       "type": "decision_review",
       "verb": "pq1_awaiting_approval"
+    },
+    {
+      "at": "2026-09-02T10:52:52.168105+00:00",
+      "n": 397,
+      "reason": "research-drain 開工",
+      "receipt": "wo:wo_bb8d879295f059a0c15f55d91db87055",
+      "ref_id": "dc_a51839bbf1429618556cf8bc265398c4",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-09-02T10:55:07.010191+00:00",
+      "n": 417,
+      "reason": "編號作廢:標題與 hint 被 shell 變數插值吃掉數字,以 418 重鑄",
+      "receipt": null,
+      "ref_id": "wo:wo_bb8d879295f059a0c15f55d91db87055",
+      "type": "manual",
+      "verb": "drop"
+    },
+    {
+      "at": "2026-09-02T10:55:17.554735+00:00",
+      "n": 397,
+      "reason": "bounded research 完成:①Alphabet backlog 一手已取($519.5B/Cloud $513.9B),觀測提案 [418] 等核准寫入;②Lumentum→Google OCS 獨立印證未果——兩側一手皆不具名,僅 tier-3 substack 稱 Google/Oracle 為主要客戶(孤證不採),升級 trigger=任一側法定揭露具名,由既有 OCS watch 承接;③VP 軸缺 GOOGL market history 屬 Engine C ETL 上游,registry ticker 已在,下次 ETL 後 reassess 驗證",
+      "receipt": "manual_todo:418;edgar:0001652044-26-000071",
+      "ref_id": "dc_a51839bbf1429618556cf8bc265398c4",
+      "type": "decision_review",
+      "verb": "pq1_awaiting_approval"
     }
   ],
-  "next_n": 417,
+  "next_n": 419,
   "schema_version": "1"
 }
