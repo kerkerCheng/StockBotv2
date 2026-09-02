@@ -13679,9 +13679,12 @@
       "first_seen": "2026-09-02T12:24:28.262084+00:00",
       "lead_id": "lead_29a90e4ebae256652f94c26a5acc6980",
       "published_at": null,
-      "refs": {},
+      "refs": {
+        "research_action_id": "ra_925a4741740c9e3e527a455430544220",
+        "trace_status": "partial"
+      },
       "source": "decompose-palomar-ocs-2026-09-02",
-      "status": "triaged_go",
+      "status": "action_prepared",
       "themes": {},
       "title": "[decompose|Palomar OCS] 2D 光纖準直器陣列層(NxN fiber array+2D lens array,每台兩組)——OCS 光路入口;與 FAU/Largan/FOCI parked lead 同族。誰做?圖中無此節點",
       "triage": {
