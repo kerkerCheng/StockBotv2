@@ -7337,15 +7337,18 @@
       "added_at": "2026-09-02T12:21:10.148214+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_1385a2fc648da686d43db290597d34ab",
+      "dispatch_receipt": "decision:pd_2ea85b8f96e58daf2498540b89f0b435",
       "dispatch_ref": "wo_2421e77419234e655ef16e147838825f",
-      "dispatch_status": "queued",
+      "dispatch_status": "completed",
+      "dispatch_updated_at": "2026-09-02T23:51:00.210145+00:00",
       "dispatched_at": "2026-09-02T23:39:28.448082+00:00",
       "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 437,
-      "reason": null,
+      "reason": "五軸完成(TCL/CM corroborated,SR/FR/VP bounded)+disproof 四條(含內部人 cluster 警訊)+catalyst=FQ1 FY27 backlog 轉換;殘餘 blockers 僅 research intent 標準項——本 cohort 研究完整",
+      "receipt": "decision:pd_2ea85b8f96e58daf2498540b89f0b435",
       "ref_id": "dc_fef9e03e5e6935e7428620f7eab793ba",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-02T23:51:00.210145+00:00",
       "source": "decision_lab",
       "title": "co:aehr_test_systems：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
@@ -16774,6 +16777,33 @@
       "reason": "四軸填值(SR/TCL/CM/FR corroborated)+disproof/catalyst/expiry;VP 誠實 unknown(GOOGL 行情未入 Engine C ETL,上游資料缺非研究可解);counter_path 留待建模(Telescent 機器人配線路線已在 [444] 圖中,可為 counter-path 素材)",
       "receipt": "decision:pd_0e5251a50126e9aebc6894d8733d6656",
       "ref_id": "dc_a51839bbf1429618556cf8bc265398c4",
+      "type": "decision_review",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-02T23:50:06.239935+00:00",
+      "n": 437,
+      "reason": "assessment 撰寫開工",
+      "receipt": "wo:wo_2421e77419234e655ef16e147838825f",
+      "ref_id": "dc_fef9e03e5e6935e7428620f7eab793ba",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-09-02T23:51:00.210145+00:00",
+      "n": 437,
+      "reason": "五軸完成(TCL/CM corroborated,SR/FR/VP bounded)+disproof 四條(含內部人 cluster 警訊)+catalyst=FQ1 FY27 backlog 轉換;殘餘 blockers 僅 research intent 標準項——本 cohort 研究完整",
+      "receipt": "decision:pd_2ea85b8f96e58daf2498540b89f0b435",
+      "ref_id": "dc_fef9e03e5e6935e7428620f7eab793ba",
+      "type": "decision_review",
+      "verb": "pq1_completed"
+    },
+    {
+      "at": "2026-09-02T23:51:00.210145+00:00",
+      "n": 437,
+      "reason": "五軸完成(TCL/CM corroborated,SR/FR/VP bounded)+disproof 四條(含內部人 cluster 警訊)+catalyst=FQ1 FY27 backlog 轉換;殘餘 blockers 僅 research intent 標準項——本 cohort 研究完整",
+      "receipt": "decision:pd_2ea85b8f96e58daf2498540b89f0b435",
+      "ref_id": "dc_fef9e03e5e6935e7428620f7eab793ba",
       "type": "decision_review",
       "verb": "go"
     }
