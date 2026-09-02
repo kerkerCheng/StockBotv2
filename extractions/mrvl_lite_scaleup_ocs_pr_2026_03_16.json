@@ -1,0 +1,139 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "guided",
+      "disproof_condition": "Downgrade if the collaboration produces no deployment/design win within two fiscal years, or if scale-up interconnect standardizes on copper/CPO paths that bypass OCS; upgrade when a hyperscaler or GPU vendor names OCS-based scale-up adoption.",
+      "id": "mrvl_lite_scaleup_ocs_pr_2026_03_16_cl1",
+      "source_ids": [
+        "mrvl_lite_scaleup_ocs_pr_2026_03_16_s1",
+        "mrvl_lite_scaleup_ocs_pr_2026_03_16_s2",
+        "mrvl_lite_scaleup_ocs_pr_2026_03_16_s3",
+        "mrvl_lite_scaleup_ocs_pr_2026_03_16_s4"
+      ],
+      "statement": "Marvell and Lumentum jointly demonstrated OCS for next-generation AI scale-up infrastructure at OFC 2026 (Lumentum R300 OCS + Marvell Aquila/Ara 1.6T optical DSPs, live interoperation) — the first named supplier pair on the graph's scale-up optical interconnect layer. Architecturally this is the OCS route to scale-up; the CPO route (tech:scale_up_cpo) remains supplier-less in primary sources, so the two nodes represent competing approaches to the same layer function, not synonyms. Limits: joint vendor demo announcement, no hyperscaler customer or deployment named; NVIDIA-ecosystem scale-up remains copper-dominant today.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {
+        "qualification_status": "qualifying",
+        "sole_source": false
+      },
+      "confidence": 0.75,
+      "dst_id": "tech:scale_up_network",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mrvl_lite_scaleup_ocs_pr_2026_03_16_s1",
+        "mrvl_lite_scaleup_ocs_pr_2026_03_16_s2"
+      ],
+      "src_id": "co:lumentum"
+    },
+    {
+      "attributes": {
+        "qualification_status": "qualifying",
+        "sole_source": false
+      },
+      "confidence": 0.75,
+      "dst_id": "tech:scale_up_network",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mrvl_lite_scaleup_ocs_pr_2026_03_16_s1",
+        "mrvl_lite_scaleup_ocs_pr_2026_03_16_s3"
+      ],
+      "src_id": "co:marvell_technology"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "LITE",
+        "Lumentum Operations LLC"
+      ],
+      "attributes": {
+        "ticker": "LITE"
+      },
+      "confidence": 0.9,
+      "id": "co:lumentum",
+      "name": "Lumentum",
+      "role": null,
+      "source_ids": [
+        "mrvl_lite_scaleup_ocs_pr_2026_03_16_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "MRVL"
+      ],
+      "attributes": {
+        "ticker": "MRVL"
+      },
+      "confidence": 0.9,
+      "id": "co:marvell_technology",
+      "name": "Marvell Technology",
+      "role": null,
+      "source_ids": [
+        "mrvl_lite_scaleup_ocs_pr_2026_03_16_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "scale-up",
+        "scale up network"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:scale_up_network",
+      "name": "Scale-Up Network (GPU-to-GPU interconnect)",
+      "role": null,
+      "source_ids": [
+        "mrvl_lite_scaleup_ocs_pr_2026_03_16_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mrvl_lite_scaleup_ocs_pr_2026_03_16",
+    "evidence_tier": 2,
+    "origin_entity": "Marvell/Lumentum（雙發行人聯合官方新聞稿,Marvell IR 頁載）",
+    "permission_basis": "Public press release; URL and short excerpts.",
+    "published_at": "2026-03-16",
+    "publisher": "Marvell Technology",
+    "retrieved_at": "2026-09-03",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Marvell and Lumentum to Demonstrate Optical Circuit Switching for Next-generation AI Scale-up Infrastructure (Marvell IR PR)",
+    "url": "https://investor.marvell.com/news-events/press-releases/detail/1015/marvell-and-lumentum-to-demonstrate-optical-circuit-switching-for-next-generation-ai-scale-up-infrastructure"
+  },
+  "sources": [
+    {
+      "id": "mrvl_lite_scaleup_ocs_pr_2026_03_16_s1",
+      "locator": "PR — what is demonstrated",
+      "quote": "Optical circuit switching (OCS) for next-generation AI scale-up infrastructure, featuring live interoperation between Marvell optical connectivity solutions and Lumentum's OCS platform at OFC 2026."
+    },
+    {
+      "id": "mrvl_lite_scaleup_ocs_pr_2026_03_16_s2",
+      "locator": "PR — Lumentum role",
+      "quote": "Lumentum: Supplying the R300 optical circuit switch with scalable, low-loss switching architecture"
+    },
+    {
+      "id": "mrvl_lite_scaleup_ocs_pr_2026_03_16_s3",
+      "locator": "PR — Marvell role",
+      "quote": "Marvell: Providing optical connectivity solutions including Aquila 1.6T coherent-lite DSPs, Ara 1.6T PAM4 optical DSPs"
+    },
+    {
+      "id": "mrvl_lite_scaleup_ocs_pr_2026_03_16_s4",
+      "locator": "PR — Lumentum executive quote",
+      "quote": "AI scaling is pushing conventional packet-based networks beyond their practical limits."
+    }
+  ]
+}

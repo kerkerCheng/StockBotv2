@@ -1,0 +1,4 @@
+Source URL: https://investor.marvell.com/news-events/press-releases/detail/1015/marvell-and-lumentum-to-demonstrate-optical-circuit-switching-for-next-generation-ai-scale-up-infrastructure
+
+Excerpt:
+Optical circuit switching (OCS) for next-generation AI scale-up infrastructure, featuring live interoperation between Marvell optical connectivity solutions and Lumentum's OCS platform at OFC 2026... Lumentum: Supplying the R300 optical circuit switch... Marvell: Providing... Aquila 1.6T coherent-lite DSPs, Ara 1.6T PAM4 optical DSPs. (Marvell IR PR, 2026-03-16)
