@@ -171,6 +171,12 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
 證據與反證邊界，以及 `go` 實際授權的 action type，全部原樣收在決策行下面。
 不得只列短標題或 `co:*` ID。queued／researching／awaiting_approval 改列狀態更新，不重複要求 `go`。
 
+**同型項打包（2026-09-02 使用者定案）：** action type、授權／不含邊界與圖影響句**完全相同**的
+多個 item（最常見：一批補證據的 bounded research），共用欄位提升到組層級寫一次，每項只留
+一行決策行（公司＋ticker＋具體找什麼＋補哪個分組）；邊界有任何差異就不得併組。
+**每個編號整份 brief 只完整出現一次**：四段是編號唯一的家，「無事項目」不得複述已出現的
+編號；收尾建議摘要照舊列編號＋一句理由，但不重述內文。
+
 決策行的「不含」欄不是修辭：`go` 一律只授權該項自己的 action type，最相鄰的下一步
 （研究 `go` 不含入圖、入圖 `go` 不含 thesis mutation、任何 `go` 都不含 live）必須逐項寫出來，
 否則使用者要靠記憶區分授權邊界。
@@ -202,37 +208,44 @@ watch 的要逐項點名——那是回到純靠人記得的狀態，必須現�
 [14] 補 COHR 的 counter-path 證據 — 最弱軸 technical_causal_link，counter_paths 為空 ｜ go = bounded research，不含入圖
 
 ## 新 leads（依 priority）
-<僅列 pq1 進度／失敗；raw lead 不占 pq2 編號。每筆 `parked` 必須列完整主詞／ticker、`parked_reason`、
-`trace_status`、`trace_next_trigger`、`trace_requires_user`、是否產生 prepared RA；`original_obtained` 要說明
-已取得原文但屬時變 observation／無唯一 graph delta，`isolated_tier_3`／截圖／paywall 要說明缺哪份一手原文。>
+<僅列 pq1 進度／失敗；raw lead 不占 pq2 編號。每筆 `parked` 必列完整主詞／ticker、`parked_reason`
+與是否產生 prepared RA；trace 三欄**只在非預設值時展開**（2026-09-02 定案）——
+`original_obtained`＋無 trigger＋不需使用者＝一句「已取一手，無後續等待」收掉；
+有 trigger、需要使用者、或 `partial`／`isolated_tier_3` 的才逐欄列並說明缺哪份一手。
+同發行人同類文件（如一批 Form 4）彙總一行列數量與唯一例外，不逐筆點名。>
 
 ## Alpha 現況（完整四 pane｜無 pq2 編號）
 ### Pane 1 — 現在要投哪一檔
-<`rank_bottlenecks().rows` 的有序清單、明確首選、四維度、相關性警告、每檔 disproof；明標研究判斷且不給尺寸>
+<`rank_bottlenecks().rows` 的有序清單、明確首選、四維度、相關性警告、每檔 disproof；明標研究判斷且不給尺寸。
+**同公司多條邊壓成一列**（2026-09-02 定案）：列最高名次那條邊，其餘瓶頸併同格一句帶過。>
 <末尾附產業別分組（2026-08-31 定案）：`python -m query.bottleneck --by-sector` 的每產業 top-3
 ＋開頭兩條需求錨重疊警告原樣照印；分組解決可視性、分數不可跨組比較，單一排序仍是唯一權威；
 「🔴 無需求錨」與空產業組（如記憶體/機器人/稀土——sub 覆蓋未及）要現形，那是研究缺口不是省略對象。>
 ### Pane 2 — 該去補誰的證據
-<同一次輸出的 `structural_rows`；點出與 Pane 1 的排名差異及最高 ROI 補證據題目>
+<同一次輸出的 `structural_rows`；點出與 Pane 1 的排名差異及最高 ROI 補證據題目。
+**已在「需要你動作」出現過的研究題只引用編號**（2026-09-02 定案），不重述理由；
+本 pane 的價值是沒有 pq2 編號的結構缺口。>
 ### Pane 3 — 哪裡還是空白
-<`query.coverage_gaps`；分開真正 chokepoint 研究缺口與抽取產生的產品名詞，只把前者轉成研究題目>
+<`query.coverage_gaps`；分開真正 chokepoint 研究缺口與抽取產生的產品名詞，只把前者轉成研究題目。
+**缺口清單改「計數＋較昨變動」**（2026-09-02 定案），有變動才點名節點；完整清單附查證命令，不逐日重印。>
 ### Pane 4 — 部位與問責
 <上線標的／可量測／結案歸因計數器、真實 fill／現價／損益／epoch／disproof、錨點樣本效度與 alpha live 監控覆蓋缺口>
 <四個 pane 每列都標答案會改變 `候選集合`／`排序`／`出場條件`／`只是信心`；即使全部 `MONITOR` 或無新事件也不得省略。>
 
 ## Beta capital observation（無 pq2 編號）
-TL;DR：<約 30 年後 retirement_net_terminal_wealth 目標；本報告不判斷「今天該不該投」、不給金額或時間表，只回答各 sleeve 距目標多遠與每檔在什麼水位；最重要的動態風控 warning>
-自有現金可部署：<Portfolio CASH − cash floor；Alpha／Beta 共用；它就是可部署現金本身，不再乘任何 pace>
-未動用貸款額度：<另列已借款與估計利息；明標不算自有現金；貸款 tranche 不適用配置建議，仍 manual_review_required>
-<先出「目標配置差距」表（讀 `config/target_allocation.json`）：欄位固定為「Sleeve｜角色｜目標｜容忍區間｜實際｜差距｜狀態」，分母是已投入的非現金部位，band 是容忍區間不是 gate，落在區間內即「到位（區間內、無偏好）」。收尾一行點名「低於目標、新資金可優先補」與「高於目標、新資金避開」。只給差距，不給金額、不排名、不產生尺寸；再平衡只用新投入的錢補低格，不賣出。
-接著兩條相關性警告每天都要講一次，不因每天一樣而省略：(a) alpha 與 beta 是同一個賭注（alpha 全在 AI 光互連，beta_tilt 是 QQQ／SOXX／台股半導體，比例分開寫不代表風險獨立）；(b) TSMC look-through 約 28%，高於 `issuer_concentration_warning` 0.25，且 `issuer_loads` 覆蓋恆為 partial 故算不出精確值。
-最後是主力逐檔表，逐列比較 QQQ／TQQQ／LON:VWRA／SOXX／00631L.TW／2330.TW／00981A.TW；欄位固定為「標的｜行情狀態｜行情心跳（自身價格）｜相對水位（自身價格）｜所屬 sleeve 配置狀態」。主力表在沒有任何配置缺口、全部 sleeve 到位時仍強制保留。行情狀態燈號只表達資料狀態、不表達投入建議，固定配文字 🟢行情正常／🔴資料不足／⚪歷史不足；🟡 與「可評估／冷卻／暫停新增」等舊語意已於 2026-08-29 廢止，不得回填。行情心跳必須寫「最新完整交易日 YYYY-MM-DD：1日 ±X%」再加 5／20 日；相對水位只用位置指標——52 週區間位置（主要）、距 52 週高點、距 SMA200，全部取自商品自身價格序列（TQQQ 不得冒用 QQQ、00631L／006208 不得冒用 0050）。水位只呈現、不參與排序、不換算金額，並固定寫明「長期上漲的標的多數時間落在高位是正確資訊，不是該等回檔的訊號」。不得用 RSI／MACD 等動能指標表達水位。stale／quarantined 時改列官方 reference 日期、當日漲跌與降級原因。不得只列 raw 數字；個股與其他仍可縮成摘要，但每檔保留一列焦點>
+<**輕量版面（2026-09-02 使用者定案：投入頻率約半年一次）——無 TL;DR 段**，目標句收斂為本行：
+約 30 年後 `retirement_net_terminal_wealth` 最大化；本報告不判斷「今天該不該投」、不給金額或時間表。固定四塊：
+① 一行資本狀態：「自有現金可部署 <Portfolio CASH − cash floor；Alpha／Beta 共用> ｜ 未動用貸款額度 <amount>／已借款 <amount>／月息約 <amount>（不算自有現金；**貸款 tranche 不適用配置建議**，仍 manual_review_required）」。
+② 「目標配置差距」表（讀 `config/target_allocation.json`）：欄位「Sleeve｜目標｜容忍區間｜實際｜差距｜狀態」，分母是已投入的非現金部位，band 是容忍區間不是 gate，區間內即「到位」。**不加**「低於目標可優先補」複述行（狀態欄已講）。只給差距不給金額；再平衡只用新錢補低格、不賣出。
+③ 兩條相關性警告每天講一次、各一行：(a) alpha 與 beta 是同一個 AI 賭注，分 sleeve 不代表風險獨立；(b) TSMC look-through 已知至少約 28%，高於 0.25 warning，`issuer_loads` 恆 partial。
+④ 主力逐檔表 QQQ／TQQQ／LON:VWRA／SOXX／00631L.TW／2330.TW／00981A.TW，**只留四欄**「標的｜行情狀態｜心跳（最新完整交易日 YYYY-MM-DD：1日 ±X%）｜52週區間位置｜sleeve 狀態」——5／20 日報酬、距 52 週高點、距 SMA200 不再逐檔列出（2026-09-02 定案；心跳契約最小要求不變）。主力表在沒有任何配置缺口、全部 sleeve 到位時仍強制保留。燈號只表達資料狀態、不表達投入建議（🟢行情正常／🔴資料不足／⚪歷史不足；🟡 與「可評估／冷卻／暫停新增」等舊語意已於 2026-08-29 廢止，不得回填）。52 週區間位置取自商品**自身**價格序列（TQQQ 不冒用 QQQ、00631L／006208 不冒用 0050）；水位**只呈現、不參與排序、不換算金額**，不得用 RSI／MACD 等動能指標表達水位；表末固定一行「長期上漲的標的多數時間落在高位是正確資訊，不是該等回檔的訊號」。stale／quarantined 改列官方 reference 日期、當日漲跌與降級原因。portfolio risk threshold 只在實際跨越時出現一行，沒跨越整句省略（drawn loan 等既有 warning 照常）。>
 
 ## 健康／資料降級
 <本次 harvest、Engine C、beta technical、Neo4j、Sheet 的失敗或缺口；無則寫正常>
 
 ## 無事項目
-<`MONITOR` 類別——今天不需要複查，依 review 日曆追蹤即可>
+<`MONITOR` 類別——今天不需要複查，依 review 日曆追蹤即可。**不得複述已在四段出現的編號**
+（2026-09-02 定案）；沒有四段未涵蓋的獨有內容時整段省略。>
 
 ## 建議摘要（收尾必附；AGENTS.md「建議只由 pool ground truth 導出」）
 <go／drop／pending／不動 各一行，列編號＋每個編號一句理由。推薦 go 前必須答得出
