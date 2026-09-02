@@ -13671,6 +13671,35 @@
       },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-updates-financial-reporting-calendar-c1f73551"
     },
+    "lead_29a90e4ebae256652f94c26a5acc6980": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-02T12:24:28.262084+00:00",
+      "lead_id": "lead_29a90e4ebae256652f94c26a5acc6980",
+      "published_at": null,
+      "refs": {},
+      "source": "decompose-palomar-ocs-2026-09-02",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "[decompose|Palomar OCS] 2D 光纖準直器陣列層(NxN fiber array+2D lens array,每台兩組)——OCS 光路入口;與 FAU/Largan/FOCI parked lead 同族。誰做?圖中無此節點",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-02T12:24:41.251791+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "decompose Palomar OCS(使用者核准 [443]):Apollo 論文一手列層,圖中無節點或零供應商"
+        },
+        "decided_at": "2026-09-02T12:24:41.251791+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "decompose Palomar OCS(使用者核准 [443]):Apollo 論文一手列層,圖中無節點或零供應商",
+        "tier": 2
+      },
+      "url": "https://arxiv.org/abs/2208.10041?gap=fiber_collimator_array"
+    },
     "lead_29afe4c0a51033dc69959a4c05534d55": {
       "entities": {
         "company_ids": [
@@ -15433,6 +15462,35 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2076266613675069628"
+    },
+    "lead_32512d1557af2b2c44950ba8edbff600": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-02T12:24:27.960964+00:00",
+      "lead_id": "lead_32512d1557af2b2c44950ba8edbff600",
+      "published_at": null,
+      "refs": {},
+      "source": "decompose-palomar-ocs-2026-09-02",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "[decompose|Palomar OCS] 磁光石榴石(Garnet)Faraday rotator 材料層——circulator 心臟;Apollo 論文逐字:歷史上 C-band EDFA 小量市場,Google 放量到 O-band 資料中心規模。誰長晶/誰供應?圖中無此節點",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-02T12:24:40.968830+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "decompose Palomar OCS(使用者核准 [443]):Apollo 論文一手列層,圖中無節點或零供應商"
+        },
+        "decided_at": "2026-09-02T12:24:40.968830+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "decompose Palomar OCS(使用者核准 [443]):Apollo 論文一手列層,圖中無節點或零供應商",
+        "tier": 2
+      },
+      "url": "https://arxiv.org/abs/2208.10041?gap=garnet_faraday_rotator"
     },
     "lead_32faf58f33abcefc29e0abe4308a4a6e": {
       "entities": {
@@ -20588,10 +20646,12 @@
       "lead_id": "lead_4e7d95b05120fd1cc2d581e3d6142b25",
       "published_at": null,
       "refs": {
+        "action_digest": "98f4e3c1c01a4a700df2fc127e427a7daefe1020b425f1471db0443eb88c0186",
+        "focus_company_id": "co:nidec",
         "research_action_id": "ra_1bd1df7a5ccc06804dcec063ea2d638f"
       },
       "source": "alignment-audit-2026-09-02",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {},
       "title": "[對齊|機器人] Nidec(6594.T)registry 已登記但圖中零內容——全球馬達龍頭+諧波減速器(Nidec-Shimpo/Drive Technology),機器人群供給側缺這一家;首批 extraction 研究",
       "triage": {
@@ -27565,6 +27625,35 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2094353950040592854"
+    },
+    "lead_77539b327d06e48a3073ec7c8c2569c8": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-02T12:24:28.560419+00:00",
+      "lead_id": "lead_77539b327d06e48a3073ec7c8c2569c8",
+      "published_at": null,
+      "refs": {},
+      "source": "decompose-palomar-ocs-2026-09-02",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "[decompose|Palomar OCS] MEMS 代工層——Google 自研 2D MEMS 鏡陣列由哪家 MEMS foundry 製造?136x136 duplex 已部署數萬台;tech:mems_mirror_array 有節點但零供應商",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-02T12:24:41.544428+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "decompose Palomar OCS(使用者核准 [443]):Apollo 論文一手列層,圖中無節點或零供應商"
+        },
+        "decided_at": "2026-09-02T12:24:41.544428+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "decompose Palomar OCS(使用者核准 [443]):Apollo 論文一手列層,圖中無節點或零供應商",
+        "tier": 2
+      },
+      "url": "https://arxiv.org/abs/2208.10041?gap=mems_foundry"
     },
     "lead_779f0a8c12033e604608e1a1ed0c1c93": {
       "entities": {

@@ -7394,6 +7394,19 @@
       "source": "decision_lab",
       "title": "co:lynas：補客戶端商業承諾：訂單、產能協議或預付款等付錢方向的證據",
       "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-02T12:22:03.886566+00:00",
+      "hint": "使用者 2026-09-02 對收尾提案回覆「拆解有包含到吧」=核准選題;go=執行 system-decompose,產出研究地圖+pq1 題,不含入圖/onboard",
+      "n": 443,
+      "reason": "decompose 已執行:Palomar OCS 光路拆 9 層,🔴🔴 未知層 2(garnet/準直器陣列)+MEMS 代工題;3 題已註冊 pq1 triaged_go",
+      "receipt": "authority:decompose;ref:decompose:palomar-ocs-2026-09-02",
+      "ref_id": "manual:443",
+      "resolution": "go",
+      "resolved_at": "2026-09-02T12:24:41.786852+00:00",
+      "source": "manual",
+      "title": "decompose 選題核准:拆解 OCS 光路層(MEMS 鏡陣列+光循環器,TPU 光互連殘骸收斂)",
+      "type": "manual"
     }
   ],
   "log": [
@@ -16272,8 +16285,17 @@
       "ref_id": "dc_fef9e03e5e6935e7428620f7eab793ba",
       "type": "decision_review",
       "verb": "go"
+    },
+    {
+      "at": "2026-09-02T12:24:41.786852+00:00",
+      "n": 443,
+      "reason": "decompose 已執行:Palomar OCS 光路拆 9 層,🔴🔴 未知層 2(garnet/準直器陣列)+MEMS 代工題;3 題已註冊 pq1 triaged_go",
+      "receipt": "authority:decompose;ref:decompose:palomar-ocs-2026-09-02",
+      "ref_id": "manual:443",
+      "type": "manual",
+      "verb": "go"
     }
   ],
-  "next_n": 443,
+  "next_n": 444,
   "schema_version": "1"
 }
