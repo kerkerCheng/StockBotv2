@@ -9,11 +9,36 @@
 """
 from __future__ import annotations
 
+import json
+from pathlib import Path
 from typing import Any, Mapping, Sequence
 
 # 兩份排序回答不同問題，措辭在這裡定死，避免下游各自發明說法而讓它們看起來可互換。
 ACTIONABLE_PURPOSE = "現在能投什麼——證據夠強才可行動（evidence 優先於 substitutability）"
 STRUCTURAL_PURPOSE = "該去補誰的證據——結構很卡但證據沒跟上，研究 ROI 最高（完全不看證據等級）"
+
+# 沒被任何 sector 錨到的列（含無需求錨者）集中在這一段——現形而非消失，
+# 否則「為什麼這檔不在任何族群」會變成無法回答的問題。
+UNGROUPED_SECTOR = "未歸組／無需求錨"
+
+_SECTOR_ANCHORS_PATH = Path(__file__).resolve().parents[1] / "config" / "sector_anchors.json"
+
+
+def load_sector_map(path: str | Path = _SECTOR_ANCHORS_PATH) -> dict[str, str]:
+    """anchor id → 族群名。SSOT 是 `config/sector_anchors.json`（[323]）。
+
+    讀取失敗回空 dict——分組退化成全部落入 UNGROUPED，排序本身不受影響
+    （分組是呈現層，不是 gate，fail open 是對的）。
+    """
+    try:
+        data = json.loads(Path(path).read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+    return {
+        str(anchor): str(sector)
+        for sector, anchor_list in (data.get("sectors") or {}).items()
+        for anchor in (anchor_list or [])
+    }
 
 JUDGMENT_NOTE = (
     "這是研究判斷，不是回測結果也不是統計勝率。排序反映目前圖中已抽取的證據與結構，"
@@ -55,11 +80,14 @@ def _entry(
     rank: int,
     weakest_axes: Mapping[str, str],
     disproofs: Mapping[str, str],
+    sector_map: Mapping[str, str] | None = None,
 ) -> dict[str, Any]:
     company_id = str(row.get("company_id") or "")
     anchor = row.get("demand_anchor")
+    sector = (sector_map or {}).get(str(anchor)) if anchor else None
     return {
         "rank": rank,
+        "sector": sector,
         "ticker": row.get("ticker"),
         "company_id": company_id,
         "relation": row.get("relation"),
@@ -78,23 +106,61 @@ def _entry(
     }
 
 
+def _group_by_sector(
+    rows: Sequence[Mapping[str, Any]],
+    axes: Mapping[str, str],
+    proofs: Mapping[str, str],
+    sector_map: Mapping[str, str],
+    per_sector_limit: int,
+) -> list[dict[str, Any]]:
+    """對**截斷前的完整列表**分組——年輕族群（如剛長出的稀土／機器人）在全域前十
+    可能一列都排不進，若對截斷後分組，那些段會空著，正是本分組要修的問題。
+    entry 的 rank 保留全域名次（段內即可看出跨段相對位置）。"""
+    buckets: dict[str, list[dict[str, Any]]] = {}
+    for i, row in enumerate(rows):
+        entry = _entry(row, i + 1, axes, proofs, sector_map)
+        sector = entry["sector"] or UNGROUPED_SECTOR
+        buckets.setdefault(sector, []).append(entry)
+    ordered = sorted(
+        buckets.items(),
+        key=lambda kv: (kv[0] == UNGROUPED_SECTOR, kv[1][0]["rank"]),
+    )
+    return [
+        {
+            "sector": sector,
+            "entries": entries[:per_sector_limit],
+            "total": len(entries),
+        }
+        for sector, entries in ordered
+    ]
+
+
 def build_ranking_view(
     ranking: Mapping[str, Any],
     *,
     weakest_axes: Mapping[str, str] | None = None,
     disproofs: Mapping[str, str] | None = None,
     limit: int = 10,
+    sector_map: Mapping[str, str] | None = None,
+    per_sector_limit: int = 5,
 ) -> dict[str, Any]:
     """把 `rank_bottlenecks()` 的輸出整理成以股票為單位的排序視圖。
 
     `weakest_axes` 與 `disproofs` 以 `co:*` 為鍵。缺項留 None——不猜測，也不用
     「無」之類的字串佔位，那會讓「沒查到」與「確實沒有」變成同一個訊號。
+
+    `sector_map` 未注入時自動讀 `config/sector_anchors.json`（分組 SSOT）；
+    分組只是呈現維度，排序鍵與全域名次不因此改變。
     """
     axes = dict(weakest_axes or {})
     proofs = dict(disproofs or {})
+    smap = dict(sector_map) if sector_map is not None else load_sector_map()
 
     def _build(rows: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
-        return [_entry(row, i + 1, axes, proofs) for i, row in enumerate(rows[:limit])]
+        return [
+            _entry(row, i + 1, axes, proofs, smap)
+            for i, row in enumerate(rows[:limit])
+        ]
 
     actionable_rows = list(ranking.get("rows") or [])
     structural_rows = list(ranking.get("structural_rows") or [])
@@ -106,6 +172,14 @@ def build_ranking_view(
         "structural": _build(structural_rows),
         "structural_total": len(structural_rows),
         "structural_purpose": STRUCTURAL_PURPOSE,
+        # 族群分段視圖（2026-09-02 使用者定案）：對完整列表分組，各段有自己的第一名，
+        # rank 仍是全域名次。sector_anchors.json 新增族群時這裡自動長出新段。
+        "actionable_by_sector": _group_by_sector(
+            actionable_rows, axes, proofs, smap, per_sector_limit
+        ),
+        "structural_by_sector": _group_by_sector(
+            structural_rows, axes, proofs, smap, per_sector_limit
+        ),
         # 截斷前的完整候選公司集合。「在不在排序內」必須對整份候選比對，
         # 不能對只帶前 limit 名的 rows 比——否則排 11 名之後的公司會被誤判成
         # 「不在排序」（C-1 常駐清單的消費端踩過的坑）。

@@ -135,3 +135,38 @@ def test_output_carries_no_position_sizing() -> None:
         "probe", "cap", "position_size",
     ):
         assert forbidden not in rendered
+
+
+def test_sector_grouping_segments_full_list_with_global_rank() -> None:
+    """族群分段（2026-09-02 使用者定案）：對截斷前完整列表分組、各段有自己的
+    第一名、rank 保留全域名次；sector_anchors 新增族群時自動長出新段。"""
+    sector_map = {"tech:ai_switch": "AI 光互連／CPO", "mat:rare_earth_magnets": "稀土磁材"}
+    ranking = {
+        "rows": [
+            _row("co:coherent", "COHR", "co:nvidia"),
+            _row("co:lumentum", "LITE", "tech:uhp_laser"),
+            _row("co:mp_materials", "MP", "mat:rare_earth_magnets",
+                 anchor="mat:rare_earth_magnets", sub=4),
+            _row("co:globalfoundries", "GFS", "mat:silicon_wafer",
+                 anchor=None, hops=None),
+        ],
+        "structural_rows": [],
+        "coverage": {},
+    }
+    view = build_ranking_view(ranking, sector_map=sector_map, limit=2)
+
+    segs = {s["sector"]: s for s in view["actionable_by_sector"]}
+    # 全域 limit=2 截斷不影響分組——稀土段仍要出現（對完整列表分組）
+    assert "稀土磁材" in segs
+    assert segs["稀土磁材"]["entries"][0]["company_id"] == "co:mp_materials"
+    # rank 是全域名次：MP 全域第 3
+    assert segs["稀土磁材"]["entries"][0]["rank"] == 3
+    # 各段有自己的第一名
+    assert segs["AI 光互連／CPO"]["entries"][0]["rank"] == 1
+    # 無錨者集中在未歸組段現形，不消失
+    from decision_lab.ranking_view import UNGROUPED_SECTOR
+    assert segs[UNGROUPED_SECTOR]["entries"][0]["company_id"] == "co:globalfoundries"
+    # 新族群 = 改 map 就長新段
+    sector_map["mat:silicon_wafer"] = "矽晶圓"
+    view2 = build_ranking_view(ranking, sector_map=sector_map)
+    assert any(s["sector"] == "AI 光互連／CPO" for s in view2["actionable_by_sector"])

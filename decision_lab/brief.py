@@ -997,29 +997,60 @@ def _render_ranking(ranking: Mapping[str, Any] | None) -> list[str]:
             "",
         ]
     lines = ["# 瓶頸排序", ""]
+
+    def _row_line(row: Mapping[str, Any]) -> str:
+        ticker = markdown_text(row.get("ticker") or row.get("company_id") or "?")
+        anchor_note = "" if not row.get("no_demand_anchor") else " 🔴無需求錨點"
+        return (
+            f"| {row.get('rank')} | {ticker}{anchor_note} "
+            f"| {markdown_text(row.get('bottleneck') or '')} "
+            f"| {row.get('substitutability') or '—'}"
+            f"{'｜sole_source' if row.get('sole_source') else ''} "
+            f"| {markdown_text(row.get('evidence') or '')} "
+            f"| {markdown_text(row.get('weakest_axis') or '—')} |"
+        )
+
+    _TABLE_HEAD = [
+        "| 全域# | 標的 | 卡在哪 | 替代難度 | 證據 | 最弱軸 |",
+        "|---|---|---|---|---|---|",
+    ]
+
     for key, label_key, total_key in (
         ("actionable", "actionable_purpose", "actionable_total"),
         ("structural", "structural_purpose", "structural_total"),
     ):
-        rows = ranking.get(key) or []
         lines.append(f"## {markdown_text(ranking.get(label_key) or key)}")
         lines.append("")
+        # 族群分段視圖（2026-09-02 使用者定案）：各段有自己的第一名，# 欄保留全域名次
+        # 供跨段比較。舊 DTO 沒有 *_by_sector 時回退到全域混排表。
+        sectors = ranking.get(f"{key}_by_sector")
+        if sectors:
+            for seg in sectors:
+                entries = seg.get("entries") or []
+                if not entries:
+                    continue
+                seg_total = seg.get("total")
+                more = (
+                    f"（族群共 {seg_total}，顯示前 {len(entries)}）"
+                    if isinstance(seg_total, int) and seg_total > len(entries)
+                    else ""
+                )
+                lines.append(f"### {markdown_text(seg.get('sector') or '?')}{more}")
+                lines.append("")
+                lines += _TABLE_HEAD
+                lines += [_row_line(row) for row in entries]
+                lines.append("")
+            total = ranking.get(total_key)
+            if isinstance(total, int):
+                lines.append(f"（全域候選共 {total}；# 欄為全域名次）")
+            lines.append("")
+            continue
+        rows = ranking.get(key) or []
         if not rows:
             lines += ["（無候選）", ""]
             continue
-        lines.append("| # | 標的 | 卡在哪 | 替代難度 | 證據 | 最弱軸 |")
-        lines.append("|---|---|---|---|---|---|")
-        for row in rows:
-            ticker = markdown_text(row.get("ticker") or row.get("company_id") or "?")
-            anchor_note = "" if not row.get("no_demand_anchor") else " 🔴無需求錨點"
-            lines.append(
-                f"| {row.get('rank')} | {ticker}{anchor_note} "
-                f"| {markdown_text(row.get('bottleneck') or '')} "
-                f"| {row.get('substitutability') or '—'}"
-                f"{'｜sole_source' if row.get('sole_source') else ''} "
-                f"| {markdown_text(row.get('evidence') or '')} "
-                f"| {markdown_text(row.get('weakest_axis') or '—')} |"
-            )
+        lines += _TABLE_HEAD
+        lines += [_row_line(row) for row in rows]
         total = ranking.get(total_key)
         if isinstance(total, int) and total > len(rows):
             lines.append("")
