@@ -7354,15 +7354,18 @@
       "added_at": "2026-09-02T12:21:10.148214+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_7d9c2ba725cd0da0280021c1aaa6a18e",
+      "dispatch_receipt": "decision:pd_0e5251a50126e9aebc6894d8733d6656",
       "dispatch_ref": "wo_79382f56ad1c6c464796fbc3216b8fc5",
-      "dispatch_status": "queued",
+      "dispatch_status": "completed",
+      "dispatch_updated_at": "2026-09-02T23:49:52.595743+00:00",
       "dispatched_at": "2026-09-02T23:39:28.486205+00:00",
       "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 438,
-      "reason": null,
+      "reason": "四軸填值(SR/TCL/CM/FR corroborated)+disproof/catalyst/expiry;VP 誠實 unknown(GOOGL 行情未入 Engine C ETL,上游資料缺非研究可解);counter_path 留待建模(Telescent 機器人配線路線已在 [444] 圖中,可為 counter-path 素材)",
+      "receipt": "decision:pd_0e5251a50126e9aebc6894d8733d6656",
       "ref_id": "dc_a51839bbf1429618556cf8bc265398c4",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-02T23:49:52.595743+00:00",
       "source": "decision_lab",
       "title": "co:google：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
@@ -16744,6 +16747,33 @@
       "reason": "五軸 assessment 完成(SR corroborated/TCL corroborated/CM+FR+VP bounded)+disproof 四條+catalyst+expiry 2027-06-30;殘餘 corroboration 缺口=客戶具名,已在 missing_data 現形",
       "receipt": "decision:pd_cfa49aab64f9ebb430749ae37f796c46",
       "ref_id": "dc_6e429d67c7b9e925a1b25874e9dcefd9",
+      "type": "decision_review",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-02T23:48:53.838508+00:00",
+      "n": 438,
+      "reason": "assessment 撰寫開工",
+      "receipt": "wo:wo_79382f56ad1c6c464796fbc3216b8fc5",
+      "ref_id": "dc_a51839bbf1429618556cf8bc265398c4",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-09-02T23:49:52.595743+00:00",
+      "n": 438,
+      "reason": "四軸填值(SR/TCL/CM/FR corroborated)+disproof/catalyst/expiry;VP 誠實 unknown(GOOGL 行情未入 Engine C ETL,上游資料缺非研究可解);counter_path 留待建模(Telescent 機器人配線路線已在 [444] 圖中,可為 counter-path 素材)",
+      "receipt": "decision:pd_0e5251a50126e9aebc6894d8733d6656",
+      "ref_id": "dc_a51839bbf1429618556cf8bc265398c4",
+      "type": "decision_review",
+      "verb": "pq1_completed"
+    },
+    {
+      "at": "2026-09-02T23:49:52.595743+00:00",
+      "n": 438,
+      "reason": "四軸填值(SR/TCL/CM/FR corroborated)+disproof/catalyst/expiry;VP 誠實 unknown(GOOGL 行情未入 Engine C ETL,上游資料缺非研究可解);counter_path 留待建模(Telescent 機器人配線路線已在 [444] 圖中,可為 counter-path 素材)",
+      "receipt": "decision:pd_0e5251a50126e9aebc6894d8733d6656",
+      "ref_id": "dc_a51839bbf1429618556cf8bc265398c4",
       "type": "decision_review",
       "verb": "go"
     }
