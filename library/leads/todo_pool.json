@@ -7538,6 +7538,19 @@
       "source": "research_action",
       "title": "16 波長 WDM 雷射層落圖——Sivers InP100 DFB 陣列整合進 Ayar Labs SuperNova(ECOC 2024 聯合 PR),Ayar CTO 具名『key partner...at scale』",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-09-02T16:51:18.145416+00:00",
+      "graph_impact": "+2 節點、1 邊、1 claims｜來源：Meta（客戶端自著論文,NextPlatform 逐字轉載;canonical=ECOC 2025 presentation 167）（tier 2）",
+      "hint": "核准 exact graph delta；Decision handoff：co:broadcom。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 453,
+      "reason": null,
+      "ref_id": "ra_58dd0e5c82c977b07ca6e6532bb65cad",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "AVGO CPO 邊獲客戶端證據——Meta 自著 ECOC 2025 論文:Bailly CPO 百萬 device hours 零 link flap+24K GPU 叢集 MTBF+省電 65%(經 NextPlatform 逐字轉載)",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -16454,6 +16467,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 453,
+  "next_n": 454,
   "schema_version": "1"
 }

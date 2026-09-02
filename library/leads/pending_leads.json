@@ -16891,9 +16891,12 @@
       "first_seen": "2026-09-02T13:14:03.162333+00:00",
       "lead_id": "lead_3a42f692ec4e0421323aca7bbfd2538e",
       "published_at": null,
-      "refs": {},
+      "refs": {
+        "research_action_id": "ra_58dd0e5c82c977b07ca6e6532bb65cad",
+        "trace_status": "partial"
+      },
       "source": "bottleneck-run-2026-09-02",
-      "status": "triaged_go",
+      "status": "action_prepared",
       "themes": {
         "cpo": {
           "counter_only": false,
