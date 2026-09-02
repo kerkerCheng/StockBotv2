@@ -11246,6 +11246,35 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2077741631135191234"
     },
+    "lead_1acfa75f85b80a88db95c35eb402974b": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-02T23:41:30.177215+00:00",
+      "lead_id": "lead_1acfa75f85b80a88db95c35eb402974b",
+      "published_at": null,
+      "refs": {},
+      "source": "user-approved-2026-09-03",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "[授權工程|448] 人形族群邊 substitutability 補值——逐邊 bounded research 定值(諧波/RV/滾柱絲槓/力矩感測/磁材群現有邊),打包 RA 入圖;補完族群進瓶頸排序",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-02T23:41:41.544108+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "ranking",
+          "reason": "[448] 使用者批次核准 2026-09-03;建模工程排入 drain"
+        },
+        "decided_at": "2026-09-02T23:41:41.544108+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "[448] 使用者批次核准 2026-09-03;建模工程排入 drain",
+        "tier": 2
+      },
+      "url": "https://github.com/local/robotics-sub-backfill?work=448"
+    },
     "lead_1b561ff0f07f8e5497f68cb0a15c6885": {
       "entities": {
         "company_ids": [],
@@ -17386,11 +17415,13 @@
       "lead_id": "lead_3a42f692ec4e0421323aca7bbfd2538e",
       "published_at": null,
       "refs": {
+        "action_digest": "10b168765b52c80bb740a52d0eaa243e430e14149ea327f8af15f09a63ea8782",
+        "focus_company_id": "co:broadcom",
         "research_action_id": "ra_58dd0e5c82c977b07ca6e6532bb65cad",
         "trace_status": "partial"
       },
       "source": "bottleneck-run-2026-09-02",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -27872,11 +27903,13 @@
       "lead_id": "lead_74a5f43620c6f4853615b2c0b475c953",
       "published_at": null,
       "refs": {
+        "action_digest": "cc5e13dd81401b0e28711aedde8f0635f5a3cb7c2ff70ba0095169fbe1788a59",
+        "focus_company_id": "co:coherent",
         "research_action_id": "ra_47c9a8f24ece42269ce3c0233bdcb2d2",
         "trace_status": "partial"
       },
       "source": "coverage-gap-2026-09-02",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {},
       "title": "[decompose 殘骸|TPU] tech:optical_circulator 零供應商——誰量產資料中心級光循環器(TPU ICI 單纖雙向依賴)?具名供應商+量產規模+替代性初判",
       "triage": {
@@ -31056,11 +31089,13 @@
       "lead_id": "lead_8149c92cdb302200ffb332ee061d3bba",
       "published_at": null,
       "refs": {
+        "action_digest": "c8ae3639d65626d8f6f48f40267f550b7ef59f40e3ebab0ed74da9ab5f788c3d",
+        "focus_company_id": "co:lumentum",
         "research_action_id": "ra_829d84d8bd4085a33d2e49d2be86da11",
         "trace_status": "partial"
       },
       "source": "coverage-gap-2026-09-02",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -37926,6 +37961,43 @@
       },
       "url": "https://www.sivers-semiconductors.com/press/uppdatering-avseende-utgangen-lock-up-period-och-insynspersoners-transaktioner-i-sivers-semiconductors/"
     },
+    "lead_a5e0447bc74691a10b93a1e4dc1ff4b2": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-02T23:41:30.490803+00:00",
+      "lead_id": "lead_a5e0447bc74691a10b93a1e4dc1ff4b2",
+      "published_at": null,
+      "refs": {},
+      "source": "user-approved-2026-09-03",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CPO"
+          ]
+        }
+      },
+      "title": "[授權工程|449] 同義節點合併 proposal——nand_technology vs nand_flash/in_package_optical_io vs chip_to_chip_optical/scale_up_cpo vs scale_up_network 逐對語意確認+產 resolution proposal",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-02T23:41:41.836772+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "[449] 使用者批次核准 2026-09-03;圖維護 proposal 排入 drain"
+        },
+        "decided_at": "2026-09-02T23:41:41.836772+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "[449] 使用者批次核准 2026-09-03;圖維護 proposal 排入 drain",
+        "tier": 2
+      },
+      "url": "https://github.com/local/synonym-merge-proposal?work=449"
+    },
     "lead_a600d0a88beebed42f157188799b7083": {
       "entities": {
         "company_ids": [
@@ -39422,11 +39494,13 @@
       "lead_id": "lead_aea66c177e553e6b8da4bef0da9f4d25",
       "published_at": null,
       "refs": {
+        "action_digest": "3b036203190f10db6dfd68bb74c1d6d8b4c1e11b973957f63b0ef8fcd1ec1a84",
+        "focus_company_id": "co:sivers_semiconductors",
         "research_action_id": "ra_cb937794408a4232e01c56a643c7b713",
         "trace_status": "partial"
       },
       "source": "coverage-gap-2026-09-02",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {
         "cpo": {
           "counter_only": false,
