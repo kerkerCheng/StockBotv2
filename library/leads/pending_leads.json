@@ -20567,9 +20567,11 @@
       "first_seen": "2026-09-02T02:23:30.353290+00:00",
       "lead_id": "lead_4e7d95b05120fd1cc2d581e3d6142b25",
       "published_at": null,
-      "refs": {},
+      "refs": {
+        "research_action_id": "ra_1bd1df7a5ccc06804dcec063ea2d638f"
+      },
       "source": "alignment-audit-2026-09-02",
-      "status": "triaged_go",
+      "status": "action_prepared",
       "themes": {},
       "title": "[對齊|機器人] Nidec(6594.T)registry 已登記但圖中零內容——全球馬達龍頭+諧波減速器(Nidec-Shimpo/Drive Technology),機器人群供給側缺這一家;首批 extraction 研究",
       "triage": {

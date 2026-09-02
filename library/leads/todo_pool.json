@@ -7141,6 +7141,19 @@
       "source": "decision_lab",
       "title": "co:schaeffler：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-02T11:42:30.418512+00:00",
+      "graph_impact": "+2 節點、1 邊、1 claims｜來源：Nidec Drive Technology（供應商官方產品頁,前 Nidec-Shimpo）（tier 2）",
+      "hint": "核准 exact graph delta；Decision handoff：co:nidec。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 426,
+      "reason": null,
+      "ref_id": "ra_1bd1df7a5ccc06804dcec063ea2d638f",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "Nidec 首批入圖——FLEXWAVE 諧波減速器官方定位人形關節,諧波層新增第二供應商候選(直接影響 HDS 替代性敘事)",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -15719,6 +15732,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 426,
+  "next_n": 427,
   "schema_version": "1"
 }
