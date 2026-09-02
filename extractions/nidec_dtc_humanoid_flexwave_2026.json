@@ -1,0 +1,98 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "Downgrade if Nidec exits or deprioritizes strain-wave reducers (product line discontinued or absent from subsequent robotics showcases); upgrade when any humanoid/robot maker names FLEXWAVE adoption, or Nidec discloses precision-reducer capacity or revenue split in statutory filings.",
+      "id": "nidec_dtc_humanoid_flexwave_2026_cl1",
+      "source_ids": [
+        "nidec_dtc_humanoid_flexwave_2026_s1",
+        "nidec_dtc_humanoid_flexwave_2026_s2"
+      ],
+      "statement": "Nidec Drive Technology (formerly Nidec-Shimpo, part of Nidec 6594.T) officially markets FLEXWAVE strain wave gear reducers for humanoid robot joints across six series, from component sets to integrated assemblies — making Nidec the second at-scale supplier candidate in this graph's strain-wave-gear chokepoint alongside Harmonic Drive Systems. This is a structural counterweight to the HDS ~85%-share narrative and an observable path for the HDS disproof condition (major humanoid adopting non-HDS reduction). Limits: vendor self-report product page; no humanoid maker named as FLEXWAVE customer, no capacity or revenue disclosure; catalog availability does not equal design wins.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {
+        "qualification_status": "qualifying",
+        "sole_source": false,
+        "substitutability": null
+      },
+      "confidence": 0.7,
+      "dst_id": "tech:strain_wave_gear",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "nidec_dtc_humanoid_flexwave_2026_s1"
+      ],
+      "src_id": "co:nidec"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "6594.T",
+        "Nidec Corporation",
+        "Nidec Drive Technology",
+        "Nidec-Shimpo"
+      ],
+      "attributes": {
+        "ticker": "6594.T"
+      },
+      "confidence": 0.85,
+      "id": "co:nidec",
+      "name": "Nidec（尼得科）",
+      "role": null,
+      "source_ids": [
+        "nidec_dtc_humanoid_flexwave_2026_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "robot_subsystem",
+      "aliases": [
+        "harmonic drive",
+        "諧波減速機",
+        "strain wave gearing"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:strain_wave_gear",
+      "name": "Strain Wave Gear（諧波減速器）",
+      "role": null,
+      "source_ids": [
+        "nidec_dtc_humanoid_flexwave_2026_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "nidec_dtc_humanoid_flexwave_2026",
+    "evidence_tier": 2,
+    "origin_entity": "Nidec Drive Technology（供應商官方產品頁,前 Nidec-Shimpo）",
+    "permission_basis": "Public vendor page; URL and short excerpts.",
+    "published_at": null,
+    "publisher": "Nidec Drive Technology America Corporation",
+    "retrieved_at": "2026-09-02",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Nidec Drive Technology — Highly Developed Humanoid Robots (official product page)",
+    "url": "https://www.nidec-dtc.com/humanoid-robots/"
+  },
+  "sources": [
+    {
+      "id": "nidec_dtc_humanoid_flexwave_2026_s1",
+      "locator": "Humanoid robots page — product positioning",
+      "quote": "The Next Generation Nidec FLEXWAVE high precision simple contained assembly and component sub-assembly gear reducers are the ideal choice for these types of applications."
+    },
+    {
+      "id": "nidec_dtc_humanoid_flexwave_2026_s2",
+      "locator": "Humanoid robots page — joint requirements",
+      "quote": "High positional accuracy, zero backlash, low vibration, maximum torque capacity, as well as lightweight and compactness are a necessity for drive components for such robot structures."
+    }
+  ]
+}
