@@ -692,6 +692,7 @@ def build_today_brief(
     alpha_series_by_ticker: Mapping[str, Any] | None = None,
     ranking: Mapping[str, Any] | None = None,
     nav_exposure: Mapping[str, Any] | None = None,
+    identity_alignment: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """掃描 cohorts／decisions 與當前 Sheet snapshot；不寫入任何 authority。
 
@@ -869,6 +870,12 @@ def build_today_brief(
         "capital_expression": (
             counters() if callable(counters := getattr(store, "capital_expression_counters", None))
             else None
+        ),
+        # 公司三集合對齊常駐計數器（2026-09-02 使用者稽核定案）：圖∖registry 是
+        # join-key 契約破口（應恆 0），registry∖圖 是登記未研究。None＝呼叫端未注入
+        #（如遠端受限 surface），不與「對齊為 0」混用。
+        "identity_alignment": (
+            dict(identity_alignment) if identity_alignment is not None else None
         ),
         # Alpha live 部位的事件監控。與 `capital_expression` 同一個窄 duck-type
         # 契約：surface 不提供就是 None，不與「有部位但沒事」的空 list 混用。
@@ -1235,6 +1242,25 @@ def render_today_markdown(brief: Mapping[str, Any]) -> str:
             lines.append(
                 f"  - ℹ 報酬可量測但尚無結案歸因（outcome_envelopes {measured}/{outcomes}）；"
                 "跑 `scripts/outcome_if_settled_today.py` 看目前表現"
+            )
+    # 公司對齊常駐計數器（2026-09-02）：洩漏（圖∖registry）應恆 0——非 0 逐一列出
+    # 並附修法；registry∖圖 只計數現形。None＝surface 未注入，整行略過（≠對齊為 0）。
+    alignment = brief.get("identity_alignment")
+    if alignment:
+        leaked = list(alignment.get("graph_not_in_registry") or ())
+        unresearched = int(alignment.get("registry_not_in_graph_count") or 0)
+        if leaked:
+            names = "、".join(markdown_text(x) for x in leaked[:5])
+            more = f" 等 {len(leaked)} 個" if len(leaked) > 5 else ""
+            lines.append(
+                f"- 🔴 公司對齊：圖中 {names}{more} 不在 registry——join-key 契約破口，"
+                "補 `config/company_identity.json` 條目（private 也要 null 條目）"
+            )
+        else:
+            lines.append(
+                f"- 公司對齊：圖∖registry 0（✓）｜registry 已登記未入圖 {unresearched} 家"
+                f"（圖 {alignment.get('graph_companies')}／registry "
+                f"{alignment.get('registry_companies')}）"
             )
     # 備份計數器：與 capital_expression 各自獨立呈現——surface 沒給就整行略過，
     # 「從未備份」與「狀態檔壞掉」都必須現形，不得靜默（L12／L14）。

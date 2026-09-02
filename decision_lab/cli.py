@@ -382,6 +382,7 @@ def run(
             # 的 authority（Neo4j／Google Sheet），所以在這一層取好再注入。
             # 兩者各自 fail-soft：缺席時 brief 照常渲染並明說「未提供」，不是「沒有候選」。
             from engine_d_runtime.adapters import (
+                fetch_identity_alignment,
                 fetch_nav_exposure,
                 fetch_ranking_view,
             )
@@ -394,6 +395,7 @@ def run(
                 )
             )
             nav_exposure = _optional(fetch_nav_exposure)
+            identity_alignment = _optional(fetch_identity_alignment)
             brief = build_today_brief(
                 store,
                 as_of=evaluation_at,
@@ -401,6 +403,7 @@ def run(
                 provider=runtime,
                 ranking=ranking,
                 nav_exposure=nav_exposure,
+                identity_alignment=identity_alignment,
             )
             _render(
                 brief,

@@ -71,6 +71,62 @@ def fetch_nav_exposure(
     return build_nav_exposure(rows, groups=groups)
 
 
+def compute_identity_alignment(
+    graph_ids: set[str], registry_ids: set[str]
+) -> dict[str, Any]:
+    """圖／registry 兩集合對齊——純函式，供測試與 fetch 版共用。
+
+    2026-09-02 使用者稽核定案：`graph ∖ registry` 是 join-key 契約破口（應恆 0，
+    非 0 必逐一列出）；`registry ∖ graph` 是「登記了沒研究」，只計數現形。
+    """
+    leaked = sorted(graph_ids - registry_ids)
+    return {
+        "graph_companies": len(graph_ids),
+        "registry_companies": len(registry_ids),
+        "graph_not_in_registry": leaked,
+        "registry_not_in_graph_count": len(registry_ids - graph_ids),
+    }
+
+
+def fetch_identity_alignment() -> dict[str, Any] | None:
+    """讀圖與 registry 算公司對齊計數；讀不到回 None（surface 不提供 ≠ 對齊為 0）。"""
+    import json
+    import os
+
+    password = os.environ.get("NEO4J_PASSWORD")
+    if not password:
+        return None
+    try:
+        registry_path = (
+            Path(__file__).resolve().parent.parent / "config" / "company_identity.json"
+        )
+        registry = json.loads(registry_path.read_text(encoding="utf-8"))
+        registry_ids = {
+            str(c.get("company_id"))
+            for c in registry.get("companies") or []
+            if c.get("company_id")
+        }
+        from neo4j import GraphDatabase
+
+        driver = GraphDatabase.driver(
+            os.environ.get("NEO4J_URI", "bolt://localhost:7687"),
+            auth=(os.environ.get("NEO4J_USER", "neo4j"), password),
+        )
+        try:
+            with driver.session() as session:
+                graph_ids = {
+                    str(r["id"])
+                    for r in session.run("MATCH (n:Company) RETURN n.id AS id")
+                    if r["id"]
+                }
+        finally:
+            driver.close()
+    except Exception as exc:  # noqa: BLE001 — 對齊計數缺席只降級
+        _LOG.warning("identity alignment fetch failed: %s", exc, exc_info=True)
+        return None
+    return compute_identity_alignment(graph_ids, registry_ids)
+
+
 def fetch_ranking_view(
     *,
     weakest_axes: Mapping[str, str] | None = None,

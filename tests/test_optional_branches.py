@@ -81,3 +81,16 @@ def test_assessment_scaffold_prefills_refs_and_leaves_judgment_blank() -> None:
         assert body["reason"] == SCAFFOLD_REASON_PLACEHOLDER
         assert body["evidence_refs"] == []
         assert body["missing_data"] == [SCAFFOLD_NO_AUTHORITY_NOTE]
+
+
+def test_identity_alignment_pure_diff() -> None:
+    """公司對齊計數（2026-09-02）：洩漏逐一列出、未研究只計數。"""
+    from engine_d_runtime.adapters import compute_identity_alignment
+
+    out = compute_identity_alignment(
+        {"co:a", "co:b", "co:leak"}, {"co:a", "co:b", "co:only_reg"}
+    )
+    assert out["graph_not_in_registry"] == ["co:leak"]
+    assert out["registry_not_in_graph_count"] == 1
+    assert out["graph_companies"] == 3
+    assert out["registry_companies"] == 3
