@@ -234,6 +234,18 @@ CREATE TABLE IF NOT EXISTS research_work_orders (
     created_at          TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
+-- cohort thesis（2026-09-02 使用者定案「cohort 是終點」）：variant perception 的家。
+-- append-only：修正用新列 supersedes 舊列，兩列都留（L10 private authority 規則）。
+CREATE TABLE IF NOT EXISTS cohort_thesis (
+    thesis_id           TEXT PRIMARY KEY,
+    cohort_id           TEXT NOT NULL REFERENCES decision_cohorts(cohort_id),
+    variant_perception  TEXT NOT NULL,
+    supersedes_id       TEXT REFERENCES cohort_thesis(thesis_id),
+    created_at          TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_cohort_thesis_cohort_time
+    ON cohort_thesis (cohort_id, created_at, thesis_id);
+
 CREATE INDEX IF NOT EXISTS idx_decision_events_cohort_time
     ON decision_events (cohort_id, observed_at, event_id);
 CREATE INDEX IF NOT EXISTS idx_paper_events_cohort_time
@@ -250,5 +262,5 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_paper_events_approved_action
     ON paper_events (approved_action_id)
     WHERE approved_action_id IS NOT NULL;
 INSERT INTO decision_store_meta (key, value)
-VALUES ('schema_version', '8')
+VALUES ('schema_version', '9')
 ON CONFLICT(key) DO NOTHING;

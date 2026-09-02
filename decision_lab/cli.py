@@ -130,6 +130,14 @@ def build_parser() -> argparse.ArgumentParser:
         help="輸出路徑；預設 library/private/decision_lab/assessment_scaffold_<cohort>.json",
     )
 
+    vp = subcommands.add_parser(
+        "variant-perception",
+        help="寫入或讀取 cohort 的 variant perception（市場隱含 X／本 thesis 認為 Y／催化劑 Z）。",
+    )
+    vp.add_argument("cohort_id")
+    vp.add_argument("--text", help="不給即為讀取最新一筆")
+    vp.add_argument("--supersedes", help="修正既有筆時填入被取代的 th_* id")
+
     card = subcommands.add_parser("card", help="純讀既有 decision 的 Action Card。")
     card.add_argument("decision_id")
     card.add_argument("--as-of")
@@ -453,6 +461,30 @@ def run(
                 "`decision_lab references <cohort> --assessment <out>` 驗證再 reassess。",
             }
             print(json.dumps(summary, ensure_ascii=False, indent=2), file=stdout)
+        elif args.command == "variant-perception":
+            if args.text:
+                thesis_id = store.record_variant_perception(
+                    args.cohort_id,
+                    variant_perception=args.text,
+                    supersedes_id=args.supersedes,
+                )
+                print(
+                    json.dumps(
+                        {"thesis_id": thesis_id, "cohort_id": args.cohort_id},
+                        ensure_ascii=False,
+                    ),
+                    file=stdout,
+                )
+            else:
+                current = store.latest_variant_perception(args.cohort_id)
+                print(
+                    json.dumps(
+                        current or {"cohort_id": args.cohort_id, "variant_perception": None},
+                        ensure_ascii=False,
+                        indent=2,
+                    ),
+                    file=stdout,
+                )
         elif args.command == "card":
             card = build_action_card(store, args.decision_id, as_of=args.as_of)
             _render(

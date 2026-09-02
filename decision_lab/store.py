@@ -37,7 +37,7 @@ from .redaction import sensitive_payload_path
 
 
 _SCHEMA_PATH = Path(__file__).with_name("schema.sql")
-_SCHEMA_VERSION = "8"
+_SCHEMA_VERSION = "9"
 
 # `user_sized` 仍然硬擋的 blocker。判準來自 `AGENTS.md`「資本與風控」：
 # **只有 ETF 槓桿 cap 與 5% 單筆上限會把 live supported range 歸零，其餘曝險只記錄／警告。**
@@ -1024,6 +1024,68 @@ class DecisionStore:
                 (confirmation_id, sheet_digest, confirmed_at),
             )
         return confirmation_id
+
+    def record_variant_perception(
+        self,
+        cohort_id: str,
+        *,
+        variant_perception: str,
+        supersedes_id: str | None = None,
+    ) -> str:
+        """寫入 cohort 的 variant perception（2026-09-02「cohort 是終點」定案）。
+
+        append-only：修正用新列 supersedes 舊列，兩列都留（L10）。內容應回答
+        「當前股價隱含假設 X，本 thesis 認為 Y，催化劑 Z」——這是研究判斷的
+        寫入（同 assessment 性質），不是 thesis lifecycle mutation；lifecycle
+        （active/retired）仍走原人工 gate。
+        """
+        text = (variant_perception or "").strip()
+        if not text:
+            raise ValueError("variant_perception 不可為空")
+        cohort = self._conn.execute(
+            "SELECT cohort_id FROM decision_cohorts WHERE cohort_id = ?",
+            (cohort_id,),
+        ).fetchone()
+        if cohort is None:
+            raise KeyError(f"cohort 不存在：{cohort_id}")
+        created_at = datetime.now(timezone.utc).isoformat()
+        thesis_id = "th_" + _digest(f"{cohort_id}:{text}:{created_at}")[:32]
+        with immediate_transaction(self._conn):
+            if supersedes_id is not None:
+                prev = self._conn.execute(
+                    "SELECT thesis_id FROM cohort_thesis WHERE thesis_id = ? AND cohort_id = ?",
+                    (supersedes_id, cohort_id),
+                ).fetchone()
+                if prev is None:
+                    raise KeyError(
+                        f"supersedes_id 不存在於此 cohort：{supersedes_id}"
+                    )
+            self._conn.execute(
+                """
+                INSERT INTO cohort_thesis (
+                    thesis_id, cohort_id, variant_perception, supersedes_id, created_at
+                ) VALUES (?, ?, ?, ?, ?)
+                """,
+                (thesis_id, cohort_id, text, supersedes_id, created_at),
+            )
+        return thesis_id
+
+    def latest_variant_perception(self, cohort_id: str) -> dict[str, Any] | None:
+        """最新一筆（被 supersede 的不回傳）；None＝從未寫過，讓「未寫」現形。"""
+        row = self._conn.execute(
+            """
+            SELECT t.thesis_id, t.cohort_id, t.variant_perception, t.created_at
+            FROM cohort_thesis t
+            WHERE t.cohort_id = ?
+              AND NOT EXISTS (
+                SELECT 1 FROM cohort_thesis n WHERE n.supersedes_id = t.thesis_id
+              )
+            ORDER BY t.created_at DESC, t.thesis_id DESC
+            LIMIT 1
+            """,
+            (cohort_id,),
+        ).fetchone()
+        return dict(row) if row is not None else None
 
     def latest_holdings_confirmation(self, sheet_digest: str) -> dict[str, Any] | None:
         row = self._conn.execute(

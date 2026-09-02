@@ -82,6 +82,8 @@ def _blockers_by_mode(blockers: Sequence[str]) -> dict[str, list[str]]:
 def _decision_item(
     card: Mapping[str, Any],
     current_authority: Mapping[str, Any] | None = None,
+    *,
+    variant_perception: str | None = None,
 ) -> dict[str, Any]:
     lifecycle = card.get("lifecycle") or {}
     attention = str(card["attention"])
@@ -152,6 +154,10 @@ def _decision_item(
         "blockers_by_mode": _blockers_by_mode(blockers),
         "next_review_at": lifecycle.get("review_due_at"),
         "disproof_condition": card.get("disproof_condition") or "",
+        # variant perception 跟著 item 走（2026-09-02「cohort 是終點」定案）：
+        # 「市場隱含 X／本 thesis 認為 Y」是這一檔存在的理由，REVIEW 時第一眼要看到。
+        # None＝從未寫過——渲染端顯示「（未寫）」現形，不隱藏。
+        "variant_perception": variant_perception,
         # 這些軸的 authority 現在拿得到了，值得重評估（只是提示，不自動改等級）。
         "reassessable_axes": list(current_authority.get("reassessable_axes") or []),
         # 缺這些 Engine C 人工觀測 ⇒ commercial_maturity 恆 unknown ⇒ 部位恆為 0。
@@ -753,7 +759,18 @@ def build_today_brief(
             portfolio_context=portfolios.get(cohort_id),
         )
         card["cohort_id"] = cohort_id
-        decision_item = _decision_item(card, current_authorities.get(cohort_id))
+        # variant perception 窄 duck-type（同 capital_expression 契約）：surface
+        # 沒有這個方法就是 None（未提供），不與「沒寫過」混用——渲染端兩者都顯示
+        # 「（未寫）」是可接受的合流：對使用者的動作都是「該去寫」。
+        _vp_fn = getattr(store, "latest_variant_perception", None)
+        _vp_row = _vp_fn(str(cohort_id)) if callable(_vp_fn) else None
+        decision_item = _decision_item(
+            card,
+            current_authorities.get(cohort_id),
+            variant_perception=(
+                str(_vp_row["variant_perception"]) if _vp_row else None
+            ),
+        )
         if (
             decision_item["company_id"] == "unresolved"
             and summary.get("company_id_hint")
@@ -1309,6 +1326,17 @@ def render_today_markdown(brief: Mapping[str, Any]) -> str:
             resp = markdown_text(item.get("user_response_needed") or "")
             if resp:
                 lines.append(f"      → {resp}")
+            # variant perception（2026-09-02）：REVIEW 項第一眼要看到「市場隱含 vs
+            # 本 thesis」；沒寫就顯示（未寫）現形——那是待辦，不是可以省略的欄。
+            vp = item.get("variant_perception")
+            if "variant_perception" in item:
+                if vp:
+                    lines.append(f"      → 差異點：{markdown_text(str(vp))}")
+                elif item.get("attention") == "REVIEW":
+                    lines.append(
+                        "      → 差異點：（未寫 variant perception——"
+                        f"`decision_lab variant-perception {item.get('cohort_id')} --text …`）"
+                    )
             disproof = markdown_text(item.get("disproof_condition") or "")
             if disproof:
                 lines.append(f"      → Disproof：{disproof}")

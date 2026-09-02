@@ -94,3 +94,37 @@ def test_identity_alignment_pure_diff() -> None:
     assert out["registry_not_in_graph_count"] == 1
     assert out["graph_companies"] == 3
     assert out["registry_companies"] == 3
+
+
+def test_variant_perception_roundtrip_and_supersede(tmp_path) -> None:
+    """cohort thesis(2026-09-02):append-only、supersede 後只回最新。"""
+    from decision_lab.store import DecisionStore
+    from storage.relational import initialize_private_root
+
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    private_root = repo / "library" / "private"
+    initialize_private_root(private_root, repo_root=repo)
+    store = DecisionStore.open(
+        private_root / "decision_lab" / "decision_lab.db",
+        private_root=private_root,
+        repo_root=repo,
+    )
+    try:
+        cohort = store.ensure_cohort(
+            dedupe_key="vp-test", company_id="co:nvidia", research_ticker="NVDA"
+        )
+        cid = (
+            cohort.cohort_id
+            if hasattr(cohort, "cohort_id")
+            else cohort["cohort_id"]
+        )
+        t1 = store.record_variant_perception(cid, variant_perception="v1")
+        assert store.latest_variant_perception(cid)["variant_perception"] == "v1"
+        store.record_variant_perception(
+            cid, variant_perception="v2", supersedes_id=t1
+        )
+        assert store.latest_variant_perception(cid)["variant_perception"] == "v2"
+        assert store.latest_variant_perception("dc_nonexistent") is None
+    finally:
+        store.close()
