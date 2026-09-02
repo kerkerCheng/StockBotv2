@@ -1,0 +1,4 @@
+Source URL: https://www.coherent.com/news/press-releases/coherent-to-present-a-broad-portfolio-of-new-products-and-technology-innovations-at-ofc-2024
+
+Excerpt:
+Bi-di circulator adaptor based on Coherent's vertically integrated circulator technology that enables bi-directional transmission over a single fiber between two transceivers in a compact footprint compatible with all transceiver LC connector ports. (Coherent OFC 2024 PR, 2024-03-25)

@@ -1,0 +1,94 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "guided",
+      "disproof_condition": "Downgrade if the DLX OCS line is discontinued or loses to MEMS/robotic alternatives without disclosed wins; upgrade when a hyperscaler is named as customer or shipment volumes appear in Coherent's statutory reporting.",
+      "id": "cohr_ocs_dlx_pr_2024_03_25_cl1",
+      "source_ids": [
+        "cohr_ocs_dlx_pr_2024_03_25_s1",
+        "cohr_ocs_dlx_pr_2024_03_25_s2"
+      ],
+      "statement": "Coherent entered the OCS product market with a liquid-crystal (LCoS/DLX) 300x300-port optical circuit switch demonstrated at OFC 2024, a technology path distinct from Google's MEMS-based Palomar and Lumentum's MEMS OCS — adding a second at-scale merchant OCS supplier candidate to the graph. Limits: vendor self-report demo announcement; no named customer; third-party estimates of 2026 shipment volumes exist but are not ingested.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {
+        "qualification_status": "qualifying",
+        "sole_source": false
+      },
+      "confidence": 0.8,
+      "dst_id": "tech:ocs",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "cohr_ocs_dlx_pr_2024_03_25_s1",
+        "cohr_ocs_dlx_pr_2024_03_25_s2"
+      ],
+      "src_id": "co:coherent"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "COHR"
+      ],
+      "attributes": {
+        "ticker": "COHR"
+      },
+      "confidence": 0.9,
+      "id": "co:coherent",
+      "name": "Coherent Corp",
+      "role": null,
+      "source_ids": [
+        "cohr_ocs_dlx_pr_2024_03_25_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "optical circuit switch",
+        "光路交換"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:ocs",
+      "name": "Optical Circuit Switching (OCS)",
+      "role": null,
+      "source_ids": [
+        "cohr_ocs_dlx_pr_2024_03_25_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "cohr_ocs_dlx_pr_2024_03_25",
+    "evidence_tier": 2,
+    "origin_entity": "Coherent（發行人官方新聞稿）",
+    "permission_basis": "Public press release; URL and short excerpts.",
+    "published_at": "2024-03-25",
+    "publisher": "Coherent",
+    "retrieved_at": "2026-09-02",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Coherent — Optical Circuit Switch for Data Centers, live demo at OFC 2024 (DLX liquid-crystal)",
+    "url": "https://www.coherent.com/news/press-releases/optical-circuit-switch-for-data-centers-live-demo-at-ofc-2024-based-on-ultrareliable-dlx-technology"
+  },
+  "sources": [
+    {
+      "id": "cohr_ocs_dlx_pr_2024_03_25_s1",
+      "locator": "PR — OCS demo",
+      "quote": "a 300-port x 300-port OCS"
+    },
+    {
+      "id": "cohr_ocs_dlx_pr_2024_03_25_s2",
+      "locator": "PR — technology and value",
+      "quote": "the company's field-proven and ultrareliable digital liquid-crystal technology... In an OCS, data signals remain in the optical domain as they transit the switch; eliminating OEO conversion can provide dramatic cost and power consumption savings."
+    }
+  ]
+}

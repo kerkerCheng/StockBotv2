@@ -1,0 +1,87 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "guided",
+      "disproof_condition": "Downgrade if circulator-based bidirectionality is displaced (e.g., duplex-fiber OCS architectures win) or the product line is discontinued; upgrade when any OCS deployment names its circulator supplier or volumes are disclosed.",
+      "id": "cohr_ofc2024_portfolio_pr_2024_03_25_cl1",
+      "source_ids": [
+        "cohr_ofc2024_portfolio_pr_2024_03_25_s1"
+      ],
+      "statement": "Coherent officially productizes optical circulator technology it describes as vertically integrated, packaged as a bi-di circulator adaptor enabling bidirectional transmission over a single fiber — the first named supplier on the graph's optical-circulator chokepoint (the component Google's Apollo re-engineered for O-band datacenter-scale bidirectional OCS links). Limits: vendor self-report; adaptor is a transceiver-port product and the mapping to link-level OCS circulator volumes is unverified; Google's actual circulator sourcing undisclosed; Molex and others also market circulators but lack ingested verbatim here.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {
+        "qualification_status": "qualifying",
+        "sole_source": false
+      },
+      "confidence": 0.8,
+      "dst_id": "tech:optical_circulator",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "cohr_ofc2024_portfolio_pr_2024_03_25_s1"
+      ],
+      "src_id": "co:coherent"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "COHR"
+      ],
+      "attributes": {
+        "ticker": "COHR"
+      },
+      "confidence": 0.9,
+      "id": "co:coherent",
+      "name": "Coherent Corp",
+      "role": null,
+      "source_ids": [
+        "cohr_ofc2024_portfolio_pr_2024_03_25_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "circulator",
+        "光循環器"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:optical_circulator",
+      "name": "Optical circulator (bidirectional OCS links)",
+      "role": null,
+      "source_ids": [
+        "cohr_ofc2024_portfolio_pr_2024_03_25_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "cohr_ofc2024_portfolio_pr_2024_03_25",
+    "evidence_tier": 2,
+    "origin_entity": "Coherent（發行人官方新聞稿）",
+    "permission_basis": "Public press release; URL and short excerpts.",
+    "published_at": "2024-03-25",
+    "publisher": "Coherent",
+    "retrieved_at": "2026-09-02",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Coherent OFC 2024 portfolio press release (bi-di circulator adaptor)",
+    "url": "https://www.coherent.com/news/press-releases/coherent-to-present-a-broad-portfolio-of-new-products-and-technology-innovations-at-ofc-2024"
+  },
+  "sources": [
+    {
+      "id": "cohr_ofc2024_portfolio_pr_2024_03_25_s1",
+      "locator": "PR — circulator adaptor",
+      "quote": "Bi-di circulator adaptor based on Coherent's vertically integrated circulator technology that enables bi-directional transmission over a single fiber between two transceivers in a compact footprint compatible with all transceiver LC connector ports."
+    }
+  ]
+}
