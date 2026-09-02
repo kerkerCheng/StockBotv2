@@ -7433,6 +7433,18 @@
       "source": "research_action",
       "title": "磁光石榴石 Faraday rotator 材料層落圖——Coherent 官方 datasheet 證實 LPE BIG 厚膜產品線(1290-1610nm 含 O-band),circulator 心臟材料首個具名供應商",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-09-02T12:57:55.110778+00:00",
+      "hint": "go＝①registry 加 co:novanta(research_ticker=NOVT/USD/NASDAQ);②prepare+apply library/leads/action_drafts/novanta_ft_sensor_2026_09_02_action.json(ATI 官方 humanoid 頁,力矩感測+frameless 馬達+編碼器);效果:🔴 tech:force_torque_sensor 層獲首個具名供應商。不含 thesis/live。L8 現況:單一 origin(供應商自報),零客戶具名;[341] 既有評估該層替代難度低多供應商——首個入圖不代表瓶頸持有者,純度低(Novanta 多元化)",
+      "n": 446,
+      "reason": null,
+      "ref_id": "lead:lead_5087a6570af0c525743b6f2d96e17d9a",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "Novanta(NOVT)onboard 核准——registry 增列+ATI 力矩感測器首批 extraction 入圖(draft 已備)",
+      "type": "manual"
     }
   ],
   "log": [
@@ -16322,6 +16334,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 446,
+  "next_n": 447,
   "schema_version": "1"
 }

@@ -20909,9 +20909,13 @@
       "first_seen": "2026-09-02T11:47:09.440753+00:00",
       "lead_id": "lead_5087a6570af0c525743b6f2d96e17d9a",
       "published_at": null,
-      "refs": {},
+      "refs": {
+        "parked_reason": "onboard 包已備等核准:Novanta(NOVT)/ATI 官方 humanoid 頁具名,draft=novanta_ft_sensor_2026_09_02_action.json;registry 增列是 prepare 的前置,已鑄 manual pq2 承載",
+        "trace_next_trigger": "使用者核准 onboard 編號後 prepare+apply;或任一人形製造商具名採用 ATI 感測器",
+        "trace_status": "awaiting_named_disclosure"
+      },
       "source": "coverage-gap-2026-09-02",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "[decompose 殘骸|人形] tech:force_torque_sensor 零供應商——人形關節/腕踝力矩感測器具名供應商(ATI/Sintokogio/坤維?)+合格週期 3-7 年說法一手化",
       "triage": {
