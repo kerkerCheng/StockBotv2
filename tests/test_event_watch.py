@@ -205,3 +205,31 @@ def test_primary_source_tier_has_single_ssot():
 
     assert ew.PRIMARY_SOURCE_TIER is lead_refs.PRIMARY_SOURCE_TIER
     assert leads_mod.PRIMARY_SOURCE_TIER is lead_refs.PRIMARY_SOURCE_TIER
+
+
+def test_render_watch_covers_every_kind_and_wake_target():
+    """2026-09-02 事故：[321] 新增 related_entity_signal 後 _render_watch 的平行
+    dict 沒跟上，daily sweep 整批 KeyError、38 筆 watch 一輪 0 檢查（L16）。
+    本測試對 WATCH_KINDS 全集逐一 render——新增 kind 漏補條目時在這裡先炸。"""
+    data = _fresh()
+    ew.add_watch(data, kind="date", wake_pq2=1, expires="2027-01-01", until="2026-10-01")
+    ew.add_watch(
+        data, kind="entity_filing_signal", wake_pq2=2,
+        expires="2027-01-01", entities=["NVDA"],
+    )
+    ew.add_watch(
+        data, kind="fact_verification", wake_pq2=3,
+        expires="2027-01-01", fact="x", fact_check_ref="lead_1", entities=["AMD"],
+    )
+    ew.add_watch(
+        data, kind="related_entity_signal", wake_lead="lead_2",
+        expires="2027-01-01", entities=["COHR"],
+    )
+    rendered_kinds = set()
+    for watch in data["watches"]:
+        line = ew._render_watch(watch)
+        assert "未知 kind" not in line, f"{watch['kind']} 缺 render 條目"
+        rendered_kinds.add(watch["kind"])
+    assert rendered_kinds == set(ew.WATCH_KINDS)
+    lead_line = ew._render_watch(data["watches"][-1])
+    assert "lead lead_2" in lead_line

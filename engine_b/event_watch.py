@@ -431,16 +431,23 @@ def reactivate(data: dict[str, Any], watch_id: str) -> None:
 
 def _render_watch(watch: Mapping[str, Any]) -> str:
     kind = watch["kind"]
+    # ⚠ 這裡是 WATCH_KINDS 的平行消費端（L16）：新增 kind 必須同步補一行，
+    # 否則 2026-09-02 的事故重演——[321] 併入 `related_entity_signal` 後這裡沒跟上，
+    # daily 的 sweep 整批 KeyError、38 筆 watch 一輪 0 檢查。用 .get 兜底讓
+    # 單一未知 kind 只影響自己那一行，不再炸掉整個 render。
     detail = {
         "date": f"until {watch.get('until')}",
         "entity_filing_signal": f"等 {','.join(watch.get('entities') or [])} 的一手文件",
         "fact_verification": f"對照 {watch.get('fact', '')[:50]}",
-    }[kind]
+        "related_entity_signal": f"等 {','.join(watch.get('entities') or [])} 的新動靜",
+    }.get(kind, "（未知 kind——render 端缺條目，請補 _render_watch）")
     poll = "｜可輪詢" if (watch.get("poll") or {}).get("eligible") else ""
-    target = (
-        f"pq2 [{watch['wake_pq2']}]" if watch.get("wake_pq2")
-        else f"假設 {watch.get('hypothesis_ref')}"
-    )
+    if watch.get("wake_pq2"):
+        target = f"pq2 [{watch['wake_pq2']}]"
+    elif watch.get("wake_lead"):
+        target = f"lead {watch['wake_lead']}"
+    else:
+        target = f"假設 {watch.get('hypothesis_ref')}"
     return (
         f"  {watch['watch_id']} [{watch['status']}] {kind}：{detail}"
         f" → 喚醒 {target}{poll}（expires {watch['expires']}）"
