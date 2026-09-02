@@ -6723,8 +6723,10 @@
       "added_at": "2026-09-01T13:44:29.878804+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_a9038b904b9ee9ebaa8840eea8af5d0d",
+      "dispatch_receipt": "ra:ra_fc05721e4487cd1632865753f00196e7;manual_todo:415,416;raw:library/raw/soitec_urd_fy2026_en.pdf",
       "dispatch_ref": "wo_572942101b48c926ae2d0da1a665113e",
-      "dispatch_status": "queued",
+      "dispatch_status": "awaiting_approval",
+      "dispatch_updated_at": "2026-09-02T10:52:21.241413+00:00",
       "dispatched_at": "2026-09-02T00:41:57.544298+00:00",
       "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 400,
@@ -6987,6 +6989,31 @@
       "resolved_at": null,
       "source": "manual",
       "title": "Lynas [408] customer_concentration 觀測寫入核准——FY26 年報已核對:占營收比重結構性不揭露,改記質性+量錨",
+      "type": "manual"
+    },
+    {
+      "added_at": "2026-09-02T10:51:54.432072+00:00",
+      "graph_impact": "+1 節點、0 邊、1 claims｜來源：Soitec（發行人法定年度文件,經審計財報）（tier 1）",
+      "hint": "核准 exact graph delta；Decision handoff：co:soitec。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 415,
+      "reason": null,
+      "ref_id": "ra_fc05721e4487cd1632865753f00196e7",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "Soitec 產能保留協議獲法定財報印證——URD FY26 揭露客戶量承諾最高 €1.1B＋contract liabilities 明細,升級 Reuters 訪談敘事",
+      "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-09-02T10:52:12.466046+00:00",
+      "hint": "go＝把以下觀測寫入 Engine C manual ledger(backlog+customer_concentration,co:soitec)；不含入圖(那是 [415])、不含 thesis mutation。內容:①backlog 代理:多年期產能保留+量承諾協議未來銷售上限 €1.1B(URD FY26 note 9.1,2026-03-31 為準,審計級;明標是承諾上限非 backlog);②contract liabilities 非流動 €50,288k(前年 €11,200k),含客戶預付款 €9,958k(前年 €11,200k,YoY 略降)+遞延收入 €40,330k(note 8.14);流動 €15,251k(note 8.15);③customer_concentration:URD 無具名客戶,Photonics-SOI >\\ 營收(FY26 結果自報)無客戶拆分。來源:library/raw/soitec_urd_fy2026_en.pdf",
+      "n": 416,
+      "reason": null,
+      "ref_id": "wo:wo_572942101b48c926ae2d0da1a665113e",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "Soitec [400] backlog/customer 觀測寫入核准——URD FY26 法定量承諾與 contract liabilities 落 Engine C",
       "type": "manual"
     }
   ],
@@ -15393,8 +15420,26 @@
       "ref_id": "dc_48446dbceb85d4b785634e3c4ca5d669",
       "type": "decision_review",
       "verb": "pq1_awaiting_approval"
+    },
+    {
+      "at": "2026-09-02T10:45:25.050493+00:00",
+      "n": 400,
+      "reason": "research-drain 開工",
+      "receipt": "wo:wo_572942101b48c926ae2d0da1a665113e",
+      "ref_id": "dc_6e429d67c7b9e925a1b25874e9dcefd9",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-09-02T10:52:21.241413+00:00",
+      "n": 400,
+      "reason": "bounded research 完成:URD FY26 法定揭露觸發既有 claim 升級路徑(statutory filing corroborates)——€1.1B 客戶量承諾+contract liabilities 明細;入圖包 [415] 與 Engine C 觀測 [416] 等核准;客戶具名仍缺,已寫入新 disproof watch 條件",
+      "receipt": "ra:ra_fc05721e4487cd1632865753f00196e7;manual_todo:415,416;raw:library/raw/soitec_urd_fy2026_en.pdf",
+      "ref_id": "dc_6e429d67c7b9e925a1b25874e9dcefd9",
+      "type": "decision_review",
+      "verb": "pq1_awaiting_approval"
     }
   ],
-  "next_n": 415,
+  "next_n": 417,
   "schema_version": "1"
 }
