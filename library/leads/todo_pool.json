@@ -6691,8 +6691,10 @@
       "added_at": "2026-09-01T13:44:29.878804+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_c49ad9a8820654fd8e9cbc9abc660f0e",
+      "dispatch_receipt": "ra:ra_ca043d9a93d842cea6ed5832f82922cd;manual_todo:420,421;raw:library/raw/jlmag_6680_annual_report_2025_hkex.pdf",
       "dispatch_ref": "wo_7b8e7b06c0ff531faa099666bb9b1f53",
-      "dispatch_status": "queued",
+      "dispatch_status": "awaiting_approval",
+      "dispatch_updated_at": "2026-09-02T11:03:17.676302+00:00",
       "dispatched_at": "2026-09-02T07:50:55.422644+00:00",
       "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 398,
@@ -7058,6 +7060,43 @@
       "resolved_at": null,
       "source": "manual",
       "title": "Nabtesco [399] backlog/segment 觀測寫入核准——Q2 FY2026 決算短信精密減速機所屬 segment 受注/残高落 Engine C",
+      "type": "manual"
+    },
+    {
+      "added_at": "2026-09-02T11:03:02.428564+00:00",
+      "graph_impact": "+1 節點、0 邊、1 claims｜來源：JL MAG（發行人法定年報,審計級）（tier 1）",
+      "hint": "核准 exact graph delta；Decision handoff：co:jl_mag。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 420,
+      "reason": null,
+      "ref_id": "ra_ca043d9a93d842cea6ed5832f82922cd",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "JL MAG 人形轉子產品化——2025 年報(HKEX)確認 humanoid robot motor rotors 列為最終產品類別+小批量已交付,客戶結構同步更新",
+      "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-09-02T11:03:02.428564+00:00",
+      "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "n": 421,
+      "reason": null,
+      "ref_id": "dc_b8fb35bfe958d2e6ca4b3f60e623a576",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:proterial：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-02T11:03:16.966962+00:00",
+      "hint": "go＝把以下觀測寫入 Engine C manual ledger(customer_concentration,co:jl_mag)；不含入圖(那是 [420])、不含 thesis mutation。內容(2025 年報 HKEX 2026-03-25,審計級一手,library/raw/jlmag_6680_annual_report_2025_hkex.pdf p.155-156):①最大客戶 14.32% 營收、前五 45.08%(FY2022 對照:12.71%/47.88%,溫和穩定);②最大供應商 69.13% 採購額、前五 80.08%——上游單一來源集中是重大風險屬性;③FY2025 營收 CNY 7.72B(+14.11%)、歸母淨利 CNY 705.6M(+142.44%)",
+      "n": 422,
+      "reason": null,
+      "ref_id": "wo:wo_7b8e7b06c0ff531faa099666bb9b1f53",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "JL MAG [398] customer/supplier concentration 觀測寫入核准——2025 年報審計級數字落 Engine C",
       "type": "manual"
     }
   ],
@@ -15554,8 +15593,26 @@
       "ref_id": "dc_b8fb35bfe958d2e6ca4b3f60e623a576",
       "type": "decision_review",
       "verb": "go"
+    },
+    {
+      "at": "2026-09-02T10:59:26.534006+00:00",
+      "n": 398,
+      "reason": "research-drain 開工",
+      "receipt": "wo:wo_7b8e7b06c0ff531faa099666bb9b1f53",
+      "ref_id": "dc_32872cf6a80c5f273b9b4c55a57ff229",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-09-02T11:03:17.676302+00:00",
+      "n": 398,
+      "reason": "bounded research 完成:2025 年報一手取得——人形轉子產品化+小批量已交付(客戶未具名,self_reported);入圖包 [420] 與觀測提案 [421] 等核准;客戶具名仍是升級目標,disproof 綁 FY2026 年報",
+      "receipt": "ra:ra_ca043d9a93d842cea6ed5832f82922cd;manual_todo:420,421;raw:library/raw/jlmag_6680_annual_report_2025_hkex.pdf",
+      "ref_id": "dc_32872cf6a80c5f273b9b4c55a57ff229",
+      "type": "decision_review",
+      "verb": "pq1_awaiting_approval"
     }
   ],
-  "next_n": 420,
+  "next_n": 423,
   "schema_version": "1"
 }
