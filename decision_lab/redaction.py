@@ -1,42 +1,14 @@
-"""Shared high-confidence secret detection for persisted and rendered payloads。"""
-from __future__ import annotations
+"""⚠ 已搬到 `shared/redaction.py`（2026-09-03，Phase 3 B2）。
 
-import re
-from collections.abc import Mapping, Sequence
-from typing import Any
+**理由：** engine_c.cutover 也要用它——留在 Engine D 會形成 `engine_c → decision_lab` 相依環。
 
+本檔是 **module aliasing shim**，不是複製：`decision_lab.redaction` 與
+`shared.redaction` 是**同一個模組物件**，所以公開與私有名稱、`isinstance` 判定、
+module-level 快取全部一致。用 `from ... import *` 會漏掉私有名稱而產生兩份行為
+（實測：`tests/test_coverage_severity.py` 直接 import `_match` 就炸了）。
+"""
+import sys as _sys
 
-_SENSITIVE_KEY = re.compile(
-    r"password|passwd|token|secret|credential|service.?account|dsn|private.?key"
-    r"|api.?key|access.?key",
-    re.IGNORECASE,
-)
-_SENSITIVE_VALUE = re.compile(
-    r"-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----"
-    r"|\bAuthorization\s*:\s*Bearer\s+\S+"
-    r"|\b(?:postgres(?:ql)?|mysql|mariadb|mongodb(?:\+srv)?)://[^\s:/]+:[^\s/@]+@"
-    r"|\b(?:password|passwd|token|secret|api[_-]?key)\s*[:=]\s*['\"]?[^\s'\"]{8,}",
-    re.IGNORECASE,
-)
+from shared import redaction as _impl
 
-
-def sensitive_payload_path(value: Any, path: str = "root") -> str | None:
-    """Return the first high-confidence secret location, otherwise ``None``。"""
-
-    if isinstance(value, Mapping):
-        for key, child in value.items():
-            child_path = f"{path}.{key}"
-            if _SENSITIVE_KEY.search(str(key)):
-                return child_path
-            found = sensitive_payload_path(child, child_path)
-            if found is not None:
-                return found
-    elif isinstance(value, str):
-        if _SENSITIVE_VALUE.search(value):
-            return path
-    elif isinstance(value, Sequence) and not isinstance(value, bytes):
-        for index, child in enumerate(value):
-            found = sensitive_payload_path(child, f"{path}[{index}]")
-            if found is not None:
-                return found
-    return None
+_sys.modules[__name__] = _impl

@@ -21,6 +21,14 @@ ROOT = Path(__file__).resolve().parents[1]
 #: 新架構的三個 package。
 NEW_LAYERS = ("alpha", "portfolio", "risk")
 
+#: **Engine D 不得 import 的層。**
+#:
+#: ⚠ `risk` **不在列上**，而且那是刻意的：pipeline 是
+#: `alpha → portfolio → risk → Engine D`，Engine D 的職責**就是執行硬上限**，
+#: 所以它消費 `risk/policy.py` 的政策數值是正確方向（下游消費上游）。
+#: 真正不准的是反過來——`risk/` 不得 import `decision_lab`（見下一條測試）。
+FORBIDDEN_FOR_ENGINE_D = ("alpha", "portfolio")
+
 #: 掃描範圍：所有 first-party package（不含 tests 與 .venv）。
 CORE_PACKAGES = (
     "alpha", "portfolio", "risk", "decision_lab", "engine_b", "engine_c",
@@ -169,8 +177,38 @@ def test_cypher_stays_out_of_the_alpha_core() -> None:
 # 2. Engine D 不得反向依賴新層
 # ---------------------------------------------------------------------------
 
-def test_decision_lab_does_not_import_new_layers() -> None:
-    """Engine D 是**下游**：它消費 `AlphaSignal`，不呼叫 Alpha Research。
+#: **搬遷期的 module aliasing shim。** 舊路徑轉發到新家，讓既有 import 不必一次全改。
+#:
+#: ⚠ 這是一份**會縮小的欠債清單**，不是豁免：`test_listed_shims_really_are_shims`
+#: 會驗證每一個列出的檔案**真的只是 shim**（極短、含 aliasing 標記、無業務邏輯），
+#: 所以它不能被拿來藏真正的違規。
+#: **Phase 3 收尾的驗收條件是這個集合變成空的。**
+TRANSITIONAL_SHIMS = frozenset({
+    "decision_lab/beta_policy.py",
+    "decision_lab/beta_monitor.py",
+    "decision_lab/nav_exposure.py",
+    "decision_lab/portfolio_risk.py",
+    "decision_lab/ranking_view.py",
+    "decision_lab/capital_authority.py",
+    "decision_lab/adapters/market.py",
+    "decision_lab/redaction.py",
+    "decision_lab/blockers.py",
+    "decision_lab/blocker_severity.py",
+    "thesis/investment_policy.py",
+})
+
+#: `engine_d_runtime` 是 **composition root**——它的職責就是把各層接起來，
+#: 所以它 import `portfolio`／`alpha` 是**正確方向**（peripheral → core 的組裝端）。
+#: 真正不准的是 `decision_lab/` 的 domain 模組反向依賴新層。
+COMPOSITION_ROOTS = frozenset({
+    "engine_d_runtime/adapters.py",
+    "engine_d_runtime/bootstrap.py",
+    "decision_lab/cli.py",
+})
+
+
+def test_decision_lab_domain_does_not_import_new_layers() -> None:
+    """Engine D 的 **domain 模組**是下游：它消費 `AlphaSignal`，不呼叫 Alpha Research。
 
     Phase 3 的 adapter（`decision_lab/adapters/alpha.py`）只吃已經算好的
     `AlphaSignal` payload，不 import `alpha/`。
@@ -178,10 +216,50 @@ def test_decision_lab_does_not_import_new_layers() -> None:
     offenders: list[str] = []
     for package in ("decision_lab", "engine_d_runtime"):
         for path in _python_files(package):
+            rel = _rel(path)
+            if rel in TRANSITIONAL_SHIMS or rel in COMPOSITION_ROOTS:
+                continue
             for module in _imported_roots(path):
-                if module.split(".")[0] in NEW_LAYERS:
+                if module.split(".")[0] in FORBIDDEN_FOR_ENGINE_D:
+                    offenders.append(f"{rel} → {module}")
+    assert not offenders, (
+        "Engine D 的 domain 模組不得 import alpha／portfolio：\n" + "\n".join(offenders)
+    )
+
+
+def test_upstream_layers_do_not_import_engine_d() -> None:
+    """**方向只准一邊。** `alpha`／`portfolio`／`risk`／`shared` 都在 Engine D 上游。
+
+    它們若 import `decision_lab`，就形成環——而環的實際後果是
+    「Engine C 為了讀一個字彙表而載入整個決策層」
+    （2026-09-03 實測的三條環全是這個形狀）。
+    """
+    offenders: list[str] = []
+    for package in ("alpha", "portfolio", "risk", "shared"):
+        for path in _python_files(package):
+            for module in _imported_roots(path):
+                if module.split(".")[0] in ("decision_lab", "engine_d_runtime"):
                     offenders.append(f"{_rel(path)} → {module}")
-    assert not offenders, "Engine D 不得 import 新層：\n" + "\n".join(offenders)
+    assert not offenders, "上游層不得 import Engine D：\n" + "\n".join(offenders)
+
+
+@pytest.mark.parametrize("rel", sorted(TRANSITIONAL_SHIMS))
+def test_listed_shims_really_are_shims(rel: str) -> None:
+    """**欠債清單不得被拿來藏真正的違規。**
+
+    每個列在 `TRANSITIONAL_SHIMS` 的檔案必須真的只是轉發：
+    極短、含 aliasing 標記、且沒有任何 `def`／`class`。
+    """
+    text = (ROOT / rel).read_text(encoding="utf-8")
+    assert "_sys.modules[__name__] = _impl" in text, f"{rel} 不是 aliasing shim"
+    assert "def " not in text and "class " not in text, f"{rel} 含業務邏輯，不是純轉發"
+    assert len(text.splitlines()) < 25, f"{rel} 太長，可能不只是 shim"
+
+
+def test_shim_list_has_no_stale_entries() -> None:
+    """搬完卻沒從清單移除，下一個人會以為還欠著（「清單會腐壞，判準不會」）。"""
+    stale = {rel for rel in TRANSITIONAL_SHIMS if not (ROOT / rel).exists()}
+    assert not stale, f"shim 已刪除但清單未更新：{sorted(stale)}"
 
 
 # ---------------------------------------------------------------------------

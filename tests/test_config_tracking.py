@@ -135,7 +135,10 @@ def test_every_symbol_cited_in_the_registry_table_still_exists() -> None:
         ("decision_lab/sizing.py", "LEVELS"),
         ("engine_b/leads.py", "ALLOWED_TRANSITIONS"),
         ("decision_lab/workflow.py", "_INTENTS"),
-        ("decision_lab/capital_authority.py", "_ALLOWED_TYPES"),
+        # ⚠ 2026-09-03 Phase 3 搬遷：capital_authority 是 authority 的**讀取器**
+        # 不是擁有者，且有兩個不同層的消費端（portfolio 算可部署現金、
+        # Engine D 資本許可）→ 移至 shared/。字彙內容一字未改。
+        ("shared/capital_authority.py", "_ALLOWED_TYPES"),
         ("engine_c/technical.py", "_METRIC_COLUMNS"),
         ("thesis/evidence_manifest.py", "HIGH_RISK_ATTRIBUTES"),
         ("loader/edge_resolution.py", "ALLOWED_ACTIONS"),

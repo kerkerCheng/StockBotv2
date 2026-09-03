@@ -6,7 +6,7 @@ import re
 from datetime import datetime, timedelta, timezone
 from typing import Any, Mapping, Sequence
 
-from .adapters.market import sessions_between
+from shared.market_normalization import sessions_between
 from .blocker_severity import fatal_blockers
 from .models import research_status_of
 from .redaction import sensitive_payload_path

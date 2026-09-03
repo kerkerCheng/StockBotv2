@@ -11,7 +11,7 @@ from typing import Any, Mapping, Sequence
 
 from identity.authority_tokens import tokens_for_owner
 
-from .adapters.market import normalize_fx_snapshot, normalize_market_snapshot
+from shared.market_normalization import normalize_fx_snapshot, normalize_market_snapshot
 from .adapters.holdings import execution_aliases
 from .identity import resolve_identity
 from .models import ContextBundle

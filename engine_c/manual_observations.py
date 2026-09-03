@@ -8,7 +8,7 @@ import sqlite3
 from datetime import date, datetime, time, timezone
 from typing import Any, Mapping
 
-from decision_lab.redaction import sensitive_payload_path
+from shared.redaction import sensitive_payload_path
 
 _DATE_ONLY = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 

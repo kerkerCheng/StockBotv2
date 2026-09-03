@@ -850,7 +850,7 @@ class DecisionStore:
         """
 
         try:  # lazy import：避免 store 為了一個版本字串而依賴 policy 載入器
-            from thesis.investment_policy import load_policy
+            from risk.policy import load_policy
 
             current_calculator = str(load_policy()["probe_lane"]["calculator_version"])
         except Exception:  # noqa: BLE001 — 取不到版本只降級，不阻斷 brief

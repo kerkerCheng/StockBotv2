@@ -57,11 +57,11 @@ tags:
 | 公司 ID ↔ research／execution 識別 | `config/company_identity.json` | 加一列；`identity/registry.py` 是唯一 loader |
 | 交易所報價單位 → ISO 結算幣別 | `config/currency_units.json` | 只登記 minor unit（GBp／ILA／ZAc…）；ISO code 形式的新幣別（TWD／JPY…）不必登記就自動通過。`identity/currency.py` 是唯一 loader |
 | Engine C 人工觀測欄位 | `config/engine_c_observation_fields.json` | 加一項且 `gate_member` 必須為 false；`engine_c/observation_fields.py` 是唯一 loader |
-| Blocker 說明與分類 | `config/decision_blockers.json` | 加 exact code 或 prefix；`decision_lab/blockers.py` 是唯一 loader |
+| Blocker 說明與分類 | `config/decision_blockers.json` | 加 exact code 或 prefix；`shared/blockers.py` 是唯一 loader |
 | Authority token（證據來自哪個引擎、哪個軸能引用） | `config/authority_tokens.json` | 加一項並指定 `owner`；`identity/authority_tokens.py` 是唯一 loader，Engine C 與 Decision Lab 共用 |
 | Engine B lead `refs` 鍵名 | `config/lead_ref_keys.json` | 加一項並說明用途與 value type；`engine_b/lead_refs.py` 是唯一 loader，`annotate`／`advance` 拒絕未登記鍵 |
 | 投資／beta 政策數值、持股覆蓋分類、daily routine 參數、信號來源 | `config/investment_policy.json`、`config/beta_policy.json`、`config/holdings_coverage.json`、`config/daily_routine.json`、`config/signal_sources.json` | 各自為該領域的 numeric／設定 SSOT。⚠ `config/signal_sources.json` 指的是 **Engine B 的 lead 來源登記**，與已移除的 beta 技術訊號無關，不要因為名字有 signal 就以為它也該拔 |
-| Beta sleeve 目標配置比例 | `config/target_allocation.json` | 加／改一個 sleeve 的 `target`／`band`；`decision_lab/beta_policy.py` 是唯一 loader。⚠ 它是**錨點不是 gate**：`band` 只是容忍區間，不歸零任何東西、不產生部位尺寸；真實風控仍只在 `config/beta_policy.json`（槓桿 cap）與 `config/investment_policy.json`（5% 單筆上限）。查證：`python -c "import json;d=json.load(open('config/target_allocation.json'));print(d['basis'], sorted(d['sleeves']))"` |
+| Beta sleeve 目標配置比例 | `config/target_allocation.json` | 加／改一個 sleeve 的 `target`／`band`；`portfolio/policy.py` 是唯一 loader。⚠ 它是**錨點不是 gate**：`band` 只是容忍區間，不歸零任何東西、不產生部位尺寸；真實風控仍只在 `config/beta_policy.json`（槓桿 cap）與 `config/investment_policy.json`（5% 單筆上限）。查證：`python -c "import json;d=json.load(open('config/target_allocation.json'));print(d['basis'], sorted(d['sleeves']))"` |
 
 > ⚠ `config/*.json` 在 `.gitignore` 中**預設被忽略**（該目錄放 Google service account 憑證），靠白名單開例外。新增 config 檔一定要補 `!config/<name>.json`，否則 fresh clone 與另一個 agent 會缺檔而整個功能靜默失效——本機因為檔案在，測試還會全綠。2026-07-30 一天內踩到兩次。`tests/test_config_tracking.py` 是這道剎車。
 
@@ -76,7 +76,7 @@ tags:
 | thesis 生命週期狀態機 | `thesis/pending_lifecycle.py` 的 `ALLOWED_TRANSITIONS` | L7 的語意骨架；`retired` 刻意是終局。開啟它等於改變 thesis 的意義，不是補字彙 |
 | 執行 intent | `decision_lab/workflow.py` 的 `_INTENTS`（research／paper／live） | 資本邊界 |
 | 使用者動詞 | `engine_b/todo.py` 的 `VERBS`（`engine_b/batch.py` 另有一份含 `skip`） | 對話介面契約 |
-| 資本 authority record 類型 | `decision_lab/capital_authority.py` 的 `_ALLOWED_TYPES` | 2026-07-30 定案只保留 cash_floor 與 credit_facility |
+| 資本 authority record 類型 | `shared/capital_authority.py` 的 `_ALLOWED_TYPES` | 2026-07-30 定案只保留 cash_floor 與 credit_facility |
 
 ### 會再咬人（是 taxonomy，但目前寫死在 Python）
 
@@ -92,9 +92,9 @@ tags:
 
 | 字彙 | 原位置 | 移除日期／commit | 為什麼 |
 |---|---|---|---|
-| Beta 三態系統動作 `CONTRIBUTE REVIEW`／`HOLD`／`PAUSE CONTRIBUTION` | `decision_lab/beta_monitor.py` | 2026-08-29 `6aa31de` | beta 不再回答「今天該不該投」，只回答距目標多遠與在什麼水位 |
+| Beta 三態系統動作 `CONTRIBUTE REVIEW`／`HOLD`／`PAUSE CONTRIBUTION` | `portfolio/allocation.py` | 2026-08-29 `6aa31de` | beta 不再回答「今天該不該投」，只回答距目標多遠與在什麼水位 |
 | `signal` 整區：`tiers`（含 `rsi_at_most` 45／40／35）、`baseline_pace`、`allowed_paces`、`repeat_after_sessions`、`stretched_above_sma200` | `config/beta_policy.json` | 2026-08-29 `6aa31de` | 2026-08-01 三次回測 0 勝 3 敗（見 `AGENTS.md`「技術訊號的地位」）。拔的是**已被量測為有害**的東西，不是精簡 |
-| `campaign_budget_fraction_by_sleeve` 與「本輪可評估上限」概念 | `config/beta_policy.json`、`decision_lab/beta_monitor.py` | 2026-08-29 `6aa31de` | `self_funded_supported_range` 已重新定義為可部署現金本身，不再乘 pace |
+| `campaign_budget_fraction_by_sleeve` 與「本輪可評估上限」概念 | `config/beta_policy.json`、`portfolio/allocation.py` | 2026-08-29 `6aa31de` | `self_funded_supported_range` 已重新定義為可部署現金本身，不再乘 pace |
 | RSI／MACD／`sma_50_slope` | `engine_c/technical.py` 的 `_METRIC_COLUMNS` | 2026-08-29 `6aa31de` | 從計算與寫入徹底移出，不是只停止顯示 |
 
 ⚠ **這一區與「可自由擴充」的差別是方向性的：** 上面那些不是「暫時沒用到」，是**測過而且輸了**。
@@ -125,3 +125,18 @@ tags:
 - 判準源頭：AGENTS.md 的 L2（不要在動工前追求完美 schema：表的形狀鎖死、字彙留鬆）與 L4（屬性歸位三分）
 - [`knowledge-graph-data-quality-and-engine-c-join-key.md`](knowledge-graph-data-quality-and-engine-c-join-key.md)：Engine A→C join key 為何必須是靜態 registry
 - [`engine-d-content-addressed-decision-context.md`](engine-d-content-addressed-decision-context.md)：為何評分骨架不能熱改
+
+---
+
+## ⚠ 2026-09-03 路徑更新（Phase 3 搬遷）
+
+本表的 loader 路徑已隨 Alpha Research Refactor 的 Phase 3 更新。**字彙內容與擴充判準一字未改**，只有檔案位置變了：
+
+- `decision_lab/capital_authority.py → shared/capital_authority.py`
+- `decision_lab/blockers.py → shared/blockers.py`
+- `decision_lab/beta_policy.py → portfolio/policy.py`
+- `decision_lab/beta_monitor.py → portfolio/allocation.py`
+
+搬遷理由是斷相依環（實測 `decision_lab` 涉及的環 3 → 1）。舊路徑留有 module aliasing shim，所以既有 import 仍可用；shim 清單與「它真的只是 shim」的驗證見 `tests/test_layer_separation.py::TRANSITIONAL_SHIMS`。
+
+⚠ **這張表會過期，而 `tests/test_config_tracking.py` 是它的剎車**——本次搬遷正是被那兩條斷言抓到的（登記表指向已不存在的符號）。

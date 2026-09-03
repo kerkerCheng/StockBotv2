@@ -10,7 +10,7 @@ from typing import Any, Mapping
 from urllib.parse import urlparse
 
 from identity.registry import get_registry
-from thesis.investment_policy import load_policy
+from risk.policy import load_policy
 
 from .action_card import assert_safe_payload, build_action_card, markdown_text, render_markdown
 from .context import build_context_bundle, holdings_snapshot_digest

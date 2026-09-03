@@ -17,7 +17,7 @@ except ImportError:
 if str(Path(__file__).resolve().parents[1]) not in sys.path:
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from decision_lab.beta_policy import load_beta_policy, unique_technical_targets
+from portfolio.policy import load_beta_policy, unique_technical_targets
 from engine_c.db import DB_TYPE, get_conn
 from engine_c.technical import (
     append_technical_observation,

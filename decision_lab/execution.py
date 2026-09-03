@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 from typing import Any, Mapping
 
 from identity.registry import IdentityRegistry, get_registry
-from thesis.investment_policy import load_policy, validate_policy
+from risk.policy import load_policy, validate_policy
 
 from .models import (
     ContextBundle,

@@ -15,7 +15,7 @@ import math
 from typing import Any, Mapping, Sequence
 
 from identity.registry import IdentityRegistry, get_registry
-from thesis.investment_policy import PolicyError, load_policy, validate_policy
+from risk.policy import PolicyError, load_policy, validate_policy
 
 from .beta_policy import load_beta_policy
 from .blocker_severity import fatal_blockers

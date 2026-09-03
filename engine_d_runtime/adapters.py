@@ -53,7 +53,7 @@ def fetch_nav_exposure(
     ⚠ 用 raw 層的 `fetch_portfolio`，不是 `current_holdings` 的正規化輸出——正規化
     只拿 `bucket` 判斷是否為現金列，判完就丟掉，而 bucket 分布正是 NAV 呈現要的東西。
     """
-    from decision_lab.nav_exposure import build_nav_exposure
+    from portfolio.exposure import build_nav_exposure
 
     fetcher = holdings_fetcher or _fetch_operational_portfolio
     try:
@@ -180,7 +180,7 @@ def fetch_ranking_view(
 
     import os
 
-    from decision_lab.ranking_view import build_ranking_view
+    from alpha.ranking import build_ranking_view
     from query.bottleneck import fetch_assertions, rank_bottlenecks
 
     password = os.environ.get("NEO4J_PASSWORD")
@@ -238,7 +238,8 @@ def counter_path_relations() -> frozenset[str]:
 
 # Sheet 的現金列標籤（大小寫與中英文皆可）。現金是 NAV 的一部分，但不是
 # 可對應到 company／factor 的持股。
-_CASH_BUCKET_LABELS = frozenset({"cash", "現金"})
+# ⚠ 字彙已搬到 `shared/buckets.py`（跨層共用）；此處保留別名供既有消費端使用。
+from shared.buckets import CASH_BUCKET_LABELS as _CASH_BUCKET_LABELS  # noqa: E402
 
 
 _EXACT_COMPANY_QUERY = """

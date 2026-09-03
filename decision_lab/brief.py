@@ -663,7 +663,7 @@ def _alpha_position_events(
     if not callable(positions_fn):
         return None
     try:
-        from thesis.investment_policy import load_policy
+        from risk.policy import load_policy
 
         from .alpha_event_monitor import alpha_event_search_requests, fetch_close_series
 
