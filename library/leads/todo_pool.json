@@ -7792,6 +7792,19 @@
       "source": "research_action",
       "title": "[448] 磁材叢集第一包——人形致動器 depends_on 稀土磁石定 sub=4;Niron 官方現況錨定:商業化首發是喇叭,馬達方案仍在開發",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-09-03T01:15:49.631976+00:00",
+      "graph_impact": "+2 節點、1 邊、1 claims｜來源：Impact Lab（轉載 Fast Company 記者報導,含 Morgan Stanley 2025-02 報告轉述與具名引述）（tier 3）",
+      "hint": "核准 exact graph delta；Decision handoff：co:ewellix。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 465,
+      "reason": null,
+      "ref_id": "ra_f1e264bf9bab99798f5fe6a33bd2b965",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "[448] 致動器叢集第一包——Ewellix→行星滾柱絲槓定 sub=4;第三方錨:Tesla 小腿×4/MS 判多數/單支 $1,350-2,700/BOM 33%/『供應鏈尚不存在』",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -17039,6 +17052,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 465,
+  "next_n": 466,
   "schema_version": "1"
 }

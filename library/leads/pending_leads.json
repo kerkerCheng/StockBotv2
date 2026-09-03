@@ -32332,9 +32332,13 @@
       "first_seen": "2026-09-03T00:20:02.658285+00:00",
       "lead_id": "lead_86709ede2c19f3b0bcbaba2317325971",
       "published_at": null,
-      "refs": {},
+      "refs": {
+        "outcome": "第一包=Ewellix 滾柱絲槓邊 sub=4;FT 感測器邊(Novanta,既有評估低替代難度)與 tech 層邊留後續包",
+        "research_action_id": "ra_f1e264bf9bab99798f5fe6a33bd2b965",
+        "trace_status": "partial"
+      },
       "source": "sub-backfill-448-2026-09-03",
-      "status": "triaged_go",
+      "status": "action_prepared",
       "themes": {
         "robotics": {
           "counter_only": false,
