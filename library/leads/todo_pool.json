@@ -7686,10 +7686,11 @@
       "added_at": "2026-09-03T00:04:57.038361+00:00",
       "hint": "go＝執行兩項圖維護(L10 正確性優先,先 Neo4j dump 備份):①tech:nand_technology 併入 tech:nand_flash——兩者 aliases 完全同集(NAND/Flash memory),各 1 邊 1 來源,遷移 nand_technology 的 edge assertion+source_ids 後刪除節點,alias 補 NAND fab;②tech:in_package_optical_io(零邊零來源孤兒,alias 含 chip-to-chip optical interconnect)吸收進 tech:chip_to_chip_optical——alias 遷移後刪除;③tech:scale_up_cpo vs tech:scale_up_network 確認不併——[451] claim 已確立為同一功能層的兩條技術路線(CPO vs OCS),誤併會抹掉這個區分。不含其他節點變更",
       "n": 456,
-      "reason": null,
+      "reason": "使用者指示做到底;備份後執行:nand_technology 併入 nand_flash(邊重指 edge:9a13e50f...+assertion 更新+aliases/來源合併+刪節點);in_package_optical_io 孤兒吸收進 chip_to_chip_optical;scale_up 對確認不動;覆蓋掃描 🔴 11→5",
+      "receipt": "authority:graph_maintenance;ref:backup_20260903T013247Z",
       "ref_id": "lead:lead_a5e0447bc74691a10b93a1e4dc1ff4b2",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-03T01:34:58.038573+00:00",
       "source": "manual",
       "title": "同義節點合併執行核准——nand 對合併+optical_io 孤兒吸收;scale_up 對確認不併(proposal 完成)",
       "type": "manual"
@@ -7769,42 +7770,90 @@
     },
     {
       "added_at": "2026-09-03T00:38:26.825587+00:00",
+      "completion_authority": {
+        "action_digest": "e8542622aaad24edbaa0cdebab04a71b3cb840b80e965ecd83792171b8c07959",
+        "cohort_id": "dc_cc46527aac12ba14191ee71c0460f3fe",
+        "commit": "70f4c7838cccea039447371b58323b7d5bcde7ae",
+        "company_id": "co:harmonic_drive_systems",
+        "verified_at": "2026-09-03T01:33:37.884030+00:00"
+      },
       "graph_impact": "+4 節點、2 邊、2 claims｜來源：Harmonic Drive Systems（供應商官方產品頁）（tier 2）、Nabtesco（供應商官方產品頁,市占為自估）（tier 2）",
       "hint": "核准 exact graph delta；Decision handoff：co:harmonic_drive_systems。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 463,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_7eb8ecdeed0759ef1af5bf5f924dd372;digest:e8542622aaad24edbaa0cdebab04a71b3cb840b80e965ecd83792171b8c07959;commit:70f4c7838cccea039447371b58323b7d5bcde7ae;cohort:dc_cc46527aac12ba14191ee71c0460f3fe",
       "ref_id": "ra_7eb8ecdeed0759ef1af5bf5f924dd372",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-03T01:33:37.884030+00:00",
       "source": "research_action",
       "title": "[448] 減速器叢集 sub 補值(第一包)——HDS→諧波與 Nabtesco→RV 兩條邊定 sub=4,論證:在位高市占+合格週期摩擦 vs 挑戰者已量產",
       "type": "ra_admission"
     },
     {
       "added_at": "2026-09-03T00:57:29.159372+00:00",
+      "completion_authority": {
+        "action_digest": "310fb946ff4e3cdc7f52478bef3e0505af0cd2d592a9f5cedabeccab03d450e3",
+        "cohort_id": "dc_d940b7dc21e559ead10c75eb1f74db7a",
+        "commit": "c44584431fc9c5c76720f008b8fd6a51dd9eb753",
+        "company_id": "co:niron_magnetics",
+        "verified_at": "2026-09-03T01:33:39.353244+00:00"
+      },
       "graph_impact": "+2 節點、1 邊、1 claims｜來源：Niron Magnetics（替代磁材開發商官方新聞頁）（tier 2）",
       "hint": "核准 exact graph delta；Decision handoff：co:niron_magnetics。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 464,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_44e0a3b539bafe0b3da2d6841df64212;digest:310fb946ff4e3cdc7f52478bef3e0505af0cd2d592a9f5cedabeccab03d450e3;commit:c44584431fc9c5c76720f008b8fd6a51dd9eb753;cohort:dc_d940b7dc21e559ead10c75eb1f74db7a",
       "ref_id": "ra_44e0a3b539bafe0b3da2d6841df64212",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-03T01:33:39.353244+00:00",
       "source": "research_action",
       "title": "[448] 磁材叢集第一包——人形致動器 depends_on 稀土磁石定 sub=4;Niron 官方現況錨定:商業化首發是喇叭,馬達方案仍在開發",
       "type": "ra_admission"
     },
     {
       "added_at": "2026-09-03T01:15:49.631976+00:00",
+      "completion_authority": {
+        "action_digest": "c608edeace0439d3f425f26749f1980de6d552f3eff29101ca6dd3d1684212ac",
+        "cohort_id": "dc_f18630675b314a83fcbc871290d5d8c3",
+        "commit": "4266c42141a707d2126fa6853b95e86da82e1f8b",
+        "company_id": "co:ewellix",
+        "verified_at": "2026-09-03T01:33:44.298613+00:00"
+      },
       "graph_impact": "+2 節點、1 邊、1 claims｜來源：Impact Lab（轉載 Fast Company 記者報導,含 Morgan Stanley 2025-02 報告轉述與具名引述）（tier 3）",
       "hint": "核准 exact graph delta；Decision handoff：co:ewellix。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 465,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_f1e264bf9bab99798f5fe6a33bd2b965;digest:c608edeace0439d3f425f26749f1980de6d552f3eff29101ca6dd3d1684212ac;commit:4266c42141a707d2126fa6853b95e86da82e1f8b;cohort:dc_f18630675b314a83fcbc871290d5d8c3",
       "ref_id": "ra_f1e264bf9bab99798f5fe6a33bd2b965",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-03T01:33:44.298613+00:00",
       "source": "research_action",
       "title": "[448] 致動器叢集第一包——Ewellix→行星滾柱絲槓定 sub=4;第三方錨:Tesla 小腿×4/MS 判多數/單支 $1,350-2,700/BOM 33%/『供應鏈尚不存在』",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-09-03T01:36:00.085206+00:00",
+      "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "n": 466,
+      "reason": null,
+      "ref_id": "dc_d940b7dc21e559ead10c75eb1f74db7a",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:niron_magnetics：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-03T01:36:00.085206+00:00",
+      "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "n": 467,
+      "reason": null,
+      "ref_id": "dc_f18630675b314a83fcbc871290d5d8c3",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:ewellix：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
     }
   ],
   "log": [
@@ -17050,8 +17099,44 @@
       "ref_id": "dc_912a03a50135ea5e29000a0417c3f477",
       "type": "decision_review",
       "verb": "go"
+    },
+    {
+      "at": "2026-09-03T01:33:37.884030+00:00",
+      "n": 463,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_7eb8ecdeed0759ef1af5bf5f924dd372;digest:e8542622aaad24edbaa0cdebab04a71b3cb840b80e965ecd83792171b8c07959;commit:70f4c7838cccea039447371b58323b7d5bcde7ae;cohort:dc_cc46527aac12ba14191ee71c0460f3fe",
+      "ref_id": "ra_7eb8ecdeed0759ef1af5bf5f924dd372",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-03T01:33:39.353244+00:00",
+      "n": 464,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_44e0a3b539bafe0b3da2d6841df64212;digest:310fb946ff4e3cdc7f52478bef3e0505af0cd2d592a9f5cedabeccab03d450e3;commit:c44584431fc9c5c76720f008b8fd6a51dd9eb753;cohort:dc_d940b7dc21e559ead10c75eb1f74db7a",
+      "ref_id": "ra_44e0a3b539bafe0b3da2d6841df64212",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-03T01:33:44.298613+00:00",
+      "n": 465,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_f1e264bf9bab99798f5fe6a33bd2b965;digest:c608edeace0439d3f425f26749f1980de6d552f3eff29101ca6dd3d1684212ac;commit:4266c42141a707d2126fa6853b95e86da82e1f8b;cohort:dc_f18630675b314a83fcbc871290d5d8c3",
+      "ref_id": "ra_f1e264bf9bab99798f5fe6a33bd2b965",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-03T01:34:58.038573+00:00",
+      "n": 456,
+      "reason": "使用者指示做到底;備份後執行:nand_technology 併入 nand_flash(邊重指 edge:9a13e50f...+assertion 更新+aliases/來源合併+刪節點);in_package_optical_io 孤兒吸收進 chip_to_chip_optical;scale_up 對確認不動;覆蓋掃描 🔴 11→5",
+      "receipt": "authority:graph_maintenance;ref:backup_20260903T013247Z",
+      "ref_id": "lead:lead_a5e0447bc74691a10b93a1e4dc1ff4b2",
+      "type": "manual",
+      "verb": "go"
     }
   ],
-  "next_n": 466,
+  "next_n": 468,
   "schema_version": "1"
 }
