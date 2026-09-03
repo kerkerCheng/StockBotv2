@@ -69,16 +69,17 @@ Outcome Learning ──────────────────▶ 回�
 
 沿用 repo 既有的**平面 top-level package** 慣例，不引入 `stockbot/` namespace。
 
-> **⚠ 這是一個刻意的取捨，一行可改。** prompt §18 的範例是
-> `python -m stockbot.alpha research ASML`。改成 `stockbot/` 需要搬動全部 15 個
+> **✅ 2026-09-03 使用者定案：平面 `alpha/`。** prompt §18 的範例原本是
+> `python -m stockbot.alpha research ASML`；改成 `stockbot/` 需要搬動全部 15 個
 > top-level package，屬 §20 明令禁止的「為了整理目錄做沒有價值的大 rename」，
 > 而且會改變 `.codex/rules/stockbot-automations.rules` 裡 **16 條 exact command prefix**
-> 的字串——那會**靜默打斷 daily 排程**。因此 MVP 命令定為：
+> 的字串——那會**靜默打斷 daily 排程**。MVP 命令因此是：
 > ```
-> python -m alpha research ASML --as-of 2026-06-30
+> python -m alpha research COHR --as-of 2026-06-30
 > ```
-> 若使用者仍要 `stockbot.alpha`，Phase 1 加一個 `stockbot/` shim package 即可，
-> 但 daily 的 16 條 rule 必須同時走 sandbox impact review。
+> ⚠ **首條 vertical slice 用 COHR 而不是 prompt 範例的 ASML**（2026-09-03 使用者定案）：
+> 實測 ASML **不在 registry 的 100 家裡、也不在圖中**，要先走完整 onboard 才跑得動——
+> 那會讓第一條切片同時測試 onboard 與新架構兩件事，出問題時分不清是哪一邊。
 
 ```
 alpha/                          ← 新增。Alpha Research Core
@@ -285,16 +286,21 @@ class AlphaSignal:
     company_id: str | None
     as_of: date
 
-    # ── 綜合
-    value: float                        # -1..1，方向與強度。**不是部位大小**
-    confidence: float                   # 0..1
-
     # ── 五個成分（prompt §6 的五問，各自可 explain）
-    structural_score: float             # Q1 Structural Scarcity
-    value_capture_score: float          # Q2 Economic Value Capture
-    earnings_exposure_score: float      # Q3 Earnings / FCF Exposure
-    expectation_gap_score: float        # Q4 Expectation Gap
-    catalyst_score: float               # Q5 Catalyst
+    # ⚠ 每個 score 都是 `Score | None`；`None` = 不知道，`0.0` = 我判斷它很弱。
+    # 每個 Score 內含 declared 與 effective 兩個值（F-25，見 phase-1-plan §2.1b）。
+    structural_score: Score | None       # Q1 Structural Scarcity
+    value_capture_score: Score | None    # Q2 Economic Value Capture
+    earnings_exposure_score: Score | None  # Q3 Earnings / FCF Exposure
+    expectation_gap_score: Score | None  # Q4 Expectation Gap
+    catalyst_score: Score | None         # Q5 Catalyst
+
+    direction: Literal["long", "short", "neutral"]
+    confidence: float                    # 0..1
+
+    # ⚠ v1 刻意**沒有** scalar `value` / `alpha` 欄位。理由見下方硬規則 4。
+    # 排序由 ordering_key() 以 deterministic 字典序產生，不做加權總分。
+    def ordering_key(self) -> tuple: ...
 
     expected_horizon: str               # 例 "2-4 quarters"
 
@@ -326,12 +332,70 @@ class AlphaSignal:
 3. **每個 `*_score` 都必須在 `model_components` 有對應 trace**，trace 裡列出
    輸入值、`EvidenceRef` 與規則版本。**算不出來就是 `None`，不是 0.0**——
    0.0 是「我判斷它很弱」，`None` 是「我不知道」，兩者混用就是 L12。
-4. **`value` 不是由五個分數固定加權而來。** 加權是未經量測的機制（L14）。
-   Phase 2 先用最保守的形式：**`value` 由 deterministic 規則從五個分數導出，
-   規則寫成一個具名的 `CompositionRule` 並版本化**，且第一版就要能回答
-   「換掉這條規則，現有 N 筆 signal 有幾筆排序會變」。
+4. **v1 不產生 scalar `value` / `alpha`（2026-09-03 使用者定案）。**
+   ⚠ **這一條刻意偏離原 prompt §18 的 MVP 範例輸出 `"alpha": 0.42`**，理由是本 repo 的實測：
+   2026-08-21 pq1 排序用加權總分，`tier 4.0 + holdings 4.0 + thesis 4.0 = 12.0`——
+   **三個各自成立的弱理由相加，就壓過了一則講「誰掏 122 億綁誰」的資本承諾事件**，
+   於是每日 5 個 slot 有 3 個排的是 7 週前、公司已明文降範圍的 Form 4。
+   改成 **LLM 做封閉字彙分類 ＋ 程式做字典序**之後，「只是信心／無內容」由 3 → 0、
+   前 20 名 Form 4 由 16 → 0。**字典序結構上沒有補償性，加權總分結構上有。**
+   五個 score 有完全相同的形狀，所以套用同一個結論。
+   - **排序：** `ordering_key()` 回傳 tuple，第一鍵是**最弱的那個 score**
+     （同 `weakest_axis` 的形狀），其後依 Q4 → Q1 → Q5 → Q2 → Q3。
+     排序鍵順序本身是一個可版本化、可否證的決定，寫成具名 `OrderingRule`。
+   - **重開條件：** 若日後仍要 scalar，必須先能回答「換掉組合規則，現有 N 筆 signal
+     有幾筆排序會變」，並通過 L14 的三個免 outcome 測試。
+   - **`test_alpha_signal_has_no_composite_scalar`** 守住這條（掃欄位名，
+     出現 `value`／`alpha`／`score`（單數總分）即失敗）。
 5. **`expectation_gap_score` 不得由低本益比直接得出**（§20 明令）。
    它必須是 `internal_implied_fundamentals` 與 `market_implied_fundamentals` 的**差**。
+6. **`None` 不是 0。** `None`＝不知道（該 score 算不出來），`0.0`＝我判斷它很弱。
+   `ordering_key()` 對 `None` 的處理必須顯性（排最後，且該 signal 標為 `incomplete`），
+   不得把 `None` 當 0 參與比較。
+
+---
+
+### 5.1 v1 的 MVP 輸出形狀（取代 prompt §18 的範例）
+
+```jsonc
+{
+  "ticker": "COHR",
+  "company_id": "co:coherent",
+  "as_of": "2026-06-30",
+  "direction": "long",
+  "confidence": 0.78,
+
+  // 五個 score，各自 declared / effective 分開，各自可 explain
+  "scores": {
+    "structural":        { "declared": 0.94, "effective": 0.94, "trace": "ct_a1b2" },
+    "value_capture":     { "declared": 0.82, "effective": 0.82, "trace": "ct_c3d4" },
+    "earnings_exposure": { "declared": 0.79, "effective": 0.41, "trace": "ct_e5f6",
+                           "downgrade_reason": "segment_revenue_missing" },
+    "expectation_gap":   null,        // ← 不知道，不是 0
+    "catalyst":          { "declared": 0.55, "effective": 0.55, "trace": "ct_g7h8" }
+  },
+  "weakest": "expectation_gap",       // ← 排序第一鍵，也是「該補什麼」
+  "research_status": "incomplete",    // 有 None score
+
+  "thesis": "...",
+  "variant_view": "市場隱含 X／本 thesis 認為 Y／催化劑 Z",
+  "bull_case": "...", "base_case": "...", "bear_case": "...",
+  "catalysts": [...], "risks": [...],
+  "disproof_conditions": [
+    { "condition": "...", "check_frequency": "quarterly",
+      "action_within_48h": "..." }          // ← L7 三件套，缺一即 raise
+  ],
+  "evidence_refs": [...],
+  "model_components": { "ct_a1b2": { "inputs": {...}, "rule_version": "...",
+                                     "evidence_refs": [...] } },
+  "research_context_digest": "sha256:...",
+  "metadata": { "model": "...", "prompt_version": "...", "ordering_rule": "v1" }
+}
+```
+
+**⚠ 沒有 `"alpha": 0.42` 這一欄。** `weakest` ＋ 五個 score 就是排序資訊；
+`ordering_key()` 由它們產生 deterministic 的序。
+**每個值都可 explain**——`trace` 指向 `model_components` 裡的推導過程與 `EvidenceRef`。
 
 ---
 
@@ -495,6 +559,7 @@ class CompanyImpact:
 | **Point-in-time** | `as_of` 模式下不得回傳 `published_at > as_of` 的證據 | **7/5 才發布的 filing 不得出現在 6/30 的 `ResearchContext`** |
 | **Anti-lookahead** | `as_of` 未實作時必須 `raise PointInTimeUnsupported`，不得靜默回當前資料 | 這條比上一條更早需要（L13） |
 | **AlphaSignal schema** | 必填欄位、`disproof_conditions` 非空、無 position 欄位 | 掃輸出 key，出現 `weight`/`shares`/`nav` 即失敗（同 `test_nav_exposure` 的禁用字手法） |
+| **無加權總分** | `AlphaSignal` 沒有 scalar `value`／`alpha`；排序由 `ordering_key()` 的字典序產生 | 加一個 `value: float` 欄位 → 必須紅（§5 硬規則 4） |
 | **Earnings sensitivity** | 敏感度計算對已知輸入給出已知輸出 | 手算對照 |
 | **Expectation gap** | 低 P/E 不得單獨產生高 gap 分數 | 造一個低 P/E ＋ 共識與 thesis 一致的案例 → gap ≈ 0 |
 | **Causal path** | `confidence` 取最弱段而非平均 | 三強一弱的路徑 → confidence == 弱段 |

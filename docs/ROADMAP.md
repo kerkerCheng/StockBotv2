@@ -56,15 +56,15 @@ engine｜**Engine D** ＝capital permission 與 accountability。
 
 | Phase | Goal | Deliverables | Exit criteria（哪個數字會變） | Dependencies |
 |---|---|---|---|---|
-| **0** ✅ | Architecture inventory | 五份 `docs/refactor/*.md` ＋ 舊 roadmap 封存 | 五份文件邏輯一致；舊 roadmap 每個標題都有去向判定 | — |
-| **1** | Alpha contracts | `alpha/{contracts,causal,provider,errors,testing}.py`；5 個測試檔 | `alpha/` 零外部相依；≥12 條新斷言且每條做過「故意違規→確認會紅」；**既有 package 變更 0 行** | Phase 0 |
-| **1.5** | Portfolio/Risk 搬家（`engine-d-decomposition` B1） | `portfolio/`、`risk/` | `decision_lab/` −2,054 行；`engine_c → decision_lab` 相依環消失；全套測試綠 | Phase 1（為了乾淨的 before/after） |
-| **2** | First research vertical slice | B4：concrete `GraphResearchProvider`、LLM assessor、`python -m alpha research <TICKER>` | ①每個 score 都能 explain 到 `EvidenceRef`；②圖零新增節點；③與 `rank_bottlenecks` 首選一致或能說明差異 | Phase 1 |
-| **3** | Engine D decomposition | B2／B3／B5／B6：shared infra 升格、alpha 模組搬入、`sizing` 切三段、`brief` 拆四 pane | `decision_lab/` 13,502 → **≤8,000 行**；直接相依環 **3 → 0**（`engine_d_runtime`／`thesis`／`engine_c`）；daily 輸出 **bytes 下降且 pq2 項目數不減**（baseline 2026-09-02＝24,195 bytes） | Phase 2 |
+| **0** ✅ | Architecture inventory ＋ AGENTS 分類 ＋ MCP 降級 ＋ 歷史事故矩陣 | 六份 `docs/refactor/*.md` ＋ 舊 roadmap 封存 | 六份文件邏輯一致；舊 roadmap 22 個標題都有去向判定；36 筆事故已分類 | — |
+| **1** | Alpha contracts ＋ 三個防事故型別 ＋ audit 骨架 ＋ golden fixtures | `alpha/{contracts,causal,provider,errors,identity,testing}.py`＋`alpha/audit/`；5 個測試檔；`tests/fixtures/golden/` 14 類 | `alpha/` 零外部相依；**≥17 條新斷言且每條做過「故意違規→確認會紅」**；**既有 package 變更 0 行**；F-20／F-25／F-31 三個 🔴 歸零 | Phase 0 |
+| **2** | First research vertical slice（**標的＝COHR**） | B4：concrete `GraphResearchProvider`、LLM assessor、`python -m alpha research COHR --as-of ...` | ①每個 score 都能 explain 到 `EvidenceRef`；②圖零新增節點；③與 `rank_bottlenecks` 首選一致或能說明差異 | Phase 1 |
+| **3** | Engine D decomposition ＋ `mcp_server` domain 抽出 | B2／B3／B5／B6：shared infra 升格、alpha 模組搬入、`sizing` 切三段、`brief` 拆四 pane；core → `mcp_server` import 5 → 0 | `decision_lab/` 13,502 → **≤8,000 行**；直接相依環 **3 → 0**（`engine_d_runtime`／`thesis`／`engine_c`）；daily 輸出 **bytes 下降且 pq2 項目數不減**（baseline 2026-09-02＝24,195 bytes） | Phase 2 |
+| **3.5** | Portfolio / Risk 搬家（B1） | `portfolio/`、`risk/` | `decision_lab/` −2,054 行；`engine_c → decision_lab` 環消失；三個硬擋逐筆一致 | Phase 2 |
 | **4** | Expectation Gap | Engine C 欄位擴充（forwardEps／revenue estimate／segment revenue）、peer registry、implied fundamentals | `expectation_gap_score` 對 **≥5 檔**可算出且可 explain；低 P/E 但共識與 thesis 一致的案例 gap ≈ 0 | Phase 2 |
 | **5** | Causal propagation | `StructuralEvent` → `CausalPath` → `CompanyImpact` | 對 **≥1 個真實事件**產出 **≥1 個**二階受益／受害者，路徑可追溯到 `EvidenceRef` | Phase 2 |
 | **6** | Backtest / validation | as-of 圖投影、anti-lookahead 測試、epoch 錨點 | SourceDoc `published_at` 覆蓋 **83% → 100%**；EdgeAssertion 可定日比例 **58% → ≥95%**；排序前段 vs 後段等權報酬差有 **≥2 期** | Phase 4、5 |
-| **7** | Portfolio / Risk 完整化 | view → target exposure → hard limits | 三個硬擋行為與現況**逐筆一致**（characterization 測試）；**不新增任何 alpha 尺寸** | Phase 1.5、2 |
+| **7** | Portfolio / Risk 完整化 | view → target exposure → hard limits | **不新增任何 alpha 尺寸**；target exposure 可由 `AlphaSignal[]` 導出 | Phase 3.5 |
 | **8** | Automation / productization | daily／weekly／skills／MCP 適配 | 16 條 sandbox rule 完成 impact review；`sync_agent_skills.py --check` 無漂移；daily 端到端綠 | Phase 3 |
 
 ## 每個 Phase 的 completion gate（八項，缺一不得宣稱完成）

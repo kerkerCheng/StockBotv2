@@ -78,7 +78,9 @@ alpha/
 | `Catalyst` | contracts | **封閉字彙 `kind`**（見 §2.3） |
 | `DisproofCondition` | contracts | `condition`＋`check_frequency`＋`action_within_48h`（L7 三件套，缺一即 raise） |
 | `ComponentTrace` | contracts | `inputs`／`rule_version`／`evidence_refs`／`value` |
-| `AlphaSignal` | contracts | **無任何 position 欄位**；每個非 None score 必須有 trace |
+| `AlphaSignal` | contracts | **無任何 position 欄位**；**無 scalar `value`／`alpha`**（2026-09-03 定案，見 `target-architecture.md` §5 硬規則 4）；每個非 None score 必須有 trace；排序由 `ordering_key()` 字典序產生 |
+| `Score` | contracts | `declared` / `effective` / `trace` / `downgrade_reason`（F-25） |
+| `OrderingRule` | contracts | 具名、版本化的排序鍵順序；換規則要能答出「幾筆排序會變」 |
 | `AlphaModel` | contracts | Protocol，`predict(ticker, as_of, context) -> AlphaSignal` |
 | `StructuralEvent`／`CausalPath`／`CompanyImpact` | causal | `CompanyImpact.confidence` 取路徑最弱段 |
 | `ImpactDirection`／`ImpactMagnitude`／`ImpactConfidence`／`TimeHorizon` | causal | enum |
@@ -112,7 +114,8 @@ tests/test_layer_separation.py         import 邊界
 | `test_alpha_signal_has_no_position_fields` | 掃 `AlphaSignal` 的欄位名，出現 `weight`／`shares`／`nav`／`size`／`target` 即失敗 | 暫時加一個 `weight: float` 欄位 → 必須紅（手法同 `tests/test_nav_exposure.py` 的禁用字掃描） |
 | `test_score_without_trace_is_rejected` | 給一個有 `structural_score` 但 `model_components` 缺對應 key 的 payload → raise | 移掉檢查 → 必須紅 |
 | `test_disproof_requires_frequency_and_action` | `DisproofCondition` 缺 `check_frequency` 或 `action_within_48h` → raise（L7） | 同上 |
-| `test_none_is_not_zero` | `structural_score=None` 與 `=0.0` 產生不同的 `AlphaSignal`，且 `None` 不參與 `value` 計算 | 把 `None` 當 0 → 必須紅 |
+| `test_none_is_not_zero` | `structural_score=None` 與 `=0.0` 產生不同的 `AlphaSignal`；`None` 排最後且該 signal 標 `incomplete`，**不得當 0 參與比較** | 把 `None` 當 0 → 必須紅 |
+| **`test_alpha_signal_has_no_composite_scalar`** | 掃 `AlphaSignal` 欄位名，出現 `value`／`alpha`／單數總分 `score` 即失敗；排序只能經 `ordering_key()` | 加一個 `value: float` → 必須紅（2026-08-21 加權總分補償性的直接繼承） |
 | `test_provider_returns_evidence` | fake provider 的 9 個方法，每個回傳物件的 `evidence` 皆非空 | 讓 fake 回空 tuple → 必須紅 |
 | **`test_as_of_raises_when_unsupported`** | `provider.get_bottlenecks(as_of=date(2026,6,30))` 在未實作 as-of 的 provider 上 **raise `PointInTimeUnsupported`**，**不得靜默回傳當前資料** | 改成回傳當前資料 → 必須紅。**這條是 Phase 6 的保險絲，Phase 1 就要裝** |
 | **`test_filing_published_after_as_of_is_excluded`** | fake provider 帶兩份 SourceDoc（`published_at` 6/30 與 7/5），`as_of=6/30` 的 `ResearchContext` 的 `evidence_refs` **不含**後者 | prompt §19 的原句：7/5 才發布的 filing 不得出現在 6/30 的 ResearchContext |
@@ -195,8 +198,9 @@ tests/test_layer_separation.py         import 邊界
 
 **唯一的例外討論：** `engine-d-decomposition.md` 的 **B1（Portfolio/Risk 搬家，約 2,054 行）**
 技術上可以與 Phase 1 平行，因為它完全不依賴新契約。
-**但建議排在 Phase 1 之後、Phase 2 之前**——先讓 Phase 1 的「零既有 package 變更」
-驗收條件保持乾淨，B1 才有一個明確的 before/after 可以對照。
+**但依使用者 2026-09-03 給的優先序（Alpha Research 是 #2、Portfolio 是 #7），
+B1 排在 Phase 2 之後，成為 Phase 3.5。** 先做完第一條 vertical slice 再搬 Portfolio——
+流程上「先搬最乾淨的一刀當練習」是合理的，但它會延後使用者真正要的東西（先能研究一家公司）。
 
 ---
 
@@ -217,10 +221,11 @@ tests/test_layer_separation.py         import 邊界
 
 | Phase | Goal | Exit criteria |
 |---|---|---|
-| **2 — First research vertical slice** | 一支 ticker 從 graph context → financial → expectations → `AlphaSignal`，能跑 `python -m alpha research COHR` | ①輸出的每個 score 都能 explain 到 `EvidenceRef`；②圖零新增節點；③與現行 `rank_bottlenecks` 首選一致或能說明為何不一致 |
-| **3 — Engine D decomposition** | 執行 B2–B6（B1 已在 Phase 1.5） | `decision_lab/` 13,502 → ≤8,000 行；直接相依環 3 → 0；daily 輸出內容不變且 bytes 下降 |
+| **2 — First research vertical slice** | **COHR**（2026-09-03 定案）從 graph context → financial → expectations → `AlphaSignal`，能跑 `python -m alpha research COHR` | ①輸出的每個 score 都能 explain 到 `EvidenceRef`；②圖零新增節點；③與現行 `rank_bottlenecks` 首選一致或能說明為何不一致 |
+| **3 — Engine D decomposition** | B2／B3／B5／B6 ＋ `mcp_server` domain 抽出 | `decision_lab/` 13,502 → ≤8,000 行；直接相依環 3 → 0；**core → `mcp_server` import 5 → 0**；daily 輸出內容不變且 bytes 下降 |
+| **3.5 — Portfolio / Risk 搬家** | B1 | `decision_lab/` −2,054 行；`engine_c → decision_lab` 環消失；三個硬擋逐筆一致（characterization） |
 | **4 — Expectation Gap** | implied fundamentals vs market implied | `expectation_gap_score` 對 ≥5 檔可算出且能 explain；低 P/E 案例的 gap ≈ 0 |
 | **5 — Causal propagation** | `StructuralEvent` → `CompanyImpact` | 對 ≥1 個真實事件產出 ≥1 個二階受益／受害者，且路徑可追溯 |
 | **6 — Backtest / validation** | as-of 圖投影 ＋ anti-lookahead 回測 | SourceDoc `published_at` 覆蓋 → 100%；as-of provider 通過 anti-lookahead 測試；排序前段 vs 後段的等權報酬差有 ≥2 期 |
-| **7 — Portfolio / Risk** | view → target exposure → limits | 三個硬擋行為與現況逐筆一致（characterization 測試）；不新增任何 alpha 尺寸 |
+| **7 — Portfolio / Risk 完整化** | view → target exposure → limits（B1 已於 3.5 搬完） | 不新增任何 alpha 尺寸；target exposure 可由 `AlphaSignal[]` 導出 |
 | **8 — Automation / productization** | daily／weekly／skills／MCP 適配新架構 | 16 條 sandbox rule 完成 impact review；skills 同步 `--check` 無漂移 |
