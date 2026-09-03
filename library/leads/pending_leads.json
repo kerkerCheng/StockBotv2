@@ -49041,9 +49041,13 @@
       "first_seen": "2026-09-03T00:20:02.030099+00:00",
       "lead_id": "lead_d966ce5858ebd7f5e72a3329c49214dc",
       "published_at": null,
-      "refs": {},
+      "refs": {
+        "outcome": "第一包覆蓋 HDS/Nabtesco 兩條主邊(各 sub=4);叢集殘餘:Leaderdrive/Nidec/双環自身邊+tech 層邊(strain_wave/rv→actuators),入圖後續包再補",
+        "research_action_id": "ra_7eb8ecdeed0759ef1af5bf5f924dd372",
+        "trace_status": "partial"
+      },
       "source": "sub-backfill-448-2026-09-03",
-      "status": "triaged_go",
+      "status": "action_prepared",
       "themes": {
         "robotics": {
           "counter_only": false,

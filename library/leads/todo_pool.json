@@ -7693,6 +7693,92 @@
       "source": "manual",
       "title": "同義節點合併執行核准——nand 對合併+optical_io 孤兒吸收;scale_up 對確認不併(proposal 完成)",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-09-03T00:34:53.882999+00:00",
+      "hint": "當前 missing_data：Nidec 決算短信/有報的精密減速器(Drive Technology)segment 受注或營收拆分(Engine （共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "n": 457,
+      "reason": null,
+      "ref_id": "dc_ff57320d45f0cb4be3857308e32b578a",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:nidec：補客戶端商業承諾：訂單、產能協議或預付款等付錢方向的證據",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-03T00:34:53.882999+00:00",
+      "hint": "當前 missing_data：GOOGL 價格序列進 Engine C ETL(上游資料缺,非研究可解)（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "n": 458,
+      "reason": null,
+      "ref_id": "dc_a51839bbf1429618556cf8bc265398c4",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:google：補估值錨點：市值、分析師覆蓋與隱含假設，回答股價已經定價了什麼",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-03T00:34:53.882999+00:00",
+      "hint": "當前 missing_data：RV 市占的審計級或客戶端來源(Estun/双環年報路徑未建)（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "n": 459,
+      "reason": null,
+      "ref_id": "dc_db19d3b490013f4cc464b2aab37b0bc8",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:nabtesco：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-03T00:34:53.882999+00:00",
+      "hint": "當前 missing_data：四家具名人形夥伴中任一家的付款方向證據（訂單金額、產能協議或預付款）——partnership 具名已有，缺的是誰付錢給；Schaeffler 官方一手（收購新聞稿、2026-02-05 humanoid IR 簡報）——schaeffler（共 2 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "n": 460,
+      "reason": null,
+      "ref_id": "dc_912a03a50135ea5e29000a0417c3f477",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:schaeffler：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-03T00:34:53.882999+00:00",
+      "hint": "當前 missing_data：產能保留協議任一對手方具名(客戶端或法定文件)（共 1 項）｜go（大項）＝reassess 後以 assessment_gap 排入 pq1，研究範圍：source_reliability_corroboration_incomplete。產出為 assessment／研究包，完成後 reassess 以新 decision receipt 結案",
+      "n": 461,
+      "reason": null,
+      "ref_id": "dc_6e429d67c7b9e925a1b25874e9dcefd9",
+      "residual_digest": "a47af9655a031ed9",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:soitec：殘餘缺口——產能保留協議任一對手方具名(客戶端或法定文件)",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-03T00:34:53.882999+00:00",
+      "hint": "當前 missing_data：人形轉子交付金額/客戶具名；H1 2026 中報一手(機器人+伺服收入 CNY 1.18B +81.84% 僅二手)（共 2 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "n": 462,
+      "reason": null,
+      "ref_id": "dc_32872cf6a80c5f273b9b4c55a57ff229",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:jl_mag：補客戶端商業承諾：訂單、產能協議或預付款等付錢方向的證據",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-03T00:38:26.825587+00:00",
+      "graph_impact": "+4 節點、2 邊、2 claims｜來源：Harmonic Drive Systems（供應商官方產品頁）（tier 2）、Nabtesco（供應商官方產品頁,市占為自估）（tier 2）",
+      "hint": "核准 exact graph delta；Decision handoff：co:harmonic_drive_systems。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 463,
+      "reason": null,
+      "ref_id": "ra_7eb8ecdeed0759ef1af5bf5f924dd372",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "[448] 減速器叢集 sub 補值(第一包)——HDS→諧波與 Nabtesco→RV 兩條邊定 sub=4,論證:在位高市占+合格週期摩擦 vs 挑戰者已量產",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -16940,6 +17026,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 457,
+  "next_n": 464,
   "schema_version": "1"
 }
