@@ -50716,10 +50716,12 @@
       "lead_id": "lead_e43bbbebc27c5bacc0a2ab090629b278",
       "published_at": "2026-09-01",
       "refs": {
+        "outcome": "Form 4 已解析:COHR Place 配股 3,358 @0,例行",
+        "parked_reason": "insider Form 4 信心類,無 graph delta",
         "trace_status": "partial"
       },
       "source": "edgar:COHR",
-      "status": "researching",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
