@@ -6364,6 +6364,174 @@
       "result": "ok",
       "run_at": "2026-09-02T22:33:04.281620+00:00",
       "source": "edgar:TSM"
+    },
+    {
+      "new": 2,
+      "result": "ok",
+      "run_at": "2026-09-03T22:33:01.858958+00:00",
+      "source": "mfn:sivers-semiconductors"
+    },
+    {
+      "new": 2,
+      "result": "ok",
+      "run_at": "2026-09-03T22:33:03.091348+00:00",
+      "source": "sivers:press"
+    },
+    {
+      "new": 2,
+      "result": "ok",
+      "run_at": "2026-09-03T22:33:03.742416+00:00",
+      "source": "yahoo:iqe-l"
+    },
+    {
+      "new": 8,
+      "result": "ok",
+      "run_at": "2026-09-03T22:33:07.900783+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-03T22:33:09.213966+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-03T22:33:09.924470+00:00",
+      "source": "edgar:AEHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-03T22:33:10.628198+00:00",
+      "source": "edgar:AEVA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-03T22:33:11.359086+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-03T22:33:11.895265+00:00",
+      "source": "edgar:AVGO"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-03T22:33:12.624104+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-03T22:33:13.325754+00:00",
+      "source": "edgar:CCXI"
+    },
+    {
+      "new": 2,
+      "result": "ok",
+      "run_at": "2026-09-03T22:33:14.060107+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-03T22:33:14.778168+00:00",
+      "source": "edgar:GFS"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-03T22:33:15.538466+00:00",
+      "source": "edgar:GOOGL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-03T22:33:16.263350+00:00",
+      "source": "edgar:HIMX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-03T22:33:17.027414+00:00",
+      "source": "edgar:JBL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-03T22:33:17.745396+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-09-03T22:33:18.500059+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-03T22:33:19.218368+00:00",
+      "source": "edgar:META"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-03T22:33:19.909388+00:00",
+      "source": "edgar:MP"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-03T22:33:20.704394+00:00",
+      "source": "edgar:MRVL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-03T22:33:21.396450+00:00",
+      "source": "edgar:MTSI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-03T22:33:21.928676+00:00",
+      "source": "edgar:MU"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-09-03T22:33:22.696791+00:00",
+      "source": "edgar:NVDA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-03T22:33:23.430554+00:00",
+      "source": "edgar:POET"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-03T22:33:24.143218+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-03T22:33:24.708854+00:00",
+      "source": "edgar:TSLA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-03T22:33:25.228542+00:00",
+      "source": "edgar:TSM"
     }
   ],
   "leads": {
@@ -6999,6 +7167,81 @@
         "tier": 4
       },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-has-resolved-on-a-directed-share-issue-of-shares-amounting-to-approximately-125-msek-2e81dac5"
+    },
+    "lead_0344629068cd250dc6c39e8c0df44fab": {
+      "entities": {
+        "company_ids": [
+          "co:sivers_semiconductors",
+          "co:broadcom"
+        ],
+        "tickers": [
+          "SIVE",
+          "AVGO"
+        ]
+      },
+      "first_seen": "2026-09-03T22:33:07.899036+00:00",
+      "lead_id": "lead_0344629068cd250dc6c39e8c0df44fab",
+      "media": [
+        {
+          "cache": {
+            "bytes": 194433,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_0344629068cd250dc6c39e8c0df44fab/3_2095453254557855744.jpg",
+            "sha256": "9219fce5e7fd95852f5c61576ec69bd4809c0ee87a50dec3cd0a564e9dea639e"
+          },
+          "height": 1129,
+          "media_key": "3_2095453254557855744",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HRSLogFbcAATf8E.jpg",
+          "width": 1224
+        },
+        {
+          "cache": {
+            "bytes": 81358,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_0344629068cd250dc6c39e8c0df44fab/3_2095453254553673730.jpg",
+            "sha256": "ba8c9064853e973d723232b00dffcc583d4440f2f6a561c6eb235f7833eeb0ed"
+          },
+          "height": 623,
+          "media_key": "3_2095453254553673730",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HRSLogEboAIpZuo.jpg",
+          "width": 1053
+        }
+      ],
+      "published_at": "2026-09-03T10:06:04.000Z",
+      "raw_text": "$SIVE announced today that it is expanding InP manufacturing in Glasgow.  \n\nThe new capacity target is:\n\n~100 million CW DFB laser annual production.\n\nUsing Sivers’ historical $50-$100 per 8-laser array pricing, the implied revenue capacity might be ~$625M-$1.25B/year (not guidance, just illustrative modeling)\n\nI’m personally very surprised by the amount of capacity coming online from their new hybrid manufacturing model, targeted Q4 2027.\n\nEspecially during an industry shortage, mentioned by $AVGO earnings call today.",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "AVGO",
+            "CW DFB laser",
+            "InP"
+          ]
+        },
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "SIVE",
+            "Sivers"
+          ]
+        }
+      },
+      "title": "$SIVE announced today that it is expanding InP manufacturing in Glasgow. The new capacity target is: ~100 million CW DFB laser annual production. Using Sivers’ historical $50-$100 per 8-laser array pricing, the implied revenue capacity might be ~$625M-$1.25B/year (not guidance, just illustrative modeling) I’m personally very surprised by the amount of capacity coming online from their new hybrid manufacturing model, targeted Q4 2027. Especially during an industry shortage, mentioned by $AVGO earnings call today.",
+      "triage": {
+        "decided_at": "2026-09-03T22:36:15.503901+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "同一 Sivers 產能事件已有官方英文公告代表性 lead；此貼文額外的 USD 625m–1.25b 僅為作者推算，不應重複占 pq1。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2095453263613341938"
     },
     "lead_0372f419a6423004be01bfb464111aa8": {
       "entities": {
@@ -9399,12 +9642,35 @@
       "first_seen": "2026-09-02T22:46:33.305364+00:00",
       "lead_id": "lead_102300d281aaa59b763b3a17149788e1",
       "published_at": "2026-08-26",
-      "refs": {},
+      "refs": {
+        "parked_reason": "official CFO commentary obtained; entities would require separate onboarding",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000073/q2fy27cfocommentary.htm",
+        "research_outcome": "no_prepared_ra: time-bound credit guarantees and campus leases belong to dated financing/demand observation, not a durable supplier edge",
+        "trace_attempts_ref": "sec_cfo_commentary_2026-09-04",
+        "trace_origin_entity": "NVIDIA",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
       "source": "sec:nvda",
-      "status": "pending",
+      "status": "parked",
       "themes": {},
       "title": "NVIDIA Q2 FY2027 CFO commentary: US PORTS-Pike guarantees for OpenAI leases",
-      "triage": null,
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-03T22:36:14.452389+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "若保證機制成立，可能新增 AI 基建融資與供應鏈候選角色。"
+        },
+        "decided_at": "2026-09-03T22:36:14.452389+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "NVIDIA 官方 CFO commentary 明列美國 PORTS-Pike 對 OpenAI 租賃保證，具金額／主體與 SEC 原文，可核對 AI 基建融資鏈。",
+        "tier": 1
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000073/q2fy27cfocommentary.htm"
     },
     "lead_105118dfda204e29a99f82160ad2f751": {
@@ -10483,9 +10749,17 @@
       "first_seen": "2026-09-03T01:48:31.671072+00:00",
       "lead_id": "lead_18be6b7764b40d7cb853925a0a4836eb",
       "published_at": null,
-      "refs": {},
+      "refs": {
+        "parked_reason": "research-map layer verified; named-supplier role remains unproven",
+        "primary_url": "https://developer.nvidia.com/blog/nvidia-800-v-hvdc-architecture-will-power-the-next-generation-of-ai-factories/",
+        "research_outcome": "no_prepared_ra: official ecosystem list names silicon providers but does not establish GPU VRM socket share or supplier concentration",
+        "trace_attempts_ref": "nvidia_800vdc_blog_2026-09-04",
+        "trace_origin_entity": "NVIDIA",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
       "source": "decompose-800vdc-2026-09-03",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "[decompose|800VDC] 板上 VRM/multiphase power stage 層——NVIDIA 具名 ADI/Infineon/MPS/Renesas/TI 等;MPWR 的 GPU VRM socket 集中度一手化;圖中無節點",
       "triage": {
@@ -11278,6 +11552,47 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2077741631135191234"
+    },
+    "lead_1ac8f4f95a2ab2eb9ce035328e43e38a": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "DELL",
+          "HOOD"
+        ]
+      },
+      "first_seen": "2026-09-03T22:33:07.894729+00:00",
+      "lead_id": "lead_1ac8f4f95a2ab2eb9ce035328e43e38a",
+      "media": [
+        {
+          "cache": {
+            "bytes": 117085,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_1ac8f4f95a2ab2eb9ce035328e43e38a/3_2095563905791840256.jpg",
+            "sha256": "c35dd7bb761cab8b00bc2669a5a36ea2f5b2b872edbf7ef82738da9ca860ca7a"
+          },
+          "height": 804,
+          "media_key": "3_2095563905791840256",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HRTwRQDaUAA78ft.jpg",
+          "width": 1712
+        }
+      ],
+      "published_at": "2026-09-03T17:31:40.000Z",
+      "raw_text": "$DELL founder is a legend.\n\nThe Dell family pledged $6.25B / $250 each to 25M children through Trump Accounts, with $HOOD (up 14.83%+ today) as the initial sole brokerage. \n\nLittle off topic but getting the public invested early is very meaningful compared to the dollar amount. https://t.co/Xwrp7lMPyS",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "$DELL founder is a legend. The Dell family pledged $6.25B / $250 each to 25M children through Trump Accounts, with $HOOD (up 14.83%+ today) as the initial sole brokerage. Little off topic but getting the public invested early is very meaningful compared to the dollar amount. https://t.co/Xwrp7lMPyS",
+      "triage": {
+        "decided_at": "2026-09-03T22:36:16.404311+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "Trump Accounts 與 HOOD 券商事件雖有具體金額，但與現行瓶頸供應鏈／追蹤標的投資問題無直接關聯。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2095565402223038651"
     },
     "lead_1acfa75f85b80a88db95c35eb402974b": {
       "entities": {
@@ -13554,6 +13869,36 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1835632/000162828026060112/xslF345X06/wk-form4_1788380464.xml"
+    },
+    "lead_250c73325bc9d0653f6a1adb5cd1fab7": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-03T22:33:01.858332+00:00",
+      "lead_id": "lead_250c73325bc9d0653f6a1adb5cd1fab7",
+      "published_at": "Thu, 03 Sep 2026 06:00:00 +0000",
+      "refs": {},
+      "source": "mfn:sivers-semiconductors",
+      "status": "triaged_no_go",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Sivers Semiconductors investerar 30 miljoner USD för att expandera europeisk fotoniktillverkning för AI-datacenters",
+      "triage": {
+        "decided_at": "2026-09-03T22:36:16.693169+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "與 Sivers 官網英文公告為同一事件的 MFN 瑞典文副本；保留官方英文代表性 lead，避免重複研究。",
+        "tier": 1
+      },
+      "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-investerar-30-miljoner-usd-for-att-expandera-europeisk-fotoniktillverkning-for-ai-datacenters-25838384"
     },
     "lead_250f6558cea6c4beab2a95e262024800": {
       "entities": {
@@ -16151,6 +16496,28 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/928876/000197640826000651/xslF345X06/primary_doc.xml"
     },
+    "lead_337be0623060bf180b2b3ffe0f1971ae": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-03T22:33:03.742266+00:00",
+      "lead_id": "lead_337be0623060bf180b2b3ffe0f1971ae",
+      "published_at": "Thu, 03 Sep 2026 06:30:47 +0000",
+      "refs": {},
+      "source": "yahoo:iqe-l",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "UK Stock Market News: IQE, Galliford Try, Hilton Food",
+      "triage": {
+        "decided_at": "2026-09-03T22:36:16.984028+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "與 IQE–Quintessent 協議稿為同一事件的市場摘要，沒有額外獨立 claim；不重複占 pq1。",
+        "tier": 3
+      },
+      "url": "https://www.thearmchairtrader.com/uk-stock-market-news/iqe-gallifordtry-hiltonfood/?.tsrc=rss"
+    },
     "lead_33ee86d7a2c5f997576b00bba3ca357e": {
       "entities": {
         "company_ids": [
@@ -18244,9 +18611,17 @@
       "first_seen": "2026-09-03T01:48:32.319562+00:00",
       "lead_id": "lead_3e0ba028986066e33b30d7c97c0a33b9",
       "published_at": null,
-      "refs": {},
+      "refs": {
+        "parked_reason": "true unknown layer; wait for named product or supplier disclosure",
+        "primary_url": "https://developer.nvidia.com/blog/nvidia-800-v-hvdc-architecture-will-power-the-next-generation-of-ai-factories/",
+        "research_outcome": "no_prepared_ra: official architecture confirms subsecond storage is required but names no supplier",
+        "trace_attempts_ref": "nvidia_800vdc_blog_2026-09-04",
+        "trace_origin_entity": "NVIDIA",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
       "source": "decompose-800vdc-2026-09-03",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "[decompose|800VDC] 次秒級能量儲存層(BBU/supercap,GPU power fluctuations)——NVIDIA 明文是架構一環但夥伴未具名;誰做?圖中無節點(真未知層)",
       "triage": {
@@ -19389,6 +19764,82 @@
         "tier": 4
       },
       "url": "https://www.sec.gov/Archives/edgar/data/898293/000122520826006697/xslF345X06/doc4.xml"
+    },
+    "lead_44861dcb4eab4ed577877c0fbba59644": {
+      "entities": {
+        "company_ids": [
+          "co:micron_technology",
+          "co:sk_hynix",
+          "co:sandisk"
+        ],
+        "tickers": [
+          "MU",
+          "SKHY",
+          "SNDK"
+        ]
+      },
+      "first_seen": "2026-09-03T22:33:07.892250+00:00",
+      "lead_id": "lead_44861dcb4eab4ed577877c0fbba59644",
+      "media": [
+        {
+          "cache": {
+            "bytes": 77903,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_44861dcb4eab4ed577877c0fbba59644/3_2095570270312640512.jpg",
+            "sha256": "47b2d0929dab6f48c4151c74d2efbf1ea28bea2f43caf34b22b1ef04efdee5cd"
+          },
+          "height": 1384,
+          "media_key": "3_2095570270312640512",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HRT2DtvasAAi59o.jpg",
+          "width": 1639
+        },
+        {
+          "cache": {
+            "bytes": 50439,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_44861dcb4eab4ed577877c0fbba59644/3_2095574248911937536.jpg",
+            "sha256": "65c8292754a372c2bb519db382d1ac896488f807e1c6f8d4d8f96cb9d99eb191"
+          },
+          "height": 532,
+          "media_key": "3_2095574248911937536",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HRT5rTLaIAAhhCW.jpg",
+          "width": 362
+        }
+      ],
+      "published_at": "2026-09-03T18:30:01.000Z",
+      "raw_text": "Just an update to my DDR2/DDR3 memory idea with ESMT.  They reported August revenue (Taiwan sometimes does monthly reporting): \n\nJune revenue: ~$153M\nJuly: ~$214M\nAugust (new): ~$249M vs. $35.3m (last year)\n\nMonthly revenue has increased ~63% in two months despite reportedly similar 2026 wafer allocations to 2025 (MoneyDJ report).\n\nThe profitability is already really high as seen with July's monthly revenue (where they reported ~$109M net income).\n\nSo if pricing holds, and revenue increases, that would be very nice... \n\nNow a lot of US people don't really care since it's in Taiwan, but if you're in the $MU / $SKHY, $SNDK trade. \n\nJust educational purposes, it's a second order effect where your leading memory players prioritize AI/DC higher end memory and reduce allocations to older generations (causing shortages).\n\nBut... DDR4 since prices going up too much, so older gen memory products (DDR4) are getting redesigned with older gen memory (DDR3). And DDR3 products with DDR2. \n\nAnd so on. Causing cascading supply chain shortages.\n\n(DDR2 for example is boring/old memory used for cameras, printers, automotive back in the 2000s and not many ppl make them anymore). \n\nAnd even your old DDR2 suppliers like Winbond are gradually withdrawing from the market too... \n\nSo ESMT is the beneficiary of DDR3/DDR2 shortages. \n\nTLDR:\n\nESMT August revenue was ~$249M, up from ~$214M last month.",
+      "refs": {
+        "parked_reason": "issuer monthly-revenue authority obtained; no Engine A graph delta",
+        "primary_url": "https://www.esmt.com.tw/en/investor/financial?financial-tab=annual",
+        "research_outcome": "no_prepared_ra: official monthly revenue is a timestamped financial observation for Engine C; DDR cascade thesis remains author inference",
+        "trace_attempts_ref": "issuer_monthly_revenue_2026-09-04",
+        "trace_origin_entity": "ESMT",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
+      "source": "x:aleabitoreddit",
+      "status": "parked",
+      "themes": {},
+      "title": "Just an update to my DDR2/DDR3 memory idea with ESMT. They reported August revenue (Taiwan sometimes does monthly reporting): June revenue: ~$153M July: ~$214M August (new): ~$249M vs. $35.3m (last year) Monthly revenue has increased ~63% in two months despite reportedly similar 2026 wafer allocations to 2025 (MoneyDJ report). The profitability is already really high as seen with July's monthly revenue (where they reported ~$109M net income). So if pricing holds, and revenue increases, that would be very nice... Now a lot of US people don't really care since it's in Taiwan, but if you're in the $MU / $SKHY, $SNDK trade. Just educational purposes, it's a second order effect where your leading memory players prioritize AI/DC higher end memory and reduce allocations to older generations (causing shortages). But... DDR4 since prices going up too much, so older gen memory products (DDR4) are getting redesigned with older gen memory (DDR3). And DDR3 products with DDR2. And so on. Causing cascading supply chain shortages. (DDR2 for example is boring/old memory used for cameras, printers, automotive back in the 2000s and not many ppl make them anymore). And even your old DDR2 suppliers like Winbond are gradually withdrawing from the market too... So ESMT is the beneficiary of DDR3/DDR2 shortages. TLDR: ESMT August revenue was ~$249M, up from ~$214M last month.",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-03T22:36:13.851146+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "candidate_set",
+          "reason": "若月營收與供給機制成立，ESMT 可能進入舊世代記憶體候選集合。"
+        },
+        "decided_at": "2026-09-03T22:36:13.851146+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "ESMT 月營收與月增數字具體，且可追回台灣月營收公告；與舊世代記憶體供給假設直接相關。",
+        "tier": 3
+      },
+      "url": "https://x.com/aleabitoreddit/status/2095580088620449880"
     },
     "lead_44ce140c224422130eecf4bb9766219e": {
       "entities": {
@@ -20923,9 +21374,17 @@
       "first_seen": "2026-09-03T01:48:32.644494+00:00",
       "lead_id": "lead_4c2881be9b2f66a3b2b54291e26985aa",
       "published_at": null,
-      "refs": {},
+      "refs": {
+        "parked_reason": "ecosystem membership is not a supply contract",
+        "primary_url": "https://developer.nvidia.com/blog/nvidia-800-v-hvdc-architecture-will-power-the-next-generation-of-ai-factories/",
+        "research_outcome": "no_prepared_ra: official ecosystem list names power-system vendors but does not establish rectifier or busway awards",
+        "trace_attempts_ref": "nvidia_800vdc_blog_2026-09-04",
+        "trace_origin_entity": "NVIDIA",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
       "source": "decompose-800vdc-2026-09-03",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "[decompose|800VDC] 整流站/800V busway 基礎設施層——NVIDIA 具名 Eaton/Schneider/Vertiv(VRT 已出 MGX reference architecture);圖中無節點",
       "triage": {
@@ -21913,6 +22372,71 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1045810/000169684126000010/xslF345X06/wk-form4_1788386836.xml"
     },
+    "lead_52a2617b8b9c78cc6df1ff1a91dea403": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia",
+          "co:microsoft"
+        ],
+        "tickers": [
+          "NVDA",
+          "MSFT"
+        ]
+      },
+      "first_seen": "2026-09-03T22:33:07.897021+00:00",
+      "lead_id": "lead_52a2617b8b9c78cc6df1ff1a91dea403",
+      "media": [
+        {
+          "cache": {
+            "bytes": 53301,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_52a2617b8b9c78cc6df1ff1a91dea403/3_2095490087597527040.jpg",
+            "sha256": "a9327d1012ccf5ad53daa91ea2875a5ae860190d4612f10aaec2e4864316c2a6"
+          },
+          "height": 1430,
+          "media_key": "3_2095490087597527040",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HRStId2aUAAnXha.jpg",
+          "width": 1921
+        },
+        {
+          "cache": {
+            "bytes": 153009,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_52a2617b8b9c78cc6df1ff1a91dea403/3_2095490087589187584.jpg",
+            "sha256": "fad9e07b978a13bd308aeb710e772363411fe44370a864d24149cec7956dd089"
+          },
+          "height": 1803,
+          "media_key": "3_2095490087589187584",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HRStId0bEAAhW00.jpg",
+          "width": 1902
+        }
+      ],
+      "published_at": "2026-09-03T12:34:55.000Z",
+      "raw_text": "$NVDA acquires hugging face for $12,930,300,000.\n\nJensen stated the reason being:\n- 18M+ devs use Hugging Face \n- 3M+ models, 500k+ datasets, 1M+ apps \n- 200k+ companies use the platformm\n- support of open weight models\n\nthis almost reminds me of $MSFT buying Github? https://t.co/8FhE7b9mU0",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "NVDA"
+          ]
+        }
+      },
+      "title": "$NVDA acquires hugging face for $12,930,300,000. Jensen stated the reason being: - 18M+ devs use Hugging Face - 3M+ models, 500k+ datasets, 1M+ apps - 200k+ companies use the platformm - support of open weight models this almost reminds me of $MSFT buying Github? https://t.co/8FhE7b9mU0",
+      "triage": {
+        "decided_at": "2026-09-03T22:36:16.088459+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "同一 NVIDIA 交易已有官方 SEC 8-K 代表性 lead；社群貼文的收購價格與類比不另占 pq1，改由 SEC 原文核對。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2095490725412733092"
+    },
     "lead_5365613adf1bce24257876e3dab03eea": {
       "entities": {
         "company_ids": [],
@@ -22196,6 +22720,57 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2083225872207937687"
+    },
+    "lead_546fd08ac57b4d0149ebb71c1ace212d": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-03T22:33:07.890829+00:00",
+      "lead_id": "lead_546fd08ac57b4d0149ebb71c1ace212d",
+      "media": [
+        {
+          "cache": {
+            "bytes": 90277,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_546fd08ac57b4d0149ebb71c1ace212d/3_2095588114131800064.jpg",
+            "sha256": "dc0c6ecdfb4981cd0f00cb71e44d9ab1bb2d511c6e02665566aedab0cba9d146"
+          },
+          "height": 880,
+          "media_key": "3_2095588114131800064",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HRUGSXJbUAAKvNM.jpg",
+          "width": 1024
+        },
+        {
+          "cache": {
+            "bytes": 132528,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_546fd08ac57b4d0149ebb71c1ace212d/3_2095589067350282241.jpg",
+            "sha256": "d3ec42b6814ab2c9867261228c8e9d2052d77b52f7243764e83d44d3e0ab307d"
+          },
+          "height": 923,
+          "media_key": "3_2095589067350282241",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HRUHJ2KbEAEw1Q9.jpg",
+          "width": 1924
+        }
+      ],
+      "published_at": "2026-09-03T19:11:50.000Z",
+      "raw_text": "OpenAI GPT-6 Astra benchmarks got released. Looks both AGI and the Singularity are almost here.\n\nThe leap in eval performance:\n\nFrom 78.5% -> 100% on ExploitBench to 22.4% -> 64.6% on the Science benchmark is enormous. \n\nAnd the most striking part is the VP of Research comment around: \n\n\"Astra was also OpenAI's first model that involved previous AI models very heavily in the training process, with the older generations helping train the new one.\"\n\nSo we also get the beginnings of recursive self-improvement as a bonus. \n\nI don't think Bernie Sanders will be too happy about this?",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "OpenAI GPT-6 Astra benchmarks got released. Looks both AGI and the Singularity are almost here. The leap in eval performance: From 78.5% -> 100% on ExploitBench to 22.4% -> 64.6% on the Science benchmark is enormous. And the most striking part is the VP of Research comment around: \"Astra was also OpenAI's first model that involved previous AI models very heavily in the training process, with the older generations helping train the new one.\" So we also get the beginnings of recursive self-improvement as a bonus. I don't think Bernie Sanders will be too happy about this?",
+      "triage": {
+        "decided_at": "2026-09-03T22:36:17.276722+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "只有未附可核對原始發布頁的模型 benchmark 與 AGI／奇點推論；與現行標的因果鏈連結過泛，抽取會落成情緒而非可驗證 claim。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2095590610967421206"
     },
     "lead_54bf82feffa718f34f8d8ce6e2a6184a": {
       "entities": {
@@ -23779,6 +24354,89 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2074466925263061100"
     },
+    "lead_5d45143e26d3fb1bcb1a019610ef3731": {
+      "entities": {
+        "company_ids": [
+          "co:sivers_semiconductors",
+          "co:broadcom",
+          "co:lumentum",
+          "co:marvell_technology"
+        ],
+        "tickers": [
+          "SIVE",
+          "AVGO",
+          "LITE",
+          "MRVL"
+        ]
+      },
+      "first_seen": "2026-09-03T22:33:07.895319+00:00",
+      "lead_id": "lead_5d45143e26d3fb1bcb1a019610ef3731",
+      "media": [
+        {
+          "cache": {
+            "bytes": 93005,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_5d45143e26d3fb1bcb1a019610ef3731/3_2095546123444535296.jpg",
+            "sha256": "0f0b5ae1de5f69c4ef3d276412ca928a83e0a7dcef482a3fe81e42d7658c0faf"
+          },
+          "height": 1218,
+          "media_key": "3_2095546123444535296",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HRTgGLpbwAA407G.jpg",
+          "width": 1239
+        }
+      ],
+      "published_at": "2026-09-03T16:15:07.000Z",
+      "raw_text": "This is the correct response when looking at $SIVE >100m CW DFB extraordinary capacity disclosure.\n\nTo give some context, Trendforce July data cites global CW/EML capacity is roughly 608.4M/year (~50.7M monthly units annualized). \n\nWith $AVGO, $LITE, and Sumitomo making up ~335m/year combined. \n\nBy Q4 2027, it's likely a lot of these players will significantly expand capacity again, with broadcom citing 3x Y/Y growth.  (also capacity not being 1:1 since many are allocated to EML or UHP CWs, etc). \n\nBut this capacity target would place Sivers in global Tier 1 laser supplier category. \n\nWith possibly low double digits global laser market share if you factor in their hybrid 2:1 manufacturing model.\n\nThis new disclosure is very exciting coming from a conservative company.\n\nAnd sheds more light on why the $MRVL SVP cited Europe as a major geography when talking about laser supply chain sourcing.",
+      "refs": {
+        "parked_reason": "original macro source obtained; structured company delta already captured separately",
+        "primary_url": "https://www.trendforce.com/presscenter/news/20260603-13077.html",
+        "research_outcome": "no_prepared_ra: TrendForce confirms 50.7M monthly 2026 industry capacity; Sivers target handled by ra_51171727ae171518974b4196f814c7b2; market-share inference excluded",
+        "trace_attempts_ref": "trendforce_and_sivers_2026-09-04",
+        "trace_origin_entity": "TrendForce",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
+      "source": "x:aleabitoreddit",
+      "status": "parked",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "AVGO",
+            "LITE"
+          ]
+        },
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "SIVE",
+            "Sivers"
+          ]
+        }
+      },
+      "title": "This is the correct response when looking at $SIVE >100m CW DFB extraordinary capacity disclosure. To give some context, Trendforce July data cites global CW/EML capacity is roughly 608.4M/year (~50.7M monthly units annualized). With $AVGO, $LITE, and Sumitomo making up ~335m/year combined. By Q4 2027, it's likely a lot of these players will significantly expand capacity again, with broadcom citing 3x Y/Y growth. (also capacity not being 1:1 since many are allocated to EML or UHP CWs, etc). But this capacity target would place Sivers in global Tier 1 laser supplier category. With possibly low double digits global laser market share if you factor in their hybrid 2:1 manufacturing model. This new disclosure is very exciting coming from a conservative company. And sheds more light on why the $MRVL SVP cited Europe as a major geography when talking about laser supply chain sourcing.",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-03T22:36:12.661482+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "ranking",
+          "reason": "查證各家 CW／EML 產能後可能改變雷射供應商的瓶頸排序。"
+        },
+        "decided_at": "2026-09-03T22:36:12.661482+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true,
+          "novelty": true
+        },
+        "reason": "Sivers 與 AVGO 雷射產能數字具體且可追查 TrendForce／公司原文；可能新增獨立產能脈絡，放行追源，但作者市場份額推論不視為證據。",
+        "tier": 3
+      },
+      "url": "https://x.com/aleabitoreddit/status/2095546138510459218"
+    },
     "lead_5d4775ae3e7cfda8c51492fe6a22309a": {
       "entities": {
         "company_ids": [],
@@ -24768,6 +25426,73 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2072733748261720186"
     },
+    "lead_63223b00052e006d476c5cf2dbd3bf6d": {
+      "entities": {
+        "company_ids": [
+          "co:broadcom"
+        ],
+        "tickers": [
+          "AVGO"
+        ]
+      },
+      "first_seen": "2026-09-03T22:33:07.900126+00:00",
+      "lead_id": "lead_63223b00052e006d476c5cf2dbd3bf6d",
+      "media": [
+        {
+          "cache": {
+            "bytes": 116610,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_63223b00052e006d476c5cf2dbd3bf6d/3_2095278879120498688.jpg",
+            "sha256": "a7db39f1377c853bd436f9627f8ce22e9b2c4e87de28d5abb437323272e2a6bd"
+          },
+          "height": 533,
+          "media_key": "3_2095278879120498688",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HRPtCg9bIAATqld.jpg",
+          "width": 1090
+        }
+      ],
+      "published_at": "2026-09-02T22:37:31.000Z",
+      "raw_text": "$AVGO CEO: \"Demand for lasers, whether it is EML lasers, CW lasers.\n\nIs far surpassing supply out there in the industry\"\n\nPretty material coming from one of the largest laser suppliers in the world... Even while they 3x laser capacity. \n\nExciting validation for laser companies. https://t.co/l4alSsexMT https://t.co/SF1OTJfhZi",
+      "refs": {
+        "parked_reason": "management statement verified; retain as demand-side lead without graph admission",
+        "primary_url": "https://investors.broadcom.com/events/event-details/q3-2026-broadcom-earnings-conference-call",
+        "research_outcome": "no_prepared_ra: official webcast and aligned transcripts confirm laser demand exceeds supply and InP fab capacity is more than tripling; no new counterparty edge",
+        "trace_attempts_ref": "broadcom_ir_webcast_2026-09-04",
+        "trace_origin_entity": "Broadcom",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
+      "source": "x:aleabitoreddit",
+      "status": "parked",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "AVGO"
+          ]
+        }
+      },
+      "title": "$AVGO CEO: \"Demand for lasers, whether it is EML lasers, CW lasers. Is far surpassing supply out there in the industry\" Pretty material coming from one of the largest laser suppliers in the world... Even while they 3x laser capacity. Exciting validation for laser companies. https://t.co/l4alSsexMT https://t.co/SF1OTJfhZi",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-03T22:36:12.952644+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "ranking",
+          "reason": "若原文成立，會改變雷射瓶頸鏈的排序強度。"
+        },
+        "decided_at": "2026-09-03T22:36:12.952644+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true
+        },
+        "reason": "AVGO CEO 對雷射需求超過供給與 3x 擴產的具體引述可追回法說；與 Sivers 自報形成不同 origin_entity 的需求側交叉驗證。",
+        "tier": 3
+      },
+      "url": "https://x.com/aleabitoreddit/status/2095279986701951461"
+    },
     "lead_637ff27363713403fe64357400ecd082": {
       "entities": {
         "company_ids": [],
@@ -25372,6 +26097,36 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2089355682286092748"
     },
+    "lead_65a9f0c0cc8a0740adfef70778234b50": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-03T22:33:01.838524+00:00",
+      "lead_id": "lead_65a9f0c0cc8a0740adfef70778234b50",
+      "published_at": "Thu, 03 Sep 2026 06:00:00 +0000",
+      "refs": {},
+      "source": "mfn:sivers-semiconductors",
+      "status": "triaged_no_go",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Sivers Semiconductors Invests USD 30 Million to Expand European Photonics Manufacturing for AI Datacenters",
+      "triage": {
+        "decided_at": "2026-09-03T22:36:17.577241+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "與 Sivers 官網英文公告為同一事件的 MFN 英文轉載；保留公司一手代表性 lead，避免重複研究。",
+        "tier": 2
+      },
+      "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-invests-usd-30-million-to-expand-european-photonics-manufacturing-for-ai-datacenters-6c7a8503"
+    },
     "lead_65cd6e71ec67ef60eb999082611afa8b": {
       "entities": {
         "company_ids": [
@@ -25874,6 +26629,47 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1835632/000183563226000022/mrvl-20260827.htm"
+    },
+    "lead_67d32f7e8f057b93fc1f35a99930833c": {
+      "entities": {
+        "company_ids": [
+          "co:coherent"
+        ],
+        "tickers": [
+          "COHR"
+        ]
+      },
+      "first_seen": "2026-09-03T22:33:14.059972+00:00",
+      "lead_id": "lead_67d32f7e8f057b93fc1f35a99930833c",
+      "published_at": "2026-09-02",
+      "refs": {},
+      "source": "edgar:COHR",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "COHR"
+          ]
+        }
+      },
+      "title": "COHR 4 filed 2026-09-02",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-03T22:36:13.244857+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "結果只增加治理與稀釋脈絡，不改候選集合或排序。"
+        },
+        "decided_at": "2026-09-03T22:36:13.244857+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "COHR 官方 SEC Form 4，發行人與申報日期可逐字核對；低優先放行作內部人／稀釋時變觀測。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/820318/000089914026001047/xslF345X06/form4.xml"
     },
     "lead_687d441b132fcead50b9d2e39863c050": {
       "entities": {
@@ -34326,6 +35122,47 @@
       },
       "url": "https://www.release.tdnet.info/inbs/I_list_001_6324.html?loop=runway-refresh-q1fy2027"
     },
+    "lead_9086e8525c8d8dcccb58b78d140d128b": {
+      "entities": {
+        "company_ids": [
+          "co:coherent"
+        ],
+        "tickers": [
+          "COHR"
+        ]
+      },
+      "first_seen": "2026-09-03T22:33:14.059834+00:00",
+      "lead_id": "lead_9086e8525c8d8dcccb58b78d140d128b",
+      "published_at": "2026-09-02",
+      "refs": {},
+      "source": "edgar:COHR",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "COHR"
+          ]
+        }
+      },
+      "title": "COHR 4 filed 2026-09-02",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-03T22:36:13.552857+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "結果只增加治理與稀釋脈絡，不改候選集合或排序。"
+        },
+        "decided_at": "2026-09-03T22:36:13.552857+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "COHR 官方 SEC Form 4，發行人與申報日期可逐字核對；低優先放行作內部人／稀釋時變觀測。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/820318/000089914026001048/xslF345X06/form4.xml"
+    },
     "lead_90c5dcc2d514c7ed4342bd2acdad08f7": {
       "entities": {
         "company_ids": [
@@ -36166,6 +37003,47 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1326801/000095010326012279/xslF345X06/ownership.xml"
     },
+    "lead_9a57f8b89da26e654a1372e9700465ca": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-03T22:33:03.091128+00:00",
+      "lead_id": "lead_9a57f8b89da26e654a1372e9700465ca",
+      "published_at": "Thu, 03 Sep 2026 06:00:00 +0000",
+      "refs": {
+        "research_action_id": "ra_51171727ae171518974b4196f814c7b2"
+      },
+      "source": "sivers:press",
+      "status": "action_prepared",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Sivers Semiconductors Invests USD 30 Million to Expand European Photonics Manufacturing for AI Datacenters",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-03T22:36:30.192415+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "ranking",
+          "reason": "新增量產規模與時點可改變 Sivers 在雷射瓶頸排序中的位置。"
+        },
+        "decided_at": "2026-09-03T22:36:30.192415+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "Sivers 官方英文公告具 USD 30m、100m CW DFB 年產能與 Q4 2027 時點，可逐字核對且直接涉及雷射瓶頸。",
+        "tier": 1
+      },
+      "url": "https://www.sivers-semiconductors.com/press/sivers-semiconductors-invests-usd-30-million-to-expand-european-photonics-manufacturing-for-ai-datacenters/"
+    },
     "lead_9a9bc78fb2b55441c6a1d61bf9987a0c": {
       "entities": {
         "company_ids": [],
@@ -37205,6 +38083,39 @@
       ],
       "url": "https://x.com/aleabitoreddit/status/2092186856792506435"
     },
+    "lead_a07a7f35b0e3d5591b3ab0da4007bc09": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-03T22:33:03.742020+00:00",
+      "lead_id": "lead_a07a7f35b0e3d5591b3ab0da4007bc09",
+      "published_at": "Thu, 03 Sep 2026 07:08:29 +0000",
+      "refs": {
+        "research_action_id": "ra_ca9471422ef13d9301ca7f66baaac9be"
+      },
+      "source": "yahoo:iqe-l",
+      "status": "action_prepared",
+      "themes": {},
+      "title": "IQE Signs Quantum Dot Laser Epiwafer Supply Agreement With Quintessent",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-03T22:36:14.909254+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "若供貨關係成立，可能新增量子點雷射 epiwafer 的供應商候選。"
+        },
+        "decided_at": "2026-09-03T22:36:14.909254+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "IQE 與 Quintessent 的 quantum-dot laser epiwafer supply agreement 主體、產品與 sampling 階段具體，可追回公司公告。",
+        "tier": 2
+      },
+      "url": "https://uk.advfn.com/market-news/article/22214/iqe-signs-quantum-dot-laser-epiwafer-supply-agreement-with-quintessent?.tsrc=rss"
+    },
     "lead_a0bd6fe7a49456be4c19949c9717c138": {
       "entities": {
         "company_ids": [
@@ -37698,9 +38609,17 @@
       "first_seen": "2026-09-03T01:48:31.990321+00:00",
       "lead_id": "lead_a4c2e14392aec9ce92ee74d1f1b6e81d",
       "published_at": null,
-      "refs": {},
+      "refs": {
+        "parked_reason": "technology layer verified; beneficiary ranking would be inference",
+        "primary_url": "https://developer.nvidia.com/blog/nvidia-800-v-hvdc-architecture-will-power-the-next-generation-of-ai-factories/",
+        "research_outcome": "no_prepared_ra: official list names wide-bandgap ecosystem participants but provides no 800V content share, qualification, or award",
+        "trace_attempts_ref": "nvidia_800vdc_blog_2026-09-04",
+        "trace_origin_entity": "NVIDIA",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
       "source": "decompose-800vdc-2026-09-03",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "[decompose|800VDC] 寬能隙功率半導體層(GaN/SiC)——NVIDIA 具名 Innoscience/Navitas/OnSemi/ROHM/ST;800V 化誰受益,NVTS 純度最高;圖中僅 tech:power_gan 孤節點",
       "triage": {
@@ -39836,6 +40755,36 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1652044/000119312526345383/xslF345X06/ownership.xml"
     },
+    "lead_af196c20cccc1f3208cd96c0f3afd3a2": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-03T22:33:03.090927+00:00",
+      "lead_id": "lead_af196c20cccc1f3208cd96c0f3afd3a2",
+      "published_at": "Thu, 03 Sep 2026 06:00:00 +0000",
+      "refs": {},
+      "source": "sivers:press",
+      "status": "triaged_no_go",
+      "themes": {
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Sivers Semiconductors investerar 30 miljoner USD för att expandera europeisk fotoniktillverkning för AI-datacenters",
+      "triage": {
+        "decided_at": "2026-09-03T22:36:17.866268+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "與 Sivers 官網英文公告為同一事件的瑞典文副本；保留英文一手代表性 lead，避免重複研究。",
+        "tier": 1
+      },
+      "url": "https://www.sivers-semiconductors.com/press/sivers-semiconductors-investerar-30-miljoner-usd-for-att-expandera-europeisk-fotoniktillverkning-for-ai-datacenters/"
+    },
     "lead_af3d60cc842a4d14bea3c53b299771f4": {
       "entities": {
         "company_ids": [],
@@ -40855,6 +41804,57 @@
         }
       ],
       "url": "https://x.com/aleabitoreddit/status/2076748688559587338"
+    },
+    "lead_b1ef391e297899ec152ece7f57547ade": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia"
+        ],
+        "tickers": [
+          "NVDA"
+        ]
+      },
+      "first_seen": "2026-09-03T22:33:22.696603+00:00",
+      "lead_id": "lead_b1ef391e297899ec152ece7f57547ade",
+      "published_at": "2026-09-03",
+      "refs": {
+        "parked_reason": "official 8-K obtained; no graph delta admitted",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000078/nvda-20260902.htm",
+        "research_outcome": "no_prepared_ra: Hugging Face acquisition is a corporate transaction observation; no durable bottleneck edge and target is not onboarded",
+        "trace_attempts_ref": "edgar_fetch_2026-09-04",
+        "trace_origin_entity": "NVIDIA",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
+      "source": "edgar:NVDA",
+      "status": "parked",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "NVDA"
+          ]
+        }
+      },
+      "title": "NVDA 8-K filed 2026-09-03",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-03T22:36:14.158208+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "原文若揭露新交易或需求承諾，可能改變 AI 基礎設施候選集合。"
+        },
+        "decided_at": "2026-09-03T22:36:14.158208+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "NVDA 官方 SEC 8-K，事件與文件日期明確；先放行讀原文，再依內容決定是否有結構或資本承諾 delta。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000078/nvda-20260902.htm"
     },
     "lead_b1fc52cd3e937e21181f87e95daf0377": {
       "entities": {
@@ -46184,6 +47184,63 @@
       ],
       "url": "https://x.com/aleabitoreddit/status/2085499853099208716"
     },
+    "lead_ca73c6b87610fec364ee8b66803f9653": {
+      "entities": {
+        "company_ids": [
+          "co:iqe"
+        ],
+        "tickers": [
+          "IQE",
+          "ALMU",
+          "ALRIB"
+        ]
+      },
+      "first_seen": "2026-09-03T22:33:07.897652+00:00",
+      "lead_id": "lead_ca73c6b87610fec364ee8b66803f9653",
+      "media": [
+        {
+          "cache": {
+            "bytes": 119345,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_ca73c6b87610fec364ee8b66803f9653/3_2095460491678388224.jpg",
+            "sha256": "b5f486655b27e69974a3e9e65ff150a89dc252d9ceed9d3da1395345d43e0873"
+          },
+          "height": 999,
+          "media_key": "3_2095460491678388224",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HRSSNwdbEAAcQkl.jpg",
+          "width": 1207
+        },
+        {
+          "cache": {
+            "bytes": 139668,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_ca73c6b87610fec364ee8b66803f9653/3_2095460491686723584.jpg",
+            "sha256": "78801af98f5b24d7e02b7cb3d1eb9d4c3ea980d454285f1a68f2cb4bc9b53630"
+          },
+          "height": 1013,
+          "media_key": "3_2095460491686723584",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HRSSNwfaQAAhVSS.jpg",
+          "width": 1234
+        }
+      ],
+      "published_at": "2026-09-03T10:34:49.000Z",
+      "raw_text": "$IQE is actually a quantum dot foundry leader believe it or not.\n\nToday IQE announced a purchase agreement with Quintessent (top player in the QD space).\n\n“As quantum dot lasers move to customer sampling.”\n\nYour QD bros like $ALMU, QD Laser (6613), and others might finally start to see the light of day, with broader commercialization in the next few years. \n\nSecond order effects are QD machine chokepoints like $ALRIB that might capture more attention.\n\nBut TAM is typically pretty small on the QD material epi side of things. (No disclosure over $ figure), but good news nevertheless.",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "$IQE is actually a quantum dot foundry leader believe it or not. Today IQE announced a purchase agreement with Quintessent (top player in the QD space). “As quantum dot lasers move to customer sampling.” Your QD bros like $ALMU, QD Laser (6613), and others might finally start to see the light of day, with broader commercialization in the next few years. Second order effects are QD machine chokepoints like $ALRIB that might capture more attention. But TAM is typically pretty small on the QD material epi side of things. (No disclosure over $ figure), but good news nevertheless.",
+      "triage": {
+        "decided_at": "2026-09-03T22:36:15.793581+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "同一 IQE–Quintessent 協議已有具體協議稿代表性 lead；此貼文的 ALMU／ALRIB 二階推論未附可逐字核對的一手依據。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2095460499769155944"
+    },
     "lead_caa3e0209d61d6de504ac996be1f03fc": {
       "entities": {
         "company_ids": [
@@ -50568,6 +51625,39 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1326801/000095010326012607/xslF345X06/ownership.xml"
+    },
+    "lead_e11e6bf3708003d280916a6fea59f549": {
+      "entities": {
+        "company_ids": [
+          "co:lam_research"
+        ],
+        "tickers": [
+          "LRCX"
+        ]
+      },
+      "first_seen": "2026-09-03T22:33:18.499876+00:00",
+      "lead_id": "lead_e11e6bf3708003d280916a6fea59f549",
+      "published_at": "2026-09-03",
+      "refs": {},
+      "source": "edgar:LRCX",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "LRCX 4 filed 2026-09-03",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-03T22:36:15.210151+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "結果只增加治理與稀釋脈絡，不改候選集合或排序。"
+        },
+        "decided_at": "2026-09-03T22:36:15.210151+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "LRCX 官方 SEC Form 4，發行人與申報日期可逐字核對；低優先放行作內部人／稀釋時變觀測。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/707549/000170782726000006/xslF345X06/wk-form4_1788462360.xml"
     },
     "lead_e123ebff0d822e6c32b9a2b089646aab": {
       "entities": {
@@ -55786,9 +56876,17 @@
       "first_seen": "2026-09-03T01:48:31.354343+00:00",
       "lead_id": "lead_fa672a299978b3f3ec2b0cf8ae1d4130",
       "published_at": null,
-      "refs": {},
+      "refs": {
+        "parked_reason": "research-map candidate set verified; supplier relationship not proven",
+        "primary_url": "https://developer.nvidia.com/blog/nvidia-800-v-hvdc-architecture-will-power-the-next-generation-of-ai-factories/",
+        "research_outcome": "no_prepared_ra: official list names power-component vendors but does not identify Kyber power-shelf socket allocation",
+        "trace_attempts_ref": "nvidia_800vdc_blog_2026-09-04",
+        "trace_origin_entity": "NVIDIA",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
       "source": "decompose-800vdc-2026-09-03",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "[decompose|800VDC] 機櫃 DC/DC power shelf 層——NVIDIA 具名 Delta/Flex Power/Lead Wealth/LiteOn/Megmeet;誰拿 Kyber socket?集中度與台達(2308.TW)純度;圖中無節點",
       "triage": {
@@ -56646,8 +57744,8 @@
   "schema_version": "2",
   "source_state": {
     "x:aleabitoreddit": {
-      "since_id": "2095261816767283663",
-      "updated_at": "2026-09-02T22:32:47.203898+00:00",
+      "since_id": "2095590610967421206",
+      "updated_at": "2026-09-03T22:33:07.900776+00:00",
       "user_id": "1940360837547565056"
     }
   }

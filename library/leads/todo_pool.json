@@ -7903,6 +7903,51 @@
       "source": "manual",
       "title": "GlobalFoundries 對 Tower Semiconductor 的專利訴訟——追一手訴狀／法院文件",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-09-03T22:40:31.052222+00:00",
+      "hint": "當前 missing_data：JDA 客戶或 hyperscaler 的具名一手確認；Optical Connectivity 的第三方 qualification／design-win 證據；任何 Sivers／Aeva 供應關係的一手揭露（共 3 項）｜coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
+      "n": 472,
+      "reason": null,
+      "ref_id": "dc_2906500af891541ea4bdd52503b9b3aa",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:aeva：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review",
+      "waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-09-03T22:40:31.051699+00:00",
+        "trigger": "財務核驗清單欄位缺失或待人工填入",
+        "until": null
+      }
+    },
+    {
+      "added_at": "2026-09-03T22:53:12.025510+00:00",
+      "graph_impact": "+1 節點、0 邊、1 claims｜來源：Sivers Semiconductors（tier 2）",
+      "hint": "核准 exact graph delta；Decision handoff：co:sivers_semiconductors。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 473,
+      "reason": null,
+      "ref_id": "ra_51171727ae171518974b4196f814c7b2",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "Sivers Glasgow InP 廠 US$30M 擴建，目標 2027 Q4 年產逾 1 億顆 CW DFB",
+      "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-09-03T22:53:12.025510+00:00",
+      "graph_impact": "+2 節點、1 邊、1 claims｜來源：IQE plc / Quintessent Inc. joint announcement（tier 2）",
+      "hint": "核准 exact graph delta；Decision handoff：co:iqe。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 474,
+      "reason": null,
+      "ref_id": "ra_ca9471422ef13d9301ca7f66baaac9be",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "IQE 供應 Quintessent 6 吋 GaAs QDL epiwafer，進入 customer sampling",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -17195,6 +17240,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 472,
+  "next_n": 475,
   "schema_version": "1"
 }

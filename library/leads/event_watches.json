@@ -253,7 +253,7 @@
       ],
       "poll": {
         "eligible": true,
-        "last_checked": null,
+        "last_checked": "2026-09-03",
         "query_hint": "取得 canonical Rosenblatt／B. Riley note，或 AAOI／Broadcom 官方量化 MRC／RNG 對 optical unit demand 的影響"
       },
       "note": "[321] 由 trace backlog 遷移；trace_status=partial",
@@ -1100,7 +1100,7 @@
       ],
       "poll": {
         "eligible": true,
-        "last_checked": null,
+        "last_checked": "2026-09-03",
         "query_hint": "FCC 正式發布 NPRM／Report and Order，或把中國光模組廠列入 Covered List。"
       },
       "note": "[321] 由 trace backlog 遷移；trace_status=isolated_tier_3",
