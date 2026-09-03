@@ -1,0 +1,89 @@
+{
+  "cohort_id": "dc_957bff3701ea4e46d962bfb9ff0932c8",
+  "company_id": "co:coherent",
+  "weakest_axis": "technical_causal_link",
+  "research_status": "READY",
+  "rubric_version": "confidence-envelope-v1",
+  "axis_results": {
+    "commercial_maturity": {
+      "accepted_refs": [
+        "COHR Q3 FY2026 8-K EX-99.1（filed 2026-05-06, accession 000119312526208972）Business Outlook 逐字：Revenue for the fourth quarter of fiscal 2026 is expected to be between $1.91 billion and $2.05 billion.；backlog 無營運揭露與 contract liabilities $70M 出自 Q3 FY2026 10-Q（accession 000082031826000013）；產能協議出自同 10-Q Liquidity 段。local: library/raw/cohr_ex991_20260506.txt, cohr_10_q_20260506.txt",
+        "COHR FY2025 10-K（filed 2025-08-15, accession 000082031825000014）segment note「Major Customers」逐字：We had two major customers who accounted for 12 % and 10 % of consolidated revenue during fiscal 2025. … These customers purchased primarily from our Networking segment.；NVIDIA 註記出自 COHR Q3 FY2026 10-Q（filed 2026-05-06, accession 000082031826000013）Liquidity 段。local: library/raw/cohr_10_k_20250815.txt, cohr_10_q_20260506.txt"
+      ],
+      "effective_level": "corroborated",
+      "evidence_refs": [
+        "COHR Q3 FY2026 8-K EX-99.1（filed 2026-05-06, accession 000119312526208972）Business Outlook 逐字：Revenue for the fourth quarter of fiscal 2026 is expected to be between $1.91 billion and $2.05 billion.；backlog 無營運揭露與 contract liabilities $70M 出自 Q3 FY2026 10-Q（accession 000082031826000013）；產能協議出自同 10-Q Liquidity 段。local: library/raw/cohr_ex991_20260506.txt, cohr_10_q_20260506.txt",
+        "COHR FY2025 10-K（filed 2025-08-15, accession 000082031825000014）segment note「Major Customers」逐字：We had two major customers who accounted for 12 % and 10 % of consolidated revenue during fiscal 2025. … These customers purchased primarily from our Networking segment.；NVIDIA 註記出自 COHR Q3 FY2026 10-Q（filed 2026-05-06, accession 000082031826000013）Liquidity 段。local: library/raw/cohr_10_k_20250815.txt, cohr_10_q_20260506.txt"
+      ],
+      "level": "corroborated",
+      "missing_data": [],
+      "reason": "multi-billion-dollar purchase commitment（non-exclusive）＋ Q4 FY2026 guided revenue $1.91B–$2.05B 是實際商業承諾層級的證據，非僅 reference design。"
+    },
+    "financial_resilience": {
+      "accepted_refs": [
+        "yfinance.info",
+        "COHR FY2025 10-K（filed 2025-08-15, accession 000082031825000014）segment note「Major Customers」逐字：We had two major customers who accounted for 12 % and 10 % of consolidated revenue during fiscal 2025. … These customers purchased primarily from our Networking segment.；NVIDIA 註記出自 COHR Q3 FY2026 10-Q（filed 2026-05-06, accession 000082031826000013）Liquidity 段。local: library/raw/cohr_10_k_20250815.txt, cohr_10_q_20260506.txt"
+      ],
+      "effective_level": "bounded_hypothesis",
+      "evidence_refs": [
+        "yfinance.info",
+        "COHR FY2025 10-K（filed 2025-08-15, accession 000082031825000014）segment note「Major Customers」逐字：We had two major customers who accounted for 12 % and 10 % of consolidated revenue during fiscal 2025. … These customers purchased primarily from our Networking segment.；NVIDIA 註記出自 COHR Q3 FY2026 10-Q（filed 2026-05-06, accession 000082031826000013）Liquidity 段。local: library/raw/cohr_10_k_20250815.txt, cohr_10_q_20260506.txt"
+      ],
+      "level": "bounded_hypothesis",
+      "missing_data": [
+        "financial_runway_analysis"
+      ],
+      "reason": "毛利率 37% 持平、$2B 現金入帳、股數稀釋 +0%（快照期間），但完整 runway／負債結構分析尚未完成（financial_runway_manual_required）。"
+    },
+    "source_reliability": {
+      "accepted_refs": [
+        "cohr_10_q_20260506",
+        "nvda_coherent_partnership_pr_2026_03_02",
+        "coherent_q3fy26_cpo"
+      ],
+      "effective_level": "corroborated",
+      "evidence_refs": [
+        "cohr_10_q_20260506",
+        "nvda_coherent_partnership_pr_2026_03_02",
+        "coherent_q3fy26_cpo"
+      ],
+      "level": "corroborated",
+      "missing_data": [],
+      "reason": "同一事件（2026-03-02 NVIDIA $2B 投資＋多年期產能協議）有 3 個 origin_event：Coherent Q3 FY2026 10-Q（tier 1 filing）、NVIDIA 端新聞稿、Coherent 法說會，跨 2 個獨立 origin_entity（Coherent、NVIDIA）。"
+    },
+    "technical_causal_link": {
+      "accepted_refs": [
+        "co:coherent"
+      ],
+      "context_only_refs": [
+        "edge:b0ecd9e64a2631b4c81ea35ef3214654244f7b6b0e3b4d7b151759d06ece6a6c"
+      ],
+      "effective_level": "bounded_hypothesis",
+      "evidence_refs": [
+        "co:coherent",
+        "edge:b0ecd9e64a2631b4c81ea35ef3214654244f7b6b0e3b4d7b151759d06ece6a6c"
+      ],
+      "level": "bounded_hypothesis",
+      "missing_data": [
+        "counter_thesis_path"
+      ],
+      "reason": "供應關係與投資關係在圖中已多源佐證；但「產能協議 → 2030 前營收/毛利實現」的因果鏈仍是前瞻假設，尚無 counter-path 佐證（圖 slice counter_paths 為空）。"
+    },
+    "valuation_payoff": {
+      "accepted_refs": [
+        "yfinance://history/COHR"
+      ],
+      "effective_level": "bounded_hypothesis",
+      "evidence_refs": [
+        "yfinance://history/COHR"
+      ],
+      "level": "bounded_hypothesis",
+      "missing_data": [
+        "FY2027 CPO revenue contribution and margin bridge",
+        "downside valuation under guide-low and CPO-delay scenarios"
+      ],
+      "reason": "Variant perception：目前股價 US$325.83、forward P/E 23.4x、EV/Revenue 9.9x，隱含市場已給予 Networking／CPO 成長與 NVIDIA 多年期產能協議相當高的兌現機率，但仍要求毛利與現金流同步轉換；本 thesis 認為真實情境不是只靠單一 NVIDIA headline，而是六吋 InP 良率／產能、ELS／CPO 與既有 Networking 需求共同支撐更耐久的收入組合；重新定價催化劑是 Q4 FY2026 實際營收／non-GAAP 毛利率落在或高於 US$1.91B–US$2.05B／39%–41% 指引，並在 FY2027 指引中首次把 CPO scale-out 收入與產能轉換量化。若只達指引下緣、毛利未擴張或 CPO 量化再延後，9.9x EV/Revenue 反而使 downside 放大。"
+    }
+  },
+  "_scrubbed_private_keys": []
+}

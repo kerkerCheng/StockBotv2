@@ -1,0 +1,259 @@
+{
+  "_comment": "由 scripts/capture_alpha_fixtures.py 從 COHR 真實五軸映射而成。⚠ 舊五軸與新五 score 不是同一組東西，映射關係見 AXIS_TO_SCORE。",
+  "signal": {
+    "ticker": "COHR",
+    "company_id": "co:coherent",
+    "as_of": "2026-09-03",
+    "structural_score": {
+      "declared": 0.5,
+      "effective": 0.5,
+      "trace_id": "ct_structural",
+      "downgrade_reason": null
+    },
+    "value_capture_score": {
+      "declared": 0.85,
+      "effective": 0.85,
+      "trace_id": "ct_value_capture",
+      "downgrade_reason": null
+    },
+    "earnings_exposure_score": {
+      "declared": 0.5,
+      "effective": 0.5,
+      "trace_id": "ct_earnings_exposure",
+      "downgrade_reason": null
+    },
+    "expectation_gap_score": {
+      "declared": 0.5,
+      "effective": 0.5,
+      "trace_id": "ct_expectation_gap",
+      "downgrade_reason": null
+    },
+    "catalyst_score": null,
+    "direction": "long",
+    "confidence": 0.6,
+    "expected_horizon": "2-4 quarters",
+    "thesis": "NVIDIA 多年期產能協議＋20 億美元投資使 COHR 在 CPO 外部光源具結構位置",
+    "variant_view": "市場隱含：forward P/E 23.4x／EV-Revenue 9.9x 已給 Networking／CPO 成長相當高的兌現機率；本 thesis 認為毛利與現金流的轉換速度是未被充分定價的分歧點",
+    "bull_case": "產能協議如期轉為營收，毛利率隨 CPO 組合上行",
+    "base_case": "營收兌現但毛利改善落後",
+    "bear_case": "CPO 時程遞延，供給側擴張壓縮定價權",
+    "disproof_conditions": [
+      {
+        "condition": "non-GAAP 毛利率連續兩季低於 40.2%",
+        "check_frequency": "quarterly",
+        "action_within_48h": "強制 review → retire 或 revise thesis",
+        "evidence_refs": []
+      }
+    ],
+    "catalysts": [],
+    "risks": [],
+    "evidence_refs": [],
+    "model_components": {
+      "ct_earnings_exposure": {
+        "trace_id": "ct_earnings_exposure",
+        "rule_version": "confidence-envelope-v1",
+        "inputs": {
+          "effective_level": "bounded_hypothesis",
+          "level": "bounded_hypothesis",
+          "source_axis": "financial_resilience"
+        },
+        "evidence_refs": [
+          {
+            "ref": "yfinance.info",
+            "kind": "source_doc",
+            "source_doc_id": null,
+            "origin_entity": null,
+            "origin_event": null,
+            "url": null,
+            "quote": null,
+            "published_at": null,
+            "retrieved_at": null,
+            "recorded_at": null,
+            "evidence_tier": null,
+            "demand_proof_level": null,
+            "confidence": null,
+            "evidence_class": null,
+            "corroborating_origins": []
+          },
+          {
+            "ref": "COHR FY2025 10-K（filed 2025-08-15, accession 000082031825000014）segment note「Major Customers」逐字：We had two major customers who accounted for 12 % and 10 % of consolidated revenue during fiscal 2025. … These customers purchased primarily from our Networking segment.；NVIDIA 註記出自 COHR Q3 FY2026 10-Q（filed 2026-05-06, accession 000082031826000013）Liquidity 段。local: library/raw/cohr_10_k_20250815.txt, cohr_10_q_20260506.txt",
+            "kind": "external_document",
+            "source_doc_id": null,
+            "origin_entity": null,
+            "origin_event": null,
+            "url": null,
+            "quote": null,
+            "published_at": null,
+            "retrieved_at": null,
+            "recorded_at": null,
+            "evidence_tier": null,
+            "demand_proof_level": null,
+            "confidence": null,
+            "evidence_class": null,
+            "corroborating_origins": []
+          }
+        ],
+        "note": "毛利率 37% 持平、$2B 現金入帳、股數稀釋 +0%（快照期間），但完整 runway／負債結構分析尚未完成（financial_runway_manual_required）。"
+      },
+      "ct_expectation_gap": {
+        "trace_id": "ct_expectation_gap",
+        "rule_version": "confidence-envelope-v1",
+        "inputs": {
+          "effective_level": "bounded_hypothesis",
+          "level": "bounded_hypothesis",
+          "source_axis": "valuation_payoff"
+        },
+        "evidence_refs": [
+          {
+            "ref": "yfinance://history/COHR",
+            "kind": "market_series",
+            "source_doc_id": null,
+            "origin_entity": null,
+            "origin_event": null,
+            "url": null,
+            "quote": null,
+            "published_at": null,
+            "retrieved_at": null,
+            "recorded_at": null,
+            "evidence_tier": null,
+            "demand_proof_level": null,
+            "confidence": null,
+            "evidence_class": null,
+            "corroborating_origins": []
+          }
+        ],
+        "note": "Variant perception：目前股價 US$325.83、forward P/E 23.4x、EV/Revenue 9.9x，隱含市場已給予 Networking／CPO 成長與 NVIDIA 多年期產能協議相當高的兌現機率，但仍要求毛利與現金流同步轉換；本 thesis 認為真實情境不是只靠單一 NVIDIA headline，而是六吋 InP 良率／產能、ELS／CPO 與既有 Networking 需求共同支撐更耐久的收入組合；重新定價催化劑是 Q4 FY2026 實際營收／non-GAAP 毛利率落在或高於 US$1.91B–US$2.05B／39%–41% 指引，並在 FY2027 指引中首次把 CPO scale-out 收入與產能轉換量化。若只達指引下緣、毛利未擴張或 CPO 量化再延後，9.9x EV/Revenue 反而使 downside 放大。"
+      },
+      "ct_structural": {
+        "trace_id": "ct_structural",
+        "rule_version": "confidence-envelope-v1",
+        "inputs": {
+          "effective_level": "bounded_hypothesis",
+          "level": "bounded_hypothesis",
+          "source_axis": "technical_causal_link"
+        },
+        "evidence_refs": [
+          {
+            "ref": "co:coherent",
+            "kind": "graph_claim",
+            "source_doc_id": null,
+            "origin_entity": null,
+            "origin_event": null,
+            "url": null,
+            "quote": null,
+            "published_at": null,
+            "retrieved_at": null,
+            "recorded_at": null,
+            "evidence_tier": null,
+            "demand_proof_level": null,
+            "confidence": null,
+            "evidence_class": null,
+            "corroborating_origins": []
+          },
+          {
+            "ref": "edge:b0ecd9e64a2631b4c81ea35ef3214654244f7b6b0e3b4d7b151759d06ece6a6c",
+            "kind": "graph_edge",
+            "source_doc_id": null,
+            "origin_entity": null,
+            "origin_event": null,
+            "url": null,
+            "quote": null,
+            "published_at": null,
+            "retrieved_at": null,
+            "recorded_at": null,
+            "evidence_tier": null,
+            "demand_proof_level": null,
+            "confidence": null,
+            "evidence_class": null,
+            "corroborating_origins": []
+          }
+        ],
+        "note": "供應關係與投資關係在圖中已多源佐證；但「產能協議 → 2030 前營收/毛利實現」的因果鏈仍是前瞻假設，尚無 counter-path 佐證（圖 slice counter_paths 為空）。"
+      },
+      "ct_value_capture": {
+        "trace_id": "ct_value_capture",
+        "rule_version": "confidence-envelope-v1",
+        "inputs": {
+          "effective_level": "corroborated",
+          "level": "corroborated",
+          "source_axis": "commercial_maturity"
+        },
+        "evidence_refs": [
+          {
+            "ref": "COHR Q3 FY2026 8-K EX-99.1（filed 2026-05-06, accession 000119312526208972）Business Outlook 逐字：Revenue for the fourth quarter of fiscal 2026 is expected to be between $1.91 billion and $2.05 billion.；backlog 無營運揭露與 contract liabilities $70M 出自 Q3 FY2026 10-Q（accession 000082031826000013）；產能協議出自同 10-Q Liquidity 段。local: library/raw/cohr_ex991_20260506.txt, cohr_10_q_20260506.txt",
+            "kind": "external_document",
+            "source_doc_id": null,
+            "origin_entity": null,
+            "origin_event": null,
+            "url": null,
+            "quote": null,
+            "published_at": null,
+            "retrieved_at": null,
+            "recorded_at": null,
+            "evidence_tier": null,
+            "demand_proof_level": null,
+            "confidence": null,
+            "evidence_class": null,
+            "corroborating_origins": []
+          },
+          {
+            "ref": "COHR FY2025 10-K（filed 2025-08-15, accession 000082031825000014）segment note「Major Customers」逐字：We had two major customers who accounted for 12 % and 10 % of consolidated revenue during fiscal 2025. … These customers purchased primarily from our Networking segment.；NVIDIA 註記出自 COHR Q3 FY2026 10-Q（filed 2026-05-06, accession 000082031826000013）Liquidity 段。local: library/raw/cohr_10_k_20250815.txt, cohr_10_q_20260506.txt",
+            "kind": "external_document",
+            "source_doc_id": null,
+            "origin_entity": null,
+            "origin_event": null,
+            "url": null,
+            "quote": null,
+            "published_at": null,
+            "retrieved_at": null,
+            "recorded_at": null,
+            "evidence_tier": null,
+            "demand_proof_level": null,
+            "confidence": null,
+            "evidence_class": null,
+            "corroborating_origins": []
+          }
+        ],
+        "note": "multi-billion-dollar purchase commitment（non-exclusive）＋ Q4 FY2026 guided revenue $1.91B–$2.05B 是實際商業承諾層級的證據，非僅 reference design。"
+      }
+    },
+    "research_context_digest": "",
+    "ordering_rule": {
+      "name": "weakest_then_gap_first",
+      "version": "v1",
+      "keys": [
+        "incomplete",
+        "weakest_effective",
+        "expectation_gap",
+        "structural",
+        "catalyst",
+        "value_capture",
+        "earnings_exposure",
+        "ticker"
+      ]
+    },
+    "metadata": {}
+  },
+  "is_incomplete": true,
+  "weakest": "structural",
+  "known_axes": [
+    "structural",
+    "value_capture",
+    "earnings_exposure",
+    "expectation_gap"
+  ],
+  "ordering_key": [
+    "1",
+    "-0.5",
+    "-0.5",
+    "-0.5",
+    "inf",
+    "-0.85",
+    "-0.5",
+    "COHR"
+  ],
+  "contract_gaps": [
+    "source_reliability：meta 軸，不對應任何 score（限定 EvidenceRef 品質）",
+    "catalyst（Q5）：舊系統無對應軸——它住在 coverage_assessments.catalyst 的自由文字裡，沒有結構化欄位。這是 Phase 4/5 要補的缺口"
+  ]
+}

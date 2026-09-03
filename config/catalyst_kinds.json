@@ -1,0 +1,18 @@
+{
+  "_comment": "Catalyst.kind 的封閉字彙。taxonomy——世界會長出新品類，加一列即可，不改 Python。判準見 docs/solutions/architecture-patterns/closed-vocabulary-registry.md",
+  "_authority": "alpha/contracts.py::Catalyst 讀本檔；新增 kind 只改這裡",
+  "version": "2026-09-03",
+  "kinds": [
+    {"key": "qualification", "label": "認證通過", "note": "客戶完成供應商 qualification，從 sampling/qualifying 進到 qualified/designed_in"},
+    {"key": "design_win", "label": "設計導入", "note": "被指定進入下一代產品 BOM"},
+    {"key": "competitor_exit", "label": "競爭者退出", "note": "第二供應源退場、產線關閉或被併購"},
+    {"key": "capacity_inflection", "label": "產能拐點", "note": "擴產投產或產能受限開始影響出貨"},
+    {"key": "repricing", "label": "價格重訂", "note": "長約重談、ASP 調整或 take-or-pay 條款生效"},
+    {"key": "margin_inflection", "label": "毛利拐點", "note": "毛利率方向改變且公司自陳原因"},
+    {"key": "production_ramp", "label": "量產爬坡", "note": "從試產進入量產，出貨量級改變"},
+    {"key": "inventory_reversal", "label": "庫存反轉", "note": "通路庫存去化完成或重新堆積"},
+    {"key": "estimate_revision", "label": "預估調整", "note": "賣方共識 EPS/營收預估被上修或下修"},
+    {"key": "regulatory_transition", "label": "法規轉折", "note": "出口管制、關稅、補貼或認證標準改變"},
+    {"key": "technology_transition", "label": "技術世代交替", "note": "既有方案被新架構取代（如 pluggable → CPO）"}
+  ]
+}

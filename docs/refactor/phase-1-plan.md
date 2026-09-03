@@ -152,7 +152,48 @@ tests/test_layer_separation.py         import 邊界
 
 ---
 
-## 4. Exit criteria（可逐條驗證）
+## 4. Exit criteria（2026-09-03 實測結果）
+
+> ✅ **全數達成。** 實測值記在每一條後面；重跑方式見括號內命令。
+
+| 條件 | 結果 |
+|---|---|
+| `alpha/` 零外部相依 | ✅ `[]`（`python -c "import alpha, sys; print([m for m in ('neo4j','yfinance','anthropic','decision_lab','engine_c','mcp_server') if m in sys.modules])"`） |
+| 新增測試斷言 | ✅ **6 個測試檔、73 條**（原訂 5 檔 ≥17 條；多出的是真實 fixture 那一組） |
+| 每條斷言做過「故意違規→確認會紅」 | ✅ **17/17 突變全部讓測試變紅、空跑 0**（`python scripts/verify_test_nonvacuity.py`） |
+| 真實資料 fixture | ✅ 3 份（`tests/fixtures/alpha/`），由 `scripts/capture_alpha_fixtures.py` 從真實 authority 擷取並 scrub |
+| 全套測試 | ✅ **1,175 → 1,248 passed／0 skipped** |
+| 既有 package 變更 | ✅ **0 行**（`decision_lab`／`engine_b`／`engine_c`／`query`／`loader`／`thesis`／`identity`／`storage`／`mcp_server` 皆未動） |
+| F-20／F-25／F-31 三個 🔴 歸零 | ✅ `RankedList`／`Score.declared-effective`／`PointInTimeUnsupported` 各有會紅的突變守著 |
+
+### 4.0 動工過程中撞出的三件事（比計畫本身更有價值）
+
+**① 真實資料撞出兩個契約缺口**（T2／T5，`scripts/capture_alpha_fixtures.py --report`）：
+- **既有五軸與新的五個 score 不是同一組東西。** 舊五軸問「證據多強」，新五 score 問
+  prompt §6 的五個投資問題。映射是**輸入**不是改名：`technical_causal_link`→Q1、
+  `commercial_maturity`→Q2、`financial_resilience`→Q3（**只是部分**，真正要的
+  segment revenue 在 Engine C 沒有欄位）、`valuation_payoff`→Q4；
+  而 **`source_reliability` 沒有對應**——它是 meta 軸，限定所有 `EvidenceRef` 的品質。
+- **Q5 catalyst 在舊系統沒有任何軸**，住在 `coverage_assessments.catalyst` 的自由文字裡。
+  所以 COHR 的真實 `AlphaSignal` 是 `incomplete`、`catalyst_score is None`——
+  順帶讓「`None` ≠ 0」在**真實資料**上被驗到，不只在手寫案例上。
+
+**② 真實 `evidence_refs` 有 3/10 是散文型引用**（帶 `accession` 但無結構化 id），
+契約 10/10 都裝得下。這是 F-22 的世界，也是 Phase 2 resolver 的難度預覽。
+
+**③ 兩個守衛第一次跑就攔錯東西（L15 的現場實例，各記在程式碼註解裡）：**
+- `FORBIDDEN_POSITION_TOKENS` 含 `exposure` → 直接攔下 `earnings_exposure_score`
+  （那是 Q3 的研究維度不是部位）。修法是**改它問問題的方式**：名單只留無歧義 token。
+- Cypher 偵測用 `IGNORECASE` → 把 `_ENTITY_RE.match(` 判成 `MATCH (`。
+  改成大小寫敏感 ＋ 前面不得是 `.`。
+
+**④ 突變工具自己有偽陰性。** 每跑一次就有一條不同的斷言被報成「空跑」，
+手動重現卻會紅。成因是 Python 的 pyc 失效判準是 `(source_mtime_秒, source_size)`——
+`os.replace` 保留來源檔 mtime，相鄰兩個突變若讓檔案大小相同又落在同一秒，
+直譯器就沿用上一輪的 bytecode。修法是每次用全新的 `PYTHONPYCACHEPREFIX`。
+**這個 bug 的形狀正是它自己要防的東西：一個看起來在檢查、實際沒在檢查的檢查。**
+
+### 4.1 原始 checklist（保留供對照）
 
 - [ ] `alpha/` 存在（`contracts`／`causal`／`provider`／`errors`／`identity`／`testing`／`audit`），**零外部相依**：
       `python -c "import alpha; import sys; print([m for m in sys.modules if m in ('neo4j','yfinance','anthropic','decision_lab')])"` → `[]`
@@ -166,7 +207,7 @@ tests/test_layer_separation.py         import 邊界
 - [ ] `git diff --stat` 顯示 **`decision_lab/`／`engine_b/`／`engine_c/`／`query/`／`loader/` 的變更為 0 行**
       （Phase 1 是純新增；有任何一行動到既有 package 就代表 scope 漏了）
 
-### 4.1 Completion gate（八項，出自 `historical-failure-matrix.md` §9）
+### 4.2 Completion gate（八項，出自 `historical-failure-matrix.md` §9）
 
 - [ ] 1. Historical regression suite pass — **Phase 1 只需建立 `tests/fixtures/golden/`
       的 14 類 fixture 並凍結現況輸出**（refactor 前的 baseline；此時沒有新舊可比）

@@ -1,0 +1,16 @@
+{
+  "_comment": "StructuralEvent.kind 的封閉字彙。taxonomy——加一列即可。⚠ 與 catalyst_kinds 的分野：StructuralEvent 描述『圖上某個結構事實變了』（供給側事件），Catalyst 描述『市場什麼時候會重新定價』（定價側事件）。同一件事可能兩者都是，但它們回答不同問題，不合併。",
+  "_authority": "alpha/causal.py::StructuralEvent 讀本檔；新增 kind 只改這裡",
+  "version": "2026-09-03",
+  "kinds": [
+    {"key": "capacity_constraint", "label": "產能受限", "default_direction": "tightening"},
+    {"key": "capacity_expansion", "label": "產能擴張", "default_direction": "loosening"},
+    {"key": "qualification", "label": "認證狀態改變", "default_direction": "tightening"},
+    {"key": "design_win", "label": "設計導入", "default_direction": "tightening"},
+    {"key": "competitor_exit", "label": "競爭者退出", "default_direction": "tightening"},
+    {"key": "substitution", "label": "出現替代方案", "default_direction": "loosening"},
+    {"key": "price_move", "label": "價格變動", "default_direction": "tightening"},
+    {"key": "regulatory", "label": "法規變動", "default_direction": "tightening"},
+    {"key": "supply_disruption", "label": "供應中斷", "default_direction": "tightening"}
+  ]
+}

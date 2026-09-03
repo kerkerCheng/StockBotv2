@@ -30,6 +30,8 @@ config/*.json
 !config/target_allocation.json
 !config/event_watch.json
 !config/sector_anchors.json
+!config/catalyst_kinds.json
+!config/structural_event_kinds.json
 
 # Claude Code 本機設定（不共用）；project skills 轉接層需納入版本控制
 .claude/*
