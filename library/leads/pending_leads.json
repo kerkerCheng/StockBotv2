@@ -43617,9 +43617,13 @@
       "first_seen": "2026-09-03T00:20:02.337088+00:00",
       "lead_id": "lead_c042366cb469dcaf82dda0d6f222f652",
       "published_at": null,
-      "refs": {},
+      "refs": {
+        "outcome": "第一包=樞紐依賴邊 sub=4(Niron 官方時間表反向錨定);供應商邊(MP/Lynas/JL MAG/Proterial)因地緣分裂需逐家論證留後續包",
+        "research_action_id": "ra_44e0a3b539bafe0b3da2d6841df64212",
+        "trace_status": "partial"
+      },
       "source": "sub-backfill-448-2026-09-03",
-      "status": "triaged_go",
+      "status": "action_prepared",
       "themes": {},
       "title": "[448 拆分|磁材叢集] sub 補值論證——MP/Lynas/JL MAG/Proterial→rare_earth_magnets;actuators depends_on magnets(鐵氮化物/HRE-free 替代路線評值);GBD enables 邊。每邊定值附新來源打包 RA",
       "triage": {

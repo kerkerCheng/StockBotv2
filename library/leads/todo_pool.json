@@ -7779,6 +7779,19 @@
       "source": "research_action",
       "title": "[448] 減速器叢集 sub 補值(第一包)——HDS→諧波與 Nabtesco→RV 兩條邊定 sub=4,論證:在位高市占+合格週期摩擦 vs 挑戰者已量產",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-09-03T00:57:29.159372+00:00",
+      "graph_impact": "+2 節點、1 邊、1 claims｜來源：Niron Magnetics（替代磁材開發商官方新聞頁）（tier 2）",
+      "hint": "核准 exact graph delta；Decision handoff：co:niron_magnetics。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 464,
+      "reason": null,
+      "ref_id": "ra_44e0a3b539bafe0b3da2d6841df64212",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "[448] 磁材叢集第一包——人形致動器 depends_on 稀土磁石定 sub=4;Niron 官方現況錨定:商業化首發是喇叭,馬達方案仍在開發",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -17026,6 +17039,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 464,
+  "next_n": 465,
   "schema_version": "1"
 }
