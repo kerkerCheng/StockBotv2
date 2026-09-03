@@ -153,6 +153,38 @@ commit message 寫「這是純重構」，錯誤會原封不動進 master；因�
 | **B** | **Daily 架構重整＋beta 減量（可大修）** | 使用者定案。beta 區目前是 daily 最長的一段（主力逐檔表＋燈號＋pace＋貸款區塊），而 2026-08-01 已實測 beta **訊號 0 勝 3 敗**、有證據的只有 baseline 定投——呈現成本與證據價值不成比例。⚠ 減量不等於刪除行情心跳：`AGENTS.md`「行情表是每日心跳」仍然生效，要減的是**訊號衍生的敘述**，不是最新交易日與 1 日漲跌。<br>🔶 **2026-09-02 減量規則已落地待量測**：使用者讀完當日 brief（本機留底 `library/private/notifications/daily_brief_2026-09-02.md`，**baseline 24,195 bytes**）後定案五項——①pq2 同型項打包（7 個補證項的樣板重複 40+ 行）；②每編號整份只完整出現一次（[129][311][359] 曾三現）；③parked lead trace 欄位只在非預設值時展開；④Pane 1 同公司壓一列、Pane 2 已有編號只引用、Pane 3 改計數＋變動；⑤**beta 輕量版面**（半年投一次定案；同日使用者修正：表格橫向可滑，**欄位保留完整**——砍的是段落與重複敘述，不是欄位；無 TL;DR、無複述行、risk threshold 只在跨越時出現），AGENTS 契約已補定案句。規則進 `skills/daily-brief/SKILL.md`＋`crons/daily_brief_prompt.md`，契約測試換 token 不刪剎車（21 綠）。**本項保持掛著（使用者 2026-09-02 指示）**：等後續 daily 實跑對照 bytes 與 pq2 項目數，還可再減 | ①單次 daily 的輸出長度與 token 用量下降，且 **pq2 項目數不減少**（baseline 2026-09-02：24,195 bytes；查證：`Get-ChildItem library\private\notifications`）；②「研究完整但不在瓶頸排序內」的標的數 → 0（見下方 C-1，✅已落地）。 | ✅baseline 已取得（notifications 留底） |
 | ~~**C**~~ | ~~把 pq1 drain 乾淨~~ | ✅ **2026-08-29 完成**：110 條 `triaged_go`（66 Form 4＋11 filing＋11 Sivers/IQE＋22 X）逐條追源處置至 **0**，同日 decompose 產出的 11 條新題亦全數研究完畢再歸零（commit `c03743b`→`3acf18e`）。查證：`python -m engine_b.cli counts` 的 `triaged_go`。 | 110 → 0（兩次） | — |
 
+### 最終消化層（investable digest，使用者 2026-09-03 提出）
+
+**做什麼：** 在瓶頸排序之上加一層「最終消化」視圖：`rank_bottlenecks` 輸出 × Engine C
+未來性指標（forward EPS／預估營收、市值、analyst_count）× cohort 的條件式未來營收
+（「若 disproof 未觸發，量級大約多少」）× 需求端 capex 投入度 → **由 LLM 在 session 內
+綜合成最終可投資標的清單**。使用者原話：「分段的原因是不想讓後面這些比較飄渺的東西真的入圖」。
+
+**架構定位（不動任何既有權威）：**
+1. **兩段隔離就是 L4**——未來 EPS／capex／條件式營收全是時變＋推估，歸 Engine C 與
+   cohort 欄位，**永不入圖**；使用者的分段直覺與現行鐵律完全一致。
+2. **排序權威不變**：`rank_bottlenecks()` 仍是唯一排序；本層是**純消費端渲染視圖**
+   （與 lane memo 同類：隨叫隨到、不 gate 任何東西、不產生部位尺寸）。
+3. **條件式未來營收已有家**：cohort 的 `variant_perception` 欄位（市場隱含 X／thesis Y／
+   催化劑 Z）——把「若 disproof 不發生的進帳量級」寫成 Y 的量化版，用現成
+   `decision_lab variant-perception` 命令寫入，明標推估。
+4. **L14 記分板從第一天接上**：清單自動接既有等權重報酬追蹤（Shadow 價格錨），
+   「LLM 綜合層有沒有用」用排序前段 vs 後段的後續報酬回答。
+
+**分四步：** P1 確認／小擴 Engine C info 快照欄位（forwardEps/forwardPE/marketCap/
+analyst counts——yfinance.info 多半已有，缺的補進 ETL 快照）；P2 top-N cohort 補
+variant perception（這步是研究，逐 cohort 走 pq2）；P3 視圖組裝器
+（`decision_lab investable_digest`：rows × Engine C × cohort 欄位 → 組 context 給
+session 內 LLM 綜合，輸出每檔附瓶頸位置／條件式未來性（明標推估）／純度／相關性組／
+disproof，固定聲明「研究判斷非回測」）；P4 接 outcome 追蹤。
+
+**驗收（哪個數字會變）：** ①`investable_digest` 輸出的每一檔都能追溯到
+rank 行＋Engine C 欄位＋cohort 欄位（零自算數字——與 alpha-status 純消費端同紀律）；
+②圖中零新增節點/claim（隔離驗證：`coverage_gaps` 節點數不因本層而動）；
+③清單進等權重報酬追蹤的錨點筆數 >0。
+
+**前置：** P2 依賴各 cohort assessment 完備（2026-09-03 已就緒 7 家）；P1 無前置。
+
 #### B 的範圍（2026-08-29 使用者細化）
 
 **B-1 beta：訊號機制整組拔除，改為「目標比例 ＋ 相對水位」。**
