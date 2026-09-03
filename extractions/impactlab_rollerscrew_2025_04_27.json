@@ -1,0 +1,104 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "guided",
+      "disproof_condition": "Lower toward 3 if humanoid designs lock onto commodity/Chinese roller-screw suppliers at scale (named adoptions) or ball-screw/alternative transmissions retake sockets; raise toward 5 if designs lock onto few precision incumbents with multi-year qualification, evidenced by capacity reservations or named long-term agreements.",
+      "id": "impactlab_rollerscrew_2025_04_27_cl1",
+      "source_ids": [
+        "impactlab_rollerscrew_2025_04_27_s1",
+        "impactlab_rollerscrew_2025_04_27_s2",
+        "impactlab_rollerscrew_2025_04_27_s3",
+        "impactlab_rollerscrew_2025_04_27_s4"
+      ],
+      "statement": "Substitutability valuation for the planetary-roller-screw supply layer (Ewellix edge): 4 of 5. Third-party anchors: Morgan Stanley (Feb 2025 report, as reported) expects roller screws to become the majority of screws in humanoids; adoption already spans Tesla Optimus (four in calves), Figure, Agility, 1X and nearly all Chinese humanoid makers; each screw costs $1,350-2,700 and reducers+screws are ~33% of humanoid BOM; and per a named industry source 'the supply chain does not yet exist because the designs are not yet locked' — a demand-surging, precision-constrained layer with few incumbent suppliers. Rationale for 4 not 5: the same design-unlocked state means qualification barriers have not hardened, and Chinese entrants are ramping capacity — the vacuum will be contested. Research judgment; both error directions in disproof.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {
+        "sole_source": false,
+        "substitutability": 4
+      },
+      "confidence": 0.8,
+      "dst_id": "tech:planetary_roller_screw",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "impactlab_rollerscrew_2025_04_27_s2",
+        "impactlab_rollerscrew_2025_04_27_s4"
+      ],
+      "src_id": "co:ewellix"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "Ewellix AB"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:ewellix",
+      "name": "Ewellix（Schaeffler 旗下線性傳動）",
+      "role": null,
+      "source_ids": [
+        "impactlab_rollerscrew_2025_04_27_s4"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "robot_subsystem",
+      "aliases": [
+        "roller screw",
+        "PRS"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:planetary_roller_screw",
+      "name": "行星滾柱絲槓（planetary roller screw）",
+      "role": null,
+      "source_ids": [
+        "impactlab_rollerscrew_2025_04_27_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "impactlab_rollerscrew_2025_04_27",
+    "evidence_tier": 3,
+    "origin_entity": "Impact Lab（轉載 Fast Company 記者報導,含 Morgan Stanley 2025-02 報告轉述與具名引述）",
+    "permission_basis": "Public article; URL and short excerpts.",
+    "published_at": "2025-04-27",
+    "publisher": "Impact Lab",
+    "retrieved_at": "2026-09-03",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Impact Lab — The Hidden Hardware Powering the Humanoid Revolution: Planetary Roller Screws (Fast Company reprint)",
+    "url": "https://www.impactlab.com/2025/04/27/the-hidden-hardware-powering-the-humanoid-revolution-planetary-roller-screws-take-center-stage/"
+  },
+  "sources": [
+    {
+      "id": "impactlab_rollerscrew_2025_04_27_s1",
+      "locator": "Article — MS prediction",
+      "quote": "Over time, planetary roller screws should represent the majority of screws used in humanoids"
+    },
+    {
+      "id": "impactlab_rollerscrew_2025_04_27_s2",
+      "locator": "Article — adoption",
+      "quote": "Tesla's Optimus robot, for example, uses four planetary roller screws in its calves. Other major players—including Figure AI, Agility Robotics, 1X, and nearly all of China's humanoid robot manufacturers—are also incorporating them into their designs."
+    },
+    {
+      "id": "impactlab_rollerscrew_2025_04_27_s3",
+      "locator": "Article — cost and BOM",
+      "quote": "Each screw can cost between $1,350 and $2,700, making them one of the most expensive single components in a humanoid robot. ... Reducers and roller screws make up about 33% of the typical humanoid's bill of materials."
+    },
+    {
+      "id": "impactlab_rollerscrew_2025_04_27_s4",
+      "locator": "Article — supply chain",
+      "quote": "The supply chain does not yet exist because the designs are not yet locked"
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+Source URL: https://www.impactlab.com/2025/04/27/the-hidden-hardware-powering-the-humanoid-revolution-planetary-roller-screws-take-center-stage/
+
+Excerpt:
+Over time, planetary roller screws should represent the majority of screws used in humanoids (Morgan Stanley, Feb 2025)... Tesla's Optimus uses four planetary roller screws in its calves... Each screw can cost between $1,350 and $2,700... Reducers and roller screws make up about 33% of the typical humanoid's bill of materials... The supply chain does not yet exist because the designs are not yet locked. (Impact Lab, 2025-04-27)
