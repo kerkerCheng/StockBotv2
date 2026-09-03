@@ -86,20 +86,52 @@ FORBIDDEN_IN_ALPHA = (
 )
 
 
-def test_alpha_has_no_external_or_engine_dependencies() -> None:
-    """`alpha/` 在 Phase 1 結束時是**純型別 ＋ 一個 fake**。
+#: **唯一允許碰外部世界的 `alpha/` 子套件。**
+#: Phase 1 的測試 docstring 已預告：「Phase 2 的 concrete provider 住
+#: `alpha/providers/`，屆時本條要**明確加例外，不是整條刪掉**」——現在兌現。
+#: `alpha/contracts.py`／`causal.py`／`identity.py` 永遠不該需要資料庫。
+ALPHA_IO_SUBPACKAGE = "alpha/providers/"
+
+#: `alpha/cli.py` 允許 import `identity`——ticker → CompanyId 必須經 registry
+#: 解析而不是用猜的（INV-1／F-01）。這是**窄**例外，不是把 cli 排除在檢查外。
+ALPHA_IDENTITY_CONSUMERS = frozenset({"alpha/cli.py"})
+
+
+def test_alpha_core_has_no_external_or_engine_dependencies() -> None:
+    """`alpha/` 的**契約與模型層**維持零外部相依（要能離線測試）。
 
     空跑檢查：在 `alpha/contracts.py` 加一行 `import neo4j` → 這條會紅。
-    ⚠ Phase 2 的 concrete provider 住 `alpha/providers/`，屆時本條要**明確加例外**，
-    不是整條刪掉——`alpha/contracts.py` 永遠不該需要資料庫。
     """
     offenders: list[str] = []
     for path in _python_files("alpha"):
+        rel = _rel(path)
+        if rel.startswith(ALPHA_IO_SUBPACKAGE):
+            continue
         for module in _imported_roots(path):
             root = module.split(".")[0]
+            if root == "identity" and rel in ALPHA_IDENTITY_CONSUMERS:
+                continue
             if root in FORBIDDEN_IN_ALPHA:
-                offenders.append(f"{_rel(path)} → {module}")
-    assert not offenders, "alpha/ 不得依賴外部世界或其他 engine：\n" + "\n".join(offenders)
+                offenders.append(f"{rel} → {module}")
+    assert not offenders, (
+        "alpha/ 的契約與模型層不得依賴外部世界：\n" + "\n".join(offenders)
+        + f"\n（唯一例外是 {ALPHA_IO_SUBPACKAGE}）"
+    )
+
+
+def test_the_io_exception_stays_narrow() -> None:
+    """例外必須**窄**——若 `alpha/providers/` 之外也開始 import 資料庫，這條會紅。
+
+    ⚠ 這條與上一條是一對：上一條放行 providers，這一條確保放行的範圍沒有擴散。
+    「清單會腐壞，判準不會」——例外清單尤其會。
+    """
+    io_files = {
+        _rel(p) for p in _python_files("alpha")
+        if any(m.split(".")[0] in ("neo4j", "engine_c", "yfinance", "loader")
+               for m in _imported_roots(p))
+    }
+    outside = {f for f in io_files if not f.startswith(ALPHA_IO_SUBPACKAGE)}
+    assert not outside, f"I/O 溢出到 providers 之外：{sorted(outside)}"
 
 
 def test_alpha_imports_cleanly_without_optional_dependencies() -> None:
@@ -118,13 +150,19 @@ def test_alpha_imports_cleanly_without_optional_dependencies() -> None:
     assert out.stdout.strip() == "", f"import alpha 拉進了：{out.stdout.strip()}"
 
 
-def test_cypher_stays_out_of_alpha() -> None:
-    """Neo4j 是 implementation detail；Cypher 的家是 `query/`／`loader/`。"""
+def test_cypher_stays_out_of_the_alpha_core() -> None:
+    """Neo4j 是 implementation detail；Cypher 只准出現在 `alpha/providers/`。
+
+    ⚠ 連 providers 裡也應該優先呼叫既有的 `query/`——那裡才是 Cypher 的家。
+    `providers/` 允許少量 Cypher，是為了取 `query/` 沒有提供的 provenance
+    （例如 claim → SourceDoc 的引用），不是為了重寫排序邏輯。
+    """
     offenders = [
         _rel(p) for p in _python_files("alpha")
-        if _CYPHER.search(p.read_text(encoding="utf-8"))
+        if not _rel(p).startswith(ALPHA_IO_SUBPACKAGE)
+        and _CYPHER.search(p.read_text(encoding="utf-8"))
     ]
-    assert not offenders, f"alpha/ 出現 Cypher：{offenders}"
+    assert not offenders, f"alpha/ 的契約與模型層出現 Cypher：{offenders}"
 
 
 # ---------------------------------------------------------------------------
