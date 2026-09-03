@@ -2417,6 +2417,66 @@
         "at": "2026-09-02T22:54:06.248132+00:00",
         "wake_lead": "lead_a600d0a88beebed42f157188799b7083"
       }
+    },
+    {
+      "watch_id": "ew_0072_2026-09-03",
+      "created_at": "2026-09-02T22:35:26.960266+00:00",
+      "expires": "2027-01-01",
+      "kind": "related_entity_signal",
+      "until": null,
+      "entities": [
+        "APLD",
+        "BE",
+        "BTDR",
+        "CLSK",
+        "CORZ",
+        "CRWV",
+        "HIVE",
+        "IREN",
+        "KEEL",
+        "MU",
+        "NBIS",
+        "RIOT",
+        "SHAZ",
+        "SNDK",
+        "STM",
+        "TE",
+        "TSM",
+        "VSH",
+        "WYFI",
+        "co:coreweave",
+        "co:iren",
+        "co:micron_technology",
+        "co:nebius",
+        "co:sandisk",
+        "co:tsmc"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_b0daa9998b26ef6637edc45dc681bb97",
+      "consumed_entities": [
+        "CO:TSMC",
+        "TSM"
+      ],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "SNDK/MU 相關 decision 需要擁擠度證據時,以 EDGAR 13F-HR 原檔核對"
+      },
+      "note": "park 時自動建立；trace_status=partial",
+      "status": "fired",
+      "woken_by": {
+        "kind": "related_entity_signal",
+        "lead_id": "lead_19075d8c72a6e63c865ac7892028a08b",
+        "shared_entities": [
+          "TSM",
+          "co:tsmc"
+        ],
+        "at": "2026-09-03T00:34:53.939250+00:00",
+        "wake_lead": "lead_b0daa9998b26ef6637edc45dc681bb97"
+      }
     }
   ]
 }
