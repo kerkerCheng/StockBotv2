@@ -550,7 +550,7 @@ def _substantive_blockers(cohort_id: str) -> list[str]:
     這裡不另外猜一份（2026-08-26 手寫過一份 stale 清單，立刻就誤判了 co:axt）。
     """
 
-    from mcp_server.decision_tools import get_decision_brief_core
+    from decision_lab.public_view import get_decision_brief_core
 
     try:
         items = get_decision_brief_core().get("items") or []
@@ -834,7 +834,7 @@ def apply_batch(
 
 
 def _read_action_for_completion(action_id: str) -> dict[str, Any]:
-    from mcp_server.research_actions import read_action
+    from intake.actions import read_action
 
     return read_action(action_id)
 
@@ -843,7 +843,7 @@ def _declared_focus_for_action(action_id: str) -> str | None:
     """讀 RA 自報的 focus_company_id；讀不到就回 None（由呼叫端決定怎麼辦）。"""
 
     try:
-        from mcp_server.research_actions import read_action
+        from intake.actions import read_action
 
         action = read_action(action_id) or {}
     except Exception:
@@ -1602,7 +1602,7 @@ def _ra_graph_impact(payload: Mapping[str, Any]) -> str:
 
 def _collect_research_action_rows() -> list[dict[str, Any]]:
     """等核准入圖的 Research Action → 經典 pq2。"""
-    from mcp_server.research_actions import iter_actions
+    from intake.actions import iter_actions
 
     rows: list[dict[str, Any]] = []
     for action in iter_actions():
@@ -1977,7 +1977,7 @@ def _collect_decision_rows() -> list[dict[str, Any]]:
     需要本機 private Decision Store 與外部 authority；失敗會往上拋，由呼叫端
     決定是 fail-soft 還是記錄成「來源不健康」。
     """
-    from mcp_server.decision_tools import get_decision_brief_core
+    from decision_lab.public_view import get_decision_brief_core
 
     brief = get_decision_brief_core()
     rows: list[dict[str, Any]] = []

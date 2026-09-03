@@ -19,8 +19,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from mcp_server.intake import pending_intake_files
-from mcp_server.research_actions import count_action_states, iter_actions
+from intake.provenance import pending_intake_files
+from intake.actions import count_action_states, iter_actions
 
 REPO = "kerkerCheng/StockBotv2"
 LABEL = "weekly-scan"

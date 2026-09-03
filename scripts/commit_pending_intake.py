@@ -10,8 +10,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from mcp_server.action_publisher import publication_status, publish_pending_actions
-from mcp_server.research_actions import cleanup_expired_actions
+from intake.publish import publication_status, publish_pending_actions
+from intake.actions import cleanup_expired_actions
 
 
 def _parser() -> argparse.ArgumentParser:

@@ -368,7 +368,7 @@ def run_local_audit(*, today: date | None = None) -> str:  # pragma: no cover - 
                 graph_lines.get("dup_url", []),
             )
         )
-        from mcp_server.graph_mcp import GRAPH_SCHEMA_VERSION
+        from intake.application import GRAPH_SCHEMA_VERSION
 
         schema_ok = schema_version == GRAPH_SCHEMA_VERSION
         report.extend(
@@ -508,7 +508,7 @@ def run_local_audit(*, today: date | None = None) -> str:  # pragma: no cover - 
 
     # 6. 管道 / Provenance
     try:
-        from mcp_server.action_publisher import publication_status
+        from intake.publish import publication_status
 
         status = publication_status(root=ROOT)
         pending = status.get("actions") or []

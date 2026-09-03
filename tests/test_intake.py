@@ -10,8 +10,11 @@ from pathlib import Path
 
 import pytest
 
-from mcp_server import intake
-from mcp_server import graph_mcp
+# ⚠ 2026-09-03 Phase 3b：application 邏輯已搬到 `intake/`，`mcp_server/graph_mcp.py`
+# 只剩 @mcp.tool 包裝。**測試目標跟著模組走——斷言一條未改。**
+# `graph_mcp` 這個別名保留，是為了讓 diff 只有 import 一行，而不是全檔改名。
+from intake import provenance as intake
+from intake import application as graph_mcp
 
 
 def _extraction(

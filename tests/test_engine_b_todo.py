@@ -1216,7 +1216,7 @@ def test_ra_can_declare_its_own_decision_handoff(monkeypatch) -> None:
         raising=False,
     )
     monkeypatch.setitem(
-        __import__("sys").modules, "mcp_server.research_actions",
+        __import__("sys").modules, "intake.actions",
         type("M", (), {"iter_actions": staticmethod(
             lambda: [_ready_action("ra_x", focus="co:meta")]
         )})(),
@@ -1231,7 +1231,7 @@ def test_ra_can_declare_its_own_decision_handoff(monkeypatch) -> None:
 
 def test_ra_without_any_focus_still_blocks(monkeypatch) -> None:
     monkeypatch.setitem(
-        __import__("sys").modules, "mcp_server.research_actions",
+        __import__("sys").modules, "intake.actions",
         type("M", (), {"iter_actions": staticmethod(
             lambda: [_ready_action("ra_y")]
         )})(),

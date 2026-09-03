@@ -31,24 +31,21 @@ FORBIDDEN_FOR_ENGINE_D = ("alpha", "portfolio")
 
 #: 掃描範圍：所有 first-party package（不含 tests 與 .venv）。
 CORE_PACKAGES = (
-    "alpha", "portfolio", "risk", "decision_lab", "engine_b", "engine_c",
+    "alpha", "portfolio", "risk", "shared", "intake",
+    "decision_lab", "engine_b", "engine_c",
     "engine_d_runtime", "query", "loader", "thesis", "identity", "storage",
     "fetchers", "notifications", "crons", "scripts",
 )
 
-#: ⚠ `mcp_server` 的**已知例外**。實測（2026-09-03）：`mcp_server/` 4,016 行有 79%
-#: 不是 MCP，而是被關在 transport package 裡的 domain——因此這 5 個 core 消費端
-#: 被迫 import 它，其中包含 pq2 待辦池本身。
+#: ✅ **2026-09-03 Phase 3b：5 → 0，欠債清空。**
 #:
-#: **Phase 3 的驗收條件是這個集合變成空的。** 在那之前它是一份會被讀到的欠債清單，
-#: 而不是一條被關掉的檢查——新增第 6 個消費端會讓測試紅。
-KNOWN_MCP_CONSUMERS = frozenset({
-    "engine_b/todo.py",
-    "query/health_audit.py",
-    "crons/weekly_scan_digest.py",
-    "scripts/commit_pending_intake.py",
-    "scripts/prepare_research_action.py",
-})
+#: 原本這裡有 5 個 core 消費端被迫 import `mcp_server`（含 pq2 待辦池本身），
+#: 成因是 `mcp_server/` 4,016 行有 **79% 不是 MCP**——Research Action 的 domain、
+#: filesystem provenance 原語、local-only Git 發布，全被關在 transport package 裡。
+#: 抽出到 `intake/` 之後，**新核心可以在完全沒有 MCP 的情況下運作**。
+#:
+#: ⚠ 這個集合現在是空的，而檢查**仍然在跑**——它擋的是第 1 個新增者。
+KNOWN_MCP_CONSUMERS: frozenset[str] = frozenset()
 
 #: Cypher 偵測。⚠ **刻意大小寫敏感，且前面不得是 `.`**——第一版用 IGNORECASE，
 #: 結果把 `alpha/identity.py` 的 `_ENTITY_RE.match(` 判成 Cypher `MATCH (`。
@@ -195,6 +192,10 @@ TRANSITIONAL_SHIMS = frozenset({
     "decision_lab/blockers.py",
     "decision_lab/blocker_severity.py",
     "thesis/investment_policy.py",
+    "mcp_server/research_actions.py",
+    "mcp_server/intake.py",
+    "mcp_server/action_publisher.py",
+    "mcp_server/decision_tools.py",
 })
 
 #: `engine_d_runtime` 是 **composition root**——它的職責就是把各層接起來，
@@ -298,11 +299,23 @@ def test_mcp_allowlist_has_no_stale_entries() -> None:
     }
     stale = KNOWN_MCP_CONSUMERS - actual
     assert not stale, f"allowlist 有已修好的殘留條目，請移除：{sorted(stale)}"
+    # 反向也要成立：清單為空時，實際依賴也必須為空
+    assert not (actual - KNOWN_MCP_CONSUMERS), (
+        f"出現未登記的 mcp_server 依賴：{sorted(actual - KNOWN_MCP_CONSUMERS)}"
+    )
 
 
-def test_known_mcp_debt_is_exactly_five_files() -> None:
-    """Phase 3 的驗收 baseline：**5 → 0**。這個數字寫成斷言才不會悄悄變大。"""
-    assert len(KNOWN_MCP_CONSUMERS) == 5
+def test_no_core_module_depends_on_mcp() -> None:
+    """**Phase 3b 的驗收：core → `mcp_server` 的 import 數 5 → 0。**
+
+    這個數字寫成斷言才不會悄悄變回去。若日後真的又需要一個例外，
+    加進 `KNOWN_MCP_CONSUMERS` 會讓這條紅——那是刻意的摩擦：
+    每一個例外都應該是被討論過的決定，不是順手加的 import。
+    """
+    assert KNOWN_MCP_CONSUMERS == frozenset(), (
+        "core 不應再有任何 mcp_server 依賴；"
+        f"目前欠債清單：{sorted(KNOWN_MCP_CONSUMERS)}"
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -332,3 +345,34 @@ def test_every_audit_check_names_an_invariant_and_an_owner() -> None:
         assert check.invariant.startswith("INV-"), check.name
         assert check.owner_phase.startswith("Phase "), check.name
         assert check.description
+
+
+# ---------------------------------------------------------------------------
+# 5. intake/ 是 application layer，不得依賴 transport
+# ---------------------------------------------------------------------------
+
+def test_intake_does_not_import_mcp() -> None:
+    """**`intake/` 可以在完全沒有 MCP 的情況下運作。**
+
+    這是「MCP 是 optional adapter」這句話唯一可執行的形式——
+    若 `intake/` 需要 `mcp`，那它就不是 application layer，只是換了個目錄的 transport。
+    """
+    offenders = [
+        f"{_rel(p)} → {m}"
+        for p in _python_files("intake")
+        for m in _imported_roots(p)
+        if m.split(".")[0] in ("mcp", "mcp_server")
+    ]
+    assert not offenders, "intake/ 不得依賴 MCP：\n" + "\n".join(offenders)
+
+
+def test_mcp_adapter_is_thin() -> None:
+    """adapter 只該有 `@mcp.tool()` 包裝——**business logic 不得回流**。
+
+    baseline（2026-09-03 抽出後）：`graph_mcp.py` 從 1,349 行降到 ~350。
+    若它又長回 500 行以上，代表 application 邏輯正在回流到 transport 層。
+    """
+    text = (ROOT / "mcp_server" / "graph_mcp.py").read_text(encoding="utf-8")
+    assert len(text.splitlines()) < 500, (
+        "mcp_server/graph_mcp.py 又變厚了——application 邏輯應該住 intake/"
+    )

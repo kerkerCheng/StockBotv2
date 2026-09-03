@@ -49,7 +49,7 @@ def prepare_from_file(
     if not isinstance(payload, dict):
         raise ValueError("action draft 頂層必須是 JSON object")
     if prepare is None:
-        from mcp_server.graph_mcp import _prepare_research_action_impl
+        from intake.application import _prepare_research_action_impl
 
         prepare = _prepare_research_action_impl
     return prepare(action_json, root=root)
