@@ -159,10 +159,12 @@ tests/test_layer_separation.py         import 邊界
 | 條件 | 結果 |
 |---|---|
 | `alpha/` 零外部相依 | ✅ `[]`（`python -c "import alpha, sys; print([m for m in ('neo4j','yfinance','anthropic','decision_lab','engine_c','mcp_server') if m in sys.modules])"`） |
-| 新增測試斷言 | ✅ **6 個測試檔、73 條**（原訂 5 檔 ≥17 條；多出的是真實 fixture 那一組） |
-| 每條斷言做過「故意違規→確認會紅」 | ✅ **17/17 突變全部讓測試變紅、空跑 0**（`python scripts/verify_test_nonvacuity.py`） |
+| 新增測試斷言 | ✅ **8 個測試檔、108 條**（原訂 5 檔 ≥17 條） |
+| 每條斷言做過「故意違規→確認會紅」 | ✅ **23/23 突變全部讓測試變紅、空跑 0**（`python scripts/verify_test_nonvacuity.py`） |
 | 真實資料 fixture | ✅ 3 份（`tests/fixtures/alpha/`），由 `scripts/capture_alpha_fixtures.py` 從真實 authority 擷取並 scrub |
-| 全套測試 | ✅ **1,175 → 1,248 passed／0 skipped** |
+| **Golden fixtures（T13）** | ✅ **14/14 類**（`scripts/capture_golden_fixtures.py`），漂移偵測 `--verify`；隱私分兩層：tracked 只有摘要與 digest，完整內容在 gitignored 的 `library/private/golden/` |
+| 舊五軸 → 新五 score 轉換 | ✅ 單向轉換器 ＋ **41 cohort dual run、UNEXPECTED 0**（`scripts/dualrun_axis_conversion.py`） |
+| 全套測試 | ✅ **1,175 → 1,283 passed／0 skipped** |
 | 既有 package 變更 | ✅ **0 行**（`decision_lab`／`engine_b`／`engine_c`／`query`／`loader`／`thesis`／`identity`／`storage`／`mcp_server` 皆未動） |
 | F-20／F-25／F-31 三個 🔴 歸零 | ✅ `RankedList`／`Score.declared-effective`／`PointInTimeUnsupported` 各有會紅的突變守著 |
 

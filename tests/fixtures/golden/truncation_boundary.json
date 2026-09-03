@@ -1,0 +1,18 @@
+{
+  "limit": 10,
+  "rows_within_limit": [
+    "co:lumentum",
+    "co:coherent",
+    "co:coherent",
+    "co:coherent",
+    "co:soitec",
+    "co:coherent",
+    "co:mp_materials",
+    "co:tsmc",
+    "co:tower_semiconductor",
+    "co:globalfoundries"
+  ],
+  "full_id_count": 36,
+  "first_beyond_limit": "co:globalfoundries",
+  "note": "F-20：只帶前 N 名時，第 N+1 名會被誤判成「不在排序裡」。RankedList 型別強制同時帶截斷前的完整 id 集合"
+}

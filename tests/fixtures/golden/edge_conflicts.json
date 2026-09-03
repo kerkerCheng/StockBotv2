@@ -1,0 +1,11 @@
+{
+  "raw_conflict_count": 24,
+  "sample_ids": [
+    "conflict_554584ff8dd774394bbc12e74badb9d3e48bf166a0c3ea77f73a84a28d7f2cea",
+    "conflict_6c1f96fe3637acda75d993bcfabea2e4341b0d289b9f3c4d5e9b5ec3bb2e88f0",
+    "conflict_7398a995b6f01c1768ae878643f79457b0f7e38bebae438b08667cde20ed318d",
+    "conflict_98da1429243be40ceaf6916f2d733635f6cd57885c480256607dd1d530b548b3",
+    "conflict_f119c2f7a44c3e85fa798d6294008461c6f74cb716d51e453a9502f2acfb04e3"
+  ],
+  "note": "衝突單位是 edge_key + attribute。⚠ 這是 RAW detector，不扣除已核准的 resolution——數字恆定不代表沒被處理"
+}

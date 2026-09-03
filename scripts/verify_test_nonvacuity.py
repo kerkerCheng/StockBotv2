@@ -212,6 +212,22 @@ MUTATIONS: tuple[Mutation, ...] = (
         guards="舊軸問「撐不撐得住」，新 Q3 問「對 EPS/FCF 多重要」——不是同一件事",
     ),
     Mutation(
+        name="golden fixture 少一類",
+        path="tests/test_golden_fixtures.py",
+        old='    "truncation_boundary": "F-20",\n',
+        new="",
+        test="tests/test_golden_fixtures.py::test_all_fourteen_classes_are_present",
+        guards="14 類全在場——少一類代表某個歷史事故的 frozen input 不存在",
+    ),
+    Mutation(
+        name="tracked golden fixture 混入金額",
+        path="tests/fixtures/golden/normal_company.json",
+        old='  "note":',
+        new='  "nav_base": 123456.78,\n  "note":',
+        test="tests/test_golden_fixtures.py::test_tracked_fixtures_carry_no_monetary_values",
+        guards="private authority（NAV／部位金額）永不進 Git",
+    ),
+    Mutation(
         name="新增第 6 個 core → mcp_server 消費端",
         path="identity/registry.py",
         old="from __future__ import annotations",

@@ -1,0 +1,11 @@
+{
+  "assertion_dated_coverage": {
+    "assertions": 662,
+    "dated": 382
+  },
+  "claim_dated_coverage": {
+    "claims": 372,
+    "dated": 300
+  },
+  "note": "🔴 canonical edge **完全沒有時間欄位**；唯一時間線索是 CITES → SourceDoc.published_at。Phase 6 的驗收是把 dated 比例推到 ≥95%"
+}

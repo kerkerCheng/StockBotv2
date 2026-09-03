@@ -1,0 +1,25 @@
+{
+  "most_supplied_targets": [
+    {
+      "target": "None",
+      "suppliers": [
+        "co:axt",
+        "co:broadcom",
+        "co:coherent",
+        "co:ewellix",
+        "co:globalfoundries",
+        "co:harmonic_drive_systems",
+        "co:iqe",
+        "co:lumentum",
+        "co:lynas",
+        "co:mp_materials",
+        "co:poet_technologies",
+        "co:soitec",
+        "co:sumitomo_electric",
+        "co:tower_semiconductor",
+        "co:tsmc"
+      ]
+    }
+  ],
+  "note": "⚠ 同一 chokepoint 的供應商計數反映的是**我們研究了幾家**，不是世界上有幾家——不得單獨當瓶頸性證據"
+}

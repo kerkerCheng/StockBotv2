@@ -1,0 +1,30 @@
+{
+  "top3": [
+    {
+      "company_id": "co:lumentum",
+      "relation": "supplies_to",
+      "substitutability": 5,
+      "sole_source": true,
+      "qualification_status": "designed_in",
+      "demand_anchor": "tech:optical_scale_up"
+    },
+    {
+      "company_id": "co:coherent",
+      "relation": "supplies_to",
+      "substitutability": 5,
+      "sole_source": true,
+      "qualification_status": "designed_in",
+      "demand_anchor": "tech:ai_switch"
+    },
+    {
+      "company_id": "co:coherent",
+      "relation": "depends_on",
+      "substitutability": 5,
+      "sole_source": false,
+      "qualification_status": "qualified",
+      "demand_anchor": "tech:ai_switch"
+    }
+  ],
+  "total_rows": 36,
+  "note": "sub>=4 的可行動排序。**唯一排序權威是 query/bottleneck.py**；alpha 排序必須消費它，不得重算結構分"
+}

@@ -57,7 +57,7 @@ engine｜**Engine D** ＝capital permission 與 accountability。
 | Phase | Goal | Deliverables | Exit criteria（哪個數字會變） | Dependencies |
 |---|---|---|---|---|
 | **0** ✅ | Architecture inventory ＋ AGENTS 分類 ＋ MCP 降級 ＋ 歷史事故矩陣 | 六份 `docs/refactor/*.md` ＋ 舊 roadmap 封存 | 六份文件邏輯一致；舊 roadmap 22 個標題都有去向判定；36 筆事故已分類 | — |
-| **1** | Alpha contracts ＋ 三個防事故型別 ＋ audit 骨架 ＋ golden fixtures | `alpha/{contracts,causal,provider,errors,identity,testing}.py`＋`alpha/audit/`；5 個測試檔；`tests/fixtures/golden/` 14 類 | `alpha/` 零外部相依；**≥17 條新斷言且每條做過「故意違規→確認會紅」**；**既有 package 變更 0 行**；F-20／F-25／F-31 三個 🔴 歸零 | Phase 0 |
+| **1** ✅ | Alpha contracts ＋ 三個防事故型別 ＋ audit 骨架 ＋ golden fixtures ＋ 舊五軸轉換 | `alpha/{contracts,causal,provider,errors,identity,testing}.py`＋`alpha/audit/`；5 個測試檔；`tests/fixtures/golden/` 14 類 | ✅ 全數達成：`alpha/` 零外部相依；**23/23 突變證明斷言會紅**；**既有 package 變更 0 行**；1,175 → **1,283 passed / 0 skipped**；golden fixtures 14/14；舊五軸 dual run 41 cohort、UNEXPECTED 0；F-20／F-25／F-31 三個 🔴 歸零 | Phase 0 |
 | **2** | First research vertical slice（**標的＝COHR**） | B4：concrete `GraphResearchProvider`、LLM assessor、`python -m alpha research COHR --as-of ...` | ①每個 score 都能 explain 到 `EvidenceRef`；②圖零新增節點；③與 `rank_bottlenecks` 首選一致或能說明差異 | Phase 1 |
 | **3** | Engine D decomposition ＋ `mcp_server` domain 抽出 | B2／B3／B5／B6：shared infra 升格、alpha 模組搬入、`sizing` 切三段、`brief` 拆四 pane；core → `mcp_server` import 5 → 0 | `decision_lab/` 13,502 → **≤8,000 行**；直接相依環 **3 → 0**（`engine_d_runtime`／`thesis`／`engine_c`）；daily 輸出 **bytes 下降且 pq2 項目數不減**（baseline 2026-09-02＝24,195 bytes） | Phase 2 |
 | **3.5** | Portfolio / Risk 搬家（B1） | `portfolio/`、`risk/` | `decision_lab/` −2,054 行；`engine_c → decision_lab` 環消失；三個硬擋逐筆一致 | Phase 2 |
@@ -136,7 +136,7 @@ engine｜**Engine D** ＝capital permission 與 accountability。
 | Engine D cohort 重複（claim-keyed vs company-keyed） | 同公司可能同時存在兩個 cohort（2026-07-30 [74]／[75]） | 新建 cohort 時偵測同公司既有 cohort 並警告。**不回溯清理**（append-only） | 無 |
 | **把 `mcp_server/` 的 domain 抽出到 application layer**（新增 2026-09-03） | 實測：`mcp_server/` 4,016 行有 **79%（3,165 行）不是 MCP**——Research Action 的 domain、filesystem provenance 原語、local-only Git 發布，全被關在 transport package 裡。因此 5 個 core 消費端被迫 import 它，其中包含 pq2 待辦池本身 | `Core → mcp_server` 的 import **5 → 0**；`scripts/prepare_research_action.py` 不再呼叫私有 `_impl` 函式 | 併入 Phase 3（分類見 `target-architecture.md` §14.2） |
 | **`audit invariants` runtime checker**（新增 2026-09-03） | 36 筆歷史事故有 **10 筆只有文字保護**。L14 已寫過「真正的防呆是會自己出現的常駐計數器，不是要人讀的段落」 | 12 個 check 全部可對真實 DB 執行且 fail loudly；上線後**至少抓到過 1 筆真實問題**（抓到 0 筆的 audit 依 INV-5 是恆滅閘門） | Phase 1 建骨架，各 Phase 補檢查 |
-| **Golden fixtures / 歷史回歸套件**（新增 2026-09-03） | refactor 前必須先凍結 expected semantic behavior，否則無法分辨 `EXPECTED_CHANGE` 與 `REGRESSION` | `tests/fixtures/golden/` 有 14 類 fixture（見 `historical-failure-matrix.md` §7）；B1／B5／B6 三批都跑過 old/new dual run 且 unexplained diff = 0 | Phase 1 |
+| ~~**Golden fixtures / 歷史回歸套件**~~ ✅ **2026-09-03 交付** | — | 14/14 類已凍結（`scripts/capture_golden_fixtures.py --verify` 偵測漂移）。B1／B5／B6 的 dual run 仍待各批執行 | ✅ |
 
 ### 明確不排程（理由已量測，勿重開）
 

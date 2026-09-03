@@ -1,0 +1,20 @@
+{
+  "missing_data_histogram": {
+    "research_assessment_missing": 45,
+    "financial_runway_analysis": 1,
+    "counter_thesis_path": 1,
+    "FY2027 CPO revenue contribution and margin bridge": 1,
+    "downside valuation under guide-low and CPO-delay scenarios": 1,
+    "named Photonics production order": 1,
+    "opportunity pipeline conversion probability 與 timing": 1,
+    "Q2 2026 融資後現金與季度 cash burn": 1,
+    "重編後可比財務": 1,
+    "2026-08-27 重編與收入認列核對": 1,
+    "獨立客戶端量產訂單": 1,
+    "四位分析師目標價的日期與是否已反映 2026-07 之後的重定價": 1,
+    "以 pipeline conversion 機率 × 毛利率為基礎的 downside case（$799M pipel": 1,
+    "下一輪融資的時點、金額與稀釋程度（runway < 12 個月）": 1,
+    "獨立客戶端 800G／1.6T 量產訂單": 1
+  },
+  "note": "F-24：research_assessment_missing 與「缺某一筆觀測」是兩層關卡。順序是 assessment → 觀測才有機會被引用"
+}

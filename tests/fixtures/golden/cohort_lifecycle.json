@@ -1,0 +1,9 @@
+{
+  "lifecycle_state_counts": {
+    "active": 33,
+    "expired": 4,
+    "rejected": 4
+  },
+  "cohorts_with_reopened_epoch": [],
+  "note": "F-06：terminal 不等於死亡——已終結的 cohort 仍可能收到新事實，必須有 append-only 的重開路徑（reopen_lifecycle_epoch）"
+}

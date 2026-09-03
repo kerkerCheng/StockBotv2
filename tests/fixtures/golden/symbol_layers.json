@@ -1,0 +1,19 @@
+{
+  "registry_entry": {
+    "company_id": "co:sivers_semiconductors",
+    "research_ticker": "SIVE.ST",
+    "market_currency": "SEK",
+    "execution_currency": "EUR",
+    "execution_venue": "FRA",
+    "aliases": [
+      "SIVEF"
+    ]
+  },
+  "expected": {
+    "research_ticker": "SIVE.ST",
+    "market_currency": "SEK",
+    "execution_venue": "FRA",
+    "execution_currency": "EUR"
+  },
+  "note": "研究／執行／provider 三層 symbol 不得互相冒充；瑞典主掛牌的 ADV 不得冒充 Frankfurt live liquidity"
+}

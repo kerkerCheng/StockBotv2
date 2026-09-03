@@ -1,0 +1,39 @@
+{
+  "registered_units": {
+    "version": 1,
+    "quote_units": [
+      {
+        "quote_code": "GBp",
+        "currency": "GBP",
+        "factor": 0.01,
+        "note": "London Stock Exchange 以便士報價；Yahoo 對 .L 標的回傳 GBp"
+      },
+      {
+        "quote_code": "GBX",
+        "currency": "GBP",
+        "factor": 0.01,
+        "note": "GBp 的另一種常見寫法（部分 data vendor 用 GBX）"
+      },
+      {
+        "quote_code": "ILA",
+        "currency": "ILS",
+        "factor": 0.01,
+        "note": "Tel Aviv Stock Exchange 以 agorot 報價"
+      },
+      {
+        "quote_code": "ZAc",
+        "currency": "ZAR",
+        "factor": 0.01,
+        "note": "Johannesburg Stock Exchange 以 cents 報價"
+      }
+    ]
+  },
+  "resolution": {
+    "GBp": "QuoteUnit(quote_code='GBp', currency='GBP', factor=0.01)",
+    "GBP": "QuoteUnit(quote_code='GBP', currency='GBP', factor=1.0)",
+    "ILA": "QuoteUnit(quote_code='ILA', currency='ILS', factor=0.01)",
+    "ZAc": "QuoteUnit(quote_code='ZAc', currency='ZAR', factor=0.01)",
+    "USD": "QuoteUnit(quote_code='USD', currency='USD', factor=1.0)"
+  },
+  "note": "⚠ 大小寫敏感：GBp（便士）與 GBP（英鎊）折疊會讓價格差 100 倍。「修正」成 ISO code 會通過所有驗證卻餵出錯價——比 quarantine 危險得多"
+}

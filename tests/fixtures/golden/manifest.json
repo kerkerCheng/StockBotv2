@@ -1,0 +1,86 @@
+{
+  "_comment": "Golden fixtures 的 digest 清單。private=true 的完整內容只在 library/private/golden/（gitignored）；這裡只有摘要與 digest。",
+  "captured_at": "2026-09-03",
+  "fixtures": {
+    "normal_company": {
+      "guards": "baseline",
+      "private": false,
+      "digest": "sha256:a0973fa6107baa4cad4c3bbbe8480c83503f27f602c0ab8d6f05b25f9901384c"
+    },
+    "symbol_layers": {
+      "guards": "F-05",
+      "private": false,
+      "digest": "sha256:f4bff58856bd25e251d30572fca03512cd7d329ba07bb97c9d760c65305fcc26"
+    },
+    "minor_unit_quotes": {
+      "guards": "F-02",
+      "private": false,
+      "digest": "sha256:80091b7fa7a5098667aa02f1a963c57ae03e98aec7530a770a4d977efce2c397"
+    },
+    "unlisted_company": {
+      "guards": "F-03",
+      "private": false,
+      "digest": "sha256:0eec3c83a96a43a23cecfe1d03e7555965c3314681706e1348a8e3142f63eb4f"
+    },
+    "structural_bottleneck": {
+      "guards": "—",
+      "private": false,
+      "digest": "sha256:2e6af011ab1db781eb1b94597af5c853817a78e4d1e9f7070873d8a2a33e729d"
+    },
+    "multiple_substitutes": {
+      "guards": "—",
+      "private": false,
+      "digest": "sha256:6c14afb08fa4c8573b43473390de9f683aeab754d10805080c4a64ddf83676c8"
+    },
+    "watch_states": {
+      "guards": "F-15",
+      "private": false,
+      "digest": "sha256:02a3c8dfbbdac0b2bda49b9b523d8f7916b03a3f90b9f06c3a6bd3a3eacd6421"
+    },
+    "cohort_lifecycle": {
+      "guards": "F-06",
+      "private": false,
+      "digest": "sha256:bbb91deb5fa025d2b7757a8fc9d6de4f86c8def5979b5092c0e5bda38c18e7cb"
+    },
+    "blocked_states": {
+      "guards": "F-24",
+      "private": false,
+      "digest": "sha256:1dabf5b98dae694cfd6d758246a50463b7a076b7909fc3c852b1fcfb1db650c4"
+    },
+    "stale_observations": {
+      "guards": "—",
+      "private": false,
+      "digest": "sha256:e0878efb47c5f0613492151ec85e99dfa16345fb1007745f6465b73d92ad8d82"
+    },
+    "edge_conflicts": {
+      "guards": "—",
+      "private": false,
+      "digest": "sha256:0ae15c7ed1755ea344648e0cb256d4e3518e153fdbedc14484b5b519ba5cb19c"
+    },
+    "point_in_time_boundary": {
+      "guards": "F-31",
+      "private": false,
+      "digest": "sha256:b9690d2708be1f7b820492b4a7463a8d193b0895fad4e2a09512cb83d86de750"
+    },
+    "truncation_boundary": {
+      "guards": "F-20",
+      "private": false,
+      "digest": "sha256:2904da6f4d21d99f4cbd0dfe75677e6dab6fdeec99a15670be8a4a583348ce85"
+    },
+    "multi_account_holding": {
+      "guards": "F-21",
+      "private": true,
+      "digest": "sha256:9bc0f1d9af33a7998b5c4e1fe9ba5fa9650a55c751e15112bab185320e9101f3",
+      "summary": {
+        "status": "available",
+        "position_count": 16,
+        "tickers_across_multiple_lots": [
+          "00981A.TW",
+          "2330.TW",
+          "LON:VWRA"
+        ],
+        "note": "F-21：同一檔散在多帳戶時，按第一列 nav_base 計算會讓**沒有任何一列顯示真實曝險**。只記 ticker 與 lot 數，不記金額"
+      }
+    }
+  }
+}

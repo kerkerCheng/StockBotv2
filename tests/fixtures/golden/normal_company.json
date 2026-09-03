@@ -1,0 +1,10 @@
+{
+  "registry_entry": {
+    "company_id": "co:coherent",
+    "research_ticker": "COHR",
+    "market_currency": "USD",
+    "execution_currency": "USD",
+    "execution_venue": "NYSE"
+  },
+  "note": "資料最完整的標的：有五軸、有 variant perception、有 live fill、有 outcome"
+}

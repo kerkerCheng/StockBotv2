@@ -1,0 +1,8 @@
+{
+  "count": 27,
+  "sample": {
+    "company_id": "co:agility_robotics",
+    "research_ticker": null
+  },
+  "note": "research_ticker=null 是**明確標記**不是空缺（L9）。identity 的部分缺漏不得靜默關掉整條下游管線（F-03）"
+}

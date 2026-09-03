@@ -1,0 +1,31 @@
+{
+  "total_manual_observations": 85,
+  "oldest": [
+    {
+      "ticker": "6680.HK",
+      "field_name": "customer_concentration",
+      "as_of": "2023-03-31T00:00:00+00:00"
+    },
+    {
+      "ticker": "3081.TWO",
+      "field_name": "backlog",
+      "as_of": "2025-12-31T00:00:00+00:00"
+    },
+    {
+      "ticker": "3081.TWO",
+      "field_name": "customer_concentration",
+      "as_of": "2025-12-31T00:00:00+00:00"
+    },
+    {
+      "ticker": "3363.TWO",
+      "field_name": "backlog",
+      "as_of": "2025-12-31T00:00:00+00:00"
+    },
+    {
+      "ticker": "3363.TWO",
+      "field_name": "customer_concentration",
+      "as_of": "2025-12-31T00:00:00+00:00"
+    }
+  ],
+  "note": "runway 觀測的 as_of 應填**資產負債表日**不是申報日；100 天鮮度窗是刻意對齊財報節奏的設計，**不要去改窗**"
+}
