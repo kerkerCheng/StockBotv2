@@ -11258,9 +11258,13 @@
       "first_seen": "2026-09-02T23:41:30.177215+00:00",
       "lead_id": "lead_1acfa75f85b80a88db95c35eb402974b",
       "published_at": null,
-      "refs": {},
+      "refs": {
+        "parked_reason": "大題拆分完成:盤點 15 條缺 sub 供應型邊(develops/competes 不需),拆三叢集(減速器/磁材/致動器感測)註冊 pq1 triaged_go 逐輪清;每邊定值需獨立論證+新來源,單輪不可壓縮",
+        "trace_next_trigger": "三叢集題完成後本題自然閉合",
+        "trace_status": "partial"
+      },
       "source": "user-approved-2026-09-03",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "[授權工程|448] 人形族群邊 substitutability 補值——逐邊 bounded research 定值(諧波/RV/滾柱絲槓/力矩感測/磁材群現有邊),打包 RA 入圖;補完族群進瓶頸排序",
       "triage": {
@@ -32320,6 +32324,44 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2087345398130282801"
     },
+    "lead_86709ede2c19f3b0bcbaba2317325971": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-03T00:20:02.658285+00:00",
+      "lead_id": "lead_86709ede2c19f3b0bcbaba2317325971",
+      "published_at": null,
+      "refs": {},
+      "source": "sub-backfill-448-2026-09-03",
+      "status": "triaged_go",
+      "themes": {
+        "robotics": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "Schaeffler",
+            "humanoid"
+          ]
+        }
+      },
+      "title": "[448 拆分|致動器/感測叢集] sub 補值論證——Ewellix→roller_screw;Novanta→force_torque_sensor(既評「替代難度低」待定值);Schaeffler 組件邊;actuators→humanoid_systems。每邊定值附新來源打包 RA",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-03T00:20:18.133303+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "ranking",
+          "reason": "[448] 使用者已授權工程的拆分叢集;逐輪 drain 清"
+        },
+        "decided_at": "2026-09-03T00:20:18.133303+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "[448] 使用者已授權工程的拆分叢集;逐輪 drain 清",
+        "tier": 2
+      },
+      "url": "https://github.com/local/robotics-sub-backfill?cluster=actuators"
+    },
     "lead_8731ea81a6fcb4e666a7f2c5cea71e2b": {
       "entities": {
         "company_ids": [
@@ -40322,9 +40364,42 @@
       ],
       "published_at": "2026-09-02T09:54:21.000Z",
       "raw_text": "Just taking a look at Leopold's Situational Awareness Q2 13F latest holdings as of June 30th:\n\n1. $SNDK - $5.674B \n2. $MU - $5.574B \n3. $BE -  $1.899B\n4. $TSM - $1.265B\n5. $NBIS - $1.232B\n6. $CRWV - $744.5M\n7. $CORZ - $665.6M\n8. $STM - $584.3M (new)\n9. $APLD - $469.0M\n10. $RIOT - $468.2M\n11. $SHAZ - $456.8M\n12. $IREN - $433.3M\n\nLess material positions includeed $CLSK, $KEEL, sei-network:native, $WYFI, $BTDR, $TE, $HIVE, $VSH, and others. \n\nSeems like Situational Awareness concentrated around memory (Sandisk, Micron), that have low forward multiples but high visibility into 2030.  \n\nAs well as Anthropic/energy/power adjacent from colo/neoclouds + Bloom. \n\nSome of the bottlenecks like the MLCC trade, he couldn't see play out (Taiyo Yuden, etc). due to July's liqudation. And some are new like $STM (eg. MCU price hikes).\n\nWith core winners of everything such as $TSM (but less high-beta). \n\nThis looked similar to my H2 2026/early 2027 portfolio with Nebius, Micron, TSM, colo players and others as core focus. (I've heavily concentrated on upstream networking/legacy memory currently, with a lot of name overlap).  \n\nBut always cool to see what others are doing.",
-      "refs": {},
+      "refs": {
+        "outcome": "倉位/情緒類(L4 市場認知,不進圖):Situational Awareness Q2 13F 記憶體重倉(SNDK/MU 前二,合計逾 11B 級)+BE/TSM/NBIS/CRWV;貼文金額本輪未對上 EDGAR(fund 實體名搜尋未命中),數字視為未驗證轉述;對 SNDK/MU 的擁擠度脈絡已記錄",
+        "parked_reason": "sentiment/positioning,無 graph delta;需要時 13F-HR 是可驗證一手",
+        "trace_next_trigger": "SNDK/MU 相關 decision 需要擁擠度證據時,以 EDGAR 13F-HR 原檔核對",
+        "trace_status": "partial",
+        "trace_trigger_entities": [
+          "APLD",
+          "BE",
+          "BTDR",
+          "CLSK",
+          "CORZ",
+          "CRWV",
+          "HIVE",
+          "IREN",
+          "KEEL",
+          "MU",
+          "NBIS",
+          "RIOT",
+          "SHAZ",
+          "SNDK",
+          "STM",
+          "TE",
+          "TSM",
+          "VSH",
+          "WYFI",
+          "co:coreweave",
+          "co:iren",
+          "co:micron_technology",
+          "co:nebius",
+          "co:sandisk",
+          "co:tsmc"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "Just taking a look at Leopold's Situational Awareness Q2 13F latest holdings as of June 30th: 1. $SNDK - $5.674B 2. $MU - $5.574B 3. $BE - $1.899B 4. $TSM - $1.265B 5. $NBIS - $1.232B 6. $CRWV - $744.5M 7. $CORZ - $665.6M 8. $STM - $584.3M (new) 9. $APLD - $469.0M 10. $RIOT - $468.2M 11. $SHAZ - $456.8M 12. $IREN - $433.3M Less material positions includeed $CLSK, $KEEL, sei-network:native, $WYFI, $BTDR, $TE, $HIVE, $VSH, and others. Seems like Situational Awareness concentrated around memory (Sandisk, Micron), that have low forward multiples but high visibility into 2030. As well as Anthropic/energy/power adjacent from colo/neoclouds + Bloom. Some of the bottlenecks like the MLCC trade, he couldn't see play out (Taiyo Yuden, etc). due to July's liqudation. And some are new like $STM (eg. MCU price hikes). With core winners of everything such as $TSM (but less high-beta). This looked similar to my H2 2026/early 2027 portfolio with Nebius, Micron, TSM, colo players and others as core focus. (I've heavily concentrated on upstream networking/legacy memory currently, with a lot of name overlap). But always cool to see what others are doing.",
       "triage": {
@@ -43533,6 +43608,35 @@
         "tier": 4
       },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/kallelse-till-arsstamma-i-sivers-semiconductors-ab-publ-7c0595a8"
+    },
+    "lead_c042366cb469dcaf82dda0d6f222f652": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-03T00:20:02.337088+00:00",
+      "lead_id": "lead_c042366cb469dcaf82dda0d6f222f652",
+      "published_at": null,
+      "refs": {},
+      "source": "sub-backfill-448-2026-09-03",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "[448 拆分|磁材叢集] sub 補值論證——MP/Lynas/JL MAG/Proterial→rare_earth_magnets;actuators depends_on magnets(鐵氮化物/HRE-free 替代路線評值);GBD enables 邊。每邊定值附新來源打包 RA",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-03T00:20:17.840935+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "ranking",
+          "reason": "[448] 使用者已授權工程的拆分叢集;逐輪 drain 清"
+        },
+        "decided_at": "2026-09-03T00:20:17.840935+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "[448] 使用者已授權工程的拆分叢集;逐輪 drain 清",
+        "tier": 2
+      },
+      "url": "https://github.com/local/robotics-sub-backfill?cluster=magnets"
     },
     "lead_c0d903fffe41657bd0ebd171471eed13": {
       "entities": {
@@ -48928,6 +49032,43 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2074568161299771394"
+    },
+    "lead_d966ce5858ebd7f5e72a3329c49214dc": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-03T00:20:02.030099+00:00",
+      "lead_id": "lead_d966ce5858ebd7f5e72a3329c49214dc",
+      "published_at": null,
+      "refs": {},
+      "source": "sub-backfill-448-2026-09-03",
+      "status": "triaged_go",
+      "themes": {
+        "robotics": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "actuator"
+          ]
+        }
+      },
+      "title": "[448 拆分|減速器叢集] sub 補值論證——HDS/Nidec/Leaderdrive→strain_wave_gear;Nabtesco/双環→rv_reducer;兩 tech→actuator 組件邊。核心問題:85%/60% 市占+3-7 年合格週期 vs 中國挑戰者已量產,每邊定值附新來源打包 RA",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-03T00:20:17.553096+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "ranking",
+          "reason": "[448] 使用者已授權工程的拆分叢集;逐輪 drain 清"
+        },
+        "decided_at": "2026-09-03T00:20:17.553096+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "[448] 使用者已授權工程的拆分叢集;逐輪 drain 清",
+        "tier": 2
+      },
+      "url": "https://github.com/local/robotics-sub-backfill?cluster=reducers"
     },
     "lead_d980d3e0d3b02fb6aa301dba929334c6": {
       "entities": {
