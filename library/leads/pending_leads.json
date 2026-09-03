@@ -10538,9 +10538,13 @@
       "first_seen": "2026-09-02T22:33:01.550703+00:00",
       "lead_id": "lead_1900dc8a3a9795331553496fc7b83dc4",
       "published_at": "2026-09-02",
-      "refs": {},
+      "refs": {
+        "outcome": "Form 4 已解析:NVDA 董事 Mark Stevens:賣 1,848,501 股 @220.06-226.27(約 USD 410M)——量級大,但 Stevens 為長年慣性大額減持的 VC 董事,單獨不構成訊號;NVDA 價位 ~220",
+        "parked_reason": "insider Form 4 信心類,無 graph delta",
+        "trace_status": "partial"
+      },
       "source": "edgar:NVDA",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -13493,9 +13497,13 @@
       "first_seen": "2026-09-02T22:32:59.463452+00:00",
       "lead_id": "lead_24e98e2fb4e446ac129f3334c9189fc5",
       "published_at": "2026-09-02",
-      "refs": {},
+      "refs": {
+        "outcome": "Form 4 已解析:MRVL Koopmans:賣 10,000 股 @203.27,例行",
+        "parked_reason": "insider Form 4 信心類,無 graph delta",
+        "trace_status": "partial"
+      },
       "source": "edgar:MRVL",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "MRVL 4 filed 2026-09-02",
       "triage": {
@@ -21781,9 +21789,13 @@
       "first_seen": "2026-09-02T22:33:01.550580+00:00",
       "lead_id": "lead_522e298dc1a193b34d3afcf3f9949096",
       "published_at": "2026-09-02",
-      "refs": {},
+      "refs": {
+        "outcome": "Form 4 已解析:NVDA Teter:賣 30,000 股 @216.8-218.5,例行",
+        "parked_reason": "insider Form 4 信心類,無 graph delta",
+        "trace_status": "partial"
+      },
       "source": "edgar:NVDA",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -43864,9 +43876,13 @@
       "first_seen": "2026-09-02T22:32:53.239213+00:00",
       "lead_id": "lead_c2d6b5c68a631a1ab627e5fb2f2dedb7",
       "published_at": "2026-09-01",
-      "refs": {},
+      "refs": {
+        "outcome": "Form 4 已解析:COHR CEO Anderson:RSU 歸屬 30,564+F 代扣 11,958 @295.39,例行",
+        "parked_reason": "insider Form 4 信心類,無 graph delta",
+        "trace_status": "partial"
+      },
       "source": "edgar:COHR",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -50699,9 +50715,11 @@
       "first_seen": "2026-09-02T22:32:53.238739+00:00",
       "lead_id": "lead_e43bbbebc27c5bacc0a2ab090629b278",
       "published_at": "2026-09-01",
-      "refs": {},
+      "refs": {
+        "trace_status": "partial"
+      },
       "source": "edgar:COHR",
-      "status": "triaged_go",
+      "status": "researching",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -55897,9 +55915,13 @@
       "first_seen": "2026-09-02T22:33:04.281392+00:00",
       "lead_id": "lead_fd3d74d515670ced7ec5e5bdac69f6c6",
       "published_at": "2026-09-02",
-      "refs": {},
+      "refs": {
+        "outcome": "Form 4 已解析:TSM Mii Yuh-Jier:配股 32,204 @0,例行",
+        "parked_reason": "insider Form 4 信心類,無 graph delta",
+        "trace_status": "partial"
+      },
       "source": "edgar:TSM",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "TSM 4 filed 2026-09-02",
       "triage": {
