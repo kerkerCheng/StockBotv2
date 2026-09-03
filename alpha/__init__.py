@@ -33,7 +33,7 @@ from .identity import (
 )
 from .contracts import (
     AXES, DEFAULT_ORDERING_RULE, AlphaModel, AlphaSignal, Catalyst, ComponentTrace,
-    ConsensusSnapshot, DisproofCondition, EvidenceRef, EvidenceSelection,
+    ConsensusSnapshot, DisproofCondition, EvidenceQuality, EvidenceRef, EvidenceSelection,
     FreshnessState, FundamentalsSnapshot, MarketSnapshot, OrderingRule, RankedList,
     ResearchContext, ScarcityInputs, Score, StructuralContext, ValuationSnapshot,
     content_digest, select_point_in_time_evidence,
@@ -45,17 +45,23 @@ from .causal import (
 from .provider import (
     AS_OF_METHODS, PROVIDER_METHODS, BottleneckRow, GraphResearchProvider, SupplyExposure,
 )
+from .evidence_quality import assess_evidence_quality, from_legacy_level
+from .legacy_axes import LEGACY_AXIS_TO_SCORE, ConversionResult, convert_axis_results
+from .levels import LEVELS, LEVEL_SCALE_VERSION, level_to_ceiling, level_to_score
 
 __all__ = [
     "AXES", "AS_OF_METHODS", "DEFAULT_ORDERING_RULE", "PROVIDER_METHODS",
     "Alias", "AlphaError", "AlphaModel", "AlphaSignal", "BottleneckRow", "CausalPath",
     "Catalyst", "CompanyId", "CompanyImpact", "ComponentTrace", "ConsensusSnapshot",
-    "ContractViolation", "DisproofCondition", "EntityId", "EvidenceRef",
+    "ContractViolation", "ConversionResult", "DisproofCondition", "EntityId",
+    "EvidenceQuality", "EvidenceRef",
     "EvidenceSelection", "Exchange", "ExternalProviderId", "FreshnessState",
     "FundamentalsSnapshot", "GraphResearchProvider", "IdentityError", "ImpactConfidence",
     "ImpactDirection", "ImpactMagnitude", "InstrumentId", "MarketSnapshot",
     "OrderingRule", "PointInTimeUnsupported", "RankedList", "ResearchContext",
     "ScarcityInputs", "Score", "StructuralContext", "StructuralEvent", "SupplyExposure",
-    "Ticker", "TimeHorizon", "ValuationSnapshot", "content_digest",
-    "select_point_in_time_evidence",
+    "LEGACY_AXIS_TO_SCORE", "LEVELS", "LEVEL_SCALE_VERSION",
+    "Ticker", "TimeHorizon", "ValuationSnapshot", "assess_evidence_quality",
+    "content_digest", "convert_axis_results", "from_legacy_level",
+    "level_to_ceiling", "level_to_score", "select_point_in_time_evidence",
 ]

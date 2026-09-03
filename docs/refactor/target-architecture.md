@@ -355,6 +355,52 @@ class AlphaSignal:
 
 ---
 
+### 5.0 舊五軸 → 新五 score 的乾淨轉換（2026-09-03 使用者定案：**取代，不並存**）
+
+實測 41 個 operational cohort（`python scripts/dualrun_axis_conversion.py`）：
+
+| 舊軸（問「證據多強」） | 新 score（問投資問題） |
+|---|---|
+| `technical_causal_link` | `structural`（Q1） |
+| `commercial_maturity` | `value_capture`（Q2） |
+| `financial_resilience` | `earnings_exposure`（Q3）⚠ **只轉得到一半** |
+| `valuation_payoff` | `expectation_gap`（Q4） |
+| **`source_reliability`** | **無**——它是 meta 軸 → `EvidenceQuality` 上限 |
+| **無** | **`catalyst`（Q5）**——舊系統沒有這一軸 → 轉換後恆為 `None` |
+
+**`source_reliability` 的處置是本次轉換最重要的設計決定。**
+它不是一個投資問題（「你憑什麼相信前面那些答案」不是「這檔好不好」），
+所以不能當第六個維度。它從**第五個被 `min()` 的分量**變成**套在所有維度上的上限**：
+
+```
+舊：weakest = min(五軸)             → 只說「證據不夠」
+新：effective = min(declared, ceiling) → 說「所以**哪個投資維度**看不清」
+```
+
+**實測依據（L14 恆亮測試）：舊 `source_reliability` 在 41 個 cohort 中有
+33 個（80%）是 weakest**——它幾乎總是最弱，於是其他四軸的判斷很少改變結論。
+一個觸發率 80% 的分量沒有鑑別力。
+
+> ⚠ **誠實的但書：新 `weakest` 也有 73% 集中在 `structural`。**
+> 轉換**換了標籤，沒有解決集中**——依同一條 L14 測試，新 weakest 同樣接近恆亮。
+> 差別只在**可行動性**（新標籤指得出下一步：補 counter-path）。
+> **那是可讀性的改善，不是鑑別力的改善。** 真正要讓這個數字下降的是
+> Phase 4／5（補 Q3 的 segment revenue、Q5 的結構化 catalyst），不是再改一次標籤。
+
+**兩個誠實的缺口，不得用預設值填掉：**
+1. **Q3 只轉得到一半**——舊軸問「公司撐不撐得住」，新 Q3 問「對 EPS/FCF 多重要」，
+   後者需要 segment revenue share，而 **Engine C 沒有這個欄位**。轉換結果帶
+   `partial:legacy_financial_resilience_only`。
+2. **Q5 沒有來源**——轉換後 `catalyst_score is None`。**那是正確答案**：
+   填預設值會讓「沒有結構化催化劑」看起來像「催化劑很弱」。
+
+**轉換是單向的。** Decision Store append-only，268 筆歷史 payload 永不改寫（L10）；
+`alpha/legacy_axes.py` 只有 `convert_axis_results()`，**沒有也不會有 `to_legacy()`**
+——那會製造兩份可寫的真相。
+
+**dual run 結果：41 個 cohort、5 類 semantic diff、UNEXPECTED = 0**
+（依 `historical-failure-matrix.md` §8，unexplained diff 未歸零前不得移除 legacy）。
+
 ### 5.1 v1 的 MVP 輸出形狀（取代 prompt §18 的範例）
 
 ```jsonc
@@ -634,7 +680,7 @@ class CompanyImpact:
 | 4 | **AlphaSignal ≠ Position** | ✅ | Alpha 呈現契約已極強：「系統不給部位尺寸」「拿掉的是憑空的建議尺寸，不是煞車」。**直接繼承** |
 | 5 | **Research automation ≠ capital authority** | ✅ | 四個 gate ＋「LLM 可以解析與提議，不可以授權」（L15）。**直接繼承，且要寫進 §12 的 A5** |
 | 6 | **Alpha 必須考慮 market expectation / variant perception** | 🟡 **缺口** | variant perception 的**操作定義已有**（2026-09-02 定案：市場隱含 X／thesis Y／催化劑 Z），但「哪些標的值得看」的**四維度不含 expectation gap**。**處置：四維度 → 五 score，expectation gap 是新增的第四題** |
-| 7 | **Engine D 不應承擔 fundamental research／thesis／valuation／catalyst／alpha scoring** | 🔴 **衝突** | `AGENTS.md` 的 Engine D 表格逐字寫著它擁有「Shadow、Coverage、**五軸 Confidence、瓶頸排序**、NAV 比例呈現、outcome」。**處置：Engine D 的 authority 欄改為 §12 的 A5，把五軸／排序／NAV 移出** |
+| 7 | **Engine D 不應承擔 fundamental research／thesis／valuation／catalyst／alpha scoring** | 🔴 **衝突（轉換方案已定，見 §5.0）** | `AGENTS.md` 的 Engine D 表格逐字寫著它擁有「Shadow、Coverage、**五軸 Confidence、瓶頸排序**、NAV 比例呈現、outcome」。**處置：Engine D 的 authority 欄改為 §12 的 A5。五軸已於 2026-09-03 定案由新五 score 取代（不並存），轉換器 `alpha/legacy_axes.py` 已交付並跑過 41 cohort dual run** |
 | 8 | **LLM qualitative／deterministic numeric** | ✅ | L15 逐字已有。**處置：從 lesson 升格為 §6.1 的架構分工表** |
 | 9 | **所有歷史 research／backtest 必須 point-in-time correct** | 🔴 **重大缺口** | 現行 point-in-time contract **只涵蓋 Engine D 決策**，不涵蓋研究與回測；**Engine A 根本沒有 as-of 能力**（`current-architecture.md` §4.2 實測）。**處置：INV-6 ＋ `GraphResearchProvider.as_of` ＋ `PointInTimeUnsupported`** |
 | 10 | **所有重要 conclusion 可回溯至 evidence** | 🟡 | 圖層已極強（每個 node/edge/claim 必掛 `source_ids`），但**五軸 assessment 的 reason 是自由文字**、`variant_perception` 也是。**處置：`AlphaSignal` 的每個非 None score 強制帶 `EvidenceRef`** |

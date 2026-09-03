@@ -200,6 +200,47 @@ def select_point_in_time_evidence(
     return EvidenceSelection(tuple(kept), tuple(future), tuple(undated))
 
 
+@dataclass(frozen=True, slots=True)
+class EvidenceQuality:
+    """一組證據**能撐多高**，以及為什麼。
+
+    ⚠ 這是舊 `source_reliability` 軸的新家。它**不是** `AlphaSignal` 的第六個維度——
+    「你憑什麼相信前面那些答案」不是一個投資問題，它是套在**所有**維度上的上限。
+
+    - 舊語意：`weakest = min(五軸)`；`source_reliability` 最弱時它就是 weakest，
+      而輸出只會說「證據不夠」，不會說「所以哪個投資維度看不清」。
+    - 新語意：`effective = min(declared, ceiling)`，被壓下去的維度帶
+      `downgrade_reason="evidence_quality_ceiling"`——**多回答了「什麼看不清」**。
+
+    推導邏輯在 `alpha/evidence_quality.py`（型別住這裡，判斷住那裡）。
+    """
+
+    level: str
+    independent_origins: int
+    best_tier: int | None
+    total_refs: int
+    reason: str
+    scale_version: str = "ordinal-v1"
+
+    def __post_init__(self) -> None:
+        from .levels import level_rank
+
+        if level_rank(self.level) < 0:
+            raise ContractViolation(f"EvidenceQuality.level 未登記：{self.level!r}")
+
+    @property
+    def ceiling(self) -> float:
+        from .levels import level_to_ceiling
+
+        return level_to_ceiling(self.level)
+
+    def apply(self, declared: float) -> tuple[float, str | None]:
+        """把上限套到宣告值上。回傳 `(effective, downgrade_reason)`。"""
+        if declared <= self.ceiling:
+            return declared, None
+        return self.ceiling, "evidence_quality_ceiling"
+
+
 # ---------------------------------------------------------------------------
 # 2. Score / ComponentTrace / DisproofCondition / Catalyst
 # ---------------------------------------------------------------------------
@@ -631,6 +672,7 @@ class AlphaSignal:
     catalysts: tuple[Catalyst, ...] = ()
     risks: tuple[str, ...] = ()
 
+    evidence_quality: EvidenceQuality | None = None
     evidence_refs: tuple[EvidenceRef, ...] = ()
     model_components: Mapping[str, ComponentTrace] = field(default_factory=dict)
     research_context_digest: str = ""
@@ -658,6 +700,15 @@ class AlphaSignal:
                 raise ContractViolation(
                     f"{axis}_score 的 trace 沒有任何 EvidenceRef——"
                     "所有重要 conclusion 必須可回溯至 evidence（INV-6）"
+                )
+            # 證據品質是套在所有維度上的上限（舊 source_reliability 軸的新家）。
+            # 超過上限代表「這組證據撐不起這個分數」——那是 L8 要防的事。
+            if (self.evidence_quality is not None
+                    and score.effective > self.evidence_quality.ceiling):
+                raise ContractViolation(
+                    f"{axis}_score 的 effective={score.effective} 超過證據品質上限 "
+                    f"{self.evidence_quality.ceiling}（{self.evidence_quality.reason}）——"
+                    "供應商自報不能撐起外部印證等級的結論（L8）"
                 )
 
     # ---- 讀取 -------------------------------------------------------------
