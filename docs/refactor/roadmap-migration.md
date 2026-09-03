@@ -192,8 +192,27 @@ GF 對 Tower 專利訴訟未追源。
 > 調整建議在 [`target-architecture.md`](target-architecture.md) §15。**
 > 這裡只記「哪一段最後會住在哪個檔案」，作為 roadmap 層級的搬遷追蹤。
 >
-> ⚠ **第一輪不執行**——`AGENTS.md` 每個 session 完整載入，改它的風險最高，
-> 必須等新的 architecture boundary 確認（Phase 2 結束）後才動。
+> ⚠ **第一輪不執行**——`AGENTS.md` 每個 session 完整載入，改它的風險最高。
+
+### AGENTS.md 的改動分兩類，時機完全不同
+
+**A 類——「防止文件說謊」的即時修正。不可延後，必須在同一個 change 內完成。**
+當 code 改動讓 `AGENTS.md` 的某句話變成假的，那句話就要在同一個 commit 改掉。
+依據是 2026-08-29 的實測教訓：程式已於 `6aa31de` 拔掉 beta 訊號，但三份文件仍在描述
+**已不存在的行為**——那不是 L13 的「管子只接一頭」，是**管子換了但說明書沒換**，
+下一個 session 會照著說明書把已被量測為有害的機制講回來。
+下表「什麼時候動」標成具體 Phase 的，全部屬 A 類。
+
+**B 類——一次性結構瘦身。排成 Phase 3.9（Phase 3.5 之後、Phase 4 之前）。**
+包含：把約 310 行 PROCEDURE 搬去 OPERATIONS／skills、L1–L16 改寫成五欄格式、
+四引擎表換成五條 authority separation。
+
+**為什麼是 3.9 而不是更早：** architecture boundary 要到 Phase 3.5 結束才真的定下來
+（Engine D 拆完、`mcp_server` domain 抽出、`alpha/` 擁有 research、Portfolio/Risk 搬完）。
+在那之前寫的瘦身版本，會在後面每個 Phase 落地時再被改一次——那正是使用者原話
+「確認新的 architecture boundary 後，再進行 `AGENTS.md` 瘦身」要避免的。
+
+**為什麼不能全部等到 3.9：** A 類延後就是讓文件說謊，而本 repo 已經因此踩過一次。
 
 | `AGENTS.md` 段落 | 判定 | 去向 | 什麼時候動 |
 |---|---|---|---|
@@ -203,19 +222,19 @@ GF 對 Tower 專利訴訟未追源。
 | 授權載體唯一＝pq2 編號｜`go` 的語意 | **KEEP** | `AGENTS.md` | — |
 | Alpha 呈現契約的 invariant 部分（不給尺寸／交付要求） | **KEEP** | `AGENTS.md` | — |
 | 技術訊號的地位（三次回測記錄） | **KEEP，不得刪減** | `AGENTS.md` | — |
-| L1–L16 | **KEEP（重寫成五欄格式）** | `AGENTS.md` | Phase 3 後 |
-| **系統架構（四引擎／四層）表** | **REDESIGN** | 改為五條 authority separation | Phase 3 後 |
+| L1–L16 | **KEEP（重寫成五欄格式）** | `AGENTS.md` | **Phase 3.9（B 類）** |
+| **系統架構（四引擎／四層）表** | **REDESIGN** | 改為五條 authority separation | **Phase 3.9（B 類）** |
 | Engine D 的 authority 欄（含五軸／排序／NAV） | **REDESIGN** 🔴 | 只留 A5 | Phase 3（B5/B6 落地時） |
 | 「唯一排序權威是 `rank_bottlenecks()`」 | **REDESIGN** 🔴 | 改為「結構排序唯一權威；alpha 排序必須消費它」 | Phase 2（`AlphaSignal` 首次排序時） |
 | 「哪些標的值得看」四維度 | **MERGE → 五 score** | `alpha/contracts.py` ＋ `AGENTS.md` 摘要 | Phase 4 |
 | 「報告產出：cohort 是終點」 | **REDESIGN** | 「`AlphaSignal` 是研究終點」 | Phase 2 |
 | point-in-time contract（只講 Engine D） | **REDESIGN**（擴充） | 加研究／回測側 | Phase 1（`PointInTimeUnsupported` 落地時） |
-| Beta 呈現契約 | **MOVE** | 隨 `portfolio/` 搬家，`AGENTS.md` 留一段摘要 | Phase 1.5 |
-| pq2 呈現規格（約 90 行） | **MOVE** | `skills/daily-brief/SKILL.md` | Phase 3（B6 拆 brief 時） |
+| Beta 呈現契約 | **MOVE** | 隨 `portfolio/` 搬家，`AGENTS.md` 留一段摘要 | Phase 3.5（A 類） |
+| pq2 呈現規格（約 90 行） | **MOVE** | `skills/daily-brief/SKILL.md` | **Phase 3.9（B 類）**——B6 拆 brief 時只確保不說謊，搬移在 3.9 一次做 |
 | Codex sandbox／16 條 rule 抄本 | **MOVE** | `docs/OPERATIONS.md` | Phase 8 |
 | Luna 委派契約 | **MOVE** | `skills/luna-reviewer/SKILL.md` | 隨時 |
-| Daily routine 權限與 retry｜報告留檔策略｜outbound 通知細節 | **MOVE** | `docs/OPERATIONS.md` | Phase 8 |
-| 五套證據強度字彙 | **MOVE** | `CONCEPTS.md` | Phase 1（`EvidenceRef` 落地時） |
+| Daily routine 權限與 retry｜報告留檔策略｜outbound 通知細節 | **MOVE** | `docs/OPERATIONS.md` | **Phase 3.9（B 類）** |
+| 五套證據強度字彙 | **MOVE** | `CONCEPTS.md` | Phase 1（A 類：`EvidenceRef` 落地時必須對得上） |
 | 管道層 ASCII 圖含 MCP 動詞 | **REDESIGN** | 改 application service 名稱 | Phase 3 |
 | 「MCP server 十二工具 surface」 | **MOVE → OPTIONAL_ADAPTER** | 標為 optional peripheral | Phase 8 |
 | L9 三前置條件已達標 | **KEEP**（實作可搬） | `thesis/preconditions.py` → Engine D | Phase 3 |

@@ -61,11 +61,26 @@ engine｜**Engine D** ＝capital permission 與 accountability。
 | **2** | First research vertical slice（**標的＝COHR**） | B4：concrete `GraphResearchProvider`、LLM assessor、`python -m alpha research COHR --as-of ...` | ①每個 score 都能 explain 到 `EvidenceRef`；②圖零新增節點；③與 `rank_bottlenecks` 首選一致或能說明差異 | Phase 1 |
 | **3** | Engine D decomposition ＋ `mcp_server` domain 抽出 | B2／B3／B5／B6：shared infra 升格、alpha 模組搬入、`sizing` 切三段、`brief` 拆四 pane；core → `mcp_server` import 5 → 0 | `decision_lab/` 13,502 → **≤8,000 行**；直接相依環 **3 → 0**（`engine_d_runtime`／`thesis`／`engine_c`）；daily 輸出 **bytes 下降且 pq2 項目數不減**（baseline 2026-09-02＝24,195 bytes） | Phase 2 |
 | **3.5** | Portfolio / Risk 搬家（B1） | `portfolio/`、`risk/` | `decision_lab/` −2,054 行；`engine_c → decision_lab` 環消失；三個硬擋逐筆一致 | Phase 2 |
+| **3.9** | **`AGENTS.md` 結構瘦身**（一次做完，見下方說明） | PROCEDURE 搬 OPERATIONS／skills；L1–L16 改五欄格式；四引擎表 → 五條 authority separation | `AGENTS.md` **771 → ≤450 行**且 INVARIANT 一條未刪；16 條 lesson 全部保留且各自標明 implementation 可不可改；`grep` 不到與 `.codex/rules`／`skills/*` 重複的清單 | Phase 3.5（boundary 定下來才動） |
 | **4** | Expectation Gap | Engine C 欄位擴充（forwardEps／revenue estimate／segment revenue）、peer registry、implied fundamentals | `expectation_gap_score` 對 **≥5 檔**可算出且可 explain；低 P/E 但共識與 thesis 一致的案例 gap ≈ 0 | Phase 2 |
 | **5** | Causal propagation | `StructuralEvent` → `CausalPath` → `CompanyImpact` | 對 **≥1 個真實事件**產出 **≥1 個**二階受益／受害者，路徑可追溯到 `EvidenceRef` | Phase 2 |
 | **6** | Backtest / validation | as-of 圖投影、anti-lookahead 測試、epoch 錨點 | SourceDoc `published_at` 覆蓋 **83% → 100%**；EdgeAssertion 可定日比例 **58% → ≥95%**；排序前段 vs 後段等權報酬差有 **≥2 期** | Phase 4、5 |
 | **7** | Portfolio / Risk 完整化 | view → target exposure → hard limits | **不新增任何 alpha 尺寸**；target exposure 可由 `AlphaSignal[]` 導出 | Phase 3.5 |
 | **8** | Automation / productization | daily／weekly／skills／MCP 適配 | 16 條 sandbox rule 完成 impact review；`sync_agent_skills.py --check` 無漂移；daily 端到端綠 | Phase 3 |
+
+### ⚠ `AGENTS.md` 的改動分兩類
+
+**A 類——防止文件說謊，不可延後。** code 改動讓某句話變成假的，就在**同一個 commit** 改掉。
+依據是 2026-08-29 實測：程式已於 `6aa31de` 拔掉 beta 訊號，三份文件卻仍在描述**已不存在的
+行為**——**管子換了但說明書沒換**，下一個 session 會照著說明書把已被量測為有害的機制講回來。
+逐 Phase 的小改，清單見 [`roadmap-migration.md`](refactor/roadmap-migration.md) §10。
+
+**B 類——結構瘦身，一次做完＝Phase 3.9。** 約 310 行 PROCEDURE 搬走、L1–L16 五欄重寫、
+四引擎表換成五條 authority separation。放在 3.5 之後是因為 architecture boundary 到那時
+才真的定下來；更早寫的瘦身版本會在後面每個 Phase 再被改一次。
+
+⚠ **`docs/ROADMAP.md` 本身的重構已於 Phase 0 完成**（673 → 227 行、逐字封存、22 個標題
+全有去向判定）。之後只剩每個 Phase 完成時回填實測 before → after，那是維護不是重構。
 
 ## 每個 Phase 的 completion gate（八項，缺一不得宣稱完成）
 
