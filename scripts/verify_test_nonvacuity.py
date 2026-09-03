@@ -199,7 +199,7 @@ MUTATIONS: tuple[Mutation, ...] = (
         name="證據品質上限不套用",
         path="alpha/contracts.py",
         old="        return self.ceiling, \"evidence_quality_ceiling\"",
-        new="        return declared, None",
+        new="        return declared, None",  # noqa: E501
         test="tests/test_alpha_legacy_conversion.py::test_weak_source_reliability_caps_every_dimension",
         guards="L8：供應商自報不能撐起外部印證等級的結論",
     ),

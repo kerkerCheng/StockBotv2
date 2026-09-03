@@ -126,10 +126,37 @@ def cmd_research(args: argparse.Namespace) -> int:
         if args.judgment:
             judgment = json.loads(Path(args.judgment).read_text(encoding="utf-8"))
             signal = compose_signal(build, judgment)
+            from .contracts import _canonical
+            payload = _canonical(signal)
+
+            if args.emit_assessment:
+                # ⚠ **composition root 負責序列化**——Engine D 的 adapter 吃 dict，
+                # 不吃 `AlphaSignal` 物件，所以 Engine D 依然不 import `alpha/`。
+                from decision_lab.adapters.alpha_signal import (
+                    coverage_assessment_from_signal,
+                )
+
+                bridged = coverage_assessment_from_signal(payload)
+                out = Path(args.emit_assessment)
+                out.write_text(json.dumps(bridged["assessment"], ensure_ascii=False,
+                                          indent=2, default=str), encoding="utf-8")
+                mirror = out.with_suffix(".alpha_signal.json")
+                mirror.write_text(json.dumps(bridged["_alpha_signal"],
+                                             ensure_ascii=False, indent=2, default=str),
+                                  encoding="utf-8")
+                print(f"assessment → {out}")
+                print(f"⚠ 有損轉換的完整鏡像 → {mirror}")
+                print("  （五軸裝不下 Q5 catalyst，也表達不了 evidence quality 的"
+                      "『上限』語意；鏡像保留原值供還原）")
+                print("")
+                print("下一步：python -m decision_lab reassess <cohort_id> "
+                      f"--assessment {out}")
+                print("⚠ 那一步會**寫進 append-only 的 Decision Store**——"
+                      "它是既有的人工 gate，本命令只負責寫檔。")
+                return 0
+
             if args.format == "json":
-                from .contracts import _canonical
-                print(json.dumps(_canonical(signal), ensure_ascii=False, indent=2,
-                                 default=str))
+                print(json.dumps(payload, ensure_ascii=False, indent=2, default=str))
             else:
                 print(_render(signal))
             return 0
@@ -164,6 +191,12 @@ def build_parser() -> argparse.ArgumentParser:
     research.add_argument("-o", "--out", help="packet 輸出路徑")
     research.add_argument("--judgment", help="session 寫好的判斷 JSON")
     research.add_argument("--format", choices=("markdown", "json"), default="markdown")
+    research.add_argument(
+        "--emit-assessment",
+        help="把 AlphaSignal 轉成 Engine D 的五軸 assessment 檔（**有損**，"
+             "會同時寫一份 .alpha_signal.json 完整鏡像）。"
+             "⚠ 寫檔而已——入圖／decision 仍需既有人工 gate",
+    )
     research.set_defaults(func=cmd_research)
 
     audit = sub.add_parser("audit", help="runtime invariant audit")

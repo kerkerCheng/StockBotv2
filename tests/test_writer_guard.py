@@ -86,6 +86,11 @@ def test_check_is_safe_for_a_short_run_far_from_the_window(capsys, monkeypatch) 
 
     monkeypatch.setattr(writer_guard, "datetime", _FixedDatetime)
     monkeypatch.setattr(writer_guard, "_git", lambda *a: "")
+    # ⚠ 也要隔離**真實鎖檔**。第一版只 monkeypatch 了 `_git`，於是這條測試會在
+    # 「排程正在跑（或留下孤兒鎖）」時失敗——2026-09-04 實測踩到：daily 06:32
+    # 取鎖後中途結束，鎖未釋放，測試就紅了。
+    # 那是環境狀態，不是被測邏輯；讀真實狀態的測試會在最不該紅的時候紅。
+    monkeypatch.setattr(writer_guard, "_lock_holder", lambda: None)
 
     code = writer_guard.main(["check", "--minutes", "60"])
     payload = json.loads(capsys.readouterr().out)

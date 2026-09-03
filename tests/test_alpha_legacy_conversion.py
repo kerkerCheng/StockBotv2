@@ -191,15 +191,44 @@ def test_legacy_level_is_reused_not_recomputed() -> None:
     assert "沿用舊" in quality.reason
 
 
-def test_signal_rejects_scores_above_the_evidence_ceiling() -> None:
-    """契約層強制：證據撐不起的分數不得存在。"""
+def test_downgrade_reason_must_match_the_numbers() -> None:
+    """契約層強制：**宣稱被證據上限壓過，數值就必須真的被壓過。**
+
+    ⚠ 這條取代了舊的「全域 ceiling 檢查」。舊版拿 context-wide 的證據品質去檢查
+    **每一個**軸，結果是**一個弱軸把好軸一起拖下水**——實測：引用外部印證邊的
+    `value_capture` 被行情快照的 origin 拉到 0（2026-09-03）。
+
+    上限是**逐軸**的（`quality.apply()` 在 `structural_score` 與 `compose_signal`
+    各自呼叫），生效證據留在 `Score.downgrade_reason`。契約層能檢查的、也該檢查的，
+    是**理由與數值一致**（L12：因果不得被截斷），不是拿一個全域值當閘門。
+
+    逐軸上限本身由 `test_weak_source_reliability_caps_every_dimension` 與
+    `test_ceiling_is_applied_per_axis_not_globally` 守著。
+    """
+    from alpha.contracts import Score
     from tests.test_alpha_contracts import build_signal
 
-    with pytest.raises(ContractViolation, match="證據品質上限"):
-        build_signal(evidence_quality=EvidenceQuality(
-            level="bounded_hypothesis", independent_origins=2,
-            best_tier=2, total_refs=4, reason="僅 2 個獨立來源",
-        ))
+    # 宣稱被上限壓過，但 effective == declared → 矛盾，必須拒收
+    with pytest.raises(ContractViolation, match="降級理由與數值不一致"):
+        build_signal(structural_score=Score(
+            0.5, 0.5, "ct_structural",
+            downgrade_reason="evidence_quality_ceiling"))
+
+
+def test_context_wide_quality_is_informational_not_a_gate() -> None:
+    """`AlphaSignal.evidence_quality` 是**整體摘要**，不是任何軸的閘門。
+
+    把它當閘門就是同一個表示承載兩種語意（L12）——而且會產生上面那個
+    「弱軸拖累好軸」的實測後果。
+    """
+    from tests.test_alpha_contracts import build_signal
+
+    signal = build_signal(evidence_quality=EvidenceQuality(
+        level="unknown", independent_origins=0, best_tier=None,
+        total_refs=0, reason="沒有可辨識的獨立來源"))
+    # ceiling 是 0，但各軸分數（0.94 等）**不受影響**——因為它們有自己的證據
+    assert signal.evidence_quality.ceiling == 0.0
+    assert signal.structural_score.effective == 0.94
 
 
 # ---------------------------------------------------------------------------

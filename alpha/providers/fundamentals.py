@@ -61,7 +61,12 @@ class EngineCFundamentalsProvider:
         bar = _as_date(row.get("bar_date"))
         snap = _as_date(row.get("snapshot_date"))
         return EvidenceRef(
-            ref=f"engine_c://financial_snapshot/{ticker}/{bar or snap}",
+            # ⚠ **ref 不含日期。** 第一版是 `.../{ticker}/{bar_date}`，於是同一個字串
+            # 同時承載「這是哪一份資料」與「它屬於哪一天」（L12 一表兩義）——
+            # 實測後果：2026-09-03 寫的判斷到 09-04 就對不上，而錯誤訊息誤導成
+            # 「引用了不在 ResearchContext 裡的證據」，看起來像 authority laundering
+            # 而不是資料更新。時間屬於 `published_at`／`retrieved_at`，不屬於身分。
+            ref=f"engine_c://financial_snapshot/{ticker}",
             kind=kind,
             # ⚠ `origin_entity` 是**誰發出這份資料**，不是**這份資料在講誰**。
             # 第一版填了 ticker，於是 L8 獨立性把「一檔股票的行情」當成

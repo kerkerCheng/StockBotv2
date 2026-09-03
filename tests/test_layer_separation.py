@@ -114,7 +114,7 @@ def test_alpha_core_has_no_external_or_engine_dependencies() -> None:
             continue
         for module in _imported_roots(path):
             root = module.split(".")[0]
-            if root == "identity" and rel in ALPHA_IDENTITY_CONSUMERS:
+            if rel in COMPOSITION_ROOTS and root in ("identity", "decision_lab"):
                 continue
             if root in FORBIDDEN_IN_ALPHA:
                 offenders.append(f"{rel} → {module}")
@@ -205,6 +205,11 @@ COMPOSITION_ROOTS = frozenset({
     "engine_d_runtime/adapters.py",
     "engine_d_runtime/bootstrap.py",
     "decision_lab/cli.py",
+    # ⚠ `alpha/cli.py` 是 entry point：它負責把 `AlphaSignal` **序列化**後交給
+    # Engine D 的 adapter。domain 模組（contracts／context／models）仍然完全
+    # 不知道 Engine D 存在——`test_alpha_core_has_no_external_or_engine_dependencies`
+    # 守著那一半。
+    "alpha/cli.py",
 })
 
 
@@ -238,6 +243,8 @@ def test_upstream_layers_do_not_import_engine_d() -> None:
     offenders: list[str] = []
     for package in ("alpha", "portfolio", "risk", "shared"):
         for path in _python_files(package):
+            if _rel(path) in COMPOSITION_ROOTS:
+                continue
             for module in _imported_roots(path):
                 if module.split(".")[0] in ("decision_lab", "engine_d_runtime"):
                     offenders.append(f"{_rel(path)} → {module}")

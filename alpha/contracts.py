@@ -701,14 +701,23 @@ class AlphaSignal:
                     f"{axis}_score 的 trace 沒有任何 EvidenceRef——"
                     "所有重要 conclusion 必須可回溯至 evidence（INV-6）"
                 )
-            # 證據品質是套在所有維度上的上限（舊 source_reliability 軸的新家）。
-            # 超過上限代表「這組證據撐不起這個分數」——那是 L8 要防的事。
-            if (self.evidence_quality is not None
-                    and score.effective > self.evidence_quality.ceiling):
+            # ⚠ **這裡刻意不做全域 ceiling 檢查。**
+            #
+            # 上限是**逐軸**的：「這組證據能撐多高」的「這組」是**該軸自己引用的
+            # 那組**（`session_assessor.compose_signal` 與 `context.structural_score`
+            # 各自呼叫 `quality.apply()`）。曾經有一版在這裡用 context-wide 的品質
+            # 檢查所有軸，結果是**一個弱軸把好軸一起拖下水**——引用了外部印證邊的
+            # value_capture 被行情快照的 origin 拉到 0。
+            #
+            # 上限確實生效的證據留在 `Score.downgrade_reason`（`evidence_quality_ceiling`），
+            # 那是逐軸的、可稽核的。`self.evidence_quality` 只是**整體摘要**，
+            # 不是任何軸的閘門——把它當閘門就是同一個表示承載兩種語意（L12）。
+            if (score.downgrade_reason
+                    and "evidence_quality_ceiling" in score.downgrade_reason
+                    and score.effective >= score.declared):
                 raise ContractViolation(
-                    f"{axis}_score 的 effective={score.effective} 超過證據品質上限 "
-                    f"{self.evidence_quality.ceiling}（{self.evidence_quality.reason}）——"
-                    "供應商自報不能撐起外部印證等級的結論（L8）"
+                    f"{axis}_score 宣稱被證據上限壓過，但 effective 未低於 declared——"
+                    "降級理由與數值不一致（L12：因果不得被截斷）"
                 )
 
     # ---- 讀取 -------------------------------------------------------------

@@ -214,6 +214,17 @@ def compose_signal(build: Any, judgment: Mapping[str, Any]) -> AlphaSignal:
     context: ResearchContext = build.context
     index = {ref.ref: ref for ref in context.evidence_refs}
 
+    # ⚠ 判斷是對**某一份** ResearchContext 做的。context 變了（新的行情、新入圖的邊）
+    # 而判斷沒重做時，必須**明說是哪一種失敗**——否則它會退化成「引用不存在」，
+    # 看起來像 authority laundering，實際上只是資料更新了（2026-09-04 實測踩到）。
+    declared_digest = str(judgment.get("_packet_digest") or "").rstrip("…").strip()
+    if declared_digest and not context.digest.startswith(declared_digest):
+        raise ContractViolation(
+            f"judgment 是對 context {declared_digest} 做的，但目前 context 是 "
+            f"{context.digest[:24]}——**資料已更新，判斷需要重做**。"
+            "這不是引用錯誤，也不得用放寬解析來繞過"
+        )
+
     scores: dict[str, Score | None] = {axis: None for axis in AXES}
     traces: dict[str, ComponentTrace] = {}
     if build.structural is not None:
@@ -316,7 +327,8 @@ def compose_signal(build: Any, judgment: Mapping[str, Any]) -> AlphaSignal:
         disproof_conditions=disproofs,
         catalysts=catalysts,
         risks=tuple(str(r) for r in (judgment.get("risks") or [])),
-        evidence_quality=None,
+        # 整體摘要，**不是任何軸的閘門**（閘門是逐軸的，見 contracts.py）
+        evidence_quality=context_quality,
         evidence_refs=context.evidence_refs,
         model_components=traces,
         research_context_digest=context.digest,
