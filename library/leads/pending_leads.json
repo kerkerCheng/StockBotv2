@@ -11628,9 +11628,13 @@
       "first_seen": "2026-09-02T22:32:53.239047+00:00",
       "lead_id": "lead_1cc8a618f313fef294d383ac05a1e016",
       "published_at": "2026-09-01",
-      "refs": {},
+      "refs": {
+        "outcome": "Form 4 已解析:COHR Sheridan Eng:RSU 歸屬+F 代扣 @295.39,另市場賣 13,077 股 @270.7-276.8(強勢段部分減持)",
+        "parked_reason": "insider Form 4 信心類,無 graph delta",
+        "trace_status": "partial"
+      },
       "source": "edgar:COHR",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -13109,9 +13113,13 @@
       "first_seen": "2026-09-02T22:33:04.281472+00:00",
       "lead_id": "lead_23e4edb21812bfc1e842664b618fbb6f",
       "published_at": "2026-09-02",
-      "refs": {},
+      "refs": {
+        "outcome": "Form 4 已解析:TSM Wang Ying-Lang:配股 12,881 @0,例行",
+        "parked_reason": "insider Form 4 信心類,無 graph delta",
+        "trace_status": "partial"
+      },
       "source": "edgar:TSM",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "TSM 4 filed 2026-09-02",
       "triage": {
@@ -16903,9 +16911,13 @@
       "first_seen": "2026-09-02T22:33:04.281550+00:00",
       "lead_id": "lead_36abf110271b7e8988ef171f6c6e498a",
       "published_at": "2026-09-02",
-      "refs": {},
+      "refs": {
+        "outcome": "Form 4 已解析:TSM Lu Lee-Chung:配股 8,175 @0,例行",
+        "parked_reason": "insider Form 4 信心類,無 graph delta",
+        "trace_status": "partial"
+      },
       "source": "edgar:TSM",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "TSM 4 filed 2026-09-02",
       "triage": {
@@ -20845,9 +20857,13 @@
       "first_seen": "2026-09-02T22:32:53.239129+00:00",
       "lead_id": "lead_4c624bf197b688bce6b5a827922583cd",
       "published_at": "2026-09-01",
-      "refs": {},
+      "refs": {
+        "outcome": "Form 4 已解析:COHR Beard:RSU 歸屬 5,373+F 代扣 1,896 @295.39,例行",
+        "parked_reason": "insider Form 4 信心類,無 graph delta",
+        "trace_status": "partial"
+      },
       "source": "edgar:COHR",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -27321,9 +27337,13 @@
       "first_seen": "2026-09-02T22:32:56.796366+00:00",
       "lead_id": "lead_702acc97c325101cd482e95c46cd62ae",
       "published_at": "2026-09-01",
-      "refs": {},
+      "refs": {
+        "outcome": "Form 4 已解析:LITE Wupen Yuen:賣 1,500 股 @895-941,量小",
+        "parked_reason": "insider Form 4 信心類,無 graph delta",
+        "trace_status": "partial"
+      },
       "source": "edgar:LITE",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -30146,9 +30166,13 @@
       "first_seen": "2026-09-02T22:33:04.281312+00:00",
       "lead_id": "lead_7f41609b717da7a987e371264e81d718",
       "published_at": "2026-09-02",
-      "refs": {},
+      "refs": {
+        "outcome": "Form 4 已解析:TSM CEO Wei Che-Chia:配股 204,375 @0,例行年度授予",
+        "parked_reason": "insider Form 4 信心類,無 graph delta",
+        "trace_status": "partial"
+      },
       "source": "edgar:TSM",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "TSM 4 filed 2026-09-02",
       "triage": {
@@ -35187,9 +35211,13 @@
       "first_seen": "2026-09-02T22:33:04.281224+00:00",
       "lead_id": "lead_975580caddca5a44327585d663935a12",
       "published_at": "2026-09-02",
-      "refs": {},
+      "refs": {
+        "outcome": "Form 4 已解析:TSM Zhang:配股 20,313 @0,例行",
+        "parked_reason": "insider Form 4 信心類,無 graph delta",
+        "trace_status": "partial"
+      },
       "source": "edgar:TSM",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "TSM 4 filed 2026-09-02",
       "triage": {
@@ -38768,9 +38796,13 @@
       "first_seen": "2026-09-02T22:32:53.238963+00:00",
       "lead_id": "lead_aa2866407b0c98500f424e294e833e03",
       "published_at": "2026-09-01",
-      "refs": {},
+      "refs": {
+        "outcome": "Form 4 已解析:COHR Luther:RSU 歸屬 8,731+F 代扣 2,594 @295.39,例行",
+        "parked_reason": "insider Form 4 信心類,無 graph delta",
+        "trace_status": "partial"
+      },
       "source": "edgar:COHR",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -39420,9 +39452,13 @@
       "first_seen": "2026-09-02T22:33:04.280942+00:00",
       "lead_id": "lead_ade2408084cf667565569a07f1f7e3d1",
       "published_at": "2026-09-02",
-      "refs": {},
+      "refs": {
+        "outcome": "Form 4 已解析:TSM Yeap:配股 12,881 @0,例行",
+        "parked_reason": "insider Form 4 信心類,無 graph delta",
+        "trace_status": "partial"
+      },
       "source": "edgar:TSM",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "TSM 4 filed 2026-09-02",
       "triage": {
@@ -43531,9 +43567,13 @@
       "first_seen": "2026-09-02T22:33:04.281062+00:00",
       "lead_id": "lead_c0f63a0365472b40cc52fe5c8184ce37",
       "published_at": "2026-09-02",
-      "refs": {},
+      "refs": {
+        "outcome": "Form 4 已解析:TSM Yoo:配股 8,175 @0,例行",
+        "parked_reason": "insider Form 4 信心類,無 graph delta",
+        "trace_status": "partial"
+      },
       "source": "edgar:TSM",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "TSM 4 filed 2026-09-02",
       "triage": {
