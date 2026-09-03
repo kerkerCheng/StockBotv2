@@ -49,7 +49,8 @@ engine｜**Engine D** ＝capital permission 與 accountability。
 [`current-architecture.md`](refactor/current-architecture.md)（實測盤點）｜
 [`target-architecture.md`](refactor/target-architecture.md)（契約與邊界）｜
 [`engine-d-decomposition.md`](refactor/engine-d-decomposition.md)（逐檔搬遷）｜
-[`phase-1-plan.md`](refactor/phase-1-plan.md)（施工圖）
+[`phase-1-plan.md`](refactor/phase-1-plan.md)（施工圖）｜
+**[`historical-failure-matrix.md`](refactor/historical-failure-matrix.md)（36 筆歷史事故 → 六條 hard invariant → completion gate）**
 
 ## Phase 表
 
@@ -66,6 +67,22 @@ engine｜**Engine D** ＝capital permission 與 accountability。
 | **7** | Portfolio / Risk 完整化 | view → target exposure → hard limits | 三個硬擋行為與現況**逐筆一致**（characterization 測試）；**不新增任何 alpha 尺寸** | Phase 1.5、2 |
 | **8** | Automation / productization | daily／weekly／skills／MCP 適配 | 16 條 sandbox rule 完成 impact review；`sync_agent_skills.py --check` 無漂移；daily 端到端綠 | Phase 3 |
 
+## 每個 Phase 的 completion gate（八項，缺一不得宣稱完成）
+
+出自 [`historical-failure-matrix.md`](refactor/historical-failure-matrix.md) §9。
+**不得僅以「tests pass／CLI works／architecture looks cleaner」判定完成。**
+
+1. Historical regression suite pass（golden fixtures）
+2. Runtime invariant audit pass（`audit invariants`）
+3. No unexplained semantic diff（old/new dual run）
+4. **No new dual authority**
+5. No silent-drop path（每個 filter 都能報 input／accepted／filtered／reasons）
+6. Point-in-time tests pass
+7. All migrated lifecycle objects reachable
+8. **該 phase 負責的 critical historical failure 已有 executable protection**
+
+> 現況：36 筆歷史事故中，**🔴 僅有文字保護的有 10 筆**。各 Phase 的責任分配見該檔 §9。
+
 ## 重構期間的硬約束
 
 1. **不重建 Neo4j。** 資產是 662 條 EdgeAssertion 的 provenance，不是節點數。
@@ -77,6 +94,19 @@ engine｜**Engine D** ＝capital permission 與 accountability。
 7. **既有 126 個測試檔全部保留**——可改 import 路徑，不可刪斷言。
 8. **改任何 `python -m <module>` 命令字串前，先走 sandbox impact review 五步**——
    `.codex/rules/stockbot-automations.rules` 的 16 條 exact prefix 會靜默打斷 daily。
+9. **六條 hard invariant 全程適用**（`historical-failure-matrix.md` §2）：
+   IDENTITY（ticker 不是 entity identity）／LIFECYCLE（每個 active object 答得出五問）／
+   **NO SILENT DROP**（「查不到了」不是合法 lifecycle）／QUEUE LIVENESS（producer 指得出
+   consumer）／MEASURED GATE（未量測的機制不得享有默認信任）／POINT-IN-TIME & PROVENANCE。
+10. **Core 不得 import `mcp_server`。** MCP／remote 是 optional adapter，
+    依賴方向只准 peripheral → core。⚠ 今天**不是** 0：`engine_b/todo.py`、
+    `query/health_audit.py`、`crons/weekly_scan_digest.py`、`scripts/*` 共 5 個消費端。
+11. **Local-first：新核心必須能在完全沒有 MCP 的情況下運作。**
+    若 MCP 相容性與新核心架構衝突，**優先選擇新核心架構**。
+12. **`AGENTS.md` 不是憲法。** 「四引擎架構」是 CURRENT_ARCHITECTURE；
+    不可變的是五條 authority separation（`target-architecture.md` §12）。
+    ⚠ **lesson learned 一條都不刪**——綁定實作的改寫成
+    Context → Failure → Learned invariant → Current implementation → 可改？
 
 ---
 
@@ -89,6 +119,9 @@ engine｜**Engine D** ＝capital permission 與 accountability。
 | `current_holdings` 用裸 `except Exception` 壓平三種失敗 | 「Sheet 真的沒持股」「網路讀不到」「憑證失效」收斂成同一個 `holdings_unavailable`（L12） | 三種情形產生可區分的 blocker，且至少一個測試能分辨「空持股」與「讀取失敗」 | 建議併入 Phase 3 拆 `engine_d_runtime/adapters.py` |
 | `checkpoint_decision_review` completed 路徑非原子 | 裸 `pd_*` 能通過前半驗證並先寫 DB，最後 `resolve()` 才拋錯 → work order completed 但 todo item 仍 awaiting_approval，CLI 修不回來（2026-08-19 實測 [166]） | 用裸 `pd_*` 呼叫 `todo work` 時 work order 狀態不變；可寫成測試 | 無 |
 | Engine D cohort 重複（claim-keyed vs company-keyed） | 同公司可能同時存在兩個 cohort（2026-07-30 [74]／[75]） | 新建 cohort 時偵測同公司既有 cohort 並警告。**不回溯清理**（append-only） | 無 |
+| **把 `mcp_server/` 的 domain 抽出到 application layer**（新增 2026-09-03） | 實測：`mcp_server/` 4,016 行有 **79%（3,165 行）不是 MCP**——Research Action 的 domain、filesystem provenance 原語、local-only Git 發布，全被關在 transport package 裡。因此 5 個 core 消費端被迫 import 它，其中包含 pq2 待辦池本身 | `Core → mcp_server` 的 import **5 → 0**；`scripts/prepare_research_action.py` 不再呼叫私有 `_impl` 函式 | 併入 Phase 3（分類見 `target-architecture.md` §14.2） |
+| **`audit invariants` runtime checker**（新增 2026-09-03） | 36 筆歷史事故有 **10 筆只有文字保護**。L14 已寫過「真正的防呆是會自己出現的常駐計數器，不是要人讀的段落」 | 12 個 check 全部可對真實 DB 執行且 fail loudly；上線後**至少抓到過 1 筆真實問題**（抓到 0 筆的 audit 依 INV-5 是恆滅閘門） | Phase 1 建骨架，各 Phase 補檢查 |
+| **Golden fixtures / 歷史回歸套件**（新增 2026-09-03） | refactor 前必須先凍結 expected semantic behavior，否則無法分辨 `EXPECTED_CHANGE` 與 `REGRESSION` | `tests/fixtures/golden/` 有 14 類 fixture（見 `historical-failure-matrix.md` §7）；B1／B5／B6 三批都跑過 old/new dual run 且 unexplained diff = 0 | Phase 1 |
 
 ### 明確不排程（理由已量測，勿重開）
 

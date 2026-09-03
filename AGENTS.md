@@ -113,7 +113,7 @@ fetchers/edgar.py ──────↑                        engine_c/etl_yfin
 |------|------|-----------|
 | [`docs/OPERATIONS.md`](docs/OPERATIONS.md) | 指令、環境變數、排程流程、harvest／MCP 操作陷阱 | 要實際執行操作時 |
 | [`docs/ROADMAP.md`](docs/ROADMAP.md) | 現行 Phase 路線圖、開放 backlog、開工前必讀（已撤回的診斷／看起來像缺口但不是） | 規劃或決定下一步時 |
-| [`docs/refactor/`](docs/refactor/) | Alpha Research Refactor 的五份設計文件（現況盤點、目標架構、Engine D 分解、roadmap 遷移、Phase 1 施工圖） | 動 `alpha/`／`decision_lab/`／contracts 之前 |
+| [`docs/refactor/`](docs/refactor/) | Alpha Research Refactor 的六份設計文件（現況盤點、目標架構、Engine D 分解、roadmap 遷移、Phase 1 施工圖、**歷史事故矩陣**）。⚠ 本檔的規則已完成分類 audit（INVARIANT／CURRENT_ARCHITECTURE／LESSON_LEARNED／PROCEDURE／OBSOLETE），見 `current-architecture.md` §11——**「四引擎架構」是 CURRENT_ARCHITECTURE 不是憲法** | 動 `alpha/`／`decision_lab/`／contracts 之前 |
 | [`docs/archive/roadmap-pre-alpha-refactor.md`](docs/archive/roadmap-pre-alpha-refactor.md) | 2026-09-03 之前的交付歷史與已結案項目（逐字封存） | 要查「這件事以前做過嗎」時 |
 
 拆分理由：本檔每個 session 完整載入，所以每加一段都在花掉未來每一次執行的 context。

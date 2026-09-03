@@ -4,7 +4,12 @@
 > **前置：** 本檔與 [`current-architecture.md`](current-architecture.md)、
 > [`target-architecture.md`](target-architecture.md)、
 > [`engine-d-decomposition.md`](engine-d-decomposition.md)、
-> [`roadmap-migration.md`](roadmap-migration.md) 邏輯一致後才開工。
+> [`roadmap-migration.md`](roadmap-migration.md)、
+> [`historical-failure-matrix.md`](historical-failure-matrix.md) 邏輯一致後才開工。
+>
+> ⚠ **開工前必讀 `historical-failure-matrix.md` §2 的六條 hard invariant 與 §9 的
+> completion gate。** Phase 1 不是「寫幾個 dataclass」——它的一半價值在於
+> **把三個歷史事故的防線做進型別**（§2.1b）。
 
 ---
 
@@ -36,11 +41,26 @@ L14 要求「說得出哪個現有數字會變」。Phase 1 的誠實答案是 *
 alpha/
   __init__.py              package docstring：這一層的責任與禁止事項
   contracts.py             EvidenceRef / ResearchContext / AlphaSignal / AlphaModel
+                           ＋ RankedList（截斷集合必帶完整 id 集合，見 F-20）
   causal.py                StructuralEvent / CausalPath / CompanyImpact / 三個 enum
   provider.py              GraphResearchProvider Protocol ＋ 回傳型別
   errors.py                PointInTimeUnsupported / ContractViolation
+  identity.py              CompanyId / InstrumentId / Ticker / Alias 型別（INV-1）
   testing.py               FakeGraphResearchProvider（給契約測試與 Phase 2 用）
+  audit/
+    __init__.py            runtime invariant checker 骨架（12 個 check 的註冊表）
 ```
+
+### 2.1b 三個由歷史事故直接導出的型別（不是可選的）
+
+出自 [`historical-failure-matrix.md`](historical-failure-matrix.md)。
+**Phase 1 的 completion gate 第 8 項就是這三個。**
+
+| 型別 | 防哪個事故 | 為什麼型別層才擋得住 |
+|---|---|---|
+| **`RankedList[T]`**：同時帶 `rows`（截斷後）與 `full_ids`（截斷前完整集合） | **F-20**：ranking DTO 只帶前 `limit` 名，直接比對把排 11 名之後的公司誤判成「不在排序」 | 只要有人拿 `rows` 做成員判斷就會錯；**把完整集合綁在同一個型別上，成員判斷才有正確的東西可用**（INV-3） |
+| **每個 score 都有 `declared` 與 `effective` 兩個值**（或 `effective_*` 顯性欄位） | **F-25**：`weakest_axis` 用 raw `level` 排序會漏掉「宣告 corroborated 但引用不成立」的軸——ceiling 被打成 0 卻不動 level | `AlphaSignal` 的 5 個 score 有**完全相同的形狀**（宣告 vs 引用實際成立）。不顯性化就會重演 |
+| **`CompanyId` / `InstrumentId` / `Ticker` 是不同型別，不是 `str`** | **F-01～F-05**：`co:sivers` 猜錯 ID、報價單位當結算幣別、registry 缺欄位靜默關管線 | `str` 讓四種 identifier 可以互相賦值；分型別後**編譯／型別檢查層就擋得住**，不必靠人記得（INV-1） |
 
 **Phase 1 不寫任何 concrete provider、不寫 LLM 呼叫、不寫 CLI。**
 `alpha/` 在 Phase 1 結束時是**純型別 ＋ 一個 fake**，沒有任何外部相依
@@ -101,6 +121,11 @@ tests/test_layer_separation.py         import 邊界
 | `test_decision_lab_does_not_import_alpha` | AST 掃 `decision_lab/`，無 `import alpha`／`portfolio`／`risk` | 暫時加一行 import → 必須紅 |
 | `test_alpha_does_not_import_decision_store` | AST 掃 `alpha/`，無 `decision_lab.store`／`neo4j`／`yfinance`／`anthropic` | 同上 |
 | `test_cypher_stays_in_query_layer` | 正規表達式掃 `alpha/`，無 `MATCH (`／`MERGE (`／`RETURN ` | 同上 |
+| **`test_core_does_not_import_mcp_server`** | AST 掃 `alpha/`／`portfolio/`／`risk/`，無 `import mcp_server`。⚠ **暫不涵蓋既有 package**——今天 `engine_b/todo.py` 等 5 處會紅，那是 Phase 3 的範圍，測試要用 explicit allowlist 記下這 5 個已知例外並在 Phase 3 逐一移除 | allowlist 為空時對 `engine_b` 跑一次 → 必須紅 |
+| **`test_ranked_list_carries_full_id_set`** | `RankedList` 截斷後 `rows` 少於 `full_ids`，且成員判斷 API 只吃 `full_ids` | 讓成員判斷讀 `rows` → 必須紅（F-20） |
+| **`test_declared_score_without_valid_evidence_has_lower_effective`** | 宣告 `corroborated` 但引用不成立時，`effective_*` 必須低於 `declared`，且排序用 `effective` | 用 `declared` 排序 → 必須紅（F-25） |
+| **`test_company_id_and_ticker_are_not_interchangeable`** | `CompanyId("co:axt")` 不得被當成 `Ticker` 使用（型別層或 runtime 檢查） | 互相賦值 → 必須紅（F-01～F-05，INV-1） |
+| **`test_audit_registry_reports_not_implemented_not_pass`** | `alpha/audit/` 的 12 個 check 在未實作時回 `SKIPPED(not_implemented)`，**不得回 `PASS`** | 改成回 PASS → 必須紅（L13） |
 
 ---
 
@@ -115,17 +140,20 @@ tests/test_layer_separation.py         import 邊界
 | T5 | **用真實 cohort 驗證 `AlphaSignal`**：取 COHR 或 LITE 的既有五軸 assessment ＋ variant perception ＋ rank row，手工組成一個 `AlphaSignal` | fixture | 同 T2 的理由 |
 | T6 | `AlphaModel` Protocol ＋ `causal.py` ＋ 對應測試 | 型別 | |
 | T7 | `provider.py` Protocol ＋ 回傳型別 ＋ `testing.FakeGraphResearchProvider` | 型別＋fake | |
-| T8 | point-in-time 三條測試（含 `PointInTimeUnsupported`） | 測試 | |
+| T8 | point-in-time 三條測試（含 `PointInTimeUnsupported`） | 測試 | 對應 F-31 |
 | T9 | `test_layer_separation.py` 三條 import 邊界測試 | 測試 | 最後做：前面的檔案都存在了才掃得到 |
 | T10 | 兩個 config 字彙檔 ＋ `.gitignore` 白名單 ＋ `test_config_tracking` 通過 | config | |
+| T11 | `alpha/identity.py`：`CompanyId`／`InstrumentId`／`Ticker`／`Alias` 型別（INV-1）＋不可互換測試 | 型別 | 可與 T1 併做——`EvidenceRef` 會用到 |
+| T12 | `alpha/audit/` 骨架：12 個 check 的註冊表，全部回 `SKIPPED(not_implemented)` | 骨架 | **只建骨架**；各 check 由對應 Phase 補。骨架先建的理由是讓「還沒實作」在每次執行時現形 |
+| T13 | **`tests/fixtures/golden/` 14 類 fixture，凍結 refactor 前的 expected semantic behavior** | fixture | ⚠ **必須在任何搬遷之前**——B1 之後就補不回「舊行為長什麼樣」了 |
 
 ---
 
 ## 4. Exit criteria（可逐條驗證）
 
-- [ ] `alpha/` 存在，6 個 `.py` 檔，**零外部相依**：
+- [ ] `alpha/` 存在（`contracts`／`causal`／`provider`／`errors`／`identity`／`testing`／`audit`），**零外部相依**：
       `python -c "import alpha; import sys; print([m for m in sys.modules if m in ('neo4j','yfinance','anthropic','decision_lab')])"` → `[]`
-- [ ] 新增 5 個測試檔、**≥ 12 條斷言**，全綠
+- [ ] 新增 5 個測試檔、**≥ 17 條斷言**（§2.4），全綠
 - [ ] **每條斷言都做過「故意違規 → 確認會紅」的空跑檢查**，結果記在 commit message
 - [ ] `tests/fixtures/alpha/` 有 2 份**由真實資料手工組成**的 fixture（T2、T5），
       且組裝過程中發現的契約缺口已回寫進 `target-architecture.md`
@@ -134,6 +162,21 @@ tests/test_layer_separation.py         import 邊界
 - [ ] daily 端到端跑一次成功且輸出**內容不變**（pq2 項目數、首屏計數器與 Phase 1 前一致）
 - [ ] `git diff --stat` 顯示 **`decision_lab/`／`engine_b/`／`engine_c/`／`query/`／`loader/` 的變更為 0 行**
       （Phase 1 是純新增；有任何一行動到既有 package 就代表 scope 漏了）
+
+### 4.1 Completion gate（八項，出自 `historical-failure-matrix.md` §9）
+
+- [ ] 1. Historical regression suite pass — **Phase 1 只需建立 `tests/fixtures/golden/`
+      的 14 類 fixture 並凍結現況輸出**（refactor 前的 baseline；此時沒有新舊可比）
+- [ ] 2. Runtime invariant audit pass — Phase 1 只需 **`alpha/audit/` 骨架＋12 個 check
+      的註冊表**，check 本身可以全部回 `SKIPPED(not_implemented)`，**但不得回 `PASS`**
+      （L13：成功與未實作不得在同一個訊號上同形）
+- [ ] 3. No unexplained semantic diff — N/A（純新增，無舊路徑可比）
+- [ ] 4. No new dual authority — `alpha/` 不落地任何快取表，不開新 DB
+- [ ] 5. No silent-drop path — `RankedList` 型別已強制帶 `full_ids`
+- [ ] 6. Point-in-time tests pass — §2.4 的三條 as-of 測試
+- [ ] 7. All migrated lifecycle objects reachable — N/A（未搬任何 object）
+- [ ] 8. **本 Phase 負責的 🔴 已歸零：F-20（`RankedList`）、F-25（declared vs effective）、
+      F-31（`PointInTimeUnsupported`）**
 
 ---
 

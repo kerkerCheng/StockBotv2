@@ -49,6 +49,11 @@ Engine D (decision_lab/) — capital permission、DecisionContext freeze、
 Outcome Learning ──────────────────▶ 回饋到 AlphaModel 的量測
 ```
 
+> **⚠ 這條主幹之外還有兩件事必須先講清楚，否則下面的契約會被誤讀：**
+> **①「四引擎」不是憲法**——真正不可變的是五條 authority separation，見 **§12**。
+> **②MCP／remote 是 optional adapter，不是核心**——依賴方向與邊界見 **§14**。
+> 與新方向的逐條衝突分析見 **§13**；`AGENTS.md` 該怎麼調整見 **§15**。
+
 **四個角色一句話：**
 
 | 層 | 回答什麼 | **絕不做什麼** |
@@ -518,3 +523,208 @@ class CompanyImpact:
 | 無價值大 rename | `decision_lab/`、`query/`、`engine_*` 全部保留原名 |
 | 訊號未可信就 overfit backtest | Phase 6 排在最後，且 point-in-time 前置未達成前不得跑 |
 | 第二套 graph / financial current-state authority | provider 是**唯讀 view**，不落地任何快取表 |
+
+---
+
+## 12. 真正的憲法：五條 authority separation（取代「四引擎」）
+
+> **使用者定案（2026-09-03）：不要把「Engine A/B/C/D 四引擎架構本身」當成不可變憲法。**
+> 引擎命名是**現行實現方式**；不可變的是**權責分離**。
+
+| # | Authority | 擁有什麼真相 | 唯一寫入者 | 可變性 | 今天由誰實現 |
+|---|---|---|---|---|---|
+| **A1** | **Structural / Evidence truth** | 實體、關係、claim、provenance、逐字引文 | 經人工 admission gate 的 loader | 可重建（extraction 檔是 ground truth） | Engine A（Neo4j）＋`loader/` |
+| **A2** | **Financial observation** | 帶時戳的財務／市場／共識觀測 | ETL（可重建）＋ append-only 人工 ledger | 混合：projection 可重建、ledger 只能 append | Engine C |
+| **A3** | **Research belief / Alpha** | 「我們相信什麼、憑什麼、什麼會推翻它」 | 研究流程（LLM 提議 → schema 驗證） | **可重算**（研究可以重跑） | 🔴 **今天沒有家**——散在 Engine D 的五軸、`thesis/`、`query/bottleneck` |
+| **A4** | **Portfolio / Risk** | 目前曝險、目標配置、硬上限 | policy config ＋ Google Sheet（外部 authority） | 可重算 | 🔴 散在 `decision_lab/` 的 beta／nav／risk 模組 |
+| **A5** | **Capital decision / accountability** | 「當時憑什麼決定、使用者選了什麼、後來對不對」 | 明確的人工動作 | **append-only，Git 救不回** | Engine D |
+
+**五條分離規則（這才是憲法）：**
+
+1. **A1 不含時變數字。** 股價、估值、共識、未來 EPS、capex 推估**永不入圖**
+   （L4；也是 2026-09-03 使用者對 investable digest 的「分段隔離」直覺）。
+2. **A3 不得成為第二個 A1／A2 current-state authority。** research provider 是唯讀 view，
+   不落地任何快取表。
+3. **A3 可重算、A5 不可重算。** 這是 `ResearchContext` 與 `DecisionContext` 必須分開的
+   全部理由（§4；也是 L10 與 F-30 的直接推論）。
+4. **A4 不形成 view，A3 不算尺寸。** view → target exposure → hard limits 是單向的。
+5. **A5 是唯一能授權資本的地方**，且 live 永遠 100% 人工。
+   **research automation ≠ capital authority。**
+
+**判別問法：** 一條規則若在「換掉 Neo4j」「把 Engine D 拆成三個 package」之後仍然成立，
+它屬於這五條；否則它是 CURRENT_ARCHITECTURE。
+
+---
+
+## 13. 與新方向的逐條衝突分析
+
+> 對使用者列出的 12 條新方向，逐條檢查 `AGENTS.md` 現況：
+> ✅相容｜🟡缺口（不衝突但沒寫）｜🔴衝突（現行文字必須改）
+
+| # | 新方向 | 判定 | `AGENTS.md` 現況與處置 |
+|---|---|---|---|
+| 1 | **Structural importance ≠ investability** | ✅ | 已明文：「**『是個真瓶頸』不等於『現在該投』**」（主題範圍段）。四維度已含需求錨點／客戶端資本承諾／標的純度。**不需改，只需升格為 `AlphaSignal` 的 Q1–Q3 分工** |
+| 2 | **Bottleneck ≠ buy signal** | 🔴 **部分衝突** | 判準本身相容（「已知會失焦的指標」「進場靠判斷，出場靠 disproof」）。**衝突在這一句：「唯一排序權威是 `rank_bottlenecks()`，不得另建平行排序」**——`AlphaSignal.value` 排序會直接違反它的字面。**處置：改寫為「結構排序的唯一權威是 `rank_bottlenecks()`；alpha 排序必須消費它作為 `structural_score`，不得重算結構分，也不得繞過它自建第二套結構評分」** |
+| 3 | **ResearchContext ≠ DecisionContext** | 🟡 缺口 | `AGENTS.md` 只定義 DecisionContext，且措辭讓人以為**任何**凍結 context 都屬 Engine D。**處置：新增一句「研究工作區的凍結不是 Engine D authority」**（§4 表格） |
+| 4 | **AlphaSignal ≠ Position** | ✅ | Alpha 呈現契約已極強：「系統不給部位尺寸」「拿掉的是憑空的建議尺寸，不是煞車」。**直接繼承** |
+| 5 | **Research automation ≠ capital authority** | ✅ | 四個 gate ＋「LLM 可以解析與提議，不可以授權」（L15）。**直接繼承，且要寫進 §12 的 A5** |
+| 6 | **Alpha 必須考慮 market expectation / variant perception** | 🟡 **缺口** | variant perception 的**操作定義已有**（2026-09-02 定案：市場隱含 X／thesis Y／催化劑 Z），但「哪些標的值得看」的**四維度不含 expectation gap**。**處置：四維度 → 五 score，expectation gap 是新增的第四題** |
+| 7 | **Engine D 不應承擔 fundamental research／thesis／valuation／catalyst／alpha scoring** | 🔴 **衝突** | `AGENTS.md` 的 Engine D 表格逐字寫著它擁有「Shadow、Coverage、**五軸 Confidence、瓶頸排序**、NAV 比例呈現、outcome」。**處置：Engine D 的 authority 欄改為 §12 的 A5，把五軸／排序／NAV 移出** |
+| 8 | **LLM qualitative／deterministic numeric** | ✅ | L15 逐字已有。**處置：從 lesson 升格為 §6.1 的架構分工表** |
+| 9 | **所有歷史 research／backtest 必須 point-in-time correct** | 🔴 **重大缺口** | 現行 point-in-time contract **只涵蓋 Engine D 決策**，不涵蓋研究與回測；**Engine A 根本沒有 as-of 能力**（`current-architecture.md` §4.2 實測）。**處置：INV-6 ＋ `GraphResearchProvider.as_of` ＋ `PointInTimeUnsupported`** |
+| 10 | **所有重要 conclusion 可回溯至 evidence** | 🟡 | 圖層已極強（每個 node/edge/claim 必掛 `source_ids`），但**五軸 assessment 的 reason 是自由文字**、`variant_perception` 也是。**處置：`AlphaSignal` 的每個非 None score 強制帶 `EvidenceRef`** |
+| 11 | **所有重要 thesis 必須有 disproof** | ✅ | L7 ＋ schema「可證偽是一等公民」。**處置：升格為 `DisproofCondition` 型別強制（含核查頻率與 48h 動作）** |
+| 12 | **Local-first, remote-capable if needed later** | ✅ | 「Local-first 方針（2026-07-26 使用者定案）」已存在，且 daily／weekly prompt 逐字禁用 MCP。**處置：把管道層架構圖裡的 MCP 動詞移出**（見 §14） |
+
+**淨結論：2 條真衝突（#2、#7）、3 條重大缺口（#3、#6、#9）、其餘相容。**
+`AGENTS.md` 的判準絕大多數**支持**新方向——衝突集中在「Engine D 擁有什麼」與
+「排序權威」兩句話，而它們都是 CURRENT_ARCHITECTURE 而非 INVARIANT。
+
+---
+
+## 14. Optional Remote Adapters — 依賴方向
+
+> **核心原則：新的核心系統必須能在完全沒有 MCP 的情況下正常運作。**
+> **Dependency direction 必須由 peripheral 指向 core。Core 不得依賴 MCP。**
+
+### 14.1 目標依賴圖
+
+```
+  ┌──────────────────────────────────────────────────────┐
+  │  Optional Remote Adapters  （可整包刪除，core 不受影響）  │
+  │  ───────────────────────────────────────────────────  │
+  │  mcp_server/  @mcp.tool 包裝層 (222 行)                 │
+  │  mcp_server/  leads_tools / decision_tools /           │
+  │               engine_c_tools / leads_git  (411 行)      │
+  │  cloudflared tunnel · connector 設定 · mobile UX         │
+  └───────────────────────┬──────────────────────────────┘
+                          │  只准這個方向
+                          ▼
+  ┌──────────────────────────────────────────────────────┐
+  │  Application Boundary  （use case / application service）│
+  │  ───────────────────────────────────────────────────  │
+  │  intake/    prepare_extraction · apply_action ·        │
+  │             finalize · publish                         │
+  │             （由 graph_mcp 的 _impl 與 intake.py 抽出）  │
+  │  alpha/     research(ticker, as_of) -> AlphaSignal      │
+  │  decision/  evaluate · reassess · record_choice         │
+  └───────────────────────┬──────────────────────────────┘
+                          │
+                          ▼
+  ┌──────────────────────────────────────────────────────┐
+  │  Core Domain                                          │
+  │  Engine A(loader/query) · Engine C · alpha/ ·          │
+  │  portfolio/ · risk/ · Engine D · identity/             │
+  └──────────────────────────────────────────────────────┘
+```
+
+**硬規則：**
+
+1. **`Core Domain → mcp_server` 的 import 必須為 0。**
+   落成 `tests/test_layer_separation.py::test_core_does_not_import_mcp_server`。
+   ⚠ 今天**不是** 0——`engine_b/todo.py`、`query/health_audit.py`、
+   `crons/weekly_scan_digest.py`、`scripts/*` 共 5 個消費端
+   （`current-architecture.md` §12.2）。
+2. **application boundary 的每個 use case 必須能在沒有 MCP 的情況下被本機直接呼叫。**
+   今天 `scripts/prepare_research_action.py` 已經在做（呼叫 `_prepare_research_action_impl`），
+   只是走的是私有底線函式——把它變成公開 application service 就完成了。
+3. **若 MCP 相容性與新核心架構衝突，優先選擇新核心架構。**
+   不得為了保留目前 MCP API shape 而增加 domain complexity。
+
+### 14.2 MCP 元件分類
+
+| 元件 | 行 | 分類 | 處置 |
+|---|---:|---|---|
+| `research_actions.py` | 1,128 | **EXTRACT_FROM_CORE** | 搬到 `intake/actions.py`（application layer）。**domain semantics 全部保留**：bounded mutation／content digest／immutable review packet／explicit approval／idempotent apply／state machine |
+| `graph_mcp.py` 的 `_impl` 函式 | 660 | **EXTRACT_FROM_CORE** | 升為公開 application service：`intake.prepare_extraction()`／`intake.apply_action()`／`intake.finalize()` |
+| `intake.py` | 608 | **EXTRACT_FROM_CORE** | 搬到 `intake/provenance.py`。**與遠端完全無關**（filesystem 原語） |
+| `action_publisher.py` | 528 | **EXTRACT_FROM_CORE** | 搬到 `intake/publish.py`。docstring 已自陳 local-only |
+| `graph_mcp.py` 的 `@mcp.tool` 包裝 | 222 | **KEEP_AS_ADAPTER** | 留在 `mcp_server/`，改為只呼叫 application service |
+| `leads_tools.py` | 147 | **KEEP_AS_ADAPTER** | |
+| `engine_c_tools.py` | 112 | **KEEP_AS_ADAPTER** | |
+| `decision_tools.py` | 88 | **KEEP_AS_ADAPTER** | ⚠ `engine_b/todo.py` 目前 import 它 → 必須改指向 `decision_lab.brief` 本身 |
+| `leads_git.py` | 64 | **LEGACY_BUT_HARMLESS**（原始理由已失效） | 它存在的理由是「讓 cloud routine 讀 pushed leads」，而 cloud routine 已於 2026-07-26 移回本機。**保留但標記；若手機入口停用即 OBSOLETE** |
+| `docs/remote-access-architecture.md`（152 行） | — | **LEGACY_BUT_HARMLESS** | 保留為 adapter 文件，開頭加一句「本檔描述 optional peripheral，不是核心架構」 |
+| Cloudflare tunnel／startup vbs／connector 權限設定 | — | **DEFER** | 純 ops，寫在 OPERATIONS |
+| `skills/daily-brief` 的 5 處 MCP 提及 | — | **LEGACY_BUT_HARMLESS** | 都已標明「cloud＋MCP 是備援」，措辭正確 |
+| MCP quota／expiry／5 MiB／two-call UX／server ID | — | **OBSOLETE（作為 domain rule）** | 見 `current-architecture.md` §12.5：這些是 transport 限制，**不得升格為 domain invariant** |
+
+### 14.3 Research Action 的語意拆分（不得因為 MCP 可忽略就整包刪掉）
+
+| 保留為 core domain | 降級為 transport |
+|---|---|
+| bounded research mutation（一次核准 ＝ 一個有界的變更集） | MCP server ID |
+| provenance（`storage_permission`／`permission_basis`／canonical hash） | remote provider session |
+| immutable review packet | cloud-specific apply API |
+| content digest ＝ identity（stale／tampered payload 在 graph mutation 前拒絕） | MCP tool exposure |
+| explicit approval before graph mutation（**四個 gate 之一**） | mobile two-call workflow |
+| idempotent apply ＋ 逐文件 checkpoint ＋ filesystem-first | native approval UX |
+| Research Action state machine（INV-2） | 遠端 Git 限制 |
+
+---
+
+## 15. `AGENTS.md` 應如何調整（第一輪不執行，只提出）
+
+> 依 `current-architecture.md` §11 的分類，四份清單。**⚠ lesson learned 一條都不刪。**
+
+### 15.1 應保留在 `AGENTS.md`（真正的 INVARIANT，約 110 行）
+
+工作語言｜現況數字會過期，判準不會｜資本與風控（三個硬擋／共同現金池只有一條／兩個槓桿指標
+不得混用／capital authority 逐次人工）｜授權載體唯一＝pq2 編號｜`go` 的語意＝推進到下一個
+人工 gate｜系統不給部位尺寸｜Alpha 交付要求（必須有序清單＋明確首選＋各自 disproof＋
+點明相關性）｜量測／訊號／脈絡三分｜通知不是 authority｜一手來源優先｜`co:*` 不得由名稱猜｜
+報價單位 ≠ 結算幣別｜L4 三分｜同一 working tree 單一 writer｜session memory 不是 authority
+**＋新增：五條 authority separation（§12）與六條 hard invariant
+（`historical-failure-matrix.md` §2）**
+
+### 15.2 應搬到別處
+
+| 內容 | 搬到 | 為什麼 |
+|---|---|---|
+| Codex sandbox 權限 16 條 rule 的抄本 | `docs/OPERATIONS.md`（`.codex/rules` 已是權威） | 「清單會腐壞」的現行違規——同一份清單存在兩處 |
+| Luna 委派契約 | `skills/luna-reviewer/SKILL.md`（已是權威） | 同上 |
+| pq2 的呈現規格（決策行格式／內容密度／措辭層／四段分段軸，約 90 行） | `skills/daily-brief/SKILL.md` | 它是 presentation contract，不是 authority |
+| Daily routine 權限與 retry 邊界 | `docs/OPERATIONS.md` | PROCEDURE |
+| Daily Brief outbound 通知的操作細節（invariant「通知不是 authority」留下） | `docs/OPERATIONS.md` | PROCEDURE |
+| 報告留檔策略 | `docs/OPERATIONS.md` | PROCEDURE |
+| 五套證據強度字彙的對照 | `CONCEPTS.md` | 它是詞彙表 |
+| 「四引擎」架構表 | 本 refactor 的 ADR（＝本檔 §12） | 它是 CURRENT_ARCHITECTURE |
+
+### 15.3 應因新 Alpha Research architecture 而修改
+
+| 現行文字 | 改成 |
+|---|---|
+| Engine D「Current-state authority」欄含 **五軸 Confidence、瓶頸排序、NAV 比例呈現** | Engine D 只擁有 **A5**（capital permission／DecisionContext／approval semantics／immutable history／outcome attribution） |
+| 「**唯一排序權威**是 `rank_bottlenecks()`，不得另建平行排序」 | 「**結構**排序的唯一權威是 `rank_bottlenecks()`；alpha 排序必須消費它作為 `structural_score`，不得重算結構分或自建第二套結構評分」 |
+| 「哪些標的值得看」**四維度** | **五 score**（Structural Scarcity／Value Capture／Earnings Exposure／**Expectation Gap**／Catalyst）；四維度成為前三者的判準細節 |
+| 「報告產出：**cohort 是終點**」 | 「**`AlphaSignal` 是研究終點**；cohort 是 decision case 的身分，不是研究的顆粒度」 |
+| point-in-time contract（只講 Engine D） | 加一句：**研究與回測同樣受 point-in-time 約束**；`ResearchContext` 是研究側的凍結，**不是 Engine D authority** |
+| 管道層 ASCII 圖含 `prepare_research_action`／`apply_research_action` | 改為 application service 名稱；MCP 移到圖外標為 optional adapter |
+| 「MCP server 十二工具 surface」 | 標明為 optional peripheral，並指向 §14 |
+
+### 15.4 只是 legacy implementation constraint（不是 invariant，未來可整段移除）
+
+遠端工具無 Git 能力 ＋ leads.json 窄例外（cloud routine 已不存在）｜
+MCP action quota（5 MiB／10 文件／50 非終態／100 MiB／30 天）｜
+prepare/apply 兩次呼叫 ＋ 一次 native approval 的 UX 描述｜
+`GraphSchemaState.version` 由 routine 帳號在每次寫圖前讀取（Neo4j RBAC 細節）｜
+Cloudflare tunnel／`httpHostHeader` 改寫／DNS-rebinding 421｜
+ChatGPT web-only、connector refresh 等第三方平台限制｜
+U7／U12 等已完成 plan 的編號引用
+
+---
+
+## 16. 優先順序（衝突時的裁決順序）
+
+1. Core domain correctness
+2. Alpha Research architecture
+3. Point-in-time correctness
+4. Evidence provenance
+5. Engine D decomposition
+6. Local developer ergonomics
+7. Backtest / portfolio integration
+8. Optional remote adapters
+9. **Legacy MCP compatibility**
+
+**若 MCP 相容性與新核心架構衝突，優先選擇新核心架構。
+MCP 不得成為這次重構的主要設計約束。**

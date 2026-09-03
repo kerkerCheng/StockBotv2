@@ -367,6 +367,175 @@ Event Watch（統一 registry）／RA `expires_at`／thesis `next_check`／catal
 
 ---
 
+## 11. `AGENTS.md` 規則分類 audit（771 行，30 個章節）
+
+> **前提：`AGENTS.md` 不是憲法。** 它混了五種東西，其中只有一種是真正不可變的。
+> **⚠ 本節只做分類與衝突分析，第一輪不重寫 `AGENTS.md`。**
+
+### 11.1 分類判準
+
+| 代碼 | 定義 | 判別問法 |
+|---|---|---|
+| **INVARIANT** | 不論未來 architecture 如何改變都成立 | 「換掉 Neo4j／換掉 Engine D，這句話還對嗎？」 |
+| **CURRENT_ARCHITECTURE** | 只是目前實現 invariant 的方式，可重構 | 「它有沒有提到具體 module／欄位／引擎名稱？」 |
+| **LESSON_LEARNED** | 踩坑所得。**必須保留學到的 invariant，不必保留當時的 implementation** | 「事發段落是不是在描述一次具體事件？」 |
+| **PROCEDURE** | 具體操作流程 | 「它是不是在教人怎麼跑一個命令？」 |
+| **OBSOLETE** | 已不符合新架構 | 「它描述的東西還存在嗎？」 |
+
+### 11.2 逐節分類
+
+| `AGENTS.md` 章節 | 行 | 分類 | 底下的 invariant 是什麼（若非 INVARIANT） |
+|---|---|---|---|
+| Claude Code / Codex 雙代理相容契約 | 5–17 | **PROCEDURE**＋2 條 INVARIANT | ①**同一 working tree 只有一個 writer**；②**session memory 不是 authority**——授權綁 action type ＋ underlying authority ＋ receipt，**不綁 provider**。其餘（skill 轉接層同步、平台設定分開）→ OPERATIONS |
+| Codex sandbox／private authority 整合契約 | 18–24 | **PROCEDURE**＋1 條 INVARIANT | **unattended 的 executable surface 變更必須在同一個 change 完成 impact review**；不得用 broad permission 掩蓋整合缺口。其餘 → OPERATIONS |
+| Codex custom-agent 委派契約（Luna） | 25–32 | **PROCEDURE** | → `skills/luna-reviewer/SKILL.md`（已是權威，此處是重複） |
+| 工作語言（繁體中文） | 33–46 | **INVARIANT** | 使用者偏好，與架構無關 |
+| 定位一句話 | 47–54 | **CURRENT_ARCHITECTURE** | invariant＝「研究輸入 ＋ 決策責任 → 可稽核的投資決策；**系統不給部位尺寸**」。「Engine A/B/C/D」是實現方式 |
+| **系統架構（四引擎／四層）** | 55–105 | **CURRENT_ARCHITECTURE** 🔴 | ⚠ **使用者明示：四引擎架構本身不是憲法。** 真正的 invariant 是**五條 authority separation**（見 `target-architecture.md` §12）。此表的價值在「誰不負責什麼」那一欄，不在引擎命名 |
+| ↳ Skill 層 | 64–71 | PROCEDURE ＋1 INVARIANT | **清單會腐壞，判準不會**（已有實測：新增 luna-reviewer 後表就漏一個） |
+| ↳ 決策層 Engine D | 72–78 | 混合 | **INVARIANT**：point-in-time contract（凍結的是「該次決策實際使用的 slice」，不是 snapshot 全庫）＋ 資本邊界（不產生任何部位尺寸、三個硬擋、七天時效）。**CURRENT_ARCHITECTURE**：runtime 路徑與 U7 欄位歷史 |
+| ↳ 記憶層 | 79–83 | **CURRENT_ARCHITECTURE**＋1 INVARIANT | Neo4j／SQLite 是選型；invariant＝**append-only manual ledger 是 private authority，刪除／重建前必須先 recovery backup** |
+| ↳ 管道層 | 84–105 | **CURRENT_ARCHITECTURE** 🔴 | ⚠ ASCII 管線圖裡有 `prepare_research_action` → `apply_research_action`——**那是 MCP 的動詞，被寫進了架構圖**。見 §12 |
+| 本檔的角色與另外兩份 | 106–124 | **PROCEDURE** | |
+| ⚠ 現況數字會過期，判準不會 | 125–149 | **INVARIANT**（meta） | 陳述現況必須附查證命令；引用自家文件前先跑那條命令 |
+| 統一待辦池（廣義 pq2） | 154–278 | 混合 🔴 | **INVARIANT**：**授權載體唯一＝pq2 編號**；`go` 的語意＝推進到下一個人工 gate；「等你決定」與「等事件」分離；建議只由 pool ground truth 導出。**PROCEDURE**（→ `skills/daily-brief`）：批次語法、決策行格式、內容密度、措辭層、四段分段軸——**這 124 行裡約 90 行是呈現規格** |
+| Decision gap dispatch | 279–284 | **CURRENT_ARCHITECTURE** | invariant＝`go` 只推進到下一個 gate，authority mutation 仍需另外核准 |
+| Sheet 持股覆蓋分類 | 285–290 | **CURRENT_ARCHITECTURE** | invariant＝**derived item 的 drop 必須改變推導條件**（＝F-17／INV-3） |
+| Source-trace backlog 防漏 | 291–315 | **LESSON_LEARNED** → CURRENT_ARCHITECTURE | invariant＝**每個等待都必須有到期**；「可觸發」與「還會醒」是兩個問題（＝F-15／INV-2） |
+| 資本與風控 | 316–331 | **INVARIANT** | 三個硬擋、共同現金池只有一條、兩個槓桿指標不得混用、capital authority 逐次人工。**這一節幾乎全是 invariant** |
+| Alpha 呈現契約 | 332–433 | 混合 🔴 | **INVARIANT**：系統不給尺寸；outcome 等權重量測；交付要求（必須輸出有序清單與明確首選、不得以「未驗證」搪塞、必須點明相關性）。**CURRENT_ARCHITECTURE**：「哪些標的值得看」**四維度**——它是 `AlphaSignal` 五 score 的前身，**將被取代而非推翻**。**LESSON_LEARNED**：U7 移除清單與已知會失焦的指標 |
+| Beta 呈現契約 | 434–457 | **CURRENT_ARCHITECTURE** | 整節將隨 `portfolio/` 搬家。invariant＝相對水位只呈現、不排序、不換算金額 |
+| 技術訊號的地位 | 458–469 | **LESSON_LEARNED**（不得刪減）＋1 INVARIANT | 三次回測 0 勝 3 敗是拔除依據，**任何改寫都不得刪減**。invariant＝**量測／訊號／脈絡三分**，脈絡一旦被拿去排序或調尺寸就變回訊號 |
+| 事件監控 | 470–473 | **CURRENT_ARCHITECTURE** | |
+| Daily routine 權限與 retry 邊界 | 474–491 | **PROCEDURE** | → OPERATIONS（16 條 rule 的清單本身是 `.codex/rules` 的權威，此處是第二份抄本——**「清單會腐壞」的現行違規**） |
+| 報告留檔策略 | 492–497 | **PROCEDURE**＋1 INVARIANT | invariant＝**不建立與待辦池競爭的第二個狀態源** |
+| Daily Brief outbound 通知 | 498–515 | **PROCEDURE**＋1 INVARIANT | invariant＝**通知不是 authority**；canonical brief 只有一份 |
+| 來源登記表 | 516–521 | **PROCEDURE**＋1 INVARIANT | invariant＝一手來源優先；出建議前的財務核驗五項 |
+| v0 Schema 快速記憶 | 522–535 | 混合 | **INVARIANT**：`co:*` 不得由名稱猜（F-01）；**報價單位 ≠ 結算幣別**（F-02）；L4 三分。**CURRENT_ARCHITECTURE**：node/edge 具體欄位 |
+| 報告產出：cohort 是終點 | 536–558 | **CURRENT_ARCHITECTURE** 🔴 | 「cohort 是研究終點」將被 **`AlphaSignal` 是研究終點**取代。**INVARIANT**：variant perception 的操作定義（市場隱含 X／thesis Y／催化劑 Z）、財務核驗五項、每份 thesis 必帶 `disproof_condition` |
+| L1–L16 | 559–762 | **LESSON_LEARNED** | 見 §11.3 |
+| 文件化學習 | 763–770 | **PROCEDURE**＋1 INVARIANT | invariant＝taxonomy（世界會長新品類→留鬆）vs contract（刻意有限→打開它是 bug） |
+
+**量化：771 行中約 **310 行是 PROCEDURE**（應搬 OPERATIONS／skills）、
+約 **200 行是 LESSON_LEARNED**、約 **150 行是 CURRENT_ARCHITECTURE**、
+只有約 **110 行是真正的 INVARIANT**。**
+
+### 11.3 L1–L16 的五欄重寫（lesson 不得刪除，但要把 implementation 與 invariant 分開）
+
+> 格式：**Context → Failure → Learned invariant → Current implementation → Implementation may change?**
+
+| L | Learned invariant（**不變**） | Current implementation | 可改？ |
+|---|---|---|---|
+| **L1** | 核心元件優化能力／生態成熟度／可觀測性，不優化「系統數量」；需人工 review 的資料結構，視覺化是硬需求 | Neo4j（已定案） | **NO**（選型已鎖，但理由是 invariant） |
+| **L2** | 「現在搞錯、以後要搬全部資料才能修」的現在想清楚（表的形狀）；「以後加一列設定就能補」的直接動工 | `schema/vocab.json` 字彙留鬆 | YES |
+| **L3** | 抽取層輸出 DB 無關 JSON，選型隨時可換 | `extract.py` → `loader/` | YES |
+| **L4** | **物理／關係／時變三分。三連問：換掉另一端值會變嗎（→edge）／隨時間變嗎（→時變觀測）／講的是物理現實還是證據強度（→metadata）。瓶頸的 alpha 大半在邊上，不在點上** | node/edge attributes、Engine C 時變觀測 | **NO**——這是 schema 建模鐵律，新架構的 `ScarcityInputs`／`FundamentalsSnapshot` 分野直接繼承它 |
+| **L5** | chokepoint-atlas 是**單一 lens**（偏小市值瓶頸獵手），當眾多視角之一，別讓世界觀被綁死 | 無相依套件 | YES |
+| **L6** | **具體型號／公司名必須在 quote 裡逐字出現**（反幻覺）；schema gap 只有真實資料撞上去才會現形；局部 ID 跨文件 MERGE 會命名空間衝突 | `prompts/extract_system.md`、`loader` 加 doc_id 前綴 | YES（實作）／**NO**（逐字規則） |
+| **L7** | **`disproof_condition` 是欄位不是流程。** 每條 disproof 必須附「核查頻率」與「觸發後 48 小時內做什麼」，否則是一個永遠不會響的火警警報 | `thesis/lifecycle.json`＋`catalyst_watch.py` | YES（實作）／**NO**（三件套要求 → `DisproofCondition` 型別強制） |
+| **L8** | **供應商自報不算獨立佐證。** 多文件入圖前至少 3 個不同 `origin_entity`；`sole_source` 需客戶端或第三方；全同一 origin 則標 weak | `validate.py` WARN、`single_origin_report.py` | YES（實作）／**NO**（獨立性判準 → `EvidenceRef.corroborating_origins`） |
+| **L9** | 跨引擎 join 必須有**靜態 lookup 的共同 ID**，不由 LLM 推斷；私有公司映射到**明確 null** 而非空缺 | `config/company_identity.json` | YES（實作）／**NO**（＝INV-1） |
+| **L10** | **「這筆資料今天重新取一次拿得回來嗎？」拿得回來→可重建可覆寫；拿不回來→只能 append** | Engine A 可重建；Engine C ledger／Decision Store 只能 append | **NO**（＝INV-6 的一半，也是 ResearchContext/DecisionContext 分離的依據） |
+| **L11** | 具體審計／法律術語的措辭精度本身就是一個 claim；對自己引用的事實套跟圖裡 claim 同一套 tier 紀律；**多個二手都這樣說 ≠ 一手已證實**；追源前先 grep 自家庫；**「我找不到」與「它不存在」是兩個 claim**；同一套紀律適用於自己的技術診斷 | ROADMAP「已撤回的診斷」 | **NO**（全部是 invariant） |
+| **L12** | **一個表示承載兩種語意時，下游被迫二選一而兩邊都錯。** 修法永遠是先分開再各自定規則。兩個訊號：兩個修法方向都會壞／修法讓警報消失得太乾淨。**任何會改變輸出的輸入，都必須出現在該輸出自己的證據欄位裡** | 各處 | **NO** |
+| **L13** | **驗收條件寫成「產出出現在下游消費者手上」。** 最危險的是成功與失敗在同一個訊號上同形 | — | **NO**（＝INV-4） |
+| **L14** | **未經量測的機制不得享有默認信任，gate 也不例外。** 三個免 outcome 測試（恆亮／不會滅／講不出因果機制）。先量測後放閘。**維持營運 vs 改變行為要先分兩類** | daily brief 常駐計數器 | **NO**（＝INV-5） |
+| **L15** | **語意交給語言處理，權限永遠 deterministic；先解析身分，再查權限。** gate 攔下的若是格式而非風險，該修的是它問問題的方式。放寬解析不等於放寬判準 | `sizing._resolve_reference` | YES（實作）／**NO**（分工原則） |
+| **L16** | **分類已有 SSOT 時要讓它跟著資料走到需要它的地方。** 修法是把分類附到 payload 上，不是再寫一份文件叫人記得去查。**不要用會誤報的 linter 來防這件事** | `blockers_by_mode` 等 | **NO** |
+
+**結論：16 條 lesson 中，13 條的 learned invariant 標記為「implementation may change: NO」
+——它們不是實作細節，是新架構必須繼承的 domain contract。**
+其中 L4／L10／L13／L14／L15／L16 已直接收斂進 `historical-failure-matrix.md` 的 INV-1～INV-6。
+
+---
+
+## 12. MCP / Remote access coupling 實測 🔴
+
+> **使用者定位（2026-09-03）：MCP／remote access／cloud session 是 Legacy Peripheral，
+> 不是核心架構。** 新核心必須能在完全沒有 MCP 的情況下運作。
+
+### 12.1 實測：`mcp_server/` 有 79% 不是 MCP
+
+`mcp_server/` 4,016 行的實際組成（AST 量測）：
+
+| 內容 | 行 | 佔比 | 這是什麼 |
+|---|---:|---:|---|
+| `research_actions.py` | 1,128 | 28% | Research Action 的 **domain**：bounded mutation、content digest、immutable review packet、state machine、idempotent apply、publication receipt |
+| `graph_mcp.py` 的 `_impl` 函式 | 660 | 16% | **application services**：`_prepare_extraction_impl`／`_apply_research_action_impl`／`_finalize_research_action_impl`／`_load_extraction_impl`／`_prepare_research_action_impl` |
+| `intake.py` | 608 | 15% | **filesystem provenance 原語**：canonical extraction hash、atomic publish、no-clobber、storage permission。**與遠端無關** |
+| `action_publisher.py` | 528 | 13% | **local-only Git 發布**。docstring 逐字寫著「intentionally **not** imported by the remote MCP tool surface」 |
+| `graph_mcp.py` 其他 helper | 241 | 6% | 驗證與錯誤處理 |
+| **小計：非 MCP 的 domain／application** | **3,165** | **79%** | |
+| `@mcp.tool()` 包裝層 | 222 | 6% | **真正的 transport** |
+| `leads_tools.py` | 147 | 4% | remote adapter |
+| `engine_c_tools.py` | 112 | 3% | remote adapter |
+| `decision_tools.py` | 88 | 2% | remote adapter |
+| `leads_git.py` | 64 | 2% | 窄 Git 例外（見 12.4） |
+| **小計：真正的 transport／adapter** | **633** | **16%** | |
+
+查證：
+```
+python - <<'EOF'
+import ast; t=ast.parse(open("mcp_server/graph_mcp.py",encoding="utf-8").read())
+tool=sum(n.end_lineno-n.lineno+1 for n in t.body if isinstance(n,ast.FunctionDef)
+         and any("mcp.tool" in ast.unparse(d) for d in n.decorator_list))
+impl=sum(n.end_lineno-n.lineno+1 for n in t.body if isinstance(n,ast.FunctionDef)
+         and n.name.endswith("_impl"))
+print("tool wrapper", tool, "| _impl", impl)
+EOF
+```
+
+### 12.2 Core → MCP 的反向依賴（**dependency direction 目前是錯的**）
+
+| 消費端 | import 什麼 | 為什麼這是問題 |
+|---|---|---|
+| **`engine_b/todo.py`**（pq2 待辦池，2,597 行） | `mcp_server.research_actions`（3 處）、`mcp_server.decision_tools`（2 處） | **統一待辦池——本 repo 最核心的人工核准介面——依賴一個名為 MCP 的 package** |
+| `query/health_audit.py` | `mcp_server.graph_mcp.GRAPH_SCHEMA_VERSION`、`mcp_server.action_publisher.publication_status` | 健康稽核依賴 transport package |
+| `crons/weekly_scan_digest.py` | `mcp_server.intake`、`mcp_server.research_actions` | 本機 weekly 依賴 MCP package |
+| `scripts/commit_pending_intake.py` | `mcp_server.action_publisher`、`mcp_server.research_actions` | 本機 Git 收尾依賴 MCP package |
+| `scripts/prepare_research_action.py` | **`mcp_server.graph_mcp._prepare_research_action_impl`** | 本機路徑直接呼叫一個**私有底線函式**——這本身就是「domain 被關在 transport 裡」最直接的證據 |
+
+**沒有任何 core module 需要 MCP 協定本身；它們需要的是被關在 `mcp_server/` 裡的 domain。**
+
+### 12.3 實測：現行 routine 已經不用 MCP
+
+| 檔案 | 逐字 |
+|---|---|
+| `crons/daily_brief_prompt.md:5` | 「不要使用 Claude cloud clone 或**遠端 MCP 降級路徑**」 |
+| `crons/weekly_scan_prompt.md:4` | 「**不靠 MCP 才能讀本機 authority**」 |
+| `skills/daily-brief/SKILL.md:25` | 「預設就是 Claude Code 本機；**cloud session＋MCP 是備援**」 |
+
+`AGENTS.md` 也已寫下 **Local-first 方針（2026-07-26 使用者定案）**。
+**因此「MCP 是 peripheral」不是這次的新決定，是把既成事實寫進架構。**
+
+### 12.4 已經失效的理由（`leads_git.py`）
+
+`leads_git.py` 的存在理由逐字是：「本機 MCP server 把 leads.json commit+push，
+讓 **cloud routine** 每天讀 pushed clone 看到最新狀態」。
+**而 cloud routine 已於 2026-07-26 移回本機。** 這條窄 Git 例外的原始理由已不成立；
+它現在只服務手機 chat 入口。→ 分類見 `target-architecture.md` §14。
+
+### 12.5 哪些「看起來像 domain rule」其實是 transport 問題
+
+| 現行規則 | 真實性質 | 處置 |
+|---|---|---|
+| prepare／apply **兩次呼叫** ＋ 一次 native approval | **transport**（mobile UX：先讓使用者看 packet 再按一次確認） | 本機可以是一個函式兩個階段，不必是兩次 RPC |
+| server 簽發 action **ID** | **transport**（跨 session 需要 handle） | 本機用 content digest 即可定址 |
+| 單 action **5 MiB／10 文件／50 個非終態／100 MiB staging／30 天過期** | **transport／ops quota** | 不是 domain invariant，不得升格 |
+| **遠端工具完全沒有 Git 能力**＋唯一窄例外 leads.json | **transport security** | 本機路徑本來就有 Git；這條不適用 core |
+| `storage_permission`／`permission_basis` 兩欄必填 | **domain**（provenance） | ✅ 保留為 core |
+| **content digest ＋ exact ID 核准** | **domain**（approval boundary 的完整性） | ✅ 保留為 core（digest 是 identity，不是 authentication） |
+| **immutable review packet** | **domain** | ✅ 保留 |
+| **idempotent apply ＋ 逐文件 checkpoint** | **domain**（filesystem-first、partial retry） | ✅ 保留 |
+| `focus_company_id` 自我聲明 | **domain**（identity binding，INV-1） | ✅ 保留 |
+| Research Action **state machine**（ready／partial／applied／expired） | **domain**（INV-2 lifecycle） | ✅ 保留 |
+
+> ⚠ **這張表是本節最重要的產出。** 它防止的是：因為「MCP 可以忽略」就把
+> bounded research mutation、provenance、digest identity、explicit approval、
+> idempotent apply 一起丟掉——**那些是這個系統最貴的資產之一，只是住錯了 package。**
+
+---
+
 ## 附錄 A：查證命令總表
 
 ```bash

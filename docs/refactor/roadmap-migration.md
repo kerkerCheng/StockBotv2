@@ -181,7 +181,82 @@ GF 對 Tower 專利訴訟未追源。
 
 ---
 
-## 10. 這份 matrix 自己的驗收
+## 10. `AGENTS.md` 條目的去向（2026-09-03 補充 audit）
+
+> **完整分類在 [`current-architecture.md`](current-architecture.md) §11；
+> 調整建議在 [`target-architecture.md`](target-architecture.md) §15。**
+> 這裡只記「哪一段最後會住在哪個檔案」，作為 roadmap 層級的搬遷追蹤。
+>
+> ⚠ **第一輪不執行**——`AGENTS.md` 每個 session 完整載入，改它的風險最高，
+> 必須等新的 architecture boundary 確認（Phase 2 結束）後才動。
+
+| `AGENTS.md` 段落 | 判定 | 去向 | 什麼時候動 |
+|---|---|---|---|
+| 工作語言 | **KEEP** | `AGENTS.md` | — |
+| 現況數字會過期，判準不會 | **KEEP** | `AGENTS.md` | — |
+| 資本與風控 | **KEEP** | `AGENTS.md` | — |
+| 授權載體唯一＝pq2 編號｜`go` 的語意 | **KEEP** | `AGENTS.md` | — |
+| Alpha 呈現契約的 invariant 部分（不給尺寸／交付要求） | **KEEP** | `AGENTS.md` | — |
+| 技術訊號的地位（三次回測記錄） | **KEEP，不得刪減** | `AGENTS.md` | — |
+| L1–L16 | **KEEP（重寫成五欄格式）** | `AGENTS.md` | Phase 3 後 |
+| **系統架構（四引擎／四層）表** | **REDESIGN** | 改為五條 authority separation | Phase 3 後 |
+| Engine D 的 authority 欄（含五軸／排序／NAV） | **REDESIGN** 🔴 | 只留 A5 | Phase 3（B5/B6 落地時） |
+| 「唯一排序權威是 `rank_bottlenecks()`」 | **REDESIGN** 🔴 | 改為「結構排序唯一權威；alpha 排序必須消費它」 | Phase 2（`AlphaSignal` 首次排序時） |
+| 「哪些標的值得看」四維度 | **MERGE → 五 score** | `alpha/contracts.py` ＋ `AGENTS.md` 摘要 | Phase 4 |
+| 「報告產出：cohort 是終點」 | **REDESIGN** | 「`AlphaSignal` 是研究終點」 | Phase 2 |
+| point-in-time contract（只講 Engine D） | **REDESIGN**（擴充） | 加研究／回測側 | Phase 1（`PointInTimeUnsupported` 落地時） |
+| Beta 呈現契約 | **MOVE** | 隨 `portfolio/` 搬家，`AGENTS.md` 留一段摘要 | Phase 1.5 |
+| pq2 呈現規格（約 90 行） | **MOVE** | `skills/daily-brief/SKILL.md` | Phase 3（B6 拆 brief 時） |
+| Codex sandbox／16 條 rule 抄本 | **MOVE** | `docs/OPERATIONS.md` | Phase 8 |
+| Luna 委派契約 | **MOVE** | `skills/luna-reviewer/SKILL.md` | 隨時 |
+| Daily routine 權限與 retry｜報告留檔策略｜outbound 通知細節 | **MOVE** | `docs/OPERATIONS.md` | Phase 8 |
+| 五套證據強度字彙 | **MOVE** | `CONCEPTS.md` | Phase 1（`EvidenceRef` 落地時） |
+| 管道層 ASCII 圖含 MCP 動詞 | **REDESIGN** | 改 application service 名稱 | Phase 3 |
+| 「MCP server 十二工具 surface」 | **MOVE → OPTIONAL_ADAPTER** | 標為 optional peripheral | Phase 8 |
+| L9 三前置條件已達標 | **KEEP**（實作可搬） | `thesis/preconditions.py` → Engine D | Phase 3 |
+
+---
+
+## 11. MCP / Remote access 相關項目的優先級調整
+
+> **使用者定案（2026-09-03）：MCP／remote access／cloud session 是 Legacy Peripheral。**
+> 純 remote/cloud-session 的 roadmap 項目一律降級，**除非它對目前 local-first workflow
+> 有直接價值**。
+
+| 項目 | 原本在哪 | 新判定 | 理由 |
+|---|---|---|---|
+| **Research Action 的 domain semantics**（bounded mutation／digest identity／immutable review packet／explicit approval／idempotent apply／state machine） | 分散在 archive 的多筆交付 | **KEEP → 升格為 core** | 這是系統最貴的資產之一，只是住錯 package。**不得因為「MCP 可以忽略」就一起丟掉** |
+| `mcp_server/` 的 79% domain code（3,165 行） | 未在 roadmap | **EXTRACT_FROM_CORE**（新增項） | `current-architecture.md` §12.1 實測。**新增到 Phase 3 的範圍** |
+| `Core → mcp_server` 的 5 個反向依賴 | 未在 roadmap | **EXTRACT_FROM_CORE**（新增項） | `engine_b/todo.py` 等；驗收＝該 import 計數 5 → 0 |
+| remote Decision MCP（「Engine D 仍未包含」） | archive | **OPTIONAL_ADAPTER / DEFER** | 遠端能看建議、不能替使用者接受 choice——這條邊界不變，但不排程 |
+| `record_lead_decision` 的窄 Git 例外（`leads_git.py`） | archive（已交付） | **LEGACY_BUT_HARMLESS**（原始理由已失效） | 它存在是為了讓 cloud routine 讀 pushed leads，**而 cloud routine 已於 2026-07-26 移回本機** |
+| cloud session ＋ MCP 作為 daily／weekly 備援 | `AGENTS.md`／skills | **DEFER** | daily／weekly prompt 已逐字禁用 MCP；備援定位保留但不投資 |
+| 雲端 egress 白名單 | `docs/OPERATIONS.md` | **DEFER** | 只影響日後 cloud fallback |
+| ChatGPT full-MCP write 方案／connector refresh | `docs/remote-access-architecture.md` | **OBSOLETE（作為設計約束）** | 第三方平台限制，不得影響 core |
+| MCP action quota／30 天過期／5 MiB 上限 | `docs/remote-access-architecture.md` | **OBSOLETE（作為 domain rule）** | transport／ops 限制，不得升格為 domain invariant |
+| OAuth 2.1／短效 audience-bound token（殘餘安全升級） | `docs/remote-access-architecture.md` | **DEFER** | 只在手機入口仍使用時才有價值 |
+| 手機 ad hoc intake（`skills/lead-intake` 遠端入口） | skills | **KEEP_AS_ADAPTER** | 這是 MCP **唯一仍有現實價值**的用途：使用者在手機上看到線索時的入口 |
+
+**⚠ 一條反向的注意事項：** 降級 MCP **不等於**降級 `skills/source-trace`、
+`prompts/intake_protocol.md` 或 storage permission 規則——那些是 **provenance domain**，
+只是最初因為遠端入口才被寫下來。它們對 local-first 一樣適用。
+
+---
+
+## 12. 歷史事故的遷移責任
+
+完整矩陣見 [`historical-failure-matrix.md`](historical-failure-matrix.md)。
+roadmap 層級只記一句：
+
+> **本次 refactor 的每個 phase，exit criteria 必須包含
+> [`historical-failure-matrix.md`](historical-failure-matrix.md) §9 的八項 completion gate；
+> 該 phase 負責的 🔴（僅有文字保護的 lesson）未歸零前，不得宣稱完成。**
+
+現況：36 筆事故中 **🔴 10 筆**。各 Phase 的責任分配見該檔 §9。
+
+---
+
+## 13. 這份 matrix 自己的驗收
 
 - [x] **舊 ROADMAP 的每一個標題都在本檔出現過**——2026-09-03 實測：
       `grep -n "^## \|^### \|^#### " docs/archive/roadmap-pre-alpha-refactor.md` 得 **22 個標題**，
