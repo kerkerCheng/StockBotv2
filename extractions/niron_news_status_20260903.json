@@ -1,0 +1,99 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "Lower toward 3 when Aspina/Niron ship a commercial rare-earth-free motor adopted by any named robotics/appliance OEM, or a humanoid maker discloses a non-NdFeB joint motor; raise toward 5 if by 2028 iron nitride remains confined to low-flux applications (speakers/sensors) with no motor-grade product.",
+      "id": "niron_news_status_20260903_cl1",
+      "source_ids": [
+        "niron_news_status_20260903_s1",
+        "niron_news_status_20260903_s2",
+        "niron_news_status_20260903_s3"
+      ],
+      "statement": "Substitutability valuation for the humanoid-actuator dependency on rare-earth (NdFeB) magnets: 4 of 5. Anchor from the substitute's own timeline: iron nitride's first commercial products are loudspeakers (June 2026, low flux-density application); motor solutions only entered development with Aspina in July 2026; heavy-rare-earth-free routes (Proterial) are still NdFeB. Rationale for 4 not 5: capital is committed to the alternative — Niron secured two $150M loans in August 2026 (DoW OSC 20-year term; SMSC) for its Sartell plant, so the substitution path is funded and directionally real, just not at motor grade. Using the substitute's self-report is conservative here (developers overstate readiness, so actual substitution is no closer than stated). Research judgment; both error directions in disproof.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {
+        "substitutability": 4
+      },
+      "confidence": 0.85,
+      "dst_id": "mat:rare_earth_magnets",
+      "id": "e1",
+      "relation": "depends_on",
+      "source_ids": [
+        "niron_news_status_20260903_s1",
+        "niron_news_status_20260903_s2"
+      ],
+      "src_id": "comp:humanoid_precision_actuators"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "robot_subsystem",
+      "aliases": [
+        "precision actuators",
+        "series elastic actuators",
+        "quasi-direct-drive motors",
+        "precision reducers"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "comp:humanoid_precision_actuators",
+      "name": "Humanoid precision actuators (series elastic / quasi-direct-drive / precision reducers)",
+      "role": null,
+      "source_ids": [
+        "niron_news_status_20260903_s2"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "NdFeB"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:rare_earth_magnets",
+      "name": "Rare earth magnets (neodymium, samarium-cobalt)",
+      "role": null,
+      "source_ids": [
+        "niron_news_status_20260903_s1"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "niron_news_status_20260903",
+    "evidence_tier": 2,
+    "origin_entity": "Niron Magnetics（替代磁材開發商官方新聞頁）",
+    "permission_basis": "Public vendor news page; URL and short excerpts.",
+    "published_at": "2026-08-18",
+    "publisher": "Niron Magnetics",
+    "retrieved_at": "2026-09-03",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Niron Magnetics official news page (commercialization status capture)",
+    "url": "https://www.nironmagnetics.com/news/"
+  },
+  "sources": [
+    {
+      "id": "niron_news_status_20260903_s1",
+      "locator": "News 2026-06-04 — first commercial product",
+      "quote": "YG ACOUSTICS, SCAN-SPEAK AND NIRON MAGNETICS DEBUT WORLD'S FIRST LOUDSPEAKERS POWERED BY RARE-EARTH-FREE IRON NITRIDE MAGNETS AT HIGH END VIENNA"
+    },
+    {
+      "id": "niron_news_status_20260903_s2",
+      "locator": "News 2026-07-13 — Aspina partnership",
+      "quote": "rare-earth-free motor solutions across global end markets"
+    },
+    {
+      "id": "niron_news_status_20260903_s3",
+      "locator": "News 2026-08-07 — OSC loan",
+      "quote": "a conditional commitment from the Department of War's Office of Strategic Capital (OSC) for a direct loan of up to $150 million, with a 20-year term"
+    }
+  ]
+}
