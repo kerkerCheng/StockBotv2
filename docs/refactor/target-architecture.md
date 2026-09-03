@@ -97,7 +97,7 @@ alpha/                          ← 新增。Alpha Research Core
   catalysts.py                    Q5
   causal.py                       StructuralEvent / CausalPath / CompanyImpact
   models/
-    llm_assessor.py               structured LLM reasoning → schema-validated payload
+    session_assessor.py           packet builder ＋ judgment 驗證（**不接 API**）
     composite.py                  deterministic 組合 → AlphaSignal
   thesis/                         ← 由現 thesis/ 搬入（research 那部分）
     lifecycle.py, memo.py, evidence_manifest.py
@@ -461,17 +461,37 @@ class AlphaModel(Protocol):
 
 ### 6.1 LLM 與 deterministic 的分工（prompt §11 落地）
 
+> **⚠ 2026-09-03 使用者定案：不接 LLM API。LLM 就是 session 本身。**
+
 ```
 deterministic retrieval            ← GraphResearchProvider ＋ Engine C
         ↓
-structured LLM reasoning           ← alpha/models/llm_assessor.py
-        ↓  （產出 JSON，帶 evidence_refs）
-schema validation                  ← contracts.py，pydantic/dataclass 驗證
+   LLM-ready packet（純文字／JSON）  ← alpha/models/session_assessor.py::build_packet
+        ↓
+**session（Claude Code／Codex）讀 packet，寫判斷 JSON**   ← 零 API 呼叫
+        ↓
+schema validation                  ← session_assessor.py::validate_judgment
         ↓  （引用必須解析得到 ResearchContext 內的物件，否則 reject）
 deterministic calculation          ← alpha/models/composite.py
         ↓
 AlphaSignal
 ```
+
+**為什麼不接 API（四個理由，不只是省錢）：**
+
+1. **既有流程早已如此，且有 268 筆紀錄佐證。**
+   `decision_lab assessment-scaffold`（deterministic 取料，判斷欄位刻意留白）
+   → **session 寫判斷 JSON** → `decision_lab reassess --assessment`（deterministic 驗證）。
+   全程零 API 呼叫。`assessment-scaffold` 的 docstring 逐字寫著「生成器不代寫研究判斷」。
+2. **provider-neutral 執行契約。** `AGENTS.md` 要求本機 Codex 與 Claude Code 是可互換的
+   executor；寫死 `anthropic` client 會把研究能力綁死在一個 provider 上。
+3. **`alpha/` 的零外部相依驗收得以維持**——契約與模型層都能離線測試。
+4. **`AGENTS.md`「不值得自己開發」已明文**：長文解讀、Text2Cypher、節點重要性評分
+   都該「直接給 Claude 原始 context，Claude 自己解讀」，不要自製 pipeline。
+
+⚠ **全 repo 的 API 相依只剩兩處，都是 legacy**：`extract.py` 與
+`thesis/generate_lane_memo.py`。後者在 B3 的搬遷範圍內，屆時一併改成 session-driven，
+**整個 repo 就不再需要 `ANTHROPIC_API_KEY`**。
 
 | LLM 負責（語意） | Python 負責（確定性） |
 |---|---|
