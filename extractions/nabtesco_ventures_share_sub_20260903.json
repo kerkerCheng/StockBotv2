@@ -1,0 +1,87 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "Lower toward 3 if Shuanghuan or another challenger wins named sockets at non-Chinese robot majors; raise toward 5 if challengers stay domestic-only through 2027 while Nabtesco share holds in customer-side or third-party accounts.",
+      "id": "nabtesco_ventures_share_sub_20260903_cl1",
+      "source_ids": [
+        "nabtesco_ventures_share_sub_20260903_s1"
+      ],
+      "statement": "Substitutability valuation for the Nabtesco RV-reducer supply edge: 4 of 5. Anchors: Nabtesco's ventures site states 60 percent of the global market for precision reduction gears (self-report verbatim; the corporate page's medium-to-large joints ~60% self-estimate is already in this graph); Shuanghuan Driveline already supplies RV reducers in this graph (Chinese domestic adoption). Rationale for 4: dominant installed base plus qualification/installed-base switching friction, but a named at-scale challenger exists — not sole (not 5), friction too high for 3. Research judgment with both error directions encoded in disproof.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {
+        "sole_source": false,
+        "substitutability": 4
+      },
+      "confidence": 0.85,
+      "dst_id": "tech:rv_reducer",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "nabtesco_ventures_share_sub_20260903_s1"
+      ],
+      "src_id": "co:nabtesco"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "6268.T"
+      ],
+      "attributes": {
+        "ticker": "6268.T"
+      },
+      "confidence": 0.9,
+      "id": "co:nabtesco",
+      "name": "Nabtesco",
+      "role": null,
+      "source_ids": [
+        "nabtesco_ventures_share_sub_20260903_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "robot_subsystem",
+      "aliases": [
+        "RV gear",
+        "cycloidal reducer"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:rv_reducer",
+      "name": "RV Reducer（RV 減速器）",
+      "role": null,
+      "source_ids": [
+        "nabtesco_ventures_share_sub_20260903_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "nabtesco_ventures_share_sub_20260903",
+    "evidence_tier": 2,
+    "origin_entity": "Nabtesco（供應商官方產品頁,市占為自估）",
+    "permission_basis": "Public vendor page; URL and short excerpts.",
+    "published_at": null,
+    "publisher": "Nabtesco Technology Ventures",
+    "retrieved_at": "2026-09-03",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Nabtesco Technology Ventures — precision reduction gears #1 page",
+    "url": "https://nabtesco-ventures.com/precision-reduction-gears/"
+  },
+  "sources": [
+    {
+      "id": "nabtesco_ventures_share_sub_20260903_s1",
+      "locator": "Ventures page — market position",
+      "quote": "Nabtesco Corporation is the world's leading manufacturer of precision reduction gears for automated production equipment, with 60 percent of the global market."
+    }
+  ]
+}

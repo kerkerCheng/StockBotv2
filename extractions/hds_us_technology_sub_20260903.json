@@ -1,0 +1,96 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "Lower toward 3 if any major humanoid maker publicly qualifies a non-HDS strain-wave supplier in under 2 years or Chinese suppliers win named non-domestic humanoid sockets; raise toward 5 if challengers remain confined to low-end/domestic sockets through 2027 while HDS wins named humanoid design-ins.",
+      "id": "hds_us_technology_sub_20260903_cl1",
+      "source_ids": [
+        "hds_us_technology_sub_20260903_s1",
+        "hds_us_technology_sub_20260903_s2"
+      ],
+      "statement": "Substitutability valuation for the HDS strain-wave supply edge: 4 of 5. Rationale for 4 not 5: HDS is not sole — Leaderdrive (688017.SS, adopted by Chinese humanoid makers) and Nidec (FLEXWAVE, six productized series) are named at-scale challengers already in this graph. Rationale for 4 not 3: switching friction is high — 3-7 year qualification cycles (existing graph claim) plus zero-backlash performance criticality; the ~85% incumbent-share figure remains a tier-3 attribution (HDS's own page makes no share claim — honestly layered). This is a research judgment, not a source quote; both directions of error are encoded in the disproof.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {
+        "sole_source": false,
+        "substitutability": 4
+      },
+      "confidence": 0.85,
+      "dst_id": "tech:strain_wave_gear",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "hds_us_technology_sub_20260903_s1",
+        "hds_us_technology_sub_20260903_s2"
+      ],
+      "src_id": "co:harmonic_drive_systems"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "6324.T",
+        "HDS"
+      ],
+      "attributes": {
+        "ticker": "6324.T"
+      },
+      "confidence": 0.9,
+      "id": "co:harmonic_drive_systems",
+      "name": "Harmonic Drive Systems",
+      "role": null,
+      "source_ids": [
+        "hds_us_technology_sub_20260903_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "robot_subsystem",
+      "aliases": [
+        "harmonic drive",
+        "諧波減速機",
+        "strain wave gearing"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:strain_wave_gear",
+      "name": "Strain Wave Gear（諧波減速器）",
+      "role": null,
+      "source_ids": [
+        "hds_us_technology_sub_20260903_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "hds_us_technology_sub_20260903",
+    "evidence_tier": 2,
+    "origin_entity": "Harmonic Drive Systems（供應商官方產品頁）",
+    "permission_basis": "Public vendor page; URL and short excerpts.",
+    "published_at": null,
+    "publisher": "Harmonic Drive LLC",
+    "retrieved_at": "2026-09-03",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Harmonic Drive LLC (US) — strain wave gearing technology page",
+    "url": "https://www.harmonicdrive.net/technology"
+  },
+  "sources": [
+    {
+      "id": "hds_us_technology_sub_20260903_s1",
+      "locator": "Technology page — zero backlash",
+      "quote": "Because the gear teeth are always fully engaged in a region along the major axis, Harmonic Drive strain wave gearheads have Zero Backlash."
+    },
+    {
+      "id": "hds_us_technology_sub_20260903_s2",
+      "locator": "Technology page — performance attributes",
+      "quote": "The high performance attributes of this gearing technology including zero backlash, high torque, compact size, excellent positional accuracy and repeatability are all a direct result of the unique operating principle."
+    }
+  ]
+}
