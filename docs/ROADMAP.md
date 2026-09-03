@@ -171,12 +171,18 @@ commit message 寫「這是純重構」，錯誤會原封不動進 master；因�
 4. **L14 記分板從第一天接上**：清單自動接既有等權重報酬追蹤（Shadow 價格錨），
    「LLM 綜合層有沒有用」用排序前段 vs 後段的後續報酬回答。
 
+**與 Lane Memo 合併（2026-09-03 使用者定案）：** lane memo 是以公司為單位的縱深視圖
+（`--ticker`/`--company-id` 單檔一頁），digest 是橫切面（一檔一行、比較後給最終清單）——
+**同一組料的兩種顆粒度**。實作上共用資料組裝層：把 `generate_lane_memo.py` 的取料邏輯
+抽成共用模組（＝原 P3），digest＝逐檔跑組裝器＋比較型 prompt，memo＝單檔＋深度型 prompt；
+digest 每一行即該檔 memo 的摘要行。variant perception 補一次，兩視圖都吃。
+
 **分四步：** P1 確認／小擴 Engine C info 快照欄位（forwardEps/forwardPE/marketCap/
 analyst counts——yfinance.info 多半已有，缺的補進 ETL 快照）；P2 top-N cohort 補
-variant perception（這步是研究，逐 cohort 走 pq2）；P3 視圖組裝器
-（`decision_lab investable_digest`：rows × Engine C × cohort 欄位 → 組 context 給
-session 內 LLM 綜合，輸出每檔附瓶頸位置／條件式未來性（明標推估）／純度／相關性組／
-disproof，固定聲明「研究判斷非回測」）；P4 接 outcome 追蹤。
+variant perception（這步是研究，逐 cohort 走 pq2）；P3 共用組裝器抽出＋digest 渲染模式
+（rows × Engine C × cohort 欄位 → 組 context 給 session 內 LLM 綜合，輸出每檔附瓶頸位置／
+條件式未來性（明標推估）／純度／相關性組／disproof，固定聲明「研究判斷非回測」）；
+P4 接 outcome 追蹤。
 
 **驗收（哪個數字會變）：** ①`investable_digest` 輸出的每一檔都能追溯到
 rank 行＋Engine C 欄位＋cohort 欄位（零自算數字——與 alpha-status 純消費端同紀律）；
