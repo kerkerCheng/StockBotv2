@@ -7681,6 +7681,18 @@
       "source": "decision_lab",
       "title": "co:sivers_semiconductors：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-03T00:04:57.038361+00:00",
+      "hint": "go＝執行兩項圖維護(L10 正確性優先,先 Neo4j dump 備份):①tech:nand_technology 併入 tech:nand_flash——兩者 aliases 完全同集(NAND/Flash memory),各 1 邊 1 來源,遷移 nand_technology 的 edge assertion+source_ids 後刪除節點,alias 補 NAND fab;②tech:in_package_optical_io(零邊零來源孤兒,alias 含 chip-to-chip optical interconnect)吸收進 tech:chip_to_chip_optical——alias 遷移後刪除;③tech:scale_up_cpo vs tech:scale_up_network 確認不併——[451] claim 已確立為同一功能層的兩條技術路線(CPO vs OCS),誤併會抹掉這個區分。不含其他節點變更",
+      "n": 456,
+      "reason": null,
+      "ref_id": "lead:lead_a5e0447bc74691a10b93a1e4dc1ff4b2",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "同義節點合併執行核准——nand 對合併+optical_io 孤兒吸收;scale_up 對確認不併(proposal 完成)",
+      "type": "manual"
     }
   ],
   "log": [
@@ -16928,6 +16940,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 456,
+  "next_n": 457,
   "schema_version": "1"
 }

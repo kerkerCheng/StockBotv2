@@ -37969,9 +37969,13 @@
       "first_seen": "2026-09-02T23:41:30.490803+00:00",
       "lead_id": "lead_a5e0447bc74691a10b93a1e4dc1ff4b2",
       "published_at": null,
-      "refs": {},
+      "refs": {
+        "parked_reason": "proposal 完成並鑄 [456] 等執行核准:nand 對真重複建議合併/optical_io 孤兒吸收/scale_up 對確認不併([451] 兩路線區分)",
+        "trace_next_trigger": "[456] go 後執行圖維護",
+        "trace_status": "awaiting_named_disclosure"
+      },
       "source": "user-approved-2026-09-03",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
