@@ -793,3 +793,95 @@ U7／U12 等已完成 plan 的編號引用
 
 **若 MCP 相容性與新核心架構衝突，優先選擇新核心架構。
 MCP 不得成為這次重構的主要設計約束。**
+
+---
+
+## 17. 重構後的文件集合與分工
+
+> **本節定義 Phase 3.9 之後每份文件各自回答什麼問題。**
+> ⚠ `docs/ARCHITECTURE.md` **今天不存在**——它在 Phase 3.9 由本檔（`target-architecture.md`）
+> 蒸餾而成；`docs/refactor/` 整個目錄在 Phase 8 之後封存到 `docs/archive/`。
+
+### 17.1 五份文件各回答一個互斥的問句
+
+| 檔案 | 回答的問句 | 內容判準 | 何時讀 | 行數（現況 → 目標） |
+|---|---|---|---|---|
+| **`AGENTS.md`** | **「我可以／不可以做什麼？」** | **會約束行為的規則**：invariant、authority 邊界、四個人工 gate、lesson 的判準句 | **每個 session 完整載入** | 771 → **≤450** |
+| **`CONCEPTS.md`** | **「這個詞是什麼意思？」** | **詞彙表**：專案特有語意的名詞。不含規則、不含流程、不含結構 | 遇到不懂的詞 | 190 → ~260 |
+| **`docs/ARCHITECTURE.md`** | **「系統長什麼樣、為什麼這樣切？」** | **結構與邊界**：層、authority separation、contract、依賴方向，**以及為什麼**（ADR 理由） | 新增 module／動邊界前 | 0 → ~300（新檔） |
+| **`docs/OPERATIONS.md`** | **「這件事怎麼跑？」** | **可執行程序**：命令、環境變數、排程、排錯順序 | 要動手執行時 | 492 → ~670 |
+| **`docs/ROADMAP.md`** | **「接下來要做什麼？」** | **active future work ＋ 驗收條件** | 規劃下一步時 | 242（已到位） |
+
+**一句話判準：這句話改變的是我的行為、我的用詞、我的結構、我的按鍵、還是我的排程？**
+
+### 17.2 三組容易混淆的邊界
+
+**① `AGENTS.md` vs `ARCHITECTURE.md`——最容易混的一組。**
+分野**已經量過了**，就是 `current-architecture.md` §11 的分類：
+**INVARIANT → `AGENTS.md`（約 110 行）｜CURRENT_ARCHITECTURE → `ARCHITECTURE.md`（約 150 行）。**
+
+判別問法：**「換掉 Neo4j、把 Engine D 拆成三個 package 之後，這句話還對嗎？」**
+還對 → AGENTS；會跟著變 → ARCHITECTURE。
+
+實例對照：
+
+| 內容 | 去哪 |
+|---|---|
+| 「Core 不得 import `mcp_server`」 | **AGENTS**（約束行為） |
+| 「為什麼依賴方向必須 peripheral → core；`mcp_server/` 79% 是 domain 的實測」 | **ARCHITECTURE**（結構與理由） |
+| 「五條 authority separation」 | **AGENTS**（它是憲法） |
+| 「今天由 Engine A/B/C/D 四個 package 實現這五條」 | **ARCHITECTURE**（實現方式會變） |
+| 「`AlphaSignal` 不得有 position 欄位」 | **AGENTS** |
+| 「`AlphaSignal` 的完整欄位定義與 `ordering_key()` 設計」 | **ARCHITECTURE** |
+
+⚠ **允許鏡像，但 AGENTS 那一句必須短且連過去。** 完整論證只寫一份，在 ARCHITECTURE。
+
+**② `CONCEPTS.md` vs `ARCHITECTURE.md`。**
+CONCEPTS 定義**名詞本身**，ARCHITECTURE 定義**名詞之間的關係與邊界**。
+
+| 內容 | 去哪 |
+|---|---|
+| 「`EvidenceRef` 是什麼」 | **CONCEPTS** |
+| 「為什麼五套證據強度欄位並列而不壓成一個分數」 | **ARCHITECTURE** |
+| 「不得壓成單一分數」 | **AGENTS** |
+
+**③ `AGENTS.md` vs `OPERATIONS.md`。**
+> **OPERATIONS 的內容被改壞 → 跑不起來。
+> AGENTS 的內容被改壞 → 跑起來了，但做錯事。**
+
+這是最實用的一條分野。「16 條 sandbox rule 的清單」被改壞只會讓排程失敗（OPERATIONS）；
+「unattended surface 變更必須做 impact review」被刪掉會讓人在無人值守路徑上加危險命令
+（AGENTS）。**現況兩者都在 `AGENTS.md`，清單那份是「清單會腐壞」的現行違規。**
+
+### 17.3 不在這五份裡的東西
+
+| 位置 | 是什麼 | 為什麼不合併 |
+|---|---|---|
+| `skills/*/SKILL.md`（12 個） | **操作手冊 ＋ 呈現契約**：一個具體工作怎麼做、輸出長什麼樣 | 兩端 harness 自動載入；`description` frontmatter 是權威。pq2 的 90 行呈現規格搬來這裡 |
+| `docs/solutions/*/*.md`（9 篇） | **單一事故的事後檢討**（帶 `problem_type` frontmatter 可搜尋） | 它們是**個案**；餵養 AGENTS 的 lesson 判準與 ARCHITECTURE 的設計理由，但不取代兩者 |
+| `docs/historical-failure-matrix.md` | **回歸憲法**：36 筆事故 → 六條 invariant → executable protection 對照 | Phase 8 由 `docs/refactor/` 移出成常駐檔。⚠ 它會**逐步溶解**——§2 六條 invariant 進 AGENTS、§3 audit 規格變成 `alpha/audit/` 的 code、§7 golden fixtures 變成測試。**殘留的只有矩陣本身**（一份活的登記表），這正是「lesson 必須 executable」套用在文件自己身上 |
+| `schema/graph_schema.md`＋`schema/vocab.json` | **機器可讀的 schema 規格** | 有程式直接消費（`loader/validate.py`）；改它等於改資料格式 |
+| `docs/brainstorms/`、`docs/plans/`、`docs/reports/` | 需求推導、交付規格、point-in-time 報告 | 純歷史，`docs/plans/` 已轉純歷史 |
+| `CLAUDE.md` | 只有一行 `@AGENTS.md` | 雙代理相容轉接層，不放內容 |
+
+### 17.4 Phase 3.9 的搬移對照（B 類一次做完）
+
+```
+AGENTS.md 771 行
+  ├─ 110  INVARIANT ─────────────────► 留下
+  ├─ 200  LESSON_LEARNED ────────────► 留下（改寫成五欄格式，一條都不刪）
+  ├─ 150  CURRENT_ARCHITECTURE ──────► docs/ARCHITECTURE.md（新檔）
+  ├─  90  pq2 呈現規格 ──────────────► skills/daily-brief/SKILL.md
+  ├─ ~30  Luna 委派契約 ─────────────► skills/luna-reviewer/SKILL.md
+  ├─ ~15  五套證據強度字彙 ───────────► CONCEPTS.md（Phase 1 就搬，A 類）
+  └─ ~180 PROCEDURE（sandbox rule 抄本／
+          daily 權限／報告留檔／通知細節）► docs/OPERATIONS.md
+  ＋新增   五條 authority separation
+          六條 hard invariant ────────► AGENTS.md
+```
+
+**驗收（Phase 3.9 exit criteria）：**
+- `AGENTS.md` **771 → ≤450 行**，且 INVARIANT **一條未刪**
+- **16 條 lesson 全部保留**，各自標明 implementation 可不可改
+- `grep` 不到與 `.codex/rules`／`skills/*` 重複的清單（消除「清單會腐壞」的現行違規）
+- 五份文件的任一句話，都能明確歸到 §17.1 的一個問句底下——**歸不到就是它不該存在**
