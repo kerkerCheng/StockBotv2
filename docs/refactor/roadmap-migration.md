@@ -132,7 +132,12 @@ TSEM oversupply watch｜MACOM／Semtech 作為 Tower TIA 客戶（tier 3 待客�
 GF 對 Tower 專利訴訟未追源。
 
 三項都是「改變我知道什麼」而非「改變系統怎麼運作」，依 `AGENTS.md` 判準應走 pq2，
-不該躺在 ROADMAP。**動作：Phase 1 開工前用 `todo add` 鑄三個 `manual` 編號。**
+不該躺在 ROADMAP。
+
+✅ **2026-09-03 已鑄號：[469] TSEM oversupply｜[470] MACOM／Semtech Tower TIA 客戶｜
+[471] GF 對 Tower 專利訴訟。** 三項皆為 `manual` 型、active 待使用者 `go`——
+使用者當日授權的是「鑄號」（把它們從 ROADMAP 搬進正確的載體），**不是啟動研究**，
+因此不在受理時 resolve。
 
 ---
 
@@ -264,7 +269,8 @@ roadmap 層級只記一句：
 - [x] **`AGENTS.md` 對 ROADMAP 的連結仍能命中**——「已撤回的診斷」與「看起來像缺口但不是」
       兩節**刻意留在新 ROADMAP**（它們是 active guardrail 不是歷史），
       `AGENTS.md` L11-6 的錨點連結因此不會斷。
-- [ ] 三個 M1 研究遺留已鑄成 pq2 編號（TSEM oversupply／MACOM-Semtech tier 3／GF-Tower 訴訟追源）
+- [x] **三個 M1 研究遺留已鑄成 pq2 編號**（2026-09-03）：[469] TSEM oversupply／
+      [470] MACOM-Semtech tier 3／[471] GF-Tower 訴訟追源。查證：`python -m engine_b.todo list`
 - [ ] 沒有任何一項被判成 OBSOLETE 卻仍有程式碼在跑（反例：技術指標擴充判 OBSOLETE，
       而 `engine_c/technical.py` 的 legacy 動能欄位仍在 schema 裡——那是**刻意保留的歷史列**，
       不是活的功能，已在 schema 註解載明）

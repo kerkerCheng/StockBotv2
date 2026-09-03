@@ -7867,6 +7867,42 @@
       "source": "manual",
       "title": "decompose 選題核准:拆解 NVIDIA 800 VDC 機櫃供電鏈(Vera Rubin/Kyber)——電源域圖中零節點,使用者授權開新領域並委任進入點選擇",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-09-03T07:35:28.111051+00:00",
+      "hint": "M1 研究遺留，2026-09-03 由 ROADMAP 遷入 pq2（它改變的是「我知道什麼」＝研究，不是系統行為）。供給側擴張正是 AXT v4 由偏多轉謹慎偏空的同一主軸——AXTI 的 disproof 第 6 條已被 JX（4 年最多 1,200 億日圓、產能拉到 FY2025 的 7–10 倍）與住友（180 億日圓、FY2028 達 FY2024 的 3.1 倍）觸發過一次。本項要問的是同一個供給側訊號在 CPO 光通訊整體是否成立。｜go＝bounded research（source-trace＋抽取），不含入圖、不含 Engine C 寫入、不含 thesis mutation、不含 live｜完成條件：圖中出現可支持／反駁 oversupply 的 dated claim ≥1，或明確結案為「本輪無新證據」",
+      "n": 469,
+      "reason": null,
+      "ref_id": "manual:469",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "TSEM／光通訊 2027–29 集體擴產 oversupply watch（RA ra_2bf1494b）",
+      "type": "manual"
+    },
+    {
+      "added_at": "2026-09-03T07:35:44.579213+00:00",
+      "hint": "M1 研究遺留，2026-09-03 由 ROADMAP 遷入 pq2。現況 tier 3（產業報導轉述），依 L8（來源獨立性：供應商自報不能當獨立佐證）不得直接入圖。Tower（TSEM）目前在瓶頸排序第 9（supplies_to → prod:ph18da，替代難度 4/5、外部印證）與第 16（supplies_to → co:marvell_technology）。｜go＝bounded research（追客戶端一手揭露），不含入圖、不含 evidence tier 升級、不含 live｜兩種合法終局：①取得 MACOM／Semtech 端的一手揭露 → 升 tier 後另走入圖核准；②判定「對方結構上不會揭露供應商」→ 標為永久 tier 3 並停止重試（不得無限期掛著）",
+      "n": 470,
+      "reason": null,
+      "ref_id": "manual:470",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "MACOM／Semtech 是否為 Tower Semiconductor 的 TIA 客戶——待客戶端揭露印證",
+      "type": "manual"
+    },
+    {
+      "added_at": "2026-09-03T07:35:44.803547+00:00",
+      "hint": "M1 研究遺留，2026-09-03 由 ROADMAP 遷入 pq2。GFS 與 TSEM 兩家都已在圖中且都在瓶頸排序內（GFS 第 10/11/14/18/19，TSEM 第 9/16），訴訟結果會影響兩者的競爭關係邊，但目前只有二手轉述、沒有一手文件。｜go＝bounded research（source-trace：法院 PACER／公司 filing），不含入圖、不含 thesis mutation、不含 live｜兩種合法終局：①追到一手訴狀或法院文件；②確認公開管道不可得並記錄嘗試過的路由（trace_status＋trace_attempts_ref，不得只註記「找不到」）",
+      "n": 471,
+      "reason": null,
+      "ref_id": "manual:471",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "GlobalFoundries 對 Tower Semiconductor 的專利訴訟——追一手訴狀／法院文件",
+      "type": "manual"
     }
   ],
   "log": [
@@ -17159,6 +17195,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 469,
+  "next_n": 472,
   "schema_version": "1"
 }
