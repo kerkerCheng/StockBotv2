@@ -7854,6 +7854,19 @@
       "source": "decision_lab",
       "title": "co:ewellix：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-03T01:47:32.359627+00:00",
+      "hint": "使用者 2026-09-03 指示:電源域若空白則直接 decompose 最適進入點;go=執行,產出研究地圖+pq1 題,不含入圖/onboard",
+      "n": 468,
+      "reason": "decompose 已執行:800VDC 供電鏈拆 7 層(整流站/busway/DC-DC shelf/VRM/寬能隙半導體/次秒儲能/電網介面),圖中除 power_gan 孤節點外全空白;NVIDIA 官方 blog 一手三層夥伴具名;5 題註冊 pq1 triaged_go",
+      "receipt": "authority:decompose;ref:decompose:nvidia-800vdc-2026-09-03",
+      "ref_id": "manual:468",
+      "resolution": "go",
+      "resolved_at": "2026-09-03T01:48:49.359850+00:00",
+      "source": "manual",
+      "title": "decompose 選題核准:拆解 NVIDIA 800 VDC 機櫃供電鏈(Vera Rubin/Kyber)——電源域圖中零節點,使用者授權開新領域並委任進入點選擇",
+      "type": "manual"
     }
   ],
   "log": [
@@ -17135,8 +17148,17 @@
       "ref_id": "lead:lead_a5e0447bc74691a10b93a1e4dc1ff4b2",
       "type": "manual",
       "verb": "go"
+    },
+    {
+      "at": "2026-09-03T01:48:49.359850+00:00",
+      "n": 468,
+      "reason": "decompose 已執行:800VDC 供電鏈拆 7 層(整流站/busway/DC-DC shelf/VRM/寬能隙半導體/次秒儲能/電網介面),圖中除 power_gan 孤節點外全空白;NVIDIA 官方 blog 一手三層夥伴具名;5 題註冊 pq1 triaged_go",
+      "receipt": "authority:decompose;ref:decompose:nvidia-800vdc-2026-09-03",
+      "ref_id": "manual:468",
+      "type": "manual",
+      "verb": "go"
     }
   ],
-  "next_n": 468,
+  "next_n": 469,
   "schema_version": "1"
 }

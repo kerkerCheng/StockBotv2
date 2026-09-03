@@ -10475,6 +10475,35 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2072743412244287527"
     },
+    "lead_18be6b7764b40d7cb853925a0a4836eb": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-03T01:48:31.671072+00:00",
+      "lead_id": "lead_18be6b7764b40d7cb853925a0a4836eb",
+      "published_at": null,
+      "refs": {},
+      "source": "decompose-800vdc-2026-09-03",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "[decompose|800VDC] 板上 VRM/multiphase power stage 層——NVIDIA 具名 ADI/Infineon/MPS/Renesas/TI 等;MPWR 的 GPU VRM socket 集中度一手化;圖中無節點",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-03T01:48:48.165788+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "decompose 800VDC([468] 使用者授權開電源域):NVIDIA 官方一手具名三層夥伴,圖中電源域零節點"
+        },
+        "decided_at": "2026-09-03T01:48:48.165788+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "decompose 800VDC([468] 使用者授權開電源域):NVIDIA 官方一手具名三層夥伴,圖中電源域零節點",
+        "tier": 2
+      },
+      "url": "https://developer.nvidia.com/blog/nvidia-800-v-hvdc-architecture-will-power-the-next-generation-of-ai-factories/?gap=vrm_power_stage"
+    },
     "lead_18da0ec221ed6ebc51ea83b93ee8e7d8": {
       "entities": {
         "company_ids": [
@@ -18207,6 +18236,35 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2086634510935118161"
     },
+    "lead_3e0ba028986066e33b30d7c97c0a33b9": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-03T01:48:32.319562+00:00",
+      "lead_id": "lead_3e0ba028986066e33b30d7c97c0a33b9",
+      "published_at": null,
+      "refs": {},
+      "source": "decompose-800vdc-2026-09-03",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "[decompose|800VDC] 次秒級能量儲存層(BBU/supercap,GPU power fluctuations)——NVIDIA 明文是架構一環但夥伴未具名;誰做?圖中無節點(真未知層)",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-03T01:48:48.760536+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "decompose 800VDC([468] 使用者授權開電源域):NVIDIA 官方一手具名三層夥伴,圖中電源域零節點"
+        },
+        "decided_at": "2026-09-03T01:48:48.760536+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "decompose 800VDC([468] 使用者授權開電源域):NVIDIA 官方一手具名三層夥伴,圖中電源域零節點",
+        "tier": 2
+      },
+      "url": "https://developer.nvidia.com/blog/nvidia-800-v-hvdc-architecture-will-power-the-next-generation-of-ai-factories/?gap=subsecond_energy_storage"
+    },
     "lead_3e383a34e368086c3f09085532274856": {
       "content_updated_at": "2026-07-28T12:28:35.362386+00:00",
       "entities": {
@@ -20856,6 +20914,35 @@
         "tier": 3
       },
       "url": "https://cignal.ai/2026/08/fcc-ban-on-new-chinese-optical-modules/"
+    },
+    "lead_4c2881be9b2f66a3b2b54291e26985aa": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-03T01:48:32.644494+00:00",
+      "lead_id": "lead_4c2881be9b2f66a3b2b54291e26985aa",
+      "published_at": null,
+      "refs": {},
+      "source": "decompose-800vdc-2026-09-03",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "[decompose|800VDC] 整流站/800V busway 基礎設施層——NVIDIA 具名 Eaton/Schneider/Vertiv(VRT 已出 MGX reference architecture);圖中無節點",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-03T01:48:49.060097+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "decompose 800VDC([468] 使用者授權開電源域):NVIDIA 官方一手具名三層夥伴,圖中電源域零節點"
+        },
+        "decided_at": "2026-09-03T01:48:49.060097+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "decompose 800VDC([468] 使用者授權開電源域):NVIDIA 官方一手具名三層夥伴,圖中電源域零節點",
+        "tier": 2
+      },
+      "url": "https://developer.nvidia.com/blog/nvidia-800-v-hvdc-architecture-will-power-the-next-generation-of-ai-factories/?gap=rectifier_busway"
     },
     "lead_4c624bf197b688bce6b5a827922583cd": {
       "entities": {
@@ -32333,12 +32420,14 @@
       "lead_id": "lead_86709ede2c19f3b0bcbaba2317325971",
       "published_at": null,
       "refs": {
+        "action_digest": "c608edeace0439d3f425f26749f1980de6d552f3eff29101ca6dd3d1684212ac",
+        "focus_company_id": "co:ewellix",
         "outcome": "第一包=Ewellix 滾柱絲槓邊 sub=4;FT 感測器邊(Novanta,既有評估低替代難度)與 tech 層邊留後續包",
         "research_action_id": "ra_f1e264bf9bab99798f5fe6a33bd2b965",
         "trace_status": "partial"
       },
       "source": "sub-backfill-448-2026-09-03",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {
         "robotics": {
           "counter_only": false,
@@ -37600,6 +37689,35 @@
         "tier": 3
       },
       "url": "https://finance.yahoo.com/sectors/technology/articles/iqe-tower-semiconductor-announce-multi-060000113.html?.tsrc=rss"
+    },
+    "lead_a4c2e14392aec9ce92ee74d1f1b6e81d": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-03T01:48:31.990321+00:00",
+      "lead_id": "lead_a4c2e14392aec9ce92ee74d1f1b6e81d",
+      "published_at": null,
+      "refs": {},
+      "source": "decompose-800vdc-2026-09-03",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "[decompose|800VDC] 寬能隙功率半導體層(GaN/SiC)——NVIDIA 具名 Innoscience/Navitas/OnSemi/ROHM/ST;800V 化誰受益,NVTS 純度最高;圖中僅 tech:power_gan 孤節點",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-03T01:48:48.464955+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "decompose 800VDC([468] 使用者授權開電源域):NVIDIA 官方一手具名三層夥伴,圖中電源域零節點"
+        },
+        "decided_at": "2026-09-03T01:48:48.464955+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "decompose 800VDC([468] 使用者授權開電源域):NVIDIA 官方一手具名三層夥伴,圖中電源域零節點",
+        "tier": 2
+      },
+      "url": "https://developer.nvidia.com/blog/nvidia-800-v-hvdc-architecture-will-power-the-next-generation-of-ai-factories/?gap=wbg_power_semi"
     },
     "lead_a4eca2bd1a52d9a049fe6a5f6a642aab": {
       "content_updated_at": "2026-07-29T13:46:51.647894+00:00",
@@ -43622,12 +43740,14 @@
       "lead_id": "lead_c042366cb469dcaf82dda0d6f222f652",
       "published_at": null,
       "refs": {
+        "action_digest": "310fb946ff4e3cdc7f52478bef3e0505af0cd2d592a9f5cedabeccab03d450e3",
+        "focus_company_id": "co:niron_magnetics",
         "outcome": "第一包=樞紐依賴邊 sub=4(Niron 官方時間表反向錨定);供應商邊(MP/Lynas/JL MAG/Proterial)因地緣分裂需逐家論證留後續包",
         "research_action_id": "ra_44e0a3b539bafe0b3da2d6841df64212",
         "trace_status": "partial"
       },
       "source": "sub-backfill-448-2026-09-03",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {},
       "title": "[448 拆分|磁材叢集] sub 補值論證——MP/Lynas/JL MAG/Proterial→rare_earth_magnets;actuators depends_on magnets(鐵氮化物/HRE-free 替代路線評值);GBD enables 邊。每邊定值附新來源打包 RA",
       "triage": {
@@ -49050,12 +49170,14 @@
       "lead_id": "lead_d966ce5858ebd7f5e72a3329c49214dc",
       "published_at": null,
       "refs": {
+        "action_digest": "e8542622aaad24edbaa0cdebab04a71b3cb840b80e965ecd83792171b8c07959",
+        "focus_company_id": "co:harmonic_drive_systems",
         "outcome": "第一包覆蓋 HDS/Nabtesco 兩條主邊(各 sub=4);叢集殘餘:Leaderdrive/Nidec/双環自身邊+tech 層邊(strain_wave/rv→actuators),入圖後續包再補",
         "research_action_id": "ra_7eb8ecdeed0759ef1af5bf5f924dd372",
         "trace_status": "partial"
       },
       "source": "sub-backfill-448-2026-09-03",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {
         "robotics": {
           "counter_only": false,
@@ -55655,6 +55777,35 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1326801/000095010326012729/xslF345X06/ownership.xml"
+    },
+    "lead_fa672a299978b3f3ec2b0cf8ae1d4130": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-03T01:48:31.354343+00:00",
+      "lead_id": "lead_fa672a299978b3f3ec2b0cf8ae1d4130",
+      "published_at": null,
+      "refs": {},
+      "source": "decompose-800vdc-2026-09-03",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "[decompose|800VDC] 機櫃 DC/DC power shelf 層——NVIDIA 具名 Delta/Flex Power/Lead Wealth/LiteOn/Megmeet;誰拿 Kyber socket?集中度與台達(2308.TW)純度;圖中無節點",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-03T01:48:47.862764+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "decompose 800VDC([468] 使用者授權開電源域):NVIDIA 官方一手具名三層夥伴,圖中電源域零節點"
+        },
+        "decided_at": "2026-09-03T01:48:47.862764+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "decompose 800VDC([468] 使用者授權開電源域):NVIDIA 官方一手具名三層夥伴,圖中電源域零節點",
+        "tier": 2
+      },
+      "url": "https://developer.nvidia.com/blog/nvidia-800-v-hvdc-architecture-will-power-the-next-generation-of-ai-factories/?gap=dcdc_power_shelf"
     },
     "lead_fabcb44c5a4191a580c4d959fd22de5e": {
       "entities": {
