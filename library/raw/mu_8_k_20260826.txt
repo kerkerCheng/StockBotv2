@@ -1,0 +1,352 @@
+false 
+ 0000723125 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 0000723125 
+ 
+ 
+ 2026-08-24 
+ 2026-08-24 
+ 
+ 
+ 
+ iso4217:USD 
+ 
+ 
+ xbrli:shares 
+ 
+ 
+ 
+ 
+ iso4217:USD 
+ 
+ 
+ xbrli:shares 
+ 
+ 
+ 
+ 
+ 
+ 
+
+ 
+
+ &#160; 
+
+ &#160; 
+
+ UNITED
+STATES 
+
+ SECURITIES
+AND EXCHANGE COMMISSION 
+
+ Washington,
+D.C. 20549 
+
+ &#160; FORM
+ 8-K 
+
+ &#160; 
+
+ CURRENT
+REPORT 
+
+ Pursuant
+to Section 13 or 15(d) of The Securities Exchange Act of 1934 
+
+ &#160; 
+
+ August 24, 2026 
+
+ Date of Report (date of earliest event reported) 
+
+ &#160; 
+
+ &#160; 
+
+ 
+ &#160; 
+
+ Micron
+Technology, Inc. 
+
+ (Exact
+name of registrant as specified in its charter) 
+
+ &#160; 
+
+ 
+ Delaware 
+ &#160; 
+ 1-10658 
+ &#160; 
+ 75-1618004 
+ 
+ (State or
+ other jurisdiction of incorporation) 
+ &#160; 
+ (Commission
+ File Number) 
+ &#160; 
+ (IRS
+ Employer Identification No.) 
+ 
+ &#160; 
+
+ 8000
+South Federal Way 
+
+ Boise ,
+ Idaho 83716-9632 
+
+ 
+ 
+ &#160; 
+ (Address
+ of principal executive offices and Zip Code) 
+ &#160; 
+ 
+
+ &#160; 
+
+ (208) 
+ 368-4000 
+
+ 
+ 
+ &#160; 
+ (Registrant&#8217;s
+ telephone number, including area code) 
+ &#160; 
+ 
+
+ &#160; 
+
+ Check the appropriate
+box below if the Form 8-K filing is intended to simultaneously satisfy the filing obligation of the registrant under any of the following
+provisions: 
+
+ &#160; 
+
+ 
+ &#168; Written
+communications pursuant to Rule 425 under the Securities Act (17 CFR 230.425) 
+ 
+
+ &#160; 
+
+ 
+ &#168; Soliciting
+material pursuant to Rule 14a-12 under the Exchange Act (17 CFR 240.14a-12) 
+ 
+
+ &#160; 
+
+ 
+ &#168; Pre-commencement
+communications pursuant to Rule 14d-2(b) under the Exchange Act (17 CFR 240.14d-2(b)) 
+ 
+
+ &#160; 
+
+ 
+ &#168; Pre-commencement communications pursuant to Rule 13e-4(c) under the
+Exchange Act (17 CFR 240.13e-4(c)) 
+ 
+
+ &#160; 
+
+ Securities
+registered pursuant to Section 12(b) of the Act: 
+
+ &#160; 
+
+ 
+ 
+ Title
+ of each class 
+ &#160; 
+ Trading 
+symbol 
+ &#160; 
+ Name
+ of each exchange on which 
+registered 
+ 
+ Common
+ Stock, par value $0.10 per share 
+ &#160; 
+ MU 
+ &#160; 
+ Nasdaq
+ Global Select Market 
+ 
+
+ &#160; 
+
+ Indicate by check mark whether the registrant is an emerging growth
+company as defined in Rule 405 of the Securities Act of 1933 (&#167;230.405 of this chapter) or Rule 12b-2 of the Securities Exchange
+Act of 1934 (&#167;240.12b-2 of this chapter). 
+ &#160; 
+
+ Emerging growth
+company &#168; 
+
+ &#160; 
+
+ If an emerging
+growth company, indicate by check mark if the registrant has elected not to use the extended transition period for complying with any
+new or revised financial accounting standards provided pursuant to Section 13(a) of the Exchange Act. &#168; 
+
+ &#160; 
+
+ 
+
+ &#160; 
+
+ 
+
+ 
+
+ 
+
+ 
+ &#160; 
+ &#160; 
+ 
+
+ &#160; 
+
+ Item 5.02. &#8239;&#8239;&#8239;Departure of Directors or Certain Officers; Election of Directors; Appointment of Certain Officers; Compensatory Arrangements of Certain Officers. 
+
+ &#160; 
+
+ On August&#160;26, 2026, Micron Technology,&#160;Inc.
+("Micron" or the &#8220;Company&#8221;) announced that Manish Bhatia, 54, the Company&#8217;s current Executive Vice President,
+Global Operations, has been appointed as President and Chief Operating Officer of the Company and that Dr.&#160;Scott DeBoer, 60, the
+Company&#8217;s current Executive Vice President, Chief Technology and Products Officer, has been appointed President and Chief Technology
+and Products Officer of the Company, effective immediately. 
+
+ &#160; 
+
+ Mr.&#160;Bhatia has led the Company&#8217;s global
+operations since joining Micron in 2017, overseeing manufacturing and factory construction, supply chain, procurement, quality, information
+technology, artificial intelligence and global government affairs. Dr.&#160;DeBoer joined Micron in 1995 and has served in a variety of
+technical and managerial roles, most recently leading the Company&#8217;s global technology development and engineering efforts. For additional
+biographical information of Mr.&#160;Bhatia and Dr.&#160;DeBoer, refer to the section titled &#8220;Information About Our Executive Officers&#8221;
+in the Company&#8217;s Annual Report on Form&#160;10-K filed on October&#160;3, 2025. 
+
+ &#160; 
+
+ There are no family relationships between either
+of Mr.&#160;Bhatia or Dr.&#160;DeBoer and any of the Company&#8217;s directors or executive officers and neither has a direct or indirect
+material interest in any transaction required to be disclosed pursuant to Item 404(a)&#160;of Regulation S-K. There are no arrangements
+or understandings between either Mr.&#160;Bhatia or Dr.&#160;DeBoer and any other persons pursuant to which such person was selected as
+an executive officer. There are no changes to the compensation arrangements for either Mr.&#160;Bhatia or Dr.&#160;DeBoer at this time. 
+
+ &#160; 
+
+ On August&#160;26, 2026, the Company also announced
+that Sumit Sadana has transitioned from his role as the Company&#8217;s Executive Vice President and Chief Business Officer to the role
+of Senior Advisor to the CEO. 
+
+ &#160; 
+
+ A copy of the press release related to this announcement
+is attached hereto as Exhibit&#160;99.1. 
+
+ &#160; 
+
+ 
+
+ 
+ &#160; 
+ &#160; 
+ 
+
+ &#160; 
+
+ 
+ Item 9.01.&#8239;&#8239; Financial Statements and Exhibits. 
+ 
+
+ &#160; 
+
+ (d)&#160;Exhibits. 
+
+ &#160; 
+
+ 
+ 
+ Exhibit&#160;No. 
+ &#160; 
+ Description 
+ 
+ 99.1 
+ &#160; 
+ Press Release dated August&#160;26, 2026 
+ 
+ 104 
+ &#160; 
+ Cover Page&#160;Interactive Data File (embedded within the Inline XBRL document) 
+ 
+ &#160; 
+
+ 
+
+ 
+ &#160; 
+ &#160; 
+ 
+
+ &#160; 
+
+ SIGNATURE 
+
+ &#160; 
+
+ Pursuant to the requirements of the Securities Exchange Act of 1934,
+the Registrant has duly caused this report to be signed on its behalf by the undersigned hereunto duly authorized. 
+
+ &#160; 
+
+ 
+ 
+ Date: August&#160;26, 2026 
+ MICRON TECHNOLOGY,&#160;INC. &#160; 
+ 
+ &#160; 
+ &#160; 
+ 
+ &#160; 
+ By:
+ 
+ /s/ Michael Ray&#160; 
+ 
+ &#160; 
+ Name: 
+ Michael Ray 
+ 
+ &#160; 
+ Title: 
+ Senior Vice
+ President, Chief Legal Officer and Corporate Secretary 
+ 
+
+ &#160; 
+
+ 
+
+ 
+ &#160; 
+ 
+
+ &#160; 
+
+ &#160;

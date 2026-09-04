@@ -31,8 +31,19 @@ Codex local scheduled task
 上限 20 份，超過 fail closed（`guard_evidence_volume`）。
 事發：`audit invariants` 實測 3 筆 `trace_attempts_ref` 有 2 筆指向已不存在的檔案——
 引用推上 origin、被引用的檔案留在本機，之後就沒了。
-⚠ **斷掉的引用不得用重新下載補檔**：那會造出 `retrieved_at` 是今天的檔案冒充當時的
-追源嘗試，等於偽造 provenance。查證：`python -m audit invariants --only Orphans`。
+查證：`python -m audit invariants --only Orphans`。
+
+**斷鏈要不要重新下載補檔，取決於來源可不可變：**
+
+| 來源 | 可否重抓 | 理由 |
+|---|---|---|
+| SEC EDGAR `/Archives/{cik}/{accession}/` | ✅ 可 | accession number 定址，內容不可變——重抓得到的是**同一份文件**，不是代替品 |
+| arXiv 版本號、DOI、其他內容定址 | ✅ 可 | 同上 |
+| 新聞頁、公司官網、法說會頁面 | ❌ 不可 | 今天抓到的是**今天的版本**。補一個 `retrieved_at` 是今天的檔案去冒充當時的追源嘗試，等於偽造 provenance（INV-6） |
+
+可重抓時**仍須核對**還原內容與 lead 既有的 `research_outcome` 相符，再宣稱復原
+（2026-09-04 復原 `mu_8_k_20260826`／`mu_4_20260825` 即以人事異動三個人名逐字核對）。
+不可重抓時不要硬補——讓 audit 一直紅著，直到有人明確判定「這筆證據確實遺失」。
 
 ### Runtime invariant audit
 

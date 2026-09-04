@@ -332,6 +332,9 @@ def check_orphans() -> AuditResult:
     `library/raw/`、把路徑寫進 leads state，但 `publish_daily_state.py` 的
     pathset 只有四個 leads JSON。於是引用推上 origin、檔案留在本機，之後就沒了
     （3 筆 `trace_attempts_ref` 有 2 筆指向已不存在的檔案）。
+    兩筆皆為 SEC `/Archives/` 不可變歸檔，已重抓還原並與 lead 的
+    `research_outcome` 逐字核對；publisher 端的結構修法見 `_referenced_evidence`。
+    **可不可以重抓取決於來源可不可變**，判準見 `docs/OPERATIONS.md`。
 
     ⚠ `library/private/` 底下的引用**刻意**不算違規——那些是設計上就不進 Git 的
     （X 附圖、ASR 逐字稿）。把它們算進來會讓這個 check 恆亮。
