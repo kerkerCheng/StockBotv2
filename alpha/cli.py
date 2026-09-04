@@ -199,11 +199,32 @@ def build_parser() -> argparse.ArgumentParser:
     )
     research.set_defaults(func=cmd_research)
 
-    audit = sub.add_parser("audit", help="runtime invariant audit")
+    audit = sub.add_parser(
+        "audit",
+        help="（已搬走）runtime invariant audit → 改用 `python -m audit invariants`",
+    )
     audit.add_argument("what", choices=("invariants",))
-    audit.set_defaults(func=lambda a: __import__(
-        "alpha.audit", fromlist=["main"]).main([]))
+    audit.set_defaults(func=cmd_audit_moved)
     return parser
+
+
+def cmd_audit_moved(_args: argparse.Namespace) -> int:
+    """**這條子命令刻意不執行 audit，只指路。**
+
+    `audit/` 於 2026-09-04 從 `alpha/audit/` 搬到 top-level，因為那些 check 必須同時
+    讀 registry、Neo4j、Engine C、leads state 與 Decision Store——**一個讀遍所有層的
+    東西不可能住在 core 裡**（`tests/test_layer_separation.py::test_nothing_imports_audit`
+    是這道剎車）。搬家時漏改的就是這裡，於是 `python -m alpha audit invariants`
+    從 commit `5b11c85` 起**每一次呼叫都是 ModuleNotFoundError**，直到 2026-09-04
+    才被實跑撞出來——L13：沒有下游消費者跑過的路徑不算接通。
+
+    ⚠ 修法不是把 import 改指 `audit`：那會讓 `alpha/` 在 runtime 依賴 audit，
+    正好反轉上面那條測試在守的依賴方向。所以這裡只印出正確入口並 fail。
+    """
+    print("`python -m alpha audit` 已停用——audit 站在所有層之上，不由 alpha 呼叫。",
+          file=sys.stderr)
+    print("請改用：python -m audit invariants", file=sys.stderr)
+    return 2
 
 
 def main(argv: list[str] | None = None) -> int:

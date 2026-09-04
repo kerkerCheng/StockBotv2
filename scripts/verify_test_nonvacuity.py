@@ -860,6 +860,16 @@ MUTATIONS: tuple[Mutation, ...] = (
         ),
         guards="一檔 +334% 撐起整期價差，只看平均完全看不出來",
     ),
+    Mutation(
+        name="子命令 handler 退回 lazy import 的 lambda",
+        path="alpha/cli.py",
+        old="    audit.set_defaults(func=cmd_audit_moved)",
+        new=("    audit.set_defaults(func=lambda a: __import__(\n"
+             "        \"alpha.audit\", fromlist=[\"main\"]).main([]))"),
+        test="tests/test_alpha_cli_dispatch.py",
+        guards="lazy `__import__` 的 import 錯誤延後到呼叫當下——`--help` 照列，parser 照建，"
+               "任何只驗「子命令存在」的測試照綠。`alpha audit` 就是這樣壞了整段時間沒人發現（L13）",
+    ),
 )
 
 
