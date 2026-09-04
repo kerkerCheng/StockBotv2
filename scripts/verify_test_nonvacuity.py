@@ -492,6 +492,31 @@ MUTATIONS: tuple[Mutation, ...] = (
         guards="取錯窗口會差一個數量級（實測 +900% vs +100%）",
     ),
     Mutation(
+        name="分部資料讀不到時回空 dict 而不是 None",
+        path="alpha/providers/fundamentals.py",
+        old="        return shares or None",
+        new="        return shares",
+        test=(
+            "tests/test_estimate_revision.py::"
+            "test_unusable_segment_payloads_are_none_not_empty_dict"
+        ),
+        guards=(
+            "空 dict 會通過「有沒有分部資料」的檢查，然後讓 Q3 讀成"
+            "「每一塊業務都是 0%」——比誠實說不知道危險得多"
+        ),
+    ),
+    Mutation(
+        name="說明欄位被當成一個分部",
+        path="alpha/providers/fundamentals.py",
+        old="            if isinstance(value, (int, float)) and not isinstance(value, bool)",
+        new="            if True",
+        test=(
+            "tests/test_estimate_revision.py::"
+            "test_segment_revenue_share_reaches_q3_when_it_has_been_recorded"
+        ),
+        guards="`fiscal_period` 之類的說明欄位不是分部占比，混進來會多出一個假分部",
+    ),
+    Mutation(
         name="槓桿算不出來時 fail open",
         path="risk/snapshot.py",
         old="        if not math.isfinite(float(nav)) or float(nav) <= 0:",

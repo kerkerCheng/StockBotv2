@@ -174,6 +174,18 @@
         "engine_c_manual"
       ],
       "why": "going concern、保留意見、restatement 這類措辭精度本身就是 claim（見 L11），需獨立欄位承載逐字一手用語。"
+    },
+    {
+      "field_name": "segment_revenue_share",
+      "category": "profitability",
+      "label": "分部營收占比（瓶頸業務佔公司多少）",
+      "gate_member": false,
+      "auto_source": null,
+      "authorities": [
+        "engine_c_financial",
+        "engine_c_manual"
+      ],
+      "why": "Q3（earnings_exposure）問的是「這個結構優勢對上市公司的 EPS／FCF 到底多重要」，而整體毛利率答不了它——同為 substitutability=5，市值 1.7 兆的 AVGO 那塊 CPO 業務可能只佔 3%，AXTI 的 InP 卻是主業。yfinance 沒有分部資料，只能從 10-K／年報的分部附註（IFRS 8／ASC 280）人工讀入。value 必須是 JSON 物件，鍵為分部名稱、值為佔總營收的比例（0..1 的小數，非百分比），例如 {\"Networking\": 0.61, \"Materials\": 0.23}；另可帶 fiscal_period 與逐字出處。⚠ 缺此欄位時 Q3 一律誠實回 unknown，**不得用整體毛利率代替**（alpha/models/session_assessor.py 的 do_not 明列）。"
     }
   ]
 }

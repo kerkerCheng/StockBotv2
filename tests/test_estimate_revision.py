@@ -165,3 +165,85 @@ def test_derived_eps_is_in_quote_units_so_only_ratios_are_safe() -> None:
     assert pence["estimate_vs_price"] == pytest.approx(pounds["estimate_vs_price"])
     # 而絕對值**不**相同——所以它不得跨標的比大小。
     assert in_pence[0]["forward_eps"] != pytest.approx(in_pounds[0]["forward_eps"])
+
+
+# ---------------------------------------------------------------------------
+# Q3 原料：分部營收占比（Phase 4b 的機制，資料本身仍需逐檔 pq2）
+# ---------------------------------------------------------------------------
+
+def _provider_with(rows: list[tuple[str, str, str]]):
+    """建一個只有兩張必要表的 in-memory Engine C，回傳 provider。"""
+    import sqlite3
+
+    from alpha.providers.fundamentals import EngineCFundamentalsProvider
+
+    conn = sqlite3.connect(":memory:")
+    conn.row_factory = sqlite3.Row
+    conn.execute(
+        "CREATE TABLE financial_snapshots (ticker TEXT, snapshot_date TEXT, "
+        "bar_date TEXT, price REAL, pe_forward REAL, pe_trailing REAL, "
+        "gross_margin REAL, operating_margin REAL, revenue_ttm REAL, "
+        "free_cash_flow_ttm REAL, cash_and_equivalents REAL, total_debt REAL, "
+        "shares_outstanding REAL, ev_revenue REAL, analyst_target_mean REAL, "
+        "analyst_target_count INTEGER, price_kind TEXT, fetched_at TEXT)"
+    )
+    conn.execute(
+        "INSERT INTO financial_snapshots (ticker, snapshot_date, bar_date, price, "
+        "pe_forward, revenue_ttm) VALUES ('TEST','2026-09-03','2026-09-03',100.0,10.0,1000.0)"
+    )
+    conn.execute(
+        "CREATE TABLE manual_fields (ticker TEXT, field_name TEXT, value TEXT, "
+        "updated_at TEXT, source_note TEXT)"
+    )
+    for ticker, field, value in rows:
+        conn.execute(
+            "INSERT INTO manual_fields (ticker, field_name, value) VALUES (?,?,?)",
+            (ticker, field, value),
+        )
+    return EngineCFundamentalsProvider(conn=conn)
+
+
+def test_segment_revenue_share_reaches_q3_when_it_has_been_recorded() -> None:
+    """L14 的「哪個數字會變」：登記欄位 ＋ 接線之後，人工觀測真的到得了 Q3。
+
+    這是 Phase 4b 唯一能在沒有 authority 核准下驗收的東西——**機制通了**。
+    真實資料仍要逐檔從 10-K 分部附註讀入，而寫 Engine C manual ledger 是四個
+    authority gate 之一，每一檔都要 pq2。
+    """
+    provider = _provider_with([
+        ("TEST", "segment_revenue_share",
+         '{"Networking": 0.61, "Materials": 0.23, "fiscal_period": "FY2025"}'),
+    ])
+    snapshot, _ = provider.fundamentals("TEST")
+
+    assert snapshot.segment_revenue_share == {"Networking": 0.61, "Materials": 0.23}
+    # `fiscal_period` 是說明欄位不是分部占比，不得混進來當成一個 61% 的分部。
+    assert "fiscal_period" not in snapshot.segment_revenue_share
+
+
+@pytest.mark.parametrize(
+    "value",
+    ["", "not json", "[1, 2, 3]", '"just a string"', '{"fiscal_period": "FY2025"}', "{}"],
+)
+def test_unusable_segment_payloads_are_none_not_empty_dict(value: str) -> None:
+    """⚠ 讀不到／格式壞掉一律 `None`，**不得回 `{}`**。
+
+    空 dict 會讓 Q3 看到「有分部資料，而每一塊都是 0」——那比誠實說不知道危險得多，
+    因為它會通過「有沒有資料」的檢查，然後餵出一個結論說這塊業務不重要。
+    """
+    provider = _provider_with([("TEST", "segment_revenue_share", value)])
+    snapshot, _ = provider.fundamentals("TEST")
+
+    assert snapshot.segment_revenue_share is None
+
+
+def test_absent_observation_stays_none_and_does_not_fall_back_to_margins() -> None:
+    """沒有這筆觀測時 Q3 誠實回 `None`——不得用整體毛利率或 revenue_ttm 近似。
+
+    `session_assessor` 的 `earnings_exposure.do_not` 明文寫了這條；這裡讓它可執行。
+    """
+    provider = _provider_with([])
+    snapshot, _ = provider.fundamentals("TEST")
+
+    assert snapshot.segment_revenue_share is None
+    assert snapshot.revenue_ttm == 1000.0, "其餘欄位照常，缺的只有分部資料"

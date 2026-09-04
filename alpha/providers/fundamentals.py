@@ -13,6 +13,7 @@
 """
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
 from datetime import date, datetime
 from typing import Any, Mapping, Sequence
@@ -106,9 +107,12 @@ class EngineCFundamentalsProvider:
                 cash_and_equivalents=_num(row.get("cash_and_equivalents")),
                 total_debt=_num(row.get("total_debt")),
                 shares_outstanding=_num(row.get("shares_outstanding")),
-                # ⚠ **Engine C 沒有 segment revenue 欄位**——Q3 的核心輸入缺席。
-                # 這是 Phase 4 的第一個補洞項，不得用其他欄位近似。
-                segment_revenue_share=None,
+                # Q3（earnings_exposure）的核心輸入。yfinance 沒有分部資料，只能從
+                # 10-K／年報的分部附註人工讀入 Engine C manual ledger
+                #（欄位已登記，2026-09-04 Phase 4b）。
+                # ⚠ 讀不到就是 `None`——**不得用整體毛利率或 revenue_ttm 近似**，
+                # 也不得回空 dict：`{}` 會被讀成「分部占比全是 0」。
+                segment_revenue_share=self._segment_revenue_share(ticker),
                 evidence=(ref,),
             ),
             _freshness(row, as_of),
@@ -172,6 +176,41 @@ class EngineCFundamentalsProvider:
             ),
             _freshness(row, as_of),
         )
+
+    def _segment_revenue_share(self, ticker: Ticker) -> Mapping[str, float] | None:
+        """分部營收占比，取自 Engine C 的人工觀測投影 `manual_fields`。
+
+        `value` 是 JSON 物件（分部名稱 → 佔總營收比例，0..1 小數），格式契約寫在
+        `config/engine_c_observation_fields.json` 的 `why`。
+
+        **四種情形都回 `None`，不回空 dict**（L12）：沒有這筆觀測、value 不是 JSON、
+        不是物件、或物件裡沒有任何可用的數值。`{}` 會讓 Q3 看到「有分部資料，
+        而每一塊都是 0」——那比誠實說不知道危險得多。
+        """
+        try:
+            cur = self._cursor()
+            cur.execute(
+                "SELECT value FROM manual_fields WHERE ticker = ? AND field_name = ?",
+                (str(ticker), "segment_revenue_share"),
+            )
+            row = cur.fetchone()
+        except Exception:  # noqa: BLE001 — 缺表／舊 schema 只降級成「沒有這筆觀測」
+            return None
+        if row is None or not row[0]:
+            return None
+        try:
+            payload = json.loads(row[0])
+        except (TypeError, ValueError):
+            return None
+        if not isinstance(payload, dict):
+            return None
+        shares = {
+            str(name): float(value)
+            for name, value in payload.items()
+            # 只收數值；`fiscal_period`／出處等說明欄位不是分部占比。
+            if isinstance(value, (int, float)) and not isinstance(value, bool)
+        }
+        return shares or None
 
     def estimate_revision(
         self, ticker: Ticker | None, *, as_of: date | None = None, sessions: int = 30
