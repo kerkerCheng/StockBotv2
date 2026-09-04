@@ -256,7 +256,11 @@
         "wafer fab equipment",
         "WFE"
       ],
-      "attributes": {},
+      "attributes": {
+        "ramp_difficulty_intrinsic": 4,
+        "concentration_score": 4,
+        "intrinsic_cycle_time_weeks": 52
+      },
       "confidence": 0.9,
       "source_ids": [
         "amat_10_k_20251212_s1"

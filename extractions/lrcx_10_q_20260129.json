@@ -92,12 +92,14 @@
       ]
     },
     {
-      "id": "tech:wafer_fab_equipment",
+      "id": "tech:deposition_etch_clean",
       "type": "TechNode",
       "name": "Wafer Fabrication Equipment (deposition, etch, clean)",
       "abstraction_level": "equipment_epitaxy",
       "role": null,
       "aliases": [
+        "dep/etch/clean",
+        "wafer fabrication deposition/etch/clean",
         "WFE",
         "etch equipment",
         "deposition equipment",
@@ -210,7 +212,7 @@
     {
       "id": "lrcx_10_q_20260129_e1",
       "src_id": "co:lam_research",
-      "dst_id": "tech:wafer_fab_equipment",
+      "dst_id": "tech:deposition_etch_clean",
       "relation": "supplies_to",
       "attributes": {
         "qualification_status": "qualified",
@@ -300,7 +302,7 @@
     {
       "id": "lrcx_10_q_20260129_e7",
       "src_id": "prod:reliant_product_line",
-      "dst_id": "tech:wafer_fab_equipment",
+      "dst_id": "tech:deposition_etch_clean",
       "relation": "is_component_of",
       "attributes": {},
       "confidence": 0.9,

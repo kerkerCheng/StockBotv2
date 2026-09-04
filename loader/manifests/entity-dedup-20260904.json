@@ -1,0 +1,35 @@
+{
+  "dry_run": false,
+  "merges": {
+    "tech:semiconductor_equipment": "tech:semiconductor_manufacturing_equipment",
+    "tech:semicon_manuf_equipment": "tech:semiconductor_manufacturing_equipment",
+    "tech:wafer_fab_equipment": "tech:deposition_etch_clean"
+  },
+  "backup_dir": "library/private/backups/20260904T150924Z",
+  "preflight": {
+    "graph_before": [
+      "tech:semiconductor_equipment",
+      "tech:semicon_manuf_equipment",
+      "tech:wafer_fab_equipment"
+    ],
+    "legacy_edges_before": 1
+  },
+  "reloaded": [
+    "amat_10_q_20260219",
+    "gfs_20_f_20260227",
+    "amat_10_k_20251212",
+    "lrcx_10_q_20260129",
+    "lrcx_10_k_20250811",
+    "lrcx_10_q_20260423"
+  ],
+  "dropped_assertions": 0,
+  "dropped_nodes": 3,
+  "reprojected": {
+    "status": "projected",
+    "edges": 17,
+    "open_conflict_ids": [],
+    "stale_resolution_ids": []
+  },
+  "graph_after": [],
+  "legacy_edges_after": 0
+}

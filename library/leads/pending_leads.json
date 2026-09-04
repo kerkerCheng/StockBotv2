@@ -37200,10 +37200,12 @@
       "lead_id": "lead_9a57f8b89da26e654a1372e9700465ca",
       "published_at": "Thu, 03 Sep 2026 06:00:00 +0000",
       "refs": {
+        "action_digest": "07ffe014e3d3aaedd0c378b4af64f19680092c19877eab0d59ac139f06d4ba8c",
+        "focus_company_id": "co:sivers_semiconductors",
         "research_action_id": "ra_51171727ae171518974b4196f814c7b2"
       },
       "source": "sivers:press",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -38280,10 +38282,12 @@
       "lead_id": "lead_a07a7f35b0e3d5591b3ab0da4007bc09",
       "published_at": "Thu, 03 Sep 2026 07:08:29 +0000",
       "refs": {
+        "action_digest": "bd01607b7c20f108c90bbd02e90ca69873e0b0674514070c732b2a7cedfe1092",
+        "focus_company_id": "co:iqe",
         "research_action_id": "ra_ca9471422ef13d9301ca7f66baaac9be"
       },
       "source": "yahoo:iqe-l",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {},
       "title": "IQE Signs Quantum Dot Laser Epiwafer Supply Agreement With Quintessent",
       "triage": {

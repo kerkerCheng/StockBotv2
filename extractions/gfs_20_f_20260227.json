@@ -22,7 +22,7 @@
         "gfs_20_f_20260227_s15"
       ],
       "statement": "GF's semiconductor manufacturing equipment suppliers operate with delivery lead times of 12 months or more, creating a structural bottleneck for capacity expansion.",
-      "subject_id": "tech:semicon_manuf_equipment"
+      "subject_id": "tech:semiconductor_manufacturing_equipment"
     },
     {
       "confidence": 0.9,
@@ -149,7 +149,7 @@
         "substitutability": 4
       },
       "confidence": 0.9,
-      "dst_id": "tech:semicon_manuf_equipment",
+      "dst_id": "tech:semiconductor_manufacturing_equipment",
       "id": "gfs_20_f_20260227_e5",
       "relation": "depends_on",
       "source_ids": [
@@ -354,7 +354,7 @@
       "source_ids": [
         "gfs_20_f_20260227_s14"
       ],
-      "src_id": "tech:semicon_manuf_equipment"
+      "src_id": "tech:semiconductor_manufacturing_equipment"
     },
     {
       "attributes": {},
@@ -632,14 +632,17 @@
     },
     {
       "abstraction_level": "equipment_epitaxy",
-      "aliases": [],
+      "aliases": [
+        "wafer fab equipment",
+        "WFE"
+      ],
       "attributes": {
         "concentration_score": 4,
         "intrinsic_cycle_time_weeks": 52,
         "ramp_difficulty_intrinsic": 4
       },
       "confidence": 0.9,
-      "id": "tech:semicon_manuf_equipment",
+      "id": "tech:semiconductor_manufacturing_equipment",
       "name": "Semiconductor Manufacturing Equipment",
       "role": null,
       "source_ids": [

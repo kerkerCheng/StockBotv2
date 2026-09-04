@@ -163,7 +163,12 @@
       "abstraction_level": "equipment_epitaxy",
       "role": null,
       "aliases": [
-        "dep/etch/clean"
+        "dep/etch/clean",
+        "wafer fabrication deposition/etch/clean",
+        "WFE",
+        "etch equipment",
+        "deposition equipment",
+        "clean equipment"
       ],
       "attributes": {
         "ramp_difficulty_intrinsic": 3,

@@ -96,16 +96,19 @@
       ]
     },
     {
-      "id": "tech:semiconductor_equipment",
+      "id": "tech:semiconductor_manufacturing_equipment",
       "type": "TechNode",
       "name": "Semiconductor Manufacturing Equipment",
       "abstraction_level": "equipment_epitaxy",
       "role": null,
-      "aliases": [],
+      "aliases": [
+        "wafer fab equipment",
+        "WFE"
+      ],
       "attributes": {
         "ramp_difficulty_intrinsic": 4,
-        "concentration_score": null,
-        "intrinsic_cycle_time_weeks": null
+        "concentration_score": 4,
+        "intrinsic_cycle_time_weeks": 52
       },
       "confidence": 0.9,
       "source_ids": [
@@ -206,7 +209,7 @@
     {
       "id": "amat_10_q_20260219_e1",
       "src_id": "co:applied_materials",
-      "dst_id": "tech:semiconductor_equipment",
+      "dst_id": "tech:semiconductor_manufacturing_equipment",
       "relation": "supplies_to",
       "attributes": {
         "qualification_status": "qualified",
@@ -222,7 +225,7 @@
     },
     {
       "id": "amat_10_q_20260219_e2",
-      "src_id": "tech:semiconductor_equipment",
+      "src_id": "tech:semiconductor_manufacturing_equipment",
       "dst_id": "tech:foundry_logic",
       "relation": "enables",
       "attributes": {},
@@ -233,7 +236,7 @@
     },
     {
       "id": "amat_10_q_20260219_e3",
-      "src_id": "tech:semiconductor_equipment",
+      "src_id": "tech:semiconductor_manufacturing_equipment",
       "dst_id": "tech:dram_technology",
       "relation": "enables",
       "attributes": {},
@@ -244,7 +247,7 @@
     },
     {
       "id": "amat_10_q_20260219_e4",
-      "src_id": "tech:semiconductor_equipment",
+      "src_id": "tech:semiconductor_manufacturing_equipment",
       "dst_id": "tech:nand_technology",
       "relation": "enables",
       "attributes": {},
