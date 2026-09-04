@@ -126,6 +126,7 @@ def fetch_snapshot(ticker: str) -> dict | None:
         return None
 
     bar_date, price_kind = _bar_identity(info)
+    revenue_next = _next_fy_revenue_estimate(t, ticker)
     return {
         "ticker":               ticker,
         # ⚠ snapshot_date 是「跑 ETL 的當地日期」，**不是行情交易日**。它是 UNIQUE
@@ -148,7 +149,38 @@ def fetch_snapshot(ticker: str) -> dict | None:
         "analyst_target_high":  _sf(info.get("targetHighPrice")),
         "analyst_target_low":   _sf(info.get("targetLowPrice")),
         "analyst_target_count": _si(info.get("numberOfAnalystOpinions")),
+        # 下一會計年度的營收共識（Phase 4c）。⚠ 絕對值是**該標的的報表幣別**，
+        # 不是 USD——只能比同一標的的時間序列，不得跨標的比絕對值（同 Phase 4a 的單位陷阱）。
+        # `..._growth` 無單位，那一欄才可以跨標的比。
+        "revenue_estimate_next_fy":          revenue_next["avg"],
+        "revenue_estimate_next_fy_growth":   revenue_next["growth"],
+        "revenue_estimate_next_fy_analysts": revenue_next["analysts"],
         "fetched_at":           datetime.now(timezone.utc),
+    }
+
+
+def _next_fy_revenue_estimate(ticker_obj, ticker: str) -> dict:
+    """`+1y` 的分析師營收共識。取不到一律回三個 `None`，**不回 0**。
+
+    ⚠ **ROADMAP 曾寫「yfinance 沒有絕對營收估計」，那句話是假的。**
+    2026-09-04 實測 `revenue_estimate` 直接給 `+1y` 的 avg／growth／numberOfAnalysts，
+    73/73 檔全覆蓋。這是「引用自家文件的現況陳述前先跑查證命令」第三次抓到同型錯誤。
+
+    ⚠ 取不到時回 `None` 而不是 0：「沒有共識」與「共識是零成長」是兩件事（L12）。
+    """
+    empty = {"avg": None, "growth": None, "analysts": None}
+    try:
+        frame = ticker_obj.revenue_estimate
+    except Exception as exc:  # noqa: BLE001 — provider 失敗只降級成「這檔沒有共識」
+        print(f"[etl] WARN: revenue_estimate failed for {ticker}: {exc}", file=sys.stderr)
+        return empty
+    if frame is None or "+1y" not in getattr(frame, "index", ()):
+        return empty
+    row = frame.loc["+1y"]
+    return {
+        "avg": _sf(row.get("avg")),
+        "growth": _sf(row.get("growth")),
+        "analysts": _si(row.get("numberOfAnalysts")),
     }
 
 

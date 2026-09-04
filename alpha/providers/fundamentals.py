@@ -168,7 +168,13 @@ class EngineCFundamentalsProvider:
                 # 時間序列比值（單位會消掉），**不得跨標的比大小**。
                 # 見 `engine_c/estimates.py` 的模組 docstring。
                 forward_eps=forward_eps_from(row.get("price"), row.get("pe_forward")),
-                revenue_estimate_next_fy=None,   # Engine C 無此欄位（Phase 4 未補）
+                # Phase 4c（2026-09-04）。⚠ ROADMAP 原本寫「yfinance 沒有絕對營收
+                # 估計」——實測是假的，`revenue_estimate` 的 `+1y` 73/73 檔全覆蓋。
+                # 絕對值以**報表幣別**計（同 `forward_eps` 的單位陷阱），
+                # `..._growth` 才是可跨標的比的那一欄。
+                revenue_estimate_next_fy=_num(row.get("revenue_estimate_next_fy")),
+                revenue_estimate_next_fy_growth=_num(
+                    row.get("revenue_estimate_next_fy_growth")),
                 estimate_revision_30d=(
                     revision["eps_change"] if revision else None  # type: ignore[index]
                 ),

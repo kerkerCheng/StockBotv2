@@ -792,6 +792,29 @@ MUTATIONS: tuple[Mutation, ...] = (
         ),
         guards="缺價的多半是非美股，它們在排序裡不是均勻分布的",
     ),
+    # ---- Phase 4c：下一會計年度營收共識 ------------------------------------
+    Mutation(
+        name="共識取不到時回 0 而不是 None",
+        path="engine_c/etl_yfinance.py",
+        old="    empty = {\"avg\": None, \"growth\": None, \"analysts\": None}",
+        new="    empty = {\"avg\": 0.0, \"growth\": 0.0, \"analysts\": 0}",
+        test=(
+            "tests/test_revenue_estimate_next_fy.py::"
+            "test_missing_consensus_is_none_not_zero"
+        ),
+        guards="L12：「沒有共識」與「共識是零成長」是兩件事",
+    ),
+    Mutation(
+        name="營收成長與 EPS 隱含成長被合併成一個 gap 欄位",
+        path="alpha/contracts.py",
+        old="    market_implied_growth: float | None = None\n    market_implied_margin: float | None = None",
+        new="    market_implied_growth: float | None = None\n    growth_gap: float | None = None\n    market_implied_margin: float | None = None",
+        test=(
+            "tests/test_revenue_estimate_next_fy.py::"
+            "test_revenue_growth_and_implied_eps_growth_are_separate_fields"
+        ),
+        guards="兩者不同口徑，相減出來的差混著利潤率變化（L12）",
+    ),
     # ---- Phase 7：AlphaSignal[] × 持股 ------------------------------------
     Mutation(
         name="持股讀不到時逐檔輸出 0.0%",

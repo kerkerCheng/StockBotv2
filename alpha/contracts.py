@@ -398,7 +398,14 @@ class ConsensusSnapshot:
     trailing_pe: float | None = None
     ev_revenue: float | None = None
     forward_eps: float | None = None
+    #: 下一會計年度的營收共識（絕對值）。⚠ **以該標的的報表幣別計**——
+    #: SK Hynix 是 534 兆（KRW）。只能比同一標的的時間序列，**不得跨標的比大小**。
     revenue_estimate_next_fy: float | None = None
+    #: 同一份共識的成長率。**這一欄無單位，是唯一可跨標的比較的那個。**
+    #: ⚠ 它是**營收**成長，而 `ValuationSnapshot.market_implied_growth` 是由
+    #: `trailing_pe/forward_pe` 導出的 **EPS** 成長——**兩者不是同一個量，不得相減
+    #: 當成 expectation gap**（差額裡混著利潤率變化）。要比必須同口徑。
+    revenue_estimate_next_fy_growth: float | None = None
     estimate_revision_30d: float | None = None
     evidence: tuple[EvidenceRef, ...] = ()
 
