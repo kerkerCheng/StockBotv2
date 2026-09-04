@@ -603,6 +603,25 @@ writer 的變更混在同一份 diff）；**不得用 unattended 廣泛 Git 命�
 ⚠ **重啟只會重新載入**已存在**的 rule，不能補上一條根本沒寫的 rule。**
 rule 缺漏時不得把重啟當修復。詳細五步見上方「Sandbox／private authority 排錯」。
 
+### Sandbox impact review 結論（2026-09-04，Phase 6／7 新增的三支入口）
+
+本次新增 `scripts/backfill_source_dating.py`、`scripts/rank_forward_returns.py` 與
+`portfolio/alpha_exposure.py`。**三者都不進 unattended rule**，結論如下：
+
+| 入口 | side effect | OS／network capability | 判定 |
+|---|---|---|---|
+| `scripts/backfill_source_dating.py` | 寫 Neo4j 的 SourceDoc metadata（白名單兩個日期欄位） | Neo4j bolt（本機），不碰 identity／ACL／credential | **互動專用**。它會寫圖，就算欄位再窄也不該無人值守跑 |
+| `scripts/rank_forward_returns.py` | 唯讀；讀 Neo4j ＋ yfinance | 對外網路（yfinance） | **互動專用**。它是研究檢核，不是排程產出 |
+| `portfolio/alpha_exposure.py` | 純函式，無 I/O | 無 | 不是 CLI，無 surface |
+
+查證（三者都不該出現在 rules）：
+```powershell
+Select-String -Path .codexules\stockbot-automations.rules `
+  -Pattern 'backfill_source_dating|rank_forward_returns|alpha_exposure'
+```
+⚠ 十六條 fixed entry **數量未變**；`tests/test_codex_daily_permissions.py` 斷言
+`prefix_rule(` 恰好 16 次，加一條就會紅。
+
 ### unattended surface 變更的 impact review 五步
 
 判準（「必須在同一個 change 完成」）是 invariant，住 `AGENTS.md`；五步在這裡：
