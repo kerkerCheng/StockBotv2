@@ -4585,7 +4585,7 @@
       "added_at": "2026-08-30T09:00:00.875798+00:00",
       "hint": "當前 missing_data：HBM 市占的第三方量化（TrendForce 級，tier 3 需標明）；NVDA 供應承諾中 Micron 份額（issuer 不拆分，可能長期不可得）（共 2 項）｜coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
       "n": 279,
-      "reactivated_at": "2026-08-30T13:43:26.064880+00:00",
+      "reactivated_at": "2026-09-04T22:45:56.191164+00:00",
       "reactivation_event": {
         "type": "decision_blocker_mode_changed"
       },
@@ -4595,14 +4595,7 @@
       "resolved_at": null,
       "source": "decision_lab",
       "title": "co:micron_technology：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
-      "type": "decision_review",
-      "waiting_on": {
-        "derived_from_blockers": true,
-        "reason": "所有 blocker 都不需要使用者決定",
-        "set_at": "2026-08-31T02:45:27.304261+00:00",
-        "trigger": "技術指標觀測問題",
-        "until": null
-      }
+      "type": "decision_review"
     },
     {
       "added_at": "2026-08-30T09:03:48.249782+00:00",
@@ -7763,8 +7756,10 @@
       "added_at": "2026-09-03T00:34:53.882999+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_fc6700785d33708362bb9bc798ec5272",
+      "dispatch_receipt": "action:ra_e2668dc472f138c3c4a9269a06d4097a;manual_todo:481",
       "dispatch_ref": "wo_97b1bc0171584fc681bd2df1cb548c99",
-      "dispatch_status": "queued",
+      "dispatch_status": "awaiting_approval",
+      "dispatch_updated_at": "2026-09-04T23:10:23.632471+00:00",
       "dispatched_at": "2026-09-04T14:28:19.380737+00:00",
       "hint": "當前 missing_data：人形轉子交付金額/客戶具名；H1 2026 中報一手(機器人+伺服收入 CNY 1.18B +81.84% 僅二手)（共 2 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 462,
@@ -7941,6 +7936,11 @@
       "resolution": null,
       "resolved_at": null,
       "source": "research_action",
+      "source_cleared": {
+        "at": "2026-09-04T22:45:56.191164+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
       "title": "Sivers Glasgow InP 廠 US$30M 擴建，目標 2027 Q4 年產逾 1 億顆 CW DFB",
       "type": "ra_admission"
     },
@@ -7954,6 +7954,11 @@
       "resolution": null,
       "resolved_at": null,
       "source": "research_action",
+      "source_cleared": {
+        "at": "2026-09-04T22:45:56.191164+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
       "title": "IQE 供應 Quintessent 6 吋 GaAs QDL epiwafer，進入 customer sampling",
       "type": "ra_admission"
     },
@@ -8008,6 +8013,44 @@
       "source": "manual",
       "title": "圖實體去重：三個同名 Semiconductor Manufacturing Equipment 節點合併，以及 Lam 的 WFE／dep-etch-clean 兩節點合併",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-09-04T22:45:56.191164+00:00",
+      "hint": "當前 missing_data：Tower／IQE 協議的金額、最低採購量、期限與排他性之一手揭露；客戶端或第三方對 IQE 為合格 InP epiwafer 供應者的獨立確認（共 2 項）｜coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
+      "n": 479,
+      "reason": null,
+      "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:iqe：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-04T23:09:52.902998+00:00",
+      "graph_impact": "+4 節點、2 邊、2 claims｜來源：Noveon Magnetics（tier 2）、USA Rare Earth（tier 2）",
+      "hint": "核准 exact graph delta；Decision handoff：co:mp_materials。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 480,
+      "reason": null,
+      "ref_id": "ra_40fd847ff25e0ccb93fecb6e3e903957",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "MP 磁材邊反證：Noveon 已量產、USA Rare Earth 商用線已啟用，substitutability 提議 4→3",
+      "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-09-04T23:09:52.902998+00:00",
+      "graph_impact": "+1 節點、0 邊、1 claims｜來源：JL MAG（發行人法定中報）（tier 1）",
+      "hint": "核准 exact graph delta；Decision handoff：co:jl_mag。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 481,
+      "reason": null,
+      "ref_id": "ra_e2668dc472f138c3c4a9269a06d4097a",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "JL MAG 2026 中報：已獲選人形馬達轉子供應商並持續小批量交付",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -17380,8 +17423,60 @@
       "ref_id": "manual:478",
       "type": "manual",
       "verb": "go"
+    },
+    {
+      "at": "2026-09-04T22:45:56.191164+00:00",
+      "n": 279,
+      "prior_waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-08-31T02:45:27.304261+00:00",
+        "trigger": "技術指標觀測問題",
+        "until": null
+      },
+      "reason": "blocker 已不再全屬等待事件，恢復人工複查",
+      "receipt": null,
+      "ref_id": "dc_b05cc1360e4bdf2a238787c23e7b227d",
+      "type": "decision_review",
+      "verb": "event_reactivated"
+    },
+    {
+      "at": "2026-09-04T22:45:56.191164+00:00",
+      "n": 473,
+      "reason": "來源本輪成功執行，但不再產出此項",
+      "receipt": null,
+      "ref_id": "ra_51171727ae171518974b4196f814c7b2",
+      "type": "ra_admission",
+      "verb": "source_cleared"
+    },
+    {
+      "at": "2026-09-04T22:45:56.191164+00:00",
+      "n": 474,
+      "reason": "來源本輪成功執行，但不再產出此項",
+      "receipt": null,
+      "ref_id": "ra_ca9471422ef13d9301ca7f66baaac9be",
+      "type": "ra_admission",
+      "verb": "source_cleared"
+    },
+    {
+      "at": "2026-09-04T22:50:08.907843+00:00",
+      "n": 462,
+      "reason": "本輪 budget 選中，開始核對 JL MAG H1 2026 中報與人形轉子客戶／金額",
+      "receipt": "daily-brief:2026-09-05:pq1-drain",
+      "ref_id": "dc_32872cf6a80c5f273b9b4c55a57ff229",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-09-04T23:10:23.632471+00:00",
+      "n": 462,
+      "reason": "bounded research 已完成：HKEX 2026 中報把二手數字更正為機器人及工業伺服馬達收入 RMB260.8M、年增96.40%，並確認已獲選為未具名世界知名科技公司的人形馬達轉子供應商且持續小批量交付；客戶名稱與交付金額仍未揭露。新 qualitative claim 已凍結為 RA ra_e2668...，停在 graph admission [481]；核准入圖後再 reassess。",
+      "receipt": "action:ra_e2668dc472f138c3c4a9269a06d4097a;manual_todo:481",
+      "ref_id": "dc_32872cf6a80c5f273b9b4c55a57ff229",
+      "type": "decision_review",
+      "verb": "pq1_awaiting_approval"
     }
   ],
-  "next_n": 479,
+  "next_n": 482,
   "schema_version": "1"
 }

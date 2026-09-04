@@ -1242,7 +1242,7 @@
       ],
       "poll": {
         "eligible": true,
-        "last_checked": null,
+        "last_checked": "2026-09-04",
         "query_hint": "取得 canonical investor-conference agenda／錄影／逐字稿，或 issuer 一手量化供應缺口與時程。"
       },
       "note": "[321] 由 trace backlog 遷移；trace_status=partial",
@@ -1716,7 +1716,7 @@
       ],
       "poll": {
         "eligible": true,
-        "last_checked": null,
+        "last_checked": "2026-09-04",
         "query_hint": "Meta 官方具名揭露 excess compute 出售、對手方與容量，或取得 Wells Fargo canonical note。"
       },
       "note": "[321] 由 trace backlog 遷移；trace_status=isolated_tier_3",
@@ -1977,7 +1977,10 @@
       "wake_pq2": null,
       "hypothesis_ref": "",
       "wake_lead": "lead_cbd50ac57aa511c2d6c4e531b759f7a7",
-      "consumed_entities": [],
+      "consumed_entities": [
+        "CO:LYNAS",
+        "LYC.AX"
+      ],
       "poll": {
         "eligible": false,
         "last_checked": null,
@@ -1985,7 +1988,16 @@
       },
       "note": "park 時自動建立；trace_status=partial",
       "status": "active",
-      "woken_by": null
+      "woken_by": {
+        "kind": "related_entity_signal",
+        "lead_id": "lead_fc1f6fddc45c93d06a7ee0e5a3e723ad",
+        "shared_entities": [
+          "LYC.AX",
+          "co:lynas"
+        ],
+        "at": "2026-09-04T22:38:33.532879+00:00",
+        "wake_lead": "lead_cbd50ac57aa511c2d6c4e531b759f7a7"
+      }
     },
     {
       "watch_id": "ew_0059_2026-08-31",
@@ -2004,7 +2016,10 @@
       "wake_pq2": null,
       "hypothesis_ref": "",
       "wake_lead": "lead_3238fc77ac974944b52a2916205b98a6",
-      "consumed_entities": [],
+      "consumed_entities": [
+        "CO:LYNAS",
+        "LYC.AX"
+      ],
       "poll": {
         "eligible": false,
         "last_checked": null,
@@ -2012,7 +2027,16 @@
       },
       "note": "park 時自動建立；trace_status=partial",
       "status": "active",
-      "woken_by": null
+      "woken_by": {
+        "kind": "related_entity_signal",
+        "lead_id": "lead_fc1f6fddc45c93d06a7ee0e5a3e723ad",
+        "shared_entities": [
+          "LYC.AX",
+          "co:lynas"
+        ],
+        "at": "2026-09-04T22:38:33.532895+00:00",
+        "wake_lead": "lead_3238fc77ac974944b52a2916205b98a6"
+      }
     },
     {
       "watch_id": "ew_0060_2026-08-31",
@@ -2059,8 +2083,10 @@
       "wake_lead": "lead_e8c68c83ef5c3ee9b929bdc0d15a055d",
       "consumed_entities": [
         "CO:COHERENT",
+        "CO:GOOGLE",
         "CO:LUMENTUM",
         "COHR",
+        "GOOGL",
         "LITE"
       ],
       "poll": {
@@ -2072,14 +2098,12 @@
       "status": "active",
       "woken_by": {
         "kind": "related_entity_signal",
-        "lead_id": "lead_c6b2150d6ec2db0bf22b046dbe4ddb5d",
+        "lead_id": "lead_75b6ff16300b8da2f360a3f118eca4b6",
         "shared_entities": [
-          "COHR",
-          "LITE",
-          "co:coherent",
-          "co:lumentum"
+          "GOOGL",
+          "co:google"
         ],
-        "at": "2026-09-02T22:35:28.300285+00:00",
+        "at": "2026-09-04T22:38:31.707084+00:00",
         "wake_lead": "lead_e8c68c83ef5c3ee9b929bdc0d15a055d"
       }
     },
@@ -2312,15 +2336,31 @@
       "wake_pq2": null,
       "hypothesis_ref": "",
       "wake_lead": "lead_77539b327d06e48a3073ec7c8c2569c8",
-      "consumed_entities": [],
+      "consumed_entities": [
+        "CO:GOOGLE",
+        "CO:LUMENTUM",
+        "GOOGL",
+        "LITE"
+      ],
       "poll": {
         "eligible": true,
         "last_checked": null,
         "query_hint": "Google Palomar OCS MEMS mirror array foundry Silex Plan Optik manufacturing supplier"
       },
       "note": "補 2026-09-03 Daily 的 unwatched 黑洞；一手具名才重開研究，不提高 evidence tier",
-      "status": "active",
-      "woken_by": null
+      "status": "fired",
+      "woken_by": {
+        "kind": "fact_verification",
+        "lead_id": "lead_75b6ff16300b8da2f360a3f118eca4b6",
+        "shared_entities": [
+          "GOOGL",
+          "co:google"
+        ],
+        "at": "2026-09-04T22:45:56.250505+00:00",
+        "fact": "Google Palomar OCS 2D MEMS 鏡陣列的具名代工來源",
+        "fact_check_ref": "https://arxiv.org/abs/2208.10041",
+        "wake_lead": "lead_77539b327d06e48a3073ec7c8c2569c8"
+      }
     },
     {
       "watch_id": "ew_0069_2026-09-02",
@@ -2477,6 +2517,97 @@
         "at": "2026-09-03T00:34:53.939250+00:00",
         "wake_lead": "lead_b0daa9998b26ef6637edc45dc681bb97"
       }
+    },
+    {
+      "watch_id": "ew_0073_2026-09-04",
+      "created_at": "2026-09-04T22:38:33.530738+00:00",
+      "expires": "2027-01-02",
+      "kind": "related_entity_signal",
+      "until": null,
+      "entities": [
+        "AXTI",
+        "LITE",
+        "LYC.AX",
+        "co:axt",
+        "co:lumentum",
+        "co:lynas"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_fc1f6fddc45c93d06a7ee0e5a3e723ad",
+      "consumed_entities": [
+        "CO:LUMENTUM",
+        "LITE"
+      ],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "Lynas quarterly report or Japanese customs METI disclosure names Dy Tb volumes, or Proterial Shin-Etsu directly discloses license or order interruption"
+      },
+      "note": "park 時自動建立；trace_status=partial",
+      "status": "fired",
+      "woken_by": {
+        "kind": "related_entity_signal",
+        "lead_id": "lead_a9a12c2b8ad54e92dce8dc3afac2ecee",
+        "shared_entities": [
+          "LITE",
+          "co:lumentum"
+        ],
+        "at": "2026-09-04T23:09:03.234230+00:00",
+        "wake_lead": "lead_fc1f6fddc45c93d06a7ee0e5a3e723ad"
+      }
+    },
+    {
+      "watch_id": "ew_0074_2026-09-04",
+      "created_at": "2026-09-04T22:38:34.138522+00:00",
+      "expires": "2027-01-02",
+      "kind": "related_entity_signal",
+      "until": null,
+      "entities": [
+        "CCXI",
+        "co:churchill_capital_xi"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_f1cf205e2c5d75400f98dea3391b1e3b",
+      "consumed_entities": [],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "SEC S-4 full text becomes indexable or Agility investor relations publishes the filed prospectus"
+      },
+      "note": "park 時自動建立；trace_status=partial",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0075_2026-09-04",
+      "created_at": "2026-09-04T22:38:35.638153+00:00",
+      "expires": "2027-01-02",
+      "kind": "related_entity_signal",
+      "until": null,
+      "entities": [
+        "POET",
+        "co:poet_technologies"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_7ffb373885549dcbf1942919d192a9fb",
+      "consumed_entities": [],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "SEC indexes the 2026-09-04 POET 6-K or POET investor relations posts the corresponding announcement"
+      },
+      "note": "park 時自動建立；trace_status=partial",
+      "status": "active",
+      "woken_by": null
     }
   ]
 }

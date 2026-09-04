@@ -6700,6 +6700,174 @@
       "result": "ok",
       "run_at": "2026-09-04T07:47:03.748516+00:00",
       "source": "edgar:TSM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-04T22:33:50.231225+00:00",
+      "source": "mfn:sivers-semiconductors"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-04T22:33:51.405811+00:00",
+      "source": "sivers:press"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-04T22:33:52.211863+00:00",
+      "source": "yahoo:iqe-l"
+    },
+    {
+      "new": 5,
+      "result": "ok",
+      "run_at": "2026-09-04T22:33:53.650988+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-04T22:33:55.566672+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-04T22:33:56.366046+00:00",
+      "source": "edgar:AEHR"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-09-04T22:33:57.047924+00:00",
+      "source": "edgar:AEVA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-04T22:33:57.724836+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-04T22:33:58.230341+00:00",
+      "source": "edgar:AVGO"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-04T22:33:58.910572+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-09-04T22:33:59.581258+00:00",
+      "source": "edgar:CCXI"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-09-04T22:34:00.269194+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-09-04T22:34:00.943310+00:00",
+      "source": "edgar:GFS"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-04T22:34:01.466683+00:00",
+      "source": "edgar:GOOGL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-04T22:34:02.249434+00:00",
+      "source": "edgar:HIMX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-04T22:34:02.752639+00:00",
+      "source": "edgar:JBL"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-09-04T22:34:03.590999+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-04T22:34:04.270839+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-04T22:34:04.780673+00:00",
+      "source": "edgar:META"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-04T22:34:05.283640+00:00",
+      "source": "edgar:MP"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-04T22:34:05.800397+00:00",
+      "source": "edgar:MRVL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-04T22:34:06.310697+00:00",
+      "source": "edgar:MTSI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-04T22:34:06.815759+00:00",
+      "source": "edgar:MU"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-09-04T22:34:07.333734+00:00",
+      "source": "edgar:NVDA"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-09-04T22:34:08.021406+00:00",
+      "source": "edgar:POET"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-04T22:34:08.701586+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-04T22:34:09.202836+00:00",
+      "source": "edgar:TSLA"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-09-04T22:34:09.721534+00:00",
+      "source": "edgar:TSM"
     }
   ],
   "leads": {
@@ -9198,6 +9366,44 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000189/xslF345X06/wk-form4_1785439277.xml"
     },
+    "lead_0c2b12c5c37ffc61dc9e5a047834f073": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-04T22:33:53.620395+00:00",
+      "lead_id": "lead_0c2b12c5c37ffc61dc9e5a047834f073",
+      "media": [
+        {
+          "cache": {
+            "bytes": 35465,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_0c2b12c5c37ffc61dc9e5a047834f073/3_2095955076645089280.jpg",
+            "sha256": "886b7c7a9f1195446b4d435eba40a43f73f06e76f26577abcd5d21d61304d3cb"
+          },
+          "height": 635,
+          "media_key": "3_2095955076645089280",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HRZUCZCbcAAbhAX.jpg",
+          "width": 1835
+        }
+      ],
+      "published_at": "2026-09-04T19:28:02.000Z",
+      "raw_text": "OpenAI's Astra is now available. https://t.co/foqBHhPGkH",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "OpenAI's Astra is now available. https://t.co/foqBHhPGkH",
+      "triage": {
+        "decided_at": "2026-09-04T22:38:32.311509+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "只有 OpenAI Astra 已上線的短句與轉址，沒有可直接連到追蹤瓶頸、資本承諾或供應鏈關係的具體 atom；關聯性與可引用內容不足。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2095957075302273257"
+    },
     "lead_0c4d787d641296115df7d94fdddb0c3e": {
       "entities": {
         "company_ids": [
@@ -11011,8 +11217,9 @@
       "published_at": "2026-09-02",
       "refs": {
         "outcome": "Form 4 已解析:NVDA 董事 Mark Stevens:賣 1,848,501 股 @220.06-226.27(約 USD 410M)——量級大,但 Stevens 為長年慣性大額減持的 VC 董事,單獨不構成訊號;NVDA 價位 ~220",
-        "parked_reason": "insider Form 4 信心類,無 graph delta",
-        "trace_status": "partial"
+        "parked_reason": "官方 Form 4 已取得且可逐字核對；個別交易不形成唯一 graph delta，後續只在內部人／稀釋彙總觀測使用",
+        "trace_next_trigger": "無；官方 Form 4 已取得，按內部人交易彙總觀測處理",
+        "trace_status": "original_obtained"
       },
       "source": "edgar:NVDA",
       "status": "parked",
@@ -11771,9 +11978,9 @@
       "lead_id": "lead_1acfa75f85b80a88db95c35eb402974b",
       "published_at": null,
       "refs": {
-        "parked_reason": "大題拆分完成:盤點 15 條缺 sub 供應型邊(develops/competes 不需),拆三叢集(減速器/磁材/致動器感測)註冊 pq1 triaged_go 逐輪清;每邊定值需獨立論證+新來源,單輪不可壓縮",
-        "trace_next_trigger": "三叢集題完成後本題自然閉合",
-        "trace_status": "partial"
+        "parked_reason": "使用者核准的母項已完成三叢集拆分並各產生 Research Action；本母項不再作外部事件追源，殘餘逐邊工作由具體分拆題承接",
+        "trace_next_trigger": "無；母項已拆成三個具體叢集，後續由分拆 lead 的 receipt 承接",
+        "trace_status": "not_pursued"
       },
       "source": "user-approved-2026-09-03",
       "status": "parked",
@@ -12150,8 +12357,9 @@
       "published_at": "2026-09-01",
       "refs": {
         "outcome": "Form 4 已解析:COHR Sheridan Eng:RSU 歸屬+F 代扣 @295.39,另市場賣 13,077 股 @270.7-276.8(強勢段部分減持)",
-        "parked_reason": "insider Form 4 信心類,無 graph delta",
-        "trace_status": "partial"
+        "parked_reason": "官方 Form 4 已取得且可逐字核對；個別交易不形成唯一 graph delta，後續只在內部人／稀釋彙總觀測使用",
+        "trace_next_trigger": "無；官方 Form 4 已取得，按內部人交易彙總觀測處理",
+        "trace_status": "original_obtained"
       },
       "source": "edgar:COHR",
       "status": "parked",
@@ -13635,8 +13843,9 @@
       "published_at": "2026-09-02",
       "refs": {
         "outcome": "Form 4 已解析:TSM Wang Ying-Lang:配股 12,881 @0,例行",
-        "parked_reason": "insider Form 4 信心類,無 graph delta",
-        "trace_status": "partial"
+        "parked_reason": "官方 Form 4 已取得且可逐字核對；個別交易不形成唯一 graph delta，後續只在內部人／稀釋彙總觀測使用",
+        "trace_next_trigger": "無；官方 Form 4 已取得，按內部人交易彙總觀測處理",
+        "trace_status": "original_obtained"
       },
       "source": "edgar:TSM",
       "status": "parked",
@@ -14015,8 +14224,9 @@
       "published_at": "2026-09-02",
       "refs": {
         "outcome": "Form 4 已解析:MRVL Koopmans:賣 10,000 股 @203.27,例行",
-        "parked_reason": "insider Form 4 信心類,無 graph delta",
-        "trace_status": "partial"
+        "parked_reason": "官方 Form 4 已取得且可逐字核對；個別交易不形成唯一 graph delta，後續只在內部人／稀釋彙總觀測使用",
+        "trace_next_trigger": "無；官方 Form 4 已取得，按內部人交易彙總觀測處理",
+        "trace_status": "original_obtained"
       },
       "source": "edgar:MRVL",
       "status": "parked",
@@ -16441,9 +16651,14 @@
       "lead_id": "lead_3238fc77ac974944b52a2916205b98a6",
       "published_at": null,
       "refs": {
+        "action_digest": "a51ac4ee585834105d22112ed5bdae7ad4883b0d19f3c565c1d907346c12fe75",
         "parked_reason": "研究方向已確認、一手未到位。本輪佐證了原線索的預期：美國 NdFeB 磁材不是獨家（Noveon 已量產、USA Rare Earth 2026 首條商業線、Vacuumschmelze e-VAC 2025 底出貨），MP 的差異化是唯一 mine-to-magnet 全整合而非磁材獨家，sub 應為 3 而非 5。但支撐這個值的仍是二手報導；且它與 Lynas 那條同屬「稀土的瓶頸在哪一層」同一個問題，拆開入圖會產生兩個互相矛盾的部分答案，故一併等 USGS 一手。",
+        "research_action_id": "ra_40fd847ff25e0ccb93fecb6e3e903957",
+        "research_run": "daily-brief-2026-09-05",
         "trace_attempts_ref": "2026-08-31：IEEE Spectrum 美國磁材製造報導（線索既有）；USGS MCS 2026 兩份 PDF 皆 403",
         "trace_next_trigger": "與 lead_cbd50ac5 同一個 trigger：取得 USGS MCS 2026「Rare Earths (Heavy)」逐字，或 Noveon／USA Rare Earth／VAC 任一方的一手產能揭露",
+        "trace_requeue_trigger": "related_triaged_lead:lead_fc1f6fddc45c93d06a7ee0e5a3e723ad",
+        "trace_requeued_at": "2026-09-04T22:38:33.530738+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
@@ -16452,10 +16667,12 @@
           "LYC.AX",
           "co:lynas"
         ],
-        "trace_trigger_kind": "related_entity_signal"
+        "trace_trigger_event_ref": "lead:lead_fc1f6fddc45c93d06a7ee0e5a3e723ad",
+        "trace_trigger_kind": "related_entity_signal",
+        "trace_trigger_watch_ref": "ew_0059_2026-08-31"
       },
       "source": "directed:sub_backfill",
-      "status": "parked",
+      "status": "action_prepared",
       "themes": {},
       "title": "[定向補 sub｜稀土] MP Materials 的反證：美國 NdFeB 磁材有多家——Noveon Magnetics（首家且唯一已量產，回收料）、USA Rare Earth（2026 奧克拉荷馬首條商業線）、Vacuumschmelze e-VAC（2025 底首批出貨）。MP 的差異化是唯一 mine-to-magnet 全整合，非磁材獨家。預期 sub 3-4 非 5——這是誠實答案不是失敗",
       "triage": {
@@ -16466,14 +16683,38 @@
           "decision_impact": "candidate_set",
           "reason": "決定 MP 進不進稀土組；sub<4 是誠實答案也算結論"
         },
-        "decided_at": "2026-08-31T10:17:01.869217+00:00",
+        "decided_at": "2026-09-04T22:38:33.530738+00:00",
         "decision": "go",
         "priority_flags": {
           "contradiction": true
         },
-        "reason": "[325] 同上；MP 的反證（Noveon/USAR/VAC 皆做 NdFeB）需一手確認，預期 sub 3-4",
+        "reason": "Event Watch ew_0059_2026-08-31 觸發：新 triage PASS lead lead_fc1f6fddc45c93d06a7ee0e5a3e723ad 與等待中的追源共用具名標的 LYC.AX, co:lynas；事件觸發 bounded pq1 重查",
         "tier": 3
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-04T22:38:33.530738+00:00",
+          "superseded_reason": "Event Watch ew_0059_2026-08-31 觸發：新 triage PASS lead lead_fc1f6fddc45c93d06a7ee0e5a3e723ad 與等待中的追源共用具名標的 LYC.AX, co:lynas；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_fc1f6fddc45c93d06a7ee0e5a3e723ad",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-08-31T10:17:01.869217+00:00",
+              "classified_by": "triage_semantic_v1",
+              "content_type": "structural_fact",
+              "decision_impact": "candidate_set",
+              "reason": "決定 MP 進不進稀土組；sub<4 是誠實答案也算結論"
+            },
+            "decided_at": "2026-08-31T10:17:01.869217+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "contradiction": true
+            },
+            "reason": "[325] 同上；MP 的反證（Noveon/USAR/VAC 皆做 NdFeB）需一手確認，預期 sub 3-4",
+            "tier": 3
+          }
+        }
+      ],
       "url": "https://spectrum.ieee.org/advanced-magnet-manufacturing-in-us"
     },
     "lead_32467138b3832782d89c940740dff50c": {
@@ -17489,8 +17730,9 @@
       "published_at": "2026-09-02",
       "refs": {
         "outcome": "Form 4 已解析:TSM Lu Lee-Chung:配股 8,175 @0,例行",
-        "parked_reason": "insider Form 4 信心類,無 graph delta",
-        "trace_status": "partial"
+        "parked_reason": "官方 Form 4 已取得且可逐字核對；個別交易不形成唯一 graph delta，後續只在內部人／稀釋彙總觀測使用",
+        "trace_next_trigger": "無；官方 Form 4 已取得，按內部人交易彙總觀測處理",
+        "trace_status": "original_obtained"
       },
       "source": "edgar:TSM",
       "status": "parked",
@@ -21585,8 +21827,9 @@
       "published_at": "2026-09-01",
       "refs": {
         "outcome": "Form 4 已解析:COHR Beard:RSU 歸屬 5,373+F 代扣 1,896 @295.39,例行",
-        "parked_reason": "insider Form 4 信心類,無 graph delta",
-        "trace_status": "partial"
+        "parked_reason": "官方 Form 4 已取得且可逐字核對；個別交易不形成唯一 graph delta，後續只在內部人／稀釋彙總觀測使用",
+        "trace_next_trigger": "無；官方 Form 4 已取得，按內部人交易彙總觀測處理",
+        "trace_status": "original_obtained"
       },
       "source": "edgar:COHR",
       "status": "parked",
@@ -22429,6 +22672,36 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000205/xslF345X06/wk-form4_1785530595.xml"
     },
+    "lead_5178be3262d97b3db02193184e6c9040": {
+      "entities": {
+        "company_ids": [
+          "co:sk_hynix"
+        ],
+        "tickers": [
+          "HOOD",
+          "AMC",
+          "SKHY"
+        ]
+      },
+      "first_seen": "2026-09-04T22:33:53.640949+00:00",
+      "lead_id": "lead_5178be3262d97b3db02193184e6c9040",
+      "media": [],
+      "published_at": "2026-09-04T12:29:30.000Z",
+      "raw_text": "From my channel checks, it appears Korean retail is firmly siding with $HOOD over the $AMC CEO.\n\nKorean sources find the prospect of 40x leveraged Samsung / $SKHY a powerful enough argument to win the tokenization debate.",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "From my channel checks, it appears Korean retail is firmly siding with $HOOD over the $AMC CEO. Korean sources find the prospect of 40x leveraged Samsung / $SKHY a powerful enough argument to win the tokenization debate.",
+      "triage": {
+        "decided_at": "2026-09-04T22:38:32.924571+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "內容是韓國散戶對 HOOD／AMC 與 40 倍代幣化槓桿的情緒判斷，未提供與現行瓶頸圖可連結的供應關係或可核對基本面事件。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2095851749127188691"
+    },
     "lead_51b7cbee157b59eac63d002095600ceb": {
       "entities": {
         "company_ids": [
@@ -22509,8 +22782,9 @@
       "published_at": "2026-09-02",
       "refs": {
         "outcome": "Form 4 已解析:NVDA Teter:賣 30,000 股 @216.8-218.5,例行",
-        "parked_reason": "insider Form 4 信心類,無 graph delta",
-        "trace_status": "partial"
+        "parked_reason": "官方 Form 4 已取得且可逐字核對；個別交易不形成唯一 graph delta，後續只在內部人／稀釋彙總觀測使用",
+        "trace_next_trigger": "無；官方 Form 4 已取得，按內部人交易彙總觀測處理",
+        "trace_status": "original_obtained"
       },
       "source": "edgar:NVDA",
       "status": "parked",
@@ -26810,9 +27084,16 @@
       "first_seen": "2026-09-03T22:33:14.059972+00:00",
       "lead_id": "lead_67d32f7e8f057b93fc1f35a99930833c",
       "published_at": "2026-09-02",
-      "refs": {},
+      "refs": {
+        "parked_reason": "官方 Form 4 已逐字核對；屬既定 10b5-1 董事售股，留作聚合 insider 與稀釋觀測，沒有唯一 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/820318/000089914026001047/xslF345X06/form4.xml",
+        "research_outcome": "official_form4_no_unique_graph_delta",
+        "research_run": "daily-brief-2026-09-05",
+        "trace_attempts_ref": "SEC Form 4 inspected; director Stephen Skaggs sold 2272 shares on 2026-08-31 under 10b5-1 plan at weighted average USD276.8758",
+        "trace_status": "original_obtained"
+      },
       "source": "edgar:COHR",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -28406,8 +28687,9 @@
       "published_at": "2026-09-01",
       "refs": {
         "outcome": "Form 4 已解析:LITE Wupen Yuen:賣 1,500 股 @895-941,量小",
-        "parked_reason": "insider Form 4 信心類,無 graph delta",
-        "trace_status": "partial"
+        "parked_reason": "官方 Form 4 已取得且可逐字核對；個別交易不形成唯一 graph delta，後續只在內部人／稀釋彙總觀測使用",
+        "trace_next_trigger": "無；官方 Form 4 已取得，按內部人交易彙總觀測處理",
+        "trace_status": "original_obtained"
       },
       "source": "edgar:LITE",
       "status": "parked",
@@ -29118,10 +29400,27 @@
       "published_at": "2026-09-03",
       "refs": {},
       "source": "edgar:GOOGL",
-      "status": "pending",
+      "status": "triaged_go",
       "themes": {},
       "title": "GOOGL 4 filed 2026-09-03",
-      "triage": null,
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-04T22:38:31.704822+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "單一 Form 4 不改候選集合或排序，只增加內部人交易脈絡。"
+        },
+        "decided_at": "2026-09-04T22:38:31.704822+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "GOOGL 官方 Form 4 與追蹤標的直接相關且可逐字核對；個別交易只提供內部人／稀釋觀測，低優先但保留進 pq1 彙總。",
+        "related_trace_requeues": [
+          "lead_77539b327d06e48a3073ec7c8c2569c8",
+          "lead_e8c68c83ef5c3ee9b929bdc0d15a055d"
+        ],
+        "tier": 1
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/1652044/000119312526382332/xslF345X06/ownership.xml"
     },
     "lead_760eb6913a23e02842e06ac15b77d48d": {
@@ -29513,10 +29812,18 @@
       "lead_id": "lead_77539b327d06e48a3073ec7c8c2569c8",
       "published_at": null,
       "refs": {
-        "parked_reason": "MEMS 代工層追源未果:Google/Lumentum 兩側一手皆不揭露 MEMS 鏡陣列代工;唯一具體說法(Silex Microsystems 代工 Lumentum MEMS 予 Google+Plan Optik 玻璃晶圓,Glass-on-Silicon 8 吋)出自單一 tier-3 substack(latentvalue),不可入圖;DCD 深度報導 403 未取",
-        "trace_next_trigger": "Silex/賽微電子(Sai MicroElectronics)或 Plan Optik 官方文件具名 OCS/MEMS 鏡陣列客戶;或 Lumentum/Google 揭露 MEMS 製造來源",
+        "parked_reason": "Google 一手論文確認 Jupiter 使用 MEMS OCS，但完全沒有 foundry 名稱；問題本身仍是具名缺口，只能等 Google、專利、供應商 filing 或 teardown 點名。",
+        "primary_url": "https://research.google/pubs/jupiter-evolving-transforming-googles-datacenter-network-via-optical-circuit-switches-and-software-defined-networking/",
+        "research_outcome": "google_paper_confirms_mems_ocs_but_not_foundry",
+        "research_run": "daily-brief-2026-09-05",
+        "trace_attempts_ref": "Google Research Jupiter Evolving paper and Google author pages searched; MEMS OCS architecture is explicit, manufacturing foundry is not named",
+        "trace_next_trigger": "Google paper patent supplier filing or teardown explicitly names the MEMS mirror-array foundry",
+        "trace_requeue_trigger": "related_triaged_lead:lead_75b6ff16300b8da2f360a3f118eca4b6",
+        "trace_requeued_at": "2026-09-04T22:38:31.704822+00:00",
         "trace_requires_user": "false",
-        "trace_status": "isolated_tier_3"
+        "trace_status": "awaiting_named_disclosure",
+        "trace_trigger_event_ref": "lead:lead_75b6ff16300b8da2f360a3f118eca4b6",
+        "trace_trigger_watch_ref": "ew_0068_2026-09-02"
       },
       "source": "decompose-palomar-ocs-2026-09-02",
       "status": "parked",
@@ -29530,12 +29837,34 @@
           "decision_impact": "candidate_set",
           "reason": "decompose Palomar OCS(使用者核准 [443]):Apollo 論文一手列層,圖中無節點或零供應商"
         },
-        "decided_at": "2026-09-02T12:24:41.544428+00:00",
+        "decided_at": "2026-09-04T22:38:31.704822+00:00",
         "decision": "go",
         "priority_flags": {},
-        "reason": "decompose Palomar OCS(使用者核准 [443]):Apollo 論文一手列層,圖中無節點或零供應商",
+        "reason": "Event Watch ew_0068_2026-09-02 觸發：新 triage PASS lead lead_75b6ff16300b8da2f360a3f118eca4b6 與等待中的追源共用具名標的 GOOGL, co:google；事件觸發 bounded pq1 重查",
         "tier": 2
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-04T22:38:31.704822+00:00",
+          "superseded_reason": "Event Watch ew_0068_2026-09-02 觸發：新 triage PASS lead lead_75b6ff16300b8da2f360a3f118eca4b6 與等待中的追源共用具名標的 GOOGL, co:google；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_75b6ff16300b8da2f360a3f118eca4b6",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-09-02T12:24:41.544428+00:00",
+              "classified_by": "triage_semantic_v1",
+              "content_type": "structural_fact",
+              "decision_impact": "candidate_set",
+              "reason": "decompose Palomar OCS(使用者核准 [443]):Apollo 論文一手列層,圖中無節點或零供應商"
+            },
+            "decided_at": "2026-09-02T12:24:41.544428+00:00",
+            "decision": "go",
+            "priority_flags": {},
+            "reason": "decompose Palomar OCS(使用者核准 [443]):Apollo 論文一手列層,圖中無節點或零供應商",
+            "tier": 2
+          }
+        }
+      ],
       "url": "https://arxiv.org/abs/2208.10041?gap=mems_foundry"
     },
     "lead_779f0a8c12033e604608e1a1ed0c1c93": {
@@ -31255,8 +31584,9 @@
       "published_at": "2026-09-02",
       "refs": {
         "outcome": "Form 4 已解析:TSM CEO Wei Che-Chia:配股 204,375 @0,例行年度授予",
-        "parked_reason": "insider Form 4 信心類,無 graph delta",
-        "trace_status": "partial"
+        "parked_reason": "官方 Form 4 已取得且可逐字核對；個別交易不形成唯一 graph delta，後續只在內部人／稀釋彙總觀測使用",
+        "trace_next_trigger": "無；官方 Form 4 已取得，按內部人交易彙總觀測處理",
+        "trace_status": "original_obtained"
       },
       "source": "edgar:TSM",
       "status": "parked",
@@ -31550,6 +31880,53 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2093712497949950242"
+    },
+    "lead_7ffb373885549dcbf1942919d192a9fb": {
+      "entities": {
+        "company_ids": [
+          "co:poet_technologies"
+        ],
+        "tickers": [
+          "POET"
+        ]
+      },
+      "first_seen": "2026-09-04T22:34:08.021112+00:00",
+      "lead_id": "lead_7ffb373885549dcbf1942919d192a9fb",
+      "published_at": "2026-09-04",
+      "refs": {
+        "parked_reason": "取得官方 filing locator，但內容尚無法由現有路由逐字核對；不以 8 月財報或社群貼文猜測 9 月 4 日 6-K 事件。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1437424/000117184326005894/f6k_090426.htm",
+        "research_outcome": "official_6k_url_obtained_document_not_yet_indexed",
+        "research_run": "daily-brief-2026-09-05",
+        "trace_attempts_ref": "SEC canonical 6-K URL from EDGAR harvest plus POET IR and SEC indexed-document search; current accession not yet searchable and direct SEC route was blocked",
+        "trace_next_trigger": "SEC indexes the 2026-09-04 POET 6-K or POET investor relations posts the corresponding announcement",
+        "trace_requires_user": "false",
+        "trace_status": "partial",
+        "trace_trigger_entities": [
+          "POET",
+          "co:poet_technologies"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
+      "source": "edgar:POET",
+      "status": "parked",
+      "themes": {},
+      "title": "POET 6-K filed 2026-09-04",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-04T22:38:35.638153+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "ranking",
+          "reason": "重大事件文件若含新產品、客戶或量產進展，會改變 POET 的排序。"
+        },
+        "decided_at": "2026-09-04T22:38:35.638153+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "POET 官方 6-K 是 CPO 追蹤標的的重大事件一手文件，具體且可逐字核對；文件內容可能改變 POET 的商業成熟度與瓶頸排序。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1437424/000117184326005894/f6k_090426.htm"
     },
     "lead_800fb456828b63727b76094378540c82": {
       "entities": {
@@ -32629,6 +33006,39 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000199/xslF345X06/wk-form4_1785530512.xml"
+    },
+    "lead_844d2bb07b3890ed458eac0e7fce2bd4": {
+      "entities": {
+        "company_ids": [
+          "co:aeva"
+        ],
+        "tickers": [
+          "AEVA"
+        ]
+      },
+      "first_seen": "2026-09-04T22:33:57.047739+00:00",
+      "lead_id": "lead_844d2bb07b3890ed458eac0e7fce2bd4",
+      "published_at": "2026-09-04",
+      "refs": {},
+      "source": "edgar:AEVA",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "AEVA 4 filed 2026-09-04",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-04T22:38:33.824729+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "單一 Form 4 不改候選集合或排序，只增加內部人交易脈絡。"
+        },
+        "decided_at": "2026-09-04T22:38:33.824729+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "AEVA 官方 Form 4 與追蹤標的直接相關且可逐字核對；個別交易只提供內部人／稀釋觀測，低優先但保留進 pq1 彙總。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1789029/000119312526383903/xslF345X06/ownership.xml"
     },
     "lead_8482d009db1c60e12c73a8a726d8a0df": {
       "entities": {
@@ -34720,6 +35130,63 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826005947/xslF345X06/ownership.xml"
     },
+    "lead_8ca39ddcf94d067733694639082bf700": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia",
+          "co:broadcom",
+          "co:microsoft",
+          "co:google"
+        ],
+        "tickers": [
+          "NVDA",
+          "AVGO",
+          "MSFT",
+          "GOOGL",
+          "AMZN"
+        ]
+      },
+      "first_seen": "2026-09-04T22:33:53.639300+00:00",
+      "lead_id": "lead_8ca39ddcf94d067733694639082bf700",
+      "media": [],
+      "published_at": "2026-09-04T14:31:24.000Z",
+      "raw_text": "Let me get this straight chat… you have:\n\n$NVDA 70% supply constrained revenue growth projections (would be 100%+)\n\n$AVGO AI revenue growing 100%+ Y/Y for next 2 years from mid ~$50B -> $230B\n\nOpenAI Astra blowing away AGI benchmarks and starting to train itself.\n\n$MSFT / $GOOGL / $AMZN stating compute demand imbalances into next year, with Nvidia projecting $1.3T spend for 2027.\n\nYou’re seeing this flow through supply chains from Samsung 70% capacity LTAs into 2031 to Powertech advanced packaging capacity 100% booked into 2030.\n\nEven your legacy players like Winbond are starting 2029-2030 allocations.\n\nMarkets always have temporary drawdowns and macro scares… but…\n\nHow can anyone not think AI stock go brrr?",
+      "refs": {
+        "parked_reason": "同一貼文混合 NVDA AVGO OpenAI 三家 hyperscaler Samsung Powertech Winbond 的多組遠期數字與作者市場結論，沒有原文件 locator；拆開後均是既有追蹤主題，本輪不讓 composite 自身成為 evidence，也不重複產 RA。",
+        "research_outcome": "composite_forward_estimates_no_single_origin_locator",
+        "research_run": "daily-brief-2026-09-05",
+        "trace_status": "not_pursued"
+      },
+      "source": "x:aleabitoreddit",
+      "status": "parked",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "AVGO",
+            "NVDA"
+          ]
+        }
+      },
+      "title": "Let me get this straight chat… you have: $NVDA 70% supply constrained revenue growth projections (would be 100%+) $AVGO AI revenue growing 100%+ Y/Y for next 2 years from mid ~$50B -> $230B OpenAI Astra blowing away AGI benchmarks and starting to train itself. $MSFT / $GOOGL / $AMZN stating compute demand imbalances into next year, with Nvidia projecting $1.3T spend for 2027. You’re seeing this flow through supply chains from Samsung 70% capacity LTAs into 2031 to Powertech advanced packaging capacity 100% booked into 2030. Even your legacy players like Winbond are starting 2029-2030 allocations. Markets always have temporary drawdowns and macro scares… but… How can anyone not think AI stock go brrr?",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-04T22:38:32.612298+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "capital_commitment",
+          "decision_impact": "ranking",
+          "payment_direction": "unclear",
+          "reason": "多個供應／採購承諾若被一手證實會改變瓶頸候選排序；原貼文未清楚揭露付款方向。"
+        },
+        "decided_at": "2026-09-04T22:38:32.612298+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "社群來源但具名 NVDA、AVGO、Samsung、Powertech、Winbond 與多組成長／產能／LTA 數字；高度關聯 AI 供應鏈且可逐項追回一手，是否成立會改變需求錨與排序。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2095882424932766163"
+    },
     "lead_8d147304399b5153fb89b3c8149d9d3d": {
       "entities": {
         "company_ids": [
@@ -35322,9 +35789,16 @@
       "first_seen": "2026-09-03T22:33:14.059834+00:00",
       "lead_id": "lead_9086e8525c8d8dcccb58b78d140d128b",
       "published_at": "2026-09-02",
-      "refs": {},
+      "refs": {
+        "parked_reason": "官方 Form 4 locator 已取得；單筆內部人交易不改供應鏈結構，僅供後續聚合觀測，不重複產 graph claim。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/820318/000089914026001048/xslF345X06/form4.xml",
+        "research_outcome": "official_form4_no_unique_graph_delta",
+        "research_run": "daily-brief-2026-09-05",
+        "trace_attempts_ref": "SEC canonical Form 4 filing obtained from EDGAR harvest; individual insider filing is routed to aggregate insider and dilution monitoring",
+        "trace_status": "original_obtained"
+      },
       "source": "edgar:COHR",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -36385,8 +36859,9 @@
       "published_at": "2026-09-02",
       "refs": {
         "outcome": "Form 4 已解析:TSM Zhang:配股 20,313 @0,例行",
-        "parked_reason": "insider Form 4 信心類,無 graph delta",
-        "trace_status": "partial"
+        "parked_reason": "官方 Form 4 已取得且可逐字核對；個別交易不形成唯一 graph delta，後續只在內部人／稀釋彙總觀測使用",
+        "trace_next_trigger": "無；官方 Form 4 已取得，按內部人交易彙總觀測處理",
+        "trace_status": "original_obtained"
       },
       "source": "edgar:TSM",
       "status": "parked",
@@ -39285,9 +39760,9 @@
       "lead_id": "lead_a5e0447bc74691a10b93a1e4dc1ff4b2",
       "published_at": null,
       "refs": {
-        "parked_reason": "proposal 完成並鑄 [456] 等執行核准:nand 對真重複建議合併/optical_io 孤兒吸收/scale_up 對確認不併([451] 兩路線區分)",
-        "trace_next_trigger": "[456] go 後執行圖維護",
-        "trace_status": "awaiting_named_disclosure"
+        "parked_reason": "同義節點 proposal 已完成，且 [456] 已執行圖維護；本母項不再等待來源或事件",
+        "trace_next_trigger": "無；[456] 圖維護已留下 durable receipt",
+        "trace_status": "not_pursued"
       },
       "source": "user-approved-2026-09-03",
       "status": "parked",
@@ -39696,6 +40171,54 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/707549/000131606526000012/xslF345X06/wk-form4_1784048170.xml"
     },
+    "lead_a9a12c2b8ad54e92dce8dc3afac2ecee": {
+      "entities": {
+        "company_ids": [
+          "co:lumentum"
+        ],
+        "tickers": [
+          "LITE"
+        ]
+      },
+      "first_seen": "2026-09-04T22:34:03.590809+00:00",
+      "lead_id": "lead_a9a12c2b8ad54e92dce8dc3afac2ecee",
+      "published_at": "2026-09-04",
+      "refs": {
+        "parked_reason": "官方 Lumentum Form 4 locator 已取得；單筆內部人交易不構成新的供應鏈 edge 或 claim，只保留為聚合監控輸入。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1633978/000148955026000009/xslF345X06/form4-09042026_080916.xml",
+        "research_outcome": "official_form4_no_unique_graph_delta",
+        "research_run": "daily-brief-2026-09-05",
+        "trace_attempts_ref": "SEC canonical Lumentum Form 4 obtained from EDGAR harvest; individual filing routed to aggregate insider and dilution monitoring",
+        "trace_status": "original_obtained"
+      },
+      "source": "edgar:LITE",
+      "status": "parked",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "LITE"
+          ]
+        }
+      },
+      "title": "LITE 4 filed 2026-09-04",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-04T22:38:35.032848+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "單一 Form 4 不改候選集合或排序，只增加內部人交易脈絡。"
+        },
+        "decided_at": "2026-09-04T22:38:35.032848+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "LITE 官方 Form 4 與追蹤標的直接相關且可逐字核對；個別交易只提供內部人／稀釋觀測，低優先但保留進 pq1 彙總。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1633978/000148955026000009/xslF345X06/form4-09042026_080916.xml"
+    },
     "lead_a9b6bd59cd2a456b0f7bc1ffa27245f6": {
       "entities": {
         "company_ids": [
@@ -40085,8 +40608,9 @@
       "published_at": "2026-09-01",
       "refs": {
         "outcome": "Form 4 已解析:COHR Luther:RSU 歸屬 8,731+F 代扣 2,594 @295.39,例行",
-        "parked_reason": "insider Form 4 信心類,無 graph delta",
-        "trace_status": "partial"
+        "parked_reason": "官方 Form 4 已取得且可逐字核對；個別交易不形成唯一 graph delta，後續只在內部人／稀釋彙總觀測使用",
+        "trace_next_trigger": "無；官方 Form 4 已取得，按內部人交易彙總觀測處理",
+        "trace_status": "original_obtained"
       },
       "source": "edgar:COHR",
       "status": "parked",
@@ -40741,8 +41265,9 @@
       "published_at": "2026-09-02",
       "refs": {
         "outcome": "Form 4 已解析:TSM Yeap:配股 12,881 @0,例行",
-        "parked_reason": "insider Form 4 信心類,無 graph delta",
-        "trace_status": "partial"
+        "parked_reason": "官方 Form 4 已取得且可逐字核對；個別交易不形成唯一 graph delta，後續只在內部人／稀釋彙總觀測使用",
+        "trace_next_trigger": "無；官方 Form 4 已取得，按內部人交易彙總觀測處理",
+        "trace_status": "original_obtained"
       },
       "source": "edgar:TSM",
       "status": "parked",
@@ -43858,10 +44383,23 @@
       "published_at": "2026-09-03",
       "refs": {},
       "source": "edgar:GOOGL",
-      "status": "pending",
+      "status": "triaged_go",
       "themes": {},
       "title": "GOOGL 4 filed 2026-09-03",
-      "triage": null,
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-04T22:38:32.004055+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "單一 Form 4 不改候選集合或排序，只增加內部人交易脈絡。"
+        },
+        "decided_at": "2026-09-04T22:38:32.004055+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "GOOGL 官方 Form 4 與追蹤標的直接相關且可逐字核對；個別交易只提供內部人／稀釋觀測，低優先但保留進 pq1 彙總。",
+        "tier": 1
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/1652044/000119312526382328/xslF345X06/ownership.xml"
     },
     "lead_ba4073c079bac993eaafc74feb7c6df3": {
@@ -45025,8 +45563,9 @@
       "published_at": "2026-09-02",
       "refs": {
         "outcome": "Form 4 已解析:TSM Yoo:配股 8,175 @0,例行",
-        "parked_reason": "insider Form 4 信心類,無 graph delta",
-        "trace_status": "partial"
+        "parked_reason": "官方 Form 4 已取得且可逐字核對；個別交易不形成唯一 graph delta，後續只在內部人／稀釋彙總觀測使用",
+        "trace_next_trigger": "無；官方 Form 4 已取得，按內部人交易彙總觀測處理",
+        "trace_status": "original_obtained"
       },
       "source": "edgar:TSM",
       "status": "parked",
@@ -45322,8 +45861,9 @@
       "published_at": "2026-09-01",
       "refs": {
         "outcome": "Form 4 已解析:COHR CEO Anderson:RSU 歸屬 30,564+F 代扣 11,958 @295.39,例行",
-        "parked_reason": "insider Form 4 信心類,無 graph delta",
-        "trace_status": "partial"
+        "parked_reason": "官方 Form 4 已取得且可逐字核對；個別交易不形成唯一 graph delta，後續只在內部人／稀釋彙總觀測使用",
+        "trace_next_trigger": "無；官方 Form 4 已取得，按內部人交易彙總觀測處理",
+        "trace_status": "original_obtained"
       },
       "source": "edgar:COHR",
       "status": "parked",
@@ -46738,6 +47278,47 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2078274370795954384"
+    },
+    "lead_c8441a91c1bd085c7424eeaf9f6a5f5b": {
+      "entities": {
+        "company_ids": [
+          "co:coherent"
+        ],
+        "tickers": [
+          "COHR"
+        ]
+      },
+      "first_seen": "2026-09-04T22:34:00.269010+00:00",
+      "lead_id": "lead_c8441a91c1bd085c7424eeaf9f6a5f5b",
+      "published_at": "2026-09-04",
+      "refs": {},
+      "source": "edgar:COHR",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "COHR"
+          ]
+        }
+      },
+      "title": "COHR 4 filed 2026-09-04",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-04T22:38:34.433180+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "單一 Form 4 不改候選集合或排序，只增加內部人交易脈絡。"
+        },
+        "decided_at": "2026-09-04T22:38:34.433180+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "COHR 官方 Form 4 與追蹤標的直接相關且可逐字核對；個別交易只提供內部人／稀釋觀測，低優先但保留進 pq1 彙總。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/820318/000089914026001054/xslF345X06/form4.xml"
     },
     "lead_c8aedcfeccfebd35b0baad3bf4be5225": {
       "entities": {
@@ -49180,6 +49761,47 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2072741541404406008"
     },
+    "lead_d248abb3982f975a435d1c63cc7ca496": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia"
+        ],
+        "tickers": [
+          "NVDA"
+        ]
+      },
+      "first_seen": "2026-09-04T22:34:07.333547+00:00",
+      "lead_id": "lead_d248abb3982f975a435d1c63cc7ca496",
+      "published_at": "2026-09-04",
+      "refs": {},
+      "source": "edgar:NVDA",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "NVDA"
+          ]
+        }
+      },
+      "title": "NVDA 4 filed 2026-09-04",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-04T22:38:35.338756+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "單一 Form 4 不改候選集合或排序，只增加內部人交易脈絡。"
+        },
+        "decided_at": "2026-09-04T22:38:35.338756+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "NVDA 官方 Form 4 與追蹤標的直接相關且可逐字核對；個別交易只提供內部人／稀釋觀測，低優先但保留進 pq1 彙總。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1045810/000119764726000009/xslF345X06/wk-form4_1788555631.xml"
+    },
     "lead_d2495f0ff605f6790af86147ac148842": {
       "entities": {
         "company_ids": [
@@ -50378,6 +51000,63 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1040470/000104047026000249/xslF345X06/primary_01.xml"
+    },
+    "lead_d8fee64e0334807bb0f1af3c5dee0bc8": {
+      "entities": {
+        "company_ids": [
+          "co:soitec",
+          "co:tsmc",
+          "co:sk_hynix",
+          "co:nvidia"
+        ],
+        "tickers": [
+          "ASML",
+          "SOI",
+          "TSM",
+          "SKHY",
+          "LCRX",
+          "KLA",
+          "NVDA"
+        ]
+      },
+      "first_seen": "2026-09-04T22:33:53.641405+00:00",
+      "lead_id": "lead_d8fee64e0334807bb0f1af3c5dee0bc8",
+      "media": [],
+      "published_at": "2026-09-04T10:35:17.000Z",
+      "raw_text": "So... here's my take on US / China tensions: \n\nYou have European monopolies like:\n- $ASML (EUV)\n- $SOI (Photonics-SOI)\n- Zeiss SMT (ASML EUV supplier), Trumpf (ASML EUV laser supplier)\n\nJapan has many near/complete monoplies like:\n- TOK, JSR, ShinEstu, Fujifilm for EUV photoresist - 90-100% share\n- coat/develop equiment with Tokyo Electron -90%+\n- actinic EUV patterned mask inspection (Lasertec) -100% share\n- EUV mask blanks (HOYA, AGC) ~93% share\n- arf photoresist\n- Nittobo T-Glass \n- ABF film (Ajinomoto)\n- lot of misc from specialty glassAGC, wafer thinning/grinding/dicing with Disco and others. \n\nThen there's US allied countries like Taiwan eg. $TSM, Korean memory with $SKHY / Samsung. \n\nUS has EDA with Synopsys/Cadence, $LCRX / $KLA, $NVDA, and many downstream giants.\n\nChina has many chokepoints such as gallium, graphite, refined lithium, and others + benefits from cost mass production over many future supply chains (eg. robotics). \n\nIf I had to give my opinion on US / China supply chain wars:\n\n- US is trying to achieve Western independence from China/Russia rare earths + materials supply, but took too long (should have been a priority last decade). \n\n- China is trying to eliminate strategic chokepoint dependence and forcing US reliance on Chinese supply chains (as seen with Wf6) \n\nIt's a race on who achieves supply chain independence first to gain leverage over the other.  \n\nAnd fun thing is, AI acceleration kinda throws an unknown variable in terms of speeding up independence. \n\nAs well as open source efforts (eg. RISC-V), which China is heavily focusing on. So it's a weird paradox where US should theoretically support open source hardware development + open source AI, but it's also being exploited against them.\n\nFrom a Chinese perspective, they're pressuring US supply chains by targeting Japan, which increases Western supply chain reliance on China. \n\nAnd going down the list to eliminate competitor chokepoints internally by throwing subsidized spend into R&D. Or by acqusition as seen with China's acquisition of EU leaders like Ficontec.  \n\nAmerica... they had all the cards initially, but I think they got too comfortable, and took too long to focus heavily on rare earths (recent funding is a good thing).\n\nThe earlier tariffs went the wrong way (socks, furniture, other exports), and pissed off allies in EU/Canada too. \n\nWhich could have been used for leverage for major chokepoints. But maybe they'll realize soon enough why allies are important.\n\nAnyway, we'll see what happens, just my two cents about ongoing dynamics.\n\nIn an ideal world, everyone works together... \n\nTLDR: Just some shower thoughts on how there's an unspoken race on who achieves supply chain independence first to gain leverage over the other.",
+      "refs": {
+        "parked_reason": "此貼文把數十個國家與公司壟斷、地緣策略及作者政策看法綁成單一 composite；沒有 locator 或單一可驗證 atom，且多數候選已在圖中。依 bounded research 原則不把整包意見轉成證據。",
+        "research_outcome": "no_bounded_unique_graph_delta",
+        "research_run": "daily-brief-2026-09-05",
+        "trace_status": "not_pursued"
+      },
+      "source": "x:aleabitoreddit",
+      "status": "parked",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "NVDA"
+          ]
+        }
+      },
+      "title": "So... here's my take on US / China tensions: You have European monopolies like: - $ASML (EUV) - $SOI (Photonics-SOI) - Zeiss SMT (ASML EUV supplier), Trumpf (ASML EUV laser supplier) Japan has many near/complete monoplies like: - TOK, JSR, ShinEstu, Fujifilm for EUV photoresist - 90-100% share - coat/develop equiment with Tokyo Electron -90%+ - actinic EUV patterned mask inspection (Lasertec) -100% share - EUV mask blanks (HOYA, AGC) ~93% share - arf photoresist - Nittobo T-Glass - ABF film (Ajinomoto) - lot of misc from specialty glassAGC, wafer thinning/grinding/dicing with Disco and others. Then there's US allied countries like Taiwan eg. $TSM, Korean memory with $SKHY / Samsung. US has EDA with Synopsys/Cadence, $LCRX / $KLA, $NVDA, and many downstream giants. China has many chokepoints such as gallium, graphite, refined lithium, and others + benefits from cost mass production over many future supply chains (eg. robotics). If I had to give my opinion on US / China supply chain wars: - US is trying to achieve Western independence from China/Russia rare earths + materials supply, but took too long (should have been a priority last decade). - China is trying to eliminate strategic chokepoint dependence and forcing US reliance on Chinese supply chains (as seen with Wf6) It's a race on who achieves supply chain independence first to gain leverage over the other. And fun thing is, AI acceleration kinda throws an unknown variable in terms of speeding up independence. As well as open source efforts (eg. RISC-V), which China is heavily focusing on. So it's a weird paradox where US should theoretically support open source hardware development + open source AI, but it's also being exploited against them. From a Chinese perspective, they're pressuring US supply chains by targeting Japan, which increases Western supply chain reliance on China. And going down the list to eliminate competitor chokepoints internally by throwing subsidized spend into R&D. Or by acqusition as seen with China's acquisition of EU leaders like Ficontec. America... they had all the cards initially, but I think they got too comfortable, and took too long to focus heavily on rare earths (recent funding is a good thing). The earlier tariffs went the wrong way (socks, furniture, other exports), and pissed off allies in EU/Canada too. Which could have been used for leverage for major chokepoints. But maybe they'll realize soon enough why allies are important. Anyway, we'll see what happens, just my two cents about ongoing dynamics. In an ideal world, everyone works together... TLDR: Just some shower thoughts on how there's an unspoken race on who achieves supply chain independence first to gain leverage over the other.",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-04T22:38:33.218826+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "供應鏈壟斷與替代來源查證可能讓候選集合新增或移除公司。"
+        },
+        "decided_at": "2026-09-04T22:38:33.218826+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "列出 ASML、Soitec、Zeiss、Trumpf、Lasertec、Ajinomoto 等具名供應商與市占／壟斷主張，與半導體瓶頸主題直接相關且可追回官方資料；若成立可擴增候選集合。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2095823005595439615"
     },
     "lead_d95d26c1e9be71f3422d0b4d10ee6ad8": {
       "entities": {
@@ -52280,6 +52959,39 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2076847779037790620"
     },
+    "lead_e41f44f7b1c507fdd965e34899202c43": {
+      "entities": {
+        "company_ids": [
+          "co:globalfoundries"
+        ],
+        "tickers": [
+          "GFS"
+        ]
+      },
+      "first_seen": "2026-09-04T22:34:00.943121+00:00",
+      "lead_id": "lead_e41f44f7b1c507fdd965e34899202c43",
+      "published_at": "2026-09-04",
+      "refs": {},
+      "source": "edgar:GFS",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "GFS 4 filed 2026-09-04",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-04T22:38:34.732347+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "單一 Form 4 不改候選集合或排序，只增加內部人交易脈絡。"
+        },
+        "decided_at": "2026-09-04T22:38:34.732347+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "GFS 官方 Form 4 與追蹤標的直接相關且可逐字核對；個別交易只提供內部人／稀釋觀測，低優先但保留進 pq1 彙總。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000230/xslF345X06/wk-form4_1788553011.xml"
+    },
     "lead_e43bbbebc27c5bacc0a2ab090629b278": {
       "entities": {
         "company_ids": [
@@ -52294,8 +53006,9 @@
       "published_at": "2026-09-01",
       "refs": {
         "outcome": "Form 4 已解析:COHR Place 配股 3,358 @0,例行",
-        "parked_reason": "insider Form 4 信心類,無 graph delta",
-        "trace_status": "partial"
+        "parked_reason": "官方 Form 4 已取得且可逐字核對；個別交易不形成唯一 graph delta，後續只在內部人／稀釋彙總觀測使用",
+        "trace_next_trigger": "無；官方 Form 4 已取得，按內部人交易彙總觀測處理",
+        "trace_status": "original_obtained"
       },
       "source": "edgar:COHR",
       "status": "parked",
@@ -52492,6 +53205,39 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1709048/000162828026058190/xslF345X06/wk-form4_1787243591.xml"
+    },
+    "lead_e53df528c346154592533616d6ee2358": {
+      "entities": {
+        "company_ids": [
+          "co:tsmc"
+        ],
+        "tickers": [
+          "TSM"
+        ]
+      },
+      "first_seen": "2026-09-04T22:34:09.721342+00:00",
+      "lead_id": "lead_e53df528c346154592533616d6ee2358",
+      "published_at": "2026-09-04",
+      "refs": {},
+      "source": "edgar:TSM",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "TSM 4 filed 2026-09-04",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-04T22:38:35.940686+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "單一 Form 4 不改候選集合或排序，只增加內部人交易脈絡。"
+        },
+        "decided_at": "2026-09-04T22:38:35.940686+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "TSM 官方 Form 4 與追蹤標的直接相關且可逐字核對；個別交易只提供內部人／稀釋觀測，低優先但保留進 pq1 彙總。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1046179/000104617926000596/xslF345X06/wk-form4_1788517801.xml"
     },
     "lead_e54a283404bc6c658c3c9a636199ce2e": {
       "entities": {
@@ -53613,23 +54359,24 @@
       "refs": {
         "gap": "Google 客製 ICI 光模組的具名供應商與精確 port BOM",
         "original_claim_status": "9,216-chip、144-cube、ICI 加 OCS 架構已確認；13,824 光埠與光模組供應商未由 Google 揭露",
-        "parked_reason": "系統一手已取得，但供應商具名揭露尚不存在",
+        "parked_reason": "Google 一手資料確認 Ironwood 的 9,216 chips、144 cubes 與 OCS 互連需求錨；未揭露 ICI 光模組供應商，不能從 NVDA AVGO 生態類推。",
         "primary_url": "https://cloud.google.com/blog/products/compute/inside-the-ironwood-tpu-codesigned-ai-stack/",
-        "research_outcome": "第三需求錨成立但供應商候選空白；不以其他陣營類推",
+        "research_outcome": "google_confirms_ironwood_ocs_scale_but_not_ici_module_supplier",
+        "research_run": "daily-brief-2026-09-05",
         "storage_permission": "repo_excerpt",
-        "trace_attempts_ref": "Apollo 論文:WDM transceivers 為 Google 客製共同設計、四代(40/100/200/400GbE),製造夥伴僅致謝詞泛稱 industry/vendor partners;SemiAnalysis TPUv7 免費段有 48 OCS/13,824 ports 規模數字(tier-3)但無模組供應商具名",
-        "trace_next_trigger": "Google、光模組商或 OCS 供應商 filing／技術文件具名 Ironwood ICI 供應關係",
+        "trace_attempts_ref": "Google Cloud Ironwood codesigned stack and reliability posts; 9216 chips 144 cubes and OCS topology confirmed, ICI optical module supplier not named",
+        "trace_next_trigger": "Google Cloud qualification paper teardown or supplier filing explicitly names the custom ICI optical-module vendor",
         "trace_origin_entity": "Google Cloud",
         "trace_origin_linkage": "系統設計者一手技術說明",
-        "trace_requeue_trigger": "related_triaged_lead:lead_c6b2150d6ec2db0bf22b046dbe4ddb5d",
-        "trace_requeued_at": "2026-09-02T22:35:28.297507+00:00",
+        "trace_requeue_trigger": "related_triaged_lead:lead_75b6ff16300b8da2f360a3f118eca4b6",
+        "trace_requeued_at": "2026-09-04T22:38:31.704822+00:00",
         "trace_requires_user": "false",
         "trace_status": "awaiting_named_disclosure",
         "trace_trigger_entities": [
           "GOOGL",
           "co:google"
         ],
-        "trace_trigger_event_ref": "lead:lead_c6b2150d6ec2db0bf22b046dbe4ddb5d",
+        "trace_trigger_event_ref": "lead:lead_75b6ff16300b8da2f360a3f118eca4b6",
         "trace_trigger_kind": "related_entity_signal",
         "trace_trigger_watch_ref": "ew_0061_2026-09-01"
       },
@@ -53654,13 +54401,13 @@
           "decision_impact": "candidate_set",
           "reason": "TPU 第三需求錨的光互連層;答案改變候選集合"
         },
-        "decided_at": "2026-09-02T22:35:28.297507+00:00",
+        "decided_at": "2026-09-04T22:38:31.704822+00:00",
         "decision": "go",
         "priority_flags": {
           "independent_source": true,
           "novelty": true
         },
-        "reason": "Event Watch ew_0061_2026-09-01 觸發：新 triage PASS lead lead_c6b2150d6ec2db0bf22b046dbe4ddb5d 與等待中的追源共用具名標的 COHR, LITE, co:coherent, co:lumentum；事件觸發 bounded pq1 重查",
+        "reason": "Event Watch ew_0061_2026-09-01 觸發：新 triage PASS lead lead_75b6ff16300b8da2f360a3f118eca4b6 與等待中的追源共用具名標的 GOOGL, co:google；事件觸發 bounded pq1 重查",
         "tier": 3
       },
       "triage_history": [
@@ -53684,6 +54431,29 @@
               "novelty": true
             },
             "reason": "decompose 產出的結構研究題(使用者選題 TPU Ironwood);層存在性 tier1-2 已核,供應商未知即題目",
+            "tier": 3
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-04T22:38:31.704822+00:00",
+          "superseded_reason": "Event Watch ew_0061_2026-09-01 觸發：新 triage PASS lead lead_75b6ff16300b8da2f360a3f118eca4b6 與等待中的追源共用具名標的 GOOGL, co:google；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_75b6ff16300b8da2f360a3f118eca4b6",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-09-01T01:15:06.596110+00:00",
+              "classified_by": "triage_semantic_v1",
+              "content_type": "structural_fact",
+              "decision_impact": "candidate_set",
+              "reason": "TPU 第三需求錨的光互連層;答案改變候選集合"
+            },
+            "decided_at": "2026-09-02T22:35:28.297507+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "independent_source": true,
+              "novelty": true
+            },
+            "reason": "Event Watch ew_0061_2026-09-01 觸發：新 triage PASS lead lead_c6b2150d6ec2db0bf22b046dbe4ddb5d 與等待中的追源共用具名標的 COHR, LITE, co:coherent, co:lumentum；事件觸發 bounded pq1 重查",
             "tier": 3
           }
         }
@@ -54500,10 +55270,23 @@
       "published_at": "2026-09-03",
       "refs": {},
       "source": "edgar:AEHR",
-      "status": "pending",
+      "status": "triaged_go",
       "themes": {},
       "title": "AEHR 4 filed 2026-09-03",
-      "triage": null,
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-04T22:38:31.410410+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "單一 Form 4 不改候選集合或排序，只增加內部人交易脈絡。"
+        },
+        "decided_at": "2026-09-04T22:38:31.410410+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "AEHR 官方 Form 4 與追蹤標的直接相關且可逐字核對；個別交易只提供內部人／稀釋觀測，低優先但保留進 pq1 彙總。",
+        "tier": 1
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/1040470/000104047026000265/xslF345X06/primary_01.xml"
     },
     "lead_eeeaadc30d6e4c258e42483085b3e32f": {
@@ -55277,6 +56060,61 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1835632/000162828026048546/xslF345X06/wk-form4_1784242364.xml"
+    },
+    "lead_f1cf205e2c5d75400f98dea3391b1e3b": {
+      "entities": {
+        "company_ids": [
+          "co:churchill_capital_xi"
+        ],
+        "tickers": [
+          "CCXI"
+        ]
+      },
+      "first_seen": "2026-09-04T22:33:59.581064+00:00",
+      "lead_id": "lead_f1cf205e2c5d75400f98dea3391b1e3b",
+      "published_at": "2026-09-04",
+      "refs": {
+        "parked_reason": "公開 S-4 已構成 [200] 的外部事件命中，但本輪可用路由尚無法逐字讀取新 accession；既有 425 只支持超過 3 億美元訂單與具名部署，不能代替 S-4 的財務與 milestone 條款。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/2074973/000121390026097764/ea0297114-04.htm",
+        "research_outcome": "public_s4_filed_full_text_not_yet_searchable_in_current_route",
+        "research_run": "daily-brief-2026-09-05",
+        "trace_attempts_ref": "SEC canonical S-4 URL from EDGAR harvest; SEC direct route temporarily blocked and web index has not ingested accession; older official 425 and Agility IR checked",
+        "trace_next_trigger": "SEC S-4 full text becomes indexable or Agility investor relations publishes the filed prospectus",
+        "trace_requires_user": "false",
+        "trace_status": "partial",
+        "trace_trigger_entities": [
+          "CCXI",
+          "co:churchill_capital_xi"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
+      "source": "edgar:CCXI",
+      "status": "parked",
+      "themes": {
+        "robotics": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CCXI"
+          ]
+        }
+      },
+      "title": "CCXI S-4 filed 2026-09-04",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-04T22:38:34.138522+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "candidate_set",
+          "reason": "S-4 若含 Agility 經審計財務與交易條款，會改變機器人候選集合是否可評估。"
+        },
+        "decided_at": "2026-09-04T22:38:34.138522+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "CCXI 官方 S-4 是 Agility Robotics 交易、身分與財務缺口的直接一手文件，具體且可引用；內容可能使機器人候選由私有追蹤轉為可完整評估。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/2074973/000121390026097764/ea0297114-04.htm"
     },
     "lead_f1d18173b1d1d173650f0dae1545c692": {
       "entities": {
@@ -57373,6 +58211,115 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/723125/000131107926000003/xslF345X06/primarydocument.xml"
     },
+    "lead_fc1f6fddc45c93d06a7ee0e5a3e723ad": {
+      "entities": {
+        "company_ids": [
+          "co:lynas",
+          "co:axt",
+          "co:lumentum"
+        ],
+        "tickers": [
+          "LYC.AX",
+          "AXTI",
+          "LITE"
+        ]
+      },
+      "first_seen": "2026-09-04T22:33:53.646272+00:00",
+      "lead_id": "lead_fc1f6fddc45c93d06a7ee0e5a3e723ad",
+      "media": [
+        {
+          "cache": {
+            "bytes": 70994,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_fc1f6fddc45c93d06a7ee0e5a3e723ad/3_2095802625447075840.jpg",
+            "sha256": "a80c3a9628e67394a769b7c87ebe295d9f3c2c2568ec48537550921da4fc5503"
+          },
+          "height": 804,
+          "media_key": "3_2095802625447075840",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HRXJYkEaoAAg8Ff.jpg",
+          "width": 1260
+        },
+        {
+          "cache": {
+            "bytes": 89700,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_fc1f6fddc45c93d06a7ee0e5a3e723ad/3_2095802625451307008.jpg",
+            "sha256": "9276d116848661de83cb4501f0c21d133c761bda57a535114a74cae9b4e08b3f"
+          },
+          "height": 1341,
+          "media_key": "3_2095802625451307008",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HRXJYkFbMAApy0n.jpg",
+          "width": 1195
+        },
+        {
+          "cache": {
+            "bytes": 98488,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_fc1f6fddc45c93d06a7ee0e5a3e723ad/3_2095802625434505216.jpg",
+            "sha256": "d12fbc95204d21aeb7b0b2c44a2ba7019a3bcc65aeb3db911dcb331fd8d84198"
+          },
+          "height": 1431,
+          "media_key": "3_2095802625434505216",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HRXJYkBa0AAoD6-.jpg",
+          "width": 1224
+        }
+      ],
+      "published_at": "2026-09-04T09:14:21.000Z",
+      "raw_text": "China reportedly halts some rare earth shipments to US.\n\nNot a new blanket ban, or any mention of specific rare earths. \n\nBut… if I had to guess, Japan is usually a decent indicator of what’s actively important since Japan:\n\n- “sources virtually all of its dysprosium and terbium from China.”\n- gallium, dysprosium, terbium and yttrium from China to Japan all stood at “zero” in June. \n- Shin-Etsu Chemical has reportedly suspended acceptance of new orders for magnets containing dysprosium.\n- Global magnet producer Proterial had received no export licenses for Chinese dysprosium as of last month\n\nThe Reuters piece mentioned yttrium, gallium, terbium, indium phosphide, and tungsten as historical examples (doesn’t say what’s being targeted now).\n\nOn a side note, $LYC.AX is becoming one of the most important alternatives, as Japan has locked up 75% of Lynas’s medium/heavy rare-earth output. (8 tons of dysprosium + terbium in Q1)\n\nSomething fun I also read is that Japan’s deep sea resource is enormous (est. at 16 million tons of rare earth rich mud, but commercialization is post-2028)\n\nBut in the meantime, China seem to be choking off feedstock that would materially affect Japan.\n\nSince you’ve already seen the WF6 Japanese industry stressed from tungsten related halts.\n\nAnd indium/others earlier this year that is used to make InP substrates from Sumitomo/JX.\n\nBut still gradually allowing exports directly eg. $AXTI -> $LITE to allow US/China trade to continue, kinda disrupting that from time to time, then using that as leverage.\n\nIt’s interesting since Japan has so many different monopolies like ABF, so we’ll see if they do anything back.\n\nBut if I had to give a prediction, it does look like the US has a countdown timer until China becomes self-sufficient on semiconductors.\n\nTLDR:\n- rare earth disruption to US\n- China actively targeting Japan for upstream feedstock (which goes to Us supply chains), probably want to focus on that\n- many many second/third order effects from disruptions\n- we’ll see what US/Japan wants to do back, but supply chain wars are being fought upstream.",
+      "refs": {
+        "parked_reason": "已取得日本 METI 對中國稀土出口管制造成供應鏈衝擊的一手脈絡；但貼文的最新對美停運、6 月對日歸零、個別公司許可與停單仍只有轉述，不能把具體量或公司狀態入圖。",
+        "primary_url": "https://www.meti.go.jp/english/speeches/press_conferences/2026/0203001.html",
+        "research_outcome": "official_macro_context_only_specific_shipment_claims_unverified",
+        "research_run": "daily-brief-2026-09-05",
+        "trace_attempts_ref": "METI 2026 press briefings plus Lynas Proterial Shin-Etsu official-site search; official sources confirm export-control stress but not this posts June zero-flow and latest halt quantities",
+        "trace_next_trigger": "Lynas quarterly report or Japanese customs METI disclosure names Dy Tb volumes, or Proterial Shin-Etsu directly discloses license or order interruption",
+        "trace_requires_user": "false",
+        "trace_status": "partial",
+        "trace_trigger_entities": [
+          "AXTI",
+          "LITE",
+          "LYC.AX",
+          "co:axt",
+          "co:lumentum",
+          "co:lynas"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
+      "source": "x:aleabitoreddit",
+      "status": "parked",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "InP",
+            "LITE"
+          ]
+        }
+      },
+      "title": "China reportedly halts some rare earth shipments to US. Not a new blanket ban, or any mention of specific rare earths. But… if I had to guess, Japan is usually a decent indicator of what’s actively important since Japan: - “sources virtually all of its dysprosium and terbium from China.” - gallium, dysprosium, terbium and yttrium from China to Japan all stood at “zero” in June. - Shin-Etsu Chemical has reportedly suspended acceptance of new orders for magnets containing dysprosium. - Global magnet producer Proterial had received no export licenses for Chinese dysprosium as of last month The Reuters piece mentioned yttrium, gallium, terbium, indium phosphide, and tungsten as historical examples (doesn’t say what’s being targeted now). On a side note, $LYC.AX is becoming one of the most important alternatives, as Japan has locked up 75% of Lynas’s medium/heavy rare-earth output. (8 tons of dysprosium + terbium in Q1) Something fun I also read is that Japan’s deep sea resource is enormous (est. at 16 million tons of rare earth rich mud, but commercialization is post-2028) But in the meantime, China seem to be choking off feedstock that would materially affect Japan. Since you’ve already seen the WF6 Japanese industry stressed from tungsten related halts. And indium/others earlier this year that is used to make InP substrates from Sumitomo/JX. But still gradually allowing exports directly eg. $AXTI -> $LITE to allow US/China trade to continue, kinda disrupting that from time to time, then using that as leverage. It’s interesting since Japan has so many different monopolies like ABF, so we’ll see if they do anything back. But if I had to give a prediction, it does look like the US has a countdown timer until China becomes self-sufficient on semiconductors. TLDR: - rare earth disruption to US - China actively targeting Japan for upstream feedstock (which goes to Us supply chains), probably want to focus on that - many many second/third order effects from disruptions - we’ll see what US/Japan wants to do back, but supply chain wars are being fought upstream.",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-04T22:38:33.530738+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "出口中斷與替代供應來源查證可能改變稀土／InP 候選集合。"
+        },
+        "decided_at": "2026-09-04T22:38:33.530738+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "具名中國稀土出口、Shin-Etsu、Proterial、Lynas、AXTI、LITE 與多個材料／數字，可逐 atom 追 Reuters 與公司一手；若成立會改變稀土與 InP 候選集合。",
+        "related_trace_requeues": [
+          "lead_3238fc77ac974944b52a2916205b98a6"
+        ],
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2095802636876619928"
+    },
     "lead_fcbf2bd4a87932e4d67c12f0c188c3ac": {
       "content_updated_at": "2026-07-29T13:46:48.255609+00:00",
       "entities": {
@@ -57553,8 +58500,9 @@
       "published_at": "2026-09-02",
       "refs": {
         "outcome": "Form 4 已解析:TSM Mii Yuh-Jier:配股 32,204 @0,例行",
-        "parked_reason": "insider Form 4 信心類,無 graph delta",
-        "trace_status": "partial"
+        "parked_reason": "官方 Form 4 已取得且可逐字核對；個別交易不形成唯一 graph delta，後續只在內部人／稀釋彙總觀測使用",
+        "trace_next_trigger": "無；官方 Form 4 已取得，按內部人交易彙總觀測處理",
+        "trace_status": "original_obtained"
       },
       "source": "edgar:TSM",
       "status": "parked",
@@ -57976,8 +58924,8 @@
   "schema_version": "2",
   "source_state": {
     "x:aleabitoreddit": {
-      "since_id": "2095590610967421206",
-      "updated_at": "2026-09-04T07:46:48.320250+00:00",
+      "since_id": "2095957075302273257",
+      "updated_at": "2026-09-04T22:33:53.650981+00:00",
       "user_id": "1940360837547565056"
     }
   }
