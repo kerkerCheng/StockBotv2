@@ -7953,10 +7953,11 @@
       "added_at": "2026-09-04T08:06:35.285620+00:00",
       "hint": "MP 是 28 檔裡唯一「設定不完整」的——cohort_thesis 的 disproof 與 catalyst 皆空，expiry 2026-11-29 因此是一個沒有內容的鬧鐘（L7：沒有證偽條件的警報永遠不會響）。2026-09-04 已把下次財報日 2026-11-06 寫進 catalyst_calendar.json，但那只讓提醒有日期，不等於 thesis 有證偽條件。go＝寫入 cohort_thesis 的 disproof＋catalyst（thesis mutation，四個人工 gate 之一）；不含入圖、不含 Engine C 判讀寫入、不含 live。⚠ 需要先決定 MP 的 thesis 到底賭什麼——它的已記錄缺口是客戶集中度/backlog 觀測未提案、runway_inputs 未填、Engine C 快照當時未納入 MP（後者已於本輪 ETL 解決，73/73 含 MP）。",
       "n": 475,
-      "reason": null,
+      "reason": "MP 的 catalyst 與 disproof 已寫入（cohort dc_21d81aa11dd2fe85c747b1c759fd01ed，coverage ca_a6be21a7e3f64fcf61b9aa3355380056，intent=research）。disproof 是針對 Decision Store 既有的 variant perception（MP 不是稀土價格週期股：DoW 價格地板＋Apple 200M／GM 50M 預付款把下檔結構性墊高、與現貨部分脫鉤）寫的三條可觀測失效條件，未新增任何主張；含 L7 要求的核查頻率（每季財報）與觸發後 48h 動作（轉 review_required 並重跑 reassess，不得沿用舊 assessment）。catalyst 綁 2026-11-06 Q3 財報，早於 expiry 2026-11-29，順序正確。驗證：catalyst_watch 設定不完整 1 → 0，28 檔全部有證偽條件。未跨越其他 gate：無入圖、無 Engine C 判讀寫入、intent 維持 research、無 live。",
+      "receipt": "authority:decision_lab_reassess;ref:pd_ceb53da6fa652c69784f45e0fcc81a39",
       "ref_id": "thesis/catalyst_calendar.json",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-04T08:38:26.002084+00:00",
       "source": "manual",
       "title": "co:mp_materials：補 MP 的 disproof 與 catalyst（thesis mutation）",
       "type": "manual"
@@ -17248,6 +17249,15 @@
       "reason": "decompose 已執行:800VDC 供電鏈拆 7 層(整流站/busway/DC-DC shelf/VRM/寬能隙半導體/次秒儲能/電網介面),圖中除 power_gan 孤節點外全空白;NVIDIA 官方 blog 一手三層夥伴具名;5 題註冊 pq1 triaged_go",
       "receipt": "authority:decompose;ref:decompose:nvidia-800vdc-2026-09-03",
       "ref_id": "manual:468",
+      "type": "manual",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-04T08:38:26.002084+00:00",
+      "n": 475,
+      "reason": "MP 的 catalyst 與 disproof 已寫入（cohort dc_21d81aa11dd2fe85c747b1c759fd01ed，coverage ca_a6be21a7e3f64fcf61b9aa3355380056，intent=research）。disproof 是針對 Decision Store 既有的 variant perception（MP 不是稀土價格週期股：DoW 價格地板＋Apple 200M／GM 50M 預付款把下檔結構性墊高、與現貨部分脫鉤）寫的三條可觀測失效條件，未新增任何主張；含 L7 要求的核查頻率（每季財報）與觸發後 48h 動作（轉 review_required 並重跑 reassess，不得沿用舊 assessment）。catalyst 綁 2026-11-06 Q3 財報，早於 expiry 2026-11-29，順序正確。驗證：catalyst_watch 設定不完整 1 → 0，28 檔全部有證偽條件。未跨越其他 gate：無入圖、無 Engine C 判讀寫入、intent 維持 research、無 live。",
+      "receipt": "authority:decision_lab_reassess;ref:pd_ceb53da6fa652c69784f45e0fcc81a39",
+      "ref_id": "thesis/catalyst_calendar.json",
       "type": "manual",
       "verb": "go"
     }
