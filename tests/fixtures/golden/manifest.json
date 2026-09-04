@@ -60,7 +60,7 @@
     "point_in_time_boundary": {
       "guards": "F-31",
       "private": false,
-      "digest": "sha256:b9690d2708be1f7b820492b4a7463a8d193b0895fad4e2a09512cb83d86de750"
+      "digest": "sha256:d439ff5513ddc58a71db36dc2f3a375042d2b079e25c8d749f8e8d938b699567"
     },
     "truncation_boundary": {
       "guards": "F-20",

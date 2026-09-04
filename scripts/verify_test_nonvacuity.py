@@ -267,13 +267,20 @@ MUTATIONS: tuple[Mutation, ...] = (
         test="tests/test_alpha_vertical_slice.py::test_unresolvable_evidence_reference_is_rejected",
         guards="L15／L8：不得讓引用去尋找能通過的權威",
     ),
+    # ⚠ 2026-09-04 更新錨點：Phase 6 把保險絲從「as-of 一律拒絕」換成
+    # 「投影不存在時拒絕」，原本的 `_reject_as_of` 已不存在。**守的東西沒變**，
+    # 所以這條不是刪掉而是改指向新的條件（本腳本自己會抓到錨點失效：
+    # 首跑回報「突變錨點在原始碼中找不到」）。
     Mutation(
-        name="concrete provider 靜默接受 as-of",
+        name="concrete provider 在圖沒有日期時靜默接受 as-of",
         path="alpha/providers/graph_neo4j.py",
-        old="    if as_of is not None:\n        raise PointInTimeUnsupported(",
-        new="    if False and as_of is not None:\n        raise PointInTimeUnsupported(",
-        test="tests/test_alpha_vertical_slice.py::test_concrete_graph_provider_refuses_as_of",
-        guards="F-31：Engine A 沒有 as-of 能力，回傳當前資料會讓回測看到未來",
+        old="        if projection.dated_total < _MIN_DATED_FOR_PROJECTION:",
+        new="        if False:",
+        test=(
+            "tests/test_alpha_vertical_slice.py::"
+            "test_concrete_graph_provider_refuses_as_of_when_the_graph_has_no_dates"
+        ),
+        guards="F-31：投影不存在時回傳資料會讓回測看到未來",
     ),
     Mutation(
         name="I/O 例外從 providers 溢出",
@@ -616,6 +623,185 @@ MUTATIONS: tuple[Mutation, ...] = (
         new="        if float(nav) <= 0:",
         test="tests/test_portfolio_risk.py::test_unavailable_leverage_is_a_blocker_not_a_pass",
         guards="NaN 的所有比較都是 False——算不出來不等於沒有超標",
+    ),
+    # ---- Phase 6：as-of 投影、回填走廊、排序報酬 ----------------------------
+    Mutation(
+        name="投影不篩掉 as_of 之後發表的證據",
+        path="query/bottleneck.py",
+        old="        if published > as_of:\n            future += 1\n            continue",
+        new="        if False:\n            future += 1\n            continue",
+        test="tests/test_alpha_as_of_projection.py::test_evidence_published_after_as_of_is_invisible",
+        guards="Phase 6 的驗收條件本身：T 之後 published 的證據在 T 看不到",
+    ),
+    Mutation(
+        name="未定日的證據被當成在 as_of 之前",
+        path="query/bottleneck.py",
+        old="        if published is None:\n            undated += 1\n            continue",
+        new="        if published is None:\n            undated += 1\n            kept.append(row)\n            continue",
+        test="tests/test_alpha_as_of_projection.py::test_undated_evidence_is_excluded_not_assumed_old",
+        guards="L11-5：「我找不到日期」≠「它在 T 之前」",
+    ),
+    Mutation(
+        name="年月精度取當月第一天",
+        path="query/bottleneck.py",
+        old="    last = calendar.monthrange(year, month)[1]",
+        new="    last = 1",
+        test=(
+            "tests/test_alpha_as_of_projection.py::"
+            "test_a_month_precision_document_is_not_visible_at_the_start_of_that_month"
+        ),
+        guards="L12：一個欄位兩種精度；取月初＝把不確定讀成對自己有利",
+    ),
+    Mutation(
+        name="圖上沒有日期時投影靜默回空",
+        path="alpha/providers/graph_neo4j.py",
+        old="_MIN_DATED_FOR_PROJECTION = 1",
+        new="_MIN_DATED_FOR_PROJECTION = 0",
+        test=(
+            "tests/test_alpha_as_of_projection.py::"
+            "test_the_fuse_still_blows_when_the_graph_carries_no_time_information"
+        ),
+        guards="L13：保險絲換了條件但沒被拿掉——投影不存在時仍須拋",
+    ),
+    Mutation(
+        name="問得太早時回空排序而不拋",
+        path="alpha/providers/graph_neo4j.py",
+        old="        if not projection.rows:\n            raise PointInTimeUnsupported(",
+        new="        if False:\n            raise PointInTimeUnsupported(",
+        test=(
+            "tests/test_alpha_as_of_projection.py::"
+            "test_the_fuse_blows_when_asked_about_a_time_before_any_evidence"
+        ),
+        guards="空排序與「那天沒有任何瓶頸」同形（L13）",
+    ),
+    Mutation(
+        name="EvidenceRef 不帶 published_at",
+        path="alpha/providers/graph_neo4j.py",
+        old="                kind=\"graph_edge\",\n                published_at=published,",
+        new="                kind=\"graph_edge\",",
+        test=(
+            "tests/test_alpha_as_of_projection.py::"
+            "test_every_evidence_ref_in_the_projection_predates_as_of"
+        ),
+        guards="投影篩對了列，證據卻在下一關被整批判成 undated",
+    ),
+    Mutation(
+        name="第一個已知供應商被報成結構變化",
+        path="alpha/providers/graph_neo4j.py",
+        old="            if str(new.get(\"bottleneck\")) not in known_targets:\n                return out",
+        new="            if False:\n                return out",
+        test=(
+            "tests/test_alpha_as_of_projection.py::"
+            "test_the_first_known_supplier_is_not_a_structural_change"
+        ),
+        guards="「我們開了一條新研究線」不得看起來像「世界鬆了」",
+    ),
+    Mutation(
+        name="窗外的舊文件被當成窗內新到的資訊",
+        path="alpha/providers/graph_neo4j.py",
+        old="            arrived = tuple(\n                ref for ref in refs\n                if ref.published_at is not None and ref.published_at > since)",
+        new="            arrived = tuple(\n                ref for ref in refs\n                if ref.published_at is not None)",
+        test=(
+            "tests/test_alpha_as_of_projection.py::"
+            "test_a_row_that_only_appeared_because_of_undated_evidence_is_not_an_event"
+        ),
+        guards="補讀一份舊文件是知識補登，不是結構變化（首跑產出過窗前日期的事件）",
+    ),
+    Mutation(
+        name="回填走廊放行判讀屬性",
+        path="loader/source_dating.py",
+        old="BACKFILLABLE_PROPERTIES: tuple[str, ...] = (\"published_at\", \"retrieved_at\")",
+        new="BACKFILLABLE_PROPERTIES: tuple[str, ...] = (\"published_at\", \"retrieved_at\", \"substitutability\", \"evidence_tier\")",
+        test=(
+            "tests/test_alpha_as_of_projection.py::"
+            "test_the_corridor_refuses_everything_it_should"
+        ),
+        guards="mechanical 走廊不得變成繞過 graph admission 的後門",
+    ),
+    Mutation(
+        name="url_path 不再實際重導",
+        path="loader/source_dating.py",
+        old="        if parsed not in candidates:",
+        new="        if False:",
+        test=(
+            "tests/test_alpha_as_of_projection.py::"
+            "test_the_corridor_refuses_everything_it_should"
+        ),
+        guards="宣稱可機械重導就必須真的重導得出來（拿掉 pq2 的補償控制）",
+    ),
+    Mutation(
+        name="audit 不比對回填當時寫下的基準值",
+        path="loader/source_dating.py",
+        old="        if recorded and value != recorded:",
+        new="        if False and recorded and value != recorded:",
+        test=(
+            "tests/test_alpha_as_of_projection.py::"
+            "test_audit_detects_a_value_that_drifted_away_from_its_basis"
+        ),
+        guards="loader 重跑把值蓋掉、basis 還留著——脫鉤必須看得見",
+    ),
+    Mutation(
+        name="loader 用 null 洗掉回填的日期",
+        path="loader/load_to_neo4j.py",
+        old="    sd.published_at = coalesce($published_at, sd.published_at),",
+        new="    sd.published_at = $published_at,",
+        test=(
+            "tests/test_alpha_as_of_projection.py::"
+            "test_the_loader_cannot_wipe_a_backfilled_date_with_null"
+        ),
+        guards="as-of 投影的唯一時間線索被靜默清空，且不會有任何東西報錯",
+    ),
+    Mutation(
+        name="價格往前補（拿未來的價當進場價）",
+        path="alpha/backtest.py",
+        old="        if not day or day > target:\n            continue",
+        new="        if not day:\n            continue",
+        test=(
+            "tests/test_alpha_backtest.py::"
+            "test_prices_are_never_carried_forward_from_the_future"
+        ),
+        guards="在一份專門檢查 lookahead 的模組裡，這是最不能犯的錯",
+    ),
+    Mutation(
+        name="缺價的標的被靜默丟棄",
+        path="alpha/backtest.py",
+        old="            missing.append(ticker)\n            continue",
+        new="            continue",
+        test=(
+            "tests/test_alpha_backtest.py::"
+            "test_missing_prices_are_named_not_silently_dropped"
+        ),
+        guards="L13：「排序沒用」與「資料缺一半」不得同形",
+    ),
+    Mutation(
+        name="算不出報酬時回 0.0 而不是 None",
+        path="alpha/backtest.py",
+        old="    if not returns:\n        return None, tuple(missing)",
+        new="    if not returns:\n        return 0.0, tuple(missing)",
+        test="tests/test_alpha_backtest.py::test_no_data_is_none_not_zero",
+        guards="L12：「沒資料」與「持平」是兩件事",
+    ),
+    Mutation(
+        name="先切前後段再剔除缺價",
+        path="alpha/backtest.py",
+        old="    half = len(priced) // 2\n    top, bottom = priced[:half], priced[-half:]",
+        new="    half = len(ranked) // 2\n    top, bottom = ranked[:half], ranked[-half:]",
+        test=(
+            "tests/test_alpha_backtest.py::"
+            "test_unpriced_names_are_removed_before_the_split_not_after"
+        ),
+        guards="缺價的多半是非美股，它們在排序裡不是均勻分布的",
+    ),
+    Mutation(
+        name="極端值不現形",
+        path="alpha/backtest.py",
+        old="        if not self.contributions:\n            return None",
+        new="        if True:\n            return None",
+        test=(
+            "tests/test_alpha_backtest.py::"
+            "test_the_dominant_name_is_surfaced_not_removed"
+        ),
+        guards="一檔 +334% 撐起整期價差，只看平均完全看不出來",
     ),
 )
 

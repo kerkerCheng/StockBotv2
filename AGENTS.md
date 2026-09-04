@@ -78,6 +78,23 @@
 
 ### 記憶層（持久知識庫）
 - **Neo4j 知識圖譜（引擎A）：** 供應鏈結構、技術關係、來源可追溯的主張。Property graph，不是 tree。
+
+  **⚠ 同一條「可否確定性重導」判準也適用圖的 metadata 回填（2026-09-04 使用者定案）。**
+  **`graph admission` 攔的是「新的知識主張」，不是「這個欄位在圖裡」。** 替**既有**
+  SourceDoc 補 `published_at`／`retrieved_at` 這類**印在文件上的事實**是 `mechanical`，
+  **不需 pq2**——那個日期本來就印在文件上，任何人重讀都得到同一個數。
+  讓**新的 claim／新的邊**進圖仍然是 pq2，一個字都不放寬；`substitutability`、
+  `sole_source`、`evidence_tier` 這類判讀屬性也一樣。
+  唯一走廊是 `scripts/backfill_source_dating.py`（規則在 `loader/source_dating.py`），
+  四道補償控制缺一它就變成繞過 admission 的後門（放行與收緊必須同時發生）：
+  ① 屬性白名單（只有那兩個日期欄位）；② `--basis` 必填並落地成節點屬性；
+  ③ 寫入值另存 `published_at_backfilled`，**basis 與現值脫鉤是可偵測的**；
+  ④ `published_at_method` 是封閉字彙，宣稱 `url_path` 的由 audit 拿當下的 url 重導。
+  ⚠ **字彙裡刻意沒有「抓到的那天」**——ingest 日期冒充 published_at 會讓所有東西看起來
+  都是最近才發表的，而回測會因此在每個歷史時點看到全部證據。
+  推不出日期的**留 null 並列進報告**（L11-5：「我找不到」≠「它不存在」）；留 null 的後果
+  是那份證據在 as-of 查詢中被排除**並計數**，是誠實的降級。
+  查證：`python -m audit invariants --only PointInTime`（覆蓋率、重導抽查、投影漏水一次看完）
 - **SQLite / Postgres 財務數據（引擎C）：** 財務快照、Watchlist Gate。零安裝預設用 SQLite；設 `POSTGRES_HOST`/`POSTGRES_DSN` 切換 Postgres。SQLite authority 已移至 ignored `library/private/engine_c/`，由 `library/private/runtime_pointer.json` 指向；ETL projection 可由 tracked schema 重建，但同庫的 append-only manual observation ledger 是 private authority，刪除／重建前必須先做 recovery backup，不能假設 Git 能救回。見 [`docs/solutions/tooling-decisions/engine-c-sqlite-dual-backend.md`](docs/solutions/tooling-decisions/engine-c-sqlite-dual-backend.md)。
 
   **⚠ Engine C 的 gate 按「可否確定性重導」畫，不按「存哪張表」畫（2026-09-04 使用者定案）。**

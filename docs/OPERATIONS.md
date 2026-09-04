@@ -58,6 +58,35 @@ python -m audit invariants --json       # 機器可讀（findings 不截斷）
 一個看了 0 筆資料的檢查，鑑別力與恆滅的閘門一樣是零（INV-5）。
 Neo4j 沒開時相關 check 顯示 `unavailable`，**不會**因此變成綠燈。
 
+⚠ `--only PointInTime` 會**實跑一次 as-of 投影**（取「最新證據日 −60 天」當 `as_of`），
+驗它沒有漏出未來的證據。所以它比其他 check 慢一點，也需要 Neo4j 開著。
+
+### SourceDoc 定日回填（mechanical，不需 pq2）
+
+```powershell
+python scripts/backfill_source_dating.py --list          # 誰還沒定日、擋住幾條 assertion
+python scripts/backfill_source_dating.py --batch loader/manifests/<file>.json --dry-run
+python scripts/backfill_source_dating.py --doc-id <id> --value 2026-02-03 `
+    --method url_path --basis "URL 路徑 fool.com/.../2026/02/03/"
+```
+
+判準與四道補償控制見 `AGENTS.md` 記憶層那段與 `loader/source_dating.py` 的 docstring。
+**這支寫不進任何 claim、邊或判讀屬性**——那些仍走 graph admission（pq2）。
+`--dry-run` 只驗不寫；已有值時要改必須 `--supersede`（舊值會留在 basis 裡）。
+回填紀錄留在 `loader/manifests/sourcedoc-dating-backfill-<date>.json`（可重放）。
+
+### 排序前段 vs 後段的等權報酬
+
+```powershell
+python scripts/rank_forward_returns.py                   # 預設 3 期、90 天
+python scripts/rank_forward_returns.py --epochs 2026-03-01 2026-06-01 --horizon 60 --json
+```
+
+排序取自 **as-of 投影**（不偷看未來），價格走 yfinance 已收盤序列。
+⚠ 輸出是**研究判斷的檢核，不是回測勝率**：期數個位數、標的高度集中在 AI 光互連。
+逐檔報酬與「這期主要由誰決定」是強制輸出——實測第一期幾乎全由 `SOI.PA` 一檔決定。
+問得太早時 as-of 保險絲會拒絕該期，那是正確行為，輸出會列出被拒的期數。
+
 ### Writer lock（雙向互斥，2026-09-02）
 
 同一 working tree 的排程與互動 session 靠 `library/leads/.writer_lock.json`

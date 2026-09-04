@@ -73,6 +73,8 @@ tags:
 | 證據充分度三階序數 | `shared/evidence_levels.py` 的 `LEVELS` | 次序本身是排序鍵。⚠ 2026-09-04 前 `decision_lab/sizing.py` 與 `alpha/levels.py` **各存一份**，靠一句註解同步而無測試——漂掉不報錯，只讓 `convert_axis_results` 對歷史 payload 靜默誤轉。兩層都消費它且它不擁有 authority → shared |
 | 軸 → authority 對照 | `decision_lab/sizing.py` 的 `AXIS_REFERENCE_AUTHORITIES` | 證據來源分權；它會擋下「拿 Engine A 文件冒充 Engine C 財務證據」這類錯誤 |
 | 觀測欄位的核准分級 | `config/engine_c_observation_fields.json` 的 `verifiability`（`mechanical`／`judgment`） | 決定寫入要不要 pq2。判準是**可否確定性重導**（L10「今天重新取一次拿得回來嗎」），不是「存哪張表」。⚠ 未宣告 fail safe 當 `judgment`；`mechanical` 換來寫入端強制 JSON 數值（拿掉人工閘門的補償控制）。與 `gate_member` 是不同的軸，但**交集必須為空** |
+| 圖 metadata 可回填的屬性 | `loader/source_dating.py` 的 `BACKFILLABLE_PROPERTIES`（`published_at`／`retrieved_at`） | 同一條「可否確定性重導」判準延伸到圖（2026-09-04）。**這是白名單不是黑名單**：擴充前先問「這個值是印在文件上、任何人重讀都得到同一個數嗎」。不是的話它是判讀，走 graph admission（pq2 `ra_admission`）。⚠ `substitutability`／`sole_source`／`evidence_tier` 永遠不得加進來 |
+| SourceDoc 定日方法 | `loader/source_dating.py` 的 `DATING_METHODS`（`url_path`／`filing_metadata`／`document_masthead`／`event_date`） | 每個 method 代表「一種可被接受的日期來源」，新增一個要同時想清楚 **audit 怎麼抽查它**（`audit/checks.py::check_point_in_time`）。⚠ **刻意沒有「抓到的那天」**：ingest 日期冒充 `published_at` 會讓所有東西看起來都是最近才發表的，回測會因此在每個歷史時點看到全部證據 |
 | 財務核驗清單五項 | `engine_c/checklist.py` 的 `items` | L9 前置條件 #3 的 Watchlist 升格 gate。`gate_pass` 對全體取 `all()`，加第六項會讓**所有既有標的**的 gate 退化 |
 | lead 狀態機 | `engine_b/leads.py` 的 `ALLOWED_TRANSITIONS` | 狀態是行為不是分類；加狀態本來就要加邏輯 |
 | thesis 生命週期狀態機 | `thesis/pending_lifecycle.py` 的 `ALLOWED_TRANSITIONS` | L7 的語意骨架；`retired` 刻意是終局。開啟它等於改變 thesis 的意義，不是補字彙 |

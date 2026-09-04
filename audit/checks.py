@@ -541,10 +541,150 @@ def check_alpha_lineage() -> AuditResult:
         note = () if store.exists() else (
             "⚠ ResearchContext 尚未持久化（無 contexts/ 目錄），"
             "本次只驗了 digest 存在與格式——**不等於 lineage 完整**。"
-            "完整驗證要等 Phase 6 的 as-of 投影落地。",)
+            "⚠ 這個缺口與 as-of 投影無關（投影已於 Phase 6 落地並由 PointInTime "
+            "check 驗證）：缺的是把 ResearchContext 落地成可解析的檔案。",)
         return ok("AlphaLineage", f"{examined} 份 signal 都帶 context digest", examined, note)
 
     return _guard("AlphaLineage", run)
+
+
+def check_point_in_time() -> AuditResult:
+    """**as-of 投影不得偷看未來**，且回填的日期指得回一手出處。
+
+    三件會 FAIL 的事，全部是「邏輯上不可能」而不是「數字不夠好」：
+
+    1. **投影漏出未來證據**——實跑一次 as-of 投影，若任何 `EvidenceRef` 的
+       `published_at` 晚於 `as_of`，回測就在看未來。這是本 check 的核心，
+       也是唯一在**活資料**上驗 anti-lookahead 的地方。
+    2. **`published_at` 晚於 `retrieved_at`**——我們不可能在它發表前就抓到它。
+    3. **回填的 basis 與現值脫鉤**——`url_path` 重導不出來，或有東西把值改掉了
+       而 basis 還留著（`loader/source_dating.py::audit_backfills`）。
+
+    ⚠ **覆蓋率只報告，不當 FAIL 條件。** 「published_at 覆蓋 ≥95%」是 ROADMAP 的
+    交付目標，不是不變式：把它寫成 gate 等於新增一個從未被量測過的閘門（L14），
+    而它擋下的會是「還沒補完」而不是「答錯了」。真正危險的是**填了但填錯**，
+    那三件事上面都攔了。13 份未定日文件仍逐筆列出——沒有到期的等待會沉底，
+    沒有現形的缺口也一樣。
+    """
+    def run() -> AuditResult:
+        from loader.source_dating import audit_backfills
+
+        findings: list[str] = []
+        soft: list[str] = []
+        examined = 0
+
+        docs = sources.graph_rows(
+            "MATCH (d:SourceDoc) RETURN count(d) AS total, "
+            "count(d.published_at) AS dated")[0]
+        assertions = sources.graph_rows("MATCH (a:EdgeAssertion) RETURN count(a) AS n")[0]
+        datable = sources.graph_rows(
+            "MATCH (a:EdgeAssertion)-[:CITES]->(d:SourceDoc) "
+            "WHERE d.published_at IS NOT NULL RETURN count(DISTINCT a) AS n")[0]
+        examined += int(docs["total"]) + int(assertions["n"])
+
+        # ① 不可能的時間順序
+        impossible = sources.graph_rows(
+            "MATCH (d:SourceDoc) WHERE d.published_at IS NOT NULL "
+            "  AND d.retrieved_at IS NOT NULL AND d.published_at > d.retrieved_at "
+            "RETURN d.id AS id, d.published_at AS p, d.retrieved_at AS r")
+        findings.extend(
+            f"{row['id']} 的 published_at={row['p']} 晚於 retrieved_at={row['r']}"
+            "——不可能在它發表之前就抓到它"
+            for row in impossible)
+
+        # ② 回填的 provenance 抽查
+        backfilled = sources.graph_rows(
+            "MATCH (d:SourceDoc) WHERE d.published_at_method IS NOT NULL "
+            "RETURN d.id AS id, d.url AS url, d.published_at AS published_at, "
+            "       d.published_at_method AS method, d.published_at_basis AS basis, "
+            "       d.published_at_backfilled AS backfilled")
+        examined += len(backfilled)
+        findings.extend(audit_backfills(backfilled))
+
+        # ③ 活資料上實跑一次 as-of 投影，驗它沒有漏出未來
+        leaked = _projection_leaks()
+        findings.extend(leaked)
+
+        undated = sources.graph_rows(
+            "MATCH (d:SourceDoc) WHERE d.published_at IS NULL "
+            "OPTIONAL MATCH (a:EdgeAssertion)-[:CITES]->(d) "
+            "RETURN d.id AS id, count(DISTINCT a) AS n ORDER BY n DESC, d.id")
+        if undated:
+            soft.append(
+                f"⚠ {len(undated)} 份 SourceDoc 仍未定日，擋住 "
+                f"{sum(int(r['n']) for r in undated)} 條 EdgeAssertion——"
+                "它們在任何 as-of 查詢裡都會被排除並計為 undated（L11-5：留 null "
+                "比猜一個日期誠實）。查證：python scripts/backfill_source_dating.py --list")
+            soft.extend(f"未定日：{r['id']}（擋住 {r['n']} 條）" for r in undated[:6])
+
+        summary = (
+            f"SourceDoc published_at {docs['dated']}/{docs['total']}"
+            f"（{int(docs['dated']) / max(int(docs['total']), 1):.1%}）"
+            f"；EdgeAssertion 可定日 {datable['n']}/{assertions['n']}"
+            f"（{int(datable['n']) / max(int(assertions['n']), 1):.1%}）"
+            f"；已回填 {len(backfilled)} 份且 basis 全部指得回去"
+        )
+        if findings:
+            return fail("PointInTime", f"{len(findings)} 筆 point-in-time 違規",
+                        _clip(findings + soft), examined)
+        return ok("PointInTime", summary, examined, _clip(soft))
+
+    return _guard("PointInTime", run)
+
+
+def _projection_leaks() -> list[str]:
+    """實跑一次 as-of 投影，回傳漏出未來的證據（空 list ＝ 沒漏）。
+
+    ⚠ 這裡刻意**不 mock**：型別與測試已經在 `tests/test_alpha_as_of_projection.py`
+    守過純函式，本 check 要答的是另一個問題——**線上這份圖、這個 provider，
+    今天真的沒有漏嗎**。L13：元件會動不等於端到端有效。
+    """
+    from datetime import timedelta
+
+    from alpha.errors import PointInTimeUnsupported
+
+    bounds = sources.graph_rows(
+        "MATCH (d:SourceDoc) WHERE d.published_at IS NOT NULL "
+        "RETURN min(d.published_at) AS lo, max(d.published_at) AS hi")[0]
+    if not bounds.get("hi"):
+        raise SourceUnavailable("圖上沒有任何 published_at——無從驗 as-of 投影")
+
+    from query.bottleneck import latest_possible_date
+
+    newest = latest_possible_date(bounds["hi"])
+    oldest = latest_possible_date(bounds["lo"])
+    if newest is None or oldest is None:
+        raise SourceUnavailable(f"published_at 邊界讀不成日期：{bounds}")
+    # 取一個**中間**的時點：太早會被保險絲擋下（那是正確行為但驗不到漏水），
+    # 太晚則沒有未來證據可漏。
+    as_of = max(oldest, newest - timedelta(days=60))
+
+    from alpha.providers.graph_neo4j import Neo4jGraphResearchProvider
+
+    with sources.graph_session() as session:
+        class _Driver:
+            def session(self):  # noqa: D401 — 借用既有 session，不另開連線
+                from contextlib import nullcontext
+                return nullcontext(session)
+
+        provider = Neo4jGraphResearchProvider(driver=_Driver())
+        try:
+            rows = provider.get_bottlenecks(as_of=as_of)
+        except PointInTimeUnsupported as exc:
+            raise SourceUnavailable(f"as-of 投影拒絕了 {as_of}：{exc}") from exc
+
+    leaks: list[str] = []
+    for row in rows:
+        for ref in row.evidence:
+            if ref.published_at is None:
+                leaks.append(
+                    f"as_of={as_of} 的投影裡有未定日證據 {ref.ref}"
+                    "——未定日必須在投影前就被排除，留在裡面等於當成過去")
+            elif ref.published_at > as_of:
+                leaks.append(
+                    f"as_of={as_of} 的投影漏出 {ref.ref}"
+                    f"（published_at={ref.published_at}）——回測在看未來")
+    return leaks
 
 
 def check_decision_lineage() -> AuditResult:

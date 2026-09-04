@@ -330,8 +330,11 @@ def cap_point_in_time_boundary() -> dict:
     return {
         "assertion_dated_coverage": a,
         "claim_dated_coverage": c,
-        "note": "🔴 canonical edge **完全沒有時間欄位**；唯一時間線索是 "
-                "CITES → SourceDoc.published_at。Phase 6 的驗收是把 dated 比例推到 ≥95%",
+        "note": "canonical edge **仍然沒有時間欄位**；唯一時間線索是 "
+                "CITES → SourceDoc.published_at。Phase 6（2026-09-04）把 assertion "
+                "dated 比例從 382/662（58%）推到 645/662（97%），as-of 投影已上線。"
+                "⚠ 這個 fixture 之後**應該保持穩定**：它再往下掉代表有東西在清空 "
+                "published_at（`loader` 的 coalesce 是那道剎車），往上跳則是又補了回填。",
     }
 
 

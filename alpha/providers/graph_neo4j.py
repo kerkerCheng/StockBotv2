@@ -6,15 +6,27 @@
 **不做**：不新寫 Cypher 排序邏輯、不重算結構分、不另建平行排序。
 `rank_bottlenecks()` 仍是唯一的結構排序權威（`AGENTS.md` 硬契約）。
 
-## as-of：明確拒絕，不靜默降級
+## as-of：真的投影（Phase 6），但保險絲沒有拿掉
 
-Engine A **今天沒有 point-in-time 能力**——canonical edge 完全沒有時間欄位，
-屬性是對所有 assertion 的當前投影；唯一時間線索是 `CITES → SourceDoc.published_at`，
-覆蓋率只有 **382/662（58%）**（`current-architecture.md` §4.2 實測）。
+canonical edge 仍然沒有時間欄位——唯一的時間線索還是
+`CITES → SourceDoc.published_at`。**投影就是靠它做的**：把 assertion 依
+「引用的文件在 `as_of` 之前發表過沒有」篩一次，再交給 `rank_bottlenecks`。
 
-所以帶 `as_of` 呼叫時**一律拋 `PointInTimeUnsupported`**，不回傳當前資料。
-L13：成功與失敗若在同一個訊號上同形，回測就會靜默看到未來。
-as-of 投影是 Phase 6 的工作；在那之前這道保險絲必須響。
+⚠ **順序不可顛倒。** 過濾必須在排序**之前**：`rank_bottlenecks` 是在 assertion 上
+collapse 屬性、判證據等級、走需求鏈的，先排序再砍列會留下用未來文件算出來的
+`substitutability` 與 `evidence`——列是對的，值是偷看來的，而那是 lookahead
+最難察覺的形式。
+
+⚠ **未定日一律排除並計數。** 「我找不到日期」不等於「它在 T 之前」（L11-5）。
+
+**保險絲從「一律拒絕」換成「投影不存在時拒絕」，不是拿掉**（`_rank` 裡兩處
+`PointInTimeUnsupported`）：圖上完全沒有 `published_at`、或 `as_of` 早於最早的
+證據時，回空 list 會與「那天真的沒有瓶頸」同形（L13），所以那兩種情況仍然拋。
+
+Phase 6 回填後的實測覆蓋：SourceDoc `published_at` **187/200（93.5%）**、
+EdgeAssertion 可定日 **645/662（97.4%）**。查證：
+`MATCH (a:EdgeAssertion)-[:CITES]->(d:SourceDoc) WHERE d.published_at IS NOT NULL
+RETURN count(DISTINCT a)`
 """
 from __future__ import annotations
 
@@ -66,13 +78,11 @@ def _link_confidence(confidence: float | None) -> ImpactConfidence:
     return ImpactConfidence.LOW
 
 
-def _reject_as_of(as_of: date | None) -> None:
-    if as_of is not None:
-        raise PointInTimeUnsupported(
-            f"Engine A 目前無法回答 as_of={as_of} 的圖狀態："
-            "canonical edge 沒有時間欄位，屬性是對所有 assertion 的當前投影。"
-            "as-of 投影是 Phase 6 的工作；回傳當前資料會讓回測靜默看到未來"
-        )
+#: 一份投影至少要看得到幾條已定日 assertion 才算「投影存在」。
+#: ⚠ 這不是品質門檻，是**存在性**門檻：`0` 代表圖上完全沒有時間資訊
+#: （例如重建過的空庫、或 `published_at` 尚未回填），那時候唯一誠實的回答是
+#: 「我答不了」，不是「那天沒有瓶頸」。
+_MIN_DATED_FOR_PROJECTION = 1
 
 
 @dataclass(slots=True)
@@ -83,35 +93,99 @@ class Neo4jGraphResearchProvider:
     registry: Any = None
     min_substitutability: int = 4
     _ranked: Mapping[str, Any] | None = None
+    _projections: dict[date, Mapping[str, Any]] | None = None
+    #: 注入的原始 assertion（測試用的縫）。**as-of 投影必須在 assertion 上做**，
+    #: 所以 `_ranked` 那個縫不夠——注入排序結果的測試無法驗投影。
+    _assertion_rows: Sequence[Mapping[str, Any]] | None = None
 
     # ---- 內部：取一次排序，快取在 instance 上（不落地成第二個 authority）----
-    def _rank(self) -> Mapping[str, Any]:
-        if self._ranked is None:
-            from identity.registry import get_registry
-            from query.bottleneck import fetch_assertions, rank_bottlenecks
+    def _assertions(self) -> list[Mapping[str, Any]]:
+        from query.bottleneck import fetch_assertions
 
-            with self.driver.session() as session:
-                assertions = fetch_assertions(session)
-            self._ranked = rank_bottlenecks(
-                assertions,
-                self.registry or get_registry(),
-                min_substitutability=self.min_substitutability,
+        if self._assertion_rows is not None:
+            return list(self._assertion_rows)
+        with self.driver.session() as session:
+            return fetch_assertions(session)
+
+    def _rank(self, as_of: date | None = None) -> Mapping[str, Any]:
+        """`as_of=None` ＝ 當前視角；給日期則走 as-of 投影。
+
+        ⚠ **投影不是「排序完再過濾」**：`rank_bottlenecks` 是在 assertion 上
+        collapse 屬性、分類證據等級、走需求鏈的，所以過濾必須發生在**它之前**。
+        先排序再砍列會留下用未來文件算出來的 `substitutability` 與 `evidence`，
+        那正是 lookahead 最隱蔽的形式——列是對的，值是偷看來的。
+        """
+        from identity.registry import get_registry
+        from query.bottleneck import project_assertions_as_of, rank_bottlenecks
+
+        if as_of is None:
+            if self._ranked is None:
+                self._ranked = rank_bottlenecks(
+                    self._assertions(),
+                    self.registry or get_registry(),
+                    min_substitutability=self.min_substitutability,
+                )
+            return self._ranked
+
+        if self._projections is None:
+            self._projections = {}
+        if as_of in self._projections:
+            return self._projections[as_of]
+
+        projection = project_assertions_as_of(self._assertions(), as_of)
+        if projection.dated_total < _MIN_DATED_FOR_PROJECTION:
+            # **保險絲仍然在。** 它從「as-of 一律拒絕」換成「投影不存在時拒絕」，
+            # 不是拿掉——L13：成功與失敗若在同一個訊號上同形，回測會靜默看到未來。
+            # 這裡的同形風險是「回空 list」：那與「那天真的沒有瓶頸」長得一樣。
+            raise PointInTimeUnsupported(
+                f"無法投影到 as_of={as_of}：{projection.input_count} 條 EdgeAssertion "
+                "沒有任何一條引用得到帶 published_at 的 SourceDoc。"
+                "圖上沒有時間資訊時，唯一誠實的回答是『答不了』，不是『那天沒有瓶頸』。"
+                "先跑 scripts/backfill_source_dating.py --list 看缺哪些"
             )
-        return self._ranked
+        if not projection.rows:
+            raise PointInTimeUnsupported(
+                f"as_of={as_of} 早於圖上最早的證據發表日：{projection.dated_total} 條"
+                f"已定日 assertion 全部晚於它（另有 {projection.excluded_undated} 條未定日）。"
+                "回傳空排序會與『那天沒有任何瓶頸』同形，所以這裡拒絕"
+            )
+        ranked = dict(rank_bottlenecks(
+            projection.rows,
+            self.registry or get_registry(),
+            min_substitutability=self.min_substitutability,
+        ))
+        # 投影自己的計數必須跟著資料走（L16），否則消費端會把
+        # 「as-of 篩掉一半」讀成「這家公司本來就沒幾條邊」。
+        ranked["coverage"] = dict(ranked.get("coverage") or {}) | {
+            "as_of": as_of.isoformat(),
+            "as_of_input_assertions": projection.input_count,
+            "as_of_excluded": projection.reasons(),
+            "as_of_dated_total": projection.dated_total,
+        }
+        self._projections[as_of] = ranked
+        return ranked
 
     def _row_evidence(self, row: Mapping[str, Any]) -> tuple[EvidenceRef, ...]:
         """由排序列組出 `EvidenceRef`。
 
         ⚠ **`documents` 是注意力指標，不參與排序**（`bottleneck.py` 已明文排除），
         但它**是 provenance**——每份文件都要能被列出來，否則 provider 就在隱藏證據。
+
+        ⚠ **`published_at` 一定要帶。** 沒有它，`select_point_in_time_evidence`
+        會把每一條證據都判成 `excluded_undated`——as-of 投影明明篩對了列，
+        證據卻在下一關全數被丟掉，而丟掉的理由（未定日）與「真的沒有證據」同形。
+        這條邊的日期取所有引用文件中**最早**的一份：它回答「這條邊最早什麼時候
+        說得出來」，也保證投影留下的列一定通過 as-of 篩選。
         """
         evidence_class = str(row.get("evidence") or "")
         tier = _EVIDENCE_CLASS_TIER.get(evidence_class)
+        published = _date_or_none(row.get("published_at"))
         refs = [
             EvidenceRef(
                 ref=f"graph://edge/{row.get('company_id')}/{row.get('relation')}/"
                     f"{row.get('bottleneck')}",
                 kind="graph_edge",
+                published_at=published,
                 # ⚠ **不得把被分析的公司填成 origin_entity。**
                 # 第一版這樣做，於是 L8 獨立性永遠只看到 1 個來源，
                 # 把 COHR 的 Q1 從 declared 0.9 壓成 effective 0.0——
@@ -124,11 +198,16 @@ class Neo4jGraphResearchProvider:
                 evidence_tier=tier,
             )
         ]
+        # 每份文件用**它自己的**發表日，不是整條邊的最早日：
+        # 邊的日期回答「最早何時說得出來」，文件的日期回答「這一份何時出現」，
+        # 兩者混用會讓晚出的佐證看起來早就存在（L12：一個表示兩種語意）。
+        dates = row.get("source_dates") or {}
         for source in (row.get("sources") or []):
             refs.append(EvidenceRef(
                 ref=f"graph://source/{source}", kind="source_doc",
                 source_doc_id=str(source), evidence_class=evidence_class or None,
                 evidence_tier=tier,
+                published_at=_date_or_none(dates.get(source)) or published,
             ))
         return tuple(refs)
 
@@ -137,8 +216,8 @@ class Neo4jGraphResearchProvider:
         self, *, sector: str | None = None, min_substitutability: int = 4,
         as_of: date | None = None,
     ) -> Sequence[BottleneckRow]:
-        _reject_as_of(as_of)
-        rows = self._rank().get("rows") or []
+        ranked = self._rank(as_of)
+        rows = ranked.get("rows") or []
         out: list[BottleneckRow] = []
         for row in rows:
             if sector and str(row.get("demand_anchor") or "") != sector:
@@ -175,10 +254,10 @@ class Neo4jGraphResearchProvider:
     def get_company_structural_context(
         self, company_id: CompanyId, *, as_of: date | None = None
     ) -> StructuralContext:
-        _reject_as_of(as_of)
-        rows = [r for r in (self._rank().get("rows") or [])
+        ranked = self._rank(as_of)
+        rows = [r for r in (ranked.get("rows") or [])
                 if str(r.get("company_id")) == str(company_id)]
-        structural = [r for r in (self._rank().get("structural_rows") or [])
+        structural = [r for r in (ranked.get("structural_rows") or [])
                       if str(r.get("company_id")) == str(company_id)]
         evidence: list[EvidenceRef] = []
         for row in rows:
@@ -207,9 +286,8 @@ class Neo4jGraphResearchProvider:
     def get_dependency_paths(
         self, company_id: CompanyId, *, max_hops: int = 3, as_of: date | None = None
     ) -> Sequence[CausalPath]:
-        _reject_as_of(as_of)
         paths: list[CausalPath] = []
-        for row in self._rank().get("rows") or []:
+        for row in self._rank(as_of).get("rows") or []:
             if str(row.get("company_id")) != str(company_id):
                 continue
             chain = [str(c) for c in (row.get("chain") or [])]
@@ -235,8 +313,7 @@ class Neo4jGraphResearchProvider:
         （它反映「我們研究了幾家」不是「世界上有幾家」），但「有沒有第二家」
         對 disproof 是實質資訊。
         """
-        _reject_as_of(as_of)
-        rows = self._rank().get("rows") or []
+        rows = self._rank(as_of).get("rows") or []
         mine = {str(r.get("bottleneck")) for r in rows
                 if str(r.get("company_id")) == str(company_id)}
         paths: list[CausalPath] = []
@@ -259,9 +336,8 @@ class Neo4jGraphResearchProvider:
         self, company_id: CompanyId, *,
         direction: Literal["upstream", "downstream"], as_of: date | None = None,
     ) -> Sequence[SupplyExposure]:
-        _reject_as_of(as_of)
         out: list[SupplyExposure] = []
-        for row in self._rank().get("rows") or []:
+        for row in self._rank(as_of).get("rows") or []:
             if str(row.get("company_id")) != str(company_id):
                 continue
             relation = str(row.get("relation") or "")
@@ -521,10 +597,126 @@ class Neo4jGraphResearchProvider:
     def get_structural_changes_since(
         self, since: date, *, company_id: CompanyId | None = None
     ) -> Sequence[StructuralEvent]:
-        raise NotImplementedError(
-            "StructuralEvent 偵測是 Phase 5。需要 as-of 投影才知道「變了什麼」，"
-            "而那是 Phase 6 的前置"
-        )
+        """Phase 5b：比對 `since` 的投影與當前圖，找出**結構事實變了什麼**。
+
+        ## 它為什麼非等 as-of 投影不可
+
+        「變了什麼」＝兩個時點的差。沒有投影就只有「現在長什麼樣」，
+        任何「變化」都只能靠 `updated_at` 猜——而那是**我們何時寫進去**，
+        不是**世界何時改變**（F-27 的形狀：ingest 時間冒充事件時間）。
+
+        ## ⚠ 這裡偵測到的，嚴格說是「世界在窗內產出了新文件」
+
+        投影是按 `published_at` 篩的，所以差集裡的每一條都**至少有一份在
+        `since` 之後發表的文件**在支持它。這排除了最大的雜訊來源——
+        「我們補讀了一份 2023 年的舊文件」不會產生事件（那是知識補登，
+        不是結構變化）。
+
+        但它**不排除**「新文件描述一個一直都成立的舊事實」。所以每個事件的
+        `evidence` 都帶著那份文件與它的發表日，讀的人自己判斷；
+        `description` 也逐字寫出圖上是哪個屬性從什麼變成什麼。
+        **不得把這個輸出當成「世界確實改變了」的證據。**
+
+        ## kind 是九個字彙裡最接近的一個，不是獨立觀測
+
+        `config/structural_event_kinds.json` 的字彙是為「供給側事件」設計的，
+        而這裡看到的是圖屬性的差。對應只做三種**講得出因果機制**的：
+        新供應商出現 → `substitution`（loosening）；`sole_source` 轉真或
+        `substitutability` 上升 → `capacity_constraint`（tightening）；
+        `qualification_status` 前進 → `qualification`（tightening）。
+        其餘的差（confidence 變動、證據等級提升）**刻意不產生事件**——
+        那些量的是我們讀了幾份文件，不是世界（同 `documents` 不參與排序的理由）。
+        """
+        import hashlib
+
+        before = {(r["company_id"], r["relation"], r["bottleneck"]): r
+                  for r in (self._rank(since).get("rows") or [])}
+        now = {(r["company_id"], r["relation"], r["bottleneck"]): r
+               for r in (self._rank().get("rows") or [])}
+        known_targets = {str(r["bottleneck"]) for r in before.values()}
+
+        events: list[StructuralEvent] = []
+        for key, row in sorted(now.items()):
+            if company_id is not None and str(row.get("company_id")) != str(company_id):
+                continue
+            refs = self._row_evidence(row)
+            # ⚠ **事件日必須來自窗內新到的那份文件**，不是整條邊的最早引用日。
+            # 首跑時用後者，於是 `since=2026-06-30` 產出 `observed_at=2026-03-06`
+            # 的「變化」——一個發生在觀察窗開始之前的事件，自相矛盾。
+            # 成因是差集同時混了兩件事：真的新邊，與**舊邊剛跨過 sub>=4 門檻**
+            # （早期 assertion 沒填 substitutability，晚到的那份才填）。
+            # 窗內沒有任何新文件 → 沒有新資訊 → 不是事件，是屬性收斂的副作用。
+            arrived = tuple(
+                ref for ref in refs
+                if ref.published_at is not None and ref.published_at > since)
+            if not arrived:
+                continue
+            # ⚠ **這裡刻意沒有 try/except。** 第一版包了一層
+            # `except Exception: continue`（理由是「契約拒收就不產生事件」），
+            # 而它把上面那道窗內判斷變成了**無法被測到的死碼**：拿掉判斷後
+            # `StructuralEvent` 因為 evidence 空而被契約拒收，例外被吞掉，
+            # 結果與「正確地不產生事件」完全同形（L13）——突變測試就是這樣抓到的。
+            # `arrived` 非空 ⇒ evidence 非空，契約本來就不會拒；id 若不合規，
+            # 那是 identity 問題（INV-1 的 `Identity` check 負責），該吵不該吞。
+            observed = min(ref.published_at for ref in arrived)
+            old = before.get(key)
+            for kind, direction, what in self._structural_diff(old, row, known_targets):
+                digest = hashlib.sha256(
+                    "|".join([kind, direction, *map(str, key), str(observed)])
+                    .encode("utf-8")).hexdigest()[:16]
+                events.append(StructuralEvent(
+                    event_id=f"se_{digest}",
+                    kind=kind,
+                    subject_id=EntityId(str(row["bottleneck"])),
+                    direction=direction,
+                    observed_at=observed,
+                    description=(
+                        f"{row['company_id']} {row['relation']} {row['bottleneck']}："
+                        f"{what}（{since} 之後發表的文件帶進來的，"
+                        "**不等於世界在這段期間才改變**）"),
+                    evidence=arrived,
+                ))
+        return tuple(events)
+
+    @staticmethod
+    def _structural_diff(
+        old: Mapping[str, Any] | None,
+        new: Mapping[str, Any],
+        known_targets: set[str],
+    ) -> list[tuple[str, str, str]]:
+        """`(kind, direction, 人類可讀的變化)`。看不出**因果機制**的差不產生事件。"""
+        out: list[tuple[str, str, str]] = []
+        if old is None:
+            # ⚠ **第一個已知供應商不是「替代」。** 這條瓶頸在 `since` 時我們一個
+            # 供應商都不知道，代表我們那時候還沒研究這個領域——把它報成
+            # 「可替代性上升」，就是讓「我們開了一條新研究線」看起來像
+            # 「世界鬆了」。那是 `documents` 不參與排序的同一個理由。
+            if str(new.get("bottleneck")) not in known_targets:
+                return out
+            out.append(("substitution", "loosening",
+                        f"這個瓶頸多了一個已知供應商（sub={new.get('substitutability')}）"))
+            return out
+        old_sub, new_sub = old.get("substitutability"), new.get("substitutability")
+        if isinstance(old_sub, int) and isinstance(new_sub, int) and new_sub != old_sub:
+            out.append((
+                "capacity_constraint",
+                "tightening" if new_sub > old_sub else "loosening",
+                f"substitutability {old_sub} → {new_sub}"))
+        if bool(new.get("sole_source")) and not bool(old.get("sole_source")):
+            out.append(("capacity_constraint", "tightening",
+                        "sole_source 由否轉是"))
+        elif bool(old.get("sole_source")) and not bool(new.get("sole_source")):
+            out.append(("capacity_constraint", "loosening",
+                        "sole_source 由是轉否"))
+        old_q = str(old.get("qualification_status") or "")
+        new_q = str(new.get("qualification_status") or "")
+        if new_q != old_q:
+            from query.bottleneck import QUALIFICATION_RANK
+
+            advanced = QUALIFICATION_RANK.get(new_q, 0) > QUALIFICATION_RANK.get(old_q, 0)
+            out.append(("qualification", "tightening" if advanced else "loosening",
+                        f"qualification_status {old_q or '（無）'} → {new_q or '（無）'}"))
+        return out
 
     def get_claim_evidence(self, claim_id: str) -> Sequence[EvidenceRef]:
         from query.graph_context import _Q_COMPANY_CLAIMS  # noqa: F401  (存在性檢查)

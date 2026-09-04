@@ -155,13 +155,25 @@ c.execute('SELECT COUNT(*), COUNT(bar_date) FROM financial_snapshots'); print(c.
 今天投影出來的 `sole_source=true` 可能來自 2026-08 的文件，但你無法從 edge 本身知道
 它在 2026-06-30 是不是已經成立。
 
-唯一的時間線索是 `Claim/EdgeAssertion -[:CITES]-> SourceDoc.published_at`，而覆蓋率是：
+唯一的時間線索是 `Claim/EdgeAssertion -[:CITES]-> SourceDoc.published_at`，而覆蓋率是
+（**下表是 2026-09-03 Phase 0 的盤點值，是歷史記錄；現況見表後的 Phase 6 更新**）：
 
-| 路徑 | 有 `published_at` 的比例 |
+| 路徑 | 有 `published_at` 的比例（2026-09-03 實測） |
 |---|---|
 | EdgeAssertion → SourceDoc | **382 / 662（58%）** |
 | Claim → SourceDoc | **300 / 372（81%）** |
 | SourceDoc 本身 | 166 / 200（83%），範圍 2022-08-22 → 2026-08-31 |
+
+> **⚠ 2026-09-04 Phase 6 更新——本節的「結論」已不再成立。**
+> 回填 21 份 SourceDoc 後：EdgeAssertion **645 / 662（97.4%）**、
+> Claim **359 / 372（96.5%）**、SourceDoc **187 / 200（93.5%）**。
+> 三個前置條件的現況：①**部分達成**（13 份留 null，多為無出版日的常設產品頁，
+> L11-5 判定留 null 比猜日期誠實）；②③**已達成**——
+> `query/bottleneck.py::project_assertions_as_of` ＋
+> `Neo4jGraphResearchProvider._rank(as_of)`，且過濾發生在 `rank_bottlenecks` **之前**，
+> 所以屬性投影本身就是 as-of 投影而不是「當前投影再砍列」。
+> 查證：`python -m audit invariants --only PointInTime`（它會實跑一次投影驗沒漏水）。
+> **本節其餘文字保留原樣**：它記錄的是動工前的狀態，不隨現況改寫。
 
 查證：
 ```

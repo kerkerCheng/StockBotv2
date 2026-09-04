@@ -42,14 +42,18 @@ def test_unimplemented_checks_report_not_implemented_not_pass() -> None:
         assert result.summary == "not_implemented"
 
 
-def test_the_two_remaining_skips_are_the_ones_we_said_they_are() -> None:
-    """剩下沒實作的必須**恰好**是 Phase 4／6 那兩個。
+def test_the_remaining_skip_is_the_one_we_said_it_is() -> None:
+    """剩下沒實作的必須**恰好**是 Phase 4 的 `GateDiscrimination`。
 
     ⚠ 這條擋的是「悄悄把一個實作不出來的 check 改回 `run=None`」——
     那會讓報表變綠，而變綠的原因是檢查被拿掉了。
+
+    ⚠ `PointInTime` 已於 Phase 6 實作（2026-09-04），所以從這個集合移除。
+    **移除一個名字必須伴隨它真的被實作**，不是為了讓這條通過而改清單：
+    `check_point_in_time` 會實跑一次 as-of 投影驗它沒漏出未來。
     """
     pending = {c.name for c in audit.all_checks() if c.run is None}
-    assert pending == {"GateDiscrimination", "PointInTime"}
+    assert pending == {"GateDiscrimination"}
 
 
 def test_output_says_skipped_is_not_pass() -> None:

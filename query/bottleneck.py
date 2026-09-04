@@ -36,11 +36,13 @@
 """
 from __future__ import annotations
 
+import calendar
 import json
 import os
 import re
 from collections import defaultdict
 from dataclasses import dataclass, field
+from datetime import date
 from typing import Any, Iterable, Mapping
 
 # 向下（找瓶頸）的邊型：只有這些的 substitutability 有意義。
@@ -242,6 +244,10 @@ class CanonicalEdge:
     origins: set = field(default_factory=set)
     filing_origins: set = field(default_factory=set)
     evidence: str = "self_reported"
+    #: 引用到的 SourceDoc id → 它的 `published_at`（字串或 None）。
+    #: ⚠ 這是 point-in-time 的唯一時間線索：canonical edge 本身沒有時間欄位，
+    #: 「這條邊在 T 那天存不存在」只能由「引用它的文件在 T 之前發表過沒有」回答。
+    source_docs: dict = field(default_factory=dict)
 
 
 def collapse_assertions(rows: Iterable[Mapping[str, Any]]) -> dict[tuple, CanonicalEdge]:
@@ -280,6 +286,12 @@ def collapse_assertions(rows: Iterable[Mapping[str, Any]]) -> dict[tuple, Canoni
             grouped[key] = edge
         edge.documents += 1
         edge.confidence = max(edge.confidence, conf)
+        doc_id = row.get("source_doc_id")
+        if doc_id:
+            # ⚠ 同一份文件可能被多條 assertion 引用；後者的 published_at 若為 None
+            # 不得覆蓋已知值（`or` 而不是直接指派）。
+            edge.source_docs[str(doc_id)] = (
+                row.get("published_at") or edge.source_docs.get(str(doc_id)))
         if row.get("origin"):
             edge.origins.add(str(row["origin"]))
             if str(row.get("source_type") or "") == "filing":
@@ -407,6 +419,14 @@ def rank_bottlenecks(
                 "evidence": edge.evidence,
                 "confidence": edge.confidence,
                 "documents": edge.documents,
+                # provenance：`documents` 只是計數（注意力指標，不參與排序），
+                # `sources` 才讓下游列得出**是哪幾份**。`published_at` 取所有已知
+                # 引用日期中最早的一個——它回答「這條邊最早什麼時候說得出來」。
+                "sources": sorted(edge.source_docs),
+                "source_dates": {k: (str(v) if v else None)
+                                 for k, v in sorted(edge.source_docs.items())},
+                "published_at": min(
+                    (str(v) for v in edge.source_docs.values() if v), default=None),
                 "chain": chain,
                 "demand_anchor": chain[0] if chain else None,
                 "demand_hops": (len(chain) - 1) if chain else None,
@@ -485,9 +505,91 @@ def fetch_assertions(session) -> list[dict[str, Any]]:
         OPTIONAL MATCH (d:SourceDoc {id: e.source_doc_id})
         RETURN e.src_id AS src, e.relation AS relation, e.dst_id AS dst,
                e.attributes AS attributes, e.confidence AS confidence,
-               d.origin_entity AS origin, d.source_type AS source_type
+               d.origin_entity AS origin, d.source_type AS source_type,
+               e.source_doc_id AS source_doc_id, d.published_at AS published_at
         """
     ).data()
+
+
+# ---------------------------------------------------------------------------
+# Point-in-time：as-of 投影（Phase 6）
+# ---------------------------------------------------------------------------
+
+def latest_possible_date(text: Any) -> date | None:
+    """把 `published_at` 字串讀成「**它最晚可能是哪一天**」。
+
+    ⚠ 圖上的 `published_at` 有兩種精度：完整日期（`2026-06-02`）與只有年月
+    （`2025-12`，實測 2 筆）。字串比大小會讓 `2025-12` 在 `2025-12-01` 就可見，
+    而它其實可能是 12/31 發表的——那是 lookahead。同一個欄位承載兩種精度是
+    L12 的形狀，修法不是排除它，是**讓兩邊各自有正確的規則**：年月精度一律
+    取當月最後一天（保守），完整日期照用。
+
+    讀不懂就回 `None`，由呼叫端當成「未定日」排除並計數，不猜。
+    """
+    if not text:
+        return None
+    raw = str(text).strip()
+    if len(raw) >= 10:
+        try:
+            return date.fromisoformat(raw[:10])
+        except ValueError:
+            return None
+    match = re.fullmatch(r"(\d{4})-(\d{2})", raw)
+    if not match:
+        return None
+    year, month = int(match[1]), int(match[2])
+    if not 1 <= month <= 12:
+        return None
+    last = calendar.monthrange(year, month)[1]
+    return date(year, month, last)
+
+
+@dataclass(frozen=True)
+class AsOfProjection:
+    """`as_of` 那天看得到的 assertion，**以及被排除的計數**。
+
+    計數不是裝飾：沒有它，「as-of 之後證據變少」與「本來就沒有證據」在下游同形
+    （INV-3 no silent drop／L13）。
+    """
+
+    as_of: date
+    rows: tuple[Mapping[str, Any], ...]
+    excluded_future: int = 0
+    excluded_undated: int = 0
+    dated_total: int = 0
+
+    @property
+    def input_count(self) -> int:
+        return len(self.rows) + self.excluded_future + self.excluded_undated
+
+    def reasons(self) -> dict[str, int]:
+        return {"published_after_as_of": self.excluded_future,
+                "undated": self.excluded_undated}
+
+
+def project_assertions_as_of(
+    rows: Iterable[Mapping[str, Any]], as_of: date
+) -> AsOfProjection:
+    """只留下「`as_of` 當天已經有人發表過」的 assertion。
+
+    **未定日一律排除並計數**——「我找不到日期」不等於「它在 T 之前」（L11-5）。
+    把未定日當成可用等於讓回測看到未來，而那是回測最沒有價值的失敗方式：
+    它會給出一個好看且完全不可信的結果。
+    """
+    kept: list[Mapping[str, Any]] = []
+    future = undated = dated = 0
+    for row in rows:
+        published = latest_possible_date(row.get("published_at"))
+        if published is None:
+            undated += 1
+            continue
+        dated += 1
+        if published > as_of:
+            future += 1
+            continue
+        kept.append(row)
+    return AsOfProjection(as_of=as_of, rows=tuple(kept), excluded_future=future,
+                          excluded_undated=undated, dated_total=dated)
 
 
 def render_markdown(result: Mapping[str, Any]) -> str:

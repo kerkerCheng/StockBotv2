@@ -138,7 +138,9 @@ def _registry() -> tuple[AuditCheck, ...]:
         AuditCheck("GateDiscrimination", "INV-5", ("F-26",), "Phase 4",
                    "每個 gate 的觸發率與清除率——偵測恆亮（近 100%）與恆滅（近 0%）"),
         AuditCheck("PointInTime", "INV-6", ("F-27", "F-28", "F-31"), "Phase 6",
-                   "as-of fallback 次數必須為 0；published_at／bar_date 覆蓋率"),
+                   "實跑 as-of 投影驗它沒漏出未來；published_at 不得晚於 retrieved_at；"
+                   "回填的 basis 指得回一手出處",
+                   run=checks.check_point_in_time),
         AuditCheck("EvidenceProvenance", "INV-6", ("F-36",), "Phase 2",
                    "每個非 None 的 AlphaSignal score 都列得出 EvidenceRef",
                    run=checks.check_evidence_provenance),

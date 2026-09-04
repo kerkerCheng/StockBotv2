@@ -132,6 +132,12 @@ SET r.id = $edge_key,
 RETURN r.edge_key
 """
 
+# ⚠ `published_at`／`retrieved_at` 用 coalesce，**其餘欄位照舊直接覆寫**。
+# 理由：抽取 JSON 沒帶日期時原本會 SET 成 null，把
+# `scripts/backfill_source_dating.py` 補上的日期靜默洗掉——而那個日期正是
+# as-of 投影的唯一時間線索，洗掉的後果是回測重新看到未來（F-31 的形狀）。
+# 帶了值仍以抽取 JSON 為準（一手優先）；值若與回填當時不同，
+# 節點上的 `published_at_backfilled` 會與現值分歧，由 audit 的 PointInTime 抓出來。
 MERGE_SOURCE_DOC = """
 MERGE (sd:SourceDoc {id: $id})
 SET sd.title = $title,
@@ -140,8 +146,8 @@ SET sd.title = $title,
     sd.origin_entity = $origin_entity,
     sd.url = $url,
     sd.publisher = $publisher,
-    sd.published_at = $published_at,
-    sd.retrieved_at = $retrieved_at,
+    sd.published_at = coalesce($published_at, sd.published_at),
+    sd.retrieved_at = coalesce($retrieved_at, sd.retrieved_at),
     sd.storage_permission = $storage_permission,
     sd.permission_basis = $permission_basis,
     sd.section = $section

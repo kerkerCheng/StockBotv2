@@ -1,0 +1,128 @@
+[
+  {
+    "doc_id": "lumentum_q2fy26_cpo",
+    "value": "2026-02-03",
+    "method": "url_path",
+    "basis": "Motley Fool 逐字稿 URL 路徑 fool.com/earnings/call-transcripts/2026/02/03/lumentum-lite-q2-2026-earnings-call-transcript/ — 路徑段即發布日，可由 url 重導"
+  },
+  {
+    "doc_id": "lumentum_q3fy26_cpo",
+    "value": "2026-05-06",
+    "method": "url_path",
+    "basis": "Motley Fool 逐字稿 URL 路徑 fool.com/earnings/call-transcripts/2026/05/06/lumentum-lite-q3-2026-earnings-transcript/"
+  },
+  {
+    "doc_id": "Broadcom_q2fy26_cpo",
+    "value": "2026-06-03",
+    "method": "url_path",
+    "basis": "Motley Fool 逐字稿 URL 路徑 fool.com/earnings/call-transcripts/2026/06/03/broadcom-avgo-q2-2026-earnings-transcript/"
+  },
+  {
+    "doc_id": "coherent_q2fy26_cpo",
+    "value": "2026-02-04",
+    "method": "url_path",
+    "basis": "Motley Fool 逐字稿 URL 路徑 fool.com/earnings/call-transcripts/2026/02/04/coherent-cohr-q2-2026-earnings-call-transcript/；與 COHR 8-K Item 2.02 accession 0001193125-26-037556（filed 2026-02-04）同日"
+  },
+  {
+    "doc_id": "Nvidia_q1fy27",
+    "value": "2026-05-20",
+    "method": "url_path",
+    "basis": "Motley Fool 逐字稿 URL 路徑 fool.com/earnings/call-transcripts/2026/05/20/nvidia-nvda-q1-2027-earnings-transcript/"
+  },
+  {
+    "doc_id": "coherent-corp-cohr-discusses-photonics-innovation-and-data-center-communications-at-ofc_march_17",
+    "value": "2026-03-17",
+    "method": "event_date",
+    "basis": "Coherent 2026 OFC Technology Innovation Briefing，2026-03-17。Seeking Alpha article 4883374 為該場逐字稿；同場 slideshow（article 4883431）標題逐字帶 2026-03-17。⚠ 圖上此節點的 title 誤寫成「OFC March 2025」，實為 2026——已於本次回填時記錄，title 另行更正"
+  },
+  {
+    "doc_id": "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era",
+    "value": "2025-04-02",
+    "method": "document_masthead",
+    "basis": "MDPI Micromachines 2025, 16(4), 431，期刊頁 Published 欄位 2 April 2025（doi 10.3390/mi16040431）"
+  },
+  {
+    "doc_id": "coherent_q3fy26_cpo",
+    "value": "2026-05-06",
+    "method": "event_date",
+    "basis": "Coherent Q3 FY2026 法說會日 2026-05-06，錨定 SEC 8-K Item 2.02 accession 0001193125-26-208972（filed 2026-05-06）。⚠ 這是法說會當日，不是 Seeking Alpha 頁面的抓取日"
+  },
+  {
+    "doc_id": "sivers_ar_2025_photonics_excerpt",
+    "value": "2026-05-13",
+    "method": "document_masthead",
+    "basis": "Sivers Semiconductors 新聞稿 dateline「Kista, Sweden – May 13, 2026」：Sivers publishes the 2025 Annual Report。原定 2026-04-27 發布，因 PCAOB audit uplift 兩度延後"
+  },
+  {
+    "doc_id": "sivers_ar_2025_financials",
+    "value": "2026-05-13",
+    "method": "document_masthead",
+    "basis": "同一份 2025 Annual Report 的財務附註節；發布日同上（Sivers 新聞稿 dateline May 13, 2026）"
+  },
+  {
+    "doc_id": "nvidia_sipho_blog_partner_roles",
+    "value": "2025-03-27",
+    "method": "document_masthead",
+    "basis": "NVIDIA developer blog 文章頁作者列旁的時間戳 Mar 27, 2025"
+  },
+  {
+    "doc_id": "enablence_sivers_onet_ofc_pr_2026_03_17",
+    "value": "2026-03-17",
+    "method": "document_masthead",
+    "basis": "Sivers Semiconductors 新聞稿頁 dateline March 17, 2026（Sivers／O-Net／Enablence 於 OFC 2026 聯合公告）"
+  },
+  {
+    "doc_id": "sivers_gf_pr_2026_06_02",
+    "value": "2026-06-02",
+    "method": "document_masthead",
+    "basis": "Sivers Semiconductors 新聞稿頁 dateline June 2, 2026"
+  },
+  {
+    "doc_id": "opticsorg_sivers_gf_2026_06_02",
+    "value": "2026-06-02",
+    "method": "document_masthead",
+    "basis": "optics.org 文章頁日期 2 June 2026"
+  },
+  {
+    "doc_id": "semiconductor_today_sivers_gf_2026_06_02",
+    "value": "2026-06-02",
+    "method": "document_masthead",
+    "basis": "Semiconductor Today 文章開頭逐字「2 June 2026」"
+  },
+  {
+    "doc_id": "semiconductor_today_sivers_ayar_1m_order_2023_07_03",
+    "value": "2023-07-03",
+    "method": "document_masthead",
+    "basis": "Semiconductor Today 文章開頭逐字「3 July 2023」"
+  },
+  {
+    "doc_id": "semiconductor_today_poet_celestial_2022_02_11",
+    "value": "2022-02-11",
+    "method": "document_masthead",
+    "basis": "Semiconductor Today 文章開頭逐字「11 February 2022」"
+  },
+  {
+    "doc_id": "poet_celestial_supply_6k_2022_02_10",
+    "value": "2022-02-10",
+    "method": "filing_metadata",
+    "basis": "SEC EDGAR Form 6-K，CIK 1437424，accession 0001171843-22-000925，filed 2022-02-10（主文件 f6k_021022.htm）"
+  },
+  {
+    "doc_id": "arxiv_g1_power_model_2026",
+    "value": "2026-06-14",
+    "method": "document_masthead",
+    "basis": "arXiv 2606.15915 submission history v1「Sun, 14 Jun 2026 16:45:07 UTC」"
+  },
+  {
+    "doc_id": "aleabitoreddit_sivers_cpo_customer_map",
+    "value": "2026-05-19",
+    "method": "document_masthead",
+    "basis": "Substack 貼文頁時間戳 May 19, 2026（JSON-LD 亦同）"
+  },
+  {
+    "doc_id": "ree_exchanges_proterial_hre_free_critique",
+    "value": "2025-08-19",
+    "method": "document_masthead",
+    "basis": "Rare Earth Exchanges 文章 byline「Aug 19, 2025」，JSON-LD datePublished 2025-08-19T04:00:16-06:00"
+  }
+]

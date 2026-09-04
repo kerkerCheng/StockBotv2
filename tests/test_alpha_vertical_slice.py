@@ -343,20 +343,46 @@ def test_signal_carries_the_context_digest() -> None:
 # as-of 保險絲在 concrete provider 上也要響
 # ---------------------------------------------------------------------------
 
-def test_concrete_graph_provider_refuses_as_of() -> None:
-    """Engine A 沒有 as-of 能力——**明確拒絕，不靜默回傳當前資料**（F-31）。"""
+_UNDATED_ASSERTION = {
+    "src": "co:coherent", "relation": "depends_on", "dst": "mat:inp_substrate",
+    "attributes": {"substitutability": 5}, "confidence": 0.9,
+    "source_doc_id": "sd_1", "published_at": None,
+}
+
+
+def test_concrete_graph_provider_refuses_as_of_when_the_graph_has_no_dates() -> None:
+    """圖上沒有時間資訊時，**明確拒絕，不靜默回傳當前資料**（F-31）。
+
+    ⚠ Phase 6 把保險絲的條件從「as-of 一律拒絕」換成「投影不存在時拒絕」，
+    **不是拿掉**。條件變了，被守的東西沒變：回傳當前資料（或空 list）會讓
+    回測靜默看到未來，而失敗與成功在同一個訊號上同形（L13）。
+    """
     from alpha.errors import PointInTimeUnsupported
     from alpha.providers.graph_neo4j import Neo4jGraphResearchProvider
 
-    provider = Neo4jGraphResearchProvider(driver=object())
-    with pytest.raises(PointInTimeUnsupported, match="沒有時間欄位"):
+    provider = Neo4jGraphResearchProvider(
+        driver=object(), _assertion_rows=[_UNDATED_ASSERTION])
+    with pytest.raises(PointInTimeUnsupported, match="沒有任何一條"):
         provider.get_bottlenecks(as_of=date(2026, 6, 30))
 
 
-def test_phase5_methods_raise_instead_of_returning_empty() -> None:
-    """回空集合會讓「還沒實作」與「查無結果」在同一個訊號上同形（L13）。"""
+def test_as_of_before_the_earliest_evidence_raises_instead_of_returning_empty() -> None:
+    """空排序會與「那天真的沒有任何瓶頸」同形——所以問得太早也要拋（L13）。"""
+    from alpha.errors import PointInTimeUnsupported
     from alpha.providers.graph_neo4j import Neo4jGraphResearchProvider
 
-    provider = Neo4jGraphResearchProvider(driver=object())
-    with pytest.raises(NotImplementedError, match="Phase 5"):
+    provider = Neo4jGraphResearchProvider(driver=object(), _assertion_rows=[
+        {**_UNDATED_ASSERTION, "published_at": "2026-06-02"}])
+    with pytest.raises(PointInTimeUnsupported, match="早於圖上最早的證據"):
+        provider.get_bottlenecks(as_of=date(2020, 1, 1))
+
+
+def test_structural_changes_still_raise_when_the_projection_is_unavailable() -> None:
+    """Phase 5b 已實作，但它靠投影——投影不在時仍不得回空集合（L13）。"""
+    from alpha.errors import PointInTimeUnsupported
+    from alpha.providers.graph_neo4j import Neo4jGraphResearchProvider
+
+    provider = Neo4jGraphResearchProvider(
+        driver=object(), _assertion_rows=[_UNDATED_ASSERTION])
+    with pytest.raises(PointInTimeUnsupported):
         provider.get_structural_changes_since(date(2026, 1, 1))

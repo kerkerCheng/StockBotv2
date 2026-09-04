@@ -207,11 +207,21 @@ def test_confidence_is_the_weakest_link_not_the_average() -> None:
     )
 
 
-def test_as_of_still_raises_because_engine_a_has_no_point_in_time() -> None:
-    """傳播不得偷偷繞過 as-of 保險絲（Phase 6 之前它必須響）。"""
+def test_as_of_still_raises_when_the_projection_does_not_exist() -> None:
+    """傳播不得偷偷繞過 as-of 保險絲。
+
+    ⚠ Phase 6 之後這條保險絲**換了條件、沒有拿掉**：從「as-of 一律拒絕」變成
+    「投影不存在時拒絕」。這裡注入的 assertion 一條 `published_at` 都沒有——
+    圖上沒有時間資訊時，唯一誠實的回答是「答不了」，不是「那天沒有瓶頸」（L13）。
+    """
     from alpha.errors import PointInTimeUnsupported
 
-    with pytest.raises(PointInTimeUnsupported):
-        _provider(_rows()).get_dependency_paths(
+    undated = Neo4jGraphResearchProvider(driver=None, _assertion_rows=[
+        {"src": "co:coherent", "relation": "depends_on", "dst": "mat:inp_substrate",
+         "attributes": {"substitutability": 5}, "confidence": 0.9,
+         "source_doc_id": "sd_1", "published_at": None},
+    ])
+    with pytest.raises(PointInTimeUnsupported, match="沒有任何一條"):
+        undated.get_dependency_paths(
             EntityId("co:coherent"), as_of=date(2026, 1, 1)  # type: ignore[arg-type]
         )
