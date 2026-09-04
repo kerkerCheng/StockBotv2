@@ -373,3 +373,35 @@ def test_mechanical_fields_must_be_machine_comparable() -> None:
         write("segment_revenue_share", '{"note": "未揭露"}')
     # judgment 欄位維持散文——這條規則**只**適用 mechanical
     write("customer_concentration", "FY2025 前三大客戶占營收 59.8%")
+
+
+def test_the_mechanical_entry_point_refuses_judgment_fields() -> None:
+    """⚠ 這是 `scripts/record_mechanical_observation.py` **最重要的行為**。
+
+    判準改成「mechanical 不需 pq2」之後，需要一條不經核准的寫入走廊。但那條走廊
+    若什麼都寫得進去，它就是一條繞過 pq2 的後門——而那道 gate 正是為了擋
+    「誰算客戶」「這算不算或有請求權」這類無法被複查的判讀。
+
+    放行與收緊必須同時發生（L15：分開之後兩邊都要更嚴）。這條測試就是那個「兩邊」
+    的第二邊：**judgment 欄位走這條路必須失敗**。
+    """
+    import subprocess
+    import sys
+
+    def run(field: str, value: str) -> subprocess.CompletedProcess:
+        return subprocess.run(
+            [sys.executable, "scripts/record_mechanical_observation.py",
+             "--ticker", "TEST", "--field", field, "--value", value,
+             "--source-ref", "test", "--as-of", "2026-06-30", "--dry-run"],
+            cwd=ROOT, capture_output=True, text=True,
+        )
+
+    judgment = run("customer_concentration", '{"top3": 0.5}')
+    assert judgment.returncode != 0, "judgment 欄位必須被這條走廊拒絕"
+    assert "pq2" in judgment.stderr
+
+    mechanical = run("segment_revenue_share", '{"Datacenter": 0.741}')
+    assert mechanical.returncode == 0, mechanical.stderr
+
+    prose = run("segment_revenue_share", "資料中心約七成")
+    assert prose.returncode != 0, "mechanical 欄位存散文必須被拒"

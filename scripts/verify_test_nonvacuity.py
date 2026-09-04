@@ -543,6 +543,20 @@ MUTATIONS: tuple[Mutation, ...] = (
         ),
     ),
     Mutation(
+        name="不需核准的走廊變成 pq2 後門",
+        path="scripts/record_mechanical_observation.py",
+        old="    if spec.requires_user_approval:",
+        new="    if False and spec.requires_user_approval:",
+        test=(
+            "tests/test_engine_c_observation_fields.py::"
+            "test_the_mechanical_entry_point_refuses_judgment_fields"
+        ),
+        guards=(
+            "mechanical 走廊若什麼都寫得進去，它就繞過了擋「誰算客戶」"
+            "這類無法複查判讀的 pq2 gate"
+        ),
+    ),
+    Mutation(
         name="槓桿算不出來時 fail open",
         path="risk/snapshot.py",
         old="        if not math.isfinite(float(nav)) or float(nav) <= 0:",
