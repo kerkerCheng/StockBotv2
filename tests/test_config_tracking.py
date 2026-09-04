@@ -131,8 +131,11 @@ def test_every_symbol_cited_in_the_registry_table_still_exists() -> None:
     "rel,symbol",
     [
         ("decision_lab/sizing.py", "AXIS_REFERENCE_AUTHORITIES"),
-        ("decision_lab/sizing.py", "AXES"),
-        ("decision_lab/sizing.py", "LEVELS"),
+        ("shared/assessment_axes.py", "AXES"),
+        # ⚠ 2026-09-04 Phase 3：`LEVELS` 移至 shared/——`alpha/levels.py` 與
+        # `decision_lab/sizing.py` 原本各存一份逐字相同的 tuple，而兩者不能
+        # 互相 import（方向違規），所以唯一的家是 shared。字彙內容一字未改。
+        ("shared/evidence_levels.py", "LEVELS"),
         ("engine_b/leads.py", "ALLOWED_TRANSITIONS"),
         ("decision_lab/workflow.py", "_INTENTS"),
         # ⚠ 2026-09-03 Phase 3 搬遷：capital_authority 是 authority 的**讀取器**

@@ -22,50 +22,18 @@ from shared.blocker_severity import fatal_blockers
 from .models import ContextBundle, CoverageResult, ProbeSizingResult
 
 
-AXES = (
-    "source_reliability",
-    "technical_causal_link",
-    "commercial_maturity",
-    "financial_resilience",
-    "valuation_payoff",
+# ⚠ 軸名、研究提示與最弱軸判定自 2026-09-04 起住 `shared/assessment_axes.py`。
+# 搬家的理由不是行數：`alpha/legacy_axes.py` 的 dual-run 對照器需要同一組
+# 宣告序才能正確 tie-break，而它不得 import Engine D（見那支的 docstring）。
+# 這裡 re-import 讓既有的 `from .sizing import AXES` 全部維持成立。
+from shared.assessment_axes import (  # noqa: F401
+    AXES,
+    AXIS_RESEARCH_PROMPT,
+    weakest_axis_of,
 )
-LEVELS = ("unknown", "bounded_hypothesis", "corroborated")
-
-# 每一軸對應的「該補什麼」。最弱軸是排序的瓶頸，也是提高排序的唯一路徑，所以這句話
-# 就是 pq2 項目的內容——使用者要看到的是「補 COHR 的 counter-path」，不是
-# 「REVIEW — co:coherent」那種沒有成因的文字。
-#
-# ⚠ 與 AXES 綁在一起放，是為了讓新增一軸時被強迫決定它的研究動作（同
-# schema/vocab.json 的 counter_path_relation 模式）。`tests/test_weakest_axis.py`
-# 斷言兩者的鍵完全一致。
-AXIS_RESEARCH_PROMPT: dict[str, str] = {
-    "source_reliability": "補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
-    "technical_causal_link": "補 counter-path：什麼會讓這條因果鏈斷掉（第二供應源、客戶自製、技術替代）",
-    "commercial_maturity": "補客戶端商業承諾：訂單、產能協議或預付款等付錢方向的證據",
-    "financial_resilience": "補 Engine C 財務觀測：客戶集中度、backlog、runway 等人工欄位",
-    "valuation_payoff": "補估值錨點：市值、分析師覆蓋與隱含假設，回答股價已經定價了什麼",
-}
+from shared.evidence_levels import LEVELS  # noqa: F401
 
 
-def weakest_axis_of(axes: Mapping[str, Mapping[str, Any]]) -> str:
-    """回傳證據最弱的那一軸。
-
-    以 `effective_level` 次序為主鍵，同階時退到 `AXES` 的宣告次序
-    （`source_reliability` 優先）。
-
-    ⚠ 不能改用宣告的 `level`：`_validate_assessment` 在 `fatal_axis_blocker`
-    （例如 evidence_missing）時把該軸判為失效卻**不動 level**，所以一個宣告
-    corroborated 但引用不成立的軸，raw level 仍是 corroborated。用 raw level 排序
-    會漏掉它，`test_probe_sizing.py::...[missing_ref]` 立刻紅。`effective_level`
-    就是把那個隱含資訊顯性化的欄位。
-    """
-    def rank(axis: str) -> tuple[int, int]:
-        level = str(axes[axis].get("effective_level") or axes[axis]["level"])
-        # 未登記的等級視為最弱：寧可多提醒一次，也不要讓拼錯的值看起來佐證完整。
-        order = LEVELS.index(level) if level in LEVELS else -1
-        return (order, AXES.index(axis))
-
-    return min(AXES, key=rank)
 AXIS_REFERENCE_AUTHORITIES = {
     "source_reliability": frozenset(
         {"graph_source_assertion", "source_trace"}

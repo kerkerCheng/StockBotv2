@@ -405,6 +405,56 @@ MUTATIONS: tuple[Mutation, ...] = (
         ),
     ),
     Mutation(
+        name="三階序數又被抄成第二份",
+        path="alpha/levels.py",
+        old="from shared.evidence_levels import LEVELS",
+        new='LEVELS = ("unknown", "bounded_hypothesis", "corroborated")',
+        test=(
+            "tests/test_weakest_axis.py::"
+            "test_the_three_level_ordinal_has_exactly_one_definition"
+        ),
+        guards=(
+            "抄第二份當下值剛好一樣，`==` 會過；漂掉時 convert_axis_results "
+            "對 268 筆歷史 payload 靜默誤轉，不報錯"
+        ),
+    ),
+    Mutation(
+        name="dual-run 對照器改回字母序 tie-break",
+        path="shared/assessment_axes.py",
+        old="    declared = AXES.index(axis) if axis in AXES else len(AXES)",
+        new="    declared = axis  # type: ignore[assignment]  # 字母序",
+        test=(
+            "tests/test_weakest_axis.py::"
+            "test_the_dual_run_comparator_breaks_ties_the_same_way"
+        ),
+        guards=(
+            "對照器與權威 tie-break 不同時，dual run 的「零差異」是假的——"
+            "Phase 1 的 41 cohort UNEXPECTED 0 就是這麼來的"
+        ),
+    ),
+    Mutation(
+        name="對照器被「順手統一」成要求五軸齊全",
+        path="alpha/legacy_axes.py",
+        old="    if not axis_results:\n        return None\n    return min(\n        axis_results,",
+        new="    if not axis_results:\n        return None\n    return min(\n        __import__('shared.assessment_axes', fromlist=['AXES']).AXES,",
+        test=(
+            "tests/test_weakest_axis.py::"
+            "test_the_comparator_still_tolerates_missing_axes"
+        ),
+        guards="對照器讀歷史 payload，缺軸要容忍；統一容忍度會讓半數 dual run 拋例外",
+    ),
+    Mutation(
+        name="Engine D 反向 import alpha 的催化劑判定",
+        path="decision_lab/store.py",
+        old="        from shared.catalyst_state import assess_entry",
+        new="        from alpha.catalyst import assess_entry  # type: ignore[attr-defined]",
+        test="tests/test_layer_separation.py::test_decision_lab_domain_does_not_import_new_layers",
+        guards=(
+            "催化劑狀態被 Engine D 與 alpha 兩層消費，所以它屬 shared；"
+            "判給任一邊都會逼出一條反向 import"
+        ),
+    ),
+    Mutation(
         name="槓桿算不出來時 fail open",
         path="risk/snapshot.py",
         old="        if not math.isfinite(float(nav)) or float(nav) <= 0:",

@@ -19,11 +19,15 @@ from __future__ import annotations
 
 from typing import Final
 
+from shared.evidence_levels import LEVELS
+
 from .errors import ContractViolation
 
-#: 三階序數，由弱到強。與 `decision_lab/sizing.py::LEVELS` 逐字相同——
-#: 這是刻意的：轉換器要能無歧義地讀舊 payload。
-LEVELS: Final[tuple[str, ...]] = ("unknown", "bounded_hypothesis", "corroborated")
+# `LEVELS` 自 2026-09-04 起是 `shared/evidence_levels.py` 的**同一個物件**，
+# 不是逐字相同的第二份。原本兩邊各存一份、靠一句註解維持同步，而沒有任何測試守它
+# ——漂了不會報錯，只會讓 `convert_axis_results` 對 268 筆歷史 payload 靜默誤轉
+# （L16 第 3 點：字彙一旦有行為後果就必須被強制）。
+__all__ = ["LEVELS", "LEVEL_SCALE_VERSION", "level_to_ceiling", "level_to_score"]
 
 #: 序數 → 分數。**版本化**：改動它就是改動排序，必須答出「幾筆排序會變」。
 LEVEL_SCALE_VERSION: Final[str] = "ordinal-v1"

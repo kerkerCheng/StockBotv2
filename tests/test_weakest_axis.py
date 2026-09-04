@@ -113,3 +113,72 @@ def test_matches_the_previous_ceiling_based_ordering_when_ceiling_tracks_level()
     for combo in itertools.product(LEVELS, repeat=len(AXES)):
         axes = _axes(**dict(zip(AXES, combo)))
         assert weakest_axis_of(axes) == legacy(axes), combo
+
+
+def test_the_three_level_ordinal_has_exactly_one_definition() -> None:
+    """`alpha` 與 Engine D 用的必須是**同一個物件**，不是逐字相同的兩份。
+
+    ⚠ 用 `is` 而不是 `==`：`==` 對「有人抄了第二份、目前剛好一樣」也會過，
+    而那正是 2026-09-04 之前的狀態——兩邊各存一份 tuple，靠 `alpha/levels.py`
+    的一句註解（「與 `decision_lab/sizing.py::LEVELS` 逐字相同」）維持同步，
+    **沒有任何測試守它**。
+
+    漂掉的後果不會報錯：`legacy_axes.convert_axis_results` 讀 268 筆歷史 payload
+    時會靜默誤轉，排序悄悄變了而沒有任何東西變紅（L16 第 3 點：字彙一旦有行為
+    後果就必須被強制；L13：最危險的是成功與失敗在同一個訊號上同形）。
+    """
+    from alpha.levels import LEVELS as alpha_levels
+    from shared.evidence_levels import LEVELS as shared_levels
+
+    assert LEVELS is shared_levels, "Engine D 的 LEVELS 不是 shared 的那一份"
+    assert alpha_levels is shared_levels, "alpha 的 LEVELS 不是 shared 的那一份"
+
+
+def test_the_dual_run_comparator_breaks_ties_the_same_way() -> None:
+    """對照器與權威**必須同意**，否則它報出來的「零差異」沒有意義。
+
+    事發（2026-09-04）：`alpha.legacy_axes.legacy_weakest` 用 `min()` over
+    `(rank, name)` tuple，同階時比**軸名字母序**；權威 `weakest_axis_of` 比的是
+    `AXES` 的**宣告序**。五軸同階時前者回 `commercial_maturity`、後者回
+    `source_reliability`。
+
+    ⚠ 而 Phase 1 的 dual run 報告是「41 cohort、UNEXPECTED 0」——**那不是兩者
+    一致，是那 41 筆剛好沒有並列最弱軸**。這正是 L13 第 2 點：最危險的是成功與
+    失敗在同一個訊號上同形，要驗就驗那個會因為「真的成功」而改變的東西。
+    所以這條刻意**只測平手**——單一最弱軸的案例本來就會過，測它等於沒測。
+    """
+    from alpha.legacy_axes import legacy_weakest
+
+    all_tied = {
+        axis: {"level": "bounded_hypothesis", "effective_level": "bounded_hypothesis"}
+        for axis in AXES
+    }
+    assert legacy_weakest(all_tied) == weakest_axis_of(all_tied) == "source_reliability"
+
+    # 宣告序上不相鄰的兩軸並列：字母序會挑 commercial_maturity，宣告序挑
+    # source_reliability——兩種 tie-break 在這裡答案不同，所以它測得到。
+    pair_tied = {
+        axis: {"level": "corroborated", "effective_level": "corroborated"}
+        for axis in AXES
+    }
+    for axis in ("source_reliability", "commercial_maturity"):
+        pair_tied[axis] = {"level": "unknown", "effective_level": "unknown"}
+    assert legacy_weakest(pair_tied) == weakest_axis_of(pair_tied) == "source_reliability"
+
+
+def test_the_comparator_still_tolerates_missing_axes() -> None:
+    """對照器讀的是歷史 payload，缺軸要容忍；權威要求五軸齊全，缺軸該 KeyError。
+
+    兩者的容忍度**刻意不同**，所以對照器不能直接呼叫權威——只共用 tie-break。
+    這條把那個差異釘住，否則下次有人「順手統一」就會讓 dual run 對半數歷史
+    payload 拋例外。
+    """
+    import pytest
+
+    from alpha.legacy_axes import legacy_weakest
+
+    partial = {"valuation_payoff": {"level": "unknown"}}
+    assert legacy_weakest(partial) == "valuation_payoff"
+    assert legacy_weakest({}) is None
+    with pytest.raises(KeyError):
+        weakest_axis_of(partial)

@@ -1568,7 +1568,7 @@ class DecisionStore:
         一律保留並標記，不得默默排除——那正是 `action_card` 註解記錄過的 AXT 災難
         （expiry 比自己的催化劑早三個月，自動關會關掉一個還在跑的 thesis）。
         """
-        from decision_lab.catalyst_watch import assess_entry
+        from shared.catalyst_state import assess_entry
 
         assessment_id = str(item["assessment_id"])
         cohort_id = str(item["cohort_id"])

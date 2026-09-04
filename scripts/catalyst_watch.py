@@ -12,7 +12,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from decision_lab.catalyst_watch import build_watchlist, render_markdown  # noqa: E402
+from alpha.catalyst import build_watchlist, render_markdown  # noqa: E402
+from decision_lab.coverage_queries import latest_coverage_assessments  # noqa: E402
 from thesis.lifecycle_schedule import checkpoints_by_ticker  # noqa: E402
 
 DECISION_DB = ROOT / "library" / "private" / "decision_lab" / "decision_lab.db"
@@ -26,14 +27,16 @@ def main() -> int:
     conn.row_factory = sqlite3.Row
     try:
         by_ticker = checkpoints_by_ticker()
-        rows = build_watchlist(conn)
+        # 只查一次 DB，兩次判定都用同一份 entries（先前查了兩次同樣的 SQL）。
+        entries = latest_coverage_assessments(conn)
+        rows = build_watchlist(entries)
         # cohort 以 company_id 為鍵，lifecycle 以 ticker——在這裡對接。
         by_company = {}
         for row in rows:
             ticker = row.get("ticker")
             if ticker and ticker in by_ticker:
                 by_company[str(row["company_id"])] = by_ticker[ticker]
-        rows = build_watchlist(conn, checkpoints_by_company=by_company)
+        rows = build_watchlist(entries, checkpoints_by_company=by_company)
         print("\n".join(render_markdown(rows)).lstrip())
         covered = sum(1 for r in rows if r["next_catalyst"])
         if covered < len(rows):

@@ -28,7 +28,7 @@ Decision Store 是 append-only 的 private authority，268 筆歷史 decision �
    （`current-architecture.md` §8 缺口 #1）。所以轉換出來的 Q3 帶
    `downgrade_reason` 明說它是部分轉換，不是完整答案。
 2. **Q5 沒有來源。** catalyst 住在 `coverage_assessments.catalyst` 的自由文字裡，
-   `catalyst_watch.py` 明文「刻意不解析散文日期」。轉換後 `catalyst_score is None`
+   `shared/catalyst_state.py` 明文「刻意不解析散文日期」。轉換後 `catalyst_score is None`
    ——**那是正確答案**，不是缺陷。填一個預設值會讓「沒有結構化催化劑」看起來像
    「催化劑很弱」，正是 `None ≠ 0` 要防的事。
 """
@@ -213,13 +213,32 @@ def convert_axis_results(
 
 
 def legacy_weakest(axis_results: Mapping[str, Mapping[str, Any]]) -> str | None:
-    """重算舊語意的 `weakest_axis`（`min()` over 五軸）——供 dual-run 對照用。"""
-    from .levels import level_rank
+    """重算舊語意的 `weakest_axis`——供 dual-run 對照用。
 
-    ranked = [
-        (level_rank(str(p.get("effective_level") or p.get("level") or "unknown")), name)
-        for name, p in axis_results.items()
-    ]
-    if not ranked:
+    ⚠ **tie-break 必須與被對照者相同**，否則它報出來的「零差異」沒有意義。
+    2026-09-04 實測：本函式原本用 `min()` over `(rank, name)` tuple，也就是同階時
+    比**軸名字母序**；而權威 `weakest_axis_of` 比的是 `AXES` 的**宣告序**。
+    五軸同階時前者回 `commercial_maturity`、後者回 `source_reliability`。
+
+    Phase 1 的 dual run 報告是「41 cohort、UNEXPECTED 0」——那不是兩者一致，
+    是那 41 筆剛好沒有並列最弱軸（L13：檢查通過是因為案例沒發生，不是因為邏輯相同）。
+
+    現在共用 `shared.assessment_axes.axis_sort_key`。仍保留自己的迴圈而不直接呼叫
+    `weakest_axis_of`，是因為兩者的**容忍度刻意不同**：權威要求五軸齊全（缺軸是
+    資料缺陷，該 KeyError），而這裡讀的是歷史 payload，缺軸要能容忍。
+    """
+    from shared.assessment_axes import axis_sort_key
+
+    if not axis_results:
         return None
-    return min(ranked)[1]
+    return min(
+        axis_results,
+        key=lambda name: axis_sort_key(
+            name,
+            str(
+                axis_results[name].get("effective_level")
+                or axis_results[name].get("level")
+                or "unknown"
+            ),
+        ),
+    )

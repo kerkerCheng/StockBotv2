@@ -1,9 +1,15 @@
-"""賣出側每日檢查：條件檢查而非訊號，所以判準必須是確定性的。"""
+"""賣出側每日檢查：條件檢查而非訊號，所以判準必須是確定性的。
+
+⚠ 判定住 `shared/catalyst_state.py`（Engine D 的 work order lifecycle 也消費它），
+呈現住 `alpha/catalyst.py`——本檔跨兩者，因為它守的是「判準是確定性的」這件事，
+而那條線正好穿過兩個模組。
+"""
 from __future__ import annotations
 
 from datetime import date, timedelta
 
-from decision_lab.catalyst_watch import DUE_SOON_DAYS, assess_entry, render_markdown
+from alpha.catalyst import render_markdown
+from shared.catalyst_state import DUE_SOON_DAYS, assess_entry
 
 TODAY = date(2026, 8, 18)
 

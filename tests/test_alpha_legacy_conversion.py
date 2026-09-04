@@ -46,10 +46,12 @@ def _legacy(**overrides) -> dict:
 
 def test_mapping_covers_every_legacy_axis_exactly_once() -> None:
     """五個舊軸都要有明確去向——包含「刻意沒有對應」的那一個。"""
-    assert set(LEGACY_AXIS_TO_SCORE) == {
-        "source_reliability", "technical_causal_link", "commercial_maturity",
-        "financial_resilience", "valuation_payoff",
-    }
+    # ⚠ 對 SSOT 斷言，不是再寫一份 literal set。原版把五個軸名第三次抄在這裡
+    # （`shared/assessment_axes.py`、`LEGACY_AXIS_TO_SCORE` 的鍵、這裡），
+    # 於是「對應表漏了新軸」與「測試也忘了更新」會一起發生而測不出來（L16）。
+    from shared.assessment_axes import AXES as LEGACY_AXES
+
+    assert set(LEGACY_AXIS_TO_SCORE) == set(LEGACY_AXES)
     targets = [v for v in LEGACY_AXIS_TO_SCORE.values() if v is not None]
     assert len(targets) == len(set(targets)), "一個新維度不得由兩個舊軸餵"
     assert set(targets) <= set(AXES)
