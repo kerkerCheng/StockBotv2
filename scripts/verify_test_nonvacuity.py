@@ -792,6 +792,40 @@ MUTATIONS: tuple[Mutation, ...] = (
         ),
         guards="缺價的多半是非美股，它們在排序裡不是均勻分布的",
     ),
+    # ---- Phase 7：AlphaSignal[] × 持股 ------------------------------------
+    Mutation(
+        name="持股讀不到時逐檔輸出 0.0%",
+        path="portfolio/alpha_exposure.py",
+        old="    if status not in _AVAILABLE:",
+        new="    if False:",
+        test=(
+            "tests/test_portfolio_alpha_exposure.py::"
+            "test_unavailable_holdings_do_not_emit_zero_percent_per_candidate"
+        ),
+        guards="L12：「沒持有」與「持股讀不到」導向相反的行動，不得同形",
+    ),
+    Mutation(
+        name="portfolio 層自己把候選重排一次",
+        path="portfolio/alpha_exposure.py",
+        old="    base[\"candidates\"] = candidates",
+        new="    base[\"candidates\"] = sorted(candidates, key=lambda c: -float(c[\"nav_pct\"] or 0.0))",
+        test=(
+            "tests/test_portfolio_alpha_exposure.py::"
+            "test_incoming_order_is_preserved_because_ranking_lives_elsewhere"
+        ),
+        guards="唯一排序權威是 rank_bottlenecks，不得另建平行排序",
+    ),
+    Mutation(
+        name="沒有 ticker 的 signal 被靜默丟棄",
+        path="portfolio/alpha_exposure.py",
+        old="            unresolved.append(index)\n            continue",
+        new="            continue",
+        test=(
+            "tests/test_portfolio_alpha_exposure.py::"
+            "test_signals_without_a_ticker_are_listed_not_dropped"
+        ),
+        guards="INV-3：被 filter 掉的 item 必須說得出理由",
+    ),
     Mutation(
         name="極端值不現形",
         path="alpha/backtest.py",

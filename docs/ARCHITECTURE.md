@@ -198,6 +198,24 @@ alpha 排序必須**消費**它，不得重算結構分，也不得繞過它自�
 判準與禁令（band 不是 gate、水位只呈現、不得復刻擇時語言）住 `AGENTS.md`；
 這裡是它今天長什麼樣。
 
+**輸入／輸出（`target-architecture.md` §9）：**
+
+| | `portfolio/` | `risk/` |
+|---|---|---|
+| 輸入 | `AlphaSignal[]` ＋ 現有持股 ＋ `config/target_allocation.json` | portfolio 的 target exposure |
+| 輸出 | target exposure、配置差距、相對水位 | binding limits、violation 清單 |
+| **不做** | 不形成 view、**不排序標的** | 不判斷好壞 |
+
+`portfolio/alpha_exposure.py` 是 alpha 那一側的接點（Phase 7）：把 `AlphaSignal[]` join
+到持股，回答「**這些候選我現在持有多少**」。它輸出的每個數字都是已經發生的事實，
+**不是建議**；候選順序原樣沿用傳入順序（排序權威在 `rank_bottlenecks`，不在這一層）。
+⚠ 它刻意以 duck typing 接受 signal，**不 import `alpha/`**——保持
+`portfolio/ → alpha/` 沒有相依。
+⚠ 持股讀不到時**整份降級並帶出 `blockers`，不逐檔輸出 0.0%**：那會讓使用者看到
+「你一檔都沒買」，而事實是「我沒讀到你買了什麼」（L12）。
+`single_position_nav_cap_reference` 的欄位名自己說出它不是 gate——真正的硬擋在
+`store.record_live_choice`。
+
 - **目標配置比例** SSOT 只有 `config/target_allocation.json`：sleeve 層級六格，分母是
   **已投入的非現金部位**（不含現金；cash floor 是另一個 authority）。
   查證：`python -c "import json;d=json.load(open('config/target_allocation.json'));print(d['basis'], sorted(d['sleeves']))"`
