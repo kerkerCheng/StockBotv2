@@ -50,7 +50,7 @@
     "stale_observations": {
       "guards": "—",
       "private": false,
-      "digest": "sha256:8b6d705af978168160c01bfb4c89b01c2c6553193a95b1cdc01be773946f5aa2"
+      "digest": "sha256:689985afcbc3bfc60a9670d24741ba63d878e1966624b40ce43b5274d91235be"
     },
     "edge_conflicts": {
       "guards": "—",

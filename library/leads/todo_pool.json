@@ -7966,13 +7966,27 @@
       "added_at": "2026-09-04T08:58:49.463698+00:00",
       "hint": "⚠ 措辭已逐字核對（L11：審計術語的精度本身就是 claim）。Nidec 2026-04-27 公告逐字：「the Company received an audit report containing a disclaimer of opinion on the consolidated financial statements in the securities report for the fiscal year ended March 31, 2025」，引用其 2025-09-26 之「Notice Regarding Disclaimer of Opinion in the Audit Report...」。同份文件另載內部控制存在 material weakness（company-wide internal control 與 accounting/financial closing processes），並設第三方委員會調查（FIR Issue＋額外關稅影響）。⚠ disclaimer of opinion（無法表示意見）**強於** qualified opinion（保留意見），是最重的審計結果——審計師明確拒絕對該財報表示意見。投資意義：①系統目前對 co:nidec 的財務軸會使用這份財報的數字，而那些數字未經有效審計；②這也是我今天不把 Nidec 分部營收登記成 verifiability=mechanical 的理由——mechanical 的前提是「指得出一手報表、任何人重讀都得到同一個數」，帶無法表示意見的數字不符合。發現經過：補非美股 segment 資料時抓 FY 全年財報才撞到。go＝寫入 Engine C 的 litigation_and_audit_flags（judgment 欄位，需 pq2）；不含入圖、不含 thesis mutation、不含 live。",
       "n": 476,
-      "reason": null,
+      "reason": "Nidec 審計旗標已寫入 Engine C ledger。走設計好的提案路徑（set_manual_field → propose → sync 鑄 [477] → complete-observation），[477] 是 [476] 授權的機械後果，未再問第二次核准（AGENTS：重複要核准是介面失敗）。措辭逐字核對：disclaimer of opinion 強於 qualified opinion，審計師是明確拒絕表示意見。未跨越其他 gate：無入圖、無 thesis mutation、無 live。",
+      "receipt": "authority:engine_c_manual_observation;ref:mo_479f13195842c7a2aafbc6a34861d257",
       "ref_id": "https://www.nidec.com/files/user/www-nidec-com/corporate/news/2026/0427-01/260427-01en.pdf",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-04T09:17:59.224909+00:00",
       "source": "manual",
       "title": "co:nidec：Nidec 合併財報遭出具 disclaimer of opinion（無法表示意見）——Engine C 審計旗標",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-09-04T09:17:43.114589+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2025-03-31T00:00:00+00:00；來源=https://www.nidec.com/files/user/www-nidec-com/corporate/news/2026/0427-01/26042",
+      "n": 477,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_479f13195842c7a2aafbc6a34861d257;proposal:po_094553c7dba52d102e78f239d16fe140",
+      "ref_id": "po_094553c7dba52d102e78f239d16fe140",
+      "resolution": "go",
+      "resolved_at": "2026-09-04T09:17:49.064279+00:00",
+      "source": "engine_c",
+      "title": "Engine C 觀測：6594.T / litigation_and_audit_flags",
+      "type": "engine_c_observation"
     }
   ],
   "log": [
@@ -17272,8 +17286,26 @@
       "ref_id": "thesis/catalyst_calendar.json",
       "type": "manual",
       "verb": "go"
+    },
+    {
+      "at": "2026-09-04T09:17:49.064279+00:00",
+      "n": 477,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_479f13195842c7a2aafbc6a34861d257;proposal:po_094553c7dba52d102e78f239d16fe140",
+      "ref_id": "po_094553c7dba52d102e78f239d16fe140",
+      "type": "engine_c_observation",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-04T09:17:59.224909+00:00",
+      "n": 476,
+      "reason": "Nidec 審計旗標已寫入 Engine C ledger。走設計好的提案路徑（set_manual_field → propose → sync 鑄 [477] → complete-observation），[477] 是 [476] 授權的機械後果，未再問第二次核准（AGENTS：重複要核准是介面失敗）。措辭逐字核對：disclaimer of opinion 強於 qualified opinion，審計師是明確拒絕表示意見。未跨越其他 gate：無入圖、無 thesis mutation、無 live。",
+      "receipt": "authority:engine_c_manual_observation;ref:mo_479f13195842c7a2aafbc6a34861d257",
+      "ref_id": "https://www.nidec.com/files/user/www-nidec-com/corporate/news/2026/0427-01/260427-01en.pdf",
+      "type": "manual",
+      "verb": "go"
     }
   ],
-  "next_n": 477,
+  "next_n": 478,
   "schema_version": "1"
 }
