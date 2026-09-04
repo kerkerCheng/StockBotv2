@@ -243,8 +243,27 @@ decision_lab/                    ≈ 7,900 行（現 13,502，−41%）
 （上表逐項相加 ≈ 7,927 行。**目標設 ≤ 8,000 而不是更漂亮的 ≤7,000，是因為逐項算得出來——
 訂一個算不出來的數字，之後只會靠刪註解達成。**）
 
+> ## ⚠ 2026-09-04：上面那個 7,927 是**算錯的**，≤8,000 已撤回
+>
+> 諷刺的是它錯在同一句話所警告的事——「逐項算得出來」讓人以為它可信，於是沒有人
+> 再驗一次。逐檔查證後有五處錯：
+>
+> | 項目 | 本表估計 | 實際 | 為什麼 |
+> |---|---:|---:|---|
+> | `capital_authority.py` | 419 | **0** | 已於 B2 搬到 `shared/`，本表**重複計入** |
+> | `brief.py` | ~400 | **763** | 少算四段純 Engine D：`_current_authority_context` 102、`_reassessable_axes` 60、`ranking_annotations` 48、`identity_registration_pending` 43。它們只能拆成**另一個 `decision_lab/` 檔案**，對套件總行數是 0 |
+> | `sizing.py` | ~300 | **450** | §3 自己把 `_resolve_reference`／`AXIS_REFERENCE_AUTHORITIES`／`_validate_assessment`／`calculate_probe_limits` 全判為 **D**；字彙移出後剩下的就是它們 |
+> | `references.py` | 0（D∩A 切半） | **139** | 它同時需要 frozen bundle（D）與 `AXIS_REFERENCE_AUTHORITIES`（D）。**「讀者是研究者」不決定層級** |
+> | `workflow.py` | ~600 | **773，0 可移** | 「研究部分（assessment 產生）」已於 3c 移出；剩下全是 evaluate／reassess 編排 |
+>
+> 重算後真正的地板 ≈ **8,630**。唯一夠大的來源是 `store.py`（3,125）或 `context.py`
+> （713），而本文件自己就寫了「不搬」——為一個**代理指標**去動 append-only authority
+> 的模組與 point-in-time 凍結機制，正是 L14 禁止的事。
+>
+> **exit criterion 已改成下面那三條方向指標**（它們全部達成）。行數只留作觀察值。
+
 **驗收條件（L14：哪個數字會變）：**
-- `decision_lab/` 行數 **13,502 → ≤ 8,000**
+- ~~`decision_lab/` 行數 **13,502 → ≤ 8,000**~~ → 撤回，見上框；實測 13,502 → **8,807**
 - `decision_lab` 的**直接相依環 3 條（`engine_d_runtime`／`thesis`／`engine_c`）→ 0 條**
 - `tests/test_engine_d_separation.py`（新增）斷言 `decision_lab` 不 import `alpha`／`portfolio`／`risk`
 - daily brief 端到端輸出**內容不變**（bytes 可變，pq2 項目數與首屏計數器不變）
