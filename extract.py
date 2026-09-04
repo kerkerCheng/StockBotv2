@@ -1,23 +1,39 @@
 """
-extract.py — LLM-based extraction of supply-chain knowledge graph from raw documents.
+extract.py — 從原始文件抽出供應鏈知識圖譜的中介 JSON。**session-in-the-loop，不接 API。**
 
-Reads prompts/extract_system.md as the system prompt at startup.
-Injects the known-entity list from samples/cpo_external_laser_source.json so the LLM
-reuses canonical IDs (e.g. co:broadcom) instead of inventing duplicates.
+## 為什麼不再呼叫 anthropic（2026-09-04）
 
-Usage:
-    python extract.py --input library/raw/<doc>.txt \\
-                      --source-type transcript \\
-                      --evidence-tier 1 \\
-                      --out extractions/<doc>.json
+使用者已定案不再使用 LLM API；實際流程早就是 session-in-the-loop——
+`decision_lab assessment-scaffold` → session 寫判斷 → `reassess --assessment`
+（268 筆紀錄佐證）。這支是最後兩個 legacy API 呼叫點之一，改成同一個形狀。
 
-On JSON parse error: writes raw LLM response to extractions/<doc>_raw.txt and exits 1.
-Run loader/validate.py on the output before loading into Neo4j.
+⚠ **拆成兩段，而且中間那段刻意留給 session：**
+
+1. `--scaffold OUT.md` — 產生**完整的抽取提示**（system prompt ＋ 已知實體清單 ＋
+   文件全文 ＋ 欄位指示）。deterministic，零外部相依。
+2. `--response RESP.json --out OUT.json` — 吃 session 寫好的 JSON，跑**原封不動的
+   後處理**：schema_version 預設、source id 加 doc_id 前綴（L6：局部 ID 跨文件
+   MERGE 會命名空間衝突）、寫檔。
+
+⚠ **後處理是這支的價值所在，不能省。** 從前它藏在 API 呼叫後面，看起來像是
+「LLM 做完就好」；拆開之後才看得出來：真正不可替代的是 id 前綴與 schema 驗證，
+而那兩件事跟哪個模型產出 JSON 完全無關（L3：抽取層輸出 DB 無關 JSON）。
+
+用法：
+    # ① 產提示
+    python extract.py --input library/raw/<doc>.txt --source-type transcript \
+        --evidence-tier 1 --scaffold extractions/<doc>.prompt.md
+    # ② session 依提示產出 JSON，存成 <doc>.response.json
+    # ③ 後處理
+    python extract.py --input library/raw/<doc>.txt --source-type transcript \
+        --evidence-tier 1 --response extractions/<doc>.response.json \
+        --out extractions/<doc>.json
+
+抽完跑 `loader/validate.py` 再進 Neo4j。
 
 Env vars:
-    ANTHROPIC_API_KEY  — required
-    NEO4J_*            — not used by this script; consumed by loader/load_to_neo4j.py
-    EXTRACT_MODEL      — optional; defaults to claude-sonnet-4-6
+    NEO4J_*  — 本支不用；由 loader/load_to_neo4j.py 消費
+    ⚠ **不再需要 ANTHROPIC_API_KEY。**
 """
 from __future__ import annotations
 
@@ -112,44 +128,29 @@ def _strip_code_fences(text: str) -> str:
 
 # ── core extraction ────────────────────────────────────────────────────────────
 
-def extract(
+def build_prompt(
     input_path: str,
     source_type: str,
     evidence_tier: int,
-    out_path: str,
     title: str | None = None,
-    model: str | None = None,
-) -> int:
-    try:
-        from anthropic import Anthropic
-    except ImportError:
-        print("需要 anthropic 套件: pip install anthropic", file=sys.stderr)
-        return 1
+) -> tuple[str, str]:
+    """組出 (system_prompt, user_message)。**純函式，零外部相依。**
 
-    api_key = os.environ.get("ANTHROPIC_API_KEY")
-    if not api_key:
-        print("請設 ANTHROPIC_API_KEY 環境變數", file=sys.stderr)
-        return 1
-
-    model = model or os.environ.get("EXTRACT_MODEL", "claude-sonnet-4-6")
-
-    # Load and patch system prompt
-    system_prompt = _load_system_prompt()
-    system_prompt = system_prompt.replace("{{KNOWN_ENTITIES}}", _known_entities_block())
-
-    # Read document
+    這一段從前埋在 API 呼叫裡，拆出來之後才測得到——提示本身就是契約
+    （`prompts/extract_system.md` 的逐字規則，例如「具體型號／公司名必須在 quote 裡
+    逐字出現」是 L6 Gap 4 的唯一防線）。
+    """
     doc_path = Path(input_path)
     if not doc_path.exists():
-        print(f"ERROR: Input file not found: {input_path}", file=sys.stderr)
-        return 1
+        raise FileNotFoundError(f"Input file not found: {input_path}")
     doc_text = doc_path.read_text(encoding="utf-8")
-
     doc_id = doc_path.stem
     doc_title = title or doc_id
 
-    # Build user message
-    user_message = f"""\
-Document to extract:
+    system_prompt = _load_system_prompt().replace(
+        "{{KNOWN_ENTITIES}}", _known_entities_block()
+    )
+    user_message = f"""Document to extract:
 
 Title: {doc_title}
 Source type: {source_type}
@@ -168,41 +169,62 @@ Set these fields in source_doc:
   evidence_tier: {evidence_tier}
 
 Output ONLY the JSON object."""
+    return system_prompt, user_message
 
-    # Call API
-    print(f"[extract] model={model}  input={input_path}", file=sys.stderr)
-    client = Anthropic(api_key=api_key)
 
-    response = client.messages.create(
-        model=model,
-        max_tokens=16000,
-        system=system_prompt,
-        messages=[{"role": "user", "content": user_message}],
+def write_scaffold(
+    input_path: str,
+    source_type: str,
+    evidence_tier: int,
+    scaffold_path: str,
+    title: str | None = None,
+) -> int:
+    """把提示寫成一份 Markdown，交給 session 產出 JSON。"""
+    system_prompt, user_message = build_prompt(
+        input_path, source_type, evidence_tier, title
     )
+    out = Path(scaffold_path)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    header = (
+        "# 抽取提示（session-in-the-loop）\n\n"
+        "⚠ 依下列 system prompt 的規則產出**單一 JSON 物件**，存成檔案後用\n"
+        "`python extract.py --input ... --response <該檔> --out <輸出>` 完成後處理。\n"
+        "**不要自己補 source id 前綴或 schema_version**——那是後處理的事。\n\n"
+    )
+    out.write_text(
+        header
+        + "## System prompt\n\n" + system_prompt
+        + "\n\n## Document\n\n" + user_message + "\n",
+        encoding="utf-8",
+    )
+    print(f"[extract] 提示已寫入 {scaffold_path}；產出 JSON 後用 --response 完成後處理",
+          file=sys.stderr)
+    return 0
 
-    raw_text = response.content[0].text
 
-    # Parse JSON
+def ingest_response(
+    input_path: str,
+    response_path: str,
+    out_path: str,
+) -> int:
+    """吃 session 產出的 JSON，跑 deterministic 後處理並寫檔。
+
+    ⚠ 後處理**與從前一字不差**：`schema_version` 預設、source id 加 doc_id 前綴。
+    前綴那一步是 L6 的教訓——局部 ID 在單文件內沒問題，跨文件 MERGE 後會命名空間衝突。
+    """
+    raw_text = Path(response_path).read_text(encoding="utf-8")
     cleaned = _strip_code_fences(raw_text)
     try:
         doc = json.loads(cleaned)
     except json.JSONDecodeError as exc:
-        out = Path(out_path)
-        raw_file = out.parent / (out.stem + "_raw.txt")
-        raw_file.parent.mkdir(parents=True, exist_ok=True)
-        raw_file.write_text(raw_text, encoding="utf-8")
-        print(f"ERROR: LLM response is not valid JSON: {exc}", file=sys.stderr)
-        print(f"  Raw response saved to {raw_file}", file=sys.stderr)
-        print("  Fix the system prompt and retry.", file=sys.stderr)
+        print(f"ERROR: {response_path} 不是合法 JSON：{exc}", file=sys.stderr)
+        print("  ⚠ 這是 session 產出的內容有問題，不是抽取失敗——修 JSON 後重跑即可。",
+              file=sys.stderr)
         return 1
 
-    # Ensure schema_version is set
     doc.setdefault("schema_version", "0.1")
+    doc = _prefix_source_ids(doc, Path(input_path).stem)
 
-    # Rewrite source IDs to global namespace ({doc_id}_s{N})
-    doc = _prefix_source_ids(doc, doc_id)
-
-    # Write output
     out = Path(out_path)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(doc, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -214,7 +236,7 @@ Output ONLY the JSON object."""
 
 def main() -> int:
     ap = argparse.ArgumentParser(
-        description="Extract supply-chain knowledge graph from a raw document via Claude."
+        description="從原始文件抽出供應鏈知識圖譜的中介 JSON（session-in-the-loop，不接 API）"
     )
     ap.add_argument(
         "--input", required=True,
@@ -230,26 +252,42 @@ def main() -> int:
         help="Evidence tier: 1=filing/transcript (strongest) … 4=social (weakest).",
     )
     ap.add_argument(
-        "--out", required=True,
-        help="Output path for the intermediate JSON (e.g. extractions/coherent_q3.json).",
+        "--scaffold",
+        help="產生抽取提示到這個路徑（第一段）。與 --response 互斥。",
+    )
+    ap.add_argument(
+        "--response",
+        help="session 產出的 JSON 檔（第二段）。需搭配 --out。",
+    )
+    ap.add_argument(
+        "--out",
+        help="中介 JSON 的輸出路徑（例：extractions/coherent_q3.json）。搭配 --response。",
     )
     ap.add_argument(
         "--title",
         help="Human-readable document title. Defaults to the input filename stem.",
     )
-    ap.add_argument(
-        "--model",
-        help="Claude model override (env: EXTRACT_MODEL; default: claude-sonnet-4-6).",
-    )
     args = ap.parse_args()
 
-    return extract(
+    # ⚠ 兩段互斥且各自必要——不給任何一段時**明確報錯，不預設走某一段**。
+    # 這支從前是一個命令做完全部；沉默地挑一段會讓使用者以為抽取完成了。
+    if bool(args.scaffold) == bool(args.response):
+        ap.error("--scaffold 與 --response 必須且只能擇一"
+                 "（先 --scaffold 產提示，session 產出 JSON 後再 --response）")
+    if args.scaffold:
+        return write_scaffold(
+            input_path=args.input,
+            source_type=args.source_type,
+            evidence_tier=args.evidence_tier,
+            scaffold_path=args.scaffold,
+            title=args.title,
+        )
+    if not args.out:
+        ap.error("--response 必須搭配 --out")
+    return ingest_response(
         input_path=args.input,
-        source_type=args.source_type,
-        evidence_tier=args.evidence_tier,
+        response_path=args.response,
         out_path=args.out,
-        title=args.title,
-        model=args.model,
     )
 
 

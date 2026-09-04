@@ -1,23 +1,30 @@
 """
-generate_lane_memo.py — 用 Claude API 生成 Directional Lane Memo。
+generate_lane_memo.py — 渲染 Directional Lane Memo。**session-in-the-loop，不接 API。**
 
-流程:
-  1. 建立 Neo4j driver，呼叫 query.graph_context.build_context() 取得結構化 Markdown
-  2. 若有 --ticker，跑 Engine C 財務核驗清單 gate + 市場數據快照
-  3. 讀 prompts/lane_memo_system.md 作為 system prompt
-  4. 呼叫 anthropic.messages.create
-  5. 輸出加 output_type header（[Watchlist Candidate] 或 [Research Note]）寫入 --out
+## 2026-09-04：拔掉最後一個 API 呼叫點
 
-用法:
-    python thesis/generate_lane_memo.py
-    python thesis/generate_lane_memo.py --ticker COHR --company-id co:coherent
-    python thesis/generate_lane_memo.py --out thesis/cpo_v1_lane_memo.md
-    python thesis/generate_lane_memo.py --override-gate --override-reason "第一次 dry run"
+使用者已定案不再使用 LLM API。`--envelope-file` 這條 provider-independent 路徑本來就
+存在（給其他 agent 產 draft 用），拔掉 API 分支之後它成為唯一的內容入口——
+**驗證與 evidence gate 一行沒動**。
+
+⚠ 同時記住 memo 在 2026-09-02 之後的定位：**它是隨叫隨到的視圖，不是流程的一站**，
+也不 gate 任何東西（cohort 才是研究終點）。想要一頁式綜合時才渲染。
+
+流程：
+  1. 建 Neo4j driver → `query.graph_context.build_context()` 取結構化 Markdown
+  2. 有 --ticker 就跑 Engine C 財務核驗清單 gate ＋ 市場數據快照
+  3. 讀 prompts/lane_memo_system.md 當 system prompt
+  4. `--scaffold` 產出提示 → session 寫 envelope → `--envelope-file` 吃回來
+  5. 驗證 ＋ evidence gate ＋ output_type header（[Watchlist Candidate]／[Research Note]）
+
+用法：
+    python thesis/generate_lane_memo.py --ticker COHR --company-id co:coherent         --scaffold thesis/cohr.prompt.md
+    # ...session 依提示產出 JSON envelope...
+    python thesis/generate_lane_memo.py --ticker COHR --company-id co:coherent         --envelope-file thesis/cohr.envelope.json --out thesis/cohr_lane_memo.md
 
 Env vars:
-    ANTHROPIC_API_KEY  — required
     NEO4J_URI / NEO4J_USER / NEO4J_PASSWORD — Neo4j 連線
-    THESIS_MODEL       — optional; defaults to claude-sonnet-4-6
+    ⚠ **不再需要 ANTHROPIC_API_KEY。**
 """
 from __future__ import annotations
 
@@ -42,11 +49,9 @@ SYSTEM_PROMPT_FILE = ROOT / "prompts" / "lane_memo_system.md"
 DEFAULT_OUT = ROOT / "thesis" / "cpo_v1_lane_memo.md"
 
 
-def _check_env(*, require_anthropic: bool = True) -> bool:
+def _check_env() -> bool:
+    """⚠ 2026-09-04 起**不再檢查 `ANTHROPIC_API_KEY`**——本支已無 API 呼叫。"""
     ok = True
-    if require_anthropic and not os.environ.get("ANTHROPIC_API_KEY"):
-        print("ERROR: ANTHROPIC_API_KEY 未設定", file=sys.stderr)
-        ok = False
     if not os.environ.get("NEO4J_PASSWORD"):
         print("ERROR: NEO4J_PASSWORD 未設定", file=sys.stderr)
         ok = False
@@ -302,23 +307,24 @@ def _atomic_write_pair(memo_path: Path, memo_text: str, sidecar: dict) -> Path:
 
 def generate(
     out_path: str | Path | None = None,
-    model: str | None = None,
     ticker: str | None = None,
     company_id: str | None = None,
     override_gate: bool = False,
     override_reason: str | None = None,
     envelope_path: str | Path | None = None,
+    scaffold_path: str | Path | None = None,
 ) -> int:
-    if not _check_env(require_anthropic=envelope_path is None):
-        return 1
+    """⚠ **session-in-the-loop，不接 API**（2026-09-04）。
 
-    Anthropic = None
-    if envelope_path is None:
-        try:
-            from anthropic import Anthropic
-        except ImportError:
-            print("需要 anthropic 套件: pip install anthropic", file=sys.stderr)
-            return 1
+    兩段：`--scaffold` 產出提示交給 session，`--envelope-file` 吃回 JSON envelope
+    並跑**原封不動的**驗證與 evidence gate。envelope 路徑本來就存在（給其他
+    agent 用），拔掉 API 分支之後它成為唯一入口——驗證與 gate 一行沒動。
+    """
+    if not _check_env():
+        return 1
+    if bool(envelope_path) == bool(scaffold_path):
+        print("ERROR: --scaffold 與 --envelope-file 必須且只能擇一", file=sys.stderr)
+        return 1
     try:
         from neo4j import GraphDatabase
     except ImportError:
@@ -388,7 +394,6 @@ def generate(
           f"l9_pass={l9_pass}, company_l8_pass={source_diversity_pass}", file=sys.stderr)
 
     # ── 4. Claude API call ────────────────────────────────────────────────────
-    model = model or os.environ.get("THESIS_MODEL", "claude-sonnet-4-6")
     user_message = f"""\
 以下是供應鏈知識圖譜的結構化上下文與財務/市場數據，請依照 system prompt 的格式撰寫 Directional Lane Memo。
 
@@ -412,24 +417,34 @@ def generate(
 Variant Perception 段落必須以它為基礎渲染（可補市場數字，不得改寫方向）。每個重要論點必須用 `[E#]` 指向
 evidence_items；所有 ID 必須逐字取自 Evidence Inventory。"""
 
-    if envelope_path is not None:
-        envelope_file = Path(envelope_path)
-        try:
-            raw_text = envelope_file.read_text(encoding="utf-8")
-        except OSError as exc:
-            print(f"ERROR: 無法讀取 envelope file：{exc}", file=sys.stderr)
-            return 1
-        print(f"[generate_lane_memo] envelope_file={envelope_file}", file=sys.stderr)
-    else:
-        print(f"[generate_lane_memo] model={model}", file=sys.stderr)
-        client = Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
-        response = client.messages.create(
-            model=model,
-            max_tokens=16000,
-            system=system_prompt,
-            messages=[{"role": "user", "content": user_message}],
+    if scaffold_path is not None:
+        # 第一段：把提示寫出去，交給 session 產 envelope。**這裡就結束，不往下走。**
+        # ⚠ 不得順手產一份空 envelope 讓後面的 gate「跑得完」——那會讓
+        # 「還沒寫」與「寫了但證據不足」在 gate 結果上同形（L13）。
+        scaffold_file = Path(scaffold_path)
+        scaffold_file.parent.mkdir(parents=True, exist_ok=True)
+        scaffold_header = (
+            "# Lane Memo envelope 提示（session-in-the-loop）\n\n"
+            "⚠ 依 system prompt 產出**單一 JSON envelope**，存檔後用\n"
+            "`--envelope-file <該檔>` 跑同一套驗證與 evidence gate。\n\n"
         )
-        raw_text = response.content[0].text
+        scaffold_file.write_text(
+            scaffold_header
+            + "## System prompt\n\n" + system_prompt
+            + "\n\n## Context\n\n" + user_message + "\n",
+            encoding="utf-8",
+        )
+        print(f"[generate_lane_memo] 提示已寫入 {scaffold_file}；"
+              "產出 envelope 後用 --envelope-file 完成驗證與 gate", file=sys.stderr)
+        return 0
+
+    envelope_file = Path(envelope_path)
+    try:
+        raw_text = envelope_file.read_text(encoding="utf-8")
+    except OSError as exc:
+        print(f"ERROR: 無法讀取 envelope file：{exc}", file=sys.stderr)
+        return 1
+    print(f"[generate_lane_memo] envelope_file={envelope_file}", file=sys.stderr)
     envelope, parse_error = _parse_envelope(raw_text)
     if envelope is None:
         validation = {
@@ -521,8 +536,6 @@ def main() -> int:
     )
     ap.add_argument("--out", default=str(DEFAULT_OUT),
                     help="Output path for the Lane Memo markdown file.")
-    ap.add_argument("--model",
-                    help="Claude model override (env: THESIS_MODEL; default: claude-sonnet-4-6).")
     ap.add_argument("--ticker",
                     help="股票代號（如 COHR）。用於財務核驗清單 gate 與市場數據取得。")
     ap.add_argument("--company-id",
@@ -532,22 +545,27 @@ def main() -> int:
     ap.add_argument("--override-reason", default=None,
                     help="override-gate 時說明跳過理由。")
     ap.add_argument(
+        "--scaffold",
+        default=None,
+        help="產出 envelope 提示到這個路徑（第一段），交給 session 撰寫。與 --envelope-file 互斥。",
+    )
+    ap.add_argument(
         "--envelope-file",
         default=None,
         help=(
-            "讀取 provider-independent JSON envelope，不呼叫 Anthropic API；"
-            "適合由其他 agent/model 先產生 draft，再走同一驗證與 gate。"
+            "讀取 provider-independent JSON envelope（第二段），跑驗證與 evidence gate。"
+            "⚠ 2026-09-04 起這是唯一的內容入口——本支已無 API 呼叫。"
         ),
     )
     args = ap.parse_args()
     return generate(
         out_path=args.out,
-        model=args.model,
         ticker=args.ticker,
         company_id=args.company_id,
         override_gate=args.override_gate,
         override_reason=args.override_reason,
         envelope_path=args.envelope_file,
+        scaffold_path=args.scaffold,
     )
 
 
