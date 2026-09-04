@@ -154,8 +154,12 @@ def build_research_context(
     fundamentals, fund_fresh = fundamentals_provider.fundamentals(ticker, as_of=as_of)
     market, market_fresh = fundamentals_provider.market(ticker, as_of=as_of)
     consensus, consensus_fresh = fundamentals_provider.consensus(ticker, as_of=as_of)
+    # 估計修正與股價變動分開的完整 payload（Phase 4）。provider 沒有這個能力時
+    # 是 None——與「有序列但算不出修正」不同，兩者在 method 字串裡各有說法。
+    revision_fn = getattr(fundamentals_provider, "estimate_revision", None)
+    revision = revision_fn(ticker, as_of=as_of) if callable(revision_fn) else None
 
-    valuation = _implied_valuation(market, consensus, notes)
+    valuation = _implied_valuation(market, consensus, notes, revision)
 
     all_refs: list[EvidenceRef] = []
     for block in (graph.evidence, scarcity.evidence, fundamentals.evidence,
@@ -194,7 +198,10 @@ def build_research_context(
 
 
 def _implied_valuation(
-    market: MarketSnapshot, consensus: ConsensusSnapshot, notes: list[str]
+    market: MarketSnapshot,
+    consensus: ConsensusSnapshot,
+    notes: list[str],
+    revision: Mapping[str, Any] | None = None,
 ) -> ValuationSnapshot:
     """由行情與共識反推市場隱含假設。
 
@@ -209,11 +216,17 @@ def _implied_valuation(
         # ⚠ 粗略 proxy：它假設本益比不變，而那正是要質疑的東西。
         implied_growth = (consensus.trailing_pe / consensus.forward_pe) - 1.0
         method_parts.append("implied_growth=trailing_pe/forward_pe-1（假設倍數不變）")
-    if consensus.estimate_revision_30d is not None:
+    if revision:
+        # Phase 4 的核心：**估計修正與股價變動分開**。原版取 `pe_forward` 的 30 日
+        # 變化，而倍數同時被兩者推動，下游無從分辨（L12）。分開之後才問得出 Q4 的
+        # 問題——「分析師改了估計，而股價還沒反映」正是 expectation gap 的形狀。
         method_parts.append(
-            "revision_proxy=forward_pe 30 日變化"
-            "（⚠ 混合了估計調整與股價變動，Phase 4 補 forwardEps 後才算得準）"
+            f"estimate_revision=forward EPS {revision['eps_change']:+.1%}"
+            f" vs 股價 {revision['price_change']:+.1%}"
+            f"（{revision['observations']} 個觀測，{revision['from']}→{revision['to']}）"
         )
+    elif consensus.forward_pe:
+        method_parts.append("estimate_revision=不可得（序列太短、起點為 0 或跨越正負號）")
     if not method_parts:
         notes.append("Q4 原料不足：缺 forward/trailing 倍數，市場隱含假設算不出來")
     return ValuationSnapshot(

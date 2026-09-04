@@ -454,6 +454,43 @@ MUTATIONS: tuple[Mutation, ...] = (
             "判給任一邊都會逼出一條反向 import"
         ),
     ),
+    # --- Phase 4 Q4 原料：估計修正與股價分開（2026-09-04）-----------------
+    Mutation(
+        name="估計修正退回混合了股價的舊 proxy",
+        path="engine_c/estimates.py",
+        old='        "eps_change": e1 / e0 - 1.0,',
+        new='        "eps_change": (p1 / e1) / (p0 / e0) - 1.0,  # pe_forward 變化',
+        test=(
+            "tests/test_estimate_revision.py::"
+            "test_a_multiple_that_did_not_move_still_reports_both_legs"
+        ),
+        guards=(
+            "倍數同時被估計與股價推動；估計與股價同幅上升時舊 proxy 回報「修正 0」，"
+            "而事實是分析師把估計調高了一倍"
+        ),
+    ),
+    Mutation(
+        name="虧損轉盈利時硬算比值",
+        path="engine_c/estimates.py",
+        old="    if (e0 > 0) != (e1 > 0):\n        return None",
+        new="    if False:\n        return None",
+        test=(
+            "tests/test_estimate_revision.py::"
+            "test_sign_crossing_is_unavailable_not_a_huge_number"
+        ),
+        guards="跨越正負號的比值方向是反的，進了 Q4 原料會寫出完全錯誤的 variant perception",
+    ),
+    Mutation(
+        name="修正窗口取整條序列而不是最近 N 個",
+        path="engine_c/estimates.py",
+        old="    window = series[-(sessions + 1):] if sessions > 0 else series",
+        new="    window = series",
+        test=(
+            "tests/test_estimate_revision.py::"
+            "test_the_window_takes_the_most_recent_observations"
+        ),
+        guards="取錯窗口會差一個數量級（實測 +900% vs +100%）",
+    ),
     Mutation(
         name="槓桿算不出來時 fail open",
         path="risk/snapshot.py",

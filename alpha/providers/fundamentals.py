@@ -17,6 +17,8 @@ from dataclasses import dataclass
 from datetime import date, datetime
 from typing import Any, Mapping, Sequence
 
+from engine_c.estimates import forward_eps_from, revision_over
+
 from ..contracts import (
     ConsensusSnapshot, EvidenceRef, FreshnessState, FundamentalsSnapshot, MarketSnapshot,
 )
@@ -149,47 +151,68 @@ class EngineCFundamentalsProvider:
         if row is None:
             return ConsensusSnapshot(), FreshnessState(
                 as_of=None, age_days=None, status="missing", reason="無快照")
-        price = _num(row.get("price"))
-        forward_pe = _num(row.get("pe_forward"))
+        revision = self._revision(ticker, as_of)
         return (
             ConsensusSnapshot(
                 analyst_count=_int(row.get("analyst_target_count")),
                 target_mean=_num(row.get("analyst_target_mean")),
-                forward_pe=forward_pe,
+                forward_pe=_num(row.get("pe_forward")),
                 trailing_pe=_num(row.get("pe_trailing")),
                 ev_revenue=_num(row.get("ev_revenue")),
-                # ⚠ **由 price / forward_pe 反推的 implied EPS，不是分析師的估計值。**
-                # 它分不出「估計被下修」與「股價漲了」。真正的 forwardEps 是
-                # Phase 4 的補洞項（yfinance.info 直接有）。
-                forward_eps=(price / forward_pe) if price and forward_pe else None,
-                revenue_estimate_next_fy=None,   # Engine C 無此欄位（Phase 4）
-                estimate_revision_30d=self._revision(ticker, as_of),
+                # ⚠ **以報價單位計，不是結算幣別**——實測 IQE.L（`GBp` 報價）
+                # 導出值是 yfinance `forwardEps` 的 100 倍。它只能用在同一標的的
+                # 時間序列比值（單位會消掉），**不得跨標的比大小**。
+                # 見 `engine_c/estimates.py` 的模組 docstring。
+                forward_eps=forward_eps_from(row.get("price"), row.get("pe_forward")),
+                revenue_estimate_next_fy=None,   # Engine C 無此欄位（Phase 4 未補）
+                estimate_revision_30d=(
+                    revision["eps_change"] if revision else None  # type: ignore[index]
+                ),
                 evidence=(self._ref(ticker, row, "engine_c_snapshot"),),
             ),
             _freshness(row, as_of),
         )
 
-    def _revision(self, ticker: Ticker, as_of: date | None) -> float | None:
-        """`pe_forward` 的 30 日變化——**estimate revision 的雛形**。
+    def estimate_revision(
+        self, ticker: Ticker | None, *, as_of: date | None = None, sessions: int = 30
+    ) -> dict[str, Any] | None:
+        """估計修正與股價變動**分開**的 30 個觀測窗口。Q4 的原料。
 
-        每日快照已跑了兩個月（2026-07-08 起），所以「forward 倍數在動」是量得到的。
-        ⚠ 但它**混合了估計調整與股價變動**——真正的 revision 要等 Phase 4 補
-        `forwardEps` 之後才算得準。這裡先給出來，並在 `ValuationSnapshot.method`
-        標明它是 proxy。
+        `consensus()` 只放得下一個 `estimate_revision_30d` 純量，但 Q4 真正要問的是
+        「估計動了多少 vs 股價動了多少」——那是兩個數字。這裡把完整 payload 給出來
+        （`eps_change`／`price_change`／`estimate_vs_price`）。
+        """
+        if ticker is None:
+            return None
+        return self._revision(ticker, as_of, sessions=sessions)
+
+    def _revision(
+        self, ticker: Ticker, as_of: date | None, *, sessions: int = 30
+    ) -> dict[str, Any] | None:
+        """forward EPS 的修正幅度——**與股價變動分開**。
+
+        原版取的是 `pe_forward` 的 30 日變化，而倍數同時被「分析師改估計」與
+        「股價漲跌」推動：一個表示兩種語意，下游無從分辨（L12）。原註解說真正的
+        revision「要等 Phase 4 補 `forwardEps`」——**2026-09-04 實測後那個前提是錯的**：
+        `forwardEps` 恆等於 `price / forwardPE`，而兩者我們每天都存，
+        導出立刻有兩個月歷史（見 `engine_c/estimates.py`）。
         """
         cur = self._cursor()
         anchor = (as_of or date.today()).isoformat()
         cur.execute(
-            "SELECT pe_forward FROM financial_snapshots WHERE ticker = ? "
-            "AND pe_forward IS NOT NULL AND COALESCE(bar_date, snapshot_date) <= ? "
-            "ORDER BY COALESCE(bar_date, snapshot_date) DESC LIMIT 30",
+            "SELECT COALESCE(bar_date, snapshot_date) AS d, price, pe_forward "
+            "FROM financial_snapshots WHERE ticker = ? "
+            "AND price IS NOT NULL AND pe_forward IS NOT NULL "
+            "AND COALESCE(bar_date, snapshot_date) <= ? "
+            "ORDER BY d ASC",
             (str(ticker), anchor),
         )
-        values = [_num(r[0]) for r in cur.fetchall()]
-        values = [v for v in values if v]
-        if len(values) < 2:
-            return None
-        return (values[0] - values[-1]) / values[-1]
+        series = [
+            {"as_of": str(r[0]), "forward_eps": eps, "price": float(r[1])}
+            for r in cur.fetchall()
+            if (eps := forward_eps_from(r[1], r[2])) is not None
+        ]
+        return revision_over(series, sessions=sessions)
 
 
 def _freshness(row: Mapping[str, Any], as_of: date | None) -> FreshnessState:
