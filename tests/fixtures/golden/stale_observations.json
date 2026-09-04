@@ -1,5 +1,5 @@
 {
-  "total_manual_observations": 86,
+  "total_manual_observations": 100,
   "oldest": [
     {
       "ticker": "6680.HK",
@@ -7,22 +7,22 @@
       "as_of": "2023-03-31T00:00:00+00:00"
     },
     {
+      "ticker": "MU",
+      "field_name": "segment_revenue_share",
+      "as_of": "2025-08-28T00:00:00+00:00"
+    },
+    {
+      "ticker": "AVGO",
+      "field_name": "segment_revenue_share",
+      "as_of": "2025-11-02T00:00:00+00:00"
+    },
+    {
       "ticker": "3081.TWO",
       "field_name": "backlog",
       "as_of": "2025-12-31T00:00:00+00:00"
     },
     {
       "ticker": "3081.TWO",
-      "field_name": "customer_concentration",
-      "as_of": "2025-12-31T00:00:00+00:00"
-    },
-    {
-      "ticker": "3363.TWO",
-      "field_name": "backlog",
-      "as_of": "2025-12-31T00:00:00+00:00"
-    },
-    {
-      "ticker": "3363.TWO",
       "field_name": "customer_concentration",
       "as_of": "2025-12-31T00:00:00+00:00"
     }
