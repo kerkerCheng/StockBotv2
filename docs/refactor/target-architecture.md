@@ -923,7 +923,7 @@ CONCEPTS 定義**名詞本身**，ARCHITECTURE 定義**名詞之間的關係與�
 
 | 位置 | 是什麼 | 為什麼不合併 |
 |---|---|---|
-| `skills/*/SKILL.md`（12 個） | **操作手冊 ＋ 呈現契約**：一個具體工作怎麼做、輸出長什麼樣 | 兩端 harness 自動載入；`description` frontmatter 是權威。pq2 的 90 行呈現規格搬來這裡 |
+| `skills/*/SKILL.md`（⚠ 原文寫 12 個，`luna-reviewer` 2026-09-04 退役後為 11；**數字會過期，別引用它**——`ls skills/` 才是答案） | **操作手冊 ＋ 呈現契約**：一個具體工作怎麼做、輸出長什麼樣 | 兩端 harness 自動載入；`description` frontmatter 是權威。pq2 的 90 行呈現規格搬來這裡 |
 | `docs/solutions/*/*.md`（9 篇） | **單一事故的事後檢討**（帶 `problem_type` frontmatter 可搜尋） | 它們是**個案**；餵養 AGENTS 的 lesson 判準與 ARCHITECTURE 的設計理由，但不取代兩者 |
 | `docs/historical-failure-matrix.md` | **回歸憲法**：36 筆事故 → 六條 invariant → executable protection 對照 | Phase 8 由 `docs/refactor/` 移出成常駐檔。⚠ 它會**逐步溶解**——§2 六條 invariant 進 AGENTS、§3 audit 規格變成 `audit/` 的 code、§7 golden fixtures 變成測試。**殘留的只有矩陣本身**（一份活的登記表），這正是「lesson 必須 executable」套用在文件自己身上 |
 | `schema/graph_schema.md`＋`schema/vocab.json` | **機器可讀的 schema 規格** | 有程式直接消費（`loader/validate.py`）；改它等於改資料格式 |

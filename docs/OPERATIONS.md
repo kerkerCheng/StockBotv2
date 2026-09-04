@@ -151,19 +151,16 @@ Engine C 提案）→ 報告本輪產出與下一題。**所有 authority mutati
 
 ## 常用指令
 
-### Luna reviewer（手動 opt-in）
+### 委派唯讀 subagent（已無專用入口）
 
-預設不啟動。每次要用時在指令前加 `$luna-reviewer` 或 `Luna reviewer：`；只對該次指令有效，不會黏到下一個 session／下一個請求。
+⚠ **`luna-reviewer` skill 與 `.codex/agents/luna-operator.toml` 已於 2026-09-04 退役**
+（實測：2026-08-01 上線、只用過 2 次、之後 34 天／744 個 commit 零使用）。
+要用便宜模型做唯讀盤點時，**直接用 harness 原生的 subagent**：Claude Code 的 `Agent`
+工具可指定 `model`（`haiku`／`sonnet`…）與唯讀的 `Explore` 型別；Codex 側用它自己的
+custom-agent 機制。**不要再包一層 skill** ——那層才是當初重造的輪子。
 
-```text
-Luna reviewer：pq1 5
-$luna-reviewer pq1 5
-Luna reviewer：alpha NBIS，先做財務五項與反證蒐集
-Luna reviewer：repo audit，檢查 queue schema 與測試失敗
-Luna reviewer：停止
-```
-
-入口會啟動既有 `.codex/agents/luna-operator.toml`：Luna 唯讀批量執行，主代理逐項 review 並保留唯一寫入與所有人工 gate。若 Luna runtime 不可用，不自動換成較昂貴 subagent。完整契約見 `skills/luna-reviewer/SKILL.md`。
+授權邊界不因此改變（`AGENTS.md`「協作與邊界」）：回傳只是 review packet 不是 authority，
+主代理是唯一 writer，所有人工 gate 照舊。
 
 ### 待辦池（統一 pq2）
 ```powershell

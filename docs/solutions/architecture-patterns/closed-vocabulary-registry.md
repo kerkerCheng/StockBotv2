@@ -100,6 +100,12 @@ tags:
 | `signal` 整區：`tiers`（含 `rsi_at_most` 45／40／35）、`baseline_pace`、`allowed_paces`、`repeat_after_sessions`、`stretched_above_sma200` | `config/beta_policy.json` | 2026-08-29 `6aa31de` | 2026-08-01 三次回測 0 勝 3 敗（見 `AGENTS.md`「技術訊號的地位」）。拔的是**已被量測為有害**的東西，不是精簡 |
 | `campaign_budget_fraction_by_sleeve` 與「本輪可評估上限」概念 | `config/beta_policy.json`、`portfolio/allocation.py` | 2026-08-29 `6aa31de` | `self_funded_supported_range` 已重新定義為可部署現金本身，不再乘 pace |
 | RSI／MACD／`sma_50_slope` | `engine_c/technical.py` 的 `_METRIC_COLUMNS` | 2026-08-29 `6aa31de` | 從計算與寫入徹底移出，不是只停止顯示 |
+| **`luna-reviewer` skill ＋ `luna_operator` custom agent**（觸發詞 `$luna-reviewer`／`Luna reviewer：`、`agent_type="luna_operator"`、~~`skills/luna-reviewer/SKILL.md`~~、~~`.codex/agents/luna-operator.toml`~~、~~`tests/test_luna_reviewer_skill.py`~~） | `skills/`＋`.codex/agents/` | 2026-09-04 | **量測後退役，不是嫌它醜。** 2026-08-01 上線，實際使用 **2 次**（`luna_reviewer_2026-08-01_pq1_5` 4 筆 lead、`luna_reviewer_2026-08-02_pq1_10` 6 筆），之後 **34 天／744 個 commit 零使用**；`.toml` 自上線日起未再修改。<br>兩個原因：①**成本模型變了**——subagent 每次 spawn 都是冷啟動、要重新推導主代理已有的 context，便宜模型省下的往往被 context 重灌吃掉，這很可能就是它兩天後就沒人再用的原因；②**原生功能已覆蓋**——各 harness 的 subagent 本來就能指定便宜模型與唯讀型別（Claude Code 的 `Agent(model=…)`＋唯讀 `Explore`；Codex 的 custom-agent 機制）。<br>⚠ **真正重造的輪子是疊在上面那 95 行 skill 協定層**，不是 Codex 原生的 `.toml` 設定；退役時兩者一起拔，是因為 `.toml` 沒有 skill 也沒人會去叫它。<br>⚠ **授權邊界沒有跟著消失**：「回傳只是 review packet 不是 authority」「主代理是唯一 writer」「不得委派寫入／graph admission／pq2 resolve／thesis mutation／資本／commit-push」已改寫成 provider-neutral 版本留在 `AGENTS.md`「協作與邊界」。<br>⚠ `library/leads/pending_leads.json` 裡兩批 `research_run: luna_reviewer_*` 標記**刻意保留**——那是 append-only 的稽核痕跡，不因工具退役而改寫。 |
+
+> **標記慣例：** 本區用 ~~刪除線~~ 標的路徑代表**該檔案本身已被刪除**，
+> `tests/test_config_tracking.py::test_paths_cited_as_removed_are_actually_gone`
+> 會斷言它們真的不在了（宣告移除卻還在＝移除沒做完）。沒有刪除線的路徑是
+> 「東西**從這裡**被移除」，檔案本身仍存在。
 
 ⚠ **這一區與「可自由擴充」的差別是方向性的：** 上面那些不是「暫時沒用到」，是**測過而且輸了**。
 把它們改名成「熱度」「節奏」「水位」再放回排序或尺寸，等於換名字重來一次同一個實驗——

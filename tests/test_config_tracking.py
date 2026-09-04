@@ -96,14 +96,70 @@ def _doc_text() -> str:
     return DOC.read_text(encoding="utf-8")
 
 
+_REMOVED_HEADING = "### 已移除（不是「可以擴充」，是不得回填）"
+
+
+def _live_and_removed_sections() -> tuple[str, str]:
+    """把登記表切成「現行」與「已移除」兩段。
+
+    ⚠ 兩段的路徑語意**相反**：現行段引用的檔案必須存在；已移除段引用的檔案
+    **必須不存在**（存在就代表那次移除沒做完，而文件已經宣告它移除了）。
+    混在一起驗只能取兩者的下限（L12）。
+    """
+    text = _doc_text()
+    index = text.find(_REMOVED_HEADING)
+    if index == -1:
+        return text, ""
+    return text[:index], text[index:]
+
+
+_PATH = r"[A-Za-z0-9_\-/.]+\.(?:py|json|md|toml)"
+
+
+def _cited_paths(text: str) -> set[str]:
+    """一般引用的路徑（排除 ~~刪除線~~ 標記的）。"""
+    without_struck = re.sub(rf"~~`{_PATH}`~~", "", text)
+    return set(re.findall(rf"`({_PATH})`", without_struck))
+
+
+def _struck_paths(text: str) -> set[str]:
+    """~~刪除線~~ 標記的路徑＝登記表宣告「這個檔案本身已被刪除」。"""
+    return set(re.findall(rf"~~`({_PATH})`~~", text))
+
+
 def test_every_path_cited_in_the_registry_table_exists() -> None:
-    """表上列的每個檔案路徑都必須真的存在。"""
-    cited = set(
-        re.findall(r"`([A-Za-z0-9_\-/]+\.(?:py|json))`", _doc_text())
-    )
+    """**現行段**列的每個檔案路徑都必須真的存在。"""
+    live, _ = _live_and_removed_sections()
+    cited = _cited_paths(live)
     assert cited, "應至少擷取到一些路徑"
     missing = sorted(rel for rel in cited if not (ROOT / rel).exists())
     assert not missing, f"登記表引用了不存在的檔案：{missing}"
+
+
+def test_paths_cited_as_removed_are_actually_gone() -> None:
+    """**已移除段**引用的檔案必須真的不在了。
+
+    ⚠ 這條是上一條的反面，不是它的例外。2026-09-04 退役 `luna-reviewer` 時，
+    上一條當場變紅（登記表引用了剛被刪掉的 `tests/test_luna_reviewer_skill.py`）——
+    正確的修法不是把已移除段排除在檢查外，而是**對它斷言相反的事**：
+    宣告移除了、檔案卻還在，就是「文件說謊」的另一個方向。
+
+    ⚠ 只認 `~~刪除線~~` 標記的路徑。已移除段也會引用**仍存在**的檔案——那是
+    「東西**從這裡**被移除」（如 `engine_c/technical.py` 的 RSI 欄位），檔案本身還在。
+    第一版沒分這兩種，於是把五個健在的檔案報成「移除沒做完」。
+
+    空跑檢查：把 `skills/luna-reviewer/SKILL.md` 建回來 → 這條會紅。
+    """
+    _, removed = _live_and_removed_sections()
+    if not removed:
+        return
+    struck = _struck_paths(removed)
+    assert struck, "已移除段應至少有一個 ~~刪除線~~ 標記的路徑"
+    still_here = sorted(rel for rel in struck if (ROOT / rel).exists())
+    assert not still_here, (
+        "登記表宣告這些已移除，但檔案還在——移除沒做完，或文件寫錯了："
+        f"{still_here}"
+    )
 
 
 def test_every_symbol_cited_in_the_registry_table_still_exists() -> None:

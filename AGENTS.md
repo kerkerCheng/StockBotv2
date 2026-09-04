@@ -351,10 +351,14 @@ tier／pace／`campaign_budget_fraction_by_sleeve`／三態系統動作／「本
   sandbox impact review**（五步見 OPERATIONS）。**不得用 broad permission 掩蓋整合缺口**——
   只放行能由既有人工 gate、action type 與 receipt 約束的最窄 command prefix；
   縮不到可安全 allowlist 的入口就保留互動 approval。
-- **Luna 委派預設關閉、每次明確 opt-in。** 不得因工作看似機械、便宜或適合平行化而自行派
-  Luna。**Luna 的回傳只是 review packet，不是 authority**；不得委派任何寫入、evidence
+- **subagent 委派預設關閉、每次明確 opt-in。** 不得因工作看似機械、便宜或適合平行化而
+  自行派工——每次 spawn 都是冷啟動，要重新推導主代理已經有的 context。
+  **subagent 的回傳只是 review packet，不是 authority**；不得委派任何寫入、evidence
   tier 升級、graph admission、pq2 核准／resolve、thesis mutation、資本配置、commit／push。
-  完整分工見 [`skills/luna-reviewer/SKILL.md`](skills/luna-reviewer/SKILL.md)。
+  同一 working tree 維持主代理為唯一 writer；真要 writing subagent 必須另建 worktree／
+  branch 並指定唯一 owner。
+  ⚠ 專用的 `luna-reviewer` skill 已於 2026-09-04 退役（實測 34 天零使用，且各 harness
+  原生的 subagent 已可指定便宜模型＋唯讀）；**上面這幾條授權邊界與它無關，照舊適用**。
 - **Push 是常規動作**，session 收尾把 master push 到 origin，不需逐次確認；
   push 前 sanity check：`git ls-files library/private` 應為空。程序見 OPERATIONS。
 - **通知不是 authority。** Daily Brief 的 outbound 通知不接受 Discord `go`／交易／入圖
