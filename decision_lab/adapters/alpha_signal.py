@@ -160,6 +160,20 @@ def coverage_assessment_from_signal(payload: Mapping[str, Any]) -> dict[str, Any
         name: payload.get(f"{name}_score")
         for name in sorted(SCORES_WITHOUT_LEGACY_AXIS)
     }
+
+    # ⚠ 鏡像必須把 score 引用到的 trace **一起帶走**。
+    # 2026-09-04 `audit invariants` 實測：鏡像保留了 `trace_id` 卻沒帶
+    # `model_components`，於是每個分數都指向一個檔案裡不存在的 trace——
+    # 一份宣稱「隨時可重建」的鏡像，實際上重建不出任何一個分數憑什麼。
+    # 這與同日抓到的斷鏈 `trace_attempts_ref` 是同一個形狀：
+    # **指標活著、被指的東西沒帶**（INV-3）。
+    mirrored_traces = {
+        trace_id: traces[trace_id]
+        for name in (*SCORE_TO_LEGACY_AXIS, *SCORES_WITHOUT_LEGACY_AXIS)
+        if isinstance(payload.get(f"{name}_score"), Mapping)
+        for trace_id in ((payload[f"{name}_score"] or {}).get("trace_id"),)
+        if trace_id and trace_id in traces
+    }
     return {
         "assessment": assessment,
         # ⚠ 完整鏡像：轉換丟掉的東西必須留在 payload 裡，不得靜默消失。
@@ -170,6 +184,9 @@ def coverage_assessment_from_signal(payload: Mapping[str, Any]) -> dict[str, Any
                 for name in (*SCORE_TO_LEGACY_AXIS, *sorted(SCORES_WITHOUT_LEGACY_AXIS))
             },
             "scores_without_legacy_axis": dropped,
+            #: 上面那些 score 的 `trace_id` 指向的 trace。少了它，鏡像裡的分數
+            #: 講不出憑什麼——`audit invariants` 的 EvidenceProvenance 守著這一條。
+            "model_components": mirrored_traces,
             "variant_view": payload.get("variant_view"),
             "disproof_conditions": payload.get("disproof_conditions"),
             "catalysts": payload.get("catalysts"),

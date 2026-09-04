@@ -25,6 +25,28 @@ Codex local scheduled task
 
 排程收尾只跑 `scripts/publish_daily_state.py`（窄 state publisher，只發布四個 leads state 檔：`pending_leads.json`＋`todo_pool.json`＋`event_watches.json`＋`hypotheses.json`——2026-09-02 由二擴四，impact review 結論見腳本 docstring；不得用 unattended 廣泛 Git 命令碰其他檔）。
 
+**追源證據隨引用一起發布（2026-09-04）：** 同一筆提交會帶上**被那份 state 指名引用、
+且確實存在**的 `library/raw/` 原文。集合由 state 推導（`_referenced_evidence`），
+**不是把 `library/raw/` 加進 pathset**——state 沒提到的下載內容一律留在本機；
+上限 20 份，超過 fail closed（`guard_evidence_volume`）。
+事發：`audit invariants` 實測 3 筆 `trace_attempts_ref` 有 2 筆指向已不存在的檔案——
+引用推上 origin、被引用的檔案留在本機，之後就沒了。
+⚠ **斷掉的引用不得用重新下載補檔**：那會造出 `retrieved_at` 是今天的檔案冒充當時的
+追源嘗試，等於偽造 provenance。查證：`python -m audit invariants --only Orphans`。
+
+### Runtime invariant audit
+
+```powershell
+python -m audit invariants              # 12 個跨層 invariant check
+python -m audit invariants --only Orphans,Expiry
+python -m audit invariants --json       # 機器可讀（findings 不截斷）
+```
+
+唯讀，不寫任何 authority。exit code 非 0 代表有 FAIL。
+報表上 **SKIPPED 不是 PASS**，而且「檢查了 0 筆」會自動從 PASS 降級成 SKIPPED——
+一個看了 0 筆資料的檢查，鑑別力與恆滅的閘門一樣是零（INV-5）。
+Neo4j 沒開時相關 check 顯示 `unavailable`，**不會**因此變成綠燈。
+
 ### Writer lock（雙向互斥，2026-09-02）
 
 同一 working tree 的排程與互動 session 靠 `library/leads/.writer_lock.json`

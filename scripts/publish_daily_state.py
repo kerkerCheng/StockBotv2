@@ -30,6 +30,13 @@ STATE_PATHS = (
     "library/leads/event_watches.json",
     "library/leads/hypotheses.json",
 )
+#: 追源證據的所在目錄。**不是 pathset 的一部分**——只有「被本次要發布的 leads
+#: state 指名引用、且確實存在」的檔案才會被帶上（見 `_referenced_evidence`）。
+EVIDENCE_PREFIX = "library/raw/"
+#: 一輪最多帶幾份證據。daily 一輪只做少量追源；數字爆掉代表**發生了別的事**，
+#: 這時 fail closed 比「照單全收」安全（L12：兩個修法方向都會壞時先分開再各自定規則）。
+MAX_EVIDENCE_PER_RUN = 20
+
 COMMIT_PREFIX = "chore(daily):"
 # 本 publisher 提交時的**完整** subject。`writer_guard` 靠它辨認「這筆共用檔變更
 # 是排程做的」——必須是完整字串而不是 prefix：互動 session 也會用 `chore(daily):`
@@ -55,6 +62,56 @@ def _lines(value: str) -> list[str]:
 
 def _result(status: str, *, committed: bool = False, pushed: bool = False) -> dict[str, Any]:
     return {"status": status, "committed": committed, "pushed": pushed}
+
+
+def _referenced_evidence(repo: Path) -> list[str]:
+    """本次要發布的 leads state 指名引用、且確實存在的 `library/raw/` 檔案。
+
+    ## 為什麼需要這個（2026-09-04 `audit invariants` 抓到的第一筆真實問題）
+
+    daily 的 pq1 追源把原文寫進 `library/raw/`、把路徑寫進 lead 的
+    `trace_attempts_ref`，但 publisher 的 pathset 只有四個 leads JSON。
+    結果是**引用推上 origin、被引用的檔案留在本機**——實測 3 筆有 2 筆
+    （`mu_8_k_20260826.txt`／`mu_4_20260825.txt`）已經永久消失。
+    指標活著、被指的東西死了，而沒有任何東西會叫（INV-3：no silent drop）。
+
+    ## 為什麼不是直接把 `library/raw/` 加進 pathset
+
+    那會讓無人值守排程能提交**任何**下載到該目錄的東西，surface 大得多。
+    這裡的集合是**從即將發布的 state 推導出來的**：只有 state 自己指名、
+    路徑合法、確實存在的檔案才進來。state 沒提到的檔案一律留在本機。
+
+    ⚠ 這**不能**用「重新下載補檔」來取代——那會產生一個 `retrieved_at` 是
+    今天的檔案去冒充當時的追源嘗試，等於偽造 provenance（INV-6）。
+    """
+    leads_path = repo / "library" / "leads" / "pending_leads.json"
+    if not leads_path.exists():
+        return []
+    try:
+        payload = json.loads(leads_path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return []
+
+    found: set[str] = set()
+
+    def walk(node: Any) -> None:
+        if isinstance(node, dict):
+            for value in node.values():
+                walk(value)
+        elif isinstance(node, list):
+            for value in node:
+                walk(value)
+        elif isinstance(node, str):
+            ref = node.strip().replace("\\", "/")
+            if not ref.startswith(EVIDENCE_PREFIX) or len(ref.split()) != 1:
+                return
+            if ".." in ref or ref.endswith("/"):
+                return          # 路徑穿越／目錄一律不收
+            if (repo / ref).is_file():
+                found.add(ref)
+
+    walk(payload.get("leads") or {})
+    return sorted(found)
 
 
 def publish_daily_state(root: Path | str = ROOT) -> dict[str, Any]:
@@ -84,7 +141,11 @@ def publish_daily_state(root: Path | str = ROOT) -> dict[str, Any]:
     # 但 push 失敗；那種 commit 必須只碰 STATE_PATHS，且 subject 帶固定 prefix。
     if head.strip() != upstream.strip():
         code, ahead_paths = _git(repo, "diff", "--name-only", "origin/master..HEAD")
-        if code != 0 or not set(_lines(ahead_paths)).issubset(set(STATE_PATHS)):
+        ahead = set(_lines(ahead_paths))
+        # 上一輪可能同時帶了被引用的追源證據；那些也只能在 `library/raw/` 底下。
+        if code != 0 or not all(
+            path in STATE_PATHS or path.startswith(EVIDENCE_PREFIX) for path in ahead
+        ):
             return _result("guard_unpushed_commits")
         code, subjects = _git(repo, "log", "--format=%s", "origin/master..HEAD")
         if code != 0 or not _lines(subjects) or any(
@@ -100,9 +161,35 @@ def publish_daily_state(root: Path | str = ROOT) -> dict[str, Any]:
     # porcelain 的第一欄可能是空白（例如 `` M path``），不可先 strip。
     status_lines = [line.rstrip() for line in changed.splitlines() if line.strip()]
     expected = {line[3:].strip().replace("\\", "/") for line in status_lines}
+
+    # 被 state 指名、且本身有未提交變更的追源證據，與 state 同一筆提交。
+    # 分開提交會讓兩者之間存在一個「引用已推、檔案未推」的窗口——正是要防的形狀。
+    evidence: list[str] = []
+    if expected:
+        referenced = _referenced_evidence(repo)
+        if len(referenced) > MAX_EVIDENCE_PER_RUN:
+            return _result("guard_evidence_volume")
+        if referenced:
+            code, dirty = _git(repo, "status", "--porcelain", "--", *referenced)
+            if code != 0:
+                return _result("status_failed")
+            evidence = sorted(
+                line.rstrip()[3:].strip().replace("\\", "/")
+                for line in dirty.splitlines() if line.strip()
+            )
+        if not all(path.startswith(EVIDENCE_PREFIX) for path in evidence):
+            return _result("guard_pathset")
+
     if expected:
         if not expected.issubset(set(STATE_PATHS)):
             return _result("guard_pathset")
+        # 證據多半是**新檔**，而 `git commit -- <path>` 只吃 tracked 路徑
+        # （untracked 會 `pathspec did not match`）。所以先 add——此時 index
+        # 已由 `guard_staged_changes` 確認為空，加進去的只有這幾個檔。
+        if evidence:
+            code, _ = _git(repo, "add", "--", *evidence)
+            if code != 0:
+                return _result("evidence_stage_failed")
         code, _ = _git(
             repo,
             "commit",
@@ -110,15 +197,20 @@ def publish_daily_state(root: Path | str = ROOT) -> dict[str, Any]:
             COMMIT_SUBJECT,
             "--",
             *STATE_PATHS,
+            *evidence,
         )
         if code != 0:
+            # 別把髒 index 留給下一輪——那會讓它撞 `guard_staged_changes`，
+            # 而失敗原因看起來會變成完全不相干的另一件事（L12）。
+            if evidence:
+                _git(repo, "reset", "-q", "--", *evidence)
             return _result("commit_failed")
         committed = True
 
         code, committed_paths = _git(
             repo, "show", "--name-only", "--pretty=format:", "HEAD"
         )
-        if code != 0 or set(_lines(committed_paths)) != expected:
+        if code != 0 or set(_lines(committed_paths)) != expected | set(evidence):
             return _result("guard_commit_pathset", committed=True)
 
     # 即使本輪沒新變更，仍可補推上一輪由本腳本留下的安全 commit。

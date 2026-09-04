@@ -925,7 +925,7 @@ CONCEPTS 定義**名詞本身**，ARCHITECTURE 定義**名詞之間的關係與�
 |---|---|---|
 | `skills/*/SKILL.md`（12 個） | **操作手冊 ＋ 呈現契約**：一個具體工作怎麼做、輸出長什麼樣 | 兩端 harness 自動載入；`description` frontmatter 是權威。pq2 的 90 行呈現規格搬來這裡 |
 | `docs/solutions/*/*.md`（9 篇） | **單一事故的事後檢討**（帶 `problem_type` frontmatter 可搜尋） | 它們是**個案**；餵養 AGENTS 的 lesson 判準與 ARCHITECTURE 的設計理由，但不取代兩者 |
-| `docs/historical-failure-matrix.md` | **回歸憲法**：36 筆事故 → 六條 invariant → executable protection 對照 | Phase 8 由 `docs/refactor/` 移出成常駐檔。⚠ 它會**逐步溶解**——§2 六條 invariant 進 AGENTS、§3 audit 規格變成 `alpha/audit/` 的 code、§7 golden fixtures 變成測試。**殘留的只有矩陣本身**（一份活的登記表），這正是「lesson 必須 executable」套用在文件自己身上 |
+| `docs/historical-failure-matrix.md` | **回歸憲法**：36 筆事故 → 六條 invariant → executable protection 對照 | Phase 8 由 `docs/refactor/` 移出成常駐檔。⚠ 它會**逐步溶解**——§2 六條 invariant 進 AGENTS、§3 audit 規格變成 `audit/` 的 code、§7 golden fixtures 變成測試。**殘留的只有矩陣本身**（一份活的登記表），這正是「lesson 必須 executable」套用在文件自己身上 |
 | `schema/graph_schema.md`＋`schema/vocab.json` | **機器可讀的 schema 規格** | 有程式直接消費（`loader/validate.py`）；改它等於改資料格式 |
 | `docs/brainstorms/`、`docs/plans/`、`docs/reports/` | 需求推導、交付規格、point-in-time 報告 | 純歷史，`docs/plans/` 已轉純歷史 |
 | `CLAUDE.md` | 只有一行 `@AGENTS.md` | 雙代理相容轉接層，不放內容 |

@@ -211,7 +211,7 @@ retry／failure disposition｜必須有 terminal disposition｜必須能查詢 s
 新增統一 checker（Phase 1 建骨架，各 Phase 補檢查）：
 
 ```
-python -m alpha.audit invariants          # 或 scripts/audit_invariants.py
+python -m audit invariants                # top-level package（2026-09-04 由 alpha/audit/ 搬出）
 ```
 
 **必須能對真實 repository / storage / DB state 執行，不只是 unit-test fixture。**

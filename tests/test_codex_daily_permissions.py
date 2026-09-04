@@ -1,6 +1,7 @@
 """Daily Brief scheduled task 只使用窄 fixed-entry rules。"""
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 
@@ -116,9 +117,18 @@ def test_event_watch_sweep_is_in_sandbox_not_escalated() -> None:
     本測試鎖兩件事：①rules 檔**不得**出現 event_watch 條目——它不需要
     escalation，未來有人順手放寬就是 broad permission 掩蓋整合缺口；
     ②daily prompt 必須帶 sweep 步驟與 cap 紀律。
+
+    ⚠ **①要問的是「有沒有這樣一條 rule」，不是「檔案裡有沒有這串字」。**
+    第一版寫成 `"event_watch" not in rules`，2026-09-04 被 publisher 的
+    justification 誤觸——那段文字只是提到檔名 `event_watches.json`，
+    不是一條 permission。gate 攔到的是散文不是權限（L15），
+    修法一樣是**改它問問題的方式**：只掃 `pattern=[...]`。
     """
     rules = RULES.read_text(encoding="utf-8")
-    assert "event_watch" not in rules
+    patterns = re.findall(r"pattern=\[(.*?)\]", rules, re.S)
+    assert patterns, "rules 檔解析不出任何 pattern——這條檢查會變成恆真"
+    offenders = [p for p in patterns if "event_watch" in p]
+    assert not offenders, f"event_watch 不需要 escalation，卻出現在 rule pattern：{offenders}"
 
     prompt = (ROOT / "crons" / "daily_brief_prompt.md").read_text(encoding="utf-8")
     for token in (

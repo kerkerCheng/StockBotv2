@@ -14,8 +14,6 @@ from pathlib import Path
 
 import pytest
 
-from alpha import audit
-
 ROOT = Path(__file__).resolve().parents[1]
 
 #: 新架構的三個 package。
@@ -326,32 +324,37 @@ def test_no_core_module_depends_on_mcp() -> None:
 
 
 # ---------------------------------------------------------------------------
-# 4. audit 骨架：未實作不得偽裝成通過
+# 4. audit/ 是 composition root：它看得到所有層，所有層看不到它
 # ---------------------------------------------------------------------------
 
-def test_audit_registry_reports_not_implemented_not_pass() -> None:
-    """L13：成功與未實作若在同一個訊號上同形，讀的人會以為那項健全性有人在管。"""
-    results = audit.run_all()
-    assert len(results) == len(audit.CHECKS) == 12
-    for result in results:
-        assert result.status is not audit.AuditStatus.PASS, result.check
-        assert result.status is audit.AuditStatus.SKIPPED
-        assert result.summary == "not_implemented"
+def test_nothing_imports_audit() -> None:
+    """**`audit/` 站在所有層之上，不被任何層 import。**
+
+    ⚠ 它原本是 `alpha/audit/`（Phase 1 建骨架時的便宜行事）。真的要實作就會發現：
+    這些 check 必須同時讀 registry、Neo4j、Engine C、leads state 與 Decision Store——
+    而 `FORBIDDEN_IN_ALPHA` 明文禁止 `alpha/` 依賴那些。
+    **一個讀遍所有層的東西不可能住在 core 裡**，那正是本次重構要建立的依賴方向。
+
+    空跑檢查：在 `alpha/contracts.py` 加 `import audit` → 這條會紅。
+    """
+    offenders = [
+        f"{_rel(p)} → audit"
+        for package in CORE_PACKAGES
+        for p in _python_files(package)
+        if "audit" in _imported_roots(p)
+    ]
+    assert not offenders, (
+        "有層 import 了 audit，依賴方向反了：\n" + "\n".join(offenders))
 
 
-def test_audit_output_says_skipped_is_not_pass() -> None:
-    """輸出必須自己講清楚，不能只靠讀的人知道。"""
-    text = audit.render(audit.run_all())
-    assert "SKIPPED" in text
-    assert "SKIPPED 不是 PASS" in text
+def test_audit_may_read_every_layer() -> None:
+    """反向確認：audit **應該**看得到各層——否則它檢查不了跨層 invariant。
 
-
-def test_every_audit_check_names_an_invariant_and_an_owner() -> None:
-    """沒有 owner 的檢查＝沒有人會實作它（L13 的「管子只接一頭」）。"""
-    for check in audit.CHECKS:
-        assert check.invariant.startswith("INV-"), check.name
-        assert check.owner_phase.startswith("Phase "), check.name
-        assert check.description
+    這條與上一條是一對。少了它，把 audit 寫成什麼都不讀也會「通過」。
+    """
+    roots = _imported_roots(ROOT / "audit" / "sources.py")
+    assert {"identity.registry", "neo4j", "decision_lab.bootstrap"} <= roots, (
+        f"audit/sources.py 沒有讀到各層：{sorted(roots)}")
 
 
 # ---------------------------------------------------------------------------

@@ -74,7 +74,13 @@ prefix_rule(
 prefix_rule(
     pattern=[".venv\\Scripts\\python.exe", "scripts\\publish_daily_state.py"],
     decision="allow",
-    justification="固定 publisher 只提交兩個 daily state files 並推送 master。",
+    justification=(
+        "固定 publisher 提交四個 leads state files（pending_leads／todo_pool／"
+        "event_watches／hypotheses）並推送 master。2026-09-04 起同時帶上"
+        "**被那份 state 指名引用、且確實存在**的 library/raw/ 追源原文——"
+        "集合由 state 推導而來，不是整目錄放行；上限 20 份，超過 fail closed。"
+        "命令、旗標與 OS／網路能力皆未改變（同一支腳本、同一組 git 動作）。"
+    ),
 )
 
 prefix_rule(

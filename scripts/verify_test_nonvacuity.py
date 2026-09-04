@@ -149,10 +149,10 @@ MUTATIONS: tuple[Mutation, ...] = (
     ),
     Mutation(
         name="audit 未實作卻回 PASS",
-        path="alpha/audit/__init__.py",
+        path="audit/__init__.py",
         old="                status=AuditStatus.SKIPPED,\n                summary=\"not_implemented\",",
         new="                status=AuditStatus.PASS,\n                summary=\"not_implemented\",",
-        test="tests/test_layer_separation.py::test_audit_registry_reports_not_implemented_not_pass",
+        test="tests/test_audit.py::test_unimplemented_checks_report_not_implemented_not_pass",
         guards="L13：未實作不得偽裝成通過",
     ),
     Mutation(
@@ -290,6 +290,56 @@ MUTATIONS: tuple[Mutation, ...] = (
         new="from __future__ import annotations\nimport mcp_server  # noqa: F401",
         test="tests/test_layer_separation.py::test_core_does_not_import_mcp_server",
         guards="依賴方向只准 peripheral → core（allowlist 擋新增）",
+    ),
+    # --- audit（2026-09-04）---------------------------------------------
+    Mutation(
+        name="audit 讓「看了 0 筆」算通過",
+        path="audit/__init__.py",
+        old="    if examined <= 0:",
+        new="    if False:",
+        test="tests/test_audit.py::test_passing_with_zero_examined_is_downgraded_to_skipped",
+        guards="看了 0 筆資料的檢查，鑑別力與恆滅的閘門一樣是零（INV-5）",
+    ),
+    Mutation(
+        name="audit 把自己爆掉當成 SKIPPED",
+        path="audit/__init__.py",
+        old="                check=self.name, status=AuditStatus.FAIL,\n                summary=\"check_raised\",",
+        new="                check=self.name, status=AuditStatus.SKIPPED,\n                summary=\"check_raised\",",
+        test="tests/test_audit.py::test_check_that_raises_is_a_failure_not_a_skip",
+        guards="跑不起來的檢查等於沒有檢查，而它偽裝成有",
+    ),
+    Mutation(
+        name="資料源讀不到時回空集合而非丟例外",
+        path="audit/sources.py",
+        old="    if not path.exists():\n        raise SourceUnavailable(f\"{path.relative_to(ROOT)} 不存在\")",
+        new="    if not path.exists():\n        return {}",
+        test="tests/test_audit.py::test_sources_raise_rather_than_return_empty",
+        guards="「我找不到」與「它不存在」是兩個 claim（L11-5）；空集合讓兩者同形",
+    ),
+    Mutation(
+        name="有層開始 import audit（依賴方向反轉）",
+        path="alpha/contracts.py",
+        old="from __future__ import annotations",
+        new="from __future__ import annotations\nimport audit  # noqa: F401",
+        test="tests/test_layer_separation.py::test_nothing_imports_audit",
+        guards="audit 讀遍所有層，被任何層 import 就形成環",
+    ),
+    # --- daily publisher 追源證據（2026-09-04）---------------------------
+    Mutation(
+        name="publisher 帶走 state 沒有引用的檔案",
+        path="scripts/publish_daily_state.py",
+        old="            if (repo / ref).is_file():\n                found.add(ref)",
+        new="            found.add(ref)",
+        test="tests/test_daily_state_publisher.py::test_only_existing_files_enter_the_derived_set",
+        guards="只帶被 state 指名且**確實存在**的檔案，不是整目錄放行",
+    ),
+    Mutation(
+        name="publisher 放行 library/private 引用",
+        path="scripts/publish_daily_state.py",
+        old="            if not ref.startswith(EVIDENCE_PREFIX) or len(ref.split()) != 1:",
+        new="            if not ref.startswith(\"library/\") or len(ref.split()) != 1:",
+        test="tests/test_daily_state_publisher.py::test_private_and_traversal_references_are_never_shipped",
+        guards="private authority 刻意不進 Git——無人值守排程尤其不得碰",
     ),
 )
 
