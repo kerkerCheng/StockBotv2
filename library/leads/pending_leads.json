@@ -6532,6 +6532,174 @@
       "result": "ok",
       "run_at": "2026-09-03T22:33:25.228542+00:00",
       "source": "edgar:TSM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-04T07:46:47.247511+00:00",
+      "source": "mfn:sivers-semiconductors"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-04T07:46:47.768808+00:00",
+      "source": "sivers:press"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-04T07:46:48.135275+00:00",
+      "source": "yahoo:iqe-l"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-04T07:46:48.320265+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-04T07:46:50.112822+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-09-04T07:46:50.630950+00:00",
+      "source": "edgar:AEHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-04T07:46:51.132448+00:00",
+      "source": "edgar:AEVA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-04T07:46:51.811731+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-04T07:46:52.319025+00:00",
+      "source": "edgar:AVGO"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-04T07:46:52.825670+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-04T07:46:53.332758+00:00",
+      "source": "edgar:CCXI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-04T07:46:54.028376+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-04T07:46:54.707347+00:00",
+      "source": "edgar:GFS"
+    },
+    {
+      "new": 2,
+      "result": "ok",
+      "run_at": "2026-09-04T07:46:55.430007+00:00",
+      "source": "edgar:GOOGL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-04T07:46:55.953495+00:00",
+      "source": "edgar:HIMX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-04T07:46:56.631346+00:00",
+      "source": "edgar:JBL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-04T07:46:57.142452+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-04T07:46:57.666555+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-04T07:46:58.353251+00:00",
+      "source": "edgar:META"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-04T07:46:58.852671+00:00",
+      "source": "edgar:MP"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-04T07:46:59.356101+00:00",
+      "source": "edgar:MRVL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-04T07:47:00.092700+00:00",
+      "source": "edgar:MTSI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-04T07:47:00.768661+00:00",
+      "source": "edgar:MU"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-04T07:47:01.274257+00:00",
+      "source": "edgar:NVDA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-04T07:47:02.036859+00:00",
+      "source": "edgar:POET"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-04T07:47:02.735062+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-04T07:47:03.237816+00:00",
+      "source": "edgar:TSLA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-04T07:47:03.748516+00:00",
+      "source": "edgar:TSM"
     }
   ],
   "leads": {
@@ -28936,6 +29104,26 @@
       },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/microelectronics-commons-starker-sitt-engagemang-i-sivers-semiconductors-med-finansiering-for-andra-aret-ffc72f3e"
     },
+    "lead_75b6ff16300b8da2f360a3f118eca4b6": {
+      "entities": {
+        "company_ids": [
+          "co:google"
+        ],
+        "tickers": [
+          "GOOGL"
+        ]
+      },
+      "first_seen": "2026-09-04T07:46:55.429642+00:00",
+      "lead_id": "lead_75b6ff16300b8da2f360a3f118eca4b6",
+      "published_at": "2026-09-03",
+      "refs": {},
+      "source": "edgar:GOOGL",
+      "status": "pending",
+      "themes": {},
+      "title": "GOOGL 4 filed 2026-09-03",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1652044/000119312526382332/xslF345X06/ownership.xml"
+    },
     "lead_760eb6913a23e02842e06ac15b77d48d": {
       "entities": {
         "company_ids": [
@@ -43652,6 +43840,26 @@
       },
       "url": "https://www.schaeffler.com/en/technology-innovation/technology/humanoid-robots/?wiring=robot_anchor_chain"
     },
+    "lead_b9ea75681bdf1885d5d65218da043569": {
+      "entities": {
+        "company_ids": [
+          "co:google"
+        ],
+        "tickers": [
+          "GOOGL"
+        ]
+      },
+      "first_seen": "2026-09-04T07:46:55.429834+00:00",
+      "lead_id": "lead_b9ea75681bdf1885d5d65218da043569",
+      "published_at": "2026-09-03",
+      "refs": {},
+      "source": "edgar:GOOGL",
+      "status": "pending",
+      "themes": {},
+      "title": "GOOGL 4 filed 2026-09-03",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1652044/000119312526382328/xslF345X06/ownership.xml"
+    },
     "lead_ba4073c079bac993eaafc74feb7c6df3": {
       "entities": {
         "company_ids": [
@@ -54274,6 +54482,26 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/2074973/000121390026077978/ea0297923-8k425_churchill11.htm"
     },
+    "lead_eede896d2f8835aad9f4c315755960a0": {
+      "entities": {
+        "company_ids": [
+          "co:aehr_test_systems"
+        ],
+        "tickers": [
+          "AEHR"
+        ]
+      },
+      "first_seen": "2026-09-04T07:46:50.617345+00:00",
+      "lead_id": "lead_eede896d2f8835aad9f4c315755960a0",
+      "published_at": "2026-09-03",
+      "refs": {},
+      "source": "edgar:AEHR",
+      "status": "pending",
+      "themes": {},
+      "title": "AEHR 4 filed 2026-09-03",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/1040470/000104047026000265/xslF345X06/primary_01.xml"
+    },
     "lead_eeeaadc30d6e4c258e42483085b3e32f": {
       "entities": {
         "company_ids": [
@@ -57745,7 +57973,7 @@
   "source_state": {
     "x:aleabitoreddit": {
       "since_id": "2095590610967421206",
-      "updated_at": "2026-09-03T22:33:07.900776+00:00",
+      "updated_at": "2026-09-04T07:46:48.320250+00:00",
       "user_id": "1940360837547565056"
     }
   }
