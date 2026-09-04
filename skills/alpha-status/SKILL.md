@@ -89,7 +89,7 @@ SQL 繞過。真正的 `private_storage_boundary_rejected` 才是 storage bounda
 「超高功率雷射 `tech:uhp_laser`」「磷化銦基板 `mat:inp_substrate`」「客戶端印證」
 「供應商自報」「獨家供應」；關係動詞寫「供貨給 NVIDIA」／「依賴 X」。
 同一份輸出內重複出現可只寫中文。Pane 3 的研究題目同理——寫「誰供應薄膜鈮酸鋰平台
-`tech:tfln_platform`」，不寫裸 label。完整判準見 `AGENTS.md`「面向使用者的措辭層」。
+`tech:tfln_platform`」，不寫裸 label。完整判準見 `skills/daily-brief/SKILL.md`「面向使用者的措辭層」。
 
 ### 三個必附，缺一即未完成
 

@@ -133,19 +133,27 @@ def test_daily_brief_title_carries_taipei_date() -> None:
 
 
 def test_daily_brief_preserves_beta_market_heartbeat_and_canonical_output() -> None:
+    """⚠ 2026-09-04（Phase 3.9）分家：**判準留 `AGENTS.md`，欄位細節搬
+    `docs/ARCHITECTURE.md`**。這條測試因此改成兩組各驗自己該有的，
+    **每個 token 仍然被斷言存在**——搬移當下它就是這樣被抓到的（本檔第三次）。
+    """
+    architecture = ROOT / "docs" / "ARCHITECTURE.md"
+    # ① 判準：不得省略心跳、舊語意必須明文廢止、canonical brief 只有一份
     for path in (AGENTS, DAILY, ROOT / "skills" / "daily-brief" / "SKILL.md"):
         text = path.read_text(encoding="utf-8")
         assert "最新完整交易日" in text
-        assert "1 日" in text or "1日" in text
-        # 心跳的觸發條件跟著字彙改：從「非投入日／ceiling=0」改成「沒有配置缺口」，
-        # 但「不得省略」這條剎車本身不變。
-        assert "52 週區間位置" in text or "52週區間位置" in text
-        # ⚠ 禁的是「當成現行欄位使用」，不是提到這個詞——三份文件都刻意留著移除紀錄，
+        # ⚠ 禁的是「當成現行欄位使用」，不是提到這個詞——文件刻意留著移除紀錄，
         # 那正是防止它被重新加回來的剎車（見 AGENTS.md「技術訊號的地位」移除清單）。
         assert "本輪可評估上限：" not in text
         # 舊燈號語意必須被明文廢止，而不是安靜消失——安靜消失擋不住下次回填。
         assert "廢止" in text and "2026-08-29" in text
         assert "canonical Markdown" in text or "Canonical Brief" in text
+    # ② 欄位細節：逐檔表要有哪幾欄
+    for path in (architecture, DAILY, ROOT / "skills" / "daily-brief" / "SKILL.md"):
+        text = path.read_text(encoding="utf-8")
+        assert "1 日" in text or "1日" in text
+        assert "52 週區間位置" in text or "52週區間位置" in text
+        assert "本輪可評估上限：" not in text
     daily = DAILY.read_text(encoding="utf-8")
     skill = (ROOT / "skills" / "daily-brief" / "SKILL.md").read_text(encoding="utf-8")
     assert "主力表在沒有任何配置缺口、全部 sleeve 到位時仍強制保留" in daily

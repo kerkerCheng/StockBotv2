@@ -80,19 +80,28 @@ def test_fetchers_directory_is_not_broadly_allowed() -> None:
 
 
 def test_project_memory_defines_common_sandbox_impact_review() -> None:
+    """sandbox impact review 的**判準與程序**都必須被寫下來。
+
+    ⚠ 2026-09-04（Phase 3.9）分家：**判準留 `AGENTS.md`，程序搬 `OPERATIONS.md`**
+    （「OPERATIONS 被改壞 → 跑不起來；AGENTS 被改壞 → 跑起來了，但做錯事」）。
+    這條測試因此**改成兩份各驗自己該有的**，而不是放寬——
+    每一個 token 仍然被斷言存在，只是換了檔案。搬移當下它就是這樣被抓到的。
+    """
     agents = AGENTS.read_text(encoding="utf-8")
     operations = OPERATIONS.read_text(encoding="utf-8")
     for token in (
+        # 判準：改壞了會讓人在無人值守路徑上加危險命令
+        "任何 unattended routine 的 executable surface 變更",
+        "不得用 broad permission",
+    ):
+        assert token in agents, f"AGENTS.md 缺少 sandbox 判準：{token}"
+    for token in (
+        # 程序：改壞了只會讓人排錯排錯方向
         "`workspace-write` 是路徑邊界",
         "Windows identity／ACL",
-        "任何 unattended routine 的 executable surface 變更",
         "更新 permission contract test",
         "端到端 smoke test",
         "重啟只會重新載入**已存在**的 rule",
-        "不得用 broad permission",
-    ):
-        assert token in agents
-    for token in (
         "Sandbox／private authority 排錯",
         "verification.status=unavailable",
         "skill 有命令而 rules 沒有",

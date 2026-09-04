@@ -13,6 +13,24 @@ description: >-
 
 把本 skill 視為既有 `.codex/agents/luna-operator.toml` 的手動啟動器，不建立第二個 agent。
 
+## `luna_operator` 是什麼（2026-08-01 使用者定案）
+
+專案級 `.codex/agents/luna-operator.toml` 定義 `luna_operator`：使用 `gpt-5.6-luna`／
+`max`／`read-only`，只接明確、重複、可逐項驗收的機械型工作。
+`ultra` 經 2026-08-01 實際 spawn 驗證**不受 Luna runtime 支援**；`max` 是目前最高可用
+effort。主代理負責拆 scope、列 acceptance criteria、檢查回傳證據，並作最後判斷。
+
+**適合委派：** repo／queue 盤點、確定性資料檢查、測試與 log 分析、pq1 原始文件追源與
+原子 claim 抽取、依固定清單蒐集 alpha 財務事實與反證。
+**所有回傳都只是 review packet，不是 authority。**
+
+**不得委派給 `luna_operator`：** 任何 working-tree 或 private authority 寫入、
+evidence tier 升級、graph admission、pq2 核准／resolve、thesis revise／retire、
+資本配置、live choice／fill、commit 或 push。這些仍由主代理依既有人工 gate 執行。
+
+同一 working tree 維持主代理為唯一 writer。若未來確需 writing subagent，必須另建
+worktree／branch、明確指定唯一 owner，且**不得沿用 `luna_operator` 的唯讀角色暗示授權**。
+
 ## 啟動語意
 
 - 每次明確觸發只授權該次指令；完成後自動退出，不跨到下一個使用者指令。

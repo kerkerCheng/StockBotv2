@@ -29,6 +29,31 @@ A 4-level classification of source document reliability applied to every Claim a
 
 Evidence tier determines how much a source contributes to `confidence` scoring.
 
+### 五套並列的證據強度欄位（不得壓成一個分數）
+
+專案裡有**五個**互不等價的「證據有多強」欄位。它們刻意並列，因為每一個回答不同的問題；
+把它們壓成一個綜合分數會讓「誰說的」「多少人說」「說得多確定」互相補償。
+判準與禁令在 `AGENTS.md`；這裡只定義各是什麼。
+
+| 欄位 | 回答什麼 | 值域 |
+|---|---|---|
+| `evidence_tier` | **這份文件多可靠？**（來源型態） | 1–4，1 最強（見上） |
+| `evidence_class` | **誰在替這條邊背書？**（來源獨立性） | `externally_corroborated` ＞ `counterparty_joint` ＞ `self_reported_costly` ＞ `needs_review` ＞ `self_reported` |
+| `demand_proof_level` | **需求端的證據到哪一層？** | `confirmed` ＞ `guided` ＞ `inferred` ＞ `speculative` |
+| `confidence` | **這個關係存在的信心** | 0–1；只在不同 `origin_event` 之間累加 |
+| `corroborating_origins` | **還有誰獨立說過同一件事**（L8 的獨立性計數） | `origin_entity` 集合，門檻 3 |
+
+`evidence_class` 五級的權威是 `query/bottleneck.py::EVIDENCE_RANK`；三級證據充分度
+（`corroborated` ／ `bounded_hypothesis` ／ `unknown`）的權威是 `shared/evidence_levels.py`。
+
+⚠ **`confidence` 不是「這條因果鏈有多強」**，它只是「這個關係存在的信心」——兩者共用一個
+數字會讓下游無法分辨（`alpha/providers/graph_neo4j.py::_link_confidence` 因此只做序數
+轉換、不做內插）。
+
+⚠ **`sole_source` 的確認來源必須是客戶端或第三方。** 供應商自稱 sole_source →
+`verified_by_absence`（弱，≤0.5）；客戶在法說會說「目前只有一個供應商」或第三方產業報告
+列出供應商名單只有該公司 → 才可能是 `verified_by_search`（強）。
+
 ### Claim Fan-out
 A data quality failure pattern in the extract-load pipeline where a single Claim statement produces multiple ABOUT edges — one per `subjects[]` entry. The result is that a `LIMIT N` query on Claims returns fewer distinct statements than expected, with each repeated several times. Caused by the LLM listing multiple subjects per claim and the loader iterating them naively. Fixed in `graph_context.py` by using `DISTINCT` before `LIMIT`; addressed long-term by capping `subjects[]` to ≤ 2 in the extract prompt.
 

@@ -552,3 +552,142 @@ fixed entry，與 `edgar.py` 同構：無憑證、不碰 Windows identity／ACL�
 ## 本機音訊追源
 
 官方 podcast／錄音沒有 transcript 時用 `scripts/transcribe_audio.py` 跑 `faster-whisper`；預設 CPU `small.en`，模型與完整逐字稿只存 ignored `library/private/`。ASR 只提供 timestamp locator，**不自行提高 evidence tier**；精確技術詞與 quote 仍須回聽核對。cloud fallback 不假設有此工具。
+
+---
+
+# 協作與排程程序
+
+> 以下六節於 2026-09-04（Phase 3.9）自 `AGENTS.md` 搬入。
+> **判準留在 `AGENTS.md`，程序在這裡。** 分野：
+> **OPERATIONS 被改壞 → 跑不起來；AGENTS 被改壞 → 跑起來了，但做錯事。**
+
+## 雙代理協作（Claude Code / Codex）
+
+- **研究 skill 唯一權威：** `skills/<name>/SKILL.md`。`.agents/skills/`（Codex）與
+  `.claude/skills/`（Claude Code）是生成的薄轉接層，不直接手改。
+  新增 skill 或改 `name`／`description` 後跑 `python scripts/sync_agent_skills.py`；
+  交接前用 `--check` 驗證兩端無漂移。
+- **平台設定分開：** Codex 設定放 `.codex/`，Claude Code 本機設定放
+  `.claude/settings.local.json`；共用行為呼叫同一支 repo Python 程式，
+  不在兩份 hook 裡複製業務邏輯。
+- **切換交接：** 本機 Codex／Claude Code 序列切換可沿用 `master` 與同一組 private
+  authorities，但下一個 agent 必須重新讀 `git status --short`、`todo_pool.json`、
+  對應 action／decision receipt，**不得依賴上一個 session 的自然語言摘要**。
+  交接訊息至少附：目前 plan 路徑、進行中的編號、`git status --short`、
+  最後一次驗證命令與結果。
+- 本機開發 agent 可以是 Claude Code 或 Codex；架構中明指 `claude.ai` custom connector
+  的遠端流程仍維持 Claude，不因本機開發工具切換而改名。
+
+### Push 政策（2026-07-22 使用者定案）
+
+push 是常規動作——session 收尾（邏輯 commits 完成後）把 master push 到 origin，
+不需逐次人工確認。私有隔離依 `.gitignore`（`library/private/`、`.env`）；
+**push 前 sanity check：`git ls-files library/private` 應為空。**
+
+本機 daily scheduled task 只可經 `scripts/publish_daily_state.py` 發布四個 leads state
+檔（`pending_leads.json`＋`todo_pool.json`＋`event_watches.json`＋`hypotheses.json`；
+2026-09-02 由二擴四——watch／假設本就是 daily 的正當產出物，留本機未提交會讓兩個
+writer 的變更混在同一份 diff）；**不得用 unattended 廣泛 Git 命令碰其他檔。**
+
+## Codex sandbox：判準的落點
+
+> ⚠ **排錯順序、16 條 fixed entry 與 retry 邊界的完整內容已經在本檔上方**
+> （「Sandbox／private authority 排錯」與 harvest 那一節）。**不要在這裡再抄一份**——
+> 2026-09-04 從 `AGENTS.md` 搬入時就差點造出第二份清單，而「清單會腐壞，判準不會」
+> 正是這次搬移要消除的違規。
+
+`workspace-write` 是路徑邊界，**不是「repo 內所有 OS 能力都可用」**。
+命令即使只碰 repo 內路徑，只要還會呼叫 Windows identity／ACL（`whoami`、`Get-Acl`、
+`icacls`）、credential store、網路、child shell、`.git`，或 permission profile 對該子路徑
+有更窄限制，仍可能需要 outside-sandbox exact rule。`library/private/` 雖在 repo 內，
+開啟 authority 前會驗 owner-only ACL，屬 capability-sensitive path。
+
+**排錯先看 command surface，再碰 ACL 或要求重啟。**
+⚠ **重啟只會重新載入**已存在**的 rule，不能補上一條根本沒寫的 rule。**
+rule 缺漏時不得把重啟當修復。詳細五步見上方「Sandbox／private authority 排錯」。
+
+### unattended surface 變更的 impact review 五步
+
+判準（「必須在同一個 change 完成」）是 invariant，住 `AGENTS.md`；五步在這裡：
+
+1. 列出 path ＋ side effect ＋ OS／network capability
+2. 更新 canonical skill／prompt 與本檔
+3. 需要越界時新增**最窄**的 `.codex/rules/*.rules` exact prefix
+4. 更新 permission contract test，明確斷言允許項**與禁止的相鄰動詞**
+5. 用 scheduled task 的相同 sandbox／exact command 跑一次端到端 smoke test
+
+## Daily / pq1 / 待辦池的參數與去重
+
+- **Daily pq1 budget：** 每輪上限唯一 authority 是 `config/daily_routine.json` 的
+  `pq1.drain_limit_per_run`，它是**吞吐量 cap 不是每日 quota**。查證：
+  `python -c "import json;print(json.load(open('config/daily_routine.json'))['pq1']['drain_limit_per_run'])"`
+  排序權重唯一 authority 是 `engine_b/priority.py`。tracked thesis impact 由非 retired
+  lifecycle ＋ non-terminal Decision cohorts 自動導出。
+- **提醒去重：** lifecycle SessionStart hook 只提醒**尚未進池**的新到期項目；已存在的
+  `thesis_lifecycle`（含 deferred）由 Daily Brief 顯示，hook 必須靜默。
+  新提醒只走 `additionalContext` 呈現一次。
+- **Sheet 持股覆蓋分類：** `portfolio/brief.py::build_sheet_only_items` 依 Sheet ticker
+  分三類——beta policy 涵蓋（`coverage=beta_policy`）、使用者明確不研究
+  （`coverage=user_ignored`，登記於 `config/holdings_coverage.json`）、其餘
+  `coverage=uncovered`。前兩類判 `MONITOR` ＋空 blockers，仍在 daily brief 現形但不占
+  pq2 編號。覆蓋設定檔讀取失敗一律 fail safe 退回 `REVIEW`。
+  beta universe 的 SSOT 只有 `config/beta_policy.json`。
+- **Decision gap dispatch：** `decision_review go` 的語意是把最新 decision 綁定的
+  proposed work order checkpoint 成 pq1 `queued`，**不是**立刻沿用舊 assessment 做 bare
+  `reassess`。原 pq2 項目在 queued／researching／awaiting_approval 期間保持 active 但
+  不重複詢問；只有研究未果的 parked receipt，或補缺口後產生的**新 decision receipt**
+  才能 resolve。Decision gap jobs 優先占用同一個 daily pq1 budget。
+- **事件監控：** issuer 曝險 ≥20% 且對應 series 單日報酬首次跌破 −4% 才產 ephemeral
+  `event_search_requests`；daily agent 只做一次 WebSearch，輸出可能原因＋曝險並標
+  未經查證，**不建 lead／decision、不進 pq1/pq2、不寫 Engine A**。需要深挖才另走
+  `skills/lead-intake`。
+
+## Source-trace backlog 的 park 程序
+
+pq1 每次因 `isolated_tier_3`／截圖／paywall 未果而 park 時，必須留下 `trace_status`、
+`trace_attempts_ref`、`trace_next_trigger` 與 `trace_requires_user`。
+
+**等待條件的唯一 registry 是 Event Watch**（[321]，2026-08-31）：追源 backlog 已併入
+`library/leads/event_watches.json`，與待辦等待、假設對照共用同一個引擎與計數器。
+線索 park 當下自動建 watch 並取得到期日（`config/event_watch.json` 的 `trace_ttl_days`，
+預設 120 天＝一個財報週期＋緩衝）。
+
+`wake_state` 四態：`watching`（有事件在等）／`stalled`（具名標的已全部觸發過一輪，
+被動層短期不會再醒）／`expired`（到期）／`unwatched`（沒有任何機制在等它）。
+**後三者用 `engine_b.cli trace-backlog --needs-attention` 撈出並逐筆處置。**
+
+**Lead 之間的關聯鍵：** URL hash 只認同一篇文章。跨文章關聯靠 `engine_b/entities.py`
+的具名標的做確定性比對（cashtag、`edgar:<TICKER>`、registry 反查的 `co:*`）。
+`trace_next_trigger` 保留給人讀；機器改用 `trace_trigger_kind=related_entity_signal`
+＋`trace_trigger_entities`。同標的的新 lead 通過 triage 後，會把不需人工 access／付費的
+parked trace 排回 bounded pq1，留下 triggering lead receipt。
+
+一般 scheduled／event-triggered 重查仍屬 pq1，不占 pq2；只有需要使用者提供合法 access、
+核准付費或明確改變研究優先權時，`todo sync` 才建立 `source_trace_review`。
+該類型的 `go` 只把 exact lead dispatch 回 pq1，**不代表相信截圖、提高 evidence tier 或
+graph admission**。任何新訂閱／購買必須另列 exact 金額與方案。
+
+## 報告留檔與 outbound 通知
+
+**daily brief 不留檔**（只出在 session；稽核價值由待辦池 log ＋ leads 狀態機 ＋
+Decision Store 承擔）；**weekly report 留檔**（`docs/reports/`，含無法從池重建的
+topic discovery 與健康審查趨勢）。不回到 PR/Issue 形式。
+
+**Weekly authority hierarchy：** `AGENTS.md` 是政策 SSOT；`crons/weekly_scan_prompt.md`
+是 executable runbook，只有開發／人工修 policy 時才改，**weekly routine 本身不得自我
+改寫**；`docs/reports/weekly_scan_<date>.md` 是當週 point-in-time 歷史報告，
+不是 current-state truth。
+
+**Daily Brief outbound 通知（2026-08-04）：** 完成後可由 Codex 或本機 Claude Code 呼叫
+同一支 `scripts/publish_daily_brief.py`，outbound-only 送到 Discord private Forum
+channel。失敗是 `delivery_failed`／`not_configured` 的 best-effort 狀態，**不得阻斷**；
+`.env`、webhook 與 `library/private/notifications/` 永遠不得進 Git。
+去重鍵、Forum thread 保存、分段重試與 PowerShell UTF-8 陷阱見本檔上方 harvest 段落。
+
+## 來源路由（一手來源優先）
+
+通用搜尋（Tavily 等）只配 LLM 品質評分 gate，用在第三層。
+**機器可執行的路由與未果處置唯一權威是 [`../skills/source-trace/SKILL.md`](../skills/source-trace/SKILL.md)**；
+快速記憶：美股走 SEC EDGAR，台股走公開資訊觀測站（含月營收揭露），
+A股走年報／問詢函／海關數據，技術走 arXiv／OFC/ECOC／專利。
+各市場都優先做上下游上市公司交叉驗證。

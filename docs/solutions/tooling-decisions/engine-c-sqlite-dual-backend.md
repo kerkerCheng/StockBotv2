@@ -340,4 +340,4 @@ python fetchers/edgar.py --ticker COHR --forms 10-K --n 1 --max-chars 0
 - `docs/onboarding-sop.md` — step-by-step onboarding SOP that uses this non-US path
 - `docs/solutions/architecture-patterns/knowledge-graph-data-quality-and-engine-c-join-key.md` — graph-side TICKER_MAP: how Neo4j Company nodes get ticker attributes as the A→C join key
 - `docs/solutions/architecture-patterns/engine-d-content-addressed-decision-context.md` — Engine D 只凍結本次使用的 Engine C values，不取代 current observation authority
-- `AGENTS.md`「上游三引擎匯流至 Engine D 的前置條件」— Engine C / Engine A join key design: `TICKER_MAP` is the A→C bridge
+- `AGENTS.md` L9（跨引擎匯流的前置條件）— Engine C / Engine A join key design: `TICKER_MAP` is the A→C bridge
