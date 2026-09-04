@@ -14,7 +14,7 @@ from __future__ import annotations
 import json
 
 from decision_lab import workflow
-from thesis.investment_policy import POLICY_PATH, load_policy
+from risk.policy import POLICY_PATH, load_policy
 
 AT = "2026-08-31T00:00:00+00:00"
 
@@ -77,7 +77,7 @@ def test_policy_rejects_a_tracking_horizon_short_enough_to_be_a_fake_alarm() -> 
 
     import pytest
 
-    from thesis.investment_policy import PolicyError, validate_policy
+    from risk.policy import PolicyError, validate_policy
 
     for bad in (2, 3, 6):
         base = json.loads(POLICY_PATH.read_text(encoding="utf-8"))

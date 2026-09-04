@@ -4,10 +4,11 @@ from copy import deepcopy
 
 import pytest
 
-from decision_lab.beta_policy import load_beta_policy
-from decision_lab.portfolio_risk import (
+from portfolio.policy import load_beta_policy
+from risk.snapshot import (
     append_risk_snapshot,
     build_portfolio_components,
+    leverage_hard_blocks,
     event_search_requests,
     read_latest_risk_snapshot,
     risk_changes,
@@ -121,8 +122,8 @@ def _exposure_rows(*, nav, cash, plain, tqqq=0.0):
 
 
 def _exposure_snapshot(rows, *, drawn=0.0, callable_debt=0.0):
-    from decision_lab.beta_policy import load_beta_policy
-    from decision_lab.portfolio_risk import (
+    from portfolio.policy import load_beta_policy
+    from risk.snapshot import (
         build_portfolio_components,
         compose_risk_snapshot,
     )
@@ -157,7 +158,7 @@ def test_total_exposure_does_not_double_count_borrowed_money() -> None:
 
 def test_total_exposure_cap_blocks_borrowing_that_etf_caps_miss() -> None:
     """修正前的 🔴：hard_blocks 只看槓桿 ETF，借款完全不受約束。"""
-    from decision_lab.beta_policy import load_beta_policy
+    from portfolio.policy import load_beta_policy
 
     cap = load_beta_policy()["risk"]["total_exposure_cap"]
     # 全部是 1x 持股，槓桿 ETF 為零——舊 ETF cap 完全擋不到
@@ -185,3 +186,46 @@ def test_wipeout_threshold_is_reported_with_the_multiple() -> None:
     snap = _exposure_snapshot(_exposure_rows(nav=1000.0, cash=0.0, plain=1000.0))
     assert snap["total_exposure_weight"] == pytest.approx(1.0)
     assert snap["wipeout_index_drawdown"] == pytest.approx(1.0)
+
+
+# ---------------------------------------------------------------------------
+# leverage_hard_blocks：Engine D 的資本閘門入口（2026-09-04 由 sizing.py 收回）
+# ---------------------------------------------------------------------------
+
+def test_unavailable_leverage_is_a_blocker_not_a_pass() -> None:
+    """**算不出來不等於沒有超標。**
+
+    nav 讀不到、政策壞掉、持股列格式異常——全部回
+    `portfolio_leverage_unavailable`，它是 blocker。若改成回空 list，
+    一個算不出槓桿的帳戶會被判成「槓桿沒問題」而放行（fail open）。
+    這是 L13「成功與失敗不得在同一個訊號上同形」用在資本閘門上。
+
+    ⚠ 三種非正常 nav 各有**不同**的 fail-open 路徑，所以要逐個測：
+    負數讓比例變負、NaN 讓所有比較變 False、`inf` 讓比例變成有限的 0.0。
+    最後一種在本測試第一版沒測到，而當時的實作真的漏了它。
+    """
+    for nav in (0, -1, float("nan"), float("inf"), "x", None):
+        assert leverage_hard_blocks([{"ticker": None}], nav=nav) == [
+            "portfolio_leverage_unavailable"
+        ], f"nav={nav!r} 沒有 fail closed"
+
+
+def test_no_leverage_means_no_blocks() -> None:
+    """反向：真的沒有槓桿部位就不得產生 blocker——否則閘門恆亮（L14）。"""
+    assert leverage_hard_blocks([], nav=100_000.0) == []
+
+
+def test_the_block_codes_match_the_risk_snapshot_ones() -> None:
+    """與 `compose_risk_snapshot` 的 `hard_blocks` **同名**——它們是同一件事。
+
+    名字分岔的話，Engine D 的 `_HARD_CAP_BLOCKERS` 只會認得其中一組，
+    另一組會安靜地降級成普通 blocker。
+    """
+    import inspect
+
+    from risk import snapshot
+
+    source = inspect.getsource(snapshot.compose_risk_snapshot)
+    for code in ("etf_leverage_nominal_cap_reached", "etf_leverage_effective_cap_reached"):
+        assert code in source, code
+        assert code in inspect.getsource(snapshot.leverage_hard_blocks), code

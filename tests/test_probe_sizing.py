@@ -11,7 +11,7 @@ from decision_lab.sizing import AXES, LEVELS, AssessmentError, calculate_probe_l
 from decision_lab.store import DecisionStore
 from storage.relational import initialize_private_root
 from tests.test_decision_context import NOW, complete_inputs
-from thesis.investment_policy import load_policy
+from risk.policy import load_policy
 
 
 def _store(tmp_path: Path) -> DecisionStore:
@@ -411,7 +411,7 @@ def test_single_position_cap_surfaces_as_live_blocker(tmp_path: Path) -> None:
 
 
 def test_portfolio_etf_leverage_cap_surfaces_as_live_blocker(tmp_path: Path) -> None:
-    from decision_lab.beta_policy import load_beta_policy
+    from portfolio.policy import load_beta_policy
 
     # TQQQ 是 3x：持有金額取兩個 cap 各自所需的較大者再加一，確保兩者都越界。
     # 依 policy 推導而非寫死數字，改 cap 時測試不會腐爛。

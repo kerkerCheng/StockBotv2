@@ -15,7 +15,7 @@ from typing import Any, Callable, Mapping
 from identity.currency import is_settlement_currency
 from identity.registry import get_registry
 
-from .blocker_severity import fatal_blockers
+from shared.blocker_severity import fatal_blockers
 from storage.relational import (
     connect_sqlite,
     immediate_transaction,
@@ -34,7 +34,7 @@ from .models import (
     ShadowBaseline,
     research_status_of,
 )
-from .redaction import sensitive_payload_path
+from shared.redaction import sensitive_payload_path
 
 
 _SCHEMA_PATH = Path(__file__).with_name("schema.sql")

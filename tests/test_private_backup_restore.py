@@ -5,8 +5,8 @@ from pathlib import Path
 
 import pytest
 
-import decision_lab.backup as backup_module
-from decision_lab.backup import BackupError, create_private_backup, restore_private_backup
+import shared.private_backup as backup_module
+from shared.private_backup import BackupError, create_private_backup, restore_private_backup
 from storage.relational import initialize_private_root
 
 

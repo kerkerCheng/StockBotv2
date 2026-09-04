@@ -9,7 +9,7 @@ from __future__ import annotations
 import pytest
 
 from decision_lab.alpha_event_monitor import alpha_event_search_requests
-from thesis.investment_policy import PolicyError, validate_policy
+from risk.policy import PolicyError, validate_policy
 
 
 POLICY = {"live_position_monitor": {"return_1d_at_most": -0.04, "history_sessions": 10}}
@@ -137,7 +137,7 @@ def test_policy_rejects_non_negative_threshold() -> None:
 def test_repository_policy_registers_the_monitor() -> None:
     """`validate_policy` 會丟掉未登記的 key——沒有這條，加了 config 也會靜默失效。"""
 
-    from thesis.investment_policy import load_policy
+    from risk.policy import load_policy
 
     monitor = load_policy()["live_position_monitor"]
     assert monitor["return_1d_at_most"] < 0

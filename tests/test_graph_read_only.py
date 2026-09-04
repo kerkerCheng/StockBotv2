@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from decision_lab.adapters.graph import (
+from shared.graph_port import (
     GraphQueryRejected,
     Neo4jReadOnlyQueryPort,
     ReadOnlyCredential,

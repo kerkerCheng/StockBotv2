@@ -4,7 +4,7 @@ from __future__ import annotations
 from dataclasses import replace
 from datetime import datetime
 
-from .blocker_severity import CHECKLIST_ITEMS as _CHECKLIST_ITEMS, fatal_blockers
+from shared.blocker_severity import CHECKLIST_ITEMS as _CHECKLIST_ITEMS, fatal_blockers
 from .models import ContextBundle, CoverageResult
 from .store import DecisionStore
 

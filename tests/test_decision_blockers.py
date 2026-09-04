@@ -17,7 +17,7 @@ from pathlib import Path
 
 import pytest
 
-from decision_lab.blockers import (
+from shared.blockers import (
     RESOLUTION_MODES,
     UNKNOWN,
     BlockerRegistry,

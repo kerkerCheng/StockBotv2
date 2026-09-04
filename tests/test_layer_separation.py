@@ -172,28 +172,33 @@ def test_cypher_stays_out_of_the_alpha_core() -> None:
 # 2. Engine D 不得反向依賴新層
 # ---------------------------------------------------------------------------
 
-#: **搬遷期的 module aliasing shim。** 舊路徑轉發到新家，讓既有 import 不必一次全改。
+#: ✅ **2026-09-04 Phase 3：15 → 0，搬遷期欠債清空。**
 #:
-#: ⚠ 這是一份**會縮小的欠債清單**，不是豁免：`test_listed_shims_really_are_shims`
-#: 會驗證每一個列出的檔案**真的只是 shim**（極短、含 aliasing 標記、無業務邏輯），
-#: 所以它不能被拿來藏真正的違規。
-#: **Phase 3 收尾的驗收條件是這個集合變成空的。**
-TRANSITIONAL_SHIMS = frozenset({
-    "decision_lab/beta_policy.py",
-    "decision_lab/beta_monitor.py",
-    "decision_lab/nav_exposure.py",
-    "decision_lab/portfolio_risk.py",
-    "decision_lab/ranking_view.py",
-    "decision_lab/capital_authority.py",
-    "decision_lab/adapters/market.py",
-    "decision_lab/redaction.py",
-    "decision_lab/blockers.py",
-    "decision_lab/blocker_severity.py",
-    "thesis/investment_policy.py",
-    "mcp_server/research_actions.py",
-    "mcp_server/intake.py",
-    "mcp_server/action_publisher.py",
-    "mcp_server/decision_tools.py",
+#: 原本這裡有 15 個 module aliasing shim（舊路徑轉發到新家），讓 B1／B3 的搬遷
+#: 不必一次改完所有 import。現在 71 處消費端全部指向真正的家，shim 已刪除。
+#:
+#: ⚠ 集合是空的，而檢查**仍然在跑**——它擋的是第 1 個新增者。
+#: 再加 shim 前先問：是搬遷中途的暫時狀態，還是「不想改 import」？
+#: 後者會讓一個模組永遠有兩個名字。
+TRANSITIONAL_SHIMS: frozenset[str] = frozenset()
+
+#: **B6（`brief.py` 拆 pane）之前還解不掉的耦合。** 一條，逐條列名。
+#:
+#: ⚠ 這份清單存在的理由，是它比先前那個 shim **更誠實**。清 shim 時
+#: `decision_lab/sizing.py → portfolio.policy` 與這一條同時現形——它們一直都在，
+#: 只是 `decision_lab/portfolio_risk.py`／`beta_policy.py` 這兩個 aliasing shim
+#: 讓 import 掃描看到的是 `decision_lab.*`，於是層級測試綠著跑了整段搬遷期。
+#: **一個「暫時轉發」的 shim，實際效果是把方向違規變成隱形的。**
+#: 具名清單不會——它每次執行都出現，而且 `test_the_pending_couplings_are_all_still_real`
+#: 會在債還掉時強迫你把它刪掉。
+#:
+#: `sizing.py` 那條已於同日修掉（比對邏輯收回 `risk.snapshot.leverage_hard_blocks`，
+#: 它與 `compose_risk_snapshot` 本來就是同一段，重複兩份＝兩個會各自漂移的真相）。
+#: 剩下這條要等 B6：`_beta_covered_aliases` 服務的是 `_sheet_only_items`，而它在
+#: `engine_b todo sync → public_view → build_today_brief` 這條 pq2 收集鏈上，
+#: 改成注入要同時穿過四層。設計文件把 B6 列為 🔴 並註明「需要 B1/B3 的 DTO 先存在」。
+PENDING_B6_COUPLINGS: frozenset[tuple[str, str]] = frozenset({
+    ("decision_lab/brief.py", "portfolio.policy"),
 })
 
 #: `engine_d_runtime` 是 **composition root**——它的職責就是把各層接起來，
@@ -221,14 +226,32 @@ def test_decision_lab_domain_does_not_import_new_layers() -> None:
     for package in ("decision_lab", "engine_d_runtime"):
         for path in _python_files(package):
             rel = _rel(path)
-            if rel in TRANSITIONAL_SHIMS or rel in COMPOSITION_ROOTS:
+            if rel in COMPOSITION_ROOTS:
                 continue
             for module in _imported_roots(path):
-                if module.split(".")[0] in FORBIDDEN_FOR_ENGINE_D:
-                    offenders.append(f"{rel} → {module}")
+                if module.split(".")[0] not in FORBIDDEN_FOR_ENGINE_D:
+                    continue
+                if (rel, module) in PENDING_B6_COUPLINGS:
+                    continue
+                offenders.append(f"{rel} → {module}")
     assert not offenders, (
         "Engine D 的 domain 模組不得 import alpha／portfolio：\n" + "\n".join(offenders)
     )
+
+
+def test_the_pending_couplings_are_all_still_real() -> None:
+    """**欠債清單不得比欠債活得久。**
+
+    清單上的每一條若已經修掉，它就必須從清單移除——否則下一個人會以為
+    這裡還有債，或更糟：把新違規加進來時看到「反正清單上本來就有東西」。
+    """
+    stale = [
+        f"{rel} → {module}"
+        for rel, module in PENDING_B6_COUPLINGS
+        if module not in _imported_roots(ROOT / rel)
+    ]
+    assert not stale, (
+        "這些耦合已經不存在，請從 PENDING_B6_COUPLINGS 移除：\n" + "\n".join(stale))
 
 
 def test_upstream_layers_do_not_import_engine_d() -> None:
@@ -247,6 +270,20 @@ def test_upstream_layers_do_not_import_engine_d() -> None:
                 if module.split(".")[0] in ("decision_lab", "engine_d_runtime"):
                     offenders.append(f"{_rel(path)} → {module}")
     assert not offenders, "上游層不得 import Engine D：\n" + "\n".join(offenders)
+
+
+def test_no_transitional_shims_remain() -> None:
+    """搬遷期欠債為 0——**寫成斷言，不靠上面那條的空參數集。**
+
+    `@parametrize` 收到空集合會變成 SKIPPED，而 SKIPPED 與「檢查通過」在報表上
+    長得一樣（L13：成功與未執行不得同形）。這條讓「shim 已清空」自己現形。
+    """
+    assert TRANSITIONAL_SHIMS == frozenset(), (
+        f"又出現搬遷期 shim：{sorted(TRANSITIONAL_SHIMS)}。"
+        "shim 會讓方向違規變成隱形的——2026-09-04 清掉 15 個時現形了兩條"
+        "（`sizing.py`／`brief.py` → `portfolio`），它們整段搬遷期都在，測試卻是綠的。"
+        "改用 PENDING_B6_COUPLINGS 那種具名清單，它每次執行都會出現。"
+    )
 
 
 @pytest.mark.parametrize("rel", sorted(TRANSITIONAL_SHIMS))

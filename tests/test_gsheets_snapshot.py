@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from decision_lab.identity import resolve_identity
+from shared.identity_resolution import resolve_identity
 from fetchers import gsheets
 from fetchers.gsheets import (
     CAPITAL_AUTHORITY_HEADERS,

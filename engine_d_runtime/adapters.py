@@ -13,8 +13,8 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Callable, Mapping, Sequence
 
-from decision_lab.adapters.graph import Neo4jReadOnlyQueryPort
-from decision_lab.identity import resolve_identity as resolve_registered_identity
+from shared.graph_port import Neo4jReadOnlyQueryPort
+from shared.identity_resolution import resolve_identity as resolve_registered_identity
 from decision_lab.workflow_ports import (
     AuthoritySnapshot,
     AuthorityWorkOrder,
@@ -46,7 +46,7 @@ def fetch_nav_exposure(
 ) -> dict[str, Any]:
     """從 Google Sheet 讀持股並算出 NAV 比例呈現。
 
-    取數住在這一層而不是 `decision_lab.nav_exposure`：後者是純轉換層，不得 import
+    取數住在這一層而不是 `portfolio.exposure`：後者是純轉換層，不得 import
     `fetchers`（架構邊界由 test_decision_lab_does_not_import_concrete_current_state_
     authorities 守著）。
 
@@ -169,7 +169,7 @@ def fetch_ranking_view(
 ) -> dict[str, Any] | None:
     """從 Neo4j 讀 assertion 並產生瓶頸排序視圖；讀不到就回 `None`。
 
-    取數住在這一層而不是 `decision_lab.ranking_view`：後者是純轉換層，不得 import
+    取數住在這一層而不是 `alpha.ranking`：後者是純轉換層，不得 import
     Neo4j driver（架構邊界由 `test_decision_lab_does_not_import_concrete_current_state_
     authorities` 守著）。
 
@@ -336,7 +336,7 @@ def evidence_hops() -> int:
     cohort 對照差異。
     """
 
-    from thesis.investment_policy import load_policy
+    from risk.policy import load_policy
 
     hops = int(load_policy()["probe_lane"]["evidence_hops"])
     if not 1 <= hops <= 3:

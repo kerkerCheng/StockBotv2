@@ -10,7 +10,7 @@ from copy import deepcopy
 from pathlib import Path
 
 from decision_lab.action_card import build_action_card
-from decision_lab.blocker_severity import (
+from shared.blocker_severity import (
     diagnostic_blockers,
     registered_keys,
     severity_of,
@@ -21,7 +21,7 @@ from decision_lab.execution import assess_probe
 from tests.test_decision_context import NOW, complete_inputs
 from tests.test_decision_execution import _store
 from tests.test_probe_sizing import _assessment
-from thesis.investment_policy import load_policy
+from risk.policy import load_policy
 
 
 # 讓資本歸零：這些缺陷使決策無法稽核或事後檢驗，不是「還沒被證實的好消息」。
@@ -188,7 +188,7 @@ def test_every_known_blocker_has_a_deliberate_classification() -> None:
     # 每一個都必須是**明確登記**的，不能靠 fail-closed 預設落進 fatal。
     # 判準是「有沒有在 config 命中一條規則」：命中 diagnostic/sizing 顯然是明確的；
     # 命中 fatal 也必須來自登記，而不是未登記的預設。
-    from decision_lab.blocker_severity import _match  # noqa: PLC0415 — 僅測試用
+    from shared.blocker_severity import _match  # noqa: PLC0415 — 僅測試用
 
     for blocker in sorted(known | set(LIVE_ONLY_FATAL)):
         assert _match(blocker) is not None, f"{blocker} 未登記於 config/decision_blockers.json"

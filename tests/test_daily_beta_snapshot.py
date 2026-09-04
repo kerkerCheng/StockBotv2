@@ -5,7 +5,7 @@ import io
 import json
 import sqlite3
 
-from decision_lab.beta_policy import load_beta_policy, unique_technical_targets
+from portfolio.policy import load_beta_policy, unique_technical_targets
 from engine_c.technical import ensure_technical_schema
 from scripts.daily_beta_snapshot import run
 

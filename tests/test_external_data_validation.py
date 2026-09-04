@@ -4,7 +4,7 @@ import math
 
 import pytest
 
-from decision_lab.adapters.market import normalize_fx_snapshot, normalize_market_snapshot
+from shared.market_normalization import normalize_fx_snapshot, normalize_market_snapshot
 from decision_lab.context import derive_runway
 
 

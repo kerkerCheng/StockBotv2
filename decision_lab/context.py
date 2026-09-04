@@ -13,9 +13,9 @@ from identity.authority_tokens import tokens_for_owner
 
 from shared.market_normalization import normalize_fx_snapshot, normalize_market_snapshot
 from .adapters.holdings import execution_aliases
-from .identity import resolve_identity
+from shared.identity_resolution import resolve_identity
 from .models import ContextBundle
-from .redaction import sensitive_payload_path
+from shared.redaction import sensitive_payload_path
 from .store import DecisionStore
 
 

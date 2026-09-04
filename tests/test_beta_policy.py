@@ -5,7 +5,7 @@ import copy
 
 import pytest
 
-from decision_lab.beta_policy import (
+from portfolio.policy import (
     BetaPolicyError,
     TargetAllocationError,
     instrument_price_key,

@@ -7,7 +7,7 @@ from decimal import Decimal
 
 import pytest
 
-from decision_lab.beta_policy import load_beta_policy, unique_technical_targets
+from portfolio.policy import load_beta_policy, unique_technical_targets
 from engine_c.etl_technical import refresh_technical_observations
 from engine_c.technical import (
     _METRIC_COLUMNS,

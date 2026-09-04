@@ -20,7 +20,7 @@ from paper_portfolio.ledger import (
     value_portfolio,
     write_review,
 )
-from thesis.investment_policy import calculate_position_limit, load_policy
+from risk.policy import calculate_position_limit, load_policy
 
 
 def _root(tmp_path: Path, *, nav: float = 100.0, currency: str = "USD") -> Path:
@@ -337,7 +337,7 @@ def test_correction_retains_original_policy_after_policy_changes(
     correction["policy_version"] = original["policy_version"]
     correction["policy_decision"] = original["policy_decision"]
     monkeypatch.setattr(
-        "thesis.investment_policy.load_policy",
+        "risk.policy.load_policy",
         lambda: {**load_policy(), "policy_version": "future-policy"},
     )
 

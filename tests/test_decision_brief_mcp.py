@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import json
 
-from mcp_server.decision_tools import get_decision_brief_core
+from decision_lab.public_view import get_decision_brief_core
 from mcp_server import graph_mcp
 
 

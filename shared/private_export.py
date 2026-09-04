@@ -1,4 +1,14 @@
-"""Explicit recovery and redacted diagnostic exports; no implicit write side effects。"""
+"""Explicit recovery and redacted diagnostic exports; no implicit write side effects。
+
+⚠ 2026-09-04 由 `decision_lab/export.py` 搬到 `shared/`：備份與 export 是
+infrastructure，Engine C 的 private ledger 也適用同一套規則，不該只有 Engine D 有。
+
+搬遷時把 `from .store import DecisionStore` 換成下面的窄 Protocol——它實際只用到
+**兩個方法**，import 整個 `DecisionStore` 只是為了一個型別註解，卻會讓 `shared`
+反向依賴 Engine D（`test_upstream_layers_do_not_import_engine_d` 會紅）。
+窄 port 同時把「這支 export 需要 store 提供什麼」寫成可讀的契約，
+形狀照 `decision_lab/workflow_ports.py`（repo 裡唯一真正的 port）。
+"""
 from __future__ import annotations
 
 import json
@@ -6,10 +16,17 @@ import os
 import sqlite3
 from collections import Counter
 from pathlib import Path
+from typing import Protocol
 
 from storage.relational import validate_private_destination
 
-from .store import DecisionStore
+
+class ExportableStore(Protocol):
+    """export 對 store 的**全部**需求。多一個方法都要先問這裡放不放得下。"""
+
+    def lifecycle_invariant_violations(self) -> list[str]: ...
+
+    def table_count(self, table: str) -> int: ...
 
 
 class ExportError(RuntimeError):
@@ -17,7 +34,7 @@ class ExportError(RuntimeError):
 
 
 def export_redacted_summary(
-    store: DecisionStore,
+    store: ExportableStore,
     destination: Path,
     *,
     repo_root: Path,

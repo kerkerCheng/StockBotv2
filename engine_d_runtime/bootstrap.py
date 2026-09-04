@@ -4,7 +4,7 @@ from __future__ import annotations
 import os
 from typing import Any
 
-from decision_lab.adapters.graph import Neo4jReadOnlyQueryPort
+from shared.graph_port import Neo4jReadOnlyQueryPort
 
 from .adapters import DefaultRuntimeProvider
 

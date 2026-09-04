@@ -6,7 +6,7 @@
 """
 from __future__ import annotations
 
-from decision_lab.ranking_view import build_ranking_view
+from alpha.ranking import build_ranking_view
 
 
 def _row(company_id, ticker, bottleneck, *, sub=5, evidence="externally_corroborated",
@@ -164,7 +164,7 @@ def test_sector_grouping_segments_full_list_with_global_rank() -> None:
     # 各段有自己的第一名
     assert segs["AI 光互連／CPO"]["entries"][0]["rank"] == 1
     # 無錨者集中在未歸組段現形，不消失
-    from decision_lab.ranking_view import UNGROUPED_SECTOR
+    from alpha.ranking import UNGROUPED_SECTOR
     assert segs[UNGROUPED_SECTOR]["entries"][0]["company_id"] == "co:globalfoundries"
     # 新族群 = 改 map 就長新段
     sector_map["mat:silicon_wafer"] = "矽晶圓"

@@ -5,7 +5,7 @@ import copy
 
 import pytest
 
-from decision_lab.capital_authority import build_capital_view
+from shared.capital_authority import build_capital_view
 
 
 NOW = "2026-07-28T00:00:00+00:00"

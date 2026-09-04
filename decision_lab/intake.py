@@ -15,9 +15,9 @@ from urllib.parse import urlparse
 from identity.registry import get_registry
 
 from .adapters.holdings import execution_aliases
-from .identity import resolve_identity
+from shared.identity_resolution import resolve_identity
 from .models import CaptureResult, MarketObservation, SignalInput
-from .redaction import sensitive_payload_path
+from shared.redaction import sensitive_payload_path
 from .store import DecisionStore
 
 

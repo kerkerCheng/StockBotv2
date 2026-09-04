@@ -564,7 +564,7 @@ def replay_decision_store_events(
 def append_event(event: Mapping[str, Any], *, root: str | Path = ROOT) -> dict[str, Any]:
     """Validate the complete ledger, then append exactly one immutable row."""
 
-    from thesis.investment_policy import calculate_position_limit, load_policy
+    from risk.policy import calculate_position_limit, load_policy
 
     existing = read_events(root)
     normalized = _validate_event_shape(event)

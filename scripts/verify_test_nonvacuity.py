@@ -341,6 +341,31 @@ MUTATIONS: tuple[Mutation, ...] = (
         test="tests/test_daily_state_publisher.py::test_private_and_traversal_references_are_never_shipped",
         guards="private authority 刻意不進 Git——無人值守排程尤其不得碰",
     ),
+    # --- Phase 3 shim 清空與槓桿硬擋收回（2026-09-04）-------------------
+    Mutation(
+        name="搬遷期 shim 悄悄長回來",
+        path="tests/test_layer_separation.py",
+        old="TRANSITIONAL_SHIMS: frozenset[str] = frozenset()",
+        new='TRANSITIONAL_SHIMS: frozenset[str] = frozenset({"decision_lab/store.py"})',
+        test="tests/test_layer_separation.py::test_no_transitional_shims_remain",
+        guards="shim 會把方向違規變成隱形的——清空後不得再開第一個",
+    ),
+    Mutation(
+        name="欠債清單比欠債活得久",
+        path="tests/test_layer_separation.py",
+        old='    ("decision_lab/brief.py", "portfolio.policy"),',
+        new='    ("decision_lab/store.py", "portfolio.policy"),\n    ("decision_lab/brief.py", "portfolio.policy"),',
+        test="tests/test_layer_separation.py::test_the_pending_couplings_are_all_still_real",
+        guards="還掉的債必須從清單刪掉，否則清單會變成永久豁免",
+    ),
+    Mutation(
+        name="槓桿算不出來時 fail open",
+        path="risk/snapshot.py",
+        old="        if not math.isfinite(float(nav)) or float(nav) <= 0:",
+        new="        if float(nav) <= 0:",
+        test="tests/test_portfolio_risk.py::test_unavailable_leverage_is_a_blocker_not_a_pass",
+        guards="NaN 的所有比較都是 False——算不出來不等於沒有超標",
+    ),
 )
 
 

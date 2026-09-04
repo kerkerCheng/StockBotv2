@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import pytest
 
-from decision_lab.nav_exposure import build_nav_exposure
+from portfolio.exposure import build_nav_exposure
 
 NAV = 1000.0
 

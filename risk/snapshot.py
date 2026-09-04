@@ -528,11 +528,82 @@ def append_risk_snapshot(path: str | Path, snapshot: Mapping[str, Any]) -> bool:
     return True
 
 
+def leverage_hard_blocks(
+    holdings_rows: Sequence[Mapping[str, Any]],
+    *,
+    nav: float,
+    nav_base: Any = None,
+    base_currency: Any = None,
+    registry: IdentityRegistry | None = None,
+) -> list[str]:
+    """ETF 槓桿 nominal／effective 兩個**硬擋**——供 Engine D 的資本閘門呼叫。
+
+    ## 為什麼這段住在 `risk/` 而不是 `decision_lab/sizing.py`
+
+    2026-09-04 清掉 `decision_lab/portfolio_risk.py` 這個 aliasing shim 之後，
+    層級測試立刻紅在 `decision_lab/sizing.py → portfolio.policy`——**Engine D 一直
+    直接依賴 Portfolio，只是隔著 shim 所以看不到**（層級測試會跳過 shim 清單，
+    這正是「欠債清單不得被拿來藏違規」那條要防的形狀，而它藏的是一條真的違規）。
+
+    政策數值的方向本來就對：pipeline 是 `alpha → portfolio → risk → Engine D`，
+    Engine D 的職責就是執行硬上限。錯的是**它自己去組 portfolio 元件再自己比對**——
+    那份比對邏輯與 `compose_risk_snapshot` 裡的是同一段，重複兩份就是兩個會各自漂移的
+    真相。這裡把它收回唯一的家，Engine D 只拿結果。
+
+    ⚠ 回傳的 blocker code 與 `compose_risk_snapshot` 的 `hard_blocks` **刻意同名**——
+    它們是同一件事，下游（`_HARD_CAP_BLOCKERS`）靠這個名字判定是不是資本硬擋。
+    `nav <= 0` 或政策讀不到時回 `portfolio_leverage_unavailable`：
+    **算不出來不等於沒有超標**，所以它也是 blocker（fail closed）。
+    """
+    from portfolio.policy import load_beta_policy
+
+    try:
+        # ⚠ 這裡與下面的 `isfinite(weight)` **不是重複**，是兩件事：
+        # 這條驗**輸入**（nav 是不是一個有意義的數），那條驗**計算結果**
+        # （components 側可能餵進 NaN）。三種非正常 nav 各有不同的 fail-open 路徑：
+        #   負數 → 比例變負 → `>= cap` False → 通過
+        #   NaN  → 所有比較都 False → 通過
+        #   inf  → base/inf = 0.0（有限！）→ 通過，而且連 weight 檢查都攔不到
+        # 最後一種是本函式第二版的實際漏洞——當時以為 weight 檢查涵蓋了一切。
+        if not isinstance(nav, (int, float)) or isinstance(nav, bool):
+            raise ValueError("nav must be numeric")
+        if not math.isfinite(float(nav)) or float(nav) <= 0:
+            raise ValueError("nav unavailable")
+        policy = load_beta_policy()
+        components = build_portfolio_components(
+            list(holdings_rows),
+            policy,
+            nav_base=nav_base,
+            base_currency=base_currency,
+            strict_reconciliation=False,
+            registry=registry,
+        )
+        risk = policy["risk"]
+        blocks: list[str] = []
+        for base_key, cap_key, code in (
+            ("leveraged_nominal_base", "leveraged_nominal_cap",
+             "etf_leverage_nominal_cap_reached"),
+            ("leveraged_effective_base", "leveraged_effective_cap",
+             "etf_leverage_effective_cap_reached"),
+        ):
+            # ⚠ 這裡**不再**檢查 weight 是否有限。第二版曾經有那道守衛，突變測試
+            # 證明它是死碼：`build_portfolio_components` 的 `_finite()` 已濾掉所有
+            # 非有限的 row value，bases 必為有限和；nav 又在上面驗過。
+            # 永遠不會觸發的守衛就是 L14 的恆滅閘門——留著只會讓人以為有兩層保護。
+            weight = float(components[base_key]) / float(nav)
+            if weight >= float(risk[cap_key]):
+                blocks.append(code)
+        return blocks
+    except (KeyError, OSError, TypeError, ValueError, ZeroDivisionError):
+        return ["portfolio_leverage_unavailable"]
+
+
 __all__ = [
     "append_risk_snapshot",
     "build_portfolio_components",
     "compose_risk_snapshot",
     "event_search_requests",
+    "leverage_hard_blocks",
     "read_latest_risk_snapshot",
     "risk_changes",
 ]

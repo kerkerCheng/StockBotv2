@@ -7,7 +7,7 @@ from typing import Any, Callable, Mapping
 
 from engine_c import db as engine_db
 from engine_c.checklist import get_checklist
-from thesis.investment_policy import coverage_policy_view, load_policy, validate_policy
+from risk.policy import coverage_policy_view, load_policy, validate_policy
 
 
 _TICKER = re.compile(r"^[A-Z0-9.^_-]{1,20}$")

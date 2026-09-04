@@ -564,7 +564,7 @@ def _substantive_blockers(cohort_id: str) -> list[str]:
         if isinstance(grouped, Mapping):
             return sorted(str(b) for b in (grouped.get("user_decision") or []))
         # 舊 payload（例如遠端受限 surface）沒有這個欄位時才自行分組。
-        from decision_lab.blockers import describe_blocker
+        from shared.blockers import describe_blocker
 
         return sorted(
             code
@@ -1760,7 +1760,7 @@ def _derive_waiting_on(blockers: Any) -> dict[str, Any] | None:
     if not codes:
         return None
     try:
-        from decision_lab.blockers import get_blocker_registry
+        from shared.blockers import get_blocker_registry
 
         registry = get_blocker_registry()
     except Exception:
@@ -1793,7 +1793,7 @@ def _only_system_internal_blockers(blockers: Any) -> bool:
     if not codes:
         return False
     try:
-        from decision_lab.blockers import get_blocker_registry
+        from shared.blockers import get_blocker_registry
 
         grouped = get_blocker_registry().classify(codes)
     except Exception:
@@ -1872,7 +1872,7 @@ def _decision_review_hint(
     if ref in dispatchable:
         return "coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess"
     # 哪些 blocker 真的需要人動手，唯一權威是 config/decision_blockers.json 的
-    # `resolution_mode`（`decision_lab.blockers` 是唯一 loader）。
+    # `resolution_mode`（`shared.blockers` 是唯一 loader）。
     #
     # ⚠ 這裡原本手寫了一組 stale_only 清單——那是把一個已有 SSOT 的分類複製第二份，
     # 而複製品立刻就錯了：2026-08-26 實測 [220] co:axt 的
@@ -1881,7 +1881,7 @@ def _decision_review_hint(
     # awaiting_external，而該項實際上只要 reassess 就從 REVIEW 變成 NO ACTION。
     # 判準與 L15 一致：分類是語意問題，但它已經被登記成 deterministic 資料，
     # 就該去讀它，不要另外猜一份。
-    from decision_lab.blockers import describe_blocker
+    from shared.blockers import describe_blocker
 
     substantive = sorted(
         code
@@ -1960,7 +1960,7 @@ def _corroboration_only_user_codes(blockers: Any) -> list[str] | None:
     if not codes:
         return None
     try:
-        from decision_lab.blockers import get_blocker_registry
+        from shared.blockers import get_blocker_registry
 
         grouped = get_blocker_registry().classify(codes)
     except Exception:

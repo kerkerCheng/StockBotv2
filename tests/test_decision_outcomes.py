@@ -15,7 +15,7 @@ from decision_lab.outcomes import (
 from tests.test_decision_execution import _bundle, _store
 from tests.test_probe_sizing import _assessment
 from decision_lab.execution import assess_probe, record_live_choice
-from thesis.investment_policy import load_policy
+from risk.policy import load_policy
 
 
 class FixedMarket:

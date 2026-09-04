@@ -40,7 +40,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from decision_lab.backup import (  # noqa: E402
+from shared.private_backup import (  # noqa: E402
     BackupError,
     create_private_backup,
     restore_private_backup,

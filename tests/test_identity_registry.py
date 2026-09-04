@@ -4,7 +4,7 @@ import ast
 import json
 from pathlib import Path
 
-from decision_lab.identity import resolve_identity
+from shared.identity_resolution import resolve_identity
 from identity.registry import TICKER_MAP, get_registry
 from loader.load_to_neo4j import TICKER_MAP as LOADER_TICKER_MAP
 

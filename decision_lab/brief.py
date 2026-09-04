@@ -70,7 +70,7 @@ def _blockers_by_mode(blockers: Sequence[str]) -> dict[str, list[str]]:
     下游只能靠猜，而猜錯的方向永遠是「看起來需要更多研究」。
     """
 
-    from .blockers import describe_blocker
+    from shared.blockers import describe_blocker
 
     grouped: dict[str, list[str]] = {}
     for code in sorted({str(b) for b in blockers if b}):
@@ -480,7 +480,7 @@ def _beta_covered_aliases() -> dict[str, str]:
     也不能因設定檔壞掉而讓未覆蓋持股從 pq2 靜默消失。
     """
     try:
-        from .beta_policy import load_beta_policy
+        from portfolio.policy import load_beta_policy
 
         policy = load_beta_policy()
     except Exception:

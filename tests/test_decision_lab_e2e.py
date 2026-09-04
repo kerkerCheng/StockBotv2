@@ -8,7 +8,7 @@ import sqlite3
 import pytest
 
 from decision_lab.action_card import build_action_card
-from decision_lab.backup import create_private_backup, restore_private_backup
+from shared.private_backup import create_private_backup, restore_private_backup
 from decision_lab.bootstrap import open_default_store
 from decision_lab.context import build_context_bundle, holdings_snapshot_digest
 from decision_lab.coverage import assess_coverage
@@ -21,7 +21,7 @@ from decision_lab.store import DecisionStore
 from engine_c.db import _ensure_sqlite_schema, upsert_snapshot
 from engine_c.manual_observations import append_manual_observation
 from paper_portfolio.ledger import replay_decision_store_events
-from thesis.investment_policy import load_policy
+from risk.policy import load_policy
 
 
 FIXTURES = Path(__file__).parent / "fixtures" / "decision_lab"

@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from decision_lab.adapters.graph import (
+from shared.graph_port import (
     GraphQueryRejected,
     Neo4jReadOnlyQueryPort,
     fixture_fingerprint,

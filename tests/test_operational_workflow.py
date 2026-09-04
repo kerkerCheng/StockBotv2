@@ -3,7 +3,7 @@ from __future__ import annotations
 from copy import deepcopy
 from pathlib import Path
 
-from decision_lab.blocker_severity import fatal_blockers, severity_of
+from shared.blocker_severity import fatal_blockers, severity_of
 from decision_lab.models import RESEARCH_STATUSES
 from decision_lab.workflow import EvaluationRequest, evaluate_signal, reassess
 from decision_lab.workflow_ports import AuthoritySnapshot, IdentityAuthority

@@ -20,9 +20,9 @@ try:
 except ImportError:
     pass
 
-from decision_lab.beta_monitor import build_beta_monitor, render_beta_monitor_markdown
-from decision_lab.beta_policy import load_beta_policy, unique_technical_targets
-from decision_lab.portfolio_risk import append_risk_snapshot, read_latest_risk_snapshot
+from portfolio.allocation import build_beta_monitor, render_beta_monitor_markdown
+from portfolio.policy import load_beta_policy, unique_technical_targets
+from risk.snapshot import append_risk_snapshot, read_latest_risk_snapshot
 from engine_c.db import get_conn
 from engine_c.etl_technical import refresh_technical_observations
 from engine_c.market_data import get_fx_snapshot

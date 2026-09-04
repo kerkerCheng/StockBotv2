@@ -11,13 +11,13 @@ import json
 
 import pytest
 
-from decision_lab.beta_monitor import (
+from portfolio.allocation import (
     build_allocation_gap,
     build_beta_monitor,
     render_beta_monitor_markdown,
     water_level,
 )
-from decision_lab.beta_policy import (
+from portfolio.policy import (
     instrument_price_key,
     load_beta_policy,
     load_target_allocation,
@@ -294,7 +294,7 @@ def test_twse_reference_is_rendered_without_becoming_adjusted_indicator() -> Non
 
 
 def _gap(rows, *, policy=None, target=None):
-    from decision_lab.portfolio_risk import build_portfolio_components
+    from risk.snapshot import build_portfolio_components
 
     policy = policy or load_beta_policy()
     portfolio = build_portfolio_components(rows, policy)

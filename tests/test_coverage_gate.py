@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from decision_lab.blocker_severity import severity_of
+from shared.blocker_severity import severity_of
 from decision_lab.context import build_context_bundle, holdings_snapshot_digest
 from decision_lab.coverage import assess_coverage
 from decision_lab.store import DecisionStore

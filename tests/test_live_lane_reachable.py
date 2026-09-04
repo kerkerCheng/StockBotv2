@@ -34,7 +34,7 @@ from decision_lab.sizing import calculate_probe_limits
 from tests.test_decision_context import NOW, complete_inputs
 from tests.test_decision_execution import _store
 from tests.test_probe_sizing import _assessment
-from thesis.investment_policy import load_policy
+from risk.policy import load_policy
 
 
 def _same_symbol_payload() -> dict:

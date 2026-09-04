@@ -9,7 +9,9 @@ from pathlib import Path
 
 import pytest
 
-from mcp_server import graph_mcp, intake, research_actions
+from mcp_server import graph_mcp
+from intake import provenance as intake
+from intake import actions as research_actions
 
 
 BASIS = "Official public filing retained for private research"

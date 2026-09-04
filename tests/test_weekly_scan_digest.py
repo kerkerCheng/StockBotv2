@@ -6,7 +6,7 @@ import subprocess
 from pathlib import Path
 
 from crons.weekly_scan_digest import intake_pending_summary
-from mcp_server import research_actions
+from intake import actions as research_actions
 
 
 def _git(repo: Path, *args: str) -> None:

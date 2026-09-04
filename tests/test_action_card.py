@@ -89,7 +89,7 @@ def test_coverage_blocker_that_drives_review_appears_in_card_blockers(
 
     from decision_lab.context import build_context_bundle, holdings_digest
     from tests.test_decision_context import complete_inputs
-    from thesis.investment_policy import load_policy
+    from risk.policy import load_policy
 
     store = _store(tmp_path)
     try:

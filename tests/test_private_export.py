@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from decision_lab.export import ExportError, export_full_sqlite, export_redacted_summary
+from shared.private_export import ExportError, export_full_sqlite, export_redacted_summary
 from decision_lab.store import DecisionStore
 from storage.relational import initialize_private_root
 

@@ -4,7 +4,7 @@ import ast
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
-from decision_lab.adapters.graph import Neo4jReadOnlyQueryPort
+from shared.graph_port import Neo4jReadOnlyQueryPort
 from decision_lab.workflow_ports import WorkflowDataProvider
 from engine_d_runtime.adapters import DefaultRuntimeProvider
 from engine_d_runtime.adapters import bounded_evidence_query

@@ -16,11 +16,10 @@ from typing import Any, Mapping, Sequence
 
 from identity.registry import IdentityRegistry, get_registry
 from risk.policy import PolicyError, load_policy, validate_policy
+from risk.snapshot import leverage_hard_blocks
+from shared.blocker_severity import fatal_blockers
 
-from .beta_policy import load_beta_policy
-from .blocker_severity import fatal_blockers
 from .models import ContextBundle, CoverageResult, ProbeSizingResult
-from .portfolio_risk import build_portfolio_components
 
 
 AXES = (
@@ -416,26 +415,19 @@ def calculate_probe_limits(
     single_position_nav_cap = float(current_policy["single_position_nav_cap"])
     if live_current >= single_position_nav_cap:
         live_blockers.append("single_position_nav_cap_reached")
-    try:
-        if live_nav <= 0:
-            raise ValueError("live nav unavailable")
-        beta_policy = load_beta_policy()
-        leverage = build_portfolio_components(
+    # ETF 槓桿兩個硬擋由 `risk/` 算——Engine D 只拿結果，不自己組 portfolio 元件。
+    # 原本這裡有一份與 `compose_risk_snapshot` 相同的比對邏輯，且直接 import
+    # `portfolio.policy`；aliasing shim 讓層級測試看不到那條違規（2026-09-04 清 shim
+    # 時現形）。政策數值往 Engine D 流是對的方向，重複實作不是。
+    live_blockers.extend(
+        leverage_hard_blocks(
             holdings.get("rows") or [],
-            beta_policy,
+            nav=live_nav,
             nav_base=holdings.get("nav_base"),
             base_currency=holdings.get("base_currency"),
-            strict_reconciliation=False,
             registry=registry,
         )
-        nominal_weight = float(leverage["leveraged_nominal_base"]) / live_nav
-        effective_weight = float(leverage["leveraged_effective_base"]) / live_nav
-        if nominal_weight >= float(beta_policy["risk"]["leveraged_nominal_cap"]):
-            live_blockers.append("etf_leverage_nominal_cap_reached")
-        if effective_weight >= float(beta_policy["risk"]["leveraged_effective_cap"]):
-            live_blockers.append("etf_leverage_effective_cap_reached")
-    except (KeyError, OSError, TypeError, ValueError):
-        live_blockers.append("portfolio_leverage_unavailable")
+    )
     execution_market = payload.get("execution_market") or {}
     execution_fx = payload.get("execution_fx") or {}
     if execution_market.get("status") != "available":

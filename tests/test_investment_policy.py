@@ -5,7 +5,7 @@ import json
 
 import pytest
 
-from thesis.investment_policy import (
+from risk.policy import (
     POLICY_PATH,
     PolicyError,
     calculate_position_limit,

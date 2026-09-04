@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 from decision_lab.action_card import build_action_card
-from decision_lab.blocker_severity import fatal_blockers
+from shared.blocker_severity import fatal_blockers
 from decision_lab.context import build_context_bundle, holdings_digest
 from decision_lab.coverage import assess_coverage
 from decision_lab.execution import (
@@ -28,7 +28,7 @@ from decision_lab.store import (
 from storage.relational import initialize_private_root
 from tests.test_decision_context import NOW, complete_inputs
 from tests.test_probe_sizing import _assessment
-from thesis.investment_policy import load_policy
+from risk.policy import load_policy
 
 
 def _store(tmp_path: Path) -> DecisionStore:
