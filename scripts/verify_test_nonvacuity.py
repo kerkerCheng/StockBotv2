@@ -516,6 +516,32 @@ MUTATIONS: tuple[Mutation, ...] = (
         ),
         guards="`fiscal_period` 之類的說明欄位不是分部占比，混進來會多出一個假分部",
     ),
+    # --- Engine C gate 改按可重導性分（2026-09-04）------------------------
+    Mutation(
+        name="漏填 verifiability 變成自動放行",
+        path="engine_c/observation_fields.py",
+        old='verifiability = str(item.get("verifiability") or "judgment").strip()',
+        new='verifiability = str(item.get("verifiability") or "mechanical").strip()',
+        test=(
+            "tests/test_engine_c_observation_fields.py::"
+            "test_unclassified_fields_fail_safe_to_needing_approval"
+        ),
+        guards="新增欄位時忘記想核准問題，就自動不用核准——放閘不得是漏填的副作用",
+    ),
+    Mutation(
+        name="mechanical 欄位可以存散文",
+        path="engine_c/manual_observations.py",
+        old="    if spec is None or spec.requires_user_approval:\n        return",
+        new="    if True:\n        return",
+        test=(
+            "tests/test_engine_c_observation_fields.py::"
+            "test_mechanical_fields_must_be_machine_comparable"
+        ),
+        guards=(
+            "散文無法被未來的重導 diff——存進 mechanical 等於宣稱可核對卻沒人核得了，"
+            "那是拆了煞車又不裝儀表板"
+        ),
+    ),
     Mutation(
         name="槓桿算不出來時 fail open",
         path="risk/snapshot.py",

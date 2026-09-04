@@ -274,3 +274,102 @@ def test_runway_inputs_field_is_registered_and_not_a_gate_member() -> None:
     assert spec is not None, "runway_inputs 必須登記，否則 set_manual_field 會拒寫"
     assert spec.gate_member is False
     assert "engine_c_manual" in spec.authorities
+
+
+# ---------------------------------------------------------------------------
+# verifiability：gate 按「可否確定性重導」畫，不按「存哪張表」畫（2026-09-04）
+# ---------------------------------------------------------------------------
+
+def test_unclassified_fields_fail_safe_to_needing_approval() -> None:
+    """漏填 `verifiability` 不得變成放行。
+
+    這是整條改動裡最容易出事的地方：判準從「全部都卡」放寬成「有些不卡」之後，
+    **預設值決定了漏填的後果**。預設成 mechanical 等於新增欄位時忘記想這件事就
+    自動不用核准；預設成 judgment 只是多問一次（L14 第 3 點：順序不可顛倒，
+    先量測後放閘）。
+    """
+    from engine_c.observation_fields import ObservationFieldRegistry
+
+    registry = ObservationFieldRegistry.from_payload({
+        "version": 1,
+        "categories": {"profitability": {"label": "獲利能力"}},
+        "fields": [{
+            "field_name": "some_new_field", "category": "profitability",
+            "label": "測試", "gate_member": False,
+            "authorities": ["engine_c_manual"],
+        }],
+    })
+
+    assert registry.get("some_new_field").verifiability == "judgment"
+    assert registry.get("some_new_field").requires_user_approval is True
+
+
+def test_unknown_verifiability_is_rejected_not_coerced() -> None:
+    """封閉字彙——打錯字要報錯，不得靜默當成 judgment 或 mechanical。"""
+    from engine_c.observation_fields import ObservationFieldError, ObservationFieldRegistry
+
+    with pytest.raises(ObservationFieldError, match="verifiability"):
+        ObservationFieldRegistry.from_payload({
+            "version": 1,
+            "categories": {"profitability": {"label": "獲利能力"}},
+            "fields": [{
+                "field_name": "x", "category": "profitability", "label": "t",
+                "gate_member": False, "authorities": ["engine_c_manual"],
+                "verifiability": "machanical",   # 打錯字
+            }],
+        })
+
+
+def test_no_gate_member_is_also_mechanical() -> None:
+    """⚠ 五項 gate 欄位一律要 pq2——放寬不得從財務核驗清單開缺口。
+
+    `gate_member` 管的是 L9 前置條件 #3，`verifiability` 管的是要不要人工核准，
+    兩者是不同的軸。但**交集必須是空的**：一個進入 Watchlist 升格 gate 的欄位
+    若能不經核准寫入，那道 gate 就等於沒有。
+    """
+    registry = get_observation_field_registry()
+    overlap = set(registry.gate_field_names) & set(registry.mechanical_field_names)
+
+    assert not overlap, f"gate 欄位不得同時是 mechanical：{sorted(overlap)}"
+
+
+def test_mechanical_fields_must_be_machine_comparable() -> None:
+    """拿掉人工閘門的**補償控制**：mechanical 的 value 必須能被未來的重導 diff。
+
+    散文存進 mechanical 欄位等於宣稱這筆可以被核對，卻讓任何人都核不了
+    （L15：分開之後兩邊都要更嚴；L14：不得拆煞車而不裝儀表板）。
+
+    實測價值：既有 ledger 裡有 1 筆 LITE `runway_inputs` 是 unquoted-key 的壞 JSON，
+    這條規則當初就會擋下它——它後來是靠 1.5 小時後補寫一筆正確的來 supersede 的。
+    """
+    import sqlite3
+
+    from engine_c.manual_observations import (
+        append_manual_observation, ensure_manual_observation_schema,
+    )
+
+    conn = sqlite3.connect(":memory:")
+    conn.row_factory = sqlite3.Row
+    ensure_manual_observation_schema(conn)
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS manual_fields (ticker TEXT, field_name TEXT, "
+        "value TEXT, source_note TEXT, updated_at TEXT, PRIMARY KEY (ticker, field_name))"
+    )
+
+    def write(field: str, value: str) -> None:
+        append_manual_observation(
+            conn, ticker="TEST", field_name=field, value=value,
+            source_ref="COHR FY2025 10-K (EDGAR 0000820318-25-000030) Note 18",
+            as_of="2026-09-03", author="test",
+        )
+
+    # JSON 數值：接受
+    write("segment_revenue_share", '{"Networking": 0.61, "Materials": 0.23}')
+    # 散文：拒絕
+    with pytest.raises(ValueError, match="必須是 JSON"):
+        write("segment_revenue_share", "Networking 約佔六成")
+    # 合法 JSON 但沒有任何數字：拒絕（沒有可比對的東西）
+    with pytest.raises(ValueError, match="至少要有一個數值"):
+        write("segment_revenue_share", '{"note": "未揭露"}')
+    # judgment 欄位維持散文——這條規則**只**適用 mechanical
+    write("customer_concentration", "FY2025 前三大客戶占營收 59.8%")

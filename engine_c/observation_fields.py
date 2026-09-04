@@ -37,6 +37,16 @@ class ObservationFieldError(ValueError):
     """未登記的欄位名或 registry 本身不合法。"""
 
 
+#: 寫入要不要人工 pq2 核准。**判準是「可否確定性重導」，不是「存哪張表」**
+#: （2026-09-04 使用者定案，沿用 L10 的「這筆資料今天重新取一次拿得回來嗎」）。
+#:
+#: 事發：`financial_snapshots` 每天自動寫 73 檔價格／EPS／倍數，零核准；而
+#: `runway_inputs`（現金／總債／FCF 三個抄自報表的數字）卻要 pq2。同一道閘門攔
+#: 兩種東西，於是對判讀太鬆、對抄表純粹是稅——正是 L15「gate 攔下的若是格式而不是
+#: 風險，該修的是它問問題的方式」。
+VERIFIABILITY = ("mechanical", "judgment")
+
+
 @dataclass(frozen=True)
 class ObservationField:
     """一個人工觀測欄位的定義。"""
@@ -48,12 +58,23 @@ class ObservationField:
     authorities: tuple[str, ...]
     auto_source: str | None = None
     why: str | None = None
+    verifiability: str = "judgment"
 
     @property
     def is_manual(self) -> bool:
         """auto_source 為空即需人工從一手來源填入。"""
 
         return self.auto_source is None
+
+    @property
+    def requires_user_approval(self) -> bool:
+        """寫入這個欄位要不要先取得使用者的 pq2 核准。
+
+        ⚠ **預設 `judgment`＝要核准。** 未宣告 verifiability 的欄位一律 fail safe
+        走 gate——放行必須是明確寫下來的決定，不是漏填的副作用。
+        """
+
+        return self.verifiability != "mechanical"
 
 
 @dataclass(frozen=True)
@@ -106,6 +127,13 @@ class ObservationFieldRegistry:
                 )
             if not authorities:
                 raise ObservationFieldError(f"field {name!r} must declare authorities")
+            # 未宣告一律 judgment（fail safe：漏填不得變成放行）。
+            verifiability = str(item.get("verifiability") or "judgment").strip()
+            if verifiability not in VERIFIABILITY:
+                raise ObservationFieldError(
+                    f"field {name!r} has unknown verifiability {verifiability!r}；"
+                    f"只接受 {VERIFIABILITY}"
+                )
             fields[name] = ObservationField(
                 field_name=name,
                 category=category,
@@ -118,6 +146,7 @@ class ObservationFieldRegistry:
                     else None
                 ),
                 why=str(item["why"]) if item.get("why") is not None else None,
+                verifiability=verifiability,
             )
             order.append(name)
         return cls(
@@ -145,6 +174,18 @@ class ObservationFieldRegistry:
 
     def manual_field_names(self) -> tuple[str, ...]:
         return tuple(n for n in self._order if self.fields[n].is_manual)
+
+    @property
+    def mechanical_field_names(self) -> tuple[str, ...]:
+        """可確定性重導、寫入**不需** pq2 的欄位。"""
+
+        return tuple(n for n in self._order if not self.fields[n].requires_user_approval)
+
+    @property
+    def judgment_field_names(self) -> tuple[str, ...]:
+        """需要判讀、寫入**仍需** pq2 的欄位。"""
+
+        return tuple(n for n in self._order if self.fields[n].requires_user_approval)
 
     def by_category(self) -> Mapping[str, tuple[str, ...]]:
         grouped: dict[str, list[str]] = {key: [] for key in self.categories}

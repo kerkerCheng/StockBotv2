@@ -80,6 +80,56 @@ def ensure_manual_observation_schema(conn: Any) -> None:
     )
 
 
+def _numeric_leaves(payload: Any) -> int:
+    """JSON 裡有幾個可比對的數值葉節點（bool 不算）。"""
+    if isinstance(payload, bool):
+        return 0
+    if isinstance(payload, (int, float)):
+        return 1
+    if isinstance(payload, Mapping):
+        return sum(_numeric_leaves(v) for v in payload.values())
+    if isinstance(payload, (list, tuple)):
+        return sum(_numeric_leaves(v) for v in payload)
+    return 0
+
+
+def _require_machine_comparable_if_mechanical(field_name: str, value: str) -> None:
+    """`verifiability=mechanical` 的欄位，value 必須是可機械比對的 JSON 數值。
+
+    ## 為什麼這條存在
+
+    2026-09-04 使用者定案：Engine C 人工 ledger 的 pq2 gate 改成按「**可不可以確定性
+    重導**」分，不再按「存哪張表」分。`mechanical` 欄位因此**不再需要人工核准**。
+
+    這一條就是拿掉那道人工閘門的**補償控制**。`mechanical` 的定義是「任何人重讀同
+    一份文件都得到同一個數」，而**散文無法被 diff**——把它存成散文等於宣稱這筆可以
+    被核對，卻讓任何人都核不了。放行與收緊必須同時發生（L15：分開之後兩邊都要更嚴；
+    L14 第 3 點：先量測後放閘，不得拆煞車而不裝儀表板）。
+
+    ⚠ **刻意不驗 `source_ref` 的格式。** 現有 85 筆橫跨 SEC／AMF／HKEX／ASX／TDnet
+    五種轄區、五種寫法（`EDGAR 0001654954-26-006919`、`AMF 2026-06-10 notes 9.1/8.14`、
+    `HKEX 2023033100951.pdf`…）。用 regex 驗只會攔下格式而不是風險，而且會擋掉完全
+    合法的法國 URD 引用——那正是 L15 記過的坑。provenance 仍然必填。
+    """
+    from engine_c.observation_fields import get_observation_field_registry
+
+    spec = get_observation_field_registry().get(field_name)
+    if spec is None or spec.requires_user_approval:
+        return
+    try:
+        payload = json.loads(value)
+    except (TypeError, ValueError):
+        raise ValueError(
+            f"{field_name} 是 verifiability=mechanical 欄位，value 必須是 JSON——"
+            "散文無法被未來的重導 diff，等於宣稱可核對卻沒人核得了"
+        ) from None
+    if _numeric_leaves(payload) == 0:
+        raise ValueError(
+            f"{field_name} 是 verifiability=mechanical 欄位，value 至少要有一個數值——"
+            "沒有數字就沒有可比對的東西"
+        )
+
+
 def append_manual_observation(
     conn: Any,
     *,
@@ -105,6 +155,7 @@ def append_manual_observation(
         "ticker", "field_name", "value", "source_ref", "as_of", "author"
     )):
         raise ValueError("manual observation requires value, provenance, as_of, and author")
+    _require_machine_comparable_if_mechanical(str(fields["field_name"]), str(fields["value"]))
     fields["as_of"] = normalize_as_of(str(fields["as_of"]))
     sensitive = sensitive_payload_path(fields, "manual_observation")
     if sensitive is not None:

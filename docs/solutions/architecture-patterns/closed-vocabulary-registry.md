@@ -72,6 +72,7 @@ tags:
 | Confidence 五軸 | `shared/assessment_axes.py` 的 `AXES`（＋`AXIS_RESEARCH_PROMPT`／`weakest_axis_of`） | 評分骨架，已凍進所有既有 decision payload。⚠ 與 `alpha/contracts.py` 的 `AXES`（新五 score）**同名不同物**——舊軸問「證據多強」，新 score 問投資問題，對照表見 `alpha/legacy_axes.py` |
 | 證據充分度三階序數 | `shared/evidence_levels.py` 的 `LEVELS` | 次序本身是排序鍵。⚠ 2026-09-04 前 `decision_lab/sizing.py` 與 `alpha/levels.py` **各存一份**，靠一句註解同步而無測試——漂掉不報錯，只讓 `convert_axis_results` 對歷史 payload 靜默誤轉。兩層都消費它且它不擁有 authority → shared |
 | 軸 → authority 對照 | `decision_lab/sizing.py` 的 `AXIS_REFERENCE_AUTHORITIES` | 證據來源分權；它會擋下「拿 Engine A 文件冒充 Engine C 財務證據」這類錯誤 |
+| 觀測欄位的核准分級 | `config/engine_c_observation_fields.json` 的 `verifiability`（`mechanical`／`judgment`） | 決定寫入要不要 pq2。判準是**可否確定性重導**（L10「今天重新取一次拿得回來嗎」），不是「存哪張表」。⚠ 未宣告 fail safe 當 `judgment`；`mechanical` 換來寫入端強制 JSON 數值（拿掉人工閘門的補償控制）。與 `gate_member` 是不同的軸，但**交集必須為空** |
 | 財務核驗清單五項 | `engine_c/checklist.py` 的 `items` | L9 前置條件 #3 的 Watchlist 升格 gate。`gate_pass` 對全體取 `all()`，加第六項會讓**所有既有標的**的 gate 退化 |
 | lead 狀態機 | `engine_b/leads.py` 的 `ALLOWED_TRANSITIONS` | 狀態是行為不是分類；加狀態本來就要加邏輯 |
 | thesis 生命週期狀態機 | `thesis/pending_lifecycle.py` 的 `ALLOWED_TRANSITIONS` | L7 的語意骨架；`retired` 刻意是終局。開啟它等於改變 thesis 的意義，不是補字彙 |

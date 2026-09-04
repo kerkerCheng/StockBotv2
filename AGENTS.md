@@ -79,6 +79,20 @@
 ### 記憶層（持久知識庫）
 - **Neo4j 知識圖譜（引擎A）：** 供應鏈結構、技術關係、來源可追溯的主張。Property graph，不是 tree。
 - **SQLite / Postgres 財務數據（引擎C）：** 財務快照、Watchlist Gate。零安裝預設用 SQLite；設 `POSTGRES_HOST`/`POSTGRES_DSN` 切換 Postgres。SQLite authority 已移至 ignored `library/private/engine_c/`，由 `library/private/runtime_pointer.json` 指向；ETL projection 可由 tracked schema 重建，但同庫的 append-only manual observation ledger 是 private authority，刪除／重建前必須先做 recovery backup，不能假設 Git 能救回。見 [`docs/solutions/tooling-decisions/engine-c-sqlite-dual-backend.md`](docs/solutions/tooling-decisions/engine-c-sqlite-dual-backend.md)。
+
+  **⚠ Engine C 的 gate 按「可否確定性重導」畫，不按「存哪張表」畫（2026-09-04 使用者定案）。**
+  事發：`financial_snapshots` 每天無人值守寫 73 檔價格／EPS／倍數，**零核准**；而
+  `runway_inputs`（現金／總債／FCF 三個抄自報表的數字）卻要 pq2。同一道閘門攔兩種東西，
+  對判讀太鬆、對抄表純粹是稅——L15「gate 攔下的若是格式而不是風險，該修的是它問問題的方式」。
+  判準沿用 L10：**「這筆資料今天重新取一次拿得回來嗎？」**
+  - `verifiability=mechanical`（值是結構化數字、指得出一手報表的確切位置、任何人重讀都得到
+    同一個數）→ **不需 pq2**。補償控制是寫入端強制 value 必須是可機械比對的 JSON 數值——
+    `mechanical` 的定義就是「可被重導核對」，而散文無法被 diff（放行與收緊必須同時發生）。
+  - `verifiability=judgment`（需要決定「這算不算」「這是什麼意思」）→ **維持 pq2**。
+  唯一權威是 `config/engine_c_observation_fields.json` 的 `verifiability`；**未宣告一律
+  fail safe 當 judgment**。查證：`python -c "from engine_c.observation_fields import get_observation_field_registry as g;print(g().mechanical_field_names)"`
+  ⚠ 刻意**不驗 `source_ref` 格式**：現有 85 筆橫跨 SEC／AMF／HKEX／ASX／TDnet 五種寫法，
+  用 regex 驗會攔掉合法的法國 URD 引用——那正是 L15 記過的坑。provenance 仍然必填。
 - **向量 RAG：** 暫用 Neo4j 內建，量大再分。
 
 ### 管道層（Engine B discovery／知識入庫的機器）
@@ -213,12 +227,12 @@ pq2 決定的只有研究與 authority。
 要求（適用上面「使用者主動指示＝已授權」）。系統主動提出的開發構想寫進 ROADMAP 待排程，
 **不主動要求 `go`**——它會在下次規劃時被一起看，而不是插隊進每日核准迴路。
 
-四個 authority gate（graph admission、Engine C 寫入、thesis mutation、live）不因此改變：
+四個 authority gate（graph admission、Engine C **判讀**寫入、thesis mutation、live）不因此改變：
 開發項落地後若要動圖或 authority，那是另一個 pq2 編號。
 **使用者主動指示＝已授權（2026-08-30 補）：** 使用者口頭／文字請求的工作，鑄號只為稽核
 （受理時即以 `go` resolve，receipt 註明使用者指示語境），**不得回頭再請求一次 `go`**——
 重複要核准是介面失敗。`go` 請求流程只適用於**系統主動提案**的項目。四個 authority gate
-（graph admission、Engine C 寫入、thesis mutation、live）不因此放寬：使用者指示的研究
+（graph admission、Engine C **判讀**寫入、thesis mutation、live）不因此放寬：使用者指示的研究
 產出若要入圖，admission 編號照鑄照問——那是新的決策點，不是重複請求。
 
 **Onboard 也走 pq2（2026-08-29 使用者定案）：** 使用者對系統的核准介面收斂為**唯一一種——pq2 編號＋`go`**。新公司 onboard 不再是獨立的對話流程審批：發現方（自主迴圈、routine 或互動研究）把 registry 增列與首批 extraction 打包成 prepared RA 取 `ra_admission` 編號，packet 內必含 L8 來源清單（origin_entity 多樣性現況）與 registry 條目內容；`go` 授權＝「registry 加該公司＋apply 該 RA 入圖」，不含 thesis／live。互動 session 可當場 sync 取號並立刻 `go`，不必等 daily——統一的是**核准的載體**，不是核准的時機。`skills/company-onboard` 的文件發現與 L8 判準照舊，只有最後的核准動作改由 pq2 承載。

@@ -38,7 +38,8 @@
       "auto_source": "financial_snapshots",
       "authorities": [
         "engine_c_financial"
-      ]
+      ],
+      "verifiability": "judgment"
     },
     {
       "field_name": "customer_concentration",
@@ -48,7 +49,8 @@
       "auto_source": null,
       "authorities": [
         "engine_c_customer"
-      ]
+      ],
+      "verifiability": "judgment"
     },
     {
       "field_name": "backlog",
@@ -58,7 +60,8 @@
       "auto_source": null,
       "authorities": [
         "engine_c_backlog"
-      ]
+      ],
+      "verifiability": "judgment"
     },
     {
       "field_name": "dilution",
@@ -68,7 +71,8 @@
       "auto_source": "financial_snapshots",
       "authorities": [
         "engine_c_financial"
-      ]
+      ],
+      "verifiability": "judgment"
     },
     {
       "field_name": "equity_issuance_authorizations",
@@ -80,7 +84,8 @@
         "engine_c_financial",
         "engine_c_manual"
       ],
-      "why": "dilution 是自動欄位、取自已實現的 shares_outstanding 趨勢，看不到「已授權但尚未發行」的額度。兩者刻意分開（L12）：把 ATM 授權寫進 dilution 會用前瞻授權覆蓋事實股數，把它省略則會漏掉一個隨時可被行使的稀釋來源。AAOI 2026-08-21 的 424B5 授權 US$600M ATM（約當時股本 5.5%），股數當下完全未變。"
+      "why": "dilution 是自動欄位、取自已實現的 shares_outstanding 趨勢，看不到「已授權但尚未發行」的額度。兩者刻意分開（L12）：把 ATM 授權寫進 dilution 會用前瞻授權覆蓋事實股數，把它省略則會漏掉一個隨時可被行使的稀釋來源。AAOI 2026-08-21 的 424B5 授權 US$600M ATM（約當時股本 5.5%），股數當下完全未變。",
+      "verifiability": "judgment"
     },
     {
       "field_name": "valuation_pressure",
@@ -90,7 +95,8 @@
       "auto_source": "financial_snapshots",
       "authorities": [
         "engine_c_valuation"
-      ]
+      ],
+      "verifiability": "judgment"
     },
     {
       "field_name": "channel_structure",
@@ -102,7 +108,8 @@
         "engine_c_customer",
         "engine_c_manual"
       ],
-      "why": "客戶集中度數字無法區分終端需求與通路集中。AAOI 的 Digicomm 佔 FY2025 營收 53.1% 但是獨家代理商，兩者投資意義完全不同。"
+      "why": "客戶集中度數字無法區分終端需求與通路集中。AAOI 的 Digicomm 佔 FY2025 營收 53.1% 但是獨家代理商，兩者投資意義完全不同。",
+      "verifiability": "judgment"
     },
     {
       "field_name": "contingent_liquidity_claims",
@@ -114,7 +121,8 @@
         "engine_c_financial",
         "engine_c_manual"
       ],
-      "why": "現金與負債快照看不到或有請求權。AXT 的 PE 基金贖回權加 Coherent 可退預付款上限約 US$71.3M，足以把淨現金翻負。"
+      "why": "現金與負債快照看不到或有請求權。AXT 的 PE 基金贖回權加 Coherent 可退預付款上限約 US$71.3M，足以把淨現金翻負。",
+      "verifiability": "judgment"
     },
     {
       "field_name": "runway_inputs",
@@ -126,7 +134,8 @@
         "engine_c_financial",
         "engine_c_manual"
       ],
-      "why": "yfinance 在財報後常暫時清空 free_cash_flow_ttm，runway 因此變成 manual_required 並讓 coverage gate 歸零。decision_lab 的 derive_runway 早就接受並驗證 manual_runway（含 timestamp future／stale 檢查），卻沒有任何地方提供它——這個欄位就是那條缺掉的走廊。value 必須是 JSON 物件，含 cash_and_equivalents、total_debt、free_cash_flow_ttm 三個數值，單位與 financial_snapshots 一致（報表原幣別絕對金額），可另帶 note 說明取自哪一段一手文件；三者缺一即視為未提供，不做部分推導。"
+      "why": "yfinance 在財報後常暫時清空 free_cash_flow_ttm，runway 因此變成 manual_required 並讓 coverage gate 歸零。decision_lab 的 derive_runway 早就接受並驗證 manual_runway（含 timestamp future／stale 檢查），卻沒有任何地方提供它——這個欄位就是那條缺掉的走廊。value 必須是 JSON 物件，含 cash_and_equivalents、total_debt、free_cash_flow_ttm 三個數值，單位與 financial_snapshots 一致（報表原幣別絕對金額），可另帶 note 說明取自哪一段一手文件；三者缺一即視為未提供，不做部分推導。 ｜verifiability=mechanical：現金／總債／自由現金流三個數字直接抄自報表，本來就規定 value 必須是含三個數值的 JSON 物件；它同時有 auto_source，人工值存在只是因為 yfinance 在財報後會暫時清空。",
+      "verifiability": "mechanical"
     },
     {
       "field_name": "debt_maturity_and_covenants",
@@ -138,7 +147,8 @@
         "engine_c_financial",
         "engine_c_manual"
       ],
-      "why": "total_debt 是單一數字，看不出到期集中度或最低流動性條款；此項在 AXT 與 AAOI 的 missing_data 都重複出現。"
+      "why": "total_debt 是單一數字，看不出到期集中度或最低流動性條款；此項在 AXT 與 AAOI 的 missing_data 都重複出現。 ｜verifiability=judgment（刻意）：到期時程表是機械可得的，covenant 條文卻要判讀「哪一條算重大」——**一欄兩義**（L12）。要放行到期表必須先把兩者拆成兩個欄位，而不是整欄標成 mechanical。",
+      "verifiability": "judgment"
     },
     {
       "field_name": "committed_capex",
@@ -150,7 +160,8 @@
         "engine_c_financial",
         "engine_c_manual"
       ],
-      "why": "以 capex 為主的負自由現金流，runway 取決於擴產能否煞停；已簽約承諾與可自由延後的部分必須分開。"
+      "why": "以 capex 為主的負自由現金流，runway 取決於擴產能否煞停；已簽約承諾與可自由延後的部分必須分開。",
+      "verifiability": "judgment"
     },
     {
       "field_name": "regulatory_dependency",
@@ -162,7 +173,8 @@
         "engine_c_valuation",
         "engine_c_manual"
       ],
-      "why": "單一監管路徑可否決整條營收假設。AXT 管理層自己點名 InP 出口許可時程是最大變數。"
+      "why": "單一監管路徑可否決整條營收假設。AXT 管理層自己點名 InP 出口許可時程是最大變數。",
+      "verifiability": "judgment"
     },
     {
       "field_name": "litigation_and_audit_flags",
@@ -173,7 +185,8 @@
       "authorities": [
         "engine_c_manual"
       ],
-      "why": "going concern、保留意見、restatement 這類措辭精度本身就是 claim（見 L11），需獨立欄位承載逐字一手用語。"
+      "why": "going concern、保留意見、restatement 這類措辭精度本身就是 claim（見 L11），需獨立欄位承載逐字一手用語。",
+      "verifiability": "judgment"
     },
     {
       "field_name": "segment_revenue_share",
@@ -185,7 +198,9 @@
         "engine_c_financial",
         "engine_c_manual"
       ],
-      "why": "Q3（earnings_exposure）問的是「這個結構優勢對上市公司的 EPS／FCF 到底多重要」，而整體毛利率答不了它——同為 substitutability=5，市值 1.7 兆的 AVGO 那塊 CPO 業務可能只佔 3%，AXTI 的 InP 卻是主業。yfinance 沒有分部資料，只能從 10-K／年報的分部附註（IFRS 8／ASC 280）人工讀入。value 必須是 JSON 物件，鍵為分部名稱、值為佔總營收的比例（0..1 的小數，非百分比），例如 {\"Networking\": 0.61, \"Materials\": 0.23}；另可帶 fiscal_period 與逐字出處。⚠ 缺此欄位時 Q3 一律誠實回 unknown，**不得用整體毛利率代替**（alpha/models/session_assessor.py 的 do_not 明列）。"
+      "why": "Q3（earnings_exposure）問的是「這個結構優勢對上市公司的 EPS／FCF 到底多重要」，而整體毛利率答不了它——同為 substitutability=5，市值 1.7 兆的 AVGO 那塊 CPO 業務可能只佔 3%，AXTI 的 InP 卻是主業。yfinance 沒有分部資料，只能從 10-K／年報的分部附註（IFRS 8／ASC 280）人工讀入。value 必須是 JSON 物件，鍵為分部名稱、值為佔總營收的比例（0..1 的小數，非百分比），例如 {\"Networking\": 0.61, \"Materials\": 0.23}；另可帶 fiscal_period 與逐字出處。⚠ 缺此欄位時 Q3 一律誠實回 unknown，**不得用整體毛利率代替**（alpha/models/session_assessor.py 的 do_not 明列）。 ｜verifiability=mechanical：分部營收數字印在分部附註（IFRS 8／ASC 280），accession 不可變、附註位置固定，任何人重讀都得到同一個數；value 是 JSON 數值物件，可被未來的重導直接 diff。",
+      "verifiability": "mechanical"
     }
-  ]
+  ],
+  "_verifiability_contract": "決定這個欄位的寫入要不要人工 pq2 核准。判準沿用 L10 的「這筆資料今天重新取一次拿得回來嗎」——**不是**按存哪張表分。mechanical＝值是結構化數字、指得出一手報表的確切位置、任何人重讀都得到同一個數 → **不需 pq2**，但寫入端強制 value 必須是可機械比對的 JSON 數值（append_manual_observation 會拒絕散文）。那個強制是拿掉 pq2 的**補償控制**：mechanical 的定義就是「可被重導核對」，而散文無法被 diff——存成散文等於宣稱可核對卻讓任何人都核不了（L15：分開之後兩邊都要更嚴）。judgment＝需要決定「這算不算」「這是什麼意思」 → **維持 pq2**。⚠ 不驗 source_ref 的格式：現有 85 筆橫跨 SEC／AMF／HKEX／ASX／TDnet 五種轄區五種寫法，用 regex 驗只會攔下格式而不是風險（L15）。provenance 仍然必填，且由 audit 抽查。"
 }
