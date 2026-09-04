@@ -7948,6 +7948,18 @@
       "source": "research_action",
       "title": "IQE 供應 Quintessent 6 吋 GaAs QDL epiwafer，進入 customer sampling",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-09-04T08:06:35.285620+00:00",
+      "hint": "MP 是 28 檔裡唯一「設定不完整」的——cohort_thesis 的 disproof 與 catalyst 皆空，expiry 2026-11-29 因此是一個沒有內容的鬧鐘（L7：沒有證偽條件的警報永遠不會響）。2026-09-04 已把下次財報日 2026-11-06 寫進 catalyst_calendar.json，但那只讓提醒有日期，不等於 thesis 有證偽條件。go＝寫入 cohort_thesis 的 disproof＋catalyst（thesis mutation，四個人工 gate 之一）；不含入圖、不含 Engine C 判讀寫入、不含 live。⚠ 需要先決定 MP 的 thesis 到底賭什麼——它的已記錄缺口是客戶集中度/backlog 觀測未提案、runway_inputs 未填、Engine C 快照當時未納入 MP（後者已於本輪 ETL 解決，73/73 含 MP）。",
+      "n": 475,
+      "reason": null,
+      "ref_id": "thesis/catalyst_calendar.json",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "co:mp_materials：補 MP 的 disproof 與 catalyst（thesis mutation）",
+      "type": "manual"
     }
   ],
   "log": [
@@ -17240,6 +17252,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 475,
+  "next_n": 476,
   "schema_version": "1"
 }

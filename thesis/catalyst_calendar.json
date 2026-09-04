@@ -24,6 +24,18 @@
       ]
     },
     {
+      "ticker": "6268.T",
+      "catalyst_checkpoints": [
+        {
+          "date": "2026-10-30",
+          "what": "FY2027 上半期決算",
+          "decides": "人形相關受注／營收是否首次出現任何揭露（法說 Q&A 或補充資料皆可）",
+          "date_confidence": "estimated",
+          "basis": "yfinance calendar 的 Earnings Date（provider 值，未逐檔回公司 IR 頁核對）——依 _date_confidence 規則屬 estimated，照樣排程但呈現時必須標明"
+        }
+      ]
+    },
+    {
       "ticker": "6324.T",
       "catalyst_checkpoints": [
         {
@@ -48,6 +60,18 @@
       ]
     },
     {
+      "ticker": "AEHR",
+      "catalyst_checkpoints": [
+        {
+          "date": "2026-10-09",
+          "what": "FY2027 Q1 財報",
+          "decides": "矽光／CPO burn-in 客戶是否任一具名（供應端或客戶端皆可）",
+          "date_confidence": "estimated",
+          "basis": "yfinance calendar 的 Earnings Date（provider 值，未逐檔回公司 IR 頁核對）——依 _date_confidence 規則屬 estimated，照樣排程但呈現時必須標明"
+        }
+      ]
+    },
+    {
       "ticker": "AEVA",
       "catalyst_checkpoints": [
         {
@@ -68,6 +92,30 @@
           "decides": "firmly committed RPO 是否自 US$164.6B 維持或續增；custom AI accelerator 交付時程是否重申。對應 disproof 第 (1) 條",
           "date_confidence": "estimated",
           "basis": "yfinance calendar Earnings Date（2026-08-20 取得）；AVGO 慣例為 9 月上旬"
+        }
+      ]
+    },
+    {
+      "ticker": "GOOGL",
+      "catalyst_checkpoints": [
+        {
+          "date": "2026-10-29",
+          "what": "2026 Q3 財報",
+          "decides": "對外部 OCS／元件供應商的採購是否有任一側具名揭露",
+          "date_confidence": "estimated",
+          "basis": "yfinance calendar 的 Earnings Date（provider 值，未逐檔回公司 IR 頁核對）——依 _date_confidence 規則屬 estimated，照樣排程但呈現時必須標明"
+        }
+      ]
+    },
+    {
+      "ticker": "HIMX",
+      "catalyst_checkpoints": [
+        {
+          "date": "2026-11-05",
+          "what": "2026 Q3 財報",
+          "decides": "CPO／WLO 業務是否首次出現營收分項揭露（判斷 COUPE 成熟度的唯一途徑）；是否出現合約型訂單或最低採購承諾",
+          "date_confidence": "estimated",
+          "basis": "yfinance calendar 的 Earnings Date（provider 值，未逐檔回公司 IR 頁核對）——依 _date_confidence 規則屬 estimated，照樣排程但呈現時必須標明"
         }
       ]
     },
@@ -108,6 +156,30 @@
       ]
     },
     {
+      "ticker": "MP",
+      "catalyst_checkpoints": [
+        {
+          "date": "2026-11-06",
+          "what": "2026 Q3 財報",
+          "decides": "是否揭露客戶集中度與 backlog（10-K 素材已足但尚未提案觀測），以及現金／總債／FCF 三個 runway 輸入值",
+          "date_confidence": "estimated",
+          "basis": "yfinance calendar 的 Earnings Date（provider 值，未逐檔回公司 IR 頁核對）——依 _date_confidence 規則屬 estimated，照樣排程但呈現時必須標明"
+        }
+      ]
+    },
+    {
+      "ticker": "MRVL",
+      "catalyst_checkpoints": [
+        {
+          "date": "2026-12-02",
+          "what": "FY2027 Q3 財報",
+          "decides": "是否出現任何形式的量化訂單能見度（RPO 不揭露）；NVIDIA 合作是否有採購承諾；Distributor A 的終端客戶組成與 sell-through",
+          "date_confidence": "estimated",
+          "basis": "yfinance calendar 的 Earnings Date（provider 值，未逐檔回公司 IR 頁核對）——依 _date_confidence 規則屬 estimated，照樣排程但呈現時必須標明"
+        }
+      ]
+    },
+    {
       "ticker": "MU",
       "catalyst_checkpoints": [
         {
@@ -140,6 +212,54 @@
           "decides": "Lumilens US$50M 首期 PO 是否開始出貨並認列營收；剩餘 20,629,268 份 warrants 是否新增 vest。對應 disproof 第 (1)(2) 條",
           "date_confidence": "estimated",
           "basis": "yfinance calendar Earnings Date（2026-08-20 取得）"
+        }
+      ]
+    },
+    {
+      "ticker": "SHA0.DE",
+      "catalyst_checkpoints": [
+        {
+          "date": "2026-11-03",
+          "what": "2026 Q3 財報",
+          "decides": "四家具名人形夥伴中是否任一家出現付款方向證據（訂單金額、產能協議或預付款）；淨負債與利息覆蓋是否可逐項核對",
+          "date_confidence": "estimated",
+          "basis": "yfinance calendar 的 Earnings Date（provider 值，未逐檔回公司 IR 頁核對）——依 _date_confidence 規則屬 estimated，照樣排程但呈現時必須標明"
+        }
+      ]
+    },
+    {
+      "ticker": "SOI.PA",
+      "catalyst_checkpoints": [
+        {
+          "date": "2026-11-18",
+          "what": "FY27 中報",
+          "decides": "contract liabilities／預付款是否如 2026-08 新協議所預期地增長；任一產能保留協議客戶是否具名",
+          "date_confidence": "estimated",
+          "basis": "yfinance calendar 的 Earnings Date（provider 值，未逐檔回公司 IR 頁核對）——依 _date_confidence 規則屬 estimated，照樣排程但呈現時必須標明"
+        }
+      ]
+    },
+    {
+      "ticker": "TSEM",
+      "catalyst_checkpoints": [
+        {
+          "date": "2026-11-09",
+          "what": "2026 Q3 財報",
+          "decides": "SiPho 13 億美元合約的客戶家數與各自佔比是否拆分；2028 預付款是否於 2027-01 前到帳",
+          "date_confidence": "estimated",
+          "basis": "yfinance calendar 的 Earnings Date（provider 值，未逐檔回公司 IR 頁核對）——依 _date_confidence 規則屬 estimated，照樣排程但呈現時必須標明"
+        }
+      ]
+    },
+    {
+      "ticker": "TSM",
+      "catalyst_checkpoints": [
+        {
+          "date": "2026-10-15",
+          "what": "2026 Q3 法說會",
+          "decides": "capex guidance 與客戶預付款揭露能否作為 backlog 的替代觀測；MRM/COUPE 量產爬坡的實測出貨（與 NVIDIA cohort [348] 共用驗證點）",
+          "date_confidence": "estimated",
+          "basis": "yfinance calendar 的 Earnings Date（provider 值，未逐檔回公司 IR 頁核對）——依 _date_confidence 規則屬 estimated，照樣排程但呈現時必須標明"
         }
       ]
     }
