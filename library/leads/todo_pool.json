@@ -8000,10 +8000,11 @@
       "added_at": "2026-09-04T15:08:01.023373+00:00",
       "hint": "使用者 2026-09-04 於互動 session 明確指示「補投影 合併 然後一併查」＝已授權，本號僅為稽核，受理時即以 go resolve。範圍：①tech:semiconductor_equipment（amat_10_q）與 tech:semicon_manuf_equipment（gfs_20_f）併入 tech:semiconductor_manufacturing_equipment（amat_10_k，全名式、與 name 一致）；②tech:wafer_fab_equipment（lrcx_10_q_20260129）併入 tech:deposition_etch_clean（lrcx_10_k＋lrcx_10_q_20260423，邊多且命名精確）。⚠ 不含：不把 ②併入 ①（WFE dep/etch/clean 嚴格窄於 SME，合併會抹掉 ASML 微影不在其中的區別）、不新增兩者之間的階層邊（新的知識主張仍走 graph admission）、不動 tech:200mm_equipment。",
       "n": 478,
-      "reason": null,
+      "reason": "使用者 2026-09-04 互動 session 明確指示「補投影 合併 然後一併查」；依 AGENTS「使用者主動指示＝已授權」，鑄號僅為稽核。實測：dropped_nodes=3、reprojected_edges=17、legacy_edges 1→0、graph_after=[]、commit db7fd75。",
+      "receipt": "authority:graph_migration;ref:loader/manifests/entity-dedup-20260904.json",
       "ref_id": "manual:478",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-04T15:23:24.533753+00:00",
       "source": "manual",
       "title": "圖實體去重：三個同名 Semiconductor Manufacturing Equipment 節點合併，以及 Lam 的 WFE／dep-etch-clean 兩節點合併",
       "type": "manual"
@@ -17370,6 +17371,15 @@
       "ref_id": "dc_32872cf6a80c5f273b9b4c55a57ff229",
       "type": "decision_review",
       "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-09-04T15:23:24.533753+00:00",
+      "n": 478,
+      "reason": "使用者 2026-09-04 互動 session 明確指示「補投影 合併 然後一併查」；依 AGENTS「使用者主動指示＝已授權」，鑄號僅為稽核。實測：dropped_nodes=3、reprojected_edges=17、legacy_edges 1→0、graph_after=[]、commit db7fd75。",
+      "receipt": "authority:graph_migration;ref:loader/manifests/entity-dedup-20260904.json",
+      "ref_id": "manual:478",
+      "type": "manual",
+      "verb": "go"
     }
   ],
   "next_n": 479,
