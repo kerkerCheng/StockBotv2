@@ -5,7 +5,8 @@ from pathlib import Path
 
 import pytest
 
-from decision_lab import build_today_brief, ensure_shadow_for_company, evaluate_signal
+from briefing.today import build_today_brief
+from decision_lab import ensure_shadow_for_company, evaluate_signal
 from tests.test_operational_workflow import FixtureProvider, _request
 from tests.test_decision_execution import _store
 

@@ -4,7 +4,8 @@ from pathlib import Path
 
 import pytest
 
-from decision_lab.brief import build_today_brief, render_today_markdown
+from briefing.render import render_today_markdown
+from briefing.today import build_today_brief
 from decision_lab.execution import apply_live_override, prepare_managed_action, record_live_choice
 from tests.test_action_card import _decision
 from tests.test_decision_execution import _store
@@ -289,6 +290,76 @@ def test_uncovered_holding_still_demands_review(tmp_path: Path) -> None:
         assert "sheet_only_holding" in item["blockers"]
         # U7：要求的動作改成「讓這檔進入瓶頸排序」，不再是配額度。
         assert "瓶頸排序" in item["user_response_needed"]
+    finally:
+        store.close()
+
+
+def test_coverage_classification_cannot_be_silently_skipped(tmp_path: Path) -> None:
+    """漏做 Sheet 覆蓋分類必須是 `TypeError`，不是一份少了持股的 brief。
+
+    B6 之後 pq2 收集鏈是
+    `engine_b todo sync → briefing.public_view → build_today_brief →
+    portfolio.brief.build_sheet_only_items → decision_lab.brief.build_decision_brief`。
+    ⚠ **漏掉最後那次注入，持股就從待辦池靜默消失**——而「少了 12 檔」與「本來就
+    沒有這些持股」在 brief 上完全同形（L13：成功與未執行不得同形）。
+
+    所以 `sheet_only_items` 刻意沒有預設值：新增第四條呼叫路徑時，忘記做分類的
+    後果是當場炸開，而不是一份看起來正常的 brief。
+    """
+    from decision_lab.brief import build_decision_brief
+
+    store = _store(tmp_path)
+    try:
+        with pytest.raises(TypeError):
+            build_decision_brief(  # type: ignore[call-arg]
+                store,
+                as_of=NOW,
+                current_holdings={
+                    "status": "available",
+                    "rows": [{"ticker": "QQQ", "shares": 87.0, "currency": "USD"}],
+                },
+            )
+    finally:
+        store.close()
+
+
+def test_terminal_cohorts_still_claim_their_company(tmp_path: Path) -> None:
+    """已終結的 cohort 仍然算「這家公司有人負責」。
+
+    它的 probe 不再是今日待辦，但它的 Sheet 持股也**不是**沒人看的 legacy
+    holding——漏掉這條，已 promote／reject 的標的每天都會以 sheet-only 身分重新
+    冒出來配一個新 pq2 編號（同 2026-07-29 [18]-[33] → [46]-[60] 的形狀：
+    collector 仍會重新推導的項目，drop 只會換號重生）。
+
+    這條規則只有一份（L16），`portfolio.brief.build_sheet_only_items` 消費它而不
+    自己再推導一次；所以它必須在 Engine D 這一側被鎖住。
+    """
+    from decision_lab.brief import cohort_company_ids
+
+    store = _store(tmp_path)
+    try:
+        decision = _decision(store, key="brief-terminal")
+        cohort_id = str(store.get_decision(decision.decision_id)["cohort_id"])
+        company_id = str(store.cohort_identity(cohort_id)["company_id"] or "")
+        assert company_id, "此 fixture 應已綁定 company_id，否則測不到本條"
+
+        assert company_id in cohort_company_ids(store, as_of=NOW)
+
+        store.close_lifecycle_with_outcome(
+            cohort_id=cohort_id,
+            terminal_status="rejected",
+            outcome_payload={
+                "claim_correctness": "false",
+                "market_return_status": "unavailable",
+                "reason": "測試用終結",
+                "evidence_refs": (),
+            },
+            effective_at=NOW,
+        )
+        assert str(store.current_lifecycle(cohort_id).status) == "rejected"
+        assert company_id in cohort_company_ids(store, as_of=NOW), (
+            "終結的 cohort 仍要登記它的公司，否則其 Sheet 持股會被誤判成 sheet-only"
+        )
     finally:
         store.close()
 

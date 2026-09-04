@@ -2,11 +2,11 @@
 from __future__ import annotations
 
 import math
-import re
 from datetime import datetime, timedelta, timezone
 from typing import Any, Mapping, Sequence
 
 from shared.market_normalization import sessions_between
+from shared.markdown import markdown_text
 from shared.blocker_severity import fatal_blockers
 from .models import research_status_of
 from shared.redaction import sensitive_payload_path
@@ -17,16 +17,10 @@ class RedactionError(ValueError):
     """Payload contains a field that must never enter output or diagnostics。"""
 
 
-_ANSI_ESCAPE = re.compile(r"\x1b\[[0-?]*[ -/]*[@-~]")
-_MARKDOWN_SPECIAL = re.compile(r"([\\`*_{}\[\]()<>#+.!|-])")
-
-
-def markdown_text(value: Any) -> str:
-    """將外部文字限制成單行並 escape Markdown／terminal control。"""
-
-    text = _ANSI_ESCAPE.sub("", str(value)).replace("\r", " ").replace("\n", " ")
-    text = "".join(character if character >= " " else " " for character in text)
-    return _MARKDOWN_SPECIAL.sub(r"\\\1", text)
+# `markdown_text` 自 B6 起住 `shared/markdown.py`——三個 pane（Engine D 的 action
+# card、`alpha/brief.py` 的排序區、`portfolio/brief.py` 的 NAV 區）分屬不同層卻
+# 共用同一套轉義規則。這裡 re-import 只是讓既有 `from .action_card import
+# markdown_text` 繼續成立，不是第二份實作。
 
 
 def assert_safe_payload(value: Any, path: str = "root") -> None:

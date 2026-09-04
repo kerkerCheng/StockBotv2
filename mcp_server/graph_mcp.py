@@ -54,7 +54,7 @@ from intake.provenance import (
 )
 from intake import actions as research_actions
 from mcp_server.engine_c_tools import get_financial_checklist_core
-from decision_lab.public_view import get_decision_brief_core
+from briefing.public_view import get_decision_brief_core
 from mcp_server.leads_tools import get_pending_leads_core, record_lead_decision_core
 
 # application 邏輯的 re-import：讓既有測試仍能對本模組 monkeypatch。

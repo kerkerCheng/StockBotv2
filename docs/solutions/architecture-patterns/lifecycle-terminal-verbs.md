@@ -47,7 +47,8 @@ elif terminal_status in {"promoted", "rejected", "expired"}:
 
 `revised` 是**刻意**的延續語意，忠實實作 AGENTS.md 的 L7（thesis 生命週期：
 `revised` = 修正後的 thesis 成立，**重新進入 `active`** 並更新 disproof 條件）。
-`decision_lab/brief.py` 的過濾器也同樣刻意地把它排除在終態之外：
+`decision_lab/brief.py` 的過濾器也同樣刻意地把它排除在終態之外（字彙的 SSOT 是
+`decision_lab/models.py` 的 `TERMINAL_LIFECYCLE_STATUSES`）：
 
 ```python
 _TERMINAL_LIFECYCLE = frozenset({"promoted", "rejected", "expired"})

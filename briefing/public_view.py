@@ -7,6 +7,12 @@ redaction（plan R8／KTD3）。這是 daily brief 的決策佇列在遠端（�
 安全：Decision Store 路徑私有（`library/private/decision_lab/`）。開 store 或產生
 brief 的 exception 可能夾帶該路徑，因此錯誤只回穩定 code 與 exception 型別名，
 **絕不回 str(exc)**；最終 DTO 另過一次 `assert_safe_payload` 作為 belt-and-suspenders。
+
+⚠ **B6 起住 `briefing/` 而不是 `decision_lab/`。** 它是組裝函式（開 store、建
+runtime provider、組 brief），而組裝點必須看得到所有層。留在 Engine D 裡的後果是
+它成為 pq2 收集鏈上第二條繞過組裝層的路徑——而 sheet-only 持股的覆蓋分類正好在
+那條鏈上（`engine_b todo sync → 這裡 → build_today_brief`），繞過去就等於持股從
+待辦池靜默消失。兩條路徑收斂成一條，那個失敗模式就不存在了。
 """
 from __future__ import annotations
 
@@ -14,7 +20,8 @@ from datetime import datetime, timezone
 from typing import Any, Callable
 
 from decision_lab.action_card import assert_safe_payload
-from decision_lab.brief import build_today_brief
+
+from .today import build_today_brief
 
 
 def get_decision_brief_core(

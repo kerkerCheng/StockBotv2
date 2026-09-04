@@ -550,7 +550,7 @@ def _substantive_blockers(cohort_id: str) -> list[str]:
     這裡不另外猜一份（2026-08-26 手寫過一份 stale 清單，立刻就誤判了 co:axt）。
     """
 
-    from decision_lab.public_view import get_decision_brief_core
+    from briefing.public_view import get_decision_brief_core
 
     try:
         items = get_decision_brief_core().get("items") or []
@@ -1977,7 +1977,7 @@ def _collect_decision_rows() -> list[dict[str, Any]]:
     需要本機 private Decision Store 與外部 authority；失敗會往上拋，由呼叫端
     決定是 fail-soft 還是記錄成「來源不健康」。
     """
-    from decision_lab.public_view import get_decision_brief_core
+    from briefing.public_view import get_decision_brief_core
 
     brief = get_decision_brief_core()
     rows: list[dict[str, Any]] = []

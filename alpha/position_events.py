@@ -21,19 +21,25 @@ packet；packet 是 ephemeral 的 WebSearch 提示，`persistence=none`、
 `config/beta_policy.json` 的 14 個 benchmark（QQQ／SOXX／TSMC／NVDA…），alpha 標的
 一筆都沒有，COHR 亦然。因此這裡比照 `scripts/outcome_if_settled_today.py` 直接取
 provider 已收盤序列，唯讀、不寫 Engine C——與 packet 本身 `persistence=none` 的
-定位一致。序列由呼叫端注入（`series_by_ticker`），純函式好測；抓取放
-`fetch_close_series()`，失敗只降級不阻斷 brief。
+定位一致。序列由呼叫端注入（`series_by_ticker`），純函式好測。
+
+## B6：為什麼從 `decision_lab/` 搬到這裡
+
+原本住 `decision_lab/alpha_event_monitor.py`，是因為唯一的消費端是 `brief.py`。
+B6 把 alpha pane 搬到 `alpha/brief.py` 之後那個理由就消失了——若留在原處，
+`alpha/brief.py` 就得 import `decision_lab`，正是 `test_upstream_layers_do_not_
+import_engine_d` 擋的方向。**它一直都是 alpha 的東西**（`engine-d-decomposition.md`
+逐檔判定就標 **A**），只是被最短路徑留在了 Engine D。
+
+抓取（yfinance）已分出去到 `alpha/providers/close_series.py`：本檔必須維持零外部
+相依才能離線測試（`FORBIDDEN_IN_ALPHA` 含 `yfinance`）。
 """
 from __future__ import annotations
 
 import math
-from datetime import date
 from typing import Any, Iterable, Mapping, Sequence
 
-__all__ = [
-    "alpha_event_search_requests",
-    "fetch_close_series",
-]
+__all__ = ["alpha_event_search_requests"]
 
 
 def _finite(value: Any) -> float | None:
@@ -147,48 +153,3 @@ def alpha_event_search_requests(
             }
         )
     return requests
-
-
-def fetch_close_series(
-    tickers: Iterable[str],
-    *,
-    sessions: int,
-    today: date | None = None,
-) -> dict[str, list[dict[str, Any]]]:
-    """取 provider 已收盤日線 {ticker: [{session_date, close}]}。
-
-    ⚠ 只取**已收盤**的交易日。盤中價與收盤價混在同一條序列會讓單日報酬時而是
-    「昨收到現價」、時而是「昨收到今收」——一個欄位兩種語意（L12），而門檻比較
-    無從分辨。yfinance 的日線在盤中會回一根未結算的當日 bar，因此丟掉最後一根
-    session_date == 今天的資料。
-
-    任何 ticker 抓取失敗只是該 ticker 沒有序列（呼叫端會因 `len(history) < 2`
-    自然跳過），不拋例外——事件監控是加值訊號，不該讓整份 brief 失敗。
-    """
-
-    symbols = [str(ticker).strip() for ticker in tickers if str(ticker).strip()]
-    if not symbols:
-        return {}
-    try:
-        import yfinance as yf
-    except ImportError:
-        return {}
-
-    # 交易日約占日曆日的 7 成，抓寬一點再截尾，免得遇到連假拿不滿 sessions 根。
-    period_days = max(int(sessions) * 2 + 10, 20)
-    cutoff = today or date.today()
-    out: dict[str, list[dict[str, Any]]] = {}
-    for symbol in symbols:
-        try:
-            history = yf.Ticker(symbol).history(period=f"{period_days}d")["Close"]
-        except Exception:  # noqa: BLE001 — provider 失敗只降級成「沒有序列」
-            continue
-        rows = [
-            {"session_date": timestamp.date().isoformat(), "close": float(close)}
-            for timestamp, close in history.items()
-            if close == close  # NaN guard
-        ]
-        rows = [row for row in rows if row["session_date"] < cutoff.isoformat()]
-        if rows:
-            out[symbol] = rows[-int(sessions) :]
-    return out

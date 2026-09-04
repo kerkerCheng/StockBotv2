@@ -11,7 +11,7 @@ from typing import Any, Mapping, TextIO
 
 from .action_card import RedactionError, assert_safe_payload, build_action_card, render_markdown
 from .bootstrap import open_default_store
-from .brief import build_today_brief, ranking_annotations, render_today_markdown
+from .brief import ranking_annotations
 from .execution import (
     ExecutionError,
     assess_probe,
@@ -389,6 +389,11 @@ def run(
             # 首屏是瓶頸排序在前、NAV 比例在後。兩者都需要 `decision_lab` 不得 import
             # 的 authority（Neo4j／Google Sheet），所以在這一層取好再注入。
             # 兩者各自 fail-soft：缺席時 brief 照常渲染並明說「未提供」，不是「沒有候選」。
+            #
+            # `briefing` 是 B6 之後的組裝層：它看得到 alpha／portfolio／Engine D
+            # 三邊，`cli.py` 本身是 composition root，所以在這裡 import 是正確方向。
+            from briefing.render import render_today_markdown
+            from briefing.today import build_today_brief
             from engine_d_runtime.adapters import (
                 fetch_identity_alignment,
                 fetch_nav_exposure,

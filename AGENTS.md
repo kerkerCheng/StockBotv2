@@ -284,7 +284,7 @@ Decision gap jobs 優先占用同一個 daily pq1 budget。若研究結果需要
 
 ### Sheet 持股覆蓋分類
 
-`sheet_only_holding` 只針對**真正沒有任何機制負責**的持股。`decision_lab/brief.py` 的 `_sheet_only_items` 依 Sheet ticker 分三類：beta policy 涵蓋（`coverage=beta_policy`）、使用者明確不研究（`coverage=user_ignored`，登記於 `config/holdings_coverage.json`）、其餘 `coverage=uncovered`。前兩類判 `MONITOR` ＋空 blockers，仍在 daily brief 現形但不占 pq2 編號。
+`sheet_only_holding` 只針對**真正沒有任何機制負責**的持股。`portfolio/brief.py` 的 `build_sheet_only_items` 依 Sheet ticker 分三類：beta policy 涵蓋（`coverage=beta_policy`）、使用者明確不研究（`coverage=user_ignored`，登記於 `config/holdings_coverage.json`）、其餘 `coverage=uncovered`。前兩類判 `MONITOR` ＋空 blockers，仍在 daily brief 現形但不占 pq2 編號。
 
 **`todo drop` 對這類項目無效**——它只清當次編號，sync 會依 Sheet 持股＋無 cohort 重新推導並配新編號（2026-07-29 實測 [18]-[33] → [46]-[60]）；要真正解除必須改覆蓋分類或建 cohort。覆蓋設定檔讀取失敗一律 fail safe 退回 `REVIEW`。beta universe 的 SSOT 只有 `config/beta_policy.json`。
 

@@ -327,7 +327,8 @@ def test_daily_brief_counters_track_breadth_and_measurability(tmp_path) -> None:
         AXT／LITE／IQE／NVDA 的舊版本，**改進反而讓比率變難看**。上線標的改按
         cohort 取最新 decision 計算。
     """
-    from decision_lab.brief import build_today_brief, render_today_markdown
+    from briefing.render import render_today_markdown
+    from briefing.today import build_today_brief
 
     store = _store(tmp_path)
     try:
@@ -398,7 +399,8 @@ def test_duplicate_and_orphan_cohorts_stay_visible(tmp_path) -> None:
     會發現——那是把缺陷掃到地毯下，ROADMAP 的「Engine D cohort 重複」backlog 會
     永遠沒有觸發點。它們不進分母（本來就不可能上線），但必須各自現形。
     """
-    from decision_lab.brief import build_today_brief, render_today_markdown
+    from briefing.render import render_today_markdown
+    from briefing.today import build_today_brief
 
     store = _store(tmp_path)
     try:

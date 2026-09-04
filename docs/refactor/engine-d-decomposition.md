@@ -123,6 +123,23 @@ risk.brief.build_risk_pane(...)          -> RiskPaneDTO       # 門檻跨越
 scripts/daily_brief_assembler.py  或  skills/daily-brief 的 Step 順序
 ```
 
+> **✅ 2026-09-04 實際落地（與上面的草圖有三處差異，都是實作時才看得到的）：**
+>
+> 1. **組裝層是 `briefing/` package，不是 `scripts/` 腳本。** 因為它有第二個
+>    呼叫者——`public_view.get_decision_brief_core`（MCP／`engine_b todo sync`）。
+>    腳本不能被 import，兩條路徑就會各自組裝，而 sheet-only 覆蓋分類正好在那條
+>    鏈上：漏掉就是持股從 pq2 靜默消失。`public_view.py` 因此一併搬進 `briefing/`，
+>    **兩條路徑收斂成一條**。
+> 2. **pane 的 markdown 跟著 pane 走，不是集中在組裝層。** `render_ranking` 住
+>    `alpha/brief.py`、`render_nav_exposure` 住 `portfolio/brief.py`——「`None` ≠
+>    空」那些 L12 措辭是 pane 的呈現契約，離開 domain 就會漂移。組裝層只管順序。
+> 3. **沒有 `risk.brief`。** 現況 brief 沒有獨立的 risk pane（門檻跨越目前由
+>    `risk.snapshot` 在別的 surface 呈現），憑空造一個空 pane 只是為了對稱。
+>
+> 另外 `sheet_only_items` 在 `build_decision_brief` 是**必填**參數（不給預設值），
+> 那是刻意的摩擦：新增第四條呼叫路徑時忘記做覆蓋分類會是 `TypeError`，而不是一份
+> 少了持股、看起來完全正常的 brief（L13：成功與未執行不得同形）。
+
 ⚠ **拆解時的硬約束：** `crons/daily_brief_prompt.md` ＋ `skills/daily-brief/SKILL.md`
 ＋ `tests/test_daily_brief_skill.py`／`tests/test_today_first_screen.py` 是契約測試，
 斷言首屏必須出現哪些 token。**不得為了通過測試而刪斷言**——
@@ -152,6 +169,16 @@ scripts/daily_brief_assembler.py  或  skills/daily-brief 的 Step 順序
 ---
 
 ## 4. 搬遷順序（strangler，七批 B0–B6）
+
+> **⚠ 本節（與 §1 的逐檔行數）是 Phase 0 當時的判定，不是現況。** 交付紀錄的唯一
+> authority 是 [`ROADMAP.md`](../ROADMAP.md) 的 Phase 表。截至 2026-09-04：
+> **B0／B2／B4／B5／B6 已完成，B1 已完成，B3 只完成 `ranking_view`**——
+> `catalyst_watch.py` 仍在 `decision_lab/`（`store.py` 反向依賴它，要先倒轉），
+> `alpha_event_monitor.py` 已於 B6 搬走（`alpha/position_events.py`＋
+> `alpha/providers/close_series.py`），因為 alpha pane 一旦搬家就不能再回頭
+> import Engine D。
+>
+> 查證：`git ls-files decision_lab | grep '\.py$' | xargs wc -l | sort -rn`
 
 每一批的驗收條件都是 **①全套測試綠 ②daily 端到端跑一次成功 ③被搬走的模組
 在原位置留 re-export shim 或已確認零呼叫端**。

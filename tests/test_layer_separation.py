@@ -25,11 +25,16 @@ NEW_LAYERS = ("alpha", "portfolio", "risk")
 #: `alpha → portfolio → risk → Engine D`，Engine D 的職責**就是執行硬上限**，
 #: 所以它消費 `risk/policy.py` 的政策數值是正確方向（下游消費上游）。
 #: 真正不准的是反過來——`risk/` 不得 import `decision_lab`（見下一條測試）。
-FORBIDDEN_FOR_ENGINE_D = ("alpha", "portfolio")
+#:
+#: `briefing` 在列上是 B6 的核心約束：組裝層看得到所有層，所以 Engine D 一旦
+#: import 它，就等於把組裝點搬回 `decision_lab/`——而那正是 `brief.py` 長成
+#: 1,462 行全系統儀表板的機制（`engine-d-decomposition.md` §0 第 3 點）。
+#: `decision_lab/cli.py` 是 entry point，列在 `COMPOSITION_ROOTS` 例外裡。
+FORBIDDEN_FOR_ENGINE_D = ("alpha", "portfolio", "briefing")
 
 #: 掃描範圍：所有 first-party package（不含 tests 與 .venv）。
 CORE_PACKAGES = (
-    "alpha", "portfolio", "risk", "shared", "intake",
+    "alpha", "portfolio", "risk", "shared", "intake", "briefing",
     "decision_lab", "engine_b", "engine_c",
     "engine_d_runtime", "query", "loader", "thesis", "identity", "storage",
     "fetchers", "notifications", "crons", "scripts",
@@ -182,24 +187,26 @@ def test_cypher_stays_out_of_the_alpha_core() -> None:
 #: 後者會讓一個模組永遠有兩個名字。
 TRANSITIONAL_SHIMS: frozenset[str] = frozenset()
 
-#: **B6（`brief.py` 拆 pane）之前還解不掉的耦合。** 一條，逐條列名。
+#: ✅ **2026-09-04 B6：1 → 0，搬遷期方向違規清空。**
+#:
+#: 這份清單曾裝著 `decision_lab/brief.py → portfolio.policy`——`_beta_covered_aliases`
+#: 服務 `_sheet_only_items`，而它在 `engine_b todo sync → public_view →
+#: build_today_brief` 這條 pq2 收集鏈上。
+#:
+#: 解法不是把 policy 注入穿過四層，是**改歸屬**：「我的持股裡哪一檔沒有任何機制在
+#: 看」是投組覆蓋問題，整段搬去 `portfolio/brief.py::build_sheet_only_items`；
+#: Engine D 只提供 `cohort_company_ids`（哪些公司已經有人負責）。分開之後兩邊都更嚴格
+#: ——Portfolio 不認識 Decision Store，Engine D 不認識 beta policy（L12 的形狀：
+#: **不是放寬也不是收緊，是先分開再各自定規則**）。
 #:
 #: ⚠ 這份清單存在的理由，是它比先前那個 shim **更誠實**。清 shim 時
 #: `decision_lab/sizing.py → portfolio.policy` 與這一條同時現形——它們一直都在，
 #: 只是 `decision_lab/portfolio_risk.py`／`beta_policy.py` 這兩個 aliasing shim
 #: 讓 import 掃描看到的是 `decision_lab.*`，於是層級測試綠著跑了整段搬遷期。
 #: **一個「暫時轉發」的 shim，實際效果是把方向違規變成隱形的。**
-#: 具名清單不會——它每次執行都出現，而且 `test_the_pending_couplings_are_all_still_real`
-#: 會在債還掉時強迫你把它刪掉。
 #:
-#: `sizing.py` 那條已於同日修掉（比對邏輯收回 `risk.snapshot.leverage_hard_blocks`，
-#: 它與 `compose_risk_snapshot` 本來就是同一段，重複兩份＝兩個會各自漂移的真相）。
-#: 剩下這條要等 B6：`_beta_covered_aliases` 服務的是 `_sheet_only_items`，而它在
-#: `engine_b todo sync → public_view → build_today_brief` 這條 pq2 收集鏈上，
-#: 改成注入要同時穿過四層。設計文件把 B6 列為 🔴 並註明「需要 B1/B3 的 DTO 先存在」。
-PENDING_B6_COUPLINGS: frozenset[tuple[str, str]] = frozenset({
-    ("decision_lab/brief.py", "portfolio.policy"),
-})
+#: 集合是空的，而檢查**仍然在跑**——它擋的是第 1 個新增者。
+PENDING_B6_COUPLINGS: frozenset[tuple[str, str]] = frozenset()
 
 #: `engine_d_runtime` 是 **composition root**——它的職責就是把各層接起來，
 #: 所以它 import `portfolio`／`alpha` 是**正確方向**（peripheral → core 的組裝端）。
@@ -236,6 +243,22 @@ def test_decision_lab_domain_does_not_import_new_layers() -> None:
                 offenders.append(f"{rel} → {module}")
     assert not offenders, (
         "Engine D 的 domain 模組不得 import alpha／portfolio：\n" + "\n".join(offenders)
+    )
+
+
+def test_no_pending_couplings_remain() -> None:
+    """**B6 的驗收：搬遷期方向違規 1 → 0，寫成斷言。**
+
+    與 `test_no_transitional_shims_remain` 同一個理由：靠上面那條「清單上的每一條
+    都還存在」在空集合時會**貌似通過**，而「通過」與「沒東西可檢查」在報表上長得
+    一樣（L13：成功與未執行不得同形）。這條讓 0 自己現形。
+
+    日後若真的又需要一條，加進 `PENDING_B6_COUPLINGS` 會讓這條紅——那是刻意的
+    摩擦：每一條方向違規都該是被討論過的決定，不是順手加的 import。
+    """
+    assert PENDING_B6_COUPLINGS == frozenset(), (
+        f"Engine D 又出現對 alpha／portfolio／briefing 的相依："
+        f"{sorted(PENDING_B6_COUPLINGS)}"
     )
 
 

@@ -14,7 +14,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from decision_lab.brief import _backup_status_payload, render_today_markdown  # noqa: E402
+from briefing.render import render_today_markdown  # noqa: E402
+from briefing.sources import load_backup_status as _backup_status_payload  # noqa: E402
 
 
 def _load_entrypoint():

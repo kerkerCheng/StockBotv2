@@ -917,7 +917,7 @@ def test_load_missing_returns_empty_pool(tmp_path) -> None:
 
 
 def test_collect_from_decisions_keeps_global_blocker_without_items(monkeypatch) -> None:
-    from decision_lab import public_view as decision_tools
+    from briefing import public_view as decision_tools
 
     # U7：brief 頂層的 `recommended_action` 已改為 `attention`，全域項標題固定寫「複查」。
     monkeypatch.setattr(decision_tools, "get_decision_brief_core", lambda: {
@@ -1011,7 +1011,7 @@ def test_collect_from_research_actions_exposes_multiple_focus_blocker(monkeypatc
 def test_collect_from_decisions_keeps_sheet_only_items_without_cohort(
     monkeypatch,
 ) -> None:
-    from decision_lab import public_view as decision_tools
+    from briefing import public_view as decision_tools
 
     monkeypatch.setattr(decision_tools, "get_decision_brief_core", lambda: {
         "action_needed": True,
@@ -1054,7 +1054,7 @@ def test_collect_from_decisions_keeps_sheet_only_items_without_cohort(
 def test_collect_from_decisions_uses_company_hint_only_as_display_label(
     monkeypatch,
 ) -> None:
-    from decision_lab import public_view as decision_tools
+    from briefing import public_view as decision_tools
 
     monkeypatch.setattr(decision_tools, "get_decision_brief_core", lambda: {
         "action_needed": True,
@@ -1085,7 +1085,7 @@ def test_collect_from_decisions_uses_company_hint_only_as_display_label(
 def test_collect_material_decision_never_derives_waiting_from_system_blockers(
     monkeypatch,
 ) -> None:
-    from decision_lab import public_view as decision_tools
+    from briefing import public_view as decision_tools
 
     monkeypatch.setattr(decision_tools, "get_decision_brief_core", lambda: {
         "action_needed": True,
@@ -1109,7 +1109,7 @@ def test_collect_marks_pure_system_internal_decision_for_retirement(
 ) -> None:
     """純 stale context 要交給 sync 留 audit，不可冒充「等事件」。"""
 
-    from decision_lab import public_view as decision_tools
+    from briefing import public_view as decision_tools
 
     monkeypatch.setattr(decision_tools, "get_decision_brief_core", lambda: {
         "action_needed": True,

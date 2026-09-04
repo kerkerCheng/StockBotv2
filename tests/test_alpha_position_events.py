@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import pytest
 
-from decision_lab.alpha_event_monitor import alpha_event_search_requests
+from alpha.position_events import alpha_event_search_requests
 from risk.policy import PolicyError, validate_policy
 
 

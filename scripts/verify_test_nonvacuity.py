@@ -353,10 +353,56 @@ MUTATIONS: tuple[Mutation, ...] = (
     Mutation(
         name="欠債清單比欠債活得久",
         path="tests/test_layer_separation.py",
-        old='    ("decision_lab/brief.py", "portfolio.policy"),',
-        new='    ("decision_lab/store.py", "portfolio.policy"),\n    ("decision_lab/brief.py", "portfolio.policy"),',
+        old="PENDING_B6_COUPLINGS: frozenset[tuple[str, str]] = frozenset()",
+        new=(
+            "PENDING_B6_COUPLINGS: frozenset[tuple[str, str]] = frozenset({"
+            '("decision_lab/brief.py", "portfolio.policy")})'
+        ),
         test="tests/test_layer_separation.py::test_the_pending_couplings_are_all_still_real",
         guards="還掉的債必須從清單刪掉，否則清單會變成永久豁免",
+    ),
+    # --- Phase 3 B6：brief 拆 pane（2026-09-04）-------------------------
+    #
+    # ⚠ 這裡原本還有第四條：把 `briefing` 從 `FORBIDDEN_FOR_ENGINE_D` 拿掉，
+    # 宣稱守「組裝層不得被 Engine D import」。它是**空跑**——拿掉之後測試仍然綠，
+    # 因為當下沒有任何 decision_lab 模組 import 它，違規要**兩個條件同時成立**
+    # 才發生。下一條（真的加一行 import）才是它的正確形式：那條會紅，正好證明
+    # 清單上的 `briefing` 是承重的。這正是本腳本存在的理由——
+    # 「看起來在守某件事」與「真的守得住」不是同一件事。
+    Mutation(
+        name="Engine D 直接 import 組裝層",
+        path="decision_lab/brief.py",
+        old="from .workflow_ports import WorkflowDataProvider",
+        new="from .workflow_ports import WorkflowDataProvider\nimport briefing  # noqa: F401",
+        test="tests/test_layer_separation.py::test_decision_lab_domain_does_not_import_new_layers",
+        guards="依賴方向只准 briefing → decision_lab，反過來就形成環",
+    ),
+    Mutation(
+        name="Sheet 覆蓋分類變成可略過",
+        path="decision_lab/brief.py",
+        old="    sheet_only_items: Sequence[Mapping[str, Any]],",
+        new="    sheet_only_items: Sequence[Mapping[str, Any]] = (),",
+        test=(
+            "tests/test_decision_brief.py::"
+            "test_coverage_classification_cannot_be_silently_skipped"
+        ),
+        guards=(
+            "pq2 收集鏈漏一環，持股就從待辦池靜默消失——"
+            "而「少了 12 檔」與「本來就沒有」在 brief 上完全同形"
+        ),
+    ),
+    Mutation(
+        name="已終結 cohort 的公司不再算「有人負責」",
+        path="decision_lab/brief.py",
+        old='        if summary.get("company_id")\n    }',
+        new='        if summary.get("company_id")\n        and str(summary.get("lifecycle_status") or "") not in _TERMINAL_LIFECYCLE\n    }',
+        test=(
+            "tests/test_decision_brief.py::"
+            "test_terminal_cohorts_still_claim_their_company"
+        ),
+        guards=(
+            "已 promote／reject 的標的會每天以 sheet-only 身分重新冒出來配新 pq2 編號"
+        ),
     ),
     Mutation(
         name="槓桿算不出來時 fail open",
