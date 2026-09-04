@@ -23,10 +23,13 @@ from dataclasses import dataclass
 from datetime import date
 from typing import Any, Literal, Mapping, Sequence
 
-from ..causal import CausalPath, CompanyImpact, ImpactConfidence, StructuralEvent  # noqa: F401
+from ..causal import (
+    CausalPath, CompanyImpact, ImpactConfidence, ImpactDirection, ImpactMagnitude,
+    StructuralEvent, TimeHorizon,
+)
 from ..contracts import EvidenceRef, ScarcityInputs, StructuralContext
 from ..errors import PointInTimeUnsupported
-from ..identity import CompanyId, EntityId
+from ..identity import CompanyId, EntityId, Ticker
 from ..provider import BottleneckRow, SupplyExposure
 
 #: `query.bottleneck` 的 evidence 等級 → `EvidenceRef.evidence_class`。
@@ -37,6 +40,17 @@ _EVIDENCE_CLASS_TIER: Mapping[str, int] = {
     "self_reported_costly": 2,
     "needs_review": 3,
     "self_reported": 4,
+}
+
+#: 走訪方向的關係標籤。⚠ 圖上的邊有自己的方向，而衝擊是**逆著依賴走**的：
+#: `co:coherent depends_on mat:inp_substrate` 這條邊，衝擊從 substrate 流向 coherent。
+#: 若直接沿用原標籤，路徑會印成 `mat:inp_substrate -depends_on-> co:coherent`
+#: ——**方向剛好講反**，而讀的人無從發現（2026-09-04 首次實跑時就印出了這一行）。
+#: 所以逆走的邊改用衍生標籤；`constrains` 不是圖上的關係，是推論路徑的措辭。
+_TRAVERSAL_RELATION: Mapping[str, str] = {
+    "supplies_to": "supplies_to",        # 順走：company → 它供應的對象
+    "depends_on": "constrains",          # 逆走：被依賴者 → 依賴它的人
+    "is_component_of": "constrains",
 }
 
 #: 邊上的 `confidence` → 這條路徑的 link confidence。
@@ -266,19 +280,243 @@ class Neo4jGraphResearchProvider:
             ))
         return tuple(out)
 
-    # ---- Phase 5 才實作的三個：明確拋，不回空集合 -------------------------
+    # ---- Phase 5：多跳因果傳播 --------------------------------------------
+    def propagate(
+        self, event: StructuralEvent, *, max_hops: int = 3
+    ) -> tuple[CompanyImpact, ...]:
+        """由一個結構事件推出二階以上的受影響公司。**全部 derived，永不入圖。**
+
+        ## 傳播規則（這是**規則不是量測**，寫出來才能被反駁）
+
+        圖上的邊化約成一個方向：`A ⇒ B` 讀作「**A 依賴 B**」。
+        - `company depends_on X` / `company is_component_of X` → `company ⇒ X`
+        - `company supplies_to X` → `X ⇒ company`（X 依賴這家供應商）
+
+        然後兩條、也只有兩條傳播路徑：
+
+        1. **依賴鏈**：凡（遞移地）依賴 subject 的公司，在 subject `tightening`
+           時是 `VICTIM`、`loosening` 時是 `BENEFICIARY`。
+        2. **替代鏈**：與 subject 供應同一個 chokepoint 的**其他**公司，在 subject
+           `tightening` 時是 `BENEFICIARY`（稀缺讓替代者受惠）、反之為 `VICTIM`。
+
+        ⚠ **只回 `co:*` 節點。** `tech:`／`mat:` 是路徑上的中繼點，不是可投資標的；
+        把它們也產出 impact 會讓下游以為那是一個標的。
+
+        ⚠ **二階＝至少 2 跳。** 1 跳是直接關係，圖上本來就看得到，不需要推論；
+        這一層的價值在「圖上沒有直接連線、但推得出來」的那些。
+
+        ## 三個刻意不做的事
+
+        - **不加權總分。** `magnitude` 由跳數與路徑上最低的 `substitutability`
+          決定，且**二階最高只給 `MEDIUM`**——它是推論不是觀測，給 `HIGH` 是
+          overclaim。
+        - **不編時間。** `time_horizon` 只在路徑上有 `lead_time_weeks` 時才給值，
+          否則 `UNKNOWN`。圖裡沒有的東西不憑空生出來。
+        - **不取平均信心。** `CompanyImpact.confidence` 由 `CausalPath` 取最弱的
+          一段（契約已強制），三段強證據不得把一段沒證據的補起來。
+        """
+        rows = list(self._rank().get("rows") or [])
+        subject = str(event.subject_id)
+        flip = event.direction == "loosening"
+
+        def _dir(base: ImpactDirection) -> ImpactDirection:
+            if not flip:
+                return base
+            return (ImpactDirection.VICTIM if base is ImpactDirection.BENEFICIARY
+                    else ImpactDirection.BENEFICIARY)
+
+        impacts: dict[tuple[str, str], CompanyImpact] = {}
+
+        for path, base in self._causal_paths(rows, subject, max_hops=max_hops):
+            endpoint = path.nodes[-1]
+            if not endpoint.startswith("co:"):
+                continue                      # 中繼節點不是標的
+            if endpoint == subject:
+                continue                      # 不對自己發 impact
+            direction = _dir(base)
+            key = (endpoint, direction.value)
+            existing = impacts.get(key)
+            # 同一家公司多條路徑時取**最短**的那條：跳數少的推論比較站得住腳。
+            if existing is not None and existing.path.hops <= path.hops:
+                continue
+            impacts[key] = CompanyImpact(
+                company_id=CompanyId(endpoint),
+                ticker=self._ticker_for(endpoint, rows),
+                direction=direction,
+                magnitude=self._magnitude(path, rows),
+                time_horizon=self._horizon(path, rows),
+                path=path,
+                rationale=(
+                    f"{event.kind}（{event.direction}）發生在 {subject}；"
+                    f"沿 {' → '.join(path.nodes)} 推出 {endpoint} 受影響。"
+                    f"最弱的一段是 {path.weakest_link or '未知'}。"
+                    "⚠ 這是多跳推論不是圖上的事實。"
+                ),
+                event=event,
+            )
+        return tuple(impacts.values())
+
     def get_second_order_beneficiaries(
         self, event: StructuralEvent, *, max_hops: int = 3
     ) -> Sequence[CompanyImpact]:
-        raise NotImplementedError(
-            "多跳因果傳播是 Phase 5。⚠ 回空集合會讓「還沒實作」與「查無受益者」"
-            "在同一個訊號上同形（L13）"
-        )
+        return tuple(i for i in self.propagate(event, max_hops=max_hops)
+                     if i.direction is ImpactDirection.BENEFICIARY)
 
     def get_second_order_victims(
         self, event: StructuralEvent, *, max_hops: int = 3
     ) -> Sequence[CompanyImpact]:
-        raise NotImplementedError("多跳因果傳播是 Phase 5（同上，不回空集合）")
+        return tuple(i for i in self.propagate(event, max_hops=max_hops)
+                     if i.direction is ImpactDirection.VICTIM)
+
+    # ---- Phase 5 的內部機件 ------------------------------------------------
+    @staticmethod
+    def _dependency_edges(
+        rows: Sequence[Mapping[str, Any]]
+    ) -> dict[str, list[tuple[str, Mapping[str, Any]]]]:
+        """`依賴者 → [(被依賴者, row)]`。方向統一成「A 依賴 B」。"""
+        edges: dict[str, list[tuple[str, Mapping[str, Any]]]] = {}
+        for row in rows:
+            company = str(row.get("company_id") or "")
+            target = str(row.get("bottleneck") or "")
+            if not company or not target:
+                continue
+            relation = str(row.get("relation") or "")
+            if relation == "supplies_to":
+                edges.setdefault(target, []).append((company, row))
+            else:                              # depends_on／is_component_of
+                edges.setdefault(company, []).append((target, row))
+        return edges
+
+
+    def _causal_paths(
+        self, rows: Sequence[Mapping[str, Any]], subject: str, *, max_hops: int
+    ) -> list[tuple[CausalPath, ImpactDirection]]:
+        """由 subject 出發的兩類路徑，各自帶「tightening 時的方向」。"""
+        edges = self._dependency_edges(rows)
+        # 反轉：`被依賴者 → [依賴它的人]`，衝擊沿這個方向往下游擴散。
+        dependents: dict[str, list[tuple[str, Mapping[str, Any]]]] = {}
+        for source, targets in edges.items():
+            for target, row in targets:
+                dependents.setdefault(target, []).append((source, row))
+
+        out: list[tuple[CausalPath, ImpactDirection]] = []
+
+        # (1) 依賴鏈：BFS，記錄完整路徑；≥2 跳才算二階。
+        queue: list[tuple[str, tuple[str, ...], tuple[Mapping[str, Any], ...]]] = [
+            (subject, (subject,), ())
+        ]
+        seen = {subject}
+        while queue:
+            node, nodes, used = queue.pop(0)
+            if len(used) >= max_hops:
+                continue
+            for nxt, row in dependents.get(node, ()):
+                if nxt in nodes:
+                    continue               # 不繞圈
+                path_nodes = nodes + (nxt,)
+                path_rows = used + (row,)
+                if len(path_rows) >= 2:
+                    out.append((self._path_from(path_nodes, path_rows),
+                                ImpactDirection.VICTIM))
+                if nxt not in seen:
+                    seen.add(nxt)
+                    queue.append((nxt, path_nodes, path_rows))
+
+        # (2) 替代鏈：與 subject 供同一個 chokepoint 的其他公司（固定 2 跳）。
+        supplies = [r for r in rows
+                    if str(r.get("company_id")) == subject
+                    and str(r.get("relation")) == "supplies_to"]
+        for mine in supplies:
+            chokepoint = str(mine.get("bottleneck"))
+            for other in rows:
+                if (str(other.get("bottleneck")) != chokepoint
+                        or str(other.get("relation")) != "supplies_to"
+                        or str(other.get("company_id")) == subject):
+                    continue
+                out.append((
+                    self._path_from(
+                        (subject, chokepoint, str(other.get("company_id"))),
+                        (mine, other),
+                        relations=("supplies_to", "also_supplied_by"),
+                    ),
+                    ImpactDirection.BENEFICIARY,
+                ))
+        return out
+
+    def _path_from(
+        self,
+        nodes: tuple[str, ...],
+        rows: tuple[Mapping[str, Any], ...],
+        relations: tuple[str, ...] | None = None,
+    ) -> CausalPath:
+        return CausalPath(
+            nodes=nodes,
+            relations=relations or tuple(
+                _TRAVERSAL_RELATION.get(
+                    str(r.get("relation") or ""), str(r.get("relation") or "related_to")
+                )
+                for r in rows
+            ),
+            link_confidences=tuple(
+                _link_confidence(_finite(r.get("confidence"))) for r in rows
+            ),
+            evidence=tuple(
+                ref for r in rows for ref in self._row_evidence(r)
+            ),
+        )
+
+    @staticmethod
+    def _ticker_for(
+        company_id: str, rows: Sequence[Mapping[str, Any]]
+    ) -> Ticker | None:
+        for row in rows:
+            if str(row.get("company_id")) == company_id and row.get("ticker"):
+                try:
+                    return Ticker(str(row["ticker"]))
+                except Exception:
+                    return None
+        return None
+
+    @staticmethod
+    def _magnitude(path: CausalPath, rows: Sequence[Mapping[str, Any]]) -> ImpactMagnitude:
+        """跳數 ＋ 路徑上最低的 `substitutability`。**二階最高只到 MEDIUM。**
+
+        給 `HIGH` 等於宣稱一個多跳推論和直接觀測一樣可靠，那是 overclaim。
+        """
+        subs = [
+            _number(r.get("substitutability"))
+            for r in rows
+            if str(r.get("company_id")) in path.nodes
+            or str(r.get("bottleneck")) in path.nodes
+        ]
+        known = [s for s in subs if s is not None]
+        if not known:
+            return ImpactMagnitude.UNKNOWN     # 不知道，不是「低」
+        if path.hops <= 2 and min(known) >= 4:
+            return ImpactMagnitude.MEDIUM
+        return ImpactMagnitude.LOW
+
+    @staticmethod
+    def _horizon(path: CausalPath, rows: Sequence[Mapping[str, Any]]) -> TimeHorizon:
+        """只在圖上真的有 `lead_time_weeks` 時才給值，否則 `UNKNOWN`。
+
+        ⚠ 不套用「供應鏈事件大概一季」這種預設值——那是編出來的，
+        而編出來的時間會被下游當成可以排程的東西。
+        """
+        weeks = [
+            _number(r.get("lead_time_weeks"))
+            for r in rows
+            if str(r.get("bottleneck")) in path.nodes
+        ]
+        known = [w for w in weeks if w is not None]
+        if not known:
+            return TimeHorizon.UNKNOWN
+        longest = max(known)
+        if longest < 13:
+            return TimeHorizon.WEEKS
+        if longest < 52:
+            return TimeHorizon.QUARTERS
+        return TimeHorizon.YEARS
 
     def get_structural_changes_since(
         self, since: date, *, company_id: CompanyId | None = None
@@ -326,6 +564,18 @@ def _finite(value: Any) -> float | None:
     except (TypeError, ValueError):
         return None
     return parsed if 0.0 <= parsed <= 1.0 else None
+
+
+def _number(value: Any) -> float | None:
+    """任意有限數值。⚠ **不要用 `_finite`**——那支把值夾在 0..1，它是
+    `confidence` 專用的。`substitutability`(1–5) 與 `lead_time_weeks` 用它會
+    一律變成 `None`，而 `None` 在下游是「不知道」，於是所有 magnitude 都變 UNKNOWN。
+    """
+    try:
+        parsed = float(value)
+    except (TypeError, ValueError):
+        return None
+    return parsed if parsed == parsed and parsed not in (float("inf"), float("-inf")) else None
 
 
 def _entity_or_none(value: Any) -> EntityId | None:

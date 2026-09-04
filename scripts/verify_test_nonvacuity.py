@@ -556,6 +556,59 @@ MUTATIONS: tuple[Mutation, ...] = (
             "這類無法複查判讀的 pq2 gate"
         ),
     ),
+    # --- Phase 5 因果傳播（2026-09-04）------------------------------------
+    Mutation(
+        name="逆走的邊沿用原關係標籤（方向講反）",
+        path="alpha/providers/graph_neo4j.py",
+        old='    "depends_on": "constrains",          # 逆走：被依賴者 → 依賴它的人',
+        new='    "depends_on": "depends_on",',
+        test=(
+            "tests/test_causal_propagation.py::"
+            "test_path_relations_read_in_the_direction_of_travel"
+        ),
+        guards=(
+            "路徑會印成 `mat:inp_substrate -depends_on-> co:coherent`，"
+            "因果方向剛好講反而讀的人無從發現"
+        ),
+    ),
+    Mutation(
+        name="substitutability 被 confidence 的 0..1 夾掉",
+        path="alpha/providers/graph_neo4j.py",
+        old='            _number(r.get("substitutability"))',
+        new='            _finite(r.get("substitutability"))',
+        test=(
+            "tests/test_causal_propagation.py::"
+            "test_substitutability_is_not_clamped_to_the_confidence_range"
+        ),
+        guards="sub(1–5) 被夾成 None，所有 magnitude 變 UNKNOWN——看起來像資料不足，其實資料在",
+    ),
+    Mutation(
+        name="一階關係混進二階清單",
+        path="alpha/providers/graph_neo4j.py",
+        old="                if len(path_rows) >= 2:",
+        new="                if len(path_rows) >= 1:",
+        test="tests/test_causal_propagation.py::test_first_order_relations_are_not_returned",
+        guards="1 跳是圖上直接看得到的關係，混進來等於重複圖已經說過的話",
+    ),
+    Mutation(
+        name="二階衝擊自稱 HIGH",
+        path="alpha/providers/graph_neo4j.py",
+        old="        if path.hops <= 2 and min(known) >= 4:\n            return ImpactMagnitude.MEDIUM",
+        new="        if path.hops <= 2 and min(known) >= 4:\n            return ImpactMagnitude.HIGH",
+        test="tests/test_causal_propagation.py::test_second_order_magnitude_never_claims_high",
+        guards="多跳推論宣稱與直接觀測一樣可靠是 overclaim",
+    ),
+    Mutation(
+        name="圖上沒有 lead time 卻編一個季度出來",
+        path="alpha/providers/graph_neo4j.py",
+        old="        if not known:\n            return TimeHorizon.UNKNOWN",
+        new="        if not known:\n            return TimeHorizon.QUARTERS",
+        test=(
+            "tests/test_causal_propagation.py::"
+            "test_time_horizon_stays_unknown_when_the_graph_has_no_lead_time"
+        ),
+        guards="編出來的時間會被下游當成可以排程的東西",
+    ),
     Mutation(
         name="槓桿算不出來時 fail open",
         path="risk/snapshot.py",
