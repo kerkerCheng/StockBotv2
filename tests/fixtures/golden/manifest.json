@@ -1,6 +1,6 @@
 {
   "_comment": "Golden fixtures 的 digest 清單。private=true 的完整內容只在 library/private/golden/（gitignored）；這裡只有摘要與 digest。",
-  "captured_at": "2026-09-03",
+  "captured_at": "2026-09-04",
   "fixtures": {
     "normal_company": {
       "guards": "baseline",
@@ -50,7 +50,7 @@
     "stale_observations": {
       "guards": "—",
       "private": false,
-      "digest": "sha256:e0878efb47c5f0613492151ec85e99dfa16345fb1007745f6465b73d92ad8d82"
+      "digest": "sha256:d59da4991e6a9180360faaa17f3fe8ecc4eabf98c1a8ac70f4f4381f0847adc6"
     },
     "edge_conflicts": {
       "guards": "—",
