@@ -57,12 +57,32 @@ DOC_KINDS: dict[str, tuple[str, ...]] = {
     "financial_report": ("財務報告", "財務報表"),
     "meeting_minutes": ("股東會議事錄",),
     "meeting_handbook": ("議事手冊",),
+    # 2026-09-04 新增：**分部附註（IFRS 8）住這一區，不在股東會年報裡。**
+    # 事發：3081 的股東會年報 112 頁抽得出 281,784 字，`部門`／`IFRS 8` 命中 0 次，
+    # 於是被記成「小型單一部門公司」——但那份文件**根本不含財務報表附註**
+    # （`Independent Auditor` 0 次）。從一份結構上不會有分部附註的文件得出「未揭露」
+    # 是 L11-5 的教科書案例。要查分部，抓的是這兩種。
+    "consolidated_financial_statement": ("合併財報",),
+    "separate_financial_statement": ("個別財報",),
+}
+
+#: 每種文件住 MOPS 的哪一區。`t57sb01` 的 `mtype` 不是裝飾——列檔與下載必須用同一個，
+#: 否則下載端拿不到路徑而錯誤訊息會說「檔名可能有誤」（見 `fetch_document` 坑 4）。
+KIND_MTYPE: dict[str, str] = {
+    "annual_report": "F",
+    "financial_report": "F",
+    "meeting_minutes": "F",
+    "meeting_handbook": "F",
+    "consolidated_financial_statement": "A",
+    "separate_financial_statement": "A",
 }
 
 # 年報與財報都是 issuer 一手申報文件。
 KIND_TIER: dict[str, int] = {
     "annual_report": 1,
     "financial_report": 1,
+    "consolidated_financial_statement": 1,
+    "separate_financial_statement": 1,
     "meeting_minutes": 2,
     "meeting_handbook": 2,
 }
@@ -136,13 +156,20 @@ def select_documents(
     return picked
 
 
-def fetch_document(co_id: str, filename: str) -> bytes:
-    """兩段式下載（坑 2）：先取一次性時戳路徑，再 GET 實際 PDF。"""
+def fetch_document(co_id: str, filename: str, *, mtype: str = "F") -> bytes:
+    """兩段式下載（坑 2）：先取一次性時戳路徑，再 GET 實際 PDF。
+
+    ⚠ **`mtype` 必須與列檔時用的同一個**（坑 4，2026-09-04）。這個參數原本寫死
+    `"F"`，於是財報區（`mtype="A"`）的檔名一律拿不到下載路徑，錯誤訊息卻說
+    「檔名可能有誤，或該文件已下架」——**一個表示兩種語意**（L12）：實際上檔名是對的、
+    文件也在，只是查錯了區。那句誤導訊息讓「台股分部附註抓不到」被記成資料問題，
+    而它其實是 fetcher 的整合缺口。
+    """
     session = requests.Session()
     session.headers.update(_build_headers())
     resp = session.post(
         MOPS_QUERY,
-        data={"step": "9", "kind": "F", "co_id": co_id, "filename": filename},
+        data={"step": "9", "kind": mtype, "co_id": co_id, "filename": filename},
         timeout=60,
     )
     resp.encoding = "big5"
@@ -151,7 +178,9 @@ def fetch_document(co_id: str, filename: str) -> bytes:
     match = re.search(r"href='(/pdf/[^']+\.pdf)'", resp.text)
     if not match:
         raise RuntimeError(
-            f"MOPS 未回傳 {filename} 的下載路徑——檔名可能有誤，或該文件已下架"
+            f"MOPS 未回傳 {filename} 的下載路徑（mtype={mtype}）——"
+            "先確認 mtype 與列檔時相同（財報在 A、股東會文件在 F），"
+            "再懷疑檔名有誤或文件已下架"
         )
     pdf = session.get(MOPS_DOC_BASE + match.group(1), timeout=120)
     rate_sleep()
@@ -220,10 +249,12 @@ def fetch_company(
 
     預設只取最新一份修訂；`all_revisions=True` 時全取，並以表單碼區分 doc_id。
     """
-    documents = list_documents(co_id, year)
+    mtype = KIND_MTYPE.get(kind, "F")
+    documents = list_documents(co_id, year, mtype=mtype)
     picked = select_documents(documents, kind, include_english=include_english)
     if not picked:
-        print(f"[mops] {co_id} year={year} kind={kind}：無符合文件", file=sys.stderr)
+        print(f"[mops] {co_id} year={year} kind={kind}（mtype={mtype}）：無符合文件",
+              file=sys.stderr)
         return []
 
     superseded: list[dict[str, str]] = []
@@ -241,7 +272,7 @@ def fetch_company(
     written: list[dict[str, object]] = []
     for doc in picked:
         filename = doc["filename"]
-        content = fetch_document(co_id, filename)
+        content = fetch_document(co_id, filename, mtype=mtype)
         text, pages = pdf_to_text(content)
         doc_id = make_mops_doc_id(co_id, kind, filename, disambiguate=all_revisions)
         meta = {
@@ -263,7 +294,7 @@ def fetch_company(
                  "uploaded_at": d["uploaded_at"]}
                 for d in superseded
             ],
-            "url": f"{MOPS_QUERY}?step=9&kind=F&co_id={co_id}&filename={filename}",
+            "url": f"{MOPS_QUERY}?step=9&kind={mtype}&co_id={co_id}&filename={filename}",
             "retrieval_note": (
                 "MOPS 電子書為兩段式下載，url 欄為查詢入口而非直連 PDF；"
                 "實際 PDF 路徑帶一次性時戳，不可長期引用"
@@ -309,9 +340,13 @@ def main() -> int:
     year = args.year or _default_roc_year()
 
     if args.list:
-        documents = list_documents(args.co_id, year)
+        # ⚠ `--list` 必須用與 `--kind` 相同的 mtype，否則列的是另一區的文件。
+        # 舊版寫死 F，於是「列出來沒有財報」被讀成「這家公司沒申報財報」。
+        mtype = KIND_MTYPE.get(args.kind, "F")
+        documents = list_documents(args.co_id, year, mtype=mtype)
         if not documents:
-            print(f"[mops] {args.co_id} year={year}：查無文件", file=sys.stderr)
+            print(f"[mops] {args.co_id} year={year}（mtype={mtype}）：查無文件",
+                  file=sys.stderr)
             return 1
         for doc in documents:
             print(f"  {doc['data_year']:>6} | {doc['detail'][:34]:36} | "

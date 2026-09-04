@@ -7961,6 +7961,18 @@
       "source": "manual",
       "title": "co:mp_materials：補 MP 的 disproof 與 catalyst（thesis mutation）",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-09-04T08:58:49.463698+00:00",
+      "hint": "⚠ 措辭已逐字核對（L11：審計術語的精度本身就是 claim）。Nidec 2026-04-27 公告逐字：「the Company received an audit report containing a disclaimer of opinion on the consolidated financial statements in the securities report for the fiscal year ended March 31, 2025」，引用其 2025-09-26 之「Notice Regarding Disclaimer of Opinion in the Audit Report...」。同份文件另載內部控制存在 material weakness（company-wide internal control 與 accounting/financial closing processes），並設第三方委員會調查（FIR Issue＋額外關稅影響）。⚠ disclaimer of opinion（無法表示意見）**強於** qualified opinion（保留意見），是最重的審計結果——審計師明確拒絕對該財報表示意見。投資意義：①系統目前對 co:nidec 的財務軸會使用這份財報的數字，而那些數字未經有效審計；②這也是我今天不把 Nidec 分部營收登記成 verifiability=mechanical 的理由——mechanical 的前提是「指得出一手報表、任何人重讀都得到同一個數」，帶無法表示意見的數字不符合。發現經過：補非美股 segment 資料時抓 FY 全年財報才撞到。go＝寫入 Engine C 的 litigation_and_audit_flags（judgment 欄位，需 pq2）；不含入圖、不含 thesis mutation、不含 live。",
+      "n": 476,
+      "reason": null,
+      "ref_id": "https://www.nidec.com/files/user/www-nidec-com/corporate/news/2026/0427-01/260427-01en.pdf",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "co:nidec：Nidec 合併財報遭出具 disclaimer of opinion（無法表示意見）——Engine C 審計旗標",
+      "type": "manual"
     }
   ],
   "log": [
@@ -17262,6 +17274,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 476,
+  "next_n": 477,
   "schema_version": "1"
 }

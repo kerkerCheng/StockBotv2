@@ -488,6 +488,32 @@ brief 不可直接用 `Get-Content | --stdin` 管線傳送；`--brief-file` 會�
 
 ## 非美股 filing 抓取（台股 MOPS／日股 TDnet）
 
+⚠ **要查分部附註（IFRS 8）就抓財報，不要抓股東會年報**（2026-09-04 實測）。
+MOPS 的 `t57sb01` 分兩區，`mtype` 決定查哪一區：
+
+| `--kind` | MOPS 區（`mtype`） | 內容 |
+|---|---|---|
+| `annual_report`／`meeting_*` | `F` 股東會相關 | 股東會年報、議事手冊、議事錄——**不含財務報表附註** |
+| `consolidated_financial_statement` | `A` 財報 | IFRSs 合併財報（含「十四、部門資訊」） |
+| `separate_financial_statement` | `A` 財報 | IFRSs 個別財報（無子公司者用這個） |
+
+```powershell
+& '.venv\Scripts\python.exe' fetchers\mops.py --co-id 3363 --year 115 `
+    --kind consolidated_financial_statement --list
+```
+
+**事發：** 3081 的股東會年報 112 頁／281,784 字，`部門`／`IFRS 8` 命中 0 次，於是被記成
+「單一部門公司」——但那份文件 `Independent Auditor` 也是 0 次，**它根本不含財報附註**。
+改抓 `mtype=A` 後，附註逐字寫著「歸屬為單一報導部門」。結論相同，但**這次是證據**。
+
+⚠ 下載端的 `mtype` 必須與列檔時相同，否則 MOPS 不回下載路徑；舊版寫死 `F`，
+錯誤訊息卻說「檔名可能有誤，或該文件已下架」——**檔名其實是對的**（L12 一表兩義）。
+
+**Sandbox impact review（2026-09-04）：** 本次只新增 `--kind` 的兩個選項與內部
+`mtype` 對照，**未新增 CLI 名稱、未新增網路主機、未碰 credential／private authority**；
+`.codex/rules` 的 `fetchers\mops.py` 是 prefix rule，涵蓋新參數，**十六條 entry 數量未變**。
+
+
 **台股：`fetchers/mops.py`**（互動式入口，**未加入任何 unattended routine**）。
 
 ```bash
@@ -616,7 +642,8 @@ rule 缺漏時不得把重啟當修復。詳細五步見上方「Sandbox／priva
 
 查證（三者都不該出現在 rules）：
 ```powershell
-Select-String -Path .codexules\stockbot-automations.rules `
+Select-String -Path .codex
+ules\stockbot-automations.rules `
   -Pattern 'backfill_source_dating|rank_forward_returns|alpha_exposure'
 ```
 ⚠ 十六條 fixed entry **數量未變**；`tests/test_codex_daily_permissions.py` 斷言

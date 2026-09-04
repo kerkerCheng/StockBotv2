@@ -123,3 +123,51 @@ def test_every_registered_kind_has_a_tier() -> None:
     from fetchers.mops import KIND_TIER
 
     assert set(DOC_KINDS) <= set(KIND_TIER)
+
+
+# ---------------------------------------------------------------------------
+# 坑 4（2026-09-04）：財報區與股東會區是兩個 mtype
+# ---------------------------------------------------------------------------
+
+def test_every_kind_declares_which_mops_region_it_lives_in() -> None:
+    """`DOC_KINDS` 的每一種都要在 `KIND_MTYPE` 有對應，否則會靜默查錯區。
+
+    空跑檢查：在 `DOC_KINDS` 加一種但不加 `KIND_MTYPE` → 這條會紅。
+    """
+    from fetchers.mops import DOC_KINDS, KIND_MTYPE
+
+    assert set(DOC_KINDS) == set(KIND_MTYPE), (
+        "新增文件種類時必須同時宣告它住哪一區："
+        f"{set(DOC_KINDS) ^ set(KIND_MTYPE)}"
+    )
+
+
+def test_financial_statement_kinds_live_in_region_a_not_f() -> None:
+    """⚠ **分部附註（IFRS 8）在財報區，不在股東會年報裡。**
+
+    事發（2026-09-04）：3081 的股東會年報 112 頁抽得出 281,784 字，`部門`／`IFRS 8`
+    命中 0 次，於是被記成「小型單一部門公司」——但那份文件**根本不含財務報表附註**
+    （`Independent Auditor` 0 次）。從一份結構上不會有分部附註的文件得出「未揭露」，
+    是 L11-5 的教科書案例。改抓 `mtype=A` 後，附註「十四、部門資訊」逐字寫著
+    「歸屬為單一報導部門」——結論剛好相同，但**這次是證據，之前是巧合**。
+    """
+    from fetchers.mops import KIND_MTYPE
+
+    assert KIND_MTYPE["consolidated_financial_statement"] == "A"
+    assert KIND_MTYPE["separate_financial_statement"] == "A"
+    assert KIND_MTYPE["annual_report"] == "F"
+
+
+def test_the_download_error_message_names_the_region() -> None:
+    """下載失敗時的訊息不得只說「檔名可能有誤」。
+
+    ⚠ 原訊息是「檔名可能有誤，或該文件已下架」——但最常見的成因其實是
+    **mtype 用錯區**，檔名完全正確。一個訊息承載兩種語意，下游只能猜（L12）。
+    """
+    import inspect
+
+    from fetchers.mops import fetch_document
+
+    source = inspect.getsource(fetch_document)
+    assert "mtype={mtype}" in source
+    assert "先確認 mtype 與列檔時相同" in source
