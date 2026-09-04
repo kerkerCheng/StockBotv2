@@ -5778,7 +5778,7 @@
     },
     {
       "added_at": "2026-08-31T16:29:32.145069+00:00",
-      "deferred_at": "2026-08-31T23:46:17.362757+00:00",
+      "deferred_at": "2026-09-04T14:28:00.390540+00:00",
       "hint": "當前 missing_data：MRM 良率數字改判結構性不可得:TSMC 不揭露 wafer/die 良率,公開唯一量化是 BER<1E-08(pro（共 1 項）｜go（大項）＝reassess 後以 assessment_gap 排入 pq1，研究範圍：source_reliability_corroboration_incomplete。產出為 assessment／研究包，完成後 reassess 以新 decision receipt 結案",
       "n": 348,
       "reason": null,
@@ -7697,6 +7697,7 @@
     },
     {
       "added_at": "2026-09-03T00:34:53.882999+00:00",
+      "deferred_at": "2026-09-04T14:28:00.390582+00:00",
       "hint": "當前 missing_data：Nidec 決算短信/有報的精密減速器(Drive Technology)segment 受注或營收拆分(Engine （共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 457,
       "reason": null,
@@ -7709,6 +7710,7 @@
     },
     {
       "added_at": "2026-09-03T00:34:53.882999+00:00",
+      "deferred_at": "2026-09-04T14:28:00.390614+00:00",
       "hint": "當前 missing_data：GOOGL 價格序列進 Engine C ETL(上游資料缺,非研究可解)（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 458,
       "reason": null,
@@ -7745,6 +7747,7 @@
     },
     {
       "added_at": "2026-09-03T00:34:53.882999+00:00",
+      "deferred_at": "2026-09-04T14:28:00.390643+00:00",
       "hint": "當前 missing_data：產能保留協議任一對手方具名(客戶端或法定文件)（共 1 項）｜go（大項）＝reassess 後以 assessment_gap 排入 pq1，研究範圍：source_reliability_corroboration_incomplete。產出為 assessment／研究包，完成後 reassess 以新 decision receipt 結案",
       "n": 461,
       "reason": null,
@@ -7758,6 +7761,11 @@
     },
     {
       "added_at": "2026-09-03T00:34:53.882999+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_fc6700785d33708362bb9bc798ec5272",
+      "dispatch_ref": "wo_97b1bc0171584fc681bd2df1cb548c99",
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-09-04T14:28:19.380737+00:00",
       "hint": "當前 missing_data：人形轉子交付金額/客戶具名；H1 2026 中報一手(機器人+伺服收入 CNY 1.18B +81.84% 僅二手)（共 2 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 462,
       "reason": null,
@@ -17304,6 +17312,52 @@
       "ref_id": "https://www.nidec.com/files/user/www-nidec-com/corporate/news/2026/0427-01/260427-01en.pdf",
       "type": "manual",
       "verb": "go"
+    },
+    {
+      "at": "2026-09-04T14:28:00.390540+00:00",
+      "n": 348,
+      "reason": null,
+      "receipt": null,
+      "ref_id": "dc_fdab434d1fad67666c57a6eefd379337",
+      "type": "decision_review",
+      "verb": "pending"
+    },
+    {
+      "at": "2026-09-04T14:28:00.390582+00:00",
+      "n": 457,
+      "reason": null,
+      "receipt": null,
+      "ref_id": "dc_ff57320d45f0cb4be3857308e32b578a",
+      "type": "decision_review",
+      "verb": "pending"
+    },
+    {
+      "at": "2026-09-04T14:28:00.390614+00:00",
+      "n": 458,
+      "reason": null,
+      "receipt": null,
+      "ref_id": "dc_a51839bbf1429618556cf8bc265398c4",
+      "type": "decision_review",
+      "verb": "pending"
+    },
+    {
+      "at": "2026-09-04T14:28:00.390643+00:00",
+      "n": 461,
+      "reason": null,
+      "receipt": null,
+      "ref_id": "dc_6e429d67c7b9e925a1b25874e9dcefd9",
+      "type": "decision_review",
+      "verb": "pending"
+    },
+    {
+      "at": "2026-09-04T14:28:19.380737+00:00",
+      "attempt": 1,
+      "n": 462,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_97b1bc0171584fc681bd2df1cb548c99",
+      "ref_id": "dc_32872cf6a80c5f273b9b4c55a57ff229",
+      "type": "decision_review",
+      "verb": "pq1_queued"
     }
   ],
   "next_n": 478,

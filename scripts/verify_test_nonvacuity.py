@@ -870,6 +870,21 @@ MUTATIONS: tuple[Mutation, ...] = (
         guards="lazy `__import__` 的 import 錯誤延後到呼叫當下——`--help` 照列，parser 照建，"
                "任何只驗「子命令存在」的測試照綠。`alpha audit` 就是這樣壞了整段時間沒人發現（L13）",
     ),
+    Mutation(
+        name="定價空間表自己按估值重排",
+        path="scripts/alpha_expectation_gap.py",
+        old="    return {\n        \"schema_version\": SCHEMA_VERSION,\n"
+            "        \"status\": \"ok\" if all(row[\"status\"] == \"ok\" for row in rows) else \"degraded\",",
+        new="    rows.sort(key=lambda r: r[\"target_vs_price\"] or \"\")\n"
+            "    return {\n        \"schema_version\": SCHEMA_VERSION,\n"
+            "        \"status\": \"ok\" if all(row[\"status\"] == \"ok\" for row in rows) else \"degraded\",",
+        test=(
+            "tests/test_alpha_expectation_gap.py::"
+            "test_output_order_is_the_input_order_not_sorted_by_any_number"
+        ),
+        guards="估值落差一旦參與排序就從脈絡變回訊號，且會在 rank_bottlenecks() 之外"
+               "長出第二套排名（AGENTS.md：唯一排序權威只有一個）",
+    ),
 )
 
 

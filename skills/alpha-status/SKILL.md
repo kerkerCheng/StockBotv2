@@ -34,6 +34,7 @@ description: >
 | 該補誰的證據 | 同上的 `structural_rows` | 同上（同一次輸出） |
 | 哪裡是空白 | `query/coverage_gaps.py` | `python -m query.coverage_gaps` |
 | 標的純度（市值／分析師） | Engine C `financial_snapshots`／`consensus_coverage_observations` | 見 §pane 1 |
+| 股價已經定價了什麼 | Engine C `financial_snapshots`（Phase 4） | `scripts/alpha_expectation_gap.py` |
 | 部位與計數器 | `decision_lab today`＋`scripts/outcome_if_settled_today.py` | 見 §pane 4 |
 | 注意力佇列現況 | `engine_b/priority.py` 的分類 | `python -m engine_b.cli drain` |
 
@@ -73,6 +74,28 @@ minor quote unit 換回結算幣別後輸出市值。**本 skill 只轉述結果
 此入口屬 Daily 的 exact outside-sandbox rule。若回 `private_acl_verification_unavailable`，意思是目前
 執行環境無法執行 owner-only ACL 驗證、所以 fail closed，**不等於 ACL 不合格**；不得再以 ad-hoc
 SQL 繞過。真正的 `private_storage_boundary_rejected` 才是 storage boundary 拒絕。
+
+### 第 5 塊：股價已經定價了什麼（**必附，2026-09-04 新增**）
+
+```powershell
+& '.venv\Scripts\python.exe' scripts\alpha_expectation_gap.py --format markdown --tickers <與上一行相同的候選，且順序相同>
+```
+
+四維度回答的是「這家公司在結構上多重要」，**完全沒有回答「這個重要性有沒有被股價定價完」**。
+沒有這一塊，排序第一名到底是機會還是已經漲完，使用者看不出來——而那正是他真正要決定的事。
+
+⚠ **為什麼它到 2026-09-04 才出現：** Phase 4a 早就把 `market_implied_growth` 等欄位算了出來，
+但它們只流進 `alpha research --emit-packet` 的研究包（給 session 讀），**六個面向使用者的
+surface 引用次數全是 0**。這是 L13 的復發——當時的驗收是「欄位算得出來」，不是「使用者看得到」。
+
+**三條不可退讓的讀法（腳本自己也會印，但這裡是判準來源）：**
+
+- **前兩欄不可相減。** 市場隱含成長是**每股盈餘**、分析師估的是**營收**，分母不同。
+  COHR 的 +244.6% vs +38.2% 差 206pp，只反映市場預期利潤率擴張，不是任何一種「落差」。
+- **不得用它重排。** 唯一排序權威仍是 `rank_bottlenecks()`；本表順序必須與 Pane 1 逐列對齊。
+  估值落差一旦參與排序，它就從脈絡變回訊號（同 beta 的相對水位，適用同一條實測紀律）。
+- **「不可算」是不知道，不是 0。** 虧損公司沒有 trailing PE；把它寫成 0% 會讓那幾檔看起來
+  「市場對它們零成長預期」，而事實是它們還在虧錢。
 
 ### 四維度（`AGENTS.md` 為唯一權威，此處只是操作提示）
 

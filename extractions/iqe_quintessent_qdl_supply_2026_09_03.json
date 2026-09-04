@@ -1,0 +1,99 @@
+{
+  "claims": [
+    {
+      "confidence": 0.65,
+      "demand_proof_level": "guided",
+      "disproof_condition": "若任一方宣布協議終止、customer sampling 未於 2027-09-30 前產生 qualification 或 production update，或後續文件顯示產品已改由其他 epiwafer 平台供應，則降級。",
+      "id": "iqe_quintessent_qdl_supply_2026_09_03_cl1",
+      "source_ids": [
+        "iqe_quintessent_qdl_supply_2026_09_03_s1",
+        "iqe_quintessent_qdl_supply_2026_09_03_s2",
+        "iqe_quintessent_qdl_supply_2026_09_03_s3"
+      ],
+      "statement": "IQE 與 Quintessent 於 2026-09-03 公布 QDL epitaxy 採購協議，由 IQE 供應 6 吋 GaAs epiwafer，以支援 Quintessent customer sampling；這是 sampling 階段，不代表量產、最低採購量或終端客戶 design-win。",
+      "subject_id": "co:iqe"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {
+        "qualification_status": "sampling"
+      },
+      "confidence": 0.65,
+      "dst_id": "prod:quantum_dot_laser_epiwafer",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "iqe_quintessent_qdl_supply_2026_09_03_s1",
+        "iqe_quintessent_qdl_supply_2026_09_03_s2"
+      ],
+      "src_id": "co:iqe"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "IQE"
+      ],
+      "attributes": {},
+      "confidence": 0.7,
+      "id": "co:iqe",
+      "name": "IQE plc",
+      "role": "bottleneck_supplier",
+      "source_ids": [
+        "iqe_quintessent_qdl_supply_2026_09_03_s1",
+        "iqe_quintessent_qdl_supply_2026_09_03_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "QDL epitaxy",
+        "QDL epiwafer"
+      ],
+      "attributes": {},
+      "confidence": 0.65,
+      "id": "prod:quantum_dot_laser_epiwafer",
+      "name": "6-inch GaAs quantum-dot-laser epiwafer",
+      "role": null,
+      "source_ids": [
+        "iqe_quintessent_qdl_supply_2026_09_03_s1",
+        "iqe_quintessent_qdl_supply_2026_09_03_s2"
+      ],
+      "type": "Product"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "iqe_quintessent_qdl_supply_2026_09_03",
+    "evidence_tier": 2,
+    "origin_entity": "IQE plc / Quintessent Inc. joint announcement",
+    "permission_basis": "Official public joint-company announcement; canonical URL retained, only research-relevant excerpts stored.",
+    "published_at": "2026-09-03",
+    "publisher": "IQE plc",
+    "retrieved_at": "2026-09-04",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "IQE announces purchase agreement with Quintessent as Quantum Dot Laser technology moves to customer sampling",
+    "url": "https://www.iqep.com/media/press-releases/2026/iqe-announces-purchase-agreement-with-quintessent-as-quantum-dot-laser-technology-moves-to-customer-sampling/"
+  },
+  "sources": [
+    {
+      "id": "iqe_quintessent_qdl_supply_2026_09_03_s1",
+      "locator": "opening paragraph",
+      "quote": "a purchase agreement with Quintessent Inc. ... for the supply of Quantum Dot Laser (QDL) epitaxy"
+    },
+    {
+      "id": "iqe_quintessent_qdl_supply_2026_09_03_s2",
+      "locator": "agreement scope paragraph",
+      "quote": "IQE supply 6-inch Gallium Arsenide epiwafers through its foundry-ready service"
+    },
+    {
+      "id": "iqe_quintessent_qdl_supply_2026_09_03_s3",
+      "locator": "commercial stage paragraph",
+      "quote": "support Quintessent's customer sampling activity as its technology progresses towards commercial deployment"
+    }
+  ]
+}
