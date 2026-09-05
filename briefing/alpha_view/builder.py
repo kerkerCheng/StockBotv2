@@ -643,6 +643,12 @@ def build_alpha_investment_view(
     if signal is not None:
         for ref in signal.evidence_refs:
             evidence_pool.setdefault(ref.ref, ref)
+    # Phase 2 驗收（2026-09-06）抓到：假設引用的 engine_c://manual_observation／consensus_estimate
+    # 在模型端解析得到，卡片自己的 evidence index 卻沒有——讀者拿著卡片對不回引用。
+    # 模型的 evidence 已在 as-of 下過濾（recorded_at／captured_at ≤ T），放進來不會漏未來。
+    if fundamental_model is not None:
+        for ref in fundamental_model.evidence:
+            evidence_pool.setdefault(ref.ref, ref)
 
     fund_fresh = _freshness_status(build, "fundamentals")
     market_fresh = _freshness_status(build, "market")

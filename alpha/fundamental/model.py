@@ -104,10 +104,20 @@ def build_fundamental_model(
         elif actuals.period.end > cutoff:
             warnings.append("基期觀測的會計年度尚未結束於 as_of，拒用（INV-6）")
             actuals, actuals_reason = None, "基期會計年度在 as_of 之後才結束（lookahead，拒用）"
-    usable_consensus = tuple(c for c in consensus
-                             if c.captured_at is None or c.captured_at <= cutoff)
+    # ⚠ 共識的 `captured_at` 是行情交易日（bar_date），`fetched_at` 才是我們何時取得。
+    # 週六 11:53 UTC 抓到的共識會標成週五的 bar_date——as_of=週五 時它其實還不存在（INV-6）。
+    # 兩個時間都必須 ≤ T；價格可以用 bar_date 定日，分析師共識不行。
+    def _known_by_cutoff(item: ConsensusEstimate) -> bool:
+        if item.captured_at is not None and item.captured_at > cutoff:
+            return False
+        if item.fetched_at is not None and item.fetched_at.date() > cutoff:
+            return False
+        return True
+
+    usable_consensus = tuple(c for c in consensus if _known_by_cutoff(c))
     if len(usable_consensus) != len(consensus):
-        warnings.append(f"{len(consensus) - len(usable_consensus)} 筆共識晚於 as_of，排除")
+        warnings.append(f"{len(consensus) - len(usable_consensus)} 筆共識晚於 as_of"
+                        "（captured_at 或 fetched_at 在 T 之後），排除")
     usable_guidance = tuple(g for g in guidance if g.issued_at is None or g.issued_at <= cutoff)
 
     # ---- 1. 目標期間 ---------------------------------------------------------

@@ -216,3 +216,18 @@ def test_sources_fail_soft_when_the_provider_has_no_fiscal_capability(monkeypatc
     model, reason = sources._fundamental_model(  # noqa: SLF001
         build, _Exploding(), Ticker("COHR"), CompanyId("co:coherent"), as_of=None, today=TODAY)
     assert model is None and "執行失敗" in reason and "boom" in reason
+
+
+def test_evidence_index_resolves_the_models_own_citations() -> None:
+    """假設引用的 engine_c://manual_observation／consensus_estimate 必須出現在卡片自己的 evidence index，
+    否則讀者拿著卡片對不回引用（Phase 2 驗收 2026-09-06 抓到的 provenance 缺口）。"""
+    model = _run()
+    view = _view(fundamental_model=model)
+    indexed = {item.ref for item in view.evidence.index}
+    for ref in model.evidence:
+        assert ref.ref in indexed
+    engine_c_refs = {r for d in view.earnings_bridge.assumptions for r in d.evidence_refs
+                     if r.startswith("engine_c://")}
+    assert engine_c_refs and engine_c_refs <= indexed        # graph:// 引用由 context 供應，fixture 不含
+    # 沒有模型時 evidence index 不受影響
+    assert "engine_c://manual_observation/mo_fy2026" not in {i.ref for i in _view().evidence.index}

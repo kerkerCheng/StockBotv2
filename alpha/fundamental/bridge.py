@@ -31,6 +31,12 @@ from .contracts import (
 #: 分部基期合計與公司營收的容忍差（四捨五入）。超過就在步驟上標 warning，不靜默。
 _SEGMENT_SUM_TOLERANCE = 0.005
 
+#: 這幾個 driver 的值本身有 GAAP／non-GAAP 之分（稅、利息、NCI、營益率變化）；假設若自帶口徑，
+#: 必須與橋口徑一致，否則不得套用——non-GAAP 的 254M 所得稅套到 GAAP 基期是混算，不是估計。
+#: 營收成長與稀釋股數沒有口徑之分，不在此列。
+_BASIS_BEARING_DRIVERS: frozenset[str] = frozenset(
+    {"operating_margin_delta", "interest_and_other_net", "tax_rate", "nci_attribution"})
+
 
 @dataclass(frozen=True, slots=True)
 class BridgeResult:
@@ -69,13 +75,33 @@ def build_bridge(
     target: FiscalPeriod,
 ) -> BridgeResult:
     """把基期觀測與假設算成目標期間的內部估計。"""
-    by_key = _by_key(assumptions)
     steps: list[BridgeStep] = []
     warnings: list[str] = []
     base_refs = actuals.refs
 
     basis = "non_gaap" if (actuals.non_gaap and actuals.non_gaap.get("operating_income") is not None) else "gaap"
     block = actuals.block(basis) or {}
+
+    # 假設自帶的 accounting_basis 必須與橋口徑一致（或 not_applicable）。不符的不是「缺假設」，
+    # 是「有假設但口徑不同」——理由要說清楚，且絕不靜默套用（Phase 2 驗收 2026-09-06 補）。
+    basis_mismatch: dict[tuple[str, str], OperatingAssumption] = {}
+    compatible: list[OperatingAssumption] = []
+    for item in assumptions:
+        if item.driver in _BASIS_BEARING_DRIVERS and item.accounting_basis not in (basis, "not_applicable"):
+            basis_mismatch[item.key] = item
+            warnings.append(
+                f"假設 {item.assumption_id}（{item.driver}[{item.scope}]）口徑 {item.accounting_basis} "
+                f"與橋口徑 {basis} 不符，未套用——口徑不同不得混算")
+        else:
+            compatible.append(item)
+    by_key = _by_key(compatible)
+
+    def _absent(driver: str, default: str) -> str:
+        hit = [a for k, a in basis_mismatch.items() if k[0] == driver]
+        if hit:
+            return (f"{driver} 假設口徑 {hit[0].accounting_basis} 與橋口徑 {basis} 不符，未套用"
+                    "（不是缺假設，是口徑不同）")
+        return default
 
     def _metric(name: str, value: float | None, unit: str, formula: str | None,
                 assumption_ids: Sequence[str], reason: str | None = None,
@@ -180,7 +206,9 @@ def build_bridge(
     if base_om is None:
         margin_reason = f"基期觀測缺 {basis}.operating_income，算不出基期營益率"
     elif not deltas:
-        margin_reason = "沒有 operating_margin_delta 假設——沿用基期也必須是一條寫下來的假設（值可為 0）"
+        margin_reason = _absent(
+            "operating_margin_delta",
+            "沒有 operating_margin_delta 假設——沿用基期也必須是一條寫下來的假設（值可為 0）")
     else:
         margin = base_om + sum(d.value for d in deltas)
     margin_formula = "base_operating_margin + Σ operating_margin_delta[scope]"
@@ -212,7 +240,8 @@ def build_bridge(
     pretax = (oi - interest.value) if (oi is not None and interest is not None) else None
     pretax_ids = oi_ids + ([interest.assumption_id] if interest else [])
     pretax_reason = (None if pretax is not None else
-                     ("缺 interest_and_other_net 假設" if interest is None else oi_reason))
+                     (_absent("interest_and_other_net", "缺 interest_and_other_net 假設")
+                      if interest is None else oi_reason))
     _emit(steps, "internal_pretax_income", f"內部稅前利益（{basis}）", pretax, "currency",
           "internal_operating_income − interest_and_other_net", pretax_ids, base_refs, pretax_reason)
 
@@ -223,7 +252,7 @@ def build_bridge(
     tax = (pretax * tax_rate.value) if (pretax is not None and tax_rate is not None) else None
     tax_ids = pretax_ids + ([tax_rate.assumption_id] if tax_rate else [])
     tax_reason = (None if tax is not None else
-                  ("缺 tax_rate 假設" if tax_rate is None else pretax_reason))
+                  (_absent("tax_rate", "缺 tax_rate 假設") if tax_rate is None else pretax_reason))
     _emit(steps, "internal_income_taxes", f"內部所得稅（{basis}）", tax, "currency",
           "internal_pretax_income × tax_rate", tax_ids, base_refs, tax_reason)
     net_income = (pretax - tax) if (pretax is not None and tax is not None) else None
@@ -237,7 +266,8 @@ def build_bridge(
     attributable = (net_income + nci.value) if (net_income is not None and nci is not None) else None
     attributable_ids = tax_ids + ([nci.assumption_id] if nci else [])
     attributable_reason = (None if attributable is not None else
-                           ("缺 nci_attribution 假設" if nci is None else tax_reason))
+                           (_absent("nci_attribution", "缺 nci_attribution 假設")
+                            if nci is None else tax_reason))
     _emit(steps, "internal_net_income_attributable", f"內部歸屬母公司淨利（{basis}）", attributable,
           "currency", "internal_net_income + nci_attribution", attributable_ids, base_refs,
           attributable_reason)

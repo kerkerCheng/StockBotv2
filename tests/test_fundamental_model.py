@@ -481,3 +481,54 @@ def test_model_result_is_replace_safe_for_read_model_tests() -> None:
     result = _run()
     changed = replace(result.metrics["eps"], value=123.456)
     assert changed.value == 123.456 and changed.assumption_ids == result.metrics["eps"].assumption_ids
+
+
+# ---------------------------------------------------------------------------
+# Phase 2 驗收（2026-09-06）補的三條回歸：共識 fetched_at 的 PIT、假設口徑必須與橋口徑一致
+# ---------------------------------------------------------------------------
+
+def test_consensus_fetched_after_as_of_is_excluded_even_if_bar_date_is_earlier() -> None:
+    """週六抓到的共識標成週五的 bar_date——as_of=週五 時它還不存在，不得出現（INV-6）。"""
+    late = replace(_consensus("eps", 9.41634, year_ago=5.61, captured=date(2026, 9, 5)),
+                   fetched_at=datetime(2026, 9, 6, 11, 53, tzinfo=UTC))
+    ok = replace(_consensus("revenue", 10_618_193_080.0, captured=date(2026, 9, 5)),
+                 fetched_at=datetime(2026, 9, 5, 11, 53, tzinfo=UTC))
+    result = _run(consensus=(late, ok), as_of=date(2026, 9, 5))
+    assert result.comparisons["eps"].status == "consensus_missing"
+    assert result.comparisons["revenue"].status == "comparable"
+    assert any("fetched_at" in w for w in result.warnings)
+    assert all(c.metric != "eps" for c in result.consensus)
+
+
+def test_bridge_refuses_assumptions_whose_accounting_basis_differs_from_bridge_basis() -> None:
+    """non-GAAP 稅率套到 GAAP 基期是混算，不是估計：不套用、理由要說是口徑不同而不是缺假設。"""
+    mismatched = [
+        a if a.driver != "tax_rate" else
+        _assumption("tax_rate", "total", 0.19, basis="heuristic_proxy", refs=(ACT_REF.ref,),
+                    accounting_basis="non_gaap")
+        for a in _full_set()
+    ]
+    result = _run(mismatched, actuals=_actuals(non_gaap=None))        # 橋走 GAAP
+    assert result.accounting_basis == "gaap"
+    assert result.metrics["operating_income"].value is not None       # 上游不受影響
+    assert result.metrics["eps"].value is None
+    assert "口徑" in (result.metrics["eps"].reason or "") and "不是缺假設" in result.metrics["eps"].reason
+    assert any("未套用" in w for w in result.warnings)
+    tax_step = next(s for s in result.steps if s.key == "internal_income_taxes")
+    assert tax_step.value is None and "口徑" in (tax_step.reason or "")
+    # 同一條假設在 non-GAAP 橋上（口徑一致）照常套用
+    matched = _run(mismatched)
+    assert matched.accounting_basis == "non_gaap" and matched.metrics["eps"].value is not None
+    assert not any("未套用" in w for w in matched.warnings)
+
+
+def test_basis_free_drivers_are_not_subject_to_the_basis_check() -> None:
+    """營收成長／稀釋股數沒有 GAAP／non-GAAP 之分：標了口徑也不因此被擋。"""
+    labelled = [
+        a if a.driver != "diluted_shares" else
+        _assumption("diluted_shares", "total", 203_400_000.0, basis="heuristic_proxy",
+                    refs=(ACT_REF.ref,), accounting_basis="gaap")
+        for a in _full_set()
+    ]
+    result = _run(labelled)                                            # non-GAAP 橋
+    assert result.metrics["eps"].value is not None
