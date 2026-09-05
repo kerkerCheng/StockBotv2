@@ -1,17 +1,17 @@
 {
   "counters": {
-    "active": 35,
+    "active": 36,
     "t1_date": 0,
-    "t0_passive": 35,
-    "t2_pollable": 14,
+    "t0_passive": 36,
+    "t2_pollable": 13,
     "wake_pq2": 1,
-    "wake_lead": 32,
+    "wake_lead": 33,
     "wake_hypothesis": 2,
-    "stalled": 10,
-    "fired_unconsumed": 36,
+    "stalled": 11,
+    "fired_unconsumed": 38,
     "expired": 0
   },
-  "total": 72,
+  "total": 75,
   "stalled_ids": [
     "ew_0008_2026-08-31",
     "ew_0009_2026-08-31",
