@@ -235,14 +235,21 @@ class SignalCompleteness:
 
 @dataclass(frozen=True, slots=True)
 class LifecycleFacts:
-    """Engine D 與 thesis lifecycle 的**公開**事實（不含任何部位／NAV／尺寸）。"""
+    """Engine D 與 thesis lifecycle 的**公開**事實（不含任何部位／NAV／尺寸）。
 
-    attention: str | None = None            # MONITOR／REVIEW（Engine D）
+    ⚠ 刻意沒有 `attention`（MONITOR／REVIEW）：它由 `decision_lab today` 的 brief 計算，
+    本 view 不重算也不留一個永遠是 None 的欄位假裝有。
+    """
+
     research_status: str | None = None      # READY／…（Engine D coverage）
     lifecycle_status: str | None = None     # Engine D probe lifecycle epoch status
     review_due_at: str | None = None
     decision_effective_at: str | None = None
     legacy_weakest_axis: str | None = None  # 舊五軸的最弱軸（Engine D）
+    legacy_axis_levels: Mapping[str, str] | None = None  # 舊五軸各軸生效等級（Engine D）
+    cohort_count: int | None = None         # 同公司有幾個 cohort；view 只呈現其中一個
+    cohort_selection_rule: str | None = None
+    decision_facts_as_of: str | None = None  # Engine D 事實的 as-of 截止（None＝當前）
     thesis_lifecycle_status: str | None = None   # thesis/lifecycle.json 的 status
     thesis_next_check: date | None = None
     thesis_next_check_source: str | None = None  # cadence／catalyst／unscheduled

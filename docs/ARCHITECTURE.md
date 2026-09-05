@@ -236,6 +236,16 @@ thesis/lifecycle.json＋catalyst_calendar.json、engine_c.checklist ────
 | expected_return／downside／entry_logic | — | **`not_modeled`**，並列出「不要跟什麼混淆」（賣方目標價、市場隱含成長、排序名次） |
 | evidence | 全部 `EvidenceRef` 的索引＋as-of 篩選計數＋L8 品質摘要 | `observation` |
 
+**as-of 視角的邊界（2026-09-05 Phase 1.1 定案）：** 三種來源三種處置，判準是「authority
+答不答得出 T 時刻」。① Engine A（投影）與 Engine C（時序）：原生 as-of。② Decision Store：
+append-only 且每張表帶時間戳，所以 `decision_lab.coverage_queries.company_decision_facts(as_of=…)`
+做**真正的歷史過濾**（cohort `created_at`、decision `effective_at`、coverage `created_at`、
+lifecycle 狀態由事件回放、variant perception 含 supersede 時點），回傳值帶 `point_in_time`；
+builder **只接受標記與 `context.as_of` 相符的事實**，沒有標記或不符一律拒收成
+`not_applicable`（呼叫端傳錯不會把當前值混進歷史卡）；到期狀態以 as_of 當今天判定。
+③ `thesis/*.json` 與檢核點是當前狀態檔、沒有歷史 → 一律 `not_applicable` 並附 INV-6 原因。
+Decision Store 只經 `mode=ro` sqlite 連線讀，查詢只回研究欄位、選 cohort 的規則寫在回傳值裡。
+
 **判斷新鮮度：** session 判斷是對某一份 `ResearchContext` 做的。`compose_signal(...,
 allow_stale_context=True)` 是唯讀 view 的明確 opt-in——舊判斷仍呈現但整段標 `stale`，
 `identity.signal.context_matches=False`；`python -m alpha research --judgment` 維持嚴格。

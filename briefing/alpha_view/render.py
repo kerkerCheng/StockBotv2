@@ -184,10 +184,11 @@ def render_alpha_investment_view_markdown(view: AlphaInvestmentView) -> str:
     else:
         lines.append(f"- session 判斷：**無**——{markdown_text(sig.reason or '')}")
     lc = ident.lifecycle
+    cohorts = f"｜cohort {lc.cohort_count} 個" if lc.cohort_count else ""
     lines.append(
         f"- Engine D：research_status {markdown_text(lc.research_status or '—')}｜lifecycle "
         f"{markdown_text(lc.lifecycle_status or '—')}｜複查到期 {markdown_text(lc.review_due_at or '—')}"
-        f"｜舊五軸最弱 {markdown_text(lc.legacy_weakest_axis or '—')}"
+        f"｜舊五軸最弱 {markdown_text(lc.legacy_weakest_axis or '—')}{cohorts}"
         + (f"｜（{markdown_text(lc.reason)}）" if lc.reason else "")
     )
     lines.append(
@@ -467,13 +468,18 @@ def _card_row(card: Mapping[str, Any]) -> str:
     q1 = _score_cell(scores.get("structural") or {})
     others = "／".join(_score_cell(scores.get(a) or {})
                       for a in ("value_capture", "earnings_exposure", "expectation_gap", "catalyst"))
+    # 每一格只看 builder 給的 status；不用「值在不在」反推缺席（那是 renderer 端的語意回復）。
     implied = card.get("market_implied_eps_growth") or {}
-    implied_text = (f"{_pct(implied['value'])}（proxy）" if isinstance(implied.get("value"), (int, float))
-                    else f"未知（{markdown_text(implied.get('reason') or implied.get('status') or '—')}）")
+    if implied.get("status") in ("available", "stale") and isinstance(implied.get("value"), (int, float)):
+        implied_text = f"{_pct(implied['value'])}（proxy）" + ("⌛" if implied.get("status") == "stale" else "")
+    else:
+        implied_text = f"未知（{markdown_text(implied.get('reason') or implied.get('status') or '—')}）"
     cons = card.get("consensus_revenue_growth") or {}
     n = cons.get("analyst_count")
-    cons_text = (f"{_pct(cons['value'])}" + (f"（{n} 位）" if isinstance(n, int) else "")
-                 if isinstance(cons.get("value"), (int, float)) else "未知")
+    if cons.get("status") in ("available", "stale") and isinstance(cons.get("value"), (int, float)):
+        cons_text = f"{_pct(cons['value'])}" + (f"（{n} 位）" if isinstance(n, int) else "")
+    else:
+        cons_text = f"未知（{markdown_text(cons.get('status') or '—')}）"
     cat = card.get("catalyst") or {}
     cat_text = markdown_text(cat.get("state_label") or ("未知" if not cat.get("state") else cat["state"]))
     if cat.get("next_checkpoint"):
@@ -482,11 +488,10 @@ def _card_row(card: Mapping[str, Any]) -> str:
         cat_text = f"未知（{markdown_text(cat.get('reason') or '—')}）"
     dis = card.get("disproof") or {}
     signal = card.get("signal") or {}
-    # 沒有 session 判斷時，結構化條件數不是「0 條」而是「無判斷」——0 是知道沒有，這裡是不知道。
-    if signal.get("has_signal"):
-        dis_text = f"{dis.get('condition_count')} 條結構化"
-    else:
-        dis_text = "結構化：無判斷"
+    # 只查值：`condition_count` 是 None 代表 builder 已判定「不知道」（無判斷／無投影），
+    # renderer 不自己用 has_signal 再解讀一次。
+    count = dis.get("condition_count")
+    dis_text = f"{count} 條結構化" if isinstance(count, int) else "結構化：未知"
     dis_text += "＋散文" if dis.get("narrative_present") else "；散文：無"
     if dis.get("problems"):
         dis_text += f"｜⚠ 設定問題 {len(dis['problems'])}"
@@ -511,7 +516,7 @@ def render_alpha_cards(cards: Sequence[Mapping[str, Any]] | None, *, present: bo
         return []
     lines = ["## Alpha Card 摘要（每檔一列；完整卡：`python -m briefing alpha-card <TICKER>`）", ""]
     if cards is None:
-        lines += ["⚠ 本次未提供 Alpha Card（未注入或讀取失敗）——不是「沒有候選」。", ""]
+        lines += ["⚠ 本次未提供 Alpha Card 摘要（這個 surface 未注入，或整批讀取失敗）——不是「沒有候選」。", ""]
         return lines
     if not cards:
         lines += ["（無候選可摘要）", ""]

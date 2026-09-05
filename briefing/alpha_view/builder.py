@@ -89,8 +89,14 @@ class DecisionFacts:
     """
 
     cohort_id: str | None = None
-    attention: str | None = None
+    cohort_count: int | None = None
+    selection_rule: str | None = None
+    #: Engine D 唯讀查詢回報的時點：`current` 或 `as_of`＋日期。builder 在 as-of 模式下
+    #: **只接受標記與 context.as_of 相符的事實**，其餘一律拒收（INV-6）。
+    point_in_time_mode: str | None = None
+    point_in_time_as_of: str | None = None
     research_status: str | None = None
+    rubric_version: str | None = None
     lifecycle_status: str | None = None
     review_due_at: str | None = None
     decision_effective_at: str | None = None
@@ -110,6 +116,14 @@ class DecisionFacts:
 
 def _refs(refs: Sequence[EvidenceRef]) -> tuple[str, ...]:
     return tuple(dict.fromkeys(r.ref for r in refs))
+
+
+def _absent(key: str, label: str, reason: str, *, status: str = "missing",
+            authority: str | None = None) -> Datum:
+    """缺席格。`status` 區分 `missing`（有能力沒資料）與 `not_applicable`
+    （這個視角下不該回答，例如 as-of 模式對沒有時點投影的來源）。"""
+    return Datum(key=key, label=label, value=None, status=status, basis="none",
+                 authority=authority, reason=reason)
 
 
 AXIS_LABEL: Mapping[str, str] = {
@@ -143,14 +157,14 @@ def _q1_datum(build: ContextBuild) -> Datum:
 
 def _session_score_datum(
     signal: AlphaSignal | None, axis: str, *, signal_reason: str | None, stale: bool,
-    judged_on: date | None = None,
+    judged_on: date | None = None, absent_status: str = "missing",
 ) -> Datum:
     """Q2–Q5 的一格：session 判斷，`None` 分數＝不知道，不是 0。"""
     label = AXIS_LABEL[axis]
     if signal is None:
-        return missing(f"{axis}_score", label,
+        return _absent(f"{axis}_score", label,
                        signal_reason or "尚無 session 判斷（AlphaSignal 未組成）",
-                       authority=A_SESSION)
+                       status=absent_status, authority=A_SESSION)
     score: Score | None = signal.score_for(axis)
     if score is None:
         return missing(f"{axis}_score", label, "session 回答 unknown——不知道，不是 0",
@@ -175,10 +189,10 @@ def _session_score_datum(
 
 def _text_datum(
     key: str, label: str, text: str | None, *, basis: str, authority: str,
-    stale: bool, as_of: date | None, missing_reason: str,
+    stale: bool, as_of: date | None, missing_reason: str, absent_status: str = "missing",
 ) -> Datum:
     if not text or not str(text).strip():
-        return missing(key, label, missing_reason, authority=authority)
+        return _absent(key, label, missing_reason, status=absent_status, authority=authority)
     return Datum(key=key, label=label, value=str(text), status="stale" if stale else "available",
                  basis=basis, authority=authority, as_of=as_of)
 
@@ -187,13 +201,14 @@ def _observation(
     key: str, label: str, value: Any, *, authority: str, unit: str | None,
     as_of: date | None, freshness: str | None, evidence_refs: tuple[str, ...],
     method: str | None = None, missing_reason: str = "authority 無此值",
+    reason: str | None = None,
 ) -> Datum:
     if value is None:
         return missing(key, label, missing_reason, authority=authority)
     status = "stale" if freshness == "stale" else "available"
     return Datum(key=key, label=label, value=value, status=status, basis="observation",
                  authority=authority, method=method, unit=unit, as_of=as_of,
-                 evidence_refs=evidence_refs)
+                 evidence_refs=evidence_refs, reason=reason)
 
 
 def _path_item(path: CausalPath) -> PathItem:
@@ -247,6 +262,38 @@ def build_alpha_investment_view(
     company_id = str(context.company_id) if context.company_id else None
     identity = dict(identity or {})
 
+    # as-of 模式：Engine A／C 有時點投影，Decision Store 與 thesis 檔沒有。沒有投影的來源
+    # 一律 `not_applicable` 並說明，不拿當前值冒充 T 時刻（INV-6）。builder 自己強制，
+    # 不靠 sources 記得不要傳。
+    as_of_mode = context.as_of is not None
+    as_of_iso = context.as_of.isoformat() if context.as_of else None
+    reference_day = context.as_of or today
+    pit_reason = (
+        f"as-of {as_of_iso} 模式：這個來源沒有時點投影，不以當前值冒充 T 時刻的知識（INV-6）"
+        if as_of_mode else None
+    )
+    decision_refused = False
+    if as_of_mode:
+        # Decision Store 是 append-only 且帶時間戳，`company_decision_facts(as_of=…)` 能做真正的
+        # 歷史過濾——所以允許**帶著相符 as-of 標記**的事實進來；沒有標記或標記不符的一律拒收，
+        # 否則呼叫端傳錯就會把當前值混進歷史卡。
+        if decision_facts is not None and decision_facts.point_in_time_as_of != as_of_iso:
+            decision_refused = True
+            decision_facts_reason = (
+                f"as-of {as_of_iso} 模式：傳入的 Engine D 事實沒有相符的 as-of 過濾標記"
+                f"（point_in_time_as_of={decision_facts.point_in_time_as_of!r}），拒收以免把當前值混進歷史卡（INV-6）"
+            )
+            decision_facts = None
+        elif decision_facts is None and not decision_facts_reason:
+            decision_refused = True
+            decision_facts_reason = pit_reason
+        # thesis/lifecycle.json 與 catalyst_calendar.json 是當前狀態檔，沒有歷史。
+        thesis_lifecycle = None
+        catalyst_checkpoints = ()
+    #: 沒有時點語意的來源在 as-of 下是 not_applicable；authority 回答「T 時刻沒有」則是 missing。
+    thesis_absent_status = "not_applicable" if as_of_mode else "missing"
+    decision_absent_status = "not_applicable" if (as_of_mode and decision_refused) else "missing"
+
     # ---- 判斷新鮮度：判斷是對哪一份 context 做的 ---------------------------
     mismatch = None
     if signal is not None:
@@ -265,6 +312,21 @@ def build_alpha_investment_view(
     judged_on: date | None = None
     if signal is not None:
         judged_on = _as_date((signal.metadata or {}).get("judged_at")) or signal.as_of
+    # as-of 模式的 lookahead 防線：判斷寫於 T 之後就是 T 之後的知識，就算標 stale 也不得
+    # 出現在歷史卡上（INV-6）。拒用後 Q2–Q5／thesis／情境全部 not_applicable 並說明。
+    signal_absent_status = "missing"
+    if as_of_mode and signal is not None and judged_on is not None and judged_on > context.as_of:
+        signal_reason = (
+            f"as-of {as_of_iso} 模式：session 判斷寫於 {judged_on.isoformat()}，晚於 as_of，"
+            "屬 lookahead；歷史卡拒用（INV-6）"
+        )
+        signal = None
+        signal_stale = False
+        mismatch = None
+        judged_digest = None
+        stale_reason = None
+        judged_on = None
+        signal_absent_status = "not_applicable"
 
     # ---- Evidence index：context ＋ 路徑／事件的引用，去重 -------------------
     evidence_pool: dict[str, EvidenceRef] = {}
@@ -316,12 +378,16 @@ def build_alpha_investment_view(
         else (None, None, None)
     )
     lifecycle = LifecycleFacts(
-        attention=decision_facts.attention if decision_facts else None,
         research_status=decision_facts.research_status if decision_facts else None,
         lifecycle_status=decision_facts.lifecycle_status if decision_facts else None,
         review_due_at=decision_facts.review_due_at if decision_facts else None,
         decision_effective_at=decision_facts.decision_effective_at if decision_facts else None,
         legacy_weakest_axis=decision_facts.legacy_weakest_axis if decision_facts else None,
+        legacy_axis_levels=(dict(decision_facts.legacy_axis_levels)
+                            if decision_facts and decision_facts.legacy_axis_levels else None),
+        cohort_count=decision_facts.cohort_count if decision_facts else None,
+        cohort_selection_rule=decision_facts.selection_rule if decision_facts else None,
+        decision_facts_as_of=decision_facts.point_in_time_as_of if decision_facts else None,
         thesis_lifecycle_status=thesis_status,
         thesis_next_check=next_check,
         thesis_next_check_source=next_source,
@@ -329,8 +395,9 @@ def build_alpha_investment_view(
         reason=(
             (decision_facts_reason or "Engine D 無此公司的 cohort，或本次未讀 Decision Store")
             if decision_facts is None else
-            ("attention（MONITOR／REVIEW）由 decision_lab today 計算，本 view 不重算"
-             if decision_facts.attention is None else None)
+            (f"同公司 {decision_facts.cohort_count} 個 cohort，只呈現規則 "
+             f"{decision_facts.selection_rule} 選出的那個"
+             if (decision_facts.cohort_count or 0) > 1 else None)
         ),
     )
     completeness = SignalCompleteness(
@@ -372,7 +439,7 @@ def build_alpha_investment_view(
     q1 = _q1_datum(build)
     session_scores = {
         axis: _session_score_datum(signal, axis, signal_reason=signal_reason, stale=signal_stale,
-                                   judged_on=judged_on)
+                                   judged_on=judged_on, absent_status=signal_absent_status)
         for axis in AXES if axis != "structural"
     }
     all_scores = tuple(q1 if axis == "structural" else session_scores[axis] for axis in AXES)
@@ -381,7 +448,7 @@ def build_alpha_investment_view(
         vp_as_of = _as_date(decision_facts.variant_perception_created_at)
     variant_section = VariantViewSection(
         meta=SectionMeta(
-            status=("stale" if signal_stale else "available") if signal else "missing",
+            status=("stale" if signal_stale else "available") if signal else signal_absent_status,
             basis="session_judgment" if signal else "none",
             authority=A_SESSION if signal else None,
             reason=(stale_reason if signal else no_signal),
@@ -392,27 +459,30 @@ def build_alpha_investment_view(
         ),
         thesis=_text_datum("thesis", "Thesis", signal.thesis if signal else None,
                            basis="session_judgment", authority=A_SESSION, stale=signal_stale,
-                           as_of=judged_on, missing_reason=no_signal),
+                           as_of=judged_on, missing_reason=no_signal,
+                           absent_status=signal_absent_status),
         variant_view=_text_datum("variant_view", "Variant perception（市場隱含 X／本 thesis 認為 Y／催化劑 Z）",
                                  signal.variant_view if signal else None,
                                  basis="session_judgment", authority=A_SESSION, stale=signal_stale,
-                                 as_of=judged_on, missing_reason=no_signal),
+                                 as_of=judged_on, missing_reason=no_signal,
+                                 absent_status=signal_absent_status),
         direction=(Datum(key="direction", label="方向", value=signal.direction,
                          status="stale" if signal_stale else "available",
                          basis="session_judgment", authority=A_SESSION, as_of=judged_on)
-                   if signal else missing("direction", "方向", no_signal, authority=A_SESSION)),
+                   if signal else _absent("direction", "方向", no_signal,
+                                          status=signal_absent_status, authority=A_SESSION)),
         confidence=(Datum(key="confidence", label="信心（session 自評）", value=signal.confidence,
                           status="stale" if signal_stale else "available",
                           basis="session_judgment", authority=A_SESSION, unit="confidence_0_1",
                           as_of=judged_on,
                           reason="session 自評的信心（0..1），不是量測的勝率")
-                    if signal else missing("confidence", "信心（session 自評）", no_signal,
-                                           authority=A_SESSION)),
+                    if signal else _absent("confidence", "信心（session 自評）", no_signal,
+                                           status=signal_absent_status, authority=A_SESSION)),
         expected_horizon=_text_datum("expected_horizon", "預期期間",
                                      signal.expected_horizon if signal else None,
                                      basis="session_judgment", authority=A_SESSION,
                                      stale=signal_stale, as_of=judged_on,
-                                     missing_reason=no_signal),
+                                     missing_reason=no_signal, absent_status=signal_absent_status),
         scores=all_scores,
         risks=tuple(signal.risks) if signal else (),
         decision_store_variant_perception=_text_datum(
@@ -422,6 +492,7 @@ def build_alpha_investment_view(
             missing_reason=("cohort 從未寫過 variant perception（None＝未寫，現形不隱藏）"
                             if decision_facts else
                             decision_facts_reason or "本次未讀 Decision Store"),
+            absent_status=decision_absent_status,
         ),
     )
 
@@ -435,7 +506,7 @@ def build_alpha_investment_view(
         _observation(key, label, value, authority=A_RANK, unit=unit, as_of=graph_as_of,
                      freshness=None, evidence_refs=scarcity_refs,
                      method="已經 graph admission gate 核准的邊屬性；provider 取最強的一條邊，不平均",
-                     missing_reason="圖上這條邊沒有這個屬性（未填≠0）")
+                     missing_reason="圖上這條邊沒有這個屬性（未填≠否；rank_bottlenecks 自 2026-09-05 起保留三態）")
         for key, label, value, unit in (
             ("substitutability", "替代難度", scarcity.substitutability, "ordinal_1_5"),
             ("sole_source", "獨家供應", scarcity.sole_source, "bool"),
@@ -674,9 +745,8 @@ def build_alpha_investment_view(
     # =======================================================================
     c = context.consensus
     cons_as_of = _freshness_as_of(build, "consensus")
-    target_vs_price = None
-    if c.target_mean is not None and m.price:
-        target_vs_price = c.target_mean / m.price - 1.0
+    # ⚠ 刻意不算 target_vs_price：那個比值已由 scripts/alpha_expectation_gap.py 產出，
+    # view 只讀 authority，不長第二份算式（審計 2026-09-05 第 5 條）。
     consensus_items = (
         _observation("analyst_count", "分析師目標價家數", c.analyst_count, authority=A_SNAP,
                      unit="count", as_of=cons_as_of, freshness=cons_fresh,
@@ -685,15 +755,6 @@ def build_alpha_investment_view(
                      authority=A_SNAP, unit=quote_price_unit, as_of=cons_as_of,
                      freshness=cons_fresh, evidence_refs=consensus_refs,
                      missing_reason="無分析師目標價"),
-        (Datum(key="target_vs_price", label="賣方目標價 vs 現價（不是預期報酬）",
-               value=target_vs_price, status="stale" if cons_fresh == "stale" else "available",
-               basis="deterministic", authority=A_SNAP, unit="ratio", as_of=cons_as_of,
-               method="analyst_target_mean / price − 1；同為報價單位，比值無單位",
-               evidence_refs=consensus_refs,
-               reason="賣方目標價是第三方觀點，不是 StockBot 的判斷、也不是報酬預期")
-         if target_vs_price is not None else
-         missing("target_vs_price", "賣方目標價 vs 現價（不是預期報酬）", "缺目標價或現價",
-                 authority=A_SNAP)),
         _observation("forward_pe", "forward P/E", c.forward_pe, authority=A_SNAP, unit="multiple",
                      as_of=cons_as_of, freshness=cons_fresh, evidence_refs=consensus_refs),
         _observation("trailing_pe", "trailing P/E", c.trailing_pe, authority=A_SNAP,
@@ -865,16 +926,19 @@ def build_alpha_investment_view(
                        source=checkpoint_source or A_THESIS_FILE)
         for cp in catalyst_checkpoints if cp.get("date")
     )
-    watch_state_datum = missing("watch_state", "到期／催化劑狀態", decision_facts_reason or "本次未讀 Decision Store",
-                                authority=A_CATALYST_STATE)
-    expiry_datum = missing("expiry", "decision 有效期（expiry）", decision_facts_reason or "本次未讀 Decision Store",
-                           authority=A_COVERAGE)
+    watch_state_datum = _absent("watch_state", "到期／催化劑狀態",
+                                decision_facts_reason or "本次未讀 Decision Store",
+                                status=decision_absent_status, authority=A_CATALYST_STATE)
+    expiry_datum = _absent("expiry", "decision 有效期（expiry）",
+                           decision_facts_reason or "本次未讀 Decision Store",
+                           status=decision_absent_status, authority=A_COVERAGE)
     problems: tuple[str, ...] = ()
     if decision_facts is not None:
+        # as-of 模式：以 as_of 當「今天」判到期；檢核點來自沒有歷史的 thesis 檔，已被清空。
         assessed = assess_entry(
             {"company_id": company_id, "ticker": ticker, "catalyst": decision_facts.catalyst,
              "disproof": decision_facts.disproof, "expiry": decision_facts.expiry},
-            today=today,
+            today=reference_day,
             checkpoints=[{"date": cp.date.isoformat(), "date_confidence": cp.date_confidence}
                          for cp in checkpoint_items],
         )
@@ -886,8 +950,9 @@ def build_alpha_investment_view(
                    "next_catalyst": assessed["next_catalyst"],
                    "next_catalyst_confidence": assessed["next_catalyst_confidence"]},
             status="available", basis="deterministic", authority=A_CATALYST_STATE,
-            method="shared.catalyst_state.assess_entry（與 scripts/catalyst_watch.py 同一支；只判日期，不解析散文）",
-            as_of=today,
+            method=("shared.catalyst_state.assess_entry（與 scripts/catalyst_watch.py 同一支；只判日期，不解析散文）"
+                    + (f"；as-of 模式以 {as_of_iso} 為今天、無檢核點" if as_of_mode else "")),
+            as_of=reference_day,
             reason="它是條件檢查不是訊號：只回答「你寫下的到期日今天到了沒」",
         )
         expiry_datum = _observation("expiry", "decision 有效期（expiry）", decision_facts.expiry,
@@ -900,19 +965,22 @@ def build_alpha_investment_view(
         stale=False, as_of=_as_date(decision_facts.coverage_created_at) if decision_facts else None,
         missing_reason=("cohort 的 catalyst 未填（L7：expiry 因此是沒有內容的鬧鐘）" if decision_facts
                         else decision_facts_reason or "本次未讀 Decision Store"),
+        absent_status=decision_absent_status,
     )
     has_catalyst = bool(structured or checkpoint_items or narrative_catalyst.is_known or q5.is_known)
     catalyst_section = CatalystSection(
         meta=SectionMeta(
             status="partial" if has_catalyst else "missing",
+            # 檢核點是人手填進 thesis JSON 的結構化紀錄（含 estimated 標記），是 observation
+            # 不是 deterministic；deterministic 的是 assess_entry 算出來的 watch_state。
             basis=("session_judgment" if structured or q5.is_known else
-                   "deterministic" if checkpoint_items else
+                   "observation" if checkpoint_items else
                    "narrative" if narrative_catalyst.is_known else "none"),
             authority=A_SESSION if structured else (checkpoint_source or A_COVERAGE),
             capability=CAP_CATALYST_UNLINKED,
             reason=("催化劑有結構化日期與狀態，但尚未量化連結到盈餘／重定價（partial capability）"
                     if has_catalyst else "沒有任何來源提供催化劑"),
-            as_of=today,
+            as_of=reference_day,
             warnings=("推估（estimated）日期照樣排程但必須標明；散文裡的日期不猜。",),
         ),
         catalyst_score=q5, structured=structured, checkpoints=checkpoint_items,
@@ -937,18 +1005,23 @@ def build_alpha_investment_view(
         stale=False, as_of=_as_date(decision_facts.coverage_created_at) if decision_facts else None,
         missing_reason=("cohort 的 disproof 未填（L7：沒有證偽條件的警報永遠不會響）" if decision_facts
                         else decision_facts_reason or "本次未讀 Decision Store"),
+        absent_status=decision_absent_status,
     )
     thesis_status_datum = (
         Datum(key="thesis_lifecycle_status", label="thesis lifecycle 狀態", value={
                   "status": thesis_status, "next_check": next_check,
                   "next_check_source": next_source,
                   "next_check_is_catalyst": next_source == CATALYST},
-              status="available", basis="deterministic", authority=A_THESIS_FILE,
-              method="thesis.lifecycle_schedule.effective_next_check（cadence 與催化劑取較早者）", as_of=today)
+              # `status` 是人在 lifecycle.json 手動維護的紀錄（observation）；
+              # 只有 next_check 是 lifecycle_schedule 算出來的，寫在 method 裡。
+              status="available", basis="observation", authority=A_THESIS_FILE,
+              method="status 由人維護於 thesis/lifecycle.json；next_check 由 "
+                     "thesis.lifecycle_schedule.effective_next_check 算出（cadence 與催化劑取較早者）",
+              as_of=reference_day)
         if thesis_lifecycle else
-        missing("thesis_lifecycle_status", "thesis lifecycle 狀態",
-                "這檔沒有 lane memo thesis（thesis/lifecycle.json 只涵蓋有 memo 的 thesis）",
-                authority=A_THESIS_FILE)
+        _absent("thesis_lifecycle_status", "thesis lifecycle 狀態",
+                pit_reason or "這檔沒有 lane memo thesis（thesis/lifecycle.json 只涵蓋有 memo 的 thesis）",
+                status=thesis_absent_status, authority=A_THESIS_FILE)
     )
     has_falsification = bool(conditions or narrative_disproof.is_known)
     falsification_section = FalsificationSection(
@@ -974,11 +1047,12 @@ def build_alpha_investment_view(
     # =======================================================================
     def _scenario(key: str, label: str, text: str | None) -> Datum:
         return _text_datum(key, label, text, basis="narrative", authority=A_SESSION,
-                           stale=signal_stale, as_of=judged_on, missing_reason=no_signal)
+                           stale=signal_stale, as_of=judged_on, missing_reason=no_signal,
+                           absent_status=signal_absent_status)
 
     scenario_section = ScenarioSection(
         meta=SectionMeta(
-            status=("stale" if signal_stale else "available") if signal else "missing",
+            status=("stale" if signal_stale else "available") if signal else signal_absent_status,
             basis="narrative" if signal else "none", authority=A_SESSION if signal else None,
             capability=CAP_NARRATIVE_SCENARIOS, as_of=judged_on,
             reason=("bull／base／bear 是 session 寫的散文，沒有機率、沒有目標估值" if signal else no_signal),
@@ -1006,7 +1080,8 @@ def build_alpha_investment_view(
         "系統不產生預期報酬：沒有內部估計、沒有目標估值、沒有機率加權。等權重報酬追蹤（outcome）是事後量測，不是預期。",
         (("expected_return", "預期報酬"), ("probability_weighted_return", "機率加權報酬"),
          ("target_valuation_upside", "目標估值上檔")),
-        ("consensus.target_vs_price 是賣方目標價，不是 StockBot 預期報酬",
+        ("consensus.target_mean 是賣方目標價，不是 StockBot 預期報酬；"
+         "目標價 vs 現價的比值住 scripts/alpha_expectation_gap.py",
          "price_implied_expectations.market_implied_eps_growth 是市場已定價的成長，不是我們預期的報酬"),
     )
     downside_section = _not_modeled_section(
@@ -1019,7 +1094,7 @@ def build_alpha_investment_view(
         (("required_return", "要求報酬"), ("entry_price", "進場價"),
          ("wait_for_price_threshold", "等待價位門檻"), ("actionable_now", "現在可行動")),
         ("structural_thesis.ranking 是 rank_bottlenecks 的研究注意力順序，不是 opportunity ranking",
-         "identity.lifecycle.attention（MONITOR／REVIEW）是「今天要不要看」，不是「該不該買」"),
+         "decision_lab today 的 attention（MONITOR／REVIEW）是「今天要不要看」，不是「該不該買」；本 view 不重算它"),
     )
 
     # =======================================================================
@@ -1076,10 +1151,16 @@ def build_alpha_investment_view(
     freshness_items.append(FreshnessItem(
         source="decision_store_coverage",
         status="available" if decision_facts and dec_as_of else "missing",
-        as_of=dec_as_of, age_days=float((today - dec_as_of).days) if dec_as_of else None,
-        reason=None if dec_as_of else (decision_facts_reason or "無 coverage assessment")))
+        as_of=dec_as_of, age_days=float((reference_day - dec_as_of).days) if dec_as_of else None,
+        reason=(None if dec_as_of else (decision_facts_reason or "無 coverage assessment"))
+        if not (dec_as_of and as_of_mode) else f"距 as-of {as_of_iso} 的天數；事實已依 as_of 歷史過濾"))
 
     warnings = [JUDGMENT_WARNING, CORRELATION_WARNING]
+    if as_of_mode:
+        warnings.append(
+            f"as-of 視角（{as_of_iso}）：Engine A 投影、Engine C 時序、Decision Store 事實皆已依 as_of "
+            "歷史過濾（cohort／decision／coverage／lifecycle 事件／variant perception 的時間戳）；"
+            "thesis/*.json 與檢核點沒有歷史，一律 not_applicable；到期狀態以 as_of 為今天判定")
     if signal_stale:
         warnings.append("session 判斷過期：" + str(stale_reason))
     if signal is None:
@@ -1159,17 +1240,21 @@ def compact_card(view: AlphaInvestmentView) -> dict[str, Any]:
             "days_to_expiry": (watch.value or {}).get("days_to_expiry") if watch.is_known else None,
             "next_checkpoint": next_cp.date.isoformat() if next_cp else None,
             "next_checkpoint_confidence": next_cp.date_confidence if next_cp else None,
-            "structured_count": len(view.catalysts.structured),
-            "checkpoint_count": len(view.catalysts.checkpoints),
+            # None＝不知道（沒有 session 判斷／as-of 模式沒有投影），不是 0
+            "structured_count": (len(view.catalysts.structured)
+                                 if view.identity.signal.has_signal else None),
+            "checkpoint_count": (len(view.catalysts.checkpoints)
+                                 if view.identity.point_in_time_mode == "current" else None),
             "reason": None if watch.is_known else watch.reason,
         },
         "disproof": {
-            "condition_count": len(view.falsification.conditions),
+            "condition_count": (len(view.falsification.conditions)
+                                if view.identity.signal.has_signal else None),
             "narrative_present": view.falsification.narrative_disproof.is_known,
             "problems": list(view.catalysts.problems),
         },
-        "attention": view.identity.lifecycle.attention,
         "research_status": view.identity.lifecycle.research_status,
+        "point_in_time_mode": view.identity.point_in_time_mode,
         "not_modeled": not_modeled_keys,
         "warnings": list(view.warnings),
     }

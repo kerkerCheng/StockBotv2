@@ -93,7 +93,8 @@ def _entry(
         "relation": row.get("relation"),
         "bottleneck": row.get("bottleneck"),
         "substitutability": row.get("substitutability"),
-        "sole_source": bool(row.get("sole_source")),
+        # 三態原樣傳下去：None＝未填，不是 False（`rank_bottlenecks` 自 2026-09-05 起保留 None）
+        "sole_source": row.get("sole_source"),
         "qualification_status": row.get("qualification_status"),
         "evidence": row.get("evidence"),
         "demand_anchor": anchor,

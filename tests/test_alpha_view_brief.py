@@ -38,7 +38,7 @@ def _card(ticker: str = "COHR") -> dict:
                      "next_checkpoint": "2026-12-01", "next_checkpoint_confidence": "estimated",
                      "structured_count": 0, "checkpoint_count": 1, "reason": None},
         "disproof": {"condition_count": 3, "narrative_present": True, "problems": []},
-        "attention": None, "research_status": "READY",
+        "research_status": "READY", "point_in_time_mode": "current",
         "not_modeled": ["internal_fundamentals", "earnings_bridge", "expected_return", "downside",
                         "entry_logic"],
         "warnings": [],
@@ -162,3 +162,142 @@ def test_briefing_cli_reports_unknown_ticker_without_traceback(capsys: pytest.Ca
     rc = cli.main(["alpha-card", "NOT_A_TICKER_XYZ", "--no-causal"])
     assert rc == 2
     assert "registry 找不到" in capsys.readouterr().err
+
+
+def test_company_decision_facts_reads_only_research_fields_from_a_real_store(tmp_path: Path) -> None:
+    """Engine D 自己的唯讀查詢：對真實 schema 的 store 建一筆 decision，再用 `mode=ro` 連線讀。
+    回傳裡不得出現任何部位／NAV／cap 欄位。"""
+    import sqlite3
+
+    from decision_lab.coverage_queries import company_decision_facts
+    from tests.test_action_card import _decision
+
+    store = _store(tmp_path)
+    try:
+        decision = _decision(store, key="facts-ro")
+        cohort_id = store.get_decision(decision.decision_id)["cohort_id"]
+        company_id = store._conn.execute(  # noqa: SLF001 — 只為取測試 fixture 的 company_id
+            "SELECT company_id FROM decision_cohorts WHERE cohort_id = ?", (cohort_id,)
+        ).fetchone()["company_id"]
+        db_path = Path(store.path)
+    finally:
+        store.close()
+
+    conn = sqlite3.connect(f"file:{db_path.as_posix()}?mode=ro", uri=True)
+    conn.row_factory = sqlite3.Row
+    try:
+        facts = company_decision_facts(conn, str(company_id))
+    finally:
+        conn.close()
+    assert facts is not None
+    assert facts["cohort_id"] == cohort_id
+    assert facts["cohort_count"] == 1
+    assert facts["selection_rule"]
+    assert "research_status" in facts and "legacy_axis_levels" in facts
+    banned = {"live_current_position", "single_position_nav_cap", "live_blockers", "paper_blockers",
+              "nav", "selected_weight", "shares"}
+    assert not (set(facts) & banned), set(facts) & banned
+    # 沒有這家公司 → None（不是空 dict）
+    conn = sqlite3.connect(f"file:{db_path.as_posix()}?mode=ro", uri=True)
+    conn.row_factory = sqlite3.Row
+    try:
+        assert company_decision_facts(conn, "co:nobody_here") is None
+    finally:
+        conn.close()
+
+
+def test_fetch_alpha_cards_shares_one_provider_across_tickers(monkeypatch: pytest.MonkeyPatch) -> None:
+    """整批共用 provider：不得每檔各開一次 Neo4j／重算一次排序。"""
+    from briefing.alpha_view import sources
+
+    seen: list[object] = []
+
+    def fake_fetch(ticker: str, **kwargs):
+        seen.append(kwargs.get("graph_provider"))
+        from tests.test_alpha_investment_view import _view
+
+        return _view()
+
+    monkeypatch.setattr(sources, "fetch_alpha_investment_view", fake_fetch)
+    sentinel = object()
+    sources.fetch_alpha_cards(["COHR", "LITE", "AXTI"], graph_provider=sentinel,
+                              fundamentals_provider=object())
+    assert seen == [sentinel, sentinel, sentinel]
+
+
+def test_alpha_cards_render_unknown_condition_count_as_unknown_not_zero() -> None:
+    from briefing.alpha_view import render_alpha_cards
+
+    card = _card()
+    card["signal"]["has_signal"] = False
+    card["disproof"]["condition_count"] = None
+    row = next(line for line in render_alpha_cards([card]) if line.startswith("| co:coherent"))
+    assert "結構化：未知" in row and "0 條" not in row
+
+
+def test_company_decision_facts_filters_history_by_as_of(tmp_path: Path) -> None:
+    """Decision Store 有時間戳，所以 as-of 是**真正的過濾**：decision 生效日（2026-07-21）之前
+    問 → None；之後問 → 事實帶 `point_in_time.as_of`。"""
+    import sqlite3
+
+    from decision_lab.coverage_queries import company_decision_facts
+    from tests.test_action_card import _decision
+
+    store = _store(tmp_path)
+    try:
+        decision = _decision(store, key="facts-asof")
+        cohort_id = store.get_decision(decision.decision_id)["cohort_id"]
+        company_id = store._conn.execute(  # noqa: SLF001
+            "SELECT company_id FROM decision_cohorts WHERE cohort_id = ?", (cohort_id,)
+        ).fetchone()["company_id"]
+        db_path = Path(store.path)
+    finally:
+        store.close()
+
+    from datetime import date as _date, timedelta
+
+    conn = sqlite3.connect(f"file:{db_path.as_posix()}?mode=ro", uri=True)
+    conn.row_factory = sqlite3.Row
+    try:
+        # fixture 的 cohort `created_at` 是真實寫入時間（今天），decision `effective_at` 是固定的
+        # 2026-07-21；截止日以 cohort 建立日為錨，前一天問 → 什麼都不知道。
+        created = _date.fromisoformat(str(conn.execute(
+            "SELECT created_at FROM decision_cohorts WHERE cohort_id = ?", (cohort_id,)
+        ).fetchone()["created_at"])[:10])
+        before = company_decision_facts(conn, str(company_id), as_of=(created - timedelta(days=1)).isoformat())
+        on_day = company_decision_facts(conn, str(company_id), as_of=created.isoformat())
+        current = company_decision_facts(conn, str(company_id))
+    finally:
+        conn.close()
+    assert before is None, "cohort 建立前一天，Engine D 對這家公司什麼都不知道"
+    assert on_day is not None and on_day["point_in_time"] == {"mode": "as_of", "as_of": created.isoformat()}
+    assert on_day["decision_effective_at"].startswith("2026-07-21")
+    assert current["point_in_time"] == {"mode": "current", "as_of": None}
+    assert current["decision_effective_at"] == on_day["decision_effective_at"]
+
+
+def test_sources_pass_as_of_into_decision_store_query(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    """取數層在 as-of 模式下把 as_of 交給 Engine D 的唯讀查詢，並把回報的時點標記帶進 DecisionFacts。"""
+    from briefing.alpha_view import sources
+
+    calls: list[tuple[str, str | None]] = []
+
+    def fake_facts(conn, company_id, *, as_of=None):
+        calls.append((company_id, as_of))
+        return {"cohort_id": "dc_x", "cohort_count": 1, "selection_rule": "r",
+                "point_in_time": {"mode": "as_of" if as_of else "current", "as_of": as_of},
+                "catalyst": "x", "disproof": "y", "expiry": "2026-11-30T00:00:00+00:00",
+                "coverage_created_at": "2026-08-15 03:06:02"}
+
+    db = tmp_path / "decision_lab.db"
+    db.write_bytes(b"")
+    monkeypatch.setattr(sources, "DECISION_DB", db)
+    import decision_lab.coverage_queries as cq
+
+    monkeypatch.setattr(cq, "company_decision_facts", fake_facts)
+    facts, reason = sources._decision_facts("co:coherent", as_of=date(2026, 8, 15))  # noqa: SLF001
+    assert reason is None and facts is not None
+    assert calls == [("co:coherent", "2026-08-15")]
+    assert facts.point_in_time_as_of == "2026-08-15" and facts.point_in_time_mode == "as_of"
+    facts_now, _ = sources._decision_facts("co:coherent", as_of=None)  # noqa: SLF001
+    assert facts_now.point_in_time_as_of is None and facts_now.point_in_time_mode == "current"

@@ -702,10 +702,14 @@ class Neo4jGraphResearchProvider:
                 "capacity_constraint",
                 "tightening" if new_sub > old_sub else "loosening",
                 f"substitutability {old_sub} → {new_sub}"))
-        if bool(new.get("sole_source")) and not bool(old.get("sole_source")):
+        # sole_source 是三態（True／False／None＝未填）。只有**明確**的轉換才是事件：
+        # 未填→是 是新資訊（收緊）；是→否 是鬆動；是→未填 只是屬性從最可信文件上消失，
+        # 那是我們的資料變了，不是世界變了，不產生事件。
+        old_sole, new_sole = old.get("sole_source"), new.get("sole_source")
+        if new_sole is True and old_sole is not True:
             out.append(("capacity_constraint", "tightening",
-                        "sole_source 由否轉是"))
-        elif bool(old.get("sole_source")) and not bool(new.get("sole_source")):
+                        f"sole_source 由{'否' if old_sole is False else '未填'}轉是"))
+        elif old_sole is True and new_sole is False:
             out.append(("capacity_constraint", "loosening",
                         "sole_source 由是轉否"))
         old_q = str(old.get("qualification_status") or "")

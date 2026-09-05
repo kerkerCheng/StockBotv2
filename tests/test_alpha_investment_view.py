@@ -236,8 +236,8 @@ def test_analyst_target_is_not_expected_return() -> None:
     assert any("賣方目標價" in x for x in view.expected_return.not_to_be_confused_with)
     target = next(d for d in view.consensus.items if d.key == "target_mean")
     assert target.is_known and "不是本系統的預期報酬" in target.label
-    ratio = next(d for d in view.consensus.items if d.key == "target_vs_price")
-    assert ratio.is_known and "不是預期報酬" in ratio.label
+    # view 不自己算目標價 vs 現價的比值：那是 scripts/alpha_expectation_gap.py 的產出（審計第 5 條）
+    assert not any(d.key == "target_vs_price" for d in view.consensus.items)
     payload = view.to_dict()["expected_return"]
     numeric = [(p, v) for p, k, v in _walk(payload) if isinstance(v, (int, float)) and not isinstance(v, bool)]
     assert not numeric, f"expected_return 出現數值：{numeric}"
@@ -518,3 +518,144 @@ def test_fixed_warnings_are_always_present() -> None:
     for view in (_view(), _view(with_signal=False)):
         assert any("同一賭注" in w for w in view.warnings)
         assert any("不是回測" in w for w in view.warnings)
+
+
+# ---------------------------------------------------------------------------
+# 審計修正（2026-09-05）：as-of 拒答、basis 重貼標、精簡卡零值、上游壓平標註
+# ---------------------------------------------------------------------------
+
+def _as_of_build(as_of: date):
+    from alpha.testing import as_of_capable
+
+    provider = as_of_capable(FakeGraphResearchProvider(
+        company_id=COMPANY, evidence_pool=(_CORROBORATED, _SELF_REPORTED)))
+    return build_research_context(ticker=TICKER, company_id=COMPANY, graph_provider=provider,
+                                  fundamentals_provider=_FakeFundamentals(), as_of=as_of)
+
+
+def test_as_of_mode_refuses_sources_without_point_in_time_projection() -> None:
+    """INV-6：Decision Store／thesis 檔沒有時點投影，as-of 視角下必須 `not_applicable`，
+    **即使呼叫端不小心把當前值傳進來**（builder 自己擋，不靠 sources 記得）。"""
+    build = _as_of_build(date(2026, 6, 30))
+    view = build_alpha_investment_view(
+        build=build, decision_facts=_facts(),                       # 故意傳當前值
+        catalyst_checkpoints=[{"date": date(2026, 12, 1), "what": "x", "decides": "",
+                               "date_confidence": "estimated"}],   # 故意傳當前檢核點
+        thesis_lifecycle={"status": "active", "ticker": "COHR", "next_check": "2026-10-15"},
+        today=TODAY,
+    )
+    assert view.identity.point_in_time_mode == "as_of"
+    for datum in (view.catalysts.narrative, view.catalysts.watch_state, view.catalysts.expiry,
+                  view.falsification.narrative_disproof, view.falsification.thesis_status,
+                  view.variant_view.decision_store_variant_perception):
+        assert datum.status == "not_applicable", datum.key
+        assert datum.value is None
+        assert "INV-6" in (datum.reason or ""), datum.key
+    assert view.catalysts.checkpoints == ()
+    assert view.identity.lifecycle.research_status is None
+    assert "INV-6" in (view.identity.lifecycle.reason or "")
+    assert any("as-of 視角" in w for w in view.warnings)
+    # Engine A／C 的切片仍然是 T 時刻的：evidence index 裡沒有晚於 as_of 的引用
+    assert all(i.published_at is None or i.published_at <= date(2026, 6, 30)
+               for i in view.evidence.index)
+    card = compact_card(view)
+    assert card["catalyst"]["checkpoint_count"] is None and card["point_in_time_mode"] == "as_of"
+
+
+def test_current_mode_keeps_decision_facts() -> None:
+    """對照組：當前視角下 Decision Store 事實正常呈現（確認上一條不是把功能拿掉）。"""
+    view = _view()
+    assert view.identity.point_in_time_mode == "current"
+    assert view.catalysts.watch_state.is_known
+    assert view.falsification.narrative_disproof.is_known
+
+
+def test_compact_card_counts_are_none_not_zero_without_a_signal() -> None:
+    """精簡卡的 JSON 也要守 Missing != Zero：沒有 session 判斷時條數是不知道，不是 0。"""
+    card = compact_card(_view(with_signal=False))
+    assert card["disproof"]["condition_count"] is None
+    assert card["catalyst"]["structured_count"] is None
+    assert card["signal"]["has_signal"] is False
+    with_signal = compact_card(_view())
+    assert with_signal["disproof"]["condition_count"] == 1
+    assert with_signal["catalyst"]["structured_count"] == 0     # 有判斷、判斷裡沒有催化劑＝知道是 0
+
+
+def test_human_entered_checkpoints_are_observation_not_deterministic() -> None:
+    """thesis JSON 裡人手填的檢核點與 status 是 observation；deterministic 的只有 assess_entry。"""
+    view = _view(with_signal=False)
+    assert view.catalysts.checkpoints                              # 只有檢核點、沒有 session 催化劑
+    assert view.catalysts.meta.basis == "observation"
+    assert view.catalysts.watch_state.basis == "deterministic"
+    assert view.falsification.thesis_status.basis == "observation"
+    assert "lifecycle_schedule" in (view.falsification.thesis_status.method or "")
+
+
+def test_as_of_mode_accepts_decision_facts_that_carry_a_matching_as_of_marker() -> None:
+    """Decision Store 有時間戳，`company_decision_facts(as_of=…)` 做過歷史過濾的事實**可以**進
+    歷史卡；到期狀態以 as_of 當今天判定，不用真實今天。"""
+    as_of = date(2026, 8, 15)
+    build = _as_of_build(as_of)
+    facts = _facts(point_in_time_mode="as_of", point_in_time_as_of="2026-08-15",
+                   coverage_created_at="2026-08-15 03:06:02", expiry="2026-11-30T00:00:00+00:00")
+    view = build_alpha_investment_view(build=build, decision_facts=facts, today=TODAY)
+    assert view.catalysts.narrative.is_known
+    watch = view.catalysts.watch_state
+    assert watch.is_known and watch.as_of == as_of
+    assert watch.value["days_to_expiry"] == (date(2026, 11, 30) - as_of).days   # 以 as_of 為今天
+    assert "as-of 模式以 2026-08-15 為今天" in (watch.method or "")
+    assert view.identity.lifecycle.decision_facts_as_of == "2026-08-15"
+    # thesis 檔仍然沒有歷史 → 仍是 not_applicable
+    assert view.falsification.thesis_status.status == "not_applicable"
+    coverage_fresh = next(f for f in view.freshness if f.source == "decision_store_coverage")
+    assert coverage_fresh.age_days == 0.0 and "as-of" in (coverage_fresh.reason or "")
+
+
+def test_as_of_mode_reports_missing_when_authority_answers_none_as_of_t() -> None:
+    """authority 回答「T 時刻沒有 cohort」是 missing（有能力、當時沒資料），不是 not_applicable。"""
+    build = _as_of_build(date(2026, 6, 30))
+    view = build_alpha_investment_view(
+        build=build, decision_facts=None,
+        decision_facts_reason="截至 as-of 2026-06-30，Engine D 尚無此公司的 cohort（歷史過濾後為空）",
+        today=TODAY,
+    )
+    assert view.catalysts.narrative.status == "missing"
+    assert "尚無" in (view.catalysts.narrative.reason or "")
+    assert view.falsification.thesis_status.status == "not_applicable"      # thesis 檔無歷史
+
+
+def test_compact_card_serializes_unknown_counts_as_json_null() -> None:
+    payload = json.loads(json.dumps(compact_card(_view(with_signal=False)), ensure_ascii=False))
+    assert payload["disproof"]["condition_count"] is None
+    assert payload["catalyst"]["structured_count"] is None
+    text = json.dumps(payload, ensure_ascii=False)
+    assert '"condition_count": null' in text and '"condition_count": 0' not in text
+
+
+def test_lifecycle_facts_have_no_permanently_empty_attention_field() -> None:
+    from briefing.alpha_view.contracts import LifecycleFacts
+
+    assert "attention" not in {f.name for f in LifecycleFacts.__dataclass_fields__.values()}
+
+
+def test_as_of_mode_refuses_a_session_judgment_written_after_the_cutoff() -> None:
+    """09-04 寫的判斷不得出現在 08-15 的歷史卡上：那是 T 之後的知識（lookahead），
+    就算標 stale 也不行——builder 直接拒用並說明，Q2–Q5 與 thesis 全部 not_applicable。"""
+    as_of = date(2026, 8, 15)
+    build = _as_of_build(as_of)
+    signal = compose_signal(build, _judgment())                       # _produced_at = 2026-09-04
+    view = build_alpha_investment_view(build=build, signal=signal, today=TODAY)
+    assert view.identity.signal.has_signal is False
+    assert "lookahead" in (view.identity.signal.reason or "")
+    assert view.variant_view.meta.status == "not_applicable"
+    assert view.variant_view.thesis.status == "not_applicable"
+    scores = {d.key: d for d in view.variant_view.scores}
+    assert scores["structural_score"].is_known                        # Q1 是 T 時刻圖投影算的
+    assert all(scores[k].status == "not_applicable" for k in scores if k != "structural_score")
+    assert view.scenarios.meta.status == "not_applicable"
+    assert view.catalysts.meta.as_of == as_of
+    # 對照：判斷日期早於或等於 as_of 就可以用（只是照舊會因 digest 不同標 stale）
+    early = compose_signal(build, _judgment(_produced_at="2026-08-01"), allow_stale_context=True)
+    view_ok = build_alpha_investment_view(build=build, signal=early, today=TODAY)
+    assert view_ok.identity.signal.has_signal is True
+    assert view_ok.identity.signal.judged_at == "2026-08-01"

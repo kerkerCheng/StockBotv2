@@ -412,7 +412,11 @@ def rank_bottlenecks(
                 "relation": edge.relation,
                 "bottleneck": edge.dst,
                 "substitutability": edge.substitutability,
-                "sole_source": bool(edge.sole_source),
+                # ⚠ 三態：True／False／None。None＝圖上沒有任何文件對這條邊的 sole_source
+                # 發言過（未填），**不是** False。2026-09-05 之前這裡是 `bool(...)`，把
+                # 「不知道」壓成「否」，下游（read model、Q1 佐證）就再也分不出兩者。
+                # 排序鍵仍用 `1 if sole_source else 0`（None 與 False 同為 0），排序不變。
+                "sole_source": edge.sole_source,
                 "qualification_status": edge.qualification_status,
                 "ramp_execution": edge.ramp_execution,
                 "lead_time_weeks": edge.lead_time_weeks,

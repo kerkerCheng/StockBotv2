@@ -668,8 +668,8 @@ ules\stockbot-automations.rules `
 
 | 入口 | side effect | OS／network capability | 判定 |
 |---|---|---|---|
-| `python -m briefing alpha-card` | 唯讀；讀 Neo4j＋Engine C SQLite＋Decision Store＋thesis JSON | 與 `decision_lab today` 相同的本機資源，無新增網路主機、憑證或 identity／ACL 呼叫 | **互動專用**。新 CLI 名稱，不進 unattended rule |
-| `python -m decision_lab today`（既有 fixed entry） | 新增「Alpha Card 摘要」區：對排序前 5 檔各讀一次 Neo4j／Engine C／Decision Store | **無新增 capability**——三者 `today` 原本就讀（ranking、`_read_financial`、store）；全程 fail-soft，讀不到只讓該區寫「未提供」 | 命令字串未變、rule 未動 |
+| `python -m briefing alpha-card` | 唯讀；讀 Neo4j＋Engine C SQLite＋Decision Store（`mode=ro` sqlite，不開可寫 store）＋thesis JSON | 與 `decision_lab today` 相同的本機資源，無新增網路主機、憑證或 identity／ACL 呼叫 | **互動專用**。新 CLI 名稱，不進 unattended rule |
+| `python -m decision_lab today`（既有 fixed entry） | 新增「Alpha Card 摘要」區：對排序前 5 檔組卡；整批共用一個 Neo4j provider（排序只算一次）與一個 Engine C provider，Decision Store 走唯讀連線 | **無新增 capability**——三者 `today` 原本就讀（ranking、`_read_financial`、store）；全程 fail-soft，讀不到只讓該區寫「未提供」 | 命令字串未變、rule 未動。實測 `today` 全程 104 秒（含 Sheet 與 Neo4j），Alpha Card 區單獨計時見 ROADMAP 該列 |
 
 查證（新入口不該出現在 rules；十六條 fixed entry 數量未變）：
 ```powershell

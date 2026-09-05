@@ -76,66 +76,40 @@ def _compose_signal(
         return None, f"判斷檔未通過契約驗證：{str(exc)[:200]}"
 
 
-def _decision_facts(company_id: str, today: date) -> tuple[DecisionFacts | None, str | None]:
-    """Engine D 的公開 cohort 事實。⚠ 只取列名的欄位，部位／NAV 欄位一個都不碰。"""
+def _decision_facts(company_id: str, *, as_of: date | None) -> tuple[DecisionFacts | None, str | None]:
+    """Engine D 的公開 cohort 事實。
+
+    - **唯讀 sqlite 連線**（`mode=ro`），與 `scripts/catalyst_watch.py` 同一條窄路徑；
+      不開可寫的 `DecisionStore`。
+    - schema 知識住 Engine D 自己的 `decision_lab.coverage_queries.company_decision_facts`，
+      這裡不寫 SQL；該函式只回研究欄位，部位／NAV／cap 一個都不會出現。
+    - `as_of` 非 None 時做**歷史過濾**（Decision Store 每張表都帶時間戳，答得出「T 時刻
+      知道什麼」），回傳值帶 `point_in_time_as_of`，builder 會核對它與 context.as_of 相符。
+    """
     if not DECISION_DB.is_file():
         return None, "本機沒有 Decision Store"
     try:
-        from decision_lab.bootstrap import open_default_store
-        from decision_lab.coverage_queries import latest_coverage_assessments
+        from decision_lab.coverage_queries import company_decision_facts
 
-        store = open_default_store()
+        conn = sqlite3.connect(f"file:{DECISION_DB.as_posix()}?mode=ro", uri=True)
     except Exception as exc:  # noqa: BLE001 — surface 缺席只降級
         return None, f"Decision Store 無法開啟：{type(exc).__name__}"
+    conn.row_factory = sqlite3.Row
     try:
-        now_iso = f"{today.isoformat()}T23:59:59+00:00"
-        cohorts = [c for c in store.list_operational_cohorts(as_of=now_iso)
-                   if str(c.get("company_id")) == company_id]
-        if not cohorts:
-            return None, "Engine D 沒有這家公司的 cohort"
-        # 同公司多個 cohort 時取最新建立的那個；不合併、不加總。
-        cohort = cohorts[-1]
-        facts: dict[str, Any] = {
-            "cohort_id": str(cohort.get("cohort_id")),
-            "lifecycle_status": cohort.get("lifecycle_status"),
-            "review_due_at": cohort.get("review_due_at"),
-        }
-        decision_id = cohort.get("latest_decision_id")
-        if decision_id:
-            decision = store.get_decision(str(decision_id))
-            sizing = (decision.get("payload") or {}).get("sizing") or {}
-            facts["decision_effective_at"] = decision.get("effective_at")
-            facts["research_status"] = sizing.get("research_status")
-            facts["legacy_weakest_axis"] = sizing.get("weakest_axis")
-            facts["legacy_axis_levels"] = {
-                str(axis): str(item.get("effective_level") or item.get("level") or "unknown")
-                for axis, item in (sizing.get("axis_results") or {}).items()
-                if isinstance(item, Mapping)
-            }
-        vp = store.latest_variant_perception_for_company(company_id)
-        if vp:
-            facts["variant_perception"] = vp.get("variant_perception")
-            facts["variant_perception_created_at"] = vp.get("created_at")
-        # coverage assessment 的 catalyst／disproof／expiry 原文：走既有唯讀查詢
-        conn = sqlite3.connect(f"file:{DECISION_DB.as_posix()}?mode=ro", uri=True)
-        conn.row_factory = sqlite3.Row
-        try:
-            for entry in latest_coverage_assessments(conn):
-                if str(entry.get("company_id")) == company_id:
-                    facts["catalyst"] = entry.get("catalyst")
-                    facts["disproof"] = entry.get("disproof")
-                    facts["expiry"] = entry.get("expiry")
-                    facts["coverage_created_at"] = entry.get("created_at")
-                    break
-        finally:
-            conn.close()
-        return DecisionFacts(**facts), None
+        facts = company_decision_facts(
+            conn, company_id, as_of=as_of.isoformat() if as_of else None)
     except Exception as exc:  # noqa: BLE001
         return None, f"Decision Store 讀取失敗：{type(exc).__name__}"
     finally:
-        close = getattr(store, "close", None)
-        if callable(close):
-            close()
+        conn.close()
+    if facts is None:
+        return None, (f"截至 as-of {as_of.isoformat()}，Engine D 尚無此公司的 cohort（歷史過濾後為空）"
+                      if as_of else "Engine D 沒有這家公司的 cohort")
+    point_in_time = dict(facts.pop("point_in_time", None) or {})
+    facts["point_in_time_mode"] = point_in_time.get("mode")
+    facts["point_in_time_as_of"] = point_in_time.get("as_of")
+    allowed = {f.name for f in DecisionFacts.__dataclass_fields__.values()}
+    return DecisionFacts(**{k: v for k, v in facts.items() if k in allowed}), None
 
 
 def _thesis_lifecycle_entry(ticker: str) -> Mapping[str, Any] | None:
@@ -251,14 +225,19 @@ def fetch_alpha_investment_view(
             if callable(close):
                 close()
 
-    decision_facts, decision_reason = _decision_facts(str(company_id), today)
-    try:
-        from thesis.lifecycle_schedule import checkpoints_by_ticker
+    decision_facts, decision_reason = _decision_facts(str(company_id), as_of=as_of)
+    # thesis/lifecycle.json 與 catalyst_calendar.json 是當前狀態檔，沒有歷史；as-of 模式不讀，
+    # builder 端也會再擋一次（雙保險，讓「忘了在這裡跳過」不會變成靜默的當前值）。
+    checkpoints: list[Mapping[str, Any]] = []
+    lifecycle_entry: Mapping[str, Any] | None = None
+    if as_of is None:
+        try:
+            from thesis.lifecycle_schedule import checkpoints_by_ticker
 
-        checkpoints = checkpoints_by_ticker().get(str(resolved_ticker), [])
-    except Exception:  # noqa: BLE001
-        checkpoints = []
-    lifecycle_entry = _thesis_lifecycle_entry(str(resolved_ticker))
+            checkpoints = checkpoints_by_ticker().get(str(resolved_ticker), [])
+        except Exception:  # noqa: BLE001
+            checkpoints = []
+        lifecycle_entry = _thesis_lifecycle_entry(str(resolved_ticker))
     checkpoint_source = "thesis://lifecycle.json" if lifecycle_entry else "thesis://catalyst_calendar.json"
     try:
         from engine_c.checklist import get_checklist
@@ -298,17 +277,51 @@ def tickers_from_ranking(ranking: Mapping[str, Any] | None, *, limit: int = 5) -
     return seen
 
 
-def fetch_alpha_cards(tickers: Iterable[str], *, today: date | None = None) -> list[dict[str, Any]]:
+def fetch_alpha_cards(
+    tickers: Iterable[str], *, today: date | None = None,
+    graph_provider: Any = None, fundamentals_provider: Any = None,
+) -> list[dict[str, Any]]:
     """Daily Brief 用：每檔一張精簡卡。單檔失敗只降級成 `status=unavailable` 那一列，
-    不丟掉、不阻斷（INV-3）。"""
-    cards: list[dict[str, Any]] = []
-    for ticker in tickers:
+    不丟掉、不阻斷（INV-3）。
+
+    provider **整批共用一份**：Neo4j provider 會把 `rank_bottlenecks()` 快取在 instance 上，
+    每檔各開一個 driver 等於把 663 條 assertion 的排序算 N 次。呼叫端沒注入時這裡開一次、
+    最後關一次。
+    """
+    tickers = list(tickers)
+    if not tickers:
+        return []
+    owns_graph = graph_provider is None
+    if graph_provider is None:
         try:
-            view = fetch_alpha_investment_view(str(ticker), today=today, include_causal=False)
-            cards.append(compact_card(view))
-        except Exception as exc:  # noqa: BLE001 — 一檔讀不到不讓整個摘要消失
-            cards.append({"ticker": str(ticker), "status": "unavailable",
-                          "reason": type(exc).__name__})
+            from alpha.providers.graph_neo4j import open_default_provider
+
+            graph_provider = open_default_provider()
+        except Exception as exc:  # noqa: BLE001 — 圖開不了就每檔都 unavailable，原因帶著
+            return [{"ticker": str(t), "status": "unavailable", "reason": type(exc).__name__}
+                    for t in tickers]
+    if fundamentals_provider is None:
+        from alpha.providers.fundamentals import EngineCFundamentalsProvider
+
+        fundamentals_provider = EngineCFundamentalsProvider()
+    cards: list[dict[str, Any]] = []
+    try:
+        for ticker in tickers:
+            try:
+                view = fetch_alpha_investment_view(
+                    str(ticker), today=today, include_causal=False,
+                    graph_provider=graph_provider, fundamentals_provider=fundamentals_provider,
+                )
+                cards.append(compact_card(view))
+            except Exception as exc:  # noqa: BLE001 — 一檔讀不到不讓整個摘要消失
+                cards.append({"ticker": str(ticker), "status": "unavailable",
+                              "reason": type(exc).__name__})
+    finally:
+        if owns_graph:
+            driver = getattr(graph_provider, "driver", None)
+            close = getattr(driver, "close", None)
+            if callable(close):
+                close()
     return cards
 
 
