@@ -61,6 +61,8 @@ Engine D（decision_lab/）— 凍結 context、記錄 live choice、outcome att
 **依賴方向只准 peripheral → core。** `alpha/` 的契約與模型層零外部相依
 （`tests/test_layer_separation.py::FORBIDDEN_IN_ALPHA`），唯一允許碰外部世界的是
 `alpha/providers/`。`audit/` 是 composition root：它看得到所有層，所有層看不到它。
+`briefing/` 是 daily brief 與 **Alpha Investment Read Model**（§6.1）的組裝層，同樣看得到
+所有層；Engine D 的 domain 模組不得 import 它（`FORBIDDEN_FOR_ENGINE_D`）。
 
 **MCP／remote access 是 Legacy Peripheral，不是核心。** 新核心必須能在完全沒有 MCP
 的情況下運作；`Core → mcp_server` 的 import 已於 Phase 3 歸零。
@@ -178,6 +180,70 @@ alpha 排序必須**消費**它，不得重算結構分，也不得繞過它自�
 前後段都不是獨立賭注；輸出強制列逐檔報酬與「這期主要由誰決定」。
 
 ---
+
+### 6.1 Alpha Investment Read Model（`briefing/alpha_view/`，2026-09-05）
+
+**角色一句話：StockBot 對一家公司目前投資理解的 canonical、machine-readable 表示。**
+Alpha Card 只是它的一個 consumer。它是 **composition／read model，不是新的 authority**——
+不重算 Q1–Q5、不重排、不算估值、不判定催化劑狀態，只做**選取、正規化、語意標註、組裝、
+序列化**。
+
+```
+GraphResearchProvider ─┐
+Engine C provider ─────┼─► alpha.context.build_research_context ─► ContextBuild ─┐
+session 判斷檔 ────────┴─► alpha.models.compose_signal ──────────► AlphaSignal ──┤
+Engine D 公開 cohort 事實（coverage／cohort_thesis／lifecycle）──────────────────┼─► build_alpha_investment_view
+thesis/lifecycle.json＋catalyst_calendar.json、engine_c.checklist ──────────────┘          │
+                                                                                          ▼
+                                                                    AlphaInvestmentView（canonical DTO）
+                                                                       │            │             │
+                                                            Daily Brief 摘要   `python -m briefing   未來 Web／API
+                                                            （compact_card）     alpha-card`（完整卡） （消費同一份 DTO）
+```
+
+**為什麼住 `briefing/` 而不是 `alpha/`：** 它必須同時看得到 Engine C、Engine D 與 thesis，
+而 `alpha/contracts.py` 是零外部相依的 research contract。`AlphaSignal` 仍然只是研究判斷的
+載體，**不是** UI DTO、不是跨層 composition blob、不含部位。四支檔案的分工：
+`contracts.py`（型別＋字彙，純 stdlib）／`builder.py`（純函式組裝）／`render.py`
+（Markdown，只依賴 contracts＋`shared.markdown`）／`sources.py`（唯一碰 I/O 的地方）。
+`tests/test_alpha_view_render.py` 用 import 掃描守著這個分工。
+
+**兩個正交的語意軸**（讓不同種類的知識在文字裡不再「看起來同樣可信」）：
+
+| 軸 | 值 | 回答 |
+|---|---|---|
+| `status` | `available`／`partial`／`stale`／`missing`／`insufficient_evidence`／`not_modeled`／`not_applicable` | 這格有沒有東西、為什麼沒有。**`missing`＝有能力沒資料；`not_modeled`＝系統還沒有這個能力** |
+| `basis` | `deterministic`／`observation`／`heuristic_proxy`／`session_judgment`／`narrative`／`structural_inference`／`none` | 這格是哪一種知識 |
+
+`Datum` 在型別層強制 **Missing != Zero**：`status` 屬於「沒有值」那組時 `value` 必須是
+`None`；`available` 時不得是 `None`。
+
+**Authority map（每個 section 的真相來源與知識種類）：**
+
+| Section | 來源 authority | basis／capability（今天） |
+|---|---|---|
+| structural_thesis | `rank_bottlenecks()`（經 provider）＋`alpha.context.structural_score` | Q1 `deterministic`；邊屬性 `observation` |
+| causal_paths | `GraphResearchProvider` 的路徑／`propagate`／`get_structural_changes_since` | `structural_inference`，capability＝**`structural_causal_model`**（不是 financial） |
+| fundamentals | Engine C `financial_snapshots`＋manual ledger（segment）＋`checklist` | `observation` |
+| consensus | Engine C `financial_snapshots`＋`engine_c.estimates` | `observation`，status **`partial`**（只有 next-FY 營收、PE、EV/Rev、目標價均值、導出 forward EPS） |
+| price_implied_expectations | `alpha.context._implied_valuation` | **`heuristic_proxy`**（trailing/forward PE − 1）；隱含利潤率與 reverse DCF `not_modeled` |
+| internal_fundamentals | — | **`not_modeled`** |
+| earnings_bridge | — | **`not_modeled`**（列出今天已存在的原料：segment share、結構事件、依賴路徑） |
+| expectation_gap | Q4（session）＋估計修正 vs 股價（`engine_c.estimates`） | Q4 `session_judgment`（ordinal）；數值 gap `not_modeled` |
+| catalysts | AlphaSignal.catalysts＋thesis checkpoints＋Engine D 散文＋`shared.catalyst_state` | `partial`，capability＝`structured_dates_without_repricing_link` |
+| falsification | AlphaSignal.disproof_conditions（L7 三件套）＋Engine D 散文＋thesis lifecycle | capability＝`structured_conditions_with_expiry_watch`；自動失效引擎 `not_modeled` |
+| scenarios | AlphaSignal bull／base／bear | **`narrative`**；機率與目標估值 `not_modeled` |
+| expected_return／downside／entry_logic | — | **`not_modeled`**，並列出「不要跟什麼混淆」（賣方目標價、市場隱含成長、排序名次） |
+| evidence | 全部 `EvidenceRef` 的索引＋as-of 篩選計數＋L8 品質摘要 | `observation` |
+
+**判斷新鮮度：** session 判斷是對某一份 `ResearchContext` 做的。`compose_signal(...,
+allow_stale_context=True)` 是唯讀 view 的明確 opt-in——舊判斷仍呈現但整段標 `stale`，
+`identity.signal.context_matches=False`；`python -m alpha research --judgment` 維持嚴格。
+判斷檔約定位置 `library/private/alpha/judgments/<TICKER>.json`（private，不進 Git）。
+
+**下一階段的插座：** Causal Fundamental Model 落地後，`internal_fundamentals`／
+`earnings_bridge`／`expectation_gap.internal_vs_*` 由 `not_modeled` 變成 `available`，
+schema 不必重寫；view 的 `capability_map()` 就是「知道什麼／還不知道什麼」的常駐計數器。
 
 ## 7. Engine D（Decision Lab）runtime
 

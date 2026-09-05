@@ -204,12 +204,20 @@ def build_packet(build: Any) -> JudgmentPacket:
     )
 
 
-def compose_signal(build: Any, judgment: Mapping[str, Any]) -> AlphaSignal:
+def compose_signal(
+    build: Any, judgment: Mapping[str, Any], *, allow_stale_context: bool = False,
+) -> AlphaSignal:
     """驗證 session 的判斷並組成 `AlphaSignal`。
 
     **每一個引用都必須解析得到 `ResearchContext` 內的物件，否則 reject。**
     L15：解析時若偏好「能通過的答案」，等於讓引用去尋找能通過的權威——
     那正是 authority laundering。
+
+    `allow_stale_context`（預設 False）：**唯讀 read model 專用**。`True` 時判斷對舊
+    context 做的不再 raise，改把 `{"judged_context_digest", "current_context_digest"}`
+    寫進 `metadata["context_mismatch"]`——view 要能呈現「有一份舊判斷」而不是把它藏起來，
+    但呈現時必須標 stale。引用解析那一關**不因此放寬**：refs 仍必須落在目前 context 內。
+    `python -m alpha research --judgment` 維持嚴格（預設值）。
     """
     context: ResearchContext = build.context
     index = {ref.ref: ref for ref in context.evidence_refs}
@@ -218,12 +226,18 @@ def compose_signal(build: Any, judgment: Mapping[str, Any]) -> AlphaSignal:
     # 而判斷沒重做時，必須**明說是哪一種失敗**——否則它會退化成「引用不存在」，
     # 看起來像 authority laundering，實際上只是資料更新了（2026-09-04 實測踩到）。
     declared_digest = str(judgment.get("_packet_digest") or "").rstrip("…").strip()
+    context_mismatch: dict[str, str] | None = None
     if declared_digest and not context.digest.startswith(declared_digest):
-        raise ContractViolation(
-            f"judgment 是對 context {declared_digest} 做的，但目前 context 是 "
-            f"{context.digest[:24]}——**資料已更新，判斷需要重做**。"
-            "這不是引用錯誤，也不得用放寬解析來繞過"
-        )
+        if not allow_stale_context:
+            raise ContractViolation(
+                f"judgment 是對 context {declared_digest} 做的，但目前 context 是 "
+                f"{context.digest[:24]}——**資料已更新，判斷需要重做**。"
+                "這不是引用錯誤，也不得用放寬解析來繞過"
+            )
+        context_mismatch = {
+            "judged_context_digest": declared_digest,
+            "current_context_digest": context.digest,
+        }
 
     scores: dict[str, Score | None] = {axis: None for axis in AXES}
     traces: dict[str, ComponentTrace] = {}
@@ -332,8 +346,14 @@ def compose_signal(build: Any, judgment: Mapping[str, Any]) -> AlphaSignal:
         evidence_refs=context.evidence_refs,
         model_components=traces,
         research_context_digest=context.digest,
-        metadata={"model": MODEL_NAME, "model_version": MODEL_VERSION,
-                  "packet_digest": context.digest},
+        metadata={
+            "model": MODEL_NAME, "model_version": MODEL_VERSION,
+            "packet_digest": context.digest,
+            # 判斷檔自報的產出日（session 寫的），read model 用它標「判斷是哪天做的」。
+            "judged_at": str(judgment.get("_produced_at") or "") or None,
+            # None＝判斷就是對目前 context 做的；非 None＝舊判斷（只在 allow_stale_context 下出現）
+            "context_mismatch": context_mismatch,
+        },
         **{f"{axis}_score": scores[axis] for axis in AXES},
     )
 

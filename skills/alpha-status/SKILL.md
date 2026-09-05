@@ -97,6 +97,21 @@ surface 引用次數全是 0**。這是 L13 的復發——當時的驗收是「
 - **「不可算」是不知道，不是 0。** 虧損公司沒有 trailing PE；把它寫成 0% 會讓那幾檔看起來
   「市場對它們零成長預期」，而事實是它們還在虧錢。
 
+### 第 6 塊：單檔 Alpha Card（canonical read model，2026-09-05 新增；隨叫隨到）
+
+```powershell
+& '.venv\Scripts\python.exe' -m briefing alpha-card <TICKER>            # 完整卡
+& '.venv\Scripts\python.exe' -m briefing alpha-card <TICKER> --format json
+```
+
+使用者問「這一檔到底知道什麼、還不知道什麼」時用它，不要自己從 packet／圖／Engine C 拼。
+它是 `briefing/alpha_view/` 的 read model：每一格都帶 **status**（有／部分／過期／缺料／
+尚未建模）與 **basis**（確定性規則／觀測值／粗略代理／session 判斷／散文／結構推論）。
+**本 skill 只轉述，三條不得改寫：**（a）`not_modeled` 的格（內部基本面、earnings bridge、
+預期報酬、下檔、進場邏輯）就說「尚未建模」，不得用 Q 分數、賣方目標價或散文補；
+（b）`stale` 的 session 判斷要明說「判斷是對舊 context 做的」；（c）`heuristic_proxy`
+不得寫成「模型」。Daily 的「Alpha Card 摘要」區是同一份 view 的一列精簡版。
+
 ### 四維度（`AGENTS.md` 為唯一權威，此處只是操作提示）
 
 1. **瓶頸地位** — `substitutability` 4–5／5、`sole_source`、距需求端跳數

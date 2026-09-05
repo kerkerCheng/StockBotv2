@@ -409,6 +409,15 @@ def run(
             )
             nav_exposure = _optional(fetch_nav_exposure)
             identity_alignment = _optional(fetch_identity_alignment)
+            # Alpha Card 精簡摘要（2026-09-05）：對可行動排序前段的標的各組一份 canonical
+            # view 再壓成一列。同樣 fail-soft：整批讀不到就 None（「未提供」），單檔讀不到
+            # 由 fetch_alpha_cards 自己降級成那一列的 unavailable。沒有排序就沒有候選 → None。
+            from briefing.alpha_view.sources import fetch_alpha_cards, tickers_from_ranking
+
+            alpha_cards = (
+                _optional(lambda: fetch_alpha_cards(tickers_from_ranking(ranking)))
+                if ranking else None
+            )
             brief = build_today_brief(
                 store,
                 as_of=evaluation_at,
@@ -417,6 +426,7 @@ def run(
                 ranking=ranking,
                 nav_exposure=nav_exposure,
                 identity_alignment=identity_alignment,
+                alpha_cards=alpha_cards,
             )
             _render(
                 brief,

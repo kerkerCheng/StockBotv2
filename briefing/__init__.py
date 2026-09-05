@@ -14,7 +14,15 @@ builder＋renderer，然後在這裡接一行。
 ## 這一層的紀律
 
 **薄殼，不含判斷邏輯。** 這裡不決定任何 attention／blocker／覆蓋分類／排序——
-那些各自有 SSOT。這裡只做三件事：取數（`sources.py`）、排順序（`today.py`）、
-串 markdown（`render.py`）。任何「if 條件成立就改變語意」的程式碼出現在這裡，
-就是 pane 該擁有而沒擁有的東西。
+那些各自有 SSOT。這裡只做四件事：取數（`sources.py`）、排順序（`today.py`）、
+串 markdown（`render.py`）、以及**組 canonical read model**（`alpha_view/`，2026-09-05）。
+任何「if 條件成立就改變語意」的程式碼出現在這裡，就是 pane 該擁有而沒擁有的東西。
+
+## `alpha_view/`：單一公司的 Alpha Investment View
+
+它是 read model 不是 authority：把 Engine A／Engine C／AlphaSignal／Engine D 公開事實／
+thesis lifecycle **選取、正規化、語意標註（status／basis）、組裝、序列化**成一份
+presentation-independent 的 DTO；Daily Brief 的「Alpha Card 摘要」、`python -m briefing
+alpha-card` 與未來 Web／API 都消費同一份。住這裡的理由與 daily brief 相同——
+它必須同時看得到所有層，而 `alpha/` 不得。詳見 `docs/ARCHITECTURE.md` §6.1。
 """

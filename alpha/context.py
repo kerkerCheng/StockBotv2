@@ -212,10 +212,16 @@ def _implied_valuation(
     method_parts: list[str] = []
     implied_growth = None
     if consensus.forward_pe and consensus.trailing_pe:
-        # forward 相對 trailing 的折價＝市場隱含的盈餘成長。
-        # ⚠ 粗略 proxy：它假設本益比不變，而那正是要質疑的東西。
-        implied_growth = (consensus.trailing_pe / consensus.forward_pe) - 1.0
-        method_parts.append("implied_growth=trailing_pe/forward_pe-1（假設倍數不變）")
+        if consensus.forward_pe > 0 and consensus.trailing_pe > 0:
+            # forward 相對 trailing 的折價＝市場隱含的盈餘成長。
+            # ⚠ 粗略 proxy：它假設本益比不變，而那正是要質疑的東西。
+            implied_growth = (consensus.trailing_pe / consensus.forward_pe) - 1.0
+            method_parts.append("implied_growth=trailing_pe/forward_pe-1（假設倍數不變）")
+        else:
+            # 負的 forward PE＝分析師預估下一年度仍虧損，比值無意義（POET 現值 −43）。
+            # 不擋會算出 −2.4 並被讀成「−240%」——一個看起來像資訊、實際什麼都不是的數字。
+            # 與 scripts/alpha_expectation_gap.py 的 `pe_forward_nonpositive` 同一條判準。
+            method_parts.append("implied_growth=不可算（forward／trailing PE 非正，比值無意義）")
     if revision:
         # Phase 4 的核心：**估計修正與股價變動分開**。原版取 `pe_forward` 的 30 日
         # 變化，而倍數同時被兩者推動，下游無從分辨（L12）。分開之後才問得出 Q4 的

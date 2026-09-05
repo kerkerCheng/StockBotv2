@@ -885,6 +885,94 @@ MUTATIONS: tuple[Mutation, ...] = (
         guards="估值落差一旦參與排序就從脈絡變回訊號，且會在 rank_bottlenecks() 之外"
                "長出第二套排名（AGENTS.md：唯一排序權威只有一個）",
     ),
+    # ---- Alpha Investment Read Model（briefing/alpha_view，2026-09-05）------------------
+    Mutation(
+        name="read model 把未建模的內部 EPS 填成 0",
+        path="briefing/alpha_view/builder.py",
+        old="        items=tuple(not_modeled(k, l, internal_reason) for k, l in (",
+        new="        items=tuple(Datum(key=k, label=l, value=0.0, status=\"available\", "
+            "basis=\"deterministic\") for k, l in (",
+        test="tests/test_alpha_investment_view.py::test_missing_internal_eps_is_not_serialized_as_zero",
+        guards="Missing != Zero：internal EPS 不存在必須是 not_modeled＋null，不是 0",
+    ),
+    Mutation(
+        name="read model 把 PE 比值 proxy 標成 deterministic model",
+        path="briefing/alpha_view/builder.py",
+        old="               basis=\"heuristic_proxy\", authority=A_IMPLIED, unit=\"ratio\", as_of=cons_as_of,",
+        new="               basis=\"deterministic\", authority=A_IMPLIED, unit=\"ratio\", as_of=cons_as_of,",
+        test="tests/test_alpha_investment_view.py::test_price_implied_growth_is_marked_heuristic_proxy",
+        guards="trailing/forward PE − 1 是 heuristic proxy，不得被讀成 reverse DCF／modeled",
+    ),
+    Mutation(
+        name="read model 把散文情境宣稱成量化情境模型",
+        path="briefing/alpha_view/builder.py",
+        old="        scenario_type=CAP_NARRATIVE_SCENARIOS,",
+        new="        scenario_type=CAP_QUANTITATIVE_SCENARIOS,",
+        test="tests/test_alpha_investment_view.py::test_scenarios_are_narrative_not_quantitative",
+        guards="bull/base/bear 是 session 散文，scenario_type 必須是 narrative",
+    ),
+    Mutation(
+        name="read model 把 structural causal 宣稱成 financial causal",
+        path="briefing/alpha_view/builder.py",
+        old="            authority=A_GRAPH, capability=CAP_STRUCTURAL_CAUSAL,",
+        new="            authority=A_GRAPH, capability=CAP_FINANCIAL_CAUSAL,",
+        test="tests/test_alpha_investment_view.py::test_causal_section_is_structural_not_financial",
+        guards="沒有 revenue／margin／EPS bridge 之前，因果 section 只能是 structural_causal_model",
+    ),
+    Mutation(
+        name="read model 把賣方目標價灌進 expected_return",
+        path="briefing/alpha_view/builder.py",
+        old="            items=tuple(not_modeled(k, l, reason) for k, l in items),",
+        new="            items=tuple(Datum(key=k, label=l, value=0.47, status=\"available\", "
+            "basis=\"observation\") for k, l in items),",
+        test="tests/test_alpha_investment_view.py::test_analyst_target_is_not_expected_return",
+        guards="analyst target != StockBot expected return；expected_return 區不得出現任何數值",
+    ),
+    Mutation(
+        name="Datum 契約不再擋「缺席卻帶值」",
+        path="briefing/alpha_view/contracts.py",
+        old="        if self.status in VALUELESS_STATUSES and self.value is not None:\n"
+            "            raise ViewContractViolation(\n"
+            "                f\"Datum[{self.key}] status={self.status} 卻帶著值 {self.value!r}——\"",
+        new="        if False and self.status in VALUELESS_STATUSES and self.value is not None:\n"
+            "            raise ViewContractViolation(\n"
+            "                f\"Datum[{self.key}] status={self.status} 卻帶著值 {self.value!r}——\"",
+        test="tests/test_alpha_investment_view.py::test_datum_contract_enforces_missing_is_not_zero",
+        guards="Missing != Zero 在型別層強制，不靠 builder 記得",
+    ),
+    Mutation(
+        name="compose_signal 預設放行舊 context 的判斷",
+        path="alpha/models/session_assessor.py",
+        old="    build: Any, judgment: Mapping[str, Any], *, allow_stale_context: bool = False,",
+        new="    build: Any, judgment: Mapping[str, Any], *, allow_stale_context: bool = True,",
+        test="tests/test_alpha_investment_view.py::test_stale_judgment_is_flagged_not_hidden",
+        guards="`alpha research --judgment` 維持嚴格；只有唯讀 read model 明確 opt-in 才呈現 stale 判斷",
+    ),
+    Mutation(
+        name="renderer 把缺席印成 0",
+        path="briefing/alpha_view/render.py",
+        old="        reason = f\"——{markdown_text(datum.reason)}\" if datum.reason else \"\"\n"
+            "        return f\"- {markdown_text(datum.label)}：**{STATUS_LABEL.get(datum.status, datum.status)}**{reason}\"",
+        new="        return f\"- {markdown_text(datum.label)}：0\"",
+        test="tests/test_alpha_view_render.py::test_missing_and_not_modeled_render_as_words_not_zero",
+        guards="renderer 對缺席只能印狀態字＋原因，不得印 0",
+    ),
+    Mutation(
+        name="renderer 偷偷依賴 Engine C",
+        path="briefing/alpha_view/render.py",
+        old="from shared.markdown import markdown_text\n",
+        new="from shared.markdown import markdown_text\nimport engine_c.db  # noqa: F401\n",
+        test="tests/test_alpha_view_render.py::test_renderer_only_imports_contracts_and_markdown_primitives",
+        guards="view 是 presentation-independent 的前提是 renderer 只依賴 contracts＋markdown 原語",
+    ),
+    Mutation(
+        name="today brief 把「未注入 Alpha Card」壓成空 list",
+        path="briefing/today.py",
+        old="        \"alpha_cards\": [dict(card) for card in alpha_cards] if alpha_cards is not None else None,",
+        new="        \"alpha_cards\": [dict(card) for card in alpha_cards] if alpha_cards is not None else [],",
+        test="tests/test_alpha_view_brief.py::test_today_brief_passes_alpha_cards_through_and_keeps_none_distinct",
+        guards="L12：「沒注入」與「沒有候選」不得同形",
+    ),
 )
 
 

@@ -323,6 +323,14 @@ Pane 2 顯示純結構排序與最值得補證據的標的。第四支只讀 Eng
 其實是編的」提醒，比沒有提醒危險。報表末尾必須顯示「N/M 檔有結構化催化劑日期」——
 其餘檔的 `expiry 早於催化劑` 錯誤測不到，**沒抓到問題不等於沒有問題**（L13）。
 
+第一支自 2026-09-05 起在排序之後多一區 **「Alpha Card 摘要」**：對可行動排序前 5 檔，
+各由 `briefing/alpha_view/` 的 canonical read model 壓成一列（Q1 確定性／Q2–Q5 session 判斷／
+市場隱含 EPS 成長 proxy／共識營收成長／催化劑到期狀態／disproof 條數／尚未建模的區數）。
+它回答「排序第一名到底知道什麼、還不知道什麼」，是排序的補充不是替代；「未知」是不知道
+不是 0，⌛ 代表判斷是對舊 context 做的。完整卡片隨叫隨到：
+`& '.venv\Scripts\python.exe' -m briefing alpha-card <TICKER>`（互動專用，不進 unattended rule）。
+該區寫「未提供」代表這一批讀取失敗，與「無候選可摘要」不同。
+
 第一支回今日的瓶頸排序與注意力狀態（`MONITOR`／`REVIEW`，四動作已於 2026-08-28 移除），
 每個 probe 附**自追蹤變化%**與**evidence_delta**
 （material=有觸及 thesis 因果結構的新證據 → 建議 reassess；peripheral=只多週邊 source；none=無變或

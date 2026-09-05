@@ -213,3 +213,15 @@ The append-only funded simulation context for Paper executions. `paper_portfolio
 ### Crowding Discount（擁擠折扣）
 A position-sizing rule that lowers the conviction tier by one level (15%→10%→8%→no position) when a thesis is already priced in — triggered by sell-side coverage count above a threshold or a forward multiple that already implies the thesis scenario. Exists because Lane Memo conviction measures evidence completeness, which correlates with consensus; without the discount, sizing systematically rewards the most-priced-in ideas. Uses third-party observable data (analyst coverage count, valuation multiples), deliberately not a self-assessed "variant perception strength" score — self-grading one's own non-consensus-ness has the same confirmation-bias shape as L8 self-reporting. Feeds and consumes the `consensus_coverage` observation slot in Engine C.
 *Avoid:* consensus penalty, anti-crowding factor
+
+---
+
+## Read Model（呈現無關的組裝層）
+
+### Alpha Investment View（Alpha Card 的 backend contract）
+StockBot 對**一家公司**目前投資理解的 canonical、machine-readable 表示（`briefing/alpha_view/`，2026-09-05）。它把 Engine A 結構事實與 Q1、`AlphaSignal` 的 session 判斷、Engine C 觀測與共識、價格隱含 proxy、Engine D 公開的 catalyst／disproof／lifecycle、thesis 檢核點與全部 `EvidenceRef` **選取、正規化、語意標註、組裝、序列化**成一份 DTO；Daily Brief 的「Alpha Card 摘要」、`python -m briefing alpha-card` 與未來 Web／API 消費同一份。它是 read model 不是 authority：不重算、不重排、不含部位、不留檔。`capability_map()` 一眼列出每個 section 是 available／partial／stale／missing／not_modeled。
+*Avoid:* Alpha dashboard、scorecard、AlphaSignal DTO、position view
+
+### status／basis（read model 的兩個語意軸）
+每一格（`Datum`）都帶兩個封閉字彙。**`status`** 回答「這格有沒有東西、為什麼沒有」：`available`／`partial`／`stale`／`missing`（有能力、這檔沒資料）／`insufficient_evidence`／`not_modeled`（**系統還沒有這個能力**）／`not_applicable`。**`basis`** 回答「這是哪一種知識」：`deterministic`（既有規則算出，如 Q1）／`observation`（直接讀自 authority）／`heuristic_proxy`（如 trailing／forward PE − 1）／`session_judgment`（Q2–Q5、thesis、variant view）／`narrative`（bull／base／bear、Decision Store 散文）／`structural_inference`（圖上多跳推論）／`none`。型別層強制 **Missing != Zero**：沒有值的狀態不得帶值。
+*Avoid:* confidence（那是 session 自評）、data quality score、把 status 與 basis 壓成一個欄位

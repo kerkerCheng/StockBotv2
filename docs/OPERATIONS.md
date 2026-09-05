@@ -282,6 +282,21 @@ cashtag 由 `entities.py` 確定性抽取；公司名寫成純文字時 regex �
 
 只有使用者明確要求才用 `--intent paper`／`live`；live 另加 `--confirm-holdings`。決策命令只在本機執行；遠端 chat 看決策才用 MCP 唯讀 `get_decision_brief`。
 
+### Alpha Card（canonical read model，2026-09-05）
+
+```powershell
+& '.venv\Scripts\python.exe' -m briefing alpha-card COHR                      # 完整卡（Markdown）
+& '.venv\Scripts\python.exe' -m briefing alpha-card COHR --format json -o card.json
+& '.venv\Scripts\python.exe' -m briefing alpha-card COHR --no-causal          # 略過路徑／結構事件（較快）
+& '.venv\Scripts\python.exe' -m briefing alpha-card COHR --as-of 2026-06-30   # as-of 視角（Engine A 投影＋Engine C 時序）
+```
+
+純讀：不 freeze context、不建 decision、不寫任何 authority。session 判斷檔預設找
+`library/private/alpha/judgments/<TICKER>.json`（也接受舊的 `<ticker>_judgment.json`）；
+判斷是對舊 context 做的時仍呈現但整段標 **stale**，`--strict-judgment` 改成視為無判斷。
+`decision_lab today` 的「Alpha Card 摘要」區消費**同一份** view（可行動排序前 5 檔各一列）。
+架構與 authority map 見 `docs/ARCHITECTURE.md` §6.1。**互動專用，不進 unattended rule。**
+
 ### Engine C
 ```powershell
 & '.venv\Scripts\python.exe' engine_c\etl_yfinance.py <TICKER>
@@ -648,6 +663,18 @@ ules\stockbot-automations.rules `
 ```
 ⚠ 十六條 fixed entry **數量未變**；`tests/test_codex_daily_permissions.py` 斷言
 `prefix_rule(` 恰好 16 次，加一條就會紅。
+
+### Sandbox impact review 結論（2026-09-05，Alpha Investment Read Model）
+
+| 入口 | side effect | OS／network capability | 判定 |
+|---|---|---|---|
+| `python -m briefing alpha-card` | 唯讀；讀 Neo4j＋Engine C SQLite＋Decision Store＋thesis JSON | 與 `decision_lab today` 相同的本機資源，無新增網路主機、憑證或 identity／ACL 呼叫 | **互動專用**。新 CLI 名稱，不進 unattended rule |
+| `python -m decision_lab today`（既有 fixed entry） | 新增「Alpha Card 摘要」區：對排序前 5 檔各讀一次 Neo4j／Engine C／Decision Store | **無新增 capability**——三者 `today` 原本就讀（ranking、`_read_financial`、store）；全程 fail-soft，讀不到只讓該區寫「未提供」 | 命令字串未變、rule 未動 |
+
+查證（新入口不該出現在 rules；十六條 fixed entry 數量未變）：
+```powershell
+Select-String -Path .codex\rules\stockbot-automations.rules -Pattern 'briefing'
+```
 
 ### unattended surface 變更的 impact review 五步
 

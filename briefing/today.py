@@ -6,7 +6,7 @@
 """
 from __future__ import annotations
 
-from typing import Any, Mapping
+from typing import Any, Mapping, Sequence
 
 from alpha.brief import build_ready_not_ranked
 from decision_lab.brief import build_decision_brief, cohort_company_ids
@@ -38,6 +38,7 @@ def build_today_brief(
     ranking: Mapping[str, Any] | None = None,
     nav_exposure: Mapping[str, Any] | None = None,
     identity_alignment: Mapping[str, Any] | None = None,
+    alpha_cards: Sequence[Mapping[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """掃描 cohorts／decisions 與當前 Sheet snapshot；不寫入任何 authority。
 
@@ -80,6 +81,10 @@ def build_today_brief(
     panes: dict[str, Any] = {
         "ranking": dict(ranking) if ranking else None,
         "ready_not_ranked": build_ready_not_ranked(brief["items"], ranking),
+        # Alpha Card 精簡摘要（2026-09-05）：由 `briefing.alpha_view` 的 canonical view 經
+        # `compact_card` 選取而來，呼叫端注入（取數要 Neo4j＋Engine C＋Decision Store）。
+        # None＝未注入／整批讀取失敗，不與「排序內沒有候選」的空 list 混用（L12）。
+        "alpha_cards": [dict(card) for card in alpha_cards] if alpha_cards is not None else None,
         "nav_exposure": dict(nav_exposure) if nav_exposure else None,
         # 公司三集合對齊常駐計數器（2026-09-02 使用者稽核定案）：圖∖registry 是
         # join-key 契約破口（應恆 0），registry∖圖 是登記未研究。None＝呼叫端未注入
@@ -106,7 +111,7 @@ def build_today_brief(
     assembled: dict[str, Any] = {}
     for key in ("schema_version", "as_of"):
         assembled[key] = brief[key]
-    for key in ("ranking", "ready_not_ranked", "nav_exposure"):
+    for key in ("ranking", "ready_not_ranked", "alpha_cards", "nav_exposure"):
         assembled[key] = panes[key]
     for key in (
         "action_needed", "attention", "reason", "alpha_thesis_changes",

@@ -22,6 +22,8 @@ from decision_lab.action_card import assert_safe_payload
 from portfolio.brief import render_nav_exposure
 from shared.markdown import markdown_text, pct
 
+from .alpha_view.render import render_alpha_cards
+
 __all__ = ["render_today_markdown"]
 
 
@@ -229,6 +231,9 @@ def render_today_markdown(brief: Mapping[str, Any]) -> str:
     # 首屏是瓶頸排序——系統的終點是「哪些標的值得看」，不是「今天要不要動作」。
     lines = render_ranking(brief.get("ranking"))
     lines += render_ready_not_ranked(brief.get("ready_not_ranked"))
+    # Alpha Card 精簡摘要緊接排序之後：它回答「排序第一名到底知道什麼、還不知道什麼」，
+    # 是排序的補充不是替代。完整卡片走 `python -m briefing alpha-card <TICKER>`。
+    lines += render_alpha_cards(brief.get("alpha_cards"), present="alpha_cards" in brief)
     lines += render_nav_exposure(brief.get("nav_exposure"))
     lines += [
         f"# 今天需要動作嗎？{'是' if brief['action_needed'] else '否'}",
