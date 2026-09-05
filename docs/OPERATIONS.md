@@ -676,6 +676,41 @@ ules\stockbot-automations.rules `
 Select-String -Path .codex\rules\stockbot-automations.rules -Pattern 'briefing'
 ```
 
+### Sandbox impact review 結論（2026-09-05，Causal Fundamental Model）
+
+| 入口 | side effect | OS／network capability | 判定 |
+|---|---|---|---|
+| `engine_c\etl_yfinance.py`（既有 fixed entry） | 同一次 `yf.Ticker` 多讀 `earnings_estimate`／`revenue_estimate` 兩個屬性，寫入新表 `consensus_estimates`（同一 SQLite authority） | **無新增**：同一網路主機（yfinance）、同一 DB、同一命令字串；解析不出會計行事曆的期間只印 WARN 不寫列 | rule 未動、fixed entry 數量未變 |
+| `python -m alpha assumptions <T> --add/--retract` | append `library/private/alpha/assumptions/<T>.jsonl`（研究判斷，A3） | 本機檔案；private 目錄 | **互動專用**，不進 unattended rule（假設是 session 的判斷，排程不得自己寫） |
+| `scripts/record_mechanical_observation.py --field fiscal_year_results／company_guidance` | 既有 mechanical 走廊，兩個新登記欄位 | 無新增 | 既有判定不變（mechanical 不需 pq2，但仍是互動寫入） |
+| `python -m briefing alpha-card`／`decision_lab today` 的 Alpha Card 摘要 | 多讀 `consensus_estimates`＋兩個 ledger 欄位＋假設 ledger，執行純函式模型 | 無新增（同一 Engine C 連線、本機檔案） | 命令字串未變 |
+
+查證（新入口不該出現在 rules）：
+```powershell
+Select-String -Path .codex\rules\stockbot-automations.rules -Pattern 'assumptions|record_mechanical'
+```
+
+### Causal Fundamental Model：怎麼跑（互動）
+
+```powershell
+# 1) 基期實際與指引（mechanical，不需 pq2；value 契約見 config/engine_c_observation_fields.json 的 why）
+python scripts/record_mechanical_observation.py --ticker COHR --field fiscal_year_results --value '<JSON>' --source-ref "<8-K EX-99.1 accession + 表號>" --as-of 2026-06-30
+python scripts/record_mechanical_observation.py --ticker COHR --field company_guidance    --value '<JSON>' --source-ref "<Business Outlook 逐字>" --as-of 2026-08-12
+# 2) FY 別共識（daily ETL 已含；要立刻有就對單檔跑一次）
+python engine_c/etl_yfinance.py COHR
+# 3) 明示假設（session 寫；evidence_refs 必須是 alpha-card evidence index 或 Engine C 觀測的 ref）
+python -m alpha assumptions COHR --add spec.json      # spec：period_end／driver／scope／value／basis／rationale／evidence_refs
+python -m alpha assumptions COHR --list
+python -m alpha assumptions COHR --retract oa_xxx --rationale "..."
+# 4) 看結果（第 7／8／9 節；--as-of 走 PIT）
+python -m briefing alpha-card COHR
+python -m briefing alpha-card COHR --format json | python -c "import json,sys;v=json.load(sys.stdin);print(v['expectation_gap']['internal_vs_consensus'])"
+```
+
+⚠ 假設解析不到證據會被拒用並在 `earnings_bridge.selection.reasons` 計數（`unresolved_evidence`），
+不會靜默生效；缺任何一條 driver 就是 `missing`，不補 0。driver 是封閉字彙
+（`alpha/fundamental/contracts.py::ASSUMPTION_DRIVERS`）。
+
 ### unattended surface 變更的 impact review 五步
 
 判準（「必須在同一個 change 完成」）是 invariant，住 `AGENTS.md`；五步在這裡：

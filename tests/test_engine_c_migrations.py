@@ -125,6 +125,7 @@ def test_required_migration_and_table_are_verified() -> None:
             ("consensus_coverage_observations",),
             ("manual_observations",),
             ("technical_observations",),
+            ("consensus_estimates",),
             ("cash_and_equivalents",),
             ("total_debt",),
             ("free_cash_flow_ttm",),
@@ -152,6 +153,7 @@ def test_required_migration_and_table_are_verified() -> None:
             ("consensus_coverage_observations",),
             ("manual_observations",),
             ("technical_observations",),
+            ("consensus_estimates",),
             None,
         ]
     )

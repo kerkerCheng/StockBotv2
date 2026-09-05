@@ -24,8 +24,9 @@ Engine D 的公開 cohort 事實與 thesis lifecycle **選取、正規化、語�
 | `basis` | **這格的東西是哪一種知識** | `deterministic`／`observation`／`heuristic_proxy`／`session_judgment`／`narrative`／`structural_inference`／`none` |
 
 - `missing`＝系統有這個能力、這檔沒資料；`not_modeled`＝系統**還沒有這個能力**
-  （internal fundamentals、earnings bridge、expected return…）。兩者下一步完全不同，
-  所以不得共用一個值。
+  （expected return、downside、entry logic…）。兩者下一步完全不同，所以不得共用一個值。
+  ⚠ 2026-09-05 起 internal fundamentals／earnings bridge／numeric expectation gap **有能力了**
+  （`alpha/fundamental`）：沒有假設或沒有基期觀測的公司是 `missing`，不再是 `not_modeled`。
 - `heuristic_proxy` 是 `trailing_pe/forward_pe − 1` 這類粗略代理；它**不是** reverse DCF，
   也不得被讀成 modeled。
 - `session_judgment` 是 session／LLM 的判斷（Q2–Q5、thesis、variant view）；
@@ -102,6 +103,8 @@ CAP_QUANTITATIVE_SCENARIOS = "quantitative_scenario_model"
 CAP_STRUCTURED_DISPROOF = "structured_conditions_with_expiry_watch"
 CAP_AUTOMATIC_INVALIDATION = "automatic_invalidation_engine"
 CAP_CATALYST_UNLINKED = "structured_dates_without_repricing_link"
+#: Phase 2：內部估計 vs **同期、同口徑**共識的數值 gap（不含估值、不含價格隱含側）。
+CAP_NUMERIC_EXPECTATION_GAP = "numeric_internal_vs_consensus"
 
 
 class ViewContractViolation(ValueError):
@@ -129,6 +132,8 @@ class Datum:
     - `unit`：單位語意。⚠ 報價單位 ≠ 結算幣別，`quote_unit`／`reporting_currency`／`ratio`
       要寫清楚，跨標的比較前不得假設同尺度。
     - `evidence_refs`：`EvidenceRef.ref` 的 key，指向 `EvidenceSection.index`。
+    - `dependencies`：模型輸出的依賴（假設 id、觀測 ref、輸入知識種類、期間、口徑）。
+      **`basis=deterministic` 只說算法確定；輸入是不是判斷看這裡的 `input_dependency`。**
     """
 
     key: str
@@ -142,6 +147,7 @@ class Datum:
     as_of: date | None = None
     reason: str | None = None
     evidence_refs: tuple[str, ...] = ()
+    dependencies: Mapping[str, Any] | None = None
 
     def __post_init__(self) -> None:
         if not self.key or not self.label:
@@ -385,6 +391,8 @@ class ConsensusSection:
     meta: SectionMeta                        # 覆蓋只到 next-FY 營收＋forward PE ⇒ partial
     items: tuple[Datum, ...]
     coverage_note: str
+    #: 會計年度別的 EPS／營收共識（Engine C `consensus_estimates`，身分是 fiscal_period_end）。
+    fiscal_items: tuple[Datum, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)
@@ -396,16 +404,24 @@ class PriceImpliedSection:
 
 @dataclass(frozen=True, slots=True)
 class InternalFundamentalsSection:
-    meta: SectionMeta                        # not_modeled（下一階段 Causal Fundamental Model）
+    meta: SectionMeta                        # available／partial／missing（alpha/fundamental）
     items: tuple[Datum, ...]
     plug_in_note: str
+    period: str | None = None                # 目標會計期間標籤（FY2027）
+    period_end: date | None = None           # 目標會計期間身分（結束日）
+    base_period_end: date | None = None      # 基期會計年度結束日
+    accounting_basis: str | None = None      # gaap／non_gaap／not_applicable
 
 
 @dataclass(frozen=True, slots=True)
 class EarningsBridgeSection:
-    meta: SectionMeta                        # not_modeled
-    steps: tuple[Datum, ...]                 # operating_assumptions → revenue → margin → eps → fcf
+    meta: SectionMeta
+    steps: tuple[Datum, ...]                 # 基期觀測 → 假設 → 每一步 derived（含公式）
     inputs_available: tuple[Datum, ...]      # 今天已存在、可接進 bridge 的原料
+    assumptions: tuple[Datum, ...] = ()      # 生效的 OperatingAssumption，每條各自標知識種類
+    sensitivities: tuple[Datum, ...] = ()    # 每條假設動一格，輸出動多少（確定性微擾）
+    selection: "EvidenceSelectionCounts | None" = None   # 假設的 as-of／supersede／證據解析計數
+    period: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -413,8 +429,9 @@ class ExpectationGapSection:
     meta: SectionMeta
     session_judgment: Datum                  # Q4（ordinal，session 判斷）
     proxies: tuple[Datum, ...]               # 估計修正 vs 股價變動等 deterministic 原料
-    internal_vs_consensus: Datum             # not_modeled
-    internal_vs_price_implied: Datum         # not_modeled
+    internal_vs_consensus: Datum             # 數值 gap 總表（只在 apples-to-apples 時有值）
+    internal_vs_price_implied: Datum         # not_modeled（估值側是下一階段）
+    numeric_comparisons: tuple[Datum, ...] = ()   # 逐指標：revenue／eps／operating_margin
 
 
 @dataclass(frozen=True, slots=True)
@@ -609,6 +626,7 @@ def _jsonable(obj: Any) -> Any:
 __all__ = [
     "AlphaInvestmentView", "BASES", "BASIS_LABEL", "Basis", "CAP_AUTOMATIC_INVALIDATION",
     "CAP_CATALYST_UNLINKED", "CAP_FINANCIAL_CAUSAL", "CAP_NARRATIVE_SCENARIOS",
+    "CAP_NUMERIC_EXPECTATION_GAP",
     "CAP_QUANTITATIVE_SCENARIOS", "CAP_STRUCTURAL_CAUSAL", "CAP_STRUCTURED_DISPROOF",
     "CatalystItem", "CatalystSection", "CausalPathSection", "CheckpointItem",
     "ConsensusSection", "Datum", "DisproofItem", "EarningsBridgeSection", "EventItem",

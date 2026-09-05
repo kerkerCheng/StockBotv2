@@ -76,6 +76,10 @@ tags:
 | 圖 metadata 可回填的屬性 | `loader/source_dating.py` 的 `BACKFILLABLE_PROPERTIES`（`published_at`／`retrieved_at`） | 同一條「可否確定性重導」判準延伸到圖（2026-09-04）。**這是白名單不是黑名單**：擴充前先問「這個值是印在文件上、任何人重讀都得到同一個數嗎」。不是的話它是判讀，走 graph admission（pq2 `ra_admission`）。⚠ `substitutability`／`sole_source`／`evidence_tier` 永遠不得加進來 |
 | SourceDoc 定日方法 | `loader/source_dating.py` 的 `DATING_METHODS`（`url_path`／`filing_metadata`／`document_masthead`／`event_date`） | 每個 method 代表「一種可被接受的日期來源」，新增一個要同時想清楚 **audit 怎麼抽查它**（`audit/checks.py::check_point_in_time`）。⚠ **刻意沒有「抓到的那天」**：ingest 日期冒充 `published_at` 會讓所有東西看起來都是最近才發表的，回測會因此在每個歷史時點看到全部證據 |
 | 財務核驗清單五項 | `engine_c/checklist.py` 的 `items` | L9 前置條件 #3 的 Watchlist 升格 gate。`gate_pass` 對全體取 `all()`，加第六項會讓**所有既有標的**的 gate 退化 |
+| 營運假設的 driver | `alpha/fundamental/contracts.py` 的 `ASSUMPTION_DRIVERS`（`revenue_growth`／`operating_margin_delta`／`interest_and_other_net`／`tax_rate`／`nci_attribution`／`diluted_shares`） | **contract 不是 taxonomy**：每個 driver 對應 `bridge.py` 的一段算術，多一個 driver 就要多一段算術＋測試；自由字串會讓「寫得進 ledger 卻不影響任何數字」的假設出現（訊號二）。單位跟著 driver 走，寫入端驗 |
+| 假設的知識種類 | 同檔 `ASSUMPTION_BASES`（`observation`／`heuristic_proxy`／`session_judgment`） | 是 read model `Basis` 的**子集**（`tests/test_fundamental_model.py` 斷言），刻意沒有 `deterministic`——輸入假設永遠不是確定性事實，確定性的是橋的算術 |
+| 比較狀態與會計口徑 | 同檔 `COMPARISON_STATUSES`／`ACCOUNTING_BASES` | `comparable` 以外的狀態**不得帶 gap 數字**（型別層強制）；`unverified` 口徑不得與任何口徑相減。多一種「不可比」要先想清楚 renderer 怎麼呈現它 |
+| FY 別共識的指標與期間種類 | `engine_c/db.py` `consensus_estimates` 的 CHECK（`metric IN ('eps','revenue')`、`period_kind IN ('fiscal_year')`） | 同時是 DB 約束，需配 migration；季度期間要進來得先決定季度結束日的解析規則（`shared/fiscal.py` v1 只做年度） |
 | lead 狀態機 | `engine_b/leads.py` 的 `ALLOWED_TRANSITIONS` | 狀態是行為不是分類；加狀態本來就要加邏輯 |
 | thesis 生命週期狀態機 | `thesis/pending_lifecycle.py` 的 `ALLOWED_TRANSITIONS` | L7 的語意骨架；`retired` 刻意是終局。開啟它等於改變 thesis 的意義，不是補字彙 |
 | 執行 intent | `decision_lab/workflow.py` 的 `_INTENTS`（research／paper／live） | 資本邊界 |

@@ -200,6 +200,32 @@
       ],
       "why": "Q3（earnings_exposure）問的是「這個結構優勢對上市公司的 EPS／FCF 到底多重要」，而整體毛利率答不了它——同為 substitutability=5，市值 1.7 兆的 AVGO 那塊 CPO 業務可能只佔 3%，AXTI 的 InP 卻是主業。yfinance 沒有分部資料，只能從 10-K／年報的分部附註（IFRS 8／ASC 280）人工讀入。value 必須是 JSON 物件，鍵為分部名稱、值為佔總營收的比例（0..1 的小數，非百分比），例如 {\"Networking\": 0.61, \"Materials\": 0.23}；另可帶 fiscal_period 與逐字出處。⚠ 缺此欄位時 Q3 一律誠實回 unknown，**不得用整體毛利率代替**（alpha/models/session_assessor.py 的 do_not 明列）。 ｜verifiability=mechanical：分部營收數字印在分部附註（IFRS 8／ASC 280），accession 不可變、附註位置固定，任何人重讀都得到同一個數；value 是 JSON 數值物件，可被未來的重導直接 diff。",
       "verifiability": "mechanical"
+    },
+    {
+      "field_name": "fiscal_year_results",
+      "category": "profitability",
+      "label": "會計年度已報告結果（GAAP／non-GAAP 損益項目、分部營收、稀釋股數）",
+      "gate_member": false,
+      "auto_source": null,
+      "authorities": [
+        "engine_c_financial",
+        "engine_c_manual"
+      ],
+      "why": "Causal Fundamental Model（alpha/fundamental）的 base observations：financial_snapshots 只有 TTM 的 GAAP 毛利／營益率，沒有「這是哪一個會計年度」的身分，也沒有利息、稅、非控制權益、稀釋股數與 non-GAAP 對帳——而分析師 EPS 共識是 non-GAAP 口徑（COHR 實測：yfinance yearAgoEps 5.61 ＝ 8-K 的 non-GAAP 稀釋 EPS，≠ GAAP 4.12），內部 EPS 要能與它比就必須從同一口徑的已報告數字出發。value 必須是 JSON 物件：fiscal_year_end（YYYY-MM-DD，就是本筆的 as_of）、currency、revenue（報表幣別**絕對金額**，與 financial_snapshots 同單位）、segment_revenue（分部名→絕對金額，鍵與 segment_revenue_share 一致）、gaap 與 non_gaap 兩個子物件（operating_income、interest_and_other_net、pretax_income、income_taxes、net_income_attributable、preferred_dividends、diluted_eps、diluted_shares、normalized_tax_rate 等，**只放財報或新聞稿表上印出來的數字**）、可選 exit_quarter（最後一季的 period_end／revenue／operating_income／interest_and_other_net／diluted_shares，明標是季度）、source_filed_at（文件申報日）。⚠ 不放指引、不放推估——指引走 company_guidance，推估走 OperatingAssumption（L12：一筆紀錄一種語意）。 ｜verifiability=mechanical：每個數字都印在 10-K／8-K EX-99.1 的表上（Table 2 損益、Table 5 分部、Table 6 對帳、Table 8 EPS 計算），accession 不可變，任何人重讀都得到同一個數。",
+      "verifiability": "mechanical"
+    },
+    {
+      "field_name": "company_guidance",
+      "category": "demand_and_orders",
+      "label": "公司公開指引（Business Outlook 的區間數字）",
+      "gate_member": false,
+      "auto_source": null,
+      "authorities": [
+        "engine_c_financial",
+        "engine_c_manual"
+      ],
+      "why": "OperatingAssumption 最常引用的證據之一是「公司自己說下一季會怎樣」，但它是**公司說了什麼**的觀測，不是本系統的假設——假設值仍由 session 明示、可被 disproof，不得把指引中點直接當內部估計（L8：發行人自述只能算佐證）。value 必須是 JSON 物件：period_label（例 Q1 FY2027）、period_kind（fiscal_quarter／fiscal_year）、period_end（YYYY-MM-DD）、basis（gaap／non_gaap，指引以哪個口徑給）、issued_at（發布日，就是本筆的 as_of），以及成對的 *_low／*_high 數值（revenue、gross_margin、opex、tax_rate、eps…，比率用 0..1 小數、金額用報表幣別絕對金額）。 ｜verifiability=mechanical：區間數字逐字印在 8-K EX-99.1 的 Business Outlook 段落，accession 不可變。",
+      "verifiability": "mechanical"
     }
   ],
   "_verifiability_contract": "決定這個欄位的寫入要不要人工 pq2 核准。判準沿用 L10 的「這筆資料今天重新取一次拿得回來嗎」——**不是**按存哪張表分。mechanical＝值是結構化數字、指得出一手報表的確切位置、任何人重讀都得到同一個數 → **不需 pq2**，但寫入端強制 value 必須是可機械比對的 JSON 數值（append_manual_observation 會拒絕散文）。那個強制是拿掉 pq2 的**補償控制**：mechanical 的定義就是「可被重導核對」，而散文無法被 diff——存成散文等於宣稱可核對卻讓任何人都核不了（L15：分開之後兩邊都要更嚴）。judgment＝需要決定「這算不算」「這是什麼意思」 → **維持 pq2**。⚠ 不驗 source_ref 的格式：現有 85 筆橫跨 SEC／AMF／HKEX／ASX／TDnet 五種轄區五種寫法，用 regex 驗只會攔下格式而不是風險（L15）。provenance 仍然必填，且由 audit 抽查。"

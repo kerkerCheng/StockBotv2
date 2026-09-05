@@ -35,12 +35,19 @@ from identity.registry import TICKER_MAP
 from engine_c.db import (
     DB_TYPE,
     get_conn,
+    upsert_consensus_estimate,
     upsert_coverage_observation,
     upsert_snapshot,
 )
+from shared.fiscal import FISCAL_YEAR_LABELS, epoch_to_date, fiscal_label, resolve_fiscal_year_end
 
 
 COVERAGE_SOURCE = "yfinance.info.numberOfAnalystOpinions"
+#: 會計年度別共識的來源標記（metric → yfinance 屬性、去年實際值欄位）。
+FISCAL_ESTIMATE_SOURCES: tuple[tuple[str, str, str], ...] = (
+    ("eps", "earnings_estimate", "yearAgoEps"),
+    ("revenue", "revenue_estimate", "yearAgoRevenue"),
+)
 YFINANCE_CACHE_DIR = Path(
     os.environ.get(
         "YFINANCE_CACHE_DIR",
@@ -127,11 +134,20 @@ def fetch_snapshot(ticker: str) -> dict | None:
 
     bar_date, price_kind = _bar_identity(info)
     revenue_next = _next_fy_revenue_estimate(t, ticker)
+    fetched_at = datetime.now(timezone.utc)
+    snapshot_date = date.today()
     return {
+        # 會計年度別共識（Phase 2）：在抓取當下就解析成絕對會計期間，`run_etl` 另存
+        # `consensus_estimates` 表。它不是 financial_snapshots 的欄位，所以放在底線鍵下，
+        # `upsert_snapshot` 只讀具名欄位、不會碰到它。
+        "_consensus_estimates": _fiscal_estimates(
+            t, info, ticker, snapshot_date=snapshot_date, bar_date=bar_date,
+            fetched_at=fetched_at,
+        ),
         "ticker":               ticker,
         # ⚠ snapshot_date 是「跑 ETL 的當地日期」，**不是行情交易日**。它是 UNIQUE
         # 鍵的一半，保留原語意不動；要 as-of 的消費者一律讀 bar_date。
-        "snapshot_date":        date.today(),
+        "snapshot_date":        snapshot_date,
         "bar_date":             bar_date,
         "price_kind":           price_kind,
         "gross_margin":         _sf(info.get("grossMargins")),
@@ -155,8 +171,69 @@ def fetch_snapshot(ticker: str) -> dict | None:
         "revenue_estimate_next_fy":          revenue_next["avg"],
         "revenue_estimate_next_fy_growth":   revenue_next["growth"],
         "revenue_estimate_next_fy_analysts": revenue_next["analysts"],
-        "fetched_at":           datetime.now(timezone.utc),
+        "fetched_at":           fetched_at,
     }
+
+
+def _fiscal_estimates(
+    ticker_obj, info: dict, ticker: str, *, snapshot_date, bar_date, fetched_at,
+) -> list[dict]:
+    """會計年度別的 EPS／營收共識，每一筆帶**絕對的** `fiscal_period_end`。
+
+    ⚠ `0y`／`+1y` 是相對於抓取日的標籤——COHR 在 2026-09 抓到的 `+1y` 是 FY2028，
+    而既有的 `revenue_estimate_next_fy` 欄位就存的是它。內部估計要與共識做同期比較，
+    身分必須在抓取當下就用 provider 的 `lastFiscalYearEnd`／`nextFiscalYearEnd` 解析成
+    日期（`shared.fiscal.resolve_fiscal_year_end`）；解析不出來的期間**不寫列**。
+
+    ⚠ 取不到一律沒有列，不是 0（同 `_next_fy_revenue_estimate` 的理由，L12）。
+    ⚠ provider 不宣告 GAAP／non-GAAP：`year_ago_actual` 保存去年實際值，讓讀取端能與
+    一手財報數字機械核對，本函式**不猜** basis。
+    """
+    last_end = epoch_to_date(info.get("lastFiscalYearEnd"))
+    next_end = epoch_to_date(info.get("nextFiscalYearEnd"))
+    rows: list[dict] = []
+    for metric, attr, year_ago_column in FISCAL_ESTIMATE_SOURCES:
+        try:
+            frame = getattr(ticker_obj, attr)
+        except Exception as exc:  # noqa: BLE001 — provider 失敗只降級成「這檔沒有」
+            print(f"[etl] WARN: {attr} failed for {ticker}: {exc}", file=sys.stderr)
+            continue
+        index = getattr(frame, "index", None)
+        if frame is None or index is None:
+            continue
+        for label in FISCAL_YEAR_LABELS:
+            if label not in index:
+                continue
+            period_end = resolve_fiscal_year_end(
+                label, last_fiscal_year_end=last_end, next_fiscal_year_end=next_end)
+            if period_end is None:
+                print(f"[etl] WARN: {ticker} {attr} {label}: fiscal calendar unresolved "
+                      f"(last={last_end}, next={next_end}); row skipped", file=sys.stderr)
+                continue
+            row = frame.loc[label]
+            avg = _sf(row.get("avg"))
+            if avg is None:
+                continue
+            rows.append({
+                "ticker": ticker,
+                "snapshot_date": snapshot_date,
+                "bar_date": bar_date,
+                "metric": metric,
+                "period_kind": "fiscal_year",
+                "relative_label": label,
+                "fiscal_period_end": period_end.isoformat(),
+                "fiscal_label": fiscal_label(period_end),
+                "estimate_avg": avg,
+                "estimate_low": _sf(row.get("low")),
+                "estimate_high": _sf(row.get("high")),
+                "analyst_count": _si(row.get("numberOfAnalysts")),
+                "year_ago_actual": _sf(row.get(year_ago_column)),
+                "growth": _sf(row.get("growth")),
+                "currency": (str(row.get("currency")) if row.get("currency") else None),
+                "source": f"yfinance.{attr}",
+                "fetched_at": fetched_at,
+            })
+    return rows
 
 
 def _next_fy_revenue_estimate(ticker_obj, ticker: str) -> dict:
@@ -211,17 +288,21 @@ def run_etl(tickers: list[str], dry_run: bool = False) -> int:
         if snap is None:
             print("SKIP")
             continue
+        estimates = snap.pop("_consensus_estimates", [])
         try:
             upsert_snapshot(conn, snap, commit=False)
             upsert_coverage_observation(
                 conn, coverage_observation_from_snapshot(snap), commit=False
             )
+            for row in estimates:
+                upsert_consensus_estimate(conn, row, commit=False)
             conn.commit()
         except Exception as exc:
             conn.rollback()
             print(f"FAILED ({type(exc).__name__}: {exc})")
             continue
-        print(f"ok  (price={snap['price']}, gm={snap['gross_margin']})")
+        print(f"ok  (price={snap['price']}, gm={snap['gross_margin']}, "
+              f"fy_estimates={len(estimates)})")
         success += 1
     conn.close()
     return success

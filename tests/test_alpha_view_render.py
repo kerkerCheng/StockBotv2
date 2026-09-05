@@ -63,9 +63,11 @@ def test_renderer_contains_no_ranking_or_business_tokens() -> None:
 
 def test_missing_and_not_modeled_render_as_words_not_zero() -> None:
     text = render_alpha_investment_view_markdown(_view())
-    eps_line = next(line for line in text.splitlines() if "內部 EPS 估計" in line)
-    assert "尚未建模" in eps_line
+    eps_line = next(line for line in text.splitlines() if "內部稀釋 EPS 估計" in line)
+    assert "缺料" in eps_line                                   # 有能力、本次沒資料
     assert not re.search(r"[：:]\s*0(\.0+)?%?(\s|$)", eps_line)
+    fcf_line = next(line for line in text.splitlines() if "內部 FCF 估計" in line)
+    assert "尚未建模" in fcf_line                               # bridge v1 沒有現金流量表
     margin_line = next(line for line in text.splitlines() if "市場隱含利潤率" in line)
     assert "尚未建模" in margin_line and "0%" not in margin_line.replace("不是 0%", "")
     q3_line = next(line for line in text.splitlines() if "Q3 盈餘曝險" in line)

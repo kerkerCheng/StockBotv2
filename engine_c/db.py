@@ -144,6 +144,33 @@ def _ensure_sqlite_schema(conn: sqlite3.Connection) -> None:
         );
         CREATE INDEX IF NOT EXISTS idx_coverage_ticker_date
             ON consensus_coverage_observations (ticker, observation_date DESC);
+        -- 會計年度別的分析師共識（Phase 2 Causal Fundamental Model，2026-09-05）。
+        -- 身分是 fiscal_period_end（絕對日期），在抓取當下由 provider 的
+        -- lastFiscalYearEnd／nextFiscalYearEnd 解析；relative_label 只留作 provenance。
+        -- 取不到的期間不寫列——缺料是「沒有列」，不是 0。
+        CREATE TABLE IF NOT EXISTS consensus_estimates (
+            id                 INTEGER PRIMARY KEY AUTOINCREMENT,
+            ticker             TEXT    NOT NULL,
+            snapshot_date      TEXT    NOT NULL,
+            bar_date           TEXT,
+            metric             TEXT    NOT NULL CHECK (metric IN ('eps', 'revenue')),
+            period_kind        TEXT    NOT NULL CHECK (period_kind IN ('fiscal_year')),
+            relative_label     TEXT    NOT NULL,
+            fiscal_period_end  TEXT    NOT NULL,
+            fiscal_label       TEXT    NOT NULL,
+            estimate_avg       REAL,
+            estimate_low       REAL,
+            estimate_high      REAL,
+            analyst_count      INTEGER,
+            year_ago_actual    REAL,
+            growth             REAL,
+            currency           TEXT,
+            source             TEXT    NOT NULL,
+            fetched_at         TEXT    NOT NULL,
+            UNIQUE (ticker, snapshot_date, metric, fiscal_period_end, source)
+        );
+        CREATE INDEX IF NOT EXISTS idx_consensus_estimates_ticker_date
+            ON consensus_estimates (ticker, snapshot_date DESC);
     """)
     columns = {
         row[1] for row in conn.execute("PRAGMA table_info(financial_snapshots)")
@@ -388,6 +415,81 @@ def upsert_coverage_observation(
                 observation["data_status"],
                 str(observation["fetched_at"]),
             ),
+        )
+    if commit:
+        conn.commit()
+
+
+#: `consensus_estimates` 一列的必要欄位。缺一即拒收——「不知道是哪個會計期間」的共識
+#: 沒有身分，寫進去只會在比較時被誤當成別的年度。
+CONSENSUS_ESTIMATE_COLUMNS: tuple[str, ...] = (
+    "ticker", "snapshot_date", "bar_date", "metric", "period_kind", "relative_label",
+    "fiscal_period_end", "fiscal_label", "estimate_avg", "estimate_low", "estimate_high",
+    "analyst_count", "year_ago_actual", "growth", "currency", "source", "fetched_at",
+)
+_CONSENSUS_ESTIMATE_REQUIRED: frozenset[str] = frozenset({
+    "ticker", "snapshot_date", "metric", "period_kind", "relative_label",
+    "fiscal_period_end", "fiscal_label", "source", "fetched_at",
+})
+
+
+def upsert_consensus_estimate(conn, row: dict, *, commit: bool = True) -> None:
+    """Idempotently store one fiscal-period-identified consensus estimate。
+
+    ⚠ `fiscal_period_end` 是身分：呼叫端必須已在抓取當下把 `0y`／`+1y` 解析成絕對日期
+    （`engine_c.fiscal.resolve_fiscal_year_end`）；解析不出來就**不要呼叫本函式**，
+    缺料是沒有列，不是一列 0。
+    """
+    missing = sorted(k for k in _CONSENSUS_ESTIMATE_REQUIRED if not row.get(k))
+    if missing:
+        raise ValueError(f"consensus estimate missing keys: {', '.join(missing)}")
+    if row["metric"] not in ("eps", "revenue"):
+        raise ValueError("consensus estimate metric must be eps or revenue")
+    if row["period_kind"] != "fiscal_year":
+        raise ValueError("consensus estimate period_kind must be fiscal_year (v1)")
+    count = row.get("analyst_count")
+    if count is not None and (isinstance(count, bool) or not isinstance(count, int) or count < 0):
+        raise ValueError("analyst_count must be a non-negative integer or null")
+    payload = {key: row.get(key) for key in CONSENSUS_ESTIMATE_COLUMNS}
+    for key in ("snapshot_date", "bar_date", "fiscal_period_end", "fetched_at"):
+        if payload[key] is not None:
+            payload[key] = str(payload[key])
+    if _use_postgres():
+        sql = """
+        INSERT INTO consensus_estimates (
+            ticker, snapshot_date, bar_date, metric, period_kind, relative_label,
+            fiscal_period_end, fiscal_label, estimate_avg, estimate_low, estimate_high,
+            analyst_count, year_ago_actual, growth, currency, source, fetched_at
+        ) VALUES (
+            %(ticker)s, %(snapshot_date)s, %(bar_date)s, %(metric)s, %(period_kind)s,
+            %(relative_label)s, %(fiscal_period_end)s, %(fiscal_label)s, %(estimate_avg)s,
+            %(estimate_low)s, %(estimate_high)s, %(analyst_count)s, %(year_ago_actual)s,
+            %(growth)s, %(currency)s, %(source)s, %(fetched_at)s
+        ) ON CONFLICT (ticker, snapshot_date, metric, fiscal_period_end, source) DO UPDATE SET
+            bar_date=EXCLUDED.bar_date, relative_label=EXCLUDED.relative_label,
+            fiscal_label=EXCLUDED.fiscal_label, estimate_avg=EXCLUDED.estimate_avg,
+            estimate_low=EXCLUDED.estimate_low, estimate_high=EXCLUDED.estimate_high,
+            analyst_count=EXCLUDED.analyst_count, year_ago_actual=EXCLUDED.year_ago_actual,
+            growth=EXCLUDED.growth, currency=EXCLUDED.currency, fetched_at=EXCLUDED.fetched_at
+        """
+        with conn.cursor() as cur:
+            cur.execute(sql, payload)
+    else:
+        conn.execute(
+            """
+            INSERT INTO consensus_estimates (
+                ticker, snapshot_date, bar_date, metric, period_kind, relative_label,
+                fiscal_period_end, fiscal_label, estimate_avg, estimate_low, estimate_high,
+                analyst_count, year_ago_actual, growth, currency, source, fetched_at
+            ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+            ON CONFLICT (ticker, snapshot_date, metric, fiscal_period_end, source) DO UPDATE SET
+                bar_date=excluded.bar_date, relative_label=excluded.relative_label,
+                fiscal_label=excluded.fiscal_label, estimate_avg=excluded.estimate_avg,
+                estimate_low=excluded.estimate_low, estimate_high=excluded.estimate_high,
+                analyst_count=excluded.analyst_count, year_ago_actual=excluded.year_ago_actual,
+                growth=excluded.growth, currency=excluded.currency, fetched_at=excluded.fetched_at
+            """,
+            tuple(payload[key] for key in CONSENSUS_ESTIMATE_COLUMNS),
         )
     if commit:
         conn.commit()

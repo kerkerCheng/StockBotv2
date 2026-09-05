@@ -222,6 +222,18 @@ A position-sizing rule that lowers the conviction tier by one level (15%→10%�
 StockBot 對**一家公司**目前投資理解的 canonical、machine-readable 表示（`briefing/alpha_view/`，2026-09-05）。它把 Engine A 結構事實與 Q1、`AlphaSignal` 的 session 判斷、Engine C 觀測與共識、價格隱含 proxy、Engine D 公開的 catalyst／disproof／lifecycle、thesis 檢核點與全部 `EvidenceRef` **選取、正規化、語意標註、組裝、序列化**成一份 DTO；Daily Brief 的「Alpha Card 摘要」、`python -m briefing alpha-card` 與未來 Web／API 消費同一份。它是 read model 不是 authority：不重算、不重排、不含部位、不留檔。`capability_map()` 一眼列出每個 section 是 available／partial／stale／missing／not_modeled。
 *Avoid:* Alpha dashboard、scorecard、AlphaSignal DTO、position view
 
+### Operating Assumption（明示營運假設）
+StockBot 對某個未來 driver 的**明示**假設（`alpha/fundamental/contracts.py::OperatingAssumption`，2026-09-05）：公司、會計期間（身分是結束日）、driver（封閉字彙：`revenue_growth`／`operating_margin_delta`／`interest_and_other_net`／`tax_rate`／`nci_attribution`／`diluted_shares`）、scope（分部名或 total）、值、單位、`basis`（`observation`／`heuristic_proxy`／`session_judgment`，沿用 read model 字彙）、rationale、`evidence_refs`（必須解析到 ResearchContext／Engine C 的證據）、`created_at`。住 private append-only ledger（`library/private/alpha/assumptions/<TICKER>.jsonl`），改＝append 新紀錄，撤回＝append `retracted`。**它不是事實**：LLM 只能寫假設，不能直接寫 EPS。
+*Avoid:* forecast（那是橋算出來的輸出）、guidance（那是公司說了什麼，住 Engine C `company_guidance`）、把假設存成 Python 常數或測試 fixture
+
+### Financial Bridge（確定性財務橋）
+把基期觀測（Engine C `fiscal_year_results`）與明示假設算成目標期間的內部數字（`alpha/fundamental/bridge.py`，`fundamental-bridge/v1`）：分部營收 × (1 + 成長) → 營收；基期營益率 + Σ 變化 → 營益率；→ 營業利益 − 利息其他 → 稅前 × (1 − 稅率) → 淨利 + NCI 調整 → ÷ 稀釋股數 → EPS。每格是 observation／assumption／derived 三種之一，帶公式、假設 id 與觀測 ref；每個輸出 `calculation=deterministic` 且 `input_dependency`＝最弱輸入假設的知識種類。**缺任何一條假設就是 missing，不補 0。**
+*Avoid:* model（太泛）、DCF／估值（下一階段）、把 derived 的數讀成事實
+
+### Expectation Comparison（內部 vs 共識的數值 gap）
+`alpha/fundamental/compare.py`：內部估計與 Engine C `consensus_estimates` 的同一指標、**同一會計期間、同一口徑（GAAP／non-GAAP）、同幣別**才給 `absolute_gap`／`relative_gap`；否則 `incompatible_period`／`incompatible_basis`／`incompatible_unit`／`internal_missing`／`consensus_missing`，**沒有數字**。EPS 共識的口徑靠 `year_ago_actual` 與一手財報稀釋 EPS 機械核對，核不出來是 `unverified`。它與 Q4（session 的 ordinal 判斷）並存、分開標示，**不是** Q4。
+*Avoid:* 把 `price/pe_forward` 導出的 EPS-like 值當共識、把相對標籤 `+1y` 當會計年度身分、拿它排序
+
 ### status／basis（read model 的兩個語意軸）
-每一格（`Datum`）都帶兩個封閉字彙。**`status`** 回答「這格有沒有東西、為什麼沒有」：`available`／`partial`／`stale`／`missing`（有能力、這檔沒資料）／`insufficient_evidence`／`not_modeled`（**系統還沒有這個能力**）／`not_applicable`。**`basis`** 回答「這是哪一種知識」：`deterministic`（既有規則算出，如 Q1）／`observation`（直接讀自 authority）／`heuristic_proxy`（如 trailing／forward PE − 1）／`session_judgment`（Q2–Q5、thesis、variant view）／`narrative`（bull／base／bear、Decision Store 散文）／`structural_inference`（圖上多跳推論）／`none`。型別層強制 **Missing != Zero**：沒有值的狀態不得帶值。
+每一格（`Datum`）都帶兩個封閉字彙。**`status`** 回答「這格有沒有東西、為什麼沒有」：`available`／`partial`／`stale`／`missing`（有能力、這檔沒資料）／`insufficient_evidence`／`not_modeled`（**系統還沒有這個能力**）／`not_applicable`。⚠ 2026-09-05 起 `internal_fundamentals`／`earnings_bridge`／數值 gap **有能力了**：沒有假設或基期觀測是 `missing`，不再是 `not_modeled`；模型輸出另帶 `dependencies`（假設 id、觀測 ref、`input_dependency`、期間、口徑）。**`basis`** 回答「這是哪一種知識」：`deterministic`（既有規則算出，如 Q1）／`observation`（直接讀自 authority）／`heuristic_proxy`（如 trailing／forward PE − 1）／`session_judgment`（Q2–Q5、thesis、variant view）／`narrative`（bull／base／bear、Decision Store 散文）／`structural_inference`（圖上多跳推論）／`none`。型別層強制 **Missing != Zero**：沒有值的狀態不得帶值。
 *Avoid:* confidence（那是 session 自評）、data quality score、把 status 與 basis 壓成一個欄位

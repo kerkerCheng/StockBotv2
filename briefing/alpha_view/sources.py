@@ -18,8 +18,10 @@ from typing import Any, Iterable, Mapping, Sequence
 from alpha.context import ContextBuild, build_research_context
 from alpha.contracts import AlphaSignal
 from alpha.errors import AlphaError, ContractViolation, PointInTimeUnsupported
+from alpha.fundamental import FundamentalModelResult, build_fundamental_model
 from alpha.identity import CompanyId, Ticker
 from alpha.models import compose_signal
+from alpha.providers import assumptions as assumption_ledger
 from identity.registry import get_registry
 
 from .builder import DecisionFacts, build_alpha_investment_view, compact_card
@@ -159,6 +161,39 @@ def _causal_inputs(graph: Any, company_id: CompanyId, *, as_of: date | None, tod
     return out
 
 
+def _fundamental_model(
+    build: ContextBuild, fundamentals_provider: Any, ticker: Ticker, company_id: CompanyId,
+    *, as_of: date | None, today: date,
+) -> tuple[FundamentalModelResult | None, str | None]:
+    """Causal Fundamental Model 的取數與執行（Phase 2）。
+
+    - 觀測（`fiscal_year_results`）、指引（`company_guidance`）、會計年度別共識
+      （`consensus_estimates`）全部由 Engine C provider 唯讀取出；假設由 private ledger
+      （`alpha/providers/assumptions.py`）讀出。本檔不算任何數字——算術在 `alpha.fundamental`。
+    - provider 沒有這三個方法（測試用的假 provider）→ `(None, 原因)`，read model 標 missing。
+    - 任何一段失敗都 fail-soft，原因交給 builder。
+    """
+    fetch_results = getattr(fundamentals_provider, "fiscal_year_results", None)
+    fetch_consensus = getattr(fundamentals_provider, "fiscal_consensus", None)
+    fetch_guidance = getattr(fundamentals_provider, "company_guidance", None)
+    if not all(callable(f) for f in (fetch_results, fetch_consensus, fetch_guidance)):
+        return None, "fundamentals provider 沒有 fiscal_year_results／fiscal_consensus／company_guidance 能力"
+    try:
+        actuals, actuals_reason = fetch_results(ticker, as_of=as_of)
+        consensus, _consensus_reason = fetch_consensus(ticker, as_of=as_of)
+        guidance, _guidance_reason = fetch_guidance(ticker, as_of=as_of)
+        records, parse_errors = assumption_ledger.read_assumption_records(str(ticker))
+        model = build_fundamental_model(
+            company_id=str(company_id), ticker=str(ticker), as_of=as_of, today=today,
+            actuals=actuals, actuals_reason=actuals_reason, consensus=consensus, guidance=guidance,
+            assumption_records=records, parse_errors=parse_errors,
+            evidence_index={ref.ref: ref for ref in build.context.evidence_refs},
+        )
+    except Exception as exc:  # noqa: BLE001 — 模型失敗只讓該區 missing，不讓整份 view 失敗
+        return None, f"fundamental model 執行失敗：{type(exc).__name__}: {str(exc)[:160]}"
+    return model, None
+
+
 def _ranking_position(graph: Any, company_id: CompanyId, *, as_of: date | None) -> Mapping[str, Any] | None:
     try:
         rows = list(graph.get_bottlenecks(as_of=as_of))
@@ -218,6 +253,8 @@ def fetch_alpha_investment_view(
         causal = (_causal_inputs(graph_provider, company_id, as_of=as_of, today=today)
                   if include_causal else {"causal_reason": "本次未取因果路徑（--no-causal）"})
         ranking_position = _ranking_position(graph_provider, company_id, as_of=as_of)
+        fundamental_model, fundamental_reason = _fundamental_model(
+            build, fundamentals_provider, resolved_ticker, company_id, as_of=as_of, today=today)
     finally:
         if owns_graph:
             driver = getattr(graph_provider, "driver", None)
@@ -256,7 +293,9 @@ def fetch_alpha_investment_view(
         ranking_position=ranking_position, estimate_revision=estimate_revision,
         decision_facts=decision_facts, decision_facts_reason=decision_reason,
         catalyst_checkpoints=checkpoints, checkpoint_source=checkpoint_source,
-        thesis_lifecycle=lifecycle_entry, checklist=checklist, identity=identity, today=today,
+        thesis_lifecycle=lifecycle_entry, checklist=checklist, identity=identity,
+        fundamental_model=fundamental_model, fundamental_model_reason=fundamental_reason,
+        today=today,
     )
 
 

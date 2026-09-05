@@ -176,11 +176,111 @@ def cmd_research(args: argparse.Namespace) -> int:
         graph.driver.close()
 
 
+def cmd_assumptions(args: argparse.Namespace) -> int:
+    """OperatingAssumption ledger 的讀寫入口（Causal Fundamental Model）。
+
+    - `--list`：列出 ledger 全部紀錄（含已撤回／被取代者，稽核用）。
+    - `--add spec.json`：append 一筆。spec 只給 driver／scope／period_end／value／basis／
+      rationale／evidence_refs（＋可選 accounting_basis／supersedes_id）；id 與 created_at 由程式產生。
+    - `--retract <id>`：append 一筆撤回紀錄。
+
+    ⚠ 這裡**不算任何財務數字**，也不驗證 evidence_refs 解析得到哪裡——解析在模型執行時做，
+    解析不到的假設會被拒用並計數（INV-3），不會靜默生效。
+    """
+    from datetime import datetime, timezone
+
+    from .fundamental.assumptions import assumption_record
+    from .providers.assumptions import append_assumption_record, read_assumption_records
+
+    try:
+        resolved_ticker, company_id = _resolve_company(args.ticker)
+    except AlphaError as exc:
+        print(f"✗ {exc}", file=sys.stderr)
+        return 2
+    ticker = str(resolved_ticker)
+
+    if args.add or args.retract:
+        if args.add:
+            spec = json.loads(Path(args.add).read_text(encoding="utf-8"))
+            try:
+                record = assumption_record(
+                    company_id=str(company_id), ticker=ticker,
+                    period_end=date.fromisoformat(str(spec["period_end"])),
+                    driver=str(spec["driver"]), scope=str(spec.get("scope") or ""),
+                    value=float(spec["value"]), basis=str(spec["basis"]),
+                    rationale=str(spec.get("rationale") or ""),
+                    evidence_refs=list(spec.get("evidence_refs") or []),
+                    accounting_basis=str(spec.get("accounting_basis") or "not_applicable"),
+                    supersedes_id=spec.get("supersedes_id"),
+                    author=str(spec.get("author") or "session"),
+                    created_at=datetime.now(timezone.utc),
+                )
+            except (KeyError, ValueError, TypeError, AlphaError) as exc:
+                print(f"✗ 假設不合法：{exc}", file=sys.stderr)
+                return 2
+        else:
+            existing, _ = read_assumption_records(ticker)
+            target = next((r for r in existing if r.assumption_id == args.retract), None)
+            if target is None:
+                print(f"✗ ledger 裡沒有 {args.retract}", file=sys.stderr)
+                return 2
+            record = assumption_record(
+                company_id=target.company_id, ticker=ticker, period_end=target.period.end,
+                driver=target.driver, scope=target.scope, value=target.value, basis=target.basis,
+                rationale=str(args.rationale or "retracted"), evidence_refs=target.evidence_refs,
+                accounting_basis=target.accounting_basis, supersedes_id=target.assumption_id,
+                retracted=True, created_at=datetime.now(timezone.utc),
+            )
+        try:
+            path = append_assumption_record(record)
+        except AlphaError as exc:
+            print(f"✗ {exc}", file=sys.stderr)
+            return 2
+        print(f"✓ {record['assumption_id']} → {path}")
+        print("  下一步：python -m briefing alpha-card "
+              f"{ticker} 會在模型執行時解析 evidence_refs；解析不到會被拒用並計數")
+        return 0
+
+    records, errors = read_assumption_records(ticker)
+    if args.format == "json":
+        payload = [{
+            "assumption_id": r.assumption_id, "period": r.period.label,
+            "period_end": r.period.end.isoformat(), "driver": r.driver, "scope": r.scope,
+            "value": r.value, "unit": r.unit, "basis": r.basis,
+            "accounting_basis": r.accounting_basis, "created_at": r.created_at.isoformat(),
+            "author": r.author, "supersedes_id": r.supersedes_id, "retracted": r.retracted,
+            "evidence_refs": list(r.evidence_refs), "rationale": r.rationale,
+        } for r in records]
+        print(json.dumps({"ticker": ticker, "records": payload, "parse_errors": errors},
+                         ensure_ascii=False, indent=2))
+        return 0
+    print(f"# {ticker} OperatingAssumption ledger（{len(records)} 筆，解析失敗 {len(errors)}）")
+    for r in records:
+        mark = "（已撤回）" if r.retracted else ""
+        print(f"- {r.assumption_id} {r.period.label} {r.driver}[{r.scope}] = {r.value} {r.unit}"
+              f" 〔{r.basis}｜{r.accounting_basis}〕 created {r.created_at.date()}{mark}")
+        print(f"    {r.rationale[:160]}")
+        print(f"    證據：{', '.join(r.evidence_refs[:3])}")
+    for error in errors:
+        print(f"- ⚠ 解析失敗：{error}")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="python -m alpha", description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = parser.add_subparsers(dest="command", required=True)
+
+    assumptions = sub.add_parser(
+        "assumptions", help="OperatingAssumption ledger：--list／--add spec.json／--retract <id>")
+    assumptions.add_argument("ticker")
+    assumptions.add_argument("--list", action="store_true", help="（預設）列出 ledger")
+    assumptions.add_argument("--add", help="append 一筆假設（JSON spec 檔路徑）")
+    assumptions.add_argument("--retract", help="append 一筆撤回紀錄（指定 assumption_id）")
+    assumptions.add_argument("--rationale", help="撤回理由")
+    assumptions.add_argument("--format", choices=("markdown", "json"), default="markdown")
+    assumptions.set_defaults(func=cmd_assumptions)
 
     research = sub.add_parser(
         "research", help="組 ResearchContext；預設輸出 packet，帶 --judgment 則組 AlphaSignal")

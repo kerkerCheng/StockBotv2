@@ -23,7 +23,15 @@ from engine_c.estimates import forward_eps_from, revision_over
 from ..contracts import (
     ConsensusSnapshot, EvidenceRef, FreshnessState, FundamentalsSnapshot, MarketSnapshot,
 )
+from ..errors import ContractViolation
+from ..fundamental.contracts import (
+    ConsensusEstimate, FiscalPeriod, FiscalYearActuals, GuidanceObservation,
+)
 from ..identity import CompanyId, Ticker
+
+#: Causal Fundamental Model 的兩個 Engine C 人工 ledger 欄位（`config/engine_c_observation_fields.json`）。
+FISCAL_RESULTS_FIELD = "fiscal_year_results"
+GUIDANCE_FIELD = "company_guidance"
 
 
 @dataclass(slots=True)
@@ -218,6 +226,161 @@ class EngineCFundamentalsProvider:
         }
         return shares or None
 
+    # ---- Causal Fundamental Model 的三個唯讀入口（Phase 2，2026-09-05）------------
+    def fiscal_consensus(
+        self, ticker: Ticker | None, *, as_of: date | None = None
+    ) -> tuple[tuple[ConsensusEstimate, ...], str | None]:
+        """會計年度別的 EPS／營收共識（`consensus_estimates`），取 as-of 之前**最新一次抓取**的全部列。
+
+        身分是 `fiscal_period_end`（抓取當下解析），不是 `0y`／`+1y`。取不到回空 tuple ＋原因，
+        不回 0。⚠ 口徑不在這裡判：provider 只帶出 `year_ago_actual`，由 `alpha.fundamental.compare`
+        與一手財報數字核對。
+        """
+        if ticker is None:
+            return (), "未上市，無共識資料"
+        cur = self._cursor()
+        sql = ("SELECT * FROM consensus_estimates WHERE ticker = ? "
+               "{cut} ORDER BY COALESCE(bar_date, snapshot_date) DESC, fetched_at DESC")
+        params: list[Any] = [str(ticker)]
+        if as_of is not None:
+            sql = sql.format(cut="AND COALESCE(bar_date, snapshot_date) <= ? ")
+            params.append(as_of.isoformat())
+        else:
+            sql = sql.format(cut="")
+        try:
+            cur.execute(sql, params)
+            rows = [dict(r) for r in cur.fetchall()]
+        except Exception as exc:  # noqa: BLE001 — 表尚未建立只降級成「沒有」
+            return (), f"consensus_estimates 讀取失敗：{type(exc).__name__}"
+        if not rows:
+            return (), (f"Engine C 截至 {as_of.isoformat()} 無這檔的會計年度別共識" if as_of
+                        else "Engine C 無這檔的會計年度別共識（consensus_estimates 尚無列；跑一次 ETL）")
+        latest = rows[0].get("bar_date") or rows[0].get("snapshot_date")
+        out: list[ConsensusEstimate] = []
+        for row in rows:
+            if (row.get("bar_date") or row.get("snapshot_date")) != latest:
+                break
+            end = _as_date(row.get("fiscal_period_end"))
+            if end is None:
+                continue
+            captured = _as_date(row.get("bar_date")) or _as_date(row.get("snapshot_date"))
+            ref = EvidenceRef(
+                ref=f"engine_c://consensus_estimate/{ticker}/{row['metric']}/{end.isoformat()}",
+                kind="engine_c_observation", origin_entity="yfinance",
+                published_at=captured, retrieved_at=_as_date(row.get("snapshot_date")),
+                recorded_at=_as_datetime(row.get("fetched_at")),
+            )
+            out.append(ConsensusEstimate(
+                metric=str(row["metric"]), period=FiscalPeriod(end=end),
+                value=_num(row.get("estimate_avg")), source=str(row.get("source") or ""),
+                evidence=(ref,), low=_num(row.get("estimate_low")), high=_num(row.get("estimate_high")),
+                analyst_count=_int(row.get("analyst_count")),
+                year_ago_actual=_num(row.get("year_ago_actual")), growth=_num(row.get("growth")),
+                currency=(str(row["currency"]) if row.get("currency") else None),
+                captured_at=captured, fetched_at=_as_datetime(row.get("fetched_at")),
+                relative_label=(str(row["relative_label"]) if row.get("relative_label") else None),
+            ))
+        return tuple(out), None
+
+    def _ledger_rows(self, ticker: Ticker, field_name: str, as_of: date | None) -> list[dict[str, Any]]:
+        """`manual_observations` 的歷史列（不是投影）：as-of 用 `recorded_at`（我們何時知道）與
+        `as_of`（事實屬於哪一天）雙重過濾。投影 `manual_fields` 沒有歷史，這裡刻意不讀它。"""
+        cur = self._cursor()
+        try:
+            cur.execute(
+                "SELECT observation_id, value, source_ref, as_of, recorded_at, supersedes_id "
+                "FROM manual_observations WHERE ticker = ? AND field_name = ? "
+                "ORDER BY as_of DESC, recorded_at DESC",
+                (str(ticker), field_name),
+            )
+            rows = [dict(r) for r in cur.fetchall()]
+        except Exception:  # noqa: BLE001
+            return []
+        if as_of is None:
+            return rows
+        cutoff = as_of.isoformat()
+        return [r for r in rows
+                if str(r.get("as_of") or "")[:10] <= cutoff
+                and str(r.get("recorded_at") or "")[:10] <= cutoff]
+
+    def _ledger_ref(self, row: Mapping[str, Any], *, published_at: date | None) -> EvidenceRef:
+        return EvidenceRef(
+            ref=f"engine_c://manual_observation/{row['observation_id']}",
+            kind="engine_c_observation", origin_entity="issuer_filing",
+            quote=str(row.get("source_ref") or "")[:240] or None,
+            published_at=published_at, retrieved_at=_as_date(row.get("recorded_at")),
+            recorded_at=_as_datetime(row.get("recorded_at")),
+        )
+
+    def fiscal_year_results(
+        self, ticker: Ticker | None, *, as_of: date | None = None
+    ) -> tuple[FiscalYearActuals | None, str | None]:
+        """最近一個**已報告且在 T 時刻已寫進 ledger**的會計年度（`fiscal_year_results`）。"""
+        if ticker is None:
+            return None, "未上市，無財報"
+        rows = self._ledger_rows(ticker, FISCAL_RESULTS_FIELD, as_of)
+        if not rows:
+            return None, (f"Engine C 截至 {as_of.isoformat()} 無 {ticker} 的 fiscal_year_results 觀測" if as_of
+                          else f"Engine C 無 {ticker} 的 fiscal_year_results 觀測（scripts/record_mechanical_observation.py）")
+        superseded = {r.get("supersedes_id") for r in rows if r.get("supersedes_id")}
+        errors: list[str] = []
+        for row in rows:
+            if row["observation_id"] in superseded:
+                continue
+            try:
+                payload = json.loads(row["value"])
+                end = _as_date(payload.get("fiscal_year_end")) or _as_date(row.get("as_of"))
+                if end is None:
+                    raise ValueError("缺 fiscal_year_end")
+                filed = _as_date(payload.get("source_filed_at"))
+                ref = self._ledger_ref(row, published_at=filed or end)
+                segments = payload.get("segment_revenue")
+                return FiscalYearActuals(
+                    period=FiscalPeriod(end=end),
+                    currency=str(payload.get("currency") or ""),
+                    revenue=float(payload["revenue"]),
+                    segment_revenue=({str(k): float(v) for k, v in segments.items()}
+                                     if isinstance(segments, dict) and segments else None),
+                    gaap=_numeric_block(payload.get("gaap")),
+                    non_gaap=(_numeric_block(payload.get("non_gaap")) if payload.get("non_gaap") else None),
+                    exit_quarter=(dict(payload["exit_quarter"]) if isinstance(payload.get("exit_quarter"), dict) else None),
+                    evidence=(ref,), source_filed_at=filed,
+                    recorded_at=_as_datetime(row.get("recorded_at")),
+                    observation_id=str(row["observation_id"]),
+                ), None
+            except (KeyError, TypeError, ValueError, ContractViolation) as exc:
+                errors.append(f"{row['observation_id']}: {exc}")
+        return None, "fiscal_year_results 觀測無法解析：" + "；".join(errors[:2])
+
+    def company_guidance(
+        self, ticker: Ticker | None, *, as_of: date | None = None
+    ) -> tuple[tuple[GuidanceObservation, ...], str | None]:
+        """公司公開指引（`company_guidance`），最新在前。它是「公司說了什麼」，不是本系統的假設。"""
+        if ticker is None:
+            return (), "未上市，無指引"
+        rows = self._ledger_rows(ticker, GUIDANCE_FIELD, as_of)
+        out: list[GuidanceObservation] = []
+        for row in rows:
+            try:
+                payload = json.loads(row["value"])
+                issued = _as_date(payload.get("issued_at")) or _as_date(row.get("as_of"))
+                values = {str(k): float(v) for k, v in payload.items()
+                          if isinstance(v, (int, float)) and not isinstance(v, bool)}
+                out.append(GuidanceObservation(
+                    period_label=str(payload.get("period_label") or "?"),
+                    period_kind=str(payload.get("period_kind") or "?"),
+                    period_end=_as_date(payload.get("period_end")),
+                    basis=str(payload.get("basis") or "unverified"),
+                    values=values, issued_at=issued,
+                    evidence=(self._ledger_ref(row, published_at=issued),),
+                    observation_id=str(row["observation_id"]),
+                ))
+            except (TypeError, ValueError, ContractViolation):
+                continue
+        if not out:
+            return (), f"Engine C 無 {ticker} 的 company_guidance 觀測"
+        return tuple(out), None
+
     def estimate_revision(
         self, ticker: Ticker | None, *, as_of: date | None = None, sessions: int = 30
     ) -> dict[str, Any] | None:
@@ -270,6 +433,14 @@ def _freshness(row: Mapping[str, Any], as_of: date | None) -> FreshnessState:
     status = "available" if age <= 14 else "stale"
     return FreshnessState(as_of=anchor, age_days=float(age), status=status,
                           reason=None if status == "available" else f"距 {reference} 已 {age} 天")
+
+
+def _numeric_block(value: Any) -> dict[str, float]:
+    """子物件裡只收數值（bool 不算）；說明文字不是損益項目。"""
+    if not isinstance(value, dict):
+        return {}
+    return {str(k): float(v) for k, v in value.items()
+            if isinstance(v, (int, float)) and not isinstance(v, bool)}
 
 
 def _num(value: Any) -> float | None:

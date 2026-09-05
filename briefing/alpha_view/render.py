@@ -68,9 +68,41 @@ def _scalar(value: Any, unit: str | None) -> str:
             return f"{value:.1f}x"
         if unit.startswith("ordinal_0_1"):
             return f"{value:.2f}"
+        if unit == "currency_per_share":
+            return f"{value:,.2f}"
+        if unit == "shares" or unit.startswith("reporting_currency"):
+            return f"{value:,.0f}"
     if isinstance(value, (int, float)):
         return _number(value)
     return markdown_text(value)
+
+
+def _dependency_lines(deps: Mapping[str, Any]) -> list[str]:
+    """模型輸出的依賴：期間／口徑／輸入知識種類／假設 id。只排版，不解讀。"""
+    parts: list[str] = []
+    if deps.get("period"):
+        period = markdown_text(deps["period"])
+        if deps.get("fiscal_period_end"):
+            period += f"（至 {markdown_text(deps['fiscal_period_end'])}）"
+        parts.append(f"期間 {period}")
+    if deps.get("accounting_basis"):
+        parts.append(f"口徑 {markdown_text(deps['accounting_basis'])}")
+    if deps.get("input_dependency"):
+        parts.append(f"輸入知識種類 **{BASIS_LABEL.get(deps['input_dependency'], deps['input_dependency'])}**")
+    ids = deps.get("assumption_ids") or ()
+    if ids:
+        shown = "、".join(f"`{i}`" for i in list(ids)[:6])
+        more = f" 等 {len(ids)} 條" if len(ids) > 6 else ""
+        parts.append(f"依賴假設 {shown}{more}")
+    if deps.get("assumption_id"):
+        parts.append(f"id `{deps['assumption_id']}`")
+    if deps.get("created_at"):
+        parts.append(f"寫於 {markdown_text(str(deps['created_at'])[:10])}")
+    if deps.get("supersedes_id"):
+        parts.append(f"取代 `{deps['supersedes_id']}`")
+    if deps.get("kind"):
+        parts.append(f"格的種類 {markdown_text(deps['kind'])}")
+    return [f"  - 依賴：{'｜'.join(parts)}"] if parts else []
 
 
 def _mapping_text(value: Mapping[str, Any], unit: str | None) -> str:
@@ -122,6 +154,8 @@ def _datum_line(datum: Datum) -> str:
         shown = "、".join(f"`{r}`" for r in datum.evidence_refs[:4])
         more = f" 等 {len(datum.evidence_refs)} 條" if len(datum.evidence_refs) > 4 else ""
         line += f"\n  - 證據：{shown}{more}"
+    if datum.dependencies:
+        line += "".join("\n" + dep for dep in _dependency_lines(datum.dependencies))
     return line
 
 
@@ -282,6 +316,9 @@ def render_alpha_investment_view_markdown(view: AlphaInvestmentView) -> str:
     lines += _section("5. 共識（partial：只有今天真的存在的欄位）", cs.meta)
     lines.append(f"覆蓋範圍：{markdown_text(cs.coverage_note)}")
     lines += [_datum_line(d) for d in cs.items]
+    if cs.fiscal_items:
+        lines.append("會計年度別共識（身分是 fiscal_period_end；同期比較只用這些）：")
+        lines += ["  " + _datum_line(d).replace("\n  - ", "\n    - ") for d in cs.fiscal_items]
     lines.append("")
 
     # 6. Price-implied
@@ -294,6 +331,12 @@ def render_alpha_investment_view_markdown(view: AlphaInvestmentView) -> str:
     # 7. Internal fundamentals
     inf = view.internal_fundamentals
     lines += _section("7. 內部基本面（Internal Fundamental View）", inf.meta)
+    if inf.period:
+        lines.append(
+            f"目標期間：{markdown_text(inf.period)}"
+            + (f"（至 {inf.period_end.isoformat()}）" if inf.period_end else "")
+            + (f"｜基期至 {inf.base_period_end.isoformat()}" if inf.base_period_end else "")
+            + (f"｜口徑 {markdown_text(inf.accounting_basis)}" if inf.accounting_basis else ""))
     lines += [_datum_line(d) for d in inf.items]
     lines.append(f"插座：{markdown_text(inf.plug_in_note)}")
     lines.append("")
@@ -301,7 +344,22 @@ def render_alpha_investment_view_markdown(view: AlphaInvestmentView) -> str:
     # 8. Earnings bridge
     eb = view.earnings_bridge
     lines += _section("8. Earnings bridge（structural event → operating assumptions → revenue／margin／EPS）", eb.meta)
-    lines += [_datum_line(d) for d in eb.steps]
+    if eb.period:
+        lines.append(f"目標期間：{markdown_text(eb.period)}")
+    if eb.steps:
+        lines.append("橋（由上而下；每格標 observation／assumption／derived）：")
+        lines += ["  " + _datum_line(d).replace("\n  - ", "\n    - ") for d in eb.steps]
+    if eb.assumptions:
+        lines.append("生效的營運假設（每條各自標知識種類；它們不是事實）：")
+        lines += ["  " + _datum_line(d).replace("\n  - ", "\n    - ") for d in eb.assumptions]
+    if eb.selection is not None:
+        sel = eb.selection
+        lines.append(
+            f"假設選取：input {sel.input_count}／accepted {sel.accepted_count}／filtered {sel.filtered_count}"
+            f"（{_mapping_text(sel.reasons, None) or '無過濾'}）")
+    if eb.sensitivities:
+        lines.append("敏感度（每條假設動一格，輸出動多少；確定性微擾，不是機率）：")
+        lines += ["  " + _datum_line(d).replace("\n  - ", "\n    - ") for d in eb.sensitivities]
     lines.append("今天已存在、可接進 bridge 的原料：")
     lines += ["  " + _datum_line(d).replace("\n  - ", "\n    - ") for d in eb.inputs_available]
     lines.append("")
@@ -312,6 +370,9 @@ def render_alpha_investment_view_markdown(view: AlphaInvestmentView) -> str:
     lines.append(_datum_line(eg.session_judgment))
     lines += [_datum_line(d) for d in eg.proxies]
     lines.append(_datum_line(eg.internal_vs_consensus))
+    if eg.numeric_comparisons:
+        lines.append("逐指標（只在同期、同口徑、同幣別時有數字）：")
+        lines += ["  " + _datum_line(d).replace("\n  - ", "\n    - ") for d in eg.numeric_comparisons]
     lines.append(_datum_line(eg.internal_vs_price_implied))
     lines.append("")
 
@@ -442,9 +503,25 @@ def _disproof_line(d: DisproofItem) -> str:
 # ---------------------------------------------------------------------------
 
 _CARD_HEAD = [
-    "| 標的 | Q1 結構 | Q2／Q3／Q4／Q5（session） | 市場隱含 EPS 成長 | 共識營收成長 | 催化劑／到期 | Disproof | 尚未建模 |",
-    "|---|---|---|---|---|---|---|---|",
+    "| 標的 | Q1 結構 | Q2／Q3／Q4／Q5（session） | 市場隱含 EPS 成長 | 共識營收成長 | 內部 vs 共識 EPS（同期） | 催化劑／到期 | Disproof | 尚未建模 |",
+    "|---|---|---|---|---|---|---|---|---|",
 ]
+
+
+def _internal_gap_cell(card: Mapping[str, Any]) -> str:
+    """內部假設推出的 EPS vs 同期共識。只看 builder 給的 status；缺席印原因，不印 0。"""
+    block = card.get("internal_vs_consensus")
+    if not isinstance(block, Mapping):
+        return "未提供"
+    eps = block.get("eps")
+    if not isinstance(eps, Mapping):
+        return "未知"
+    if eps.get("status") == "available" and isinstance(eps.get("relative_gap"), (int, float)):
+        text = f"{_pct(eps['relative_gap'])}"
+        if eps.get("period"):
+            text += f"（{markdown_text(eps['period'])}）"
+        return text
+    return f"未知（{markdown_text(eps.get('reason') or eps.get('status') or '—')}）"
 
 
 def _score_cell(score: Mapping[str, Any]) -> str:
@@ -462,7 +539,7 @@ def _score_cell(score: Mapping[str, Any]) -> str:
 
 def _card_row(card: Mapping[str, Any]) -> str:
     if card.get("status") == "unavailable":
-        return (f"| {markdown_text(card.get('ticker') or '?')} | 讀不到 | 讀不到 | 讀不到 | 讀不到 | 讀不到 | 讀不到 | "
+        return (f"| {markdown_text(card.get('ticker') or '?')} | 讀不到 | 讀不到 | 讀不到 | 讀不到 | 讀不到 | 讀不到 | 讀不到 | "
                 f"（{markdown_text(card.get('reason') or 'unavailable')}） |")
     scores = card.get("scores") or {}
     q1 = _score_cell(scores.get("structural") or {})
@@ -502,7 +579,9 @@ def _card_row(card: Mapping[str, Any]) -> str:
         label += "（無 session 判斷）"
     nm = card.get("not_modeled") or []
     nm_text = f"{len(nm)} 區" if nm else "—"
-    return f"| {label} | {q1} | {others} | {implied_text} | {cons_text} | {cat_text} | {dis_text} | {nm_text} |"
+    gap_text = _internal_gap_cell(card)
+    return (f"| {label} | {q1} | {others} | {implied_text} | {cons_text} | {gap_text} | {cat_text} | "
+            f"{dis_text} | {nm_text} |")
 
 
 def render_alpha_cards(cards: Sequence[Mapping[str, Any]] | None, *, present: bool = True) -> list[str]:
@@ -528,7 +607,9 @@ def render_alpha_cards(cards: Sequence[Mapping[str, Any]] | None, *, present: bo
         "- 讀法：Q1 是確定性規則；Q2–Q5 是 session 判斷（括號內為 session 等級）；⌛＝判斷是對舊 context 做的；"
         "「未知」是不知道，不是 0。",
         "- 市場隱含 EPS 成長是 trailing／forward PE 的粗略代理，與共識**營收**成長分母不同，不得相減。",
-        "- 「尚未建模」列的是 internal fundamentals／earnings bridge／expected return／downside／entry logic 等系統還沒有的能力。",
+        "- 「內部 vs 共識 EPS」是明示營運假設（session 判斷／heuristic）經確定性橋算出的 EPS 與**同期、同口徑**共識的相對差；"
+        "假設不是事實，數字不是 Q4；不可比或缺料一律「未知」。",
+        "- 「尚未建模」列的是 expected return／downside／entry logic 等系統還沒有的能力。",
         "",
     ]
     return lines

@@ -225,11 +225,11 @@ thesis/lifecycle.json＋catalyst_calendar.json、engine_c.checklist ────
 | structural_thesis | `rank_bottlenecks()`（經 provider）＋`alpha.context.structural_score` | Q1 `deterministic`；邊屬性 `observation` |
 | causal_paths | `GraphResearchProvider` 的路徑／`propagate`／`get_structural_changes_since` | `structural_inference`，capability＝**`structural_causal_model`**（不是 financial） |
 | fundamentals | Engine C `financial_snapshots`＋manual ledger（segment）＋`checklist` | `observation` |
-| consensus | Engine C `financial_snapshots`＋`engine_c.estimates` | `observation`，status **`partial`**（只有 next-FY 營收、PE、EV/Rev、目標價均值、導出 forward EPS） |
+| consensus | Engine C `financial_snapshots`＋`engine_c.estimates`＋**`consensus_estimates`**（FY-identified EPS／營收，`fiscal_items`） | `observation`，status **`partial`**（快照欄位＋0y／+1y 兩個會計年度；缺第三年起、目標價高低、逐位分布） |
 | price_implied_expectations | `alpha.context._implied_valuation` | **`heuristic_proxy`**（trailing/forward PE − 1）；隱含利潤率與 reverse DCF `not_modeled` |
-| internal_fundamentals | — | **`not_modeled`** |
-| earnings_bridge | — | **`not_modeled`**（列出今天已存在的原料：segment share、結構事件、依賴路徑） |
-| expectation_gap | Q4（session）＋估計修正 vs 股價（`engine_c.estimates`） | Q4 `session_judgment`（ordinal）；數值 gap `not_modeled` |
+| internal_fundamentals | **`alpha/fundamental`**（§6.2）：假設 ledger → 確定性橋 | `deterministic`（capability `financial_causal_model`）；每格 `dependencies.input_dependency` 帶最弱輸入假設的知識種類。**沒有假設或沒有基期觀測＝`missing`**（有能力、沒資料），不再是 `not_modeled` |
+| earnings_bridge | 同上 | 每格 observation／assumption／derived 各自標 basis；`assumptions`／`sensitivities`／`selection` 隨附 |
+| expectation_gap | Q4（session）＋估計修正 vs 股價（`engine_c.estimates`）＋**`alpha/fundamental/compare`**（`numeric_comparisons`） | Q4 `session_judgment`（ordinal）**與**數值 gap `deterministic`（capability `numeric_internal_vs_consensus`）並存、分開標；數值 gap 只在同期、同口徑、同幣別時有值，否則 `not_applicable`／`missing` |
 | catalysts | AlphaSignal.catalysts＋thesis checkpoints＋Engine D 散文＋`shared.catalyst_state` | `partial`，capability＝`structured_dates_without_repricing_link` |
 | falsification | AlphaSignal.disproof_conditions（L7 三件套）＋Engine D 散文＋thesis lifecycle | capability＝`structured_conditions_with_expiry_watch`；自動失效引擎 `not_modeled` |
 | scenarios | AlphaSignal bull／base／bear | **`narrative`**；機率與目標估值 `not_modeled` |
@@ -251,9 +251,54 @@ allow_stale_context=True)` 是唯讀 view 的明確 opt-in——舊判斷仍呈�
 `identity.signal.context_matches=False`；`python -m alpha research --judgment` 維持嚴格。
 判斷檔約定位置 `library/private/alpha/judgments/<TICKER>.json`（private，不進 Git）。
 
-**下一階段的插座：** Causal Fundamental Model 落地後，`internal_fundamentals`／
-`earnings_bridge`／`expectation_gap.internal_vs_*` 由 `not_modeled` 變成 `available`，
-schema 不必重寫；view 的 `capability_map()` 就是「知道什麼／還不知道什麼」的常駐計數器。
+view 的 `capability_map()` 就是「知道什麼／還不知道什麼」的常駐計數器。
+
+### 6.2 Causal Fundamental Model（`alpha/fundamental/`，2026-09-05 Phase 2 v1）
+
+**角色一句話：根據我們知道的，我們對這門生意明確假設了什麼，那些假設推得出什麼數字，
+跟同期共識差多少。** 它回答的是「StockBot 的內部預測」，**不是**估值、預期報酬或進場邏輯
+（那三者仍 `not_modeled`）。
+
+```
+Engine A 證據 ─┐                                  Engine C（A2，唯讀）
+               ├─► OperatingAssumption[]（A3，private append-only ledger）   fiscal_year_results（基期）
+session 判斷 ──┘        │ select_assumptions(as_of)                          company_guidance（指引，證據）
+                        ▼                                                    consensus_estimates（FY 別共識）
+                 build_bridge（確定性算術）◄──────────────────────────────── 基期觀測
+                        ▼
+                 ModeledMetric[]（revenue／operating_margin／operating_income／net_income／eps）
+                        ▼ verify_consensus_basis ＋ compare_metric
+                 ExpectationComparison[]（只在同期、同口徑、同幣別時有數字）
+                        ▼
+                 briefing/alpha_view（只選取）→ internal_fundamentals／earnings_bridge／expectation_gap
+```
+
+**誰擁有什麼（authority 分工，不得混）：**
+
+| 東西 | 擁有者 | 住哪 |
+|---|---|---|
+| 假設（值、basis、rationale、evidence、created_at） | A3 研究判斷，session 明示 | `library/private/alpha/assumptions/<TICKER>.jsonl`（append-only；`python -m alpha assumptions`） |
+| 算術（revenue → margin → EPS） | A3，`alpha/fundamental/bridge.py` | 純函式，版本 `fundamental-bridge/v1` |
+| 基期實際、指引、FY 別共識 | A2 Engine C | `manual_observations`（`fiscal_year_results`／`company_guidance`，mechanical）、`consensus_estimates`（ETL） |
+| 口徑核實與比較 | A3，`alpha/fundamental/compare.py` | 純函式 |
+| 組裝 | `briefing/alpha_view`（read model） | 不算任何數字 |
+
+**認識論分界（本模型最重要的一條）：** 「FY27 D&C 營收成長 +60%」是 session 判斷；
+「FY27 分部營收 ＝ 基期 × (1 + 成長)」是確定性算術。每個輸出都同時帶
+`calculation="deterministic"` 與 `input_dependency`（最弱輸入假設的知識種類）；LLM 不得直接
+吐 EPS，只能寫假設。缺任何一條假設就是 `missing`，不補 0 成長、0% 利潤率。
+
+**會計期間與口徑是身分：** `FiscalPeriod.end` 才是身分，`FY2027` 只是結束年命名慣例；
+provider 的 `0y`／`+1y` 在 ETL 抓取當下解析成絕對日期（`shared/fiscal.py`）。EPS 共識的
+GAAP／non-GAAP 口徑不靠慣例，靠 `year_ago_actual` 與一手財報稀釋 EPS 機械核對（COHR：5.61 ＝
+non-GAAP，≠ GAAP 4.12）；核不出來就 `unverified`，不得相減。
+
+**PIT 三道門：** 假設 `created_at <= T`、觀測 `recorded_at <= T`、共識 `captured_at <= T`；
+builder 另核對 model 的 `as_of` 與 context 相符，不符拒收。歷史時點沒有假設就是 `missing`，
+不偷用現在的假設重建過去的 gap。
+
+**刻意不做（下一階段）：** DCF／reverse DCF、目標價、預期報酬、下檔、進場價、opportunity
+ranking、毛利率／營業費用拆分、FCF、季度期間。`rank_bottlenecks()` 仍是唯一排序權威。
 
 ## 7. Engine D（Decision Lab）runtime
 

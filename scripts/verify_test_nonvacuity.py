@@ -887,13 +887,83 @@ MUTATIONS: tuple[Mutation, ...] = (
     ),
     # ---- Alpha Investment Read Model（briefing/alpha_view，2026-09-05）------------------
     Mutation(
-        name="read model 把未建模的內部 EPS 填成 0",
+        name="read model 把缺料的內部 EPS 填成 0",
         path="briefing/alpha_view/builder.py",
-        old="        items=tuple(not_modeled(k, l, internal_reason) for k, l in (",
-        new="        items=tuple(Datum(key=k, label=l, value=0.0, status=\"available\", "
-            "basis=\"deterministic\") for k, l in (",
+        old="        internal_items = tuple(missing(f\"internal_{k}\", l, absent, authority=A_BRIDGE)\n"
+            "                               for k, l, _u in _INTERNAL_METRIC_LABELS) + fixed_not_modeled",
+        new="        internal_items = tuple(Datum(key=f\"internal_{k}\", label=l, value=0.0, status=\"available\", "
+            "basis=\"deterministic\")\n"
+            "                               for k, l, _u in _INTERNAL_METRIC_LABELS) + fixed_not_modeled",
         test="tests/test_alpha_investment_view.py::test_missing_internal_eps_is_not_serialized_as_zero",
-        guards="Missing != Zero：internal EPS 不存在必須是 not_modeled＋null，不是 0",
+        guards="Missing != Zero：internal EPS 沒有模型輸出必須是 missing＋null，不是 0",
+    ),
+    # ---- Phase 2 Causal Fundamental Model（2026-09-05）--------------------------------
+    Mutation(
+        name="橋把缺席的分部成長假設當成零成長",
+        path="alpha/fundamental/bridge.py",
+        old="                missing_segments.append(name)",
+        new="                running += base",
+        test="tests/test_fundamental_model.py::test_missing_segment_assumption_makes_revenue_missing_not_zero_growth",
+        guards="Missing != Zero：少一條分部假設是 missing，不是 0% 成長",
+    ),
+    Mutation(
+        name="比較跨會計期間硬減",
+        path="alpha/fundamental/compare.py",
+        old="    if not internal.period.same_as(consensus.period):\n        return _no(\"incompatible_period\",",
+        new="    if False:\n        return _no(\"incompatible_period\",",
+        test="tests/test_fundamental_model.py::test_fy27_internal_is_not_compared_with_fy26_or_fy28_consensus",
+        guards="同一指標、不同會計期間不得相減——期間是身分",
+    ),
+    # ⚠ 第一版突變拿掉的是「unverified 不得相減」那道檢查，結果測試仍綠——因為下一道
+    # 「口徑不同不得相減」把 unverified≠non_gaap 也擋住了（兩道檢查刻意重疊，第一道只是
+    # 給更準確的原因）。空跑不是斷言沒守住，是突變選錯了門；改突變第二道，它才是承重牆。
+    Mutation(
+        name="內部與共識口徑不同也照樣相減",
+        path="alpha/fundamental/compare.py",
+        old="        if internal.accounting_basis != consensus_basis:",
+        new="        if False:",
+        test="tests/test_fundamental_model.py::test_unverified_or_mismatched_basis_yields_no_gap",
+        guards="GAAP vs non-GAAP 不得硬減；口徑靠一手數字核實不靠慣例（L11：自己引用的事實也要追源）",
+    ),
+    Mutation(
+        name="as_of 之後寫的假設被當成存在",
+        path="alpha/fundamental/assumptions.py",
+        old="        if record.created_on > cutoff:",
+        new="        if False:",
+        test="tests/test_fundamental_model.py::test_assumptions_created_after_as_of_are_invisible",
+        guards="INV-6：歷史時點不得偷用現在的假設重建過去的 gap",
+    ),
+    Mutation(
+        name="解析不到證據的假設照樣生效",
+        path="alpha/fundamental/assumptions.py",
+        old="        if unresolved:",
+        new="        if False and unresolved:",
+        test="tests/test_fundamental_model.py::test_unresolved_evidence_rejects_assumption_and_counts",
+        guards="L15／L8：假設的引用必須解析到 ResearchContext／Engine C 的證據，否則拒用並計數",
+    ),
+    Mutation(
+        name="ETL 把沒有估計值的共識寫成 0",
+        path="engine_c/etl_yfinance.py",
+        old="            avg = _sf(row.get(\"avg\"))\n            if avg is None:\n                continue",
+        new="            avg = _sf(row.get(\"avg\")) or 0.0",
+        test="tests/test_engine_c_consensus_estimates.py::test_missing_estimate_writes_no_row_not_zero",
+        guards="L12：「沒有共識」與「共識是 0」不得同形",
+    ),
+    Mutation(
+        name="模型接受寫入時間晚於 as_of 的基期觀測",
+        path="alpha/fundamental/model.py",
+        old="        if actuals.recorded_at is not None and actuals.recorded_at.date() > cutoff:",
+        new="        if False:",
+        test="tests/test_fundamental_model.py::test_actuals_recorded_after_as_of_are_refused",
+        guards="INV-6：T 時刻還沒寫進 ledger 的觀測，在 T 就是不知道",
+    ),
+    Mutation(
+        name="builder 在 as-of 模式下接受用別的時點跑的 model",
+        path="briefing/alpha_view/builder.py",
+        old="        if fundamental_model is not None and fundamental_model.as_of != context.as_of:",
+        new="        if False:",
+        test="tests/test_alpha_view_fundamental.py::test_builder_refuses_a_model_run_at_a_different_as_of",
+        guards="INV-6：呼叫端拿當前假設跑的 model 不得混進歷史卡",
     ),
     Mutation(
         name="read model 把 PE 比值 proxy 標成 deterministic model",

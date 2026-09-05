@@ -180,16 +180,24 @@ def _walk(node: Any, path: str = ""):
 # ---------------------------------------------------------------------------
 
 def test_missing_internal_eps_is_not_serialized_as_zero() -> None:
-    """internal EPS 今天不存在——它必須是 `not_modeled` ＋ `null`，不是 0。"""
+    """沒有 fundamental model 輸出時 internal EPS 必須是 `missing` ＋ `null`，不是 0。
+
+    ⚠ 2026-09-05 起系統**有**這個能力（`alpha/fundamental`），所以缺席是 `missing`
+    （有能力、沒資料／本次未執行），不再是 `not_modeled`；缺席不是 0 這條不變。
+    """
     view = _view()
     section = view.internal_fundamentals
-    assert section.meta.status == "not_modeled"
+    assert section.meta.status == "missing"
+    assert section.meta.capability == CAP_FINANCIAL_CAUSAL
     eps = next(d for d in section.items if d.key == "internal_eps")
-    assert eps.status == "not_modeled" and eps.value is None
+    assert eps.status == "missing" and eps.value is None
     payload = json.loads(json.dumps(view.to_dict(), ensure_ascii=False))
     serialized = next(d for d in payload["internal_fundamentals"]["items"] if d["key"] == "internal_eps")
     assert serialized["value"] is None
-    assert serialized["status"] == "not_modeled"
+    assert serialized["status"] == "missing"
+    # bridge v1 不做的東西仍是 not_modeled（能力不存在），與 missing 分開
+    fcf = next(d for d in section.items if d.key == "internal_fcf")
+    assert fcf.status == "not_modeled" and fcf.value is None
 
 
 def test_missing_implied_margin_is_not_zero_percent() -> None:
@@ -293,10 +301,12 @@ def test_causal_section_is_structural_not_financial() -> None:
     assert view.causal_paths.meta.capability == CAP_STRUCTURAL_CAUSAL
     assert view.causal_paths.meta.capability != CAP_FINANCIAL_CAUSAL
     assert view.causal_paths.meta.basis == "structural_inference"
-    assert view.causal_paths.financial_causal_model.status == "not_modeled"
+    # 沒注入 fundamental model：財務橋那一格是 missing（有能力沒資料），causal section 本身仍是 structural
+    assert view.causal_paths.financial_causal_model.status == "missing"
+    assert view.causal_paths.financial_causal_model.value is None
     assert any("不是 financial causal model" in w for w in view.causal_paths.meta.warnings)
-    assert view.earnings_bridge.meta.status == "not_modeled"
-    assert all(d.value is None for d in view.earnings_bridge.steps)
+    assert view.earnings_bridge.meta.status == "missing"
+    assert view.earnings_bridge.steps == () and view.earnings_bridge.assumptions == ()
 
 
 # ---------------------------------------------------------------------------
@@ -405,12 +415,14 @@ def test_missing_snapshot_makes_sections_missing_not_not_modeled() -> None:
     view = _view(fundamentals=_FakeFundamentals(available=False))
     assert view.fundamentals.meta.status == "missing"
     assert view.consensus.meta.status == "missing"
-    assert view.internal_fundamentals.meta.status == "not_modeled"
+    assert view.expected_return.meta.status == "not_modeled"
     price = next(d for d in view.fundamentals.items if d.key == "price")
     assert price.value is None and price.status == "missing"
     cap = view.capability_map()
     assert cap["fundamentals"]["status"] == "missing"
-    assert cap["internal_fundamentals"]["status"] == "not_modeled"
+    assert cap["expected_return"]["status"] == "not_modeled"
+    # internal fundamentals 自 2026-09-05 起是「有能力」：沒資料是 missing，不是 not_modeled
+    assert cap["internal_fundamentals"]["status"] == "missing"
 
 
 def test_catalyst_capability_is_partial_and_reuses_shared_state() -> None:
@@ -485,8 +497,11 @@ def test_compact_card_is_pure_selection_from_the_view() -> None:
     assert card["market_implied_eps_growth"]["value"] == growth.value
     assert card["market_implied_eps_growth"]["basis"] == "heuristic_proxy"
     assert card["catalyst"]["state"] == "watch"
-    assert set(card["not_modeled"]) >= {"internal_fundamentals", "earnings_bridge",
-                                        "expected_return", "downside", "entry_logic"}
+    assert set(card["not_modeled"]) >= {"expected_return", "downside", "entry_logic"}
+    assert "internal_fundamentals" not in card["not_modeled"]          # 有能力了；沒資料是 missing
+    assert card["internal_fundamentals_status"] == "missing"
+    assert card["internal_vs_consensus"]["eps"]["status"] == "missing"
+    assert card["internal_vs_consensus"]["eps"]["relative_gap"] is None
     banned = set(FORBIDDEN_POSITION_TOKENS)
     assert not any(set(str(k).lower().split("_")) & banned for _p, k, _v in _walk(card))
 
