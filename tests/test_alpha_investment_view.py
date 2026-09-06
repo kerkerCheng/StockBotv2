@@ -145,9 +145,11 @@ def _facts(**overrides: Any) -> DecisionFacts:
 
 def _view(*, with_signal: bool = True, fundamentals: _FakeFundamentals | None = None,
           facts: DecisionFacts | None = None, judgment: dict[str, Any] | None = None,
-          identity: dict[str, Any] | None = None, **kwargs: Any) -> AlphaInvestmentView:
+          identity: dict[str, Any] | None = None, allow_stale: bool = False, today: date = TODAY,
+          **kwargs: Any) -> AlphaInvestmentView:
     build = _build(fundamentals)
-    signal = compose_signal(build, judgment or _judgment()) if with_signal else None
+    signal = (compose_signal(build, judgment or _judgment(), allow_stale_context=allow_stale)
+              if with_signal else None)
     return build_alpha_investment_view(
         build=build, signal=signal,
         signal_reason=None if with_signal else "測試：刻意不給判斷",
@@ -161,7 +163,7 @@ def _view(*, with_signal: bool = True, fundamentals: _FakeFundamentals | None = 
                           "last_checked": "2026-07-17"},
         identity=identity or {"market_currency": "USD", "market_quote_unit": "USD",
                               "execution_venue": "NYSE"},
-        today=TODAY, **kwargs,
+        today=today, **kwargs,
     )
 
 
@@ -455,7 +457,12 @@ def test_falsification_keeps_l7_triplet_and_does_not_claim_auto_invalidation() -
     assert section.conditions[0].action_within_48h == "強制 review"
     assert section.conditions[0].basis == "session_judgment"
     assert section.meta.capability == "structured_conditions_with_expiry_watch"
-    assert section.automatic_invalidation.status == "not_modeled"
+    # Step 0.5 起有 dependency impact 引擎（partial），但它**不是**自動 thesis 失效引擎：
+    # 不解析自然語言條件、不改 thesis、不呼叫 LLM——這三條必須寫在 view 裡，不是只在文件裡。
+    auto = section.automatic_invalidation
+    assert auto.status == "partial" and auto.value["capability"] == "dependency_impact_v1"
+    assert any("LLM" in x for x in auto.value["does_not"]) and any("thesis" in x for x in auto.value["does_not"])
+    assert "automatic_invalidation_engine" not in auto.value["capability"]
     assert section.thesis_status.value["status"] == "active"
 
 

@@ -234,6 +234,22 @@ StockBot 對某個未來 driver 的**明示**假設（`alpha/fundamental/contrac
 `alpha/fundamental/compare.py`：內部估計與 Engine C `consensus_estimates` 的同一指標、**同一會計期間、同一口徑（GAAP／non-GAAP）、同幣別**才給 `absolute_gap`／`relative_gap`；否則 `incompatible_period`／`incompatible_basis`／`incompatible_unit`／`internal_missing`／`consensus_missing`，**沒有數字**。EPS 共識的口徑靠 `year_ago_actual` 與一手財報稀釋 EPS 機械核對，核不出來是 `unverified`。它與 Q4（session 的 ordinal 判斷）並存、分開標示，**不是** Q4。
 *Avoid:* 把 `price/pe_forward` 導出的 EPS-like 值當共識、把相對標籤 `+1y` 當會計年度身分、拿它排序
 
+### Refresh State（研究成果相對於依賴的狀態）
+`alpha/refresh` 的封閉字彙：`current`（依賴沒 materially changed）／`recalculate`（輸入變了、下游確定性，重算即可）／`review_required`（依據 material change，舊判斷只剩歷史價值，要人重看）／`invalidated`（前提不成立：證據撤回、解析不到、review condition 宣告）／`stale`（**只是**核查週期到期，不隱含新證據）／`superseded`（被較新紀錄或同期實際值取代——歷史）／`missing`（此視角不存在）。每個 state 有固定的 `required_action`。
+*Avoid:* 把 digest 變了叫 stale、把 stale 與 review_required 混用、讓引擎改任何判斷或假設
+
+### ChangeEvent（已分類的變化）
+「什麼變了」的 canonical 表示：class（`market_price`／`consensus`／`financial_actual`／`company_guidance`／`graph_edge`／`graph_claim`／`evidence`／`operating_assumption`／`fiscal_period_rollover`／`thesis_review_due`／`disproof_signal`／`context_digest`）＋authority＋物件 ref＋`observed_at`（系統何時知道；as-of 可見性）＋`published_at`（世界何時知道；「判斷當時知不知道」）＋material fields＋old／new。由 `briefing/alpha_view/changes.py` 從 authority 時序導出，**不是 digest diff**；同一身分、不同值才是變化。
+*Avoid:* 「context digest 變了」、第一次出現當變化、用 ingest 時間冒充事件時間
+
+### Dependency Role（假設 ref 的角色）
+`OperatingAssumption.dependency_roles`：`supporting`（支持假設為真）／`calibration`（校準數字的脈絡，例：市場隱含 +65% 所以選 +60%）／`comparison`（拿來比較的對象）。**同期分析師共識不得是 supporting**（provenance 循環）。舊紀錄標 `provenance_semantics=legacy`，讀取端 fail safe。
+*Avoid:* 只靠「ref 還解析得到」判假設仍成立、改寫舊 ledger 行補角色
+
+### Review Condition（假設自帶的 machine-readable 觸發條件）
+`metric`／`scope`／`period_end`／`period_kind`／`operator`／`threshold`／`on_trigger`／`note`。由寫假設的人明示，引擎拿 Engine C 觀測（年度＋exit quarter）對照；滿足 → `disproof_signal` → 該假設 `on_trigger` state。`note` 是人寫的下一步（例：下修至 +45%），引擎只讀不做。也可經 Event Watch `hypothesis_ref=oa_*` 喚醒。
+*Avoid:* parser 讀 rationale 自由文字、觸發後自動寫新假設
+
 ### status／basis（read model 的兩個語意軸）
-每一格（`Datum`）都帶兩個封閉字彙。**`status`** 回答「這格有沒有東西、為什麼沒有」：`available`／`partial`／`stale`／`missing`（有能力、這檔沒資料）／`insufficient_evidence`／`not_modeled`（**系統還沒有這個能力**）／`not_applicable`。⚠ 2026-09-05 起 `internal_fundamentals`／`earnings_bridge`／數值 gap **有能力了**：沒有假設或基期觀測是 `missing`，不再是 `not_modeled`；模型輸出另帶 `dependencies`（假設 id、觀測 ref、`input_dependency`、期間、口徑）。**`basis`** 回答「這是哪一種知識」：`deterministic`（既有規則算出，如 Q1）／`observation`（直接讀自 authority）／`heuristic_proxy`（如 trailing／forward PE − 1）／`session_judgment`（Q2–Q5、thesis、variant view）／`narrative`（bull／base／bear、Decision Store 散文）／`structural_inference`（圖上多跳推論）／`none`。型別層強制 **Missing != Zero**：沒有值的狀態不得帶值。
+每一格（`Datum`）都帶兩個封閉字彙。**`status`** 回答「這格有沒有東西、為什麼沒有」：`available`／`partial`／`stale`（2026-09-06 起**只**表示時間／排程到期）／`review_required`／`invalidated`（有值但不得當 current，由 `alpha/refresh` 決定）／`missing`（有能力、這檔沒資料）／`insufficient_evidence`／`not_modeled`（**系統還沒有這個能力**）／`not_applicable`。⚠ 2026-09-05 起 `internal_fundamentals`／`earnings_bridge`／數值 gap **有能力了**：沒有假設或基期觀測是 `missing`，不再是 `not_modeled`；模型輸出另帶 `dependencies`（假設 id、觀測 ref、`input_dependency`、期間、口徑）。**`basis`** 回答「這是哪一種知識」：`deterministic`（既有規則算出，如 Q1）／`observation`（直接讀自 authority）／`heuristic_proxy`（如 trailing／forward PE − 1）／`session_judgment`（Q2–Q5、thesis、variant view）／`narrative`（bull／base／bear、Decision Store 散文）／`structural_inference`（圖上多跳推論）／`none`。型別層強制 **Missing != Zero**：沒有值的狀態不得帶值。
 *Avoid:* confidence（那是 session 自評）、data quality score、把 status 與 basis 壓成一個欄位

@@ -187,10 +187,10 @@ def test_compact_card_and_daily_brief_cell_select_the_gap_without_recomputing() 
     assert card["internal_vs_consensus"]["eps"]["period"] == "FY2027"
     assert "internal_fundamentals" not in card["not_modeled"]
     row = next(l for l in render_alpha_cards([card]) if l.startswith("| co:coherent"))
-    assert "（FY2027）" in row and row.count("|") == 10
+    assert "（FY2027）" in row and row.count("|") == 11        # Step 0.5 多一欄 Refresh
     # 舊 fixture 沒有這個欄位 → 「未提供」，不是 0
     legacy = next(l for l in render_alpha_cards([_card()]) if l.startswith("| co:coherent"))
-    assert "未提供" in legacy and legacy.count("|") == 10
+    assert "未提供" in legacy and legacy.count("|") == 11
 
 
 def test_sources_fail_soft_when_the_provider_has_no_fiscal_capability(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -199,7 +199,7 @@ def test_sources_fail_soft_when_the_provider_has_no_fiscal_capability(monkeypatc
     from tests.test_alpha_investment_view import _FakeFundamentals, _build
 
     build = _build()
-    model, reason = sources._fundamental_model(  # noqa: SLF001
+    model, reason, _records = sources._fundamental_model(  # noqa: SLF001
         build, _FakeFundamentals(), Ticker("COHR"), CompanyId("co:coherent"), as_of=None, today=TODAY)
     assert model is None and "沒有" in reason
 
@@ -213,7 +213,7 @@ def test_sources_fail_soft_when_the_provider_has_no_fiscal_capability(monkeypatc
         def company_guidance(self, ticker, *, as_of=None):
             return (), None
 
-    model, reason = sources._fundamental_model(  # noqa: SLF001
+    model, reason, _records = sources._fundamental_model(  # noqa: SLF001
         build, _Exploding(), Ticker("COHR"), CompanyId("co:coherent"), as_of=None, today=TODAY)
     assert model is None and "執行失敗" in reason and "boom" in reason
 

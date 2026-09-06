@@ -56,8 +56,15 @@ SCHEMA_VERSION = "alpha-investment-view/v1"
 SectionStatus = Literal[
     "available", "partial", "stale", "missing",
     "insufficient_evidence", "not_modeled", "not_applicable",
+    "review_required", "invalidated",
 ]
 SECTION_STATUSES: frozenset[str] = frozenset(SectionStatus.__args__)  # type: ignore[attr-defined]
+
+#: Step 0.5（2026-09-06）加的兩個 status——它們**有值**（舊判斷仍保留為歷史資訊），但不得再當
+#: current：`review_required`＝依據發生 material change，要人重看；`invalidated`＝已知前提不成立。
+#: `stale` 從此**只**表示時間／排程到期（Engine C 快照超過 14 天、核查週期到了），不再兼任
+#: 「context digest 變了」——那正是 Step 0 抓到的 over-invalidation（L12：一個表示兩種語意）。
+REFRESH_STATUSES: frozenset[str] = frozenset({"available", "stale", "review_required", "invalidated"})
 
 #: 這些狀態代表「沒有值」——`Datum.value` 必須是 `None`。
 VALUELESS_STATUSES: frozenset[str] = frozenset(
@@ -88,11 +95,13 @@ BASIS_LABEL: Mapping[str, str] = {
 STATUS_LABEL: Mapping[str, str] = {
     "available": "有",
     "partial": "部分",
-    "stale": "過期",
+    "stale": "過期（排程）",
     "missing": "缺料",
     "insufficient_evidence": "證據不足",
     "not_modeled": "尚未建模",
     "not_applicable": "不適用",
+    "review_required": "需複查",
+    "invalidated": "已失效",
 }
 
 #: capability 等級的具名常數——section 用它宣告「我做到哪裡」，消費端據此不得 overclaim。
@@ -105,6 +114,10 @@ CAP_AUTOMATIC_INVALIDATION = "automatic_invalidation_engine"
 CAP_CATALYST_UNLINKED = "structured_dates_without_repricing_link"
 #: Phase 2：內部估計 vs **同期、同口徑**共識的數值 gap（不含估值、不含價格隱含側）。
 CAP_NUMERIC_EXPECTATION_GAP = "numeric_internal_vs_consensus"
+#: Step 0.5：dependency impact（什麼變了 → 影響誰 → 哪種 state）。它評估 machine-readable 條件與
+#: 已分類的變化，**不解析自然語言 disproof、不改 thesis、不自動呼叫 LLM**——所以不是
+#: `CAP_AUTOMATIC_INVALIDATION`（那個名字保留給「會自己判定條件並改狀態」的東西，今天不存在）。
+CAP_DEPENDENCY_IMPACT = "dependency_impact_v1"
 
 
 class ViewContractViolation(ValueError):
@@ -237,6 +250,9 @@ class SignalCompleteness:
     current_context_digest: str | None = None
     context_matches: bool | None = None
     reason: str | None = None
+    #: thesis 層級的 refresh state（alpha.refresh）；None＝無判斷。它與 `context_matches` 分開：
+    #: 後者是「判斷對的是不是這份 context」的事實，前者是「變化動不動搖這份判斷」的結論。
+    refresh_state: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -539,6 +555,63 @@ class EvidenceSection:
 
 
 @dataclass(frozen=True, slots=True)
+class RefreshItem:
+    """一個研究成果的 refresh state（由 `alpha.refresh.resolve_refresh` 算出，這裡只抄）。"""
+
+    artifact_type: str
+    artifact_id: str
+    label: str
+    state: str
+    reasons: tuple[str, ...]
+    changed_refs: tuple[str, ...]
+    dependency_refs: tuple[str, ...]
+    detected_at: datetime | None
+    established_at: datetime | None
+    required_action: str
+    propagated_from: tuple[str, ...]
+    kind: str
+
+
+@dataclass(frozen=True, slots=True)
+class ChangeItem:
+    """一件已分類的變化（`alpha.refresh.ChangeEvent` 的 view 形狀）。"""
+
+    change_id: str
+    change_type: str
+    authority: str
+    changed_ref: str
+    observed_at: datetime
+    effective_at: date | None
+    old_version: str | None
+    new_version: str | None
+    material_fields: tuple[str, ...]
+    detail: str
+    target_artifact: str | None
+
+
+@dataclass(frozen=True, slots=True)
+class RefreshStatusSection:
+    """什麼變了、影響哪些研究成果、各自處在哪種 state、要做什麼。
+
+    read model **只組裝**：impact 由 `alpha.refresh` 單一 authority 算出。`overall` 是所有非終局
+    成果的最高 state；`counts` 是各 state 的個數（常駐計數器，L14）。
+    """
+
+    meta: SectionMeta
+    overall: str
+    policy_version: str
+    counts: Mapping[str, int]
+    items: tuple[RefreshItem, ...]
+    changes: tuple[ChangeItem, ...]
+    excluded_changes: Mapping[str, int]
+    excluded_artifacts: Mapping[str, int]
+    notes: tuple[str, ...]
+    digest: str
+    change_detection: str                    # "authority_time_series"／"not_run"／"scenario"
+    judged_context_matches: bool | None
+
+
+@dataclass(frozen=True, slots=True)
 class FreshnessItem:
     source: str
     status: str                              # available／stale／missing／quarantined
@@ -578,6 +651,7 @@ class AlphaInvestmentView:
     entry_logic: NotModeledSection
     evidence: EvidenceSection
     freshness: tuple[FreshnessItem, ...]
+    refresh_status: RefreshStatusSection
     warnings: tuple[str, ...] = ()
 
     #: 有 `meta` 的 section 名稱，`capability_map()` 依此列舉。
@@ -585,7 +659,7 @@ class AlphaInvestmentView:
         "variant_view", "structural_thesis", "causal_paths", "fundamentals", "consensus",
         "price_implied_expectations", "internal_fundamentals", "earnings_bridge",
         "expectation_gap", "catalysts", "falsification", "scenarios", "expected_return",
-        "downside", "entry_logic", "evidence",
+        "downside", "entry_logic", "evidence", "refresh_status",
     )
 
     def capability_map(self) -> dict[str, dict[str, str | None]]:
@@ -625,8 +699,8 @@ def _jsonable(obj: Any) -> Any:
 
 __all__ = [
     "AlphaInvestmentView", "BASES", "BASIS_LABEL", "Basis", "CAP_AUTOMATIC_INVALIDATION",
-    "CAP_CATALYST_UNLINKED", "CAP_FINANCIAL_CAUSAL", "CAP_NARRATIVE_SCENARIOS",
-    "CAP_NUMERIC_EXPECTATION_GAP",
+    "CAP_CATALYST_UNLINKED", "CAP_DEPENDENCY_IMPACT", "CAP_FINANCIAL_CAUSAL", "CAP_NARRATIVE_SCENARIOS",
+    "CAP_NUMERIC_EXPECTATION_GAP", "ChangeItem", "REFRESH_STATUSES", "RefreshItem", "RefreshStatusSection",
     "CAP_QUANTITATIVE_SCENARIOS", "CAP_STRUCTURAL_CAUSAL", "CAP_STRUCTURED_DISPROOF",
     "CatalystItem", "CatalystSection", "CausalPathSection", "CheckpointItem",
     "ConsensusSection", "Datum", "DisproofItem", "EarningsBridgeSection", "EventItem",

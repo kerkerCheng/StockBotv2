@@ -300,6 +300,74 @@ builder 另核對 model 的 `as_of` 與 context 相符，不符拒收。歷史�
 **刻意不做（下一階段）：** DCF／reverse DCF、目標價、預期報酬、下檔、進場價、opportunity
 ranking、毛利率／營業費用拆分、FCF、季度期間。`rank_bottlenecks()` 仍是唯一排序權威。
 
+### 6.3 Research Refresh／Dependency Invalidation（`alpha/refresh/`，2026-09-06 Step 0.5 v1）
+
+**角色一句話：什麼變了？影響哪些研究成果？哪些只需重算？哪些需要重新研究？哪些已失效？**
+
+它是 **dependency／orchestration authority**，不是 analyst authority——這條邊界必須寫死：
+
+| 誰 | 產生什麼 | refresh 引擎對它做什麼 |
+|---|---|---|
+| Data authority（A1 Engine A、A2 Engine C） | 觀測、結構事實 | 只讀時序，導出 `ChangeEvent` |
+| Research authority（A3：session 判斷、`OperatingAssumption`） | 判斷、假設 | **不產生、不修改**；只決定每個成果的 refresh state |
+| Refresh／Invalidation（`alpha/refresh`） | `RefreshReport` | 不產生新事實、不產生新假設、不改 thesis、**不自動呼叫 LLM** |
+
+```
+Engine C 時序／圖投影差集／假設 ledger／Event Watch／lifecycle ─► briefing/alpha_view/changes.py ─► ChangeEvent[]
+                                                                                                   │
+既有 provenance（ComponentTrace.evidence_refs、OperatingAssumption.evidence_refs＋dependency_roles、  │
+ModeledMetric.assumption_ids、ExpectationComparison.consensus_refs）─► artifacts.py ─► ArtifactDependency[]
+                                                                                                   ▼
+                                   alpha/refresh/resolver.py（policy.py 的表 × 引用命中 × 一層傳播）─► RefreshReport
+                                                                                                   ▼
+                                   briefing/alpha_view：refresh_status section＋各格 status；只組裝，不判 impact
+```
+
+**封閉字彙（contract）：** state ＝ `current`／`recalculate`／`review_required`／`invalidated`／`stale`／
+`superseded`／`missing`；change class ＝ `market_price`／`consensus`／`financial_actual`／`company_guidance`／
+`graph_edge`／`graph_claim`／`evidence`／`operating_assumption`／`fiscal_period_rollover`／`thesis_review_due`／
+`disproof_signal`／`context_digest`（殘餘：digest 變了但沒有 class 能解釋——必須現形）。
+
+**三條規則（改它們要先答出「現有幾個成果的 state 會變」，L14）：**
+
+1. **`digest changed` 不是變化。** 每個 `ChangeEvent` 都指得出 class、authority、物件、`observed_at`（系統何時
+   知道，決定 as-of 可見性）、`published_at`（世界何時知道，決定「判斷當時知不知道」）。同一身分、不同值才是
+   變化——共識表「第一次出現」是資料覆蓋變了，不是世界變了（同 `documents` 不參與排序的理由）。
+2. **recalculate ≠ review_required ≠ invalidated ≠ stale。** 確定性成果（Q1、橋、數值 gap、市場 proxy）的輸入
+   變了 → `recalculate`；判斷型成果（Q2–Q5、thesis、假設）的依據 material change → `review_required`；
+   supporting evidence 撤回／解析不到／review condition 宣告 → `invalidated`；L7 核查週期到期 → `stale`，
+   不隱含任何新證據。舊 D&C 假設被新紀錄取代、或 FY2027 有了實際值 → `superseded`（歷史，不沿用）。
+3. **不 cascade。** 影響只由 `policy.py` 的表（class → axis／basis／driver）與**引用命中**（變化的 ref ∈ 成果的
+   supporting refs）決定；傳播只沿 `assumption_ids` 走一層（模型輸出 ← 假設）並標 `propagated_from`。
+   **v1 materiality 立場：price-only 變化只讓市場導出量 recalculate，任何研究判斷維持 current**——沒有經量測的
+   門檻能說「漲 6.6% 該重看、0.6% 不用」，假裝有比誠實說沒有更危險。共識有 1% 雜訊地板，那是抖動不是 materiality。
+
+**假設 provenance（Step 0.5 擴充，舊 ledger 不改寫）：** `dependency_roles`（ref → `supporting`／`calibration`／
+`comparison`）、`review_conditions`（machine-readable：metric／scope／period／operator／threshold／`on_trigger`）、
+`provenance_semantics`（`legacy`＝2026-09-05 的 v1 紀錄；讀取端 fail safe：未分類 ref 當 supporting，同期共識 ref 依
+前綴當 calibration）。**同期分析師共識不得是 supporting**（契約拒收）——那是 provenance 循環：共識支持假設 →
+假設推出內部預測 → 再拿去比共識。Event Watch 的 `hypothesis_ref` 可指向 `oa_*` 假設 id；watch fired →
+`disproof_signal` → 該假設 `review_required`，值不自動改。
+
+**PIT：** `--as-of T` 只看 `observed_at <= T` 的變化、`established_at <= T` 的成果（其餘計數為 excluded）；
+未來的 contradiction 不得回頭把歷史成果標 invalidated——當時它是 current。
+
+**read model 的消費：** `SectionStatus` 多了 `review_required`／`invalidated`（有值但不得當 current）；`stale`
+從此**只**表示時間／排程到期。`identity.signal.context_matches` 仍是「判斷對的是不是這份 context」的事實，
+但它不再自動讓 Q2–Q5／thesis／情境整份 stale。沒跑變更偵測時（`refresh_changes=None`）退回舊語意並標
+`change_detection=not_run`。`falsification.automatic_invalidation` 由 `not_modeled` 改為 `partial`（capability
+`dependency_impact_v1`，明列不做：解析自然語言條件、改 thesis、呼叫 LLM）。
+
+**入口：** `python -m briefing refresh <TICKER> [--scenario price_only|consensus_revision|graph_edge|new_guidance|
+new_actual|fiscal_rollover|disproof] [--as-of]`；完整卡第 15 節；精簡卡 `refresh` 欄；`python -m alpha assumptions
+--add` 的 spec 可帶 `calibration_refs`／`comparison_refs`／`review_conditions`。
+
+**刻意不做（v1 限制）：** 語意 materiality（只有 class 級規則＋1% 雜訊地板）；自然語言 rationale／disproof 不解析；
+`evidence`／`graph_claim` class 有契約但沒有 runtime 偵測來源（圖不記錄撤回）；ResearchContext 未持久化，所以
+digest 殘餘差異只能整批標 `context_digest`；行情 as-of 仍以 `bar_date` 篩（判斷基線用 `fetched_at`）。
+
+---
+
 ## 7. Engine D（Decision Lab）runtime
 
 - Decision facts 存於 ignored `library/private/decision_lab/`；第一筆真實事件後只允許

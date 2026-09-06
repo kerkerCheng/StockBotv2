@@ -168,9 +168,20 @@ def build_fundamental_model(
         if accepted:
             sensitivities = _sensitivities(actuals, accepted, target, metrics)
         if not accepted:
-            reason = ("沒有任何可用的 OperatingAssumption（" + "；".join(
-                f"{k}={v}" for k, v in selection.reasons.items()) + "）"
-                      if selection.input_count else "尚未寫入任何 OperatingAssumption")
+            # Step 0.5（2026-09-06）：FY2027 實際值寫入後基期推進、目標變 FY2028，舊假設全部
+            # `other_period`——技術上正確，但只說 missing 讀者不知道發生了什麼。把「會計期間已推進」
+            # 明確辨識出來；**不自動把舊假設複製到新期間**——新期間必須有明示的新假設。
+            rolled = [r for r in assumption_records
+                      if not r.retracted and r.period.same_as(actuals.period)]
+            if rolled and selection.reasons.get("other_period"):
+                reason = (f"會計期間已推進：基期 {actuals.period.label}（至 {actuals.period.end}）已報告，"
+                          f"目標期間為 {target.label}；{len(rolled)} 條 {actuals.period.label} 假設是歷史預測"
+                          f"（不沿用），{target.label} 需明示新的 OperatingAssumption")
+                warnings.append(f"fiscal_period_rollover：{actuals.period.label} → {target.label}")
+            else:
+                reason = ("沒有任何可用的 OperatingAssumption（" + "；".join(
+                    f"{k}={v}" for k, v in selection.reasons.items()) + "）"
+                          if selection.input_count else "尚未寫入任何 OperatingAssumption")
 
     # ---- 5. 共識與比較 --------------------------------------------------------
     consensus_bases = {

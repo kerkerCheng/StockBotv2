@@ -2608,6 +2608,31 @@
       "note": "park 時自動建立；trace_status=partial",
       "status": "active",
       "woken_by": null
+    },
+    {
+      "watch_id": "ew_0076_2026-09-06",
+      "created_at": "2026-09-06T00:03:55.752748+00:00",
+      "expires": "2027-03-31",
+      "kind": "fact_verification",
+      "until": null,
+      "entities": [
+        "COHR",
+        "co:coherent"
+      ],
+      "fact": "COHR Q2 FY2027（至 2026-12-31）D&C 季營收是否 <1.85B（+10% q/q 軌跡失守）——對照 8-K／新聞稿分部表；<1.85B 則 D&C +60% 假設需複查（人寫的下一步：下修至 +45%）",
+      "fact_check_ref": "engine_c:COHR:fiscal_year_results.exit_quarter.segment_revenue",
+      "wake_pq2": null,
+      "hypothesis_ref": "oa_b43e83a1413ab91c",
+      "wake_lead": "",
+      "consumed_entities": [],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": ""
+      },
+      "note": "Step 0.5（2026-09-06）：OperatingAssumption oa_b43e83a1413ab91c 的 review_condition 對應的 Event Watch；fired 後 refresh 引擎把該假設標 review_required，不自動改值、不呼叫 LLM",
+      "status": "active",
+      "woken_by": null
     }
   ]
 }

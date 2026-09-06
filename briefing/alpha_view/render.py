@@ -442,8 +442,11 @@ def render_alpha_investment_view_markdown(view: AlphaInvestmentView) -> str:
         )
     lines.append("")
 
-    # 15. Freshness ＋ warnings
-    lines += ["## 15. 新鮮度總表", "", "| 來源 | 狀態 | as-of | 幾天前 | 註 |", "|---|---|---|---|---|"]
+    # 15. Refresh／dependency status
+    lines += render_refresh_status_lines(view)
+
+    # 16. Freshness ＋ warnings
+    lines += ["## 16. 新鮮度總表", "", "| 來源 | 狀態 | as-of | 幾天前 | 註 |", "|---|---|---|---|---|"]
     for fr in view.freshness:
         age = "—" if fr.age_days is None else f"{fr.age_days:.0f}"
         lines.append(f"| {markdown_text(fr.source)} | {markdown_text(fr.status)} | "
@@ -451,6 +454,56 @@ def render_alpha_investment_view_markdown(view: AlphaInvestmentView) -> str:
     lines += ["", "## ⚠ 警告", ""]
     lines += [f"- {markdown_text(w)}" for w in view.warnings]
     return "\n".join(lines)
+
+
+def render_refresh_status_lines(view: AlphaInvestmentView) -> list[str]:
+    """第 15 節（refresh／dependency status）。`python -m briefing refresh` 單獨印這一節。"""
+    lines: list[str] = []
+    rs = view.refresh_status
+    lines += _section("15. Refresh／dependency status（什麼變了、影響誰、要做什麼）", rs.meta)
+    lines.append(
+        f"- overall：**{rs.overall}**｜policy {markdown_text(rs.policy_version)}｜變更偵測：{markdown_text(rs.change_detection)}"
+        + ("｜判斷與目前 context：" + ("一致" if rs.judged_context_matches else "**不一致**")
+           if rs.judged_context_matches is not None else "")
+    )
+    counts = "、".join(f"{k} {v}" for k, v in rs.counts.items() if v)
+    lines.append(f"- 計數：{markdown_text(counts) if counts else '（無成果）'}")
+    if rs.changes:
+        lines.append("- 已分類的變化：")
+        for c in rs.changes:
+            versions = (f"（{markdown_text(c.old_version or '?')} → {markdown_text(c.new_version or '?')}）"
+                        if c.old_version or c.new_version else "")
+            lines.append(
+                f"  - `{c.change_type}` {markdown_text(c.changed_ref)}{versions}｜知道於 {c.observed_at.date().isoformat()}"
+                + (f"｜屬於 {c.effective_at.isoformat()}" if c.effective_at else "")
+                + (f"｜{markdown_text(c.detail)}" if c.detail else "")
+            )
+    else:
+        lines.append("- 已分類的變化：無")
+    attention = [i for i in rs.items if i.state not in ("current", "superseded", "missing")]
+    if attention:
+        lines.append("- 需要動作的成果：")
+        for i in attention:
+            lines.append(f"  - **{i.state}** {markdown_text(i.label)}（`{i.artifact_type}:{i.artifact_id}`）→ {markdown_text(i.required_action)}")
+            for reason in i.reasons[:3]:
+                lines.append(f"    - {markdown_text(reason)}")
+            if i.propagated_from:
+                lines.append(f"    - 傳播自：{markdown_text('、'.join(i.propagated_from))}")
+    else:
+        lines.append("- 需要動作的成果：無（所有成果 current 或歷史）")
+    current = [i for i in rs.items if i.state == "current"]
+    if current:
+        lines.append(f"- current：{markdown_text('、'.join(i.label for i in current))}")
+    historical = [i for i in rs.items if i.state in ("superseded", "missing")]
+    if historical:
+        lines.append(f"- 歷史／不在此視角：{markdown_text('、'.join(f'{i.label}（{i.state}）' for i in historical))}")
+    for note in rs.notes:
+        lines.append(f"- 註：{markdown_text(note)}")
+    if rs.excluded_changes or rs.excluded_artifacts:
+        lines.append(f"- as-of 排除：變化 {dict(rs.excluded_changes)}｜成果 {dict(rs.excluded_artifacts)}")
+    lines.append("")
+
+    return lines
 
 
 def _edge_row(e: StructuralEdgeItem) -> str:
@@ -503,8 +556,8 @@ def _disproof_line(d: DisproofItem) -> str:
 # ---------------------------------------------------------------------------
 
 _CARD_HEAD = [
-    "| 標的 | Q1 結構 | Q2／Q3／Q4／Q5（session） | 市場隱含 EPS 成長 | 共識營收成長 | 內部 vs 共識 EPS（同期） | 催化劑／到期 | Disproof | 尚未建模 |",
-    "|---|---|---|---|---|---|---|---|---|",
+    "| 標的 | Q1 結構 | Q2／Q3／Q4／Q5（session） | 市場隱含 EPS 成長 | 共識營收成長 | 內部 vs 共識 EPS（同期） | 催化劑／到期 | Disproof | Refresh | 尚未建模 |",
+    "|---|---|---|---|---|---|---|---|---|---|",
 ]
 
 
@@ -524,8 +577,23 @@ def _internal_gap_cell(card: Mapping[str, Any]) -> str:
     return f"未知（{markdown_text(eps.get('reason') or eps.get('status') or '—')}）"
 
 
+def _refresh_cell(card: Mapping[str, Any]) -> str:
+    """Refresh 摘要：只抄 builder 給的計數。舊 fixture 沒這欄位 → 「未提供」，不是「全部 current」。"""
+    block = card.get("refresh")
+    if not isinstance(block, Mapping):
+        return "未提供"
+    counts = block.get("counts") or {}
+    parts = [f"{label} {counts[key]}" for key, label in
+             (("review_required", "⚠ 複查"), ("invalidated", "⛔ 失效"), ("recalculate", "↻ 重算"), ("stale", "⌛ 到期"))
+             if isinstance(counts.get(key), int) and counts[key]]
+    text = "、".join(parts) if parts else "current"
+    if block.get("change_detection") == "not_run":
+        text += "（未偵測）"
+    return text
+
+
 def _score_cell(score: Mapping[str, Any]) -> str:
-    if score.get("status") in ("available", "stale"):
+    if score.get("status") in ("available", "stale", "review_required", "invalidated"):
         level = score.get("session_level")
         eff = score.get("effective")
         text = f"{eff:.2f}" if isinstance(eff, (int, float)) else "—"
@@ -533,13 +601,17 @@ def _score_cell(score: Mapping[str, Any]) -> str:
             text += f"（{markdown_text(level)}）"
         if score.get("status") == "stale":
             text += "⌛"
+        elif score.get("status") == "review_required":
+            text += "⚠"
+        elif score.get("status") == "invalidated":
+            text += "⛔"
         return text
     return "未知"
 
 
 def _card_row(card: Mapping[str, Any]) -> str:
     if card.get("status") == "unavailable":
-        return (f"| {markdown_text(card.get('ticker') or '?')} | 讀不到 | 讀不到 | 讀不到 | 讀不到 | 讀不到 | 讀不到 | 讀不到 | "
+        return (f"| {markdown_text(card.get('ticker') or '?')} | 讀不到 | 讀不到 | 讀不到 | 讀不到 | 讀不到 | 讀不到 | 讀不到 | 讀不到 | "
                 f"（{markdown_text(card.get('reason') or 'unavailable')}） |")
     scores = card.get("scores") or {}
     q1 = _score_cell(scores.get("structural") or {})
@@ -573,15 +645,19 @@ def _card_row(card: Mapping[str, Any]) -> str:
     if dis.get("problems"):
         dis_text += f"｜⚠ 設定問題 {len(dis['problems'])}"
     label = markdown_text(card.get("company_label") or card.get("ticker") or "?")
-    if signal.get("has_signal") and signal.get("context_matches") is False:
-        label += "（判斷過期⌛）"
+    refresh_overall = (card.get("refresh") or {}).get("overall") if isinstance(card.get("refresh"), Mapping) else None
+    if signal.get("has_signal") and refresh_overall in ("review_required", "invalidated", "stale"):
+        label += f"（判斷{ {'review_required': '需複查⚠', 'invalidated': '已失效⛔', 'stale': '到期⌛'}[refresh_overall] }）"
+    elif signal.get("has_signal") and signal.get("context_matches") is False and refresh_overall is None:
+        label += "（判斷過期⌛）"          # 舊 fixture／沒跑 refresh 的卡：沿用 digest 語意
     elif not signal.get("has_signal"):
         label += "（無 session 判斷）"
     nm = card.get("not_modeled") or []
     nm_text = f"{len(nm)} 區" if nm else "—"
     gap_text = _internal_gap_cell(card)
+    refresh_text = _refresh_cell(card)
     return (f"| {label} | {q1} | {others} | {implied_text} | {cons_text} | {gap_text} | {cat_text} | "
-            f"{dis_text} | {nm_text} |")
+            f"{dis_text} | {refresh_text} | {nm_text} |")
 
 
 def render_alpha_cards(cards: Sequence[Mapping[str, Any]] | None, *, present: bool = True) -> list[str]:
@@ -604,8 +680,9 @@ def render_alpha_cards(cards: Sequence[Mapping[str, Any]] | None, *, present: bo
     lines += [_card_row(card) for card in cards]
     lines += [
         "",
-        "- 讀法：Q1 是確定性規則；Q2–Q5 是 session 判斷（括號內為 session 等級）；⌛＝判斷是對舊 context 做的；"
-        "「未知」是不知道，不是 0。",
+        "- 讀法：Q1 是確定性規則；Q2–Q5 是 session 判斷（括號內為 session 等級）；⌛＝排程到期、⚠＝需複查、"
+        "⛔＝已失效（refresh 引擎依變化種類判定，price tick 不觸發）；「未知」是不知道，不是 0。",
+        "- 「Refresh」欄是 refresh_status 的計數：什麼變了、影響誰、要做什麼見完整卡第 15 節；引擎只標 state，不改任何判斷。",
         "- 市場隱含 EPS 成長是 trailing／forward PE 的粗略代理，與共識**營收**成長分母不同，不得相減。",
         "- 「內部 vs 共識 EPS」是明示營運假設（session 判斷／heuristic）經確定性橋算出的 EPS 與**同期、同口徑**共識的相對差；"
         "假設不是事實，數字不是 Q4；不可比或缺料一律「未知」。",

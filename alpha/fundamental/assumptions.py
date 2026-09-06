@@ -25,17 +25,23 @@ from .contracts import (
     ASSUMPTION_DRIVERS, TOTAL_SCOPE, AssumptionSelection, FiscalPeriod, OperatingAssumption,
 )
 
-RECORD_VERSION = "operating-assumption/v1"
+#: v1＝2026-09-05 的原始形狀；v2（Step 0.5，2026-09-06）多了 `dependency_roles`／`review_conditions`／
+#: `provenance_semantics`。**舊行不改寫**：parse 端把沒有這三個欄位的紀錄標成 `legacy`。
+RECORD_VERSION = "operating-assumption/v2"
+LEGACY_RECORD_VERSION = "operating-assumption/v1"
 
 _ID_FIELDS = ("company_id", "ticker", "period_end", "period_kind", "driver", "scope", "value",
               "unit", "basis", "accounting_basis", "rationale", "evidence_refs", "created_at",
               "author", "supersedes_id", "retracted")
+#: v2 才有的欄位：**只在有值時**參與 id——舊紀錄的 id 不因新欄位存在而改變。
+_ID_FIELDS_V2 = ("dependency_roles", "review_conditions", "provenance_semantics")
 
 
 def new_assumption_id(payload: Mapping[str, Any]) -> str:
     """content-addressed id：同一份內容永遠得到同一個 id（重複 append 可被偵測）。"""
-    canonical = json.dumps({k: payload.get(k) for k in _ID_FIELDS}, ensure_ascii=False,
-                           sort_keys=True, separators=(",", ":"), default=str)
+    body = {k: payload.get(k) for k in _ID_FIELDS}
+    body.update({k: payload[k] for k in _ID_FIELDS_V2 if payload.get(k)})
+    canonical = json.dumps(body, ensure_ascii=False, sort_keys=True, separators=(",", ":"), default=str)
     return "oa_" + hashlib.sha256(canonical.encode("utf-8")).hexdigest()[:16]
 
 
@@ -56,8 +62,17 @@ def assumption_record(
     supersedes_id: str | None = None,
     retracted: bool = False,
     period_kind: str = "fiscal_year",
+    calibration_refs: Sequence[str] = (),
+    comparison_refs: Sequence[str] = (),
+    review_conditions: Sequence[Mapping[str, Any]] = (),
+    legacy_roles: bool = False,
 ) -> dict[str, Any]:
-    """建一筆可寫進 ledger 的紀錄（先經 `OperatingAssumption` 驗證，驗不過就不產生）。"""
+    """建一筆可寫進 ledger 的紀錄（先經 `OperatingAssumption` 驗證，驗不過就不產生）。
+
+    `evidence_refs` 是 **supporting** 證據；`calibration_refs`／`comparison_refs` 另列
+    （同期共識只能出現在這兩個，出現在 supporting 會被契約拒絕）。
+    `legacy_roles=True` 只給撤回舊紀錄用：沿用舊紀錄的 refs、不強迫補角色。
+    """
     spec = ASSUMPTION_DRIVERS.get(driver)
     if spec is None:
         raise ContractViolation(f"driver 未登記：{driver!r}；已知 {sorted(ASSUMPTION_DRIVERS)}")
@@ -65,8 +80,18 @@ def assumption_record(
     if stamp.tzinfo is None:
         raise ContractViolation("created_at 必須帶時區")
     stamp = stamp.astimezone(timezone.utc)
+    supporting = [str(r) for r in evidence_refs]
+    calibration = [str(r) for r in calibration_refs]
+    comparison = [str(r) for r in comparison_refs]
+    all_refs = supporting + [r for r in calibration if r not in supporting] \
+        + [r for r in comparison if r not in supporting and r not in calibration]
+    roles: dict[str, str] = {}
+    if not legacy_roles:
+        roles.update({r: "supporting" for r in supporting})
+        roles.update({r: "calibration" for r in calibration})
+        roles.update({r: "comparison" for r in comparison})
     payload: dict[str, Any] = {
-        "record_version": RECORD_VERSION,
+        "record_version": RECORD_VERSION if not legacy_roles else LEGACY_RECORD_VERSION,
         "company_id": str(company_id),
         "ticker": str(ticker).upper(),
         "period_end": period_end.isoformat(),
@@ -78,12 +103,19 @@ def assumption_record(
         "basis": basis,
         "accounting_basis": accounting_basis,
         "rationale": rationale,
-        "evidence_refs": [str(r) for r in evidence_refs],
+        "evidence_refs": all_refs,
         "created_at": stamp.isoformat(),
         "author": author,
         "supersedes_id": supersedes_id,
         "retracted": bool(retracted),
     }
+    if not legacy_roles:
+        payload["dependency_roles"] = roles
+        payload["provenance_semantics"] = "v2"
+    if review_conditions:
+        from ..refresh.contracts import ReviewCondition
+
+        payload["review_conditions"] = [ReviewCondition.from_dict(c).to_dict() for c in review_conditions]
     payload["assumption_id"] = new_assumption_id(payload)
     parse_assumption_record(payload)          # 驗證；不合法就在這裡炸，不會寫進 ledger
     return payload
@@ -100,6 +132,16 @@ def parse_assumption_record(raw: Mapping[str, Any]) -> OperatingAssumption:
     refs = raw.get("evidence_refs") or []
     if isinstance(refs, str):
         raise ContractViolation("evidence_refs 必須是 list")
+    roles_raw = raw.get("dependency_roles") or {}
+    if not isinstance(roles_raw, Mapping):
+        raise ContractViolation("dependency_roles 必須是物件（ref → role）")
+    conditions_raw = raw.get("review_conditions") or []
+    if not isinstance(conditions_raw, (list, tuple)):
+        raise ContractViolation("review_conditions 必須是 list")
+    from ..refresh.contracts import ReviewCondition
+
+    # 舊行（2026-09-05 v1）沒有角色欄位 → `legacy`；**不改寫舊行**，讀取端 fail safe。
+    semantics = str(raw.get("provenance_semantics") or ("v2" if roles_raw else "legacy"))
     return OperatingAssumption(
         assumption_id=str(raw.get("assumption_id") or ""),
         company_id=str(raw.get("company_id") or ""),
@@ -117,6 +159,9 @@ def parse_assumption_record(raw: Mapping[str, Any]) -> OperatingAssumption:
         accounting_basis=str(raw.get("accounting_basis") or "not_applicable"),
         supersedes_id=(str(raw["supersedes_id"]) if raw.get("supersedes_id") else None),
         retracted=bool(raw.get("retracted")),
+        dependency_roles={str(k): str(v) for k, v in roles_raw.items()},
+        review_conditions=tuple(ReviewCondition.from_dict(c) for c in conditions_raw),
+        provenance_semantics=semantics,
     )
 
 
@@ -193,6 +238,6 @@ def select_assumptions(
 
 
 __all__ = [
-    "RECORD_VERSION", "assumption_record", "new_assumption_id", "parse_assumption_record",
-    "select_assumptions",
+    "LEGACY_RECORD_VERSION", "RECORD_VERSION", "assumption_record", "new_assumption_id",
+    "parse_assumption_record", "select_assumptions",
 ]

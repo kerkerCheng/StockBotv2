@@ -25,7 +25,9 @@ from alpha.providers import assumptions as assumption_ledger
 from identity.registry import get_registry
 
 from .builder import DecisionFacts, build_alpha_investment_view, compact_card
+from .changes import baseline_since, detect_changes, load_watches
 from .contracts import AlphaInvestmentView
+from .scenarios import SCENARIOS, rollover_actuals, scenario_changes
 
 _ROOT = Path(__file__).resolve().parents[2]
 #: session 判斷檔的約定位置（private，不進 Git）。先找專用目錄，再找舊命名。
@@ -163,8 +165,8 @@ def _causal_inputs(graph: Any, company_id: CompanyId, *, as_of: date | None, tod
 
 def _fundamental_model(
     build: ContextBuild, fundamentals_provider: Any, ticker: Ticker, company_id: CompanyId,
-    *, as_of: date | None, today: date,
-) -> tuple[FundamentalModelResult | None, str | None]:
+    *, as_of: date | None, today: date, actuals_override: Any = None,
+) -> tuple[FundamentalModelResult | None, str | None, list[Any]]:
     """Causal Fundamental Model 的取數與執行（Phase 2）。
 
     - 觀測（`fiscal_year_results`）、指引（`company_guidance`）、會計年度別共識
@@ -176,13 +178,19 @@ def _fundamental_model(
     fetch_results = getattr(fundamentals_provider, "fiscal_year_results", None)
     fetch_consensus = getattr(fundamentals_provider, "fiscal_consensus", None)
     fetch_guidance = getattr(fundamentals_provider, "company_guidance", None)
+    records: list[Any] = []
+    try:
+        records, parse_errors = assumption_ledger.read_assumption_records(str(ticker))
+    except Exception as exc:  # noqa: BLE001
+        return None, f"假設 ledger 讀取失敗：{type(exc).__name__}", records
     if not all(callable(f) for f in (fetch_results, fetch_consensus, fetch_guidance)):
-        return None, "fundamentals provider 沒有 fiscal_year_results／fiscal_consensus／company_guidance 能力"
+        return None, "fundamentals provider 沒有 fiscal_year_results／fiscal_consensus／company_guidance 能力", records
     try:
         actuals, actuals_reason = fetch_results(ticker, as_of=as_of)
+        if actuals_override is not None:
+            actuals, actuals_reason = actuals_override, None
         consensus, _consensus_reason = fetch_consensus(ticker, as_of=as_of)
         guidance, _guidance_reason = fetch_guidance(ticker, as_of=as_of)
-        records, parse_errors = assumption_ledger.read_assumption_records(str(ticker))
         model = build_fundamental_model(
             company_id=str(company_id), ticker=str(ticker), as_of=as_of, today=today,
             actuals=actuals, actuals_reason=actuals_reason, consensus=consensus, guidance=guidance,
@@ -190,8 +198,8 @@ def _fundamental_model(
             evidence_index={ref.ref: ref for ref in build.context.evidence_refs},
         )
     except Exception as exc:  # noqa: BLE001 — 模型失敗只讓該區 missing，不讓整份 view 失敗
-        return None, f"fundamental model 執行失敗：{type(exc).__name__}: {str(exc)[:160]}"
-    return model, None
+        return None, f"fundamental model 執行失敗：{type(exc).__name__}: {str(exc)[:160]}", records
+    return model, None, records
 
 
 def _ranking_position(graph: Any, company_id: CompanyId, *, as_of: date | None) -> Mapping[str, Any] | None:
@@ -217,8 +225,17 @@ def fetch_alpha_investment_view(
     today: date | None = None,
     graph_provider: Any = None,
     fundamentals_provider: Any = None,
+    detect_refresh: bool = True,
+    scenario: str | None = None,
+    watches: Sequence[Mapping[str, Any]] | None = None,
 ) -> AlphaInvestmentView:
-    """單一公司的完整 view。`graph_provider`／`fundamentals_provider` 可注入（測試用）。"""
+    """單一公司的完整 view。`graph_provider`／`fundamentals_provider` 可注入（測試用）。
+
+    Step 0.5：預設跑 authority 變更偵測（`changes.detect_changes`）並把 `ChangeEvent` 交給 builder；
+    `scenario` 指定時在真實 state 上疊一件假想變化（`scenarios.py`），refresh section 標 `scenario`。
+    """
+    if scenario is not None and scenario not in SCENARIOS:
+        raise AlphaError(f"未知情境 {scenario!r}；已知 {SCENARIOS}")
     today = today or date.today()
     resolved_ticker, company_id = resolve_company(ticker)
     registry = get_registry()
@@ -253,8 +270,52 @@ def fetch_alpha_investment_view(
         causal = (_causal_inputs(graph_provider, company_id, as_of=as_of, today=today)
                   if include_causal else {"causal_reason": "本次未取因果路徑（--no-causal）"})
         ranking_position = _ranking_position(graph_provider, company_id, as_of=as_of)
-        fundamental_model, fundamental_reason = _fundamental_model(
+        fundamental_model, fundamental_reason, records = _fundamental_model(
             build, fundamentals_provider, resolved_ticker, company_id, as_of=as_of, today=today)
+        if scenario == "fiscal_rollover" and fundamental_model is not None and fundamental_model.target_period:
+            # 會計期間推進不是一件事件，是「時間走到了目標期間之後、實際值出爐」。模型的 PIT 自我核對會
+            # 正確拒絕「今天就有 FY2027 實際值」，所以情境必須把 today 推進到該年度結束後（財報約 45 天後）。
+            today = max(today, fundamental_model.target_period.end + timedelta(days=45))
+            override = rollover_actuals(fundamental_model, today=today)
+            if override is not None:
+                fundamental_model, fundamental_reason, records = _fundamental_model(
+                    build, fundamentals_provider, resolved_ticker, company_id, as_of=as_of, today=today,
+                    actuals_override=override)
+        # ---- Refresh：由 authority 時序導出 ChangeEvent（只偵測，不判 impact）---------------------
+        refresh_changes = None
+        metric_observations: list[Any] = []
+        refresh_notes: list[str] = []
+        detection = None
+        if detect_refresh:
+            judged_on = None
+            if signal is not None:
+                raw = (signal.metadata or {}).get("judged_at")
+                try:
+                    judged_on = date.fromisoformat(str(raw)[:10]) if raw else signal.as_of
+                except ValueError:
+                    judged_on = signal.as_of
+            since = baseline_since(judged_on, records)
+            lifecycle_for_refresh = _thesis_lifecycle_entry(str(resolved_ticker)) if as_of is None else None
+            try:
+                refresh_changes, metric_observations, refresh_notes = detect_changes(
+                    ticker=str(resolved_ticker), company_id=str(company_id), since=since, today=today,
+                    as_of=as_of, fundamentals_provider=fundamentals_provider, graph_provider=graph_provider,
+                    assumption_records=records, lifecycle_entry=lifecycle_for_refresh,
+                    watches=(list(watches) if watches is not None else load_watches()),
+                    ticker_obj=resolved_ticker)
+            except Exception as exc:  # noqa: BLE001 — 偵測失敗不讓 view 失敗，但必須現形（not_run）
+                refresh_changes, metric_observations = None, []
+                refresh_notes = [f"變更偵測失敗：{type(exc).__name__}: {str(exc)[:120]}"]
+        if scenario is not None:
+            extra, extra_obs = scenario_changes(
+                scenario, ticker=str(resolved_ticker), company_id=str(company_id), context=build.context,
+                model=fundamental_model, today=today)
+            refresh_changes = list(refresh_changes or ()) + extra
+            metric_observations = list(metric_observations) + extra_obs
+            detection = "scenario"
+            refresh_notes = [f"情境 {scenario}：在真實 state 上疊加假想變化（不寫任何 authority）"
+                             + (f"；today 推進到 {today}（目標年度結束後 45 天）" if scenario == "fiscal_rollover" else ""),
+                             *refresh_notes]
     finally:
         if owns_graph:
             driver = getattr(graph_provider, "driver", None)
@@ -296,6 +357,9 @@ def fetch_alpha_investment_view(
         thesis_lifecycle=lifecycle_entry, checklist=checklist, identity=identity,
         fundamental_model=fundamental_model, fundamental_model_reason=fundamental_reason,
         today=today,
+        refresh_changes=refresh_changes, assumption_records=records,
+        metric_observations=metric_observations, change_detection=detection,
+        refresh_notes=refresh_notes,
     )
 
 

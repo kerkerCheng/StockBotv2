@@ -161,12 +161,32 @@ def _nonempty(value: Any, label: str) -> str:
 # 2. OperatingAssumption
 # ---------------------------------------------------------------------------
 
+#: 假設 provenance 的語意版本。`v2`＝每條 ref 都宣告角色；`legacy`＝v1 紀錄，未宣告角色
+#: （讀取時 fail safe：未分類 ref 當 supporting，同期共識 ref 依前綴機械歸為 calibration）。
+PROVENANCE_SEMANTICS: tuple[str, ...] = ("v2", "legacy")
+
+#: 假設 evidence ref 的角色（與 `alpha.refresh.contracts.DEPENDENCY_ROLES` 的假設子集同名同義）。
+#: `supporting`＝支持這個假設為真；`calibration`＝校準數字的脈絡（例：市場隱含 +67% → 內部選 +60%）；
+#: `comparison`＝拿來比較的對象。**同期分析師共識不得是 supporting**——那是 provenance 循環：
+#: 共識支持假設 → 假設推出內部預測 → 內部預測拿去跟共識比。
+ASSUMPTION_REF_ROLES: tuple[str, ...] = ("supporting", "calibration", "comparison", "legacy_unclassified")
+
+#: 由 ref 前綴機械判定「這是同期共識」——它是可重導的字串規則，不是判斷。
+CONSENSUS_REF_PREFIX = "engine_c://consensus_estimate/"
+
+
 @dataclass(frozen=True, slots=True)
 class OperatingAssumption:
     """StockBot 對某個未來 driver 的**明示**假設。
 
     ⚠ 它不是事實。`basis` 說它是哪一種知識；`rationale` 說為什麼；`evidence_refs` 指回
     ResearchContext／Engine C 的證據；`created_at` 決定 as-of 視角下它存不存在。
+
+    Step 0.5（2026-09-06）補的三個欄位，全部 additive、舊紀錄照樣 parse：
+    - `dependency_roles`：ref → supporting／calibration／comparison。「證據還在」≠「證據仍支持
+      這個假設」，refresh 引擎要知道哪些 ref 是 supporting 才能判 review_required。
+    - `review_conditions`：machine-readable 的觸發條件（不是 parser 讀 rationale）。
+    - `provenance_semantics`：`legacy`＝舊紀錄，未宣告角色；讀取端 fail safe。
     """
 
     assumption_id: str
@@ -185,6 +205,9 @@ class OperatingAssumption:
     accounting_basis: str = "not_applicable"
     supersedes_id: str | None = None
     retracted: bool = False
+    dependency_roles: Mapping[str, str] = field(default_factory=dict)
+    review_conditions: tuple[Any, ...] = ()
+    provenance_semantics: str = "legacy"
 
     def __post_init__(self) -> None:
         _nonempty(self.assumption_id, "OperatingAssumption.assumption_id")
@@ -221,6 +244,28 @@ class OperatingAssumption:
                 "OperatingAssumption 必須至少引用一條證據——沒有 provenance 的假設不得存在（INV-6）")
         if any(not isinstance(r, str) or not r.strip() for r in self.evidence_refs):
             raise ContractViolation("evidence_refs 每一項必須是非空字串")
+        if self.provenance_semantics not in PROVENANCE_SEMANTICS:
+            raise ContractViolation(
+                f"provenance_semantics 未登記：{self.provenance_semantics!r}；已知 {PROVENANCE_SEMANTICS}")
+        for ref, role in self.dependency_roles.items():
+            if role not in ASSUMPTION_REF_ROLES:
+                raise ContractViolation(f"dependency_roles[{ref}] 未登記：{role!r}；已知 {ASSUMPTION_REF_ROLES}")
+            if ref not in self.evidence_refs:
+                raise ContractViolation(f"dependency_roles 指到不在 evidence_refs 的 ref：{ref!r}")
+            if role == "supporting" and ref.startswith(CONSENSUS_REF_PREFIX):
+                raise ContractViolation(
+                    f"同期共識 {ref!r} 不得作為 supporting evidence——那是 provenance 循環"
+                    "（共識支持假設→假設推出內部預測→再拿去比共識）；請改列 calibration_refs")
+        if self.provenance_semantics == "v2" and not self.retracted:
+            missing = [r for r in self.evidence_refs if r not in self.dependency_roles]
+            if missing:
+                raise ContractViolation(f"v2 假設每條 ref 都必須宣告角色；缺：{missing[:3]}")
+            if not any(role == "supporting" for role in self.dependency_roles.values()):
+                raise ContractViolation("v2 假設至少要有一條 supporting evidence（calibration 不算支持）")
+        from ..refresh.contracts import ReviewCondition
+
+        if any(not isinstance(c, ReviewCondition) for c in self.review_conditions):
+            raise ContractViolation("review_conditions 每一項必須是 ReviewCondition")
 
     @property
     def key(self) -> tuple[str, str]:
@@ -229,6 +274,24 @@ class OperatingAssumption:
     @property
     def created_on(self) -> date:
         return self.created_at.date()
+
+    def role_of(self, ref: str) -> str:
+        """一條 ref 的角色。legacy 紀錄：同期共識依前綴歸 calibration，其餘 `legacy_unclassified`
+        （refresh 引擎把它當 supporting——fail safe 往「更容易被標 review」那邊倒）。"""
+        declared = self.dependency_roles.get(ref)
+        if declared is not None:
+            return declared
+        if ref.startswith(CONSENSUS_REF_PREFIX):
+            return "calibration"
+        return "legacy_unclassified"
+
+    @property
+    def supporting_refs(self) -> tuple[str, ...]:
+        return tuple(r for r in self.evidence_refs if self.role_of(r) in ("supporting", "legacy_unclassified"))
+
+    @property
+    def calibration_refs(self) -> tuple[str, ...]:
+        return tuple(r for r in self.evidence_refs if self.role_of(r) == "calibration")
 
 
 # ---------------------------------------------------------------------------
@@ -499,7 +562,8 @@ class FundamentalModelResult:
 
 
 __all__ = [
-    "ACCOUNTING_BASES", "ASSUMPTION_BASES", "ASSUMPTION_DRIVERS", "BRIDGE_VERSION",
+    "ACCOUNTING_BASES", "ASSUMPTION_BASES", "ASSUMPTION_DRIVERS", "ASSUMPTION_REF_ROLES", "BRIDGE_VERSION",
+    "CONSENSUS_REF_PREFIX", "PROVENANCE_SEMANTICS",
     "COMPARISON_STATUSES", "FISCAL_PERIOD_KINDS", "MODEL_VERSION",
     "PERIOD_MATCH_TOLERANCE_DAYS", "TOTAL_SCOPE", "AssumptionSelection", "BridgeStep",
     "ConsensusEstimate", "DriverSpec", "ExpectationComparison", "FiscalPeriod",

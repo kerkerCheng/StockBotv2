@@ -690,6 +690,42 @@ Select-String -Path .codex\rules\stockbot-automations.rules -Pattern 'briefing'
 Select-String -Path .codex\rules\stockbot-automations.rules -Pattern 'assumptions|record_mechanical'
 ```
 
+### Sandbox impact review 結論（2026-09-06，Research Refresh／Dependency Invalidation v1）
+
+| 入口 | side effect | OS／network capability | 判定 |
+|---|---|---|---|
+| `python -m briefing refresh <T> [--scenario …]` | 唯讀：Engine C 快照時序（`snapshot_series`）＋兩個 ledger 欄位的歷史列（`observation_history`）＋假設 ledger＋`library/leads/event_watches.json`＋`thesis/lifecycle.json`＋圖投影差集；情境只在記憶體疊事件，**不寫任何 authority** | 與 `alpha-card` 相同的本機資源；無新增網路主機、憑證或 identity／ACL | **互動專用**。新 CLI 名稱，不進 unattended rule |
+| `python -m briefing alpha-card`／`decision_lab today` 的 Alpha Card 摘要（既有） | 多跑一次變更偵測（同上的唯讀來源）＋純函式 resolver；多一個 `refresh_status` section 與精簡卡 `refresh` 欄 | 無新增（同一 Engine C 連線、本機檔案）；每檔多一次 `get_structural_changes_since` 投影（記憶體快取） | 命令字串未變 |
+| `python -m alpha assumptions <T> --add`（既有） | spec 多三個可選欄位 `calibration_refs`／`comparison_refs`／`review_conditions`；仍只 append private ledger | 無新增 | 既有判定不變（互動專用） |
+| `python -m engine_b.event_watch add --wake-hypothesis oa_*`（既有） | `hypothesis_ref` 可指向假設 id；fired 後由 refresh 引擎標 review_required | 無新增 | 既有判定不變 |
+
+查證（新入口不該出現在 rules）：
+```powershell
+Select-String -Path .codex\rules\stockbot-automations.rules -Pattern 'refresh'
+```
+
+### Research Refresh／Dependency Invalidation：怎麼跑（互動）
+
+```powershell
+# 1) 現況：什麼變了、影響誰、要做什麼（read model 第 15 節）
+python -m briefing refresh COHR
+python -m briefing refresh COHR --format json | python -c "import json,sys;r=json.load(sys.stdin);print(r['overall'], r['counts'])"
+# 2) 情境：在真實 state 上疊一件假想變化（不寫任何 authority）
+python -m briefing refresh COHR --scenario price_only        # 只有市場導出量 recalculate，研究判斷 current
+python -m briefing refresh COHR --scenario graph_edge        # Q1 recalculate；引用該邊的 Q2／假設 review_required
+python -m briefing refresh COHR --scenario fiscal_rollover   # FY 假設 superseded；模型 review_required：需新假設
+# 3) 歷史視角：只看 T 之前已知的變化與成果
+python -m briefing refresh COHR --as-of 2026-09-04
+# 4) 假設帶角色與 machine-readable 條件（spec 見 .pytest_tmp/cohr_dc_v2.json 的形狀）
+python -m alpha assumptions COHR --add spec.json           # evidence_refs=supporting；calibration_refs／comparison_refs 另列
+# 5) 把條件鏈到 Event Watch（fired → 假設 review_required；值不自動改）
+python -m engine_b.event_watch add --kind fact_verification --entities COHR,co:coherent --fact "…" --wake-hypothesis oa_xxx --expires 2027-03-31
+```
+
+**state 的下一步（機器可讀，`required_action`）：** `recalculate`→重跑即可（不需判斷）；`review_required`→在
+session 重新評估，**不得自動取代**，舊值只是歷史；`invalidated`→不得再當 current，退場或用新證據重建；
+`stale`→排程複查到期，不隱含新證據；`superseded`→歷史。**引擎不呼叫 LLM、不改任何判斷。**
+
 ### Causal Fundamental Model：怎麼跑（互動）
 
 ```powershell

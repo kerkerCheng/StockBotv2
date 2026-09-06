@@ -381,6 +381,47 @@ class EngineCFundamentalsProvider:
             return (), f"Engine C 無 {ticker} 的 company_guidance 觀測"
         return tuple(out), None
 
+    # ---- Step 0.5（2026-09-06）：變更偵測用的兩個窄入口（唯讀；只回時序列，不判 impact）------
+    def snapshot_series(
+        self, ticker: Ticker | None, *, since: date, as_of: date | None = None
+    ) -> list[dict[str, Any]]:
+        """`since` 之後的快照時序（升冪）。每列帶 `bar_date`（行情日）、`snapshot_date`（ETL 日）與
+        `fetched_at`（我們何時取得）——變更偵測用 `fetched_at` 判「判斷當時知不知道」（INV-6）。"""
+        if ticker is None:
+            return []
+        cur = self._cursor()
+        sql = ("SELECT bar_date, snapshot_date, fetched_at, price, pe_forward, analyst_target_mean "
+               "FROM financial_snapshots WHERE ticker = ? AND COALESCE(bar_date, snapshot_date) >= ? ")
+        params: list[Any] = [str(ticker), since.isoformat()]
+        if as_of is not None:
+            sql += "AND COALESCE(bar_date, snapshot_date) <= ? "
+            params.append(as_of.isoformat())
+        sql += "ORDER BY COALESCE(bar_date, snapshot_date) ASC, fetched_at ASC"
+        try:
+            cur.execute(sql, params)
+            return [dict(r) for r in cur.fetchall()]
+        except Exception:  # noqa: BLE001 — 舊 schema 只降級成「沒有序列」
+            return []
+
+    def observation_history(
+        self, ticker: Ticker | None, field_name: str, *, as_of: date | None = None
+    ) -> list[dict[str, Any]]:
+        """某個人工 ledger 欄位的**全部歷史列**（含被 supersede 的），payload 已解析。
+        `recorded_at`＝我們何時知道；payload 內的 `source_filed_at`／`issued_at`＝世界何時知道。"""
+        if ticker is None:
+            return []
+        out: list[dict[str, Any]] = []
+        for row in self._ledger_rows(ticker, field_name, as_of):
+            try:
+                payload = json.loads(row["value"])
+            except (TypeError, ValueError):
+                payload = None
+            out.append({"observation_id": str(row["observation_id"]), "as_of": _as_date(row.get("as_of")),
+                        "recorded_at": _as_datetime(row.get("recorded_at")),
+                        "supersedes_id": row.get("supersedes_id"),
+                        "payload": payload if isinstance(payload, dict) else None})
+        return out
+
     def estimate_revision(
         self, ticker: Ticker | None, *, as_of: date | None = None, sessions: int = 30
     ) -> dict[str, Any] | None:

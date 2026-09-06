@@ -214,6 +214,10 @@ def cmd_assumptions(args: argparse.Namespace) -> int:
                     supersedes_id=spec.get("supersedes_id"),
                     author=str(spec.get("author") or "session"),
                     created_at=datetime.now(timezone.utc),
+                    # Step 0.5：supporting／calibration／comparison 分開列；同期共識只能在後兩者。
+                    calibration_refs=list(spec.get("calibration_refs") or []),
+                    comparison_refs=list(spec.get("comparison_refs") or []),
+                    review_conditions=list(spec.get("review_conditions") or []),
                 )
             except (KeyError, ValueError, TypeError, AlphaError) as exc:
                 print(f"✗ 假設不合法：{exc}", file=sys.stderr)
@@ -230,6 +234,8 @@ def cmd_assumptions(args: argparse.Namespace) -> int:
                 rationale=str(args.rationale or "retracted"), evidence_refs=target.evidence_refs,
                 accounting_basis=target.accounting_basis, supersedes_id=target.assumption_id,
                 retracted=True, created_at=datetime.now(timezone.utc),
+                # 撤回紀錄沿用舊 refs、不補角色——它只是一個「撤回」標記，不是新的 provenance 主張。
+                legacy_roles=True,
             )
         try:
             path = append_assumption_record(record)

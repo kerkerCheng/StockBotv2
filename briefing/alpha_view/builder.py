@@ -28,23 +28,30 @@ from typing import Any, Mapping, Sequence
 from alpha.causal import CausalPath, CompanyImpact, StructuralEvent
 from alpha.context import ContextBuild
 from alpha.contracts import AXES, AlphaSignal, EvidenceRef, Score
-from alpha.fundamental.contracts import FundamentalModelResult
+from alpha.fundamental.contracts import FundamentalModelResult, OperatingAssumption
 from alpha.provider import SupplyExposure
+from alpha.refresh import (
+    CONTEXT_DIGEST, CURRENT, INVALIDATED, MISSING, RECALCULATE, REVIEW_REQUIRED, STALE, SUPERSEDED,
+    THESIS_ARTIFACT_ID, AffectedArtifact, ChangeEvent, MetricObservation, artifacts_from_context,
+    artifacts_from_model, artifacts_from_signal, build_instant, resolve_refresh,
+)
 from shared.catalyst_state import STATE_LABEL, assess_entry
 from thesis.lifecycle_schedule import CATALYST, effective_next_check
 
 from .contracts import (
-    BASIS_LABEL, CAP_AUTOMATIC_INVALIDATION, CAP_CATALYST_UNLINKED, CAP_FINANCIAL_CAUSAL,
+    BASIS_LABEL, CAP_AUTOMATIC_INVALIDATION, CAP_CATALYST_UNLINKED, CAP_DEPENDENCY_IMPACT,
+    CAP_FINANCIAL_CAUSAL,
     CAP_NARRATIVE_SCENARIOS, CAP_NUMERIC_EXPECTATION_GAP, CAP_QUANTITATIVE_SCENARIOS,
     CAP_STRUCTURAL_CAUSAL,
-    CAP_STRUCTURED_DISPROOF, SCHEMA_VERSION, AlphaInvestmentView, CatalystItem,
-    CatalystSection, CausalPathSection, CheckpointItem, ConsensusSection, Datum,
+    CAP_STRUCTURED_DISPROOF, SCHEMA_VERSION, STATUS_LABEL, AlphaInvestmentView, CatalystItem,
+    CatalystSection, CausalPathSection, ChangeItem, CheckpointItem, ConsensusSection, Datum,
     DisproofItem, EarningsBridgeSection, EventItem, EvidenceItem, EvidenceSection,
     EvidenceSelectionCounts, ExpectationGapSection, ExposureItem, FalsificationSection,
     FreshnessItem, FundamentalsSection, IdentitySection, ImpactItem,
     InternalFundamentalsSection, LifecycleFacts, NotModeledSection, PathItem,
-    PriceImpliedSection, ScenarioSection, SectionMeta, SignalCompleteness,
-    StructuralEdgeItem, StructuralThesisSection, VariantViewSection, missing, not_modeled,
+    PriceImpliedSection, RefreshItem, RefreshStatusSection, ScenarioSection, SectionMeta,
+    SignalCompleteness, StructuralEdgeItem, StructuralThesisSection, VariantViewSection, missing,
+    not_modeled,
 )
 
 # ---------------------------------------------------------------------------
@@ -68,6 +75,29 @@ A_THESIS_FILE = "thesis://lifecycle.json"
 A_CATALYST_STATE = "shared://catalyst_state.assess_entry"
 # Causal Fundamental Model（Phase 2，2026-09-05）：假設、橋、比較各自是 authority，read model 只選取。
 A_ASSUMPTIONS = "alpha://fundamental/assumptions"
+A_REFRESH = "alpha://refresh/resolver"
+
+#: refresh state → Datum status。`current`／`recalculate` 在 read model 裡都是「有、可用」（確定性成果每次
+#: build 都重算）；`stale`／`review_required`／`invalidated` 各自是一個 status（L12：不壓成一個 stale）。
+_REFRESH_TO_STATUS: Mapping[str, str] = {
+    CURRENT: "available", RECALCULATE: "available", STALE: "stale",
+    REVIEW_REQUIRED: "review_required", INVALIDATED: "invalidated",
+}
+
+
+def _refresh_status(artifact: AffectedArtifact | None, *, fallback: str = "available") -> str:
+    if artifact is None or artifact.state in (SUPERSEDED, MISSING):
+        return fallback
+    return _REFRESH_TO_STATUS[artifact.state]
+
+
+def _refresh_deps(artifact: AffectedArtifact | None) -> dict[str, Any]:
+    if artifact is None:
+        return {"refresh_state": None}
+    return {"refresh_state": artifact.state, "refresh_reasons": list(artifact.reasons),
+            "refresh_changed_refs": list(artifact.changed_refs),
+            "refresh_required_action": artifact.required_action,
+            "refresh_propagated_from": list(artifact.propagated_from)}
 A_BRIDGE = "alpha://fundamental/bridge"
 A_COMPARE = "alpha://fundamental/compare"
 A_CONSENSUS_FY = "engine_c://consensus_estimates"
@@ -131,6 +161,7 @@ class _FundamentalParts:
 def _fundamental_parts(
     model: FundamentalModelResult | None, reason: str | None, *,
     reference_day: date, reporting_unit: str,
+    refresh: Mapping[str, AffectedArtifact] | None = None,
 ) -> _FundamentalParts:
     """把 `FundamentalModelResult` 選取成 Datum。**不算任何數字**——值、公式、依賴全部照抄。"""
     def _unit(unit: str) -> str:
@@ -173,19 +204,24 @@ def _fundamental_parts(
             internal_items.append(missing(f"internal_{key}", label, f"{why}（缺席不是 0）",
                                           authority=A_BRIDGE))
             continue
+        # refresh：數字算法確定，但它依賴的假設若被動搖，這一格不得再當 current（傳播來的 state 現形）。
+        refreshed = (refresh or {}).get(f"modeled_metric:{key}")
+        refresh_note = (f"；refresh={refreshed.state}：{refreshed.reasons[0]}"
+                        if refreshed is not None and refreshed.state != CURRENT else "")
         internal_items.append(Datum(
-            key=f"internal_{key}", label=label, value=metric.value, status="available",
+            key=f"internal_{key}", label=label, value=metric.value, status=_refresh_status(refreshed),
             basis="deterministic", authority=A_BRIDGE,
             method=f"{metric.formula}（{model.bridge_version}）", unit=_unit(unit),
             as_of=reference_day, evidence_refs=tuple(metric.observation_refs),
             reason=(f"calculation=deterministic；input_dependency={metric.input_dependency}"
-                    f"（{BASIS_LABEL.get(str(metric.input_dependency), metric.input_dependency)}）"),
+                    f"（{BASIS_LABEL.get(str(metric.input_dependency), metric.input_dependency)}）" + refresh_note),
             dependencies={
                 "period": metric.period.label, "fiscal_period_end": metric.period.end.isoformat(),
                 "accounting_basis": metric.accounting_basis,
                 "input_dependency": metric.input_dependency,
                 "assumption_ids": list(metric.assumption_ids),
                 "observation_refs": list(metric.observation_refs),
+                **_refresh_deps(refreshed),
             },
         ))
     internal_items.extend(fixed_not_modeled)
@@ -222,15 +258,24 @@ def _fundamental_parts(
         ))
     assumptions: list[Datum] = []
     for a in model.assumptions:
+        refreshed = (refresh or {}).get(f"operating_assumption:{a.assumption_id}")
         assumptions.append(Datum(
             key=f"assumption:{a.driver}:{a.scope}", label=f"假設 {a.driver}[{a.scope}]",
-            value=a.value, status="available", basis=a.basis, authority=A_ASSUMPTIONS,
+            value=a.value, status=_refresh_status(refreshed), basis=a.basis, authority=A_ASSUMPTIONS,
             unit=_unit(a.unit), as_of=a.created_on, evidence_refs=tuple(a.evidence_refs),
             reason=a.rationale,
             dependencies={"assumption_id": a.assumption_id, "period": a.period.label,
                           "fiscal_period_end": a.period.end.isoformat(),
                           "created_at": a.created_at.isoformat(), "author": a.author,
-                          "accounting_basis": a.accounting_basis, "supersedes_id": a.supersedes_id},
+                          "accounting_basis": a.accounting_basis, "supersedes_id": a.supersedes_id,
+                          # Step 0.5：supporting／calibration 分開、legacy 標記、machine-readable 條件
+                          "provenance_semantics": a.provenance_semantics,
+                          "dependency_roles": {r: a.role_of(r) for r in a.evidence_refs},
+                          "review_conditions": [c.to_dict() for c in a.review_conditions],
+                          # 「60% 是判斷不是觀測」：basis 已說；這個旗標讓 consumer 不必讀 basis 也知道
+                          # 支持證據一變就該重看（heuristic／judgment 都是）。
+                          "requires_review_on_support_change": a.basis != "observation",
+                          **_refresh_deps(refreshed)},
         ))
     sensitivities: list[Datum] = []
     for s in model.sensitivities:
@@ -280,13 +325,15 @@ def _fundamental_parts(
             "accounting_basis": cmp.accounting_basis_internal,
         }
         comparable[metric] = payload
+        refreshed = (refresh or {}).get(f"expectation_comparison:{metric}")
         comparisons.append(Datum(
-            key=key, label=label, value=payload, status="available", basis="deterministic",
+            key=key, label=label, value=payload, status=_refresh_status(refreshed), basis="deterministic",
             authority=A_COMPARE, unit=_unit(cmp.unit or ""), as_of=cmp.consensus_captured_at,
             method="absolute = internal − consensus；relative = internal／consensus − 1（同期、同口徑、同幣別才算）",
             evidence_refs=tuple(cmp.observation_refs) + tuple(cmp.consensus_refs), reason=cmp.reason,
             dependencies={"assumption_ids": list(cmp.assumption_ids), "status": cmp.status,
-                          "accounting_basis_consensus": cmp.accounting_basis_consensus},
+                          "accounting_basis_consensus": cmp.accounting_basis_consensus,
+                          **_refresh_deps(refreshed)},
         ))
     if comparable:
         summary = Datum(
@@ -435,7 +482,8 @@ def _q1_datum(build: ContextBuild) -> Datum:
 
 def _session_score_datum(
     signal: AlphaSignal | None, axis: str, *, signal_reason: str | None, stale: bool,
-    judged_on: date | None = None, absent_status: str = "missing",
+    judged_on: date | None = None, absent_status: str = "missing", status: str | None = None,
+    refresh: AffectedArtifact | None = None,
 ) -> Datum:
     """Q2–Q5 的一格：session 判斷，`None` 分數＝不知道，不是 0。"""
     label = AXIS_LABEL[axis]
@@ -456,22 +504,26 @@ def _session_score_datum(
         "session_level": level or None,
         "session_level_label": _SESSION_LEVEL_LABEL.get(level),
     }
+    note = trace.note if trace else None
+    if refresh is not None and refresh.state != CURRENT:
+        note = f"[refresh={refresh.state}] {refresh.reasons[0]}" + (f"｜{note}" if note else "")
     return Datum(
         key=f"{axis}_score", label=label, value=value,
-        status="stale" if stale else "available", basis="session_judgment", authority=A_SESSION,
+        status=status or ("stale" if stale else "available"), basis="session_judgment", authority=A_SESSION,
         method=(trace.rule_version if trace else None), unit="ordinal_0_1",
         as_of=judged_on or signal.as_of, evidence_refs=_refs(trace.evidence_refs) if trace else (),
-        reason=(trace.note if trace else None),
+        reason=note, dependencies=(_refresh_deps(refresh) if refresh is not None else None),
     )
 
 
 def _text_datum(
     key: str, label: str, text: str | None, *, basis: str, authority: str,
     stale: bool, as_of: date | None, missing_reason: str, absent_status: str = "missing",
+    status: str | None = None,
 ) -> Datum:
     if not text or not str(text).strip():
         return _absent(key, label, missing_reason, status=absent_status, authority=authority)
-    return Datum(key=key, label=label, value=str(text), status="stale" if stale else "available",
+    return Datum(key=key, label=label, value=str(text), status=status or ("stale" if stale else "available"),
                  basis=basis, authority=authority, as_of=as_of)
 
 
@@ -534,6 +586,11 @@ def build_alpha_investment_view(
     fundamental_model: FundamentalModelResult | None = None,
     fundamental_model_reason: str | None = None,
     today: date | None = None,
+    refresh_changes: Sequence[ChangeEvent] | None = None,
+    assumption_records: Sequence[OperatingAssumption] = (),
+    metric_observations: Sequence[MetricObservation] = (),
+    change_detection: str | None = None,
+    refresh_notes: Sequence[str] = (),
 ) -> AlphaInvestmentView:
     """組裝一家公司的 `AlphaInvestmentView`。所有參數都是已取好的既有 authority 輸出。"""
     today = today or date.today()
@@ -582,11 +639,6 @@ def build_alpha_investment_view(
     #: 沒有時點語意的來源在 as-of 下是 not_applicable；authority 回答「T 時刻沒有」則是 missing。
     thesis_absent_status = "not_applicable" if as_of_mode else "missing"
     decision_absent_status = "not_applicable" if (as_of_mode and decision_refused) else "missing"
-    fund = _fundamental_parts(
-        fundamental_model, fundamental_model_reason, reference_day=reference_day,
-        reporting_unit=f"reporting_currency（{market_currency or '未知'}；未正規化）",
-    )
-
     # ---- 判斷新鮮度：判斷是對哪一份 context 做的 ---------------------------
     mismatch = None
     if signal is not None:
@@ -620,6 +672,57 @@ def build_alpha_investment_view(
         stale_reason = None
         judged_on = None
         signal_absent_status = "not_applicable"
+
+    # ---- Refresh／dependency impact：單一 authority（alpha.refresh），這裡只消費 -------------
+    # digest mismatch 只是「判斷對的是舊 context」這個**事實**（留在 identity.signal.context_matches）；
+    # 它**不再**自動讓 Q2–Q5／thesis／情境全部 stale——那是 Step 0（2026-09-06）抓到的 over-invalidation。
+    # 判斷型成果的 status 改由 resolver 依變化的種類決定；呼叫端沒跑變更偵測（refresh_changes=None）時
+    # 退回舊行為（digest 不符即 stale）並在 refresh section 標 change_detection=not_run。
+    build_at = build_instant(reference_day)
+    judged_at = build_instant(judged_on) if judged_on else None
+    artifacts = artifacts_from_signal(signal, judged_at=judged_at,
+                                      structural_trace=build.structural_trace, build_at=build_at)
+    artifacts += artifacts_from_model(fundamental_model, build_at=build_at,
+                                      assumption_records=assumption_records)
+    artifacts += artifacts_from_context(context, build_at=build_at)
+    detection = change_detection or ("not_run" if refresh_changes is None else "authority_time_series")
+    changes = list(refresh_changes or ())
+    if (refresh_changes is not None and signal_stale and judged_at is not None
+            and not any(c.observed_at > judged_at for c in changes)):
+        # 殘餘：digest 變了但沒有任何已分類的變化——必須現形，不得靜默當 current（保守：review_required）。
+        changes.append(ChangeEvent(
+            change_type=CONTEXT_DIGEST, ticker=ticker, company_id=company_id, authority=A_SESSION,
+            changed_ref=context.digest, observed_at=build_at,
+            old_version=judged_digest, new_version=context.digest,
+            material_fields=("research_context_digest",),
+            detail="ResearchContext digest 已變，但變更偵測沒有任何已分類的變化能解釋——殘餘差異未分類"))
+    report = resolve_refresh(ticker=ticker, company_id=company_id, artifacts=artifacts, changes=changes,
+                             observations=metric_observations, as_of=context.as_of, today=today)
+    refresh_by_key = {a.key: a for a in report.artifacts}
+    thesis_refresh = refresh_by_key.get(f"thesis:{THESIS_ARTIFACT_ID}")
+    axis_refresh = {axis: refresh_by_key.get(f"axis:{axis}") for axis in AXES}
+    if refresh_changes is None:
+        judgment_status = "stale" if signal_stale else "available"
+        axis_status = {axis: judgment_status for axis in AXES}
+    else:
+        judgment_status = _refresh_status(thesis_refresh)
+        axis_status = {axis: _refresh_status(axis_refresh[axis]) for axis in AXES}
+        if signal is not None:
+            if judgment_status != "available":
+                stale_reason = "；".join(thesis_refresh.reasons[:2]) if thesis_refresh else stale_reason
+            elif signal_stale:
+                kinds = sorted({c.change_type for c in report.changes})
+                stale_reason = ("判斷對的是舊 context（digest 已變），但已分類的變化不動搖這份判斷"
+                                f"（{', '.join(kinds) or '無變化'}）")
+            else:
+                stale_reason = None
+    judgment_not_current = judgment_status != "available"
+
+    fund = _fundamental_parts(
+        fundamental_model, fundamental_model_reason, reference_day=reference_day,
+        reporting_unit=f"reporting_currency（{market_currency or '未知'}；未正規化）",
+        refresh=refresh_by_key,
+    )
 
     # ---- Evidence index：context ＋ 路徑／事件的引用，去重 -------------------
     evidence_pool: dict[str, EvidenceRef] = {}
@@ -709,6 +812,7 @@ def build_alpha_investment_view(
         current_context_digest=context.digest,
         context_matches=(None if signal is None else not signal_stale),
         reason=(signal_reason if signal is None else stale_reason),
+        refresh_state=(thesis_refresh.state if (signal is not None and thesis_refresh) else None),
     )
     identity_warnings: list[str] = []
     if quote_unit and market_currency and quote_unit != market_currency:
@@ -736,7 +840,9 @@ def build_alpha_investment_view(
     q1 = _q1_datum(build)
     session_scores = {
         axis: _session_score_datum(signal, axis, signal_reason=signal_reason, stale=signal_stale,
-                                   judged_on=judged_on, absent_status=signal_absent_status)
+                                   judged_on=judged_on, absent_status=signal_absent_status,
+                                   status=axis_status[axis],
+                                   refresh=(axis_refresh[axis] if refresh_changes is not None else None))
         for axis in AXES if axis != "structural"
     }
     all_scores = tuple(q1 if axis == "structural" else session_scores[axis] for axis in AXES)
@@ -745,31 +851,31 @@ def build_alpha_investment_view(
         vp_as_of = _as_date(decision_facts.variant_perception_created_at)
     variant_section = VariantViewSection(
         meta=SectionMeta(
-            status=("stale" if signal_stale else "available") if signal else signal_absent_status,
+            status=judgment_status if signal else signal_absent_status,
             basis="session_judgment" if signal else "none",
             authority=A_SESSION if signal else None,
             reason=(stale_reason if signal else no_signal),
             as_of=judged_on,
-            freshness=("stale" if signal_stale else "available") if signal else "missing",
+            freshness=("stale" if judgment_not_current else "available") if signal else "missing",
             warnings=("thesis／variant view／bull-base-bear 是 session（LLM）判斷，"
                       "不是 deterministic model output；引用皆已解析到 ResearchContext 內的證據",),
         ),
         thesis=_text_datum("thesis", "Thesis", signal.thesis if signal else None,
                            basis="session_judgment", authority=A_SESSION, stale=signal_stale,
                            as_of=judged_on, missing_reason=no_signal,
-                           absent_status=signal_absent_status),
+                           absent_status=signal_absent_status, status=judgment_status),
         variant_view=_text_datum("variant_view", "Variant perception（市場隱含 X／本 thesis 認為 Y／催化劑 Z）",
                                  signal.variant_view if signal else None,
                                  basis="session_judgment", authority=A_SESSION, stale=signal_stale,
                                  as_of=judged_on, missing_reason=no_signal,
-                                 absent_status=signal_absent_status),
+                                 absent_status=signal_absent_status, status=judgment_status),
         direction=(Datum(key="direction", label="方向", value=signal.direction,
-                         status="stale" if signal_stale else "available",
+                         status=judgment_status,
                          basis="session_judgment", authority=A_SESSION, as_of=judged_on)
                    if signal else _absent("direction", "方向", no_signal,
                                           status=signal_absent_status, authority=A_SESSION)),
         confidence=(Datum(key="confidence", label="信心（session 自評）", value=signal.confidence,
-                          status="stale" if signal_stale else "available",
+                          status=judgment_status,
                           basis="session_judgment", authority=A_SESSION, unit="confidence_0_1",
                           as_of=judged_on,
                           reason="session 自評的信心（0..1），不是量測的勝率")
@@ -779,7 +885,8 @@ def build_alpha_investment_view(
                                      signal.expected_horizon if signal else None,
                                      basis="session_judgment", authority=A_SESSION,
                                      stale=signal_stale, as_of=judged_on,
-                                     missing_reason=no_signal, absent_status=signal_absent_status),
+                                     missing_reason=no_signal, absent_status=signal_absent_status,
+                                     status=judgment_status),
         scores=all_scores,
         risks=tuple(signal.risks) if signal else (),
         decision_store_variant_perception=_text_datum(
@@ -1195,7 +1302,8 @@ def build_alpha_investment_view(
         gap_basis, gap_authority = "none", A_IMPLIED
     expectation_gap_section = ExpectationGapSection(
         meta=SectionMeta(
-            status=("stale" if signal_stale and q4.is_known else "partial") if gap_has else "missing",
+            status=((q4.status if q4.status in ("stale", "review_required", "invalidated") else "partial")
+                    if gap_has else "missing"),
             basis=gap_basis, authority=gap_authority,
             capability=CAP_NUMERIC_EXPECTATION_GAP if fund.has_numeric_gap else None,
             reason=(("Q4 是 session 的 ordinal 判斷；numeric_comparisons 是內部假設推出的數字與同期共識的差——"
@@ -1333,7 +1441,7 @@ def build_alpha_investment_view(
     has_falsification = bool(conditions or narrative_disproof.is_known)
     falsification_section = FalsificationSection(
         meta=SectionMeta(
-            status=("stale" if signal_stale and conditions else "available") if has_falsification else "missing",
+            status=(judgment_status if conditions else "available") if has_falsification else "missing",
             basis="session_judgment" if conditions else ("narrative" if narrative_disproof.is_known else "none"),
             authority=A_SESSION if conditions else A_COVERAGE,
             capability=CAP_STRUCTURED_DISPROOF,
@@ -1343,9 +1451,17 @@ def build_alpha_investment_view(
         ),
         conditions=conditions, narrative_disproof=narrative_disproof, thesis_status=thesis_status_datum,
         expiry_watch=watch_state_datum,
-        automatic_invalidation=not_modeled(
-            "automatic_invalidation", "自動 thesis 失效引擎（條件觸發偵測）",
-            "不存在：條件是結構化文字，觸發與否仍由人在核查頻率時判讀（capability＝" + CAP_STRUCTURED_DISPROOF + "，非 " + CAP_AUTOMATIC_INVALIDATION + "）",
+        automatic_invalidation=Datum(
+            key="automatic_invalidation", label="依賴失效引擎（refresh／dependency impact）",
+            value={"capability": CAP_DEPENDENCY_IMPACT, "overall": report.overall,
+                   "evaluates": ["已分類的 ChangeEvent（authority 時序）", "假設自帶的 machine-readable review_conditions",
+                                 "Event Watch 喚醒（disproof_signal）", "L7 核查頻率到期（stale）"],
+                   "does_not": ["解析自然語言的 disproof 條件", "改 thesis／假設／判斷", "自動呼叫 LLM"]},
+            status="partial", basis="deterministic", authority=A_REFRESH, as_of=reference_day,
+            method="alpha.refresh.resolve_refresh（" + report.policy_version + "）",
+            reason=("它決定 impact state（review_required／invalidated／recalculate／stale），不決定真假；"
+                    "自然語言條件仍由人在核查頻率時判讀（capability＝" + CAP_DEPENDENCY_IMPACT
+                    + "，非 " + CAP_AUTOMATIC_INVALIDATION + "）"),
         ),
     )
 
@@ -1355,11 +1471,11 @@ def build_alpha_investment_view(
     def _scenario(key: str, label: str, text: str | None) -> Datum:
         return _text_datum(key, label, text, basis="narrative", authority=A_SESSION,
                            stale=signal_stale, as_of=judged_on, missing_reason=no_signal,
-                           absent_status=signal_absent_status)
+                           absent_status=signal_absent_status, status=judgment_status)
 
     scenario_section = ScenarioSection(
         meta=SectionMeta(
-            status=("stale" if signal_stale else "available") if signal else signal_absent_status,
+            status=judgment_status if signal else signal_absent_status,
             basis="narrative" if signal else "none", authority=A_SESSION if signal else None,
             capability=CAP_NARRATIVE_SCENARIOS, as_of=judged_on,
             reason=("bull／base／bear 是 session 寫的散文，沒有機率、沒有目標估值" if signal else no_signal),
@@ -1450,10 +1566,11 @@ def build_alpha_investment_view(
                                              as_of=None, age_days=None, reason="沒有任何帶 published_at 的引用"))
     freshness_items.append(FreshnessItem(
         source="session_judgment",
-        status=("stale" if signal_stale else "available") if signal else "missing",
+        status=("stale" if judgment_not_current else "available") if signal else "missing",
         as_of=judged_on,
         age_days=float((today - judged_on).days) if judged_on else None,
-        reason=stale_reason if signal else no_signal))
+        reason=(f"refresh={thesis_refresh.state}：{stale_reason}" if (thesis_refresh and judgment_not_current)
+                else stale_reason) if signal else no_signal))
     dec_as_of = _as_date(decision_facts.coverage_created_at) if decision_facts else None
     freshness_items.append(FreshnessItem(
         source="decision_store_coverage",
@@ -1462,14 +1579,57 @@ def build_alpha_investment_view(
         reason=(None if dec_as_of else (decision_facts_reason or "無 coverage assessment"))
         if not (dec_as_of and as_of_mode) else f"距 as-of {as_of_iso} 的天數；事實已依 as_of 歷史過濾"))
 
+    # =======================================================================
+    # P. Refresh／dependency status（只組裝 alpha.refresh 的輸出）
+    # =======================================================================
+    attention = report.attention
+    refresh_section = RefreshStatusSection(
+        meta=SectionMeta(
+            status="available" if report.artifacts else "missing",
+            basis="deterministic" if report.artifacts else "none", authority=A_REFRESH,
+            capability=CAP_DEPENDENCY_IMPACT, as_of=reference_day,
+            reason=(f"overall={report.overall}；需要動作 {len(attention)} 項；變更偵測={detection}"
+                    if report.artifacts else "沒有任何研究成果可評估（無判斷、無模型）"),
+            warnings=("state 只回答「相對於依賴，這個成果還能不能當 current」——不是新事實、不是新判斷、不改 thesis。",
+                      "recalculate＝確定性輸入變了（不需判斷）；review_required＝依據 material change（要人重看）；"
+                      "invalidated＝前提不成立；stale＝只是排程到期；superseded＝歷史。",
+                      "price-only 變化不觸發任何研究判斷複查（v1 materiality 立場，見 alpha/refresh/policy.py）。"),
+        ),
+        overall=report.overall, policy_version=report.policy_version, counts=report.counts,
+        items=tuple(RefreshItem(
+            artifact_type=a.artifact_type, artifact_id=a.artifact_id, label=a.label, state=a.state,
+            reasons=a.reasons, changed_refs=a.changed_refs, dependency_refs=a.dependency_refs,
+            detected_at=a.detected_at, established_at=a.established_at,
+            required_action=a.required_action, propagated_from=a.propagated_from, kind=a.kind,
+        ) for a in report.artifacts),
+        changes=tuple(ChangeItem(
+            change_id=c.change_id, change_type=c.change_type, authority=c.authority,
+            changed_ref=c.changed_ref, observed_at=c.observed_at, effective_at=c.effective_at,
+            old_version=c.old_version, new_version=c.new_version, material_fields=c.material_fields,
+            detail=c.detail, target_artifact=c.target_artifact,
+        ) for c in report.changes),
+        excluded_changes=dict(report.excluded_changes), excluded_artifacts=dict(report.excluded_artifacts),
+        notes=tuple(refresh_notes) + report.notes, digest=report.digest, change_detection=detection,
+        judged_context_matches=(None if signal is None else not signal_stale),
+    )
+
     warnings = [JUDGMENT_WARNING, CORRELATION_WARNING]
     if as_of_mode:
         warnings.append(
             f"as-of 視角（{as_of_iso}）：Engine A 投影、Engine C 時序、Decision Store 事實皆已依 as_of "
             "歷史過濾（cohort／decision／coverage／lifecycle 事件／variant perception 的時間戳）；"
             "thesis/*.json 與檢核點沒有歷史，一律 not_applicable；到期狀態以 as_of 為今天判定")
-    if signal_stale:
-        warnings.append("session 判斷過期：" + str(stale_reason))
+    if signal is not None and judgment_not_current:
+        warnings.append(f"session 判斷 {STATUS_LABEL.get(judgment_status, judgment_status)}：{stale_reason}")
+    if attention:
+        counts = report.counts
+        warnings.append(
+            f"⚠ {len(attention)} 項研究成果需要動作（review_required {counts['review_required']}／"
+            f"invalidated {counts['invalidated']}／recalculate {counts['recalculate']}／stale {counts['stale']}）"
+            "——見 refresh_status；引擎不改任何判斷，只標 state")
+    if detection == "not_run":
+        warnings.append("refresh：本次未執行 authority 變更偵測，只評估了 core 可導出的變化"
+                        "（排程到期、review 條件、會計期間推進）；digest 不符時沿用整份 stale 的舊語意")
     if signal is None:
         warnings.append("尚無 session 判斷：Q2–Q5、thesis、variant view、情境、disproof 條件皆缺；"
                         "跑 `python -m alpha research " + ticker + " -o packet.json` 產研究包後由 session 判斷")
@@ -1491,7 +1651,7 @@ def build_alpha_investment_view(
         falsification=falsification_section, scenarios=scenario_section,
         expected_return=expected_return_section, downside=downside_section,
         entry_logic=entry_section, evidence=evidence_section,
-        freshness=tuple(freshness_items), warnings=tuple(warnings),
+        freshness=tuple(freshness_items), refresh_status=refresh_section, warnings=tuple(warnings),
     )
 
 
@@ -1574,6 +1734,17 @@ def compact_card(view: AlphaInvestmentView) -> dict[str, Any]:
         },
         "research_status": view.identity.lifecycle.research_status,
         "point_in_time_mode": view.identity.point_in_time_mode,
+        # Step 0.5：refresh 摘要——只抄 refresh_status，不重算 impact
+        "refresh": {
+            "overall": view.refresh_status.overall,
+            "change_detection": view.refresh_status.change_detection,
+            "counts": {k: view.refresh_status.counts.get(k, 0)
+                       for k in ("review_required", "invalidated", "recalculate", "stale")},
+            "attention": [{"artifact": f"{i.artifact_type}:{i.artifact_id}", "state": i.state,
+                           "reason": (i.reasons[0] if i.reasons else None)}
+                          for i in view.refresh_status.items
+                          if i.state in ("review_required", "invalidated", "recalculate", "stale")][:6],
+        },
         # 內部假設推出的數字 vs 同期共識；None＝不可比／缺料（原因在 reason），不是 0
         "internal_vs_consensus": internal_vs_consensus,
         "internal_fundamentals_status": view.internal_fundamentals.meta.status,
