@@ -20,8 +20,10 @@ from alpha.contracts import AlphaSignal
 from alpha.errors import AlphaError, ContractViolation, PointInTimeUnsupported
 from alpha.fundamental import FundamentalModelResult, build_fundamental_model
 from alpha.identity import CompanyId, Ticker
+from alpha.implied_return import ImpliedReturnResult, build_implied_return
 from alpha.models import compose_signal
 from alpha.providers import assumptions as assumption_ledger
+from alpha.providers import horizon_assumptions as horizon_ledger
 from alpha.providers import valuation_assumptions as valuation_ledger
 from alpha.valuation import CurrentPrice, ValuationResult, build_valuation
 from identity.registry import get_registry
@@ -222,13 +224,7 @@ def _valuation_model(
         records, parse_errors = valuation_ledger.read_valuation_assumption_records(str(ticker))
     except Exception as exc:  # noqa: BLE001
         return None, f"估值假設 ledger 讀取失敗：{type(exc).__name__}", records
-    market = build.context.market
-    price = CurrentPrice(
-        value=market.price, bar_date=market.bar_date,
-        unit=(market.currency or identity.get("market_quote_unit") or identity.get("market_currency")),
-        evidence_refs=tuple(r.ref for r in market.evidence),
-        reason=None if market.price is not None else "Engine C 無現價快照",
-    )
+    price = _current_price(build, identity)
     try:
         result = build_valuation(
             company_id=str(company_id), ticker=str(ticker), as_of=as_of, today=today,
@@ -238,6 +234,43 @@ def _valuation_model(
         )
     except Exception as exc:  # noqa: BLE001 — 估值失敗只讓該區 missing，不讓整份 view 失敗
         return None, f"valuation model 執行失敗：{type(exc).__name__}: {str(exc)[:160]}", records
+    return result, None, records
+
+
+def _current_price(build: ContextBuild, identity: Mapping[str, Any]) -> CurrentPrice:
+    """Engine C 現價（已依 as-of 過濾）；估值層與報酬層共用**同一個**物件，不各取一份。"""
+    market = build.context.market
+    return CurrentPrice(
+        value=market.price, bar_date=market.bar_date,
+        unit=(market.currency or identity.get("market_quote_unit") or identity.get("market_currency")),
+        evidence_refs=tuple(r.ref for r in market.evidence),
+        reason=None if market.price is not None else "Engine C 無現價快照",
+    )
+
+
+def _implied_return_model(
+    build: ContextBuild, valuation: ValuationResult | None, valuation_reason: str | None,
+    ticker: Ticker, company_id: CompanyId, *, as_of: date | None, today: date, identity: Mapping[str, Any],
+) -> tuple[ImpliedReturnResult | None, str | None, list[Any]]:
+    """Base-case Implied Return v1（Step 2）的取數與執行。
+
+    - horizon 判斷由 private ledger（`alpha/providers/horizon_assumptions.py`）讀出；fair value 是已經跑好的
+      valuation；現價與估值層共用同一個 `CurrentPrice`。本檔不算任何數字——算術在 `alpha.implied_return`。
+    - 任何一段失敗都 fail-soft，原因交給 builder。
+    """
+    records: list[Any] = []
+    try:
+        records, parse_errors = horizon_ledger.read_horizon_assumption_records(str(ticker))
+    except Exception as exc:  # noqa: BLE001
+        return None, f"horizon 假設 ledger 讀取失敗：{type(exc).__name__}", records
+    try:
+        result = build_implied_return(
+            company_id=str(company_id), ticker=str(ticker), as_of=as_of, today=today,
+            valuation=valuation, valuation_reason=valuation_reason, horizon_records=records, parse_errors=parse_errors,
+            evidence_index={ref.ref: ref for ref in build.context.evidence_refs}, price=_current_price(build, identity),
+        )
+    except Exception as exc:  # noqa: BLE001 — 報酬失敗只讓該區 missing，不讓整份 view 失敗
+        return None, f"implied return model 執行失敗：{type(exc).__name__}: {str(exc)[:160]}", records
     return result, None, records
 
 
@@ -323,6 +356,9 @@ def fetch_alpha_investment_view(
         valuation_model, valuation_reason, valuation_records = _valuation_model(
             build, fundamental_model, fundamental_reason, resolved_ticker, company_id, as_of=as_of, today=today,
             identity=identity)
+        implied_return_model, implied_return_reason, horizon_records = _implied_return_model(
+            build, valuation_model, valuation_reason, resolved_ticker, company_id, as_of=as_of, today=today,
+            identity=identity)
         # ---- Refresh：由 authority 時序導出 ChangeEvent（只偵測，不判 impact）---------------------
         refresh_changes = None
         metric_observations: list[Any] = []
@@ -336,7 +372,7 @@ def fetch_alpha_investment_view(
                     judged_on = date.fromisoformat(str(raw)[:10]) if raw else signal.as_of
                 except ValueError:
                     judged_on = signal.as_of
-            since = baseline_since(judged_on, [*records, *valuation_records])
+            since = baseline_since(judged_on, [*records, *valuation_records, *horizon_records])
             lifecycle_for_refresh = _thesis_lifecycle_entry(str(resolved_ticker)) if as_of is None else None
             try:
                 refresh_changes, metric_observations, refresh_notes = detect_changes(
@@ -344,7 +380,8 @@ def fetch_alpha_investment_view(
                     as_of=as_of, fundamentals_provider=fundamentals_provider, graph_provider=graph_provider,
                     assumption_records=records, lifecycle_entry=lifecycle_for_refresh,
                     watches=(list(watches) if watches is not None else load_watches()),
-                    ticker_obj=resolved_ticker, valuation_records=valuation_records)
+                    ticker_obj=resolved_ticker, valuation_records=valuation_records,
+                    horizon_records=horizon_records)
             except Exception as exc:  # noqa: BLE001 — 偵測失敗不讓 view 失敗，但必須現形（not_run）
                 refresh_changes, metric_observations = None, []
                 refresh_notes = [f"變更偵測失敗：{type(exc).__name__}: {str(exc)[:120]}"]
@@ -399,6 +436,7 @@ def fetch_alpha_investment_view(
         thesis_lifecycle=lifecycle_entry, checklist=checklist, identity=identity,
         fundamental_model=fundamental_model, fundamental_model_reason=fundamental_reason,
         valuation=valuation_model, valuation_reason=valuation_reason, valuation_records=valuation_records,
+        implied_return=implied_return_model, implied_return_reason=implied_return_reason, horizon_records=horizon_records,
         today=today,
         refresh_changes=refresh_changes, assumption_records=records,
         metric_observations=metric_observations, change_detection=detection,

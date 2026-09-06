@@ -22,7 +22,7 @@ from typing import Mapping
 
 from .contracts import (
     COMPANY_GUIDANCE, CONSENSUS, CONTEXT_DIGEST, CURRENT, DISPROOF_SIGNAL, EVIDENCE,
-    FINANCIAL_ACTUAL, FISCAL_PERIOD_ROLLOVER, GRAPH_CLAIM, GRAPH_EDGE, MARKET_PRICE,
+    FINANCIAL_ACTUAL, FISCAL_PERIOD_ROLLOVER, GRAPH_CLAIM, GRAPH_EDGE, HORIZON_ASSUMPTION, MARKET_PRICE,
     OPERATING_ASSUMPTION, RECALCULATE, REVIEW_REQUIRED, STALE, THESIS_REVIEW_DUE, VALUATION_ASSUMPTION,
 )
 
@@ -56,6 +56,7 @@ AXIS_POLICY: Mapping[str, Mapping[str, str]] = {
     EVIDENCE: {"structural": RECALCULATE},
     OPERATING_ASSUMPTION: {"expectation_gap": REVIEW_REQUIRED},
     VALUATION_ASSUMPTION: {},       # 估值判斷變了不動任何基本面判斷（Step 1 立場，明說）
+    HORIZON_ASSUMPTION: {},         # horizon 判斷變了只動 implied return（Step 2 立場，明說）
     FISCAL_PERIOD_ROLLOVER: {},
     THESIS_REVIEW_DUE: {},          # 由排程規則統一處理（所有判斷型成果 stale）
     DISPROOF_SIGNAL: {},            # 由 target_artifact 指名處理
@@ -84,6 +85,7 @@ ASSUMPTION_CLASS_POLICY: Mapping[str, Mapping[str, str]] = {
     COMPANY_GUIDANCE: {},                            # 透過 driver 相關性處理（GUIDANCE_FIELD_DRIVERS）
     OPERATING_ASSUMPTION: {},
     VALUATION_ASSUMPTION: {},
+    HORIZON_ASSUMPTION: {},
     CONTEXT_DIGEST: {},
 }
 
@@ -112,6 +114,9 @@ DERIVED_CLASS_POLICY: Mapping[str, frozenset[str]] = {
     # 價格不進 fair value。gap 才吃價格。
     "fair_value": frozenset({FINANCIAL_ACTUAL}),
     "fair_value_gap": frozenset({MARKET_PRICE, FINANCIAL_ACTUAL}),
+    # Step 2：implied return 吃現價（price-only → recalculate）與基期實際值（經 EPS → fair value）；
+    # 估值／horizon 假設的變化經 assumption_ids 命中處理，不在 class 規則裡。
+    "implied_return": frozenset({MARKET_PRICE, FINANCIAL_ACTUAL}),
 }
 
 #: L7 的核查頻率 → 天數。字串比對（含中英文），比不到＝不知道，不排程 stale（並列 note）。

@@ -76,6 +76,9 @@ OPERATING_ASSUMPTION = "operating_assumption"
 #: Step 1（2026-09-06）：估值假設 ledger 的新增／取代／撤回。與 operating_assumption 分開，因為它動的是
 #: fair value 而不是財務橋；policy 表對它一格 axis 都不動（估值判斷變了不代表基本面判斷變了）。
 VALUATION_ASSUMPTION = "valuation_assumption"
+#: Step 2（2026-09-06）：horizon 判斷 ledger 的新增／取代／撤回。它只動 implied return，不動 fair value、
+#: 不動任何基本面判斷（policy 表對 Q1–Q5 與假設層一格都不動）。
+HORIZON_ASSUMPTION = "horizon_assumption"
 FISCAL_PERIOD_ROLLOVER = "fiscal_period_rollover"
 THESIS_REVIEW_DUE = "thesis_review_due"
 DISPROOF_SIGNAL = "disproof_signal"
@@ -84,8 +87,8 @@ CONTEXT_DIGEST = "context_digest"
 
 CHANGE_TYPES: tuple[str, ...] = (
     MARKET_PRICE, CONSENSUS, FINANCIAL_ACTUAL, COMPANY_GUIDANCE, GRAPH_EDGE, GRAPH_CLAIM,
-    EVIDENCE, OPERATING_ASSUMPTION, VALUATION_ASSUMPTION, FISCAL_PERIOD_ROLLOVER, THESIS_REVIEW_DUE,
-    DISPROOF_SIGNAL, CONTEXT_DIGEST,
+    EVIDENCE, OPERATING_ASSUMPTION, VALUATION_ASSUMPTION, HORIZON_ASSUMPTION, FISCAL_PERIOD_ROLLOVER,
+    THESIS_REVIEW_DUE, DISPROOF_SIGNAL, CONTEXT_DIGEST,
 )
 
 # artifact 型別。判斷型（session 判斷／假設）與確定性型（模型輸出）在 policy 裡走不同 state。
@@ -101,14 +104,19 @@ ARTIFACT_MODEL = "fundamental_model"
 ARTIFACT_VALUATION_ASSUMPTION = "valuation_assumption"
 ARTIFACT_FAIR_VALUE = "fair_value"
 ARTIFACT_FAIR_VALUE_GAP = "fair_value_gap"
+#: Step 2：報酬層的兩種成果。horizon 判斷是判斷型（帶 `expires_at`＝horizon_end：INV-2 每個等待都有到期）；
+#: implied return 是確定性型，依賴＝fair value 的依賴＋現價 ref＋horizon 假設。
+ARTIFACT_HORIZON_ASSUMPTION = "horizon_assumption"
+ARTIFACT_IMPLIED_RETURN = "implied_return"
 
 ARTIFACT_TYPES: tuple[str, ...] = (
     ARTIFACT_AXIS, ARTIFACT_THESIS, ARTIFACT_ASSUMPTION, ARTIFACT_METRIC, ARTIFACT_COMPARISON,
     ARTIFACT_MARKET_IMPLIED, ARTIFACT_MODEL, ARTIFACT_VALUATION_ASSUMPTION, ARTIFACT_FAIR_VALUE,
-    ARTIFACT_FAIR_VALUE_GAP,
+    ARTIFACT_FAIR_VALUE_GAP, ARTIFACT_HORIZON_ASSUMPTION, ARTIFACT_IMPLIED_RETURN,
 )
-#: 判斷型假設的兩種成果型別（refresh 規則相同：supporting 變了 → review、撤回 → invalidated…）。
-ASSUMPTION_ARTIFACT_TYPES: frozenset[str] = frozenset({ARTIFACT_ASSUMPTION, ARTIFACT_VALUATION_ASSUMPTION})
+#: 判斷型假設的三種成果型別（refresh 規則相同：supporting 變了 → review、撤回 → invalidated…）。
+ASSUMPTION_ARTIFACT_TYPES: frozenset[str] = frozenset({ARTIFACT_ASSUMPTION, ARTIFACT_VALUATION_ASSUMPTION,
+                                                        ARTIFACT_HORIZON_ASSUMPTION})
 
 #: 成果的「性質」：判斷型輸入變了要人複查；確定性型輸入變了重算就好。
 KIND_JUDGMENT = "judgment"
@@ -331,6 +339,9 @@ class ArtifactDependency:
     preset_state: str | None = None
     preset_reason: str | None = None
     extras: Mapping[str, Any] = field(default_factory=dict)
+    #: Step 2：這個成果自帶的**絕對**到期日（例：horizon 判斷的 horizon_end）。到期＝排程事件 → `stale`；
+    #: 與 `check_frequency_days`（相對週期）分開，因為 horizon 是「到那一天」不是「每 N 天」。
+    expires_at: date | None = None
 
     def __post_init__(self) -> None:
         _check(self.artifact_type, ARTIFACT_TYPES, "ArtifactDependency.artifact_type")
@@ -338,6 +349,8 @@ class ArtifactDependency:
         if not self.artifact_id or not self.label:
             raise ContractViolation("ArtifactDependency.artifact_id／label 必須非空")
         _aware(self.established_at, "ArtifactDependency.established_at")
+        if self.expires_at is not None and (not isinstance(self.expires_at, date) or isinstance(self.expires_at, datetime)):
+            raise ContractViolation("ArtifactDependency.expires_at 必須是 date")
         for ref, role in self.refs.items():
             if not ref:
                 raise ContractViolation("ArtifactDependency.refs 的 key 必須非空")
@@ -444,6 +457,7 @@ class RefreshReport:
 
 __all__ = [
     "ARTIFACT_ASSUMPTION", "ARTIFACT_AXIS", "ARTIFACT_COMPARISON", "ARTIFACT_FAIR_VALUE", "ARTIFACT_FAIR_VALUE_GAP",
+    "ARTIFACT_HORIZON_ASSUMPTION", "ARTIFACT_IMPLIED_RETURN", "HORIZON_ASSUMPTION",
     "ARTIFACT_MARKET_IMPLIED", "ARTIFACT_METRIC", "ARTIFACT_MODEL", "ARTIFACT_THESIS", "ARTIFACT_TYPES",
     "ARTIFACT_VALUATION_ASSUMPTION", "ASSUMPTION_ARTIFACT_TYPES", "VALUATION_ASSUMPTION", "AffectedArtifact",
     "ArtifactDependency", "CHANGE_TYPES", "COMPANY_GUIDANCE", "CONSENSUS", "CONTEXT_DIGEST",

@@ -104,7 +104,7 @@ def test_renderer_is_deterministic_and_covers_every_section() -> None:
     for heading in ("## 0. 能力地圖", "## 1. Variant view", "## 2. 結構 thesis", "## 3. 因果路徑",
                     "## 4. 財務觀測", "## 5. 共識", "## 6. 價格隱含預期", "## 7. 內部基本面",
                     "## 8. Earnings bridge", "## 9. Expectation gap", "## 10. 催化劑",
-                    "## 11. 證偽條件", "## 12. 情境", "## 13a. 預期報酬", "## 13b. 下檔",
+                    "## 11. 證偽條件", "## 12. 情境", "## 13. 估值", "## 13a. Base-case implied return", "## 13b. 下檔",
                     "## 13c. 進場邏輯", "## 14. 證據與 provenance", "## 15. Refresh／dependency status",
                     "## 16. 新鮮度總表"):
         assert heading in first, heading

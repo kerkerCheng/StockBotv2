@@ -317,6 +317,7 @@ def cmd_valuation(args: argparse.Namespace) -> int:
                     calibration_refs=list(spec.get("calibration_refs") or []),
                     comparison_refs=list(spec.get("comparison_refs") or []),
                     review_conditions=list(spec.get("review_conditions") or []),
+                    value_date_convention=spec.get("value_date_convention"),
                 )
             except (KeyError, ValueError, TypeError, AlphaError) as exc:
                 print(f"✗ 估值假設不合法：{exc}", file=sys.stderr)
@@ -335,6 +336,7 @@ def cmd_valuation(args: argparse.Namespace) -> int:
                 comparison_refs=[r for r in target.evidence_refs if target.role_of(r) == "comparison"],
                 method=target.method, parameter=target.parameter, supersedes_id=target.assumption_id,
                 retracted=True, created_at=datetime.now(timezone.utc),
+                value_date_convention=target.value_date_convention,
             )
         try:
             path = append_valuation_assumption_record(record)
@@ -354,6 +356,7 @@ def cmd_valuation(args: argparse.Namespace) -> int:
             "supersedes_id": r.supersedes_id, "retracted": r.retracted,
             "evidence_refs": list(r.evidence_refs), "dependency_roles": dict(r.dependency_roles),
             "review_conditions": [c.to_dict() for c in r.review_conditions], "rationale": r.rationale,
+            "value_date_convention": r.value_date_convention,
         } for r in records]
         print(json.dumps({"ticker": ticker, "records": payload, "parse_errors": errors}, ensure_ascii=False, indent=2))
         return 0
@@ -366,6 +369,92 @@ def cmd_valuation(args: argparse.Namespace) -> int:
         print(f"    supporting：{', '.join(r.supporting_refs[:3])}｜calibration：{', '.join(r.calibration_refs[:3]) or '—'}")
     for error in errors:
         print(f"- ⚠ 解析失敗：{error}")
+    return 0
+
+
+def cmd_horizon(args: argparse.Namespace) -> int:
+    """HorizonAssumption ledger 的讀寫入口（Base-case Implied Return v1，Step 2）。
+
+    - `--list`：列出 ledger 全部紀錄（含已撤回／被取代者，稽核用）。
+    - `--add spec.json`：append 一筆。spec 給 period_end（估值目標期間結束日）／horizon_end（明示實現日期）／
+      basis／rationale／evidence_refs（supporting）＋可選 calibration_refs／comparison_refs／review_conditions／supersedes_id。
+    - `--retract <id>`：append 一筆撤回紀錄。
+
+    ⚠ 這裡**不算報酬**、也不驗證 evidence_refs 解析得到哪裡——解析在報酬執行時做。**沒有 hidden horizon**：
+    ledger 沒紀錄，implied return 就是 missing（不補 12 個月）。
+    """
+    from datetime import datetime, timezone
+
+    from .implied_return.assumptions import horizon_assumption_record
+    from .providers.horizon_assumptions import append_horizon_assumption_record, read_horizon_assumption_records
+
+    try:
+        resolved_ticker, company_id = _resolve_company(args.ticker)
+    except AlphaError as exc:
+        print(f"✗ {exc}", file=sys.stderr)
+        return 2
+    ticker = str(resolved_ticker)
+
+    if args.add or args.retract:
+        if args.add:
+            spec = json.loads(Path(args.add).read_text(encoding="utf-8"))
+            try:
+                record = horizon_assumption_record(
+                    company_id=str(company_id), ticker=ticker,
+                    period_end=date.fromisoformat(str(spec["period_end"])),
+                    horizon_end=date.fromisoformat(str(spec["horizon_end"])),
+                    basis=str(spec["basis"]), rationale=str(spec.get("rationale") or ""),
+                    evidence_refs=list(spec.get("evidence_refs") or []),
+                    supersedes_id=spec.get("supersedes_id"), author=str(spec.get("author") or "session"),
+                    created_at=datetime.now(timezone.utc),
+                    calibration_refs=list(spec.get("calibration_refs") or []),
+                    comparison_refs=list(spec.get("comparison_refs") or []),
+                    review_conditions=list(spec.get("review_conditions") or []),
+                )
+            except (KeyError, ValueError, TypeError, AlphaError) as exc:
+                print(f"✗ horizon 假設不合法：{exc}", file=sys.stderr)
+                return 2
+        else:
+            existing, _ = read_horizon_assumption_records(ticker)
+            target = next((r for r in existing if r.assumption_id == args.retract), None)
+            if target is None:
+                print(f"✗ ledger 裡沒有 {args.retract}", file=sys.stderr)
+                return 2
+            record = horizon_assumption_record(
+                company_id=target.company_id, ticker=ticker, period_end=target.period.end,
+                horizon_end=target.horizon_end, basis=target.basis, rationale=str(args.rationale or "retracted"),
+                evidence_refs=list(target.supporting_refs), calibration_refs=list(target.calibration_refs),
+                comparison_refs=[r for r in target.evidence_refs if target.role_of(r) == "comparison"],
+                supersedes_id=target.assumption_id, retracted=True, created_at=datetime.now(timezone.utc),
+            )
+        try:
+            path = append_horizon_assumption_record(record)
+        except AlphaError as exc:
+            print(f"✗ {exc}", file=sys.stderr)
+            return 2
+        print(f"✓ {record['assumption_id']} → {path}")
+        print(f"  下一步：python -m briefing implied-return {ticker} 會在報酬執行時解析 evidence_refs；解析不到會被拒用並計數")
+        return 0
+
+    records, errors = read_horizon_assumption_records(ticker)
+    if args.format == "json":
+        payload = [{
+            "assumption_id": r.assumption_id, "period": r.period.label, "period_end": r.period.end.isoformat(),
+            "horizon_end": r.horizon_end.isoformat(), "basis": r.basis, "created_at": r.created_at.isoformat(),
+            "author": r.author, "supersedes_id": r.supersedes_id, "retracted": r.retracted,
+            "evidence_refs": list(r.evidence_refs), "dependency_roles": dict(r.dependency_roles),
+            "review_conditions": [c.to_dict() for c in r.review_conditions], "rationale": r.rationale,
+        } for r in records]
+        print(json.dumps({"ticker": ticker, "records": payload, "parse_errors": errors}, ensure_ascii=False, indent=2))
+        return 0
+    print(f"# {ticker} HorizonAssumption ledger（{len(records)} 筆，解析失敗 {len(errors)}）")
+    for r in records:
+        flag = "（已撤回）" if r.retracted else ""
+        print(f"- {r.assumption_id}{flag} {r.period.label} fair value 於 {r.horizon_end} 前實現｜{r.basis}｜寫於 {r.created_at.date()}"
+              + (f"｜取代 {r.supersedes_id}" if r.supersedes_id else ""))
+        print(f"  {r.rationale[:200]}")
+    for e in errors:
+        print(f"  ✗ {e}")
     return 0
 
 
@@ -384,6 +473,16 @@ def build_parser() -> argparse.ArgumentParser:
     valuation.add_argument("--rationale", help="撤回理由")
     valuation.add_argument("--format", choices=("markdown", "json"), default="markdown")
     valuation.set_defaults(func=cmd_valuation)
+
+    horizon = sub.add_parser(
+        "horizon", help="HorizonAssumption ledger：--list／--add spec.json／--retract <id>（Step 2）")
+    horizon.add_argument("ticker")
+    horizon.add_argument("--list", action="store_true", help="（預設）列出 ledger")
+    horizon.add_argument("--add", help="append 一筆 horizon 假設（JSON spec 檔路徑）")
+    horizon.add_argument("--retract", help="append 一筆撤回紀錄（指定 assumption_id）")
+    horizon.add_argument("--rationale", help="撤回理由")
+    horizon.add_argument("--format", choices=("markdown", "json"), default="markdown")
+    horizon.set_defaults(func=cmd_horizon)
 
     assumptions = sub.add_parser(
         "assumptions", help="OperatingAssumption ledger：--list／--add spec.json／--retract <id>")

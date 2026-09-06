@@ -287,8 +287,9 @@ def test_builder_and_renderer_copy_fair_value_without_computing_it() -> None:
     assert section.assumptions[0].basis == "session_judgment" and section.assumptions[0].dependencies["assumption_id"].startswith("va_")
     assert view.capability_map()["valuation"]["status"] == "available"
     assert view.scenarios.target_valuation.value == valuation.fair_value       # 單點 fair value 照抄
-    assert view.expected_return.meta.status == "not_modeled" and view.entry_logic.meta.status == "not_modeled"
+    assert view.implied_return.meta.status == "missing" and view.entry_logic.meta.status == "not_modeled"
     assert "expected_return" not in {d.key for d in section.trace}
+    assert view.valuation.value_date.status == "missing"                       # 未宣告 value_date_convention → 不猜
     # 竄改：builder 只抄，不重算
     tampered = replace(valuation, fair_value=123.456)
     tview = _view(fundamental_model=model, valuation=tampered, valuation_records=list(valuation.assumptions))

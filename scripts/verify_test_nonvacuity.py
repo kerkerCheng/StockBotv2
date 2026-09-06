@@ -990,13 +990,13 @@ MUTATIONS: tuple[Mutation, ...] = (
         guards="沒有 revenue／margin／EPS bridge 之前，因果 section 只能是 structural_causal_model",
     ),
     Mutation(
-        name="read model 把賣方目標價灌進 expected_return",
+        name="read model 在沒有 horizon／估值時把賣方目標價灌進 implied_return",
         path="briefing/alpha_view/builder.py",
-        old="            items=tuple(not_modeled(k, l, reason) for k, l in items),",
-        new="            items=tuple(Datum(key=k, label=l, value=0.47, status=\"available\", "
-            "basis=\"observation\") for k, l in items),",
+        old="            price_return=missing(\"base_case_implied_price_return\", \"Base-case 隱含價格報酬（simple）\", why, authority=A_IMPLIED_RETURN),",
+        new="            price_return=Datum(key=\"base_case_implied_price_return\", label=\"Base-case 隱含價格報酬（simple）\", value=0.47, "
+            "status=\"available\", basis=\"observation\", authority=A_IMPLIED_RETURN),",
         test="tests/test_alpha_investment_view.py::test_analyst_target_is_not_expected_return",
-        guards="analyst target != StockBot expected return；expected_return 區不得出現任何數值",
+        guards="analyst target != StockBot implied return；報酬缺席時 implied_return 區不得出現任何數值",
     ),
     Mutation(
         name="Datum 契約不再擋「缺席卻帶值」",
@@ -1210,11 +1210,93 @@ MUTATIONS: tuple[Mutation, ...] = (
     Mutation(
         name="估值：refresh 傳播只認營運假設，估值假設 review 不傳到 fair value",
         path="alpha/refresh/resolver.py",
-        old="            upstream = (resolved.get(f\"{ARTIFACT_ASSUMPTION}:{aid}\")\n"
-            "                        or resolved.get(f\"{ARTIFACT_VALUATION_ASSUMPTION}:{aid}\"))",
+        old="            upstream = next((resolved[f\"{t}:{aid}\"] for t in sorted(ASSUMPTION_ARTIFACT_TYPES)\n"
+            "                             if f\"{t}:{aid}\" in resolved), None)",
         new="            upstream = resolved.get(f\"{ARTIFACT_ASSUMPTION}:{aid}\")",
         test="tests/test_valuation_model.py::test_refresh_states_propagate_through_fair_value_and_gap",
         guards="supporting evidence 變了 → 估值假設 review_required → fair value 不得假裝 current",
+    ),
+    # ---- Phase 2 Step 2：Base-case Implied Return v1（2026-09-06）------------------------------------------
+    Mutation(
+        name="報酬：估值假設未宣告 value_date_convention 時偷猜成 target_period_end",
+        path="alpha/valuation/model.py",
+        old="        elif convention == VALUE_DATE_SPOT:\n"
+            "            value_date, value_date_semantics = cutoff, VALUE_DATE_SPOT\n"
+            "        else:",
+        new="        elif convention == VALUE_DATE_SPOT:\n"
+            "            value_date, value_date_semantics = cutoff, VALUE_DATE_SPOT\n"
+            "        elif target is not None:\n"
+            "            value_date, value_date_semantics = target.end, VALUE_DATE_TARGET_PERIOD_END\n"
+            "        else:",
+        test="tests/test_implied_return.py::test_value_date_semantics_unspecified_makes_return_missing_even_with_fair_value_and_horizon",
+        guards="223.60 是哪一天的值必須由估值判斷宣告；未宣告＝unspecified，不得由程式猜",
+    ),
+    Mutation(
+        name="報酬：時點語意 unspecified 也照算報酬",
+        path="alpha/implied_return/model.py",
+        old="    if valuation.value_date_semantics == VALUE_DATE_UNSPECIFIED:",
+        new="    if False and valuation.value_date_semantics == VALUE_DATE_UNSPECIFIED:",
+        test="tests/test_implied_return.py::test_value_date_semantics_unspecified_makes_return_missing_even_with_fair_value_and_horizon",
+        guards="沒有 value-date 就沒有「從哪天到哪天」；報酬層拒算，不猜",
+    ),
+    Mutation(
+        name="報酬：年化改成線性（simple × 365.25／days）",
+        path="alpha/implied_return/model.py",
+        old="    return (1.0 + price_return) ** (DAYS_PER_YEAR / days) - 1.0",
+        new="    return price_return * DAYS_PER_YEAR / days",
+        test="tests/test_implied_return.py::test_annualization_math_is_compound_over_365_25_days",
+        guards="年化 convention 是 compound（365.25 天），公式字串與算術必須一致",
+    ),
+    Mutation(
+        name="報酬：builder 自己把 fair value / 現價 − 1 算一遍",
+        path="briefing/alpha_view/builder.py",
+        old="            value=result.price_return, status=_refresh_status(ret_refresh), basis=\"deterministic\", authority=A_IMPLIED_RETURN,",
+        new="            value=((result.fair_value / result.current_price.value - 1) if (result.fair_value and result.current_price.value) else result.price_return),\n"
+            "            status=_refresh_status(ret_refresh), basis=\"deterministic\", authority=A_IMPLIED_RETURN,",
+        test="tests/test_implied_return.py::test_builder_and_renderer_copy_the_return_without_computing_it",
+        guards="briefing/alpha_view 只消費 canonical result，不含報酬公式",
+    ),
+    Mutation(
+        name="報酬：implied return 的依賴不含現價 ref（price-only 變化不 recalculate）",
+        path="alpha/refresh/artifacts.py",
+        old="    refs: dict[str, str] = {r: ROLE_OBSERVATION for r in result.observation_refs}\n"
+            "    refs.update({a: ROLE_INPUT for a in result.assumption_ids})\n"
+            "    out.append(ArtifactDependency(\n"
+            "        artifact_type=ARTIFACT_IMPLIED_RETURN, artifact_id=\"implied_return\",",
+        new="    refs: dict[str, str] = {r: ROLE_OBSERVATION for r in result.observation_refs if not r.startswith(\"engine_c://financial_snapshot/\")}\n"
+            "    refs.update({a: ROLE_INPUT for a in result.assumption_ids})\n"
+            "    out.append(ArtifactDependency(\n"
+            "        artifact_type=ARTIFACT_IMPLIED_RETURN, artifact_id=\"implied_return\",",
+        test="tests/test_implied_return.py::test_price_only_change_recalculates_the_return_and_nothing_judgmental",
+        guards="現價是報酬的確定性輸入：價格變了報酬必須 recalculate",
+    ),
+    Mutation(
+        name="報酬：implied return 的依賴不宣告輸入假設（horizon 被取代時報酬仍 current）",
+        path="alpha/refresh/artifacts.py",
+        old="    refs.update({a: ROLE_INPUT for a in result.assumption_ids})\n"
+            "    out.append(ArtifactDependency(\n"
+            "        artifact_type=ARTIFACT_IMPLIED_RETURN, artifact_id=\"implied_return\",",
+        new="    refs.update({a: ROLE_INPUT for a in result.assumption_ids if not a.startswith(\"ha_\")})\n"
+            "    out.append(ArtifactDependency(\n"
+            "        artifact_type=ARTIFACT_IMPLIED_RETURN, artifact_id=\"implied_return\",",
+        test="tests/test_implied_return.py::test_horizon_supersede_recalculates_the_return_and_expiry_makes_it_stale",
+        guards="horizon 判斷 supersede → implied return recalculate（Step 2 refresh 契約）",
+    ),
+    Mutation(
+        name="報酬：horizon 到期不排程 stale（INV-2）",
+        path="alpha/refresh/resolver.py",
+        old="            if expiry <= cutoff:",
+        new="            if False and expiry <= cutoff:",
+        test="tests/test_implied_return.py::test_horizon_supersede_recalculates_the_return_and_expiry_makes_it_stale",
+        guards="INV-2：每個等待都必須有到期；horizon_end 到了 horizon 就 stale、報酬跟著 stale",
+    ),
+    Mutation(
+        name="報酬：as-of 視角選 horizon 時不看 as_of（偷看未來的 horizon）",
+        path="alpha/implied_return/model.py",
+        old="            horizon_records, target=target, as_of=as_of, today=today, evidence_index=index, parse_errors=parse_errors)",
+        new="            horizon_records, target=target, as_of=None, today=today, evidence_index=index, parse_errors=parse_errors)",
+        test="tests/test_implied_return.py::test_historical_view_does_not_leak_future_horizon_or_valuation",
+        guards="INV-6：T 時刻不存在的 horizon 判斷不得參與 T 的報酬",
     ),
 )
 

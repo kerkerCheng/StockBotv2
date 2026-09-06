@@ -290,6 +290,7 @@ cashtag 由 `entities.py` 確定性抽取；公司名寫成純文字時 regex �
 & '.venv\Scripts\python.exe' -m briefing alpha-card COHR --no-causal          # 略過路徑／結構事件（較快）
 & '.venv\Scripts\python.exe' -m briefing alpha-card COHR --as-of 2026-06-30   # as-of 視角（Engine A 投影＋Engine C 時序）
 & '.venv\Scripts\python.exe' -m briefing valuation COHR                      # 只印第 13 節：fair value／現價／gap／refresh state（Step 1）
+& '.venv\Scripts\python.exe' -m briefing implied-return COHR                 # 只印第 13a 節：現價／fair value 時點／horizon／隱含報酬／refresh state（Step 2）
 ```
 
 純讀：不 freeze context、不建 decision、不寫任何 authority。session 判斷檔預設找
@@ -736,6 +737,42 @@ python -m briefing valuation COHR --as-of 2026-09-05         # 估值假設寫�
 
 ⚠ 沒有生效的估值假設就是 `missing`（不補 default）；口徑／期間與內部 EPS 不合是 `missing`＋「不合」理由；gap **不是**
 expected return／upside／entry signal（型別沒有那些欄位，section 每次列 `gap_is_not`）。
+
+### Sandbox impact review 結論（2026-09-06，Base-case Implied Return v1／Step 2）
+
+| 入口 | side effect | OS／network capability | 判定 |
+|---|---|---|---|
+| `python -m alpha horizon <T> --list／--add／--retract` | append `library/private/alpha/horizon/<T>.jsonl`（horizon 判斷，A3）；`--list` 唯讀 | 本機檔案；private 目錄 | **互動專用**，不進 unattended rule（horizon 是 session 的判斷，排程不得自己寫、不得補 12 個月） |
+| `python -m alpha valuation <T> --add`（既有） | spec 多一個可選欄位 `value_date_convention`（spot／target_period_end）；仍只 append private ledger | 無新增 | 既有判定不變（互動專用） |
+| `python -m briefing implied-return <T> [--scenario …] [--as-of]` | 唯讀：與 `alpha-card` 相同的來源＋估值／horizon ledger；情境只在記憶體疊事件，**不寫任何 authority** | 與 `alpha-card` 相同的本機資源；無新增網路主機、憑證或 identity／ACL | **互動專用**。新 CLI 名稱，不進 unattended rule |
+| `python -m briefing alpha-card`／`decision_lab today` 的 Alpha Card 摘要（既有） | 多讀 horizon ledger＋跑純函式 `build_implied_return`；`expected_return` section 改名 `implied_return`、估值 section 多 `value_date` 格、精簡卡多 `implied_return` 欄；**卡表欄位不變** | 無新增（同一 Engine C 連線、本機檔案） | 命令字串未變 |
+
+查證（新入口不該出現在 rules）：
+```powershell
+Select-String -Path .codex\rules\stockbot-automations.rules -Pattern 'horizon|implied'
+```
+
+### Base-case Implied Return：怎麼跑（互動）
+
+```powershell
+# 0) 先確認估值假設有宣告時點語意（沒有就 append 一筆 supersede：spec 加 "value_date_convention": "target_period_end" 或 "spot"）
+python -m alpha valuation COHR --list --format json | python -c "import json,sys;print([(r['assumption_id'], r['value_date_convention']) for r in json.load(sys.stdin)['records']])"
+# 1) 明示 horizon 判斷（session 寫；period_end＝估值目標期間結束日、horizon_end＝明示實現日期；evidence_refs 必須解析到 alpha-card evidence index）
+python -m alpha horizon COHR --add spec.json        # spec：period_end／horizon_end／basis／rationale／evidence_refs／calibration_refs／review_conditions
+python -m alpha horizon COHR --list
+python -m alpha horizon COHR --retract ha_xxx --rationale "..."
+# 2) 看結果（read model 第 13a 節：現價／fair value／value_date／horizon／區間／simple／年化／total return／認識論分解／refresh state）
+python -m briefing implied-return COHR
+python -m briefing implied-return COHR --format json | python -c "import json,sys;r=json.load(sys.stdin);print(r['meta']['status'], r['price_return']['value'], r['annualized_price_return']['value'], r['horizon_window']['value'])"
+# 3) 情境與歷史視角
+python -m briefing implied-return COHR --scenario price_only    # 只有 implied_return recalculate；fair value／horizon current
+python -m briefing implied-return COHR --scenario graph_edge    # 估值假設 review_required → fair value／implied_return review_required
+python -m briefing implied-return COHR --as-of 2026-09-05       # 估值假設 v2 與 horizon 皆寫於 09-06 → created_after_as_of → missing
+```
+
+⚠ 四個輸入缺一就是 `missing`（現價含 bar_date、fair value 同單位、fair value 的 value-date 語意、生效的 horizon 判斷），**不補 12 個月、
+不補下一會計年度**；horizon 到期即 stale，要新的判斷。它是 **base-case 隱含價格報酬**：不是機率加權期望報酬（沒有機率）、不是 total
+return（沒有股利預測）、不是 entry signal（型別沒有那些欄位，section 每次列 `is_not`）。
 
 ### Research Refresh／Dependency Invalidation：怎麼跑（互動）
 

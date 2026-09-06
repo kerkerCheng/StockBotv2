@@ -254,6 +254,18 @@ StockBot 對某個估值參數的**明示**判斷（`alpha/valuation/contracts.p
 `alpha/valuation/model.py::build_valuation`：`fair_value = internal_eps[target_period] × target_pe`（同期、同口徑才乘；`calculation=deterministic`、`input_dependency`＝所有輸入判斷中最弱者）；`gap = fair_value − current_price`／`fair_value / current_price − 1`（同單位才算；報價單位 ≠ 結算幣別，本層不換算）；`implied_multiple_at_price = current_price / internal_eps`——給定內部 EPS，**整個 gap ＝ target_pe / implied_multiple − 1**。fair value **不含現價**（price-only 變化只動 gap）。**gap 不是** expected return／upside forecast／entry signal／buy-sell（horizon 與報酬語意是 Step 2）；read model 每次列 `gap_is_not`。
 *Avoid:* 把 gap 叫 upside 或預期報酬、拿 gap 排序或給尺寸、把 fair value 讀成觀測
 
+### Value-date convention（fair value 是哪一天的值）
+`ValuationAssumption.value_date_convention`（2026-09-06 Step 2；封閉字彙）：`spot`＝fair value 是估值視角日的值（「今天就該以 target_pe × 目標期間 EPS 交易」）；`target_period_end`＝fair value 是目標會計期間結束日的值（「到 FY 期末，市場會以 target_pe 定價那一年的 EPS」）。**沒有預設**：舊紀錄讀成 `unspecified`，fair value 照算但報酬層拒算。`ValuationResult.value_date`／`value_date_semantics` 依 `VALUE_DATE_FORMULA` 導出。它是估值判斷的一部分，不是觀測——兩種讀法算術相同、報酬語意不同，所以必須明示。
+*Avoid:* 由 renderer 或文字註解猜時點、程式補預設、把 spot 的 gap 讀成「今天就該漲跌到那裡」的即時錯價主張而不說
+
+### HorizonAssumption（horizon 判斷）
+StockBot 對「fair value 何時會被市場定價到」的**明示**判斷（`alpha/implied_return/contracts.py`，2026-09-06 Step 2）：公司、服務的目標會計期間、`horizon_end`（明示日期，不是「12 個月」）、`basis`、rationale、`evidence_refs`＋`dependency_roles`、`created_at`、supersede／retract、`review_conditions`。與營運／估值假設同一套 epistemic system、同一支選取器；id 前綴 `ha_`，住 `library/private/alpha/horizon/<TICKER>.jsonl`。寫下時已過去的 horizon 契約拒收；到期（`horizon_end`）由 refresh 標 `stale`（INV-2）。
+*Avoid:* hardcode 12 個月／下一會計年度、renderer 預設、horizon 過期後仍當 current
+
+### Base-case Implied Return（Step 2）
+`alpha/implied_return/model.py::build_implied_return`：`price_return = fair_value / current_price − 1`；`holding_period_days = horizon_end − current_price.bar_date`；`annualized_price_return = (1 + price_return) ** (365.25 / days) − 1`。四個輸入缺一就 `missing`（現價含 bar_date、fair value 同單位、value-date 語意、生效 horizon）；`calculation=deterministic`、`input_dependency`＝所有輸入判斷中最弱者。**它不是** probability-weighted expected return（沒有機率；名稱刻意用 implied）、不是 total return（`total_return_status` 恆 `not_modeled`）、不是 entry signal／required return／buy-sell；read model 第 13a 節 `implied_return` 每次列 `is_not`。COHR 2026-09-06：從 2026-09-04（281.86）到 2027-06-30，simple −20.7%、年化 −24.6%。
+*Avoid:* 叫它 expected return、把 price return 冒充 total return、拿它排序或給尺寸、horizon 缺就偷用一年
+
 ### Review Condition（假設自帶的 machine-readable 觸發條件）
 `metric`／`scope`／`period_end`／`period_kind`／`operator`／`threshold`／`on_trigger`／`note`。由寫假設的人明示，引擎拿 Engine C 觀測（年度＋exit quarter）對照；滿足 → `disproof_signal` → 該假設 `on_trigger` state。`note` 是人寫的下一步（例：下修至 +45%），引擎只讀不做。也可經 Event Watch `hypothesis_ref=oa_*` 喚醒。
 *Avoid:* parser 讀 rationale 自由文字、觸發後自動寫新假設

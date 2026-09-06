@@ -109,7 +109,8 @@ def test_without_a_model_sections_are_missing_not_not_modeled() -> None:
     assert "provider 無 fiscal 能力" in (view.internal_fundamentals.meta.reason or "")
     assert view.earnings_bridge.meta.status == "missing"
     assert view.expectation_gap.internal_vs_consensus.status == "missing"
-    assert view.expected_return.meta.status == "not_modeled"             # 真正沒能力的還是 not_modeled
+    assert view.implied_return.meta.status == "missing"                  # Step 2：有能力了；沒資料是 missing
+    assert view.downside.meta.status == "not_modeled"                    # 真正沒能力的還是 not_modeled
     assert view.consensus.fiscal_items == ()
 
 

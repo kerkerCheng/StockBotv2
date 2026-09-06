@@ -86,6 +86,25 @@ IMPLIED_MULTIPLE_FORMULA = "implied_multiple_at_price = current_price / internal
 #: 估值假設的口徑只能是 GAAP 或 non-GAAP——倍數套在哪一種 EPS 上是身分的一部分。
 VALUATION_ACCOUNTING_BASES: tuple[str, ...] = ("gaap", "non_gaap")
 
+#: **Step 2（2026-09-06）補的 value-date 語意：fair value 這個數字是「哪一天」的值。**
+#: Step 1 audit 實測：v1 契約只有 `target_period`（EPS 屬於哪個會計期間）與 `as_of`（知識視角），
+#: 答不出「223.60 是今天的 fair value（A）還是某個未來日期的 target value（B）」——兩種讀法算術相同、
+#: 報酬語意完全不同，所以它必須是估值判斷自己宣告的封閉字彙，不得由 renderer 或文字註解猜。
+#: - `spot`：fair value 是**估值視角日**（as_of 或 today）的值——「今天就該以 target_pe × 目標期間 EPS 交易」。
+#: - `target_period_end`：fair value 是**目標會計期間結束日**的值——「到 FY 期末，市場會以 target_pe 定價那一年的 EPS」。
+#: 未宣告（舊紀錄）＝`unspecified`：fair value 照算（Step 1 語意不變），但**報酬層拒算**（沒有時點就沒有 horizon）。
+VALUE_DATE_SPOT = "spot"
+VALUE_DATE_TARGET_PERIOD_END = "target_period_end"
+VALUE_DATE_CONVENTIONS: tuple[str, ...] = (VALUE_DATE_SPOT, VALUE_DATE_TARGET_PERIOD_END)
+VALUE_DATE_UNSPECIFIED = "unspecified"
+VALUE_DATE_SEMANTICS: tuple[str, ...] = VALUE_DATE_CONVENTIONS + (VALUE_DATE_UNSPECIFIED,)
+#: value_date 的機器可讀定義（**唯一定義處**；read model 只抄）。
+VALUE_DATE_FORMULA: Mapping[str, str] = {
+    VALUE_DATE_SPOT: "value_date = 估值視角日（as_of，否則 today）——fair value 是「現在」的值",
+    VALUE_DATE_TARGET_PERIOD_END: "value_date = target_period.end——fair value 是目標會計期間結束日的值",
+    VALUE_DATE_UNSPECIFIED: "value_date = None——估值假設未宣告 value_date_convention，時點語意未知（不猜）",
+}
+
 VALUATION_STATUSES: tuple[str, ...] = ("available", "missing")
 GAP_STATUSES: tuple[str, ...] = (
     "comparable", "fair_value_missing", "price_missing", "incompatible_unit", "unverified_unit",
@@ -144,6 +163,9 @@ class ValuationAssumption:
     dependency_roles: Mapping[str, str] = field(default_factory=dict)
     review_conditions: tuple[Any, ...] = ()
     provenance_semantics: str = "v2"
+    #: Step 2：這條倍數判斷算出來的 fair value 是哪一天的值（`VALUE_DATE_CONVENTIONS`）。**沒有預設**：
+    #: 舊紀錄是 None（＝unspecified），要補語意就 append 一筆新紀錄 supersede 它。
+    value_date_convention: str | None = None
 
     def __post_init__(self) -> None:
         _nonempty(self.assumption_id, "ValuationAssumption.assumption_id")
@@ -176,6 +198,10 @@ class ValuationAssumption:
         if spec.upper is not None and value > spec.upper:
             raise ContractViolation(f"{self.parameter}={value} 高於上限 {spec.upper}")
         _nonempty(self.rationale, "ValuationAssumption.rationale")
+        if self.value_date_convention is not None and self.value_date_convention not in VALUE_DATE_CONVENTIONS:
+            raise ContractViolation(
+                f"value_date_convention 未登記：{self.value_date_convention!r}；已知 {VALUE_DATE_CONVENTIONS}"
+                "——fair value 是哪一天的值是封閉字彙，不得自由填寫")
         if not isinstance(self.created_at, datetime) or self.created_at.tzinfo is None:
             raise ContractViolation("created_at 必須是帶時區的 datetime")
         if not self.retracted and not self.evidence_refs:
@@ -359,6 +385,10 @@ class ValuationResult:
 
     `fair_value` 有值 ⇒ `calculation="deterministic"` 且 `input_dependency` 是所有輸入判斷
     （內部 EPS 的 input_dependency ＋ 估值假設的 basis）中最弱的那一種。
+
+    Step 2 補的兩個欄位回答「這個數字是哪一天的值」：`value_date_semantics`（spot／target_period_end／
+    unspecified，抄自生效估值假設的 `value_date_convention`）與 `value_date`（依 `VALUE_DATE_FORMULA` 導出的
+    日期；unspecified 時是 None）。**它們不改 fair value 的算術**，只讓時點語意 machine-readable。
     """
 
     company_id: str
@@ -387,10 +417,20 @@ class ValuationResult:
     digest: str = ""
     warnings: tuple[str, ...] = ()
     evidence: tuple[EvidenceRef, ...] = field(default_factory=tuple)
+    value_date: date | None = None
+    value_date_semantics: str = VALUE_DATE_UNSPECIFIED
 
     def __post_init__(self) -> None:
         if self.status not in VALUATION_STATUSES:
             raise ContractViolation(f"ValuationResult.status 未登記：{self.status!r}")
+        if self.value_date_semantics not in VALUE_DATE_SEMANTICS:
+            raise ContractViolation(f"ValuationResult.value_date_semantics 未登記：{self.value_date_semantics!r}")
+        if self.value_date_semantics == VALUE_DATE_UNSPECIFIED and self.value_date is not None:
+            raise ContractViolation("value_date_semantics=unspecified 不得帶 value_date（不猜時點）")
+        if self.value_date_semantics != VALUE_DATE_UNSPECIFIED and self.value_date is None:
+            raise ContractViolation(f"value_date_semantics={self.value_date_semantics} 必須有 value_date")
+        if self.value_date is not None and (not isinstance(self.value_date, date) or isinstance(self.value_date, datetime)):
+            raise ContractViolation("ValuationResult.value_date 必須是 date")
         if self.method is not None and self.method not in VALUATION_METHODS:
             raise ContractViolation(f"ValuationResult.method 未登記：{self.method!r}")
         if self.accounting_basis is not None and self.accounting_basis not in ACCOUNTING_BASES:
@@ -420,6 +460,10 @@ class ValuationResult:
         ops = tuple(self.fundamental_input.assumption_ids) if self.fundamental_input else ()
         return ops + tuple(a.assumption_id for a in self.assumptions)
 
+    @property
+    def value_date_formula(self) -> str:
+        return VALUE_DATE_FORMULA[self.value_date_semantics]
+
 
 def combined_input_dependency(fundamental_dependency: str | None, assumptions: Sequence[ValuationAssumption]) -> str | None:
     """fair value 的輸入知識種類＝所有輸入中最弱的那一種。"""
@@ -430,7 +474,9 @@ def combined_input_dependency(fundamental_dependency: str | None, assumptions: S
 __all__ = [
     "FAIR_VALUE_FORMULA", "GAP_FORMULA", "GAP_STATUSES", "IMPLIED_MULTIPLE_FORMULA",
     "METHOD_FORWARD_EARNINGS_MULTIPLE", "METHOD_FUNDAMENTAL_INPUT", "METHOD_PARAMETERS", "MODEL_VERSION",
-    "VALUATION_ACCOUNTING_BASES", "VALUATION_METHODS", "VALUATION_STATUSES", "CurrentPrice",
+    "VALUATION_ACCOUNTING_BASES", "VALUATION_METHODS", "VALUATION_STATUSES", "VALUE_DATE_CONVENTIONS",
+    "VALUE_DATE_FORMULA", "VALUE_DATE_SEMANTICS", "VALUE_DATE_SPOT", "VALUE_DATE_TARGET_PERIOD_END",
+    "VALUE_DATE_UNSPECIFIED", "CurrentPrice",
     "FairValueGap", "FairValueSensitivity", "FundamentalInput", "ParameterSpec", "ValuationAssumption",
     "ValuationResult", "ValuationStep", "combined_input_dependency",
 ]

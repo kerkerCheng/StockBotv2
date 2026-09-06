@@ -32,18 +32,22 @@ from .assumptions import (
 from .contracts import (
     FAIR_VALUE_FORMULA, GAP_FORMULA, GAP_STATUSES, IMPLIED_MULTIPLE_FORMULA,
     METHOD_FORWARD_EARNINGS_MULTIPLE, METHOD_FUNDAMENTAL_INPUT, METHOD_PARAMETERS, MODEL_VERSION,
-    VALUATION_ACCOUNTING_BASES, VALUATION_METHODS, VALUATION_STATUSES, CurrentPrice, FairValueGap,
+    VALUATION_ACCOUNTING_BASES, VALUATION_METHODS, VALUATION_STATUSES, VALUE_DATE_CONVENTIONS,
+    VALUE_DATE_FORMULA, VALUE_DATE_SEMANTICS, VALUE_DATE_SPOT, VALUE_DATE_TARGET_PERIOD_END,
+    VALUE_DATE_UNSPECIFIED, CurrentPrice, FairValueGap,
     FairValueSensitivity, FundamentalInput, ValuationAssumption, ValuationResult, ValuationStep,
     combined_input_dependency,
 )
-from .model import build_valuation
+from .model import build_valuation, units_comparable
 
 __all__ = [
     "FAIR_VALUE_FORMULA", "GAP_FORMULA", "GAP_STATUSES", "IMPLIED_MULTIPLE_FORMULA",
     "METHOD_FORWARD_EARNINGS_MULTIPLE", "METHOD_FUNDAMENTAL_INPUT", "METHOD_PARAMETERS", "MODEL_VERSION",
     "RECORD_VERSION", "VALUATION_ACCOUNTING_BASES", "VALUATION_METHODS", "VALUATION_STATUSES",
+    "VALUE_DATE_CONVENTIONS", "VALUE_DATE_FORMULA", "VALUE_DATE_SEMANTICS", "VALUE_DATE_SPOT",
+    "VALUE_DATE_TARGET_PERIOD_END", "VALUE_DATE_UNSPECIFIED",
     "CurrentPrice", "FairValueGap", "FairValueSensitivity", "FundamentalInput", "ValuationAssumption",
     "ValuationResult", "ValuationStep", "build_valuation", "combined_input_dependency",
     "new_valuation_assumption_id", "parse_valuation_assumption_record", "select_valuation_assumptions",
-    "valuation_assumption_record",
+    "units_comparable", "valuation_assumption_record",
 ]

@@ -14,6 +14,8 @@
 | 估值假設（Step 1） | `ValuationAssumption.evidence_refs`＋`dependency_roles`＋`review_conditions` |
 | fair value（Step 1） | `ValuationResult.assumption_ids`（營運＋估值假設）＋內部 EPS 的 `observation_refs`——**不含現價** |
 | fair value gap（Step 1） | fair value 的依賴＋`CurrentPrice.evidence_refs` |
+| horizon 假設（Step 2） | `HorizonAssumption.evidence_refs`＋`dependency_roles`＋`review_conditions`；`expires_at`＝`horizon_end` |
+| implied return（Step 2） | fair value 的依賴＋`CurrentPrice.evidence_refs`＋horizon 假設（`assumption_ids` 含 `ha_*`） |
 
 `established_at` 是 PIT 的錨：session 判斷＝判斷檔自報的產出日；假設＝`created_at`；
 確定性輸出＝這次 build 的參考時點（它們每次都重算，所以在 build 之前發生的變化都已納入）。
@@ -27,9 +29,11 @@ from ..contracts import AXES, AlphaSignal, ComponentTrace, ResearchContext
 from ..fundamental.contracts import (
     FiscalPeriod, FundamentalModelResult, OperatingAssumption,
 )
+from ..implied_return.contracts import HorizonAssumption, ImpliedReturnResult
 from ..valuation.contracts import ValuationAssumption, ValuationResult
 from .contracts import (
     ARTIFACT_ASSUMPTION, ARTIFACT_AXIS, ARTIFACT_COMPARISON, ARTIFACT_FAIR_VALUE, ARTIFACT_FAIR_VALUE_GAP,
+    ARTIFACT_HORIZON_ASSUMPTION, ARTIFACT_IMPLIED_RETURN,
     ARTIFACT_MARKET_IMPLIED, ARTIFACT_METRIC, ARTIFACT_MODEL, ARTIFACT_THESIS, ARTIFACT_VALUATION_ASSUMPTION,
     INVALIDATED, KIND_DETERMINISTIC, KIND_JUDGMENT, MISSING, ROLE_CALIBRATION, ROLE_COMPARISON, ROLE_INPUT,
     ROLE_LEGACY, ROLE_OBSERVATION, ROLE_SUPPORTING, SUPERSEDED, ArtifactDependency,
@@ -118,7 +122,7 @@ def artifacts_from_signal(
 # 假設（含被取代／撤回／其他期間的歷史紀錄）＋ 模型輸出 ＋ 數值 gap
 # ---------------------------------------------------------------------------
 
-def _assumption_refs(record: OperatingAssumption | ValuationAssumption) -> dict[str, str]:
+def _assumption_refs(record: OperatingAssumption | ValuationAssumption | HorizonAssumption) -> dict[str, str]:
     roles: dict[str, str] = {}
     for ref in record.evidence_refs:
         role = record.role_of(ref)
@@ -307,6 +311,61 @@ def artifacts_from_valuation(
 
 
 # ---------------------------------------------------------------------------
+# 報酬（Step 2）：horizon 假設（判斷型，帶絕對到期）＋ implied return（確定性，含現價與 horizon）
+# ---------------------------------------------------------------------------
+
+def artifacts_from_implied_return(
+    result: ImpliedReturnResult | None,
+    *,
+    build_at: datetime,
+    horizon_records: Sequence[HorizonAssumption] = (),
+    base_period_end: date | None = None,
+) -> list[ArtifactDependency]:
+    """horizon 假設（含歷史紀錄）＋ implied return。
+
+    horizon 假設帶 `expires_at=horizon_end`：到那天就 stale（INV-2：每個等待都必須有到期）。
+    implied return 的依賴＝fair value 的依賴（營運＋估值假設、基期觀測）＋現價 ref＋horizon 假設——
+    所以 price-only → recalculate；估值假設 review → 傳播成 review；horizon 被取代 → recalculate；
+    無關的圖變化（沒命中任何 supporting ref）→ current。
+    """
+    out: list[ArtifactDependency] = []
+    if result is None:
+        return out
+    accepted = {result.horizon.assumption_id} if result.horizon is not None else set()
+    rejection = {aid: reason for aid, reason in result.horizon_selection.rejected}
+    target_end = result.target_period.end if result.target_period else None
+    seen: set[str] = set()
+    for record in (*((result.horizon,) if result.horizon is not None else ()), *horizon_records):
+        if record.assumption_id in seen:
+            continue
+        seen.add(record.assumption_id)
+        preset, why = _historical_state(record, accepted=accepted, rejection=rejection,
+                                        base_end=base_period_end, target_end=target_end)
+        out.append(ArtifactDependency(
+            artifact_type=ARTIFACT_HORIZON_ASSUMPTION, artifact_id=record.assumption_id,
+            label=f"Horizon 判斷 {record.period.label} fair value 於 {record.horizon_end} 前實現",
+            kind=KIND_JUDGMENT, established_at=record.created_at, refs=_assumption_refs(record),
+            basis=record.basis, driver=record.driver, scope=record.scope, period_end=record.period.end,
+            review_conditions=tuple(record.review_conditions), preset_state=preset, preset_reason=why,
+            expires_at=(record.horizon_end if preset is None else None),
+            extras={"provenance_semantics": record.provenance_semantics, "horizon_end": record.horizon_end.isoformat()},
+        ))
+    if not result.is_known:
+        return out
+    refs: dict[str, str] = {r: ROLE_OBSERVATION for r in result.observation_refs}
+    refs.update({a: ROLE_INPUT for a in result.assumption_ids})
+    out.append(ArtifactDependency(
+        artifact_type=ARTIFACT_IMPLIED_RETURN, artifact_id="implied_return",
+        label=(f"Base-case implied return（{result.target_period.label if result.target_period else '?'}；"
+               f"{result.horizon_start} → {result.horizon_end}；不是 expected return）"),
+        kind=KIND_DETERMINISTIC, established_at=build_at, refs=refs,
+        assumption_ids=tuple(result.assumption_ids), basis=result.input_dependency, period_end=target_end,
+        extras={"return_convention": result.return_convention, "horizon_end": result.horizon_end.isoformat() if result.horizon_end else None},
+    ))
+    return out
+
+
+# ---------------------------------------------------------------------------
 # 市場導出量（確定性 proxy）
 # ---------------------------------------------------------------------------
 
@@ -330,6 +389,7 @@ def artifacts_from_context(context: ResearchContext, *, build_at: datetime) -> l
 
 
 __all__ = [
-    "AXIS_LABEL", "THESIS_ARTIFACT_ID", "artifacts_from_context", "artifacts_from_model",
-    "artifacts_from_signal", "artifacts_from_valuation", "build_instant", "end_of_day", "start_of_day",
+    "AXIS_LABEL", "THESIS_ARTIFACT_ID", "artifacts_from_context", "artifacts_from_implied_return",
+    "artifacts_from_model", "artifacts_from_signal", "artifacts_from_valuation", "build_instant", "end_of_day",
+    "start_of_day",
 ]

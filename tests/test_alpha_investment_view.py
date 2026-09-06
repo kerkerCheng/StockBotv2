@@ -240,17 +240,21 @@ def test_unknown_session_axis_is_missing_not_zero() -> None:
 # ---------------------------------------------------------------------------
 
 def test_analyst_target_is_not_expected_return() -> None:
+    """Step 2（2026-09-06）：implied_return section **有能力了**——沒注入 horizon／估值就是 missing，不是 not_modeled；
+    但機率加權期望報酬與總報酬仍 not_modeled，且 section 每次列「不是 expected return」。"""
     view = _view()
-    assert view.expected_return.meta.status == "not_modeled"
-    assert all(d.value is None and d.status == "not_modeled" for d in view.expected_return.items)
-    assert any("賣方目標價" in x for x in view.expected_return.not_to_be_confused_with)
+    assert view.implied_return.meta.status == "missing"
+    assert view.implied_return.price_return.value is None and view.implied_return.price_return.status == "missing"
+    assert view.implied_return.probability_weighted_return.status == "not_modeled"
+    assert view.implied_return.total_return.status == "not_modeled"
+    assert any("expected return" in x for x in view.implied_return.is_not)
     target = next(d for d in view.consensus.items if d.key == "target_mean")
     assert target.is_known and "不是本系統的預期報酬" in target.label
     # view 不自己算目標價 vs 現價的比值：那是 scripts/alpha_expectation_gap.py 的產出（審計第 5 條）
     assert not any(d.key == "target_vs_price" for d in view.consensus.items)
-    payload = view.to_dict()["expected_return"]
+    payload = view.to_dict()["implied_return"]
     numeric = [(p, v) for p, k, v in _walk(payload) if isinstance(v, (int, float)) and not isinstance(v, bool)]
-    assert not numeric, f"expected_return 出現數值：{numeric}"
+    assert not numeric, f"implied_return 缺席時出現數值：{numeric}"
 
 
 # ---------------------------------------------------------------------------
@@ -420,12 +424,14 @@ def test_missing_snapshot_makes_sections_missing_not_not_modeled() -> None:
     view = _view(fundamentals=_FakeFundamentals(available=False))
     assert view.fundamentals.meta.status == "missing"
     assert view.consensus.meta.status == "missing"
-    assert view.expected_return.meta.status == "not_modeled"
+    assert view.implied_return.meta.status == "missing"                 # Step 2：有能力了；沒資料是 missing
+    assert view.downside.meta.status == "not_modeled"
     price = next(d for d in view.fundamentals.items if d.key == "price")
     assert price.value is None and price.status == "missing"
     cap = view.capability_map()
     assert cap["fundamentals"]["status"] == "missing"
-    assert cap["expected_return"]["status"] == "not_modeled"
+    assert cap["implied_return"]["status"] == "missing"
+    assert cap["downside"]["status"] == "not_modeled"
     # internal fundamentals 自 2026-09-05 起是「有能力」：沒資料是 missing，不是 not_modeled
     assert cap["internal_fundamentals"]["status"] == "missing"
 
@@ -480,7 +486,8 @@ def test_to_dict_round_trips_json_and_keeps_nulls() -> None:
     back = json.loads(text)
     assert back["schema_version"] == "alpha-investment-view/v1"
     assert back["identity"]["ticker"] == "COHR"
-    assert back["capability_map"]["expected_return"]["status"] == "not_modeled"
+    assert back["capability_map"]["downside"]["status"] == "not_modeled"
+    assert back["capability_map"]["implied_return"]["status"] == "missing"
     nulls = [p for p, k, v in _walk(back) if k == "value" and v is None]
     assert nulls, "read model 裡沒有任何 null——代表缺席被填掉了"
 
@@ -507,7 +514,9 @@ def test_compact_card_is_pure_selection_from_the_view() -> None:
     assert card["market_implied_eps_growth"]["value"] == growth.value
     assert card["market_implied_eps_growth"]["basis"] == "heuristic_proxy"
     assert card["catalyst"]["state"] == "watch"
-    assert set(card["not_modeled"]) >= {"expected_return", "downside", "entry_logic"}
+    assert set(card["not_modeled"]) >= {"downside", "entry_logic"}
+    assert "implied_return" not in card["not_modeled"]                 # Step 2：有能力了；沒資料是 missing
+    assert card["implied_return"]["status"] == "missing" and card["implied_return"]["price_return"] is None
     assert "internal_fundamentals" not in card["not_modeled"]          # 有能力了；沒資料是 missing
     assert card["internal_fundamentals_status"] == "missing"
     assert card["internal_vs_consensus"]["eps"]["status"] == "missing"

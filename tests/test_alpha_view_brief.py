@@ -39,7 +39,7 @@ def _card(ticker: str = "COHR") -> dict:
                      "structured_count": 0, "checkpoint_count": 1, "reason": None},
         "disproof": {"condition_count": 3, "narrative_present": True, "problems": []},
         "research_status": "READY", "point_in_time_mode": "current",
-        "not_modeled": ["internal_fundamentals", "earnings_bridge", "expected_return", "downside",
+        "not_modeled": ["internal_fundamentals", "earnings_bridge", "downside",
                         "entry_logic"],
         "warnings": [],
     }

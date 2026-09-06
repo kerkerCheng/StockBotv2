@@ -8,7 +8,7 @@
 | market_price／consensus | Engine C `financial_snapshots`（逐日）＋`consensus_estimates`（逐次抓取） | `fetched_at`（session 只看得到 packet 快照） |
 | graph_edge | `GraphResearchProvider.get_structural_changes_since`（投影差集） | 文件 `published_at`（世界時間） |
 | financial_actual／company_guidance | Engine C 人工 ledger 歷史列 | payload 的 `source_filed_at`／`issued_at`（世界時間；系統 `recorded_at` 只管 as-of 可見性） |
-| operating_assumption／valuation_assumption | private ledger `created_at` | `created_at` |
+| operating_assumption／valuation_assumption／horizon_assumption | private ledger `created_at` | `created_at` |
 | thesis_review_due | `thesis/lifecycle.json` 的 `is_due` | 到期日 |
 | disproof_signal | Event Watch 已 fired 且 `hypothesis_ref` 指向 `oa_*`／`signal:<TICKER>` | `woken_by.at` |
 
@@ -25,7 +25,7 @@ from typing import Any, Mapping, Sequence
 from alpha.fundamental.contracts import OperatingAssumption
 from alpha.refresh import (
     COMPANY_GUIDANCE, CONSENSUS, CONSENSUS_NOISE_FLOOR_REL, DISPROOF_SIGNAL, FINANCIAL_ACTUAL,
-    GRAPH_EDGE, MARKET_PRICE, OPERATING_ASSUMPTION, THESIS_ARTIFACT_ID, THESIS_REVIEW_DUE,
+    GRAPH_EDGE, HORIZON_ASSUMPTION, MARKET_PRICE, OPERATING_ASSUMPTION, THESIS_ARTIFACT_ID, THESIS_REVIEW_DUE,
     VALUATION_ASSUMPTION, ChangeEvent, MetricObservation, end_of_day, start_of_day,
 )
 
@@ -38,6 +38,7 @@ A_LEDGER = "engine_c://manual_observations"
 A_GRAPH = "engine_a://graph_research_provider"
 A_ASSUMPTIONS = "alpha://fundamental/assumptions"
 A_VALUATION_ASSUMPTIONS = "alpha://valuation/assumptions"
+A_HORIZON_ASSUMPTIONS = "alpha://implied_return/horizon"
 A_LIFECYCLE = "thesis://lifecycle.json"
 A_WATCH = "engine_b://event_watch"
 
@@ -209,7 +210,10 @@ def assumption_changes(
     records: Sequence[Any], *, ticker: str, company_id: str | None, since: datetime,
     change_type: str = OPERATING_ASSUMPTION, authority: str = A_ASSUMPTIONS,
 ) -> list[ChangeEvent]:
-    """ledger 新紀錄：新建／取代／撤回都是「內部觀點變了」。營運假設與估值假設同一支（class 不同）。"""
+    """ledger 新紀錄：新建／取代／撤回都是「內部觀點變了」。營運／估值／horizon 假設同一支（class 不同）。"""
+    def _value_text(value: Any) -> str:
+        return value.isoformat() if isinstance(value, date) else f"{value:g}"
+
     ordered = sorted(records, key=lambda r: (r.created_at, r.assumption_id))
     latest_before: dict[tuple[str, str, date], str] = {}
     out: list[ChangeEvent] = []
@@ -221,9 +225,9 @@ def assumption_changes(
             out.append(ChangeEvent(
                 change_type=change_type, ticker=ticker, company_id=company_id, authority=authority,
                 changed_ref=record.assumption_id, observed_at=record.created_at,
-                effective_at=record.period.end, new_version=f"{record.value:g}",
+                effective_at=record.period.end, new_version=_value_text(record.value),
                 old_version=None, material_fields=(record.driver, record.scope),
-                detail=f"{kind}假設 {record.driver}[{record.scope}] {record.period.label} = {record.value:g}（{record.basis}）",
+                detail=f"{kind}假設 {record.driver}[{record.scope}] {record.period.label} = {_value_text(record.value)}（{record.basis}）",
                 related_refs=((predecessor,) if predecessor else ())))
         latest_before[key] = record.assumption_id
     return out
@@ -252,7 +256,7 @@ def watch_changes(
     watches: Sequence[Mapping[str, Any]], *, ticker: str, company_id: str | None,
     assumption_ids: Sequence[str],
 ) -> list[ChangeEvent]:
-    """已 fired 的 Event Watch，`hypothesis_ref` 指向假設 id（`oa_*`）或 `signal:<TICKER>` → disproof_signal。
+    """已 fired 的 Event Watch，`hypothesis_ref` 指向假設 id（`oa_*`／`va_*`／`ha_*`）或 `signal:<TICKER>` → disproof_signal。
     一般 `hy_*` 假設層 watch 不在此列（那是 what-if overlay 的事）。"""
     out: list[ChangeEvent] = []
     wanted = {ticker.upper(), str(company_id or "").lower()}
@@ -264,7 +268,7 @@ def watch_changes(
         entities = {str(e).upper() for e in (watch.get("entities") or ())} | {str(e).lower() for e in (watch.get("entities") or ())}
         if not (entities & wanted):
             continue
-        if (target.startswith("oa_") or target.startswith("va_")) and target in known:
+        if (target.startswith("oa_") or target.startswith("va_") or target.startswith("ha_")) and target in known:
             artifact = target
         elif target.lower() == f"signal:{ticker.lower()}":
             artifact = THESIS_ARTIFACT_ID
@@ -335,6 +339,7 @@ def detect_changes(
     watches: Sequence[Mapping[str, Any]],
     ticker_obj: Any = None,
     valuation_records: Sequence[Any] = (),
+    horizon_records: Sequence[Any] = (),
 ) -> tuple[list[ChangeEvent], list[MetricObservation], list[str]]:
     """把 `since` 之後各 authority 的變化收成一份 `ChangeEvent` 清單（每段各自 fail-soft，原因進 notes）。"""
     events: list[ChangeEvent] = []
@@ -392,9 +397,11 @@ def detect_changes(
     events += assumption_changes(assumption_records, ticker=ticker, company_id=company_id, since=since)
     events += assumption_changes(valuation_records, ticker=ticker, company_id=company_id, since=since,
                                  change_type=VALUATION_ASSUMPTION, authority=A_VALUATION_ASSUMPTIONS)
+    events += assumption_changes(horizon_records, ticker=ticker, company_id=company_id, since=since,
+                                 change_type=HORIZON_ASSUMPTION, authority=A_HORIZON_ASSUMPTIONS)
     events += lifecycle_due_changes(lifecycle_entry, ticker=ticker, company_id=company_id, today=as_of or today)
     events += watch_changes(watches, ticker=ticker, company_id=company_id,
-                            assumption_ids=[r.assumption_id for r in (*assumption_records, *valuation_records)])
+                            assumption_ids=[r.assumption_id for r in (*assumption_records, *valuation_records, *horizon_records)])
     events.sort(key=lambda e: (e.observed_at, e.change_type, e.changed_ref))
     return events, observations, notes
 

@@ -32,7 +32,8 @@ from ..fundamental.contracts import (
 from .assumptions import select_valuation_assumptions
 from .contracts import (
     FAIR_VALUE_FORMULA, GAP_FORMULA, IMPLIED_MULTIPLE_FORMULA, METHOD_FUNDAMENTAL_INPUT,
-    METHOD_PARAMETERS, VALUATION_METHODS, CurrentPrice, FairValueGap, FairValueSensitivity,
+    METHOD_PARAMETERS, VALUATION_METHODS, VALUE_DATE_SPOT, VALUE_DATE_TARGET_PERIOD_END,
+    VALUE_DATE_UNSPECIFIED, CurrentPrice, FairValueGap, FairValueSensitivity,
     FundamentalInput, ValuationAssumption, ValuationResult, ValuationStep, combined_input_dependency,
 )
 
@@ -40,8 +41,8 @@ from .contracts import (
 _RELATIVE_BUMP = 0.01
 
 
-def _units_match(fair_value_currency: str | None, price_unit: str | None) -> tuple[str, str | None]:
-    """fair value 的幣別（報表幣別）與現價的報價單位是否同尺度。
+def units_comparable(fair_value_currency: str | None, price_unit: str | None) -> tuple[str, str | None]:
+    """fair value 的幣別（報表幣別）與現價的報價單位是否同尺度。（報酬層共用同一判準，不另寫一份。）
 
     ⚠ 報價單位 ≠ 結算幣別（AGENTS：GBp／ILA／ZAc 是 minor unit）。這裡**不換算**——
     任一邊不知道 → `unverified_unit`；兩邊都知道但不同 → `incompatible_unit`。價格會差 100 倍的事
@@ -64,7 +65,7 @@ def _gap(fair_value: float | None, price: CurrentPrice, *, currency: str | None)
         return FairValueGap(status="price_missing", absolute_gap=None, relative_gap=None,
                             implied_multiple_at_price=None, unit=None,
                             reason=price.reason or "Engine C 無現價", price_refs=price.evidence_refs)
-    status, why = _units_match(currency, price.unit)
+    status, why = units_comparable(currency, price.unit)
     if status != "comparable":
         return FairValueGap(status=status, absolute_gap=None, relative_gap=None,
                             implied_multiple_at_price=None, unit=None, reason=why, price_refs=price.evidence_refs)
@@ -252,6 +253,19 @@ def build_valuation(
             "note": "沒有任何一個輸入數字是觀測到的 fair value；fair value 是判斷的確定性函數，不是事實",
         }
 
+    # ---- 6. value-date 語意（Step 2）：這個數字是哪一天的值——抄自估值假設，不猜 ------------------
+    value_date: date | None = None
+    value_date_semantics = VALUE_DATE_UNSPECIFIED
+    if fair_value is not None and assumption is not None:
+        convention = assumption.value_date_convention
+        if convention == VALUE_DATE_TARGET_PERIOD_END and target is not None:
+            value_date, value_date_semantics = target.end, VALUE_DATE_TARGET_PERIOD_END
+        elif convention == VALUE_DATE_SPOT:
+            value_date, value_date_semantics = cutoff, VALUE_DATE_SPOT
+        else:
+            warnings.append("估值假設未宣告 value_date_convention——fair value 的時點語意 unspecified；"
+                            "報酬層會拒算（要補語意請 append 新紀錄 supersede 它）")
+
     status = "available" if fair_value is not None else "missing"
     digest = content_digest({
         "company_id": company_id, "ticker": ticker, "as_of": as_of, "method": method,
@@ -266,7 +280,8 @@ def build_valuation(
         formula=formula, input_dependency=dependency, steps=tuple(steps), current_price=price, gap=gap,
         sensitivities=tuple(sensitivities), epistemics=epistemics, digest=digest, warnings=tuple(warnings),
         evidence=tuple({r.ref: r for r in model_evidence}.values()),
+        value_date=value_date, value_date_semantics=value_date_semantics,
     )
 
 
-__all__ = ["GAP_FORMULA", "IMPLIED_MULTIPLE_FORMULA", "build_valuation"]
+__all__ = ["GAP_FORMULA", "IMPLIED_MULTIPLE_FORMULA", "build_valuation", "units_comparable"]

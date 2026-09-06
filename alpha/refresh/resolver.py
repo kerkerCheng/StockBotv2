@@ -25,9 +25,10 @@ from ..fundamental.contracts import PERIOD_MATCH_TOLERANCE_DAYS
 from .artifacts import THESIS_ARTIFACT_ID, end_of_day
 from .contracts import (
     ARTIFACT_ASSUMPTION, ARTIFACT_AXIS, ARTIFACT_COMPARISON, ARTIFACT_FAIR_VALUE, ARTIFACT_FAIR_VALUE_GAP,
+    ARTIFACT_HORIZON_ASSUMPTION, ARTIFACT_IMPLIED_RETURN,
     ARTIFACT_MARKET_IMPLIED, ARTIFACT_METRIC, ARTIFACT_MODEL, ARTIFACT_THESIS, ARTIFACT_VALUATION_ASSUMPTION,
     ASSUMPTION_ARTIFACT_TYPES, CONSENSUS, CONTEXT_DIGEST, CURRENT,
-    DISPROOF_SIGNAL, FISCAL_PERIOD_ROLLOVER, INVALIDATED, KIND_DETERMINISTIC, KIND_JUDGMENT,
+    DISPROOF_SIGNAL, FISCAL_PERIOD_ROLLOVER, HORIZON_ASSUMPTION, INVALIDATED, KIND_DETERMINISTIC, KIND_JUDGMENT,
     MISSING, OPERATING_ASSUMPTION, RECALCULATE, REVIEW_REQUIRED, ROLE_CALIBRATION, ROLE_LEGACY,
     ROLE_SUPPORTING, STALE, SUPERSEDED, THESIS_REVIEW_DUE, COMPANY_GUIDANCE, VALUATION_ASSUMPTION,
     AffectedArtifact, ArtifactDependency, ChangeEvent, MetricObservation, RefreshReport,
@@ -40,9 +41,10 @@ from .policy import (
 
 _ORDER = {ARTIFACT_AXIS: 0, ARTIFACT_THESIS: 1, ARTIFACT_ASSUMPTION: 2, ARTIFACT_METRIC: 3,
           ARTIFACT_COMPARISON: 4, ARTIFACT_MARKET_IMPLIED: 5, ARTIFACT_MODEL: 6,
-          ARTIFACT_VALUATION_ASSUMPTION: 7, ARTIFACT_FAIR_VALUE: 8, ARTIFACT_FAIR_VALUE_GAP: 9}
+          ARTIFACT_VALUATION_ASSUMPTION: 7, ARTIFACT_FAIR_VALUE: 8, ARTIFACT_FAIR_VALUE_GAP: 9,
+          ARTIFACT_HORIZON_ASSUMPTION: 10, ARTIFACT_IMPLIED_RETURN: 11}
 #: 「自己就是那筆新紀錄」的 change class（新紀錄的建立不是對它自己的變化）。
-_LEDGER_CHANGE_TYPES: frozenset[str] = frozenset({OPERATING_ASSUMPTION, VALUATION_ASSUMPTION})
+_LEDGER_CHANGE_TYPES: frozenset[str] = frozenset({OPERATING_ASSUMPTION, VALUATION_ASSUMPTION, HORIZON_ASSUMPTION})
 _AXIS_ORDER = {"structural": 0, "value_capture": 1, "earnings_exposure": 2, "expectation_gap": 3,
                "catalyst": 4}
 
@@ -119,6 +121,18 @@ def _schedule_events(
 ) -> list[ChangeEvent]:
     out: list[ChangeEvent] = []
     for artifact in artifacts:
+        if artifact.expires_at is not None and artifact.preset_state is None:
+            # Step 2：絕對到期（horizon_end）。到期就是排程事件；成果自己說「等到那天」，那天到了就 stale。
+            expiry = end_of_day(artifact.expires_at)
+            if expiry <= cutoff:
+                out.append(ChangeEvent(
+                    change_type=THESIS_REVIEW_DUE, ticker=ticker, company_id=company_id,
+                    authority="alpha://refresh/schedule", changed_ref=artifact.key,
+                    observed_at=expiry, effective_at=artifact.expires_at,
+                    material_fields=("expires_at",),
+                    detail=f"到期日 {artifact.expires_at} 已到（成果自帶的絕對到期；INV-2）",
+                    target_artifact=artifact.artifact_id,
+                ))
         if artifact.check_frequency_days is None or artifact.established_at is None:
             if artifact.extras.get("unparsed_frequencies"):
                 notes.append(f"{artifact.key}：核查頻率無法解析成天數："
@@ -262,6 +276,8 @@ def _assumption_hits(artifact: ArtifactDependency, event: ChangeEvent) -> list[_
     if event.change_type == DISPROOF_SIGNAL and event.target_artifact == artifact.artifact_id:
         hits.append(_Hit(event.on_trigger or REVIEW_REQUIRED, f"review 條件觸發：{event.detail}",
                          event.changed_ref, event.observed_at))
+    if event.change_type == THESIS_REVIEW_DUE and event.target_artifact == artifact.artifact_id:
+        hits.append(_Hit(STALE, f"到期：{event.detail}", event.changed_ref, event.observed_at))
     return hits
 
 
@@ -372,9 +388,9 @@ def resolve_refresh(
         states: list[str] = [current.state]
         inherited: list[tuple[str, str]] = []
         for aid in artifact.assumption_ids:
-            # 上游可能是營運假設（oa_*）或估值假設（va_*）；兩者都是宣告過的依賴，都沿一層傳播。
-            upstream = (resolved.get(f"{ARTIFACT_ASSUMPTION}:{aid}")
-                        or resolved.get(f"{ARTIFACT_VALUATION_ASSUMPTION}:{aid}"))
+            # 上游可能是營運假設（oa_*）、估值假設（va_*）或 horizon 假設（ha_*）；都是宣告過的依賴，都沿一層傳播。
+            upstream = next((resolved[f"{t}:{aid}"] for t in sorted(ASSUMPTION_ARTIFACT_TYPES)
+                             if f"{t}:{aid}" in resolved), None)
             if upstream is None or upstream.state in (CURRENT, MISSING):
                 continue
             mapped = {REVIEW_REQUIRED: REVIEW_REQUIRED, INVALIDATED: INVALIDATED,

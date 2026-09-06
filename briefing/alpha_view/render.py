@@ -26,7 +26,7 @@ from .contracts import (
     StructuralEdgeItem,
 )
 
-__all__ = ["render_alpha_investment_view_markdown", "render_alpha_cards"]
+__all__ = ["render_alpha_investment_view_markdown", "render_alpha_cards", "render_implied_return_lines"]
 
 _LEGEND = (
     "> 圖例——每一格後面的〔〕標的是**這是哪一種知識**："
@@ -415,9 +415,11 @@ def render_alpha_investment_view_markdown(view: AlphaInvestmentView) -> str:
     # 13. Valuation（Step 1；`python -m briefing valuation` 單獨印這一節）
     lines += render_valuation_lines(view)
 
-    # 13a–c. Not modeled trio（估值之後的三個插座）
-    for title, section in (("13a. 預期報酬", view.expected_return),
-                           ("13b. 下檔", view.downside),
+    # 13a. Base-case implied return（Step 2；`python -m briefing implied-return` 單獨印這一節）
+    lines += render_implied_return_lines(view)
+
+    # 13b–c. Not modeled（報酬之後的兩個插座）
+    for title, section in (("13b. 下檔", view.downside),
                            ("13c. 進場邏輯／可行動性", view.entry_logic)):
         lines += _section(title, section.meta)
         lines += [_datum_line(d) for d in section.items]
@@ -480,6 +482,7 @@ def render_valuation_lines(view: AlphaInvestmentView) -> list[str]:
             f"估值假設選取：input {sel.input_count}／accepted {sel.accepted_count}／filtered {sel.filtered_count}"
             f"（{_mapping_text(sel.reasons, None) or '無過濾'}）")
     lines.append(_datum_line(va.fair_value))
+    lines.append(_datum_line(va.value_date))
     lines.append(_datum_line(va.current_price))
     lines.append(_datum_line(va.fair_value_gap))
     if va.trace:
@@ -491,6 +494,32 @@ def render_valuation_lines(view: AlphaInvestmentView) -> list[str]:
     lines.append(_datum_line(va.epistemics))
     lines.append("gap 不是什麼：")
     lines += [f"- {markdown_text(x)}" for x in va.gap_is_not]
+    lines.append("")
+    return lines
+
+
+def render_implied_return_lines(view: AlphaInvestmentView) -> list[str]:
+    """第 13a 節（base-case implied return）。只印 implied_return section 的 Datum；公式字串來自
+    `alpha.implied_return`，本檔不含公式、不算年化。"""
+    lines: list[str] = []
+    ir = view.implied_return
+    lines += _section("13a. Base-case implied return（現價 ＋ fair value 時點語意 ＋ 明示 horizon → 隱含價格報酬；不是 expected return）", ir.meta)
+    if ir.period:
+        lines.append(f"目標期間：{markdown_text(ir.period)}" + (f"（至 {ir.period_end.isoformat()}）" if ir.period_end else ""))
+    for datum in (ir.return_convention, ir.current_price, ir.fair_value, ir.value_date, ir.horizon, ir.horizon_window,
+                  ir.price_return, ir.annualized_price_return, ir.total_return, ir.probability_weighted_return):
+        lines.append(_datum_line(datum))
+    if ir.selection is not None:
+        sel = ir.selection
+        lines.append(
+            f"horizon 判斷選取：input {sel.input_count}／accepted {sel.accepted_count}／filtered {sel.filtered_count}"
+            f"（{_mapping_text(sel.reasons, None) or '無過濾'}）")
+    if ir.trace:
+        lines.append("算式（每格標 price_input／valuation_input／horizon_input／derived）：")
+        lines += ["  " + _datum_line(d).replace("\n  - ", "\n    - ") for d in ir.trace]
+    lines.append(_datum_line(ir.epistemics))
+    lines.append("implied return 不是什麼：")
+    lines += [f"- {markdown_text(x)}" for x in ir.is_not]
     lines.append("")
     return lines
 
@@ -750,8 +779,9 @@ def render_alpha_cards(cards: Sequence[Mapping[str, Any]] | None, *, present: bo
         "- 「內部 vs 共識 EPS」是明示營運假設（session 判斷／heuristic）經確定性橋算出的 EPS 與**同期、同口徑**共識的相對差；"
         "假設不是事實，數字不是 Q4；不可比或缺料一律「未知」。",
         "- 「Fair value vs 現價」是內部 EPS × 明示目標倍數（session 判斷）算出的 fair value 與現價的相對差；"
-        "**它不是 expected return、不是 upside forecast、不是進場訊號**（horizon 與報酬語意是 Step 2）；沒有估值假設一律「未知」。",
-        "- 「尚未建模」列的是 expected return／downside／entry logic 等系統還沒有的能力。",
+        "**它不是 expected return、不是 upside forecast、不是進場訊號**（報酬語意住完整卡第 13a 節的 base-case implied return，"
+        "那也只是 base case 從 bar_date 到明示 horizon 的隱含價格報酬，不是機率加權期望值）；沒有估值假設一律「未知」。",
+        "- 「尚未建模」列的是 downside／entry logic 等系統還沒有的能力。",
         "",
     ]
     return lines

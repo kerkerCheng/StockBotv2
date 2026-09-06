@@ -24,7 +24,7 @@ Engine D 的公開 cohort 事實與 thesis lifecycle **選取、正規化、語�
 | `basis` | **這格的東西是哪一種知識** | `deterministic`／`observation`／`heuristic_proxy`／`session_judgment`／`narrative`／`structural_inference`／`none` |
 
 - `missing`＝系統有這個能力、這檔沒資料；`not_modeled`＝系統**還沒有這個能力**
-  （expected return、downside、entry logic…）。兩者下一步完全不同，所以不得共用一個值。
+  （probability-weighted expected return、total return、downside、entry logic…）。兩者下一步完全不同，所以不得共用一個值。
   ⚠ 2026-09-05 起 internal fundamentals／earnings bridge／numeric expectation gap **有能力了**
   （`alpha/fundamental`）：沒有假設或沒有基期觀測的公司是 `missing`，不再是 `not_modeled`。
 - `heuristic_proxy` 是 `trailing_pe/forward_pe − 1` 這類粗略代理；它**不是** reverse DCF，
@@ -119,8 +119,12 @@ CAP_NUMERIC_EXPECTATION_GAP = "numeric_internal_vs_consensus"
 #: `CAP_AUTOMATIC_INVALIDATION`（那個名字保留給「會自己判定條件並改狀態」的東西，今天不存在）。
 CAP_DEPENDENCY_IMPACT = "dependency_impact_v1"
 #: Step 1（2026-09-06）：內部 FY 目標期間 EPS × 明示目標倍數 → 確定性 fair value ＋ 與現價的差。
-#: 它**不是** expected return／upside forecast／entry signal（horizon 與報酬語意是 Step 2）。
+#: 它**不是** expected return／upside forecast／entry signal（horizon 與報酬語意住 Step 2 的 implied_return）。
 CAP_DETERMINISTIC_FAIR_VALUE = "deterministic_fair_value_v1"
+#: Step 2（2026-09-06）：現價 ＋ fair value（含 value-date 語意）＋ 明示 horizon 判斷 → 確定性 base-case 隱含
+#: **價格**報酬（simple＋年化）。它**不是** probability-weighted expected return（沒有機率）、不是 total return
+#: （沒有股利預測）、不是 entry signal。名稱刻意用 implied 不用 expected。
+CAP_BASE_CASE_IMPLIED_RETURN = "base_case_implied_return_v1"
 
 
 class ViewContractViolation(ValueError):
@@ -537,14 +541,46 @@ class ValuationSection:
     epistemics: Datum
     selection: "EvidenceSelectionCounts | None"
     gap_is_not: tuple[str, ...]
+    #: Step 2：fair value 是哪一天的值（spot／target_period_end；估值假設未宣告＝missing，不猜）。
+    value_date: Datum
     period: str | None = None
     period_end: date | None = None
     accounting_basis: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
+class ImpliedReturnSection:
+    """Base-case implied return（Step 2）：**只消費** `alpha.implied_return.build_implied_return` 的輸出，
+    builder 不含任何報酬公式。
+
+    - `price_return`／`annualized_price_return` 是確定性算術；`horizon` 是 session 判斷（`ha_*`）；
+      `value_date` 抄自估值層。四個輸入缺一就 `missing`，不補 12 個月。
+    - `total_return` 與 `probability_weighted_return` 恆 `not_modeled`（系統沒有那個能力），與 `missing` 分開。
+    - `is_not`：這格明列它不是什麼（expected return／total return／entry signal／opportunity ranking）。
+    """
+
+    meta: SectionMeta                          # available／missing／review_required／invalidated／stale
+    return_convention: Datum
+    current_price: Datum
+    fair_value: Datum
+    value_date: Datum
+    horizon: Datum                             # 生效的 horizon 判斷（ha_*）
+    horizon_window: Datum                      # start／end／days／years（確定性）
+    price_return: Datum
+    annualized_price_return: Datum
+    total_return: Datum                        # not_modeled
+    probability_weighted_return: Datum         # not_modeled
+    trace: tuple[Datum, ...]
+    epistemics: Datum
+    selection: "EvidenceSelectionCounts | None"
+    is_not: tuple[str, ...]
+    period: str | None = None
+    period_end: date | None = None
+
+
+@dataclass(frozen=True, slots=True)
 class NotModeledSection:
-    """expected_return／downside／entry_logic 共用的形狀：全 not_modeled，附「不是什麼」。"""
+    """downside／entry_logic 共用的形狀：全 not_modeled，附「不是什麼」。"""
 
     meta: SectionMeta
     items: tuple[Datum, ...]
@@ -677,7 +713,7 @@ class AlphaInvestmentView:
     falsification: FalsificationSection
     scenarios: ScenarioSection
     valuation: ValuationSection
-    expected_return: NotModeledSection
+    implied_return: ImpliedReturnSection
     downside: NotModeledSection
     entry_logic: NotModeledSection
     evidence: EvidenceSection
@@ -689,7 +725,7 @@ class AlphaInvestmentView:
     SECTIONS_WITH_META = (
         "variant_view", "structural_thesis", "causal_paths", "fundamentals", "consensus",
         "price_implied_expectations", "internal_fundamentals", "earnings_bridge",
-        "expectation_gap", "catalysts", "falsification", "scenarios", "valuation", "expected_return",
+        "expectation_gap", "catalysts", "falsification", "scenarios", "valuation", "implied_return",
         "downside", "entry_logic", "evidence", "refresh_status",
     )
 
@@ -730,6 +766,7 @@ def _jsonable(obj: Any) -> Any:
 
 __all__ = [
     "AlphaInvestmentView", "BASES", "BASIS_LABEL", "Basis", "CAP_AUTOMATIC_INVALIDATION",
+    "CAP_BASE_CASE_IMPLIED_RETURN", "ImpliedReturnSection",
     "CAP_CATALYST_UNLINKED", "CAP_DEPENDENCY_IMPACT", "CAP_DETERMINISTIC_FAIR_VALUE", "CAP_FINANCIAL_CAUSAL",
     "CAP_NARRATIVE_SCENARIOS", "ValuationSection",
     "CAP_NUMERIC_EXPECTATION_GAP", "ChangeItem", "REFRESH_STATUSES", "RefreshItem", "RefreshStatusSection",

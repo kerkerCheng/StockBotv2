@@ -133,6 +133,47 @@ def cmd_valuation(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_implied_return(args: argparse.Namespace) -> int:
+    """單一公司的 base-case implied return（read model 第 13a 節）：現價 ＋ fair value 時點語意 ＋ 明示 horizon → 隱含價格報酬。"""
+    from alpha.errors import AlphaError, PointInTimeUnsupported
+
+    from .alpha_view.render import render_implied_return_lines
+    from .alpha_view.sources import fetch_alpha_investment_view
+
+    as_of = date.fromisoformat(args.as_of) if args.as_of else None
+    try:
+        view = fetch_alpha_investment_view(
+            args.ticker, as_of=as_of, include_causal=False, scenario=args.scenario,
+            judgment_path=Path(args.judgment) if args.judgment else None)
+    except PointInTimeUnsupported as exc:
+        print(f"✗ {exc}", file=sys.stderr)
+        return 3
+    except AlphaError as exc:
+        print(f"✗ {exc}", file=sys.stderr)
+        return 2
+    if args.format == "json":
+        payload = view.to_dict()["implied_return"]
+        payload["identity"] = {"ticker": view.identity.ticker, "company_id": view.identity.company_id,
+                               "as_of": view.identity.as_of.isoformat() if view.identity.as_of else None,
+                               "generated_on": view.identity.generated_on.isoformat()}
+        payload["refresh_items"] = [i for i in view.to_dict()["refresh_status"]["items"]
+                                    if i["artifact_type"] in ("horizon_assumption", "implied_return",
+                                                              "valuation_assumption", "fair_value")]
+        text = json.dumps(payload, ensure_ascii=False, indent=2)
+    else:
+        head = [f"# Base-case implied return — {view.identity.company_label}",
+                f"- 生成日 {view.identity.generated_on.isoformat()}｜視角 {view.identity.point_in_time_mode}"
+                + (f"（as-of {view.identity.as_of.isoformat()}）" if view.identity.as_of else "")
+                + (f"｜情境 **{args.scenario}**" if args.scenario else ""), ""]
+        text = "\n".join(head + render_implied_return_lines(view))
+    if args.out:
+        Path(args.out).write_text(text, encoding="utf-8")
+        print(f"implied return → {args.out}（{len(text)} chars）")
+    else:
+        print(text)
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="python -m briefing", description=__doc__,
@@ -168,6 +209,16 @@ def build_parser() -> argparse.ArgumentParser:
     valuation.add_argument("--format", choices=("markdown", "json"), default="markdown")
     valuation.add_argument("-o", "--out", help="輸出路徑")
     valuation.set_defaults(func=cmd_valuation)
+    implied = sub.add_parser("implied-return", help="單一公司的 base-case implied return（Step 2：現價／fair value 時點／horizon／報酬／refresh state）")
+    implied.add_argument("ticker")
+    implied.add_argument("--as-of", help="YYYY-MM-DD：只看 T 之前已知的 horizon 判斷、估值假設、內部基本面與行情")
+    implied.add_argument("--scenario", choices=("price_only", "consensus_revision", "graph_edge", "new_guidance",
+                                                "new_actual", "fiscal_rollover", "disproof"),
+                         help="在真實 state 上疊一件假想變化（不寫任何 authority）")
+    implied.add_argument("--judgment", help="指定 session 判斷 JSON")
+    implied.add_argument("--format", choices=("markdown", "json"), default="markdown")
+    implied.add_argument("-o", "--out", help="輸出路徑")
+    implied.set_defaults(func=cmd_implied_return)
     return parser
 
 

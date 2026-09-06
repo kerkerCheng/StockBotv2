@@ -233,8 +233,9 @@ thesis/lifecycle.json＋catalyst_calendar.json、engine_c.checklist ────
 | catalysts | AlphaSignal.catalysts＋thesis checkpoints＋Engine D 散文＋`shared.catalyst_state` | `partial`，capability＝`structured_dates_without_repricing_link` |
 | falsification | AlphaSignal.disproof_conditions（L7 三件套）＋Engine D 散文＋thesis lifecycle | capability＝`structured_conditions_with_expiry_watch`；自動失效引擎 `not_modeled` |
 | scenarios | AlphaSignal bull／base／bear | **`narrative`**；機率 `not_modeled`；`target_valuation` 自 2026-09-06 起照抄 valuation 的單點 fair value（逐情境仍無） |
-| valuation | **`alpha/valuation`**（§6.4）：內部 EPS × 明示目標倍數 | `deterministic`（capability `deterministic_fair_value_v1`）；fair value／現價／gap 三格分開，gap 附 `gap_is_not`；沒有估值假設或內部 EPS＝`missing` |
-| expected_return／downside／entry_logic | — | **`not_modeled`**，並列出「不要跟什麼混淆」（賣方目標價、市場隱含成長、排序名次、**fair value gap**） |
+| valuation | **`alpha/valuation`**（§6.4）：內部 EPS × 明示目標倍數 | `deterministic`（capability `deterministic_fair_value_v1`）；fair value／`value_date`／現價／gap 分開，gap 附 `gap_is_not`；沒有估值假設或內部 EPS＝`missing`；估值假設未宣告時點語意時 `value_date`＝`missing` |
+| implied_return | **`alpha/implied_return`**（§6.5）：現價 ＋ fair value 時點語意 ＋ 明示 horizon | `deterministic`（capability `base_case_implied_return_v1`）；`price_return`／`annualized_price_return` 確定性、`horizon` 與 `value_date` 是判斷、`total_return`／`probability_weighted_return` **`not_modeled`**；四個輸入缺一＝`missing`；每次列 `is_not` |
+| downside／entry_logic | — | **`not_modeled`**，並列出「不要跟什麼混淆」（賣方目標價、市場隱含成長、排序名次、**fair value gap**、**implied return**） |
 | evidence | 全部 `EvidenceRef` 的索引＋as-of 篩選計數＋L8 品質摘要 | `observation` |
 
 **as-of 視角的邊界（2026-09-05 Phase 1.1 定案）：** 三種來源三種處置，判準是「authority
@@ -423,8 +424,67 @@ read model 每次都列 `gap_is_not` 四條。
 給定內部 EPS，**整個 gap 就是 `target_pe / implied_multiple_at_price − 1`**——即「我們的倍數 vs 市場對我們 EPS 付的倍數」；
 EPS 的判斷藏在 implied multiple 與市場對共識 EPS 付的倍數之差裡。`ValuationResult.epistemics` 把這個分解機器可讀化。
 
-**刻意不做（Step 2 以後）：** expected return、horizon、entry logic、buy／sell、portfolio、機率加權情境、逐情境目標估值、
-多 method（EV/EBITDA／DCF 要先有內部現金流）、跨標的比較、consumer UI。
+**刻意不做（Step 2 以後）：** entry logic、buy／sell、portfolio、機率加權情境、逐情境目標估值、
+多 method（EV/EBITDA／DCF 要先有內部現金流）、跨標的比較、consumer UI。**horizon 與報酬語意自 2026-09-06 起住 §6.5。**
+
+### 6.5 Base-case Implied Return（`alpha/implied_return/`，2026-09-06 Phase 2 Step 2 v1）
+
+**角色一句話：從哪一天（現價的 bar_date）到哪一天（明示的 horizon_end），在什麼假設下（內部 EPS 的營運假設＋目標倍數＋
+value-date 語意＋realization horizon），現價走到 fair value 的 base-case 隱含價格報酬是多少。**
+名稱刻意用 **implied** 不用 expected：「expected」在統計上是機率加權期望值，本層沒有任何機率。
+
+```
+alpha/valuation（fair value、value_date、input_dependency）─┐
+HorizonAssumption[]（A3，private append-only ledger）─ select(as_of) ─┼─► build_implied_return ─► ImpliedReturnResult
+Engine C 現價（A2，唯讀；含 bar_date）─────────────────────────────┘        price_return ＝ fair_value / current_price − 1
+                                                                        days ＝ horizon_end − bar_date
+                                                                        annualized ＝ (1 + r) ** (365.25 / days) − 1
+                                                                        ▼
+                                                     briefing/alpha_view（只選取）→ implied_return section／精簡卡 implied_return 欄
+```
+
+**先回答 Step 1 沒回答的問題：223.60 是哪一天的值？** v1 估值契約只有 `target_period`（EPS 屬於哪一年）與 `as_of`（知識視角），
+**答不出**「今天的 fair value（A）」還是「未來某日的 target value（B）」——兩種讀法算術相同、報酬語意完全不同。修法是最小擴充：
+`ValuationAssumption.value_date_convention`（封閉字彙 `spot`／`target_period_end`，**沒有預設**；舊紀錄讀成 `unspecified`，
+content-addressed id 不變）→ `ValuationResult.value_date`／`value_date_semantics`（`VALUE_DATE_FORMULA` 唯一定義處）。
+fair value 的算術一格不動；**時點未宣告時報酬層拒算**（不猜）。COHR 的 25x 宣告為 `target_period_end`：223.60 是 2027-06-30 的值。
+
+**誰擁有什麼：**
+
+| 東西 | 擁有者 | 住哪 |
+|---|---|---|
+| horizon 判斷（目標期間／`horizon_end`／basis／rationale／證據角色／created_at／supersede／retract／review_conditions） | A3 研究判斷，session 明示 | `library/private/alpha/horizon/<TICKER>.jsonl`（append-only；`python -m alpha horizon`） |
+| value-date 語意 | A3，估值假設宣告 | `ValuationAssumption.value_date_convention`（§6.4 ledger） |
+| 報酬算術＋年化 | A3，`alpha/implied_return/model.py` | 純函式，版本 `implied-return-model/v1`；公式字串唯一定義處 `PRICE_RETURN_FORMULA`／`ANNUALIZED_RETURN_FORMULA`／`HOLDING_PERIOD_FORMULA` |
+| fair value | `alpha/valuation`（§6.4） | 報酬層**照抄**，不重算 |
+| 現價 | A2 Engine C | 與估值層共用同一個 `CurrentPrice`（`bar_date` 是 horizon 起點） |
+| 組裝 | `briefing/alpha_view`（implied_return section） | 不含任何報酬公式（`tests/test_implied_return.py` 以竄改＋import／token 掃描守著） |
+
+**與營運／估值假設同一套 epistemic system（刻意）：** `HorizonAssumption` 用同一組 `basis` 字彙、同一組 ref 角色、同一種
+append-only／as-of／supersede 語意、**同一支選取器**；id 前綴 `ha_`；`period` 是它服務的估值目標期間（估值換期間，horizon 就是
+`other_period`，不沿用）；`horizon_end` 是明示日期，不是「12 個月」這種相對量；寫下時已過去的 horizon 契約拒收（INV-2）。
+
+**五條規則：** ① **四個輸入缺一就 `missing`**：現價（含 bar_date）、fair value（同單位）、value-date 語意、生效 horizon；沒有 hidden
+default。② **horizon 已過就不是報酬**（`horizon_end <= bar_date` → missing＋「需要新的 horizon 判斷」）。③ **只有 price return**：
+`total_return_status` 恆 `not_modeled`（無股利／分配預測能力），不得冒充。④ **沒有機率**：型別裡沒有 probability-weighted 欄位。
+⑤ **算術確定、輸入是判斷**：`calculation=deterministic`；`input_dependency`＝fair value 的輸入依賴與 horizon basis 中最弱者。
+另有 `alignment`（`aligned`／`horizon_after_value_date`／`horizon_before_value_date`／`spot_value_realized_over_horizon`）只現形不阻擋。
+
+**Refresh 整合（沿用 `alpha/refresh`）：** 新 change class `horizon_assumption`（Q1–Q5 與假設層一格不動）；新 artifact
+`horizon_assumption`（判斷型，帶 `expires_at=horizon_end`——`ArtifactDependency.expires_at` 是本步新增的絕對到期欄位，到期即
+`stale`）／`implied_return`（確定性；policy `{market_price, financial_actual}`；依賴＝fair value 的依賴＋現價 ref＋horizon）。
+傳播上游泛化到 `ASSUMPTION_ARTIFACT_TYPES`（`oa_*`／`va_*`／`ha_*`）。實跑 COHR：price-only→只有 implied_return `recalculate`；
+估值假設 review→implied_return `review_required`（`propagated_from` 指名）；horizon 被取代→`recalculate`；到期→horizon `stale`
+→報酬 `stale`；無關的圖變化→`current`。
+
+**PIT：** horizon `created_at <= T`；估值的 `as_of` 與報酬視角不符一律拒用（INV-6）；horizon 起點是現價的 `bar_date`（≤ T）。
+實跑 COHR `--as-of 2026-09-05`：估值假設 v2 與 horizon 皆 `created_after_as_of` → `missing`，JSON 無 `ha_*`。
+
+**認識論：** 算術＝報酬／年化／持有期間／估值／橋；判斷＝營運假設＋估值假設（含 value-date 語意）＋horizon；觀測＝現價＋基期實際值。
+`ImpliedReturnResult.epistemics.one_sentence` 把「從哪天、到哪天、在什麼假設下」機器組成一句話。
+
+**刻意不做（v1 限制）：** Entry Logic／buy-sell／portfolio／consumer UI／機率加權情境／Valuation v2（historical normalized
+multiple、peer multiple、growth durability、margin／ROIC quality、cycle position——backlog 不遺失）／total return／跨標的比較。
 
 ---
 
