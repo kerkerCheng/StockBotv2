@@ -232,8 +232,9 @@ thesis/lifecycle.json＋catalyst_calendar.json、engine_c.checklist ────
 | expectation_gap | Q4（session）＋估計修正 vs 股價（`engine_c.estimates`）＋**`alpha/fundamental/compare`**（`numeric_comparisons`） | Q4 `session_judgment`（ordinal）**與**數值 gap `deterministic`（capability `numeric_internal_vs_consensus`）並存、分開標；數值 gap 只在同期、同口徑、同幣別時有值，否則 `not_applicable`／`missing` |
 | catalysts | AlphaSignal.catalysts＋thesis checkpoints＋Engine D 散文＋`shared.catalyst_state` | `partial`，capability＝`structured_dates_without_repricing_link` |
 | falsification | AlphaSignal.disproof_conditions（L7 三件套）＋Engine D 散文＋thesis lifecycle | capability＝`structured_conditions_with_expiry_watch`；自動失效引擎 `not_modeled` |
-| scenarios | AlphaSignal bull／base／bear | **`narrative`**；機率與目標估值 `not_modeled` |
-| expected_return／downside／entry_logic | — | **`not_modeled`**，並列出「不要跟什麼混淆」（賣方目標價、市場隱含成長、排序名次） |
+| scenarios | AlphaSignal bull／base／bear | **`narrative`**；機率 `not_modeled`；`target_valuation` 自 2026-09-06 起照抄 valuation 的單點 fair value（逐情境仍無） |
+| valuation | **`alpha/valuation`**（§6.4）：內部 EPS × 明示目標倍數 | `deterministic`（capability `deterministic_fair_value_v1`）；fair value／現價／gap 三格分開，gap 附 `gap_is_not`；沒有估值假設或內部 EPS＝`missing` |
+| expected_return／downside／entry_logic | — | **`not_modeled`**，並列出「不要跟什麼混淆」（賣方目標價、市場隱含成長、排序名次、**fair value gap**） |
 | evidence | 全部 `EvidenceRef` 的索引＋as-of 篩選計數＋L8 品質摘要 | `observation` |
 
 **as-of 視角的邊界（2026-09-05 Phase 1.1 定案）：** 三種來源三種處置，判準是「authority
@@ -365,6 +366,65 @@ new_actual|fiscal_rollover|disproof] [--as-of]`；完整卡第 15 節；精簡�
 **刻意不做（v1 限制）：** 語意 materiality（只有 class 級規則＋1% 雜訊地板）；自然語言 rationale／disproof 不解析；
 `evidence`／`graph_claim` class 有契約但沒有 runtime 偵測來源（圖不記錄撤回）；ResearchContext 未持久化，所以
 digest 殘餘差異只能整批標 `context_digest`；行情 as-of 仍以 `bar_date` 篩（判斷基線用 `fetched_at`）。
+
+### 6.4 Valuation Model（`alpha/valuation/`，2026-09-06 Phase 2 Step 1 v1）
+
+**角色一句話：根據我們自己的內部 EPS 與我們自己明示的目標倍數，這門生意值多少；跟現價差多少。**
+它回答的是「StockBot 的 fair value」，**不是**預期報酬、horizon、進場價、買賣、機率加權情境（Step 2 以後）。
+
+```
+alpha/fundamental（內部 FY 目標期間 EPS，含 input_dependency）─┐
+ValuationAssumption[]（A3，private append-only ledger）─ select(as_of) ─┼─► build_valuation ─► ValuationResult
+Engine C 現價（A2，唯讀；`build.context.market`）──────────────────────┘        │
+                                                                    fair_value ＝ internal_eps × target_pe（不含現價）
+                                                                    gap ＝ fair_value vs current_price（同單位才算）
+                                                                    ▼
+                                                  briefing/alpha_view（只選取）→ valuation section／精簡卡 valuation 欄
+```
+
+**方法選擇（audit 2026-09-06，用資料證明）：** 內部可靠的 forward metric 只有 FY 目標期間的稀釋 EPS（橋 v1）；沒有內部
+FCF、D&A、EBITDA、資本支出、營運資金，`financial_snapshots` 的 `total_debt`／`cash` 也沒有會計年度身分——所以 EV/EBITDA、
+FCF／DCF、reverse DCF **沒有資料可餵，不為完整硬做**。v1 唯一 method＝`forward_earnings_multiple`（parameter `target_pe`），
+method／parameter 是封閉字彙（`alpha/valuation/contracts.py::METHOD_PARAMETERS`），多一個 method 就要多一段算術。
+
+**誰擁有什麼：**
+
+| 東西 | 擁有者 | 住哪 |
+|---|---|---|
+| 估值假設（method／parameter／值／basis／rationale／證據角色／created_at／supersede／retract／review_conditions） | A3 研究判斷，session 明示 | `library/private/alpha/valuation/<TICKER>.jsonl`（append-only；`python -m alpha valuation`） |
+| fair value 算術＋gap | A3，`alpha/valuation/model.py` | 純函式，版本 `valuation-model/v1`；公式字串唯一定義處 `FAIR_VALUE_FORMULA`／`GAP_FORMULA` |
+| 內部 EPS | `alpha/fundamental`（§6.2） | 估值層**照抄** `ModeledMetric`，不重算 |
+| 現價 | A2 Engine C | `build.context.market`（已依 as-of 過濾）；報價單位取自 registry |
+| 組裝 | `briefing/alpha_view`（valuation section） | 不含任何估值公式（`tests/test_valuation_model.py` 以竄改＋import／token 掃描守著） |
+
+**與 `OperatingAssumption` 同一套 epistemic system（刻意）：** 同一組 `basis` 字彙、同一組 ref 角色（supporting／calibration／
+comparison；**同期共識與市場倍數只能是 calibration**）、同一種 append-only／as-of／supersede 語意，**連選取器都是同一支**
+（`select_assumptions` duck-typed）。差別只有三處：id 前綴 `va_`、`driver` 換成 `method`＋`parameter`、`accounting_basis`
+必填且只能 gaap／non_gaap。它**不是**橋的 driver——倍數不是財務橋的一段算術，所以住自己的型別與 ledger。
+
+**四條規則：** ① **沒有 hidden default**：ledger 沒生效倍數→`missing`；內部 EPS 缺→`missing`；不補、不由 LLM 補。
+② **同期、同口徑才乘**：估值假設的 period／accounting_basis 必須與內部 EPS 相同，不合是「口徑不合」不是「缺假設」。
+③ **price 不進 fair value**：現價只進 gap；依賴層 fair value 的 refs 不含現價 ref，policy 表 `fair_value` 沒有
+`market_price`，所以 price-only 變化只讓 gap `recalculate`。④ **gap 不是 expected return**：型別沒有 horizon／報酬欄位，
+read model 每次都列 `gap_is_not` 四條。
+
+**Refresh 整合（沿用 `alpha/refresh`，不另建 freshness）：** 新 change class `valuation_assumption`（policy 表對 Q1–Q5
+一格都不動）；新 artifact type `valuation_assumption`（判斷型，規則同營運假設）／`fair_value`／`fair_value_gap`
+（確定性）；傳播沿 `assumption_ids` 一層，上游可以是 `oa_*` 或 `va_*`。實跑 COHR：內部 EPS 假設被取代→fair value
+`recalculate`；估值假設被取代→`recalculate`；估值假設的 supporting edge 變了→假設 `review_required`→fair value／gap
+`review_required`（`propagated_from` 指名）；price-only→fair value `current`、gap `recalculate`。
+
+**PIT：** 估值假設 `created_at <= T`；內部 EPS 沿用 fundamental 的三道門；fundamental 的 `as_of` 與估值視角不符一律拒用
+（INV-6）。實跑 COHR `--as-of 2026-09-05`：EPS 8.94 在、估值假設（09-06）`created_after_as_of`→`missing`；
+`--as-of 2026-08-15`：無基期觀測→`missing`，JSON 內無任何 `va_*` id。
+
+**認識論（回答「fair value 裡多少是算術、多少是判斷」）：** 算術＝橋＋乘法＋基期實際值（Engine C mechanical 觀測）；
+判斷＝內部 EPS 底下的 7 條營運假設（COHR：3 session_judgment＋4 heuristic_proxy）＋1 條估值假設（session_judgment）。
+給定內部 EPS，**整個 gap 就是 `target_pe / implied_multiple_at_price − 1`**——即「我們的倍數 vs 市場對我們 EPS 付的倍數」；
+EPS 的判斷藏在 implied multiple 與市場對共識 EPS 付的倍數之差裡。`ValuationResult.epistemics` 把這個分解機器可讀化。
+
+**刻意不做（Step 2 以後）：** expected return、horizon、entry logic、buy／sell、portfolio、機率加權情境、逐情境目標估值、
+多 method（EV/EBITDA／DCF 要先有內部現金流）、跨標的比較、consumer UI。
 
 ---
 

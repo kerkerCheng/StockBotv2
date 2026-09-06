@@ -289,6 +289,7 @@ cashtag 由 `entities.py` 確定性抽取；公司名寫成純文字時 regex �
 & '.venv\Scripts\python.exe' -m briefing alpha-card COHR --format json -o card.json
 & '.venv\Scripts\python.exe' -m briefing alpha-card COHR --no-causal          # 略過路徑／結構事件（較快）
 & '.venv\Scripts\python.exe' -m briefing alpha-card COHR --as-of 2026-06-30   # as-of 視角（Engine A 投影＋Engine C 時序）
+& '.venv\Scripts\python.exe' -m briefing valuation COHR                      # 只印第 13 節：fair value／現價／gap／refresh state（Step 1）
 ```
 
 純讀：不 freeze context、不建 decision、不寫任何 authority。session 判斷檔預設找
@@ -703,6 +704,38 @@ Select-String -Path .codex\rules\stockbot-automations.rules -Pattern 'assumption
 ```powershell
 Select-String -Path .codex\rules\stockbot-automations.rules -Pattern 'refresh'
 ```
+
+### Sandbox impact review 結論（2026-09-06，Valuation Model v1／Step 1）
+
+| 入口 | side effect | OS／network capability | 判定 |
+|---|---|---|---|
+| `python -m alpha valuation <T> --list／--add／--retract` | append `library/private/alpha/valuation/<T>.jsonl`（估值判斷，A3）；`--list` 唯讀 | 本機檔案；private 目錄 | **互動專用**，不進 unattended rule（估值假設是 session 的判斷，排程不得自己寫） |
+| `python -m briefing valuation <T> [--scenario …] [--as-of]` | 唯讀：與 `alpha-card` 相同的來源＋估值 ledger；情境只在記憶體疊事件，**不寫任何 authority** | 與 `alpha-card` 相同的本機資源；無新增網路主機、憑證或 identity／ACL | **互動專用**。新 CLI 名稱，不進 unattended rule |
+| `python -m briefing alpha-card`／`decision_lab today` 的 Alpha Card 摘要（既有） | 多讀估值 ledger＋跑純函式 `build_valuation`；多一個 `valuation` section、精簡卡 `valuation` 欄與卡表一欄 | 無新增（同一 Engine C 連線、本機檔案） | 命令字串未變 |
+
+查證（新入口不該出現在 rules）：
+```powershell
+Select-String -Path .codex\rules\stockbot-automations.rules -Pattern 'valuation'
+```
+
+### Valuation Model：怎麼跑（互動）
+
+```powershell
+# 1) 明示估值假設（session 寫；evidence_refs＝supporting，必須解析到 alpha-card evidence index；共識／市場倍數只能放 calibration_refs）
+python -m alpha valuation COHR --add spec.json      # spec：period_end／value／basis／accounting_basis（gaap|non_gaap）／rationale／evidence_refs／calibration_refs／review_conditions
+python -m alpha valuation COHR --list
+python -m alpha valuation COHR --retract va_xxx --rationale "..."
+# 2) 看結果（read model 第 13 節：方法／內部 EPS／假設／fair value／現價／gap／算式／敏感度／認識論分解／refresh state）
+python -m briefing valuation COHR
+python -m briefing valuation COHR --format json | python -c "import json,sys;v=json.load(sys.stdin);print(v['meta']['status'], v['fair_value']['value'], v['fair_value_gap']['value'])"
+# 3) 情境與歷史視角
+python -m briefing valuation COHR --scenario price_only      # fair value current、gap recalculate
+python -m briefing valuation COHR --scenario graph_edge      # 引用該邊的估值／營運假設 review_required → fair value review_required
+python -m briefing valuation COHR --as-of 2026-09-05         # 估值假設寫於 09-06 → created_after_as_of → missing
+```
+
+⚠ 沒有生效的估值假設就是 `missing`（不補 default）；口徑／期間與內部 EPS 不合是 `missing`＋「不合」理由；gap **不是**
+expected return／upside／entry signal（型別沒有那些欄位，section 每次列 `gap_is_not`）。
 
 ### Research Refresh／Dependency Invalidation：怎麼跑（互動）
 

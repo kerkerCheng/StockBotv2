@@ -17,11 +17,12 @@ from __future__ import annotations
 
 from .artifacts import (
     AXIS_LABEL, THESIS_ARTIFACT_ID, artifacts_from_context, artifacts_from_model,
-    artifacts_from_signal, build_instant, end_of_day, start_of_day,
+    artifacts_from_signal, artifacts_from_valuation, build_instant, end_of_day, start_of_day,
 )
 from .contracts import (
-    ARTIFACT_ASSUMPTION, ARTIFACT_AXIS, ARTIFACT_COMPARISON, ARTIFACT_MARKET_IMPLIED,
-    ARTIFACT_METRIC, ARTIFACT_MODEL, ARTIFACT_THESIS, ARTIFACT_TYPES, CHANGE_TYPES,
+    ARTIFACT_ASSUMPTION, ARTIFACT_AXIS, ARTIFACT_COMPARISON, ARTIFACT_FAIR_VALUE, ARTIFACT_FAIR_VALUE_GAP,
+    ARTIFACT_MARKET_IMPLIED, ARTIFACT_METRIC, ARTIFACT_MODEL, ARTIFACT_THESIS, ARTIFACT_TYPES,
+    ARTIFACT_VALUATION_ASSUMPTION, ASSUMPTION_ARTIFACT_TYPES, CHANGE_TYPES, VALUATION_ASSUMPTION,
     COMPANY_GUIDANCE, CONSENSUS, CONTEXT_DIGEST, CONTRACT_VERSION, CURRENT, DISPROOF_SIGNAL,
     EVIDENCE, FINANCIAL_ACTUAL, FISCAL_PERIOD_ROLLOVER, GRAPH_CLAIM, GRAPH_EDGE, INVALIDATED,
     KIND_DETERMINISTIC, KIND_JUDGMENT, MARKET_PRICE, MISSING, OPERATING_ASSUMPTION, RECALCULATE,
@@ -37,8 +38,9 @@ from .policy import (
 from .resolver import resolve_refresh
 
 __all__ = [
-    "ARTIFACT_ASSUMPTION", "ARTIFACT_AXIS", "ARTIFACT_COMPARISON", "ARTIFACT_MARKET_IMPLIED",
-    "ARTIFACT_METRIC", "ARTIFACT_MODEL", "ARTIFACT_THESIS", "ARTIFACT_TYPES", "AXIS_LABEL",
+    "ARTIFACT_ASSUMPTION", "ARTIFACT_AXIS", "ARTIFACT_COMPARISON", "ARTIFACT_FAIR_VALUE", "ARTIFACT_FAIR_VALUE_GAP",
+    "ARTIFACT_MARKET_IMPLIED", "ARTIFACT_METRIC", "ARTIFACT_MODEL", "ARTIFACT_THESIS", "ARTIFACT_TYPES",
+    "ARTIFACT_VALUATION_ASSUMPTION", "ASSUMPTION_ARTIFACT_TYPES", "VALUATION_ASSUMPTION", "AXIS_LABEL",
     "AXIS_POLICY", "CHANGE_TYPES", "COMPANY_GUIDANCE", "CONSENSUS", "CONSENSUS_NOISE_FLOOR_REL",
     "CONTEXT_DIGEST", "CONTRACT_VERSION", "CURRENT", "DISPROOF_SIGNAL", "EVIDENCE",
     "FINANCIAL_ACTUAL", "FISCAL_PERIOD_ROLLOVER", "GRAPH_CLAIM", "GRAPH_EDGE",
@@ -48,6 +50,7 @@ __all__ = [
     "ROLE_INPUT", "ROLE_LEGACY", "ROLE_OBSERVATION", "ROLE_SUPPORTING", "STALE", "SUPERSEDED",
     "THESIS_ARTIFACT_ID", "THESIS_REVIEW_DUE", "AffectedArtifact", "ArtifactDependency",
     "ChangeEvent", "MetricObservation", "RefreshReport", "ReviewCondition",
-    "artifacts_from_context", "artifacts_from_model", "artifacts_from_signal", "build_instant", "end_of_day",
+    "artifacts_from_context", "artifacts_from_model", "artifacts_from_signal", "artifacts_from_valuation",
+    "build_instant", "end_of_day",
     "frequency_to_days", "guidance_driver", "merge_states", "resolve_refresh", "start_of_day",
 ]

@@ -23,7 +23,7 @@ from typing import Mapping
 from .contracts import (
     COMPANY_GUIDANCE, CONSENSUS, CONTEXT_DIGEST, CURRENT, DISPROOF_SIGNAL, EVIDENCE,
     FINANCIAL_ACTUAL, FISCAL_PERIOD_ROLLOVER, GRAPH_CLAIM, GRAPH_EDGE, MARKET_PRICE,
-    OPERATING_ASSUMPTION, RECALCULATE, REVIEW_REQUIRED, STALE, THESIS_REVIEW_DUE,
+    OPERATING_ASSUMPTION, RECALCULATE, REVIEW_REQUIRED, STALE, THESIS_REVIEW_DUE, VALUATION_ASSUMPTION,
 )
 
 POLICY_VERSION = "refresh-policy/v1"
@@ -55,6 +55,7 @@ AXIS_POLICY: Mapping[str, Mapping[str, str]] = {
     GRAPH_CLAIM: {"structural": RECALCULATE},
     EVIDENCE: {"structural": RECALCULATE},
     OPERATING_ASSUMPTION: {"expectation_gap": REVIEW_REQUIRED},
+    VALUATION_ASSUMPTION: {},       # 估值判斷變了不動任何基本面判斷（Step 1 立場，明說）
     FISCAL_PERIOD_ROLLOVER: {},
     THESIS_REVIEW_DUE: {},          # 由排程規則統一處理（所有判斷型成果 stale）
     DISPROOF_SIGNAL: {},            # 由 target_artifact 指名處理
@@ -82,6 +83,7 @@ ASSUMPTION_CLASS_POLICY: Mapping[str, Mapping[str, str]] = {
     FINANCIAL_ACTUAL: {"heuristic_proxy": REVIEW_REQUIRED, "observation": REVIEW_REQUIRED},
     COMPANY_GUIDANCE: {},                            # 透過 driver 相關性處理（GUIDANCE_FIELD_DRIVERS）
     OPERATING_ASSUMPTION: {},
+    VALUATION_ASSUMPTION: {},
     CONTEXT_DIGEST: {},
 }
 
@@ -106,6 +108,10 @@ DERIVED_CLASS_POLICY: Mapping[str, frozenset[str]] = {
     "expectation_comparison": frozenset({CONSENSUS}),
     "modeled_metric": frozenset({FINANCIAL_ACTUAL}),
     "fundamental_model": frozenset({FINANCIAL_ACTUAL}),
+    # Step 1：fair value 只隨基期實際值與（經 assumption_ids 命中的）假設重算；**market_price 不在列**——
+    # 價格不進 fair value。gap 才吃價格。
+    "fair_value": frozenset({FINANCIAL_ACTUAL}),
+    "fair_value_gap": frozenset({MARKET_PRICE, FINANCIAL_ACTUAL}),
 }
 
 #: L7 的核查頻率 → 天數。字串比對（含中英文），比不到＝不知道，不排程 stale（並列 note）。

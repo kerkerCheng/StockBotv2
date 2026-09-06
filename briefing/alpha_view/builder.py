@@ -13,11 +13,11 @@
 
 ## 缺口一律標 `not_modeled`，不用預設值補
 
-internal fundamentals／earnings bridge／numeric expectation gap／expected return／
-downside／entry logic 今天 runtime 上**沒有任何程式路徑產生**（`ValuationSnapshot.internal_*`
-恆為 `None`、`AlphaSignal` 沒有這些欄位）。這些 section 仍然存在於 view 裡，
-好讓下一階段的 Causal Fundamental Model 有明確的插座，但值一律 `None`、status 一律
-`not_modeled`——**不得**拿 Q3 分數、分析師目標價或 bull/base 散文冒充。
+expected return／downside／entry logic 今天 runtime 上**沒有任何程式路徑產生**。這些 section 仍然
+存在於 view 裡，好讓下一階段有明確的插座，但值一律 `None`、status 一律 `not_modeled`——
+**不得**拿 Q3 分數、分析師目標價、fair value gap 或 bull/base 散文冒充。
+internal fundamentals／earnings bridge／numeric gap（2026-09-05）與 valuation（2026-09-06 Step 1）
+**有能力了**：沒資料是 `missing`，不再是 `not_modeled`。
 """
 from __future__ import annotations
 
@@ -33,14 +33,15 @@ from alpha.provider import SupplyExposure
 from alpha.refresh import (
     CONTEXT_DIGEST, CURRENT, INVALIDATED, MISSING, RECALCULATE, REVIEW_REQUIRED, STALE, SUPERSEDED,
     THESIS_ARTIFACT_ID, AffectedArtifact, ChangeEvent, MetricObservation, artifacts_from_context,
-    artifacts_from_model, artifacts_from_signal, build_instant, resolve_refresh,
+    artifacts_from_model, artifacts_from_signal, artifacts_from_valuation, build_instant, resolve_refresh,
 )
+from alpha.valuation.contracts import ValuationAssumption, ValuationResult
 from shared.catalyst_state import STATE_LABEL, assess_entry
 from thesis.lifecycle_schedule import CATALYST, effective_next_check
 
 from .contracts import (
     BASIS_LABEL, CAP_AUTOMATIC_INVALIDATION, CAP_CATALYST_UNLINKED, CAP_DEPENDENCY_IMPACT,
-    CAP_FINANCIAL_CAUSAL,
+    CAP_DETERMINISTIC_FAIR_VALUE, CAP_FINANCIAL_CAUSAL,
     CAP_NARRATIVE_SCENARIOS, CAP_NUMERIC_EXPECTATION_GAP, CAP_QUANTITATIVE_SCENARIOS,
     CAP_STRUCTURAL_CAUSAL,
     CAP_STRUCTURED_DISPROOF, SCHEMA_VERSION, STATUS_LABEL, AlphaInvestmentView, CatalystItem,
@@ -50,8 +51,8 @@ from .contracts import (
     FreshnessItem, FundamentalsSection, IdentitySection, ImpactItem,
     InternalFundamentalsSection, LifecycleFacts, NotModeledSection, PathItem,
     PriceImpliedSection, RefreshItem, RefreshStatusSection, ScenarioSection, SectionMeta,
-    SignalCompleteness, StructuralEdgeItem, StructuralThesisSection, VariantViewSection, missing,
-    not_modeled,
+    SignalCompleteness, StructuralEdgeItem, StructuralThesisSection, ValuationSection, VariantViewSection,
+    missing, not_modeled,
 )
 
 # ---------------------------------------------------------------------------
@@ -112,7 +113,8 @@ NEXT_PHASE_NOTE = (
     "Operating Assumptions（private ledger，session 明示）→ deterministic Revenue／Margin Bridge → "
     "Internal Fundamental View → Same-period Consensus（Engine C consensus_estimates）→ Numeric "
     "Expectation Gap。沒有假設或沒有基期觀測的公司是 missing（有能力、沒資料）；"
-    "估值／預期報酬／進場邏輯仍 not_modeled（下一階段）。"
+    "估值（Step 1，2026-09-06）已落地於 valuation section（internal EPS × explicit target multiple）；"
+    "預期報酬／下檔／進場邏輯仍 not_modeled（Step 2 以後）。"
 )
 FUNDAMENTAL_EPISTEMIC_WARNING = (
     "每個內部數字的 calculation 是 deterministic，但輸入假設是 session 判斷／heuristic——"
@@ -401,6 +403,183 @@ def _fundamental_parts(
         has_numeric_gap=bool(comparable), warnings=tuple(model.warnings),
     )
 
+
+# ---------------------------------------------------------------------------
+# 估值（Step 1）：只選取 `alpha.valuation` 的輸出。**本檔沒有 fair value 公式**——
+# 值、公式字串、依賴全部照抄 `ValuationResult`；builder 不乘任何數。
+# ---------------------------------------------------------------------------
+A_VALUATION = "alpha://valuation/model"
+A_VALUATION_ASSUMPTIONS = "alpha://valuation/assumptions"
+
+#: gap 不是什麼——每次都列，讀者不必靠記憶區分（AGENTS：不含欄逐項寫出最相鄰的未授權語意）。
+GAP_IS_NOT: tuple[str, ...] = (
+    "不是 expected return（沒有 horizon、沒有報酬語意）",
+    "不是 upside／downside forecast（沒有機率、沒有情境加權）",
+    "不是 entry signal、不是 buy／sell、不是 required return 或 entry price",
+    "不是 opportunity ranking——它是一檔的 fair value 與現價之差，不跨標的比較",
+)
+VALUATION_EPISTEMIC_WARNING = (
+    "fair value 是判斷的確定性函數，不是事實：內部 EPS 的每條營運假設與目標倍數都是 session 判斷／heuristic——"
+    "看 fair_value.dependencies.input_dependency 與 epistemics；不得把公式算出來的價格讀成觀測。"
+)
+
+
+def _valuation_section(
+    valuation: Any, reason: str | None, *, reference_day: date, reporting_unit: str,
+    refresh: Mapping[str, AffectedArtifact],
+) -> ValuationSection:
+    def _unit(unit: str) -> str:
+        return reporting_unit if unit == "currency" else unit
+
+    def _absent_section(why: str, *, status: str = "missing") -> ValuationSection:
+        meta = SectionMeta(status=status, basis="none", authority=A_VALUATION,
+                           capability=CAP_DETERMINISTIC_FAIR_VALUE, reason=why, as_of=reference_day)
+        return ValuationSection(
+            meta=meta,
+            method=missing("valuation_method", "估值方法", why, authority=A_VALUATION),
+            fundamental_input=missing("valuation_fundamental_input", "估值消費的內部指標", why, authority=A_VALUATION),
+            assumptions=(), fair_value=missing("fair_value", "Fair value", why, authority=A_VALUATION),
+            current_price=missing("current_price", "現價（Engine C）", why, authority=A_SNAP),
+            fair_value_gap=missing("fair_value_gap", "Fair value vs 現價（gap）", why, authority=A_VALUATION),
+            trace=(), sensitivities=(),
+            epistemics=missing("valuation_epistemics", "fair value 的認識論分解", why, authority=A_VALUATION),
+            selection=None, gap_is_not=GAP_IS_NOT,
+        )
+
+    if valuation is None:
+        return _absent_section(reason or "本次未執行 valuation model（呼叫端未注入）")
+
+    target = valuation.target_period
+    fv_refresh = refresh.get("fair_value:fair_value")
+    gap_refresh = refresh.get("fair_value_gap:fair_value_gap")
+    fi = valuation.fundamental_input
+    fundamental_datum = (
+        Datum(key="valuation_fundamental_input", label=f"估值消費的內部指標：{fi.metric}（{fi.period.label}，{fi.accounting_basis}）",
+              value=fi.value, status="available", basis="deterministic", authority=A_BRIDGE,
+              method=fi.formula, unit=_unit("currency_per_share"), as_of=reference_day,
+              evidence_refs=tuple(fi.observation_refs),
+              reason=f"照抄 internal_fundamentals.internal_{fi.metric}；calculation=deterministic；input_dependency={fi.input_dependency}",
+              dependencies={"period": fi.period.label, "fiscal_period_end": fi.period.end.isoformat(),
+                            "accounting_basis": fi.accounting_basis, "input_dependency": fi.input_dependency,
+                            "assumption_ids": list(fi.assumption_ids), "currency": fi.currency})
+        if fi is not None and fi.is_known else
+        missing("valuation_fundamental_input", "估值消費的內部指標",
+                (fi.reason if fi and fi.reason else valuation.reason or "內部指標缺席") + "（不是 0）", authority=A_BRIDGE)
+    )
+    assumption_data: list[Datum] = []
+    for a in valuation.assumptions:
+        refreshed = refresh.get(f"valuation_assumption:{a.assumption_id}")
+        assumption_data.append(Datum(
+            key=f"valuation_assumption:{a.method}:{a.parameter}", label=f"估值假設 {a.parameter}（{a.method}）",
+            value=a.value, status=_refresh_status(refreshed), basis=a.basis, authority=A_VALUATION_ASSUMPTIONS,
+            unit=a.unit, as_of=a.created_on, evidence_refs=tuple(a.evidence_refs), reason=a.rationale,
+            dependencies={"assumption_id": a.assumption_id, "period": a.period.label,
+                          "fiscal_period_end": a.period.end.isoformat(), "accounting_basis": a.accounting_basis,
+                          "created_at": a.created_at.isoformat(), "author": a.author,
+                          "supersedes_id": a.supersedes_id, "provenance_semantics": a.provenance_semantics,
+                          "dependency_roles": {r: a.role_of(r) for r in a.evidence_refs},
+                          "review_conditions": [c.to_dict() for c in a.review_conditions],
+                          "requires_review_on_support_change": a.basis != "observation",
+                          **_refresh_deps(refreshed)}))
+    method_datum = Datum(
+        key="valuation_method", label="估值方法", value=valuation.method, status="available", basis="deterministic",
+        authority=A_VALUATION, method=valuation.model_version, as_of=reference_day,
+        reason="audit（2026-09-06）：內部可靠的 forward metric 只有 FY 目標期間 EPS；無內部 FCF／EBITDA，"
+               "所以 EV/EBITDA、DCF、reverse DCF 沒有資料可餵——不為完整硬做")
+    if valuation.is_known:
+        fv_note = (f"；refresh={fv_refresh.state}：{fv_refresh.reasons[0]}"
+                   if fv_refresh is not None and fv_refresh.state != CURRENT else "")
+        fair_value_datum = Datum(
+            key="fair_value", label=f"Fair value（{target.label if target else '?'}，{valuation.accounting_basis}）",
+            value=valuation.fair_value, status=_refresh_status(fv_refresh), basis="deterministic",
+            authority=A_VALUATION, method=f"{valuation.formula}（{valuation.model_version}）",
+            unit=_unit("currency_per_share"), as_of=reference_day,
+            evidence_refs=tuple(fi.observation_refs) if fi else (),
+            reason=(f"calculation=deterministic；input_dependency={valuation.input_dependency}"
+                    f"（{BASIS_LABEL.get(str(valuation.input_dependency), valuation.input_dependency)}）" + fv_note),
+            dependencies={"period": target.label if target else None,
+                          "fiscal_period_end": target.end.isoformat() if target else None,
+                          "accounting_basis": valuation.accounting_basis, "currency": valuation.currency,
+                          "input_dependency": valuation.input_dependency,
+                          "assumption_ids": list(valuation.assumption_ids),
+                          "observation_refs": list(fi.observation_refs) if fi else [],
+                          "price_in_formula": False, **_refresh_deps(fv_refresh)})
+    else:
+        fair_value_datum = missing("fair_value", "Fair value", f"{valuation.reason}（缺席不是 0）", authority=A_VALUATION)
+    price = valuation.current_price
+    current_price_datum = (
+        Datum(key="current_price", label="現價（Engine C）", value=price.value, status="available", basis="observation",
+              authority=A_SNAP, unit=f"quote_unit（{price.unit or '未知'}）", as_of=price.bar_date,
+              evidence_refs=tuple(price.evidence_refs), reason="估值層只讀現價；它不進 fair value，只進 gap")
+        if price.is_known else
+        missing("current_price", "現價（Engine C）", price.reason or "無現價", authority=A_SNAP))
+    gap = valuation.gap
+    if gap.is_known:
+        gap_note = (f"；refresh={gap_refresh.state}：{gap_refresh.reasons[0]}"
+                    if gap_refresh is not None and gap_refresh.state != CURRENT else "")
+        gap_datum = Datum(
+            key="fair_value_gap", label="Fair value vs 現價（gap；不是 expected return）",
+            value={"absolute_gap": gap.absolute_gap, "relative_gap": gap.relative_gap,
+                   "implied_multiple_at_price": gap.implied_multiple_at_price,
+                   "fair_value": valuation.fair_value, "current_price": price.value, "unit": gap.unit},
+            status=_refresh_status(gap_refresh), basis="deterministic", authority=A_VALUATION,
+            method=valuation.gap_formula, unit=_unit("currency_per_share"), as_of=price.bar_date,
+            evidence_refs=tuple(gap.price_refs) + (tuple(fi.observation_refs) if fi else ()),
+            reason="它是 fair value 與現價的差，" + "；".join(GAP_IS_NOT[:2]) + gap_note,
+            dependencies={"assumption_ids": list(valuation.assumption_ids), "status": gap.status,
+                          "implied_multiple_formula": valuation.implied_multiple_formula, **_refresh_deps(gap_refresh)})
+    else:
+        gap_status = "not_applicable" if gap.status in ("incompatible_unit", "unverified_unit") else "missing"
+        gap_datum = Datum(key="fair_value_gap", label="Fair value vs 現價（gap；不是 expected return）", value=None,
+                          status=gap_status, basis="none", authority=A_VALUATION, reason=f"{gap.status}：{gap.reason}")
+    trace: list[Datum] = []
+    for step in valuation.steps:
+        authority = {"fundamental_input": A_BRIDGE, "assumption": A_VALUATION_ASSUMPTIONS, "derived": A_VALUATION}[step.kind]
+        if step.value is None:
+            trace.append(missing(f"valuation_step:{step.key}", step.label, step.reason or "上游缺料（不是 0）", authority=authority))
+            continue
+        trace.append(Datum(
+            key=f"valuation_step:{step.key}", label=step.label, value=step.value, status="available", basis=step.basis,
+            authority=authority, method=step.formula, unit=_unit(step.unit), as_of=reference_day,
+            evidence_refs=tuple(step.observation_refs), reason=step.reason,
+            dependencies={"kind": step.kind, "assumption_ids": list(step.assumption_ids),
+                          "input_dependency": step.input_dependency}))
+    sens: list[Datum] = []
+    for s in valuation.sensitivities:
+        bump_text = f"+{s.bump:.2f}" if s.bump_unit == "absolute_ratio" else f"×{1 + s.bump:.2f}"
+        sens.append(Datum(
+            key=f"fair_value_sensitivity:{s.driver}:{s.scope}", label=f"fair value 敏感度 {s.driver}[{s.scope}] {bump_text}",
+            value={"delta_fair_value": s.delta_fair_value, "fair_value_relative": s.fair_value_relative,
+                   "bump": s.bump, "bump_unit": s.bump_unit},
+            status="available", basis="deterministic", authority=A_VALUATION,
+            method="只動這一條判斷重算 fair value；確定性微擾，不是機率、不是情境", as_of=reference_day,
+            dependencies={"assumption_id": s.assumption_id}))
+    epistemics_datum = (
+        Datum(key="valuation_epistemics", label="fair value 的認識論分解（算術 vs 判斷）", value=dict(valuation.epistemics),
+              status="available", basis="deterministic", authority=A_VALUATION, as_of=reference_day,
+              method="純計數與選取：列出哪些是確定性算術、哪些輸入是判斷（按 basis 計數）；不是新判斷")
+        if valuation.epistemics else
+        missing("valuation_epistemics", "fair value 的認識論分解（算術 vs 判斷）", "fair value 缺席，無可分解", authority=A_VALUATION))
+    selection = EvidenceSelectionCounts(
+        input_count=valuation.selection.input_count, accepted_count=valuation.selection.accepted_count,
+        filtered_count=valuation.selection.filtered_count, reasons=dict(valuation.selection.reasons))
+    section_status = fair_value_datum.status if valuation.is_known else "missing"
+    meta = SectionMeta(
+        status=section_status, basis="deterministic" if valuation.is_known else "none", authority=A_VALUATION,
+        capability=CAP_DETERMINISTIC_FAIR_VALUE, reason=valuation.reason, as_of=reference_day,
+        warnings=(VALUATION_EPISTEMIC_WARNING,
+                  "fair value 不含現價：price-only 變化只動 gap，不動 fair value。",
+                  "gap " + "；".join(GAP_IS_NOT), *valuation.warnings),
+    )
+    return ValuationSection(
+        meta=meta, method=method_datum, fundamental_input=fundamental_datum, assumptions=tuple(assumption_data),
+        fair_value=fair_value_datum, current_price=current_price_datum, fair_value_gap=gap_datum,
+        trace=tuple(trace), sensitivities=tuple(sens), epistemics=epistemics_datum, selection=selection,
+        gap_is_not=GAP_IS_NOT, period=target.label if target else None, period_end=target.end if target else None,
+        accounting_basis=valuation.accounting_basis,
+    )
+
+
 _SESSION_LEVEL_LABEL = {
     "unknown": "不知道", "weak": "弱", "moderate": "中等", "strong": "強", "very_strong": "很強",
 }
@@ -585,6 +764,9 @@ def build_alpha_investment_view(
     identity: Mapping[str, Any] | None = None,
     fundamental_model: FundamentalModelResult | None = None,
     fundamental_model_reason: str | None = None,
+    valuation: ValuationResult | None = None,
+    valuation_reason: str | None = None,
+    valuation_records: Sequence[ValuationAssumption] = (),
     today: date | None = None,
     refresh_changes: Sequence[ChangeEvent] | None = None,
     assumption_records: Sequence[OperatingAssumption] = (),
@@ -636,6 +818,10 @@ def build_alpha_investment_view(
                 f"as-of {as_of_iso} 模式：傳入的 fundamental model 以 as_of="
                 f"{fundamental_model.as_of} 執行，與 context 不符，拒收（INV-6）")
             fundamental_model = None
+        if valuation is not None and valuation.as_of != context.as_of:
+            valuation_reason = (f"as-of {as_of_iso} 模式：傳入的 valuation 以 as_of={valuation.as_of} 執行，"
+                                "與 context 不符，拒收（INV-6）")
+            valuation = None
     #: 沒有時點語意的來源在 as-of 下是 not_applicable；authority 回答「T 時刻沒有」則是 missing。
     thesis_absent_status = "not_applicable" if as_of_mode else "missing"
     decision_absent_status = "not_applicable" if (as_of_mode and decision_refused) else "missing"
@@ -684,6 +870,9 @@ def build_alpha_investment_view(
                                       structural_trace=build.structural_trace, build_at=build_at)
     artifacts += artifacts_from_model(fundamental_model, build_at=build_at,
                                       assumption_records=assumption_records)
+    artifacts += artifacts_from_valuation(
+        valuation, build_at=build_at, assumption_records=valuation_records,
+        base_period_end=(fundamental_model.base_period.end if fundamental_model and fundamental_model.base_period else None))
     artifacts += artifacts_from_context(context, build_at=build_at)
     detection = change_detection or ("not_run" if refresh_changes is None else "authority_time_series")
     changes = list(refresh_changes or ())
@@ -723,6 +912,11 @@ def build_alpha_investment_view(
         reporting_unit=f"reporting_currency（{market_currency or '未知'}；未正規化）",
         refresh=refresh_by_key,
     )
+    valuation_section = _valuation_section(
+        valuation, valuation_reason, reference_day=reference_day,
+        reporting_unit=f"reporting_currency（{market_currency or '未知'}；未正規化）",
+        refresh=refresh_by_key,
+    )
 
     # ---- Evidence index：context ＋ 路徑／事件的引用，去重 -------------------
     evidence_pool: dict[str, EvidenceRef] = {}
@@ -751,6 +945,9 @@ def build_alpha_investment_view(
     # 模型的 evidence 已在 as-of 下過濾（recorded_at／captured_at ≤ T），放進來不會漏未來。
     if fundamental_model is not None:
         for ref in fundamental_model.evidence:
+            evidence_pool.setdefault(ref.ref, ref)
+    if valuation is not None:
+        for ref in valuation.evidence:
             evidence_pool.setdefault(ref.ref, ref)
 
     fund_fresh = _freshness_status(build, "fundamentals")
@@ -1321,7 +1518,9 @@ def build_alpha_investment_view(
         session_judgment=q4, proxies=gap_proxies,
         internal_vs_consensus=fund.internal_vs_consensus,
         internal_vs_price_implied=not_modeled("internal_vs_price_implied", "內部估計 vs 價格隱含（數值）",
-                                              "價格隱含側只有 PE 比值 proxy，沒有 reverse DCF；估值是下一階段"),
+                                              "價格隱含側只有 PE 比值 proxy，沒有 reverse DCF（價格隱含的成長／利潤率解）；"
+                                              "fair value 與現價的差住 valuation section，它是 fair_value − price，"
+                                              "不是內部基本面 vs 價格隱含基本面"),
         numeric_comparisons=fund.comparisons,
     )
 
@@ -1486,7 +1685,17 @@ def build_alpha_investment_view(
         base=_scenario("base_case", "Base case（散文）", signal.base_case if signal else None),
         bear=_scenario("bear_case", "Bear case（散文）", signal.bear_case if signal else None),
         probabilities=not_modeled("scenario_probabilities", "情境機率", "沒有任何機率加權"),
-        target_valuation=not_modeled("target_valuation", "目標估值", "沒有任何目標價／目標倍數模型；賣方目標價住 consensus，不是這一格"),
+        # Step 1：單點 fair value 有了（valuation section）；**逐情境**的目標估值仍然沒有。
+        target_valuation=(
+            Datum(key="target_valuation", label="目標估值（單點 fair value；非逐情境）",
+                  value=valuation_section.fair_value.value, status=valuation_section.fair_value.status,
+                  basis="deterministic", authority=A_VALUATION, unit=valuation_section.fair_value.unit,
+                  as_of=reference_day, method=valuation_section.fair_value.method,
+                  reason="照抄 valuation.fair_value；bull／base／bear 各自的目標估值與機率加權仍未建模")
+            if valuation_section.fair_value.is_known else
+            Datum(key="target_valuation", label="目標估值（單點 fair value；非逐情境）", value=None,
+                  status=valuation_section.fair_value.status, basis="none", authority=A_VALUATION,
+                  reason=f"valuation section：{valuation_section.fair_value.reason}；逐情境目標估值仍未建模")),
     )
 
     # =======================================================================
@@ -1500,12 +1709,13 @@ def build_alpha_investment_view(
         )
 
     expected_return_section = _not_modeled_section(
-        "系統不產生預期報酬：沒有內部估計、沒有目標估值、沒有機率加權。等權重報酬追蹤（outcome）是事後量測，不是預期。",
+        "系統不產生預期報酬：沒有 horizon、沒有報酬語意、沒有機率加權（Step 2）。等權重報酬追蹤（outcome）是事後量測，不是預期。",
         (("expected_return", "預期報酬"), ("probability_weighted_return", "機率加權報酬"),
          ("target_valuation_upside", "目標估值上檔")),
         ("consensus.target_mean 是賣方目標價，不是 StockBot 預期報酬；"
          "目標價 vs 現價的比值住 scripts/alpha_expectation_gap.py",
-         "price_implied_expectations.market_implied_eps_growth 是市場已定價的成長，不是我們預期的報酬"),
+         "price_implied_expectations.market_implied_eps_growth 是市場已定價的成長，不是我們預期的報酬",
+         "valuation.fair_value_gap 是 fair value 與現價的差（Step 1）——沒有 horizon 與報酬語意，不是 upside forecast"),
     )
     downside_section = _not_modeled_section(
         "系統不產生下檔估計：沒有 bear case 的數值、沒有最大回撤模型。",
@@ -1517,7 +1727,8 @@ def build_alpha_investment_view(
         (("required_return", "要求報酬"), ("entry_price", "進場價"),
          ("wait_for_price_threshold", "等待價位門檻"), ("actionable_now", "現在可行動")),
         ("structural_thesis.ranking 是 rank_bottlenecks 的研究注意力順序，不是 opportunity ranking",
-         "decision_lab today 的 attention（MONITOR／REVIEW）是「今天要不要看」，不是「該不該買」；本 view 不重算它"),
+         "decision_lab today 的 attention（MONITOR／REVIEW）是「今天要不要看」，不是「該不該買」；本 view 不重算它",
+         "valuation.fair_value_gap 不是 entry signal——fair value 低於現價不代表賣、高於不代表買"),
     )
 
     # =======================================================================
@@ -1639,6 +1850,8 @@ def build_alpha_investment_view(
     if fund.has_numeric_gap:
         warnings.append(FUNDAMENTAL_EPISTEMIC_WARNING)
     warnings.extend(f"fundamental model：{w}" for w in fund.warnings)
+    if valuation_section.fair_value.is_known:
+        warnings.append(VALUATION_EPISTEMIC_WARNING)
 
     return AlphaInvestmentView(
         schema_version=SCHEMA_VERSION,
@@ -1648,7 +1861,7 @@ def build_alpha_investment_view(
         price_implied_expectations=price_implied_section,
         internal_fundamentals=internal_section, earnings_bridge=earnings_bridge_section,
         expectation_gap=expectation_gap_section, catalysts=catalyst_section,
-        falsification=falsification_section, scenarios=scenario_section,
+        falsification=falsification_section, scenarios=scenario_section, valuation=valuation_section,
         expected_return=expected_return_section, downside=downside_section,
         entry_logic=entry_section, evidence=evidence_section,
         freshness=tuple(freshness_items), refresh_status=refresh_section, warnings=tuple(warnings),
@@ -1747,6 +1960,18 @@ def compact_card(view: AlphaInvestmentView) -> dict[str, Any]:
         },
         # 內部假設推出的數字 vs 同期共識；None＝不可比／缺料（原因在 reason），不是 0
         "internal_vs_consensus": internal_vs_consensus,
+        # Step 1：估值摘要——只抄 valuation section；gap 不是 expected return（renderer 不得改稱）
+        "valuation": {
+            "status": view.valuation.meta.status,
+            "method": _val(view.valuation.method),
+            "fair_value": _val(view.valuation.fair_value),
+            "current_price": _val(view.valuation.current_price),
+            "relative_gap": ((view.valuation.fair_value_gap.value or {}).get("relative_gap")
+                             if view.valuation.fair_value_gap.is_known else None),
+            "gap_status": view.valuation.fair_value_gap.status,
+            "period": view.valuation.period,
+            "reason": None if view.valuation.fair_value.is_known else view.valuation.fair_value.reason,
+        },
         "internal_fundamentals_status": view.internal_fundamentals.meta.status,
         "not_modeled": not_modeled_keys,
         "warnings": list(view.warnings),

@@ -239,12 +239,20 @@ StockBot 對某個未來 driver 的**明示**假設（`alpha/fundamental/contrac
 *Avoid:* 把 digest 變了叫 stale、把 stale 與 review_required 混用、讓引擎改任何判斷或假設
 
 ### ChangeEvent（已分類的變化）
-「什麼變了」的 canonical 表示：class（`market_price`／`consensus`／`financial_actual`／`company_guidance`／`graph_edge`／`graph_claim`／`evidence`／`operating_assumption`／`fiscal_period_rollover`／`thesis_review_due`／`disproof_signal`／`context_digest`）＋authority＋物件 ref＋`observed_at`（系統何時知道；as-of 可見性）＋`published_at`（世界何時知道；「判斷當時知不知道」）＋material fields＋old／new。由 `briefing/alpha_view/changes.py` 從 authority 時序導出，**不是 digest diff**；同一身分、不同值才是變化。
+「什麼變了」的 canonical 表示：class（`market_price`／`consensus`／`financial_actual`／`company_guidance`／`graph_edge`／`graph_claim`／`evidence`／`operating_assumption`／`valuation_assumption`／`fiscal_period_rollover`／`thesis_review_due`／`disproof_signal`／`context_digest`）＋authority＋物件 ref＋`observed_at`（系統何時知道；as-of 可見性）＋`published_at`（世界何時知道；「判斷當時知不知道」）＋material fields＋old／new。由 `briefing/alpha_view/changes.py` 從 authority 時序導出，**不是 digest diff**；同一身分、不同值才是變化。
 *Avoid:* 「context digest 變了」、第一次出現當變化、用 ingest 時間冒充事件時間
 
 ### Dependency Role（假設 ref 的角色）
 `OperatingAssumption.dependency_roles`：`supporting`（支持假設為真）／`calibration`（校準數字的脈絡，例：市場隱含 +65% 所以選 +60%）／`comparison`（拿來比較的對象）。**同期分析師共識不得是 supporting**（provenance 循環）。舊紀錄標 `provenance_semantics=legacy`，讀取端 fail safe。
 *Avoid:* 只靠「ref 還解析得到」判假設仍成立、改寫舊 ledger 行補角色
+
+### ValuationAssumption（估值假設）
+StockBot 對某個估值參數的**明示**判斷（`alpha/valuation/contracts.py`，2026-09-06 Step 1）：公司、目標會計期間、`method`（封閉字彙，v1 只有 `forward_earnings_multiple`）、`parameter`（`target_pe`）、值（倍）、`basis`、`accounting_basis`（**必填** gaap／non_gaap——倍數套在哪種 EPS 上是身分）、rationale、`evidence_refs`＋`dependency_roles`（同期共識與市場倍數只能是 calibration）、`created_at`、supersede／retract、`review_conditions`。與 `OperatingAssumption` 同一套 epistemic system（同 basis 字彙、同角色、同 append-only／as-of、同一支選取器），id 前綴 `va_`，住 `library/private/alpha/valuation/<TICKER>.jsonl`。**它不是橋的 driver**：倍數不是財務橋的算術。
+*Avoid:* 把倍數塞進 `ASSUMPTION_DRIVERS`、程式或 LLM 補 default multiple、拿 unverified 口徑的 EPS 乘
+
+### Fair Value／Fair-value Gap（Step 1）
+`alpha/valuation/model.py::build_valuation`：`fair_value = internal_eps[target_period] × target_pe`（同期、同口徑才乘；`calculation=deterministic`、`input_dependency`＝所有輸入判斷中最弱者）；`gap = fair_value − current_price`／`fair_value / current_price − 1`（同單位才算；報價單位 ≠ 結算幣別，本層不換算）；`implied_multiple_at_price = current_price / internal_eps`——給定內部 EPS，**整個 gap ＝ target_pe / implied_multiple − 1**。fair value **不含現價**（price-only 變化只動 gap）。**gap 不是** expected return／upside forecast／entry signal／buy-sell（horizon 與報酬語意是 Step 2）；read model 每次列 `gap_is_not`。
+*Avoid:* 把 gap 叫 upside 或預期報酬、拿 gap 排序或給尺寸、把 fair value 讀成觀測
 
 ### Review Condition（假設自帶的 machine-readable 觸發條件）
 `metric`／`scope`／`period_end`／`period_kind`／`operator`／`threshold`／`on_trigger`／`note`。由寫假設的人明示，引擎拿 Engine C 觀測（年度＋exit quarter）對照；滿足 → `disproof_signal` → 該假設 `on_trigger` state。`note` 是人寫的下一步（例：下修至 +45%），引擎只讀不做。也可經 Event Watch `hypothesis_ref=oa_*` 喚醒。

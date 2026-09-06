@@ -73,6 +73,9 @@ GRAPH_EDGE = "graph_edge"
 GRAPH_CLAIM = "graph_claim"
 EVIDENCE = "evidence"
 OPERATING_ASSUMPTION = "operating_assumption"
+#: Step 1（2026-09-06）：估值假設 ledger 的新增／取代／撤回。與 operating_assumption 分開，因為它動的是
+#: fair value 而不是財務橋；policy 表對它一格 axis 都不動（估值判斷變了不代表基本面判斷變了）。
+VALUATION_ASSUMPTION = "valuation_assumption"
 FISCAL_PERIOD_ROLLOVER = "fiscal_period_rollover"
 THESIS_REVIEW_DUE = "thesis_review_due"
 DISPROOF_SIGNAL = "disproof_signal"
@@ -81,8 +84,8 @@ CONTEXT_DIGEST = "context_digest"
 
 CHANGE_TYPES: tuple[str, ...] = (
     MARKET_PRICE, CONSENSUS, FINANCIAL_ACTUAL, COMPANY_GUIDANCE, GRAPH_EDGE, GRAPH_CLAIM,
-    EVIDENCE, OPERATING_ASSUMPTION, FISCAL_PERIOD_ROLLOVER, THESIS_REVIEW_DUE, DISPROOF_SIGNAL,
-    CONTEXT_DIGEST,
+    EVIDENCE, OPERATING_ASSUMPTION, VALUATION_ASSUMPTION, FISCAL_PERIOD_ROLLOVER, THESIS_REVIEW_DUE,
+    DISPROOF_SIGNAL, CONTEXT_DIGEST,
 )
 
 # artifact 型別。判斷型（session 判斷／假設）與確定性型（模型輸出）在 policy 裡走不同 state。
@@ -93,11 +96,19 @@ ARTIFACT_METRIC = "modeled_metric"
 ARTIFACT_COMPARISON = "expectation_comparison"
 ARTIFACT_MARKET_IMPLIED = "market_implied"
 ARTIFACT_MODEL = "fundamental_model"
+#: Step 1：估值層的三種成果。估值假設是判斷型；fair value 與 gap 是確定性型，但**分開**——
+#: fair value 只依賴內部 EPS 與估值假設，gap 才依賴現價（price-only 變化只動 gap）。
+ARTIFACT_VALUATION_ASSUMPTION = "valuation_assumption"
+ARTIFACT_FAIR_VALUE = "fair_value"
+ARTIFACT_FAIR_VALUE_GAP = "fair_value_gap"
 
 ARTIFACT_TYPES: tuple[str, ...] = (
     ARTIFACT_AXIS, ARTIFACT_THESIS, ARTIFACT_ASSUMPTION, ARTIFACT_METRIC, ARTIFACT_COMPARISON,
-    ARTIFACT_MARKET_IMPLIED, ARTIFACT_MODEL,
+    ARTIFACT_MARKET_IMPLIED, ARTIFACT_MODEL, ARTIFACT_VALUATION_ASSUMPTION, ARTIFACT_FAIR_VALUE,
+    ARTIFACT_FAIR_VALUE_GAP,
 )
+#: 判斷型假設的兩種成果型別（refresh 規則相同：supporting 變了 → review、撤回 → invalidated…）。
+ASSUMPTION_ARTIFACT_TYPES: frozenset[str] = frozenset({ARTIFACT_ASSUMPTION, ARTIFACT_VALUATION_ASSUMPTION})
 
 #: 成果的「性質」：判斷型輸入變了要人複查；確定性型輸入變了重算就好。
 KIND_JUDGMENT = "judgment"
@@ -432,8 +443,9 @@ class RefreshReport:
 
 
 __all__ = [
-    "ARTIFACT_ASSUMPTION", "ARTIFACT_AXIS", "ARTIFACT_COMPARISON", "ARTIFACT_MARKET_IMPLIED",
-    "ARTIFACT_METRIC", "ARTIFACT_MODEL", "ARTIFACT_THESIS", "ARTIFACT_TYPES", "AffectedArtifact",
+    "ARTIFACT_ASSUMPTION", "ARTIFACT_AXIS", "ARTIFACT_COMPARISON", "ARTIFACT_FAIR_VALUE", "ARTIFACT_FAIR_VALUE_GAP",
+    "ARTIFACT_MARKET_IMPLIED", "ARTIFACT_METRIC", "ARTIFACT_MODEL", "ARTIFACT_THESIS", "ARTIFACT_TYPES",
+    "ARTIFACT_VALUATION_ASSUMPTION", "ASSUMPTION_ARTIFACT_TYPES", "VALUATION_ASSUMPTION", "AffectedArtifact",
     "ArtifactDependency", "CHANGE_TYPES", "COMPANY_GUIDANCE", "CONSENSUS", "CONTEXT_DIGEST",
     "CONTRACT_VERSION", "CURRENT", "ChangeEvent", "DEPENDENCY_ROLES", "DISPROOF_SIGNAL",
     "EVIDENCE", "FINANCIAL_ACTUAL", "FISCAL_PERIOD_ROLLOVER", "GRAPH_CLAIM", "GRAPH_EDGE",

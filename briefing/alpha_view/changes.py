@@ -8,7 +8,7 @@
 | market_price／consensus | Engine C `financial_snapshots`（逐日）＋`consensus_estimates`（逐次抓取） | `fetched_at`（session 只看得到 packet 快照） |
 | graph_edge | `GraphResearchProvider.get_structural_changes_since`（投影差集） | 文件 `published_at`（世界時間） |
 | financial_actual／company_guidance | Engine C 人工 ledger 歷史列 | payload 的 `source_filed_at`／`issued_at`（世界時間；系統 `recorded_at` 只管 as-of 可見性） |
-| operating_assumption | private ledger `created_at` | `created_at` |
+| operating_assumption／valuation_assumption | private ledger `created_at` | `created_at` |
 | thesis_review_due | `thesis/lifecycle.json` 的 `is_due` | 到期日 |
 | disproof_signal | Event Watch 已 fired 且 `hypothesis_ref` 指向 `oa_*`／`signal:<TICKER>` | `woken_by.at` |
 
@@ -26,7 +26,7 @@ from alpha.fundamental.contracts import OperatingAssumption
 from alpha.refresh import (
     COMPANY_GUIDANCE, CONSENSUS, CONSENSUS_NOISE_FLOOR_REL, DISPROOF_SIGNAL, FINANCIAL_ACTUAL,
     GRAPH_EDGE, MARKET_PRICE, OPERATING_ASSUMPTION, THESIS_ARTIFACT_ID, THESIS_REVIEW_DUE,
-    ChangeEvent, MetricObservation, end_of_day, start_of_day,
+    VALUATION_ASSUMPTION, ChangeEvent, MetricObservation, end_of_day, start_of_day,
 )
 
 _ROOT = Path(__file__).resolve().parents[2]
@@ -37,6 +37,7 @@ A_CONS_FY = "engine_c://consensus_estimates"
 A_LEDGER = "engine_c://manual_observations"
 A_GRAPH = "engine_a://graph_research_provider"
 A_ASSUMPTIONS = "alpha://fundamental/assumptions"
+A_VALUATION_ASSUMPTIONS = "alpha://valuation/assumptions"
 A_LIFECYCLE = "thesis://lifecycle.json"
 A_WATCH = "engine_b://event_watch"
 
@@ -205,9 +206,10 @@ def ledger_changes(
 
 
 def assumption_changes(
-    records: Sequence[OperatingAssumption], *, ticker: str, company_id: str | None, since: datetime,
+    records: Sequence[Any], *, ticker: str, company_id: str | None, since: datetime,
+    change_type: str = OPERATING_ASSUMPTION, authority: str = A_ASSUMPTIONS,
 ) -> list[ChangeEvent]:
-    """ledger 新紀錄：新建／取代／撤回都是「內部觀點變了」。"""
+    """ledger 新紀錄：新建／取代／撤回都是「內部觀點變了」。營運假設與估值假設同一支（class 不同）。"""
     ordered = sorted(records, key=lambda r: (r.created_at, r.assumption_id))
     latest_before: dict[tuple[str, str, date], str] = {}
     out: list[ChangeEvent] = []
@@ -217,7 +219,7 @@ def assumption_changes(
         if record.created_at > since:
             kind = "撤回" if record.retracted else ("取代" if predecessor else "新增")
             out.append(ChangeEvent(
-                change_type=OPERATING_ASSUMPTION, ticker=ticker, company_id=company_id, authority=A_ASSUMPTIONS,
+                change_type=change_type, ticker=ticker, company_id=company_id, authority=authority,
                 changed_ref=record.assumption_id, observed_at=record.created_at,
                 effective_at=record.period.end, new_version=f"{record.value:g}",
                 old_version=None, material_fields=(record.driver, record.scope),
@@ -262,7 +264,7 @@ def watch_changes(
         entities = {str(e).upper() for e in (watch.get("entities") or ())} | {str(e).lower() for e in (watch.get("entities") or ())}
         if not (entities & wanted):
             continue
-        if target.startswith("oa_") and target in known:
+        if (target.startswith("oa_") or target.startswith("va_")) and target in known:
             artifact = target
         elif target.lower() == f"signal:{ticker.lower()}":
             artifact = THESIS_ARTIFACT_ID
@@ -332,6 +334,7 @@ def detect_changes(
     lifecycle_entry: Mapping[str, Any] | None,
     watches: Sequence[Mapping[str, Any]],
     ticker_obj: Any = None,
+    valuation_records: Sequence[Any] = (),
 ) -> tuple[list[ChangeEvent], list[MetricObservation], list[str]]:
     """把 `since` 之後各 authority 的變化收成一份 `ChangeEvent` 清單（每段各自 fail-soft，原因進 notes）。"""
     events: list[ChangeEvent] = []
@@ -387,14 +390,16 @@ def detect_changes(
             notes.append(f"結構事件偵測失敗：{type(exc).__name__}: {str(exc)[:80]}")
 
     events += assumption_changes(assumption_records, ticker=ticker, company_id=company_id, since=since)
+    events += assumption_changes(valuation_records, ticker=ticker, company_id=company_id, since=since,
+                                 change_type=VALUATION_ASSUMPTION, authority=A_VALUATION_ASSUMPTIONS)
     events += lifecycle_due_changes(lifecycle_entry, ticker=ticker, company_id=company_id, today=as_of or today)
     events += watch_changes(watches, ticker=ticker, company_id=company_id,
-                            assumption_ids=[r.assumption_id for r in assumption_records])
+                            assumption_ids=[r.assumption_id for r in (*assumption_records, *valuation_records)])
     events.sort(key=lambda e: (e.observed_at, e.change_type, e.changed_ref))
     return events, observations, notes
 
 
-def baseline_since(judged_on: date | None, records: Sequence[OperatingAssumption]) -> datetime:
+def baseline_since(judged_on: date | None, records: Sequence[Any]) -> datetime:
     """偵測窗的起點＝最早的研究成果建立時點（判斷日或最早假設）；沒有任何成果就看最近 30 天。"""
     candidates: list[datetime] = []
     if judged_on is not None:

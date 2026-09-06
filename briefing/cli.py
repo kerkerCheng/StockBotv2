@@ -93,6 +93,46 @@ def cmd_refresh(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_valuation(args: argparse.Namespace) -> int:
+    """單一公司的估值（read model 第 13 節）：internal EPS × explicit target multiple → fair value → gap。"""
+    from alpha.errors import AlphaError, PointInTimeUnsupported
+
+    from .alpha_view.render import render_valuation_lines
+    from .alpha_view.sources import fetch_alpha_investment_view
+
+    as_of = date.fromisoformat(args.as_of) if args.as_of else None
+    try:
+        view = fetch_alpha_investment_view(
+            args.ticker, as_of=as_of, include_causal=False, scenario=args.scenario,
+            judgment_path=Path(args.judgment) if args.judgment else None)
+    except PointInTimeUnsupported as exc:
+        print(f"✗ {exc}", file=sys.stderr)
+        return 3
+    except AlphaError as exc:
+        print(f"✗ {exc}", file=sys.stderr)
+        return 2
+    if args.format == "json":
+        payload = view.to_dict()["valuation"]
+        payload["identity"] = {"ticker": view.identity.ticker, "company_id": view.identity.company_id,
+                               "as_of": view.identity.as_of.isoformat() if view.identity.as_of else None,
+                               "generated_on": view.identity.generated_on.isoformat()}
+        payload["refresh_items"] = [i for i in view.to_dict()["refresh_status"]["items"]
+                                    if i["artifact_type"] in ("valuation_assumption", "fair_value", "fair_value_gap")]
+        text = json.dumps(payload, ensure_ascii=False, indent=2)
+    else:
+        head = [f"# Valuation — {view.identity.company_label}",
+                f"- 生成日 {view.identity.generated_on.isoformat()}｜視角 {view.identity.point_in_time_mode}"
+                + (f"（as-of {view.identity.as_of.isoformat()}）" if view.identity.as_of else "")
+                + (f"｜情境 **{args.scenario}**" if args.scenario else ""), ""]
+        text = "\n".join(head + render_valuation_lines(view))
+    if args.out:
+        Path(args.out).write_text(text, encoding="utf-8")
+        print(f"valuation → {args.out}（{len(text)} chars）")
+    else:
+        print(text)
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="python -m briefing", description=__doc__,
@@ -118,6 +158,16 @@ def build_parser() -> argparse.ArgumentParser:
     refresh.add_argument("--format", choices=("markdown", "json"), default="markdown")
     refresh.add_argument("-o", "--out", help="輸出路徑")
     refresh.set_defaults(func=cmd_refresh)
+    valuation = sub.add_parser("valuation", help="單一公司的估值（Step 1：fair value／現價／gap／refresh state）")
+    valuation.add_argument("ticker")
+    valuation.add_argument("--as-of", help="YYYY-MM-DD：只看 T 之前已知的假設、內部基本面與行情")
+    valuation.add_argument("--scenario", choices=("price_only", "consensus_revision", "graph_edge", "new_guidance",
+                                                  "new_actual", "fiscal_rollover", "disproof"),
+                           help="在真實 state 上疊一件假想變化（不寫任何 authority）")
+    valuation.add_argument("--judgment", help="指定 session 判斷 JSON")
+    valuation.add_argument("--format", choices=("markdown", "json"), default="markdown")
+    valuation.add_argument("-o", "--out", help="輸出路徑")
+    valuation.set_defaults(func=cmd_valuation)
     return parser
 
 

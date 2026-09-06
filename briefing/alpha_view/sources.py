@@ -22,6 +22,8 @@ from alpha.fundamental import FundamentalModelResult, build_fundamental_model
 from alpha.identity import CompanyId, Ticker
 from alpha.models import compose_signal
 from alpha.providers import assumptions as assumption_ledger
+from alpha.providers import valuation_assumptions as valuation_ledger
+from alpha.valuation import CurrentPrice, ValuationResult, build_valuation
 from identity.registry import get_registry
 
 from .builder import DecisionFacts, build_alpha_investment_view, compact_card
@@ -202,6 +204,43 @@ def _fundamental_model(
     return model, None, records
 
 
+def _valuation_model(
+    build: ContextBuild, fundamental_model: FundamentalModelResult | None, fundamental_reason: str | None,
+    ticker: Ticker, company_id: CompanyId, *, as_of: date | None, today: date,
+    identity: Mapping[str, Any],
+) -> tuple[ValuationResult | None, str | None, list[Any]]:
+    """Valuation Model v1（Step 1）的取數與執行。
+
+    - 估值假設由 private ledger（`alpha/providers/valuation_assumptions.py`）讀出；
+      內部 EPS 是已經跑好的 fundamental model；現價是 `build.context.market`（Engine C，已依 as-of 過濾）。
+    - 本檔不算任何數字——算術在 `alpha.valuation`。任何一段失敗都 fail-soft，原因交給 builder。
+    - 現價的報價單位取自 registry（`market_quote_unit`／`market_currency`）；不知道就留 None，
+      估值層會拒絕算 gap（報價單位 ≠ 結算幣別，不猜）。
+    """
+    records: list[Any] = []
+    try:
+        records, parse_errors = valuation_ledger.read_valuation_assumption_records(str(ticker))
+    except Exception as exc:  # noqa: BLE001
+        return None, f"估值假設 ledger 讀取失敗：{type(exc).__name__}", records
+    market = build.context.market
+    price = CurrentPrice(
+        value=market.price, bar_date=market.bar_date,
+        unit=(market.currency or identity.get("market_quote_unit") or identity.get("market_currency")),
+        evidence_refs=tuple(r.ref for r in market.evidence),
+        reason=None if market.price is not None else "Engine C 無現價快照",
+    )
+    try:
+        result = build_valuation(
+            company_id=str(company_id), ticker=str(ticker), as_of=as_of, today=today,
+            fundamental=fundamental_model, fundamental_reason=fundamental_reason,
+            assumption_records=records, parse_errors=parse_errors,
+            evidence_index={ref.ref: ref for ref in build.context.evidence_refs}, price=price,
+        )
+    except Exception as exc:  # noqa: BLE001 — 估值失敗只讓該區 missing，不讓整份 view 失敗
+        return None, f"valuation model 執行失敗：{type(exc).__name__}: {str(exc)[:160]}", records
+    return result, None, records
+
+
 def _ranking_position(graph: Any, company_id: CompanyId, *, as_of: date | None) -> Mapping[str, Any] | None:
     try:
         rows = list(graph.get_bottlenecks(as_of=as_of))
@@ -281,6 +320,9 @@ def fetch_alpha_investment_view(
                 fundamental_model, fundamental_reason, records = _fundamental_model(
                     build, fundamentals_provider, resolved_ticker, company_id, as_of=as_of, today=today,
                     actuals_override=override)
+        valuation_model, valuation_reason, valuation_records = _valuation_model(
+            build, fundamental_model, fundamental_reason, resolved_ticker, company_id, as_of=as_of, today=today,
+            identity=identity)
         # ---- Refresh：由 authority 時序導出 ChangeEvent（只偵測，不判 impact）---------------------
         refresh_changes = None
         metric_observations: list[Any] = []
@@ -294,7 +336,7 @@ def fetch_alpha_investment_view(
                     judged_on = date.fromisoformat(str(raw)[:10]) if raw else signal.as_of
                 except ValueError:
                     judged_on = signal.as_of
-            since = baseline_since(judged_on, records)
+            since = baseline_since(judged_on, [*records, *valuation_records])
             lifecycle_for_refresh = _thesis_lifecycle_entry(str(resolved_ticker)) if as_of is None else None
             try:
                 refresh_changes, metric_observations, refresh_notes = detect_changes(
@@ -302,7 +344,7 @@ def fetch_alpha_investment_view(
                     as_of=as_of, fundamentals_provider=fundamentals_provider, graph_provider=graph_provider,
                     assumption_records=records, lifecycle_entry=lifecycle_for_refresh,
                     watches=(list(watches) if watches is not None else load_watches()),
-                    ticker_obj=resolved_ticker)
+                    ticker_obj=resolved_ticker, valuation_records=valuation_records)
             except Exception as exc:  # noqa: BLE001 — 偵測失敗不讓 view 失敗，但必須現形（not_run）
                 refresh_changes, metric_observations = None, []
                 refresh_notes = [f"變更偵測失敗：{type(exc).__name__}: {str(exc)[:120]}"]
@@ -356,6 +398,7 @@ def fetch_alpha_investment_view(
         catalyst_checkpoints=checkpoints, checkpoint_source=checkpoint_source,
         thesis_lifecycle=lifecycle_entry, checklist=checklist, identity=identity,
         fundamental_model=fundamental_model, fundamental_model_reason=fundamental_reason,
+        valuation=valuation_model, valuation_reason=valuation_reason, valuation_records=valuation_records,
         today=today,
         refresh_changes=refresh_changes, assumption_records=records,
         metric_observations=metric_observations, change_detection=detection,

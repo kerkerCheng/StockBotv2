@@ -295,7 +295,10 @@ def test_scenarios_are_narrative_not_quantitative() -> None:
     assert view.scenarios.meta.capability == CAP_NARRATIVE_SCENARIOS
     assert view.scenarios.bull.basis == "narrative"
     assert view.scenarios.probabilities.status == "not_modeled"
-    assert view.scenarios.target_valuation.status == "not_modeled"
+    # Step 1（2026-09-06）：單點 fair value 有能力了——沒有估值假設是 missing，不再是 not_modeled；
+    # 逐情境目標估值仍然沒有，理由要說出來。
+    assert view.scenarios.target_valuation.status == "missing"
+    assert "逐情境目標估值仍未建模" in (view.scenarios.target_valuation.reason or "")
 
 
 def test_causal_section_is_structural_not_financial() -> None:

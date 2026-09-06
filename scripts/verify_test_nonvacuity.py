@@ -1165,6 +1165,57 @@ MUTATIONS: tuple[Mutation, ...] = (
         test="tests/test_alpha_view_brief.py::test_today_brief_passes_alpha_cards_through_and_keeps_none_distinct",
         guards="L12：「沒注入」與「沒有候選」不得同形",
     ),
+    Mutation(
+        name="估值：ledger 沒生效倍數時偷補一個 default multiple",
+        path="alpha/valuation/model.py",
+        old="    assumption: ValuationAssumption | None = chosen[0] if chosen else None",
+        new="    assumption: ValuationAssumption | None = (chosen[0] if chosen else\n"
+            "                                             (replace(assumption_records[0], value=20.0) if assumption_records else None))",
+        test="tests/test_valuation_model.py::test_missing_multiple_is_missing_not_a_default",
+        guards="沒有 hidden default multiple：ledger 沒有生效假設就是 missing，不得由程式補",
+    ),
+    Mutation(
+        name="估值：price-only 變化讓 fair value 也 recalculate",
+        path="alpha/refresh/policy.py",
+        old="    \"fair_value\": frozenset({FINANCIAL_ACTUAL}),",
+        new="    \"fair_value\": frozenset({FINANCIAL_ACTUAL, MARKET_PRICE}),",
+        test="tests/test_valuation_model.py::test_refresh_states_propagate_through_fair_value_and_gap",
+        guards="price 不進 fair value：價格只動 gap（Step 1 refresh 契約）",
+    ),
+    Mutation(
+        name="估值：builder 自己把 EPS × 倍數算一遍",
+        path="briefing/alpha_view/builder.py",
+        old="            value=valuation.fair_value, status=_refresh_status(fv_refresh), basis=\"deterministic\",",
+        new="            value=(fi.value * valuation.assumptions[0].value if (fi and valuation.assumptions) else valuation.fair_value),\n"
+            "            status=_refresh_status(fv_refresh), basis=\"deterministic\",",
+        test="tests/test_valuation_model.py::test_builder_and_renderer_copy_fair_value_without_computing_it",
+        guards="briefing/alpha_view 只消費 canonical result，不含估值公式",
+    ),
+    Mutation(
+        name="估值：GAAP 倍數套在 non-GAAP EPS 上",
+        path="alpha/valuation/model.py",
+        old="            elif assumption.accounting_basis != fundamental_input.accounting_basis:",
+        new="            elif False and assumption.accounting_basis != fundamental_input.accounting_basis:",
+        test="tests/test_valuation_model.py::test_basis_and_period_mismatch_never_multiply",
+        guards="口徑是身分：GAAP／non-GAAP 不得混算",
+    ),
+    Mutation(
+        name="估值：拿別的 as-of 視角跑出的 fundamental model 算 fair value",
+        path="alpha/valuation/model.py",
+        old="        if fundamental.as_of != as_of:",
+        new="        if False and fundamental.as_of != as_of:",
+        test="tests/test_valuation_model.py::test_historical_as_of_does_not_see_future_valuation_assumptions",
+        guards="INV-6：估值視角與內部基本面視角必須同一個 T",
+    ),
+    Mutation(
+        name="估值：refresh 傳播只認營運假設，估值假設 review 不傳到 fair value",
+        path="alpha/refresh/resolver.py",
+        old="            upstream = (resolved.get(f\"{ARTIFACT_ASSUMPTION}:{aid}\")\n"
+            "                        or resolved.get(f\"{ARTIFACT_VALUATION_ASSUMPTION}:{aid}\"))",
+        new="            upstream = resolved.get(f\"{ARTIFACT_ASSUMPTION}:{aid}\")",
+        test="tests/test_valuation_model.py::test_refresh_states_propagate_through_fair_value_and_gap",
+        guards="supporting evidence 變了 → 估值假設 review_required → fair value 不得假裝 current",
+    ),
 )
 
 
@@ -1236,26 +1287,28 @@ def verify(mutation: Mutation) -> tuple[bool, str]:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--list", action="store_true", help="只列出突變，不執行")
+    parser.add_argument("--only", help="只跑 name 含此子字串的突變（開發時用；驗收仍跑全部）")
     args = parser.parse_args()
+    selected = tuple(m for m in MUTATIONS if not args.only or args.only in m.name)
 
     if args.list:
-        for mutation in MUTATIONS:
+        for mutation in selected:
             print(f"{mutation.name:<40s} → {mutation.test}")
             print(f"{'':<42s}守：{mutation.guards}")
         return 0
 
     failures: list[str] = []
-    for index, mutation in enumerate(MUTATIONS, 1):
+    for index, mutation in enumerate(selected, 1):
         ok, detail = verify(mutation)
         mark = "✓" if ok else "✗"
-        print(f"{mark} [{index:2d}/{len(MUTATIONS)}] {mutation.name}")
+        print(f"{mark} [{index:2d}/{len(selected)}] {mutation.name}")
         print(f"        守：{mutation.guards}")
         print(f"        {detail}")
         if not ok:
             failures.append(f"{mutation.name}：{detail}")
 
     print()
-    print(f"總計 {len(MUTATIONS)} 個突變｜通過 {len(MUTATIONS) - len(failures)}"
+    print(f"總計 {len(selected)} 個突變｜通過 {len(selected) - len(failures)}"
           f"｜**空跑 {len(failures)}**")
     if failures:
         print("\n⚠ 以下斷言是空跑，必須修：")

@@ -412,7 +412,10 @@ def render_alpha_investment_view_markdown(view: AlphaInvestmentView) -> str:
         lines.append(_datum_line(datum))
     lines.append("")
 
-    # 13. Not modeled trio
+    # 13. Valuation（Step 1；`python -m briefing valuation` 單獨印這一節）
+    lines += render_valuation_lines(view)
+
+    # 13a–c. Not modeled trio（估值之後的三個插座）
     for title, section in (("13a. 預期報酬", view.expected_return),
                            ("13b. 下檔", view.downside),
                            ("13c. 進場邏輯／可行動性", view.entry_logic)):
@@ -454,6 +457,42 @@ def render_alpha_investment_view_markdown(view: AlphaInvestmentView) -> str:
     lines += ["", "## ⚠ 警告", ""]
     lines += [f"- {markdown_text(w)}" for w in view.warnings]
     return "\n".join(lines)
+
+
+def render_valuation_lines(view: AlphaInvestmentView) -> list[str]:
+    """第 13 節（估值）。只印 valuation section 的 Datum；公式字串來自 `alpha.valuation`，本檔不含公式。"""
+    lines: list[str] = []
+    va = view.valuation
+    lines += _section("13. 估值（internal EPS × explicit target multiple → deterministic fair value）", va.meta)
+    if va.period:
+        lines.append(
+            f"目標期間：{markdown_text(va.period)}"
+            + (f"（至 {va.period_end.isoformat()}）" if va.period_end else "")
+            + (f"｜口徑 {markdown_text(va.accounting_basis)}" if va.accounting_basis else ""))
+    lines.append(_datum_line(va.method))
+    lines.append(_datum_line(va.fundamental_input))
+    if va.assumptions:
+        lines.append("生效的估值假設（每條各自標知識種類；它不是觀測、不是 LLM runtime 輸出）：")
+        lines += ["  " + _datum_line(d).replace("\n  - ", "\n    - ") for d in va.assumptions]
+    if va.selection is not None:
+        sel = va.selection
+        lines.append(
+            f"估值假設選取：input {sel.input_count}／accepted {sel.accepted_count}／filtered {sel.filtered_count}"
+            f"（{_mapping_text(sel.reasons, None) or '無過濾'}）")
+    lines.append(_datum_line(va.fair_value))
+    lines.append(_datum_line(va.current_price))
+    lines.append(_datum_line(va.fair_value_gap))
+    if va.trace:
+        lines.append("算式（每格標 fundamental_input／assumption／derived）：")
+        lines += ["  " + _datum_line(d).replace("\n  - ", "\n    - ") for d in va.trace]
+    if va.sensitivities:
+        lines.append("fair value 敏感度（每條判斷動一格；確定性微擾，不是機率）：")
+        lines += ["  " + _datum_line(d).replace("\n  - ", "\n    - ") for d in va.sensitivities]
+    lines.append(_datum_line(va.epistemics))
+    lines.append("gap 不是什麼：")
+    lines += [f"- {markdown_text(x)}" for x in va.gap_is_not]
+    lines.append("")
+    return lines
 
 
 def render_refresh_status_lines(view: AlphaInvestmentView) -> list[str]:
@@ -556,9 +595,32 @@ def _disproof_line(d: DisproofItem) -> str:
 # ---------------------------------------------------------------------------
 
 _CARD_HEAD = [
-    "| 標的 | Q1 結構 | Q2／Q3／Q4／Q5（session） | 市場隱含 EPS 成長 | 共識營收成長 | 內部 vs 共識 EPS（同期） | 催化劑／到期 | Disproof | Refresh | 尚未建模 |",
-    "|---|---|---|---|---|---|---|---|---|---|",
+    "| 標的 | Q1 結構 | Q2／Q3／Q4／Q5（session） | 市場隱含 EPS 成長 | 共識營收成長 | 內部 vs 共識 EPS（同期） | Fair value vs 現價 | 催化劑／到期 | Disproof | Refresh | 尚未建模 |",
+    "|---|---|---|---|---|---|---|---|---|---|---|",
 ]
+
+
+def _valuation_cell(card: Mapping[str, Any]) -> str:
+    """fair value 與現價的差。只看 builder 給的 status；缺席印原因，不印 0；**不得改稱 upside／報酬**。"""
+    block = card.get("valuation")
+    if not isinstance(block, Mapping):
+        return "未提供"
+    status = block.get("status")
+    gap = block.get("relative_gap")
+    if status in ("available", "review_required", "invalidated", "stale") and isinstance(gap, (int, float)):
+        text = f"{_pct(gap)}"
+        if isinstance(block.get("fair_value"), (int, float)) and isinstance(block.get("current_price"), (int, float)):
+            text += f"（FV {block['fair_value']:,.1f} vs {block['current_price']:,.2f}）"
+        if block.get("period"):
+            text += f"（{markdown_text(block['period'])}）"
+        if status == "review_required":
+            text += "⚠"
+        elif status == "invalidated":
+            text += "⛔"
+        elif status == "stale":
+            text += "⌛"
+        return text
+    return f"未知（{markdown_text(block.get('reason') or block.get('gap_status') or status or '—')}）"
 
 
 def _internal_gap_cell(card: Mapping[str, Any]) -> str:
@@ -611,7 +673,7 @@ def _score_cell(score: Mapping[str, Any]) -> str:
 
 def _card_row(card: Mapping[str, Any]) -> str:
     if card.get("status") == "unavailable":
-        return (f"| {markdown_text(card.get('ticker') or '?')} | 讀不到 | 讀不到 | 讀不到 | 讀不到 | 讀不到 | 讀不到 | 讀不到 | 讀不到 | "
+        return (f"| {markdown_text(card.get('ticker') or '?')} | 讀不到 | 讀不到 | 讀不到 | 讀不到 | 讀不到 | 讀不到 | 讀不到 | 讀不到 | 讀不到 | "
                 f"（{markdown_text(card.get('reason') or 'unavailable')}） |")
     scores = card.get("scores") or {}
     q1 = _score_cell(scores.get("structural") or {})
@@ -655,8 +717,9 @@ def _card_row(card: Mapping[str, Any]) -> str:
     nm = card.get("not_modeled") or []
     nm_text = f"{len(nm)} 區" if nm else "—"
     gap_text = _internal_gap_cell(card)
+    valuation_text = _valuation_cell(card)
     refresh_text = _refresh_cell(card)
-    return (f"| {label} | {q1} | {others} | {implied_text} | {cons_text} | {gap_text} | {cat_text} | "
+    return (f"| {label} | {q1} | {others} | {implied_text} | {cons_text} | {gap_text} | {valuation_text} | {cat_text} | "
             f"{dis_text} | {refresh_text} | {nm_text} |")
 
 
@@ -686,6 +749,8 @@ def render_alpha_cards(cards: Sequence[Mapping[str, Any]] | None, *, present: bo
         "- 市場隱含 EPS 成長是 trailing／forward PE 的粗略代理，與共識**營收**成長分母不同，不得相減。",
         "- 「內部 vs 共識 EPS」是明示營運假設（session 判斷／heuristic）經確定性橋算出的 EPS 與**同期、同口徑**共識的相對差；"
         "假設不是事實，數字不是 Q4；不可比或缺料一律「未知」。",
+        "- 「Fair value vs 現價」是內部 EPS × 明示目標倍數（session 判斷）算出的 fair value 與現價的相對差；"
+        "**它不是 expected return、不是 upside forecast、不是進場訊號**（horizon 與報酬語意是 Step 2）；沒有估值假設一律「未知」。",
         "- 「尚未建模」列的是 expected return／downside／entry logic 等系統還沒有的能力。",
         "",
     ]

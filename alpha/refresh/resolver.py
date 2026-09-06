@@ -24,11 +24,12 @@ from typing import Any, Mapping, Sequence
 from ..fundamental.contracts import PERIOD_MATCH_TOLERANCE_DAYS
 from .artifacts import THESIS_ARTIFACT_ID, end_of_day
 from .contracts import (
-    ARTIFACT_ASSUMPTION, ARTIFACT_AXIS, ARTIFACT_COMPARISON, ARTIFACT_MARKET_IMPLIED,
-    ARTIFACT_METRIC, ARTIFACT_MODEL, ARTIFACT_THESIS, CONSENSUS, CONTEXT_DIGEST, CURRENT,
+    ARTIFACT_ASSUMPTION, ARTIFACT_AXIS, ARTIFACT_COMPARISON, ARTIFACT_FAIR_VALUE, ARTIFACT_FAIR_VALUE_GAP,
+    ARTIFACT_MARKET_IMPLIED, ARTIFACT_METRIC, ARTIFACT_MODEL, ARTIFACT_THESIS, ARTIFACT_VALUATION_ASSUMPTION,
+    ASSUMPTION_ARTIFACT_TYPES, CONSENSUS, CONTEXT_DIGEST, CURRENT,
     DISPROOF_SIGNAL, FISCAL_PERIOD_ROLLOVER, INVALIDATED, KIND_DETERMINISTIC, KIND_JUDGMENT,
     MISSING, OPERATING_ASSUMPTION, RECALCULATE, REVIEW_REQUIRED, ROLE_CALIBRATION, ROLE_LEGACY,
-    ROLE_SUPPORTING, STALE, SUPERSEDED, THESIS_REVIEW_DUE, COMPANY_GUIDANCE,
+    ROLE_SUPPORTING, STALE, SUPERSEDED, THESIS_REVIEW_DUE, COMPANY_GUIDANCE, VALUATION_ASSUMPTION,
     AffectedArtifact, ArtifactDependency, ChangeEvent, MetricObservation, RefreshReport,
     merge_states,
 )
@@ -38,7 +39,10 @@ from .policy import (
 )
 
 _ORDER = {ARTIFACT_AXIS: 0, ARTIFACT_THESIS: 1, ARTIFACT_ASSUMPTION: 2, ARTIFACT_METRIC: 3,
-          ARTIFACT_COMPARISON: 4, ARTIFACT_MARKET_IMPLIED: 5, ARTIFACT_MODEL: 6}
+          ARTIFACT_COMPARISON: 4, ARTIFACT_MARKET_IMPLIED: 5, ARTIFACT_MODEL: 6,
+          ARTIFACT_VALUATION_ASSUMPTION: 7, ARTIFACT_FAIR_VALUE: 8, ARTIFACT_FAIR_VALUE_GAP: 9}
+#: 「自己就是那筆新紀錄」的 change class（新紀錄的建立不是對它自己的變化）。
+_LEDGER_CHANGE_TYPES: frozenset[str] = frozenset({OPERATING_ASSUMPTION, VALUATION_ASSUMPTION})
 _AXIS_ORDER = {"structural": 0, "value_capture": 1, "earnings_exposure": 2, "expectation_gap": 3,
                "catalyst": 4}
 
@@ -270,10 +274,10 @@ def _derived_hits(artifact: ArtifactDependency, event: ChangeEvent) -> list[_Hit
     if touched and event.change_type not in (THESIS_REVIEW_DUE, DISPROOF_SIGNAL, FISCAL_PERIOD_ROLLOVER):
         hits.append(_Hit(RECALCULATE, f"輸入 {touched} 變了（{event.change_type}）——重算即可",
                          event.changed_ref, event.observed_at, touched))
-    if event.change_type == OPERATING_ASSUMPTION:
+    if event.change_type in _LEDGER_CHANGE_TYPES:
         superseded = _touches(event, frozenset(artifact.assumption_ids))
         if superseded:
-            hits.append(_Hit(RECALCULATE, f"輸入假設 {superseded} 已被取代——用新假設重跑橋即可",
+            hits.append(_Hit(RECALCULATE, f"輸入假設 {superseded} 已被取代——用新假設重算即可",
                              event.changed_ref, event.observed_at, superseded))
     if (event.change_type == FISCAL_PERIOD_ROLLOVER and artifact.artifact_type == ARTIFACT_MODEL
             and event.target_artifact == artifact.artifact_id):
@@ -286,7 +290,7 @@ def _hits_for(artifact: ArtifactDependency, event: ChangeEvent) -> list[_Hit]:
         return _axis_hits(artifact, event)
     if artifact.artifact_type == ARTIFACT_THESIS:
         return _thesis_hits(artifact, event)
-    if artifact.artifact_type == ARTIFACT_ASSUMPTION:
+    if artifact.artifact_type in ASSUMPTION_ARTIFACT_TYPES:
         return _assumption_hits(artifact, event)
     return _derived_hits(artifact, event)
 
@@ -332,7 +336,7 @@ def resolve_refresh(
     accepted.extend(_rollover_events(visible, ticker=ticker, company_id=company_id, notes=notes))
     accepted.sort(key=lambda e: (e.observed_at, e.change_type, e.changed_ref))
 
-    legacy = [a for a in visible if a.artifact_type == ARTIFACT_ASSUMPTION
+    legacy = [a for a in visible if a.artifact_type in ASSUMPTION_ARTIFACT_TYPES
               and a.extras.get("provenance_semantics") == "legacy" and a.preset_state is None]
     if legacy:
         notes.append(f"{len(legacy)} 條生效假設是 legacy provenance（未宣告 ref 角色）：未分類 ref 一律當 "
@@ -352,7 +356,7 @@ def resolve_refresh(
         for event in accepted:
             if artifact.established_at is not None and event.known_at() <= artifact.established_at:
                 continue                       # 建立當時已經知道（世界或系統）——不是新變化
-            if event.change_type == OPERATING_ASSUMPTION and event.changed_ref == artifact.artifact_id:
+            if event.change_type in _LEDGER_CHANGE_TYPES and event.changed_ref == artifact.artifact_id:
                 continue                       # 自己就是那筆新紀錄
             hits.extend(_hits_for(artifact, event))
         resolved[artifact.key] = _compose(artifact, hits)
@@ -368,7 +372,9 @@ def resolve_refresh(
         states: list[str] = [current.state]
         inherited: list[tuple[str, str]] = []
         for aid in artifact.assumption_ids:
-            upstream = resolved.get(f"{ARTIFACT_ASSUMPTION}:{aid}")
+            # 上游可能是營運假設（oa_*）或估值假設（va_*）；兩者都是宣告過的依賴，都沿一層傳播。
+            upstream = (resolved.get(f"{ARTIFACT_ASSUMPTION}:{aid}")
+                        or resolved.get(f"{ARTIFACT_VALUATION_ASSUMPTION}:{aid}"))
             if upstream is None or upstream.state in (CURRENT, MISSING):
                 continue
             mapped = {REVIEW_REQUIRED: REVIEW_REQUIRED, INVALIDATED: INVALIDATED,

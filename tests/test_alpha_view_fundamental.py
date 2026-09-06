@@ -187,10 +187,10 @@ def test_compact_card_and_daily_brief_cell_select_the_gap_without_recomputing() 
     assert card["internal_vs_consensus"]["eps"]["period"] == "FY2027"
     assert "internal_fundamentals" not in card["not_modeled"]
     row = next(l for l in render_alpha_cards([card]) if l.startswith("| co:coherent"))
-    assert "（FY2027）" in row and row.count("|") == 11        # Step 0.5 多一欄 Refresh
+    assert "（FY2027）" in row and row.count("|") == 12        # Step 0.5 多一欄 Refresh；Step 1 多一欄 Fair value
     # 舊 fixture 沒有這個欄位 → 「未提供」，不是 0
     legacy = next(l for l in render_alpha_cards([_card()]) if l.startswith("| co:coherent"))
-    assert "未提供" in legacy and legacy.count("|") == 11
+    assert "未提供" in legacy and legacy.count("|") == 12
 
 
 def test_sources_fail_soft_when_the_provider_has_no_fiscal_capability(monkeypatch: pytest.MonkeyPatch) -> None:

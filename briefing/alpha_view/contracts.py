@@ -118,6 +118,9 @@ CAP_NUMERIC_EXPECTATION_GAP = "numeric_internal_vs_consensus"
 #: 已分類的變化，**不解析自然語言 disproof、不改 thesis、不自動呼叫 LLM**——所以不是
 #: `CAP_AUTOMATIC_INVALIDATION`（那個名字保留給「會自己判定條件並改狀態」的東西，今天不存在）。
 CAP_DEPENDENCY_IMPACT = "dependency_impact_v1"
+#: Step 1（2026-09-06）：內部 FY 目標期間 EPS × 明示目標倍數 → 確定性 fair value ＋ 與現價的差。
+#: 它**不是** expected return／upside forecast／entry signal（horizon 與報酬語意是 Step 2）。
+CAP_DETERMINISTIC_FAIR_VALUE = "deterministic_fair_value_v1"
 
 
 class ViewContractViolation(ValueError):
@@ -513,6 +516,33 @@ class ScenarioSection:
 
 
 @dataclass(frozen=True, slots=True)
+class ValuationSection:
+    """估值（Step 1）：**只消費** `alpha.valuation.build_valuation` 的輸出，builder 不含任何估值公式。
+
+    - `fair_value`／`current_price`／`fair_value_gap` 三格分開：fair value 不依賴現價，gap 才依賴。
+    - `assumptions` 是生效的估值假設（每條自帶 basis／rationale／證據角色）；`trace` 是算式的每一格。
+    - `epistemics` 回答「fair value 裡多少是算術、多少是判斷」——它是分解與計數，不是新判斷。
+    - `gap_is_not`：這格明列 gap 不是什麼（expected return／upside forecast／entry signal／buy-sell）。
+    """
+
+    meta: SectionMeta                          # available／missing／review_required／invalidated
+    method: Datum
+    fundamental_input: Datum                   # 內部 EPS（照抄 internal_fundamentals 那一格的值）
+    assumptions: tuple[Datum, ...]
+    fair_value: Datum
+    current_price: Datum
+    fair_value_gap: Datum
+    trace: tuple[Datum, ...]
+    sensitivities: tuple[Datum, ...]
+    epistemics: Datum
+    selection: "EvidenceSelectionCounts | None"
+    gap_is_not: tuple[str, ...]
+    period: str | None = None
+    period_end: date | None = None
+    accounting_basis: str | None = None
+
+
+@dataclass(frozen=True, slots=True)
 class NotModeledSection:
     """expected_return／downside／entry_logic 共用的形狀：全 not_modeled，附「不是什麼」。"""
 
@@ -646,6 +676,7 @@ class AlphaInvestmentView:
     catalysts: CatalystSection
     falsification: FalsificationSection
     scenarios: ScenarioSection
+    valuation: ValuationSection
     expected_return: NotModeledSection
     downside: NotModeledSection
     entry_logic: NotModeledSection
@@ -658,7 +689,7 @@ class AlphaInvestmentView:
     SECTIONS_WITH_META = (
         "variant_view", "structural_thesis", "causal_paths", "fundamentals", "consensus",
         "price_implied_expectations", "internal_fundamentals", "earnings_bridge",
-        "expectation_gap", "catalysts", "falsification", "scenarios", "expected_return",
+        "expectation_gap", "catalysts", "falsification", "scenarios", "valuation", "expected_return",
         "downside", "entry_logic", "evidence", "refresh_status",
     )
 
@@ -699,7 +730,8 @@ def _jsonable(obj: Any) -> Any:
 
 __all__ = [
     "AlphaInvestmentView", "BASES", "BASIS_LABEL", "Basis", "CAP_AUTOMATIC_INVALIDATION",
-    "CAP_CATALYST_UNLINKED", "CAP_DEPENDENCY_IMPACT", "CAP_FINANCIAL_CAUSAL", "CAP_NARRATIVE_SCENARIOS",
+    "CAP_CATALYST_UNLINKED", "CAP_DEPENDENCY_IMPACT", "CAP_DETERMINISTIC_FAIR_VALUE", "CAP_FINANCIAL_CAUSAL",
+    "CAP_NARRATIVE_SCENARIOS", "ValuationSection",
     "CAP_NUMERIC_EXPECTATION_GAP", "ChangeItem", "REFRESH_STATUSES", "RefreshItem", "RefreshStatusSection",
     "CAP_QUANTITATIVE_SCENARIOS", "CAP_STRUCTURAL_CAUSAL", "CAP_STRUCTURED_DISPROOF",
     "CatalystItem", "CatalystSection", "CausalPathSection", "CheckpointItem",

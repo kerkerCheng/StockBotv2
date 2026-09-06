@@ -272,11 +272,118 @@ def cmd_assumptions(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_valuation(args: argparse.Namespace) -> int:
+    """ValuationAssumption ledger 的讀寫入口（Valuation Model v1，Step 1）。
+
+    - `--list`：列出 ledger 全部紀錄（含已撤回／被取代者，稽核用）。
+    - `--add spec.json`：append 一筆。spec 給 period_end／value／basis／accounting_basis／rationale／
+      evidence_refs（supporting）＋可選 calibration_refs／comparison_refs／review_conditions／supersedes_id；
+      method／parameter 預設 forward_earnings_multiple／target_pe；id 與 created_at 由程式產生。
+    - `--retract <id>`：append 一筆撤回紀錄。
+
+    ⚠ 這裡**不算 fair value**、也不驗證 evidence_refs 解析得到哪裡——解析在估值執行時做，解析不到的
+    假設會被拒用並計數（INV-3）。**沒有 hidden default**：ledger 沒紀錄，fair value 就是 missing。
+    """
+    from datetime import datetime, timezone
+
+    from .providers.valuation_assumptions import (
+        append_valuation_assumption_record, read_valuation_assumption_records,
+    )
+    from .valuation.assumptions import valuation_assumption_record
+
+    try:
+        resolved_ticker, company_id = _resolve_company(args.ticker)
+    except AlphaError as exc:
+        print(f"✗ {exc}", file=sys.stderr)
+        return 2
+    ticker = str(resolved_ticker)
+
+    if args.add or args.retract:
+        if args.add:
+            spec = json.loads(Path(args.add).read_text(encoding="utf-8"))
+            try:
+                record = valuation_assumption_record(
+                    company_id=str(company_id), ticker=ticker,
+                    period_end=date.fromisoformat(str(spec["period_end"])),
+                    value=float(spec["value"]), basis=str(spec["basis"]),
+                    accounting_basis=str(spec["accounting_basis"]),
+                    rationale=str(spec.get("rationale") or ""),
+                    evidence_refs=list(spec.get("evidence_refs") or []),
+                    method=str(spec.get("method") or "forward_earnings_multiple"),
+                    parameter=str(spec.get("parameter") or "target_pe"),
+                    supersedes_id=spec.get("supersedes_id"),
+                    author=str(spec.get("author") or "session"),
+                    created_at=datetime.now(timezone.utc),
+                    calibration_refs=list(spec.get("calibration_refs") or []),
+                    comparison_refs=list(spec.get("comparison_refs") or []),
+                    review_conditions=list(spec.get("review_conditions") or []),
+                )
+            except (KeyError, ValueError, TypeError, AlphaError) as exc:
+                print(f"✗ 估值假設不合法：{exc}", file=sys.stderr)
+                return 2
+        else:
+            existing, _ = read_valuation_assumption_records(ticker)
+            target = next((r for r in existing if r.assumption_id == args.retract), None)
+            if target is None:
+                print(f"✗ ledger 裡沒有 {args.retract}", file=sys.stderr)
+                return 2
+            record = valuation_assumption_record(
+                company_id=target.company_id, ticker=ticker, period_end=target.period.end,
+                value=target.value, basis=target.basis, accounting_basis=target.accounting_basis,
+                rationale=str(args.rationale or "retracted"),
+                evidence_refs=list(target.supporting_refs), calibration_refs=list(target.calibration_refs),
+                comparison_refs=[r for r in target.evidence_refs if target.role_of(r) == "comparison"],
+                method=target.method, parameter=target.parameter, supersedes_id=target.assumption_id,
+                retracted=True, created_at=datetime.now(timezone.utc),
+            )
+        try:
+            path = append_valuation_assumption_record(record)
+        except AlphaError as exc:
+            print(f"✗ {exc}", file=sys.stderr)
+            return 2
+        print(f"✓ {record['assumption_id']} → {path}")
+        print(f"  下一步：python -m briefing valuation {ticker} 會在估值執行時解析 evidence_refs；解析不到會被拒用並計數")
+        return 0
+
+    records, errors = read_valuation_assumption_records(ticker)
+    if args.format == "json":
+        payload = [{
+            "assumption_id": r.assumption_id, "period": r.period.label, "period_end": r.period.end.isoformat(),
+            "method": r.method, "parameter": r.parameter, "value": r.value, "unit": r.unit, "basis": r.basis,
+            "accounting_basis": r.accounting_basis, "created_at": r.created_at.isoformat(), "author": r.author,
+            "supersedes_id": r.supersedes_id, "retracted": r.retracted,
+            "evidence_refs": list(r.evidence_refs), "dependency_roles": dict(r.dependency_roles),
+            "review_conditions": [c.to_dict() for c in r.review_conditions], "rationale": r.rationale,
+        } for r in records]
+        print(json.dumps({"ticker": ticker, "records": payload, "parse_errors": errors}, ensure_ascii=False, indent=2))
+        return 0
+    print(f"# {ticker} ValuationAssumption ledger（{len(records)} 筆，解析失敗 {len(errors)}）")
+    for r in records:
+        mark = "（已撤回）" if r.retracted else ""
+        print(f"- {r.assumption_id} {r.period.label} {r.method}.{r.parameter} = {r.value} {r.unit}"
+              f" 〔{r.basis}｜{r.accounting_basis}〕 created {r.created_at.date()}{mark}")
+        print(f"    {r.rationale[:160]}")
+        print(f"    supporting：{', '.join(r.supporting_refs[:3])}｜calibration：{', '.join(r.calibration_refs[:3]) or '—'}")
+    for error in errors:
+        print(f"- ⚠ 解析失敗：{error}")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="python -m alpha", description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = parser.add_subparsers(dest="command", required=True)
+
+    valuation = sub.add_parser(
+        "valuation", help="ValuationAssumption ledger：--list／--add spec.json／--retract <id>（Step 1）")
+    valuation.add_argument("ticker")
+    valuation.add_argument("--list", action="store_true", help="（預設）列出 ledger")
+    valuation.add_argument("--add", help="append 一筆估值假設（JSON spec 檔路徑）")
+    valuation.add_argument("--retract", help="append 一筆撤回紀錄（指定 assumption_id）")
+    valuation.add_argument("--rationale", help="撤回理由")
+    valuation.add_argument("--format", choices=("markdown", "json"), default="markdown")
+    valuation.set_defaults(func=cmd_valuation)
 
     assumptions = sub.add_parser(
         "assumptions", help="OperatingAssumption ledger：--list／--add spec.json／--retract <id>")
